@@ -2,7 +2,7 @@
  * 
  * Fabien Coelho, August 1993
  *
- * $RCSfile: o-analysis.c,v $ ($Date: 1995/12/20 16:49:26 $, )
+ * $RCSfile: o-analysis.c,v $ ($Date: 1995/12/22 16:06:11 $, )
  * version $Revision$
  */
 
@@ -15,228 +15,9 @@ static list lblocks = NIL, lloop  = NIL;
 
 GENERIC_LOCAL_MAPPING(variable_used, int, entity)
 
-/* must clear everything before returning in Overlap_Analysis...
+/* true if there is no cyclic distribution for the array
  */
-#define RETURN(x) \
-{ gen_free_list(Wa); gen_free_list(lWa); gen_free_list(Ra);\
-  gen_free_list(lRa); gen_free_list(Ro); gen_free_list(lRo);\
-  gen_free_list(Rrt); gen_free_list(lblocks); gen_free_list(lloop);\
-  reset_hpfc_current_statement(); reset_current_loops(); return x;}
-
-/* check conditions and compile...
- */
-bool Overlap_Analysis(stat, pstat)
-statement stat, *pstat;
-{
-    list lw = NIL, lr = NIL, Ra = NIL, Ro = NIL, Rrt = NIL,
-	lWa = NIL, lRa = NIL, lRo = NIL, W  = NIL, Wa = NIL, 
-        Wrt = NIL, lvect = NIL, lkind = NIL;
-    syntax the_written_syntax = syntax_undefined;
-    reference the_written_reference = reference_undefined;
-    statement innerbody, messages_stat, newloopnest;
-
-    DEBUG_STAT(9, "considering statement", stat);
-
-    set_hpfc_current_statement(stat);
-    set_current_loops(stat);
-
-    lblocks = NIL,
-    lloop = NIL;
-    innerbody = parallel_loop_nest_to_body(stat, &lblocks, &lloop);
-
-    FindRefToDistArrayInStatement(innerbody, &lw, &lr);
-
-    /* keeps only written references of which dimensions are block distributed,
-     * and indices simple enough (=> normalization of loops may be usefull).
-     * ??? bug: should also search for A(i,i) things that are forbidden...
-     */
-    MAP(SYNTAX, s,
-    {
-	reference r = syntax_reference(s);
-	entity array = reference_variable(r);
-	
-	if ((block_distributed_p(array)) && 
-	    (simple_indices_p(r)) &&
-	    (!replicated_p(array)))
-	    W = CONS(SYNTAX, s, W);
-	else
-	    Wrt = CONS(SYNTAX, s, Wrt);
-    },
-	lw);
-
-    gen_free_list(lw);
-    if (W==NIL) /* no ok distributed variable written ! */
-    {
-	pips_debug(7, "FALSE: no ok distributed variable written\n");
-	RETURN(FALSE);
-    }
-	
-    
-    the_written_syntax = choose_one_syntax_in_references_list(&W);
-
-    the_written_reference = syntax_reference(the_written_syntax);
-    Wa = CONS(SYNTAX, the_written_syntax, NIL);
-    if (!align_check(the_written_reference,
-		     the_written_reference, &lvect, &lkind))
-	pips_error("Overlap_Analysis","no self alignment!\n");
-    
-    lWa = CONS(CONSP, CONS(CONSP, lkind,
-		      CONS(CONSP, lvect, NIL)), NIL);
-
-    MAP(SYNTAX, s,
-    {
-	reference r = syntax_reference(s);
-
-	 if (align_check(the_written_reference, r, &lvect, &lkind))
-	 {
-	     if (aligned_p(the_written_reference, r, lvect, lkind))
-	     {
-		 Wa = gen_nconc(Wa, CONS(SYNTAX, s, NIL));
-		 lWa = gen_nconc(lWa, CONS(CONSP,
-					   CONS(CONSP, lkind, 
-						CONS(CONSP, lvect, NIL)),
-					   NIL));
-	     }
-	     else /* ??? what about loop splitting */
-	     {
-		 Wrt = gen_nconc(Wrt, CONS(SYNTAX, s, NIL));
-		 gen_free_list(lvect);
-		 gen_free_list(lkind); /* ??? memory leak */
-	     }
-	 }
-	 else
-	 {
-	     Wrt = gen_nconc(Wrt, CONS(SYNTAX, s, NIL));
-	     gen_free_list(lvect);
-	     gen_free_list(lkind); /* ??? memory leak */
-	 }
-     },
-	 CDR(W));
-
-    gen_free_list(W);
-    
-    debug(5, "Overlap_Analysis",
-	  "Wa length is %d (%d), Wrt lenght is %d\n",
-	  gen_length(Wa), gen_length(lWa), gen_length(Wrt));
-
-    if (gen_length(Wrt)!=0) 
-	RETURN(FALSE);
-
-    /* Now, we have the fellowing situation:
-     *
-     * Wa: set of aligned written references, the first of which is ``the'' ref.
-     */
-    MAP(SYNTAX, s,
-     {
-	 reference r = syntax_reference(s);
-	 entity array = reference_variable(r);
-	 list lvect = NIL;
-	 list lkind = NIL;
-
-	 debug(6, "Overlap_Analysis",
-	       "dealing with reference of array %s\n",
-	       entity_name(array));
-
-	 ifdebug(6)
-	 {
-	     fprintf(stderr, "[Overlap_Analysis]\nreference is:\n");
-	     print_reference(r);
-	     fprintf(stderr, "\n");
-	 }
-
-	 if (align_check(the_written_reference, r, &lvect, &lkind))
-	 {
-	     if (aligned_p(the_written_reference, r, lvect, lkind))
-	     {
-		 Ra = gen_nconc(Ra, CONS(SYNTAX, s, NIL));
-		 lRa = gen_nconc(lRa, CONS(CONSP,
-					   CONS(CONSP, lkind, 
-						CONS(CONSP, lvect, NIL)),
-					   NIL));    
-	     }
-	     else
-	     if (message_manageable_p(array, lvect, lkind))
-	     {
-		 Ro = gen_nconc(Ro, CONS(SYNTAX, s, NIL));
-		 lRo = gen_nconc(lRo, CONS(CONSP,
-					   CONS(CONSP, lkind, 
-						CONS(CONSP, lvect, NIL)),
-					   NIL));
-	     }
-	     else
-	     {
-		 Rrt = gen_nconc(Rrt, CONS(SYNTAX, s, NIL));
-		 gen_free_list(lvect);
-		 gen_free_list(lkind);
-	     }
-	 }
-	 else
-	 {
-	     Rrt = gen_nconc(Rrt, CONS(SYNTAX, s, NIL));
-	     gen_free_list(lvect);
-	     gen_free_list(lkind);
-	 }
-     },
-	 lr);
-
-    gen_free_list(lr);
-
-    debug(5, "Overlap_Analysis",
-	  "Ra length is %d, Ro length is %d, Rrt lenght is %d\n",
-	  gen_length(Ra), gen_length(Ro), gen_length(Rrt));
-
-    if (gen_length(Rrt)!=0) 
-	RETURN(FALSE);
-
-    /* here is the situation now:
-     *
-     * Wa set of aligned references written,
-     * Ra set of aligned references read,
-     * Ro set of nearly aligned references that suits the overlap analysis
-     */
-
-    /* messages handling
-     */
-
-    messages_stat = ((gen_length(Ro)>0)?
-		     (messages_handling(Ro, lRo)):
-		     (make_continue_statement(entity_empty_label())));
-
-    /* generate the local loop for every processor, given the global loop
-     * bounds. The former indexes have to be computed, and the loops are
-     * based upon new indexes, of which names have to be propagated in the
-     * body of the loop. This generation is to be based on the normalized
-     * form computed for every references of Ro, but it is direct for
-     * Ra and Wa, since new declarations implied that the alignment is
-     * performed for distributed indices. Not distributed dimensions
-     * indices have not to be touched, (at least if no new declarations are
-     * the common case)
-     */
-    
-    if (!generate_optimized_code_for_loop_nest
-	(innerbody, &newloopnest, Wa, Ra, Ro, lWa, lRa, lRo))
-	RETURN(FALSE);
-
-    (*pstat) = 
-	make_block_statement
-	    (CONS(STATEMENT, messages_stat,
-	     CONS(STATEMENT, loop_nest_guard(newloopnest,
-					     the_written_reference,
-					     CONSP(CAR(CONSP(CAR(lWa)))),
-					     CONSP(CAR(CDR(CONSP(CAR(lWa)))))),
-		  NIL)));    
-
-    DEBUG_STAT(8, entity_name(node_module), *pstat);
-
-    RETURN(TRUE);
-}
-
-/* bool block_distributed_p(array)
- *
- * true if there is no cyclic distribution for the array
- */
-bool block_distributed_p(array)
-entity array;
+bool block_distributed_p(entity array)
 {
     int	dim = NumberOfDimension(array);
     tag n;
@@ -254,29 +35,22 @@ entity array;
     return(TRUE);
 }
 
-/* bool simple_indices_p(r)
- *
- * true if indices are constants or index
+/* true if indices are constants or index
  */
-bool simple_indices_p(r)
-reference r;
+static bool simple_indices_p(reference r)
 {
-    entity
-	array = reference_variable(r);
-    int
-	dim = 1;
+    entity array = reference_variable(r);
+    int	dim = 1;
 
     MAP(EXPRESSION, e,
      {
-	 normalized /* must be normalized somewhere! */
-	     n = expression_normalized(e); 
+	 normalized  n = expression_normalized(e); 
 	 int p;
 	 bool b1 = ith_dim_distributed_p(array, dim, &p);
 	 bool b2 = ((!b1) ? local_integer_constant_expression(e) : FALSE);
 
-	 debug(7, "simple_indices_p",
-	       "array %s, dim %d, distributed %d, locally constant %d\n",
-	       entity_name(array), dim, b1, b2);
+	 pips_debug(7, "%s(DIM=%d), distributed %d, locally constant %d\n",
+		    entity_name(array), dim, b1, b2);
 
 	 if (!b2)
 	 {
@@ -340,17 +114,16 @@ reference r;
     return(TRUE);
 }
 
-/* bool aligned_p(r1, r2, lvref, lkref)
- *
- * true if references are aligned or, for constants, on the same processor...
+/* true if references are aligned or, for constants, on the same processor...
  */
-bool aligned_p(r1, r2, lvref, lkref)
-reference r1, r2;
-list lvref, lkref;
+static bool 
+aligned_p(
+    reference r1,
+    reference r2,
+    list lvref,
+    list lkref)
 {
-    entity
-	e2 = reference_variable(r2),
-	template = array_to_template(e2);
+    entity e2 = reference_variable(r2),	template = array_to_template(e2);
     list lv = lvref, lk = lkref;
     bool result = TRUE;
     int i = 1 ;
@@ -362,11 +135,8 @@ list lvref, lkref;
     {
 	tag t = access_tag(INT(CAR(lk)));
 	Pvecteur v = (Pvecteur) PVECTOR(CAR(lv));
-	int
-	    p,
+	int p,
 	    tpldim = template_dimension_of_array_dimension(e2, i),
-/*	    s   = vect_size(v),
-	    cst = vect_coeff(TCST, v), */
 	    tpl = vect_coeff(TEMPLATEV, v),
 	    dlt = vect_coeff(DELTAV, v),
 	    tsh = vect_coeff(TSHIFTV, v);
@@ -384,15 +154,27 @@ list lvref, lkref;
     return(result);
 }
 
-/* bool message_manageable_p(array, lpref, lkref) 
- *
- * conditions:
- * every thing should be manageable, i.e.
+/* true if the given template elements on the specified dimension
+ * are mapped on the same processor.
+ */
+static bool on_same_proc_p(t1, t2, template, dim)
+int t1, t2;
+entity template;
+int dim;
+{
+    int p;
+    return(processor_number(template, dim, t1, &p) ==
+	   processor_number(template, dim, t2, &p));
+}
+
+/* every thing should be manageable, i.e.
  * no star in the dimensions, and the width has to be accepted...
  */
-bool message_manageable_p(array, lpref, lkref)
-entity array;
-list lpref, lkref;
+static bool 
+message_manageable_p(
+    entity array,
+    list lpref,
+    list lkref)
 {
     list lp = NIL, lk = NIL;
     int	i;
@@ -400,8 +182,7 @@ list lpref, lkref;
     for(i=1, lk=lkref, lp=lpref ; lk!=NIL ; lk=CDR(lk), lp=CDR(lp))
     {
 	tag ta = access_tag(INT(CAR(lk)));
-	int
-	    p = 0,
+	int p = 0,
 	    shift = vect_coeff(TSHIFTV, (Pvecteur) PVECTOR(CAR(lp))),
 	    dlt = vect_coeff(DELTAV, (Pvecteur) PVECTOR(CAR(lp))),
 	    t2 = vect_coeff(TEMPLATEV, (Pvecteur) PVECTOR(CAR(lp)));
@@ -438,16 +219,11 @@ list lpref, lkref;
 
     for(i=1, lk=lkref, lp=lpref ; lk!=NIL ; lk=CDR(lk), lp=CDR(lp))
     {
-	tag
-	    ta = access_tag(INT(CAR(lk)));
-	int
-	    shift = vect_coeff(TSHIFTV, (Pvecteur) PVECTOR(CAR(lp)));
+	tag ta = access_tag(INT(CAR(lk)));
+	int shift = vect_coeff(TSHIFTV, (Pvecteur) PVECTOR(CAR(lp)));
 
 	if ((ta==aligned_shift) && (shift!=0))
-	    set_overlap(array, 
-			i, 
-			((shift<0)?(0):(1)), 
-			abs(shift));
+	    set_overlap(array, i, (shift<0)?(0):(1), abs(shift));
 
 	i++;
     }
@@ -455,11 +231,11 @@ list lpref, lkref;
     return(TRUE); /* accepted! */
 }
 
+/*
 bool statically_decidable_loops(l)
 list l;
 {
-    range
-	r = ((ENDP(l))?(NULL):(loop_range(LOOP(CAR(l)))));
+    range r = ((ENDP(l))?(NULL):(loop_range(LOOP(CAR(l)))));
 
     return((ENDP(l))?
 	   (TRUE):
@@ -469,29 +245,18 @@ list l;
 	    (HpfcExpressionToInt(range_increment(r))==1) &&
 	    statically_decidable_loops(CDR(l))));
 }
+*/
 
 bool expression_integer_constant_p(e)
 expression e;
 {
-    syntax
-	s = expression_syntax(e);
-    normalized
-	n = expression_normalized(e);
+    syntax s = expression_syntax(e);
+    normalized n = expression_normalized(e);
 
     if ((n!=normalized_undefined) && (normalized_linear_p(n)))
     {
-	Pvecteur
-	    v = normalized_linear(n);
-	int
-	    s = vect_size(v);
-
-	ifdebug(8)
-	{
-	    fprintf(stderr, 
-		    "[expression_integer_constant_p] normalized linear, size %d, TCST %d\n",
-		    s, (int) vect_coeff(TCST,v));
-	    print_expression(e);
-	}
+	Pvecteur v = normalized_linear(n);
+	int s = vect_size(v);
 
 	if (s==0) return(TRUE);
 	if (s>1) return(FALSE);
@@ -500,10 +265,8 @@ expression e;
     else
     if (syntax_call_p(s))
     {
-	call 
-	    c = syntax_call(s);
-	value
-	    v = entity_initial(call_function(c));
+	call c = syntax_call(s);
+	value v = entity_initial(call_function(c));
 
 	/* I hope a short evaluation is made by the compiler */
 	return((value_constant_p(v)) && (constant_int_p(value_constant(v))));
@@ -514,11 +277,15 @@ expression e;
 
 /*   generate the call to the dynamic loop bounds computation
  */
-static statement statement_compute_bounds(newlobnd, newupbnd, oldidxvl, 
-				   lb, ub, an, dp)
-entity newlobnd, newupbnd, oldidxvl;
-expression lb, ub;
-int an, dp;
+static statement 
+statement_compute_bounds(
+    entity newlobnd,
+    entity newupbnd, 
+    entity oldidxvl, 
+    expression lb,
+    expression ub,
+    int an,
+    int dp)
 {
     list
 	l = CONS(EXPRESSION, entity_to_expression(newlobnd),
@@ -533,25 +300,357 @@ int an, dp;
     return(hpfc_make_call_statement(hpfc_name_to_entity(LOOP_BOUNDS), l));
 }
 
-static statement make_loop_nest_for_overlap(lold, lnew, lbl,
-					    new_indexes, old_indexes, 
-					    innerbody)
-list lold, lnew, lbl;
-entity_mapping new_indexes, old_indexes;
-statement innerbody;
+/*  To Kill scalar definitions within the generated code
+ *  recognize if only one reference. 
+ */
+static bool hpfc_killed_scalar;
+
+static void hpfc_overlap_kill_unused_scalars_rewrite(stat)
+statement stat;
 {
+    instruction
+	i = statement_instruction(stat);
+    expression
+	e = expression_undefined;
     entity
-	index, 
-	oldindexvalue;
-    loop
-	oldloop,
-	newloop;
-    list
-	l,
-	lnew_loop = NIL,
-	lnew_body = NIL;
-    bool
-	compute_index = FALSE;
+	var = entity_undefined;
+
+    if (!instruction_assign_p(i)) return;
+
+    e = EXPRESSION(CAR(call_arguments(instruction_call(i))));
+
+    assert(expression_reference_p(e));
+
+    var = reference_variable(syntax_reference(expression_syntax(e)));
+
+    debug(5, "hpfc_overlap_kill_unused_scalars_rewrite",
+	  "considering definition of %s (statement 0x%x)\n",
+	  entity_name(var), stat);
+
+    if (entity_integer_scalar_p(var) &&
+	load_entity_variable_used(var)==1)
+    {
+	debug(3, "hpfc_overlap_kill_unused_scalars_rewrite",
+	      "killing definition of %s (statement 0x%x)\n",
+	      entity_name(var), stat);
+
+	hpfc_killed_scalar = TRUE;
+	statement_instruction(stat) =  /* ??? memory leak */
+	    make_continue_instruction();
+    }
+}
+
+/*   true if one statement was killed
+ */
+static bool hpfc_overlap_kill_unused_scalars(statement stat)
+{
+    assert(get_variable_used_map()!=hash_table_undefined);
+
+    hpfc_killed_scalar = FALSE;
+
+    gen_recurse(stat, statement_domain,	gen_true,
+		hpfc_overlap_kill_unused_scalars_rewrite);
+
+    return(hpfc_killed_scalar);
+}
+
+/* returns the dimension of reference on which index entity e is used
+ */
+static int which_array_dimension(r, e)
+reference r;
+entity e;
+{
+    int	dim = 1;
+    list li = reference_indices(r);
+    Variable v = (Variable) e;
+
+    MAP(EXPRESSION, e,
+    {
+	normalized n = expression_normalized(e);
+	
+	if (normalized_linear_p(n) &&
+	    (vect_coeff(v, (Pvecteur)normalized_linear(n)) != 0))
+	    return(dim);
+	
+	dim++;
+    },
+	li);
+
+    return(-1);
+}
+
+static loop 
+make_loop_skeleton(
+    entity newindex,
+    expression lower_expression, 
+    expression upper_expression)
+{
+    return(make_loop(newindex, 
+		     make_range(lower_expression, 
+				upper_expression,
+				int_to_expression(1)),
+		     statement_undefined, /* statement is not yet defined */
+		     entity_empty_label(),
+		     make_execution(is_execution_sequential, UU),
+		     NIL));
+}
+
+static void 
+update_indices_for_local_computation(
+    entity_mapping new_indexes,
+    list Ref,
+    list lRef)
+{
+    list lr = Ref, lkv = lRef;
+
+    for ( ; (lr!=NIL) ; lr=CDR(lr), lkv=CDR(lkv))
+    {
+	int dim = 1;
+	syntax s = SYNTAX(CAR(lr));
+	reference r = syntax_reference(s);
+	entity array = reference_variable(r);
+	list
+	    l1 = CONSP(CAR(lkv)),
+	    lk = CONSP(CAR(l1)),
+	    li = reference_indices(r),
+	    lv = CONSP(CAR(CDR(l1))),
+	    li2 = NIL;
+
+	for ( ; (lk!=NIL) ; POP(lk), POP(li), POP(lv))
+	{
+	    expression indice = EXPRESSION(CAR(li));
+	    Pvecteur v = (Pvecteur) PVECTOR(CAR(lv));
+	    access ac = INT(CAR(lk));
+
+	    /* caution: only distributed dimensions indexes are modified
+	     * other have to remain untouched...
+	     * ??? aligned star is missing
+	     */
+	    switch (access_tag(ac))
+	    {
+	    case aligned_shift: /* find the new index of the loop */
+	    {
+		Pvecteur vindex = the_index_of_vect(v);
+		entity
+		    oldindex = (entity) var_of(vindex),
+		    newindex = (entity) GET_ENTITY_MAPPING(new_indexes, 
+							   oldindex);
+		int shift = (int) vect_coeff(TSHIFTV, v);
+
+		if (shift==0)
+		{
+		    li2 = gen_nconc(li2,
+				    CONS(EXPRESSION,
+					 entity_to_expression(newindex),
+					 NIL));
+		}
+		else
+		{
+		    li2 = 
+			gen_nconc(li2,
+				  CONS(EXPRESSION,
+				       MakeBinaryCall
+				       (entity_intrinsic((shift>0)?
+							(PLUS_OPERATOR_NAME):
+							(MINUS_OPERATOR_NAME)),
+					entity_to_expression(newindex),
+					int_to_expression(abs(shift))),
+				       NIL));
+		}
+
+		break;
+	    }
+	    case aligned_constant: /* compute the local indice */
+	    {
+		int tval = vect_coeff(TEMPLATEV, v);
+		
+		li2 = gen_nconc(li2,
+				CONS(EXPRESSION,
+				     int_to_expression
+				     (template_cell_local_mapping(array, 
+								  dim, 
+								  tval)),
+				     NIL));
+		break;
+	    }
+	    case aligned_affine:
+	    case aligned_star:
+		pips_error("update_indices_for_local_computation",
+			   "part of that function not implemented yet\n");
+		break;
+	    default: /* ??? nothing is changed */
+		li2 = gen_nconc(li2, CONS(EXPRESSION, indice, NIL));
+		break;
+	    }
+	    dim++;
+	}
+
+	reference_indices(r) = li2;
+
+	ifdebug(8)
+	 {
+	     fprintf(stderr,
+	      "[update_indices_for_local_computation]\nnew reference is:\n");
+	     print_reference(r);
+	     fprintf(stderr, "\n");
+	 }
+
+    }
+    
+}
+
+static statement make_increment_statement(index)
+entity index;
+{
+    return(make_assign_statement
+	   (entity_to_expression(index),
+	    MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
+			   entity_to_expression(index),
+			   int_to_expression(1))));
+}
+
+/* bool variable_used_in_statement_p(ent, stat)
+ *
+ * not 0 if ent is referenced in statement stat.
+ * yes, I know, proper effects may be called several
+ * times for the same statement...
+ *
+ * ??? I should have used cumulated/proper effects to be computed on
+ * the statement being generated, but It would not have been as easy
+ * to compute and to use.
+ */
+static statement 
+  current_variable_used_statement = statement_undefined;
+
+static void variable_used_rewrite(r)
+reference r;
+{
+    entity v = reference_variable(r);
+    int n = load_entity_variable_used(v);
+    store_entity_variable_used(v, int_undefined_p(n) ? 1 : n+1);
+}
+
+/*
+static void 
+initialize_variable_used_map_for_statement(
+    statement stat)
+{
+    make_variable_used_map();
+    current_variable_used_statement = stat; 
+    gen_recurse(stat, reference_domain,	gen_true, variable_used_rewrite);
+}
+*/
+
+static void 
+initialize_variable_used_map_for_current_loop_nest(
+    statement inner_body)
+{
+    list ll=lloop, lb=lblocks;
+    instruction i;
+    loop l;
+
+    make_variable_used_map();     
+    current_variable_used_statement = inner_body;
+
+    gen_recurse(inner_body, reference_domain, gen_true,	variable_used_rewrite);
+
+    for (; !ENDP(ll); ll=CDR(ll), lb=CDR(lb))
+    {
+	l = LOOP(CAR(ll));
+
+	MAP(STATEMENT, s,
+	{
+	    i = statement_instruction(s);
+	    
+	    if (!(instruction_loop_p(i) && l==i))
+		gen_recurse(s,
+			    reference_domain,
+			    gen_true,
+			    variable_used_rewrite);
+	    
+	},
+	    CONSP(CAR(lb)));
+    }
+}
+
+static void close_variable_used_map_for_statement()
+{
+    free_variable_used_map();
+    current_variable_used_statement = statement_undefined;
+}
+
+static bool variable_used_in_statement_p(ent, stat)
+entity ent;
+statement stat;
+{
+    assert(stat == current_variable_used_statement);
+    return !entity_variable_used_undefined_p(ent);
+}
+
+static int number_of_distributed_dimensions(a)
+entity a;
+{
+    int p = -1, ndim = NumberOfDimension(a), i = 1, n = 0;
+
+    for (i=1 ; i<=ndim ; i++)
+	if (ith_dim_distributed_p(a, i, &p)) n++;
+   
+    return(n);
+}
+
+/* one of the syntax is chosen from the list. The "larger one".
+ * and the list is given back, the chosen syntax as first element.
+ */
+static syntax choose_one_syntax_in_references_list(pls)
+list *pls;
+{
+    list cls = *pls, nls = NIL;
+    syntax chosen = SYNTAX(CAR(cls));
+    int chosen_distribution = 
+	    number_of_distributed_dimensions
+		(reference_variable(syntax_reference(chosen)));
+
+    MAP(SYNTAX, current,
+    {
+	int current_distribution = 
+		number_of_distributed_dimensions
+		    (reference_variable(syntax_reference(current)));
+
+	 if (current_distribution > chosen_distribution)
+	 {
+	     nls = CONS(SYNTAX, chosen, nls);
+	     chosen = current;
+	     chosen_distribution = current_distribution;
+	 }
+	 else
+	     nls = CONS(SYNTAX, current, nls);
+     },
+	 CDR(cls));
+	 
+    gen_free_list(cls);
+    *pls = CONS(SYNTAX, chosen, nls);
+
+    debug(7, "choose_one_syntax_in_references_list",
+	  "reference to %s chosen, %d dimensions\n",
+	  entity_name(reference_variable(syntax_reference(chosen))),
+	  chosen_distribution);
+
+    return(chosen);
+}
+
+static statement 
+make_loop_nest_for_overlap(
+    list lold,
+    list lnew,
+    list lbl,
+    entity_mapping new_indexes,
+    entity_mapping old_indexes, 
+    statement innerbody)
+{
+    entity index, oldindexvalue;
+    loop oldloop, newloop;
+    list l, lnew_loop = NIL, lnew_body = NIL;
+    bool compute_index = FALSE;
 
     if (ENDP(lold)) 
 	return(innerbody);
@@ -583,8 +682,7 @@ statement innerbody;
 							 newloop)),
 		     NIL);
 
-    /*
-     * i = initial_old_value 
+    /* i = initial_old_value 
      * DO i' = ...
      *   i = i + 1
      *   body
@@ -640,33 +738,29 @@ statement innerbody;
     return(make_block_statement(lnew_loop));
 }
 
-bool generate_optimized_code_for_loop_nest(innerbody, pstat,
-					   Wa, Ra, Ro, 
-					   lWa, lRa, lRo)
-statement innerbody, *pstat;
-list Wa, Ra, Ro, lWa, lRa, lRo;
+static bool 
+generate_optimized_code_for_loop_nest(
+    statement innerbody, 
+    statement *pstat,
+    list Wa,
+    list Ra,
+    list Ro,
+    list lWa,
+    list lRa,
+    list lRo)
 {
-    syntax
-	the_written_syntax = SYNTAX(CAR(Wa));
-    reference
-	the_written_reference = syntax_reference(the_written_syntax);
-    entity
-	array = reference_variable(the_written_reference);
-    int
-	an = load_hpf_number(array);
+    syntax the_written_syntax = SYNTAX(CAR(Wa));
+    reference the_written_reference = syntax_reference(the_written_syntax);
+    entity array = reference_variable(the_written_reference);
+    int an = load_hpf_number(array);
     entity_mapping
 	new_indexes = MAKE_ENTITY_MAPPING(),
 	old_indexes = MAKE_ENTITY_MAPPING();
-    list
-	boundcomp = NIL,
-	newloops = NIL;
-    statement
-	newnest = NULL;
+    list boundcomp = NIL, newloops = NIL;
+    statement newnest = NULL;
     range rg;
-    expression
-	lb, ub;
-    entity
-	index, newindex, newlobnd, newupbnd, oldidxvl;
+    expression lb, ub;
+    entity index, newindex, newlobnd, newupbnd, oldidxvl;
     loop nl;
     int p, dim;
 
@@ -758,392 +852,219 @@ list Wa, Ra, Ro, lWa, lRa, lRo;
     return(TRUE);
 }
 
-/*  To Kill scalar definitions within the generated code
- *  recognize if only one reference. 
+/* must clear everything before returning in Overlap_Analysis...
  */
-static bool hpfc_killed_scalar;
+#define RETURN(x) \
+{ gen_free_list(Wa); gen_free_list(lWa); gen_free_list(Ra);\
+  gen_free_list(lRa); gen_free_list(Ro); gen_free_list(lRo);\
+  gen_free_list(Rrt); gen_free_list(lblocks); gen_free_list(lloop);\
+  reset_hpfc_current_statement(); reset_current_loops(); return x;}
 
-static void hpfc_overlap_kill_unused_scalars_rewrite(stat)
-statement stat;
-{
-    instruction
-	i = statement_instruction(stat);
-    expression
-	e = expression_undefined;
-    entity
-	var = entity_undefined;
-
-    if (!instruction_assign_p(i)) return;
-
-    e = EXPRESSION(CAR(call_arguments(instruction_call(i))));
-
-    assert(expression_reference_p(e));
-
-    var = reference_variable(syntax_reference(expression_syntax(e)));
-
-    debug(5, "hpfc_overlap_kill_unused_scalars_rewrite",
-	  "considering definition of %s (statement 0x%x)\n",
-	  entity_name(var), stat);
-
-    if (entity_integer_scalar_p(var) &&
-	load_entity_variable_used(var)==1)
-    {
-	debug(3, "hpfc_overlap_kill_unused_scalars_rewrite",
-	      "killing definition of %s (statement 0x%x)\n",
-	      entity_name(var), stat);
-
-	hpfc_killed_scalar = TRUE;
-	statement_instruction(stat) =  /* ??? memory leak */
-	    make_continue_instruction();
-    }
-}
-
-/*   true if one statement was killed
+/* check conditions and compile...
  */
-bool hpfc_overlap_kill_unused_scalars(stat)
-statement stat;
+bool Overlap_Analysis(stat, pstat)
+statement stat, *pstat;
 {
-    assert(get_variable_used_map()!=hash_table_undefined);
+    list lw = NIL, lr = NIL, Ra = NIL, Ro = NIL, Rrt = NIL,
+	lWa = NIL, lRa = NIL, lRo = NIL, W  = NIL, Wa = NIL, 
+        Wrt = NIL, lvect = NIL, lkind = NIL;
+    syntax the_written_syntax = syntax_undefined;
+    reference the_written_reference = reference_undefined;
+    statement innerbody, messages_stat, newloopnest;
 
-    hpfc_killed_scalar = FALSE;
+    DEBUG_STAT(9, "considering statement", stat);
 
-    gen_recurse(stat,
-		statement_domain,
-		gen_true,
-		hpfc_overlap_kill_unused_scalars_rewrite);
+    set_hpfc_current_statement(stat);
+    set_current_loops(stat);
 
-    return(hpfc_killed_scalar);
-}
+    lblocks = NIL,
+    lloop = NIL;
+    innerbody = parallel_loop_nest_to_body(stat, &lblocks, &lloop);
 
-/* int which_array_dimension(r, e)
- *
- * returns the dimension of reference on which index entity e is used
- */
-int which_array_dimension(r, e)
-reference r;
-entity e;
-{
-    int
-	dim = 1;
-    list
-	li = reference_indices(r);
-    Variable
-	v = (Variable) e;
+    FindRefToDistArrayInStatement(innerbody, &lw, &lr);
 
-    MAP(EXPRESSION, e,
+    /* keeps only written references of which dimensions are block distributed,
+     * and indices simple enough (=> normalization of loops may be usefull).
+     * ??? bug: should also search for A(i,i) things that are forbidden...
+     */
+    MAP(SYNTAX, s,
     {
-	normalized n = expression_normalized(e);
-	
-	if (normalized_linear_p(n) &&
-	    (vect_coeff(v, (Pvecteur)normalized_linear(n)) != 0))
-	    return(dim);
-	
-	dim++;
-    },
-	li);
-
-    return(-1);
-}
-
-loop make_loop_skeleton(newindex, lower_expression, upper_expression)
-entity newindex;
-expression lower_expression, upper_expression;
-{
-    return(make_loop(newindex, 
-		     make_range(lower_expression, 
-				upper_expression,				
-				int_to_expression(1)),
-		     statement_undefined, /* statement is not yet defined */
-		     entity_empty_label(),
-		     make_execution(is_execution_sequential, UU),
-		     NIL));
-}
-
-void update_indices_for_local_computation(new_indexes, Ref, lRef)
-entity_mapping new_indexes;
-list Ref, lRef;
-{
-    list
-	lr = Ref,
-	lkv = lRef;
-
-    for ( ; (lr!=NIL) ; lr=CDR(lr), lkv=CDR(lkv))
-    {
-	int dim = 1;
-	syntax s = SYNTAX(CAR(lr));
 	reference r = syntax_reference(s);
 	entity array = reference_variable(r);
-	list
-	    l1 = CONSP(CAR(lkv)),
-	    lk = CONSP(CAR(l1)),
-	    li = reference_indices(r),
-	    lv = CONSP(CAR(CDR(l1))),
-	    li2 = NIL;
+	
+	if ((block_distributed_p(array)) && 
+	    (simple_indices_p(r)) &&
+	    (!replicated_p(array)))
+	    W = CONS(SYNTAX, s, W);
+	else
+	    Wrt = CONS(SYNTAX, s, Wrt);
+    },
+	lw);
 
-	for ( ; (lk!=NIL) ; POP(lk), POP(li), POP(lv))
-	{
-	    expression indice = EXPRESSION(CAR(li));
-	    Pvecteur v = (Pvecteur) PVECTOR(CAR(lv));
-	    access ac = INT(CAR(lk));
+    gen_free_list(lw);
+    if (W==NIL) /* no ok distributed variable written ! */
+    {
+	pips_debug(7, "FALSE: no ok distributed variable written\n");
+	RETURN(FALSE);
+    }
+	
+    
+    the_written_syntax = choose_one_syntax_in_references_list(&W);
 
-	    /* caution: only distributed dimensions indexes are modified
-	     * other have to remain untouched...
-	     * ??? aligned star is missing
-	     */
-	    switch (access_tag(ac))
-	    {
-	    case aligned_shift: /* find the new index of the loop */
-	    {
-		Pvecteur
-		    vindex = the_index_of_vect(v);
-		entity
-		    oldindex = (entity) var_of(vindex),
-		    newindex = (entity) GET_ENTITY_MAPPING(new_indexes, 
-							   oldindex);
-		int
-		    shift = (int) vect_coeff(TSHIFTV, v);
+    the_written_reference = syntax_reference(the_written_syntax);
+    Wa = CONS(SYNTAX, the_written_syntax, NIL);
 
-		if (shift==0)
-		{
-		    li2 = gen_nconc(li2,
-				    CONS(EXPRESSION,
-					 entity_to_expression(newindex),
-					 NIL));
-		}
-		else
-		{
-		    li2 = 
-			gen_nconc(li2,
-				  CONS(EXPRESSION,
-				       MakeBinaryCall
-				       (entity_intrinsic((shift>0)?
-							(PLUS_OPERATOR_NAME):
-							(MINUS_OPERATOR_NAME)),
-					entity_to_expression(newindex),
-					int_to_expression(abs(shift))),
-				       NIL));
-		}
+    if (!align_check(the_written_reference,
+		     the_written_reference, &lvect, &lkind))
+	pips_error("Overlap_Analysis","no self alignment!\n");
+    
+    lWa = CONS(CONSP, CONS(CONSP, lkind,
+		      CONS(CONSP, lvect, NIL)), NIL);
 
-		break;
-	    }
-	    case aligned_constant: /* compute the local indice */
-	    {
-		int
-		    tval = vect_coeff(TEMPLATEV, v);
-		
-		li2 = gen_nconc(li2,
-				CONS(EXPRESSION,
-				     int_to_expression
-				     (template_cell_local_mapping(array, 
-								  dim, 
-								  tval)),
-				     NIL));
-		break;
-	    }
-	    case aligned_affine:
-	    case aligned_star:
-		pips_error("update_indices_for_local_computation",
-			   "part of that function not implemented yet\n");
-		break;
-	    default: /* ??? nothing is changed */
-		li2 = gen_nconc(li2, CONS(EXPRESSION, indice, NIL));
-		break;
-	    }
-	    dim++;
-	}
+    MAP(SYNTAX, s,
+    {
+	reference r = syntax_reference(s);
 
-	reference_indices(r) = li2;
-
-	ifdebug(8)
+	 if (align_check(the_written_reference, r, &lvect, &lkind))
 	 {
-	     fprintf(stderr,
-	      "[update_indices_for_local_computation]\nnew reference is:\n");
+	     if (aligned_p(the_written_reference, r, lvect, lkind))
+	     {
+		 Wa = gen_nconc(Wa, CONS(SYNTAX, s, NIL));
+		 lWa = gen_nconc(lWa, CONS(CONSP,
+					   CONS(CONSP, lkind, 
+						CONS(CONSP, lvect, NIL)),
+					   NIL));
+	     }
+	     else /* ??? what about loop splitting */
+	     {
+		 Wrt = gen_nconc(Wrt, CONS(SYNTAX, s, NIL));
+		 gen_free_list(lvect);
+		 gen_free_list(lkind); /* ??? memory leak */
+	     }
+	 }
+	 else
+	 {
+	     Wrt = gen_nconc(Wrt, CONS(SYNTAX, s, NIL));
+	     gen_free_list(lvect);
+	     gen_free_list(lkind); /* ??? memory leak */
+	 }
+     },
+	 CDR(W));
+
+    gen_free_list(W);
+    
+    debug(5, "Overlap_Analysis",
+	  "Wa length is %d (%d), Wrt lenght is %d\n",
+	  gen_length(Wa), gen_length(lWa), gen_length(Wrt));
+
+    if (gen_length(Wrt)!=0) 
+	RETURN(FALSE);
+
+    /* Now, we have the following situation:
+     * Wa: set of aligned written refs, the first of which is ``the'' ref.
+     * (what if no written, for instance a reduction ??? 
+     */
+    MAP(SYNTAX, s,
+     {
+	 reference r = syntax_reference(s);
+	 entity array = reference_variable(r);
+	 list lvect = NIL;
+	 list lkind = NIL;
+
+	 pips_debug(6, "dealing with reference of array %s\n",
+		    entity_name(array));
+
+	 ifdebug(6)
+	 {
+	     fprintf(stderr, "[Overlap_Analysis]\nreference is:\n");
 	     print_reference(r);
 	     fprintf(stderr, "\n");
 	 }
 
-    }
-    
-}
-
-statement make_increment_statement(index)
-entity index;
-{
-    return(make_assign_statement
-	   (entity_to_expression(index),
-	    MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
-			   entity_to_expression(index),
-			   int_to_expression(1))));
-}
-
-/* bool variable_used_in_statement_p(ent, stat)
- *
- * not 0 if ent is referenced in statement stat.
- * yes, I know, proper effects may be called several
- * times for the same statement...
- *
- * ??? I should have used cumulated/proper effects to be computed on
- * the statement being generated, but It would not have been as easy
- * to compute and to use.
- */
-static statement 
-  current_variable_used_statement = statement_undefined;
-
-static void variable_used_rewrite(r)
-reference r;
-{
-    entity 
-	v = reference_variable(r);
-    int
-	n = load_entity_variable_used(v);
-
-    store_entity_variable_used(v, int_undefined_p(n) ? 1 : n+1);
-}
-
-void initialize_variable_used_map_for_statement(stat)
-statement stat;
-{
-    make_variable_used_map();
-    current_variable_used_statement = stat; 
-
-    gen_recurse(stat,
-		reference_domain,
-		gen_true,
-		variable_used_rewrite);
-}
-
-void initialize_variable_used_map_for_current_loop_nest(inner_body)
-statement inner_body;
-{
-    list ll=lloop, lb=lblocks;
-    instruction i;
-    loop l;
-
-    make_variable_used_map();     
-    current_variable_used_statement = inner_body;
-
-    gen_recurse(inner_body,
-		reference_domain,
-		gen_true,
-		variable_used_rewrite);
-
-    for (; !ENDP(ll); ll=CDR(ll), lb=CDR(lb))
-    {
-	l = LOOP(CAR(ll));
-
-	MAP(STATEMENT, s,
-	{
-	    i = statement_instruction(s);
-	    
-	    if (!(instruction_loop_p(i) && l==i))
-		gen_recurse(s,
-			    reference_domain,
-			    gen_true,
-			    variable_used_rewrite);
-	    
-	},
-	    CONSP(CAR(lb)));
-    }
-}
-
-void close_variable_used_map_for_statement()
-{
-    free_variable_used_map();
-    current_variable_used_statement = statement_undefined;
-}
-
-bool variable_used_in_statement_p(ent, stat)
-entity ent;
-statement stat;
-{
-    bool
-	result;
-
-    assert(stat == current_variable_used_statement);
-
-    result = (!entity_variable_used_undefined_p(ent));
-    
-    return(result);
-}
-
-/* syntax choose_one_syntax_in_references_list(pls)
- *
- * one of the syntax is chosen from the list. The "larger one".
- * and the list is given back, the chosen syntax as first element.
- */
-syntax choose_one_syntax_in_references_list(pls)
-list *pls;
-{
-    list
-	cls = *pls,
-	nls = NIL;
-    syntax
-	chosen = SYNTAX(CAR(cls));
-    int 
-	chosen_distribution = 
-	    number_of_distributed_dimensions
-		(reference_variable(syntax_reference(chosen)));
-
-    MAP(SYNTAX, current,
-    {
-	int
-	    current_distribution = 
-		number_of_distributed_dimensions
-		    (reference_variable(syntax_reference(current)));
-
-	 if (current_distribution > chosen_distribution)
+	 if (align_check(the_written_reference, r, &lvect, &lkind))
 	 {
-	     nls = CONS(SYNTAX, chosen, nls);
-	     chosen = current;
-	     chosen_distribution = current_distribution;
+	     if (aligned_p(the_written_reference, r, lvect, lkind))
+	     {
+		 Ra = gen_nconc(Ra, CONS(SYNTAX, s, NIL));
+		 lRa = gen_nconc(lRa, CONS(CONSP,
+					   CONS(CONSP, lkind, 
+						CONS(CONSP, lvect, NIL)),
+					   NIL));    
+	     }
+	     else
+	     if (message_manageable_p(array, lvect, lkind))
+	     {
+		 Ro = gen_nconc(Ro, CONS(SYNTAX, s, NIL));
+		 lRo = gen_nconc(lRo, CONS(CONSP,
+					   CONS(CONSP, lkind, 
+						CONS(CONSP, lvect, NIL)),
+					   NIL));
+	     }
+	     else
+	     {
+		 Rrt = gen_nconc(Rrt, CONS(SYNTAX, s, NIL));
+		 gen_free_list(lvect);
+		 gen_free_list(lkind);
+	     }
 	 }
 	 else
-	     nls = CONS(SYNTAX, current, nls);
+	 {
+	     Rrt = gen_nconc(Rrt, CONS(SYNTAX, s, NIL));
+	     gen_free_list(lvect);
+	     gen_free_list(lkind);
+	 }
      },
-	 CDR(cls));
-	 
-    gen_free_list(cls);
-    *pls = CONS(SYNTAX, chosen, nls);
+	 lr);
 
-    debug(7, "choose_one_syntax_in_references_list",
-	  "reference to %s chosen, %d dimensions\n",
-	  entity_name(reference_variable(syntax_reference(chosen))),
-	  chosen_distribution);
+    gen_free_list(lr);
 
-    return(chosen);
+    debug(5, "Overlap_Analysis",
+	  "Ra length is %d, Ro length is %d, Rrt lenght is %d\n",
+	  gen_length(Ra), gen_length(Ro), gen_length(Rrt));
+
+    if (gen_length(Rrt)!=0) 
+	RETURN(FALSE);
+
+    /* here is the situation now:
+     *
+     * Wa set of aligned references written,
+     * Ra set of aligned references read,
+     * Ro set of nearly aligned references that suits the overlap analysis
+     */
+
+    /* messages handling
+     */
+    messages_stat = ((gen_length(Ro)>0)?
+		     (messages_handling(Ro, lRo)):
+		     (make_continue_statement(entity_empty_label())));
+
+    /* generate the local loop for every processor, given the global loop
+     * bounds. The former indexes have to be computed, and the loops are
+     * based upon new indexes, of which names have to be propagated in the
+     * body of the loop. This generation is to be based on the normalized
+     * form computed for every references of Ro, but it is direct for
+     * Ra and Wa, since new declarations implied that the alignment is
+     * performed for distributed indices. Not distributed dimensions
+     * indices have not to be touched, (at least if no new declarations are
+     * the common case)
+     */
+    if (!generate_optimized_code_for_loop_nest
+	(innerbody, &newloopnest, Wa, Ra, Ro, lWa, lRa, lRo))
+	RETURN(FALSE);
+
+    (*pstat) = 
+	make_block_statement
+	    (CONS(STATEMENT, messages_stat,
+	     CONS(STATEMENT, loop_nest_guard(newloopnest,
+					     the_written_reference,
+					     CONSP(CAR(CONSP(CAR(lWa)))),
+					     CONSP(CAR(CDR(CONSP(CAR(lWa)))))),
+		  NIL)));    
+
+    DEBUG_STAT(8, entity_name(node_module), *pstat);
+
+    RETURN(TRUE);
 }
-
-int number_of_distributed_dimensions(a)
-entity a;
-{
-    int
-	p = -1,
-	ndim = NumberOfDimension(a),
-	i = 1,
-	n = 0;
-
-    for (i=1 ; i<=ndim ; i++)
-	if (ith_dim_distributed_p(a, i, &p)) n++;
-   
-    return(n);
-}
-
-/* bool on_same_proc_p(t1, t2, temp, dim)
- *
- * true if the given template elements on the specified dimension
- * are mapped on the same processor.
- */
-bool on_same_proc_p(t1, t2, template, dim)
-int t1, t2;
-entity template;
-int dim;
-{
-    int p;
-
-    return(processor_number(template, dim, t1, &p) ==
-	   processor_number(template, dim, t2, &p));
-}
-
 
 /* That is all
  */
