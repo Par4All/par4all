@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <varargs.h>
+#include <stdarg.h>
 #include <errno.h>
 
 #include <sys/time.h>
@@ -122,14 +122,16 @@ va_dcl
 }
 */
 
-/*VARARGS0*/
 
-void prompt_user(string some_text)
+void prompt_user(string a_printf_format, ...)
 {
    Event e;
+   va_list some_arguments;
    static char message_buffer[SMALL_BUFFER_LENGTH];
 
-   (void) vsprintf(message_buffer, some_text);
+   va_start(some_arguments, a_printf_format);
+
+   (void) vsprintf(message_buffer, a_printf_format, some_arguments);
 
    if (wpips_emacs_mode) 
       send_prompt_user_to_emacs(message_buffer);
@@ -168,7 +170,6 @@ Attr_avlist avlist[ATTR_STANDARD_SIZE];
 }
 */
 
-/*VARARGS0*/
 void wpips_user_error_message(error_buffer)
 char error_buffer[];
 {
@@ -265,9 +266,7 @@ va_dcl
 }
 */
 
-void wpips_user_log(fmt, args)
-string fmt;
-va_list args;
+void wpips_user_log(string fmt, va_list args)
 {
    int l = (int) xv_get(log_textsw, TEXTSW_LENGTH);
    static char log_buffer[SMALL_BUFFER_LENGTH];
@@ -278,6 +277,7 @@ va_list args;
    (void) vsprintf(log_buffer, fmt, args);
 
    log_on_file(log_buffer);
+
    if (wpips_emacs_mode) 
       send_user_log_to_emacs(log_buffer);
    else {
@@ -285,11 +285,13 @@ va_list args;
       textsw_insert(log_textsw, log_buffer, strlen(log_buffer));
       textsw_possibly_normalize(log_textsw, 
                                 (Textsw_index) xv_get(log_textsw, TEXTSW_INSERTION_POINT));
-      show_message(log_buffer);
-      XFlush((Display *) xv_get(main_frame, XV_DISPLAY));
       XFlush((Display *) xv_get(log_frame, XV_DISPLAY));
       xv_set(clear, MENU_INACTIVE, FALSE, 0);
    }
+   /* Display the "Message:" line in the main windo also in the emacs
+      mode: */
+   show_message(log_buffer);
+   XFlush((Display *) xv_get(main_frame, XV_DISPLAY));
 }
 
 
