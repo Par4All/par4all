@@ -60,7 +60,7 @@
 #define entity_to_offset(E)\
   formal_offset(storage_formal(entity_storage(E)))
 
-#define entity_common_p(Ent)               \
+#define entity_is_a_common_p(Ent)               \
   (type_area_p(entity_type(Ent)))
 
 #define special_common(Ent)                                     \
@@ -685,7 +685,7 @@ bool check_commons(module)
 	local = ENTITY(CAR(ldecl));
 	ldecl = CDR(ldecl);
 
-	if (entity_common_p(local) && (!special_common(local)))
+	if (entity_is_a_common_p(local) && (!special_common(local)))
 	    check_one_common(local, module);
     }
     
