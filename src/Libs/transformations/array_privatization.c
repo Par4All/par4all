@@ -6,7 +6,7 @@
  * This File contains the functions computing the private regions.
  *
  * $RCSfile: array_privatization.c,v $ (version $Revision$)
- * $Date: 1996/10/17 13:22:57 $, 
+ * $Date: 1996/11/22 17:52:22 $, 
  */
 
 #include <stdio.h>
@@ -873,6 +873,8 @@ privatize_entity(entity ent)
     if (storage_ram_p(ent_storage) &&
 	!dynamic_area_p(ram_section(storage_ram(ent_storage))))
     {
+	pips_user_warning("privatizing variable: %s\n",
+			  entity_local_name(ent));
 
 	/* Make a new ram entity, similar to the previous one, 
 	   but with a new name */
@@ -978,8 +980,6 @@ declarations_privatizer(char *module_name)
     /* We effectively perform the privatization */
     MAP(REGION, reg,
 	{
-	    pips_user_warning("privatizing variable: %s\n",
-			      entity_local_name(region_entity(reg)));
 	    privatize_entity(region_entity(reg));
 	},
 	l_priv);
