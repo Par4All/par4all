@@ -281,7 +281,7 @@ in_alias_pairs( string module_name )
     list l_reg, l_pairs;
 
     debug_on("ALIAS_DEBUG_LEVEL");
-    pips_debug(9,"begin for module %\n",module_name);
+    pips_debug(9,"begin for module %s\n",module_name);
 
     /* we need the IN summary regions*/
     l_reg = (list) db_get_memory_resource(DBR_IN_SUMMARY_REGIONS,
@@ -312,7 +312,7 @@ out_alias_pairs( string module_name )
     list l_reg, l_pairs;
 
     debug_on("ALIAS_DEBUG_LEVEL");
-    pips_debug(9,"begin for module %\n",module_name);
+    pips_debug(9,"begin for module %s\n",module_name);
 
     /* we need the OUT summary regions*/
     l_reg = (list) db_get_memory_resource(DBR_OUT_SUMMARY_REGIONS,
