@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.78  1998/04/15 15:31:55  coelho
+ * linear.h added.
+ *
  * Revision 1.77  1998/04/14 16:16:56  coelho
  * getwd -> getcwd
  *
@@ -109,6 +112,7 @@
 #include <sys/param.h>
 #include <unistd.h>
 
+#include "linear.h"
 #include "genC.h"
 
 #include "ri.h"
@@ -117,7 +121,7 @@
 
 #include "misc.h"
 
-#include "ri-util.h"
+#include "ri-util.h" /* ri needed for statement_mapping in pipsdbm... */
 #include "pipsdbm.h"
 #include "resources.h"
 #include "phases.h"
