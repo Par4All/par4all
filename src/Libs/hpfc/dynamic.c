@@ -6,7 +6,7 @@
  * to deal with them in HPFC.
  *
  * $RCSfile: dynamic.c,v $ version $Revision$
- * ($Date: 1995/08/30 15:16:21 $, )
+ * ($Date: 1995/09/15 15:54:10 $, )
  */
 
 #include "defines-local.h"
@@ -27,9 +27,9 @@
  *   introduced to handle remappings.
  * - renamings: remappings associated to a statement.
  */
-GENERIC_GLOBAL_FUNCTION(dynamic_hpf, entity_entities);
-GENERIC_GLOBAL_FUNCTION(primary_entity, entitymap);
-GENERIC_GLOBAL_FUNCTION(renamings, statement_renamings);
+GENERIC_GLOBAL_FUNCTION(dynamic_hpf, entity_entities)
+GENERIC_GLOBAL_FUNCTION(primary_entity, entitymap)
+GENERIC_GLOBAL_FUNCTION(renamings, statement_renamings)
 
 entity safe_load_primary_entity(entity e)
 {
@@ -326,12 +326,12 @@ distribute d;
  *   (simplification assumption: only one per array)
  * - remapped: the (primary) arrays remapped at the vertex.
  */
-GENERIC_LOCAL_FUNCTION(alive_synonym, statement_entities);
-GENERIC_LOCAL_FUNCTION(used_dynamics, statement_entities);
-GENERIC_LOCAL_FUNCTION(remapping_graph, controlmap);
-GENERIC_LOCAL_FUNCTION(reaching_mappings, statement_entities);
-GENERIC_LOCAL_FUNCTION(leaving_mappings, statement_entities);
-GENERIC_LOCAL_FUNCTION(remapped, statement_entities);
+GENERIC_LOCAL_FUNCTION(alive_synonym, statement_entities)
+GENERIC_LOCAL_FUNCTION(used_dynamics, statement_entities)
+GENERIC_LOCAL_FUNCTION(remapping_graph, controlmap)
+GENERIC_LOCAL_FUNCTION(reaching_mappings, statement_entities)
+GENERIC_LOCAL_FUNCTION(leaving_mappings, statement_entities)
+GENERIC_LOCAL_FUNCTION(remapped, statement_entities)
 
 void init_dynamic_locals()
 {
@@ -770,10 +770,16 @@ statement s;
     }
 }
 
-static list /* of statements */ list_of_remapping_statements()
+static list /* of statements */ 
+list_of_remapping_statements()
 {
     list /* of statements */ l = NIL;
-    CONTROLMAP_MAP(s, c, l = CONS(STATEMENT, s, l), get_remapping_graph());
+    CONTROLMAP_MAP(s, c,
+    {
+	pips_debug(9, "0x%x -> 0x%x\n", (unsigned int) s, (unsigned int) c);
+	l = CONS(STATEMENT, s, l);
+    },
+		   get_remapping_graph());
     return l;
 }
 
