@@ -1,5 +1,7 @@
 /* package arithmetique
  *
+ * $Id$
+ *
  * Francois Irigoin, mai 1989
  *
  * Modifications
@@ -47,6 +49,9 @@ typedef long long int Value;
 #define VALUE_FMT "%lld"
 #define VALUE_CONST(val) (val##LL)
 #define VALUE_NAN LONG_LONG_MIN
+/* CAUTION! the min is defined as hard-min+1 so as to preserve the
+ * symetry (-min==max) and to have a nan value. FC.
+ */
 #define VALUE_MIN (LONG_LONG_MIN+1LL)
 #define VALUE_MAX LONG_LONG_MAX
 #define VALUE_SQRT_MIN long_to_value(LONG_MIN) /* ??? assumes 32 bit long */
