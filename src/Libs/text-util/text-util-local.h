@@ -33,3 +33,5 @@
 /* maximum length of a line when prettyprinting...
  */
 #define MAX_LINE_LENGTH 70
+
+#define FORESYS_CONTINUATION_PREFIX "C$&"
