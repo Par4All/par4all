@@ -1791,7 +1791,7 @@ statement_to_comment_length(statement stmt)
  * ENDIF, ELSE, ENDDO,... must be taken care of too.
  */
 
-static current_line = -1;
+static int current_line = -1;
 static persistant_statement_to_int stmt_to_line = persistant_statement_to_int_undefined;
 
 static bool
