@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/10/24 11:49:01 $, )
+# ($Date: 1996/10/24 11:54:21 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET macro is expected somewhere...
@@ -30,10 +30,10 @@ help:
 	#
 	#   diff: compares sequential and parallel stdouts!
 	#   clean: removes deducable files
+	#   clobber: also removes executables files.
 	#   reset: reset pvm
 	#   install_{main,hostnode}: 
 	#     copies executables to the pvm directory (where spawn find them)
-	#            
 	#
 
 PVM=pvm
