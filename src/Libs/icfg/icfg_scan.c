@@ -297,7 +297,7 @@ static void instruction_rwt (instruction i)
 	{
 	  list s_list = (list)(instruction_block(i));
 	  statement s;
-	  for(; s; POP(s_list)) {
+	  for(; s_list; POP(s_list)) {
 	    s = (statement) STATEMENT(CAR(s_list));
 	    MERGE_TEXTS(t, load_statement_icfg(s));
 	  }
