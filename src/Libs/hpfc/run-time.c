@@ -2,7 +2,7 @@
  *
  * Fabien Coelho, May and June 1993
  *
- * $RCSfile: run-time.c,v $ ($Date: 1996/03/21 15:56:05 $, )
+ * $RCSfile: run-time.c,v $ ($Date: 1996/04/01 11:36:37 $, )
  * version $Revision$,
  */
 
@@ -652,21 +652,22 @@ static RunTimeSupportDescriptor RTSTable[] =
 
 /* special FCD target calls.
  */
-    { HOST_TIMEON,	0, is_sub, no_basic, no_entity },
-    { NODE_TIMEON,	0, is_sub, no_basic, no_entity },
-    { HOST_TIMEOFF,	0, is_sub, no_basic, no_entity },
-    { NODE_TIMEOFF,	0, is_sub, no_basic, no_entity },
+    { HOST_TIMEON,			0, is_sub, no_basic, no_entity },
+    { NODE_TIMEON,			0, is_sub, no_basic, no_entity },
+    { HOST_TIMEOFF,			0, is_sub, no_basic, no_entity },
+    { NODE_TIMEOFF,			0, is_sub, no_basic, no_entity },
 
 /* special FCD calls needed for translation...
  */
-    { HPF_PREFIX SYNCHRO_SUFFIX, 0, is_sub, no_basic, no_entity },
-    { HPF_PREFIX TIMEON_SUFFIX,  0, is_sub, no_basic, no_entity },
-    { HPF_PREFIX TIMEOFF_SUFFIX, 0, is_sub, no_basic, no_entity },
-    { HPF_PREFIX RENAME_SUFFIX,  0, is_sub, no_basic, no_entity },
+    { HPF_PREFIX SYNCHRO_SUFFIX, 	0, is_sub, no_basic, no_entity },
+    { HPF_PREFIX TIMEON_SUFFIX,  	0, is_sub, no_basic, no_entity },
+    { HPF_PREFIX TIMEOFF_SUFFIX, 	0, is_sub, no_basic, no_entity },
+    { HPF_PREFIX RENAME_SUFFIX,  	0, is_sub, no_basic, no_entity },
+    { HPF_PREFIX HOSTSECTION_SUFFIX,	0, is_sub, no_basic, no_entity },
 
 /* End
  */
-    { "", 0, is_end, -1, NULL },
+    { "", 				0, is_end, -1, NULL },
 };
 
 /* to be seen from outside of this file
