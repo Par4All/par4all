@@ -102,7 +102,7 @@ db_get_current_builder_name(void)
     return current_builder;
 }
 
-#define DEFAULT_OWNER_NAME "Program"
+#define DEFAULT_OWNER_NAME WORKSPACE_PROGRAM_SPACE
 
 /* returns the allocated and mkdir'ed directory for module name
  */
