@@ -90,7 +90,7 @@ list loops;
     Pvecteur	pvi = NULL;
 
     l = LOOP(CAR( loops ));
-    pvi = vect_new( (Variable) loop_index( l ), 1 );
+    pvi = vect_new( (Variable) loop_index( l ), VALUE_ONE);
     ran = loop_range( l );
     low = range_lower( ran );
     upp = range_upper( ran );
