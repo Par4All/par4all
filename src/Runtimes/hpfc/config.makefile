@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1996/09/09 10:27:44 $, )
+# ($Date: 1996/09/09 17:09:50 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -160,9 +160,7 @@ endif
 #
 # pvm3 portability macros for Fortran calls to C functions:
 
-M4_CONF_FILE	= $(PVM_CONF)/$(PVM_ARCH).m4
-
-M4FLAGS	+=	$(M4_CONF_FILE)
+M4FLAGS	+=	$(PVM_ARCH).m4
 
 PVM_HEADERS	= pvm3.h fpvm3.h
 LIB_M4FFILES = 	hpfc_packing.m4f \
@@ -251,10 +249,13 @@ all: $(RT_ARCH) $(PVM_HEADERS) $(DDC_HEADERS) $(DDC_CFILES) $(DDC_FFILES) \
 #
 
 pvm3.h:	$(PVM_INC)/pvm3.h
-	$(COPY) $(PVM_INC)/pvm3.h .
+	$(COPY) $< $@
 
 fpvm3.h:$(PVM_INC)/fpvm3.h
-	$(COPY) $(PVM_INC)/fpvm3.h .
+	$(COPY) $< $@
+
+$(PVM_ARCH).m4: $(PVM_CONF)/$(PVM_ARCH).m4
+	$(COPY) $< $@
 
 #
 
