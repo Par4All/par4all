@@ -36,7 +36,7 @@ Menu_item menu_item;
 
     if (modulename != NULL) {
 	if (strcmp(label, PRIVATIZE_TRANSFORM) == 0) {
-	    safe_apply(BUILDER_PRIVATIZER, modulename);
+	    safe_apply(BUILDER_PRIVATIZE_MODULE, modulename);
 	}
 	else if (strcmp(label, DISTRIBUTE_TRANSFORM) == 0) {
 	    safe_apply(BUILDER_DISTRIBUTER, modulename);
@@ -54,7 +54,7 @@ Menu_item menu_item;
 	    safe_apply(BUILDER_LOOP_INTERCHANGE, modulename);
 	}
 	else if (strcmp(label, DEAD_CODE_ELIMINATION_TRANSFORM) == 0) {
-	    safe_apply(BUILDER_DEAD_CODE_ELIMINATION, modulename);
+	    safe_apply(BUILDER_SUPPRESS_DEAD_CODE, modulename);
 	}
 	else if (strcmp(label, REDUCTIONS_TRANSFORM) == 0) {
 	    safe_apply(BUILDER_REDUCTIONS, modulename);
