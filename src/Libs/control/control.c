@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 2003/12/04 16:41:24 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 2003/12/19 12:18:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_control_control[] = "%A% ($Date: 2003/12/04 16:41:24 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_control_control[] = "%A% ($Date: 2003/12/19 12:18:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* - control.c
@@ -31,6 +31,10 @@ char vcid_control_control[] = "%A% ($Date: 2003/12/04 16:41:24 $, ) version $Rev
  * $Id$
  *
  * $Log: control.c,v $
+ * Revision 1.41  2003/12/19 12:18:10  irigoin
+ * strdup() applied to constant empty strings "" for empty statement
+ * comments, debug_on() and debug_off() moved up into module.
+ *
  * Revision 1.40  2003/12/04 16:41:24  nguyen
  * Handle forloop controlization
  *
@@ -517,7 +521,7 @@ statement loop_test(statement sl)
 		     MAKE_CONTINUE_STATEMENT(), 
 		     MAKE_CONTINUE_STATEMENT());
   string csl = statement_comments(sl);
-  string prev_comm = empty_comments_p(csl)? "" : strdup(csl);
+  string prev_comm = empty_comments_p(csl)? strdup("") : strdup(csl);
   string lab = string_undefined;
 
   if(entity_empty_label_p(loop_label(l)))
@@ -781,7 +785,7 @@ statement forloop_test(statement sl)
 		     MAKE_CONTINUE_STATEMENT(), 
 		     MAKE_CONTINUE_STATEMENT());
   string csl = statement_comments(sl);
-  string cs = empty_comments_p(csl)? "" : strdup(csl);
+  string cs = empty_comments_p(csl)? strdup("") : strdup(csl);
 
   statement ts = make_statement(entity_empty_label(), 
 				statement_number(sl),
@@ -1446,8 +1450,6 @@ statement st;
     hash_table used_labels = hash_table_make(hash_string, 0);
     unstructured u;
 
-    debug_on("CONTROL_DEBUG_LEVEL");
-
     ifdebug(1) {
 	pips_assert("Statement should be OK.", statement_consistent_p(st));
 	set_bool_property("PRETTYPRINT_BLOCKS", TRUE);
@@ -1503,8 +1505,6 @@ statement st;
 	check_control_coherency(unstructured_exit(u));
 	pips_assert("Unstructured should be OK.", unstructured_consistent_p(u));
     }
-
-    debug_off();
 
     return(u);
 }
