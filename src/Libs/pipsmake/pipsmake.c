@@ -304,9 +304,8 @@ string rname, oname;
  * "apply PRINT_CALL_GRAPH_WITH_TRANSFORMERS" applies the rule
  * PRINT_CALL_GRAPH to all callees of the main, leading to a core
  * dump. 
- * A solution, suggested by FI, is to create an apply that checks the 
- * activation of the rule and exits if it is not activated 
- * else calls a "blind" apply -DB, 03-07-96 
+ * Safe apply checks if the rule applied is activated and produces ressources 
+ * that it requires (no transitive closure) --DB 8/96
  */
 static bool apply(pname, oname)
 string pname, oname;
@@ -1097,7 +1096,7 @@ string phase_n, module_n;
 		     phase_n, module_n);
 	success = FALSE;
     }
-    else {
+    else 
     if (rule_use_resource_produced(r) && (! active_phase_p(phase_n))) {
         user_warning("safe_apply",
 		     "Request aborted in pipsmake: "
