@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1995/07/26 16:52:54 $, ) 
+ * ($Date: 1995/08/01 09:13:45 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -44,7 +44,7 @@ entity (*create_var)(/* int */);
 
     if (var) vect_add_elem(&v, (Variable) var, -1);
 
-    return(contrainte_make(v));
+    return contrainte_make(v);
 }
 
 /* builds a linarization equation of the dimensions of obj.
@@ -72,7 +72,7 @@ entity (*create_var)(/* int */);
 
     if (var) vect_add_elem(&v, (Variable) var, -1);
 
-    return(contrainte_make(v));
+    return contrainte_make(v);
 }
 
 static Psysteme 
@@ -140,7 +140,7 @@ entity src, trg;
     result = sc_append(result, s_equ), sc_rm(s_equ);
     result = sc_append(result, s_shr), sc_rm(s_shr);
 
-    return(result);
+    return result;
 }
 
 /*   ??? assumes that there are no parameters. what should be the case...
@@ -300,9 +300,9 @@ boolean sh; /* whether to shift the psi's */
 
     sc_rm(simpler); sc_rm(enumeration);
 
-    return(make_block_statement(CONS(STATEMENT, define_psis,
+    return make_block_statement(CONS(STATEMENT, define_psis,
 				CONS(STATEMENT, if_guard,
-				     NIL))));
+				     NIL)));
 }
 
 /* to be generated:
@@ -318,11 +318,11 @@ Psysteme s;
 list /* of entities */ ll, /* of expressions */ ld;
 statement body;
 {
-    return(systeme_to_loop_nest(s, ll,
-	    make_block_statement(CONS(STATEMENT, generate_deducables(ld),
-				 CONS(STATEMENT, body,
-				      NIL))), 
-	    hpfc_name_to_entity(IDIVIDE)));
+    return systeme_to_loop_nest(s, ll,
+	   make_block_statement(CONS(STATEMENT, generate_deducables(ld),
+				CONS(STATEMENT, body,
+				     NIL))), 
+				hpfc_name_to_entity(IDIVIDE));
 }
 
 /* to be generated:
@@ -337,29 +337,11 @@ if_different_pe(lid, true, false)
 entity lid;
 statement true, false;
 {
-    return(test_to_statement
-	   (make_test(MakeBinaryCall(CreateIntrinsic(NON_EQUAL_OPERATOR_NAME),
-			     entity_to_expression(hpfc_name_to_entity(MYLID)),
-			     entity_to_expression(lid)),
-		      true, false)));
-}
-
-static statement msg(ld, send)
-entity ld;
-bool send;
-{
-    entity nc, nt;
-    expression lid, tid, chn;
-
-    nc = hpfc_name_to_entity(send ? SEND_CHANNELS : RECV_CHANNELS);
-    nt = hpfc_name_to_entity(NODETIDS);
-    lid = entity_to_expression(ld);
-    tid = reference_to_expression
-	(make_reference(nt, CONS(EXPRESSION, lid, NIL)));
-    chn = reference_to_expression
-	(make_reference(nc, CONS(EXPRESSION, copy_expression(lid), NIL)));
-
-    return(hpfc_message(tid, chn, send));
+    return test_to_statement
+      (make_test(MakeBinaryCall(CreateIntrinsic(NON_EQUAL_OPERATOR_NAME),
+	   entity_to_expression(hpfc_name_to_entity(MYLID)),
+	   entity_to_expression(lid)),
+		      true, false));
 }
 
 /* builds the diffusion loop.
@@ -369,20 +351,24 @@ bool send;
  *   IF (MYLID.NE.LID) send to LID
  * ENDDO
  */
-static statement diffuse(lid, proc, sr, ldiff)
+static statement diffuse(lid, proc, sr, ldiff, lazy)
 entity lid, proc;
 Psysteme sr;
 list /* of entity */ ldiff;
+bool lazy;
 {
-    statement body;
+    statement body, nest;
 
     body = make_block_statement
 	(CONS(STATEMENT, hpfc_compute_lid(lid, proc, get_ith_processor_prime),
-	 CONS(STATEMENT, if_different_pe(lid, msg(lid, TRUE),
-					 make_empty_statement()),
+	 CONS(STATEMENT, if_different_pe
+	      (lid, hpfc_generate_message(lid, TRUE, FALSE),
+	       make_empty_statement()),
 	      NIL)));
 
-    return(systeme_to_loop_nest(sr, ldiff, body, hpfc_name_to_entity(IDIVIDE)));
+    nest = systeme_to_loop_nest(sr, ldiff, body, hpfc_name_to_entity(IDIVIDE));
+
+    return lazy ? hpfc_lazy_guard(TRUE, nest) : nest ;
 }
 
 /* in the following functions tag t controls the code generation, 
@@ -390,34 +376,38 @@ list /* of entity */ ldiff;
  * tag t may have the following values:
  */
 
-#define COPY 0
-#define SEND 1
-#define RECV 2
-#define DIFF 3
+#define CPY	1
+#define SND	2
+#define RCV	3
+#define BRD     4
 
 static statement 
 pre(t, lid)
 int t;
 entity lid;
 {
-    return(t==COPY ? make_empty_statement() :
-	   t==SEND || t==DIFF ? hpfc_initsend() :
-           t==RECV ? msg(lid, FALSE) :
+    return(t==CPY ? make_empty_statement() :
+	   t==SND || t==BRD ? hpfc_initsend(lazy_message_p()) :
+           t==RCV ? (lazy_message_p() ? 
+		    set_logical(hpfc_name_to_entity(LAZY_RECV), TRUE) :
+		    hpfc_generate_message(lid, FALSE, FALSE)) :
 	   statement_undefined);
 }
 
 static statement 
-in(t, src, trg, create_src, create_trg)
+in(t, src, trg, lid, create_src, create_trg)
 int t;
-entity src, trg;
+entity src, trg, lid;
 entity (*create_src)(), (*create_trg)();
 {
-    return(t==COPY ? make_assign_statement
-	              (make_reference_expression(trg, create_trg),
-		       make_reference_expression(src, create_src)) :
-	   t==SEND || t==DIFF ? hpfc_packing(src, create_src, TRUE) :
-	   t==RECV ? hpfc_packing(trg, create_trg, FALSE) :
-	   statement_undefined);
+    return
+      t==CPY ? make_assign_statement
+	  (make_reference_expression(trg, create_trg),
+	   make_reference_expression(src, create_src)) :
+      t==SND ? hpfc_lazy_packing(src, lid, create_src, TRUE, lazy_message_p()) :
+      t==BRD ? hpfc_lazy_packing(src, lid, create_src, TRUE, lazy_message_p()) :
+      t==RCV ? hpfc_lazy_packing(trg, lid, create_trg, FALSE, lazy_message_p()) :
+	  statement_undefined;
 }
 
 static statement 
@@ -427,9 +417,9 @@ entity lid, proc;
 Psysteme sr;
 list /* of entities */ ldiff;
 {
-    return(t==COPY || t==RECV ? make_empty_statement() :
-           t==SEND ? msg(lid, TRUE) :
-           t==DIFF ? diffuse(lid, proc, sr, ldiff) :
+    return(t==CPY || t==RCV ? make_empty_statement() :
+           t==SND ? hpfc_generate_message(lid, TRUE, lazy_message_p()) :
+           t==BRD ? diffuse(lid, proc, sr, ldiff, lazy_message_p()) :
 	   statement_undefined);
 }
 
@@ -442,7 +432,7 @@ entity lid, src, trg;
 {
     statement inner, result;
 
-    inner  = in(t, src, trg, get_ith_local_dummy, get_ith_local_prime),
+    inner  = in(t, src, trg, lid, get_ith_local_dummy, get_ith_local_prime),
     result = make_block_statement
 	    (CONS(STATEMENT, pre(t, lid),
 	     CONS(STATEMENT, elements_loop(s, ll, ld, inner),
@@ -450,11 +440,11 @@ entity lid, src, trg;
 		  NIL))));
 
     statement_comments(result) = 
-	strdup(concatenate("c - ", 
-	   t==COPY ? "copy" : t==SEND ? "send" : t==RECV ? "receiv" :
-			   t==DIFF ? "broadcast" : "?",  "ing\n", NULL));
+	strdup(concatenate("c - ", lazy_message_p() ? "lazy " : "",
+	   t==CPY ? "copy" : t==SND ? "send" : t==RCV ? "receiv" :
+			   t==BRD ? "broadcast" : "?",  "ing\n", NULL));
 
-    return(result);
+    return result;
 }
 
 void 
@@ -483,13 +473,13 @@ bool dist_p; /* true if must take care of lambda */
            p_src = array_to_processors(src),
            p_trg = array_to_processors(trg),
            lambda = get_ith_temporary_dummy(3);
-    statement rp_copy, rp_recv, send, recv, cont, result;
+    statement copy, recv, send, receive, cont, result;
 
     pips_debug(3, "%s taking care of processor cyclic distribution\n", 
 	       dist_p ? "actually" : "not");
 
-    rp_copy = remapping_stats(0, locals, SC_EMPTY, ll, NIL, ld, lid, src, trg);
-    rp_recv = remapping_stats(2, locals, SC_EMPTY, ll, NIL, ld, lid, src, trg);
+    copy = remapping_stats(CPY, locals, SC_EMPTY, ll, NIL, ld, lid, src, trg);
+    recv = remapping_stats(RCV, locals, SC_EMPTY, ll, NIL, ld, lid, src, trg);
 
     if (dist_p) lp = CONS(ENTITY, lambda, lp);
 
@@ -500,7 +490,7 @@ bool dist_p; /* true if must take care of lambda */
 	statement rp_send;
 
 	rp_send =
-	    remapping_stats(1, locals, SC_EMPTY, ll, NIL, ld, lid, src, trg);
+	    remapping_stats(SND, locals, SC_EMPTY, ll, NIL, ld, lid, src, trg);
     
 	send = processor_loop
 	    (procs, l, lp, p_src, p_trg, lid,
@@ -511,7 +501,7 @@ bool dist_p; /* true if must take care of lambda */
     {
 	Pbase b = entity_list_to_base(ldiff);
 	list lpproc = gen_copy_seq(lp);
-	statement rp_diff;
+	statement diff;
 	Psysteme 
 	    sd /* distributed */, 
 	    sr /* replicated */;
@@ -523,12 +513,12 @@ bool dist_p; /* true if must take care of lambda */
 	sc_separate_on_vars(procs, b, &sr, &sd);
 	base_rm(b);
 
-	rp_diff = remapping_stats(3, locals, sr, ll, ldiff, ld, lid, src, trg);
+	diff = remapping_stats(BRD, locals, sr, ll, ldiff, ld, lid, src, trg);
 
 	send = processor_loop
 	    (sd, l, lpproc, p_src, p_trg, NULL,
 	     get_ith_processor_dummy, get_ith_processor_prime,
-	     rp_diff, FALSE);
+	     diff, FALSE);
 
 	gen_free_list(lpproc); sc_rm(sd); sc_rm(sr);
     }
@@ -539,17 +529,17 @@ bool dist_p; /* true if must take care of lambda */
 	l = gen_nconc(l, CONS(ENTITY, lambda, NIL)); /* ??? to be deduced */
     }
 
-    recv = processor_loop
+    receive = processor_loop
 	(procs, lp, l, p_trg, p_src, lid,
 	 get_ith_processor_prime, get_ith_processor_dummy,
-	 if_different_pe(lid, rp_recv, rp_copy), TRUE);
+	 if_different_pe(lid, recv, copy), TRUE);
 
     if (dist_p) gen_remove(&l, lambda);
 
     cont = make_empty_statement();
 
     result = make_block_statement(CONS(STATEMENT, send,
-				  CONS(STATEMENT, recv,
+				  CONS(STATEMENT, receive,
 				  CONS(STATEMENT, cont,
 				       NIL))));
 
@@ -559,17 +549,17 @@ bool dist_p; /* true if must take care of lambda */
 	strdup(concatenate("c remapping ", entity_local_name(src), 
 			   " -> ", entity_local_name(trg), "\n", NULL));
     statement_comments(send) = strdup("c send part\n");
-    statement_comments(recv) = strdup("c receive part\n");
+    statement_comments(receive) = strdup("c receive part\n");
     statement_comments(cont) = strdup("c end of remapping\n");
     
     DEBUG_STAT(3, "result", result);
     
-    return(result);
+    return result;
 }
 
-/* IF (current_mapping.eq.src) THEN
- *   code
- *   current_mapping = trg
+/* IF (MSTATUS(primary_number).eq.src_number) THEN
+ *   the_code
+ *   MSTATUS(primary_number) = trg_number
  * ENDDIF
  */
 static statement
@@ -580,24 +570,29 @@ statement the_code;
     int src_n = load_hpf_number(src), /* source, target and primary numbers */
         trg_n = load_hpf_number(trg),
         prm_n = load_hpf_number(load_primary_entity(src));
-    entity m_status = hpfc_name_to_entity(MSTATUS);
+    entity m_status = hpfc_name_to_entity(MSTATUS); /* mapping status */
     expression m_stat_ref, cond;
     statement affecte, result;
-
-    m_stat_ref = reference_to_expression
-	(make_reference(m_status, 
-			CONS(EXPRESSION, int_to_expression(prm_n), NIL)));
     
+    /* MSTATUS(primary_n) */
+    m_stat_ref =
+	reference_to_expression
+	    (make_reference(m_status, 
+			    CONS(EXPRESSION, int_to_expression(prm_n), NIL)));
+    
+    /* MSTATUS(primary_number) = trg_number */
     affecte = make_assign_statement(copy_expression(m_stat_ref), 
 				    int_to_expression(trg_n));
 
+    /* MSTATUS(primary_number).eq.src_number */
     cond = MakeBinaryCall(CreateIntrinsic(EQUAL_OPERATOR_NAME),
 			  m_stat_ref, int_to_expression(src_n));
 
     result = test_to_statement(make_test(cond, 
       make_block_statement(CONS(STATEMENT, the_code,
-			   CONS(STATEMENT, affecte, NIL))),
-				make_empty_statement()));
+			   CONS(STATEMENT, affecte, 
+				NIL))),
+      make_empty_statement()));
 
     return result;
 }
@@ -617,7 +612,7 @@ entity src, trg;
 
     pips_debug(3, "%s -> %s\n", entity_name(src), entity_name(trg));
 
-    if (src==trg) return(make_empty_statement()); /* (optimization:-) */
+    if (src==trg) return make_empty_statement(); /* (optimization:-) */
 
     /*   builds and simplifies the systems.
      */
@@ -660,7 +655,7 @@ entity src, trg;
     
     DEBUG_STAT(6, "result", s);
 
-    return(s);
+    return s;
 }
 
 /* void remapping_compile(s, hsp, nsp)
@@ -684,11 +679,8 @@ statement s, *hsp /* Host Statement Pointer */, *nsp /* idem Node */;
     *hsp = make_empty_statement(); /* nothing for host */
 
     MAP(RENAMING, r,
-     {
-	 l = CONS(STATEMENT, 
-		  hpf_remapping(renaming_old(r), renaming_new(r)), l);
-     },
-	 load_renamings(s));
+	l = CONS(STATEMENT, hpf_remapping(renaming_old(r), renaming_new(r)), l),
+	load_renamings(s));
 
     *nsp = make_block_statement(l); /* block of remaps for the nodes */
 
