@@ -3,6 +3,9 @@
   $Id$
 
   $Log: loop_unroll.c,v $
+  Revision 1.23  2000/07/03 09:57:49  irigoin
+  transformation cut...
+
   Revision 1.22  2000/03/16 14:03:59  irigoin
   Comments added to find_unroll_pragma_and_fully_unroll()
 
@@ -57,6 +60,67 @@ expression make_ref_expr(entity ent, cons *args)
     return( make_expression(make_syntax(is_syntax_reference, 
 					make_reference(ent, args) ),
 			    normalized_undefined ));
+}
+
+/* Find the label associated with the last statement executed within s. */
+entity find_final_statement_label(statement s)
+{
+  entity fsl = entity_undefined;
+  instruction i = statement_instruction(s);
+  list l = list_undefined;
+
+  switch(instruction_tag(i)) {
+
+  case is_instruction_block:
+    if(!ENDP(l=gen_last(instruction_block(i)))) {
+      fsl = statement_label(STATEMENT(CAR(l)));
+    }
+    else {
+      /* If empty blocks are allowed, we've recursed one statement too
+         far. */
+      pips_error("find_final_statement_label",
+		 "Useless empty sequence. Unexpected in controlized code.\n");
+    }
+    break;
+
+  case is_instruction_test:
+    /* There cannot be a final statement. The test itself is the final
+       instruction. */
+    fsl = statement_label(s);
+    break;
+
+  case is_instruction_loop:
+    fsl = find_final_statement_label(loop_body(instruction_loop(i)));
+    break;
+
+  case is_instruction_goto:
+    pips_error("find_final_statement_label",
+	       "Controlized code should not contain GO TO statements\n");
+    break;
+
+  case is_instruction_call:
+    fsl = statement_label(s);
+    break;
+
+  case is_instruction_unstructured:
+    /* Must be the label of the exit node. */
+    fsl = find_final_statement_label
+      (control_statement(unstructured_exit(instruction_unstructured(i))));
+    break;
+
+  default:
+    pips_error("find_final_statement_label",
+	       "Unknown instruction tag: %d\n",
+	       instruction_tag(i));
+  }
+
+  /* fsl should be either a meaningful label or the empty label */
+  if(entity_undefined_p(fsl)) {
+    pips_error("find_final_statement_label",
+	       "Undefined final label\n");
+  }
+
+  return fsl;
 }
 
 /* db_get_current_module_name() unusable because module not set,
@@ -383,6 +447,7 @@ void full_loop_unroll(statement loop_statement)
     loop il = instruction_loop(statement_instruction(loop_statement));
     range lr = loop_range(il);
     entity ind = loop_index(il);
+    entity flbl = entity_undefined; /* final loop body label */
     expression lb = range_lower(lr),
                ub = range_upper(lr),
                inc = range_increment(lr);
@@ -394,7 +459,7 @@ void full_loop_unroll(statement loop_statement)
 
     debug(2, "full_loop_unroll", "begin\n");
 
-    if(get_debug_level()==7) {
+    ifdebug(7) {
 	/* Start debug in Newgen */
 	gen_debug |= GEN_DBG_CHECK;
     }
@@ -415,9 +480,13 @@ void full_loop_unroll(statement loop_statement)
     /* Instruction block is created and will contain everything */
     block = make_instruction_block(NIL);
 
-    /* get rid of labels in loop body (don't worry, useful labels have
+    /* get rid of labels in loop body: don't worry, useful labels have
        been transformed into arcs by controlizer, you just loose loop
-       labels) */
+       labels. However, the label of the last statement in the loop body
+       might be used by an outer loop and, in doubt, should be preserved. */
+
+    flbl = find_final_statement_label(loop_body(il));
+
     (void) clear_labels (loop_body (il));
 
     for(iter = lbval; iter <= ubval; iter += incval) {
@@ -449,8 +518,19 @@ void full_loop_unroll(statement loop_statement)
 		       CONS(STATEMENT, transformed_stmt, NIL));
     }
 
-    /* Generate a statement to reinitialize old index 
-     */
+    /* Generate a CONTINUE to carry the final loop body label in case an
+       outer loop uses it */
+    if(!entity_empty_label_p(flbl)) {
+      stmt = make_continue_statement(flbl);
+      ifdebug(9) {
+	print_text(stderr,text_statement(entity_undefined,0,stmt));
+	pips_assert("full_loop_unroll", statement_consistent_p(stmt));
+      }
+      instruction_block(block)= gen_nconc(instruction_block(block),
+					  CONS(STATEMENT, stmt, NIL ));
+    }
+
+    /* Generate a statement to reinitialize old index */
     rhs_expr = int_to_expression(iter);
     expr = make_ref_expr(ind, NIL);
     stmt = make_assign_statement(expr, rhs_expr);
