@@ -455,16 +455,40 @@ entity v;
 }
 
 
-bool variable_in_module_p(v,m)
-entity v;
-entity m;
+bool
+variable_is_a_module_formal_parameter_p(entity a_variable,
+                                        entity a_module)
 {
-    bool in_module_1 = strcmp(module_local_name(m), entity_module_name(v)) == 0;
-    bool in_module_2 = entity_is_argument_p(v, code_declarations (value_code(entity_initial (m))));
+   MAP(ENTITY, e,
+       {
+          storage s = entity_storage(e);
+          if (e == a_variable)
+             if (storage_formal_p(s))
+                /* Well, the variable is a formal parameter of the
+                   module: */
+                return TRUE;
+             else
+                /* The variable is in the declaration of the module
+                   but is not a formal parameter: */
+                return FALSE;
+       },
+          code_declarations(value_code(entity_initial(a_module))));
 
-    pips_assert ("variable_in_module_p", in_module_1==in_module_2);
+   /* The variable is not in the declaration of the module: */
+   return FALSE;
+}
 
-    return in_module_1;
+
+bool
+variable_in_module_p(entity v,
+                     entity m)
+{
+   bool in_module_1 = strcmp(module_local_name(m), entity_module_name(v)) == 0;
+   bool in_module_2 = entity_is_argument_p(v, code_declarations(value_code(entity_initial(m))));
+
+   pips_assert ("variable_in_module_p", in_module_1==in_module_2);
+
+   return in_module_1;
 }
 
 
