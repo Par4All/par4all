@@ -362,7 +362,7 @@ get_new_cache_file_name(void)
     static int unique = 0;
     string dir_name, file_name;
     int len;
-    dir_name = db_get_directory_name_for_module("Tmp");
+    dir_name = db_get_directory_name_for_module(WORKSPACE_TMP_SPACE);
     len = strlen(dir_name)+20;
     file_name = (char*) malloc(sizeof(char)*len);
     if (!file_name) pips_internal_error("malloc failed\n");
@@ -566,32 +566,17 @@ static void sort_file(string name)
     safe_fclose(f, name);
 }
 
-static bool pips_split_file(string name, string tempfile)
+static bool 
+pips_split_file(string name, string tempfile)
 {
-#ifdef NO_INTERNAL_FSPLIT
-    int err = safe_system_no_abort
-	(concatenate("trap 'exit 123' 2;",
-		     "pips-split ", abspath,
-		     "| sed -e /zzz[0-9][0-9][0-9].f/d | sort -r > ",
-		     tempfile, "; /bin/rm -f zzz???.f", NULL));
-
-    if(err==123)
-	pips_user_warning("File splitting interrupted by control-C\n");
-    else if(err!=0)
-	pips_internal_error("Unexpected return code from pips-split: %d\n", 
-			    err);
-
-    return err;
-#else
     int err;
     FILE * out = safe_fopen(tempfile, "w");
-    err = fsplit(name, out);
+    string dir = db_get_current_workspace_directory();
+    err = fsplit(dir, name, out);
+    free(dir);
     safe_fclose(out, tempfile);
-
     sort_file(tempfile);
-
     return err;
-#endif
 }
 
 /********************************************** managing .F files with cpp */
@@ -619,11 +604,12 @@ static string process_thru_cpp(string name)
 {
     string dir_name, new_name, simpler, cpp_options, cpp;
 
-    dir_name = db_get_current_workspace_directory();
+    dir_name = db_get_directory_name_for_module(WORKSPACE_TMP_SPACE);
     simpler = basename(name, ".F");
     new_name = 
 	strdup(concatenate(dir_name, "/", simpler, CPP_FILTERED_SUFFIX, 0));
     free(simpler);
+    free(dir_name);
 
     cpp_options = getenv(CPP_PIPS_OPTIONS_ENV);
     cpp = getenv(CPP_PIPS_ENV);
@@ -685,8 +671,7 @@ process_user_file(string file)
 {
     FILE *fd;
     bool success_p = FALSE, cpp_processed_p;
-    string cwd, abspath, initial_file, tempfile = NULL, nfile, name;
-    int err;
+    string initial_file, nfile, name, file_list;
 
     static int number_of_files = 0;
     static int number_of_modules = 0;
@@ -720,9 +705,6 @@ process_user_file(string file)
 	nfile = process_thru_cpp(initial_file);
     }
 
-    if (tempfile == NULL)
-	tempfile = tmpnam(NULL);
-
     /* the new file is registered in the database
      */
     user_log("Registering file %s\n", file);
@@ -731,28 +713,22 @@ process_user_file(string file)
 
     user_log("Splitting file    %s\n", nfile);
 
-    /* the absolute path of file is calculated
-     */
-    abspath = strdup((*nfile == '/') ? nfile : 
-		     concatenate(get_cwd(), "/", nfile, NULL));
-    cwd = strdup(get_cwd());
-    chdir(db_get_current_workspace_directory());
-
     /* if two modules have the same name, the first splitted wins
        and the other one is hidden by the call to "sed" since
        fsplit gives it a zzz00n.f name */
     /* Let's hope no user module is called zzz???.f */
-    err = pips_split_file(abspath, tempfile);
+    {
+	string dir = db_get_current_workspace_directory();
+	file_list = strdup(concatenate(dir, "/.fsplit_file_list", 0));
+	unlink(file_list);
+	free(dir);
+    }
 
-    /* Go back unconditionnally to regular directory for execution
-     * or you are heading for trouble when the database is closed
-     */
-    chdir(cwd);
-    free(cwd);
-    if (err) return FALSE;
+    if (pips_split_file(nfile, file_list))
+	return FALSE;
 
     /* the newly created module files are registered in the database */
-    fd = safe_fopen(tempfile, "r");
+    fd = safe_fopen(file_list, "r");
     while ((name=safe_readline(fd))) 
     {
 	string mod_name, file_name, res_name;
@@ -790,23 +766,20 @@ process_user_file(string file)
 	    /* from which file the initial source was derived.
 	     * absolute path to the file so that db moves should be ok...
 	     */
-	    DB_PUT_NEW_FILE_RESOURCE(DBR_USER_FILE, mod_name, strdup(abspath));
+	    DB_PUT_NEW_FILE_RESOURCE(DBR_USER_FILE, mod_name, strdup(nfile));
 	    free(file_name); free(abs_file); free(abs_res);
 	}
     }
-    safe_fclose(fd, tempfile);
+    safe_fclose(fd, file_list);
+    unlink(file_list); 
+    free(file_list);
 
-    unlink(tempfile); tempfile = NULL;
-
-    if (cpp_processed_p) {
-	unlink(nfile); /* remove .cpp_filtered file */
+    if (cpp_processed_p)
 	free(initial_file);
-    }
 
     if(!success_p)
 	pips_user_warning("No module was found when splitting file %s.\n",
 			  nfile);
     free(nfile);
-    free(abspath);
     return success_p;
 }
