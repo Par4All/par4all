@@ -200,21 +200,34 @@ char * (*variable_name)();
 }
 
 /*============================================================================*/
-/* void fprint_dataflow(FILE *fp, int sink, dataflow df): prints in
- * the file "fp" the dataflow "df" with a sink statement "sink".
+/* void fprint_dataflow(FILE *fp, int stmt, dataflow df, int count)
+ *
+ * Prints in the file "fp" the dataflow "df" with a sink statement "stmt".
+ *
+ * AP, oct 4th 1995: add the 4th arg "count" which is used for labelling
+ * the instructions that are duplicated in the DFG due to a
+ * disjunction. If count=0 then it is not printed.
  */
-void fprint_dataflow(fp, sink, df)
+void fprint_dataflow(fp, stmt, df, count)
 FILE *fp;
-int sink;
+int stmt;
 dataflow df;
+int count;
 {
  list trans_l = dataflow_transformation(df);
  reference ref = dataflow_reference(df);
  predicate gov_pred = dataflow_governing_pred(df);
  communication comm = dataflow_communication(df);
 
- fprintf(fp," ---Def-Use---> ins_%d:\n  Reference: %s\n  Transformation: [",
-	 sink, words_to_string(words_reference(ref)));
+ if(count == 0)
+   fprintf(fp
+	   " ---Def-Use---> ins_%d:\n  Reference: %s\n  Transformation: [",
+	   stmt, words_to_string(words_reference(ref)));
+ else
+   fprintf(fp
+	   " ---Def-Use---> ins_%d_%d:\n  Reference: %s\n  Transformation: [",
+	   stmt, count, words_to_string(words_reference(ref)));
+
  fprint_list_of_exp(fp, trans_l);
  fprintf(fp,"]\n");
  fprintf(fp,"  Governing predicate:\n");
