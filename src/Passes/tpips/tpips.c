@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.99  1998/05/25 17:16:07  coelho
+ * signal handling fixed...
+ *
  * Revision 1.98  1998/05/25 16:48:33  coelho
  * pips signal initialization added.
  *
@@ -890,7 +893,7 @@ tpips_init(void)
 
     initialize_newgen();
     initialize_sc((char*(*)(Variable))entity_local_name);
-    initialize_signal_catcher();
+    /* initialize_signal_catcher(); */
 
     set_bool_property("ABORT_ON_USER_ERROR", FALSE); /* ??? */
 
@@ -915,10 +918,13 @@ tpips_exec(char * line)
 
     pips_debug(3, "considering line: %s\n", line? line: " --- empty ---");
 
-    if (signal_occured()) {
+    /* does not make much sense here... FC. 
+    if (interrupt_pipsmake_asap_p())
+    {
 	user_log("signal occured, closing workspace...\n");
 	close_workspace_if_opened();
     }
+    */
 
     if (setjmp(pips_top_level)) 
     {
@@ -1141,7 +1147,7 @@ tpips_main(int argc, char * argv[])
 {
     debug_on("TPIPS_DEBUG_LEVEL");
     pips_log_handler = tpips_user_log;
-    initialize_pips_signal_handlers();
+    initialize_signal_catcher();
 
     {
 	string pid = (char*) malloc(sizeof(char)*20);
