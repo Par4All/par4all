@@ -1,5 +1,5 @@
 /* $RCSfile: tpips.c,v $ (version $Revision$
- * $Date: 1997/04/21 18:30:36 $, 
+ * $Date: 1997/04/22 10:57:26 $, 
  */
 
 #include <stdio.h>
@@ -198,6 +198,7 @@ static char *default_hist_file_name()
      */
     home = getenv("HOME");
     tmp = (char*) malloc(sizeof(char)*(strlen(home)+strlen(TPIPS_HISTORY)+2));
+    if (!tmp) pips_exit(1, "memory exhausted\n");
     (void) sprintf(tmp, "%s/%s", home, TPIPS_HISTORY);
 
     return tmp;
@@ -558,21 +559,24 @@ static void (*find_handler(char* line))(char *)
 /*************************************************************** DO THE JOB */
 
 /* returns an allocated string up to \n or EOF from f
+ * returns NULL on EOF as readline.
  */
 static char * tpips_readline(FILE *f)
 {
     int c, index = 0, size = 20;
     char * line = (char*) malloc(size);
-    if (!line) pips_internal_error("malloc failed\n");
+    if (!line) pips_exit(1, "memory exhausted\n");
 
     while ((c=getc(f)), c!=EOF && c!='\n') 
     {
 	if (index+1>=size) size*=2, line = (char*) realloc(line, size);
-	if (!line) pips_internal_error("realloc failed\n");
+	if (!line) pips_exit(1, "memory exhausted\n");
 	line[index++] = (char) c;
     }
-    line[index++] = '\0';
 
+    if (c==EOF && index==0) { free(line); return NULL; }
+
+    line[index++] = '\0';
     return line;
 }
 
@@ -622,6 +626,7 @@ static void init_sbuffer(void)
     if (sbuffer) return;
     sbufsize = 64; 
     sbuffer = (char*) malloc(sbufsize); 
+    if (!sbuffer) pips_exit(3, "memory exhausted\n");
 }
 /* appends a char at pos
  */
@@ -630,6 +635,7 @@ static int add_sbuffer_char(int pos, char c)
     if (pos>=sbufsize) { 
 	sbufsize*=2; 
 	sbuffer = realloc(sbuffer, sbufsize); 
+	if (!sbuffer) pips_exit(3, "memory exhausted\n");
     }
     sbuffer[pos] = c;
     return pos+1;
