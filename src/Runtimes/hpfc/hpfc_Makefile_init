@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/09/01 21:39:16 $, )
+# ($Date: 1996/09/02 10:40:04 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET entry is expected somewhere...
@@ -274,15 +274,18 @@ param_init.f: param_init.m4
 #
 # Link
 
-# also insures that a directive is there only once? should be ok?
+# also insures that a directive is there only once? 
+# should be ok?
 # what about continuations?
-# LDI: Link eDitor I/O (host & source)
-# LDP: Link eDitor Pure (all)
+# LD IO: Link eDitor I/O (host & source)
+# LD PURE: Link eDitor PURE (all)
 
-LDI:=$(shell echo $(shell sed -n 's/^[Cc!\*][Ll][Dd][Ii].//p' $(TARGET).f | \
-		sort -u))
-LDP:=$(shell echo $(shell sed -n 's/^[Cc!\*][Ll][Dd][Pp].//p' $(TARGET).f | \
-		sort -u))
+LDF:=$(shell echo $(shell \
+	sed -n 's,^[Cc!\*][Ff][Cc][Dd]$$[ 	][ 	]*[Ll][Dd],ld,p' \
+		$(TARGET).f) | sort -u)
+
+LDIO:=$(shell echo $(LDF) | sed -n 's,^ld[ 	]*[Ii][Oo],,p')
+LDPURE:=$(shell echo $(LDF) | sed -n 's,^ld[ 	]*[Pp][Uu][Rr][Ee],,p')
 
 $(HOST):  $(HEADERS) $(COMMON_OFILES) $(HOST_OFILES)
 	$(FC) $(FFLAGS) -o $(HOST) \
@@ -290,7 +293,7 @@ $(HOST):  $(HEADERS) $(COMMON_OFILES) $(HOST_OFILES)
 		$(COMMON_OFILES) \
 		$(LIBS_DIR) \
 		$(ALL_HLIBS) \
-		$(LDI) $(LDP)
+		$(LDIO) $(LDPURE)
 	$(STRIP) $(HOST)
 
 $(NODE):  $(HEADERS) $(COMMON_OFILES) $(NODE_OFILES) 
@@ -301,7 +304,7 @@ $(NODE):
 		$(COMMON_OFILES) \
 		$(LIBS_DIR) \
 		$(ALL_NLIBS)\
-		$(LDP)
+		$(LDPURE)
 	$(STRIP) $(NODE)
 
 ifeq ($(PVM_ARCH),CM5)
@@ -323,7 +326,7 @@ $(NODE): $(HOST_OFILES)
 endif
 
 $(RTEST):  $(FTEST)
-	$(FC) $(FFLAGS) -o $(RTEST) $(FTEST) $(LDI) $(LDP)
+	$(FC) $(FFLAGS) -o $(RTEST) $(FTEST) $(LDIO) $(LDPURE)
 	$(STRIP) $(RTEST)
 
 #
@@ -331,6 +334,8 @@ $(RTEST):  $(FTEST)
 
 clean:;	$(RM) *.o *~ *.trace $(DEDUCED) core
 clobber: clean; $(RM) $(RUNABLES) $(PVM_BIN_DIR)/$(HOST) $(PVM_BIN_DIR)/$(NODE)
+
+echo:; @echo $(ECHO)
 
 # that is all
 #
