@@ -1,4 +1,4 @@
-#!/bin/csh -fvx
+#!/bin/csh -f
 #
 #  stf is a csh script to standardize the structure of a Fortran program
 #  using ISTST.
