@@ -35,6 +35,7 @@ sed -n \
 -e 's/^Request: build resource \(.*\) for module \(.*\)./display \1(\2)/p' \
 -e 's/^Request: perform rule \(.*\) on module \(.*\)./apply \1(\2)/p' \
 -e 's/^Options: phase \(.*\) (\(.*\)) set on./activate \2 # \1/p' \
+-e 's/^Selecting rule: \(.*\)/activate \1/p' \
 -e 's/^HPFC View of "\(.*\)" done./shell '$CAT' '$WDIR'\/hpfc\/\1/p' \
 -e 's/^User Request.../# user request :/p' \
 -e 's/^"\(.*\)"$/\1/p' \
