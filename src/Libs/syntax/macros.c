@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: macros.c,v $
+ * Revision 1.8  1998/07/24 09:22:30  coelho
+ * added ref to standard about macro expansion within a macro.
+ *
  * Revision 1.7  1998/07/24 07:30:37  coelho
  * apply macro expansion on new macros before entering them.
  *
@@ -129,7 +132,8 @@ void parser_add_a_macro(call c, expression e)
     pips_assert("macro not already defined", 
 		find_entity_macro(macro) == NULL);
 
-    /* expand macros in the macro! 
+    /* expand macros in the macro! It is ok, because
+     * referenced macros must appear in preceding lines (F77 15-5, line 3-5).
      */
     parser_macro_expansion(e);
 
