@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1995/09/14 21:11:00 $, )
+ * ($Date: 1995/09/22 13:14:29 $, )
  */
 
 #include "defines-local.h"
@@ -196,8 +196,7 @@ alignment_p(list /* of expressions */ align_src,
 
     /*  the alignment should be a simple affine expression
      */
-    message_assert("align subscript is not affine",
-		   *pshift==0 ? size<=1 : size<=2)
+    message_assert("affine align subscript", *pshift==0 ? size<=1 : size<=2)
 
     /*   constant alignment case
      */
@@ -216,7 +215,7 @@ alignment_p(list /* of expressions */ align_src,
 	{
 	    v_src = normalized_linear(n);
 
-	    message_assert("simple index expected",
+	    message_assert("simple index",
 			   vect_size(v_src)==1 && var_of(v_src)!=TCST);
 	    
 	    *prate = vect_coeff(var_of(v_src), v);
@@ -309,7 +308,7 @@ one_align_directive(reference alignee,
 	statement current = current_stmt_head();
 	entity new_array;
 
-	message_assert("realigning non dynamic array",
+	message_assert("dynamic array realignment",
 		       array_distributed_p(array) && dynamic_entity_p(array));
 
 	new_array = array_synonym_aligned_as(array, a);
@@ -363,13 +362,13 @@ static tag distribution_format(expression e,
     string name;
     call c;
 
-    message_assert("invalid distribution format", syntax_call_p(s));
+    message_assert("valid distribution format", syntax_call_p(s));
 
     c = syntax_call(s);
     function = call_function(c);
     *pl = call_arguments(c);
 
-    message_assert("invalid distribution format", 
+    message_assert("valid distribution format", 
 		   hpf_directive_entity_p(function));
 
     name = entity_local_name(function);
@@ -410,7 +409,7 @@ extract_the_distribute(reference distributee, reference proc)
 	{
 	case is_style_block:
 	case is_style_cyclic:
-	    message_assert("invalid distribution", gen_length(largs)<=1);
+	    message_assert("valid distribution", gen_length(largs)<=1);
 
 	    parameter = ENDP(largs) ? 
 		expression_undefined :                   /* implicit size */
@@ -455,7 +454,7 @@ one_distribute_directive(reference distributee,
 	statement current = current_stmt_head();
 	entity new_t;
 
-	message_assert("redistributing non dynamic template",
+	message_assert("dynamic template redistribution",
 		  entity_template_p(template) && dynamic_entity_p(template));
 
 	new_t = template_synonym_distributed_as(template, d);
@@ -661,10 +660,10 @@ HANDLER_PROTOTYPE(set)
 	string property;
 	int val, i;
 	
-	message_assert("two args expected", gen_length(args)==2);
+	message_assert("two args", gen_length(args)==2);
 	arg1 = EXPRESSION(CAR(args));
 	arg2 = EXPRESSION(CAR(CDR(args)));
-	message_assert("constant args expected",
+	message_assert("constant args",
 		       expression_is_constant_p(arg1) &&
 		       expression_is_constant_p(arg2));
 
