@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: hpfc.c,v $ ($Date: 1995/03/28 16:24:44 $, ) version $Revision$,
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/04/10 14:23:38 $, ) version $Revision$,
  * got on %D%, %T%
  */
  
@@ -389,7 +389,7 @@ string name;
     put_generated_resources_for_program(name);      /* global informations */
 
     close_hpfc_status();
-    DB_PUT_FILE_RESOURCE(DBR_HPFC_STATUS, strdup(name), NO_FILE); /* fake */
+    db_unput_resources(DBR_HPFC_STATUS);            /* destroy hpfc status */
 
     debug_off();
 }
