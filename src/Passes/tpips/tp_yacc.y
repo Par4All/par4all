@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.93  1998/11/24 18:38:49  coelho
+ * %MAIN is fixed. if none, try to parse just in case.
+ *
  * Revision 1.92  1998/07/08 12:56:54  coelho
  * user errors protect files to view.
  *
@@ -399,6 +402,7 @@ static void tp_some_info(string about)
 
 	}
 	if (jpips_is_running) jpips_end_tag();
+
 	gen_array_full_free(modules);
     }
     else if (same_string_p(about, "directory"))
@@ -410,6 +414,53 @@ static void tp_some_info(string about)
     }
     
     fprintf(stdout, "\n");
+}
+
+/* returns an array with the main inside.
+   if not found, try to build all callees to parse all sources
+   and maybe find it.
+ */
+static gen_array_t get_main(void)
+{
+  gen_array_t result = gen_array_make(0), modules;
+  int number_of_main = 0, nmodules = 0;
+  int n = 0;
+  
+  while (number_of_main==0 && n<2)
+  {
+    n++;
+    modules = db_get_module_list();
+    nmodules = gen_array_nitems(modules);
+    
+    if (n==2) 
+    {
+      res_or_rule * pr = (res_or_rule*) malloc(sizeof(res_or_rule));
+      pips_user_warning("no main directly found, searching...\n");
+      pr->the_owners = modules;
+      pr->the_name = strdup(DBR_CALLEES);
+      perform(safe_make, pr); /* pr is freed inside. */
+    }
+
+    GEN_ARRAY_MAP(on, 
+    {
+      entity mod = local_name_to_top_level_entity(on);
+      
+      if (!entity_undefined_p(mod) && 
+	  entity_main_module_p(mod))
+      {
+	if (number_of_main)
+	  pips_internal_error("More than one main\n");
+	
+	number_of_main++;
+	gen_array_dupappend(result, on);
+      }
+    },
+      modules);
+    
+    if (n==1) gen_array_full_free(modules);
+  }
+
+  return result;
 }
 
 %}
@@ -911,33 +962,12 @@ owner:	TK_OPENPAREN TK_OWNER_ALL TK_CLOSEPAREN
 	    pips_debug(7,"reduce rule owner (MAIN)\n");
 
 	    if (tpips_execution_mode) {
-		if (!db_get_current_workspace_name())
-		    pips_user_error("No current workspace! "
-				    "create or open one!\n");
-		else {
-		    gen_array_t modules = db_get_module_list();
-		    int nmodules = gen_array_nitems(modules),
-			number_of_main = 0;
-		    message_assert("some modules", nmodules>0);
-		    $$ = gen_array_make(0);
-		    
-		    GEN_ARRAY_MAP(on, 
-		    {
-			entity mod = local_name_to_top_level_entity(on);
-
-			if (!entity_undefined_p(mod) && 
-			    entity_main_module_p(mod))
-			{
-			    if (number_of_main)
-				pips_internal_error("More the one main\n");
-			
-			    number_of_main++;
-			    gen_array_dupappend($$, on);
-			}
-		    },
-			modules);
-		    gen_array_full_free(modules);
-		}
+	      if (!db_get_current_workspace_name())
+		pips_user_error("No current workspace! "
+				"create or open one!\n");
+	      else {
+		$$ = get_main();
+	      }
 	    }
 	}
 	| TK_OPENPAREN TK_OWNER_MODULE TK_CLOSEPAREN
