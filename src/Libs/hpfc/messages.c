@@ -1,6 +1,6 @@
 /* Messages handling
  *
- * $RCSfile: messages.c,v $ ($Date: 1995/10/10 11:38:13 $, )
+ * $RCSfile: messages.c,v $ ($Date: 1996/07/23 15:08:29 $, )
  * version $Revision$
  * 
  * Fabien Coelho, August 1993
@@ -68,10 +68,9 @@ list li, lk, lv;
 	     * that's rather interesting since I do not know where I could
 	     * put it...
 	     */
-	    int
-		cst = vect_coeff(TCST, v),
-		tpl = vect_coeff(TEMPLATEV, v),
-		localarraycell = template_cell_local_mapping(array, i, tpl);
+	    Value cst = vect_coeff(TCST, v), vt = vect_coeff(TEMPLATEV, v);
+	    int tpl = VALUE_TO_INT(vt),
+	        localarraycell = template_cell_local_mapping(array, i, tpl);
 
 	    /* no neighbour concerned */
 	    /* content: */
@@ -84,8 +83,8 @@ list li, lk, lv;
 	    /* domain: */
 	    ldom = gen_nconc(ldom,
 			     CONS(RANGE,
-				  make_range(int_to_expression(cst),
-					     int_to_expression(cst),
+				  make_range(Value_to_expression(cst),
+					     Value_to_expression(cst),
 					     int_to_expression(1)),
 				  NIL));
 	    break;
@@ -95,19 +94,15 @@ list li, lk, lv;
 	     * note that rate==1 
 	     */
 	{
-	    Pvecteur
-		vindex = the_index_of_vect(v);
-	    entity
-		index = (entity) var_of(vindex);
-	    range
-		rg = loop_index_to_range(index);
-	    int
-		procdim,
-		shift = vect_coeff(TSHIFTV, v),
-		ishft = vect_coeff(TCST, v),
+	    Pvecteur vindex = the_index_of_vect(v);
+	    entity index = (entity) var_of(vindex);
+	    range rg = loop_index_to_range(index);
+	    Value vs = vect_coeff(TSHIFTV, v), vi = vect_coeff(TCST, v);
+	    int	procdim,
+		shift = VALUE_TO_INT(vs),
+		ishft = VALUE_TO_INT(vi),
 		n     = DistributionParameterOfArrayDim(array, i, &procdim);
-	    expression
-		dom_lb, dom_ub;
+	    expression dom_lb, dom_ub;
 
 	    debug(10, "generate_one_message",
 		  "n = %d, just to avoid a gcc warning:-)\n", n);
@@ -117,41 +112,39 @@ list li, lk, lv;
 		/* neighbour to send to */
 		procv = vect_add(procv, 
 				 vect_new((Variable) procdim, 
-					  (shift<0)?(1):(-1)));
+					  (shift<0)?(VALUE_ONE):(VALUE_MONE)));
 		
 		/* content, on the sender point of view... */
 		if (shift<0)
 		{
-		    lr = 
-			gen_nconc
-			    (lr,
-			     CONS(RANGE,
-				  make_range(int_to_expression(arrayup+shift+1),
-					     int_to_expression(arrayup),
-					     int_to_expression(1)),
-				  NIL));
+		    lr = gen_nconc
+			(lr,
+			 CONS(RANGE,
+			      make_range(int_to_expression(arrayup+shift+1),
+					 int_to_expression(arrayup),
+					 int_to_expression(1)),
+			      NIL));
 		}
 		else /* (shift>0) */
 		{
-		    lr = 
-			gen_nconc
-			    (lr,
-			     CONS(RANGE,
-				  make_range(int_to_expression(arraylo),
-					     int_to_expression(arraylo+shift-1),
-					     int_to_expression(1)),
-				  NIL));
+		    lr = gen_nconc
+			(lr,
+			 CONS(RANGE,
+			      make_range(int_to_expression(arraylo),
+					 int_to_expression(arraylo+shift-1),
+					 int_to_expression(1)),
+			      NIL));
 		}
 	    }
 	    else /* shift == 0 */
 	    {
 		/* content: send it all? */
 		lr = gen_nconc(lr,
-				   CONS(RANGE,
-					make_range(int_to_expression(arraylo),
-						   int_to_expression(arrayup),
-						   int_to_expression(1)),
-					NIL));
+			       CONS(RANGE,
+				    make_range(int_to_expression(arraylo),
+					       int_to_expression(arrayup),
+					       int_to_expression(1)),
+				    NIL));
 	    }
 
 	    /* assert(gen_consistent_p(rg)); */
@@ -160,7 +153,7 @@ list li, lk, lv;
 					      range_lower(rg), ishft, TRUE);
 	    dom_ub = safe_static_domain_bound(array, i, 
 					      range_upper(rg), ishft, FALSE);
-
+	    
 	    /* domain */
 	    ldom = 
 		gen_nconc(ldom,
@@ -174,7 +167,7 @@ list li, lk, lv;
 	}
 	case local_constant:
 	{
-	    int
+	    Value
 		/* ??? bug if there is a declaration shift... */
 		arraycell = vect_coeff(TCST, v);
 
@@ -182,30 +175,27 @@ list li, lk, lv;
 	    /* content: */
 	    lr = gen_nconc(lr,
 			   CONS(RANGE,
-				make_range(int_to_expression(arraycell),
-					   int_to_expression(arraycell),
+				make_range(Value_to_expression(arraycell),
+					   Value_to_expression(arraycell),
 					   int_to_expression(1)),
 				NIL));
 	    /* domain: */
 	    ldom = gen_nconc(ldom,
 			     CONS(RANGE,
-				  make_range(int_to_expression(arraycell),
-					     int_to_expression(arraycell),
+				  make_range(Value_to_expression(arraycell),
+					     Value_to_expression(arraycell),
 					     int_to_expression(1)),
 				  NIL));
 	    break;
 	}
 	case local_shift:
 	{
-	    Pvecteur
-		vindex = the_index_of_vect(v);
-	    entity
-		index = (entity) var_of(vindex);
-	    range
-		rg = loop_index_to_range(index);
-	    int
-		shift = vect_coeff(TCST, v),
-		ishft = vect_coeff(TCST, v),
+	    Pvecteur vindex = the_index_of_vect(v);
+	    entity index = (entity) var_of(vindex);
+	    range rg = loop_index_to_range(index);
+	    Value vs = vect_coeff(TCST, v);
+	    int shift = VALUE_TO_INT(vs),
+		ishft = shift,
 		lb    = HpfcExpressionToInt(range_lower(rg)),
 		ub    = HpfcExpressionToInt(range_upper(rg));
 	    
@@ -226,7 +216,7 @@ list li, lk, lv;
 			  CONS(RANGE,
 			       make_range(int_to_expression(lb+ishft),
 					  int_to_expression(ub+ishft),
-					  int_to_expression(1)), /* ??? why 1 */
+					  int_to_expression(1)),/* ??? why 1 */
 			       NIL));
 	    
 
@@ -240,10 +230,11 @@ list li, lk, lv;
 		index = (entity) var_of(vindex);
 	    range
 		rg = loop_index_to_range(index);
+	    Value vs = vect_coeff(TCST, v);
 	    int
-		rate  = (int) val_of(vindex),
-		shift = vect_coeff(TCST, v),
-		ishft = vect_coeff(TCST, v),
+		rate  = VALUE_TO_INT(val_of(vindex)),
+		shift = VALUE_TO_INT(vs),
+		ishft = shift,
 		in    = HpfcExpressionToInt(range_increment(rg)),
 		lb    = HpfcExpressionToInt(range_lower(rg)),
 		ub    = HpfcExpressionToInt(range_upper(rg));
@@ -362,16 +353,11 @@ message m;
     
     for (cnt=content, dom=domain ; cnt!=NIL ; cnt=CDR(cnt), dom=CDR(dom), i++)
     {
-	int 
-	    procdim;
-	range
-	    rcnt = RANGE(CAR(cnt)),
-	    rdom = RANGE(CAR(dom));
-	bool
-	    distributed = ith_dim_distributed_p(array, i, &procdim);
-	int
-	    neighbour = ((distributed)?
-			 ((int) vect_coeff((Variable) procdim, v)):(0));
+	int procdim;
+	range rcnt = RANGE(CAR(cnt)), rdom = RANGE(CAR(dom));
+	bool distributed = ith_dim_distributed_p(array, i, &procdim);
+	Value vn = distributed? vect_coeff((Variable) procdim, v):  VALUE_ZERO;
+	int neighbour = VALUE_TO_INT(vn);
 
 	debug(9, "atomize_one_message", "dimension %d\n", i);
 
@@ -548,9 +534,8 @@ message m;
 	lrt = array_ranges_to_template_ranges(array, lra),
 	lrp = template_ranges_to_processors_ranges(template, lrt);
     int
-	i = 1,
-	t = 0,
-	procndim = NumberOfDimension(processor);
+	i = 1, t = 0, procndim = NumberOfDimension(processor);
+    Value vt;
 
     gen_free_list(lra);
     gen_free_list(lrt);
@@ -564,14 +549,16 @@ message m;
 
     assert(procndim>=1);
 
-    t = (int) vect_coeff((Variable) 1, v);
+    vt = vect_coeff((Variable) 1, v);
+    t = VALUE_TO_INT(vt);
     for (i=2 ; i<=NumberOfDimension(processor) ; i++)
     {
-	t = t*SizeOfIthDimension(processor, i) + 
-	    (int) vect_coeff((Variable) i, v);
+	Value vi = vect_coeff((Variable) i, v);
+	t = t*SizeOfIthDimension(processor, i) + VALUE_TO_INT(vi) ;
     }
 
-    message_neighbour(m) = (gen_chunk*) vect_add(v, vect_new(TCST, t));
+    message_neighbour(m) =
+	(gen_chunk*) vect_add(v, vect_new(TCST, int_to_value(t)));
 
     return(m);
 }
@@ -596,9 +583,11 @@ message send;
 	array = message_array(send);
     Pvecteur
 	sendneighbour = (Pvecteur) message_neighbour(send),
-	neighbour = vect_new(TCST, - (int) vect_coeff(TCST, sendneighbour));
+	neighbour = vect_new(TCST, 
+			     value_uminus(vect_coeff(TCST, sendneighbour)));
     list
-	content = compute_receive_content(array, message_content(send), sendneighbour),
+	content = compute_receive_content(array, message_content(send), 
+					  sendneighbour),
 	domain  = compute_receive_domain(message_dom(send), sendneighbour);
 
     return(make_message(array, content, neighbour, domain));
@@ -635,23 +624,18 @@ static statement st_one_message(m, bsend)
 message m;
 bool bsend;
 {
-    char
-	buffer[100],
-	*buf = buffer;
-    entity
-	array     = message_array(m),
-	processor = array_to_processors(array);
-    list
-	content = message_content(m),
-	domain  = message_dom(m);
-    int
-	neighbour = (int) vect_coeff(TCST, (Pvecteur) message_neighbour(m));
+    char buffer[100], *buf = buffer;
+    entity array     = message_array(m),
+	   processor = array_to_processors(array);
+    list content = message_content(m),
+	 domain  = message_dom(m);
+    Value vn = vect_coeff(TCST, (Pvecteur) message_neighbour(m));
+    int neighbour = VALUE_TO_INT(vn);
     statement
 	cmpneighbour = st_compute_neighbour(neighbour),
 	pass = (bsend ? st_send_to_neighbour() : st_receive_from_neighbour()),
 	pack = st_generate_packing(array, content, bsend);
-    list
-	interm = CONS(STATEMENT, 
+    list interm = CONS(STATEMENT, 
 		      cmpneighbour,
 		      (bsend ?
 		       CONS(STATEMENT, pack, CONS(STATEMENT, pass, NIL)) :
@@ -663,21 +647,21 @@ bool bsend;
     
     /* comment generation to improve readibility of the code
      */
-    
-    buf += strlen(sprintf(buf, "c %s(", entity_local_name(processor)));
-    buf += strlen(sprint_lrange(buf, domain));
-    buf += strlen(sprintf(buf, ") %s %s(",
-			  (bsend ? "send" : "receive"),
-			  entity_local_name(array)));
-    buf += strlen(sprint_lrange(buf, content));
-    buf += strlen(sprintf(buf, ") %s (%s%d)\n", 
-			  (bsend ? "to" : "from"), 
-			  (neighbour>0 ? "+" : "-"),
-			  abs(neighbour)));
+    sprintf(buf, "c %s(", entity_local_name(processor));
+    buf += strlen(buf);
+    sprint_lrange(buf, domain);
+    buf += strlen(buf);
+    sprintf(buf, ") %s %s(", bsend ? "send" : "receive",
+	    entity_local_name(array));
+    buf += strlen(buf);
+    sprint_lrange(buf, content);
+    buf += strlen(buf);
+    sprintf(buf, ") %s (%s%d)\n", bsend ? "to" : "from", 
+	    neighbour>0 ? "+" : "-", abs(neighbour));
+    buf += strlen(buf);
 
     statement_comments(result) = strdup(buffer);
-
-    return(result);
+    return result;
 }
 
 static list generate_the_messages(lm, bsend)
