@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1996/02/23 20:08:06 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1996/02/23 22:38:37 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -101,7 +101,10 @@ $SED '//s,A,a,g;//s,B,b,g;//s,C,c,g;//s,D,d,g;
       //s,M,m,g;//s,N,n,g;//s,O,o,g;//s,P,p,g;
       //s,Q,q,g;//s,R,r,g;//s,S,s,g;//s,T,t,g;
       //s,U,u,g;//s,V,v,g;//s,W,w,g;//s,X,x,g;
-      //s,Y,y,g;//s,Z,z,g;//s,[ 	][ 	]*, ,g' |
+      //s,Y,y,g;//s,Z,z,g;//s,[ 	][ 	]*, ,g;
+      //s,\([0-9a-z]\) \([^0-9a-z]\),\1\2,g;
+      //s,\([^0-9a-z]\) \([0-9a-z]\),\1\2,g;
+      //s,\([^0-9a-z]\) \([^0-9a-z]\),\1\2,g;' |
 #
 # and continuation handling:
 # put the whole file on one line:-)
@@ -121,11 +124,11 @@ $TR '' '\012' |
 # massive pattern-matching transformations.
 # directives are switched to hpfc specials calls.
 #
-$SED '//s,\([ \,(]\)block\([ \,()]\),\1k\2,g
-      //s,\([ \,(]\)block\([ \,()]\),\1k\2,g
+$SED '//s,\([\,(]\)block\([\,()]\),\1k\2,g
+      //s,\([\,(]\)block\([\,()]\),\1k\2,g
       //s,k\([\,)]\),k()\1,g
-      //s,\([ \,(]\)cyclic\([ \,()]\),\1c\2,g
-      //s,\([ \,(]\)cyclic\([ \,()]\),\1c\2,g
+      //s,\([\,(]\)cyclic\([\,()]\),\1c\2,g
+      //s,\([\,(]\)cyclic\([\,()]\),\1c\2,g
       //s,c\([\,)]\),c(1)\1,g
       //s,\*\([\,)]\),s()\1,g
       s,number_of_processors(),#,g
@@ -150,12 +153,12 @@ $SED '//s,\([ \,(]\)block\([ \,()]\),\1k\2,g
       s, redistribute \(.*\) onto \(.*\),      e(\1\,\2),
       s, redistribute onto \(.*\)::\(.*\),      d(\2\,\1),
       s, redistribute \(.*\),      e(\1\,hpfcX),
-      s, \(.*\)\,[ ]*new[ ]*\((.*\), \1 new\2,
-      s, \(.*\)\,[ ]*reduction[ ]*\((.*\), \1 reduction\2,
-      s, \(.*\)\,[ ]*independent[ ]*\((.*\), \1 independent\2,
-      s, new[ ]*(,      n(,
-      s, reduction[ ]*(,      r(,
-      s, independent[ ]*\(.*\),      i\1,
+      s, \(.*\)\,new\((.*)\), \1 new\2,g
+      s, \(.*\)\,reduction\((.*)\), \1 reduction\2,g
+      s, \(.*\)\,independent\([^0-9a-z]*\)$, \1 independent\2,g
+      s, new,      n,
+      s, reduction,      r,
+      s, independent,      i,
       s,\([12345abdeintpryou]\),call hpfc\1,g
       s,\([ck#s]\),hpfc\1,g' | 
 #
