@@ -51,14 +51,12 @@ Des que l'evaluation n'est plus possible, il faut regenerer l'expression
 
 #include "arithmetique.h"
 
-#include "transformations.h"
-
+#include "transformations.h" /* should be removed? */
+#include "expressions.h"
 
 
 static struct eformat  eformat_undefined = {expression_undefined, 1, 0, FALSE};
 /* when formating is useless (ie. = (1 * expr + 0)) */
-
-
 
 /* Set of enclosing loop indices
  *
