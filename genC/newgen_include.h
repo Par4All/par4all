@@ -194,7 +194,6 @@ extern int Read_spec_mode ;
 /* For tabulated domains, their index in the Gen_tabulated_ table. */
 
 extern int Current_index ;
-extern hash_table Gen_tabulated_names ;
 
 /* For tabulated objects, the offset HASH_OFFSET of the hashed subdomain 
    and the separation character HASH_SEPAR between domain number and 
@@ -221,4 +220,9 @@ extern int genspec_lex(void);
 extern int genread_parse();
 extern int genread_lex(void);
 
-
+extern void gen_init_Gen_tabulated_names(void);
+extern void gen_close_Gen_tabulated_names(void);
+extern void gen_delete_tabulated_name(gen_chunk *);
+extern char * gen_get_tabulated_name_basic(int , char *);
+extern char * gen_get_tabulated_name(gen_chunk *);
+extern void gen_put_tabulated_name(int, char *, char *);
