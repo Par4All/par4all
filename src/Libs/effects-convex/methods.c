@@ -255,8 +255,10 @@ set_methods_for_convex_effects()
     effects_forward_translation_op = convex_regions_forward_translation;
     effects_local_to_global_translation_op = regions_dynamic_elim;
 
-    effects_prettyprint_func = print_regions;
-    effects_to_text_func = text_array_regions;
+    /* 
+       effects_prettyprint_func = print_regions;
+       effects_to_text_func = text_array_regions;
+    */
 
     load_context_func = load_statement_precondition;
     load_transformer_func = load_statement_transformer;
@@ -300,6 +302,13 @@ set_methods_for_convex_effects()
     set_descriptor_range_p(TRUE);
 }
 
+void 
+init_convex_rw_prettyprint(string module_name)
+{
+    effects_prettyprint_func = print_rw_regions;
+    effects_to_text_func = text_rw_array_regions;
+}
+
 void
 init_convex_rw_regions(string module_name)
 {
@@ -319,7 +328,14 @@ init_convex_rw_regions(string module_name)
 	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
     module_to_value_mappings( local_name_to_top_level_entity(module_name));
 
-    set_action_interpretation(ACTION_READ, ACTION_WRITE);
+    init_convex_rw_prettyprint(module_name);
+}
+
+void 
+init_convex_inout_prettyprint(string module_name)
+{
+    effects_prettyprint_func = print_inout_regions;
+    effects_to_text_func = text_inout_array_regions;
 }
 
 void
@@ -345,7 +361,7 @@ init_convex_in_out_regions(string module_name)
 	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
     module_to_value_mappings( local_name_to_top_level_entity(module_name));
 
-    set_action_interpretation(ACTION_IN, ACTION_OUT);
+    init_convex_inout_prettyprint(module_name);
 }
 
 void 
@@ -376,7 +392,7 @@ init_convex_summary_rw_regions(string module_name)
 	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
     module_to_value_mappings( local_name_to_top_level_entity(module_name));
 
-    set_action_interpretation(ACTION_READ, ACTION_WRITE);
+    init_convex_rw_prettyprint(module_name);
 }
 
 void
@@ -399,7 +415,14 @@ init_convex_summary_in_out_regions(string module_name)
 	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
     module_to_value_mappings( local_name_to_top_level_entity(module_name));
 
-    set_action_interpretation(ACTION_IN, ACTION_OUT);
+    init_convex_inout_prettyprint(module_name);
+}
+
+void 
+reset_convex_prettyprint(string module_name)
+{
+    effects_prettyprint_func = NULL;
+    effects_to_text_func = NULL;
 }
 
 void
@@ -407,5 +430,4 @@ reset_convex_summary_in_out_regions(string module_name)
 {
     regions_end();
     reset_cumulated_rw_effects();
-
 }
