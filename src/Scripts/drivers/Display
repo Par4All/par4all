@@ -234,8 +234,7 @@ else
 fi
 fi
 
-. ${PIPS_CURRENT_PROGRAM:-.pipsprogram}
-
+. ./${PIPS_CURRENT_PROGRAM:-.pipsprogram}
 
 uppercase()
 {
