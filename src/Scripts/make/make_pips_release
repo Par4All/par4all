@@ -1,15 +1,15 @@
 #! /bin/sh
 #
 # $RCSfile: make_pips_release,v $ (version $Revision$)
-# $Date: 1996/09/02 20:24:43 $, 
+# $Date: 1996/09/02 22:17:48 $, 
 #
 # (c) Fabien COELHO 1996
 
-unset pack what tz
+unset pack what tz zip name
 
 tar=${PIPS_TAR:-gtar}
 taropt=cf
-zip=${PIPS_ZIP:-gzip -v9}
+zip=${PIPS_ZIP:-"gzip -v9"}
 verb=:
 
 verbose()
@@ -29,68 +29,76 @@ usage()
 	    -h: this help
 	    -v: verbose
 	    -z: tar and zip
+	    -w: additional what options for make_release
 	  release content:
 	    -S: include sources (Include, Src, Utils)
-	    -E arch: include executables for arch
-	    -D arch: include libraries for this arch
+	    -B arch: include executables for arch
+	    -L arch: include libraries for this arch
 	  software:
 	    -p: Pips
 	    -n: Newgen
 	    -l: Linear
 	    -e: Extern (other softs...)
-	  name: target directory
+	  name: target (a date & content-dependent default is provided)
 	EOF
     exit $ret
 }
 
-what="-d Share -d Doc -d Runtime" 
+what="-d Share -d Doc -d Runtime -d Examples" 
 
-while getopts hvzSE:D:pnle opt
+while getopts hvzw:SB:L:pnle opt
 do
     case $opt in
 	h) usage 0 some help ;;
 	v) verb=verbose ; what="$what -v" ; taropt=cvf ;;
 	z) tz='1' ;;
-	S) what="$what -s Src -d Include -d Utils" ;;
-	E) what="$what -d Bin/$OPTARG" ;;
-	D) what="$what -d Lib/$OPTARG" ;;
-	p) pack="$pack PIPS" ;;
-	n) pack="$pack NEWGEN" ;;
-	l) pack="$pack LINEAR" ;;
-	e) pack="$pack EXTERN" ;;
+	w) what="$what $OPTARG" ;;
+	S) what="$what -s Src -d Include -d Utils" ; name="${name}S" ;;
+	B) what="$what -d Bin/$OPTARG" ; name="${name}B$OPTARG" ;;
+	L) what="$what -d Lib/$OPTARG" ; name="${name}L$OPTARG" ;;
+	p) pack="$pack PIPS" ; name="${name}p" ;;
+	n) pack="$pack NEWGEN" ; name="${name}n" ;;
+	l) pack="$pack LINEAR" ; name="${name}l" ;;
+	e) pack="$pack EXTERN" ; name="${name}e" ;;
 	*) usage 1 "invalid option -$opt" ;;
     esac
 done
 
 shift `expr $OPTIND - 1 `
 
-name=${1:-$PIPS_RELEASE/default_pips_release}
+# default:
+name=${1:-${PIPS_DIR}/Release/pips_${name}_`date +"%y%m%d%H$RCSfile: make_pips_release,v $S"`}
+
+$verb "target release name: $name"
 
 test -d $name || mkdir $name || error 2 "cannot create directory $name"
 
 #
-#
+# getting the files
 
 for p in $pack
 do
     case $p in
-	PIPS) root=$PIPS_ROOT ; trg=$name/Pips ;;
+	PIPS)   root=$PIPS_ROOT   ; trg=$name/Pips   ;;
 	NEWGEN) root=$NEWGEN_ROOT ; trg=$name/Newgen ;;
 	LINEAR) root=$LINEAR_ROOT ; trg=$name/Linear ;;
-	EXTERN) root=$LINEAR_ROOT ; trg=$name/Extern ;;
+	EXTERN) root=$EXTERN_ROOT ; trg=$name/Extern ;;
     esac
     $verb "packing for $p ($root) in $trg:"
     $verb "what=$what"
     make_release -v -r $root -t $trg $what
 done
 
+#
+# taring and zipping if required
+
 test "$tz" && 
 {
-    $verb "taring and zipping"
+    $verb "taring ($tar $taropt) and zipping ($zip)"
     cd `dirname $name`
     base=`basename $name`
     $tar $taropt $base.tar $base
-    eval $zip $base.tar
+    $zip $base.tar
     rm -rf $base
 }
 
