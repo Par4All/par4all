@@ -62,16 +62,7 @@ statement s;
 	  statement_number(s), ORDERING_NUMBER(statement_ordering(s)), 
 	  ORDERING_STATEMENT(statement_ordering(s)));
 
-    /* some fix for HPFC - FC */
-    if (!bound_cumulated_rw_effects_p(s))
-    {
-	pips_user_warning("undefined effects -> NIL\n");
-	e = NIL;
-    }
-    else
-	e = load_cumulated_rw_effects_list(s);
-    
-
+    e = load_cumulated_rw_effects_list(s);
     t = load_statement_transformer(s);
 
     /* it would be nicer to control warning_on_redefinition */
