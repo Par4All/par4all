@@ -92,6 +92,7 @@ struct t_completion_scheme
 static struct t_completion_scheme completion_scheme[] =
 {
 { SHELL_ESCAPE, COMP_FILENAME,   COMP_FILENAME },
+{ "source",	COMP_FILENAME,   COMP_FILENAME },
 { CHANGE_DIR,   COMP_FILENAME,   COMP_NONE },
 { QUIT,         COMP_NONE,       COMP_NONE },
 { HELP,         COMP_HELP_TOPIC, COMP_NONE },
@@ -117,7 +118,7 @@ static char *tp_help_topics[] =
 {
     "readline", "create","close","delete","echo","module","activate",
     "make","apply","display",SET_ENV, SET_PROP,GET_PROP,SHELL_ESCAPE,
-    CHANGE_DIR,QUIT,HELP,"rule","resource","owner",
+    CHANGE_DIR,QUIT,"source", HELP,"rule","resource","owner",
     (char*)NULL
 };
 
@@ -359,6 +360,8 @@ static void help_handler(char * line)
     TP_HELP("exit",
 	 "exit\n",
 	 "\texit tpips quickly (rhough!)\n");
+    TP_HELP("source", "source <filenames...>\n",
+	    "\tread tpips commands from files.\n");
     TP_HELP("help",
 	 "help     [<help-item>]\n",
 	 "\tprint a list of all the commands or a \"detailled\""
@@ -736,13 +739,19 @@ tpips_exec(char * line)
     pop_pips_context();
 }
 
-/* processing command line per line
+/* processing command line per line. might be called recursively thru source.
  */
-static void 
-process_a_file(void)
+void 
+tpips_process_a_file(FILE * file, bool use_rl)
 {
     static readline_initialized = FALSE;
     char * line;
+    FILE * saved = current_file;
+    bool saved_use_rl = use_readline;
+
+    /* push globals */
+    current_file = file;
+    use_readline = use_rl;
 
     if ((use_readline) && (readline_initialized == FALSE))
     {
@@ -753,10 +762,13 @@ process_a_file(void)
 	fprintf(stdout, before_initial_prompt);
     }
 
-    /*  interactive loop
-     */
+    /* interactive loop */
     while ((line = tpips_read_a_line(TPIPS_PRIMARY_PROMPT)))
 	tpips_exec(line);
+
+    /* pop globals */
+    current_file = saved;
+    use_readline = saved_use_rl;
 }
 
 static void 
@@ -789,37 +801,38 @@ parse_arguments(int argc, char * argv[])
     if (argc == optind)
     {
 	/* no arguments, parses stdin. */
-	use_readline = isatty(0);
+	bool use_rl = isatty(0);
 	pips_debug(1, "reading from stdin, which %s a tty\n",
-		   use_readline ? "is" : "is not");
-	current_file = stdin;
-	process_a_file();
+		   use_rl ? "is" : "is not");
+	tpips_process_a_file(stdin, use_rl);
     }
     else 
     {
 	/* process file arguments. */
 	while (optind < argc )
 	{
+	    FILE * toprocess;
+	    bool use_rl = FALSE;
+
 	    if (same_string_p(argv[optind], "-")) {
-		current_file = stdin;
-		use_readline = isatty(0);
+		toprocess = stdin;
+		use_rl = isatty(0);
 	    }
 	    else {
-		if((current_file = fopen(argv[optind], "r"))==NULL) {
-		    /* perror("tpips"); */
+		if((toprocess = fopen(argv[optind], "r"))==NULL) {
 		    perror(argv[optind]);
 		    exit(1);
 		}
 		else {
-		    use_readline = FALSE;
+		    use_rl = FALSE;
 		}
 	    }
 	    
 	    pips_debug(1, "reading from file %s\n",argv[optind]);
 	    
-	    process_a_file ();
+	    tpips_process_a_file (toprocess, use_rl);
 	    if (!same_string_p(argv[optind], "-"))
-		safe_fclose(current_file, argv[optind]);
+		safe_fclose(toprocess, argv[optind]);
 	    
 	    optind++;
 	}
