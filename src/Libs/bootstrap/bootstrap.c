@@ -185,17 +185,6 @@ default_intrinsic_type(int n)
     ft = make_functional(NIL, MakeOverloadedResult());
     t = make_type(is_type_functional, ft);
 
-    /*
-      if (n < (INT_MAX)) {
-      int i = n;
-      while (i-- > 0) {
-      functional_parameters(ft) = 
-      CONS(PARAMETER, MakeOverloadedParameter(),
-      functional_parameters(ft));
-      }
-      }
-    */
-
     functional_parameters(ft) = make_parameter_list(n, MakeOverloadedParameter);
     return t;
 }
@@ -214,12 +203,25 @@ overloaded_to_integer_type(int n)
 }
 
 static type 
+overloaded_to_real_type(int n)
+{
+    type t = type_undefined;
+    functional ft = functional_undefined;
+
+    ft = make_functional(NIL, MakeRealResult());
+    functional_parameters(ft) = make_parameter_list(n, MakeOverloadedParameter);
+    t = make_type(is_type_functional, ft);
+
+    return t;
+}
+
+static type 
 overloaded_to_double_type(int n)
 {
     type t = type_undefined;
     functional ft = functional_undefined;
 
-    ft = make_functional(NIL, MakeIntegerResult());
+    ft = make_functional(NIL, MakeDoubleprecisionResult());
     functional_parameters(ft) = make_parameter_list(n, MakeOverloadedParameter);
     t = make_type(is_type_functional, ft);
 
@@ -574,12 +576,12 @@ LOCAL IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"INT", 1, overloaded_to_integer_type},
     {"IFIX", 1, real_to_integer_type},
     {"IDINT", 1, double_to_integer_type},
-    {"REAL", 1, integer_to_real_type},
-    {"FLOAT", 1, default_intrinsic_type},
-    {"DFLOAT", 1, default_intrinsic_type},
-    {"SNGL", 1, double_to_real_type},
+    {"REAL", 1, overloaded_to_real_type},
+    {"FLOAT", 1, overloaded_to_real_type},
+    {"DFLOAT", 1, overloaded_to_double_type},
+    {"SNGL", 1, overloaded_to_real_type},
     {"DBLE", 1, overloaded_to_double_type},
-    {"CMPLX", 1, overloaded_to_complex_type},
+    {"CMPLX", (INT_MAX), overloaded_to_complex_type},
     {"ICHAR", 1, default_intrinsic_type},
     {"CHAR", 1, default_intrinsic_type},
     {"AINT", 1, real_to_real_type},
