@@ -401,34 +401,46 @@ transformer
 all_data_to_precondition(entity m) 
 {
   transformer pre = transformer_identity();
-  Pbase b = (Pbase) VECTEUR_NUL;
+  linear_hashtable_pt b = linear_hashtable_make(); /* already seen */
   
   pips_debug(8, "begin for %s\n", module_local_name(m));
   
-  /* look for entities with an integer initial value. */
+  /* look for entities with an initial value. */
   MAP(ENTITY, e,
   {
     value val = entity_initial(e);
+
     if(value_constant_p(val))
     {
       constant c = value_constant(val);
       if (constant_int_p(c))
       {
 	int int_val = constant_int(value_constant(val));
-	if(entity_has_values_p(e)
-	   && !base_contains_variable_p(b, (Variable) e)) 
+	if(entity_has_values_p(e) && !linear_hashtable_isin(b, e))
 	{
 	  Pvecteur v = vect_new((Variable) e, VALUE_ONE);
 	  vect_add_elem(&v, TCST, int_to_value(-int_val));
 	  pre = transformer_equality_add(pre, v);
-	  b = vect_add_variable(b, (Variable) e);
+	  linear_hashtable_put_once(b, e, e);
+	}
+      }
+      else if (constant_call_p(c))
+      {
+	if (entity_has_values_p(e) && !linear_hashtable_isin(b, e))
+	{
+	  Pvecteur v = vect_make(VECTEUR_NUL,
+				 (Variable) e, VALUE_ONE,
+				 (Variable) constant_call(c), VALUE_MONE,
+				 NULL);
+	  pre = transformer_equality_add(pre, v);
+	  linear_hashtable_put_once(b, e, e);
 	}
       }
     }
   },
       code_declarations(entity_code(m)));
       
-  base_rm(b);
+  linear_hashtable_free(b);
   pips_assert("some transformer", pre != transformer_undefined);
   
   ifdebug(8) {
