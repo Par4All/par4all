@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.39  2000/05/29 13:27:01  coelho
+ * FMA -> FMS for IA64.
+ *
  * Revision 1.38  2000/05/26 11:10:41  coelho
  * check for manageable expressions...
  *
@@ -380,10 +383,11 @@ read_new_entities_from_eole(FILE * file, string module){
   
   /* read the number of new entities to create */
   test = fscanf(file,"%d\n",&num);
-  pips_assert("fscanf - read number of entity \n",(test==1));
+  pips_assert("fscanf - read number of entity",(test==1));
   pips_debug(3,"reading %d new entity from module %s\n", num, module);
-  for (i=0;i<num;i++){
-    
+
+  for (i=0;i<num;i++)
+  {
     ent_type = read_and_allocate_string_from_file(file);
     
     if (!strcmp(ent_type,"constant")) { /* constant */
@@ -417,8 +421,7 @@ read_new_entities_from_eole(FILE * file, string module){
       free(const_value);
     }
     else 
-      pips_internal_error("can't create this kind of entity: %s",
-			  ent_type);
+      pips_internal_error("can't create this kind of entity: %s", ent_type);
     
     free(ent_type);
   }
@@ -525,7 +528,7 @@ apply_eole_on_statement(string module_name, statement s, string flags)
   else 
     pips_debug(3, "no expression for module %s\n", module_name);
 
-  pips_debug(3,"EOLE transformations ... Done for module %s\n", module_name);
+  pips_debug(3,"EOLE transformations done for module %s\n", module_name);
 
   /* free lists */
   gen_free_list(ln);
@@ -536,11 +539,14 @@ apply_eole_on_statement(string module_name, statement s, string flags)
 /************************************************************* SOME PATTERNS */
 
 /* A + (--B) -> A - B
+ * FMA       -> FMS
  */
 static entity
   bplus  = NULL,
   uminus = NULL,
-  bminus = NULL;
+  bminus = NULL,
+  fmaop  = NULL,
+  fmsop  = NULL;
 
 /* returns B if uminus(B), else 0
  */
@@ -585,6 +591,23 @@ static void call_simplify_rwt(call c)
       return;
     }
   }
+  else if (call_function(c)==fmaop) /* FMA(A,B,-C) => FMS(A,B,C) */
+  {
+    list la = call_arguments(c);
+    expression e3 = EXPRESSION(CAR(CDR(CDR(la)))), me;
+
+    me = is_uminus(e3);
+    if (me) 
+    {
+      /* avoid memory leak */
+      gen_free_list(call_arguments(syntax_call(expression_syntax(e3))));
+      call_arguments(syntax_call(expression_syntax(e3))) = NIL;
+      free_expression(e3);
+      
+      call_function(c) = fmsop;
+      EXPRESSION(CAR(CDR(CDR(la)))) = me;
+    }
+  }
 }
 
 static void generate_bminus(statement s)
@@ -592,12 +615,16 @@ static void generate_bminus(statement s)
   bplus  = entity_intrinsic(PLUS_OPERATOR_NAME);
   uminus = entity_intrinsic(UNARY_MINUS_OPERATOR_NAME);
   bminus = entity_intrinsic(MINUS_OPERATOR_NAME);
+  fmaop  = entity_intrinsic(EOLE_FMA_OPERATOR_NAME);
+  fmsop  = entity_intrinsic(EOLE_FMS_OPERATOR_NAME);
 
   gen_recurse(s, call_domain, gen_true, call_simplify_rwt);
 
   bplus  = NULL;
   uminus = NULL;
   bminus = NULL;
+  fmaop  = NULL;
+  fmsop  = NULL;
 }
 
 /* look for some expressions in s and simplify some patterns.
@@ -608,6 +635,7 @@ static void optimize_simplify_patterns(statement s)
 
   /* a + (-b)       -> a - b */
   /* (-b) + a       -> a - b */
+  /* fma(a,b,-c) => fms(a,b,c) */
   generate_bminus(s);
 
   /* a * (1/ b)     -> a / b */
