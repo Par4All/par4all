@@ -154,14 +154,6 @@ typedef struct
 
 static list /* of p_prettyprint_stuff */ lp = NIL;
 
-void 
-reset_generic_prettyprints(void)
-{
-    gen_map(free, lp);
-    gen_free_list(lp);
-    lp = NIL;
-}
-
 static void 
 load_resources(string module_name)
 {
