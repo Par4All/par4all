@@ -1,7 +1,4 @@
-# $RCSfile: config.makefile,v $ ($Date: 1997/06/03 06:20:48 $, ) 
-# version $Revision$
-# got on %D%, %T%
-# [%P%].
+# $Id$
 #
 # Copyright (c) École des Mines de Paris Proprietary.
 #
