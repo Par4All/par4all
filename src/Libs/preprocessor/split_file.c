@@ -23,6 +23,9 @@
  * - bang comment management added (to avoid the parser)
  *
  * $Log: split_file.c,v $
+ * Revision 1.43  1998/12/23 14:04:26  coelho
+ * *** empty log message ***
+ *
  * Revision 1.42  1998/09/21 09:45:44  coelho
  * '#' added as a comment start to deal with cpp output...
  *
@@ -471,7 +474,7 @@ int fsplit(char * dir_name, char * file_name, FILE * out)
     /* MALLOC STRINGS 
      */
     char * main_list = full_name(dir_name, ".fsplit_main_list");
-    x = full_name(dir_name, "zzz000.f");
+    x = full_name(dir_name, "###000.f");
     mainp = full_name(dir_name, "main000.f");
     blkp = full_name(dir_name, "data000.f");
 	
