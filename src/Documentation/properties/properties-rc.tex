@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1997/02/06 09:11:11 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1997/02/06 17:42:10 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -1078,9 +1078,14 @@ PRETTYPRINT_FINAL_RETURN FALSE
 The internal representation is based on a standard IF structure, known as
 {\em block if} in Fortran jargon. When possible, the prettyprinter uses
 the {\em logical if} syntactical form to save lines and to produce an
-output assumed  closer to the input. When statements are decorated,
+output assumed closer to the input. When statements are decorated,
 information gathered by PIPS may be lost. This property can be turned on
-to have an output closer to the internal representation.
+to have an output closer to the internal representation. Note that edges
+of the control flow graphs may still be displayed as {\em logical if}
+since they never carry any useful information\footnote{Information is
+carried by the vertices (i.e. nodes). A \verb/CONTINUE/ statement is
+generated to have an attachment node when
+some information must be stored and displayed.}.
 
 \begin{verbatim}
 PRETTYPRINT_BLOCK_IF_ONLY FALSE
