@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * $RCSfile: defines-local.h,v $ version $Revision$
- * ($Date: 1995/09/12 10:20:02 $, ) 
+ * ($Date: 1995/09/15 15:54:33 $, ) 
  */
 
 /* Most includes are centralized here.
@@ -51,7 +51,8 @@
 list base_to_list(Pbase base);
 void fprint_entity_list(FILE *fp, list l);
 
-#define PVECTOR(v) ((Pvecteur)CHUNK(v))
+#define PVECTOR(v) CHUNK(v)
+#define VECTOR gen_chunk*
 
 /* ??? very beurk!
  */
@@ -217,6 +218,13 @@ void fprint_entity_list(FILE *fp, list l);
 #define SND_TO_N        "HPFC_SNDTO_N"
 #define RCV_FR_N        "HPFC_RCVFR_N"
 
+/* hpfc packing and unpacking
+ */
+#define BUFPCK		"_HPFC_BUFPCK"
+#define BUFUPK		"_HPFC_BUFUPK"
+
+#define BROADCAST	"HPFC_BROADCAST_"
+
 /* special FCD calls.
  */
 #define HOST_TIMEON	"HPFC_HTIMEON"
@@ -261,13 +269,16 @@ void fprint_entity_list(FILE *fp, list l);
 
 /* common /hpfc_buffers/
  */
-#define BUFFER_SUFFIX	"_BUFF"
+#define BUFFER		"_BUFF"
+#define BUFSZ		"_BUFFSIZE"
 #define BUFFER_INDEX	"BUFINDEX"
 #define BUFFER_SIZE	"SIZEOFBUFFER"
 #define BUFFER_RCV_SIZE	"SIZEOFRECEIVEDBUFFER"
 #define LAZY_SEND	"LAZY_SEND"
 #define LAZY_RECV	"LAZY_RECV"
-
+#define SND_NOT_INIT	"SEND_NOT_INITIALIZED"
+#define RCV_NOT_PRF	"RECEIVED_NOT_PERFORMED"
+#define BUFFER_ENCODING	"BUFFER_ENCODING"
 
 /* Variables
  */
@@ -312,20 +323,22 @@ void fprint_entity_list(FILE *fp, list l);
 
 /* suffixes for my own (FCD:-) directives.
  * these directives are used to instrument the code. 
- * must be used carefully. may be ignore with some properties ?
+ * must be used carefully. may be ignore with some properties.
  */
 #define SYNCHRO_SUFFIX		"1"
 #define TIMEON_SUFFIX		"2"
 #define TIMEOFF_SUFFIX		"3"
+#define SETBOOL_SUFFIX		"4"
+#define SETINT_SUFFIX		"5"
 
 /*************************************************************** PROPERTY */
 
 /* property prefix for ignoring FCD directives
- * TIME and SYNCHRO exists.
+ * TIME, SYNCHRO and SET exists.
  */
 #define FCD_IGNORE_PREFIX	"HPFC_IGNORE_FCD_"
-
-#define HPFC_USE_BUFFERS	"HPFC_USE_BUFFERS"
+#define LAZY_MESSAGES		"HPFC_LAZY_MESSAGES"
+#define USE_BUFFERS		"HPFC_USE_BUFFERS"
 
 /***************************************************************** MACROS */
 
@@ -440,8 +453,6 @@ void fprint_entity_list(FILE *fp, list l);
  */
 #define hpfc_warning \
     if (!get_bool_property("HPFC_NO_WARNING")) user_warning
-
-#define lazy_message_p() get_bool_property("HPFC_LAZY_MESSAGES")
 
 /* that is all
  */
