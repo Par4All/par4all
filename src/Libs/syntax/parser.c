@@ -52,14 +52,14 @@ char FormatValue[FORMATLENGTH];
 void ParserError(char * f, char * m)
 {
     /* reset lex... Might be better to read the whole file like sserror() */
-    extern char sssbuf[];
-    extern char * sssptr;
-    extern int ssprevious;
+    extern char sys_sbuf[];
+    extern char * syn_sptr;
+    extern int syn_previous;
     entity mod = get_current_module_entity();
 
-    sssptr = sssbuf;
+    syn_sptr = syn_sbuf;
 # define MMNEWLINE 10
-    ssprevious = MMNEWLINE;
+    syn_previous = MMNEWLINE;
 
     ResetBlockStack();
 
