@@ -537,7 +537,7 @@ set region;
 		    successor s2su = successor_undefined;
 		    vertex v1bis;
 		    statement s1bis;
-		    dg_arc_label dals2s1;
+		    dg_arc_label dals2s1 = dg_arc_label_undefined;
 		    conflict cs2s1 = conflict_undefined;
 		    effect e1bis = effect_undefined, e2bis = effect_undefined;
 		    list levels = list_undefined;
@@ -806,6 +806,9 @@ Ptsg *gs,*gsop;
     }
 	
     default :
+	pips_error ("TestCoupleOfEffects",
+		    "Unknown dependence test %d\n", dg_type);
+	break;
     }
 
 
@@ -1041,7 +1044,10 @@ list *levelsop;
 Ptsg *gs,*gsop;
 /*boolean Finds2s1;*/
 {
-    Psysteme dep_syst = SC_UNDEFINED, dep_syst1, dep_syst2, dep_syst_op;
+    Psysteme dep_syst = SC_UNDEFINED;
+    Psysteme dep_syst1 = SC_UNDEFINED;
+    Psysteme dep_syst2 = SC_UNDEFINED;
+    Psysteme dep_syst_op = SC_UNDEFINED;
     Pbase b, tmp_base, coord;
 
     int l, cl;
@@ -1240,8 +1246,9 @@ Ptsg *gs,*gsop;
 	if(!SG_UNDEFINED_P(*gs)) 
 	{
 	    fprintf(stderr, 
-		    "\nThe lexico-positive Dependence cone for dep (s1,s2) :\n");
-	    print_dependence_cone(stderr,*gs,b);
+		    "\nThe lexico-positive dependence cone for"
+		    " dep (s1,s2) :\n");
+	    print_dependence_cone(stderr, *gs, b);
 	} 
 	else 
 	    fprintf(stderr,"\nLexico-positive dependence cone"
