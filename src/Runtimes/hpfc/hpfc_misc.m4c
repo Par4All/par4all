@@ -4,7 +4,7 @@
  *
  * also include functions for timings...
  *
- * $RCSfile: hpfc_misc.m4c,v $ ($Date: 1995/09/04 17:18:28 $, )
+ * $RCSfile: hpfc_misc.m4c,v $ ($Date: 1995/09/04 17:45:02 $, )
  * version $Revision$
  *
  * Fabien Coelho, June 1993
@@ -77,7 +77,7 @@ FUNCTION(print_host_info) ARGS(`')
 
 void 
 FUNCTION(print_task_info) ARGS(`number, tids, hosttid')
-int *number, int *tids, int *hosttid;
+int *number, *tids, *hosttid;
 {
     int i, info, nhost, narch, ntask;
     struct pvmtaskinfo *taskp;
@@ -128,18 +128,33 @@ FUNCTION(hpfc_timeon) ARGS(`')
     is_timer_on = 1;
 }
 
+#define MAX_COMMENT_LENGTH 127
+
 void 
 FUNCTION(hpfc_timeoff) ARGS(`STRING_ARG(comment)')
 STRING_ARG_DECL(comment);
 {
     struct timeval current;
+    char buffer[ MAX_COMMENT_LENGTH + 1 ];
+    int i;
+    long seconds, micros;
+
+    /* copy the comment in the buffer to ensure there is a NULL at the end.
+     */  
+    for (i=0; i<MAX_COMMENT_LENGTH && i<STRING_LEN(comment); i++)
+	buffer[i] = STRING_PTR(comment)[i];
 
     assert(is_timer_on);
     if (gettimeofday(&current, (struct timezone *) NULL))
 	fprintf(stderr, "gettimeofday error\n");
 
-    fprintf(stderr, "%s (wall clock time): %ld.%6ld\n", comment,
-	    current.tv_sec-initial.tv_sec, current.tv_usec-initial.tv_usec);
+    seconds = current.tv_sec-initial.tv_sec;
+    micros = current.tv_usec-initial.tv_usec;
+
+    if (micros<0) micros+=1000000, seconds--;
+
+    fprintf(stderr, "%s (wall clock time): %ld.%6ld\n", 
+	    buffer, seconds, micros);
 
     is_timer_on = 0;
 }
