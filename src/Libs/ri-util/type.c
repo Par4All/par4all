@@ -1,5 +1,10 @@
 /*
  * $Id$
+ *
+ * $Log: type.c,v $
+ * Revision 1.32  1998/10/07 15:34:45  irigoin
+ * $log$ added
+ *
  */
 #include <stdio.h>
 
