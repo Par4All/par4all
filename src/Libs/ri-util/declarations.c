@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: declarations.c,v $
+ * Revision 1.3  1997/11/08 17:25:10  coelho
+ * extension for cloning (name different from actual module)
+ *
  * Revision 1.2  1997/10/30 13:09:14  coelho
  * prettyprint of common/equiv with PRETTYPRINT_COMMONS="include" seems ok.
  *
@@ -317,6 +320,15 @@ sentence_area(entity e, entity module, bool pp_dimensions)
 		 entities);
 
 	    gen_free_list(entities);
+	}
+	else 
+	{
+	    pips_user_warning("empty common %s for module %s encountered...\n",
+			      entity_name(e), entity_name(module));
+	    return make_sentence(is_sentence_formatted,
+	       strdup(concatenate("!! empty common ", entity_local_name(e),
+				  " in module ", entity_local_name(module),
+				  "\n", 0)));
 	}
     }
 
