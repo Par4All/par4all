@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: declarations.c,v $
+ * Revision 1.19  2002/06/20 15:43:55  irigoin
+ * New handling of DATA thru the initializations field in code.
+ *
  * Revision 1.18  2002/06/17 15:30:32  irigoin
  * Syntactic changes only
  *
@@ -980,7 +983,10 @@ static sentence sentence_data_statement(statement is)
   instruction ii = statement_instruction(is);
   call ic = instruction_call(ii);
   entity ife = entity_undefined;
-  list al = list_undefined;
+  list al = list_undefined; /* Argument List */
+  list rl = list_undefined; /* Reference List */
+  expression rle = expression_undefined; /* reference list expression, i.e. call to DATA LIST */
+  entity rlf = entity_undefined; /* DATA LIST entity function */
   
   pips_assert("An initialization instruction is a call", instruction_call_p(ii));
   ife = call_function(ic);
@@ -988,29 +994,25 @@ static sentence sentence_data_statement(statement is)
 	      ENTITY_STATIC_INITIALIZATION_P(ife));
   al = call_arguments(ic);
 
-  /* Find all initialized variables */
-  for(al = call_arguments(ic); !ENDP(al); POP(al)){
-    expression eiolist = EXPRESSION(CAR(al));
-    entity iolist = call_function(syntax_call(expression_syntax(eiolist)));
+  /* Find all initialized variables pending from DATA LIST */
+  rle = EXPRESSION(CAR(al));
+  POP(al); /* Move al to the first value */
+  pips_assert("The first argument is a call", expression_call_p(rle));
+  rlf = call_function(syntax_call(expression_syntax(rle)));
+  pips_assert("This is the DATA LIST function", ENTITY_DATA_LIST_P(rlf));
+  rl = call_arguments(syntax_call(expression_syntax(rle)));
 
-    pips_assert("eiolist is a call expression", expression_call_p(eiolist));
+  for(; !ENDP(rl); POP(rl)){
+    expression ive = expression_undefined;
+    list ivwl = list_undefined;
 
-    if(strcmp(entity_local_name(iolist), IO_LIST_STRING_NAME) == 0) {
-      expression ive = expression_undefined;
-      list ivwl = list_undefined;
-
-      if(al!=call_arguments(ic)) {
-	wl = CHAIN_SWORD(wl, strdup(", "));
-      }
-
-      /* odd arguments must be calls to IOLIST */
-      POP(al);
-      ive = EXPRESSION(CAR(al));
-      ivwl = words_expression(ive);
-      wl = gen_nconc(wl, ivwl);
+    if(rl!=call_arguments(syntax_call(expression_syntax(rle)))) {
+      wl = CHAIN_SWORD(wl, strdup(", "));
     }
-    else
-      break;
+
+    ive = EXPRESSION(CAR(rl));
+    ivwl = words_expression(ive);
+    wl = gen_nconc(wl, ivwl);
   }
 
   pips_assert("The value list is not empty", !ENDP(al));
@@ -1385,9 +1387,13 @@ text_entity_declaration(
 
   /* what about DATA statements! FC 
    */
+  /* More general way with with call to text_initializations(module) in
+     text_named_module() */
+  /*
   if(get_bool_property("PRETTYPRINT_DATA_STATEMENTS")) {
     MERGE_TEXTS(r, text_data(module, ldecl));
   }
+  */
 
   return r;
 }
