@@ -7,6 +7,12 @@
  * update_props() .
  *
  * $Log: source_file.c,v $
+ * Revision 1.112  2005/03/21 13:16:00  irigoin
+ * Distinction between the C and the Fortran preprocessors enforced
+ * clearly. PIPS environment also is modified. See pipsrc.ref for new
+ * variables now used for Fortran. Old variables are now used for C
+ * exclusively.
+ *
  * Revision 1.111  2003/12/30 14:42:27  irigoin
  * user warning format improved
  *
@@ -635,12 +641,12 @@ static bool pips_split_file(string name, string tempfile)
 
 /***************************************** MANAGING .F AND .c FILES WITH CPP */
 
-/* an issue is that the cpp used for .F must be Fortran 77 aware.
+/* an issue is that the preprocessor used for .F must be Fortran 77 aware.
  */
 
-#define CPP_FORTRAN_ED		 	".cpp_processed.f"
-#define CPP_C_ED		 	".cpp_processed.c"
-#define CPP_ERR			".stderr"
+#define PP_FORTRAN_ED		 	".fpp_processed.f"
+#define PP_C_ED		 	".cpp_processed.c"
+#define PP_ERR			".stderr"
 
 /* allocates a new string containing the user file name, before preprocessing */
 string preprocessed_to_user_file(string preprocessed_user_file)
@@ -648,10 +654,10 @@ string preprocessed_to_user_file(string preprocessed_user_file)
   string user_file = strdup(preprocessed_user_file);
   string suffix = string_undefined;
 
-  if((suffix=strstr(user_file, CPP_FORTRAN_ED))!=NULL) {
+  if((suffix=strstr(user_file, PP_FORTRAN_ED))!=NULL) {
     strcpy(suffix, ".f");
   }
-  else if((suffix=strstr(user_file, CPP_C_ED))!=NULL) {
+  else if((suffix=strstr(user_file, PP_C_ED))!=NULL) {
     strcpy(suffix, ".c");
   }
   else {
@@ -665,11 +671,15 @@ string preprocessed_to_user_file(string preprocessed_user_file)
  */
 #define CPP_PIPS_ENV		"PIPS_CPP"
 #define CPP_PIPS_OPTIONS_ENV 	"PIPS_CPP_FLAGS"
+#define FPP_PIPS_ENV		"PIPS_FPP"
+#define FPP_PIPS_OPTIONS_ENV 	"PIPS_FPP_FLAGS"
 
 /* default preprocessor and basic options
  */
 #define CPP_CPP			"cpp -C" /* alternative values: "gcc -E -C" or "fpp" */
 #define CPP_CPPFLAGS		" -P -D__PIPS__ -D__HPFC__ "
+#define FPP_CPP			"cpp -C" /* alternative values: "gcc -E -C" or "fpp" */
+#define FPP_CPPFLAGS		" -P -D__PIPS__ -D__HPFC__ "
 
 static bool suffix_file_p(string name, char suffix)
 {
@@ -692,8 +702,8 @@ bool dot_c_file_p(string name)
   return suffix_file_p(name, 'c');
 }
 
-/* Returns the newly allocated name if ccp succeeds.
- * Returns NULL if cpp fails.
+/* Returns the newly allocated name if preprocessing succeeds.
+ * Returns NULL if preprocessing fails.
  */
 
 /* The structure of the string is not checked. Funny results to be expected for strings starting or ending with ':' and containing lots of SPACES*/
@@ -710,7 +720,7 @@ static int colon_number(string s)
   return number;
 }
 
-static string process_thru_C_cpp(string name)
+static string process_thru_C_pp(string name)
 {
     string dir_name, new_name, simpler, cpp_options, cpp, cpp_err;
     int status = 0;
@@ -729,8 +739,8 @@ static string process_thru_C_cpp(string name)
     new_include_options = include_options+strlen(include_options);
     dir_name = db_get_directory_name_for_module(WORKSPACE_TMP_SPACE);
     simpler = pips_basename(name, ".c");
-    new_name = strdup(concatenate(dir_name, "/", simpler, CPP_C_ED, 0));
-    cpp_err  = strdup(concatenate(new_name, CPP_ERR, 0));
+    new_name = strdup(concatenate(dir_name, "/", simpler, PP_C_ED, 0));
+    cpp_err  = strdup(concatenate(new_name, PP_ERR, 0));
     free(dir_name);
     free(simpler);
 
@@ -763,10 +773,9 @@ static string process_thru_C_cpp(string name)
     pips_debug(1, "PIPS_SRCPATH=\"%s\"\n", includes);
     pips_debug(1, "INCLUDE=\"%s\"\n", include_options);
 
-
     status = safe_system_no_abort
-      (concatenate("/usr/local/bin/gcc "/* cpp? cpp: CPP_CPP  */,
-		   "-E -C " /* CPP_CPPFLAGS, cpp_options? cpp_options: ""*/, 
+      (concatenate(cpp? cpp: CPP_CPP,
+		   CPP_CPPFLAGS, cpp_options? cpp_options: "", 
 		   old_include_options,
 		   name, " > ", new_name, " 2> ", cpp_err, 0));
 
@@ -786,22 +795,22 @@ static string process_thru_C_cpp(string name)
     return new_name;
 }
 
-static string process_thru_fortran_cpp(string name)
+static string process_thru_fortran_pp(string name)
 {
-    string dir_name, new_name, simpler, cpp_options, cpp, cpp_err;
+    string dir_name, new_name, simpler, fpp_options, fpp, fpp_err;
     int status;
 
     dir_name = db_get_directory_name_for_module(WORKSPACE_TMP_SPACE);
     simpler = pips_basename(name, ".F");
-    new_name = strdup(concatenate(dir_name, "/", simpler, CPP_FORTRAN_ED, 0));
-    cpp_err  = strdup(concatenate(new_name, CPP_ERR, 0));
+    new_name = strdup(concatenate(dir_name, "/", simpler, PP_FORTRAN_ED, 0));
+    fpp_err  = strdup(concatenate(new_name, PP_ERR, 0));
     free(dir_name);
     free(simpler);
 
-    cpp = getenv(CPP_PIPS_ENV);
-    cpp_options = getenv(CPP_PIPS_OPTIONS_ENV);
+    fpp = getenv(FPP_PIPS_ENV);
+    fpp_options = getenv(FPP_PIPS_OPTIONS_ENV);
     
-    /* Note: the cpp used **must** know somehow about Fortran
+    /* Note: the preprocessor used **must** know somehow about Fortran
      * and its lexical and comment conventions. This is ok with gcc
      * when g77 is included. Otherwise, "'" appearing in Fortran comments
      * results in errors to be reported.
@@ -816,18 +825,18 @@ static string process_thru_fortran_cpp(string name)
 
        See preprocessor/Validation/csplit09.tpips */
 
-    status = safe_system_no_abort(concatenate(cpp? cpp: CPP_CPP, 
-				 CPP_CPPFLAGS, cpp_options? cpp_options: "", 
-				 name, " > ", new_name, " 2> ", cpp_err, 
-				 " && cat ", cpp_err, 
-         			 " && test ! -s ", cpp_err, 
-			         " && rm -f ", cpp_err, 0));
+    status = safe_system_no_abort(concatenate(fpp? fpp: FPP_CPP, 
+				 FPP_CPPFLAGS, fpp_options? fpp_options: "", 
+				 name, " > ", new_name, " 2> ", fpp_err, 
+				 " && cat ", fpp_err, 
+         			 " && test ! -s ", fpp_err, 
+			         " && rm -f ", fpp_err, 0));
 
     /* fpp was wrong... */
     if (status)
     {
       /* show errors */
-      (void) safe_system_no_abort(concatenate("cat ", cpp_err, 0));
+      (void) safe_system_no_abort(concatenate("cat ", fpp_err, 0));
       free(new_name);
       new_name = NULL;
     }
@@ -841,9 +850,9 @@ static string process_thru_cpp(string name)
   string new_name = string_undefined;
 
   if(dot_F_file_p(name)) 
-    new_name = process_thru_fortran_cpp(name);
+    new_name = process_thru_fortran_pp(name);
   else
-    new_name = process_thru_C_cpp(name);
+    new_name = process_thru_C_pp(name);
 
     return new_name;
 }
