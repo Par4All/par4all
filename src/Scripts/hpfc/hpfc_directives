@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: hpfc_directives,v $ version $Revision$
-# $Date: 1997/03/07 16:33:28 $, 
+# $Date: 1997/03/07 19:02:49 $, 
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
 # by the PIPS Fortran 77 parser. 
@@ -135,17 +135,37 @@ $SED "#
       /[]/s,^\([^'\"]*'[^'\"]*'[^'\"]*\)!.*,\1,;
       /[]/s,^\([^'\"]*\"[^'\"]*\"[^'\"]*\)!.*,\1,;
       #
-      # switch to lower case letters the directive lines *only*
-      # ??? this includes messages that may be put in directives,
-      #     as with the time/end time stuff and sets...
+      # switch to lower case letters the directive lines *only*,
+      # up to any quote...
       #
-      /[]/s,A,a,g;/[]/s,B,b,g;/[]/s,C,c,g;/[]/s,D,d,g;
-      /[]/s,E,e,g;/[]/s,F,f,g;/[]/s,G,g,g;/[]/s,H,h,g;
-      /[]/s,I,i,g;/[]/s,J,j,g;/[]/s,K,k,g;/[]/s,L,l,g;
-      /[]/s,M,m,g;/[]/s,N,n,g;/[]/s,O,o,g;/[]/s,P,p,g;
-      /[]/s,Q,q,g;/[]/s,R,r,g;/[]/s,S,s,g;/[]/s,T,t,g;
-      /[]/s,U,u,g;/[]/s,V,v,g;/[]/s,W,w,g;/[]/s,X,x,g;
-      /[]/s,Y,y,g;/[]/s,Z,z,g;" |
+      : while
+      /[]/s,^\([^'\"]*\)A,\1a,g;
+      /[]/s,^\([^'\"]*\)B,\1b,g;
+      /[]/s,^\([^'\"]*\)C,\1c,g;
+      /[]/s,^\([^'\"]*\)D,\1d,g;
+      /[]/s,^\([^'\"]*\)E,\1e,g;
+      /[]/s,^\([^'\"]*\)F,\1f,g;
+      /[]/s,^\([^'\"]*\)G,\1g,g;
+      /[]/s,^\([^'\"]*\)H,\1h,g;
+      /[]/s,^\([^'\"]*\)I,\1i,g;
+      /[]/s,^\([^'\"]*\)J,\1j,g;
+      /[]/s,^\([^'\"]*\)K,\1k,g;
+      /[]/s,^\([^'\"]*\)L,\1l,g;
+      /[]/s,^\([^'\"]*\)M,\1m,g;
+      /[]/s,^\([^'\"]*\)N,\1n,g;
+      /[]/s,^\([^'\"]*\)O,\1o,g;
+      /[]/s,^\([^'\"]*\)P,\1p,g;
+      /[]/s,^\([^'\"]*\)Q,\1q,g;
+      /[]/s,^\([^'\"]*\)R,\1r,g;
+      /[]/s,^\([^'\"]*\)S,\1s,g;
+      /[]/s,^\([^'\"]*\)T,\1t,g;
+      /[]/s,^\([^'\"]*\)U,\1u,g;
+      /[]/s,^\([^'\"]*\)V,\1v,g;
+      /[]/s,^\([^'\"]*\)W,\1w,g;
+      /[]/s,^\([^'\"]*\)X,\1x,g;
+      /[]/s,^\([^'\"]*\)Y,\1y,g;
+      /[]/s,^\([^'\"]*\)Z,\1z,g;
+      t while" |
 #
 # continuation handling:
 # - put the whole file on one line:-)
@@ -162,11 +182,11 @@ $TR '' '\012' |
 #
 $SED "#
       # space normalization (pattern-matching is easier afterwards)
-      # all spaces are removed but on lines that includes quotes
-      # (there are some in the endtime and set* directives, 
-      # that are thus expected with some spaces)
+      # all spaces are removed befoew quotes...
       #
-      /[][^'\"]*$/s,[ 	][ 	]*,\1,g;
+      : while
+      /[]/s,^\([^'\"]*\)[ 	][ 	]*,\1,;
+      t while
       /[]/s,\([]\),\1 ,;
       #
       # simple 1D FORALL instruction without continuation... 
@@ -192,17 +212,17 @@ $SED "#
       #
       # obsolescent FC directives:
       s, timeon,2,
-      s, [ 	]*t[ 	]*i[ 	]*m[ 	]*e[ 	]*o[ 	]*f[ 	]*f,3,
+      s, timeoff,3,
       #
       # FC directives and hacks...
       #
       s, synchro,1,
       s, time,2,
       # end time, set{bool,int} and tell may not be normalized
-      s, [ 	]*e[ 	]*n[ 	]*d[ 	]*t[ 	]*i[ 	]*m[ 	]*e,3,
-      s, [ 	]*t[ 	]*e[ 	]*l[ 	]*l,0,
-      s, [ 	]*s[ 	]*e[ 	]*t[ 	]*b[ 	]*o[ 	]*o[ 	]*l,4,
-      s, [ 	]*s[ 	]*e[ 	]*t[ 	]*i[ 	]*n[ 	]*t,5,
+      s, endtime,3,
+      s, tell,0,
+      s, setbool,4,
+      s, setint,5,
       s, local\(.*\),i(I_LOCAL)\1do I_LOCAL = 0\, 0,
       s, endlocal,      enddo,
       s, io\(.*\),6(\1),
