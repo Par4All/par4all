@@ -1,7 +1,7 @@
 c
 c     Reductions management 
 c
-c $RCSfile: hpfc_reductions.m4f,v $ ($Date: 1994/08/30 15:45:13 $, )
+c $RCSfile: hpfc_reductions.m4f,v $ ($Date: 1994/08/30 15:46:16 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -14,8 +14,6 @@ c----------
 c
 c this could be computed statically, where it is used...
 c
-cdecl      external HPFC_PROCDIM
-cdecl      integer HPFC_PROCDIM
 c
       integer function HPFC_PROCDIM(an, ad)
       include 'hpfc_commons.h'
@@ -87,8 +85,6 @@ c
 c     
 c NODE PART
 c
-cdecl      external  build_name(nred,LEVEL,PVMTYPE,NAME)
-cdecl      TYPE build_name(nred,LEVEL,PVMTYPE,NAME)
       TYPE function build_name(nred,LEVEL,PVMTYPE,NAME)(a, an, dnl
 COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS'),dnl
 COMMA_REPLICATE(LEVEL, `LIST_RED_BOUNDS')
@@ -146,8 +142,6 @@ c
 c
 c HOST PART
 c
-cdecl      external build_name(hred,LEVEL,PVMTYPE,NAME)
-cdecl      TYPE build_name(hred,LEVEL,PVMTYPE,NAME)
       TYPE function build_name(hred,LEVEL,PVMTYPE,NAME)()
       include ''`fpvm3.h''`
       include ''`hpfc_commons.h''`
