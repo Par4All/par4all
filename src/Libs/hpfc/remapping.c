@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1995/04/21 17:01:11 $, ) 
+ * ($Date: 1995/04/21 17:11:22 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -189,7 +189,7 @@ entity ld;
 bool send;
 {
     entity 
-	nc = hpfc_name_to_entity(send ? SEND_CHANNELS : NODE_CHANNELS),
+	nc = hpfc_name_to_entity(send ? SEND_CHANNELS : RECV_CHANNELS),
 	nt = hpfc_name_to_entity(NODETIDS);
     expression
 	lid = entity_to_expression(ld),
