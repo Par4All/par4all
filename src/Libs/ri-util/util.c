@@ -1,8 +1,3 @@
-/* 	%A% ($Date: 1997/09/15 14:00:39 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
-
-#ifndef lint
-char* vcid_ri_util_util_c = "%A% ($Date: 1997/09/15 14:00:39 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
-#endif /* lint */
 
 #include <stdio.h>
 #include <string.h>
@@ -21,8 +16,8 @@ string
 local_name(s)
 string s;
 {
-    pips_assert("local_name", strchr(s, MODULE_SEP) != NULL);
-    return(strchr(s, MODULE_SEP)+1);
+    pips_assert("some separator", strchr(s, MODULE_SEP) != NULL);
+    return strchr(s, MODULE_SEP)+1;
 }
 
 string 
