@@ -1,7 +1,7 @@
 #! /bin/sh
 #! /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/02 15:27:49 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/02 17:09:00 $, )
 # version $Revision$
 
 # Automatic generation of Makefile for the PIPS project
@@ -440,8 +440,11 @@ depend: $(INC_TARGET) production-depend $(MAKEFILE)
 # Quand on cree le Makefile, il faut toujours le completer avec
 #	les dependances d''include :
 production-depend: $(DERIVED_HEADERS) $(EXTERN)
-	sed -n -e 's/^		*\$\$//; 1,/^### DO NOT DELETE THIS LINE./p;' < $(MAKEFILE) > $(MAKEFILE).new
-	-for file in $(CFILES) ; do $(PREPROC) -M \$\$file >> $(MAKEFILE).new; done;
+	{\\
+	sed -n -e 's/^		*\$\$//; 1,/^### DO NOT DELETE THIS LINE./p;' \\
+		$(MAKEFILE) ;\\
+	$(PREPROC) -M $(CFILES) ;\\
+	} > $(MAKEFILE).new
 	cp $(MAKEFILE).new $(MAKEFILE)
 	$(RM) $(MAKEFILE).new
 
