@@ -1,5 +1,5 @@
 /* $RCSfile: sc_simplexe_feasibility.c,v $ (version $Revision$)
- * $Date: 1996/08/07 13:59:55 $, 
+ * $Date: 1996/08/09 12:54:14 $, 
  */
 
 /* test du simplex : 
@@ -530,6 +530,11 @@ sc_simplexe_feasibility_ofl_ctrl(
     
     CATCH(simplex_arithmetic_error)
     {
+	ifscdebug(2) {
+	    fprintf(stderr,
+		    "[sc_simplexe_feasibility_ofl_ctrl] arithmetic error\n");
+	}
+
 	DEBUG(fprintf(stdout, "arithmetic error in simplex\n"));
 
 	for(i=premier_hash ; i!=(int)PTR_NIL; i=hashtable[i].succ)
