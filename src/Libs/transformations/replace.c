@@ -130,8 +130,13 @@ void ExpressionReplaceReference(expression e, reference ref, expression next)
       }
 	break;
       case is_syntax_range :
+	ExpressionReplaceReference(range_lower(syntax_range(s)), ref, next);
+	ExpressionReplaceReference(range_upper(syntax_range(s)), ref, next);
+	ExpressionReplaceReference(range_increment(syntax_range(s)), ref, next);
+	/*
 	pips_error("ExpressionReplaceReference", 
 		   "tag syntax_range not implemented\n");
+	*/
 	break;
       case is_syntax_call :
 	CallReplaceReference(syntax_call(s), ref, next);
