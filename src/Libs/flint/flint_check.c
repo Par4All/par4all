@@ -164,7 +164,12 @@ bool check_the_call(c)
 	return (TRUE);
 
     /* else */
-    return (check_call_mode_consistency(la, lt, the_fnct));
+    /* Errors in parameter modes are found out by effect computation.
+     * A second check, later, is meaningless.
+     */
+    /* return (check_call_mode_consistency(la, lt, the_fnct)); */
+
+    return TRUE;
 }
 
 
@@ -409,15 +414,15 @@ void check_the_reference(ref)
 
     if (len_dim < len_ind) {
 	flint_message("reference",
-		      "too many indices for a reference (%d>%d)\n",
-		      len_ind, len_dim);
+		      "too many indices (%d>%d) in reference to %s\n",
+		      len_ind, len_dim, entity_local_name(var));
 	return;
     }
 
     if (len_dim > len_ind) {
 	flint_message("reference",
-		      "too few indices for a reference (%d<%d)\n",
-		      len_ind, len_dim);
+		      "too few indices (%d<%d) in reference to %s\n",
+		      len_ind, len_dim, entity_local_name(var));
 	return;
     }
 
