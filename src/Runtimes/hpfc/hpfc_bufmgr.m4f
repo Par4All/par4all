@@ -2,6 +2,9 @@
 ! $Id$
 !
 ! $Log: hpfc_bufmgr.m4f,v $
+! Revision 1.19  1997/06/09 13:00:43  zory
+! bufid has been deleted in recv calls
+!
 ! Revision 1.18  1997/06/02 15:52:54  zory
 ! HPFC RECEIVE is now waiting for a LID
 !
@@ -81,13 +84,13 @@ fake_buffers(dnl
       debug(print *, MYLID, " [hpfc bufupk] in ", RECEIVED NOT PERFORMED)
       if (RECEIVED NOT PERFORMED) then
          debug(print *, "RCV from ", lid, RECVCHANNELS(lid))
-         call HPFC RECEIVE(lid, RECVCHANNELS(lid), BUFFER ID)
+         call HPFC RECEIVE(lid, RECVCHANNELS(lid))
          RECVCHANNELS(lid) = RECVCHANNELS(lid) + 2
          RECEIVED NOT PERFORMED = .FALSE.
          debug(print *, "RCV done")
       endif
       debug(print *,"hpfc bufupk",MYLID,"before message info") 
-      call HPFC MESSAGE INFO(BUFFER ID, length, tag, tid, info)
+      call HPFC MESSAGE INFO(length, tag, tid, info)
       SIZEOFRECEIVEDBUFFER = length / M4_PVM_LENGTH(PVMTYPE)
       call HPFC UNPACK(PVMTYPE, build_name(PVMTYPE,BUFF),
      $     SIZEOFRECEIVEDBUFFER, 1, info)
