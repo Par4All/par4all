@@ -53,7 +53,75 @@ Des que l'evaluation n'est plus possible, il faut regenerer l'expression
 static struct eformat  eformat_undefined = {expression_undefined, 1, 0, FALSE};
 /* when formating is useless (ie. = (1 * expr + 0)) */
 
+
 
+/* Set of enclosing loop indices
+ *
+ * This set is maintained to avoid useless partial evaluation of loop indices
+ * which are very unlikely to be partially evaluable. Loops with only one
+ * iteration can be removed by dead code elimination.
+ *
+ * This set is implemented as a list because the loop nest depth is expected
+ * small.
+ *
+ * It would be nice to take inductive variables into account. Their evaluation
+ * is quite long in ocean. We could use the loop transformer instead of the
+ * loop index to populate live_loop_indices. But it would be harder to regenerate
+ * the set when leaving the loop, unless a copy is made on entrance.
+ *
+ * A stack is not too attractive, as it should be all visited to make sure
+ * a variable is not a live loop index or inductive variable.
+ *
+ * A multiset might make loop exit easier, but each membership test will be
+ * longer.
+ */
+
+static list live_loop_indices = list_undefined;
+
+static void
+set_live_loop_indices()
+{
+    pips_assert("set_live_loop_indices", live_loop_indices==list_undefined);
+    live_loop_indices = NIL;
+}
+
+static void
+reset_live_loop_indices()
+{
+    /* The index set should be empty when leaving partial eval */
+    pips_assert("reset_live_loop_indices", ENDP(live_loop_indices));
+    if(!ENDP(live_loop_indices)) {
+	free_arguments(live_loop_indices);
+    }
+    live_loop_indices = list_undefined;
+}
+
+void dump_live_loop_indices()
+{
+    dump_arguments(live_loop_indices);
+}
+
+static bool
+live_loop_index_p(entity i)
+{
+    return entity_is_argument_p(i, live_loop_indices);
+}
+
+static void
+add_live_loop_index(entity i)
+{
+    pips_assert("add_live_index",!live_loop_index_p(i))
+	live_loop_indices = gen_nconc(live_loop_indices,
+				      CONS(ENTITY, i, NIL));
+}
+
+static void
+rm_live_loop_index(entity i)
+{
+    live_loop_indices = arguments_rm_entity(live_loop_indices, i);
+}
+
+
 void init_use_proper_effects(char *module_name)
 {
     set_proper_effects_map( effectsmap_to_listmap((statement_mapping)
@@ -245,8 +313,8 @@ struct eformat partial_eval_syntax(expression e, Psysteme ps, effects fx)
 struct eformat partial_eval_reference(expression e, Psysteme ps, effects fx)
 {
     reference r;
-    Pvecteur pv;
     entity var;
+    Pbase base_min = BASE_UNDEFINED;
     
     pips_assert("partial_eval_reference", 
 		syntax_reference_p(expression_syntax(e)));
@@ -264,30 +332,46 @@ struct eformat partial_eval_reference(expression e, Psysteme ps, effects fx)
 	debug(9, "partial_eval_reference", "Array elements not evaluated\n");
 	return(eformat_undefined);
     }
+
     if(!type_variable_p(entity_type(var)) || 
        !basic_int_p(variable_basic(type_variable(entity_type(var)))) ) {
-	debug(9, "partial_eval_reference", "Reference cannot be evaluated\n");
+	debug(9, "partial_eval_reference",
+	      "Reference to a non-scalar-integer variable %s cannot be evaluated\n",
+	      entity_name(var));
 	return(eformat_undefined);
     }
 
     if (SC_UNDEFINED_P(ps)) {
+	debug(9, "partial_eval_reference", "No precondition information\n");
+	pips_error("partial_eval_reference", "Probably corrupted precondition\n");
 	return(eformat_undefined);
     }
 
     if(entity_written_p(var, fx)) {
 	/* entity cannot be replaced */
+	debug(9, "partial_eval_reference",
+	      "Write Reference to variable %s cannot be evaluated\n",
+	      entity_name(var));
+	return(eformat_undefined);
+    }
+
+    if(live_loop_index_p(var)) {
+	debug(9, "partial_eval_reference",
+	      "Index %s cannot be evaluated\n",
+	      entity_name(var));
 	return(eformat_undefined);
     }
 
     /* faire la Variable */
     /* verification de la presence de la variable dans ps */
-    for ( pv=ps->base; !VECTEUR_NUL_P(pv) ; pv=pv->succ) {
-	if ((entity)var_of(pv)==var) {
+    base_min = sc_to_minimal_basis(ps);
+    if(base_contains_variable_p(base_min, (Variable) var)) {
 	    bool feasible;
 	    Value min, max;
 	    Psysteme ps1 = sc_dup(ps);
 
-	    feasible = sc_minmax_of_variable(ps1, (Variable)var, &min, &max);
+	    /* feasible = sc_minmax_of_variable(ps1, (Variable)var, &min, &max); */
+	    feasible = sc_minmax_of_variable2(ps1, (Variable)var, &min, &max);
 	    if (! feasible) {
 		user_warning("partial_eval_reference", 
 			     "Not feasible system:"
@@ -338,7 +422,7 @@ struct eformat partial_eval_reference(expression e, Psysteme ps, effects fx)
 	     */
 	    return(eformat_undefined);
 	}
-    }
+    base_rm(base_min);
     return(eformat_undefined);
 }
 
@@ -1165,7 +1249,10 @@ void recursiv_partial_eval(statement stmt)
 	  partial_eval_expression_and_regenerate(&range_increment(r), 
 						 stmt_prec(stmt), 
 						 stmt_to_fx(stmt, pfx_map));
+	  add_live_loop_index(loop_index(l));
 	  recursiv_partial_eval(loop_body(l));
+	  rm_live_loop_index(loop_index(l));
+
 	  if(get_debug_level()>=9) {
 	      print_text(stderr, text_statement(entity_undefined, 0, stmt));
 	      pips_assert("recursiv_partial_eval", gen_consistent_p(stmt));
@@ -1205,8 +1292,7 @@ void recursiv_partial_eval(statement stmt)
 		   "Bad instruction tag %d", instruction_tag(inst));
     }
 }
-
-
+
 /* Top-level function
  */
 
@@ -1216,8 +1302,6 @@ bool partial_eval(char *mod_name)
     statement mod_stmt;
     instruction mod_inst;
     cons *blocs = NIL;
-
-    debug_on("PARTIAL_EVAL_DEBUG_LEVEL");
 
     /* be carrefull not to get any mapping before the code */
     /* DBR_CODE will be changed: argument "pure" is TRUE because 
@@ -1241,16 +1325,11 @@ bool partial_eval(char *mod_name)
 
     init_use_preconditions(mod_name);
 
+    set_live_loop_indices();
+
     mod_inst = statement_instruction(mod_stmt);
-    /* FI: not necessarily the case anymore */
-    /*
-    if(!instruction_unstructured_p(mod_inst)) {
-	user_warning ("partial_eval", "Non-standard instruction tag %d\n",
-		      instruction_tag (mod_inst));
-    }
-    */
-    /* pips_assert("unroll", instruction_unstructured_p(mod_inst)); */
-    /* "unstructured expected\n"); */
+
+    debug_on("PARTIAL_EVAL_DEBUG_LEVEL");
 
     switch (instruction_tag (mod_inst)) {
 
@@ -1280,11 +1359,12 @@ bool partial_eval(char *mod_name)
 
     debug_off();
 
-    /* Reorder the module, because new statements have been generated. */
+    /* Reorder the module, because new statements may have been generated. */
     module_reorder(mod_stmt);
 
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stmt);
 
+    reset_live_loop_indices();
     reset_precondition_map();
     reset_cumulated_effects_map();
     reset_proper_effects_map();
