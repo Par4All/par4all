@@ -94,6 +94,7 @@ _			{ yylval.s = NULL; return READ_STRING; }
 T			{ return CHUNK_BEGIN; }
 \$			{ return VECTOR_BEGIN; }
 %			{ return ARROW_BEGIN; }
+\*			{ return TABULATED_BEGIN; }
 \(		        { return LP; }
 \)			{ return RP; }
 \{		        { return LC; }
