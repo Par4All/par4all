@@ -18,7 +18,7 @@
 #ifndef MAP_INCLUDED
 #define MAP_INCLUDED
 
-/* $RCSfile: newgen_map.h,v $ ($Date: 1995/04/12 10:33:14 $, ) 
+/* $RCSfile: newgen_map.h,v $ ($Date: 1995/04/14 09:02:01 $, ) 
  * version $Revision$
  * got on %D%, %T%
  *
@@ -28,7 +28,7 @@
 #define MAX_NESTED_HASH 10
 
 extern gen_chunk Gen_hash_[] ;
-gen_chunk *gen_hash_ ;
+static gen_chunk *gen_hash_ ;
 
 #define HASH_GET(start,image,h,k) \
 IN_STACK(gen_hash_, &Gen_hash_[MAX_NESTED_HASH], \
