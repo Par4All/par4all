@@ -403,10 +403,17 @@ cast_constant(expression exp_constant, basic to_basic, type_context_p context)
 		ENTITY_CONVERSION_DCMPLX_P(function_called)))
       {
 	b = make_basic_float(4);
-	exp_real2 = cast_constant(exp_real, b, context);
+	if ((exp_real2 = cast_constant(exp_real, b, context)) == NULL)
+	{
+	  exp_real2 = exp_real;
+	}
+	
 	if (exp_imag != NULL)
 	{
-	  exp_imag2 = cast_constant(exp_imag, b, context);
+	  if ((exp_imag2 = cast_constant(exp_imag, b, context)) == NULL)
+	  {
+	    exp_imag2 = exp_imag;
+	  }
 	}
 	else
 	{
@@ -415,10 +422,6 @@ cast_constant(expression exp_constant, basic to_basic, type_context_p context)
 			 NIL);
 	  exp_imag2 = make_expression(make_syntax(is_syntax_call, c),
 				      normalized_undefined);
-	}
-	if ( exp_real2 == NULL || exp_imag2 == NULL)
-	{
-	  pips_internal_error("Real and imagine party are not constants!\n");
 	}
 	/* Conversion implicit */
 	if (!get_bool_property("TYPE_CHECKER_EXPLICIT_COMPLEX_CONSTANTS") &&
@@ -444,10 +447,16 @@ cast_constant(expression exp_constant, basic to_basic, type_context_p context)
 		ENTITY_CONVERSION_CMPLX_P(function_called)))
       {
 	b = make_basic_float(8);
-	exp_real2 = cast_constant(exp_real, b, context);
+	if ((exp_real2 = cast_constant(exp_real, b, context)) == NULL)
+	{
+	  exp_real2 = exp_real;
+	}
 	if (exp_imag != NULL)
 	{
-	  exp_imag2 = cast_constant(exp_imag, b, context);
+	  if ((exp_imag2 = cast_constant(exp_imag, b, context)) == NULL)
+	  {
+	    exp_imag2 = exp_imag;
+	  }
 	}
 	else
 	{
@@ -456,10 +465,6 @@ cast_constant(expression exp_constant, basic to_basic, type_context_p context)
 			 NIL);
 	  exp_imag2 = make_expression(make_syntax(is_syntax_call, c),
 				      normalized_undefined);
-	}
-	if ( exp_real2 == NULL || exp_imag2 == NULL)
-	{
-	  pips_internal_error("Real and imagine party are not constants!\n");
 	}
 	/* Conversion implicit */
 	if (!get_bool_property("TYPE_CHECKER_EXPLICIT_COMPLEX_CONSTANTS") &&
