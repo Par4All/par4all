@@ -40,6 +40,25 @@
 
 #define LOCAL static
 
+/* CLASSIFICATION OF BASIC */
+#define basic_numeric_simple_p(b) (basic_int_p(b) || basic_float_p(b))
+#define basic_numeric_p(b) (basic_numeric_simple_p(b) || basic_complex_p(b))
+#define basic_compatible_simple_p(b1, b2) (\
+                          (basic_numeric_simple_p(b1) && basic_numeric_simple_p(b2)) ||\
+                          (basic_string_p(b1) && basic_string_p(b2)) ||\
+                          (basic_logical_p(b1) && basic_logical_p(b2)) ||\
+                          (basic_overloaded_p(b1) && basic_overloaded_p(b2)) ||\
+                          (basic_undefined_p(b1) && basic_undefined_p(b2)))
+#define basic_compatible_p(b1, b2) (\
+                          (basic_complex_p(b1) && basic_complex_p(b2)) ||\
+                          (basic_compatible_simple_p(b1, b2)))
+
+/* Working with hash_table of basic
+ */
+#define GET_TYPE(h, e) ((basic)hash_get(h, (char*)(e)))
+#define PUT_TYPE(h, e, b) hash_put(h, (char*)(e), (char*)(b))
+
+
 void 
 CreateAreas()
 {
@@ -555,16 +574,497 @@ logical_to_logical_type(int n)
     return t;
 }
 
+/**************************************************************** TYPE A CALL FUNCTIONS */
+/* I have to cast b to REAL or DOUBLE. Between REAL et DOUBLE, 
+ * I have to choose the type that is the nearest to b!
+ * e.g: type_nearest_RealDouble(INT(x)) --> REAL
+ * e.g: type_nearest_RealDouble(CMPLX(x)) --> DOUBLE
+ *
+ * WARNING: b must be a type numeric, otherwise, I return basic_undefined
+ */
+basic type_nearest_RealDouble(basic b)
+{
+    if(basic_int_p(b) || (basic_float_p(b) && basic_float(b)==4))
+    {
+        return make_basic_float(4);
+    }
+    if(basic_complex_p(b) || (basic_float_p(b) && basic_float(b)==8))
+    {
+        return make_basic_float(8);
+    }
+    return basic_undefined;
+}
+basic type_nearest_IntegerRealDouble(basic b)
+{
+    if(basic_int_p(b))
+    {
+        return copy_basic(b);
+    }
+    return type_nearest_RealDouble(b);
+}
+basic type_nearest_RealDoubleComplex(basic b)
+{
+    if(basic_complex_p(b))
+    {
+        return copy_basic(b);
+    }
+    return type_nearest_RealDouble(b);
+}
+basic type_nearest_IntegerRealDoubleComplex(basic b)
+{
+    if(basic_complex_p(b))
+    {
+        return copy_basic(b);
+    }
+    return type_nearest_IntegerRealDouble(b);
+}
+/***************************************************************************************** 
+ * Determine the longest basic among the arguments of c
+ */
+basic basic_union_arguments(call c, hash_table types)
+{
+    basic b1, b2;
+    list args = call_arguments(c);
+
+    // #arguments = 0
+    if (args == NIL)
+    {
+        return basic_undefined;
+    }
+
+    // #arguments >= 1
+    b1 = GET_TYPE(types, EXPRESSION(CAR(args)));
+    args = CDR(args);
+    while (args != NIL)
+    {
+	b2 = GET_TYPE(types, EXPRESSION(CAR(args)));
+	if (is_inferior_basic(b1, b2))
+	{
+	    b1 = b2;
+	}
+	args = CDR(args);
+    }
+    return copy_basic(b1);
+}
+/********************** CHECK THE VALIDE OF ARGUMENTS BASIC OF FUNCTION ******************/
+/* Verify if all the arguments basic of function C are b
+ * If there is no argument, I return TRUE
+ */
+bool arguments_basic_equal_with(call c, hash_table types, basic b)
+{
+    basic b1;
+    list args = call_arguments(c);
+
+    while (args != NIL)
+    {
+	b1 = GET_TYPE(types, EXPRESSION(CAR(args)));
+	if (!basic_equal_p(b, b1))
+	{
+	  return FALSE;
+	}
+	args = CDR(args);
+    }
+    return TRUE;
+}
+bool arguments_are_numeric_simple(call c, hash_table types)
+{
+    basic b;
+    list args = call_arguments(c);
+
+    while (args != NIL)
+    {
+	b = GET_TYPE(types, EXPRESSION(CAR(args)));
+	if (!basic_numeric_simple_p(b))
+	{
+	  return FALSE;
+	}
+	args = CDR(args);
+    }
+    return TRUE;
+}
+bool arguments_are_numeric(call c, hash_table types)
+{
+    basic b;
+    list args = call_arguments(c);
+
+    while (args != NIL)
+    {
+	b = GET_TYPE(types, EXPRESSION(CAR(args)));
+	if (!basic_numeric_p(b))
+	{
+	  return FALSE;
+	}
+	args = CDR(args);
+    }
+    return TRUE;
+}
+bool arguments_are_character(call c, hash_table types)
+{
+    basic b;
+    list args = call_arguments(c);
+
+    while (args != NIL)
+    {
+	b = GET_TYPE(types, EXPRESSION(CAR(args)));
+	if (!basic_string_p(b))
+	{
+	  return FALSE;
+	}
+	args = CDR(args);
+    }
+    return TRUE;
+}
+bool arguments_are_logical(call c, hash_table types)
+{
+    basic b;
+    list args = call_arguments(c);
+
+    while (args != NIL)
+    {
+	b = GET_TYPE(types, EXPRESSION(CAR(args)));
+	if (!basic_logical_p(b))
+	{
+	  return FALSE;
+	}
+	args = CDR(args);
+    }
+    return TRUE;
+}
+bool arguments_basic_compatible_simple_with(call c, hash_table types, basic b)
+{
+    basic b1;
+    list args = call_arguments(c);
+
+    while (args != NIL)
+    {
+        b1 = GET_TYPE(types, EXPRESSION(CAR(args)));
+	if (!basic_compatible_simple_p(b, b1))
+	{
+	  return FALSE;
+	}
+	args = CDR(args);
+    }
+    return TRUE;
+}
+bool arguments_basic_compatible_with(call c, hash_table types, basic b)
+{
+    basic b1;
+    list args = call_arguments(c);
+
+    while (args != NIL)
+    {
+	b1 = GET_TYPE(types, EXPRESSION(CAR(args)));
+	if (!basic_compatible_p(b, b1))
+	{
+	  return FALSE;
+	}
+	args = CDR(args);
+    }
+    return TRUE;
+}
+
+/***************************************************************************************** 
+ * Typing all the arguments of c to basic b if their basic <> b
+ */
+void typing_arguments(call c, hash_table types, basic b)
+{
+    basic b1;
+    list args = call_arguments(c);
+
+    while (args != NIL)
+    {
+	b1 = GET_TYPE(types, EXPRESSION(CAR(args)));
+	if (!basic_equal_p(b, b1))
+	{
+	    EXPRESSION(CAR(args)) = insert_cast(b, b1, EXPRESSION(CAR(args)));
+	    // Update hash table
+	    PUT_TYPE(types, EXPRESSION(CAR(args)), b);
+	}
+	args = CDR(args);
+    }
+}
+
+/***************************************************************************************** 
+ * Typing function C whose argument type is from_type and whose return type is to_type
+ */
+static basic 
+typing_function_argument_type_to_return_type(call c, hash_table types, 
+					     basic from_type, basic to_type)
+{
+    entity function_called = call_function(c);
+
+    if(!arguments_basic_compatible_with(c, types, from_type))
+    {
+        // ERROR: Invalide of type
+        fprintf(stderr,"Intrinsic [%s]: Arguments are not compatible with [%s]\n", 
+		entity_name(function_called), basic_to_string(from_type));
+    }
+    else
+    {
+        // Typing all arguments to from_type if necessary
+        typing_arguments(c, types, from_type);
+    }
+
+    return copy_basic(to_type);
+}
+static basic
+typing_function_int_to_int(call c, hash_table types)
+{
+    basic type_INT = make_basic_int(4);
+    return typing_function_argument_type_to_return_type(c, types, type_INT, type_INT);
+}
+static basic
+typing_function_real_to_real(call c, hash_table types)
+{
+    basic type_REAL = make_basic_float(4);
+    return typing_function_argument_type_to_return_type(c, types, type_REAL, type_REAL);
+}
+static basic
+typing_function_double_to_double(call c, hash_table types)
+{
+    basic type_DBLE = make_basic_float(8);
+    return typing_function_argument_type_to_return_type(c, types, type_DBLE, type_DBLE);
+}
+static basic
+typing_function_complex_to_complex(call c, hash_table types)
+{
+    basic type_CMPLX = make_basic_complex(8);
+    return typing_function_argument_type_to_return_type(c, types, type_CMPLX, type_CMPLX);
+}
+static basic
+typing_function_dcomplex_to_dcomplex(call c, hash_table types)
+{
+    basic type_DCMPLX = make_basic_complex(16);
+    return typing_function_argument_type_to_return_type(c, types, type_DCMPLX, type_DCMPLX);
+}
+static basic
+typing_function_char_to_int(call c, hash_table types)
+{
+    basic type_INT = make_basic_int(4);
+    basic type_CHAR = make_basic(is_basic_string, string_undefined);
+    return typing_function_argument_type_to_return_type(c, types, type_CHAR, type_INT);
+}
+static basic
+typing_function_int_to_char(call c, hash_table types)
+{
+    basic type_INT = make_basic_int(4);
+    basic type_CHAR = make_basic(is_basic_string, string_undefined);
+    return typing_function_argument_type_to_return_type(c, types, type_INT, type_CHAR);
+}
+static basic
+typing_function_real_to_int(call c, hash_table types)
+{
+    basic type_INT = make_basic_int(4);
+    basic type_REAL = make_basic_float(4);
+    return typing_function_argument_type_to_return_type(c, types, type_REAL, type_INT);
+}
+static basic
+typing_function_int_to_real(call c, hash_table types)
+{
+    basic type_INT = make_basic_int(4);
+    basic type_REAL = make_basic_float(4);
+    return typing_function_argument_type_to_return_type(c, types, type_INT, type_REAL);
+}
+static basic
+typing_function_double_to_int(call c, hash_table types)
+{
+    basic type_INT = make_basic_int(4);
+    basic type_DBLE = make_basic_float(8);
+    return typing_function_argument_type_to_return_type(c, types, type_DBLE, type_INT);
+}
+static basic
+typing_function_real_to_double(call c, hash_table types)
+{
+    basic type_REAL = make_basic_float(4);
+    basic type_DBLE = make_basic_float(8);
+    return typing_function_argument_type_to_return_type(c, types, type_REAL, type_DBLE);
+}
+static basic
+typing_function_double_to_real(call c, hash_table types)
+{
+    basic type_REAL = make_basic_float(4);
+    basic type_DBLE = make_basic_float(8);
+    return typing_function_argument_type_to_return_type(c, types, type_DBLE, type_REAL);
+}
+static basic
+typing_function_complex_to_int(call c, hash_table types)
+{
+    basic type_INT = make_basic_int(4);
+    basic type_CMPLX = make_basic_complex(8);
+    return typing_function_argument_type_to_return_type(c, types, type_CMPLX, type_INT);
+}
+static basic
+typing_function_complex_to_real(call c, hash_table types)
+{
+    basic type_REAL = make_basic_float(4);
+    basic type_CMPLX = make_basic_complex(8);
+    return typing_function_argument_type_to_return_type(c, types, type_CMPLX, type_REAL);
+}
+static basic
+typing_function_char_to_logical(call c, hash_table types)
+{
+    basic type_LOGICAL = make_basic_logical(4);
+    basic type_CHAR = make_basic(is_basic_string, string_undefined);
+    return typing_function_argument_type_to_return_type(c, types, type_CHAR, type_LOGICAL);
+}
+
+/***************************************************************************************** 
+ * Arguments are REAL (or DOUBLE); and the return is the same with argument
+ */
+static basic
+typing_function_RealDouble_to_RealDouble(call c, hash_table types)
+{
+    basic b;
+
+    entity function_called = call_function(c);
+
+    if(!arguments_are_numeric(c, types))
+    {
+        // ERROR: Invalide of type
+        fprintf(stderr,"Intrinsic [%s]: Arguments are not numeric\n", 
+		entity_name(function_called));
+    }
+    // Find the longest type amongs all arguments
+    b = basic_union_arguments(c, types);
+    // Find the nearest type between REAL and DOUBLE
+    b = type_nearest_RealDouble(b); 
+    // Typing all arguments to b if necessary
+    typing_arguments(c, types, b);
+
+    return copy_basic(b);    
+}
+static basic
+typing_function_RealDoubleComplex_to_RealDoubleComplex(call c, hash_table types)
+{
+    basic b;
+
+    entity function_called = call_function(c);
+
+    if(!arguments_are_numeric(c, types))
+    {
+        // ERROR: Invalide of type
+        fprintf(stderr,"Intrinsic [%s]: Arguments are not numeric\n", 
+		entity_name(function_called));
+    }
+    // Find the longest type amongs all arguments
+    b = basic_union_arguments(c, types);
+    // Find the nearest type between REAL, DOUBLE and COMPLEX
+    b = type_nearest_RealDoubleComplex(b); 
+    // Typing all arguments to b if necessary
+    typing_arguments(c, types, b);
+
+    return copy_basic(b);
+}
+static basic
+typing_function_IntegerRealDouble_to_IntegerRealDouble(call c, hash_table types)
+{
+    basic b;
+
+    entity function_called = call_function(c);
+
+    if(!arguments_are_numeric(c, types))
+    {
+        // ERROR: Invalide of type
+        fprintf(stderr,"Intrinsic [%s]: Arguments are not numeric\n", 
+		entity_name(function_called));
+    }
+    // Find the longest type amongs all arguments
+    b = basic_union_arguments(c, types);
+    // Find the nearest type between REAL and DOUBLE
+    b = type_nearest_IntegerRealDouble(b); 
+    // Typing all arguments to b if necessary
+    typing_arguments(c, types, b);
+
+    return copy_basic(b);    
+}
+/***************************************************************************************** 
+ * The arguments are INT, REAL, DOUBLE or COMPLEX. The return is the same with the argument
+ * except case argument are COMPLEX, return is REAL
+ *
+ * Note: Only for Intrinsic ABS(): ABS(CMPLX(x)) --> REAL
+ */
+static basic
+typing_function_IntegerRealDoubleComplex_to_IntegerRealDoubleReal(call c, hash_table types)
+{
+    basic b;
+
+    entity function_called = call_function(c);
+
+    if(!arguments_are_numeric(c, types))
+    {
+        // ERROR: Invalide of type
+        fprintf(stderr,"Intrinsic [%s]: Arguments are not numeric\n", 
+		entity_name(function_called));
+    }
+    // Find the longest type amongs all arguments
+    b = basic_union_arguments(c, types);
+    // Find the nearest type between REAL and DOUBLE
+    b = type_nearest_IntegerRealDouble(b); 
+    // Typing all arguments to b if necessary
+    typing_arguments(c, types, b);
+
+    if (basic_complex_p(b))
+    {
+        b = make_basic_float(4); // REAL
+    }
+    return copy_basic(b);
+}
+
+/***************************************************************************************** 
+ * Intrinsic conversion to a numeric
+ *
+ * Note: argument must be numeric
+ */
+static basic
+typing_function_conversion_to_numeric(call c, hash_table types, basic to_type)
+{
+    if(!arguments_are_numeric(c, types))
+    {
+        // ERROR: Invalide of type
+        fprintf(stderr,"Intrinsic [%s]: Arguments are not numeric\n", 
+		entity_name(call_function(c)));
+    }
+    return copy_basic(to_type);
+}
+static basic
+typing_function_conversion_to_integer(call c, hash_table types)
+{
+    return typing_function_conversion_to_numeric(c, types, make_basic_int(4));
+}
+static basic
+typing_function_conversion_to_real(call c, hash_table types)
+{
+    return typing_function_conversion_to_numeric(c, types, make_basic_float(4));
+}
+static basic
+typing_function_conversion_to_double(call c, hash_table types)
+{
+    return typing_function_conversion_to_numeric(c, types, make_basic_float(8));
+}
+static basic
+typing_function_conversion_to_complex(call c, hash_table types)
+{
+    return typing_function_conversion_to_numeric(c, types, make_basic_complex(8));
+}
+static basic
+typing_function_conversion_to_dcomplex(call c, hash_table types)
+{
+    return typing_function_conversion_to_numeric(c, types, make_basic_complex(16));
+}
+
+/*********************************************************************** INTRINSICS LIST */
+
 /* the following data structure describes an intrinsic function: its
 name and its arity and its type. */
 
+typedef basic (*typing_function_t)(call, hash_table);
+
 typedef struct IntrinsicDescriptor {
-    string name;
-    int nbargs;
+  string name;
+  int nbargs;
   type (*intrinsic_type)(int);
+  typing_function_t type_function;
 } IntrinsicDescriptor;
-
-
 
 /* the table of intrinsic functions. this table is used at the begining
 of linking to create Fortran operators, commands and intrinsic functions. 
@@ -574,172 +1074,191 @@ arguments.
 */
 
 static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
-    {"+", 2, default_intrinsic_type},
-    {"-", 2, default_intrinsic_type},
-    {"/", 2, default_intrinsic_type},
-    {"INV", 1, real_to_real_type},
-    {"*", 2, default_intrinsic_type},
-    {"--", 1, default_intrinsic_type},
-    {"**", 2, default_intrinsic_type},
+    {"+", 2, default_intrinsic_type, 0},
+    {"-", 2, default_intrinsic_type, 0},
+    {"/", 2, default_intrinsic_type, 0},
+    {"INV", 1, real_to_real_type, 0},
+    {"*", 2, default_intrinsic_type, 0},
+    {"--", 1, default_intrinsic_type, 0},
+    {"**", 2, default_intrinsic_type, 0},
 
-    {"=", 2, default_intrinsic_type},
+    {"=", 2, default_intrinsic_type, 0},
 
-    {".EQV.", 2, overloaded_to_logical_type},
-    {".NEQV.", 2, overloaded_to_logical_type},
+    {".EQV.", 2, overloaded_to_logical_type, 0},
+    {".NEQV.", 2, overloaded_to_logical_type, 0},
 
-    {".OR.", 2, logical_to_logical_type},
-    {".AND.", 2, logical_to_logical_type},
+    {".OR.", 2, logical_to_logical_type, 0},
+    {".AND.", 2, logical_to_logical_type, 0},
 
-    {".LT.", 2, overloaded_to_logical_type},
-    {".GT.", 2, overloaded_to_logical_type},
-    {".LE.", 2, overloaded_to_logical_type},
-    {".GE.", 2, overloaded_to_logical_type},
-    {".EQ.", 2, overloaded_to_logical_type},
-    {".NE.", 2, overloaded_to_logical_type},
+    {".LT.", 2, overloaded_to_logical_type, 0},
+    {".GT.", 2, overloaded_to_logical_type, 0},
+    {".LE.", 2, overloaded_to_logical_type, 0},
+    {".GE.", 2, overloaded_to_logical_type, 0},
+    {".EQ.", 2, overloaded_to_logical_type, 0},
+    {".NE.", 2, overloaded_to_logical_type, 0},
 
-    {"//", 2, character_to_character_type},
+    {"//", 2, character_to_character_type, 0},
 
-    {".NOT.", 1, logical_to_logical_type},
+    {".NOT.", 1, logical_to_logical_type, 0},
 
-    {"WRITE", (INT_MAX), default_intrinsic_type},
-    {"REWIND", (INT_MAX), default_intrinsic_type},
-    {"BACKSPACE", (INT_MAX), default_intrinsic_type},
-    {"OPEN", (INT_MAX), default_intrinsic_type},
-    {"CLOSE", (INT_MAX), default_intrinsic_type},
-    {"READ", (INT_MAX), default_intrinsic_type},
-    {"BUFFERIN", (INT_MAX), default_intrinsic_type},
-    {"BUFFEROUT", (INT_MAX), default_intrinsic_type},
-    {"ENDFILE", (INT_MAX), default_intrinsic_type},
-    {"IMPLIED-DO", (INT_MAX), default_intrinsic_type},
-    {FORMAT_FUNCTION_NAME, 1, default_intrinsic_type},
-    {"INQUIRE", (INT_MAX), default_intrinsic_type},
+    {"WRITE", (INT_MAX), default_intrinsic_type, 0},
+    {"REWIND", (INT_MAX), default_intrinsic_type, 0},
+    {"BACKSPACE", (INT_MAX), default_intrinsic_type, 0},
+    {"OPEN", (INT_MAX), default_intrinsic_type, 0},
+    {"CLOSE", (INT_MAX), default_intrinsic_type, 0},
+    {"READ", (INT_MAX), default_intrinsic_type, 0},
+    {"BUFFERIN", (INT_MAX), default_intrinsic_type, 0},
+    {"BUFFEROUT", (INT_MAX), default_intrinsic_type, 0},
+    {"ENDFILE", (INT_MAX), default_intrinsic_type, 0},
+    {"IMPLIED-DO", (INT_MAX), default_intrinsic_type, 0},
+    {FORMAT_FUNCTION_NAME, 1, default_intrinsic_type, 0},
+    {"INQUIRE", (INT_MAX), default_intrinsic_type, 0},
 
-    {SUBSTRING_FUNCTION_NAME, 3, substring_type},
-    {ASSIGN_SUBSTRING_FUNCTION_NAME, 4, assign_substring_type},
+    {SUBSTRING_FUNCTION_NAME, 3, substring_type, 0},
+    {ASSIGN_SUBSTRING_FUNCTION_NAME, 4, assign_substring_type, 0},
 
-    {"CONTINUE", 0, default_intrinsic_type},
-    {"ENDDO", 0, default_intrinsic_type},
-    {"PAUSE", 1, default_intrinsic_type},
-    {"RETURN", 0, default_intrinsic_type},
-    {"STOP", 0, default_intrinsic_type},
-    {"END", 0, default_intrinsic_type},
+    {"CONTINUE", 0, default_intrinsic_type, 0},
+    {"ENDDO", 0, default_intrinsic_type, 0},
+    {"PAUSE", 1, default_intrinsic_type, 0},
+    {"RETURN", 0, default_intrinsic_type, 0},
+    {"STOP", 0, default_intrinsic_type, 0},
+    {"END", 0, default_intrinsic_type, 0},
 
-    {"INT", 1, overloaded_to_integer_type},
-    {"IFIX", 1, real_to_integer_type},
-    {"IDINT", 1, double_to_integer_type},
-    {"REAL", 1, overloaded_to_real_type},
-    {"FLOAT", 1, overloaded_to_real_type},
-    {"DFLOAT", 1, overloaded_to_double_type},
-    {"SNGL", 1, overloaded_to_real_type},
-    {"DBLE", 1, overloaded_to_double_type},
-    {"DREAL", 1, overloaded_to_double_type}, /* Arnauld Leservot, code CEA */
-    {"CMPLX", (INT_MAX), overloaded_to_complex_type},
-    {"DCMPLX", (INT_MAX), overloaded_to_doublecomplex_type},
+    {"INT", 1, overloaded_to_integer_type, 0},
+    {"IFIX", 1, real_to_integer_type, 0},
+    {"IDINT", 1, double_to_integer_type, 0},
+    {"REAL", 1, overloaded_to_real_type, 0},
+    {"FLOAT", 1, overloaded_to_real_type, 0},
+    {"DFLOAT", 1, overloaded_to_double_type, 0},
+    {"SNGL", 1, overloaded_to_real_type, 0},
+    {"DBLE", 1, overloaded_to_double_type, 0},
+    {"DREAL", 1, overloaded_to_double_type, 0}, /* Arnauld Leservot, code CEA */
+    {"CMPLX", (INT_MAX), overloaded_to_complex_type, 0},
+    {"DCMPLX", (INT_MAX), overloaded_to_doublecomplex_type, 0},
 
     /* (0.,1.) -> switched to a function call...
      */
-    { IMPLIED_COMPLEX_NAME, 2, overloaded_to_complex_type},
-    { IMPLIED_DCOMPLEX_NAME, 2, overloaded_to_doublecomplex_type},
+    { IMPLIED_COMPLEX_NAME, 2, overloaded_to_complex_type, 0},
+    { IMPLIED_DCOMPLEX_NAME, 2, overloaded_to_doublecomplex_type, 0},
 
-    {"ICHAR", 1, default_intrinsic_type},
-    {"CHAR", 1, default_intrinsic_type},
-    {"AINT", 1, real_to_real_type},
-    {"DINT", 1, double_to_double_type},
-    {"ANINT", 1, real_to_real_type},
-    {"DNINT", 1, double_to_double_type},
-    {"NINT", 1, real_to_integer_type},
-    {"IDNINT", 1, double_to_integer_type},
-    {"IABS", 1, integer_to_integer_type},
-    {"ABS", 1, real_to_real_type},
-    {"DABS", 1, double_to_double_type},
-    {"CABS", 1, complex_to_real_type},
-    {"CDABS", 1, doublecomplex_to_double_type},
+    {"ICHAR", 1, default_intrinsic_type, 0},
+    {"CHAR", 1, default_intrinsic_type, 0},
+    {"AINT", 1, real_to_real_type, 0},
+    {"DINT", 1, double_to_double_type, 0},
+    {"ANINT", 1, real_to_real_type, 0},
+    {"DNINT", 1, double_to_double_type, 0},
+    {"NINT", 1, real_to_integer_type, 0},
+    {"IDNINT", 1, double_to_integer_type, 0},
+    {"IABS", 1, integer_to_integer_type, 0},
+    {"ABS", 1, real_to_real_type, 0},
+    {"DABS", 1, double_to_double_type, 0},
+    {"CABS", 1, complex_to_real_type, 0},
+    {"CDABS", 1, doublecomplex_to_double_type, 0},
 
-    {"MOD", 2, default_intrinsic_type},
-    {"AMOD", 2, real_to_real_type},
-    {"DMOD", 2, double_to_double_type},
-    {"ISIGN", 2, integer_to_integer_type},
-    {"SIGN", 2, default_intrinsic_type},
-    {"DSIGN", 2, double_to_double_type},
-    {"IDIM", 2, integer_to_integer_type},
-    {"DIM", 2, default_intrinsic_type},
-    {"DDIM", 2, double_to_double_type},
-    {"DPROD", 2, real_to_double_type},
-    {"MAX", (INT_MAX), default_intrinsic_type},
-    {"MAX0", (INT_MAX), integer_to_integer_type},
-    {"AMAX1", (INT_MAX), real_to_real_type},
-    {"DMAX1", (INT_MAX), double_to_double_type},
-    {"AMAX0", (INT_MAX), integer_to_real_type},
-    {"MAX1", (INT_MAX), real_to_integer_type},
-    {"MIN", (INT_MAX), default_intrinsic_type},
-    {"MIN0", (INT_MAX), integer_to_integer_type},
-    {"AMIN1", (INT_MAX), real_to_real_type},
-    {"DMIN1", (INT_MAX), double_to_double_type},
-    {"AMIN0", (INT_MAX), integer_to_real_type},
-    {"MIN1", (INT_MAX), real_to_integer_type},
-    {"LEN", 1, character_to_integer_type},
-    {"INDEX", 2, character_to_integer_type},
-    {"AIMAG", 1, complex_to_real_type},
-    {"DIMAG", 1, doublecomplex_to_double_type},
-    {"CONJG", 1, complex_to_complex_type},
-    {"DCONJG", 1, doublecomplex_to_doublecomplex_type},
-    {"SQRT", 1, default_intrinsic_type},
-    {"DSQRT", 1, double_to_double_type},
-    {"CSQRT", 1, complex_to_complex_type},
+    {"MOD", 2, default_intrinsic_type, 0},
+    {"AMOD", 2, real_to_real_type, 0},
+    {"DMOD", 2, double_to_double_type, 0},
+    {"ISIGN", 2, integer_to_integer_type, 0},
+    {"SIGN", 2, default_intrinsic_type, 0},
+    {"DSIGN", 2, double_to_double_type, 0},
+    {"IDIM", 2, integer_to_integer_type, 0},
+    {"DIM", 2, default_intrinsic_type, 0},
+    {"DDIM", 2, double_to_double_type, 0},
+    {"DPROD", 2, real_to_double_type, 0},
+    {"MAX", (INT_MAX), default_intrinsic_type, 0},
+    {"MAX0", (INT_MAX), integer_to_integer_type, 0},
+    {"AMAX1", (INT_MAX), real_to_real_type, 0},
+    {"DMAX1", (INT_MAX), double_to_double_type, 0},
+    {"AMAX0", (INT_MAX), integer_to_real_type, 0},
+    {"MAX1", (INT_MAX), real_to_integer_type, 0},
+    {"MIN", (INT_MAX), default_intrinsic_type, 0},
+    {"MIN0", (INT_MAX), integer_to_integer_type, 0},
+    {"AMIN1", (INT_MAX), real_to_real_type, 0},
+    {"DMIN1", (INT_MAX), double_to_double_type, 0},
+    {"AMIN0", (INT_MAX), integer_to_real_type, 0},
+    {"MIN1", (INT_MAX), real_to_integer_type, 0},
+    {"LEN", 1, character_to_integer_type, 0},
+    {"INDEX", 2, character_to_integer_type, 0},
+    {"AIMAG", 1, complex_to_real_type, 0},
+    {"DIMAG", 1, doublecomplex_to_double_type, 0},
+    {"CONJG", 1, complex_to_complex_type, 0},
+    {"DCONJG", 1, doublecomplex_to_doublecomplex_type, 0},
+    {"SQRT", 1, default_intrinsic_type, 0},
+    {"DSQRT", 1, double_to_double_type, 0},
+    {"CSQRT", 1, complex_to_complex_type, 0},
 
-    {"EXP", 1, default_intrinsic_type},
-    {"DEXP", 1, double_to_double_type},
-    {"CEXP", 1, complex_to_complex_type},
-    {"LOG", 1, default_intrinsic_type},
-    {"ALOG", 1, real_to_real_type},
-    {"DLOG", 1, double_to_double_type},
-    {"CLOG", 1, complex_to_complex_type},
-    {"LOG10", 1, default_intrinsic_type},
-    {"ALOG10", 1, real_to_real_type},
-    {"DLOG10", 1, double_to_double_type},
-    {"SIN", 1, default_intrinsic_type},
-    {"DSIN", 1, double_to_double_type},
-    {"CSIN", 1, complex_to_complex_type},
-    {"COS", 1, default_intrinsic_type},
-    {"DCOS", 1, double_to_double_type},
-    {"CCOS", 1, complex_to_complex_type},
-    {"TAN", 1, default_intrinsic_type},
-    {"DTAN", 1, double_to_double_type},
-    {"ASIN", 1, default_intrinsic_type},
-    {"DASIN", 1, double_to_double_type},
-    {"ACOS", 1, default_intrinsic_type},
-    {"DACOS", 1, double_to_double_type},
-    {"ATAN", 1, default_intrinsic_type},
-    {"DATAN", 1, double_to_double_type},
-    {"ATAN2", 1, default_intrinsic_type},
-    {"DATAN2", 1, double_to_double_type},
-    {"SINH", 1, default_intrinsic_type},
-    {"DSINH", 1, double_to_double_type},
-    {"COSH", 1, default_intrinsic_type},
-    {"DCOSH", 1, double_to_double_type},
-    {"TANH", 1, default_intrinsic_type},
-    {"DTANH", 1, double_to_double_type},
+    {"EXP", 1, default_intrinsic_type, 0},
+    {"DEXP", 1, double_to_double_type, 0},
+    {"CEXP", 1, complex_to_complex_type, 0},
+    {"LOG", 1, default_intrinsic_type, 0},
+    {"ALOG", 1, real_to_real_type, 0},
+    {"DLOG", 1, double_to_double_type, 0},
+    {"CLOG", 1, complex_to_complex_type, 0},
+    {"LOG10", 1, default_intrinsic_type, 0},
+    {"ALOG10", 1, real_to_real_type, 0},
+    {"DLOG10", 1, double_to_double_type, 0},
+    {"SIN", 1, default_intrinsic_type, 0},
+    {"DSIN", 1, double_to_double_type, 0},
+    {"CSIN", 1, complex_to_complex_type, 0},
+    {"COS", 1, default_intrinsic_type, 0},
+    {"DCOS", 1, double_to_double_type, 0},
+    {"CCOS", 1, complex_to_complex_type, 0},
+    {"TAN", 1, default_intrinsic_type, 0},
+    {"DTAN", 1, double_to_double_type, 0},
+    {"ASIN", 1, default_intrinsic_type, 0},
+    {"DASIN", 1, double_to_double_type, 0},
+    {"ACOS", 1, default_intrinsic_type, 0},
+    {"DACOS", 1, double_to_double_type, 0},
+    {"ATAN", 1, default_intrinsic_type, 0},
+    {"DATAN", 1, double_to_double_type, 0},
+    {"ATAN2", 1, default_intrinsic_type, 0},
+    {"DATAN2", 1, double_to_double_type, 0},
+    {"SINH", 1, default_intrinsic_type, 0},
+    {"DSINH", 1, double_to_double_type, 0},
+    {"COSH", 1, default_intrinsic_type, 0},
+    {"DCOSH", 1, double_to_double_type, 0},
+    {"TANH", 1, default_intrinsic_type, 0},
+    {"DTANH", 1, double_to_double_type, 0},
 
-    {"LGE", 2, character_to_logical_type},
-    {"LGT", 2, character_to_logical_type},
-    {"LLE", 2, character_to_logical_type},
-    {"LLT", 2, character_to_logical_type},
+    {"LGE", 2, character_to_logical_type, 0},
+    {"LGT", 2, character_to_logical_type, 0},
+    {"LLE", 2, character_to_logical_type, 0},
+    {"LLT", 2, character_to_logical_type, 0},
 
-    {LIST_DIRECTED_FORMAT_NAME, 0, default_intrinsic_type},
-    {UNBOUNDED_DIMENSION_NAME, 0, default_intrinsic_type},
+    {LIST_DIRECTED_FORMAT_NAME, 0, default_intrinsic_type, 0},
+    {UNBOUNDED_DIMENSION_NAME, 0, default_intrinsic_type, 0},
 
     /* These operators are used within the OPTIMIZE transformation in
 order to manipulate operators such as n-ary add and multiply or
 multiply-add operators ( JZ - sept 98) */
-    {EOLE_SUM_OPERATOR_NAME, (INT_MAX), default_intrinsic_type },
-    {EOLE_PROD_OPERATOR_NAME, (INT_MAX), default_intrinsic_type },
-    {EOLE_FMA_OPERATOR_NAME, 3, default_intrinsic_type },
+    {EOLE_SUM_OPERATOR_NAME, (INT_MAX), default_intrinsic_type , 0},
+    {EOLE_PROD_OPERATOR_NAME, (INT_MAX), default_intrinsic_type , 0},
+    {EOLE_FMA_OPERATOR_NAME, 3, default_intrinsic_type , 0},
 
-    {NULL, 0, 0}
+    {NULL, 0, 0, 0}
 };
 
+typing_function_t get_type_function_for_intrinsic(string name)
+{
+  static hash_table name_to_type_function = NULL;
 
-  
+  /* initialize first time */
+  if (!name_to_type_function) 
+  {
+    IntrinsicDescriptor * pdt = IntrinsicDescriptorTable;
+
+    name_to_type_function = hash_table_make(hash_pointer, 0);
+    
+    for(; pdt->name; pdt++)
+      hash_put(name_to_type_function, (char*)pdt->name, (char*)pdt->type_function);
+  }
+
+  if (!hash_bound_p(name_to_type_function, name))
+    pips_internal_error("no type function for intrinsics %s", name);
+
+  return (typing_function_t) hash_get(name_to_type_function, name);
+}
+
 /* this function creates an entity that represents an intrinsic
 function. Fortran operators and basic statements are intrinsic
 functions.
