@@ -272,7 +272,7 @@ string module_name;
 
   module = local_name_to_top_level_entity(module_name);
   dfg = (graph) db_get_memory_resource(DBR_ADFG, module_name, TRUE);
-  filename = strdup(concatenate(db_get_current_program_directory(),
+  filename = strdup(concatenate(db_get_current_workspace_directory(),
 				"/", module_name, ".adfg_file", NULL));
 
   fd = safe_fopen(filename, "w");
