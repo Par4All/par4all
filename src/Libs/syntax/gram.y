@@ -56,6 +56,9 @@
   * $Id$
   *
   * $Log: gram.y,v $
+  * Revision 1.58  2002/04/23 12:07:25  coelho
+  * syntax error--
+  *
   * Revision 1.57  2001/07/19 12:47:57  irigoin
   * code for pointer_inst: moved from gram.y into declaration.c. New function DeclarePointer().
   *
@@ -947,6 +950,7 @@ common: TK_COMMON
 	    {
 		CurrentType = type_undefined;
 	    }
+	;
 
 common_name: TK_CONCAT
 	    {
