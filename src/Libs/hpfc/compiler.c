@@ -1,6 +1,6 @@
 /* HPFC - Fabien Coelho, May 1993 and later...
  *
- * $RCSfile: compiler.c,v $ ($Date: 1997/01/22 18:58:00 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1997/02/18 10:07:49 $, )
  * version $Revision$
  *
  * Compiler
@@ -178,7 +178,7 @@ hpf_compile_call(
 	    entity primary = expression_to_entity(e);
 	    pips_debug(5, "dealing with array %s\n", entity_name(primary));
 	    if (array_distributed_p(primary))
-		ls = CONS(STATEMENT, generate_all_live(primary), ls);
+		ls = CONS(STATEMENT, generate_all_liveness(primary, TRUE), ls);
 	},
 	    call_arguments(c));
 	
@@ -656,6 +656,7 @@ hpf_compiler(
     statement *nodestatp)
 {
     list /* of hpfc_reduction */ lr = NIL;
+    bool root_statement_p = stat==get_current_module_statement();
 
     DEBUG_STAT(9, "stat is", stat);
     pips_debug(9, "only io %d, remapping %d, reduction %d\n",
@@ -668,7 +669,7 @@ hpf_compiler(
 	io_efficient_compile(stat, hoststatp, nodestatp);
 	return;
     }
-    else if (bound_renamings_p(stat)) /* remapping */
+    else if (bound_renamings_p(stat) && !root_statement_p) /* remapping */
     {
 	remapping_compile(stat, hoststatp, nodestatp);
 	return;
@@ -714,6 +715,13 @@ hpf_compiler(
 
 	*hoststatp = make_block_statement(lh);
 	*nodestatp = make_block_statement(ln);
+    }
+
+    if (root_statement_p && bound_renamings_p(stat))
+    {
+	*nodestatp = make_block_statement(
+	    CONS(STATEMENT, root_statement_remapping_inits(stat),
+	    CONS(STATEMENT, *nodestatp, NIL)));
     }
 }
 
