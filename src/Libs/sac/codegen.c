@@ -458,7 +458,9 @@ static void pack_instructions(int kind, int nb_pack, list* args, cons** instr)
    iargs = argList;
    for( j=0; j<nb_pack; j++)
    {
-      CDR(iargs) = CONS(EXPRESSION, EXPRESSION(CAR(args[j])), NIL);
+      CDR(iargs) = CONS(EXPRESSION, 
+			copy_expression(EXPRESSION(CAR(args[j]))), 
+			NIL);
       iargs = CDR(iargs);
    }
    *instr = CONS( STATEMENT, 
@@ -479,7 +481,7 @@ static void pack_instructions(int kind, int nb_pack, list* args, cons** instr)
 
    /* make the load instruction(s) */
    {
-   list pArgs[8];
+   list * pArgs = (list*)malloc(nb_pack*sizeof(list));
    int i;
 
    for(i=0; i<nb_pack; i++)
@@ -491,7 +493,9 @@ static void pack_instructions(int kind, int nb_pack, list* args, cons** instr)
       iargs = argList;
       for( i=0; i<nb_pack; i++)
       {
-	 CDR(iargs) = CONS( EXPRESSION, EXPRESSION(CAR(pArgs[i])), NIL);
+	 CDR(iargs) = CONS( EXPRESSION, 
+			    copy_expression(EXPRESSION(CAR(pArgs[i]))), 
+			    NIL);
 	 iargs = CDR(iargs);
 
 	 pArgs[i] = CDR(pArgs[i]);
@@ -501,7 +505,11 @@ static void pack_instructions(int kind, int nb_pack, list* args, cons** instr)
 		     make_load_statement(nb_pack, argList),
 		     *instr);
    }
+
+   free(pArgs);
    }
+
+   free(operands);
 }
 
 #define MAX_PACK 8
