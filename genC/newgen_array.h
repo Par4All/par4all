@@ -2,6 +2,12 @@
  * $Id$
  *
  * $Log: newgen_array.h,v $
+ * Revision 1.8  1998/12/29 16:03:53  coelho
+ * fixed type in map.
+ *
+ * Revision 1.7  1998/12/29 16:01:43  coelho
+ * *** empty log message ***
+ *
  * Revision 1.6  1998/12/29 16:00:21  coelho
  * char * -> void *
  *
@@ -28,7 +34,7 @@ void gen_array_addto(gen_array_t, int, void *);
 void gen_array_dupaddto(gen_array_t, int, void *);
 void gen_array_append(gen_array_t, void *);
 void gen_array_dupappend(gen_array_t, void *);
-char ** gen_array_pointer(gen_array_t);
+void ** gen_array_pointer(gen_array_t);
 int gen_array_nitems(gen_array_t);
 int gen_array_size(gen_array_t);
 void * gen_array_item(gen_array_t, int);
@@ -41,7 +47,7 @@ list list_from_gen_array(gen_array_t);
       int _i, _nitems = gen_array_nitems(array);	\
       for(_i=0; _i<_nitems; _i++)			\
       {							\
-	  string s = gen_array_item(array, _i);		\
+	  void * s = gen_array_item(array, _i);		\
 	  code;						\
       }							\
   }
