@@ -144,6 +144,7 @@ void init(void)
     for( bp = Domains ; bp < &Domains[ MAX_DOMAIN ] ; bp++ ) {
 	bp->name = NULL ;
 	bp->compiled = 0 ;
+	bp->size = 0 ; 
 	bp->tabulated = NULL;
 	bp->domain = NULL ;
 	bp->inlined = NULL ;
@@ -347,11 +348,9 @@ void print_domain(FILE * out, union domain * dp)
    aren't printed. */
 
 void
-print_domains( out )
-FILE *out ;
+print_domains(FILE * out)
 {
     struct gen_binding *bp ;
-    union domain *dp ;
 
     for( bp = Domains ; bp < &Domains[ MAX_DOMAIN ] ; bp++ ) {
 	if( bp->name == NULL || bp == Tabulated_bp ) continue ;
@@ -381,10 +380,7 @@ FILE *out ;
 
 static int current_first ;
 
-void
-reconnect( op, dp )
-int op ;
-union domain *dp ;
+void reconnect(int op, union domain * dp)
 {
     struct domainlist *dlp ;
 
@@ -422,33 +418,43 @@ union domain *dp ;
 /* COMPILE reconnects the Domains table (for not compiled types -- note that
    an inlined type is already compiled). */
 
-void
-compile()
+void compile(void)
 {
-    struct gen_binding *bp = Domains ;
-
-    current_first = 0;
-
-    for( ; bp < &Domains[ MAX_DOMAIN ] ; bp++ ) {
-	if( bp->name == NULL || bp->compiled || bp == Tabulated_bp )
-		continue ;
-
-	reconnect( -1, bp->domain ) ;
-	bp->compiled = (bp->domain->ba.type != EXTERNAL_DT ) ;
-
-	if( IS_TABULATED( bp )) {
-	    union domain *dp = NULL;
-
-	    if( !(bp->domain->ba.type == CONSTRUCTED_DT &&
-		  (dp=bp->domain->co.components->domain)->ba.type == BASIS_DT &&
-		  strcmp( dp->ba.constructand->name, "string" ) == 0)) {
-		user( "compile: tabulated first %s domain isn't string\n",
-		      dp->ba.constructand->name ) ;
-	    }
-	}
+  int i;
+  current_first = 0;
+  
+  for(i=0; i<MAX_DOMAIN; i++)
+  {
+    struct gen_binding * bp = &Domains[i];
+    
+    if( bp->name == NULL || bp->compiled || bp == Tabulated_bp )
+      continue ;
+    
+    reconnect( -1, bp->domain ) ;
+    bp->compiled = (bp->domain->ba.type != EXTERNAL_DT ) ;
+    
+    if( IS_TABULATED( bp )) {
+      union domain *dp = NULL;
+      
+      if( !(bp->domain->ba.type == CONSTRUCTED_DT &&
+	    (dp=bp->domain->co.components->domain)->ba.type == BASIS_DT &&
+	    strcmp( dp->ba.constructand->name, "string" ) == 0)) {
+	user( "compile: tabulated first %s domain isn't string\n",
+	      dp->ba.constructand->name ) ;
+      }
     }
+    
+    /* set size of domain. */
+    if (bp->domain->ba.type == BASIS_DT ||
+	bp->domain->ba.type == ARRAY_DT ||
+	bp->domain->ba.type == SET_DT ||
+	bp->domain->ba.type == LIST_DT ||
+	bp->domain->ba.type == CONSTRUCTED_DT)
+      bp->size = gen_size(i);
+  }
+
 #ifdef DBG_COMPILE
-    print_domains( stderr ) ;
+  print_domains( stderr ) ;
 #endif
 }
 
@@ -466,7 +472,7 @@ void gen_write_spec(char * filename)
     print_domains( id ) ;
 
     if( fclose( id )) 
-	    user( "Cannot close spec file %s\n", filename ) ;
+      user( "Cannot close spec file %s\n", filename ) ;
 }
 
 /* BUILD (in fact, the "main" function) parses the specifications and generates
@@ -475,16 +481,18 @@ void gen_write_spec(char * filename)
 /*ARGSUSED*/
 int build(int argc, char * argv[])
 {
-    init() ;
-    genspec_parse() ;
-    compile() ;
+  init();
+  genspec_parse();
+  compile();
   
-    if (error_seen == 0) {
-	gencode(argv[1]);
-	gen_write_spec(argv[2]);
-	return( 0 ) ;
-    }
-    return( 1 ) ;
+  if (error_seen == 0) {
+    if (argc<3)
+      user("not enough arguments provided, need 3, got %d!", argc);
+    gencode(argv[1]);
+    gen_write_spec(argv[2]);
+    return 0;
+  }
+  return 1;
 }
 
 /* ALLOC is an "iron-clad" version of malloc(3). */
