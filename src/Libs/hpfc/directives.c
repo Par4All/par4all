@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1996/03/20 13:37:31 $, )
+ * ($Date: 1996/03/20 19:09:47 $, )
  */
 
 #include "defines-local.h"
@@ -760,9 +760,24 @@ HANDLER_PROTOTYPE(set)
     add_statement_to_clean(current_stmt_head());
 }
 
+/* prescriptive mappings before a call.
+ * another kind of remapping, as realign and redistribute.
+ */
 HANDLER_PROTOTYPE(prescriptive)
 {
-    pips_debug(4, "in\n");
+    statement current = current_stmt_head();
+    entity array, new_array;
+
+    array = expression_to_entity(EXPRESSION(CAR(args)));
+    new_array = expression_to_entity(EXPRESSION(CAR(CDR(args))));
+
+    propagate_synonym(current, array, new_array);
+
+    /* only one renaming per rename directive!
+     */
+    store_renamings(current, 
+		    CONS(RENAMING, make_renaming(array, new_array), NIL));
+
 }
 
 HANDLER_PROTOTYPE(nothing)
@@ -819,7 +834,7 @@ static struct DirectiveHandler handlers[] =
     
     /* remappings before/after a call. internal management. 
      */
-    {HPF_PREFIX "_call",		3,	HANDLER(prescriptive) },
+    {HPF_PREFIX RENAME_SUFFIX,		3,	HANDLER(prescriptive) },
 	 
     /* default issues an error
      */
@@ -933,6 +948,8 @@ void handle_hpf_directives(statement s, bool dyn)
 	call_domain,       prescription_filter, gen_null,
 		      NULL);
 
+    DEBUG_STAT(7, "between phase 2 and 3", s);
+
 
     /* PHASE 3
      */
@@ -947,7 +964,7 @@ void handle_hpf_directives(statement s, bool dyn)
 
     initial_alignment(s);
 
-    DEBUG_STAT(7, "intermediate code", s);
+    DEBUG_STAT(7, "after phase 3", s);
 
     /* OPTIMIZATION
      */
