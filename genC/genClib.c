@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1996/06/15 13:02:01 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1996/07/08 16:33:59 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -78,7 +78,7 @@ static int disallow_undefined_tabulated = TRUE ;
  *
  * Fabien COELHO 10/06/94
  */
-#define check_domain(domain) \
+#define check_domain(dom) \
   message_assert("Inconsistant domain number",\
 		 (domain)>=0 && (domain)<MAX_DOMAIN)
 
