@@ -4,6 +4,9 @@
 # JPips is a java interface to tpips. It is based on swing.
 #
 # $Log: config.makefile,v $
+# Revision 1.2  1998/07/02 14:57:40  coelho
+# jpips.jar entry added.
+#
 # Revision 1.1  1998/07/01 17:08:48  coelho
 # Initial revision
 #
@@ -51,6 +54,7 @@ SCRIPTS	=	jpips
 SOURCES	=	$(J_FILES) $(SCRIPTS) $(MENUS) $(GIF)
 
 JZIP	=	jpips.zip
+JJAR	=	jpips.jar
 
 INSTALL_SHR =	$(MENUS) $(GIF) $(JZIP)
 
@@ -101,8 +105,16 @@ $(JZIP): $(OJ_FILES)
 	pwd=`pwd` ; cd $(pkg_dir); \
 		$(ZIP) $(ZIPFLAGS) $$pwd/$@ $(package)/*.class
 
+# jar files are a little bigger than simple zip files.
+$(JJAR): $(OJ_FILES)
+	pwd=`pwd` ; cd $(pkg_dir); \
+		$(JAR) $(JARFLAGS) $$pwd/$@ $(package)/*.class
+
 zrun: $(JZIP)
 	CLASSPATH=$(JZIP) $(JAVA) $(JFLAGS) $(package).JPips
+
+jrun: $(JJAR)
+	CLASSPATH=$(JJAR) $(JAVA) $(JFLAGS) $(package).JPips
 
 clean:local-clean
 local-clean:; $(RM) $(OJ_FILES) ; $(RM) -rf $(pkg_dir) $(d)
