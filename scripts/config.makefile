@@ -8,7 +8,8 @@ shr_scripts = \
 
 utl_scripts = \
 	test_newgen_type_translation.sh \
-	test_newgen_type_translation.pl
+	test_newgen_type_translation.pl \
+	tabulated_count.pl
 
 # Makefile macros
 
