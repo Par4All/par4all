@@ -8,7 +8,7 @@
    - add intrinsics according to Fortran standard Table 5, pp. 15.22-15-25,
    Francois Irigoin, 02/06/90
    - add .SEQ. to handle ranges outside of arrays [pj]
-   
+   - add intrinsic DFLOAT. bc. 13/1//96.
    Bugs:
    - intrinsics are not properly typed
    */
@@ -166,6 +166,7 @@ LOCAL IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"IDINT", 1},
     {"REAL", 1},
     {"FLOAT", 1},
+    {"DFLOAT", 1},
     {"SNGL", 1},
     {"DBLE", 1},
     {"CMPLX", 1},
