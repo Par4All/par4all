@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/11/09 16:19:31 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1997/01/13 20:34:04 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -81,6 +81,19 @@ PIPS_ROOT="${PIPS_DIR}/Production"
 # man pages?
 MANPATH="${MANPATH}:${PIPS_ROOT}/Doc"
 PATH="${PATH}:${PIPS_ROOT}/Share:./${PIPS_ARCH}:${PIPS_ROOT}/Bin/${PIPS_ARCH}"
+
+#
+# The properties.rc file to use. if set, overrides defaults.
+# default: 
+# PIPS_PROPERTIESRC=./properties.rc 
+# PIPS_PROPERTIESRC=${PIPS_ROOT}/Share/properties.rc
+
+#
+# The pipsmake.rc file to use. if set, overrides defaults.
+# default:
+# PIPS_PIPSMAKERC=./pipsmake.rc
+# PIPS_PIPSMAKERC=${PIPS_ROOT}/Share/pipsmake.rc
+
 
 ############################################################## COMPILING PIPS
 
