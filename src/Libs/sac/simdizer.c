@@ -323,20 +323,20 @@ void simd_simple_sequence_rewrite(statement s)
    return;
 }
 
-bool simdizer(char * module_name)
+bool simdizer(char * mod_name)
 {
    string resp;
 
    /* get the resources */
    statement mod_stmt = (statement)
-      db_get_memory_resource(DBR_CODE, module_name, TRUE);
+      db_get_memory_resource(DBR_CODE, mod_name, TRUE);
 
    set_current_module_statement(mod_stmt);
-   set_current_module_entity(local_name_to_top_level_entity(module_name));
+   set_current_module_entity(local_name_to_top_level_entity(mod_name));
    set_proper_rw_effects((statement_effects)
-      db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE));
+      db_get_memory_resource(DBR_PROPER_EFFECTS, mod_name, TRUE));
    set_precondition_map((statement_mapping)
-      db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE));
+      db_get_memory_resource(DBR_PRECONDITIONS, mod_name, TRUE));
 
    debug_on("SIMDIZER_DEBUG_LEVEL");
    /* Now do the job */
