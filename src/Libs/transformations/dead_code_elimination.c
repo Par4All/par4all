@@ -7,6 +7,9 @@
   one trip loops fixed, FC 08/01/1998
 
   $Log: dead_code_elimination.c,v $
+  Revision 1.28  2000/12/13 10:31:51  ancourt
+  renaming the other phase
+
   Revision 1.27  2000/12/11 15:41:45  ancourt
   call to compute_callees at the end of suppress_dead_code
 
@@ -357,11 +360,16 @@ static bool loop_executed_once_p(statement s, loop l)
     pc3 = contrainte_make(pv3);
     ps = sc_dup(precondition_ps);
     sc_add_ineg(ps, pc3);
-    m3_negatif = sc_faisabilite(ps);
-    
-    (void) vect_chg_sgn(pv3);
-    m3_positif = sc_faisabilite(ps);
-    
+    CATCH(overflow_error) {
+      sc_rm(ps);
+      return FALSE;
+    }
+    TRY {
+      m3_negatif = sc_rational_feasibility_ofl_ctrl(ps,FWD_OFL_CTRL,TRUE); 
+      (void) vect_chg_sgn(pv3);
+      m3_positif = sc_rational_feasibility_ofl_ctrl(ps,FWD_OFL_CTRL,TRUE);
+      UNCATCH(overflow_error);
+    }
     pips_debug(2, "loop_increment_value positif = %d, negatif = %d\n",
 	       m3_positif, m3_negatif);
     
