@@ -38,7 +38,7 @@
 
 #include "ricedg.h"
 
-extern jmp_buf overflow_error; 
+ 
 /* to deal with overflow errors occuring during the projection 
  * of a Psysteme along a variable */
 
@@ -528,26 +528,28 @@ Psysteme sc;
 	Psysteme sc1 = sc_dup(sc);
 	is_test_Di = FALSE;
 	
-	if (setjmp(overflow_error)) {
+	CATCH(overflow_error) {
 	    pips_debug(7, "overflow error, returning TRUE. \n"); 
 	    sc_rm(sc1);
 	    debug(6, "sc_faisabilite_optim", "end\n");
 	    return(TRUE);
 	    
 	}
-	else {
+	TRY {
 	    sc1 = sc_projection_optim_along_vecteur_ofl(sc1,
 							base_dup(sc1->base));
 	    if (sc_empty_p(sc1)) {
 		debug(7, "sc_faisabilite_optim", "system not feasible\n");
 		debug(6, "sc_faisabilite_optim", "end\n");
 		sc_rm(sc);
+		UNCATCH(overflow_error);
 		return(FALSE);
 	    }	    
 	    else {
 		sc_rm (sc1);
 		debug(7, "sc_faisabilite_optim", "system feasible\n");
 		debug(6, "sc_faisabilite_optim", "end\n");
+		UNCATCH(overflow_error);
 		return(TRUE);
 	    }
 	}
@@ -955,24 +957,28 @@ Value *pmin, *pmax;
 	}
     } 
 
-    if (setjmp(overflow_error)) {
+    CATCH(overflow_error) {
 	debug(6, "sc_minmax_of_variable_optim", 
 	      " overflow error, returning INT_MAX and INT_MIN. \n");
 	*pmax =  INT_MAX;
 	*pmin = INT_MIN;
     }
-    else {
+    TRY {
+	
 	ps = sc_projection_optim_along_vecteur_ofl(ps, pv);
 	if (sc_empty_p(ps)) {	
+	    UNCATCH(overflow_error);
 	    return FALSE;
 	}
 	if (SC_EMPTY_P(ps = sc_normalize(ps))) {
+	    UNCATCH(overflow_error);
 	    return FALSE;
 	}
 	
 	if (sc_value_of_variable(ps, var, &val) == TRUE) {
 	    *pmin = val;
 	    *pmax = val;
+	    UNCATCH(overflow_error);
 	    return TRUE;
 	}
 
@@ -994,7 +1000,8 @@ Value *pmin, *pmax;
 		    *pmin = bi;
 	    }
 	}
-	
+
+	UNCATCH(overflow_error);
 	vect_rm(pv);
     }
 
