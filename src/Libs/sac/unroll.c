@@ -94,3 +94,32 @@ void simd_unroll_as_needed(statement module_stmt)
    gen_recurse(module_stmt, statement_domain, 
 	       simd_unroll_loop_filter, simd_unroll_loop_rewrite);
 }
+
+bool simdizer_auto_unroll(char * mod_name)
+{
+   // get the resources
+   statement mod_stmt = (statement)
+      db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+
+   set_current_module_statement(mod_stmt);
+   set_current_module_entity(local_name_to_top_level_entity(mod_name));
+
+   debug_on("SIMDIZER_DEBUG_LEVEL");
+
+   simd_unroll_as_needed(mod_stmt);
+
+   pips_assert("Statement is consistent after SIMDIZER_AUTO_UNROLL", 
+	       statement_consistent_p(mod_stmt));
+
+   // Reorder the module, because new statements have been added
+   module_reorder(mod_stmt);
+   DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
+ 
+   // update/release resources
+   reset_current_module_statement();
+   reset_current_module_entity();
+
+   debug_off();
+
+   return TRUE;
+}
