@@ -19,19 +19,6 @@
 #define effect_exact_p(eff) \
         (approximation_tag(effect_approximation(eff)) == is_approximation_exact)
 
-/* some CONSTANTS
- */
-
-#define UNDEFINED_ACTION_INTERPRETATION (0)
-
-#define WRITE_IS_WRITE                  (1)
-#define WRITE_IS_OUT                    (2)
-#define WRITE_IS_COPYOUT                (3)
-
-#define READ_IS_READ                    (11)
-#define READ_IS_IN                      (12)
-#define READ_IS_PRIVATE                 (13)
-
 /* Generic FUNCTIONS on lists of effects to be instanciated for specific 
    types of effects */
 
