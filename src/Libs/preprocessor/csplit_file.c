@@ -5,6 +5,10 @@
  * preprocessed.
  *
  * $Log: csplit_file.c,v $
+ * Revision 1.3  2003/08/01 16:42:28  irigoin
+ * Intermediate version, compatible with the C-syntax Validation, coupled
+ * with the parser and the controlizer, if not yet the C prettyprinter.
+ *
  * Revision 1.2  2003/08/01 05:59:04  irigoin
  * Intermediate version installed to let Production link
  *
@@ -54,13 +58,16 @@ void error_reset_module_name_list()
     reset_module_name_list();
 }
 
-static FILE * compilation_unit_file = NULL; /* Compilation unit*/
 static string splitc_input_file_name = string_undefined;
 static FILE * splitc_in_append = NULL; /* Used to generate the compilation unit */
 static int current_input_line = 0; /* In previous file */
-/* static FILE * splitc_in_copy = NULL; */ /* Used to generate the modules */
-static string current_compilation_unit_name = string_undefined;
+
+static string current_compilation_unit_file_name = string_undefined;
+static string current_compilation_unit_name = string_undefined; /* includes FILE_SEP_STRING as a suffix. */
+static FILE * compilation_unit_file = NULL; /* Compilation unit*/
+
 static FILE * module_list_file = NULL;
+
 static string current_workspace_name = string_undefined;
 
 /* Disambiguate the compilation unit base name (special character to avoid
@@ -71,39 +78,55 @@ static string current_workspace_name = string_undefined;
  *
  * Initialize compilation_unit_file by opening this last file. 
  *
- * Set the current_compilation_unit_name.
+ * Set the current_compilation_unit_file_name.
  * */
 void csplit_open_compilation_unit(string input_file_name)
 {
-  string unambiguous_name = string_undefined;
+  string unambiguous_file_name = string_undefined;
   string simpler_file_name = pips_basename(input_file_name, ".cpp_processed.c");
-  string compilation_unit_name = string_undefined;
+  /* string compilation_unit_name = string_undefined; */
+  /* string compilation_unit_file_name = string_undefined; */
 
   pips_debug(1, "Open compilation unit \"%s\"\n", input_file_name);
 
+  pips_assert("No current compilation unit",
+	      string_undefined_p(current_compilation_unit_file_name));
+
+  pips_assert("No current compilation unit",
+	      string_undefined_p(current_compilation_unit_name));
+
   /* Step 1: Define the compilation unit name from the input file name. */
-  unambiguous_name = strdup(concatenate(current_workspace_name,
+  unambiguous_file_name = strdup(concatenate(current_workspace_name,
 					"/", simpler_file_name,
 					FILE_SEP_STRING,
 					".c",
 					NULL));
-  compilation_unit_file = safe_fopen(unambiguous_name, "w");
-  pips_assert("No current compilation unit",
-	      string_undefined_p(current_compilation_unit_name));
-  current_compilation_unit_name = unambiguous_name;
+  compilation_unit_file = safe_fopen(unambiguous_file_name, "w");
 
-  /* Keep track of the new compilation unit as a "module" */
-  compilation_unit_name = strdup(concatenate(current_workspace_name,
-					     "/", simpler_file_name,
-					     FILE_SEP_STRING,
-					     ".c",
-					     NULL));
-  fprintf(module_list_file, "%s %s\n", simpler_file_name, compilation_unit_name);
+  /* Loop with a counter until the open is OK. Two or more files with the
+     same local names may be imported from different directories. */
+
+  /* Loop over counter not implemented. */
+
+  pips_assert("compilation_unit_file is defined", 
+	      compilation_unit_file != NULL);
+
+  current_compilation_unit_file_name = unambiguous_file_name;
+  current_compilation_unit_name
+    = strdup(concatenate(simpler_file_name, FILE_SEP_STRING, NULL));
+
+  /* Keep track of the new compilation unit as a "module" stored in a file */
+
+  fprintf(module_list_file, "%s %s\n", 
+	  current_compilation_unit_name,
+	  current_compilation_unit_file_name);
 }
 
-void csplit_close_compilation_unit(string name)
+void csplit_close_compilation_unit()
 {
-  safe_fclose(compilation_unit_file, name);
+  safe_fclose(compilation_unit_file, current_compilation_unit_file_name);
+  current_compilation_unit_name = string_undefined;
+  current_compilation_unit_file_name = string_undefined;
 }
 
 void csplit_append_to_compilation_unit(int last_line)
@@ -146,12 +169,19 @@ static void csplit_skip(FILE * f, int lines)
 }
 */
 
-/* Create the module directory and file, copy the definition of the module and add the module name to the module name list*/
+/* Create the module directory and file, copy the definition of the module
+ and add the module name to the module name list. The compilation unit
+ name used for static functions is retrieved from a global variable set by
+ csplit_open_compilation_unit(), current_compilation_unit_name. */
 void csplit_copy(string module_name, string signature, int first_line, int last_line, bool is_static_p)
 {
   FILE * mfd = NULL;
+  /* Unambiguous, unless the user has given the same name to two functions. */
   string unambiguous_module_file_name
     = strdup(concatenate(current_workspace_name, "/", module_name, ".c", NULL));
+  string unambiguous_module_name = is_static_p?
+    strdup(concatenate(current_compilation_unit_name, /* FILE_SEP_STRING,*/ module_name, NULL)) :
+    module_name;
   /* string unambiguous_module_name = module_name; */
 
   pips_debug(1, "Begin for %s module \"%s\" from line %d to line %d in compilation unit %s towards %s\n",
@@ -162,29 +192,40 @@ void csplit_copy(string module_name, string signature, int first_line, int last_
 
   pips_assert("First line is strictly positive and lesser than last_line",
 	      first_line>0 && first_line<last_line);
+  pips_assert("current_compilation_unit_name is defined",
+	      !string_undefined_p(current_compilation_unit_name));
 
-  /* Step 1: Define an unambiguous name */
+  /* Step 1: Define an unambiguous name and open the file if possible */
   if(is_static_p) {
     /* Concatenate the unambigous compilation unit name and the module name */
     /* Note: the same static function may be declared twice in the
        compilation unit because the user is mistaken. */
-    pips_internal_error("Not implemented yet.");
+    /* pips_internal_error("Not implemented yet."); */
+    unambiguous_module_file_name
+      = strdup(concatenate(current_workspace_name, "/", current_compilation_unit_name,
+			   /* FILE_SEP_STRING, */ module_name, ".c", NULL));
   }
   else {
     /* The name should be unique in the workspace, but the user may have
        provided several module with the same name */
-    if((mfd=fopen(unambiguous_module_file_name, "r"))!=NULL) {
-      /* Such a module already exists */
-      pips_user_warning("Duplicate function %s.\nCopy in file %s from input file %s is ignored\n",
-			module_name, 
-			unambiguous_module_file_name,
-			splitc_input_file_name);
-      pips_internal_error("Not implemented yet.");
-    }
-    else if((mfd=fopen(unambiguous_module_file_name, "w"))==NULL) {
-      /* Possible access right problem? */
-      pips_internal_error("Not implemented yet.");
-    }
+    unambiguous_module_file_name
+      = strdup(concatenate(current_workspace_name, "/", module_name, ".c", NULL));
+  }
+
+  if((mfd=fopen(unambiguous_module_file_name, "r"))!=NULL) {
+    /* Such a module already exists */
+    pips_user_error("Duplicate function \"%s\".\n"
+		    "Copy in file %s from input file %s is ignored\n"
+		    "Check source code with a compiler or set property %s\n",
+		    module_name, 
+		    unambiguous_module_file_name,
+		    splitc_input_file_name,
+		    "PIPS_CHECK_FORTRAN");
+  }
+  else if((mfd=fopen(unambiguous_module_file_name, "w"))==NULL) {
+    /* Possible access right problem? */
+    pips_user_error("Access or creation right denied for %s\n",
+		    unambiguous_module_file_name);
   }
 
   pips_assert("The module file descriptor is defined", mfd!=NULL);
@@ -203,12 +244,11 @@ void csplit_copy(string module_name, string signature, int first_line, int last_
       current_input_line++;
   }
 
-
   /* Step 4: Copy the function definition */
   fprintf(compilation_unit_file, "extern %s;\n", signature);
 
   /* Step 5: Keep track of the new module */
-  fprintf(module_list_file, "%s %s\n", module_name, unambiguous_module_file_name);
+  fprintf(module_list_file, "%s %s\n", unambiguous_module_name, unambiguous_module_file_name);
 
   safe_fclose(mfd, unambiguous_module_file_name);
   free(unambiguous_module_file_name);
