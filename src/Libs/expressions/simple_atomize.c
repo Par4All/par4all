@@ -164,10 +164,26 @@ statement atomize_this_expression(entity (*create)(entity, basic),
 
 	ref = make_syntax(is_syntax_reference, make_reference(newvar, NIL));
 
-	assign = make_assign_statement(
-				       make_expression(copy_syntax(ref), normalized_undefined), rhs);
-	
+	assign = make_assign_statement(make_expression(copy_syntax(ref), 
+						       normalized_undefined), 
+				       rhs);
 	expression_syntax(e) = ref;
+
+	/*
+	// TEST
+	if (syntax_reference_p(ref))
+	{
+	  fprintf(stderr,"Ref: %s is reference!\n", entity_local_name(newvar));
+	}
+	else if (syntax_call_p(ref))
+	{
+	  fprintf(stderr,"Ref: %s is call '%s'!\n", entity_local_name(newvar),
+		  entity_local_name(call_function(syntax_call(ref))));
+	}
+	print_expression(e);
+	print_statement(assign);
+	*/
+
 	return assign;
       }
   
