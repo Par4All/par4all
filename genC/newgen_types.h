@@ -15,16 +15,19 @@
 */
 
 
-#ifndef TYPES_INCLUDED
-#define TYPES_INCLUDED
+#ifndef newgen_types_included
+#define newgen_types_included
 
-/* -- $RCSfile: newgen_types.h,v $ (version $Revision$)
+/*
+  
+  $Id$
 
-   The implementation of the basic types UNIT, BOOL, TAG and STRING. The
-   others CHAR, INT and FLOAT are provided by C. 
+  The implementation of the basic types UNIT, BOOL, TAG and STRING. The
+  others CHAR, INT and FLOAT are provided by C. 
 
 */
 
+/* typedef enum { false, true } bool; */
 typedef int bool;
 #define	TRUE     1
 #define	FALSE    0
@@ -36,17 +39,9 @@ typedef int bool;
 #endif
 typedef char *string ;
 
-/* this is the disk representation of an undefined string
- */
-#define disk_string_undefined "## Newgen: shouldn't appear, indeed... ##\n"
-#define disk_string_undefined_p(s) (strcmp(s,disk_string_undefined)==0)
-
-/* to be used for core memory
- */
 #define string_undefined ((string)-15)
 #define string_undefined_p(s) ((s)==string_undefined)
 #define copy_string(s) strdup(s)
-
 
 typedef int tag;
 #define tag_undefined (-3)
@@ -81,7 +76,5 @@ struct gen_binding {
 #endif /* __STDC__ */
 #endif /* __STRICT_ANSI__ */
 
-#endif /* file */
+#endif /* newgen_types_included */
 
-/*  end of $RCSfile: newgen_types.h,v $
- */
