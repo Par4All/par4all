@@ -70,10 +70,10 @@ Variable var;
 	    b1 = b1->succ);
 	if (VECTEUR_NUL_P(b1)) {
 	    for (b1 = b; !VECTEUR_NUL_P(b1->succ); b1=b1->succ);
-	    b1->succ = vect_new(var, 1);
+	    b1->succ = vect_new(var, VALUE_ONE);
 	}
     }
-    else { result = vect_new(var,1);
+    else { result = vect_new(var, VALUE_ONE);
        }
     return(result);
 }
@@ -372,22 +372,22 @@ Pbase b2;
     Pbase vtmp;
 
     if (!VECTEUR_NUL_P(b1)) {
-	vtmp = b = vect_new(var_of((Pvecteur) b1), 1);
+	vtmp = b = vect_new(var_of((Pvecteur) b1), VALUE_ONE);
 	for (b1 = b1->succ ; b1!=VECTEUR_NUL; b1=b1->succ) {
-	    vtmp->succ = vect_new(var_of((Pvecteur) b1), 1);
+	    vtmp->succ = vect_new(var_of((Pvecteur) b1), VALUE_ONE);
 	    vtmp = vtmp->succ;
 	} 
     }
     else 
 	if (!VECTEUR_NUL_P(b2)) {
-	    vtmp = b = vect_new(var_of((Pvecteur) b2), 1);
+	    vtmp = b = vect_new(var_of((Pvecteur) b2), VALUE_ONE);
 	    b2 = b2->succ;
 	}
 	else return b;
 
     for ( ; b2!=VECTEUR_NUL; b2=b2->succ) {
 	if (!vect_coeff(var_of((Pvecteur) b2),b)) {
-	vtmp->succ = vect_new(var_of((Pvecteur) b2), 1);
+	vtmp->succ = vect_new(var_of((Pvecteur) b2), VALUE_ONE);
 	vtmp = vtmp->succ; }
     } 
 	
@@ -502,7 +502,7 @@ Pbase b;
     Pbase eb;
 
     for (eb = b ; !BASE_NULLE_P(eb) ; eb=eb->succ)
-	vecteur_val(eb) = 1;
+	vecteur_val(eb) = VALUE_ONE;
     return b;
 }
 
@@ -511,7 +511,9 @@ Pbase b;
 {
     Pbase eb;
 
-    for (eb = b ; !BASE_NULLE_P(eb) && vecteur_val(eb) == 1; eb=eb->succ)
+    for (eb = b ; 
+	 !BASE_NULLE_P(eb) && value_one_p(vecteur_val(eb)); 
+	 eb=eb->succ)
 	;
     return !BASE_NULLE_P(eb) && vect_check((Pvecteur) b);
 }
