@@ -211,7 +211,7 @@ loop_regions_normalize(list l_reg, entity index, range l_range,
 		{
 		    Psysteme sc_tmp;
 		    sc_tmp = sc_safe_append(*psc_loop, beta_sc);
-		    sc_projection_along_variable_ofl_ctrl_timeout_ctrl(&sc_tmp,(Variable) index,
+		    sc_projection_along_variable_ofl_ctrl(&sc_tmp,(Variable) index,
 							  FWD_OFL_CTRL); 
 		    sc_base_remove_variable(sc_tmp, (Variable) index);
 		    *psc_loop = sc_tmp;
@@ -846,7 +846,7 @@ void region_exact_projection_along_parameters(region reg, list l_param)
 void region_non_exact_projection_along_variables(region reg, list l_var)
 {
     Psysteme ps;
-
+    int tmp;
     ps = region_system(reg);
 
     if (!sc_empty_p(ps) && !sc_rn_p(ps))
@@ -898,7 +898,6 @@ effect reg;
 list l_var;
 {
     Psysteme ps;    
-
     ps = region_system(reg);
 
     if (!sc_empty_p(ps) && !sc_rn_p(ps))
@@ -995,7 +994,7 @@ void region_exact_projection_along_variable(region reg, entity var)
 		
 		if (gen_find_eq(var, l_phi_var) == chunk_undefined)
 		{
-		    sc_projection_along_variable_ofl_ctrl_timeout_ctrl(&sc,(Variable) var,
+		    sc_projection_along_variable_ofl_ctrl(&sc,(Variable) var,
 							  FWD_OFL_CTRL); 
 		    sc_base_remove_variable(sc, (Variable) var);
 		    sc = region_sc_normalize(sc,2);	
@@ -1509,19 +1508,29 @@ Pvecteur pv;
 int ofl_ctrl;
 {
     Pvecteur pv1;
-    Pbase scbase = base_dup((*psc)->base); 
+    Pbase scbase = base_copy((*psc)->base); 
 
     if (!VECTEUR_NUL_P(pv)) {
-	for (pv1 = pv;!VECTEUR_NUL_P(pv1) && !SC_UNDEFINED_P(*psc); pv1=pv1->succ) {
-	  sc_projection_along_variable_ofl_ctrl_timeout_ctrl(psc,vecteur_var(pv1), 
-	     ofl_ctrl);
-	  /* DN sc_projection_along_variable_ofl_ctrl(psc,vecteur_var(pv1), 
-	     ofl_ctrl);*/
-	    if (!SC_UNDEFINED_P(*psc)) {
-		sc_base_remove_variable(*psc,vecteur_var(pv1));
-		/* *psc = region_sc_normalize(*psc,2);	 */
-	    }
-	}
+		for (pv1 = pv;!VECTEUR_NUL_P(pv1) && !SC_UNDEFINED_P(*psc); pv1=pv1->succ) {
+
+		  sc_projection_along_variable_ofl_ctrl(psc,vecteur_var(pv1), ofl_ctrl);
+			
+		  /* In case of big sc, we might consider a better order for the projection.
+			* Example: 2 phases of elimination (must-projection): 
+			*  - first: elimination of PHI variables: PHI3, PHI2, PHI1
+			*  - then: elimination of PSI variables: PSI3, PSI2, PSI1
+			* Ex: PHI3 (297 inequations), then PHI2 => explosion (21000) = PSI1 (1034)
+			*But PHI3(297 inequations), then PSI1 (191), then PHI2 => ok (1034) DN 21/1/03
+			*
+			* The non_exact projection: 
+			* if the projection excat fails, then return the modified sc, without variable in base.
+			*/
+
+		  if (!SC_UNDEFINED_P(*psc)) {
+			 sc_base_remove_variable(*psc,vecteur_var(pv1));
+			 /* *psc = region_sc_normalize(*psc,2);	 */
+		  }
+		}
     }
 
     if (SC_UNDEFINED_P(*psc)){ /* ne devrait plus arriver ! */
