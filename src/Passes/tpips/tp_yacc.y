@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.91  1998/07/03 21:36:23  coelho
+ * checkactive added.
+ *
  * Revision 1.90  1998/06/30 15:19:39  coelho
  * property -> result for jpips checks.
  *
@@ -100,7 +103,7 @@
 %token TK_CDIR TK_INFO TK_PWD TK_HELP TK_SHOW TK_SOURCE
 %token TK_SHELL TK_ECHO TK_UNKNOWN
 %token TK_QUIT TK_EXIT
-%token TK_LINE
+%token TK_LINE TK_CHECKACTIVE
 
 %token TK_OWNER_NAME
 %token TK_OWNER_ALL
@@ -124,7 +127,7 @@
 %type <status> i_open i_create i_close i_delete i_module i_make i_pwd i_source
 %type <status> i_apply i_activate i_display i_get i_setenv i_getenv i_cd i_rm
 %type <status> i_info i_shell i_echo i_setprop i_quit i_exit i_help i_capply
-%type <status> i_checkpoint i_show i_unknown
+%type <status> i_checkpoint i_show i_unknown i_checkactive
 %type <name> rulename filename propname phasename resourcename
 %type <array> filename_list
 %type <rn> resource_id rule_id
@@ -421,6 +424,7 @@ command: TK_ENDOFLINE { /* may be empty! */ }
 	| i_show
 	| i_rm
 	| i_activate
+	| i_checkactive
 	| i_get
 	| i_getenv
 	| i_setenv
@@ -763,14 +767,28 @@ i_rm: TK_REMOVE resource_id TK_ENDOFLINE
 i_activate: TK_ACTIVATE rulename TK_ENDOFLINE
 	{
 	    pips_debug(7,"reduce rule i_activate\n");
-	    if (tpips_execution_mode) {
-
+	    if (tpips_execution_mode)
+	    {
 		if(!db_get_current_workspace_name())
 		    pips_user_error("Open or create a workspace first!\n");
 		
 		user_log("Selecting rule: %s\n", $2);
 		activate ($2);
 		$$ = TRUE;
+	    }
+	    free($2);
+	}
+	;
+
+i_checkactive: TK_CHECKACTIVE resourcename TK_ENDOFLINE
+	{
+	    string ph = active_phase_for_resource($2);
+	    fprintf(stdout, "resource %s built by phase %s\n", $2, ph);
+	    if (jpips_is_running)
+	    {
+		jpips_begin_tag("result");
+		jpips_add_tag(ph);
+		jpips_end_tag();
 	    }
 	    free($2);
 	}
