@@ -5,6 +5,9 @@
  * $Id$
  *
  * $Log: ri-util-local.h,v $
+ * Revision 1.85  2003/07/24 07:21:03  nguyen
+ * Add prefixes and new basic type sizes for C language
+ *
  * Revision 1.84  2003/06/19 07:25:04  nguyen
  * Update calls to make_statement and make_variable with new RI for C
  *
@@ -123,6 +126,15 @@ typedef hash_table control_mapping;
 #define COMMON_PREFIX 			"~"
 #define BLOCKDATA_PREFIX 		"&"
 
+#define FILE_SEP_STRING 		"%"
+#define BLOCK_SEP_STRING 		"~"
+#define MEMBER_SEP_STRING 		"^"
+#define STRUCT_PREFIX 			"#"
+#define UNION_PREFIX 			"*"
+#define ENUM_PREFIX 			"?"
+#define TYPEDEF_PREFIX 			"$"
+
+
 /*  constant names
  */
 #define BLANK_COMMON_LOCAL_NAME 	"*BLANK*"
@@ -145,6 +157,9 @@ typedef hash_table control_mapping;
 #define DATA_LIST_FUNCTION_NAME 	"DATA-LIST="
 #define IO_LIST_STRING_NAME             "IOLIST="
 #define RETURN_LABEL_NAME 		"00000"
+
+
+#define BRACE_INTRINSIC                 "BRACE_INTRINSIC"
 
 #define IMPLIED_COMPLEX_NAME		"CMPLX_"
 #define IMPLIED_DCOMPLEX_NAME		"DCMPLX_"
@@ -342,6 +357,8 @@ typedef hash_table control_mapping;
 #define ENTITY_REPEAT_VALUE_P(e) ENTITY_NAME_P(e, REPEAT_VALUE_FUNCTION_NAME)
 #define ENTITY_DATA_LIST_P(e) ENTITY_NAME_P(e, DATA_LIST_FUNCTION_NAME)
 
+/* C initialization expression */
+#define ENTITY_BRACE_INTRINSIC_P(e) ENTITY_NAME_P(e, BRACE_INTRINSIC)
 
 #define ENTITY_IMPLIED_CMPLX_P(e) ENTITY_NAME_P(e, IMPLIED_COMPLEX_NAME)
 #define ENTITY_IMPLIED_DCMPLX_P(e) ENTITY_NAME_P(e, IMPLIED_DCOMPLEX_NAME)
@@ -578,13 +595,45 @@ entity get_ith_##lname##_prime(int i)\
 
 /* Default type sizes */
 
+#define DEFAULT_CHARACTER_TYPE_SIZE (1)
+#define DEFAULT_SHORT_INTEGER_TYPE_SIZE (2)
 #define DEFAULT_INTEGER_TYPE_SIZE (4)
+#define DEFAULT_LONG_INTEGER_TYPE_SIZE (6)
+#define DEFAULT_LONG_LONG_INTEGER_TYPE_SIZE (8)
+
+#define DEFAULT_UNSIGNED_TYPE_SIZE (1)
+#define DEFAULT_SIGNED_TYPE_SIZE (2)
+
+/* The standard integer types are represented as follow
+char                   = 1
+short_int              = 2
+int                    = 4
+long_int               = 6
+long_long_int          = 8
+
+unsigned_char          = 11
+unsigned_short_int     = 12
+unsigned_int           = 14
+unsigned_long_int      = 16
+unsigned_long_long_int = 18
+
+signed_char            = 21
+signed_short_int       = 22
+signed_int             = 24
+signed_long_int        = 26
+signed_long_long_int   = 28
+
+mod(i,10) refers to the basic size and div(i,10) refers that 
+the variable is unsigned, signed or not */
+
 #define DEFAULT_REAL_TYPE_SIZE (4)
 #define DEFAULT_DOUBLEPRECISION_TYPE_SIZE (8)
 #define DEFAULT_COMPLEX_TYPE_SIZE (8)
 #define DEFAULT_DOUBLECOMPLEX_TYPE_SIZE (16)
 #define DEFAULT_LOGICAL_TYPE_SIZE (4)
-#define DEFAULT_CHARACTER_TYPE_SIZE (1)
+
+#define DEFAULT_POINTER_TYPE_SIZE (4)
+
 
 /* Implicit variables to handle IO effetcs */
 
