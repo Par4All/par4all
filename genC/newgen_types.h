@@ -29,14 +29,21 @@ typedef int bool;
 #define	TRUE     1
 #define	FALSE    0
 
+/* STRING
+ */
 typedef char *string ;
 
-/* this is the disk representation of an undefined string, but it can also
-   be used in core memory */
+/* this is the disk representation of an undefined string
+ */
+#define disk_string_undefined "## Newgen: shouldn't appear, indeed... ##\n"
+#define disk_string_undefined_p(s) (strcmp(s,disk_string_undefined)==0)
 
-#define string_undefined "newgen: shouldn't appear"
-#define string_undefined_p(s) (strcmp(s,string_undefined) == 0)
+/* to be used for core memory
+ */
+#define string_undefined ((string)-15)
+#define string_undefined_p(s) ((s)==string_undefined)
 #define copy_string(s) strdup(s)
+
 
 typedef int tag;
 #define tag_undefined (-3)
