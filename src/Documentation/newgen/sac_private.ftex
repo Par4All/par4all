@@ -1,0 +1,95 @@
+\documentstyle[a4]{article}
+
+\title{PIPS/SAC: SIMD Architecture Compiler}
+\author{Franc,ois Ferrand \\
+\\
+	ENST Bretagne}
+
+\newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{#2}}
+
+\begin{document}
+\maketitle
+\sloppy
+
+\section*{Introduction}
+
+This document defines and describes the data structures used by SAC, the
+SIMD Architecture Compiler. SAC is a new PIPS phase, which allows to
+generate code optimized for architectures supporting multimedia
+instruction sets, such as MMX, SSE or VIS.
+
+\section*{Opcodes and opcode classes}
+
+\domain{opcode = name:string x vectorSize:int x subwordSize:int}
+{}
+
+\domain{opcodeClass = nbArgs:int x opcodes*}
+{}
+
+\section*{Statement matching}
+
+Statement matching is used to detect ``patterns'' in the code. It
+works on the expression tree representing the program. The actual
+patterns are read from a file, to create a matchTree that is used to
+efficiently parse the expression tree. This process returns a list of
+matches, indicating the various opcodes that can thus be generated,
+and with which arguments.
+
+
+A \verb+patternArg+ specifies how an argument is to be generated. It
+can be an integer constant, with the specified value, or extracted
+from the actual expression tree.
+
+\domain{patternArg = static:int + dynamic:unit}
+{}
+
+A \verb+pattern+ identifies what to generate. It specifies the opcode
+class corresponding to the pattern, as well as a list that can be used
+to translate from original statement references or constants to
+arguments for the opcode.
+
+\domain{pattern = class:int x args:patternArg*}
+{}
+
+\domain{External hash_table}
+{}
+
+\verb+matchTree+ is a structure used to efficiently identify
+patterns corresponding to a statement. When traversed, it can thus map
+a statement to a list of patterns that can be used.
+
+\domain{matchTree = pattern:pattern* x sons:hash_table}
+{}
+
+A \verb+pattern+ can be translated into a \verb+match+ by mapping the
+arguments properly. The argument list in a \verb+match+ is constructed
+from the arguments of the statement, following the rules of pattern
+arguments (list of \verb+patternArg+).
+
+\domain{match = type:int x args:expression*}
+{}
+
+\section*{Statement information}
+
+\domain{referenceInfo = entity x nbDimensions:int x index:reference x
+offset:int}
+{}
+
+The \verb+referenceInfo+ domain reprensents an easier to use
+representation of reference of the form \verb{A[I+5]}. The reference 
+expression has already been parsed to find all the items.
+
+
+\domain{vectorElement = vector:entity x element:int}
+
+\domain{statementArgument = expression x dependances:vectorElement*}
+
+\domain{simdStatementInfo = opcode x nbArgs:int x vectors:entity[16] x arguments:statementArgument[48]}
+
+\domain{statementInfo = simd:simdStatementInfo + nonsimd:statement}
+
+
+\section*{Transformation}
+
+\end{document}
+\end
