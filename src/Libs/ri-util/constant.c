@@ -1,3 +1,7 @@
+/* BEGIN_EOLE */ /* - please do not remove this line */
+/* Lines between BEGIN_EOLE and END_EOLE tags are automatically included
+   in the EOLE project (JZ - 11/98) */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,6 +12,8 @@
 #include "misc.h"
 #include "ri.h"
 #include "ri-util.h"
+
+/* END_EOLE */
 
 extern string make_entity_fullname();
 
@@ -227,6 +233,10 @@ int i;
     return(MakeIntegerConstantExpression(buffer));
 }
 
+/* BEGIN_EOLE */ /* - please do not remove this line */
+/* Lines between BEGIN_EOLE and END_EOLE tags are automatically included
+   in the EOLE project (JZ - 11/98) */
+
 /* (*int_p) gets integer constant if any */
 bool 
 integer_constant_p(ent, int_p)
@@ -242,6 +252,8 @@ int *int_p;
     else
 	return(FALSE);
 }
+
+/* END_EOLE */
 
 /* (*int_p) gets integer constant if any */
 bool 
