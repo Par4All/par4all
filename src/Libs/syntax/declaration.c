@@ -620,11 +620,15 @@ DeclareVariable(
 	if(!type_equal_p(tr, t)) {
 	    if(variable_had_implicit_type_p) {
 		debug(8, "DeclareVariable", " Type for result of function %s "
-		      "changed from %s to %s\n", module_local_name(f),
+		      "changed from %s to %s: ", module_local_name(f),
 			     basic_to_string(old), basic_to_string(new));
 		free_type(functional_result(func));
 		old = basic_undefined; /* the pointed area has just been freed! */
-		functional_result(func) = t;
+		functional_result(func) = copy_type(t);
+		ifdebug(8) {
+		  fprint_functional(stderr, type_functional(tf));
+		  fprintf(stderr, "\n");
+		}
 	    }
 	    else {
 		user_warning("DeclareVariable",
@@ -1361,7 +1365,7 @@ print_common_layout(FILE * fd, entity c)
     list members = common_members_of_module(c, mod , FALSE);
     list equiv_members = NIL;
 
-    (void) fprintf(fd,"\nLayout for common /%s/ of size %d:\n",
+    (void) fprintf(fd,"\nLayout for common /%s/ of size %d (or %d):\n",
 		   module_local_name(c), area_size(type_area(entity_type(c))));
 
     if(ENDP(members)) {
@@ -1370,7 +1374,8 @@ print_common_layout(FILE * fd, entity c)
     }
     else {
 	pips_assert("A non-empty area has size greater than 0",
-		    area_size(type_area(entity_type(c)))>0);
+		    area_size(type_area(entity_type(c)))>0 ||
+		    common_to_size(c)>0);
 	/* Look for variables declared in this common by *some* procedures
 	 * which declares it. The procedures involved depend on the ordering
 	 * of the parser steps by pipsmake and the user. Maybe, the list should
