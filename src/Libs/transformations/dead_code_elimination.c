@@ -7,6 +7,11 @@
   one trip loops fixed, FC 08/01/1998
 
   $Log: dead_code_elimination.c,v $
+  Revision 1.18  2000/07/03 12:17:31  nguyen
+  Modify function discard_statement_and_save_label_and_comment(statement s):
+  to avoid bug if both inner and outer loops of a nested loop have the same
+  label. This label must be preseved while eliminating the dead inner loop.
+
   Revision 1.17  1999/01/08 12:43:25  coelho
   rcs stuff...
 
@@ -151,15 +156,53 @@ dead_test_filter(statement true, statement false)
 static bool
 discard_statement_and_save_label_and_comment(statement s)
 {
-    /* Discard the old instruction: */
-    free_instruction(statement_instruction(s));
-    /* And put a new empty one: */
-    statement_instruction(s) = make_instruction_block(NIL);
 
-    /* Since the RI need to have no label on instruction block: */
-    fix_sequence_statement_attributes(s);
- 
-    return FALSE;
+  /* NN -> Bug found : if we have two loops with the same label 
+     such as : 
+     DO 100 I=1,N
+        DO 100 J=1,M
+     ......
+     
+     100 CONTINUE    
+     and the inner loop is a dead statement, there is an error when 
+     compiling the generated file Fortran. 
+     Because the label of the last statement in the inner loop 
+     might be used by an outer loop and, in doubt, should be preserved.
+
+     SOLUTION : like in full_loop_unroll()*/
+
+  
+  if (instruction_loop_p(statement_instruction(s)))
+    { 
+      entity flbl = find_final_statement_label(loop_body(instruction_loop(statement_instruction(s))));
+
+      if(!entity_empty_label_p(flbl)) {
+
+	instruction block =  make_instruction_block(NIL); 
+	statement stmt = make_continue_statement(flbl);   
+	instruction_block(block)= gen_nconc(instruction_block(block),
+					    CONS(STATEMENT, stmt, NIL ));  
+	free_instruction(statement_instruction(s));
+	/* And put a new empty one: */
+	statement_instruction(s) = block;      
+	/* Since the RI need to have no label on instruction block: */
+
+	fix_sequence_statement_attributes(s);
+
+      }
+      
+    }
+  else 
+    {
+      /* Discard the old instruction: */
+      free_instruction(statement_instruction(s));
+      /* And put a new empty one: */
+      statement_instruction(s) = make_instruction_block(NIL);
+      
+      /* Since the RI need to have no label on instruction block: */
+      fix_sequence_statement_attributes(s); 
+    }
+   return FALSE;
 }
 
 
