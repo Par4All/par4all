@@ -245,7 +245,8 @@ EndOfProcedure()
      * and their addresses must be computed. At least, ComputeAddresses()
      * must stay here.. so I keep all these calls together.
      */
-    UpdateFunctionalType(FormalParameters);
+    UpdateFunctionalType(CurrentFunction,
+			 FormalParameters);
 
     check_common_layouts(CurrentFunction);
 
@@ -307,6 +308,12 @@ EndOfProcedure()
     parser_substitute_all_macros(function_body);
     parser_close_macros_support();
 
+    if(!EmptyEntryListsP()) {
+	set_current_module_statement(function_body);
+	ProcessEntries();
+	reset_current_module_statement();
+    }
+
     DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, 
 			   module_local_name(CurrentFunction), 
 			   (char*) make_callees(called_modules));
@@ -339,13 +346,14 @@ EndOfProcedure()
  */
 
 void 
-UpdateFunctionalType(l)
-cons *l;
+UpdateFunctionalType(
+		     entity f,
+		     list l)
 {
     cons *pc;
     parameter p;
     functional ft;
-    entity CurrentFunction = get_current_module_entity();
+    entity CurrentFunction = f;
     type t = entity_type(CurrentFunction);
 
     ifdebug(8) {
@@ -373,7 +381,14 @@ cons *l;
 		ENDP(functional_parameters(ft)));
 
     for (pc = l; pc != NULL; pc = CDR(pc)) {
-	p = make_parameter((entity_type(ENTITY(CAR(pc)))), 
+	entity fp = ENTITY(CAR(pc));
+	type fpt = entity_type(fp);
+
+	if(type_undefined_p(fpt)) {
+	    entity_type(fp) = ImplicitType(fp);
+	}
+
+	p = make_parameter((entity_type(fp)), 
 			   (MakeModeReference()));
 	functional_parameters(ft) = 
 		gen_nconc(functional_parameters(ft),
@@ -576,7 +591,7 @@ MakeCurrentFunction(
      */
     SubstituteAlternateReturns
 	(get_string_property("PARSER_SUBSTITUTE_ALTERNATE_RETURNS"));
-    ScanFormalParameters(add_formal_return_code(lfp));
+    ScanFormalParameters(cf, add_formal_return_code(lfp));
 
     if (msf == TK_FUNCTION) {
 	/* a result entity is created */
@@ -593,7 +608,492 @@ MakeCurrentFunction(
 	AddEntityToDeclarations(result, cf);
     }
 }
+
+/* Processing of entries: when an ENTRY statement is encountered, it is
+ * replaced by a labelled CONTINUE and the entry is declared as function
+ * or a subroutine, depending on its type. The label and the module entity
+ * which are created are stored in two static lists, entry_labels and
+ * entry_entities, for later processing. When the current module has been
+ * fully parsed, the two entry lists are scanned together. The current
+ * module code is duplicated for each entry, a GOTO the proper entry label
+ * is added, the code is controlized to get rid of unwanted code, and:
+ *
+ * - either all references are translated into the entry
+ *   reference. The entry declarations are then initialized.
+ *
+ * - or the controlized code is prettyprinted as SOURCE_FILE and parser
+ *   again to avoid the translation issue.
+ *
+ * The second approach was selected. The current .f file is overwritten
+ * when the parser is called for the code of an entry.
+ *
+ * Further problems are created by entries in fsplit which creates a
+ * .f_initial file for each entry and in the parser which may not produce
+ * the expected PARSED_CODE when it is called for an ENTRY. A recursive
+ * call to the parser is executed to parse the .f file just produced by
+ * the first call. This scheme was designed to make entries unvisible from
+ * pipsmake.
+ *
+ */
 
+static list entry_labels = NIL;
+static list entry_targets = NIL;
+static list entry_entities = NIL;
+static list effective_formal_parameters = NIL;
+
+void
+ResetEntries()
+{
+    gen_free_list(entry_labels);
+    gen_free_list(entry_targets);
+    gen_free_list(entry_entities);
+    gen_free_list(effective_formal_parameters);
+    entry_labels = NIL;
+    entry_targets = NIL;
+    entry_entities = NIL;
+    effective_formal_parameters = NIL;
+}
+
+bool
+EmptyEntryListsP()
+{
+    bool empty = ((entry_labels==NIL) && (entry_entities==NIL));
+
+    return empty;
+}
+
+void
+AddEntryLabel(entity l)
+{
+    entry_labels = arguments_add_entity(entry_labels, l);
+}
+
+void
+AddEntryTarget(statement s)
+{
+    entry_targets = gen_nconc(entry_targets, CONS(STATEMENT, s, NIL));
+}
+
+void
+AddEntryEntity(entity e)
+{
+    entry_entities = arguments_add_entity(entry_entities, e);
+}
+
+/* Keep track of the formal parameters for the current module */
+void
+AddEffectiveFormalParameter(entity f)
+{
+    effective_formal_parameters = arguments_add_entity(effective_formal_parameters, f);
+}
+
+bool
+IsEffectiveFormalParameterP(entity f)
+{
+    return entity_is_argument_p(f, effective_formal_parameters);
+}
+
+static list
+TranslateEntryFormals(
+    entity e, /* entry e */
+    list lfp) /* list of formal parameters wrongly declared in current module */
+{
+    list lefp = NIL; /* list of effective formal parameters lefp for entry e */
+
+    ifdebug(1) {
+	debug(1, "TranslateEntryFormals", "Begin with lfp = ");
+	dump_arguments(lfp);
+    }
+
+    MAP(ENTITY, fp, {
+	entity efp = FindOrCreateEntity(module_local_name(e), entity_local_name(fp));
+	entity_type(efp) = copy_type(entity_type(fp));
+	/* the storage is not recoverable */
+	entity_initial(efp) = copy_value(entity_initial(fp));
+	lefp = gen_nconc(lefp, CONS(ENTITY, efp, NIL));
+    }, lfp);
+
+    ifdebug(1) {
+	debug(1, "TranslateEntryFormals", "\nEnd with lefp = ");
+	dump_arguments(lefp);
+    }
+
+    return lefp;
+}
+
+/* Static variables in a module with entries must be redeclared as stored
+ * in a common in order to be accessible from all modules derived from the
+ * entries. This may create a problem for variables initialized with a DATA
+ * for compilers that do not accept multiple initializations of a common
+ * variable.
+ */
+
+static void
+MakeEntryCommon(
+    entity m,
+    entity a)
+{
+    string c_name = strdup(concatenate(COMMON_PREFIX, "_ENTRY_", 
+				       module_local_name(m), NULL));
+    entity c = local_name_to_top_level_entity(c_name);
+    area aa = type_area(entity_type(a));
+    area ac = area_undefined;
+
+    pips_debug(1, "Begin for static area %s in module %s\n",
+	       entity_name(a), entity_name(m));
+
+    if(entity_undefined_p(c)) {
+	c = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, c_name);
+	c = MakeCommon(c);
+	ac = type_area(entity_type(c));
+    }
+    else {
+	pips_internal_error("The scheme to generate a new common name %s"
+			    " for entries in module %s failed",
+			    c_name, module_local_name(m));
+    }
+    free(c_name);
+
+    /* Process all variables in a's layout and declare them stored in c */
+    MAP(ENTITY, v, {
+	storage vs = entity_storage(v);
+
+	pips_assert("storage is ram", storage_ram_p(vs));
+	pips_assert("storage is static", ram_section(storage_ram(vs)) == a);
+	ram_section(storage_ram(vs)) = c;
+    }, area_layout(aa));
+
+    /* Copy a's area in c's area */
+    area_layout(ac) = area_layout(aa);
+    area_size(ac) = area_size(aa);
+
+    /* Reset a's area */
+    area_layout(aa) = NIL;
+    area_size(aa) = 0;
+
+    ifdebug(1) {
+	pips_debug(1, "New common %s for static area %s in module %s\n",
+	       entity_name(c), entity_name(a), entity_name(m));
+	print_common_layout(stderr, c);
+    }
+
+    pips_debug(1, "End for static area %s in module %s\n",
+	       entity_name(a), entity_name(m));
+}
+
+/* An ENTRY statement is substituted by a labelled continue. The ENTRY
+ * entity is created as in MakeExternalFunction() and MakeCurrentFunction().
+ */
+
+instruction
+MakeEntry(
+    entity e, /* entry, local to retrieve potential explicit typing */
+    list lfp) /* list of formal parameters */
+{
+    entity cm = get_current_module_entity(); /* current module cm */
+    string cmn = get_current_module_name(); /* current module name cmn */
+    entity l = make_new_label(cmn);
+    statement s = make_continue_statement(l);
+    /* The parser expects an instruction and not a statement. I use
+     * a block wrapping to avoid tampering with lab_I.
+     */
+    instruction i = make_instruction_block(CONS(STATEMENT, s, NIL));
+    /* entity e = FindOrCreateEntity(cmn, en); */
+    entity fe = entity_undefined;
+    bool is_a_function = entity_function_p(get_current_module_entity());
+    type rt = type_undefined; /* result type */
+    list cc = list_undefined; /* current chunk (temporary) */
+    list lefp = list_undefined; /* list of effective formal parameters */
+
+    debug(1, "MakeEntry", "Begin for entry %s\n", entity_name(e));
+
+    /* Name conflicts could be checked here as in MakeCurrentFunction() */
+
+    /* Keep track of the effective formal parameters of the current module cm
+     * at the first call to MakeEntry and reallocate static variables.
+     */
+    if(EmptyEntryListsP()) {
+	MAP(ENTITY, fp, {
+	    if(!storage_undefined_p(entity_storage(fp))
+	       && storage_formal_p(entity_storage(fp)))
+		AddEffectiveFormalParameter(fp);
+	}, entity_declarations(cm));
+
+	/* Check if the static area is empty and define a specific common
+	 * if not.
+	 */
+	if(area_size(type_area(entity_type(StaticArea)))!=0) {
+	    MakeEntryCommon(cm, StaticArea);
+	    /* pips_internal_error("static variables are not handled for entries"); */
+	}
+    }
+
+    /* Compute the result type and make sure a functional entity is being
+     * used.
+     */
+    if(is_a_function) {
+	rt = MakeResultType(e, type_undefined);
+	/* In case of previous declaration in the current module */
+	/* Entity e must not be destroyed if fe is a function because e
+	 * must carry the result.
+	 */
+	fe = SafeLocalToGlobal(e, rt);
+    }
+    else {
+	rt = make_type(is_type_void, UU);
+	/* In case of previous declaration in the current module */
+	fe = LocalToGlobal(e);
+    }
+
+    lefp = TranslateEntryFormals(fe, lfp);
+    UpdateFormalStorages(fe, lefp);
+    TypeFunctionalEntity(fe, rt);
+    UpdateFunctionalType(fe, lefp);
+
+    if(storage_undefined_p(entity_storage(fe))) {
+	entity_storage(fe) = MakeStorageRom();
+    }
+
+    if(value_undefined_p(entity_initial(fe))) {
+	entity_initial(fe) = make_value(is_value_code, make_code(lefp, strdup("")));
+    }
+
+    /* The entry formal parameters should be removed if they are not
+     * formal parameters of the current module... but they are referenced.
+     * They cannot be preserved although useless because they may be
+     * dimensionned by expressions legal for this entry but not for the
+     * current module. They should be removed later when dead code elimination
+     * let us know which variables are used by each entry.
+     *
+     * Temporarily, the formal parameters of entry fe are declared in cm
+     * to keep the code consistent but they are supposedly not added to
+     * cm's declarations... because FindOrCreateEntity() does not update
+     * declarations.
+     */
+    for(cc = lfp; !ENDP(cc); POP(cc)) {
+	entity fp = ENTITY(CAR(cc));
+	storage fps = entity_storage(fp);
+
+	if(storage_undefined_p(fps) || !storage_formal_p(fps)) {
+	    /* Let's assume it works for undefined storages.. */
+	    free_storage(fps);
+	    entity_storage(fp) = make_storage(is_storage_formal,
+					      make_formal(cm, 0));
+	    /* Should it really be officially declared? */
+	    if(!IsEffectiveFormalParameterP(fp)) {
+		/* Remove it from the declaration list */
+		/*
+		entity_declarations(cm) = 
+		    arguments_rm_entity(entity_declarations(cm), fp);
+		    */
+		if(entity_is_argument_p(fp,entity_declarations(cm))) {
+		    debug(1, "MakeEntry", "Entity %s removed from declarations for %s\n",
+			  entity_name(fp), module_local_name(cm));
+		}
+		gen_remove(&entity_declarations(cm), fp);
+	    }
+	}
+    }
+
+    /* Request some post-processing */
+    AddEntryLabel(l);
+    AddEntryTarget(s);
+    AddEntryEntity(fe);
+
+    /* pips_error("MakeEntry", "not implemented yet\n"); */
+
+    debug(1, "MakeEntry", "End for entry %s\n", entity_name(fe));
+
+    return i;
+}
+
+/* Build an entry version of the current module statement. */ 
+
+static statement
+BuildStatementForEntry(
+    entity cm, 
+    entity e,
+    statement t)
+{
+    statement s = statement_undefined;
+    statement jump = instruction_to_statement(make_instruction(is_instruction_goto, t));
+    /* The copy_statement() is not consistent with the use of statement t.
+     * You have to free  s in a very careful way
+     */
+    statement cms = get_current_module_statement(); /* current module statement */
+    statement es = statement_undefined; /* statement for entry e */
+    list l = NIL; /* temporary statement list */
+
+    debug(1, "BuildStatementForEntry", "Begin for entry %s in module %s\n",
+	  entity_name(e), entity_name(cm));
+
+    pips_assert("jump consistent", statement_consistent_p(jump));
+    pips_assert("cms consistent", statement_consistent_p(cms));
+
+    s = make_block_statement(
+			     CONS(STATEMENT, jump,
+				  CONS(STATEMENT, cms, 
+				       NIL)));
+    es = copy_statement(s);
+
+    pips_assert("s consistent", statement_consistent_p(s));
+    pips_assert("es consistent", statement_consistent_p(es));
+
+    /* Let's get rid of s without destroying cms: d not forget the goto t! */
+    l = instruction_block(statement_instruction(s));
+    pips_assert("cms is the second statement of the block", STATEMENT(CAR(CDR(l))) == cms);
+    STATEMENT(CAR(CDR(l))) = statement_undefined;
+    instruction_goto(statement_instruction(STATEMENT(CAR(l)))) = statement_undefined;
+    free_statement(s);
+
+    pips_assert("es is still consistent", statement_consistent_p(es));
+    pips_assert("cms is still consistent", statement_consistent_p(cms));
+
+    debug(1, "BuildStatementForEntry", "Begin for entry %s in module %s\n",
+	  entity_name(e), entity_name(cm));
+
+    return es;
+}
+
+static void
+ProcessEntry(
+    entity cm,
+    entity e,
+    entity l,
+    statement t)
+{
+    statement es = statement_undefined; /* so as not to compute anything
+					   before the debugging message is printed out */
+    statement ces = statement_undefined;
+    list decls = NIL;
+    text txt = text_undefined;
+    bool line_numbering_p = FALSE;
+    extern void unspaghettify_statement(statement);
+    extern unstructured control_graph(statement);
+    extern void make_text_resource_and_free(string, string, string, text);
+
+    debug(1, "ProcessEntry", "Begin for entry %s of module %s\n",
+	  entity_name(e), module_local_name(cm));
+
+    es = BuildStatementForEntry(cm, e, t);
+
+    /* Compute the proper declaration list, without formal parameters from cm
+     * and with formal parameters from e
+     */
+    MAP(ENTITY, v, {
+	if(!storage_formal_p(entity_storage(v))) {
+	    decls = arguments_add_entity(decls, v);
+	}
+	}, entity_declarations(cm));
+
+    ifdebug(2) {
+      (void) fprintf(stderr, "Declarations inherited from module %s:\n",
+		     module_local_name(cm));
+      dump_arguments(entity_declarations(cm));
+      (void) fprintf(stderr, "Declarations of formal parameters for entry %s:\n",
+		     module_local_name(e));
+      dump_arguments(entity_declarations(e));
+    }
+
+    ifdebug(2) {
+      (void) fprintf(stderr, "Declarations of all variables for entry %s:\n",
+		     module_local_name(e));
+      dump_arguments(entity_declarations(e));
+    }
+
+    /* Try to get rid of unreachable statements which may contain references
+     * to formal parameters undeclared in the current entry an obtain a clean
+     * entry statement (ces).
+     */
+
+    ces = make_statement(entity_empty_label(), 
+				 STATEMENT_NUMBER_UNDEFINED,
+				 MAKE_ORDERING(0,1),
+				 empty_comments,
+				 make_instruction(is_instruction_unstructured,
+						  control_graph(es)));
+    unspaghettify_statement(ces);
+
+    /* Compute an external representation of entry statement es for entry e.
+     * Cheat with the declarations because of text_names_module().
+     */
+    entity_declarations(e) = gen_nconc(entity_declarations(e), decls);
+    decls = entity_declarations(cm);
+    entity_declarations(cm) = entity_declarations(e);
+    ifdebug(1) {
+      fprint_environment(stderr, cm);
+    }
+    line_numbering_p = get_bool_property("PRETTYPRINT_STATEMENT_NUMBER");
+    set_bool_property("PRETTYPRINT_STATEMENT_NUMBER", FALSE);
+    txt = text_named_module(e, cm, ces);
+    set_bool_property("PRETTYPRINT_STATEMENT_NUMBER", line_numbering_p);
+    entity_declarations(cm) = decls;
+
+    pips_assert("statement ces is consistent", statement_consistent_p(ces));
+
+    pips_assert("statement for cm is consistent",
+		statement_consistent_p(get_current_module_statement()));
+
+    /* */
+    make_text_resource_and_free(module_local_name(e), DBR_SOURCE_FILE, ".f", txt);
+
+    pips_assert("statement for cm is consistent",
+		statement_consistent_p(get_current_module_statement()));
+
+    free_statement(ces);
+
+    /* give the entry a user file.
+     */
+    DB_PUT_MEMORY_RESOURCE(DBR_USER_FILE, module_local_name(e), 
+	strdup(db_get_memory_resource(DBR_USER_FILE, module_local_name(cm), TRUE)));
+
+    pips_assert("statement for cm is consistent",
+		statement_consistent_p(get_current_module_statement()));
+
+    debug(1, "ProcessEntry", "End for entry %s of module %s\n",
+	  entity_name(e), module_local_name(cm));
+
+}
+
+void
+ProcessEntries()
+{
+    entity cm = get_current_module_entity();
+    code c = entity_code(cm);
+    list ce = NIL;
+    list cl = NIL;
+    list ct = NIL;
+    text txt = text_undefined;
+    bool line_numbering_p = FALSE;
+
+    /* The declarations for cm are likely to be incorrect. They must be
+     * synthesized by the prettyprinter.
+     */
+    free(code_decls_text(c));
+    code_decls_text(c) = strdup("");
+    /* Regenerate a SOURCE_FILE .f without entries for the module itself */
+    line_numbering_p = get_bool_property("PRETTYPRINT_STATEMENT_NUMBER");
+    set_bool_property("PRETTYPRINT_STATEMENT_NUMBER", FALSE);
+    txt = text_named_module(cm, cm, get_current_module_statement());
+    set_bool_property("PRETTYPRINT_STATEMENT_NUMBER", line_numbering_p);
+    make_text_resource_and_free(module_local_name(cm), DBR_SOURCE_FILE, ".f", txt);
+
+    /* Process each entry */
+    for(ce = entry_entities, cl = entry_labels, ct = entry_targets;
+	!ENDP(ce) && !ENDP(cl) && !ENDP(ct); POP(ce), POP(cl), POP(ct)) {
+	entity e = ENTITY(CAR(ce));
+	entity l = ENTITY(CAR(cl));
+	statement t = STATEMENT(CAR(ct));
+
+	pips_assert("Target and label match", l==statement_label(t));
+
+	ProcessEntry(cm, e, l, t);
+    }
+    /* Postponed to the_actual_parser() which needs to know entries were
+       encountered */
+    /* ResetEntries(); */
+}
+
 entity
 NameToFunctionalEntity(string name)
 {
@@ -633,6 +1133,180 @@ NameToFunctionalEntity(string name)
 	;
     }
     return f;
+}
+
+/* The result type of a function may be carried by e, by r or be implicit.
+ * A new type structure is allocated, unless r is used as new result type.
+ */
+
+type
+MakeResultType(
+    entity e,
+    type r)
+{
+    type te = entity_type(e);
+    type new_r = type_undefined;
+
+    if (te != type_undefined) {
+	if (type_variable_p(te)) {
+	    /* e is a function that was implicitly declared as a variable. 
+	       this may happen in Fortran. */
+	    pips_debug(2, "variable --> fonction\n");
+	    pips_assert("undefined type", r == type_undefined);
+	    new_r = copy_type(te);
+	}
+	else if (type_functional_p(te)) {
+	    /* Well... this should be useless because e is already typed.
+	     * FI: I do not believe copy_type() is necessary in spite of
+	     * the non orthogonality...
+	     */
+	    new_r = functional_result(type_functional(te));
+	}
+	else {
+	    pips_error("MakeResultType", "Unexpected type %s for entity %s\n", 
+		       type_to_string(te), entity_name(e));
+	}
+    }
+    else {
+	if(type_undefined_p(r)) {
+	    new_r = ImplicitType(e);
+	}
+	else {
+	    new_r = r;
+	}
+    }
+    pips_assert("type new_r is defined", !type_undefined_p(new_r));
+    return new_r;
+}
+
+/* A local entity might have been created but found out later to be
+ * global, depending on the order of declaration statements (see
+ * MakeExternalFunction()). The local entity e is (marked as) destroyed
+ * and replaced by functional entity fe.
+ */
+
+entity
+LocalToGlobal(entity e)
+{
+    return SafeLocalToGlobal(e, type_undefined);
+}
+
+entity
+SafeLocalToGlobal(entity e, type r)
+{
+    entity fe = entity_undefined;
+
+    if(!top_level_entity_p(e)) {
+	storage s = entity_storage(e);
+	if(s == storage_undefined || storage_ram_p(s)) {
+	    extern list arguments_add_entity(list a, entity e);
+
+	    fe = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, 
+				    entity_local_name(e));
+
+	    pips_debug(1, "external function %s re-declared as %s\n",
+		       entity_name(e), entity_name(fe));
+	    /* FI: I need to destroy a virtual entity which does not
+	     * appear in the program and wich was temporarily created by
+	     * the parser when it recognized a name; however, I've no way
+	     * to know if the same entity does not appear for good
+	     * somewhere else in the code; does the Fortran standard let
+	     * you write: LOG = LOG(3.)  If yes, PIPS will core dump...
+	     * PIPS also core dumps with ALOG(ALOG(X))... (8 July 1993) */
+	    /* remove_variable_entity(e); */
+	    if(type_undefined_p(r)) {
+		add_ghost_variable_entity(e);
+		pips_debug(1, "entity %s to be destroyed\n", entity_name(e));
+	    }
+	    else {
+		pips_debug(1, "entity %s to be preserved to carry function result\n",
+			   entity_name(e));
+	    }
+	}
+	else if(storage_formal_p(s)){
+	    pips_user_warning("entity %s is a formal functional parameter\n",
+			      entity_name(e));
+	    ParserError("LocalToGlobal",
+			"Formal functional parameters are not supported "
+			"by PIPS.\n");
+	    fe = e;
+	}
+	else {
+	    pips_internal_error("entity %s has an unexpected storage %d\n",
+				entity_name(e), storage_tag(s));
+	}
+    }
+    else {
+	fe = e;
+    }
+    pips_assert("Entity is global", top_level_entity_p(fe));
+    return fe;
+}
+
+void
+TypeFunctionalEntity(entity fe,
+		     type r)
+{
+    type tfe = entity_type(fe);
+
+    if(tfe == type_undefined) {
+	/* this is wrong, because we do not know if we are handling
+	   an EXTERNAL declaration, in which case the result type
+	   is type_undefined, or a function call appearing somewhere,
+	   in which case the ImplicitType should be used;
+	   maybe the unknown type should be used? */
+	entity_type(fe) = make_type(is_type_functional, 
+				   make_functional(NIL, 
+						   (r == type_undefined) ?
+						   ImplicitType(fe) :
+						   r));
+    }
+    else if (type_functional_p(tfe)) 
+    {
+	type tr = functional_result(type_functional(tfe));
+	if(r != type_undefined && !type_equal_p(tr, r)) {
+
+	    /* a bug is detected here: MakeExternalFunction, as its name
+	       implies, always makes a FUNCTION, even when the symbol
+	       appears in an EXTERNAL statement; the result type is
+	       infered from ImplicitType() - see just above -;
+	       let's use implicit_type_p() again, whereas the unknown type
+	       should have been used 
+	    */
+	    if(intrinsic_entity_p(fe)) {
+		/* ignore r */
+	    } else if (type_void_p(tr)) {
+		/* someone used a subroutine as a function.
+		 * this happens in hpfc for declaring "pure" routines.
+		 * thus I make this case being ignored. warning? FC.
+		 */		
+	    } else if (implicit_type_p(fe) || overloaded_type_p(tr)) {
+		/* memory leak of tr */
+		functional_result(type_functional(tfe)) = r;
+	    } else  {
+		user_warning("TypeFunctionalEntity",
+			     "Type redefinition of result for function %s\n", 
+			     entity_name(fe));
+		if(type_variable_p(tr)) {
+		    user_warning("TypeFunctionalEntity",
+				 "Currently declared result is %s\n", 
+				 basic_to_string(variable_basic(type_variable(tr))));
+		}
+		if(type_variable_p(r)) {
+		    user_warning("TypeFunctionalEntity",
+				 "Redeclared result is %s\n", 
+				 basic_to_string(variable_basic(type_variable(r))));
+		}
+		ParserError("TypeFunctionalEntity",
+			    "Functional type redefinition.\n");
+	    }
+	}
+    } else if (type_variable_p(tfe)) {
+	pips_internal_error("Fortran does not support global variables\n");
+    } else {
+	pips_internal_error("Unexpected type for a global name %s\n",
+			    entity_name(fe));
+    }
 }
 
 /* 
@@ -676,9 +1350,8 @@ MakeExternalFunction(
     entity e, /* entity to be turned into external function */
     type r /* type of result */)
 {
-    type te;
     entity fe = entity_undefined;
-    type tfe;
+    type new_r = type_undefined;
 
     debug(8, "MakeExternalFunction", "Begin for %s\n", entity_name(e));
 
@@ -687,131 +1360,19 @@ MakeExternalFunction(
       return e;
     }
 
-    te = entity_type(e);
-    if (te != type_undefined) {
-	if (type_variable_p(te)) {
-	    /* e is a function that was implicitly declared as a variable. 
-	       this may happen in Fortran. */
-	    pips_debug(2, "variable --> fonction\n");
-	    pips_assert("undefined type", r == type_undefined);
-	    r = te;
-	}
-    }
+    new_r = MakeResultType(e, r);
 
     pips_debug(9, "external function %s declared\n", entity_name(e));
 
-    if(!top_level_entity_p(e)) {
-	storage s = entity_storage(e);
-	if(s == storage_undefined || storage_ram_p(s)) {
-	    extern list arguments_add_entity(list a, entity e);
-
-	    fe = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, 
-				    entity_local_name(e));
-
-	    pips_debug(1, "external function %s re-declared as %s\n",
-		       entity_name(e), entity_name(fe));
-	    /* FI: I need to destroy a virtual entity which does not
-	     * appear in the program and wich was temporarily created by
-	     * the parser when it recognized a name; however, I've no way
-	     * to know if the same entity does not appear for good
-	     * somewhere else in the code; does the Fortran standard let
-	     * you write: LOG = LOG(3.)  If yes, PIPS will core dump...
-	     * PIPS also core dumps with ALOG(ALOG(X))... (8 July 1993) 
-	     */
-	    /* remove_variable_entity(e); */
-	    add_ghost_variable_entity(e);
-	    pips_debug(1, "entity %s to be destroyed\n", entity_name(e));
-
-	    if(r!=type_undefined) {
-		/* r is going to be re-used to build the functional type
-		 * which is going to be freed later with e
-		 */
-		type new_r = type_undefined;
-		new_r = copy_type(r);
-		r = new_r;
-	    }
-	}
-	else if(storage_formal_p(s)){
-	    pips_user_warning("entity %s is a formal functional parameter\n",
-			      entity_name(e));
-	    ParserError("MakeExternalFunction",
-			"Formal functional parameters are not supported "
-			"by PIPS.\n");
-	    fe = e;
-	}
-	else {
-	    pips_internal_error("entity %s has an unexpected storage %d\n",
-				entity_name(e), storage_tag(s));
-	}
-    }
-    else {
-	fe = e;
-    }
+    fe = LocalToGlobal(e);
 
     /* Assertion: fe is a (functional) global entity and the type of its 
-       result is r */
+       result is new_r */
 
-    tfe = entity_type(fe);
-    if(tfe == type_undefined) {
-	/* this is wrong, because we do not know if we are handling
-	   an EXTERNAL declaration, in which case the result type
-	   is type_undefined, or a function call appearing somewhere,
-	   in which case the ImplicitType should be used;
-	   maybe the unknown type should be used? */
-	entity_type(fe) = make_type(is_type_functional, 
-				   make_functional(NIL, 
-						   (r == type_undefined) ?
-						   ImplicitType(fe) :
-						   r));
-    }
-    else if (type_functional_p(tfe)) 
-    {
-	type tr = functional_result(type_functional(tfe));
-	if(r != type_undefined && !type_equal_p(tr, r)) {
-
-	    /* a bug is detected here: MakeExternalFunction, as its name
-	       implies, always makes a FUNCTION, even when the symbol
-	       appears in an EXTERNAL statement; the result type is
-	       infered from ImplicitType() - see just above -;
-	       let's use implicit_type_p() again, whereas the unknown type
-	       should have been used 
-	    */
-	    if(intrinsic_entity_p(fe)) {
-		/* ignore r */
-	    } else if (type_void_p(tr)) {
-		/* someone used a subroutine as a function.
-		 * this happens in hpfc for declaring "pure" routines.
-		 * thus I make this case being ignored. warning? FC.
-		 */		
-	    } else if (implicit_type_p(fe) || overloaded_type_p(tr)) {
-		/* memory leak of tr */
-		functional_result(type_functional(tfe)) = r;
-	    } else  {
-		user_warning("MakeExternalFunction",
-			     "Type redefinition of result for function %s\n", 
-			     entity_name(fe));
-		if(type_variable_p(tr)) {
-		    user_warning("MakeExternalFunction",
-				 "Currently declared result is %s\n", 
-				 basic_to_string(variable_basic(type_variable(tr))));
-		}
-		if(type_variable_p(r)) {
-		    user_warning("MakeExternalFunction",
-				 "Redeclared result is %s\n", 
-				 basic_to_string(variable_basic(type_variable(r))));
-		}
-		ParserError("MakeExternalFunction",
-			    "Functional type redefinition.\n");
-	    }
-	}
-    } else if (type_variable_p(tfe)) {
-	pips_internal_error("Fortran does not support global variables\n");
-    } else {
-	pips_internal_error("Unexpected type for a global name %s\n",
-			    entity_name(fe));
-    }
+    TypeFunctionalEntity(fe, new_r);
 
     /* a function has a rom storage, except for formal functions */
+
     if (entity_storage(e) == storage_undefined)
 	entity_storage(fe) = MakeStorageRom();
     else
@@ -847,7 +1408,10 @@ MakeExternalFunction(
  */
 
 void 
-MakeFormalParameter(entity fp, int nfp)
+MakeFormalParameter(
+		    entity m, /* module of formal parameter */
+		    entity fp, /* formal parameter */
+		    int nfp) /* offset (i.e. rank) of formal parameter */
 {
     pips_assert("type is undefined", entity_type(fp) == type_undefined);
 
@@ -859,8 +1423,7 @@ MakeFormalParameter(entity fp, int nfp)
     }
 
     entity_storage(fp) = 
-	make_storage(is_storage_formal, 
-		     make_formal(get_current_module_entity(), nfp));
+	make_storage(is_storage_formal, make_formal(m, nfp));
     entity_initial(fp) = MakeValueUnknown();
 }
 
@@ -870,7 +1433,7 @@ MakeFormalParameter(entity fp, int nfp)
 is created with an implicit type, and then is added to CurrentFunction's
 declarations. */
 void 
-ScanFormalParameters(list l)
+ScanFormalParameters(entity m, list l)
 {
 	list pc;
 	entity fp; /* le parametre formel */
@@ -881,10 +1444,50 @@ ScanFormalParameters(list l)
 	for (pc = l, nfp = 1; pc != NULL; pc = CDR(pc), nfp += 1) {
 		fp = ENTITY(CAR(pc));
 
-		MakeFormalParameter(fp, nfp);
+		MakeFormalParameter(m, fp, nfp);
 
-		AddEntityToDeclarations(fp, get_current_module_entity());
+		AddEntityToDeclarations(fp, m);
 	}
+}
+
+/* this function check and set if necessary the storage of formal parameters in lfp. */
+void 
+UpdateFormalStorages(
+		     entity m, 
+		     list lfp)
+{
+    list fpc; /* formal parameter chunk */
+    int fpo; /* formal parameter offset */
+
+    for (fpc = lfp, fpo = 1; !ENDP(fpc); POP(fpc), fpo += 1) {
+	entity fp = ENTITY(CAR(fpc));
+	storage fps = entity_storage(fp);
+
+	pips_assert("Formal parameter fp must be in scope of module m",
+		    m==local_name_to_top_level_entity(entity_module_name(fp)));
+
+	if(storage_undefined_p(fps)) {
+	    entity_storage(fp) = make_storage(is_storage_formal,
+					      make_formal(m, fpo));
+	}
+	else if(storage_ram_p(fps)){
+	    /* Oupss... the associated area should be cleaned up...  but
+	     * it should ony occur in EndOfProcedure() when all implictly
+	     * declared variables have been encountered...
+	     */
+	    free_storage(fps);
+	    entity_storage(fp) = make_storage(is_storage_formal,
+					      make_formal(m, fpo));
+	}
+	else if(storage_formal_p(fps)){
+	    pips_assert("Consistent Offset", 
+			fpo==formal_offset(storage_formal(fps)));
+	}
+	else {
+	    pips_internal_error("Unexpected storage for entity %s\n",
+				entity_name(fp));
+	}
+    }
 }
 
 
