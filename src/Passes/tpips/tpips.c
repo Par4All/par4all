@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.108  1998/07/21 17:36:20  coelho
+ * -v option updated.
+ *
  * Revision 1.107  1998/07/10 18:09:02  coelho
  * comments++
  *
@@ -1084,7 +1087,8 @@ static void parse_arguments(int argc, char * argv[])
 	    tpips_exec(optarg);
 	    break;
 	case 'v': 
-	    fprintf(stderr, "tpips: (ARCH=%s) %s\n", SOFT_ARCH, argv[0]);
+	    fprintf(stderr, "tpips: (ARCH=" SOFT_ARCH 
+		    ", DATE=" UTC_DATE ") %s\n", argv[0]);
             break;
 	case 'r': 
 	    free(tpipsrc);
