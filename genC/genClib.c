@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1996/08/08 11:56:34 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1996/08/09 18:47:12 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -1960,7 +1960,6 @@ char *s ;
 
 static void init_gen_quick_recurse_tables();
 
-/*VARARGS0*/
 void
 gen_read_spec(char * spec, ...)
 {
@@ -1971,6 +1970,15 @@ gen_read_spec(char * spec, ...)
     char *mktemp(), *tmp ;
     extern int unlink();
 
+    /* default initialization of newgen lexers files:
+     */
+    genread_in = stdin;
+    genspec_in = stdin;
+    genread_out = stdout;
+    genspec_out = stdout;
+
+    /* now let's read the spec files
+     */
     va_start(ap, spec) ;
 
     init() ;
