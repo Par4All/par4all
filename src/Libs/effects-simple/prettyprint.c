@@ -55,6 +55,35 @@ compare_effect_reference(effect * e1, effect * e2)
   return (n1 || n2)?  (n2-n1): strcmp(entity_name(v1), entity_name(v2));
 }
 
+/* int compare_effect_reference_in_common(e1, e2):
+ *
+ * returns -1 if "e1" is before "e2" in the alphabetic order, else
+ * +1. "e1" and "e2" are pointers to effect, we compare the names of their
+ * reference's entity with the common name in first if the entity belongs  
+ * to a common */
+int
+compare_effect_reference_in_common(effect * e1, effect * e2)
+{
+  entity v1, v2;
+  int n1, n2 ,result;
+  string name1, name2;
+  v1 = reference_variable(effect_reference(*e1));
+  v2 = reference_variable(effect_reference(*e2));
+  n1 = (v1==(entity)NULL),
+  n2 = (v2==(entity)NULL);
+  name1= strdup((entity_in_common_p(v1)) ? 
+      (string) entity_and_common_name(v1):
+      entity_name(v1));
+  name2=  strdup((entity_in_common_p(v2)) ? 
+      (string) entity_and_common_name(v2):
+      entity_name(v2));
+  
+  result =  (n1 || n2)?  (n2-n1): strcmp(name1,name2);
+  free(name1);free(name2);  
+  return result;
+}
+
+
 /* Try to factorize code from Alexis Platonoff :
 
    Append an_effect_string to an_effect_text an position the
@@ -147,7 +176,10 @@ simple_effects_to_text(
     Wt = make_text(NIL);
 
     /* We sort the list of effects in lexicographic order */
-    gen_sort_list(sefs_list, compare_effect_reference);
+     if (get_bool_property("PRETTYPRINT_WITH_COMMON_NAMES")) 
+	 gen_sort_list(sefs_list, compare_effect_reference_in_common);
+     else 
+	 gen_sort_list(sefs_list, compare_effect_reference);
   
     /* Walk through all the effects */
     for(ce = sefs_list; !ENDP(ce); POP(ce)) 
