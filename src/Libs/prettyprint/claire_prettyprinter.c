@@ -9,6 +9,10 @@
                             < MODULE.code
 
    $Log: claire_prettyprinter.c,v $
+   Revision 1.14  2004/06/16 15:18:42  hurbain
+   First definitive version.
+   Some bugs left, but stable state.
+
    Revision 1.13  2004/06/16 09:37:49  hurbain
    Ça compile.
    Yapuka debugger.
@@ -572,20 +576,21 @@ static string claire_array_in_task(reference r, bool first, int task_number){
   result = strdup(concatenate(result, "inLoopNest = LOOPNEST(deep = ", int_to_string(gen_array_nitems(intern_indices_array)), NL, TAB, TAB, TAB, NULL));
   result = strdup(concatenate(result, "upperBound = list<VARTYPE>(", NULL));
   
-  for(i = 0; i<gen_array_nitems(intern_upperbounds_array) - 1; i++){
-    result = strdup(concatenate(result, "vartype!(", gen_array_item(intern_upperbounds_array, i), "), ", NULL));
+  if(gen_array_nitems(intern_indices_array) > 0){
+    for(i = 0; i<gen_array_nitems(intern_upperbounds_array) - 1; i++){
+      result = strdup(concatenate(result, "vartype!(", *((string *)(gen_array_item(intern_upperbounds_array, i))), "), ", NULL));
+    }
+    
+    result = strdup(concatenate(result, "vartype!(", *((string *)(gen_array_item(intern_upperbounds_array, i))), ")),", NULL));
+    
+    result = strdup(concatenate(result, NL, TAB, TAB, TAB, "names = list<string>(", NULL));
+    
+    for(i = 0; i<gen_array_nitems(intern_indices_array) - 1; i++){
+      result = strdup(concatenate(result, QUOTE, *((string *)(gen_array_item(intern_indices_array, i))), QUOTE, ", ", NULL));
+    }
+
+    result = strdup(concatenate(result, QUOTE, *((string *)(gen_array_item(intern_indices_array, i))), QUOTE, "),", NULL));
   }
-
-  result = strdup(concatenate(result, "vartype!(", gen_array_item(intern_upperbounds_array, i), ")),", NULL));
-
-  result = strdup(concatenate(result, NL, TAB, TAB, TAB, "names = list<string>(", NULL));
-
-  for(i = 0; i<gen_array_nitems(intern_indices_array) - 1; i++){
-    result = strdup(concatenate(result, QUOTE, gen_array_item(intern_indices_array, i), QUOTE, ", ", NULL));
-  }
-
-  result = strdup(concatenate(result, QUOTE, gen_array_item(intern_indices_array, i), QUOTE, "),", NULL));
-
   result = strdup(concatenate(result, ")))", NL, NULL)); 
   return result;
   
@@ -639,13 +644,15 @@ static call claire_loop_from_loop(loop l, string * result, int task_number){
   statement s = loop_body(l);
   instruction i = statement_instruction(s);
 
-  *up = int_to_string(gen_array_nitems(extern_indices_array));
+  *up = claire_expression(range_upper(loop_range(l)));
   *claire_name = claire_entity_local_name(loop_index(l));
   if( (*claire_name)[0] == 'M'){
     gen_array_append(intern_indices_array, claire_name);
+    gen_array_append(intern_upperbounds_array, up);
   }
   else{
     gen_array_append(extern_indices_array, claire_name);
+    gen_array_append(extern_upperbounds_array, up);
   }
 
   switch(instruction_tag(i)){
@@ -656,7 +663,7 @@ static call claire_loop_from_loop(loop l, string * result, int task_number){
   }
   case is_instruction_call:{
     call c = instruction_call(i);
-    *result = strdup(concatenate(*result, *up, ",", NL, TAB, TAB,NULL));
+    *result = strdup(concatenate(*result, int_to_string(gen_array_nitems(extern_indices_array)), ",", NL, TAB, TAB,NULL));
     return c;
   }
   default:
@@ -686,13 +693,13 @@ static string claire_loop_from_sequence(loop l, int task_number){
 
   string * name = malloc(sizeof(string));
   *name = claire_entity_local_name(loop_index(l));
+  string * up = malloc(sizeof(string));
+  *up = claire_expression(range_upper(loop_range(l)));
 
   if((*name)[0] == 'M'){
     pips_user_error("At least one extern loop is needed");
   }
   else{
-    string * up = malloc(sizeof(string));
-    *up = claire_expression(range_upper(loop_range(l)));
     gen_array_append(extern_indices_array, name);
     gen_array_append(extern_upperbounds_array, up);
   }
@@ -718,15 +725,15 @@ static string claire_loop_from_sequence(loop l, int task_number){
   /* add external upperbounds */
   result = strdup(concatenate(result, "upperBound = list<VARTYPE>(", NULL));
   for(i=0; i<gen_array_nitems(extern_upperbounds_array) - 1; i++){
-    result = strdup(concatenate(result, "vartype!(", gen_array_item(extern_upperbounds_array, i), "), ", NULL));
+    result = strdup(concatenate(result, "vartype!(", *((string *)(gen_array_item(extern_upperbounds_array, i))), "), ", NULL));
   }
-  result = strdup(concatenate(result, "vartype!(", gen_array_item(extern_upperbounds_array, i), ")),",NL, TAB, TAB, NULL));
+  result = strdup(concatenate(result, "vartype!(",*((string *)(gen_array_item(extern_upperbounds_array, i))), ")),",NL, TAB, TAB, NULL));
   /* add external indices names*/
   result = strdup(concatenate(result, "names = list<string>(", NULL));
   for(i=0; i<gen_array_nitems(extern_indices_array) - 1; i++){
-    result = strdup(concatenate(result, QUOTE, gen_array_item(extern_indices_array, i), QUOTE ", ", NULL));
+    result = strdup(concatenate(result, QUOTE, *((string *)(gen_array_item(extern_indices_array, i))), QUOTE ", ", NULL));
   }
-  result = strdup(concatenate(result, QUOTE, gen_array_item(extern_indices_array, i), QUOTE, ")),", NL, TAB, NULL));
+  result = strdup(concatenate(result, QUOTE, *((string *)(gen_array_item(extern_indices_array, i))), QUOTE, ")),", NL, TAB, NULL));
   
   result = strdup(concatenate(result, claire_call_from_loopnest(c, task_number), NULL));
 
