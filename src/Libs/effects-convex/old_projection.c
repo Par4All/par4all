@@ -378,9 +378,10 @@ void regions_transformer_apply(list l_reg, transformer trans,
 	Psysteme sc_trans = sc_dup(predicate_system(transformer_relation(trans)));
 
 	ifdebug(8)
-	{
-	    pips_debug(8, "transformer: \n\t%s\n", transformer_to_string(trans));
-	}	
+	    {
+		fprintf(stderr,"transformer:\n");
+		sc_print(sc_trans,entity_local_name);
+	    }	
 	
 	/* addition of the predicate of the transformer to the predicate of 
 	 * the regions and elimination of redundances; then, projection of 
