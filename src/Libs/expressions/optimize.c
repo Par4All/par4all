@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.30  1999/05/27 14:56:21  ancourt
+ * fma moved after icm association/atomization.
+ *
  * Revision 1.29  1999/05/27 14:48:18  ancourt
  * 2 eole passes. does not work yet.
  *
@@ -836,7 +839,7 @@ static optimization_strategy
   { 
     /* name */ "P2SC", 
     /* huff */ TRUE, expression_gravity, TRUE,
-    /* eole */ TRUE, FALSE, "0",
+    /* eole */ TRUE, TRUE, "0",
     /* simp */ TRUE, 
     /* gcm cse */ TRUE
 	       
@@ -844,21 +847,21 @@ static optimization_strategy
   {
     "test",
     TRUE, expression_gravity, TRUE,
-    TRUE, FALSE, "0",
+    TRUE, TRUE, "0",
     TRUE, 
     FALSE
   },
   {
     "R10K",
     TRUE, expression_gravity_inv, FALSE,
-    TRUE, FALSE, "1",
+    TRUE, TRUE, "1",
     TRUE, 
     TRUE
   },
   {
     "EOLE",
     FALSE, NULL, FALSE,
-    TRUE, FALSE, "0",
+    TRUE, TRUE, "0",
     FALSE, 
     FALSE
   },
@@ -867,7 +870,7 @@ static optimization_strategy
   {
     NULL, /* default similar to P2SC. */
     TRUE, expression_gravity, TRUE,
-    TRUE, FALSE, "0",
+    TRUE, TRUE, "0",
     TRUE, 
     TRUE
   }
@@ -965,7 +968,7 @@ bool optimize_expressions(string module_name)
     /* EOLE Stuff, second pass for FMA.
      */
     if (strategy->apply_eole2)
-      apply_eole_on_statement(module_name, s, "-f");
+      apply_eole_on_statement(module_name, s, "-m");
 
     if (strategy->apply_balancing)
       switch_nary_to_binary(s);
