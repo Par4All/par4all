@@ -168,7 +168,7 @@ Psysteme ps;
 
 static Psysteme sc_rational_feasibility(Psysteme sc)
 {
-    if(!sc_rational_feasibility_ofl_ctrl((sc), NO_OFL_CTRL,TRUE)) {
+    if(!sc_rational_feasibility_ofl_ctrl((sc), OFL_CTRL,TRUE)) {
 	sc_rm(sc);
 	sc = SC_EMPTY;
     }
@@ -686,6 +686,7 @@ Psysteme sc_strong_normalize4(Psysteme ps, char * (*variable_name)(Variable))
 
 Psysteme sc_strong_normalize5(Psysteme ps, char * (*variable_name)(Variable))
 {
+    /* Good, but pretty slow */
     /*
     Psysteme new_ps =
 	sc_strong_normalize_and_check_feasibility2
