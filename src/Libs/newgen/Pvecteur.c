@@ -13,17 +13,13 @@
 #include <string.h>
 
 #include "linear.h"
-
 #include "genC.h"
 #include "ri.h"
-#include "ri-util.h"
 #include "misc.h"
 
 #define TCST_NAME "TERME_CONSTANT"
 
-void vect_gen_write(fd, v)
-FILE *fd;
-Pvecteur v;
+void vect_gen_write(FILE *fd, Pvecteur v)
 {
     Pvecteur p;
 
@@ -103,31 +99,14 @@ int (*f)();
     return(p);
 }
 
-void vect_gen_free(v)
-Pvecteur v;
+void vect_gen_free(Pvecteur v)
 {
     vect_rm(v);
 }
 
-Pvecteur vect_gen_copy_tree(v)
-Pvecteur v;
+Pvecteur vect_gen_copy_tree(Pvecteur v)
 {
-    return(vect_dup(v));
-}
-
-void vect_debug(v)
-Pvecteur v;
-{
-    vect_fprint(stderr, v, entity_local_name);
-}
-
-/* comparison function for Pvecteur in pips
- */
-int compare_Pvecteur(pv1, pv2)
-Pvecteur *pv1, *pv2;
-{
-    return(compare_entities((entity*)&var_of(*pv1),
-			    (entity*)&var_of(*pv2)));
+    return vect_dup(v);
 }
 
 int 
@@ -137,6 +116,17 @@ vect_gen_allocated_memory(
     int result = 0;
     for (; v; v=v->succ)
 	result += sizeof(Svecteur);
+    return result;
+}
+
+int
+contrainte_gen_allocated_memory(
+    Pcontrainte pc)
+{
+    int result = 0;
+    for(; pc; pc=pc->succ)
+	result += sizeof(Scontrainte) + 
+	    vect_gen_allocated_memory(pc->vecteur);
     return result;
 }
 
