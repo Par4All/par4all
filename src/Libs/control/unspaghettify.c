@@ -2,15 +2,17 @@
 
    Ronan Keryell, 1995.
    */
-/* 	%A% ($Date: 1998/03/19 15:53:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1998/04/14 19:54:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_unspaghettify[] = "%A% ($Date: 1998/03/19 15:53:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_unspaghettify[] = "%A% ($Date: 1998/04/14 19:54:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
 #include <stdio.h> 
 #include <string.h> 
+
+#include "linear.h"
 
 #include "genC.h"
 #include "ri.h"
@@ -733,7 +735,7 @@ static void
 restructure_this_test(control c,
 		      structured_test_type t)
 {
-    instruction the_test_statement = control_statement(c);
+    statement the_test_statement = control_statement(c);
     test the_test = instruction_test(statement_instruction(the_test_statement));
     control then_node = CONTROL(CAR(control_successors(c)));
     control else_node = CONTROL(CAR(CDR(control_successors(c))));
