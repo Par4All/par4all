@@ -338,7 +338,7 @@ char *prefix, *base, *suffix;
 {
     char *s;
 
-    s = malloc(strlen(prefix)+strlen(base)+strlen(suffix)+1);
+    s = (char*) malloc(strlen(prefix)+strlen(base)+strlen(suffix)+1);
 
     strcpy(s, prefix);
     strcat(s, base);
