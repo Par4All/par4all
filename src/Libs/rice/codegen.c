@@ -444,7 +444,11 @@ statement body;
 
     if (instruction_loop_p(ibody))
 	body = make_block_statement(CONS(STATEMENT,body,NIL));
-    ibody = statement_instruction(body);  
+    ibody = statement_instruction(body);
+    /* Do not forget to move forbidden information associated with
+       block: */
+    fix_sequence_statement_attributes(body);
+  
     if (rice_distribute_only)
 	seq_or_par = is_execution_sequential;
 
