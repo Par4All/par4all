@@ -975,13 +975,18 @@ owner:	TK_OPENPAREN TK_OWNER_ALL TK_CLOSEPAREN
 		$$ = gen_array_make(0);
 		if (n) 
 		  gen_array_dupappend($$, n);
-		else
+		else {
+		  string wsn = db_get_current_workspace_name();
 		  /* pips_internal_error("No current module name\n"); */
-		  pips_user_error("No current module has been defined, explicitly or implictly.\n"
-				  "Please specify a module name as argument or check that"
-				  " the current workspace \"%s\" contains one main module"
-				  " or no more than one module.\n",
-				  db_get_current_workspace_name());
+		  if (wsn==NULL) 
+		    pips_user_error("No current workspace. Open or create one first!\n");
+		  else
+		    pips_user_error("No current module has been defined, explicitly or implictly.\n"
+				    "Please specify a module name as argument or check that"
+				    " the current workspace \"%s\" contains one main module"
+				    " or no more than one module.\n",
+				    wsn);
+		}
 	    }
 	}
 	;
