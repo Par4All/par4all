@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1996/03/11 17:15:37 $, ) 
+ * ($Date: 1996/03/11 17:46:21 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -357,9 +357,8 @@ elements_loop(
 static expression 
 mylid_ne_lid(entity lid)
 {
-    return MakeBinaryCall(entity_intrinsic(NON_EQUAL_OPERATOR_NAME),
-			  entity_to_expression(hpfc_name_to_entity(MYLID)),
-			  entity_to_expression(lid));
+    return ne_expression(entity_to_expression(hpfc_name_to_entity(MYLID)),
+			 entity_to_expression(lid));
 }
 
 /* to be generated:
@@ -833,15 +832,13 @@ generate_remapping_guard(
 				   int_to_expression(trg_n)), l);
 
     /* MSTATUS(primary_number).eq.src_number */
-    cond = MakeBinaryCall(entity_intrinsic(EQUAL_OPERATOR_NAME),
-			  m_stat_ref, int_to_expression(src_n));
+    cond = eq_expression(m_stat_ref, int_to_expression(src_n));
 
     /* checks whether alive or not */
     if (get_bool_property("HPFC_DYNAMIC_LIVENESS"))
     {
 	expression live_cond =
-	    MakeUnaryCall(entity_intrinsic(NOT_OPERATOR_NAME),
-			  live_mapping_expression(trg_n));
+	    not_expression(live_mapping_expression(trg_n));
 
 	the_code =  test_to_statement(make_test
 	    (live_cond, the_code, make_empty_statement()));
