@@ -1,0 +1,27 @@
+#!/bin/sh
+
+# Tags computation for the PIPS project, using the Development version.
+# To be run by cron for user pips on isatis
+
+# Remi Triolet
+
+# Modifications:
+#  - add tags for Linear
+#  - add recomputation of TAGS for Linear
+
+HOME=`ypcat passwd | egrep '^pips:' | awk -F: '{print $6}'`
+
+# . /etc/profile
+. ${HOME}/.profile
+
+TAGS=/tmp/PIPS-TAGS
+FILES=/tmp/PIPS-FILES
+PATHNAME_LIST="${HOME}/Newgen/genClib.c ${HOME}/Newgen/hash.c ${HOME}/Newgen/list.c ${HOME}/Newgen/set.c ${DEVEDIR}/Lib/[a-z]* ${DEVEDIR}/Passes/[a-z]* ${INCLUDEDIR} ${EXTEDIR}"
+
+find ${PATHNAME_LIST} -name '*.[cyhl]' -print > ${FILES} 2>/dev/null
+/usr/local/bin/etags -f ${TAGS} `cat ${FILES}` 2>/dev/null
+cp ${TAGS} ${PIPSDIR}/Tags/TAGS
+
+rm -f ${TAGS} ${FILES}
+(cd $LINEARDIR/Development; rm TAGS; make TAGS)
+cat ${HOME}/C3/Linear/Development/TAGS >>${PIPSDIR}/Tags/TAGS
