@@ -2,12 +2,20 @@
 # $RCSfile$ (version $Revision$)
 # $Date$, 
 
-HTMS =	index.html \
+# To deal with non-framed viewer and no server side include:
+HTML_AUTO = index.html \
 	bibliography.html \
+	current_team.html \
 	history.html \
 	home.html \
 	man_pages.html \
+	navigation.html \
 	related_projects.html \
+	search.html \
+	technical_pages.html
+
+HTMS =	$(HTML_AUTO) \
+	\
 	batch-interface.html \
 	line-interface.html \
 	outline.html \
@@ -23,20 +31,24 @@ HTMS =	index.html \
 
 SOURCES= $(HTMS)
 
-all: home.html index.html
+# Ask to make the html files:
+all: $(HTML_AUTO)
 clean: local_clean
 
 INSTALL_HTM= $(HTMS)
 
 # To deal with non-framed viewer and no server side include:
 APPLY_CPP = cpp -C -P
-home.html : home.cpp.html home_content.html
-	$(APPLY_CPP) home.cpp.html > $@
 
-index.html : index.cpp.html home_content.html
-	$(APPLY_CPP) index.cpp.html > $@
+# Overkill for home.html and index.html but anyway...
+%.html : %.cpp.html go_back.html
+	$(APPLY_CPP) $< > $@
+
+home.html : home_content.html
+
+index.html : home_content.html
 
 local_clean:
-	$(RM) home.html index.html
+	$(RM) $(HTML_AUTO)
 
 # end of $RCSfile$
