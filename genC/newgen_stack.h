@@ -1,6 +1,10 @@
 /*  STACK MANAGEMENT -- headers
+ *  
+ * $RCSfile: newgen_stack.h,v $ version $Revision$
+ * $Date: 1995/02/01 10:50:03 $, 
+ * got on %D%, %T%
  *
- *  - a stack is declared with type stack
+ *  - a stack is declared with type stack (internals not visible from here)
  *  - it is allocated with stack_make(newgen domain, bulk size)
  *  - it is freed with stack_free(stack)
  *  - stack_size(stack) returns the size
@@ -13,28 +17,8 @@
 #ifndef STACK_INCLUDED
 #define STACK_INCLUDED
 
-/* the stack bulks, that is arrays containing the elements
- */
-typedef struct _stack_bulk
-{
-  int n_item;                 /* next available item in the bulk */
-  int max_items;              /* the maximun number of items of this bulk */
-  char **items;               /* the items (only pointers at the moment) */
-  struct _stack_bulk *succ;   /* the next bulk */
-}
-  _stack_bulk, *_stack_ptr;
-
-/*  the stack head
- */
-typedef struct 
-{
-  int size;
-  int type; /* as BASIC, LIST, EXTERNAL, CHUNK and so on */
-  int max_extent;
-  _stack_ptr stack;
-  _stack_ptr available;
-}
-  _stack_head, *stack;
+struct __stack_head;
+typedef struct __stack_head *stack;
 
 #define STACK_NULL ((stack) NULL)
 #define STACK_NULL_P(s) ((s)==STACK_NULL)
@@ -52,6 +36,8 @@ extern void stack_push GEN_PROTO((char*, stack));
 extern char *stack_pop GEN_PROTO((stack));
 extern char *stack_head GEN_PROTO((stack));
 extern char *stack_replace GEN_PROTO((char*, stack));
+
+extern void stack_info GEN_PROTO((FILE*, stack));
 
 #endif
 
