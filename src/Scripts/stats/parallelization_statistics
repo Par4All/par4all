@@ -1,0 +1,23 @@
+#! /bin/sh
+#
+# $Id$
+#
+# display a summary of parallelization statistics by
+# analyzing the file (stderr) when PARALLELIZATION_STATISTICS is on.
+#
+# Usage: $0 files...
+
+count()
+{
+    grep ${1} ${2} |
+    gawk ' BEGIN { seq=0; par=0; }
+	   { seq += $5 ; par += $8; }
+	   END { print "seq:", seq, "par:" par; }'
+}
+
+for f
+do
+    echo "FILE: ${f}"
+    count "ante" ${f}
+    count "post" ${f}
+done
