@@ -53,7 +53,7 @@ done
 # Library order does usualy not matter. In order not to forget any:
 LIBS=`(cd $LIBSRCDIR; ls)`
 
-#LIBS="misc properties text-util ri-util pipsdbm syntax effects sdfi control dg-util rice ricedg transformer semantics regions privatize prettyprint generation conversion complexity chains callgraph bootstrap loop_normalize atomizer transformations movements wp65 reductions pipsmake top-level"
+#LIBS="misc properties text-util ri-util pipsdbm syntax effects control dg-util rice ricedg transformer semantics regions privatize prettyprint generation conversion complexity chains callgraph bootstrap loop_normalize atomizer transformations movements wp65 reductions pipsmake top-level"
 
 # obsolete (use "make bottom-up" instead)
 #LIBS=`analyze_libraries -p;order_libraries -b; sed 's/^lib//;s/.a$//' </tmp/libs.b`
