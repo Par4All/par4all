@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/06/29 14:17:36 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/06/29 15:52:57 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -216,7 +216,7 @@ MAIN=		main
 # macros default and architecture dependent values...
 
 for m in AR ARFLAGS CC CFLAGS CPPFLAGS LD LDFLAGS LEX LFLAGS LINT LINTFLAGS \
-		YACC YFLAGS TAR ZIP DIFF M4 PROTO
+		YACC YFLAGS TAR ZIP DIFF M4 PROTOIZE
 do
     echo "#"
     echo "# defining ${m} with \$(ARCH) or default"
@@ -281,7 +281,7 @@ SCAN=		$(LEX) $(LFLAGS) -t
 TYPECHECK=      $(LINT) $(LINTFLAGS) $(CPPFLAGS) $(TARGET_ARCH) $(LINT_LIBS)
 PARSE=		$(YACC) $(YFLAGS)
 ARCHIVE=	$(AR) $(ARFLAGS)
-PROTOIZE=	$(PROTO) -e -E "$(PREPROC)"
+PROTO=		$(PROTOIZE) -e -E "$(PREPROC)"
 #
 LIB_TARGET=	$(ARCH)/lib$(TARGET).a
 BIN_TARGET=	$(ARCH)/$(TARGET)
@@ -586,7 +586,7 @@ $(INC_TARGET): $(TARGET)-local.h
 	echo "#ifndef ${dir_simple_name}_header_included";\\
 	echo "#define ${dir_simple_name}_header_included";\\
 	cat $(TARGET)-local.h;\\
-	$(PROTOIZE)  $(INC_CFILES);\\
+	$(PROTO)  $(INC_CFILES);\\
 	echo "#endif /* ${dir_simple_name}_header_included */";\\
 	} > $(INC_TARGET).tmp
 	mv $(INC_TARGET).tmp $(INC_TARGET)
