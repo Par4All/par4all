@@ -1,5 +1,5 @@
  /* $RCSfile: module.c,v $ (version $Revision$)
-  * $Date: 1997/07/24 15:13:14 $, 
+  * $Date: 1997/10/24 16:28:45 $, 
   */
 #include <stdlib.h>
 #include <stdio.h>
@@ -171,31 +171,140 @@ static list /* of entity */
     referenced_variables_list = NIL;
 
 static void 
-store_this_variable(entity var)
+store_this_entity(entity var)
 {
-    message_assert("defined variable", !entity_undefined_p(var));
-
-    referenced_variables_list = CONS(ENTITY, var, referenced_variables_list);
-
+    message_assert("defined entity", !entity_undefined_p(var));
     if (!bound_referenced_variables_p(var))
     {
-	pips_debug(9, "%s\n", entity_name(var));
+	storage s = entity_storage(var);
+	pips_debug(4, "new reference to %s (storage: %d)\n",
+		   entity_name(var), storage_tag(s));
+	referenced_variables_list = 
+	    CONS(ENTITY, var, referenced_variables_list);
 	store_referenced_variables(var, TRUE);
+
+	if (storage_ram_p(s)) 
+	    /* the COMMON is also marqued as referenced... */
+	    store_this_entity(ram_section(storage_ram(s)));
     }
+}
+
+static void
+store_a_call_function(call c)
+{
+    entity called = call_function(c);
+    type t = entity_type(called);
+    value v = entity_initial(called);
+    storage s = entity_storage(called);
+
+    pips_debug(5, "call to %s\n", entity_name(called));
+
+    if (type_functional_p(t) && 
+	((value_code_p(v) || value_unknown_p(v) /* not parsed callee */) && 
+	 storage_rom_p(s) && 
+	 !type_void_p(functional_result(type_functional(t)))) ||
+	value_symbolic_p(v))
+	store_this_entity(called); /* it is an EXTERNAL or a PARAMETER */
 }
 
 static void 
 store_a_referenced_variable(reference ref)
 {
-    /* assert(!reference_undefined_p(ref)); */
-    store_this_variable(reference_variable(ref));
+    store_this_entity(reference_variable(ref));
 }
 
 static void 
 store_the_loop_index(loop l)
 {
-    /* assert(!loop_undefined_p(l)); */
-    store_this_variable(loop_index(l));
+    store_this_entity(loop_index(l));
+}
+
+static void
+mark_referenced_entities(gen_chunk * p)
+{
+    gen_multi_recurse(
+	p,
+	call_domain, gen_true, store_a_call_function,
+	reference_domain, gen_true, store_a_referenced_variable,
+	loop_domain, gen_true, store_the_loop_index,
+	NULL);    
+}
+
+/*  the referenced_variable_map is global and must be made/freed
+ *  before/after the call
+ */
+void 
+insure_declaration_coherency(
+    entity module,
+    statement stat,
+    list /* of entity */ le) /* added entities, for includes... */
+{
+    list decl = entity_declarations(module), new_decl = NIL;
+
+    debug_on("RI_UTIL_DEBUG_LEVEL");
+    pips_assert("initialized", !referenced_variables_undefined_p());
+    pips_debug(2, "Processing module %s\n", entity_name(module));
+
+    init_declared_variables();
+    referenced_variables_list = NIL;
+    if (le) MAP(ENTITY, e, store_this_entity(e), le);
+
+    pips_debug(3, "tagging references\n");
+    mark_referenced_entities(stat);
+
+    /* formal arguments are considered as referenced.
+     */
+    MAP(ENTITY, var, 
+	if (storage_formal_p(entity_storage(var)))
+	    store_this_entity(var),
+	decl);
+
+    /* checks each declared variable for a reference
+     */
+    MAP(ENTITY, var,
+    {
+	if (bound_referenced_variables_p(var) &&
+	    !bound_declared_variables_p(var))
+	{
+	    pips_debug(3, "declared %s referenced, kept\n",
+		       entity_name(var));
+	    new_decl = CONS(ENTITY, var, new_decl);
+	    store_or_update_declared_variables(var, TRUE);
+	    if (entity_variable_p(var))
+		mark_referenced_entities(entity_type(var));
+	}
+	else
+	{
+	    pips_debug(7, "declared %s not referenced, dropped\n",
+		       entity_name(var));
+	}
+    },
+	 decl);
+
+    /* checks each referenced variable for a declaration 
+     */
+    MAP(ENTITY, var,
+    {
+	if (!bound_declared_variables_p(var))
+	{
+	    pips_debug(3, "referenced %s added\n", entity_name(var));
+	    new_decl = CONS(ENTITY, var, new_decl);
+	    store_declared_variables(var, TRUE);
+	}
+    },
+	referenced_variables_list);
+
+    gen_sort_list(new_decl, compare_entities); /* sorted for determinism */
+    entity_declarations(module) = new_decl;
+
+    /* the temporaries are cleaned
+     */
+    close_declared_variables();
+    gen_free_list(decl);
+    gen_free_list(referenced_variables_list),
+    referenced_variables_list = NIL;
+
+    debug_off();
 }
 
 /*  to be called if the referenced map need not be shared between modules
@@ -211,100 +320,8 @@ insure_declaration_coherency_of_module(
     close_referenced_variables();
 }
 
-/*  the referenced_variable_map is global and must be made/freed
- *  before/after the call
- */
-void 
-insure_declaration_coherency(
-    entity module,
-    statement stat,
-    list /* of entity */ le) /* added entities, for includes... */
-{
-    list decl = entity_declarations(module), new_decl = NIL, ahead = NIL;
 
-    debug_on("RI_UTIL_DEBUG_LEVEL");
-
-    assert(!referenced_variables_undefined_p());
-
-    pips_debug(5, "Processing module %s\n", entity_name(module));
-
-    init_declared_variables();
-    referenced_variables_list = NIL;
-    
-    MAP(ENTITY, e, store_this_variable(e), le);
-    /* MAP(ENTITY, e, store_declared_variables(e, TRUE), decl); */
-
-    gen_multi_recurse(stat,
-		      /*   Direct References   
-		       */
-		      reference_domain, gen_true, store_a_referenced_variable,
-		      /*   References in Loops   
-		       */
-		      loop_domain, gen_true, store_the_loop_index,
-		      NULL);
-
-    /*    checks each declared variable for a reference
-     */
-    MAP(ENTITY, var,
-    {
-	if (value_symbolic_p(entity_initial(var)))
-	{
-	    /* some variables must be kept in order */
-	    ahead = CONS(ENTITY, var, ahead);
-	    store_declared_variables(var, TRUE);
-	}
-	else
-	    if (!entity_variable_p(var) ||
-		storage_formal_p(entity_storage(var)) ||
-		!local_entity_of_module_p(var, module) ||
-		(bound_referenced_variables_p(var) &&
-		 !bound_declared_variables_p(var)))
-	    {
-		pips_debug(7, "declared variable %s is referenced, kept\n",
-			   entity_name(var));
-		new_decl = CONS(ENTITY, var, new_decl);
-		store_or_update_declared_variables(var, TRUE);
-	    }
-	    else
-	    {
-		pips_debug(7, "declared variable %s not referenced, removed\n",
-			   entity_name(var));
-	    }
-    },
-	 decl);
-
-    /*    checks each referenced variable for a declaration 
-     */
-    MAP(ENTITY, var,
-    {
-	if (!bound_declared_variables_p(var) &&
-	    !basic_overloaded_p(entity_basic(var)))
-	{
-	    pips_debug(7, "referenced var %s added\n", entity_name(var));
-	    new_decl = CONS(ENTITY, var, new_decl);
-	    store_declared_variables(var, TRUE);
-	}
-	else
-	{
-	    pips_debug(7, "referenced var %s declared\n", entity_name(var));
-	}
-    },
-	referenced_variables_list);
-
-    ahead = gen_nreverse(ahead); /* back to initial order */
-    gen_sort_list(new_decl, compare_entities); /* sorted for determinism */
-    entity_declarations(module) = gen_nconc(ahead, new_decl); 
-
-    /* the temporaries are cleaned
-     */
-    close_declared_variables();
-    gen_free_list(decl);
-    gen_free_list(referenced_variables_list),
-    referenced_variables_list = NIL;
-
-    debug_off();
-}
-
+/****************************************************** DECLARATION COMMENTS */
 
 /*  Look for the end of header comments: */
 static string
