@@ -233,58 +233,61 @@ print_sentence(FILE * fd,
     }
 }
 
-void dump_sentence(sentence s)
-{
-    print_sentence(stderr, s);
-}
-
-void print_text(fd, t)
-FILE *fd;
-text t;
+void 
+print_text(FILE *fd, text t)
 {
     print_sentence_init();
     MAP(SENTENCE, s, print_sentence(fd, s), text_sentences(t));
 }
 
+void 
+dump_sentence(sentence s)
+{
+    print_sentence(stderr, s);
+}
+
 /* FI: print_text() should be fprint_text() and dump_text(), print_text() */
 
-void dump_text(t)
-text t;
+void 
+dump_text(text t)
 {
     print_text(stderr, t);
 }
 
 /* Convert a word list into a string and translate the position of
    eventual attachment accordingly: */
-string words_to_string(lw)
-cons *lw;
+string 
+words_to_string(list ls)
 {
-    static char buffer[2048]; /* SNIF */
+    int size = 1; /* 1 for null termination. */
+    string buffer, p;
 
+    /* computes the buffer length.
+     */
+    MAP(STRING, s, size+=strlen(s), ls);
+    buffer = (char*) malloc(sizeof(char)*size);
+    pips_assert("malloc ok", buffer);
+
+    /* appends to the buffer...
+     */
     buffer[0] = '\0';
-    MAPL(pw, {
-	string w = STRING(CAR(pw));
-	if (strlen(buffer)+strlen(w) > 2047) {
-	    fprintf(stderr, "[words_to_string] buffer too small\n");
-	    exit(1);
-	}
-	(void) strcat_word_and_migrate_attachments(buffer, w);
-    }, lw);
+    p=buffer;
+    MAP(STRING, s, 
+	{ strcat_word_and_migrate_attachments(p, s); p+=strlen(s); }, ls);
 
-    return(strdup_and_migrate_attachments(buffer));
+    return buffer;
 }
 
-void dump_words(list lw)
-{
-    print_words(stderr, lw);
-}
-
-
-void print_words(fd, lw)
-FILE *fd;
-cons *lw;
+void 
+print_words(FILE * fd, list lw)
 {
     string s = words_to_string(lw);
     fputs(s, fd);
     free(s);
+}
+
+void 
+dump_words(list lw)
+{
+    print_words(stderr, lw);
 }
