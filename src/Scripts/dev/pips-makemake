@@ -3,8 +3,8 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
-# Revision 1.270  1997/03/11 18:34:14  coelho
-# SCCS -> RCS
+# Revision 1.271  1997/03/11 19:11:30  coelho
+# RCS and SCCS compatible as a transition...
 #
 #
 # Automatic generation of Makefile for the PIPS project
@@ -293,11 +293,7 @@ clean-all-compiled:
 	done
 #
 OLD:; mkdir OLD
-SCCS:; mkdir SCCS
 RCS:; mkdir RCS
-get: 
-	-test -d SCCS && sccs get SCCS
-	-test -d RCS && co RCS/*
 # .PHONY is a gnu extension...
 .PHONY: install all depend header recompile clobber count info delta
 .PHONY: generate_makefile_if_necessary_and_possible
@@ -806,7 +802,9 @@ TAGS: \$(INCLUDES) \$(CFILES)
 	ctags \$(INCLUDES) \$(CFILES)
 
 \$(TARGET)-local.h:
-	[ -f \$(TARGET)-local.h ] || touch \$(TARGET)-local.h
+	[ -f \$(TARGET)-local.h ] || { \\
+	    test -f RCS/\$(TARGET)-local.h,v && co \$(TARGET)-local.h ; \\
+	    touch \$(TARGET)-local.h ; }
 
 # headers are not generated automatically, bacause it should be
 # done each time a c file is touched, which is too much...
