@@ -2,6 +2,11 @@
   *
   * Remi Triolet
   *
+  * Warning: do not use user_error() when processing must be interrupted,
+  * but ParserError() which fixes global variables and leaves a consistent
+  * symbol table. Use user_warning() to display additional information if
+  * ParserError() is too terse.
+  *
   * Bugs:
   *  - IO control info list should be checked; undected errors are likely
   *    to induce core dumps in effects computation; Francois Irigoin;
@@ -900,12 +905,23 @@ dataconst: const_simple
 	    {
 		/* Cachan bug 4: there should be a check about the entity
 		 * returned as $1 because MakeDatVal() is going to try
-		 * to evaluate that expression. FI: I need to look at
-		 * the Fortran standard to understand the why of this rule.
+		 * to evaluate that expression. The entity must be a
+		 * parameter.
 		 */
-		$$ = make_expression(make_syntax(is_syntax_call,
-						 make_call($1, NIL)), 
-				     normalized_undefined);
+		if(symbolic_constant_entity_p($1)) {
+		    $$ = make_expression(make_syntax(is_syntax_call,
+						     make_call($1, NIL)), 
+					 normalized_undefined);
+		}
+		else {
+		    user_warning("gram", "Symbolic constant expected: %s\n",
+			       entity_local_name($1));
+		    if(strcmp("Z", entity_local_name($1))==0) {
+			user_warning("gram",
+				   "Might be a non supported hexadecimal constant\n");
+		    }
+		    ParserError("gram", "Error in initializer");
+		}
 	    }
 	;
 
