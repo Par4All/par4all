@@ -17,6 +17,9 @@
  * $Id$
  *
  * $Log: Console.java,v $
+ * Revision 1.2  1998/10/16 13:40:56  coelho
+ * fixed.
+ *
  * Revision 1.1  1998/06/30 17:35:33  coelho
  * Initial revision
  *
@@ -49,8 +52,8 @@ package JPips;
 import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.swing.*;
-import java.awt.swing.border.*;
+import com.sun.java.swing.*;
+import com.sun.java.swing.border.*;
 
 
 /**
@@ -107,19 +110,18 @@ public class Console extends JFrame implements StreamObserver
       /* Create a Panel to get it in the ConsoleLinePanel because the
          CardLayout freeze by using the entire Frame event if the
          Frame is a container... RK. */
-      console_panel = new JPanel(new BorderLayout()) {
-         public Dimension getPreferredSize() {
-            return new Dimension(300, 200);
-         }
-         };
+      console_panel = new JPanel(new BorderLayout() {
+	  public Dimension getPreferredSize() {
+	      return new Dimension(300, 200);
+	  }
+      });
       
-      addWindowListener(new WindowAdapter()
-                        {
-                           public void windowClosing(WindowEvent e) 
-                              {
-                                 setVisible(false);
-                              }
-                        });
+      addWindowListener(new WindowAdapter() {
+	  public void windowClosing(WindowEvent e) 
+	      {
+		  setVisible(false);
+	      }
+      });
 
       // A scrollable JTextArea:
       aTextArea = new JTextArea();
