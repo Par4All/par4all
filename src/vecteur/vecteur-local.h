@@ -25,9 +25,6 @@
 #define VECTEUR 1006	/* constante associee a un vecteur	*/
 #endif
 
-#ifndef VECTEUR_INCLUDED
-#define VECTEUR_INCLUDED
-
 /* le type des variables (ou coordonnees) dans les vecteurs */
 typedef char * Variable;
 
@@ -113,5 +110,3 @@ typedef struct Svecteur Sbase, * Pbase;
 #define OFL_CTRL 2     /* overflows are treated in the called procedure */
 #define FWD_OFL_CTRL 1 /* overflows are treated by the calling procedure */
 #define NO_OFL_CTRL 0  /* overflows are not trapped at all  (dangerous !) */
-
-#endif /* VECTEUR_INCLUDED */
