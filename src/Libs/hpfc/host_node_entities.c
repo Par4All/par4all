@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: host_node_entities.c,v $
+ * Revision 1.25  1997/08/04 13:55:09  coelho
+ * *** empty log message ***
+ *
  * Revision 1.24  1997/07/21 14:00:58  keryell
  * Replaced %x format by %p.
  *
@@ -16,9 +19,10 @@
 #include "defines-local.h"
 
 #include "control.h"
-#include "regions.h"
 #include "semantics.h"
-#include "effects.h"
+#include "effects-generic.h"
+#include "effects-simple.h"
+#include "effects-convex.h"
 
 /*      HOST AND NODE ENTITIES MANAGEMENT
  */
