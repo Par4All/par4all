@@ -16,6 +16,7 @@
 %token CALLERS
 %token ALL
 %token SELECT
+%token COMPILATION_UNIT
 %token REQUIRED
 %token PRODUCED
 %token MODIFIED
@@ -162,6 +163,8 @@ owner:		PROGRAM
 		{ $$ = make_owner(is_owner_all, UU); }
 	|	SELECT
 		{ $$ = make_owner(is_owner_select, UU); }
+	|	COMPILATION_UNIT
+		{ $$ = make_owner(is_owner_compilation_unit, UU); }
 	;
 
 phase:		NAME
@@ -213,6 +216,9 @@ fprint_virtual_resources(FILE *fd, string dir, list lrv)
 	    break;
 	case is_owner_select:
 	    fprintf(fd, "    %s select.%s\n", dir, n);
+	    break;
+	case is_owner_compilation_unit:
+	    fprintf(fd, "    %s compilation_unit.%s\n", dir, n);
 	    break;
 	default:
 	    pips_internal_error("bad owner tag (%d)\n", owner_tag(o));
