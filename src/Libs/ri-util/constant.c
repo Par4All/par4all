@@ -80,6 +80,12 @@ tag t;
 	return(e);
 }
 
+
+/* BEGIN_EOLE */ /* - please do not remove this line */
+/* Lines between BEGIN_EOLE and END_EOLE tags are automatically included
+   in the EOLE project (JZ - 11/98) */
+
+
 /* This function creates a constant. a constant is represented in our
 internal representation by a function. Its name is the name of the
 constant, its type is a functional that gives the type of the constant,
@@ -133,6 +139,9 @@ make_constant_entity(
 
     return(e);
 }
+
+/* END_EOLE */
+
 
 entity 
 MakeConstant(name, bt)
