@@ -1,7 +1,7 @@
 /*
  * Messages handling
  *
- * $RCSfile: messages.c,v $ ($Date: 1994/12/22 16:52:21 $, )
+ * $RCSfile: messages.c,v $ ($Date: 1994/12/27 08:53:21 $, )
  * version $Revision$
  * got on %D%, %T%
  * 
@@ -33,192 +33,58 @@ extern int      fprintf();
 entity CreateIntrinsic(string name); /* in syntax.h */
 
 /*
- *
- *
- * every required conditions are supposed to be verified in this function.
- */
-statement messages_handling(Ro, lRo)
-list Ro, lRo;
+static expression make_addition(e1, e2)
+expression e1, e2;
 {
-    list
-	lm1  = NIL,
-	lm2  = NIL,
-	lm2p = NIL,
-	lm3  = NIL,
-	lm3p = NIL,
-	lm4  = NIL,
-	lms  = NIL,
-	lmr  = NIL,
-	lsend = NIL,
-	lreceive = NIL;
-    int
-	len = gen_length(Ro);
-    
-    assert(len==gen_length(lRo) && len>=1);
+    expression
+	e = MakeBinaryCall(CreateIntrinsic(PLUS_OPERATOR_NAME), e1, e2);
 
-    /*
-     * first kind of messages generation
-     *
-     * a message is 
-     * an array,
-     * a mixed content on the local array,
-     * a set of neighbours (in a Pvecteur) and
-     * an array section concerned.
-     */
-    lm1 = messages_generation(Ro, lRo);
-
-    debug(6, "messages_handling",
-	  "lm1 length is %d\n", gen_length(lm1));
-    ifdebug(8)
-    {
-	fprint_lmessage(stderr, lm1);
-    }
-
-    /*
-     * second kind of messages generation
-     *
-     * messages are atomized to real messages:
-     * a message is 
-     * an array, 
-     * a content (on the local array),
-     * a neighbour to send to (in a Pvecteur),
-     * a domain of the array concerned.
-     */
-    lm2 = messages_atomization(lm1);
-    gen_free_list(lm1);
-
-    debug(6, "messages_handling",
-	  "lm2 length is %d\n", gen_length(lm2));
-    ifdebug(8)
-    {
-	fprint_lmessage(stderr, lm2);
-    }
-
-    lm2p = keep_non_empty_messages_with_destination(lm2);
-    gen_free_list(lm2);
-
-    debug(6, "messages_handling",
-	  "lm2p length is %d\n", gen_length(lm2p));
-    ifdebug(8)
-    {
-	fprint_lmessage(stderr, lm2p);
-    }
-
-
-    /*
-     * third kind of messages generation
-     *
-     * the domain is restricted to what is necessary for the
-     * given message, and this on every distributed dimension...
-     * this is important for the guards generation later on.
-     */
-    lm3 = messages_shaping(lm2p);
-    gen_free_list(lm2p);
-
-    debug(6, "messages_handling",
-	  "lm3 length is %d\n", gen_length(lm3));
-    ifdebug(8)
-    {
-	fprint_lmessage(stderr, lm3);
-    }
-
-
-    lm3p = keep_non_empty_domain_messages(lm3);
-    gen_free_list(lm3);
-
-    debug(6, "messages_handling", "lm3p length is %d\n", gen_length(lm3p));
-    ifdebug(8) fprint_lmessage(stderr, lm3p);
-
-    /*
-     * fourth kind of messages generation
-     * 
-     * the array section domain is translated into a processors section,
-     * and the neighbour shift is computed for the linearized processors 
-     * arrangement considered in the runtime resolution.
-     */
-    lm4 = messages_guards_and_neighbour(lm3p);
-    gen_free_list(lm3p);
-    
-    debug(6, "messages_handling", "lm4 length is %d\n", gen_length(lm4));
-    ifdebug(8) fprint_lmessage(stderr, lm4);
-
-    /*
-     * here should be performed some message coalescing and/or aggregation:
-     *
-     * a first simple version could check for messages sent twice, and so on.
-     */
-
-    user_warning("messages_handling", 
-		 "messages coalescing and aggregation not implemented yet\n");
-
-    lms = remove_stammering_messages(lm4);
-
-    /*
-     * receive generation
-     *
-     * the message list on the receiver point of view is computed.
-     */
-    lmr = receive_messages_generation(lms);
-
-    debug(6, "messages_handling",
-	  "lmr length is %d, and lms length is %d\n", 
-	  gen_length(lmr), gen_length(lms));
-    ifdebug(8)
-    {
-	fprint_lmessage(stderr, lmr);
-    }
-    ifdebug(8)
-    {
-	fprint_lmessage(stderr, lms);
-    }
-
-    /*
-     * 
-     *
-     *
-     */
-    lsend = generate_the_messages(lms, SEND);
-    lreceive = generate_the_messages(lmr, RECEIVE);
-
-    return(make_block_statement(gen_nconc(lsend, lreceive)));    
+    return(e);
 }
 
-/*
- * list messages_generation(Ro, lRo)
- *
- * first kind of messages generation 
- * (the overlap management is handled in message_manageable_p())
- */
-list messages_generation(Ro, lRo)
-list Ro, lRo;
+static expression add_to(e, i)
+expression e;
+int i;
 {
-    list
-	lm = NIL,
-	lr = NIL,
-	lp = NIL;
-   
-    for (lr=Ro, lp=lRo ; lr!=NIL ; lr=CDR(lr), lp=CDR(lp))
+    int val=-1;
+    expression result = expression_undefined;
+
+    if (i==0) return(copy_expression(e));
+
+    if (hpfc_integer_constant_expression_p(e, &val))
+	result = int_to_expression(val+i);
+    else
     {
-	reference
-	    r = syntax_reference(SYNTAX(CAR(lr)));
-	entity
-	    array = reference_variable(r);
-	list
-	    li  = reference_indices(r),
-	    lkv = CONSP(CAR(lp)),
-	    lk  = CONSP(CAR(lkv)),
-	    lv  = CONSP(CAR(CDR(lkv)));
-	int
-	    len = gen_length(li);
-
-	assert(len==gen_length(lk) && len==gen_length(lv));
-
-	lm = CONS(MESSAGE,
-		  generate_one_message(array, li, lk, lv),
-		  lm);	  
+	result = make_addition(copy_expression(e), int_to_expression(i));
+	expression_normalized(result) = 
+	    normalize_call(syntax_call(expression_syntax(result)));
     }
 
-    return(lm);
+    return(result);
+}
+*/
+
+/*  ????
+ */
+static expression safe_static_domain_bound(array, dim, e, shift, lower)
+entity array;
+int dim;
+expression e;
+int shift;
+bool lower;
+{
+    expression result;
+    int l=0, u=0, tmp=-1;
+
+    if (hpfc_integer_constant_expression_p(e, &tmp))
+	result = int_to_expression(tmp+shift);
+    else
+    {
+	get_entity_dimensions(array, dim, &l, &u);
+	result = int_to_expression(lower ? l : u);
+    }
+
+    return(result);
 }
 
 /*
@@ -227,7 +93,7 @@ list Ro, lRo;
  * generate one message after the reference given,
  * 
  */
-message generate_one_message(array, li, lk, lv)
+static message generate_one_message(array, li, lk, lv)
 entity array;
 list li, lk, lv;
 {
@@ -242,10 +108,10 @@ list li, lk, lv;
 	ldom = NIL;
     entity
 	newarray = load_entity_node_new(array);
-/*	proc = template_to_processors(array_to_template(array));*/
     Pvecteur
 	procv = VECTEUR_NUL;
     
+    assert(len==gen_length(lk) && len==gen_length(lv));
 
     for ( ; i<=len ; i++, lip=CDR(lip), lkp=CDR(lkp), lvp=CDR(lvp))
     {
@@ -277,7 +143,6 @@ list li, lk, lv;
 	    int
 		cst = vect_coeff(TCST, v),
 		tpl = vect_coeff(TEMPLATEV, v),
-/*		dlt = vect_coeff(DELTAV, v), */
 		localarraycell = template_cell_local_mapping(array, i, tpl);
 
 	    /* no neighbour concerned */
@@ -312,10 +177,9 @@ list li, lk, lv;
 		procdim,
 		shift = vect_coeff(TSHIFTV, v),
 		ishft = vect_coeff(TCST, v),
-		lb    = HpfcExpressionToInt(range_lower(rg)),
-		ub    = HpfcExpressionToInt(range_upper(rg)),
-/*		in    = HpfcExpressionToInt(range_increment(rg)), */
 		n     = DistributionParameterOfArrayDim(array, i, &procdim);
+	    expression
+		dom_lb, dom_ub;
 
 	    debug(10, "generate_one_message",
 		  "n = %d, just to avoid a gcc warning:-)\n", n);
@@ -362,13 +226,21 @@ list li, lk, lv;
 					NIL));
 	    }
 
+	    /* assert(gen_consistent_p(rg)); */
+
+	    dom_lb = safe_static_domain_bound(array, i, 
+					      range_lower(rg), ishft, TRUE);
+	    dom_ub = safe_static_domain_bound(array, i, 
+					      range_upper(rg), ishft, FALSE);
+
 	    /* domain */
-	    ldom = gen_nconc(ldom,
-			     CONS(RANGE,
-				  make_range(int_to_expression(lb+ishft),
-					     int_to_expression(ub+ishft),
-					     int_to_expression(1)), /* ??? why 1 */
-				  NIL));
+	    ldom = 
+		gen_nconc(ldom,
+			  CONS(RANGE,
+			       make_range(dom_lb,
+					  dom_ub,
+					  int_to_expression(1)), /* ??? why 1 */
+			       NIL));
 	    
 	    break;
 	}
@@ -406,27 +278,28 @@ list li, lk, lv;
 	    int
 		shift = vect_coeff(TCST, v),
 		ishft = vect_coeff(TCST, v),
-/*		in    = HpfcExpressionToInt(range_increment(rg)), */
 		lb    = HpfcExpressionToInt(range_lower(rg)),
 		ub    = HpfcExpressionToInt(range_upper(rg));
 	    
 	    /* no neighbour */
 	    /* content: all shifted space indexed */
 	    /* ??? false if declaration shift */
-	    lr = gen_nconc(lr,
-			   CONS(RANGE,
-				make_range(int_to_expression(lb+shift),
-					   int_to_expression(ub+shift),
-					   int_to_expression(1)),
-				    NIL));
+	    lr = 
+		gen_nconc(lr,
+			  CONS(RANGE,
+			       make_range(int_to_expression(lb+shift),
+					  int_to_expression(ub+shift),
+					  int_to_expression(1)),
+			       NIL));
 
 	    /* domain */
-	    ldom = gen_nconc(ldom,
-			     CONS(RANGE,
-				  make_range(int_to_expression(lb+ishft),
-					     int_to_expression(ub+ishft),
-					     int_to_expression(1)), /* ??? why 1 */
-				  NIL));
+	    ldom = 
+		gen_nconc(ldom,
+			  CONS(RANGE,
+			       make_range(int_to_expression(lb+ishft),
+					  int_to_expression(ub+ishft),
+					  int_to_expression(1)), /* ??? why 1 */
+			       NIL));
 	    
 
 	    break;
@@ -498,32 +371,47 @@ list li, lk, lv;
 }
 
 /*
- * list messages_atomization(lm1)
+ * list messages_generation(Ro, lRo)
  *
- *
+ * first kind of messages generation 
+ * (the overlap management is handled in message_manageable_p())
  */
-list messages_atomization(lm1)
-list lm1;
+static list messages_generation(Ro, lRo)
+list Ro, lRo;
 {
     list
-	lm2 = NIL;
+	lm = NIL,
+	lr = NIL,
+	lp = NIL;
+   
+    for (lr=Ro, lp=lRo ; lr!=NIL ; lr=CDR(lr), lp=CDR(lp))
+    {
+	reference
+	    r = syntax_reference(SYNTAX(CAR(lr)));
+	entity
+	    array = reference_variable(r);
+	list
+	    li  = reference_indices(r),
+	    lkv = CONSP(CAR(lp)),
+	    lk  = CONSP(CAR(lkv)),
+	    lv  = CONSP(CAR(CDR(lkv)));
+	int
+	    len = gen_length(li);
 
-    MAPL(cm,
-     {
-	 message
-	     m = MESSAGE(CAR(cm));
-	 
-	 lm2 = gen_nconc(atomize_one_message(m), lm2);
-     },
-	 lm1);
+	assert(len==gen_length(lk) && len==gen_length(lv));
 
-    return(lm2);
+	lm = CONS(MESSAGE,
+		  generate_one_message(array, li, lk, lv),
+		  lm);	  
+    }
+
+    return(lm);
 }
 
 /*
  * list atomize_one_message(m)
  */
-list atomize_one_message(m)
+static list atomize_one_message(m)
 message m;
 {
     entity
@@ -605,10 +493,28 @@ message m;
     return(lm);
 }
 
+static list messages_atomization(lm1)
+list lm1;
+{
+    list
+	lm2 = NIL;
+
+    MAPL(cm,
+     {
+	 message
+	     m = MESSAGE(CAR(cm));
+	 
+	 lm2 = gen_nconc(atomize_one_message(m), lm2);
+     },
+	 lm1);
+
+    return(lm2);
+}
+
 /*
  * list keep_non_empty_messages_with_destination(l)
  */
-list keep_non_empty_messages_with_destination(l)
+static list keep_non_empty_messages_with_destination(l)
 list l;
 {
     list
@@ -632,7 +538,7 @@ list l;
 /*
  * list keep_non_empty_domain_messages
  */
-list keep_non_empty_domain_messages(l)
+static list keep_non_empty_domain_messages(l)
 list l;
 {
     list
@@ -653,32 +559,11 @@ list l;
 }
 
 /*
- * list messages_shaping(l)
- */
-list messages_shaping(l)
-list l;
-{
-    list
-	result = NIL;
-    
-    MAPL(cm,
-     {
-	 message
-	     m = MESSAGE(CAR(cm));
-
-	 result = CONS(MESSAGE, shape_one_message(m), result);
-     },
-	 l);
-
-    return(result);
-}
-
-/*
  * message shape_one_message(m)
  *
  * caution, rate==1 is assumed.
  */
-message shape_one_message(m)
+static message shape_one_message(m)
 message m;
 {
     entity
@@ -737,32 +622,25 @@ message m;
     return(m);
 }
 
-
-/*
- * list messages_guards(l)
- */
-list messages_guards_and_neighbour(l)
+static list messages_shaping(l)
 list l;
 {
     list
 	result = NIL;
-
+    
     MAPL(cm,
      {
 	 message
 	     m = MESSAGE(CAR(cm));
-	 
-	 result = CONS(MESSAGE, one_message_guards_and_neighbour(m), result);
+
+	 result = CONS(MESSAGE, shape_one_message(m), result);
      },
 	 l);
-    
+
     return(result);
 }
 
-/*
- * message one_message_guards(m)
- */
-message one_message_guards_and_neighbour(m)
+static message one_message_guards_and_neighbour(m)
 message m;
 {
     Pvecteur
@@ -805,13 +683,47 @@ message m;
     return(m);
 }
 
+static list messages_guards_and_neighbour(l)
+list l;
+{
+    list
+	result = NIL;
+
+    MAPL(cm,
+     {
+	 message
+	     m = MESSAGE(CAR(cm));
+	 
+	 result = CONS(MESSAGE, one_message_guards_and_neighbour(m), result);
+     },
+	 l);
+    
+    return(result);
+}
+
+
+static message one_receive_message(send)
+message send;
+{
+    entity
+	array = message_array(send);
+    Pvecteur
+	sendneighbour = (Pvecteur) message_neighbour(send),
+	neighbour = vect_new(TCST, - (int) vect_coeff(TCST, sendneighbour));
+    list
+	content = compute_receive_content(array, message_content(send), sendneighbour),
+	domain  = compute_receive_domain(message_dom(send), sendneighbour);
+
+    return(make_message(array, content, neighbour, domain));
+}
+
 /*
  * list receive_messages_generation(lms)
  *
  * this function must warranty that all messages send will be received,
  * so the messages are symetric.
  */
-list receive_messages_generation(lms)
+static list receive_messages_generation(lms)
 list lms;
 {
     list
@@ -832,50 +744,13 @@ list lms;
 }
 
 /*
- * message one_receive_message(send)
- */
-message one_receive_message(send)
-message send;
-{
-    entity
-	array = message_array(send);
-    Pvecteur
-	sendneighbour = (Pvecteur) message_neighbour(send),
-	neighbour = vect_new(TCST, - (int) vect_coeff(TCST, sendneighbour));
-    list
-	content = compute_receive_content(array, message_content(send), sendneighbour),
-	domain  = compute_receive_domain(message_dom(send), sendneighbour);
-
-    return(make_message(array, content, neighbour, domain));
-}
-
-/*
- * list generate_the_messages(lm)
- */
-list generate_the_messages(lm, bsend)
-list lm;
-bool bsend;
-{
-    list
-	l = NIL;
-
-    MAPL(cm,
-     {
-	 l = CONS(STATEMENT, st_one_message(MESSAGE(CAR(cm)), bsend), l);
-     },
-	 lm);
-
-    return(l);
-}
-
-/*
  * statement st_one_message(m, bsend)
  *
  * this function will have to be modified in order to include 
  * message coalescing and aggregation. Here, a direct call to
  * a function that packs and passes the message is made.
  */
-statement st_one_message(m, bsend)
+static statement st_one_message(m, bsend)
 message m;
 bool bsend;
 {
@@ -925,12 +800,28 @@ bool bsend;
     return(result);
 }
 
+static list generate_the_messages(lm, bsend)
+list lm;
+bool bsend;
+{
+    list
+	l = NIL;
+
+    MAPL(cm,
+     {
+	 l = CONS(STATEMENT, st_one_message(MESSAGE(CAR(cm)), bsend), l);
+     },
+	 lm);
+
+    return(l);
+}
+
 /*
  * list remove_stammering_messages(lm)
  *
  * remove messages that are contained in another message
  */
-list remove_stammering_messages(lm)
+static list remove_stammering_messages(lm)
 list lm;
 {
     list
@@ -948,4 +839,139 @@ list lm;
 	 lm);
 
     return(kept);
+}
+
+/*
+ *
+ *
+ * every required conditions are supposed to be verified in this function.
+ */
+statement messages_handling(Ro, lRo)
+list Ro, lRo;
+{
+    list
+	lm1  = NIL,
+	lm2  = NIL,
+	lm2p = NIL,
+	lm3  = NIL,
+	lm3p = NIL,
+	lm4  = NIL,
+	lms  = NIL,
+	lmr  = NIL,
+	lsend = NIL,
+	lreceive = NIL;
+    int
+	len = gen_length(Ro);
+    
+    assert(len==gen_length(lRo) && len>=1);
+
+    /* first kind of messages generation
+     *
+     * a message is 
+     * an array,
+     * a mixed content on the local array,
+     * a set of neighbours (in a Pvecteur) and
+     * an array section concerned.
+     */
+    lm1 = messages_generation(Ro, lRo);
+
+    debug(6, "messages_handling", "lm1 length is %d\n", gen_length(lm1));
+    ifdebug(8)
+    {
+	fprint_lmessage(stderr, lm1);
+    }
+
+    /*
+     * second kind of messages generation
+     *
+     * messages are atomized to real messages:
+     * a message is 
+     * an array, 
+     * a content (on the local array),
+     * a neighbour to send to (in a Pvecteur),
+     * a domain of the array concerned.
+     */
+    lm2 = messages_atomization(lm1);
+    gen_free_list(lm1);
+
+    debug(6, "messages_handling",
+	  "lm2 length is %d\n", gen_length(lm2));
+    ifdebug(8)
+    {
+	fprint_lmessage(stderr, lm2);
+    }
+
+    lm2p = keep_non_empty_messages_with_destination(lm2);
+    gen_free_list(lm2);
+
+    debug(6, "messages_handling",
+	  "lm2p length is %d\n", gen_length(lm2p));
+    ifdebug(8)
+    {
+	fprint_lmessage(stderr, lm2p);
+    }
+
+
+    /*
+     * third kind of messages generation
+     *
+     * the domain is restricted to what is necessary for the
+     * given message, and this on every distributed dimension...
+     * this is important for the guards generation later on.
+     */
+    lm3 = messages_shaping(lm2p);
+    gen_free_list(lm2p);
+
+    debug(6, "messages_handling",
+	  "lm3 length is %d\n", gen_length(lm3));
+    ifdebug(8)
+    {
+	fprint_lmessage(stderr, lm3);
+    }
+
+
+    lm3p = keep_non_empty_domain_messages(lm3);
+    gen_free_list(lm3);
+
+    debug(6, "messages_handling", "lm3p length is %d\n", gen_length(lm3p));
+    ifdebug(8) fprint_lmessage(stderr, lm3p);
+
+    /*
+     * fourth kind of messages generation
+     * 
+     * the array section domain is translated into a processors section,
+     * and the neighbour shift is computed for the linearized processors 
+     * arrangement considered in the runtime resolution.
+     */
+    lm4 = messages_guards_and_neighbour(lm3p);
+    gen_free_list(lm3p);
+    
+    debug(6, "messages_handling", "lm4 length is %d\n", gen_length(lm4));
+    ifdebug(8) fprint_lmessage(stderr, lm4);
+
+    /* here should be performed some message coalescing and/or aggregation:
+     * a first simple version could check for messages sent twice, and so on.
+     */
+    user_warning("messages_handling", 
+		 "messages coalescing and aggregation not implemented yet\n");
+
+    lms = remove_stammering_messages(lm4);
+
+    /*  RECEIVE 
+     */
+    lmr = receive_messages_generation(lms);
+
+    assert(gen_length(lmr)==gen_length(lms));
+
+    ifdebug(8)
+    {
+	fprintf(stderr, "[message handling] lmr and lms\n");
+	fprint_lmessage(stderr, lmr);
+	fprint_lmessage(stderr, lms);
+    }
+
+    lsend = generate_the_messages(lms, SEND);
+    lreceive = generate_the_messages(lmr, RECEIVE);
+
+    return(make_block_statement(gen_nconc(lsend, lreceive)));    
 }
