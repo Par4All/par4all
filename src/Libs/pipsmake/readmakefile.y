@@ -107,7 +107,7 @@ deps:		deps dir virtuals
 			else {	
 				fprintf(stderr, 
 				        "[readmakefile] unknown dir: %d\n", $2);
-				abort(1);
+				abort();
 			}
 
 			$$ = $1;
