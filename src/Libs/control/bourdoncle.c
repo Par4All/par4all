@@ -4,8 +4,10 @@
    43, Francois Bourdoncle's PhD. Define heuristically SCC and sub-SCC
    heads.
 
-   Build a set nof new data structures to represent any CFG as a recursive
-   stucture of CFG's and DAG's.
+   Build a set of new data structures to represent any CFG as a recursive
+   structure of CFG's (scc_map) and one parent DAG (ndu) and one node
+   traversal order (partition list) and a correspondance between the new
+   nodes and the original nodes (ancestor_map).
 
    Some predecessors or successors must be deleted in the recursive
    descent. These vertices are given a statement_undefined statement and
@@ -23,6 +25,10 @@
  $Id$
 
  $Log: bourdoncle.c,v $
+ Revision 1.7  2002/07/22 17:12:26  irigoin
+ A few bug fixes, assertions added, plus support functions added for
+ semantics/unstructured.c. Memory cleanup function still missing.
+
  Revision 1.6  2002/07/09 14:55:06  irigoin
  Version debugged with card.f and readin.f in SemanticsPrivate.  Profile of
  bourdoncle_partition() modified to return more information.
@@ -139,8 +145,8 @@ static void free_meaningless_control(control c)
 
 /* Check that a node is used as a test in a CFG. The associated statement
    must be a test, the number of successors must be two and the TRUE and
-   FALSE branches must be empty. */
-static bool control_test_p(control c)
+   FALSE branches must be empty. Exported for user of ND CFG's. */
+bool control_test_p(control c)
 {
   bool test_p = FALSE;
   if(!meaningless_control_p(c)) {
@@ -312,6 +318,7 @@ static void davinci_print_control_node(control c, FILE * f,
 				       bool fix_point_p)
 {
   char attributes[256];
+  bool arc_kind = TRUE;
   
   /* The same node can be an entry and an exit node. */
   attributes[0] = '\000';
@@ -344,10 +351,18 @@ static void davinci_print_control_node(control c, FILE * f,
   /* Declare arcs */
   MAPL(c_s, {
     control s = CONTROL(CAR(c_s));
-    
-    fprintf(f, "\tl(\"%p->%p\",e(\"\",[],r(\"%p\")))", c, s, s);
+
+    if(control_test_p(c)) {
+    (void) strcpy(&attributes[0], arc_kind? "green":"red");
+      fprintf(f, "\tl(\"%p->%p\",e(\"\",[a(\"EDGECOLOR\",\"%s\")],r(\"%p\")))",
+	      c, s, attributes, s);
+    }
+    else {
+      fprintf(f, "\tl(\"%p->%p\",e(\"\",[],r(\"%p\")))", c, s, s);
+    }
     
     fprintf(f, "%s\n", ENDP(CDR(c_s))? "" : ",");
+    arc_kind = !arc_kind;
   }, control_successors(c));
 
   fprintf(f,"\t]))");
@@ -601,7 +616,13 @@ static list node_to_linked_nodes(control c)
 }
 
 /* Take care of two problems: meaningless control nodes may end up shared
-   by effective nodes and they may end up uselessly numerous. */
+   by effective nodes and they may end up uselessly numerous.
+
+   FI: Two more problems could be tackled. The same node should not be
+   twice a true or twice a false successor, although a given node can be a
+   true and a false successor. gen_once() should be used to build t_succs
+   and f_succs but the assertions and the memory management should then be
+   updated. Duplicate could be chained to the u_succs(), the useless successors */
 
 static int clean_up_control_test(control c)
 {
@@ -649,26 +670,29 @@ static int clean_up_control_test(control c)
   
     for(rank=1; rank <= nts || rank <= nfs; rank++) {
       if(!ENDP(c_t_succs)) {
-	n_succs = CONS(CONTROL, CONTROL(CAR(c_t_succs)), n_succs);
+	n_succs = gen_nconc(n_succs, CONS(CONTROL, CONTROL(CAR(c_t_succs)), NIL));
 	POP(c_t_succs);
       }
       else {
 	pips_assert("The empty successor list is not empty", !ENDP(c_e_succs));
-	n_succs = CONS(CONTROL, CONTROL(CAR(c_e_succs)), n_succs);
+	n_succs = gen_nconc(n_succs, CONS(CONTROL, CONTROL(CAR(c_e_succs)), NIL));
 	POP(c_e_succs);
       }
       if(!ENDP(c_f_succs)) {
-	n_succs = CONS(CONTROL, CONTROL(CAR(c_f_succs)), n_succs);
+	n_succs = gen_nconc(n_succs, CONS(CONTROL, CONTROL(CAR(c_f_succs)), NIL));
 	POP(c_f_succs);
       }
       else {
 	pips_assert("The empty successor list is not empty", !ENDP(c_e_succs));
-	n_succs = CONS(CONTROL, CONTROL(CAR(c_e_succs)), n_succs);
+	n_succs = gen_nconc(n_succs, CONS(CONTROL, CONTROL(CAR(c_e_succs)), NIL));
 	POP(c_e_succs);
       }
     }
     pips_assert("No more true successors", ENDP(c_t_succs));
     pips_assert("No more false successors", ENDP(c_f_succs));
+    /* FI: I do not see why you are sure not to need all meaningless
+       controls... There might be no meaningless control at all. The next
+       two assertions seem too strong. */
     pips_assert("More true successors", !ENDP(c_e_succs));
 
     nel = ns - gen_length(n_succs);
@@ -730,7 +754,7 @@ static void clean_up_embedding_graph(control c)
 
   gen_free_list(el);
 
-  pips_debug(2, "End: \n");
+  pips_debug(2, "End: %d useless successors destroyed\n", nel);
 }
 
 static void print_control_to_control_mapping(string message, hash_table map)
@@ -761,8 +785,8 @@ static bool ancestor_control_p(hash_table ancestor_map, control c)
 }
 
 /* If vertex is an ancestor control node from the input control graph,
-   return vertex, else return its ancestor */
-static control control_to_ancestor(control vertex, hash_table ancestor_map)
+   return vertex, else return its ancestor. Is used in other libraries. */
+control control_to_ancestor(control vertex, hash_table ancestor_map)
 {
   control ancestor = control_undefined; 
 
@@ -772,9 +796,20 @@ static control control_to_ancestor(control vertex, hash_table ancestor_map)
     /* This assert may be too strong, but all control nodes are copied
        when just after entering bourdoncle_partition which should make it
        correct. */
-    pips_assert("ancestor really is an ancestor",
-		ancestor_control_p(ancestor_map, ancestor));
+    /* Theoretically only useful when HASH_UNDEFINED_VALUE has been
+       returned, i.e. when ancestor==vertex */
+    if(!ancestor_control_p(ancestor_map, ancestor)) {
+      statement vs = control_statement(vertex);
+      statement as = control_statement(ancestor);
+
+      pips_debug(2, "vertex=%p with statement %s\n",
+		 vertex, statement_identification(vs));
+      pips_debug(2, "ancestor=%p with statement %s\n",
+		 ancestor, statement_identification(as));
+      pips_assert("ancestor really is an ancestor",
+		  ancestor_control_p(ancestor_map, ancestor));
     }
+  }
   
   return ancestor;
 }
@@ -1157,22 +1192,6 @@ static void insert_non_deterministic_control_node(list succs,
   }
 }
 
-/* Element ranks are strictly positive as for first, second, and so on. If
-   item is not in l, 0 is returned. */
-static int gen_position(void * item, list l)
-{
-  list c_item = list_undefined;
-  int rank = 0;
-
-  for(c_item = l; !ENDP(l); POP(l)) {
-    rank++;
-    if(item==CHUNK(CAR(c_item))) {
-      break;
-    }
-  }
-  return rank;
-}
-
 /* new_c is not consistent on entry and might not be on exit because it is
    called from within a loop */
 static void update_successors_of_predecessor(control pred, control new_c, control old_c)
@@ -1695,6 +1714,10 @@ static unstructured scc_to_dag(control root, list partition, hash_table ancestor
       pips_assert("l_root and l_new_root have an empty intersection",
 		  ENDP(l_root));
     }
+
+    clean_up_embedding_graph(root);
+
+    clean_up_embedding_graph(new_root);
     
     pips_debug(3, "Final embedding graph after replication and cycle removal\n");
     sprintf(msg, "Final embedding graph after replication and cycle removal");
@@ -2179,4 +2202,79 @@ int bourdoncle_visit(control vertex,
   }
   
   return head;
+}
+
+/*
+ * OBSERVERS TO USE THE DATASTRUCTURES BUILT BY BOURDONCLE_PARTITION()
+ *
+ *
+ */
+static unstructured ancestor_cycle_head_to_scc(control a, hash_table scc_map)
+{
+  unstructured scc_u = unstructured_undefined;
+
+  if((scc_u = (unstructured) hash_get(scc_map, (void *) a))
+     == (unstructured) (HASH_UNDEFINED_VALUE))
+    scc_u = unstructured_undefined;
+
+  return scc_u;
+}
+
+bool cycle_head_p(control c, hash_table ancestor_map, hash_table  scc_map)
+{
+  bool is_cycle = FALSE;
+  control a = control_to_ancestor(c, ancestor_map);
+  unstructured scc_u = ancestor_cycle_head_to_scc(a, scc_map);
+
+  is_cycle = !unstructured_undefined_p(scc_u);
+
+  return is_cycle;
+}
+
+unstructured cycle_head_to_scc(control c, hash_table ancestor_map, hash_table  scc_map)
+{
+  control a = control_to_ancestor(c, ancestor_map);
+  unstructured scc_u = ancestor_cycle_head_to_scc(a, scc_map);
+  return scc_u;
+}
+
+/* useful for non-deterministic control flow graph only */
+
+/* There exists at least one real successor of the requested kind and only
+   meaningless successors of the other kind. */
+bool one_successor_kind_only_p(control c, bool true_p)
+{
+  bool one_kind_only_p = FALSE;
+  bool is_true_successor_p = TRUE;
+  bool real_successor_found_p = FALSE;
+  list succs = control_successors(c);
+
+  pips_assert("c is a test", control_test_p(c));
+
+  MAP(CONTROL, s, {
+    if(is_true_successor_p && true_p) {
+      real_successor_found_p |= !meaningless_control_p(s);
+    }
+    else {
+      one_kind_only_p &= meaningless_control_p(s);
+    }
+  }, succs);
+
+  one_kind_only_p &= real_successor_found_p;
+
+  return one_kind_only_p;
+}
+
+bool true_successors_only_p(control c)
+{
+  bool true_only_p = FALSE;
+  true_only_p = one_successor_kind_only_p(c, TRUE);
+  return true_only_p;
+}
+
+bool false_successors_only_p(control c)
+{
+  bool true_only_p = FALSE;
+  true_only_p = one_successor_kind_only_p(c, TRUE);
+  return true_only_p;
 }
