@@ -1,0 +1,30 @@
+#! /bin/sh
+
+#
+# Select [-w wspace] rule[,rule]...
+#
+
+USAGE="Usage: Select [-w wspace] rule [rule] ..."
+
+if [ $# -eq 0 ]
+then	echo $USAGE >&2
+	exit 2
+fi
+
+while getopts w: opt
+do
+	case $opt in
+	w)	OPT_PGM=$OPTARG;;
+	\?)	echo $USAGE >&2
+		exit 2;;
+	esac
+done
+shift `expr $OPTIND - 1`
+
+if [ -z "$*" ]
+then
+	echo $USAGE >&2
+	exit 1
+fi
+
+Pips -w "$OPT_PGM" -s "$*" || exit 1;
