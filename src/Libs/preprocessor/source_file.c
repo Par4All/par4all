@@ -143,6 +143,11 @@ build_view_file(char * print_type)
 {
    char * module_name = db_get_current_module_name();
 
+   if(!unloadable_file_p(print_type)) {
+       user_error("build_view_file", "resource %s cannot be displayed\n",
+		   print_type);
+   }
+
    if(module_name != NULL) {
       if ( safe_make(print_type, module_name) ) {
          static char file_name_in_database[MAXPATHLEN];
