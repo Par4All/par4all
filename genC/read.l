@@ -90,7 +90,7 @@ int yyinput()
 }
 #endif
 
-yywrap()
+int yywrap(void)
 {
 #ifdef FLEX_SCANNER
     yy_init = 1 ;
