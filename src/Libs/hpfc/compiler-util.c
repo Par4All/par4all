@@ -2,7 +2,7 @@
  *
  * Fabien Coelho, May 1993
  *
- * $RCSfile: compiler-util.c,v $ ($Date: 1996/06/12 16:39:39 $, )
+ * $RCSfile: compiler-util.c,v $ ($Date: 1996/06/12 17:42:14 $, )
  * version $Revision$
  */
 
@@ -28,12 +28,15 @@ static bool cannot_be_empty(gen_chunk* x)
 
 static bool call_filter(call c)
 {
-    return ENTITY_CONTINUE_P(call_function(c)) || cannot_be_empty(c);
+    if (ENTITY_CONTINUE_P(call_function(c)))
+	return FALSE;
+    else
+	return cannot_be_empty(c);
 }
 
 bool hpfc_empty_statement_p(statement s)
 {
-    if (!s || statement_undefined_p(s)) 
+    if ((!s) || statement_undefined_p(s)) 
 	return TRUE;
 
     statement_is_empty = TRUE;
@@ -42,6 +45,7 @@ bool hpfc_empty_statement_p(statement s)
 		      loop_domain, cannot_be_empty, gen_null,
 		      call_domain, call_filter, gen_null,
 		      NULL);
+
     return statement_is_empty;
 }
 
