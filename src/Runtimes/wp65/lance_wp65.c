@@ -44,21 +44,6 @@ main(int argc, char *argv[])
   char *argv_fils[3], *debut_basename, *p, *chaine_env;
   int niveau_debug_pvm;
 
-  if (argc == 2)
-    /* Suppose que c'est le debug_level passé aux fils */
-    set_debug_level(atoi(argv[1]));
-  else {
-    /* Sinon, on le récupère dans l'environnement : */
-    debug_on(ENV_DEBUG);
-    sprintf(chaine, "%d", get_debug_level());
-    argv_fils[0] = argv[0];
-    argv_fils[1] = chaine;
-    argv_fils[2] = (char *) NULL;
-    argv = argv_fils;
-  }
-    
-/* set_debug_level(2); */
-      
   mytid = pvm_mytid();
   tids[0] = pvm_parent();
 
@@ -72,13 +57,22 @@ main(int argc, char *argv[])
 	/* Dans UNIX, un nom d'exécutable ne peut terminer par un "/". */
       p++;
     }
+    argv_fils[0] = debut_basename;
+    argv_fils[1] = (char *) NULL;
+    argv_fils[2] = (char *) NULL;
+    /* Si on est sous X11 on passe le DISPLAY comme premier argument.
+       Magouille sordide pour faire marcher debugger légèrement
+       modifié... */
+    chaine_env = getenv("DISPLAY");
+    if (chaine_env != NULL)
+      argv_fils[1] = chaine_env;
 
     if (get_debug_level() >= 3)
       niveau_debug_pvm = PvmTaskDebug;
     else
       niveau_debug_pvm = PvmTaskDefault;
 
-    nb_t = pvm_spawn(debut_basename, argv,
+    nb_t = pvm_spawn(debut_basename, argv_fils,
 		     niveau_debug_pvm, 
 		     "*", 
 		     nb_taches - 1, 
@@ -186,7 +180,7 @@ void send_4(int tid, float *donnee, int taille)
   testerreur("pvm_pack",
 	     pvm_pkfloat(donnee, taille, 1));
   debug(5, "send_4",
-	"pvm_send vers tid 0x%x\n", tid);
+	"pvm_send de tid 0x%x vers tid 0x%x\n", mytid, tid);
   testerreur("pvm_send",
 	     pvm_send(tid, 0));
 }
@@ -195,7 +189,7 @@ void send_4(int tid, float *donnee, int taille)
 void receive_4(int tid, float *donnee, int taille)
 {
   debug(5, "receive_4",
-	"pvm_recv depuis le tid 0x%x\n", tid);
+	"pvm_recv de tid 0x%x depuis le tid 0x%x\n", mytid, tid);
   testerreur("pvm_recv",
 	     (int) pvm_recv(tid, 0));
   testerreur("pvm_unpack",
