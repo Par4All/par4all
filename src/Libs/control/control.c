@@ -474,8 +474,7 @@ control c_end ;
 	    c_last = c_res;
 	}
 	if(!instruction_block_p(i=statement_instruction(st))) {
-	    i = make_instruction(is_instruction_block,
-				 CONS(STATEMENT, st, NIL));
+	    i = make_instruction_block(CONS(STATEMENT, st, NIL));
 	    control_statement(c_res) =
 		make_statement(entity_empty_label(), 
 			       STATEMENT_NUMBER_UNDEFINED,
