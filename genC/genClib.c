@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1997/04/28 17:32:39 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1997/07/22 12:57:31 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -100,8 +100,8 @@ gen_chunk *obj ;
     message_assert("No NULL object", obj!=NULL);
     message_assert("No undefined object", obj!=gen_chunk_undefined);
     if ((obj->i)<0 || (obj->i)>=MAX_DOMAIN) 
-	fatal("Inconsistent domain number %d (0x%x) found\n", 
-	      obj->i, (unsigned int) obj);
+	fatal("Inconsistent domain number %d (%p) found\n", 
+	      obj->i, obj);
     return obj->i;
 }
 
@@ -700,7 +700,7 @@ gen_trav_obj( obj, dr )
 	if( gen_debug & GEN_DBG_TRAV_OBJECT )
 	{
 	    fprintf_spaces( stderr, gen_debug_indent++ ) ;
-	    (void) fprintf( stderr, "trav_obj (0x%x) ", (unsigned int) obj) ;
+	    (void) fprintf( stderr, "trav_obj (%p) ", obj) ;
 	    print_domain( stderr, dp ) ;
 	    (void) fprintf( stderr, "\n" ) ;
 	}
@@ -1169,7 +1169,7 @@ copy_hsearch(gen_chunk *key)
 
     if ((p=(gen_chunk *)hash_get( copy_table, (char *)key ))==
 	(gen_chunk *)HASH_UNDEFINED_VALUE) {
-	fatal( "[copy_hsearch] bad key: %s\n", itoa( (int) key ));
+	fatal( "[copy_hsearch] bad key: %p\n", key );
     }
     return(p);
 }
@@ -1655,7 +1655,7 @@ struct driver *dr ;
     if( shared_obj( obj, write_define_shared_node, write_shared_node ))
 	    return( !GO) ;
 
-    (void) fprintf( user_file, "#(#]type %d ", bp-Domains ) ;
+    (void) fprintf( user_file, "#(#]type %p ", bp-Domains ) ;
 
     if( IS_TABULATED( bp )) {
 	(void) fprintf( user_file, "%d ", abs( (obj+1)->i )) ;
@@ -2378,7 +2378,7 @@ char *p ;
 char *type ;
 {
   if( hash_get( pointers, p ) != HASH_UNDEFINED_VALUE ) {
-      user("Sharing of %s detected on 0x%x", type, (int) p ) ;
+      user("Sharing of %s detected on %p", type, p ) ;
     longjmp( env, 1 ) ;
     /* NOTREACHED*/
   }
@@ -2685,7 +2685,7 @@ GenDecisionTableType t;
 {
     int i;
     
-    fprintf(stderr, "[print_decision_table] 0x%x\n", (int) t);
+    fprintf(stderr, "[print_decision_table] %p\n", t);
 
     for (i=0; i<MAX_DOMAIN; i++)
 	if (t[i]) fprintf(stderr, "  go through %s\n", Domains[i].name);
@@ -2789,7 +2789,7 @@ union domain *dp;
     case SET_DT:
 	if (gen_debug & GEN_DBG_RECURSE)
 	    fprintf(stderr,
-		    " - setting %s (%d) contains %s (%d)\n",
+		    " - setting %s (%d) contains %s (%p)\n",
 		    Domains[target].name, target,
 		    dp->se.element->name, dp->se.element-Domains);
 	DirectDomainsTable[dp->se.element-Domains][target] = TRUE;
