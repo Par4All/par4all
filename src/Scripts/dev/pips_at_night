@@ -182,6 +182,10 @@ $debug "report=$report"
 	find ${pips_home}/Pips -name '.validate_*' -mtime +4 -print |
 	    xargs rm -rf
 
+	$verbose - Removing .pips executables in Validation...
+	find ${PIPS_ROOT}/Validation -name '[twf]pips' -o -name pips -print |
+	    xargs rm -f
+
 	$verbose - Removing generated files in Production...
 	msg="${msg}C"
         makeit nlp cleaning $report full-clean .
