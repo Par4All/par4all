@@ -1123,13 +1123,13 @@ call_to_postcondition(
     entity e = call_function(c);
     tag tt;
 
-    debug(8,"call_to_postcondition","begin\n");
+    pips_debug(8,"begin\n");
 
     switch (tt = value_tag(entity_initial(e))) {
       case is_value_intrinsic:
 	/* there is room for improvement because assign is now the only 
 	   well handled intrinsic */
-	debug(5, "call_to_postcondition", "intrinsic function %s\n",
+	pips_debug(5, "intrinsic function %s\n",
 	      entity_name(e));
 	post = transformer_apply(tf, pre);
 	/* propagate precondition pre as summary precondition 
@@ -1143,8 +1143,7 @@ call_to_postcondition(
 	   */
 	break;
       case is_value_code:
-	debug(5, "call_to_postcondition", "external function %s\n",
-	      entity_name(e));
+	pips_debug(5, "external function %s\n", entity_name(e));
 	if(get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
 	    /*
 	      list args = call_arguments(c);
@@ -1162,21 +1161,19 @@ call_to_postcondition(
 	break;
       case is_value_symbolic:
       case is_value_constant:
-	pips_error("call_to_postcondition", 
-		   "call to symbolic or constant %s\n",
-		   entity_name(e));
+	pips_internal_error("call to symbolic or constant %s\n", 
+			    entity_name(e));
 	break;
       case is_value_unknown:
-	pips_error("call_to_postcondition", "unknown function %s\n",
-		   entity_name(e));
+	pips_internal_error("unknown function %s\n", entity_name(e));
 	break;
       default:
-	pips_error("call_to_postcondition", "unknown tag %d\n", tt);
+	pips_internal_error("unknown tag %d\n", tt);
     }
 
-    debug(8,"call_to_postcondition","end\n");
+    pips_debug(8,"end\n");
 
-    return(post);
+    return post;
 }
 
 /* Non-convex information can be made convexe when moving postcondition downwards
