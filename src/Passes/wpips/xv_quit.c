@@ -37,10 +37,9 @@ quit_notify(Menu menu,
 {
    Event e;
    int result;
-   database p;
+   string pn;
 
-   if ((p = db_get_current_workspace()) != database_undefined ) {
-      string pn = database_name(p);
+   if ((pn = db_get_current_workspace_name())) {
       string fmt="Workspace %s not closed";
       char str[SMALL_BUFFER_LENGTH];
       string str1, str2, menu_string;
