@@ -581,7 +581,7 @@ pips_split_file(string name, string tempfile)
 
 /********************************************** managing .F files with cpp */
 
-#define CPP_FILTERED_SUFFIX 	"_cpp_processed.f"
+#define CPP_FILTERED_SUFFIX 	".cpp_processed.f"
 
 /* pre-processor and added options from environment
  */
