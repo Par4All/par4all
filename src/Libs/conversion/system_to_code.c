@@ -3,7 +3,7 @@
  *    moved to conversion on 15 May 94
  *
  * SCCS stuff:
- * $RCSfile: system_to_code.c,v $ ($Date: 1995/10/10 12:01:12 $, ) version $Revision$, 
+ * $RCSfile: system_to_code.c,v $ ($Date: 1995/10/10 12:01:29 $, ) version $Revision$, 
  * got on %D%, %T%
  * $Id$
  */
@@ -412,7 +412,7 @@ constraints_to_loop_bound(
   }
   else
   {
-      entity operator = entity_instrinsic(is__lower ? "MAX" : "MIN");
+      entity operator = entity_instrinsic(is_lower ? "MAX" : "MIN");
       result = make_call_expression(operator, le);
   }
 
