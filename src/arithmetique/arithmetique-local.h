@@ -70,9 +70,9 @@ typedef long long int Value;
 #define VALUE_MAX LONG_LONG_MAX
 #define VALUE_SQRT_MIN long_to_value(LONG_MIN) /* ??? assumes 32 bit long */
 #define VALUE_SQRT_MAX long_to_value(LONG_MAX)
-#define VALUE_ZERO 0LL
-#define VALUE_ONE  1LL
-#define VALUE_MONE -1LL
+#define VALUE_ZERO (0LL)
+#define VALUE_ONE  (1LL)
+#define VALUE_MONE (-1LL)
 /* I can just trust myself for this...
  */
 #define VALUE_TO_LONG(val) \
