@@ -21,7 +21,7 @@ pips [\-f
 .IR boolean_property ].\|.\|.
 .I workspace
 .\"
-.SH DESCRIPTION
+.SH DESCRIPTION 
 PIPS (Paralleliseur Interprocedural de Programmes Scientifiques) is a research project from the computer science research center (CRI) at Ecole des Mines de Paris (France). It is a source to source compiler, currently supporting most of Fortran 77, to analyze and parallelize real scientific codes for shared memory multi-processor machines, and to distribute simple codes for processor networks.
 
 pips is one of the major binary programs of the PIPS project. All of
