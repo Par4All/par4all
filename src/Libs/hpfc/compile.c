@@ -1,7 +1,7 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1996/06/13 21:15:13 $, )
+ * ($Date: 1996/07/23 11:56:38 $, )
  */
 
 #include "defines-local.h"
@@ -20,8 +20,8 @@ static string
 hpfc_local_name (string name, string suffix)
 {
     static char buffer[100]; /* ??? should be enough */
-
-    return(sprintf(buffer, "%s_%s", name, suffix));
+    (void) sprintf(buffer, "%s_%s", name, suffix)
+    return buffer;
 }
 
 static string 
@@ -126,7 +126,7 @@ drop_distributed_arguments(entity module) /* of the host */
 	else
 	{
 	    if (!entity_undefined_p(ent))
-		formal_offset(storage_formal(entity_storage(ent))) = MAXINT;
+		formal_offset(storage_formal(entity_storage(ent))) = INT_MAX;
 
 	    pips_debug(8, "dropping %d argument %s\n", i, 
 		       entity_undefined_p(ent)? "undefined": entity_name(ent));
