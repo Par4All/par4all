@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1996/08/12 09:03:40 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1996/08/12 09:10:59 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -102,30 +102,35 @@ which_executable()
 #
 validate_usage()
 {
-  {
-    echo "Usage: $script [-dsvpnhtVD] [-a address] [-u xx] [-r dir] [-l dir] "
-    echo "       [-x/y pips/tpips] [-i lines] [-f file] [Modules]"
-    echo "   -d: debug"
-    echo "   -D: more debug"
-    echo "   -s: silent (default)"
-    echo "   -v: verbose"
-    echo "   -V: more verbose"
-    echo "   -p: parallel (default)"
-    echo "   -n: sequential"
-    echo "   -h: help"
-    echo "   -t: timing"
-    echo "   -a adress: mail sent to (defaut $user)"
-    echo "   -u xx: update time (default 30)"
-    echo "   -r dir: run directory (default .)"
-    echo "   -i lines: max number of lines for sending a full message"
-    echo "   -l dir: lock directory (default .)"
-    echo "   -f file: what file in a module (use with -n)"
-    echo "   -x pips: pips to be used"
-    echo "   -y tpips: tpips to be used (same defaults as pips)"
-    echo "      default -[xy]: . ./\$PIPS_ARCH \$PIPS_BINDIR/\$PIPS_ARCH type)"
-    echo "   Modules: if none, from file \$PIPS_VALIDDIR/defaults.\$PIPS_ARCH"
-    echp "            else from file \$PIPS_VALIDDIR/defaults"
-  } >&2
+  cat >&2 <<-EOF
+	$script (version $Revision$): $@
+	Description
+	  This script executes pips non regressive tests (in \$PIPS_VALIDDIR).
+	  The modules to test (script arguments) are executed in parallel on
+	  available hosts from \$PIPS_HOSTS. Reports are sent to the user.
+	Usage: $script [-dsvpnhtVD] [-a address] [-u xx] [-r dir] [-l dir]
+	       [-x/y pips/tpips] [-i lines] [-f file] [modules]
+	  -h: this help
+	  -d: debug
+	  -D: more debug
+	  -s: silent (default)
+	  -v: verbose
+	  -V: more verbose
+	  -p: parallel (default)
+	  -n: sequential
+	  -t: timing
+	  -a adress: mail sent to (defaut $user for you:-)
+	  -u xx: update time (default 30)
+	  -r dir: run directory (default .)
+	  -i lines: max number of lines for sending a full message
+	  -l dir: lock directory (default .)
+	  -f file: what file in a module (use with -n)
+	  -x pips: pips to be used
+	  -y tpips: tpips to be used (same defaults as pips)
+	     default {,t}pips: . ./\$PIPS_ARCH \$PIPS_BINDIR/\$PIPS_ARCH type)
+	  modules: if none, from file \$PIPS_VALIDDIR/defaults.\$PIPS_ARCH
+	           else from file \$PIPS_VALIDDIR/defaults
+EOF
   exit ${1:-1}
 }
 
