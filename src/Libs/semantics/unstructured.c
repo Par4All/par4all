@@ -49,6 +49,10 @@
   * $Id$
   *
   * $Log: unstructured.c,v $
+  * Revision 1.14  2003/07/24 11:00:17  irigoin
+  * Suppression of obsolete code, typedef of recursive_context to avoid
+  * useless compiler warnings
+  *
   * Revision 1.13  2002/07/19 12:09:58  irigoin
   * First draft of the new version of unstructured.c working for all
   * Validation/unstrucnn.f with nn in[01-13]. Lots of memory leaks, code
@@ -375,26 +379,6 @@ static void store_control_fix_point(control c, transformer fptf,
 	   (void *)c, (void *) fptf);
 }
 
-static void update_control_fix_point(control c, transformer fptf,
-					 control_mapping control_fix_point_map)
-{
-  statement stat = control_statement(c);
-
-  pips_assert("The statement is defined",
-	      !meaningless_control_p(c) && !statement_undefined_p(stat));
-  pips_debug(8, "Update fix point for control %s\n",
-	     statement_identification(stat));
-  ifdebug(8) {
-    print_transformer(fptf);
-  }
-
-  pips_assert("The fix point is already defined", 
-	      hash_get((hash_table) control_fix_point_map, (void *) c)
-	      != HASH_UNDEFINED_VALUE);
-  hash_update((hash_table) (control_fix_point_map),
-	      (void *)c, (void *) fptf);
-}
-
 static control_mapping make_control_fix_point_map()
 {
   control_mapping control_fix_point_map = NULL;
@@ -415,62 +399,6 @@ static control_mapping free_control_fix_point_map(control_mapping control_fix_po
   return NULL;
 }
 
-/*
- * SCHEDULING OF THE TRANSFORMER OR POSTCONDITION COMPUTATIONS ON A DAG
- *
- */
-
-/* a control can be considered already processed if it has been processed
-   already or if it can receive a trivial empty postcondition */
-static bool considered_already_processed_p(control c, list to_be_processed,
-					   list already_processed,
-					   control_mapping control_postcondition_map)
-{
-  bool already = gen_in_list_p(c, already_processed);
-
-  if(!already) {
-    if(!gen_in_list_p(c, to_be_processed)) {
-      /* unreachable node with empty precondition */
-      /* transformer pre = transformer_empty(); */
-      transformer post = load_control_postcondition(c, control_postcondition_map);
-
-      if(transformer_undefined_p(post)) {
-	post = transformer_empty();
-	/* transformer post = statement_to_postcondition(pre, stmt); */
-	store_control_postcondition(c, post, control_postcondition_map);
-      }
-      else {
-	pips_assert("Postcondition for unreachable nodes must be empty",
-		    transformer_empty_p(post));
-      }
-      already = TRUE;
-    }
-  }
-
-  return already;
-}
-
-static bool nodes_considered_already_processed_p(list l, list to_be_processed,
-						 list already_processed,
-						 control_mapping control_postcondition_map)
-{
-  bool ready = TRUE;
-
-  MAP(CONTROL, c, {
-    if(considered_already_processed_p(c, 
-				      to_be_processed,
-				      already_processed,
-				      control_postcondition_map)) {
-      ready &= TRUE;
-    }
-    else {
-      ready &= FALSE;
-    }
-  }, l);
-
-  return ready;
-}
-
 /* a control is ready to be processed if all its predecessors have known
    postconditions or can receive a trivial empty postcondition */
 static bool ready_to_be_processed_p(control c,
@@ -512,109 +440,7 @@ static bool ready_to_be_processed_p(control c,
   return ready;
 }
 
-static bool nodes_ready_to_be_processed_p(list l,
-				    list to_be_processed,
-				    list still_to_be_processed,
-				    list already_processed,
-				    control_mapping control_postcondition_map)
-{
-  bool ready = TRUE;
-
-  MAP(CONTROL, c, {
-    if(ready_to_be_processed_p
-       (c, to_be_processed, still_to_be_processed, already_processed, 
-	control_postcondition_map)) {
-      ready &= TRUE;
-    }
-    else {
-      ready &= FALSE;
-    }
-  }, l);
-
-  return ready;
-}
 
-/*
- * MANAGEMENT OF ARC POSTCONDITIONS: TEST CONDITIONS MUST BE TAKEN INTO ACCOUNT
- *
- *  - load_predecessor_postcondition_or_test_condition()
- *
- *  - load_predecessor_postcondition()
- *
- *  - load_predecessor_test_condition()
- *
- * */
-
-/* A new postcondition may have to be allocated because a unique control
-   may have two successors and hence two preconditions. To keep memory
-   management tractable, a new postcondition always is allocated.
-
-   This assumes a deterministic CFG (unstructured). See
-   load_arc_precondition() to deal with non-deterministic CFG's.  */
-static transformer load_predecessor_postcondition_or_test_condition
-(control pred,
- control c,
- bool postcondition_p,
- control_mapping control_postcondition_map)
-{
-  statement stmt = control_statement(pred);
-  transformer post = postcondition_p? 
-    transformer_dup(load_control_postcondition(pred, control_postcondition_map))
-    :transformer_identity();
-
-  pips_assert("The predecessor precondition is defined",
-	      !transformer_undefined_p(post));
-  pips_assert("The predecessor has no more than two successors",
-	      gen_length(control_successors(pred))<=2);
-  /* Let's hope that || is evaluated left to right... */
-  pips_assert("The predecessor has c as successor",
-	      c==CONTROL(CAR(control_successors(pred)))
-	      ||c==CONTROL(CAR(CDR(control_successors(pred)))) );
-
-  if(c==CONTROL(CAR(control_successors(pred)))) {
-    if(ENDP(CDR(control_successors(pred)))) {
-      /* stmt is not a test, post is OK */
-      ;
-    }
-    else if(c==CONTROL(CAR(control_successors(pred)))
-	    && c==CONTROL(CAR(CDR(control_successors(pred))))) {
-      /* Sometimes, the two successors are really only one. To simplify a
-	 useless convex hull, do not add condition information. */
-      ;
-    }
-    else {
-      /* True branch of a test */
-      expression e = test_condition(statement_test(stmt));
-      post = precondition_add_condition_information(post, e,
-						    transformer_undefined, TRUE);
-    }
-  }
-  else {
-    /* Must be the false branch of a test */
-    expression e = test_condition(statement_test(stmt));
-    post = precondition_add_condition_information(post, e,
-						  transformer_undefined, FALSE);
-  }
-
-  return post;
-}
-
-static transformer load_predecessor_postcondition(control pred, control c,
- control_mapping control_postcondition_map)
-{
-  transformer post = load_predecessor_postcondition_or_test_condition
-    (pred, c, TRUE, control_postcondition_map);
-  return post;
-}
-
-static transformer load_predecessor_test_condition(control pred, control c,
- control_mapping control_postcondition_map)
-{
-  transformer post = load_predecessor_postcondition_or_test_condition
-    (pred, c, FALSE, control_postcondition_map);
-  return post;
-}
-
 /* Returns the precondition of c associated to arc pred->c in a newly
    allocated transformer. */
 static transformer load_arc_precondition(control pred, control c,
@@ -948,15 +774,6 @@ static list get_cycle_dependencies(control d, control_mapping cycle_dependencies
   }
 
   return dependencies;
-}
-
-static void free_cycle_dependencies(control_mapping cycle_dependencies_map) {
-  HASH_MAP(d, dependencies, {
-    /* All dependency lists should be empty after full processing */
-    pips_assert("No dependencies are left", ENDP(dependencies));
-  }, cycle_dependencies_map);
-
-  FREE_CONTROL_MAPPING(cycle_dependencies_map);
 }
 
 void update_temporary_precondition(void * k,
@@ -1319,8 +1136,8 @@ static void dag_to_flow_sensitive_preconditions
       }, cycle_dependencies_map);
     }
     else {
-      /* No cycles */
-      pips_assert("No cycles left to be processed", ENDP(still_to_be_processed));
+      /* No cycles with dependencies */
+      pips_debug(2, "no cycles with dependencies\n");
     }
   }
 
@@ -1599,20 +1416,19 @@ transformer cycle_to_flow_sensitive_postconditions_or_transformers
  *  - unstructured_to_accurate_postconditions_or_transformer()
  *
  */
-  
-static void local_process_unreachable_node(control c, struct  { 
+
+typedef struct  { 
     bool pcond;
     control_mapping smap;
-} * pcontext)
+} recursive_context;
+
+static void local_process_unreachable_node(control c, recursive_context * pcontext)
 {
   process_unreachable_node(c, pcontext->smap, pcontext->pcond);
 }
   
 /* A debug function to prettyprint the result */
-static void node_to_path_transformer_or_postcondition(control c, struct  { 
-    bool pcond;
-    control_mapping smap;
-} * pcontext)
+static void node_to_path_transformer_or_postcondition(control c, recursive_context * pcontext)
 {
   if(!meaningless_control_p(c)) {
     control_mapping control_postcondition_map = pcontext->smap;
@@ -1628,10 +1444,7 @@ static void node_to_path_transformer_or_postcondition(control c, struct  {
 }
   
 /* A debug function to prettyprint the fix points */
-static void print_cycle_head_to_fixpoint(control c, struct  { 
-    bool pcond;
-    control_mapping smap;
-} * pcontext)
+static void print_cycle_head_to_fixpoint(control c, recursive_context * pcontext)
 {
   control_mapping control_fix_point_map = pcontext->smap;
   statement s = control_statement(c);
@@ -1665,15 +1478,9 @@ transformer unstructured_to_flow_sensitive_postconditions_or_transformers
   transformer pre_u_r = transformer_range(pre_u);
   transformer pre_r = transformer_range(pre);
 
-  struct  { 
-    bool pcond;
-    control_mapping smap;
-  } context = { postcondition_p, control_postcondition_map };
+  recursive_context context = { postcondition_p, control_postcondition_map };
   
-  struct  { 
-    bool pcond;
-    control_mapping smap;
-  } fcontext = { postcondition_p, fix_point_map };
+  recursive_context fcontext = { postcondition_p, fix_point_map };
 
   ifdebug(2) {
     pips_debug(2, "Begin for %s with nodes:\n",
@@ -1762,6 +1569,9 @@ transformer unstructured_to_flow_sensitive_postconditions_or_transformers
     print_transformer(post);
   }
 
+  /* Get rid of the auxiliary data structures */
+  bourdoncle_free(ndu, ancestor_map, scc_map);
+
   return post;
 }
 
@@ -1784,9 +1594,9 @@ transformer unstructured_to_flow_sensitive_postconditions_or_transformers
 
 static transformer
 unstructured_to_postconditions(
-    transformer pre,
-    transformer pre_first,
-    unstructured u)
+			       transformer pre, /* precondition holding for any node */
+			       transformer pre_first, /* precondition holding at entry */
+			       unstructured u)
 {
   list nodes = NIL ;
   control entry_node = unstructured_control(u) ;
@@ -1884,7 +1694,7 @@ transformer unstructured_to_flow_sensitive_postconditions
   if(gen_length(succs)>SEMANTICS_MAX_CFG_SIZE1) {
       pips_user_warning("\nControl flow graph too large for an accurate analysis (%d nodes)\n"
 			"Have you fully restructured your code?\n", gen_length(succs));
-    post = unstructured_to_postconditions(pre_u, pre, u);
+    post = unstructured_to_postconditions(pre, pre_u, u);
   }
   else if(!get_bool_property("SEMANTICS_ANALYZE_UNSTRUCTURED")) {
     pips_user_warning("\nControl flow graph not analyzed accurately"
