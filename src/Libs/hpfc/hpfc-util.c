@@ -3,7 +3,7 @@
  *
  * Fabien Coelho, May 1993.
  *
- * $RCSfile: hpfc-util.c,v $ ($Date: 1996/03/21 15:56:02 $, )
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1996/04/02 14:35:28 $, )
  * version $Revision$
  */
 
@@ -765,6 +765,65 @@ references_aligned_p(reference r1, reference r2)
 	le1);
 
     XDEBUG("aligned!"); return TRUE;
+}
+
+/*************************************************** IR STRUCTURAL cleaning */
+
+/* removes IF (.TRUE.) THEN
+ * and DO X=n, n
+ * ??? memory leak...
+ */
+
+DEFINE_LOCAL_STACK(current_stmt, statement)
+
+static void test_rewrite(test t)
+{
+    entity e = expression_to_entity(test_condition(t));
+    if (ENTITY_TRUE_P(e))
+    {
+	pips_debug(5, "true test simplified\n");
+
+	statement_instruction(current_stmt_head()) = 
+	    statement_instruction(test_true(t));
+    }
+    else if (ENTITY_FALSE_P(e))
+    {	
+	pips_debug(5, "false test simplified\n");
+
+	statement_instruction(current_stmt_head()) = 
+	    statement_instruction(test_false(t));
+    }
+}
+
+static void loop_rewrite(loop l)
+{
+    range r = loop_range(l);
+    if (expression_equal_p(range_lower(r), range_upper(r)))
+    {
+	pips_debug(5, "loop on %s simplified\n", entity_name(loop_index(l)));
+
+	statement_instruction(current_stmt_head()) = 
+	    make_instruction(is_instruction_block,
+	      CONS(STATEMENT, make_assign_statement
+		         (entity_to_expression(loop_index(l)),
+			  copy_expression(range_lower(r))),
+	      CONS(STATEMENT, loop_body(l),
+		   NIL)));						    
+    }
+}
+
+void 
+statement_structural_cleaning(statement s)
+{
+    make_current_stmt_stack();
+
+    gen_multi_recurse(s,
+	statement_domain, current_stmt_filter, current_stmt_rewrite,
+        test_domain,      gen_true,            test_rewrite,
+        loop_domain,      gen_true,            loop_rewrite,
+		      NULL);  
+  
+    free_current_stmt_stack();
 }
 
 /*   that is all
