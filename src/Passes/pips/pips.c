@@ -1,3 +1,7 @@
+/*
+ * $Id$
+ */
+
 #include <stdio.h>
 #include <setjmp.h>
 #include <stdlib.h>
@@ -196,7 +200,7 @@ char * argv[];
 	}
 	else {
 	    /* Workspace must be opened */
-	    if (open_workspace(wspace) == NULL) {
+	    if (open_workspace(wspace) == 0) {
 		user_log("Cannot open workspace %s\n", wspace);
 		exit(1);
 	    }
