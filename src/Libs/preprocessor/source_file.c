@@ -7,6 +7,9 @@
  * update_props() .
  *
  * $Log: source_file.c,v $
+ * Revision 1.100  2003/08/01 06:00:25  irigoin
+ * Intermediate version installed to let Production link
+ *
  * Revision 1.99  2000/03/24 11:37:18  coelho
  * ordering dropped.
  *
@@ -90,6 +93,10 @@
 #include "pipsdbm.h"
 
 #include "preprocessor.h"
+
+extern string strdup(string);
+static bool dot_c_file_p(string);
+extern int putenv(char *); /* Supposedly in stdlib.h */
 
 #define skip_line_p(s) \
   ((*(s))=='\0' || (*(s))=='!' || (*(s))=='*' || (*(s))=='c' || (*(s))=='C')
@@ -645,20 +652,26 @@ static bool pips_split_file(string name, string tempfile)
   char * err;
   FILE * out = safe_fopen(tempfile, "w");
   string dir = db_get_current_workspace_directory();
-  err = fsplit(dir, name, out);
+
+  if(dot_c_file_p(name))
+    err = csplit(dir, name, out);
+  else /* .f or .F */
+    err = fsplit(dir, name, out);
+
   free(dir);
   safe_fclose(out, tempfile);
   clean_file(tempfile); 
   if (err) fprintf(stderr, "split error: %s\n", err);
   return err? TRUE: FALSE;
 }
+
+/********************************************** MANAGING .F AND .c FILES WITH CPP */
 
-/********************************************** MANAGING .F FILES WITH CPP */
-
-/* an issue is that the cpp used must be Fortran 77 aware.
+/* an issue is that the cpp used for .F must be Fortran 77 aware.
  */
 
-#define CPP_ED		 	".cpp_processed.f"
+#define CPP_FORTRAN_ED		 	".cpp_processed.f"
+#define CPP_C_ED		 	".cpp_processed.c"
 #define CPP_ERR			".stderr"
 
 /* pre-processor and added options from environment
@@ -671,22 +684,68 @@ static bool pips_split_file(string name, string tempfile)
 #define CPP_CPP			"cpp -C" /* alternative values: "gcc -E -C" or "fpp" */
 #define CPP_CPPFLAGS		" -P -D__PIPS__ -D__HPFC__ "
 
-static bool dot_F_file_p(string name)
+static bool suffix_file_p(string name, char suffix)
 {
     int l = strlen(name);
-    return l>=2 && name[l-1]=='F' && name[l-2]=='.';
+    return l>=2 && name[l-1]==suffix && name[l-2]=='.';
 }
 
-/* returns the newly allocated name.
- * returns NULL if cpp failed.
+static bool dot_F_file_p(string name)
+{
+  return suffix_file_p(name, 'F');
+}
+
+static bool dot_f_file_p(string name)
+{
+  return suffix_file_p(name, 'f');
+}
+
+static bool dot_c_file_p(string name)
+{
+  return suffix_file_p(name, 'c');
+}
+
+/* Returns the newly allocated name if ccp succeeds.
+ * Returns NULL if cpp fails.
  */
-static string process_thru_cpp(string name)
+
+static string process_thru_C_cpp(string name)
+{
+    string dir_name, new_name, simpler, cpp_options, cpp, cpp_err;
+
+    dir_name = db_get_directory_name_for_module(WORKSPACE_TMP_SPACE);
+    simpler = pips_basename(name, ".c");
+    new_name = strdup(concatenate(dir_name, "/", simpler, CPP_C_ED, 0));
+    cpp_err  = strdup(concatenate(new_name, CPP_ERR, 0));
+    free(dir_name);
+    free(simpler);
+
+    cpp = getenv(CPP_PIPS_ENV);
+    cpp_options = getenv(CPP_PIPS_OPTIONS_ENV);
+    
+    /* Note: the cpp used **must** know somehow about Fortran
+     * and its lexical and comment conventions. This is ok with gcc
+     * when g77 is included. Otherwise, "'" appearing in Fortran comments
+     * results in errors to be reported.
+     * Well, the return code could be ignored maybe, but I prefer not to.
+     */
+    safe_system(concatenate("/usr/local/bin/gcc "/* cpp? cpp: CPP_CPP  */,
+			    "-E " /* CPP_CPPFLAGS, cpp_options? cpp_options: ""*/, 
+			    name, " > ", new_name, " 2> ", cpp_err, 
+			    " && cat ", cpp_err, 
+			    " && test ! -s ", cpp_err, 
+			    " && rm -f ", cpp_err, 0));
+
+    return new_name;
+}
+
+static string process_thru_fortran_cpp(string name)
 {
     string dir_name, new_name, simpler, cpp_options, cpp, cpp_err;
 
     dir_name = db_get_directory_name_for_module(WORKSPACE_TMP_SPACE);
     simpler = pips_basename(name, ".F");
-    new_name = strdup(concatenate(dir_name, "/", simpler, CPP_ED, 0));
+    new_name = strdup(concatenate(dir_name, "/", simpler, CPP_FORTRAN_ED, 0));
     cpp_err  = strdup(concatenate(new_name, CPP_ERR, 0));
     free(dir_name);
     free(simpler);
@@ -710,6 +769,19 @@ static string process_thru_cpp(string name)
     return new_name;
 }
 
+static string process_thru_cpp(string name)
+{
+  /* Not much to share between .F and .c? */
+  string new_name = string_undefined;
+
+  if(dot_F_file_p(name)) 
+    new_name = process_thru_fortran_cpp(name);
+  else
+    new_name = process_thru_C_cpp(name);
+
+    return new_name;
+}
+
 /*************************************************** MANAGING A USER FILE */
 
 /* Fortran compiler triggerred from the environment (PIPS_CHECK_FORTRAN) 
@@ -760,134 +832,161 @@ static string extract_last_name(string line)
 
 bool process_user_file(string file)
 {
-    FILE *fd;
-    bool success_p = FALSE, cpp_processed_p;
-    string initial_file, nfile, file_list, a_line,
-	dir_name = db_get_current_workspace_directory();
+  FILE *fd;
+  bool success_p = FALSE, cpp_processed_p;
+  string initial_file, nfile, file_list, a_line,
+    dir_name = db_get_current_workspace_directory();
 
-    static int number_of_files = 0;
-    static int number_of_modules = 0;
+  static int number_of_files = 0;
+  static int number_of_modules = 0;
 
-    number_of_files++;
-    pips_debug(1, "file %s (number %d)\n", file, number_of_files);
+  number_of_files++;
+  pips_debug(1, "file %s (number %d)\n", file, number_of_files);
 
-    /* the file is looked for in the pips source path.
-     */
-    nfile = find_file_in_directories(file, getenv(SRCPATH));
+  /* the file is looked for in the pips source path.
+   */
+  nfile = find_file_in_directories(file, getenv(SRCPATH));
 
-    if (!nfile)
+  if (!nfile)
     {
-	pips_user_warning("Cannot open file: %s\n", file);
-	return FALSE;
+      pips_user_warning("Cannot open file: %s\n", file);
+      return FALSE;
     }
 
-    initial_file = nfile;
+  initial_file = nfile;
 
-    /* the new file is registered (well, not really...) in the database.
-     */
-    user_log("Registering file %s\n", file);
+  /* the new file is registered (well, not really...) in the database.
+   */
+  user_log("Registering file %s\n", file);
 
-    /* Fortran compiler if required.
-     */
-    if (pips_check_fortran()) 
-	check_fortran_syntax_before_pips(nfile);
+  /* Fortran compiler if required.
+   */
+  if (pips_check_fortran() && (dot_F_file_p(nfile) || dot_f_file_p(nfile))) 
+    check_fortran_syntax_before_pips(nfile);
+  else if(FALSE) {
+    /*Run the C compiler */
+    ;
+  }
 
-    /* CPP if necessary.
-     */
-    cpp_processed_p = dot_F_file_p(nfile);
+  /* CPP if file extension if .F or .c (assumes string_equal_p(nfile, initial_file))
+   */
+  cpp_processed_p = dot_F_file_p(nfile) || dot_c_file_p(nfile);
 
-    if (cpp_processed_p)
+  if (cpp_processed_p) {
+    user_log("Preprocessing file %s\n", initial_file);
+    nfile = process_thru_cpp(initial_file);
+  }
+  else if(!dot_f_file_p(nfile)) {
+    pips_user_error("Unexpected file extension\n");
+  }
+
+  /* if two modules have the same name, the first splitted wins
+   * and the other one is hidden by the call since fsplit gives 
+   * it a zzz00n.f name 
+   * Let's hope no user module is called ###???.f 
+   */
+  file_list = strdup(concatenate(dir_name,
+				 dot_c_file_p(nfile)? "/.csplit_file_list" : "/.fsplit_file_list", 0));
+  unlink(file_list);
+
+  user_log("Splitting file    %s\n", nfile);
+  if (pips_split_file(nfile, file_list))
+    return FALSE;
+
+  /* the newly created module files are registered in the database
+   * The file_list allows split to communicate with this function.
+   */
+  fd = safe_fopen(file_list, "r");
+  while ((a_line = safe_readline(fd))) 
     {
-	user_log("Preprocessing file %s\n", initial_file);
-	nfile = process_thru_cpp(initial_file);
-    }
+      string mod_name = NULL, res_name = NULL, abs_res, file_name;
+      list modules = NIL;
+      bool renamed=FALSE;
 
-    /* if two modules have the same name, the first splitted wins
-     * and the other one is hidden by the call since fsplit gives 
-     * it a zzz00n.f name 
-     * Let's hope no user module is called ###???.f 
-     */
-    file_list = strdup(concatenate(dir_name, "/.fsplit_file_list", 0));
-    unlink(file_list);
+      /* a_line: "MODULE1 ... MODULEn file_name"
+       *
+       * the liste modules come from entries that might be included
+       * in the subroutine. 
+       */
+      file_name = extract_last_name(a_line);
+      success_p = TRUE;
+      number_of_modules++;
+      pips_debug(2, "module %s (number %d)\n", file_name, number_of_modules);
 
-    user_log("Splitting file    %s\n", nfile);
-    if (pips_split_file(nfile, file_list))
-	return FALSE;
+      while (mod_name!=a_line && (mod_name = extract_last_name(a_line)))
+	modules = CONS(STRING, mod_name, modules);
 
-    /* the newly created module files are registered in the database
-     * The file_list allows split to communicate with this function.
-     */
-    fd = safe_fopen(file_list, "r");
-    while ((a_line = safe_readline(fd))) 
-    {
-	string mod_name = NULL, res_name = NULL, abs_res, file_name;
-	list modules = NIL;
-	bool renamed=FALSE;
+      /* For each Fortran module in the line, put the initial_file and
+	 user_file resource. In C, line should have only one entry and a C
+	 source file and a user file resources are created. */
+      MAP(STRING, mod_name, 
+      {
+	user_log("  Module         %s\n", mod_name);
 
-	/* a_line: "MODULE1 ... MODULEn file_name"
-	 *
-	 * the liste modules come from entries that might be included
-	 * in the subroutine. 
-	 */
-	file_name = extract_last_name(a_line);
-	success_p = TRUE;
-	number_of_modules++;
-	pips_debug(2, "module %s (number %d)\n", file_name, number_of_modules);
-
-	while (mod_name!=a_line && (mod_name = extract_last_name(a_line)))
-	    modules = CONS(STRING, mod_name, modules);
-
-	/* for each module, put the initial_file and user_file resource.
-	 */
-	MAP(STRING, mod_name, 
-	{
-	    user_log("  Module         %s\n", mod_name);
-
-	    if (!renamed)
-	    {
-		res_name = db_build_file_resource_name
-		    (DBR_INITIAL_FILE, mod_name, ".f_initial");
-	    
-		abs_res = strdup(concatenate(dir_name, "/", res_name, 0));
-		
-		if (rename(file_name, abs_res))
-		{
-		    perror("process_user_file");
-		    pips_internal_error("mv %s %s failed\n", 
-					file_name, res_name);
-		}
-		renamed = TRUE;
-		free(abs_res); 
+	if (!renamed)
+	  {
+	    if(dot_c_file_p(nfile)) {
+	      res_name = db_build_file_resource_name
+		(DBR_C_SOURCE_FILE, mod_name, ".c");
+	    }
+	    else {
+	      res_name = db_build_file_resource_name
+		(DBR_INITIAL_FILE, mod_name, ".f_initial");
 	    }
 	    
-	    DB_PUT_NEW_FILE_RESOURCE(DBR_INITIAL_FILE, mod_name, 
-				     strdup(res_name));
-	    /* from which file the initial source was derived.
-	     * absolute path to the file so that db moves should be ok?
-	     */
-	    DB_PUT_NEW_FILE_RESOURCE(DBR_USER_FILE, mod_name, strdup(nfile));
-	},
-	    modules);
+	    abs_res = strdup(concatenate(dir_name, "/", res_name, 0));
+		
+	    if (rename(file_name, abs_res))
+	      {
+		perror("process_user_file");
+		pips_internal_error("mv %s %s failed\n", 
+				    file_name, res_name);
+	      }
+	    renamed = TRUE;
+	    free(abs_res); 
+	  }
 
-	gen_free_list(modules), modules=NIL;
+	if(dot_c_file_p(nfile)) {
+	  DB_PUT_NEW_FILE_RESOURCE(DBR_C_SOURCE_FILE, mod_name, 
+				   strdup(res_name));
+	}
+	else {
+	  DB_PUT_NEW_FILE_RESOURCE(DBR_INITIAL_FILE, mod_name, 
+				   strdup(res_name));
+	}
+	/* from which file the initial source was derived.
+	 * absolute path to the file so that db moves should be ok?
+	 */
+	DB_PUT_NEW_FILE_RESOURCE(DBR_USER_FILE, mod_name, strdup(nfile));
+      },
+	  modules);
 
-	if (res_name) free(res_name), res_name = NULL;
-	free(a_line);
+      gen_free_list(modules), modules=NIL;
+
+      if (res_name) free(res_name), res_name = NULL;
+      free(a_line);
     }
 
-    safe_fclose(fd, file_list);
-    unlink(file_list); 
-    free(file_list);
-    free(dir_name);
+  safe_fclose(fd, file_list);
+  unlink(file_list); 
+  free(file_list);
+  free(dir_name);
 
-    if (cpp_processed_p)
-	free(initial_file); /* hey, that's cleaning! */
+  if (cpp_processed_p)
+    free(initial_file); /* hey, that's cleaning! */
 
-    if(!success_p)
-	pips_user_warning("No module was found when splitting file %s.\n",
-			  nfile);
+  if(!success_p)
+    pips_user_warning("No module was found when splitting file %s.\n",
+		      nfile);
 
-    free(nfile);
+  if(cpp_processed_p) {
+    /* nfile is not the initial file */
+    pips_debug(1, "Remove output of preprocessing: %s\n", nfile);
+    /* Seems to be recorded as a resource, causes problems later when
+       closing the workspace... */
+    /* unlink(nfile); */
+  }
+  free(nfile);
 
-    return TRUE; /* well, returns ok whether modules were found or not. */
+  return TRUE; /* well, returns ok whether modules were found or not. */
 }
