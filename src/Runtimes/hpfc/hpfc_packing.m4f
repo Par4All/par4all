@@ -3,6 +3,9 @@
 !
 ! $Id$
 ! $Log: hpfc_packing.m4f,v $
+! Revision 1.17  1997/05/29 15:48:06  zory
+! *** empty log message ***
+!
 ! Revision 1.16  1997/03/20 07:50:01  coelho
 ! better RCS headers.
 !
@@ -58,8 +61,8 @@ popdef(`TYPE')dnl
 popdef(`PVMTYPE')')dnl
 !
 define(ONE_PACKING,`
-GENERIC_PACKING($1,pvmfpack,PACK,$2)
-GENERIC_PACKING($1,pvmfunpack,UNPACK,$2)')dnl
+GENERIC_PACKING($1,HPFC PACK,PACK,$2)
+GENERIC_PACKING($1,HPFC UNPACK,UNPACK,$2)')dnl
 define(ALLPACK,`
 ! ----------------------------------------
 !
