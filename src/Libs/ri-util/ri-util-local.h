@@ -524,6 +524,10 @@ entity get_ith_##lname##_prime(int i)\
 #define instruction_block(i) sequence_statements(instruction_sequence(i))
 #endif
 
+/* After the modification in Newgen:  unstructured = entry:control x exit:control
+   we have create a macro to transform automatically unstructured_control to unstructured_entry */
+#define unstructured_control unstructured_entry
+
 /* Default type sizes */
 
 #define DEFAULT_INTEGER_TYPE_SIZE (4)
