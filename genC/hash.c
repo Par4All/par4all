@@ -510,6 +510,9 @@ char *key;
     return(buffer);
 }
 
+/*  buggy function, the hash table stuff should be made again from scratch.
+ *  - FC 02/02/95
+ */
 static hash_entry_pointer hash_find_entry(htp, key, prank, operation)
 hash_table htp;
 char *key;
@@ -528,7 +531,11 @@ hash_operation operation;
 
 	if (he.key == FREE)
 	    break;
-
+	
+	/*  ??? it may happen that the previous mapping is kept
+	 *  somewhere forward! So after a hash_del, the old value
+	 *  would be visible again!
+	 */
 	if (he.key == FREE_FOR_PUT && operation == hash_put_op)
 	    break;
 
@@ -537,6 +544,9 @@ hash_operation operation;
 
 	r = (r == htp->hash_size-1) ? 0 : r+1;
 
+	/*   ??? this may happen in a hash_get after many put and del,
+	 *   if the table contains no FREE, but many FREE_FOR_PUT instead!
+	 */
 	if( r == r_init ) {
 	    fprintf(stderr,"[hash_find_entry] cannot find entry\n") ;
 	    abort() ;
