@@ -654,7 +654,7 @@ int cherche_min(Value *min,Polyhedron *D,int pos) {
   value_clear(binf); value_clear(bsup);
   value_clear(i);
 
-  value_assign(min[pos],0);
+  value_set_si(min[pos],0);
   return(0);	     /* not found :-( */
 } /* cherche_min */
 
