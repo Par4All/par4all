@@ -1,17 +1,20 @@
 #
 # $RCSfile: config.makefile,v $ for make
-# $Date: 1996/09/02 17:13:38 $, 
+# $Date: 1996/09/03 12:58:50 $, 
 #
 
 SCRIPTS = 	make-pips \
-		tape-pips \
 		make_release \
 		make_pips_release \
-		make-gdbinit
+		make-gdbinit \
+		install_pips
 
-SOURCES	=	$(SCRIPTS)
+DOCS=		install.README \
+		install.INSTALL
 
-INSTALL_UTL=	$(SCRIPTS)
+SOURCES	=	$(SCRIPTS) $(DOCS)
+
+INSTALL_UTL=	$(SOURCES)
 
 # that is all
 #
