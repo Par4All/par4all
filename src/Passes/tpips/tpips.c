@@ -1,5 +1,5 @@
 /* $RCSfile: tpips.c,v $ (version $Revision$
- * $Date: 1997/04/11 16:30:17 $, 
+ * $Date: 1997/04/14 10:54:04 $, 
  */
 
 #include <stdio.h>
@@ -809,6 +809,8 @@ static void parse_arguments(int argc, char * argv[])
 int main(int argc, char * argv[])
 {
     debug_on("TPIPS_DEBUG_LEVEL");
+
+    pips_checks();
 
     initialize_newgen();
     initialize_sc((char*(*)(Variable))entity_local_name);
