@@ -251,10 +251,15 @@ set region;
 }
 
 
+/************************************** SORT ALL LOCALS AFTER PRIVATIZATION */
 
+static void loop_rwt(loop l)
+{
+    list /* of entity */ le = loop_locals(l);
+    if (le) sort_list_of_entities(le);
+}
 
-
-
-
-
-
+void sort_all_loop_locals(statement s)
+{
+    gen_recurse(s, loop_domain, gen_true, loop_rwt);
+}
