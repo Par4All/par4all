@@ -127,16 +127,22 @@ entity e;
     }
 }
 
-/* void add_intraprocedural_value_entities(entity e)
- */
-static void add_intraprocedural_value_entities(e)
-entity e;
+static void 
+add_intraprocedural_value_entities_unconditionally(entity e)
 {
-    if(!entity_has_values_p(e)) {
 	add_new_value(e);
 	add_local_old_value(e);
 	add_local_intermediate_value(e);
 	add_or_kill_equivalenced_variables(e, FALSE);
+}
+
+/* void add_intraprocedural_value_entities(entity e)
+ */
+static void 
+add_intraprocedural_value_entities(entity e)
+{
+    if(!entity_has_values_p(e)) {
+	add_intraprocedural_value_entities_unconditionally(e);
     }
 }
 
@@ -384,8 +390,15 @@ entity m;
 	       * Note: this makes the control structure of this procedure 
 	       * obsolete!
 	       */
-	      add_intraprocedural_value_entities(e);
-	      add_or_kill_equivalenced_variables(e, TRUE);
+	     /* This call is useless because it only is effective if
+	      * entity_has_values_p() is true:
+	      * add_intraprocedural_value_entities(e);
+	      */
+	      add_intraprocedural_value_entities_unconditionally(e);
+	      /* A stronger call to the same subroutine is included in
+	       * the previous call:
+	       * add_or_kill_equivalenced_variables(e, TRUE);
+	       */
 	  }},
 	 module_intra_effects);
 
