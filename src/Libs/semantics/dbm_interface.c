@@ -434,7 +434,7 @@ transformer t;
     transformer t_old = transformer_undefined;
     transformer t_new = transformer_undefined;
 
-    pips_assert(entity_module_p(e));
+    pips_assert("update_summary_precondition", entity_module_p(e));
 
     debug(8, "update_summary_precondition", "begin\n");
 
