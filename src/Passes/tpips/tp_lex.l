@@ -1,4 +1,6 @@
 %{
+/* $Id$
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,6 +32,7 @@ void yyrestart(FILE *f){ yyin = f;}
 
 #endif
 
+static bool cr_not_returned;
 static char * line_to_parse;
 static char * line_parsed;
 
@@ -39,6 +42,7 @@ void tpips_set_line_to_parse(char * line)
 
     /* store line pointer */
     line_parsed = line_to_parse = line;
+    cr_not_returned = TRUE;
 
     /* cut line at the beginning of comments */
     while (*line)
@@ -57,15 +61,6 @@ char * tpips_get_line_to_parse(void)
     return line_to_parse;
 }
 
-/*
-static void tpips_lex_unput(int c)
-{
-    pips_debug(9,"unput char '%c'(0x%2x)\n", c,c);
-    pips_assert("some place to unput a char", line_parsed<line_to_parse);
-    *(--line_to_parse) = (char) c;
-}
-*/
-
 static void tpips_lex_print_pos(FILE* fout)
 {
     fprintf(fout,"%s\n",line_parsed);
@@ -77,10 +72,13 @@ static int tpips_lex_input (void)
     char c = *line_to_parse;
     pips_debug(9,"input char '%c'(0x%2x) from input\n", c, c);
     if (c) line_to_parse++;
+    /* a fake \n is provided, to check for nargs in the syntax... */
+    else if (cr_not_returned) { cr_not_returned=FALSE; return (int) '\n'; }
     return (int) c;
 }
 
-#define KEYWORD(x) BEGIN INITIAL; return x
+#define RETURN(x) pips_debug(8, "init %d\n", x); return x
+#define KEYWORD(x) pips_debug(8, "key %d\n", x); BEGIN INITIAL; return x
 
 %}
 
@@ -106,24 +104,26 @@ static int tpips_lex_input (void)
 <KEY>pwd 		{ KEYWORD(PWD); }
 <KEY>source		{ KEYWORD(SOURCE); }
 
-\(			{ return OPENPAREN; }
-\)			{ return CLOSEPAREN; }
-\,			{ return COMMA; }
-= 			{ return EQUAL; }
+\(			{ RETURN(OPENPAREN); }
+\)			{ RETURN(CLOSEPAREN); }
+\,			{ RETURN(COMMA); }
+= 			{ RETURN(EQUAL); }
+
+\n			{ RETURN(ENDOFLINE); }
 
 <STR>[^\"]*\"		{ yylval.name = strdup(concatenate("\"", yytext, 0));
-		  	  BEGIN INITIAL; return A_STRING;}
+		  	  BEGIN INITIAL; RETURN(A_STRING);}
 \"			{ BEGIN STR;} /* " */
 
-"$ALL"			{ return OWNER_ALL; }
-"$PROGRAM"		{ return OWNER_PROGRAM; }
-"$MAIN"			{ return OWNER_MAIN; }
-"$MODULE"		{ return OWNER_MODULE; }
-"$CALLERS"		{ return OWNER_CALLERS; }
-"$CALLEES"		{ return OWNER_CALLEES; }
+"$ALL"			{ RETURN(OWNER_ALL); }
+"$PROGRAM"		{ RETURN(OWNER_PROGRAM); }
+"$MAIN"			{ RETURN(OWNER_MAIN); }
+"$MODULE"		{ RETURN(OWNER_MODULE); }
+"$CALLERS"		{ RETURN(OWNER_CALLERS); }
+"$CALLEES"		{ RETURN(OWNER_CALLEES); }
 
-[/\.0-9A-Za-z_-]+ { yylval.name = strdup(yytext); return NAME;}
-[ \t\n]+		/* skip blanks */
+[/\.0-9A-Za-z_-]+ 	{ yylval.name = strdup(yytext); RETURN(NAME);}
+[ \t]+			/* skip blanks... */
 .			{ pips_user_error("unexpected char %c\n", *yytext); }
 
 %%
