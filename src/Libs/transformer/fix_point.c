@@ -199,6 +199,13 @@ transformer tf;
 }
 
 
+/* Must be declared explicity to keep a logical order in this C file.
+ * Also, the matrice type is now obsolete and should not appear in
+ * transformer.h. Hence buil_transfer_matrix() must be static.
+ */
+static void 
+build_transfer_matrix(matrice *, Pcontrainte, int, Pbase);
+
 /* Let A be the affine loop transfert function. The affine transfer fix-point T
  * is such that T(A-I) = 0
  *
@@ -556,7 +563,7 @@ Pvecteur eq;
 
 
 
-void 
+static void 
 build_transfer_matrix(pa, lteq, n_eq, b_new)
 matrice * pa;
 Pcontrainte lteq;
