@@ -1,5 +1,5 @@
 /* $RCSfile: call.c,v $ (version $Revision$)
- * $Date: 1996/06/19 13:58:34 $, 
+ * $Date: 1996/06/21 11:47:52 $, 
  *
  * Fabien COELHO
  */
@@ -48,7 +48,8 @@ translate_reduction(
     MAP(REFERENCE, r, 
     {
 	reduction red = copy_reduction(external_red);
-	reduction_reference(red) = r;
+	free_reference(reduction_reference(red));
+	reduction_reference(red) = copy_reference(r); /* ??? */
 	lrds = CONS(REDUCTION, red, lrds);
     },
 	lref);
