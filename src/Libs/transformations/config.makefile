@@ -19,7 +19,8 @@ LIB_CFILES =	replace.c \
 		standardize_structure.c \
 		use_def_elimination.c \
 		loop_normalize.c  \
-		declarations.c
+		declarations.c \
+		clone.c
 
 LIB_HEADERS =	transformations-local.h
 
