@@ -9,6 +9,9 @@
  * (c) CA et FC, Sept 1997
  *
  * $Log: arithmetic_errors.h,v $
+ * Revision 1.19  1998/10/24 09:22:47  coelho
+ * size update.
+ *
  * Revision 1.18  1998/10/24 09:21:45  coelho
  * const added to constants.
  *
@@ -18,7 +21,7 @@
 /* the index points to the first available chunck for a new context...
  */
 
-#define MAX_STACKED_CONTEXTS 20
+#define MAX_STACKED_CONTEXTS 40
 extern jmp_buf global_exception_stack[MAX_STACKED_CONTEXTS];
 extern int     global_exception_type[MAX_STACKED_CONTEXTS];
 extern int     global_exception_index;
