@@ -1,5 +1,5 @@
 %% $RCSfile: ri.tex,v $ (version $Revision$)
-%% $Date: 1997/02/06 17:41:29 $, 
+%% $Date: 1997/06/11 20:39:41 $, 
 
 \documentclass[a4paper]{article}
 \usepackage{psfig,verbatim,comment,newgen_domain}
@@ -1014,28 +1014,29 @@ ou de manie`re systématique avec les fonctions de parcours de NewGen,
 \verb/gen_multi_recurse/\index{gen\_multi\_recurse},...
 \end{comment}
 
-Member {\tt comments} contains the comments associated to the statement in
-the source program. This string\footnote{To avoid problems with static 
-buffers, a list of strings should have been used to store comments.} is
-used by the prettyprinter. Comments are associated to the {\em next}
-executable statement. For statements with no comments, this member
-receives a special value, \verb/empty_comments/\footnote{This special
-value used to be \verb/string_undefined/, but its name carried less
-semantics. Empty comments could be defined either as NULL, or the null
-length string, "", or as the Newgen special value,
-\verb/string_undefined/. The NULL string was not chosen because it is not
-specific enough and because it is not compatible with the UNIX string
-library. The null length string is compatible with the string library,
-but sharing would have to be carefully considered. To avoid many
-allocations and desallocations of one byte areas, and many storage related
-bugs, the Newgen solution was chosen, although it is not comptaible with
-the UNIX library and although Newgen does not provide such a
-library. Objects of type \verb/string/ are not 100~\% equivalent to
-objects of type \verb/char */ and guards for \verb/string_undefined/ must
-be added..}, which can be tested with predicate
-\verb/empty_comments_p()/. Comments associated to statements that may
-disappear during processing, such as CONTINUE, RETURN and GO~TO, may
-disappear too.
+Member {\tt comments} contains the comments associated to the
+statement in the source program. This string\footnote{To avoid
+  problems with static buffers, a list of strings should have been
+  used to store comments.} is used by the prettyprinter. Comments are
+associated to the {\em next} executable statement. For statements with
+no comments, this member receives a special value,
+\verb/empty_comments/\footnote{This special value used to be
+  \texttt{string\_undefined}, but its name carried less semantics.
+  Empty comments could be defined either as NULL, or the null length
+  string, "", or as the Newgen special value,
+  \texttt{string\_undefined}. The NULL string was not chosen because
+  it is not specific enough and because it is not compatible with the
+  UNIX string library. The null length string is compatible with the
+  string library, but sharing would have to be carefully considered.
+  To avoid many allocations and desallocations of one byte areas, and
+  many storage related bugs, the Newgen solution was chosen, although
+  it is not compatible with the UNIX library and although Newgen does
+  not provide such a library. Objects of type \texttt{string} are not
+  100~\% equivalent to objects of type \texttt{char *} and guards for
+  \texttt{string\_undefined} must be added.}, which can be tested with
+predicate \verb/empty_comments_p()/. Comments associated to statements
+that may disappear during processing, such as CONTINUE, RETURN and
+GO~TO, may disappear too.
 
 \begin{comment}
 Le sous-domaine {\tt comments} contient le texte du commentaire associé
