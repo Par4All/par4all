@@ -23,7 +23,6 @@
 
 /* some string constants 
  */
-
 #define ACTION_UNDEFINED 	string_undefined
 #define ACTION_READ 		"R"
 #define ACTION_WRITE 		"W"
@@ -91,12 +90,7 @@ list (*effects_forward_translation_op)(entity /* callee */, list /* args */,
 /* local to global name space translation */
 list (*effects_local_to_global_translation_op)(list);
 
-/* prettyprint function for debug */
-void (*effects_prettyprint_func)(list);
 
-/* prettyprint function for sequential and user views */
-text (*effects_to_text_func)(list);
-void (*attach_effects_decoration_to_text_func)(text);
 
 /* functions to provide context and transformer information */
 transformer (*load_context_func)(statement);
@@ -141,12 +135,29 @@ void (*db_put_summary_out_effects_func)(char *, list);
 statement_effects  (*db_get_out_effects_func)(char *);
 void (*db_put_out_effects_func)(char *, statement_effects);
 
-/* */
+
+/* prettyprint function types:
+ */
+
+typedef text (*generic_text_function)(list /* of effect */);
+typedef void (*generic_prettyprint_function)(list /* of effect */);
+typedef void (*generic_attachment_function)(text);
 
 
 /* For COMPATIBILITY purpose only - DO NOT USE anymore
  */
 #define effect_variable(e) reference_variable(effect_reference(e))
+
+/*
+ * CAUTION! 3 NEXTS ARE OBSOLETE! just kept for the old engine!
+ */
+/* prettyprint function for debug */
+void (*effects_prettyprint_func)(list);
+
+/* prettyprint function for sequential and user views */
+text (*effects_to_text_func)(list);
+void (*attach_effects_decoration_to_text_func)(text);
+
 
 /* end of effects-generic-local.h
  */
