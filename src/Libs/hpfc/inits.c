@@ -3,7 +3,7 @@
  * in this file there are functions to generate the 
  * run-time resolution parameters.
  *
- * $RCSfile: inits.c,v $ ($Date: 1996/02/16 15:11:37 $, )
+ * $RCSfile: inits.c,v $ ($Date: 1996/03/21 15:56:03 $, )
  * version $Revision$,
  */
 
@@ -51,32 +51,38 @@ entity module;
 
     MAP(ENTITY, array,
     {
+	bool is_argument = storage_formal_p(entity_storage(array));
 	int andim;
-
 	newarray = load_new_node(array);
 	andim  = NumberOfDimension(newarray);
 
 	pips_debug(8, "considering array %s (new is %s)\n",
 	      entity_name(array), entity_name(newarray));
-	
+
+	/* formal parameters are passed the value by the caller
+	 * as far as overlapable dimensions are concerned.
+	 */
 	for (i=1 ; i<=andim ; i++)
 	{
-	    d = FindIthDimension(newarray, i);
-	    
-	    /* ??? memory leak from bound_parameter_name
-	     */
-	    fprintf(file,
-		    "      integer \n"
-		    "     $    %s,\n"
-		    "     $    %s\n"
-		    "      parameter(%s = %d)\n"
-		    "      parameter(%s = %d)\n",
-		    bound_parameter_name(newarray, LOWER, i),
-		    bound_parameter_name(newarray, UPPER, i),
-		    bound_parameter_name(newarray, LOWER, i),
-		    HpfcExpressionToInt(dimension_lower(d)),
-		    bound_parameter_name(newarray, UPPER, i),
-		    HpfcExpressionToInt(dimension_upper(d)));
+	    if (!is_argument || !ith_dim_overlapable_p(array, i))
+	    {
+		d = FindIthDimension(newarray, i);
+		
+		/* ??? memory leak from bound_parameter_name
+		 */
+		fprintf(file,
+			"      integer \n"
+			"     $    %s,\n"
+			"     $    %s\n" 
+			"      parameter(%s = %d)\n"
+			"      parameter(%s = %d)\n",
+			bound_parameter_name(newarray, LOWER, i),
+			bound_parameter_name(newarray, UPPER, i), 
+			bound_parameter_name(newarray, LOWER, i),
+			HpfcExpressionToInt(dimension_lower(d)),
+			bound_parameter_name(newarray, UPPER, i),
+			HpfcExpressionToInt(dimension_upper(d)));
+	    }
 	}
     },
 	l);
