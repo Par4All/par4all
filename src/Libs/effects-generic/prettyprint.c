@@ -154,7 +154,7 @@ void my_effects_filter(list l_effs, string str_filter)
 {
   MAPL(ce, {
     effect eff = EFFECT(CAR(ce));
-    string t = effect_word_reference(effect_reference(eff));
+    string t = effect_words_reference(effect_reference(eff));
     if (!same_string_p(t, str_filter))
       gen_remove(l_effs, eff);
     free(t)
