@@ -150,7 +150,7 @@ statement loop_chunk_size_and_strip_mine(cons *lls)
     string resp;
     int kind, factor;
     statement stmt, new_s;
-    bool cancel_status;
+    bool cancel_status = FALSE;
     int chunk_size = -1;
     int chunk_number = -1;
 
@@ -159,7 +159,8 @@ statement loop_chunk_size_and_strip_mine(cons *lls)
     stmt = STATEMENT(CAR(lls));
 
     /* Get the strip_mining kind from the user */
-    resp = user_request("Type of strip-mining:\n - in fixed-size chunks (enter 0)\n - in a fixed number of chunks (enter 1)");
+    resp = user_request("Type of strip-mining:\n - in fixed-size chunks "
+			"(enter 0)\n - in a fixed number of chunks (enter 1)");
     if (resp[0] == '\0') {
 	cancel_status = TRUE;
     }
@@ -167,12 +168,13 @@ statement loop_chunk_size_and_strip_mine(cons *lls)
 	/* CA(15/1/93):if(sscanf(resp, "%d", &kind)!=1 || kind !=1) { 
 	   replaced by */
 	if(sscanf(resp, "%d", &kind)!=1 || (kind!= 0 && kind !=1)) {
-	    user_error("strip_mine", 
-		       "strip_mining kind should be either 0 or 1!\n");
+	    pips_user_error("strip_mining kind should be either 0 or 1!\n");
 	}
 
 	/* Get the strip_mining factor from the user */
-	resp = user_request("What's the stripe %s?\n(choose integer greater or egal to 2): ", kind ? "number" : "size");
+	resp = user_request("What's the stripe %s?\n"
+			    "(choose integer greater or egal to 2): ", 
+			    kind ? "number" : "size");
 	if (resp[0] == '\0') {
 	    cancel_status = TRUE;
 	}
@@ -191,7 +193,7 @@ statement loop_chunk_size_and_strip_mine(cons *lls)
 		chunk_number = factor;
 	    }
 
-	    debug(1,"strip_mine","strip mine in %d chunks of size %d \n",
+	    pips_debug(1,"strip mine in %d chunks of size %d \n",
 		  chunk_number, chunk_size);
 	}
     }
@@ -204,7 +206,7 @@ statement loop_chunk_size_and_strip_mine(cons *lls)
 	new_s = loop_strip_mine(stmt,chunk_size,chunk_number);
    return(new_s);
 }
-
+
 /* Top-level function
  */
 
