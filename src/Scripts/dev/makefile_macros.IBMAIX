@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: makefile_macros.IBMAIX,v $
+# Revision 1.13  1997/08/19 14:57:35  coelho
+# fixes for IBM AIX (no wpips, no wpips in fpips).
+#
 # Revision 1.12  1997/08/18 15:10:00  coelho
 # fpips does not include wpips.
 #
@@ -26,9 +29,7 @@ CANSI	= -qlanglvl=ansi
 CFLAGS	= -g -O2 -qmaxmem=8192 -qfullpath -ma 
 # if -E is ommitted, the file is *compiled*:-(
 CMKDEP	= -E -M
-# wpips was never compiled with aix...
-CPPFLAGS= 	-DFPIPS_WITHOUT_WPIPS \
-		-I. \
+CPPFLAGS = 	-I. \
 		-I$(NEWGEN_ROOT)/Include \
 		-I$(LINEAR_ROOT)/Include \
 		-I$(PIPS_ROOT)/Include \
@@ -53,7 +54,7 @@ LFLAGS	=
 YACC	= bison
 YFLAGS	= -y
 LINT	= lint
-LINTFLAGS= -habxu
+LINTFLAGS = -habxu
 PROTO	= cproto
 PRFLAGS	= -evcf2
 M4	= gm4
@@ -64,7 +65,7 @@ ETAGS	= etags
 # tools for the documentation
 
 LX2HTML	= latex2html
-L2HFLAGS= -link 8 -split 5
+L2HFLAGS = -link 8 -split 5
 LATEX	= latex
 BIBTEX	= bibtex
 MAKEIDX	= makeindex
@@ -83,8 +84,21 @@ DIFF	= diff
 # Well, AIX is not unix, and xlc does not have the expected behavior under -M
 DEPFILE = *.u
 
-# no -ltermcap under AIX. -lcurses instead.
-TPIPS_ADDED_LIBS=-lreadline -lcurses
 
-# end of $RCSfile: makefile_macros.IBMAIX,v $
+#
+# NO WPIPS under IBM AIX.
+#
+
+# wpips was never compiled with aix, hence
+CPPFLAGS 	+=	-DFPIPS_WITHOUT_WPIPS 
+
+WPIPS_ADDED_LIBS =
+
+# no -ltermcap under AIX. -lcurses instead.
+TPIPS_ADDED_LIBS =	-lreadline -lcurses
+
+# no wpips with ibm.
+FPIPS_ADDED_LIBS =	-lpips -ltpips $(TPIPS_ADDED_LIBS)
+
+# end of it
 #
