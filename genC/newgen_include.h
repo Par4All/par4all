@@ -217,4 +217,8 @@ extern int gen_size();
 extern void print_domain();
 
 extern int genspec_parse();
+extern int genspec_lex(void);
 extern int genread_parse();
+extern int genread_lex(void);
+
+
