@@ -52,6 +52,6 @@ MAIN_LIBS=	-lloop_normalize \
 
 # Source, header and object files used to build the library.
 # Do not include the main program source file.
-LIB_CFILES=	new_atomizer.c atomizer.c utils.c variables.c codegen.c control.c norm_exp.c defs_elim.c
+LIB_CFILES=	new_atomizer.c atomizer.c utils.c codegen.c control.c norm_exp.c defs_elim.c
 LIB_HEADERS=	atomizer-local.h
-LIB_OBJECTS=	new_atomizer.o atomizer.o utils.o variables.o codegen.o control.o norm_exp.o defs_elim.o
+LIB_OBJECTS=	new_atomizer.o atomizer.o utils.o codegen.o control.o norm_exp.o defs_elim.o
