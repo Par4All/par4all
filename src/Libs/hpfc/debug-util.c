@@ -41,7 +41,8 @@ entity e;
 void print_align(a)
 align a;
 {
-    (void) fprintf(stderr,"aligned\n");
+    (void) fprintf(stderr, "aligned (%d dimensions)\n", 
+		   gen_length(align_alignment(a)));
     gen_map(print_alignment, align_alignment(a));
     (void) fprintf(stderr, "to template %s\n\n",
 		   entity_name(align_template(a)));
