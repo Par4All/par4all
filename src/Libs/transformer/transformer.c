@@ -165,7 +165,7 @@ transformer_normalize(transformer t, int level)
 	 * values from equations into inequalities.
 	 */
 	    sc_nredund(&r);
-	    predicate_system_(transformer_relation(t)) = r;
+	    predicate_system_(transformer_relation(t)) = newgen_Psysteme(r);
 	    break;
 
 	case 2:
