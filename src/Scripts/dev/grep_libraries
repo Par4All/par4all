@@ -1,0 +1,12 @@
+#! /bin/sh
+
+for lib in $LIBDIR/*.a ; do
+	nm $lib | fgrep $1 | fgrep U > /dev/null
+	if [ $? = 0 ] ; then
+		echo undef in $lib ...
+	fi
+	nm $lib | fgrep $1 | fgrep T > /dev/null
+	if [ $? = 0 ] ; then
+		echo def in $lib ...
+	fi
+done
