@@ -1,8 +1,6 @@
-/* 	%A% ($Date: 1997/09/17 14:36:18 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
-
-#ifndef lint
-char vcid_syntax_procedure[] = "%A% ($Date: 1997/09/17 14:36:18 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
-#endif /* lint */
+/*
+ * $Id$
+ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -121,6 +119,40 @@ entity e;
     }
 }
 
+/* macros are added, although they should not have been.
+ */
+void
+remove_from_called_modules(entity e)
+{
+    bool found = FALSE;
+    list l = called_modules;
+    string name = module_local_name(e);
+
+    if (!called_modules) return;
+
+    if (same_string_p(name, STRING(CAR(called_modules)))) {
+	called_modules = CDR(called_modules);
+	found = TRUE;
+    } else {
+	list lp = called_modules;
+	l = CDR(called_modules);
+	
+	for(; !ENDP(l); POP(l), POP(lp)) {
+	    if (same_string_p(name, STRING(CAR(l)))) {
+		CDR(lp) = CDR(l);
+		found = TRUE;
+	    }
+	}
+    }    
+
+    if (found) {
+	pips_debug(3, "removing %s from callees\n", entity_name(e));
+	CDR(l) = NIL;
+	free(STRING(CAR(l)));
+	gen_free_list(l);
+    }
+}
+
 void 
 AbortOfProcedure()
 {
@@ -141,7 +173,8 @@ EndOfProcedure()
 {
     entity CurrentFunction = get_current_module_entity();
 
-    debug(8, "EndOfProcedure", "Begin for module %s\n", entity_name(CurrentFunction));
+    debug(8, "EndOfProcedure", "Begin for module %s\n",
+	  entity_name(CurrentFunction));
 
     /* get rid of ghost variable entities */
     remove_ghost_variable_entities();
@@ -215,14 +248,20 @@ EndOfProcedure()
 	called_modules = l;
     }
 
+    /* done here. affects callees and code. FC.
+     */
+    parser_substitute_all_macros(function_body);
+    parser_close_macros_support();
+
     DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, 
 			   strdup(module_local_name(CurrentFunction)), 
 			   (char*) make_callees(called_modules));
-
+    
     ifdebug(5) {
 	fprintf(stderr, "Parser: checking code consistency = %d\n",
 		gen_consistent_p( function_body )) ;
     }
+
     DB_PUT_MEMORY_RESOURCE(DBR_PARSED_CODE, 
 			   strdup(module_local_name(CurrentFunction)), 
 			   (char *)function_body);
