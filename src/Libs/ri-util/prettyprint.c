@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.95  1997/11/04 17:36:48  coelho
+ * strdup of comments added.
+ *
  * Revision 1.94  1997/11/04 12:46:09  coelho
  * unused function dropped.
  *
@@ -103,7 +106,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.94 1997/11/04 12:46:09 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.95 1997/11/04 17:36:48 coelho Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -1509,6 +1512,8 @@ text_statement(
     string comments = statement_comments(stmt);
 
     pips_debug(2, "Begin for statement %s\n", statement_identification(stmt));
+    pips_debug(9, "statement_comments: --%s--\n", 
+	       string_undefined_p(comments)? "<undef>": comments);
 
     if(statement_number(stmt)!=STATEMENT_NUMBER_UNDEFINED &&
        statement_ordering(stmt)==STATEMENT_ORDERING_UNDEFINED) {
@@ -1541,11 +1546,14 @@ text_statement(
 				statement_number(stmt)) ;
     }
 
+    /* note about comments: they are duplicated here, but I'm pretty
+     * sure that the free is NEVER performed as it should. FC.
+     */
     if(!ENDP(text_sentences(temp))) {
 	MERGE_TEXTS(r, init_text_statement(module, margin, stmt)) ;
 	if (! string_undefined_p(comments)) {
 	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
-						  comments));
+						  strdup(comments)));
 	}
 	MERGE_TEXTS(r, temp);
     }
@@ -1553,7 +1561,7 @@ text_statement(
 	/* Preserve comments */
 	if (! string_undefined_p(comments)) {
 	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
-						  comments));
+						  strdup(comments)));
 	}
     }
 
