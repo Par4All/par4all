@@ -265,7 +265,7 @@ complexity comp;
     else 
 	return (polynome_TCST(complexity_eval(comp)));
 }
-
+
 /* multiply a complexity by a floating-point number. 
  * Abort if undefined.
  */
@@ -281,7 +281,9 @@ float f;
 	*pcomp = make_zero_complexity();
     }
     else if ( !complexity_zero_p(*pcomp) )
-	complexity_eval(*pcomp) = polynome_scalar_multiply(complexity_eval(*pcomp), f);
+	complexity_eval_(*pcomp) = 
+	    newgen_Ppolynome
+	    (polynome_scalar_multiply(complexity_eval(*pcomp), f));
 }
 
 /* Add comp2's statistics to *pcomp1's
@@ -300,7 +302,8 @@ complexity *pcomp1, comp2;
 
     if ( complexity_zero_p(*pcomp1) ) {
 	*pcomp1 = complexity_dup(comp2);
-	complexity_eval(*pcomp1) = polynome_free(complexity_eval(*pcomp1));
+	complexity_eval_(*pcomp1) = 
+	    newgen_Ppolynome(polynome_free(complexity_eval(*pcomp1)));
     }
     else if ( !complexity_zero_p(comp2) ) {
 	varcount   vc1 = complexity_varcount(*pcomp1);
@@ -345,8 +348,9 @@ complexity *pcomp1, comp2;
 	*pcomp1 = complexity_dup(comp2);
     }
     else if ( !complexity_zero_p(comp2) ) {
-	complexity_eval(*pcomp1) = polynome_addition(complexity_eval(*pcomp1),
-						     complexity_eval(comp2));
+	complexity_eval_(*pcomp1) = 
+	    newgen_Ppolynome(polynome_addition(complexity_eval(*pcomp1),
+					       complexity_eval(comp2)));
 	complexity_stats_add(pcomp1, comp2);
     }
 }
@@ -365,11 +369,14 @@ complexity *pcomp1, comp2;
     if ( complexity_zero_p(*pcomp1) ) 
 	*pcomp1 = complexity_dup(comp2);
     else if ( !complexity_zero_p(comp2) ) {
-	complexity_eval(comp2) = polynome_opposed(complexity_eval(comp2));
-	complexity_eval(*pcomp1) = polynome_addition(complexity_eval(*pcomp1), 
-						     complexity_eval(comp2));
+	complexity_eval_(comp2) = 
+	    newgen_Ppolynome(polynome_opposed(complexity_eval(comp2)));
+	complexity_eval_(*pcomp1) = 
+	    newgen_Ppolynome(polynome_addition(complexity_eval(*pcomp1), 
+					       complexity_eval(comp2)));
 	complexity_stats_add(pcomp1, comp2);
-	complexity_eval(comp2) = polynome_opposed(complexity_eval(comp2));
+	complexity_eval_(comp2) = 
+	    newgen_Ppolynome(polynome_opposed(complexity_eval(comp2)));
     }
 }
 
@@ -390,10 +397,12 @@ complexity *pcomp1, comp2;
     else if ( !complexity_zero_p(*pcomp1) ) {
 	Ppolynome ppmult;
 
-	ppmult = polynome_mult(complexity_eval(*pcomp1), complexity_eval(comp2));
-	complexity_eval(*pcomp1) = polynome_free(complexity_eval(*pcomp1));
+	ppmult = polynome_mult(complexity_eval(*pcomp1),
+			       complexity_eval(comp2));
+	complexity_eval_(*pcomp1) = 
+	    newgen_Ppolynome(polynome_free(complexity_eval(*pcomp1)));
 	/* (Ppolynome) complexity_eval(*pcomp1) = (Ppolynome) ppmult; */
-	complexity_eval(*pcomp1) = ppmult;
+	complexity_eval_(*pcomp1) = newgen_Ppolynome(ppmult);
 	complexity_stats_add(pcomp1, comp2);
     }
 }
@@ -415,7 +424,7 @@ complexity *pcomp1, comp2;
 	Ppolynome ppdiv;
 	ppdiv = polynome_div(complexity_eval(*pcomp1), complexity_eval(comp2));
 /*	polynome_rm(&(complexity_eval(*pcomp1))); */
-	complexity_eval(*pcomp1) = (Ppolynome) ppdiv;
+	complexity_eval_(*pcomp1) = newgen_Ppolynome(ppdiv);
 	complexity_stats_add(pcomp1, comp2);
     }
 }
@@ -429,7 +438,8 @@ Ppolynome pp;
     else if ( POLYNOME_UNDEFINED_P(pp)  )
 	pips_error("complexity_polynome_add", "polynome undefined\n");
     else {
-	complexity_eval(*pcomp) = polynome_addition(complexity_eval(*pcomp), pp);
+	complexity_eval_(*pcomp) = 
+	    newgen_Ppolynome(polynome_addition(complexity_eval(*pcomp), pp));
     }
 }
 
@@ -450,8 +460,9 @@ float f;
 	polynome_rm(&ppnew);
     }
     else 
-	complexity_eval(*pcomp) = 
-	    polynome_scalar_addition(complexity_eval(*pcomp), f);
+	complexity_eval_(*pcomp) = 
+	    newgen_Ppolynome(polynome_scalar_addition(complexity_eval(*pcomp),
+						      f));
 }
 
 
