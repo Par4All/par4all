@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/09/15 14:40:14 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/10/09 15:14:03 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-static char vcid[] = "%A% ($Date: 1995/09/15 14:40:14 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
+static char vcid[] = "%A% ($Date: 1995/10/09 15:14:03 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -43,6 +43,11 @@ Menu_item edit_menu_item;
 
 /* The menu "View" on the main panel: */
 Menu view_menu;
+
+
+/* To pass the view name to
+   execute_wpips_execute_and_display_something_outside_the_notifyer(): */
+string static execute_wpips_execute_and_display_something_outside_the_notifyer_view_name = NULL;
 
 
 void
@@ -229,7 +234,7 @@ wpips_file_view(char * file_name,
    else {
       /* The Emacs mode equivalent: */
       send_window_number_to_emacs(window_number);
-      send_module_name_to_emacs(title_module_name);
+      send_module_name_to_emacs(db_get_current_module_name());
       /* send_icon_name_to_emacs(icon_number); */
       send_view_to_emacs(title_label, file_name);
    }
@@ -244,18 +249,15 @@ wpips_file_view(char * file_name,
 
 
 /* To execute something and display some Pips output with wpips or
-   epips: */
+   epips, called outside the notifyer: */
 void
-wpips_execute_and_display_something(char * label)
+execute_wpips_execute_and_display_something_outside_the_notifyer()
 {
    char * file_name;
    char *module_name = db_get_current_module_name();
 
-   if (module_name == NULL) {
-      prompt_user("No module selected");
-      return;
-   }
-
+   string label = execute_wpips_execute_and_display_something_outside_the_notifyer_view_name;
+   
    if (strcmp(label, SEQUENTIAL_GRAPH_VIEW) == 0) {
       /* Use some graph viewer to display the resource: */
       char system_buffer[300];
@@ -358,7 +360,35 @@ wpips_execute_and_display_something(char * label)
          wpips_file_view(file_name, title_module_name, bank_view_name, window_number, icon_number2, module_name);
       }
    }
-   
+
+   free(execute_wpips_execute_and_display_something_outside_the_notifyer_view_name);
+}
+
+
+void
+wpips_execute_and_display_something_outside_the_notifyer(char * label)
+{
+   execute_wpips_execute_and_display_something_outside_the_notifyer_view_name = strdup(label);
+   /* Ask to execute the
+      execute_wpips_execute_and_display_something_outside_the_notifyer(): */
+   execute_main_loop_command(WPIPS_EXECUTE_AND_DISPLAY);
+   /* I guess the function above does not return... */
+}
+
+
+/* To execute something and display some Pips output with wpips or
+   epips: */
+void
+wpips_execute_and_display_something(char * label)
+{
+   char * module_name = db_get_current_module_name();
+
+   if (module_name == NULL) {
+      prompt_user("No module selected");
+      return;
+   }
+
+   wpips_execute_and_display_something_outside_the_notifyer(label);
 }
 
 
