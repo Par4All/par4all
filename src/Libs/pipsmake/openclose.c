@@ -82,9 +82,9 @@ make_close_workspace(void)
     res &= db_close_workspace();
 
     if(res)
-	user_log("Workspace %s closed\n\n", name);
+	user_log("Workspace %s closed.\n\n", name);
     else
-	user_log("Failed to close workspace %s\n\n", name);
+	user_log("Failed to close workspace %s.\n\n", name);
 
     free(name);
     return res;
