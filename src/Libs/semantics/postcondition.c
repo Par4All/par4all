@@ -1,6 +1,6 @@
 /* by Fabien COELHO
  *
- * $RCSfile: postcondition.c,v $ ($Date: 1996/07/09 22:04:18 $, )
+ * $RCSfile: postcondition.c,v $ ($Date: 1996/07/09 23:30:40 $, )
  * version $Revision$,
  */
 
@@ -13,7 +13,6 @@
 /* Psystems stuff
  */
 
-#include "types.h"
 #include "boolean.h"
 #include "vecteur.h"
 #include "contrainte.h"
