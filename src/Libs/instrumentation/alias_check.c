@@ -400,7 +400,11 @@ static void insert_test_before_statement(expression flags, expression condition,
   expression cond;
   statement smt;
   int order = statement_ordering(s);
-  string message;
+  string message = strdup(concatenate("\'Alias violation in module ", 
+				      module_local_name(current_mod),": write on ", 
+				      entity_local_name(e1),", aliased with ",
+				      entity_local_name(e2)," by call path ",
+				      print_call_path(path),"\'", NULL));
   string mod_name = module_local_name(current_mod);
   string user_file = db_get_memory_resource(DBR_USER_FILE,mod_name,TRUE);
   string base_name = pips_basename(user_file, NULL);
@@ -410,27 +414,11 @@ static void insert_test_before_statement(expression flags, expression condition,
   else
     cond = and_expression(condition,flags);
   if (get_bool_property("PROGRAM_VERIFICATION_WITH_PRINT_MESSAGE"))
-    {   
-      message = strdup(concatenate("\'AV: module ", 
-				   module_local_name(current_mod)," write on ", 
-				   entity_local_name(e1)," aliased with ",
-				   entity_local_name(e2)," by call path ",
-				   print_call_path(path)," with ",
-				   words_to_string(words_syntax(expression_syntax(condition))),
-				   "\'",print_variables(condition), NULL));
-      smt = test_to_statement(make_test(cond, make_print_statement(message),
-					make_block_statement(NIL)));
-    }
+    smt = test_to_statement(make_test(cond, make_print_statement(message),
+				      make_block_statement(NIL)));
   else
-    {
-      message = strdup(concatenate("\'Alias violation in module ", 
-				   module_local_name(current_mod),": write on ", 
-				   entity_local_name(e1),", aliased with ",
-				   entity_local_name(e2)," by call path ",
-				   print_call_path(path),"\'", NULL));
-      smt = test_to_statement(make_test(cond, make_stop_statement(message),
-					make_block_statement(NIL)));
-    }
+    smt = test_to_statement(make_test(cond, make_stop_statement(message),
+				      make_block_statement(NIL)));
   fprintf(out,"%s\t%s\t%s\t(%d,%d)\n",PREFIX1,file_name,module_local_name(current_mod),
 	  ORDERING_NUMBER(order),ORDERING_STATEMENT(order));
   print_text(out, text_statement(entity_undefined,0,smt));
@@ -2047,7 +2035,7 @@ bool alias_check(char * module_name)
       if (entity_undefined_p(alias_flag))
 	alias_flag = make_entity(alias_flag_name, 
 				 make_type(is_type_variable,
-					   make_variable(make_basic_logical(4),NIL)),
+					   make_variable(make_basic_logical(4),NIL,NIL)),
 				 storage_undefined, value_undefined);
       alias_function = gen_find_tabulated(alias_function_name,entity_domain);
       if (entity_undefined_p(alias_function))
