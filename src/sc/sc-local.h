@@ -232,13 +232,6 @@ les anciens noms des fonctions */
 #define integer_projection(sci,sc,v) \
  sc_integer_projection_along_variable((sci),(sc),(v))
 
-/* structures D'Arnauld Leservot */
-typedef struct Ssyslist	 {
-	Psysteme		psys;
-	struct Ssyslist		*succ;
-	} *Psyslist,Ssyslist;
-#define SL_UNDEFINED	NULL
-
 
 
 #endif SYSTEME
