@@ -990,6 +990,8 @@ static void bottom_up_abc_statement_rwt(
     case is_instruction_sequence: 
     case is_instruction_loop:
       // suppose that there are not array references in loop's range in norm	
+    case is_instruction_forloop:
+      // suppose that there are not array references in loop's range in norm	
     case is_instruction_unstructured:
       /* because we use gen_recurse with statement domain, 
        * we don't have to check unstructured  instruction here*/
