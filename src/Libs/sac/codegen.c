@@ -244,9 +244,9 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad)
       OTHER
    } argsType;
    const char funcNames[3][2][20] = {
-      { "simd_save",          "simd_load"          },
-      { "simd_constant_save", "simd_constant_load" },
-      { "simd_generic_save",  "simd_generic_load"  } };
+      { "SIMD_SAVE",          "SIMD_LOAD"          },
+      { "SIMD_CONSTANT_SAVE", "SIMD_CONSTANT_LOAD" },
+      { "SIMD_GENERIC_SAVE",  "SIMD_GENERIC_LOAD"  } };
    referenceInfo firstRef = make_empty_referenceInfo();
    referenceInfo cRef = make_empty_referenceInfo();
    int lastOffset = 0;
@@ -776,7 +776,7 @@ static statement make_shuffle_statement(entity dest, entity src, int order)
 			     entity_to_expression(src),
 			     make_integer_constant_expression(order),
 			     NULL);
-   return call_to_statement(make_call(get_function_entity("mmx_pshufw"),
+   return call_to_statement(make_call(get_function_entity("PSHUFW"),
 				      args));
 }
 
