@@ -1,9 +1,9 @@
-/* %A% ($Date: 1995/12/15 19:24:35 $, ) 
+/* %A% ($Date: 1995/12/19 10:57:55 $, ) 
     version $Revision$, got on %D%, %T% [%P%].
    Copyright (c) - École des Mines de Paris Proprietary.  */
 
 #ifndef lint
-char top_level_newgen_c_vcid[] = "%A% ($Date: 1995/12/15 19:24:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char top_level_newgen_c_vcid[] = "%A% ($Date: 1995/12/19 10:57:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 #include <stdio.h>
 
@@ -27,42 +27,27 @@ char top_level_newgen_c_vcid[] = "%A% ($Date: 1995/12/15 19:24:35 $, ) version $
 #include "paf_ri.h"
 #include "word_attachment.h"
 
-#include <malloc.h> /* for mallopt */
-
 void initialize_newgen()
 {
-/* use mallopt if possible...
- * not define for System V I guess.
- */
-#ifdef M_MXFAST
-    /* it seems not to be implemented...
+    /* Read NewGen specification file
      */
-    if (mallopt(M_MXFAST, 48))
-	fprintf(stderr, "mallopt mxfast failed\n");
-
-    if (mallopt(M_GRAIN, 8))
-	fprintf(stderr, "XX mallopt grain failed\n");
-#endif    
-
-    /* lecture specifications NewGen */
     gen_read_spec(ALL_SPECS);
       
-    /* initialisation des fonctions d'entrees-sorties pour les types
-     * de donnees non geres par NewGen (ou presque:-)
+    /* Initialise external functions...
+     * re-entry in newgen because of the graph stuff...
      */  
-
     gen_init_external(ARC_LABEL, 
 		      (char *(*)()) gen_read, 
 		      (void (*)()) gen_write,
-		      (void (*)()) gen_free_with_sharing, 
-		      (char *(*)()) gen_copy_tree,
+		      (void (*)()) gen_free, 
+		      (char *(*)()) gen_copy_tree_with_sharing,
 		      (int (*)()) gen_allocated_memory);
 
     gen_init_external(VERTEX_LABEL, 
 		      (char *(*)()) gen_read, 
 		      (void (*)()) gen_write,
-		      (void (*)()) gen_free_with_sharing, 
-		      (char *(*)()) gen_copy_tree,
+		      (void (*)()) gen_free, 
+		      (char *(*)()) gen_copy_tree_with_sharing,
 		      (int (*)()) gen_allocated_memory);
 
     gen_init_external(PPOLYNOME, 
@@ -87,9 +72,9 @@ void initialize_newgen()
 		      (int (*)()) sc_gen_allocated_memory);
 
     gen_init_external(MATRICE, 
-		      (char *(*)()) matrice_gen_read,
-		      (void (*)()) matrice_gen_write, 
-		      (void (*)()) matrice_gen_free,
-		      (char *(*)()) matrice_gen_copy_tree,
+		      (char *(*)()) gen_core,
+		      (void (*)()) gen_core, 
+		      (void (*)()) free,
+		      (char *(*)()) gen_core,
 		      (int (*)()) NULL); /* can't get the size... FC */
 }
