@@ -4,6 +4,9 @@
 # $Id$
 #
 # $Log: pips-makemake,v $
+# Revision 1.328  1998/07/21 17:05:30  coelho
+# UTC_DATE added.
+#
 # Revision 1.327  1998/07/02 10:57:16  coelho
 # fixes for jpips are useless, and buggy for properties which does not have
 # any c file...
@@ -446,6 +449,7 @@ include \$(CONFIG)
 all: \$(ARCH) $ALL_RULE_TARGET
 #
 # The software architecture (compilers and options...) used.
+UTC_DATE = $(shell date -u)
 CPPFLAGS += -DSOFT_ARCH='"\$(ARCH)"'
 #
 # {C,CPP,LD,L,Y}OPT macros allow to *add* things from the command line
