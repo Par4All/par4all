@@ -163,7 +163,7 @@ void declaration_with_overlaps()
 	 entity 
 	     oldent = ENTITY(CAR(ce));
 	 entity
-	     ent = (entity) GET_ENTITY_MAPPING(oldtonewnodevar, oldent);
+	     ent = load_entity_node_new(oldent);
 	 int 
 	     ndim = variable_entity_dimension(ent);
 	 int 
@@ -193,6 +193,6 @@ void declaration_with_overlaps()
 	     }
 	 }
      },
-	 distributedarrays);
+	 list_of_distributed_arrays());
 }
 
