@@ -1,0 +1,47 @@
+$RCSfile: hpfc_runtime_library.README,v $ ($Revision$) $Date: 1995/09/26 08:52:25 $, 
+
+ (c) Fabien Coelho, 1993-1995
+
+This file describe the content of the Hpfc Runtime Library.
+Don't expect anything from these sources, so you won't be disapointed.
+
+Introduction:
+-------------
+
+This library was developped as a support to the Prototype HPF Compiler
+generated codes. It includes functions for runtime description of the
+distributed arrays, communications, shifts, broadcasts, and so on.
+It is based on PVM. Some never tested extensions tried to use the CMMD
+library of the CM5. Plans to switch to MPI. Most of the functions are
+generated thru m4 templates, that get rid of types and data dimensions.
+
+How to built the library:
+-------------------------
+
+Define the following environment variables:
+
+PIPS_M4
+HPFC_M4 
+ these m4 should include the shift operator. 
+ (Sun m4 is defficient, GNU m4 1.4 is okay)
+PVM_ROOT and PVM_ARCH
+HPFC_RUNTIME_M4_PARAMS:
+ -D DEMO      (print some messages when launched)
+ -D DIRECT    (use direct connexion)
+ -D DEBUG     (verbose run)
+ -D SYNC_EXIT (synchronize on exit)
+ -D USE_PVMe  (for IBM's PVM. a PVM3_ROOT is expected if set)
+
+Then make and hope.
+
+Library content and organization:
+---------------------------------
+
+
+
+Bugs:
+-----
+
+Many of them!
+I should build one lib for the host and one the nodes?
+Demand driven compilation of functions?
