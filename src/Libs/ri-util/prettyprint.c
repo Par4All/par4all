@@ -249,7 +249,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.234 2003/08/14 09:29:47 nguyen Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.235 2003/09/05 14:29:54 nguyen Exp $";
 #endif /* lint */
 
  /*
@@ -583,7 +583,7 @@ words_regular_call(call obj, bool is_a_subroutine)
   if (type_void_p(functional_result(type_functional(t)))) 
     {
       if (is_a_subroutine) 
-	pc = CHAIN_SWORD(pc, "CALL ");
+	pc = CHAIN_SWORD(pc, is_fortran?"CALL ":"");
       else
 	pips_user_warning("subroutine '%s' used as a function.\n",
 			  entity_name(f));
@@ -592,7 +592,7 @@ words_regular_call(call obj, bool is_a_subroutine)
   else if (is_a_subroutine) {
     pips_user_warning("function '%s' used as a subroutine.\n",
 		      entity_name(f));
-    pc = CHAIN_SWORD(pc, "CALL ");
+    pc = CHAIN_SWORD(pc, is_fortran?"CALL ":"");
   }
 
   /* the implied complex operator is hidden... [D]CMPLX_(x,y) -> (x,y)
@@ -1053,9 +1053,6 @@ words_prefix_unary_op(call obj, int precedence, bool leftmost)
 	else
 	 if (strcmp(fun,"+unary") == 0) 
 	    fun = "+";
-	  else
-	    if (strcmp(fun,"-unary") == 0) 
-	      fun = "-";
     pc = CHAIN_SWORD(pc,strdup(fun));
     pc = gen_nconc(pc, words_subexpression(e, prec, FALSE));
 
@@ -1468,7 +1465,7 @@ multiply-add operators ( JZ - sept 98) */
     {"&",  words_prefix_unary_op,25},
     {"*indirection",  words_prefix_unary_op, 25},
     {"+unary", words_prefix_unary_op, 25},
-    {"-unary", words_prefix_unary_op, 25},
+    /*{"-unary", words_prefix_unary_op, 25},*/
     {"~", words_prefix_unary_op, 25},
     {"!", words_prefix_unary_op, 25},
     
@@ -2534,7 +2531,7 @@ text_statement(
     /* 31/07/2003 Nga Nguyen : This code is added for C, because a statement can have its own declarations */
     list l = statement_declarations(stmt);
     if (!ENDP(l))
-      MERGE_TEXTS(r,c_text_entity_declaration(l,margin));
+      MERGE_TEXTS(r,c_text_entities(l,margin));
 
     pips_debug(2, "Begin for statement %s\n", statement_identification(stmt));
     pips_debug(9, "statement_comments: --%s--\n", 
