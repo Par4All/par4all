@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.114  2000/11/29 09:15:27  coelho
+ * tpips_init_done made visible.
+ *
  * Revision 1.113  2000/07/06 13:35:28  coelho
  * remove added to automatic completion.
  *
@@ -957,7 +960,7 @@ static string tp_substitutions(string line)
     return substituted;
 }
 
-static bool tpips_init_done = FALSE;
+bool tpips_init_done = FALSE;
 void tpips_init(void)
 {
     if (tpips_init_done) return;
@@ -983,7 +986,7 @@ static bool blank_or_comment_line_p(string line)
     return line[0]==TPIPS_COMMENT_PREFIX || line[0]=='\0';
 }
 
-void tpips_exec(char * line)
+static void tpips_exec(char * line)
 {
     jmp_buf pips_top_level;
 
