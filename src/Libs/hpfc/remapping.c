@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1995/04/24 16:36:32 $, ) 
+ * ($Date: 1995/04/24 16:39:17 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -271,10 +271,10 @@ entity lid, src, trg;
 		  NIL))));
 
     statement_comments(result) = 
-	strdup(concatenate("c - %sing\n",
+	strdup(concatenate("c - ",
 			   t==0 ? "copy" :
 			   t==1 ? "send" :
-			   t==2 ? "receiv" : "?", NULL));
+			   t==2 ? "receiv" : "?", "ing\n", NULL));
 
     return(result);
 }
