@@ -21,6 +21,7 @@ SCRIPTS = 	$(UTILS) \
 SRC_MACROS =	auto.h \
 		define_libraries.sh \
 		makefile_macros.. \
+		makefile_macros.GNUSOL1 \
 		makefile_macros.DEFAULT \
 		makefile_macros.GNU \
 		makefile_macros.SUN4 \
