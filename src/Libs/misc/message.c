@@ -15,6 +15,8 @@
 #include <setjmp.h>
 
 #include "types.h"
+#include "genC.h"
+#include "misc.h"
 
 /* FI: grah, qu'est-ce que c'est que cette heresie? misc ne devait pas
    dependre de NewGen! */
@@ -325,9 +327,8 @@ va_dcl
 
 /*  new version without varargs, FC 09/06/94
  */
-void pips_assert(function, predicate)
-char *function;
-int predicate;
+void pips_assert_function(char * function, int predicate,
+			  int line, char * file)
 {
     /* print name of function causing error and
      * create a core file for debug 
@@ -335,7 +336,7 @@ int predicate;
     if(!predicate) 
 	(void) fprintf(stderr, "pips assertion failed"
 		       " in function %s at line %d of file %s\n",
-		       function, __LINE__, __FILE__),
+		       function, line, file),
 	(void) abort();
 }
 
