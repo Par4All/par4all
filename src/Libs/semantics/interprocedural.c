@@ -3,6 +3,11 @@
  * $Id$
  *
  * $Log: interprocedural.c,v $
+ * Revision 1.29  1999/01/14 17:27:43  irigoin
+ * Kludge to avoid a useless costly projection in
+ * precondition_intra_to_inter(). This was motivated by XERCTL in KIVA,
+ * combustion code from Renault.
+ *
  * Revision 1.28  1999/01/07 16:43:06  irigoin
  * Bug fix in translated_global_value() to resist aliasing between a global variable and a formal parameter. See spice01.f in Validation.
  *
@@ -269,7 +274,7 @@ list l;
 transformer add_formal_to_actual_bindings(c, pre)
 call c;
 transformer pre;
- {
+{
      entity f = call_function(c);
      list pc = call_arguments(c);
      list formals = entity_to_formal_integer_parameters(f);
@@ -324,157 +329,177 @@ transformer precondition_intra_to_inter(callee, pre, le)
 entity callee;
 transformer pre;
 cons * le;
- {
+{
 #define DEBUG_PRECONDITION_INTRA_TO_INTER 1
-     cons * values = NIL;
-     cons * lost_values = NIL;
-     Psysteme r;
-     Pbase b;
-     cons * ca;
+    list values = NIL;
+    list lost_values = NIL;
+    list preserved_values = NIL;
+    Psysteme r;
+    Pbase b;
+    cons * ca;
 
-     ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER) 
-	 {
-	     debug(DEBUG_PRECONDITION_INTRA_TO_INTER,"precondition_intra_to_inter",
-		   "begin for call to %s\nwith precondition:\n", 
-		   module_local_name(callee));
-	     /* precondition cannot be printed because equations linking formal 
-	      * parameters have been added to the real precondition
-	      */
-	     dump_transformer(pre);
-	 }
+    ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER) 
+	{
+	    debug(DEBUG_PRECONDITION_INTRA_TO_INTER,"precondition_intra_to_inter",
+		  "begin for call to %s\nwith precondition:\n", 
+		  module_local_name(callee));
+	    /* precondition cannot be printed because equations linking formal 
+	     * parameters have been added to the real precondition
+	     */
+	    dump_transformer(pre);
+	}
 
-     r = (Psysteme) predicate_system(transformer_relation(pre));
+    r = (Psysteme) predicate_system(transformer_relation(pre));
 
-     /* make sure you do not export a (potentially) meaningless old value */
-     for( ca = transformer_arguments(pre); !ENDP(ca); POP(ca) ) 
-     {
-	 entity e = ENTITY(CAR(ca));
-	 entity e_old;
+    /* make sure you do not export a (potentially) meaningless old value */
+    for( ca = transformer_arguments(pre); !ENDP(ca); POP(ca) ) 
+    {
+	entity e = ENTITY(CAR(ca));
+	entity e_old;
 
-	 /* Thru DATA statements, old values of other modules may appear */
-	 if(!same_string_p(entity_module_name(e), 
-			   module_local_name(get_current_module_entity()))) {
-	     debug(DEBUG_PRECONDITION_INTRA_TO_INTER,
-		   "precondition_intra_to_inter",
-		   "entitiy %s not belonging from module %s\n",
-		   entity_name(e),
-		   module_local_name(get_current_module_entity()));
-	 }
+	/* Thru DATA statements, old values of other modules may appear */
+	if(!same_string_p(entity_module_name(e), 
+			  module_local_name(get_current_module_entity()))) {
+	    debug(DEBUG_PRECONDITION_INTRA_TO_INTER,
+		  "precondition_intra_to_inter",
+		  "entitiy %s not belonging to module %s\n",
+		  entity_name(e),
+		  module_local_name(get_current_module_entity()));
+	}
 
-	 e_old  = entity_to_old_value(e);
+	e_old  = entity_to_old_value(e);
 	
-	 if(base_contains_variable_p(sc_base(r), (Variable) e_old))
-	     lost_values = arguments_add_entity(lost_values,
-						e_old);
-     }
+	if(base_contains_variable_p(sc_base(r), (Variable) e_old))
+	    lost_values = arguments_add_entity(lost_values,
+					       e_old);
+    }
 
-     ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER) 
-	 {
-	     debug(DEBUG_PRECONDITION_INTRA_TO_INTER, "precondition_intra_to_inter",
-		   "meaningless old value(s):\n");
-	     dump_arguments(lost_values);
-	 }
+    ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER) 
+	{
+	    debug(DEBUG_PRECONDITION_INTRA_TO_INTER, "precondition_intra_to_inter",
+		  "meaningless old value(s):\n");
+	    dump_arguments(lost_values);
+	}
 
-     /* get rid of old_values */
-     pre = transformer_projection_with_redundancy_elimination
-	 (pre, lost_values, /* sc_elim_redund */ no_elim);
+    /* get rid of old_values */
+    pre = transformer_projection_with_redundancy_elimination
+	(pre, lost_values, /* sc_elim_redund */ no_elim);
 
-     gen_free_list(lost_values);
+    gen_free_list(lost_values);
 
     
-     translate_global_values(callee, pre);
+    translate_global_values(callee, pre);
 
-     /* get rid of pre's variables that do not appear in effects le */
-     /* we should not have to know about these internal objects, Psysteme
-	and Pvecteur! */
-     lost_values = NIL;
-     r = (Psysteme) predicate_system(transformer_relation(pre));
-     for(b = r->base; b != NULL; b = b->succ)
-	 values = arguments_add_entity(values, (entity) b->var);
+    /* get rid of pre's variables that do not appear in effects le */
+    /* we should not have to know about these internal objects, Psysteme
+       and Pvecteur! */
+    lost_values = NIL;
+    r = (Psysteme) predicate_system(transformer_relation(pre));
+    for(b = r->base; b != NULL; b = b->succ)
+	values = arguments_add_entity(values, (entity) b->var);
 
-     /* build a list of arguments to suppress; 
-	get rid of variables that are not referenced, directly or indirectly,
-     by the callee; translate what you can */
-     for(ca =values; !ENDP(ca);  POP(ca))    {
-	 entity e = ENTITY(CAR(ca));
-	 list l_callee = (list) effects_conflict_with_entities(le, e);
-	 /* For clarity, all cases are presented */
-	 if (ENDP(l_callee)) {   /* no conflicts */
-	     lost_values = arguments_add_entity(lost_values, e);
-	     debug(DEBUG_PRECONDITION_INTRA_TO_INTER, 
-		   "precondition_intra_to_inter",
-		   "value %s lost according to effect list\n",
-		   entity_name(e));
-	 }
-	 else {
-	     /* list of conflicting entities */
-	     entity e_callee = ENTITY(CAR(l_callee));
-	     /* case 1: only one entity*/
-	     if (gen_length(l_callee)==1) {
-		 /*  case 1.1: one conflicting integer entity */
-		 if (integer_scalar_entity_p(e_callee)) {
-		     if(e_callee != e) {
-			 pre = transformer_value_substitute(pre, 
-							    e, e_callee);
-			 ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER) {
-			     debug(DEBUG_PRECONDITION_INTRA_TO_INTER, 
-				   "precondition_intra_to_inter",
-				   "value %s substituted by %s according to effect list le:\n", 
-				   entity_name(e), entity_name(e_callee));
-			     dump_arguments(lost_values);
-			 }
-		     }
-		 }
-		 /* case 1.22: one conflicting non integer scalar entity*/
-		 else { 
-		     lost_values = arguments_add_entity(lost_values, e);
-		     debug(DEBUG_PRECONDITION_INTRA_TO_INTER, 
-			   "precondition_intra_to_inter",
-			   "value %s lost because non integer scalar entity\n",
-			   entity_name(e));
-		 }
-	     }   
-	     else  { /* case 2: at least 2 conflicting entities */
-		 if (integer_scalar_entity_list_p(l_callee)) {
-		     /* case 2.1: all entities have the same type, 
-			according to mapping_values the subtitution 
-		     is made with the first list element e_callee*/
-		     if(e_callee != e) {
-			 pre = transformer_value_substitute(pre, 
-							    e, e_callee);
-			 ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER) {
-			     debug(DEBUG_PRECONDITION_INTRA_TO_INTER, 
-				   "precondition_intra_to_inter",
-				   "value %s substituted by %s the first element list according to effect list le:\n", 
-				   entity_name(e), entity_name(e_callee));
-			     dump_arguments(lost_values);
-			 }
-		     }
-		 }
+    /* build a list of arguments to suppress; 
+       get rid of variables that are not referenced, directly or indirectly,
+       by the callee; translate what you can */
+    for(ca = values; !ENDP(ca);  POP(ca))    {
+	entity e = ENTITY(CAR(ca));
+	list l_callee = (list) effects_conflict_with_entities(le, e);
+	/* For clarity, all cases are presented */
+	if (ENDP(l_callee)) {   /* no conflicts */
+	    lost_values = arguments_add_entity(lost_values, e);
+	    debug(DEBUG_PRECONDITION_INTRA_TO_INTER, 
+		  "precondition_intra_to_inter",
+		  "value %s lost according to effect list\n",
+		  entity_name(e));
+	}
+	else {
+	    /* list of conflicting entities */
+	    entity e_callee = ENTITY(CAR(l_callee));
+	    /* case 1: only one entity*/
+	    if (gen_length(l_callee)==1) {
+		/*  case 1.1: one conflicting integer entity */
+		if (integer_scalar_entity_p(e_callee)) {
+		    if(e_callee != e) {
+			pre = transformer_value_substitute(pre, 
+							   e, e_callee);
+			ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER) {
+			    debug(DEBUG_PRECONDITION_INTRA_TO_INTER, 
+				  "precondition_intra_to_inter",
+				  "value %s substituted by %s according to effect list le:\n", 
+				  entity_name(e), entity_name(e_callee));
+			    dump_arguments(lost_values);
+			}
+		    }
+		}
+		/* case 1.22: one conflicting non integer scalar entity*/
+		else { 
+		    lost_values = arguments_add_entity(lost_values, e);
+		    debug(DEBUG_PRECONDITION_INTRA_TO_INTER, 
+			  "precondition_intra_to_inter",
+			  "value %s lost because non integer scalar entity\n",
+			  entity_name(e));
+		}
+	    }   
+	    else  { /* case 2: at least 2 conflicting entities */
+		if (integer_scalar_entity_list_p(l_callee)) {
+		    /* case 2.1: all entities have the same type, 
+		       according to mapping_values the subtitution 
+		       is made with the first list element e_callee*/
+		    if(e_callee != e) {
+			pre = transformer_value_substitute(pre, 
+							   e, e_callee);
+			ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER) {
+			    debug(DEBUG_PRECONDITION_INTRA_TO_INTER, 
+				  "precondition_intra_to_inter",
+				  "value %s substituted by %s the first element list according to effect list le:\n", 
+				  entity_name(e), entity_name(e_callee));
+			    dump_arguments(lost_values);
+			}
+		    }
+		}
 		
-		 else { /* case 2.2:all entities do not have the same type*/ 
-		     lost_values = arguments_add_entity(lost_values, e);
-		     debug(DEBUG_PRECONDITION_INTRA_TO_INTER, 
-			   "precondition_intra_to_inter",
-			   "value %s lost - list of conflicting entities with different types\n",
-			   entity_name(e));
-		 }
-	     }
-	 }
+		else { /* case 2.2:all entities do not have the same type*/ 
+		    lost_values = arguments_add_entity(lost_values, e);
+		    debug(DEBUG_PRECONDITION_INTRA_TO_INTER, 
+			  "precondition_intra_to_inter",
+			  "value %s lost - list of conflicting entities with different types\n",
+			  entity_name(e));
+		}
+	    }
+	}
 	
-     }
+    }
 
+    preserved_values = arguments_difference(values, lost_values);
+     
     ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER) {
 	debug(DEBUG_PRECONDITION_INTRA_TO_INTER, "precondition_intra_to_inter",
 	      "values lost because they do not appear in the effect list le:\n");
 	dump_arguments(lost_values);
+	debug(DEBUG_PRECONDITION_INTRA_TO_INTER, "precondition_intra_to_inter",
+	      "values preserved because they do appear in the effect list le"
+	      " and in the transformer basis:\n");
+	dump_arguments(preserved_values);
     }
 
-    /* get rid of untouched variables */
-    pre = transformer_projection_with_redundancy_elimination
-	(pre, lost_values, /* sc_elim_redund */ no_elim);
+    /* Get rid of unused or untouched variables, even though they may
+     * appear as global variables or formal parameters
+     *
+     * This happens with automatically generated modules and for routine
+     * XERCLT in KIVA (Renault) because it has been emptied.
+     *
+     */
+    if(ENDP(preserved_values)) {
+	free_transformer(pre);
+	pre = transformer_identity();
+    }
+    else {
+	pre = transformer_projection_with_redundancy_elimination
+	    (pre, lost_values, /* sc_elim_redund */ no_elim);
+    }
     
     /* free the temporary list of entities */
+    gen_free_list(preserved_values);
     gen_free_list(lost_values);
     gen_free_list(values);
 
@@ -484,14 +509,14 @@ cons * le;
     transformer_arguments(pre) = NIL;
 
     ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER) 
-    {
-	debug(DEBUG_PRECONDITION_INTRA_TO_INTER,"precondition_intra_to_inter",
-	      "return pre=%x\n",pre);
-	(void) dump_transformer(pre);
+	{
+	    debug(DEBUG_PRECONDITION_INTRA_TO_INTER,"precondition_intra_to_inter",
+		  "return pre=%x\n",pre);
+	    (void) dump_transformer(pre);
 	
-	debug(DEBUG_PRECONDITION_INTRA_TO_INTER,
-	      "precondition_intra_to_inter","end\n");
-    }
+	    debug(DEBUG_PRECONDITION_INTRA_TO_INTER,
+		  "precondition_intra_to_inter","end\n");
+	}
     
 
     return pre;
