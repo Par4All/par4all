@@ -363,3 +363,14 @@ statement_to_effects(statement s)
 
     return l_eff;
 }
+
+/* SIDE EFFECT: set both proper_rw_effects and expr_prw_effects.
+ */
+bool full_proper_effects(string module_name, statement current)
+{
+  bool ok = TRUE;
+  set_methods_for_proper_simple_effects();
+  expression_proper_effects_engine(module_name, current);
+  generic_effects_reset_all_methods();
+  return ok;
+}
