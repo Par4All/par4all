@@ -75,11 +75,8 @@ text_block(
 	statement s = STATEMENT(CAR(objs));
 
 	text t = text_statement(module, margin, s);
-	/**********written by Dat************/
-	if (found_filter) {
-	  text_sentences(r) = 
-	    gen_nconc(text_sentences(r), text_sentences(t));
-	}
+	text_sentences(r) = 
+	  gen_nconc(text_sentences(r), text_sentences(t));
 	text_sentences(t) = NIL;
 	free_text(t);
     }
@@ -117,8 +114,9 @@ load_list_icfg(statement_effects m, statement s) {
   return effects_effects(apply_statement_effects(m, s));
 }
 
-list /* of effect */ effects_filter(list l_effs, entity e_flt)
+list /* of effect */ effects_filter(list l_effs)
 {
+  entity e_flt = global_name_to_entity("MAIN", "KMAX");
   list l_flt = NIL;
   MAPL(l, {
     effect eff = EFFECT(CAR(l));
@@ -135,8 +133,7 @@ static text
 resource_text_flt(entity module, int margin, statement stat)
 {
   list l_eff = load_list_icfg(ips->resource, stat);
-  entity e_flt = global_name_to_entity("MAIN", "KMAX");
-  list l_eff_flt = effects_filter(l_eff, e_flt);
+  list l_eff_flt = effects_filter(l_eff);
   text l_eff_text = (*(ips->get_text))(l_eff_flt);
   gen_free_list(l_eff_flt);
   return l_eff_text;
