@@ -108,7 +108,7 @@ Psysteme s1, s2;
 }
 
 
-/* Psysteme build_sc_nredund_1pass_ofl_ctrl(Psysteme ps, int ofl_check_level)
+/* Psysteme build_sc_nredund_1pass_ofl_ctrl(Psysteme ps, int ofl_ctrl)
  * input    : a system in which redundancies must be eliminated, and an
  *            integer indicating how overflow errors must be handled.
  * output   : Computes a new system sc from the system ps, where each 
@@ -120,17 +120,18 @@ Psysteme s1, s2;
  *            The set of equalities is copied as such and ignored by 
  *            redundancy checks.
  *
- *            if ofl_check_level == 0 overflow errors are trapped in the 
+ *            if ofl_ctrl == 0 overflow errors are trapped in the 
  *               routine which checks if the system is feasible.
- *            if ofl_check_level == 2 overflow errors are trapped in the 
- *               current routine, and the remaining constraints are simply 
- *               added, as if they were not redundant.
- *            if ofl_check_level == 1 overflow errors are forwarded to the
+ *            if ofl_ctrl == 2 overflow errors are trapped in the 
+ *              sc_rational_feasibility_ofl_ctrl  routine that 
+ *              keeps the constraint in the system whatever its redundancy 
+ *              characteristic
+ *            if ofl_ctrl == 1 overflow errors are forwarded to the
  *               calling routine.
  */
-void build_sc_nredund_1pass_ofl_ctrl(psc, ofl_check_level)
+void build_sc_nredund_1pass_ofl_ctrl(psc, ofl_ctrl)
 Psysteme *psc;
-int ofl_check_level;
+int ofl_ctrl;
 {
 
     Psysteme sc;
@@ -162,7 +163,7 @@ int ofl_check_level;
 	contrainte_reverse(ineg);
 	
 	sc_add_inegalite(sc,ineg);
-	if (sc_rational_feasibility_ofl_ctrl(sc,ofl_check_level,TRUE))
+	if (sc_rational_feasibility_ofl_ctrl(sc,ofl_ctrl,TRUE))
 	    contrainte_reverse(ineg);
 	else {
 	    sc->inegalites = sc->inegalites->succ;
