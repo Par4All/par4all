@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1995/09/04 16:33:23 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1995/09/05 08:34:19 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -82,13 +82,13 @@ $SED 's,^[Cc!\*][Hh][Pp][Ff]\$\(.\)[ 	]*,chpf$\1,;
 #
 # lower case letters for directives *only*
 #
-$SED '/^chpf$/s,A,a,g;/^chpf$/s,B,b,g;/^chpf$/s,C,c,g;/^chpf$/s,D,d,g;
-      /^chpf$/s,E,e,g;/^chpf$/s,F,f,g;/^chpf$/s,G,g,g;/^chpf$/s,H,h,g;
-      /^chpf$/s,I,i,g;/^chpf$/s,J,j,g;/^chpf$/s,K,k,g;/^chpf$/s,L,l,g;
-      /^chpf$/s,M,m,g;/^chpf$/s,N,n,g;/^chpf$/s,O,o,g;/^chpf$/s,P,p,g;
-      /^chpf$/s,Q,q,g;/^chpf$/s,R,r,g;/^chpf$/s,S,s,g;/^chpf$/s,T,t,g;
-      /^chpf$/s,U,u,g;/^chpf$/s,V,v,g;/^chpf$/s,W,w,g;/^chpf$/s,X,x,g;
-      /^chpf$/s,Y,y,g;/^chpf$/s,Z,z,g;' |
+$SED '/^chpf\$/s,A,a,g;/^chpf\$/s,B,b,g;/^chpf\$/s,C,c,g;/^chpf\$/s,D,d,g;
+      /^chpf\$/s,E,e,g;/^chpf\$/s,F,f,g;/^chpf\$/s,G,g,g;/^chpf\$/s,H,h,g;
+      /^chpf\$/s,I,i,g;/^chpf\$/s,J,j,g;/^chpf\$/s,K,k,g;/^chpf\$/s,L,l,g;
+      /^chpf\$/s,M,m,g;/^chpf\$/s,N,n,g;/^chpf\$/s,O,o,g;/^chpf\$/s,P,p,g;
+      /^chpf\$/s,Q,q,g;/^chpf\$/s,R,r,g;/^chpf\$/s,S,s,g;/^chpf\$/s,T,t,g;
+      /^chpf\$/s,U,u,g;/^chpf\$/s,V,v,g;/^chpf\$/s,W,w,g;/^chpf\$/s,X,x,g;
+      /^chpf\$/s,Y,y,g;/^chpf\$/s,Z,z,g;' |
 #
 # and continuation handling:
 # put on one line
