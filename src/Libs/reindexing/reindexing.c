@@ -712,9 +712,12 @@ char*           mod_name;
 
   new_mod_stat = re_do_it(the_dfg, the_bdt, the_plc);
 
-  control_statement(unstructured_control(instruction_unstructured(statement_instruction(mod_stat)))) = new_mod_stat;
-  module_reorder(mod_stat);
-
+  /* Remove the old code: */
+  free_instruction(statement_instruction(mod_stat));
+  /* And replace it by the new one: */
+  statement_instruction(mod_stat) = make_instruction_block(CONS(STATEMENT,
+								new_mod_stat,
+								NIL));
   DB_PUT_MEMORY_RESOURCE(DBR_REINDEXED_CODE, strdup(mod_name),
 			 (char*) mod_stat);
   reset_current_module_statement(); 
