@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1995/09/15 17:35:39 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1995/09/20 19:32:11 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -143,16 +143,15 @@ OPENWINHOME="/usr/openwin"
 WPIPS_ADDED_CPPFLAGS='-I$(OPENWINHOME)/include -Iicons'
 WPIPS_ADDED_LIBS='-lxview -lolgx -lX11'
 WPIPS_ADDED_LDFLAGS='-L$(OPENWINHOME)/lib -static'
-
+ 
 #
-#        ####### ######    ###   ######   #####
-#           #    #     #    #    #     # #     #
-#           #    #     #    #    #     # #
-#           #    ######     #    ######   #####
-#           #    #          #    #             #
-#           #    #          #    #       #     #
-#           #    #         ###   #        #####
-#
+#         #####  #####      #    #####    ####
+#           #    #    #     #    #    #  #
+#           #    #    #     #    #    #   ####
+#           #    #####      #    #####        #
+#           #    #          #    #       #    #
+#           #    #          #    #        ####
+# 
 # Settings added for TPIPS (used for tpips and ttest)
 
 TPIPS_ADDED_LIBS='-lreadline -ltermcap'
@@ -174,6 +173,7 @@ HPFC_INCLUDE=$PIPS_EXTEDIR
 HPFC_LIBS=$PIPS_EXTEDIR
 HPFC_TOOLS=$PIPS_UTILDIR
 
+HPFC_RUNTIME_M4_PARAMS='-DDEMO -DDIRECT'
 HPFC_SED='/usr5/gnu/bin-sparc/sed'
 HPFC_TR='/bin/tr'
 HPFC_M4='gm4'
@@ -190,8 +190,8 @@ HPFC_MAKE='gmake'
 #
 # EXTERNAL softwares
 
-LINEARDIR=/projects/C3/Linear
-NEWGENDIR=/projects/Newgen
+LINEAR_DIR=/projects/C3/Linear
+NEWGEN_DIR=/projects/Newgen
 NEWGEN_MAX_TABULATED_ELEMENTS=12007
 
 # An absolute file name is necessary for LISP
@@ -241,6 +241,10 @@ RELEDIR=$PIPS_RELEDIR
 INCLUDEDIR=$PIPS_INCLUDEDIR
 DOCDIR=$PIPS_DOCDIR
 }
+
+LINEARDIR=$LINEAR_DIR
+NEWGENDIR=$NEWGEN_DIR
+
 # that is all
 #
 
