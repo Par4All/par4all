@@ -726,7 +726,7 @@ parse_arguments(int argc, char * argv[])
 		saved_srcpath = getenv("PIPS_SRCPATH");
 		saved_srcpath = strdup(saved_srcpath? saved_srcpath: "");
 		tps = find_file_in_directories(argv[optind], saved_srcpath);
-		dir = dirname(tps);
+		dir = pips_dirname(tps);
 		new_srcpath = strdup
 		    (concatenate("PIPS_SRCPATH=", saved_srcpath, ":", dir, 0));
 		free(dir), dir = NULL;
