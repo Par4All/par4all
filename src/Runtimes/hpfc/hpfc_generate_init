@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_generate_init,v $ ($Date: 1996/09/09 16:46:47 $, )
+# $RCSfile: hpfc_generate_init,v $ ($Date: 1996/09/09 16:47:13 $, )
 # version $Revision$
 #
 # generate the initialization file
@@ -38,7 +38,7 @@ NAME=`echo $NAME | tr '[A-Z]' '[a-z]'`
 key="${NAME}.`hostname`.`whoami`.`date +"%H.%M.%S.%j.%y"`"
 
 {
-  echo "      subroutine HPFC INIT COMMON PARAM()"
+  echo "      subroutine HPFC INIT COMMON PARAM"
   echo "      include \"hpfc_commons.h\""
   #
   # must avoid the hpfc_ version. 
