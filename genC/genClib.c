@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1995/12/15 16:30:26 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1995/12/16 23:46:06 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -107,6 +107,7 @@ fprintf_spaces( fd, number )
 FILE *fd ;
 int number ;
 {
+    assert(number>=0);
     for( ; number ; number-- )
 	    (void) fprintf( fd, " " ) ;
 }
