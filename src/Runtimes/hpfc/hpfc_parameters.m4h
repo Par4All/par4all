@@ -2,7 +2,7 @@
 ! parameters used to compile 
 !
 ! $RCSfile: hpfc_parameters.m4h,v $ version $Revision$
-! ($Date: 1997/01/14 18:36:20 $, )
+! ($Date: 1997/06/09 12:58:55 $, )
 !
 ! type declarations
 !
@@ -21,6 +21,7 @@
       parameter(MAX NB OF TEMPLATES = 32)
       parameter(MAX NB OF PROCESSORS = 32)
       parameter(MAX MAX SIZE OF PROCS = _HPFC_MAX_NPES_)
+      parameter(MAX SIZE OF STATUS = 10)
 !
 ! MAXMAXSIZEOFBUFFER is around 1 MB
 !
