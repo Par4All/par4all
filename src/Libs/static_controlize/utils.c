@@ -1084,14 +1084,17 @@ call c;
 		
 
 /*=================================================================*/
-/* bool get_sp_of_call_p( (call) c )			AL 04/93
- * Updates the global variables Gstructure_parameters
- * and Gforward_substitute_table according to the type of call.
- * Returns TRUE if the call has to be modified (redefinition
- * of a structural parameter), FALSE in all the other cases.
+/* bool get_sp_of_call_p( (call) c, fst) AL 04/93 Updates the global
+ * variables Gstructure_parameters and Gforward_substitute_table according
+ * to the type of call.  Returns TRUE if the call has to be modified
+ * (redefinition of a structural parameter), FALSE in all the other cases.
+ *
+ * AP, sep 95 : Gforward_substitute_table is no longer a global variable,
+ * we pass it as an argument.
  */
-bool get_sp_of_call_p( c )
+bool get_sp_of_call_p( c, fst)
 call c;
+hash_table fst; /* forward substitute table */
 {
    entity 	lhs_ent, ent;
    bool		ret_bool = FALSE;
@@ -1127,9 +1130,7 @@ call c;
 	else {
 	        nsp_ent = make_nsp_entity();
 	        nsp_exp = make_entity_expression( nsp_ent, NIL );
-		hash_put( Gforward_substitute_table, 
-			  (char*) lhs_ent,
-			  (char*) nsp_exp  );
+		hash_put(fst, (char*) lhs_ent, (char*) nsp_exp  );
 		ADD_ELEMENT_TO_LIST( Gstructure_parameters, ENTITY, nsp_ent );
 		ret_bool = TRUE;
 	}
