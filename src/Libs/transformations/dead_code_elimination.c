@@ -1,6 +1,16 @@
-/* Dead loop elimination.
-   Ronan Keryell, 12/1993 -> 1995.
-   */
+/*
+  $Id$
+
+  Dead loop elimination.
+  Ronan Keryell, 12/1993 -> 1995.
+
+  one trip loops fixed, FC 08/01/1998
+
+  $Log: dead_code_elimination.c,v $
+  Revision 1.17  1999/01/08 12:43:25  coelho
+  rcs stuff...
+
+*/
 
 #include <stdio.h> 
 #include <stdlib.h> 
