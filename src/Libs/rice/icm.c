@@ -1,5 +1,7 @@
-/* Olivier Albiez
+/*
+ * $Id$
  *
+ * Olivier Albiez
  */
 
 
@@ -683,6 +685,84 @@ loop_level_out (loop l)
     return TRUE;
 }
 
+/******************************************************** REMOVE DUMMY LOOPS */
+
+DEFINE_LOCAL_STACK(stmt, statement)
+
+static list /* of entity */ depending_indices;
+static bool it_depends;
+
+/* set whether s depends from enclosing indices
+ */
+static void does_it_depend(statement s)
+{
+  it_depends |= statement_depend_of_indices_p(s, depending_indices, 0);
+  if (it_depends) gen_recurse_stop(NULL);
+}
+
+static bool push_depending_index(loop l)
+{
+  depending_indices = CONS(ENTITY, loop_index(l), depending_indices);
+  return TRUE;
+}
+
+static void pop_depending_index(loop l)
+{
+  list tmp = depending_indices;
+  pips_assert("current loop index is poped", 
+	      loop_index(l)==ENTITY(CAR(depending_indices)));
+  depending_indices = CDR(depending_indices);
+  CDR(tmp) = NIL;
+  free(tmp);
+}
+
+static bool stmt_filter_and_check(statement s)
+{
+  stmt_push(s);
+  does_it_depend(s);
+  return TRUE;
+}
+
+static bool drop_it(loop l)
+{
+  if (execution_parallel_p(loop_execution(l)))
+  {
+    depending_indices = NIL;
+    it_depends = FALSE;
+    gen_multi_recurse(l,
+		      statement_domain, stmt_filter_and_check, stmt_rewrite,
+		      loop_domain, push_depending_index, pop_depending_index,
+		      NULL);
+    depending_indices = NIL; /* assert? */
+    return it_depends;
+  }
+  
+  return FALSE;
+}
+
+static void loop_rwt(loop l)
+{
+  if (drop_it(l))
+  {
+    statement head = stmt_head();
+    statement_instruction(head) = statement_instruction(loop_body(l));
+    /* memory leak... */
+  }
+}
+
+void drop_dummy_loops(statement s)
+{
+  make_stmt_stack();
+
+  gen_multi_recurse(s,
+		    statement_domain, stmt_filter, stmt_rewrite,
+		    loop_domain, gen_true, loop_rwt,
+		    NULL);
+
+  free_stmt_stack();
+}
+
+/*********************************************************** REGENERATE CODE */
 
 statement
 icm_codegen(statement stat, 
@@ -754,7 +834,7 @@ icm_codegen(statement stat,
     free_graph(simplyfied_graph);
 
     /* Remove dummy loops. */
-    
+    drop_dummy_loops(result);
 
     /* Print debugginf information : statement */
     print_statement(result);
