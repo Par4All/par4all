@@ -31,7 +31,7 @@ INSTALL_INC=	$(MACROS)
 
 SOURCES	=	$(SCRIPTS) $(MACROS) forward_gnu_makefile config.makefile
 
-quick-install: install_forward_makefiles install_macros
+quick-install: install_forward_makefiles install_macros 
 
 install_macros:
 	#
