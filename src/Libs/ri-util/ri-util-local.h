@@ -226,6 +226,10 @@ typedef hash_table control_mapping;
 #define ENTITY_EQUIV_P(e) entity_an_operator_p(e, EQUIV)
 #define ENTITY_NON_EQUIV_P(e) entity_an_operator_p(e, NON_EQUIV)
 
+/* Attention : 
+   This definition is different with the Fortran Standard where the logical 
+   operators are the following only: AND, OR, NOT, EQUIV, NEQUIV (NN-Mars 2000)*/
+
 #define ENTITY_LOGICAL_OPERATOR_P(e) ( ENTITY_RELATIONAL_OPERATOR_P(e) || \
                                        ENTITY_AND_P(e) || \
                                        ENTITY_OR_P(e) || \
