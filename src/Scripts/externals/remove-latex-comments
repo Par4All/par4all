@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # $RCSfile: remove-latex-comments,v $ (version $Revision$)
-# $Date: 1996/06/28 17:02:58 $, 
+# $Date: 1996/08/21 11:04:02 $, 
 #
 # Conversion d'un fichier Latex en un fichier NewGen
 #
@@ -19,7 +19,7 @@
 
 input=$1
 tmp=`basename $1 .tex`
-output=`basename $tmp .f`.newgen
+output=$tmp.newgen
 
 tmp=/tmp/rlc.$$
 rm -rf $tmp.*
@@ -43,26 +43,21 @@ cat > $output <<!
 sed    '/^\\domain{/s,^\\domain{ *\(.*\)} *$,\1 ;,p
         1,/^\\begin{domain}/d
         /^\\end{domain}/,/^\\begin{domain}/d
-	/^\\end{domain}/,$d' $input | 
-# 
-# put in lower cases
-#
-tr '[A-Z]' '[a-z]' | 
-#
-# sort the result
-#
-sort |
-#
-# remove unwanted characters
-# and separate in different files
-#
-sed "	s,\\\\,,g;
+	/^\\end{domain}/,$d' $input |
+sed    "s,\\\\,,g;
+        # stupid uppercase letters as the first char must be removed...
+	s,^A,a,;s,^B,b,;s,^C,c,;s,^D,d,;s,^E,e,;s,^F,f,;s,^G,g,;s,^H,h,;
+	s,^I,i,;s,^J,j,;s,^K,k,;s,^L,l,;s,^M,m,;s,^N,n,;s,^O,o,;s,^P,p,;
+	s,^Q,q,;s,^R,r,;s,^S,s,;s,^T,t,;s,^U,u,;s,^V,v,;s,^W,w,;s,^X,x,;
+        s,^Y,y,;s,^Z,z,;
 	/^import /w $tmp.import
 	/^import /d
 	/^external /w $tmp.external
-	/^external /d
-	w $tmp.domains
-	d"
+	/^external /d" | 
+#
+# sort the result
+#
+sort > $tmp.domains
 
 {
   echo
