@@ -26,6 +26,8 @@
 #include "newgen_include.h"
 #include "genC.h"
 
+#define YYERROR_VERBOSE 1 /* better error messages by bison */
+
 extern FILE * yyin;
 
 /* This constant should be adapted to the particular need of the application */
