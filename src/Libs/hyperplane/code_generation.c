@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: code_generation.c,v $
+ * Revision 1.6  2003/06/19 07:32:52  nguyen
+ * Update calls to make_statement and make_variable with new RI for C
+ *
  * Revision 1.5  1998/10/13 06:57:27  irigoin
  * Generate fresh new loops instead of creating meaningless sharing with
  * initial loops.
@@ -98,7 +101,7 @@ Psysteme sc_newbase;
 				statement_number(s_loop),
 				statement_ordering(s_loop),
 				statement_comments(s_loop),
-				instr_lhyp);
+				instr_lhyp,NIL,NULL);
     return(state_lhyp);
 }
 
