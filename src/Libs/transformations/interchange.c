@@ -1,18 +1,12 @@
-
- /* package loops_interchange
+/* 
+ * $Id$
  */
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <malloc.h>
 
-#include "genC.h"
-#include "ri.h"
-#include "misc.h"
-#include "text.h"
-#include "prettyprint.h"
 
-#include "ri-util.h"
 #include "boolean.h"
 #include "vecteur.h"
 #include "contrainte.h"
@@ -20,14 +14,17 @@
 #include "matrice.h"
 #include "matrix.h"
 #include "sparse_sc.h"
-#include "conversion.h"
-/* #include "generation.h" */
 
-/* #include "loops_interchange.h" */
-#define INTERCHANGE_OPTIONS "X"
+#include "genC.h"
+#include "ri.h"
+#include "misc.h"
+#include "text.h"
+
+#include "ri-util.h"
+#include "prettyprint.h"
+#include "conversion.h"
+
 extern void global_parallelization();
-extern statement gener_DOSEQ();
-extern statement interchange();
 extern int set_interchange_parameters();
 
 /* statement gener_DOSEQ(cons *lls,Pvecteur pvg[], Pbase base_oldindex,
@@ -40,7 +37,13 @@ extern int set_interchange_parameters();
  *        ...
  *  ENDDO
  */
-statement gener_DOSEQ(cons *lls, Pvecteur *pvg, Pbase base_oldindex, Pbase base_newindex, Psysteme sc_newbase)
+statement 
+gener_DOSEQ(
+    list lls, 
+    Pvecteur *pvg, 
+    Pbase base_oldindex, 
+    Pbase base_newindex, 
+    Psysteme sc_newbase)
 {
     statement state_lhyp = statement_undefined;
     instruction instr_lhyp = instruction_undefined;
@@ -53,7 +56,7 @@ statement gener_DOSEQ(cons *lls, Pvecteur *pvg, Pbase base_oldindex, Pbase base_
     statement s_loop = statement_undefined;
     Pbase pb = BASE_NULLE;
 
-    bl = loop_body(instruction_loop(statement_instruction(STATEMENT(CAR(lls)))));
+    bl=loop_body(instruction_loop(statement_instruction(STATEMENT(CAR(lls)))));
     statement_newbase(bl,pvg,base_oldindex);
     /* make the parallel loops from inner loop to upper loop*/
    
@@ -67,9 +70,10 @@ statement gener_DOSEQ(cons *lls, Pvecteur *pvg, Pbase base_oldindex, Pbase base_
 	rl = make_range(lower,upper,make_integer_constant_expression(1));
 
 
-	if (CDR(lls)!=NULL) {		/* make  the inner sequential loops
-					   they will be the inner parallel loops after 
-					   integration the phase  of parallelization*/
+	if (CDR(lls)!=NULL) {
+	    /* make  the inner sequential loops
+	       they will be the inner parallel loops after 
+	       integration the phase  of parallelization*/
 	    l_hyp = make_loop(pb->var,
 			      rl,
 			      bl,
@@ -183,10 +187,14 @@ interchange(cons *lls)
     debug(8," interchange","end\n");
     debug_off();
 
-    return(s_lhyp);
+    return s_lhyp;
 }
 
-statement interchange_two_loops(cons *lls, int n1, int n2)
+statement 
+interchange_two_loops(
+    list lls, 
+    int n1, 
+    int n2)
 {
     Psysteme sci;			/* sc initial */
     Psysteme scn;			/* sc nouveau */
@@ -237,7 +245,9 @@ statement interchange_two_loops(cons *lls, int n1, int n2)
 
     /* changeof basis for index */
     change_of_base_index(base_oldindex,&base_newindex);
-    sc_newbase=sc_change_baseindex(sc_dup(sc_row_echelon),base_oldindex,base_newindex);
+    sc_newbase =
+	sc_change_baseindex(sc_dup(sc_row_echelon),
+			    base_oldindex,base_newindex);
     
     /* generation of interchange  code */
     /*  generation of bounds */
@@ -261,5 +271,5 @@ statement interchange_two_loops(cons *lls, int n1, int n2)
     debug(8, "interchange_two_loops", "end\n");
     debug_off();
 
-    return(s_lhyp);
+    return s_lhyp;
 }
