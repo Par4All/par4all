@@ -19,6 +19,7 @@
  * - extr* stuff dropped.
  * - dir_name for localizing files...
  * - \r skipped
+ * - last line may not be \n'ed.
  */
 
 static void hollerith(char *);
@@ -158,14 +159,18 @@ static int getline()
 {
 	register char *ptr;
 
+	if (feof(ifp)) return -1;
+
 	for (ptr = buf; ptr < &buf[BSZ]; ) {
 		*ptr = getc(ifp);
-		if (feof(ifp))
-			return (-1);
-		if (*ptr++ == '\n') {
-			*ptr = 0;
-			return (1);
-		}
+		/* fix for the last line that may not have a \n.
+		 * It is returned however and lend handles it correctly.
+		 */
+		if (feof(ifp) || *ptr++ == '\n')
+		  {
+		    *ptr = 0;
+		    return (1);
+		  }
 	}
 	while (getc(ifp) != '\n' && feof(ifp) == 0) ;
 	fprintf(stderr, "line truncated to %d characters\n", BSZ);
@@ -202,7 +207,7 @@ static int lend()
 	if (*p != 'd' && *p != 'D') return(0);
 	p++;
 	trim(p);
-	if (p - buf >= 72 || *p == '\n' || *p == '\r')
+	if (p - buf >= 72 || *p == '\n' || *p == '\r' || *p == '\0')
 		return (1);
 	return (0);
 }
