@@ -286,6 +286,7 @@ i_make:
 	opt_sep_list
 	{
 	    bool result = TRUE;
+	    string save_current_module_name = strdup(db_get_current_module_name());
 
 	    debug(7,"yyparse","reduce rule i_make\n");
 
@@ -297,6 +298,8 @@ i_make:
 		    }
 		}, $3.the_owners);
 	    }
+	    db_set_current_module_name(save_current_module_name);
+	    free(save_current_module_name);
 	    $$ = result;
 /*	    free ($3.the_name);
 	    gen_free_list ($3.the_owners);
@@ -311,6 +314,7 @@ i_apply:
 	opt_sep_list
 	{
 	    bool result = TRUE;
+	    string save_current_module_name = strdup(db_get_current_module_name());
 
 	    debug(7,"yyparse","reduce rule i_apply\n");
 
@@ -326,6 +330,8 @@ i_apply:
 		    }
 		}, $3.the_owners);
 	    }
+	    db_set_current_module_name(save_current_module_name);
+	    free(save_current_module_name);
 	    $$ = result;
 /*	    free ($3.the_name);
 	    gen_free_list ($3.the_owners);
@@ -339,6 +345,8 @@ i_display:
 	resource_id
 	opt_sep_list
 	{
+	    string save_current_module_name = strdup(db_get_current_module_name());
+
 	    debug(7,"yyparse","reduce rule i_display\n");
 
 	    if(db_get_current_workspace()==database_undefined) {
@@ -366,6 +374,8 @@ i_display:
 		}, $3.the_owners);
 		$$ = TRUE;
 	    }
+	    db_set_current_module_name(save_current_module_name);
+	    free(save_current_module_name);
 /*
 	    free ($3.the_name);
 	    gen_free_list ($3.the_owners);
@@ -511,7 +521,6 @@ filename_list:
 	    } else {
 	      pips_error("tpips",
 			 "Too many files - Resize FILE_LIST_MAX_LENGTH\n");
-		YYERROR;
 	    }
 	    
 	}
@@ -524,8 +533,10 @@ filename_list:
 	    if (the_file_list.argc < FILE_LIST_MAX_LENGTH) {
 		the_file_list.argv[the_file_list.argc] = $1;
 		the_file_list.argc++;
-	    } else
-		YYERROR;
+	    } else {
+	      pips_error("tpips",
+			 "Too many files (2) - Resize FILE_LIST_MAX_LENGTH\n");
+	    }
 	}
 	;
 
@@ -649,8 +660,10 @@ owner:
 
 	    if (execution_mode) {
 		if (safe_make(DBR_CALLEES, db_get_current_module_name())
-		    == FALSE)
-		    YYERROR;	
+		    == FALSE) {
+		  pips_error("ana_syn.y", "Cannot make callees for %s\n",
+			     db_get_current_module_name());
+		}
 
 		called_modules = (callees) 
 		db_get_memory_resource(DBR_CALLEES,
@@ -677,8 +690,10 @@ owner:
 	    debug(7,"yyparse","reduce rule owner (CALLERS)\n");
 	    if (execution_mode) {
 		if (safe_make(DBR_CALLERS, db_get_current_module_name())
-		    == FALSE)
-		    YYERROR;	
+		    == FALSE) {
+		  pips_error("ana_syn.y", "Cannot make callers for %s\n",
+			     db_get_current_module_name());
+		}
 
 		caller_modules = (callees) 
 		    db_get_memory_resource(DBR_CALLERS,
