@@ -1,5 +1,5 @@
 /* $RCSfile: pipsmake.c,v $ (version $Revision$)
- * $Date: 1997/04/16 14:24:13 $, 
+ * $Date: 1997/04/16 15:15:10 $, 
  * pipsmake: call by need (make),
  *
  * rule selection (activate),
@@ -203,6 +203,12 @@ void init_make_cache()
 {
     pips_assert("not set", set_undefined_p(up_to_date_resources));
     up_to_date_resources = set_make(set_pointer);
+}
+
+void reinit_make_cache_if_necessary()
+{
+    if (!set_undefined_p(up_to_date_resources))
+	reset_make_cache(), init_make_cache();
 }
 
 static bool make(rname, oname)
