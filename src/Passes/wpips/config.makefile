@@ -1,4 +1,4 @@
-# $RCSfile: config.makefile,v $ ($Date: 1995/11/27 17:16:59 $, ) 
+# $RCSfile: config.makefile,v $ ($Date: 1996/07/02 16:28:40 $, ) 
 # version $Revision$
 # got on %D%, %T%
 # [%P%].
@@ -15,27 +15,13 @@
 # the consequences of using it or for whether it serves any particular
 # purpose or works at all, unless he says so in writing.
 #
-# AR=		$(PIPS_AR)
-# ARFLAGS=	$(PIPS_ARFLAGS)
-# CC=		$(PIPS_CC)
-CFLAGS=		$(PIPS_CFLAGS) -DLARGE_FONTS
-CPPFLAGS=	$(PIPS_CPPFLAGS) $(WPIPS_ADDED_CPPFLAGS)
-# LD=		$(PIPS_LD) 
-LDFLAGS=	$(PIPS_LDFLAGS) $(WPIPS_ADDED_LDFLAGS)
-# LEX=		$(PIPS_LEX)
-# LFLAGS=	$(PIPS_LFLAGS)
-# LINT=		$(PIPS_LINT)
-# LINTFLAGS=	$(PIPS_LINTFLAGS)
-# YACC=		$(PIPS_YACC)
-# YFLAGS=	$(PIPS_YFLAGS)
-#
-# The following macros define your pass.
-#
-# TARGET=	wpips
+CFLAGS+=	$(PIPS_CFLAGS) -DLARGE_FONTS
+CPPFLAGS+=	$(WPIPS_ADDED_CPPFLAGS)
+LDFLAGS+=	$(WPIPS_ADDED_LDFLAGS)
 #
 # Source, header and object files used to build the target
 # xv_icons.c
-TARGET_CFILES=	emacs.c \
+LIB_CFILES=	emacs.c \
 		directory_menu.c \
 		wpips.c \
 		xv_compile.c \
@@ -57,10 +43,10 @@ TARGET_CFILES=	emacs.c \
 #
 # Rajoute le directory icons :
 #
-TARGET_HEADERS=	xv_sizes.h wpips-local.h wpips-labels.h pips.icon icons
+LIB_HEADERS=	xv_sizes.h wpips-local.h wpips-labels.h pips.icon icons
 #
 #
-TARGET_OBJECTS=	$(TARGET_CFILES:.c=.o)
+LIB_OBJECTS=	$(TARGET_CFILES:.c=.o)
 #
 # List of libraries used to build the target
 #
