@@ -1,38 +1,35 @@
-/* 	%A% ($Date: 1997/09/17 14:36:44 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
-
-#ifndef lint
-char vcid_syntax_declaration[] = "%A% ($Date: 1997/09/17 14:36:44 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
-#endif /* lint */
-
-
- /* Functions to handle all declarations, but some related to functional
-  * entities
-  *
-  * Remi Triolet
-  *
-  * Modifications:
-  *  - DeclareVariable() : an implicit type is assumed to be mutable like
-  *    an undefined type; Francois Irigoin, 5 April 1991
-  *  - FindOrCreateEntity() : see below; numerous trials of various
-  *    partial links at compile time; see also procedure.c, 
-  *    update_called_modules()
-  *  - DeclareVariable() is rewritten from scratch; (Francois Irigoin, 
-  *    20 September 1991)
-  *  - AnalyzeData() : "too few analyzers" for an exact count; the last 
-  *    iteration of pcr = CDR(pcr) is not executed because pcl==NIL;
-  *    fix: update of datavar_nbelements(dvr) and modification of the
-  *    condition guarding the message emission; FI, 18 February 1992
-  *    (this might be no more than a new bug! )
-  *  - MakeDataVar() : used to consider that array X was full initialized
-  *    each time an array element was initialized; a check for subscripts
-  *    was added; FI, 18 February 1992
-  *  - check_common_layouts() : added to fix bug 1; FI, 1 December 1993
-  * 
-  * Bugs:
-  *  - layout for commons are wrong if type and/or dimension declarations
-  *    follow the COMMON declaration; PIPS Fortran syntax should be modified
-  *    to prevent this;
-  */
+/*
+ * $Id$
+ *
+ *
+ * Functions to handle all declarations, but some related to functional
+ * entities
+ *
+ * Remi Triolet
+ *
+ * Modifications:
+ *  - DeclareVariable() : an implicit type is assumed to be mutable like
+ *    an undefined type; Francois Irigoin, 5 April 1991
+ *  - FindOrCreateEntity() : see below; numerous trials of various
+ *    partial links at compile time; see also procedure.c, 
+ *    update_called_modules()
+ *  - DeclareVariable() is rewritten from scratch; (Francois Irigoin, 
+ *    20 September 1991)
+ *  - AnalyzeData() : "too few analyzers" for an exact count; the last 
+ *    iteration of pcr = CDR(pcr) is not executed because pcl==NIL;
+ *    fix: update of datavar_nbelements(dvr) and modification of the
+ *    condition guarding the message emission; FI, 18 February 1992
+ *    (this might be no more than a new bug! )
+ *  - MakeDataVar() : used to consider that array X was full initialized
+ *    each time an array element was initialized; a check for subscripts
+ *    was added; FI, 18 February 1992
+ *  - check_common_layouts() : added to fix bug 1; FI, 1 December 1993
+ * 
+ * Bugs:
+ *  - layout for commons are wrong if type and/or dimension declarations
+ *    follow the COMMON declaration; PIPS Fortran syntax should be modified
+ *    to prevent this;
+ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -251,18 +248,17 @@ ldvr is a list of datavar.
 ldvl is a list of dataval. */
 
 void 
-AnalyzeData(ldvr, ldvl)
-cons *ldvr, *ldvl;
+AnalyzeData(list ldvr, list ldvl)
 {
-    cons *pcr, *pcl;
+    list pcr, pcl;
     dataval dvl;
 
     /* FI: this assertion must be usually wrong!
      * pips_assert("AnalyseData", gen_length(ldvr) == gen_length(ldvl));
      */
 
-	debug(8, "AnalyzeData", "number of reference groups: %d\n", 
-	      gen_length(ldvr));
+    debug(8, "AnalyzeData", "number of reference groups: %d\n", 
+	  gen_length(ldvr));
 
     pcl = ldvl;
     dvl = DATAVAL(CAR(pcl));
@@ -270,8 +266,9 @@ cons *ldvr, *ldvl;
 	datavar dvr = DATAVAR(CAR(pcr));
 	entity e = datavar_variable(dvr);
 	int i = datavar_nbelements(dvr);
-
-	debug(8, "AnalyzeData", "Storage for entity %s must be static or made static\n",
+	
+	debug(8, "AnalyzeData", 
+	      "Storage for entity %s must be static or made static\n",
 	      entity_name(e));
 
 	if(storage_undefined_p(entity_storage(e))) {
@@ -292,9 +289,11 @@ cons *ldvr, *ldvl;
 	}
 	else {
 	    user_warning("AnalyzeData",
-			 "DATA initialization for non RAM variable %s (storage tag = %d)\n",
+			 "DATA initialization for non RAM variable %s "
+			 "(storage tag = %d)\n",
 			entity_name(e), storage_tag(entity_storage(e)));
-	    ParserError("AnalyzeData", "DATA statement initializes non RAM variable\n");
+	    ParserError("AnalyzeData", 
+			"DATA statement initializes non RAM variable\n");
 	}
 
 	debug(8, "AnalyzeData", "needs %d elements for entity %s\n", 
@@ -304,7 +303,7 @@ cons *ldvr, *ldvl;
 
 	if (IsIntegerScalar(e)) {
 	    pips_assert("AnalyzeData", i == 1);
-	    /* pips_assert("AnalyzeData", constant_int_p(dataval_constant(dvl))); */
+
 	    if(constant_int_p(dataval_constant(dvl))) {
 	      entity_initial(e) = make_value(is_value_constant, 
 					     dataval_constant(dvl));
@@ -314,7 +313,8 @@ cons *ldvr, *ldvl;
 	    }
 	    else {
 	      Warning("AnalyzeData", 
-		      "Integer scalar variable initialized with non-integer constant");
+		      "Integer scalar variable initialized "
+		      "with non-integer constant");
 	    }
 	}
 
@@ -397,12 +397,12 @@ cons *ldvr, *ldvl;
  * used in e fields.
  */
 void 
-DeclareVariable(e, t, d, s, v)
-entity e;
-type t;
-cons *d;
-storage s;
-value v;
+DeclareVariable(
+    entity e,
+    type t,
+    list d,
+    storage s,
+    value v)
 {
     type et = entity_type(e);
     list etd = list_undefined;
@@ -498,7 +498,9 @@ value v;
 			   basic_type_size(variable_basic(type_variable(t)))
 			   > basic_type_size(variable_basic(type_variable(entity_type(e))))) {
 			    user_warning("DeclareVariable",
-					 "Storage information for %s is likely to be wrong because its type is redefined as a larger type\nType is *not* redefined internally to avoid aliasing\n", entity_local_name(e));
+     "Storage information for %s is likely to be wrong because its type is "
+     "redefined as a larger type\nType is *not* redefined internally to avoid "
+     "aliasing\n", entity_local_name(e));
 			    /* FI: it should be redefined and the offset be updated,
 			     * maybe in check_common_area(); 1 Feb. 1994
 			     */
