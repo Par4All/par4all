@@ -29,3 +29,19 @@
 #define ICFG_DECOR_TOTAL_PRECONDITIONS 10
 #define ICFG_DECOR_FILTERED_PROPER_EFFECTS 11
 #define DVICFG_DECOR_FILTERED_PROPER_EFFECTS 12
+
+/* util.c */
+extern void safe_free_vertex(vertex /*ver*/, list /*l_of_vers*/);
+extern list safe_add_vertex_to_list(vertex /*ver*/, list /*l_of_vers*/);
+extern list list_of_connected_nodes(vertex /*ver*/, list /*l_of_vers*/);
+extern string remove_newline_of_string(string);
+extern string add_flash_newline_to_string(string);
+extern vertex get_vertex_by_string(string /*str_name*/, list /*l_of_vers*/);
+extern string sentence_to_string(sentence /*sen*/);
+extern list safe_make_successor(vertex /*ver_parent*/, vertex /*ver_child*/, list /*l_of_vers*/);
+extern void print_graph_of_text_to_daVinci(FILE * /*fd*/, graph /*g_in*/);
+extern void print_graph_daVinci_with_starting_node(FILE * /*fd*/, vertex /*star_ver*/);
+extern list get_list_of_variable_to_filter();
+extern list effects_filter(list /*l_effs*/, list /*l_ents*/);
+
+
