@@ -304,9 +304,7 @@ dimension_equal_p(
 }
 
 bool 
-variable_equal_p(v1, v2)
-variable v1;
-variable v2;
+variable_equal_p(variable v1, variable v2)
 {
   if(v1 == v2)
       return TRUE;
@@ -333,7 +331,6 @@ variable v2;
 	  /* FI: I return FALSE because the exact test should never be useful
 	     in the parser; 1 February 1994 */
 	  /* FC: I need this in the prettyprinter... */
-
 	  int l1 = gen_length(ld1), l2 = gen_length(ld2);
 	  if (l1!=l2) 
 	      return FALSE;
