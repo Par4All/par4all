@@ -86,6 +86,8 @@ typedef dfg_arc_label arc_label;
  *   vector:		2 * I - J - 4
  *
  */
+/* GRRRR this function is already/also in array_dfg... FC */
+
 static void pu_contrainte_fprint(fp,c,is_what,variable_name)
 FILE *fp;
 Pcontrainte c;
@@ -94,7 +96,7 @@ char * (*variable_name)();
 {
     Pvecteur v;
     short int debut = 1;
-    long int constante = 0;
+    Value constante = VALUE_ZERO;
 
     if (!CONTRAINTE_UNDEFINED_P(c))
         v = contrainte_vecteur(c);
@@ -107,56 +109,49 @@ char * (*variable_name)();
     while (!VECTEUR_NUL_P(v)) {
         if (v->var!=TCST) {
             char signe;
-            long int coeff = v->val;
+            Value coeff = v->val;
 
-            if (coeff != 0) {
-                if (coeff > 0)
+            if (value_notzero_p(coeff)) {
+                if (value_pos_p(coeff))
                     signe = (debut) ? ' ' : '+';
                 else {
                     signe = '-';
-                    coeff = -coeff;
+                    value_oppose(coeff);
                 };
                 debut = 0;
-                if (coeff == 1)
+                if (value_one_p(coeff))
                     (void) fprintf(fp,"%c %s ", signe, variable_name(v->var));
 		else
-                    (void) fprintf(fp,"%c %ld %s ", signe, coeff,
-				   variable_name(v->var));
+		{
+		    (void) fprintf(fp,"%c ", signe);
+		    fprint_Value(fp, coeff);
+		    fprintf(fp, " %s ", variable_name(v->var));
+		}
             }
         }
-        else
-            /* on admet plusieurs occurences du terme constant!?! */
-            constante += v->val;
+        else    /* on admet plusieurs occurences du terme constant!?! */
+	    value_addto(constante, v->val);
 
-        v = v->succ;
-    }
-    if (is_what == IS_INEG)
-      {
-       if (constante > 0)
-          fprintf (fp,"+ %ld <= 0 ,", constante);
-       else if (constante < 0)
-          fprintf (fp,"- %ld <= 0 ,", -constante);
-       else 
-          fprintf (fp,"<= 0 ,");
-      }
-    else if(is_what == IS_EG)
-      {
-       if (constante > 0)
-          fprintf (fp,"+ %ld == 0 ,", constante);
-       else if (constante < 0)
-          fprintf (fp,"- %ld == 0 ,", -constante);
-       else 
-          fprintf (fp,"== 0 ,");
-      }
-    else /* IS_VEC */
-      {
-       if (constante > 0)
-          fprintf (fp,"+ %ld ,", constante);
-       else if (constante < 0)
-          fprintf (fp,"- %ld ,", -constante);
-       else 
-          fprintf (fp," ,");
-      }
+	v = v->succ;
+  }
+  
+  /* sign */
+  if (value_pos_p(constante))
+      fprintf(fp, "+ ");
+  else if (value_neg_p(constante))
+      value_oppose(constante), fprintf(fp, "- ");
+ 
+  /* value */
+  if (value_notzero_p(constante))
+      fprint_Value(fp, constante);
+ 
+  /* trail */
+  if (is_what == IS_INEG)
+      fprintf (fp,"<= 0 ,");
+  else if(is_what == IS_EG) 
+      fprintf (fp,"== 0 ,");
+  else /* IS_VEC */ 
+      fprintf (fp," ,");
 }
 
 /*============================================================================*/
@@ -169,7 +164,7 @@ FILE *fp;
 Pcontrainte ineg;
 char * (*variable_name)();
 {
- pu_contrainte_fprint(fp,ineg,IS_INEG,variable_name);
+    pu_contrainte_fprint(fp,ineg,IS_INEG,variable_name);
 }
 
 /*============================================================================*/
@@ -181,7 +176,7 @@ FILE *fp;
 Pcontrainte eg;
 char * (*variable_name)();
 {
- pu_contrainte_fprint(fp,eg,IS_EG,variable_name);
+    pu_contrainte_fprint(fp,eg,IS_EG,variable_name);
 }
 
 /*============================================================================*/
@@ -439,48 +434,54 @@ Variable v1, v2;
  *
  * There exist a function "vect_fprint" in C3 which takes a third argument.
  */
+/* arg, also in array_dfg. */
 void pu_vect_fprint(fp, v)
 FILE *fp;
 Pvecteur v;
 {
     short int debut = 1;
-    long int constante = 0;
+    Value constante = VALUE_ZERO;
     char signe;
     while (!VECTEUR_NUL_P(v)) {
 	if (v->var!=TCST) {
-	    long int coeff = v->val;
+	    Value coeff = v->val;
 
-	    if (coeff != 0) {
-		if (coeff > 0)
+	    if (value_notzero_p(coeff)) {
+		if (value_pos_p(coeff))
 		    signe = (debut) ? ' ' : '+';
 		else {
 		    signe = '-';
-		    coeff = -coeff;
+		    value_oppose(coeff);
 		}
 		debut = 0;
-		if (coeff == 1)
+		if (value_one_p(coeff))
 		    fprintf(fp,"%c %s ", signe,
 			    entity_local_name((entity) v->var));
 		else
-		    fprintf(fp,"%c %ld %s ", signe, coeff,
-			    entity_local_name((entity) v->var));
+		{
+		    fprintf(fp,"%c ", signe);
+		    fprint_Value(fp, coeff);
+		    fprintf(fp, " %s ", entity_local_name((entity) v->var));
+		}
 	    }
 	}
 	else
 	    /* on admet plusieurs occurences du terme constant!?! */
-	    constante += v->val;
+	    value_addto(constante, v->val);
 	v = v->succ;
     }
     if(debut)
-	(void) fprintf(fp,"%ld\n", constante);
-    else if(constante != 0) {
-	if(constante > 0)
+	fprint_Value(fp, constante);
+    else if(value_notzero_p(constante)) {
+	if(value_pos_p(constante))
 	    signe = (debut) ? ' ' : '+';
 	else {
 	    signe = '-';
-	    constante = -constante;
+	    value_oppose(constante);
 	}
-	(void) fprintf(fp,"%c %ld\n", signe, constante);
+	(void) fprintf(fp,"%c ", signe);
+	fprint_Value(fp, constante);
+	fprintf(fp, "\n");
     }
     else
 	(void) fprintf(fp, "\n");
