@@ -20,7 +20,7 @@ gen_array_make(int size)
 {
     gen_array_t a;
     int i;
-    if (size<0) size= GEN_ARRAY_SIZE_INCREMENT; /* default size */
+    if (size<=0) size= GEN_ARRAY_SIZE_INCREMENT; /* default size */
     a = (gen_array_t) malloc(sizeof(struct _gen_array_chunk_t));
     message_assert("array ok", a);
     a->size = size;
