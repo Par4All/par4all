@@ -7,6 +7,9 @@
  * update_props() .
  *
  * $Log: source_file.c,v $
+ * Revision 1.96  1998/12/24 11:10:11  coelho
+ * unlink zzz files.
+ *
  * Revision 1.95  1998/12/23 14:05:16  coelho
  * zzz -> ###
  *
@@ -602,7 +605,11 @@ static void sort_file(string name)
 	    }
             lines[i++]=line;
 	}
-	else free(line);
+	else 
+	{
+	    unlink(line);
+	    free(line);
+	}
     }
     safe_fclose(f, name);
 
