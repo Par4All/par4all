@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1995/07/26 14:42:34 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1995/07/26 16:55:24 $, )
 # version $Revision$, 
 # got on %D%, %T%
 # $Id$
@@ -25,7 +25,7 @@ TEMPDIR="/tmp"
 OPENWINHOME="/usr/openwin"
 
 # hosts for Validate
-PIPS_HOSTS=":chailly:episy"
+PIPS_HOSTS="chailly:episy:aiguebelette"
 
 # home directories for external softwares
 LINEARDIR=/projects/C3/Linear
