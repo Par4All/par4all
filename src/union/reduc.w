@@ -1337,9 +1337,14 @@ boolean   ofl_res;
   chemin = pa_make(conv_hull,sl_append_system(sl_append_system(NULL,ps1),ps2));
   
   if (ofl_ctrl==OFL_CTRL) {
-	CATCH(overflow_error) result = ofl_res;
+	CATCH(overflow_error) 
+            result = ofl_res;
+        TRY
+            result = !(pa_feasibility_ofl_ctrl(chemin, local_ofl_ctrl));
   }
-  else result = !(pa_feasibility_ofl_ctrl(chemin, local_ofl_ctrl));
+  else
+      result = !(pa_feasibility_ofl_ctrl(chemin, local_ofl_ctrl));
+
   chemin = pa_free1(chemin);
   return(result);
 }
