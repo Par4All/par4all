@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: compiler.c,v $
+ * Revision 1.56  1997/07/25 22:25:37  keryell
+ * Avoid to put comments on sequences.
+ *
  * Revision 1.55  1997/07/21 13:30:25  keryell
  * Replaced %x format by %p.
  *
@@ -662,8 +665,8 @@ statement *hoststatp, *nodestatp;
 
 		*hoststatp = make_continue_statement(entity_empty_label());
 		*nodestatp = overlapstat;
-		statement_comments(*nodestatp) = 
-		    string_undefined_p(c)? c: strdup(c);
+		if (!string_undefined_p(c))
+		    insert_comments_to_statement(*nodestatp, c);
 	    }
 	    else
 	    {
