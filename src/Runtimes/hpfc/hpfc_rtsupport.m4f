@@ -4,7 +4,7 @@ c High Performance Fortran Compiler
 c by Fabien COELHO.
 c
 c $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-c ($Date: 1995/11/21 23:16:52 $, )
+c ($Date: 1995/11/21 23:30:02 $, )
 c
 c-----------------
 c
@@ -1001,12 +1001,13 @@ direct(`'
       subroutine HPFC_DIRECT_ROUTE_IF_POSSIBLE
       include "fpvm3.h"
       include "hpfc_commons.h"
-      integer nhost, narch, dtid, host, arch, speed, info
+      integer nhost, narch, dtid, speed, info
+      character host(50), arch(20)
       call pvmfconfig(nhost, narch, dtid, host, arch, speed, info)
       if (nhost.ge.NBOFTASKS) then
          call pvmfsetopt(PVMROUTE, PVMROUTEDIRECT, info)
       else
-         print *, "no DIRECT ROUTE, not enough processors..."
+         print *, "Warning: no direct route, not enough processors..."
       endif
       end
 )
