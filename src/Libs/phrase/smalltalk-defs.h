@@ -18,7 +18,7 @@
 #define BEGINTEMPVAR  "|"
 #define ENDTEMPVAR    "|"
 
-#define SETVALUE      "_"
+#define SETVALUE      ":="
 #define RETURNVALUE   "^"
 
 #define COMMENT       "\""
