@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: io-compile.c,v $ ($Date: 1994/12/06 14:42:49 $, ) version $Revision$,
+ * $RCSfile: io-compile.c,v $ ($Date: 1994/12/22 16:52:23 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -104,8 +104,7 @@ statement stat;
 
     debug(4, "io_efficient_compilable_p", "statement 0x%x\n", stat);
 
-    pips_assert("io_efficient_compilable_p",
-		load_statement_only_io(stat)==TRUE);
+    assert(load_statement_only_io(stat)==TRUE);
 
     /*
      * ok, no conditions are put here, what means that any statement that
@@ -265,8 +264,7 @@ statement *psh, *psn;
     Psysteme
 	syst = generate_io_system(array, stat, move, act);
 
-    pips_assert("generate_io_collect_or_update", 
-		entity_variable_p(array) && syst!=SC_UNDEFINED);
+    assert(entity_variable_p(array) && syst!=SC_UNDEFINED);
 
 
     /* ifdebug(9)
@@ -340,12 +338,12 @@ statement *psh, *psn;
 	    scanners = NIL,
 	    rebuild = NIL;
 
-	pips_assert("generate_io_collect_or_update", movement_update_p(move));
+	assert(movement_update_p(move));
 
 	put_variables_in_ordered_lists
 	    (&syst, array, &parameters, &tmp, &scanners, &rebuild);
 
-	pips_assert("generate_io_collect_or_update", ENDP(tmp));
+	assert(ENDP(tmp));
 
 	hpfc_algorithm_row_echelon(syst, scanners, &condition, &row_echelon);
 	hpfc_simplify_condition(&condition, stat, move);
@@ -397,7 +395,7 @@ tag move, act;
     Psysteme
 	result = SC_UNDEFINED;
 
-    pips_assert("generate_io_system", entity_variable_p(array));
+    assert(entity_variable_p(array));
 
     if (array_distributed_p(array))
     {
@@ -452,7 +450,7 @@ tag move, act;
 	stamme = hpfc_unstutter_dummies(array),
 	contxt = statement_context(stat, move); 
     
-    pips_assert("generate_shared_io_system", !array_distributed_p(array));
+    assert(!array_distributed_p(array));
 
     result = sc_append(sc_rn(NULL), region);
     result = sc_append(result, a_decl);
@@ -767,7 +765,7 @@ tag move;
 	  entity_local_name(array), 
 	  (movement_collect_p(move))?"collect":"update");
 
-    pips_assert("clean_distributed_io_system", array_distributed_p(array));
+    assert(array_distributed_p(array));
     
     /* THETA_i's */
     remove = 
@@ -1129,10 +1127,7 @@ bool number_first;
 	gen_nconc(result,
 		  hpfc_order_specific_variables(le, get_ith_local_dummy));
 
-    pips_assert("hpfc_order_variables",
-		gen_length(result)==gen_length(le));
-
-    
+    assert(gen_length(result)==gen_length(le));
     
     return(result);
 }
