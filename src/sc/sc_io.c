@@ -16,7 +16,7 @@ extern Psysteme ps_yacc;
 extern boolean syntax_error;
 
  /* fichier lu par sc_lex.l */
-extern FILE * yyin;
+extern FILE * syst_in;
 
 /* Psysteme * sc_read(char * nomfic): construit un systeme d'inegalites
  * lineaires a partir d'une representation externe standard; les variables
@@ -39,13 +39,13 @@ extern FILE * yyin;
 Psysteme * sc_read(nomfic)
 char * nomfic;
 {
-	if ((yyin = fopen(nomfic,"r")) == NULL) {
+	if ((syst_in = fopen(nomfic,"r")) == NULL) {
 		(void) fprintf(stderr,
 			       "Ouverture du fichier %s impossible\n",nomfic);
 		exit(4);
 	}
 	sc_init_lex();
-	yyparse();
+	syst_parse();
 	return(&ps_yacc);
 }
 
@@ -88,9 +88,9 @@ boolean sc_fscan(f,ps)
 FILE * f;
 Psysteme * ps;
 {
-    yyin = f;
+    syst_in = f;
     sc_init_lex();
-    yyparse();
+    syst_parse();
     ps_yacc = sc_reversal(ps_yacc);
     *ps = ps_yacc;
     return(!syntax_error);
