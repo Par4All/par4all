@@ -303,7 +303,7 @@ bool task_parallelize_p;
    debug_on("RICE_DEBUG_LEVEL");
 
     debug(9, "CodeGenerate", "starting at level %d ...\n", l); 
-        ifdebug(9)
+    ifdebug(9)
 	print_statement_set(stderr, region);
  
     debug(9, "CodeGenerate", "finding and top-sorting sccs ...\n");
@@ -312,18 +312,18 @@ bool task_parallelize_p;
     debug(9, "CodeGenerate", "generating code ...\n");
     for (ps = lsccs; ps != NULL; ps = CDR(ps)) {
 	scc s = SCC(CAR(ps));
-	stat=statement_undefined;
+	stat = statement_undefined;
 	
 	if (get_bool_property("PARTIAL_DISTRIBUTION")) {
-	    /* statements that are independent are gathered into the same doall loop */
+	    /* statements that are independent are gathered 
+	       into the same doall loop */
 	    if (! strongly_connected_p(s, l)) {
 		set inner_region = scc_region(s);
 		if (contains_level_l_dependence(s,inner_region,l)) {
 		    stat = IsolatedStatement(s, l, task_parallelize_p);
-		    ifdebug(9) 		
-			(void) fprintf(stderr,
-				       "CodeGenerate - isolated comp.that contains dep. at Level %d\n",
-				       l);
+		    debug(9, "CodeGenerate", 
+			  "isolated comp.that contains dep. at Level %d\n",
+			  l);
 		}
 		else  { 
 		    vertex v = VERTEX(CAR(scc_vertices(s)));
@@ -333,8 +333,9 @@ bool task_parallelize_p;
 			(strcmp(entity_local_name(call_function(instruction_call(sbody))), 
 				"CONTINUE") != 0))  { 
 			ifdebug(9) {
-			    (void) fprintf(stderr,
-					   "CodeGenerate - isolated comp. that does not contain dep.at Lev %d\n",
+			    debug(9,"CodeGenerate",
+				  "isolated comp. that does not contain"
+				  " dep.at Lev %d\n",
 					   l);
 			    print_text(stderr, text_statement(module,0,st)) ;
 			}
@@ -378,19 +379,26 @@ bool task_parallelize_p;
        
     if (nbl) {  
 	if (nbl>=l) { 
-	    if (gen_length(lst)== 1)  rst = (STATEMENT(CAR(lst)));
-	    else rst = make_block_statement(lst);
+	    if (gen_length(lst)== 1)
+		rst = (STATEMENT(CAR(lst)));
+	    else 
+		rst = make_block_statement(lst);
 	    statb = MakeNestOfParallelLoops(l-1-enclosing, 
 					    loops, 
 					    rst, 
 					    task_parallelize_p);
 	    INSERT_AT_END(block, eblock, CONS(STATEMENT, statb, NIL));
 	}
-	else   eblock = block = lst;
+	else
+	    eblock = block = lst;
 	nbl = 0;
     }
-    if( !ENDP( block ))	rst = make_block_statement(block);
-    else rst = statement_undefined ;
+
+    if( !ENDP( block ))	
+	rst = make_block_statement(block);
+    else 
+	rst = statement_undefined ;
+
     ifdebug(8) { 
 	(void) fprintf(stderr,"CodeGenerate - Exiting ...\n") ;
 	if (rst==statement_undefined)  
