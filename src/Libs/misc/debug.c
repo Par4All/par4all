@@ -45,11 +45,23 @@ int get_debug_level()
 }
 
 #define STACK_LENGTH 50
-static debug_level_stack[STACK_LENGTH];
+
+typedef struct 
+{
+    char * name;
+    char * function;
+    char * file;
+    int line;
+    int level;
+} debug_level ;
+
+/* idls points to the first free bucket in debug_stack
+ */
+static debug_level debug_stack[STACK_LENGTH];
 static int idls = 0;
 
 /* The pair get_ and set_debug_stack_pointer() should never be used
-except to clean up the stack fater a long jump */
+except to clean up the stack after a long jump */
 
 int get_debug_stack_pointer()
 {
@@ -60,44 +72,65 @@ void set_debug_stack_pointer(i)
 {
     if(i >= 0 && i <= idls) {
 	if (i!=idls) {
-	    user_warning("set_debug_stack_pointer",
-			 "debug level stack is set to %d\n", i);
+	    pips_user_warning("debug level stack is set to %d\n", i);
 	    idls = i;
-	    if(idls>1) {
-		set_debug_level(debug_level_stack[idls-1]);
-	    }
-	    else {
-		set_debug_level(0);
-	    }
+	    set_debug_level(idls>1 ? debug_stack[idls-1].level : 0);
 	}
     }
     else
-	pips_error("set_debug_stack_pointer", 
-		   "value %d out of stack range [0..%d]. "
-		   "Too many calls to debug_off()\n", i, idls);
+	pips_internal_error("value %d out of stack range [0..%d]. "
+			    "Too many calls to debug_off()\n", i, idls);
 }
 
-void debug_off()
-{
-    message_assert("empty debug level stack", idls > 0);
-
-    if(idls>1)
-	set_debug_level(debug_level_stack[(--idls)-1]);
-    else
-	set_debug_level(0);
-}
-
-void debug_on(env)
-char *env;
+void 
+debug_on_function(
+    char * env,
+    char * function,
+    char * file,
+    int line)
 {
     int dl;
-    char *debug_level;
+    char * level_env;
 
-    pips_assert("debug_on", idls < STACK_LENGTH-1);
+    pips_assert("stack not full", idls < STACK_LENGTH-1);
+    dl = ((level_env = getenv(env)) != NULL) ? atoi(level_env) : 0;
 
-    dl = ((debug_level = getenv(env)) != NULL) ? atoi(debug_level) : 0;
+    debug_stack[idls].name = env;
+    debug_stack[idls].function = function;
+    debug_stack[idls].file = file;
+    debug_stack[idls].line = line;
+    debug_stack[idls].level = dl;
 
-    set_debug_level(debug_level_stack[idls++] = dl);
+    idls++;
+
+    set_debug_level(dl);
+}
+
+void 
+debug_off_function(
+    char * function,
+    char * file,
+    int line)
+{
+    debug_level *current;
+
+    pips_assert("debug stack not empty", idls > 0);
+
+    idls--;
+    current = &debug_stack[idls];
+
+    if (!same_string_p(current->file, file) ||
+	!same_string_p(current->function, function))
+    {
+	pips_internal_error("debug %s (level is %d)\n"
+			    "[%s] (%s:%d) debug on and\n"
+			    "[%s] (%s:%d) debug off don't match\n",
+			    current->name, current->level,
+			    current->function, current->file, current->line,
+			    function, file, line);
+    }
+
+    set_debug_level(idls>0 ? debug_stack[idls-1].level : 0);
 }
 
 /* function used to debug (can be called from dbx)
@@ -107,10 +140,15 @@ void print_debug_stack()
 {
     int i;
 
-    (void) printf("Debug stack (last debug_on first): ");
-    for(i=idls-1;i>=0;i--) {
-	(void) printf("%d ",debug_level_stack[i]);
-    }
+    (void) fprintf(stderr, "Debug stack (last debug_on first): ");
+
+    for(i=idls-1;i>=0;i--)
+	(void) fprintf(stderr, "%s=%d [%s] (%s:%d)\n",
+		       debug_stack[i].name,
+		       debug_stack[i].level,
+		       debug_stack[i].function,
+		       debug_stack[i].file,
+		       debug_stack[i].line);
 }
 
 /*
