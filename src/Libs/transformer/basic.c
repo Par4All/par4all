@@ -39,7 +39,14 @@ transformer t_in;
     return t_out;
 }
 
+
 void transformer_free(t)
+transformer t;
+{
+    free_transformer(t);
+}
+
+void old_transformer_free(t)
 transformer t;
 {
     /* I should use gen_free directly but Psysteme is not yet properly
