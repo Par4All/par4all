@@ -1,7 +1,7 @@
 c
 c COMMON /HPFC_PARAM/
 c
-c $RCSfile: hpfc_param.h,v $ ($Date: 1995/07/26 15:59:09 $, )
+c $RCSfile: hpfc_param.h,v $ ($Date: 1995/07/26 16:01:05 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -24,5 +24,5 @@ c
 c
       integer 
      $     ATOT, TTOP, NODIMA, NODIMT, NODIMP, 
-     $     RANGEA, RANGET, RANGEP, ALIGN, DIST
+     $     RANGEA, RANGET, RANGEP, ALIGN, DIST, MSTATUS
 c
