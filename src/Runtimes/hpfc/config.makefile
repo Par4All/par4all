@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1996/09/09 17:09:50 $, )
+# ($Date: 1996/09/09 17:11:55 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -185,6 +185,8 @@ DDC_CFILES	= $(LIB_M4CFILES:.m4c=.c)
 DDC_HEADERS 	= $(LIB_M4FFILES:.m4f=.h) \
 		  $(M4_HEADERS:.m4h=.h)\
 		  hpfc_includes.h
+
+$(DDC_FFILES) $(DDC_CFILES) $(DDC_HEADERS): $(PVM_ARCH).m4
 
 LIB_HEADERS	= $(CORE_HEADERS) \
 		  $(DDC_HEADERS)
