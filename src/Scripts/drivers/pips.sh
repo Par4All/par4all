@@ -3,7 +3,8 @@
 # $Id$
 #
 # Find out actual *pips for the current $PIPS_ARCH...
-# it is always better to use the executable directly. 
+# It is always better to use the executable directly. 
+#
 # This shell script is expected to be executer as pips/tpips or wpips.
 # This can be achieve by providing such links in the Share directory.
 #
@@ -18,9 +19,13 @@ error()
   exit ${status}
 }
 
-[ "${PIPS_ARCH}" ] || error 1 "\$PIPS_ARCH is undefined"
-[ "${PIPS_ROOT}" ] || error 2 "\$PIPS_ROOT is undefined"
+[ "${PIPS_ARCH}" ] || error 1 "\$PIPS_ARCH is undefined!"
+[ "${PIPS_ROOT}" ] || error 2 "\$PIPS_ROOT is undefined!"
 
 PATH=./${PIPS_ARCH}:${PIPS_ROOT}/Bin/${PIPS_ARCH}:${PATH}
+
+# how to avoid a recursion of no actual binary is found:
+PATH=./${PIPS_ARCH}:${PIPS_ROOT}/Bin/${PIPS_ARCH} \
+    type ${what} > /dev/null || error 3 "no ${what} binary found!"
 
 exec "${what}" "$@"
