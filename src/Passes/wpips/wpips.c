@@ -52,10 +52,12 @@ Panel main_panel,
 void create_menus()
 {
     create_select_menu();
-    create_options_menu_and_window();
     create_edit_menu();
 /*    create_analyze_menu();*/
     create_transform_menu();
+    /* The option panel use the definition of the edit menu and so
+       needs to be create after it: */
+    create_options_menu_and_window();
     create_help_menu();
     /* In the Emacs mode, no XView log window: */
     if (! wpips_emacs_mode)
