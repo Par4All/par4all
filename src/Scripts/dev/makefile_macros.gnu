@@ -12,16 +12,8 @@ CFLAGS	= -g -O2 -Wall -pipe
 CMKDEP	= -M
 LD	= $(CC) 
 RANLIB	= granlib
-LEX	= flex
-LFLAGS	= 
 FC	= g77
 FFLAGS	= -O2 -g -Wimplicit -pipe
-LINT	= lint
-LINTFLAGS= -habxu
-YACC	= bison
-YFLAGS	= -y
-PROTO	= cproto
-PRFLAGS	= -evcf2
 
 LDFLAGS += -g
 
