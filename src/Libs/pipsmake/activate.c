@@ -62,15 +62,15 @@ string phase;
     /* find rule that describes phase */
     r = find_rule_by_phase(phase);
     if(r == rule_undefined) {
-	user_warning( "activate", "Rule `%s' undefined\n", phase);
+	user_error( "activate", "Rule `%s' undefined\n", phase);
 
     } else {
 
 	/* complete simple cases */
 	if (active_phase_p(phase)) {
-	    debug( 7, "activate", "Rule `%s' already active\n", phase);
+	    user_warning ("activate", "Rule `%s' already active\n", phase);
 	} else if (!gen_length(rule_produced(r))) {
-	    pips_error("activate", 
+	    user_error("activate", 
 		       "Phase %s produces no resource\n", phase);
 	} else {
 	    /* GO: for many produced resources we loop over them
@@ -125,7 +125,7 @@ string phase;
 	    }, rule_produced(r));
 
 	    if (rule_cyclic_p == TRUE) {
-		pips_error("activate",
+		user_error("activate",
 			   "Phase %s is cyclic\n",
 			   phase);
 	    }
