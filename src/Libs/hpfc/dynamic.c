@@ -6,7 +6,7 @@
  * to deal with them in HPFC.
  *
  * $RCSfile: dynamic.c,v $ version $Revision$
- * ($Date: 1995/10/05 11:32:25 $, )
+ * ($Date: 1995/12/19 15:52:33 $, )
  */
 
 #include "defines-local.h"
@@ -150,7 +150,7 @@ align al;
 {
     entity new_a = new_synonym(a);
     set_array_as_distributed(new_a);
-    store_entity_align(new_a, al);
+    store_hpf_alignment(new_a, al);
     return new_a;
 }
 
@@ -163,7 +163,7 @@ distribute di;
 {
     entity new_t = new_synonym(t);
     set_template(new_t);
-    store_entity_distribute(new_t, di);
+    store_hpf_distribution(new_t, di);
     return new_t;
 }
 
@@ -253,7 +253,7 @@ align a;
 {
     MAP(ENTITY, ar,
     {
-	if (same_align_p(load_entity_align(ar), a))
+	if (same_align_p(load_hpf_alignment(ar), a))
 	{
 	    free_align(a);
 	    return ar;    /* the one found is returned */
@@ -293,7 +293,7 @@ distribute d;
 {
     MAP(ENTITY, t,
     {
-	if (same_distribute_p(load_entity_distribute(t), d))
+	if (same_distribute_p(load_hpf_distribution(t), d))
 	{
 	    free_distribute(d);
 	    return t;    /* the one found is returned */
@@ -504,7 +504,7 @@ continue_propagation_p(statement s)
 	else if (redistribute_directive_p(fun))
 	{
 	    entity t = array_propagation ?
-		align_template(load_entity_align(new_variable)) : old_variable;
+		align_template(load_hpf_alignment(new_variable)):old_variable;
 		
 	    MAP(EXPRESSION, e,
 	    {
@@ -894,7 +894,7 @@ alive_arrays(
 
     MAP(ENTITY, array,
     {
-	if (align_template(load_entity_align(array))==t)
+	if (align_template(load_hpf_alignment(array))==t)
 	    l = CONS(ENTITY, array, l);
 
 	pips_debug(8, "adding %s as alive\n", entity_name(array));
@@ -909,7 +909,7 @@ alive_arrays(
     {
 	if (primary_entity_p(array) && !gen_in_list_p(array, lseens))
 	{
-	    if (align_template(load_entity_align(array))==t)
+	    if (align_template(load_hpf_alignment(array))==t)
 		l = CONS(ENTITY, array, l);
 	    
 	    pips_debug(8, "adding %s as default\n", entity_name(array));
