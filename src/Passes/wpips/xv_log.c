@@ -12,14 +12,17 @@
 
 #include "genC.h"
 #include "misc.h"
+#include "database.h"
+#include "pipsdbm.h"
 
 #include "wpips.h"
 
-static Textsw log_textsw;
-static Menu_item open_front, clear, close;
-
+#define LOG_FILE "LOGFILE"
 /* Par de'faut, le fichier est ferme' : */
 FILE *log_file = NULL;
+
+static Textsw log_textsw;
+static Menu_item open_front, clear, close;
 
 
   void
@@ -37,14 +40,18 @@ close_log_file()
   void
 open_log_file()
 {
-  char tampon[LARGE_BUFFER_LENGTH];
-  
+  char file_name[MAXPATHLEN];
+
   if (log_file != NULL)
     close_log_file();
 
   if (get_bool_property("USER_LOG_P")==TRUE) {
-    sprintf(tampon, "%s.log", db_get_current_workspace());
-    if ((log_file = fopen(tampon, "a")) == NULL) {
+    (void) strcpy(file_name,
+		  concatenate(database_directory(db_get_current_workspace()),
+			      "/",
+			      LOG_FILE,
+			      NULL));
+    if ((log_file = fopen(file_name, "w")) == NULL) {
       perror("open_log_file");
       abort();
     }
@@ -55,10 +62,12 @@ open_log_file()
 log_on_file(char chaine[])
 {
   if (log_file != NULL && get_bool_property("USER_LOG_P")==TRUE) {
-    if (fprintf(log_file, "%s", chaine)) != 1) {
+    if (fprintf(log_file, "%s", chaine) <= 0) {
       perror("log_on_file");
       abort();
     }
+    else
+      fflush(log_file);
   }
 }
 
