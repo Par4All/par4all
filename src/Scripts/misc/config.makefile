@@ -13,24 +13,23 @@ UTL_SCRIPTS = 	filter_verbatim \
 		job-receive \
 		unjustify
 
-FILES =	 \
-		extract-doc.awk \
+FILES =	 	extract-doc.awk \
 		accent.sed
 
-HFI =	handle_fortran_includes
+#HFI =	handle_fortran_includes
 
 INSTALL_UTL=	$(UTL_SCRIPTS) $(FILES)
 SCRIPTS=	$(INSTALL_SHR) $(UTL_SCRIPTS)
-SOURCES=	$(SCRIPTS) $(FILES) $(HFI).c
+SOURCES=	$(SCRIPTS) $(FILES)
+# $(HFI).c
 
-$(ARCH)/$(HFI): $(ARCH)/$(HFI).o
-	$(RM) $@
-	$(LD) $(LDFLAGS) -o $@ $< -lrx
-	chmod a+rx-w $@
+#$(ARCH)/$(HFI): $(ARCH)/$(HFI).o
+#	$(RM) $@
+#	$(LD) $(LDFLAGS) -o $@ $< -lrx
+#	chmod a+rx-w $@
 
 clean: local-clean
-local-clean:
-	$(RM) $(ARCH)/$(HFI) $(ARCH)/$(HFI).o
+local-clean:; $(RM) $(ARCH)/$(HFI) $(ARCH)/$(HFI).o
 
 all: .runable
 
