@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.281  1997/05/14 16:00:01  coelho
+# *** empty log message ***
+#
 # Revision 1.280  1997/05/14 15:57:39  coelho
 # *** empty log message ***
 #
@@ -347,7 +350,7 @@ CPPFLAGS += -DSOFT_ARCH='"\$(ARCH)"'
 # as gmake CPPOPT="-DFOO=bar" ... that will be added to the defaults
 # a typical interesting example is to put -pg in {C,LD}OPT
 #
-PREPROC=  \$(CC) -E \$(CPPFLAGS) \$(CPPOPT)
+PREPROC=  \$(CC) -E \$(CANSI) \$(CPPFLAGS) \$(CPPOPT)
 COMPILE=  \$(CC) \$(CANSI) \$(CFLAGS) \$(COPT) \$(CPPFLAGS) \$(CPPOPT) -c
 F77COMPILE=\$(FC) \$(FFLAGS) \$(FOPT) -c
 LINK=	  \$(LD) \$(LDFLAGS) \$(LDOPT) -o
@@ -357,7 +360,7 @@ PARSE=	  \$(YACC) \$(YFLAGS) \$(YOPT)
 ARCHIVE=  \$(AR) \$(ARFLAGS)
 PROTOIZE= \$(PROTO) \$(PRFLAGS) -E "\$(PREPROC)"
 M4FILTER= \$(M4) \$(M4FLAGS) \$(M4OPT)
-MAKEDEP=  \$(CC) \$(CMKDEP) \$(CPPFLAGS) \$(CPPOPT) \$(CFLAGS) \$(COPT)
+MAKEDEP=  \$(CC) \$(CMKDEP) \$(CPPFLAGS) \$(CPPOPT) \$(CANSI) \$(CFLAGS) \$(COPT)
 #
 # for easy debugging... e.g. gmake ECHO='something' echo
 echo:; @echo \$(ECHO)
