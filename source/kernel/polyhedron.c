@@ -3906,10 +3906,15 @@ Polyhedron *Polyhedron_Preimage(Polyhedron *Pol,Matrix *Func,unsigned NbMaxRays)
   Matrix *Constraints = NULL;
   Polyhedron *NewPol = NULL;
   unsigned NbConstraints, Dimension1, Dimension2;
-  
+  int i, j, k;
+  Value Sum,tmp;
+
+  value_init(Sum); value_init(tmp);
+
   CATCH(any_exception_error) {
     if (Constraints) Matrix_Free(Constraints);
     if (NewPol) Polyhedron_Free(NewPol);
+    value_clear(Sum); value_clear(tmp);
     RETHROW();
   }
   TRY {
@@ -3920,6 +3925,7 @@ Polyhedron *Polyhedron_Preimage(Polyhedron *Pol,Matrix *Func,unsigned NbMaxRays)
     if (Dimension1!=(Func->NbRows)) {
       errormsg1("Polyhedron_Preimage", "dimincomp", "incompatable dimensions");
       UNCATCH(any_exception_error);
+      value_clear(Sum); value_clear(tmp);
       return Empty_Polyhedron(Dimension2-1);
     }
     
@@ -3936,12 +3942,28 @@ Polyhedron *Polyhedron_Preimage(Polyhedron *Pol,Matrix *Func,unsigned NbMaxRays)
       errormsg1("Polyhedron_Preimage", "outofmem", "out of memory space\n");
       Pol_status = 1;
       UNCATCH(any_exception_error);
+      value_clear(Sum); value_clear(tmp);
       return 0;
     }
     
     /* The new constraint matrix is the product of constraint matrix of the */
-    /* polyhedron and the function matrix.                                  */
-    Rays_Mult(Pol->Constraint, Func, Constraints->p, NbConstraints);
+    /* polyhedron and the function matrix.
+       */
+    for (i=0; i<NbConstraints; i++) {
+      value_assign(Constraints->p[i][0],Pol->Constraint[i][0]);
+      for (j=0; j<Dimension2; j++) {
+	value_set_si(Sum,0);
+	for (k=0; k<Dimension1; k++) {
+	  
+	  /* Sum+=Pol->Constraint[i][k+1] * Func->p[k][j]; */
+	  value_multiply(tmp,Pol->Constraint[i][k+1],Func->p[k][j]);
+	  value_addto(Sum,Sum,tmp);
+	}
+	value_assign(Constraints->p[i][j+1],Sum);
+      }
+    }
+
+    //Rays_Mult(Pol->Constraint, Func, Constraints->p, NbConstraints);
     NewPol = Constraints2Polyhedron(Constraints, NbMaxRays);
     Matrix_Free(Constraints), Constraints = NULL;
     
@@ -3981,6 +4003,16 @@ Polyhedron *DomainPreimage(Polyhedron *Pol,Matrix *Func,unsigned NbMaxRays) {
   return d;
 } /* DomainPreimage */
 
+
+
+
+
+
+
+
+
+
+
 /*
  * Transform a polyhedron 'Pol' into another polyhedron according to a given
  * affine mapping function 'Func'. 'NbMaxConstrs' is the maximum number of 
@@ -3991,10 +4023,15 @@ Polyhedron *Polyhedron_Image(Polyhedron *Pol, Matrix *Func,unsigned NbMaxConstrs
   Matrix *Rays = NULL;
   Polyhedron *NewPol = NULL;
   unsigned NbRays, Dimension1, Dimension2;
+  int i, j, k;
+  Value Sum, tmp;
   
+  value_init(Sum); value_init(tmp);
+
   CATCH(any_exception_error) {
     if (Rays) Matrix_Free(Rays);
     if (NewPol) Polyhedron_Free(NewPol);
+    value_clear(Sum); value_clear(tmp);
     RETHROW();
   }
   TRY {
@@ -4005,6 +4042,7 @@ Polyhedron *Polyhedron_Image(Polyhedron *Pol, Matrix *Func,unsigned NbMaxConstrs
     if (Dimension1!=Func->NbColumns) {
       errormsg1("Polyhedron_Image", "dimincomp", "incompatable dimensions");
       UNCATCH(any_exception_error);
+      value_clear(Sum); value_clear(tmp);
       return Empty_Polyhedron(Dimension2-1);
     }
     
@@ -4016,66 +4054,44 @@ Polyhedron *Polyhedron_Image(Polyhedron *Pol, Matrix *Func,unsigned NbMaxConstrs
      Pol->Rays  \       Func /               Rays
 
     */
-
-    if (Dimension1 == Dimension2) {
-	Matrix *M, *M2;
-	int ok;
-	M = Matrix_Copy(Func);
-	M2 = Matrix_Alloc(Dimension2, Dimension1);
-	if (!M2) {
-	  errormsg1("Polyhedron_Image", "outofmem", "out of memory space\n");
-	  UNCATCH(any_exception_error);
-	  return 0;
-	}
-
-	ok = Matrix_Inverse(M, M2);
-	Matrix_Free(M);
-	if (ok) {
-	    NewPol = Polyhedron_Alloc(Pol->Dimension, Pol->NbConstraints,
-				      Pol->NbRays);
-	    if (!NewPol) {
-	      errormsg1("Polyhedron_Image", "outofmem", 
-			"out of memory space\n");
-	      UNCATCH(any_exception_error);
-	      return 0;
-	    }
-	    Rays_Mult_Transpose(Pol->Ray, Func, NewPol->Ray, NbRays);
-	    Rays_Mult(Pol->Constraint, M2, NewPol->Constraint, 
-		      Pol->NbConstraints);
-	    NewPol->NbEq = Pol->NbEq;
-	    NewPol->NbBid = Pol->NbBid;
-	    if (NewPol->NbEq)
-	      Gauss4(NewPol->Constraint, NewPol->NbEq, NewPol->NbConstraints,
-		     NewPol->Dimension+1);
-	    if (NewPol->NbBid)
-	      Gauss4(NewPol->Ray, NewPol->NbBid, NewPol->NbRays,
-		     NewPol->Dimension+1);
-	}
-	Matrix_Free(M2);
-    }
     
     
-    if (!NewPol) {
-	/* Allocate space for the resultant ray matrix */
-	Rays = Matrix_Alloc(NbRays, Dimension2+1);
-	if (!Rays) {
-	  errormsg1("Polyhedron_Image", "outofmem", "out of memory space\n");
-	  UNCATCH(any_exception_error);
-	  return 0;
-	}
-	
-	/* The new ray space is the product of ray matrix of the polyhedron and */
-	/* the transpose matrix of the mapping function.                        */
-	Rays_Mult_Transpose(Pol->Ray, Func, Rays->p, NbRays);
-	NewPol = Rays2Polyhedron(Rays, NbMaxConstrs);
-	Matrix_Free(Rays), Rays = NULL;
+    /* Allocate space for the resultant ray matrix */
+    Rays = Matrix_Alloc(NbRays, Dimension2+1);
+    if (!Rays) {
+      errormsg1("Polyhedron_Image", "outofmem", "out of memory space\n");
+      UNCATCH(any_exception_error);
+      value_clear(Sum); value_clear(tmp);
+      return 0;
     }
+    
+    /* The new ray space is the product of ray matrix of the polyhedron and */
+    /* the transpose matrix of the mapping function.                        */
+    for (i=0; i<NbRays; i++) {
+      value_assign(Rays->p[i][0],Pol->Ray[i][0]);
+      for (j=0; j<Dimension2; j++) {
+	value_set_si(Sum,0);
+	for (k=0; k<Dimension1; k++) {
+	  
+	  /* Sum+=Pol->Ray[i][k+1] * Func->p[j][k]; */
+	  value_multiply(tmp,Pol->Ray[i][k+1],Func->p[j][k]);
+	  value_addto(Sum,Sum,tmp);
+	}
+	value_assign(Rays->p[i][j+1],Sum);
+      }
+    }
+    NewPol = Rays2Polyhedron(Rays, NbMaxConstrs);
+    Matrix_Free(Rays), Rays = NULL;
     
   } /* end of TRY */
-
+  
   UNCATCH(any_exception_error);
+  value_clear(Sum); value_clear(tmp);
   return NewPol;
 } /* Polyhedron_Image */
+
+
+
 
 /* 
  *Transform a polyhedral domain 'Pol' into another domain according to a given
