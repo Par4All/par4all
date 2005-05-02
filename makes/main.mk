@@ -237,6 +237,7 @@ endif # LIB_CFILES
 ifdef LIB_TARGET
 $(ARCH)/$(LIB_TARGET): $(LIB_OBJECTS)
 	$(ARCHIVE) $(ARCH)/$(LIB_TARGET) $(LIB_OBJECTS)
+	ranlib $@
 
 INSTALL_LIB	+=   $(addprefix $(ARCH)/,$(LIB_TARGET))
 
