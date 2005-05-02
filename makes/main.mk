@@ -16,6 +16,8 @@
 # INSTALL_LIB: libraries to be added (LIB_TARGET not included)
 # INSTALL_BIN: added binaries (BIN_TARGET not included)
 
+all: recompile
+
 ########################################################################## ROOT
 
 ifdef ROOT
@@ -254,6 +256,8 @@ install_lib: $(INSTALL_LIB) $(LIB.d)
 clean: lib-clean
 
 lib-clean:; $(RM) $(ARCH)/$(LIB_TARGET)
+
+recompile: $(ARCH)/$(LIB_TARGET)
 
 endif # INSTALL_LIB
 
