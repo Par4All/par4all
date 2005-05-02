@@ -4,8 +4,8 @@ TARGET	= union
 
 LIB_CFILES=	disjunct.c \
 		path.c \
-		reduc.c
-#		sc_list.c
+		reduc.c \
+		sc_list.c
 
 DERIVED_CFILES = sl_gram.c sl_lex.c  $(LIB_CFILES)
 
