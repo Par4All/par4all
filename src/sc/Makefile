@@ -1,8 +1,10 @@
-#
-# $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 2003/07/31 07:20:25 $, 
+# $Id$
 
-LIB_CFILES=	sc_alloc.c \
+TARGET	= sc
+
+DERIVED_CFILES = sc_gram.c sc_lex.c
+
+INC_CFILES = 	sc_alloc.c \
 	        sc_projection.c \
 	        sc_read.c \
 	        sc.c \
@@ -28,17 +30,28 @@ LIB_CFILES=	sc_alloc.c \
 		sc_debug.c \
 		sc_janus_feasibility.c
 
-LIB_HEADERS=	sc-local.h \
+LIB_CFILES= $(INC_CFILES) $(DERIVED_CFILES)
+
+OTHER_HEADERS=	sc-local.h \
 		sc-private.h \
 		sc_gram.y \
 		sc_lex.l
 
-DERIVED_HEADERS=sc_gram.h
-DERIVED_CFILES=	sc_gram.c sc_lex.c
+DERIVED_HEADERS = sc_gram.h
 
-# $(TARGET).h: $(DERIVED_HEADERS) $(DERIVED_CFILES) 
+LIB_TARGET	= lib$(TARGET).a
 
-LIB_OBJECTS= $(LIB_CFILES:.c=.o) $(DERIVED_CFILES:.c=.o) 
+INC_TARGET	= $(TARGET).h
+
+################################################################## COMMON STUFF
+
+ifdef LINEAR_ROOT
+ROOT    = $(LINEAR_ROOT)
+else
+ROOT    = ../..
+endif
+include $(ROOT)/makes/main.mk
+
 
 YY2SYST	= sed '/extern char \*malloc/d;/^FILE *\*/s,=[^,;]*,,g;\
 	s/YY/SYST_/g;s/yy/syst_/g;' 
@@ -51,6 +64,8 @@ sc_gram.c sc_gram.h: sc_gram.y
 	$(YY2SYST) y.tab.c > sc_gram.c
 	$(YY2SYST) y.tab.h > sc_gram.h
 	$(RM) y.tab.c y.tab.h
- 
-# end of $RCSfile: config.makefile,v $
-#
+
+clean: local-clean
+
+local-clean:
+	$(RM) $(DERIVED_HEADERS) $(DERIVED_CFILES)
