@@ -23,9 +23,9 @@ FWD_DIRS = \
 	sommet \
 	sparse_sc \
 	sg \
-	polyedre \
 	polynome \
-	union
+	union \
+	polyedre
 
 #	plint \
 #	janusvalue \
