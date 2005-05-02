@@ -4,7 +4,7 @@
 # ROOT
 # ARCH (or default provided)
 
-# INC_TARGET: header file for directory
+# INC_TARGET: header file for directory (on INC_CFILES or LIB_CFILES)
 
 # LIB_CFILES: C files that are included in the library
 # LIB_TARGET: generated library file
@@ -173,6 +173,10 @@ endif # need_depend
 ifdef INC_TARGET
 # generate directory header file with cproto
 
+ifndef INC_CFILES
+INC_CFILES	= $(LIB_CFILES)
+endif # INC_CFILES
+
 name	= $(subst -, _, $(notdir $(CURDIR)))
 
 build-header-file:
@@ -182,7 +186,7 @@ build-header-file:
 	  echo "#ifndef $(name)_header_included";\
 	  echo "#define $(name)_header_included";\
 	  cat $(TARGET)-local.h;\
-	  $(PROTOIZE) $(LIB_CFILES) | \
+	  $(PROTOIZE) $(INC_CFILES) | \
 	  sed 's/struct _iobuf/FILE/g;s/__const/const/g;/_BUFFER_STATE/d;/__inline__/d;' ;\
 	  echo "#endif /* $(name)_header_included */";\
 	} > $(INC_TARGET).tmp
