@@ -16,11 +16,7 @@ OTHER_HEADERS =	assert.h \
 		arithmetic_errors.h \
 		linear.h
 
-#LIB_HEADERS =	$(TARGET)-local.h $(OTHER_HEADERS) 
-
 INC_TARGET	= $(TARGET).h
-
-INC_CFILES	= $(LIB_CFILES)
 
 LIB_TARGET	= lib$(TARGET).a
 
@@ -34,7 +30,3 @@ else
 ROOT    = ../..
 endif
 include $(ROOT)/makes/main.mk
-
-all: $(LIB_TARGET)
-
-$(LIB_OBJECTS): $(DERIVED_HEADERS)
