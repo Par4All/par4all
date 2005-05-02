@@ -1,5 +1,21 @@
 # $Id$
 
+# expected macros:
+# ROOT
+# ARCH (or default provided)
+
+# INC_TARGET: header file for directory
+
+# LIB_CFILES: C files that are included in the library
+# LIB_TARGET: generated library file
+# LIB_OBJECTS: what objects in above lib (LIB_CFILES not included)
+
+# BIN_TARGET: generated binary files
+
+# INSTALL_INC: headers to be installed (INC_TARGET not included)
+# INSTALL_LIB: libraries to be added (LIB_TARGET not included)
+# INSTALL_BIN: added binaries (BIN_TARGET not included)
+
 ########################################################################## ROOT
 
 ifdef ROOT
@@ -89,6 +105,7 @@ JAVAC	= javac
 JNI	= javah -jni
 MKDIR	= mkdir -p
 RMDIR	= rmdir
+INSTALL	= install
 
 # for easy debugging... e.g. gmake ECHO='something' echo
 echo:; @echo $(ECHO)
@@ -119,13 +136,13 @@ $(ARCH)/%.o: %.f; $(F77CMP) $< -o $@
 
 ################################################################## DEPENDENCIES
 
-ifdef CFILES
+ifdef LIB_CFILES
 need_depend	= 1
-endif # CFILES
+endif # LIB_CFILES
 
-ifdef DERIVED_CFILES
+ifdef OTHER_CFILES
 need_depend	= 1
-endif # DERIVED_CFILES
+endif # OTHER_CFILES
 
 ifdef need_depend
 phase0: depend $(ARCH)
@@ -135,12 +152,12 @@ DEPEND	= .depend.$(ARCH)
 -include $(DEPEND)
 
 # false generation
-$(DEPEND): $(CFILES) $(DERIVED_CFILES) $(DERIVED_LIB_HEADERS)
+$(DEPEND): $(LIB_CFILES) $(OTHER_CFILES) $(DERIVED_LIB_HEADERS)
 	touch $@
 
 # actual generation is done on demand only
 depend:
-	$(MAKEDEP) $(CFILES) $(DERIVED_CFILES) | \
+	$(MAKEDEP) $(LIB_CFILES) $(OTHER_CFILES) | \
 		sed 's,^\(.*\.o:\),$(ARCH)/\1,' > $(DEPEND)
 
 clean: depend-clean
@@ -152,6 +169,7 @@ endif # need_depend
 ####################################################################### HEADERS
 
 ifdef INC_TARGET
+# generate directory header file with cproto
 
 current_directory=$(pwd)
 dir_real_name=$(basename $current_directory)
@@ -164,7 +182,7 @@ build-header-file:
 	  echo "#ifndef $(dir_simple_name)_header_included";\
 	  echo "#define $(dir_simple_name)_header_included";\
 	  cat $(TARGET)-local.h;\
-	  $(PROTOIZE) $(INC_CFILES) | \
+	  $(PROTOIZE) $(LIB_CFILES) | \
 	  sed 's/struct _iobuf/FILE/g;s/__const/const/g;/_BUFFER_STATE/d;/__inline__/d;' ;\
 	  echo "#endif /* $(dir_simple_name)_header_included */";\
 	} > $(INC_TARGET).tmp
@@ -173,26 +191,78 @@ build-header-file:
 header:	.header $(INC_TARGET)
 
 # .header carrie all dependencies for INC_TARGET:
-.header: $(TARGET)-local.h $(DERIVED_HEADERS) $(INC_CFILES) 
+.header: $(TARGET)-local.h $(DERIVED_HEADERS) $(LIB_CFILES) 
 	$(MAKE) $(GMKNODIR) build-header-file ; touch .header
 
 $(INC_TARGET): $(TARGET)-local.h
 	$(RM) .header; $(MAKE) $(GMKNODIR) .header
 
+phase1:	header
+
+clean: inc-clean
+
+inc-clean:; $(RM) $(INC_TARGET) .header
+
+INSTALL_INC	+=   $(INC_TARGET)
+
 endif # INC_TARGET
+
+ifdef INSTALL_INC
+phase1: install_inc
+
+$(INC.d):; $(MKDIR) $(INC.d)
+
+install_inc: $(INSTALL_INC) $(INC.d)
+	$(INSTALL) --mode=644 $(INSTALL_INC) $(INC.d)
+
+endif # INSTALL_INC
+
+####################################################################### LIBRARY
 
 # ARCH subdirectory
 $(ARCH):; test -d $(ARCH) || $(MKDIR) $(ARCH)
 
 clean: arch-clean
 
-arch-clean:; -$(RMDIR) $(ARCH)
+arch-clean:
+	-$(RM) $(ARCH)/*.o $(ARCH)/lib*.a
+	-$(RMDIR) $(ARCH)
 
-####################################################################### INSTALL
+ifdef LIB_CFILES
+ifndef LIB_OBJECTS
+LIB_OBJECTS = $(addprefix $(ARCH)/,$(LIB_CFILES:.c=.o))
+endif # LIB_OBJECTS
+endif # LIB_CFILES
+
+ifdef LIB_TARGET
+$(ARCH)/$(LIB_TARGET): $(LIB_OBJECTS)
+	$(ARCHIVE) $(ARCH)/$(LIB_TARGET) $(LIB_OBJECTS)
+
+INSTALL_LIB	+=   $(addprefix $(ARCH)/,$(LIB_TARGET))
+
+endif # LIB_TARGET
+
+ifdef INSTALL_LIB
+phase2:	install_lib
+
+$(INSTALL_LIB): $(ARCH) 
+
+$(LIB.d):; $(MKDIR) $(LIB.d)
+
+install_lib: $(INSTALL_LIB) $(LIB.d)
+	$(INSTALL) --mode=644 $(INSTALL_LIB) $(LIB.d)
+
+clean: lib-clean
+
+lib-clean:; $(RM) $(ARCH)/$(LIB_TARGET)
+
+endif # INSTALL_LIB
+
+######################################################################## PHASES
 
 # multiphase compilation?
 
-recompile:
+compile:
 	$(MAKE) phase0
 	$(MAKE) phase1
 	$(MAKE) phase2
@@ -209,48 +279,13 @@ phase3:
 phase4:
 phase5:
 
-# NO! otherwise compilation always redone because directory changed
-#ifdef LIB_OBJECTS
-#$(LIB_OBJECTS): $(ARCH)
-#endif # LIB_OBJECTS
-
-# includes
-ifdef INC_TARGET
-INSTALL_INC	+=   $(INC_TARGET)
-endif # INC_TARGET
-
-ifdef INSTALL_INC
-phase1: install_inc
-
-$(INC.d):; $(MKDIR) $(INC.d)
-
-install_inc: $(INSTALL_INC) $(INC.d)
-	for f in $(INSTALL_INC) ; do $(INSTALL) $$f $(INC.d) ; done
-
-endif # INSTALL_INC
-
-# libraries
-ifdef LIB_TARGET
-INSTALL_LIB	+=   $(LIB_TARGET)
-endif # LIB_TARGET
-
-ifdef INSTALL_LIB
-phase2:	install_lib
-
-$(INSTALL_LIB): $(ARCH)
-
-$(LIB.d):; $(MKDIR) $(LIB.d)
-
-install_lib: $(INSTALL_LIB) $(LIB.d)
-	for f in $(INSTALL_LIB) ; do $(INSTALL) $$f $(LIB.d) ; done
-endif # INSTALL_LIB
-
 # binaries
 ifdef BIN_TARGET
 INSTALL_BIN	+=   $(BIN_TARGET)
 endif # BIN_TARGET
 
 ifdef INSTALL_BIN
+
 phase2: install_bin
 
 $(INSTALL_BIN): $(ARCH)
@@ -258,37 +293,44 @@ $(INSTALL_BIN): $(ARCH)
 $(BIN.d):; $(MKDIR) $(BIN.d)
 
 install_bin: $(INSTALL_BIN) $(BIN.d)
-	for f in $(INSTALL_BIN) ; do $(INSTALL) $$f $(BIN.d) ; done
+	$(INSTALL) --mode=755 $(INSTALL_BIN) $(BIN.d)
+
 endif # INSTALL_BIN
 
 # documentation
 ifdef INSTALL_DOC
+
 phase3: install_doc
 
 $(DOC.d):; $(MKDIR) $(DOC.d)
 
 install_doc: $(INSTALL_DOC) $(DOC.d)
-	for f in $(INSTALL_DOC) ; do $(INSTALL) $$f $(DOC.d) ; done
+	$(INSTALL) --mode=644 $(INSTALL_DOC) $(DOC.d)
+
 endif # INSTALL_DOC
 
 # shared
 ifdef INSTALL_SHR
+
 phase1: install_shr 
 
 $(SHR.d):; $(MKDIR) $(SHR.d)
 
 install_shr: $(INSTALL_SHR) $(SHR.d)
-	for f in $(INSTALL_SHR) ; do $(INSTALL) $$f $(SHR.d) ; done
+	$(INSTALL) --mode=644 $(INSTALL_SHR) $(SHR.d)
+
 endif # INSTALL_SHR
 
 # utils
 ifdef INSTALL_UTL
+
 phase1: install_utl
 
 $(UTL.d):; $(MKDIR) $(UTL.d)
 
 install_utl: $(INSTALL_UTL) $(UTL.d)
-	for f in $(INSTALL_UTL) ; do $(INSTALL) $$f $(UTL.d) ; done
+	$(INSTALL) --mode=755 $(INSTALL_UTL) $(UTL.d)
+
 endif # INSTALL_UTL
 
 ##################################################################### UNINSTALL
