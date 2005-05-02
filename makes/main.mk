@@ -171,20 +171,18 @@ endif # need_depend
 ifdef INC_TARGET
 # generate directory header file with cproto
 
-current_directory=$(pwd)
-dir_real_name=$(basename $current_directory)
-dir_simple_name=$(echo $dir_real_name | tr '-' '_')
+name	= $(subst -, _, $(notdir $(CURDIR)))
 
 build-header-file:
 	$(COPY) $(TARGET)-local.h $(INC_TARGET); \
 	{ \
 	  echo "/* header file built by \$(PROTO) */"; \
-	  echo "#ifndef $(dir_simple_name)_header_included";\
-	  echo "#define $(dir_simple_name)_header_included";\
+	  echo "#ifndef $(name)_header_included";\
+	  echo "#define $(name)_header_included";\
 	  cat $(TARGET)-local.h;\
 	  $(PROTOIZE) $(LIB_CFILES) | \
 	  sed 's/struct _iobuf/FILE/g;s/__const/const/g;/_BUFFER_STATE/d;/__inline__/d;' ;\
-	  echo "#endif /* $(dir_simple_name)_header_included */";\
+	  echo "#endif /* $(name)_header_included */";\
 	} > $(INC_TARGET).tmp
 	$(MOVE) $(INC_TARGET).tmp $(INC_TARGET)
 
