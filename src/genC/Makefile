@@ -34,6 +34,12 @@ DERIVED_HEADERS=\
 	genspec.h \
 	$(DERIVED_LIB_HEADERS)
 
+DERIVED_CFILES=\
+	genread_yacc.c \
+	genread_lex.c \
+	genspec_yacc.c \
+	genspec_lex.c
+
 LIB_CFILES=\
         build.c \
         genC.c \
@@ -44,29 +50,17 @@ LIB_CFILES=\
         list.c \
         stack.c \
 	array.c \
-	string.c
+	string.c \
+	$(DERIVED_CFILES)
 
 OTHER_CFILES=\
 	new.c \
 	genLisp.c \
 	genSML.c
 
-DERIVED_CFILES=\
-	genread_yacc.c \
-	genread_lex.c \
-	genspec_yacc.c \
-	genspec_lex.c
-
-DERIVED_FILES=
-
-CFILES=  $(LIB_CFILES) $(DERIVED_CFILES) $(OTHER_CFILES)
-LIB_OBJECTS= $(addprefix $(ARCH)/,$(LIB_CFILES:.c=.o) $(DERIVED_CFILES:.c=.o))
-
-SOURCES= $(LIB_HEADERS) $(LIB_CFILES) $(OTHER_HEADERS) $(OTHER_CFILES) 
-
 INSTALL_INC	= $(LIB_HEADERS) $(DERIVED_LIB_HEADERS)
-INSTALL_LIB	= $(ARCH)/libgenC.a
-INSTALL_BIN	= $(ARCH)/newC
+LIB_TARGET	= libgenC.a
+BIN_TARGET	= newC
 
 ################################################################## COMMON STUFF
 
@@ -80,23 +74,15 @@ include $(ROOT)/makes/main.mk
 # LEX=flex
 YFLAGS+= -d -v
 
-all: $(ARCH)/newC $(ARCH)/libgenC.a
-
+# all: $(ARCH)/newC $(ARCH)/libgenC.a
 #recompile: all quick-install
 
 # dependences.
-
 $(addprefix $(ARCH)/,$(OTHER_CFILES:.c=.o)) $(LIB_OBJECTS): $(DERIVED_HEADERS)
 
 # local rules
-
 newgen_auto_%.h: %.c
 	$(RM) $@ ; $(PROTOIZE) $< > $@
-
-$(ARCH)/libgenC.a: $(LIB_OBJECTS)
-	$(RM) $@
-	$(ARCHIVE) $@ $(LIB_OBJECTS)
-	ranlib $@
 
 genread.h genread_yacc.c: read.y
 	$(PARSE) $< 
@@ -104,7 +90,7 @@ genread.h genread_yacc.c: read.y
 	sed 's,YY,GENREAD_,g;s,yy,genread_,g' < y.tab.h > genread.h
 	$(RM) y.output y.tab.c y.tab.h
 
-genread_lex.o: genread.h
+#genread_lex.o: genread.h
 genread_lex.c: read.l 
 	$(SCAN) $< | \
 	sed '/^FILE *\*/s,=[^,;]*,,g;s,YY,GENREAD_,g;s,yy,genread_,g;' > $@
@@ -115,7 +101,7 @@ genspec.h genspec_yacc.c: gram.y
 	sed 's,YY,GENSPEC_,g;s,yy,genspec_,g' < y.tab.h > genspec.h
 	$(RM) y.output y.tab.c y.tab.h
 
-genspec_lex.o: genspec.h
+#genspec_lex.o: genspec.h
 genspec_lex.c: token.l
 	$(SCAN) $< | \
 	sed '/^FILE *\*/s,=[^,;]*,,g;s,YY,GENSPEC_,g;s,yy,genspec_,g' > $@
