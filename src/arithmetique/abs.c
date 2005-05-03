@@ -1,6 +1,4 @@
-/* $RCSfile: abs.c,v $ (version $Revision$)
- * $Date: 1997/09/08 19:19:32 $, 
- */
+/* $Id$ */
 
 #include <stdio.h>
 #include <limits.h>
