@@ -12,5 +12,5 @@ install:
 	$(MAKE) -C src phase5
 
 # coldly clean everything
-uninstall:
+uninstall: clean
 	$(RM) -r ./Include ./Lib ./Bin ./Share ./Utils ./Doc ./Runtime
