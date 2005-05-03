@@ -1,7 +1,6 @@
 /* package arithmetique 
  *
- * $RCSfile: modulo.c,v $ (version $Revision$)
- * $Date: 1996/07/19 19:50:42 $, 
+ * $Id$
  */
 
 /*LINTLIBRARY*/
