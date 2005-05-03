@@ -7,59 +7,6 @@
  * management. 
  *
  * (c) CA et FC, Sept 1997
- *
- * $Log: arithmetic_errors.h,v $
- * Revision 1.34  2003/09/03 13:59:46  coelho
- * ++
- *
- * Revision 1.33  2003/09/03 13:35:34  coelho
- * no more callback.
- *
- * Revision 1.32  2003/08/18 14:55:38  coelho
- * callback fix.
- *
- * Revision 1.31  2003/08/18 14:16:45  coelho
- * NULL callback added.
- *
- * Revision 1.30  2003/06/13 13:59:55  coelho
- * hop.
- *
- * Revision 1.29  2000/07/27 15:01:55  coelho
- * hop.
- *
- * Revision 1.28  2000/07/26 09:11:58  coelho
- * hop.
- *
- * Revision 1.27  2000/07/26 09:07:32  coelho
- * *** empty log message ***
- *
- * Revision 1.26  2000/07/26 09:06:32  coelho
- * the_last_just_thrown_exception declared.
- *
- * Revision 1.25  2000/07/26 08:41:40  coelho
- * RETHROW added.
- *
- * Revision 1.24  1998/10/26 14:37:48  coelho
- * constants moved out.
- *
- * Revision 1.23  1998/10/26 14:36:13  coelho
- * constants explicitely defined in .h.
- *
- * Revision 1.22  1998/10/24 15:18:26  coelho
- * THROW macro updated to tell its source.
- *
- * Revision 1.21  1998/10/24 14:33:08  coelho
- * parser exception added.
- *
- * Revision 1.20  1998/10/24 14:32:45  coelho
- * simpler macros.
- *
- * Revision 1.19  1998/10/24 09:22:47  coelho
- * size update.
- *
- * Revision 1.18  1998/10/24 09:21:45  coelho
- * const added to constants.
- *
  */
 
 #if !defined(linear_arithmetic_error_included)
