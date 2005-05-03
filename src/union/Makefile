@@ -2,14 +2,26 @@
 
 TARGET	= union
 
-LIB_CFILES=	disjunct.c \
+CWEB_CFILES = \
+		disjunct.c \
 		path.c \
 		reduc.c \
 		sc_list.c
 
-DERIVED_CFILES = sl_gram.c sl_lex.c  $(LIB_CFILES)
+CWEB_OTHERS = \
+		sl_lex.l \
+		sl_gram.y \
+		union-local.h
 
-DERIVED_HEADERS = y.tab.h sl_lex.l sl_gram.y union-local.h
+DERIVED_CFILES = \
+		sl_gram.c \
+		sl_lex.c
+
+DERIVED_HEADERS = y.tab.h  
+
+INC_CFILES = $(CWEB_CFILES)
+ 
+LIB_CFILES = $(CWEB_CFILES) $(DERIVED_CFILES)
 
 LIB_TARGET = lib$(TARGET).a
 
@@ -29,6 +41,11 @@ include $(ROOT)/makes/main.mk
 %.h: %.w; touch $@
 %.tex: %.w
 
+# can only work if nuweb executable is available
+NUWEB	= nuweb
+code:;	$(NUWEB) -t UNION.w
+doc:;	$(NUWEB) -f -o  UNION.w
+
 sl_lex.c: sl_lex.l y.tab.h
 	$(SCAN) $< | \
 	sed '/^FILE *\*/s,=[^,;]*,,g;s/YY/SL_/g;s/yy/slx_/g;'  > sl_lex.c
@@ -37,11 +54,6 @@ y.tab.h sl_gram.c: sl_gram.y
 	$(PARSE) -d $< 
 	sed 's/YY/SL_/g;s/yy/slx_/g' < y.tab.c > sl_gram.c
 	$(RM) y.tab.c
-
-# cancel rule
-NUWEB	= /users/cri/coelho/tmp/nuweb/nuweb
-code:;	$(NUWEB) -t UNION.w
-doc:;	$(NUWEB) -f -o  UNION.w
 
 clean: local-clean
 
