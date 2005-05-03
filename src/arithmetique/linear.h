@@ -1,15 +1,6 @@
-/*
- * $Id$
+/* $Id$
  *
  * includes what is typically needed from the C3/Linear library.
- *
- * $Log: linear.h,v $
- * Revision 1.2  1998/04/14 08:55:39  coelho
- * more includes.
- *
- * Revision 1.1  1998/04/11 13:06:09  coelho
- * Initial revision
- *
  */
 
 #if !defined(C3_LINEAR_H_INCLUDED)
