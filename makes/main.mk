@@ -339,10 +339,3 @@ install_utl: $(INSTALL_UTL) $(UTL.d)
 	$(INSTALL) --mode=755 $(INSTALL_UTL) $(UTL.d)
 
 endif # INSTALL_UTL
-
-##################################################################### UNINSTALL
-
-# clean installation. TOO ROUGH!
-uninstall:
-	$(RM) -r $(INC.d) $(LIB.d) $(BIN.d) $(DOC.d) $(SHR.d) $(UTL.d)
-	-$(RMDIR) $(ROOT)/Bin $(ROOT)/Lib
