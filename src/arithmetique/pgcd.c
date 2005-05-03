@@ -1,4 +1,6 @@
- /* package arithmetique */
+ /* $Id$
+  * package arithmetique
+  */
 
  /*LINTLIBRARY*/
 
@@ -367,6 +369,3 @@ Value bezout_grl(Value a, Value b, Value *x, Value *y)
 	return a1;
     }
 }
-
-/* end of $RCSfile: pgcd.c,v $
- */
