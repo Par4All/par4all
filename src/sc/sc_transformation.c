@@ -1,6 +1,5 @@
 /* Package sc 
- * $RCSfile: sc_transformation.c,v $ (version $Revision$)
- * $Date: 2002/03/08 10:39:28 $, .
+ * $Id$
  */
 
 #include <string.h>
