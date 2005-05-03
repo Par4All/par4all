@@ -1,6 +1,4 @@
-/* $RCSfile: simp.c,v $ (version $Revision$)
- * $Date: 1996/08/08 16:01:22 $, 
- */
+/* $Id$ */
 
 /* test du simplex : ce test s'appelle par :
  *  programme fichier1.data fichier2.data ... fichiern.data
@@ -84,4 +82,3 @@ main(int argc, char *argv[])
     }
     exit(0) ;
 }
-
