@@ -11,4 +11,14 @@ install:
 	$(MAKE) -C src phase5
 
 uninstall: clean
-	$(RM) -r ./Bin ./Include ./Lib ./Share ./Utils ./Doc ./Runtime
+	$(RM) -r ./Bin ./Include ./Lib ./Share ./Utils ./Doc ./Runtime TAGS
+
+local-clean:
+	$(RM) TAGS
+
+# temporary file
+TAGS	= /tmp/tags.$$$$
+
+tags:
+	find $(CURDIR) -name '*.[chly]' -print | xargs etags -o $(TAGS) ; \
+	mv $(TAGS) TAGS
