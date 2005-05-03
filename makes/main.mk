@@ -197,22 +197,25 @@ header:	.header $(INC_TARGET)
 
 # .header carrie all dependencies for INC_TARGET:
 .header: $(TARGET)-local.h $(DERIVED_HEADERS) $(LIB_CFILES) 
-	$(MAKE) $(GMKNODIR) build-header-file ; touch .header
+	$(MAKE) $(GMKNODIR) build-header-file
+	touch .header
 
 $(INC_TARGET): $(TARGET)-local.h
 	$(RM) .header; $(MAKE) $(GMKNODIR) .header
 
 phase2:	header
 
-clean: inc-clean
+clean: header-clean
 
-inc-clean:; $(RM) $(INC_TARGET) .header .install_inc
+header-clean:
+	$(RM) $(INC_TARGET) .header
 
 INSTALL_INC	+=   $(INC_TARGET)
 
 endif # INC_TARGET
 
 ifdef INSTALL_INC
+
 phase2: .install_inc
 
 $(INC.d):; $(MKDIR) $(INC.d)
@@ -220,6 +223,11 @@ $(INC.d):; $(MKDIR) $(INC.d)
 .install_inc: $(INSTALL_INC) $(INC.d)
 	$(INSTALL) --mode=644 $(INSTALL_INC) $(INC.d)
 	touch $@
+
+clean: inc-clean
+
+inc-clean:
+	$(RM) .install_inc
 
 endif # INSTALL_INC
 
