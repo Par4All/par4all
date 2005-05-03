@@ -147,15 +147,17 @@ need_depend	= 1
 endif # OTHER_CFILES
 
 ifdef need_depend
-phase0: depend $(ARCH)
 
 DEPEND	= .depend.$(ARCH)
 
+phase0: $(DEPEND)
+
 -include $(DEPEND)
 
-# false generation
+# generation by make recursion
 $(DEPEND): $(LIB_CFILES) $(OTHER_CFILES) $(DERIVED_LIB_HEADERS)
 	touch $@
+	test -s $(DEPEND) || $(MAKE) depend
 
 # actual generation is done on demand only
 depend:
@@ -205,19 +207,20 @@ phase2:	header
 
 clean: inc-clean
 
-inc-clean:; $(RM) $(INC_TARGET) .header
+inc-clean:; $(RM) $(INC_TARGET) .header .install_inc
 
 INSTALL_INC	+=   $(INC_TARGET)
 
 endif # INC_TARGET
 
 ifdef INSTALL_INC
-phase2: install_inc
+phase2: .install_inc
 
 $(INC.d):; $(MKDIR) $(INC.d)
 
-install_inc: $(INSTALL_INC) $(INC.d)
+.install_inc: $(INSTALL_INC) $(INC.d)
 	$(INSTALL) --mode=644 $(INSTALL_INC) $(INC.d)
+	touch $@
 
 endif # INSTALL_INC
 
@@ -239,6 +242,7 @@ endif # LIB_OBJECTS
 endif # LIB_CFILES
 
 ifdef LIB_TARGET
+
 $(ARCH)/$(LIB_TARGET): $(LIB_OBJECTS)
 	$(ARCHIVE) $(ARCH)/$(LIB_TARGET) $(LIB_OBJECTS)
 	ranlib $@
@@ -247,19 +251,24 @@ INSTALL_LIB	+=   $(addprefix $(ARCH)/,$(LIB_TARGET))
 
 endif # LIB_TARGET
 
-ifdef INSTALL_LIB
-phase3:	install_lib
 
-$(INSTALL_LIB): $(ARCH) 
+ifdef INSTALL_LIB
+
+phase2: $(ARCH)
+
+phase3:	.install_lib
+
+$(INSTALL_LIB): $(ARCH)
 
 $(LIB.d):; $(MKDIR) $(LIB.d)
 
-install_lib: $(INSTALL_LIB) $(LIB.d)
+.install_lib: $(INSTALL_LIB) $(LIB.d)
 	$(INSTALL) --mode=644 $(INSTALL_LIB) $(LIB.d)
+	touch $@
 
 clean: lib-clean
 
-lib-clean:; $(RM) $(ARCH)/$(LIB_TARGET)
+lib-clean:; $(RM) $(ARCH)/$(LIB_TARGET) .install_lib
 
 recompile: $(ARCH)/$(LIB_TARGET)
 
@@ -279,6 +288,7 @@ compile:
 
 install: recompile
 
+# empty dependencies to please compile targets
 phase0:
 phase1:
 phase2:
@@ -293,49 +303,68 @@ endif # BIN_TARGET
 
 ifdef INSTALL_BIN
 
-phase3: install_bin
+phase3: .install_bin
 
 $(INSTALL_BIN): $(ARCH)
 
 $(BIN.d):; $(MKDIR) $(BIN.d)
 
-install_bin: $(INSTALL_BIN) $(BIN.d)
+.install_bin: $(INSTALL_BIN) $(BIN.d)
 	$(INSTALL) --mode=755 $(INSTALL_BIN) $(BIN.d)
+	touch $@
 
 endif # INSTALL_BIN
 
 # documentation
 ifdef INSTALL_DOC
 
-phase4: install_doc
+phase4: .install_doc
 
 $(DOC.d):; $(MKDIR) $(DOC.d)
 
-install_doc: $(INSTALL_DOC) $(DOC.d)
+.install_doc: $(INSTALL_DOC) $(DOC.d)
 	$(INSTALL) --mode=644 $(INSTALL_DOC) $(DOC.d)
+	touch $@
+
+clean: doc-clean
+
+doc-clean:
+	$(RM) .install_doc
 
 endif # INSTALL_DOC
 
 # shared
 ifdef INSTALL_SHR
 
-phase2: install_shr 
+phase2: .install_shr 
 
 $(SHR.d):; $(MKDIR) $(SHR.d)
 
-install_shr: $(INSTALL_SHR) $(SHR.d)
+.install_shr: $(INSTALL_SHR) $(SHR.d)
 	$(INSTALL) --mode=644 $(INSTALL_SHR) $(SHR.d)
+	touch $@
+
+clean: shr-clean
+
+shr-clean:
+	$(RM) .install_shr
 
 endif # INSTALL_SHR
 
 # utils
 ifdef INSTALL_UTL
 
-phase2: install_utl
+phase2: .install_utl
 
 $(UTL.d):; $(MKDIR) $(UTL.d)
 
-install_utl: $(INSTALL_UTL) $(UTL.d)
+.install_utl: $(INSTALL_UTL) $(UTL.d)
 	$(INSTALL) --mode=755 $(INSTALL_UTL) $(UTL.d)
+	touch $@
+
+clean: utl-clean
+
+utl-clean:
+	$(RM) .install_utl
 
 endif # INSTALL_UTL
