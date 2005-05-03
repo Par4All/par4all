@@ -76,6 +76,7 @@ endif
 
 include $(MAKE.d)/$(ARCH).mk
 include $(MAKE.d)/svn.mk
+#include $(MAKE.d)/local.mk
 
 ###################################################################### DO STUFF
 
@@ -221,7 +222,10 @@ phase2: .install_inc
 $(INC.d):; $(MKDIR) $(INC.d)
 
 .install_inc: $(INSTALL_INC) $(INC.d)
-	$(INSTALL) --mode=644 $(INSTALL_INC) $(INC.d)
+	for f in $(INSTALL_INC) ; do \
+	  cmp $$f $(INC.d)/$$f || \
+	    $(INSTALL) --mode=644 $$f $(INC.d) ; \
+	done
 	touch $@
 
 clean: inc-clean
@@ -263,19 +267,22 @@ ifdef INSTALL_LIB
 
 phase2: $(ARCH)
 
-phase3:	.install_lib
+phase3:	.install_lib.$(ARCH)
 
 $(INSTALL_LIB): $(ARCH)
 
 $(LIB.d):; $(MKDIR) $(LIB.d)
 
-.install_lib: $(INSTALL_LIB) $(LIB.d)
-	$(INSTALL) --mode=644 $(INSTALL_LIB) $(LIB.d)
+.install_lib.$(ARCH): $(INSTALL_LIB) $(LIB.d)
+	for l in $(INSTALL_LIB) ; do \
+	  cmp $$l $(LIB.d)/$$l || \
+	    $(INSTALL) --mode=644 $$l $(LIB.d) ; \
+	done
 	touch $@
 
 clean: lib-clean
 
-lib-clean:; $(RM) $(ARCH)/$(LIB_TARGET) .install_lib
+lib-clean:; $(RM) $(ARCH)/$(LIB_TARGET) .install_lib.*
 
 recompile: $(ARCH)/$(LIB_TARGET)
 
@@ -310,15 +317,20 @@ endif # BIN_TARGET
 
 ifdef INSTALL_BIN
 
-phase3: .install_bin
+phase3: .install_bin.$(ARCH)
 
 $(INSTALL_BIN): $(ARCH)
 
 $(BIN.d):; $(MKDIR) $(BIN.d)
 
-.install_bin: $(INSTALL_BIN) $(BIN.d)
+.install_bin.$(ARCH): $(INSTALL_BIN) $(BIN.d)
 	$(INSTALL) --mode=755 $(INSTALL_BIN) $(BIN.d)
 	touch $@
+
+clean: bin-clean
+
+bin-clean:
+	$(RM) .install_bin.*
 
 endif # INSTALL_BIN
 
