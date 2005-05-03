@@ -10,5 +10,5 @@ install:
 	$(MAKE) -C src phase4
 	$(MAKE) -C src phase5
 
-uninstall:
+uninstall: clean
 	$(RM) -r ./Bin ./Include ./Lib ./Share ./Utils ./Doc ./Runtime
