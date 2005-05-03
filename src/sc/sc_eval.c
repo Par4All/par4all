@@ -1,6 +1,5 @@
 /* package sc
- * $RCSfile: sc_eval.c,v $ (version $Revision$)
- * $Date: 1998/11/18 12:31:20 $, 
+ * $Id$
  */
 
 #include <string.h>
