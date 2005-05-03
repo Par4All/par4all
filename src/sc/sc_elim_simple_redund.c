@@ -1,16 +1,6 @@
-/* package sc 
- * $RCSfile: sc_elim_simple_redund.c,v $ (version $Revision$)
- * $Date: 2003/07/28 09:08:07 $, 
- * $Log: sc_elim_simple_redund.c,v $
- * Revision 1.7  2003/07/28 09:08:07  duong
- * change _dup to _copy version
- *
- * Revision 1.6  2002/03/08 10:36:00  irigoin
- * sc_elim_db_constraints() is restored and sc_elim_double_constraints() is
- * added to provide the new functionalities. sc_elim_db_constraints is used
- * in Linear by Arnauld Leservot on systems whose equations have been
- * transformed into inequalities. The equations should not be restored!
- *
+/* $Id$
+ * 
+ * package sc 
  */
 
 #include <stdio.h>
