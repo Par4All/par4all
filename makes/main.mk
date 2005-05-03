@@ -8,7 +8,6 @@
 
 # LIB_CFILES: C files that are included in the library
 # LIB_TARGET: generated library file
-# LIB_OBJECTS: what objects in above lib (LIB_CFILES not included)
 
 # BIN_TARGET: generated binary files
 
