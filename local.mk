@@ -13,4 +13,4 @@ install:
 
 # coldly clean everything
 uninstall:
-	$(RM) -r ./Include ./Lib ./Bin ./Share ./Utils ./Documentation
+	$(RM) -r ./Include ./Lib ./Bin ./Share ./Utils ./Doc ./Runtime
