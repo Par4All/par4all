@@ -1,65 +1,7 @@
 /*
   $Id$
 
-  Exception management.
-  See "arithmetic_errors.h".
-
-  $Log: errors.c,v $
-  Revision 1.27  2003/09/04 09:40:37  coelho
-  init added.
-  verbosity mask added.
-
-  Revision 1.26  2003/09/03 14:05:20  coelho
-  push/pop callbacks called.
-
-  Revision 1.20  2003/08/18 09:55:09  coelho
-  get_exception_name added...
-
-  Revision 1.19  2003/06/13 13:59:07  coelho
-  const out.
-
-  Revision 1.18  2003/06/13 13:54:47  coelho
-  hop.
-
-  Revision 1.17  2002/04/02 08:44:54  coelho
-  timeout_error ajoute.
-
-  Revision 1.16  2000/10/27 13:26:03  ancourt
-  exception_thrown -> linear_number_of_exception_thrown
-
-  Revision 1.15  2000/07/27 15:21:55  coelho
-  message++
-
-  Revision 1.14  2000/07/27 14:59:59  coelho
-  trace added.
-
-  Revision 1.13  2000/07/26 08:41:23  coelho
-  the_last_just_thrown_exception management added.
-
-  Revision 1.12  1998/10/26 18:48:34  coelho
-  message++.
-
-  Revision 1.11  1998/10/26 14:38:06  coelho
-  constants back in.
-
-  Revision 1.10  1998/10/26 14:35:47  coelho
-  constants in .h.
-
-  Revision 1.9  1998/10/24 15:36:22  coelho
-  better exception error messages...
-
-  Revision 1.8  1998/10/24 15:19:17  coelho
-  more verbose throw...
-
-  Revision 1.7  1998/10/24 14:31:13  coelho
-  new stack implementation.
-  checks for matching catch/uncatch.
-  debug mode.
-
-  Revision 1.6  1998/10/24 09:31:06  coelho
-  RCS headers.
-  'const' tried.
-
+  Exception management. See "arithmetic_errors.h".
 */
 
 #include <stdio.h>
