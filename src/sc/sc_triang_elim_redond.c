@@ -1,9 +1,6 @@
  /* package sc
   *
-  * SCCS stuff:
-  * $RCSfile: sc_triang_elim_redond.c,v $ ($Date: 2001/10/12 07:06:49 $, )
-  * version $Revision$
-  * got on %D%, %T%
+  * $Id$
   */
 
 #include <stdio.h>
