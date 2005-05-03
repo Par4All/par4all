@@ -1,7 +1,6 @@
-/* package arithmetique 
- *
- * $RCSfile: divide.c,v $ (version $Revision$)
- * $Date: 1996/07/19 18:37:34 $, 
+/* $Id$
+ * 
+ * package arithmetique 
  */
 
 /*LINTLIBRARY*/
@@ -91,6 +90,3 @@ Value divide_slow(Value a, Value b)
 {
     return value_pdiv(a, b);
 }
-
-/* end of $RCSfile: divide.c,v $
- */
