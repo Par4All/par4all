@@ -475,5 +475,4 @@ typedef int Value;
 typedef struct {Value num, den; int numero ; } frac ;
 typedef struct col{int taille, existe ; frac *colonne ;} tableau ;
 
-/* end of $RCSfile: arithmetique-local.h,v $
- */
+/* end of arithmetique-local.h */
