@@ -1,7 +1,6 @@
 /* package arithmetic
  *
- * $RCSfile: io.c,v $ (version $Revision$)
- * $Date: 1997/12/10 17:07:58 $, 
+ * $Id$
  *
  * IO on a Value
  */
@@ -55,6 +54,3 @@ char * Value_to_string(Value v)
     sprintf(buf, VALUE_FMT, v);
     return buf;
 }
-
-/* end of $RCSfile: io.c,v $
- */
