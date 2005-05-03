@@ -1,7 +1,6 @@
  /* package arithmetique 
   *
-  * $RCSfile: exp.c,v $ (version $Revision$)
-  * $Date: 1996/07/19 17:57:11 $, 
+  * $Id$
   */
 
 /*LINTLIBRARY*/
@@ -33,6 +32,3 @@ Value exponentiate(Value x, int n)
 
     return y;
 }
-
-/* end of $RCSfile: exp.c,v $
- */
