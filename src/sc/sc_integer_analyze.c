@@ -1,6 +1,4 @@
-/* $RCSfile: sc_integer_analyze.c,v $ (version $Revision$
- * $Date: 1996/07/18 19:15:55 $, 
- */
+/* $Id$ */
 
 #include <stdio.h>
 
@@ -247,7 +245,3 @@ constraint_integer_combination(
     *left_coeff = vect_coeff(*left_var,left_ineg->vecteur);
 
 }
-
-
-
-
