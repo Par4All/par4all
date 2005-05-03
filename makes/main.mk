@@ -201,7 +201,7 @@ header:	.header $(INC_TARGET)
 $(INC_TARGET): $(TARGET)-local.h
 	$(RM) .header; $(MAKE) $(GMKNODIR) .header
 
-phase1:	header
+phase2:	header
 
 clean: inc-clean
 
@@ -212,7 +212,7 @@ INSTALL_INC	+=   $(INC_TARGET)
 endif # INC_TARGET
 
 ifdef INSTALL_INC
-phase1: install_inc
+phase2: install_inc
 
 $(INC.d):; $(MKDIR) $(INC.d)
 
@@ -248,7 +248,7 @@ INSTALL_LIB	+=   $(addprefix $(ARCH)/,$(LIB_TARGET))
 endif # LIB_TARGET
 
 ifdef INSTALL_LIB
-phase2:	install_lib
+phase3:	install_lib
 
 $(INSTALL_LIB): $(ARCH) 
 
@@ -293,7 +293,7 @@ endif # BIN_TARGET
 
 ifdef INSTALL_BIN
 
-phase2: install_bin
+phase3: install_bin
 
 $(INSTALL_BIN): $(ARCH)
 
@@ -307,7 +307,7 @@ endif # INSTALL_BIN
 # documentation
 ifdef INSTALL_DOC
 
-phase3: install_doc
+phase4: install_doc
 
 $(DOC.d):; $(MKDIR) $(DOC.d)
 
@@ -319,7 +319,7 @@ endif # INSTALL_DOC
 # shared
 ifdef INSTALL_SHR
 
-phase1: install_shr 
+phase2: install_shr 
 
 $(SHR.d):; $(MKDIR) $(SHR.d)
 
@@ -331,7 +331,7 @@ endif # INSTALL_SHR
 # utils
 ifdef INSTALL_UTL
 
-phase1: install_utl
+phase2: install_utl
 
 $(UTL.d):; $(MKDIR) $(UTL.d)
 
