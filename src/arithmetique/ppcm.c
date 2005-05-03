@@ -1,7 +1,6 @@
 /* package arithmetique
  * 
- * $RCSfile: ppcm.c,v $ (version $Revision$)
- * $Date: 1996/07/18 19:30:07 $, 
+ * $Id$
  */
 
 /*LINTLIBRARY*/
@@ -28,6 +27,3 @@ Value ppcm(Value i, Value j)
 	return value_mult(d,j);
     }
 }
-
-/* end of $RCSfile: ppcm.c,v $
- */
