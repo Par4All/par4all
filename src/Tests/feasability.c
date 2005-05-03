@@ -1,6 +1,4 @@
-/* $RCSfile: feasability.c,v $ (version $Revision$)
- * $Date: 1996/08/09 12:50:59 $, 
- */
+/* $Id$ */
 
 #include <stdio.h>
 #include <malloc.h>
@@ -75,4 +73,3 @@ main(int argc, char *argv[])
     }
     exit(0) ;
 }
-
