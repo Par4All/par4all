@@ -1,14 +1,4 @@
-/*
-  $Id$
-
-  $Log: sc_new_loop_bound.c,v $
-  Revision 1.14  2003/09/08 08:52:30  duong
-  add scn=NULL after call of sc_rm(scn)
-
-  Revision 1.13  1998/12/23 09:50:06  coelho
-  RCS stuff.
-
-*/
+/* $Id$ */
 
 #include <stdlib.h>
 #include <stdio.h>
