@@ -159,5 +159,4 @@ typedef struct Svecteur Sbase, * Pbase;
 struct linear_hashtable_st;
 typedef struct linear_hashtable_st * linear_hashtable_pt;
 
-/* end of $RCSfile: vecteur-local.h,v $
- */
+/* end of vecteur-local.h */
