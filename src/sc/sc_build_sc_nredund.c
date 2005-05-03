@@ -1,6 +1,4 @@
-/* $RCSfile: sc_build_sc_nredund.c,v $ (version $Revision$)
- * $Date: 2003/09/08 09:43:43 $, 
- */
+/* $Id$ */
 
 #include <stdio.h>
 
