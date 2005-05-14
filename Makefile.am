@@ -30,15 +30,34 @@ sources = $(CFILES) \
 
 EXTRA_DIST = doc source/oldpolytest.c
 
-lib_LTLIBRARIES = @polylib@
+lib_LTLIBRARIES = @polylibs@
 libpolylib32_la_LDFLAGS = -rpath $(libdir) -version-info @versioninfo@
 libpolylib32_la_SOURCES = $(sources)
+libpolylib32_la_CPPFLAGS = @CPPFLAGS32@
 libpolylib64_la_LDFLAGS = -rpath $(libdir) -version-info @versioninfo@
 libpolylib64_la_SOURCES = $(sources)
+libpolylib64_la_CPPFLAGS = @CPPFLAGS64@
 libpolylib128_la_LDFLAGS = -rpath $(libdir) -version-info @versioninfo@
 libpolylib128_la_SOURCES = $(sources)
+libpolylib128_la_CPPFLAGS = @CPPFLAGS128@
 libpolylibgmp_la_LDFLAGS = -rpath $(libdir) -version-info @versioninfo@
 libpolylibgmp_la_SOURCES = $(sources)
+libpolylibgmp_la_CPPFLAGS = -DGNUMP
+
+testlib_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
+polytest_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
+verif_ehrhart_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
+Zpolytest_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
+example_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
+count_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
+c2p_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
+r2p_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
+findv_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
+pp_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
+disjoint_union_sep_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
+disjoint_union_adj_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
+testehrhart_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
+ehrhart_union_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
 
 EXTRA_LTLIBRARIES = libpolylib32.la libpolylib64.la libpolylib128.la \
 		    libpolylibgmp.la
