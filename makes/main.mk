@@ -217,11 +217,11 @@ endif # INC_TARGET
 
 ifdef INSTALL_INC
 
-phase2: .install_inc
+phase2: .build_inc
 
 $(INC.d):; $(MKDIR) $(INC.d)
 
-.install_inc: $(INSTALL_INC) $(INC.d)
+.build_inc: $(INSTALL_INC) $(INC.d)
 	for f in $(INSTALL_INC) ; do \
 	  cmp $$f $(INC.d)/$$f || \
 	    $(INSTALL) --mode=644 $$f $(INC.d) ; \
@@ -231,7 +231,7 @@ $(INC.d):; $(MKDIR) $(INC.d)
 clean: inc-clean
 
 inc-clean:
-	$(RM) .install_inc
+	$(RM) .build_inc
 
 endif # INSTALL_INC
 
@@ -267,13 +267,13 @@ ifdef INSTALL_LIB
 
 phase2: $(ARCH)
 
-phase3:	.install_lib.$(ARCH)
+phase3:	.build_lib.$(ARCH)
 
 $(INSTALL_LIB): $(ARCH)
 
 $(LIB.d):; $(MKDIR) $(LIB.d)
 
-.install_lib.$(ARCH): $(INSTALL_LIB) $(LIB.d)
+.build_lib.$(ARCH): $(INSTALL_LIB) $(LIB.d)
 	for l in $(INSTALL_LIB) ; do \
 	  cmp $$l $(LIB.d)/$$l || \
 	    $(INSTALL) --mode=644 $$l $(LIB.d) ; \
@@ -282,7 +282,7 @@ $(LIB.d):; $(MKDIR) $(LIB.d)
 
 clean: lib-clean
 
-lib-clean:; $(RM) $(ARCH)/$(LIB_TARGET) .install_lib.*
+lib-clean:; $(RM) $(ARCH)/$(LIB_TARGET) .build_lib.*
 
 recompile: $(ARCH)/$(LIB_TARGET)
 
@@ -317,73 +317,73 @@ endif # BIN_TARGET
 
 ifdef INSTALL_BIN
 
-phase3: .install_bin.$(ARCH)
+phase3: .build_bin.$(ARCH)
 
 $(INSTALL_BIN): $(ARCH)
 
 $(BIN.d):; $(MKDIR) $(BIN.d)
 
-.install_bin.$(ARCH): $(INSTALL_BIN) $(BIN.d)
+.build_bin.$(ARCH): $(INSTALL_BIN) $(BIN.d)
 	$(INSTALL) --mode=755 $(INSTALL_BIN) $(BIN.d)
 	touch $@
 
 clean: bin-clean
 
 bin-clean:
-	$(RM) .install_bin.*
+	$(RM) .build_bin.*
 
 endif # INSTALL_BIN
 
 # documentation
 ifdef INSTALL_DOC
 
-phase4: .install_doc
+phase4: .build_doc
 
 $(DOC.d):; $(MKDIR) $(DOC.d)
 
-.install_doc: $(INSTALL_DOC) $(DOC.d)
+.build_doc: $(INSTALL_DOC) $(DOC.d)
 	$(INSTALL) --mode=644 $(INSTALL_DOC) $(DOC.d)
 	touch $@
 
 clean: doc-clean
 
 doc-clean:
-	$(RM) .install_doc
+	$(RM) .build_doc
 
 endif # INSTALL_DOC
 
 # shared
 ifdef INSTALL_SHR
 
-phase2: .install_shr 
+phase2: .build_shr 
 
 $(SHR.d):; $(MKDIR) $(SHR.d)
 
-.install_shr: $(INSTALL_SHR) $(SHR.d)
+.build_shr: $(INSTALL_SHR) $(SHR.d)
 	$(INSTALL) --mode=644 $(INSTALL_SHR) $(SHR.d)
 	touch $@
 
 clean: shr-clean
 
 shr-clean:
-	$(RM) .install_shr
+	$(RM) .build_shr
 
 endif # INSTALL_SHR
 
 # utils
 ifdef INSTALL_UTL
 
-phase2: .install_utl
+phase2: .build_utl
 
 $(UTL.d):; $(MKDIR) $(UTL.d)
 
-.install_utl: $(INSTALL_UTL) $(UTL.d)
+.build_utl: $(INSTALL_UTL) $(UTL.d)
 	$(INSTALL) --mode=755 $(INSTALL_UTL) $(UTL.d)
 	touch $@
 
 clean: utl-clean
 
 utl-clean:
-	$(RM) .install_utl
+	$(RM) .build_utl
 
 endif # INSTALL_UTL

@@ -2,7 +2,7 @@
 
 FWD_DIRS	= src
 
-install:
+build:
 	$(MAKE) -C src phase0
 	$(MAKE) -C src phase1
 	$(MAKE) -C src phase2
@@ -10,8 +10,15 @@ install:
 	$(MAKE) -C src phase4
 	$(MAKE) -C src phase5
 
-uninstall: clean
+unbuild: clean
 	$(RM) -r ./Bin ./Include ./Lib ./Share ./Utils ./Doc ./Runtime TAGS
+
+# todo: install, uninstall
+install:
+	@echo "NOT IMPLEMENTED YET"
+
+uninstall:
+	@echo "NOT IMPLEMENTED YET"
 
 local-clean:
 	$(RM) TAGS
