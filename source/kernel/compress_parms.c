@@ -453,7 +453,7 @@ Matrix * compress_parms(Matrix * E, int nb_parms) {
 
 // given a matrix with m parameterized equations, compress the nb_parms parameters and n-m variables so that m variables are integer,
 // and transform the variable space into a n-m space by eliminating the m variables (using the equalities)
-// the variables to be eliminated are chosen automatically by the function 
+// the variables to be eliminated are chosen automatically by the function
 Matrix * full_dimensionize(Matrix const * M, int nb_parms, Matrix ** Validity_Lattice) {
   Matrix * Eqs, * Ineqs;
   Matrix * Permuted_Eqs, * Permuted_Ineqs;
@@ -495,7 +495,7 @@ Matrix * full_dimensionize(Matrix const * M, int nb_parms, Matrix ** Validity_La
   for (i=0; i< Permuted_Ineqs->NbRows; i++) {
     value_set_si(Full_Dim->p[i][0], 1);
     for (j=0; j< nb_parms; j++) 
-      value_assign(Full_Dim->p[i][j+Permuted_Ineqs->NbColumns-nb_parms-2-nb_elim_vars+1], Permuted_Ineqs->p[i][j+nb_elim_vars+1]);
+      value_assign(Full_Dim->p[i][j+Full_Dim->NbColumns-nb_parms-1], Permuted_Ineqs->p[i][j+nb_elim_vars+1]);
     for (j=0; j< Permuted_Ineqs->NbColumns-nb_parms-2-nb_elim_vars; j++) 
       value_assign(Full_Dim->p[i][j+1], Permuted_Ineqs->p[i][nb_elim_vars+nb_parms+j+1]);
     value_assign(Full_Dim->p[i][Full_Dim->NbColumns-1], Permuted_Ineqs->p[i][Permuted_Ineqs->NbColumns-1]);

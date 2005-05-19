@@ -90,7 +90,7 @@ unsigned int * find_a_permutation(Matrix * Eqs, unsigned int nb_parms) {
       Matrix_Free(Q);
       Matrix_Free(U);
       // if it is full-row-rank, we have found a set of variables that can be eliminated. (to be prooved in order to be clean)
-      if (Square_Mat->p[Eqs->NbRows-1][Eqs->NbRows-1]!=0) {
+      if (H->p[Eqs->NbRows-1][Eqs->NbRows-1]!=0) {
 	// 3- make the permutation matrix
 	//  a- deal with the variables
 	k=0;
@@ -116,6 +116,7 @@ unsigned int * find_a_permutation(Matrix * Eqs, unsigned int nb_parms) {
 	// return it.
 	return permutation;
       }
+      Matrix_Free(H);
     }
   }
   // if no combination of variables allow an elimination, then return an error code.
