@@ -16,7 +16,7 @@
 #include <assert.h>
 
 #include <polylib/polylib.h>
-
+#include <polylib/compress_parms.h>
 
 /*! \class Ehrhart
 
@@ -496,6 +496,33 @@ void eadd(evalue *e1,evalue *res) {
   return;
 } /* eadd */
 
+/*------------------------------------------------------------*/
+/* void evalue_div (e, n)                                     */
+/* divides the evalue e by the integer n                      */
+/* recursive function                                         */
+/* modifies e                                                 */
+/*____________________________________________________________*/
+void evalue_div(evalue * e, Value n) {
+  int i;
+  Value gc;
+  value_init(gc);
+  if (value_zero_p(e->d)) {
+    for (i=0; i< e->x.p->size; i++) {
+      evalue_div(&(e->x.p->arr[i]), n);
+    }
+  }
+  else {
+    value_multiply(e->d, e->d, n);
+    /* simplify the new rational if needed */
+    Gcd(e->x.n, e->d, &gc);
+    if (value_notone_p(gc)&&(value_notzero_p(gc))) {
+      value_division(e->d, e->d, gc);
+      value_division(e->x.n, e->x.n, gc);
+    }
+  }
+  value_clear(gc);
+}
+
 /** 
 
 computes the inner product of two vectors. Result = result (evalue) =
@@ -734,8 +761,6 @@ Polyhedron *Polyhedron_Preprocess(Polyhedron *D,Value *size,unsigned MAXRAYS)
   
     value_init(tmp);
     d = D->Dimension;
-    if (MAXRAYS < 2*D->NbConstraints)
-	MAXRAYS = 2*D->NbConstraints;
     M = Matrix_Alloc(MAXRAYS, D->Dimension+2);
     M->NbRows = D->NbConstraints;
   
@@ -1194,7 +1219,7 @@ void count_points (int pos,Polyhedron *P,Value *context, Value *res) {
 	if(value_notmone_p(c))
 	    value_addto(*res, *res, c);
 	else {
-	    value_set_si(*res, -1);
+	    value_set_si(*res, 0);
 	    break;
         }
     }
@@ -1858,24 +1883,6 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS,
     
     return(Enumerate_NoParameters(P,C,NULL,NULL,MAXRAYS,param_name));  
   }
-  if(nb_param == dim) {
-    res = (Enumeration *)malloc(sizeof(Enumeration));
-    res->next = 0;
-    res->ValidityDomain = DomainIntersection(P,C,MAXRAYS);
-    value_init(res->EP.d);
-    value_init(res->EP.x.n);
-    value_set_si(res->EP.d,1);
-    value_set_si(res->EP.x.n,1);
-    if( param_name ) {
-      fprintf(stdout,"---------------------------------------\n");
-      fprintf(stdout,"Domain:\n");
-      Print_Domain(stdout,res->ValidityDomain, param_name);
-      fprintf(stdout,"\nEhrhart Polynomial:\n");
-      print_evalue(stdout,&res->EP,param_name);
-      fprintf(stdout, "\n");
-    }
-    return res;
-  }
   PP = Polyhedron2Param_SimplifiedDomain(&P,C,MAXRAYS,&CEq,&CT);
   if(!PP) {
 	if( param_name )
@@ -2156,5 +2163,429 @@ void Enumeration_Free(Enumeration *en)
   }
 }
 
+// adds by B. Meister for Ehrhart Polynomial approximation
+
+
+/*----------------------------------------------------------------*/
+/* Ehrhart_Quick_Apx_Full_Dim(P, C, MAXRAYS)                      */
+/*    P : Polyhedron to enumerate (approximatively)               */
+/*    C : Context Domain                                          */
+/*    MAXRAYS : size of workspace                                 */
+/* Procedure to estimate the # points in a parameterized polytope.*/
+/* Returns a list of validity domains + evalues EP                */
+/* B.M.                                                           */
+/* The most rough and quick approximation by variables expansion  */
+/* Deals with the full-dimensional case.                          */
+/* WARNING : initially based on version 5.11.1 of Polylib         */
+/* updated to 5.20.0
+/*----------------------------------------------------------------*/
+Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS, char ** param_name)
+{
+  Polyhedron *L, *CQ, *CQ2, *LQ, *U, *CEq, *rVD, *P;
+  Matrix *CT;
+  Param_Polyhedron *PP;
+  Param_Domain   *Q;
+  int i,j,hdim, dim, nb_param, np;
+  Value *lcm, *m1, hdv;
+  Value *context;
+  Enumeration *en, *res;
+  Value cur_gc;
+  unsigned int nb_vars;
+  Matrix * denoms;
+  Value expansion_det;
+  Value global_var_lcm;
+  Matrix * expansion;
+  Polyhedron * Expanded;
+
+  // BM : used to scan the vertices
+  Param_Vertices * V_tmp;
+
+  res = NULL;
+  P = Pi;
+
+  
+  value_init(expansion_det);
+  value_init(global_var_lcm);
+
+#ifdef EDEBUG2
+  fprintf(stderr,"C = \n");
+  Polyhedron_Print(stderr,P_VALUE_FMT,C);
+  fprintf(stderr,"P = \n");
+  Polyhedron_Print(stderr,P_VALUE_FMT,P);
+#endif
+
+  hdim		= P->Dimension + 1;
+  dim		= P->Dimension;
+  nb_param	= C->Dimension;
+
+  /* Don't call Polyhedron2Param_Domain if there are no parameters */
+  if(nb_param == 0) {
+    
+    return(Enumerate_NoParameters(P,C,NULL,NULL,MAXRAYS, param_name));  
+  }
+  printf("Enumerating polyhedron : \n");
+  Polyhedron_Print(stdout, P_VALUE_FMT, P);
+  PP = Polyhedron2Param_SimplifiedDomain(&P,C,MAXRAYS,&CEq,&CT);
+  if(!PP) {
+    if( param_name )
+      fprintf(stdout, "\nEhrhart Polynomial:\nNULL\n");
+
+    return(NULL);
+  }
+  
+  /* CT : transformation matrix to eliminate useless ("false") parameters */
+  if(CT) {
+    nb_param -= CT->NbColumns-CT->NbRows;
+    dim  -= CT->NbColumns-CT->NbRows;
+    hdim -= CT->NbColumns-CT->NbRows;
+    
+    /* Don't call Polyhedron2Param_Domain if there are no parameters */
+    if(nb_param == 0)
+    {
+	    res = Enumerate_NoParameters(P,C,CT,CEq,MAXRAYS,param_name);
+	    if( P != Pi )
+		    Polyhedron_Free( P );
+	    return( res );
+    }  
+  }
+
+  /* get memory for Values */
+  lcm = (Value *)malloc( nb_param * sizeof(Value));
+  m1  = (Value *)malloc( nb_param * sizeof(Value));
+  /* Initialize all the 'Value' variables */
+  for( np=0 ; np<nb_param ; np++ )
+  {
+    value_init(lcm[np]); value_init(m1[np]);
+  }
+  value_init(hdv);
+
+  /* BM: Scan the vertices and make an orthogonal expansion of the variable space */
+  /* a- prepare the array of common denominators */
+  if (!PP->nbV) return 0;
+  else {
+    nb_vars = P->Dimension-C->Dimension;
+    denoms = Matrix_Alloc(1, nb_vars);
+    for (i=0; i< nb_vars; i++) value_set_si(denoms->p[0][i], 0);
+  }
+  
+  /* b- scan the vertices and compute the global variable lcms */
+  for (V_tmp = PP->V; V_tmp; V_tmp=V_tmp->next)
+    for (i=0; i< nb_vars; i++) B_Lcm(denoms->p[0][i],V_tmp->Vertex->p[i][nb_param+1], &(denoms->p[0][i]));
+  printf("denoms = \n");
+  Matrix_Print(stderr, P_VALUE_FMT, denoms);
+  value_set_si(expansion_det, 1);
+  value_set_si(global_var_lcm, 1);
+  for (i=0; i< nb_vars;i++) {
+    value_multiply(expansion_det, expansion_det, denoms->p[0][i]);
+    B_Lcm(global_var_lcm, denoms->p[0][i], &global_var_lcm);
+  }
+  printf("expansion_det:\n");
+  value_print(stderr, P_VALUE_FMT, expansion_det);
+  printf("\n");
+  
+  
+  /* the expansion can be actually writen as denoms_det.L^{-1} */
+  /* this is equivalent to multiply the rows of P by denoms_det */
+  for (i=0; i< nb_vars; i++) value_division(denoms->p[0][i], global_var_lcm, denoms->p[0][i]);
+  
+  // OPT : we could use a vector instead of a diagonal matrix here (c- and d-).
+  /* c- make the quick expansion matrix */
+  printf("nb vars = %d, nb param = %d", nb_vars, nb_param);
+  expansion = Matrix_Alloc(nb_vars+nb_param+1, nb_vars+nb_param+1);
+  for (i=0; i< nb_vars; i++) {
+    for (j=0; j< nb_vars+nb_param+1; j++) {
+      if (i==j) value_assign(expansion->p[i][j], denoms->p[0][i]);
+      else value_set_si(expansion->p[i][j], 0);
+    }
+  }
+  for (i=nb_vars; i< nb_vars+nb_param+1; i++) {
+    for (j=0; j< nb_vars+nb_param+1; j++) {
+      if (i==j) value_assign(expansion->p[i][j], global_var_lcm);
+      else value_set_si(expansion->p[i][j], 0);
+    }
+  }
+  value_clear(global_var_lcm);
+  printf("expansion = \n");
+  Matrix_Print(stderr, P_VALUE_FMT, expansion);
+  
+  /* d- apply the variable expansion to the polyhedron */
+  Polyhedron_Print(stderr, P_VALUE_FMT, P);
+  Expanded = Polyhedron_Preimage(P, expansion, MAXRAYS);
+  
+  Polyhedron_Print(stderr, P_VALUE_FMT, Expanded);
+  Polyhedron_Free(P);
+  P = Expanded;
+  /* formerly : Scan the vertices and compute lcm 
+     Scan_Vertices_Quick_Apx(PP,Q,CT,lcm,nb_param); */
+  /* now : lcm = 1 (by construction) */
+  // OPT : A lot among what happens after this point can be simplified by knowing that lcm[i] = 1
+  // for now, we just conservatively fool the rest of the function with lcm = 1
+  // to do after a first debugging
+  for (i=0; i< nb_param; i++) value_set_si(lcm[i], 1);
+  
+  for(Q=PP->D;Q;Q=Q->next) {
+    if(CT) {
+      Polyhedron *Dt;
+      CQ = Q->Domain;      
+      Dt = Polyhedron_Preimage(Q->Domain,CT,MAXRAYS);
+      rVD = DomainIntersection(Dt,CEq,MAXRAYS);
+      
+      /* if rVD is empty or too small in geometric dimension */
+      if(!rVD || emptyQ(rVD) ||
+	 (rVD->Dimension-rVD->NbEq < Dt->Dimension-Dt->NbEq-CEq->NbEq)) {
+	if(rVD)
+	  Polyhedron_Free(rVD);
+	Polyhedron_Free(Dt);
+	continue;		/* empty validity domain */
+      }
+      Polyhedron_Free(Dt);
+    }
+    else
+      rVD = CQ = Q->Domain;
+    en = (Enumeration *)malloc(sizeof(Enumeration));
+    en->next = res;
+    res = en;
+    res->ValidityDomain = rVD;
+	
+    if( param_name )
+      {    
+	fprintf(stdout,"---------------------------------------\n");
+	fprintf(stdout,"Domain:\n");
+    
+#ifdef EPRINT_ALL_VALIDITY_CONSTRAINTS
+	Print_Domain(stdout,res->ValidityDomain,param_name);
+#else    
+	{
+	  Polyhedron *VD;
+	  VD = DomainSimplify(res->ValidityDomain,C,MAXRAYS);
+	  Print_Domain(stdout,VD,param_name);
+	  Domain_Free(VD);
+	}
+#endif /* EPRINT_ALL_VALIDITY_CONSTRAINTS */
+      }
+    
+    overflow_warning_flag = 1;
+
+    // BM : expansion formerly here.
+    
+#ifdef EDEBUG2
+    fprintf(stderr,"Denominator = ");
+    for( np=0;np<nb_param;np++)
+      value_print(stderr,P_VALUE_FMT,lcm[np]);
+    fprintf(stderr," and hdim == %d \n",hdim);
+#endif
+    
+#ifdef EDEBUG2
+    fprintf(stderr,"CQ = \n");
+    Polyhedron_Print(stderr,P_VALUE_FMT,CQ);
+#endif
+
+    /* Before scanning, add constraints to ensure at least hdim*lcm */
+    /* points in every dimension */
+    value_set_si(hdv,hdim-nb_param);
+
+    for( np=0;np<nb_param;np++)
+    {
+		if( value_notzero_p(lcm[np]) )
+			value_multiply(m1[np],hdv,lcm[np]);
+		else
+			value_set_si(m1[np],1);
+    }
+
+#ifdef EDEBUG2 
+    fprintf(stderr,"m1 == ");
+    for( np=0;np<nb_param;np++)
+      value_print(stderr,P_VALUE_FMT,m1[np]);
+    fprintf(stderr,"\n");
+#endif 
+
+    CATCH(overflow_error) {
+      fprintf(stderr,"Enumerate: arithmetic overflow error.\n");
+      CQ2 = NULL;
+    }
+    TRY {      
+      CQ2 = Polyhedron_Preprocess(CQ,m1,MAXRAYS);
+
+#ifdef EDEBUG2
+      fprintf(stderr,"After preprocess, CQ2 = ");
+      Polyhedron_Print(stderr,P_VALUE_FMT,CQ2);
+#endif
+      
+      UNCATCH(overflow_error);
+    }
+    
+    /* Vin100, Feb 2001 */
+    /* in case of degenerate, try to find a domain _containing_ CQ */
+    if ((!CQ2 || emptyQ(CQ2)) && CQ->NbBid==0) {
+      int r;
+      
+#ifdef EDEBUG2
+      fprintf(stderr,"Trying to call Polyhedron_Preprocess2 : CQ = \n");
+      Polyhedron_Print(stderr,P_VALUE_FMT,CQ);
+#endif
+      
+      /* Check if CQ is bounded */
+      for(r=0;r<CQ->NbRays;r++) {
+	if(value_zero_p(CQ->Ray[r][0]) ||
+	   value_zero_p(CQ->Ray[r][CQ->Dimension+1]))
+	  break;
+      }
+      if(r==CQ->NbRays) {
+	
+	/* ok, CQ is bounded */
+	/* now find if CQ is contained in a hypercube of size m1 */
+	CQ2 = Polyhedron_Preprocess2(CQ,m1,lcm,MAXRAYS);
+      }
+    }
+    if (!CQ2 || emptyQ(CQ2)) {
+#ifdef EDEBUG2
+      fprintf(stderr,"Degenerate.\n");
+#endif
+      fprintf(stdout,"Degenerate Domain. Can not continue.\n");
+      value_init(res->EP.d);
+      value_init(res->EP.x.n);
+      value_set_si(res->EP.d,1);
+      value_set_si(res->EP.x.n,-1);
+    }
+    else {
+      
+#ifdef EDEBUG2
+      fprintf(stderr,"CQ2 = \n");
+      Polyhedron_Print(stderr,P_VALUE_FMT,CQ2);
+      if( ! PolyhedronIncludes(CQ, CQ2) )
+	fprintf( stderr,"CQ does not include CQ2 !\n");
+      else
+	fprintf( stderr,"CQ includes CQ2.\n");
+      if( ! PolyhedronIncludes(res->ValidityDomain, CQ2) )
+	fprintf( stderr,"CQ2 is *not* included in validity domain !\n");
+      else
+	fprintf( stderr,"CQ2 is included in validity domain.\n");
+#endif
+      
+      /* L is used in counting the number of points in the base cases */
+      L = Polyhedron_Scan(P,CQ,MAXRAYS);
+      U = Universe_Polyhedron(0);
+      
+      /* LQ is used to scan the parameter space */
+      LQ = Polyhedron_Scan(CQ2,U,MAXRAYS); /* bounds on parameters */
+      Domain_Free(U);
+      if(CT)	/* we did compute another Q->Domain */
+	Domain_Free(CQ);
+      
+      /* Else, CQ was Q->Domain (used in res) */
+      Domain_Free(CQ2);
+      
+#ifdef EDEBUG2
+      fprintf(stderr,"L = \n");
+      Polyhedron_Print(stderr,P_VALUE_FMT,L);
+      fprintf(stderr,"LQ = \n");
+      Polyhedron_Print(stderr,P_VALUE_FMT,LQ);
+#endif
+#ifdef EDEBUG3
+      fprintf(stdout,"\nSystem of Equations:\n");
+#endif
+      
+      value_init(res->EP.d);
+      value_set_si(res->EP.d,0);
+      
+      /* Create a context vector size dim+2 */
+      context = (Value *) malloc ((hdim+1)*sizeof(Value));  
+      for(i=0;i<=(hdim);i++)
+	value_init(context[i]);
+      Vector_Set(context,0,(hdim+1));
+      
+      /* Set context[hdim] = 1  (the constant) */
+      value_set_si(context[hdim],1);
+      
+      CATCH(overflow_error) {
+			fprintf(stderr,"Enumerate: arithmetic overflow error.\n");
+			fprintf(stderr,"You should rebuild PolyLib using GNU-MP or increasing the size of integers.\n");
+			overflow_warning_flag = 0;
+			assert(overflow_warning_flag);
+	
+      }
+      TRY {
+			res->EP.x.p = P_Enum(L,LQ,context,1,nb_param,dim,lcm, param_name);
+			UNCATCH(overflow_error);	
+      }
+      
+      for(i=0;i<=(hdim);i++)
+	value_clear(context[i]);
+      free(context);
+      Domain_Free(L);
+      Domain_Free(LQ);
+      
+#ifdef EDEBUG5
+      if( param_name )
+	{
+	  fprintf(stdout,"\nEhrhart Polynomial (before simplification):\n");
+	  print_evalue(stdout,&res->EP,param_name);
+	}
+
+      /* BM: divide EP by denom_det, the expansion factor */
+      fprintf(stdout,"\nEhrhart Polynomial (before division):\n");
+      print_evalue(stdout,&(res->EP),param_name);
+#endif
+
+      evalue_div(&(res->EP), expansion_det);
+
+
+      /* Try to simplify the result */
+      reduce_evalue(&res->EP);
+      
+      /* Put back the original parameters into result */
+      /* (equalities have been eliminated)            */
+      if(CT) 
+          addeliminatedparams_evalue(&res->EP,CT);
+      
+      if( param_name )
+	{
+	  fprintf(stdout,"\nEhrhart Polynomial:\n");
+	  print_evalue(stdout,&res->EP, param_name);
+	  fprintf(stdout,"\n");
+	  /* sometimes the final \n lacks (when a single constant is printed) */
+	}
+      
+    }
+  }
+  value_clear(expansion_det);
+
+  if( P != Pi )
+ 	Polyhedron_Free( P );
+  /* Clear all the 'Value' variables */
+  for( np=0; np<nb_param ; np++ )
+  {
+    value_clear(lcm[np]); value_clear(m1[np]);
+  }
+  value_clear(hdv);
+
+  return res;
+} /* Ehrhart_Quick_Apx_Full_Dim */ 
+
+
+// computes the approximation of the Ehrhart polynomial of a polyhedron (implicit form -> matrix), treating the non-full-dimensional case.
+Enumeration *Ehrhart_Quick_Apx(Matrix * M, Matrix * C, Matrix ** Validity_Lattice, unsigned MAXRAYS, char ** param_name) {
+
+  // 0- compute a full-dimensional polyhedron with the same number of points,
+  // and its parameter's validity lattice
+  Matrix * M_full;
+  Polyhedron * P, * PC;
+  Enumeration *en;
+  
+  M_full = full_dimensionize(M, C->NbColumns-2, Validity_Lattice);
+  // 1- apply the same tranformation to the context that what has been applied to the parameters space of the polyhedron.
+  mpolyhedron_compress_last_vars(C, *Validity_Lattice);
+  show_matrix(M_full);
+  P = Constraints2Polyhedron(M_full, MAXRAYS);
+  PC = Constraints2Polyhedron(C, MAXRAYS);
+  Matrix_Free(M_full);
+  // compute the Ehrhart polynomial of the "equivalent" polyhedron
+  en = Ehrhart_Quick_Apx_Full_Dim(P, PC, MAXRAYS, param_name);
+
+  // clean up
+  Polyhedron_Free(P);
+  Polyhedron_Free(PC);
+  return en;
+} // Ehrhart_Quick_Apx
 
 

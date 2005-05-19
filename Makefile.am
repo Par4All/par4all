@@ -17,6 +17,9 @@ CFILES= \
 	source/ehrhart/ehrhart.c \
 	source/ehrhart/ext_ehrhart.c \
 	source/ehrhart/eval_ehrhart.c \
+	source/kernel/matrix_addon.c \
+	source/kernel/matrix_permutations.c \
+	source/kernel/compress_parms.c \
 	source/kernel/SolveDio.c \
 	source/kernel/Lattice.c \
 	source/kernel/Matop.c \
@@ -77,7 +80,10 @@ bin_PROGRAMS = \
 	disjoint_union_sep \
 	disjoint_union_adj \
 	testehrhart \
-	ehrhart_union
+	ehrhart_union \
+	ehrhart_quick_apx \
+	ehrhart_upper_bound \
+	ehrhart_lower_bound
 
 LDADD = @polylib@
 c2p_SOURCES = $(poly_src)/c2p.c
@@ -87,6 +93,9 @@ pp_SOURCES = $(poly_src)/pp.c
 disjoint_union_sep_SOURCES = $(poly_src)/disjoint_union_sep.c
 disjoint_union_adj_SOURCES = $(poly_src)/disjoint_union_adj.c
 ehrhart_union_SOURCES = $(poly_src)/ehrhart_union.c
+ehrhart_quick_apx_SOURCES = $(poly_src)/ehrhart_quick_apx.c
+ehrhart_upper_bound_SOURCES =  $(poly_src)/ehrhart_upper_bound.c
+ehrhart_lower_bound_SOURCES =  $(poly_src)/ehrhart_lower_bound.c
 testlib_SOURCES = $(poly_src)/testlib.c
 polytest_SOURCES = $(poly_src)/polytest.c
 example_SOURCES = $(poly_src)/example.c
