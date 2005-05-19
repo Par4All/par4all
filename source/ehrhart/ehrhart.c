@@ -2223,8 +2223,12 @@ Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,unsigned MA
     
     return(Enumerate_NoParameters(P,C,NULL,NULL,MAXRAYS, param_name));  
   }
+
+#if EDEBUG2
   printf("Enumerating polyhedron : \n");
   Polyhedron_Print(stdout, P_VALUE_FMT, P);
+#endif
+
   PP = Polyhedron2Param_SimplifiedDomain(&P,C,MAXRAYS,&CEq,&CT);
   if(!PP) {
     if( param_name )
@@ -2309,10 +2313,16 @@ Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,unsigned MA
   Matrix_Print(stderr, P_VALUE_FMT, expansion);
   
   /* d- apply the variable expansion to the polyhedron */
+#if EDEBUG2 
   Polyhedron_Print(stderr, P_VALUE_FMT, P);
+#endif
+
   Expanded = Polyhedron_Preimage(P, expansion, MAXRAYS);
   
+#if EDEBUG2
   Polyhedron_Print(stderr, P_VALUE_FMT, Expanded);
+#endif
+
   Polyhedron_Free(P);
   P = Expanded;
   /* formerly : Scan the vertices and compute lcm 
