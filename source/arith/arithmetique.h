@@ -4,7 +4,7 @@
 
 /* package arithmetique
  *
- * $Id: arithmetique.h,v 1.5 2005/02/28 13:32:25 loechner Exp $
+ * $Id: arithmetique.h,v 1.6 2005/05/19 10:44:17 loechner Exp $
  *
  * Francois Irigoin, mai 1989
  *
@@ -12,6 +12,8 @@
  *  - reprise de DIVIDE qui etait faux (Remi Triolet, Francois Irigoin, 
  *    april 90)
  *  - simplification de POSITIVE_DIVIDE par suppression d'un modulo
+ *  - B.Meister : added addmul, operation existing in gmp and useful 
+ *    for matrix multiplications (05-2005)
  */
 
 /* We would like linear to be generic about the "integer" type used
@@ -283,6 +285,7 @@ typedef mpz_t Value;
 
 #define value_addto(ref,val1,val2)     (mpz_add((ref),(val1),(val2)))
 #define value_add_int(ref,val,vint)     (mpz_add_ui((ref),(val),(long)(vint)))
+#define value_addmul(ref, val1, val2)   (mpz_addmul((ref), (val1), (val2))
 #define value_increment(ref,val)       (mpz_add_ui((ref),(val),1))
 #define value_multiply(ref,val1,val2)  (mpz_mul((ref),(val1),(val2)))
 #define value_substract(ref,val1,val2) (mpz_sub((ref),(val1),(val2)))
@@ -372,6 +375,7 @@ typedef mpz_t Value;
 
 #define value_addto(ref,val1,val2) 	((ref) = (val1)+(val2))
 #define value_add_int(ref,val,vint)     ((ref) = (val)+(Value)(vint))
+#define value_addmul(ref, val1, val2)   ((ref) += (val1)*(val2))
 #define value_increment(ref,val) 	((ref) = (val)+VALUE_ONE)
 #define value_direct_product(ref,val1,val2) ((ref) = (val1)*(val2)) /* direct! */
 #define value_multiply(ref,val1,val2)	((ref) = value_mult((val1),(val2)))
