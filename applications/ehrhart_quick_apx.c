@@ -37,6 +37,7 @@ int main( int argc, char **argv)
   Matrix_Free(C1);
   Matrix_Free(P1);
 
+  printf("============ Ehrhart polynomial quick approximation ============\n");
   show_matrix(Validity_Lattice);
   for( en=e ; en ; en=en->next ) {    
     Print_Domain(stdout,en->ValidityDomain, param_name);
