@@ -33,6 +33,11 @@
 #include <polylib/NormalForms.h>
 #include <polylib/Zpolyhedron.h>
 
+// added for Ehrhart polynomial approximation + bounds
+#include <polylib/matrix_addon.h>
+#include <polylib/matrix_permutations.h>
+#include <polylib/compress_parms.h>
+
 #ifdef GNUMP
 #include <gmp.h>
 #endif
