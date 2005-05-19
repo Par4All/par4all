@@ -1,0 +1,18 @@
+Basic installation procedure.
+
+You need the GNU tools : aclocal, autoconf, automake (some old versions do not work), libtool.
+
+first, build your configure, ltmain.sh and Makefile scripts :
+
+aclocal
+libtoolize -f 
+autoconf
+automake -a
+
+Then, you can run the scripts 
+
+./configure 
+
+make
+
+make install
