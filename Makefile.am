@@ -61,6 +61,10 @@ disjoint_union_sep_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
 disjoint_union_adj_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
 testehrhart_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
 ehrhart_union_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
+ehrhart_quick_apx_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
+ehrhart_lower_bound_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
+ehrhart_ipper_bound_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
+
 
 EXTRA_LTLIBRARIES = libpolylib32.la libpolylib64.la libpolylib128.la \
 		    libpolylibgmp.la
