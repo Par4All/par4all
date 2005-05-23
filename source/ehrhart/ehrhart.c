@@ -16,7 +16,7 @@
 #include <assert.h>
 
 #include <polylib/polylib.h>
-#include <polylib/compress_parms.h>
+
 
 /*! \class Ehrhart
 
@@ -496,33 +496,6 @@ void eadd(evalue *e1,evalue *res) {
   return;
 } /* eadd */
 
-/*------------------------------------------------------------*/
-/* void evalue_div (e, n)                                     */
-/* divides the evalue e by the integer n                      */
-/* recursive function                                         */
-/* modifies e                                                 */
-/*____________________________________________________________*/
-void evalue_div(evalue * e, Value n) {
-  int i;
-  Value gc;
-  value_init(gc);
-  if (value_zero_p(e->d)) {
-    for (i=0; i< e->x.p->size; i++) {
-      evalue_div(&(e->x.p->arr[i]), n);
-    }
-  }
-  else {
-    value_multiply(e->d, e->d, n);
-    /* simplify the new rational if needed */
-    Gcd(e->x.n, e->d, &gc);
-    if (value_notone_p(gc)&&(value_notzero_p(gc))) {
-      value_division(e->d, e->d, gc);
-      value_division(e->x.n, e->x.n, gc);
-    }
-  }
-  value_clear(gc);
-}
-
 /** 
 
 computes the inner product of two vectors. Result = result (evalue) =
@@ -761,6 +734,8 @@ Polyhedron *Polyhedron_Preprocess(Polyhedron *D,Value *size,unsigned MAXRAYS)
   
     value_init(tmp);
     d = D->Dimension;
+    if (MAXRAYS < 2*D->NbConstraints)
+	MAXRAYS = 2*D->NbConstraints;
     M = Matrix_Alloc(MAXRAYS, D->Dimension+2);
     M->NbRows = D->NbConstraints;
   
@@ -1219,7 +1194,7 @@ void count_points (int pos,Polyhedron *P,Value *context, Value *res) {
 	if(value_notmone_p(c))
 	    value_addto(*res, *res, c);
 	else {
-	    value_set_si(*res, 0);
+	    value_set_si(*res, -1);
 	    break;
         }
     }
@@ -1883,6 +1858,24 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS,
     
     return(Enumerate_NoParameters(P,C,NULL,NULL,MAXRAYS,param_name));  
   }
+  if(nb_param == dim) {
+    res = (Enumeration *)malloc(sizeof(Enumeration));
+    res->next = 0;
+    res->ValidityDomain = DomainIntersection(P,C,MAXRAYS);
+    value_init(res->EP.d);
+    value_init(res->EP.x.n);
+    value_set_si(res->EP.d,1);
+    value_set_si(res->EP.x.n,1);
+    if( param_name ) {
+      fprintf(stdout,"---------------------------------------\n");
+      fprintf(stdout,"Domain:\n");
+      Print_Domain(stdout,res->ValidityDomain, param_name);
+      fprintf(stdout,"\nEhrhart Polynomial:\n");
+      print_evalue(stdout,&res->EP,param_name);
+      fprintf(stdout, "\n");
+    }
+    return res;
+  }
   PP = Polyhedron2Param_SimplifiedDomain(&P,C,MAXRAYS,&CEq,&CT);
   if(!PP) {
 	if( param_name )
@@ -2165,20 +2158,54 @@ void Enumeration_Free(Enumeration *en)
 
 // adds by B. Meister for Ehrhart Polynomial approximation
 
+/**
 
-/*----------------------------------------------------------------*/
-/* Ehrhart_Quick_Apx_Full_Dim(P, C, MAXRAYS)                      */
-/*    P : Polyhedron to enumerate (approximatively)               */
-/*    C : Context Domain                                          */
-/*    MAXRAYS : size of workspace                                 */
-/* Procedure to estimate the # points in a parameterized polytope.*/
-/* Returns a list of validity domains + evalues EP                */
-/* B.M.                                                           */
-/* The most rough and quick approximation by variables expansion  */
-/* Deals with the full-dimensional case.                          */
-/* WARNING : initially based on version 5.11.1 of Polylib         */
-/* updated to 5.20.0
-/*----------------------------------------------------------------*/
+void evalue_div (e, n)                                    
+divides the evalue e by the integer n
+recursive function
+Warning :  modifies e
+
+@param e an evalue (to be divided by n)
+@param n
+
+*/
+
+void evalue_div(evalue * e, Value n) {
+  int i;
+  Value gc;
+  value_init(gc);
+  if (value_zero_p(e->d)) {
+    for (i=0; i< e->x.p->size; i++) {
+      evalue_div(&(e->x.p->arr[i]), n);
+    }
+  }
+  else {
+    value_multiply(e->d, e->d, n);
+    /* simplify the new rational if needed */
+    Gcd(e->x.n, e->d, &gc);
+    if (value_notone_p(gc)&&(value_notzero_p(gc))) {
+      value_division(e->d, e->d, gc);
+      value_division(e->x.n, e->x.n, gc);
+    }
+  }
+  value_clear(gc);
+} /* evalue_div */
+
+
+/** 
+
+Ehrhart_Quick_Apx_Full_Dim(P, C, MAXRAYS, param_names)
+
+Procedure to estimate the nubmer of points in a parameterized polytope.
+Returns a list of validity domains + evalues EP
+B.M.
+The most rough and quick approximation by variables expansion  
+Deals with the full-dimensional case.                          
+@param P : Polyhedron to enumerate (approximatively)
+@param C : Context Domain
+@param MAXRAYS : size of workspace
+
+*/
 Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS, char ** param_name)
 {
   Polyhedron *L, *CQ, *CQ2, *LQ, *U, *CEq, *rVD, *P;
@@ -2203,7 +2230,7 @@ Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,unsigned MA
   res = NULL;
   P = Pi;
 
-  
+
   value_init(expansion_det);
   value_init(global_var_lcm);
 
@@ -2267,7 +2294,7 @@ Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,unsigned MA
   /* a- prepare the array of common denominators */
   if (!PP->nbV) return 0;
   else {
-    nb_vars = P->Dimension-C->Dimension;
+    nb_vars = P->Dimension-nb_param;
     denoms = Matrix_Alloc(1, nb_vars);
     for (i=0; i< nb_vars; i++) value_set_si(denoms->p[0][i], 0);
   }
@@ -2573,7 +2600,19 @@ Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,unsigned MA
 } /* Ehrhart_Quick_Apx_Full_Dim */ 
 
 
-// computes the approximation of the Ehrhart polynomial of a polyhedron (implicit form -> matrix), treating the non-full-dimensional case.
+/** 
+
+Ehrhart_Quick_Apx
+
+computes the approximation of the Ehrhart polynomial of a polyhedron (implicit form -> matrix), treating the non-full-dimensional case.
+
+@param M a Matrix (polyhedron under implicit form)
+@param C a Matrix (context under implicit form)
+@param Validity_Lattice a pointer to a Matrix (returned : the parameter's validity lattice)
+@param MAXRAYS (the needed "working space" for other polylib functions used here)
+@param param_name (the names of the parameters
+
+*/
 Enumeration *Ehrhart_Quick_Apx(Matrix * M, Matrix * C, Matrix ** Validity_Lattice, unsigned MAXRAYS, char ** param_name) {
 
   // 0- compute a full-dimensional polyhedron with the same number of points,
@@ -2596,6 +2635,7 @@ Enumeration *Ehrhart_Quick_Apx(Matrix * M, Matrix * C, Matrix ** Validity_Lattic
   Polyhedron_Free(P);
   Polyhedron_Free(PC);
   return en;
-} // Ehrhart_Quick_Apx
+} /* Ehrhart_Quick_Apx */
+
 
 
