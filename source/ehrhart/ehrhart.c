@@ -2202,9 +2202,10 @@ Returns a list of validity domains + evalues EP
 B.M.
 The most rough and quick approximation by variables expansion  
 Deals with the full-dimensional case.                          
-@param P : Polyhedron to enumerate (approximatively)
+@param Pi : Polyhedron to enumerate (approximatively)
 @param C : Context Domain
 @param MAXRAYS : size of workspace
+@param param_names : names for the parameters (char strings)
 
 */
 Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS, char ** param_name)
@@ -2611,7 +2612,7 @@ computes the approximation of the Ehrhart polynomial of a polyhedron (implicit f
 @param C a Matrix (context under implicit form)
 @param Validity_Lattice a pointer to a Matrix (returned : the parameter's validity lattice)
 @param MAXRAYS (the needed "working space" for other polylib functions used here)
-@param param_name (the names of the parameters
+@param param_name (the names of the parameters)
 
 */
 Enumeration *Ehrhart_Quick_Apx(Matrix * M, Matrix * C, Matrix ** Validity_Lattice, unsigned MAXRAYS, char ** param_name) {
