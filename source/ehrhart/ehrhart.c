@@ -168,6 +168,7 @@ enode *ecopy(enode *e) {
 
 @param DST destination file
 @param e pointer to evalue to be printed
+@param pname array of strings, name of the parameters
 
 */
 void print_evalue(FILE *DST,evalue *e,char **pname) {
@@ -1121,7 +1122,7 @@ each imbriquation
 @param pos index position of current loop index (1..hdim-1)
 @param P loop domain
 @param context context values for fixed indices 
-@return the number of integer points in this
+@param res the number of integer points in this
 polyhedron 
 
 */
@@ -1700,7 +1701,7 @@ Procedure to count points in a non-parameterized polytope.
 @param P       Polyhedron to count
 @param C       Parameter Context domain
 @param CT      Matrix to transform context to original
-@parma CEq     additionnal equalities in context
+@param CEq     additionnal equalities in context
 @param MAXRAYS workspace size
 @param param_name parameter names
 
@@ -1821,7 +1822,7 @@ Enumeration *Enumerate_NoParameters(Polyhedron *P,Polyhedron *C,Matrix *CT,Polyh
 
 /**  Procedure to count points in a parameterized polytope.
 
-@param P Polyhedron to enumerate
+@param Pi Polyhedron to enumerate
 @param C Context Domain
 @param MAXRAYS size of workspace
 @param param_name parameter names (array of strings), may be NULL
