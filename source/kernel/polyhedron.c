@@ -2095,7 +2095,7 @@ Matrix *Polyhedron2Constraints(Polyhedron *Pol) {
 Given a matrix of rays 'Ray', create and return a polyhedron. 
 
 @param Ray Rays (may be modified!)
-@param NbMaxRays Estimated number of constraints in the polyhedron.
+@param NbMaxConstrs Estimated number of constraints in the polyhedron.
 @return newly allocated Polyhedron
 
 */ 
