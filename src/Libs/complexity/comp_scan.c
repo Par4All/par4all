@@ -4,6 +4,9 @@
  * scan the Abstract Syntax Tree of a program to count operations
  *
  * $Log: comp_scan.c,v $
+ * Revision 1.23  2005/05/27 13:24:04  irigoin
+ * gen_consistent_p() replaced by complexity_consistent_p() to improve typing.
+ *
  * Revision 1.22  1998/04/14 19:25:41  coelho
  * casts.
  *
@@ -375,7 +378,7 @@ list effects_list;
     }
 
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
-	(void) gen_consistent_p(comp);
+	(void) complexity_consistent_p(comp);
 	fprintf(stderr, "block comp is at %p and comp value is ", comp);
 	complexity_fprint(stderr, comp, FALSE, TRUE);
     }
