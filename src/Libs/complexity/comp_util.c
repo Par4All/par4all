@@ -255,16 +255,8 @@ hash_table hash_statement_to_complexity;
  *  -- LOOP_OVERHEAD and CALL_OVERHEAD are added, 280993 LZ
  *  -- LOOP_OVERHEAD is divided into two: INIT and BRAANCH 081093 LZ
  */
-struct intrinsic_cost_rec {
-    char *name;
-    int min_basic_result;
-    int min_nbytes_result;
-    int int_cost;
-    int float_cost;
-    int double_cost;
-    int complex_cost;
-    int dcomplex_cost;
-} intrinsic_cost_table[] = {
+
+intrinsic_cost_record intrinsic_cost_table[] = {
 
     { "+",                        is_basic_int, INT_NBYTES, EMPTY_COST },
     { "-",                        is_basic_int, INT_NBYTES, EMPTY_COST },
@@ -594,7 +586,7 @@ basic *pargsbasic;
 	user_warning("intrinsic_cost", "LOG or LOG10 functions used\n");
       }
 
-      b = make_basic(p->min_basic_result, p->min_nbytes_result);
+      b = make_basic(p->min_basic_result, (void *) p->min_nbytes_result);
       if (is_inferior_basic(*pargsbasic, b)) {
 	free_basic(*pargsbasic);
 	*pargsbasic = simple_basic_dup(b);
