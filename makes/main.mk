@@ -17,6 +17,8 @@
 
 all: recompile
 
+recompile: phase0 phase1 phase2 phase3 phase4 phase5
+
 ########################################################################## ROOT
 
 ifdef ROOT
@@ -287,8 +289,6 @@ $(LIB.d)/$(ARCH): $(LIB.d)
 clean: lib-clean
 
 lib-clean:; $(RM) $(ARCH)/$(LIB_TARGET) .build_lib.*
-
-recompile: $(ARCH)/$(LIB_TARGET)
 
 endif # INSTALL_LIB
 
