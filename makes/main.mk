@@ -42,8 +42,8 @@ EXTERN_ROOT	= $(ROOT)/../extern
 endif # EXTERN_ROOT
 
 # where to install stuff
-BIN.d	= $(INSTALL_DIR)/Bin/$(ARCH)
-LIB.d	= $(INSTALL_DIR)/Lib/$(ARCH)
+BIN.d	= $(INSTALL_DIR)/Bin
+LIB.d	= $(INSTALL_DIR)/Lib
 INC.d	= $(INSTALL_DIR)/Include
 DOC.d	= $(INSTALL_DIR)/Doc
 HTM.d	= $(INSTALL_DIR)/Html
@@ -271,12 +271,16 @@ phase3:	.build_lib.$(ARCH)
 
 $(INSTALL_LIB): $(ARCH)
 
-$(LIB.d):; $(MKDIR) $(LIB.d)
+$(LIB.d):
+	$(MKDIR) $@
 
-.build_lib.$(ARCH): $(INSTALL_LIB) $(LIB.d)
+$(LIB.d)/$(ARCH): $(LIB.d)
+	$(MKDIR) $@
+
+.build_lib.$(ARCH): $(INSTALL_LIB) $(LIB.d)/$(ARCH)
 	for l in $(INSTALL_LIB) ; do \
 	  cmp $$l $(LIB.d)/$$l || \
-	    $(INSTALL) -m 644 $$l $(LIB.d) ; \
+	    $(INSTALL) -m 644 $$l $(LIB.d)/$(ARCH) ; \
 	done
 	touch $@
 
@@ -321,10 +325,14 @@ phase3: .build_bin.$(ARCH)
 
 $(INSTALL_BIN): $(ARCH)
 
-$(BIN.d):; $(MKDIR) $(BIN.d)
+$(BIN.d):
+	$(MKDIR) $@
 
-.build_bin.$(ARCH): $(INSTALL_BIN) $(BIN.d)
-	$(INSTALL) -m 755 $(INSTALL_BIN) $(BIN.d)
+$(BIN.d)/$(ARCH): $(BIN.d)
+	$(MKDIR) $@
+
+.build_bin.$(ARCH): $(INSTALL_BIN) $(BIN.d)/$(ARCH)
+	$(INSTALL) -m 755 $(INSTALL_BIN) $(BIN.d)/$(ARCH)
 	touch $@
 
 clean: bin-clean
