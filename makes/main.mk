@@ -224,7 +224,7 @@ $(INC.d):; $(MKDIR) $(INC.d)
 .build_inc: $(INSTALL_INC) $(INC.d)
 	for f in $(INSTALL_INC) ; do \
 	  cmp $$f $(INC.d)/$$f || \
-	    $(INSTALL) --mode=644 $$f $(INC.d) ; \
+	    $(INSTALL) -m 644 $$f $(INC.d) ; \
 	done
 	touch $@
 
@@ -276,7 +276,7 @@ $(LIB.d):; $(MKDIR) $(LIB.d)
 .build_lib.$(ARCH): $(INSTALL_LIB) $(LIB.d)
 	for l in $(INSTALL_LIB) ; do \
 	  cmp $$l $(LIB.d)/$$l || \
-	    $(INSTALL) --mode=644 $$l $(LIB.d) ; \
+	    $(INSTALL) -m 644 $$l $(LIB.d) ; \
 	done
 	touch $@
 
@@ -324,7 +324,7 @@ $(INSTALL_BIN): $(ARCH)
 $(BIN.d):; $(MKDIR) $(BIN.d)
 
 .build_bin.$(ARCH): $(INSTALL_BIN) $(BIN.d)
-	$(INSTALL) --mode=755 $(INSTALL_BIN) $(BIN.d)
+	$(INSTALL) -m 755 $(INSTALL_BIN) $(BIN.d)
 	touch $@
 
 clean: bin-clean
@@ -342,7 +342,7 @@ phase4: .build_doc
 $(DOC.d):; $(MKDIR) $(DOC.d)
 
 .build_doc: $(INSTALL_DOC) $(DOC.d)
-	$(INSTALL) --mode=644 $(INSTALL_DOC) $(DOC.d)
+	$(INSTALL) -m 644 $(INSTALL_DOC) $(DOC.d)
 	touch $@
 
 clean: doc-clean
@@ -360,7 +360,7 @@ phase2: .build_shr
 $(SHR.d):; $(MKDIR) $(SHR.d)
 
 .build_shr: $(INSTALL_SHR) $(SHR.d)
-	$(INSTALL) --mode=644 $(INSTALL_SHR) $(SHR.d)
+	$(INSTALL) -m 644 $(INSTALL_SHR) $(SHR.d)
 	touch $@
 
 clean: shr-clean
@@ -378,7 +378,7 @@ phase2: .build_utl
 $(UTL.d):; $(MKDIR) $(UTL.d)
 
 .build_utl: $(INSTALL_UTL) $(UTL.d)
-	$(INSTALL) --mode=755 $(INSTALL_UTL) $(UTL.d)
+	$(INSTALL) -m 755 $(INSTALL_UTL) $(UTL.d)
 	touch $@
 
 clean: utl-clean
