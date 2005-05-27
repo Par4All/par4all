@@ -184,7 +184,7 @@ name	= $(subst -, _, $(notdir $(CURDIR)))
 build-header-file:
 	$(COPY) $(TARGET)-local.h $(INC_TARGET); \
 	{ \
-	  echo "/* header file built by \$(PROTO) */"; \
+	  echo "/* header file built by $(PROTO) */"; \
 	  echo "#ifndef $(name)_header_included";\
 	  echo "#define $(name)_header_included";\
 	  cat $(TARGET)-local.h;\
