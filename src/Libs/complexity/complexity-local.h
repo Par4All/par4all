@@ -64,11 +64,11 @@
 #define DOUBLE_NBYTES 8                  /* number of bytes used by a double-precision    */
 #define COMPLEX_NBYTES 2*FLOAT_NBYTES    /* complex, single-precision */
 #define DCOMPLEX_NBYTES 2*DOUBLE_NBYTES  /* complex, double-precision */
-#define MAKE_INT_BASIC make_basic(is_basic_int, INT_NBYTES)
-#define MAKE_FLOAT_BASIC make_basic(is_basic_float, FLOAT_NBYTES)
-#define MAKE_DOUBLE_BASIC make_basic(is_basic_float, DOUBLE_NBYTES)
-#define MAKE_COMPLEX_BASIC make_basic(is_basic_complex, COMPLEX_NBYTES)
-#define MAKE_DCOMPLEX_BASIC make_basic(is_basic_complex, DCOMPLEX_NBYTES)
+#define MAKE_INT_BASIC make_basic(is_basic_int, (void *) INT_NBYTES)
+#define MAKE_FLOAT_BASIC make_basic(is_basic_float, (void *) FLOAT_NBYTES)
+#define MAKE_DOUBLE_BASIC make_basic(is_basic_float, (void *) DOUBLE_NBYTES)
+#define MAKE_COMPLEX_BASIC make_basic(is_basic_complex, (void *) COMPLEX_NBYTES)
+#define MAKE_DCOMPLEX_BASIC make_basic(is_basic_complex, (void *) DCOMPLEX_NBYTES)
 #define MAKE_STRING_BASIC make_basic(is_basic_string, make_value(is_value_unknown, UU))
 
 #define hash_contains_p(htp, key) (hash_get(htp, key) != HASH_UNDEFINED_VALUE)
@@ -97,6 +97,17 @@
 #define POWER_OP "**"
 
 /* Intrinsics costs defines */
+
+typedef struct intrinsic_cost_rec {
+    char *name;
+    int min_basic_result;
+    int min_nbytes_result;
+    int int_cost;
+    int float_cost;
+    int double_cost;
+    int complex_cost;
+    int dcomplex_cost;
+} intrinsic_cost_record;
 
 #define LOOP_INIT_OVERHEAD "LOOP-INIT-OVERHEAD"
 #define LOOP_BRANCH_OVERHEAD "LOOP-BRANCH-OVERHEAD"
