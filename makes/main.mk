@@ -312,7 +312,7 @@ phase5:
 
 # binaries
 ifdef BIN_TARGET
-INSTALL_BIN	+=   $(BIN_TARGET)
+INSTALL_BIN	+=   $(addprefix $(ARCH)/,$(BIN_TARGET))
 endif # BIN_TARGET
 
 ifdef INSTALL_BIN
