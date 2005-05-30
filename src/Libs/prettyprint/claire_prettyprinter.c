@@ -9,6 +9,9 @@
                             < MODULE.code
 
    $Log: claire_prettyprinter.c,v $
+   Revision 1.27  2005/05/30 17:31:27  hurbain
+   Corrected the bug that blocked filtrage-1d-ca. Should work OK now :o))
+
    Revision 1.26  2005/05/30 15:45:08  hurbain
    Stable version, works on filtrage-ca1 and interpol. Probably still having some bugs on filtrage-1d-ca (not tested yet).
 
@@ -487,19 +490,19 @@ static void claire_call_from_indice(call c, string * offset_array, string paving
 	if(syntax_tag(args[0]) == is_syntax_reference){
 	  reference ref = syntax_reference(args[0]);
 	  if((iterator_nr = gen_array_index(extern_indices_array, claire_entity_local_name(reference_variable(ref)))) != ITEM_NOT_IN_ARRAY){
-	    paving_array[iterator_nr] = "1";
+	    paving_array[iterator_nr] = strdup("1");
 	  }
 	  else if((iterator_nr = gen_array_index(intern_indices_array, claire_entity_local_name(reference_variable(ref)))) != ITEM_NOT_IN_ARRAY){
-	    fitting_array[iterator_nr] = "1";
+	    fitting_array[iterator_nr] = strdup("1");
 	  }
 	}
 	if(syntax_tag(args[1]) == is_syntax_reference){
 	  reference ref = syntax_reference(args[1]);
 	  if((iterator_nr = gen_array_index(extern_indices_array, claire_entity_local_name(reference_variable(ref)))) != ITEM_NOT_IN_ARRAY){
-	   paving_array[iterator_nr] = "1";
+	   paving_array[iterator_nr] = strdup("1");
 	  }
 	  else if((iterator_nr = gen_array_index(intern_indices_array, claire_entity_local_name(reference_variable(ref)))) != ITEM_NOT_IN_ARRAY){
-	   fitting_array[iterator_nr] = "1";
+	   fitting_array[iterator_nr] = strdup("1");
 	  }
 	}
       }
@@ -508,10 +511,10 @@ static void claire_call_from_indice(call c, string * offset_array, string paving
 	  if(syntax_tag(args[0]) == is_syntax_reference){
 	    reference ref = syntax_reference(args[0]);
 	    if((iterator_nr = gen_array_index(extern_indices_array, claire_entity_local_name(reference_variable(ref)))) != ITEM_NOT_IN_ARRAY){
-	      paving_array[iterator_nr] = "1";
+	      paving_array[iterator_nr] = strdup("1");
 	    }
 	    else if((iterator_nr = gen_array_index(intern_indices_array, claire_entity_local_name(reference_variable(ref)))) != ITEM_NOT_IN_ARRAY){
-	      fitting_array[iterator_nr] = "1";
+	      fitting_array[iterator_nr] = strdup("1");
 	    }
 	  }
 	  if(syntax_tag(args[0]) == is_syntax_call){
@@ -530,12 +533,12 @@ static void claire_call_from_indice(call c, string * offset_array, string paving
 	else {
 	  int intern_nr = gen_array_index(intern_indices_array, claire_entity_local_name(reference_variable(syntax_reference(args[1]))));
 	  int extern_nr = gen_array_index(extern_indices_array, claire_entity_local_name(reference_variable(syntax_reference(args[1]))));
-	  string mult =  claire_entity_local_name(call_function(syntax_call(args[0]))); 
+	  string mult =  strdup(claire_entity_local_name(call_function(syntax_call(args[0])))); 
 	  if(extern_nr != ITEM_NOT_IN_ARRAY){
 	    paving_array[extern_nr] = mult;
 	  }
 	  else if(intern_nr != ITEM_NOT_IN_ARRAY){
-	    fitting_array[intern_nr] = mult;
+	    fitting_array[intern_nr] = strdup(mult);
 	  }
 	}
       }
@@ -620,10 +623,10 @@ static string claire_array_in_task(reference r, bool first, int task_number){
     case is_syntax_reference:{
       reference ref = syntax_reference(sind);
       if((iterator_nr = gen_array_index(extern_indices_array, claire_entity_local_name(reference_variable(ref)))) != ITEM_NOT_IN_ARRAY){
-	paving_array[indice_nr][iterator_nr] = "1";
+	paving_array[indice_nr][iterator_nr] = strdup("1");
       }
       else if((iterator_nr = gen_array_index(intern_indices_array, claire_entity_local_name(reference_variable(ref)))) != ITEM_NOT_IN_ARRAY){
-	fitting_array[indice_nr][iterator_nr] = "1";
+	fitting_array[indice_nr][iterator_nr] = strdup("1");
       }
 
       break;
@@ -695,7 +698,7 @@ static string claire_array_in_task(reference r, bool first, int task_number){
   for(j = 0; j<index_of_array-1; j++){
     result = strdup(concatenate(result, "vartype!(", paving_array[j][i], "), ", NULL));
   }
-  result = strdup(concatenate(result, "vartype!(", paving_array[i][j], "))),", NL, TAB, TAB, NULL));
+  result = strdup(concatenate(result, "vartype!(", paving_array[j][i], "))),", NL, TAB, TAB, NULL));
   
 #define MONMAX(a, b) ((a<b)?b:a)
   
