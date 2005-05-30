@@ -9,6 +9,9 @@
                             < MODULE.code
 
    $Log: claire_prettyprinter.c,v $
+   Revision 1.26  2005/05/30 15:45:08  hurbain
+   Stable version, works on filtrage-ca1 and interpol. Probably still having some bugs on filtrage-1d-ca (not tested yet).
+
    Revision 1.25  2005/02/14 09:13:20  hurbain
    *** empty log message ***
 
@@ -588,6 +591,7 @@ static string claire_array_in_task(reference r, bool first, int task_number){
   bool null_fitting_p = TRUE;
   string internal_index_declarations = strdup("");
   string fitting_declaration = strdup("");
+  string fitting_declaration2 = strdup("");
 
   /* initialization of the arrays */
   for (i=0; i<index_of_array; i++)
@@ -662,14 +666,15 @@ static string claire_array_in_task(reference r, bool first, int task_number){
       fitting_declaration = strdup(concatenate(fitting_declaration, 
 					       "vartype!(", 
 					       fitting_array[j][i], 
-					       i<intern_nb-1?")),":"))),",
-					       NL, TAB, TAB, 
-					       i<intern_nb-1?TAB:"", 
+					       ")), ",
 					       NULL));
     }
   }
-
-  result = strdup(concatenate(result, fitting_declaration, NULL));
+  
+  if(!null_fitting_p){
+    fitting_declaration2 = strdup(concatenate(strndup0(strlen(fitting_declaration) - 2, fitting_declaration), "),", NL, TAB, TAB, TAB, NULL));
+    result = strdup(concatenate(result, fitting_declaration2, NULL));
+  }
 
   if(null_fitting_p){
     result = strdup(concatenate(result, "list()),", NL, TAB, TAB, NULL));
@@ -727,17 +732,22 @@ static string claire_array_in_task(reference r, bool first, int task_number){
       result = strdup(concatenate(result, 
 				  "vartype!(", 
 				  *((string *)(gen_array_item(intern_upperbounds_array, j))), 
-				  j<intern_nb-1? "), ":"))," , 
+				  "), ",
 				  NULL));
       internal_index_declarations = 
 	strdup(concatenate(internal_index_declarations, 
 			   QUOTE, 
 			   *((string *)(gen_array_item(intern_indices_array, j))), 
 			   QUOTE, 
-			   j<intern_nb-1?", ": ")",
+			   ", ",
 			   NULL));
     }
   }
+  if(!null_fitting_p)
+    {
+      result = strdup(concatenate(strndup0(strlen(result) - 2, result), "),", NULL));
+      internal_index_declarations = strdup(concatenate(strndup0(strlen(internal_index_declarations) -2, internal_index_declarations), ")", NULL));
+    }
 
 
 
