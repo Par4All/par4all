@@ -2205,7 +2205,7 @@ Deals with the full-dimensional case.
 @param Pi : Polyhedron to enumerate (approximatively)
 @param C : Context Domain
 @param MAXRAYS : size of workspace
-@param param_names : names for the parameters (char strings)
+@param param_name : names for the parameters (char strings)
 
 */
 Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS, char ** param_name)
