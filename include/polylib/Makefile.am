@@ -8,11 +8,14 @@ polyinclude_HEADERS = \
 	alpha.h \
 	arithmetique.h \
 	arithmetic_errors.h \
+	compress_parms.h \
 	ehrhart.h \
 	errormsg.h \
 	eval_ehrhart.h \
 	ext_ehrhart.h \
 	matrix.h \
+	matrix_addon.h \
+	matrix_permutations.h \
 	param.h \
 	polyhedron.h \
 	polylib.h \
