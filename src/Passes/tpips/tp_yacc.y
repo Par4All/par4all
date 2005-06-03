@@ -835,26 +835,43 @@ i_source: TK_SOURCE filename_list TK_ENDOFLINE
 	    int n = gen_array_nitems($2), i=0;
 	    bool saved_tpips_is_interactive = tpips_is_interactive;
 	    tpips_is_interactive = FALSE;
-	    for(; i<n; i++) {
+	    CATCH(user_error)
+	    {
+	      /* cleanup */
+	      gen_array_full_free($2);
+	      tpips_set_line_to_parse(""); /* humm... */
+	      tpips_is_interactive = saved_tpips_is_interactive;
+	      RETHROW();
+	    }
+	    TRY
+	    {
+	      for(; i<n; i++) 
+	      {
 		string name = gen_array_item($2, i);
 		FILE * sourced = fopen(name, "r");
 		if (!sourced) {
-		    perror("while sourcing");
-		    /* just in case, maybe tpips_init is not yet performed. */
-		    if (tpips_init_done)
-		      pips_user_error("cannot source file '%s'\n", name);
-		    else
-		      fprintf(stderr, "cannot source file '%s'\n", name);
-		    /* should we abort the loop? */
+		  perror("while sourcing");
+		  /* just in case, maybe tpips_init is not yet performed. */
+		  if (tpips_init_done)
+		    /* this performs a throw... */
+		    pips_user_error("cannot source file '%s'\n", name);
+		  else
+		  {
+		    fprintf(stderr, "cannot source file '%s'\n", name);
+		    break;
+		  }
 		}
-		else {
+		else 
+		{
 		  tpips_process_a_file(sourced, FALSE);
 		  fclose(sourced);
 		}
+	      }
+	      gen_array_full_free($2);
+	      tpips_set_line_to_parse(""); /* humm... */
+	      tpips_is_interactive = saved_tpips_is_interactive;
+	      UNCATCH(user_error);
 	    }
-	    gen_array_full_free($2);
-	    tpips_set_line_to_parse(""); /* humm... */
-	    tpips_is_interactive = saved_tpips_is_interactive;
 	}
 
 rulename: phasename
