@@ -37,7 +37,7 @@ Matrix * mtransformation_permute(Matrix * transf, unsigned int * permutation) {
   Matrix * permuted = Matrix_Alloc(transf->NbRows, transf->NbRows);
   for (i= 0; i< transf->NbRows; i++) {
     for (j= 0; j< transf->NbRows; j++) {
-      permuted->p[permutation[i]][permutation[j]] = transf->p[i][j];
+      value_assign(permuted->p[permutation[i]][permutation[j]], transf->p[i][j]);
     }
   }
   return permuted;
@@ -48,9 +48,9 @@ Matrix * mpolyhedron_permute(Matrix * polyh, unsigned int * permutation) {
   unsigned int i,j;
   Matrix * permuted = Matrix_Alloc(polyh->NbRows, polyh->NbColumns);
   for (i= 0; i< polyh->NbRows; i++) {
-    permuted->p[i][0] = polyh->p[i][0];
+    value_assign(permuted->p[i][0], polyh->p[i][0]);
     for (j= 1; j< polyh->NbColumns; j++) {
-      permuted->p[i][permutation[j-1]+1] = polyh->p[i][j];
+      value_assign(permuted->p[i][permutation[j-1]+1], polyh->p[i][j]);
     }
   }
   return permuted;
@@ -80,7 +80,7 @@ unsigned int * find_a_permutation(Matrix * Eqs, unsigned int nb_parms) {
       for (j=0; j< nb_vars; j++) {
 	if ((combination>>j)%2) {
 	  for (i=0; i< Eqs->NbRows; i++) {
-	    Square_Mat->p[i][k] = Eqs->p[i][j];
+	    value_assign(Square_Mat->p[i][k], Eqs->p[i][j]);
 	  }
 	  k++;
 	}
