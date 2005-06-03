@@ -24,7 +24,7 @@ Matrix * Identity_Matrix(unsigned int dim);
 
 // given a n x n integer transformation matrix transf, compute its inverse M/g, where M is a nxn integer matrix.
 // g is a common denominator for elements of (transf^{-1})
-unsigned int mtransformation_inverse(Matrix * transf, Matrix ** inv);
+void mtransformation_inverse(Matrix * transf, Matrix ** inv, Value * g);
 
 // simplify a matrix seen as a polyhedron, by dividing its rows by the gcd of their elements.
 void mpolyhedron_simplify(Matrix * polyh);
