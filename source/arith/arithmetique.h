@@ -4,7 +4,7 @@
 
 /* package arithmetique
  *
- * $Id: arithmetique.h,v 1.6 2005/05/19 10:44:17 loechner Exp $
+ * $Id: arithmetique.h,v 1.7 2005/06/03 10:31:07 verdoolaege Exp $
  *
  * Francois Irigoin, mai 1989
  *
@@ -285,7 +285,7 @@ typedef mpz_t Value;
 
 #define value_addto(ref,val1,val2)     (mpz_add((ref),(val1),(val2)))
 #define value_add_int(ref,val,vint)     (mpz_add_ui((ref),(val),(long)(vint)))
-#define value_addmul(ref, val1, val2)   (mpz_addmul((ref), (val1), (val2))
+#define value_addmul(ref, val1, val2)   (mpz_addmul((ref), (val1), (val2)))
 #define value_increment(ref,val)       (mpz_add_ui((ref),(val),1))
 #define value_multiply(ref,val1,val2)  (mpz_mul((ref),(val1),(val2)))
 #define value_substract(ref,val1,val2) (mpz_sub((ref),(val1),(val2)))
