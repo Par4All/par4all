@@ -65,13 +65,16 @@ Matrix * Identity_Matrix(unsigned int dim) {
     }
   }
   return ret;
-}
+} // Identity_Matrix
 
 // given a n x n integer transformation matrix transf, compute its inverse M/g, where M is a nxn integer matrix.
 // g is a common denominator for elements of (transf^{-1})
-unsigned int mtransformation_inverse(Matrix * transf, Matrix ** inverse) {
-  unsigned int g=1; // global denominator of the matrix -> result = inverse/g, where inverse is an integer matrix.
+void mtransformation_inverse(Matrix * transf, Matrix ** inverse, Value * g) {
+  Value factor;
   unsigned int i,j;
+
+  value_init(*g);
+  value_set_si(*g,1);
 
   // a - compute the inverse as usual (n x (n+1) matrix)
   Matrix * tmp = Matrix_Copy(transf);
@@ -80,17 +83,18 @@ unsigned int mtransformation_inverse(Matrix * transf, Matrix ** inverse) {
   Matrix_Free(tmp);
 
   // b - as it is rational, put it to the same denominator
-  unsigned int factor;
   (*inverse) = Matrix_Alloc(transf->NbRows, transf->NbRows);
-  for (i=0; i< inv->NbRows; i++) g = lcm(g, inv->p[i][inv->NbColumns-1]);
+  for (i=0; i< inv->NbRows; i++) B_Lcm(*g, inv->p[i][inv->NbColumns-1],g);
   for (i=0; i< inv->NbRows; i++) {
-    factor = g/inv->p[i][inv->NbColumns-1];
-    for (j=0; j< (*inverse)->NbColumns; j++) (*inverse)->p[i][j] = inv->p[i][j] * factor;
+    value_division(factor, *g, inv->p[i][inv->NbColumns-1]);
+    for (j=0; j< (*inverse)->NbColumns; j++) value_multiply((*inverse)->p[i][j], inv->p[i][j],  factor);
   }
-  Matrix_Free(inv);
 
-  return g;
-}
+  // c- clean up
+  value_clear(factor);
+  Matrix_Free(inv);
+} // mtransformation_inverse
+
 
 // takes a transformation matrix, and expands it to a higher dimension with the identity matrix 
 // regardless of it homogeneousness
@@ -104,7 +108,8 @@ Matrix * mtransformation_expand_left_to_dim(Matrix * M, int new_dim) {
     for (j=0; j< M->NbRows; j++)
       value_assign(ret->p[offset+i][offset+j], M->p[i][j]);
   return ret;
-}
+} // mtransformation_expand_left_to_dim
+
 
 // simplify a matrix seen as a polyhedron, by dividing its rows by the gcd of their elements.
 void mpolyhedron_simplify(Matrix * polyh) {
@@ -118,7 +123,8 @@ void mpolyhedron_simplify(Matrix * polyh) {
     for (j=1; j< polyh->NbColumns; j++) value_division(polyh->p[i][j], polyh->p[i][j], cur_gcd);
   }
   value_clear(cur_gcd);
-}
+} // mpolyhedron_simplify
+
 
 // inflates a polyhedron (represented as a matrix) P, so that the apx of its Ehrhart Polynomial is an upper bound of the Ehrhart polynomial of P
 // WARNING: this inflation is supposed to be applied on full-dimensional polyhedra.
@@ -223,7 +229,8 @@ void mpolyhedron_compress_last_vars(Matrix * M, Matrix * compression) {
       value_assign(M->p[i][j+offset], M_tmp->p[0][j]);
   }
   Matrix_Free(M_tmp);
-}
+} // mpolyhedron_compress_last_vars
+
 
 // use a set of m equalities Eqs to eliminate m variables in the polyhedron Ineqs represented as a matrix
 // eliminates the m first variables
