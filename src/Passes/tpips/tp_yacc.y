@@ -840,12 +840,12 @@ i_source: TK_SOURCE filename_list TK_ENDOFLINE
 		FILE * sourced = fopen(name, "r");
 		if (!sourced) {
 		    perror("while sourcing");
-		    gen_array_full_free($2);
 		    /* just in case, maybe tpips_init is not yet performed. */
 		    if (tpips_init_done)
 		      pips_user_error("cannot source file '%s'\n", name);
 		    else
 		      fprintf(stderr, "cannot source file '%s'\n", name);
+		    /* should we abort the loop? */
 		}
 		else {
 		  tpips_process_a_file(sourced, FALSE);
