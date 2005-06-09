@@ -9,6 +9,9 @@
                             < MODULE.code
 
    $Log: claire_prettyprinter.c,v $
+   Revision 1.28  2005/06/09 08:26:47  ancourt
+   impression de debug mise en commentaire
+
    Revision 1.27  2005/05/30 17:31:27  hurbain
    Corrected the bug that blocked filtrage-1d-ca. Should work OK now :o))
 
@@ -889,7 +892,7 @@ static call claire_loop_from_loop(loop l, string * result, int task_number){
 
   u = atoi(claire_expression(range_upper(loop_range(l))));
   low = atoi(claire_expression(range_lower(loop_range(l))));
-  printf("%i %i\n", u, low);
+  /*  printf("%i %i\n", u, low); */
   *up = strdup(int_to_string(u - low+1));
 	       //*up = claire_expression(range_upper(loop_range(l)) - range_lower(loop_range(l)) + 1);
   *claire_name = claire_entity_local_name(loop_index(l));
