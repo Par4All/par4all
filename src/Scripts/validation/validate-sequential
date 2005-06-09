@@ -169,7 +169,7 @@ cd $RUNDIR || error 2 "cannot cd $RUNDIR ($?)"
 # test -d $COMDIR || error 2 "no communication dir $COMDIR"
 
 pips_version=${pips_version:-`which_executable pips`}
-tpips_version=${tpips_version:=`which_executable tpips`}
+tpips_version=${tpips_version:-`which_executable tpips`}
 
 export pips_version tpips_version
 
