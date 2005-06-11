@@ -7,7 +7,7 @@
 int main( int argc, char **argv)
 {
   int i;
-  char ** param_name;
+  char ** param_name = NULL;
   Matrix *C1, *P1;
   Polyhedron *P, *C;
   Enumeration *e, *en;
@@ -32,18 +32,13 @@ int main( int argc, char **argv)
   param_name = Read_ParamNames(stdin,nb_parms);
 
   // compute a polynomial approximation of the Ehrhart polynomial
+  printf("============ Ehrhart polynomial quick approximation ============\n");
   e = Ehrhart_Quick_Apx(P1, C1, &Validity_Lattice, 1024, param_name);
   
   Matrix_Free(C1);
   Matrix_Free(P1);
 
-  printf("============ Ehrhart polynomial quick approximation ============\n");
   show_matrix(Validity_Lattice);
-  for( en=e ; en ; en=en->next ) {    
-    Print_Domain(stdout,en->ValidityDomain, param_name);
-    print_evalue(stdout,&en->EP, param_name);
-    printf( "\n-----------------------------------\n" );
-  }
  
 #ifdef EP_EVALUATION
   if( isatty(0) && nb_parms != 0)

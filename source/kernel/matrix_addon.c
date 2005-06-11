@@ -176,7 +176,7 @@ void eliminate_var_with_constr(Matrix * Eliminator, unsigned int eliminator_row,
   value_init(cur_lcm); value_init(mul_a); value_init(mul_b); value_init(a); value_init(b); value_init(sb);
   value_init(tmp); value_init(tmp2);
   // if the victim coefficient is not zero 
-  if (Victim->p[victim_row][var_to_elim+1]!=0) {
+  if (value_notzero_p(Victim->p[victim_row][var_to_elim+1])) {
     value_assign(a, Eliminator->p[eliminator_row][var_to_elim+1]);
     value_assign(b, Victim->p[victim_row][var_to_elim+1]);
     B_Lcm(a, b, &cur_lcm);
@@ -235,17 +235,25 @@ void mpolyhedron_compress_last_vars(Matrix * M, Matrix * compression) {
 // use a set of m equalities Eqs to eliminate m variables in the polyhedron Ineqs represented as a matrix
 // eliminates the m first variables
 // - assumes that Eqs allow to eliminate the m equalities
+//  -modifies Eqs and Ineqs
 unsigned int mpolyhedron_eliminate_first_variables(Matrix * Eqs, Matrix * Ineqs) {
   unsigned int i, j, k;
   // eliminate one variable (index i) after each other
   for (i=0; i< Eqs->NbRows; i++) {
-    for (j=0; j<Eqs->NbRows && (Eqs->p[j][i+1]==0); j++);
-    // if no row is found in Eqs that allows to eliminate variable i, return an error code (NULL Matrix)
+    // find j, the first (non-marked) row of Eqs with a non-zero coefficient
+    for (j=0; j<Eqs->NbRows && (Eqs->p[j][i+1]==0 || ( !value_cmp_si(Eqs->p[j][0],2) )); j++);
+    // if no row is found in Eqs that allows to eliminate variable i, return an error code (0)
     if (j==Eqs->NbRows) return 0;
-    // else, eliminate variable i in Ineqs with the j^th row of Eqs
+    // else, eliminate variable i in Eqs and Ineqs with the j^th row of Eqs (and mark this row so we don't use it again for an elimination)
+    for (k=j+1; k<Eqs->NbRows; k++)
+      eliminate_var_with_constr(Eqs, j, Eqs, k, i);
     for (k=0; k< Ineqs->NbRows; k++)
       eliminate_var_with_constr(Eqs, j, Ineqs, k, i);
+    // mark the row
+    value_set_si(Eqs->p[j][0],2);
   }
+  // un-mark all the rows
+  for (i=0; i< Eqs->NbRows; i++) value_set_si(Eqs->p[i][0],0);
   return 1;
 }
 

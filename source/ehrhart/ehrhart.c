@@ -2218,7 +2218,6 @@ Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,unsigned MA
   Value *lcm, *m1, hdv;
   Value *context;
   Enumeration *en, *res;
-  Value cur_gc;
   unsigned int nb_vars;
   Matrix * denoms;
   Value expansion_det;

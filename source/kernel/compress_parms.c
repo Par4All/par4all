@@ -68,8 +68,10 @@ Matrix * affine_periods(Matrix * M, Matrix * d) {
   value_init(tmp);
   // 1- compute the overall periods
   Value * periods = (Value *)malloc(sizeof(Value) * M->NbColumns);
-  for(i=0; i< M->NbColumns; i++) 
+  for(i=0; i< M->NbColumns; i++) {
+    value_init(periods[i]);
     value_set_si(periods[i], 1);
+  }
   for (i=0; i<M->NbRows; i++) {
     for (j=0; j< M->NbColumns; j++) {
       Gcd(d->p[i][0], M->p[i][j], &tmp);
@@ -87,6 +89,7 @@ Matrix * affine_periods(Matrix * M, Matrix * d) {
       else value_set_si(S->p[i][j], 0);
 
   // 3- clean up
+  for(i=0; i< M->NbColumns; i++) value_clear(periods[i]);
   free(periods);
   return S;
 }
@@ -261,7 +264,7 @@ Matrix * get_parameter_part(Matrix const * E, int nb_parms) {
   // well a priori the minus is unuseful here, but
   for(i=0; i< E->NbRows; i++) {
     for(j=0; j< nb_parms; j++)
-      value_oppose(B->p[i][j], E->p[i][1+nb_vars+j]);
+      value_assign(B->p[i][j], E->p[i][1+nb_vars+j]);
   }
   return B;
 }
@@ -273,7 +276,7 @@ Matrix * get_constant_part(Matrix const * E, int nb_parms) {
   Matrix * C = Matrix_Alloc(nb_eqs,1);
   k=0;
   for(i=0; i< E->NbRows; i++) {
-    value_oppose(C->p[i][0], E->p[i][E->NbColumns-1]);
+    value_assign(C->p[i][0], E->p[i][E->NbColumns-1]);
   }
   return C;
 }
@@ -368,10 +371,11 @@ Matrix * compress_parms(Matrix * E, int nb_parms) {
   unsigned int i,j, k, nb_eqs=0;
   int nb_vars=E->NbColumns - nb_parms -2;
   Matrix *U, *d, *Bp, *Cp;
-  U = extract_funny_stuff(E, nb_parms, &Bp, & Cp, &d);
 
   // particular case where there is no equation
-  if (U==NULL) return Identity_Matrix(nb_parms+1);
+  if (E->NbRows==0) return Identity_Matrix(nb_parms+1);
+
+  U = extract_funny_stuff(E, nb_parms, &Bp, & Cp, &d); 
 
   Matrix_Free(U);
   // The compression matrix N = G.N' must be such that (B'N+C') mod d = 0 (1)
@@ -423,12 +427,16 @@ Matrix * full_dimensionize(Matrix const * M, int nb_parms, Matrix ** Validity_La
   Matrix_Free(Eqs);
   Matrix_Free(Ineqs);
   mpolyhedron_compress_last_vars(Permuted_Ineqs, Whole_Validity_Lattice);
+  show_matrix(Permuted_Eqs);
+  show_matrix(Whole_Validity_Lattice);
 
   // 3- eliminate the first variables
   if (!mpolyhedron_eliminate_first_variables(Permuted_Eqs, Permuted_Ineqs)) {
     fprintf(stderr,"full-dimensionize > variable elimination failed. \n"); 
     return NULL;
   }
+  show_matrix(Permuted_Eqs);
+  show_matrix(Permuted_Ineqs);
 
   // 4- get rid of the first (zero) columns, which are now useless, and put the parameters back at the end
   Full_Dim = Matrix_Alloc(Permuted_Ineqs->NbRows, Permuted_Ineqs->NbColumns-nb_elim_vars);
@@ -441,6 +449,7 @@ Matrix * full_dimensionize(Matrix const * M, int nb_parms, Matrix ** Validity_La
     value_assign(Full_Dim->p[i][Full_Dim->NbColumns-1], Permuted_Ineqs->p[i][Permuted_Ineqs->NbColumns-1]);
   }
   Matrix_Free(Permuted_Ineqs);
+  show_matrix(Full_Dim);
   // return Full_Dim; 
 
   // 4- Un-permute (so that the parameters are at the end as usual)

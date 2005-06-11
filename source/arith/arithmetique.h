@@ -4,7 +4,7 @@
 
 /* package arithmetique
  *
- * $Id: arithmetique.h,v 1.7 2005/06/03 10:31:07 verdoolaege Exp $
+ * $Id: arithmetique.h,v 1.8 2005/06/11 13:10:20 loechner Exp $
  *
  * Francois Irigoin, mai 1989
  *
@@ -318,6 +318,7 @@ typedef mpz_t Value;
 #define value_notone_p(val)      (mpz_cmp_si(val,1) != 0)
 #define value_mone_p(val)        (mpz_cmp_si(val,-1) ==0)
 #define value_notmone_p(val)     (mpz_cmp_si(val,-1) !=0)
+#define value_cmp_si(val, n)     (mpz_cmp_si(val,n))
 
 /* ************************************************************************* */
 
@@ -415,6 +416,7 @@ typedef mpz_t Value;
 #define value_notone_p(val)   value_ne(val,VALUE_ONE)
 #define value_mone_p(val)     value_eq(val,VALUE_MONE)
 #define value_notmone_p(val)  value_ne(val,VALUE_MONE)
+#define value_cmp_si(val, n)  (val - VALUE_CONST(n))
 #define value_min_p(val)      value_eq(val,VALUE_MIN)
 #define value_max_p(val)      value_eq(val,VALUE_MAX)
 #define value_notmin_p(val)   value_ne(val,VALUE_MIN)
