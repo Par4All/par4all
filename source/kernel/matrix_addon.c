@@ -6,8 +6,7 @@
 
 /* computes c = lcm(a,b) using Gcd(a,b,&c) */
 void B_Lcm(Value a, Value b, Value * c) {
-  Value tmp;
-  value_init(tmp);
+  Value tmp, tmp2;
   if (value_zero_p(a)) {
     value_assign(*c, b);
     return;
@@ -16,11 +15,16 @@ void B_Lcm(Value a, Value b, Value * c) {
     value_assign(*c, a);
     return;
   }
-  else Gcd(a,b,c);
-  value_multiply(tmp,a,b);
-  value_absolute(tmp, tmp);
-  value_division(*c, tmp, *c);
-  value_clear(tmp);
+  else {
+    value_init(tmp);
+    value_init(tmp2);
+    Gcd(a,b,&tmp2);
+    value_multiply(tmp,a,b);
+    value_absolute(tmp, tmp);
+    value_division(*c, tmp, tmp2);
+    value_clear(tmp);
+    value_clear(tmp2);
+  }
 }
 
 // splits a matrix of constraints M into a matrix of equalities Eqs and a matrix of inequalities Ineqs
