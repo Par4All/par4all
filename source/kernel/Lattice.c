@@ -206,7 +206,8 @@ void AffineSmith(Lattice *A, Lattice **U, Lattice **V, Lattice **Diag) {
   Lattice *temp;
   Lattice *Uinv;
   int i,j;
-  Value sum, tmp, quo, rem;
+  Value sum, quo, rem;
+  //, tmp;
   
 #ifdef DOMDEBUG
   FILE *fp;
@@ -215,7 +216,8 @@ void AffineSmith(Lattice *A, Lattice **U, Lattice **V, Lattice **Diag) {
   fclose(fp);
 #endif
   
-  value_init(sum); value_init(tmp);
+  value_init(sum); 
+  // value_init(tmp);
   value_init(quo); value_init(rem);
   temp = Homogenise(A,True);  
   Smith((Matrix *)temp, (Matrix **)U, (Matrix **)V, (Matrix **)Diag);
@@ -244,8 +246,9 @@ void AffineSmith(Lattice *A, Lattice **U, Lattice **V, Lattice **Diag) {
   for (i = 0; i < U[0]->NbRows-1; i ++) {
     value_set_si(sum,0);
     for(j = 0; j < U[0]->NbColumns-1; j ++) {
-      value_multiply(tmp,Uinv->p[i][j],U[0]->p[j][U[0]->NbColumns-1]);
-      value_addto(sum,sum,tmp);
+      // value_multiply(tmp,Uinv->p[i][j],U[0]->p[j][U[0]->NbColumns-1]);
+      // value_addto(sum,sum,tmp);
+      value_addmul(sum, Uinv->p[i][j], U[0]->p[j][U[0]->NbColumns-1]);
     }
     value_assign(Diag[0]->p[i][j],sum);
   }
@@ -275,7 +278,8 @@ void AffineSmith(Lattice *A, Lattice **U, Lattice **V, Lattice **Diag) {
     value_assign( Diag[0]->p[i][Diag[0]->NbColumns-1],rem);
     value_assign(V[0]->p[i][V[0]->NbColumns-1],quo);
   }  
-  value_clear(sum); value_clear(tmp);
+  value_clear(sum); 
+  // value_clear(tmp);
   value_clear(quo); value_clear(rem);
   return;
 } /* AffineSmith */
@@ -928,8 +932,9 @@ static void AddLattice (LatticeUnion *Head, Matrix  *B1,  Matrix *B2, int NumofT
       tempMatrix = (Lattice *)Matrix_Copy(temp->M);	  
       for (j = 0; j < B2->NbRows; j++) {
 	value_set_si(tmp,i);
-	value_multiply(tmp,tmp,B1->p[j][Colnumber]);
-	value_addto(tempMatrix->p[j][B2->NbColumns-1],tempMatrix->p[j][B2->NbColumns-1],tmp);	
+	// value_multiply(tmp,tmp,B1->p[j][Colnumber]);
+	// value_addto(tempMatrix->p[j][B2->NbColumns-1],tempMatrix->p[j][B2->NbColumns-1],tmp);	
+	value_addmul(tempMatrix->p[j][B2->NbColumns-1], tmp, B1->p[j][Colnumber]);
       }
       tail->next = (LatticeUnion *)malloc(sizeof(LatticeUnion)); 
       AffineHermite(tempMatrix,&H,&U);

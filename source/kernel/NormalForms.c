@@ -105,20 +105,21 @@ static void ligne(Value *a,int i,int j,Value x,int n,int p) {
  
   int k;
   Value *c1,*c2;
-  Value tmp;
+  // Value tmp;
 
-  value_init(tmp);
+  // value_init(tmp);
   c1=a+(i-1)*p;
   c2=a+(j-1)*p;
   
   for(k=1;k<=p;k++) {
 
-    value_multiply(tmp,x,*c2);
-    value_addto(*c1,*c1,tmp);
+    // value_multiply(tmp,x,*c2);
+    // value_addto(*c1,*c1,tmp);
+    value_addmul(*c1, x, *c2);
     c1++;
     c2++;
   }
-  value_clear(tmp);
+  // value_clear(tmp);
   return;
 } /* ligne */
 
@@ -134,19 +135,20 @@ static void colonne(Value *a,int i,int j,Value x,int n,int p) {
   
   int k;
   Value *c1,*c2;
-  Value tmp;
+  //  Value tmp;
 
-  value_init(tmp);
+  // value_init(tmp);
   c1=a+(i-1);
   c2=a+(j-1);
   
   for(k=1;k<=n;k++) {
-    value_multiply(tmp,x,*c2);
-    value_addto(*c1,*c1,tmp);
+    // value_multiply(tmp,x,*c2);
+    // value_addto(*c1,*c1,tmp);
+    value_addmul(*c1, x, *c2);
     c1=c1+p;
     c2=c2+p;
   }
-  value_clear(tmp);
+  // value_clear(tmp);
   return;
 } /* colonne */
 	

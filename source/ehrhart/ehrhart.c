@@ -731,9 +731,10 @@ Polyhedron *Polyhedron_Preprocess(Polyhedron *D,Value *size,unsigned MAXRAYS)
     Matrix *M;
     int i, j, d;
     Polyhedron *T, *S, *H, *C;
-    Value *min,tmp;
+    Value *min;
+    //, tmp;
   
-    value_init(tmp);
+    // value_init(tmp);
     d = D->Dimension;
     if (MAXRAYS < 2*D->NbConstraints)
 	MAXRAYS = 2*D->NbConstraints;
@@ -764,8 +765,9 @@ Polyhedron *Polyhedron_Preprocess(Polyhedron *D,Value *size,unsigned MAXRAYS)
         Vector_Copy(D->Constraint[i],M->p[M->NbRows],(d+2));
         for(j=1;j<=d;j++)
             if(value_neg_p(D->Constraint[i][j])) {
-                value_multiply(tmp,D->Constraint[i][j],size[j-1]);
-                value_addto(M->p[M->NbRows][d+1],M->p[M->NbRows][d+1],tmp);
+	      // value_multiply(tmp,D->Constraint[i][j],size[j-1]);
+	      // value_addto(M->p[M->NbRows][d+1],M->p[M->NbRows][d+1],tmp);
+	      value_addmul(M->p[M->NbRows][d+1], D->Constraint[i][j], size[j-1]);
             }
     
         /* If anything changed, add this new constraint */
@@ -783,7 +785,7 @@ Polyhedron *Polyhedron_Preprocess(Polyhedron *D,Value *size,unsigned MAXRAYS)
     if (!T || emptyQ(T)) {
         if(T)
             Polyhedron_Free(T);
-        value_clear(tmp);
+        // value_clear(tmp);
         return(NULL);
     }
   
@@ -814,7 +816,7 @@ Polyhedron *Polyhedron_Preprocess(Polyhedron *D,Value *size,unsigned MAXRAYS)
         {
             for(i=0;i<=(d+1);i++)
                 value_clear(min[i]);
-            value_clear(tmp);
+            // value_clear(tmp);
             return(NULL);
         }
     Domain_Free(S);
@@ -865,7 +867,7 @@ Polyhedron *Polyhedron_Preprocess(Polyhedron *D,Value *size,unsigned MAXRAYS)
     for(i=0;i<=(d+1);i++)
         value_clear(min[i]);
     free(min);
-    value_clear(tmp);
+    // value_clear(tmp);
     return(H);
 } /* Polyhedron_Preprocess */
 
@@ -1098,8 +1100,9 @@ Polyhedron *old_Polyhedron_Preprocess(Polyhedron *D,Value size,unsigned MAXRAYS)
                 Vector_Combine(&(C[ub][1]),&(C[lb][1]),&(M->p[new][1]),
                         b1,abs_a,dim+1);
                 value_multiply(aa,a1,b1);
-                value_multiply(abs_a,aa,size_copy);
-                value_addto(M->p[new][dim+1],M->p[new][dim+1],abs_a);
+                // value_multiply(abs_a,aa,size_copy);
+                // value_addto(M->p[new][dim+1],M->p[new][dim+1],abs_a);
+		value_addmul(M->p[new][dim+1], aa, size_copy);
                 Vector_Normalize(&(M->p[new][1]),(dim+1));
                 new++;
             }

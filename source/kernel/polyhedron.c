@@ -399,7 +399,7 @@ static int Chernikova (Matrix *Mat,Matrix *Ray,SatMatrix *Sat, unsigned NbBid, u
   int *Temp, aux;
   int *ip1, *ip2;
   unsigned bx, m, jx;
-  Value tmp;
+  // Value tmp;
   Value *p1, *p2, *p3;
 
 #ifdef POLY_CH_DEBUG
@@ -411,7 +411,7 @@ static int Chernikova (Matrix *Mat,Matrix *Ray,SatMatrix *Sat, unsigned NbBid, u
   SMPrint(Sat);
 #endif
   
-  value_init(tmp);
+  // value_init(tmp);
   NbConstraints=Mat->NbRows;
   NbRay = Ray->NbRows;
   Dimension = Mat->NbColumns-1;         /* Homogeneous Dimension */
@@ -423,7 +423,7 @@ static int Chernikova (Matrix *Mat,Matrix *Ray,SatMatrix *Sat, unsigned NbBid, u
   Temp=(int *)malloc(RowSize2);
   if(!Temp) {	
     errormsg1("Chernikova", "outofmem", "out of memory space");
-    value_clear(tmp);
+    // value_clear(tmp);
     return 0;
   }
   CATCH(any_exception_error) {
@@ -432,7 +432,7 @@ static int Chernikova (Matrix *Mat,Matrix *Ray,SatMatrix *Sat, unsigned NbBid, u
    * In case of overflow, free the allocated memory!
    * Rethrow upwards the stack to forward the exception.
    */
-    value_clear(tmp);
+    // value_clear(tmp);
     free(Temp);
     RETHROW();
   }
@@ -458,8 +458,9 @@ static int Chernikova (Matrix *Mat,Matrix *Ray,SatMatrix *Sat, unsigned NbBid, u
 	for (j=1; j<Dimension; j++) {	
 	  
 	  /* *p3 +=  *p1 * *p2 */
-	  value_multiply(tmp,*p1,*p2);
-	  value_addto(*p3,*p3,tmp);
+	  // value_multiply(tmp,*p1,*p2);
+	  // value_addto(*p3,*p3,tmp);
+	  value_addmul(*p3, *p1, *p2);
 	  p1++; p2++;
 	}
 	if (value_notzero_p(*p3) && (i<index_non_zero)) 
@@ -739,7 +740,7 @@ static int Chernikova (Matrix *Mat,Matrix *Ray,SatMatrix *Sat, unsigned NbBid, u
   SMPrint (Sat);
 #endif
   
-  value_clear(tmp);
+  // value_clear(tmp);
   return 0;
 } /* Chernikova */
 
@@ -2218,15 +2219,15 @@ static SatMatrix *BuildSat(Matrix *Mat,Matrix *Ray,unsigned NbConstraints,unsign
   SatMatrix *Sat = NULL;
   int i, j, k, jx;
   Value *p1, *p2, *p3;
-  Value tmp;
+  // Value tmp;
   unsigned Dimension, NbRay, bx, nbcolumns;
   
-  value_init(tmp);
+  // value_init(tmp);
   
   CATCH(any_exception_error) {
     if (Sat) 
       SMFree(&Sat);
-    value_clear(tmp);
+    // value_clear(tmp);
     RETHROW();
   }
   TRY {
@@ -2249,8 +2250,9 @@ static SatMatrix *BuildSat(Matrix *Mat,Matrix *Ray,unsigned NbConstraints,unsign
 	p3 = Ray->p[i];
 	value_set_si(*p3,0);
 	for (j=0; j<Dimension; j++) {
-	  value_multiply(tmp,*p1,*p2);
-	  value_addto(*p3,*p3,tmp);
+	  //  value_multiply(tmp,*p1,*p2);
+	  // value_addto(*p3,*p3,tmp);
+	  value_addmul(*p3, *p1, *p2);
 	  p1++; p2++;
 	}
       }
@@ -2266,7 +2268,7 @@ static SatMatrix *BuildSat(Matrix *Mat,Matrix *Ray,unsigned NbConstraints,unsign
   } /* end of TRY */
   
   UNCATCH(any_exception_error);
-  value_clear(tmp);
+  // value_clear(tmp);
   return Sat;
 } /* BuildSat */
 
@@ -2355,9 +2357,11 @@ int PolyhedronIncludes(Polyhedron *Pol1,Polyhedron *Pol2) {
 	
   int Dimension = Pol1->Dimension + 1;   /* Homogenous Dimension */
   int i, j, k;
-  Value *p1, *p2, p3, tmp;
+  Value *p1, *p2, p3;
+  //, tmp;
   
-  value_init(p3); value_init(tmp);
+  value_init(p3); 
+  // value_init(tmp);
   for (k=0; k<Pol1->NbConstraints; k++) {
     for (i=0;i<Pol2->NbRays;i++) {
       
@@ -2366,8 +2370,9 @@ int PolyhedronIncludes(Polyhedron *Pol1,Polyhedron *Pol2) {
       p2 = Pol1->Constraint[k]+1;
       value_set_si(p3,0);
       for(j=0;j<Dimension;j++) {
-	value_multiply(tmp,*p1,*p2);
-	value_addto(p3,p3,tmp);
+	// value_multiply(tmp,*p1,*p2);
+	// value_addto(p3,p3,tmp);
+	value_addmul(p3, *p1,*p2);
 	p1++; p2++;
       }
      
@@ -2376,12 +2381,14 @@ int PolyhedronIncludes(Polyhedron *Pol1,Polyhedron *Pol2) {
       if(value_neg_p(p3) ||
           (value_notzero_p(p3)
              && (value_zero_p(Pol1->Constraint[k][0]) || (value_zero_p(Pol2->Ray[i][0]))   ) )) {
-	value_clear(p3); value_clear(tmp);
+	value_clear(p3); 
+	// value_clear(tmp);
 	return 0;
       }
     }
   } 
-  value_clear(p3); value_clear(tmp);
+  value_clear(p3); 
+  // value_clear(tmp);
   return 1;
 } /* PolyhedronIncludes */
 
@@ -2957,8 +2964,9 @@ static void FindSimple(Polyhedron *P1,Polyhedron *P2,unsigned *Filter,unsigned N
 	    p2 = P1->Constraint[k]+1;
 	    value_set_si(p3,0);
 	    for (j=0; j<Dimension; j++) {
-	      value_multiply(tmp,*p1,*p2);
-	      value_addto(p3,p3,tmp);
+	      // value_multiply(tmp,*p1,*p2);
+	      // value_addto(p3,p3,tmp);
+	      value_addmul(p3, *p1, *p2);
 	      p1++; p2++;
 	    }
 	    if(value_zero_p(p3) ||
@@ -3840,8 +3848,9 @@ static void Rays_Mult(Value **A, Matrix *B, Value **C, unsigned NbRays)
 	for (k=0; k<Dimension1; k++) {
 	  
 	  /* Sum+=A[i][k+1] * B->p[k][j]; */
-	  value_multiply(tmp,A[i][k+1],B->p[k][j]);
-	  value_addto(Sum,Sum,tmp);
+	  // value_multiply(tmp,A[i][k+1],B->p[k][j]);
+	  // value_addto(Sum,Sum,tmp);
+	  value_addto(Sum, A[i][k+1], B->p[k][j]);
 	}
 	value_assign(C[i][j+1],Sum);
       }
@@ -3881,8 +3890,9 @@ static void Rays_Mult_Transpose(Value **A, Matrix *B, Value **C,
 	for (k=0; k<Dimension1; k++) {
 	  
 	  /* Sum+=A[i][k+1] * B->p[j][k]; */
-	  value_multiply(tmp,A[i][k+1],B->p[j][k]);
-	  value_addto(Sum,Sum,tmp);
+	  // value_multiply(tmp,A[i][k+1],B->p[j][k]);
+	  // value_addto(Sum,Sum,tmp);
+	  value_addmul(Sum, A[i][k+1], B->p[j][k]);
 	}
 	value_assign(C[i][j+1],Sum);
       }
@@ -3907,14 +3917,17 @@ Polyhedron *Polyhedron_Preimage(Polyhedron *Pol,Matrix *Func,unsigned NbMaxRays)
   Polyhedron *NewPol = NULL;
   unsigned NbConstraints, Dimension1, Dimension2;
   int i, j, k;
-  Value Sum,tmp;
+  Value Sum;
+  //, tmp;
 
-  value_init(Sum); value_init(tmp);
+  value_init(Sum); 
+  // value_init(tmp);
 
   CATCH(any_exception_error) {
     if (Constraints) Matrix_Free(Constraints);
     if (NewPol) Polyhedron_Free(NewPol);
-    value_clear(Sum); value_clear(tmp);
+    value_clear(Sum); 
+    // value_clear(tmp);
     RETHROW();
   }
   TRY {
@@ -3925,7 +3938,8 @@ Polyhedron *Polyhedron_Preimage(Polyhedron *Pol,Matrix *Func,unsigned NbMaxRays)
     if (Dimension1!=(Func->NbRows)) {
       errormsg1("Polyhedron_Preimage", "dimincomp", "incompatable dimensions");
       UNCATCH(any_exception_error);
-      value_clear(Sum); value_clear(tmp);
+      value_clear(Sum); 
+      // value_clear(tmp);
       return Empty_Polyhedron(Dimension2-1);
     }
     
@@ -3942,7 +3956,8 @@ Polyhedron *Polyhedron_Preimage(Polyhedron *Pol,Matrix *Func,unsigned NbMaxRays)
       errormsg1("Polyhedron_Preimage", "outofmem", "out of memory space\n");
       Pol_status = 1;
       UNCATCH(any_exception_error);
-      value_clear(Sum); value_clear(tmp);
+      value_clear(Sum); 
+      // value_clear(tmp);
       return 0;
     }
     
@@ -3956,8 +3971,9 @@ Polyhedron *Polyhedron_Preimage(Polyhedron *Pol,Matrix *Func,unsigned NbMaxRays)
 	for (k=0; k<Dimension1; k++) {
 	  
 	  /* Sum+=Pol->Constraint[i][k+1] * Func->p[k][j]; */
-	  value_multiply(tmp,Pol->Constraint[i][k+1],Func->p[k][j]);
-	  value_addto(Sum,Sum,tmp);
+	  // value_multiply(tmp,Pol->Constraint[i][k+1],Func->p[k][j]);
+	  // value_addto(Sum,Sum,tmp);
+	  value_addmul(Sum, Pol->Constraint[i][k+1], Func->p[k][j]);
 	}
 	value_assign(Constraints->p[i][j+1],Sum);
       }
@@ -4024,14 +4040,17 @@ Polyhedron *Polyhedron_Image(Polyhedron *Pol, Matrix *Func,unsigned NbMaxConstrs
   Polyhedron *NewPol = NULL;
   unsigned NbRays, Dimension1, Dimension2;
   int i, j, k;
-  Value Sum, tmp;
+  Value Sum;
+  // , tmp;
   
-  value_init(Sum); value_init(tmp);
+  value_init(Sum); 
+  // value_init(tmp);
 
   CATCH(any_exception_error) {
     if (Rays) Matrix_Free(Rays);
     if (NewPol) Polyhedron_Free(NewPol);
-    value_clear(Sum); value_clear(tmp);
+    value_clear(Sum); 
+    // value_clear(tmp);
     RETHROW();
   }
   TRY {
@@ -4042,7 +4061,8 @@ Polyhedron *Polyhedron_Image(Polyhedron *Pol, Matrix *Func,unsigned NbMaxConstrs
     if (Dimension1!=Func->NbColumns) {
       errormsg1("Polyhedron_Image", "dimincomp", "incompatable dimensions");
       UNCATCH(any_exception_error);
-      value_clear(Sum); value_clear(tmp);
+      value_clear(Sum); 
+      // value_clear(tmp);
       return Empty_Polyhedron(Dimension2-1);
     }
     
@@ -4061,7 +4081,8 @@ Polyhedron *Polyhedron_Image(Polyhedron *Pol, Matrix *Func,unsigned NbMaxConstrs
     if (!Rays) {
       errormsg1("Polyhedron_Image", "outofmem", "out of memory space\n");
       UNCATCH(any_exception_error);
-      value_clear(Sum); value_clear(tmp);
+      value_clear(Sum); 
+      // value_clear(tmp);
       return 0;
     }
     
@@ -4074,8 +4095,9 @@ Polyhedron *Polyhedron_Image(Polyhedron *Pol, Matrix *Func,unsigned NbMaxConstrs
 	for (k=0; k<Dimension1; k++) {
 	  
 	  /* Sum+=Pol->Ray[i][k+1] * Func->p[j][k]; */
-	  value_multiply(tmp,Pol->Ray[i][k+1],Func->p[j][k]);
-	  value_addto(Sum,Sum,tmp);
+	  // value_multiply(tmp,Pol->Ray[i][k+1],Func->p[j][k]);
+	  // value_addto(Sum,Sum,tmp);
+	  value_addmul(Sum, Pol->Ray[i][k+1], Func->p[j][k]);
 	}
 	value_assign(Rays->p[i][j+1],Sum);
       }
@@ -4086,7 +4108,8 @@ Polyhedron *Polyhedron_Image(Polyhedron *Pol, Matrix *Func,unsigned NbMaxConstrs
   } /* end of TRY */
   
   UNCATCH(any_exception_error);
-  value_clear(Sum); value_clear(tmp);
+  value_clear(Sum); 
+  // value_clear(tmp);
   return NewPol;
 } /* Polyhedron_Image */
 

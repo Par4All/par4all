@@ -35,7 +35,8 @@ Matrix *CalcBase( Matrix *R )
 	int lnn;
 	int dimbase;
 	int u;		/* vecteur util en cours de calcul */
-	Value  som, t;
+	Value  som;
+	// , t;
 	int c;
 	/* diagonalisation de R : algo du pivot */
 	/* avec conservation des pivots nuls */
@@ -87,16 +88,17 @@ Matrix *CalcBase( Matrix *R )
 			{
 				/* somme des coef deja calcules * coef dans la matrice */
 				value_set_si(som,0);
-				value_init( t );
+				// value_init( t );
 				for( c=l ; c>i ; --c )
 				{
 			       //som += R->p[i][c] * B->p[u][c];
-					value_multiply( t, R->p[i][c] , B->p[u][c]);
-					value_addto(som, som, t );
+				  // value_multiply( t, R->p[i][c] , B->p[u][c]);
+				  // value_addto(som, som, t );
+				  value_addmul(som, R->p[i][c], B->p[u][c]);
 					//B->p[u][c] *= R->p[i][i];
 					value_multiply(B->p[u][c] ,B->p[u][c] , R->p[i][i]);	
 				}
-				value_clear( t );
+				// value_clear( t );
 				value_oppose(B->p[u][i] , som );
 			}
 		}
@@ -524,19 +526,21 @@ Matrix *Reduce_Matrix (Matrix *Mat) {
   /* Computes the scalar product (in euclidien space) of two vectors */ 
   
 void Scalar_product(Value *p1,Value *p2,unsigned length, Value *r) {
-        Value *cp1, *cp2, tmp;
+        Value *cp1, *cp2;
+	// , tmp;
 	
         int i;
           cp1=p1;
        	  cp2=p2;
-	  value_init(tmp);
+	  // value_init(tmp);
 	  value_set_si(*r,0);
                for (i=0;i<length;i++) {
-                 value_multiply(tmp,*cp1,*cp2);    		       
-                 value_addto(*r,*r,tmp);
+                 // value_multiply(tmp,*cp1,*cp2);    		       
+                 // value_addto(*r,*r,tmp);
+		 value_addmul(*r, *cp1, *cp2);
 		  cp1++; cp2++;
 	       }
-	       value_clear(tmp);
+	       // value_clear(tmp);
   } /* Scalar_product */
 
     /* computes the scm of two integrals  */

@@ -427,16 +427,15 @@ Matrix * full_dimensionize(Matrix const * M, int nb_parms, Matrix ** Validity_La
   Matrix_Free(Eqs);
   Matrix_Free(Ineqs);
   mpolyhedron_compress_last_vars(Permuted_Ineqs, Whole_Validity_Lattice);
-  show_matrix(Permuted_Eqs);
-  show_matrix(Whole_Validity_Lattice);
+  // show_matrix(Whole_Validity_Lattice);
 
   // 3- eliminate the first variables
   if (!mpolyhedron_eliminate_first_variables(Permuted_Eqs, Permuted_Ineqs)) {
     fprintf(stderr,"full-dimensionize > variable elimination failed. \n"); 
     return NULL;
   }
-  show_matrix(Permuted_Eqs);
-  show_matrix(Permuted_Ineqs);
+  // show_matrix(Permuted_Eqs);
+  // show_matrix(Permuted_Ineqs);
 
   // 4- get rid of the first (zero) columns, which are now useless, and put the parameters back at the end
   Full_Dim = Matrix_Alloc(Permuted_Ineqs->NbRows, Permuted_Ineqs->NbColumns-nb_elim_vars);
@@ -449,7 +448,7 @@ Matrix * full_dimensionize(Matrix const * M, int nb_parms, Matrix ** Validity_La
     value_assign(Full_Dim->p[i][Full_Dim->NbColumns-1], Permuted_Ineqs->p[i][Permuted_Ineqs->NbColumns-1]);
   }
   Matrix_Free(Permuted_Ineqs);
-  show_matrix(Full_Dim);
+  // show_matrix(Full_Dim);
   // return Full_Dim; 
 
   // 4- Un-permute (so that the parameters are at the end as usual)
