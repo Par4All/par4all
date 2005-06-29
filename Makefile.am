@@ -17,6 +17,7 @@ CFILES= \
 	source/ehrhart/ehrhart.c \
 	source/ehrhart/ext_ehrhart.c \
 	source/ehrhart/eval_ehrhart.c \
+	source/ehrhart/ranking.c \
 	source/kernel/matrix_addon.c \
 	source/kernel/matrix_permutations.c \
 	source/kernel/compress_parms.c \
@@ -64,6 +65,7 @@ ehrhart_union_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
 ehrhart_quick_apx_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
 ehrhart_lower_bound_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
 ehrhart_upper_bound_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
+ehrhart_ranking_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
 
 
 EXTRA_LTLIBRARIES = libpolylib32.la libpolylib64.la libpolylib128.la \
@@ -87,7 +89,8 @@ bin_PROGRAMS = \
 	ehrhart_union \
 	ehrhart_quick_apx \
 	ehrhart_upper_bound \
-	ehrhart_lower_bound
+	ehrhart_lower_bound \
+	ehrhart_ranking
 
 LDADD = @polylib@
 c2p_SOURCES = $(poly_src)/c2p.c
@@ -100,6 +103,7 @@ ehrhart_union_SOURCES = $(poly_src)/ehrhart_union.c
 ehrhart_quick_apx_SOURCES = $(poly_src)/ehrhart_quick_apx.c
 ehrhart_upper_bound_SOURCES =  $(poly_src)/ehrhart_upper_bound.c
 ehrhart_lower_bound_SOURCES =  $(poly_src)/ehrhart_lower_bound.c
+ehrhart_ranking_SOURCES =  $(poly_src)/ehrhart_ranking.c
 testlib_SOURCES = $(poly_src)/testlib.c
 polytest_SOURCES = $(poly_src)/polytest.c
 example_SOURCES = $(poly_src)/example.c
