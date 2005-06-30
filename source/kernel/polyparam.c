@@ -377,12 +377,12 @@ static void traite_m_face(Polyhedron *D,unsigned int *mf) {
   }
   
 #ifdef DEBUGPP41
-  printf("\nRaysDi=\n");
-  Matrix_Print(stdout,P_VALUE_FMT,RaysDi);
+  fprintf(stderr, "\nRaysDi=\n");
+  Matrix_Print(stderr,P_VALUE_FMT,RaysDi);
   if(c < m+1)
-    printf("Invalid ");
-  printf("Pi=\n");
-  Matrix_Print(stdout,P_VALUE_FMT,Pi);
+    fprintf(stderr, "Invalid ");
+  fprintf(stderr, "Pi=\n");
+  Matrix_Print(stderr,P_VALUE_FMT,Pi);
 #endif
   
 #ifdef DEBUGPP4
