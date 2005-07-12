@@ -33,6 +33,7 @@ typedef struct __stack_bucket
     int max_items;              /* the max number of items of this bucket */
     void **items;               /* the items (only pointers at the moment) */
     struct __stack_bucket *succ;/* the next bucket */
+    /* we could keep the privious bucket? */
 }
    _stack_bucket, *_stack_ptr;
 
@@ -212,6 +213,15 @@ stack stack_make(int type, int bucket_size, int policy)
     s->avail = STACK_PTR_NULL;
  
     return(s);
+}
+
+/* duplicate a stack with its contents.
+ */
+stack stack_copy(stack s)
+{
+  stack n = stack_make(s->type, s->bucket_size, s->policy);
+  STACK_MAP_X(i, void*, stack_push(i, n), s, 0);
+  return n;
 }
 
 /* FREEs the stack
