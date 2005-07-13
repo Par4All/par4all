@@ -168,6 +168,21 @@ string concatenate(string next, ...)
     return buffer;
 }
 
+string string_stack_to_string(stack s, bool free_strings)
+{
+  init_the_buffer();
+  STACK_MAP_X(i, string, { append_to_the_buffer(i); if (free_strings) free(i); }, s, 0);
+  return buffer;
+}
+
+string string_list_to_string(list l, bool free_strings)
+{
+  init_the_buffer();
+  gen_map((void(*)()) append_to_the_buffer, l);
+  if (free_strings) gen_map(free, l);
+  return buffer;
+}
+
 string strupper(string s1, string s2)
 {
     char *r = s1;

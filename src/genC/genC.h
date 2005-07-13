@@ -36,7 +36,6 @@
 
 #include "newgen_types.h"
 #include "newgen_set.h"
-#include "newgen_auto_string.h"
 
 /* The size of the management information inside each Newgen object (in
  *  gen_chunks) 
@@ -112,6 +111,7 @@ typedef union gen_chunk {
 
 #include "newgen_list.h"
 #include "newgen_stack.h"
+#include "newgen_auto_string.h"
 
 /* never used I guess. FC 19/04/2000.
 #define TABULATED_MAP(_x,_code,_dom) \
