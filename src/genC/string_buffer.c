@@ -51,5 +51,5 @@ string string_buffer_to_string(string_buffer sb)
 
 void string_buffer_append(string_buffer sb, string s)
 {
-	stack_push(sb->ins, (void*) s);
+	stack_push(s, sb->ins);
 }
