@@ -111,6 +111,7 @@ typedef union gen_chunk {
 
 #include "newgen_list.h"
 #include "newgen_stack.h"
+#include "newgen_string_buffer.h"
 #include "newgen_auto_string.h"
 
 /* never used I guess. FC 19/04/2000.

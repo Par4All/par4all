@@ -104,10 +104,10 @@ void init_the_buffer(void)
      */
     if (buffer_size==0)
     {
-	message_assert("NULL buffer", buffer==NULL);
-	buffer_size = BUFFER_SIZE_INCREMENT;
-	buffer = (string) malloc(buffer_size);
-	message_assert("enough memory", buffer);
+		message_assert("NULL buffer", buffer==NULL);
+		buffer_size = BUFFER_SIZE_INCREMENT;
+		buffer = (string) malloc(buffer_size);
+		message_assert("enough memory", buffer);
     }
     current = 0;
     buffer[0] = '\0';
@@ -121,9 +121,10 @@ string append_to_the_buffer(string s) /* what to append to the buffer */
      */
     if (current+len >= buffer_size)
     {
-	buffer_size = MAX(current+len+1, buffer_size+BUFFER_SIZE_INCREMENT);
-	buffer = realloc(buffer, buffer_size);
-	message_assert("enough memory", buffer);
+		buffer_size = MAX(current+len+1, 
+						  buffer_size+BUFFER_SIZE_INCREMENT);
+		buffer = realloc(buffer, buffer_size);
+		message_assert("enough memory", buffer);
     }
 
     (void) memcpy(&buffer[current], s, len);
@@ -139,7 +140,7 @@ string get_the_buffer(void)
 }
 
 /* concatenation is based on a static dynamic buffer
- * which is shared from one call to another.
+ * which is shared from one call to another. beurk.
  *
  * FC.
  */
@@ -155,11 +156,11 @@ string concatenate(string next, ...)
     va_start(args, next);
     while (next)
     {
-	count++;
-	(void) append_to_the_buffer(next);
-	next = va_arg(args, string);
+		count++;
+		(void) append_to_the_buffer(next);
+		next = va_arg(args, string);
 
-	/* should stop after some count. */
+		/* should stop after some count. */
     }
     va_end(args);
 
@@ -168,34 +169,19 @@ string concatenate(string next, ...)
     return buffer;
 }
 
-string string_stack_to_string(stack s, bool free_strings)
-{
-  init_the_buffer();
-  STACK_MAP_X(i, string, { append_to_the_buffer(i); if (free_strings) free(i); }, s, 0);
-  return buffer;
-}
-
-string string_list_to_string(list l, bool free_strings)
-{
-  init_the_buffer();
-  gen_map((void(*)()) append_to_the_buffer, l);
-  if (free_strings) gen_map(free, l);
-  return buffer;
-}
-
 string strupper(string s1, string s2)
 {
     char *r = s1;
 
     while (*s2) {
-	*s1 = (islower((int)*s2)) ? toupper(*s2) : *s2;
-	s1++;
-	s2++;
+		*s1 = (islower((int)*s2)) ? toupper(*s2) : *s2;
+		s1++;
+		s2++;
     }
 
     *s1 = '\0';
 	
-    return(r);
+    return r;
 }
 
 string strlower(string s1, string s2)
@@ -203,22 +189,19 @@ string strlower(string s1, string s2)
     char *r = s1;
 
     while (*s2) {
-	*s1 = (isupper((int)*s2)) ? tolower(*s2) : *s2;
-	s1++;
-	s2++;
+		*s1 = (isupper((int)*s2)) ? tolower(*s2) : *s2;
+		s1++;
+		s2++;
     }
 
     *s1 = '\0';
 	
-    return(r);
+    return r;
 }
 
 string bool_to_string(bool b)
 {
-    static string t = "TRUE";
-    static string f = "FALSE";
-
-    return b?t:f;
+    return b? "TRUE": "FALSE";
 }
 
 /* @return the english suffix for i.

@@ -3,7 +3,7 @@
 # Newgen should be quite particular...
 #
 
-############################################################## STANDARD DEFINES
+########################################################## STANDARD DEFINES
 
 LIB_HEADERS=\
         genC.h \
@@ -17,7 +17,8 @@ LIB_HEADERS=\
         newgen_generic_function.h \
         newgen_map.h \
         newgen_stack.h \
-	newgen_array.h
+	newgen_array.h \
+	newgen_string_buffer.h
 
 DERIVED_LIB_HEADERS	= \
 	newgen_auto_string.h
@@ -51,6 +52,7 @@ LIB_CFILES=\
         stack.c \
 	array.c \
 	string.c \
+	string_buffer.c \
 	$(DERIVED_CFILES)
 
 OTHER_CFILES=\
