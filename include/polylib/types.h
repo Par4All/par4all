@@ -39,7 +39,7 @@
 #elif defined(LINEAR_VALUE_IS_INT) 
 #define P_VALUE_FMT "%4d "
 #else  /* GNUMP */
-#define P_VALUE_FMT "%4s"
+#define P_VALUE_FMT "%4s "
 #endif
 
 /* Used in lower_upper_bounds */
