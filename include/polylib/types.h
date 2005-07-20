@@ -90,7 +90,7 @@ typedef struct interval {
 #define emptyQ(P) (P->NbRays==0)
 
 /* Test whether P is a universe polyheron */
-#define universeQ(P) (P->Dimension==P->NbLines)
+#define universeQ(P) (P->Dimension==P->NbBid)
 
 typedef struct _Param_Vertex {  	
   Matrix *Vertex; /* Each row is a coordinate of the vertex. The first  */
