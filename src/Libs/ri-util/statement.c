@@ -8,6 +8,9 @@
     $Id$
 
     $Log: statement.c,v $
+    Revision 1.79  2005/07/27 16:45:48  irigoin
+    Functions write_statement_p() and whileloop_statement_p() added.
+
     Revision 1.78  2004/02/18 10:28:17  keryell
     I stole lock to install ri-util
 
@@ -277,6 +280,15 @@ statement s;
 }
 
 bool 
+write_statement_p(s)
+statement s;
+{
+    instruction i = statement_instruction(s);
+
+    return (fortran_instruction_p(i, WRITE_FUNCTION_NAME));
+}
+
+bool 
 statement_less_p(st1, st2)
 statement st1, st2;
 {
@@ -337,6 +349,13 @@ statement_loop_p(s)
 statement s;
 {
     return(instruction_loop_p(statement_instruction(s)));
+}
+
+bool 
+statement_whileloop_p(s)
+statement s;
+{
+    return(instruction_whileloop_p(statement_instruction(s)));
 }
 
 bool 
