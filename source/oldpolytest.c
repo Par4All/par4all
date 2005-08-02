@@ -56,7 +56,7 @@ static int exist_points(int pos,Polyhedron *Pol,Value *context) {
     return 0;
   }  
   if (!Pol->next) {
-    value_substract(tmp,UB,LB);
+    value_subtract(tmp,UB,LB);
     value_increment(tmp,tmp);
     value_clear(UB);
     value_clear(LB);

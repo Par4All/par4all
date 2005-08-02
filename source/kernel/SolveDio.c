@@ -126,7 +126,7 @@ int SolveDiophantine(Matrix *M, Matrix **U, Vector **X) {
       // value_addto(sum,sum,tmp);
       value_addmul(sum, T[j], hermi->p[i][j]);
     } 
-    value_substract(tmp,C[i],sum);
+    value_subtract(tmp,C[i],sum);
     value_modulus(tmp,tmp,hermi->p[i][i]);
     if (value_notzero_p(tmp)) { /* no solution to the equation */
       *U = Matrix_Alloc(0,0);
@@ -140,7 +140,7 @@ int SolveDiophantine(Matrix *M, Matrix **U, Vector **X) {
       free(T);
       return (-1);
     };
-    value_substract(tmp,C[i],sum);
+    value_subtract(tmp,C[i],sum);
     value_division(T[i],tmp,hermi->p[i][i]);
     // value_assign(T[i],tmp);
   }

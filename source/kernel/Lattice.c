@@ -1045,7 +1045,7 @@ int FindHermiteBasisofDomain(Polyhedron *A, Matrix **B) {
   vert = Matrix_Alloc(temp->NbRows-1, temp->NbColumns);
   for (i = 1; i < temp->NbRows; i++)
     for (j = 0; j < temp->NbColumns ; j++)
-      value_substract(vert->p[i-1][j],temp->p[0][j],temp->p[i][j]);
+      value_subtract(vert->p[i-1][j],temp->p[0][j],temp->p[i][j]);
   
   /* Add the Rays and Lines */
   /* Combined Matrix */  
@@ -1184,7 +1184,7 @@ Lattice *LatticePreimage(Lattice *L, Matrix *G) {
   
   for (i = 0; i < Dio->NbRows-1; i++) {
     value_multiply(tmp,divisor,L->p[i][L->NbColumns-1]);
-    value_substract(tmp,G->p[i][G->NbColumns-1],tmp);
+    value_subtract(tmp,G->p[i][G->NbColumns-1],tmp);
     value_assign(Dio->p[i][Dio->NbColumns-1],tmp);
   }
   for (i = 0; i < Dio->NbColumns-1; i++)

@@ -1020,7 +1020,7 @@ Polyhedron *Polyhedron_Preprocess2(Polyhedron *D,Value *size,Value *lcm,unsigned
         return(NULL);
     }
     for(i=0;i<D->Dimension;i++) {
-        value_substract(c->p[2*i+1][D->Dimension+1],size[i], 
+        value_subtract(c->p[2*i+1][D->Dimension+1],size[i], 
                 c->p[2*i][D->Dimension+1]);
     }
   
@@ -1173,7 +1173,7 @@ void count_points (int pos,Polyhedron *P,Value *context, Value *res) {
 	return;  
     }  
     if (!P->next) {
-        value_substract(k,UB,LB);
+        value_subtract(k,UB,LB);
         value_add_int(k,k,1);
 	value_assign(*res, k);
         value_clear(LB); value_clear(UB); value_clear(k);
@@ -1279,7 +1279,7 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
       value_sub_int(nLB,nUB,1);
       value_set_si(hdv,hdim);
       value_multiply(tmp,hdv,lcm_copy);
-      value_substract(nLB,nLB,tmp);
+      value_subtract(nLB,nLB,tmp);
       if(value_pos_p(nLB))
 	value_set_si(nLB,0);
     }
@@ -1311,7 +1311,7 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
     fprintf(stderr,"\n");
 #endif
 
-    value_substract(n,nUB,nLB);
+    value_subtract(n,nUB,nLB);
     value_increment(n,n);
     
 #ifdef EDEBUG 
@@ -1390,7 +1390,7 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
   }
   
   /* noff is a multiple of lcm */
-  value_substract(noff,nLB,nlcm);
+  value_subtract(noff,nLB,nlcm);
   value_addto(tmp,lcm_copy,nlcm);
   for (value_assign(k,nlcm);value_lt(k,tmp);value_increment(k,k)) {
  
@@ -1561,7 +1561,7 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
     if(value_lt(k,lcm_copy))
       value_assign(k1,k);
     else
-      value_substract(k1,k,lcm_copy);
+      value_subtract(k1,k,lcm_copy);
     
     for (i=0; i<rank; i++) {
       

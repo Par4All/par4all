@@ -145,7 +145,7 @@ void mpolyhedron_inflate(Matrix * polyh, unsigned int nb_parms) {
 	value_addto(infl, infl, polyh->p[i][j]);
     }
     // here, we substract a negative value
-    value_substract(polyh->p[i][polyh->NbColumns-1], polyh->p[i][polyh->NbColumns-1], infl);
+    value_subtract(polyh->p[i][polyh->NbColumns-1], polyh->p[i][polyh->NbColumns-1], infl);
   }
   value_clear(infl);
 } // mpolyhedron_inflate
@@ -166,7 +166,7 @@ void mpolyhedron_deflate(Matrix * polyh, unsigned int nb_parms) {
 	value_addto(defl, defl, polyh->p[i][j]);
     }
     // here, we substract a negative value
-    value_substract(polyh->p[i][polyh->NbColumns-1], polyh->p[i][polyh->NbColumns-1], defl);
+    value_subtract(polyh->p[i][polyh->NbColumns-1], polyh->p[i][polyh->NbColumns-1], defl);
   }
   value_clear(defl);
 } // mpolyhedron_deflate
@@ -201,7 +201,7 @@ void eliminate_var_with_constr(Matrix * Eliminator, unsigned int eliminator_row,
     for (k=1; k<Victim->NbColumns; k++) {
       value_multiply(tmp, Victim->p[victim_row][k], mul_a);
       value_multiply(tmp2, Eliminator->p[eliminator_row][k], mul_b);
-      value_substract(Victim->p[victim_row][k], tmp, tmp2);
+      value_subtract(Victim->p[victim_row][k], tmp, tmp2);
       // = Victim->p[victim_row][k] * mul_a -  Eliminator->p[eliminator_row][k] * mul_b;
     }
   }

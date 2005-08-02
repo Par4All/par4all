@@ -176,7 +176,7 @@ static int TestRank(Matrix *Mat) {
 	/* pour tous les indices i > k */
 	value_multiply(m1,Mat->p[j][i],Mat->p[k][k]);
 	value_multiply(m2,Mat->p[j][k],Mat->p[k][i]);
-	value_substract(m3,m1,m2);
+	value_subtract(m3,m1,m2);
 	value_division(Mat->p[j][i],m3,gcd);
       }
     }   
@@ -917,7 +917,7 @@ Polyhedron *Elim_Columns(Polyhedron *A,Polyhedron *E,int *p,int *ref) {
 	for(i=1;i<M->NbColumns;++i) {
 	  value_multiply(tmp1,M->p[c][i],E->Constraint[l][p[l]]);
 	  value_multiply(tmp2,E->Constraint[l][i],M->p[c][p[l]]);
-	  value_substract(M->p[c][i],tmp1,tmp2);
+	  value_subtract(M->p[c][i],tmp1,tmp2);
 	}
       }
     }

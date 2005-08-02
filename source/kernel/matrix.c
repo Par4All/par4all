@@ -306,14 +306,14 @@ static int hermite(Matrix *H,Matrix *U,Matrix *Q) {
 	      value_division(x,x,pivot);
 	    for (j=0; j<nc; j++) {
 	      value_multiply(aux,x,H->p[rank][j]);
-	      value_substract(H->p[i][j],H->p[i][j],aux);
+	      value_subtract(H->p[i][j],H->p[i][j],aux);
 	    }
 	    
 	    /* U->p[i][j] -= (x * U->p[rank][j]); */
 	    if (U)
 	      for (j=0; j<nr; j++) {
 		value_multiply(aux,x,U->p[rank][j]);
-		value_substract(U->p[i][j],U->p[i][j],aux);
+		value_subtract(U->p[i][j],U->p[i][j],aux);
 	      }
 	    
 	    /* Q->p[rank][j] += (x * Q->p[i][j]); */
@@ -359,14 +359,14 @@ static int hermite(Matrix *H,Matrix *U,Matrix *Q) {
 	  /* H->p[i][j] -= x * H->p[rank][j]; */
 	  for (j=0; j<nc; j++) {
 	    value_multiply(aux,x,H->p[rank][j]);
-	    value_substract(H->p[i][j],H->p[i][j],aux);
+	    value_subtract(H->p[i][j],H->p[i][j],aux);
 	  }
 	  
 	  /* U->p[i][j] -= x * U->p[rank][j]; */
 	  if (U)
 	    for (j=0; j<nr; j++) {
 	      value_multiply(aux,x,U->p[rank][j]);
-	      value_substract(U->p[i][j],U->p[i][j],aux);
+	      value_subtract(U->p[i][j],U->p[i][j],aux);
 	    }
 	  
 	  /* Q->p[rank][j] += x * Q->p[i][j]; */
@@ -636,12 +636,12 @@ int MatInverse(Matrix *Mat,Matrix *MatInv ) {
 	for(c=((j>i)?i:0);c<k;++c) {
 	  value_multiply(m1,piv,Mat->p[j][c]);
 	  value_multiply(m2,x,Mat->p[i][c]);
-	  value_substract(Mat->p[j][c],m1,m2); 
+	  value_subtract(Mat->p[j][c],m1,m2); 
 	}
 	for(c=0;c<k;++c) {
 	  value_multiply(m1,piv,MatInv->p[j][c]);
 	  value_multiply(m2,x,MatInv->p[i][c]);
-	  value_substract(MatInv->p[j][c],m1,m2);
+	  value_subtract(MatInv->p[j][c],m1,m2);
 	}
 	      
 	/* Simplify row(j) of the two matrices 'Mat' and 'MatInv' by */
@@ -965,12 +965,12 @@ int Matrix_Inverse(Matrix *Mat,Matrix *MatInv ) {
 	for(c=((j>i)?i:0);c<k;++c) {
 	  value_multiply(m1,piv,Mat->p[j][c]);
 	  value_multiply(m2,x,Mat->p[i][c]);
-	  value_substract(Mat->p[j][c],m1,m2); 
+	  value_subtract(Mat->p[j][c],m1,m2); 
 	}
 	for(c=0;c<k;++c) {
 	  value_multiply(m1,piv,MatInv->p[j][c]);
 	  value_multiply(m2,x,MatInv->p[i][c]);
-	  value_substract(MatInv->p[j][c],m1,m2);
+	  value_subtract(MatInv->p[j][c],m1,m2);
 	}
 	      
 	/* Simplify row(j) of the two matrices 'Mat' and 'MatInv' by */

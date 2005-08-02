@@ -247,7 +247,7 @@ int main(int argc,char *argv[]) {
 
 #ifndef PRINT_ALL_RESULTS
   if(C->Dimension > 0) {
-    value_substract(tmp,max,min);
+    value_subtract(tmp,max,min);
     if (VALUE_TO_INT(tmp) > 80)
       st = 1+(VALUE_TO_INT(tmp))/80;
     else

@@ -296,7 +296,7 @@ void Vector_Sub(Value *p1,Value *p2,Value *p3,unsigned length) {
   for (i=0;i<length;i++) {
     
     /* *cp3++= *cp1++ - *cp2++ */
-    value_substract(*cp3,*cp1,*cp2);
+    value_subtract(*cp3,*cp1,*cp2);
     cp1++; cp2++; cp3++;
   }
 } /* Vector_Sub */

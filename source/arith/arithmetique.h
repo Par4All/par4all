@@ -4,7 +4,7 @@
 
 /* package arithmetique
  *
- * $Id: arithmetique.h,v 1.8 2005/06/11 13:10:20 loechner Exp $
+ * $Id: arithmetique.h,v 1.9 2005/08/02 16:13:57 verdoolaege Exp $
  *
  * Francois Irigoin, mai 1989
  *
@@ -288,7 +288,7 @@ typedef mpz_t Value;
 #define value_addmul(ref, val1, val2)   (mpz_addmul((ref), (val1), (val2)))
 #define value_increment(ref,val)       (mpz_add_ui((ref),(val),1))
 #define value_multiply(ref,val1,val2)  (mpz_mul((ref),(val1),(val2)))
-#define value_substract(ref,val1,val2) (mpz_sub((ref),(val1),(val2)))
+#define value_subtract(ref,val1,val2) (mpz_sub((ref),(val1),(val2)))
 #define value_sub_int(ref,val,vint)     (mpz_sub_ui((ref),(val),(long)(vint)))
 #define value_decrement(ref,val)       (mpz_sub_ui((ref),(val),1))
 #define value_division(ref,val1,val2)  (mpz_tdiv_q((ref),(val1),(val2)))
@@ -380,7 +380,7 @@ typedef mpz_t Value;
 #define value_increment(ref,val) 	((ref) = (val)+VALUE_ONE)
 #define value_direct_product(ref,val1,val2) ((ref) = (val1)*(val2)) /* direct! */
 #define value_multiply(ref,val1,val2)	((ref) = value_mult((val1),(val2)))
-#define value_substract(ref,val1,val2) 	((ref) = (val1)-(val2))
+#define value_subtract(ref,val1,val2) 	((ref) = (val1)-(val2))
 #define value_sub_int(ref,val,vint)     ((ref) = (val)-(Value)(vint))
 #define value_decrement(ref,val) 	((ref) = (val)-VALUE_ONE)
 #define value_division(ref,val1,val2) 	((ref) = (val1)/(val2))
@@ -523,8 +523,8 @@ typedef mpz_t Value;
 #define value_mod(v1,v2) value_fake_binary(v1,v2)
 #undef value_addto
 #define value_addto(v1,v2) value_assign(v1,value_plus(v1,v2))
-#undef value_substract
-#define value_substract(v1,v2) value_addto(v1,v2)
+#undef value_subtract
+#define value_subtract(v1,v2) value_addto(v1,v2)
 #undef value_product
 #define value_product(v1,v2) value_addto(v1,v2)
 #undef value_modulus
@@ -549,6 +549,8 @@ typedef mpz_t Value;
 #define value_rshift(v1,v2) value_fake_binary(v1,v2)
 #endif 
 
+/* for backward compatibility */
+#define value_substract(ref,val1,val2) (value_subtract((ref),(val1),(val2)))
 
 /* valeur absolue
  */

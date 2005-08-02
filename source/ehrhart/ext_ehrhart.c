@@ -294,7 +294,7 @@ static void Soustraire_ligne(Matrix *R, int l1, int l2, int piv )
 		//R->p[l2][i] = a*R->p[l2][i] - b*R->p[l1][i];
 		value_multiply(t,b,R->p[l1][i]);
 		value_multiply(R->p[l2][i],a,R->p[l2][i]);
-		value_substract(R->p[l2][i],R->p[l2][i],t);
+		value_subtract(R->p[l2][i],R->p[l2][i],t);
 		//p = pgcd( p, R->p[l2][i] );
 		Gcd(p, R->p[l2][i], &p );
 	}
@@ -613,7 +613,7 @@ void ppcm(Value a, Value b, Value *r) {
 		}
 	              		  
 	           for(k=0;k<length;k++) {
-	               value_substract(q->p[k],q->p[k],p->p[k]);
+	               value_subtract(q->p[k],q->p[k],p->p[k]);
 		   }
 				
             }
@@ -949,7 +949,7 @@ Enumeration *Polyhedron_Image_Enumerate(Polyhedron *D,  Polyhedron *C, Matrix *T
 		            value_oppose( NCont->p[k], D->Constraint[j][k]);
 					}
 		       value_decrement(val,h);
-		       value_substract(val,val,D->Constraint[j][D->Dimension+1]);
+		       value_subtract(val,val,D->Constraint[j][D->Dimension+1]);
 		       value_assign (NCont->p[D->Dimension+1],val);
 		       value_clear(val);
                         //add the new constraint to polyhedron D

@@ -15,14 +15,14 @@ void b_modulo(Value g, Value a, Value b) {
   if (value_posz_p(a)) {
     value_division(g,a,b);
     value_multiply(g,g,b);
-    value_substract(g, a, g);
+    value_subtract(g, a, g);
     return;
   }
   else {
     value_division(g, a, b);
     value_decrement(g, g);
     value_multiply(g, g, b);
-    value_substract(g, a, g);
+    value_subtract(g, a, g);
     //  g =a-(a/b-1)*b;
     if (value_eq(g,b)) value_set_si(g,0);
   }
