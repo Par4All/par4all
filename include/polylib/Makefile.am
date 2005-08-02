@@ -23,6 +23,7 @@ polyinclude_HEADERS = \
 	polylib64.h \
 	polylibgmp.h \
 	polyparam.h \
+	ranking.h \
 	types.h \
 	vector.h
 
