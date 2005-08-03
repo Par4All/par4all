@@ -126,7 +126,7 @@ Enumeration *Ranking(Matrix * Constraints, Matrix * C, Matrix * M,
   ranking = Domain_Enumerate(P1, C1, MAXRAYS, param_name);
 
   // 4- clean up
-  Polyhedron_Free(P1);
+  Domain_Free(P1);
   Polyhedron_Free(C1);
   Matrix_Free(cur_element);
   Matrix_Free(C_times_J);
