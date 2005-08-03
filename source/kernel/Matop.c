@@ -275,16 +275,16 @@ Matrix *AddANullColumn(Matrix *M) {
  */
 Matrix *RemoveRow(Matrix *M, int Rownumber) {
   
-  Matrix *temp, *Result;
-  int i,j;
+  Matrix *Result;
+  int i;
   
-  temp = Matrix_Copy (M);
-  PutRowLast(temp, Rownumber); 
-  Result = Matrix_Alloc(temp->NbRows-1, temp->NbColumns);
+  Result = Matrix_Alloc(M->NbRows-1, M->NbColumns);
   
-  for (i = 0; i < Result->NbRows; i ++)
-    for (j = 0; j < Result->NbColumns; j ++)
-      value_assign(Result->p[i][j],temp->p[i][j]);   
+  for (i = 0; i < Rownumber; i++)
+    Vector_Copy(M->p[i], Result->p[i], M->NbColumns);
+  for ( ; i < Result->NbRows; i++)
+    Vector_Copy(M->p[i+1], Result->p[i], M->NbColumns);
+
   return Result;
 } /* RemoveRow */
 
@@ -293,16 +293,16 @@ Matrix *RemoveRow(Matrix *M, int Rownumber) {
  */
 Matrix *RemoveColumn (Matrix *M, int Columnnumber) {
   
-  Matrix *temp, *Result;
-  int i,j;
+  Matrix *Result;
+  int i;
   
-  temp = Matrix_Copy(M);
-  PutColumnLast(temp,Columnnumber); 
-  Result = Matrix_Alloc (temp->NbRows, temp->NbColumns-1);
+  Result = Matrix_Alloc (M->NbRows, M->NbColumns-1);
   
-  for (i = 0; i < Result->NbRows; i ++)
-    for (j = 0; j < Result->NbColumns; j ++)
-      value_assign(Result->p[i][j],temp->p[i][j]);   
+  for (i = 0; i < Result->NbRows; i++) {
+    Vector_Copy(M->p[i], Result->p[i], Columnnumber);
+    Vector_Copy(M->p[i]+Columnnumber, Result->p[i]+Columnnumber, 
+		M->NbColumns-1-Columnnumber);
+  }
   return Result;
 } /* RemoveColumn */
 
