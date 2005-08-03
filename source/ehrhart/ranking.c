@@ -4,6 +4,7 @@
 // HiPEAC Network
 
 #include <polylib/polylib.h>
+#include <polylib/ranking.h>
 
 
 // given the constraints of a polyhedron P (the matrix Constraints), returns the number of points that are lexicographically stricly lesser than a point I of P,
