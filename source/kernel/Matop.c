@@ -41,20 +41,15 @@ Matrix *Identity (unsigned size) {
 void ExchangeRows(Matrix *M, int Row1, int Row2) {
   
   int i;
-  Value *temp;
+  Value temp;
   
-  temp = (Value *) malloc (sizeof(Value) * M->NbColumns);
-  
-  for (i = 0 ;i < (int)M->NbColumns; i++) {
-    value_init(temp[i]);
-    value_assign(temp[i],M->p[Row1][i]);
-  }
+  value_init(temp);
   for (i = 0; i < (int)M->NbColumns;  i++) {
+    value_assign(temp,M->p[Row1][i]);
     value_assign(M->p[Row1][i],M->p[Row2][i]);
-    value_assign(M->p[Row2][i],temp[i]);
-    value_clear(temp[i]);
+    value_assign(M->p[Row2][i],temp);
   }  
-  free (temp);
+  value_clear(temp);
   return ;
 } /* ExchangeRows */
 
@@ -64,19 +59,15 @@ void ExchangeRows(Matrix *M, int Row1, int Row2) {
 void ExchangeColumns(Matrix *M, int Column1, int Column2) {
   
   int i;
-  Value *temp;
+  Value temp;
   
-  temp = (Value *) malloc(sizeof(Value) * M->NbRows);
-  for (i = 0 ;i < (int) M->NbRows; i++) {
-    value_init(temp[i]);
-    value_assign(temp[i],M->p[i][Column1]);
-  } 
+  value_init(temp);
   for (i = 0; i < (int)M->NbRows; i++) {
-      value_assign(M->p[i][Column1],M->p[i][Column2]);
-      value_assign(M->p[i][Column2],temp[i]);
-      value_clear(temp[i]);
-    }
-  free (temp);
+    value_assign(temp,M->p[i][Column1]);
+    value_assign(M->p[i][Column1],M->p[i][Column2]);
+    value_assign(M->p[i][Column2],temp);
+  }
+  value_clear(temp);
   return ;
 } /* ExchangeColumns */
 
@@ -170,25 +161,19 @@ Bool isinHnf(Matrix *A) {
 void PutRowLast (Matrix *X, int Rownumber) {
   
   int i, j ;
-  Value *vector;
+  Value temp;
  
   if (Rownumber == X->NbRows-1)
     return;
-  vector = (Value *) malloc (sizeof(Value) * X->NbColumns); 
   
-  for (i = 0; i < X->NbColumns; i++) {
-    value_init(vector[i]);
-    value_assign(vector[i],X->p[Rownumber][i]);
-  }    
-  for (i = Rownumber; i < X->NbRows-1; i++)
-    for (j = 0; j < X->NbColumns; j++)
+  value_init(temp);
+  for (j = 0; j < X->NbColumns; j++) {
+    value_assign(temp,X->p[Rownumber][j]);
+    for (i = Rownumber; i < X->NbRows-1; i++)
       value_assign(X->p[i][j],X->p[i+1][j]);
-  
-  for (j = 0; j < X->NbColumns ; j++) {
-    value_assign(X->p[i][j],vector[j]);
-    value_clear(vector[j]);
-  }    
-  free (vector);
+    value_assign(X->p[i][j],temp);
+  }
+  value_clear(temp);
   return;
 } /* PutRowLast */
 
@@ -198,23 +183,16 @@ void PutRowLast (Matrix *X, int Rownumber) {
 void PutRowFirst(Matrix *X, int Rownumber) {
   
   int i, j ;
-  Value *vector;
+  Value temp;
 
-  vector = (Value *) malloc (sizeof(Value) * X->NbColumns); 
-  
-  for (i = 0; i < X->NbColumns; i++) {
-    value_init(vector[i]);
-    value_assign(vector[i],X->p[Rownumber][i]);
-  }  
-  for (i = Rownumber; i > 0; i--)
-    for (j = 0; j < X->NbColumns; j++)
+  value_init(temp);
+  for (j = 0; j < X->NbColumns; j++) {
+    value_assign(temp,X->p[Rownumber][j]);
+    for (i = Rownumber; i > 0; i--)
       value_assign(X->p[i][j],X->p[i-1][j]);
-  
-  for (j = 0; j < X->NbColumns ; j++) {
-    value_assign(X->p[i][j],vector[j]);
-    value_clear(vector[j]);
-  } 
-  free(vector);
+    value_assign(X->p[i][j],temp);
+  }
+  value_clear(temp);
   return;
 } /* PutRowFirst */
 
@@ -225,24 +203,16 @@ void PutRowFirst(Matrix *X, int Rownumber) {
 void PutColumnFirst (Matrix *X, int Columnnumber) {
   
   int i, j ;
-  Value *vector;
+  Value temp;
 
-  vector = (Value *)malloc(sizeof (Value) * X->NbRows); 
-  
-  for (i = 0; i < X->NbRows; i++) {
-    value_init(vector[i]);
-    value_assign(vector[i],X->p[i][Columnnumber]);
-  }
-  
-  for (i = 0; i < X->NbRows; i ++)
+  value_init(temp);
+  for (i = 0; i < X->NbRows; i ++) {
+    value_assign(temp,X->p[i][Columnnumber]);
     for (j = Columnnumber; j > 0; j --)
       value_assign(X->p[i][j],X->p[i][j-1]);
-  
-  for (i = 0; i < X->NbRows ; i ++) {
-    value_assign(X->p[i][0],vector[i]);
-    value_clear(vector[i]);
-  }    
-  free (vector);
+    value_assign(X->p[i][0],temp);
+  }
+  value_clear(temp);
   return ;
 } /* PutColumnFirst */
 
@@ -252,24 +222,16 @@ void PutColumnFirst (Matrix *X, int Columnnumber) {
 void PutColumnLast (Matrix *X, int Columnnumber) {
   
   int i, j ;
-  Value *vector;
+  Value temp;
 
-  vector = (Value *) malloc (sizeof (Value) * X->NbRows); 
-  
+  value_init(temp);
   for (i = 0; i < X->NbRows; i++) {
-    value_init(vector[i]);
-    value_assign(vector[i],X->p[i][Columnnumber]);
-  }    
-  
-  for (i = 0; i < X->NbRows; i++)
+    value_assign(temp,X->p[i][Columnnumber]);
     for (j = Columnnumber; j < X->NbColumns-1; j++)
       value_assign(X->p[i][j],X->p[i][j+1]);
-  
-  for (i = 0; i < X->NbRows ; i++) {
-    value_assign(X->p[i][X->NbColumns-1],vector[i]);
-    value_clear(vector[i]);
-  }  
-  free (vector);
+    value_assign(X->p[i][X->NbColumns-1],temp);
+  }
+  value_clear(temp);
   return ;
 } /* PutColumnLast */
 
