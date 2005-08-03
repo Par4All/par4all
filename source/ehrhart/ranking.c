@@ -11,7 +11,9 @@
 // where M is an integer matrix provided by the user.
 // J are the n' first variables of the returned Ehrhart polynomial.
 // If M is NULL, I = J is taken by default.
-Enumeration *Ranking(Matrix * Constraints, Matrix * C, Matrix * M, unsigned MAXRAYS, char ** param_name) {
+Enumeration *Ranking(Matrix * Constraints, Matrix * C, Matrix * M, 
+		     unsigned MAXRAYS, char ** param_name) 
+{
   unsigned i,j,k;
   unsigned nb_parms = C->NbColumns -2;
   unsigned nb_vars = Constraints->NbColumns-C->NbColumns;
@@ -20,20 +22,31 @@ Enumeration *Ranking(Matrix * Constraints, Matrix * C, Matrix * M, unsigned MAXR
   Matrix * cur_element, * C_times_J, * Klon;
   Polyhedron * P1, *C1;
   Polyhedron * lexico_lesser_union = NULL;
-  if (M) assert(M->NbRows==nb_vars);
 
-  if (M) nb_new_parms = M->NbColumns-C->NbColumns+1;
-  else nb_new_parms = nb_vars;
+  if (M)
+    assert(M->NbRows==nb_vars);
+
+  if (M)
+    nb_new_parms = M->NbColumns-C->NbColumns+1;
+  else
+    nb_new_parms = nb_vars;
 
   // the number of variables must be positive
-  if (nb_vars<=0) { printf("\nRanking > No variables, returning NULL.\n"); return NULL;}
-  cur_element = Matrix_Alloc(Constraints->NbRows+nb_vars, Constraints->NbColumns+nb_new_parms);
+  if (nb_vars<=0) {
+    printf("\nRanking > No variables, returning NULL.\n"); 
+    return NULL;
+  }
+  cur_element = Matrix_Alloc(Constraints->NbRows+nb_vars, 
+			     Constraints->NbColumns+nb_new_parms);
 
 
   // 0- Put P in the first rows of cur_element
   for (i=0; i< Constraints->NbRows; i++) {
-    for (j=0; j< nb_vars+1; j++) value_assign(cur_element->p[i][j], Constraints->p[i][j]);
-    for (j=0; j< nb_parms+1; j++) value_assign(cur_element->p[i][j+nb_vars+nb_new_parms+1], Constraints->p[i][j+nb_vars+1]);
+    for (j=0; j< nb_vars+1; j++)
+      value_assign(cur_element->p[i][j], Constraints->p[i][j]);
+    for (j=0; j< nb_parms+1; j++)
+      value_assign(cur_element->p[i][j+nb_vars+nb_new_parms+1], 
+		   Constraints->p[i][j+nb_vars+1]);
   }
 
   // 1- compute the Ehrhart polynomial of each disjoint polyhedron defining the lexicographic order
@@ -52,9 +65,11 @@ Enumeration *Ranking(Matrix * Constraints, Matrix * C, Matrix * M, unsigned MAXR
     value_set_si(cur_element->p[Constraints->NbRows+k][0], 1);
     value_set_si(cur_element->p[Constraints->NbRows+k][k+1], -1);
     if (M) {
-      for (j=0; j< M->NbColumns; j++) value_assign(cur_element->p[Constraints->NbRows+k][j+nb_vars+1], M->p[k][j]);
+      for (j=0; j< M->NbColumns; j++)
+	value_assign(cur_element->p[Constraints->NbRows+k][j+nb_vars+1], M->p[k][j]);
     }
-    else value_set_si(cur_element->p[Constraints->NbRows+k][nb_vars+k+1], 1);
+    else
+      value_set_si(cur_element->p[Constraints->NbRows+k][nb_vars+k+1], 1);
     value_decrement(cur_element->p[Constraints->NbRows+k][cur_element->NbColumns-1], cur_element->p[Constraints->NbRows+k][cur_element->NbColumns-1]); // we want a strict inequality
     show_matrix(cur_element);
 
@@ -73,7 +88,8 @@ Enumeration *Ranking(Matrix * Constraints, Matrix * C, Matrix * M, unsigned MAXR
   // copy the initial context while adding the new parameters
   for (i=0; i< C->NbRows; i++) {
     value_assign(C_times_J->p[i][0], C->p[i][0]);
-    for (j=0; j< nb_parms; j++) value_assign(C_times_J->p[i][j+nb_vars+1], C->p[i][j+1]); 
+    for (j=0; j< nb_parms; j++)
+      value_assign(C_times_J->p[i][j+nb_vars+1], C->p[i][j+1]); 
   }
 
   // add the constraints PM(J N 1)^T >=0
