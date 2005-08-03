@@ -222,6 +222,11 @@ AC_SUBST(BITS)
 dnl Used with doxygen
 AC_SUBST(DOXYGEN)
 
+dnl Currently, we only create one .pc file
+dnl Creating one for each configured version is a bit complicated
+PACKAGE_NAME=polylib$BITS
+AX_CREATE_PKGCONFIG_INFO
+
 AC_OUTPUT(Makefile
 	  include/Makefile
 	  include/polylib/Makefile

@@ -2,6 +2,8 @@ SUBDIRS = include Test
 
 CPPFLAGS = -I$(srcdir)/include -Iinclude @CPPFLAGS@
 
+ACLOCAL_AMFLAGS = -I m4
+
 poly_src = $(srcdir)/applications
 poly_arith = $(srcdir)/source/arith
 
@@ -123,3 +125,10 @@ document:
 dist-hook: document
 	rm -rf `find $(distdir)/doc -name CVS`
 	cp -r doc/codeDoc $(distdir)/doc
+
+install-data-local:
+	@test -z "$(pkgconfig_libdir)" || $(mkdir_p) "$(DESTDIR)$(pkgconfig_libdir)"
+	$(INSTALL_DATA) $(pkgconfig_libfile) "$(DESTDIR)$(pkgconfig_libdir)/$(pkgconfig_libfile)"
+
+uninstall-local:
+	rm -f "$(DESTDIR)$(pkgconfig_libdir)/$(pkgconfig_libfile)"
