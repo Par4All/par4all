@@ -1499,7 +1499,7 @@ static Polyhedron *Remove_Redundants(Matrix *Mat,Matrix *Ray,SatMatrix *Sat,unsi
     
     /* 
      * STEP(9): Final Pass filter of inequalities and detection of redundant
-     * inequaties. Redundant inequalities include: 
+     * inequalities. Redundant inequalities include: 
      * (1) Inequalities which are always true, such as 1>=0, 
      * (2) Redundant inequalities such as y>=4 given y>=3, or x>=1 given x=2. 
      * (3) Redundant inequalities such as x+y>=5 given x>=3 and y>=2.
