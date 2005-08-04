@@ -12,10 +12,6 @@
 extern Enumeration *Domain_Enumerate
     PARAMS((Polyhedron *D, Polyhedron *C, unsigned MAXRAYS, char **pn));
 
-extern Enumeration *Domain_Image_Enumerate
-    PARAMS((Polyhedron *D,  Polyhedron *C,Matrix *T, 
-            unsigned MAXRAYS, char **par_name));
-
 extern void new_eadd PARAMS((evalue *e1,evalue *res));
 
 #endif
