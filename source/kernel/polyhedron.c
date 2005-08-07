@@ -1729,6 +1729,7 @@ NbBid -	|	|       |      | |   |  |  |e|
   for(i=0;i<RowSize1;i++)
     value_clear(temp1[i]);
   free(temp1);
+  F_SET(Pol, POL_INEQUALITIES | POL_FACETS | POL_POINTS | POL_VERTICES);
   return Pol;
 } /* Remove_Redundants */
 
@@ -1754,6 +1755,7 @@ Polyhedron* Polyhedron_Alloc(unsigned Dimension,unsigned NbConstraints,unsigned 
   Pol->NbRays        = NbRays;
   Pol->NbEq          = 0;
   Pol->NbBid         = 0;
+  Pol->flags	     = 0;
   NbRows             = NbConstraints + NbRays;
   NbColumns          = Dimension + 2;
   
@@ -1921,6 +1923,7 @@ Polyhedron *Empty_Polyhedron(unsigned Dimension) {
   }
   Pol->NbEq = Dimension+1;
   Pol->NbBid = 0;
+  F_SET(Pol, POL_INEQUALITIES | POL_FACETS | POL_POINTS | POL_VERTICES);
   return Pol;
 } /* Empty_Polyhedron */
 
@@ -1962,6 +1965,7 @@ Polyhedron *Universe_Polyhedron(unsigned Dimension) {
   value_set_si(Pol->Ray[Dimension][0],1);
   Pol->NbEq = 0;
   Pol->NbBid = Dimension;
+  F_SET(Pol, POL_INEQUALITIES | POL_FACETS | POL_POINTS | POL_VERTICES);
   return Pol;
 } /* Universe_Polyhedron */
 
@@ -1990,9 +1994,6 @@ Polyhedron *Constraints2Polyhedron(Matrix *Constraints,unsigned NbMaxRays) {
     return 0;
   }
   
-  if (Dimension > NbMaxRays)
-    NbMaxRays = Dimension;
-    
   /* If there is no constraint in the constraint matrix, return universe */
   /* polyhderon.                                                         */
   if (Constraints->NbRows==0) {  
@@ -2000,6 +2001,31 @@ Polyhedron *Constraints2Polyhedron(Matrix *Constraints,unsigned NbMaxRays) {
     return Pol;
   }
 
+  if (NbMaxRays == POL_NO_DUAL) {
+    unsigned NbEq = 0;
+    unsigned Rank;
+    /* Move equalities up */
+    for (i = 0; i < Constraints->NbRows; ++i)
+      if (value_zero_p(Constraints->p[i][0])) {
+	if (i != NbEq)
+	  ExchangeRows(Constraints, i, NbEq);
+	++NbEq;
+      }
+    Rank = Gauss(Constraints, NbEq, Dimension);
+    Pol = Polyhedron_Alloc(Dimension-1, Constraints->NbRows - (NbEq-Rank), 0);
+    /* Make sure nobody accesses the rays by accident */
+    Vector_Copy(Constraints->p_Init, Pol->Constraint[0], 
+		Rank * Constraints->NbColumns);
+    Vector_Copy(Constraints->p_Init, Pol->Constraint[Rank], 
+		(Constraints->NbRows - NbEq) * Constraints->NbColumns);
+    Pol->Ray = 0;
+    F_SET(Pol, POL_INEQUALITIES);
+    return Pol;
+  }
+
+  if (Dimension > NbMaxRays)
+    NbMaxRays = Dimension;
+    
   /*
    * Rather than adding a 'positivity constraint', it is better to
    * initialize the lineality space with line in each of the index
@@ -2079,6 +2105,8 @@ Matrix *Polyhedron2Constraints(Polyhedron *Pol) {
   
   Matrix     *Mat;
   unsigned NbConstraints,Dimension;
+
+  POL_ENSURE_INEQUALITIES(Pol);
   
   NbConstraints = Pol->NbConstraints;
   Dimension     = Pol->Dimension+2;
@@ -2207,6 +2235,37 @@ Polyhedron *Rays2Polyhedron(Matrix *Ray,unsigned NbMaxConstrs) {
   return Pol;
 } /* Rays2Polyhedron */
 
+/*
+ * Compute the dual representation if P only contains one representation.
+ * Currently only handles the case where only the equalities are known.
+ */
+void Polyhedron_Compute_Dual(Polyhedron *P)
+{
+  if (F_ISSET(P, POL_FACETS | POL_VERTICES))
+    return;
+
+  if (F_ISSET(P, POL_INEQUALITIES)) {
+    Matrix M;
+    Polyhedron tmp, *Q;
+    /* Pretend P is a Matrix for a second */
+    M.NbRows = P->NbConstraints;
+    M.NbColumns = P->Dimension+2;
+    M.p_Init = P->p_Init;
+    M.p = P->Constraint;
+    Q = Constraints2Polyhedron(&M, 0);
+
+    /* Switch contents of P and Q */
+    tmp = *Q;
+    *Q = *P;
+    *P = tmp;
+    Polyhedron_Free(Q);
+    return;
+  }
+
+  /* other cases not handled yet */
+  assert(0);
+}
+
 /*   
  * Build a saturation matrix from constraint matrix 'Mat' and ray matrix 
  * 'Ray'. Only 'NbConstraints' constraint of matrix 'Mat' are considered 
@@ -2287,6 +2346,9 @@ Polyhedron *AddConstraints(Value *Con,unsigned NbConstraints,Polyhedron *Pol,uns
   if (NbConstraints == 0)
     return Polyhedron_Copy(Pol);
   
+  POL_ENSURE_FACETS(Pol);
+  POL_ENSURE_VERTICES(Pol);
+
   CATCH(any_exception_error) {
     if (NewPol) Polyhedron_Free(NewPol);
     if (Mat) Matrix_Free(Mat);
@@ -2360,6 +2422,11 @@ int PolyhedronIncludes(Polyhedron *Pol1,Polyhedron *Pol2) {
   Value *p1, *p2, p3;
   //, tmp;
   
+  POL_ENSURE_FACETS(Pol1);
+  POL_ENSURE_VERTICES(Pol1);
+  POL_ENSURE_FACETS(Pol2);
+  POL_ENSURE_VERTICES(Pol2);
+
   value_init(p3); 
   // value_init(tmp);
   for (k=0; k<Pol1->NbConstraints; k++) {
@@ -2407,6 +2474,9 @@ Polyhedron *AddPolyToDomain(Polyhedron *Pol,Polyhedron *PolDomain) {
     return PolDomain;
   if (!PolDomain)	
     return Pol;
+
+  POL_ENSURE_FACETS(Pol);
+  POL_ENSURE_VERTICES(Pol);
   
   /* Check for emptiness of polyhedron 'Pol' */
   if (emptyQ(Pol)) {
@@ -2414,6 +2484,9 @@ Polyhedron *AddPolyToDomain(Polyhedron *Pol,Polyhedron *PolDomain) {
     return PolDomain;
   }
   
+  POL_ENSURE_FACETS(PolDomain);
+  POL_ENSURE_VERTICES(PolDomain);
+
   /* Check for emptiness of polyhedral domain 'PolDomain' */
   if (emptyQ(PolDomain)) {
     Polyhedron_Free(PolDomain);
@@ -2475,6 +2548,9 @@ Polyhedron *SubConstraint(Value *Con,Polyhedron *Pol,unsigned NbMaxRays,int Pass
   SatMatrix *Sat = NULL;
   unsigned NbRay, NbCon, NbEle1, Dimension;
   int i;
+
+  POL_ENSURE_FACETS(Pol);
+  POL_ENSURE_VERTICES(Pol);
   
   CATCH(any_exception_error) {
     if (NewPol) Polyhedron_Free(NewPol);
@@ -2596,6 +2672,8 @@ Matrix *Polyhedron2Rays(Polyhedron *Pol) {
   
   Matrix     *Ray;
   unsigned NbRays, Dimension;
+
+  POL_ENSURE_POINTS(Pol);
   
   NbRays    = Pol->NbRays;
   Dimension = Pol->Dimension+2;		/* Homogeneous Dimension + Status */
@@ -2619,6 +2697,9 @@ Polyhedron *AddRays(Value *AddedRays,unsigned NbAddedRays,Polyhedron *Pol,unsign
   SatMatrix *Sat = NULL, *SatTranspose = NULL;
   unsigned NbCon, NbRay,NbEle1, Dimension;
   
+  POL_ENSURE_FACETS(Pol);
+  POL_ENSURE_VERTICES(Pol);
+
   CATCH(any_exception_error) {
     if (NewPol) Polyhedron_Free(NewPol);
     if (Mat) Matrix_Free(Mat);
@@ -2757,6 +2838,7 @@ Polyhedron *Polyhedron_Copy(Polyhedron *Pol) {
 	      Pol->NbRays*(Pol->Dimension+2));
   Pol1->NbBid = Pol->NbBid;
   Pol1->NbEq = Pol->NbEq;
+  Pol1->flags = Pol->flags;
   return Pol1;
 } /* Polyhedron_Copy */
 
@@ -3216,6 +3298,8 @@ Polyhedron *DomainSimplify(Polyhedron *Pol1, Polyhedron *Pol2, unsigned NbMaxRay
     Pol_status = 1;
     return 0;
   }
+  POL_ENSURE_VERTICES(Pol1);
+  POL_ENSURE_VERTICES(Pol2);
   if (emptyQ(Pol1)||emptyQ(Pol2)) 
     return Empty_Polyhedron(Pol1->Dimension);
 
@@ -3332,6 +3416,8 @@ Polyhedron *Stras_DomainSimplify(Polyhedron *Pol1,Polyhedron *Pol2,unsigned NbMa
       UNCATCH(any_exception_error);
       return 0;
     }
+    POL_ENSURE_VERTICES(Pol1);
+    POL_ENSURE_VERTICES(Pol2);
     if (emptyQ(Pol1)||emptyQ(Pol2)) {
       UNCATCH(any_exception_error);
       return Empty_Polyhedron(Pol1->Dimension);
@@ -3551,6 +3637,10 @@ Polyhedron *DomainDifference(Polyhedron *Pol1,Polyhedron *Pol2,unsigned NbMaxRay
 	      "diffdim", "operation on different dimensions");
     return (Polyhedron*) 0;
   }
+  POL_ENSURE_FACETS(Pol1);
+  POL_ENSURE_VERTICES(Pol1);
+  POL_ENSURE_FACETS(Pol2);
+  POL_ENSURE_VERTICES(Pol2);
   if (emptyQ(Pol1) || emptyQ(Pol2))
     return (Domain_Copy(Pol1));
   d = (Polyhedron *)0;
@@ -3598,6 +3688,9 @@ Polyhedron *align_context(Polyhedron *Pol,int align_dimension,int NbMaxRays) {
   int i, j, k;
   Polyhedron *p = NULL, *q, *result = NULL;
   Matrix *Mat = NULL;
+
+  POL_ENSURE_FACETS(Pol);
+  POL_ENSURE_VERTICES(Pol);
 
   CATCH(any_exception_error) {
     if (Mat) Matrix_Free(Mat);
@@ -3676,6 +3769,11 @@ Polyhedron *Polyhedron_Scan(Polyhedron *D, Polyhedron *C,unsigned NbMaxRays) {
   res = last = (Polyhedron *) 0;
   if (dim==0) return (Polyhedron *)0;
   
+  POL_ENSURE_FACETS(D);
+  POL_ENSURE_VERTICES(D);
+  POL_ENSURE_FACETS(C);
+  POL_ENSURE_VERTICES(C);
+
   /* Allocate space for constraint matrix. */
   Mat   = Matrix_Alloc(D->Dimension, D->Dimension+2);
   if(!Mat) {
@@ -3726,6 +3824,9 @@ int lower_upper_bounds(int pos,Polyhedron *P,Value *context,Value *LBp,Value *UB
   int flag, i;
   Value n, n1, d, tmp;
   
+  POL_ENSURE_FACETS(P);
+  POL_ENSURE_VERTICES(P);
+
   /* Initialize all the 'Value' variables */
   value_init(LB); value_init(UB); value_init(tmp);
   value_init(n); value_init(n1); value_init(d);
@@ -3920,6 +4021,9 @@ Polyhedron *Polyhedron_Preimage(Polyhedron *Pol,Matrix *Func,unsigned NbMaxRays)
   Value Sum;
   //, tmp;
 
+  POL_ENSURE_FACETS(Pol);
+  POL_ENSURE_VERTICES(Pol);
+
   value_init(Sum); 
   // value_init(tmp);
 
@@ -4043,6 +4147,9 @@ Polyhedron *Polyhedron_Image(Polyhedron *Pol, Matrix *Func,unsigned NbMaxConstrs
   Value Sum;
   // , tmp;
   
+  POL_ENSURE_FACETS(Pol);
+  POL_ENSURE_VERTICES(Pol);
+
   value_init(Sum); 
   // value_init(tmp);
 
@@ -4167,6 +4274,9 @@ Interval *DomainCost(Polyhedron *Pol,Value *Cost) {
 
   value_init(p3); value_init(d); value_init(status);
   value_init(tmp1); value_init(tmp2); value_init(tmp3);
+
+  POL_ENSURE_FACETS(Pol);
+  POL_ENSURE_VERTICES(Pol);
 
   CATCH(any_exception_error) {
     if (I) free(I);

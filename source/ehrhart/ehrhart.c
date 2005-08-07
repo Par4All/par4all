@@ -1133,6 +1133,9 @@ void count_points (int pos,Polyhedron *P,Value *context, Value *res) {
    
     Value LB, UB, k, c;
 
+    POL_ENSURE_FACETS(P);
+    POL_ENSURE_VERTICES(P);
+
     if (emptyQ(P)) {
 	value_set_si(*res, 0);
 	return;
@@ -1842,6 +1845,11 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS,
   Value *lcm, *m1, hdv;
   Value *context;
   Enumeration *en, *res;
+
+  POL_ENSURE_FACETS(Pi);
+  POL_ENSURE_VERTICES(Pi);
+  POL_ENSURE_FACETS(C);
+  POL_ENSURE_VERTICES(C);
 
   res = NULL;
   P = Pi;

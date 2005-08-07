@@ -30,6 +30,9 @@ int in_domain(Polyhedron *P, Value *list_args) {
 	       parameters are instanciated*/
   //  Value tmp;
 
+  POL_ENSURE_FACETS(P);
+  POL_ENSURE_VERTICES(P);
+
   value_init(v); 
   // value_init(tmp);
   

@@ -719,6 +719,11 @@ Enumeration *Domain_Enumerate(Polyhedron *D, Polyhedron *C, unsigned MAXRAYS,cha
       Enumeration *e,*pr,*en,*en1, *en2,*tmp, *res, *sen;
       Polun=NULL;
      
+      POL_ENSURE_FACETS(D);
+      POL_ENSURE_VERTICES(D);
+      POL_ENSURE_FACETS(C);
+      POL_ENSURE_VERTICES(C);
+
      lp = Disjoint_Domain( D, 0, MAXRAYS );
 
 #ifdef UE_DEBUG
@@ -842,6 +847,12 @@ Enumeration *Polyhedron_Image_Enumerate(Polyhedron *D,  Polyhedron *C, Matrix *T
     Vector *v1,*v2;
     Value h;
     int i,j,k;
+
+  POL_ENSURE_FACETS(D);
+  POL_ENSURE_VERTICES(D);
+  POL_ENSURE_FACETS(C);
+  POL_ENSURE_VERTICES(C);
+
    value_init(h);
     if(!D) {
 	 fprintf(stdout,"             Error: in reading input domain \n");   

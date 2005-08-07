@@ -58,6 +58,11 @@ Polyhedron *PDomainIntersection(Polyhedron *Pol1,Polyhedron *Pol2,unsigned NbMax
     return (Polyhedron*) 0;
   }
   
+  POL_ENSURE_FACETS(Pol1);
+  POL_ENSURE_VERTICES(Pol1);
+  POL_ENSURE_FACETS(Pol2);
+  POL_ENSURE_VERTICES(Pol2);
+ 
   d = (Polyhedron *)0;
   for (p1=Pol1; p1; p1=p1->next) {
     for (p2=Pol2; p2; p2=p2->next) {
@@ -95,6 +100,11 @@ Polyhedron *PDomainDifference(Polyhedron *Pol1,Polyhedron *Pol2,unsigned NbMaxRa
 	    "? PDomainDifference: operation on different dimensions\n");
     return (Polyhedron*) 0;
   }
+
+  POL_ENSURE_FACETS(Pol1);
+  POL_ENSURE_VERTICES(Pol1);
+  POL_ENSURE_FACETS(Pol2);
+  POL_ENSURE_VERTICES(Pol2);
  
   d = (Polyhedron *)0;
   for (p2=Pol2; p2; p2=p2->next) {
@@ -1415,6 +1425,11 @@ Param_Polyhedron *Polyhedron2Param_Vertices(Polyhedron *Din,Polyhedron *Cin,int 
   
   Param_Polyhedron *result;
   
+  POL_ENSURE_FACETS(Din);
+  POL_ENSURE_VERTICES(Din);
+  POL_ENSURE_FACETS(Cin);
+  POL_ENSURE_VERTICES(Cin);
+ 
 #ifdef DEBUGPP
   fprintf(stderr,"Polyhedron2Param_Vertices algorithm starting at : %.2fs\n",
 	  (float)clock()/CLOCKS_PER_SEC);
@@ -1561,6 +1576,9 @@ void Print_Domain(FILE *DST,Polyhedron *D,char **pname) {
   int l, v;
   int first;
   
+  POL_ENSURE_FACETS(D);
+  POL_ENSURE_VERTICES(D);
+ 
   for(l=0;l<D->NbConstraints;++l) {
     fprintf(DST, "         ");
     first = 1;
@@ -1636,6 +1654,11 @@ Param_Polyhedron *Polyhedron2Param_Domain(Polyhedron *Din,Polyhedron *Cin,int wo
   Param_Polyhedron *result;
   Param_Domain *D;
 
+  POL_ENSURE_FACETS(Din);
+  POL_ENSURE_VERTICES(Din);
+  POL_ENSURE_FACETS(Cin);
+  POL_ENSURE_VERTICES(Cin);
+ 
 #ifdef DEBUGPP
   fprintf(stderr,"Polyhedron2Param_Polyhedron algorithm starting at : %.2fs\n",
 	  (float)clock()/CLOCKS_PER_SEC);
@@ -1671,6 +1694,11 @@ Param_Polyhedron *Polyhedron2Param_SimplifiedDomain(Polyhedron **Din,Polyhedron 
 						     
   Param_Polyhedron *result;
   
+  POL_ENSURE_FACETS(*Din);
+  POL_ENSURE_VERTICES(*Din);
+  POL_ENSURE_FACETS(Cin);
+  POL_ENSURE_VERTICES(Cin);
+ 
 #ifdef DEBUGPP
   fprintf(stderr,"Polyhedron2Param_Polyhedron algorithm starting at : %.2fs\n",
 	  (float)clock()/CLOCKS_PER_SEC);

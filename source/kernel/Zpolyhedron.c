@@ -39,6 +39,9 @@ ZPolyhedron *ZPolyhedron_Alloc(Lattice *Lat, Polyhedron *Poly) {
   
   ZPolyhedron *A;
   
+  POL_ENSURE_FACETS(Poly);
+  POL_ENSURE_VERTICES(Poly);
+
   if(Lat->NbRows != Poly->Dimension+1) {
     fprintf(stderr,"\nInZPolyAlloc - The Lattice  and the Polyhedron");
     fprintf(stderr," are not compatible to form a ZPolyhedra\n");

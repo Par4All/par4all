@@ -90,6 +90,11 @@ int Polyhedron_Not_Empty(Polyhedron *P,Polyhedron *C,int MAXRAYS) {
   Value *context;
   Polyhedron *L;
   
+  POL_ENSURE_FACETS(P);
+  POL_ENSURE_VERTICES(P);
+  POL_ENSURE_FACETS(C);
+  POL_ENSURE_VERTICES(C);
+
   /* Create a context vector size dim+2 and set it to all zeros */
   context = (Value *) malloc((P->Dimension+2)*sizeof(Value));
   
@@ -134,6 +139,11 @@ int PolyhedronLTQ (Polyhedron *Pol1,Polyhedron *Pol2,int INDEX, int PDIM, int Nb
     return 0;
   }
   dim = Pol1->Dimension+2;
+
+  POL_ENSURE_FACETS(Pol1);
+  POL_ENSURE_VERTICES(Pol1);
+  POL_ENSURE_FACETS(Pol2);
+  POL_ENSURE_VERTICES(Pol2);
   
 #ifdef DEBUG
   fprintf(stdout, "P1\n");
@@ -549,6 +559,8 @@ int PolyhedronTSort (Polyhedron **L,unsigned int n,unsigned int index,unsigned i
   /* Compute the dag using transitivity to reduce the number of */
   /*   PolyhedronLTQ calls.                                     */
   for (i=0; i<n-1; i++) {
+    POL_ENSURE_FACETS(L[i]);
+    POL_ENSURE_VERTICES(L[i]);
     for (j=i+1; j<n; j++) {
       if (p[i][j] == -2) /* not computed yes */
 	p[i][j] = PolyhedronLTQ(L[i], L[j], index, pdim, MAXRAYS);

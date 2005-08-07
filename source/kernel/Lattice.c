@@ -995,6 +995,9 @@ int FindHermiteBasisofDomain(Polyhedron *A, Matrix **B) {
   fclose(fp);
 #endif
   
+  POL_ENSURE_FACETS(A);
+  POL_ENSURE_VERTICES(A);
+
   /* Checking is empty */  
   if (emptyQ(A)) {
       B[0] = Identity(A->Dimension+1);

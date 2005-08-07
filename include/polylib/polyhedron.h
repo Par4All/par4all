@@ -6,6 +6,34 @@
  */
 #ifndef _polyhedron_H_
 #define _polyhedron_H_
+
+/* Make sure the Constraint member is valid */
+#define POL_ENSURE_INEQUALITIES(P) 				    		\
+	if (!F_ISSET(P, POL_INEQUALITIES)) 					\
+	    Polyhedron_Compute_Dual(P);
+/* Make sure the Ray member is valid */
+#define POL_ENSURE_POINTS(P) 					    		\
+	if (!F_ISSET(P, POL_POINTS)) 						\
+	    Polyhedron_Compute_Dual(P);
+/* Make sure the Constraint member is valid and non-redundant */
+#define POL_ENSURE_FACETS(P) 					    		\
+	if (!F_ISSET(P, POL_FACETS)) 						\
+	    Polyhedron_Compute_Dual(P);
+/* Make sure the Ray member is valid and non-redundant */
+#define POL_ENSURE_VERTICES(P) 					    		\
+	if (!F_ISSET(P, POL_VERTICES)) 						\
+	    Polyhedron_Compute_Dual(P);
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+extern void Polyhedron_Compute_Dual(Polyhedron *P);
+
+#if defined(__cplusplus)
+}
+#endif
+
 #if (defined(__STDC__) || defined(__cplusplus))
 
 #if defined(__cplusplus)

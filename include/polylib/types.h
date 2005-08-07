@@ -19,6 +19,8 @@
 #include<gmp.h>
 #endif 
 
+#include <limits.h>
+
 /*********************** USER DEFINES ******************************/
 
 /* first parameter name char.  */
@@ -59,6 +61,8 @@
 /* Status of last Polyhedron operation */
 extern int Pol_status;
 
+#define POL_NO_DUAL	UINT_MAX
+
 typedef struct  {
   unsigned Size;
   Value *p;
@@ -71,6 +75,17 @@ typedef struct matrix {
   int p_Init_size;	/* needed to free the memory allocated by mpz_init */
 } Matrix;
 
+/* Macros to init/set/clear/test flags. */
+#define FL_INIT(l, f)   (l) = (f)               /* Specific flags location. */
+#define FL_SET(l, f)    ((l) |= (f))
+#define FL_CLR(l, f)    ((l) &= ~(f))
+#define FL_ISSET(l, f)  ((l) & (f))
+
+#define F_INIT(p, f)    FL_INIT((p)->flags, f)  /* Structure element flags. */
+#define F_SET(p, f)     FL_SET((p)->flags, f)
+#define F_CLR(p, f)     FL_CLR((p)->flags, f)
+#define F_ISSET(p, f)   FL_ISSET((p)->flags, f)
+
 typedef struct polyhedron { 
   unsigned Dimension, NbConstraints, NbRays, NbEq, NbBid;
   Value **Constraint;
@@ -78,6 +93,11 @@ typedef struct polyhedron {
   Value *p_Init;
   int p_Init_size;
   struct polyhedron *next;
+#define    POL_INEQUALITIES	0x00000001
+#define    POL_FACETS		0x00000002
+#define    POL_POINTS		0x00000004
+#define    POL_VERTICES		0x00000008
+  unsigned flags;
 } Polyhedron;
 
 typedef struct interval {
