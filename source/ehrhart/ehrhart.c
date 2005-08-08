@@ -1243,15 +1243,6 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
   fprintf(stderr,"Calling P_Enum with pos = %d\n",pos);
 #endif
   
-  /* Xavier Redon modification: handle the case when there is no parameter */
-  if(nb_param==0) {
-    res=new_enode(polynomial,1,0);
-    value_set_si(res->arr[0].d,1);
-    value_init(res->arr[0].x.n);
-    count_points(1,L,context,&res->arr[0].x.n);
-    return res;
-  }
-  
   /* Initialize all the 'Value' variables */
   value_init(n); value_init(g); value_init(nLB);
   value_init(nUB); value_init(nlcm); value_init(noff);
@@ -1716,7 +1707,7 @@ Enumeration *Enumerate_NoParameters(Polyhedron *P,Polyhedron *C,Matrix *CT,Polyh
   
     Polyhedron *L;
     Enumeration *res;
-    Value *context,tmp;
+    Value *context;
     int j;
     int hdim = P->Dimension + 1;
     int r,i;
@@ -1725,7 +1716,6 @@ Enumeration *Enumerate_NoParameters(Polyhedron *P,Polyhedron *C,Matrix *CT,Polyh
     context = (Value *) malloc((hdim+1)*sizeof(Value));
     for (j=0;j<= hdim;j++) 
         value_init(context[j]);
-    value_init(tmp);
   
     res = (Enumeration *)malloc(sizeof(Enumeration));
     res->next = NULL;
@@ -1799,8 +1789,10 @@ Enumeration *Enumerate_NoParameters(Polyhedron *P,Polyhedron *C,Matrix *CT,Polyh
     
         /* Set context[hdim] = 1  (the constant) */
         value_set_si(context[hdim],1);
-        value_set_si(tmp,1);
-        res->EP.x.p = P_Enum(L,NULL,context,1,0,hdim-1,&tmp,param_name);
+	res->EP.x.p = new_enode(polynomial,1,0);
+	value_set_si(res->EP.x.p->arr[0].d, 1);
+	value_init(res->EP.x.p->arr[0].x.n);
+	count_points(1, L, context, &res->EP.x.p->arr[0].x.n);
         UNCATCH(overflow_error);
     }
   }
@@ -1819,7 +1811,6 @@ Enumeration *Enumerate_NoParameters(Polyhedron *P,Polyhedron *C,Matrix *CT,Polyh
     fprintf(stdout, "\n");
 	}
 
-    value_clear(tmp);
     for (j=0;j<= hdim;j++) 
         value_clear(context[j]);  
     free(context);
