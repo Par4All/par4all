@@ -6,14 +6,14 @@
 #include <polylib/polylib.h>
 #include <polylib/homogenization.h>
 
-static evalue *dehomogenize_periodic(enode *en, int nb_param,char **param_names);
-static evalue *dehomogenize_polynomial(enode *en, int nb_param,char **param_names);
+static evalue *dehomogenize_periodic(enode *en, int nb_param);
+static evalue *dehomogenize_polynomial(enode *en, int nb_param);
 
 
 /** dehomogenize an evalue. The last parameter (nb_param) is replaced by 1.
     This function is mutually recursive with dehomogenize_enode.
 **/
-void dehomogenize_evalue(evalue *ep, int nb_param, char **param_names){
+void dehomogenize_evalue(evalue *ep, int nb_param){
   evalue *w;
 
   /** cannot dehomogenize rationals **/
@@ -22,17 +22,17 @@ void dehomogenize_evalue(evalue *ep, int nb_param, char **param_names){
     /** we need to replace the last parameter **/
     if (ep->x.p->pos == nb_param){
       if (ep->x.p->type == periodic){
-	w = dehomogenize_periodic(ep->x.p, nb_param, param_names); 
+	w = dehomogenize_periodic(ep->x.p, nb_param); 
       }
       else{
-	w = dehomogenize_polynomial(ep->x.p, nb_param, param_names);
+	w = dehomogenize_polynomial(ep->x.p, nb_param);
       }
       free_evalue_refs(ep);
       memcpy(ep, w, sizeof(evalue));
     }
     else{
       /** Not the last parameter. Recurse **/
-      dehomogenize_enode(ep->x.p, nb_param, param_names);
+      dehomogenize_enode(ep->x.p, nb_param);
     }
 
   }
@@ -41,17 +41,17 @@ void dehomogenize_evalue(evalue *ep, int nb_param, char **param_names){
 /** dehomogenize all evalues in an enode. 
     This function is mutually recursive with dehomogenize_evalue.
 **/
-void dehomogenize_enode(enode *p, int nb_param, char **param_names){
+void dehomogenize_enode(enode *p, int nb_param){
   evalue *temp;
   int i;
   for (i = 0; i < p->size; i++){
-    dehomogenize_evalue(&p->arr[i], nb_param, param_names);
+    dehomogenize_evalue(&p->arr[i], nb_param);
   }
 }
 
 
 /** return the 1st element of an enode representing a periodic **/
-static evalue *dehomogenize_periodic(enode *en, int nb_param, char **param_names){
+static evalue *dehomogenize_periodic(enode *en, int nb_param){
   evalue *w;
   assert(en->type == periodic);
   assert(value_notzero_p(en->arr[1].d));
@@ -65,7 +65,7 @@ static evalue *dehomogenize_periodic(enode *en, int nb_param, char **param_names
     one variable, the homogenous parameter. 
     Returns an new evalue, representing a rational.
  **/
-static evalue *dehomogenize_polynomial(enode *en, int nb_param, char **param_names){
+static evalue *dehomogenize_polynomial(enode *en, int nb_param){
   evalue *enn;
   evalue *ev;
   int i;
@@ -81,7 +81,7 @@ static evalue *dehomogenize_polynomial(enode *en, int nb_param, char **param_nam
       but not polynomial) **/
   for (i = 0; i < en->size; i++){
     if (value_zero_p(en->arr[i].d)){
-      ev = dehomogenize_periodic(en->arr[i].x.p, nb_param, param_names);
+      ev = dehomogenize_periodic(en->arr[i].x.p, nb_param);
     }
     else{
       ev = &en->arr[i];
@@ -147,13 +147,13 @@ Matrix *homogenize(Matrix *m){
 /** dehomogenize an enumeration. Replaces each validity domain and 
     Ehrhart polynomial in the Enumeration en with the dehomogenized form.
  **/
-void dehomogenize_enumeration(Enumeration* en, int nb_params, char** param_name, int maxRays){
+void dehomogenize_enumeration(Enumeration* en, int nb_params, int maxRays){
   Enumeration *en2;
   Polyhedron *vd;
   for (en2 = en; en2; en2 = en2->next) {
     vd = dehomogenize_polyhedron(en2->ValidityDomain, maxRays);
     Polyhedron_Free(en2->ValidityDomain);
     en2->ValidityDomain = vd;
-    dehomogenize_evalue(&en2->EP, nb_params, param_name);
+    dehomogenize_evalue(&en2->EP, nb_params);
   }
 }

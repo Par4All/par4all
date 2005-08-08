@@ -150,7 +150,7 @@ int main() {
 
     printf("inhomogenous form:\n");
   
-    dehomogenize_enumeration(en, C->Dimension, param_name, WS);
+    dehomogenize_enumeration(en, C->Dimension, WS);
     for (en2 = en; en2; en2 = en2->next) {
 	Print_Domain(stdout, en2->ValidityDomain, param_name);
 	print_evalue(stdout, &en2->EP, param_name);
