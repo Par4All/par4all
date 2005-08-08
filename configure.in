@@ -227,6 +227,7 @@ dnl Creating one for each configured version is a bit complicated
 PACKAGE_NAME=polylib$BITS
 AX_CREATE_PKGCONFIG_INFO
 
+AC_CONFIG_HEADERS(config.h)
 AC_OUTPUT(Makefile
 	  include/Makefile
 	  include/polylib/Makefile
