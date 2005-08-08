@@ -16,6 +16,7 @@
 #include <assert.h>
 
 #include <polylib/polylib.h>
+#include <polylib/homogenization.h>
 
 
 /*! \class Ehrhart
@@ -1663,7 +1664,7 @@ static void Scan_Vertices(Param_Polyhedron *PP,Param_Domain *Q,Matrix *CT,
 
       for(j=0;j<V->Vertex->NbRows;j++) {
 			/* A matrix */
-			for( l=0 ; l<V->Vertex->NbColumns-2 ; l++ )
+			for( l=0 ; l<V->Vertex->NbColumns-1 ; l++ )
 			{
 				if( value_notzero_p(V->Vertex->p[j][l]) )
 				{
@@ -1825,7 +1826,7 @@ Enumeration *Enumerate_NoParameters(Polyhedron *P,Polyhedron *C,Matrix *CT,Polyh
 */
 Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS,char **param_name)
 {
-  Polyhedron *L, *CQ, *CQ2, *LQ, *U, *CEq, *rVD, *P;
+  Polyhedron *L, *CQ, *CQ2, *LQ, *U, *CEq, *rVD, *P, *Ph = NULL;
   Matrix *CT;
   Param_Polyhedron *PP;
   Param_Domain   *Q;
@@ -1901,16 +1902,17 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS,
   }
 
   /* get memory for Values */
-  lcm = (Value *)malloc( nb_param * sizeof(Value));
-  m1  = (Value *)malloc( nb_param * sizeof(Value));
+  lcm = (Value *)malloc((nb_param+1) * sizeof(Value));
+  m1  = (Value *)malloc((nb_param+1) * sizeof(Value));
   /* Initialize all the 'Value' variables */
-  for( np=0 ; np<nb_param ; np++ )
+  for( np=0 ; np < nb_param+1; np++ )
   {
     value_init(lcm[np]); value_init(m1[np]);
   }
   value_init(hdv);
 
   for(Q=PP->D;Q;Q=Q->next) {
+    int hom = 0;
     if(CT) {
       Polyhedron *Dt;
       CQ = Q->Domain;      
@@ -1971,7 +1973,7 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS,
     /* points in every dimension */
     value_set_si(hdv,hdim-nb_param);
 
-    for( np=0;np<nb_param;np++) {
+    for( np=0;np<nb_param+1;np++) {
 	if( value_notzero_p(lcm[np]) )
 	    value_multiply(m1[np],hdv,lcm[np]);
 	else
@@ -1999,7 +2001,7 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS,
       
       UNCATCH(overflow_error);
     }
-    
+
     /* Vin100, Feb 2001 */
     /* in case of degenerate, try to find a domain _containing_ CQ */
     if ((!CQ2 || emptyQ(CQ2)) && CQ->NbBid==0) {
@@ -2023,6 +2025,19 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS,
 	CQ2 = Polyhedron_Preprocess2(CQ,m1,lcm,MAXRAYS);
       }
     }
+
+    if (!CQ2) {
+      hom = 1;
+      Polyhedron *tmp = homogenize(CQ, MAXRAYS);
+      CQ2 = Polyhedron_Preprocess(tmp,m1,MAXRAYS);
+      Polyhedron_Free(tmp);
+      if (!Ph)
+	Ph = homogenize(P, MAXRAYS);
+      for (np=0; np < nb_param+1; np++)
+	  if (value_notzero_p(lcm[np]))
+	      value_addto(m1[np],m1[np],lcm[np]);
+    }
+    
     if (!CQ2 || emptyQ(CQ2)) {
 #ifdef EDEBUG2
       fprintf(stderr,"Degenerate.\n");
@@ -2049,7 +2064,7 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS,
 #endif
       
       /* L is used in counting the number of points in the base cases */
-      L = Polyhedron_Scan(P,CQ,MAXRAYS);
+      L = Polyhedron_Scan(hom ? Ph : P,CQ2,MAXRAYS);
       U = Universe_Polyhedron(0);
       
       /* LQ is used to scan the parameter space */
@@ -2075,13 +2090,13 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS,
       value_set_si(res->EP.d,0);
       
       /* Create a context vector size dim+2 */
-      context = (Value *) malloc ((hdim+1)*sizeof(Value));  
-      for(i=0;i<=(hdim);i++)
+      context = (Value *) malloc ((hdim+1+hom)*sizeof(Value));  
+      for(i=0;i<=(hdim+hom);i++)
 	value_init(context[i]);
-      Vector_Set(context,0,(hdim+1));
+      Vector_Set(context,0,(hdim+1+hom));
       
       /* Set context[hdim] = 1  (the constant) */
-      value_set_si(context[hdim],1);
+      value_set_si(context[hdim+hom],1);
       
       CATCH(overflow_error) {
 	  fprintf(stderr,"Enumerate: arithmetic overflow error.\n");
@@ -2091,11 +2106,13 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS,
 	
       }
       TRY {
-	  res->EP.x.p = P_Enum(L,LQ,context,1,nb_param,dim,lcm,param_name);
+	  res->EP.x.p = P_Enum(L,LQ,context,1,nb_param+hom,dim+hom,lcm,param_name);
 	  UNCATCH(overflow_error);	
       }
+      if (hom)
+	  dehomogenize_evalue(&res->EP, nb_param+1);
       
-      for(i=0;i<=(hdim);i++)
+      for(i=0;i<=(hdim+hom);i++)
 	value_clear(context[i]);
       free(context);
       Domain_Free(L);
@@ -2129,8 +2146,10 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS,
 
   if( P != Pi )
     Polyhedron_Free( P );
+  if (Ph)
+    Polyhedron_Free(Ph);
   /* Clear all the 'Value' variables */
-  for( np=0; np<nb_param ; np++ )
+  for (np=0; np < nb_param+1; np++)
   {
     value_clear(lcm[np]); value_clear(m1[np]);
   }

@@ -12,7 +12,11 @@ Domain:
 Vertices:
 [ a1-1,  a1-1,  a1-2 ]
 [ 2k0-a1+2,  2k0-a1+2,  2k0-a1+1 ]
-Degenerate Domain. Can not continue.
+
+Ehrhart Polynomial:
+( -2 * k0 + ( 2 * a1 + -2 )
+ )
+
 ---------------------------------------
 Domain:
          i0 - k0  -1 = 0
@@ -27,7 +31,10 @@ Domain:
 Vertices:
 [ a1-1,  a1-1,  a1-2 ]
 [ 1,  1,  0 ]
-Degenerate Domain. Can not continue.
+
+Ehrhart Polynomial:
+( 1 * a1 + -1 )
+
 ---------------------------------------
 Domain:
          i0 - k0  -1 = 0

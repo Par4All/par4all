@@ -9,6 +9,19 @@
 static evalue *dehomogenize_periodic(enode *en, int nb_param);
 static evalue *dehomogenize_polynomial(enode *en, int nb_param);
 
+Polyhedron *homogenize(Polyhedron *P, unsigned MAXRAYS)
+{
+    Matrix M, *M2;
+    /* Pretend P is a Matrix for a second */
+    M.NbRows = P->NbConstraints;
+    M.NbColumns = P->Dimension+2;
+    M.p_Init = P->p_Init;
+    M.p = P->Constraint;
+    M2 = AddANullColumn(&M);
+    P = Constraints2Polyhedron(M2, MAXRAYS);
+    Matrix_Free(M2);
+    return P;
+}
 
 /** dehomogenize an evalue. The last parameter (nb_param) is replaced by 1.
     This function is mutually recursive with dehomogenize_enode.
@@ -21,7 +34,7 @@ void dehomogenize_evalue(evalue *ep, int nb_param){
 
     /** we need to replace the last parameter **/
     if (ep->x.p->pos == nb_param){
-      if (ep->x.p->type == periodic){
+      if (ep->x.p->type == periodic && ep->x.p->size > 1){
 	w = dehomogenize_periodic(ep->x.p, nb_param); 
       }
       else{
@@ -54,6 +67,7 @@ void dehomogenize_enode(enode *p, int nb_param){
 static evalue *dehomogenize_periodic(enode *en, int nb_param){
   evalue *w;
   assert(en->type == periodic);
+  assert(en->size > 1);
   assert(value_notzero_p(en->arr[1].d));
   w = (evalue*)malloc(sizeof(evalue));
   value_init(w->d); value_init(w->x.n);
@@ -81,7 +95,10 @@ static evalue *dehomogenize_polynomial(enode *en, int nb_param){
       but not polynomial) **/
   for (i = 0; i < en->size; i++){
     if (value_zero_p(en->arr[i].d)){
-      ev = dehomogenize_periodic(en->arr[i].x.p, nb_param);
+      if (en->arr[i].x.p->size > 1)
+	ev = &en->arr[i].x.p->arr[1];
+      else
+	ev = &en->arr[i].x.p->arr[0];
     }
     else{
       ev = &en->arr[i];
