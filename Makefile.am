@@ -69,7 +69,6 @@ ehrhart_quick_apx_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
 ehrhart_lower_bound_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
 ehrhart_upper_bound_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
 ehrhart_ranking_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
-h_ehrhart_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
 
 
 EXTRA_LTLIBRARIES = libpolylib32.la libpolylib64.la libpolylib128.la \
@@ -94,8 +93,7 @@ bin_PROGRAMS = \
 	ehrhart_quick_apx \
 	ehrhart_upper_bound \
 	ehrhart_lower_bound \
-	ehrhart_ranking \
-	h_ehrhart
+	ehrhart_ranking
 
 LDADD = @polylib@
 c2p_SOURCES = $(poly_src)/c2p.c
@@ -116,7 +114,6 @@ count_SOURCES = source/count.c
 Zpolytest_SOURCES = $(poly_src)/Zpolytest.c
 verif_ehrhart_SOURCES = $(poly_src)/verif_ehrhart.c
 testehrhart_SOURCES = $(poly_src)/testehrhart.c
-h_ehrhart_SOURCES = $(poly_src)/h_ehrhart.c
 
 longtest:
 	(cd Test; $(MAKE) long_tests)

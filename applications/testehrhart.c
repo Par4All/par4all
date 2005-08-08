@@ -16,6 +16,18 @@
 #include <assert.h>
 
 #include <polylib/polylib.h>
+#include <polylib/homogenization.h>
+#include "config.h"
+
+#ifndef HAVE_GETOPT_H
+#define getopt_long(a,b,c,d,e) getopt(a,b,c)
+#else
+#include <getopt.h>
+struct option options[] = {
+    { "homogenized",   no_argument,  0,  'h' },
+    { 0, 0, 0, 0 }
+};
+#endif
 
 #define WS 0
 
@@ -97,19 +109,29 @@ messages to be printed.
 */
 /* #define EPRINT */
 
-int main() {
-  
+int main(int argc, char **argv)
+{
     int i;
     char str[1024];
     Matrix *C1, *P1;
     Polyhedron *C, *P;
     Enumeration *en;
     char **param_name;
+    int c, ind = 0;
+    int hom = 0;
   
 #ifdef EP_EVALUATION
     Value *p, *tmp;
     int k;
 #endif
+
+    while ((c = getopt_long(argc, argv, "h", options, &ind)) != -1) {
+	switch (c) {
+	case 'h':
+	    hom = 1;
+	    break;
+	}
+    }
 
     P1 = Matrix_Read();
     C1 = Matrix_Read();
@@ -117,14 +139,44 @@ int main() {
         fprintf( stderr, "Not enough parameters !\n" );
         exit(0);
     }
+    if (hom) {
+	Matrix *C2, *P2;
+	P2 = homogenize(P1);
+	Matrix_Free(P1);
+	P1 = P2;
+	C2 = homogenize(C1);
+	Matrix_Free(C1);
+	C1 = C2;
+    }
     P = Constraints2Polyhedron(P1,WS);
     C = Constraints2Polyhedron(C1,WS);
-    Matrix_Free(C1);
     Matrix_Free(P1);
+    Matrix_Free(C1);
   
     /* Read the name of the parameters */
-    param_name = Read_ParamNames(stdin,C->Dimension);
+    param_name = Read_ParamNames(stdin,C->Dimension - hom);
+    if (hom) {
+	char **param_name2 = (char**)malloc(sizeof(char*) * (C->Dimension));
+	for (i = 0; i < C->Dimension - 1; i++)
+	    param_name2[i] = param_name[i];
+	param_name2[C->Dimension-1] = "_H";
+	free(param_name);
+	param_name=param_name2;
+    }
+
     en = Polyhedron_Enumerate(P,C,WS,param_name);
+
+    if (hom) {
+	Enumeration *en2;
+
+	printf("inhomogeneous form:\n");
+      
+	dehomogenize_enumeration(en, C->Dimension, WS);
+	for (en2 = en; en2; en2 = en2->next) {
+	    Print_Domain(stdout, en2->ValidityDomain, param_name);
+	    print_evalue(stdout, &en2->EP, param_name);
+	}
+    }
 
 #ifdef EP_EVALUATION
     if( isatty(0) && C->Dimension != 0)
@@ -155,7 +207,7 @@ int main() {
 #endif /* EP_EVALUATION */
   
     Enumeration_Free(en);
-    for( i=0 ; i<C->Dimension ; i++ )
+    for( i=0 ; i < C->Dimension - hom; i++ )
         free( param_name[i] );
     free(param_name);
     Polyhedron_Free( P );
