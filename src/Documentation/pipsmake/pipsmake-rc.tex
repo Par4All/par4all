@@ -2,6 +2,10 @@
 %% $Id$
 %%
 %% $Log: pipsmake-rc.tex,v $
+%% Revision 1.37  2005/08/08 13:13:23  irigoin
+%% Preconditions are now required for refine_transformers as they turn out to
+%% be useful intraprocedurally.
+%%
 %% Revision 1.36  2004/03/26 09:01:48  hurbain
 %% Oops. Debug removal.
 %%
@@ -590,7 +594,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2004/03/26 09:01:48 $~$
+$~$Date: 2005/08/08 13:13:23 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -2019,7 +2023,9 @@ transformers_inter_full         > MODULE.transformers
 \paragraph{Full Interprocedural Transformers}
 
 %%@UserManualDocumentation: refine_transformers
-Rebuild the interprocedural transformers using interprocedural preconditions.
+Rebuild the interprocedural transformers using interprocedural
+preconditions. Intraprocedural preconditions are also used to refine all
+transformers.
 %%ÿUserManualDocumentation
 
 \begin{verbatim}
@@ -2031,6 +2037,7 @@ refine_transformers         > MODULE.transformers
         < CALLEES.summary_transformer
         < MODULE.proper_effects
         < MODULE.transformers
+        < MODULE.preconditions
         < MODULE.summary_precondition
         < PROGRAM.program_precondition
 \end{verbatim}
