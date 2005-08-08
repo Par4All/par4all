@@ -12,6 +12,10 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.176  2005/08/08 13:14:09  irigoin
+%% Properties SEMANTICS_MAX_CFG_SIZE1 and SEMANTICS_MAX_CFG_SIZE2 added to
+%% avoid recompilations and increase PIPS flexibility.
+%%
 %% Revision 1.175  2004/06/21 15:35:40  irigoin
 %% Property PARSER_ACCEPT_ARRAY_RANGE_EXTENSION added, FALSE by default
 %%
@@ -240,7 +244,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2004/06/21 15:35:40 $~$
+$~$Date: 2005/08/08 13:14:09 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -1274,6 +1278,21 @@ SEMANTICS_ANALYZE_UNSTRUCTURED TRUE
 To reduce execution time, this property is complemented with a heuristics
 to turn off the analysis of very complex unstructured.
 
+If the control flow graph counts more than \verb/SEMANTICS_MAX_CFG_SIZE1/
+vertices, use effects only.
+
+\begin{verbatim}
+SEMANTICS_MAX_CFG_SIZE1 20
+\end{verbatim}
+
+If the control flow graph counts more than \verb/SEMANTICS_MAX_CFG_SIZE2/
+but less than \verb/SEMANTICS_MAX_CFG_SIZE1/
+vertices, perform the convex hull of its elementary transformers and take
+the fixpoint of it.
+
+\begin{verbatim}
+SEMANTICS_MAX_CFG_SIZE2 20
+\end{verbatim}
 
 \subsubsection{Contexte for statement and expression transformers}
 \index{Expression}
