@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.177  2005/08/08 13:19:04  irigoin
+%% Roles of SEMANTICS_MAX_CFG_SIZE1 and SEMANTICS_MAX_CFG_SIZE2 exchanged.
+%%
 %% Revision 1.176  2005/08/08 13:14:09  irigoin
 %% Properties SEMANTICS_MAX_CFG_SIZE1 and SEMANTICS_MAX_CFG_SIZE2 added to
 %% avoid recompilations and increase PIPS flexibility.
@@ -244,7 +247,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2005/08/08 13:14:09 $~$
+$~$Date: 2005/08/08 13:19:04 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -1282,16 +1285,17 @@ If the control flow graph counts more than \verb/SEMANTICS_MAX_CFG_SIZE1/
 vertices, use effects only.
 
 \begin{verbatim}
-SEMANTICS_MAX_CFG_SIZE1 20
+SEMANTICS_MAX_CFG_SIZE2 20
 \end{verbatim}
 
-If the control flow graph counts more than \verb/SEMANTICS_MAX_CFG_SIZE2/
-but less than \verb/SEMANTICS_MAX_CFG_SIZE1/
+If the control flow graph counts more than \verb/SEMANTICS_MAX_CFG_SIZE1/
+but less than \verb/SEMANTICS_MAX_CFG_SIZE2/
 vertices, perform the convex hull of its elementary transformers and take
-the fixpoint of it.
+the fixpoint of it. Note that \verb/SEMANTICS_MAX_CFG_SIZE2/ is assumed to
+be greater than or equal to \verb/SEMANTICS_MAX_CFG_SIZE1/.
 
 \begin{verbatim}
-SEMANTICS_MAX_CFG_SIZE2 20
+SEMANTICS_MAX_CFG_SIZE1 20
 \end{verbatim}
 
 \subsubsection{Contexte for statement and expression transformers}
