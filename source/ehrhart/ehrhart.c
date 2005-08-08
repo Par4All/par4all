@@ -1933,22 +1933,21 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS,
     res = en;
     res->ValidityDomain = rVD;
     
-	if( param_name )
-   {
-	 fprintf(stdout,"---------------------------------------\n");
-    fprintf(stdout,"Domain:\n");
+    if( param_name ) {
+      fprintf(stdout,"---------------------------------------\n");
+      fprintf(stdout,"Domain:\n");
     
 #ifdef EPRINT_ALL_VALIDITY_CONSTRAINTS
-    Print_Domain(stdout,res->ValidityDomain,param_name);
+      Print_Domain(stdout,res->ValidityDomain,param_name);
 #else    
-    {
-      Polyhedron *VD;
-      VD = DomainSimplify(res->ValidityDomain,C,MAXRAYS);
-      Print_Domain(stdout,VD,param_name);
-      Domain_Free(VD);
-    }
+      {
+	Polyhedron *VD;
+	VD = DomainSimplify(res->ValidityDomain,C,MAXRAYS);
+	Print_Domain(stdout,VD,param_name);
+	Domain_Free(VD);
+      }
 #endif /* EPRINT_ALL_VALIDITY_CONSTRAINTS */
-	}
+    }
     
     overflow_warning_flag = 1;
     
@@ -1971,12 +1970,11 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS,
     /* points in every dimension */
     value_set_si(hdv,hdim-nb_param);
 
-    for( np=0;np<nb_param;np++)
-    {
-		if( value_notzero_p(lcm[np]) )
-			value_multiply(m1[np],hdv,lcm[np]);
-		else
-			value_set_si(m1[np],1);
+    for( np=0;np<nb_param;np++) {
+	if( value_notzero_p(lcm[np]) )
+	    value_multiply(m1[np],hdv,lcm[np]);
+	else
+	    value_set_si(m1[np],1);
     }
 
 #ifdef EDEBUG2 
@@ -2085,15 +2083,15 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS,
       value_set_si(context[hdim],1);
       
       CATCH(overflow_error) {
-			fprintf(stderr,"Enumerate: arithmetic overflow error.\n");
-			fprintf(stderr,"You should rebuild PolyLib using GNU-MP or increasing the size of integers.\n");
-			overflow_warning_flag = 0;
-			assert(overflow_warning_flag);
+	  fprintf(stderr,"Enumerate: arithmetic overflow error.\n");
+	  fprintf(stderr,"You should rebuild PolyLib using GNU-MP or increasing the size of integers.\n");
+	  overflow_warning_flag = 0;
+	  assert(overflow_warning_flag);
 	
       }
       TRY {
-			res->EP.x.p = P_Enum(L,LQ,context,1,nb_param,dim,lcm,param_name);
-			UNCATCH(overflow_error);	
+	  res->EP.x.p = P_Enum(L,LQ,context,1,nb_param,dim,lcm,param_name);
+	  UNCATCH(overflow_error);	
       }
       
       for(i=0;i<=(hdim);i++)
@@ -2118,19 +2116,18 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS,
       if(CT) 
           addeliminatedparams_evalue(&res->EP,CT);
       
-	if( param_name )
-	{
-      fprintf(stdout,"\nEhrhart Polynomial:\n");
-      print_evalue(stdout,&res->EP, param_name);
-      fprintf(stdout,"\n");
-      /* sometimes the final \n lacks (when a single constant is printed) */
-	}
+      if (param_name) {
+	fprintf(stdout,"\nEhrhart Polynomial:\n");
+	print_evalue(stdout,&res->EP, param_name);
+	fprintf(stdout,"\n");
+	/* sometimes the final \n lacks (when a single constant is printed) */
+      }
       
     }
   }
 
   if( P != Pi )
- 	Polyhedron_Free( P );
+    Polyhedron_Free( P );
   /* Clear all the 'Value' variables */
   for( np=0; np<nb_param ; np++ )
   {
