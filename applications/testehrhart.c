@@ -141,10 +141,10 @@ int main(int argc, char **argv)
     }
     if (hom) {
 	Matrix *C2, *P2;
-	P2 = homogenize(P1);
+	P2 = AddANullColumn(P1);
 	Matrix_Free(P1);
 	P1 = P2;
-	C2 = homogenize(C1);
+	C2 = AddANullColumn(C1);
 	Matrix_Free(C1);
 	C1 = C2;
     }

@@ -129,21 +129,6 @@ Polyhedron *dehomogenize_polyhedron(Polyhedron *p, int maxRays){
   return ph;
 }
 
-/** Homogenize a matrix. This just adds a extra columns consisting 
-    entirely out of zeros.
- **/
-Matrix *homogenize(Matrix *m){
-  int i;
-  Matrix *res;
-  res = Matrix_Alloc(m->NbRows, m->NbColumns + 1);
-  for (i = 0; i < m->NbRows; i++){
-    Vector_Copy(m->p[i], res->p[i], m->NbColumns);
-    value_set_si(res->p[i][m->NbColumns], 0);
-  }
-  /* Matrix_Print(stderr, P_VALUE_FMT, res); */
-  return res;
-}
-
 /** dehomogenize an enumeration. Replaces each validity domain and 
     Ehrhart polynomial in the Enumeration en with the dehomogenized form.
  **/
