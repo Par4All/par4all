@@ -1765,16 +1765,15 @@ Enumeration *Enumerate_NoParameters(Polyhedron *P,Polyhedron *C,Matrix *CT,Polyh
         printf("\n");
     }
 	}
+
+  res->EP.x.p = new_enode(polynomial,1,0);;
+  value_set_si(res->EP.x.p->arr[0].d, 1);
+  value_init(res->EP.x.p->arr[0].x.n);
+
   if (emptyQ(P)) {
-    res->EP.x.p = new_enode(polynomial,1,0);;
-    value_set_si(res->EP.x.p->arr[0].d, 1);
-    value_init(res->EP.x.p->arr[0].x.n);
     value_set_si(res->EP.x.p->arr[0].x.n, 0);
   } else if (!L) {
     /* Non-empty zero-dimensional domain */
-    res->EP.x.p = new_enode(polynomial,1,0);;
-    value_set_si(res->EP.x.p->arr[0].d, 1);
-    value_init(res->EP.x.p->arr[0].x.n);
     value_set_si(res->EP.x.p->arr[0].x.n, 1);
   } else {
     CATCH(overflow_error) {
@@ -1789,9 +1788,6 @@ Enumeration *Enumerate_NoParameters(Polyhedron *P,Polyhedron *C,Matrix *CT,Polyh
     
         /* Set context[hdim] = 1  (the constant) */
         value_set_si(context[hdim],1);
-	res->EP.x.p = new_enode(polynomial,1,0);
-	value_set_si(res->EP.x.p->arr[0].d, 1);
-	value_init(res->EP.x.p->arr[0].x.n);
 	count_points(1, L, context, &res->EP.x.p->arr[0].x.n);
         UNCATCH(overflow_error);
     }
