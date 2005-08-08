@@ -701,8 +701,8 @@ int cherche_min(Value *min,Polyhedron *D,int pos) {
 /** 
 
 This procedure finds the smallest parallelepiped of size
-'<i>size[i]</i>' for every dimension i, contained in polyhedron D If
-this is not possible, an empty polyhedron is returned
+'<i>size[i]</i>' for every dimension i, contained in polyhedron D.
+If this is not possible, NULL is returned
 
 <p>
 
@@ -868,6 +868,7 @@ Polyhedron *Polyhedron_Preprocess(Polyhedron *D,Value *size,unsigned MAXRAYS)
         value_clear(min[i]);
     free(min);
     // value_clear(tmp);
+    assert(!emptyQ(H));
     return(H);
 } /* Polyhedron_Preprocess */
 
