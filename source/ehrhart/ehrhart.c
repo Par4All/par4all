@@ -320,16 +320,14 @@ void reduce_evalue (evalue *e) {
     else if (p->type==polynomial) {
 	  
         /* Try to reduce the degree */
-        for (i=p->size-1;i>=0;i--) {
-            if (value_one_p(p->arr[i].d) && value_zero_p(p->arr[i].x.n))
-	
-                /* Zero coefficient */
-                continue;
-            else
+        for (i=p->size-1;i>=1;i--) {
+            if (!(value_one_p(p->arr[i].d) && value_zero_p(p->arr[i].x.n)))
                 break;
+	    /* Zero coefficient */
+	    free_evalue_refs(&p->arr[i]);
         }
-        if (i==-1) p->size = 1;
-        else if (i+1<p->size) p->size = i+1;
+        if (i+1<p->size)
+	    p->size = i+1;
 
         /* Try to reduce its strength */
         if (p->size == 1) {
