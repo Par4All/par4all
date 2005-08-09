@@ -533,7 +533,6 @@ void edot(enode *v1,enode *v2,evalue *res) {
     emul(&v1->arr[0],&v2->arr[0],res);
     for (i=1; i<v1->size; i++) {
         value_init(tmp.d);
-        value_init(tmp.x.n);
      
         /* res = res + v1[i]*v2[i] */
         emul(&v1->arr[i],&v2->arr[i],&tmp);
