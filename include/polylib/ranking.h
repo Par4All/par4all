@@ -13,6 +13,6 @@
 // defined by I = M.(J N 1)^T
 // J are the n' first variables of the returned Ehrhart polynomial.
 // If M is NULL, I = J is taken by default.
-Enumeration *Ranking(Matrix * Constraints, Matrix * C, Matrix * M, unsigned MAXRAYS, char ** param_name);
+Enumeration *Ranking(Matrix * Constraints, Matrix * C, Matrix * M, unsigned MAXRAYS);
 
 #endif // __BM_POLYLIB_RANKING_H__

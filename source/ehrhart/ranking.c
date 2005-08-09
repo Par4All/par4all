@@ -13,7 +13,7 @@
 // J are the n' first variables of the returned Ehrhart polynomial.
 // If M is NULL, I = J is taken by default.
 Enumeration *Ranking(Matrix * Constraints, Matrix * C, Matrix * M, 
-		     unsigned MAXRAYS, char ** param_name) 
+		     unsigned MAXRAYS) 
 {
   unsigned i,j,k;
   unsigned nb_parms = C->NbColumns -2;
@@ -124,7 +124,7 @@ Enumeration *Ranking(Matrix * Constraints, Matrix * C, Matrix * M,
 
   // 3- Compute the ranking, which is the sum of the Ehrhart polynomials of the n disjoint polyhedra we just put in P1.
   // OPT : our polyhdera are (already) disjoint, so Domain_Enumerate does probably too much work uselessly
-  ranking = Domain_Enumerate(P1, C1, MAXRAYS, param_name);
+  ranking = Domain_Enumerate(P1, C1, MAXRAYS, NULL);
 
   // 4- clean up
   Domain_Free(P1);
