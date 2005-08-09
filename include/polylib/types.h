@@ -97,6 +97,10 @@ typedef struct polyhedron {
 #define    POL_FACETS		0x00000002
 #define    POL_POINTS		0x00000004
 #define    POL_VERTICES		0x00000008
+/* The flags field contains "valid" information,
+ * i.e., the structure was created by PolyLib.
+ */
+#define	   POL_VALID		0x00000010
   unsigned flags;
 } Polyhedron;
 

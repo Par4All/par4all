@@ -9,19 +9,19 @@
 
 /* Make sure the Constraint member is valid */
 #define POL_ENSURE_INEQUALITIES(P) 				    		\
-	if (!F_ISSET(P, POL_INEQUALITIES)) 					\
+	if (F_ISSET(P, POL_VALID) && !F_ISSET(P, POL_INEQUALITIES)) 		\
 	    Polyhedron_Compute_Dual(P);
 /* Make sure the Ray member is valid */
 #define POL_ENSURE_POINTS(P) 					    		\
-	if (!F_ISSET(P, POL_POINTS)) 						\
+	if (F_ISSET(P, POL_VALID) && !F_ISSET(P, POL_POINTS)) 			\
 	    Polyhedron_Compute_Dual(P);
 /* Make sure the Constraint member is valid and non-redundant */
 #define POL_ENSURE_FACETS(P) 					    		\
-	if (!F_ISSET(P, POL_FACETS)) 						\
+	if (F_ISSET(P, POL_VALID) && !F_ISSET(P, POL_FACETS)) 			\
 	    Polyhedron_Compute_Dual(P);
 /* Make sure the Ray member is valid and non-redundant */
 #define POL_ENSURE_VERTICES(P) 					    		\
-	if (!F_ISSET(P, POL_VERTICES)) 						\
+	if (F_ISSET(P, POL_VALID) && !F_ISSET(P, POL_VERTICES))			\
 	    Polyhedron_Compute_Dual(P);
 
 #if defined(__cplusplus)

@@ -1729,7 +1729,8 @@ NbBid -	|	|       |      | |   |  |  |e|
   for(i=0;i<RowSize1;i++)
     value_clear(temp1[i]);
   free(temp1);
-  F_SET(Pol, POL_INEQUALITIES | POL_FACETS | POL_POINTS | POL_VERTICES);
+  F_SET(Pol, 
+        POL_VALID | POL_INEQUALITIES | POL_FACETS | POL_POINTS | POL_VERTICES);
   return Pol;
 } /* Remove_Redundants */
 
@@ -1923,7 +1924,8 @@ Polyhedron *Empty_Polyhedron(unsigned Dimension) {
   }
   Pol->NbEq = Dimension+1;
   Pol->NbBid = 0;
-  F_SET(Pol, POL_INEQUALITIES | POL_FACETS | POL_POINTS | POL_VERTICES);
+  F_SET(Pol, 
+        POL_VALID | POL_INEQUALITIES | POL_FACETS | POL_POINTS | POL_VERTICES);
   return Pol;
 } /* Empty_Polyhedron */
 
@@ -1965,7 +1967,8 @@ Polyhedron *Universe_Polyhedron(unsigned Dimension) {
   value_set_si(Pol->Ray[Dimension][0],1);
   Pol->NbEq = 0;
   Pol->NbBid = Dimension;
-  F_SET(Pol, POL_INEQUALITIES | POL_FACETS | POL_POINTS | POL_VERTICES);
+  F_SET(Pol, 
+        POL_VALID | POL_INEQUALITIES | POL_FACETS | POL_POINTS | POL_VERTICES);
   return Pol;
 } /* Universe_Polyhedron */
 
@@ -2020,7 +2023,7 @@ Polyhedron *Constraints2Polyhedron(Matrix *Constraints,unsigned NbMaxRays) {
 		(Constraints->NbRows - NbEq) * Constraints->NbColumns);
     Pol->NbEq = Rank;
     Pol->Ray = 0;
-    F_SET(Pol, POL_INEQUALITIES);
+    F_SET(Pol, POL_VALID | POL_INEQUALITIES);
     return Pol;
   }
 
@@ -2242,6 +2245,9 @@ Polyhedron *Rays2Polyhedron(Matrix *Ray,unsigned NbMaxConstrs) {
  */
 void Polyhedron_Compute_Dual(Polyhedron *P)
 {
+  if (!F_ISSET(P, POL_VALID))
+    return;
+
   if (F_ISSET(P, POL_FACETS | POL_VERTICES))
     return;
 
