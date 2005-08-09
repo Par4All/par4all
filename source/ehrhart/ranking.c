@@ -6,72 +6,67 @@
 #include <polylib/polylib.h>
 #include <polylib/ranking.h>
 
-
-// given the constraints of a polyhedron P (the matrix Constraints), returns the number of points that are lexicographically stricly lesser than a point I of P,
-// defined by I = M.(J N 1)^T,
-// where M is an integer matrix provided by the user.
-// J are the n' first variables of the returned Ehrhart polynomial.
-// If M is NULL, I = J is taken by default.
-Enumeration *Ranking(Matrix * Constraints, Matrix * C, Matrix * M, 
+/*
+ * Returns the number of points in P that are lexicographically
+ * smaller than a given point in D.
+ * When P == D, this is the conventional ranking function.
+ * P and D are assumed to have the same parameter domain C.
+ * The variables in the Enumeration correspond to the variables
+ * in D followed by the parameter of D (the variables of C).
+ */
+Enumeration *Ranking(Polyhedron *P, Polyhedron *D, Polyhedron *C, 
 		     unsigned MAXRAYS) 
 {
-  unsigned i,j,k;
-  unsigned nb_parms = C->NbColumns -2;
-  unsigned nb_vars = Constraints->NbColumns-C->NbColumns;
+  unsigned i, j, k, r;
+  unsigned nb_parms = C->Dimension;
+  unsigned nb_vars = P->Dimension - C->Dimension;
   unsigned nb_new_parms;
   Enumeration * ranking;
   Matrix * cur_element, * C_times_J, * Klon;
   Polyhedron * P1, *C1;
   Polyhedron * lexico_lesser_union = NULL;
 
-  if (M)
-    assert(M->NbRows==nb_vars);
+  POL_ENSURE_INEQUALITIES(C);
+  POL_ENSURE_INEQUALITIES(D);
+  POL_ENSURE_INEQUALITIES(P);
 
-  if (M)
-    nb_new_parms = M->NbColumns-C->NbColumns+1;
-  else
-    nb_new_parms = nb_vars;
+  assert(P->Dimension == D->Dimension);
+  nb_new_parms = nb_vars;
 
   // the number of variables must be positive
   if (nb_vars<=0) {
     printf("\nRanking > No variables, returning NULL.\n"); 
     return NULL;
   }
-  cur_element = Matrix_Alloc(Constraints->NbRows+nb_vars, 
-			     Constraints->NbColumns+nb_new_parms);
+  cur_element = Matrix_Alloc(P->NbConstraints+nb_vars, 
+			     P->Dimension+nb_new_parms+2);
 
 
   // 0- Put P in the first rows of cur_element
-  for (i=0; i< Constraints->NbRows; i++) {
-    for (j=0; j< nb_vars+1; j++)
-      value_assign(cur_element->p[i][j], Constraints->p[i][j]);
-    for (j=0; j< nb_parms+1; j++)
-      value_assign(cur_element->p[i][j+nb_vars+nb_new_parms+1], 
-		   Constraints->p[i][j+nb_vars+1]);
+  for (i=0; i < P->NbConstraints; i++) {
+    Vector_Copy(P->Constraint[i], cur_element->p[i], nb_vars+1);
+    Vector_Copy(P->Constraint[i]+1+nb_vars, 
+		cur_element->p[i]+1+nb_vars+nb_new_parms, nb_parms+1);
   }
 
   // 1- compute the Ehrhart polynomial of each disjoint polyhedron defining the lexicographic order
-  for (k=0; k < nb_vars; k++) {
+  for (k=0, r = P->NbConstraints; k < nb_vars; k++, r++) {
 
     // a- build the corresponding matrix
     // the nb of rows of cur_element is fake, so that we do not have to re-allocate it.
-    cur_element->NbRows = Constraints->NbRows+k+1;
+    cur_element->NbRows = r+1;
 
-    // convert the last (strict) inequality into an equality
+    // convert the previous (strict) inequality into an equality
     if (k>=1) {
-      value_set_si(cur_element->p[Constraints->NbRows+k-1][0], 0);
-      value_increment(cur_element->p[Constraints->NbRows+k-1][cur_element->NbColumns-1], cur_element->p[Constraints->NbRows+k-1][cur_element->NbColumns-1]);
+      value_set_si(cur_element->p[r-1][0], 0);
+      value_set_si(cur_element->p[r][cur_element->NbColumns-1], 0);
     }
-    // build the k-th inequality form M
-    value_set_si(cur_element->p[Constraints->NbRows+k][0], 1);
-    value_set_si(cur_element->p[Constraints->NbRows+k][k+1], -1);
-    if (M) {
-      for (j=0; j< M->NbColumns; j++)
-	value_assign(cur_element->p[Constraints->NbRows+k][j+nb_vars+1], M->p[k][j]);
-    }
-    else
-      value_set_si(cur_element->p[Constraints->NbRows+k][nb_vars+k+1], 1);
-    value_decrement(cur_element->p[Constraints->NbRows+k][cur_element->NbColumns-1], cur_element->p[Constraints->NbRows+k][cur_element->NbColumns-1]); // we want a strict inequality
+    // build the k-th inequality from P
+    value_set_si(cur_element->p[r][0], 1);
+    value_set_si(cur_element->p[r][k+1], -1);
+    value_set_si(cur_element->p[r][nb_vars+k+1], 1);
+    // we want a strict inequality
+    value_set_si(cur_element->p[r][cur_element->NbColumns-1], -1);
     show_matrix(cur_element);
 
     // b- add it to the current union
@@ -85,42 +80,19 @@ Enumeration *Ranking(Matrix * Constraints, Matrix * C, Matrix * M,
   
   // 2- as we introduce n parameters, we must introduce them into the context as well
   // The added constraints are P.M.(J N 1 )^T >=0
-  C_times_J = Matrix_Alloc(C->NbRows+Constraints->NbRows, C->NbColumns+nb_new_parms);
+  C_times_J = Matrix_Alloc(C->NbConstraints + D->NbConstraints, D->Dimension+2);
   // copy the initial context while adding the new parameters
-  for (i=0; i< C->NbRows; i++) {
-    value_assign(C_times_J->p[i][0], C->p[i][0]);
-    for (j=0; j< nb_parms; j++)
-      value_assign(C_times_J->p[i][j+nb_vars+1], C->p[i][j+1]); 
+  for (i = 0; i < C->NbConstraints; i++) {
+    value_assign(C_times_J->p[i][0], C->Constraint[i][0]);
+    Vector_Copy(C->Constraint[i]+1, C_times_J->p[i]+1+nb_new_parms, nb_parms+1);
   }
 
-  // add the constraints PM(J N 1)^T >=0
-  if (M) {
-    for (i=0; i< Constraints->NbRows; i++) {
-      value_assign(C_times_J->p[i+C->NbRows][0], Constraints->p[i][0]);
-      for (j=0; j< nb_new_parms; j++) {
-	value_set_si(C_times_J->p[i+C->NbRows][j+1], 0);
-	for (k=0; k< nb_vars; k++) {
-	  value_addmul(C_times_J->p[i+C->NbRows][j+1], Constraints->p[i][k+1], M->p[k][j]);
-	}
-      }
-      for (j=0; j< nb_parms+1; j++) {
-	value_set_si(C_times_J->p[i+C->NbRows][j+nb_new_parms+1], 0);
-	for (k=0; k< nb_vars; k++) {
-	  value_addmul(C_times_J->p[i+C->NbRows][j+nb_new_parms+1], Constraints->p[i][k+1], M->p[k][j+nb_new_parms]);
-	}
-	value_addto(C_times_J->p[i+C->NbRows][j+nb_new_parms+1], C_times_J->p[i+C->NbRows][j+nb_new_parms+1], Constraints->p[i][j+nb_vars+1]);
-      }
-    }
-  }
-  else { // if M=NULL, just use I = J => copy Constraints into the new context
-    for (i=0; i< Constraints->NbRows; i++) {
-      for (j=0; j< Constraints->NbColumns; j++) {
-	value_assign(C_times_J->p[i+C->NbRows][j], Constraints->p[i][j]);
-      }
-    }
-  }
+  /* copy constraints from evaluation domain */
+  for (i = 0; i < D->NbConstraints; i++)
+    Vector_Copy(D->Constraint[i], C_times_J->p[C->NbConstraints+i], D->Dimension+2);
+
   show_matrix(C_times_J);
-  C1 = Constraints2Polyhedron(C_times_J, MAXRAYS);
+  C1 = Constraints2Polyhedron(C_times_J, POL_NO_DUAL);
 
   // 3- Compute the ranking, which is the sum of the Ehrhart polynomials of the n disjoint polyhedra we just put in P1.
   // OPT : our polyhdera are (already) disjoint, so Domain_Enumerate does probably too much work uselessly

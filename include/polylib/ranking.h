@@ -8,11 +8,15 @@
 #define __BM_POLYLIB_RANKING_H__
 #include <polylib/polylib.h>
 
-
-// given the constraints of a polyhedron P (the matrix Constraints), returns the number of points that are lexicographically stricly lesser than a point I of P,
-// defined by I = M.(J N 1)^T
-// J are the n' first variables of the returned Ehrhart polynomial.
-// If M is NULL, I = J is taken by default.
-Enumeration *Ranking(Matrix * Constraints, Matrix * C, Matrix * M, unsigned MAXRAYS);
+/*
+ * Returns the number of points in P that are lexicographically
+ * smaller than a given point in D.
+ * When P == D, this is the conventional ranking function.
+ * P and D are assumed to have the same parameter domain C.
+ * The variables in the Enumeration correspond to the variables
+ * in D followed by the parameter of D (the variables of C).
+ */
+Enumeration *Ranking(Polyhedron *P, Polyhedron *D, Polyhedron *C, 
+		     unsigned MAXRAYS);
 
 #endif // __BM_POLYLIB_RANKING_H__
