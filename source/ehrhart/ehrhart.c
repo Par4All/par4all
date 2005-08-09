@@ -2144,6 +2144,7 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS,
     }
   }
 
+  free(PP);
   if( P != Pi )
     Polyhedron_Free( P );
   if (Ph)
