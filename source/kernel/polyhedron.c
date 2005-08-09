@@ -2014,10 +2014,11 @@ Polyhedron *Constraints2Polyhedron(Matrix *Constraints,unsigned NbMaxRays) {
     Rank = Gauss(Constraints, NbEq, Dimension);
     Pol = Polyhedron_Alloc(Dimension-1, Constraints->NbRows - (NbEq-Rank), 0);
     /* Make sure nobody accesses the rays by accident */
-    Vector_Copy(Constraints->p_Init, Pol->Constraint[0], 
+    Vector_Copy(Constraints->p[0], Pol->Constraint[0], 
 		Rank * Constraints->NbColumns);
-    Vector_Copy(Constraints->p_Init, Pol->Constraint[Rank], 
+    Vector_Copy(Constraints->p[NbEq], Pol->Constraint[Rank], 
 		(Constraints->NbRows - NbEq) * Constraints->NbColumns);
+    Pol->NbEq = Rank;
     Pol->Ray = 0;
     F_SET(Pol, POL_INEQUALITIES);
     return Pol;
