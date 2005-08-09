@@ -1367,6 +1367,10 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
   A = Matrix_Alloc(hdim, 2*hdim+1);		        /* used for Gauss */
   B = new_enode(evector, hdim, 0);
   C = new_enode(evector, hdim, 0);
+
+  /* We'll create these again when we need them */
+  for (j = 0; j < hdim; ++j)
+    free_evalue_refs(&C->arr[j]);
   
   /*----------------------------------------------------------------*/
   /*                                                                */
@@ -1388,7 +1392,7 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
   /* noff is a multiple of lcm */
   value_subtract(noff,nLB,nlcm);
   value_addto(tmp,lcm_copy,nlcm);
-  for (value_assign(k,nlcm);value_lt(k,tmp);value_increment(k,k)) {
+  for (value_assign(k,nlcm);value_lt(k,tmp);) {
  
 #ifdef EDEBUG
     fprintf(stderr,"Finding ");
@@ -1564,6 +1568,7 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
       /* Set up coefficient vector C from i-th row of inverted matrix */
       for (j=0; j<rank; j++) {
 	Gcd(A->p[i][i+1],A->p[i][j+1+hdim],&g);
+	value_init(C->arr[j].d);
 	value_division(C->arr[j].d,A->p[i][i+1],g);
 	value_init(C->arr[j].x.n);
 	value_division(C->arr[j].x.n,A->p[i][j+1+hdim],g);
@@ -1589,8 +1594,17 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
 	}
 #endif
       
+      for (j = 0; j < rank; ++j)
+	free_evalue_refs(&C->arr[j]);
     }
     value_addto(tmp,lcm_copy,nlcm);
+
+    value_increment(k,k);
+    for (i = 0; i < hdim; ++i) {
+      free_evalue_refs(&B->arr[i]);
+      if (value_lt(k,tmp))
+	value_init(B->arr[i].d);
+    }
   }
   
 #ifdef EDEBUG
