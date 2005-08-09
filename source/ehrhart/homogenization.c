@@ -42,6 +42,7 @@ void dehomogenize_evalue(evalue *ep, int nb_param){
       }
       free_evalue_refs(ep);
       memcpy(ep, w, sizeof(evalue));
+      free(w);
     }
     else{
       /** Not the last parameter. Recurse **/
