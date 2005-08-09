@@ -2149,8 +2149,12 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS,
     value_clear(lcm[np]); value_clear(m1[np]);
   }
   value_clear(hdv);
+  free(lcm);
+  free(m1);
 
 out:
+  if (CEq)
+    Polyhedron_Free(CEq);
   if (CT)
     Matrix_Free(CT);
   free(PP);
