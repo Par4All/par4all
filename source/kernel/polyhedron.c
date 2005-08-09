@@ -2152,6 +2152,10 @@ Polyhedron *Rays2Polyhedron(Matrix *Ray,unsigned NbMaxConstrs) {
     return(Pol);
   }
 
+  /* Ignore for now */
+  if (NbMaxConstrs == POL_NO_DUAL)
+    NbMaxConstrs = 0;
+
   if (Dimension > NbMaxConstrs)
     NbMaxConstrs = Dimension;
   
@@ -2368,6 +2372,10 @@ Polyhedron *AddConstraints(Value *Con,unsigned NbConstraints,Polyhedron *Pol,uns
     NbCon      	= Pol->NbConstraints + NbConstraints;
     Dimension	= Pol->Dimension + 2;	/* Homogeneous Dimension + Status */
 
+    /* Ignore for now */
+    if (NbMaxRays == POL_NO_DUAL)
+      NbMaxRays = 0;
+
     if (NbRay > NbMaxRays)
       NbMaxRays = NbRay;
     
@@ -2582,6 +2590,10 @@ Polyhedron *SubConstraint(Value *Con,Polyhedron *Pol,unsigned NbMaxRays,int Pass
     Dimension = Pol->Dimension+2;	/* Homogeneous Dimension + Status */
     NbEle1    = NbCon * Dimension;
     
+    /* Ignore for now */
+    if (NbMaxRays == POL_NO_DUAL)
+      NbMaxRays = 0;
+
     if (NbRay > NbMaxRays)
       NbMaxRays = NbRay;
     
@@ -2736,6 +2748,10 @@ Polyhedron *AddRays(Value *AddedRays,unsigned NbAddedRays,Polyhedron *Pol,unsign
     /* Add the new rays pointed by 'AddedRays' to matrix 'Ray' */
     Vector_Copy(AddedRays, Ray->p_Init+NbEle1, NbAddedRays * Dimension);
     
+    /* Ignore for now */
+    if (NbMaxConstrs == POL_NO_DUAL)
+      NbMaxConstrs = 0;
+
     /* We need at least NbCon rows */
     if (NbMaxConstrs < NbCon)
 	NbMaxConstrs = NbCon;
@@ -3177,6 +3193,10 @@ static int SimplifyConstraints(Polyhedron *Pol1,Polyhedron *Pol2,unsigned *Filte
     NbCon         = NbCon1 + NbCon2;
     Dimension     = Pol1->Dimension+2;    /* Homogeneous Dimension + Status */
     NbEle1        = NbCon1*Dimension;
+    
+    /* Ignore for now */
+    if (NbMaxRays == POL_NO_DUAL)
+      NbMaxRays = 0;
 
     if (NbRay > NbMaxRays)
       NbMaxRays = NbRay;
