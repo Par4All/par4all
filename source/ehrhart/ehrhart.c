@@ -1892,12 +1892,9 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS,
     hdim -= CT->NbColumns-CT->NbRows;
     
     /* Don't call Polyhedron2Param_Domain if there are no parameters */
-    if(nb_param == 0)
-    {
-	    res = Enumerate_NoParameters(P,C,CT,CEq,MAXRAYS,param_name);
-	    if( P != Pi )
-		    Polyhedron_Free( P );
-	    return( res );
+    if(nb_param == 0) {
+	res = Enumerate_NoParameters(P,C,CT,CEq,MAXRAYS,param_name);
+	goto out;
     }  
   }
 
@@ -2144,9 +2141,6 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS,
     }
   }
 
-  free(PP);
-  if( P != Pi )
-    Polyhedron_Free( P );
   if (Ph)
     Polyhedron_Free(Ph);
   /* Clear all the 'Value' variables */
@@ -2155,6 +2149,13 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS,
     value_clear(lcm[np]); value_clear(m1[np]);
   }
   value_clear(hdv);
+
+out:
+  if (CT)
+    Matrix_Free(CT);
+  free(PP);
+  if( P != Pi )
+    Polyhedron_Free( P );
 
   return res;
 } /* Polyhedron_Enumerate */ 
