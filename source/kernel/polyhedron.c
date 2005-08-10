@@ -2265,10 +2265,12 @@ void Polyhedron_Compute_Dual(Polyhedron *P)
     M.p = P->Constraint;
     Q = Constraints2Polyhedron(&M, 0);
 
-    /* Switch contents of P and Q */
+    /* Switch contents of P and Q ... */
     tmp = *Q;
     *Q = *P;
     *P = tmp;
+    /* ... but keep the next pointer */
+    P->next = Q->next;
     Polyhedron_Free(Q);
     return;
   }
