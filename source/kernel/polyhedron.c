@@ -309,8 +309,10 @@ static void RaySort(Matrix *Ray,SatMatrix *Sat,int NbBid,int NbRay,int *equal_bo
   
   while (inf_bound>*sup_bound) {
     if (value_zero_p(**uni_sup)) {               /* status = satisfy */
-      Vector_Exchange(*uni_eq,*uni_sup,RowSize1);
-      bexchange(*inc_eq,*inc_sup,RowSize2);
+      if (inc_eq != inc_sup) {
+	Vector_Exchange(*uni_eq,*uni_sup,RowSize1);
+	bexchange(*inc_eq,*inc_sup,RowSize2);
+      }
       (*equal_bound)++; uni_eq++; inc_eq++;
       (*sup_bound)++; uni_sup++; inc_sup++;
     }
@@ -320,8 +322,10 @@ static void RaySort(Matrix *Ray,SatMatrix *Sat,int NbBid,int NbRay,int *equal_bo
       /* if (**uni_sup<0) */
       if (value_neg_p(**uni_sup)) {             /* Status != verify  */
 	inf_bound--; uni_inf--; inc_inf--;
-	Vector_Exchange(*uni_inf,*uni_sup,RowSize1);
-	bexchange(*inc_inf,*inc_sup,RowSize2);
+	if (inc_inf != inc_sup) {
+	  Vector_Exchange(*uni_inf,*uni_sup,RowSize1);
+	  bexchange(*inc_inf,*inc_sup,RowSize2);
+	}
       }
       else {                                     /* status == verify */
 	 (*sup_bound)++; uni_sup++; inc_sup++;
@@ -538,9 +542,10 @@ static int Chernikova (Matrix *Mat,Matrix *Ray,SatMatrix *Sat, unsigned NbBid, u
 	  Sat->p[NbBid][jx] |= bx;
 	}
 	else {                        /* Constraint is an equality */
-	  NbRay--;
-	  Vector_Copy(Ray->p[NbRay],Ray->p[NbBid],Dimension+1);
-	  SMVector_Copy(Sat->p[NbRay],Sat->p[NbBid],sat_nbcolumns);
+	  if (--NbRay != NbBid) {
+	    Vector_Copy(Ray->p[NbRay],Ray->p[NbBid],Dimension+1);
+	    SMVector_Copy(Sat->p[NbRay],Sat->p[NbBid],sat_nbcolumns);
+	  }
 	}
 
 #ifdef POLY_CH_DEBUG
