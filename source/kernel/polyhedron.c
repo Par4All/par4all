@@ -3721,13 +3721,8 @@ Polyhedron *align_context(Polyhedron *Pol,int align_dimension,int NbMaxRays) {
   
   int i, j, k;
   Polyhedron *p = NULL, *q, *result = NULL;
-  Matrix *Mat = NULL;
-
-  POL_ENSURE_FACETS(Pol);
-  POL_ENSURE_VERTICES(Pol);
 
   CATCH(any_exception_error) {
-    if (Mat) Matrix_Free(Mat);
     if (result) Polyhedron_Free(result);
     RETHROW();
   }
@@ -3751,33 +3746,37 @@ Polyhedron *align_context(Polyhedron *Pol,int align_dimension,int NbMaxRays) {
 
     /* Expand the dimension of all polyhedron in the polyhedral domain 'Pol' */
     for (; Pol; Pol=Pol->next) {
+      int have_cons = !F_ISSET(Pol, POL_VALID) || F_ISSET(Pol, POL_INEQUALITIES);
+      int have_rays = !F_ISSET(Pol, POL_VALID) || F_ISSET(Pol, POL_POINTS);
+      unsigned NbCons = have_cons ? Pol->NbConstraints : 0;
+      unsigned NbRays = have_rays ? Pol->NbRays + k : 0;
+
       q = p;
-      
-      /* Allocate space for the new constraint matrix with dimension expanded*/
-      /* to align_dimension.                                                 */
-      Mat = Matrix_Alloc(Pol->NbConstraints, align_dimension + 2);
-      if(!Mat) {
-	errormsg1("align_context", "outofmem", "out of memory space");
-	UNCATCH(any_exception_error);
-	return 0;
-      }
-      
-      /* Initialize the constraint matrix 'Mat' with zeros. */         
-      Vector_Set(Mat->p[0],0,(Pol->NbConstraints) * (align_dimension + 2));
-      
-      /* Each constraint in 'Pol' is mapped to k-zeros followed by the */
-      /* constraint and is stored in constraint matrix 'Mat'.          */ 
-      for (i=0; i<Pol->NbConstraints; i++) {
-	for (j=1; j<=Pol->Dimension+1;j++) {
-	  value_assign(Mat->p[i][k+j], Pol->Constraint[i][j]);
+
+      p = Polyhedron_Alloc(align_dimension, NbCons, NbRays);
+      if (have_cons) {
+	for (i = 0; i < NbCons; ++i) {
+	  value_assign(p->Constraint[i][0], Pol->Constraint[i][0]);  /* Status bit */
+	  Vector_Copy(Pol->Constraint[i]+1, p->Constraint[i]+k+1, Pol->Dimension+1);
 	}
-	value_assign(Mat->p[i][0], Pol->Constraint[i][0]);  /* Status bit */
+	p->NbEq = Pol->NbEq;
       }
+
+      if (have_rays) {
+	for (i = 0; i < k; ++i)
+	  value_set_si(p->Ray[i][1+i], 1);			    /* A line */
+	for (i = 0; i < Pol->NbRays; ++i) {
+	  value_assign(p->Ray[k+i][0], Pol->Ray[i][0]);  	    /* Status bit */
+	  Vector_Copy(Pol->Ray[i]+1, p->Ray[i+k]+k+1, Pol->Dimension+1);
+	}
+	p->NbBid = Pol->NbBid + k;
+      }
+      p->flags = Pol->flags;
       
-      /* Convert the constraint matrix 'Mat' into an equivalent polyhedron. */
-      p = Constraints2Polyhedron(Mat, NbMaxRays);
-      if (q) q->next = p; else result = p;
-      Matrix_Free(Mat), Mat = NULL;
+      if (q)
+	q->next = p;
+      else
+	result = p;
     }
   } /* end of TRY */
   
