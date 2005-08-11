@@ -3720,7 +3720,7 @@ Polyhedron *DomainDifference(Polyhedron *Pol1,Polyhedron *Pol2,unsigned NbMaxRay
 Polyhedron *align_context(Polyhedron *Pol,int align_dimension,int NbMaxRays) {
   
   int i, j, k;
-  Polyhedron *p = NULL, *q, *result = NULL;
+  Polyhedron *p = NULL, **next, *result = NULL;
 
   CATCH(any_exception_error) {
     if (result) Polyhedron_Free(result);
@@ -3741,8 +3741,7 @@ Polyhedron *align_context(Polyhedron *Pol,int align_dimension,int NbMaxRays) {
 
     /* 'k' is the dimension increment */
     k = align_dimension - Pol->Dimension;
-    result = NULL;
-    p = NULL;
+    next = &result;
 
     /* Expand the dimension of all polyhedron in the polyhedral domain 'Pol' */
     for (; Pol; Pol=Pol->next) {
@@ -3750,8 +3749,6 @@ Polyhedron *align_context(Polyhedron *Pol,int align_dimension,int NbMaxRays) {
       int have_rays = !F_ISSET(Pol, POL_VALID) || F_ISSET(Pol, POL_POINTS);
       unsigned NbCons = have_cons ? Pol->NbConstraints : 0;
       unsigned NbRays = have_rays ? Pol->NbRays + k : 0;
-
-      q = p;
 
       p = Polyhedron_Alloc(align_dimension, NbCons, NbRays);
       if (have_cons) {
@@ -3773,10 +3770,8 @@ Polyhedron *align_context(Polyhedron *Pol,int align_dimension,int NbMaxRays) {
       }
       p->flags = Pol->flags;
       
-      if (q)
-	q->next = p;
-      else
-	result = p;
+      *next = p;
+      next = &p->next;
     }
   } /* end of TRY */
   
