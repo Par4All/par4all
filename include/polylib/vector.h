@@ -12,6 +12,9 @@
 extern "C" {
 #endif
 
+Value* value_alloc(int want, int *got);
+void value_free(Value *p, int size);
+
 extern void Factorial(int n,Value *result);
 extern void Binomial(int n,int p,Value *result);
 extern void CNP(int a,int b,Value *result);

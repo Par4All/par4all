@@ -38,23 +38,18 @@ Matrix *Matrix_Alloc(unsigned NbRows,unsigned NbColumns) {
   }
   Mat->NbRows=NbRows;
   Mat->NbColumns=NbColumns;
-  if(NbRows==0) {
-    Mat->p = (Value **)0;
-    Mat->p_Init= (Value *)0;
-  }  
-  else {
-    if(NbColumns==0) {
+  if (NbRows==0 || NbColumns==0) {
       Mat->p = (Value **)0;
       Mat->p_Init= (Value *)0;
-    }
-    else {
+      Mat->p_Init_size = 0;
+  } else {
       q = (Value **)malloc(NbRows * sizeof(*q));
       if(!q) {
 	free(Mat);
 	errormsg1("Matrix_Alloc", "outofmem", "out of memory space");
 	return 0;
       }
-      p = (Value *)malloc(NbRows * NbColumns * sizeof(Value));
+      p = value_alloc(NbRows * NbColumns, &Mat->p_Init_size);
       if(!p) {
 	free(q);
 	free(Mat);
@@ -65,15 +60,11 @@ Matrix *Matrix_Alloc(unsigned NbRows,unsigned NbColumns) {
       Mat->p_Init = p;
       for (i=0;i<NbRows;i++) {
 	*q++ = p;
-	for (j=0;j<NbColumns;j++)   
-	  value_init(*(p+j));
 	p += NbColumns;
       }
-    }
   }
   p = NULL;
   q = NULL;
-  Mat->p_Init_size = NbColumns*NbRows;
 
   return Mat;
 } /* Matrix_Alloc */
@@ -81,21 +72,11 @@ Matrix *Matrix_Alloc(unsigned NbRows,unsigned NbColumns) {
 /* 
  * Free the memory space occupied by Matrix 'Mat' 
  */
-void Matrix_Free(Matrix *Mat) {
-  
-  int i,j;
-  Value *p;
-
-  if( Mat->p )
-  {
-    p = *(Mat->p);
-    for(i=0;i<Mat->p_Init_size;i++) {
-      value_clear(*p++);
-    }
-  }
-
+void Matrix_Free(Matrix *Mat)
+{ 
   if (Mat->p_Init)
-    free(Mat->p_Init);
+    value_free(Mat->p_Init, Mat->p_Init_size);
+
   if (Mat->p)
     free(Mat->p);
   free(Mat);

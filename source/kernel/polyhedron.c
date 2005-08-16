@@ -358,7 +358,6 @@ static void SatMatrix_Extend(SatMatrix *Sat, Matrix* Mat, unsigned rows)
 static void Matrix_Extend(Matrix *Mat, unsigned NbRows)
 {
   Value *p, **q;
-  unsigned rows = Mat->p_Init_size / Mat->NbColumns;
   int i,j;
 
   q = (Value **)realloc(Mat->p, NbRows * sizeof(*q));
@@ -367,20 +366,20 @@ static void Matrix_Extend(Matrix *Mat, unsigned NbRows)
     return;
   }
   Mat->p = q;
-  p = (Value *)realloc(Mat->p_Init, NbRows * Mat->NbColumns * sizeof(Value));
-  if(!p) {
-    errormsg1("Matrix_Extend", "outofmem", "out of memory space");
-    return;
+  if (Mat->p_Init_size < NbRows * Mat->NbColumns) {
+    p = (Value *)realloc(Mat->p_Init, NbRows * Mat->NbColumns * sizeof(Value));
+    if(!p) {
+      errormsg1("Matrix_Extend", "outofmem", "out of memory space");
+      return;
+    }
+    Mat->p_Init = p;
+    for (i = Mat->p_Init_size; i < Mat->NbColumns*NbRows; ++i)
+	value_init(Mat->p_Init[i]);
+    Mat->p_Init_size = Mat->NbColumns*NbRows;
   }
-  Mat->p_Init = p;
   for (i=0;i<NbRows;i++) {
     Mat->p[i] = Mat->p_Init + (i * Mat->NbColumns);
-    if (i < rows)
-      continue;
-    for (j=0;j<Mat->NbColumns;j++)   
-      value_init(Mat->p[i][j]);
   }
-  Mat->p_Init_size = Mat->NbColumns*NbRows;
   Mat->NbRows = NbRows;
 }
 
@@ -1770,7 +1769,7 @@ Polyhedron* Polyhedron_Alloc(unsigned Dimension,unsigned NbConstraints,unsigned 
     errormsg1("Polyhedron_Alloc", "outofmem", "out of memory space");
     return 0;
   }
-  p = (Value *)malloc(NbRows * NbColumns * sizeof(Value));
+  p = value_alloc(NbRows*NbColumns, &Pol->p_Init_size);
   if(!p) {
     free(q);
     errormsg1("Polyhedron_Alloc", "outofmem", "out of memory space");
@@ -1781,29 +1780,19 @@ Polyhedron* Polyhedron_Alloc(unsigned Dimension,unsigned NbConstraints,unsigned 
   Pol->p_Init        = p;
   for (i=0;i<NbRows;i++) {
     *q++ = p;
-    for(j=0;j<NbColumns;j++) 
-      value_init(*(p+j));
     p += NbColumns;
   }
-  Pol->p_Init_size   = NbRows*NbColumns;
   return Pol;
 } /* Polyhedron_Alloc */
 
 /*    
  * Free the memory space occupied by the single polyhedron.
  */
-void Polyhedron_Free(Polyhedron *Pol) {
-  
-  int i,size;
-  Value *p;
-  
+void Polyhedron_Free(Polyhedron *Pol)
+{
   if(!Pol)
     return;
-  size = Pol->p_Init_size;
-  p = Pol->p_Init;
-  for(i=0;i<size;i++)
-    value_clear(p[i]); 
-  free(Pol->p_Init);
+  value_free(Pol->p_Init, Pol->p_Init_size);
   free(Pol->Constraint);
   free(Pol);
   return;

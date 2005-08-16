@@ -746,10 +746,67 @@ void Vector_Sort(Value *vector,unsigned n) {
   return;
 } /* Vector_Sort */
 
+#define MAX_CACHE_SIZE 20
+static struct {
+  Value *p;
+  int 	size;
+} cache[MAX_CACHE_SIZE];
+static int cache_size = 0;
 
+Value* value_alloc(int want, int *got)
+{
+    int i;
+    Value *p;
 
+    if (cache_size) {
+      int best;
+      for (i = 0; i < cache_size; ++i) {
+	if (cache[i].size >= want) {
+	  Value *p = cache[i].p;
+	  *got = cache[i].size;
+	  if (--cache_size != i) 
+	    cache[i] = cache[cache_size];
+	  Vector_Set(p, 0, *got);
+	  return p;
+	}
+	if (i == 0)
+	  best = 0;
+	else if (cache[i].size > cache[best].size)
+	  best = i;
+      }
 
+      p = (Value *)realloc(cache[best].p, want * sizeof(Value));
+      *got = cache[best].size;
+      if (--cache_size != best) 
+	cache[best] = cache[cache_size];
+      Vector_Set(p, 0, *got);
+    } else {
+      p = (Value *)malloc(want * sizeof(Value));
+      *got = 0;
+    }
 
+    if (!p)
+      return p;
 
+    for (i = *got; i < want; ++i)
+      value_init(p[i]);
+    *got = want;
 
+    return p;
+}
 
+void value_free(Value *p, int size)
+{
+    int i;
+
+    if (cache_size < MAX_CACHE_SIZE) {
+      cache[cache_size].p = p;
+      cache[cache_size].size = size;
+      ++cache_size;
+      return;
+    }
+
+    for (i=0; i < size; i++)
+      value_clear(p[i]);
+    free(p);
+}
