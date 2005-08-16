@@ -525,6 +525,7 @@ void left_hermite(Matrix *A,Matrix **Hp,Matrix **Qp,Matrix **Up) {
       }
     }
   }
+  value_clear(tmp);
 } /* left_hermite */
 
 /*
