@@ -373,10 +373,14 @@ static void Matrix_Extend(Matrix *Mat, unsigned NbRows)
       return;
     }
     Mat->p_Init = p;
+    Vector_Set(Mat->p_Init + Mat->NbRows*Mat->NbColumns, 0,
+	       Mat->p_Init_size - Mat->NbRows*Mat->NbColumns);
     for (i = Mat->p_Init_size; i < Mat->NbColumns*NbRows; ++i)
 	value_init(Mat->p_Init[i]);
     Mat->p_Init_size = Mat->NbColumns*NbRows;
-  }
+  } else
+    Vector_Set(Mat->p_Init + Mat->NbRows*Mat->NbColumns, 0,
+	       (NbRows - Mat->NbRows) * Mat->NbColumns);
   for (i=0;i<NbRows;i++) {
     Mat->p[i] = Mat->p_Init + (i * Mat->NbColumns);
   }
@@ -658,6 +662,7 @@ static int Chernikova (Matrix *Mat,Matrix *Ray,SatMatrix *Sat, unsigned NbBid, u
 	      if (!redundant) {
 		if (NbRay==NbMaxRays) {
 		  NbMaxRays *= 2;
+		  Ray->NbRows = NbRay;
 		  Matrix_Extend(Ray, NbMaxRays);
 		  SatMatrix_Extend(Sat, Mat, NbMaxRays);
 		}

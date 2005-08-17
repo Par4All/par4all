@@ -766,7 +766,7 @@ Value* value_alloc(int want, int *got)
 	  *got = cache[i].size;
 	  if (--cache_size != i) 
 	    cache[i] = cache[cache_size];
-	  Vector_Set(p, 0, *got);
+	  Vector_Set(p, 0, want);
 	  return p;
 	}
 	if (i == 0)
