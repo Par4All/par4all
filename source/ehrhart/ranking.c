@@ -7,21 +7,22 @@
 #include <polylib/ranking.h>
 
 /*
- * Returns the number of points in P that are lexicographically
+ * Returns a list of polytopes needed to compute
+ * the number of points in P that are lexicographically
  * smaller than a given point in D.
  * When P == D, this is the conventional ranking function.
  * P and D are assumed to have the same parameter domain C.
- * The variables in the Enumeration correspond to the variables
- * in D followed by the parameter of D (the variables of C).
+ *
+ * The first polyhedron in the list returned is the
+ * updated context: a combination of D and C.
  */
-Enumeration *Ranking(Polyhedron *P, Polyhedron *D, Polyhedron *C, 
-		     unsigned MAXRAYS) 
+Polyhedron *RankingPolytopes(Polyhedron *P, Polyhedron *D, Polyhedron *C, 
+			     unsigned MAXRAYS)
 {
   unsigned i, j, k, r;
   unsigned nb_parms = C->Dimension;
   unsigned nb_vars = P->Dimension - C->Dimension;
   unsigned nb_new_parms;
-  Enumeration * ranking;
   Matrix * cur_element, * C_times_J, * Klon;
   Polyhedron * P1, *C1;
   Polyhedron * lexico_lesser_union = NULL;
@@ -94,14 +95,39 @@ Enumeration *Ranking(Polyhedron *P, Polyhedron *D, Polyhedron *C,
   show_matrix(C_times_J);
   C1 = Constraints2Polyhedron(C_times_J, POL_NO_DUAL);
 
-  // 3- Compute the ranking, which is the sum of the Ehrhart polynomials of the n disjoint polyhedra we just put in P1.
-  // OPT : our polyhdera are (already) disjoint, so Domain_Enumerate does probably too much work uselessly
-  ranking = Domain_Enumerate(P1, C1, MAXRAYS, NULL);
-
   // 4- clean up
-  Domain_Free(P1);
-  Polyhedron_Free(C1);
   Matrix_Free(cur_element);
   Matrix_Free(C_times_J);
-  return ranking;
+
+  C1->next = P1;
+
+  return C1;
 } // Ranking
+
+/*
+ * Returns the number of points in P that are lexicographically
+ * smaller than a given point in D.
+ * When P == D, this is the conventional ranking function.
+ * P and D are assumed to have the same parameter domain C.
+ * The variables in the Enumeration correspond to the variables
+ * in D followed by the parameter of D (the variables of C).
+ */
+Enumeration *Polyhedron_Ranking(Polyhedron *P, Polyhedron *D, Polyhedron *C, 
+				unsigned MAXRAYS)
+{
+  Enumeration * ranking;
+  Polyhedron *RC, *RD;
+
+  RC = RankingPolytopes(P, D, C, MAXRAYS);
+  RD = RC->next;
+  RC->next = NULL;
+
+  // 3- Compute the ranking, which is the sum of the Ehrhart polynomials of the n disjoint polyhedra we just put in P1.
+  // OPT : our polyhdera are (already) disjoint, so Domain_Enumerate does probably too much work uselessly
+  ranking = Domain_Enumerate(RD, RC, MAXRAYS, NULL);
+
+  Domain_Free(RD);
+  Polyhedron_Free(RC);
+
+  return ranking;
+}

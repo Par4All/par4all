@@ -5,12 +5,14 @@
 #include <stdlib.h>
 
 #include <polylib/polylib.h>
+#include <polylib/ranking.h>
 
 int main( int argc, char **argv)
 {
   int i;
   char ** param_name = NULL;
-  Matrix *C, *P, * M;
+  Matrix *M;
+  Polyhedron *P, *D, *C;
   Enumeration *e, *en;
 
   int nb_parms;
@@ -20,27 +22,28 @@ int main( int argc, char **argv)
   int k;
 #endif
 
-  P = Matrix_Read();
-  C = Matrix_Read();
   M = Matrix_Read();
-  if (M->NbRows==0) {
-    Matrix_Free(M);
-    M=NULL;
-  }
+  P = Constraints2Polyhedron(M, POL_NO_DUAL);
+  Matrix_Free(M);
+  M = Matrix_Read();
+  D = Constraints2Polyhedron(M, POL_NO_DUAL);
+  Matrix_Free(M);
+  M = Matrix_Read();
+  C = Constraints2Polyhedron(M, POL_NO_DUAL);
+  Matrix_Free(M);
 
-  if (M) nb_parms = M->NbColumns-1;
-  else nb_parms = P->NbColumns-2;
+  nb_parms = D->Dimension;
 
    /* Read the name of the parameters */
   param_name = Read_ParamNames(stdin,nb_parms);
 
   // compute a polynomial approximation of the Ehrhart polynomial
   printf("============ Ranking function ============\n");
-  e = Ranking(P, C, M, 1024, param_name);
+  e = Polyhedron_Ranking(P, D, C, POL_NO_DUAL);
   
-  Matrix_Free(C);
-  Matrix_Free(P);
-  if (M) Matrix_Free(M);
+  Polyhedron_Free(P);
+  Polyhedron_Free(D);
+  Polyhedron_Free(C);
 
   for (en=e; en; en=en->next) {
     Print_Domain(stdout,en->ValidityDomain, param_name);
