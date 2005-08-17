@@ -61,7 +61,8 @@
 /* Status of last Polyhedron operation */
 extern int Pol_status;
 
-#define POL_NO_DUAL	UINT_MAX
+#define POL_HIGH_BIT	(UINT_MAX - (UINT_MAX >> 1))
+#define POL_NO_DUAL	(POL_HIGH_BIT | 0x0001)
 
 typedef struct  {
   unsigned Size;
