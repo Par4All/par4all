@@ -361,23 +361,14 @@ void Vector_AntiScale(Value *p1,Value *p2,Value lambda,unsigned length) {
  */
 void Inner_Product(Value *p1,Value *p2,unsigned length,Value *ip) {
   
-  //  Value tmp;
   int i;
 
-  // value_init(tmp);
-
-  //  if(length==0)
-  //  return(VALUE_MAX);  
-  
   value_multiply(*ip,*p1,*p2);
   p1++; p2++;
   for(i=1;i<length;i++) {
-    // value_multiply(tmp,*p1,*p2);
-    // value_addto(*ip,*ip,tmp);
     value_addmul(*ip, *p1, *p2);
     p1++; p2++;
   }
-  // value_clear(tmp);
 } /* Inner_Product */
 
 /* 
@@ -405,8 +396,6 @@ void Vector_Min(Value *p,unsigned length,Value *min) {
   Value *cp;
   int i;
 
-  //  if(length==0)
-  //  return(VALUE_MAX);
   cp=p;
   value_assign(*min,*cp);
   cp++;
