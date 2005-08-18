@@ -207,7 +207,6 @@ void AffineSmith(Lattice *A, Lattice **U, Lattice **V, Lattice **Diag) {
   Lattice *Uinv;
   int i,j;
   Value sum, quo, rem;
-  //, tmp;
   
 #ifdef DOMDEBUG
   FILE *fp;
@@ -217,7 +216,6 @@ void AffineSmith(Lattice *A, Lattice **U, Lattice **V, Lattice **Diag) {
 #endif
   
   value_init(sum); 
-  // value_init(tmp);
   value_init(quo); value_init(rem);
   temp = Homogenise(A,True);  
   Smith((Matrix *)temp, (Matrix **)U, (Matrix **)V, (Matrix **)Diag);
@@ -246,8 +244,6 @@ void AffineSmith(Lattice *A, Lattice **U, Lattice **V, Lattice **Diag) {
   for (i = 0; i < U[0]->NbRows-1; i ++) {
     value_set_si(sum,0);
     for(j = 0; j < U[0]->NbColumns-1; j ++) {
-      // value_multiply(tmp,Uinv->p[i][j],U[0]->p[j][U[0]->NbColumns-1]);
-      // value_addto(sum,sum,tmp);
       value_addmul(sum, Uinv->p[i][j], U[0]->p[j][U[0]->NbColumns-1]);
     }
     value_assign(Diag[0]->p[i][j],sum);
@@ -279,7 +275,6 @@ void AffineSmith(Lattice *A, Lattice **U, Lattice **V, Lattice **Diag) {
     value_assign(V[0]->p[i][V[0]->NbColumns-1],quo);
   }  
   value_clear(sum); 
-  // value_clear(tmp);
   value_clear(quo); value_clear(rem);
   return;
 } /* AffineSmith */
@@ -932,8 +927,6 @@ static void AddLattice (LatticeUnion *Head, Matrix  *B1,  Matrix *B2, int NumofT
       tempMatrix = (Lattice *)Matrix_Copy(temp->M);	  
       for (j = 0; j < B2->NbRows; j++) {
 	value_set_si(tmp,i);
-	// value_multiply(tmp,tmp,B1->p[j][Colnumber]);
-	// value_addto(tempMatrix->p[j][B2->NbColumns-1],tempMatrix->p[j][B2->NbColumns-1],tmp);	
 	value_addmul(tempMatrix->p[j][B2->NbColumns-1], tmp, B1->p[j][Colnumber]);
       }
       tail->next = (LatticeUnion *)malloc(sizeof(LatticeUnion)); 
@@ -1061,14 +1054,9 @@ int FindHermiteBasisofDomain(Polyhedron *A, Matrix **B) {
     for (j = 0; j < result->NbColumns; j++)
       value_assign(result->p[i][j],rays->p[i-vert->NbRows][j]);
 
-//  printf("\nIn FHB:-\n");
-//  Matrix_Print(stdout,P_VALUE_FMT, result);
-
   rank = findHermiteBasis(result, &temp);
   temp1 = ChangeLatticeDimension(temp,temp->NbRows+1);
 
-  //  printf("\nThe rank of the Domain is %d\n", rank);
-  //  Matrix_Print(stdout,P_VALUE_FMT,temp1);
   Matrix_Free(temp);
   
   /* Adding the Affine Part to take care of the Equalities */  
@@ -1097,8 +1085,6 @@ int FindHermiteBasisofDomain(Polyhedron *A, Matrix **B) {
   Matrix_Inverse(Newmat,temp);
   B[0] = Matrix_Alloc(temp1->NbRows,temp->NbColumns);
 
-//  Matrix_Print (stdout,P_VALUE_FMT,temp);
-  
   Matrix_Product(temp1,temp,B[0]);  
   value_clear(lcm);
   value_clear(fact);
