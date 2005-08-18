@@ -122,8 +122,6 @@ int SolveDiophantine(Matrix *M, Matrix **U, Vector **X) {
   for (i = 0; i < rank ; i++) {
     value_set_si(sum,0);
     for (j = 0; j < i; j++) {
-      //  value_multiply(tmp,T[j],hermi->p[i][j]);
-      // value_addto(sum,sum,tmp);
       value_addmul(sum, T[j], hermi->p[i][j]);
     } 
     value_subtract(tmp,C[i],sum);
@@ -142,7 +140,6 @@ int SolveDiophantine(Matrix *M, Matrix **U, Vector **X) {
     };
     value_subtract(tmp,C[i],sum);
     value_division(T[i],tmp,hermi->p[i][i]);
-    // value_assign(T[i],tmp);
   }
   
   /** Case when rank < Number of Columns; **/
@@ -157,8 +154,6 @@ int SolveDiophantine(Matrix *M, Matrix **U, Vector **X) {
   for (i = rank; i < hermi->NbRows; i++) {
     value_set_si(sum,0);
     for (j = 0; j < hermi->NbColumns; j++) {
-      //      value_multiply(tmp,T[j],hermi->p[i][j]);
-      //      value_addto(sum,sum,tmp);
       value_addmul(sum, T[j], hermi->p[i][j]);
     }  
     if (value_ne(sum,C[i])) {
@@ -194,8 +189,6 @@ int SolveDiophantine(Matrix *M, Matrix **U, Vector **X) {
     /* Calculating the vector X = Uinv * T */
     value_set_si(sum,0);
     for (j = 0; j < unimodinv->NbColumns; j++) {
-      // value_multiply(tmp,unimodinv->p[i][j],T[j]);
-      // value_addto(sum,sum,tmp);
       value_addmul(sum, unimodinv->p[i][j], T[j]);
     }  
     value_assign(X[0]->p[i],sum);
