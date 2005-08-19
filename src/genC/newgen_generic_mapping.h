@@ -67,18 +67,21 @@ PREFIX void make_##name##_map() \
 { name##_map = hash_table_make(hash_pointer, HASH_DEFAULT_SIZE);}\
 PREFIX result load_##type##_##name(type s)\
 { result t; message_assert("key defined", s != type##_undefined);\
-  t = (result) hash_get((hash_table) (name##_map), (char*) (s));\
+  t = (result) hash_get((hash_table) (name##_map), (void*) (s));\
   if (t ==(result) HASH_UNDEFINED_VALUE) t = result##_undefined; return t;}\
+PREFIX void delete_##type##_##name(type s)\
+{ result t; message_assert("key defined", s != type##_undefined);\
+  (void) hash_del((hash_table) (name##_map), (void*) (s));}\
 PREFIX bool type##_##name##_undefined_p(type s)\
 { return(load_##type##_##name(s)==result##_undefined);}\
 PREFIX void store_##type##_##name(type s, result t)\
 { message_assert("key defined", s != type##_undefined);\
   message_assert("value defined", t != result##_undefined);\
-  hash_put((hash_table) name##_map, (char*) s, (char*) t);}\
+  hash_put((hash_table) name##_map, (void*) s, (void*) t);}\
 PREFIX void update_##type##_##name(type s, result t)\
 { message_assert("key defined", s != type##_undefined);\
   message_assert("value defined", t != result##_undefined);\
-  hash_update((hash_table) name##_map, (char*) s, (char*) t);}
+  hash_update((hash_table) name##_map, (void*) s, (void*) t);}
 
 #define GENERIC_CURRENT_MAPPING(name, result, type) \
         GENERIC_MAPPING(extern, name, result, type)
