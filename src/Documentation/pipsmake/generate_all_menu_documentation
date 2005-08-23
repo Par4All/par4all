@@ -8,6 +8,8 @@
 #
 # $debug = 8;
 
+my $debug = 0;
+
 $generate_menu_layout = 0;
 if ($ARGV[0] eq "-layout") {
     shift;
@@ -278,7 +280,7 @@ sub DealWithEachView {
 	$icon_name = "";
     }
     print TheWpipsViewMenuLayout "{ \"$the_title\", \"$resource_name\", $wpips_method, \"$icon_name\" },\n";
-    print TheEpipsViewMenuLayout "\t(\"$the_title\" \"$ressource_name\" $epips_method \"$icon_name\")\n";
+    print TheEpipsViewMenuLayout "\t(\"$the_title\" \"$resource_name\" $epips_method \"$icon_name\")\n";
     return "";
 }
 
