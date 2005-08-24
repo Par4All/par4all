@@ -3,6 +3,11 @@
   * $Id$
   *
   * $Log: transformer.c,v $
+  * Revision 1.52  2005/08/24 15:28:27  irigoin
+  * bug fix in transformer_combine(). Due to contextual transformers, the
+  * combination may end up with an empty transformer because the range of t1
+  * does not intersect the domain of t2.
+  *
   * Revision 1.51  2003/12/19 16:27:21  irigoin
   * two calls to entity_module_name() used to retrieve the constant string
   * associated to a constant string entity replaced by calls to entity_name()
@@ -384,6 +389,12 @@ transformer transformer_combine(transformer t1, transformer t2)
 
     /* update t1 */
     if(sc_empty_p(r1)) {
+      /* No old values should be left in r1's basis. */
+      MAP(ENTITY, v, {
+	entity oldv = entity_to_old_value(v);
+	if(base_contains_variable_p(sc_base(r1), oldv))
+	  sc_base_remove_variable(r1, (Variable) oldv);
+      }, a1);
       free_arguments(a1);
       transformer_arguments(t1) = NIL;
     }
