@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: pipsmake-rc.tex,v $
+%% Revision 1.38  2005/08/24 13:04:13  coelho
+%% tests...
+%%
 %% Revision 1.37  2005/08/08 13:13:23  irigoin
 %% Preconditions are now required for refine_transformers as they turn out to
 %% be useful intraprocedurally.
@@ -594,7 +597,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2005/08/08 13:13:23 $~$
+$~$Date: 2005/08/24 13:04:13 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -2171,11 +2174,23 @@ alias preconditions_inter_full 'Full Inter-Procedural Analysis'
 
 %%@UserManualDocumentation: preconditions_intra
 Only build the preconditions in a module without any interprocedural
-propagation.
+propagation. The fast version uses a fast but crude approximation of
+preconditions for unstructured code.
 %%ÿUserManualDocumentation
 
 \begin{verbatim}
 preconditions_intra            > MODULE.preconditions
+        < PROGRAM.entities
+        < MODULE.cumulated_effects
+        < MODULE.transformers
+        < MODULE.summary_effects
+        < MODULE.summary_transformer
+        < MODULE.summary_precondition
+        < MODULE.code
+\end{verbatim}
+
+\begin{verbatim}
+preconditions_intra_fast            > MODULE.preconditions
         < PROGRAM.entities
         < MODULE.cumulated_effects
         < MODULE.transformers
