@@ -2,6 +2,10 @@
  * $Id$
  *
  * $Log: statement.c,v $
+ * Revision 1.61  2005/08/24 15:23:13  irigoin
+ * function fix_if_condition() defined and used for test and while
+ * conditions. Logical expressions are fixed directly in gram.y.
+ *
  * Revision 1.60  2003/08/02 14:06:42  irigoin
  * One step to accomodate formal functional parameters.
  *
@@ -1304,6 +1308,18 @@ MakeWhileDoInst(expression c, string l)
     instruction iwdo, instblock_do;
     statement stmt_do;
     entity dolab;
+    expression cond = expression_undefined;
+
+    if(!logical_expression_p(c)) {
+      /* with the f77 compiler, this is equivalent to c.NE.0*/
+      cond = MakeBinaryCall(entity_intrinsic(NON_EQUAL_OPERATOR_NAME),
+			    c, int_expr(0));
+      pips_user_warning("WHILE condition between lines %d and %d is not a logical expression.\n",
+			line_b_I,line_e_I);
+    }
+    else {
+      cond = c;
+    }
 
     dolab = MakeLabel((strcmp(l, "BLOCKDO") == 0) ? "" : l);
 
@@ -1311,11 +1327,34 @@ MakeWhileDoInst(expression c, string l)
     stmt_do = instruction_to_statement(instblock_do);
 
     iwdo = make_instruction(is_instruction_whileloop,
-			   make_whileloop(c, stmt_do, dolab,make_evaluation_before()));
+			   make_whileloop(cond, stmt_do, dolab,make_evaluation_before()));
 
     LinkInstToCurrentBlock(iwdo, TRUE);
    
     PushBlock(instblock_do, l);
+}
+
+expression fix_if_condition(expression e)
+{
+  expression cond = expression_undefined;
+
+  if(!logical_expression_p(e)) {
+    /* with the f77 compiler, this is equivalent to e.NE.0 if e is an
+       integer expression. */
+    if(integer_expression_p(e)) {
+      cond = MakeBinaryCall(entity_intrinsic(NON_EQUAL_OPERATOR_NAME),
+			    e, int_expr(0));
+      pips_user_warning("IF condition between lines %d and %d is not a logical expression.\n",
+			line_b_I,line_e_I);
+    }
+    else {
+      ParserError("MakeBlockIfInst", "IF condition is neither logical nor integer.\n");
+    }
+  }
+  else {
+    cond = e;
+  }
+  return cond;
 }
 
 /* this function creates a logical if statement. the true part of the
@@ -1338,8 +1377,9 @@ instruction i;
   /* It is not easy to number bt because Yacc reduction order does not help... */
     statement bt = instruction_to_statement(i);
     statement bf = make_empty_block_statement();
+    expression cond = fix_if_condition(e);
     instruction ti = make_instruction(is_instruction_test, 
-				      make_test(e, bt, bf));
+				      make_test(cond, bt, bf));
 				      
     if (i == instruction_undefined)
 	    FatalError("MakeLogicalIfInst", "bad instruction\n");
@@ -1505,12 +1545,13 @@ expression e;
 int elsif;
 {  
     instruction bt, bf, i;
+    expression cond = fix_if_condition(e);
 
     bt = MakeEmptyInstructionBlock();
     bf = MakeEmptyInstructionBlock();
 
     i = make_instruction(is_instruction_test,
-			 make_test(e,
+			 make_test(cond,
 				   MakeStatement(MakeLabel(""), bt),
 				   MakeStatement(MakeLabel(""), bf)));
 
