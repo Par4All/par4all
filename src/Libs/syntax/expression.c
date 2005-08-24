@@ -1,8 +1,12 @@
-/* 	%A% ($Date: 2003/08/02 14:02:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
+/* 	%A% ($Date: 2005/08/24 15:19:31 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
  *
  * $Id$
  *
  * $Log: expression.c,v $
+ * Revision 1.22  2005/08/24 15:19:31  irigoin
+ * First attempt at implementing property
+ * PARSER_ACCEPT_ARRAY_RANGE_EXTENSIONS for Project DREAM-UP. Not completed.
+ *
  * Revision 1.21  2003/08/02 14:02:47  irigoin
  * Comments improved. An intermediate step to allow functional formal parameters.
  *
@@ -38,7 +42,7 @@
  */
 
 #ifndef lint
-char vcid_syntax_expression[] = "%A% ($Date: 2003/08/02 14:02:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_expression[] = "%A% ($Date: 2005/08/24 15:19:31 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -315,8 +319,15 @@ int HasParenthesis;
 		if(!basic_string_p(bt)) {
 		  /* pips_assert("Substring can only be applied to a string",
 				 basic_string_p(bt)); */
-		  ParserError("MakeAtom",
-			      "Substring operations can only be applied to strings in Fortran 77\n");
+		  if(!get_bool_property("PARSER_ACCEPT_ARRAY_RANGE_EXTENSIONS"))
+		    ParserError("MakeAtom",
+				"Substring operations can only be applied to "
+				"strings in Fortran 77\n");
+		  else {
+		    /* Probably an extension we would have liked to have
+                       for the DREAM-UP project. */
+		    pips_internal_error("Not implemented yet\n");
+		  }
 		}
 
 		if(fc == expression_undefined) 
