@@ -22,9 +22,44 @@
    successor. Standard consistency check are likely to fail if applied to
    the unstructured produced by this decomposition.
 
+   When a node pointing to a scc is replicated, two options are
+   available. Either all copies point to a unique scc (initial
+   implementation) or each control copy points towards its own copy of the
+   scc. In the initial implementation and first option, only ancestor
+   control nodes can point to a scc, and ancestor_map is used to reach the
+   scc_associated to a node. In the second case, any control node,
+   replicated or not, can point to a scc. The first option makes sense
+   when transformers are not context dependent: all identical cycles can
+   be analyzed as one cycle, although I do not understand the miracle for
+   the preconditions, since they clearly are context-sensitive. The second
+   option is useful when transformers are computed in context, since all
+   replicates of a cycle can operate in diferrent contexts. This is
+   performed as a post-processing step conditional to property
+   SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT.
+
+   Structure of the code:
+     bourdoncle_partition()
+       bourdoncle_visit()
+         bourdoncle_component()
+           bourdoncle_visit() recursively
+           update_partition()
+           scc_to_dag() [Not part of Bourdoncle's algorithm: transforms a scc 
+	                 into a non-deterministic while loop]
+       replicate_cycles() [Not part of Bourdoncle's algorithm: allocate a copy
+                           of each scc, i.e. cycle, i.e. while loop for each 
+			   of its "call" sites]
+
  $Id$
 
  $Log: bourdoncle.c,v $
+ Revision 1.15  2005/08/24 15:33:46  irigoin
+ Function replicate_cycles() added to cope with context-dependent
+ transformers. Lots of comments added. Some debugging statement. A few
+ auxiliary functions added to cope with the two different modes: the basic
+ mode without cycle replication where cycles are identified by the ancestor
+ common to all the cycle call sites, and the context sensitive mode where
+ cycles are identified by their head or their unique call site node.
+
  Revision 1.14  2003/12/20 17:42:05  irigoin
  Bug fix in clean_up_embedding_graph(). Iteration over a list whose
  elements might be freed by a previous iteration. Why didn't it show up
@@ -83,7 +118,7 @@
 #include "ri.h"
 #include "ri-util.h"
 #include "control.h"
-/* #include "properties.h" */
+#include "properties.h"
 
 #include "misc.h"
 
@@ -511,10 +546,13 @@ static void davinci_print_non_deterministic_unstructured
     if((a = hash_get(ancestor_map, c))==HASH_UNDEFINED_VALUE)
       a = c;
     
+    /* It may be called with an empty ancestor and scc maps. */
     davinci_print_control_node(c, f,
 			       c==entry_c,
 			       c==exit_c,
-			       hash_get(scc_map, (void*) a)!=HASH_UNDEFINED_VALUE);
+			       hash_table_entry_count(ancestor_map)!=0
+			       && !meaningless_control_p(c)
+			       && cycle_head_p(c, ancestor_map, scc_map));
     fprintf(f, "%s\n", ENDP(CDR(c_c))? "" : ",");
   }, sl);
 
@@ -748,7 +786,11 @@ static void clean_up_embedding_graph(control c)
   int nor = 0; /* number of replications */
   int nel = 0; /* number of eliminations */
   
-  ifdebug(1) {
+  /* FI: A level of 1 makes more sense, but it is very slow on large
+     graphs. The same nodes are checked several times because the cache
+     managed by control_consistent_p() is lost between iterations. */
+  /* ifdebug(1) { */
+  ifdebug(8) {
     pips_assert("c is consistent", control_consistent_p(c));
     MAP(CONTROL, ec, {
       pips_assert("ec is consistent first", control_consistent_p(ec));
@@ -833,8 +875,10 @@ static bool ancestor_control_p(hash_table ancestor_map, control c)
   
   HASH_MAP(c_new, c_old, 
   {
-    if(c_old==(void *) c)
+    if(c_old==(void *) c) {
       ancestor_p = TRUE;
+      break;
+    }
   }
 	   , ancestor_map);
   return ancestor_p;
@@ -949,7 +993,7 @@ static hash_table replicate_map = hash_table_undefined;
 
 static void print_replicate_map()
 {
-  fprintf(stderr,"Dump of replicate_map:\n");
+  fprintf(stderr,"\nDump of replicate_map:\n");
   HASH_MAP(old_c, new_c, 
   {
     fprintf(stderr, "Old %p -> New %p\n", old_c, new_c);
@@ -1774,16 +1818,123 @@ static unstructured scc_to_dag(control root, list partition, hash_table ancestor
   hash_table_free(replicated_input_controls);
   hash_table_free(replicated_output_controls);
 
+  ifdebug(3) {
+    pips_debug(3, "End for vertex %p and partition:\n", root);
+    print_control_nodes(partition);
+  }
+
   return u;
 }
-
 
-/* Decomposition of control flow graph u into a non-deterministic DAG CFG
-   *p_ndu and two mappings. Mapping scc_map maps nodes of u used to break
-   cycles to the unstructured representing these cycles. Mapping
-   ancestor_map maps nodes used in DAG new_u or in unstructured refered to
-   by scc_map to nodes in u. The partition list returned should be
-   compatible with a top-down partial order. */
+/*
+ *
+ * To deal with transformers computed in context, each call sites of a
+ * cycle is attached a private copy of the cycle.
+ *
+ * This is not part of Bourdoncle's algorithm.
+ *
+ */
+
+static void replicate_cycles(unstructured u_main, hash_table scc_map, hash_table ancestor_map)
+{
+  list scc_to_process = CONS(UNSTRUCTURED, u_main, NIL);
+  list scc_to_process_next = NIL;
+  list live_scc = NIL;
+  int replication_number = 0;
+  int deletion_number = 0;
+
+  pips_debug(1, "Start with %d cycles for unstructured %p with entry %p\n",
+	     hash_table_entry_count(scc_map), u_main, unstructured_control(u_main));
+
+  while(!ENDP(scc_to_process)) {
+    MAP(UNSTRUCTURED, u, {
+      list nl = NIL;
+      control root = unstructured_control(u);
+      FORWARD_CONTROL_MAP(c, {
+	/* Only the head of the main unstructured can be a pointer to a
+           cycle. The head of a scc cannot point to another scc as they
+           would be the same by construction: all their cycles would be
+           cut off by the head of each scc. */
+	if((c!=root || c==unstructured_control(u_main))
+	   && !meaningless_control_p(c)
+	   && cycle_head_p((control)c, ancestor_map, scc_map)) {
+	  static unstructured ancestor_cycle_head_to_scc(control, hash_table);
+	  control a = control_to_ancestor(c, ancestor_map);
+	  unstructured scc_u = ancestor_cycle_head_to_scc((control)a, scc_map);
+
+	  unstructured scc_u_c = unstructured_shallow_copy(scc_u, ancestor_map);
+	  scc_to_process_next = CONS(UNSTRUCTURED, scc_u_c, scc_to_process_next);
+	  hash_put(scc_map, c, (void *) scc_u_c);
+	  replication_number++;
+
+	  ifdebug(1) {
+	    control e = unstructured_control(scc_u_c);
+	    pips_debug(1, "New scc %p with entry %p for node %p copy of ancestor node %p\n",
+		       scc_u_c, e, c, control_to_ancestor(c, ancestor_map));
+	    pips_assert("e is a proper cycle head", proper_cycle_head_p(e, scc_map));
+	    pips_assert("e is a cycle head", cycle_head_p(e, ancestor_map, scc_map));
+	    pips_assert("e is a not a direct cycle head",
+			!direct_cycle_head_p(e, scc_map));
+	  }
+
+	}
+      }, root, nl);
+      gen_free_list(nl);
+    }, scc_to_process);
+    live_scc = gen_nconc(live_scc, scc_to_process);
+    scc_to_process = scc_to_process_next;
+    scc_to_process_next = NIL;
+  }
+
+  /* Only live scc are useful */
+  HASH_MAP(c, scc, {
+    if(!gen_in_list_p(scc, live_scc)) {
+      void * key = NULL;
+      unstructured u_u = unstructured_undefined;
+      u_u = (unstructured) hash_delget(scc_map, (void *) c, (void **) &key);
+      if(unstructured_undefined_p(u_u)) {
+	pips_internal_error("No scc for control %p\n", c);
+      }
+      else {
+	/* we really need a shallow_free_unstructured() */
+	/* free_unstructured(u_u); */
+	pips_debug(1, "scc %p unlinked from node %p\n", u_u, c);
+	deletion_number++;
+      }
+    }
+  }, scc_map);
+
+  pips_assert("The number of scc's has increased",
+	      replication_number >= deletion_number);
+
+  gen_free_list(live_scc);
+
+  pips_debug(1, "End replication process with %d copies and %d deletions\n",
+	     replication_number, deletion_number);
+
+  pips_debug(1, "Start with %d cycles\n", hash_table_entry_count(scc_map));
+}
+
+/* 
+   MAIN ENTRY: BOURDONCLE_PARTITION
+
+   Decomposition of control flow graph u into a non-deterministic DAG CFG
+   *p_ndu and two mappings. 
+
+   Mapping scc_map maps nodes of u used to break cycles to the
+   unstructured representing these cycles if cycles are not
+   replicated. Else, scc_map maps nodes of ndu and of the scc's to their
+   own copies of the relevant scc's.
+
+   Mapping ancestor_map maps nodes used in DAG new_u or in unstructured
+   refered to by scc_map to nodes in u. The initial control nodes in u are
+   called "ancestors".
+
+   The partition list returned should be compatible with a
+   top-down partial order.
+
+ */
+
 list bourdoncle_partition(unstructured u,
 			  unstructured * p_ndu,
 			  hash_table *p_ancestor_map,
@@ -1833,6 +1984,11 @@ list bourdoncle_partition(unstructured u,
 
   free_vertex_stack();
   hash_table_free(dfn);
+
+  /* Should the cycles be replicated to refine the analyses? If yes, replicate them. */
+  if(get_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT")) {
+    replicate_cycles(new_u, scc_map, ancestor_map);
+  }
 
   ifdebug(2) {
     int number_of_fix_points = 0;
@@ -2226,7 +2382,14 @@ int bourdoncle_visit(control vertex,
  *
  *
  */
-static unstructured ancestor_cycle_head_to_scc(control a, hash_table scc_map)
+
+/* scc_map maps either the ancestor node to its scc if the transformers
+   are computed without context, or the call site node to its scc if
+   cycles are replicated to compute transformers within their context. */
+
+/* In spite of the name, this function can be call with ANY control,
+   ancestor or not. An ancestor or a call site are mapped to a defined value. */
+unstructured ancestor_cycle_head_to_scc(control a, hash_table scc_map)
 {
   unstructured scc_u = unstructured_undefined;
 
@@ -2237,21 +2400,83 @@ static unstructured ancestor_cycle_head_to_scc(control a, hash_table scc_map)
   return scc_u;
 }
 
+/* Retrieve a scc_u from its head */
+unstructured proper_cycle_head_to_scc(control h, hash_table scc_map)
+{
+  unstructured r_scc_u = unstructured_undefined;
+
+  HASH_MAP(k_c, v_scc_u, {
+    unstructured scc_u = (unstructured) v_scc_u;
+
+    if(h==unstructured_control(scc_u)) {
+      r_scc_u = scc_u;
+      break;
+    }
+  }, scc_map);
+
+  return r_scc_u;
+}
+
+/* This node is a cycle call site. */
 bool cycle_head_p(control c, hash_table ancestor_map, hash_table  scc_map)
 {
+  /* This is correct whether the actual scc associated to c is scc_u or
+     not. If a copy of a control is associated to a scc, its ancestors and
+     all the others copies also are associated to a scc. */
   bool is_cycle = FALSE;
   control a = control_to_ancestor(c, ancestor_map);
   unstructured scc_u = ancestor_cycle_head_to_scc(a, scc_map);
+
+  if(unstructured_undefined_p(scc_u)) {
+    /* we may be in the context sensitive transformer mode */
+    scc_u = ancestor_cycle_head_to_scc(c, scc_map);
+  }
 
   is_cycle = !unstructured_undefined_p(scc_u);
 
   return is_cycle;
 }
 
+/* This node is really the head of a cycle (red on daVinci pictures). */
+bool proper_cycle_head_p(control c, hash_table  scc_map)
+{
+  bool is_proper_cycle_head_p = FALSE;
+
+    HASH_MAP(n, u, 
+    {
+      unstructured scc_u = (unstructured) u;
+
+      if((control)c==unstructured_control(scc_u)) {
+	is_proper_cycle_head_p = TRUE;
+	break;
+      }
+    }, scc_map);
+  return is_proper_cycle_head_p;
+}
+
+/* This node is directly associated to a specific cycle. */
+bool direct_cycle_head_p(control c, hash_table  scc_map)
+{
+  bool is_cycle = FALSE;
+  unstructured scc_u = ancestor_cycle_head_to_scc(c, scc_map);
+
+  is_cycle = !unstructured_undefined_p(scc_u);
+
+  return is_cycle;
+}
+
+/* The ancestor of this node is associated to a specific cycle. */
 unstructured cycle_head_to_scc(control c, hash_table ancestor_map, hash_table  scc_map)
 {
-  control a = control_to_ancestor(c, ancestor_map);
-  unstructured scc_u = ancestor_cycle_head_to_scc(a, scc_map);
+  /* either we have a direct connection, or we need to go thru the
+     ancestor node */
+
+  unstructured scc_u = ancestor_cycle_head_to_scc(c, scc_map);
+
+  if(unstructured_undefined_p(scc_u)) {
+    control a = control_to_ancestor(c, ancestor_map);
+    scc_u = ancestor_cycle_head_to_scc(a, scc_map);
+  }
   return scc_u;
 }
 
@@ -2326,4 +2551,3 @@ void bourdoncle_free(unstructured ndu,
   hash_table_free(ancestor_map);
   hash_table_free(scc_map);
 }
-
