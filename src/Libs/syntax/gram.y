@@ -56,6 +56,10 @@
   * $Id$
   *
   * $Log: gram.y,v $
+  * Revision 1.67  2005/08/24 15:14:34  irigoin
+  * calls to fix_if_condition() in logical expression to catch type mismatch
+  * and fix them. For instance, WHILE(N) is transformed into WHILE(N.NE.0).
+  *
   * Revision 1.66  2003/08/11 16:26:37  irigoin
   * Rule "entity_name:" : further attempts at identifying earlier the nature
   * of symbols or variables encountered.
@@ -1412,16 +1416,19 @@ sous_expression: atom
 	| expression TK_OR expression
 	    {
 		    $$ = MakeFortranBinaryCall(CreateIntrinsic(".OR."), 
-					      $1, $3);
+					       fix_if_condition($1),
+					       fix_if_condition($3));
 	    }
 	| expression TK_AND expression
 	    {
 		    $$ = MakeFortranBinaryCall(CreateIntrinsic(".AND."), 
-					      $1, $3);
+					       fix_if_condition($1),
+					       fix_if_condition($3));
 	    }
 	| TK_NOT expression
 	    {
-		    $$ = MakeFortranUnaryCall(CreateIntrinsic(".NOT."), $2);
+		    $$ = MakeFortranUnaryCall(CreateIntrinsic(".NOT."),
+					      fix_if_condition($2));
 	    }
 	| expression TK_CONCAT expression
             {
