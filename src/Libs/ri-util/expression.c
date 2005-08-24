@@ -284,6 +284,15 @@ bool relational_expression_p(expression e)
   return FALSE;
 }
 
+bool integer_expression_p(expression e)
+{
+  basic b = basic_of_expression(e);
+  bool integer_p = basic_int_p(b);
+
+  free_basic(b);
+  return integer_p;
+}
+
 bool logical_expression_p(expression e)
 {  
   /* A logical expression is either one of the following:
