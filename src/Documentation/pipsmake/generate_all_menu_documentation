@@ -63,11 +63,11 @@ while($PipsMakeRc =~ /^(.*)$/mg) {
 
 
 # Deal with every declaration :
-($rien = $PipsMakeRc) =~ s/%%\@UserManualDeclarations([^ÿ]*)%%ÿUserManualDeclarations/&DealWithDeclarations($1)/eg;
+($rien = $PipsMakeRc) =~ s/%%\@UserManualDeclarations(.*?)%%!UserManualDeclarations/&DealWithDeclarations($1)/eg;
 
 
 # Extract the documentation of the various functions:
-while ($PipsMakeRc =~ /%%\@UserManualDocumentation:\s*(\w*)\s*([^ÿ]*)%%ÿUserManualDocumentation/g) { &StoreFunctionDoc($1,$2) };
+while ($PipsMakeRc =~ /%%\@UserManualDocumentation:\s*(\w*)\s*(.*?)%%!UserManualDocumentation/g) { &StoreFunctionDoc($1,$2) };
 
 
 # Parse the aliases that link a full name to a function name:
@@ -83,9 +83,9 @@ while($PipsMakeRcVerbatim =~ /^\s*alias\s+(\w+)\s+\'([^\']+)\'\s*$/mg) {
 if ( $generate_menu_layout == 0) {
     print TheTransformationsMenu $general_warning;
 }
-($rien = $PipsMakeRc) =~ s/\\begin{PipsMenu}{Transformations}([^\000]*)\\end{PipsMenu}%{Transformations}/&DealWithTransformations($1)/eg;
+($rien = $PipsMakeRc) =~ s/\\begin{PipsMenu}{Transformations}(.*?)\\end{PipsMenu}%{Transformations}/&DealWithTransformations($1)/eg;
 
-($rien = $PipsMakeRc) =~ s/\\begin{PipsMenu}{View}([^\000]*)\\end{PipsMenu}%{View}/&DealWithViews($1)/eg;
+($rien = $PipsMakeRc) =~ s/\\begin{PipsMenu}{View}(.*?)\\end{PipsMenu}%{View}/&DealWithViews($1)/eg;
 
 
 # Parse the function list and the generated output:
