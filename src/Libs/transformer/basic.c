@@ -5,6 +5,9 @@
   * $id$
   *
   * $Log: basic.c,v $
+  * Revision 1.24  2005/08/24 15:26:07  irigoin
+  * Bug fix in error message
+  *
   * Revision 1.23  2003/07/24 08:36:20  irigoin
   * Functions empty_transformer(), transformer_weak_consistency_p(),
   * transformer_general_consistency_p(), transformer_add_modified_variable()
@@ -48,7 +51,7 @@ transformer t_in;
     Psysteme sc = SC_UNDEFINED;
     transformer t_out;
 
-    pips_assert("transformer_dup", t_in != transformer_undefined);
+    pips_assert("transformer t_in is not undefined", t_in != transformer_undefined);
 
     sc = (Psysteme) predicate_system(transformer_relation(t_in));
     pips_assert("transformer_dup", !SC_UNDEFINED_P(sc));
