@@ -249,7 +249,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.242 2004/02/20 13:56:10 nguyen Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.243 2005/08/25 07:52:57 nguyen Exp $";
 #endif /* lint */
 
  /*
@@ -2603,12 +2603,17 @@ text_statement(
     
     /* 31/07/2003 Nga Nguyen : This code is added for C, because a statement can have its own declarations */
     list l = statement_declarations(stmt);
-    if (!ENDP(l))
-      MERGE_TEXTS(r,c_text_entities(module,l,margin));
 
+    if (!ENDP(l))
+      {
+	/* printf("Statement declarations : ");
+	print_entities(l); */
+	MERGE_TEXTS(r,c_text_entities(module,l,margin));
+      }
     pips_debug(2, "Begin for statement %s\n", statement_identification(stmt));
     pips_debug(9, "statement_comments: --%s--\n", 
 	       string_undefined_p(comments)? "<undef>": comments);
+ 
 
     if(statement_number(stmt)!=STATEMENT_NUMBER_UNDEFINED &&
        statement_ordering(stmt)==STATEMENT_ORDERING_UNDEFINED) {
@@ -3074,9 +3079,11 @@ static text text_forloop(entity module,string label,int margin,forloop obj,int n
     if (!expression_undefined_p(forloop_initialization(obj)))
       pc = gen_nconc(pc, words_expression(forloop_initialization(obj)));
     pc = CHAIN_SWORD(pc,";");
-    pc = gen_nconc(pc, words_expression(forloop_condition(obj)));
+    if (!expression_undefined_p(forloop_condition(obj)))
+      pc = gen_nconc(pc, words_expression(forloop_condition(obj)));
     pc = CHAIN_SWORD(pc,";");
-    pc = gen_nconc(pc, words_expression(forloop_increment(obj)));
+    if (!expression_undefined_p(forloop_increment(obj)))
+      pc = gen_nconc(pc, words_expression(forloop_increment(obj)));
     pc = CHAIN_SWORD(pc,")");
     u = make_unformatted(strdup(label), n, margin, pc) ;
     ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
