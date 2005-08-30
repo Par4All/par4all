@@ -71,7 +71,7 @@ not provide exact set operators very often. So different implementations of
 a set operator by linear lagebra algorithms can be exact, over- or
 under-approximation and be compared for accuracy and speed.
 
-\section{Fourier-Motzkin Elimination and Feasability}
+\section{Fourier-Motzkin Elimination and Feasibility}
 
 Fourier-Motzkin elimination can be used to check that a set is empty or
 not empty, or that a property holds or not since these two checks are
@@ -81,9 +81,17 @@ For convex sets of integer, a Fourier-Motzkin proves that a set is empty
 but it cannot prove in general that a set is non-empty, unless additional
 conditions are met~\cite{CA91}.
 
-Decomposition: $\Omega$-library
+Decomposition: $\Omega$-library. Can we apply the decomposition by factorisation to feasibility test or not?
 
 \section{Simplexe}
+
+Pure simplex
+Can we use decomposition by factorisation to feasibility test or not?
+
+\section{Janus}
+
+A combination of Fourier Motzkin and Simplex?
+Can we use decomposition by factorisation to feasibility test or not?
 
 \section{Redundancy Elimination}
 
@@ -195,7 +203,7 @@ belongs to $B_1 \cap B_2$ by definition of convex hull.
 \end{figure}
 
 If $A$ is a vector or affine subset, this is not a sufficient condition
-for equation~\ref{equation-distributivity} to hold.In
+for equation~\ref{equation-distributivity} to hold. In
   Figure~\ref{figure-distrib03}, let $A$ be the $(Ox, Oy)$ plane and $B_1$
   and $B_2$ two lines intersecting $A$ in $X$ and $Y$ respectively. The
   point $(1,1,0)$ belongs to the intersection of $A$ and the convex
@@ -391,17 +399,14 @@ This depends on the basis chosen:
 \[
 P_1 = \{(x,y)|x+y=2, x-y=0, x+y \leq 10 \}
 \]
-
 \[
 P_2 = \{(x,y)|x+y=2, x-y=0, x+y \geq 10 \}
 \]
-
 \[
 P = \{(x,y)|x+y=2, x-y=0 \},~P'' = \{(x,y)|x+y=2, x-y=0 \}, P'=\{(x,y)\}
 \]
 
 If we change basis and use $u=x+y$ and $v=x-y$, then $P'$ is constraint by:
-
 \[
 P = \{(x,y)|x-y=0 \}
 \]
@@ -412,8 +417,8 @@ Let $ P = P' \cap P'' $ so that $P' \bot X1$ and $P' \bot X2$ and $P' \bot P''$ 
 by transitive closure, then:
 
 \[
-P1 \vee P2 = (P' \cap (P'' \cap X1)) \vee (P' \cap (P'' \cap X2)) =
-                 P' \cap ((P'' \cap X1) \vee (P'' \cap X2))
+P_1 \vee P_2 = (P' \cap (P'' \cap X_1)) \vee (P' \cap (P'' \cap X_2)) =
+                 P' \cap ((P'' \cap X_1) \vee (P'' \cap X_2))
 \]
 
 Proof: by considering the generating systems:
@@ -548,7 +553,211 @@ A \bot B \wedge A \bot C => (A \cap B) \vee (A \cap C) = A \cap (B \vee C)
 \end{eqnarray}
 
 Proof: compute both generating systems with above propositions, theorems
-and lemmas and check that they are equal.
+and lemmas and check that they are equal. \newpage
+
+\subsection{Decomposition by factorisation}
+DN
+In this section, we consider the polyhedra and their possible decomposition in order to speed up the polyhedral operators in C3, especially calculation of convex hull of two polyhedra, using factorisation notation of cite(). We intend to improve the acticle. Firslty, we recall some neccessary definitions.
+
+\subsubsection{Preliminary definitions}
+\paragraph{Definition: Factorisation}
+
+Let $I$ be a subset of \{1...n\}. We note $P \downarrow I$ the projection of the polyherdon $P$ on variables with indices in $I$ (i.e., the result, in $N^{|I|}$ of the existential quantification of all variables with indices outside $I$).
+
+Let $(I_1,I_2,... I_l)$ be a partition of \{1...n\}. We say that a polyhedron $P$ can be factorized according to  $(I_1,I_2,... I_l)$ if and only if:
+
+ $P = P \downarrow I_1 \times P \downarrow I_2 \times ... \times P \downarrow I_l $
+
+We also note $p = (p_1, p_2, ... p_l)$ for each element $p \in P$, where $p_1 \in P \downarrow I_1, p_2 \in P \downarrow I_2 , ... p_l \in P \downarrow I_l$. We say a element p consists of many components of some dimensions.
+
+\paragraph{Definition: Convex hull}
+
+Let $Y$ and $Z$ be two polyhedra. The convex hull of these two polyhedra is a polyhedron denoted $Y \vee Z$ that satisfies:
+
+$\forall x \in Y \vee Z,$ then $\exists \lambda \in [0...1], y \in Y, z \in Z$ such that: $x = \lambda y + (1 - \lambda)z$
+
+\subsubsection{Polytopes}
+\paragraph{Lemma 1:}
+
+Let $Y$ and $Z$ be two polyhedra that can be factorized according to the same partition $(I_1,I_2)$, so that we can write: $Y = Y_1 \times Y_2$ and $ Z = Z_1 \times Z_2 $, knowing that $Y_1$ and $Z_1$ have the same dimensions (variables), reciprocally for $Y_2$ and $Z_2$. Then we have:
+\begin{eqnarray}
+ (Y_1 \times Y_2) \vee (Z_1 \times Z_2) \subseteq (Y_1 \vee Y_2) \times (Z_1 \vee Z_2)
+\end{eqnarray}
+
+Proof 1:
+
+Let's call $X =(Y_1 \times Y_2) \vee (Z_1 \times Z_2)$, $X_1 = Y_1 \vee Y_2$ and $X_2 = Z_1 \vee Z_2$. By definition of convex hull, we have:
+
+$\forall x \in X,$ then $\exists \lambda \in [0...1], x_1 \in (Y_1 \times Y_2), x_2 \in (Z_1 \times Z_2)$ such that:
+
+$x = \lambda x_1 + (1 - \lambda) x_2$
+
+Because $x_1 \in (Y_1 \times Y_2)$, so $\exists y_1 \in Y_1, y_2 \in Y_2$ such that $x_1 = (y_1, y_2)$. The same we have: $\exists z_1 \in Z_1$ and $z_2 \in Z_2$ such that: $x_2 = (y_2, z_2)$. Finally:
+$ x = \lambda (y_1,y_2) + (1 - \lambda)(z_1,z_2)
+  = (\lambda y_1, \lambda y_2) + ((1 - \lambda) z_1, (1 - \lambda) z_2)
+  = (\lambda y_1 + (1-\lambda) z_1, \lambda y_2 + (1-\lambda) z_2)$
+
+So we can write:
+
+$\forall x \in X,$ then $\exists \lambda \in [0...1], y_1 \in Y_1, y_2 \in Y_2, z_1 \in Z_1$ and $z_2 \in Z_2$ such that:
+\[
+x  = (\lambda y_1 + (1-\lambda) z_1, \lambda y_2 + (1-\lambda) z_2)
+\]
+
+Furthermore, by definition of factorisation: $\forall x' \in X_1 \times X_2,$ then $\exists x'_1 \in X_1, x'_2 \in X_2 $, such that $x' = (x'_1, x'_2)$. Like above, we can have:
+
+$\forall x' \in X_1 \times X_2,$ there $\exists \mu \in [0...1], y_1' \in Y_1, y_2' \in Y_2, \nu \in [0...1], z_1' \in Z_1, z_2' \in Z_2$ such that: 
+
+$x' = (\mu y_1' + (1 - \mu) z_1', \nu y_2' + (1 -\nu) z_2')$
+
+We need to prove that for all points x belonging to X, there is a point x' corresponding to x, belongs to $X_1 \times X_2$. 
+
+Let's consider $x \in X$, then $\exists \lambda \in [0...1], y_1 \in Y_1, y_2 \in Y_2, z_1 \in Z_1$ and $z_2 \in Z_2$ such that:
+\[
+x = (\lambda y_1 + (1-\lambda) z_1, \lambda y_2 + (1-\lambda) z_2)
+\]
+
+Choose $\mu = \lambda, \nu = \lambda, y_1' = y_1, y_2' = y_2, z_1' = z_1, z_2' = z_2$, we have $x' \in  X_1 \times X_2$, and
+
+\[
+x' = (\mu y_1' + (1 - \mu) z_1', \nu y_2' + (1 -\nu) z_2') 
+   = (\lambda y_1 + (1 - \lambda) z_1, \lambda y_2 + (1 - \lambda) z_2)   = x
+\]
+
+This means $X \subseteq  X_1 \times X_2$. Note: In fact, we can have this lemma from results of section 5.2.1, because the factorisation operator can be understood as the intersection operator in this case.
+
+\paragraph{Lemma 2:}
+
+Consider 2 polytopes Y and Z. If exists a point $y_0 \in Y$ such that $y_0 \not\in Z$, then always exists an extremal point (vertex) of Y that does not belong to Z.
+
+Proof 2:
+
+Let's consider $y_0$ not being an extremal point. Otherwise it is trivial. Note that a polytope always has extremal points and suppose that $\forall y_e^i$, extremal points of Y : $y_e^i \in Z$, we need to prove this leeds to a contradiction. We can have this contradiction, by showing that $y_0$ is always a convex combination of some extremal points of Y, which means $y_0 \in Z$ convex.
+
+Note: We can refer to the Section VII, page 187 of the book ``theory of linear and integer programming'' of Alexander Shrijver, which says: ``If P is a polytope, then for any given rational vector y in P we can find affinely independent vertices $x_0, ... x_d$ of P, and $\lambda _0, ... \lambda _d \geq 0$ such that $\lambda _0 + ... +\lambda _d = 1$ and $y = \lambda _0 x_0 + ... + \lambda _d x_d$.'' The proof is mentioned but complicated.
+
+The idea somehow can be simplified as follows: As $y_0$ is not an extremal point, $\exists \lambda_0 \in [0...1], y_l, y_r: y_0 = \lambda_0 y_l + (1 - \lambda_0)y_r$, where $y_l, y_r$ belong to some facets of the polytope Y.
+
+\begin{itemize}
+\item If $y_l, y_r$ are extremal points of Y, we'll have: $y_0$ is a convex combination of points that are in Z, which means $y_0 \in Z$.
+
+\item If $y_l$ or/and $y_r$ are not extremal points of Y, so they must be represented by convex combinations of other points: $\exists \lambda _l \in [0...1], \lambda _r \in [0...1], y_l^1, y_l^2, y_r^1$ and $y_r^2$ where $y_l^1, y_l^2, y_r^1$ and $y_r^2$ belong to some intersections of facets of the polytope Y, such that:
+
+$y_l = \lambda _l y_l^1 + (1-\lambda_l) y_l^2$
+
+$y_r = \lambda _r y_r^1 + (1-\lambda_r) y_r^2$
+
+All the extremal points of a polytope are in fact intersections of facets of the polytope, so continue this procedure, due to the finite number of facets of the polytope, we can reach for some extremal points of Y. It means $y_0$ can be represented by a convex combination of these extremal points.
+\end{itemize}
+
+\paragraph{Theorem}
+
+Let $Y$ and $Z$ be two polyhedra that can be factorized according to the same partition $(I_1,I_2)$, so that we can write: $Y = Y_1 \times Y_2$ and $ Z = Z_1 \times Z_2 $, knowing that $Y_1$ and $Z_1$ have the same dimensions (variables), reciprocally for $Y_2$ and $Z_2$. Then we have:
+
+\begin{eqnarray}
+(Y_1 \times Y_2) \vee (Z_1 \times Z_2) = (Y_1 \vee Y_2) \times (Z_1 \vee Z_2)
+\end{eqnarray}
+
+if and only if:
+
+\begin{eqnarray}
+[(Z_1 \subseteq Y_1) \lor (Y_2 \subseteq Z_2)] \land [(Y_1 \subseteq Z_1) \lor (Z_2 \subseteq Y_2)]
+\end{eqnarray}
+
+Proof:
+
+To simplify the procedure, the proof firstly is limited for the polytopes. Using these 2 lemmas above, we begin by rewriting the condition in the right:
+\begin{eqnarray}
+[Z_1 = Y_1] \lor [(Y_1 \subset Z_1) \land (Y_2 \subset Z_2)] \lor [(Z_1 \subset Y_1) \land (Z_2 \subset Y_2)] \lor [Z_2 = Y_2]
+\end{eqnarray}
+
+Again, let's call $X =(Y_1 \times Y_2) \vee (Z_1 \times Z_2)$, $X_1 = Y_1 \vee Y_2$ and $X_2 = Z_1 \vee Z_2$.
+To prove the sufficiency, we need to prove $X_1 \times X_2 \subseteq X$. We will prove that for all $x' \in X_1 \times X_2,$ there is a point x corresponding to $x'$, belongs to $X$. The condition is divided into 4 cases:
+
+\begin{enumerate}
+\item $Y_1 = Z_1$ :
+We have: $\forall x' \in X_1 \times X_2,$ then $\exists \mu \in [0...1], \nu \in [0...1], y_1' \in Y_1, y_2' \in Y_2, z_1' \in Z_1, z_2' \in Z_2$ such that
+$x' = (\mu y_1' + (1 - \mu) z_1', \nu y_2' + (1 -\nu) z_2')$
+
+Choose $\lambda = \nu, y_2 = y_2' \in Y_2, z_2 = z_2' \in Z_2, y_1 = z_1 = \mu y_1' + (1-\mu)z_1' \in Y_1 = Z_1 $, then 
+
+$x = (\lambda y_1 + (1-\lambda) z_1, \lambda y_2 + (1-\lambda) z_2) 
+   = (\nu y_1 + (1-\nu) y_1, \nu y_2' + (1- \nu) z_2') 
+   = (y_1,  \nu y_2' + (1- \nu) z_2') 
+   = (\mu y_1' + (1 - \mu) z_1', \nu y_2' + (1 -\nu) z_2')
+   = x'$.
+ 
+\item $(Z_2 = Y_2)$ : 
+The same.
+
+\item $((Z_1 \subset Y_1) \land (Z_2 \subset Y_2))$ :
+We have: $\forall x' \in X_1 \times X_2, $ then $\exists \mu, \nu, y_1', y_2', z_1', z_2'$ such that $x' = (\mu y_1' + (1 - \mu) z_1', \nu y_2' + (1 -\nu) z_2')$
+
+Take $\lambda = 1, y_1 = \mu y_1' + (1-\mu)z_1' \in Y_1, y_2 = \nu y_2' + (1-\nu)z_2' \in Y_2, z_1 = z_1' \in Z_1, z_2 = z_2' \in Z_2 $, then:
+
+$ x = (\lambda y_1 + (1-\lambda) z_1, \lambda y_2 + (1-\lambda) z_2)
+   = (y_1, y_2)
+   = (\mu y_1' + (1-\mu)z_1', \nu y_2' + (1-\nu) z_2') 
+   = x'$.
+
+\item $((Y_1 \subset Z_1) \land (Y_2 \subset Z_2))$ : 
+The same.
+
+\end{enumerate}
+
+To prove the necessarity, we firstly suppose that $Y_1 \not\subseteq Z_1$, then $\exists p_0 \in Y_1 : p_0 \not\in Z_1$. According to lemma 2, $\exists$ an extremal point of $Y_1$ such that: $p_e \in Y_1,$ but $p_e \not\in Z_1$.
+
+$\forall x' \in X_1 \times X_2$:  $x' = (\mu y_1' + (1 - \mu) z_1', \nu y_2' + (1 -\nu) z_2'),$ where $\mu \in [0...1], y_1' \in Y_1, y_2' \in Y_2, \nu \in [0...1], z_1' \in Z_1$ and $z_2' \in Z_2$. If $\mu = 1, \nu = 0,$ then $x' = (y_1', z_2')$. 
+
+Consider now $y_1' = p_e, \mu = 1, \nu = 0$ and note that $Y_1, Z_1$ are independent from $Y_2, Z_2$ so $z_2'$ can span all the $Z_2$. 
+
+Because $X = X_1 \times X_2$, so for all $x = x' \in X,$ we have$ x  = (\lambda y_1 + (1-\lambda) z_1, \lambda y_2 + (1-\lambda) z_2)$ where $ \lambda \in [0...1], y_1 \in Y_1, y_2 \in Y_2, z_1 \in Z_1$ and $z_2 \in Z_2$. 
+
+We can see that in the dimensions of $Y_1$ (and $Z_1$), the chosen value $p_e$ of $x'$ coresponds to $\lambda = 1$ as follows:
+
+$p_e = \lambda y_1 + (1 - \lambda) z_1$. Note that $z_1 \in Z_1, p_e \not\in Z_1$. Moreover, as an extremal point, $p_e$ cannot be a combination of other points in $Y_1$ (otherwise, some of these points may belong to $Z_1$), so we have: $p_e = y_1, \lambda = 1$. 
+
+Then we have $y_2 = z_2'$ with $y_2 \in Y_2$ . This means $\forall z_2' \in Z_2, z_2' = y_2 \in Y_2$, which signifies that $Z_2 \subseteq Y_2$.
+
+Continue, we can see that if $Z_2 = Y_2$ then it is obvious. Else $Z_2 \subset Y_2$, then $\exists q_0 \in Y_2: q_0 \not\in Z_2$. So, $\exists$ an extremal point of $Y_2: q_e \in Y_2,$ that $q_e \not\in Z_2$.
+
+Now, consider $\forall x' \in X_1 \times X_2$ such that $\mu = 0, \nu = 1,$ then $x' = q_e + z_1'$. Also note that $Y_2, Z_2$ are independent from $Y_1, Z_1$ so $z_1'$ can span all the $Z_1$
+
+We see that if $x = x' \in X$, then like above, we have $y_1 = z_1'$. From this, we can say $\forall z_1' \in Z_1, y_1 = z_1' \in Y_1$, which signifies that $Z_1 \subseteq Y_1$.
+
+If we have $Y_1 \subseteq Z_1$, then by doing the same steps, we can deduce that $Y_2 \subseteq Z_2$. The necessarity is proved.
+
+\paragraph{Lemma 3}
+
+Consider 2 pointed polyhedron Y and Z. If exists a point $y_0 \in Y$ that $y_0 \not\in Z$, then always exists a point $p_e$ of Y that does not belong to Z, such that: $p_e$ is an extremal point, or $p_e$ belongs to an extremal ray.
+
+Proof:
+
+The proof can be directly derived from the Section IX, page 188 of the book ``theory of linear and integer programming'' of Alexander Shrijver. We have: ``If P is a pointed polyhedron, and a rational vector x in P is given, then we can find vertices $x_0, ..., x_d$ of P, extremal rays $y_1, ..., y_t$ of char.cone P, and $\lambda _0, ... \lambda _d,\mu _1, ...,\mu _t \geq 0$ such that $x = \lambda _0 x_0 + ... + \lambda _d x_d + \mu _1 y_1 + ... + \mu _t y_t, \lambda _1 + ... + \lambda _d = 1,$ and $x_1 - x_0, ..., x_d -x_0, y_1, ... y_t$ are linearly independent''.
+
+Indeed, we need to prove that there exists whether an extremal point or an extremal ray of Y that does not belong entirely to Z. By contradiction:  suppose that $\forall y_e^i$, extremal points of Y : $y_e^i \in Z$ and  $\forall r_e^j$, extremal rays of Y : $r_e^j \in Z$. 
+
+The same result as lemma 2 can be attained when we notice that Z is a convex polyhedron that contains completely all these points and rays, then their combination must belong to Z. Lemma 3 is then proved.
+
+\subsubsection{Extended to pointed polyhedron} 
+
+According to lemma 3 and note that we only need to consider 2 cases: Exists an extremal point of Y that does not belong to Z (like above); or exists a point $\in$ an extremal ray of Y, that does not belongs to Z.
+
+In fact, for all points $x' \in X_1 \times X_2$ such that $x' = p_e + z_2'$ (coresponding to $\mu = 1, \nu = 0$), where $p_e$ is a point which belongs to an extremal ray of $Y_1$ (the choice of $p_e$ in the dimensions of $Y_1$ always corespond to $\lambda = 1$), it's easy to see that the same result as the proof above of the theorem holds.
+
+\subsubsection{The general case}
+We need then to consider the cases where the polyhedron is degenerated (not full dimensional), and the case where the polyhedron is not pointed.
+
+Consider the first case: the polyhedron is not pointed. Refering to the page 106 of the same book, we can write the decomposition of a polyhedron, as:
+
+P = convex.hull() + cone() + linear.space P
+
+For a point y belongs to Y1 but not Z1, we have 3 cases:
+exists an extremal point belongs to Y1 but not Z1 in convex.hull()
+an extremal ray in cone
+a point x in linear.space
+
+TO BE DONE
 
 \subsection{Heuristics}
 
