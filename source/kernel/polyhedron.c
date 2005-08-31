@@ -3945,7 +3945,7 @@ static void Rays_Mult(Value **A, Matrix *B, Value **C, unsigned NbRays)
 	for (k=0; k<Dimension1; k++) {
 	  
 	  /* Sum+=A[i][k+1] * B->p[k][j]; */
-	  value_addto(Sum, A[i][k+1], B->p[k][j]);
+	  value_addmul(Sum, A[i][k+1], B->p[k][j]);
 	}
 	value_assign(C[i][j+1],Sum);
       }
