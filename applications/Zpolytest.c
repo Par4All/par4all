@@ -11,9 +11,9 @@ char s[128];
 
 int main() {
   
-  Matrix *a=NULL, *b, *c, *d, *e, *g;
+  Matrix *a=NULL, *b=NULL, *c=NULL, *d, *e, *g;
   LatticeUnion *l1,*l2,*l3,*l4,*temp;
-  Polyhedron *A=NULL, *B=NULL, *C, *D;
+  Polyhedron *A=NULL, *B=NULL, *C=NULL, *D;
   ZPolyhedron *ZA, *ZB, *ZC, *ZD, *Zlast;
   int  nbPol, nbMat, func, rank ;
   Vector *v=NULL;
@@ -121,7 +121,6 @@ int main() {
     d = Polyhedron2Constraints(D);
     Matrix_Print(stdout,P_VALUE_FMT, d);
     Matrix_Free(d);
-    Domain_Free(C);
     Domain_Free(D);
     break;
     
@@ -130,18 +129,12 @@ int main() {
     AffineHermite(a,&b,&c);
     Matrix_Print(stdout,P_VALUE_FMT, b);
     Matrix_Print(stdout,P_VALUE_FMT, c);
-    Matrix_Free(a);
-    Matrix_Free(b);
-    Matrix_Free(c);
     break;
     
   case 3: /* LatticeIntersection */
     
     c = LatticeIntersection(a,b);
     Matrix_Print(stdout,P_VALUE_FMT, c);
-    Matrix_Free(a);
-    Matrix_Free(b);
-    Matrix_Free(c);
     break;
     
   case 4: /* LatticeDifference */
@@ -149,9 +142,6 @@ int main() {
     fprintf(stdout," 2 in 1 : %d\n",LatticeIncludes(b,a));
     fprintf(stdout," 1 in 3 : %d\n",LatticeIncludes(c,a));
     fprintf(stdout," 1 in 2 : %d\n",LatticeIncludes(a,b));
-    Matrix_Free(a);
-    Matrix_Free(b);
-    Matrix_Free(c);
     break;
   
   case 5: /* LatticeDifference */
@@ -185,9 +175,6 @@ int main() {
       Matrix_Print(stdout,P_VALUE_FMT, temp->M);
       temp=temp->next; 
     };
-    Matrix_Free(a);
-    Matrix_Free(b);
-    Matrix_Free(c);
     break;
     
   case 6: /* isEmptyZPolyhedron */
@@ -203,6 +190,9 @@ int main() {
     ZB=ZPolyhedron_Alloc(b,B);
     ZC = ZDomainIntersection(ZA,ZB);
     ZDomainPrint(stdout,P_VALUE_FMT, ZC);
+    ZDomain_Free(ZA);
+    ZDomain_Free(ZB);
+    ZDomain_Free(ZC);
     break;
     
   case 8: /* ZDomainUnion */
@@ -319,9 +309,6 @@ int main() {
     Matrix_Print(stdout,P_VALUE_FMT, b); 
     Matrix_Print(stdout,P_VALUE_FMT, c);
     Matrix_Print(stdout,P_VALUE_FMT, d);
-    Matrix_Free(a);
-    Matrix_Free(b);
-    Matrix_Free(c);
     Matrix_Free(d);
     break;
   
@@ -342,9 +329,6 @@ int main() {
     fprintf(stdout," rank: %d \n ",rank);
     Matrix_Print(stdout,P_VALUE_FMT, d); 
     Vector_Print(stdout,P_VALUE_FMT, v);
-    Matrix_Free(a);
-    Matrix_Free(b);
-    Matrix_Free(c);
     Vector_Free(v);
     break;
 
@@ -368,6 +352,19 @@ int main() {
   }
 
   /*    Polyhedron_Free(A); */
+  if (a)
+    Matrix_Free(a);
+  if (b)
+    Matrix_Free(b);
+  if (c)
+    Matrix_Free(c);
+
+  if (A)
+    Domain_Free(A);
+  if (B)
+    Domain_Free(B);
+  if (C)
+    Domain_Free(C);
   
   return 0;
 } /* main */
