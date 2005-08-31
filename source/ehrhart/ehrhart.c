@@ -2035,6 +2035,9 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS,
     }
 
     if (!CQ2) {
+#ifdef EDEBUG2
+      fprintf(stderr,"Homogenize.\n");
+#endif
       hom = 1;
       Polyhedron *tmp = homogenize(CQ, MAXRAYS);
       CQ2 = Polyhedron_Preprocess(tmp,m1,MAXRAYS);
