@@ -407,6 +407,7 @@ int findHermiteBasis(Matrix *M, Matrix **Result) {
     Matrix_Free (temp);
     Matrix_Free (temp2);
   }
+  Matrix_Free(C);
   
   Hermite(curMat, &H, &U);
   rank = curMat->NbRows;
