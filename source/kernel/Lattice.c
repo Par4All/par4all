@@ -1016,7 +1016,7 @@ int FindHermiteBasisofDomain(Polyhedron *A, Matrix **B) {
     if ((value_notzero_p(A->Ray[i][0])) && value_notzero_p(A->Ray[i][A->Dimension+1])) {
       for(j = 1; j < A->Dimension+2; j++) 
 	value_assign(vert->p[vercount][j-1],A->Ray[i][j]);
-      value_assign(lcm,*Lcm(lcm,A->Ray[i][j-1]));
+      Lcm3(lcm, A->Ray[i][j-1], &lcm);
       vercount++;
     }
     else {
@@ -1042,6 +1042,8 @@ int FindHermiteBasisofDomain(Polyhedron *A, Matrix **B) {
   for (i = 1; i < temp->NbRows; i++)
     for (j = 0; j < temp->NbColumns ; j++)
       value_subtract(vert->p[i-1][j],temp->p[0][j],temp->p[i][j]);
+
+  Matrix_Free(temp);
   
   /* Add the Rays and Lines */
   /* Combined Matrix */  
@@ -1054,9 +1056,13 @@ int FindHermiteBasisofDomain(Polyhedron *A, Matrix **B) {
     for (j = 0; j < result->NbColumns; j++)
       value_assign(result->p[i][j],rays->p[i-vert->NbRows][j]);
 
+  Matrix_Free(vert);
+  Matrix_Free(rays);
+
   rank = findHermiteBasis(result, &temp);
   temp1 = ChangeLatticeDimension(temp,temp->NbRows+1);
 
+  Matrix_Free(result);
   Matrix_Free(temp);
   
   /* Adding the Affine Part to take care of the Equalities */  
@@ -1065,6 +1071,7 @@ int FindHermiteBasisofDomain(Polyhedron *A, Matrix **B) {
   Matrix_Inverse(temp,tempinv); 
   Matrix_Free(temp);
   Image = DomainImage(A,tempinv,MAXNOOFRAYS);  
+  Matrix_Free(tempinv);
   Newmat = Matrix_Alloc(temp1->NbRows,temp1->NbColumns);
   for(i = 0; i < rank ; i++)
     for(j = 0; j < Newmat->NbColumns ; j++) 
@@ -1078,14 +1085,18 @@ int FindHermiteBasisofDomain(Polyhedron *A, Matrix **B) {
 	value_assign(Newmat->p[rank+equcount][j-1],Image->Constraint[i][j]);
       ++equcount ;
     } 
+  Domain_Free(Image);
   for (i = 0; i < Newmat->NbColumns-1; i++)
     value_set_si(Newmat->p[Newmat->NbRows-1][i],0);
   value_set_si(Newmat->p[Newmat->NbRows-1][Newmat->NbColumns-1],1);
   temp = Matrix_Alloc(Newmat->NbRows, Newmat->NbColumns);
   Matrix_Inverse(Newmat,temp);
+  Matrix_Free(Newmat);
   B[0] = Matrix_Alloc(temp1->NbRows,temp->NbColumns);
 
   Matrix_Product(temp1,temp,B[0]);  
+  Matrix_Free(temp1);
+  Matrix_Free(temp);
   value_clear(lcm);
   value_clear(fact);
   return rank;
