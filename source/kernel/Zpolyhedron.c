@@ -436,28 +436,28 @@ ZPolyhedron *ZDomainDifference(ZPolyhedron  *A, ZPolyhedron *B) {
     ZPolyhedron *temp = NULL;
     temp = ZPolyhedron_Copy(tempA);
     
-	    for(tempB = B; tempB != NULL; tempB = tempB->next)
-	    {
-	      templist = NULL; res = NULL;
-	      for(i = temp; i != NULL; i = i->next)
-	      {
-		res = ZPolyhedronDifference(i,tempB);
-		for (j = res; j != NULL; j = j->next )
-		  templist = AddZPoly2ZDomain(j,templist);
-		ZDomain_Free(res);
-	      }
-	      ZDomain_Free (temp);
-	      temp = NULL; 
-	      for(i = templist; i != NULL; i = i->next)
-		temp = AddZPoly2ZDomain(i, temp);
-	      ZDomain_Free (templist);
-	    }
-	    for(i = temp; i != NULL; i = i->next)
-	      Result = AddZPoly2ZDomain(i, Result);
-	    ZDomain_Free(temp);    
-	}
-	if (Result==NULL) return (EmptyZPolyhedron(A->Lat->NbRows-1));
-	return Result;
+    for(tempB = B; tempB != NULL; tempB = tempB->next) {
+      templist = NULL; res = NULL;
+      //for(i = temp; i != NULL; i = i->next) {
+	i=temp;
+	res = ZPolyhedronDifference(i,tempB);
+	for (j = res; j != NULL; j = j->next )
+	  templist = AddZPoly2ZDomain(j,templist);
+	ZDomain_Free(res);
+      //}
+      ZDomain_Free (temp);
+      temp = NULL; 
+      for(i = templist; i != NULL; i = i->next)
+	temp = AddZPoly2ZDomain(i, temp);
+      ZDomain_Free (templist);
+    }
+    for(i = temp; i != NULL; i = i->next)
+      Result = AddZPolytoZDomain(i, Result);
+    ZDomain_Free(temp);    
+  }
+  if (Result==NULL)
+    return (EmptyZPolyhedron(A->Lat->NbRows-1));
+  return Result;
 } /* ZDomainDifference */
 
 /*
@@ -602,7 +602,7 @@ static ZPolyhedron *ZPolyhedronDifference(ZPolyhedron *A, ZPolyhedron *B) {
     ZPolyhedron *Z;
     PreImage = DomainPreimage(DomDiff,A->Lat,MAXNOOFRAYS);
     Z = ZPolyhedron_Alloc(A->Lat,PreImage);    
-    Result = AddZPoly2ZDomain(Z,Result);
+    Result = AddZPolytoZDomain(Z,Result);
   }  
   if (flag == True)  /* DomDiff = NULL; DomInter = A */
     DomInter = Domain_Copy(ImageA);
