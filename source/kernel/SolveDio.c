@@ -290,6 +290,8 @@ static void RearrangeMatforSolveDio(Matrix *M) {
       if (rank==min || curRow >= curend)
 	break;
     }
+    Matrix_Free (A);
   }
+  Matrix_Free (L);
   return;
 } /* RearrangeMatforSolveDio */
