@@ -410,6 +410,7 @@ int findHermiteBasis(Matrix *M, Matrix **Result) {
   
   Hermite(curMat, &H, &U);
   rank = curMat->NbRows;
+  Matrix_Free(curMat);
   
   Result[0] = Transpose (U);
   Matrix_Free (H);
