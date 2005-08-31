@@ -750,13 +750,13 @@ static int Gauss4(Value **p, int NbEq, int NbRows, int Dimension)
 {
   int i, j, k, pivot, Rank;
   int *column_index = NULL;
-  Value gcd,tmp,*cp;
+  Value gcd, *cp;
 
-  value_init(gcd); value_init(tmp);
+  value_init(gcd);
   column_index=(int *)malloc(Dimension * sizeof(int));
   if(!column_index) {	
     errormsg1("Gauss","outofmem","out of memory space");
-    value_clear(gcd); value_clear(tmp);
+    value_clear(gcd);
     return 0;
   }
   Rank=0;
@@ -764,7 +764,7 @@ static int Gauss4(Value **p, int NbEq, int NbRows, int Dimension)
   CATCH(any_exception_error) {
     if (column_index)
       free(column_index);
-    value_clear(gcd); value_clear(tmp);
+    value_clear(gcd);
     RETHROW();
   }
   TRY {
@@ -784,8 +784,7 @@ static int Gauss4(Value **p, int NbEq, int NbRows, int Dimension)
 	Vector_Gcd(p[Rank]+1,Dimension,&gcd);
 	
 	/* if (gcd >= 2) */
-	value_set_si(tmp,2);
-	if (value_ge(gcd,tmp)) { 
+	if (value_cmp_si(gcd, 2) >= 0) { 
 	  cp = &p[Rank][1];
 	  for (k=0; k<Dimension; k++) {
 	    value_division (*cp,*cp,gcd);       /* *cp /= gcd */    
@@ -797,8 +796,7 @@ static int Gauss4(Value **p, int NbEq, int NbRows, int Dimension)
 	if (value_neg_p(p[Rank][j])) { 
 	  cp = p[Rank]+1;	
 	  for (k=0; k<Dimension; k++) { 
-	    value_set_si(tmp,-1);
-	    value_multiply (*cp,*cp,tmp); /* *cp *= -1 */ 
+	    value_oppose(*cp, *cp); /* *cp *= -1 */ 
 	    cp++;
 	  }
 	}
@@ -846,7 +844,7 @@ static int Gauss4(Value **p, int NbEq, int NbRows, int Dimension)
   UNCATCH(any_exception_error);
   free(column_index), column_index = NULL;
   
-  value_clear(gcd); value_clear(tmp);
+  value_clear(gcd);
   return Rank;
 } /* Gauss */
 
