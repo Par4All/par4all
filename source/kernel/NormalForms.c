@@ -721,6 +721,8 @@ void Hermite (Matrix *A, Matrix **H, Matrix **U) {
   Matrix_Free (transpose);
   Matrix_Free (tempU);
   
+  for (i=0; i< A->NbRows * A->NbColumns; i++)
+    value_clear(darte_matA[i]);
   for (i=0; i< A->NbColumns * A->NbColumns; i++)
     value_clear(darte_identite[i]);
   for (i=0; i< A->NbColumns * A->NbColumns; i++)
