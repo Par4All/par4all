@@ -4584,15 +4584,12 @@ Polyhedron *Disjoint_Domain( Polyhedron *P, int flag, unsigned NbMaxRays )
 			}
 
 			/* add dx at beginning of Result */
-//			if( dx )
-			{
-				for( tmp=dx ; tmp->next ; tmp=tmp->next )
-					;
-				tmp->next = Result;
-				Result = dx;
-				if( !prec )
-					prec = tmp;
-			}
+			for( tmp=dx ; tmp->next ; tmp=tmp->next )
+				;
+			tmp->next = Result;
+			Result = dx;
+			if( !prec )
+				prec = tmp;
 
 			/* suppress current lR */
 			if( !prec )
