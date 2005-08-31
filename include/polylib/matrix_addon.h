@@ -11,10 +11,6 @@
 
 #define show_matrix(M) {printf(#M"= \n"); Matrix_Print(stderr,P_VALUE_FMT,(M));}
 
-// B_Lcm is Maybe not at the right place here, but...
-/* computes c = lcm(a,b) using Gcd(a,b,&c) */
-void B_Lcm(Value a, Value b, Value * c);
-
 // splits a matrix of constraints M into a matrix of equalities Eqs and a matrix of inequalities Ineqs
 // allocs the new matrices.
 void split_constraints(Matrix const * M, Matrix ** Eqs, Matrix **Ineqs);

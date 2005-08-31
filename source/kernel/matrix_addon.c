@@ -4,29 +4,6 @@
 #include<polylib/polylib.h>
 #include <polylib/matrix_addon.h>
 
-/* computes c = lcm(a,b) using Gcd(a,b,&c) */
-void B_Lcm(Value a, Value b, Value * c) {
-  Value tmp, tmp2;
-  if (value_zero_p(a)) {
-    value_assign(*c, b);
-    return;
-  }
-  else if  (value_zero_p(b)) {
-    value_assign(*c, a);
-    return;
-  }
-  else {
-    value_init(tmp);
-    value_init(tmp2);
-    Gcd(a,b,&tmp2);
-    value_multiply(tmp,a,b);
-    value_absolute(tmp, tmp);
-    value_division(*c, tmp, tmp2);
-    value_clear(tmp);
-    value_clear(tmp2);
-  }
-}
-
 // splits a matrix of constraints M into a matrix of equalities Eqs and a matrix of inequalities Ineqs
 // allocs the new matrices.
 void split_constraints(Matrix const * M, Matrix ** Eqs, Matrix **Ineqs) {
@@ -88,7 +65,8 @@ void mtransformation_inverse(Matrix * transf, Matrix ** inverse, Value * g) {
 
   // b - as it is rational, put it to the same denominator
   (*inverse) = Matrix_Alloc(transf->NbRows, transf->NbRows);
-  for (i=0; i< inv->NbRows; i++) B_Lcm(*g, inv->p[i][inv->NbColumns-1],g);
+  for (i=0; i< inv->NbRows; i++) 
+    Lcm3(*g, inv->p[i][inv->NbColumns-1],g);
   for (i=0; i< inv->NbRows; i++) {
     value_division(factor, *g, inv->p[i][inv->NbColumns-1]);
     for (j=0; j< (*inverse)->NbColumns; j++) value_multiply((*inverse)->p[i][j], inv->p[i][j],  factor);
@@ -183,7 +161,7 @@ void eliminate_var_with_constr(Matrix * Eliminator, unsigned int eliminator_row,
   if (value_notzero_p(Victim->p[victim_row][var_to_elim+1])) {
     value_assign(a, Eliminator->p[eliminator_row][var_to_elim+1]);
     value_assign(b, Victim->p[victim_row][var_to_elim+1]);
-    B_Lcm(a, b, &cur_lcm);
+    Lcm3(a, b, &cur_lcm);
     // multiplication factor for the current constraint
     value_division(tmp, cur_lcm, b);
     value_absolute(mul_a, tmp); // IT HAS TO BE POSITIVE (otherwise you may modify the sign of your constraint)

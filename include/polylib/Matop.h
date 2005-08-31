@@ -12,6 +12,9 @@
 extern "C" {
 #endif
 
+/* computes c = lcm(a,b) using Gcd(a,b,&c) */
+extern void Lcm3(Value a, Value b, Value *c);
+
 extern Matrix *AddANullColumn ( Matrix *M );
 extern Matrix *AddANullRow ( Matrix *M );
 extern void ExchangeColumns ( Matrix *M, int Column1, int Column2 );

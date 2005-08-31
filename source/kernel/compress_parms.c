@@ -76,7 +76,7 @@ Matrix * affine_periods(Matrix * M, Matrix * d) {
     for (j=0; j< M->NbColumns; j++) {
       Gcd(d->p[i][0], M->p[i][j], &tmp);
       value_division(tmp, d->p[i][0], tmp);
-      B_Lcm(periods[j], tmp, &(periods[j]));
+      Lcm3(periods[j], tmp, &(periods[j]));
      }
   }
   value_clear(tmp);

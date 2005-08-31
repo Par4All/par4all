@@ -1,20 +1,37 @@
 #include <stdlib.h>
 #include <polylib/polylib.h>
 
+/* computes c = lcm(a,b) using Gcd(a,b,&c) */
+void Lcm3(Value a, Value b, Value *c)
+{
+  Value tmp;
+
+  if (value_zero_p(a)) {
+    value_assign(*c, b);
+    return;
+  }
+  if (value_zero_p(b)) {
+    value_assign(*c, a);
+    return;
+  }
+  value_init(tmp);
+  Gcd(a,b,c);
+  value_multiply(tmp, a, b);
+  value_absolute(tmp, tmp);
+  value_division(*c, tmp, *c);
+  value_clear(tmp);
+}
+
 /*
  * Return the lcm of 'i' and 'j' 
  */ 
-Value *Lcm (Value i, Value j) {
-  
+Value *Lcm (Value i, Value j)
+{
   Value *tmp;
-  Value aux;
   
   tmp = (Value *) malloc (sizeof(Value));
-  value_init(aux); value_init(*tmp);
-  Gcd(i,j,tmp);
-  value_multiply(aux,i,j);
-  value_division(*tmp,aux,*tmp);
-  value_clear(aux);
+  value_init(*tmp);
+  Lcm3(i, j, tmp);
   return tmp;
 } /* Lcm */
 

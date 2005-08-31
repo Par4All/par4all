@@ -2337,14 +2337,15 @@ Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,unsigned MA
   
   /* b- scan the vertices and compute the global variable lcms */
   for (V_tmp = PP->V; V_tmp; V_tmp=V_tmp->next)
-    for (i=0; i< nb_vars; i++) B_Lcm(denoms->p[0][i],V_tmp->Vertex->p[i][nb_param+1], &(denoms->p[0][i]));
+    for (i=0; i< nb_vars; i++) 
+      Lcm3(denoms->p[0][i],V_tmp->Vertex->p[i][nb_param+1], &(denoms->p[0][i]));
   printf("denoms = \n");
   Matrix_Print(stderr, P_VALUE_FMT, denoms);
   value_set_si(expansion_det, 1);
   value_set_si(global_var_lcm, 1);
   for (i=0; i< nb_vars;i++) {
     value_multiply(expansion_det, expansion_det, denoms->p[0][i]);
-    B_Lcm(global_var_lcm, denoms->p[0][i], &global_var_lcm);
+    Lcm3(global_var_lcm, denoms->p[0][i], &global_var_lcm);
   }
   printf("expansion_det:\n");
   value_print(stderr, P_VALUE_FMT, expansion_det);
