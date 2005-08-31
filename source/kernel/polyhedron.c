@@ -4036,7 +4036,7 @@ Polyhedron *Polyhedron_Preimage(Polyhedron *Pol,Matrix *Func,unsigned NbMaxRays)
 	    Pol->Constraints Function        Constraints
     */
   
-    /* Allocate space for the resultant constraint matrix */
+    /* Allocate space for the resulting constraint matrix */
     Constraints = Matrix_Alloc(NbConstraints, Dimension2+1);
     if (!Constraints) { 
       errormsg1("Polyhedron_Preimage", "outofmem", "out of memory space\n");
@@ -4112,7 +4112,7 @@ Polyhedron *Polyhedron_Image(Polyhedron *Pol, Matrix *Func,unsigned NbMaxConstrs
     Dimension1 = Pol->Dimension+1;	/* Homogeneous Dimension */
     Dimension2 = Func->NbRows;		/* Homogeneous Dimension */
     if (Dimension1!=Func->NbColumns) {
-      errormsg1("Polyhedron_Image", "dimincomp", "incompatable dimensions");
+      errormsg1("Polyhedron_Image", "dimincomp", "incompatible dimensions");
       UNCATCH(any_exception_error);
       return Empty_Polyhedron(Dimension2-1);
     }
@@ -4164,7 +4164,7 @@ Polyhedron *Polyhedron_Image(Polyhedron *Pol, Matrix *Func,unsigned NbMaxConstrs
     }
     
     if (!NewPol) {
-	/* Allocate space for the resultant ray matrix */
+	/* Allocate space for the resulting ray matrix */
 	Rays = Matrix_Alloc(NbRays, Dimension2+1);
 	if (!Rays) {
 	  errormsg1("Polyhedron_Image", "outofmem", "out of memory space\n");
