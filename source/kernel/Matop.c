@@ -15,9 +15,9 @@ void Lcm3(Value a, Value b, Value *c)
     return;
   }
   value_init(tmp);
-  Gcd(a,b,c);
   value_multiply(tmp, a, b);
   value_absolute(tmp, tmp);
+  Gcd(a,b,c);
   value_division(*c, tmp, *c);
   value_clear(tmp);
 }
