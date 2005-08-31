@@ -635,9 +635,9 @@ int cherche_min(Value *min,Polyhedron *D,int pos) {
     fprintf(stderr,"LowerUpperBounds :\n");
     fprintf(stderr,"pos = %d\n",pos);
     fprintf(stderr,"current min = (");
-    value_print(stderr,P_VALUE_FMT,min[0]);
+    value_print(stderr,P_VALUE_FMT,min[1]);
     {int j;
-    for(j=1;j<=D->Dimension ; j++) {
+    for(j=2;j<=D->Dimension ; j++) {
         fprintf(stderr,", ");
         value_print(stderr,P_VALUE_FMT,min[j]);
     }  
