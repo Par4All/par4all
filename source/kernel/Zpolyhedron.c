@@ -810,7 +810,9 @@ void CanonicalForm(ZPolyhedron *Zpol,ZPolyhedron **Result,Matrix **Basis) {
   B2inv = Matrix_Alloc(B1->NbRows, B1->NbColumns);
   Matrix_Inverse(B1,B2inv);
   ImageP = DomainImage(Zpol->P, B2inv, MAXNOOFRAYS);
+  Matrix_Free(B2inv);
   Image = DomainImage(ImageP, Uprime, MAXNOOFRAYS);
+  Domain_Free(ImageP);
   Result[0] = ZPolyhedron_Alloc(Hprime, Image);
   Basis[0] = Matrix_Copy(B2); 
   
