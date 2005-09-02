@@ -68,7 +68,9 @@ Polyhedron *RankingPolytopes(Polyhedron *P, Polyhedron *D, Polyhedron *C,
     value_set_si(cur_element->p[r][nb_vars+k+1], 1);
     // we want a strict inequality
     value_set_si(cur_element->p[r][cur_element->NbColumns-1], -1);
+#ifdef ERDEBUG
     show_matrix(cur_element);
+#endif
 
     // b- add it to the current union
     // as Constraints2Polyhedron modifies its input, we must clone cur_element
@@ -92,7 +94,9 @@ Polyhedron *RankingPolytopes(Polyhedron *P, Polyhedron *D, Polyhedron *C,
   for (i = 0; i < D->NbConstraints; i++)
     Vector_Copy(D->Constraint[i], C_times_J->p[C->NbConstraints+i], D->Dimension+2);
 
+#ifdef ERDEBUG
   show_matrix(C_times_J);
+#endif
   C1 = Constraints2Polyhedron(C_times_J, POL_NO_DUAL);
 
   // 4- clean up
