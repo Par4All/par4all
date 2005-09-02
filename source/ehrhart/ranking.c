@@ -60,7 +60,7 @@ Polyhedron *RankingPolytopes(Polyhedron *P, Polyhedron *D, Polyhedron *C,
     // convert the previous (strict) inequality into an equality
     if (k>=1) {
       value_set_si(cur_element->p[r-1][0], 0);
-      value_set_si(cur_element->p[r][cur_element->NbColumns-1], 0);
+      value_set_si(cur_element->p[r-1][cur_element->NbColumns-1], 0);
     }
     // build the k-th inequality from P
     value_set_si(cur_element->p[r][0], 1);
