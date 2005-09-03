@@ -2188,7 +2188,7 @@ void Enumeration_Free(Enumeration *en)
   while( en )
   {
           free_evalue_refs( &(en->EP) );
-          Polyhedron_Free( en->ValidityDomain );
+          Domain_Free( en->ValidityDomain );
           ee = en ->next;
           free( en );
           en = ee;
