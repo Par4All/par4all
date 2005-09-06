@@ -39,7 +39,7 @@ int main( int argc, char **argv)
 
   // compute a polynomial approximation of the Ehrhart polynomial
   printf("============ Ranking function ============\n");
-  e = Polyhedron_Ranking(P, D, C, POL_NO_DUAL);
+  e = Polyhedron_LexSmallerEnumerate(P, D, C, POL_NO_DUAL);
   
   Polyhedron_Free(P);
   Polyhedron_Free(D);
