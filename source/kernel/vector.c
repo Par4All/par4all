@@ -735,6 +735,26 @@ void Vector_Sort(Value *vector,unsigned n) {
   return;
 } /* Vector_Sort */
 
+/*
+ * Replaces constraint a x >= c by x >= ceil(c/a)
+ * where "a" is a common factor in the coefficients
+ * old is the constraint; v points to an initialized
+ * value that this procedure can use.
+ * Return non-zero if something changed.
+ * Result is placed in new.
+ */
+int ConstraintSimplify(Value *old, Value *new, int len, Value* v)
+{
+    Vector_Gcd(old+1, len - 2, v);
+
+    if (value_one_p(*v))
+	return 0;
+
+    Vector_AntiScale(old+1, new+1, *v, len-2);
+    mpz_fdiv_q(new[len-1], old[len-1], *v);
+    return 1;
+}
+
 #define MAX_CACHE_SIZE 20
 static struct {
   Value *p;

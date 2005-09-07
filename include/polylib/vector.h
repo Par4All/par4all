@@ -12,6 +12,7 @@
 extern "C" {
 #endif
 
+int ConstraintSimplify(Value *old, Value *n, int len, Value* v);
 Value* value_alloc(int want, int *got);
 void value_free(Value *p, int size);
 

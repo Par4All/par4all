@@ -40,6 +40,8 @@ extern void Polyhedron_Compute_Dual(Polyhedron *P);
 extern "C" {
 #endif
 
+Polyhedron *DomainConstraintSimplify(Polyhedron *P, unsigned MaxRays);
+
 extern Polyhedron *AddConstraints(Value *Con,unsigned NbConstraints,
 				   Polyhedron *Pol,unsigned NbMaxRays );
 extern Polyhedron *AddPolyToDomain(Polyhedron *Pol,Polyhedron *PolDomain);
