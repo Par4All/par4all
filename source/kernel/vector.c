@@ -751,7 +751,7 @@ int ConstraintSimplify(Value *old, Value *new, int len, Value* v)
 	return 0;
 
     Vector_AntiScale(old+1, new+1, *v, len-2);
-    mpz_fdiv_q(new[len-1], old[len-1], *v);
+    value_pdivision(new[len-1], old[len-1], *v);
     return 1;
 }
 
