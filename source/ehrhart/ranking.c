@@ -10,19 +10,33 @@
  * Returns a list of polytopes needed to compute
  * the number of points in P that are lexicographically
  * smaller than a given point in D.
+ * Only the first dim dimensions are taken into account
+ * for computing the lexsmaller relation.
+ * The remaining variables are assumed to be extra
+ * existential/control variables.
  * When P == D, this is the conventional ranking function.
  * P and D are assumed to have the same parameter domain C.
  *
  * The first polyhedron in the list returned is the
- * updated context: a combination of D and C.
+ * updated context: a combination of D and C or an extended C.
+ *
+ * The order of the variables in the remaining polyhedra is
+ * - first dim variables of P
+ * - existential variables of P
+ * - existential variables of D
+ * - first dim variables of D
+ * - the parameters
  */
-Polyhedron *LexSmaller(Polyhedron *P, Polyhedron *D, Polyhedron *C, 
-			 unsigned MAXRAYS)
+Polyhedron *LexSmaller(Polyhedron *P, Polyhedron *D, unsigned dim,
+			Polyhedron *C, unsigned MAXRAYS)
 {
   unsigned i, j, k, r;
   unsigned nb_parms = C->Dimension;
-  unsigned nb_vars = P->Dimension - C->Dimension;
+  unsigned nb_vars = dim;
+  unsigned P_extra = P->Dimension - nb_vars - nb_parms;
+  unsigned D_extra = D->Dimension - nb_vars - nb_parms;
   unsigned nb_new_parms;
+  unsigned ncons;
   Matrix * cur_element, * C_times_J, * Klon;
   Polyhedron * P1, *C1;
   Polyhedron * lexico_lesser_union = NULL;
@@ -31,7 +45,8 @@ Polyhedron *LexSmaller(Polyhedron *P, Polyhedron *D, Polyhedron *C,
   POL_ENSURE_INEQUALITIES(D);
   POL_ENSURE_INEQUALITIES(P);
 
-  assert(P->Dimension == D->Dimension);
+  assert(P->Dimension >= C->Dimension + dim);
+  assert(D->Dimension >= C->Dimension + dim);
   nb_new_parms = nb_vars;
 
   // the number of variables must be positive
@@ -39,19 +54,43 @@ Polyhedron *LexSmaller(Polyhedron *P, Polyhedron *D, Polyhedron *C,
     printf("\nRanking > No variables, returning NULL.\n"); 
     return NULL;
   }
-  cur_element = Matrix_Alloc(P->NbConstraints+nb_vars, 
-			     P->Dimension+nb_new_parms+2);
+  /*
+   * if D has extra variables, then we can't squeeze the contraints
+   * of D in the new context, so we simply add them to each element.
+   */
+  if (D_extra)
+    cur_element = Matrix_Alloc(P->NbConstraints+D->NbConstraints+nb_new_parms, 
+			       P->Dimension+D_extra+nb_new_parms+2);
+  else
+    cur_element = Matrix_Alloc(P->NbConstraints+nb_new_parms, 
+			       P->Dimension+D_extra+nb_new_parms+2);
 
 
   // 0- Put P in the first rows of cur_element
   for (i=0; i < P->NbConstraints; i++) {
-    Vector_Copy(P->Constraint[i], cur_element->p[i], nb_vars+1);
-    Vector_Copy(P->Constraint[i]+1+nb_vars, 
-		cur_element->p[i]+1+nb_vars+nb_new_parms, nb_parms+1);
+    Vector_Copy(P->Constraint[i], cur_element->p[i], nb_vars+P_extra+1);
+    Vector_Copy(P->Constraint[i]+1+nb_vars+P_extra, 
+		cur_element->p[i]+1+nb_vars+P_extra+D_extra+nb_new_parms, 
+		nb_parms+1);
+  }
+  ncons = P->NbConstraints;
+  if (D_extra) {
+    for (i=0; i < D->NbConstraints; i++) {
+      r = P->NbConstraints + i;
+      Vector_Copy(D->Constraint[i], cur_element->p[r], 1);
+      Vector_Copy(D->Constraint[i]+1, 
+		  cur_element->p[r]+1+nb_vars+P_extra+D_extra, nb_new_parms);
+      Vector_Copy(D->Constraint[i]+1+nb_new_parms, 
+		  cur_element->p[r]+1+nb_vars+P_extra, D_extra);
+      Vector_Copy(D->Constraint[i]+1+nb_new_parms+D_extra, 
+		  cur_element->p[r]+1+nb_vars+P_extra+D_extra+nb_new_parms, 
+		  nb_parms+1);
+    }
+    ncons += D->NbConstraints;
   }
 
   // 1- compute the Ehrhart polynomial of each disjoint polyhedron defining the lexicographic order
-  for (k=0, r = P->NbConstraints; k < nb_vars; k++, r++) {
+  for (k=0, r = ncons; k < nb_vars; k++, r++) {
 
     // a- build the corresponding matrix
     // the nb of rows of cur_element is fake, so that we do not have to re-allocate it.
@@ -65,7 +104,7 @@ Polyhedron *LexSmaller(Polyhedron *P, Polyhedron *D, Polyhedron *C,
     // build the k-th inequality from P
     value_set_si(cur_element->p[r][0], 1);
     value_set_si(cur_element->p[r][k+1], -1);
-    value_set_si(cur_element->p[r][nb_vars+k+1], 1);
+    value_set_si(cur_element->p[r][nb_vars+P_extra+D_extra+k+1], 1);
     // we want a strict inequality
     value_set_si(cur_element->p[r][cur_element->NbColumns-1], -1);
 #ifdef ERDEBUG
@@ -83,7 +122,10 @@ Polyhedron *LexSmaller(Polyhedron *P, Polyhedron *D, Polyhedron *C,
   
   // 2- as we introduce n parameters, we must introduce them into the context as well
   // The added constraints are P.M.(J N 1 )^T >=0
-  C_times_J = Matrix_Alloc(C->NbConstraints + D->NbConstraints, D->Dimension+2);
+  if (D_extra)
+    C_times_J = Matrix_Alloc(C->NbConstraints, nb_new_parms+nb_parms+2);
+  else
+    C_times_J = Matrix_Alloc(C->NbConstraints + D->NbConstraints, D->Dimension+2);
   // copy the initial context while adding the new parameters
   for (i = 0; i < C->NbConstraints; i++) {
     value_assign(C_times_J->p[i][0], C->Constraint[i][0]);
@@ -91,8 +133,10 @@ Polyhedron *LexSmaller(Polyhedron *P, Polyhedron *D, Polyhedron *C,
   }
 
   /* copy constraints from evaluation domain */
-  for (i = 0; i < D->NbConstraints; i++)
-    Vector_Copy(D->Constraint[i], C_times_J->p[C->NbConstraints+i], D->Dimension+2);
+  if (!D_extra)
+    for (i = 0; i < D->NbConstraints; i++)
+      Vector_Copy(D->Constraint[i], C_times_J->p[C->NbConstraints+i], 
+		  D->Dimension+2);
 
 #ifdef ERDEBUG
   show_matrix(C_times_J);
@@ -111,18 +155,23 @@ Polyhedron *LexSmaller(Polyhedron *P, Polyhedron *D, Polyhedron *C,
 /*
  * Returns the number of points in P that are lexicographically
  * smaller than a given point in D.
+ * Only the first dim dimensions are taken into account
+ * for computing the lexsmaller relation.
+ * The remaining variables are assumed to be extra
+ * existential/control variables.
  * When P == D, this is the conventional ranking function.
  * P and D are assumed to have the same parameter domain C.
- * The variables in the Enumeration correspond to the variables
- * in D followed by the parameter of D (the variables of C).
+ * The variables in the Enumeration correspond to the first dim variables
+ * in D followed by the parameters of D (the variables of C).
  */
 Enumeration *Polyhedron_LexSmallerEnumerate(Polyhedron *P, Polyhedron *D, 
+					    unsigned dim,
 					    Polyhedron *C, unsigned MAXRAYS)
 {
   Enumeration * ranking;
   Polyhedron *RC, *RD;
 
-  RC = LexSmaller(P, D, C, MAXRAYS);
+  RC = LexSmaller(P, D, dim, C, MAXRAYS);
   RD = RC->next;
   RC->next = NULL;
 
@@ -145,5 +194,6 @@ Enumeration *Polyhedron_LexSmallerEnumerate(Polyhedron *P, Polyhedron *D,
  */
 Enumeration *Polyhedron_Ranking(Polyhedron *P, Polyhedron *C, unsigned MAXRAYS)
 {
-    return Polyhedron_LexSmallerEnumerate(P, P, C, MAXRAYS);
+    return Polyhedron_LexSmallerEnumerate(P, P, P->Dimension-C->Dimension, 
+					  C, MAXRAYS);
 }

@@ -12,24 +12,40 @@
  * Returns a list of polytopes needed to compute
  * the number of points in P that are lexicographically
  * smaller than a given point in D.
+ * Only the first dim dimensions are taken into account
+ * for computing the lexsmaller relation.
+ * The remaining variables are assumed to be extra
+ * existential/control variables.
  * When P == D, this is the conventional ranking function.
  * P and D are assumed to have the same parameter domain C.
  *
  * The first polyhedron in the list returned is the
- * updated context: a combination of D and C.
+ * updated context: a combination of D and C or an extended C.
+ *
+ * The order of the variables in the remaining polyhedra is
+ * - first dim variables of P
+ * - existential variables of P
+ * - existential variables of D
+ * - first dim variables of D
+ * - the parameters
  */
-Polyhedron *LexSmaller(Polyhedron *P, Polyhedron *D, Polyhedron *C, 
-			 unsigned MAXRAYS);
+Polyhedron *LexSmaller(Polyhedron *P, Polyhedron *D, unsigned dim,
+			Polyhedron *C, unsigned MAXRAYS);
 
 /*
  * Returns the number of points in P that are lexicographically
  * smaller than a given point in D.
+ * Only the first dim dimensions are taken into account
+ * for computing the lexsmaller relation.
+ * The remaining variables are assumed to be extra
+ * existential/control variables.
  * When P == D, this is the conventional ranking function.
  * P and D are assumed to have the same parameter domain C.
- * The variables in the Enumeration correspond to the variables
- * in D followed by the parameter of D (the variables of C).
+ * The variables in the Enumeration correspond to the first dim variables
+ * in D followed by the parameters of D (the variables of C).
  */
 Enumeration *Polyhedron_LexSmallerEnumerate(Polyhedron *P, Polyhedron *D, 
+					    unsigned dim,
 					    Polyhedron *C, unsigned MAXRAYS);
 
 /*
