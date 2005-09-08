@@ -719,8 +719,10 @@ Enumeration *Domain_Enumerate(Polyhedron *D, Polyhedron *C, unsigned MAXRAYS,cha
       Enumeration *e,*pr,*en,*en1, *en2,*tmp, *res, *sen;
       Polun=NULL;
      
-      POL_ENSURE_FACETS(D);
-      POL_ENSURE_VERTICES(D);
+      for (d = D; d; d = d->next) {
+	  POL_ENSURE_FACETS(d);
+	  POL_ENSURE_VERTICES(d);
+      }
       POL_ENSURE_FACETS(C);
       POL_ENSURE_VERTICES(C);
 
