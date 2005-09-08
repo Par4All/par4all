@@ -4638,6 +4638,13 @@ void Polyhedron_PrintConstraints(FILE *Dst,char *Format,Polyhedron *Pol)
 
 }
 
+/* Procedure to print constraint matrix of a domain */
+void Domain_PrintConstraints(FILE *Dst,char *Format,Polyhedron *Pol)
+{
+    Polyhedron *Q;
+    for (Q = Pol; Q; Q = Q->next)
+	Polyhedron_PrintConstraints(Dst, Format, Q);
+}
 
 static Polyhedron *p_simplify_constraints(Polyhedron *P, Vector *row,
 					  Value *g, unsigned MaxRays)
