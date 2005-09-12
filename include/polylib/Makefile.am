@@ -13,6 +13,7 @@ polyinclude_HEADERS = \
 	errormsg.h \
 	eval_ehrhart.h \
 	ext_ehrhart.h \
+	homogenization.h \
 	matrix.h \
 	matrix_addon.h \
 	matrix_permutations.h \
