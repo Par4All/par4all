@@ -438,13 +438,13 @@ ZPolyhedron *ZDomainDifference(ZPolyhedron  *A, ZPolyhedron *B) {
     
     for(tempB = B; tempB != NULL; tempB = tempB->next) {
       templist = NULL; res = NULL;
-      //for(i = temp; i != NULL; i = i->next) {
+      for(i = temp; i != NULL; i = i->next) {
 	i=temp;
 	res = ZPolyhedronDifference(i,tempB);
 	for (j = res; j != NULL; j = j->next )
 	  templist = AddZPoly2ZDomain(j,templist);
 	ZDomain_Free(res);
-      //}
+      }
       ZDomain_Free (temp);
       temp = NULL; 
       for(i = templist; i != NULL; i = i->next)
