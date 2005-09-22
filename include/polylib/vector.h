@@ -52,6 +52,7 @@ extern void Vector_Normalize_Positive(Value *p,int length,
 extern void Vector_Reduce(Value *p,unsigned length,
                   void(*f)(Value,Value *),Value *result);
 extern void Vector_Sort(Value *vector,unsigned n);
+extern int Vector_IsZero(Value * v, unsigned length);
 
 #if defined(__cplusplus)
 }
@@ -95,7 +96,7 @@ extern void Vector_Normalize_Positive(/*Value *p,int length,
 extern void Vector_Reduce(/*Value *p,unsigned length,
                    void(*f)(Value,Value *),Value *result*/);
 extern void Vector_Sort(/*Value *vector,unsigned n*/);
-
+extern int Vector_IsZero(/*Value * v, unsigned length*/); 
 
 #endif /* (defined(__STDC__) || defined(__cplusplus)) */
 #endif /* _vector_H_ */

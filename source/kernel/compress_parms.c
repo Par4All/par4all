@@ -31,28 +31,43 @@ void b_modulo(Value g, Value a, Value b) {
 // given a full-row-rank nxm matrix M(made of m row-vectors), 
 // computes the basis K (made of n-m column-vectors) of the integer kernel of the rows of M
 // so we have: M.K = 0
-// assumed: M is full row rank
 Matrix * int_ker(Matrix * M) {
-  Matrix *U, *Q, *H, *K;
-  int i, j;
+  Matrix *U, *Q, *H, *H2, *K;
+  int i, j, rk;
 
-  // there is a non-null kernel if and only if the dimension m of the space spanned by the rows 
-  // is inferior to the number n of variables 
-  if (M->NbColumns <= M->NbRows) {
+  /* eliminate redundant rows : UM = H*/
+  right_hermite(M, &H, &Q, &U);
+  for (rk=H->NbRows-1; (rk>=0) && Vector_IsZero(H->p[rk], H->NbColumns); rk--);
+  rk++;
+  show_matrix(H);
+  printf("rk=%u", rk);
+    
+  /* there is a non-null kernel if and only if the dimension m of 
+     the space spanned by the rows 
+     is inferior to the number n of variables */
+  if (M->NbColumns <= rk) {
     K = Matrix_Alloc(M->NbColumns, 0);
     return K;
   }
-  // computes MU = [H 0]
-  left_hermite(M, &H, &Q, &U);
-  
-  // obviously, the Integer Kernel is made of the last n-m columns of U
-  K=Matrix_Alloc(U->NbRows, U->NbColumns-M->NbRows);
-  for (i=0; i< U->NbRows; i++)
-    for(j=0; j< U->NbColumns-M->NbRows; j++) 
-      value_assign(K->p[i][j], U->p[i][M->NbRows+j]);
-
-  // clean up
+  Matrix_Free(U); 
+  Matrix_Free(Q);
+  /* fool left_hermite  by giving NbRows =rank of M*/
+  H->NbRows=rk;
+  /* computes MU = [H 0] */
+  left_hermite(H, &H2, &Q, &U); 
+  H->NbRows==M->NbRows;
   Matrix_Free(H);
+  show_matrix(H2);
+  show_matrix(Q);
+  show_matrix(U);
+  /* obviously, the Integer Kernel is made of the last n-rk columns of U */
+  K=Matrix_Alloc(U->NbRows, U->NbColumns-rk);
+  for (i=0; i< U->NbRows; i++)
+    for(j=0; j< U->NbColumns-rk; j++) 
+      value_assign(K->p[i][j], U->p[i][rk+j]);
+
+  /* clean up */
+  Matrix_Free(H2);
   Matrix_Free(U);
   Matrix_Free(Q);
   return K;
@@ -108,9 +123,15 @@ Matrix * int_mod_basis(Matrix * Bp, Matrix * Cp, Matrix * d) {
   unsigned int nb_parms=Bp->NbColumns;
   unsigned int i, j;
 
-  //   a/ compute K and S
+  /*   a/ compute K and S */
+  /* simplify the constraints */
+  for (i=0; i< Bp->NbRows; i++)
+    for (j=0; j< Bp->NbColumns; j++) 
+      value_pmodulus(Bp->p[i][j], Bp->p[i][j], d->p[0][i]);
   Matrix * K = int_ker(Bp);
+  show_matrix(K);
   Matrix * S = affine_periods(Bp, d);
+  show_matrix(S);
 
   // show_matrix(K);
   // show_matrix(S);
@@ -395,7 +416,7 @@ Matrix * compress_parms(Matrix * E, int nb_parms) {
   return G;
 }
 
-// given a matrix with m parameterized equations, compress the nb_parms parameters and n-m variables so that m variables are integer,
+// given a matrix with m parameterized equations, compress the nb_parms parameters and n-m variables so that m variables are intaseger,
 // and transform the variable space into a n-m space by eliminating the m variables (using the equalities)
 // the variables to be eliminated are chosen automatically by the function
 Matrix * full_dimensionize(Matrix const * M, int nb_parms, Matrix ** Validity_Lattice) {
@@ -420,14 +441,19 @@ Matrix * full_dimensionize(Matrix const * M, int nb_parms, Matrix ** Validity_La
   // 2- put the vars to be eliminated at the first positions, and compress the other vars/parms
   // -> [ variables to eliminate / parameters / variables to keep ]
   permutation = find_a_permutation(Eqs, nb_parms);
+  printf("permutation: [");
+    for (i=0; i< Eqs->NbColumns-2; i++) printf("%u ", permutation[i]);
+  printf("]\n");
   Permuted_Eqs = mpolyhedron_permute(Eqs, permutation);
+  show_matrix(Permuted_Eqs);
   Whole_Validity_Lattice = compress_parms(Permuted_Eqs, Eqs->NbColumns-2-Eqs->NbRows);
+  show_matrix(Whole_Validity_Lattice);
   mpolyhedron_compress_last_vars(Permuted_Eqs, Whole_Validity_Lattice);
   Permuted_Ineqs = mpolyhedron_permute(Ineqs, permutation);
   Matrix_Free(Eqs);
   Matrix_Free(Ineqs);
   mpolyhedron_compress_last_vars(Permuted_Ineqs, Whole_Validity_Lattice);
-  // show_matrix(Whole_Validity_Lattice);
+  show_matrix(Whole_Validity_Lattice);
 
   // 3- eliminate the first variables
   if (!mpolyhedron_eliminate_first_variables(Permuted_Eqs, Permuted_Ineqs)) {

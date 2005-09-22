@@ -117,7 +117,7 @@ void Gcd(Value a,Value b,Value *result) {
 /* 
  * Return the smallest component index in 'p' whose value is non-zero 
  */
-int First_Non_Zero(Value *p,unsigned length) {
+int First_Non_Zero(Value *p,unsigned length) { 
   
   Value *cp;
   int i;
@@ -755,6 +755,17 @@ int ConstraintSimplify(Value *old, Value *new, int len, Value* v)
     return 1;
 }
 
+int Vector_IsZero(Value * v, unsigned length) {
+  unsigned i;
+  if (value_notzero_p(v[0])) return 0;
+  else {
+    value_set_si(v[0], 1);
+    for (i=length-1; value_zero_p(v[i]); i--);
+    value_set_si(v[0], 0);
+    return (i==0);
+  }
+}
+
 #define MAX_CACHE_SIZE 20
 static struct {
   Value *p;
@@ -819,3 +830,4 @@ void value_free(Value *p, int size)
       value_clear(p[i]);
     free(p);
 }
+

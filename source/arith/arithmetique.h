@@ -4,7 +4,7 @@
 
 /* package arithmetique
  *
- * $Id: arithmetique.h,v 1.9 2005/08/02 16:13:57 verdoolaege Exp $
+ * $Id: arithmetique.h,v 1.10 2005/09/22 13:30:00 loechner Exp $
  *
  * Francois Irigoin, mai 1989
  *
@@ -262,10 +262,11 @@ typedef mpz_t Value;
 #define value_print(Dst,fmt,val)  {char *str; str = mpz_get_str(0,10,(val)); \
                                fprintf((Dst),(fmt),str); free(str); \
                               }
-#define value_swap(val1,val2)  {mpz_t tmp; mpz_init_set(tmp,(val1)); \
+#define value_swap(val1,val2) (mpz_swap(val1, val2))
+  /* { mpz_t tmp; mpz_init_set(tmp,(val1)); \
                                 mpz_set((val1),(val2)); mpz_set((val2),tmp); \
                                 mpz_clear(tmp); \
-                               }
+				} */
                                              
 /* Boolean operators on 'Value' */
 
