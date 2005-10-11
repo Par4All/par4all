@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: developer_guide.tex,v $
+%% Revision 1.15  2005/10/11 14:13:53  guerin
+%% 'make install' dans la doc pour ajouter une phase.
+%%
 %% Revision 1.14  2003/04/15 09:13:11  keryell
 %% Wrong \verb.
 %%
@@ -961,7 +964,7 @@ is available.
 
 \begin{itemize}
   
-\item In the directory \texttt{\$PIPS\_ROOT/Documentation}:
+\item In the directory \texttt{\$PIPS\_DEVEDIR/Documentation}:
   
   \begin{itemize}
     
@@ -988,6 +991,8 @@ myphase > MODULE.myres
       builder-map.h} and to copy them into {\tt \$PIPS\_INCLUDEDIR}; to also
     derive {\tt pipsmake.rc}, {\tt properties.rc} and {\tt wpips.rc} and to
     copy them into {\tt \$PIPS\_LIBDIR}.
+
+  \item Run the command {\tt make install}
      
   \end{itemize}
   
