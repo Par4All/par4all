@@ -76,7 +76,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2005/08/24 13:19:56 $~$
+$~$Date: 2005/10/11 14:00:15 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -6364,8 +6364,22 @@ alias print_claire_code 'Claire Pretty-Printer'
 print_claire_code        > MODULE.claire_printed_file
         < PROGRAM.entities
         < MODULE.code
+        < MODULE.preconditions
+        < MODULE.regions
 \end{verbatim}
 
+
+%%@UserManualDocumentation: print_claire_code_with_explicit_motif
+This pass generates CLAIRE code like the print\_claire\_code pass, but the input contains explicitly loops to scan motifs.  
+%%!UserManualDocumentation
+
+\begin{verbatim}
+alias print_claire_code_with_explicit_motif 'Claire Pretty-Printer with explicit motif'
+
+print_claire_code_with_explicit_motif       > MODULE.claire_printed_file
+        < PROGRAM.entities
+        < MODULE.code
+\end{verbatim}
 
 
 \section{Feautrier Methods (a.k.a. Polyhedral Method)}
