@@ -300,8 +300,6 @@ static int hermite(Matrix *H,Matrix *U,Matrix *Q) {
 	    /* Q->p[rank][j] += (x * Q->p[i][j]); */
 	    if (Q)
 	      for(j=0;j<nr;j++) {
-		// value_multiply(aux,x,Q->p[i][j]);
-		// value_addto(Q->p[rank][j],Q->p[rank][j],aux);
 		value_addmul(Q->p[rank][j], x, Q->p[i][j]);
 	      }
 	    reduced = 1;
@@ -353,8 +351,6 @@ static int hermite(Matrix *H,Matrix *U,Matrix *Q) {
 	  /* Q->p[rank][j] += x * Q->p[i][j]; */
 	  if (Q)
 	    for (j=0; j<nr; j++) {
-	      // value_multiply(aux,x,Q->p[i][j]);
-	      // value_addto(Q->p[rank][j],Q->p[rank][j],aux);
 	      value_addmul(Q->p[rank][j], x, Q->p[i][j]);
 	    }  
 #ifdef DEBUG
@@ -669,13 +665,11 @@ void rat_prodmat(Matrix *S,Matrix *X,Matrix *P) {
   int i,j,k;
   int last_column_index = P->NbColumns - 1;
   Value lcm, old_lcm,gcd,last_column_entry,s1;
-  // ,s2;
   Value m1,m2;
   
   /* Initialize all the 'Value' variables */
   value_init(lcm); value_init(old_lcm); value_init(gcd);
   value_init(last_column_entry); value_init(s1); 
-  // value_init(s2);
   value_init(m1); value_init(m2);
 
   /* Compute the LCM of last column entries (denominators) of rows */
@@ -698,9 +692,6 @@ void rat_prodmat(Matrix *S,Matrix *X,Matrix *P) {
 	
 	/* If the LCM of last column entries is one, simply add the products */
 	if(value_one_p(lcm)) {
-	  // value_set_si(s2,0);
-	  // value_multiply(s2,X->p[i][k],P->p[k][j]);
-          // value_addto(s1,s1,s2);
 	  value_addmul(s1, X->p[i][k], P->p[k][j]);
 	}  
 	
@@ -710,8 +701,6 @@ void rat_prodmat(Matrix *S,Matrix *X,Matrix *P) {
 	else {
 	  value_multiply(m1,X->p[i][k],P->p[k][j]);
 	  value_division(m2,lcm,P->p[k][last_column_index]);
-	  // value_multiply(s2,m1,m2);
-	  // value_addto(s1,s1,s2);
 	  value_addmul(s1, m1, m2);
 	}
       }	
@@ -728,7 +717,6 @@ void rat_prodmat(Matrix *S,Matrix *X,Matrix *P) {
   /* Clear all the 'Value' variables */
   value_clear(lcm); value_clear(old_lcm); value_clear(gcd);
   value_clear(last_column_entry); value_clear(s1); 
-  // value_clear(s2);
   value_clear(m1); value_clear(m2);
  
   return;
@@ -742,9 +730,7 @@ void Matrix_Vector_Product(Matrix *Mat,Value *p1,Value *p2) {
 
   int NbRows, NbColumns, i, j;
   Value **cm, *q, *cp1, *cp2;
-  // Value s;
   
-  // value_init(s);
   NbRows=Mat->NbRows;
   NbColumns=Mat->NbColumns;
   
@@ -759,17 +745,12 @@ void Matrix_Vector_Product(Matrix *Mat,Value *p1,Value *p2) {
     
     /* *cp2 = *q++ * *cp1++ */
     for(j=1;j<NbColumns;j++) {
-      
-      // value_set_si(s,0);
-      // value_multiply(s,*q, *cp1);
-      // value_addto(*cp2,*cp2,s);
       value_addmul(*cp2, *q, *cp1);
       q++;
       cp1++;
     }
     cp2++;
   }
-  // value_clear(s);
   return;
 } /* Matrix_Vector_Product */
 
@@ -781,9 +762,7 @@ void Vector_Matrix_Product(Value *p1,Matrix *Mat,Value *p2) {
   
   int NbRows, NbColumns, i, j;
   Value **cm, *cp1, *cp2;
-  // Value s;
   
-  // value_init(s);
   NbRows=Mat->NbRows;
   NbColumns=Mat->NbColumns;
   cp2 = p2;
@@ -795,16 +774,11 @@ void Vector_Matrix_Product(Value *p1,Matrix *Mat,Value *p2) {
     
     /* *cp2= *(*cm+j) * *cp1++; */
     for (i=1;i<NbRows;i++) {
-      
-      // value_set_si(s,0);
-      // value_multiply(s,*(*(cm+i)+j),*cp1);
-      // value_addto(*cp2,*cp2,s);
       value_addmul(*cp2, *(*(cm+i)+j), *cp1);
       cp1++;
     }
     cp2++;
   }
-  // value_clear(s);
   return;
 } /* Vector_Matrix_Product */
 
@@ -817,7 +791,6 @@ void Matrix_Product(Matrix *Mat1,Matrix *Mat2,Matrix *Mat3) {
   int Size, i, j, k;
   unsigned NbRows, NbColumns;
   Value **q1, **q2, *p1, *p3,sum;
-  // ,s;
   
   NbRows    = Mat1->NbRows;
   NbColumns = Mat2->NbColumns;
@@ -828,7 +801,6 @@ void Matrix_Product(Matrix *Mat1,Matrix *Mat2,Matrix *Mat3) {
     return;
   }     
   value_init(sum); 
-  // value_init(s);
   p3 = Mat3->p_Init;
   q1 = Mat1->p;
   q2 = Mat2->p;
@@ -839,11 +811,6 @@ void Matrix_Product(Matrix *Mat1,Matrix *Mat2,Matrix *Mat3) {
       p1 = *(q1+i);
       value_set_si(sum,0);
       for (k=0;k<Size;k++) {
-	
-	/* sum+=*p1++ * *(*(q2+k)+j); */
-	// value_set_si(s,0);
-	// value_multiply(s,*p1, *(*(q2+k)+j));
-	// value_addto(sum,sum,s);
 	value_addmul(sum, *p1, *(*(q2+k)+j));
 	p1++;
       }
@@ -852,7 +819,6 @@ void Matrix_Product(Matrix *Mat1,Matrix *Mat2,Matrix *Mat3) {
     }
   }
   value_clear(sum); 
-  // value_clear(s);
   return;
 } /* Matrix_Product */
   
