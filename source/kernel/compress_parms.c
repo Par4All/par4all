@@ -54,9 +54,8 @@ Matrix * affine_periods(Matrix * M, Matrix * d) {
   Matrix * S;
   unsigned int i,j;
   Value tmp;
-  value_init(tmp);
-  /* 1- compute the overall periods */
   Value * periods = (Value *)malloc(sizeof(Value) * M->NbColumns);
+  value_init(tmp);
   for(i=0; i< M->NbColumns; i++) {
     value_init(periods[i]);
     value_set_si(periods[i], 1);
@@ -99,6 +98,7 @@ Matrix * int_mod_basis(Matrix * Bp, Matrix * Cp, Matrix * d) {
   int nb_eqs = Bp->NbRows;
   unsigned int nb_parms=Bp->NbColumns;
   unsigned int i, j;
+  Matrix *H, *U, *Q, *M, *inv_H_M, *Ha, *Np_0, *N_0, *G;
 
   /*   a/ compute K and S */
   /* simplify the constraints */
@@ -122,7 +122,6 @@ Matrix * int_mod_basis(Matrix * Bp, Matrix * Cp, Matrix * d) {
   // show_matrix(KS);
 
   /* HNF(K|S) */
-  Matrix * H, * U, * Q;
   left_hermite(KS, &H, &U, &Q);
   Matrix_Free(KS);
   Matrix_Free(U);
@@ -141,7 +140,7 @@ Matrix * int_mod_basis(Matrix * Bp, Matrix * Cp, Matrix * d) {
   Matrix_Free(H);
 
   /*   c/ compute U_M.N'_0 = N_0: */
-  Matrix * M = Matrix_Alloc(nb_eqs, nb_parms+nb_eqs);
+  M = Matrix_Alloc(nb_eqs, nb_parms+nb_eqs);
   /* N'_0 = M_H^{-1}.(-C'), which must be integer
      and where H_M = HNF(M) with M = (B' D) : M.U_M = [H_M 0] */
 
@@ -159,9 +158,9 @@ Matrix * int_mod_basis(Matrix * Bp, Matrix * Cp, Matrix * d) {
   
   //       compute inv_H_M, the inverse of the HNF H of M = (B' D)
   left_hermite(M, &H, &Q, &U);
-  Matrix * inv_H_M=Matrix_Alloc(nb_eqs, nb_eqs+1);
+  inv_H_M=Matrix_Alloc(nb_eqs, nb_eqs+1);
   /* again, do a square Matrix from H, using the non-used Matrix Ha */
-  Matrix * Ha = Matrix_Alloc(nb_eqs, nb_eqs);
+  Ha = Matrix_Alloc(nb_eqs, nb_eqs);
   for(i=0; i< nb_eqs; i++) {
     for(j=0; j< nb_eqs; j++) {
       value_assign(Ha->p[i][j], H->p[i][j]); 
@@ -179,7 +178,7 @@ Matrix * int_mod_basis(Matrix * Bp, Matrix * Cp, Matrix * d) {
 
   /* Compute N'_0 = inv_H_M.(-C')
      actually compute (N' \\ 0) such that N = U^{-1}.(N' \\ 0) */
-  Matrix * Np_0= Matrix_Alloc(U->NbColumns, 1);
+  Np_0 = Matrix_Alloc(U->NbColumns, 1);
   for(i=0; i< nb_eqs; i++) 
     {
       value_set_si(Np_0->p[i][0], 0);
@@ -214,7 +213,7 @@ Matrix * int_mod_basis(Matrix * Bp, Matrix * Cp, Matrix * d) {
   // show_matrix(Np_0);
 
   /* now compute the actual particular solution N_0 = U_M. N'_0 */
-  Matrix * N_0 = Matrix_Alloc(U->NbColumns, 1);
+  N_0 = Matrix_Alloc(U->NbColumns, 1);
   /* OPT: seules les nb_eq premières valeurs de N_0 sont utiles en fait. */
   Matrix_Product(U, Np_0, N_0);
   // show_matrix(N_0);
@@ -222,7 +221,7 @@ Matrix * int_mod_basis(Matrix * Bp, Matrix * Cp, Matrix * d) {
   Matrix_Free(U);
 
   /* build the whole compression matrix:  */
-  Matrix * G = Matrix_Alloc(S->NbRows+1, S->NbRows+1);
+  G = Matrix_Alloc(S->NbRows+1, S->NbRows+1);
   for (i=0; i< S->NbRows; i++) {
     for(j=0; j< S->NbRows; j++) 
       value_assign(G->p[i][j], S->p[i][j]);
@@ -252,7 +251,7 @@ Matrix * extract_funny_stuff(Matrix const * E, int nb_parms,
 			     Matrix ** Bp, Matrix **Cp, Matrix **d) {
 unsigned int i,j, k, nb_eqs=E->NbRows;
   int nb_vars=E->NbColumns - nb_parms -2;
-  Matrix * A, * Ap, * Ha, * U, * Q, * H, *B, *C;
+  Matrix * A, * Ap, * Ha, * U, * Q, * H, *B, *C, *Ha_pre_inv;
 
   /* particular case: */
   if (nb_eqs==0) {
@@ -287,7 +286,7 @@ unsigned int i,j, k, nb_eqs=E->NbRows;
   // show_matrix(Ha);
 
   /*  c/ Invert Ha */
-  Matrix * Ha_pre_inv = Matrix_Alloc(nb_eqs, nb_eqs+1);
+  Ha_pre_inv = Matrix_Alloc(nb_eqs, nb_eqs+1);
   if(!MatInverse(Ha, Ha_pre_inv)) { 
     fprintf(stderr,"extract_funny_stuff > Matrix Ha is non-invertible.");
   }
@@ -348,7 +347,7 @@ given a parameterized constraints matrix with m equalities, computes the compres
 Matrix * compress_parms(Matrix * E, int nb_parms) {
   unsigned int i,j, k, nb_eqs=0;
   int nb_vars=E->NbColumns - nb_parms -2;
-  Matrix *U, *d, *Bp, *Cp;
+  Matrix *U, *d, *Bp, *Cp, *G;
 
   /* particular case where there is no equation */
   if (E->NbRows==0) return Identity_Matrix(nb_parms+1);
@@ -367,7 +366,7 @@ Matrix * compress_parms(Matrix * E, int nb_parms) {
      the constant part of G is a particular solution of (1)
      if no integer constant part is found, there is no solution. */
 
-  Matrix * G = int_mod_basis(Bp, Cp, d);
+  G = int_mod_basis(Bp, Cp, d);
   Matrix_Free(Bp);
   Matrix_Free(Cp);
   Matrix_Free(d);

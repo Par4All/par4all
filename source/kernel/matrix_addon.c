@@ -53,13 +53,14 @@ Matrix * Identity_Matrix(unsigned int dim) {
 void mtransformation_inverse(Matrix * transf, Matrix ** inverse, Value * g) {
   Value factor;
   unsigned int i,j;
+  Matrix *tmp, *inv;
 
   value_init(*g);
   value_set_si(*g,1);
 
   // a - compute the inverse as usual (n x (n+1) matrix)
-  Matrix * tmp = Matrix_Copy(transf);
-  Matrix * inv = Matrix_Alloc(transf->NbRows, transf->NbColumns+1);
+  tmp = Matrix_Copy(transf);
+  inv = Matrix_Alloc(transf->NbRows, transf->NbColumns+1);
   MatInverse(tmp, inv);
   Matrix_Free(tmp);
 
@@ -81,11 +82,13 @@ void mtransformation_inverse(Matrix * transf, Matrix ** inverse, Value * g) {
 // takes a transformation matrix, and expands it to a higher dimension with the identity matrix 
 // regardless of it homogeneousness
 Matrix * mtransformation_expand_left_to_dim(Matrix * M, int new_dim) {
-  assert(new_dim>=M->NbColumns);
-  assert(M->NbRows==M->NbColumns);
   Matrix * ret = Identity_Matrix(new_dim);
   int offset = new_dim-M->NbRows;
   unsigned int i,j;
+
+  assert(new_dim>=M->NbColumns);
+  assert(M->NbRows==M->NbColumns);
+
   for (i=0; i< M->NbRows; i++)
     for (j=0; j< M->NbRows; j++)
       value_assign(ret->p[offset+i][offset+j], M->p[i][j]);

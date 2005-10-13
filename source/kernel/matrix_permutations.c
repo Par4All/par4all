@@ -31,10 +31,11 @@ unsigned int * permutation_inverse(unsigned int * perm, unsigned int nb_elems) {
 // we can call it a "permutation vector" if you wish
 // transf[x][y] -> permuted[permutation(x)][permutation(y)]
 Matrix * mtransformation_permute(Matrix * transf, unsigned int * permutation) {
+  Matrix * permuted;
   unsigned int i,j;
   // the transformation is supposed to be from Q^n to Q^n, so a square matrix.
   assert(transf->NbRows==transf->NbColumns);
-  Matrix * permuted = Matrix_Alloc(transf->NbRows, transf->NbRows);
+  permuted = Matrix_Alloc(transf->NbRows, transf->NbRows);
   for (i= 0; i< transf->NbRows; i++) {
     for (j= 0; j< transf->NbRows; j++) {
       value_assign(permuted->p[permutation[i]][permutation[j]], transf->p[i][j]);
