@@ -32,12 +32,12 @@ dnl Process this file with autoconf to produce a configure script.
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
 AC_INIT(include/polylib/polylib.h)
-AM_INIT_AUTOMAKE(polylib, 5.22.0)
+AM_INIT_AUTOMAKE(polylib, 5.22.1)
 
-VERSION=5.22.0
+VERSION=5.22.1
 
 AC_SUBST(versioninfo)
-versioninfo=6:0:0
+versioninfo=6:1:0
 
 if test "x$prefix" != "xNONE"; then
     prefix_wd=`cd $prefix && pwd`
