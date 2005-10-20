@@ -216,15 +216,6 @@ AC_CHECK_PROG(DOXYGEN,doxygen,doxygen,test,[$PATH:$doxygen_package/bin:/usr/loca
 dnl AC_MSG_RESULT($DOXYGEN)
 
 
-echo "Polylib will be built with " $LIBS_TO_BUILD "integer size"
-echo "---------------------------------------------------"
-echo "You can proceed with:"
-echo "make	         :to build the libs and the executables"
-echo "make tests         :to test the library"
-echo "make install       :to install them (default /usr/local)"
-echo "---------------------------------------------------"
-
-
 AC_SUBST(VERSION)
 
 AC_SUBST(LIBS)
@@ -253,3 +244,12 @@ AC_OUTPUT(Makefile
 	  Test/pp/Makefile
 	  polylib.doxygen
 	)
+
+
+echo "Polylib will be built with " $ALL_BITS "integer size(s)"
+echo "---------------------------------------------------"
+echo "You can proceed with:"
+echo "make               :to build the libs and the executables"
+echo "make tests         :to test the library"
+echo "make install       :to install them (to $prefix)"
+echo "---------------------------------------------------"
