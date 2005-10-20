@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am,v 1.1 2005/09/06 14:03:57 verdoolaege Exp $
+# $Id: Makefile.am,v 1.2 2005/10/20 11:35:25 verdoolaege Exp $
 #
 
 OBJ_DIR = $(top_builddir)
@@ -10,11 +10,11 @@ RANKING =  \
 EXTRA_DIST = $(RANKING) \
 	$(RANKING:%.in=%.out) 
 
-check:
+tests:
 	@failedtest=0; \
 	for x in $(RANKING) ; do \
 		echo "Verify file $$x" ; \
-		$(OBJ_DIR)/ehrhart_ranking < $(srcdir)/$$x >xyz; \
+		$(OBJ_DIR)/ehrhart_ranking$(TEST_BITS) < $(srcdir)/$$x >xyz; \
 		diff -w xyz $(srcdir)/`basename $$x .in`.out ; \
 		result=$$?; \
 		if [ "$$result" -eq "1" ]; then \

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am,v 1.7 2005/06/03 10:44:32 verdoolaege Exp $
+# $Id: Makefile.am,v 1.8 2005/10/20 11:35:25 verdoolaege Exp $
 #
 
 OBJ_DIR = $(top_builddir)
@@ -53,17 +53,16 @@ EXTRA_DIST = $(EHRHART) \
 	$(EHRHART:%.in=%.out) 
 
 # These do not pass in 32 bits mode (integer overflow): isnm isnm2 e16
-if BITS32
-  OVER = bart8.in isnm.in isnm2.in e16.in esum.in t12.in
-endif
+OVER = $(if $(findstring 32, $(TEST_BITS)), \
+	    bart8.in isnm.in isnm2.in e16.in esum.in t12.in,)
 
 EHRHART_TESTS = $(filter-out $(LONG_EHRHART_TESTS) $(OVER), $(EHRHART))
 
-check:
+tests:
 	@failedtest=0; \
 	for x in $(EHRHART_TESTS) ; do \
 		echo "Verify file $$x" ; \
-		$(OBJ_DIR)/testehrhart < $(srcdir)/$$x >xyz; \
+		$(OBJ_DIR)/testehrhart$(TEST_BITS) < $(srcdir)/$$x >xyz; \
 		diff -w xyz $(srcdir)/`basename $$x .in`.out ; \
 		result=$$?; \
 		if [ "$$result" -eq "1" ]; then \
@@ -82,5 +81,5 @@ check:
 longtest:
 	@for x in $(EHRHART_TESTS) ; do \
 		echo "Verify Ehrhart for $$x"; \
-		$(OBJ_DIR)/verif_ehrhart < $(srcdir)/$$x ;\
+		$(OBJ_DIR)/verif_ehrhart$(TEST_BITS) < $(srcdir)/$$x ;\
 	done ;

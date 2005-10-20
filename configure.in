@@ -97,25 +97,35 @@ for type in long_long_int long_int int; do
     esac
 done
 
+dnl extra indirection to avoid automake getting confused
+AC_SUBST(multi_bin_programs)
+AC_SUBST(multi_noinst_programs)
+multi_bin_programs="\$(multi_bin_programs)"
+multi_noinst_programs="\$(multi_noinst_programs)"
+
 AC_SUBST(polylibs)
+AC_SUBST(ALL_BITS)
 
 AC_ARG_ENABLE(int-lib,
 	[  --enable-int-lib        Build an int library], 
         [lib_type=int
 	 bits=`expr $ac_cv_sizeof_int \* 8`
 	 polylibs="libpolylib$bits.la $polylibs"
+	 ALL_BITS="$bits $ALL_BITS"
 	])
 AC_ARG_ENABLE(longint-lib,
 	[  --enable-longint-lib    Build a long int library], 
         [lib_type=longint
 	 bits=`expr $ac_cv_sizeof_long_int \* 8`
 	 polylibs="libpolylib$bits.la $polylibs"
+	 ALL_BITS="$bits $ALL_BITS"
 	])
 AC_ARG_ENABLE(longlongint-lib,
 	[  --enable-longlongint-lib Build a long long int library], 
         [lib_type=longlongint
 	 bits=`expr $ac_cv_sizeof_long_long_int \* 8`
 	 polylibs="libpolylib$bits.la $polylibs"
+	 ALL_BITS="$bits $ALL_BITS"
 	])
 
 dnl Check for GMP library
@@ -148,6 +158,7 @@ else
 	BITS=`expr gmp`
 	LIBS="-lgmp $LIBS"
 	polylibs="libpolylib$BITS.la $polylibs"
+	ALL_BITS="$BITS $ALL_BITS"
 fi
 
 if test "X$lib_type" = "X"; then
@@ -157,16 +168,19 @@ if test "X$lib_type" = "X"; then
 	lib_type=longlongint
 	bits=`expr $ac_cv_sizeof_long_long_int \* 8`
 	polylibs="libpolylib$bits.la $polylibs"
+	ALL_BITS="$bits $ALL_BITS"
     elif test "$ac_cv_sizeof_long_int" -gt "$ac_cv_sizeof_int"; then
 	AC_MSG_RESULT([long int])
 	lib_type=longint
 	bits=`expr $ac_cv_sizeof_long_int \* 8`
 	polylibs="libpolylib$bits.la $polylibs"
+	ALL_BITS="$bits $ALL_BITS"
     else
 	AC_MSG_RESULT([NONE!])
 	lib_type=int
 	bits=`expr $ac_cv_sizeof_int \* 8`
 	polylibs="libpolylib$bits.la $polylibs"
+	ALL_BITS="$bits $ALL_BITS"
     fi
 fi
 
@@ -185,8 +199,6 @@ esac
 
 AC_SUBST(polylib)
 polylib="libpolylib$BITS.la"
-
-AM_CONDITIONAL(BITS32, test $BITS = 32)
 
 dnl /*****************************************************************************/
 AC_ARG_ENABLE(extra-suffix,

@@ -52,70 +52,156 @@ libpolylibgmp_la_SOURCES = $(sources)
 libpolylibgmp_la_CPPFLAGS = -DGNUMP
 
 testlib_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
-polytest_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
-verif_ehrhart_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
-Zpolytest_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
 example_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
 count_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
 c2p_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
 r2p_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
 findv_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
-pp_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
 disjoint_union_sep_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
 disjoint_union_adj_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
-testehrhart_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
-ehrhart_union_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
 ehrhart_quick_apx_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
 ehrhart_lower_bound_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
 ehrhart_upper_bound_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
-ehrhart_ranking_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
 
 
 EXTRA_LTLIBRARIES = libpolylib32.la libpolylib64.la libpolylib128.la \
 		    libpolylibgmp.la
 
+multi_noinst_programs = $(foreach B,$(ALL_BITS), \
+	Zpolytest$(B) \
+	polytest$(B) \
+	verif_ehrhart$(B) \
+)
+	
 noinst_PROGRAMS = \
 	testlib \
-	polytest \
-	verif_ehrhart \
-	Zpolytest \
 	example \
-	count
+	count \
+	@multi_noinst_programs@
+
+multi_bin_programs = $(foreach B,$(ALL_BITS), \
+	ehrhart_ranking$(B) \
+	ehrhart_union$(B) \
+	pp$(B) \
+	testehrhart$(B) \
+)
+	
 bin_PROGRAMS = \
 	c2p \
 	r2p \
 	findv \
-	pp \
 	disjoint_union_sep \
 	disjoint_union_adj \
-	testehrhart \
-	ehrhart_union \
 	ehrhart_quick_apx \
 	ehrhart_upper_bound \
 	ehrhart_lower_bound \
-	ehrhart_ranking
+	@multi_bin_programs@
+
+EXTRA_PROGRAMS = \
+	Zpolytest32 \
+	Zpolytest64 \
+	Zpolytestgmp \
+	ehrhart_ranking32 \
+	ehrhart_ranking64 \
+	ehrhart_rankinggmp \
+	ehrhart_union32 \
+	ehrhart_union64 \
+	ehrhart_uniongmp \
+	polytest32 \
+	polytest64 \
+	polytestgmp \
+	pp32 \
+	pp64 \
+	ppgmp \
+	testehrhart32 \
+	testehrhart64 \
+	testehrhartgmp \
+	verif_ehrhart32 \
+	verif_ehrhart64 \
+	verif_ehrhartgmp
 
 LDADD = @polylib@
 c2p_SOURCES = $(poly_src)/c2p.c
 r2p_SOURCES = $(poly_src)/r2p.c
 findv_SOURCES = $(poly_src)/findv.c
-pp_SOURCES = $(poly_src)/pp.c
 disjoint_union_sep_SOURCES = $(poly_src)/disjoint_union_sep.c
 disjoint_union_adj_SOURCES = $(poly_src)/disjoint_union_adj.c
-ehrhart_union_SOURCES = $(poly_src)/ehrhart_union.c
 ehrhart_quick_apx_SOURCES = $(poly_src)/ehrhart_quick_apx.c
 ehrhart_upper_bound_SOURCES =  $(poly_src)/ehrhart_upper_bound.c
 ehrhart_lower_bound_SOURCES =  $(poly_src)/ehrhart_lower_bound.c
-ehrhart_ranking_SOURCES =  $(poly_src)/ehrhart_ranking.c
 testlib_SOURCES = $(poly_src)/testlib.c
-polytest_SOURCES = $(poly_src)/polytest.c
 example_SOURCES = $(poly_src)/example.c
 count_SOURCES = source/count.c
-Zpolytest_SOURCES = $(poly_src)/Zpolytest.c
-verif_ehrhart_SOURCES = $(poly_src)/verif_ehrhart.c
-testehrhart_SOURCES = $(poly_src)/testehrhart.c
+Zpolytest32_CPPFLAGS = $(libpolylib32_la_CPPFLAGS)
+Zpolytest32_SOURCES = $(poly_src)/Zpolytest.c
+Zpolytest32_LDADD = libpolylib32.la
+Zpolytest64_CPPFLAGS = $(libpolylib64_la_CPPFLAGS)
+Zpolytest64_SOURCES = $(poly_src)/Zpolytest.c
+Zpolytest64_LDADD = libpolylib64.la
+Zpolytestgmp_CPPFLAGS = $(libpolylibgmp_la_CPPFLAGS)
+Zpolytestgmp_SOURCES = $(poly_src)/Zpolytest.c
+Zpolytestgmp_LDADD = libpolylibgmp.la
+ehrhart_ranking32_CPPFLAGS = $(libpolylib32_la_CPPFLAGS)
+ehrhart_ranking32_SOURCES = $(poly_src)/ehrhart_ranking.c
+ehrhart_ranking32_LDADD = libpolylib32.la
+ehrhart_ranking64_CPPFLAGS = $(libpolylib64_la_CPPFLAGS)
+ehrhart_ranking64_SOURCES = $(poly_src)/ehrhart_ranking.c
+ehrhart_ranking64_LDADD = libpolylib64.la
+ehrhart_rankinggmp_CPPFLAGS = $(libpolylibgmp_la_CPPFLAGS)
+ehrhart_rankinggmp_SOURCES = $(poly_src)/ehrhart_ranking.c
+ehrhart_rankinggmp_LDADD = libpolylibgmp.la
+ehrhart_union32_CPPFLAGS = $(libpolylib32_la_CPPFLAGS)
+ehrhart_union32_SOURCES = $(poly_src)/ehrhart_union.c
+ehrhart_union32_LDADD = libpolylib32.la
+ehrhart_union64_CPPFLAGS = $(libpolylib64_la_CPPFLAGS)
+ehrhart_union64_SOURCES = $(poly_src)/ehrhart_union.c
+ehrhart_union64_LDADD = libpolylib64.la
+ehrhart_uniongmp_CPPFLAGS = $(libpolylibgmp_la_CPPFLAGS)
+ehrhart_uniongmp_SOURCES = $(poly_src)/ehrhart_union.c
+ehrhart_uniongmp_LDADD = libpolylibgmp.la
+polytest32_CPPFLAGS = $(libpolylib32_la_CPPFLAGS)
+polytest32_SOURCES = $(poly_src)/polytest.c
+polytest32_LDADD = libpolylib32.la
+polytest64_CPPFLAGS = $(libpolylib64_la_CPPFLAGS)
+polytest64_SOURCES = $(poly_src)/polytest.c
+polytest64_LDADD = libpolylib64.la
+polytestgmp_CPPFLAGS = $(libpolylibgmp_la_CPPFLAGS)
+polytestgmp_SOURCES = $(poly_src)/polytest.c
+polytestgmp_LDADD = libpolylibgmp.la
+pp32_CPPFLAGS = $(libpolylib32_la_CPPFLAGS)
+pp32_SOURCES = $(poly_src)/pp.c
+pp32_LDADD = libpolylib32.la
+pp64_CPPFLAGS = $(libpolylib64_la_CPPFLAGS)
+pp64_SOURCES = $(poly_src)/pp.c
+pp64_LDADD = libpolylib64.la
+ppgmp_CPPFLAGS = $(libpolylibgmp_la_CPPFLAGS)
+ppgmp_SOURCES = $(poly_src)/pp.c
+ppgmp_LDADD = libpolylibgmp.la
+testehrhart32_CPPFLAGS = $(libpolylib32_la_CPPFLAGS)
+testehrhart32_SOURCES = $(poly_src)/testehrhart.c
+testehrhart32_LDADD = libpolylib32.la
+testehrhart64_CPPFLAGS = $(libpolylib64_la_CPPFLAGS)
+testehrhart64_SOURCES = $(poly_src)/testehrhart.c
+testehrhart64_LDADD = libpolylib64.la
+testehrhartgmp_CPPFLAGS = $(libpolylibgmp_la_CPPFLAGS)
+testehrhartgmp_SOURCES = $(poly_src)/testehrhart.c
+testehrhartgmp_LDADD = libpolylibgmp.la
+verif_ehrhart32_CPPFLAGS = $(libpolylib32_la_CPPFLAGS)
+verif_ehrhart32_SOURCES = $(poly_src)/verif_ehrhart.c
+verif_ehrhart32_LDADD = libpolylib32.la
+verif_ehrhart64_CPPFLAGS = $(libpolylib64_la_CPPFLAGS)
+verif_ehrhart64_SOURCES = $(poly_src)/verif_ehrhart.c
+verif_ehrhart64_LDADD = libpolylib64.la
+verif_ehrhartgmp_CPPFLAGS = $(libpolylibgmp_la_CPPFLAGS)
+verif_ehrhartgmp_SOURCES = $(poly_src)/verif_ehrhart.c
+verif_ehrhartgmp_LDADD = libpolylibgmp.la
 
-longtest:
+check: tests
+
+tests: all
+	(cd Test; $(MAKE) tests)
+
+longtest: all
 	(cd Test; $(MAKE) long_tests)
 
 # Make the 'javadoc' style documentation

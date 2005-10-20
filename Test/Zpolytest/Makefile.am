@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am,v 1.1 2004/01/31 22:17:45 verdoolaege Exp $
+# $Id: Makefile.am,v 1.2 2005/10/20 11:35:25 verdoolaege Exp $
 #
 
 OBJ_DIR = $(top_builddir)
@@ -35,11 +35,11 @@ EXTRA_DIST = $(ZPOLYTESTS) \
 
 TEST=$(ZPOLYTESTS:%.in=%.tested) 
 
-check:
+tests:
 	@failedtest=0; \
 	for x in $(ZPOLYTESTS) ; do \
 		echo "Verify file $$x" ; \
-		$(OBJ_DIR)/Zpolytest < $(srcdir)/$$x > xyz;\
+		$(OBJ_DIR)/Zpolytest$(TEST_BITS) < $(srcdir)/$$x > xyz;\
 		diff -w xyz $(srcdir)/`basename $$x .in`.out ; \
 		result=$$?; \
 		if [ "$$result" -eq "1" ]; then \
