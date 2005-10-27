@@ -5,6 +5,9 @@
  * $Id$
  *
  * $Log: ri-util-local.h,v $
+ * Revision 1.93  2005/10/27 16:05:45  coelho
+ * IMA/IMS -OP
+ *
  * Revision 1.92  2003/12/22 14:59:53  nguyen
  * Replace entity_local_name by entity_user_name to handle C
  *
@@ -269,6 +272,11 @@ typedef hash_table control_mapping;
 #define EOLE_FMS_OPERATOR_NAME          "EOLE-FMS-OP"
 #define EOLE_PROD_OPERATOR_NAME         "EOLE-PROD-OP"
 #define EOLE_SUM_OPERATOR_NAME          "EOLE-SUM-OP"
+
+/* Integer Multiply Add and Sub, FC 27/10/2005 for FI
+ */
+#define IMA_OPERATOR_NAME				"IMA-OP"
+#define IMS_OPERATOR_NAME				"IMS-OP"
 
 /* moved from ricedg-local.h */
 #define LOOP_COUNTER_MODULE_NAME 	"LOOP-COUNTER"
