@@ -76,7 +76,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2005/10/11 14:00:15 $~$
+$~$Date: 2005/10/27 09:56:42 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -3902,12 +3902,19 @@ The current implementation is still shaky and does not handle well
 expressions of mixed types such as \verb|X+1| where \verb|1| is implictly
 promoted from integer to real.
 %%!UserManualDocumentation
+
 \begin{verbatim}
 alias optimize_expressions 'Optimize Expressions'
 
 optimize_expressions    > MODULE.code
         < PROGRAM.entities
         < MODULE.code
+
+alias instruction_selection 'Select Instructions'
+
+instruction_selection > MODULE.code
+	< PROGRAM.entities
+	< MODULE.code
 \end{verbatim}
 
 
