@@ -9,7 +9,8 @@ LIB_CFILES =	partial_eval.c \
 		simple_atomize.c \
 		forward_substitution.c \
 		optimize.c \
-		sequence_gcm_cse.c
+		sequence_gcm_cse.c \
+		instruction_selection.c
 
 LIB_HEADERS =	expressions-local.h
 
