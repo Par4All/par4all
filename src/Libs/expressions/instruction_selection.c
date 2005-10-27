@@ -8,5 +8,5 @@
 
 bool instruction_selection(string module_name)
 {
-	return true;
+	return TRUE;
 }
