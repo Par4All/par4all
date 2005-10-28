@@ -302,6 +302,9 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {EOLE_PROD_OPERATOR_NAME,    no_write_effects },
     {EOLE_FMA_OPERATOR_NAME,     no_write_effects },
 
+	{IMA_OPERATOR_NAME,          no_write_effects },
+	{IMS_OPERATOR_NAME,          no_write_effects },
+
     /* Here are C intrinsics.*/
   
     {".",                    no_write_effects},
