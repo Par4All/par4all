@@ -206,6 +206,49 @@ generic_proper_effects_of_reference(reference ref)
     return(le);
 }
 
+
+/* TO VERIFY !!!!!!!!!!!!!*/
+list 
+generic_proper_effects_of_subscript(subscript s)
+{
+    list inds = subscript_indices(s);
+    list le = NIL;
+    transformer context;
+
+    if (effects_private_current_context_empty_p())
+	context = transformer_undefined;
+    else
+      {
+	context = effects_private_current_context_head();
+      }
+
+
+    pips_debug(3, "begin\n");
+    
+    if (! (*empty_context_test)(context))
+    {	
+      le = generic_proper_effects_of_expression(subscript_array(s));
+      
+      if (! ENDP(inds)) 
+	le = gen_nconc(le, generic_proper_effects_of_expressions(inds));
+      
+
+	(*effects_precondition_composition_op)(le, context);
+    }
+
+    pips_debug(3, "end\n");
+    return(le);
+}
+
+list generic_proper_effects_of_application(application a)
+{
+  list le = NIL;
+
+  /* Add code here */
+
+  return(le);
+}
+
 /* list generic_proper_effects_of_syntax(syntax s)
  * input    : 
  * output   : 
@@ -220,16 +263,32 @@ generic_proper_effects_of_syntax(syntax s)
     pips_debug(5, "begin\n");
 
     switch(syntax_tag(s))
-    {
-    case is_syntax_reference:
-        le = generic_proper_effects_of_reference(syntax_reference(s));
-        break;
-    case is_syntax_range:
+      {
+      case is_syntax_reference:
+	le = generic_proper_effects_of_reference(syntax_reference(s));
+	break;
+      case is_syntax_range:
         le = generic_proper_effects_of_range(syntax_range(s));
         break;
-    case is_syntax_call:
+      case is_syntax_call:
         le = generic_r_proper_effects_of_call(syntax_call(s));
         break;
+      case is_syntax_cast: 
+	le = generic_proper_effects_of_expression(cast_expression(syntax_cast(s)));
+	break;
+      case is_syntax_sizeofexpression:
+	{
+	  sizeofexpression se = syntax_sizeofexpression(s);
+	  if (sizeofexpression_expression_p(se))
+	    le = generic_proper_effects_of_expression(sizeofexpression_expression(se));
+	  break;
+	}
+      case is_syntax_subscript:
+	le = generic_proper_effects_of_subscript(syntax_subscript(s));
+	break;
+      case is_syntax_application:
+	le = generic_proper_effects_of_application(syntax_application(s));
+	break;
     default:
         pips_internal_error("unexpected tag %d\n", syntax_tag(s));
     }
