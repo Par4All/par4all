@@ -132,6 +132,7 @@ static IoElementDescriptor IoElementDescriptorTable[] = {
     /* C IO intrinsics */
 
     {"printf",     "FMT=",        is_action_read, is_approximation_must},
+    {"fprintf",     "&",        is_action_read, is_approximation_must},
 
     {0,           0,              0}
 };
@@ -301,7 +302,7 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {EOLE_PROD_OPERATOR_NAME,    no_write_effects },
     {EOLE_FMA_OPERATOR_NAME,     no_write_effects },
 
-    /* Here are C intrinsics */
+    /* Here are C intrinsics.*/
   
     {".",                    no_write_effects},
     {"->",                    no_write_effects},
@@ -344,15 +345,17 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {",",                    no_write_effects}, 
 
     {BRACE_INTRINSIC,            no_write_effects},
-    {NULL_STATEMENT_INTRINSIC,   no_write_effects},
     {"break",                    no_write_effects},
     {"case",                    no_write_effects},  
     {"default",                    no_write_effects},
     {"return",                    no_write_effects},
 
-  
-    /*   
+    /* These intrinsics are added with no_write_effects to work with C. 
+       The real effects must be studied !!! I do not have time for the moment */
+       
     {"__assert",                    no_write_effects},
+
+    /* #include <ctype.h>*/
 
     {"isalnum",                    no_write_effects}, 
     {"isalpha",                    no_write_effects}, 
@@ -389,9 +392,10 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"wdbindf",                    no_write_effects}, 
     {"wddelim",                    no_write_effects}, 
     {"mcfiller",                    no_write_effects},
-    {"mcwrap",                    no_write_effects},*/
+    {"mcwrap",                    no_write_effects},
 
-  /*
+    /* #include <math.h>*/
+
     {"acos",                    no_write_effects},  
     {"asin",                    no_write_effects}, 
     {"atan",                    no_write_effects}, 
@@ -468,16 +472,19 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"fcvt",                    no_write_effects},  
     {"gcvt",                    no_write_effects},  
     {"atof",                    no_write_effects},  
-    {"strtod",                    no_write_effects},  */
+    {"strtod",                    no_write_effects},  
 
-  /*   {"setjmp",                    no_write_effects},
+     /*#include <setjmp.h>*/
+
+    {"setjmp",                    no_write_effects},
     {"__setjmp",                    no_write_effects},
     {"longjmp",                    no_write_effects},
     {"__longjmp",                    no_write_effects},
     {"sigsetjmp",                    no_write_effects},
-    {"siglongjmp",                    no_write_effects},*/
+    {"siglongjmp",                    no_write_effects},
 
-  /*    {"remove",                    no_write_effects},
+    /*#include <stdio.h>*/
+    {"remove",                    no_write_effects},
     {"rename",                    no_write_effects},
     {"tmpfile",                    no_write_effects},
     {"tmpnam",                    no_write_effects}, 
@@ -487,28 +494,28 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"freopen",                    no_write_effects}, 
     {"setbuf",                    no_write_effects},
     {"setvbuf",                    no_write_effects},
-    {"fprintf",                    no_write_effects},
-    {"fscanf",                    no_write_effects},*/
+    {"fprintf",                    io_effects},
+    {"fscanf",                    io_effects},
     {"printf",                    io_effects},
-  /*   {"scanf",                    no_write_effects},
-    {"sprintf",                    no_write_effects},
-    {"sscanf",                    no_write_effects},
-    {"vfprintf",                    no_write_effects},
-    {"vprintf",                    no_write_effects},
-    {"vsprintf",                    no_write_effects},
-    {"fgetc",                    no_write_effects},
-    {"fgets",                    no_write_effects}, 
-    {"fputc",                    no_write_effects},
-    {"fputs",                    no_write_effects},
-    {"getc",                    no_write_effects},
-    {"putc",                    no_write_effects},
-    {"getchar",                    no_write_effects},
-    {"putchar",                    no_write_effects},
-    {"gets",                    no_write_effects}, 
-    {"puts",                    no_write_effects},
-    {"ungetc",                    no_write_effects},
-    {"fread",                    no_write_effects}, 
-    {"fwrite",                    no_write_effects},
+    {"scanf",                    io_effects},
+    {"sprintf",                    io_effects},
+    {"sscanf",                    io_effects},
+    {"vfprintf",                    io_effects},
+    {"vprintf",                    io_effects},
+    {"vsprintf",                    io_effects},
+    {"fgetc",                    io_effects},
+    {"fgets",                    io_effects}, 
+    {"fputc",                    io_effects},
+    {"fputs",                    io_effects},
+    {"getc",                    io_effects},
+    {"putc",                    io_effects},
+    {"getchar",                    io_effects},
+    {"putchar",                    io_effects},
+    {"gets",                    io_effects}, 
+    {"puts",                    io_effects},
+    {"ungetc",                    io_effects},
+    {"fread",                    io_effects}, 
+    {"fwrite",                    io_effects},
     {"fgetpos",                    no_write_effects},
     {"fseek",                    no_write_effects},
     {"fsetpos",                    no_write_effects},
@@ -543,8 +550,93 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"fgetpos64",                    no_write_effects},
     {"fsetpos64",                    no_write_effects},
     {"fseeko64",                    no_write_effects},
-    {"ftello64",                    no_write_effects},*/ 
+    {"ftello64",                    no_write_effects},
 
+    /*#include <stdlib.h>*/
+    {"abort", no_write_effects},
+    {"abs", no_write_effects},
+    {"atexit", no_write_effects},
+    {"atof", no_write_effects},
+    {"atoi", no_write_effects},
+    {"atol", no_write_effects},
+    {"bsearch", no_write_effects},
+    {"calloc", no_write_effects},
+    {"div", no_write_effects},
+    {"exit", no_write_effects},
+    {"free", no_write_effects},
+  /*  {char *getenv(const char *, 0, 0},
+  {long int labs(long, 0, 0},
+  {ldiv_t ldiv(long, long, 0, 0},*/
+  {"malloc", no_write_effects},
+  /* {int mblen(const char *, size_t, 0, 0},
+  {size_t mbstowcs(wchar_t *, const char *, size_t, 0, 0},
+  {int mbtowc(wchar_t *, const char *, size_t, 0, 0},
+  {void qsort(void *, size_t, size_t,
+	int (*)(const void *, const void *), 0, 0},
+  {int rand(void, 0, 0},
+  {void *realloc(void *, size_t, 0, 0},
+  {void srand(unsigned int, 0, 0},
+  {double strtod(const char *, char **, 0, 0},
+  {long int strtol(const char *, char **, int, 0, 0},
+  {unsigned long int strtoul(const char *, char **, int, 0, 0},
+  {int system(const char *, 0, 0},
+  {int wctomb(char *, wchar_t, 0, 0},
+  {size_t wcstombs(char *, const wchar_t *, size_t, 0, 0},
+  {void _exithandle(void, 0, 0},
+  {double drand48(void, 0, 0},
+  {double erand48(unsigned short *, 0, 0},
+  {long jrand48(unsigned short *, 0, 0},
+  {void lcong48(unsigned short *, 0, 0},
+  {long lrand48(void, 0, 0},
+  {long mrand48(void, 0, 0},
+  {long nrand48(unsigned short *, 0, 0},
+  {unsigned short *seed48(unsigned short *, 0, 0},
+  {void srand48(long, 0, 0},
+  {int putenv(char *, 0, 0},
+  {void setkey(const char *, 0, 0},
+  {void swab(const char *, char *, ssize_t, 0, 0},
+  {int	mkstemp(char *, 0, 0},
+  {int	mkstemp64(char *, 0, 0},
+  {long a64l(const char *, 0, 0},
+  {char *ecvt(double, int, int *, int *, 0, 0},
+  {char *fcvt(double, int, int *, int *, 0, 0},
+  {char *gcvt(double, int, char *, 0, 0},
+  {int getsubopt(char **, char *const *, char **, 0, 0},
+  {int  grantpt(int, 0, 0},
+  {char *initstate(unsigned, char *, size_t, 0, 0},
+  {char *l64a(long, 0, 0},
+  {char *mktemp(char *, 0, 0},
+  {char *ptsname(int, 0, 0},
+  {long random(void, 0, 0},
+  {char *realpath(const char *, char *, 0, 0},
+  {char *setstate(const char *, 0, 0},
+  {void srandom(unsigned, 0, 0},
+  {int ttyslot(void, 0, 0},
+  {int  unlockpt(int, 0, 0},
+  {void *valloc(size_t, 0, 0},
+  {int dup2(int, int, 0, 0},
+  {char *qecvt(long double, int, int *, int *, 0, 0},
+  {char *qfcvt(long double, int, int *, int *, 0, 0},
+  {char *qgcvt(long double, int, char *, 0, 0},
+  {char *getcwd(char *, size_t, 0, 0},
+  {const char *getexecname(void, 0, 0},
+  {char *getlogin(void, 0, 0},
+  {int getopt(int, char *const *, const char *, 0, 0},
+  {char *optarg;
+  {int optind, opterr, optopt;
+  {char *getpass(const char *, 0, 0},
+  {char *getpassphrase(const char *, 0, 0},
+  {int getpw(uid_t, char *, 0, 0},
+  {int isatty(int, 0, 0},
+  {void *memalign(size_t, size_t, 0, 0},
+  {char *ttyname(int, 0, 0},
+  {long long atoll(const char *, 0, 0},
+  {long long llabs(long long, 0, 0},
+  {lldiv_t lldiv(long long, long long, 0, 0},
+  {char *lltostr(long long, char *, 0, 0},
+  {long long strtoll(const char *, char **, int, 0, 0},
+  {unsigned long long strtoull(const char *, char **, int, 0, 0},
+  {char *ulltostr(unsigned long long, char *, 0, 0},*/
     {NULL, 0}
 };
 
