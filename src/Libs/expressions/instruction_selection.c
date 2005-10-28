@@ -18,7 +18,7 @@
 typedef struct 
 {
 	/* input */
-	entity bplus, bminus, uminus;
+	entity bmult, bplus, bminus, uminus;
 
 	/* output */
 	entity imaop, imsop;
@@ -28,6 +28,34 @@ typedef struct
 }
 inst_sel_ctx;
 
+/* whether e is a call to op with len parameters
+ * if ok, the list of arguments is returned.
+ * if not, NIL is returned.
+ */
+static list /* of expression */ 
+is_this_op(expression e, entity op, int len)
+{
+	if (expression_call_p(e))
+	{
+		call c = syntax_call(expression_syntax(e));
+		list args = call_arguments(c);
+		if (call_function(c)==op && gen_length(args)==len)
+			return args;
+	}
+	return NIL;
+}
+
+static void update_call(call c, entity op, expression e, list le)
+{
+	expression 
+		a = EXPRESSION(gen_nth(0, le)),
+		b = EXPRESSION(gen_nth(1, le));
+
+	/* ??? MEMORY LEAK */
+	call_function(c) = op;
+	call_arguments(c) = gen_make_list(expression_domain, a, b, e, NIL);
+}
+
 static void select_op_rwt(call c, inst_sel_ctx * ctx)
 {
 	entity fun = call_function(c);
@@ -36,18 +64,52 @@ static void select_op_rwt(call c, inst_sel_ctx * ctx)
 	
 	if (fun==ctx->bplus && nargs==2)
 	{
-		/*  a * b + c   ->   ima(a,b,c) */
-		/*  a * b + -c  ->   ims(a,b,c) */
-		/*  a + b * c   ->   ima(b,c,a) */
-		/* -a + b * c   ->   ims(b,c,a) */
+		list /* of expression */ lm;
 
+		lm = is_this_op(EXPRESSION(gen_nth(0, args)), ctx->bmult, 2);
+		if (lm)
+		{
+			/*  a * b + c   ->   ima(a,b,c) */
+			update_call(c, ctx->imaop, EXPRESSION(gen_nth(1, args)), lm);
+			ctx->n_ima++;
+		}
+		else
+		{
+			lm = is_this_op(EXPRESSION(gen_nth(1, args)), ctx->bmult, 2);
+			if (lm)
+			{
+				/*  a + b * c   ->   ima(b,c,a) */
+				update_call(c, ctx->imaop, EXPRESSION(gen_nth(0, args)), lm);
+				ctx->n_ima++;
+			}
+		}
+		/*  a * b + -c  ->   ims(a,b,c) */
+		/* -a + b * c   ->   ims(b,c,a) */
 	}
 	else if (fun==ctx->bminus && nargs==2)
 	{
-		/*  a * b - c   ->   ims(a,b,c) */
-		/*  a - b * c   ->  -ims(b,c,a) */
-		/* -a - b * c   ->  -ima(b,c,a) */
+		list /* of expression */ lm;
 
+		lm = is_this_op(EXPRESSION(gen_nth(0, args)), ctx->bmult, 2);
+		if (lm)
+		{
+			/*  a * b - c   ->   ims(a,b,c) */
+			update_call(c, ctx->imsop, EXPRESSION(gen_nth(1, args)), lm);
+			ctx->n_ims++;
+		}
+		else
+		{
+			/*  a - b * c   ->  -ims(b,c,a) */
+			/* -a - b * c   ->  -ima(b,c,a) */
+			/*
+			lm = is_this_op(EXPRESSION(gen_nth(1, args)), ctx->bmult, 2);
+			if (lm)
+			{
+				update_call(c, ctx->imaop, EXPRESSION(gen_nth(0, args)), lm);
+				ctx->n_ima++;
+			}
+			*/
+		}
 	}
 	return;
 }
@@ -70,6 +132,7 @@ bool instruction_selection(string module_name)
 
 	/* init gen_recurse context
 	 */
+	ctx.bmult = entity_intrinsic(MULTIPLY_OPERATOR_NAME);
 	ctx.bplus = entity_intrinsic(PLUS_OPERATOR_NAME);
 	ctx.bminus = entity_intrinsic(MINUS_OPERATOR_NAME);
 	ctx.uminus = entity_intrinsic(UNARY_MINUS_OPERATOR_NAME);
