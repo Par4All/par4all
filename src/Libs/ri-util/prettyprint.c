@@ -249,7 +249,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.243 2005/08/25 07:52:57 nguyen Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.244 2005/10/28 08:14:55 coelho Exp $";
 #endif /* lint */
 
  /*
@@ -1497,6 +1497,12 @@ multiply-add operators ( JZ - sept 98) */
                              MINIMAL_ARITHMETIC_PRECEDENCE }, 
     {EOLE_SUM_OPERATOR_NAME, words_infix_nary_op, 20},
     {EOLE_PROD_OPERATOR_NAME, words_infix_nary_op, 21},
+
+    /* show IMA/IMS */
+    {IMA_OPERATOR_NAME, eole_fma_specific_op, 
+	                         MINIMAL_ARITHMETIC_PRECEDENCE },
+	{IMS_OPERATOR_NAME, eole_fms_specific_op, 
+	                         MINIMAL_ARITHMETIC_PRECEDENCE },
 
     /* 05/08/2003 - Nga Nguyen - Here are C intrinsics. 
        The precedence is computed by using Table xx, page 49, book
