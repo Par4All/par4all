@@ -265,6 +265,10 @@ intrinsic_cost_record intrinsic_cost_table[] = {
     { "--",                       is_basic_int, INT_NBYTES, EMPTY_COST },
     { "**",                       is_basic_int, INT_NBYTES, EMPTY_COST },
 
+	/* intrinsics for integer multiply add/sub */
+	{ IMA_OPERATOR_NAME,          is_basic_int, INT_NBYTES, EMPTY_COST },
+	{ IMS_OPERATOR_NAME,          is_basic_int, INT_NBYTES, EMPTY_COST },
+
     { LOOP_INIT_OVERHEAD,         is_basic_overloaded, ZERO_BYTE, EMPTY_COST },
     { LOOP_BRANCH_OVERHEAD,       is_basic_overloaded, ZERO_BYTE, EMPTY_COST },
     { CONDITION_OVERHEAD,         is_basic_overloaded, ZERO_BYTE, EMPTY_COST },
