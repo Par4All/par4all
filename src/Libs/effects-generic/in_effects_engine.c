@@ -282,7 +282,7 @@ static void in_effects_of_whileloop(whileloop w)
  * input    : a loop, its transformer and its context.
  * output   : the corresponding list of in regions.
  * modifies : in_regions_map.
- * comment  : IN(loop) = proj[i] (proj[i'] (IN(i) - W(i', i'<i))) U IN(i=1))
+ * comment  : IN(loop) = proj[i] (proj[i'] (IN(i) - W(i', i'<i))) U IN(i=1)
  */
 static void in_effects_of_loop(loop l)
 {
