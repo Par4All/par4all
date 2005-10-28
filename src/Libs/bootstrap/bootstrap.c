@@ -21,6 +21,9 @@
   - intrinsics are not properly typed
 
   $Log: bootstrap.c,v $
+  Revision 1.83  2005/10/28 08:10:28  coelho
+  + IMA and IMS
+
   Revision 1.82  2005/03/22 16:41:00  nguyen
   Add new C intrinsics for strings.h
 
@@ -53,6 +56,9 @@
 
   Revision 1.72  2002/06/10 12:00:37  irigoin
   $Log: bootstrap.c,v $
+  Revision 1.83  2005/10/28 08:10:28  coelho
+  + IMA and IMS
+
   Revision 1.82  2005/03/22 16:41:00  nguyen
   Add new C intrinsics for strings.h
 
@@ -3937,6 +3943,12 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
    typing_arithmetic_operator, 0},
   {EOLE_FMS_OPERATOR_NAME, 3, default_intrinsic_type , 
    typing_arithmetic_operator, 0},
+
+  /* integer combined multiply add or sub - FC oct 2005 */
+  { IMA_OPERATOR_NAME, 3, integer_to_integer_type, 
+	typing_function_int_to_int, 0 },
+  { IMS_OPERATOR_NAME, 3, integer_to_integer_type, 
+	typing_function_int_to_int, 0 },
   
   /* Here are C intrinsics */
 
