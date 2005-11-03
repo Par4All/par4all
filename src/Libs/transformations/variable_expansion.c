@@ -118,6 +118,11 @@ static void unstack_index_and_dimension(loop l)
   }
 }
 
+bool variable_expansion(char *module_name)
+{
+  return scalar_expansion(module_name);
+}
+
 bool scalar_expansion(char *module_name)
 {
     entity module;
