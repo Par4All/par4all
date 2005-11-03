@@ -76,7 +76,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2005/10/27 09:56:42 $~$
+$~$Date: 2005/11/03 16:58:55 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -3913,8 +3913,8 @@ optimize_expressions    > MODULE.code
 alias instruction_selection 'Select Instructions'
 
 instruction_selection > MODULE.code
-	< PROGRAM.entities
-	< MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
 \end{verbatim}
 
 
@@ -4412,6 +4412,40 @@ declarations_privatizer              > MODULE.code
 
 \end{verbatim}
 
+\subsubsection{Scalar and Array Expansion}
+\label{subsection-scalar-and-array-expansion}
+\index{Expansion}
+\index{Array Expansion}
+\index{Scalar Expansion}
+
+Variable expansion consists in adding new dimensions to a variable so as
+to parallelize surrounding loops. There is no known advantage for
+expansion against privatization, but expansion is used when parallel loops
+must be distributed, for instance to generate SIMD code.
+
+It is assumed that the variables to be expanded are the private
+variables. So this phase only is useful if a privatization has been
+performed earlier.
+
+\paragraph{Scalar Expansion}
+\index{Scalar Expansion}
+
+%%@UserManualDocumentation: scalar_expansion 
+Loop private scalar variables are expanded when all enclosing loops have
+numerical bounds and increment one.
+%%!UserManualDocumentation
+
+\begin{verbatim}
+alias variable_expansion 'Expand Scalar'
+variable_expansion                    > MODULE.code
+        < PROGRAM.entities 
+        < MODULE.code 
+\end{verbatim}
+
+\paragraph{Array Expansion}
+\index{Array Expansion}
+
+Not implemented yet.
 
 \subsubsection{Freeze variables}
 \label{subsection-freeze-variables}
