@@ -29,7 +29,8 @@ LIB_CFILES =	replace.c \
 		array_resizing_bottom_up.c \
 		array_resizing_top_down.c\
 		array_resizing_statistic.c\
-		partial_redundancy_elimination.c
+		partial_redundancy_elimination.c \
+		variable_expansion.c
 
 #		optimize_misc.c
 
