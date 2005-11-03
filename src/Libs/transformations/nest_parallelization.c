@@ -265,7 +265,6 @@ bool nest_parallelization(string module_name)
 
     reset_current_module_statement();
     reset_current_module_entity();
-    reset_current_module_statement();
 
     return TRUE;
 }
