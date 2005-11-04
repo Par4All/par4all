@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.178  2005/11/04 17:23:53  irigoin
+%% Property FULL_UNROLL_INTERACTIVELY added.
+%%
 %% Revision 1.177  2005/08/08 13:19:04  irigoin
 %% Roles of SEMANTICS_MAX_CFG_SIZE1 and SEMANTICS_MAX_CFG_SIZE2 exchanged.
 %%
@@ -247,7 +250,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2005/08/08 13:19:04 $~$
+$~$Date: 2005/11/04 17:23:53 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -2120,6 +2123,19 @@ the option to compute new declarations for instrumented array
 \begin{verbatim}
 ARRAY_RESIZING_BOTTOM_UP_OPTION 0
 \end{verbatim}
+
+\subsection{Loop Transformations}
+
+\subsubsection{Loop Unrolling}
+
+Full loop unrolling is applied one loop at a time by default. The user
+must specify the loop label. This default feature can be turned off and all loops
+with constant loop bounds and constant increment are fully unrolled.
+
+\begin{verbatim}
+FULL_UNROLL_INTERACTIVELY TRUE
+\end{verbatim}
+
 
 \section{Program Verifications}
 
