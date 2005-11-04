@@ -3,6 +3,10 @@
   $Id$
 
   $Log: loop_unroll.c,v $
+  Revision 1.25  2005/11/04 17:36:16  irigoin
+  Property FULL_UNROLL_INTERACTIVELY added and used to unroll all loops,
+  even loops without labels.
+
   Revision 1.24  2003/05/21 07:59:20  irigoin
   In loop_unroll(), use index type for new index related variables
 
@@ -777,55 +781,77 @@ bool find_loop_and_fully_unroll(statement s)
     return go_on;
 }
 
+bool apply_full_loop_unroll(statement s)
+{
+  instruction inst = statement_instruction (s);
+  bool go_on = TRUE;
+
+  if(instruction_loop_p(inst)) {
+    full_loop_unroll(s);
+  }
+
+  return go_on;
+}
+
 
 bool
 full_unroll(char * mod_name)
 {
-    statement mod_stmt;
-    char lp_label[6];
-    string resp;
-    entity lb_ent = entity_undefined;
-    bool return_status;
+  statement mod_stmt;
+  char lp_label[6];
+  string resp;
+  entity lb_ent = entity_undefined;
+  bool return_status = TRUE;
 
-    debug_on("FULL_UNROLL_DEBUG_LEVEL");
+  debug_on("FULL_UNROLL_DEBUG_LEVEL");
 
+  if(get_bool_property("FULL_UNROLL_INTERACTIVELY")) {
     /* Get the loop label form the user */
     resp = user_request("Which loop do you want to unroll fully?\n"
 			"(give its label): ");
     if (resp[0] == '\0') {
-	user_log("Full loop unrolling has been cancelled.\n");
-	return_status = FALSE;
+      user_log("Full loop unrolling has been cancelled.\n");
+      return_status = FALSE;
     }
     else {    
-	sscanf(resp, "%s", lp_label);
-	lb_ent = find_label_entity(mod_name, lp_label);
-	if (lb_ent == entity_undefined) {
-	    user_error("unroll", "loop label `%s' does not exist\n", lp_label);
-	}
+      sscanf(resp, "%s", lp_label);
+      lb_ent = find_label_entity(mod_name, lp_label);
+      if (lb_ent == entity_undefined) {
+	user_error("unroll", "loop label `%s' does not exist\n", lp_label);
+      }
 
-	debug(1,"full_unroll","Fully unroll loop %s in module %s\n",
-	      lp_label, mod_name);
+      debug(1,"full_unroll","Fully unroll loop %s in module %s\n",
+	    lp_label, mod_name);
 
-	searched_loop_label = lb_ent;
+      searched_loop_label = lb_ent;
+    }
+  }
 
-	mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+  if(return_status) {
 
-	gen_recurse (mod_stmt, statement_domain, 
-		     find_loop_and_fully_unroll, gen_null);
+    mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
 
-	/* Reorder the module, because new statements have been generated. */
-	module_reorder(mod_stmt);
-
-	searched_loop_label = entity_undefined;
-
-	DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stmt);
-	return_status = TRUE;
+    if(entity_undefined_p(searched_loop_label)) {
+      gen_recurse (mod_stmt, statement_domain, 
+		   apply_full_loop_unroll, gen_null);
+    }
+    else {
+      gen_recurse (mod_stmt, statement_domain, 
+		   find_loop_and_fully_unroll, gen_null);
     }
 
-    debug(2,"unroll","done for %s\n", mod_name);
-    debug_off();
+    /* Reorder the module, because new statements have been generated. */
+    module_reorder(mod_stmt);
 
-    return return_status;
+    searched_loop_label = entity_undefined;
+
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stmt);
+  }
+
+  debug(2,"unroll","done for %s\n", mod_name);
+  debug_off();
+
+  return return_status;
 }
 
 
