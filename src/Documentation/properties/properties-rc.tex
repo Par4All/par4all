@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.179  2005/11/07 10:19:21  irigoin
+%% Property ATOMIZE_ARRAY_ACCESSES_WITH_OFFSETS added
+%%
 %% Revision 1.178  2005/11/04 17:23:53  irigoin
 %% Property FULL_UNROLL_INTERACTIVELY added.
 %%
@@ -250,7 +253,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2005/11/04 17:23:53 $~$
+$~$Date: 2005/11/07 10:19:21 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -2005,6 +2008,15 @@ functions.
 ATOMIZE_INDIRECT_REF_ONLY FALSE
 \end{verbatim}
 
+By default, simple array accesses such as \verb/X(I+2)/ are atomized,
+although it is not necessary to generate assembly code:
+
+\begin{verbatim}
+ATOMIZE_ARRAY_ACCESSES_WITH_OFFSETS TRUE
+\end{verbatim}
+
+The purpose of the default option is to maximise common subexpression
+elimination.
 
 \subsubsection{Loop Distribution}
 \index{Loop Distribution}
