@@ -26,6 +26,30 @@ expression e;
     if (expression_constant_p(e)) 
 	return(FALSE);
 
+    /* do not atomize A(I+5) as it is compiled as (A+5)(I). We miss
+       A(-1+I), unless expression_constant_p() accepts it. */
+    if(!get_bool_property("ATOMIZE_ARRAY_ACCESSES_WITH_OFFSETS")) {
+      if(syntax_call_p(s)) {
+	call c = syntax_call(s);
+	entity op = call_function(c);
+
+	if(ENTITY_PLUS_P(op) || ENTITY_MINUS_P(op)) {
+	  expression e1 = EXPRESSION(CAR(call_arguments(c)));
+	  expression e2 = EXPRESSION(CAR(CDR(call_arguments(c))));
+	  syntax s1 = expression_syntax(e1);
+	  syntax s2 = expression_syntax(e2);
+
+	  if(syntax_reference_p(s1))
+	    return(!(entity_scalar_p(reference_variable(syntax_reference(s1)))
+		     && expression_constant_p(e2)));
+	  else if(syntax_reference_p(s2))
+	    return(!(entity_scalar_p(reference_variable(syntax_reference(s2)))
+		     && expression_constant_p(e1)));
+
+	}
+      }
+    }
+
     return(TRUE);
 }
 
