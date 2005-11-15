@@ -66,7 +66,7 @@ else
 ifdef LINEAR_ARCH
 ARCH	= $(LINEAR_ARCH)
 else
-ARCH	= $(shell $(MAKE.d)/arch.sh)
+ARCH	:= $(shell $(MAKE.d)/arch.sh)
 endif # LINEAR_ARCH
 endif # NEWGEN_ARCH
 endif # PIPS_ARCH
