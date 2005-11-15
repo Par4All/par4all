@@ -1,0 +1,9 @@
+* notion de production
+- création et maintenance d'un tag "prod"
+- mise à jours partielles (librairies pips ou linear)
+- version partagée (script automatique ? rapide ? incrémental ?)
+- documentation des procédures
+
+* construction
+- séparer l'installation du trunk ?
+
