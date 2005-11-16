@@ -1,5 +1,8 @@
 /* $Id$
    $Log: clex.l,v $
+   Revision 1.6  2005/11/16 09:49:28  nguyen
+   debug...
+
    Revision 1.5  2003/09/05 14:19:52  nguyen
    Modify pips debug levels
 
@@ -136,18 +139,38 @@ oct_escape ('\\'{octdigit}{octdigit}?{octdigit}?)
                                 pips_debug(9,"Pragma not implemented %s\n",yytext);
 				return(TK_PRAGMA);
                         }
-\'([^\']|(\'\')|(\\\'))*\'	{ 
-                                /* Attention, the regular expression is not true*/
+
+\'[^\\]\'               { 
                                 pips_debug(9,"TK_CHARCON: %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_CHARCON);
                         }
-L\'([^\']|(\'\')|(\\\'))*\'	{ 
-                                /* Attention, the regular expression is not true*/
+\'\\[abfnrtv\'\\]\'     { 
+                                pips_debug(9,"TK_CHARCON: %s\n",yytext);
+                                yylval.string = strdup(yytext);
+				return(TK_CHARCON);
+                        }
+\'\\0[0-9]*\'           { 
+                                pips_debug(9,"TK_CHARCON: %s\n",yytext);
+                                yylval.string = strdup(yytext);
+				return(TK_CHARCON);
+                        }
+L\'[^\\]\'              { 
                                 pips_debug(9,"TK_CHARCON wide character constant: %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_CHARCON);
                         }
+L\'\\[abfnrtv\'\\]\'    { 
+                                pips_debug(9,"TK_CHARCON wide character constant: %s\n",yytext);
+                                yylval.string = strdup(yytext);
+				return(TK_CHARCON);
+                        }
+L\'\\0[0-9]*\'          { 
+                                pips_debug(9,"TK_CHARCON wide character constant: %s\n",yytext);
+                                yylval.string = strdup(yytext);
+				return(TK_CHARCON);
+                        }
+
 \"([^\"]|(\"\")|(\\\"))*\"	{ 
                                 pips_debug(9,"TK_STRINGCON regular or wide string: %s\n",yytext);
                                 /* the "world" in L"Hello, " "world" should be treated as 
