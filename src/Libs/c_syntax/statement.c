@@ -85,6 +85,13 @@ statement MakeBlock(list decls, list stms)
 			       string_undefined,
 			       make_instruction_sequence(make_sequence(stms)),
 			       decls,string_undefined);
+
+  ifdebug(1) 
+    {
+      printf("Declaration list: ");
+      print_entities(statement_declarations(s));
+    }
+
   pips_assert("Block statement is consistent",statement_consistent_p(s));
   return s;
 }
