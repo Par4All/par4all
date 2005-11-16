@@ -1,5 +1,8 @@
 /* $Id$ 
    $Log: cyacc.y,v $
+   Revision 1.9  2005/11/16 09:49:03  nguyen
+   debug...
+
    Revision 1.8  2004/02/19 14:07:30  nguyen
    Correct some small bugs (struct vs union, forgetten MakeTenaryCall, order
    of qualifiers)
@@ -806,7 +809,8 @@ arguments:
 
 opt_expression:
     /* empty */
-	        	{ $$ = expression_undefined; }
+                        { $$ = expression_undefined; } /* This should be a null expression, 
+							  not expression_undefined*/
 |   comma_expression
 	        	{ $$ = MakeCommaExpression($1); }
 ;
@@ -985,13 +989,10 @@ statement:
 			}
 |   TK_RETURN TK_SEMICOLON		 
                         {
-			  /* This kind of instruction must be added to controlize 
-			     $$ = instruction_to_statement(make_instruction_return(expression_undefined));*/
 			  $$ = call_to_statement(make_call(CreateIntrinsic(RETURN_FUNCTION_NAME),NIL));
 			}
 |   TK_RETURN comma_expression TK_SEMICOLON
-	                {
-			  /*$$ = instruction_to_statement(make_instruction_return(MakeCommaExpression($2)));	*/	  
+	                {  
 			  $$ =  call_to_statement(make_call(CreateIntrinsic(RETURN_FUNCTION_NAME),$2));
 			}
 |   TK_BREAK TK_SEMICOLON
@@ -1103,10 +1104,6 @@ my_decl_spec_list:                         /* ISO 6.7 */
                                         /* ISO 6.7.2 */
 |   type_spec decl_spec_list_opt_no_named
                         {
-			  /* if (!entity_undefined_p($1))
-			    $$ = CONS(ENTITY,$1,$2);
-			  else
-			  $$ = $2;*/
 			  $$ = gen_nconc($1,$2);
 			}	
                                         /* ISO 6.7.4 */
