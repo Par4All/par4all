@@ -202,10 +202,10 @@ expression MakeBinaryCall(f, eg, ed)
 entity f;
 expression eg, ed;
 {
-    call c =  make_call(f, CONS(EXPRESSION, eg, CONS(EXPRESSION, ed, NIL)));
+  call c =  make_call(f, CONS(EXPRESSION, eg, CONS(EXPRESSION, ed, NIL)));
 
-    return(make_expression(make_syntax(is_syntax_call, c),
-			   normalized_undefined));
+  return(make_expression(make_syntax(is_syntax_call, c),
+			 normalized_undefined));
 }
 
 expression call_to_expression(c)
@@ -1759,7 +1759,7 @@ same_expression_name_p(expression e1, expression e2)
 {
     return same_syntax_name_p(expression_syntax(e1), expression_syntax(e2));
 }
-
+
 /************************************************************* DAVINCI GRAPH */
 
 #define ALREADY_SEEN(node) (hash_defined_p(seen, (char*)node))
@@ -1859,7 +1859,7 @@ void davinci_dump_all_expressions(FILE * out, statement s)
   gen_recurse(s, expression_domain, expr_flt, gen_null);
   out_flt = NULL;
 }
-
+
 /* This function replaces all the occurences of an old entity in the 
  * expression exp by the new entity. It returns the expression modified.  
  * I think we  can write this function by using gen_context_multi_recurse  ... * To do .... NN */
@@ -1937,4 +1937,107 @@ expression substitute_entity_in_expression(entity old, entity new, expression e)
   }
 
   return retour;
+}
+
+/* Replace C operators "+C" and "-C" which can handle pointers by
+   arithmetic operators "+" and "-" when it is safe to do so, i.e. when no
+   pointer arithmetic is involved. */
+bool simplify_C_expression(expression e)
+{
+  syntax s = expression_syntax(e);
+  bool   can_be_substituted_p = FALSE;
+
+  pips_debug(9, "Begin\n");
+  
+  switch(syntax_tag(s)) {
+  case is_syntax_reference:
+    {
+      entity re = reference_variable(syntax_reference(s));
+      type rt = entity_type(re);
+      basic bt = basic_undefined;
+
+      if(type_variable_p(rt)) { /* FI: What if not? core dump? */
+	bt = variable_basic(type_variable(rt));
+
+	can_be_substituted_p =
+	  basic_int_p(bt)
+	  || basic_float_p(bt) 
+	  || basic_overloaded_p(bt) /* Might be wrong, but necessary */
+	  || basic_complex_p(bt); /* Should not occur in C */
+
+	pips_debug(9, "Variable %s is an arithmetic variable: %s\n",
+		   entity_local_name(re), bool_to_string(can_be_substituted_p));
+      }
+      break; /* FI: The index expressions should be simplified too... */
+    }
+  case is_syntax_call:
+    {
+      call c = syntax_call(s);
+
+      if(expression_constant_p(e)) {
+	/* What is the type of the constant? */
+	entity cste = call_function(c);
+	basic rb = variable_basic(type_variable(functional_result(type_functional(entity_type(cste)))));
+
+	can_be_substituted_p =
+	  basic_int_p(rb)
+	  || basic_float_p(rb) 
+	  || basic_complex_p(rb); /* Should not occur in C */
+      }
+      else if(gen_length(call_arguments(c))==2) {
+	/* Check "+C" and "-C" */
+	expression e1 = EXPRESSION(CAR(call_arguments(c)));
+	expression e2 = EXPRESSION(CAR(call_arguments(c)));
+	can_be_substituted_p = simplify_C_expression(e1)
+	  && simplify_C_expression(e2);
+	if(can_be_substituted_p) {
+	  entity op = call_function(c);
+	  if(ENTITY_PLUS_C_P(op)) {
+	    call_function(c) = entity_intrinsic(PLUS_OPERATOR_NAME);
+	  }
+	  else if(ENTITY_MINUS_C_P(op)) {
+	    call_function(c) = entity_intrinsic(MINUS_OPERATOR_NAME);
+	  }
+	}
+      }
+      else {
+	/* Try to simplify the arguments, do not hope much from the result
+           type because of overloading. */
+	entity f = call_function(c);
+	basic rb = variable_basic(type_variable(functional_result(type_functional(entity_type(f)))));
+	MAP(EXPRESSION, se, {
+	  (void) simplify_C_expression(se);
+	}, call_arguments(c));
+
+	can_be_substituted_p =
+	  basic_int_p(rb)
+	  || basic_float_p(rb) 
+	  || basic_complex_p(rb); /* Should not occur in C */
+      }
+      break;
+    }
+  case is_syntax_range: 
+    {
+      range r = syntax_range(s);
+      expression le = range_lower(r);
+      expression ue = range_upper(r);
+      expression ince = range_increment(r);
+      (void) simplify_C_expression(le);
+      (void) simplify_C_expression(ue);
+      (void) simplify_C_expression(ince);
+      can_be_substituted_p = FALSE;
+      break;
+      }
+  case is_syntax_cast:
+  case is_syntax_sizeofexpression:
+  case is_syntax_subscript: 
+  case is_syntax_application:
+      can_be_substituted_p = FALSE;
+      break;
+  default: pips_internal_error("Bad syntax tag");
+    can_be_substituted_p = FALSE; /* for gcc */
+  }
+
+  pips_debug(9, "End: %s\n", bool_to_string(can_be_substituted_p));
+  return can_be_substituted_p;
 }
