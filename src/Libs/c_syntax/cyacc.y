@@ -1,5 +1,8 @@
 /* $Id$ 
    $Log: cyacc.y,v $
+   Revision 1.10  2005/11/28 16:04:02  irigoin
+   call to simplify_C_expression() added for assignment
+
    Revision 1.9  2005/11/16 09:49:03  nguyen
    debug...
 
@@ -605,6 +608,7 @@ expression:
 			}
 |   expression TK_EQ expression
 			{
+			  (void) simplify_C_expression($3);
 			  $$ = MakeBinaryCall(CreateIntrinsic("="), $1, $3); 
 			}
 |   expression TK_PLUS_EQ expression
