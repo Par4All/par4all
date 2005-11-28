@@ -5,6 +5,9 @@
  * $Id$
  *
  * $Log: ri-util-local.h,v $
+ * Revision 1.94  2005/11/28 15:07:02  irigoin
+ * Names for operators '+C' and '-C' declared as well as macros to recognize them.
+ *
  * Revision 1.93  2005/10/27 16:05:45  coelho
  * IMA/IMS -OP
  *
@@ -193,7 +196,9 @@ typedef hash_table control_mapping;
 
 #define ASSIGN_OPERATOR_NAME 		"="
 #define PLUS_OPERATOR_NAME 		"+"
+#define PLUS_C_OPERATOR_NAME 		"+C" /* includes pointer arithmetic */
 #define MINUS_OPERATOR_NAME 		"-"
+#define MINUS_C_OPERATOR_NAME 		"-C" /* includes pointer arithmetic */
 #define UNARY_MINUS_OPERATOR_NAME 	"--"
 #define MULTIPLY_OPERATOR_NAME 		"*"
 #define DIVIDE_OPERATOR_NAME 		"/"
@@ -299,7 +304,9 @@ typedef hash_table control_mapping;
 
 #define ENTITY_ASSIGN_P(e) entity_an_operator_p(e, ASSIGN)
 #define ENTITY_PLUS_P(e) entity_an_operator_p(e, PLUS)
+#define ENTITY_PLUS_C_P(e) entity_an_operator_p(e, PLUS_C)
 #define ENTITY_MINUS_P(e) entity_an_operator_p(e, MINUS)
+#define ENTITY_MINUS_C_P(e) entity_an_operator_p(e, MINUS_C)
 #define ENTITY_UNARY_MINUS_P(e) entity_an_operator_p(e, UNARY_MINUS)
 #define ENTITY_MULTIPLY_P(e) entity_an_operator_p(e, MULTIPLY)
 #define ENTITY_MODULO_P(e) entity_an_operator_p(e, MODULO)
