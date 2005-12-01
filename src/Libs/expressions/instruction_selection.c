@@ -142,8 +142,10 @@ bool instruction_selection(string module_name)
 	ctx.n_ims = 0;
 
 	gen_context_multi_recurse(stat, &ctx,
-							  call_domain, gen_true, select_op_rwt,
-							  NULL);
+				  call_domain, gen_true, select_op_rwt,
+				  /* Do not optimize subscript expressions */
+				  reference_domain, gen_false, gen_null,
+				  NULL);
 
 	/* store statement back to pipsdbm
 	 */
