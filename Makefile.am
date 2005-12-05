@@ -68,9 +68,9 @@ EXTRA_LTLIBRARIES = libpolylib32.la libpolylib64.la libpolylib128.la \
 		    libpolylibgmp.la
 
 multi_noinst_programs = $(foreach B,$(ALL_BITS), \
-	Zpolytest$(B) \
-	polytest$(B) \
-	verif_ehrhart$(B) \
+	Zpolytest$(B)$(EXEEXT) \
+	polytest$(B)$(EXEEXT) \
+	verif_ehrhart$(B)$(EXEEXT) \
 )
 	
 noinst_PROGRAMS = \
@@ -80,10 +80,10 @@ noinst_PROGRAMS = \
 	@multi_noinst_programs@
 
 multi_bin_programs = $(foreach B,$(ALL_BITS), \
-	ehrhart_ranking$(B) \
-	ehrhart_union$(B) \
-	pp$(B) \
-	testehrhart$(B) \
+	ehrhart_ranking$(B)$(EXEEXT) \
+	ehrhart_union$(B)$(EXEEXT) \
+	pp$(B)$(EXEEXT) \
+	testehrhart$(B)$(EXEEXT) \
 )
 	
 bin_PROGRAMS = \
