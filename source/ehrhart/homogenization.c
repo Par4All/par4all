@@ -6,8 +6,8 @@
 #include <polylib/polylib.h>
 #include <polylib/homogenization.h>
 
-static evalue *dehomogenize_periodic(enode *en, int nb_param);
-static evalue *dehomogenize_polynomial(enode *en, int nb_param);
+static evalue *dehomogenize_periodic(enode *en);
+static evalue *dehomogenize_polynomial(enode *en);
 
 Polyhedron *homogenize(Polyhedron *P, unsigned MAXRAYS)
 {
@@ -35,10 +35,10 @@ void dehomogenize_evalue(evalue *ep, int nb_param){
     /** we need to replace the last parameter **/
     if (ep->x.p->pos == nb_param){
       if (ep->x.p->type == periodic && ep->x.p->size > 1){
-	w = dehomogenize_periodic(ep->x.p, nb_param); 
+	w = dehomogenize_periodic(ep->x.p); 
       }
       else{
-	w = dehomogenize_polynomial(ep->x.p, nb_param);
+	w = dehomogenize_polynomial(ep->x.p);
       }
       free_evalue_refs(ep);
       memcpy(ep, w, sizeof(evalue));
@@ -65,7 +65,7 @@ void dehomogenize_enode(enode *p, int nb_param){
 
 
 /** return the 1st element of an enode representing a periodic **/
-static evalue *dehomogenize_periodic(enode *en, int nb_param){
+static evalue *dehomogenize_periodic(enode *en){
   evalue *w;
   assert(en->type == periodic);
   assert(en->size > 1);
@@ -80,7 +80,7 @@ static evalue *dehomogenize_periodic(enode *en, int nb_param){
     one variable, the homogenous parameter. 
     Returns an new evalue, representing a rational.
  **/
-static evalue *dehomogenize_polynomial(enode *en, int nb_param){
+static evalue *dehomogenize_polynomial(enode *en){
   evalue *enn;
   evalue *ev;
   int i;
