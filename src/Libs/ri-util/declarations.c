@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: declarations.c,v $
+ * Revision 1.33  2005/12/09 14:29:08  irigoin
+ * Bug fix in c_text_entity() when called for debugging purposes with module as entity_undefined.
+ *
  * Revision 1.32  2004/02/20 13:56:01  nguyen
  * Print EXTERN
  *
@@ -2057,7 +2060,9 @@ text c_text_entity(entity module, entity e, int margin)
   value val = entity_initial(e);
   list pc = NIL;
  
-  pips_debug(5,"Print declaration for entity %s in module %s\n",entity_name(e),entity_name(module));
+  pips_debug(5,"Print declaration for entity %s in module %s\n",
+	     entity_name(e),
+	     entity_undefined_p(module)? "UNDEFINED" : entity_name(module));
 
   /* A declaration has two parts: declaration specifiers and declarator (even with initializer) 
      In declaration specifiers, we can have : 
@@ -2068,7 +2073,7 @@ text c_text_entity(entity module, entity e, int margin)
      - function specifiers : inline */
 
   /* This part is for storage specifiers */
-  if (extern_entity_p(module,e))
+  if (!entity_undefined_p(module) && extern_entity_p(module, e))
     pc = CHAIN_SWORD(pc,"extern ");
 
   if (strstr(entity_name(e),TYPEDEF_PREFIX) != NULL)
@@ -2136,7 +2141,7 @@ text c_text_entity(entity module, entity e, int margin)
       pc = gen_nconc(pc,c_words_entity(t,CHAIN_SWORD(NIL,name)));
       /* This part is for declarator initialization if there is. 
 	 If the entity is declared extern wrt current module, do not add this initialization*/
-      if (!extern_entity_p(module,e) && !value_undefined_p(val))
+      if (!entity_undefined_p(module) && !extern_entity_p(module,e) && !value_undefined_p(val))
 	{
 	  if (value_expression_p(val))
 	    {
