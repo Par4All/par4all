@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 2003/12/19 12:18:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 2005/12/09 17:27:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_control_control[] = "%A% ($Date: 2003/12/19 12:18:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_control_control[] = "%A% ($Date: 2005/12/09 17:27:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* - control.c
@@ -31,6 +31,9 @@ char vcid_control_control[] = "%A% ($Date: 2003/12/19 12:18:10 $, ) version $Rev
  * $Id$
  *
  * $Log: control.c,v $
+ * Revision 1.42  2005/12/09 17:27:27  irigoin
+ * Conversion of C for loops into C or Fortran while loops added
+ *
  * Revision 1.41  2003/12/19 12:18:10  irigoin
  * strdup() applied to constant empty strings "" for empty statement
  * comments, debug_on() and debug_off() moved up into module.
@@ -805,6 +808,98 @@ statement forloop_inc(statement sl)
   return is;
 }
 
+static sequence for_to_while_loop_conversion(expression init,
+					     expression cond,
+					     expression incr,
+					     statement body)
+{
+  syntax s_init = expression_syntax(init);
+  syntax s_cond = expression_syntax(cond);
+  syntax s_incr = expression_syntax(incr);
+  sequence wlseq = sequence_undefined;
+
+  pips_debug(5, "Begin\n");
+
+  if(!syntax_call_p(s_init) || !syntax_call_p(s_cond) || !syntax_call_p(s_incr)) {
+    pips_internal_error("expression arguments must be calls\n");
+  }
+  else {
+    statement init_st = make_statement(entity_empty_label(), 
+				       STATEMENT_NUMBER_UNDEFINED,
+				       STATEMENT_ORDERING_UNDEFINED,
+				       strdup(""),
+				       make_instruction(is_instruction_call, 
+							syntax_call(s_init)),
+				       NIL,NULL);
+    statement incr_st =  make_statement(entity_empty_label(), 
+					STATEMENT_NUMBER_UNDEFINED,
+					STATEMENT_ORDERING_UNDEFINED,
+					strdup(""),
+					make_instruction(is_instruction_call,
+							 syntax_call(s_incr)),
+					NIL,NULL);
+    sequence body_seq = make_sequence(CONS(STATEMENT, body,
+					CONS(STATEMENT, incr_st, NIL)));
+    statement n_body = make_statement(entity_empty_label(), 
+				      STATEMENT_NUMBER_UNDEFINED,
+				      STATEMENT_ORDERING_UNDEFINED,
+				      string_undefined,
+				      make_instruction(is_instruction_sequence,
+						       body_seq),
+				     NIL,NULL);
+    whileloop wl_i = make_whileloop(cond, n_body, entity_empty_label(),
+				    make_evaluation_before() );
+    statement wl_st =  make_statement(entity_empty_label(), 
+				     STATEMENT_NUMBER_UNDEFINED,
+				     STATEMENT_ORDERING_UNDEFINED,
+				     strdup(""),
+				     make_instruction(is_instruction_whileloop,
+						      wl_i),
+				     NIL,NULL);
+
+    ifdebug(5) {
+      pips_debug(5, "Initialization statement:\n");
+      print_statement(init_st);
+      pips_debug(5, "Incrementation statement:\n");
+      print_statement(incr_st);
+      pips_debug(5, "New body statement with incrementation:\n");
+      print_statement(n_body);
+      pips_debug(5, "New whileloop statement:\n");
+      print_statement(wl_st);
+    }
+
+    wlseq = make_sequence(CONS(STATEMENT, init_st,
+			       CONS(STATEMENT, wl_st, NIL)));
+
+    /* Clean-up: only cond is reused */
+
+    /* They cannot be freed because a debugging statement at the end of
+       controlize does print the initial statement */
+
+    syntax_call(s_init) = call_undefined;
+    syntax_call(s_incr) = call_undefined;
+    free_expression(init);
+    free_expression(incr);
+  }
+
+  ifdebug(5) {
+    statement d_st =  make_statement(entity_empty_label(), 
+				     STATEMENT_NUMBER_UNDEFINED,
+				     STATEMENT_ORDERING_UNDEFINED,
+				     string_undefined,
+				     make_instruction(is_instruction_sequence,
+						      wlseq),
+				     NIL,NULL);
+
+    pips_debug(5, "End with statement:\n");
+    print_statement(d_st);
+    statement_instruction(d_st) = instruction_undefined;
+    free_statement(d_st);
+  }
+
+  return wlseq;
+}
+
 bool controlize_forloop(st, l, pred, succ, c_res, used_labels)
 statement st;
 forloop l;
@@ -825,10 +920,29 @@ hash_table used_labels;
     controlize(forloop_body(l), c_test, c_inc, c_body, loop_used_labels);
 
     if (covers_labels_p(forloop_body(l),loop_used_labels)) {
-      forloop new_l = make_forloop(forloop_initialization(l),
-				   forloop_condition(l),
-				   forloop_increment(l),
-				   control_statement(c_body));
+      instruction ni = instruction_undefined;
+
+      if(get_bool_property("FOR_TO_WHILE_LOOP_IN_CONTROLIZER")) {
+	sequence wls = for_to_while_loop_conversion(forloop_initialization(l),
+						    forloop_condition(l),
+						    forloop_increment(l),
+						    control_statement(c_body));
+
+	/* These three fields have been re-used or freed by the previous call */
+	forloop_initialization(l) = expression_undefined;
+	forloop_condition(l) = expression_undefined;
+	forloop_increment(l) = expression_undefined;
+
+	ni = make_instruction(is_instruction_sequence, wls);
+      }
+      else {
+	forloop new_l = make_forloop(forloop_initialization(l),
+				     forloop_condition(l),
+				     forloop_increment(l),
+				     control_statement(c_body));
+
+	ni = make_instruction(is_instruction_forloop, new_l);
+      }
       
       gen_remove(&control_successors(c_body), c_res);
       gen_remove(&control_predecessors(c_body), c_res);
@@ -839,8 +953,7 @@ hash_table used_labels;
 				    statement_number(st),
 				    STATEMENT_ORDERING_UNDEFINED,
 				    statement_comments(st),
-				    make_instruction(is_instruction_forloop, 
-						     new_l),NIL,NULL),
+				    ni, NIL, NULL),
 		     ADD_PRED(pred, c_res),
 		     ADD_SUCC(succ, c_res )) ;
       controlized = FALSE;
@@ -1508,6 +1621,3 @@ statement st;
 
     return(u);
 }
-
-
-
