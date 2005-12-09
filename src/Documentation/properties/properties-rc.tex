@@ -12,6 +12,10 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.181  2005/12/09 15:39:06  irigoin
+%% Two controlizer properties added: FOR_TO_WHILE_LOOP_IN_CONTROLIZER and
+%% FOR_TO_DO_LOOP_IN_CONTROLIZER.
+%%
 %% Revision 1.180  2005/12/09 11:57:26  coelho
 %% psfig -> epsfig
 %%
@@ -256,7 +260,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2005/12/09 11:57:26 $~$
+$~$Date: 2005/12/09 15:39:06 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -869,12 +873,32 @@ PARSER_EXPAND_STATEMENT_FUNCTIONS TRUE
 \subsection{Controlizer}
 \index{Controlizer}
 \index{UNSPAGHETTIFY\_IN\_CONTROLIZER}
+\index{FOR\_TO\_WHILE\_LOOP\_IN\_CONTROLIZER}
+\index{FOR\_TO\_DO\_LOOP\_IN\_CONTROLIZER}
 
 By unsetting this property \verb|unspaghettify| is not applied
 implicitly in the controlizer phase.
 
 \begin{verbatim}
 UNSPAGHETTIFY_IN_CONTROLIZER   TRUE
+\end{verbatim}
+
+The next property is used to convert C for loops into C while loops. The
+purpose is to speed up the re-use of Fortran analyses and transformation
+for C code. This property is set to false by default and should ultimately disappear.
+
+\begin{verbatim}
+FOR_TO_WHILE_LOOP_IN_CONTROLIZER   FALSE
+\end{verbatim}
+
+The next property is used to convert C for loops into C do loops when
+syntactically possible. The conversion is not safe because the effect of
+the loop body on the loop index is not checked. The purpose is to speed up
+the re-use of Fortran analyses and transformation for C code. This
+property is set to false by default and should disappear soon.
+
+\begin{verbatim}
+FOR_TO_DO_LOOP_IN_CONTROLIZER   FALSE
 \end{verbatim}
 
 \subsection{Spaghettifier}
