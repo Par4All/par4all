@@ -5,6 +5,10 @@
  * $Id$
  *
  * $Log: ri-util-local.h,v $
+ * Revision 1.95  2005/12/12 17:18:09  irigoin
+ * Macros for C boolean and relational operators added. Macros unifying C and
+ * Fortran operators updated.
+ *
  * Revision 1.94  2005/11/28 15:07:02  irigoin
  * Names for operators '+C' and '-C' declared as well as macros to recognize them.
  *
@@ -234,9 +238,13 @@ typedef hash_table control_mapping;
  */
 
 #define AND_OPERATOR_NAME 		".AND."
+#define C_AND_OPERATOR_NAME 		"&&"
 #define OR_OPERATOR_NAME 		".OR."
+#define C_OR_OPERATOR_NAME 		"||"
 #define NOT_OPERATOR_NAME 		".NOT."
+#define C_NOT_OPERATOR_NAME 		".NOT."
 #define NON_EQUAL_OPERATOR_NAME 	".NE."
+#define C_NON_EQUAL_OPERATOR_NAME 	"!"
 #define EQUIV_OPERATOR_NAME 		".EQV."
 #define NON_EQUIV_OPERATOR_NAME 	".NEQV."
 
@@ -244,10 +252,15 @@ typedef hash_table control_mapping;
 #define FALSE_OPERATOR_NAME 		".FALSE."
 
 #define GREATER_OR_EQUAL_OPERATOR_NAME 	".GE."
+#define C_GREATER_OR_EQUAL_OPERATOR_NAME 	">+"
 #define GREATER_THAN_OPERATOR_NAME 	".GT."
+#define C_GREATER_THAN_OPERATOR_NAME 	">"
 #define LESS_OR_EQUAL_OPERATOR_NAME 	".LE."
+#define C_LESS_OR_EQUAL_OPERATOR_NAME 	"<="
 #define LESS_THAN_OPERATOR_NAME 	".LT."
+#define C_LESS_THAN_OPERATOR_NAME 	"<"
 #define EQUAL_OPERATOR_NAME 		".EQ."
+#define C_EQUAL_OPERATOR_NAME 		"=="
 
 #define CONTINUE_FUNCTION_NAME 		"CONTINUE"
 #define RETURN_FUNCTION_NAME 		"RETURN"
@@ -326,11 +339,11 @@ typedef hash_table control_mapping;
 #define ENTITY_DABS_P(e) entity_an_operator_p(e, DABS)
 #define ENTITY_CABS_P(e) entity_an_operator_p(e, CABS)
 
-#define ENTITY_AND_P(e) entity_an_operator_p(e, AND)
+#define ENTITY_AND_P(e) (entity_an_operator_p(e, AND) || entity_an_operator_p(e, C_AND))
 
-#define ENTITY_OR_P(e) entity_an_operator_p(e, OR)
-#define ENTITY_NOT_P(e) entity_an_operator_p(e, NOT)
-#define ENTITY_NON_EQUAL_P(e) entity_an_operator_p(e, NON_EQUAL)
+#define ENTITY_OR_P(e) (entity_an_operator_p(e, OR) || entity_an_operator_p(e, C_OR))
+#define ENTITY_NOT_P(e) (entity_an_operator_p(e, NOT) || entity_an_operator_p(e, C_NOT))
+#define ENTITY_NON_EQUAL_P(e) (entity_an_operator_p(e, NON_EQUAL) || entity_an_operator_p(e, C_NON_EQUAL))
 #define ENTITY_EQUIV_P(e) entity_an_operator_p(e, EQUIV)
 #define ENTITY_NON_EQUIV_P(e) entity_an_operator_p(e, NON_EQUIV)
 
@@ -349,12 +362,12 @@ typedef hash_table control_mapping;
 #define ENTITY_TRUE_P(e) entity_an_operator_p(e, TRUE)
 #define ENTITY_FALSE_P(e) entity_an_operator_p(e, FALSE)
 
-#define ENTITY_GREATER_OR_EQUAL_P(e) entity_an_operator_p(e, GREATER_OR_EQUAL)
-#define ENTITY_GREATER_THAN_P(e)  entity_an_operator_p(e, GREATER_THAN)
-#define ENTITY_LESS_OR_EQUAL_P(e) entity_an_operator_p(e, LESS_OR_EQUAL)
-#define ENTITY_LESS_THAN_P(e) entity_an_operator_p(e, LESS_THAN)
+#define ENTITY_GREATER_OR_EQUAL_P(e) (entity_an_operator_p(e, GREATER_OR_EQUAL) || entity_an_operator_p(e, C_GREATER_OR_EQUAL))
+#define ENTITY_GREATER_THAN_P(e)  (entity_an_operator_p(e, GREATER_THAN) || entity_an_operator_p(e, C_GREATER_THAN))
+#define ENTITY_LESS_OR_EQUAL_P(e) (entity_an_operator_p(e, LESS_OR_EQUAL) || entity_an_operator_p(e, C_LESS_OR_EQUAL))
+#define ENTITY_LESS_THAN_P(e) (entity_an_operator_p(e, LESS_THAN) || entity_an_operator_p(e, C_LESS_THAN))
 
-#define ENTITY_EQUAL_P(e) entity_an_operator_p(e, EQUAL)
+#define ENTITY_EQUAL_P(e) (entity_an_operator_p(e, EQUAL) || entity_an_operator_p(e, C_EQUAL))
 
 #define ENTITY_RELATIONAL_OPERATOR_P(e) ( \
 					 ENTITY_GREATER_OR_EQUAL_P(e) || \
