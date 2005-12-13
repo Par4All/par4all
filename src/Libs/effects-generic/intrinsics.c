@@ -42,6 +42,8 @@
 
 static list no_write_effects(entity e,list args);
 static list affect_effects(entity e,list args);
+static list update_effects(entity e,list args);
+static list unique_update_effects(entity e,list args);
 static list assign_substring_effects(entity e,list args);
 static list substring_effect(entity e,list args);
 static list some_io_effects(entity e, list args);
@@ -309,10 +311,10 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
   
     {".",                    no_write_effects},
     {"->",                    no_write_effects},
-    {"post++",                    no_write_effects},
-    {"post--",                    no_write_effects},
-    {"++pre",                    no_write_effects},
-    {"--pre",                    no_write_effects},
+    {"post++",                    unique_update_effects},
+    {"post--",                    unique_update_effects},
+    {"++pre",                    unique_update_effects},
+    {"--pre",                    unique_update_effects},
     {"&",                    no_write_effects},
     {"*indirection",                    no_write_effects},
     {"+unary",                    no_write_effects},
@@ -335,16 +337,16 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"|",                    no_write_effects},
     {"&&",                    no_write_effects},
     {"||",                    no_write_effects},
-    {"*=",                    no_write_effects},
-    {"/=",                    no_write_effects},
-    {"%=",                    no_write_effects},
-    {"+=",                    no_write_effects},
-    {"-=",                    no_write_effects},
-    {"<<=",                   no_write_effects},
-    {">>=",                   no_write_effects},
-    {"&=",                    no_write_effects},
-    {"^=",                    no_write_effects},
-    {"|=",                    no_write_effects},
+    {"*=",                    update_effects},
+    {"/=",                    update_effects},
+    {"%=",                    update_effects},
+    {"+=",                    update_effects},
+    {"-=",                    update_effects},
+    {"<<=",                   update_effects},
+    {">>=",                   update_effects},
+    {"&=",                    update_effects},
+    {"^=",                    update_effects},
+    {"|=",                    update_effects},
     {",",                    no_write_effects}, 
 
     {BRACE_INTRINSIC,            no_write_effects},
@@ -706,6 +708,54 @@ affect_effects(entity e,list args)
     le = generic_proper_effects_of_lhs(syntax_reference(s));
 
     le = gen_nconc(le, generic_proper_effects_of_expression(rhs));
+
+    pips_debug(5, "end\n");
+
+    return(le);
+}
+
+static list 
+update_effects(entity e,list args)
+{
+    list le = NIL;
+
+    expression lhs = EXPRESSION(CAR(args));
+    syntax s = expression_syntax(lhs);
+
+    expression rhs = EXPRESSION(CAR(CDR(args)));
+
+    pips_debug(5, "begin\n");
+
+    if (! syntax_reference_p(s))
+            pips_error("affect_effects", "not a reference\n");
+
+    le = generic_proper_effects_of_lhs(syntax_reference(s));
+
+    le = gen_nconc(le, generic_proper_effects_of_expression(lhs));
+
+    le = gen_nconc(le, generic_proper_effects_of_expression(rhs));
+
+    pips_debug(5, "end\n");
+
+    return(le);
+}
+
+static list 
+unique_update_effects(entity e,list args)
+{
+    list le = NIL;
+
+    expression lhs = EXPRESSION(CAR(args));
+    syntax s = expression_syntax(lhs);
+
+    pips_debug(5, "begin\n");
+
+    if (! syntax_reference_p(s))
+            pips_error("affect_effects", "not a reference\n");
+
+    le = generic_proper_effects_of_lhs(syntax_reference(s));
+
+    le = gen_nconc(le, generic_proper_effects_of_expression(lhs));
 
     pips_debug(5, "end\n");
 
