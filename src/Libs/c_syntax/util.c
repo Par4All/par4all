@@ -1,5 +1,8 @@
 /* $Id$ 
    $Log: util.c,v $
+   Revision 1.13  2005/12/15 16:19:43  irigoin
+   Bug fix attemps for entity_initial and unknown_value
+
    Revision 1.12  2005/12/15 15:33:45  irigoin
    Initial value part seems to have been forgotten in  UpdateEntity()
 
@@ -996,7 +999,7 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
    
   /************************* INITIAL VALUE PART ****************************************/
   if(value_undefined_p(entity_initial(e))) {
-    entity_initial(e) = make_value(is_value_unknown, UU);
+    entity_initial(e) = make_value_unknown();
   }
   
   pips_assert("Current entity is consistent",entity_consistent_p(e));
