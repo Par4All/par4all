@@ -9,6 +9,10 @@
  * Arnauld Leservot, Guillaume Oget, Fabien Coelho.
  *
  * $Log: pipsmake.c,v $
+ * Revision 1.88  2005/12/15 15:41:28  irigoin
+ * Bug fix (?) in error management when the compilation unit of a module is
+ * unkown because its source code is unknown.
+ *
  * Revision 1.87  2005/12/15 14:08:37  irigoin
  * Check that the compilation unit is known in build_real_resources()
  *
@@ -459,7 +463,8 @@ static list build_real_resources(string oname, list lvr)
 	    else {
 	      /* Source code for module oname is not available */
 	      pips_user_error("No source code for module %s.\n"
-			      "Code synthesis not available for C.\n");
+			      "Code synthesis not available for C.\n",
+			      oname);
 	    }
 	    break;
 	  }
