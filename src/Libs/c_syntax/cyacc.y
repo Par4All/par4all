@@ -1,5 +1,8 @@
 /* $Id$ 
    $Log: cyacc.y,v $
+   Revision 1.12  2005/12/15 16:19:50  irigoin
+   Bug fix attemps for entity_initial and unknown_value
+
    Revision 1.11  2005/12/15 15:35:13  irigoin
    Action changed for "init_declarator:" first clause.
 
@@ -1066,7 +1069,8 @@ init_declarator:                             /* ISO 6.7 */
     declarator          { 
                           /* The default initial value is often zero,
                               but not so for formal parameters */
-			  entity_initial($1) = make_value(is_value_unknown, UU);
+                          if(value_undefined_p(entity_initial($1)))
+			    entity_initial($1) = make_value_unknown();
                         }
 |   declarator TK_EQ init_expression
                         { 
