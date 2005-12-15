@@ -1,5 +1,8 @@
 /* $Id$ 
    $Log: cyacc.y,v $
+   Revision 1.11  2005/12/15 15:35:13  irigoin
+   Action changed for "init_declarator:" first clause.
+
    Revision 1.10  2005/11/28 16:04:02  irigoin
    call to simplify_C_expression() added for assignment
 
@@ -1060,7 +1063,11 @@ init_declarator_list:                       /* ISO 6.7 */
 
 ;
 init_declarator:                             /* ISO 6.7 */
-    declarator          { }
+    declarator          { 
+                          /* The default initial value is often zero,
+                              but not so for formal parameters */
+			  entity_initial($1) = make_value(is_value_unknown, UU);
+                        }
 |   declarator TK_EQ init_expression
                         { 
 			  /* Put init_expression in the initial value of entity declarator*/
