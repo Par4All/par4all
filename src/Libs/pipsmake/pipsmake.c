@@ -9,6 +9,9 @@
  * Arnauld Leservot, Guillaume Oget, Fabien Coelho.
  *
  * $Log: pipsmake.c,v $
+ * Revision 1.84  2005/12/15 11:50:56  irigoin
+ * More problems with compilation_unit_of_module()
+ *
  * Revision 1.83  2005/12/15 10:53:25  irigoin
  * Problems with function compilation_unit_of_module() when the module is not
  * defined. Probably fixed when it is not referenced either.
@@ -287,7 +290,7 @@ string compilation_unit_of_module(string module_name)
   string compilation_unit_name = string_undefined;
 
   /* The guard may not be sufficient and this may crash in db_get_memory_resource() */
-  if(db_module_exists_p(module_name)) {
+  if(db_resource_p(DBR_USER_FILE, module_nam)) {
     string source_file_name = db_get_memory_resource(DBR_USER_FILE, module_name, TRUE);
     string simpler_file_name = pips_basename(source_file_name, ".cpp_processed.c");
 
