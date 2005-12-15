@@ -9,6 +9,9 @@
  * Arnauld Leservot, Guillaume Oget, Fabien Coelho.
  *
  * $Log: pipsmake.c,v $
+ * Revision 1.87  2005/12/15 14:08:37  irigoin
+ * Check that the compilation unit is known in build_real_resources()
+ *
  * Revision 1.86  2005/12/15 11:52:44  irigoin
  * Still problem with compilation_unit_of_module()
  *
@@ -448,8 +451,16 @@ static list build_real_resources(string oname, list lvr)
 	case is_owner_compilation_unit:
 	  {
 	    string compilation_unit_name = compilation_unit_of_module(oname);
-	    add_res(vrn, compilation_unit_name);
-	    free(compilation_unit_name);
+
+	    if(!string_undefined_p(compilation_unit_name)) {
+	      add_res(vrn, compilation_unit_name);
+	      free(compilation_unit_name);
+	    }
+	    else {
+	      /* Source code for module oname is not available */
+	      pips_user_error("No source code for module %s.\n"
+			      "Code synthesis not available for C.\n");
+	    }
 	    break;
 	  }
 
