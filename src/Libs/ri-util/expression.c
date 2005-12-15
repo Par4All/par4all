@@ -246,6 +246,19 @@ expression e;
 {
     return(syntax_reference_p(expression_syntax(e)));
 }
+
+bool is_expression_reference_to_entity_p(expression e, entity v)
+{
+  bool is_e_reference_to_v = FALSE;
+
+  if(expression_reference_p(e)) {
+    reference r = syntax_reference(expression_syntax(e));
+
+    is_e_reference_to_v = (reference_variable(r)==v);
+  }
+  return is_e_reference_to_v;
+}
+
 /* This function returns TRUE, if there exists an equal expression in the list
  *                       FALSE, otherwise 
 */
