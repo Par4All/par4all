@@ -9,6 +9,9 @@
  * Arnauld Leservot, Guillaume Oget, Fabien Coelho.
  *
  * $Log: pipsmake.c,v $
+ * Revision 1.86  2005/12/15 11:52:44  irigoin
+ * Still problem with compilation_unit_of_module()
+ *
  * Revision 1.85  2005/12/15 11:52:01  irigoin
  * Comments added to compilation_unit_of_module()
  *
@@ -297,7 +300,7 @@ string compilation_unit_of_module(string module_name)
   string compilation_unit_name = string_undefined;
 
   /* The guard may not be sufficient and this may crash in db_get_memory_resource() */
-  if(db_resource_p(DBR_USER_FILE, module_nam)) {
+  if(db_resource_p(DBR_USER_FILE, module_name)) {
     string source_file_name = db_get_memory_resource(DBR_USER_FILE, module_name, TRUE);
     string simpler_file_name = pips_basename(source_file_name, ".cpp_processed.c");
 
