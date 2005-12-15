@@ -9,6 +9,10 @@
  * Arnauld Leservot, Guillaume Oget, Fabien Coelho.
  *
  * $Log: pipsmake.c,v $
+ * Revision 1.83  2005/12/15 10:53:25  irigoin
+ * Problems with function compilation_unit_of_module() when the module is not
+ * defined. Probably fixed when it is not referenced either.
+ *
  * Revision 1.82  2003/12/19 17:39:12  irigoin
  * function get_first_main_module() extended to cope with main modules in C
  *
@@ -272,17 +276,25 @@ void reset_static_phase_variables()
 
 /* Logically, this should be implemented in preprocessor, but the
    preprocessor library is at a upper level than the pipsmake
-   library... */
+   library...
+
+   The output is undefined if the module is referenced but not defined in
+   the workspace, for instance because its code should be synthetized.
+  */
 string compilation_unit_of_module(string module_name)
 {
   /* Should only be called for C modules. */
   string compilation_unit_name = string_undefined;
-  string source_file_name = db_get_memory_resource(DBR_USER_FILE, module_name, TRUE);
-  string simpler_file_name = pips_basename(source_file_name, ".cpp_processed.c");
 
-  /* It is not clear how robust it is going to be when file name conflicts occur. */
-  compilation_unit_name
-    = strdup(concatenate(simpler_file_name, FILE_SEP_STRING, NULL));
+  /* The guard may not be sufficient and this may crash in db_get_memory_resource() */
+  if(db_module_exists_p(module_name)) {
+    string source_file_name = db_get_memory_resource(DBR_USER_FILE, module_name, TRUE);
+    string simpler_file_name = pips_basename(source_file_name, ".cpp_processed.c");
+
+    /* It is not clear how robust it is going to be when file name conflicts occur. */
+    compilation_unit_name
+      = strdup(concatenate(simpler_file_name, FILE_SEP_STRING, NULL));
+  }
 
   return compilation_unit_name;
 }
