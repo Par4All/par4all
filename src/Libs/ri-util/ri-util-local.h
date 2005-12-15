@@ -5,6 +5,9 @@
  * $Id$
  *
  * $Log: ri-util-local.h,v $
+ * Revision 1.96  2005/12/15 09:18:03  irigoin
+ * Lots of C operator names and recognition macros added.
+ *
  * Revision 1.95  2005/12/12 17:18:09  irigoin
  * Macros for C boolean and relational operators added. Macros unifying C and
  * Fortran operators updated.
@@ -199,6 +202,23 @@ typedef hash_table control_mapping;
 #define IMPLIED_DCOMPLEX_NAME		"DCMPLX_"
 
 #define ASSIGN_OPERATOR_NAME 		"="
+#define POST_INCREMENT_OPERATOR_NAME    "post++"
+#define POST_DECREMENT_OPERATOR_NAME    "post--"
+#define PRE_INCREMENT_OPERATOR_NAME     "post++"
+#define PRE_DECREMENT_OPERATOR_NAME     "post--"
+#define MULTIPLY_UPDATE_OPERATOR_NAME   "*=" 
+#define DIVIDE_UPDATE_OPERATOR_NAME   	"/=" 
+#define MODULO_UPDATE_OPERATOR_NAME   	"%=" 
+#define PLUS_UPDATE_OPERATOR_NAME   	"+=" 
+#define MINUS_UPDATE_OPERATOR_NAME   	"-=" 
+#define LEFT_SHIFT_UPDATE_OPERATOR_NAME "<<="
+#define RIGHT_SHIFT_UPDATE_OPERATOR_NAME   	">>="
+#define BITWISE_AND_UPDATE_OPERATOR_NAME   	"&=" 
+#define BITWISE_XOR_UPDATE_OPERATOR_NAME "^=" 
+#define BITWISE_OR_UPDATE_OPERATOR_NAME  "|=" 
+
+#define COMMA_OPERATOR_NAME             ","
+
 #define PLUS_OPERATOR_NAME 		"+"
 #define PLUS_C_OPERATOR_NAME 		"+C" /* includes pointer arithmetic */
 #define MINUS_OPERATOR_NAME 		"-"
@@ -209,6 +229,16 @@ typedef hash_table control_mapping;
 #define INVERSE_OPERATOR_NAME           "_INV_" /* internal stuff */
 #define POWER_OPERATOR_NAME 		"**"
 #define MODULO_OPERATOR_NAME 		"MOD"
+#define C_MODULO_OPERATOR_NAME 		"%"
+#define LEFT_SHIFT_OPERATOR_NAME 	"<<"
+#define RIGHT_SHIFT_OPERATOR_NAME 	">>"
+#define BITWISE_AND_OPERATOR_NAME 	"&bitand"
+#define BITWISE_OR_OPERATOR_NAME 	"|"
+#define BITWISE_XOR_OPERATOR_NAME 	"^"
+#define RIGHT_SHIFT_OPERATOR_NAME 	">>"
+#define RIGHT_SHIFT_OPERATOR_NAME 	">>"
+#define RIGHT_SHIFT_OPERATOR_NAME 	">>"
+#define RIGHT_SHIFT_OPERATOR_NAME 	">>"
 #define MIN_OPERATOR_NAME 		"MIN"
 #define MIN0_OPERATOR_NAME 		"MIN0"
 #define AMIN1_OPERATOR_NAME 		"AMIN1"
@@ -267,6 +297,11 @@ typedef hash_table control_mapping;
 #define STOP_FUNCTION_NAME 		"STOP"
 #define PAUSE_FUNCTION_NAME 		"PAUSE"
 
+#define BREAK_FUNCTION_NAME 		"break"
+#define CASE_FUNCTION_NAME 		"case"
+#define DEFAULT_FUNCTION_NAME 		"default"
+#define C_RETURN_FUNCTION_NAME 		"return"
+
 #define SUBSTRING_FUNCTION_NAME 	"_SUBSTR"
 #define ASSIGN_SUBSTRING_FUNCTION_NAME 	"_ASSIGN_SUBSTR"
 
@@ -316,6 +351,21 @@ typedef hash_table control_mapping;
 #define ENTITY_RETURN_P(e) entity_a_function_p(e, RETURN)
 
 #define ENTITY_ASSIGN_P(e) entity_an_operator_p(e, ASSIGN)
+#define ENTITY_POST_INCREMENT_P(e) entity_an_operator_p(e, POST_INCREMENT)
+#define ENTITY_POST_DECREMENT_P(e) entity_an_operator_p(e, POST_DECREMENT)
+#define ENTITY_PRE_INCREMENT_P(e) entity_an_operator_p(e, PRE_INCREMENT)
+#define ENTITY_PRE_DECREMENT_P(e) entity_an_operator_p(e, PRE_DECREMENT)
+#define ENTITY_MULTIPLY_UPDATE_P(e) entity_an_operator_p(e, MULTIPLY_UPDATE)
+#define ENTITY_DIVIDE_UPDATE_P(e) entity_an_operator_p(e, DIVIDE_UPDATE)
+#define ENTITY_MODULO_UPDATE_P(e) entity_an_operator_p(e, MODULO_UPDATE)
+#define ENTITY_PLUS_UPDATE_P(e) entity_an_operator_p(e, PLUS_UPDATE)
+#define ENTITY_MINUS_UPDATE_P(e) entity_an_operator_p(e, MINUS_UPDATE)
+#define ENTITY_LEFT_SHIFT_UPDATE_P(e) entity_an_operator_p(e, LEFT_SHIFT_UPDATE)
+#define ENTITY_RIGHT_SHIFT_UPDATE_P(e) entity_an_operator_p(e, RIGHT_SHIFT_UPDATE)
+#define ENTITY_BITWISE_AND_UPDATE_P(e) entity_an_operator_p(e, BITWISE_AND_UPDATE)
+#define ENTITY_BITWISE_XOR_UPDATE_P(e) entity_an_operator_p(e, BITWISE_XOR_UPDATE)
+#define ENTITY_BITWISE_OR_UPDATE_P(e) entity_an_operator_p(e, BITWISE_OR_UPDATE)
+
 #define ENTITY_PLUS_P(e) entity_an_operator_p(e, PLUS)
 #define ENTITY_PLUS_C_P(e) entity_an_operator_p(e, PLUS_C)
 #define ENTITY_MINUS_P(e) entity_an_operator_p(e, MINUS)
