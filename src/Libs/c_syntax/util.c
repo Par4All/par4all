@@ -1,5 +1,8 @@
 /* $Id$ 
    $Log: util.c,v $
+   Revision 1.12  2005/12/15 15:33:45  irigoin
+   Initial value part seems to have been forgotten in  UpdateEntity()
+
    Revision 1.11  2004/02/20 13:57:47  nguyen
    Treat EXTERN entities
 
@@ -990,6 +993,11 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
 	  entity_storage(e) = MakeStorageRam(e,is_external,c_parser_context_static(context));
 	}
     }
+   
+  /************************* INITIAL VALUE PART ****************************************/
+  if(value_undefined_p(entity_initial(e))) {
+    entity_initial(e) = make_value(is_value_unknown, UU);
+  }
   
   pips_assert("Current entity is consistent",entity_consistent_p(e));
 }
