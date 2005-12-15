@@ -9,6 +9,9 @@
  * Arnauld Leservot, Guillaume Oget, Fabien Coelho.
  *
  * $Log: pipsmake.c,v $
+ * Revision 1.85  2005/12/15 11:52:01  irigoin
+ * Comments added to compilation_unit_of_module()
+ *
  * Revision 1.84  2005/12/15 11:50:56  irigoin
  * More problems with compilation_unit_of_module()
  *
@@ -283,6 +286,10 @@ void reset_static_phase_variables()
 
    The output is undefined if the module is referenced but not defined in
    the workspace, for instance because its code should be synthetized.
+
+   Fabien Coelho suggests to build a defaut compilation unit where all
+   synthesized module codes would be located.
+
   */
 string compilation_unit_of_module(string module_name)
 {
