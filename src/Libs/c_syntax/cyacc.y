@@ -1,5 +1,8 @@
 /* $Id$ 
    $Log: cyacc.y,v $
+   Revision 1.13  2005/12/16 10:54:51  irigoin
+   Bug fix in calls to simplicy_C_expression()
+
    Revision 1.12  2005/12/15 16:19:50  irigoin
    Bug fix attemps for entity_initial and unknown_value
 
@@ -619,42 +622,52 @@ expression:
 			}
 |   expression TK_PLUS_EQ expression
 			{
+			  (void) simplify_C_expression($3);
 			  $$ = MakeBinaryCall(CreateIntrinsic("+="), $1, $3); 
 			}
 |   expression TK_MINUS_EQ expression
 			{
+			  (void) simplify_C_expression($3);
 			  $$ = MakeBinaryCall(CreateIntrinsic("-="), $1, $3); 
 			}
 |   expression TK_STAR_EQ expression
 			{
+			  (void) simplify_C_expression($3);
 			  $$ = MakeBinaryCall(CreateIntrinsic("*="), $1, $3); 
 			}
 |   expression TK_SLASH_EQ expression
 			{
+			  (void) simplify_C_expression($3);
 			  $$ = MakeBinaryCall(CreateIntrinsic("/="), $1, $3); 
 			}
 |   expression TK_PERCENT_EQ expression
 			{
+			  (void) simplify_C_expression($3);
 			  $$ = MakeBinaryCall(CreateIntrinsic("%="), $1, $3); 
 			}
 |   expression TK_AND_EQ expression
 			{
+			  (void) simplify_C_expression($3);
 			  $$ = MakeBinaryCall(CreateIntrinsic("&="), $1, $3); 
 			}
 |   expression TK_PIPE_EQ expression
 			{
+			  (void) simplify_C_expression($3);
 			  $$ = MakeBinaryCall(CreateIntrinsic("|="), $1, $3); 
 			}
 |   expression TK_CIRC_EQ expression
 			{
+			  (void) simplify_C_expression($3);
 			  $$ = MakeBinaryCall(CreateIntrinsic("^="), $1, $3); 
 			}
 |   expression TK_INF_INF_EQ expression	
 			{
+			  (void) simplify_C_expression($3);
 			  $$ = MakeBinaryCall(CreateIntrinsic("<<="), $1, $3); 
 			}
 |   expression TK_SUP_SUP_EQ expression
 			{
+			  (void) simplify_C_expression($3);
 			  $$ = MakeBinaryCall(CreateIntrinsic(">>="), $1, $3); 
 			}
 |   TK_LPAREN type_name TK_RPAREN expression
@@ -828,10 +841,12 @@ opt_expression:
 comma_expression:
     expression                        
                         {
+			  (void) simplify_C_expression($1);
 			  $$ = CONS(EXPRESSION,$1,NIL);
 			}
 |   expression TK_COMMA comma_expression 
                         {
+			  (void) simplify_C_expression($1);
 			  $$ = CONS(EXPRESSION,$1,$3);
 			}
 |   error TK_COMMA comma_expression      
