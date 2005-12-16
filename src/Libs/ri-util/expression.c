@@ -2017,15 +2017,23 @@ bool simplify_C_expression(expression e)
 	/* Try to simplify the arguments, do not hope much from the result
            type because of overloading. */
 	entity f = call_function(c);
-	basic rb = variable_basic(type_variable(functional_result(type_functional(entity_type(f)))));
+	type rt = functional_result(type_functional(entity_type(f)));
+
 	MAP(EXPRESSION, se, {
 	  (void) simplify_C_expression(se);
 	}, call_arguments(c));
 
-	can_be_substituted_p =
-	  basic_int_p(rb)
-	  || basic_float_p(rb) 
-	  || basic_complex_p(rb); /* Should not occur in C */
+	if(type_variable_p(rt)) {
+	  basic rb = variable_basic(type_variable(rt));
+
+	  can_be_substituted_p =
+	    basic_int_p(rb)
+	    || basic_float_p(rb) 
+	    || basic_complex_p(rb); /* Should not occur in C */
+	}
+	else {
+	  can_be_substituted_p = FALSE;
+	}
       }
       break;
     }
