@@ -90,8 +90,10 @@ effects_dynamic_elim(list l_eff)
 	case is_storage_formal:
 	    break;
 	case is_storage_rom:
-	    pips_internal_error("bad tag for %s (rom)\n", 
-				entity_name(eff_ent));
+	  ignore_this_effect = TRUE;
+	  break;
+	  /*  pips_internal_error("bad tag for %s (rom)\n", 
+	      entity_name(eff_ent));*/
 	default:
 	    pips_internal_error("case default reached\n");
         }
