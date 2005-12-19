@@ -244,7 +244,55 @@ check_range_wrt_precondition(range r, transformer p, bool check_empty)
 
   return check;
 }
+
+/* A condition cannot be tested exactly wrt a precondition You can try to
+ * prove that it is always true (because it is never false) or you can try
+ * to prove that it is always false (because it is never true). In both
+ * case, you may fail and be unable to decide emptiness or non-emptiness.  */
+bool
+condition_true_wrt_precondition_p(expression c, transformer p)
+{
+  bool empty = FALSE;
 
+  empty = check_condition_wrt_precondition(c, p, TRUE);
+
+  return empty;
+}
+
+bool
+condition_false_wrt_precondition_p(expression c, transformer p)
+{
+  bool non_empty = FALSE;
+
+  non_empty = check_condition_wrt_precondition(c, p, FALSE);
+
+  return non_empty;
+}
+
+bool
+check_condition_wrt_precondition(expression c, transformer pre, bool check_true)
+{
+  bool check = TRUE;
+  transformer twc = transformer_dup(pre);
+
+  pips_debug(8,	"begins for check %s\n",
+	bool_to_string(check_true));
+
+  if(check_true) {
+    twc = transformer_add_condition_information(twc, c, pre, FALSE);
+  }
+  else {
+    /* Check that is is always false in a store s such that p(s) */
+    twc = transformer_add_condition_information(twc, c, pre, TRUE);
+  }
+  check = transformer_empty_p(twc);
+
+  pips_debug(8,	"ends with check=%s for check_true=%s\n",
+	bool_to_string(check), bool_to_string(check_true));
+
+  return check;
+}
+
 /* Evaluate expression e in context p, assuming that e is an integer
  * expression. If p is empty, return an empty interval.
  *
