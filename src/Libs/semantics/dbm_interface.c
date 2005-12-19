@@ -23,6 +23,11 @@
 /* $Id$
  * 
  * $Log: dbm_interface.c,v $
+ * Revision 1.45  2005/12/19 15:48:56  irigoin
+ * Update for refine_transformers(). Split of preconditions_intra into
+ * preconditions_intra_fast and preconditions_intra because the semantics has
+ * changed.
+ *
  * Revision 1.44  2003/07/24 09:00:21  irigoin
  * Normalization added before summary preconditions are stored in database.
  *
@@ -225,15 +230,21 @@ bool transformers_inter_full(char * module_name)
    interprocedural analysis is performed. For intraprocedural analyses,
    using property SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT is
    sufficient. */
+bool refine_transformers_p = FALSE;
+
 bool refine_transformers(char * module_name)
 {
-    set_bool_property(SEMANTICS_INTERPROCEDURAL, TRUE);
-    set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
-    set_bool_property(SEMANTICS_FIX_POINT, TRUE);
-    select_fix_point_operator();
-    set_bool_property(SEMANTICS_STDOUT, FALSE);
-    /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
-    return module_name_to_transformers_in_context(module_name);
+  bool res;
+  set_bool_property(SEMANTICS_INTERPROCEDURAL, TRUE);
+  set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
+  set_bool_property(SEMANTICS_FIX_POINT, TRUE);
+  select_fix_point_operator();
+  set_bool_property(SEMANTICS_STDOUT, FALSE);
+  /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
+  refine_transformers_p = TRUE;
+  res = module_name_to_transformers_in_context(module_name);
+  refine_transformers_p = FALSE;
+  return res;
 }
 
 bool summary_transformer(char * module_name)
@@ -259,6 +270,24 @@ bool preconditions_intra(char * module_name)
        semantics entries */
     /* set_bool_property(SEMANTICS_FIX_POINT, FALSE); */
     set_bool_property(SEMANTICS_FIX_POINT, TRUE);
+    set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, FALSE);
+    select_fix_point_operator();
+    set_bool_property(SEMANTICS_STDOUT, FALSE);
+    /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
+    return module_name_to_preconditions(module_name);
+}
+
+bool preconditions_intra_fast(char * module_name)
+{
+    /* nothing to do: transformers are preconditions for this
+       intraprocedural option */
+
+    set_bool_property(SEMANTICS_INTERPROCEDURAL, FALSE);
+    set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
+    /* Maybe we should have an intra fast and an intra full as with other
+       semantics entries */
+    /* set_bool_property(SEMANTICS_FIX_POINT, FALSE); */
+    set_bool_property(SEMANTICS_FIX_POINT, FALSE);
     set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, FALSE);
     select_fix_point_operator();
     set_bool_property(SEMANTICS_STDOUT, FALSE);
@@ -733,6 +762,13 @@ bool generic_module_name_to_transformers(char *module_name, bool in_context)
 						get_current_module_entity());
     }
 
+    /* Get the preconditions: they might prove useful within loops where
+       transformers cannot propagate enough information. */
+    if(in_context) {
+     set_precondition_map( (statement_mapping) 
+	db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE));
+   }
+
     /* compute intraprocedural transformer */
     t_intra = statement_to_transformer(get_current_module_statement(), mod_pre);
     free_transformer(mod_pre);
@@ -762,6 +798,7 @@ bool generic_module_name_to_transformers(char *module_name, bool in_context)
     reset_proper_rw_effects();
     reset_cumulated_rw_effects();
     reset_transformer_map();
+    if(in_context) reset_precondition_map();
 
     free_value_mappings();
 
