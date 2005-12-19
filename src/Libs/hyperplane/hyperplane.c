@@ -3,6 +3,9 @@
  * $Id$
  * 
  * $Log: hyperplane.c,v $
+ * Revision 1.9  2005/12/19 16:41:55  irigoin
+ * New debug messages added by Duong Nguyen.
+ *
  * Revision 1.8  1998/10/12 10:42:43  irigoin
  * Typo in RCS variable
  *
@@ -71,6 +74,12 @@ cons * lls;
 
     /* make the  system "sc" of constraints of iteration space */
     sci = loop_iteration_domaine_to_sc(lls, &base_oldindex);
+
+    ifdebug(8) {
+      /*DNDEBUG*/
+      (void) fprintf(stderr,"base_oldindex 0:\n");
+      base_fprint(stderr,base_oldindex,default_variable_to_string);    
+    }
     
     /* create the  matrix A of coefficients of  index in (Psysteme)sci */
     n = base_dimension(base_oldindex);
@@ -78,6 +87,21 @@ cons * lls;
     A = matrice_new(m,n);
     sys_matrice_index(sci, base_oldindex, A, n, m);
 
+    ifdebug(8) {
+      /*DNDEBUG*/
+      (void) fprintf(stderr,"base_oldindex 1:\n");
+      base_fprint(stderr,base_oldindex,default_variable_to_string);    
+    }
+    ifdebug(8) {
+      /*DNDEBUG*/
+      (void) fprintf(stderr,"Matrice A:\n");
+      matrice_fprint(stderr,A,m,n);
+    }
+    ifdebug(8) {
+      /*DNDEBUG*/
+      (void) fprintf(stderr,"sci:\n");
+      sc_default_dump(sci);
+    }
     /* computation of the hyperplane direction */
     /*  use the  hyperplane direction  */
     h = (Value*)(malloc(n*sizeof(Value)));
@@ -106,18 +130,65 @@ cons * lls;
     AG = matrice_new(m,n);
     matrice_multiply(A, G, AG, m, n, n);
 
+    ifdebug(8) {
+      /*DNDEBUG*/
+      (void) fprintf(stderr,"Matrice AG:\n");
+      matrice_fprint(stderr,AG,m,n);
+    }
     /* create the new system of constraintes (Psysteme scn) with  
        AG and sci */
     scn = sc_dup(sci);
+
+    ifdebug(8) {
+      /*DNDEBUG*/
+      (void) fprintf(stderr,"base_oldindex 2:\n");
+      base_fprint(stderr,base_oldindex,default_variable_to_string);    
+    }
+    ifdebug(8) {
+      /*DNDEBUG*/
+      (void) fprintf(stderr,"scn before matrice_index_sys :\n");
+      sc_default_dump(scn);
+    }
     matrice_index_sys(scn, base_oldindex, AG, n,m );
+
+    ifdebug(8) {
+      /*DNDEBUG*/
+      (void) fprintf(stderr,"scn after matrice_index_sys :\n");
+      sc_default_dump(scn);
+    }
 
     /* computation of the new iteration space in the new basis G */
     sc_row_echelon = new_loop_bound(scn, base_oldindex);
 
+    ifdebug(8) {
+      /*DNDEBUG*/
+      /*      (void) fprintf(stderr,"scn after new_loop_bound:\n");
+	      sc_default_dump(scn);
+	      has been destroyed
+      */
+      (void) fprintf(stderr,"sc_row_echelon:\n");
+      sc_default_dump(sc_row_echelon);
+    }
+
     /* change of basis for index */
     change_of_base_index(base_oldindex, &base_newindex);
+
+    ifdebug(8) {
+      /*DNDEBUG*/
+      (void) fprintf(stderr,"base_oldindex:\n");
+      base_fprint(stderr,base_oldindex,default_variable_to_string);
+      (void) fprintf(stderr,"base_newindex:\n");
+      base_fprint(stderr,base_newindex,default_variable_to_string);
+    }
+
     sc_newbase = sc_change_baseindex(sc_dup(sc_row_echelon), base_oldindex, base_newindex);
     
+    ifdebug(8) {
+      /*DNDEBUG*/
+      (void) fprintf(stderr,"sc_newbase:\n");
+      sc_default_dump(sc_newbase);
+    }
+
     /* generation of hyperplane  code */
     /*  generation of bounds */
     for (pb=base_newindex; pb!=NULL; pb=pb->succ) {
