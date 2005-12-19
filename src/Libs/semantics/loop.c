@@ -3,6 +3,17 @@
   * $Id$
   *
   * $Log: loop.c,v $
+  * Revision 1.8  2005/12/19 16:06:10  irigoin
+  * New functions added over the summer 2005 to refine while loop
+  * analysis. New functions are: refine_whileloop_transformer(),
+  * recompile_whileloop_transformer(),
+  * loop_body_transformer_add-entry_and_iteration_information(). Two other
+  * functions were updated to cope with transformers computed in context:
+  * while_loop_to_transformer() and whileloop_to_postcondition(). As a result,
+  * there are problems when transformers are not computed in context. This is
+  * caught by the Validation suite. I neverthelss check-in this version for
+  * the move from RDS to SVN (FI).
+  *
   * Revision 1.7  2003/07/24 10:50:49  irigoin
   * Minor changes, compiler warnings avoided, bug fix for preference vs
   * reference in cell when macro effect_reference() is used.
@@ -898,6 +909,12 @@ loop_to_transformer(loop l, transformer pre, list e)
   return tf;
 }
 
+/* The transformer computed and stored for a loop is useful to compute the
+   loop body precondition, but it is not useful to analyze a higher level
+   construct, which need the loop transformer with the exit
+   condition. Only Fortran DO loops are handled here. The need for nested
+   WHILE loops has not been identified yet. */
+
 /* The index variable is always initialized and then the loop is either
    entered and exited or not entered */
 transformer 
@@ -976,6 +993,97 @@ refine_loop_transformer(transformer ltf, transformer pre, loop l)
     free_transformer(t_enter);
   }
   else if(non_empty_range_wrt_precondition_p(r, pre)) {
+    tf = t_enter;
+    free_transformer(t_skip);
+  }
+  else {
+    tf = transformer_convex_hull(t_enter, t_skip);
+    free_transformer(t_enter);
+    free_transformer(t_skip);
+  }
+
+  ifdebug(8) {
+    pips_debug(8, "full refined loop transformer tf=\n");
+    fprint_transformer(stderr, tf, external_value_name);
+    pips_debug(8, "end\n");
+  }
+
+  return tf;
+}
+
+transformer 
+refine_whileloop_transformer(transformer ltf, transformer pre, whileloop l)
+{
+  transformer tf = transformer_undefined;
+  transformer t_enter = transformer_undefined;
+  transformer t_skip = transformer_undefined;
+  /* loop body transformer */
+  transformer btf = transformer_undefined;
+  expression cond = whileloop_condition(l);
+  statement s = whileloop_body(l);
+  transformer preb = invariant_wrt_transformer(pre, ltf);
+
+  pips_debug(8,"begin with whileloop precondition\n");
+  ifdebug(8) {
+    (void) print_transformer(pre);
+    pips_debug(8,"and whileloop transformer:\n");
+    (void) print_transformer(ltf);
+  }
+
+  /* compute the loop body transformer */
+  if(statement_loop_p(s)) {
+    /* Since it is not stored, we need to go down recursively. A way to
+       avoid this would be to always have sequences as loop
+       bodies... Let's hope that perfectly nested loops are neither
+       frequent nor deep! */
+    loop il = instruction_loop(statement_instruction(s));
+    btf = refine_loop_transformer(load_statement_transformer(s), pre, il);
+  }
+  else if(statement_whileloop_p(s)) {
+    whileloop il = instruction_whileloop(statement_instruction(s));
+    btf = refine_whileloop_transformer(load_statement_transformer(s), pre, il);
+  }
+  else {
+    btf = transformer_dup(load_statement_transformer(s));
+  }
+
+  /* btf = transformer_add_condition_information(btf, cond, preb, TRUE); */
+  t_enter = transformer_combine(transformer_dup(ltf), btf);
+
+  ifdebug(8) {
+    pips_debug(8, "entered loop transformer t_enter=\n");
+    fprint_transformer(stderr, t_enter, external_value_name);
+  }
+
+  /* add the exit condition */
+  t_enter =  transformer_add_condition_information(t_enter, cond, preb, FALSE);
+
+  ifdebug(8) {
+    pips_debug(8, "entered and exited loop transformer t_enter=\n");
+    fprint_transformer(stderr, t_enter, external_value_name);
+  }
+
+  /* add initialization for the unconditional initialization of the loop
+     index variable */
+  t_skip = transformer_undefined_p(pre)?
+    transformer_identity() :
+    transformer_dup(pre);
+  t_skip = transformer_add_condition_information(btf, cond, pre, FALSE);
+
+  ifdebug(8) {
+    pips_debug(8, "skipped loop transformer t_skip=\n");
+    fprint_transformer(stderr, t_skip, external_value_name);
+  }
+
+  /* It might be better not to compute useless transformer, but it's more
+     readable that way. Since pre is information free, only loops with
+     constant lower and upper bound and constant increment can benefit
+     from this. */
+  if(!transformer_undefined_p(pre) && condition_false_wrt_precondition_p(cond, pre)) {
+    tf = t_skip;
+    free_transformer(t_enter);
+  }
+  else if(!transformer_undefined_p(pre) && condition_true_wrt_precondition_p(cond, pre)) {
     tf = t_enter;
     free_transformer(t_skip);
   }
@@ -1084,7 +1192,56 @@ static transformer recompute_loop_transformer(loop l, transformer pre)
 
   return new_tf;
 }
+
+/* NOT USED. NOT FULLY IMPLEMENTED YET. SHOULD BE REDUNDANT WITH whileloop_to_tramsformer() */
+/* Recompute a fixpoint conditionnally to a valid precondition for all iterations */
+/* Could/Should be later called from whileloop_to_postcondition() */
+static transformer recompute_whileloop_transformer(whileloop wl, transformer pre)
+{
+  transformer new_tf = transformer_undefined;
+  pips_assert("To shut up gcc", wl==wl && pre==pre);
+  return new_tf;
+}
 
+/* FI: I do not have one test case to show that this function is of some use. */
+
+static transformer loop_body_transformer_add_entry_and_iteration_information(transformer tfb, transformer pre)
+{
+  /* add information about the old value of tfb as convex hull of the
+     entry precondition and of tfb's own image. For instance, if variable
+     I is equal to 0 on entry and set ot either 0 or 1, the loop is always
+     started with in [0, 1] */
+  transformer initial = transformer_range(pre);
+  transformer next = transformer_range(tfb);
+  transformer pre_body = transformer_convex_hull(initial, next);
+
+
+  ifdebug(8) {
+    pips_debug(5, "Begin with body transformer:\n");
+    print_transformer(tfb);
+    pips_debug(5, "initial precondition:\n");
+    print_transformer(initial);
+    pips_debug(5, "next precondition:\n");
+    print_transformer(next);
+    pips_debug(5, "body precondition:\n");
+    print_transformer(pre_body);
+  }
+
+
+  tfb = transformer_domain_intersection(tfb, pre_body);
+
+  free_transformer(initial);
+  free_transformer(next);
+  free_transformer(pre_body);
+
+  ifdebug(8) {
+    pips_debug(5, "End with new body transformer:\n");
+    print_transformer(tfb);
+  }
+
+  return tfb;
+}
+
 /* This function computes the effect of K loop iteration, with K positive.
  * This function does not take the loop exit into account because its result
  * is used to compute the precondition of the loop body.
@@ -1102,24 +1259,60 @@ whileloop_to_transformer(whileloop l, transformer pre, list e) /* effects of whi
   expression cond = whileloop_condition(l);
   statement s = whileloop_body(l);
 
-  debug(8,"whileloop_to_transformer","begin\n");
+  pips_debug(8,"begin\n");
 
   if(pips_flag_p(SEMANTICS_FIX_POINT)) {
-    /* compute the whileloop body transformer */
-    tfb = transformer_dup(statement_to_transformer(s, pre));
+    transformer pre_n = transformer_undefined;
 
+    if(transformer_undefined_p(pre)) {
+      pre_n = transformer_identity();
+    }
+    else {
+      /* Make sure not to leave too much information in pre. Perform a very
+	 simplistic fix point based on effects. */
+      transformer tf_star = effects_to_transformer(e);
+      
+      pre_n = invariant_wrt_transformer(pre, tf_star);
+      free_transformer(tf_star);
+    }
     /* If the while entry condition is usable, it must be added
      * on the old values
      */
-    tfb = transformer_add_condition_information(tfb, cond, pre, TRUE);
+    /* I'd like to use pre_n as context to evaluate the condition cond,
+       but I'm not sure it's safe (Francois Irigoin) */
+    /* Side effects in cond are ignored! */
+    pre_n = precondition_add_condition_information(pre_n, cond, transformer_undefined, TRUE);
+
+    ifdebug(8) {
+      pips_debug(8, "Precondition for loop body pre_n=\n");
+      fprint_transformer(stderr, pre_n, external_value_name);
+    }
+
+    /* compute the whileloop body transformer, including the initial conditions */
+    tfb = transformer_dup(statement_to_transformer(s, pre_n));
+
+    /* The convex hull of the image of pre and of the image of tfb can be
+       added as conditions on tfb's domain, if some information is available in pre */
+    if(!transformer_undefined_p(pre))
+      tfb = loop_body_transformer_add_entry_and_iteration_information(tfb, pre);
 
     /* compute tfb's fix point according to pips flags */
     if(pips_flag_p(SEMANTICS_INEQUALITY_INVARIANT)) {
       tf = transformer_halbwachs_fix_point(tfb);
     }
-    else if (transformer_empty_p(tfb)) {
+    else if ((!transformer_undefined_p(pre)
+	     && condition_false_wrt_precondition_p(cond, pre))
+	     /* The second clause is probably stronger than the first one */
+	     || transformer_empty_p(pre_n)) {
       /* The loop is never entered */
+      /* Side effects of the condition evaluation should be taken into account */
       tf = transformer_identity();
+      /* A temporary variable is expected as first argument. There is something to fix. */
+      /* tf = any_expression_to_transformer(); */
+    }
+    else if(transformer_empty_p(tfb)) {
+      /* The loop is never exited, e.g. because there is a STOP or an infinite loop inside */
+      tf = transformer_empty();
     }
     else {
       transformer ftf = (* transformer_fix_point_operator)(tfb);
@@ -1150,6 +1343,9 @@ whileloop_to_transformer(whileloop l, transformer pre, list e) /* effects of whi
       }
 
     }
+
+    free_transformer(pre_n);
+
     /* we have a problem here: to compute preconditions within the
        whileloop body we need a tf using private variables; to return
        the loop transformer, we need a filtered out tf; only
@@ -1483,36 +1679,46 @@ transformer whileloop_to_postcondition(
   if(pips_flag_p(SEMANTICS_FIX_POINT) && pips_flag_p(SEMANTICS_INEQUALITY_INVARIANT)) {
     pips_internal_error("Halbwachs not implemented\n");
   }
+
+  if(false_condition_wrt_precondition_p(c, pre)) {
+    pips_debug(8, "The loop is never executed\n");
+
+    /* propagate an impossible precondition in the loop body */
+    (void) statement_to_postcondition(transformer_empty(), s);
+    /* do not add the exit condition since it is redundant with pre */
+    post = transformer_dup(pre);
+  }
   else {
-    transformer preb = transformer_dup(pre);
+    transformer pre_next = transformer_dup(pre);
+    transformer pre_init = precondition_add_condition_information(transformer_dup(pre),
+								  c, pre, TRUE);
+    transformer preb = transformer_undefined;
+    transformer tb = load_statement_transformer(s);
+
+    pips_debug(8, "The loop may be executed and preconditions must be propagated in the loop body\n");
 
     /* Apply the loop fix point transformer T* to obtain the set of stores
-     * for any number of iteration, including 0.
-     */
-    preb = transformer_combine(preb, tf);
+     * for any number of iteration, including 0. Instead, use T+ and a
+     * convex hull with the precondition for the first iteration, which
+     * preserves more information when the fixpoint is not precise.  */
+    pre_next = transformer_combine(pre_next, tf);
+    pre_next = precondition_add_condition_information(pre_next, c, pre_next, TRUE);
+    pre_next = transformer_combine(pre_next, tb);
+    pre_next = precondition_add_condition_information(pre_next, c, pre_next, TRUE);
+    preb = transformer_convex_hull(pre_init, pre_next);
 
-    if(false_condition_wrt_precondition_p(c, pre)) {
-      debug(8, "whileloop_to_postcondition", "The loop is never executed\n");
+    /* propagate preconditions in the loop body */
 
-      /* propagate an impossible precondition in the loop body */
-      (void) statement_to_postcondition(transformer_empty(), s);
-      /* The loop body precondition is not useful any longer */
-      free_transformer(preb);
-      /* do not add the exit condition since it is redundant with pre */
-      post = transformer_dup(pre);
-    }
-    else if(true_condition_wrt_precondition_p(c, pre)) {
+    (void) statement_to_postcondition(preb, s);
+
+
+    if(true_condition_wrt_precondition_p(c, pre)) {
       /* At least one iteration is executed. The transformer of
        * the loop body is useful.
        */
-      transformer tb = load_statement_transformer(s);
       transformer ntl = transformer_undefined;
 
       debug(8, "whileloop_to_postcondition", "The loop certainly is executed\n");
-
-      /* propagate preconditions in the loop body */
-      preb = precondition_add_condition_information(preb, c, preb, TRUE);
-      (void) statement_to_postcondition(preb, s);
 
       ntl = transformer_apply(tf, pre);
       /* Let's execute the last iteration since it certainly exists */
@@ -1530,10 +1736,6 @@ transformer whileloop_to_postcondition(
       transformer tb = load_statement_transformer(s);
 
       debug(8, "whileloop_to_postcondition", "The loop may be executed or not\n");
-
-      /* propagate preconditions in the loop body */
-      preb = precondition_add_condition_information(preb, c, preb, TRUE);
-      (void) statement_to_postcondition(preb, s);
 
       /* The loop is executed at least once: let's execute the last iteration */
       post_al = transformer_apply(tb, preb);
