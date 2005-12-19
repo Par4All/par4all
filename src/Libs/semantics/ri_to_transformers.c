@@ -10,6 +10,10 @@
   * $Id$
   *
   * $Log: ri_to_transformers.c,v $
+  * Revision 1.62  2005/12/19 16:14:39  irigoin
+  * Mostly statement_to_transformer() updated to be able to refine while loop
+  * transformers on exit as DO loops are refined.
+  *
   * Revision 1.61  2003/07/24 10:54:37  irigoin
   * More debugging messages, more normalization steps, handling of
   * unstructured statements moved into usntructured.c.
@@ -1122,7 +1126,9 @@ transformer statement_to_transformer(
   instruction i = statement_instruction(s);
   list e = NIL;
   transformer t = transformer_undefined;
-  transformer te = transformer_undefined;
+  transformer ot = transformer_undefined; /* old transformer for s */
+  transformer nt = transformer_undefined; /* new transformer for s under spre */
+  transformer te = transformer_undefined; /* nt updated with loop exit information */
   transformer pre = transformer_undefined;
 
   pips_debug(8,"begin for statement %03d (%d,%d) with precondition %p:\n",
@@ -1137,9 +1143,19 @@ transformer statement_to_transformer(
   pips_assert("spre is a consistent precondition",
 	      transformer_consistent_p(spre));
 
-  if(get_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT")) 
+  if(get_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT")) {
     pre = transformer_undefined_p(spre)? transformer_identity() : 
-    transformer_range(spre);
+      transformer_range(spre);
+    if(refine_transformers_p) {
+      /* Transformation REFINE_TRANSFORMERS is being executed: add
+         information available from the statement precondition */
+      transformer srpre = load_statement_precondition(s);
+      transformer srpre_r = transformer_range(srpre);
+      
+      pre = transformer_domain_intersection(pre, srpre_r);
+      free_transformer(srpre_r);
+    }
+  }
   else
     pre = transformer_undefined;
 
@@ -1152,36 +1168,73 @@ transformer statement_to_transformer(
   }
 
   e = load_cumulated_rw_effects_list(s);
-  t = load_statement_transformer(s);
+  ot = load_statement_transformer(s);
 
   /* it would be nicer to control warning_on_redefinition */
-  if (t == transformer_undefined) {
-    t = instruction_to_transformer(i, pre, e);
+  if (transformer_undefined_p(ot)
+      || get_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT")) {
+    nt = instruction_to_transformer(i, pre, e);
 
     /* add array references information using proper effects */
     if(get_bool_property("SEMANTICS_TRUST_ARRAY_REFERENCES")) {
-      transformer_add_reference_information(t, s);
-      /* t = transformer_normalize(t, 0); */
+      transformer_add_reference_information(nt, s);
+      /* nt = transformer_normalize(nt, 0); */
     }
-    /* t = transformer_normalize(t, 7); */
-    t = transformer_normalize(t, 4);
+    /* nt = transformer_normalize(nt, 7); */
+    nt = transformer_normalize(nt, 4);
 
-    if(!transformer_consistency_p(t)) {
+    if(!transformer_consistency_p(nt)) {
       int so = statement_ordering(s);
       (void) fprintf(stderr, "statement %03d (%d,%d):\n",
 		     statement_number(s),
 		     ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
       /* (void) print_transformer(load_statement_transformer(s)); */
-      (void) print_transformer(t);
-      dump_transformer(t);
+      (void) print_transformer(nt);
+      dump_transformer(nt);
       pips_internal_error("Inconsistent transformer detected\n");
     }
     ifdebug(1) {
       pips_assert("Transformer is internally consistent",
-		  transformer_internal_consistency_p(t));
+		  transformer_internal_consistency_p(nt));
     }
 
-    store_statement_transformer(s, t);
+    /* When the statement is virtually replicated via control nodes, the
+       statement transformer is the convex hull of all its replicate
+       transformers. */
+    if(transformer_undefined_p(ot)) {
+      t = copy_transformer(nt);
+    }
+    else {
+      /* This implies that transformers are computed in context and that
+         we are dealing with a non-deterministic unstructured with several
+         nodes for a unique statement. */
+      t = transformer_convex_hull(nt, ot);
+
+      ifdebug(1) {
+	pips_assert("transformers are computed in context",
+		    get_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT"));
+	pips_debug(1, "Convex hull for transformer of statement  %03d (%d,%d)\n",
+		   statement_number(s), ORDERING_NUMBER(statement_ordering(s)), 
+		   ORDERING_STATEMENT(statement_ordering(s)));
+	pips_debug(1, "Previous transformer:\n");
+	(void) print_transformer(ot);
+	pips_debug(1, "New transformer:\n");
+	(void) print_transformer(nt);
+	pips_debug(1, "Resulting transformer:\n");
+	(void) print_transformer(t);
+      }
+    }
+
+    /* store or update the statement transformer */
+    if(transformer_undefined_p(ot)) {
+      store_statement_transformer(s, t);
+    }
+    else {
+      transformer_free(ot);
+       update_statement_transformer(s, t);
+      /* delete_statement_transformer(s); */
+      /* store_statement_transformer(s, t); */
+    }
   }
   else {
     user_warning("statement_to_transformer","redefinition for statement %03d (%d,%d)\n",
@@ -1202,6 +1255,11 @@ transformer statement_to_transformer(
     pips_assert("same pointer", stf==t);
   }
 
+  /* The transformer returned for the statement is not always the
+     transformer stored for the statement. This happens for loops and for
+     context sensitive transformers for replicated statements in
+     CFG/unstructured. */
+
   /* If i is a loop, the expected transformer can be more complex (see
      nga06) because the stores transformer is later used to compute the
      loop body precondition. It cannot take into account the exit
@@ -1213,10 +1271,13 @@ transformer statement_to_transformer(
     /* The refined transformer may be lost or stored as a block
        transformer is the loop is directly surrounded by a bloc or used to
        compute the transformer of the surroundings blokcs */
-    te = refine_loop_transformer(t, pre, instruction_loop(i));
+    te = refine_loop_transformer(nt, pre, instruction_loop(i));
+  }
+  else if(instruction_whileloop_p(i)) {
+    te = refine_whileloop_transformer(nt, pre, instruction_whileloop(i));
   }
   else {
-    te = t;
+    te = nt;
   }
 
   free_transformer(pre);
@@ -1226,9 +1287,9 @@ transformer statement_to_transformer(
 		all_statements_defined_p(s));
   }
 
-  pips_debug(8,"end for statement %03d (%d,%d) with t=%p and te=%p\n",
+  pips_debug(8,"end for statement %03d (%d,%d) with t=%p, nt=%p and te=%p\n",
 	     statement_number(s), ORDERING_NUMBER(statement_ordering(s)), 
-	     ORDERING_STATEMENT(statement_ordering(s)), t, te);
+	     ORDERING_STATEMENT(statement_ordering(s)), t, nt, te);
 
   return te;
 }
