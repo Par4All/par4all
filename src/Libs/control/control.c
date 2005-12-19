@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 2005/12/09 17:27:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 2005/12/19 15:37:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_control_control[] = "%A% ($Date: 2005/12/09 17:27:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_control_control[] = "%A% ($Date: 2005/12/19 15:37:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* - control.c
@@ -31,6 +31,12 @@ char vcid_control_control[] = "%A% ($Date: 2005/12/09 17:27:27 $, ) version $Rev
  * $Id$
  *
  * $Log: control.c,v $
+ * Revision 1.43  2005/12/19 15:37:56  irigoin
+ * New functions added to convert a for loop into a loop (i.e. a DO
+ * loop). These functions are not called by default. They are not completed
+ * but only target rsp05.c for the time being. This installation takes place
+ * to let Fabien Coelho move PIPS source code version management from RCS to SVN.
+ *
  * Revision 1.42  2005/12/09 17:27:27  irigoin
  * Conversion of C for loops into C or Fortran while loops added
  *
@@ -808,6 +814,193 @@ statement forloop_inc(statement sl)
   return is;
 }
 
+static bool init_expression_to_index_and_initial_bound(expression init,
+						       entity * pli,
+						       expression * plb)
+{
+  bool success = FALSE;
+  syntax init_s = expression_syntax(init);
+
+  pips_debug(5, "Begin\n");
+
+  if(syntax_call_p(init_s)) {
+    call c = syntax_call(init_s);
+    entity op = call_function(c);
+
+    if(ENTITY_ASSIGN_P(op)) {
+      expression lhs = EXPRESSION(CAR(call_arguments(c)));
+      syntax lhs_s = expression_syntax(lhs);
+      if(syntax_reference_p(lhs_s)) {
+	reference r = syntax_reference(lhs_s);
+	entity li = reference_variable(r);
+	type lit = entity_type(li);
+
+	if(ENDP(reference_indices(r)) /* scalar reference */
+	   && type_variable_p(lit) 
+	   && basic_int_p(variable_basic(type_variable(lit)))) {
+	  *pli = li;
+	  /* To avoid sharing and intricate free operations */
+	  *plb = copy_expression(EXPRESSION(CAR(CDR(call_arguments(c)))));
+	  success = TRUE;
+	}
+      }
+    }
+  }
+
+  ifdebug(5) {
+    if(success) {
+      pips_debug(5, "End with loop index %s and init expression:\n", entity_local_name(*pli));
+      print_expression(*plb);
+    }
+    else {
+      pips_debug(5, "End: DO conversion failed with initialization expression\n");
+    }
+  }
+
+  return success;
+}
+
+/* Depending on cond, the so-called upper bound may end up being a lower
+   bound with a decreasing steop loop. */
+static bool condition_expression_to_final_bound(expression cond,
+						entity li,
+						bool* p_is_upper_p,
+						bool* p_is_lower_p,
+						expression * pub)
+{
+  bool success = FALSE;
+  syntax cond_s = expression_syntax(cond);
+  bool strict_p = FALSE;
+
+  ifdebug(5) {
+    pips_debug(5, "Begin with expression\n");
+    print_expression(cond);
+  }
+
+  if(syntax_call_p(cond_s)) {
+    call c = syntax_call(cond_s);
+    entity op = call_function(c);
+
+    /* Four operators are accepted */
+    if (ENTITY_LESS_THAN_P(op) || ENTITY_LESS_OR_EQUAL_P(op)
+	|| ENTITY_GREATER_THAN_P(op) || ENTITY_GREATER_OR_EQUAL_P(op)) {
+      expression e1 = EXPRESSION(CAR(call_arguments(c)));
+      expression e2 = EXPRESSION(CAR(CDR(call_arguments(c))));
+      syntax e1_s = expression_syntax(e1);
+      syntax e2_s = expression_syntax(e2);
+
+      strict_p = ENTITY_LESS_THAN_P(op) || ENTITY_GREATER_THAN_P(op);
+
+      if(syntax_reference_p(e1_s) && reference_variable(syntax_reference(e1_s))==li) {
+	*pub = copy_expression(e2);
+	*p_is_upper_p = ENTITY_LESS_THAN_P(op) || ENTITY_LESS_OR_EQUAL_P(op);
+	success = TRUE;
+      }
+      else if(syntax_reference_p(e2_s) && reference_variable(syntax_reference(e2_s))==li) {
+	*pub = copy_expression(e1);
+	*p_is_lower_p = ENTITY_GREATER_THAN_P(op) || ENTITY_GREATER_OR_EQUAL_P(op);
+	success = TRUE;
+      }
+    }
+  }
+
+  ifdebug(5) {
+    if(success) {
+      pips_debug(5, "End with expression\n");
+      print_expression(cond);
+      pips_debug(5, "Loop counter is increasing: %s\n", bool_to_string(*p_is_upper_p))
+	pips_debug(5, "Loop condition is strict: %s\n", bool_to_string(*p_is_lower_p))
+	}
+    else {
+      pips_debug(5, "End: no final bound available\n");
+    }
+  }
+
+  return success;
+}
+
+static bool incrementation_expression_to_increment(expression incr,
+						   entity li,
+						   bool * is_increasing_p,
+						   bool * is_decreasing_p,
+						   expression * pincrement)
+{
+  bool success = FALSE;
+  syntax incr_s = expression_syntax(incr);
+
+  if(syntax_call_p(incr_s)) {
+    call incr_c = syntax_call(incr_s);
+    entity op = call_function(incr_c);
+
+    if((ENTITY_POST_INCREMENT_P(op) || ENTITY_PRE_INCREMENT_P(op))
+       && is_expression_reference_to_entity_p(EXPRESSION(CAR(call_arguments(incr_c))), li)) {
+      * is_increasing_p = TRUE;
+      * pincrement = int_to_expression(1);
+      success = TRUE;
+    }
+    else if((ENTITY_POST_DECREMENT_P(op) || ENTITY_PRE_DECREMENT_P(op))
+       && is_expression_reference_to_entity_p(EXPRESSION(CAR(call_arguments(incr_c))), li)) {
+      * is_decreasing_p = TRUE;
+      * pincrement = int_to_expression(-1);
+      success = TRUE;
+    }
+  }
+
+  return success;
+}
+
+static loop for_to_do_loop_conversion(expression init,
+				      expression cond,
+				      expression incr,
+				      statement body)
+{
+  loop l = loop_undefined;
+  entity li = entity_undefined; /* loop index */
+  range lr = range_undefined; /* loop bound and increment expressions */
+  expression lb = expression_undefined;
+  expression ub = expression_undefined;
+  expression increment = expression_undefined;
+
+  /* Pattern checked:
+
+   * The init expression is an assignment to an integer scalar (not fully necessary)
+     It failed on the first submitted for loop which had two assignments as
+     initialization steap. One of the them was the loop index assignment.
+     More work is needed to retrieve all DO loops programmed as for loops.
+
+   * The condition is a relational operation with the index
+
+   * The incrementation expression does not really matter as long as it
+   * updates the loop index.
+
+   */
+
+  if(init_expression_to_index_and_initial_bound(init, &li, &lb)) {
+      bool is_lower_p = FALSE;
+      bool is_upper_p = FALSE;
+
+    if(condition_expression_to_final_bound(cond, li, &is_upper_p, &is_lower_p, &ub)) {
+      bool is_increasing_p = FALSE;
+      bool is_decreasing_p = FALSE;
+
+      if(incrementation_expression_to_increment(incr, li, &is_increasing_p,
+						&is_decreasing_p, &increment)) {
+	if(is_lower_p && is_increasing_p)
+	  pips_user_warning("Loop with lower bound and increasing index %s\n",
+			    entity_local_name(li));
+	if(is_upper_p && is_decreasing_p)
+	  pips_user_warning("Loop with upper bound and decreasing index %s\n",
+			    entity_local_name(li));
+	lr = make_range(lb, ub, increment);
+	l = make_loop(li, lr, body, entity_empty_label(),
+		      make_execution(is_execution_sequential, UU), NIL);
+      }
+    }
+  }
+
+  return l;
+}
+
 static sequence for_to_while_loop_conversion(expression init,
 					     expression cond,
 					     expression incr,
@@ -907,21 +1100,36 @@ control pred, succ;
 control c_res;
 hash_table used_labels;
 {
-    hash_table loop_used_labels = hash_table_make(hash_string, 0);
-    control c_body = make_conditional_control(forloop_body(l));
-    control c_inc = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
-    control c_test = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
-    bool controlized = FALSE; /* To avoid gcc warning about possible
-                                 non-initialization */
+  hash_table loop_used_labels = hash_table_make(hash_string, 0);
+  control c_body = make_conditional_control(forloop_body(l));
+  control c_inc = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
+  control c_test = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
+  bool controlized = FALSE; /* To avoid gcc warning about possible
+			       non-initialization */
 
-    pips_debug(5, "(st = %p, pred = %p, succ = %p, c_res = %p)\n",
-	       st, pred, succ, c_res);
+  pips_debug(5, "(st = %p, pred = %p, succ = %p, c_res = %p)\n",
+	     st, pred, succ, c_res);
     
-    controlize(forloop_body(l), c_test, c_inc, c_body, loop_used_labels);
+  controlize(forloop_body(l), c_test, c_inc, c_body, loop_used_labels);
 
-    if (covers_labels_p(forloop_body(l),loop_used_labels)) {
-      instruction ni = instruction_undefined;
+  if (covers_labels_p(forloop_body(l),loop_used_labels)) {
+    instruction ni = instruction_undefined;
 
+    /* Try an unsafe conversion to a Fortran style DO loop: it assumes
+       that the loop body does not define the loop index, but effects are
+       not yet available when the controlizer is run. */
+    if(get_bool_property("FOR_TO_DO_LOOP_IN_CONTROLIZER")) {
+	loop new_l = for_to_do_loop_conversion(forloop_initialization(l),
+						  forloop_condition(l),
+						  forloop_increment(l),
+						  control_statement(c_body));
+
+	if(!loop_undefined_p(new_l))
+	  ni = make_instruction(is_instruction_loop, new_l);
+    }
+
+    /* If the DO conversion has failed, the WHILE conversion may be requested */
+    if(instruction_undefined_p(ni)) {
       if(get_bool_property("FOR_TO_WHILE_LOOP_IN_CONTROLIZER")) {
 	sequence wls = for_to_while_loop_conversion(forloop_initialization(l),
 						    forloop_condition(l),
@@ -943,55 +1151,56 @@ hash_table used_labels;
 
 	ni = make_instruction(is_instruction_forloop, new_l);
       }
-      
-      gen_remove(&control_successors(c_body), c_res);
-      gen_remove(&control_predecessors(c_body), c_res);
-      gen_remove(&control_predecessors(c_res), c_body);
-      
-      UPDATE_CONTROL(c_res,
-		     make_statement(statement_label(st),
-				    statement_number(st),
-				    STATEMENT_ORDERING_UNDEFINED,
-				    statement_comments(st),
-				    ni, NIL, NULL),
-		     ADD_PRED(pred, c_res),
-		     ADD_SUCC(succ, c_res )) ;
-      controlized = FALSE;
-      control_predecessors(succ) = ADD_PRED(c_res, succ);
     }
-    else 
-      {
-	/* NN : I do not know how to deal with this, the following code does not always work 
+
+    gen_remove(&control_successors(c_body), c_res);
+    gen_remove(&control_predecessors(c_body), c_res);
+    gen_remove(&control_predecessors(c_res), c_body);
+      
+    UPDATE_CONTROL(c_res,
+		   make_statement(statement_label(st),
+				  statement_number(st),
+				  STATEMENT_ORDERING_UNDEFINED,
+				  statement_comments(st),
+				  ni, NIL, NULL),
+		   ADD_PRED(pred, c_res),
+		   ADD_SUCC(succ, c_res )) ;
+    controlized = FALSE;
+    control_predecessors(succ) = ADD_PRED(c_res, succ);
+  }
+  else 
+    {
+      /* NN : I do not know how to deal with this, the following code does not always work 
 	   
-	   pips_internal_error("Forloop with goto not implemented yet\n");*/
+	 pips_internal_error("Forloop with goto not implemented yet\n");*/
 	
-	control_statement(c_test) = forloop_test(st);
-	control_predecessors(c_test) =
-	  CONS(CONTROL, c_res, CONS(CONTROL, c_inc, NIL)),
-	  control_successors(c_test) =
-	  CONS(CONTROL, succ, CONS(CONTROL, c_body, NIL));
-	control_statement(c_inc) = forloop_inc(st);
-	control_successors(c_inc) = CONS(CONTROL, c_test, NIL);
-	UPDATE_CONTROL(c_res,
-		       forloop_header(st),
-		       ADD_PRED(pred, c_res),
-		       CONS(CONTROL, c_test, NIL));
-	controlized = TRUE ;
-	control_predecessors(succ) = ADD_PRED(c_test, succ);
+      control_statement(c_test) = forloop_test(st);
+      control_predecessors(c_test) =
+	CONS(CONTROL, c_res, CONS(CONTROL, c_inc, NIL)),
+	control_successors(c_test) =
+	CONS(CONTROL, succ, CONS(CONTROL, c_body, NIL));
+      control_statement(c_inc) = forloop_inc(st);
+      control_successors(c_inc) = CONS(CONTROL, c_test, NIL);
+      UPDATE_CONTROL(c_res,
+		     forloop_header(st),
+		     ADD_PRED(pred, c_res),
+		     CONS(CONTROL, c_test, NIL));
+      controlized = TRUE ;
+      control_predecessors(succ) = ADD_PRED(c_test, succ);
 	
 	
-      }
-    add_proper_successor_to_predecessor(pred, c_res);
-    /* control_successors(pred) = ADD_SUCC(c_res, pred); */
+    }
+  add_proper_successor_to_predecessor(pred, c_res);
+  /* control_successors(pred) = ADD_SUCC(c_res, pred); */
     
-    ifdebug(5) check_control_coherency(c_res);
+  ifdebug(5) check_control_coherency(c_res);
     
-    union_used_labels( used_labels, loop_used_labels);
-    hash_table_free(loop_used_labels);
+  union_used_labels( used_labels, loop_used_labels);
+  hash_table_free(loop_used_labels);
     
-    pips_debug(5, "Exiting\n");
+  pips_debug(5, "Exiting\n");
     
-    return(controlized);
+  return(controlized);
 }
 
 
