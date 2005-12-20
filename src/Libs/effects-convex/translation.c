@@ -1175,21 +1175,27 @@ static boolean arrays_same_ith_dimension_p(int i)
 	    
 	    c = contrainte_make(vect_substract(v1,v2));
 
-	    /* if dimensions are declared with common variables,
-	     * several entities represent the same value/location.
-	     * this must be dealt with somewhere! 
-	     * maybe this should be handled in some other place?
-	     */
-	    simplify_common_variables(c);
-
-	    ifdebug(9) {
-	      pips_debug(9, "linear case: ");
-	      egalite_debug(c);
+	    if (CONTRAINTE_NULLE_P(c))
+	      same_dim = TRUE;
+	    else { 
+	      
+	      /* if dimensions are declared with common variables,
+	       * several entities represent the same value/location.
+	       * this must be dealt with somewhere! 
+	       * maybe this should be handled in some other place?
+	       */
+	      simplify_common_variables(c);
+	      
+	      ifdebug(9) {
+		pips_debug(9, "linear case: ");
+		egalite_debug(c);
+	      }
+	      
+	      same_dim = eq_redund_with_sc_p(get_translation_context_sc(), c);
 	    }
-
-	    same_dim = eq_redund_with_sc_p(get_translation_context_sc(), c);
+      
 	    if (statistics_p && !same_dim)
-		common_dimension_stat.not_same_decl++;
+	      common_dimension_stat.not_same_decl++;
 	    vect_rm(v1);
 	    vect_rm(v2);
 	    contrainte_free(c);
