@@ -466,33 +466,47 @@ list exprs;
 tag act;
 transformer context;
 {
-    list le = NIL, lep;
-    expression exp = EXPRESSION(CAR(exprs));
+  list le = NIL;
+  debug(5, "comp_regions_of_io_list", "begin\n");
+  while (!ENDP(exprs))
+    {
+      expression exp = EXPRESSION(CAR(exprs));
+      list lep = NIL;
+	
+      /* There is a bug with effects of io list  
+       
+	 READ *,N,(T(I),I=1,N)
 
-    debug(5, "comp_regions_of_io_list", "begin\n");
+	 there is write effect on N but for the io list, 
+	 we don't have this effect !
+       
+	 Cause : there is no loop for the list exprs !!! /NN:2000/ */
 
-    if (expression_implied_do_p(exp)) {
+      if (expression_implied_do_p(exp)) {
 	lep = comp_regions_of_implied_do(exp, act, context);
-    }
-    else {
+      }
+      else {
 	if (act == is_action_write) {
-	    syntax s = expression_syntax(exp);
+	  syntax s = expression_syntax(exp);
 
-	    debug(6, "comp_regions_of_io_list", "is_action_write");
-	    pips_assert("comp_regions_of_iolist", syntax_reference_p(s));
-	    lep = comp_regions_of_write(syntax_reference(s), context);
+	  debug(6, "comp_regions_of_io_list", "is_action_write");
+	  pips_assert("comp_regions_of_iolist", syntax_reference_p(s));
+	  lep = comp_regions_of_write(syntax_reference(s), context);
 	}
 	else {	
-	    debug(6, "comp_regions_of_io_elem", "is_action_read");
-	    lep = comp_regions_of_expression(exp, context);
+	  debug(6, "comp_regions_of_io_elem", "is_action_read");
+	  lep = comp_regions_of_expression(exp, context);
 	}
+      }
+      
+      le = CompRegionsExactUnion(le, lep, regions_same_action_p);
+      
+      exprs = CDR(exprs);
     }
 
-    le = CompRegionsExactUnion(le, lep, regions_same_action_p);
+  debug(5, "comp_regions_of_io_list", "end\n");
 
-    debug(5, "comp_regions_of_io_list", "end\n");
-
-    return(le);
+  return(le);
 }
 /*}}}*/
 /*{{{  comp_regions_of_implied_do*/
