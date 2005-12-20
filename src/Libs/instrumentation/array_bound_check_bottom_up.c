@@ -943,6 +943,8 @@ static void bottom_up_abc_statement_rwt(
 { 
   instruction i = statement_instruction(s);
   tag t = instruction_tag(i); 
+  statement stmt2;
+
   ifdebug(2) 
     {
       pips_debug(2, "\n Current statement");
@@ -953,7 +955,14 @@ static void bottom_up_abc_statement_rwt(
     case is_instruction_call:
       {	
 	call cal = instruction_call(i);
-	array_dimension_bound_test adt = bottom_up_abc_call(cal);
+	array_dimension_bound_test adt;
+
+        if ((stmt2 = cstr_args_check(s)) != statement_undefined) {
+          printf("Insertion d'un statement ---->\n");
+          bottom_up_abc_insert_before_statement(s, stmt2, context);
+        }
+
+	adt = bottom_up_abc_call(cal);
 	if (!array_dimension_bound_test_undefined_p(adt))
 	  { 	   
 	    statement seq = make_bottom_up_abc_tests(adt);	
@@ -1069,9 +1078,781 @@ bool array_bound_check_bottom_up(char *module_name)
   return TRUE;
 }
 
+/*
+ * Insert checks for C string manipulation functions (str*).
+ */
 
+#define cf_ge_expression(e1, e2) \
+    ( 1 ? binary_intrinsic_expression(">=", e1, e2) : ge_expression(e1, e2) )
 
+#define cf_gt_expression(e1, e2) \
+    ( 1 ? binary_intrinsic_expression(">", e1, e2) : gt_expression(e1, e2) )
 
+#define cf_lt_expression(e1, e2) \
+    ( 1 ? binary_intrinsic_expression("<", e1, e2) : lt_expression(e1, e2) )
 
+#define cf_and_expression(e1, e2) \
+    ( 1 ? binary_intrinsic_expression("&&", e1, e2) : and_expression(e1, e2) )
 
+#define cf_or_expression(e1, e2) \
+    ( 1 ? binary_intrinsic_expression("||", e1, e2) : or_expression(e1, e2) )
+
+static expression
+make_bin_expression(string name, expression e1, expression e2)
+{
+    entity add_ent = gen_find_entity(name);
+
+    return make_call_expression(add_ent, 
+            CONS(EXPRESSION, e1, CONS(EXPRESSION, e2, NIL)));
+}
+
+#define make_add_expression(e1, e2) make_bin_expression("TOP-LEVEL:+", e1, e2)
+#define make_sub_expression(e1, e2) make_bin_expression("TOP-LEVEL:-", e1, e2)
+#define make_mul_expression(e1, e2) make_bin_expression("TOP-LEVEL:*", e1, e2)
+
+static expression
+make_strlen_expression(expression arg)
+{
+    entity strlen_ent;
+
+    strlen_ent = gen_find_entity("TOP-LEVEL:strlen");
+    return make_call_expression(strlen_ent, CONS(EXPRESSION, arg, NIL));
+}
+
+static statement
+make_c_stop_statement(int abort_program)
+{
+    /*
+     * XXX 'entity_intrinsic' not verified ...
+     * Pourtant exit() et abort() sont déclarés ds bootstrap.c
+     */
+#if 0
+    list l = NIL;
+    string stop_func;
+
+    if (abort_program)
+        stop_func = "TOP-LEVEL:abort";
+    else
+        stop_func = "TOP-LEVEL:exit";
+
+    l = CONS(STATEMENT, make_call_statement(stop_func,
+                        CONS(EXPRESSION, int_to_expression(1), NIL),
+                        entity_undefined, ""),
+        l);
+
+    /*
+    if (get_bool_property("PROGRAM_VERIFICATION_WITH_PRINT_MESSAGE")) {
+        l = CONS(STATEMENT, make_call_statement("TOP-LEVEL:printf",
+                            CONS(EXPRESSION, string_to_expression(), NIL)
+                            entity_undefined, ""),
+            l);
+    }
+    */
+
+    return make_block_statement(l);
+#endif
+    return make_stop_statement("Buffer overflow!");
+}
+
+static int
+list_length(list l)
+{
+    int s = 0;
+
+    while (!ENDP(l)) {
+        l = CDR(l);
+        s++;
+    }
+    return s;
+}
+
+/*
+ * entity_constant_string_size:
+ *
+ *  If the given entity is representing a constant string, this
+ *  function will return it's length as a positive integer, else
+ *  -1 will be returned.
+ */
+static int
+entity_constant_string_size(entity e)
+{
+     basic b;
+     type t, result;
+     value v;
+     constant c;
+
+     t = entity_type(e);
+     if (type_functional_p(t)
+        && type_variable_p((result = functional_result(type_functional(t))))
+        && basic_string_p((b = variable_basic(type_variable(result))))
+        && value_constant_p((v = basic_string(b)))
+        && constant_int_p((c = value_constant(v))))
+         return constant_int(c);
+     return -1;    
+}
+
+/*
+ * entity_size_uname:
+ *
+ *  Return a string usable as a unique global variable name for
+ *  the given entity.
+ */
+static string
+entity_size_uname(entity e)
+{
+    string name = entity_name(e);
+    string uname;
+    int i, len = strlen(name);
+
+    if ((uname = malloc(len + 12)) == NULL) {
+        perror("malloc");
+        exit(1);
+    }
+    sprintf(uname, "PIPS_size_%s", name);
+    len = strlen(uname);
+    for (i = 0; i < len; i++) {
+        if (uname[i] == ':' || uname[i] == '-') {
+            uname[i] = '_';
+        }
+    }
+    return uname;
+}
+
+/*
+ * expression_try_find_size:
+ *
+ * Try to find the storage size available for the given expression.
+ */
+static expression
+expression_try_find_size(expression expr)
+{
+    syntax syn = expression_syntax(expr);
+
+    /*
+     * Case of a reference.
+     *
+     * Try to find the size of the corresponding buffer.
+     */
+    if (expression_reference_p(expr)) {
+        reference ref = syntax_reference(syn);
+        entity e = reference_variable(ref);
+        int s;
+
+        if (type_variable_p(entity_type(e))) {
+            variable var = type_variable(entity_type(e));
+            entity size_holder;
+            string e_uname;
+            list dims = variable_dimensions(var);
+            list acc = reference_indices(ref);
+
+            while (1) {
+                if (ENDP(acc) && !ENDP(dims)) {
+                    /*
+                     * We found the upper bound of the given
+                     * expression, we need to add one to get the
+                     * size of the buffer
+                     */
+                    expression upper_bound =
+                            dimension_upper(DIMENSION(CAR(dims)));
+
+                    if (expression_constant_p(upper_bound)) {
+                        return int_to_expression(1
+                                    + expression_to_int(upper_bound));
+                    } else
+                        return make_add_expression(upper_bound,
+                                                int_to_expression(1));
+                } else if (!ENDP(acc) && !ENDP(dims)) {
+                    acc = CDR(acc);
+                    dims = CDR(dims);
+                }
+                else
+                    break;
+            }
+            /*
+             * The memory pointed by the variable was probably
+             * allocated by malloc() (or a similar function).
+             */
+            e_uname = entity_size_uname(e);
+            size_holder = gen_find_entity(make_entity_fullname(
+                            // XXX ? marche pas ...
+                            //STATIC_AREA_LOCAL_NAME, e_uname));
+                            "main", e_uname));
+            free(e_uname);
+            if (size_holder == entity_undefined)
+                return expression_undefined;
+            else
+                return make_entity_expression(size_holder, NIL);
+        }
+        /* The expression is a string constant */
+        else if ((s = entity_constant_string_size(e)) >= 0)
+            return int_to_expression(s);
+    }
+
+    /*
+     * The expression is a function call.
+     *
+     * Only two forms are acceptable here:  base + x, or base - y.
+     */
+    else if (expression_call_p(expr)) {
+        call cal = syntax_call(syn);
+        entity fun = call_function(cal);
+        string fun_name = entity_name(fun);
+        list args = call_arguments(cal);
+        expression base, base_size, x;
+
+        if (strcmp(fun_name, "TOP-LEVEL:+C") == 0) {
+            base = EXPRESSION(CAR(args));
+            x = EXPRESSION(CAR(CDR(args)));
+            base_size = expression_try_find_size(base);
+            if (base_size == expression_undefined)
+                return expression_undefined;
+            else
+                return make_sub_expression(base_size, x);
+        } else // XXX traiter le cas de fonctions imbriquées !
+            return expression_undefined;
+    }
+
+    return expression_undefined;
+}
+
+/*
+ * expression_try_find_string_size:
+ *
+ *  Try to find the size of the string pointed by the given
+ *  expression.  The function will return an expression holding
+ *  the length of the string in the case of a constant string or
+ *  a call to the strlen() function in the other cases.
+ *
+ *  The size returned does not include the trailing NUL
+ *  character.
+ */
+static expression
+expression_try_find_string_size(expression expr)
+{
+    entity e;
+    int s;
+
+    e = reference_variable(expression_reference(expr));
+    if (e != entity_undefined && (s = entity_constant_string_size(e)) >= 0)
+        return int_to_expression(s);
+    else
+        return make_strlen_expression(expr);
+}
+
+static expression
+array_indices_check(expression expr)
+{
+    reference ref;
+    entity e;
+    variable var;
+    list dims, acc;
+    expression check = expression_undefined, checktmp, indice;
+
+    if (!expression_reference_p(expr))
+        return expression_undefined;
+    else {
+        ref = syntax_reference(expression_syntax(expr));
+        e = reference_variable(ref);
+        if (!type_variable_p(entity_type(e)))
+            return expression_undefined;
+    }
+    var = type_variable(entity_type(e));
+    dims = variable_dimensions(var);
+    acc = reference_indices(ref);
+
+    while (1) {
+        if (!ENDP(acc) && !ENDP(dims)) {
+            /*
+             * We found the upper bound of the given
+             * expression, we need to add one to get the
+             * size of the buffer
+             */
+            expression upper_bound =
+                    dimension_upper(DIMENSION(CAR(dims)));
+
+            if (expression_constant_p(upper_bound)) {
+                upper_bound = int_to_expression(1
+                              + expression_to_int(upper_bound));
+            } else
+                upper_bound = make_add_expression(upper_bound, 
+                                    int_to_expression(1));
+
+            /*
+             * Create the check for the current dimension (checktmp):
+             *      indice < upper_bound
+             * Add it to the global check:
+             *      check := check && checktmp
+             */
+            indice = EXPRESSION(CAR(acc));
+            checktmp = cf_lt_expression(indice, upper_bound);
+            if (check == expression_undefined)
+                check = checktmp;
+            else
+                check = cf_and_expression(check, checktmp);
+
+            acc = CDR(acc);
+            dims = CDR(dims);
+        } else
+            break;
+    }
+    return check;
+}
+
+static expression
+array_check_add(expression array_expr, expression expr)
+{
+    expression check;
+
+    if ((check = array_indices_check(array_expr)) == expression_undefined)
+        return expr;
+    else
+        return cf_and_expression(check, expr);
+}
+
+#define CHECK_NARGS(n)  if (nargs != (n)) return expression_undefined
+
+/*
+ * Check for bcopy(src, dst, n):
+ *
+ *  n > size(src) || n > size(dst)  => same as memcpy()
+ */
+static expression
+bcopy_check_expression(expression args[], int nargs)
+{
+    CHECK_NARGS(3);
+    // The arguments order (for the two first) doesn't matter
+    return memcpy_check_expression(args, nargs);
+}
+
+/*
+ * Check for bcmp(b1, b2, n):
+ *
+ *  n > size(b1) || n > size(b2)  => same as memcpy()
+ */
+static expression
+bcmp_check_expression(expression args[], int nargs)
+{
+    CHECK_NARGS(3);
+    return memcpy_check_expression(args, nargs);
+}
+
+/*
+ * Check for bzero(dst, n):
+ *
+ *  n > size(dst)
+ */
+static expression
+bzero_check_expression(expression args[], int nargs)
+{
+    expression arg0_size_expr;
+
+    CHECK_NARGS(2);
+
+    arg0_size_expr = expression_try_find_size(args[0]);
+    if (arg0_size_expr == expression_undefined)
+        return expression_undefined;
+
+    return cf_gt_expression(args[1], arg0_size_expr);
+}
+
+/*
+ * Check for memcmp(b1, b2, n):
+ *
+ *  n > size(b1) || n > size(b2)    => same as memcpy()
+ */
+static expression
+memcmp_check_expression(expression args[], int nargs)
+{
+    CHECK_NARGS(3);
+    return memcpy_check_expression(args, nargs);
+}
+
+/*
+ * Check for memcpy(dst, src, n):
+ *
+ *  n > size(src) || n > size(dst)
+ */
+static expression
+memcpy_check_expression(expression args[], int nargs)
+{
+    expression arg0_size_expr, arg1_size_expr;
+    CHECK_NARGS(3);
+
+    arg0_size_expr = expression_try_find_size(args[0]);
+    arg1_size_expr = expression_try_find_size(args[1]);
+    if (arg0_size_expr == expression_undefined
+        || arg1_size_expr == expression_undefined)
+        return expression_undefined;
+    
+    return cf_or_expression(
+                cf_gt_expression(args[2], arg1_size_expr),
+                cf_gt_expression(args[2], arg0_size_expr));
+}
+
+/*
+ * Check for memmove(dst, src, n):
+ *
+ *  n > size(src) || n > size(dst) || abs(dst - src) < n
+ *  => same as bcopy(src, dst, n)
+ */
+static expression
+memmove_check_expression(expression args[], int nargs)
+{
+    expression tmp;
+    CHECK_NARGS(3);
+
+    /* Convert memmove(dst, src, n) -> bcopy(src, dest, n) */
+    tmp = args[0];
+    args[0] = args[1];
+    args[1] = tmp;
+    return bcopy_check_expression(args, nargs);
+}
+
+/*
+ * Check for memset(dst, val, n):
+ * 
+ *  n > size(dst)       => same as bzero().
+ */
+static expression
+memset_check_expression(expression args[], int nargs)
+{
+    CHECK_NARGS(3);
+
+    /* Convert memset(dst, b, n) -> bzero(dst, n) */
+    args[1] = args[2];
+    return bzero_check_expression(args, 2);
+}
+
+/*
+ * Check for strcpy(dst, src):
+ *
+ *  strlen(src) >= size(dst)
+ */
+static expression
+strcpy_check_expression(expression args[], int nargs)
+{
+    statement smt;
+    expression arg1_size_expr, arg2_size_expr;
+    entity arg2ent;
+    int arg2size;
+
+    CHECK_NARGS(2);
+
+    arg2ent = reference_variable(expression_reference(args[1]));
+    arg1_size_expr = expression_try_find_size(args[0]);
+    if (arg1_size_expr == expression_undefined)
+        return expression_undefined;
+
+    if ((arg2size = entity_constant_string_size(arg2ent)) >= 0)
+        arg2_size_expr = int_to_expression(arg2size);
+    else
+        arg2_size_expr = make_strlen_expression(args[1]);
+
+    return cf_ge_expression(expression_try_find_string_size(args[1]), arg1_size_expr);
+}
+
+/*
+ * Check for strncpy(dst, src, n):
+ *
+ *  n >= size(dst)
+ */
+static expression
+strncpy_check_expression(expression args[], int nargs)
+{
+    expression arg1_size_expr;
+
+    CHECK_NARGS(3);
+
+    arg1_size_expr = expression_try_find_size(args[0]);
+    if (arg1_size_expr == expression_undefined)
+        return expression_undefined;
+
+    return cf_ge_expression(args[2], arg1_size_expr);
+}
+
+/*
+ * Check for strcat(dst, src):
+ *
+ *  strlen(dst) + strlen(src) >= size(dst)
+ */
+static expression
+strcat_check_expression(expression args[], int nargs)
+{
+    expression dst_size;
+
+    CHECK_NARGS(2);
+
+    dst_size = expression_try_find_size(args[0]);
+    if (dst_size == expression_undefined)
+        return expression_undefined;
+
+    return cf_ge_expression(
+        make_add_expression(expression_try_find_string_size(args[0]),
+                            expression_try_find_string_size(args[1])),
+        dst_size);
+}
+
+/*
+ * Check for strncat(dst, src, n):
+ *
+ *  n >= size(dst) - strlen(dst)
+ */
+static expression
+strncat_check_expression(expression args[], int nargs)
+{
+    expression dst_size;
+
+    CHECK_NARGS(3);
+
+    dst_size = expression_try_find_size(args[0]);
+    if (dst_size == expression_undefined)
+        return expression_undefined;
+    return cf_ge_expression(args[2], make_sub_expression(dst_size,
+                                    expression_try_find_string_size(args[0])));
+}
+
+/*
+ * Check for sprintf(dst, fmt, ...):
+ *
+ *  snprintf(PIPS_tmpbuf, 1, fmt, ...) > size(dst)
+ *
+ * (snprintf return the size that would have been written in the
+ *  case of an infinite buffer).
+ */
+static expression
+sprintf_check_expression(expression args[], int nargs)
+{
+    int k;
+    list snprintf_args = NIL;
+    expression dst_size, tmpbuf_expr;
+    entity snprintf_ent, tmpbuf_ent;
+
+    if (nargs < 2)
+        return expression_undefined;
+
+    if ((snprintf_ent = gen_find_entity("TOP-LEVEL:snprintf"))
+                == entity_undefined)
+        return expression_undefined;
+
+    if ((tmpbuf_ent = gen_find_entity("main:PIPS_tmpbuf")) == entity_undefined)
+        // XXX module "main" non correct
+        tmpbuf_ent = make_scalar_entity("PIPS_tmpbuf", "main",
+                                                make_basic_int(1));
+    // XXX Il faut &PIPS_tmpbuf
+    tmpbuf_expr = make_entity_expression(tmpbuf_ent, NIL);
+    
+    for (k = nargs - 1; k >= 2; k--)
+        snprintf_args = CONS(EXPRESSION, args[k], snprintf_args);
+    snprintf_args = CONS(EXPRESSION, tmpbuf_expr,
+                    CONS(EXPRESSION, int_to_expression(1), snprintf_args));
+    
+    return cf_gt_expression(make_call_expression(snprintf_ent, snprintf_args),
+                            dst_size);
+}
+
+/*
+ * Check for snprintf(dst, n, fmt, ...):
+ *
+ *  n >= size(dst)      => same as strncpy(dst, src, n)
+ */
+static expression
+snprintf_check_expression(expression args[], int nargs)
+{
+    if (nargs < 3)
+        return expression_undefined;
+    args[2] = args[1];
+
+    return strncpy_check_expression(args, 3);
+}
+
+#undef CHECK_NARGS
+
+static struct checkfn {
+    string function;
+    expression (*check_statement)(expression *, int);
+} checkfns[] = {
+    { "bcopy", bcopy_check_expression },
+    { "bcmp", bcmp_check_expression },
+    { "bzero", bzero_check_expression },
+    { "memcmp", memcmp_check_expression },
+    { "memcpy", memcpy_check_expression },
+    { "memmove", memmove_check_expression },
+    { "memset", memset_check_expression },
+    { "strcpy", strcpy_check_expression },
+    { "strncpy", strncpy_check_expression },
+    { "strcat", strcat_check_expression },
+    { "strncat", strncat_check_expression },
+    { "sprintf", sprintf_check_expression },
+    { "snprintf", snprintf_check_expression },
+    { NULL, NULL }
+};
+
+/*
+ * Add instrumentation to memory allocation instructions:
+ *
+ *  m = malloc(n);    =>    m = malloc(n);
+ *                          PIPS_size_m = n;
+ *
+ * The relevant functions are:
+ *  malloc(), calloc(), memalign(), realloc()
+ */
+static statement
+alloc_instrumentation(expression args[], int nargs)
+{
+    expression size_expr, size_holder;
+    entity ptr, size_holder_ent;
+    string func_name, size_holder_name;
+    call func_call;
+    list func_args;
+    reference ref;
+    int func_nargs;
+
+    if (nargs != 2) {
+        return statement_undefined;
+    }
+
+    if (!expression_reference_p(args[0]) || !expression_call_p(args[1]))
+        return statement_undefined;
+
+    ref = syntax_reference(expression_syntax(args[0]));
+    ptr = reference_variable(ref);
+
+    /*
+     * Don't try to instrument if the pointer is an array access.
+     */
+    if (reference_indices(ref) != NIL)
+        return statement_undefined;
+
+    func_call = syntax_call(expression_syntax(args[1]));
+    func_name = entity_name(call_function(func_call));
+    func_args = call_arguments(func_call);
+    func_nargs = list_length(func_args);
+
+    if (strcmp(func_name, "TOP-LEVEL:malloc") == 0) {
+        if (func_nargs != 1)
+            return statement_undefined;
+        size_expr = EXPRESSION(CAR(func_args));
+    } else if (strcmp(func_name, "TOP-LEVEL:realloc") == 0
+     || strcmp(func_name, "TOP-LEVEL:memalign") == 0) {
+        if (func_nargs != 2)
+            return statement_undefined;
+        size_expr = EXPRESSION(CAR(CDR(func_args)));
+    } else if (strcmp(func_name, "TOP-LEVEL:calloc") == 0) {
+        if (func_nargs != 2)
+            return statement_undefined;
+        size_expr = make_call_expression(gen_find_entity("TOP-LEVEL:*"), 
+                                    func_args);
+    } else
+        return statement_undefined;
+
+    /*
+     * Create a new variable to hold the size of the allocated
+     * memory.
+     */
+    size_holder_name = entity_size_uname(ptr);
+    size_holder_ent = gen_find_entity(make_entity_fullname("main", 
+                                                size_holder_name));
+    if (size_holder_ent == entity_undefined) {
+        size_holder_ent = make_scalar_entity(size_holder_name,
+                                    // XXX ?? marche pas ...
+                                    //STATIC_AREA_LOCAL_NAME, make_basic_int(4));
+                                    "main", make_basic_int(4));
+    }
+    size_holder = make_entity_expression(size_holder_ent, NIL);
+
+    return make_assign_statement(size_holder, size_expr);
+}
+
+static statement
+cstr_args_check(statement s)
+{
+    instruction i = statement_instruction(s);
+    statement astmt;
+    expression expr, *argstab;
+    call cal;
+    list args;
+    string func_name;
+    int nargs = 0, k;
+    struct checkfn *p;
+
+    pips_assert("Statement is a call statmt.",
+                  instruction_tag(i) == is_instruction_call);
+
+    cal = instruction_call(i);
+    func_name = entity_name(call_function(cal));
+    printf("FONCTION: %s\n", func_name);
+
+    /* Convert the arguments list into an array */
+    args = call_arguments(cal);
+    nargs = list_length(args);
+    argstab = malloc(sizeof(expression) * nargs);
+    for (k = 0; k < nargs; k++) {
+        argstab[k] = EXPRESSION(CAR(args));
+        args = CDR(args);
+    }
+
+    /* Add malloc(), free(), etc. instrumentation */
+    if (strcmp(func_name, "TOP-LEVEL:=") == 0
+       && (astmt = alloc_instrumentation(argstab, nargs)) != statement_undefined) {
+        free(argstab);
+        return astmt;
+    /*
+     * free(m);     =>      PIPS_size_m = 0;
+     *                      free(m);
+     */
+    } else if (strcmp(func_name, "TOP-LEVEL:free") == 0) {
+        entity arg_ent, size_holder;
+        string e_uname;
+
+        free(argstab);
+
+        if (!expression_reference_p(argstab[0]))
+            return statement_undefined;
+        else {
+            arg_ent = reference_variable(syntax_reference(
+                                    expression_syntax(argstab[0])));
+            if (!type_variable_p(entity_type(arg_ent)))
+                return statement_undefined;
+        }
+        e_uname = entity_size_uname(arg_ent);
+        size_holder = gen_find_entity(make_entity_fullname(
+                        // XXX ? marche pas ...
+                        //STATIC_AREA_LOCAL_NAME, e_uname));
+                        "main", e_uname));
+        free(e_uname);
+        if (size_holder == entity_undefined)
+            return statement_undefined;
+        return make_assign_statement(make_entity_expression(size_holder, NIL),
+                                        int_to_expression(0));
+    }
+
+    if (strncmp(func_name, "TOP-LEVEL:", 10) != 0) {
+        free(argstab);
+        return statement_undefined;
+    }
+
+    expr = expression_undefined;
+    for (p = checkfns; p->function != NULL; p++) {
+        if (strcmp(p->function, func_name + 10) == 0) {
+            expr = (p->check_statement)(argstab, nargs);
+            break;
+        }
+    }
+
+    free(argstab);
+
+    if (expr == expression_undefined) {
+        put_a_comment_on_a_statement(s, "/*CHECK WAS NOT CREATED*/");
+        return statement_undefined;
+    }
+
+    /*
+     * Add checks for array indices when necessary.
+     */
+    for (k = 0; k < nargs; k++)
+        expr = array_check_add(argstab[k], expr);
+    return test_to_statement(make_test(expr,
+                                       make_c_stop_statement(0),
+                                       make_block_statement(NIL)));
+}
 
