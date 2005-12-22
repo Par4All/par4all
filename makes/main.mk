@@ -368,7 +368,7 @@ phase2: .build_shr
 $(SHR.d):; $(MKDIR) $(SHR.d)
 
 .build_shr: $(INSTALL_SHR) $(SHR.d)
-	$(INSTALL) -m 644 $(INSTALL_SHR) $(SHR.d)
+	$(INSTALL) -m 755 $(INSTALL_SHR) $(SHR.d)
 	touch $@
 
 clean: shr-clean
