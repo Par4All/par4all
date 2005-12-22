@@ -15,8 +15,7 @@ ETEXF =	ri.tex \
 	abc_private.tex \
 	alias_private.tex \
 	ubs_private.tex \
-	c_parser_private.tex \
-	ri_C.tex
+	c_parser_private.tex
 
 FTEXF =	complexity_ri.ftex \
 	database.ftex \
@@ -33,7 +32,7 @@ FTEXF =	complexity_ri.ftex \
 	hpf.ftex \
 	sac_private.ftex
 
-SOURCES = $(ETEXF) $(FTEXF) unstructured.idraw newgen_domain.sty
+SOURCES = $(ETEXF) $(FTEXF) unstructured.idraw newgen_domain.sty ri_C.tex
 
 NGENS =	$(ETEXF:.tex=.newgen) $(FTEXF:.ftex=.newgen)
 HEADS = $(NGENS:.newgen=.h)
