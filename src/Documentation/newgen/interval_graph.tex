@@ -1,0 +1,44 @@
+\documentclass[a4paper]{article}
+\usepackage{newgen_domain}
+
+\title{PIPS: Interval Graph}
+\author{Ronan KERYELL\\
+\\
+    CRI, Ecole des Mines de Paris}
+
+\begin{document}
+
+\maketitle
+
+\sloppy
+
+The interval graph is used at least in the hierarchical restructurer
+of the control graph in PIPS. This file defines the data structures
+used by the algorithm to build and represent the interval graphs
+embedding control flow graph.
+
+
+\section{Imported NewGen Types}
+
+Since the interval graph is on the control graph, import the following
+type:\\
+\domain{Import control from "ri.newgen"}
+{}
+
+\section{The Interval Graph}
+
+An interval graph is represented by a graph (from package ``graph''
+with \verb|interval_vertex_label| decorations. The first interval of the
+graph is the entry interval of the interval graph and the first
+control node of an interval is the entry control node of the interval.
+
+\subsection{Vertex Label of the Interval Graph}
+
+
+Each interval node of the graph contains a list of corresponding nodes
+in the control graph.
+
+\domain{interval\_vertex\_label = controls:control*}
+{}
+
+\end{document}
