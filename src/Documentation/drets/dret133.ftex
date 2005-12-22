@@ -1,4 +1,4 @@
-\documentstyle[12pt,figfonts]{article}
+\documentstyle[12pt]{article}
 %\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
 
 %\newcommand{\titre}{PIPSMAKE ET PIPSDBM \\
