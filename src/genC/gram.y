@@ -135,7 +135,7 @@ File	: GRAM_FILE {
 
 Definitions
 	: Definitions Definition
-	| Definition
+	|
 	;
 
 Definition
