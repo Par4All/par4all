@@ -1,0 +1,29 @@
+%%
+%% $Id$
+%%
+%% $Log: optimizer.tex,v $
+%% Revision 1.1  2005/12/22 14:32:19  coelho
+%% Initial revision
+%%
+%%
+
+\documentclass{article}
+\usepackage{newgen_domain}
+
+\title{}
+\author{Julien Zory \and Fabien Coelho \\ CRI, École des mines de Paris}
+
+\begin{document}
+\maketitle
+
+\domain{import entity from "ri.newgen"}
+\domain{import reference from "ri.newgen"}
+\domain{import expression from "ri.newgen"}
+
+\domain{operation = \{ condition , loop , assigns , exists \}}
+
+\domain{computation = reference x operation x expressions:expression* x depends:entity* x hash:int}
+
+\domain{nested_sequence = computations:computation*}
+
+\end{document}
