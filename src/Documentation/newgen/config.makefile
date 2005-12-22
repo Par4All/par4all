@@ -32,7 +32,8 @@ FTEXF =	complexity_ri.ftex \
 	hpf.ftex \
 	sac_private.ftex
 
-SOURCES = $(ETEXF) $(FTEXF) unstructured.idraw newgen_domain.sty ri_C.tex
+SOURCES = $(ETEXF) $(FTEXF) unstructured.idraw newgen_domain.sty \
+	ri_C.tex optimizer.c
 
 NGENS =	$(ETEXF:.tex=.newgen) $(FTEXF:.ftex=.newgen)
 HEADS = $(NGENS:.newgen=.h)
