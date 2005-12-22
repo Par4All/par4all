@@ -132,7 +132,7 @@ There are different solutions to handle the blocks:
   somewhere to regenerate code. There must have special separators and tables
   to interchange between the internal names and external names. Problem for
   debugging ?
-\item Dewey indexing for blocks (like trees). It is can be associated to
+\item Dewey indexing for blocks (like trees). It can be associated to
   the above solution ?
 \item Multiple symbol tables. Note: the actual solution, a unique symbol table for general
 "entity" may create problem when dealing with large-scale programs. 
@@ -365,6 +365,9 @@ Storage = ram
 Ram_function = current module 
 Ram_section = *DYNAMIC* area of current module
 \end{verbatim}
+The keyword \verb/auto/ is kept in variable qualifiers, presented in
+\ref{type_qualifiers}. 
+
 \subsection{Formal variables}
 Like formal variables in Fortran \cite{Coel01}. 
 \begin{verbatim}
@@ -394,6 +397,7 @@ information is not important, it is only used to regenerate the source
 code. So we only need to add this information some where in the type
 structure. A solution is presented in \ref{type_qualifiers}, together with
 \verb/const, volatile/ and \verb/restrict/.
+
 \newpage
 \section{Type}
 The type system of C is much more extended than Fortran 77's
@@ -543,7 +547,7 @@ added to \verb/basic/.
 
 \verb/basic +=  pointer:type/
 
-\subsubsection{Pointer to an integer}
+\subsubsection{Pointer to integers}
 \begin{verbatim}
 int *p1
 name = p1
@@ -554,6 +558,54 @@ type = variable
              basic = int
              dimension = NIL.
 \end{verbatim}
+with this dynamic allocation:
+\begin{verbatim}
+p = malloc(5*sizeof(int));
+\end{verbatim}
+to store the size of the corresponding memory zone, the dimension of the
+pointer can be changed to : 
+\begin{verbatim}
+int *p1
+name = p1
+type = variable
+   dimension = NIL
+   basic = pointer
+         pointer of type variable
+             basic = int
+             dimension =5.
+\end{verbatim}
+But how about the following case ?
+
+\subsubsection{Pointer to pointer}
+\begin{verbatim}
+char **p;
+p = malloc(n*sizeof(char *));
+for (i=0;i<n;i++)
+   p[i] = malloc((i+1)*sizeof(char));
+\end{verbatim}
+Initially, with the declaration, we have :
+\begin{verbatim}
+name = p
+type = variable
+   dimension = NIL
+   basic = pointer
+         pointer of type variable
+             basic = pointer of type variable (basic = int/char, dimension
+             = NIL)
+             dimension = NIL.
+\end{verbatim}
+After the first allocation, p points to an array of n pointers (attention
+to the scope of n):
+\begin{verbatim}
+             basic = pointer of type variable (basic = int/char, dimension
+             = NIL)
+             dimension = n.
+\end{verbatim}
+How to know the memory size pointed by this each pointer ? And the size is
+i-related ...? p[i] represents an entity or p only ? The zise of p[i] is
+lost  There is a particular case where (i+1) is replaced by m (arrays of
+same size), we can keep this information in dimension of the 2nd pointer. 
+
 \subsubsection{Pointer to an array}
 \verb/int (*p2)[13]/ is a pointer to an array of 13 integers
 \begin{verbatim}
@@ -844,11 +896,12 @@ can be found in SPEC 2000 benchmarks),  \verb/shared/ cannot be used for a
 formal variable declared \verb/restrict/.  
 
 We can add a new field \verb/qualifiers/ for \verb/type/, at the
-\verb/variable/ level. This qualifier can also contain the \verb/register/ case.
+\verb/variable/ level. This qualifier can also contain the \verb/register/
+and \verb/auto/ cases.
 
 \verb/variable = basic x dimensions x qualifiers:qualifier*/
 
-\verb/qualifier = const:unit+restrict:unit+volatile:unit+register:unit/
+\verb/qualifier = const:unit+restrict:unit+volatile:unit+register:unit+auto:unit/
 
 There are about 36 make\_variable in PIPS source code to modify.
 
@@ -1077,23 +1130,27 @@ The ISO C standard \cite{ISOC} states that
 the initialization of a for loop may contain variable declaration, which
 is not the case for \cite{Kern78}. 
 
-\subsubsection{Continue in Fortran and Null statement in C}
-These statements have the same semantics, so we can use the continue statement in
-Fortran to represent the null statement in C. We only need to make the
+\subsubsection{Null statement}
+Null statement in C is treated as CONTINUE statement in Fortran. We only need to make the
 differences at the prettyprinter level. 
 
-\subsubsection{Break, Continue, Exit, Return, Jump, Interruption}
-Add new kinds of instruction: 
+\subsubsection{Return statement}
+Return statement in C (return; or return (exp);) is treated as RETURN statement in Fortran, which is
+considered as nullary operator but can have 0 or 1 argument, such as the
+cases of STOP and PAUSE statements. 
 
-\verb/instruction += break + continue + return : expression/
+\subsubsection{Break, Continue, Exit, Jump, Interruption}
+
+We can add new kinds of instruction to handle break and continue: 
+
+\verb/instruction += break + continue /
 
 CIL says that leaving \verb/break/ and \verb/continue/ as they are  makes transformations such as code motion
 easier? The semantic difference between \verb/continue/ in Fortran and
 \verb/continue/ in C?
 
 Another solution is to treat \verb/break/ and \verb/continue/ as
-\verb/goto/. How about code regeneration ?  
-
+\verb/goto/, which is choosen as solution for the moment. How about code regeneration ?  
 
 \section*{Conclusion}
 \nocite{Kern78, Necu02}
@@ -1158,7 +1215,7 @@ basic = int:int + float:int + logical:int + overloaded:unit + complex:int
 + string:value + bit:int + pointer:type + derived:entity + typedef:entity;
 
 instruction = sequence + test + loop + whileloop + goto:statement + call +
-unstructured + forloop + return:expression + expression;
+unstructured + forloop + expression;
 
 forloop = initialization:expression x condition:expression x
 incrementation:expression x body:statement ;
@@ -1181,7 +1238,7 @@ unknown:unit + void:unit + struct:entity* + union:entity* + enum:entity*;
 
 variable = basic x dimensions:dimension* x qualifiers:qualifier* ;
 
-qualifier = const:unit + restrict:unit + volatile:unit + register:unit ;
+qualifier = const:unit + restrict:unit + volatile:unit + register:unit + auto:unit;
 
 whileloop = condition:expression x body:statement x label:entity x
 evaluation ;
