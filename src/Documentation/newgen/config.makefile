@@ -15,7 +15,8 @@ ETEXF =	ri.tex \
 	abc_private.tex \
 	alias_private.tex \
 	ubs_private.tex \
-	c_parser_private.tex
+	c_parser_private.tex \
+	ri_C.tex
 
 FTEXF =	complexity_ri.ftex \
 	database.ftex \
