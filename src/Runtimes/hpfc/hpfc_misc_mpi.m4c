@@ -2,7 +2,7 @@
  * called from a Fortran subroutine.
  *
  * $RCSfile: hpfc_misc_mpi.m4c,v $ version $Revision$
- * ($Date: 1997/07/21 15:04:27 $, )
+ * ($Date: 2005/12/22 16:53:54 $, )
  *
  * Fabien Coelho, 1993-1994-1995-1996
  */
@@ -10,6 +10,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+
+/* returns the host name from its number and the table of hosts.
+ * ??? I guess I should abort if not found...
+ */
+
+
 
 void 
 FUNCTION(printhostinfo) ARGS(`') /* `' */
