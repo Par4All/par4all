@@ -45,18 +45,6 @@ struct inlinable {
   string Lisp_format;
 };
 
-/* FC: formats are directly inlined in genClib...
- */
-static struct inlinable Inline[] = {
-  {UNIT_TYPE_NAME, "U", "U", ":unit", "U"},
-  {"bool", "1", "B%d", "newgen:gen-true", "~S"},
-  {"char", "#\\a", "#\\%c", "#\\space", "~C"},
-  {"int", "0", "%d", "0", "~D"},
-  {"float", "0.0", "%f", "0.0", "~F"},
-  {"string", "\"\"", "\"%s\"", "\"\"", "~S"},
-  {NULL, "-- HELP --", "-- HELP --", "-- HELP --", "-- HELP --"},
-} ;
-
 static char *keywords[] = {
     "external",
     "import",
@@ -140,6 +128,18 @@ void init(void)
 {
     struct gen_binding *bp ;
     struct inlinable *ip ;
+
+    /* FC: formats are directly inlined in genClib...
+     */
+    struct inlinable Inline[] = {
+      {UNIT_TYPE_NAME, "U", "U", ":unit", "U"},
+      {"bool", "1", "B%d", "newgen:gen-true", "~S"},
+      {"char", "#\\a", "#\\%c", "#\\space", "~C"},
+      {"int", "0", "%d", "0", "~D"},
+      {"float", "0.0", "%f", "0.0", "~F"},
+      {"string", "\"\"", "\"%s\"", "\"\"", "~S"},
+      {NULL, "-- HELP --", "-- HELP --", "-- HELP --", "-- HELP --"},
+    } ;
 
     for( bp = Domains ; bp < &Domains[ MAX_DOMAIN ] ; bp++ ) {
 	bp->name = NULL ;
