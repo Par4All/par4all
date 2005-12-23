@@ -1,0 +1,6 @@
+* minimum build
+- forward makefiles
+- local.mk to restrict to some sub directories
+- avoid script dependencies
+- check available commands ? (cproto, ...)
+- think about compilation phases
