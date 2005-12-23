@@ -75,9 +75,17 @@ lisp_internal_representation: $(NGENS)
 	touch $@
 
 clean: local-clean
+
 local-clean:
 	$(RM) $(INSTALL_INC) $(NGENS) $(FTEXF:.ftex=.tex) *.dvi *.ps
 	$(RM) -r $(INSTALL_HTM) ri.html dg.html
 
-# end of $RCSfile: config.makefile,v $
-#
+# common stuff
+
+ifdef PIPS_ROOT
+ROOT    = $(PIPS_ROOT)
+else
+ROOT    = ../../..
+endif
+include $(ROOT)/makes/main.mk
+
