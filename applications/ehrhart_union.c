@@ -90,6 +90,36 @@ void Union_Read( Polyhedron **P, Polyhedron **C, char ***param_name )
 
 }
 
+void recurse ( 	Polyhedron *C, char **param_name, Enumeration *e, 
+                  Value *pmin, Value *pmax, Value *p, int l )
+{
+	Value z, *tmp; int k;
+	value_init( z );
+	if( l == C->Dimension )
+	{
+		fprintf(stdout,"EP( ");
+		value_print(stdout,VALUE_FMT,p[0]);
+		for(k=1;k<C->Dimension;++k) {
+		  fprintf(stdout,",");
+		  value_print(stdout,VALUE_FMT,p[k]);
+		}  
+		fprintf(stdout," ) = ");
+		value_print(stdout,VALUE_FMT,*(tmp=compute_poly(e,p)));
+		value_clear( *tmp );
+		free(tmp);
+		fprintf(stdout,"\n");  
+	}
+	else
+	{
+		for( value_assign( z, pmin[l]) ; value_le(z,pmax[l]) ; value_increment(z,z) )
+		{
+			value_assign( p[l], z );
+			recurse ( 	C, param_name, e, pmin, pmax, p, l+1 );
+		}
+	}
+
+}
+
 
 
 int main( int argc, char **argv)
@@ -97,6 +127,7 @@ int main( int argc, char **argv)
 	Polyhedron *P, *C;
 	char **param_name;
 	Enumeration *e, *en;
+	Value *pmin, *pmax, *p; int i, k; char str[256], *s;
 
 	if( argc != 1 )
 	{
@@ -115,8 +146,40 @@ int main( int argc, char **argv)
 	  printf( "\n-----------------------------------\n" );
 	}
 
+    if( isatty(0) && C->Dimension != 0)
+        {  /* no tty input or no polyhedron -> no evaluation. */
+            printf("Evaluation of the Ehrhart polynomial :\n");
+            pmin = (Value *)malloc(sizeof(Value) * (C->Dimension));
+            pmax = (Value *)malloc(sizeof(Value) * (C->Dimension));
+            p = (Value *)malloc(sizeof(Value) * (C->Dimension));
+            for(i=0;i<C->Dimension;i++) 
+            {
+               value_init(pmin[i]);
+               value_init(pmax[i]);
+               value_init(p[i]);
+            }
+            FOREVER {
+                fflush(stdin);
+                printf("Enter %d parameters (or intervals, comma separated) : ",C->Dimension);
+                for(k=0;k<C->Dimension;++k)
+                {
+                    scanf("%s",str);
+                    if( (s=strpbrk(str,",")) )
+                    {  *s = 0;
+                       value_read(pmin[k],str);
+                       value_read(pmax[k],(s+1));
+                    }
+                    else
+                    {  value_read(pmin[k],str);
+                       value_assign(pmax[k],pmin[k]);
+                    }
+                }
+
+                recurse( C, param_name, e, pmin, pmax, p, 0 );
+
+            }
+        }
+
 	return( 0 );
 }
-
-
 
