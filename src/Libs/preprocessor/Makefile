@@ -1,31 +1,41 @@
-#
 # $Id$
-# 
 
-ifeq ($(CC),gcc)
-CFLAGS=	-g -Wall -ansi
-else
-CFLAGS=	-g
-endif
+TARGET	= preprocessor
 
-YFLAGS+=-d
-
-LIB_CFILES = \
+INC_CFILES = \
 	initializer.c \
 	source_file.c \
 	split_file.c \
 	csplit_file.c
 
-LIB_HEADERS = preprocessor-local.h \
-              splitc.y \
-              splitc.l
+DERIVED_HEADERS = splitc.h
 
-DERIVED_HEADERS= splitc.h
-DERIVED_CFILES= splitcyaccer.c splitclexer.c
+DERIVED_CFILES = splitcyaccer.c splitclexer.c
 
-LIB_OBJECTS =	$(DERIVED_CFILES:.c=.o) $(LIB_CFILES:.c=.o)
+LIB_CFILES =	$(DERIVED_CFILES) $(INC_CFILES)
 
+INC_TARGET = $(TARGET).h
+
+LIB_TARGET = lib$(TARGET).a
+
+YOPT	= -d
+
+# common stuff
+ifdef PIPS_ROOT
+ROOT    = $(PIPS_ROOT)
+else
+ROOT    = ../../..
+endif
+
+include $(ROOT)/makes/main.mk
+
+# local stuff
 $(TARGET).h: $(DERIVED_HEADERS) $(DERIVED_CFILES) 
+
+clean: local-clean
+
+local-clean:
+	$(RM) $(DERIVED_CFILES) $(DERIVED_HEADERS) y.tab.c y.tab.h
 
 splitcyaccer.c splitc.h: splitc.y
 	$(PARSE) splitc.y
