@@ -1,26 +1,4 @@
-/*
- * $Id$
- *
- * $Log: newgen.c,v $
- * Revision 1.22  2003/06/16 15:35:57  coelho
- * ++
- *
- * Revision 1.21  2003/06/16 15:24:50  coelho
- * void*
- *
- * Revision 1.20  2003/06/16 15:00:51  coelho
- * db_void added.
- *
- * Revision 1.19  1998/04/14 16:01:37  coelho
- * moved to an independent directory.
- *
- * Revision 1.18  1998/04/14 15:27:23  coelho
- * includes added.
- *
- * Revision 1.17  1998/04/11 13:01:09  coelho
- * includes needed newgen generated support functions.
- *
- */
+/* $Id$ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,7 +6,7 @@
 #include "genC.h"
 
 typedef void * void_star;
-/*typedef void * vertex;*/
+/* typedef void * vertex; */
 typedef void * arc_label;
 typedef void * vertex_label;
 typedef void * db_void;

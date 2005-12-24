@@ -1,11 +1,4 @@
-/* Ppolynome.c
- * NewGen interface with type Ppolynome for PIPS project
- *
- * Lei Zhou       Feb. 27, 91
- *
- * Modifications:
- *     
- */
+/* $Id$ */
 
 #include <stdlib.h>
 #include <stdio.h>
