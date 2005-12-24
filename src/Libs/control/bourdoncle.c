@@ -50,64 +50,7 @@
 			   of its "call" sites]
 
  $Id$
-
- $Log: bourdoncle.c,v $
- Revision 1.15  2005/08/24 15:33:46  irigoin
- Function replicate_cycles() added to cope with context-dependent
- transformers. Lots of comments added. Some debugging statement. A few
- auxiliary functions added to cope with the two different modes: the basic
- mode without cycle replication where cycles are identified by the ancestor
- common to all the cycle call sites, and the context sensitive mode where
- cycles are identified by their head or their unique call site node.
-
- Revision 1.14  2003/12/20 17:42:05  irigoin
- Bug fix in clean_up_embedding_graph(). Iteration over a list whose
- elements might be freed by a previous iteration. Why didn't it show up
- earlier?
-
- Revision 1.13  2003/08/02 13:34:49  irigoin
- Four useless/obsolete static functions removed to reduce gcc warnings.
-
- Revision 1.12  2003/07/23 14:29:01  irigoin
- Bug fix in bourdoncle_unstructured_free()
-
- Revision 1.11  2003/07/23 13:50:02  irigoin
- Bug fix in bourdoncle_unstructured_free()
-
- Revision 1.10  2003/07/16 15:39:54  irigoin
- New debugging statements to locate a bug revealed by unstruc12.f and
- unstruc12b.f. The bug turned out to be in gen_position(), a newgen
- function from list.c
-
- Revision 1.9  2003/07/11 09:45:05  irigoin
- bourdoncle_free() added, some presentation imrpovements
-
- Revision 1.8  2003/06/19 08:25:58  irigoin
- Improvements of debugging information
-
- Revision 1.7  2002/07/22 17:12:26  irigoin
- A few bug fixes, assertions added, plus support functions added for
- semantics/unstructured.c. Memory cleanup function still missing.
-
- Revision 1.6  2002/07/09 14:55:06  irigoin
- Version debugged with card.f and readin.f in SemanticsPrivate.  Profile of
- bourdoncle_partition() modified to return more information.
-
- Revision 1.5  2002/07/05 12:53:10  irigoin
- Intermediate version with bug in update_successor_in_copy() for SemanticsPrivate/readin.f
-
- Revision 1.4  2002/07/02 17:50:48  irigoin
- Intermediate bugged version, checked in to keep track of the current state.
-
- Revision 1.3  2002/06/05 14:42:02  irigoin
- First good restructuring for semantics/Validation/unstruc10.f
-
- Revision 1.2  2002/06/04 16:07:04  irigoin
- Lots of new development. Still not working recursively. Only the deepest
- cycle in unstruc10.f is handled.
-
- Revision 1.1  2002/05/28 15:04:03  irigoin
- Initial revision */
+*/
 
 #include <stdio.h>
 #include <strings.h>
@@ -227,10 +170,10 @@ bool control_test_p(control c)
      /* Code partly replicated from semantics/unstructured.c to be able to
         taylor it to the exact needs. */
 
+static void print_control_node_without_check(control);
+
 static bool check_control_statement(control c)
 {
-  static void print_control_node_without_check(control);
-  
   if(!meaningless_control_p(c)) {
     if(statement_test_p(control_statement(c))) {
       if(gen_length(control_successors(c))==2) {
@@ -1021,7 +964,7 @@ static void control_translate_arcs(control c)
     control old_c = CONTROL(CAR(c_c));
     control new_c = hash_get(replicate_map, (void *) old_c);
     pips_assert("new_c is defined", new_c!=(control) HASH_UNDEFINED_VALUE);
-    CONTROL(CAR(c_c)) = new_c;
+    CONTROL_(CAR(c_c)) = new_c;
   }
       , control_predecessors(c));
   MAPL(c_c,
@@ -1029,7 +972,7 @@ static void control_translate_arcs(control c)
     control old_c = CONTROL(CAR(c_c));
     control new_c = hash_get(replicate_map, (void *) old_c);
     pips_assert("new_c is defined", new_c!=(control) HASH_UNDEFINED_VALUE);
-    CONTROL(CAR(c_c)) = new_c;
+    CONTROL_(CAR(c_c)) = new_c;
   }
       , control_successors(c));
 }
@@ -1119,7 +1062,7 @@ unstructured partition_to_unstructured(control vertex, list partition)
       if(gen_in_list_p(old_c, partition)) {
 	new_c = hash_get(replicate_map, (void *) old_c);
 	pips_assert("new_c is defined", new_c!=(control) HASH_UNDEFINED_VALUE);
-	CONTROL(CAR(c_c)) = new_c;
+	CONTROL_(CAR(c_c)) = new_c;
       }
       else {
 	/* This predecessor is irrelevant */
@@ -1163,7 +1106,7 @@ unstructured partition_to_unstructured(control vertex, list partition)
       }
 	
       if(!control_undefined_p(new_c))
-	CONTROL(CAR(c_c)) = new_c;
+	CONTROL_(CAR(c_c)) = new_c;
     }
 	 , control_successors(c_new));
   }
@@ -1242,7 +1185,7 @@ void intersect_successors_with_partition_or_complement(control c,
       control succ = CONTROL(CAR(succ_c));
 
       if(gen_in_list_p(succ, partition)==complement_p)
-	CONTROL(CAR(succ_c)) = make_meaningless_control(CONS(CONTROL, c, NIL), NIL);
+	CONTROL_(CAR(succ_c)) = make_meaningless_control(CONS(CONTROL, c, NIL), NIL);
     } , *succs);
   }
   else {
@@ -1286,7 +1229,7 @@ static void insert_non_deterministic_control_node(list succs,
   pips_debug(2, "Allocate new control node %p as CONTINUE for test control node %p"
 	     " with two successors, a new one, %p, and an old one %p\n",
 	     cnop, pred, new_c, old_c);
-  CONTROL(CAR(succs)) = cnop;
+  CONTROL_(CAR(succs)) = cnop;
   gen_list_patch(control_predecessors(old_c), pred, cnop);
   gen_list_patch(control_predecessors(new_c), pred, cnop);
   }
@@ -1371,7 +1314,7 @@ static void add_test_successor(control t, control new_s, bool is_true_successor)
     if(rank==is_true_successor && meaningless_control_p(s)) {
       pips_debug(2, "Free meaningless control node %p\n", s);
       free_meaningless_control(s);
-      CONTROL(CAR(s_c)) = new_s;
+      CONTROL_(CAR(s_c)) = new_s;
       slot_found = TRUE;
       break;
     }
@@ -1565,7 +1508,7 @@ static unstructured scc_to_dag(control root, list partition, hash_table ancestor
 	    control succ_new_c1 = CONTROL(CAR(succ_new_c1_c));
 	    control new_succ_new_c1 = hash_get(replicated_input_controls, succ_new_c1);
 	    if(new_succ_new_c1!=HASH_UNDEFINED_VALUE) {
-	      CONTROL(CAR(succ_new_c1_c)) = new_succ_new_c1;
+	      CONTROL_(CAR(succ_new_c1_c)) = new_succ_new_c1;
 	      /* Add new_c1 as predecessor of new_succ */
 	      control_predecessors(new_succ_new_c1) =
 		gen_once(new_c1, control_predecessors(new_succ_new_c1));
@@ -1834,6 +1777,7 @@ static unstructured scc_to_dag(control root, list partition, hash_table ancestor
  * This is not part of Bourdoncle's algorithm.
  *
  */
+extern unstructured ancestor_cycle_head_to_scc(control, hash_table);
 
 static void replicate_cycles(unstructured u_main, hash_table scc_map, hash_table ancestor_map)
 {
@@ -1858,7 +1802,6 @@ static void replicate_cycles(unstructured u_main, hash_table scc_map, hash_table
 	if((c!=root || c==unstructured_control(u_main))
 	   && !meaningless_control_p(c)
 	   && cycle_head_p((control)c, ancestor_map, scc_map)) {
-	  static unstructured ancestor_cycle_head_to_scc(control, hash_table);
 	  control a = control_to_ancestor(c, ancestor_map);
 	  unstructured scc_u = ancestor_cycle_head_to_scc((control)a, scc_map);
 
@@ -2153,12 +2096,12 @@ static void update_partition(control root,
 	eliminated = CONS(CONTROL, CONTROL(CAR(c_c)), eliminated);
 	break;
       case 1:
-	CONTROL(CAR(c_c)) = CONTROL(CAR(replacement_list));
+	CONTROL_(CAR(c_c)) = CONTROL(CAR(replacement_list));
 	gen_free_list(replacement_list);
 	break;
       default:
 	/* Many possible replacements... Keep them all. */
-	CONTROL(CAR(c_c)) = CONTROL(CAR(replacement_list));
+	CONTROL_(CAR(c_c)) = CONTROL(CAR(replacement_list));
 	replacement_list = gen_nconc(replacement_list, CDR(c_c));
 	CDR(c_c) = CDR(replacement_list);
 	CDR(replacement_list) = NIL;

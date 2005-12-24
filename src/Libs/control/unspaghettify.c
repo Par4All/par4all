@@ -1,23 +1,5 @@
-/* Try to simplify the control graph.
-
+/* $Id$
    Ronan Keryell, 1995.
-   */
-/* 	%A% ($Date: 2004/01/23 13:55:04 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
-/*
- * $Log: unspaghettify.c,v $
- * Revision 1.44  2004/01/23 13:55:04  keryell
- * Added simple_restructure_statement(statement mod_stmt)
- *
- * Revision 1.43  2003/05/26 15:43:12  keryell
- * Added debug messages.
- *
- * Revision 1.42  2002/06/27 14:49:44  irigoin
- * Function fuse_sequences_in_unstructured() updated to keep track of
- * implicit target label appearing in IO statement after an END= or ERR=
- * clause. Lots of print_text() replaced by print_statement() to cope with
- * debugging levels better and avoid useless debugging information.
- *
- *
  */
 
 #ifndef lint
@@ -196,7 +178,7 @@ clean_up_exit_node(unstructured u)
 		  && empty_statement_or_continue_p(control_statement(c)));
 
       /* Remove the useless node: */
-      CONTROL(CAR(control_predecessors(c))) = control_undefined;
+      CONTROL_(CAR(control_predecessors(c))) = control_undefined;
       gen_free_list(control_successors(exit_node));
       
       /* Now the exit node has no longer a successor: */

@@ -1,7 +1,8 @@
-/* 	%A% ($Date: 2005/12/19 15:37:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* $Id$ */
 
 #ifndef lint
-char vcid_control_control[] = "%A% ($Date: 2005/12/19 15:37:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_control_control[] = 
+"$Id$\nCopyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* - control.c
@@ -171,7 +172,7 @@ control fnode, tnode;
 	
 	MAPL(succs, {
 	    if(CONTROL(CAR(succs)) == fnode)
-		    CONTROL(CAR(succs)) = tnode;
+		    CONTROL_(CAR(succs)) = tnode;
 	}, (how == SUCCS_OF_PREDS) ? 
 	     control_successors(pred) :
 	     control_predecessors(pred));

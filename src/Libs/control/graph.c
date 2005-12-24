@@ -1,10 +1,4 @@
-/*  FULL CONTROL GRAPH
- *
- *  (c) Fabien COELHO - march 1995
- *
- *  $RCSfile: graph.c,v $ ($Date: 1998/06/03 08:47:16 $, )
- *  version $Revision$
- */
+/* $Id$ */
 
 #include <stdio.h>
 #include <strings.h>
@@ -125,7 +119,7 @@ list /* of statements */ next;
 	    current = succ, 
  	        l = CDR(l),
 	        succ = ENDP(l) ? statement_undefined : STATEMENT(CAR(l)),
-	        STATEMENT(CAR(just_next)) = succ)
+	        STATEMENT_(CAR(just_next)) = succ)
 	{
 	    statement_arrows(current, just_next);
 	}
