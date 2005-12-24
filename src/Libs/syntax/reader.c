@@ -1,27 +1,4 @@
-/*
- * $Id$
- *
- * $Log: reader.c,v $
- * Revision 1.33  2002/06/21 13:49:40  irigoin
- * Correct handling of comment lines in between continuation lines
- *
- * Revision 1.32  2002/06/12 10:39:40  irigoin
- * function dump_current_statement() added
- *
- * Revision 1.31  2001/02/02 15:14:23  coelho
- * handle continuation on long DATA...
- *
- * Revision 1.30  1998/12/28 12:37:02  coelho
- * bug--
- *
- * Revision 1.29  1998/12/28 09:55:45  coelho
- * simpler.
- *
- * Revision 1.28  1998/10/07 16:04:03  irigoin
- * Reset of variable EofSeen added in paser_reset_all_reader_buffers(). This
- * fixes a bug in Parsererror() when its call occured after EofSeen had been set.
- *
- */
+/* $Id$ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -398,7 +375,7 @@ struct Skeyword {
 	char * keywstr;
 	int keywval;
 };
-extern struct Skeyword keywtbl[];
+
 #include "keywtbl.h"
 
 /* Une table pour accelerer les recherche des keywords. keywidx[X] indique le

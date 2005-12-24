@@ -74,7 +74,7 @@ keywtbl.h: warning.h f77keywords
 	# Generating $@
 	{ cat warning.h ; \
 	  echo "#include \"syn_yacc.h\"" ; \
-	  echo "struct Skeyword keywtbl[] = {" ;\
+	  echo "static struct Skeyword keywtbl[] = {" ;\
 	  sed "s/^.*/{\"&\", TK_&},/" f77keywords ;\
 	  echo "{0, 0}" ;\
 	  echo "};" ; } > keywtbl.h

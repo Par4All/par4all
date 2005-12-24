@@ -1,70 +1,4 @@
-/*
- * $Id$
- *
- * $Log: procedure.c,v $
- * Revision 1.68  2003/08/11 16:29:22  irigoin
- * Comments or messages improved.
- *
- * Revision 1.67  2003/08/02 14:04:33  irigoin
- * One step to accomodate formal parameters. Some reformatting and additional
- * comments as well.
- *
- * Revision 1.66  2003/06/19 07:38:19  nguyen
- * Update calls to make_statement and make_variable with new RI for C
- *
- * Revision 1.65  2003/06/05 09:17:05  irigoin
- * Guard calls to CleanLocalEntities() in MakeCurrentFunction() to reduce the
- * execution time for large source code. The global symbol table was
- * systematically traversed each time a module was parsed.
- *
- * Revision 1.64  2002/06/21 13:48:16  irigoin
- * Complexification of DATA handling. The repeat function is no longer
- * systematically called when the repeat factor is 1.
- *
- * Revision 1.63  2002/06/20 15:46:32  irigoin
- * New handling of DATA statements thru the initializations field in code
- *
- * Revision 1.62  2002/06/08 16:20:56  irigoin
- * Replacement of formal return labels by formal strings
- *
- * Revision 1.61  2002/03/08 10:28:25  irigoin
- * debug() replaced by pips_debug()
- *
- * Revision 1.60  2001/07/19 17:02:41  irigoin
- * Cosmetics changes to MakeExternalFunction() and DeclareExternalFunction()
- *
- * Revision 1.59  1999/05/11 12:27:24  irigoin
- * Improved error message
- *
- * Revision 1.58  1999/01/05 12:37:48  irigoin
- * MakeEntry() updated with a better warning when entry formal parameters are
- * illegally used
- *
- * Revision 1.57  1998/12/24 13:45:19  irigoin
- * Bug fixes in MaKeEntry() to handle cases when a call site to the entry has been encountered before the entry is parsed
- *
- * Revision 1.56  1998/12/18 19:48:37  irigoin
- * Function CreateIntrinsic() moved in ri-util/entity.c
- *
- * Revision 1.55  1998/12/02 15:00:59  irigoin
- * Some calls to reset_current_module_statement() replaced by calls to error_reset_current_module_statement()
- *
- * Revision 1.54  1998/12/02 13:46:55  irigoin
- * No reset_current_module_entity() in BeginingOfProcedure()
- *
- * Revision 1.53  1998/11/27 14:54:23  irigoin
- * debug statement added in EndOfProcedure()
- *
- * Revision 1.52  1998/10/07 15:57:20  irigoin
- * Proper substitution of ghost variables to avoid dangling pointers. Profile
- * of remove_ghost_variables() modified and body updated. New function
- * AbortEntries() added to avoid dangling entities in case of a call to
- * ParserError(). Update of MakeEntryCommon() whose call is postponed wrt the
- * previous implementation. Also, it is safer wrt PIPS acceptable
- * inputs. Entry processing has been made safe (or safer) wrt to calls to
- * ParserError(). Also, duplicate DATA statements between entries are avoided.
- *
- */
+/* $Id$ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -95,7 +29,8 @@ static statement function_body = statement_undefined;
 
 /*********************************************************** GHOST VARIABLES */
 
-/* list of potential local or top-level variables that turned out to be useless.
+/* list of potential local or top-level variables 
+ * that turned out to be useless.
  */
 static list ghost_variable_entities = list_undefined;
 
@@ -162,6 +97,7 @@ substitute_ghost_variable_in_expression(
 	}, call_arguments(c));
 	break;
     default:
+      break;
     }
 
     ifdebug(8) {
@@ -534,10 +470,12 @@ static bool fix_storage(reference r)
   return FALSE;
 }
 
+/* forward declaration */
+static int implied_do_reference_number(expression);
+
 static int expression_reference_number(expression e)
 {
   int nvp = 0; /* Number of Value Positions */
-  static int implied_do_reference_number(expression);
 
   pips_debug(2, "Begin\n");
 
@@ -1946,8 +1884,9 @@ BuildStatementForEntry(
 
     /* Let's get rid of s without destroying cms: do not forget the goto t! */
     l = instruction_block(statement_instruction(s));
-    pips_assert("cms is the second statement of the block", STATEMENT(CAR(CDR(l))) == cms);
-    STATEMENT(CAR(CDR(l))) = statement_undefined;
+    pips_assert("cms is the second statement of the block", 
+		STATEMENT(CAR(CDR(l))) == cms);
+    CAR(CDR(l)).p = statement_undefined;
     instruction_goto(statement_instruction(STATEMENT(CAR(l)))) = statement_undefined;
     free_statement(s);
 
@@ -1959,6 +1898,10 @@ BuildStatementForEntry(
 
     return es;
 }
+
+extern void unspaghettify_statement(statement);
+extern unstructured control_graph(statement);
+extern bool make_text_resource_and_free(string, string, string, text);
 
 static void
 ProcessEntry(
@@ -1974,9 +1917,6 @@ ProcessEntry(
     list init_stmt = list_undefined;
     text txt = text_undefined;
     bool line_numbering_p = FALSE;
-    extern void unspaghettify_statement(statement);
-    extern unstructured control_graph(statement);
-    extern void make_text_resource_and_free(string, string, string, text);
 
     pips_debug(1, "Begin for entry %s of module %s\n",
 	  entity_name(e), module_local_name(cm));
@@ -2060,7 +2000,8 @@ ProcessEntry(
 		statement_consistent_p(get_current_module_statement()));
 
     /* */
-    make_text_resource_and_free(module_local_name(e), DBR_SOURCE_FILE, ".f", txt);
+    make_text_resource_and_free(module_local_name(e), DBR_SOURCE_FILE, ".f", 
+				txt);
 
     pips_assert("statement for cm is consistent",
 		statement_consistent_p(get_current_module_statement()));
@@ -2092,8 +2033,6 @@ ProcessEntries()
     bool line_numbering_p = get_bool_property("PRETTYPRINT_STATEMENT_NUMBER");
     bool data_statements_p = get_bool_property("PRETTYPRINT_DATA_STATEMENTS");
     /* To avoid an include of the prettyprint library and/or a compiler warning. */
-    extern bool make_text_resource_and_free(string, string, string, text);
-
     /* The declarations for cm are likely to be incorrect. They must be
      * synthesized by the prettyprinter.
      */
@@ -2103,7 +2042,8 @@ ProcessEntries()
     /* To avoid warnings about column 73 when the code is parsed again */
     set_bool_property("PRETTYPRINT_STATEMENT_NUMBER", FALSE);
     txt = text_named_module(cm, cm, get_current_module_statement());
-    make_text_resource_and_free(module_local_name(cm), DBR_SOURCE_FILE, ".f", txt);
+    make_text_resource_and_free(module_local_name(cm), DBR_SOURCE_FILE, ".f", 
+				txt);
 
     /* Not ot duplicate DATA statements for static variables and common variables
        in every entry */
