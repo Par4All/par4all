@@ -31,11 +31,13 @@
 
  *
  * $Id$
+ *
  * Version: change the structure of test: 
  * IF (I.LT.lower) THEN STOP "Bound violation ..."
  * IF (I.GT.upper) THEN STOP "Bound violation ..."
  * Add statistics 
- * Version : Modify the Implied-DO process*/
+ * Version : Modify the Implied-DO process
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -919,7 +921,7 @@ static void bottom_up_abc_insert_before_statement(statement s, statement s1,
 	  {
 	    MAPL(lc, 
 	    {
-	      if (CONTROL(CAR(lc))==c) CONTROL(CAR(lc)) = newc;
+	      if (CONTROL(CAR(lc))==c) CONTROL_(CAR(lc)) = newc;
 	    }, control_successors(co));
 	  },control_predecessors(c)); 
 	  control_predecessors(c) = CONS(CONTROL,newc,NIL);
@@ -936,6 +938,9 @@ static void bottom_up_abc_insert_before_statement(statement s, statement s1,
     // structured case 
     insert_statement(s,s1,TRUE);     
 }
+
+/* forward declaration */
+static statement cstr_args_check(statement);
 
 static void bottom_up_abc_statement_rwt(
    statement s,
@@ -1412,6 +1417,28 @@ array_check_add(expression array_expr, expression expr)
 #define CHECK_NARGS(n)  if (nargs != (n)) return expression_undefined
 
 /*
+ * Check for memcpy(dst, src, n):
+ *
+ *  n > size(src) || n > size(dst)
+ */
+static expression
+memcpy_check_expression(expression args[], int nargs)
+{
+    expression arg0_size_expr, arg1_size_expr;
+    CHECK_NARGS(3);
+
+    arg0_size_expr = expression_try_find_size(args[0]);
+    arg1_size_expr = expression_try_find_size(args[1]);
+    if (arg0_size_expr == expression_undefined
+        || arg1_size_expr == expression_undefined)
+        return expression_undefined;
+    
+    return cf_or_expression(
+                cf_gt_expression(args[2], arg1_size_expr),
+                cf_gt_expression(args[2], arg0_size_expr));
+}
+
+/*
  * Check for bcopy(src, dst, n):
  *
  *  n > size(src) || n > size(dst)  => same as memcpy()
@@ -1465,28 +1492,6 @@ memcmp_check_expression(expression args[], int nargs)
 {
     CHECK_NARGS(3);
     return memcpy_check_expression(args, nargs);
-}
-
-/*
- * Check for memcpy(dst, src, n):
- *
- *  n > size(src) || n > size(dst)
- */
-static expression
-memcpy_check_expression(expression args[], int nargs)
-{
-    expression arg0_size_expr, arg1_size_expr;
-    CHECK_NARGS(3);
-
-    arg0_size_expr = expression_try_find_size(args[0]);
-    arg1_size_expr = expression_try_find_size(args[1]);
-    if (arg0_size_expr == expression_undefined
-        || arg1_size_expr == expression_undefined)
-        return expression_undefined;
-    
-    return cf_or_expression(
-                cf_gt_expression(args[2], arg1_size_expr),
-                cf_gt_expression(args[2], arg0_size_expr));
 }
 
 /*

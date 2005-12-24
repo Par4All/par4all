@@ -308,7 +308,7 @@ static string print_call_path(list path)
 
 *****************************************************************************/
 
-void  print_alias_association(alias_association aa)
+static void  print_alias_association(alias_association aa)
 {
   entity e = alias_association_variable(aa);
   entity sec = alias_association_section(aa);

@@ -596,7 +596,7 @@ static void interprocedural_abc_insert_before_statement(statement s, statement s
 	  {
 	    MAPL(lc, 
 	    {
-	      if (CONTROL(CAR(lc))==c) CONTROL(CAR(lc)) = newc;
+	      if (CONTROL(CAR(lc))==c) CONTROL_(CAR(lc)) = newc;
 	    }, control_successors(co));
 	  },control_predecessors(c)); 
 	  control_predecessors(c) = CONS(CONTROL,newc,NIL);
