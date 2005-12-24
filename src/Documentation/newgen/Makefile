@@ -43,9 +43,9 @@ ALLHS =	all_newgen_headers.h specs.h
 
 INSTALL_INC=	$(F.h) $(F.newgen) $(F.c) $(F.spec) $(ALLHS)
 INSTALL_DOC=	$(F.newgen:%.newgen=%.ps)
-INSTALL_HTM=	ri dg
+#INSTALL_HTM=	ri dg
 
-all: $(ALLHS) $(INSTALL_DOC) ri.html dg.html
+all: $(ALLHS) $(INSTALL_DOC)
 
 dvi: $(F.newgen:%.newgen=%.dvi)
 ps: $(F.newgen:%.newgen=%.ps)
@@ -81,7 +81,8 @@ lisp_internal_representation: $(F.newgen)
 clean: local-clean
 
 local-clean:
-	$(RM) $(INSTALL_INC) $(F.newgen) *.dvi *.ind *.log *.ps
+	$(RM) $(INSTALL_INC) $(F.newgen) 
+	$(RM) *.dvi *.ind *.log *.ps *.aux *.idx *.ilg *.toc
 	$(RM) -r $(INSTALL_HTM) ri.html dg.html
 
 # common stuff
