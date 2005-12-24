@@ -227,7 +227,7 @@ pips_user_warning_function(
 
 void 
 pips_user_error_function(
-   char * format,
+   const char * format,
    ...)
 {
     va_list args;
@@ -238,7 +238,7 @@ pips_user_error_function(
 
 void 
 pips_internal_error_function(
-   char * format,
+   const char * format,
    ...)
 {
    va_list some_arguments;
@@ -301,8 +301,8 @@ Modifications:
 */
 
 static void
-default_user_error(char * calling_function_name,
-                   char * a_message_format,
+default_user_error(const char * calling_function_name,
+                   const char * a_message_format,
                    va_list *some_arguments)
 {
    /* print name of function causing error */
@@ -335,11 +335,12 @@ default_user_error(char * calling_function_name,
  * top-level (eg. wpips) may need a special user_error proceedure; they 
  * should let pips_error_handler point toward it.
  */
-void (* pips_error_handler)(char *, char *, va_list *) = default_user_error;
+void (* pips_error_handler)(const char *, const char *, va_list *) 
+     = default_user_error;
 
 void
-user_error(char * calling_function_name,
-           char * a_message_format,
+user_error(const char * calling_function_name,
+           const char * a_message_format,
            ...)
 {
    va_list some_arguments;
@@ -361,8 +362,8 @@ arguments to vprintf. PIPS_ERROR terminates execution with abort.
 
 void
 pips_error(
-    char * calling_function_name,
-    char * a_message_format,
+    const char * calling_function_name,
+    const char * a_message_format,
     ...)
 {
    va_list some_arguments;
@@ -382,10 +383,10 @@ is issued and the program aborted. The first argument is the function name.
 
 void 
 pips_assert_function(
-    char * function, /* the name of the function if available */
-    int predicate,   /* predicate to be tested */
-    int line,        /* location of the assertion */
-    char * file)     /* location of the assertion */
+    const char * function, /* the name of the function if available */
+    const int predicate,   /* predicate to be tested */
+    const int line,        /* location of the assertion */
+    const char * file)     /* location of the assertion */
 {
     /* print name of function causing error and
      * create a core file for debug 
@@ -398,8 +399,8 @@ pips_assert_function(
 }
 
 void
-user_irrecoverable_error(char * calling_function_name,
-			 char * a_message_format,
+user_irrecoverable_error(const char * calling_function_name,
+			 const char * a_message_format,
 			 ...)
 {
    va_list some_arguments;
@@ -415,7 +416,7 @@ user_irrecoverable_error(char * calling_function_name,
 }
 
 void
-user_irrecoverable_error_function(char * a_message_format, ...)
+user_irrecoverable_error_function(const char * a_message_format, ...)
 {
    va_list some_arguments;
    va_start(some_arguments, a_message_format);
