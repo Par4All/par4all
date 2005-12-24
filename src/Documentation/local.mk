@@ -1,2 +1,3 @@
 # $Id$
-FWD_DIRS	= newgen pipsmake properties
+
+FWD_DIRS	= newgen pipsmake properties constants
