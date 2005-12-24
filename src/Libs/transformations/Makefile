@@ -1,9 +1,6 @@
-#
 # $Id$
-#
-# Source, header and object files used to build the library.
-# Do not include the main program source file.
-#
+
+TARGET	= transformations
 
 LIB_CFILES =	replace.c \
 		loop_unroll.c \
@@ -32,16 +29,15 @@ LIB_CFILES =	replace.c \
 		partial_redundancy_elimination.c \
 		variable_expansion.c
 
-#		optimize_misc.c
+INC_TARGET =    $(TARGET).h
 
-LIB_HEADERS =	transformations-local.h
+LIB_TARGET =    lib$(TARGET).a
 
-LIB_OBJECTS =	$(LIB_CFILES:%.c=%.o)
+# common stuff
+ifdef PIPS_ROOT
+ROOT    = $(PIPS_ROOT)
+else
+ROOT    = ../../..
+endif
 
-
-
-
-
-
-
-
+include $(ROOT)/makes/main.mk
