@@ -7,7 +7,6 @@ UTILS=		install_pips_sources \
 		pips_set_directory_for_binaries
 
 SCRIPTS = 	$(UTILS) \
-		make-tags \
 		analyze_libraries \
 		grep_libraries \
 		checked-out \
