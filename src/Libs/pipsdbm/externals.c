@@ -15,8 +15,12 @@
 #include "vecteur.h"
 #include "contrainte.h"
 #include "sc.h"
-#include "ri-util.h"
 #include "paf_ri.h"
+
+/* ??? ri-util stupid cyclic? dependencies */
+extern void initialize_ordering_to_statement();
+extern void * ordering_to_statement();
+extern char * statement_identification();
 
 /********************************************************************* UTILS */
 
@@ -131,7 +135,7 @@ pipsdbm_read_statement_mapping(FILE * fd)
     while (n-->0) {
 	int so = lire_int(fd);
 	pips_assert("valid ordering", so!=STATEMENT_ORDERING_UNDEFINED);
-	hash_put(result,(char*)ordering_to_statement(so),(char*)gen_read(fd));
+	hash_put(result,(void*)ordering_to_statement(so),(void*)gen_read(fd));
     }
 
     return result;
@@ -285,7 +289,7 @@ free_static_control_mapping(statement_mapping map)
     FREE_STATEMENT_MAPPING(map);
 }
 
-/* Functions to read and write declarations resouce, which is a hash table 
+/* Functions to read and write declarations resource, which is a hash table 
    whose key and value are string (keyword/typedef and TK_keyword/TK_typedef)*/
 
 void declarations_write(FILE * f, hash_table h)
@@ -293,7 +297,7 @@ void declarations_write(FILE * f, hash_table h)
   HASH_MAP(k,v,
   {
     fprintf(f, "%s\n", (char *) k);
-    fprintf(f, "%d\n", v);
+    fprintf(f, "%d\n", (int) v);
   },h);
 }
 
@@ -302,7 +306,7 @@ hash_table declarations_read(FILE * f)
 {
   hash_table result = hash_table_make(hash_string,0);
   int c;
-  while (c = getc(f) && c != EOF)
+  while ((c = getc(f)) && c != EOF)
     {
       hash_put(result,(char*)safe_readline(f),(char*)safe_readline(f));
     }

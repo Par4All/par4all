@@ -27,14 +27,22 @@
  * but also lower case letters and the FILE_SEP_STRING
  * "#" added for C compilation unit FC 12/08/2003
  */
-#define MODULE_NAME_CHARS ("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_abcdefghijklmnopqrstuvwxyz" FILE_SEP_STRING "#-")
+#ifndef FILE_SEP_STRING /* in ri-util */
+#define FILE_SEP_STRING "!"
+#endif /* FILE_SEP_STRING */
 
-static bool simple_name_p(string name)
+#define MODULE_NAME_CHARS \
+  ( "ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
+    "0123456789" \
+    "abcdefghijklmnopqrstuvwxyz" \
+    FILE_SEP_STRING "_#-" )
+
+static bool simple_name_p(const string name)
 {
     return strlen(name)==strspn(name, MODULE_NAME_CHARS);
 }
 
-static db_symbol find_or_create_db_symbol(string name)
+static db_symbol find_or_create_db_symbol(const string name)
 {
     db_symbol s = gen_find_tabulated(name, db_symbol_domain);
     if (!simple_name_p(name)) pips_user_warning("strange name \"%s\"\n", name);

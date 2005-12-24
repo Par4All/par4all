@@ -21,8 +21,6 @@ typedef void * db_void;
 
 #include "misc.h"
 #include "properties.h"
-
-#include "ri-util.h" /* needed for statement_mapping */
-
+#include "newgen.h" /* needed for statement_mapping */
 #include "database.h" /* for obsolete functions... */
 #include "pipsdbm.h"
