@@ -1,12 +1,6 @@
-#
 # $Id$
-# $Log: config.makefile,v $
-# Revision 1.41  1997/03/19 16:42:32  coelho
-# better RCS headers
-#
-#
-# Source, header and object files used to build the library.
-# Do not include the main program source file.
+
+TARGET	= hpfc
 
 LIB_CFILES=	directives.c \
 		dynamic.c \
@@ -34,17 +28,15 @@ LIB_CFILES=	directives.c \
 		special_cases.c \
 		lattice_extraction.c
 
-LIB_HEADERS=	warning.h \
-		hpfc-local.h \
-		defines-local.h \
-		access_description.h \
-		version.h
+INC_TARGET =    $(TARGET).h
 
-$(LIB_CFILES): $(LIB_HEADERS)
+LIB_TARGET =    lib$(TARGET).a
 
-# should be automatically derived ?
+# common stuff
+ifdef PIPS_ROOT
+ROOT    = $(PIPS_ROOT)
+else
+ROOT    = ../../..
+endif
 
-LIB_OBJECTS= $(LIB_CFILES:.c=.o) 
-
-# that is all
-#
+include $(ROOT)/makes/main.mk

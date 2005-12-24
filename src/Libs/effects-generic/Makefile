@@ -2,9 +2,11 @@
 # $Id$
 # 
 # Source, header and object files used to build the library.
-# Do not include the main program source file.
+# $Id$
 
-LIB_CFILES	= \
+TARGET	= effects-generic
+
+LIB_CFILES = \
 	proper_effects_engine.c \
 	rw_effects_engine.c \
 	in_effects_engine.c \
@@ -16,8 +18,15 @@ LIB_CFILES	= \
 	prettyprint.c \
 	intrinsics.c
 
-# 	interprocedural.c
+INC_TARGET =    $(TARGET).h
 
-LIB_HEADERS	= effects-generic-local.h
+LIB_TARGET =    lib$(TARGET).a
 
-LIB_OBJECTS	= $(LIB_CFILES:%.c=%.o)
+# common stuff
+ifdef PIPS_ROOT
+ROOT    = $(PIPS_ROOT)
+else
+ROOT    = ../../..
+endif
+
+include $(ROOT)/makes/main.mk

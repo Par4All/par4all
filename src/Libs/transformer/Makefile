@@ -50,15 +50,21 @@
 #
 # Francois Irigoin, December 1989, April 1990
 #
-# A main program, transformer_main.c, provides an easy way to
-# test link edit
-#
-MAIN=		transformer_main
-#
-# Source, header and object files used to build the library.
-# Do not include the main program source file.
-LIB_CFILES=	basic.c convex_hull.c fix_point.c io.c \
+
+TARGET	= transformer
+
+LIB_CFILES =	basic.c convex_hull.c fix_point.c io.c \
 		transformer.c value.c prettyprint.c
-LIB_HEADERS=	transformer-local.h
-LIB_OBJECTS=	basic.o convex_hull.o fix_point.o io.o \
-		transformer.o value.o prettyprint.o
+
+INC_TARGET =    $(TARGET).h
+
+LIB_TARGET =    lib$(TARGET).a
+
+# common stuff
+ifdef PIPS_ROOT
+ROOT    = $(PIPS_ROOT)
+else
+ROOT    = ../../..
+endif
+
+include $(ROOT)/makes/main.mk

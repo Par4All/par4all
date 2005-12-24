@@ -1,6 +1,6 @@
-#
-# config.makefile for PHRASE library
-# 
+# $Id$
+
+TARGET = phrase
 
 LIB_CFILES =    phrase_distributor.c \
 		phrase_distributor_control_code.c \
@@ -20,13 +20,15 @@ LIB_CFILES =    phrase_distributor.c \
 		fsm_tools.c \
 		phrase_tools.c
 
-LIB_HEADERS = 	phrase-local.h \
-		smalltalk-defs.h \
-		spaghettify.h \
-		fsm_generation.h \
-		phrase_tools.h \
-		phrase_distribution.h
+INC_TARGET =    $(TARGET).h
 
-LIB_OBJECTS = $(DERIVED_CFILES:.c=.o) $(LIB_CFILES:.c=.o)
+LIB_TARGET =    lib$(TARGET).a
 
+# common stuff
+ifdef PIPS_ROOT
+ROOT    = $(PIPS_ROOT)
+else
+ROOT    = ../../..
+endif
 
+include $(ROOT)/makes/main.mk

@@ -49,6 +49,8 @@
 # Source, header and object files used to build the library.
 # Do not include the main program source file.
 
+TARGET	= semantics
+
 LIB_CFILES=	misc.c \
 		ri_to_transformers.c \
 		interprocedural.c\
@@ -64,7 +66,15 @@ LIB_CFILES=	misc.c \
 		loop.c \
 		ri_to_total_preconditions.c
 
-LIB_HEADERS=	semantics-local.h
+INC_TARGET =    $(TARGET).h
 
-LIB_OBJECTS=	$(LIB_CFILES:.c=.o)
+LIB_TARGET =    lib$(TARGET).a
 
+# common stuff
+ifdef PIPS_ROOT
+ROOT    = $(PIPS_ROOT)
+else
+ROOT    = ../../..
+endif
+
+include $(ROOT)/makes/main.mk

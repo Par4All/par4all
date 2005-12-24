@@ -3,16 +3,18 @@
 #
 # -O2 is too much indeed for syntax, FC 09/06/94:-)
 # bof...
-ifeq ($(CC),gcc)
-CFLAGS=	-g -Wall -ansi
-else
-CFLAGS=	-g
-endif
+#ifeq ($(CC),gcc)
+#CFLAGS=	-g -Wall -ansi
+#else
+#CFLAGS=	-g
+#endif
+
+TARGET	= syntax
 
 # I wanna the header file for the lexer
-YFLAGS+=-d
+YOPT	=	-d
 
-LIB_CFILES=	util.c \
+INC_CFILES=	util.c \
 		declaration.c \
 		expression.c \
 		equivalence.c \
@@ -25,26 +27,34 @@ LIB_CFILES=	util.c \
 		clean.c \
 		macros.c
 
-LIB_HEADERS=	f77keywords \
-		f77symboles \
-		gram.y \
-		scanner.l \
-		warning.h \
-		syntax-local.h
+DERIVED_HEADERS = keywtbl.h tokyacc.h syn_yacc.h yacc.in
 
-# headers made by some rule (except $INC_TARGET)
+DERIVED_CFILES = syn_yacc.c scanner.c
 
-DERIVED_HEADERS= keywtbl.h tokyacc.h syn_yacc.h yacc.in
-DERIVED_CFILES= syn_yacc.c scanner.c
+LIB_CFILES	= $(INC_CFILES) $(DERIVED_CFILES)
 
-LIB_OBJECTS=	$(DERIVED_CFILES:.c=.o)  $(LIB_CFILES:.c=.o) 
+INC_TARGET =    $(TARGET).h
+
+LIB_TARGET =    lib$(TARGET).a
+
+# common stuff
+ifdef PIPS_ROOT
+ROOT    = $(PIPS_ROOT)
+else
+ROOT    = ../../..
+endif
+
+include $(ROOT)/makes/main.mk
+
+# local stuff
+clean: local-clean
+
+local-clean:
+	$(RM) $(DERIVED_CFILES) $(DERIVED_HEADERS) yacc.in
 
 $(TARGET).h: $(DERIVED_HEADERS) $(DERIVED_CFILES) 
 
-# on SunOS 4.1: yacc generates "extern char *malloc(), *realloc();"!
-# filtred here.
-
-syn_yacc.c syn_yacc.h: tokyacc.h gram.y
+syn_yacc.c syn_yacc.h yacc.in: tokyacc.h gram.y
 	cat tokyacc.h gram.y > yacc.in
 	$(PARSE) yacc.in
 	sed 's/YY/SYN_/g;s/yy/syn_/g' y.tab.c > syn_yacc.c
@@ -73,6 +83,3 @@ tokyacc.h: warning.h f77keywords f77symboles
 	{ cat warning.h ; \
 	sed 's,\([^A-Z]*\)\(.*\),%token \1 TK_\2,' f77keywords f77symboles ;\
 	} > tokyacc.h
-
-# end of $RCSfile: config.makefile,v $
-#
