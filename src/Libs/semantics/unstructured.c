@@ -213,6 +213,9 @@ static transformer load_control_postcondition(control c,
   return post;
 }
 
+/* forward declaration */
+static transformer load_arc_precondition(control, control, control_mapping);
+
 static transformer get_control_precondition(control c,
 					    control_mapping control_postcondition_map,
 					    unstructured u,
@@ -220,7 +223,6 @@ static transformer get_control_precondition(control c,
 {
   transformer pre = transformer_undefined;
   list preds = control_predecessors(c);
-  static transformer load_arc_precondition(control, control, control_mapping);
 
   pips_assert("c is meaningfull", !meaningless_control_p(c));
 

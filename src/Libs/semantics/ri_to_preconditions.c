@@ -577,7 +577,7 @@ transformer statement_to_postcondition(
 	MAPL(cv,
 	 {
 	   entity v = ENTITY(CAR(cv));
-	   ENTITY(CAR(cv)) = entity_to_old_value(v);
+	   ENTITY_(CAR(cv)) = entity_to_old_value(v);
 	 },
 	     non_initial_values);
 

@@ -2,51 +2,6 @@
   * preconditions
   *
   * $Id$
-  *
-  * $Log: expression.c,v $
-  * Revision 1.9  2003/12/19 16:31:02  irigoin
-  * Call to entity_module_name() replaced by call to entity_local_name() for
-  * constant string entities, following some change performed by Nga to
-  * accomodate C
-  *
-  * Revision 1.8  2003/07/24 10:02:09  irigoin
-  * Warning avoided for modulo_to_transformer()
-  *
-  * Revision 1.7  2003/07/24 09:02:26  irigoin
-  * Better handling of absolute value intrinsic, more debugging statements,
-  * more filtering to decide if integer variables should be analyzed or not.
-  *
-  * Revision 1.6  2001/12/05 17:14:59  irigoin
-  * Maybe less accurate handling of conditions (if side effects) but faster
-  * than previous implementation which required too many projections to
-  * convert a precondition into a condition on a store (precondition range)
-  *
-  * Revision 1.5  2001/10/22 15:50:39  irigoin
-  * Lots of "context" arguments added because repeated calls to
-  * transformer_range() were too slow on ocean. However, the previous version
-  * was correct with respect to side effects in conditions because the context
-  * was recomputed from the current transformer. The new version might be
-  * faster but wrong in those cases. But they do no occur frequently.
-  *
-  * Revision 1.4  2001/07/24 13:16:53  irigoin
-  * Set of modifications:
-  *  1. side effect analysis moved into transformer library
-  *  2. bug fix for handling double or single quotes around character strings
-  *  3. test on integer type removed to handle more general tests
-  *  4. bug fix in handling side effects in test conditions
-  *  5. new handling of EQ and NEQ with LT and GT.
-  *
-  * Revision 1.3  2001/07/19 17:54:31  irigoin
-  * Lots of additional reformatting with an indentation factor of two instead
-  * of four
-  *
-  * Revision 1.2  2001/07/13 15:01:06  irigoin
-  * First multitype version
-  *
-  * Revision 1.1  2001/06/19 09:21:57  irigoin
-  * Initial revision
-  *
-  *
   */
 #include <stdio.h>
 #include <string.h>
@@ -199,6 +154,10 @@ static transformer unary_minus_operation_to_transformer(entity v,
   return tf;
 }
 
+/* forward declaration */
+static transformer generic_abs_to_transformer(
+       entity, expression, transformer, bool);
+
 static transformer 
 generic_unary_operation_to_transformer(
     entity e,
@@ -208,7 +167,6 @@ generic_unary_operation_to_transformer(
     bool is_internal)
 {
   transformer tf = transformer_undefined;
-  static transformer generic_abs_to_transformer(entity, expression, transformer, bool);
 
   if(ENTITY_UNARY_MINUS_P(op)) {
     tf = unary_minus_operation_to_transformer(e, e1, pre, is_internal);
@@ -337,6 +295,8 @@ static transformer constant_to_transformer(entity v,
  * try your best...
  *
  */
+static transformer transformer_add_condition_information_updown
+(transformer, expression, transformer, bool, bool);
 
 static transformer 
 transformer_add_anded_conditions_updown(
@@ -347,12 +307,6 @@ transformer_add_anded_conditions_updown(
     bool veracity,
     bool upwards)
 {
-  static transformer transformer_add_condition_information_updown(
-								  transformer,
-								  expression,
-								  transformer,
-								  bool,
-								  bool);
   transformer newpre = transformer_undefined;
 
   pips_debug(9,"Begin with pre=%p, veracity=%s, upwards=%s\n,",
@@ -446,12 +400,6 @@ static transformer transformer_add_ored_conditions_updown(
     bool veracity,
     bool upwards)
 {
-  static transformer transformer_add_condition_information_updown(
-    transformer,
-    expression,
-    transformer,
-    bool,
-    bool);
   transformer newpre = transformer_undefined;
 
   pips_debug(9,"Begin with pre=%p, context=%p, veracity=%s, upwards=%s\n,",
@@ -515,12 +463,6 @@ transformer_add_call_condition_information_updown(
     bool veracity,
     bool upwards)
 {
-  static transformer transformer_add_condition_information_updown(
-    transformer,
-    expression,
-    transformer,
-    bool,
-    bool);
   transformer newpre = transformer_undefined;
   expression c1 = expression_undefined;
   expression c2 = expression_undefined;

@@ -378,7 +378,7 @@ statement_to_total_precondition(
     MAPL(cv,
     {
       entity v = ENTITY(CAR(cv));
-      ENTITY(CAR(cv)) = entity_to_old_value(v);
+      ENTITY_(CAR(cv)) = entity_to_old_value(v);
     },
 	 non_initial_values);
 
