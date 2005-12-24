@@ -3,6 +3,7 @@
 
 #define region effect
 #define REGION EFFECT  /* for casts */
+#define REGION_ EFFECT_  /* for some left casts */
 #define REGION_TYPE EFFECT_TYPE
 
 #define region_undefined effect_undefined

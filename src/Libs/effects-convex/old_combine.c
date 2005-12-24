@@ -1470,7 +1470,7 @@ list proper_regions_combine(list l_reg, bool scalars_only_p)
 		region_free(reg_current);
 		
 		/* replace the base region by the new region */
-		REGION(CAR(base)) = new_reg_base;
+		REGION_(CAR(base)) = new_reg_base;
 		
 		/* remove the current list element from the global list */
 		tmp = current;	    
