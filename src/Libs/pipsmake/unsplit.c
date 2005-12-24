@@ -6,41 +6,6 @@
  * in the subdirectory Src of the database. If some includes are
  * generated, they should also be stored there. 
  * 
- * $Log: unsplit.c,v $
- * Revision 1.10  2003/12/22 15:58:16  irigoin
- * Bug fix in unsplit() to support several successive calls to unsplit for
- * the same workspace.
- *
- * Revision 1.9  2003/12/19 17:42:16  irigoin
- * unsplit() extended to cope with preprocessed file such as .F and .c
- * files. In .F case, initial file name is not exactly regenerated since
- * preprocessing is now useless: preprocessing cannot be undone. In .c case,
- * include files may clutter the unsplitted files.
- *
- * Revision 1.8  2003/08/18 14:18:53  coelho
- * warns--
- *
- * Revision 1.7  2000/03/24 11:37:35  coelho
- * use initial order.
- *
- * Revision 1.6  1998/04/14 21:22:00  coelho
- * linear.h
- *
- * Revision 1.5  1997/10/28 14:33:05  keryell
- * Renamed basename and dirname as pips_basename and pips_dirname for OSF1.
- *
- * Revision 1.4  1997/10/27 09:52:00  coelho
- * basename moved to misc.
- *
- * Revision 1.3  1997/10/21 05:24:11  coelho
- * unsplit seems ok.
- *
- * Revision 1.2  1997/10/16 19:09:25  coelho
- * comment added.
- *
- * Revision 1.1  1997/10/16 18:59:07  coelho
- * Initial revision
- *
  */
 
 #include <stdio.h>

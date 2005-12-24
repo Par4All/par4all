@@ -4,22 +4,6 @@
   * transformer package - convex hull computation
   *
   * Francois Irigoin, 21 April 1990
-  *
-  * $Id$
-  *
-  * $Log: convex_hull.c,v $
-  * Revision 1.20  2003/07/24 08:37:25  irigoin
-  * Now, empty transformers() must have an empty basis (although it does
-  * mathematically make sense to to otherwise).
-  *
-  * Revision 1.19  2001/12/05 17:08:52  irigoin
-  * Normalization step added before call to convex hull. Seems to help for
-  * Validation/Semantics/ocean.f but not for Validation/Semantics/ocanea_fi2.f
-  *
-  * Revision 1.18  2001/07/19 18:06:52  irigoin
-  * Log of transformations added in header.
-  *
-  *
   */
 
 #include <stdio.h>

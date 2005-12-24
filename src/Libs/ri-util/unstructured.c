@@ -2,32 +2,6 @@
   * $Id$
   *
   * Prettyprint unstructured
-  *
-  * $Log: unstructured.c,v $
-  * Revision 1.13  2003/08/06 13:45:52  nguyen
-  * Modify and add functions for C prettyprinter
-  *
-  * Revision 1.12  2001/03/12 15:53:45  irigoin
-  * Bug fix in decorate_trail() and text_trail() for check IO statement. See
-  * cplch.f in Validation. I had forgotten that the apparent successor of an
-  * IO statement might be TWO statement away since two different conditions
-  * may be checked, END= and ERR=
-  *
-  * Revision 1.11  2001/02/05 14:40:47  irigoin
-  * Bug fix in decorate_trail() for check IO statement
-  *
-  * Revision 1.10  2001/02/05 12:25:31  irigoin
-  * Bug fix in text_trail() for check-io statements
-  *
-  * Revision 1.9  1998/04/14 15:23:28  coelho
-  * linear.h
-  *
-  * Revision 1.8  1997/12/11 10:58:46  coelho
-  * missing strdup added.
-  *
-  * Revision 1.7  1997/11/11 10:32:47  coelho
-  * clearer assert in text_control.
-  *
   */
 
 #include <stdlib.h>

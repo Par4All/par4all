@@ -1,19 +1,6 @@
 /* Message Utilities
  * 
  * $Id$
- * $Log: message-utils.c,v $
- * Revision 1.21  1998/04/02 20:53:43  irigoin
- * Call to SizeOfDimension() replaced
- *
- * Revision 1.20  1998/03/17 15:42:00  coelho
- * warnings--.
- *
- * Revision 1.19  1997/05/03 11:52:10  coelho
- * *** empty log message ***
- *
- * Revision 1.18  1997/03/20 10:23:31  coelho
- * RCS headers.
- *
  *
  * Fabien Coelho, August 1993
  */

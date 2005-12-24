@@ -1,57 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
  * $Id$
- * $Log: hpfc.c,v $
- * Revision 1.109  1998/12/26 21:42:26  irigoin
- * Bug fix in hpfc_error_handler()
- *
- * Revision 1.108  1998/12/26 21:21:01  irigoin
- * error_handler added
- *
- * Revision 1.107  1997/11/22 16:31:51  coelho
- * init/close referenced variables mapping...
- *
- * Revision 1.106  1997/10/27 16:48:49  coelho
- * redeclarations cleaned...
- *
- * Revision 1.105  1997/10/27 09:02:26  coelho
- * PRETTYPRINT_COMMONS bool -> string
- *
- * Revision 1.104  1997/10/08 08:41:07  coelho
- * hop. cleaner common prettyprint control.
- *
- * Revision 1.103  1997/10/08 06:06:47  coelho
- * PRETTYPRINT_VARIABLE_DIMENSIONS in use.
- *
- * Revision 1.102  1997/09/26 10:50:56  coelho
- * resource deletion thru a property.
- *
- * Revision 1.101  1997/09/26 10:30:08  coelho
- * delete_all_resources moved to pipsmake.
- *
- * Revision 1.100  1997/09/26 10:29:34  coelho
- * julien updates.
- *
- * Revision 1.99  1997/08/04 13:55:59  coelho
- * new generic effects includes.
- *
- * Revision 1.98  1997/07/22 13:16:28  keryell
- * #include "makefile.h"
- * #include "pipsmake.h"
- * added.
- *
- * Revision 1.95  1997/04/16 13:14:56  coelho
- * cleaner...
- *
- * Revision 1.94  1997/04/16 09:07:44  creusil
- * statement_effects used for effects. bc.
- *
- * Revision 1.93  1997/04/15 10:58:05  creusil
- * statement_effects used instead of statement mappings for regions. bc.
- *
- * Revision 1.92  1997/03/20 10:11:38  coelho
- * better RCS headers.
- *
  */
  
 #include "defines-local.h"

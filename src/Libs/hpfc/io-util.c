@@ -1,31 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
  * $Id$
- * $Log: io-util.c,v $
- * Revision 1.39  1998/12/26 21:20:07  irigoin
- * error_handler added
- *
- * Revision 1.38  1997/08/04 13:58:09  coelho
- * new generic effects includes.
- *
- * Revision 1.37  1997/07/28 14:29:47  keryell
- * Removed conflict in concatenate().
- *
- * Revision 1.36  1997/07/25 22:28:08  keryell
- * Avoid to put comments on sequences.
- *
- * Revision 1.35  1997/07/21 15:25:59  keryell
- * Forgotten 'u'.
- *
- * Revision 1.34  1997/07/21 13:56:05  keryell
- * Replaced %x format by %p.
- *
- * Revision 1.33  1997/04/17 11:47:13  coelho
- * *** empty log message ***
- *
- * Revision 1.32  1997/03/20 10:24:21  coelho
- * RCS headers.
- *
  */
 
 #include "defines-local.h"

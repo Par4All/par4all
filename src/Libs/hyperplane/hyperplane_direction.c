@@ -1,14 +1,6 @@
 /* Find out a legal hyperplane direction. In a first phase, trust the user blindly!
  *
  * $Id$
- *
- * $Log: hyperplane_direction.c,v $
- * Revision 1.3  1998/10/12 10:43:28  irigoin
- * Better error checking on user input
- *
- * Revision 1.2  1998/10/09 15:50:23  irigoin
- * scanf() replaced by user_request()
- *
  */
 
 #include <stdio.h>

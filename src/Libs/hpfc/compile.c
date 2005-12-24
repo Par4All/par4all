@@ -1,56 +1,6 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $Id$
- * $Log: compile.c,v $
- * Revision 1.77  2003/06/19 07:39:15  nguyen
- * Update calls to make_statement and make_variable with new RI for C
- *
- * Revision 1.76  1999/05/25 13:00:50  coelho
- * type fixed.
- *
- * Revision 1.75  1998/12/30 13:12:28  zory
- * call to atomize_as_required extended to accept new parameters
- *
- * Revision 1.74  1998/12/26 21:18:15  irigoin
- * error_handler added
- *
- * Revision 1.73  1998/04/14 20:42:15  coelho
- * *** empty log message ***
- *
- * Revision 1.72  1997/12/08 14:51:29  coelho
- * free_text added.
- *
- * Revision 1.71  1997/11/22 16:34:03  coelho
- * translation not needed any more...
- *
- * Revision 1.70  1997/10/28 14:37:33  keryell
- * Renamed basename and dirname as pips_basename and pips_dirname for
- * OSF1.
- *
- * Revision 1.69  1997/10/28 09:36:16  coelho
- * nope.
- *
- * Revision 1.68  1997/10/27 16:49:26  coelho
- * db put updated to Src.
- *
- * Revision 1.67  1997/10/27 09:50:27  coelho
- * local basename dropped.
- *
- * Revision 1.66  1997/09/15 19:21:41  coelho
- * fixed for new common prefix.
- *
- * Revision 1.65  1997/08/04 13:53:30  coelho
- * new generic effects.
- *
- * Revision 1.64  1997/07/22 13:21:04  keryell
- * %x -> %p formats.
- *
- * Revision 1.63  1997/04/15 10:57:02  creusil
- * statement_effects used instead of statement mappings. bc.
- *
- * Revision 1.62  1997/03/20 09:49:06  coelho
- * system -> safe_system.
- *
  */
 
 #include "defines-local.h"

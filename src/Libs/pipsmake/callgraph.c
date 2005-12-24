@@ -1,12 +1,6 @@
 /* Global computation of CALLERS, HEIGHT and DEPTH
  *
  * $Id$
- *
- * $Log: callgraph.c,v $
- * Revision 1.9  2003/06/27 12:10:08  irigoin
- * First version computing HEIGHT and DEPTh as well as CALLERS
- *
- *
  */
 
 

@@ -6,27 +6,6 @@
  * Francois Irigoin
  *
  * $Id$
- *
- * $Log: return.c,v $
- * Revision 1.17  2003/08/02 14:05:27  irigoin
- * New error recovery procedure: soft_reset_alternate_returns()
- *
- * Revision 1.16  2003/06/19 07:38:06  nguyen
- * Update calls to make_statement and make_variable with new RI for C
- *
- * Revision 1.15  2002/06/20 15:51:10  irigoin
- * New version for handling alternate returns. Code used elsewhere moved into ri-util.
- *
- * Revision 1.14  2002/06/12 14:22:21  irigoin
- * two calls to update_called_modules() had been forgotten for the HRC option
- *
- * Revision 1.13  2002/06/12 10:43:24  irigoin
- * Ajout de l'option HRC, hidden return code.
- *
- * Revision 1.12  2002/06/08 16:17:53  irigoin
- * Functions added to replace formal return labels and actual return labels
- * by character strings
- *
  */
 
 #include <stdio.h>

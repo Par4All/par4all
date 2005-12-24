@@ -3,17 +3,6 @@
  *
  * signal management for pips.
  * moved from misc to top level so as to interact with pipsmake/pipsdbm...
- *
- * $Log: signal.c,v $
- * Revision 1.3  1998/05/26 16:51:56  coelho
- * missing break added.
- *
- * Revision 1.2  1998/05/25 17:24:34  coelho
- * interruption with different behaviors...
- *
- * Revision 1.1  1998/05/25 17:09:59  coelho
- * Initial revision
- *
  */
 
 #include <stdio.h>

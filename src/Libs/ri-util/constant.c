@@ -2,14 +2,6 @@
  *
  * $Id$
  *
- * $Log: constant.c,v $
- * Revision 1.24  2003/05/20 08:59:43  irigoin
- * Handling of unknown constants in MakeValueSymbolic(). Added for Corinne
- * and EDF code to handle concatenation operator // in DATA constant strings.
- *
- * Revision 1.23  2002/06/27 14:39:17  irigoin
- * Function complex_constant_expression_p() added.
- *
  */
 
 #include <stdio.h>

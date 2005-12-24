@@ -3,25 +3,6 @@
  * Fabien Coelho, August 1993
  *
  * $Id$
- * $Log: o-analysis.c,v $
- * Revision 1.41  1997/08/04 14:03:31  coelho
- * new generic includes.
- *
- * Revision 1.40  1997/05/03 14:11:47  coelho
- * *** empty log message ***
- *
- * Revision 1.39  1997/05/03 11:48:58  coelho
- * *** empty log message ***
- *
- * Revision 1.38  1997/04/17 18:48:30  coelho
- * hash_put warnings--
- *
- * Revision 1.37  1997/04/17 15:29:00  coelho
- * entity_mapping -> entity_int
- *
- * Revision 1.36  1997/03/20 10:22:04  coelho
- * RCS headers.
- *
  */
 
 #include "defines-local.h"

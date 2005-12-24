@@ -3,20 +3,7 @@
  * Be'atrice Apvrille, august 27, 1993
  *
  * $Id$
- *
- * $Log: static.c,v $
- * Revision 1.11  2003/12/05 17:12:00  nguyen
- * Replace module_local_name by entity_user_name to handle entities in C
- *
- * Revision 1.10  2002/07/22 17:17:24  irigoin
- * A two-entry current_module_statement stack... Not glorious but enough to
- * solve problems linked to alternate returns.
- *
- *
- *
  */
-
-
 
 /* used to store the summary transformer ? 
    to retrieve intraprocedural effects ? */

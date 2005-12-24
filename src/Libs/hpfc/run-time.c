@@ -3,37 +3,6 @@
  * Fabien Coelho, May and June 1993
  *
  * $Id$
- * $Log: run-time.c,v $
- * Revision 1.43  1997/12/13 09:09:19  coelho
- * sprintf -> concatenate.
- *
- * Revision 1.42  1997/10/27 16:48:29  coelho
- * return updated...
- *
- * Revision 1.41  1997/10/21 13:36:45  coelho
- * guard against already defined routines...
- *
- * Revision 1.40  1997/10/21 13:29:03  coelho
- * prettier.
- *
- * Revision 1.39  1997/10/20 19:58:29  irigoin
- * Typo fixed
- *
- * Revision 1.38  1997/10/20 19:54:00  irigoin
- * Calls to MakeExternalFunction() and make_empty_module() replaced.
- *
- * Revision 1.37  1997/08/04 13:58:59  coelho
- * new generic effects includes.
- *
- * Revision 1.36  1997/06/12 14:20:59  coelho
- * functions reorder.
- *
- * Revision 1.34  1997/04/17 13:25:28  coelho
- * STRING buffer added.
- *
- * Revision 1.32  1997/03/20 10:20:07  coelho
- * RCS headers.
- *
  */
 
 #include "defines-local.h"

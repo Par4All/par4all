@@ -4,19 +4,6 @@
  * run-time resolution parameters.
  *
  * $Id$
- * $Log: inits.c,v $
- * Revision 1.26  1998/04/14 20:36:02  coelho
- * bug--
- *
- * Revision 1.25  1998/04/02 20:36:09  irigoin
- * Call to NumberOfElements() replaced by call to element_number()
- *
- * Revision 1.24  1997/12/13 09:17:05  coelho
- * leaks--
- *
- * Revision 1.23  1997/03/20 10:21:40  coelho
- * RCS headers.
- *
  */
 
 #include "defines-local.h"

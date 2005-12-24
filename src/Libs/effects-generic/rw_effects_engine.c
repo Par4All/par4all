@@ -7,11 +7,6 @@
  * all types of read and write effects and cumulated references.
  *
  * $Id$
- *
- * $Log: rw_effects_engine.c,v $
- * Revision 1.11  2002/03/06 16:02:56  irigoin
- * Check that loop bodies do not define the loop indices
- *
  */
 #include <stdio.h>
 #include <string.h>

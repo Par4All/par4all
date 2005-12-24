@@ -4,12 +4,6 @@
  * Build a change of basis matrix G compatible with a hyperplane direction h
  *
  * $Id$
- *
- * $Log: scanning_base.c,v $
- * Revision 1.8  1998/10/12 10:46:34  irigoin
- * Comments added, RCS variables added
- *
- *
  */
 #include <stdlib.h>
 #include <stdio.h>

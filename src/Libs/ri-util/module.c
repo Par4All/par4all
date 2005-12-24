@@ -1,37 +1,5 @@
  /*
   * $Id$
-  *
-  * $Log: module.c,v $
-  * Revision 1.32  1998/04/14 15:14:13  coelho
-  * linear.h and casts.
-  *
-  * Revision 1.31  1997/12/02 16:18:14  coelho
-  * order fixed.
-  *
-  * Revision 1.30  1997/12/02 12:18:50  coelho
-  * resort declarations according to initial ones...
-  *
-  * Revision 1.29  1997/11/29 13:29:47  coelho
-  * fix to close on dependent parameters.
-  *
-  * Revision 1.28  1997/11/22 17:09:00  coelho
-  * global and local referenced entities are maintained separately...
-  *
-  * Revision 1.27  1997/11/22 16:55:52  coelho
-  * more debug...
-  *
-  * Revision 1.26  1997/11/22 16:24:26  coelho
-  * missing assert added.
-  *
-  * Revision 1.25  1997/11/22 16:17:42  coelho
-  * insure_global_declaration_coherency() hook for hpfc.
-  *
-  * Revision 1.24  1997/11/10 10:24:43  coelho
-  * clean declarations : do not include equiv of commons if not used...
-  *
-  * Revision 1.23  1997/11/04 12:50:02  coelho
-  * bug--: cleaning declarations must not drop data of common...
-  *
   */
 #include <stdlib.h>
 #include <stdio.h>

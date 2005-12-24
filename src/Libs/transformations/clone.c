@@ -3,69 +3,6 @@
  *
  * Cloning of a subroutine.
  * debug: CLONE_DEBUG_LEVEL
- *
- * $Log: clone.c,v $
- * Revision 1.20  2000/12/11 15:41:02  ancourt
- * compute_callees from static to non static function
- *
- * Revision 1.19  1998/12/26 20:24:40  irigoin
- * error_handler added
- *
- * Revision 1.18  1998/09/17 11:55:25  coelho
- * error handling added when dealing with user interaction.
- *
- * Revision 1.17  1998/04/14 21:30:37  coelho
- * linear.h
- *
- * Revision 1.16  1997/12/10 14:42:27  coelho
- * leaks--
- *
- * Revision 1.15  1997/11/08 17:28:42  coelho
- * fix with prettyprint, to include commons in redeclarations...
- *
- * Revision 1.14  1997/11/07 18:16:24  coelho
- * text memory leak is back to avoid core dumps...
- *
- * Revision 1.13  1997/11/07 16:40:31  coelho
- * parameters where not considered...
- *
- * Revision 1.12  1997/11/04 20:35:43  coelho
- * more comments added to clonee, when cloning on an argument.
- *
- * Revision 1.11  1997/11/04 20:18:04  coelho
- * comment added in front of generated clones. free the text...
- *
- * Revision 1.10  1997/11/04 17:34:05  coelho
- * more comments.
- *
- * Revision 1.9  1997/11/04 13:41:29  coelho
- * version names are formed in exa instead of decimal...
- *
- * Revision 1.8  1997/11/04 13:25:13  coelho
- * more comments.
- *
- * Revision 1.7  1997/11/04 10:36:58  coelho
- * more comments, plus assert to check coherency in perform...
- *
- * Revision 1.6  1997/11/04 10:12:12  coelho
- * clone_substitute interface added...
- *
- * Revision 1.5  1997/11/04 10:06:26  coelho
- * new clone_substitute interface added.
- *
- * Revision 1.4  1997/11/03 18:18:45  coelho
- * cloning seemes ok with both interface... more tests needed however.
- *
- * Revision 1.3  1997/11/03 09:45:33  coelho
- * clone -> clone_on_argument
- * and other clone pass.
- *
- * Revision 1.2  1997/10/31 16:22:10  coelho
- * tmp install for corinne.
- *
- * Revision 1.1  1997/10/31 10:40:46  coelho
- * Initial revision
- *
  */
 
 #include <stdio.h>

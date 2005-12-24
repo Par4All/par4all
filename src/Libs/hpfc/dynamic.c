@@ -6,46 +6,6 @@
  * to deal with them in HPFC.
  *
  * $Id$
- * $Log: dynamic.c,v $
- * Revision 1.54  1999/05/25 13:26:55  coelho
- * proto update.
- *
- * Revision 1.53  1998/03/17 16:51:48  coelho
- * bug when arrays are template in continue_propagation_p fixed.
- *
- * Revision 1.52  1997/10/28 09:36:59  coelho
- * nope.
- *
- * Revision 1.51  1997/08/05 16:31:35  coelho
- * more debug, and fixed use of effects...
- *
- * Revision 1.50  1997/08/04 13:54:38  coelho
- * new generic effects includes.
- *
- * Revision 1.49  1997/07/25 22:28:56  keryell
- * Avoid to put comments on sequences.
- *
- * Revision 1.48  1997/07/21 15:24:53  keryell
- * Forgotten '"'.
- *
- * Revision 1.47  1997/07/21 15:20:26  keryell
- * Replaced %x format by %p.
- *
- * Revision 1.46  1997/05/28 13:48:22  coelho
- * more debug messages.
- *
- * Revision 1.45  1997/05/02 19:53:06  coelho
- * *** empty log message ***
- *
- * Revision 1.44  1997/04/17 15:28:38  coelho
- * shorten similarity check if already done;-)
- *
- * Revision 1.43  1997/04/15 15:28:37  creusil
- * statement_effects used for proper effects. bc.
- *
- * Revision 1.42  1997/03/20 10:14:41  coelho
- * better RCS headers.
- *
  */
 
 #include "defines-local.h"

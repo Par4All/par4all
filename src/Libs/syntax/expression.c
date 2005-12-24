@@ -1,44 +1,5 @@
-/* 	%A% ($Date: 2005/08/24 15:19:31 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
- *
+/*
  * $Id$
- *
- * $Log: expression.c,v $
- * Revision 1.22  2005/08/24 15:19:31  irigoin
- * First attempt at implementing property
- * PARSER_ACCEPT_ARRAY_RANGE_EXTENSIONS for Project DREAM-UP. Not completed.
- *
- * Revision 1.21  2003/08/02 14:02:47  irigoin
- * Comments improved. An intermediate step to allow functional formal parameters.
- *
- * Revision 1.20  2002/06/20 15:47:23  irigoin
- * explicit constant "IOLIST=" replaced by preprocessor constant
- *
- * Revision 1.19  2000/07/07 16:12:48  irigoin
- * call to pips_assert() replaced by call to ParserError() in MakeAtom() if
- * an array section is parsed.
- *
- * Revision 1.18  2000/04/26 11:27:55  irigoin
- * MakeIoList() updated to avoid sharing between calls to IOLIST.
- *
- * Revision 1.17  1999/01/05 12:35:47  irigoin
- * MakeAtom() updated so as not to declare every single variable: formal
- * parameters of entries must not be declared in the current module
- *
- * Revision 1.16  1998/12/18 19:44:13  irigoin
- * Improved error messages in MakeParameter(): follow-up of adventures at EDF
- *
- * Revision 1.15  1998/11/30 20:00:32  irigoin
- * Error checking added in MakeParameter()
- *
- * Revision 1.14  1998/11/27 13:55:34  irigoin
- * MakeAtom() updated to take into account unbounded substrings of unbounded
- * strings. A fornal parameter string may be unbounded and so may be a substring.
- *
- * Revision 1.13  1998/10/23 11:15:44  irigoin
- * Bug fix in MakeAtom(): functional types were not always updated. See
- * type01, 02 and 03 in Validation/Syntax
- *
- *
  */
 
 #ifndef lint

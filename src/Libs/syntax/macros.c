@@ -1,41 +1,6 @@
 /*
  * $Id$
  *
- * $Log: macros.c,v $
- * Revision 1.11  2003/06/25 08:52:15  irigoin
- * \n added in a warning format
- *
- * Revision 1.10  1998/12/23 16:43:42  coelho
- * recursive descent to substitute macros in macros...
- *
- * Revision 1.9  1998/11/20 17:19:16  keryell
- * Added a call to ParserError when a macro is not yet defined.
- *
- * Revision 1.8  1998/07/24 09:22:30  coelho
- * added ref to standard about macro expansion within a macro.
- *
- * Revision 1.7  1998/07/24 07:30:37  coelho
- * apply macro expansion on new macros before entering them.
- *
- * Revision 1.6  1998/04/14 21:28:17  coelho
- * linear.h
- *
- * Revision 1.5  1997/09/23 15:21:39  coelho
- * typo:
- *
- * Revision 1.4  1997/09/20 22:06:58  coelho
- * recurse if necessary only.
- *
- * Revision 1.3  1997/09/18 17:11:23  coelho
- * does not subs twice...
- *
- * Revision 1.2  1997/09/18 16:56:55  coelho
- * warn if non safe.
- *
- * Revision 1.1  1997/09/18 16:01:17  coelho
- * Initial revision
- *
- *
  * Partial Fortran statement functions support by cold expansion.
  */
 

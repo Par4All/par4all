@@ -9,16 +9,6 @@
  * Fabien Coelho  August 93
  *
  * $Id$
- * $Log: align-checker.c,v $
- * Revision 1.23  1997/08/04 13:52:10  coelho
- * *** empty log message ***
- *
- * Revision 1.22  1997/04/15 16:07:07  coelho
- * headers updated.
- *
- * Revision 1.21  1997/03/20 10:22:37  coelho
- * RCS headers.
- *
  */
 
 #include "defines-local.h"

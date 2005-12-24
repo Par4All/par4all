@@ -1,44 +1,6 @@
 /* package semantics
  * 
  * $Id$
- *
- * $Log: interprocedural.c,v $
- * Revision 1.35  2003/07/24 10:48:54  irigoin
- * Consistency bug in translate_global_value() fixed.
- *
- * Revision 1.34  2002/03/14 15:16:33  irigoin
- * call to pips_user_error() replaced by call to pips_user_warning() in
- * add_formal_to_actual_bindings() when a typing problem is detected. If type
- * are about compatible, binding equation is generated. If not, the parameter
- * is ignored which is incorrect.
- *
- * Revision 1.33  2001/07/19 17:51:33  irigoin
- * Mostly reformatting and systematic use of pips_debuf() instead of
- * debug(). Make real differences hard to catch:-(
- *
- * Revision 1.32  2000/11/23 17:13:01  irigoin
- * New function for normalization, sc_safe_normalize(), to always retrieve a
- * consistent system of constraints
- *
- * Revision 1.31  1999/01/16 21:20:52  irigoin
- * Bug fix in intra_to_inter_precondition(): even non-feasible system must be
- * projected because of their possibly non-empty basis.
- *
- * Revision 1.30  1999/01/15 08:59:08  irigoin
- * Bug fix in precondition_intra_to_inter(): a non feasible transformer must
- * be preserved even though the intersection of the effects of the called
- * procedure and the basis of the transformer is empty (since the basis of
- * the transformer is empty).
- *
- * Revision 1.29  1999/01/14 17:27:43  irigoin
- * Kludge to avoid a useless costly projection in
- * precondition_intra_to_inter(). This was motivated by XERCTL in KIVA,
- * combustion code from Renault.
- *
- * Revision 1.28  1999/01/07 16:43:06  irigoin
- * Bug fix in translated_global_value() to resist aliasing between a global variable and a formal parameter. See spice01.f in Validation.
- *
- *
  */
 
 #include <stdio.h>

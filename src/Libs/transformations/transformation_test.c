@@ -1,14 +1,4 @@
-/*
-  $Id$
-
-  $Log: transformation_test.c,v $
-  Revision 1.3  1998/12/03 15:52:01  coelho
-  flattening added.
-
-  Revision 1.2  1998/12/03 14:58:15  coelho
-  cosmetics.
-
-*/
+/* $Id$ */
 
 #include <stdio.h> 
 

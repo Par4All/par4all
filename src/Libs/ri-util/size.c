@@ -1,19 +1,5 @@
 /* 
  * $Id$
- *
- * $Log: size.c,v $
- * Revision 1.16  2002/03/07 17:19:01  irigoin
- * Comment added for SizeOfElements()
- *
- * Revision 1.15  1999/01/12 20:39:02  irigoin
- * Performance improvements for entity_conflict_p(). Instead of gathering all
- * information and making a final test, partial tests are performed as soon
- * as possible. Function storage_space_of_variable() is expensive and should
- * not be called unless necessary. It might be possible to speed up
- * entity_conflict_p() some more by checking scalar variables and by avoiding
- * the call to storage_space_of_variable().
- *
- *
  */
 #include <stdio.h>
 #include <string.h>

@@ -22,44 +22,6 @@
  * - last line may not be \n'ed.
  * - bang comment management added (to avoid the parser)
  *
- * $Log: split_file.c,v $
- * Revision 1.46  2001/04/09 15:55:46  coelho
- * in_hollerith stuff?
- *
- * Revision 1.45  1999/01/08 16:35:40  coelho
- * condition fixed...
- *
- * Revision 1.44  1999/01/08 16:19:03  coelho
- * error on multi-line fsplit.
- *
- * Revision 1.43  1998/12/23 14:04:26  coelho
- * *** empty log message ***
- *
- * Revision 1.42  1998/09/21 09:45:44  coelho
- * '#' added as a comment start to deal with cpp output...
- *
- * Revision 1.41  1998/07/13 11:16:27  coelho
- * fix for entry to match only if there is some name after...
- * however yet another bug to come: entry foo(1) = 2.0
- *
- * Revision 1.40  1998/07/10 16:13:25  coelho
- * fix of the fix about entry and implicit name interaction.
- *
- * Revision 1.39  1998/07/10 15:59:04  coelho
- * fix for implicit main and data that interacted with entries.
- *
- * Revision 1.38  1998/07/10 08:17:54  coelho
- * entry-related bug fixed.
- *
- * Revision 1.37  1998/07/09 18:24:18  coelho
- * hack for entry: output file names are preceded by their modules...
- *
- * Revision 1.36  1998/05/29 16:22:27  coelho
- * handler for simply processing files.
- *
- * Revision 1.35  1998/05/29 13:18:58  coelho
- * bang comment skipped... (beurk).
- *
  */
 
 /* added macros

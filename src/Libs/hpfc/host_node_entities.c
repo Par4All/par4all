@@ -1,37 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
  * $Id$
- * $Log: host_node_entities.c,v $
- * Revision 1.31  1998/04/14 20:54:39  coelho
- * casts
- *
- * Revision 1.30  1998/04/14 20:41:08  coelho
- * *** empty log message ***
- *
- * Revision 1.29  1997/11/22 16:32:15  coelho
- * assert, and debug function added... ('bout mappings...)
- *
- * Revision 1.28  1997/10/30 17:09:41  coelho
- * nope
- *
- * Revision 1.27  1997/10/28 09:36:01  coelho
- * bug-- (full copy of list of expression necessary...)
- *
- * Revision 1.26  1997/10/27 16:26:03  coelho
- * referenced entities are not managed here any more...
- *
- * Revision 1.25  1997/08/04 13:55:09  coelho
- * *** empty log message ***
- *
- * Revision 1.24  1997/07/21 14:00:58  keryell
- * Replaced %x format by %p.
- *
- * Revision 1.23  1997/04/17 18:48:48  coelho
- * has_put warnings--
- *
- * Revision 1.22  1997/03/20 10:26:11  coelho
- * RCS headers.
- *
  */
 
 #include "defines-local.h"

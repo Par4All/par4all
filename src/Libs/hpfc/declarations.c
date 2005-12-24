@@ -4,19 +4,6 @@
  * normalization of HPF declarations.
  *
  * $Id$
- * $Log: declarations.c,v $
- * Revision 1.19  1998/04/02 20:54:14  irigoin
- * Call to SizeOfDimension() modified
- *
- * Revision 1.18  1997/10/30 17:09:31  coelho
- * comes with old var instead of new... ???
- *
- * Revision 1.17  1997/08/04 13:54:03  coelho
- * new generic effects incldues.
- *
- * Revision 1.16  1997/03/20 10:18:42  coelho
- * RCS headers.
- *
  */
  
 #include "defines-local.h"

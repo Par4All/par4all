@@ -24,35 +24,6 @@
  * See: http://www.irisa.fr/api/Rajopadhye/tiling
  *
  * $Id$
- * 
- * $Log: tiling.c,v $
- * Revision 1.8  1999/10/05 11:59:30  irigoin
- * Yet some more comments
- *
- * Revision 1.7  1999/10/05 11:23:57  irigoin
- * Some more comments
- *
- * Revision 1.6  1999/10/05 11:23:17  irigoin
- * Comments about tiling added at the beginning
- *
- * Revision 1.5  1998/11/18 14:51:28  irigoin
- * insure coherency of specified tiling wrt the loop depth.
- *
- * Revision 1.4  1998/10/13 07:17:53  irigoin
- * Intermediate version of tiling which works on at least a small set of
- * cases for Martin Griebl's visit.
- *
- * Revision 1.3  1998/10/12 17:00:37  ancourt
- * essai ca code generation
- *
- * Revision 1.2  1998/10/12 16:25:51  ancourt
- * *** empty log message ***
- *
- * Revision 1.1  1998/10/12 10:03:33  irigoin
- * Initial revision
- *
- *
- *
  */
 
 #include <stdlib.h>

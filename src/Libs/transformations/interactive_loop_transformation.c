@@ -2,11 +2,7 @@
  *interchange, hyperplane method,...
  *
  * $Id$
- *
- * $Log: interactive_loop_transformation.c,v $
- * Revision 1.1  1998/10/11 20:02:58  irigoin
- * Initial revision
- * */
+ */
 
 #include <stdio.h>
 #include <string.h>

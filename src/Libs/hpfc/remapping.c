@@ -5,53 +5,6 @@
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
  * ??? should drop the renaming domain?
- *
- * $Log: remapping.c,v $
- * Revision 1.68  1998/11/18 13:24:20  coelho
- * row echlon option moved.
- *
- * Revision 1.67  1998/04/14 20:55:06  coelho
- * casts.
- *
- * Revision 1.66  1998/04/02 20:36:39  irigoin
- * Call to NumberOfElements() replaced by call to element_number()
- *
- * Revision 1.65  1998/03/17 16:52:23  coelho
- * clearer debug messages.
- *
- * Revision 1.64  1998/02/18 12:06:24  coelho
- * cleaned log area.
- *
- * Revision 1.63  1997/12/08 14:51:14  coelho
- * free_text added.
- *
- * Revision 1.62  1997/10/27 17:03:47  coelho
- * switched to Src
- *
- * Revision 1.61  1997/07/28 14:30:25  keryell
- * Removed conflict in concatenate().
- *
- * Revision 1.60  1997/07/25 22:26:16  keryell
- * Avoid to put comments on sequences.
- *
- * Revision 1.59  1997/07/21 14:00:08  keryell
- * Replaced %x format by %p.
- *
- * Revision 1.58  1997/05/24 11:03:41  coelho
- * lambda upper bound constraint added?
- *
- * Revision 1.53  1997/04/10 08:50:05  coelho
- * optimizations guarded by properties.
- *
- * Revision 1.51  1997/04/07 17:06:35  coelho
- * test normalization...
- *
- * Revision 1.50  1997/04/07 09:27:33  coelho
- * lattice extraction for the basic enumeration.
- *
- * Revision 1.49  1997/03/20 10:25:44  coelho
- * RCS headers.
- *
  */
 
 #include "defines-local.h"

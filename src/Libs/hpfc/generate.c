@@ -1,12 +1,5 @@
 /* 
  * $Id$
- * $Log: generate.c,v $
- * Revision 1.17  1998/06/03 13:13:34  coelho
- * fix for host when receiving mcasts from sender...
- *
- * Revision 1.16  1997/03/20 10:20:35  coelho
- * RCS headers.
- *
  * 
  * Fabien Coelho, May 1993
  */

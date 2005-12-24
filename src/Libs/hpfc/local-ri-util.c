@@ -1,14 +1,4 @@
 /* $Id$
- * $Log: local-ri-util.c,v $
- * Revision 1.17  1998/04/15 09:55:33  coelho
- * fixed.
- *
- * Revision 1.16  1997/10/30 17:09:53  coelho
- * nope.
- *
- * Revision 1.15  1997/03/20 10:20:58  coelho
- * RCS headers.
- *
  *
  * HPFC (c) Fabien Coelho May 1993
  */

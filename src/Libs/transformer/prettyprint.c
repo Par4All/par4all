@@ -8,24 +8,6 @@
  * Old version  : prettyprint.old.c
  *
  * $Id$
- *
- * $Log: prettyprint.c,v $
- * Revision 1.11  2003/07/24 08:53:06  irigoin
- * Arguments now used in obsolete functions to avoid compiler warnings
- *
- * Revision 1.10  2003/07/24 08:38:32  irigoin
- * generic_value_name() made a little bit more robust
- *
- * Revision 1.9  2001/12/05 17:09:38  irigoin
- * Modification to handle value names in a safer way
- *
- * Revision 1.8  2001/10/22 15:57:34  irigoin
- * Temporary values taken into account in generic_value_name()
- *
- * Revision 1.7  2001/07/19 18:06:02  irigoin
- * Better type casting somewhere. Minor change.
- *
- *
  */
 
 #include <stdio.h>

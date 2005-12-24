@@ -1,14 +1,7 @@
 /* Messages handling
  *
  * $Id$
- * $Log: messages.c,v $
- * Revision 1.18  1997/07/25 22:25:56  keryell
- * Avoid to put comments on sequences.
  *
- * Revision 1.17  1997/03/20 10:23:02  coelho
- * RCS headers.
- *
- * 
  * Fabien Coelho, August 1993
  */
 

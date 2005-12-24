@@ -2,44 +2,7 @@
  * and in the static area and in the dynamic area. The heap area is left
  * aside.
  *
- * 	%A% ($Date: 2003/08/11 16:25:26 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
- *
  * $Id$
- *
- * $Log: equivalence.c,v $
- * Revision 1.26  2003/08/11 16:25:26  irigoin
- * User error detection improved
- *
- * Revision 1.25  2002/03/19 12:30:07  irigoin
- * General substitution of debug() by pips_debug() and replacement of CONS by
- * gen_once() in SaveChains() to avoid later bug in semantics: the same
- * variable was stored several times in ram_shared when multiple variables
- * were aliased together.
- *
- * Revision 1.24  2002/03/08 10:21:03  irigoin
- * Upgrade to ComputeAddresses() to allocate left-over varying size arrays in
- * stack area if PARSER_ACCEPT_ANSI_EXTENSIONS is set to true
- *
- * Revision 1.23  2001/04/06 11:49:50  irigoin
- * Additional tests to detect conflicting EQUIVALENCE and DATA statements
- *
- * Revision 1.22  2001/04/05 08:27:15  irigoin
- * Test added for non-standard adjustable arrays in MakeEquivAtom() for Nga
- * NMguyen (equiv23.f)
- *
- * Revision 1.21  2001/03/20 14:36:38  irigoin
- * Test for user error added in MakeEquivAtom() for Nga
- *
- * Revision 1.20  1998/10/14 06:47:12  irigoin
- * Same bug again, a bit further down in ComputeAddresses()
- *
- * Revision 1.19  1998/10/13 20:17:51  irigoin
- * Bug fix in ComputeAddress(): some order between DATA and COMMON
- * declarations in equivalence chains was assumed.
- *
- * Revision 1.18  1998/10/09 11:44:34  irigoin
- * Support for the *HEAP* area in ComputeAddresses()
- *
  *
  */
 

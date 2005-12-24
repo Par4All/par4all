@@ -13,11 +13,6 @@
 
    $Id$
 
-   $Log: fortran90.c,v $
-   Revision 1.5  1998/09/09 15:45:01  irigoin
-   Proper generation of one dimensional array assignments.
-
-
 */
 
 #include <stdio.h>

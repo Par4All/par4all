@@ -2,32 +2,6 @@
  * Detection of unreachable code, from the control flow point of view.
  *
  * $Id$
- *
- * $Log: unreachable.c,v $
- * Revision 1.8  1998/06/03 08:46:10  irigoin
- * Handling of while loops slightly modified
- *
- * Revision 1.7  1998/04/14 19:55:19  coelho
- * *** empty log message ***
- *
- * Revision 1.6  1997/11/14 09:29:50  keryell
- * Removed 2 nasty ";".
- *
- * Revision 1.5  1997/11/13 08:07:05  coelho
- * statement_continued_p added...
- *
- * Revision 1.4  1997/11/12 17:06:51  coelho
- * 1 go to 1 fixed...
- *
- * Revision 1.3  1997/11/12 12:07:58  coelho
- * new interface for Ronan to use it...
- *
- * Revision 1.2  1997/11/10 18:19:52  coelho
- * typos fixed...
- *
- * Revision 1.1  1997/11/10 18:12:15  coelho
- * Initial revision
- *
  */ 
 
 #include <stdio.h>

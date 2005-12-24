@@ -1,13 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
  * $Id$
- * $Log: generate-util.c,v $
- * Revision 1.19  1997/04/17 11:47:07  coelho
- * *** empty log message ***
- *
- * Revision 1.18  1997/03/20 10:25:10  coelho
- * RCS headers.
- *
  */
 
 #include "defines-local.h"

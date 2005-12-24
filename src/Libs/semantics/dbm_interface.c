@@ -20,33 +20,7 @@
   * Be'atrice Apvrille, August 1993
   */
 
-/* $Id$
- * 
- * $Log: dbm_interface.c,v $
- * Revision 1.45  2005/12/19 15:48:56  irigoin
- * Update for refine_transformers(). Split of preconditions_intra into
- * preconditions_intra_fast and preconditions_intra because the semantics has
- * changed.
- *
- * Revision 1.44  2003/07/24 09:00:21  irigoin
- * Normalization added before summary preconditions are stored in database.
- *
- * Revision 1.43  2003/07/11 15:37:04  irigoin
- * Intermediate version. No core dump but a lot of problem related to
- * pipsmake.rc and interprocedurality.
- *
- * Revision 1.42  2003/06/27 11:52:59  irigoin
- * temporary/intermediate version. resource SUMMARY_PRECONDITION should not
- * be generated in intraprocedural mode. other modifs linked to Duong's needs
- * to print out variables in constraints systems.
- *
- * Revision 1.41  2001/12/05 17:13:19  irigoin
- * Numerous additions to compute total preconditions
- *
- * Revision 1.40  2001/10/22 16:22:38  irigoin
- * refine_transformers() added
- *
- */
+/* $Id$ */
 
 #include <stdio.h>
 #include <string.h>

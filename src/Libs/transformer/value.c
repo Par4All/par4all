@@ -158,39 +158,6 @@
   * Francois Irigoin, 13 January 1994
   *
   * $Id$
-  *
-  * $Log: value.c,v $
-  * Revision 1.27  2004/01/06 10:09:27  irigoin
-  * Functions number_of_analyzed_values() and aproximate_number_of_analyzed_variables() added for Duong Nguyen
-  *
-  * Revision 1.26  2003/07/24 08:54:49  irigoin
-  * useless argument used to avoid a useless compiler warning.
-  *
-  * Revision 1.25  2003/07/24 08:47:21  irigoin
-  * Function hash_value_to_name_undefined_p() added to be able to use some
-  * semantics and transformer functions when the mappings are not available,
-  * especially in interprocedural contexts.
-  *
-  * Revision 1.24  2003/06/20 07:20:21  nguyen
-  * Update calls to make_statement and make_variable with new RI for C
-  *
-  * Revision 1.23  2002/07/22 17:21:26  irigoin
-  * Function readable_value_name() added to cope with temporary values
-  *
-  * Revision 1.22  2002/03/19 17:42:04  irigoin
-  * Due to a bug fixed in ../semantics/mappings.c, improvement of comments,
-  * replacement of debug() by pips_debug() and of pips_error() by pips_internal_error()
-  *
-  * Revision 1.21  2001/07/24 13:10:42  irigoin
-  * Bug fix in make_local_value_entity(): types inherited by temporary values
-  * were wrong due to a "specificity" of type_equal_p() which returns true for
-  * strings even when the lenghts are different.
-  *
-  * Revision 1.20  2001/07/19 18:13:58  irigoin
-  * Lots of modifications to support the new multitype analysis plus temporary
-  * variables. Reformatting of almost all functions.
-  *
-  *
   */
 
 #include <stdlib.h>

@@ -30,48 +30,6 @@ char vcid_control_control[] =
 
 /*
  * $Id$
- *
- * $Log: control.c,v $
- * Revision 1.43  2005/12/19 15:37:56  irigoin
- * New functions added to convert a for loop into a loop (i.e. a DO
- * loop). These functions are not called by default. They are not completed
- * but only target rsp05.c for the time being. This installation takes place
- * to let Fabien Coelho move PIPS source code version management from RCS to SVN.
- *
- * Revision 1.42  2005/12/09 17:27:27  irigoin
- * Conversion of C for loops into C or Fortran while loops added
- *
- * Revision 1.41  2003/12/19 12:18:10  irigoin
- * strdup() applied to constant empty strings "" for empty statement
- * comments, debug_on() and debug_off() moved up into module.
- *
- * Revision 1.40  2003/12/04 16:41:24  nguyen
- * Handle forloop controlization
- *
- * Revision 1.39  2003/08/06 14:15:55  nguyen
- * Modify and add functions for C
- *
- * Revision 1.38  2003/08/02 13:40:05  irigoin
- * Cosmetic changes to silence gcc
- *
- * Revision 1.37  2003/07/21 12:19:41  nguyen
- * Add new control structures for C language (for loop, switch, ...), preliminary version
- *
- * Revision 1.36  2003/06/19 07:30:13  nguyen
- * Update calls to make_statement and make_variable with new RI for C
- *
- * Revision 1.35  2002/10/07 09:56:41  irigoin
- * Bug fix in controlize_whileloop(). See Validation/redlec.f
- *
- * Revision 1.34  2002/07/09 14:58:20  irigoin
- * Function add_proper_successor_to_predecessor() added. Reformatting,
- * comments improved, debugging improved, bug fix in handling of IF
- * destructuration (to develop bourdoncle.c).
- *
- * Revision 1.33  2002/06/27 14:52:00  irigoin
- * Page breaks added.
- *
- *
  */
 
 #include <stdio.h>

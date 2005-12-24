@@ -3,45 +3,6 @@
  * Split one C file into one compilation module declaration file and one
  * file for each C function found. The input C file is assumed
  * preprocessed.
- *
- * $Log: csplit_file.c,v $
- * Revision 1.11  2003/12/04 16:29:05  irigoin
- * Bug fix in function signature declaration: static or extern
- *
- * Revision 1.10  2003/09/03 16:27:49  irigoin
- * Activation of TRY/CATCH/UNCATCH in csplit() to recover from parsing errors.
- *
- * Revision 1.9  2003/08/14 16:13:27  irigoin
- * Operational check for files with the same name
- *
- * Revision 1.8  2003/08/14 09:32:13  irigoin
- * COMPILATION_UNIT_PREFIX eliminated
- *
- * Revision 1.7  2003/08/14 08:47:38  irigoin
- * Compatibility with LINUX for strdup() declaration
- *
- * Revision 1.6  2003/08/12 15:44:46  irigoin
- * Mostly, implementation of Fabien's (useless) kludge, COMPILATION_UNIT_PREFIX
- *
- * Revision 1.5  2003/08/08 15:57:52  irigoin
- * reset added to process a set of files and not only one file at a tine
- *
- * Revision 1.4  2003/08/04 16:49:48  irigoin
- * Reset keyword and typedef table added
- *
- * Revision 1.3  2003/08/01 16:42:28  irigoin
- * Intermediate version, compatible with the C-syntax Validation, coupled
- * with the parser and the controlizer, if not yet the C prettyprinter.
- *
- * Revision 1.2  2003/08/01 05:59:04  irigoin
- * Intermediate version installed to let Production link
- *
- * Revision 1.1  2003/07/29 15:12:28  irigoin
- * Initial revision
- *
- *
- * 
- *
  */
 
 #include <stdio.h>

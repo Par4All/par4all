@@ -1,39 +1,10 @@
 /*
-
   $Id$
+ 
+  LOOP_UNROLL()
 
-  $Log: loop_unroll.c,v $
-  Revision 1.25  2005/11/04 17:36:16  irigoin
-  Property FULL_UNROLL_INTERACTIVELY added and used to unroll all loops,
-  even loops without labels.
-
-  Revision 1.24  2003/05/21 07:59:20  irigoin
-  In loop_unroll(), use index type for new index related variables
-
-  Revision 1.23  2000/07/03 09:57:49  irigoin
-  transformation cut...
-
-  Revision 1.22  2000/03/16 14:03:59  irigoin
-  Comments added to find_unroll_pragma_and_fully_unroll()
-
-  Revision 1.21  2000/03/16 09:28:13  irigoin
-  Full loop unrolling with pragma added. Draft version installed because
-  Fabien needs it!
-
-  Revision 1.20  1999/05/05 15:47:46  irigoin
-  Error message improved in full_loop_unroll()
-
-  Revision 1.19  1998/10/20 15:01:07  ancourt
-  add whileloop entry
-
-  Revision 1.18  1998/09/17 12:16:46  coelho
-  type fixed.
-
-
- * LOOP_UNROLL()
- *
- * Bruno Baron, Francois Irigoin
- */
+  Bruno Baron, Francois Irigoin
+*/
 #include <stdio.h>
 #include <string.h>
 

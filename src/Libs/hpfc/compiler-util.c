@@ -3,16 +3,6 @@
  * Fabien Coelho, May 1993
  *
  * $Id$
- * $Log: compiler-util.c,v $
- * Revision 1.24  1997/09/13 12:57:33  coelho
- * empty stat detection moved to ri-util.
- *
- * Revision 1.23  1997/05/30 13:14:20  coelho
- * less warnings...
- *
- * Revision 1.22  1997/03/20 10:19:06  coelho
- * RCS headers.
- *
  */
 
 #include "defines-local.h"

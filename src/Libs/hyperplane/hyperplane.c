@@ -1,17 +1,6 @@
 /* package hyperplane
  *
  * $Id$
- * 
- * $Log: hyperplane.c,v $
- * Revision 1.9  2005/12/19 16:41:55  irigoin
- * New debug messages added by Duong Nguyen.
- *
- * Revision 1.8  1998/10/12 10:42:43  irigoin
- * Typo in RCS variable
- *
- * Revision 1.7  1998/10/09 15:49:46  irigoin
- * Reformatting + conversion from int to Value
- *
  *
  */
 

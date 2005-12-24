@@ -1,55 +1,6 @@
 /*
  * $Id$
  *
- * $Log: initial.c,v $
- * Revision 1.16  2001/12/05 17:15:48  irigoin
- * function program_postcondition() added for total precondition computation
- *
- * Revision 1.15  2001/07/13 13:21:13  coelho
- * hop.
- *
- * Revision 1.14  1998/05/28 19:05:47  irigoin
- * Filtering by effects added to avoid spurious variables as in Spec/fppp.f
- * and data02.f
- *
- * Revision 1.13  1998/04/14 21:25:21  coelho
- * linear.h
- *
- * Revision 1.12  1997/12/10 14:29:36  coelho
- * free text.
- *
- * Revision 1.11  1997/09/30 06:57:15  coelho
- * gen_array_* used...
- *
- * Revision 1.10  1997/09/11 13:42:10  coelho
- * check consistency...
- *
- * Revision 1.9  1997/09/11 12:34:16  coelho
- * duplicates instead of relying on pipsmake/pipsdbm...
- *
- * Revision 1.8  1997/09/11 12:00:10  coelho
- * none.
- *
- * Revision 1.7  1997/09/10 09:43:30  irigoin
- * Explicit free_value_mappings() added. Context set for
- * program_precondition() and the prettyprinter modules.
- *
- * Revision 1.6  1997/09/09 11:03:15  coelho
- * initial preconditions should be ok.
- *
- * Revision 1.5  1997/09/08 17:52:05  coelho
- * some version for testing.
- *
- * Revision 1.3  1997/09/08 09:35:29  coelho
- * transformer -> precondition.
- *
- * Revision 1.2  1997/09/08 08:51:14  coelho
- * the code is not printed. name fixed.
- *
- * Revision 1.1  1997/09/08 08:45:50  coelho
- * Initial revision
- *
- *
  * Computation of initial transformers that allow to collect
  * global initializations of BLOCK DATA and so.
  *

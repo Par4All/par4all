@@ -1,37 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
  * $Id$
- * $Log: io-compile.c,v $
- * Revision 1.53  1998/11/18 14:01:32  coelho
- * conditions fixed?
- *
- * Revision 1.52  1998/11/18 13:24:00  coelho
- * row echelon with option.
- *
- * Revision 1.51  1998/04/14 20:38:05  coelho
- * useless includes removed.
- *
- * Revision 1.50  1997/09/26 10:52:34  coelho
- * julien added in/out effects io optimizations.
- *
- * Revision 1.49  1997/09/13 12:58:24  coelho
- * *** empty log message ***
- *
- * Revision 1.48  1997/08/04 13:56:52  coelho
- * new generic effects includes.
- *
- * Revision 1.47  1997/07/21 13:56:44  keryell
- * Replaced %x format by %p.
- *
- * Revision 1.46  1997/05/24 09:44:50  coelho
- * more determinism when sorting conditions.
- *
- * Revision 1.45  1997/04/17 11:47:45  coelho
- * *** empty log message ***
- *
- * Revision 1.44  1997/03/20 10:24:44  coelho
- * RCS headers.
- *
  */
 
 #include "defines-local.h"

@@ -2,10 +2,6 @@
  *
  * $Id$
  *
- * $Log: global_parallelization.c,v $
- * Revision 1.5  1998/10/09 15:50:52  irigoin
- * New function loop_hyperplane() added as a new interface with pipsmake
- *
  */
 
 #include <stdio.h>

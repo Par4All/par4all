@@ -19,13 +19,6 @@
   * inequalities and the system dimension, is discarded.
   *
   * Francois Irigoin, November 1990
-  *
-  * $Log: Psc.c,v $
-  * Revision 1.10  2002/08/29 09:00:58  irigoin
-  * sc_gen_copy_tree() now calls sc_copy() instead of sc_dup()
-  *
-  *
-  *
   */
 
 #include <stdio.h>

@@ -1,23 +1,5 @@
 /* 
  * $Id$
- *
- * $Log: initializer.c,v $
- * Revision 1.16  2003/12/30 14:41:03  irigoin
- * ask_a_missing_file() made more robust when the required module is not
- * found in the user-specified file
- *
- * Revision 1.15  2003/08/14 08:48:04  irigoin
- * Compatibility with LINUX for strdup() declaration
- *
- * Revision 1.14  2003/08/01 06:00:01  irigoin
- * Dummy c_initializer added to fit pipsmake.rc
- *
- * Revision 1.13  2003/06/05 09:09:26  irigoin
- * Two additional steps in missing_file_initializer() to survive partially
- * corrupted databases, when new resources are present in the database but
- * not recorded as resource.
- *
- *
  */
 #include <stdio.h>
 #include <string.h>

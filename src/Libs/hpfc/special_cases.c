@@ -1,34 +1,6 @@
 /* HPFC module, Fabien Coelho, May 1993.
  *
  * $Id$
- * $Log: special_cases.c,v $
- * Revision 1.30  1998/12/26 21:20:38  irigoin
- * error_handler added
- *
- * Revision 1.29  1998/04/14 20:43:28  coelho
- * generic void *.
- *
- * Revision 1.28  1998/04/02 20:37:47  irigoin
- * Call to NumberOfElements() replaced by call to element_number()
- *
- * Revision 1.27  1997/09/13 12:58:41  coelho
- * *** empty log message ***
- *
- * Revision 1.26  1997/08/04 14:05:02  coelho
- * convex also needed.
- *
- * Revision 1.25  1997/08/04 14:03:31  coelho
- * new generic includes.
- *
- * Revision 1.24  1997/07/21 15:13:58  keryell
- * Replaced %x format by %p.
- *
- * Revision 1.23  1997/07/21 14:23:29  zory
- * HPFC header is now inserted in the type
- *
- * Revision 1.22  1997/03/20 10:26:34  coelho
- * RCS headers.
- *
  */
 
 #include "defines-local.h"

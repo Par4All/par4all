@@ -1,26 +1,7 @@
-/* Pot-pourri of utilities for the internal representation. Some functions could be moved
- * to non-generic files such as entity.c.
+/* Pot-pourri of utilities for the internal representation. 
+ * Some functions could be moved to non-generic files such as entity.c.
  *
  * $Id$
- *
- * $Log: util.c,v $
- * Revision 1.16  2003/09/05 14:28:57  nguyen
- * Improve error message
- *
- * Revision 1.15  2002/03/08 10:14:33  irigoin
- * predicate stack_area_p() added for StackArea + reformatting
- *
- * Revision 1.14  2000/08/29 13:51:32  irigoin
- * Bug fix in new_label_name(), call to entity_local_name() replaced by call
- * to module_local_name()
- *
- * Revision 1.13  1998/11/05 09:27:50  zory
- * EOLE tags for automatic function extraction added
- *
- * Revision 1.12  1998/10/09 11:35:15  irigoin
- * predicate heap_area_p() added
- *
- *
  */
 #include <stdio.h>
 #include <string.h>

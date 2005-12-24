@@ -9,60 +9,6 @@
   *
   * $Id$
   *
-  * $Log: ri_to_transformers.c,v $
-  * Revision 1.62  2005/12/19 16:14:39  irigoin
-  * Mostly statement_to_transformer() updated to be able to refine while loop
-  * transformers on exit as DO loops are refined.
-  *
-  * Revision 1.61  2003/07/24 10:54:37  irigoin
-  * More debugging messages, more normalization steps, handling of
-  * unstructured statements moved into usntructured.c.
-  *
-  * Revision 1.60  2001/10/22 15:42:16  irigoin
-  * Intraprocedural preconditions can be propagated along transformers to
-  * refine them.
-  *
-  * Revision 1.59  2001/07/24 13:21:55  irigoin
-  * Formatting added
-  *
-  * Revision 1.58  2001/07/24 13:18:00  irigoin
-  * Cleanup of test_to_transformer() to handle side effects in test conditions
-  *
-  * Revision 1.57  2001/07/19 17:58:09  irigoin
-  * Two bug fixes + reformatting with a smaller indent
-  *
-  * Revision 1.56  2001/07/13 15:02:58  irigoin
-  * Restructured version with separate processing of loops and
-  * expressions. Multitype version.
-  *
-  * Revision 1.55  2001/02/07 18:14:21  irigoin
-  * New C format + support for recomputing loop fixpoints with precondition information
-  *
-  * Revision 1.54  2000/11/23 17:17:31  irigoin
-  * Function moved into unstructured.c, typing in debugging statement,
-  * consistency checks
-  *
-  * Revision 1.53  2000/11/03 17:15:07  irigoin
-  * Declarations and references are trusted or not. Better handling of unstructured.
-  *
-  * Revision 1.52  2000/07/20 14:29:42  coelho
-  * cleaner.
-  *
-  * Revision 1.51  2000/07/20 14:25:26  coelho
-  * leaks--
-  *
-  * Revision 1.50  2000/07/20 13:55:40  irigoin
-  * cleaning...
-  *
-  * Revision 1.49  2000/05/25 08:37:55  coelho
-  * no more successor when adding an eq of ineq.
-  *
-  * Revision 1.48  1999/01/07 16:44:14  irigoin
-  * Bug fix in user_call_to_transformer() to handle aliasing between two formal parameters. See spice02.f in Validation.
-  *
-  * Revision 1.47  1999/01/07 07:52:32  irigoin
-  * Bug fix in minmax_to_transformer()
-  *
   */
 
 #include <stdio.h>

@@ -1,15 +1,8 @@
-/* $RCSfile: system.c,v $ version $Revision$
- * ($Date: 2003/12/22 15:56:12 $, )
+/* 
+ * $Id$
  *
  * a safe system call. abort if fails.
  * FC 09/95
- *
- * $Log: system.c,v $
- * Revision 1.10  2003/12/22 15:56:12  irigoin
- * Function safe_system_no_abort_no_warning() added without restructuring to
- * fit the three system functions into one general frame.
- *
- *
  */
 
 #include <stdio.h>

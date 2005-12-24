@@ -4,42 +4,6 @@
  * Fabien Coelho, May 1993.
  *
  * $Id$
- * $Log: hpfc-util.c,v $
- * Revision 1.59  2003/06/19 07:39:26  nguyen
- * Update calls to make_statement and make_variable with new RI for C
- *
- * Revision 1.58  1998/12/26 21:19:35  irigoin
- * error_handler added
- *
- * Revision 1.57  1998/09/10 06:31:01  irigoin
- * Improvement/bug fix in HpfcExpressionToInt() because negative integer
- * constants are not stored. They are represented by a positive constant and
- * a unary minus.
- *
- * Revision 1.56  1998/04/14 20:42:55  coelho
- * *** empty log message ***
- *
- * Revision 1.55  1997/08/04 14:03:01  coelho
- * new generic effects includes.
- *
- * Revision 1.54  1997/07/25 22:26:50  keryell
- * Avoid to put comments on sequences.
- *
- * Revision 1.53  1997/07/24 14:21:44  keryell
- * Added a call to fix_sequence_statement_attributes().
- *
- * Revision 1.52  1997/03/28 20:41:15  coelho
- * more memory leak for AIX...
- *
- * Revision 1.51  1997/03/28 19:16:24  coelho
- * unused i removed.
- *
- * Revision 1.50  1997/03/28 19:10:57  coelho
- * obscure bug on AIX hacked around.
- *
- * Revision 1.49  1997/03/20 10:18:09  coelho
- * RCS headers.
- *
  */
 
 #include "defines-local.h"

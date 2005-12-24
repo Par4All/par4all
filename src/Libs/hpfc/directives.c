@@ -5,22 +5,6 @@
  * I'm definitely happy with this. FC.
  *
  * $Id$
- * $Log: directives.c,v $
- * Revision 1.69  1998/12/26 21:18:59  irigoin
- * error_handler added
- *
- * Revision 1.68  1998/03/17 16:52:10  coelho
- * more debug.
- *
- * Revision 1.67  1997/07/24 14:21:34  keryell
- * Added a call to fix_sequence_statement_attributes().
- *
- * Revision 1.66  1997/04/29 11:57:16  coelho
- * *** empty log message ***
- *
- * Revision 1.65  1997/03/20 10:14:04  coelho
- * better RCS headers.
- *
  */
 
 #include "defines-local.h"

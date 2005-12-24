@@ -1,60 +1,6 @@
  /* Predicate transformer package: sc complexity level
   *
   * $Id$
-  *
-  * $Log: transformer.c,v $
-  * Revision 1.52  2005/08/24 15:28:27  irigoin
-  * bug fix in transformer_combine(). Due to contextual transformers, the
-  * combination may end up with an empty transformer because the range of t1
-  * does not intersect the domain of t2.
-  *
-  * Revision 1.51  2003/12/19 16:27:21  irigoin
-  * two calls to entity_module_name() used to retrieve the constant string
-  * associated to a constant string entity replaced by calls to entity_name()
-  * following some modification of entity_module_name() by Nga
-  *
-  * Revision 1.50  2003/07/24 08:45:35  irigoin
-  * A lot of reformatting, some additional debugging statement, empty
-  * transformers now must have an empty basis. transformer_safe_normalize()
-  * added to cope with undefined transformers which are now more used in the
-  * new version of semantics to model the lack of preconditions when the
-  * analysis is to be performed without preconditions.
-  * transformer_projection_with_redundancy_elimination_and_check() added to
-  * handle transformers which are non-consistent because they are in an
-  * intermediary state: the projection may be useful to become consistent
-  * again.  See also new function transformer_projection_without_check().
-  *
-  * Revision 1.49  2003/06/20 07:21:45  irigoin
-  * Intermediate version with development feaures about time-out control commented out
-  *
-  * Revision 1.48  2002/07/24 08:59:56  irigoin
-  * Function transformer_value_substitutable_p() added to check beforehand
-  * problems created by aliases in semantics/interprocedural.c
-  *
-  * Revision 1.47  2002/03/11 09:28:42  irigoin
-  * calls to sc_normalize() replaced by calls to sc_normalize2()
-  *
-  * Revision 1.46  2001/12/05 17:10:50  irigoin
-  * Reformatting + transformer_inverse_apply() added for total precondition computation
-  *
-  * Revision 1.45  2001/10/22 16:00:02  irigoin
-  * New functions added to help with the evaluation of transformers with
-  * respect to preconditions. The transformer library should now be closer to
-  * what's really needed to be generic with respect to the abstraction
-  * used. But additional work is still needed!
-  *
-  * Mostly, transformer_range(), transformer_domain(),
-  * transformer_intersection(),... have been added.
-  *
-  * Revision 1.44  2001/07/24 13:08:59  irigoin
-  * Function  transformer_safe_combine_with_warnings() added to cope with side
-  * effects in expressions. Bug fix in constant_constraint_check() for strings.
-  *
-  * Revision 1.43  2001/07/19 18:09:37  irigoin
-  * Lots of new functions used to support multiple value types, the general
-  * derivation of a transformer from an expression. Plus some reformatting.
-  *
-  *
   */
 
 #include <stdio.h>

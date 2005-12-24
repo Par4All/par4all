@@ -1,10 +1,6 @@
 /* this is a set of functions to help hpfc debugging
  *
  * $Id$
- * $Log: debug-util.c,v $
- * Revision 1.21  1997/03/20 10:17:11  coelho
- * RCS headers and ANSI C declarations.
- *
  *
  * Fabien Coelho, May 1993.
  */

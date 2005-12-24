@@ -6,55 +6,6 @@
 
   one trip loops fixed, FC 08/01/1998
 
-  $Log: dead_code_elimination.c,v $
-  Revision 1.29  2001/10/22 16:30:51  irigoin
-  one context parameter added to calls to
-  precondition_add_condition_information(). This routine should not be
-  called from here. The precondition should be available with the proper
-  handling of unstructured in semantics
-
-  Revision 1.28  2000/12/13 10:31:51  ancourt
-  renaming the other phase
-
-  Revision 1.27  2000/12/11 15:41:45  ancourt
-  call to compute_callees at the end of suppress_dead_code
-
-  Revision 1.26  2000/12/11 13:39:55  nguyen
-  Modified function remove_dead_loop to deal with bug caused by nested loops
-  with same labels
-  Modified  dead_test_filter : change statement_feasible_p by
-  statement_strongly_feasible_p (see example )
-
-  Revision 1.25  2000/11/28 15:10:46  nguyen
-  *** empty log message ***
-
-  Revision 1.24  2000/11/08 07:47:00  nguyen
-  assert added in dead_unstructured_test_filter()
-
-  Revision 1.23  2000/07/19 15:33:43  ancourt
-  test linearity of loop range to deal with REAL range type
-
-  Revision 1.22  2000/07/05 11:02:28  coelho
-  same branches special case handled.
-
-  Revision 1.21  2000/07/05 08:46:16  coelho
-  bug fixed:
-  unstructured if with dead then or else... when branches where equal.
-
-  Revision 1.20  2000/07/05 07:11:02  coelho
-  new debug stuff
-
-  Revision 1.19  2000/07/04 16:09:51  coelho
-  hop.
-
-  Revision 1.18  2000/07/03 12:17:31  nguyen
-  Modify function discard_statement_and_save_label_and_comment(statement s):
-  to avoid bug if both inner and outer loops of a nested loop have the same
-  label. This label must be preseved while eliminating the dead inner loop.
-
-  Revision 1.17  1999/01/08 12:43:25  coelho
-  rcs stuff...
-
 */
 
 #include <stdio.h> 

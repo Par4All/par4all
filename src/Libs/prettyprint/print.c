@@ -1,30 +1,6 @@
 /* Main C functions to print code, sequential or parallel
  *
  * $Id$
- *
- * $Log: print.c,v $
- * Revision 1.24  2002/06/14 14:59:01  irigoin
- * calls to (re)set_current_module_entity/statement added
- *
- * Revision 1.23  1998/05/05 14:53:23  coelho
- * warning added...
- *
- * Revision 1.22  1998/04/14 21:23:57  coelho
- * linear.h
- *
- * Revision 1.21  1997/12/10 12:17:23  coelho
- * working free_text().
- *
- * Revision 1.20  1997/12/08 14:17:43  coelho
- * make_text_resource_and_free() added.
- *
- * Revision 1.19  1997/11/22 11:02:51  coelho
- * print_parallelizedOMP_code added.
- *
- * Revision 1.18  1997/11/21 13:17:58  coelho
- * cleaner headers.
- *
- * 
  */ 
 
 #include <stdlib.h>

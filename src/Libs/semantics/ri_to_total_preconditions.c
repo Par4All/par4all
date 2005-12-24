@@ -36,18 +36,7 @@
   * state when designing the ri.
   *
   * $Id$
-  *
-  * $Log: ri_to_total_preconditions.c,v $
-  * Revision 1.3  2003/07/24 10:55:56  irigoin
-  * Intermediate version, starting to take unstructured into consideration.
-  *
-  * Revision 1.2  2001/12/05 17:18:10  irigoin
-  * Currently being developped. Installed because necessary for Nga and pipsmake.
-  *
-  * Revision 1.1  2001/10/23 15:58:10  irigoin
-  * Initial revision
-  *
-  * */
+  */
 
 #include <stdio.h>
 #include <string.h>

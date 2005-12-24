@@ -2,42 +2,6 @@
   *
   * $Id$
   *
-  * $Log: loop.c,v $
-  * Revision 1.8  2005/12/19 16:06:10  irigoin
-  * New functions added over the summer 2005 to refine while loop
-  * analysis. New functions are: refine_whileloop_transformer(),
-  * recompile_whileloop_transformer(),
-  * loop_body_transformer_add-entry_and_iteration_information(). Two other
-  * functions were updated to cope with transformers computed in context:
-  * while_loop_to_transformer() and whileloop_to_postcondition(). As a result,
-  * there are problems when transformers are not computed in context. This is
-  * caught by the Validation suite. I neverthelss check-in this version for
-  * the move from RDS to SVN (FI).
-  *
-  * Revision 1.7  2003/07/24 10:50:49  irigoin
-  * Minor changes, compiler warnings avoided, bug fix for preference vs
-  * reference in cell when macro effect_reference() is used.
-  *
-  * Revision 1.6  2003/07/12 16:46:07  irigoin
-  * Temporary version, with unsatisfactory implementation of loop_initialization_to_transformer()
-  *
-  * Revision 1.5  2002/03/21 09:36:32  irigoin
-  * debug() replaced by pips_debug() and similar cosmetic modifications
-  *
-  * Revision 1.4  2001/12/05 17:16:24  irigoin
-  * Reformatting + additions to compute total preconditions
-  *
-  * Revision 1.3  2001/10/22 15:44:38  irigoin
-  * Code reformatting. Exploits expression transformers.
-  *
-  * Revision 1.2  2001/07/13 15:01:44  irigoin
-  * First multitype version
-  *
-  * Revision 1.1  2001/06/21 09:03:46  irigoin
-  * Initial revision
-  *
-  *
-  *
   */
 #include <stdio.h>
 #include <string.h>

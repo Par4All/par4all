@@ -2,20 +2,6 @@
  * $Id$
  *
  * scan the Abstract Syntax Tree of a program to count operations
- *
- * $Log: comp_scan.c,v $
- * Revision 1.23  2005/05/27 13:24:04  irigoin
- * gen_consistent_p() replaced by complexity_consistent_p() to improve typing.
- *
- * Revision 1.22  1998/04/14 19:25:41  coelho
- * casts.
- *
- * Revision 1.21  1997/09/11 08:33:22  coelho
- * missing header added.
- *
- * Revision 1.20  1997/09/11 08:24:09  coelho
- * better RCS headers.
- *
  */
 
 

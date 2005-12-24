@@ -1,28 +1,6 @@
 /* HPFC - Fabien Coelho, May 1993 and later...
  *
  * $Id$
- * $Log: compiler.c,v $
- * Revision 1.58  1997/10/30 17:09:14  coelho
- * now comes with old var...
- *
- * Revision 1.57  1997/09/13 12:57:58  coelho
- * *** empty log message ***
- *
- * Revision 1.56  1997/07/25 22:25:37  keryell
- * Avoid to put comments on sequences.
- *
- * Revision 1.55  1997/07/21 13:30:25  keryell
- * Replaced %x format by %p.
- *
- * Revision 1.54  1997/07/21 13:29:45  keryell
- * Replaced %x format by %p.
- *
- * Revision 1.53  1997/05/03 11:48:52  coelho
- * *** empty log message ***
- *
- * Revision 1.52  1997/03/20 10:19:38  coelho
- * RCS headers.
- *
  *
  * Compiler
  *

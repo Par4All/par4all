@@ -48,75 +48,7 @@
   *
   * $Id$
   *
-  * $Log: unstructured.c,v $
-  * Revision 1.16  2005/12/19 16:24:45  irigoin
-  * Lots of changes due to the computation of transformers in context. As a
-  * result, the data structure is modified because the same cycle/scc may have
-  * to be copied as many times as they are used. The mapping from nodes to
-  * underlying scc is changed and the concept of parent node is no longer as
-  * useful. Work performed for ACI SI APRON.
-  *
-  * Revision 1.15  2003/08/13 11:32:37  irigoin
-  * Bug fixed for Validation/Control/unstruc03.f
-  *
-  * Revision 1.14  2003/07/24 11:00:17  irigoin
-  * Suppression of obsolete code, typedef of recursive_context to avoid
-  * useless compiler warnings
-  *
-  * Revision 1.13  2002/07/19 12:09:58  irigoin
-  * First draft of the new version of unstructured.c working for all
-  * Validation/unstrucnn.f with nn in[01-13]. Lots of memory leaks, code
-  * replications, not understood behavior, and redundant computations.
-  *
-  * Ideally, node preconditions and edge preconditions should be memoized
-  * (i.e. stored in hash tables) instead of postconditions. But edges do not
-  * really exist: I should use their corresponding CONS cells.
-  *
-  * Revision 1.12  2002/07/15 16:46:25  irigoin
-  * Intermediate state. Validation OK for unstruc01.f to unstruc06.f
-  *
-  * Revision 1.11  2002/07/09 06:52:31  irigoin
-  * Comments added for the last version of unstructured.c not using
-  * Bourdoncle's partitioning heuristics
-  *
-  * Revision 1.10  2002/07/03 11:07:19  irigoin
-  * check "!get_bool_property("SEMANTICS_ANALYZE_UNSTRUCTURED")" added to
-  * circumvent an EDF bug in emergency for Corinne.
-  *
-  * Revision 1.9  2001/12/05 17:19:38  irigoin
-  * First plug to handle total preconditions
-  *
-  * Revision 1.8  2001/10/22 15:47:27  irigoin
-  * New interface to cope with transformers computed using preconditions
-  *
-  * Revision 1.7  2001/07/19 17:59:56  irigoin
-  * Improved debugging messages. Bug fix for Validation/tilt.f and tilt3.f:
-  * secondary_entries were not passed down or computed correcty and internal
-  * cycles were missed.
-  *
-  * Revision 1.6  2001/02/07 18:16:17  irigoin
-  * Lots of improvement to handle recursion in fixpoint computation. Should
-  * still be improved. Subscc should be handled like scc by enumerating paths
-  * instead of looking for a unique covering path, regardless of subsubcyles.
-  *
-  * Revision 1.5  2001/02/02 12:17:48  irigoin
-  * After bug fixes for tilt.f, before cleaning up and before bug fixes for
-  * spice and fppp
-  *
-  * Revision 1.4  2000/12/04 16:36:13  irigoin
-  * Comments added to explain the algorithm used
-  *
-  * Revision 1.3  2000/11/23 17:16:11  irigoin
-  * Too many modifications. Lots of bug fixes for PLDI'2001. New debugging
-  * statements, new functions, new consistency checks.
-  *
-  * Revision 1.2  2000/11/03 17:12:57  irigoin
-  * New version on Nov. 3
-  *
-  * Revision 1.1  2000/10/25 06:55:03  irigoin
-  * Initial revision
-  *
-  * */
+  */
 
 #include <stdio.h>
 #include <string.h>

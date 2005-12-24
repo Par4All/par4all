@@ -20,42 +20,6 @@
  * An important issue is to only perform the substitution only if correct.
  * Thus conversions are inserted and if none is available, the propagation
  * and substitution are not performed.
- *
- * $Log: forward_substitution.c,v $
- * Revision 1.10  2002/03/18 14:06:56  irigoin
- * call to free_syntax() commented out in expr_flt(). A little bit of
- * reformatting. An additional check on effects consistency. See comments in
- * expr_flt().
- *
- * Revision 1.9  2000/05/26 15:27:04  coelho
- * hop.
- *
- * Revision 1.8  1998/04/14 21:30:43  coelho
- * linear.h
- *
- * Revision 1.7  1998/04/01 13:22:02  coelho
- * initial comment updated after bug fix.
- *
- * Revision 1.6  1998/04/01 12:30:27  coelho
- * generic conversions are inserted if necessary, or the conversion is not
- * performed if no conversion function is available.
- *
- * Revision 1.5  1998/04/01 09:43:43  coelho
- * fixed a bug that was too optimistic when selectig cool statements...
- * w/w conflict have to be avoided to allow the transformation.
- *
- * Revision 1.4  1998/03/31 17:56:25  coelho
- * fixed a bug (free of maybe NULL value).
- *
- * Revision 1.3  1998/03/31 17:53:15  coelho
- * special case "x = a(i); a(j) = x+1;" is substituted before stopping.
- *
- * Revision 1.2  1998/03/31 17:17:45  coelho
- * cleaner + debug level.
- *
- * Revision 1.1  1998/03/31 16:08:25  coelho
- * Initial revision
- *
  */
 
 #include <stdio.h>

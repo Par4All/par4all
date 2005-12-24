@@ -4,27 +4,6 @@
  * Build a graph for the callgraph, instead of a tree.
  * Some other formats could be thought of, maybe?
  * Code by Corinne Ancourt and Fabien Coelho.
- *
- * $Log: graph.c,v $
- * Revision 1.6  1998/11/24 11:55:26  coelho
- * lazy use of resource, not to core on resources that are not available.
- *
- * Revision 1.5  1998/04/14 19:01:52  coelho
- * linear.h
- *
- * Revision 1.4  1998/03/20 08:28:29  coelho
- * prettier, and more comments.
- *
- * Revision 1.3  1998/03/19 20:18:49  coelho
- * graph_of_calls moved to full_graph_of_calls.
- * new graph_of_calls deal with a module.
- * improve output.
- *
- * Revision 1.2  1998/03/19 17:45:46  coelho
- * this version seems ok.
- *
- * Revision 1.1  1998/03/19 17:09:21  coelho
- * Initial revision
  */
 
 #include <stdio.h>

@@ -1,11 +1,5 @@
 /*
  * $Id$
- *
- * $Log: bound_generation.c,v $
- * Revision 1.10  1998/10/26 10:35:39  irigoin
- * Function bound_generation() slightly updated. Constraints are not yet
- * sorted. The MIN and MAX expressions are not deterministics.
- *
  */
 
 #include <stdio.h>

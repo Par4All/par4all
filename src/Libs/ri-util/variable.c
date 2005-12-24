@@ -1,28 +1,7 @@
-/* Handling of entity as program variables (see also entity.c for generic entities)
+/* Handling of entity as program variables 
+ * (see also entity.c for generic entities)
  *
  * $Id$
- *
- * $Log: variable.c,v $
- * Revision 1.48  2003/12/05 17:09:22  nguyen
- * Replace entity_local_name by entity_user_name to handle entities in C language
- *
- * Revision 1.47  2003/06/19 07:25:35  nguyen
- * Update calls to make_statement and make_variable with new RI for C
- *
- * Revision 1.46  2003/06/17 11:46:05  irigoin
- * Update functions for new RI
- *
- * Revision 1.45  2002/06/21 13:43:12  irigoin
- * Bug fix for alternate returns when a parser error or a reparsing occurs
- *
- * Revision 1.44  2002/06/17 15:31:39  irigoin
- * Functions added to manage alternate returns
- *
- * Revision 1.43  2001/07/20 11:23:34  irigoin
- * Header created to keep an explicit track of the changes + reformatting of
- * all functions
- *
- *
  */
 
 #include <stdlib.h>

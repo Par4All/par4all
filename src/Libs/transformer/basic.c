@@ -2,25 +2,7 @@
   *
   * Francois Irigoin
   *
-  * $id$
-  *
-  * $Log: basic.c,v $
-  * Revision 1.24  2005/08/24 15:26:07  irigoin
-  * Bug fix in error message
-  *
-  * Revision 1.23  2003/07/24 08:36:20  irigoin
-  * Functions empty_transformer(), transformer_weak_consistency_p(),
-  * transformer_general_consistency_p(), transformer_add_modified_variable()
-  * and move_transformer() added. Plus some reformatting.
-  *
-  * Revision 1.22  2001/10/22 15:54:36  irigoin
-  * reformatting + precondition_to_abstract_store() added, although it is
-  * redundant with transformer_range()
-  *
-  * Revision 1.21  2001/07/19 18:03:21  irigoin
-  * Lots of additions for a better handling of multitype transformers
-  *
-  *
+  * $Id$
   */
 
 #include <stdio.h>

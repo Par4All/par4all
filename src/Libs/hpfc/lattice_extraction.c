@@ -1,32 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
  * $Id$
- * $Log: lattice_extraction.c,v $
- * Revision 1.10  1999/05/25 13:27:20  coelho
- * *** empty log message ***
- *
- * Revision 1.9  1997/04/10 08:53:06  coelho
- * property name changed.
- *
- * Revision 1.8  1997/04/08 06:41:22  coelho
- * useless var removed.
- *
- * Revision 1.7  1997/04/08 06:40:27  coelho
- * *** empty log message ***
- *
- * Revision 1.6  1997/04/07 17:06:56  coelho
- * test normalization...
- *
- * Revision 1.5  1997/04/07 11:39:48  coelho
- * tmp fix...
- *
- * Revision 1.4  1997/04/07 09:27:10  coelho
- * lattice extraction seems ok... (maybe some momery leaks and implicit
- * assumptions are not checked yet...)
- *
- * Revision 1.3  1997/03/20 10:27:04  coelho
- * RCS headers.
- *
  */
 
 #include "defines-local.h"

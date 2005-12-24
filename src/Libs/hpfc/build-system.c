@@ -7,13 +7,6 @@
  * Fabien COELHO, Feb/Mar 94
  *
  * $Id$
- * $Log: build-system.c,v $
- * Revision 1.33  1997/08/04 13:52:40  coelho
- * *** empty log message ***
- *
- * Revision 1.32  1997/03/20 10:23:58  coelho
- * RCS headers.
- *
  */
 
 #include "defines-local.h"

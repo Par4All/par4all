@@ -4,29 +4,6 @@
  * Defines a static mapping from orderings to statements.
  * must be initialize_ordering_to_statement, and afterwards
  * reset_ordering_to_statement.
- *
- * $Log: ordering.c,v $
- * Revision 1.16  2003/12/05 17:04:00  nguyen
- * Add a new kind of instruction : expression instruction
- *
- * Revision 1.15  2003/09/05 14:29:19  nguyen
- * Remove the switch (multitest) case
- *
- * Revision 1.14  2003/07/24 07:21:29  nguyen
- * Add new control structures for C language
- *
- * Revision 1.13  1998/06/03 06:41:10  irigoin
- * Handling of the whileloop construct added
- *
- * Revision 1.12  1998/04/14 12:55:03  coelho
- * linear.h added.
- *
- * Revision 1.11  1997/12/09 14:21:11  coelho
- * leaks--
- *
- * Revision 1.10  1997/11/22 15:19:30  coelho
- * cleaner. RCS headers. better asser message.
- *
  */
 
 #include <stdio.h>
