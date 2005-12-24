@@ -3,15 +3,17 @@
 %%
 
 \documentclass[a4paper]{article}
+
+\usepackage[latin1]{inputenc}
 \usepackage{psfig,verbatim,comment,newgen_domain}
 
 \title{PIPS: Use-Def Chains and Dependence Graph}
-\author{Fran\c{c}ois Irigoin \\
+\author{François Irigoin \\
     Pierre Jouvelot \\
-    R\'emi Triolet\\
+    Rémi Triolet\\
     Yi-Qing Yang \\
 \\
-    CRI, \'Ecole des mines de Paris}
+    CRI, École des mines de Paris}
 
 % \newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{#2}}
 
@@ -51,11 +53,11 @@ here and not with graph data structure.
 %%\htmladdnormallink{{\tt graph}}{http://www.cri.ensmp.fr/pips/graph}.
 
 \begin{comment}
-Les structures de donne'es suivantes sont utilise'es par la phase de
-construction du graphe des de'pendances. Elles sont construites en
-utilisant les structures de donne'es \verb+statement+ et \verb+effect+
-qui ont e'te' de'finies dans la repre'sentation interne, ainsi que la
-structure de donne'es ge'ne'riques \verb+vertex+ qui fait partie du
+Les structures de données suivantes sont utilisées par la phase de
+construction du graphe des dépendances. Elles sont construites en
+utilisant les structures de données \verb+statement+ et \verb+effect+
+qui ont été définies dans la représentation interne, ainsi que la
+structure de données génériques \verb+vertex+ qui fait partie du
 package graph 
 %%\htmladdnormallink{{\em graph}}{http://www.cri.ensmp.fr/pips/graph}.
 \end{comment}
@@ -143,11 +145,11 @@ Field \verb/sccs_flags/ is used to compute strongly connected components
 of the dependence graph.
 
 \begin{comment}
-Ce domaine est utilise' pour contenir les informations qui sont
-attache'es a` chaque noeud du graphe de de'pendances (voir le domaine
+Ce domaine est utilisé pour contenir les informations qui sont
+attachées à chaque noeud du graphe de dépendances (voir le domaine
 {\tt graph} dans le fichier {\tt graph.f.tex}). Le sous-domaine {\tt
-statement} permet de retrouver l'instruction qui porte la de'pendance;
-cet entier est le champ {\tt ordering} de l'instruction concerne'e. Le
+statement} permet de retrouver l'instruction qui porte la dépendance;
+cet entier est le champ {\tt ordering} de l'instruction concernée. Le
 sous-domaine {\tt sccflags} contient diverses informations utiles pour
 le calcul des composantes fortement connexes.
 \end{comment}
@@ -164,10 +166,10 @@ source or the sink statements, i.e. the statements attached to the sink
 or the source vertex.
 
 \begin{comment}
-Ce domaine est utilise' pour contenir les informations qui sont
-attache'es a` chaque arc du graphe de de'pendances (voir le domaine {\tt
+Ce domaine est utilisé pour contenir les informations qui sont
+attachées à chaque arc du graphe de dépendances (voir le domaine {\tt
 graph} dans le fichier {\tt graph.f.tex}). Chaque arc du GD contient les
-conflits entre les deux statements des noeuds du graphe de de'pendance.
+conflits entre les deux statements des noeuds du graphe de dépendance.
 \end{comment}
 
 \subsection{Dependence Conflict}
@@ -184,8 +186,8 @@ read and write. Note that def-def conflicts are computed to provide
 locality information. This information is or might be used in phase WP65.
 
 \begin{comment}
-Un conflit existe entre deux effets pre'sents dans deux noeuds voisins
-du graphe de de'pendance. Les types d'effet (write, read) sert a`
+Un conflit existe entre deux effets présents dans deux noeuds voisins
+du graphe de dépendance. Les types d'effet (write, read) sert à
 distinguer les conflits ``use-def'', ``def-def'' et ``{def-use}''. Le
 cone comprend les informations precises de conflict.
 \end{comment}
@@ -227,18 +229,18 @@ Array Data Flow Graph (DFG). The DFG is implemented with another data
 structure described in \verb/paf_ri.f.tex/.
 
 \begin{comment}
-Le domaine co^ne de'finit une approximation polye'drique de l'ensemble
-des de'pendances porte'es par un arc. Plusieurs types d'approximation
-sont possibles: les niveaux de de'pendance, les vecteurs de direction de
-de'pendance, les syste`mes ge'ne'rateurs (aussi
-connus sous le nom de {\em co^ne de de'pendance}) et le me'canisme
-du {\em Data Flow Graph} n'est pas imple'mente' avec cette structure
-de donne'es mais avec \verb|paf_ri|.
+Le domaine cône définit une approximation polyédrique de l'ensemble
+des dépendances portées par un arc. Plusieurs types d'approximation
+sont possibles: les niveaux de dépendance, les vecteurs de direction de
+dépendance, les systèmes générateurs (aussi
+connus sous le nom de {\em cône de dépendance}) et le mécanisme
+du {\em Data Flow Graph} n'est pas implémenté avec cette structure
+de données mais avec \verb|paf_ri|.
 \end{comment}
 
 \begin{comment}
-Le niveau d'une de'pendance d\'ecrivent le nombre de boucles englobantes
-concerne\'ees.  ``{generating\_system}'' est la r\'epresentation de
+Le niveau d'une dépendance décrivent le nombre de boucles englobantes
+concernées.  ``{generating\_system}'' est la répresentation de
 system generateur.
 \end{comment}
 
@@ -255,7 +257,7 @@ connected components of the dependence graph. More information
 available in Tarjan's algorithm description?
 
 \begin{comment}
-Ce domaine est utilise' par l'algorithme de calcul des composantes
+Ce domaine est utilisé par l'algorithme de calcul des composantes
 fortement connexes d'un graphe.
 \end{comment}
 
@@ -268,9 +270,9 @@ This data type is used to return the strongly connected components of
 the dependence graph. It is a simple list of SCC's.
 
 \begin{comment}
-Ce domaine permet de contenir le re'sultat de l'algorithme de calcul
+Ce domaine permet de contenir le résultat de l'algorithme de calcul
 des composantes fortement connexes d'un graphe. Il s'agit d'une liste de
-{\tt scc}, c'est a` dire de composantes fortement connexes.
+{\tt scc}, c'est à dire de composantes fortement connexes.
 \end{comment}
 
 \subsection{Strongly Connected Component}
@@ -284,9 +286,9 @@ sort. Allen \& Kennedy algorithm~\cite{AK87} is based on topological sorts of th
 dependence graph SCC's.
 
 \begin{comment}
-Ce domaine permet de repre'senter une composante fortement connexe d'un
+Ce domaine permet de représenter une composante fortement connexe d'un
 graphe. Une {\tt scc} se compose d'un ensemble de noeuds, et d'un
-sous-domaine {\tt indegree} utilise' par l'algorithme de tri topologique.
+sous-domaine {\tt indegree} utilisé par l'algorithme de tri topologique.
 \end{comment}
 
 \begin{thebibliography}{9}
