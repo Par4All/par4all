@@ -1,9 +1,11 @@
-\documentstyle[a4]{article}
+\documentclass[a4]{article}
+
+\usepackage[latin1]{inputenc}
 
 \title{PIPS: Generic Oriented Graph}
-\author{Franc,ois Irigoin \\
+\author{François Irigoin \\
 	Pierre Jouvelot \\
-	Re'mi Triolet\\
+	Rémi Triolet\\
 \\
 	CRI, Ecole des Mines de Paris}
 
@@ -52,14 +54,14 @@ dependence graph, the Data Flow Graph (DFG) is defined in
 \verb+paf_ri.f.tex+.
 
 \iffalse
-La structure de donne'es suivante imple'mente un graphe oriente'. Cette
-structure est ge'ne'rique, mais elle peut e^tre adapte'e aux besoins de
-chacun gra^ce aux deux domaines externes {\tt vertex\_label} et {\tt
-arc\_label} qui sont attache's respectivement aux n{\oe}uds et aux arcs du
+La structure de données suivante implémente un graphe orienté. Cette
+structure est générique, mais elle peut être adaptée aux besoins de
+chacun grâce aux deux domaines externes {\tt vertex\_label} et {\tt
+arc\_label} qui sont attachés respectivement aux n{\oe}uds et aux arcs du
 graphe.
 
-Cette structure est utilise'e pour le graphe des de'pendances et aurait
-du^ l'e^tre pour le graphe de contro^le d'un module.
+Cette structure est utilisée pour le graphe des dépendances et aurait
+dû l'être pour le graphe de contrôle d'un module.
 \fi
 
 \section*{Vertex and Arc Labels}
@@ -71,7 +73,7 @@ The \verb+vertex_label+ field points to the information attached to a
 vertex or node. It is not defined here and must be provided by the user.
 
 \iffalse
-Le domaine {\tt vertex\_label} porte l'information attache'e aux sommets
+Le domaine {\tt vertex\_label} porte l'information attachée aux sommets
 du graphe.
 \fi
 
@@ -82,7 +84,7 @@ The \verb+arc_label+ field points to the information attached to an arc.
 It is not defined here and must be provided by the user.
 
 \iffalse
-Le domaine {\tt arc\_label} porte l'information attache'e aux n{\oe}udes
+Le domaine {\tt arc\_label} porte l'information attachée aux n{\oe}udes
 du graphe.
 \fi
 
@@ -102,9 +104,9 @@ not set of arcs.
 
 \iffalse
 Un graphe se compose tout simplement de l'ensemble de tous ses n{\oe}uds,
-chacun d'eux e'tant repre'sente's par le domaine {\tt vertex}. Les arcs
+chacun d'eux étant représentés par le domaine {\tt vertex}. Les arcs
 du graphe
-sont directement attache's aux n{\oe}uds}
+sont directement attachés aux n{\oe}uds}
 \fi
 
 \domain{Vertex = vertex\_label x successors:successor*}
@@ -121,10 +123,10 @@ is application specific and must be defined somewhere else. See for
 instance type \verb+dg_vertex_label+ defined in file \verb+dg.f.tex+.
 
 \iffalse
-Chaque n{\oe}ud d'un graphe est repre'sente' par un {\tt vertex}. Le
+Chaque n{\oe}ud d'un graphe est représenté par un {\tt vertex}. Le
 sous-domaine {\tt successors} donne la liste des successeurs du n{\oe}ud. Le
-sous-domaine {\tt vertex\_label} doit e^tre utilise' pour les informations
-attache'es a` chaque n{\oe}ud et dont la nature de'pend de l'application
+sous-domaine {\tt vertex\_label} doit être utilisé pour les informations
+attachées à chaque n{\oe}ud et dont la nature dépend de l'application
 utilisant le graphe; voir par exemple le domaine {\tt dg\_vertex\_label}
 dans le fichier {\tt dg.f.tex}.}
 \fi
@@ -151,10 +153,10 @@ vertices. The innermost one is over each vertex edges, so-called
 \verb+successors+.
 
 \iffalse
-Chaque arc d'un graphe est repre'sente' par un {\tt successor}. Le
+Chaque arc d'un graphe est représenté par un {\tt successor}. Le
 sous-domaine {\tt vertex} contient le n{\oe}ud vers lequel l'arc pointe. Le
-sous-domaine {\tt arc\_label} doit e^tre utilise' pour contenir les
-informations attache'es a` chaque arc{,} et dont la nature de'pend de
+sous-domaine {\tt arc\_label} doit être utilisé pour contenir les
+informations attachées à chaque arc{,} et dont la nature dépend de
 l'application utilisant le graphe; voir par exemple le domaine {\tt
 dg\_arc\_label} dans le fichier {\tt dg.f.tex}.}
 \fi

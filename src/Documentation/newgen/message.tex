@@ -1,20 +1,22 @@
 %% $RCSfile: message.ftex,v $ (version $Revision$)
 %% $Date: 1996/08/21 10:40:07 $, 
 
-\documentstyle[newgen_domain]{article}
+\documentclass[newgen_domain]{article}
+
+\usepackage[latin1]{inputenc}
 
 \title{HPFC \\ (High Performance Fortran Compiler) \\ datastructure}
 \author{Fabien Coelho\\
                 \\
-        CRI, E'cole des mines de Paris}
+        CRI, École des mines de Paris}
 
 \begin{document}
 \maketitle
 
 \section*{Introduction}
-  Ce document pre'sente tre`s bre`vement les domaines Newgen utilise's
-par le prototype de compilateur {\tt hpfc} pour de'crire les motifs de
-messages qui doivent e^tre e'change's.
+  Ce document présente très brèvement les domaines Newgen utilisés
+par le prototype de compilateur {\tt hpfc} pour décrire les motifs de
+messages qui doivent être échangés.
 
 \domain{import entity from "ri.newgen"}
 \domain{import range from "ri.newgen"}
@@ -24,10 +26,10 @@ messages qui doivent e^tre e'change's.
 \domain{message = array:entity x content:range* x neighbour:Pvecteur x dom:range*}
 
   Un message concerne un des tableaux du programme ({\tt array:entity})
-et pour ce tableau, un morceau des de'clarations locales, ge'ne'ralement
-un bord ({\tt content:range*}). Le destinataire est de'crit relativement
-sous la forme de la de'signation d'un voisin dans le tableau de {\em
-processors} sur lequel est distribue' le tableau ({\tt
+et pour ce tableau, un morceau des déclarations locales, généralement
+un bord ({\tt content:range*}). Le destinataire est décrit relativement
+sous la forme de la désignation d'un voisin dans le tableau de {\em
+processors} sur lequel est distribué le tableau ({\tt
 neighbour:Pvecteur}), et concerne le domaine de {\em template} ({\tt
 domain:range*}). 
 

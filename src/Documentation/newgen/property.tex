@@ -1,0 +1,32 @@
+\documentclass[a4]{article}
+
+\usepackage[latin1]{inputenc}
+
+\newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{\em #2}}
+
+\begin{document}
+\sloppy
+Définition d'une propriété.
+
+Une liste de propriétés est lue dans un fichier au démarrage de
+Pips. Cette liste permet de modifier le comportement par
+défaut de Pips. Chaque propriété est significative pour au moins une
+passe.
+
+Ces propriétés ne doivent pas être directement modifiées par un
+utilisateur. Elles sont normalement positionnées par le biais des
+sélections de règles (cf. {\em makefile} et {\em pipsmake}). Un
+utilisateur averti peut s'y risquer mais le maintien de la cohérence
+entre objets n'est plus garanti par {\em pipsmake}.
+
+Une propriété peut être un entier, un booléen ou une chaîne de
+caractères. Le fichier de référence se trouve dans Production/Lib
+sous le nom de {\em properties.rc}. Ce fichier est lu en premier mais les
+valeurs des propriétés peuvent être modifiées en fonction d'un
+deuxième fichier {\em properties.rc} se trouvant dans le répertoire
+courant.
+
+\domain{property = int + bool + string}
+{}
+\end{document}
+\end

@@ -1,0 +1,51 @@
+\documentclass[a4]{article}
+
+\usepackage[latin1]{inputenc}
+
+\title{PUMA: Représentation du Partitionnement}
+\author{François Irigoin \\
+	Corinne Ancourt\\
+\\
+	CRI, Ecole des Mines de Paris}
+
+\newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{{#2}}}
+
+\begin{document}
+\maketitle
+\sloppy
+
+\section{Structures de données externes}
+\label{external}
+
+\domain{External Pvecteur}
+{ Le domaine {\tt Pvecteur} est utilisé pour représenter l'origine
+du partitionnement, c'est-à-dire les coordonnées de l'origine de
+la {\em tile} 0 dans le système de coordonnées initial.
+
+Un Pvecteur est une suite de monômes, un monôme étant un couple
+(coefficient,variable).  Le coefficient d'un tel couple est un entier,
+positif ou négatif. La variable est une entité, sauf dans le cas du
+terme constant qui est représenté par la variable prédéfinie de nom
+{\tt TCST}. Les entités utilisées dans ce cas sont les indices initiaux.
+
+La structure de données Pvecteur est importée de la bibliothèque d'algèbre
+linéaire en nombres entiers du CRI.
+}
+\domain{External matrice}
+{
+Le domaine {\tt matrice} est utilisé pour représenter la matrice $P$
+de partitionnement, qui définit le changement de base du système
+de coordonnées des {\em tiles} au système de coordonnées initial.
+
+Les matrices sont à coefficients rationnels, représentés par
+des numérateurs entiers et un unique dénominateur. Les numérateurs sont
+stockés sous forme pleine. Les dimensions de la matrice sont implicites.
+
+Comme le domaine Pvecteur, la structure de données matrice est
+importée de la bibliothèque d'algèbre linéaire en nombres entiers du
+CRI.  }
+
+\domain{tiling = tile:matrice x origin:Pvecteur}
+
+\end{document}
+\end

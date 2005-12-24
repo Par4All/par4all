@@ -1,26 +1,28 @@
 %% $RCSfile: hpf.ftex,v $ (version $Revision$)
 %% $Date: 1996/08/21 10:40:08 $, 
 
-\documentstyle[newgen_domain]{article}
+\documentclass[newgen_domain]{article}
+
+\usepackage[latin1]{inputenc}
 
 \title{HPFC \\ (High Performance Fortran Compiler) \\ datastructure}
 \author{Fabien Coelho\\
                 \\
-        CRI, E'cole des mines de Paris}
+        CRI, École des mines de Paris}
 
 \begin{document}
 \maketitle
 
 \section*{Introduction}
-  Ce document pre'sente tre`s bre`vement les domaines Newgen utilise's
-par le prototype de compilateur {\tt hpfc} pour de'crire les directives
+  Ce document présente très brèvement les domaines Newgen utilisés
+par le prototype de compilateur {\tt hpfc} pour décrire les directives
 de placement d'un programme HPF.
 
 \domain{import entity from "ri.newgen"}
 \domain{import expression from "ri.newgen"}
 
 \section{Directives}
-  Les directives HPF conside're'es sont l'alignement et la distribution.
+  Les directives HPF considérées sont l'alignement et la distribution.
 L'alignement d'un tableau a lieu sur un {\tt template}, et la
 distribution d'un {\em template} est faite sur un {\tt processors}.
 
@@ -29,17 +31,17 @@ distribution d'un {\em template} est faite sur un {\tt processors}.
 
 \section{Alignements et Distributions}
   L'alignement d'une dimension de tableau sur une dimension de {\em
-template} est de'crit au moyen du domaine Newgen {\tt alignment}~:
+template} est décrit au moyen du domaine Newgen {\tt alignment}~:
 
 \domain{alignment = arraydim:int x templatedim:int x rate:expression x constant:expression}
 
-  la dimension du tableau {\tt arraydim} est aligne'e avec la dimension
-de {\em template} {\tt templatedim} avec pour parame`tres {\tt rate} et
+  la dimension du tableau {\tt arraydim} est alignée avec la dimension
+de {\em template} {\tt templatedim} avec pour paramètres {\tt rate} et
 {\tt constant}.
 
   La distribution d'une dimension de {\em template} sur une dimension de
-{\em processors} est de'crite au moyen du domaine {\tt distribution},
-qui permet de retrouver le parame`tre de distribution d'une part ({\tt
+{\em processors} est décrite au moyen du domaine {\tt distribution},
+qui permet de retrouver le paramètre de distribution d'une part ({\tt
 parameter}, et le {\tt style} de la distribution, nulle, par blocks ou
 cyclique.
 

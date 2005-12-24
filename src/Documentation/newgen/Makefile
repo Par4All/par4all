@@ -15,41 +15,40 @@ ETEXF =	ri.tex \
 	abc_private.tex \
 	alias_private.tex \
 	ubs_private.tex \
-	c_parser_private.tex
+	c_parser_private.tex \
+	complexity_ri.tex \
+	database.tex \
+	paf_ri.tex \
+	tiling.tex \
+	graph.tex \
+	parser_private.tex \
+	hpf_private.tex \
+	property.tex \
+	makefile.tex \
+	reduction.tex \
+	message.tex \
+	text.tex \
+	hpf.tex \
+	sac_private.tex
 
-FTEXF =	complexity_ri.ftex \
-	database.ftex \
-	paf_ri.ftex \
-	tiling.ftex \
-	graph.ftex \
-	parser_private.ftex \
-	hpf_private.ftex \
-	property.ftex \
-	makefile.ftex \
-	reduction.ftex \
-	message.ftex \
-	text.ftex \
-	hpf.ftex \
-	sac_private.ftex
-
-SOURCES = $(ETEXF) $(FTEXF) unstructured.idraw newgen_domain.sty \
+SOURCES = $(ETEXF) unstructured.idraw newgen_domain.sty \
 	ri_C.tex optimizer.tex
 
-NGENS =	$(ETEXF:.tex=.newgen) $(FTEXF:.ftex=.newgen)
-HEADS = $(NGENS:.newgen=.h)
-CGENS = $(NGENS:.newgen=.c)
-SPECS =	$(NGENS:.newgen=.spec)
+NGENS =	$(ETEXF:%.tex=%.newgen)
+HEADS = $(NGENS:%.newgen=%.h)
+CGENS = $(NGENS:%.newgen=%.c)
+SPECS =	$(NGENS:%.newgen=%.spec)
 
 ALLHS =	all_newgen_headers.h specs.h
 
 INSTALL_INC=	$(HEADS) $(NGENS) $(CGENS) $(SPECS) $(ALLHS)
-INSTALL_DOC=	$(NGENS:.newgen=.ps)
+INSTALL_DOC=	$(NGENS:%.newgen=%.ps)
 INSTALL_HTM=	ri dg
 
 all: $(ALLHS) $(INSTALL_DOC) ri.html dg.html
 
-dvi: $(NGENS:.newgen=.dvi)
-ps: $(NGENS:.newgen=.ps)
+dvi: $(NGENS:%.newgen=%.dvi)
+ps: $(NGENS:%.newgen=%.ps)
 newgen: $(NGENS)
 allhs: $(ALLHS)
 
@@ -77,7 +76,7 @@ lisp_internal_representation: $(NGENS)
 clean: local-clean
 
 local-clean:
-	$(RM) $(INSTALL_INC) $(NGENS) $(FTEXF:.ftex=.tex) *.dvi *.ps
+	$(RM) $(INSTALL_INC) $(NGENS) *.dvi *.ps
 	$(RM) -r $(INSTALL_HTM) ri.html dg.html
 
 # common stuff
@@ -88,4 +87,3 @@ else
 ROOT    = ../../..
 endif
 include $(ROOT)/makes/main.mk
-
