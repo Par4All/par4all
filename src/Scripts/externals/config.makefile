@@ -7,8 +7,7 @@ STF	=	stf \
 		stf-module
 
 OTHERS	=	transformer-to-sc \
-		directory-name \
-		remove-latex-comments
+		directory-name
 
 # scripts that must be chmod
 SCRIPTS =	$(STF) $(OTHERS)

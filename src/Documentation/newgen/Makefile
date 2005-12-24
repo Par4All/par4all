@@ -4,7 +4,7 @@
 
 # unused: dcdg.tex 
 
-ETEXF =	ri.tex \
+F.tex =	ri.tex \
 	dg.tex \
 	compsec.tex \
 	word_attachment.tex \
@@ -31,26 +31,31 @@ ETEXF =	ri.tex \
 	hpf.tex \
 	sac_private.tex
 
-SOURCES = $(ETEXF) unstructured.idraw newgen_domain.sty \
+SOURCES = $(F.tex) unstructured.idraw newgen_domain.sty \
 	ri_C.tex optimizer.tex
 
-NGENS =	$(ETEXF:%.tex=%.newgen)
-HEADS = $(NGENS:%.newgen=%.h)
-CGENS = $(NGENS:%.newgen=%.c)
-SPECS =	$(NGENS:%.newgen=%.spec)
+F.newgen	= $(F.tex:%.tex=%.newgen)
+F.h		= $(F.newgen:%.newgen=%.h)
+F.c		= $(F.newgen:%.newgen=%.c)
+F.spec		= $(F.newgen:%.newgen=%.spec)
 
 ALLHS =	all_newgen_headers.h specs.h
 
-INSTALL_INC=	$(HEADS) $(NGENS) $(CGENS) $(SPECS) $(ALLHS)
-INSTALL_DOC=	$(NGENS:%.newgen=%.ps)
+INSTALL_INC=	$(F.h) $(F.newgen) $(F.c) $(F.spec) $(ALLHS)
+INSTALL_DOC=	$(F.newgen:%.newgen=%.ps)
 INSTALL_HTM=	ri dg
 
 all: $(ALLHS) $(INSTALL_DOC) ri.html dg.html
 
-dvi: $(NGENS:%.newgen=%.dvi)
-ps: $(NGENS:%.newgen=%.ps)
-newgen: $(NGENS)
+dvi: $(F.newgen:%.newgen=%.dvi)
+ps: $(F.newgen:%.newgen=%.ps)
+newgen: $(F.newgen)
 allhs: $(ALLHS)
+
+%.newgen: %.tex
+	$(RM) $@
+	remove-latex-comments $<
+	chmod a-w $@
 
 all_newgen_headers.h: specs.h
 	#
@@ -60,23 +65,23 @@ all_newgen_headers.h: specs.h
 	sed -n 's,^\(.*\)_spec.*,#include "\1.h",p' $< > $@
 	chmod a+r-w $@
 
-specs.h: $(NGENS)
+specs.h: $(F.newgen)
 	#
 	# building specs.h
 	#
-	newgen -c $(NGENS) | make_all_specs > specs.h
+	newgen -c $(F.newgen) | make_all_specs > specs.h
 
-lisp_internal_representation: $(NGENS)
+lisp_internal_representation: $(F.newgen)
 	#
 	# building $@
 	#
-	newgen -lisp $(NGENS)
+	newgen -lisp $(F.newgen)
 	touch $@
 
 clean: local-clean
 
 local-clean:
-	$(RM) $(INSTALL_INC) $(NGENS) *.dvi *.ps
+	$(RM) $(INSTALL_INC) $(F.newgen) *.dvi *.ps
 	$(RM) -r $(INSTALL_HTM) ri.html dg.html
 
 # common stuff
