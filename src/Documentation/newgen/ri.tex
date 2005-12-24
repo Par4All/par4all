@@ -1,50 +1,6 @@
 %%
 %% $Id$
 %%
-%% $Log: ri.tex,v $
-%% Revision 1.74  2005/12/22 13:43:02  coelho
-%% fix epsfig.
-%%
-%% Revision 1.73  2005/12/22 13:40:12  nguyen
-%% + auto type variable.
-%%
-%% Revision 1.72  2003/11/05 15:33:53  nguyen
-%% Add new kind of syntax, application, to handle function calls in C
-%% where the first field can be any expression that denotes the called
-%% function, not necessary an entity.
-%%
-%% Revision 1.71  2003/09/12 12:01:39  nguyen
-%% Add expression to instruction to handle C language
-%%
-%% Revision 1.70  2003/09/09 10:02:07  nguyen
-%% Add subscript syntax to handle general subscripting array expressions in C.
-%%
-%% Revision 1.69  2003/07/22 11:17:49  nguyen
-%% Remove signed, unsigned and char from basic types.
-%% Add expression to value to handle C initializations
-%%
-%% Revision 1.68  2003/06/18 15:39:05  nguyen
-%% Correct the forloop declaration
-%%
-%% Revision 1.67  2003/06/18 15:21:29  nguyen
-%% Add new Newgen structures for C programs.
-%% First version, without comments
-%%
-%% Revision 1.66  2003/04/29 16:06:14  irigoin
-%% typo fixed
-%%
-%% Revision 1.65  2003/04/29 15:37:08  irigoin
-%% New field "unknown" added in constant to represent the constant value
-%% associated to a parameter via a constant expression of a type not
-%% evaluable (currently) by PIPS.
-%%
-%% Revision 1.64  2002/06/20 07:43:55  irigoin
-%% Comments about constant data type increased
-%%
-%% Revision 1.63  2002/06/13 11:36:13  irigoin
-%% initializations field added to code
-%%
-%% 
 
 \documentclass[a4paper]{article}
 \usepackage{epsfig,verbatim,comment,newgen_domain}
