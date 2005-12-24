@@ -85,8 +85,11 @@ local-clean:
 	$(RM) *.dvi *.ind *.log *.ps *.aux *.idx *.ilg *.toc
 	$(RM) -r $(INSTALL_HTM) ri.html dg.html
 
-# common stuff
 
+# what to do depending on phases
+phase2: allhs
+
+# common stuff
 ifdef PIPS_ROOT
 ROOT    = $(PIPS_ROOT)
 else
