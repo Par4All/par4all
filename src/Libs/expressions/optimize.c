@@ -1,145 +1,5 @@
 /*
  * $Id$
- *
- * $Log: optimize.c,v $
- * Revision 1.44  2003/07/28 15:10:07  coelho
- * "INV" -> INVERSE_OPERATOR_NAME
- *
- * Revision 1.43  2000/08/22 08:36:40  coelho
- * comments added.
- *
- * Revision 1.42  2000/08/21 14:10:05  phamdinh
- * hop... it should work...
- *
- * Revision 1.41  2000/07/03 12:27:01  phamdinh
- * Pour changer repertoire a travailler
- *
- * Revision 1.40  2000/05/29 13:39:04  coelho
- * IA-64 strategy added.
- * more comments in strategy definitions.
- *
- * Revision 1.39  2000/05/29 13:27:01  coelho
- * FMA -> FMS for IA64.
- *
- * Revision 1.38  2000/05/26 11:10:41  coelho
- * check for manageable expressions...
- *
- * Revision 1.37  2000/05/25 15:39:21  coelho
- * hop.
- *
- * Revision 1.36  2000/02/03 11:52:53  zory
- * bon ben faut installer... FC>
- *
- * Revision 1.35  1999/08/04 16:38:26  zory
- * new strategies added.
- *
- * Revision 1.34  1999/07/15 20:36:13  coelho
- * ac_cse expermimental phase added.
- *
- * Revision 1.33  1999/07/15 13:33:19  coelho
- * binary to nary stuff added...
- *
- * Revision 1.32  1999/05/28 12:57:58  coelho
- * missing break fixed.
- *
- * Revision 1.31  1999/05/28 12:04:43  coelho
- * nary pattern simplifies added.
- *
- * Revision 1.30  1999/05/27 14:56:21  ancourt
- * fma moved after icm association/atomization.
- *
- * Revision 1.29  1999/05/27 14:48:18  ancourt
- * 2 eole passes. does not work yet.
- *
- * Revision 1.28  1999/05/12 12:53:17  zory
- * reorder module statement after transformation
- *
- * Revision 1.27  1999/05/06 07:06:00  zory
- * test strategy modified !!
- *
- * Revision 1.26  1998/12/30 16:52:50  zory
- * atomize transformations added in strategies
- *
- * Revision 1.25  1998/12/09 09:51:47  zory
- * apply gen_nreverse to the list of indices to have i,j,k,.... in outermost
- * to inermost order
- *
- * Revision 1.24  1998/12/08 16:48:36  coelho
- * new structure to send data to eole.
- *
- * Revision 1.23  1998/11/26 14:26:45  coelho
- * fixed static variables. more comments.
- *
- * Revision 1.22  1998/11/26 10:22:26  coelho
- * davinci expression dump into $database/$module directory.
- *
- * Revision 1.21  1998/11/25 16:32:10  coelho
- * dump expressions in davinci format.
- *
- * Revision 1.20  1998/11/25 14:52:19  coelho
- * test/R10K...
- *
- * Revision 1.19  1998/11/24 17:22:37  coelho
- * simplify implemented.
- *
- * Revision 1.18  1998/11/24 14:15:28  coelho
- * more comments.
- *
- * Revision 1.17  1998/11/24 14:12:59  coelho
- * nary to binary makes use of the strategy.
- *
- * Revision 1.16  1998/11/24 14:09:07  coelho
- * strategies...
- *
- * Revision 1.15  1998/11/24 13:01:42  zory
- * debug manipulations
- *
- * Revision 1.14  1998/11/18 22:46:52  coelho
- * huffman included.
- *
- * Revision 1.13  1998/11/18 22:43:06  coelho
- * switch_nary_to_binary and optimize_simplify_patterns are called.
- *
- * Revision 1.12  1998/11/09 14:50:35  zory
- * use make_constant function instead of specific float and integer
- * make_float/integer_constant_entity funcions
- *
- * Revision 1.11  1998/11/04 09:42:57  coelho
- * use properties for eole and its options.
- *
- * Revision 1.10  1998/11/04 08:59:06  zory
- * double and float format updated
- *
- * Revision 1.9  1998/10/22 11:30:29  zory
- * double type for const values added
- *
- * Revision 1.8  1998/10/20 14:51:23  zory
- * move the free statement for all strings inside the if statement
- *
- * Revision 1.7  1998/10/20 14:48:47  zory
- * free the list of unoptimized expressions only when there are some
- * expressions in the module ! (if statement)
- *
- * Revision 1.6  1998/09/17 12:08:43  zory
- * taking into account new entity from eole
- *
- * Revision 1.5  1998/09/14 12:50:15  coelho
- * more comments.
- *
- * Revision 1.4  1998/09/14 12:34:11  coelho
- * added import from eole and substitution in module code.
- *
- * Revision 1.3  1998/09/11 12:18:39  coelho
- * new version thru a reference (suggested by PJ).
- *
- * Revision 1.2  1998/09/11 09:42:49  coelho
- * write equalities...
- *
- * Revision 1.1  1998/04/29 09:07:42  coelho
- * Initial revision
- *
- *
- * expression optimizations by Julien.
  */
 
 #include <stdio.h>
@@ -594,7 +454,7 @@ static void call_simplify_rwt(call c)
     me = is_uminus(e2);
     if (me)
     {
-      EXPRESSION(CAR(CDR(la))) = me; /* memory leak */
+      EXPRESSION_(CAR(CDR(la))) = me; /* memory leak */
       call_function(c) = bminus;
       return;
     }
@@ -602,8 +462,8 @@ static void call_simplify_rwt(call c)
     me = is_uminus(e1);
     if (me)
     {
-      EXPRESSION(CAR(CDR(la))) = me;
-      EXPRESSION(CAR(la)) = e2; /* memory leak */
+      EXPRESSION_(CAR(CDR(la))) = me;
+      EXPRESSION_(CAR(la)) = e2; /* memory leak */
       call_function(c) = bminus;
       return;
     }
@@ -622,7 +482,7 @@ static void call_simplify_rwt(call c)
       free_expression(e3);
       
       call_function(c) = fmsop;
-      EXPRESSION(CAR(CDR(CDR(la)))) = me;
+      EXPRESSION_(CAR(CDR(CDR(la)))) = me;
     }
   }
 }

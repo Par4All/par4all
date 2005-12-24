@@ -1,126 +1,6 @@
 /* 
    $Id$
 
-   $Log: sequence_gcm_cse.c,v $
-   Revision 1.26  2000/08/21 14:02:18  phamdinh
-   comments added.
-
-   Revision 1.25  2000/08/19 14:03:03  phamdinh
-   Add comments in code!
-
-   Revision 1.24  2000/07/29 17:05:24  phamdinh
-   W effects is resolved!
-
-   Revision 1.23  2000/07/28 14:12:20  phamdinh
-   	* Number of use of every new variable is counted (using the field
-   	'comments' of the statement defining it. This value is modified
-   	often, it may be increased but also be reduced!
-   	ex:
-   		x = a + b*c + d
-   		y = b*c + e
-
-   	==>	F_0 = b*c (Number of use = 2)
-   		x = F_0 + a + d
-   		y = F_0 + e
-
-   	But:
-   		x = a + b*c + d
-   		y = a + b*c + e
-
-   	==>	F_0 = b*c 	(Number of use F_0 = 1)
-   		F_1 = a + F_0	(Number of use F_1 = 2)
-   		x = F_1 + d
-   		y = F_1 + e
-   	Note: 	Before the creation of F_1, Number of use F_0 = 2. After
-   		the appaire of F_1, #F_0 = 1 because F_0 is contained in F_1
-
-   	==>> Code optimal:
-   		F_1 = a + b*c	(F_0 is removed)
-   		x = F_1 + d
-   		y = F_1 + e
-
-   *******	Summary: Code is more optimal!!!
-
-   Revision 1.22  2000/07/27 14:33:04  phamdinh
-   Debug: Constant, Unary minus, and "y = x + ..."
-
-   	x = a+b
-   	y = a+b+c
-
-   	==> 	x = a+b
-   		y = x+c
-   ======
-
-   	x = a-b+5
-   	y = a-b+5+c
-
-   	==>	x = a-b+5
-   		y = x+c
-
-   Revision 1.21  2000/07/24 16:25:46  phamdinh
-   CSE: Remove statements temporel...
-
-   Revision 1.20  2000/07/21 16:06:14  phamdinh
-   CSE: Remove statements temporel
-
-   Revision 1.19  2000/07/21 08:26:56  phamdinh
-   Modification of the update aspt->available_contents
-
-   Revision 1.18  2000/07/20 16:47:27  phamdinh
-   New statements are inserted in the correct position in hash_table
-
-   Revision 1.17  2000/07/03 12:52:07  coelho
-   headers fixed.
-
-   Revision 1.16  2000/07/03 12:51:16  coelho
-   typo fixed.
-
-   Revision 1.15  2000/07/03 12:26:06  phamdinh
-   Pour changer repertoire a travailer
-
-   Revision 1.14  2000/06/28 14:16:17  coelho
-   CSE not inverted?
-
-   Revision 1.13  1999/07/15 20:35:46  coelho
-   temporary working version of AC-CSE...
-
-   Revision 1.12  1999/05/28 09:15:37  coelho
-   cleaner and more comments.
-
-   Revision 1.11  1999/05/27 16:51:01  ancourt
-   also ICM direct expressions such as conditions and bounds.
-
-   Revision 1.10  1999/05/27 16:09:44  ancourt
-   code cleaned up...
-
-   Revision 1.9  1999/05/27 14:47:26  ancourt
-   working combined association/atomization for ICM.
-
-   Revision 1.8  1999/05/26 14:25:42  coelho
-   emprunt...
-
-   Revision 1.7  1999/05/25 13:14:50  zory
-   fixes for new atomize_as_required.
-
-   Revision 1.6  1999/05/12 14:46:15  zory
-   basic_of_expression replace by please_give_me_a_basic_for_an_expression
-
-   Revision 1.5  1999/05/12 12:24:39  zory
-   level of unknow entities changed !
-
-   Revision 1.4  1999/01/08 17:29:45  zory
-   level_atomization done
-
-   Revision 1.3  1999/01/04 16:56:32  zory
-   atomize_level in progress ...
-
-   Revision 1.2  1998/12/30 16:54:18  zory
-   atomization updated
-
-   Revision 1.1  1998/12/28 15:50:32  coelho
-   Initial revision
-
-
    Global code motion and Common subexpression elimination for nested
    sequences (a sort of perfect loop nest).
 */
@@ -1307,6 +1187,7 @@ static entity entity_of_expression(expression e, bool * inverted, entity inv)
     }
   case is_syntax_range:
   default:
+    break;
   }
   return NULL;
 }
@@ -1565,7 +1446,7 @@ simple_reference_p(expression e)
 }
 
 static bool
-expression_constant_p(expression e)
+is_expression_constant_p(expression e)
 {
   syntax s = expression_syntax(e);
   if(syntax_call_p(s))
@@ -1746,7 +1627,7 @@ static void atom_cse_expression(expression e)
    *   - Unary minus (ex: -a , -5)
    */
   if (!simple_reference_p(e) && 
-      !expression_constant_p(e) &&
+      !is_expression_constant_p(e) &&
       !call_unary_minus_p(e))
   {
     expression exp = NULL;

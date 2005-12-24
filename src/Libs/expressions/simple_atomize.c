@@ -103,7 +103,7 @@ statement s;
 	      {
 		  if (CONTROL(CAR(c2))==cc) 
 		  {
-		      CONTROL(CAR(c2))=newc;
+		      CONTROL_(CAR(c2))=newc;
 		      seen=TRUE;
 		  }
 	      },

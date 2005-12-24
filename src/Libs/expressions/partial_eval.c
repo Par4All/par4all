@@ -1,4 +1,5 @@
-/*
+/* $Id$
+ *
  * Integer constants calculated by preconditions are replaced by their value.
  * Expressions are evaluated to (ICOEF*SUBEXPR + ISHIFT) in order to perform
  * some simplifications.
@@ -315,7 +316,7 @@ struct eformat partial_eval_reference(expression e, Psysteme ps, effects fx)
 	    expression expr = EXPRESSION(CAR(li));
 
 	    partial_eval_expression_and_regenerate(&expr, ps, fx);
-	    EXPRESSION(CAR(li)) = expr;
+	    EXPRESSION_(CAR(li)) = expr;
 	}, reference_indices(r));
 
 	debug(9, "partial_eval_reference", "Array elements not evaluated\n");
@@ -427,7 +428,7 @@ void partial_eval_call_and_regenerate(call ca, Psysteme ps, effects fx)
 	expression exp = EXPRESSION(CAR(le));
 
 	partial_eval_expression_and_regenerate(&exp, ps, fx);
-	EXPRESSION(CAR(le))= exp;
+	EXPRESSION_(CAR(le))= exp;
     }, call_arguments(ca));
 }
 
