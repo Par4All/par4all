@@ -1,3 +1,5 @@
+/* $Id$ */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -867,8 +869,7 @@ output_the_attachments_for_emacs(FILE * output_file)
 	   word_to_attachments_end: */
 	MAPL(ats,
 	     {
-		 ATTACHMENT(CAR(ats)) =
-		     attachment_undefined;
+		 ATTACHMENT_(CAR(ats)) = attachment_undefined;
 	     },
 	     attachments_attachment(attachment_list));
     },

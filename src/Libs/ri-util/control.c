@@ -6,12 +6,6 @@
 
 /* 
  * $Id$
- *
- * $Log: control.c,v $
- * Revision 1.29  2002/07/03 09:22:12  irigoin
- * Updates in check_control_coherency() and in debugging messages
- *
- *
  */
 
 #ifndef lint
@@ -778,7 +772,7 @@ fuse_2_control_nodes(control first,
 	    MAPL(cp,
 		 {
 		     if (CONTROL(CAR(cp)) == second)
-			 CONTROL(CAR(cp)) = first;
+			 CONTROL_(CAR(cp)) = first;
 		 }, control_predecessors(c));
 	}, control_successors(first));
 	       
@@ -794,7 +788,7 @@ fuse_2_control_nodes(control first,
 	    MAPL(cp,
 		 {
 		     if (CONTROL(CAR(cp)) == second) {
-			 CONTROL(CAR(cp)) = first;
+			 CONTROL_(CAR(cp)) = first;
 		     }
 		 }, control_successors(c));
 	}, control_predecessors(second));
