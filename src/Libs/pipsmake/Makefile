@@ -2,12 +2,11 @@
 # $Id$
 #
 
-YFLAGS+=	-d
+TARGET	= pipsmake
 
-# Source, header and object files used to build the library.
-# Do not include the main program source file.
+YOPT	= -d
 
-LIB_CFILES=	pipsmake.c \
+INC_CFILES =	pipsmake.c \
 		activate.c \
 		callgraph.c \
 		openclose.c \
@@ -15,16 +14,33 @@ LIB_CFILES=	pipsmake.c \
 		unsplit.c \
 		stubs.c
 
-LIB_HEADERS=	readmakefile.l \
-		readmakefile.y \
-		pipsmake-local.h
+DERIVED_HEADERS = pipsmake_yacc.h
 
-DERIVED_HEADERS= pipsmake_yacc.h
-DERIVED_CFILES= pipsmake_yacc.c pipsmake_lex.c
+DERIVED_CFILES = pipsmake_yacc.c pipsmake_lex.c
 
-LIB_OBJECTS=	$(DERIVED_CFILES:.c=.o)  $(LIB_CFILES:.c=.o) 
+LIB_CFILES =	$(DERIVED_CFILES)  $(INC_CFILES) 
 
-default: all
+INC_TARGET = $(TARGET).h
+
+LIB_TARGET = lib$(TARGET).a
+
+# common stuff
+ifdef PIPS_ROOT
+ROOT    = $(PIPS_ROOT)
+else
+ROOT    = ../../..
+endif
+
+include $(ROOT)/makes/main.mk
+
+# local specials
+
+clean: local-clean
+
+local-clean:
+	$(RM) $(DERIVED_CFILES) $(DERIVED_HEADERS)
+
+$(TARGET).h: $(DERIVED_CFILES)
 
 pipsmake_lex.c: readmakefile.l pipsmake_yacc.h
 	$(SCAN) readmakefile.l | \
@@ -36,7 +52,3 @@ pipsmake_yacc.c pipsmake_yacc.h: readmakefile.y
 	sed 's/YY/PIPSMAKE_/g;s/yy/pipsmake_/g' y.tab.c > pipsmake_yacc.c
 	sed 's/YY/PIPSMAKE_/g;s/yy/pipsmake_/g' y.tab.h > pipsmake_yacc.h
 	$(RM) y.tab.[hc] y.output
-
-.depend: $(DERIVED_CFILES)
-.header: $(DERIVED_HEADERS)
-
