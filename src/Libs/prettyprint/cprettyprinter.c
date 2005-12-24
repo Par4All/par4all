@@ -396,6 +396,7 @@ static string this_entity_cdeclaration(entity var)
       break;
     }
   default: 
+    break;
   }
 
   switch (type_tag(t)) {
@@ -471,6 +472,7 @@ static string this_entity_cdeclaration(entity var)
       break;
     }
   default:
+    break;
   }
  
   return result? result: strdup("");
