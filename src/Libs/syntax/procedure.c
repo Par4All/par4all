@@ -1886,7 +1886,7 @@ BuildStatementForEntry(
     l = instruction_block(statement_instruction(s));
     pips_assert("cms is the second statement of the block", 
 		STATEMENT(CAR(CDR(l))) == cms);
-    CAR(CDR(l)).p = statement_undefined;
+    STATEMENT_(CAR(CDR(l))) = statement_undefined;
     instruction_goto(statement_instruction(STATEMENT(CAR(l)))) = statement_undefined;
     free_statement(s);
 
