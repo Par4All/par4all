@@ -2,35 +2,6 @@
  * HPFC module by Fabien COELHO
  *
  * $Id$
- * $Log: defines-local.h,v $
- * Revision 1.73  1998/06/03 08:36:26  zory
- * remove conflicts between the compiler's function names and the ones
- * defined in the run-time.
- *
- * Revision 1.72  1998/04/14 16:28:27  coelho
- * cleaner header.
- *
- * Revision 1.71  1998/04/14 16:27:56  coelho
- * switch to linear.h
- *
- * Revision 1.70  1998/03/17 15:38:30  coelho
- * statement number added
- *
- * Revision 1.69  1997/09/26 11:10:30  coelho
- * fake resource updated.
- *
- * Revision 1.68  1997/07/23 14:54:10  keryell
- * syst_debug(s) changed to sc_syst_debug(s) to avoid conflict with bison
- * output of sc+gram.y... :-(
- *
- * Revision 1.67  1997/07/21 13:23:59  keryell
- * Replaced %x format by %p.
- *
- * Revision 1.64  1997/04/17 11:46:54  coelho
- * io comms pvm -> runtime.
- *
- * Revision 1.63  1997/04/07 09:46:40  coelho
- * DEBUG_MTRX macro added
  */
 
 /* Most includes are centralized here.

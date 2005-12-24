@@ -1,12 +1,6 @@
  /* include file for transformer library
   *
   * $Id$
-  *
-  * $Log: transformer-local.h,v $
-  * Revision 1.5  2001/07/19 18:15:41  irigoin
-  * Log and id information added in header
-  *
-  *
   */
 
 /* prefix used for value entity names; no conflict should occur with user
