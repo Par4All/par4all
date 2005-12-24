@@ -14,8 +14,7 @@ INSTALL_SHR =	pips-deal-with-include \
 		check_for_recursions.pl
 
 
-UTL_SCRIPTS = 	filter_verbatim \
-		job-make \
+UTL_SCRIPTS =	job-make \
 		job-receive \
 		unjustify \
 		multi_sccs.sh
