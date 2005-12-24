@@ -116,7 +116,7 @@ string (* pips_request_handler)(char *, va_list) = default_user_request;
 /* The generic fonction to ask something to the user. Note that if
  * the user cancels his/her request,the empty string "" is returned:
  */
-string user_request(char * a_message_format, ...)
+string user_request(const char * a_message_format, ...)
 {
    string str;
    va_list some_arguments;
@@ -136,7 +136,7 @@ static string warning_file_name = (string) NULL;
 
 #define WARNING_FILE_NAME "Warnings"
 
-void open_warning_file(string dir)
+void open_warning_file(const string dir)
 {
     warning_file_name = strdup(concatenate(dir, "/", WARNING_FILE_NAME, 0));
     warning_file = safe_fopen(warning_file_name, "a");
@@ -155,8 +155,8 @@ void close_warning_file(void)
 }
 
 static void 
-append_to_warning_file(char * calling_function_name,
-		       char * a_message_format,
+append_to_warning_file(const char * calling_function_name,
+		       const char * a_message_format,
 		       va_list * some_arguments)
 {
    if (warning_file) 
@@ -170,8 +170,8 @@ append_to_warning_file(char * calling_function_name,
 }
 
 static void
-default_user_warning(char * calling_function_name,
-                     char * a_message_format,
+default_user_warning(const char * calling_function_name,
+                     const char * a_message_format,
                      va_list * some_arguments)
 {
    /* print name of function causing warning
@@ -190,8 +190,8 @@ void (* pips_warning_handler)(char *, char *, va_list *)
 
 
 void
-user_warning(char * calling_function_name,
-             char * a_message_format,
+user_warning(const char * calling_function_name,
+             const char * a_message_format,
              ...)
 {
    va_list some_arguments;
@@ -215,7 +215,7 @@ user_warning(char * calling_function_name,
 #if !defined(__GNUC__)
 void 
 pips_user_warning_function(
-    char * format,
+    const char * format,
     ...)
 {
     va_list args;
@@ -254,13 +254,13 @@ pips_internal_error_function(
 #endif /* no __GNUC__ */
 
 /* make sure the user has noticed something */
-void default_prompt_user(string s)
+void default_prompt_user(const string s)
 {
     fprintf(stderr, "%s\nPress <Return> to continue ", s);
     while (getchar() != '\n') ;
 }
 
-void pips_exit_function(int code, char * format, ...)
+void pips_exit_function(const int code, const char * format, ...)
 {
     va_list some_arguments;
     va_start(some_arguments, format);
