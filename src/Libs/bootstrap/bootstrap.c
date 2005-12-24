@@ -1557,7 +1557,7 @@ typing_arguments(call c, type_context_p context, basic b)
     b1 = GET_TYPE(context->types, EXPRESSION(CAR(args)));
     if (!basic_equal_p(b, b1))
     {
-      EXPRESSION(CAR(args)) =
+      EXPRESSION_(CAR(args)) =
 	insert_cast(b, b1, EXPRESSION(CAR(args)), context);
       /* Update hash table */
       PUT_TYPE(context->types, EXPRESSION(CAR(args)), copy_basic(b));
@@ -1618,7 +1618,7 @@ typing_power_operator(call c, type_context_p context)
   
   if (!basic_equal_p(b, b1))
   {
-    EXPRESSION(CAR(args)) = 
+    EXPRESSION_(CAR(args)) = 
       insert_cast(b, b1, EXPRESSION(CAR(args)), context);
   }
   /* Fortran prefers: (ANSI X3.9-1978, FORTRAN 77, PAGE 6-6, TABLE 3)
@@ -1627,7 +1627,7 @@ typing_power_operator(call c, type_context_p context)
    */
   if (!basic_equal_p(b, b2) && !basic_int_p(b2))
   {
-    EXPRESSION(CAR(CDR(args))) = 
+    EXPRESSION_(CAR(CDR(args))) = 
       insert_cast(b, b2, EXPRESSION(CAR(CDR(args))), context);
   }
   return copy_basic(b);
@@ -2185,7 +2185,7 @@ typing_of_assign(call c, type_context_p context)
     b2 = GET_TYPE(context->types, EXPRESSION(CAR(CDR(args))));
     if (!basic_equal_p(b1, b2))
     {
-      EXPRESSION(CAR(CDR(args))) = 
+      EXPRESSION_(CAR(CDR(args))) = 
 	insert_cast(b1, b2, EXPRESSION(CAR(CDR(args))), context);
       }
   }
