@@ -1,46 +1,4 @@
 /* $Id$ 
-   $Log: util.c,v $
-   Revision 1.13  2005/12/15 16:19:43  irigoin
-   Bug fix attemps for entity_initial and unknown_value
-
-   Revision 1.12  2005/12/15 15:33:45  irigoin
-   Initial value part seems to have been forgotten in  UpdateEntity()
-
-   Revision 1.11  2004/02/20 13:57:47  nguyen
-   Treat EXTERN entities
-
-   Revision 1.10  2004/02/19 15:18:24  nguyen
-   Bug related to "const void", qualifier for not variable type
-
-   Revision 1.9  2004/02/19 14:07:59  nguyen
-   Correct things about qualifiers
-
-   Revision 1.8  2004/02/18 10:33:07  nguyen
-   Rewrite declarators (parenthese, array and function)
-
-   Revision 1.7  2003/12/18 22:41:55  nguyen
-   Change FILE_SEP_STRING from % to !
-
-   Revision 1.6  2003/12/05 17:19:04  nguyen
-   Add more syntax types : subscript and application.
-   Handle entity creation : array, function, ..
-
-   Revision 1.5  2003/09/05 14:18:58  nguyen
-   Improved version of CreateCurrentEntity
-
-   Revision 1.4  2003/08/13 08:00:00  nguyen
-   Modify MakeCurrentEntity by taking into account the function case
-
-   Revision 1.3  2003/08/06 14:00:08  nguyen
-   Replace global variables such as CurrentCompilationUnit, static and dynamic
-   ares by function calls
-
-   Revision 1.2  2003/08/04 14:19:41  nguyen
-   Preliminary version of the C parser
-
-   Revision 1.1  2003/06/24 09:00:48  nguyen
-   Initial revision
-
 */
 
 #include <stdlib.h>
@@ -65,9 +23,6 @@
 #include "misc.h"
 #include "pipsdbm.h"
 #include "transformations.h"
-
-/* To avoid warnings */
-extern char *strdup(const char *s1);
 
 extern string compilation_unit_name;
 extern hash_table keyword_typedef_table;

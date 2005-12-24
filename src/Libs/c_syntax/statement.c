@@ -1,7 +1,7 @@
 
 /*******************  STATEMENTS ******************
- $Id
- $Log */
+ $Id$
+ */
 
 /* Attention, the null statement in C is represented as the continue 
    statement in Fortran (make_continue_statement means make_null_statement)*/
@@ -28,9 +28,6 @@
 #include "pipsdbm.h"
 #include "text-util.h"
 #include "properties.h"
-
-/* To avoid warnings */
-extern char *strdup(const char *s1);
 
 extern statement ModuleStatement;
 

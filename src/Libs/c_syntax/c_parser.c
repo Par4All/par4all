@@ -1,26 +1,4 @@
-/* $id$
-   $Log: c_parser.c,v $
-   Revision 1.7  2004/02/18 10:32:18  nguyen
-   Remove c_parser_tmp
-
-   Revision 1.6  2003/12/05 17:16:21  nguyen
-   Initialize and free global stacks
-
-   Revision 1.5  2003/09/05 14:18:25  nguyen
-   Put keywords and typedefs hash table into DECLARATIONS resource of each
-   compilation unit.
-
-   Revision 1.4  2003/08/13 07:58:41  nguyen
-   Add compilation_unit_parser
-
-   Revision 1.3  2003/08/06 14:12:55  nguyen
-   Upgraded version of C parser
-
-   Revision 1.2  2003/08/04 14:20:08  nguyen
-   Preliminary version of the C parser
-
-   Revision 1.1  2003/06/24 07:23:20  nguyen
-   Initial revision
+/* $Id$
  */
 
 #include <stdio.h>
@@ -45,9 +23,6 @@
 
 #include "pipsdbm.h"
 #include "pipsmake.h"
-
-/* To avoid warnings */
-extern char *strdup(const char *s1);
 
 string compilation_unit_name; 
 
