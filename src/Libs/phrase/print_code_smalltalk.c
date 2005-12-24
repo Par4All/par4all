@@ -413,6 +413,7 @@ static string st_declaration(entity var)
       free(svar);
     }
   default: 
+    break;
   }
   switch (type_tag(t)) {
   case is_type_variable:
@@ -498,6 +499,7 @@ static string st_declaration_init(entity var)
       break;
     }
   default: 
+    break;
   }
   switch (type_tag(t)) {
   case is_type_variable:
@@ -557,6 +559,7 @@ static string st_declaration_init(entity var)
       break;
     }
   default:
+    break;
   }
  
   return result;
