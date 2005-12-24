@@ -1,0 +1,10 @@
+#! /bin/sh
+
+for dir in "$@"
+do
+  test -d $dir &&
+  for included in $(sed -n 's/^#include *"\([-a-z_]*\)\.h" *$/\1/p' $dir/*.c)
+  do
+    echo "$dir $included"
+  done
+done
