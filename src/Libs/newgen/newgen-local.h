@@ -10,6 +10,8 @@
  * FC, Feb 21, 1994
  */
 
+#define STATEMENT_ORDERING_UNDEFINED (-1)
+
 /* these macros are obsolete! newgen functions (->) should be used
  * instead
  */
