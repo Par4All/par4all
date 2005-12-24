@@ -32,15 +32,14 @@ SET_DEBUG_LEVEL is a function that sets the current debuging level to
 the value passed as argument.  Valid debuging values are from 0 to 9.
 0 means no debug, 9 means extensive debug. Other values are illegal.
 */
-void set_debug_level(l)
-int l;
+void set_debug_level(const int l)
 {
     message_assert("debug level not in 0-9", l>=0 && l<=9);
     the_current_debug_level = l;
 }
 
 /* GET_DEBUG_LEVEL returns the current debugging level. */
-int get_debug_level()
+int get_debug_level(void)
 {
     return(the_current_debug_level);
 }
@@ -64,12 +63,12 @@ static int idls = 0;
 /* The pair get_ and set_debug_stack_pointer() should never be used
 except to clean up the stack after a long jump */
 
-int get_debug_stack_pointer()
+int get_debug_stack_pointer(void)
 {
     return idls;
 }
 
-void set_debug_stack_pointer(int i)
+void set_debug_stack_pointer(const int i)
 {
     if(i >= 0 && i <= idls) {
 	if (i!=idls) {
@@ -86,10 +85,10 @@ void set_debug_stack_pointer(int i)
 
 void 
 debug_on_function(
-    char * env,
-    char * function,
-    char * file,
-    int line)
+    const char * env,
+    const char * function,
+    const char * file,
+    const int line)
 {
     int dl;
     char * level_env;
@@ -110,9 +109,9 @@ debug_on_function(
 
 void 
 debug_off_function(
-    char * function,
-    char * file,
-    int line)
+    const char * function,
+    const char * file,
+    const int line)
 {
     debug_level *current;
 
@@ -138,7 +137,7 @@ debug_off_function(
 /* function used to debug (can be called from dbx)
  * BB 6.12.91
  */
-void print_debug_stack()
+void print_debug_stack(void)
 {
     int i;
 
@@ -163,9 +162,9 @@ expression_list are passed as arguments to vprintf.
 */
 /*VARARGS0*/
 void
-debug(int the_expected_debug_level,
-      char * calling_function_name,
-      char * a_message_format,
+debug(const int the_expected_debug_level,
+      const char * calling_function_name,
+      const char * a_message_format,
       ...)
 {
    va_list some_arguments;
@@ -198,8 +197,8 @@ debug(int the_expected_debug_level,
  * the function name won't be available. FC May 95.
  */
 void
-pips_debug_function(int the_expected_debug_level,
-                    char * a_message_format,
+pips_debug_function(const int the_expected_debug_level,
+                    const char * a_message_format,
                     ...)
 {
    va_list some_arguments;
@@ -218,7 +217,7 @@ pips_debug_function(int the_expected_debug_level,
    va_end(some_arguments);
 }
 
-double get_process_memory_size()
+double get_process_memory_size(void)
 {
     /* This is about the always increasing swap space */
     /* etext is not portable. it is not even documented on SUN:-) */
@@ -228,7 +227,7 @@ double get_process_memory_size()
     return 0.0;
 }
 
-double get_process_gross_heap_size()
+double get_process_gross_heap_size(void)
 {
     /* mallinfo is not portable */
     /* This is *used* part of the heap, but it may be bigger */
