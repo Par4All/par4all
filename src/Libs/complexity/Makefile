@@ -55,8 +55,6 @@ LIB_CFILES = \
 	comp_util.c comp_math.c comp_prettyprint.c polynome_ri.c \
 	comp_matrice.c
 
-
-
 INC_TARGET =    $(TARGET).h
 
 LIB_TARGET      = lib$(TARGET).a
