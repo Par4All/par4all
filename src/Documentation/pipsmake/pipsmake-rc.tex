@@ -60,7 +60,7 @@
 
 \documentclass[a4paper]{article}
 %\usepackage{alltt,html,fancybox,amstext,xspace,psfig}
-\usepackage{epsfig,amstext,alltt,html}
+\usepackage{epsfig,amstext,alltt}
 
 %% Cannot work with verbatim: \begin{verbatim} absorbs \end{example}
 %% \newenvironment{example}{\begin{verbatim}}{\end{verbatim}}
@@ -87,6 +87,8 @@ $~$Date: 2005/11/03 16:58:55 $~$
 
 \renewcommand{\indexname}{Index}
 
+%% short term fix to html style
+\newcommand{\LINK}[2]{#1 (#2)}
 
 %%@UserManualDeclarations
 %% Some declarations used to factorize all the label names and so on:
@@ -96,24 +98,24 @@ $~$Date: 2005/11/03 16:58:55 $~$
 
 \newcommand{\CPU}{{\em CPU}}
 \newcommand{\HPF}{{\em HPF}}
-\newcommand{\HPFC}{\htmladdnormallink{\emph{HPFC}}{http://www.cri.ensmp.fr/pips/hpfc.html}}
-\newcommand{\HPFcompiler}{\htmladdnormallink{\emph{HPF\space{}compiler}}{http://www.cri.ensmp.fr/pips/hpfc.html}}
+\newcommand{\HPFC}{\LINK{\emph{HPFC}}{http://www.cri.ensmp.fr/pips/hpfc.html}}
+\newcommand{\HPFcompiler}{\LINK{\emph{HPF\space{}compiler}}{http://www.cri.ensmp.fr/pips/hpfc.html}}
 \newcommand{\PArrayDataFlowGraphView}{{Array Data Flow Graph View}}
 \newcommand{\PELSE}{{\tt ELSE}}
 \newcommand{\PGOTO}{{\tt GOTO}}
 \newcommand{\PIF}{{\tt IF}}
-\newcommand{\PIPS}{\htmladdnormallink{\emph{PIPS}}{http://www.cri.ensmp.fr/pips}}
-\newcommand{\PIPSMAKE}{\htmladdnormallink{\emph{pipsmake/}}{http://www.cri.ensmp.fr/pips/pipsmake.html}}
+\newcommand{\PIPS}{\LINK{\emph{PIPS}}{http://www.cri.ensmp.fr/pips}}
+\newcommand{\PIPSMAKE}{\LINK{\emph{pipsmake/}}{http://www.cri.ensmp.fr/pips/pipsmake.html}}
 \newcommand{\PLinear}{\emph{Linear C$^3$}}
-\newcommand{\PNEWGEN}{\htmladdnormallink{\emph{NewGen}}{http://www.cri.ensmp.fr/pips/newgen-manual/newgen-manual.html}}
-\newcommand{\PROPERTIES}{\htmladdnormallink{\emph{properties}}{http://www.cri.ensmp.fr/pips/properties-rc}}
+\newcommand{\PNEWGEN}{\LINK{\emph{NewGen}}{http://www.cri.ensmp.fr/pips/newgen-manual/newgen-manual.html}}
+\newcommand{\PROPERTIES}{\LINK{\emph{properties}}{http://www.cri.ensmp.fr/pips/properties-rc}}
 \newcommand{\PTHEN}{{\tt THEN}}
 \newcommand{\PVM}{{\em PVM}}
 \newcommand{\PCallgraphView}{{Call Tree View}}
 \newcommand{\PCompileAnHPFProgram}{{Compile an HPF Program}}
 \newcommand{\Pcontrolgraph}{{control flow graph}}
 \newcommand{\Pcurrentmodule}{{current module}}
-\newcommand{\PdaVinci}{\htmladdnormallink{\emph{daVinci}}{http://www.informatik.uni-bremen.de/~davinci}}
+\newcommand{\PdaVinci}{\LINK{\emph{daVinci}}{http://www.informatik.uni-bremen.de/~davinci}}
 \newcommand{\PDependenceGraphView}{{Dependence Graph View}}
 \newcommand{\PDistributedView}{{Distributed View}}
 \newcommand{\PEdit}{{Edit}}
@@ -134,19 +136,19 @@ $~$Date: 2005/11/03 16:58:55 $~$
 \newcommand{\PAliasView}{{Alias View}}
 \newcommand{\PViewTheHPFCompilerOutput}{{View the HPF
     Compiler Output}}
-\newcommand{\Pri}{\htmladdnormallink{\emph{Internal\space{}Representation}}{http://www.cri.ensmp.fr/pips/ri/ri.html}}
-\newcommand{\WPsc}{\htmladdnormallink{\emph{WP65}}{http://www.cri.ensmp.fr/pips/wp65.html}}
+\newcommand{\Pri}{\LINK{\emph{Internal\space{}Representation}}{http://www.cri.ensmp.fr/pips/ri/ri.html}}
+\newcommand{\WPsc}{\LINK{\emph{WP65}}{http://www.cri.ensmp.fr/pips/wp65.html}}
  
 %% Now the interface names :
-\newcommand{\pips}{\htmladdnormallink{\texttt{pips}}{http://www.cri.ensmp.fr/pips/batch-interface.html}}
-\newcommand{\EPIPS}{\htmladdnormallink{\texttt{epips}}{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual/wpips-epips-user-manual.html}}
-\newcommand{\TPIPS}{\htmladdnormallink{\texttt{tpips}}{http://www.cri.ensmp.fr/pips/line-interface.html}}
-\newcommand{\WPIPS}{\htmladdnormallink{\texttt{wpips}}{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual/wpips-epips-user-manual.html}}
-\newcommand{\Init}{\htmladdnormallink{\texttt{Init}}{http://www.cri.ensmp.fr/pips/Init.html}}
-\newcommand{\Select}{\htmladdnormallink{\texttt{Select}}{http://www.cri.ensmp.fr/pips/Select.html}}
-\newcommand{\Perform}{\htmladdnormallink{\texttt{Perform}}{http://www.cri.ensmp.fr/pips/Perform.html}}
-\newcommand{\Display}{\htmladdnormallink{\texttt{Display}}{http://www.cri.ensmp.fr/pips/Display.html}}
-\newcommand{\Delete}{\htmladdnormallink{\texttt{Delete}}{http://www.cri.ensmp.fr/pips/Delete.html}}
+\newcommand{\pips}{\LINK{\texttt{pips}}{http://www.cri.ensmp.fr/pips/batch-interface.html}}
+\newcommand{\EPIPS}{\LINK{\texttt{epips}}{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual/wpips-epips-user-manual.html}}
+\newcommand{\TPIPS}{\LINK{\texttt{tpips}}{http://www.cri.ensmp.fr/pips/line-interface.html}}
+\newcommand{\WPIPS}{\LINK{\texttt{wpips}}{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual/wpips-epips-user-manual.html}}
+\newcommand{\Init}{\LINK{\texttt{Init}}{http://www.cri.ensmp.fr/pips/Init.html}}
+\newcommand{\Select}{\LINK{\texttt{Select}}{http://www.cri.ensmp.fr/pips/Select.html}}
+\newcommand{\Perform}{\LINK{\texttt{Perform}}{http://www.cri.ensmp.fr/pips/Perform.html}}
+\newcommand{\Display}{\LINK{\texttt{Display}}{http://www.cri.ensmp.fr/pips/Display.html}}
+\newcommand{\Delete}{\LINK{\texttt{Delete}}{http://www.cri.ensmp.fr/pips/Delete.html}}
 
 %% Pour Béatrice :
 \newcommand{\exact}[0]{{\tt EXACT}}
@@ -156,7 +158,7 @@ $~$Date: 2005/11/03 16:58:55 $~$
 \newcommand{\may}[0]{{\tt MAY}}
 %%!UserManualDeclarations
 
-\externallabels{http://www.cri.ensmp.fr/pips/ri}{public_html/ri/labels.pl}
+%%\externallabels{http://www.cri.ensmp.fr/pips/ri}{public_html/ri/labels.pl}
 
 \makeindex
 
@@ -731,8 +733,8 @@ c_parser                        > MODULE.parsed_code
 control flow graph, which preserves structured part of code as such, and
 uses a control flow graph only when no syntactic representation is
 available (see~\cite{IJT91}). The encoding of the relationship between
-structured and unstructured parts of code is explained
-in~\externalref{section-code}.
+structured and unstructured parts of code is explained elsewhere
+%% in \externalref{section-code}.
 
 The \verb+controlizer+ removes \verb+GOTO+
 statements in the parsed code and generates a similar representation
@@ -3155,7 +3157,7 @@ distribution unless all loop bounds are numerically known. It is assumed
 that the loop nest is fully parallel.
 
 Jingling Xue published an advanced code generation algorithm for tiling in
-Parallel Processing Letters (htpp://cs.une.edu.au/~xue/pub.html).
+Parallel Processing Letters (http://cs.une.edu.au/~xue/pub.html).
 %%!UserManualDocumentation
 
 \begin{verbatim}

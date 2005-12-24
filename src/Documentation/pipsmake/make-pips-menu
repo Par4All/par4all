@@ -1,6 +1,5 @@
-#! /bin/sh
+#! /usr/bin/perl -w
 
-perl -e '
 $program_name = $ARGV[0];
 print @ARGV;
 while (<>) {
@@ -31,4 +30,3 @@ while (<>) {
     }
     print "{\n\t$item, $function\n\t},\n";
 }
-'
