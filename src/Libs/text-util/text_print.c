@@ -10,15 +10,17 @@
 #include "text.h"
 
 #include "misc.h"
-#include "ri-util.h"
 #include "properties.h"
 
-/* #include "constants.h" */
+/* ??? stupid cyclic rext-util <-> ri-util dependency */
+extern void deal_with_attachments_at_this_character();
+extern void deal_with_attachments_in_this_string();
+extern void deal_with_attachments_in_this_string_length();
+extern char * strcat_word_and_migrate_attachments();
 
 /* FI: just to make sure that text.h is built; pips-makemake -l does not
-   tale into account a library whose modules do not use the library header */
+   take into account a library whose modules do not use the library header */
 #include "text-util.h"
-
 
 static int position_in_the_output = 0;
 
@@ -130,9 +132,8 @@ print_sentence(FILE * fd,
 	
 	pips_assert("not too many columns", col <= MAX_END_COLUMN);
 	
-	MAP(STRING, w, 
+	MAP(STRING, w,
 	{
-
 	  if (get_bool_property("PRETTYPRINT_C_CODE"))
 	    fprintf_sentence(fd, "%s", w);
 	  else {
