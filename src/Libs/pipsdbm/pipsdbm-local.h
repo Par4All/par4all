@@ -27,3 +27,5 @@
 #define build_pgmwd db_get_workspace_directory_name
 
 #define db_make_subdirectory(n) free(db_get_directory_name_for_module(n))
+
+#include "newgen.h" /* ??? statement_mapping */
