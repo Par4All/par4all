@@ -1,11 +1,8 @@
-#
 # $Id$
-#
-# Source, header and object files used to build the library.
-# Do not include the main program source file.
-#
 
-LIB_CFILES=	contrainte_to_text.c \
+TARGET	= ri-util
+
+LIB_CFILES =	contrainte_to_text.c \
 		eval.c \
 		size.c \
 		util.c \
@@ -35,9 +32,15 @@ LIB_CFILES=	contrainte_to_text.c \
 		misc_paf_utils.c \
 		convex_hull.c
 
-LIB_HEADERS=	ri-util-local.h operator.h
+INC_TARGET =	$(TARGET).h
 
-LIB_OBJECTS=	$(LIB_CFILES:.c=.o)
+LIB_TARGET =	lib$(TARGET).a
 
-# that is all
-#
+# common stuff
+ifdef PIPS_ROOT
+ROOT    = $(PIPS_ROOT)
+else
+ROOT    = ../../..
+endif
+
+include $(ROOT)/makes/main.mk
