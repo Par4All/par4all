@@ -57,7 +57,7 @@ statement (*codegen_fun)(statement, graph, set, int, bool);
       case is_instruction_block: {
 	  MAPL(pc, {
 	      statement st = STATEMENT(CAR(pc));
-	      STATEMENT(CAR(pc)) = rice_statement(st,l,codegen_fun);
+	      STATEMENT_(CAR(pc)) = rice_statement(st,l,codegen_fun);
 	  }, instruction_block(istat));
 	  break;
       }

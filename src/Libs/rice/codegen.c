@@ -374,7 +374,7 @@ bool task_parallelize_p;
     list loops=NIL;
    
     cons *block = NIL, *eblock = NIL;
-    statement stat = statement_undefined; 
+    statement stata = statement_undefined; 
     statement statb = statement_undefined;
     statement rst = statement_undefined;
     int nbl =0;
@@ -394,18 +394,18 @@ bool task_parallelize_p;
     debug(9, "CodeGenerate", "generating code ...\n");
     for (ps = lsccs; ps != NULL; ps = CDR(ps)) {
 	scc s = SCC(CAR(ps));
-	stat = statement_undefined;
+	stata = statement_undefined;
 	if ( strongly_connected_p(s, l))  
-	    stat = ConnectedStatements(g, s, l, task_parallelize_p);
+	    stata = ConnectedStatements(g, s, l, task_parallelize_p);
 	else {
 	    if (!get_bool_property("PARTIAL_DISTRIBUTION")) 
 		/* if s contains a single vertex and if this vertex is not 
 		   dependent upon itself, we generate a doall loop for it */
-		stat = IsolatedStatement(s, l, task_parallelize_p);
+		stata = IsolatedStatement(s, l, task_parallelize_p);
 	    else {
 		/* statements that are independent are gathered 
 		   into the same doall loop */
-		stat = IsolatedStatement(s, l, task_parallelize_p);
+		stata = IsolatedStatement(s, l, task_parallelize_p);
 		
 		/* set inner_region = scc_region(s);
 		if (contains_level_l_dependence(s,inner_region,l)) {
@@ -436,14 +436,14 @@ bool task_parallelize_p;
 	       been collected should be generated before the isolated statement 
 	    that has just been detected */
 	
-	if (stat != statement_undefined) {
+	if (stata != statement_undefined) {
 	    ifdebug(9) {
 		debug(9, "CodeGenerate", "generated statement:\n") ;
-		print_statement(stat);
+		print_statement(stata);
 		
 	    }
 	    statb= MakeNestOfStatementList(l,nbl,&lst, loops, &block,&eblock,task_parallelize_p);
-	    INSERT_AT_END(block, eblock, CONS(STATEMENT, stat, NIL));
+	    INSERT_AT_END(block, eblock, CONS(STATEMENT, stata, NIL));
 	}
     }
     
