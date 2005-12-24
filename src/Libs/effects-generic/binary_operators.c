@@ -250,7 +250,7 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
       free_effect(current);
 	
       /* replace the base effect by the new effect */
-      EFFECT(CAR(do_combine_item)) = combined;
+      EFFECT_(CAR(do_combine_item)) = combined;
 	
       /* remove the current list element from the global list */
       /* pred!=NIL as on the first items hash's are empty */
@@ -260,7 +260,7 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
     else
     {
       /* NO, just store if needed... */
-      EFFECT(CAR(cur)) = current;
+      EFFECT_(CAR(cur)) = current;
       if (may_combine)
       {
 	/* if we do not combine. ONLY IF we test, we put... */
