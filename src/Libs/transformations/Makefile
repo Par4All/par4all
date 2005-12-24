@@ -2,6 +2,8 @@
 
 TARGET	= transformations
 
+# old: loop_normalize.c
+
 LIB_CFILES =	replace.c \
 		loop_unroll.c \
 		prettyprintcray.c \
@@ -18,7 +20,6 @@ LIB_CFILES =	replace.c \
 		array_privatization.c \
 		standardize_structure.c \
 		use_def_elimination.c \
-		loop_normalize.c  \
 		declarations.c \
 		clone.c \
 	        transformation_test.c \
