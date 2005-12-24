@@ -46,13 +46,25 @@
 #######
 #
 
-SOURCES =	complexity_cost_tables
-INSTALL_SHR =	complexity_cost_tables
-LIB_CFILES=	comp_scan.c comp_expr_to_pnome.c comp_unstr.c\
-		comp_util.c comp_math.c comp_prettyprint.c polynome_ri.c\
-		comp_matrice.c
-LIB_HEADERS=	complexity-local.h
-LIB_OBJECTS=	$(LIB_CFILES:.c=.o)
+TARGET	= complexity
 
-### End of config.makefile
+INSTALL_ETC =	complexity_cost_tables
 
+LIB_CFILES = \
+	comp_scan.c comp_expr_to_pnome.c comp_unstr.c \
+	comp_util.c comp_math.c comp_prettyprint.c polynome_ri.c \
+	comp_matrice.c
+
+
+
+INC_TARGET =    $(TARGET).h
+
+LIB_TARGET      = lib$(TARGET).a
+
+# common stuff
+ifdef PIPS_ROOT
+ROOT    = $(PIPS_ROOT)
+else
+ROOT    = ../../..
+endif
+include $(ROOT)/makes/main.mk
