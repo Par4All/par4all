@@ -1,0 +1,49 @@
+* fix circular dependencies in library includes:
+- conversion control c_syntax transformations instrumentation
+- conversion control c_syntax transformations
+- ricedg icfg effects-convex control c_syntax transformations
+- effects-convex control c_syntax transformations instrumentation
+- semantics ri-util prettyprint effects-convex control c_syntax transformations
+- complexity semantics ri-util prettyprint
+- semantics ri-util prettyprint effects-convex
+- expressions effects-simple effects-generic semantics ri-util prettyprint effects-convex control c_syntax transformations
+- effects-simple effects-generic semantics ri-util prettyprint effects-convex control c_syntax transformations instrumentation
+- effects-simple effects-generic semantics ri-util prettyprint
+- effects-simple effects-generic semantics
+- effects-simple effects-generic semantics ri-util prettyprint effects-convex control c_syntax transformations
+-  chains effects-simple effects-generic semantics ri-util prettyprint effects-convex control c_syntax transformations
+- effects-generic semantics ri-util prettyprint effects-convex control c_syntax transformations instrumentation
+- effects-generic semantics ri-util prettyprint
+- effects-generic semantics
+- effects-generic semantics ri-util prettyprint effects-convex control c_syntax transformations
+- effects-generic semantics ri-util prettyprint effects-convex
+- semantics ri-util prettyprint effects-convex control c_syntax transformations instrumentation
+- semantics ri-util prettyprint
+- static_controlize ri-util prettyprint effects-convex control c_syntax transformations
+- paf-util static_controlize
+- paf-util static_controlize ri-util prettyprint effects-convex control c_syntax transformations
+- syntax ri-util prettyprint effects-convex control c_syntax transformations
+- syntax ri-util prettyprint effects-convex control c_syntax
+- top-level ri-util prettyprint effects-convex control c_syntax transformations
+- top-level ri-util prettyprint effects-convex
+- top-level ri-util prettyprint
+- top-level ri-util
+- ri-util prettyprint effects-convex control c_syntax transformations
+- transformer ri-util prettyprint effects-convex
+- transformer ri-util prettyprint effects-convex control c_syntax transformations instrumentation
+- transformer ri-util prettyprint effects-convex control c_syntax transformations
+- ri-util prettyprint effects-convex control c_syntax
+- ri-util prettyprint effects-convex control
+- ri-util prettyprint effects-convex
+- ri-util prettyprint effects-convex control c_syntax transformations instrumentation
+- pipsmake ri-util prettyprint effects-convex control c_syntax transformations
+- pipsmake ri-util prettyprint effects-convex control c_syntax
+- pipsmake ri-util prettyprint effects-convex
+- pipsmake ri-util prettyprint effects-convex control c_syntax transformations instrumentation
+- ri-util prettyprint
+- prettyprint effects-convex control c_syntax transformations
+- prettyprint effects-convex
+- effects-convex control c_syntax transformations
+- control c_syntax transformations instrumentation
+- control c_syntax transformations
+- transformations instrumentation
