@@ -392,7 +392,7 @@ transformer transformer_combine(transformer t1, transformer t2)
       /* No old values should be left in r1's basis. */
       MAP(ENTITY, v, {
 	entity oldv = entity_to_old_value(v);
-	if(base_contains_variable_p(sc_base(r1), oldv))
+	if(base_contains_variable_p(sc_base(r1), (Variable) oldv))
 	  sc_base_remove_variable(r1, (Variable) oldv);
       }, a1);
       free_arguments(a1);
@@ -1597,7 +1597,7 @@ transformer_value_substitute(transformer t, entity e1, entity e2)
 	 appear in a because it's not necessarily the new value of
 	 a modified variable */
       MAPL(ce, {entity e = ENTITY(CAR(ce));
-      if( e == e1) ENTITY(CAR(ce)) = e2;},
+      if( e == e1) ENTITY_(CAR(ce)) = e2;},
 	   a);
     }
     else {
