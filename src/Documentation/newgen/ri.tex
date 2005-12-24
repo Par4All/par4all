@@ -117,8 +117,9 @@ Library also appear in PIPS code: \verb/Pcontrainte/, which is a
 component of \verb/Psysteme/, \verb/Ppolyedre/ for polyhedra,
 \verb/Psg/ for generating systems, \verb/Pmatrix/ for matrices, and
 \verb/Ppolynome/, which is used for expressing program complexity (see
-\htmladdnormallink{Complexity
-  Analysis}{http://www.cri.ensmp.fr/pips/pipsmake-rc.html}).
+complexity in pipsmake-rc documentation)
+%%\htmladdnormallink{Complexity Analysis}
+%% {http://www.cri.ensmp.fr/pips/pipsmake-rc.html}).
 
 \subsection{Vector}
 \label{subsection-pvecteur}
@@ -1868,8 +1869,8 @@ are lists of effects, i.e. lists of lists of regions.
 
 Type \verb/effect/ is used to represent a read or write access to a
 variable, i.e. to abstract a reference in a statement. Statement effects
-are used to build \htmladdnormallink{use-def
-chains}{http://www.cri.ensmp.fr/pips/pipsmake-rc.html} , dependence
+are used to build use-def chains, dependence
+%% http://www.cri.ensmp.fr/pips/pipsmake-rc.html} 
 graphs, Summary Data Flow Information (SDFI), known as summary
 effects at the module level, and as cumulated effects at the statement
 level, and array regions. Proper effects, cumulated effects, summary
@@ -1880,8 +1881,8 @@ do not use the last field, \verb/descriptor/.
 \begin{comment}
 Le domaine \verb/effect/ est utilisé pour représenter les effets d'un
 statement sur les variables du module. Les effets des instructions sont
-le point de départ du calcul des \htmladdnormallink{use-def
-chains}{http://www.cri.ensmp.fr/pips/pipsmake-rc.html} , des
+le point de départ du calcul use-def chains, des
+%%{http://www.cri.ensmp.fr/pips/pipsmake-rc.html} 
 de'pendances, des Summary Data Flow Information (known as summary
 effects at the module level, and as cumulated effects at the statement
 level), et des re'gions.
@@ -2068,7 +2069,8 @@ NewGen library. They are stored on and read from disk by PIPS
 interprocedural database manager, {\em pipsdbm}.
 
 For details about effect analyses available see the Effects Section in the
-\htmladdnormallink{PIPS phase descriptions}{http://www.cri.ensmp.fr/pips/pipsmake-rc.html}).
+PIPS phase descriptions).
+%%{http://www.cri.ensmp.fr/pips/pipsmake-rc.html}
 
 \section{Semantics Analysis}
 \label{semantics}

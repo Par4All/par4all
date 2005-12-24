@@ -81,7 +81,7 @@ lisp_internal_representation: $(F.newgen)
 clean: local-clean
 
 local-clean:
-	$(RM) $(INSTALL_INC) $(F.newgen) *.dvi *.ps
+	$(RM) $(INSTALL_INC) $(F.newgen) *.dvi *.ind *.log *.ps
 	$(RM) -r $(INSTALL_HTM) ri.html dg.html
 
 # common stuff

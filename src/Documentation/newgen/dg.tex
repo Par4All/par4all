@@ -47,8 +47,8 @@ components (SCC) of the dependence graph. The SCC routines are not as
 generic as could be hoped. They take into account the graph hierarchy
 implied by the dependence levels of the Allen \& Kennedy parallelization
 algorithm~\cite{AK87}. This explains why the SCC related data structures are declared
-here and not with data structure
-\htmladdnormallink{{\tt graph}}{http://www.cri.ensmp.fr/pips/graph}.
+here and not with graph data structure.
+%%\htmladdnormallink{{\tt graph}}{http://www.cri.ensmp.fr/pips/graph}.
 
 \begin{comment}
 Les structures de donne'es suivantes sont utilise'es par la phase de
@@ -56,15 +56,16 @@ construction du graphe des de'pendances. Elles sont construites en
 utilisant les structures de donne'es \verb+statement+ et \verb+effect+
 qui ont e'te' de'finies dans la repre'sentation interne, ainsi que la
 structure de donne'es ge'ne'riques \verb+vertex+ qui fait partie du
-package \htmladdnormallink{{\em graph}}{http://www.cri.ensmp.fr/pips/graph}.
+package graph 
+%%\htmladdnormallink{{\em graph}}{http://www.cri.ensmp.fr/pips/graph}.
 \end{comment}
 
 Several functions compute or print a dependence graph. See the
-\htmladdnormallink{PipsMake
-  manual}{http://www.cri.ensmp.fr/pips/pipsmake-rc} for the list of
+PipsMake manual for the list of
+%%{http://www.cri.ensmp.fr/pips/pipsmake-rc}
 user-callable functions. Advanced users have access to more functions
-through the PIPS
-\htmladdnormallink{properties}{http://www.cri.ensmp.fr/pips/properties-rc}.
+through the PIPS properties.
+%% {http://www.cri.ensmp.fr/pips/properties-rc}.
 
 It is not possible to save efficiently
 the internal representation of a dependence graph onto disk. The
@@ -72,8 +73,9 @@ dependence graph structure contains pointers to memory effects and
 indirectly to memory references included in code statements. These
 references which are part of the code data structure do not have {\em
   names} and would have to be duplicated in the dependence graph
-file. Because of the evaluation mechanism used by \htmladdnormallink{PipsMake
-  manual}{http://www.cri.ensmp.fr/pips/pipsmake-rc}, it is not possible to
+file. Because of the evaluation mechanism used by PipsMake manual,
+%%{http://www.cri.ensmp.fr/pips/pipsmake-rc}
+it is not possible to
 reuse a parallelized code from one PIPS session to the next one. The
 parallelized code depends on the dependence graph, and the dependence
 graph cannot be retrived. Hence the parallelized code, however correct, is
@@ -93,8 +95,9 @@ parallelization algorithm.
 \label{section-imported-newgen-types}
 
 The dependence graph points to statement and to memory effects (see
-\htmladdnormallink{use-def chains}{http://www.cri.ensmp.fr/pips/ri} for
-both data structures).
+use-def chains for both data structures).
+%%\htmladdnormallink{use-def chains}{http://www.cri.ensmp.fr/pips/ri}
+
 
 \begin{comment}
 \domain{Import statement from "ri.newgen"}

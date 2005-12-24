@@ -1,26 +1,25 @@
-%% $RCSfile: newgen_domain.sty,v $ (version $Revision$)
-%% $Date: 1996/11/13 11:46:39 $, 
+%% $Id$
 
 %% Known feature :\domain{...} must be followed by a newline character
 %% and no other "}" can be followed by a newline in the macro
 %% argument.
 
-\RequirePackage{html}
+%%\RequirePackage{html}
 %%\newcommand{\domain}[1]{\par{#1}}
-\begin{htmlonly}
-  %% Fait croire que cela fonctionne à LaTeX2HTML
-  \newcommand{\domain}[1]{\begin{alltt}
-      #1
-    \end{alltt}}
-\end{htmlonly}
+%%\begin{htmlonly}
+%%  %% Fait croire que cela fonctionne à LaTeX2HTML
+%%  \newcommand{\domain}[1]{\begin{alltt}
+%%      #1
+%%    \end{alltt}}
+%%\end{htmlonly}
 %% Les gros hacks pour la version LaTeX :
-\begin{latexonly}
+%%\begin{latexonly}
   \gdef\domain{\medskip\par%
     \begingroup%
     \catcode `{=12\catcode `}=12\catcode `\_=12%
     \catcode `\^^M=10\catcode `==\active%
       \hack@domain}
-\end{latexonly}
+%%\end{latexonly}
 \begingroup
 %% Définit les nouveaux { et } :
 \catcode `\^^01=1
