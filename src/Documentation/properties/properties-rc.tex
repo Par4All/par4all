@@ -9,247 +9,10 @@
 %% Derivation rules and aliases must be included in verbatim environments. 
 %% Nothing else should appear in a verbatim environment.
 %% 
-%% Modifications
-%%
-%% $Log: properties-rc.tex,v $
-%% Revision 1.181  2005/12/09 15:39:06  irigoin
-%% Two controlizer properties added: FOR_TO_WHILE_LOOP_IN_CONTROLIZER and
-%% FOR_TO_DO_LOOP_IN_CONTROLIZER.
-%%
-%% Revision 1.180  2005/12/09 11:57:26  coelho
-%% psfig -> epsfig
-%%
-%% Revision 1.179  2005/11/07 10:19:21  irigoin
-%% Property ATOMIZE_ARRAY_ACCESSES_WITH_OFFSETS added
-%%
-%% Revision 1.178  2005/11/04 17:23:53  irigoin
-%% Property FULL_UNROLL_INTERACTIVELY added.
-%%
-%% Revision 1.177  2005/08/08 13:19:04  irigoin
-%% Roles of SEMANTICS_MAX_CFG_SIZE1 and SEMANTICS_MAX_CFG_SIZE2 exchanged.
-%%
-%% Revision 1.176  2005/08/08 13:14:09  irigoin
-%% Properties SEMANTICS_MAX_CFG_SIZE1 and SEMANTICS_MAX_CFG_SIZE2 added to
-%% avoid recompilations and increase PIPS flexibility.
-%%
-%% Revision 1.175  2004/06/21 15:35:40  irigoin
-%% Property PARSER_ACCEPT_ARRAY_RANGE_EXTENSION added, FALSE by default
-%%
-%% Revision 1.174  2004/01/12 16:48:30  guerin
-%% Adding new property for FSM generation in PHRASE project
-%%
-%% Revision 1.173  2003/07/30 15:21:59  ferrand
-%% Add SAC_SIMD_REGISTER_WIDTH property to set the SIMD registers width.
-%%
-%% Revision 1.172  2003/07/30 14:57:04  ferrand
-%% Add properties for SAC (auto-unroll).
-%%
-%% Revision 1.171  2003/07/30 14:34:37  nguyen
-%% Add new property to prettyprint C code
-%%
-%% Revision 1.170  2003/06/16 14:05:52  coelho
-%% hop.
-%%
-%% Revision 1.169  2002/07/04 15:44:59  nguyen
-%% Add new property for array bound checking. Arrays in a common block are
-%% checked wrt the common size
-%%
-%% Revision 1.168  2002/07/03 09:14:48  irigoin
-%% Property SEMANTICS_ANALYZE_UNSTRUCTURED added with default value TRUE.
-%% Some provisional comments added for a ICFG property, RW_FILTERED_EFFECTS,
-%% introduced by Dat.
-%%
-%% Revision 1.167  2002/07/01 09:29:54  phamdat
-%% RW_FILTERED_EFFECTS added
-%%
-%% Revision 1.166  2002/06/14 09:09:30  irigoin
-%% property PRETTYPRINT_REGENERATED_LABEL added
-%%
-%% Revision 1.165  2002/06/12 09:50:51  irigoin
-%% Latex bug with underscores fixed
-%%
-%% Revision 1.164  2002/06/12 09:47:38  irigoin
-%% Comments added about PIPS run-time functions required to support the "HRC" value of property PARSER_SUBSTITUTE_ALTERNATE_RETURNS "NO"
-%%
-%% Revision 1.163  2002/06/11 11:52:23  irigoin
-%% property PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS added
-%%
-%% Revision 1.162  2002/06/10 11:34:39  irigoin
-%% Update of comments about handling of alternate returns, property PARSER_FORMAL_LABEL_SUBSTITUTE_PREFIX added
-%%
-%% Revision 1.161  2002/06/05 09:41:09  nguyen
-%% Remove the property ARRAY_BOUND_CHECKING_FOR_DEBUGGING
-%% Replace by PROGRAM_VERIFICATION_WITH_PRINT_MESSAGE that is used by all
-%% program verifications
-%%
-%% Revision 1.160  2002/05/30 12:10:57  phamdat
-%% ICFG_DV added
-%%
-%% Revision 1.159  2002/05/06 12:16:30  coelho
-%% filter effects added.
-%%
-%% Revision 1.158  2002/03/20 08:32:47  nguyen
-%% Add a debugging property for array bound checking
-%%
-%% Revision 1.157  2001/12/07 13:21:39  nguyen
-%% Add new options for ARRAY_RESIZING_TOP_DOWN and BOTTOM_UP
-%%
-%% Revision 1.156  2001/11/30 15:00:56  nguyen
-%% Add new property for alias checking
-%%
-%% Revision 1.155  2001/11/27 12:36:36  nguyen
-%% Add new property ARRAY_RESIZING_USING_MAIN_PROGRAM
-%%
-%% Revision 1.154  2001/10/29 10:08:24  nguyen
-%% Table of contents + Add comments for array bound checking
-%%
-%% Revision 1.153  2001/09/24 15:13:03  irigoin
-%% Property SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT added
-%%
-%% Revision 1.152  2001/06/15 16:17:50  irigoin
-%% Property SEMANTICS_ANALYZE_SCALAR_COMPLEX_VARIABLES added
-%%
-%% Revision 1.151  2001/06/15 14:58:26  irigoin
-%% Four properties added for semantics: SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES, SEMANTICS_ANALYZE_SCALAR_BOOLEAN_VARIABLES, SEMANTICS_ANALYZE_SCALAR_STRING_VARIABLES, SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES.
-%%
-%% Revision 1.150  2001/04/06 08:51:59  irigoin
-%% New property PARSER_ACCEPT_ANSI_EXTENSIONS added. The previous change by
-%% Nga fixed typos and spelling mistakes.
-%%
-%% Revision 1.149  2001/04/06 08:38:34  irigoin
-%% Nga Nguyen ne sais pas ce qu'elle a change...
-%%
-%% Revision 1.148  2000/11/29 14:59:57  irigoin
-%% Three properties added: PRETTYPRINT_INDENTATION, SEMANTICS_RECOMPUTE_EXPRESSION_TRANSFORMERS and SEMANTICS_RECOMPUTE_FIX_POINTS_WITH_PRECONDITIONS
-%%
-%% Revision 1.147  2000/10/11 15:23:22  irigoin
-%% property PARSER_LINEARIZE_LOOP_BOUNDS added
-%%
-%% Revision 1.146  2000/10/11 14:44:56  irigoin
-%% Properties SEMANTICS_TRUST_ARRAY_DECLARATIONS and
-%% SEMANTICS_TRUST_ARRAY_REFERENCES added.
-%%
-%% Revision 1.145  2000/09/22 11:16:45  nguyen
-%% *** empty log message ***
-%%
-%% Revision 1.144  2000/08/25 14:03:35  quoc
-%% New property DECLARATION_COMMON_DISPLAY_STATISTICS added
-%%
-%% Revision 1.143  2000/08/22 10:09:42  nguyen
-%% Modify properties for array bound check instrumentation
-%%
-%% Revision 1.142  2000/07/19 14:30:31  nguyen
-%% Add new properties for the instrumentation of array bounds checking
-%%
-%% Revision 1.141  2000/05/17 07:57:55  coelho
-%% complex constant constructors option.
-%%
-%% Revision 1.140  2000/05/16 16:35:58  coelho
-%% props added for type checker...
-%%
-%% Revision 1.139  2000/04/28 09:57:11  quoc
-%% Added new property: DECLARATION_TABLE_DISPLAY_STATISTICS
-%%
-%% Revision 1.138  2000/04/19 11:28:19  quoc
-%% Modify the index of the property TRIVIAL_TEST_DISPLAY_STATISTICS
-%%
-%% Revision 1.137  2000/04/19 11:00:04  quoc
-%% New property TRIVIAL_TEST_DISPLAY_STATISTICS added
-%%
-%% Revision 1.136  2000/04/05 08:16:47  coelho
-%% PARTIAL_EVAL stuff added.
-%%
-%% Revision 1.135  1999/08/05 13:04:19  zory
-%% multiply-add extraction removed from EOLE_FLAGS.
-%%
-%% Revision 1.134  1998/12/23 13:33:00  coelho
-%% *** empty log message ***
-%%
-%% Revision 1.133  1998/11/24 14:00:57  coelho
-%% EOLE_OPTIMIZATION_STRATEGY added.
-%%
-%% Revision 1.132  1998/11/04 09:39:26  coelho
-%% props added for eole.
-%%
-%% Revision 1.131  1998/10/07 07:02:45  irigoin
-%% Property PRETTYPRINT_DATA_STATEMENTS added
-%%
-%% Revision 1.130  1998/07/28 16:45:52  irigoin
-%% Latex bug fixed
-%%
-%% Revision 1.129  1998/07/28 16:44:41  irigoin
-%% More indexing on property names
-%%
-%% Revision 1.128  1998/07/27 15:22:44  irigoin
-%% Latex bugs fixed.
-%%
-%% Revision 1.127  1998/07/27 15:18:43  irigoin
-%% A lot of index entries added
-%%
-%% Revision 1.126  1998/07/24 16:15:35  irigoin
-%% More comments about property PARSER_EXPAND_STATEMENT_FUNCTIONS
-%%
-%% Revision 1.125  1998/07/24 16:13:54  irigoin
-%% Default value for PARSER_EXPAND_STATEMENT_FUNCTIONS set to TRUE. Comments
-%% are modified.
-%%
-%% Revision 1.124  1998/07/24 16:01:02  irigoin
-%% property PARSER_SUBSTITUTE_ENTRIES added
-%%
-%% Revision 1.123  1998/06/24 09:20:38  irigoin
-%% String property SEMANTICS_FIX_POINT_OPERATOR added to replace boolean
-%% property SEMANTICS_PATTERN_MATCHING_FIX_POINT
-%%
-%% Revision 1.122  1998/06/05 07:06:31  irigoin
-%% comments added because I could not find the way to prettyprint all
-%% CONTINUE statements: the property of interest is a more extensive property
-%% called PRETTYPRINT_ALL_LABELS.
-%%
-%% Revision 1.121  1998/05/08 14:49:12  irigoin
-%% Property SEMANTICS_FILTERED_PRECONDITIONS added
-%%
-%% Revision 1.120  1998/03/17 16:13:16  coelho
-%% HPFC_OPTIMIZE_REMAPPINGS added.
-%%
-%% Revision 1.119  1998/03/10 14:36:27  irigoin
-%% Property PRETTYPRINT_ALL_PARENTHESES added
-%%
-%% Revision 1.118  1998/03/10 14:18:55  irigoin
-%% New property added, CHAINS_DISAMBIGUATE_CONSTANT_SUBSCRIPTS.
-%%
-%% Revision 1.117  1998/03/05 14:32:24  irigoin
-%% New property added: PARSER_SUBSTITUTE_ASSIGNED_GOTO FALSE
-%%
-%% Revision 1.116  1998/02/03 09:50:29  ancourt
-%% PRETTYPRINT_WITH_COMMON_NAMES property
-%%
-%% Revision 1.115  1997/12/12 12:15:35  coelho
-%% TPIPS_IS_A_SHELL added.
-%%
-%% Revision 1.114  1997/12/05 19:50:59  coelho
-%% comments added about PIPSMAKE_CHECKPOINTS.
-%%
-%% Revision 1.113  1997/12/05 17:34:26  coelho
-%% PIPSMAKE_CHECKPOINTS...
-%%
-%% Revision 1.112  1997/12/05 11:34:18  coelho
-%% PIPSMAKE_SAVE_RESOURCES added.
-%% GENERATE_MISSING_SOURCE_FILE dropped.
-%%
-%% Revision 1.111  1997/12/05 07:58:57  coelho
-%% PREPROCESSOR_MISSING_FILE_HANDLING added.
-%%
-%% Revision 1.110  1997/11/21 12:28:59  coelho
-%% prettyprint of parallel loops is now managed thru only one property
-%% which describe the style to be used. typically do, doall, f90, hpf and
-%% so. I do this before adding the new omp (Open MP) style. The previous
-%% state was driven by a set of boolean properties.
-%%
-%%
 
 \documentclass[a4paper]{article}
 %\usepackage{alltt,html,fancybox,amstext,xspace,epsfig}
-\usepackage{epsfig,amstext,alltt,html}
+\usepackage{epsfig,amstext,alltt}
 \title{Properties \\
     Low Level Tuning of PIPS}
 \author{Lei Zhou \hspace{2cm} 
@@ -269,24 +32,26 @@ $~$Date: 2005/12/09 15:39:06 $~$
 % \addtolength{\textheight}{172pt}
 % \addtolength{\topmargin}{-60pt}
 
-\newcommand{\PIPS}{\htmladdnormallink{{\em PIPS}}{http://www.cri.ensmp.fr/pips}}
-\newcommand{\PIPSMAKE}{\htmladdnormallink{\emph{pipsmake/}}{http://www.cri.ensmp.fr/pips/pipsmake.html}}
+\newcommand{\LINK}[2]{#1 (#2)}
+
+\newcommand{\PIPS}{\LINK{{\em PIPS}}{http://www.cri.ensmp.fr/pips}}
+\newcommand{\PIPSMAKE}{\LINK{\emph{pipsmake/}}{http://www.cri.ensmp.fr/pips/pipsmake.html}}
 \newcommand{\PLinear}{\emph{Linear C$^3$}}
-\newcommand{\PNEWGEN}{\htmladdnormallink{\emph{NewGen}}{http://www.cri.ensmp.fr/pips/newgen-manual/newgen-manual.html}}
-\newcommand{\PdaVinci}{\htmladdnormallink{\emph{daVinci}}{http://www.informatik.uni-bremen.de/~davinci}}
-\newcommand{\Pri}{\htmladdnormallink{\emph{Internal\space{}Representation}}{http://www.cri.ensmp.fr/pips/ri/ri.html}}
-\newcommand{\WPsc}{\htmladdnormallink{\emph{WP65}}{http://www.cri.ensmp.fr/pips/wp65.html}}
+\newcommand{\PNEWGEN}{\LINK{\emph{NewGen}}{http://www.cri.ensmp.fr/pips/newgen-manual/newgen-manual.html}}
+\newcommand{\PdaVinci}{\LINK{\emph{daVinci}}{http://www.informatik.uni-bremen.de/~davinci}}
+\newcommand{\Pri}{\LINK{\emph{Internal\space{}Representation}}{http://www.cri.ensmp.fr/pips/ri/ri.html}}
+\newcommand{\WPsc}{\LINK{\emph{WP65}}{http://www.cri.ensmp.fr/pips/wp65.html}}
 
 %% Now the interface names :
-\newcommand{\pips}{\htmladdnormallink{\texttt{pips}}{http://www.cri.ensmp.fr/pips/batch-interface.html}}
-\newcommand{\EPIPS}{\htmladdnormallink{\texttt{epips}}{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual/wpips-epips-user-manual.html}}
-\newcommand{\TPIPS}{\htmladdnormallink{\texttt{tpips}}{http://www.cri.ensmp.fr/pips/line-interface.html}}
-\newcommand{\WPIPS}{\htmladdnormallink{\texttt{wpips}}{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual/wpips-epips-user-manual.html}}
-\newcommand{\Init}{\htmladdnormallink{\texttt{Init}}{http://www.cri.ensmp.fr/pips/Init.html}}
-\newcommand{\Select}{\htmladdnormallink{\texttt{Select}}{http://www.cri.ensmp.fr/pips/Select.html}}
-\newcommand{\Perform}{\htmladdnormallink{\texttt{Perform}}{http://www.cri.ensmp.fr/pips/Perform.html}}
-\newcommand{\Display}{\htmladdnormallink{\texttt{Display}}{http://www.cri.ensmp.fr/pips/Display.html}}
-\newcommand{\Delete}{\htmladdnormallink{\texttt{Delete}}{http://www.cri.ensmp.fr/pips/Delete.html}}
+\newcommand{\pips}{\LINK{\texttt{pips}}{http://www.cri.ensmp.fr/pips/batch-interface.html}}
+\newcommand{\EPIPS}{\LINK{\texttt{epips}}{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual/wpips-epips-user-manual.html}}
+\newcommand{\TPIPS}{\LINK{\texttt{tpips}}{http://www.cri.ensmp.fr/pips/line-interface.html}}
+\newcommand{\WPIPS}{\LINK{\texttt{wpips}}{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual/wpips-epips-user-manual.html}}
+\newcommand{\Init}{\LINK{\texttt{Init}}{http://www.cri.ensmp.fr/pips/Init.html}}
+\newcommand{\Select}{\LINK{\texttt{Select}}{http://www.cri.ensmp.fr/pips/Select.html}}
+\newcommand{\Perform}{\LINK{\texttt{Perform}}{http://www.cri.ensmp.fr/pips/Perform.html}}
+\newcommand{\Display}{\LINK{\texttt{Display}}{http://www.cri.ensmp.fr/pips/Display.html}}
+\newcommand{\Delete}{\LINK{\texttt{Delete}}{http://www.cri.ensmp.fr/pips/Delete.html}}
 
 \makeindex
 
@@ -304,10 +69,10 @@ $~$Date: 2005/12/09 15:39:06 $~$
 %%
 
 
-\begin{latexonly}
+%%\begin{latexonly}
   \clearpage
   \tableofcontents  
-\end{latexonly}
+%%\end{latexonly}
 
 \newpage
 
@@ -2788,12 +2553,12 @@ property yourself!
 \bibitem{JT89} P. Jouvelot, R. Triolet, 
 {\em NewGen: A Language-Independent Program Generator},
 July 12, 1989, 
-\htmladdnormallink{Tech. Report A/191}{newgen-paper/newgen-paper.html}
+\LINK{Tech. Report A/191}{newgen-paper/newgen-paper.html}
 
 \bibitem{JT90} P. Jouvelot, R. Triolet, 
 {\em NewGen User Manual}. December
 1990, 
-\htmladdnormallink{Tech. Report A/???.}{newgen-manual/newgen-manual.html}
+\LINK{Tech. Report A/???.}{newgen-manual/newgen-manual.html}
 
 \bibitem{Z94} Lei Zhou,
 {\em Analyse statique et dynamique de la complÅÈxitÅÈ  des programmes

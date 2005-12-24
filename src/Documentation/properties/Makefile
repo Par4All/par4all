@@ -16,8 +16,8 @@ properties.rc: properties-rc.tex
 
 clean: local-clean
 local-clean:
-	$(RM) -r $(INSTALL_HTM) $(INSTALL_DOC) $(ETC_TARGET) \
-		properties-rc.html *.dvi
+	$(RM) -r $(INSTALL_HTM) $(INSTALL_DOC) $(ETC_TARGET)
+	$(RM) properties-rc.html *.dvi *.ind *.log *.aux *.idx *.ilg *.toc *~
 
 # common stuff
 ifdef PIPS_ROOT
