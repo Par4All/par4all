@@ -1,7 +1,0 @@
-#!/bin/sh
-# 
-# $RCSfile: checked-out,v $ (version $Revision$)
-# $Date: 1997/01/03 11:24:24 $, 
-
-find $PIPS_DEVEDIR $LINEAR_DEVEDIR $NEWGEN_DEVEDIR -name 'p.*' -ls |
-grep "${1:-SCCS/p.}"

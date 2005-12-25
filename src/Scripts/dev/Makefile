@@ -9,12 +9,10 @@ UTILS=		install_pips_sources \
 SCRIPTS = 	$(UTILS) \
 		analyze_libraries \
 		grep_libraries \
-		checked-out \
 		order_libraries \
 		pips-experiment \
 		pips_at_night \
 		pips_at_night_at_cri \
-		remove_from_sccs_file \
 		build_so_files
 
 SRC_MACROS =	define_libraries.sh
