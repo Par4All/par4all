@@ -1,3 +1,5 @@
+# $Id$
+#
 # Copyright (C) Ecole des Mines de Paris
 #               Centre d'Automatique et Informatique
 #               Section Informatique
@@ -9,19 +11,32 @@
 # the consequences of using it or for whether it serves any particular
 # purpose or works at all, unless he says so in writing.
 #
-# The following macros define the value of commands that are used to
-#
-# CPPFLAGS	+= -DLARGE_FONTS -DPIPS_ARCH=\"$(ARCH)\" 
-#
 # Source, header and object files used to build the target
 #
 
-CPPFLAGS	+= -DUTC_DATE='"$(UTC_DATE)"'
+TARGET	= pips
+
+CPPOPT	= -DUTC_DATE='"$(UTC_DATE)"'
 
 LIB_CFILES	= pips.c
-LIB_HEADERS	= pips-local.h 
-LIB_OBJECTS	= $(LIB_CFILES:.c=.o)
-LIB_MAIN	= main_pips.c
-#
-TARGET_LIBS	= $(PIPS_LIBS)
-#
+
+OTHER_CFILES	= main_pips.c
+
+INC_TARGET =    $(TARGET).h
+
+LIB_TARGET =    lib$(TARGET).a
+
+BIN_TARGET =	$(TARGET)
+
+# common stuff
+ifdef PIPS_ROOT
+ROOT    = $(PIPS_ROOT)
+else
+ROOT    = ../../..
+endif
+
+PROJECT	= pips
+include $(ROOT)/makes/main.mk
+
+# local stuff
+$(ARCH)/pips: $(ARCH)/$(PIPS_MAIN)

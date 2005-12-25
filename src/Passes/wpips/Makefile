@@ -12,22 +12,17 @@
 # the consequences of using it or for whether it serves any particular
 # purpose or works at all, unless he says so in writing.
 #
-CPPFLAGS +=	-DLARGE_FONTS \
-		$(WPIPS_ADDED_CPPFLAGS) \
-		$(PIPS_X11_ADDED_CPPFLAGS) \
-		-DUTC_DATE='"$(UTC_DATE)"' \
+
+TARGET	= wpips
+
+CPPOPT =	-DLARGE_FONTS $(WPIPS_CPPFLAGS) \
 		-DOWTOOLKIT_WARNING_DISABLED
 
 # Current version of XView is not quite ANSI... :-)
 # CANSI = -pedantic
 CANSI	=
 
-LDFLAGS  +=	$(WPIPS_ADDED_LDFLAGS) \
-		$(PIPS_X11_ADDED_LDFLAGS)
-#
-# Source, header and object files used to build the target
-# xv_icons.c
-LIB_CFILES=	emacs.c \
+INC_CFILES=	emacs.c \
 		directory_menu.c \
 		wpips.c \
 		xv_compile.c \
@@ -47,19 +42,27 @@ LIB_CFILES=	emacs.c \
 		xv_utils.c \
 		vararg.c 
 
-LIB_MAIN =	main_wpips.c
+OTHER_CFILES =	main_wpips.c
 
-#
-# Rajoute le directory icons :
-#
 LIB_HEADERS=	xv_sizes.h wpips-local.h wpips-labels.h pips.icon icons
-#
-#
-LIB_OBJECTS=	$(LIB_CFILES:.c=.o)
-#
-# List of libraries used to build the target
-#
-TARGET_LIBS= $(PIPS_LIBS) $(WPIPS_ADDED_LIBS) $(PIPS_X11_ADDED_LIBS)
-#
-# that is all
-#
+
+LIB_CFILES	= $(OTHER_CFILES) $(INC_CFILES)
+
+INC_TARGET	= $(TARGET).h
+
+LIB_TARGET	= lib$(TARGET).a
+
+BIN_TARGET	= $(TARGET)
+
+# common stuff
+ifdef PIPS_ROOT
+ROOT    = $(PIPS_ROOT)
+else
+ROOT    = ../../..
+endif
+
+PROJECT = pips
+include $(ROOT)/makes/main.mk
+
+# local stuff
+$(ARCH)/wpips: $(ARCH)/$(WPIPS_MAIN)
