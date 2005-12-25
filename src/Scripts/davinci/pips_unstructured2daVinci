@@ -1,10 +1,10 @@
-#!/usr/local/bin/perl
-
+#!/usr/bin/perl -w
+#
 # This takes a PIPS output file in the GRAPH format as a file name
 # and generates a new one in the daVinci format on stdout.
-
-# 	%A% ($Date: 1995/11/13 16:45:20 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
-
+#
+# $Id$
+#
 # Ronan.Keryell@cri.ensmp.fr, 5/09/1995.
 
 $statement_number = 0;

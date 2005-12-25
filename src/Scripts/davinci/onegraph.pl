@@ -1,4 +1,4 @@
-#! /usr/local/bin/perl -wp
+#! /usr/bin/perl -wp
 #
 # $Id$
 #

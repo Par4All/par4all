@@ -1,5 +1,5 @@
-#! /user/bin/local/perl
-
+#! /user/bin/perl -w
+#
 # nodeedge source destination
 #
 # routine pour construire un arc a partir du noeud source vers destination
