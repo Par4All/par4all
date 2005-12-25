@@ -648,7 +648,8 @@ partial_redundancy_elimination_rwt(statement s,
 			    {
 			      MAPL(lc, 
 			      {
-				if (CONTROL(CAR(lc))==c) CONTROL(CAR(lc)) = false_control;
+				if (CONTROL(CAR(lc))==c) 
+				  CONTROL_(CAR(lc)) = false_control;
 			      }, control_successors(co));
 			    },control_predecessors(c));
 			  }
@@ -681,7 +682,8 @@ partial_redundancy_elimination_rwt(statement s,
 			      {
 				MAPL(lc, 
 				{
-				  if (CONTROL(CAR(lc))==c) CONTROL(CAR(lc)) = true_control;
+				  if (CONTROL(CAR(lc))==c) 
+				    CONTROL_(CAR(lc)) = true_control;
 				}, control_successors(co));
 			      },control_predecessors(c));   
 			    }
