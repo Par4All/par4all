@@ -12,24 +12,23 @@
  
 /* Auxiliary data files
  */
+#define PIPS_ETC(file) \
+    (strdup(concatenate(getenv("PIPS_ROOT"), "/etc/", (file), NULL)))
 
 #define PIPSMAKE_RC "pipsmake.rc"
-#define DEFAULT_PIPSMAKE_RC \
-  (strdup(concatenate(getenv("PIPS_ROOT"), "/Share/", PIPSMAKE_RC, NULL)))
-#define WPIPS_RC \
-  (strdup(concatenate(getenv("PIPS_ROOT"), "/Share/", "wpips.rc", NULL)))
-#define BOOTSTRAP_FILE \
-  (strdup(concatenate(getenv("PIPS_ROOT"), "/Share/", "BOOT-STRAP.entities", NULL)))
-#define XV_HELP_FILE \
-  (strdup(concatenate(getenv("PIPS_ROOT"), "/Share/", "pips_help.txt", NULL)))
+#define DEFAULT_PIPSMAKE_RC PIPS_ETC(PIPSMAKE_RC)
+
+#define WPIPS_RC PIPS_ETC("wpips.rc")
+
+/* #define BOOTSTRAP_FILE PIPS_ETC("BOOT-STRAP.entities") */
+
+#define XV_HELP_FILE PIPS_ETC("pips_help.txt")
  
 #define PROPERTIES_FILE "properties.rc"
-#define PROPERTIES_LIB_FILE \
-  (strdup(concatenate(getenv("PIPS_ROOT"), "/Share/", PROPERTIES_FILE, NULL)))
+#define PROPERTIES_LIB_FILE PIPS_ETC(PROPERTIES_FILE)
  
 #define MODEL_RC "model.rc"
-#define DEFAULT_MODEL_RC \
-  (strdup(concatenate(getenv("PIPS_ROOT"), "/Share/", MODEL_RC, NULL)))
+#define DEFAULT_MODEL_RC PIPS_ETC(MODEL_RC)
  
 /* filename extensions
  */
