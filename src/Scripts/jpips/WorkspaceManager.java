@@ -3,13 +3,13 @@
 */
 
 
-package JPips;
+package fr.ensmp.cri.jpips;
 
 
 import java.lang.*;
 import java.util.*;
 import java.io.*;
-import JPips.Pawt.*;
+import fr.ensmp.cri.jpips.Pawt.*;
 
 import java.awt.*;
 import java.awt.event.*;

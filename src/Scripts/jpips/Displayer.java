@@ -2,13 +2,13 @@
   $Id$
 */
 
-package JPips;
+package fr.ensmp.cri.jpips;
 
 import java.io.*;
 import java.awt.*;
 import java.util.*;
 
-import JPips.Pawt.*;
+import fr.ensmp.cri.jpips.Pawt.*;
 
 import javax.swing.*;
 import javax.swing.border.*;

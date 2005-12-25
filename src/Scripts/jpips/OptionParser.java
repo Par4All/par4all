@@ -2,7 +2,7 @@
   $Id$
 */
 
-package JPips;
+package fr.ensmp.cri.jpips;
 
 import java.lang.*;
 import java.util.*;
@@ -13,7 +13,7 @@ import java.awt.*;
 
 import javax.swing.*;
 
-import JPips.Pawt.*;
+import fr.ensmp.cri.jpips.Pawt.*;
 
 /** A parser manager that uses a Parser object.
   * It creates a menu and a panel from a part of a text file.

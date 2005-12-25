@@ -2,7 +2,7 @@
  * $Id$
  */
 
-package JPips;
+package fr.ensmp.cri.jpips;
 
 /** An interface that defines interactions between jpips and a process.
   * 

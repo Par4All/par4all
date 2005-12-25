@@ -2,7 +2,7 @@
  * $Id$
  */
 
-package JPips;
+package fr.ensmp.cri.jpips;
 
 import java.lang.*;
 import java.util.*;
@@ -18,7 +18,7 @@ import javax.swing.event.*;
 import javax.swing.text.*;
 import javax.swing.border.*;
 
-import JPips.Pawt.*;
+import fr.ensmp.cri.jpips.Pawt.*;
 
 /** The application of jpips.
   * It builds the main frame and its menu.

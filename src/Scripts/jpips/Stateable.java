@@ -4,7 +4,7 @@
   * A component which has a state field
   */
 
-package JPips;
+package fr.ensmp.cri.jpips;
 
 import java.util.Vector;
 

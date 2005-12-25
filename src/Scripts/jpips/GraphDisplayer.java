@@ -1,11 +1,11 @@
-package JPips;
+package fr.ensmp.cri.jpips;
 
 import java.applet.*;
 import java.net.*;
 import java.util.*;
 import java.io.*;
 
-import JPips.Pawt.*;
+import fr.ensmp.cri.jpips.Pawt.*;
 
 import java.awt.event.*;
 import java.awt.*;

@@ -2,7 +2,7 @@
   $Id$
 */
 
-package JPips;
+package fr.ensmp.cri.jpips;
 
 import java.util.*;
 import java.io.*;

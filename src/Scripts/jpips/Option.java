@@ -2,14 +2,14 @@
  * $Id$  
  */
 
-package JPips;
+package fr.ensmp.cri.jpips;
 
 import java.awt.*;
 import java.util.*;
 
 import com.sun.java.swing.*;
 
-import JPips.Pawt.*;
+import fr.ensmp.cri.jpips.Pawt.*;
 
 /** A component for JPips which associates a frame to a menu.
   * 

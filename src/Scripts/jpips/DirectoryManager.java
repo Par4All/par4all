@@ -2,7 +2,7 @@
   $Id$
 */
 
-package JPips;
+package fr.ensmp.cri.jpips;
 
 import java.io.*;
 
@@ -13,7 +13,7 @@ import javax.swing.*;
 //import javax.swing.preview.*;
 import javax.swing.border.*;
 
-import JPips.Pawt.*;
+import fr.ensmp.cri.jpips.Pawt.*;
 
 /** A manager for the current directory of JPips 
   * 

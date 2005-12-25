@@ -4,7 +4,7 @@
   Send displays to emacs.
 */
 
-package JPips;
+package fr.ensmp.cri.jpips;
 
 import java.io.*;
 

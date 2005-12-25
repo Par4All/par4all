@@ -2,9 +2,9 @@
  * $Id$ 
  */
 
-package JPips;
+package fr.ensmp.cri.jpips;
 
-import JPips.Pawt.*;
+import fr.ensmp.cri.jpips.Pawt.*;
 import java.awt.*;
 
 /** An interface that defines methods for JPips components.

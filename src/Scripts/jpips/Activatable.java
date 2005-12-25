@@ -4,7 +4,7 @@
   * A component which can be activated or de-activated.
   */
 
-package JPips;
+package fr.ensmp.cri.jpips;
 
 public interface Activatable
 {

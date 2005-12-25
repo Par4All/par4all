@@ -29,7 +29,6 @@ error()
 unset jpips forward menu_type
 
 props="";
-java_root=${JAVA_ROOT:-/usr/local/java1.2}
 jar=jpips.jar
 gif=DownArrow.gif
 
@@ -49,8 +48,8 @@ shift `expr $OPTIND - 1`
 
 forward="${forward} $@"
 
-# default menu is jpips_menus.basic.
-men=jpips_menus.${menu_type:-basic}
+# default menu is "jpips_basic.menu"
+men=jpips_${menu_type:-basic}.menu
 
 #
 # which jpips.zip file
@@ -59,13 +58,13 @@ if [ -f ${jar} ]
 then
     jpips=${jar}
 else
-    if [ -f ${PIPS_ROOT}/Share/${jar} ]
+    if [ -f ${PIPS_ROOT}/share/${jar} ]
     then
-	jpips=${PIPS_ROOT}/Share/${jar}
+	jpips=${PIPS_ROOT}/share/${jar}
     fi
 fi
 
-[ "$jpips" ] || error 2 "cannot find jpips.jar"
+[ "$jpips" ] || error 2 "cannot find $jar"
 
 #
 # which DownArrow.gif file
@@ -74,9 +73,9 @@ if [ -f ${gif} ]
 then
     props="${props} -Djpips.downarrow=${gif}"
 else
-    if [ -f ${PIPS_ROOT}/Share/${gif} ]
+    if [ -f ${PIPS_ROOT}/share/${gif} ]
     then
-	props="${props} -Djpips.downarrow=${PIPS_ROOT}/Share/${gif}"
+	props="${props} -Djpips.downarrow=${PIPS_ROOT}/share/${gif}"
     fi
 fi
 
@@ -88,7 +87,7 @@ then
     props="${props} -Djpips.menus=${men}"
     unset men
 else
-    if [ -f ${PIPS_ROOT}/Share/${men} ]
+    if [ -f ${PIPS_ROOT}/share/${men} ]
     then
 	props="${props} -Djpips.menus=${PIPS_ROOT}/Share/${men}"
 	unset men
@@ -97,20 +96,6 @@ fi
 
 [ ! "${men}" ] || error 3 "menu ${men} not found"
 
-PATH="${JAVA_ROOT:-/usr/local/jdk1.2beta4}/bin:${PATH}"
-
-#
-# now do the job
-
-if [ -d ${java_root} ] 
-then
-    java_bin="${java_root}/bin/"
-else
-    java_bin=''
-fi
-
-export CLASSPATH
-
 # always as a shell...
 
 TPIPS_IS_A_SHELL=1
@@ -118,5 +103,4 @@ export TPIPS_IS_A_SHELL
 
 # verbose execution...
 set -x
-CLASSPATH=${jpips}:${java_root}/lib/classes.zip:${CLASSPATH}
-exec ${java_bin}java ${props} JPips.JPips ${forward}
+exec java -jar ${jpips} ${props} ${forward}

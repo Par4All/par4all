@@ -17,7 +17,7 @@
  */
 
 
-package JPips;
+package fr.ensmp.cri.jpips;
 
 
 public interface StreamObserver 

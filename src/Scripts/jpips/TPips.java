@@ -2,7 +2,7 @@
  * $Id$
  */
 
-package JPips;
+package fr.ensmp.cri.jpips;
 
 import java.lang.*;
 
@@ -12,7 +12,7 @@ import java.applet.*;
 
 import javax.swing.*;
 
-import JPips.Pawt.*;
+import fr.ensmp.cri.jpips.Pawt.*;
 
 /** A class that creates a tpips process.
   * It defines the methods to interact with the process.  
