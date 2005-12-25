@@ -47,10 +47,6 @@ test ${uname_s} = Linux && \
 test ${uname_s} = FreeBSD && \
 	PIPS_ARCH="FREEBSDLL"
 
-# could use ll as a default on loreto.
-# test ${uname_s} = Linux -a $HOSTNAME = loreto.ensmp.fr && \
-#	PIPS_ARCH="LINUXI86LL"
-
 # 
 #         #    #  ######  #    #   ####   ######  #    #
 #         ##   #  #       #    #  #    #  #       ##   #
@@ -60,26 +56,14 @@ test ${uname_s} = FreeBSD && \
 #         #    #  ######  #    #   ####   ######  #    #
 #
 
-# the maximum number of tabulated elements (entities for pips)
-# can be extended by defining this variable.
-# default: NEWGEN_MAX_TABULATED_ELEMENTS=12007
-
 # the localtion of newgen-related files
 newgen_dir=/projects/Newgen
 
 # the root location of where to find the newgen to use 
-NEWGEN_ROOT="${newgen_dir}/Production"
-
-# development version of newgen
-NEWGEN_DEVEDIR="${newgen_dir}/Development"
+NEWGEN_ROOT=${newgen_dir}/prod
 
 # PATH update
-PATH="${PATH}:${NEWGEN_ROOT}/Share:${NEWGEN_ROOT}/Utils"
-PATH="${PATH}:${NEWGEN_ROOT}/Bin/${PIPS_ARCH}"
-
-LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${NEWGEN_ROOT}/Lib/${PIPS_ARCH}"
-
-
+PATH="${PATH}:${NEWGEN_ROOT}/bin:${NEWGEN_ROOT}/bin/${PIPS_ARCH}"
 
 #
 #         #          #    #    #  ######    ##    #####
@@ -94,16 +78,7 @@ LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${NEWGEN_ROOT}/Lib/${PIPS_ARCH}"
 linear_dir=/projects/C3/Linear
 
 # the version to use
-LINEAR_ROOT="${linear_dir}/Production"
-
-# where is the development version
-LINEAR_DEVEDIR="${linear_dir}/Development"
-
-# PATH update
-PATH="${PATH}:${LINEAR_ROOT}/Share:${LINEAR_ROOT}/Utils"
-PATH="${PATH}:${LINEAR_ROOT}/Bin/${PIPS_ARCH}"
-
-LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${LINEAR_ROOT}/Lib/${PIPS_ARCH}"
+LINEAR_ROOT=${linear_dir}/prod
 
 #
 #         ######   ####   #       ######
@@ -120,9 +95,9 @@ LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${LINEAR_ROOT}/Lib/${PIPS_ARCH}"
 
 eole_dir=/projects/Eole
 
-EOLE_ROOT=${eole_dir}
+EOLE_ROOT=${eole_dir}/prod
 
-PATH="${PATH}:${eole_dir}/Bin/${PIPS_ARCH}"
+PATH="${PATH}:${EOLE_ROOT}/bin/${PIPS_ARCH}"
 
 # 
 #         #####      #    #####    ####
@@ -137,41 +112,15 @@ PATH="${PATH}:${eole_dir}/Bin/${PIPS_ARCH}"
 ############################################################### PIPS LOCATION
 
 # Pips project sources and binaries
-pips_home=/users/soft/pips
 pips_dir=/projects/Pips
 
-# space for temporary files
-# default: PIPS_TEMPDIR="/tmp"
-
-
-################################################################ RUNNING PIPS
-
-PIPS_ROOT="${pips_dir}/Production"
+PIPS_ROOT="${pips_dir}/prod"
 
 # man pages?
-MANPATH="${MANPATH}:${PIPS_ROOT}/Doc"
-PATH="${PATH}:${PIPS_ROOT}/Share"
+MANPATH="${MANPATH}:${PIPS_ROOT}/man"
 
-LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${PIPS_ROOT}/Lib/${PIPS_ARCH}"
+PATH="${PATH}:${PIPS_ROOT}/bin:${PIPS_ROOT}/bin/${PIPS_ARCH}"
 
-#
-# The properties.rc file to use: PIPS_PROPERTIESRC
-# property files' contents are appended one after the other.
-# 
-# ${PIPS_ROOT}/Share/properties.rc
-# ${PIPS_PROPERTIESRC} if set
-# ./properties.rc if exists
-
-#
-# The pipsmake.rc file to use: 
-# default: 
-# PIPS_PIPSMAKERC=./pipsmake.rc else
-# PIPS_PIPSMAKERC=${PIPS_ROOT}/Share/pipsmake.rc 
-
-#
-# preprocessor to use:
-# default: PIPS_FPP="cpp"
-#
 # to get some determinism...
 
 PIPS_CPP='gcc -E -C'
@@ -188,32 +137,6 @@ test "${PIPS_ARCH}" = GNUSOL2LL && \
 # make MUST be gmake: thus this is the default. 
 # redefine this variable if you wish to change the default path or the name...
 # PIPS_MAKE='gmake'
-
-# PIPS_DIRECTORY_FOR_xxx_BINARIES
-# where to put binaries (maybe on some other disk...)
-# default is directly in a subdirectory
-
-# should be links...
-#PIPS_DIRECTORY_FOR_LINUXI86_BINARIES=/home/tirnanog/calice1/pips/LINUXI86
-#PIPS_DIRECTORY_FOR_LINUXI86LL_BINARIES=/home/loreto/burette2/pips/LINUXI86LL
-
-# see in /home/deauville/flacon2
-PIPS_DIRECTORY_FOR_GNUSOL2LL_BINARIES=/projects/Pips/Links/GNUSOL2LL
-PIPS_DIRECTORY_FOR_GNUSOL2LLPROF_BINARIES=/projects/Pips/Links/GNUSOL2LLPROF
-PIPS_DIRECTORY_FOR_SOL2LL_BINARIES=/projects/Pips/Links/SOL2LL
-
-
-############################################################ DEVELOPPING PIPS
-
-# current development version - sources and binaries
-PIPS_DEVEDIR="${pips_dir}/Development"
-
-# scripts and programs created to manage the project
-# PIPS_UTILDIR="${PIPS_ROOT}/Utils"
-
-# other executables...
-PATH="${PATH}:${PIPS_ROOT}/Utils:/usr5/gnu/bin-sparc"
-
 
 ################################################################ TESTING PIPS
 
@@ -232,12 +155,6 @@ test "${PIPS_ARCH}" = LINUXI86 -o "${PIPS_ARCH}" = LINUXI86LL && \
 
 test "${PIPS_ARCH}" = FREEBSD -o "${PIPS_ARCH}" = FREEBSDLL && \
 	PIPS_HOSTS=""
-
-# PIPS_EXPERIMENTSDIR="${pips_dir}/Experiments"
-# PIPS_TESTSDIR="${pips_dir}/Tests"
-
-# current demo version - binaries only ???
-# PIPS_RELEASEDIR="${pips_dir}/Release"
 
 #
 # others... they are mainly documented in install_pips...
@@ -364,23 +281,23 @@ test ${uname_s} = Linux && \
 # EXTERNAL softwares
 
 # An absolute file name is necessary for LISP
-LISP=/usr/local/bin/cl
+#LISP=/usr/local/bin/cl
 
 # PVM directory
-PVMDIR=${pips_home}/pvm3.3
+#PVMDIR=${pips_home}/pvm3.3
 
 #
 # For the daVinci Graph Viewer/Editor :
 
-DAVINCIHOME="${pips_home}/daVinci/daVinci_V2.0"
-GRAPHEDITOR_DIRECTORY="${DAVINCIHOME}/grapheditor"
-DAVINCI_ICONDIR="${DAVINCIHOME}/images"
+#DAVINCIHOME="${pips_home}/daVinci/daVinci_V2.0"
+#GRAPHEDITOR_DIRECTORY="${DAVINCIHOME}/grapheditor"
+#DAVINCI_ICONDIR="${DAVINCIHOME}/images"
 
-MANPATH="${MANPATH}:${DAVINCIHOME}/man"
-PATH="${PATH}:${DAVINCIHOME}"
+#MANPATH="${MANPATH}:${DAVINCIHOME}/man"
+#PATH="${PATH}:${DAVINCIHOME}"
 
 # Toolpack is used for STF
-TOOLPACK_DIR="${pips_home}/Toolpack/toolpack1.2"
+#TOOLPACK_DIR="${pips_home}/Toolpack/toolpack1.2"
 
 
 
