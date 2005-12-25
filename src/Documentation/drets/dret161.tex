@@ -1,0 +1,312 @@
+\documentclass[12pt]{farticle}
+
+\usepackage[latin1]{inputenc}
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+
+\newcommand{\titre}{PROJET PIPS-CRAY \\
+		ETAT D'AVANCEMENT DES TRAVAUX No 1
+}
+
+\newcommand{\auteur}{
+		Bruno BARON \\
+        	François IRIGOIN \\
+        	Pierre JOUVELOT \\
+\vspace{0.5cm}
+{\it Le présent document a été établi en exécution du contrat
+No.~88.017.01.018 passé par la Direction des Recherches, Etudes et
+Techniques (Délégation Générale pour l'Armement)}
+}
+
+% pour importer des structures de données Newgen
+\newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{\em #2}}
+\newcommand{\docdate}{7 Janvier 1992}
+\newcommand{\numero}{E161}
+
+\begin{document}
+\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+
+{\it Le présent document a été établi en exécution du contrat
+No.~88.017.01.018 passé par la Direction des Recherches, Etudes et
+Techniques (Délégation Générale pour l'Armement)}
+
+\vspace{2cm}
+
+\tableofcontents
+
+\newpage
+
+\section*{Introduction}
+Commencé depuis trois mois, le contrat Pips-Cray avance simultanément
+sur plusieurs fronts que nous présentons dans ce rapport d'avancement:
+la détection des réductions généralisées, le remplacement des
+constantes, la sélection du parallélisme utile et enfin le déroulage
+de boucle.
+
+Il faut noter que nous n'avons pu commencer les tests sur machine Cray
+à cause d'un retard dans l'ouverture d'un compte sur l'une des machines
+du CEA (problèmes de procédure liés à l'épuisement de certains
+crédits cotés CEA).  Compte tenu de l'ampleur du travail a réaliser,
+cela ne nous a pas empêché de progresser.
+
+
+\section{Réductions généralisées}
+Un des volets du contrat PIPS-Cray concerne l'implémentation des
+opérations de réductions, comme la somme de vecteurs ou le produit
+interne.  Une méthode puissante, appellée {\em réductions
+généralisées}, a été envisagée pour être intégrée dans PIPS.
+Elle est décrite dans la publication scientifique {\em A Unified
+Semantic Approach for the Vectorization and Parallelization of
+Generalized Reductions} par Pierre Jouvelot et Babak Dehbonei et
+présenté à la {\em 1989 ACM SIGARCH International Conference on
+Supercomputing} en Crete. 
+
+Etant donné le caractère avancé de cet algorithme, il a été convenu
+de l'implémenter en CommonLISP, utilisant pour cela les facilités de
+compatibilité qu'offre l'outil NewGen qui sert de base aux
+développements de PIPS.  D'un point de vue pratique, l'essentiel a
+consisté jusqu'à présent à remettre à jour l'environnement
+PIPS/CommonLISP qui n'avait pas été utilisé depuis plusieurs
+semestres.  Des routines de lecture des bases de données {\tt
+pipsdbm/pipsmake} ont également été écrites et sont en cours de
+validation.  Dans les prochains mois, l'implémentation du coeur de
+l'algorithme, déjà implémenté une première fois au Centre de
+Recherche BULL, devrait être poursuivie et testée.
+
+
+\section{Remplacement de constantes}
+Les analyses sémantiques interprocédurales réalisées dans Pips
+permettent de connaître les valeurs de variables scalaires entières en
+certains points du programme.  Ces variables peuvent donc être
+remplacées par leur valeur.  C'est l'objectif de la passe de
+remplacement de constantes, prévue par ce contrat.
+
+Un prototype de cette passe remplace les constantes dans les expressions
+suivantes:
+\begin{itemize}
+  \item la condition de l'instruction \verb+IF+, 
+  \item les bornes et l'incrément des boucles \verb+DO+
+\end{itemize}
+Les valeurs des variables scalaires entières de ces expressions sont
+évaluées à partir des préconditions associées à l'instruction dont
+fait partie l'expression. Pour cela, la fonction
+sc\_minmax\_of\_variable() projette les équations du système de
+préconditions sur la dimension associée à la variable pour obtenir un
+intervalle de variation réduit à un élément pour les constantes et
+égal à $Z\!\!\!\!Z$ pour les variables dont on ne sait rien.
+
+Ce prototype devrait permettre de concevoir une passe plus générale
+qui intègre le remplacement des constantes, l'évaluation partielle de
+l'expression et la simplification des sous-expressions linéaires.
+
+
+\section{Sélection du parallélisme}
+L'une des difficultés majeures de ce projet consiste à sélectionner
+le parallélisme utile parmi celui que le projet précédent, PIPS, a
+mis en évidence. En effet parmi les boucles parallélisables certaines
+devraient être retenues comme boucles vectorielles, d'autres pour
+partager l'exécution de leurs itérations par diverses taches
+parallèles (micro-tasking), alors que d'autres encore doivent rester
+séquentielles. La complexité de cette sélection est spécialement
+accrue par la diversité des transformations disponibles afin
+d'optimiser le temps d'exécution d'un nid de boucles.
+
+Afin d'obtenir dans un délai raisonnable une version simple du
+générateur de code parallèle pour Cray, une méthode rudimentaire
+consiste à choisir dans un nid de boucle (qui a été parallélisé
+avec l'algorithme de Kennedy et Allen) la boucle la plus interne pour la
+vectorisation si elle est parallélisable, et une boucle externe
+parallélisable pour la parallélisation; les autres boucles restent
+séquentielles. Cela a été implémenté dans la librairie ``{rice}''
+sans prendre en compte le parallélisme imbriqué entre procédures et
+fonctions. En fait, il a suffi d'inhiber la parallélisation des
+boucles autres que celles retenues ci-dessus. Il faudra par la suite
+tenir compte de l'interprocéduralité pour la sélection du
+parallélisme.
+
+La propriété booléenne \verb+GENERATE_NESTED_PARALLEL_LOOPS+ doit
+être \verb+FALSE+ pour activer cette sélection. Ensuite il suffit de 
+paralléliser le code comme d'habitude: ``Display para''. Voir l'exemple
+en annexe.
+
+
+\section{Déroulage de boucle}
+Dite ``loop unrolling'', cette transformation consiste à diminuer le
+nombre d'itération de la boucle déroulée en regroupant plusieurs
+itérations du corps de boucle en une seule. Utilisée à bon escient,
+cela permet d'utiliser tous les registres vectoriels d'un processeur.
+De plus, l'overhead de boucle est réduit grâce à la diminution du
+nombre d'itérations.
+
+Une première étape a consisté à implémenter la transformation en
+elle même, afin de pouvoir ensuite évaluer par des tests le gain
+obtenu. Cela deviendra possible dès que l'accès au Cray
+deviendra effectif et que le pretty-printer Pips générera du Fortran
+parallèle adapté au Cray (utilisant les directives spécifiques
+CFT77). 
+
+\subsection{Définition du déroulage de boucle}
+Les conventions pour décrire les transformations sont les suivantes:
+\begin{itemize}
+  \item les nom en lettres minuscules apparaissent tel quel dans le
+texte du programme réel.
+  \item les nom en majuscules désignent dans le programme réel:
+     \subitem une expression s'il ont le suffixe \_EXP
+     \subitem un entier s'ils ont le suffixe \_INT
+     \subitem une fonction de la variable IND qui génère le code du
+corps de boucle pour BODY(IND). La valeur retournée pour IND valant
+EFF\_EXP s'écrit BODY(IND \ EFF\_EXP)
+     \subitem une variable à défaut.
+\end{itemize}
+
+Soit la boucle initiale:
+\begin{verbatim}
+      do IND = LB_EXP, UB_EXP, INC_EXP
+         BODY(IND)
+      enddo
+\end{verbatim}
+La boucle déroulée \verb+RATE_INT+ fois est alors de la forme:
+\begin{verbatim}
+      lu_nub = (UB_EXP - LB_EXP + INC_EXP) / INC_EXP
+      lu_ib = mod(lu_nub, RATE_INT)
+      do lu_ind = 0, lu_ib-1, 1
+         BODY(IND \ (lu_ind*INC_EXP + LB_EXP))
+      enddo
+      do lu_ind = lu_ib, lu_nub-1, RATE_INT
+         BODY(IND \ (lu_ind*INC_EXP + LB_EXP))
+         BODY(IND \ ((lu_ind+1)*INC_EXP + LB_EXP))
+         ...
+         BODY(IND \ ((lu_ind+(RATE_INT-1))*INC_EXP + LB_EXP))
+      enddo
+      IND = LB_EXP + max(lu_nub, 0)*INC_EXP
+\end{verbatim}
+
+\subsection{Conditions de validité}
+Les conditions suivantes doivent être vérifiées dans la fonction
+\verb+loop_unroll_consistent_p()+ appelée avant d'appliquer la
+transformation:
+\begin{itemize}
+  \item le taux de déroulage doit être un entier supérieur ou égal
+à 1. 
+  \item les trois expressions que comporte le \verb+range+ de la boucle
+doivent être entières, ainsi que l'indice de boucle.
+  \item les expressions du {\tt range} doivent n'avoir aucun effet de
+bord. Il faudrait donc vérifier que les {\em effets propres} de la boucle
+initiale ne comportent aucun {\tt write}.
+  \item le corps de la boucle initiale ne doit pas comporter de point
+d'entrée (GOTO un label à l'intérieur de la boucle), ni de
+redéfinition de l'indice de boucle; cela est garanti par la norme
+Fortran 77, paragraphes 11.10.8 et 11.10.5 respectivement.
+  \item le entités créées pour la transformation ne doivent pas
+préexister dans le code (lu\_nub, lu\_ib et lu\_ind). Il faudra par la
+suite palier cette restriction.
+\end{itemize}
+
+\subsection{Preuve de validité}
+Une transformation de programme est valide si elle ne modifie pas
+la sémantique de ce programme. Dans le cas d'une boucle, cela revient
+à montrer que le corps de boucle est exécuté le même nombre de fois
+dans le même ordre avec des indices tels que l'on retombe sur
+l'exécution initiale. De plus, l'indice de la boucle initiale doit
+avoir la même valeur en fin d'exécution dans les deux cas.
+
+Nous considérons dans la preuve des étapes intermédiaires: la boucle
+est d'abord normalisée (dans le cas \verb+INC_EXP+ positif puis dans le
+cas \verb+INC_EXP+ négatif). Cette normalisation permet en particulier
+d'unifier les deux cas précédents, tout en restant conforme à la
+norme Fortran 77. La boucle normalisée présente la forme suivante,
+pour tout \verb+INC_EXP+:
+\begin{verbatim}
+      lu_nub = (UB_EXP - LB_EXP + INC_EXP) / INC_EXP
+      do lu_ind = 0, lu_nub-1, 1
+         BODY(IND \ (lu_ind*INC_EXP + LB_EXP))
+      enddo
+      IND = LB_EXP + max(lu_nub, 0)*INC_EXP
+\end{verbatim}
+Le déroulement de boucle est ensuite appliqué à cette boucle
+normalisée.
+
+\subsection{Opportunité}
+La fonction de décision devra juger de l'opportunité de la
+transformation, et choisir le taux de déroulage. Elle devra tenir
+compte:
+\begin{itemize}
+  \item du nombre d'itérations,
+  \item du nombre de vecteurs en registre dans cette boucle,
+  \item du nombre d'opérations dans la boucle.
+\end{itemize}
+
+
+\section*{Conclusion}
+Les travaux pour le projet PIPS-Cray progressent normalement.  Dès que
+l'accès à un Cray nous sera possible et que les tests vont pouvoir
+commencer, nous allons implémenter le générateur de code parallèle
+spécifique CFT77.
+
+\newpage
+
+\section*{Annexe A}
+\subsection*{Exemple de sélection du parallélisme}
+Soit la fonction de calcul du produit de matrice:
+\begin{verbatim}
+      SUBROUTINE MATMUL(N, A, B, C)
+      REAL*8 A(N,N), B(N,N), C(N,N)
+      DO I = 1,N
+         DO J = 1,N
+            C(I,J) = 0.0
+            DO K = 1,N
+               C(I,J) = C(I,J) + A(I,K)*B(K,J)
+            ENDDO
+         ENDDO
+      ENDDO
+      RETURN
+      END
+\end{verbatim}
+
+Après parallélisation sans la sélection, on obtient le maximum de
+boucles parallèles:
+\begin{verbatim}
+      SUBROUTINE MATMUL(N, A, B, C)
+      REAL*8 A(N,N), B(N,N), C(N,N)
+      DOALL I = 1, N
+         DOALL J = 1, N
+            C(I,J) = 0.0
+         ENDDO
+      ENDDO
+      DOALL I = 1, N
+         DOALL J = 1, N
+            DO K = 1, N
+               C(I,J) = C(I,J)+A(I,K)*B(K,J)
+            ENDDO
+         ENDDO
+      ENDDO
+      RETURN
+      END
+\end{verbatim}
+
+Après parallélisation avec la sélection (en ajoutant dans un fichier
+./properties.rc la ligne 
+``\verb+GENERATE_NESTED_PARALLEL_LOOPS FALSE+''), la seconde boucle J
+n'est pas parallèle. En effet, la boucle externe I est parallèle, et
+la boucle K plus interne empèche la vectorisation:
+\begin{verbatim}
+      SUBROUTINE MATMUL(N, A, B, C)
+      REAL*8 A(N,N), B(N,N), C(N,N)
+      DOALL I = 1, N
+         DOALL J = 1, N
+            C(I,J) = 0.0
+         ENDDO
+      ENDDO
+      DOALL I = 1, N
+         DO J = 1, N
+            DO K = 1, N
+               C(I,J) = C(I,J)+A(I,K)*B(K,J)
+            ENDDO
+         ENDDO
+      ENDDO
+      RETURN
+      END
+\end{verbatim}
+Remarquer que sur machine Cray, la première boucle J sera vectorielle,
+alors que les deux boucles I seront exécutées avec le micro-tasking.
+
+\end{document}

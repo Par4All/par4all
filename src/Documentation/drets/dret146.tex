@@ -1,0 +1,1243 @@
+%
+% Documentation de l'environnement de développement PIPS
+%
+% $RCSfile: dret146.ftex,v $ ($Date: 1995/09/19 18:51:40 $) version $Revision$, got on %D%, %T%
+% %A%
+%
+
+\documentclass[12pt,french]{article}
+
+\usepackage[latin1]{inputenc}
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+
+% pour importer des structures de données Newgen
+\newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{\em #2}}
+
+\newcommand{\titre}{PROJET PIPS \\
+                ENVIRONNEMENT DE DÉVELOPPEMENT\\
+                {\em Version $Revision$}
+}
+
+\newcommand{\auteur}{
+                François IRIGOIN \\ 
+                Pierre JOUVELOT \\
+                        Rémi TRIOLET \\
+                        Arnauld LESERVOT \\
+                        Alexis PLATONOFF \\
+                        Ronan KERYELL \\
+                        Fabien COELHO \\
+                        Béatrice APVRILLE 
+}
+%\newcommand{\docdate}{7 octobre 1993}
+\newcommand{\docdate}{$Date: 1995/09/19 18:51:40 $}
+
+\renewcommand{\indexname}{Index}
+
+\makeindex
+
+\begin{document}
+
+% conflit avec french.sty :
+\renewcommand{\numero}{E146}
+
+\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+
+% Pour mettre des petites choses rapidement en \tt :
+\catcode `\"=\active
+\edef"{\noexpand\verb\string"}
+
+\tableofcontents
+
+\newpage
+
+\section*{Introduction}
+
+Il n'est pas possible de présenter linéairement en une seule passe
+l'ensemble des informations qui sont utiles au développeur PIPS.
+
+La présentation est plutôt statique -- quels sont les fichiers utilisés
+et comment sont-ils organisés -- que dynamique -- que faire pour ajouter
+une nouvelle bibliothèque? que faire pour recompiler PIPS avec d'autres
+options de compilations? --
+
+Il sera toujours possible d'ajouter de nouveaux chapitres quand des
+rédacteurs volontaires se présenteront.
+
+L'usage d'emacs est obligatoire, ne serait-ce que pour bénéficier
+pleinement du mécanisme des tags et des buffers multiples.
+
+\section{Organisation générale des répertoires de Pips}
+
+Le répertoire racine du logiciel Pips s'appelle \verb+~pips/Pips+. Elle
+est la propriété de l'usager {\tt pips}.
+
+Le découpage en sous-répertoires de ce répertoire racine est le
+suivant.
+
+\begin{itemize}
+
+\item {\tt \bf Development.}
+Ce répertoire contient les versions en cours de mise au point.
+
+\begin{itemize}
+
+\item {\tt \bf Passes.}
+Ce répertoire contient les sources des différentes passes dans des
+sous-répertoires portant les noms des passes. 
+
+\item {\tt \bf Lib.}
+Ce répertoire contient les sources des différentes bibliothèques dans des
+sous-répertoires portant les noms des bibliothèques. Il contient aussi
+un makefile permettant de recompiler toutes les bibliothèques. Ce makefile
+n'est pas généré automatiquement et il n'est donc pas forcément à jour.
+
+\item {\tt \bf Runtime.}
+Ce répertoire contient les sources des bibliothèques utilisées à
+l'exécution des codes générés par le PIPS.
+
+\end{itemize}
+
+\item {\tt \bf Documentation.}
+Ce répertoire contient la documentation du projet Pips: les rapports
+DRET, les lettres, les compte-rendus de discussions ou d'analyses, les
+descriptions des représentations internes, etc. Certains de ces
+documents sont utilisés pour construire des fichiers de configuration
+du projet. Un sous-répertoire, {\tt \bf Documentation/Newgen} contient
+les descriptions en Latex des structures de données utilisées dans le
+projet, telles qu'elles sont utilisées à la fois dans l'environnement
+Production et dans l'environnement Development, mais pas dans
+l'environnement Release. Ceci est dû à la non-modularité introduite
+par NewGen: il n'est pas possible de linker sans risques majeurs des
+modules produits avec des passes indépendantes de NewGen.
+
+\item {\tt \bf Production.}
+Ce répertoire contient les versions temporairement déclarées comme
+étant au point.
+
+\begin{itemize}
+
+\item {\tt \bf Src/Passes.}
+Ce répertoire contient les sources des différentes passes dans des
+sous-répertoires portant les noms des passes.
+
+\item {\tt \bf Src/Lib.}
+Ce répertoire contient les sources des différentes bibliothèques dans des
+sous-répertoires portant leurs noms.
+
+\item  {\tt \bf Src/Runtime.}
+Ce répertoire contient les sources des différentes bibliothèques et
+autres codes utilisés à l'exécution par les codes produits.
+
+\item {\tt \bf Bin.}
+Ce répertoire contient les versions exécutables des passes de Pips ainsi
+que ceux des {\em mains} se trouvant dans les bibliothèques.
+
+\item {\tt \bf Lib.}
+Ce répertoire
+contient les bibliothèques elles-mêmes. Il contient aussi les
+versions de référence de fichiers de paramétrage, {\tt pipsmake.rc}
+qui est automatiquement dérivé d'un fichier contenu dans {\bf Documentation}
+et {\tt properties.rc} qui ne se trouve nul part ailleurs\footnote{Ca
+devrait changer. On pourrait très bien l'extraire d'un fichier latex comme
+pipsmake.rc.}.
+
+\item {\tt \bf Include.}
+Ce répertoire contient les fichiers entêtes de Pips. Certains de ces
+fichiers sont générés automatiquement par la procédure
+d'installation des makefiles de la partie Development. D'autres sont
+créés par des Makefile se trouvant dans {\bf Documentation} ou
+{\bf Documentation/Newgen}.
+
+\end{itemize}
+
+\item {\tt \bf Release.}
+Ce répertoire contient les binaires d'une version cohérente de tout le
+logiciel Pips. Cette version sert pour les installations et pour les
+démonstrations.
+
+{\em Ne semble plus utilisé depuis 1990... }
+
+\begin{itemize}
+\item {\tt \bf Config.}
+Ce répertoire contient les scripts qui permettent de positionner toutes
+les variables d'environnement. Certaines de ces variables sont
+utilisées par Pips, d'autres par le serveur X ou NeWS.
+
+\item {\tt \bf Spec.}
+Ce répertoire contient les fichiers de spécification de la
+représentation interne de Pips. Ces fichiers sont lus dynamiquement par
+toutes les passes de Pips.
+
+\item {\tt \bf Bin.}
+Ce répertoire contient les versions exécutables des passes de Pips.
+
+\item {\tt \bf Lib.}
+Ce répertoire contient \verb+properties.rc+, \verb+pips_help.txt+ et
+\verb+pips.icon+. Il faudra peut-être y ajouter \verb+makefile.rc+.
+
+\item {\tt \bf OpenWindow.}
+Ce répertoire contient les fonts OpenWindows utilisées par l'interface
+graphique de Pips.
+
+\end{itemize}
+
+\item {\tt \bf Externals.}
+Ce répertoire contient les bibliothèques développées au CRI et
+utilisées par Pips. Il s'agit principalement des bibliothèques\verb+Newgen+
+et\verb+ Linear+. Seules les versions exécutables sont stockées ici, accompagnées
+des fichiers {\em headers} correspondants.
+
+\item {\tt \bf Utilities.}
+Ce répertoire contient tous les outils et scripts qui facilitent la
+gestion de Pips et le recompilation de Pips, les bibliothèques Newgen
+et Linear.
+\begin{itemize}
+
+  \item \verb+clean-pips+: \index{clean-pips}destruction de fichiers inutiles
+
+  \item \verb+make-pips+: cf. section Modification...
+
+  \item \verb+recompile-pips(newgen, linear)+: cf. section Modification...
+
+  \item \verb+search-pips+: \index{search-pips}
+	recherche et, éventuellement, destruction
+         de fichiers auxiliaires comme les \verb+database+; exemple:
+        destruction de toutes les bases non utilisées depuis un
+        mois:
+        \begin{quote}
+        \verb+search-pips -w -m -D+
+        \end{quote}
+
+  \item \verb+fetch-linear+: put in Externals the linear library and
+        the related headers
+
+  \item \verb+fetch-newgen+: put in Externals the NewGen library
+        and its related headers
+
+  \item \verb+analyze_libraries+: cf. section Dépendance entre Bibliothèques
+
+  \item \verb+order_libraries+: cf. section Dépendance entre Bibliothèques
+
+  \item \verb+tape-pips+: extraction d'une partie des fichiers de pips pour
+        effectuer une installation ou une demonstration à l'exterieur; les
+        fichiers sont naturellement pris dans \verb+Production+; ne pas
+        oublier de faire les installations nécessaires auparavant. Voir aussi:
+        \verb+bar+, \verb+eject+, \verb+fdformat+ et \verb+tar+. Pour utiliser
+        le floppy: \verb+/dev/rfd0+.
+
+  \item \verb+make-pipsrc.csh+: derivation de \verb+pipsrc.csh+ à partir
+        de \verb+pipsrc.sh+. Ce shell-script est appelé dans
+        \verb+$PIPSDIR/Makefile+.
+
+  \item \verb+make-pipsrc.sh+: derivation de \verb+pipsrc.sh+ à partir
+        de \verb+pipsrc.ref+. Ce shell-script est appelé dans
+        \verb+$PIPSDIR/Makefile+.
+
+  \item \verb+Validate+: non-regression test; see ?!?;
+
+        The arguments are names of subdirectories in
+        \verb+Pips/Tests/Validation+.
+
+        Tests are organized on a library basis in \verb+Pips/Tests/Validation+
+        while bugs are reported in the same way in \verb+Pips/Tests/Bugs+.
+        Bugs and non-regression tests are characterized by one or more Fortran
+        programs which either core dump (for bugs) or must have a known
+        result (tests).
+
+        set
+        \verb+PIPSDBM_DEBUG_LEVEL+ to 5 to check data structures when they are
+        stored and to 9 to check them when they are delivered; some data
+        structures are not checked, among them, all that contain external
+        types;
+
+        use \verb+accept+ to update reference files for validation; can be
+        used with \verb+/usr/ucb/mail+: \verb+| xx accept+ where \verb+xx+
+        is the message number;
+
+        To run it in background, redirect stderr on /dev/null. Example:
+        \begin{quote}
+        \verb+Validate DemoStd 2>/dev/null &+
+        \end{quote}
+
+        When a bug is corrected, run \verb+bug-to-validate+ to move the
+        bug case from \verb+Bugs/xxx+ to \verb+Validation/xxx+.
+
+        Do not forget to update \verb+Documentation/pips-bugs.f.tex+.
+
+  \item \verb+Init, Select, Perform, Display, Pips+: batch interface
+        for PIPS; it is described in ???
+
+  \item \verb+stf-workspace+: calls Toolpack restructurer \verb+stf+ on each
+        Fortran file in a workspace;
+
+  \item \verb+pips-experiment+: runs the same analyses and
+        transformations on each module in a workspace
+
+  \item \verb+print-dg-statistics+: exploits some of the statistics
+        generated by the dependence graph computation when a specific
+        property is true (\verb+RICE_DG_PROVIDE_STATISTICS+);
+
+\end{itemize}
+
+  \item \verb+Experiments+ is a large piece of disk space to be used
+        temporarily to analyze large programs and to core dump large
+        pips processes; no permanent, non-deductible information should
+        be stored there;
+
+\end{itemize}
+
+Il manque actuellement un répertoire {\tt \bf Backup} permettant
+de désinstaller une bibliothèque ou une passe moins au point que
+son développeur ne le croyait.
+
+L'impression du code de sortie peut-etre ameliorée en utilisant \verb+tgrind+:
+\begin{verbatim}
+tgrind -lf extr_doall.f
+\end{verbatim}
+
+\section{Environnement shell (sh, csh, ksh, tcsh)}
+
+  De nombreuses variables d'environnement sont utilisées par les
+procédures et les exécutables PIPS, qu'ils soient contenus dans {\tt
+\bf Utilities} ou dans {\tt \bf Bin}. Ces variables sont initialisées
+par le script {\tt Pips/pipsrc.sh} (dérivé de {\tt Pips/pipsrc.ref})
+pour sh et ksh et par le script {\tt Pips/pipsrc.csh} pour csh et tcsh qui
+est dérivé automatiquement du précédent (voir
+\verb+$UTILDIR/make-pipsrc.csh+, ou plus simplement exécuter {\tt make}
+sous \verb+$PIPSDIR+). Elles décrivent essentiellement la structure des
+répertoires PIPS et les options de compilation.
+
+\section{NewGen}
+
+NewGen est l'outil de génie logiciel avec lequel sont gérées
+(presque) toutes les structures de données du projet PIPS. Il est
+décrit dans ???, rapport CAII-????.
+
+NewGen a le même statut que {\tt cc}, {\tt ld} ou {\tt make}, ce qui
+signifie qu'il est considéré comme un outil externe et qu'il ne fait
+pas partie du projet PIPS.
+
+Néammoins, comme cet outil demande encore de la mise au point, les
+bibliothèques qui en proviennent, {\tt genC.a, hash.a, set.a,...}, sont
+copiées (et non pas linkées par {\tt ln} ou {\tt ln -s}) dans le
+répertoire {\tt Externals}. Cette opération doit être effectuée
+manuellement à chaque modification de Newgen. Un utilitaire, {\tt
+Utilities/fetch-newgen}, permet de l'effectuer sans rien oublier.
+
+Les fichiers headers correspondants sont copiés dans le même répertoire,
+{\tt Externals}.
+
+Les sources de NewGen, qu'il est parfois utile d'aller consulter, se
+trouvent dans \verb+$NEWGENDIR+.
+
+Plusieurs fonctionalités sont utiles lors de la mise au point:
+\begin{itemize}
+
+  \item \verb+gen_consistent_p()+ permet de verifier qu'une structure
+        de données NewGen existante est (récursivement) bien construite;
+
+  \item \verb+gen_defined_p()+ permet de verifier qu'une structure
+        de données NewGen existante est (récursivement) complètement définie;
+
+  \item \verb+gen_debug+ est une variable externe qui permet de vérifier
+        dynamiquement lors de leur construction et lors de leur
+        parcours récursif que les structures de données NewGen
+        sont cohérentes. Activation:
+        \begin{quote}
+        \verb+ gen_debug |= GEN_DBG_CHECK;+
+        \end{quote}
+        Arrêt:
+        \begin{quote}
+        \verb+ gen_debug &= ~GEN_DBG_CHECK;+
+        \end{quote}
+        En desespoir de cause:
+        \begin{quote}
+        \verb+ gen_debug = GEN_TRAV_OBJ+
+        \end{quote}
+
+  \item pour imprimer le numéro du type NewGen d'un objet
+        \verb+obj+, faire sous \verb+dbx+:
+        \begin{quote}
+        \verb|(dbx) print obj->i|
+        \end{quote}
+
+  \item pour imprimer le nom d'une entité \verb+e+, faire:
+        \begin{quote}
+        \verb|(dbx) print (e+2)->s|
+        \end{quote}
+
+  \item pour imprimer l'étiquette d'un statement \verb+stmt+, faire:
+        \begin{quote}
+        \verb|(dbx) print ((stmt+1)->p+2)->s|
+        \end{quote}
+
+  \item pour imprimer le domaine d'un objet Newgen par partie de son
+        numero (\verb+obj->i+):
+        \begin{quote}
+        \verb|(dbx) print Domains[obj->i].name|
+        \end{quote}
+
+\end{itemize}
+
+Il est prévu de définir des macros {\tt gdb} compatibles avec les
+macros C.
+
+\section{Bibliothèque Linéaire}
+
+La bibliothèque d'algèbre linéaire a été développée
+indépendamment du projet PIPS, avec un financement CNRS.
+
+La bibliothèque linéaire a le même statut que la libC, ce qui
+signifie qu'elle est considérée comme une bibliothèque externe.
+
+Néammoins, comme cette bibliothèque demande encore de la mise au
+point, ses différents constituants {\tt arithmetique.a, vecteur.a, ...}
+sont copiés (et non pas linkés) dans le répertoire {\tt Externals}.
+Cette opération devrait être effectuée manuellement à chaque modification.
+Un utilitaire, {\tt Utilities/fetch-linear}, permet de l'effectuer.
+
+Comme la bibliothèque {\tt \bf C3/Linear} est organisée d'une manière
+assez similaire à Newgen, il ne faut pas avoir oublié d'effectuer une
+installation, après une modification des sources dans {\tt \bf
+C3/Linear/Developement}. A ce niveau, des makefiles permettent de
+recompiler toutes les sous-bibliothèques.
+
+Les fichiers headers correspondants sont copiés dans le même répertoire,
+{\tt \bf Externals}.
+
+\section{Makefiles}
+
+L'utilitaire {\tt make} est utilisé extensivement pour assurer la cohérence
+des composantes de pips. Cependant, la plupart des makefiles ne sont pas
+écrits à la main mais dérivés automatiquement de fichiers appelés
+{\tt config.makefile}. Cette dérivation automatique, assurée par
+l'utilitaire {\tt pips-makemake}, permet de garantir le bon état
+des dépendances et des procédures d'installation.
+
+Il faut penser à refaire des {\tt make depend} de temps à autres
+pour assurer la mise à jour des dépendances entre fichiers. Il est
+indispensable que le fichier header de la bibliothèque ou de la passe
+existe dans la directory courante, sans quoi make depend va selectionner
+la version se trouvant dans \verb+Production/Include+ et le header ne
+sera même pas recréé.
+
+L'entrée \verb+test+ permet de créer une version de \verb+pips+ utilisant
+la version locale de la bibliothéque (i.e. du répertoire) courante. Ceci
+permet de vérifier que l'édition de liens fonctionne bien et que les
+nouveaux modules ont le comportement souhaité dans l'environnement pips.
+
+\newpage
+
+Voici un exemple typique de config.makefile:
+
+\begin{verbatim}
+...
+AR=             $(PIPS_AR)
+ARFLAGS=        $(PIPS_ARFLAGS)
+CC=             $(PIPS_CC)
+CFLAGS=         $(PIPS_CFLAGS)
+CPPFLAGS=       $(PIPS_CPPFLAGS)
+LD=             $(PIPS_LD)
+LDFLAGS=        $(PIPS_LDFLAGS)
+LEX=            $(PIPS_LEX)
+LFLAGS=         $(PIPS_LFLAGS)
+LINT=           $(PIPS_LINT)
+LINTFLAGS=      $(PIPS_LINTFLAGS)
+YACC=           $(PIPS_YACC)
+YFLAGS=         $(PIPS_YFLAGS)
+#
+# The following macros define your pass.
+#
+# Name of the target
+TARGET=         parallelize
+#
+# Source, header and object files used to build the target
+TARGET_CFILES=  kennedy.c scan.c util.c dependence.c algebre.c \
+                divar.c debug.c codegen.c scc.c
+TARGET_HEADERS= includes.h
+TARGET_OBJECTS= kennedy.o scan.o util.o dependence.o algebre.o \
+                divar.o debug.o codegen.o scc.o
+#
+# List of libraries used to build the target
+TARGET_LIBS=    -lprivatize -lusedef -lprettyprint -lsemantics -ltransformer \
+                 -lcontrol -leffects -lnormalize \
+                -lsc -lcontrainte -lvecteur -larithmetique \
+                -lri-util -lmisc -lproperties -lgenC /usr/lib/debug/malloc.o \
+                -lproperties
+
+\end{verbatim}
+
+\section{Organisation d'une bibliothèque}
+
+Les fichiers sources de la bibliothèque {\tt b} se trouve dans le répertoire
+{\tt Development/Lib/b}.
+
+Un fichier config.makefile doit être créé dans ce même répertoire;
+il doit être mis à jour avec les noms des fichiers sources et objets de la
+bibliothèque, plus quelques autres. Il peut aussi être augmenté
+de règles et de définitions compatibles avec la syntaxe de {\tt make}.
+
+Le fichier config.makefile permet à la commande {\tt pips-makemake -l}
+de créer automatiquement un fichier Makefile aux normes Pips (les
+normes Pips sont tout à fait stables...). Ce fichier Makefile contient
+notamment une entrée install pour installer la bibliothèque dans la
+partie production. Un fichier header est créé à l'installation.
+
+Un soin tout particulier doit être apporté à la création automatique
+du fichier header {\tt b.h} décrivant cette bibliothèque. Ce fichier
+automatiquement généré est la concaténation d'une part de
+l'éventuel fichier {\tt b-local.h} contenant les macros, types et
+autres définitions nécessaires pour utiliser la bibliothèque, et
+d'autre part du fichier extern.h créé automatiquement par la commande
+{\tt new-make-extern}.
+
+La concaténation de ces deux fichiers est faite automatiquement sur
+décision du programmeur par la commande '{\tt make b.h}' ou lors d'une
+mise à jour de {\tt b-local.h} mais pas lorsque {\tt extern.h} varie;
+ceci permet d'éviter les recompilations intempestives en période de
+mise au point de la bibliothèque. Une éventuelle incohérence avec
+{\tt extern.h} peut conduire à des diagnostics de compilation relatifs
+aux types des fonctions de la bibliothèque b lorsqu'elles sont
+utilisées dans le corps d'autres fonctions de b.
+
+Le fichier {\tt b.h} est systématiquement créé à chaque commande '{\tt
+make install}', avant la copie dans la partie production.
+
+En d'autres termes, il ne faut jamais modifier directement le fichier
+{\tt b.h} quoiqu'aucun warning ne soit prefixé (bug à corriger). Il
+faut toujours éditer {\tt b-local.h}.
+
+Si un programme principal permettant de tester ou d'utiliser la
+bibliothèque existe, ce programme a nécessairement le statut de passe.
+La raison est que l'expérience montre que soit ce programme existe et
+est effectivement une passe (prettyprinter, controlizer, privatizer,
+...) ou bien n'existe pas et est alors réduit à {\tt main(){}}.
+
+En fait, cette règle n'est pas respectée et cela provoque des cycles
+en cas de recompilation globale.
+
+\subsection{Relation entre bibliothèques et structures de données}
+
+Les structures de données du projet PIPS sont gérées par NewGen
+qui dérive pour chacune d'entre elles un fichier header. Par
+exemple, la représentation interne (i.e. l'abstract syntax tree)
+est appelée ri. Elle est initialement décrite dans un fichier de
+documentation {\tt ri.f.tex} stocké dans {\tt \bf Documentation/Newgen},
+puis mise en format NewGen dans {\tt ri.newgen} et enfin exploité par
+NewGen pour produire un fichier de description interne {\tt ri.spec}
+et un fichier C {\tt ri.h} nécessaire aux programmeurs voulant utilisé
+cette structure {\tt ri}.
+
+Il n'est donc pas possible de développer une bibliothèque de modules
+de base, plus évolués que ceux que fournit NewGen, opérant sur cette
+structure de données {\tt ri} et de lui donner le nom {\tt ri}. Ceci
+est vrai non seulement pour la structure {\tt ri}, mais pour toutes les
+structures construites à l'aide de NewGen. Les noms des bibliothèques
+associées sont donc généralement suffixés par {\tt -util}, ce qui
+donne {\tt libri-util.a} et {\tt ri-util.h}. Il y a malheureusement
+de nombreuses exceptions...
+
+Pour des raisons historiques, beaucoup de modules de base ne se trouvent pas
+là où on les attendrait mais dans la première bibliothèque où ils
+se sont avérés nécessaires ({\tt syntax}, le parser, en est le cas le
+plus flagrant).
+
+\subsection{Tags}
+
+  Vu le très grand nombre de macros et de fonctions utilisées dans le projet,
+il faut utiliser le mécanisme de tags pour retrouver le code source
+sous EMACS\footnote{Il y a aussi des tags pour {\tt vi}.}.
+
+  Les tags sont recalculés périodiquement par l'utilitaire PIPS
+\verb+make-tags+ qui utilise la variable
+d'environnement \verb+PIPS_ETAGS+ (qui pointe sur une commande
+\verb+etags+), et stockés dans {\tt Pips/Tags/TAGS}. Ils correspondent à
+la version {\tt Development}.  Les fonctions provenant des bibliothèques
+externes n'en font pas toujours partie, mais chacun peut se construire son
+propre fichier de tags, y compris en concaténant simplement divers
+fichiers de tags.
+
+\subsection{Dépendance entre bibliothèques}
+
+Il faut éviter de créer des cycles de dépendance entre bibliothèques.
+Une situation où la bibliothèque $A$ contient un module $a$ appelant un module
+$b$ de la bibliothèque $B$ qui appelle lui-même un module $a'$ de $A$ ne
+permet pas d'effectuer des links simples. Cette situation reflète aussi une
+mauvaise organisation logique des bibliothèques. 
+
+Les bibliothèques de PIPS doivent {donc}, en principe, former une structure
+de DAG, i.e. posséder un ordre partiel.
+
+Des utilitaires, dont les principaux sont {\tt analyze\_libraries, \tt
+order\_libraries}, permettent de determiner les {\tt uses} et les {\tt
+defs}, un ordre total des bibliothèques compatible avec leur ordre partiel et les cycles éventuels.Les résultats des analyses sont stockés dans {\tt /tmp/libs.?} où le point d'interrogation peut prendre différentes valeurs:
+\begin{itemize}
+  \item u: uses, listes des modules utilisés par une bibliothèque
+  \item d: defs, listes des modules définis par une bibliothèque
+  \item j: join entre uses et defs
+  \item o: ordre entre bibliothèques
+  \item etc...
+\end{itemize}
+
+\subsection{Mise en place d'une nouvelle phase/bibliothèque}
+
+Les fonctionalités offertes par certaines bibliothèques sont
+parfois directement visibles des utilisateurs par le biais de
+\verb+pipsmake+. La suite de ce paragraphe ne se comprend qu'après
+avoir pris connaissance de la documentation correspondante.
+
+Une phase {\em myphase} de Pips est représentée par une fonction C (nommée
+{\tt myphase}) n'ayant qu'un argument en entrée, une cha\^{\i}ne de
+caractères représentant le nom d'un module Fortran à analyser. Elle se
+trouve dans beaucoup de cas dans une bibliothèque de nom {\tt myphase}, mais ce
+n'est pas obligatoire.  Elle doit mettre en place les variables globales
+nécessaires à son exécution à l'aide des \verb+properties+ et acquérir les
+resources nécessaires par des appels à \verb+pipsdbm+. Aucun appel à
+\verb+pipsmake+ n'est (pour le moment) autorisé à ce niveau.
+
+Voici, les étapes à suivre pour installer une nouvelle
+bibliothèque de nom {\em mylib}~:
+
+\begin{itemize}
+
+\item créer un répertoire {\tt mylib} dans {\tt \$DEVEDIR/Lib} contenant 
+les fichiers {\tt mylib.c} (où se trouve généralement le code de la fonction
+C {\tt mylib()} qui correspond à la phase que l'on veut ajouter) et {\tt
+main.c} (contenant une fonction {\tt main()} vide).
+
+\item dans le répertoire {\tt \$DEVEDIR/Lib/mylib}~:
+
+\begin{itemize}
+
+\item créer un fichier {\tt config.makefile} en s'inspirant
+d'une autre bibliothèque.
+
+\item exécuter la commande {\tt pips-makemake} (option -l) pour
+construire le fichier {\tt Makefile} automatiquement.
+
+\item exécuter les commandes {\tt make libmylib.a} et {\tt make install},
+pour que cette nouvelle fonction soit ``{visible}'' par les autres
+bibliothèques et passes, {\em i.e.} pour installer cette bibliothèque dans
+le répertoire {\tt \$PRODDIR} et copier les fichier {\tt mylib.h} et {\tt
+libmylib.a} dans, respectivement, {\tt \$INCLUDEDIR} et {\tt \$LIBDIR}.
+
+Il important de signaler que le {\tt Makefile} utilise la commande {\tt
+cproto} (variable d'environnement \verb+PIPS_PROTOIZE+)
+(qui se trouve dans le répertoire {\tt \$UTILDIR}) qui permet de construire
+automatiquement le fichier {\tt mylib.h}. Pour obtenir une reconstruction
+explicite de ce fichier, il suffit d'exécuter successivement les deux
+commandes {\tt touch mylib-local.h} et {\tt make mylib.h}.
+
+\end{itemize}
+
+\item dans le répertoire {\tt \$PIPSDIR}~:
+
+\begin{itemize}
+
+\item mettre à jour le fichier d'initialisation des variables
+d'environnement Shell pour Pips {\tt pipsrc.ref}. Cela consiste à rajouter
+la cha\^{\i}ne de caractères {\tt -lmylib} dans la variable {\tt
+\$PIPS\_LIBS} (l'ordre des bibliothèques est important, il faut placer cette
+nouvelle bibliothèque après les bi\-blio\-thèques qui utilisent les
+fonctions qu'elle définies et avant celles dont elle utilise les fonctions).
+
+\item exécuter la commande {\tt make} qui met alors
+automatiquement à jour les fichiers d'initialisation des variables
+d'environnement {\tt pipsrc.sh} et {\tt pipsrc.csh}.
+
+\end{itemize}
+
+\item dans le répertoire {\tt \$DOCDIR}~:
+
+\begin{itemize}
+
+\item déclarer l'existence de la nouvelle phase en modifiant le 
+fichier de règles {\tt pipsmake-rc.f.tex}. Chaque règle indique les 
+dépendances sur les ressources en entrée et en sortie de chaque 
+bibliothèque. Dans la pratique, il faut s'inspirer des autres règles 
+déjà définies dans le fichier. On peut y ajouter une déclaration 
+d'alias pour obtenir de plus jolis menus sous \verb+wpips+, l'interface 
+multifenêtre.
+
+Par exemple, pour une phase {\em phase} qui lit une ressource {\em res1}
+et écrit une ressource {\em res2} du module cela donne~:
+
+\begin{verbatim}
+phase                            > MODULE.res2
+        < PROGRAM.entities
+        < MODULE.res1
+\end{verbatim}
+
+Il faut noter qu'en règle générale, une bibliothèque utilise toujours
+les {\em entities} du programme.
+
+\item Une série de nouvelles ``{properties}'' peut être nécessaire pour le 
+fonctionnement de cette nouvelle phase. Il ne faut pas oublier de les déclarer
+dans le fichier de référence des properties, {\tt properties-rc.f.tex}.
+
+\item exécuter la commande {\tt make all} pour dériver de ce fichier de 
+règles les fichiers {\tt phases.h}, {\tt resources.h} et {\tt builder-map.h}
+placés dans {\tt \$INCLUDEDIR}, et les fichiers {\tt pipsmake.rc}, {\tt
+wpips.rc} et {\tt properties.rc} placés dans {\tt \$LIBDIR}.
+
+
+\end{itemize}
+
+\item dans le répertoire {\tt \$BINSRCDIR}, exécuter 
+la commande {\tt make-pips -r}, qui recompile et installe une nouvelle version
+des exécutables {\tt pips} et {\tt wpips}.
+
+\end{itemize}
+
+Il peut aussi s'avérer nécessaire de mettre à jour les script shell
+qui se trouvent dans \verb+Utilities+ (Build, Init, Select, Perform, Display).
+
+Cette section ne traitait pas le cas où une nouvelle ressource doit être
+introduite, c'est l'objet de la section suivante.
+
+\subsection{Mise en place d'une nouvelle ressource}
+
+Une ressource {\em myres} de Pips est déclarée par son utilisation ou sa 
+production par l'une des règles du fichier {\tt pipsmake-rc.f.tex} (cf. 
+ci-dessous). La phase {\tt phase} ayant été déclarée comme indiqué
+précédememnt, voici, les étapes à suivre pour installer la nouvelle 
+ressource {\em myres}~:
+
+\begin{itemize}
+
+\item dans le répertoire {\tt \$DOCDIR}~:
+
+\begin{itemize}
+
+\item d'eclarer l'existence de cette nouvelle ressource en modifiant le 
+fichier de r`egles {\tt pipsmake-rc.f.tex}. Chaque règle indique les 
+dépendances sur les ressources en entrée et en sortie de chaque 
+bibliothèque. Dans la pratique, il faut s'inspirer des autres règles 
+déjà définies dans le fichier. Exemple~: 
+\begin{verbatim}
+phase                            > MODULE.myres
+        < PROGRAM.entities
+        < MODULE.une_autre_res
+\end{verbatim}
+On suppose que la fonction {\tt void phase(char *module\_name)} a déjà été
+déclarée dans une des bibliothèques.
+
+\item exécuter la commande {\tt make all} pour dériver de ce fichier de 
+règles les fichiers {\tt phases.h}, {\tt resources.h} et {\tt builder\_map.h}
+placés dans {\tt \$INCLUDEDIR}, et les fichiers {\tt pipsmake.rc} et {\tt
+wpips.rc} placés dans {\tt \$LIBDIR}.
+
+\end{itemize}
+
+\item dans le répertoire {\tt \$DEVEDIR/Lib/pipsdbm}~: il faut déclarer 
+l'existence de cette nouvelle ressource {\em myres} au gestionnaire des 
+ressources {\em pipsdbm}~:
+
+\begin{itemize}
+
+\item mettre à jour le fichier {\tt module.c} en ajoutant une ligne contenant
+\verb+DBR_MYRES,+ dans le tableau {\tt load\_order[]} qui définit les
+ressources à décharger lors de la fermeture d'un module.
+
+\item mettre à jour le fichier {\tt methods\_io.c} en augmentant le tableau
+{\tt method\_map[]} de la ligne suivante~:
+
+{
+\begin{verbatim}
+{DBR_MYRES,(chunk *(*)()) undefined\_method, undefined\_method,
+     undefined\_method, (bool (*)()) undefined\_check},
+\end{verbatim}
+}
+
+Les arguments correspondent aux fonctions de lecture, d'écriture, de
+destruction et de test de cette ressource (ici, elles sont non
+définies).
+
+\item mettre à jour les fichiers {\tt disk.c} et {\tt module.c} si la
+nouvelle ressource est un fichier et non une structure de données.
+
+\item exécuter les commandes {\tt make libpipsdbm.a} et {\tt make install}
+afin de mettre à jour {\em pipsdbm} et de l'installer.
+
+\end{itemize}
+
+\item dans le répertoire {\tt \$BINSRCDIR}, exécuter 
+la commande {\tt make-pips -r}, qui recompile et installe une nouvelle version
+des exécutables {\tt pips} et {\tt wpips}.
+
+\end{itemize}
+
+Remarque~: il est important de recompiler {\tt pips} avant tout essai car le
+fait de changer les fichiers {\tt *.h} genérés à partir de {\tt
+pipsmake-rc.f.tex} peut provoquer des inconsistances qui n'apparaissent qu'à
+l'exécution (impossibilité de créer la {\em database} par exemple).
+
+\subsection{Modification ou ajout d'une structure de données NewGen}
+
+Les structures de données NewGen sont définies dans un fichier \LaTeX{} se 
+trouvant dans le rétertoire {\tt \$DOCDIR/Newgen}. A partir de ces fichiers, 
+nous pouvons obtenir automatiquement les fichiers DDL\footnote{Les types NewGen
+sont appleés {\em domaines} et sont définis à partir d'un langage de haut
+niveau appelé DDL, pour {\em Doamin Definition Language}.}. Lors de la 
+déclaration d'une nouvelle structure deux cas se présentent~:
+
+\begin{enumerate}
+
+\item Cette structure est définie dans un nouveau fichier ({\tt
+mysd.f.tex})~:
+
+dans ce cas, quelques manipulations préalables sont alors nécessaires avant
+l'installation~; en effet, la création d'un nouveau fichier nécessite la
+mise à jour du fichier {\tt Makefile} qui se trouve dans le répertoire {\tt
+\$DOCDIR/Newgen}, dans lequel il faut compléter les deux listes {\tt
+SOURCE\_FILES} et {\tt NEWGEN\_FILES} avec respectivement {\tt mysd.f.tex} et
+{\tt mysd.newgen}, et créer la dépendance correspondant à ce nouveau
+fichier (en s'inspirant des dépendances sur les autres fichiers)~:
+
+\begin{verbatim}
+mysd.newgen: mysd.f.tex
+        remove-latex-comments mysd.f.tex
+        cp mysd.newgen $(NEWGEN_DIR)/mysd.newgen
+\end{verbatim}
+
+De plus, il faut ajouter un ``{include}'' du ``header'' de cette structure 
+({\tt mysd.h}) dans le fichier {\tt newgen.c} du répertoire {\tt 
+\$DEVEDIR/top-level} et dans les fichiers {\tt module.c} et {\tt methods\_io.c}
+du répertoire {\tt \$DEVEDIR/pipsdbm}. Il n'est pas obligatoire d'exécuter 
+immédiatement la commande {\tt make install} dans ces deux répertoires, 
+néanmoins cela sera nécessaire juste avant la recompilation complète de 
+{\tt \$PRODDIR} (cf. ci-dessous), sinon ces modifications ne seront pas prises 
+en compte.
+
+Enfin, dans le répertoire {\tt \$INCLUDEDIR} (où se trouve les fichiers DDL
+de toutes les structures de données Newgen utilisées dans Pips, les ``{\tt 
+*.newgen}''), modifier dans le fichier {\tt constants.h} la valeur de la 
+``macro'' {\tt ALL\_SPECS} qui donne l'ordre dans lequel les fichiers DDL ont 
+été pris en compte et qui est utilisée pour l'initialisation de Newgen 
+à l'exécution. Cet ordre est donné par le résultat affiché par la 
+commande {\tt make c\_internal\_representation} (cf. ci-dessous).
+
+Par exemple, si avant l'installation de ce nouveau fichier cette macro est
+définie comme suit~:
+
+\begin{verbatim}
+#define ALL_SPECS \
+        sd1_spec , \
+        sd2_spec , \
+        sd3_spec
+\end{verbatim}
+
+et si le résultat de cette commande est le suivant~:
+
+\begin{verbatim}
+sd1_spec
+mysd_spec
+sd2_spec
+sd3_spec
+\end{verbatim}
+
+alors, il faut modifier cette macro comme suit~:
+
+\begin{verbatim}
+#define ALL_SPECS \
+        sd1_spec , \
+        mysd_spec , \
+        sd2_spec , \
+        sd3_spec
+\end{verbatim}
+
+\item Cette structure est définie dans un fichier déjà existant ({\tt 
+mysd.f.tex})~: dans ce cas, il suffit alors juste de modifier ce fichier {\tt 
+mysd.f.tex} comme nécessaire.
+
+\end{enumerate}
+
+Ensuite, dans tous les cas, il faut suivre les étapes suivantes~:
+
+\begin{itemize}
+
+\item dans le répertoire {\tt \$DOCDIR/Newgen}, exécuter la commande {\tt 
+make} (équivalent à {\tt make c\_internal\_representation}), qui construit 
+le fichier DDL {\tt mysd.newgen}, le copie dans le répertoire {\tt 
+\$INCLUDEDIR}, puis dans ce dernier répertoire, exécute la commande {\tt 
+newgen -c *.newgen}, qui reconstruit le ``header'' de chaque structure de 
+données. Cette commande reconstruit également pour chaque fichier DDL le 
+fichier de spécification correspondant, les ``{\tt *.spec}''~; ces fichier ne
+sont plus utilisés.
+
+\item Comme NewGen exploite globalement toutes les structures de données 
+définies dans le projet, toute modification de l'une d'entre elles entraîne 
+potentiellement la modification de toutes leurs interfaces. Il est donc 
+nécessaire de recompiler\footnote{Au préalable, il ne faut pas oublier 
+d'exécuter {\tt make install} dans {\tt \$DEVEDIR/Lib/top-level} et {\tt 
+\$DEVEDIR/Lib/pipsdbm} si les fichiers {\tt newgen.c}, {\tt module.c} et {\tt 
+methods\_io.c} ont été modifiés (cf.ci-dessus).} tout {\tt \$PRODDIR}. 
+Deux scripts shell se trouvant dans {\tt \$UTILDIR} nous permettent de 
+réaliser cette recompilation globale~:
+
+\begin{itemize}
+
+\item {\tt make-pips}~: exécute un make dans toutes les bibliothèques et 
+dans toutes les passes composant pips~; l'option -d recompile dans {\tt 
+Development}, alors que l'option -p recompile dans {\tt Production} et installe
+la librairie dans {\tt \$LIBDIR} ({-p} par défaut)~; l'option -n, identique à 
+celle de make, permet de voir ce qui n'est pas à jour~; l'option -r 
+(recompile) associée à -p, exécute {\tt make clean} puis {\tt make 
+production-depend} avant l'exécution du {\tt make}~; c'est l'option qui 
+permet l'installation initiale ou la recompilation totale.
+
+Le recalcul des dépendances dérivées automatiquement dans chaque Makefile
+est indispensable quand on installe {\tt pips} sur un nouveau système dont la 
+structure de répertoires est à peu près toujours différente parce que les
+dépendances sont exprimées avec des noms de fichiers absolus. La 
+destruction des fichiers dérivés est indispensable en cas de changement 
+d'option de compilation (par exemple, un essai {\tt -O3} pour ameliorer les 
+temps d'exécution ou {\tt -p} pour faire du profiling).
+
+\item {\tt recompile-pips}~: cette commande est obsolète. Elle est remplacée
+par l'une des options de la commande précédente, {\tt make-pips -r}.
+
+\end{itemize}
+
+\end{itemize}
+
+\subsection{Changement de la bibliothèque d'allocation dynamique}
+
+Les erreurs les plus difficiles à trouver sont généralement des
+erreurs d'allocation dynamique d'espace mémoire. La zone allouée
+peut être utilisée apres avoir été libérée ({\em dangling pointer}).
+Une zone supérieure à la zone allouée a pu être utilisée (copie
+d'une chaine de caractères trop longue).
+
+Un premier niveau de vérification est possible en utilisant un
+ensemble de primitives de debug SUN ({man malloc.h}) et en linkant
+les programmes avec \verb+/usr/lib/debug/malloc.o+. La modification
+est à effectuer dans \verb+pipsrc.ref+ ou dans l'environnement courant
+(sans garantie quant aux possibles {\em undef} trouvés par l'éditeur
+de lien).
+
+Un deuxième niveau, beaucoup plus efficace mais aussi beaucoup plus lent,
+est offert par une bibliothèque du domaine public, \verb+malloclib-pl11+.
+Cette bibliothèque réécrit systématiquement un motif spécial dans
+les zones libérées et vérifie que les opérations sur les chaînes
+de caractères sont valides. Elle permet aussi de savoir dans quelle
+procédure de quel fichier les allocations (et les libérations) ont été
+effectués.
+
+Pour la mettre en oeuvre efficacement, il faut que tous les fichiers
+sources utilisant des fonctions de ce type incluent \verb+malloc.h+ avec
+des double quotes (et non des crochets).  Ceci est obtenu dans la
+plupart des cas parce que \verb+genC.h+, qui est indispensable pour
+Newgen, inclut \verb+malloc.h+. Il faut quand même penser à des
+fichiers n'effectuant que des manipulations de chaînes de caractères
+et qui n'ont, a priori, pas besoin d'include
+\verb+malloc.h+.
+
+Puis il faut recompiler l'ensemble de PIPS (voir \verb+make-pips+) et
+des bibliothèques contenues dans
+\verb+Externals+, après avoir fait un renommage ({\tt mv}) de
+\verb+dbmalloc.h+ en \verb+malloc.h+ dans \verb+External+ et dans les
+répertoires contenant les sources des bibliothèques externes (\verb+Newgen+
+et \verb+C3/Linear+). Avant de faire des éditions de liens, il faut avoir
+modifié la variable \verb+PIPS_LIBS+ dans l'environnement courant ou
+dans \verb+pipsrc.ref+ (et exécuté dans ce deuxième cas un
+\verb+Pips/make+) pour inclure la bonne bibliothèque.
+
+Il est
+conseillé de conserver une version de \verb+pips+ linké avec une
+bibliothèque raisaonnablement rapide de manière à pouvoir créer
+des bases de données de bonne taille pour les tests. 
+Pour éviter d'avoir trop de choses à recompiler chaque fois, il
+est aussi conseiller de modifier les variables shell \verb+$BINDIR+ et 
+\verb+$LIBDIR+ pour conserver en parallèle
+les versions compilees et linkees avec et sans bibliothèque de mise au
+point.
+
+\subsection{Variables globales, modifications}
+
+A éviter ou a documenter soigneusement, surtout quand on ajoute des
+variables globales au risque de perturber les programmes déjà
+existants.
+
+Si on a besoin de nouvelles fonctionalités, il vaut mieux essayer de ne
+pas modifier le module existant mais d'en ajouter un nouveau avec un
+autre nom.
+
+Pour les variables globales, il faut penser à procurer une routine
+d'initialisation, une routine d'acces et une routine de remise en
+veille.  Il ne faut pas oublier que plusieurs requêtes peuvent avoir à
+être traitées sous \verb+wpips+ ou \verb+tpips+ alors que les tests se
+font avec \verb+build+, qui a un fonctionnement batch beaucoup plus simple.
+
+\section{Organisation d'une passe}
+
+Les fichiers sources de la passe p se trouve dans le répertoire
+{Development/Passes/p}. Une passe, pas opposition à une bibliothèque,
+correspond à un fichier exécutable, visible par les utilisateurs.
+
+Un fichier config.makefile doit être créé dans ce même répertoire;
+il doit être mis à jour avec les noms des fichiers sources de la
+passe.
+
+Le fichier config.makefile permet à la commande {\tt pips-makemake -p}
+de créer automatiquement un fichier Makefile aux normes Pips (les
+normes Pips sont tout à fait stables ...). Ce fichier Makefile contient
+notamment une entrée install pour installer la passe dans la partie
+production.
+
+
+Les bibliothèques utilisées pour fabriquer la passe sont recherchées
+dans les répertoires {\tt Production/Libs} et {\tt Externals}. Les
+headers correspondants sont recherchées dans les répertoires {\tt
+Production/Include} et {\tt Externals}.
+
+Pour une réutilisation optimum du code, il est conseillé de limiter le
+développement de code au niveau des passes à ce qui leur est
+spécifique. Tout le reste doit être dans les bibliothèques (cf.
+top-level).
+
+Au niveau d'une bibliothèque, il est possible de créer un exécutable
+avec \verb+make test+ (cf. section Makefile).
+
+Si une passe et une bibliothèque sont développées simultanément,
+{\tt misc.a} et {\tt parallelize} par exemple, il va être nécessaire de
+rechercher misc.h et libmisc.a non plus dans {\tt
+Production/Libs/misc} mais dans le répertoire {\tt
+Development/Libs/misc}. Ceci peut être fait un peu de frais en
+modifiant le config.makefile et en désignant directement les bibliothèques
+qu'il faut utiliser:
+\begin{verbatim}
+...
+# List of libraries used to build the target
+TARGET_LIBS=    -lprivatize -lusedef -lprettyprint -lsemantics -ltransformer \
+                 -lcontrol -leffects -lnormalize \
+                -lsc -lcontrainte -lvecteur -larithmetique \
+                -lri-util ../../Libs/libmisc.a \
+                -lproperties -lgenC /usr/lib/debug/malloc.o \
+                -lproperties
+
+$(TARGET): ../Lib/misc/misc.a
+\end{verbatim}
+
+\section{Conventions}
+
+Les bibliothèques ont un nom de la forme \verb|libXXX.a|
+où \verb|XXX| est le nom
+logique de la bibliothèque: {\tt prettyprint, vecteur, {misc},} etc.
+
+Il est théoriquement inutile de mettre les bibliothèques dans les
+dépendances des makefiles car les headers générés automatiquement
+sont dans les dépendances et ces fichiers sont systématiquement
+modifiés chaque fois qu'une nouvelle installation est faite. \,Ca ne
+marche cependant pas au niveau 2: si la passe {\tt p} appelle la
+bibliothèque {\tt a} qui a besoin de la bibliothèque {\tt b} et que la
+passe {\tt p} n'a pas besoin directement de cette deuxième bilbiothèque,
+les modifications de {\tt b} ne provoqueront pas de relinkage de la
+passe {\tt p}.
+
+Chaque bibliothèque importante utilise une variable d'environnement
+appelée \verb+XXX_DEBUG_LEVEL+ pour contrôler l'émission de messages
+de mise au point. \verb+XXX+ est le nom de la bibliothèque. Un niveau
+de 0 correspond au fonctionnement normal. Le niveau le plus élevé
+normal est 8. 
+
+Il faut faire attention au placement dans le code C des appels
+\verb+debug_on()+ \verb+debug_off()+ pour que la pile des niveaux de
+debug soit correctement maintenue. Il ne faut pas non plus activer
+inintentionnellement le debug d'une bibliotheque quand on appelle une
+fonction d'une autre bibliothèque.
+
+Il existe une exception à cette règle de nommage:
+\verb+PARSER_DEBUG_LEVEL+ est le nom de la variable associée à la
+bibliothèque \verb+syntax+.
+
+\section{Correction et détection de bugs}
+
+\subsection{Détection d'un bug}
+
+Lorsqu'un bug a été détecté, il faut trouver un petit exemple
+fortran simple réalisant ce bug. Soit bug.f cet exemple.
+
+Si on arrive à déterminer que la bibliothèque xxx est responsable de
+l'apparition de ce bug, à l'aide de \verb+XXX_DEBUG_LEVEL+ et ou d'un
+debugger, installer bug.f dans ~/Tests/Bugs/xxx/.
+
+Enregistrer ce nouveau  bug dans pips-bugs.f.tex.
+
+\subsection{Correction de bug}
+
+Se placer sous ~/Tests/Bugs/xxx/ et, afin d'utiliser le pips en développement associé à la bibliothèque
+xxx, créer un lien symbolique avec lui. Voici les différentes opérations à effectuer :
+
+Trouver et corriger les sources de la bibliothèque responsables du bug.
+On suppose dans la suite que ces corrections ne touchent qu'une
+bibliothèque ; le cas de plusieurs bibliothèques impliquées est
+traité plus bas.
+
+Lancer \verb+make test+ sous /Development/Lib/xxx.
+Revenir sous /Tests/Bugs/xxx et lancer :
+\begin{verbatim}
+Init -f bug.f bug
+Display -m -v bug
+\end{verbatim}
+vérifier que la correction a éliminé le bug.
+
+Dans la suite, nous nous placerons dans la bibliothèque en
+developpement : ~/Development/Lib/xxx/.
+
+Lancer \verb+Validate xxx+ pour vérifier la cohérence de la
+bibliothèque xxx avec notre correction.
+Lancer (théoriquement...) \verb+Validate Pips+.
+Lancer \verb+make install+, afin de compiler les différentes sources et
+de les passer dans la nouvelle version en production. Attention :
+actuellement (07.09.92), cette commande ne produit pas une nouvelle
+version de pips dans production !
+
+Une fois ces opérations effectuées, il s'agit de rajouter le programme
+bug.f, le test qui porte dessus, ainsi que les résultats obtenus, dans
+/Tests/Validation/xxx/ afin de se créer une bibliothèque de validation
+pour les futurs changements dans xxx.
+Pour cela, la commande \verb+bug-to-validate bug.f+ est couramment
+utilisée. Cette commande effectue les transferts ci-dessus mentionnés
+depuis le repertoire Tests/Bugs/xxx/ vers Tests/Validation/xxx.
+Attention : \verb+bug-to-validate+ est un script-shell (dans
+~/Utilities) qui fournit une simple parallélisation de bug.f (voir
+paragraphe suivant) ! 
+Pour effectuer le transfert dans Validation d'un répertoire entier qui a
+été testé, lancer \verb+dir-to-validate+. Cette commande peut être très
+pratique dans le cas d'utilisation de fichiers tests par défaut : voir
+la partie sur \verb+default_test+ dans << Le repertoire Validation >>.
+
+Il faut alors, officiellement, relier le nouveau pips dans
+Production/Src/Passes/pips. En fait, on fait une installation
+périodique de Development/Passes/pips en Production en le supposant stable.
+
+Remarque : dans le cas où la correction du bug porte atteinte à
+plusieurs bibliothèques, avant toute opération, il faudra :
+se placer sur xxx1 et lui lier toutes les bibliothèques concernées
+xxxi. Sans oublier finalement d'appliquer \verb+make install+ à toutes
+ces bibliothèques.
+
+\subsection{Le répertoire Validation}
+
+On peut y trouver \verb+bug.test, bug.f+ ainsi que le sous répertoire
+\verb+bug.result+ ; ces deux derniers provenants de
+\verb+bug-to-validate bug.f+, comme vu précedemment.
+Le sous-repertoire contiendra les résultats d'une simple
+parallélisation (Display -v -m bug). 
+Si l'on souhaite d'autres types de résultats, il s'agira de se créer
+un script-shell à l'instar de \verb+bug-to-validate+, afin de
+transférer les fichiers adéquats dans Validation/xxx/.
+Puis ensuite de créer bug.test (comprenant toutes les opérations
+pips effectuées : voir les /Validation/xxx/*.test), afin d'indiquer à
+\verb+Validate+ le test correct à effectuer.
+Si le test est commun à tout un repertoire (ex : /Validation/Flint), il faut
+creer dans ce repertoire le fichier générique \verb+default_test+. Dans ce
+fichier, à l'image de bug.test, les noms génériques désignant les
+programmes concernés sont : \verb+tested_file+ et \verb+TESTED_FILE+. Voici par
+exemple le \verb+default_test+ de \verb+Validation/Flint+ :
+
+\begin{verbatim}
+#!/bin/sh
+Init -d -f $PIPSDIR/Tests/Validation/Flint/tested_file.f tested_file 2>/dev/null >/dev/null
+Perform -m tested_file flinter 2>/dev/null 
+cat tested_file.database/TESTED_FILE.flinted 
+Delete tested_file 2>/dev/null
+\end{verbatim}
+
+Il est à noter qu'un test local au fichier (bug.test) sera éxécuté
+prioritairement à ce test par défaut : la prioritée va du local au
+général.
+
+\subsection{Autre validation}
+
+Une commande \verb+Validate+ permet de mesurer l'impact de modifications
+par rapport au comportement précédent de PIPS.
+
+To use it to check the parallelization process, put your test file, say
+mytest.f which contains the main program MAIN and a subroutine SUB, into
+one of the directories in
+\verb+~pips/Pips/Tests/Validation+ directory. You can also create your own
+directory there if you want to ensure that a particular aspect of PIPS
+behaves the correct way.
+
+Once mytest.f is in such a directory, say kludge, you should do the
+following thing.
+
+\begin{verbatim}
+Validation/kludge: Init -f mytest.f mytest
+Validation/kludge: mkdir mytest.result
+Validation/kludge: Display -m main > mytest.result/MAIN
+Validation/kludge: Display -m sub > mytest.result/SUB
+Validation/kludge: Delete mytest
+\end{verbatim}
+
+Check that the output in the MODULE1, MODULE2, ... files is what you
+want ... and that's it!
+
+After a while, if you want to check that PIPS still does that it was
+supposed to do, go into Validation and type
+
+\begin{verbatim}
+Validate kludge
+\end{verbatim}
+
+If there is any problem, you will get a mail message that tells you want
+the problem is. You can also type
+
+        Validate
+
+to check everything.
+
+\begin{itemize}
+  \item \verb+Validate+ sans argument valide les répertoires qui se trouvent
+  dans le fichier Validation/defaults.
+
+  \item Quand on valide un sous-directory de Validation, si pour le programme
+  foo.f existe un fichier foo.test, celui est executé et son output est
+  comparé à foo.result/test (qui doit avoir etre créé au prealable).
+  Ceci permet de faire d'autres tests que de simplement regarder que les
+  versions paralleles de chaque module sont correctes.
+\end{itemize}
+
+Voir l'exemple de Bruno dans \verb+Validation/DemoStd+.
+
+\subsection{Mise au point en général}
+
+Un certain nombre d'informations sont contenues dans ce qui précède.
+
+\subsubsection{Édition de liens locales}
+
+Il est possible de compiler "pips" et "wpips" avec les bibliothèques
+du répertoire courant.
+
+Pour se faire le "Makefilë de PIPS contient les règles "test" et
+"wtest" dont l'effet est de récupérer les morceaux nécessaire à la
+confection de "pips" et "wpips" localement.
+
+Attention ensuite de vérifier que c'est bien la version locale du
+programme qu'on est en train de faire tourner...
+
+\section{Sauvegardes et Restauration}
+
+Le système de sauvegardes des automatiques informations calculées au
+cours des exécutions de pips crée de nombreux fichiers et
+sous-repertoires. Les phases en cours de mise au point conduisent
+parfois à la création de gros fichiers {\tt core}. Il faut donc faire
+le ménage de temps à autre pour récupérer de l'espace disque.
+Plusieurs procédures sont disponibles dans \verb+~pips+: \verb+clean+,
+\verb+clean-before-backup+ et \verb+clean-before-tar+.
+
+Le sauvegardes générales sont effectuées les mardi et vendredi comme
+pour les autres partitions du système à l'aide de \verb+/etc/dump+.
+Les fichiers peuvent être restaurés à l'aide de \verb+/etc/restore+.
+
+
+\newpage
+
+% Cross-references for points and keywords
+
+\input{dret146.ind}
+
+\end{document}
+\end

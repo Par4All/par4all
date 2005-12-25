@@ -1,0 +1,116 @@
+\documentclass[12pt]{article}
+
+\usepackage[latin1]{inputenc}
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+
+% pour importer des structures de données Newgen
+\newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{\em #2}}
+
+\newcommand{\titre}{PROJET PIPS \\
+		LISTING DU MODULE GENERATEUR
+}
+
+\newcommand{\auteur}{
+        	François IRIGOIN \\
+        	Pierre JOUVELOT \\
+\vspace{0.5cm}
+{\it Le présent document a été établi en exécution du contrat
+No.~88.017.01 passé par la Direction des Recherches, Etudes et
+Techniques (Délégation Générale pour l'Armement)}
+}
+\newcommand{\docdate}{Décembre 1990}
+\newcommand{\numero}{E142}
+
+\begin{document}
+\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+
+{\it Le présent document a été établi en exécution du contrat
+No.~88.017.01 passé par la Direction des Recherches, Etudes et
+Techniques (Délégation Générale pour l'Armement)}
+
+\vspace{2cm}
+
+\tableofcontents
+
+\newpage
+
+\section*{Introduction}
+
+Le langage de sortie initialement prévu était Fortran-8X qui a
+finalement vu le jour sous forme d'une norme Fortran~90 en janvier de la
+même année.
+
+Le générateur de programme parallèle est une partie extrêmement
+limitée du projet, comme en témoigne l'épaisseur de ce rapport qui
+contient les listings correspondants, à l'exception d'une partie des
+routines d'impressions qui font partie de la bibliothéque liée à la
+représentation interne. Un fichier de 200 lignes, {\em fortran90.c}, y
+traite les problèmes spécifiques à la génération de code Fortran~90.
+
+Suivant le choix de l'utilisateur, le code est généré uniquement avec
+des DO parallèles de type MIMD ({\em DOALL}) ou avec une combinaison de
+tels boucles DO et d'instructions vectorielles. Les instructions et
+expressions vectorielles ont l'avantage de diminuer la taille du
+programme ce qui en augmente potentiellement la lisibilite, surtout
+après une distribution de boucle. Malheureusement, la syntaxe de
+Fortran~90 produit des instructions assez difficiles à lire.
+
+Au vu des machines disponibles et des résultats obtenus durant des deux
+dernières années, il est apparu inutile d'implémenter des boucles
+parallèles avec synchronisations. De même les instructions de
+mouvement de données dépendent extrêmement fortement de la machine
+cible. Elles ne peuvent en aucun cas apporter du parallélisme ou être
+génériques. Elles sont donc apparus sans objets dans le cadre du
+contrat PIPS.
+
+Il est aussi possible d'adjoindre au texte du programme généré des
+commentaires contenant une forme lisible de certaines des informations
+calculées lors des phases d'analyse.
+
+Les deux bibliothèques qui suivent contiennent l'une, {\em
+prettyprint}, la routine de pilotage générique de génération de
+programme, et l'autre, {\em text-util}, la bibliothèque de base
+associée à la structure de données {\em text} qui est utilisée comme
+intermédiaire pour passer de la représentation interne ({\em ri}) à
+une représentation ASCII.
+
+Enfin, notons que les listings relatifs aux transformations de
+programmes ont été joints au rapport concernant la détection du
+parallélisme vu la relation étroite qui existe entre dépendance,
+transformation et parallélisation. La parallélisation peut d'ailleurs
+être vue comme une transformation de programme. Ceci explique aussi
+pourquoi ce rapport n'est pas plus épais.
+
+\section{Bibliothèque {\em Prettyprint}}
+
+La bibliothèque {\em prettyprint} contient les routines d'impression du
+code initial et du code parallélisée. Ces routines sont très courtes
+parce qu'elles ne servent que d'interface avec {\em pipsmake} et les
+toplevels et parce qu'elles font tout de suite appels à des routines se
+trouvant dans les bibliothèques associées aux objets à imprimer,
+c'est-à-dire essentiellement à la bibliothèque {\em ri-util}.
+
+\input{prettyprint.listing}
+
+\section{Structure de données {\em Text}}
+
+La structure de données {text} est extrêmement simple. Elle respecte
+la forme des structures arborescentes qui résident en mémoire mais
+elle en supprime toute information sèmantique. Elle est
+déclarée par l'intermédiaire de NewGen pour des raisons d'uniformité.
+Sa compréhension n'est pas importante pour arriver à dominer
+l'ensemble du projet PIPS.
+
+\input{text.datastructure}
+
+\section{Bibliothèque {\em Text-util}}
+
+La bibliothéque {\em text-util}, comme toutes les bibliothèques
+suffixée par {\em -util}, est associée à la structure de données
+NewGen correspondante, {\em text}. Elle contient les routines permettant
+de manipuler cette structure de données et de la convertir en un
+fichier ASCII, contenant réellement du texte.
+
+\input{text-util.listing}
+
+\end{document}

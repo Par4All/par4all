@@ -1,0 +1,894 @@
+\documentclass[12pt]{article}
+
+\usepackage[latin1]{inputenc}
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+
+% pour importer des structures de données Newgen
+\newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{\em #2}}
+
+\newcommand{\titre}{PROJET PIPS \\
+	RESULTAT DE LA PARALLELISATION \\
+		INTERPROCEDURALE
+}
+
+\newcommand{\auteur}{
+        	François IRIGOIN
+}
+\newcommand{\docdate}{Mars 1991}
+\newcommand{\numero}{E151}
+
+\begin{document}
+\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+
+\tableofcontents
+
+\newpage
+
+\section{Introduction}
+
+Quatre programmes de calculs numériques, représentant diverses
+méthodes de résolution, ont été fournis par l'ONERA pour le projet
+PIPS afin d'en évaluer les résultats. Ces quatre programmes ont pour
+nom {\tt tmines}, {\tt aile}, {\tt oa118} et {\tt cr2cnf}.
+
+Nous nous intéressons uniquement ici aux résultats obtenus en matière
+de parallélisation interprocédurale, qui était un des points
+novateurs du projet PIPS.
+
+\section{Programme {\tt tmines}}
+
+Le programme {\tt tmines} a été analysé manuellement en détail. Il ne
+contient pas de parallélisme interprocédural.
+
+\section{Programme {\tt aile}}
+
+Le programme {\tt aile} comporte environ 3000 lignes de Fortran. Trois
+procédures comportent des appels dans des corps de boucle susceptibles
+d'être parallélisés: {\tt norm} qui appelle {\tt pvn} (calcul de
+produit vectoriel tridimensionnel), {\tt extr} qui appelle la
+fonction {\tt d} (calcul de distance tridimensionnelle) et le programme
+principal {\tt aile} qui fait appel à {\tt clcoupk}.
+
+Aucune de ces deux routines ne contient de boucle DO. Elles ne peuvent
+donc pas représenter une partie importante du temps d'exécution globale.
+Mais il faut néanmoins être capable de paralléliser les boucles
+qui les contiennent.
+
+\subsection{Traitement de la procédure {\tt norm}}
+
+Pour faciliter l'étude de ce cas, les instructions de branchement ont
+été éliminées manuellement et systématiquement remplacées par des
+blocs IF. Ceci a été facile car le code initial est parfaitement
+structuré. Un utilitaire de structuration automatique comme {\em
+struct} aurait pu effectuer cette conversion.
+
+La procédure {\tt norm} contient trois appels à {\tt pvn}. Deux
+d'entre eux se trouvent dans une boucle 200 de niveau 1 assez complexe 
+qui a peu de chance d'être parallèle, indépendamment de ces
+deux appels. 
+
+Le troisième appel se trouve placé au sein d'une paire de boucles 300.
+Il devrait être parallélisé mais trois tableaux temporaires {\tt TI},
+{\tt TJ} and {\tt TK} créent une {\em output dependence}. L'algorithme
+de privatisation utilisé ne fonctionne que pour des scalaires.
+
+\begin{verbatim}
+         ...
+         DO 300 K = K1,K2,1                                          
+            DO 300 J = J1,JA,1                                       
+               DO 310 L = 1,3,1                                      
+                  TJ(L) = (T((J+1),K,((NI+L)-1))-T((J-1),K,((NI+L)-1)))
+                  TK(L) = (T(J,(K+1),((NI+L)-1))-T(J,(K-1),((NI+L)-1)))
+310            CONTINUE                                 
+               CALL PVN(TJ, TK, TI)                     
+               T(J,K,NN) = (S*TI(1))                    
+               T(J,K,(NN+1)) = (S*TI(2))                
+               T(J,K,(NN+2)) = (S*TI(3))                
+300      CONTINUE
+         ...
+\end{verbatim}
+
+La boucle 200 mentionnée auparavant nécessite aussi l'expansion ou la
+privatisation de ces trois mêmes tableaux.
+
+\subsection{Traitement de la procédure {\tt extr}}
+
+La procédure {\tt extr} est assez courte pour être reproduite
+intégralement ici après privatisation:
+
+\begin{verbatim}
+      SUBROUTINE EXTR(NI,NC)
+C********************************************************
+C     CALCULE LES COEFFICIENTS D EXTRAPOLATION
+C     SUR LA SURFACE DE L AILE  (K=K1)
+C********************************************************
+      DIMENSION T(52,21,60)
+      COMMON/CT/T
+      COMMON/CI/I1,I2,IMAX,I1P1,I1P2,I2M1,I2M2,IBF
+      COMMON/CJ/J1,J2,JMAX,J1P1,J1P2,J2M1,J2M2,JA,JB,JAM1,JBP1
+      COMMON/CK/K1,K2,KMAX,K1P1,K1P2,K2M1,K2M2
+      COMMON/CNI/L
+      L = NI                                             
+      K = K1                                             
+      DO 300 J = J1,JA,1                                 
+         PRIVATE J,JH,S3,S2,S1
+         S1 = D(J, K, J, (K+1))                          
+         S2 = (D(J, (K+1), J, (K+2))+S1)                 
+         S3 = (D(J, (K+2), J, (K+3))+S2)                 
+         T(J,1,(NC+3)) = ((S2*S3)/((S1-S2)*(S1-S3)))     
+         T(J,1,(NC+4)) = ((S3*S1)/((S2-S3)*(S2-S1)))     
+         T(J,1,(NC+5)) = ((S1*S2)/((S3-S1)*(S3-S2)))     
+         JH = ((J1+J2)-J)                                
+         T(JH,1,(NC+3)) = T(J,1,(NC+3))                  
+         T(JH,1,(NC+4)) = T(J,1,(NC+4))                  
+         T(JH,1,(NC+5)) = T(J,1,(NC+5))                  
+300      CONTINUE                                        
+      RETURN
+      END
+\end{verbatim}
+La parallélisation de la boucle 300 nécessite la preuve que les intervalles
+des valeurs prises par les variables {\tt J} et {\tt JH} ont une
+intersection vide.
+
+
+L'initialisation des variables clés, {\tt J1}, {\tt J2} et {\tt JA},
+est effectuée par une instruction READ dans le programme principal,
+probablement afin d'effectuer une allocation dynamique:
+
+\begin{verbatim}
+      ...
+      READ(NXYZ) TITXYZ
+      READ(NXYZ) I1,I2,J1,JA,K1,K2
+      REWIND NXYZ
+C
+      N4=4
+      J1=J1+1
+      J2=2*JA+1
+      JA=JA+1
+      ...
+\end{verbatim}
+
+A supposer qu'une analyse sémantique interprocédurale poussée soit
+effectuée, on obtient les équations suivantes (attention à
+l'incrémentation de {\tt JA} qui suit l'affectation de {\tt J2}):
+\[
+J1 \leq J \leq JA
+\]
+\[
+JH = J1 + J2 - J
+\]
+\[
+J2 = 2 JA - 1
+\]
+En remplaçant $J2$ par sa valeur:
+\[
+JH = J1 + 2 JA - 1 -J
+\]
+puis en utilisant la borne supérieure sur $J$, on obtient une inégalité
+entre $JH$ et $J$:
+\[
+JH \geq J1 + J - 1
+\]
+Malheureusement, cette inégalité ne permet pas de conclure. Il faudrait
+aussi avoir l'information:
+\[
+J1 >= 2
+\]
+qui est très vraisemblable puisque {\tt J1} est incrémenté de un
+initialement et que l'utilisateur donne probablement des dimensions
+strictement positives.
+
+L'analyse sémantique se révèle ici impuissante. Il aurait fallu avoir
+connaissance des contraintes implicites respectées par l'utilisateur
+quand il crée son fichier de données.
+
+La valeur de {\tt JH} par rapport à {\tt J1} et {\tt JA} est critique
+dans l'ensemble du programme {\tt aile}. On retrouve le même test pour
+les boucles 700 et 710 de {\tt extr} et pour {\tt clcoupk}. Les listings
+FPP de Cray montrent que la parallélisation de ces boucles est
+envisagées mais abandonnées en attence de directives de
+parallélisation explicite. C'est donc l'ensemble du processus de
+parallélisation et non seulement la parallélisation interprocédurale
+qui profiterait de l'analyse sémantique.
+
+\section{Programme {\tt oa118}}
+
+Le programme {\tt oa118} contient trois routines susceptibles
+de contenir une boucle parallèle avec appel de procédure: {\tt pmat},
+{\tt grad1} et le programme principal lui-même, {\tt oa118}.
+
+\subsection{Analyse du module {\tt pmat}}
+
+La procédure {\tt pmat} est très simple puisqu'elle effectue un
+produit matrice x vecteur à l'aide d'une procédure calculant
+un produit scalaire, {\tt sdot}.
+
+Voici le code parallélisé de {\tt pmat}:
+\begin{verbatim}
+      SUBROUTINE PMAT(V,W)
+C
+      PARAMETER(NFAC=49)
+      COMMON/OACOF/AA(NFAC,NFAC)
+      DIMENSION V(1),W(1),C(NFAC)
+C
+      DO 10 I = 1,NFAC,1
+         PRIVATE I
+         DOALL 20 J = 1,NFAC,1
+            PRIVATE J
+20          C(J) = AA(I,J)
+         W(I) = SDOT(NFAC, C, 1, V, 1)
+1O    CONTINUE
+      RETURN
+      END
+\end{verbatim}
+ainsi que le code séquentiel de {\tt sdot}:
+\begin{verbatim}
+      FUNCTION SDOT(N,X,INCX,Y,INCY)
+      REAL*4 X(1),Y(1),SDOT
+      SDOT = 0.0           
+      IX = 1               
+      IY = 1               
+      DO 10 I = 1,N,1      
+         SDOT = (SDOT+(X(IX)*Y(IY)))
+         IX = (IX+INCX)             
+         IY = (IY+INCY)             
+10       CONTINUE                   
+      ENDDO
+      RETURN
+      END
+\end{verbatim}
+
+L'appel à {\tt sdot} ne pose pas de problème de parallélisation puisqu'il
+s'agit d'une fonction pure comme le trouve PIPS. Voici les effets
+cumulés trouvés automatiquement:
+\begin{verbatim}
+C		< MAY BE READ   >: Y X INCX INCY
+C		<MUST BE READ   >: N
+       FUNCTION SDOT(N,X,INCX,Y,INCY)
+\end{verbatim}
+
+Il s'agit donc encore une fois d'un problème de parallélisation
+intraprocédural dans {\tt pmat}. Le vecteur {\tt C} est utilisé pour
+stocker une par une les lignes de la matrice {\tt AA}. Pour
+paralléliser la boucle 10 sur I, il faudrait être capable d'expanser
+ou de privatiser {\tt C} ce que ne sait pas faire PIPS.
+
+Une autre approche consisterait à profiter de l'incrément {\tt INCX} passé
+en argument à {\tt sdot}. En lui donnant la valeur {\tt NFAC} et en
+passant {\tt AA} directement, on peut faire l'économie de la transposition
+implicitement effectuée par le biais de {\tt C}. Le passage d'argument
+{\tt AA}/{\tt X} déclenche un message d'avertissement {\em bad reshaping}
+mais le code généré est maintenant parallèle:
+\begin{verbatim}
+C     MODIFIED EXCERPT OF OA118
+C     
+      SUBROUTINE PMAT(V,W)
+C     
+      PARAMETER(NFAC=49)
+      COMMON/OACOF/AA(NFAC,NFAC)
+      DIMENSION V(1),W(1)
+C     
+      DOALL 10 I = 1,NFAC,1
+         PRIVATE I
+         W(I) = SDOT(NFAC, AA(I,1), NFAC, V, 1) 
+      ENDDO
+      RETURN
+      END
+\end{verbatim}
+
+\subsection{Analyse du module {\tt grad1}}
+
+Le module {\tt grad1} est formé de 60 lignes de Fortran. Le coeur de
+l'algorithme est une boucle while, réalisée par l'instruction {\tt DO 2}
+et par le test {\tt IF(RR.LT.RRM)GO TO 11}. Ce {\tt DO} avec {\tt exit}
+est transformé en un {\tt while} implicite par la phase de construction
+du graphe de contrôle hiérarchique.
+
+A l'intérieur du corps de cette boucle, la zone intéressante pour
+le parallélisme interprocédural est la suivante:
+\begin{verbatim}
+      DO 3 II = 1,IPQ,1                        
+         DO 4 I = 1,NFAC,1                     
+4           Y(I) = S(I,II)                     
+         DO 5 JJ = II,IPQ,1                    
+            DO 6 I = 1,NFAC,1                  
+               PRIVATE I
+6              Z(I) = S(I,JJ)                  
+            A(II,JJ) = SDOT(NFAC, Y, 1, Z, 1)  
+5           A(JJ,II) = A(II,JJ)                
+         DO 7 I = 1,NFAC,1                     
+7           Z(I) = R(I,IPP0)                   
+3        RS(II) = SDOT(NFAC, Y, 1, Z, 1)       
+\end{verbatim}
+
+La version parallèle produite par PIPS ne contient pas de parallélisme
+interprocédural:
+\begin{verbatim}
+      DO 3 II = 1,IPQ,1
+         DOALL 4 I = 1,NFAC,1
+            PRIVATE I
+4           Y(I) = S(I,II)                                             
+         ENDDO
+         DO 5 JJ = II,IPQ,1
+            DOALL 6 I = 1,NFAC,1
+               PRIVATE I
+6              Z(I) = S(I,JJ)                                          
+            ENDDO
+            A(II,JJ) = SDOT(NFAC, Y, 1, Z, 1)                          
+         ENDDO
+         DO 5 JJ = II,IPQ,1
+5           A(JJ,II) = A(II,JJ)                                        
+         ENDDO
+         DOALL 7 I = 1,NFAC,1
+            PRIVATE I
+7           Z(I) = R(I,IPP0)                                           
+3        RS(II) = SDOT(NFAC, Y, 1, Z, 1)                               
+\end{verbatim}
+Seules les boucles triviales qui servent à effectuer des copies
+sont parallélisées. La recopie dans la sous-colonne {\tt A(II:IPQ,II)}
+de la sous-ligne {\tt A(II,II:IPQ)} est distribuée. Elle n'est pas
+parallèle parce que l'élément diagonal est inutilement recopié
+et que cette copie provoque une {\em output dependence}.
+
+Vu les spécifications du module {\tt sdot}, il est possible d'éliminer
+les multiples recopies que contient cette partie de code et de faire
+les appels à {\tt sdot} directement sur les tableaux {\tt S} et {\tt R}.
+Le code séquentiel devient:
+\begin{verbatim}
+      DO 3 II = 1,IPQ,1                        
+         DO 5 JJ = II,IPQ,1                    
+            A(II,JJ) = SDOT(NFAC, S(1,II), 1, S(1,JJ), 1)  
+5           A(JJ,II) = A(II,JJ)                
+3        RS(II) = SDOT(NFAC, S(1,II), 1, R(I,IPP0), 1)       
+\end{verbatim}
+et l'éditeur de liens détecte un {\em bad reshaping} entre {\tt S} et
+{\tt R} d'une part, et {\tt X} et {\tt Y} d'autre part, puisque les
+tableaux n'ont pas le même nombre de dimensions.
+
+La distribution de boucles produit l'effet attendu:
+\begin{verbatim}
+      DO 3 II = 1,IPQ,1
+         DO 5 JJ = II,IPQ,1
+            A(II,JJ) = SDOT(NFAC, S(1,II), 1, S(1,JJ), 1)               0028
+         ENDDO
+      ENDDO
+      DO 3 II = 1,IPQ,1
+         DO 5 JJ = II,IPQ,1
+5           A(JJ,II) = A(II,JJ)                                         0029
+         ENDDO
+      ENDDO
+      DO 3 II = 1,IPQ,1
+3        RS(II) = SDOT(NFAC, S(1,II), 1, R(1,IPP0), 1)                  0030
+      ENDDO
+\end{verbatim}
+
+Le calcul des effets des appels à {\tt sdot} ne pose pas de problème
+malgré le {\em bad reshaping} parce qu'il s'agit d'une fonction pure:
+\begin{verbatim}
+C		< MAY BE READ   >: II
+C		<MUST BE READ   >: IPQ
+C		<MUST BE WRITTEN>: II
+      DO 3 II = 1,IPQ,1
+C		< MAY BE READ   >: JJ
+C		<MUST BE READ   >: II IPQ
+C		<MUST BE WRITTEN>: JJ
+         DO 5 JJ = II,IPQ,1
+C		< MAY BE READ   >: S
+C		<MUST BE READ   >: II JJ
+C		<MUST BE WRITTEN>: A(II,JJ)
+            A(II,JJ) = SDOT(NFAC, S(1,II), 1, S(1,JJ), 1)
+         ENDDO
+      ENDDO
+C		< MAY BE READ   >: II
+C		<MUST BE READ   >: IPQ
+C		<MUST BE WRITTEN>: II
+      DO 3 II = 1,IPQ,1
+C		< MAY BE READ   >: JJ
+C		<MUST BE READ   >: II IPQ
+C		<MUST BE WRITTEN>: JJ
+         DO 5 JJ = II,IPQ,1
+C		<MUST BE READ   >: JJ II A(II,JJ)
+C		<MUST BE WRITTEN>: A(JJ,II)
+5           A(JJ,II) = A(II,JJ)                      
+         ENDDO
+      ENDDO
+C		< MAY BE READ   >: II
+C		<MUST BE READ   >: IPQ
+C		<MUST BE WRITTEN>: II
+      DO 3 II = 1,IPQ,1
+C		< MAY BE READ   >: S R
+C		<MUST BE READ   >: II
+C		<MUST BE WRITTEN>: RS(II)
+3        RS(II) = SDOT(NFAC, S(1,II), 1, R(1,IPP0), 1) 
+      ENDDO
+\end{verbatim}
+
+Par contre, la parallélisation n'est pas possible parce que les
+variables {\tt II} et {\tt JJ} ne sont pas privatisées:
+\begin{verbatim}
+      DO 3 II = 1,IPQ,1
+         DO 5 JJ = II,IPQ,1
+            A(II,JJ) = SDOT(NFAC, S(1,II), 1, S(1,JJ), 1)  
+         ENDDO
+      ENDDO
+      DO 3 II = 1,IPQ,1
+         DO 5 JJ = II,IPQ,1
+5           A(JJ,II) = A(II,JJ)                            
+         ENDDO
+      ENDDO
+      DO 3 II = 1,IPQ,1
+3        RS(II) = SDOT(NFAC, S(1,II), 1, R(1,IPP0), 1)     
+      ENDDO
+\end{verbatim}
+L'examen des effets de cette version de {\tt grad1} n'a pas permis de
+trouver l'origine de ce problème.
+
+Si on isole cette partie, c'est la distribution de boucle qui ne marche plus:
+\begin{verbatim}
+      DO 3 II = 1,IPQ,1
+         PRIVATE II
+         DOALL 5 JJ = II,IPQ,1
+            PRIVATE JJ
+            A(II,JJ) = SDOT(NFAC, S(1,II), 1, S(1,JJ), 1) 
+         ENDDO
+         DOALL 5 JJ = II,IPQ,1
+            PRIVATE JJ
+5           A(JJ,II) = A(II,JJ)                           
+         ENDDO
+      ENDDO
+      DOALL 3 II = 1,IPQ,1
+         PRIVATE II
+3        RS(II) = SDOT(NFAC, S(1,II), 1, R(1,IPP0), 1)     
+      ENDDO
+\end{verbatim}
+L'origine de ce comportement n'a pas encore été élucidé non plus.
+
+La complexité de {\tt solv3}, qui effectue la résolution d'un système
+linéaire, est du même ordre de grandeur que l'initialisation de la
+matrice symétrique {\tt A}: $O(n^3 )$. Il est donc important de détecter
+le parallélisme interprocédural.
+
+\subsection{Qualité du code de {\tt oa118}}
+
+Le programmeur ne semble pas maîtriser pleinement le langage FORTRAN.
+Ou bien il a essayé d'appliquer des optimisations manuelles qu'il n'a
+pas documentées.  De nombreuses recopies de tableaux, inutiles a
+priori, limitent la parallélisation parce que l'expansion et/ou la
+privatisation de tableaux ne sont pas effectuées.
+
+\subsection{Analyse du module {\tt oa118}}
+
+Le programme principal, 392 lignes de FORTRAN, contient les appels suivants:
+\begin{verbatim}
+OA118
+        OAMET           (94 lignes)
+        OAMAT1          (120 lignes)
+        GRAD1           (62 lignes)
+        do
+                PHWAK   (86 lignes)
+                GRAD1   (62 lignes)
+        enddo
+        SOLV            (25 lignes)
+        PHWPAN          (85 lignes)
+        GRAD1           (62 lignes)
+        do
+                OAVITEL (487 lignes)
+        enddo
+\end{verbatim}
+
+Il est trop complexe pour pouvoir être analysé sans connaissance
+de ses fonctionnalités.
+
+\subsection{Résultats obtenus avec {\tt oa118}}
+
+Ce programme contient potentiellement du parallelisme de trop haut
+niveau pour pouvoir être analysé syntaxiquement. Le parallélisme
+interprocédural de niveau moyen est bloqué par des {\em output
+dependence} qui sont dues à la manière inhabituelle, voir maladroite,
+dont le codage a été effectué.
+
+\section{Programme {\tt cr2cnf}}
+
+Le programme {\tt cr2cnf} est le plus riche de tous en boucles contenant
+des appels de procédures. Pas moins de cinq procédures, {\tt front},
+{\tt invfro}, {\tt zproax}, {\tt matelt} et {\tt mbtelt}, appellent neuf
+autres procédures ou fonctions, {\tt vmov}, {\tt descen}, {\tt nbdiag},
+{\tt choles}, {\tt invopt}, {\tt mxvadd}, {\tt mxv}, {\tt phi} et
+{\tt dphi}.
+
+\subsection{Analyse du module {\tt front}}
+
+Le module {\tt front} est si court qu'il est possible d'en donner le
+code complet:
+\begin{verbatim}
+      SUBROUTINE FRONT(A,B,N,NÇAF,C,Z) 
+      IMPLICIT REAL*8(A-H,O-Z)
+C  ROUTINE DE CALCUL DE LA DECOMPOSITION FRONTALE DE LA MATRICE
+C  TRIDIAGONALE PAR BLOCS DEFINIE PAR A(N,N,2) POUR LA SECTION COURANTE
+C  ET B(N,N) POUR LE DERNIER BLOC DIAGONAL .
+      DIMENSION A(N,N,3),B(N,N),AF(N,N,NC),C(N,N),Z(N,N)
+C  INVERSION DU PREMIER BLOC DIAGONAL . 
+      CALL CHOLES(A(1,1,1), N, AF(1,1,1), Z)                        
+C  COPIE DES BLOCS DIAGONAUX DE LA MATRICE AVANT DECOMPOSITION .
+      LA = (N*N)                                                    
+      DO 1 NNS = 2,(NC-1),1                                         
+1        CALL VMOV(LA, A(1,1,1), AF(1,1,NNS))                       
+      CALL VMOV(LA, B(1,1), AF(1,1,NC))                             
+C  CONTRACTION PUIS INVERSION DES BLOCS DIAGONAUX DE LA LA MATRICE
+C  SECTION PAR SECTION .
+      DO 2 NNS = 2,NC,1                                             
+         DO 3 J = 1,N,1                                             
+3           CALL DESCEN(AF(1,1,(NNS-1)), A(1,J,2), N, C(1,J))       
+         CALL NBDIAG(AF(1,1,NNS), C, AF(1,1,(NNS-1)), N)            
+         CALL CHOLES(AF(1,1,NNS), N, AF(1,1,NNS), Z)                
+2        CONTINUE                                                   
+      RETURN
+      END
+\end{verbatim}
+
+On remarque que le programmeur a profité de sa connaissance du stockage
+des matrices pour effectuer leurs copies à l'aide d'une routine de
+copie de vecteur, {\tt vmov}. Les matrices {\tt A} et {\tt AF} sont
+linéarisées et leur dimension résultante est {\tt LA = N * N}. Cette
+technique va provoquer un {\em bad reshaping} et PIPS va conclure que
+{\tt A} est sans doute lue et que {\tt AF} est sans doute écrite comme
+on le voit ci-dessous (les effets sur la mémoire des instructions sont
+indiqués en commentaire). La boucle 1 ne peut donc être trouvée
+parallèle.
+
+On peut se demander pourquoi il n'a pas éliminé cette boucle 1 en
+passant comme longueur {\tt LA*(NC-2)}.
+
+\begin{verbatim}
+      SUBROUTINE FRONT(A,B,N,NÇAF,C,Z) 
+      IMPLICIT REAL*8(A-H,O-Z)
+C  ROUTINE DE CALCUL DE LA DECOMPOSITION FRONTALE DE LA MATRICE
+C  TRIDIAGONALE PAR BLOCS DEFINIE PAR A(N,N,2) POUR LA SECTION COURANTE
+C  ET B(N,N) POUR LE DERNIER BLOC DIAGONAL .
+      DIMENSION A(N,N,3),B(N,N),AF(N,N,NC),C(N,N),Z(N,N)
+C  INVERSION DU PREMIER BLOC DIAGONAL . 
+C		< MAY BE READ   >: AF CHOLES:Z2 CHOLES:D
+C		< MAY BE WRITTEN>: AF CHOLES:Z2
+C		<MUST BE READ   >: A N CHOLES:Z1
+C		<MUST BE WRITTEN>: CHOLES:D CHOLES:Z1
+      CALL CHOLES(A(1,1,1), N, AF(1,1,1), Z)                    
+C		<MUST BE READ   >: N
+C		<MUST BE WRITTEN>: LA
+C  COPIE DES BLOCS DIAGONAUX DE LA MATRICE AVANT DECOMPOSITION .
+      LA = (N*N)                                                
+C		< MAY BE READ   >: NNS
+C		<MUST BE READ   >: NC
+C		<MUST BE WRITTEN>: NNS
+      DO 1 NNS = 2,(NC-1),1                                     
+C		< MAY BE READ   >: A
+C		< MAY BE WRITTEN>: AF
+C		<MUST BE READ   >: LA
+1        CALL VMOV(LA, A(1,1,1), AF(1,1,NNS))                   
+C		< MAY BE READ   >: B
+C		< MAY BE WRITTEN>: AF
+C		<MUST BE READ   >: LA
+      CALL VMOV(LA, B(1,1), AF(1,1,NC))                         
+C		< MAY BE READ   >: NNS
+C		<MUST BE READ   >: NC
+C		<MUST BE WRITTEN>: NNS
+C  CONTRACTION PUIS INVERSION DES BLOCS DIAGONAUX DE LA LA MATRICE
+C  SECTION PAR SECTION .
+      DO 2 NNS = 2,NC,1                                         
+C		< MAY BE READ   >: J
+C		<MUST BE READ   >: N
+C		<MUST BE WRITTEN>: J
+         DO 3 J = 1,N,1                                         
+C		< MAY BE READ   >: AF A((/I,I=1,N,1/),J,2) DESCEN:Y
+C		                   DESCEN:C
+C		< MAY BE WRITTEN>: C((/I,I=1,N,1/),J) DESCEN:C DESCEN:Y
+C		<MUST BE READ   >: N
+3           CALL DESCEN(AF(1,1,(NNS-1)), A(1,J,2), N, C(1,J))   
+C		< MAY BE READ   >: AF C NBDIAG:Z1 NBDIAG:Z2
+C		< MAY BE WRITTEN>: AF NBDIAG:Z2 NBDIAG:Z1
+C		<MUST BE READ   >: N
+         CALL NBDIAG(AF(1,1,NNS), C, AF(1,1,(NNS-1)), N)        
+C		< MAY BE READ   >: CHOLES:Z2 CHOLES:D
+C		< MAY BE WRITTEN>: AF CHOLES:Z2
+C		<MUST BE READ   >: AF N CHOLES:Z1
+C		<MUST BE WRITTEN>: CHOLES:D CHOLES:Z1
+         CALL CHOLES(AF(1,1,NNS), N, AF(1,1,NNS), Z)            
+2        CONTINUE                                               
+      RETURN
+      END
+\end{verbatim}
+
+Il est à noter que les tableaux arguments formels de {\tt vmov} sont
+déclarés:
+\begin{verbatim}
+DIMENSION X(*), Y(*)
+\end{verbatim}
+alors que l'information nécessaire était disponible pour raffiner
+ces déclarations sans nécessiter le calcul de régions:
+\begin{verbatim}
+DIMENSION X(LX), Y(LX)
+\end{verbatim}
+
+Le cas de la boucle 3 est aussi intéressant. On y remarque que les effets
+sur les tableaux {\tt A} et {\tt C} sont décrits avec suffisamment de
+finesse pour permettre la parallélisation de cette boucle. Cependant, la
+procédure {\tt descen} manipule localement deux tableaux statiques,
+{\tt C} et {\tt Y}, qui ont été alloués dans le common {\tt TOTO} (sic),
+avec des dimensions n'ayant rien a voir avec leur usage courant. Si on
+modifie manuellement {\tt descen} en déclarant {\tt C} et {\tt Y} comme
+locaux à la procédure, on obtient bien une boucle 3 parallèle:
+\begin{verbatim}
+C     EXCERPT FROM CR2CNF
+C
+C     SUBROUTINE DESCEN IS MODIFIED SO AS NOT TO USE THE /TOTO/ COMMON
+C     AND ITS VARIABLE C AND Y
+C
+C***********************************************************************
+      SUBROUTINE FRONT(A,B,N,NÇAF,C,Z) 
+      IMPLICIT REAL*8(A-H,O-Z)
+C  ROUTINE DE CALCUL DE LA DECOMPOSITION FRONTALE DE LA MATRICE
+C  TRIDIAGONALE PAR BLOCS DEFINIE PAR A(N,N,2) POUR LA SECTION COURANTE
+C  ET B(N,N) POUR LE DERNIER BLOC DIAGONAL .
+      DIMENSION A(N,N,3),B(N,N),AF(N,N,NC),C(N,N),Z(N,N)
+C  INVERSION DU PREMIER BLOC DIAGONAL . 
+      CALL CHOLES(A(1,1,1), N, AF(1,1,1), Z)                       
+C  COPIE DES BLOCS DIAGONAUX DE LA MATRICE AVANT DECOMPOSITION .
+      LA = (N*N)                                                   
+      DO 1 NNS = 2,(NC-1),1
+1        CALL VMOV(LA, A(1,1,1), AF(1,1,NNS))                      
+      CALL VMOV(LA, B(1,1), AF(1,1,NC))                            
+C  CONTRACTION PUIS INVERSION DES BLOCS DIAGONAUX DE LA LA MATRICE
+C  SECTION PAR SECTION .
+      DO 2 NNS = 2,NC,1
+         DOALL 3 J = 1,N,1
+3           CALL DESCEN(AF(1,1,(NNS-1)), A(1,J,2), N, C(1,J))      
+         CALL NBDIAG(AF(1,1,NNS), C, AF(1,1,(NNS-1)), N)           
+         CALL CHOLES(AF(1,1,NNS), N, AF(1,1,NNS), Z)               
+      RETURN
+      END
+\end{verbatim}
+
+La parallélisation de la boucle 2 est bloquée par plusieurs facteurs.
+Tout d'abord le tableau {\tt C} de {\tt front} n'est alloué qu'une fois
+et il va créer des {\em output dependendence}. Ensuite, l'analyse
+des effets de {\tt nbdiag} et de {\em choles} sur le tableau {\tt AF} n'est
+pas assez fine. Contrairement à ce qui s'était passé pour {\tt
+descen} et {\tt C}, l'association paramètre formel/paramètre réel
+n'est pas acceptée par PIPS.
+
+\subsection{Analyse des modules {\tt matelt} et {\tt mbtelt}}
+
+Ces deux modules initialisent la matrice {\tt DAE} en appelant une fonction,
+{\tt DPHI}, qui appelle elle-même une autre fonction, {\tt PHI}. Cette
+initialisation semble complétement parallèle dans {\tt mbtelt} mais
+PIPS ne trouve qu'une partie du parallélisme suite à la non privatisation
+de certains indices de boucles, {\tt I} et {\tt J}:
+\begin{verbatim}
+C  CALCUL DE LA MATRICE DAE .
+      DOALL 6 K = 1,3,1
+         PRIVATE K
+         DOALL 6 L = 1,3,1
+            PRIVATE L
+            DO 6 I = 1,6,1
+               DO 6 J = 1,6,1
+                  DAE(K,I,L,J) = ((DPHI(K, I, Y)*DPHI(L, J, Y))/2.)     0013
+               ENDDO
+            ENDDO
+         ENDDO
+      ENDDO
+\end{verbatim}
+Cette anomalie provient d'une interférence avec les ordres
+d'entrée-sortie qui se trouvent à la fin du module. Ils contiennent
+des boucles implicites utilisant les mêmes indices {\tt I} et {\tt J}
+et les effets ne sont pas calculés assez précisément:
+\begin{verbatim}
+C		<MUST BE READ   >: L K DAE J I
+C		<MUST BE WRITTEN>: J I
+            WRITE (UNIT=6,FMT=2000) ((DAE(K,I,L,J), J = 1,6,1), I = 1   0028
+     &      ,6,1)                                                       0028
+\end{verbatim}
+On remarque que {\tt I} et {\tt J} sont indiqués comme devant être lus
+alors que leur écriture précède toujours cette lecture. Les {\em
+use-def chains} résultantes empêchent la privatisation et donc la
+parallélisation des boucles 6 {\tt I} et 6 {\tt J} ci-dessus.
+
+Cette explication semble être la bonne puisque leur renommage en {\tt I1}
+et {\tt J1} permet d'obtenir les quatre boucles parallèles qu'on attendait.
+
+\subsection{Analyse du module {\tt zproax}}
+
+Le module {\tt zproax} est simple:
+\begin{verbatim}
+      SUBROUTINE ZPROAX(A,B,NOE,NC,X,Y)
+      IMPLICIT REAL*8(A-H,O-Z)
+      DIMENSION A(NOE,NOE,3),B(NOE,NOE),X(NOE,NC),Y(NOE,NC)
+C  PRODUIT PAR LA MATRICE BLOC TRIDIAGONALE SYMETRIQUE A
+C  A(*,*,1) EST LE BLOC DIAGONAL COURANT, A(*,*,2) LE BLOC SUR-DIAGONAL ,
+C  A(*,*,3) LE BLOC SOUS-DIAGONAL  .
+C  B(*,*) EST LE DERNIER BLOC DIAGONAL
+      LYN = (NOE*NC)                                              
+      CALL VCLR(LYN, Y)                                           
+      NCI = (NC-1)                                                
+      DO 1 NNS = 1,NCI,1                                          
+         CALL MXVADD(A(1,1,1), NOE, X(1,NNS), NOE, Y(1,NNS))       
+         CALL MXVADD(A(1,1,2), NOE, X(1,(NNS+1)), NOE, Y(1,NNS))    
+         CALL MXVADD(A(1,1,3), NOE, X(1,NNS), NOE, Y(1,(NNS+1)))    
+1        CONTINUE                                                   
+      ENDDO
+      CALL MXVADD(B, NOE, X(1,NC), NOE, Y(1,NC))                      
+      RETURN
+      END
+\end{verbatim}
+
+Les effets calculés par PIPS sont les suivants:
+\begin{verbatim}
+      SUBROUTINE ZPROAX(A,B,NOE,NC,X,Y)
+      IMPLICIT REAL*8(A-H,O-Z)
+      DIMENSION A(NOE,NOE,3),B(NOE,NOE),X(NOE,NC),Y(NOE,NC)
+C  PRODUIT PAR LA MATRICE BLOC TRIDIAGONALE SYMETRIQUE A
+C  A(*,*,1) EST LE BLOC DIAGONAL COURANT, A(*,*,2) LE BLOC SUR-DIAGONAL ,
+C  A(*,*,3) LE BLOC SOUS-DIAGONAL  .
+C  B(*,*) EST LE DERNIER BLOC DIAGONAL
+C		<MUST BE READ   >: NOE NC
+C		<MUST BE WRITTEN>: LYN
+      LYN = (NOE*NC)                                              
+C		< MAY BE WRITTEN>: Y
+C		<MUST BE READ   >: LYN
+      CALL VCLR(LYN, Y)                                           
+C		<MUST BE READ   >: NC
+C		<MUST BE WRITTEN>: NCI
+      NCI = (NC-1)                                                  
+C		< MAY BE READ   >: NNS
+C		<MUST BE READ   >: NCI
+C		<MUST BE WRITTEN>: NNS
+      DO 1 NNS = 1,NCI,1                                               
+C		< MAY BE READ   >: A X((/I,I=1,NOE,1/),NNS) Y MXVADD:Z1
+C		< MAY BE WRITTEN>: Y MXVADD:Z1
+C		<MUST BE READ   >: NOE
+         CALL MXVADD(A(1,1,1), NOE, X(1,NNS), NOE, Y(1,NNS))          
+C		< MAY BE READ   >: A X((/I,I=1,NOE,1/),(NNS+1)) Y
+C		                   MXVADD:Z1
+C		< MAY BE WRITTEN>: Y MXVADD:Z1
+C		<MUST BE READ   >: NOE
+         CALL MXVADD(A(1,1,2), NOE, X(1,(NNS+1)), NOE, Y(1,NNS))     
+C		< MAY BE READ   >: A X((/I,I=1,NOE,1/),NNS) Y MXVADD:Z1
+C		< MAY BE WRITTEN>: Y MXVADD:Z1
+C		<MUST BE READ   >: NOE
+         CALL MXVADD(A(1,1,3), NOE, X(1,NNS), NOE, Y(1,(NNS+1)))     
+1        CONTINUE                                                    
+      ENDDO
+C		< MAY BE READ   >: B X((/I,I=1,NOE,1/),NC) Y MXVADD:Z1
+C		< MAY BE WRITTEN>: Y MXVADD:Z1
+C		<MUST BE READ   >: NOE
+      CALL MXVADD(B, NOE, X(1,NC), NOE, Y(1,NC))                        0011
+      RETURN
+      END
+\end{verbatim}
+On remarque que {\tt mxvadd} utilise aussi le common {\tt TOTO} pour disposer
+d'espace temporaire et que ceci serait suffisant pour empêcher la
+parallélisation des appels à {\tt mxvadd}. 
+
+La redéclaration de {\tt Z1} comme tableau local ne suffirait dependant pas
+parce que les effets de {\tt mxvadd} sur le paramètre {\tt Y} ne sont
+pas assez précis. Pour une raison encore inconnue, PIPS ne se rend pas
+compte que seule une colonne de {\tt Y} est mise à jour à chaque appel.
+
+\subsection{Analyse du module {\tt invfro}}
+
+Le module principal qui est appelé par {\tt invfro} est {\tt invopt}. Ils
+communiquent entre eux en utilisant le common {\tt TOTO}, ce qui paralyse
+immédiatement toute tentative de parallélisation.
+
+Les appels à {\tt mxv} se trouvent tous accompagnés d'un ou plusieurs
+appels à {\tt invopt}.
+
+\section{Conclusion}
+
+Les règles de programmation suivantes se dégagent de ces essais:
+\begin{enumerate}
+
+  \item le {\tt IF} structuré devrait être utilisé partout où c'est
+possible pour rendre le code plus clair (les conditions des tests
+deviennent plus simples à interpréter) et pour éliminer une bonne
+partie des {\tt GO TO}; l'ajout de la structure de contrôle {\tt
+WHILE} permettrait d'éliminer la plupart des {\tt GO TO} restants,
+et même peut-être tous (nous ne disposons pas du restructureur
+{\em struct} sous SUNOS pour le vérifier);
+
+  \item les arguments formels devraient être, autant que possible,
+dimensionnés précisément. Les déclarations {\tt A(*)} et surtout
+{\tt A(1)} devraient être evitées, quitte à passer des arguments
+supplémentaires (ce qui est rarement nécessaire parce que
+l'information est de toute façon disponible pour les bornes de boucles);
+
+  \item éviter l'utilisation de tableaux temporaires qui vont provoquer
+des {\em output dependence}; leur détection est techniquement possible
+mais n'a pas encore été implémentée, dans aucun système dont nous
+avons connaissance;
+
+  \item vérifier explicitement les conditions que doivent vérifier les
+paramètres de dimensionnement; les tests correspondants permettront à
+l'analyse sémantique de propager ces conditions sans que l'utilisateur
+ait à ajouter manuellement des prédicats (cas de {\tt aile});
+
+  \item déclarer les tableaux locaux aux procédures comme {\em dynamiques}
+au lieu de réutiliser des tableaux en COMMON pour économiser de la
+mémoire; il faut que les programmeurs scientifiques s'habituent à
+l'utilisation de la pile; il faudrait que des tableaux de dimension calculée
+puissent y être alloués (ce n'est pas dans la norme);
+
+  \item passer les arguments explicitement plutôt que de les passer par
+common;
+
+\end{enumerate}
+
+Les directions de recherche qui se trouvent infirmées par l'expérience
+sont:
+\begin{itemize}
+
+  \item l'utilisation des régions pour représenter les effets des
+modules; les effets sont assez simples pour être
+représentés atomiquement au niveau du module appelé; le vrai
+problème est celui de la traduction des effets sur les paramètres
+formels en effets sur les paramètres réels;
+
+  \item la prise en compte des EQUIVALENCE s'avère avoir été
+inutile; trois statements EQUIVALENCE en tout et pour tout apparaissent
+dans l'ensemble des quatre benchmarks; deux d'entre eux ont été
+ajoutés par l'équipe PIPS pour éliminer des définitions multiples de
+commons; le troisième a été mis en commentaire par le programmeur de
+l'ONERA; il semble donc raisonnable de mettre parmi les règles de
+programmation l'interdiction de l'usage de l'ordre EQUIVALENCE;
+
+\end{itemize}
+
+Les directions de recherche du projet PIPS qui se trouvent confirmées par
+l'expérience sont:
+\begin{itemize}
+
+  \item l'utilité d'une analyse sémantique interprocédurale poussée,
+au-delà de la progration de constantes qui avait été initialement
+prévue dans le contrat PIPS;
+
+  \item l'utilité d'un test de dépendance puissant pouvant exploiter
+les conditions apportées par les bornes de boucles et l'analyse sémantique;
+
+\end{itemize}
+
+Les directions de recherche que nous pouvons déduire de ces essais
+sont les suivantes:
+\begin{enumerate}
+
+  \item expansion et/ou privatisation de tableaux; l'utilisation d'effets
+de type {\em région} permettrait d'obtenir l'information {\em MUST} au lieu
+de l'information {\em MAY} sur les tableaux; il faudrait aussi être capable
+de calculer des {\em use/def chains} hiérarchiques, puisque le {\em kill}
+d'un tableau ne peut être obtenu que par une boucle {\tt DO};
+
+  \item meilleure technique de mise en correspondance entre tableau
+paramètre formel et tableau paramètre réel; le nombre de messages {\em
+bad reshaping} devrait être réduit; ceci suppose la prise en compte
+des résultats de l'analyse sémantique et l'utilisation d'un algorithme
+de {\em pattern-matching};
+
+  \item meilleure détection des tableaux statiques {\em morts} dans les
+procédures parce qu'on commence par les affecter; ils devraient être
+retirés des effets cumulés des procédures (voir {\tt front} et {\tt
+descen}); ce problème est proche du premier;
+
+\end{enumerate}
+
+L'utilisation des programmes réels fournis par l'ONERA pour le projet
+PIPS a permis tout d'abord de trouver de nombreuses erreurs de
+programmation du paralléliseur. Elle nous permet maintenant de
+vérifier et de corriger nos directions de recherches. Nous souhaitons
+que ceci reste possible pour nos projets futurs, avec des programmes
+plus récents si possible.
+
+Une étroite collaboration avec des analystes-numériciens connaissant
+bien les programmes utilisés comme benchmarks s'avèrent indispensable.
+Elle nous permettrait de déterminer rapidement où les points
+intéressants des programmes se trouvent et si le parallélisme
+découvert a ou non un intérêt.
+
+\end{document}
+\end

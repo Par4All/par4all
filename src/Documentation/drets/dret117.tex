@@ -1,0 +1,322 @@
+\documentclass[12pt]{article}
+
+\usepackage[latin1]{inputenc}
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+\newcommand{\titre}{RAPPORT FINAL \\
+                    ANALYSE SYNTAXIQUE INTER-PROCÉDURALE}
+\newcommand{\auteur}{François IRIGOIN \\
+        Pierre JOUVELOT \\
+        Rémi TRIOLET}
+\newcommand{\docdate}{Septembre 1989}
+\newcommand{\numero}{E117}
+
+\newcommand{\SEC}[1]{\section{#1}}
+\newcommand{\SSE}[1]{\subsection{#1}}
+\newcommand{\SSS}[1]{\subsubsection{#1}}
+\newcommand{\PAR}[1]{\paragraph{#1}}
+\newcommand{\SPA}[1]{\subparagraph{#1}}
+\newcommand{\BQU}{\begin{quote}}
+\newcommand{\EQU}{\end{quote}}
+\newcommand{\BIT}{\begin{itemize}}
+\newcommand{\EIT}{\end{itemize}}
+\newcommand{\BDE}{\begin{description}}
+\newcommand{\EDE}{\end{description}}
+\newcommand{\BEQ}{\begin{equation}}
+\newcommand{\EEQ}{\end{equation}}
+\newcommand{\BAR}{\begin{array}}
+\newcommand{\EAR}{\end{array}}
+\newcommand{\BDO}{\begin{document}}
+\newcommand{\EDO}{\end{document}}
+\newcommand{\BCE}{\begin{center}}
+\newcommand{\ECE}{\end{center}}
+\newcommand{\BTG}{\begin{tabbing}}
+\newcommand{\ETG}{\end{tabbing}}
+\newcommand{\BTR}{\begin{tabular}}
+\newcommand{\ETR}{\end{tabular}}
+\newcommand{\BAB}{\begin{abstract}}
+\newcommand{\EAB}{\end{abstract}}
+\newcommand{\BEN}{\begin{enumerate}}
+\newcommand{\EEN}{\end{enumerate}}
+\newcommand{\BFI}{\begin{figure}}
+\newcommand{\EFI}{\end{figure}}
+\newcommand{\VSP}{\vspace*{\baselineskip}}
+
+\setlength{\parindent}{0cm}
+
+\begin{document}
+\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+\sloppy
+
+\PAR{}
+L'analyse syntaxique inter-procédurale (analyse syntaxique au niveau
+programme) est réalisée par un programme nommé {\em linker}, qui fait
+à peu près la même chose qu'un éditeur de liens classique, mais au
+niveau de la représentation abstraite du programme et non pas au niveau
+du code assembleur ou machine. Ce rapport a pour objet de décrire les
+structures de données et les algorithmes mis en oeuvre pour la
+réalisation du linker.
+
+\SEC{Objectif}
+\PAR{}
+Un programme Fortran se compose de un ou plusieurs fichiers, chaque
+fichier contenant un ou plusieurs modules (function, main ou
+subroutine). Nous avons vu dans les rapports précédents que Pips
+attache plusieurs informations à chaque module: type du module, nombre
+de paramètres formels, type des paramètres formels, instructions du
+corps du module, etc.
+
+\PAR{}
+Le linker a pour objectif de permettre un accès direct à ces
+informations à partir de toute référence à l'entité représentant
+ce module.  Il s'agit donc d'avoir une représentation interne où
+chaque entité n'a qu'une seule définition. Par exemple, si le module
+{\tt P} contient un appel au module {\tt Q}, nous voulons que l'entité
+référencée dans l'instruction {\tt CALL} de {\tt P} soit la même
+entité que celle créée lors de l'analyse de {\tt Q}. Ceci permet un
+accès direct depuis cette instruction {\tt CALL} aux diverses
+informations associées à {\tt Q}, et notamment le code de {\tt Q}.
+
+\PAR{}
+Ceci n'est possible qu'après une phase d'édition de liens, puisque
+{\tt P} et {\tt Q} peuvent parfaitement être définis dans deux
+fichiers différents, et que nous n'imposons aucun ordre pour soumettre
+les différents fichiers d'un programme Fortran au parser.
+
+\SEC{Rappels sur le Parser}
+\PAR{}
+Quelques rappels sur les caractéristiques du parser sont nécessaires
+pour bien comprendre la suite de ce document.
+
+\PAR{}
+Soient {\tt p.f} un fichier contenant le texte Fortran du module {\tt
+P}. Deux fichiers sont créés pour ce module par le parser:
+\BIT
+\item un fichier d'entités de nom {\tt TOP-LEVEL:P.entities},
+\item un fichier de code de nom {\tt TOP-LEVEL:P.code}.
+\EIT
+
+\PAR{}
+Le fichier d'entités contient exactement une entité globale, de nom
+{\tt TOP-LEVEL:P}, qui définit le module correspondant. Les autres
+entités sont locales.
+
+\PAR{}
+Une entité est locale si elle correspond à une variable ou une
+constante définie dans un module, comme dans la déclaration suivante: 
+\begin{verbatim}
+        INTEGER T(10)
+\end{verbatim}
+Une telle entité restera locale.
+
+\PAR{}
+Une entité est locale si elle correspond à une fonction externe non
+définie dans le module analysé, comme dans:
+\begin{verbatim}
+        CALL Q(I,J,K)
+\end{verbatim}
+Dans le module {\tt P}, l'entité définissant le module {\tt Q} a pour
+nom {\tt P:Q}, son type est celui que le parser aura pu déduire des
+appels à {\tt Q} contenus dans {\tt P}, son storage sera {\tt rom} et
+son initial-value vaut {\tt unknown} car le code de {\tt Q} n'était pas
+disponible pour le parser au moment du traitement de {\tt P}. L'entité
+{\tt P:Q} est donc {\em incomplètement définie}.
+
+\PAR{}
+Les fonctions externes ne sont pas les seules à être incomplètement
+définies après qu'un module ait été parsé. Il en est de même pour
+toutes les fonctions intrinsèques.
+
+\SEC{Utilisation des autres phases de PIPS}
+
+\PAR{}
+Après le passage du parser, l'application d'une des phases de PIPS sur
+un module {\tt P} nécessite le chargement par cette phase du domaine
+des entités, puis du code du module {\tt P}; c'est ce que nous appelons
+activer le module {\tt P}. Il est important de se souvenir que la
+représentation interne a été conçue de telle sorte que les objets
+contenus dans le code d'un module (objets des domaines {\tt statement,
+instruction, block, test, loop, goto, call, etc.}) référencent les
+objets contenus dans les entités du module (objets des domaines {\tt
+value, type, storage, ram, symbolic{,} etc.}) mais que le contraire
+ne soit pas vrai.
+
+\PAR{}
+C'est cette caractéristique de la représentation interne, ajouté à
+la séparation des fichiers {\tt .code} et {\tt .entities}, qui permet
+le mécanisme d'activation et de désactivation d'un module.
+
+\PAR{}
+Avant le passage du linker, le domaine des entités d'un module
+quelconque {\tt M} est contenu dans le fichier {\tt
+TOP-LEVEL:M.entities}, et le code de {\tt M} est contenu dans {\tt
+TOP-LEVEL:M.code}. Ce code ne peut être chargé qu'après chargement du
+domaine des entités correspondant.  Nous verrons que les choses sont
+différentes après le passage du linker sur le programme contenant ce
+module {\tt M}.
+
+\PAR{}
+Les phases suivantes sont en cours de développement: un pretty-printer, un
+analyseur de flot de données, un paralléliseur, etc.
+
+\SEC{Présentation du linker}
+
+\PAR{}
+Le linker doit donc faire l'union au sens ensemblistes des différents
+fichiers d'entités tels que {\tt TOP-LEVEL:M.entities}, puis détruire
+les entités incomplètement définies telles que {\tt P:Q} lorsque
+l'entité définie {\tt TOP-LEVEL:Q} est disponible, et enfin remplacer
+dans le code de tous les modules (fichiers {\tt TOP-LEVEL:*.code})
+toutes les références aux entités incomplètes par des références
+aux entités complètes.
+
+\SSE{Arguments du linker}
+
+\PAR{}
+Les arguments du linker sont le nom du programme et les noms des modules
+à linker. Par exemple
+\begin{verbatim}
+        $ linker linear MATMUL INIT LINEAR
+\end{verbatim}
+
+\PAR{}
+Le nom du programme sert uniquement à calculer le nom du nouveau
+fichier d'entités, qui contiendra l'union de tous les fichiers
+d'entités des modules linkés.  Ce nom peut donc être quelconque, mais
+il est conseillé d'utiliser les minuscules pour les noms de programme
+afin de ne pas risquer de collisions entre un nom de programme et un nom
+de module.
+
+\PAR{}
+Le linker de PIPS est incrémental, ce qui signifie qu'un programme de
+plusieurs modules, par exemple {\tt MATMUL, INIT, LINEAR, MEAN} et {\tt
+PRMAT}, peut être linké en plusieurs fois, comme dans:
+\begin{verbatim}
+        $ linker linear MATMUL INIT LINEAR
+        $ ...
+        $ linker linear MEAN PRMAT
+\end{verbatim}
+
+\PAR{}
+Le linker vérifie que l'utilisateur ne demande pas de linker un module
+déjà traité, ce qui est interdit avec la version actuelle du linker.
+
+\SEC{Algorithme}
+
+\SSE{Initialisation du domaine des entités}
+
+\PAR{}
+On suppose dans la suite que le linker est appelé avec trois arguments:
+{\tt pgm, P,} et {\tt Q}. 
+
+\PAR{}
+Si le programme cible {\tt pgm} n'existe pas, le linker initialise le
+domaine des entités avec les entités globales prédéfinies par
+Fortran, c'est-à-dire:
+\BIT
+\item les opérateurs: {\tt + , - , .LT. , .NEQV. , ...}
+\item les instructions: {\tt READ , WRITE , RETURN , ...}
+\item les intrinsèques: {\tt MIN , MAX , ...}
+\EIT
+Ces entités pré-définies sont contenues dans le fichier {\tt
+TOP-LEVEL:bootstrap.entities}, qui est donc lu par le linker. Ce fichier
+est créé par le programme {\tt bootstrap} à partir d'une table
+décrivant opérateur, intrinsèques et instructions Fortran (Voir le
+programme bootstrap dans l'annexe 1). Le programme bootstrap doit être
+ré-exécuté chaque fois que cette table est modifiée.
+
+\PAR{}
+Si le programme cible {\tt pgm} existe déjà, cela signifie que ce
+programme a été préalablement linké, de façon partielle. Le linker
+initialise alors le domaine des entités avec la valeur qu'il avait à
+la fin du précédent link pour ce programme, ce qui est fait en lisant
+la version courante du fichier {\tt TOP-LEVEL:pgm.entities}.
+
+\SSE{Union avec les entités des modules à linker}
+
+\PAR{}
+Une fois le domaine des entités initialisé, il faut lire les domaines
+des entités contenus dans les fichiers ``{\tt .entities}'' des modules à
+linker, {\tt P} et {\tt Q} dans notre exemple. Nous obtenons ainsi un
+domaine des entités unique qui contient toutes les entités de tous les
+modules déjà linkés et de ceux en cours de link.
+
+\SSE{Recherche des modules dont le code doit être mis à jour}
+
+\PAR{}
+Il faut ensuite rechercher parmi tous les modules connus ---les anciens
+et les nouveaux--- ceux dont le code doit être linké, c'est-à-dire
+ceux pour lesquels toute référence à une entité telle que {\tt P:Q}
+doit être remplacée par une référence à {\tt TOP-LEVEL:Q}.
+
+\PAR{}
+Tous les nouveaux modules doivent bien sûr être mis à jour. Il en est
+de même pour tous les modules déjà linkés qui contiennent au moins
+une référence à un des nouveaux modules, car le link précédent d'un
+tel module avait nécessairement été partiel.
+
+\SSE{Calcul des associations entités locales - entités globales}
+
+\PAR{}
+L'étape suivante consiste à construire une table de hashcode associant
+les entités externes incomplètement définies telles que {\tt P:Q} aux
+entités globales parfaitement définies telles que {\tt TOP-LEVEL:Q}
+que le linker a chargées dans le domaine des entités lors de la
+deuxième phase de l'algorithme.
+
+\PAR{}
+C'est pendant cette étape que sont détectées les références non
+résolues. En effet, toute référence à une entité non définie telle
+que {\tt Q:R} (créée par exemple par un appel à la fonction {\tt R}
+dans la subroutine Q) pour laquelle on ne trouve pas d'entité de nom
+{\tt TOP-LEVEL:R}, est une référence non résolue.
+
+\SSE{Mise à jour du code des modules}
+
+\PAR{}
+L'étape de mise à jour des codes des modules est la plus longue. Pour
+chaque module trouvé durant la troisième étape, il faut:
+\BIT
+\item activer le module, c'est-à-dire charger son code en mémoire,
+\item examiner ce code, instruction par instruction, expression par
+expression, référence par référence, pour y remplacer toute
+référence aux entités indéfinies par des références aux entités
+définies données par la table de hash code calculée précédemment,
+\item désactiver le module, c'est-à-dire ranger son code sur disque,
+dans le fichier ``.code{''} associé au module.
+\EIT
+
+\SSE{Sauvegarde du nouveau domaine des entités}
+
+\PAR{}
+L'étape finale du linker consiste à détruire les entités qui ne sont
+plus référencées une fois le code des modules mis à jour, comme par
+exemple l'entité {\tt P:Q}, puis, à stocker sur disque le domaine des
+entités dans le fichier {\tt pgm.entities}.
+
+\SEC{Conclusion}
+
+\PAR{}
+Après exécution du linker sur une collection de modules, les fichiers
+``.entities'' de ces modules peuvent être détruits puisqu'ils sont
+remplacés par le fichier unique du programme, {\tt pgm.entities} par
+exemple. 
+
+\PAR{}
+Si tous les modules d'un programme ont été linkés ensemble, toutes
+les entités référencées dans ce programme sont complètement
+définies dans ce fichier, sauf les entités correspondant aux modules
+du programme pour lesquelles le champs {\tt code} n'est défini que si
+le module correspondant est activé, c'est-à-dire chargé en mémoire.
+
+\newpage
+\SEC{ANNEXE 1 --- PROGRAMME BOOTSTRAP}
+\PAR{}
+Cette annexe contient le listing des programmes sources du programme bootstrap.
+
+\newpage
+\SEC{ANNEXE 2 --- PROGRAMME LINKER}
+\PAR{}
+Cette annexe contient le listing des programmes sources du programme linker.
+
+\end{document}
+\end

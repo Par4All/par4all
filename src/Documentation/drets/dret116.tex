@@ -1,0 +1,972 @@
+\documentclass[12pt]{article}
+
+\usepackage[latin1]{inputenc}
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+\newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{\em #2}}
+\newcommand{\titre}{RAPPORT D'AVANCEMENT \\
+                    ANALYSE SEMANTIQUE ET DETECTION DU PARALLELISME}
+\newcommand{\auteur}{François IRIGOIN \\
+        Pierre JOUVELOT \\
+        Rémi TRIOLET}
+\newcommand{\docdate}{Septembre 1989}
+\newcommand{\numero}{E116}
+
+\newcommand{\SEC}[1]{\section{#1}}
+\newcommand{\SSE}[1]{\subsection{#1}}
+\newcommand{\SSS}[1]{\subsubsection{#1}}
+\newcommand{\PAR}[1]{\paragraph{#1}}
+\newcommand{\SPA}[1]{\subparagraph{#1}}
+\newcommand{\BQU}{\begin{quote}}
+\newcommand{\EQU}{\end{quote}}
+\newcommand{\BIT}{\begin{itemize}}
+\newcommand{\EIT}{\end{itemize}}
+\newcommand{\BDE}{\begin{description}}
+\newcommand{\EDE}{\end{description}}
+\newcommand{\BEQ}{\begin{equation}}
+\newcommand{\EEQ}{\end{equation}}
+\newcommand{\BAR}{\begin{array}}
+\newcommand{\EAR}{\end{array}}
+\newcommand{\BDO}{\begin{document}}
+\newcommand{\EDO}{\end{document}}
+\newcommand{\BCE}{\begin{center}}
+\newcommand{\ECE}{\end{center}}
+\newcommand{\BTG}{\begin{tabbing}}
+\newcommand{\ETG}{\end{tabbing}}
+\newcommand{\BTR}{\begin{tabular}}
+\newcommand{\ETR}{\end{tabular}}
+\newcommand{\BAB}{\begin{abstract}}
+\newcommand{\EAB}{\end{abstract}}
+\newcommand{\BEN}{\begin{enumerate}}
+\newcommand{\EEN}{\end{enumerate}}
+\newcommand{\BFI}{\begin{figure}}
+\newcommand{\EFI}{\end{figure}}
+\newcommand{\VSP}{\vspace*{\baselineskip}}
+
+\setlength{\parindent}{0cm}
+
+\begin{document}
+\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+\sloppy
+
+\SEC{Introduction}
+\PAR{}
+Ce rapport intermédiaire donne l'état d'avancement de nos travaux sur
+l'analyse sémantique et la détection du parallélisme. Une part
+importante de ces travaux est représenté par le calcul du graphe de
+contrôle d'un module que nous présentons en détail dans la
+section~\ref{controle}. Ce graphe de contrôle est ou sera utilisé par
+plusieurs phases de PIPS, et notamment:
+\BIT
+\item la phase d'analyse sémantique pour construire les équations
+sémantiques associées à un programme,
+
+\item par la phase de détection de parallélisme pour déterminer
+si une boucle peut être parallélisée, même dans le cas où elle
+contient des instructions de branchements non structurées, 
+
+\item par la phase de calcul des use-def chains, 
+
+\item etc...
+\EIT
+
+Nous présentons dans la suite l'état d'avancement de la phase de
+détection du parallélisme (section~\ref{kennedy}), les structures de
+données et l'algorithme mis en oeuvre pour le calcul du graphe de
+contrôle (section~\ref{controle}), et l'état d'avancement de la phase
+d'analyse sémantique (section~\ref{semantique}).
+
+\SEC{Détection du parallélisme}
+\label{kennedy}
+\PAR{}
+Une phase de détection du parallélisme est en cours de développement
+dans le projet PIPS. Dans un premier temps, nous nous sommes restreints
+à l'algorithme de Kennedy et Allen appliqué aux boucles ne contenant
+que des instructions d'affectation.
+
+\PAR{}
+Le calcul du graphe de dépendances (voir la structure de données dans
+l'annexe 1) est effectuée selon les techniques de calcul linéaire
+développées au CAI et qui seront présentées dans les prochains
+rapports. Les programmes de calcul du graphe de dépendances font
+massivement appel à la bibliothèque linéaire développée au CAI dans
+le cadre d'un contrat avec le PRC $C^3$.
+
+\PAR{}
+Le calcul des composantes fortement connexes du graphe des dépendances
+et le tri topologique de ces composantes sont faits en utilisant des
+algorithmes classiques, présentés dans l'ouvrage {\em TYPES DE DONNEES
+ET ALGORITHMES --- Recherche, Tri, Algorithmes sur les Graphes} par
+Marie-Claude GAUDEL, Michèle Soria et Christine Froidevaux dans la
+collection Didactique de l'INRIA.
+
+\PAR{}
+L'algorithme de Kennedy proprement dit est celui présenté dans la
+revue {\em ACM TOPLAS} volume 9, numéro 4 de Octobre 1987. Nous donnons
+dans l'annexe 3 quelques résultats obtenus avec la première version de
+cette phase; la boucle est affichée avant et après transformation par
+le pretty-printer de PIPS. Les temps d'execution indiqués sont ceux de
+la phase de parallélisation uniquement, les temps du parser et du
+linker ne sont pas comptés.
+
+\SEC{Construction du graphe de contrôle}
+\label{controle}
+\PAR{}
+Si l'arbre de syntaxe abstraite représente la structure statique d'un
+programme, le graphe de contrôle en est le pendant dynamique; il
+associe à chaque instruction la liste de ses prédecesseurs et
+successeurs possibles dans toute exécution du programme. Cette
+structure de donnée est importante pour effectuer toute analyse
+sémantique {\em flow-sensitive} tels les chaines {\em use-def} ou le
+calcul de prédicats. De plus, elle intervient dans la détection du
+parallélisme avec la notion de {\em masquage de contrôle} qui permet
+de paralléliser des boucles contenant des instructions de branchement
+locaux.
+
+\PAR{}
+Nous décrivons dans la section 1 les structures de données impliquées
+dans le graphe de contrôle et présentons l'idée générale de
+l'algorithme dans la section 2. Le listing commenté du programme est
+donné en annexe 2.
+
+\SSE{Le graphe de contrôle}
+\PAR{}
+La majorité des programmes utilisateurs sont (ou devraient) être
+structurés. Prenant ce fait en considération, nous avons concu le
+graphe de contrôle comme une extension de l'arbre de syntaxe abstrait.
+Les structures de données structurées (i.e., boucle, conditionnelle,
+séquence et instruction élémentaire) sont préservées telles quelles
+dans le graphe de contrôle tandis que seuls les branchements
+``cassent'' cette structure hiérarchique pour créer un graphe
+orienté. Ceci permettra de traiter de manière simple les parties
+parallélisables d'un programme, puisque les ruptures de contrôle
+empêchent généralement toute parallélisation (mais voir ci-dessous).
+Un tel graphe de contrôle est appellé {\em Structured Control Graph}.
+
+\PAR{}
+Cette intégration du graphe de contrôle avec les instructions du
+programme se reflète dans sa description récursive dans le fichier de
+description NewGen:
+
+\begin{verbatim}
+control = statement x predecessors:control* x successors:control* ;
+instruction = block:statement* + test + loop + ploop + goto:statement + 
+              call + unstructured:control ;
+statement = label:entity x number:int x instruction x effects:effect* ;
+\end{verbatim}
+
+\PAR{}
+Dans un noeud du graphe de contrôle, le champ {\tt statement} sera toujours
+structuré; cet invariant est introduit par l'algorithme de création du
+graphe de contrôle. Dans la majorité des cas, les champs {\tt
+predecessors} et {\tt successors} auront des listes réduites à un
+élément. Seule une instruction de branchement conditionnelle (dont le
+{\tt statement} est un {\tt test}) créera une liste {\tt successors}
+ayant plus d'un élément, le premier correspondant au branchement dans
+le cas où la condition est vérifiée. Des noeuds de jointure pourront
+avoir plus d'un prédécesseur.
+
+\PAR{}
+La liste des type d'instructions possibles d'un programme a été
+augmentée d'un champ {\tt unstructured} qui apparaitra après
+construction du graphe de contrôle; il n'est jamais introduit par les
+phases précédentes de PIPS.
+
+\PAR{}
+Ce graphe de contrôle implémente la notion importante de {\em
+masquage de contrôle}. Par exemple, si une boucle utilise un corps qui
+comporte des branchements locaux (ceci est vérifié au cours de la
+construction du graphe), alors, vue de l'extérieur, cette boucle sera
+considérée comme structurée. Dans le cas d'une implémentation
+parallèle, la rupture de séquence dans une itération est en effet
+indépendante des autres itérations et n'empêche en rien l'exécution
+parallèle du programme. 
+
+\SSE{Un exemple simple}
+Dans le programme:
+\begin{verbatim}
+       do 10 i=1,n
+       t(i) = i
+       if ( i .le. m ) goto 20
+           t(i) = i
+20     continue
+10     continue
+\end{verbatim}
+le corps de la boucle sera considéré comme un graphe composé, entre
+autres, d'un noeud d'affectation et d'un noeud de contrôle qui
+correspond au saut conditionnel. Ceci est visible dans le pretty-print
+du graphe de contrôle donné ci-dessous:
+\begin{verbatim}
+Graph 60a48
+           --> Node 60a48
+           statement 61508
+           Preds: 
+           Succs: 
+           Code of 60a48:
+           DO @10 I = 1,N,1
+               Graph 60c40
+                   --> Node 60c40
+                   statement 5d718
+                   Preds: 
+                   Succs: 60ca8 
+                   Code of 60c40:
+                   =(T(I),I)
+                   End of code of 60c40
+                   --> Node 60ca8
+                   statement 5ff98
+                   Preds: 60c40 
+                   Succs: 60d38 60d50 
+                   Code of 60ca8:
+                   IF (.LE.(I,M)) THEN
+                       GOTO @20
+                   ELSE
+                       CONTINUE()
+                   ENDIF
+                   End of code of 60ca8
+                   --> Node 60d38
+                   statement 60e70
+                   Preds: 60ca8 
+                   Succs: 608e0 
+                   Code of 60d38:
+                   End of code of 60d38
+                   --> Node 608e0
+                   statement 61300
+                   Preds: 61180 60d38 
+                   Succs: 
+                   Code of 608e0:
+20                 CONTINUE()
+10                 CONTINUE()
+                   End of code of 608e0
+                   --> Node 61180
+                   statement 61160
+                   Preds: 60da0 
+                   Succs: 608e0 
+                   Code of 61180:
+                   =(T(I),I)
+                   End of code of 61180
+                   --> Node 60da0
+                   statement 60d80
+                   Preds: 60d50 60e40 
+                   Succs: 61180 
+                   Code of 60da0:
+                   End of code of 60da0
+                   --> Node 60d50
+                   statement 61098
+                   Preds: 60ca8 
+                   Succs: 60da0 
+                   Code of 60d50:
+                   CONTINUE()
+                   End of code of 60d50
+                   --> Node 60e40
+                   statement 60e20
+                   Preds: 
+                   Succs: 60da0 
+                   Code of 60e40:
+                   End of code of 60e40
+               End of graph 60c40
+           ENDDO
+00000      CONTINUE()
+           End of code of 60a48
+End of graph 60a48
+\end{verbatim}
+Ce graphe de de contrôle est construit (parsing et pretty-printing
+compris) en 0.98s.
+
+\SSE{Construction du graphe}
+La routine principale de construction du graphe de contrôle prend en
+entrée un {\tt statement} et retourne le graphe de contrôle
+correspondant. Comme précisé précédemment, si le statement en
+question est complètement structuré, le graphe de contrôle sera
+limité à un noeud; cela sera le cas, par exemple, de la routine de
+multiplication matrices.
+
+\PAR{}
+L'algorithme utilisé est défini par induction sur la structure d'arbre
+abstrait du programme. La routine récursive principale est {\tt
+controlize} qui, pour un statement {\tt st} ayant {\tt pred} pour noeud
+prédecesseur et {\tt succ} pour noeud successeur, retourne dans {\tt
+c\_res} le noeud de contrôle correspondant et met à jour l'argument
+{\tt used\_labels} qui contient la liste des occurences des étiquettes
+utilisées dans une instruction (ceci est utilisé dans
+l'implémentation du masquage de contrôle).
+
+\PAR{}
+Le but essentiel de {\tt controlize} est d'éliminer les {\tt goto} et
+de les remplacer par des arcs dans le graphe de contrôle. Ceci est fait
+via deux structures de données (implémentées par des tables de
+hachage); {\tt label\_statements} associe à tout nom d'étiquette la
+liste de instructions qui la référence, tandis que {\tt
+label\_control} associe à tout nom d'étiquette le noeud de contrôle
+correspondant (qui est utilisé dans le cas de branchement en avant).
+Ces deux structures de données sont construites lors d'un premier
+parcours de {\tt st} par la routine {\tt create\_statements\_of\_labels}.
+
+\PAR{}
+Le masquage de contrôle nécessite de compactifier les graphes de
+contrôle des composantes d'une instruction en vue de les remplacer par
+un seul noeud. La routine de test principale est {\tt covers\_labels\_p}
+qui vérifie si les occurrences des étiquettes utilisées dans
+l'instruction représentent toutes les apparences possibles de ces
+étiquettes, auquel cas les branchements correspondants sont locaux et
+pourront être négligés dans les instructions englobantes. Une étape
+de compaction importante est {\tt compact\_list} correspondant aux
+séquences; elle permet de regrouper dans des sous-séquences (i.e.,
+{\em basic blocs}) les instructions qui ne comportent pas de
+branchement.
+
+\PAR{}
+Une conséquence de la construction du graphe de contrôle est la
+possibilité de détecter les instructions du pogramme qui correspondent
+à du ``code mort''. Si cette information est inutile à la
+parallélisation proprement-dite, elle peut indiquer une erreur de
+conception du programme d'applications et est donc reportée à
+l'utilisateur.
+
+\section{Analyse sémantique}
+\label{semantique}
+
+\paragraph{}
+Le travail concernant l'analyse sémantique est présenté en deux volets,
+d'une part la programmation, d'autre part, une réflexion algorithmique.
+
+\subsection{Avancement de l'implémentation}
+
+\paragraph{}
+Le travail d'implémentation a consisté à récupérer le maximum
+de code du prototype d'analyseur sémantique pour écrire l'analyseur PIPS.
+Les modules existants ont été découpés en morceaux plus petits pouvant
+être installés dans une de nos bibliothèques d'algèbre linéaire,
+compatibles avec l'environnement PIPS.
+
+\paragraph{}
+En sus du découpage, les différentes transformations effectuées ont été:
+\begin{itemize}
+  \item le renommage des fonctions de base pour respecter des normes
+        d'uniformisation dépendant du nom de la structure de données
+        produites et de la fonctionnalité;
+  \item l'ajoût de commentaires et la mise en forme de commentaires
+        pré-existants;
+  \item la rationalisation des fichiers {\em include}, avec une automatisation
+        partielle de l'extraction des commentaires permettant d'assurer
+        une meilleure cohérence entre le code C et les fichiers {\em headers};
+  \item la mise au point de fichiers {\em Makefile} assurant la cohérence
+        entre bibliothèques dépendant les unes des autres;
+  \item la modification de codes présentant des dépendances par rapport
+        à des modules ne faisant pas partie de PIPS;
+  \item la mise en place de répertoires de tests permettant de vérifier
+        les procédures de base dans un contexte minimum (non terminé);
+\end{itemize}
+Il reste encore à en améliorer les performances à l'aide des outils
+UNIX {\em prof} et {\em gprof} et à développer des versions
+{\em instrumentées} permettant de mieux comprendre le comportement
+des algorithmes.
+
+\paragraph{}
+Ces bibliothèques sont au nombre de 7, comme les structures de données
+décrites dans le rapport d'avancement de mars 1989 (rapport No~2):
+\begin{itemize}
+  \item vecteur,
+  \item contrainte linéaire (égalité et inégalité),
+  \item systeme de contraintes linéaires,
+  \item rayon et droite,
+  \item sommet,
+  \item système générateur,
+  \item polyèdre (double représentation par système de contraintes et
+        système générateur).
+\end{itemize}
+
+\paragraph{}
+Les routines essentielles pour l'analyse sémantique par polyèdre sont:
+\begin{itemize}
+  \item {\em affectation}, qui calcule l'effet d'une affectation affine
+         sur un polyèdre
+        (i.e. sur son système de contraintes et sur son système génerateur);
+  \item {\em projection}, qui calcule l'effet d'une affectation non linéaire;
+  \item {\em intersection\_demi}, qui calcule le nouveau prédicat d'une
+        branche de test de la forme {\tt I.GE.J} 
+        ({\em demi} signifie demi-espace);
+  \item {\em intersection\_hyperplan}, qui calcule le nouveau prédicat
+        d'une branche de test varie de la forme {\tt I.EQ.J};
+  \item {\em enveloppe}, qui calcule l'enveloppe convexe de deux prédicats
+        sur les points de jonction du graphe de contrôle (fin d'un test,
+        boucle);
+  \item {\em élargissement}, qui permet de calculer un polyèdre point fixe
+        pour les boucles (opérateur $\nabla$ de la thèse de Halbwachs);
+  \item {\em sc\_to\_sg}, qui permet de passer d'un système de contraintes
+        à un système générateur;
+  \item {\em normalisation}, qui permet d'éliminer les contraintes 
+        et les éléments du système générateur qui sont redondants;
+\end{itemize}
+Ces fonctions sont construites à partir de fonctions similaires sur les
+systèmes de contraintes et sur les systèmes générateurs.
+
+\paragraph{}
+Contrairement aux routines utilisées pour le calcul de dépendance qui
+opèrent sur des entiers, ces routines utilisent et produisent des
+polyèdres rationnels.
+
+\subsection{Modification de l'algorithme d'Halbwachs}
+
+\paragraph{Notion de variable}
+
+\paragraph{}
+L'algorithme présenté dans la thèse de N. Halbwachs ne prend pas en
+compte ni l'aliasing implicite entre paramètres formels ou entre
+paramètres formels et variables globales, ni l'aliasing explicite (i.e.
+intra-procédural) créé par la déclaration {\tt EQUIVALENCE}. Nous
+proposons de suivre la norme Fortran~77 qui élimine l'aliasing
+implicite pour considérer que le premier problème ne se pose pas. Pour
+traiter l'aliasing explicite nous prendrons aléatoirement une des
+variables scalaires en alias, si plusieurs scalaires sont concernés. En
+cas d'alias entre tableaux et scalaires, les instructions d'affectation
+au tableau seront considérées comme des {\em kill}'s de la variable.
+Cette règle pourrait être améliorée ultérieurement par un test de
+dépendance si le besoin s'en fait sentir.
+
+\paragraph{Réduction de la complexité}
+
+Le comportement exponentiel de l'algorithme de résolution décrit
+dans la thèse de Halbwachs et implémenté dans le prototype d'analyseur
+sémantique est inacceptable pour des programmes scientifiques.
+
+\paragraph{}
+Nous proposons donc de découper la résolution globale du système aux
+polyèdres en des résolutions partielles, dont la combinaison risque
+bien sûr de donner des résultats moins précis mais dont le temps
+d'exécution devrait être à peu près linéaire par rapport à
+la taille du programme.
+
+\paragraph{}
+L'idée consiste à calculer pour chaque composante du graphe de
+contrôle structuré (cf. section~3) une relation, appelée {\em
+relation de transfert} dans la suite, entre le prédicat d'entrée
+(précondition) et le prédicat de sortie (post-condition). Les
+relations de transfert seront propagées de base en haut en fonction des
+opérateurs de structuration du graphe de contrôle: séquence (composition),
+test (enveloppe convexe), boucle (élargissement) et control (pour les
+parties non structurées du programme analysé). Chaque
+boucle aura une profondeur d'imbrication de 1, car les boucles internes
+auront été précédemment transformées en relation de transfert.
+Le placement des opérations d'élargissement nécessaires à la
+convergence est trivial, ainsi que celui des opérations de fermeture
+convexe.
+
+\paragraph{}
+Les instructions élémentaires (call assign, call read, call min,...)
+fourniront les relations de transfert de base. L'analyse sera limitée
+à l'assignation (call assign) dans un premier temps.
+
+\paragraph{}
+Pour les parties non structurées (unstructured:control), nous proposons
+dans un premier temps de n'effectuer qu'une projection des variables
+{\em tuées} par les statements correspondants. Si ces zones s'avèrent
+trop fréquentes et parallélisables malgré un contrôle non régulier,
+il serait possible d'implémenter l'algorithme d'Halbwachs pour elles.
+L'analyse des parties structurées éventuellement présentes sous cette
+zone control sera reprise normalement.
+
+\paragraph{}
+Une fois la relation de transfert calculée de bas en haut\footnote{Cette
+approche pourrait aussi s'appliquer d'une manière interprocédurale
+en ajoutant une traduction de la relation de transfert globale d'une
+procédure à chacun de ses sites d'appel.}, il ne reste plus qu'à propager
+les invariants de haut en bas du graphe de contrôle du module analysé.
+
+\paragraph{}
+Cette approche nous permettra éventuellement d'ajouter un peu
+d'information lors de la constitution du système de dépendance entre
+deux références, en profitant de la présence de la relation de
+transfert entre les deux statements contenant ces références.
+
+\paragraph{}
+L'inconvénient essentiel de cet algorithme est qu'il dépend de la nature
+des relations de transfert choisies. Pour obtenir les mêmes résultats
+qu'avec l'algorithme d'Halbwachs, il faudrait au moins avoir des relations
+de transfert {\em conditionnelles} où les conditions d'application
+partielles et les relations de transfert partielles seraient définies
+par des polyèdres\footnote{Ceci est plus général que les formules
+conditionelles utilisées en évaluation symbolique dans le projet
+VELOURS et que la généralisation de la propagation de constantes
+proposée par Jean Goubault.}. Pour accélérer l'exécution,
+nous proposons de réduire cette union de relations de transfert
+partielles en une unique relation de transfert inconditionnelle par
+fermeture convexe. Voici un exemple de programme où cette méthode
+va perdre de l'information:
+
+\begin{verbatim}
+I = 4
+IF(I.EQ.4) THEN
+        J = 5
+ENDIF
+\end{verbatim}
+
+Soit $i_{old}$ et $j_{old}$ les valeurs de \verb+I+ et \verb+J+ avant
+l'exécution d'une instruction, et $i_{new}$ et $j_{new}$ leurs valeurs
+après. La relation de transfert du bloc \verb+IF+ est $i_{new} = i_{old}$
+et toute information sur \verb+J+ est perdue en faisant l'enveloppe
+convexe de $j_{new} = 5$ et de $j_{new} = j_{old}$ (ce sont deux droites
+non parallèles; elles génèrent donc tout l'espace). La composition
+de l'affectation \verb+I = 4+ avec ce test va donc fournir la relation
+de transfert $i_{new} = 4$ et toute information sur \verb+J+ sera encore
+perdue. La relation de transfert calculée normalement pour cette
+séquence serait $i_{new} = 4, j_{new} = 5$.
+
+\paragraph{Fragilité des prédicats polyèdriques}
+
+L'utilisation de l'enveloppe convexe fournit des résultats non intuitifs
+car il est difficile aux programmeurs d'être aussi stricts qu'un
+programme et de faire abstraction d'informations implicites.
+
+\paragraph{}
+Supposons par exemple que nous ayons le corps de programme:
+\begin{verbatim}
+T(2) = ...
+DO I = 1, N
+  T(I) = ...
+ENDDO
+\end{verbatim}
+Quel est la partie de \verb+T+ qui est touchée par cette séquence
+d'instructions? On aimerait pouvoir dire \verb!T(1..N+1)! mais l'enveloppe
+convexe des deux régions touchées par \verb+T(2)+ et \verb+T(I)+ est 
+le tableau \verb+T+ tout entier. Aucune information sur \verb+N+ n'est
+disponible; cette variable peut avoir une valeur négative et ne peut pas
+être utilisée pour définir la partie de \verb+T+ modifiée. Il faudrait
+disposer d'une prédicat $n \ge 1$ pour pouvoir faire la déduction
+souhaitée, \verb!T(1..N+1)!. Cette information est implicite pour tout
+programmeur humain.
+
+\paragraph{}
+Supposons maintenant que nous recherchions des variables inductives dans le
+code:
+\begin{verbatim}
+K = 0
+DO I = 1, N
+  K = K + 2
+ENDDO
+\end{verbatim}
+et que nous soyons intéressé par la valeur de \verb+K+ en sortie de
+boucle. Ici encore, nous n'aurons aucune information si nous ne savons pas
+que la variable \verb+N+ a une valeur positive en entrée de boucle.
+
+\paragraph{Augmentation des sources d'information}
+
+Pour pallier le problème précédent, il faudrait pouvoir utiliser
+des sources d'information secondaires comme les déclarations
+de tableaux\footnote{Mais attention aux déclarations du genre
+\verb+REAL T(1)+ que font les programmeurs Fortran dans les
+sous-programmes quand ils ne voulent pas passer
+la dimension en argument.}, et admettre que les boucles \verb+DO+ sont
+programmées pour être exécutées au moins une fois.
+
+\subsection{Plan de travail}
+
+La programmation de ce nouvel algorithme d'analyse sémantique, qui
+devrait résoudre les points 1 et 4 de la section 2.1 du précédent
+rapport d'avancement, devrait être effectuée en priorité. Il restera
+ensuite à améliorer la technique d'élargissement en fonction des
+résultats obtenus sur les programmes dont nous disposons (points~2~et~3)
+et, très vraisemblablement, l'efficacité des procédures utilisées.
+
+\section{Conclusion}
+
+La réalisation du paralléliseur PIPS progresse comme prévu. Il nous
+faut maintenant aborder les problèmes interprocéduraux et les
+transformations de programme.
+
+\newpage
+\SEC{ANNEXE 1 --- DETECTION DU PARALLELISME}
+\PAR{}
+Cette annexe contient la description des structures de données privées
+du paralléliseur.
+
+\PAR{}
+La structure de données suivante implémente un graphe orienté. Cette
+structure est générique, mais elle peut être adaptée aux besoins de
+chacun grâce aux deux domaines externes {\tt vertex\_label} et {\tt
+arc\_label} qui sont attachés respectivement aux noeuds et aux arcs du
+graphe.
+
+Cette structure est utilisée pour le graphe des dépendances et pour le
+graphe de contrôle d'un module.
+
+\domain{External vertex\_label}
+{}
+\domain{External arc\_label}
+{}
+
+\domain{Graph = vertices:vertex*}
+{Un graphe se compose tout simplement d'un ensemble de noeuds,
+représentés par le domaine {\tt vertex}.}
+
+\domain{Vertex = vertex\_label x succs:succ*}
+{Chaque noeud d'un graphe est représenté par un {\tt vertex}. Le
+sous-domaine {\tt succs} donne la liste des successeurs du noeud. Le
+sous-domaine {\tt vertex\_label} doit etre utilisé pour les informations
+attachées à chaque noeud et dont la nature dépend de l'application
+utilisant le graphe; voir par exemple le domaine {\tt dg\_vertex\_label}
+dans le fichier {\tt kennedy.f.tex}.}
+
+\domain{Succ = arc\_label x vertex}
+{Chaque arc d'un graphe est représenté par un {\tt succ}. Le
+sous-domaine {\tt vertex} contient le noeud vers lequel l'arc pointe. Le
+sous-domaine {\tt arc\_label} doit être utilisé pour contenir les
+informations attachées à chaque arc{,} et dont la nature dépend de
+l'application utilisant le graphe; voir par exemple le domaine {\tt
+dg\_arc\_label} dans le fichier {\tt kennedy.f.tex}.}
+
+\newpage{}
+\PAR{}
+Les structures de données suivantes sont utilisées par la phase {\tt
+kennedy} de PIPS.
+
+\domain{Import statement from "ri.newgen"}
+{}
+\domain{Import vertex from "graph.newgen"}
+{}
+
+\domain{dg\_vertex\_label = statement x enclosing\_loops:statement* x sccflags}
+{Ce domaine est utilisé pour contenir les informations qui sont
+attachées à chaque noeud du graphe de dépendances (voir le domaine
+{\tt graph} dans le fichier {\tt graph.f.tex}). Le sous-domaine {\tt
+statement} représente l'instruction qui porte la dépendance. Le
+sous-domaine {\tt enclosing\_loops} represente les boucles qui englobent
+cette instruction; c'est une liste de {\tt statement} et non pas une
+liste de {\tt loop} pour avoir accès aux effets de ces boucles. Le
+sous-domaine {\tt sccflags} contient diverses informations utiles pour
+le calcul des composantes fortement connexes.}
+
+\domain{dg\_arc\_label = all\_levels:unit + levels:int*}
+{Ce domaine est utilisé pour contenir les informations qui sont
+attachées à chaque arc du graphe de dépendances (voir le domaine {\tt
+graph} dans le fichier {\tt graph.f.tex}). Il s'agit des niveaux des
+dépendances représentées par cet arc. Les dépendances de niveau {\tt
+all\_levels} sont créées par les scalaires affectés dans les boucles.}
+
+\domain{Sccflags = enclosing\_scc:scc x mark:int x dfnumber:int x lowlink:int}
+{Ce domaine est utilisé par l'algorithme de calcul des composantes
+fortement connexes d'un graphe.}
+
+\domain{Sccs = sccs:scc*}
+{Ce domaine permet de contenir le résultat de l'algorithme de calcul
+des composantes fortement connexes d'un graphe. Il s'agit d'une liste de
+{\tt scc}, c'est à dire de composantes fortement connexes.}
+\domain{Scc = vertices:vertex* x indegree:int}
+{Ce domaine permet de représenter une composante fortement connexe d'un
+graphe. Une {\tt scc} se compose d'un ensemble de noeuds, et d'un
+sous-domaine {\tt indegree} utilisé par l'algorithme de tri topologique.
+}
+
+\newpage
+\SEC{ANNEXE 2 --- RESULTATS DU PARALLELISEUR}
+\paragraph{}
+La boucle suivante:
+\begin{verbatim}
+001       DO I = 1,10,1
+002           T(I) = 0.0
+000       ENDDO
+\end{verbatim}
+
+est transformée en:
+
+\begin{verbatim}
+000       DOALL I = 1,10,1
+002           T(I) = 0.0
+000       ENDDO
+\end{verbatim}
+
+en 0.8 secondes.
+
+\newpage
+\paragraph{}
+La boucle suivante:
+\begin{verbatim}
+001       DO I = 1,10,1
+002           T(I) = 0.0
+003           V(I) = T(I) ** 2.
+000       ENDDO
+\end{verbatim}
+
+est transformée en:
+
+\begin{verbatim}
+000       DOALL I = 1,10,1
+002           T(I) = 0.0
+000       ENDDO
+000       DOALL I = 1,10,1
+003           V(I) = T(I) ** 2.
+000       ENDDO
+\end{verbatim}
+
+en 1.2 secondes.
+
+\newpage
+\paragraph{}
+La boucle suivante:
+\begin{verbatim}
+001       DO I = 1,10,1
+002           DO J = 1,10,1
+003               V1(I,J) = 0.0
+004               V2(I,J) = V2(I,J) + V1(I + 1,J)
+000           ENDDO
+000       ENDDO
+\end{verbatim}
+
+est transformée en:
+
+\begin{verbatim}
+000       DOALL I = 1,10,1
+000           DOALL J = 1,10,1
+004               V2(I,J) = V2(I,J) + V1(I + 1,J)
+000           ENDDO
+000       ENDDO
+000       DOALL I = 1,10,1
+000           DOALL J = 1,10,1
+003               V1(I,J) = 0.0
+000           ENDDO
+000       ENDDO
+\end{verbatim}
+
+en 1.5 secondes.
+
+\newpage
+\paragraph{}
+La boucle suivante:
+\begin{verbatim}
+001       DO I = 1,10,1
+002           MAT(I,I) = 0.0
+003           DO J = 1,I - 1,1
+004               MAT(I,J) = 1.0
+005               MAT(J,I) = --1.0
+000           ENDDO
+000       ENDDO
+\end{verbatim}
+
+est transformée en:
+
+\begin{verbatim}
+000       DOALL I = 1,10,1
+000           DOALL J = 1,I - 1,1
+005               MAT(J,I) = --1.0
+000           ENDDO
+000       ENDDO
+000       DOALL I = 1,10,1
+000           DOALL J = 1,I - 1,1
+004               MAT(I,J) = 1.0
+000           ENDDO
+000       ENDDO
+000       DOALL I = 1,10,1
+002           MAT(I,I) = 0.0
+000       ENDDO
+\end{verbatim}
+
+en 2.0 secondes.
+
+\newpage
+\paragraph{}
+La boucle suivante:
+\begin{verbatim}
+001       DO I = 1,10,1
+002           DO J = 1,10,1
+003               MAT(I,J) = 0.0
+000           ENDDO
+000       ENDDO
+\end{verbatim}
+
+est transformée en:
+
+\begin{verbatim}
+000       DOALL I = 1,10,1
+000           DOALL J = 1,10,1
+003               MAT(I,J) = 0.0
+000           ENDDO
+000       ENDDO
+\end{verbatim}
+
+en 1.0 secondes.
+
+\newpage
+\paragraph{}
+La boucle suivante:
+\begin{verbatim}
+001       DO L = 1,N - 1,1
+002           DO J = L + 1,N,1
+003               A(L,J) = A(L,J) / A(L,L)
+000           ENDDO
+004           DO I = L + 1,N,1
+005               DO K = L + 1,N,1
+006                   B(I,K) = A(I,L) * A(L,K)
+007                   A(I,K) = A(I,K) - B(I,K)
+000               ENDDO
+000           ENDDO
+000       ENDDO
+\end{verbatim}
+
+est transformée en:
+
+\begin{verbatim}
+000       DO L = 1,N - 1,1
+000           DOALL J = L + 1,N,1
+003               A(L,J) = A(L,J) / A(L,L)
+000           ENDDO
+000           DOALL I = L + 1,N,1
+000               DOALL K = L + 1,N,1
+006                   B(I,K) = A(I,L) * A(L,K)
+000               ENDDO
+000           ENDDO
+000           DOALL I = L + 1,N,1
+000               DOALL K = L + 1,N,1
+007                   A(I,K) = A(I,K) - B(I,K)
+000               ENDDO
+000           ENDDO
+000       ENDDO
+\end{verbatim}
+
+en 1.5 secondes.
+
+\newpage
+\paragraph{}
+La boucle suivante:
+\begin{verbatim}
+001       DO I = 1,L,1
+002           DO J = 1,N,1
+003               C(I,J) = 0.0
+004               DO K = 1,M,1
+005                   C(I,J) = C(I,J) + A(I,K) * B(K,J)
+000               ENDDO
+000           ENDDO
+000       ENDDO
+\end{verbatim}
+
+est transformée en:
+
+\begin{verbatim}
+000       DOALL I = 1,L,1
+000           DOALL J = 1,N,1
+003               C(I,J) = 0.0
+000           ENDDO
+000       ENDDO
+000       DOALL I = 1,L,1
+000           DOALL J = 1,N,1
+000               DO K = 1,M,1
+005                   C(I,J) = C(I,J) + A(I,K) * B(K,J)
+000               ENDDO
+000           ENDDO
+000       ENDDO
+\end{verbatim}
+
+en 1.1 secondes.
+
+\newpage
+\paragraph{}
+La boucle suivante:
+\begin{verbatim}
+001       DO I = 1,10,1
+002           V1(I) = 0.0
+003           V2(I) = V2(I) + V1(I + 1)
+000       ENDDO
+\end{verbatim}
+
+est transformée en:
+
+\begin{verbatim}
+000       DOALL I = 1,10,1
+003           V2(I) = V2(I) + V1(I + 1)
+000       ENDDO
+000       DOALL I = 1,10,1
+002           V1(I) = 0.0
+000       ENDDO
+\end{verbatim}
+
+en 1.2 secondes.
+
+\newpage
+\paragraph{}
+La boucle suivante:
+\begin{verbatim}
+001       DO I = 1,10,1
+002           DO J = 1,10,1
+003               V1(I,J) = 0.0
+004               V2(I,J) = V2(I,J) + V1(I + 1,J)
+000           ENDDO
+000       ENDDO
+\end{verbatim}
+
+est transformée en:
+
+\begin{verbatim}
+000       DOALL I = 1,10,1
+000           DOALL J = 1,10,1
+004               V2(I,J) = V2(I,J) + V1(I + 1,J)
+000           ENDDO
+000       ENDDO
+000       DOALL I = 1,10,1
+000           DOALL J = 1,10,1
+003               V1(I,J) = 0.0
+000           ENDDO
+000       ENDDO
+\end{verbatim}
+
+en 1.7 secondes.
+
+\newpage
+\paragraph{}
+La boucle suivante:
+\begin{verbatim}
+001       DO I = 1,10,1
+002           DO J = 1,10,1
+003               V1(I,J) = 0.0
+004               V2(I,J) = V1(I,J) + V1(I,J + 1)
+000           ENDDO
+000       ENDDO
+\end{verbatim}
+
+est transformée en:
+
+\begin{verbatim}
+000       DOALL I = 1,10,1
+000           DO J = 1,10,1
+003               V1(I,J) = 0.0
+004               V2(I,J) = V1(I,J) + V1(I,J + 1)
+000           ENDDO
+000       ENDDO
+\end{verbatim}
+
+en 1.5 secondes.
+
+\newpage
+\paragraph{}
+La boucle suivante:
+\begin{verbatim}
+001       DO I = 1,10,1
+002           DO J = 1,10,1
+003               V1(I,J) = 0.0
+004               V2(I,J) = V1(I,J) + V1(I,J)
+000           ENDDO
+000       ENDDO
+\end{verbatim}
+
+est transformée en:
+
+\begin{verbatim}
+000       DOALL I = 1,10,1
+000           DOALL J = 1,10,1
+003               V1(I,J) = 0.0
+000           ENDDO
+000       ENDDO
+000       DOALL I = 1,10,1
+000           DOALL J = 1,10,1
+004               V2(I,J) = V1(I,J) + V1(I,J)
+000           ENDDO
+000       ENDDO
+\end{verbatim}
+
+en 1.5 secondes.
+
+
+\newpage
+\SEC{ANNEXE 3 --- GRAPHE DE CONTROLE}
+\PAR{}
+Cette annexe contient le listing des programmes sources du graphe de
+contrôle. 
+
+\end{document}
+\end

@@ -1,0 +1,490 @@
+\documentclass[12pt]{farticle}
+
+\usepackage[latin1]{inputenc}
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+
+\newcommand{\titre}{PROJET PIPS-CRAY \\
+                RAPPORT INTERMEDIAIRE
+}
+
+\newcommand{\auteur}{
+                Bruno BARON \\
+                François IRIGOIN \\
+                Pierre JOUVELOT \\
+\vspace{0.5cm}
+{\it Le présent document a été établi en exécution du contrat
+No.~88.017.01.018 passé par la Direction des Recherches, Etudes et
+Techniques (Délégation Générale pour l'Armement)}
+}
+
+% pour importer des structures de données Newgen
+\newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{\em #2}}
+\newcommand{\docdate}{7 Avril 1992}
+\newcommand{\numero}{E/163/CRI}
+
+\begin{document}
+\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+
+{\it Le présent document a été établi en exécution du contrat
+No.~88.017.01.018 passé par la Direction des Recherches, Etudes et
+Techniques (Délégation Générale pour l'Armement)}
+
+\vspace{2cm}
+
+\tableofcontents
+
+\newpage
+
+\section*{Introduction}
+Commencé depuis six mois, le contrat Pips-Cray a déjà
+considérablement progressé. Outre les résultats présentés dans le
+précédent état d'avancement,
+% il s'agit du document dret161.f.tex
+nous avons aussi réalisé les points
+suivants, développés dans ce rapport intermédiaire:
+\begin{itemize}
+\item
+        la génération de code avec directives Cray CFT77, 
+\item
+        le remplacement des constantes associé à l'évaluation
+partielle pour simplifier les expressions,
+\item
+        une première détection des réductions généralisées,
+\item
+        l'exécution de quelques programmes simples sur un Cray X-MP.
+\end{itemize}
+
+\section{Génération de code avec directives Cray CFT77}
+Une première sélection du parallélisme a été effectuée, selon une
+méthode simple développée dans le précédent état d'avancement.
+En résumé, nous limitons le parallélisme d'un nid de boucle à un
+maximum de deux boucles imbriquées: la boucle la plus interne si elle
+est vectorisable, ainsi que la boucle parallèle la plus externe pour le
+microtasking. Toutes les autres boucles restent séquentielles.  
+
+Afin de pouvoir exécuter le code transformé par PIPS sur des machines
+Cray, il fallait encore générer des directives qui spécifient le mode
+d'exécution des boucles au compilateur CFT77 du Cray. Nous l'avons
+réalisé dans une phase d'impression nommée:
+\begin{quote}
+PRINT\_PARALLELIZEDCRAY\_CODE
+\end{quote}
+Cette phase ajoute les directives au format CFT77, c'est-à-dire dans un
+commentaire précédant le code de la boucle à laquelle la directive
+s'applique.
+
+Les directives générées sont donc de deux types: les directives de
+vectorisation pour les boucles vectorielles, et les directives de
+microtasking pour les boucles dont les itérations doivent s'exécuter
+de façon répartie sur plusieurs processeurs.
+
+\subsection{Directives de vectorisation}
+Pour les boucles vectorielles, nous générons la directive de
+vectorisation:
+\begin{verbatim}
+CDIR$ IVDEP
+\end{verbatim}
+
+\subsection{Directives de microtasking}
+Pour les boucles microtaskées, nous générons la directive de
+microtasking
+\begin{verbatim}
+CMIC$ DO ALL PRIVATE(<private>) SHARED(<shared>) 
+\end{verbatim}
+\verb+<private>+ étant la liste des variables privées, c'est-à-dire
+locales à la boucle, \verb+<shared>+ étant la liste des variables
+partagées par l'ensemble des processeurs et utilisées dans la boucle.
+Ainsi des processeurs disponibles sont alloués pour exécuter en
+parallèle (sans synchronisation) les itérations de la boucle.
+
+Il faut noter que la génération des listes de variables privées et
+partagées n'est pas immédiate. Pour générer la liste des variables
+partagées dans une boucle, nous avons simplement accumulé les entités
+qui apparaissent dans les {\em effets cumulés} du corps de la boucle et
+qui ne font pas partie des \verb+loop_locals+.
+
+Pour générer la liste des variables privées dans une boucle, il
+fallait tenir compte de plusieurs facteurs:
+\begin{itemize}
+  \item certains algorithmes de privatisation ne placent dans
+\verb+loop_locals+ que les entités qui sont immédiatement utilisées,
+mais pas celles qui sont privées pour des boucles internes. Comme les
+boucles internes à une boucle parallèle ne sont jamais parallèles, il
+faut donc déclarer privées toutes les entités qui apparaissent dans
+les \verb+loop_locals+ des boucles internes. Sur l'exemple suivant, {\tt
+J} devient ainsi une variable privée pour la boucle externe:
+
+\begin{verbatim}
+     DO I = 1, 10             CMIC$ DO ALL PRIVATE(I,J) SHARED(A)
+         PRIVATE I                 DO I = 1, 10
+         DO J = 1, 10         CDIR$ IVDEP
+             PRIVATE J                 DO J = 1, 10
+             A(I,J)=0.                     A(I,J)=0.
+         ENDDO                         ENDDO
+     ENDDO                         ENDDO
+\end{verbatim}
+
+  \item après certaines transformations comme la distribution (qui est
+abondamment utilisée par l'algorithme de Kennedy et Allen), certaines
+entités se trouvent dans la liste \verb+loop_locals+ alors qu'elles ne
+font plus partie du corps de la boucle. Il faut donc les filtrer pour
+économiser une allocation en pile inutile et pour améliorer la
+lisibilité du source produit.
+\end{itemize}
+
+\subsection{Commentaires}
+Par ces directives, le résultat des analyses et les transformations
+réalisées par PIPS est transmis au compilateur Cray CFT77.
+
+% Peut-on faire ce genre de commentaires ici??
+Au sujet du code généré par PIPS, il faut noter que l'absence de
+directives pour allouer plusieurs processeurs pour le programme (section
+parallèle) limite l'efficacité d'exécution des exemples réels. En
+effet, sans cela, le surcoût impliqué par l'allocation et la
+libération de processeurs doit être supporté au niveau de chaque
+boucle.
+
+\section{Remplacement des constantes et évaluation partielle}
+La phase {\tt partial\_eval} réalise en un seul parcours du code le
+remplacement des constantes entières et l'évaluation partielle des
+expressions pour réaliser des simplifications.  Voir l'exemple en
+Annexe A.
+
+\subsection{Remplacement des références par des constantes entières}
+Les analyses sémantiques interprocédurales réalisées dans Pips
+permettent de connaître les valeurs de variables scalaires entières en
+certains points du programme. Ces analyses généralisent donc ce qu'on
+appelle la {\em propagation des constantes} au contexte
+interprocédural.
+
+Les variables entières dont la valeur est connue par résolution du
+système de préconditions peuvent être remplacées par leur valeur.
+C'est l'objectif de la phase de remplacement de constantes, prévue par
+ce contrat.
+
+Cette phase remplace les constantes dans les expressions suivantes:
+\begin{itemize}
+  \item la condition de l'instruction \verb+IF+\footnote{
+Seules les constantes entières sont détectées pour l'instant; il
+faudrait y ajouter les constantes bouléennes puis effectuer
+l'élimination du code mort lorsque la condition du test est une
+constante.}, 
+  \item les bornes et l'incrément des boucles \verb+DO+
+  \item les expressions arguments des instructions \verb+CALL+.
+\end{itemize}
+Toutes les références à des scalaires entiers lue dans cette
+instruction sont candidates au remplacement. En utilisant les {\em effets
+propres}, nous empêchons le remplacement des références qui peuvent
+être écrites.
+
+Ensuite ces références scalaires entières sont évaluées à partir
+des préconditions associées à l'instruction dont fait partie la
+référence. Pour cela, la fonction {\tt sc\_minmax\_of\_variable}
+projette les équations du système de préconditions sur la dimension
+associée à la variable pour obtenir un intervalle de variation réduit
+à un élément pour les constantes et égal à $Z\!\!\!Z$ pour les
+références dont on ne sait rien.
+
+Cette phase de remplacement des constantes est inclue dans l'évaluation
+partielle des expressions, qui utilise les valeurs trouvées pour
+effectuer des simplifications.
+
+\subsection{Evaluation partielle des expressions}
+L'algorithme d'évaluation partielle des expressions écrit
+récursivement les expressions sous la forme 
+\verb#ICOEF*SUBEXPR + ISHIFT#, où \verb+ICOEF+ et \verb+ISHIFT+ 
+sont des constantes numériques entières et \verb+SUBEXPR+ est de type
+expression. Il commence par évaluer les expressions feuilles qui sont
+soit des constantes numériques entières, soit des constantes entières
+remplaçables par leur valeur. Dans la mesure du possible, il réalise
+ensuite quelques simplifications au fur et à mesure qu'il remonte dans
+les expressions, c'est-à-dire lorsqu'il évalue l'addition, la
+soustraction, la multiplication ou la division entière, ainsi que le
+modulo et le moins unaire. Lorsqu'on a terminé l'évaluation de
+l'expression, ou lorsqu'on ne peut l'évaluer (lors d'un appel à une
+fonction externe par exemple), il faut restaurer une expression sous
+forme normale. Pour cela, ou bien l'expression sous la forme ci-dessus
+est regénérée (au cas où il y a eu simplification), ou bien elle
+est concervée.
+
+Les hypothèses pour l'implémentation sont les suivantes:
+\begin{itemize}
+  \item \verb+eformat+ est une structure C qui contient les champs
+\verb+icoef+, \verb+expr+ et \verb+ishift+, ainsi que le booléen
+\verb+simpler+.
+
+  \item Toute fonction d'évaluation partielle retourne
+\verb+eformat_undefined+ lorsqu'elle n'a rien évalué (par exemple lors
+d'un appel d'une fonction externe).
+
+  \item \verb+eformat.expr+ {\em ne doit jamais} partager de structures
+avec le code.  Par contre, une expression détachée du code peut
+appartenir à \verb+eformat.expr+.
+
+  \item Lorsqu'une expression est détachée du code, il faut prendre
+garde à lui substituer \verb+expression_undefined+, de sorte qu'un free
+(dans {\tt regenerate\_expression}) puisse s'exécuter sans problème.
+
+  \item Si une information est ajoutée à \verb+eformat_undefined+,
+alors l'expression est {\em recopiée}. Pourtant, \verb+eformat.simpler+
+reste {\tt FALSE} et l'expression d'origine n'est pas désallouée, car
+une seule information ne permet aucune simplification.  A partir de la
+prise en compte de la seconde information, dès que \verb+eformat+ est
+simplifié, alors \verb+eformat.simpler+ devient vrai. L'expression
+d'origine sera alors désallouée au prochain {\tt
+regenerate\_expression}.
+
+  \item Dès que l'évaluation n'est plus possible, il faut regénérer
+l'expression.
+
+\end{itemize}
+
+\section{Réductions Généralisées}
+
+L'implémentation d'un premier prototype en CommonLISP du module de
+détection des réductions généralisées s'est poursuivie, permettant
+de présenter déjà quelques résultats sur des programmes simples.
+
+Basée sur les résultats décrits dans ``Jouvelot, P., and Dehbonei, B.
+{\em A Unified Semantic Approach for the Vectorization and
+Parallelization of Generalized Reductions}, 1989 ACM SIGARCH Int. Conf.
+on Supercomputing, Crete, Jun.89'', cette méthode permet, dans un cadre
+unifié, de détecter les invariants de boucle, les affectations
+redondantes, les variables d'induction et les opérations de réduction
+comme la détermination du maximum d'un tableau ou le produit scalaire
+de vecteurs.
+
+L'analyse d'un module se fait par évaluation symbolique des corps de
+boucle et reconnaissance de patterns dans une base de connaissance
+d'idiomes de réductions généralisées.  Nous donnons ci-dessous un
+exemple de pattern, celui décrivant le maximum d'un élément de
+tableau.
+\begin{verbatim}
+;;; Case for IF( T[I].GT.X ) X=T[I]
+
+;; ARRAY-MAX-CODE is the RI code generator when a max reduction is
+;; detected. 
+;;
+;; VAR is the reduced variable, COND the conditional test, 
+;; PARAM the right-hand side of the OP operator used when COND is true.
+;; The CONTEXT gives the LOOP indices.
+;;
+(defun array-max-code (var cond param op context loop)
+    (let ((range (loop-range loop)))
+        (make-statement-call 
+         entity[array-max]
+         `(,(make-expression-reference var '())
+           ,(make-expression-reference 
+             (expression-reference-variable param) '())
+           ,(range-lower range)
+           ,(range-upper range)
+           ,(range-increment range)))))
+
+;; The ARRAY-MAX-REDUCTION template describes the associated reduction. 
+;; The :PATTERN describes the arguments to be passed to the code
+;; :GENERATOR, while the :VALUE is instantiated and passed as 
+;; PARAM to the code generator.
+;; 
+;; Unification variables are used to allow pattern recognition to be
+;; independant from the actual reference variables used in the analyzed
+;; program. 
+;;
+(defparameter array-max-reduction
+    (let ((t[i] (make-expression-reference
+                 (make-unification-variable 2)
+                 `(,(make-expression-reference
+                     (make-unification-variable 3) '())))))
+        (make-template
+         :pattern 
+         (make-pattern :variable (make-unification-variable 1)
+                       :condition (make-expression-call
+                                   (function-entity[] ".GT.")
+                                   `(,t[i]
+                                     ,(make-expression-reference
+                                       (make-unification-variable 1) '())))
+                       :parameter t[i]
+                       :operator entity[fun-xy.y]
+                       :indices `(,(make-unification-variable 3)))
+         :generator #'array-max-code
+         :value (make-expression-reference
+                 (make-unification-variable 2) '()))))
+\end{verbatim}
+Les patterns décrivant les réductions sont regroupés dans une base de
+templates qui contiennent, pour chaque pattern, la fonction à appeler
+pour générer le code de réduction et la valeur du paramètre à
+instancier (cette valeur est fournie au générateur de code comme le
+champ {\tt param}).  Une dernière phase élimine les instructions du
+corps de boucle qui font référence à des variables ayant été
+détectées comme des réductions généralisées.
+
+A titre d'exemple, le programme de test suivant a été utilisé:
+\begin{verbatim}
+      program reduction
+      real a(10),b(10)
+      do 10 i=1,10
+         s = 2
+         f = g*f
+         t = t
+         v = v + 3
+         w = w * 4
+         x = x+a(i)
+         y = y+a(i)*b(i)
+         if( a(i).gt.z ) z = a(i)
+ 10   continue
+      end
+\end{verbatim}
+Après évaluation symbolique et détection des réductions
+correspondant aux valeurs symboliques de chaque variable, le programme
+résiduel suivant est généré:
+\begin{verbatim}
+      PROGRAM REDUCTION
+      REAL A(10),B(10)
+      DO I = 1, 10
+         F = G*F                                                        0004
+      ENDDO
+      CALL CONSTANT(S, 2, 1, 10, 1)
+      CALL SUM(V, 3, 1, 10, 1)
+      CALL PRODUCT(W, 4, 1, 10, 1)
+      CALL ARRAYSUM(X, A, 1, 10, 1)
+      CALL INNER(Y, A, B, 1, 10, 1)
+      CALL ARRAYMAX(Z, A, 1, 10, 1)
+      RETURN
+      GOTO 99997
+99997 CONTINUE
+      END
+\end{verbatim}
+La sémantique des différentes fonctions bibliothèques est donnée
+ci-dessous:
+\begin{description}
+\item[{\tt CONSTANT}] 
+        {\tt S} est une constante, de valeur {\tt 2},
+\item[{\tt SUM}] 
+        {\tt V} est une variable d'induction, par pas de {\tt 3},
+\item[{\tt PRODUCT}] 
+        {\tt W} est une variable de progression géométrique, de raison
+{\tt 4},
+\item[{\tt ARRAYSUM}]
+        {\tt X} est la somme des éléments du tableau {\tt A},
+\item[{\tt INNER}]
+        {\tt Y} est le produit scalaire des tableaux {\tt A} et {\tt B},
+\item[{\tt ARRAYMAX}]
+        {\tt Z} est l'élément maximum du tableau {\tt A}.
+\end{description}
+On notera que les bornes de boucles sont passées à chaque fonction
+bibliothèque.  Ceci permet de détecter des opérations sur des
+sous-tableaux des tableaux passés en argument et, également, de
+vérifier à l'exécution que la boucle est bien exécutée (test des
+bornes de boucles). Dans la majorité des cas, cette deuxième analyse
+pourrait être effectuée au moment de la compilation par une
+détermination un peu plus fine des bornes.
+
+\section{Exécution de tests sur un Cray X-MP}
+L'accès à un Cray X-MP est finalement possible. Nous avons donc
+réalisé quelques tests pour vérifier que le code généré est
+correct, ainsi que pour comparer le code en sortie de PIPS avec le code
+en sortie de FPP. Dans un premier temps, ces tests nous permettent de
+réaliser la mise au point du code parallèle généré par PIPS, et de
+sélectionner d'autres transformations qu'il nous faudra réaliser.
+
+\section{Conclusion}
+
+L'état d'avancement du projet Pips-Cray est satisfaisant et conforme au
+plan initial.  Nous poursuivons les expériences en grandeur réelle sur
+le Cray, dans le but d'obtenir là une validation effective des
+capacités de PIPS.
+
+\newpage
+
+\section*{Annexe A}
+\subsection*{Exemple de remplacement des constantes et évaluation
+partielle}
+\subsubsection*{Exemple 1}
+Le programme {\tt exemple} illustre diverses fonctionnalités de
+l'évaluation partielle. Soit le code initial:
+\begin{verbatim}
+      PROGRAM EXEMPLE
+C     
+      I = 5                                                             0001
+      J = 2*I                                                           0002
+      N = (4*M+I-4)/2+MOD(3*J+1, 4)-10/3                                0003
+      I = I+J+1                                                         0004
+      CALL EFFET(I, J)                                                  0005
+      M = J                                                             0006
+      END
+C
+      SUBROUTINE EFFET(NR, NW)
+      NW = NR+1                                                         0001
+      RETURN
+      END
+\end{verbatim}
+Le module {\tt EXEMPLE} après évaluation partielle:
+
+\begin{verbatim}
+      PROGRAM EXEMPLE
+C     
+      I = 5                                                             0001
+      J = 10                                                            0002
+      N = (4*M+1)/2                                                     0003
+      I = I+11                                                          0004
+      CALL EFFET(16, J)                                                 0005
+      M = 17                                                            0006
+      END
+\end{verbatim}
+Remarquer que {\tt J} n'est pas remplacé à l'instruction 5, car
+cette variable est écrite. De même pour {\tt I} à l'instruction 4,
+mais une analyse plus fine devrait permettre de remplacer le {\tt I} du
+membre de droite.
+
+\newpage
+
+\subsubsection*{Exemple 2}
+Ce code est extrait du module ROMAT du programme tmines.f de l'ONERA. On
+constate que toutes les bornes de boucles sont remplacées par leur
+valeur. Le code initial, modifié pour ne garder que les parties
+intéressantes, est:
+
+\begin{verbatim}
+      DO K = 1, KMM                                                     0045
+C     
+         DO LB = 1, 37                                                  0047
+            DO I = 1, IMM                                               0049
+               DO J = 1, JMM                                            0051
+                  BEL(LB,I,J) = BELK(LB,I,J,K)                          0052
+               ENDDO
+            ENDDO
+         ENDDO
+C     
+         DO J = 1, JMM                                                  0055
+            DO I = 1, IMM                                               0057
+               PH(I,1) = PHI(I,J,K)                                     0058
+               PH(I,2) = PHI(I+1,J,K)                                   0059
+C              ... (partie supprimee)
+            ENDDO
+         ENDDO
+      ENDDO
+\end{verbatim}
+Il devient après évaluation partielle:
+\begin{verbatim}
+      DO K = 1, 24                                                      0045
+C
+         DO LB = 1, 37                                                  0047
+            DO I = 1, 80                                                0049
+               DO J = 1, 14                                             0051
+                  BEL(LB,I,J) = BELK(LB,I,J,K)                          0052
+               ENDDO
+            ENDDO
+         ENDDO
+C
+         DO J = 1, 14                                                   0055
+            DO I = 1, 80                                                0057
+               PH(I,1) = PHI(I,J,K)                                     0058
+               PH(I,2) = PHI(I+1,J,K)                                   0059
+C              ... (partie supprimee)
+            ENDDO
+         ENDDO
+      ENDDO
+\end{verbatim}
+Ces transformations sont très utiles pour décider de l'opportunité
+d'une inversion de boucle ou d'un ``loop coalescing''.
+
+\end{document}

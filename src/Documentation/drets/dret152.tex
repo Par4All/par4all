@@ -1,0 +1,438 @@
+\documentclass[12pt]{article}
+
+\usepackage[latin1]{inputenc}
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+
+% pour importer des structures de données Newgen
+% \newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{\em #2}}
+
+\newcommand{\titre}{PROJET PIPS \\
+	PARALLELISATION DE LA PROCEDURE CHOLES \\
+	DU PROGRAMME CR2CNF
+}
+
+\newcommand{\auteur}{
+        	François IRIGOIN
+}
+\newcommand{\docdate}{Mars 1991}
+\newcommand{\numero}{E152}
+
+\begin{document}
+\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+
+% \tableofcontents
+
+% \newpage
+
+\section*{Introduction}
+
+La procédure de recette de PIPS a mis en évidence un comportement
+anormal sur la procédure {\tt choles} du programme de l'ONERA {\tt cr2cnf}.
+Cette anomalie a été étudiée et son origine a été trouvée dans la
+manière dont la privatisation est effectuée.
+
+Pour obtenir une version rapide de PIPS, la phase de privatisation est
+optionnelle. Une privatisation tres simple est cependant opérée lors
+de la parallélisation pour éviter que les indices de boucle ne créent
+systématiquement des dépendances.
+
+Il est possible de contourner ce problème sans activer la phase de
+privatisation en renommant les indices de boucles.  Ces informations ont
+été ajoutées à la nouvelle version du manuel utilisateur. Ceci n'est
+considéré que comme une solution d'un intérêt limité parce que la
+privatisation est très rapide par rapport au calcul des {\em use-def chains}
+qui est, lui, indispensable.
+
+Voici quatre versions parallélisées de {\tt choles}, qui suivent un
+listing du code original de l'ONERA. La première est celle qui a été
+obtenue le jour de la recette. La seconde est celle qui est obtenue
+après renommage de indices des boucles 9 et 10: toutes les boucles
+parallèles standards sont trouvées en utilisant l'option {\em
+rice\_full\_dg} pour le calcul du graphe de dépendance.  La troisième
+est celle qui est obtenue en utilisant la privatisation et en
+sélectionnant le test de dépendance le plus précis pour pouvoir
+traiter les boucles parallèles qui abondent dans cette version de {\tt
+choles}.  La quatrième est celle qui est produite par FPP, le
+préprocesseur de Cray qui a été développé par Pacific Sierra. On
+remarquera que la boucle 9 y est correctement parallélisée alors que
+la référence au tableau {\tt RL} n'est pas linéaire.
+
+\section{Procédure {\tt choles}}
+
+Voici la procédure {\tt choles} telle qu'elle nous a ete procurée par
+l'ONERA. 
+
+\begin{verbatim}
+C***********************************************************************
+      SUBROUTINE CHOLES(A,N,RL,Z)
+      IMPLICIT REAL*8(A-H,O-Z)
+C  ROUTINE DE CALCUL DE LA DECOMPOSEE DE CHOLESKI L*D*LT DE LA MATRICE A
+C  L ETANT STOCKEE PLEINE COMME A, LA DIAGONALE DE L ETANT EGALE A 1/D .
+C  LES MATRICES A ET RL PEUVENT ETRE CONFONDUES .
+      COMMON/TOTO/Z1(640),Z2(640),D(640)
+      DIMENSION A(N,N),RL(N,N),Z(N)
+C  CALCUL DE LA PREMIERE COLONNE DE RL .
+      Z1(1)=A(1,1)
+      D(1)=1./Z1(1)
+      DO 1 J=2,N
+1     RL(J,1)=A(J,1)*D(1)
+C  CALCUL DES COLONNES 2 A N DE RL .
+      DO 2 I=2,N
+C  CALCUL DU TERME DIAGONAL .
+      Z1(I)=A(I,I)
+        DO 5 K=1,I-1
+ 5      Z2(K)=RL(I,K)*Z1(K)
+        DO 3 K=1,I-1
+ 3      Z1(I)=Z1(I)-RL(I,K)*Z2(K)
+      D(I)=1./Z1(I)
+C  CALCUL DE LA COLONNE .
+        DO 4 J=I+1,N
+ 4      Z2(J)=A(J,I)
+        DO 6 K=1,I-1
+CDIR$ IVDEP
+          DO 7 J=I+1,N
+  7       Z2(J)=Z2(J)-RL(J,K)*Z2(K)
+ 6      CONTINUE
+        DO 8 J=I+1,N
+ 8      RL(J,I)=Z2(J)*D(I)
+2     CONTINUE
+C  RANGEMENT DE L'INVERSE DE LA DIAGONALE .
+      DO 9 I=1,N
+9     RL(I*(N+1)-N,1)=D(I)
+C RANGEMENT PAR TRANSPOSITION DES TERMES TRIANGULAIRES SUPERIEURS DE L .
+      DO 10 I=2,N
+CDIR$ IVDEP
+        DO 11 J=1,I-1
+ 11     RL(J,I)=RL(I,J)
+10    CONTINUE
+      RETURN
+      END
+\end{verbatim}
+
+\section{Parallélisation directe par PIPS}
+
+La boucle 2 est correctement distribuée. Les boucles 10 et 11 sont
+correctement parallélisée parce que les bornes de boucles sont prises
+en compte dans le test de dépendance. Les boucles 5, 4, 7 et 8 auraient
+dû être parallélisées mais leurs indices ne sont pas privatisés.
+Ils génèrent donc des cycles pour ces boucles.
+
+\begin{verbatim}
+C***********************************************************************
+      SUBROUTINE CHOLES(A,N,RL,Z)
+      IMPLICIT REAL*8(A-H,O-Z)
+C  ROUTINE DE CALCUL DE LA DECOMPOSEE DE CHOLESKI L*D*LT DE LA MATRICE A
+C  L ETANT STOCKEE PLEINE COMME A, LA DIAGONALE DE L ETANT EGALE A 1/D .
+C  LES MATRICES A ET RL PEUVENT ETRE CONFONDUES .
+      COMMON/TOTO/Z1(640),Z2(640),D(640)
+      DIMENSION A(N,N),RL(N,N),Z(N)
+C  CALCUL DE LA PREMIERE COLONNE DE RL .
+      Z1(1) = A(1,1)                                                    0002
+      D(1) = (1./Z1(1))                                                 0003
+      DOALL 1 J = 2,N,1
+         PRIVATE J
+1        RL(J,1) = (A(J,1)*D(1))                                        0006
+      ENDDO
+C  CALCUL DES COLONNES 2 A N DE RL .
+      DOALL 2 I = 2,N,1
+         PRIVATE I
+C  CALCUL DU TERME DIAGONAL .
+         Z1(I) = A(I,I)                                                 0009
+      ENDDO
+      DO 2 I = 2,N,1
+         PRIVATE I
+         DO 5 K = 1,(I-1),1
+5           Z2(K) = (RL(I,K)*Z1(K))                                     0012
+         ENDDO
+         DO 3 K = 1,(I-1),1
+3           Z1(I) = (Z1(I)-(RL(I,K)*Z2(K)))                             0015
+         ENDDO
+         D(I) = (1./Z1(I))                                              0016
+         DO 4 J = (I+1),N,1
+4           Z2(J) = A(J,I)                                              0019
+         ENDDO
+         DO 6 K = 1,(I-1),1
+            DO 7 J = (I+1),N,1
+7              Z2(J) = (Z2(J)-(RL(J,K)*Z2(K)))                          0024
+            ENDDO
+         ENDDO
+         DO 8 J = (I+1),N,1
+8           RL(J,I) = (Z2(J)*D(I))                                      0028
+         ENDDO
+      ENDDO
+C  RANGEMENT DE L'INVERSE DE LA DIAGONALE .
+      DO 9 I = 1,N,1
+         PRIVATE I
+9        RL(((I*(N+1))-N),1) = D(I)                                     0032
+      ENDDO
+C RANGEMENT PAR TRANSPOSITION DES TERMES TRIANGULAIRES SUPERIEURS DE L .
+      DOALL 10 I = 2,N,1
+         PRIVATE I
+         DOALL 11 J = 1,(I-1),1
+            PRIVATE J
+11          RL(J,I) = RL(I,J)                                           0037
+         ENDDO
+      ENDDO
+      RETURN
+      END
+\end{verbatim}
+
+\section{Parallélisation par PIPS après renommage}
+
+Pour éliminer les {\em use-def chains} qui empêchent la privatisation de
+ces indices, il suffit de renommer l'indice {\tt I} qui est réutilisé par
+les boucles 9 et 10.
+
+\begin{verbatim}
+C***********************************************************************
+      SUBROUTINE CHOLES(A,N,RL,Z)
+      IMPLICIT REAL*8(A-H,O-Z)
+C  ROUTINE DE CALCUL DE LA DECOMPOSEE DE CHOLESKI L*D*LT DE LA MATRICE A
+C  L ETANT STOCKEE PLEINE COMME A, LA DIAGONALE DE L ETANT EGALE A 1/D .
+C  LES MATRICES A ET RL PEUVENT ETRE CONFONDUES .
+      COMMON/TOTO/Z1(640),Z2(640),D(640)
+      DIMENSION A(N,N),RL(N,N),Z(N)
+C  CALCUL DE LA PREMIERE COLONNE DE RL .
+      Z1(1) = A(1,1)                                                    0002
+      D(1) = (1./Z1(1))                                                 0003
+      DOALL 1 J = 2,N,1
+         PRIVATE J
+1        RL(J,1) = (A(J,1)*D(1))                                        0006
+      ENDDO
+C  CALCUL DES COLONNES 2 A N DE RL .
+      DOALL 2 I = 2,N,1
+         PRIVATE I
+C  CALCUL DU TERME DIAGONAL .
+         Z1(I) = A(I,I)                                                 0009
+      ENDDO
+      DO 2 I = 2,N,1
+         PRIVATE I
+         DOALL 5 K = 1,(I-1),1
+            PRIVATE K
+5           Z2(K) = (RL(I,K)*Z1(K))                                     0012
+         ENDDO
+         DO 3 K = 1,(I-1),1
+            PRIVATE K
+3           Z1(I) = (Z1(I)-(RL(I,K)*Z2(K)))                             0015
+         ENDDO
+         D(I) = (1./Z1(I))                                              0016
+         DOALL 4 J = (I+1),N,1
+            PRIVATE J
+4           Z2(J) = A(J,I)                                              0019
+         ENDDO
+         DO 6 K = 1,(I-1),1
+            PRIVATE K
+            DOALL 7 J = (I+1),N,1
+               PRIVATE J
+7              Z2(J) = (Z2(J)-(RL(J,K)*Z2(K)))                          0024
+            ENDDO
+         ENDDO
+         DOALL 8 J = (I+1),N,1
+            PRIVATE J
+8           RL(J,I) = (Z2(J)*D(I))                                      0028
+         ENDDO
+      ENDDO
+C  RANGEMENT DE L'INVERSE DE LA DIAGONALE .
+      DO 9 J = 1,N,1
+         PRIVATE J
+9        RL(((J*(N+1))-N),1) = D(J)                                     0032
+      ENDDO
+C RANGEMENT PAR TRANSPOSITION DES TERMES TRIANGULAIRES SUPERIEURS DE L .
+      DOALL 10 K = 2,N,1
+         PRIVATE K
+         DOALL 11 J = 1,(K-1),1
+            PRIVATE J
+11          RL(J,K) = RL(K,J)                                           0037
+         ENDDO
+      ENDDO
+      RETURN
+      END
+\end{verbatim}
+
+Les modifications effectuées entre la version originale et la version
+renommée sont les suivantes:
+\begin{verbatim}
+\$ diff choles.d*/choles.f cr2cnf.d*/choles.f
+35,36c35,36
+<       DO 9 J=1,N
+< 9     RL(J*(N+1)-N,1)=D(J)
+---
+>       DO 9 I=1,N
+> 9     RL(I*(N+1)-N,1)=D(I)
+38c38
+<       DO 10 K=2,N
+---
+>       DO 10 I=2,N
+40,41c40,41
+<         DO 11 J=1,K-1
+<  11     RL(J,K)=RL(K,J)
+---
+>         DO 11 J=1,I-1
+>  11     RL(J,I)=RL(I,J)
+\end{verbatim}
+L'indice {\tt I} de la boucle 9 a été renommé {\tt J} et l'indice
+{\tt I} de la boucle 10 a été renommé {\tt K}. Les références et
+les expressions de bornes de boucle correspondantes ont aussi été
+mises à jour.
+
+\section{Parallélisation effectuée par PIPS après correction}
+
+Le résultat obtenu par PIPS est maintenant correct. Tous les indices
+de boucles sont bien ceux de la version originale.
+
+\begin{verbatim}
+C***********************************************************************
+      SUBROUTINE CHOLES(A,N,RL,Z)
+      IMPLICIT REAL*8(A-H,O-Z)
+C  ROUTINE DE CALCUL DE LA DECOMPOSEE DE CHOLESKI L*D*LT DE LA MATRICE A
+C  L ETANT STOCKEE PLEINE COMME A, LA DIAGONALE DE L ETANT EGALE A 1/D .
+C  LES MATRICES A ET RL PEUVENT ETRE CONFONDUES .
+      COMMON/TOTO/Z1(640),Z2(640),D(640)
+      DIMENSION A(N,N),RL(N,N),Z(N)
+C  CALCUL DE LA PREMIERE COLONNE DE RL .
+      Z1(1) = A(1,1)                                                    0002
+      D(1) = (1./Z1(1))                                                 0003
+      DOALL 1 J = 2,N,1
+         PRIVATE J
+1        RL(J,1) = (A(J,1)*D(1))                                        0006
+      ENDDO
+C  CALCUL DES COLONNES 2 A N DE RL .
+      DOALL 2 I = 2,N,1
+         PRIVATE I,K,J
+C  CALCUL DU TERME DIAGONAL .
+         Z1(I) = A(I,I)                                                 0009
+      ENDDO
+      DO 2 I = 2,N,1
+         PRIVATE I,K,J
+         DOALL 5 K = 1,(I-1),1
+            PRIVATE K
+5           Z2(K) = (RL(I,K)*Z1(K))                                     0012
+         ENDDO
+         DO 3 K = 1,(I-1),1
+            PRIVATE K
+3           Z1(I) = (Z1(I)-(RL(I,K)*Z2(K)))                             0015
+         ENDDO
+         D(I) = (1./Z1(I))                                              0016
+         DOALL 4 J = (I+1),N,1
+            PRIVATE J
+4           Z2(J) = A(J,I)                                              0019
+         ENDDO
+         DO 6 K = 1,(I-1),1
+            PRIVATE K,J
+            DOALL 7 J = (I+1),N,1
+               PRIVATE J
+7              Z2(J) = (Z2(J)-(RL(J,K)*Z2(K)))                          0024
+            ENDDO
+         ENDDO
+         DOALL 8 J = (I+1),N,1
+            PRIVATE J
+8           RL(J,I) = (Z2(J)*D(I))                                      0028
+         ENDDO
+      ENDDO
+C  RANGEMENT DE L'INVERSE DE LA DIAGONALE .
+      DO 9 I = 1,N,1
+         PRIVATE I
+9        RL(((I*(N+1))-N),1) = D(I)                                     0032
+      ENDDO
+C RANGEMENT PAR TRANSPOSITION DES TERMES TRIANGULAIRES SUPERIEURS DE L .
+      DOALL 10 I = 2,N,1
+         PRIVATE I,J
+         DOALL 11 J = 1,(I-1),1
+            PRIVATE J
+11          RL(J,I) = RL(I,J)                                           0037
+         ENDDO
+      ENDDO
+      RETURN
+      END
+\end{verbatim}
+
+\section{Parallélisation effectuée par FPP}
+
+On remarque que la boucle 2 n'est pas distribuée pour initialiser {\tt
+Z1} en parallèle, mais que la boucle 9 est identifiée comme étant
+parallèle malgré la non-linéarité de la référence et l'absence de
+directive. 
+
+Ce type de références ne fait pas partie de celles que doit
+traiter PIPS et elle n'est pas lisible. Il s'agit d'ailleurs simplement d'une
+diagonale de {\tt RL} et on pourrait remplacer {\tt RL(I*(N+1)-N,1)} par
+{\tt RL(I,I)}. Il faudrait pouvoir demander au programmeur pour quelle
+raison il a estimé utile de {\em linéariser} {\tt RL} dans cette
+boucle particulière avant d'essayer de traiter automatiquement de tel
+cas avec PIPS
+Il n'en reste pas moins remarquable que FPP l'identifie
+comme parallèle.
+
+S'il s'avérait utile de traiter de tels cas, il faudrait essayer d'exploiter
+la propagation de constante interprocédurale dans la linea'risation
+des expressions d'indice. Ceci ne donnerait malheureusement pas de résultat
+avec {\tt cr2cnf} parce que les constantes de dimensionnement sont lues
+dans un fichier.
+
+Une autre possibilité consisterait à factoriser les constantes symboliques
+(il est aisé de détecter que {\tt N} n'est pas modifié dans la procédure
+{\tt choles}) comme l'a proposé Corinne Ancourt dans sa thèse et à
+résoudre les équations de collision sur le terme affine résiduel.
+
+La parallélisation des boucles 7 et 11, qui nécessitent la prise en
+compte des bornes de boucle dans le test de dépendance, est assurée
+par des directives {\tt CDIR\$ IVDEP}. Il serait intéressant de savoir
+si ces directives sont utiles ou non à FPP.
+
+\begin{verbatim}
+     1.       C************************************************************ 
+     2.             SUBROUTINE CHOLES(A,N,RL,Z) 
+     3.             IMPLICIT REAL*8(A-H,O-Z) 
+     4.       C  ROUTINE DE CALCUL DE LA DECOMPOSEE DE CHOLESKI L*D*LT DE L 
+     5.       C  L ETANT STOCKEE PLEINE COMME A, LA DIAGONALE DE L ETANT EG 
+     6.       C  LES MATRICES A ET RL PEUVENT ETRE CONFONDUES . 
+     7.             COMMON/TOTO/Z1(640),Z2(640),D(640) 
+     8.             DIMENSION A(N,N),RL(N,N),Z(N) 
+     9.       C  CALCUL DE LA PREMIERE COLONNE DE RL . 
+    10.             Z1(1)=A(1,1) 
+    11.             D(1)=1./Z1(1) 
+    12. V-----      DO 1 J=2,N 
+    13. V-----1     RL(J,1)=A(J,1)*D(1) 
+    14.       C  CALCUL DES COLONNES 2 A N DE RL . 
+    15. N-----      DO 2 I=2,N 
+    16. N     C  CALCUL DU TERME DIAGONAL . 
+    17. N           Z1(I)=A(I,I) 
+    18. N V---        DO 5 K=1,I-1 
+    19. N V    5      Z2(K)=RL(I,K)*Z1(K) 
+    20. N V           DO 3 K=1,I-1 
+    21. N V--- 3      Z1(I)=Z1(I)-RL(I,K)*Z2(K) 
+    22. N           D(I)=1./Z1(I) 
+    23. N     C  CALCUL DE LA COLONNE . 
+    24. N V---        DO 4 J=I+1,N 
+    25. N V--- 4      Z2(J)=A(J,I) 
+    26. N N---        DO 6 K=1,I-1 
+    27. N N   CDIR$ IVDEP 
+    28. N N V-          DO 7 J=I+1,N 
+    29. N N V-  7       Z2(J)=Z2(J)-RL(J,K)*Z2(K) 
+    30. N N--- 6      CONTINUE 
+    31. N V---        DO 8 J=I+1,N 
+    32. N V--- 8      RL(J,I)=Z2(J)*D(I) 
+    33. N-----2     CONTINUE 
+    34.       C  RANGEMENT DE L'INVERSE DE LA DIAGONALE . 
+    35. V-----      DO 9 I=1,N 
+    36. V-----9     RL(I*(N+1)-N,1)=D(I) 
+    37.       C RANGEMENT PAR TRANSPOSITION DES TERMES TRIANGULAIRES SUPERI 
+    38. N-----      DO 10 I=2,N 
+    39. N     CDIR$ IVDEP 
+    40. N V---        DO 11 J=1,I-1 
+    41. N V--- 11     RL(J,I)=RL(I,J) 
+    42. N-----10    CONTINUE 
+    43.             RETURN 
+    44.             END 
+\end{verbatim}
+
+\section*{Conclusion}
+
+La procédure {\tt choles} du programme {\tt cr2cnf} est très
+intéressante. Elle a permis de mettre en évidence et de corriger une erreur
+de PIPS. De plus, la parallélisation de la boucle 9 par FPP
+mérite une étude. Enfin, il faudrait aussi savoir ce que fait FPP en
+l'absence de directives.
+
+\end{document}
+\end

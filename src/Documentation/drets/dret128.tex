@@ -1,0 +1,210 @@
+\documentclass[12pt]{article}
+
+\usepackage[latin1]{inputenc}
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+\newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{\em #2}}
+\newcommand{\titre}{RAPPORT D'AVANCEMENT No 7 \\
+                    ANALYSEUR SÉMANTIQUE ET DÉTECTEUR DE PARALLÉLISME \\
+                    (LOT 8)}
+\newcommand{\auteur}{
+        François IRIGOIN \\
+        Pierre JOUVELOT \\
+        Rémi TRIOLET}
+\newcommand{\docdate}{8 Juin 1990}
+\newcommand{\numero}{E128}
+
+\setlength{\parindent}{0cm}
+
+\begin{document}
+\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+
+\section{Introduction}
+
+\paragraph{}
+Ce rapport intermédiaire donne l'état d'avancement de nos travaux sur
+l'analyse séman\-tique et la détection du parallélisme.
+
+\paragraph{}
+Ces travaux ont été quelque peu retardés principalement à cause du
+{\em Workshop on Compilers for Parallel Computers} que l'Ecole des Mines
+de Paris organise conjointement avec le laboratoire MASI et pour lequel
+de nombreux déplacements et travaux d'organisation ont été
+nécessaires.  Les vacances ont bien sur influencé le rythme de
+l'avancement des travaux.
+
+\section{Analyse sémantique}
+
+\paragraph{}
+Les travaux sur l'analyse sémantique ont été laissé de côté
+temporairement car cette phase d'analyse avait été l'objet d'efforts
+soutenus pendant les derniers mois, notamment pour la démonstration du
+mois d'Avril. 
+
+\paragraph{}
+Il est nécessaire d'interfacer le calcul des {\tt pre-conditions} et
+des {\tt transformers} avec les autres phases d'analyse avant de
+continuer les travaux. L'utilisation des {\tt pre-conditions} pour le
+calcul des régions et pour le test de dépendance permettra de tester
+l'analyse sémantique en vraie grandeur et sans doute de découvrir des
+problèmes. C'est à partir de ce moment là que les travaux pourront
+reprendre.
+
+\section{Détection du parallélisme}
+
+\subsection{Décomposition de la phase de détection du parallélisme}
+
+\paragraph{}
+La phase de détection du parallélisme était jusqu'à présent
+composée d'une seule passe. Cette passe effectuait en séquence le
+calcul du graphe des dépendances, la décomposition de ce graphe en
+composantes fortement connexes, la distribution des boucles autour de
+ces composantes, et enfin la parallélisation des boucles ainsi
+distribuées lorsque les dépendances l'autorisaient.
+
+\paragraph{}
+Ce schéma monolithique était tout à fait incompatible avec l'approche
+{\em base de transformations et d'analyse de programmes} choisie pour
+Pips. En effet, il était souhaitable que le graphe des dépendances
+soit calculé séparemment de façon à ce qu'il soit réutilisable par
+d'autres transformations telles que l'échange de boucles ou la méthode
+hyperplane. De même, il était intéressant que la distribution de
+boucles devienne une phase à part entière de façon à pouvoir
+être appliquée séparemment pour obtenir, par exemple, des nids de
+boucles parfaitement imbriquées où l'échange de boucles et la méthode
+hyperplane peuvent être effectués sans restriction.
+
+\paragraph{}
+La décomposition de la phase de parallélisation a donc été
+effectuée. La phase {\tt kennedy} a donné naissance aux trois phases
+suivantes.
+
+\begin{itemize}
+
+\item La phase {\tt ricedg} calcule un graphe de dépendances où les
+arcs sont labellés par les niveaux des dépendances selon la
+définition de Kennedy (Rice University). Ce calcul est effectué à
+partir des {\tt Use-Def Chains} qui forment la première approximation
+du graphe. La phase {\tt ricedg} est donc en fait une phase de
+raffinement du graphe des dépendances.
+
+\item La phase {\tt distribute} utilise le graphe des dépendances
+calculé par {\tt ricedg} pour effectuer la distribution des boucles.
+L'algorithme de Kennedy et Allen est utilisé, mais la toute dernière
+phase est inhibée. Il s'agit de la phase où les composantes fortement
+connexes sont analysées pour voir si elles contiennent des dépendances
+empêchant la parallélisation.
+
+\item La phase {\tt rice} utilise le graphe des dépendances
+calculé par {\tt ricedg} pour effectuer la distribution et la
+parallélisation des boucles. L'algorithme de Kennedy et Allen est donc
+utilisé dans son intégralité.
+
+Rappelons que cet algorithme a été légèrement amélioré de façon a
+pouvoir profiter des résultats de la privatisation. Il s'agit de savoir
+ignorer certaines dépendances au moment de la parallélisation sans
+pour autant les ignorer au moment de la distribution. En effet, le cycle
+créé par les dépendances sur {\tt temp} dans:
+\begin{verbatim}
+        DO I = 1,10
+           DO J = 1,10
+              TEMP = 0.0
+              DO K = 1, 10
+                 TEMP = TEMP + A(I,K)*B(K,J)
+              ENDDO
+              C(I,J) = TEMP
+           ENDDO
+        ENDDO
+\end{verbatim}
+ne doit pas freiner la parallélisation des boucles sur {\tt I} et {\tt
+J}, mais doit empêcher leur distribution.
+\end{itemize}
+
+\subsection{Détection des indices vivants en sortie de boucle}
+
+\paragraph{}
+L'algorithme de calcul des dépendances doit tenir compte des indices de
+boucles. En effet, si les règles standards de calcul sont appliquées
+aux dépendances sur les indices, toute boucle reste nécessairement
+séquentielle car il y a un cycle sur cet indice créé par
+l'incrémentation de chaque tour de boucle.
+
+\paragraph{}
+Kennedy et Allen contournent le problème en ignorant purement et
+simplement toutes les dépendances créées par les indices de boucles.
+Cette solution a hélas l'inconvénient majeur de conduire à des
+résultats dont la correction dépend de la sémantique de la boucle
+DOALL. En effet, la boucle DO Fortran séquentielle garantit que
+l'indice conserve la valeur qu'il avait au dernier tour de boucle en
+sortie de la boucle. Certains programmeurs peuvent avoir tiré profit de
+cette propriété en réutilisant la valeur de l'indice après la
+boucle; c'est particulièrement nécessaire dans le cas de sortie
+prématurée de la boucle. Si une telle boucle est parallélisée, et
+que la sémantique du DOALL est différente de celle du DO séquentiel,
+le programme devient incorrect.
+
+\paragraph{}
+Nous avons donc choisi dans Pips de ne pas ignorer les dépendances sur
+les indices des boucles dont l'indice est vivant en sortie, i.e. dont la
+valeur peut être utilisée (un {\em use}) avant d'être tuée (un {\em
+kill}).
+
+\paragraph{}
+La détection des boucles à indice vivant est faite par une phase de
+privatisation qui n'explore que les indices de boucles. Il suffit,
+après calcul des Use-Def Chains, de vérifier pour chaque boucle si les
+ré-utilisations potentielles de l'indice ont lieu à l'intérieur ou à
+l'extérieur de la boucle. L'indice est privatisé pour la boucle si
+aucune ré-utilisation n'a lieu à l'extérieur, ce qui est vrai dans la
+très grande majorité des cas.
+
+\subsection{Diminution du nombre de dépendances}
+
+\paragraph{}
+Nous avons vu que Kennedy et Allen ont choisi d'ignorer toutes les
+dépendances créées par les indices de boucles.  Cette solution a pour
+avantage qu'un très grand nombre de dépendances n'apparaissent plus
+dans le graphe, ce qui réduit considérablement la complexité des
+algorithmes de calcul et de tri des composantes fortement connexes.
+
+\paragraph{}
+Notre solution garantit la correction des programmes, mais elle augmente
+considéra\-ble\-ment le nombre des dépendances répertoriées dans le
+graphe. Il suffit de constater que chaque indice est défini par la
+boucle puis utilisé une ou plusieurs fois dans pratiquement toutes les
+références aux éléments de tableaux qui apparaissent dans la
+boucle.
+
+\paragraph{}
+Cependant, la plupart de ces dépendances ne servent à rien car elles
+expriment une contrainte d'ordonnancement des instructions que les
+algorithmes de parallélisation ne tentent pas de violer: que
+l'instruction boucle qui décide de l'itération à exécuter soit
+effectivement exécutée avant les instructions du corps de la boucle
+pour cette itération là !!!
+
+\paragraph{}
+Nous avons donc choisi de ne pas ajouter au graphe les dépendances
+créées par un indice de boucle lorsqu'une des deux instructions
+concernées est une boucle qui englobe la seconde instruction. Cette
+optimisation respecte la correction du programme tout en diminuant
+considérablement le volume final du graphe.
+
+\section{Conclusion}
+
+\paragraph{}
+Si les spécifications précédentes ont toutes été implémentées, de
+nouveaux travaux sont en cours d'élaboration concernant l'analyse
+sémantique et la détection du parallélisme. En particulier, un module
+de détection des {\em réductions} (i.e., des opérations
+parallélisables telle que la somme d'un vecteur ou les variables
+d'induction) est en cours de prototypage en CommonLISP. Ceci est rendu
+possible dans PIPS du fait de la compatibilité avec C offerte par
+NewGen.
+
+\paragraph{}
+L'intégration de ces différents modules dans PIPS devrait permettre de
+tester l'utilité pratique de ces algorithmes, parfois complexes, dans
+les cas rééls que sont les benchmarks des utilisateurs.
+
+\end{document}
+\end

@@ -1,0 +1,498 @@
+\documentclass[12pt]{article}
+
+\usepackage[latin1]{inputenc}
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+\newcommand{\titre}{RAPPORT D'AVANCEMENT No 3 \\
+                    ANALYSE SYNTAXIQUE AU NIVEAU PROGRAMME \\
+                    ANALYSE SÉMANTIQUE}
+\newcommand{\auteur}{François IRIGOIN \\
+        Pierre JOUVELOT \\
+        Rémi TRIOLET}
+\newcommand{\docdate}{Mars 1989}
+\newcommand{\numero}{E109}
+
+\newcommand{\SEC}[1]{\section{#1}}
+\newcommand{\SSE}[1]{\subsection{#1}}
+\newcommand{\SSS}[1]{\subsubsection{#1}}
+\newcommand{\PAR}[1]{\paragraph{#1}}
+\newcommand{\SPA}[1]{\subparagraph{#1}}
+\newcommand{\BQU}{\begin{quote}}
+\newcommand{\EQU}{\end{quote}}
+\newcommand{\BIT}{\begin{itemize}}
+\newcommand{\EIT}{\end{itemize}}
+\newcommand{\BDE}{\begin{description}}
+\newcommand{\EDE}{\end{description}}
+\newcommand{\BEQ}{\begin{equation}}
+\newcommand{\EEQ}{\end{equation}}
+\newcommand{\BAR}{\begin{array}}
+\newcommand{\EAR}{\end{array}}
+\newcommand{\BDO}{\begin{document}}
+\newcommand{\EDO}{\end{document}}
+\newcommand{\BCE}{\begin{center}}
+\newcommand{\ECE}{\end{center}}
+\newcommand{\BTG}{\begin{tabbing}}
+\newcommand{\ETG}{\end{tabbing}}
+\newcommand{\BTR}{\begin{tabular}}
+\newcommand{\ETR}{\end{tabular}}
+\newcommand{\BAB}{\begin{abstract}}
+\newcommand{\EAB}{\end{abstract}}
+\newcommand{\BEN}{\begin{enumerate}}
+\newcommand{\EEN}{\end{enumerate}}
+\newcommand{\BFI}{\begin{figure}}
+\newcommand{\EFI}{\end{figure}}
+\newcommand{\VSP}{\vspace*{\baselineskip}}
+
+\setlength{\parindent}{0cm}
+
+\begin{document}
+\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+\sloppy
+
+\PAR{Introduction}
+\PAR{}Ce rapport intermédiaire donne l'état d'avancement de nos travaux sur
+l'analyse syntaxique au niveau programme et sur l'analyse sémantique.
+
+\SEC{Analyse syntaxique au niveau programme}
+
+\SSE{Objectifs}
+
+\PAR{Accès direct aux informations inter-procédurales}
+\PAR{}
+Un programme Fortran se compose de un ou plusieurs fichiers, chaque
+fichier contenant un ou plusieurs modules (function, main ou subroutine).
+
+\PAR{}
+Dans le cadre de la parallélisation automatique, nous sommes amenés à
+effectuer des traitements inter-procéduraux, c'est à dire sur la
+totalité du programme, et des traitements intra-procéduraux, c'est à
+dire sur un module uniquement.
+
+\PAR{}
+Notre premier objectif est d'avoir une représentation interne où
+chaque entité n'a qu'une seule définition. Par exemple, si le module P
+contient un appel au module Q, nous voulons que l'entité référencée
+dans l'instruction CALL de P soit la même entité que celle créée
+lors de l'analyse de Q. Ceci permet un accès direct, depuis par exemple
+une instruction CALL, aux diverses informations associées à Q, et
+notamment le code de Q.
+
+\PAR{}
+Ceci n'est possible qu'après une phase d'édition de liens, puisque P
+et Q peuvent parfaitement être définis dans deux fichiers différents,
+et que nous n'imposons aucun ordre pour soumettre les différents
+fichiers d'un programme Fortran au parser. 
+
+\PAR{Optimisation de l'espace de travail de PIPS}
+\PAR{}
+Notre second objectif est un peu contradictoire: il s'agit de ne pas
+avoir à charger en mémoire de façon permanente la représentation
+interne de tous les modules du programme.  Ceci risquerait de conduire
+à des programmes exécutables très gros, ce qui pourrait avoir des
+conséquences dramatiques sur les performances, même avec une gestion
+de mémoire virtuelle efficace.
+
+\PAR{}
+Comme beaucoup d'algorithmes sont bottom-up ou top-down, il arrive
+souvent que seuls deux modules au plus doivent être actifs en même
+temps en mémoire: le module appelant et le module appelé.
+
+\PAR{}
+Il nous faut alors avoir la possibilité d'activer ou de désactiver un
+module. L'activation correspond au chargement en mémoire des données
+représentant ce module à partir de fichiers. La désactivation
+correspond à l'opération inverse: sauvegarde sur fichiers de ces
+données, et récupération de la place mémoire occupée par le
+module. Ceci peut sembler incompatible avec notre représentation
+interne gérée par Newgen, où les pointeurs jouent un rôle important,
+bien que leur utilisation soit cachée derrière les fonctions d'accès
+générées automatiquement.
+
+\SSE{Activation et désactivation d'un module}
+
+\PAR{}
+Nous expliquons dans ce paragraphe en quoi consiste l'activation et la
+désactivation d'un module.
+
+\PAR{}
+Un module de nom Q est représenté par une entité de nom
+\verb/TOP-LEVEL:Q/ qui décrit le type, les déclarations et le corps du
+module Q. 
+
+\PAR{}
+Nous remarquons que la représentation interne a été conçue de telle
+sorte que les instructions contenues dans le code d'un module Q
+contiennent des références vers les entités qui composent Q, mais que le
+contraire ne soit pas vrai. 
+
+\PAR{}
+Ceci signifie qu'il est possible de libérer l'espace alloué pour le
+code d'une fonction sans risque d'avoir des pointeurs référençant des
+zones de mémoire libérées. Comme ce code représente généralement
+la majeure partie des données d'un module, nous en déduisons ce que
+sera l'activation et la désactivation d'un module:
+
+\begin{itemize}
+\item la désactivation correspondra à la sauvegarde sur fichier du domaine
+\verb/statement/ contenu dans la valeur initiale du module, qui est de
+type \verb/code/, puis à la libération de la mémoire occupée par ce
+statement.
+\item l'activation correspondra au chargement de ce même domaine
+\verb/statement/ depuis un fichier.
+\end{itemize}
+
+\SSE{Implications sur l'analyse syntaxique}
+
+\PAR{}
+Nous expliquons dans la suite quels traitements sont effectués par les
+phases d'analyse syntaxique pour rendre l'activation et la
+désactivation possible.
+
+\SSS{Analyse syntaxique au niveau module}
+
+La phase d'analyse syntaxique au niveau module (parser) a pour but de
+construire la représentation interne d'un module à partir de son texte
+source Fortran. Parser ne fait aucun traitement interprocédural, ce qui
+signifie qu'il se remet dans son état initial après avoir parsé
+chaque module.
+
+\PAR{}
+Pour chaque fichier \verb/file.f/ analysé, le parser effectue la
+traduction en format interne de tous les modules \verb/M1/, \verb/M2/,
+..., \verb/Mn/ contenus dans ce fichier.  Le résultat du parser est
+formé d'un couple de fichiers pour chaque module M analysé.
+
+\begin{enumerate}
+
+\item Un fichier de nom \verb/TOP-LEVEL:M.entities/ qui contient toutes les
+entités créées lors de l'analyse de M. Toutes les entités y sont
+complètement définies, sauf l'entité \verb/TOP-LEVEL:M/ dont le
+sous-domaine \verb/statement/ de la valeur initiale vaut
+\verb/statement_undefined/.
+
+\item Un fichier de nom \verb/TOP-LEVEL:M.code/ qui contient la valeur
+du statement mentionné ci dessus, c'est à dire le code de M.
+
+\end{enumerate}
+
+\SSS{Analyse syntaxique au niveau programme}
+
+\PAR{Principe}
+\PAR{}
+L'analyse syntaxique au niveau programme (linker) effectue un travail
+équivalent à celui de l'éditeur de liens dans une chaine de
+compilation classique. Cette phase est en cours de réalisation.
+
+\PAR{}
+Cette phase devra faire en sorte que les entités qui doivent être
+partagées par différents modules le soient effectivement. Ceci est
+vrai pour les constantes, pour les fonctions intrinsèques de Fortran
+(\verb/PRINT/, \verb/FORMAT/, \verb/.EQ./, \verb/+/, ...), pour les
+entités représentant des commons, et pour toutes les fonctions
+externes.
+
+\PAR{}
+Ce dernier point est important. Dans notre exemple, l'exécution de
+parser sur le module P contenant un appel a Q aura eu pour effet de
+créer une entité locale à P de nom P:Q, de type functional, de
+storage rom, et de value unknown. C'est cette entité qui est
+référencée dans l'instruction d'appel à Q. 
+
+\PAR{}
+Après exécution de linker, cette entité devra avoir disparue, et
+l'instruction \verb/CALL Q/ devra référencer directement l'entité
+TOP-LEVEL:Q dont la valeur initiale est le code de Q. Cette entité
+devra donc avoir été créée.
+
+\PAR{Méthode}
+\PAR{}
+Pour cela, la phase linker devra donc combiner entre eux tous les fichiers
+\verb/TOP-LEVEL:Mi.entities/ qui ont été créés lors de l'analyse des
+modules \verb/Mi/ formant le programme à analyser.  Le résultat de
+cette combinaison sera un fichier \verb/prog.entities/ où \verb/prog/
+est le nom du programme, donné par l'utilisateur.
+
+\PAR{}
+Ensuite, tous les fichiers \verb/TOP-LEVEL:Mi.code/ devront être mis a
+jour pour respecter la cohérence avec le fichier \verb/prog.entities/.
+Ainsi, la référence à l'entité P:Q dans un call à Q contenu dans P
+devra être remplacé par une référence à l'entité TOP-LEVEL:Q.
+
+\SSS{Conclusion}
+\PAR{}
+La phase Linker est en cours de réalisation, et son fonctionnement
+exact sera décrit dans le prochain rapport d'avancement de nos travaux.
+
+\section{Analyse sémantique intra-procédurale}
+
+\PAR{}
+Un prototype d'analyseur sémantique, utilisant la méthode de Cousot et
+Halbwachs mais n'effectuant que l'analyse en avant, est en cours de
+réalisation. Les premiers invariants ont déjà été calculés sur de
+petits programmes de test, car la programmation a été facilité par
+l'utilisation d'une bibliothèque d'algèbre linéaire en nombres
+entiers et d'un analyseur syntaxique, préalablement développée au CAI.
+
+\subsection{Premiers résultats}
+
+\PAR{}
+Ces premiers essais ont montré que nous étions capables d'obtenir les
+inégalités entre indices et bornes de boucles et les égalités
+linéaires entre variables. Ces égalités définissent, entres autres,
+les variables inductives et nous disposons donc de l'information
+minimale nécessaire à la parallelisation. Il reste à voir si ce type
+d'analyse procure, sur les programmes du jeu d'essai de l'ONERA,
+d'autres invariants utiles à la parallélisation automatique des
+programmes. Rappelons que ceci était un des objectifs du projet PIPS:
+une analyse sémantique sophistiquée est-elle utile à la
+parallélisation interprocédurale de programmes scientifiques?
+
+\paragraph{Vitesse de convergence}
+
+\PAR{}
+Ces premiers essais ont aussi montré que le temps d'exécution de
+l'algorithme de résolution du sytème au polyèdres tel qu'il est
+présenté dans la thèse d'Halbwachs croissait exponentiellement
+avec la profondeur d'imbrication des boucles et conduisait à des
+temps prohibitifs. Nous nous proposons donc d'étudier de nouvelles
+stratégies de résolution, basées sur la connaissance des variables
+vivantes, permettant de factoriser le système aux polyèdres en
+sous-sytèmes de dimensions inférieurs et de ne résoudre les
+sous-systèmes qu'un nombre minimum de fois.
+
+\paragraph{Qualité du point fixe}
+
+\PAR{}
+De plus, la recherche de points fixes est essentiellement {\em approximative}.
+Aucun système de résolution n'est capable de décider s'il est utile
+de poursuivre les itérations croissantes qui permettent d'améliorer
+la connaissance qu'on a d'un programme ou s'il faut passer à une phase
+d'itérations décroissantes pour assurer la convergence vers un résultat
+correct.
+
+\PAR{}
+Les deux informations de base, les contraintes portant sur les indices de
+boucles qui doivent se trouver entre les bornes inférieures et supérieures
+correspondantes et la détection des variables inductives, semblent
+expérimentalement obtenues après deux itérations croissantes
+seulement. Il serait utile de {\em prouver} que c'est toujours le
+cas.
+
+\PAR{}
+Il est aussi possible de construire des exemples pour lesquels il faut
+au moins trois itérations croissantes avant l'élargissement pour
+obtenir l'invariant linéaire qui est la meilleure solution possible.
+En voici un exemple:
+
+\begin{verbatim}
+        C = 0
+        DO 100 I = 1, N
+                C = 1 - C
+100     CONTINUE
+\end{verbatim}
+
+\PAR{}
+Ici \verb+C+ n'est pas une variable inductive mais sa valeur est néanmoins
+contrainte par les inégalités linéaires $0 \leq C \leq 1$. L'algorithme
+d'élargissement décrit dans la thèse de Halbwachs ne peut trouver
+ces contraintes qu'après 3 itérations croissantes sur le corps de boucle.
+Apres seulement deux itérations, toute information sur \verb+C+ est
+perdue.
+
+\PAR{}
+Il est peut-être possible de modifier l'algorithme d'élargissement pour
+essayer de {\em deviner} plus vite quelles contraintes peuvent être
+gardées. Une telle amélioration a déjà été apportée par Halbwachs
+dans sa thèse par rapport à l'élargissement mentionné par
+Patrick Cousot dans sa thèse d'état: un 2ème ensemble de contraintes,
+M2, y est conservé en sus de l'ensemble initial, M1. Une telle modification
+devrait être prouvée parce que l'élargissement assure la convergence et
+que la conservation de contraintes supplémentaires risquent d'augmenter
+la durée des itérations décroissantes. Ceci constitue une deuxième
+direction de recherche.
+
+\paragraph{Point fixe non-linéaire}
+
+\PAR{}
+Il est aussi possible de construire une boucle test dont l'invariant
+n'est pas linéaire et qui va être approximé par une suite inifinie
+de polyèdres. La boucle suivante est caractérisée par l'invariant
+quadratique:
+\[
+J = \frac{I(I-1)}{2}
+\]
+qui ne peut qu'être approximé par des polyèdres convexes. Les
+itérations croissantes construisent une suite de polyèdres dont la
+limite n'est pas un polyèdre. Elle contient un nombre infini de
+contraintes (resp. d'éléments dans le système génerateur). Chaque
+itération supplémentaire apporte un peu d'information, qui permettrait
+éventuellement, sur un cas particulier construit exprès, de
+paralléliser la boucle. 
+
+\begin{verbatim}
+        J = 0
+        DO 100 I = 1, N
+                J = J + I
+100     CONTINUE
+\end{verbatim}
+
+\PAR{}
+Il n'y a donc pas de moyen algorithmique d'interrompre les itérations
+croissantes pour la simple raison qu'elles n'apportent plus d'informations.
+Il faut donc ici aussi trouver un compromis expérimental en fonction
+des jeux de tests qui nous ont été procurés par l'ONERA. Nous
+envisageons pour le moment de nous arrêter soit par convergence
+soit sur un nombre maximum d'itérations croissantes. Dans ce contexte,
+convergence signifie que l'on obtient la même solution après
+élargissement qu'on effectue $n$ ou $n+1$ itérations croissantes.
+C'est une solution coûteuse en temps CPU dont l'intérêt reste
+à prouver expérimentalement.
+
+\paragraph{Invariants inter-itération}
+
+\PAR{}
+Un autre problème que pose l'application de la méthode d'analyse sémantique
+de P. Cousot à la parallélisation vient de l'absence de prédicats
+construits sur les valeurs des variables en différents points du
+programme. Les invariants standards sont construits sur les valeurs
+des variables en {\em un} point de contrôle du programme. La détection
+du parallélisme s'effectue en comparant les valeurs des variables en
+{\em deux} points de contrôle différents. Les invariants en un point
+sont donc utilisables mais on pourrait obtenir davantage de parallélisme
+avec des invariants linea'ires construits sur deux points. 
+
+\PAR{}
+Par exemple, la boucle suivante, où \verb+f+ est une fonction sans
+effet de bord, est parallèle:
+
+\begin{verbatim}
+        J = 0
+        DO 100 I = 1, N
+                T(J) = f(J)
+                J = J + I
+100     CONTINUE
+\end{verbatim}
+
+\PAR{}
+En effet, \verb+J+ est calculable directement en fonction de \verb+I+
+(\verb+J=I*(I-1)/2+) et si deux valeurs de \verb+I+, $i_1$ et $i_2$, sont
+différentes les deux valeurs correspondantes de \verb+J+, $j_1$ et $j_2$
+sont aussi différentes. Plus précisemment, il est possible de prouver
+qu'il n'y a pas d'{output dependence} parce que:
+\[
+j_1 - j_2 \geq i_1 - i_2
+\]
+et qu'on testera ce système sous les conditions:
+\[
+i_1 > i_2
+\]
+et
+\[
+j_1 = j_2
+\]
+L'information clé est donc de nature linéaire et pourrait donc être
+calculée par la méthode de Cousot moyennant l'adjonction de variables
+supplémentaires pour représenter les itérations 1 et 2. 
+
+\PAR{}
+Une solution serait peut-être de mettre le programme précédent sous
+une forme faisant apparaître explicitement la problématique de la
+parallélisation, c'est-à-dire en transformant le conflit entre deux
+itérations de la même instruction auxquelles est attaché le même
+invariant, en un conflit entre deux itérations de deux instructions
+équivalentes mais pour lesquelles deux invariants peuvent être
+calculés.
+
+\begin{verbatim}
+C       premieres iterations
+        J = 0
+        DO 100 I = 1, I1-1
+                T(J) = f(J)
+                J = J + I
+100     CONTINUE
+
+C       iteration I1
+        I1 = I
+        J1 = J
+        T(J1) = f(J1)
+        J = J1 + I1
+
+C       iterations suivantes
+        DO 200 I = I1+1, I2-1
+                T(J) = f(J)
+                J = J + I
+200     CONTINUE
+
+C       iteration I2
+        I2 = I
+        J2 = J
+        T(J2) = f(J2)
+        J = J2 + I2
+
+C       iterations finales
+        DO 300 I = I2+1, N
+                T(J) = f(J)
+                J = J + I
+300     CONTINUE
+\end{verbatim}
+
+\PAR{}
+Cette transformation revient à distinguer deux itérations
+particulières du corps de boucle est à les traiter avec des variables
+spéciales, utilisées sous la contrainte d'affectation unique.
+L'analyse sémantique à la Cousot va donc permettre d'établir des
+relations entre des pseudo-variables, qui ne sont que les valeurs des
+vraies variables en deux itérations distinctes.
+
+\PAR{}
+Cette transformation de programmes, si elle s'avérait utile, ne serait
+pas effectuée explicitement sur le programme mais uniquement lors de la
+construction du système aux polyèdres.
+
+\paragraph{Directions de recherche}
+
+\PAR{}
+Ces premiers résultats expérimentaux nous ont donc conduit à définir
+quatre directions de recherches:
+\begin{itemize}
+  \item trouver un algorithme de résolution efficace en présence des
+        boucles imbriquées qui caractérisent tant de programmes
+        scientifiques
+  \item trouver un élargissement {\em devinant} mieux les contraintes
+        potentiellement invariantes
+  \item trouver un moyen de n'effectuer un grand nombre d'itérations
+        croissantes que si cela est potentiellement utile
+  \item trouver un moyen de calculer des prédicats inter-itérations
+\end{itemize}
+
+\subsection{Evolution logicielle}
+
+\PAR{}
+Pour passer du prototype au système PIPS tel qu'il est prévu, il reste
+à écrire une interface entre la représentation interne de PIPS
+(représentation intra-procédurale et graphe de contrôle - en cours de
+définition) et l'algorithme de résolution du système aux polyèdres,
+qui doit encore être testé pour savoir si la factorisation du système
+selon les composantes fortement connexes du graphe de contrôle est possible.
+
+\PAR{}
+Il faudra aussi effectuer des mesures sur notre bibliothèque d'algèbre
+linéaire en nombres entiers pour accélérer les routines clés. Mais le
+gain a attendre de cet effort n'est pas un gain de complexité, tout
+au plus un coefficient.
+
+\subsection{Point sur l'analyse sémantique}
+
+\PAR{}
+Le développement de l'analyseur sémantique se poursuit normalement.
+Le caractère quelque peu spéculatif de ce rapport d'avancement ne
+reflète pas le fait que le travail effectué ces deux derniers mois
+a consisté essentiellement en de la programmation élémentaire, dont il
+n'y a pas grand-chose à dire dans un rapport d'avancement.
+
+\PAR{}
+Seule une réalisation de type prototype pouvait nous permettre
+d'obtenir des résultats montrables aussi rapidement et de voir
+rapidement dans quelles directions il allait falloir faire porter nos
+efforts de réflexion avant la réalisation finale. 
+\end{document}
+\end

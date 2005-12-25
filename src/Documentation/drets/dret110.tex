@@ -1,0 +1,874 @@
+\documentclass[12pt]{article}
+
+\usepackage[latin1]{inputenc}
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+\newcommand{\titre}{RAPPORT FINAL \\
+                    ANALYSE LEXICALE \\
+		    ANALYSE SYNTAXIQUE INTRA-PROCÉDURALE}
+\newcommand{\auteur}{François IRIGOIN \\
+        Pierre JOUVELOT \\
+        Rémi TRIOLET}
+\newcommand{\docdate}{Mai 1989}
+\newcommand{\numero}{E110}
+
+\newcommand{\SEC}[1]{\section{#1}}
+\newcommand{\SSE}[1]{\subsection{#1}}
+\newcommand{\SSS}[1]{\subsubsection{#1}}
+\newcommand{\PAR}[1]{\paragraph{#1}}
+\newcommand{\SPA}[1]{\subparagraph{#1}}
+\newcommand{\BQU}{\begin{quote}}
+\newcommand{\EQU}{\end{quote}}
+\newcommand{\BIT}{\begin{itemize}}
+\newcommand{\EIT}{\end{itemize}}
+\newcommand{\BDE}{\begin{description}}
+\newcommand{\EDE}{\end{description}}
+\newcommand{\BEQ}{\begin{equation}}
+\newcommand{\EEQ}{\end{equation}}
+\newcommand{\BAR}{\begin{array}}
+\newcommand{\EAR}{\end{array}}
+\newcommand{\BDO}{\begin{document}}
+\newcommand{\EDO}{\end{document}}
+\newcommand{\BCE}{\begin{center}}
+\newcommand{\ECE}{\end{center}}
+\newcommand{\BTG}{\begin{tabbing}}
+\newcommand{\ETG}{\end{tabbing}}
+\newcommand{\BTR}{\begin{tabular}}
+\newcommand{\ETR}{\end{tabular}}
+\newcommand{\BAB}{\begin{abstract}}
+\newcommand{\EAB}{\end{abstract}}
+\newcommand{\BEN}{\begin{enumerate}}
+\newcommand{\EEN}{\end{enumerate}}
+\newcommand{\BFI}{\begin{figure}}
+\newcommand{\EFI}{\end{figure}}
+\newcommand{\VSP}{\vspace*{\baselineskip}}
+
+\setlength{\parindent}{0cm}
+
+\begin{document}
+\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+\sloppy
+
+\PAR{Introduction} 
+\PAR{}
+L'analyse lexicale et l'analyse syntaxique intra-procédurale sont
+réalisées par un programme nommé {\em parser}. Ce rapport a pour
+objet de décrire les structures de données et les algorithmes mis en
+oeuvre pour la réalisation de parser.
+
+\PAR{}
+Ce rapport reprend des parties de précédents rapports intermédiaires.
+Nous décrivons dans la section 1 l'organisation générale de parser,
+ce qu'il prend comme données et ce qu'il produit comme résultats. La
+section 2 décrit en détail la structure de la représentation
+intermédiaire, et montre comment elle permet de représenter les
+différents objets manipulés par un programme Fortran. La section 3
+décrit les programmes qui composent parser, et indique quels outils UNIX
+qui ont été utilisés. Enfin nous donnons en annexe l'intégralité
+des programmes sources de parser.
+
+
+\SEC{Organisation générale de parser}
+\PAR{}
+L'objet du programme parser est de construire une représentation
+intermédiaire pour chaque module Fortran (subroutine, function ou main
+program) qui lui est soumis.
+
+\PAR{}
+Parser prend en entrée un fichier contenant des modules
+Fortran. Le nom de ce fichier doit avoir une extension ``\verb/.f/''.
+Parser effectue le même traitement sur chaque module, à savoir:
+\begin{itemize}
+\item construction en mémoire d'une représentation intermédiaire;
+\item stockage sur fichiers disque de cette représentation intermédiaire.
+\end{itemize}
+Le résultat de parser est identique si on lui soumet un unique fichier
+contenant plusieurs modules, ou plusieurs fichiers contenant chacun un
+unique module. Nous supposons donc dans la suite que parser est
+exécuté sur un fichier de nom \verb/m.f/ contenant un module de nom
+\verb/M/. 
+
+\PAR{}
+Sous ces hypothèses, le résultat de parser se compose de deux
+fichiers: 
+\begin{itemize}
+\item un fichier de nom \verb/TOP-LEVEL:M.entities/ qui contient la
+définition de toutes les entités apparaissant dans M,
+\item un fichier de nom \verb/TOP-LEVEL:M.code/ qui contient le code de M.
+\end{itemize}
+
+\PAR{}
+Les entités définies dans le fichier \verb/TOP-LEVEL:M.entities/ sont
+les entités locales de M, et l'entité M elle-même. Les entités
+globales telles que les commons ou les autres modules appelés par M
+sont considérées comme locales à M\footnote{La phase ultérieure d'édition
+de liens aura pour but de repérer ces entités, de les transformer en
+entités globales, et de faire en sorte qu'une entité globale ne soit
+définie qu'une seule fois et que tous les modules fassent référence
+aux mêmes définitions.}.
+
+\PAR{}
+Les entités locales à M ont un nom préfixé par \verb/M:/, où
+\verb/M/ est le nom du package de M et \verb/:/ un séparateur. Les
+entités qui sont réellement locales sont complètement définies, mais
+ceci n'est pas vrai pour les entités globales declarées dans M. Ainsi,
+la valeur initiale d'une entité de type \verb/function/ sera inconnue
+alors qu'elle devrait avoir pour valeur le code de la fonction. La
+valeur est inconnue car le code des modules appelés n'est pas
+disponible tant que ceux-ci n'ont pas été soumis à parser.
+
+\PAR{}
+L'entité définissant le module M lui-même a pour nom
+\verb/TOP-LEVEL:M/, ce qui signifie qu'elle appartient au package de
+plus haut niveau: \verb/TOP-LEVEL/. Cette entité est parfaitement
+définie puisque son code est disponible dans le fichier \verb/m.f/ qui
+est soumis à parser. Ce code n'est cependant pas stocké dans le
+fichier \verb/TOP-LEVEL:M.entities/ mais dans le fichier
+\verb/TOP-LEVEL:M.code/. Les raisons qui nous ont conduit à séparer
+code et entités seront exposées ultérieurement.
+
+\PAR{}
+La représentation intermédiaire de parser est une structure de
+données Newgen. Cela signifie que sa définition est faite à l'aide du
+langage de définition de domaines (DDL) présenté dans le document
+E-105. Cela signifie aussi que les programmes qui composent parser
+utilisent les macros et fonctions automatiquement générés par Newgen:
+fonctions de création d'objets, fonctions d'accès aux champs des objets,
+fonctions de lecture et écriture disque, fonctions de libération
+mémoire, etc.
+
+\SEC{Description de la représentation intermédiaire}
+
+\SSE{Principe généraux}
+
+\PAR{}
+Cette représentation intermédiaire de programmes procéduraux a été
+définie pour traiter des programmes Fortran mais nous avons pris soin
+de nous appuyer sur les idées générales de la sémantique
+dénotationnelle pour obtenir une représentation à la fois concise,
+solide, extensible et aussi indépendante de Fortran que possible.
+
+\PAR{}
+Cette représentation intermédiaire ne vise pas a rendre compte de tous les
+problèmes liés aux traitements interprocéduraux qui seront effectués
+dans le cadre du projet PIPS. Elle a pour but de représenter d'une
+manière sémantiquement équivalente un module: programme principal,
+subroutine ou function.
+
+\PAR{}
+Le présent document représente le résultat d'une première phase.  La
+représentation intermédiaire sera ensuite augmentée pour prendre en
+compte les besoins de l'analyse interprocédurale ou du calcul des
+dépendances.
+
+\SSE{Spécification NewGen de la représentation intermédiaire}
+
+\PAR{}
+Le fichier de spécifications NewGen de la ri est donnée ci après.  La
+liste définitions de domaines n'est pas donnée dans un ordre logique,
+mais plus simplement par ordre alphabétique.
+
+\begin{verbatim}
+array       = basic x dimensions:dimension* ;
+basic       = int:int + float:int + logical:int + overloaded:unit + 
+              complex:int + string:value ;
+call        = function:entity x arguments:expression* ;
+code        = declarations:entity* x statement ;
+constant    = int + litteral:unit ;
+dimension   = lower:expression x upper:expression ;
+entity      = name:string x type x storage x initial:value ;
+expression  = syntax ;
+formal      = function:entity x offset:int ;
+functional  = parameters:parameter* x result:type ;
+instruction = block:statement* + test + loop + goto:statement + call ;
+loop        = index:entity x range x body:statement x label:entity ;
+mode        = value:unit + reference:unit ;
+parameter   = type x mode ;
+ram         = function:entity x section:entity x offset:int ;
+range       = lower:expression x upper:expression x increment:expression ;
+reference   = variable:entity x indices:expression* ;
+statement   = label:entity x instruction ;
+storage     = return:entity + ram + formal + rom:unit ;
+symbolic    = expression x constant ;
+syntax      = reference + range + call ;
+test        = condition:expression x true:statement x false:statement ;
+type        = statement:unit + area:int + array + functional + 
+              unknown:unit + void:unit ;
+value       = code + symbolic + constant + intrinsic:unit + unknown:unit ;
+\end{verbatim}
+
+\SSE{Analyse de la représentation intermédiaire}
+
+\PAR{}
+Dans cette section, nous allons montrer comment cette représentation
+intermédiaire permet de représenter les différents objets manipulés par un
+programme Fortran.
+
+\SSS{Domaines}
+
+\PAR{}
+Nous allons tout d'abord examiner chaque domaine pour expliquer
+brièvement à quoi il sert.
+
+\PAR{Entity = name:string x type x storage x initial:value}
+\PAR{}
+Tout objet ayant un nom dans un programme Fortran est représenté par
+une \verb/entity/. Un tel objet peut être un module, une variable, un
+common, un opérateur, une constante, un label, etc. Pour chaque objet,
+le sous-domaine \verb/name/ de l'entité donne le nom de l'objet tel
+qu'il apparait dans le texte source du programme préfixé par le nom du
+package dans lequel l'entité est déclarée, le sous-domaine
+\verb/type/ donne le type de l'entité, le sous-domaine \verb/storage/
+le genre d'allocation mémoire utilisé pour l'entité, et finalement,
+le sous-domaine \verb/initial/ donne la valeur initiale, si elle est
+connue, de l'entité. Le terme valeur initiale a ici un sens assez
+large, puisqu'il s'agit par exemple du code pour les entités
+représentant des modules.
+
+\PAR{Type = statement:unit + area:int + array + functional +
+unknown:unit + void:unit} 
+\PAR{}
+Le domaine \verb/type/ représente le type d'une entité.  Le
+sous-domaine \verb/statement/ est utilisé pour les labels
+d'instruction.  Le sous-domaine \verb/area/ est utilisé pour les
+commons.  Le sous-domaine \verb/array/ est utilisé pour toutes les
+variables, y compris les paramètres formels et le résultat d'une
+fonction.  Le sous-domaine \verb/functional/ est utilisé pour les
+fonctions, pour les subroutines et pour le programme principal.  Le
+sous-domaine \verb/void/ est utilisé pour le résultat d'une subroutine
+ou d'un programme principal.
+
+\PAR{Array = basic x dimensions:dimension*}
+\PAR{}
+Le domaine \verb/array/ représente le type d'une variable.  Le
+sous-domaine \verb/basic/ donne le type Fortran de la variable.  Le
+sous-domaine \verb/dimensions/ donne la liste des dimensions de la variable.
+Un scalaire est un tableau de zéro dimension.
+
+\PAR{}
+Chaque dimension est une expression, qui n'est pas nécessairement
+constante dans le cas des tableaux formels. La constante prédéfinie de
+nom '*D*' est utilisée pour les tableaux de taille non définie
+(\verb/DIMENSION T(*)/).
+
+\PAR{Basic = int:int + float:int + logical:int + overloaded:unit + 
+complex:int + string:value}
+\PAR{}
+Le domaine \verb/basic/ permet de représenter un type Fortran tel que
+INTEGER ou REAL. La valeur de ce domaine donne la longueur en octets de
+la zone mémoire occuppée par une variable de ce type.
+
+\PAR{Dimension = lower:expression x upper:expression}
+\PAR{}
+Le domaine \verb/dimension/ permet de représenter une dimension d'un
+tableau, c'est à dire un couple borne inférieure -- sous-domaine
+\verb/lower/ -- borne supérieure -- sous-domaine \verb/upper/.
+
+\PAR{Functional = parameters:parameter* x result:type}
+\PAR{}
+Le domaine \verb/functional/ représente le type d'un module, c'est
+à dire une fonction, une subroutine ou un programme principal. Le
+sous-domaine \verb/parameters/ donne le type et le mode de passage de chaque
+paramètre, et le sous-domaine \verb/result/ donne le type du résultat. Ce
+dernier type vaut \verb/void/ pour les subroutines et les programmes
+principaux. 
+
+\PAR{Parameter = type x mode}
+\PAR{}
+Le domaine \verb/parameter/ représente le type et le mode de passage d'un
+paramètre formel de module. 
+
+\PAR{Mode = value:unit + reference:unit}
+\PAR{}
+Le domaine \verb/mode/ représente le mode de passage d'un paramètre
+formel de module. Le domaine contient un objet du domaine \verb/value/
+pour le mode de passage par valeur et \verb/reference/ pour le passage
+par adresse.
+
+\PAR{Storage = return:entity + ram + formal + rom:unit}
+\PAR{}
+Le domaine \verb/storage/ permet de préciser dans quelle zone de la mémoire
+est stockée une entité. Il y a plusieurs zones, qui ne correspondent
+pas nécessairement à la réalité, c'est à dire aux zones de mémoire
+qui seraient affectées par un compilateur.
+
+\PAR{}
+Le sous-domaine \verb/return/ permet de représenter les variables ayant
+pour nom le nom d'une fonction et auxquelles on affecte la valeur que la
+fonction doit retourner. L'entité pointée par \verb/return/ est la
+fonction concernée.
+
+\PAR{}
+Le sous-domaine \verb/ram/ est reservé aux variables ayant une adresse
+en mémoire. Il permet de préciser dans quelle fonction et
+éventuellement dans quelle common ces variables ont été déclarées.
+
+\PAR{}
+Le sous-domaine \verb/formal/ est réservé aux paramètres formels des
+modules.
+
+\PAR{}
+Le sous-domaine \verb/rom/ est utilisé pour toutes les entités dont la
+valeur n'est pas modifiable, telles que les fonctions, les labels, les
+opérateurs, etc.
+
+\PAR{Ram = function:entity x section:entity x offset:int}
+\PAR{}
+Le domaine \verb/ram/ permet de préciser la déclaration d'une
+variable. Le sous-domaine \verb/function/ indique dans quel module une
+entité est déclarée. Le sous-domaine \verb/section/ indique dans
+quelle aire une entité est stockée; il y a une aire par common
+déclaré et deux aires spéciales nommées \verb/STATIC/ et
+\verb/DYNAMIC/ pour les entités locales. Enfin, le sous-domaine
+\verb/offset/ donne l'adresse dans l'aire de la variable.
+
+\PAR{Formal = function:entity x offset:int}
+\PAR{}
+Le domaine \verb/formal/ indique le module dans lequel un paramètre formel
+est déclaré grâce le sous-domaine \verb/function/, et le rang de ce
+paramètre dans la liste des paramètres grâce au sous-domaine \verb/offset/.
+
+\PAR{Value = code + instruction + symbolic + constant + intrinsic:unit + 
+unknown:unit}
+\PAR{}
+Le domaine \verb/value/ permet de représenter les valeurs initiales des
+entités. Le sous-domaine \verb/code/ est utilisé pour les entités
+modules. Le sous-domaine \verb/symbolic/ est utilisé
+pour les entités constantes symboliques. Le sous-domaine
+\verb/constant/ est utilisé pour les entités constantes. Le
+sous-domaine \verb/intrinsic/ est utilisé pour toutes les entités qui
+ne dépendent que du langage, telles que les intrinsics Fortran, les
+opérateurs, les instructions, etc. Enfin le sous-domaine
+\verb/unknown/ est utilisé pour les valeurs initiales inconnues.
+
+\PAR{Symbolic = expression x constant}
+\PAR{}
+Le domaine \verb/symbolic/ est utilisé pour représenter la valeur
+initiale d'une entité constante symbolique, c'est à dire les PARAMETER
+de Fortran ou les CONST de Pascal. Le sous-domaine \verb/expression/ permet
+de stocker l'expression qui a permis d'évaluer la valeur initiale
+contenue dans le sous-domaine \verb/constant/. Le sous-domaine \verb/expression/
+n'est utile qui si on cherche à reproduire un texte source fidèle.
+
+\PAR{Constant = int + litteral:unit}
+\PAR{}
+Le domaine \verb/constant/ est utilisé pour représenter la valeur
+initiale des entités constantes. Seules les entités de type entier
+nous intéressent, ce qui explique qu'une constante puisse être soit un
+\verb/int/ soit un \verb/litteral/ dont on ne garde pas la valeur (type unit).
+
+\PAR{Code = declarations:entity* x statement}
+\PAR{}
+Le domaine \verb/code/ est utilisé pour stocker le corps des modules. Le
+sous-domaine \verb/declarations/ contient une liste d'entités qui sont les
+variables et commons déclarés dans la fonction. Le sous-domaine
+\verb/statement/ contient la séquence d'instructions du module.
+
+\PAR{Statement = label:entity x instruction}
+\PAR{}
+Le domaine \verb/statement/ permet de repérer les instructions d'un module.
+Le sous-domaine \verb/label/ contient une entité qui définit le label. Le
+sous-domaine \verb/instruction/ contient le corps de l'instruction.
+
+\PAR{Instruction = block:statement* + test + loop + goto:statement + call}
+\PAR{}
+Le domaine \verb/instruction/ permet de représenter les instructions
+d'un module. Une instruction peut être un sous-domaine \verb/block/,
+c'est à dire une liste de \verb/statement/, un sous-domaine \verb/test/
+pour les instructions de test, un sous-domaine \verb/loop/ pour les
+boucles, un sous-domaine \verb/goto/ pour les goto qui contient le
+\verb/statement/ vers lequel le goto se branche, ou un sous-domaine
+\verb/call/ pour toutes les autres instructions: affectation, appel de
+subroutine, entrées-sorties, return, stop, etc. Toutes ces instructions
+sont représentées par des appels à des fonctions prédéfinies dont
+nous étudierons la nature plus loin.
+
+\PAR{Test = condition:expression x true:statement x false:statement}
+\PAR{}
+Le domaine \verb/test/ permet de représenter toutes les instructions à base
+de contrôle. Le sous-domaine \verb/condition/ contient l'expression à
+tester, et les deux sous-domaines \verb/true/ et \verb/false/ contiennent les
+instructions à exécuter selon la valeur du test. 
+
+Il faut noter que chaque instruction de contrôle de Fortran,
+à l'exception de l'instruction \verb/DO/, est
+transformée en une combinaison sémantiquement équivalente de \verb/test/s
+et de \verb/goto/s.
+
+\PAR{Loop = index:entity x range x body:statement x label:entity}
+\PAR{}
+Le domaine \verb/loop/ permet de représenter les boucles du type DO Fortran
+ou FOR Pascal. Le sous-domaine \verb/index/ contient l'entité indice de
+boucle, le sous-domaine \verb/range/ contient les bornes de la boucle, le
+sous-domaine \verb/body/ contient le corps de la boucle, c'est à dire un
+\verb/statement/, le sous-domaine \verb/label/ contient le label de fin de boucle,
+c'est à dire une entité.
+
+\PAR{Range = lower:expression x upper:expression x increment:expression}
+\PAR{}
+Le domaine \verb/range/ permet de représenter les bornes des boucles DO
+Fortran. Il y a trois sous-domaines \verb/lower/, \verb/upper/ et \verb/increment/ de
+type \verb/expression/ qui sont respectivement la borne inférieure, la borne
+supérieure et l'incrément.
+
+\PAR{Call = function:entity x arguments:expression*}
+\PAR{}
+Le domaine \verb/call/ permet de représenter les appels de fonctions.
+Les fonctions jouent un rôle important dans notre représentation
+intermédiaire puisque les opérateurs et les instructions Fortran
+(READ, WRITE, RETURN, ...) sont représentées par des fonctions
+prédéfinies.
+
+Le sous-domaine \verb/function/ est une entité qui définit la fonction
+appelée. Le sous-domaine \verb/arguments/ est une liste de sous-domaines
+\verb/expression/ qui représente les arguments d'appel de la fonction.
+
+\PAR{Expression = syntax}
+\PAR{}
+Le domaine \verb/expression/ permet de stocker les expressions.
+Pour l'instant, ce domaine ne se compose que d'un unique sous-domaine
+\verb/syntax/, mais nous pensons ajouter ultérieurement d'autres
+sous-domaines, notamment pour conserver avec chaque expression linéaire
+un forme compilée, peut-être sous forme d'un vecteur.
+
+Le sous-domaine \verb/syntax/ contient l'expression avec la même
+structure que celle du code source.
+
+\PAR{Syntax = reference + range + call}
+\PAR{}
+Le domaine \verb/syntax/ permet de représenter les expressions telles
+qu'elles apparaissent dans le texte source du programme. Un
+\verb/syntax/ est soit une \verb/reference/ à un élément de tableau
+(on rappelle que les scalaires sont des tableaux à 0 dimension) , soit
+un \verb/call/ à une fonction (les opérateurs sont représentés par
+des fonctions pré-définies), soit un \verb/range/, dans le cas des
+expressions bornes de boucles.
+
+
+\PAR{Référence = variable:entity x indices:expression*}
+\PAR{}
+Le domaine \verb/reference/ est utilisé pour représenter une référence à
+un élément de tableau. Le sous-domaine \verb/variable/ contient une entité
+définissant la variable référencée. Le sous-domaine \verb/indices/
+contient une liste expressions qui sont les indices de la référence.
+
+\SSS{Objets du langage Fortran}
+
+\PAR{}
+Nous montrons à présent comment les différents objets manipulés dans
+un programme Fortran sont traduits dans notre représentation intermédiaire.
+
+\PAR{Module}
+\PAR{}
+Un module est un programme principal, une fonction ou une subroutine. 
+
+\PAR{}
+Un module est représenté par une \verb/entity/ dont le \verb/name/ est
+le nom du module préfixé par le nom du package de plus haut niveau
+\verb/TOP-LEVEL/, le \verb/type/ est un \verb/functional/ qui indique le
+type des paramètres formels et du résultat, le \verb/storage / vaut
+\verb/rom/ et le \verb/initial/ est un \verb/code/ qui contient le corps du module.
+
+Les subroutines et le programme principal n'ont pas d'argument et
+retournent un \verb/void/. Le nom du programme principal est prefixé
+par un '\_' pour le différencier d'une subroutine.
+
+Tous les autres objets sont considérés au niveau du parser comme des
+objets locaux. Leur nom est donc préfixé par le nom du package
+associé au module, à savoir le nom du module lui-même.
+
+\PAR{Commons et aires}
+\PAR{}
+Une aire représente une partie de la mémoire où sont rangées les
+variables. Les commons sont des aires (voir plus loin).
+
+\PAR{}
+Deux aires spéciales sont créées pour les variables qui
+n'appartiennent pas à un common (variables locales). Ces deux aires
+sont des entités qui ont pour \verb/name/ \verb/STATIC/ et
+\verb/DYNAMIC/, pour \verb/type/ un \verb/area/ qui donne la longueur
+de l'aire, pour \verb/storage/ un \verb/rom/ et comme \verb/initial/ une
+\verb/value/ de type \verb/unknown/. 
+
+\PAR{}
+L'appartenance d'une variable ou d'un common à l'une des ces deux aires
+spéciales indique si cette variable ou ce common est statique ou
+dynamique.
+
+\PAR{}
+Un common est représenté par une \verb/entity/ dont le \verb/name/ est
+le nom du common, le \verb/type/ est un \verb/area/ qui donne la
+longueur du common en octets, le \verb/storage/ est un \verb/ram/ qui
+indique la fonction où le common est declaré (\verb/function/) et
+l'aire où le common est rangé (\verb/section/)..
+
+\PAR{Variables -- Généralités}
+\PAR{}
+Les variables scalaires sont traitées comme des tableaux à 0 dimension.
+
+\PAR{}
+Une variable est représentée par une \verb/entity/ dont le \verb/name/ est le
+nom de la variable. 
+
+\PAR{Variables -- Types}
+\PAR{}
+Le \verb/type/ d'une entité ``variable{''} est un \verb/array/ qui donne le type
+fortran des éléments (\verb/basic/), le nombre de dimensions (longueur de
+la liste \verb/dimensions/) et les bornes de chaque dimension.
+
+\PAR{Variables -- Allocation mémoire}
+\PAR{}
+Le \verb/storage/ d'une entité ``variable résultat de fonction'' est un
+\verb/return/ qui indique la fonction contenant cette variable.
+
+\PAR{}
+Le \verb/storage/ d'une entité ``variable paramètre formel'' est un
+\verb/formal/ qui indique la fonction contenant ce paramètre et le rang de
+ce paramètre dans la liste des paramètres formels.
+
+\PAR{}
+Le \verb/storage/ d'une entité ``variable locale ou globale{''} est un \verb/ram/
+qui indique dans quelle fonction la variable est déclarée
+(\verb/function/), à quelle aire (common ou aire spéciale) elle appartient
+(\verb/section/) et quelle est son adresse dans ce common (\verb/offset/).
+
+\PAR{Variable -- Valeur initiale}
+\PAR{}
+Le \verb/initial/ d'une entité ``variable{''} vaut \verb/unknown/ sauf
+si cette variable est de type entier et est initialisée par data. Dans
+le cadre de la parallélisation, on ne s'intéresse pas aux autres variables.
+
+\PAR{Constantes numériques et symboliques}
+\PAR{}
+Les constantes sont considérées comme des fonctions. Elles sont donc
+représentées par des entités dont le \verb/name/ est le nom de la
+constante (\verb/12/, \verb/13.56E12/, \verb/'*NOMBRE DE FACETTES:*'/, \verb/PI/, \verb/MAXITER/,
+etc.), dont le \verb/type/ est un \verb/functional/ à 0 paramètre et 1
+résultat qui donne le type de la constante, dont le \verb/storage/ est un
+\verb/rom/ et dont le \verb/initial/ est un \verb/constant/ pour les constantes
+numériques et un \verb/symbolic/ pour les constantes symboliques.
+
+\PAR{Opérateurs}
+\PAR{}
+Les opérateurs Fortran sont considérés comme des fonctions. Ils sont
+donc représentés par des entités dont le \verb/name/ est le nom de
+l'opérateur, et dont le \verb/type/ est un \verb/functional/ qui indique l'arité
+de l'opérateur (longueur de la liste \verb/parameters/) mais qui n'indique
+pas le type des paramètres ou du résultat car le sous-domaine \verb/basic/
+vaut toujours \verb/overloaded/. Le storage d'un opérateur est un \verb/rom/ et
+son initial un \verb/intrinsic/.
+
+\PAR{Intrinsics}
+\PAR{}
+Les intrinsics Fortran (MAX, MIN, ABS, etc.) sont traités comme des
+opérateurs. 
+
+\PAR{Labels}
+\PAR{}
+Les labels sont représentés par des entités dont le \verb/name/ est
+le nom du label préfixé par un '\verb/@/', dont le \verb/type/ vaut
+\verb/statement/, dont le \verb/storage/ vaut \verb/rom/ et dont le
+\verb/initial/ est une constante litterale.
+
+\PAR{Instructions simples}
+\PAR{}
+Les instructions simples de Fortran telles que RETURN, CONTINUE, STOP,
+READ, WRITE, PAUSE, END, ... sont considérées comme des fonctions
+intrinsèques.  Elles sont donc représentées par des entités qui ont
+les mêmes caractéristiques qu'un opérateur à 0 paramètre. On ne
+tient pas a jour le nombre de paramètres car il ne sert à peu près à
+rien et que de toute façon, il est variable.
+
+\PAR{}
+L'instruction PRINT est transformée en WRITE.
+
+\PAR{Instructions de contrôle}
+\PAR{}
+Toutes les instructions de contrôle du sous-Fortran que nous acceptons
+en entrée, à l'exception de l'instruction \verb/DO/, sont
+transformées {\em automatiquement} en séquences équivalentes de tests
+à deux branches (une vraie et une fausse), de branchements
+inconditionnels et de boucles do.
+
+\PAR{}
+\begin{verbatim}
+      IF (I) 10, 20, 30
+\end{verbatim}
+devient
+\begin{verbatim}
+      IF (I.LT.0) THEN
+         GOTO 10
+      ELSE
+         IF (I.EQ.0) THEN
+             GOTO 20
+          ELSE
+             GOTO 30
+          ENDIF
+      ENDIF
+\end{verbatim}
+
+\PAR{}
+\begin{verbatim}
+      IF (I.GT.J) I = I-J
+\end{verbatim}
+devient
+\begin{verbatim}
+      IF (I.GT.J) THEN
+         I=I-J
+      ELSE
+        CONTINUE
+      ENDIF
+\end{verbatim}
+
+\PAR{Arguments des instructions d'entrées-sorties}
+\PAR{}
+Les arguments des instructions d'entrées-sorties sont soit des
+informations de contrôle (unité, format, longueur des enregistrements,
+etc.), soit des références à lire ou des expressions à écrire. 
+
+\PAR{}
+Dans notre représentation, les arguments des instructions
+d'entrées-sorties sont des listes de couples d'expressions. La
+première expression du couple est une constante chaine de caractères
+qui indique la nature de l'argument qui apparaissait dans l'instruction
+Fortran (\verb/UNIT=/, \verb/FORMAT=/, \verb/RECL=/, ...). La seconde
+expression est la valeur de cet argument.
+
+\PAR{}
+Le dernier couple de la liste d'un READ ou d'un WRITE n'est pas un vrai
+couple: le premier élément est une expression constante qui vaut
+\verb/IOLIST=/, et le second élément est une liste d'expressions qui sont
+les références à lire ou les expressions à écrire.
+
+\PAR{Boucles implicites}
+\PAR{}
+Les boucles do implicites dans les entrées-sorties sont représentées
+par des appels à un opérateur prédéfini (en fait une fonction) de
+nom \verb/IMPLIED-DO/, qui prend comme arguments une entité qui définit
+l'indice de la boucle, une expression \verb/range/ qui définit les bornes de
+la boucle, et une liste d'expressions.
+
+\PAR{Formats}
+\PAR{}
+Les formats sont conservés sous forme d'expressions constantes chaines
+de caractères. La constante de nom '*F*' est prédéfinie pour les
+formats libres (list-directed).
+
+\PAR{}
+Voici un exemple d'instruction d'entrées-sorties.
+\begin{verbatim}
+      READ(2,'(5E16.6)') (IMD(I),I=1,NDOM), K
+\end{verbatim}
+
+devient
+\begin{verbatim}
+      (READ 'FMT=' '(5E16.6)' 'UNIT=' 2 
+            'IOLIST=' (IMPLIED-DO I 1,NDOM,1 IMD(I)) K)
+\end{verbatim}
+
+\SEC{Implémentation de parser}
+\PAR{}
+Le programme parser se compose d'un analyseur lexical et d'un analyseur
+syntaxique.
+
+\SSE{Analyse lexicale}
+
+\PAR{}
+L'analyse lexicale de Fortran pose quelques problèmes puisque ce
+langage ne contient pas de mots clefs réservés comme c'est le cas de
+langages plus récents tels que Pascal ou C.
+
+\PAR{}
+Par exemple, on détecte que l'instruction suivante est une affectation
+car le caractère qui suit la parenthèse fermant la référence au
+tableau IF est le caractère '='.
+\begin{verbatim}
+IF(I, J, K) = 6.66
+\end{verbatim}
+
+\PAR{}
+En conséquence, l'utilitaire {\em lex}, disponible sous UNIX, ne
+permet pas de réaliser un analyseur lexical pour Fortran. Une
+première solution consistait donc à écrire complètement un
+analyseur lexical pour Fortran, ce qui aurait représenté beaucoup de
+travail.
+
+\PAR{}
+Nous avons préféré décomposer l'analyse lexicale de Fortran en
+deux parties, une première partie ayant pour objet de lever les
+ambiguités contenues dans un programme Fortran grâce à une
+pré-analyse qui introduit des mots clefs au début de chaque
+instruction, et une seconde partie, beaucoup plus simple car basée sur
+lex, qui réalise l'analyse syntaxique du Fortran avec mots clefs produit
+par la première partie.
+
+\SSS{Pré-analyseur lexical}
+
+\PAR{}
+La première partie revient à fournir à l'utilitaire {\em lex} une
+fonction ``\verb/getc/''qui permette de lever les difficultés liées à
+Fortran.
+
+\PAR{}
+La nouvelle fonction \verb/getc/ fonctionne de la façon suivante.  Elle
+lit d'un seul coup toutes les lignes d'une instruction Fortran, c'est à
+dire la ligne initiale et les 19 éventuelles lignes de continuation, et
+les stocke dans le buffer ``\verb/Stmt/''.  Au vol, \verb/getc/ repère
+le label, enlève tous les blancs, détecte les caractères entre
+simples quotes, transforme les minuscules en majuscules, et met à jour
+4 variables externes, qui représentent pour l'instruction courante les
+numéros de la première et de la dernière ligne commentaire, et de la
+première et de la dernière ligne source.  Ensuite, le contenu du
+buffer /verb/Stmt/ est analysé pour y détecter les mot clefs, c'est à
+dire traiter les cas des instructions IF, ELSEIF, ASSIGN, DO, des
+déclaratives IMPLICIT et FUNCTION, et des operateurs {\em .XX.} (.EQ.,
+.NEQV., ...).
+
+\PAR{}
+Lorsqu'un mot clef est détecté, il est mis en miniscules dans le
+texte source, sauf la première lettre qui reste en majuscule.  Ainsi,
+lex peut faire la différence entre le mot clef 'Assign' et
+l'identificateur 'ASSIGN'.  Grâce à la première lettre, lex peut
+détecter deux mots clef successifs, même sans blanc pour les
+séparer, comme dans 'IntegerFunctionASSIGN(X)'.
+
+\PAR{}
+Lorsqu'un opérateur .XX. est détecté, il est remplacé dans le
+source par \verb+_XX_+.  Ainsi, lex peut faire la difference entre une
+constante réelle et un opérateur, comme dans \verb/(X+1._EQ_5)/.
+
+\PAR{}
+Les sources du pre-analyseur lexical se trouvent dans les fichiers suivants:
+\begin{itemize}
+\item f77keywords: les mots clef du sous-Fortran reconnu par PIPS;
+\item f77symboles: les symboles (opérateurs, signes de ponctuation,
+...) du sous-Fortran reconnu par PIPS;
+\item reader.c: code de la nouvelle fonction getc.
+
+\end{itemize}
+
+\SSS{Post-analyseur lexical}
+
+\PAR{}
+La seconde partie est tout à fait classique, c'est une spécification
+d'analyseur lexical, dans le langage proposé par lex. Cette
+spécification se compose d'une liste d'expressions régulières
+correspondant aux tokens du langage, ave{c}, pour chacune d'entre elles,
+le code du token à renvoyer à yacc lorsqu'un token de ce type est
+détecté dans le programme source.
+
+\PAR{}
+Les sources du post-analyseur lexical se trouvent dans le fichier
+scanner.l. 
+
+\SEC{Analyse syntaxique}
+
+\PAR{}
+L'analyse syntaxique de PIPS est réalisée avec l'utilitaire yacc. Cet
+utilitaire permet de définir une grammaire par un ensemble de règles
+construites sur les tokens du langage et sur d'autres symboles appelés
+symboles non terminaux. Voici quelques exemples de règles.
+\begin{verbatim}
+linstruction: instruction TK_EOS
+        | linstruction instruction TK_EOS
+        ;
+
+expression: reference
+        | call
+        | constante
+        | signe expression
+        | expression TK_PLUS expression
+        | expression TK_MINUS expression
+        | ...
+        ;
+\end{verbatim}
+
+La première règle signifie qu'une liste d'instructions est composée
+de plusieurs instructions séparées par des tokens \verb+TK_EOS+ (token
+end-of-statement). La seconde règle signifie qu'une expression est soit
+une référence, soit un call, soit une constante, soit un signe suivie
+d'une expression, soit la somme ou la différence de deux expressions.
+Les symboles call, constante, reference, ... sont des non-terminaux, et
+doivent donc être définis plus loin en fonction des tokens du langage.
+
+\paragraph{}
+Yacc permet en plus d'associer à chaque règle une portion de code
+écrit en langage C, qui est exécutée chaque fois que la règle en
+question est reconnue dans le programme Fortran soumis à l'analyseur.
+L'exemple suivant montre une partie de la règle instruction, et la
+portion de code associée; il s'agit dans ce cas d'un appel de fonction
+pour chainer l'instruction que l'on vient de reconnaitre au bloc
+d'instructions courant.
+\begin{verbatim}
+instruction: return_inst
+            { LinkInstToCurrentBlock($1); }
+        | ...
+        ;
+\end{verbatim}
+
+\paragraph{}
+L'analyseur syntaxique se compose donc d'un ensemble de règles et d'un
+ensemble de fonctions C. Les sources de l'analyseur syntaxique se
+composent des fichiers dont la description suit.
+\begin{itemize}
+
+\item gram.y: fichier contenant la spécification des règles de la
+      grammaire du sous-Fortran PIPS et les actions associées. La
+      plupart des ces actions consistent en des appels de fonctions C
+      définies dans les fichiers \verb/*.c/.
+
+\item declaration.c: fonctions C appelées par les règles d'analyse des
+      déclarations d'un module Fortran.
+
+\item equivalence.c: fonctions C appelées par les règles d'analyse des
+      équivalences entre variables.
+
+\item eval.c: fonctions C réalisant un évaluateur d'expressions constantes.
+      Cet évaluateur est utilisé principalement pour calculer les bornes des
+      tableaux et leur adresse en cas d'équivalence.
+
+\item expression.c: fonctions C appelées par les règles d'analyse des
+      expressions contenues dans les déclarations et le code d'un
+      module Fortran.
+
+\item hashtable.c: fonctions C permettant de gérer la table des symboles de
+      l'analyseur syntaxique.
+
+\item intrinsic.c: fonctions C décrivant les fonctions intrinsèques de
+      Fortran.
+
+\item parser.c: le programme principal du parser. Ce programme est
+      responsable des initialisations, ouvertures de fichiers, et de
+      l'enchainement de l'analyseur lexical et de l'analyseur syntaxique.
+
+\item parser.h: fichier contenant quelques constantes et macros partagées.
+
+\item procedure.c:  fonctions C appelées par les règles d'analyse des
+      appels de modules externes.
+
+\item statement.c: fonctions C appelées par les règles d'analyse des
+      instructions d'un module Fortran.
+
+\item util.c: diverses fonctions C partagées.
+\end{itemize}
+
+\PAR{Conclusion}
+\PAR{}
+Le programme parser est entièrement réalisé. Son code ne devrait
+maintenant subir des transformations que pour effectuer des corrections. 
+
+\PAR{}
+La représentation intermédiaire va au contraire évoluer au fur et à
+mesure que de nouvelles passes de PIPS vont être développées. En
+effet, la plupart des informations qui seront calculées par la suite
+(prédicats, effets des procédures, etc.) doivent être directement
+raccrochées soit aux instructions d'un module, soit aux entités, ou
+bien encore aux expressions. Dans tous les cas, cela signifie qu'il
+faudra ajouter de nouveaux champs aux domaines déjà existants.
+
+\newpage
+\SEC{ANNEXE}
+\PAR{}
+Cette annexe contient le listing des programmes sources du parser.
+
+\end{document}
+\end

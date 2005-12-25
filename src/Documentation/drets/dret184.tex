@@ -1,0 +1,427 @@
+\documentclass[12pt,A4,french,verbatim]{article}
+
+\usepackage[latin1]{inputenc}
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+\newcommand{\titre}{RAPPORT D'AVANCEMENT No 1 \\
+COMPILATION POUR MACHINES A MEMOIRE REPARTIE
+}
+\newcommand{\auteur}{
+~Corinne ANCOURT \\
+Fabien COELHO \\
+François IRIGOIN \\
+Ronan KERYELL 
+ }
+\newcommand{\docdate}{Juin 1994}
+\newcommand{\numerocri}{E184}
+\begin{document}
+\sloppy
+\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+
+
+
+\section*{Introduction}
+
+L'objectif général de cette étude est de développer les techniques
+nécessaires à la compilation de machines à mémoire répartie. 
+Cette étude s'effectue en partie en collaboration avec l'équipe de Paul
+Feautrier du Masi. Ce rapport décrit l'état d'avancement des
+différentes tâches qui sont à la charge du CRI, c'est à dire:
+\begin{enumerate} 
+\item Interface du langage de sortie FORTRAN 77 augmenté
+d'appels à une bibliothèque de communication 
+\item Développement de techniques d'analyse statique de complexité en
+temps;
+\item  Définition des pragmas;
+\item  Extension du langage d'entrée;
+\item Compilation de structures de données dynamiques, comme les
+indirections;
+\item Compilation de structures de contrôle dynamiques, comme les 
+conditionnelles, 
+\item Développement de techniques de partitionnement pour des
+boucles non-parfaitement imbriquées ;
+\end{enumerate}
+
+Les deux premières tâches sont achevées, les trois suivantes sont en
+cours de développement et les deux dernières n'ont pas encore
+débuté. Nous détaillons maintenant les résultats obtenus pour
+chacune des cinq premières. La description des travaux déjà effectués
+dans le cadre du projet PUMA n'a pas lieu d'être dans ce rapport. Pour
+plus de détails sur ces travaux, il est conseillé de  se rapporter à
+l'article \cite{AnIr92}.
+
+
+\section{Définition des pragmas}
+
+L'ensemble des techniques déjà développées en matière de
+parallélisation automatique par les équipes du Masi et d'Armines
+représente un support important pour l'obtention rapide d'un prototype
+de compilation pour machines à mémoire distribuée. Il est important
+que les deux prototypes PAF et PIPS puissent profiter des meilleurs
+résultats obtenus par l'ensemble des techniques. Nous avons déterminé
+les informations intéressantes qui seront échangées entre PAF et
+PIPS. Plus précisément, il s'agit des {\it préconditions} et des {\it
+régions}, calculées par PIPS et disponibles sous forme de commentaire
+dans les programmes, qui seront utilisées par PAF et des {\it
+réductions}, détectées par PAF, qui seront utilisées par PIPS. Le
+format d'échanges des réductions choisi est celui décrit dans le
+premier rapport d'avancement rédigé par M. Barreteau, P. Feautrier et
+X. Redon. La prochaine étape consiste à déterminer le format
+d'échanges des préconditions et des régions.
+
+
+\section{Extension du langage d'entrée}
+Dans le cadre du projet PUMA, le langage d'entrée était très
+restreint. L'étude portait uniquement sur la génération de code
+distribué pour les nids de boucles {\em parallèles} et parfaitement
+imbriquées englobant une séquence d'affectations. L'extension de ce
+langage d'entrée aux structures de données dynamiques, telles que les
+indirections, ou aux structures de contrôle dynamiques, telles que les
+conditionnelles n'avait pas été abordée. De même, aucune stratégie
+de distribution des parties séquentielles du code n'avait été
+développée. Cette étude est maintenant en cours. Les premières
+étapes ont été la définition d'un schéma de communication adapté
+aux nouvelles structures ainsi que le développement et l'intégration
+d'une transformation de programme nommée {\it atomizer} nécessaire,
+plus particulièrement, au traitement des indirections.
+
+
+\subsection{Schéma de communication adapté aux nouvelles
+structures} 
+
+La première étape de distribution/parallélisation d'un programme,
+ composé uniquement d'un ensemble de boucles parallèles et
+ parfaitement imbriquées, consiste à regrouper les calculs en tâches
+ parallèles de taille raisonnable (relative à la taille des caches ou
+ aux lignes de bancs mémoire, par exemple). Une fois les calculs
+ regroupés en tâches parallèles, l'étape suivante est la
+ génération des communications nécessaires à l'exécution des
+ tâches sur les différents processeurs. Pour ce type de code, la
+ stratégie choisie consistait, dans le cadre du projet PUMA, à
+ transférer l'ensemble des éléments référencés en lecture
+ (respectivement en écriture) avant (respectivement après)
+ l'exécution de chacune des tâches parallèles. Cependant, l'extension
+ de notre langage d'entrée impose un schéma de communication plus
+ complet.
+
+Différentes stratégies de communication peuvent être utilisées pour
+transférer les éléments utiles à l'exécution des tâches sur les
+processeurs selon les différentes structures du programme.  Celle que
+nous avons choisi est la suivante:
+
+\begin{description}
+\item [Affectation simple:]
+~\newline
+ \begin{itemize}
+\item les éléments   référencés en lecture
+sont transférés avant l'exécution de cette instruction, pas
+nécessairement juste avant, mais le plus souvent regroupés avec ceux de
+structures plus englobantes, de manière à favoriser des possibilités
+d'effectuer concurremment communications et calculs.
+\item Les  éléments  scalaires référencés en écriture sont
+transférés juste après l'exécution, tandis que les éléments de
+tableaux modifiés sont regroupés avec ceux d'une structure plus
+englobante pour favoriser les possibilités de transferts d'éléments
+contigus, moins coûteux. 
+\end{itemize}
+
+\item [Une séquence d'affectations:]
+
+ ~\newline
+\begin{itemize}
+\item l'ensemble des éléments  référencés en lecture
+ est transféré avant l'exécution de cette séquence, si aucun des
+termes des indices des fonctions d'accès aux éléments d'un tableau ne
+dépend d'une variable scalaire qui est modifiée dans cette séquence
+linéaire (voir Figure 1).  Sinon, une communication en réception est
+générée juste avant l'instruction référençant le tableau.
+
+\begin{center}
+
+\begin{figure}[hpt]
+\begin{verbatim}
+                                 A = ...
+                                 C = T(A)
+\end{verbatim}
+\caption{Séquence d'affectations 1}
+\label{prog1}
+\end{figure}
+\end{center}
+
+
+\item  Les  éléments  scalaires référencés en écriture sont
+transférés juste après l'exécution, tandis que les éléments de
+tableaux modifiés sont regroupés au niveau de la séquence
+d'instructions.
+
+\end{itemize}
+
+ Il faut noter que les variables qui sont {\it privées}\footnote{Une
+variable est privée à un nid de boucles, si sa valeur en entrée de
+boucle et sa valeur en sortie ne sont pas utilisées dans le nid de
+boucles en dehors de cette boucle; c'est le cas des variables
+temporaires.}  à une séquence d'instructions n'impose une
+communication qu'après exécution de la séquence d'instructions et pas
+avant.  L'exemple \ref{prog2} présente le type de communications
+générées pour une séquence d'affectations.
+
+\begin{center}
+\begin{figure}[hpt]
+\begin{verbatim}
+                                        CALL RECEIVE_4(A)
+                                        CALL RECEIVE_4(B)
+          F=A                           F = A
+                                        CALL SEND_4(F)
+          D=B                           D = B 
+                                        CALL SEND_4(D)
+                                        CALL RECEIVE_4(M(F,F))
+          E=M(F,F)                      E = M(F,F)            
+                                        CALL SEND_4(E)
+\end{verbatim}
+\caption{Communications - Séquence d'affectations}
+\label{prog2}
+\end{figure}
+\end{center}
+
+\item [Les nids de boucles totalement parallèles:] 
+ Les éléments de tableaux ou scalaires référencés en lecture
+(respectivement en écriture) sont transférés globalement
+avant (respectivement après) l'exécution. Il n'y a pas de conflits
+mémoire entre les accès aux données référencées puisque les
+exécutions sont parallèles.
+
+
+\item [Les nids de boucles totalement séquentielles:] Les calculs
+séquentiels sont exécutés sur un seul processeur. Tous les
+éléments référencés en lecture (respectivement en écriture)
+peuvent être  transférées globalement
+avant (respectivement après) l'exécution du nid de boucles, car les
+dépendances sont respectées par la séquentialité de l'exécution.
+
+\item [Les nids de boucles totalement séquentielles - Pipelinées:] Si
+le volume des données est trop important pour la mémoire locale des
+processeurs, une division du domaine de
+calculs en blocs d'itérations plus petits s'impose. Ces blocs seront
+exécutés sur différents processeurs. Les communications et les
+calculs sont alors pipelinés, dans tous les cas où cela est possible,
+de manière à minimiser le temps global d'exécution. Les références
+qui ne causent pas de dépendances correspondent aux données qui
+pourront être communiquées de manière concurrente avec des calculs.
+
+\item [Les nids de boucles mixtes:] On impose un seul niveau de
+concurrence: on ne générera pas à la fois du code parallèle et
+pipeliné au sein d'un même nid de boucles.
+
+Toutes les références internes au nid de boucles parallèles ou
+pipelinées sont communiquées avant (respectivement après) pour les
+références en lecture (respectivement en écriture).  Les références
+externes seront communiquées selon le schéma de communication des
+boucles séquentielles non pipelinées. Comme les séquences
+séquentielles ne sont exécutées que sur un seul processeur, ces
+parties de code sont traitées comme des parties indépendantes des
+boucles parallèles et des communications conservant la cohérence de la
+mémoire globale doivent être générées à la fin et au début des
+parties qui sont parallèles.
+
+\item [les conditionnelles:] Par défaut, les deux branches de la
+conditionnelle sont traitées de manière indépendante selon les
+structures précédemment décrites auxquelles elles appartiennent. 
+Toutefois, il est possible d'effectuer quelques optimisations pour les
+deux cas suivants:
+\begin{itemize}
+\item La conditionnelle est une inéquation linéaire dépendante d'un
+indice de boucle. Dans ce cas il est possible d'introduire cette 
+contrainte dans le domaine d'itérations et de générer un ou deux  nouveaux nids
+de boucles et leurs communications sans conditionnelle. Les nids de
+boucles traduiront respectivement la branche vraie et la branche fausse
+de la contrainte. 
+
+\item La conditionnelle est une fonction linéaire indépendante des
+termes contenus  dans les deux branches du test. Cette contrainte est
+alors extraite du nid de boucles et placée à l'extérieur. Les
+communications sont générées pour chacune des branches
+indépendamment. Toutefois, le  test est effectué en dehors du nid de
+boucles et pas une fois pour chacune des valeurs du domaine
+d'itérations. 
+\end{itemize}
+
+\end{description}
+
+
+\section{Structures de données dynamiques: les indirections}
+
+ L'{\it atomizer} est une transformation de programme qui {\it atomise}
+toutes les références d'un programme, c'est à dire caractérise
+l'accès de chacune des variables du programme par une suite
+d'opérations trois adresses, similaires à celles qui sont utilisées
+dans le langage intermédiaire d'un compilateur.
+ 
+
+\begin{center}
+\begin{figure}[hpt]
+\begin{verbatim}
+                                      ITMP1 = I             
+                                      ITMP2 = J
+                                      ITMP3 = A(ITMP1, ITMP2)
+                                      ITMP4 = ITMP1 -1
+                                      ITMP5= ITMP2 +1
+       B(I-1,J+1)=A(I,J)              B(ITMP4,ITMP5) = ITMP3
+       C(A(I,J),J) = I                C(ITMP3,ITMP2) = ITMP1
+\end{verbatim}
+\caption{Atomizer}
+\label{prog3}
+\end{figure}
+\end{center}
+
+   Cette transformation de programme simplifie les phases d'analyse et
+de génération des communications dans les cas où il y a des
+indirections (et des entrées/sorties), puisque les variables
+temporaires créées par l'atomizer représentent les différentes
+opérations ou communications qui devront être effectuées pour
+finaliser l'envoi ou la réception d'un accès indirect aux éléments
+d'un tableau.
+
+L'exemple \ref{prog3} présente les différentes variables temporaires
+obtenues lorsqu'on applique cette transformation. Toutes les
+opérations faisant intervenir des variables  non temporaires
+représentent l'ensemble des communications à effectuer.
+
+Cette transformation de programme  a été intégrée à Pips et sera
+utilisée pour la génération des communications dans les cas où il y a
+des indirections.
+
+
+
+\section{ Interface du langage de sortie FORTRAN 77 avec  une bibliothèque de communication }
+
+Afin de pouvoir tester notre approche sur différents types
+d'architecture, nous avons choisi PVM comme  bibliothèque de communication. 
+
+PVM est à l'heure actuelle la bibliothèque de communication la plus
+utilisée pour les réseaux de stations de travail. Elle est surtout
+utilisée dans le domaine de la recherche mais est aussi adoptée par
+les industriels. Citons quelques industriels qui l'ont implantée sur
+leur multiprocesseur respectif: CRAY sur le T3D, IBM pour leurs réseaux
+de RS6000 et Fujitsu sur l'AP1000.
+
+Une fois le code distribué (Fortran 77 + Primitives de communications),
+une interface permet de traduire 
+les appels aux communications en primitives PVM. Une validation du code
+ainsi généré avec l'interface PVM peut ensuite être effectuée sur
+un réseau de stations de travail.
+
+La dernière partie de l'annexe présente cette interface. Les primitives de 
+communication présentes dans le code généré par PUMA sont traduites
+par des appels à des primitives de la bibliothèque de communications
+PVM. Les fonctions utiles au lancement des différentes
+tâches en parallèle sur les processeurs sont aussi données et
+commentées. 
+
+
+\section{Développement de techniques d'analyse statique de complexité en
+temps}
+
+Le calcul de la complexité des tâches parallèles  à exécuter sur
+les différents processeurs est utile, en autres, pour évaluer  le bon 
+équilibrage ``coûts des communications'' et ``coûts des calculs''.
+
+
+L'estimation statique de la complexité des programmes séquentiels a
+déjà fait l'objet de nombreuses recherches. L'originalité des travaux
+du CRI est due à l'utilisation de préconditions et au traitement des
+appels de procédures. Ils sont maintenant intégrés à Pips. Du point
+de vue théorique, cette étude 
+
+\begin{itemize}
+\item  a étendu l'ensemble des cas traités aux cas où le programme
+contient des tests, 
+
+\item introduit des paramètres symboliques utiles à l'expression des
+paramètres que l'on ne peut (ou veut) pas évaluer dans le programme, 
+
+\item et  tient compte des
+préconditions interprocédurales fournies par les phases d'analyses de
+Pips.
+\end{itemize}
+
+Des expériences ont été menées sur des machines séquentielles et
+parallèles pour valider l'approche choisie.
+
+L'exemple \ref{prog5} détaille le calcul de la complexité d'une
+sous-routine de calcul par Cholesky. Le coût de chacune des opérations
+élémentaires est supposée ici unitaire, mais d'autres tables
+appropriées à différents processeurs peuvent être choisies. Le
+résultat global est ici dépendant de la variable $N$ puisque cette
+constante n'est pas fixée par le programme.
+
+\begin{figure}[hpt]
+\verbatiminput{complexity.tex}
+\caption{Complexité statique}
+\label{prog5}
+\end{figure}
+
+
+\section{Validation}
+
+Une  procédure de validation du code généré a été installée. Elle
+teste (1) la correction du code généré en la comparant avec  une version
+de référence, ainsi que (2) la cohérence 
+des nouvelles versions qui doivent préserver les résultats des
+versions antérieures. Les programmes de test sur lesquels sont
+appliqués cette procédure ont un  langage d'entrée relatif  aux différentes
+versions de notre prototype. Actuellement,  nous générons un code
+distribué pour les programmes contenant:
+\begin{itemize}
+\item  un ou plusieurs nids de boucles parfaitement imbriqués englobant une
+séquence d'affectations,
+\item  des séquences d'affectations (partie à exécution séquentielle) et de nids de
+boucles parfaitement imbriqués (englobant  une séquence d'affectations),
+\end{itemize}
+
+Les déclarations des tableaux locaux sont vérifiées par une
+validation portant sur des programmes dont les sous-ensembles
+d'éléments référencés sont  disjoints ou  se recouvrent. Le
+deuxième exemple de l'annexe illustre le cas où ils sont disjoints.
+
+\section*{Conclusion}
+
+N'ayant pas rencontrés  de difficultés majeures lors de l'étude
+des différentes tâches décrites précédemment, la réalisation de
+notre contrat  progresse comme prévu. Il nous
+faut maintenant terminer ou aborder les différents points suivants:
+\begin{itemize}
+\item  Extension du langage d'entrée (implémentation du schéma de communications);
+\item Compilation de structures de données dynamiques, comme les
+indirections (utilisation de l'atomizer);
+\item Compilation de structures de contrôle dynamiques, comme les 
+conditionnelles, 
+\item Développement de techniques de partitionnement pour des
+boucles non-parfaitement imbriquées ;
+\end{itemize}
+
+L'annexe donne deux exemples de code distribué générés par notre
+prototype: l'addition de matrices et la transposition. Pour chacun de
+ces exemples, la sous-routine exécutée par les processeurs de calcul
+précède celle exécutée par les processeurs émulant la mémoire
+partagée.
+
+\newpage
+\section*{Annexe}
+\subsection*{Premier exemple: L'addition de matrices }
+\verbatiminput{add.tex}
+\newpage
+\subsection*{Deuxième exemple: La transposition de matrice}
+
+\verbatiminput{transp.tex}
+
+\newpage
+\subsection*{Interface avec la bibliothèque de communications PVM}
+\verbatiminput{pvm-interface.tex}
+\begin{thebibliography}{99}
+\bibitem[AnIr92]{AnIr92}
+C. Ancourt, F. Irigoin,
+`` Automatic Code Distribution '',
+{\it The Third Workshop on Compilers for Parallel Computers (CPC'92) },
+Vienna, Austria, July 6-9, 1992
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,487 @@
+\documentclass[12pt]{article}
+
+\usepackage[latin1]{inputenc}
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+\newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{\em #2}}
+\newcommand{\titre}{RAPPORT D'AVANCEMENT No 5 (LOT 6)\\
+                    ANALYSEUR SÉMANTIQUE ET DÉTECTEUR DE PARALLÉLISME}
+\newcommand{\auteur}{
+        François IRIGOIN \\
+        Pierre JOUVELOT \\
+        Rémi TRIOLET}
+\newcommand{\docdate}{Décembre 1989}
+\newcommand{\numero}{E124}
+
+\newcommand{\SEC}[1]{\section{#1}}
+\newcommand{\SSE}[1]{\subsection{#1}}
+\newcommand{\SSS}[1]{\subsubsection{#1}}
+\newcommand{\PAR}[1]{\paragraph{#1}}
+\newcommand{\SPA}[1]{\subparagraph{#1}}
+\newcommand{\BQU}{\begin{quote}}
+\newcommand{\EQU}{\end{quote}}
+\newcommand{\BIT}{\begin{itemize}}
+\newcommand{\EIT}{\end{itemize}}
+\newcommand{\BDE}{\begin{description}}
+\newcommand{\EDE}{\end{description}}
+\newcommand{\BEQ}{\begin{equation}}
+\newcommand{\EEQ}{\end{equation}}
+\newcommand{\BAR}{\begin{array}}
+\newcommand{\EAR}{\end{array}}
+\newcommand{\BDO}{\begin{document}}
+\newcommand{\EDO}{\end{document}}
+\newcommand{\BCE}{\begin{center}}
+\newcommand{\ECE}{\end{center}}
+\newcommand{\BTG}{\begin{tabbing}}
+\newcommand{\ETG}{\end{tabbing}}
+\newcommand{\BTR}{\begin{tabular}}
+\newcommand{\ETR}{\end{tabular}}
+\newcommand{\BAB}{\begin{abstract}}
+\newcommand{\EAB}{\end{abstract}}
+\newcommand{\BEN}{\begin{enumerate}}
+\newcommand{\EEN}{\end{enumerate}}
+\newcommand{\BFI}{\begin{figure}}
+\newcommand{\EFI}{\end{figure}}
+\newcommand{\VSP}{\vspace*{\baselineskip}}
+
+\setlength{\parindent}{0cm}
+
+\begin{document}
+\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+\sloppy
+
+\SEC{Introduction}
+\PAR{}
+Ce rapport intermédiaire donne l'état d'avancement de nos travaux sur
+l'analyse sémantique et la détection du parallélisme.
+
+\PAR{}
+Dans le cadre de l'analyse sémantique, nous détaillons dans la section
+\ref{AS} les modifications apportées à la représentation intermédiaire pour
+stocker:
+\begin{itemize}
+  \item les informations relatives au calcul des prédicats par la méthode
+	de Cousot et Halbwachs (transformeur de prédicats),
+  \item les prédicats calculés eux-mêmes,
+  \item et les informations interprocédurales afférentes à chaque module
+	(effets en lecture et écriture et transformateur de prédicat).
+\end{itemize}
+Transformeurs de prédicats et prédicats sont stockés au niveau
+{\tt statement}.
+
+\PAR{}
+Dans la cadre de la détection du parallélisme, nous présentons dans
+la section \ref{DP} les applications faites du graphe de contrôle
+structuré (cf.  précédent rapport) dans le domaine de la construction
+des chaines {\em use-def}, de leur utilisation pour la privatisation de
+variables et la construction du graphe dépendance et, enfin, de
+l'adaptation de l'algorithme de Allen et Kennedy.
+
+\PAR{}
+La représentation intermédiaire du projet PIPS ayant été largement
+augmentée au cours des derniers mois, nous donnons en annexe le listing
+complet de cette représentation intermédiaire en utilisant la notation
+Newgen, abondamment commentée.
+
+\SEC{Analyseur sémantique}
+\label{AS}
+
+\subsection{Structures de données utilisées}
+
+Deux nouvelles structures de données ont été ajoutées dans la
+représentation intermédiaire d'un programme: le {\tt transformer} et le
+{\tt predicat}. Ces deux structures sont utilisées pour enrichir
+les informations portées par les {\tt statement}s. Les explications qui
+suivent ont été directement extraites de la description de la ri
+fournies en annexe.
+
+Le domaine {\tt transformer} définit une relation entre les préconditions
+d'un {\tt statement} et les postconditions correspondantes. Cette relation
+porte sur les valeurs des variables scalaires entières du module.
+
+Les variables qui apparaissent dans la liste des arguments sont celles
+qui sont modifiées par le {\tt statement} correspondant. Deux valeurs
+sont donc associées à chacune d'entre elles: la pre- et la
+post-valeur.  Les post-valeurs sont portées par les entités
+elles-mêmes. Les pré-valeurs sont portées par des entités
+spéciales. Les variables scalaires entières qui ne sont pas modifiées
+et qui n'apparaissent donc pas dans la liste des arguments n'ont qu'une
+seule valeur, portée par l'entité correspondant à la variable.
+
+La relation est définie par des égalités et des inégalités
+linéaires entre valeurs.
+
+Un transformer n'est défini qu'après une phase d'analyse sémantique.
+
+Le domaine {\tt predicate} définit une relation entre valeurs de
+variables scalaires entières. Son interprétation est fonction de
+son utilisation. Il peut s'agir soit d'un prédicat valable en
+un point du programme (i.e. un invariant), soit d'un prédicat
+valable entre deux points du programme. Il s'agit alors d'une
+abstraction d'une commande, c'est-à-dire d'un {\tt transformer}.
+
+\subsection{Propagation de constante intra-procédurale}
+
+Une première étape de l'analyse sémantique a été réalisée,
+la propagation de constantes intra-procédurale. Elle est basée
+sur le calcul des effets et sur les affectations affines à
+des variables scalaires entières.
+
+L'algorithme utilisé consiste à faire une interprétation
+abstraite du programme en terme de polyèdres, sans calcul de point fixe.
+Les boucles, les tests et les zones non structurées des modules
+ne créent pas d'information mais en détruisent seulement.
+
+L'algorithme de propagation d'un invariant initial sur tout le corps
+d'un module n'est pas encore écrit.
+
+Les appels à des fonctions ou routines externes ne sont pas
+encore traités correctement parce que cette information interprocédurale
+n'était pas encore disponible dans la représentation intermédiaire. Elle
+devrait être ajoutée rapidement.
+
+La généralisation à une propagation de constante interprocédurale
+nécessite, en plus du stockage de {\tt transformer}s globaux pour
+chaque module du programme, une nouvelle routine de traduction et
+de filtrage des {\tt effects} et des {\tt transformer}s.
+
+Le travail sur l'analyse sémantique intra-procédurale va se poursuivre
+en ajoutant un calcul d'enveloppe convexe pour pouvoir traiter le cas
+des tests et un calcul de point fixe basé sur l'élargissement de
+Cousot et Halbwachs pour pouvoir traiter les boucles plus finement.
+
+\subsection{Informations interprocédurales}
+
+Pour éviter d'avoir à utiliser un espace de travail trop grand, Pips
+peut fonctionner en ne conservant en mémoire que la table interprocédurale
+des entités et le code d'un ou deux modules. Il n'est donc pas pratique
+de conserver les effets et les transformers uniquement au niveau
+{\tt statement}.
+
+D'autre part, certains effets locaux sont masqués vis-à-vis du module
+appelant et certains résultats de l'analyse sémantique intra-procédurale
+sont sans signification pour les modules extérieurs. Il faut donc
+filtrer et éventuellement amalgamer les informations conservées
+au niveau {\tt statement}.
+
+C'est pourquoi deux nouveaux champs ont été ajoutés au niveau {\tt code},
+{\tt effects} et {\tt transformer}. Ces deux champs sont commentés dans
+l'annexe où est décrite la représentation intermédiaire.
+
+\SEC{Détecteur de parallélisme}
+\label{DP}
+\SSE{Meilleure détection des dépendances}
+Le rapport précédent présentait une nouvelle structure de données
+permettant de représenter le graphe de contrôle d'un programme de
+manière plus adaptée à la parallélisation. En particulier, ce {\em
+graphe de contrôle structuré (GCS)} permettait de préserver la
+structuration inhérente à la grande majorité des programmes (i.e., de
+localiser de manière fine les zones d'influence des {\tt goto}),
+permettant ainsi d'en profiter plus largement qu'avec les techniques
+classiques. 
+
+\PAR{}
+Nous décrivons comment ce GCS a été utilisé pour construire les
+chaines {\em use-def} et pour privatiser les variables locales à des nids de
+boucles, ces deux nouvelles phases ayant pour but d'affiner le calcul du
+graphe de dépendance. En effet, la version présédente du
+paralléliseur comportait une phase de calcul de dépendances très
+rudimentaire qui:
+\BIT
+\item analysait pour chaque paire possible d'instructions tous les
+conflits potentiels,
+\item ne savait pas déterminer si les effets d'un corps de boucle sur
+une variable scalaire étaient ou non locaux.
+\EIT
+L'exemple suivant montre que cette analyse simpliste n'était pas
+satisfaisante dans de très nombreux cas. Sans les phases que nous
+allons présenter dans la suite, le paralléliseur ne peut pas se rendre
+compte que la boucle sur {\tt I} peut d'une part être coupée en deux
+(ce qui donne une meilleure localité des accès aux tableaux {\tt T} et
+{\tt U}), et que d'autre part chaque boucle résultante peut être
+parallélisée car les modifications du scalaire {\tt S} sont locales à
+chaque boucle: la valeur de {\tt S} est tuée en entrée et non
+utilisée par la suite (ce qui est également détecté automatiquement).
+\begin{verbatim}
+      DO I = 1, 10
+         S = T(I)+1
+         T(I) = S + S**2 + S**3
+         S = U(I)+1
+         U(I) = S + S**2 + S**3
+      ENDDO
+\end{verbatim}
+Grâce à notre analyse plus fine des dépendances, cette boucle
+pourrait être transformée en:
+\begin{verbatim}
+      DOALL I = 1, 10
+         PRIVATE S
+         S = T(I)+1
+         T(I) = S + S**2 + S**3
+      ENDDO     
+      DOALL I = 1, 10
+         PRIVATE S
+         S = U(I)+1
+         U(I) = S + S**2 + S**3
+      ENDDO
+\end{verbatim}
+
+\PAR{}
+
+\SSE{Organisation du calcul des dépendances}
+\PAR{}
+L'organisation actuelle du calcul des dépendances est la suivante:
+
+\BIT
+\item le graphe de contrôle structuré est calculé sur la totalité du
+module soumis au paralléliseur;
+
+\item les effets des instructions sont calculés sur la totalité du
+module soumis au paralléliseur; la version actuelle de cette phase ne
+sait pas traiter les appels à d'autres modules mais des travaux sont en
+cours pour améliorer ce point;
+
+\item les {\em use-def} chaines sont calculées elles aussi sur la totalité du
+module; cette analyse n'a pas de sens sur une portion de module
+puisqu'il faut connaître les variables vivantes en entrée et en sortie
+de la portion analysée;
+
+\item une fois ce point atteint, le paralléliseur pourrait tenter une
+première étape de parallélisation en utilisant les {\em use-def} chaines
+comme première approximation du graphe de dépendances; ceci est
+d'autant plus possible que {\em use-def} chaines et graphe de dépendances sont
+en fait la même chose pour PIPS; cette étape n'est pas effectuée
+actuellement vu le peu de parallélisme qui serait obtenu;
+
+\item les variables privées à un corps de boucle sont recherchées
+pour toutes les boucles du module;
+
+\item les {\em use-def} chaines sont raffinées pour tous les conflits dus à
+des références à des éléments de tableaux; cette opération est
+appliquée aux boucles en cours de parallélisation (et non pas à la
+totalité du module) pour des raisons d'efficacité car les algorithmes
+de calcul en nombres entiers sont complexes et couteux en temps cpu.
+\EIT
+
+\PAR{}
+Nous détaillons ces différentes phases dans la suite de cette section.
+
+\SSE{Effets des instructions}
+\PAR{}
+Les dépendances utilisent la notion de conflit entre instructions.
+Celle-ci est déterminée par les effets des instructions: quelles
+variables ou éléments de tableaux sont-ils lus et/ou modifiés par chaque
+instruction du module?
+
+\PAR{}
+En vue de traiter le problème dans son cas le plus général (et, {donc},
+interprocédural), les effets des instructions sont cumulés selon la
+structure syntaxique du programme à paralléliser. Comme la
+détermination exacte des effets d'une instruction est un problème non
+décidable (penser aux tests, par exemple), nous avons étendu la
+définition d'un effet pour prendre en compte le type d'{\em
+approximation} connu (cf. la définition de la représentation
+intermédiaire de PIPS en annexe). Ainsi, un effet est caractérisé
+par:
+\BIT
+\item la variable ou l'élément de tableau référencé: une {\tt
+reference};
+
+\item l'attribut permettant de savoir si cet effet est une lecture ou
+une écriture: une {\tt action}; 
+
+\item l'attribut permettant de savoir si cet effet est certain ou
+seulement possible: une {\tt approximation};
+\EIT
+
+\PAR{}
+L'effet de l'exemple suivant sur {\tt T} est {\tt <T(I), WRITE, MUST>}
+car la première instruction est effectuée à coup sûr alors que
+l'effet sur {\tt M} est {\tt <M(I,J), READ, MAY>} à cause du test.
+\begin{verbatim}
+        T(I) = 0.0
+        IF (I .EQ. J) PRINT *, M(I,J)
+\end{verbatim}
+
+\PAR{}
+L'information {\tt approximation} est de plus nécessaire pour calculer
+les chaines {\em use-def} de manière précise car elle permet de
+savoir si une affectation à une variable ``{tue}'' ou non toutes les
+définitions précédentes de cette variable.
+
+\SSE{Chaines {\em use-def}}
+\PAR{}
+Les chaines {\em use-def}, telles que définies dans les ouvrages
+classiques de compilation, permettent de relier toute utilisation d'une
+variable à la liste des définitions qui sont susceptibles de lui
+correspondre. Nous avons étendu de manière naturelle cet algorithme
+classique à notre GCS; ceci implique une nouvelle stratégie de calcul
+de point-fixe pour déterminer la solution des équations {\em
+data-flow} dans le cas de programmes non-structurés. Des travaux sont
+en cours pour démontrer la correction de notre méthode dans le cas
+général (les cas pratiques étant pour leur part presque toujours
+trivialement corrects étant donné la simplicité des graphes de
+contrôle rencontrés).
+
+\PAR{}
+Si les chaines {\em use-def} sont bien adaptées aux méthodes
+d'optimisation rencontrées dans les compilateurs, elles ne sont pas
+suffisantes pour traiter tous les cas de dépendance qu'il est
+nécessaire de prendre en compte pour préserver la sémantique
+séquentielle d'un programme au cours de leur parallélisation (le
+graphe de dépendance est calculé à partir des chaines {\em use-def},
+cf. ci-dessous). Ainsi, outre les définitions de variables, il nous
+faut propager également leur utilisation en vue de pouvoir
+ultérieurement calculer les dépendances de type {\em anti}. Cette
+adaptation a également été implémentée.
+
+\PAR{}
+Le résultat du calcul des chaines {\em use-def} est une première
+version, extrêmement fruste, du graphe de dépendances, basée
+uniquement sur les conflits entre variables, indépendement des indices
+de tableaux éventuels; à noter que les notions d'équivalence sont
+traitées dans cette phase. Ce premier graphe de dépendance est
+ultérieurement affiné en prenant en compte la notion de niveau 
+nécessaire pour l'algorithme d'Allen et Kennedy et en utilisant les
+tests de dépendance de type Banerjee et Fourier-Motzkin.
+
+\SSE{Privatisation}
+\PAR{}
+Une variable est locale (i.e. privée) à un corps de boucle (on pourra
+ultérieurement généraliser cette notion à toutes les instructions,
+en particulier les blocs) si sa valeur en entrée de boucle et sa valeur
+en sortie ne sont pas utilisées; c'est typiquement le cas d'une
+variable temporaire. Les dépendances inter-itérations dues à cette
+variable peuvent être omises durant la phase de parallélisation;
+chaque itération de boucle aura sa propre version de cette variable.
+
+\PAR{}
+Pour effectuer automatiquement ce type de transformation (dont la
+fréquence est très élevée en pratique), les chaines {\em use-def}
+sont nécessaires pour vérifier les conditions de privatisation.  Les
+paralléliseurs qui n'utilisent pas de chaines {\em use-def} ont
+généralement recours à des directives fournies par l'utilisateur
+(certifiant le caractère non-vivant de ces variables en entrée et
+sortie de boucle) pour effectuer cette opération.
+
+\PAR{}
+L'algorithme de privatisation est basé sur un calcul d'élimination.
+Toutes les variables sont supposées locales aux boucles qui les
+englobent. On parcourt alors le graphe de dépendance (en fait, les
+chaines {\em use-def}) de telle manière que
+chaque conflit détermine le sous-ensemble des boucles englobantes
+communes qui préservent le conflict. Une fois, le graphe de dépendance
+parcouru, seules les déclarations sémantiquement correctes de
+variables locales subsistent. Ces déclarations sont stockées dans le
+membre {\tt locals} définissant les boucles (le prettyprinter
+générant des déclarations de type {\tt PRIVATE} quand des variables
+locales sont présentes).
+
+\SSE{Calcul précis du graphe de dépendance}
+\PAR{}
+Le calcul précis du graphe des dépendances est fait en étudiant
+chaque conflit suggéré par les {\em use-def} chaines. Le coeur du calcul des
+dépendances est inchangé par rapport à la version précédente:
+construction puis test de la faisabilité d'un système linéaire en
+nombres entiers.
+
+\PAR{}
+Il est nécessaire de vérifier chaque conflit car les {\em use-def} chaines ne
+tiennent pas compte des indices de tableaux. Cela signifie que certains
+conflits existant au niveau des {\em use-def} chaines vont disparaître après
+le calcul précis des dépendances.
+
+\PAR{}
+Ainsi, la boucle suivante comporte deux conflits sur le tableau {\tt T}
+(producteur-con\-som\-ma\-teur et con\-som\-ma\-teur-producteur) dont un seul
+subsiste (producteur-con\-som\-ma\-teur) après l'analyse plus fine.
+
+\begin{verbatim}
+        DO I = 1, 10
+           T(I) = ...
+           ...  = T(I) ...
+        ENDDO
+\end{verbatim}
+
+\PAR{}
+Il est aussi nécessaire d'étudier chaque conflit pour rechercher quelle
+boucle le crée véritablement. Cette étude a pour but de mettre à
+jour le niveau de chaque dépendance, c'est à dire d'indiquer quelle
+boucle ferait disparaître ce conflit si on l'exécutait
+séquentiellement. Dans l'exemple précédent, le niveau de l'unique
+dépendance sur {\tt T} vaut 2, ce qui signifie que ce conflit ne peut
+pas disparaître en séquentialisant une boucle. La boucle unique est
+néanmoins parallèle et le conflit est résolu au sein de chaque itération.
+
+\PAR{}
+Il est important de remarquer que les dépendances dues aux variables
+locales ne sont pas ignorées. Les conflits demeurent même si les
+variables sont locales. Nous allons voir dans la section suivante
+comment les variables privées sont prises en compte au niveau de la
+parallélisation. 
+
+\SSE{Adaptation de l'algorithme de Allen et Kennedy}
+\PAR{}
+Il nous a fallu adapter l'algorithme de Allen et Kennedy pour pouvoir
+paralléliser les boucles comportant des conflits dues aux variables
+locales. En effet, la version standard ({\em ACM TOPLAS} volume 9,
+numéro 4 de Octobre 1987) de cet algorithme ne sait pas traiter par
+exemple la boucle suivante:
+\begin{verbatim}
+        DO I = 1, 10
+           PRIVATE S
+           S = T(I) ...         (1)
+           U(I) = S ...         (2)
+        ENDDO
+\end{verbatim}
+En effet, si le conflit sur {\tt S} con\-som\-ma\-teur-producteur de 2 vers 1
+est conservé, la boucle reste séquentielle; et si le conflit est
+détruit par la phase de calcul des dépendances la boucle est
+distribuée et on obtient:
+\begin{verbatim}
+        DOALL I = 1, 10
+           PRIVATE S
+           S = T(I) ...         (1)
+        ENNDO
+        DOALL I = 1, 10
+           PRIVATE S
+           U(I) = S ...         (2)
+        ENDDO
+\end{verbatim}
+ce qui n'est pas correct.
+
+\PAR{}
+La solution que nous avons adoptée consiste à conserver tous les
+conflits, de façon à empêcher les mauvaises distributions de boucle,
+et à analyser à posteriori chaque boucle déclarée séquentielle par
+Kennedy et Allen pour vérifier si les cycles sont brisés lorsque les
+conflits dus aux variables privées sont ignorés. Dans ce dernier cas,
+la boucle est déclarée parallèle.
+
+\section{Conclusion}
+
+Le travail sur Pips s'est poursuivi normalement durant les trois derniers
+mois. La phase d'analyse sémantique apporte une première contribution
+visible à Pips avec la propagation de constante intra-procédurale.
+La phase de parallélisation s'est enrichie d'une première transformation,
+la privatisation, qui nous a obligé à modifier l'algorithme de
+parallélisation d'Allen et Kennedy. Le calcul des dépendances a
+par ailleurs été amélioré pour prendre en compte le graphe de contrôle
+et la disponibilité des effets des instructions, qui sont aussi utilisés
+pour calculer les {\em use-def} chaines et, indirectement, pour effectuer
+la privatisation.
+
+\newpage
+\section*{ANNEXE 1}
+\PAR{}
+Cette annexe contient la version actuelle de la représentation
+intermédiaire annotée, dans le formalismede NewGen.
+
+\newpage
+\section*{ANNEXE 2}
+\PAR{}
+Cette annexe contient les même structures de données que l'annexe
+précédente, mais dépouillée de leurs commentaires et triées par
+ordre alphabétique, à l'exception du domaine {\tt entity} qui apparaît
+sous la lettre t comme {\tt tabulated entity}.
+
+\end{document}
+\end

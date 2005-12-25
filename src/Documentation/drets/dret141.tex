@@ -1,0 +1,238 @@
+\documentclass[12pt]{article}
+
+\usepackage[latin1]{inputenc}
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+
+\newcommand{\titre}{PROJET PIPS \\
+		LISTE DES TRANSFORMATIONS 
+}
+
+\newcommand{\auteur}{
+        	François IRIGOIN \\
+        	Pierre JOUVELOT \\
+\vspace{0.5cm}
+{\it Le présent document a été établi en exécution du contrat
+No.~88.017.01 passé par la Direction des Recherches, Etudes et
+Techniques (Délégation Générale pour l'Armement)}
+}
+\newcommand{\docdate}{Décembre 1990}
+\newcommand{\numero}{E141}
+
+\begin{document}
+\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+
+{\it Le présent document a été établi en exécution du contrat
+No.~88.017.01 passé par la Direction des Recherches, Etudes et
+Techniques (Délégation Générale pour l'Armement)}
+
+\vspace{2cm}
+
+\tableofcontents
+
+\newpage
+
+\section*{Introduction}
+
+L'objectif essentiel du contrat PIPS est d'étudier la parallélisation
+interprocédurale et la détection du parallélisme maximal, sans
+prendre en compte son exploitation effective sur une machine cible
+particulière. En conséquence, les transformations qui ne visent pas à
+augmenter le parallélisme en supprimant des dépendances ou qui n'ont
+pas un potentiel intéressant pour des programmes réels comme les
+programmes tests fournis par l'ONERA n'ont pas de place
+dans le projet puisque nous ne disposons pas de critères pour les
+appliquer.
+
+La plupart des transformations prévues lors de la rédaction du contrat,
+qu'elles entrent dans le cadre des transformations sur les scalaires ou
+des transformations sur les boucles sont dans ce cas. L'intérêt, ou
+l'absence d'intérêt, de chaque transformation est rapidement présenté.
+
+\section{Transformations sur les scalaires}
+
+Trois transformations sur les scalaires ont été étudiées: la
+substitution en avant, l'expansion de scalaire et la transformation des
+variables inductives.
+
+\subsection{Substitution en avant}
+
+La substitution en avant permet de remplacer une référence à une
+valeur par une expression dont l'évaluation produit la même valeur.
+Les conditions nécessaires à la connaissance d'une telle expression
+par un outil automatique en limitent l'utilisation à des cas où la
+privatisation produit le même effet positif sans avoir les effets
+secondaires nocifs de la substitution en avant, l'évaluation multiple
+de la même expression.
+
+\subsection{Expansion en tableau}
+
+De la même manière, il a semblé préférable de remplacer l'ancienne
+transformation qu'est l'expansion de scalaire en un tableau
+monodimensionnel par une transformation plus récente, la privatisation.
+
+La privatisation permet d'une part d'étendre le champ d'application de
+l'expansion à des boucles imbriquées et à des boucles dont les bornes
+sont symboliques et d'autre part d'éviter la consommation d'espace
+mémoire propre à l'expansion puisqu'il n'est pas nécessaire d'allouer
+plus de copies de la variable privatisée qu'on n'a de processeurs physiques.
+
+\subsection{Transformation des variables inductives}
+
+Les variables inductives qui peuvent être transformées sont uniquement
+les variables scalaires entières. Leur détection est donc du ressort
+de la phase d'analyse sémantique. Il s'est avéré que l'idée originale
+proposée par Rémi Triolet pour éviter cette transformation de
+programme en utilisant les prédicats ne s'est avérée qu'à moitié
+vraie.
+
+Les tests de dépendance qui portent sur des références dont les
+expressions d'indice contiennent des variables inductives et qui peuvent
+effectivement profiter des prédicats donnant la relation existant entre
+la ou les variable(s) inductive(s), ne nécessitent effectivement pas le
+remplacement de ces variables inductives par des expressions linéaires
+des indices de boucles. Mais les dépendances portant sur les variables
+inductives elles-mêmes subsistent.
+
+\subsection{Privatisation}
+
+La privatisation est la transformation de programme que nous avons
+ajouté à la liste initiale des transformations scalaires à
+implémenter. Elle nous a permis tout à la fois de diminuer le volume
+de codage à effectuer et d'augmenter le parallélisme.
+
+\section{Transformation des boucles}
+
+Six transformations de boucles ont été étudiées comme prévu: la
+conversion des IFs, l'échange de boucle, la distribution de boucle, le
+déroulage de boucle et le blocage de boucle. Un septième type de
+transformation a été ajouté sous le nom de {\em transformation
+unimodulaire}. La méthode hyperplane et l'échange de boucles en sont
+des cas particuliers.
+
+\subsection{Traitement des IFs}
+
+Les tests posent, ou plutôt ont posé, un problème pour les machines
+purement vectorielles. En effet, elles ne doivent pas exécuter exactement
+le même code sur tous les éléments d'un vecteur et la notion de
+branchement vectoriel n'a pas de sens. 
+
+L'utilisation d'instructions vectorielles conditionnelles implique une
+étude du graphe de contrôle et la conversion des dépendances de
+contrôle en des dépendances de données ({\em If conversion} d'Allen
+\& Kennedy).  Ces dépendances de données se traduisent ensuite par des
+instructions de type {\em WHERE}, comme il en existe en Fortran 90.
+
+Cependant, cette transformation n'augmente en rien le parallélisme
+intrinsèque d'un programme et n'a à avoir lieu qu'au regard d'une
+machine cible particulière, non définie pour le projet PIPS. La
+détection de parallélisme MIMD n'étant pas perturbée par les tests,
+leur présence dans un corps de boucle interne conduit simplement à la
+détection d'une boucle DOALL, MIMD.
+
+\subsection{Echange de boucles}
+
+L'échange de boucle n'apporte pas non plus de parallélisme. Il permet
+simplement d'exploiter plus ou moins bien celui qui existe en mettant
+une boucle parallèle en position interne pour disposer d'une boucle
+vectorielle ou bien en position externe pour disposer de tâches aussi
+grosses que possible pour les exécuter sur des processeurs différents.
+
+L'échange de boucle traditionnel ne concerne que deux boucles adjacentes.
+Il a été généralisé par François Irigoin à des boucles quelconques
+et à des directions quelconques sous le nom de {transformation unimodulaire}.
+C'est cette dernière transformation qui a été implémentée à la place
+de l'échange de boucle.
+
+\subsection{Distribution de boucle}
+
+La distribution de boucle est très importante pour la détection du
+parallélisme maximal, c'est pourquoi elle est souvent intégrée dans le
+processus de détection du parallélisme lui-même. C'est le cas avec
+avec l'algorithme d'Allen \& Kennedy qui a été utilisé dans PIPS.
+
+Une version particulière de cet algorithme a été developpée pour
+pouvoir effectuer uniquement la distribution de boucles, afin de pouvoir
+ultérieurement en bénéficier pour d'autres algorithmes de
+parallélisation ne l'incluant pas, comme la parallélisation globale de
+nids de boucle proposée par François Irigoin.
+
+\subsection{Fusion de boucles}
+
+La fusion de boucles, la transformation inverse de la distribution de
+boucle, n'apporte qu'une éventuelle dégradation du parallélisme d'un
+programme ce qui n'est pas étonnant vu les caractéristiques favorables
+de la distribution. Ses objectifs sont la diminution de l'overhead de
+contrôle de boucle et l'amélioration de la localité temporelle des
+références. Son utilité s'est avérée nulle dans le cadre du projet
+PIPS, où il vaudrait mieux pouvoir disposer d'un algorithme ne faisant
+pas de distribution inutile ou même, pas de distribution du tout.
+
+\subsection{Déroulage de boucle}
+
+Le déroulage de boucle ne modifie en rien l'exécution d'un programme.
+Il n'introduit donc aucun parallélisme.
+Son intérêt réside en une diminution de l'overhead de contrôle de
+boucle et dans une meilleure utilisation des registres, si la phase
+d'allocation de registres du compilateur est bonne.
+
+Cette transformation a de plus l'inconvénient d'alourdir le code et de
+le rendre illisible. Elle ne peut donc pas être appliquée
+automatiquement, surtout dans un paralléliseur source à source comme PIPS.
+
+Enfin, elle est maintenant dépassée par la technique du {\em software
+pipelining}. Elle n'a donc pas été implémentée.
+
+\subsection{Blocage de boucle}
+
+Le blocage de boucle est une technique similaire à la précédente,
+introduite initialement pour prendre en compte les registres vectoriels.
+Elle peut aussi servir pour améliorer l'utilisation des caches quand
+elle est utilisée en combinaison avec l'échange de boucles, mais elle
+produit alors des résultats moins généraux que les techniques de
+partitionnement développées par François Irigoin, l'{\em hyperplane
+partitioning} et le {\em supernode partitioning} ainsi que leur généralisation.
+
+Son intérêt est nul en l'absence d'une machine cible. Les problèmes
+de localité ne sont pas mentionnés parmi les objectifs de PIPS. Cette
+méthode ne fait donc pas partie non plus des transformations proposées.
+
+\subsection{Transformations unimodulaires}
+
+Les transformations unimodulaires sont supportées au niveau bibliothèque
+mais non intégrées dans PIPS. Faute de machine cible, il est en effet
+impossible d'en choisir une particulière à l'aide d'une fonction de coût.
+
+Pour en montrer l'existence, deux programmes principaux ont été développés.
+L'un permettait d'appliquer la méthode hyperplane mais il était très
+difficile à l'utilisateur de choisir une direction d'itération
+intéressante. Cela n'a pas permis d'améliorer les résultats obtenus
+sur les programmes tests de l'ONERA.
+
+Le second programme permet d'échanger des boucles quelconques en en
+donnant les étiquettes, ce qui est plus facile. Mais cela ne crée
+aucun parallélisme et il a donc semblé préférable de ne pas
+l'intégrer dans le paralléliseur PIPS.
+
+\section{Conclusion}
+
+La vitesse à laquelle les techniques de compilation ont évolué au
+cours des quatre années qui ont séparé la rédaction initiale de
+l'annexe technique du contrat PIPS et sa terminaison a partiellement
+rendu caduc la liste de transformations prévues.
+
+Il s'est avéré au cours de l'étude que certaines d'entre elles
+étaient sans objet vis-à-vis des objectifs poursuivis en matière de
+parallélisme interprocédural. D'autres sont devenues obsolètes sans
+que le volume de travail nécessaire à l'implémentation de tous leurs
+remplaçants ait bien sûr été prévu. Il a été néanmoins possible
+d'implémenter certaines de ces nouvelles techniques, parmi lesquelles
+la principale est la privatisation de variables scalaires.
+Une généralisation de l'échange de boucles a aussi été réalisée.
+
+Ainsi, toutes les transformations qui permettent
+d'augmenter le parallélisme qui peut être mis en évidence dans les
+programmes tests de l'ONERA ont été implémentées avec succès, qu'il
+s'agisse des transformations initialement prévues ou de celles qui les
+remplacent maintenant.
+
+\end{document}

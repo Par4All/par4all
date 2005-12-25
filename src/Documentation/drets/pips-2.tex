@@ -1,0 +1,680 @@
+\documentclass[12pt]{article}
+
+\usepackage[latin1]{inputenc}
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+
+\newcommand{\titre}{
+   PROPOSITION DE CONVENTION DRET-AR\-MI\-NES \\
+   RÉALISATION D'UN PARALLÉLISEUR POUR CRAY-YMP/8
+   }
+
+\newcommand{\auteur}{François IRIGOIN, Michel LENCI}
+
+\newcommand{\docdate}{11 avril 1991}
+
+\newcommand{\numero}{E153}
+
+\setlength{\parindent}{0cm}
+
+\begin{document}
+\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+
+\section*{Introduction}
+
+Cette proposition concernant la parallélisation automatique, nous
+présentons d'abord l'état de l'art dans ce domaine, puis les
+résultats obtenus lors du projet PIPS qui a été financé avec l'aide
+de la DRET de 1988 à 1990, et enfin les objectifs visés, les
+motivations et détails financiers.
+
+\section{La parallélisation automatique. Etat de l'art}
+
+Les contraintes matérielles ont poussé tous les constructeurs de
+superordinateurs à construire des machines comportant de plus en plus
+de processeurs. Par exemple, le Cray~1 n'existait qu'en une version
+monoprocesseur. Son successeur, le Cray~X-MP pouvait avoir de un à
+quatre processeurs. Et enfin, le modèle actuel peut avoir jusqu'à huit
+processeurs (tout comme le Cray-2). Il est prévu que les modèles
+suivants aient jusqu'à 16 processeurs alors que le Cray~3 pourrait en
+avoir 64.
+
+Les constructeurs concurrents, ainsi que les constructeurs de Crayettes,
+ont suivi la même voie. Par exemple, Alliant est passé d'une machine
+à 8 processeurs à une machine à 28 processeurs.
+
+Cette évolution matérielle a été doublée d'une évolution
+logicielle. S'il était possible de prétendre utiliser un petit nombre
+de processeurs en utilisant uniquement la multiprogrammation, ceci n'est
+plus possible quand le nombre de ces derniers dépasse quatre et quand les
+utilisateurs comparent les performances qu'ils obtiennent avec les
+capacités crêtes de la machine.
+
+Après une première période où des primitives spéciales ont été
+mises à la disposition des utilisateurs désireux de profiter du
+parallélisme des multiprocesseurs, il a fallu envisager la détection
+automatique du parallélisme et son insertion dans les logiciels de
+compilation.
+
+Ce domaine n'a pas encore la maturité de la vectorisation automatique,
+mais les premiers produits ont maintenant fait leur apparition tandis
+que les travaux se poursuivent dans les laboratoires.
+
+\subsection{Le paralléliseur d'Alliant}
+
+Le paralléliseur d'Alliant est un produit d'origine Pacific Sierra. Il
+est apparu le premier sur le marché parce que l'architecture des
+machines d'Alliant nécessite un paralléliseur. Profitant de la
+synchronisation et du scheduler câblé, le compilateur générait
+initialement du parallélisme de grain fin à partir de boucles internes
+qui auraient pu servir à générer du code vectoriel. Les instructions
+vectorielles nécessaires à chaque processeur étaient obtenues en
+effectuant un {\em strip-mining} de ces boucles internes. Des deux
+nouvelles boucles parallèles obtenues, la boucle externe est exploitée
+en parallèle par les processeurs tandis que la boucle interne est
+traduite en instruction vectorielle.
+
+\subsection{Le paralléliseur de Cray}
+
+Le compilateur Fortran de Cray est un vectoriseur. La détection
+automatique du parallélisme est faite par un préprocesseur, FPP,
+développé par Pacific Sierra. Ce préprocesseur effectue une analyse
+fine du parallélisme intraprocédural (prise en compte des bornes de
+boucles, détection de réductions sur les tableaux) mais la présence
+d'appels de procédures provoque l'arrêt des analyses.
+
+\subsection{Le paralléliseur de Convex}
+
+CONVEX a récemment annoncé le premier paralléliseur interprocédural
+du marché. Nous n'avons pu obtenir aucune information précise sur
+les fonctionnalités proposées.
+
+\subsection{Le projet PTRAN}
+
+Le projet PTRAN (Parallel Translation) a été mené dans le laboratoire
+de recherche d'IBM situé à Hawthorne (Yorktown Heights). Les machines
+cibles sont les 3090 multiprocesseurs (devenus série 9000) et le prototype
+RP3. Les points forts du projet sont:
+\begin{itemize}
+  \item la recherche du parallélisme entre instructions ou blocs
+d'instructions aussi bien qu'entre itérations de boucles;
+  \item la prise en compte de graphes de contrôle compliqués grâce au
+{\em Program Dependence Graph};
+  \item la production de Parallel Fortran, un produit IBM, et sans doute
+à terme de PCF Fortran;
+  \item une efficacité et une robustesse suffisantes pour traiter
+les programmes du PerfectClub.
+\end{itemize}
+L'interprocéduralité ne fait pas partie des points forts du projet.
+
+\subsection{Le projet CEDAR}
+
+Le CSRD est si important que de nombreux projets ont vu le jour
+dans le cadre du projet CEDAR. Rappelons que l'architecture CEDAR est un
+multi-multiprocesseur vectoriel avec une mémoire hiérarchisée à
+plusieurs niveaux. Le niveau de complexité est tel que le CSRD a
+préféré commencer par définir un langage, CEDAR FORTRAN, permettant
+au programmeur de placer lui-même ses variables au niveau mémoire qu'il
+souhaitait ainsi que de choisir pour chaque boucle parallèle le niveau
+du parallélisme (vectoriel, intra-cluster, inter-cluster).
+
+Trois projets de compilateur ont été mené en parallèle. Le premier
+visait à passer automatiquement de Fortran à CEDAR Fortran. Nous
+n'avons pas d'information sur les résultats obtenus, mais
+l'interprocéduralité ne fait pas partie des problèmes. Le second
+projet est Parafrase-2. Il s'agissait de reconstruire Parafrase, le
+paralléliseur qui avait été développé dans les années 70 et
+progressivement enrichi par des travaux d'étudiants. Parafrase n'était
+plus maintenable. Il fallait donc le reprendre à la base. A l'heure
+actuelle, aucun résultat nouveau n'a été publié à propos de
+Parafrase-2. Le troisième projet, PARCEL, est plus novateur. Il s'agit de
+fournir un unique paralléliseur permettant de traiter aussi bien LISP, que
+C et Fortran. Ici encore, les problèmes interprocéduraux ne sont pas
+dominants.
+
+\subsection{Le projet Parascope}
+
+Le projet Parascope regroupe un grand nombre de sous-projets dérivés
+de l'Université Rice à Houston. Tous les aspects de la
+parallélisation, des interfaces d'environnement de programmation aux
+tests de dépendance, et toutes les architectures de machines, à
+mémoire globale ou répartie, sont concernés.
+
+De nombreux travaux ont été menés à propos de l'analyse
+interprocédurale (propagation de constante, aliasing, analyse
+incrémentale) et de la parallélisation interprocédurale (plusieurs
+variantes de la méthode des régions proposée par Rémi Triolet). Ces
+travaux n'ont pas tous été implémentés et des expériences ont
+encore cours pour en mesurer l'intérêt et pour définir de nouvelles
+directions de recherche. L'implémentation actuelle de l'analyse
+sémantique interprocédurale de PIPS est plus développée.
+
+\subsection{Le projet SUIF}
+
+Le projet SUIF est une tentative de normalisation de la représentation
+intermédiaire utilisée par différents projets pour fournir des outils
+de programmation. Tous ces projets ont pour machine cible un
+multiprocesseur Silicon Graphics et des multi-multiprocesseurs qui
+pourraient en être dérivés. Les travaux concernent aussi bien les
+aspects matériels que les aspects logiciels. Côté compilation, la
+génération de code est plus prioritaire que l'analyse des programmes
+ou leur parallélisation.
+
+\subsection{Travaux effectués en France}
+
+~\newline
+Plusieurs équipes en France poursuivent des travaux dans le domaine des
+compilateurs pour machines à mémoire globale. A l'INRIA, l'équipe de
+Martin Jourdan participe au projet ESPRIT COMPAR qui vise à produire
+des générateurs de compilateurs pour machines parallèles. Il ne
+s'agit pas seulement de générer l'analyse syntaxique, ce qu'on sait
+faire depuis longtemps, mais aussi le générateur de code et le
+paralléliseur. Le générateur COMPAR prendrait donc en entrée une
+description du langage et une description de la machine cible et
+générerait un compilateur-paralléliseur-optimiseur. Ce projet semble
+un peu futuriste puisque des langages fonctionnels doivent être traités
+aussi bien que des langages impératifs. De plus l'accent est mis
+plutôt sur la paramétrisation de l'outil que sur des améliorations en
+parallélisation: le paralléliseur sera basé sur VATIL.
+
+A l'IRISA, l'équipe de William Jalby concentre ses efforts sur les
+problèmes de génération de code pour machines superscalaires. La
+parallélisation proprement dite est effectuée à l'aide d'un prototype
+de recherche américain, SIGMACS qui est développé à l'Université
+d'Indiana par Dennis Gannon. Ce prototype n'a pas été présenté
+auparavant parce qu'il n'a pas donné lieu à de nombreuses
+publications. La génération de code pour machines superscalaires peut
+se faire à partir d'un paralléliseur/vectoriseur simple ne traitant
+que les boucles internes. Les aspects interprocéduraux ne sont pas
+primordiaux. 
+
+A l'université Paris 6, l'équipe du Pr. Feautrier étudie de nombreux
+problèmes de compilation pour machines parallèles à mémoire
+distribuée ou non. Ces travaux sont extrêmement expérimentaux et ne
+peuvent pas être appliqués à des programmes d'une taille
+significative. L'interprocéduralité n'est pas une thème prioritaire.
+
+\subsection{Place de l'interprocéduralité}
+
+En conclusion, seule l'équipe de Rice aborde les problémes d'analyse
+et de parallélisation interprocédurale qui sont les deux points forts
+du projet PIPS que nous présentons maintenant.
+
+\section{Le Projet PIPS}
+
+\subsection{Présentation}
+
+L'équipe {\em Parallélisation} du Centre de Recherche en Informatique
+de l'Ecole des Mines de Paris a développé en 2 ans un prototype de
+Paralléliseur Interprocédural de Programmes Scientifiques (projet
+PIPS). Ce développement a été partiellement financé par la DRET dans
+le cadre de la convention DRET- AR\-MI\-NES No 87017 (bon de commande No
+8801701).
+
+
+L'objectif du projet PIPS est l'adaptation automatique de programmes
+scientifiques aux calculateurs parallèles. Il s'agit de transformer ces
+programmes de façon à ce que l'exécution sur des super-calculateurs
+de la version parallèle soit plus rapide que celle de la version
+originale.
+
+\subsection{Architecture}
+
+L'approche choisie dans le projet PIPS est différente de celle des
+paralléliseurs existants. PIPS se compose d'une collection de phases
+d'analyse et de phases de transformation de programmes organisées
+autour d'une {\em base de programmes}. La vie d'un programme Fortran
+dans cette base commence avec la phase d'initialisation qui en effectue
+l'analyse syntaxique et insère dans la base les représentations
+internes des ses différents modules.
+
+
+Le programme évolue ensuite en fonction des phases qui lui sont
+appliquées. Les phases d'analyse décorent la représentation interne
+avec des informations sur le comportement du programme; les objets
+décorés peuvent être des modules, des instructions ou des boucles.
+Les phases de transformation utilisent ces décorations pour détecter
+les portions de programme dépendantes les unes des autres et tenter de
+casser ces dépendances pour aboutir à des représentations internes
+contenant du parallélisme. Les informations calculées par les phases
+d'analyse sont partiellement perdues après une phase de transformation,
+ce qui explique que phases d'analyse et phases de transformation soient
+appliquées alternativement jusqu'à aboutir à une version parallèle
+satisfaisante.
+
+
+A tout moment, la phase de pretty-print peut être appliquée pour
+produire une représen\-ta\-tion textuelle, en Fortran-8X, de cette version
+parallèle (cf. figure \ref{interp}).
+
+\subsection{Phases d'analyse}
+
+La concision de la représentation interne des modules et la grande
+richesse des outils de manipulation de cette représentation ont permis
+à l'équipe de développer un grand nombre de phases d'analyse et de
+phases de transformation.
+
+
+La liste des décorations calculables par PIPS est assez longue: graphe
+de contrôle structuré d'un module, graphe des appels de procédure du
+programme, effets des instructions d'un module sur les variables du
+programme, effets des appels de procédure sur les variables du
+programme, pré-conditions des instructions d'un module, pré-conditions
+des modules du programme, graphe de dépendances entre instructions d'un
+module.
+
+
+La liste des transformations exécutables par PIPS est elle aussi assez
+longue: privatisation des variables scalaires, détection des
+réductions généralisées, détection et substitution en avant des
+variables inductives, blocage de boucle, déroulage de boucle,
+parallélisation de boucle, distribution de boucle, vectorisation de
+boucle, échange de boucles.
+
+\subsection{Interface utilisateur}
+
+Les phases sont appliquées à un programme sur la demande de
+l'utilisateur en fonction des transformations qu'il souhaite effectuer
+sur son programme. Ceci est fait à travers une interface
+multi-fenêtres développée sous X-Windows qui permet de visualiser le
+programme en temps réel au fur et à mesure que les transformations lui
+sont appliquées (cf. figure \ref{interf}).
+
+\begin{figure}
+\rule{\textwidth}{.2mm}
+\vspace*{20cm}
+\caption{Interface Utilisateur de PIPS}
+\label{interf}
+\rule{\textwidth}{.2mm}
+\end{figure}
+
+ 
+Comme les différentes phases ne sont pas indépendantes les unes des
+autres (nous avons vu que les transformations ont besoin des résultats
+des analyses) et qu'il n'est pas possible d'imposer à l'utilisateur la
+connaissance de ces relations de dépendances entre phases, l'interface
+utilisateur calcule l'ordre d'application des phases en fonction du
+travail demandé.
+
+\subsection{Avantages}
+
+PIPS incorpore plusieurs fonctionnalités originales développées par
+les chercheurs du CRI: calcul du graphe de contrôle structuré,
+détection des réductions généralisées, analyse dataflow par
+régions, calcul de pré-conditions, etc.
+
+
+La plus importante de ces fonctionnalités est que PIPS est totalement
+{\em interprocédural}, ce qui signifie que tous les calculs et
+transformations de programme que nous avons présentés peuvent être
+effectués sur un programme composé de plusieurs modules sans perte
+excessive d'efficacité et de qualité des résultats. PIPS est
+notamment capable de paralléliser des boucles comportant des appels de
+procedure (cf. figure \ref{interp})
+
+\begin{figure}
+\sloppy
+\rule{\textwidth}{.2mm}
+\begin{verbatim}
+C     
+C     PRODUIT DE MATRICES - VERSION AVEC APPEL A SAXPY
+C     
+C     ANALYSE DATA FLOW INTERPROCEDURALE
+C     RESUME DES EFFETS D'UNE PROCEDURE
+C     PARALLELISATION DE BOUCLES COMPORTANT DES APPELS DE PROCEDURE
+C     
+      SUBROUTINE MM03(N, A, B, C)
+C     
+      REAL*8 A(N,N), B(N,N), C(N,N), XAUX(0:127)
+C     
+      DOALL I = 1,N,1
+         PRIVATE J
+         DOALL J = 1,N,1
+            C(I,J) = 0.0                                              19
+         ENDDO
+      ENDDO
+C     
+      DOALL J = 1,N,1
+         PRIVATE K
+         DO K = 1,N,1
+            CALL SAXPY(N, C(1,J), A(1,K), B(K,J))                     24
+         ENDDO
+      ENDDO
+      RETURN
+      END
+\end{verbatim}
+\caption{Parallélisation Interprocédurale}
+\label{interp}
+\rule{\textwidth}{.2mm}
+\end{figure}
+
+\section{Le projet PIPS-CRAY}
+
+\subsection{Objectif}
+
+PIPS n'a pas été conçu pour une machine cible particulière mais pour
+toute la classe des multi-processeurs vectoriels à mémoire partagée.
+Ceci est dû, d'une part, au fait que l'architecture des cibles
+potentielles\footnote{Projet MARIE de CIMSA-SINTRA et projet ISIS de
+BULL.} n'était pas tout à fait connue au démarrage du projet PIPS,
+et, d'autre part, au fait qu'il semblait plus intéressant de développer
+un paralléliseur générique dont on pourrait dériver un
+paralléliseur spécialisé pour chaque architecture.
+
+
+Le projet PIPS-CRAY consiste donc à spécialiser la version actuelle de
+PIPS pour le CRAY-YMP/8. 
+
+\subsection{Motivations}
+
+Les motivations sont multiples. D'une part, la version actuelle de PIPS
+est d'un intérêt limité si le projet devait être abandonné.  En
+effet, les programmes produits par PIPS ne sont pas adaptés à une
+architecture particulière, ce qui implique qu'ils ont peu de chance de
+s'exécuter efficacement quelle que soit la machine cible. Il était
+d'ailleurs clairement entendu que la convention de 2 ans devait être
+impérativement prolongée d'au moins 1 an pour obtenir des résultats
+d'exécution intéressants.
+
+
+D'autre part, les scientifiques français utilisent des
+super-calculateurs bien que les projets français n'aient pas donné
+tous les résultats escomptés. Les super-calculateurs favoris semblent
+être ceux construits par CRAY, ce qui n'est pas étonnant étant donné
+leurs très grandes performances et leur nombre: le CRAY-YMP/8 est à
+l'heure actuelle le plus puissant de tous les super-calculteurs à usage
+général.
+
+
+Par exemple, les scientifiques du CEA à qui PIPS a été présenté ont
+favorablement accueilli cet outil et ont su détecter l'intérêt qu'ils
+auraient à disposer d'une version spécialisée pour le CRAY-YMP/8
+attendu prochainement au CEA. Ils ont particulièrement apprécié ses
+capacités interprocédurales et son interface utilisateur.
+
+
+Enfin, le CRAY-YMP/8 offre un environnement idéal pour une version
+spécialisée de PIPS. En effet, son système UNICOS est compatible avec
+UNIX et propose X-Windows. Il offre en outre un compilateur Fortran
+sachant compiler les boucles vectorielles et les boucles parallèles à
+la condition que l'utilisateur ou l'outil CRAY FPP\footnote{Fortran
+Parallel Preprocessor} les lui indique en insérant des directives de
+compilation; il suffit donc à PIPS de jouer le même rôle que FPP, en
+offrant en plus l'interprocéduralité et l'interactivité.
+
+
+La disponibilité du système X-Windows permettra au coeur de PIPS
+d'être exécuté sur le CRAY-YMP/8 tout en ayant l'interface graphique
+utilisateur sur une station de travail connectée à distance via un
+réseau. Les grandes performances du CRAY sont donc un atout
+supplémentaire puisqu'elles permettent d'utiliser au sein de PIPS les
+algorithmes les plus complexes, notamment pour le calcul du graphe de
+dépendances à partir des prédicats et des régions.
+
+\subsection{Travaux}
+
+Les travaux à effectuer pour réaliser une version spécialisée de
+Pips pour CRAY-YMP/8 sont les suivants.
+
+\subsubsection{Etude de FPP}
+
+FPP a été dérivé de VAST par la société Pacific Sierra
+en coopération avec les ingénieurs de CRAY. FPP n'est pas
+interprocédural, il ne calcule pas de prédicats et n'est pas
+interactif; de plus le test de dépendance utilisé est sans aucun doute
+moins évolué que celui de PIPS.
+
+
+Il nous sera néammoins très utile d'étudier les transformations qu'il
+effectue pour s'en inspirer car elles ont très certainement été
+décidées en partie par les concepteurs de la machine. Cela évitera
+l'étude des mécanismes d'allocation de registres de CFT.
+
+\subsubsection{Portage de PIPS}
+
+La première tâche à réaliser sera de porter PIPS sous UNICOS, le
+système d'exploitation des ordinateurs CRAY. Seul le coeur de PIPS
+devra être porté, l'interface graphique continuant à s'exécuter sur
+une station de travail pour profiter de l'écran bit-mapped et des
+possibilités graphiques qui en découlent.
+
+\subsubsection{Spécialisation de PIPS}
+
+Chaque phase de transformation de programme devra être adaptée au
+CRAY-YMP/8. Certaines adaptations sont faciles car elles se ramènent à
+la fixation de la valeur de constantes: taux de déroulage des boucles,
+facteur de blocage des boucles, etc. 
+
+
+D'autres sont beaucoup plus complexes.  Ainsi, l'algorithme de Kennedy
+pour distribuer, vectoriser et paralléliser les boucles devra être
+modifié pour ne générer à chaque fois qu'une boucle parallèle
+externe et une boucle vectorielle interne. Il faut noter que cet
+algorithme a déjà été modifié dans PIPS pour prendre en compte les
+variables privées. 
+
+
+Enfin, d'autres transformations devront être implémentées, comme par
+exemple le tronçon\-na\-ge de boucles qui permet de saturer tous les
+processeurs lorsque seule une boucle vectorielle a pu être détectée.
+
+\subsubsection{Production de Fortran CRAY}
+
+Un nouveau pretty-printer devra être réalisé pour produire du Fortran
+CRAY, c'est-à-dire du Fortran-77 décoré avec les directives de
+compilation de CFT-77. 
+
+\subsubsection{Tests sur CRAY-YMP/8}
+
+Il sera nécessaire d'exécuter les programmes produits par PIPS-CRAY
+sur un calculateur CRAY-YMP/8 pour valider ou invalider les choix faits
+au niveau de la spécialisation des transformations. L'Ecole des Mines
+n'ayant pas à ce jour d'accès à une telle machine, ces exécutions
+devront être effectuées en coopération avec un partenaire. Le CEA
+montre un vif intérêt aux travaux du CRI, et pourra nous
+accueillir pour ces tests.
+
+
+L'aboutissement du projet sera de faire les mêmes tests, mais en vraie
+grandeur sur les benchmarks de l'ONERA et sur ceux du CEA.
+
+\subsubsection{Autres actions}
+
+
+Dans le cadre de cette convention, le logiciel PIPS sera installé au CEA
+et à l'ONERA, de façon à faire bénéficier ces organismes de
+l'utilisation du paralléliseur. Réciproquement, le CRI bénéficiera
+du retour des expériences réalisées avec PIPS par ces deux organismes
+afin d'améliorer ses fonctionnalités.
+
+
+L'installation incluera les journées de formation nécessaire.
+
+\subsubsection{Calendrier des travaux}
+
+Le projet PIPS-CRAY nécessite la participation de 2 personnes: un
+chercheur confirmé pendant 10 mois, et un élève chercheur pendant 10
+mois. Voici la répartition des mois-hommes selon les travaux:
+
+\begin{center}
+\begin{tabular}{|l|c|}
+\hline
+\multicolumn{1}{|c|}{\bf Travaux}	& {\bf Durée} \\
+					& {\bf (en mois/homme)} \\ \hline
+Etude de FPP				& 4  \\
+Portage de PIPS sous UNICOS		& 1 \\
+Spécialisation de PIPS			& 9 \\
+Production de Fortran CRAY		& 2  \\
+Tests sur CRAY-YMP/8			& 4 \\ \hline
+Total					& 20 \\ \hline
+\end{tabular}
+\end{center}
+
+\subsection{Financement}
+
+\subsubsection{Justification du financement consenti par la DRET}
+
+\paragraph{Durée d'exécution}
+
+La durée d'exécution du projet est fixée à 12 mois à compter de la
+date de notification du contrat.
+
+\paragraph{Allocation forfaitaire}
+
+Le montant de l'allocation forfaitaire est fixée à 40.000 F. soit 8\%
+du montant total hors taxes. Cette allocation sera versée en totalité
+à AR\-MI\-NES pour frais généraux et frais d'administration de la
+convention.
+
+\paragraph{Dépenses de personnel}
+
+AR\-MI\-NES affecte à ce projet un chercheur confirmé à temps plein
+dont le salaire, les charges et les frais de laboratoire seront pris en
+charge par la DRET.
+
+
+La DRET affecte à ce projet un scientifique du contingent qui
+effectuera les travaux réservés à l'élève chercheur. Les frais de
+laboratoire et les frais de mission relatifs à ce scientifique seront
+intégralement pris en charge par AR\-MI\-NES. 
+
+
+Le montant de la participation DRET aux dépenses de personnel est
+donné dans le tableau ci-dessous.
+
+\begin{center}
+\begin{tabular}{|l|r|}
+\hline
+\multicolumn{1}{|c|}{\bf Frais}	& {\bf Participation DRET} \\
+				& \multicolumn{1}{|c|}{(en francs)} \\ \hline
+Chercheur confirmé (10 mois)		& \\
+~~~Salaire + charges		& 375.000 \\
+~~~Frais de Laboratoire		& 125.000  \\
+ 				& \\
+Total HT			& 500.000 \\ \hline
+\end{tabular}
+\end{center}
+
+\paragraph{Dépenses de sous-traitance}
+
+AR\-MI\-NES n'ayant pas accès à un CRAY-YMP/8, les tests devront être
+effectués sur une machine du CEA, qui, manifestant ainsi son intérêt
+pour le projet, met à la disposition d'ARMINES les heures de calcul
+nécessaires. 
+
+\paragraph{Frais de déplacement}
+
+Les frais de déplacement relatifs à ce projet sont intégralement pris
+en charge par AR\-MI\-NES.
+
+\paragraph{Frais de matériel}
+
+Les frais de matériel relatifs à ce projet sont intégralement pris
+en charge par AR\-MI\-NES.
+
+\paragraph{Autres dépenses}
+
+Nous ne prévoyons aucune dépense dans cette rubrique.
+
+\paragraph{Récapitulation}
+
+Les montants totaux des dépenses par rubrique sont reportés dans le
+tableau suivant:
+ 
+\begin{center}
+\begin{tabular}{|l|r|}
+\hline
+\multicolumn{1}{|c|}{\bf Frais}	& {\bf Participation DRET} \\
+				& \multicolumn{1}{|c|}{(en francs)} \\ \hline
+Allocation Forfaitaire		&  40.000 \\
+Dépenses de personnel		& 500.000 \\
+Dépenses de sous-traitance	& à préciser \\
+ 				& \\
+Total HT			& 540.000 \\
+TVA (18.6\%)			& 100.440 \\ \hline
+Total TTC			& 640.440 \\ \hline
+\end{tabular}
+\end{center}
+ 
+\begin{center}
+\begin{tabular}{|l|r|}
+\hline
+\multicolumn{1}{|c|}{\bf Frais}	& {\bf Participation du CEA} \\
+				& \multicolumn{1}{|c|}{(en francs)} \\ \hline
+Allocation Forfaitaire		&  \\
+Dépenses de personnel		& \\
+Dépenses de sous-traitance	& 400.000 \\
+ 				& \\
+Total HT			& 400.000 \\
+TVA (18.6\%)			& N.A. \\ \hline
+Total TTC			& 400.000 \\ \hline
+\end{tabular}
+\end{center}
+
+\subsubsection{Justification du financement consenti par AR\-MI\-NES}
+
+\paragraph{Dépenses de personnel}
+
+AR\-MI\-NES prend à sa charge les frais d'accueil du scientifique du
+contingent mis à sa disposition par la DRET. Nous évaluons à 75.000
+F. les frais d'accueil d'un élève-chercheur pendant 10 mois.
+
+\paragraph{Frais de déplacement}
+
+Les frais de déplacement relatifs au projet sont intégralement pris
+en charge par AR\-MI\-NES. Ils s'agit de déplacement en région parisienne
+pour aller effectuer des tests sur l'ordinateur du CEA. 
+
+
+Nous comptons effectuer environ 30 déplacements (2 par semaine pendant
+4 mois), soit une dépense de 9000 F. environ.
+
+\paragraph{Frais de matériel}
+
+Les frais de matériel relatifs à ce projet sont intégralement pris
+en charge par AR\-MI\-NES. Il s'agit des frais de maintenance de deux
+des quatre stations de travail achetées par la DRET et mises à
+disposition d'AR\-MI\-NES pour le contrat PIPS (bon de commande No~8801701).
+Cette dépense s'élève à 50.000 F. pour la durée totale du contrat.
+
+\paragraph{Récapitulation}
+
+Les montants totaux des dépenses par rubrique sont reportés dans le
+tableau suivant:
+ 
+\begin{center}
+\begin{tabular}{|l|r|}
+\hline
+\multicolumn{1}{|c|}{\bf Frais}	& {\bf Participation AR\-MI\-NES} \\
+				& \multicolumn{1}{|c|}{(en francs)} \\ \hline
+Dépenses de personnel		& 75.000 \\
+Frais de déplacement		&  9.000 \\
+Frais de matériel		& 50.000 \\
+ 				& \\
+Total HT			& 134.000 \\
+TVA (18.6\%)			&  24.924 \\ \hline
+Total TTC			& 158.924 \\ \hline
+\end{tabular}
+\end{center}
+
+\subsubsection{Calendrier des dépenses}
+
+Le paiement de l'allocation forfaitaire sera effectué à la
+notification du contrat. Le paiement des autres dépenses sera
+effectué par trimestre. Ceci nous donne l'échéancier suivant, où
+tous les montants sont exprimés en francs toutes taxes comprises.
+
+\begin{center}
+\begin{tabular}{|c|r|r|r|r|}
+\hline
+{\bf Versement Initial}	&
+\multicolumn{4}{|c|}{\bf Versements Trimestriels} \\ \cline{2-5}
+			& \multicolumn{1}{|c|}{\bf Trim. 1} &
+\multicolumn{1}{|c|}{\bf Trim. 2} & \multicolumn{1}{|c|}{\bf Trim. 3} &
+\multicolumn{1}{|c|}{\bf Trim. 4} \\ \hline
+47.440			& 148.250 & 148.250 & 148.250 & 148.250 \\
+\hline
+\end{tabular}
+\end{center}
+
+\end{document}
+\end

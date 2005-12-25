@@ -1,0 +1,90 @@
+\documentclass[12pt]{article}
+
+\usepackage[latin1]{inputenc}
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+
+% pour importer des structures de données Newgen
+\newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{\em #2}}
+
+\newcommand{\titre}{PROJET PIPS \\
+		STRUCTURES DE DONNÉES DE BASE ET LISTINGS ASSOCIÉS\\[20mm]
+		2eme edition 
+}
+
+\date{Septembre 1991}
+
+\newcommand{\auteur}{
+        	François IRIGOIN \\
+        	Pierre JOUVELOT \\
+\vspace{0.5cm}
+{\it Le présent document a été établi en exécution du contrat
+No.~88.017.01 passé par la Direction des Recherches, Etudes et
+Techniques (Délégation Générale pour l'Armement)}
+}
+\newcommand{\docdate}{Décembre 1990}
+\newcommand{\numero}{E145}
+
+\begin{document}
+\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+
+{\it Le présent document a été établi en exécution du contrat
+No.~88.017.01 passé par la Direction des Recherches, Etudes et
+Techniques (Délégation Générale pour l'Armement)}
+
+\vspace{2cm}
+
+\tableofcontents
+
+\newpage
+
+\section*{Introduction}
+
+\section{Représentation interne des programmes ({\em RI})}
+
+\input{ri.datastructure}
+
+\section{Bibliothèque de manipulation de la {\em RI} ({\em ri-util})}
+
+\input{ri-util.listing}
+
+\section{Initialisation des intrinsèques ({\em Bootstrap})}
+
+\input{bootstrap.listing}
+
+\section{Structuration du graphe de contrôle ({\em Control})}
+
+\input{control.listing}
+
+\section{Maintien de la cohérence ({\em Makefile})}
+
+\input{makefile.datastructure}
+
+\section{Exploitation des règles ({\em Pipsmake})}
+
+\input{pipsmake.listing}
+
+\section{Base de données objet ({\em Database})}
+
+\input{database.datastructure}
+
+\section{Gestion de la base de données ({\em Pipsdbm})}
+
+\input{pipsdbm.listing}
+
+\section{Paramètres d'exécution ({\em Property})}
+
+\input{property.datastructure}
+
+\section{Gestion des paramètres ({\em Properties})}
+
+\input{properties.listing}
+
+\section{Paralléliseur batch: {\em Pips}}
+
+\input{pips.listing}
+
+\section{Bibliothèque de base ({\em Misc})}
+
+\input{misc.listing}
+
+\end{document}

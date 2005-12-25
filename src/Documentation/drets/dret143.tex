@@ -1,0 +1,1455 @@
+\documentclass[12pt]{article}
+
+\usepackage[latin1]{inputenc}
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+
+\newcommand{\titre}{PROJET PIPS \\
+		RESULTATS SUR LES PROGRAMMES TESTS
+}
+
+\newcommand{\auteur}{
+        	François IRIGOIN \\
+        	Pierre JOUVELOT \\
+\vspace{0.5cm}
+{\it Le présent document a été établi en exécution du contrat
+No.~88.017.01 passé par la Direction des Recherches, Etudes et
+Techniques (Délégation Générale pour l'Armement)}
+}
+\newcommand{\docdate}{Décembre 1990}
+\newcommand{\numero}{E143}
+
+\begin{document}
+\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+
+{\it Le présent document a été établi en exécution du contrat
+No.~88.017.01 passé par la Direction des Recherches, Etudes et
+Techniques (Délégation Générale pour l'Armement)}
+
+\vspace{2cm}
+
+\tableofcontents
+
+\newpage
+
+\section*{Introduction}
+
+Nous présentons d'abord les résultats obtenus sur les cas d'école par
+les phases d'analyse de programmes et par les phases de transformations
+de programmes. Nous analysons ensuite les résultats obtenus sur les
+programmes réels de test fournis par l'ONERA.
+
+\section{Tests des phases d'analyse}
+
+Seule parmi les phases d'analyse, la recherche de relations linéaires
+entre variables scalaires se prête à la constitution de programmes
+de démonstration. En effet, les calculs des effets des instructions et
+ceux des {\em SDFI} ne produisent pas des résultats lisibles. Le calcul
+des {\em use-def chains} produit un graphe, encore plus difficile à étudier.
+
+La validité de ces analyses doit donc être estimée par l'utilisateur en
+fonction des résultats de parallélisation.
+
+\subsection{Analyse intraprocédurale}
+
+\paragraph{Effet de l'enveloppe convexe}
+
+~\newline
+Programme initial:
+\begin{verbatim}
+      program intrar
+      i = 3
+      if(j.eq.6) then
+         k = 0
+      else
+         k = 1
+      endif
+      end
+\end{verbatim}
+
+Programme décoré avec les préconditions:
+\begin{verbatim}
+      PROGRAM INTRAR
+C                       P() {}
+      I = 3
+C                       P(I) {I==3}
+      IF ((J.EQ.6)) THEN
+C                       P(I) {J==6, I==3}
+         K = 0
+      ELSE
+C                       P(I) {I==3}
+         K = 1
+      ENDIF
+C                       P(K, I) {0<=K, K<=1, I==3}
+      RETURN
+      END
+\end{verbatim}
+
+\subsection{Analyse interprocédurale}
+
+Mise en évidence de l'effet de la sélection de l'option
+interprocédurale pour le calcul des {\em transformers}.
+
+Programme initial:
+\begin{verbatim}
+      program interr
+      i = 3
+      j = 4
+      call swap(i,j)
+      end
+      subroutine swap(n,m)
+      integer t
+      t = n
+      n = m
+      m = t
+      return
+      end
+\end{verbatim}
+
+Préconditions obtenues intraprocéduralement\footnote{En fait, il
+s'agit d'une analyse interprocédurale où seuls les {\em SDFI} de la
+routine \verb+SWAP+ sont pris en compte.}:
+\begin{verbatim}
+      PROGRAM INTERR
+C                       P() {}
+      I = 3
+C                       P(I) {I==3}
+      J = 4
+C                       P(J, I) {J==4, I==3}
+      CALL SWAP(I, J)
+C                       P(J, I) {}
+      RETURN
+      END
+\end{verbatim}
+
+Résultat de l'analyse interprocédurale:
+\begin{verbatim}
+      PROGRAM INTERR
+C                       P() {}
+      I = 3
+C                       P(I) {I==3}
+      J = 4
+C                       P(J, I) {J==4, I==3}
+      CALL SWAP(I, J)
+C                       P(J, I) {J==3, I==4}
+      RETURN
+      END
+\end{verbatim}
+
+\newpage
+
+\section{Tests des transformations}
+
+Nous présentons successivement la privatisation, la parallélisation en
+présence de tests, la parallélisation avec distribution de boucles, la
+parallélisation avec échange des instructions et enfin la
+parallélisation avec utilisation des préconditions. Nous vérifions que
+nous détectons bien plusieurs niveaux de parallélisme, nous montrons que
+nous pouvons procéder à des échanges de boucles dans des cas généraux,
+puis nous finissons en comparant les sorties purement parallèles,
+utilisant Fortran~77 étendu, et les sorties vectorielles, utilisant
+Fortran~90.
+
+\subsection{Privatisation (expansion et substitution en avant)}
+
+L'algorithme de Cholesky ne peut être parallélisé que si les deux
+utilisations de la variable X sont reconnues comme indépendantes et que
+si X est privatisée dans les boucles portant sur I et sur J.
+
+Programme original:
+\begin{verbatim}
+C
+C     CHOLESKI METHOD - VERSION 1
+C
+C     PRIVATIZATION
+C     DEPENDENCE COMPUTATION WITH AND WITHOUT EXECUTION CONTEXT
+C
+      SUBROUTINE CHOLES(A, P, N)
+      REAL X, A(N,N), P(N)
+C
+      DO I = 1, N
+         X = A(I,I)
+         DO K = 1, I-1
+            X = X - A(I,K)*A(I,K)
+         ENDDO
+         P(I) = 1.0 / SQRT(X)
+         DO J = I+1, N
+            X = A(I,J)
+            DO KK = 1, I-1
+               X = X -A(I,J) * A(I,KK)
+            ENDDO
+            A(J,I) = X * P(I)
+         ENDDO
+      ENDDO
+C
+      RETURN
+      END
+\end{verbatim}
+
+Programme transformé après privatisation:
+\begin{verbatim}
+C
+C     CHOLESKI METHOD - VERSION 1
+C
+C     PRIVATIZATION
+C     DEPENDENCE COMPUTATION WITH AND WITHOUT EXECUTION CONTEXT
+C
+      SUBROUTINE CHOLES(A, P, N)
+      REAL X, A(N,N), P(N)
+C
+      DO I = 1,N,1                                                     0003
+         PRIVATE KK,J,K,X
+         X = A(I,I)                                                    0004
+         DO K = 1,(I-1),1                                              0006
+            X = (X-(A(I,K)*A(I,K)))                                    0007
+         ENDDO
+         P(I) = (1.0/SQRT(X))                                          0008
+         DO J = (I+1),N,1                                              0010
+            PRIVATE KK,X
+            X = A(I,J)                                                 0011
+            DO KK = 1,(I-1),1                                          0013
+               X = (X-(A(I,J)*A(I,KK)))                                0014
+            ENDDO
+            A(J,I) = (X*P(I))                                          0015
+         ENDDO
+      ENDDO
+      RETURN
+      END
+\end{verbatim}
+
+\subsection{Parallélisation en présence de tests}
+
+La présence de tests ne perturbe pas la reconnaissance des boucles
+parallèles.
+
+Version initiale:
+\begin{verbatim}
+      program goto
+      real t(200)
+      
+      do 10 i=1,100
+         if( i.lt.50 ) goto 20
+         do 30 j=1,200
+            t(j) = 3.14159
+ 30      continue
+ 20      continue
+ 10   continue
+      
+      end
+\end{verbatim}
+
+Version parallélisée:
+\begin{verbatim}
+      PROGRAM GOTO
+      REAL T(200)
+      
+      DO 10 I = 1,100,1                                                0003
+         PRIVATE I
+         IF ((I.LT.50)) THEN                                           0009
+         ELSE
+            GOTO 99996
+         ENDIF
+99994    CONTINUE                                                      0004
+10       CONTINUE                                                      0014
+         GOTO 99992
+99996    CONTINUE                                                      0006
+         DOALL 30 J = 1,200,1
+            PRIVATE J
+            T(J) = 3.14159                                             0012
+         ENDDO
+         GOTO 99994
+99992    CONTINUE
+      ENDDO
+      RETURN
+      END
+\end{verbatim}
+
+La régénération du graphe de contrôle n'est pas particulièrement
+adroite, mais le code généré ne devrait pas perturber un compilateur.
+Il faudrait bien sûr améliorer ce point si PIPS devait être utilisé
+interactivement.
+
+\subsection {Parallélisation et distribution de boucles}
+
+La distribution de boucles permet de  paralléliser certaines
+boucles. Elle est souvent associée à  une autre transformation de
+programme. Dans l'exemple suivant, elle permet de paralléliser une
+partie de la boucle.
+
+Programme initial:
+
+\begin{verbatim}
+      program ditrb
+      real t(10)
+      real v(10)
+      n=10
+      do 100 i = 1, 10
+         t(i) = t(i-1)+2
+         v(i)=t(i)+v(i)
+ 100  continue
+      end
+\end{verbatim}
+
+Programme obtenu après parallélisation:
+
+\begin{verbatim}
+      PROGRAM DITRB
+      REAL T(10)
+      REAL V(10)
+      N = 10
+      DO 100 I = 1,10,1
+         T(I) = (T((I-1))+2)
+      DOALL 100 I = 1,10,1
+         V(I) = (T(I)+V(I))
+      ENDDO
+      RETURN
+      END
+\end{verbatim}
+
+
+\newpage
+\subsection{Parallélisation et échange des instructions }
+
+Intervertir l'ordre d'exécution des instructions dans un corps de
+boucles permet de vectoriser ou de paralléliser certaines
+boucles supplémentaires.
+Le programme suivant en est un exemple: 
+
+Programme initial:
+
+\begin{verbatim}
+
+      program dists
+      real t1(11,10)
+      real t2(10,10)
+      
+      do 100 i = 1, 10,1
+         do 100 j = 1,10,1
+            t1(i,j) = 0
+            t2(i,j)=t2(i,j) + t1(i+1,j)
+ 100     continue
+         end
+
+\end{verbatim}
+
+L'interversion  des deux  instructions permet  de  vectoriser les boucles, 
+ou  de les distribuer et de les paralléliser.
+La  boucle d'indice I  n'aurait pas été parallélisée dans la version
+initiale du programme.
+
+Le programme obtenu après la phase de parallélisation est le suivant:
+
+\begin{verbatim}
+
+      PROGRAM DISTS
+      REAL T1(11,10)
+      REAL T2(10,10)
+
+      DOALL 100 I = 1,10,1
+         PRIVATE I
+         DOALL 100 J = 1,10,1
+            PRIVATE J
+            T2(I,J) = (T2(I,J)+T1((I+1),J))                            0007
+         ENDDO
+      ENDDO
+      DOALL 100 I = 1,10,1
+         PRIVATE I
+         DOALL 100 J = 1,10,1
+            PRIVATE J
+            T1(I,J) = 0                                                0006
+         ENDDO
+      ENDDO
+      RETURN
+      END
+\end{verbatim}
+
+
+
+
+\subsection{Parallélisation  utilisant les préconditions}
+
+
+L'utilisation  des préconditions  permet de paralléliser certaines
+boucles qui ne l'auraient pas été nécessairement.
+Dans l'exemple suivant, elles vont permettre de paralléliser la boucle 
+d'incide I.
+
+Programme initial:
+
+\begin{verbatim}
+
+      program prec
+      real MAT(10,10)
+      
+      do 100 I = 1,10,1
+         MAT(I,I) = 0.0
+         do 100 J = 1,I - 1,1
+            MAT(I,J) = 1.0
+            MAT(J,I) = -1.0
+ 100     continue
+         end
+\end{verbatim}
+
+ 
+La phase de calcul des préconditions donne les informations suivantes:
+
+\begin{verbatim}
+
+      PROGRAM PREC
+      REAL MAT(10,10)
+
+C                       P() {}
+C                       P() {}
+C                       P() {}
+      DO 100 I = 1,10,1      
+C                       P(J, I) {I<=10, 1<=I}
+C                       P(J, I) {1<=I, I<=10}
+         MAT(I,I) = 0.0      
+C                       P(J, I) {I<=10, 1<=I}
+         DO 100 J = 1,(I-1),1
+C                       P(J, I) {J+1<=I, 1<=J, I<=10, 1<=I}
+C                       P(J, I) {1<=I, I<=10, 1<=J, 1+J<=I}
+            MAT(I,J) = 1.0   
+C                       P(J, I) {J+1<=I, 1<=J, I<=10, 1<=I}
+            MAT(J,I) = (-1.0)
+C                       P(J, I) {1<=I, I<=10, 1<=J, 1+J<=I}
+100         CONTINUE         
+         ENDDO
+      ENDDO
+C                       P(J, I) {}
+      RETURN
+      END
+
+\end{verbatim}
+
+Ces informations utilisées lors de  la phase de parallélisation
+permettent de paralléliser la boucle d'indice I:
+
+\begin{verbatim}
+
+      PROGRAM PREC
+      REAL MAT(10,10)
+
+     DOALL 100 I = 1,10,1
+         PRIVATE I
+         MAT(I,I) = 0.0                                                0004
+      ENDDO
+      DOALL 100 I = 1,10,1
+         PRIVATE I
+         DOALL 100 J = 1,(I-1),1
+            PRIVATE J
+            MAT(I,J) = 1.0                                             0007
+         ENDDO
+      ENDDO
+      DOALL 100 I = 1,10,1
+         PRIVATE I
+         DOALL 100 J = 1,(I-1),1
+            PRIVATE J
+            MAT(J,I) = (-1.0)                                       
+         ENDDO
+      ENDDO
+      RETURN
+      END
+\end{verbatim}
+
+~\newpage
+\subsection{Parallélisation et boucles imbriquées}
+
+\begin{verbatim}
+      program iloop
+      real mat(10,10)
+
+      do 100 i = 1, 10,1
+         do 100 j = 1,10,1
+            mat(i,j) = 0
+ 100     continue
+         end
+\end{verbatim}
+
+Programme obtenu après parallélisation:
+
+\begin{verbatim}
+   PROGRAM ILOOP
+      REAL MAT(10,10)
+
+       DOALL 100 I = 1,10,1
+         PRIVATE I
+         DOALL 100 J = 1,10,1
+            PRIVATE J
+            MAT(I,J) = 0                                               0006
+         ENDDO
+      ENDDO
+      RETURN
+      END
+\end{verbatim}
+
+\subsection {Parallélisation du produit de matrices}
+
+Programme initial:
+
+\begin{verbatim}
+      program matmul
+      real a(10,10)
+      real b(10,10)
+      real c(10,10)
+      
+      l =10
+      n=10
+      m=10
+      do 100 i = 1, l,1
+         do 100 j = 1,n,1
+            c(i,j) = 0
+            do 100 k=1,m,1
+               c(i,j)=c(i,j) + a(i,k) * b(k,j)
+ 100        continue
+            end
+\end{verbatim}
+
+Programme obtenu après parallélisation:
+
+\begin{verbatim}
+
+     PROGRAM MATMUL
+      REAL A(10,10)
+      REAL B(10,10)
+      REAL C(10,10)
+
+      L = 10                                                           0002
+      N = 10                                                           0003
+      M = 10                                                           0004
+      DOALL 100 I = 1,L,1
+         PRIVATE I
+         DOALL 100 J = 1,N,1
+            PRIVATE J
+            C(I,J) = 0                                                 0009
+         ENDDO
+      ENDDO
+      DOALL 100 I = 1,L,1
+         PRIVATE I
+         DOALL 100 J = 1,N,1
+            PRIVATE J
+            DO 100 K = 1,M,1
+               PRIVATE K
+               C(I,J) = (C(I,J)+(A(I,K)*B(K,J)))                       0012
+            ENDDO
+         ENDDO
+      ENDDO
+      RETURN
+      END
+\end{verbatim}
+
+
+\subsection {Inversion de boucles}
+
+
+ De manière générale, l'inversion de boucles  est utilisée pour
+augmenter la localité des données utilisées et permettre la
+vectorisation de la boucle la plus interne dans le corps de boucles.
+
+~\newpage
+\subsubsection{Inversion de boucles sur un domaine triangulaire}
+
+Dans l'exemple suivant, l'inversion des deux boucles d'indices i et j
+permet de vectoriser la boucle la plus interne.
+
+Programme initial:
+
+\begin{verbatim}
+      program loop4
+
+      real t(10,10)
+      real v(10,10)
+
+      do 100 i = 1, 5
+         do 100 j = 1, i          
+            t(j+1,i)=t(j,i) + v(j,i)
+ 100     continue
+         end
+
+\end{verbatim}
+
+Programme obtenu après l'inversion  des deux  boucles:
+
+\begin{verbatim}
+      PROGRAM LOOP4
+
+      REAL T(10,10)
+      REAL V(10,10)
+
+      DO 100 Ip = 1,5,1                                                0004
+         DO 100 Jp = Ip,5,1                                            0006
+            T((1+Ip),Jp) = (T(Ip,Jp)+V(Ip,Jp))                         0007
+100         CONTINUE                                                   0008
+         ENDDO
+      ENDDO
+      RETURN
+      END
+
+
+\end{verbatim}
+
+\subsubsection{Inversion de boucles sur un domaine plus complexe}
+
+Dans l'exemple suivant, la boucle la plus interne est échangée avec 
+la plus externe. Cette opération permet d'augmenter la localité des
+données accédées. Tous les éléments des tableaux m et t seront
+accédés de manière contigüe. 
+
+~\newpage
+Programme initial:
+
+\begin{verbatim}
+      program loop3
+
+      real t(10,10,10)
+      real m(10,10)
+
+      N = 10
+      do 100 i = 1, 10
+         do 100 j = i+1, 10-i
+            do 100 k = j, N
+               m(i,j)  = m(i,j) + 2 * t(i,j,k) 
+ 100        continue
+            end
+
+\end{verbatim}
+
+Programme obtenu après l'inversion  des boucles:
+
+\begin{verbatim}
+      PROGRAM LOOP3
+      REAL T(10,10,10)
+      REAL M(10,10)
+
+      N = 10                                                           0002
+      DO 100 Ip = 2,N,1                                                0004
+         DO 100 Jp = 2,Ip,1                                            0006
+            DO 100 Kp = 1,MIN((10-Jp), (-1+Jp)),1                      0008
+               M(Kp,Jp) = (M(Kp,Jp)+(2*T(Kp,Jp,Ip)))                   0009
+100            CONTINUE                                                0010
+            ENDDO
+         ENDDO
+      ENDDO
+      RETURN
+      END
+
+\end{verbatim}
+
+\subsection{Géneration de code vectoriel}
+
+Pour obtenir une sortie en style Fortran~90, il faut mettre la
+propriété \verb+PRETTYPRINT_FORTRAN90+ à vrai dans le fichier
+\verb+properties.rc+ local.
+
+\begin{verbatim}
+      program vector
+      real a(10,10), b(100)
+      
+      do 100 i = 1, 10
+         do 200 j = 1, 10
+            a(i,j) = 0.
+ 200     continue
+ 100  continue
+      
+      do 300 i = 1, 100
+         b(i) = 1.
+ 300  continue
+      
+      end
+\end{verbatim}
+\begin{verbatim}
+      PROGRAM VECTOR
+      REAL A(10,10), B(100)
+      
+      DOALL 100 I = 1,10,1
+         PRIVATE I
+         A(I,(/I,I=1,10,1/)) = 0.
+      ENDDO
+      B((/I,I=1,100,1/)) = 1.
+      RETURN
+      END
+\end{verbatim}
+
+A noter que la réutilisation de la variable {\tt I} dans le format
+vectoriel n'entre pas en conflit avec l'indice {\tt I} de la boucle la
+plus englobante, les scopes étant différents.
+
+\subsection{Génération de code parallèle}
+
+Vu le manque de lisibilité du code vectoriel utilisant les DO implicites dans
+les expressions d'indices, l'option par défaut consiste à ne
+générer que du code parallèle. Il n'est donc pas nécessaire de
+s'inquiéter du fichier \verb+properties.rc+ local, à moins qu'il ne
+modifie justement la variable \verb+PRETTYPRINT_FORTRAN90+.
+
+\begin{verbatim}
+      program vector
+      real a(10,10), b(100)
+      
+      do 100 i = 1, 10
+         do 200 j = 1, 10
+            a(i,j) = 0.
+ 200     continue
+ 100  continue
+      
+      do 300 i = 1, 100
+         b(i) = 1.
+ 300  continue
+      
+      end
+\end{verbatim}
+
+\begin{verbatim}
+      PROGRAM VECTOR
+      REAL A(10,10), B(100)
+      
+      DOALL 100 I = 1,10,1
+         PRIVATE I
+         DOALL 200 J = 1,10,1
+            PRIVATE J
+            A(I,J) = 0.                                                0006
+         ENDDO
+      ENDDO
+      DOALL 300 I = 1,100,1
+         PRIVATE I
+         B(I) = 1.                                                     0011
+      ENDDO
+      RETURN
+      END
+\end{verbatim}
+
+\newpage
+
+\section{Tests en vraie grandeur}
+
+Les quatre programmes fournis par l'ONERA en tant qu'échantillons
+représentatifs des méthodes numériques couramment utilisées pour des
+travaux liés à la défense nationale ont été étudiés de quatre
+manières différentes.
+
+Ils ont tout d'abord permis de définir et de valider les restrictions
+à Fortran qui ont été admises pour réduire le volume de travail lié
+à l'analyse sémantique et la prise en compte de constructions ne
+pouvant en aucun cas conduire à des exécutions parallèles. Les
+résultats ont été décrits dans un précédent rapport
+(EMP-CAI-I~E/103, octobre 1988).
+
+Depuis cette date, ces choix ont été largement validés sur des
+programmes plus nombreux. La première limitation qu'il faudrait retirer
+concerne la notion de \verb+BLOCKDATA+ qui intervient trop souvent
+pourqu'il soit possible de demander aux usagers de les remplacer par des
+assignations dans le programme principal. Un deuxième problème s'est
+révélé au moment du link: il n'est pas possible d'avoir une variable
+ayant le même nom qu'un symbole global comme un COMMON ou une SUBROUTINE.
+
+Ensuite une analyse manuelle des codes a été effectuée par un
+analyste-numéricien pour définir le maximum de parallélisme que PIPS
+pouvait trouver.
+Cette étude très fastidieuse n'a pu être menée complètement
+que pour le programme TMINES qui ne contient pas de parallélisme
+interprocédural, alors que sa détection est l'objectif premier du
+projet PIPS.
+
+Puis les quatre programmes ont été soumis au paralléliseur de
+Cray Research, {\em FPP}, de manière à pouvoir disposer d'une
+référence commerciale.
+
+Enfin, les quatre programmes ont été soumis à PIPS en utilisant
+diverses options pour le test de dépendance. L'analyse manuelle des
+résultats et la comparaison des divers résultats sont extrêmement
+fastidieuses et elles ne font pas directement l'objet du contrat PIPS.
+Il s'agit plutôt de son évaluation.
+
+Il a donc fallu réduire le champ des essais et l'essentiel des efforts
+s'est porté sur le programme {\em TMINES}.
+
+\subsection{Programme TMINES}
+
+Comme il a déjà été indiqué auparavant, le programme TMINES ne
+contient pas de parallélisme interprocédural dans des boucles DO.
+PIPS et FPP détectent comme parallèles les mêmes boucles.
+
+L'algorithme de distribution de boucles de PIPS s'avère contenir une
+erreur qui se manifeste lorsqu'une variable inductive d'une boucle
+externe est utilisée dans une expression de borne de boucle. Ce
+problème peut être résolu (temporairement) en effectuant un
+remplacement de la variable inductive par une expression faisant
+intervenir les indices de boucles.
+
+Le programme TMINES contient plusieurs variables inductives
+multidimensionnelles que les méthodes actuelles ne peuvent pas
+convertir. La transformation devrait donc être effectuée à la main.
+La plupart des endroits où il peut être utile de la faire peuvent être
+rapidement détectés en recherchant les boucles dont la parallélisation
+n'est empêchée que par une unique dépendance.
+
+Le programme TMINES est intégralement analysé et parallélisé
+interprocéduralement par PIPS. Il n'est bien sûr pas possible d'en
+donner le listing complet.  A titre d'exemple, voici la version
+parallélisée de CALMAT, une des subroutines les plus importantes de TMINES:
+
+\begin{verbatim}
+      SUBROUTINE CALMAT(IM,JM,KM,R,CX,CY,CZ,BEL,BELK)
+C
+      DIMENSION CX(IM,JM,KM),CY(IM,JM,KM),CZ(IM,JM,KM),R(IM,JM,KM)
+      DIMENSION BEL(37,IM-1,JM-1)
+      DIMENSION BELK(37,IM-1,JM-1,KM-1)
+C
+      COMMON/POLXYZ/PXX(8,8,9),PYY(8,8,9),PZZ(8,8,9),PXY(8,8,9)
+     $             ,PXZ(8,8,9),PYZ(8,8,9),P(8,9,3),W(9)
+      COMMON/MACH/XMACH,XMIN,XMAX,XNEWT,IDEC
+      COMMON/VECT/X(8,3,81),A(3,3,81),SURF(81),TEMP(81),RES(81,8)
+     $,S11(81),S12(81),S13(81),S22(81),S23(81),S33(81)
+      COMMON/SECM/SECM1(25,25),SECM2(25,25)
+C
+C
+C
+      IMM = (IM-1)                                                     0002
+      JMM = (JM-1)                                                     0003
+C
+      KMM = (KM-1)                                                     0004
+      DOALL 101 K = 1,KM,1
+         PRIVATE K
+         DOALL 101 J = 1,JM,1
+            PRIVATE J
+            R((/I,I=1,IM,1/),J,K) = 0.
+         ENDDO
+      ENDDO
+C
+      DO 1 K = 1,KMM,1
+         PRIVATE K
+         DOALL 11 LB = 1,37,1
+            PRIVATE LB
+            DOALL 11 J = 1,JMM,1
+               PRIVATE J
+               BEL(LB,(/I,I=1,IMM,1/),J) = 0.
+            ENDDO
+         ENDDO
+         DO 10 J = 1,JMM,1
+            PRIVATE J
+            X(1,1,(/I,I=1,IMM,1/)) = CX((/I,I=1,IMM,1/),J,K)
+            X(1,2,(/I,I=1,IMM,1/)) = CY((/I,I=1,IMM,1/),J,K)
+            X(1,3,(/I,I=1,IMM,1/)) = CZ((/I,I=1,IMM,1/),J,K)
+            X(2,1,(/I,I=1,IMM,1/)) = CX((/I,I=(1+1),(1+IMM),1/),J,K)
+            X(2,2,(/I,I=1,IMM,1/)) = CY((/I,I=(1+1),(1+IMM),1/),J,K)
+            X(2,3,(/I,I=1,IMM,1/)) = CZ((/I,I=(1+1),(1+IMM),1/),J,K)
+            X(3,1,(/I,I=1,IMM,1/)) = CX((/I,I=(1+1),(1+IMM),1/),(J+1)        -1
+     &      ,K)
+            X(3,2,(/I,I=1,IMM,1/)) = CY((/I,I=(1+1),(1+IMM),1/),(J+1)        -1
+     &      ,K)
+            X(3,3,(/I,I=1,IMM,1/)) = CZ((/I,I=(1+1),(1+IMM),1/),(J+1)        -1
+     &      ,K)
+            X(4,1,(/I,I=1,IMM,1/)) = CX((/I,I=1,IMM,1/),(J+1),K)
+            X(4,2,(/I,I=1,IMM,1/)) = CY((/I,I=1,IMM,1/),(J+1),K)
+            X(4,3,(/I,I=1,IMM,1/)) = CZ((/I,I=1,IMM,1/),(J+1),K)
+            X(5,1,(/I,I=1,IMM,1/)) = CX((/I,I=1,IMM,1/),J,(K+1))
+            X(5,2,(/I,I=1,IMM,1/)) = CY((/I,I=1,IMM,1/),J,(K+1))
+            X(5,3,(/I,I=1,IMM,1/)) = CZ((/I,I=1,IMM,1/),J,(K+1))
+            X(6,1,(/I,I=1,IMM,1/)) = CX((/I,I=(1+1),(1+IMM),1/),J,(K+        -1
+     &      1))
+            X(6,2,(/I,I=1,IMM,1/)) = CY((/I,I=(1+1),(1+IMM),1/),J,(K+        -1
+     &      1))
+            X(6,3,(/I,I=1,IMM,1/)) = CZ((/I,I=(1+1),(1+IMM),1/),J,(K+        -1
+     &      1))
+            X(7,1,(/I,I=1,IMM,1/)) = CX((/I,I=(1+1),(1+IMM),1/),(J+1)        -1
+     &      ,(K+1))
+            X(7,2,(/I,I=1,IMM,1/)) = CY((/I,I=(1+1),(1+IMM),1/),(J+1)        -1
+     &      ,(K+1))
+            X(7,3,(/I,I=1,IMM,1/)) = CZ((/I,I=(1+1),(1+IMM),1/),(J+1)        -1
+     &      ,(K+1))
+            X(8,1,(/I,I=1,IMM,1/)) = CX((/I,I=1,IMM,1/),(J+1),(K+1))
+            X(8,2,(/I,I=1,IMM,1/)) = CY((/I,I=1,IMM,1/),(J+1),(K+1))
+            X(8,3,(/I,I=1,IMM,1/)) = CZ((/I,I=1,IMM,1/),(J+1),(K+1))
+            DO 30 L = 1,8,1
+               PRIVATE L
+               SURF((/I,I=1,IMM,1/)) = W(L)
+               DOALL 2 LJ = 1,3,1
+                  PRIVATE LJ
+                  DOALL 2 LK = 1,3,1
+                     PRIVATE LK
+                     A(LK,LJ,(/I,I=1,IMM,1/)) = 0.
+                  ENDDO
+               ENDDO
+               DOALL 2 LJ = 1,3,1
+                  PRIVATE LJ
+                  DOALL 2 LK = 1,3,1
+                     PRIVATE LK
+                     DO 2 LL = 1,8,1
+                        PRIVATE LL
+                        A(LK,LJ,(/I,I=1,IMM,1/)) = (A(LK,LJ,(/I,I=1,         -1
+     &                  IMM,1/))+(X(LL,LK,(/I,I=1,IMM,1/))*P(LL,L,LJ)        -1
+     &                  ))
+                     ENDDO
+                  ENDDO
+               ENDDO
+               DO 3 LL = 1,3,1
+                  PRIVATE LL
+                  TEMP((/I,I=1,IMM,1/)) = A(LL,LL,(/I,I=1,IMM,1/))
+                  SURF((/I,I=1,IMM,1/)) = (SURF((/I,I=1,IMM,1/))*TEMP        -1
+     &            ((/I,I=1,IMM,1/)))
+                  A(LL,LL,(/I,I=1,IMM,1/)) = 1.
+                  DOALL 4 LJ = 1,3,1
+                     PRIVATE LJ
+                     A(LL,LJ,(/I,I=1,IMM,1/)) = (A(LL,LJ,I)/TEMP(I))
+                  ENDDO
+                  DO 5 KK = 1,2,1
+                     PRIVATE KK
+                     KKK = (1+MOD(((KK-1)+LL), 3))                     0084
+                     TEMP((/I,I=1,IMM,1/)) = A(KKK,LL,(/I,I=1,IMM,1/)        -1
+     &               )
+                     A(KKK,LL,(/I,I=1,IMM,1/)) = 0.
+                     DOALL 6 LJ = 1,3,1
+                        PRIVATE LJ
+                        A(KKK,LJ,(/I,I=1,IMM,1/)) = (A(KKK,LJ,I)-(           -1
+     &                  TEMP(I)*A(LL,LJ,I)))
+                     ENDDO
+                  ENDDO
+               ENDDO
+               S11((/I,I=1,IMM,1/)) = (((A(1,1,(/I,I=1,IMM,1/))*A(1,1        -1
+     &         ,(/I,I=1,IMM,1/)))+(A(1,2,(/I,I=1,IMM,1/))*A(1,2,             -1
+     &         (/I,I=1,IMM,1/))))+(A(1,3,(/I,I=1,IMM,1/))*A(1,3,             -1
+     &         (/I,I=1,IMM,1/))))
+               S22((/I,I=1,IMM,1/)) = (((A(2,1,(/I,I=1,IMM,1/))*A(2,1        -1
+     &         ,(/I,I=1,IMM,1/)))+(A(2,2,(/I,I=1,IMM,1/))*A(2,2,             -1
+     &         (/I,I=1,IMM,1/))))+(A(2,3,(/I,I=1,IMM,1/))*A(2,3,             -1
+     &         (/I,I=1,IMM,1/))))
+               S33((/I,I=1,IMM,1/)) = (((A(3,1,(/I,I=1,IMM,1/))*A(3,1        -1
+     &         ,(/I,I=1,IMM,1/)))+(A(3,2,(/I,I=1,IMM,1/))*A(3,2,             -1
+     &         (/I,I=1,IMM,1/))))+(A(3,3,(/I,I=1,IMM,1/))*A(3,3,             -1
+     &         (/I,I=1,IMM,1/))))
+               S12((/I,I=1,IMM,1/)) = (((A(1,1,(/I,I=1,IMM,1/))*A(2,1        -1
+     &         ,(/I,I=1,IMM,1/)))+(A(1,2,(/I,I=1,IMM,1/))*A(2,2,             -1
+     &         (/I,I=1,IMM,1/))))+(A(1,3,(/I,I=1,IMM,1/))*A(2,3,             -1
+     &         (/I,I=1,IMM,1/))))
+               S13((/I,I=1,IMM,1/)) = (((A(1,1,(/I,I=1,IMM,1/))*A(3,1        -1
+     &         ,(/I,I=1,IMM,1/)))+(A(1,2,(/I,I=1,IMM,1/))*A(3,2,             -1
+     &         (/I,I=1,IMM,1/))))+(A(1,3,(/I,I=1,IMM,1/))*A(3,3,             -1
+     &         (/I,I=1,IMM,1/))))
+               S23((/I,I=1,IMM,1/)) = (((A(2,1,(/I,I=1,IMM,1/))*A(3,1        -1
+     &         ,(/I,I=1,IMM,1/)))+(A(2,2,(/I,I=1,IMM,1/))*A(3,2,             -1
+     &         (/I,I=1,IMM,1/))))+(A(2,3,(/I,I=1,IMM,1/))*A(3,3,             -1
+     &         (/I,I=1,IMM,1/))))
+               SURF((/I,I=1,IMM,1/)) = ABS(SURF(I))
+               BEL(37,(/I,I=1,IMM,1/),J) = (BEL(37,(/I,I=1,IMM,1/),J)        -1
+     &         +SURF((/I,I=1,IMM,1/)))
+               IJL = 0                                                 0108
+               DO 8 IL = 1,8,1
+                  PRIVATE IL
+                  DO 8 JL = IL,8,1
+                     IJL = (IJL+1)                                     0113
+                     BEL(IJL,(/I,I=1,IMM,1/),J) = (BEL(IJL,(/I,I=1,          -1
+     &               IMM,1/),J)+(SURF((/I,I=1,IMM,1/))*((((((S11(            -1
+     &               (/I,I=1,IMM,1/))*PXX(IL,JL,L))+(S22((/I,I=1,IMM,        -1
+     &               1/))*PYY(IL,JL,L)))+(S33((/I,I=1,IMM,1/))*PZZ(IL        -1
+     &               ,JL,L)))+(S12((/I,I=1,IMM,1/))*PXY(IL,JL,L)))+(         -1
+     &               S13((/I,I=1,IMM,1/))*PXZ(IL,JL,L)))+(S23((/I,I=1        -1
+     &               ,IMM,1/))*PYZ(IL,JL,L)))))
+                  ENDDO
+               ENDDO
+            ENDDO
+            DOALL 39 L = 1,8,1
+               PRIVATE L
+               RES((/I,I=1,IMM,1/),L) = 0.
+            ENDDO
+            IND = 0                                                    0124
+            DO 40 IL = 1,7,1
+               PRIVATE IL
+               IND = (IND+1)                                           0127
+               RES((/I,I=1,IMM,1/),IL) = (RES((/I,I=1,IMM,1/),IL)+(          -1
+     &         BEL(IND,(/I,I=1,IMM,1/),J)*X(IL,1,(/I,I=1,IMM,1/))))
+               DO 40 JL = JJ,8,1
+                  IND = (IND+1)                                        0134
+                  RES((/I,I=1,IMM,1/),IL) = (RES((/I,I=1,IMM,1/),IL)+        -1
+     &            (BEL(IND,(/I,I=1,IMM,1/),J)*X(JL,1,(/I,I=1,IMM,1/))        -1
+     &            ))
+                  RES((/I,I=1,IMM,1/),JL) = (RES((/I,I=1,IMM,1/),JL)+        -1
+     &            (BEL(IND,(/I,I=1,IMM,1/),J)*X(IL,1,(/I,I=1,IMM,1/))        -1
+     &            ))
+               ENDDO
+            ENDDO
+            RES((/I,I=1,IMM,1/),8) = (RES((/I,I=1,IMM,1/),8)+(BEL(36,        -1
+     &      (/I,I=1,IMM,1/),J)*X(8,1,(/I,I=1,IMM,1/))))
+            R((/I,I=(1+1),(1+IMM),1/),J,K) = (R((I+1),J,K)-RES(I,2))
+            R((/I,I=1,IMM,1/),J,K) = (R(I,J,K)-RES(I,1))
+            R((/I,I=(1+1),(1+IMM),1/),J,(K+1)) = (R((I+1),J,(K+1))-          -1
+     &      RES(I,6))
+            R((/I,I=1,IMM,1/),J,(K+1)) = (R(I,J,(K+1))-RES(I,5))
+            R((/I,I=(1+1),(1+IMM),1/),(J+1),K) = (R((I+1),(J+1),K)-          -1
+     &      RES(I,3))
+            R((/I,I=1,IMM,1/),(J+1),K) = (R(I,(J+1),K)-RES(I,4))
+            R((/I,I=(1+1),(1+IMM),1/),(J+1),(K+1)) = (R((I+1),(J+1),(        -1
+     &      K+1))-RES(I,7))
+            R((/I,I=1,IMM,1/),(J+1),(K+1)) = (R(I,(J+1),(K+1))-RES(I,        -1
+     &      8))
+         ENDDO
+         DOALL 66 LB = 1,37,1
+            PRIVATE LB
+            DOALL 66 I = 1,IMM,1
+               PRIVATE I
+               BELK(LB,I,(/I,I=1,JMM,1/),K) = BEL(LB,I,(/I,I=1,JMM,1         -1
+     &         /))
+            ENDDO
+         ENDDO
+      ENDDO
+      DO 1 K = 1,KMM,1
+         PRIVATE K
+         DO 10 J = 1,JMM,1
+            PRIVATE J
+            DO 40 IL = 1,7,1
+               PRIVATE IL
+               JJ = (IL+1)                                             0128
+            ENDDO
+         ENDDO
+      ENDDO
+      DOALL 7 J = 1,JM,1
+         PRIVATE J
+         SECM1(J,(/I,I=1,KM,1/)) = (-R(1,J,K))
+      ENDDO
+      DOALL 7 J = 1,JM,1
+         PRIVATE J
+         SECM2(J,(/I,I=1,KM,1/)) = R(IM,J,(/I,I=1,KM,1/))
+      ENDDO
+      RETURN
+      END
+
+\end{verbatim}
+
+A noter les déclarations de type PRIVATE pour les variables locales à
+un corps de boucle.
+
+\subsection{Programme OA118}
+
+La version parallélisée du module GRAD1 dans OA118.f est donnée
+ci-dessous. Aucun parallélisme interprocédural n'est détecté mais
+il a quand même été nécessaire d'analyser les sous-programmes
+appelés, \verb+PMAT+, \verb+SDOT+ et \verb+SOLV3+.
+
+\begin{verbatim}
+       SUBROUTINE GRAD1(B,X)
+C MULTI GRADIENT  SANS FENETRAGE
+C 
+       PARAMETER(NFAC=49,IRMAX=50)
+      COMMON/OASET/PIO2
+      COMMON/OACOF/AA(NFAC,NFAC)
+       DIMENSION A(IRMAX,IRMAX),B(NFAC),X(NFAC)
+       DIMENSION ALFA(IRMAX),R(NFAÇIRMAX),S(NFAÇIRMAX)
+       DIMENSION Y(NFAC),Z(NFAC),RS(IRMAX),D(IRMAX)
+      RRM = 1.E-20                                                     0002
+C 111 X(I)=B(I)/AA(I,I)
+      Y((/I,I=1,NFAC,1/)) = 0.
+      X((/I,I=1,NFAC,1/)) = 0.
+      R((/I,I=1,NFAC,1/),1) = (B(I)-Y(I))
+      IPM = 50                                                         0010
+      IPP = 1                                                          0011
+      IP = 1
+99997 IF ((IP.LE.IPM)) THEN
+      ELSE
+         GOTO 99996
+      ENDIF
+      IPP0 = IPP                                                       0014
+      IPP = (IPP+1)                                                    0015
+      IPQ = IP                                                         0016
+      Y((/I,I=1,NFAC,1/)) = R((/I,I=1,NFAC,1/),IPP0)
+      CALL PMAT(Y, Z)                                                  0020
+      S((/I,I=1,NFAC,1/),IPP0) = Z((/I,I=1,NFAC,1/))
+      DO 3 II = 1,IPQ,1
+         Y((/I,I=1,NFAC,1/)) = S((/I,I=1,NFAC,1/),II)
+         DO 5 JJ = II,IPQ,1
+            Z((/I,I=1,NFAC,1/)) = S((/I,I=1,NFAC,1/),JJ)
+            A(II,JJ) = SDOT(NFAC, Y, 1, Z, 1)                          0034
+         ENDDO
+         DO 5 JJ = II,IPQ,1
+5           A(JJ,II) = A(II,JJ)                                        0035
+         ENDDO
+         Z((/I,I=1,NFAC,1/)) = R((/I,I=1,NFAC,1/),IPP0)
+3        RS(II) = SDOT(NFAC, Y, 1, Z, 1)                               0039
+      ENDDO
+      CALL SOLV3(IPQ, A, RS, D)                                        0040
+      R((/I,I=1,NFAC,1/),IPP) = R((/I,I=1,NFAC,1/),IPP0)
+      DO 42 II = 1,IPQ,1
+         X((/I,I=1,NFAC,1/)) = (X((/I,I=1,NFAC,1/))+(RS(II)*R((/I,I=1        -1
+     &   ,NFAC,1/),II)))
+      ENDDO
+      DO 43 II = 1,IPQ,1
+         R((/I,I=1,NFAC,1/),IPP) = (R(I,IPP)-(RS(II)*S(I,II)))
+      ENDDO
+      Y((/I,I=1,NFAC,1/)) = R((/I,I=1,NFAC,1/),IPP)
+      RR = SDOT(NFAC, Y, 1, Y, 1)                                      0057
+      WRITE (FMT=*,UNIT=6) IP,RR                                       0058
+      WRITE (FMT=*,UNIT=100) IP,RR                                     0059
+      IF ((RR.LT.RRM)) THEN                                            0065
+      ELSE
+         GOTO 99993
+      ENDIF
+99996 CONTINUE                                                         0060
+99991 RETURN
+      GOTO 99990
+99993 CONTINUE                                                         0062
+2     CONTINUE                                                         0066
+      IP = (IP+1)
+      GOTO 99997
+99990 CONTINUE
+      END
+\end{verbatim}
+
+A noter la présence des instructions de branchement aux étiquettes de
+la forme 9999x qui correspondent à la regénération sous forme de
+programme Fortran du graphe de contrôle structuré.
+
+\subsection{Programme CR2CNF}
+
+Le programme CR2CNF est intégralement traité par PIPS.
+
+La version parallélisée de MATELT, subroutine de CR2CNF, est donnée
+ci-dessous. Il faut remarquer le degré d'imbrication élevé des boucles
+DO. Il ne permet pas l'utilisation directe des techniques d'analyse
+sémantique développées par Halbwachs et Cousot.
+
+\begin{verbatim}
+C*********************************************************************
+      SUBROUTINE MATELT(DAE,IMPRE)
+      IMPLICIT REAL*8(A-H,O-Z)
+C  ROUTINE DE CALCUL DE LA MATRICE DES INTEGRALES SUR LE PRISME DE
+C  REFERENCE DES PRODUITS DES DERIVEES PARTIELLES DES FONCTIONS DE
+C  BASE . DAE(K1,J1,K2,J2) = INTEGRALE DE DPHI(K1,J1)*DPHI(K2,J2)
+      DIMENSION DAE(3,6,3,6),Y(3,6)
+C  INITIALISATION DU TABLEAU DES COORDONNEES DES POINTS DE QUADRATURE .
+      Z = (1./(2.*SQRT(3.)))                                           0002
+      DO 1 I = 1,3,1
+         Y(I,(/I,I=1,6,1/)) = 0.
+      ENDDO
+      Y(3,(/I,I=1,3,1/)) = (0.5-Z)
+      Y(3,(/I,I=4,6,1/)) = (0.5+Z)
+      DO 4 J = 1,4,3
+         Y(1,J) = 0.5                                                  0016
+      ENDDO
+      DO 4 J = 1,4,3
+         Y(1,(J+1)) = 0.5                                              0017
+      ENDDO
+      DO 4 J = 1,4,3
+         Y(2,(J+1)) = 0.5                                              0018
+      ENDDO
+      DO 4 J = 1,4,3
+         Y(2,(J+2)) = 0.5                                              0019
+      ENDDO
+      DOALL 5 K = 1,3,1
+         DOALL 5 L = 1,3,1
+            DO 5 I = 1,6,1
+               DO 5 J = 1,6,1
+C  CALCUL DE LA MATRICE DAE .
+5                 DAE(K,I,L,J) = 0.                                    0029
+               ENDDO
+            ENDDO
+         ENDDO
+      ENDDO
+      DOALL 6 K = 1,3,1
+         DOALL 6 L = 1,3,1
+            DO 6 I = 1,6,1
+               DO 6 J = 1,6,1
+                  DO 6 NQ = 1,6,1
+                     DAE(K,I,L,J) = (DAE(K,I,L,J)+((DPHI(K, I, Y(1,NQ        40
+     &               ))*DPHI(L, J, Y(1,NQ)))/12.))                     0040
+                  ENDDO
+               ENDDO
+            ENDDO
+         ENDDO
+      ENDDO
+      IF ((IMPRE.LE.0)) THEN                                           0047
+      ELSE
+         GOTO 99996
+      ENDIF
+99994 CONTINUE
+      RETURN
+      GOTO 99992
+99996 CONTINUE                                                         0044
+      WRITE (UNIT=6,FMT=*)                                                   48
+     &'   MATRICES DES INTEGRALES DES DERIVEES DES FONCTIONS'          0048
+      WRITE (UNIT=6,FMT=*) '   DE BASE SUR LE PRISME UNITAIRÉ         0049
+      DOALL 8 K = 1,3,1
+         DOALL 8 L = 1,3,1
+            WRITE (UNIT=6,FMT=1000) K,L                                0054
+         ENDDO
+      ENDDO
+      DO 8 K = 1,3,1
+         DO 8 L = 1,3,1
+            WRITE (UNIT=6,FMT=2000) ((DAE(K,I,L,J)),J = 1,6,1)),I = 1        55
+     &      ,6,1)                                                      0055
+         ENDDO
+      ENDDO
+      GOTO 99994
+99992 CONTINUE
+      END
+\end{verbatim}
+
+\subsection{Programme AILE}
+
+Le programme AILE est intégralement traité par PIPS. L'exemple choisi est
+celui de la routine \verb+GEOM+. Les boucles 89 et 33 sont correctement
+parallélisées mais les boucles 88, 111 et 222 restent séquentielles.
+Les causes de l'attitude prudente du paralléliseur n'ont pas pu être
+découvertes.
+
+\begin{verbatim}
+      SUBROUTINE GEOM
+C******************************************************
+C      NXYZ    FICHIER DES COORDONNEES DES NOEUDS
+C      NGEO    FICHIER DES COEF. ET DES NORMALES
+C      NDIST   FICHIER DES RAYONS NUMERIQUES
+C      MAILLAGE SYMETRIQUE / XOY
+C******************************************************
+      DIMENSION T(52,21,60)
+      COMMON/CT/T
+      COMMON/CTI/TITXYZ(8),TITRE0(8),IT0,TITRE(8),IT
+      COMMON/IO/LEÇIMP,KIMP,NXYZ,NGEO,NDIST
+      COMMON/CI/I1,I2,IMAX,I1P1,I1P2,I2M1,I2M2,IBF
+      COMMON/CJ/J1,J2,JMAX,J1P1,J1P2,J2M1,J2M2,JA,JB,JAM1,JBP1
+      COMMON/CK/K1,K2,KMAX,K1P1,K1P2,K2M1,K2M2
+      COMMON/CKI1/KI1,LI1,MI1
+      COMMON/CKI2/KI2,LI2,MI2
+      DATA KPRE,KCOR/1,-1/
+      DATA N1,N3,N4,N7,N10,N14,N17/1,3,4,7,10,14,17/
+C
+      READ (UNIT=NXYZ) TITXYZ                                           0002
+      READ (UNIT=NXYZ) N,N,N,N,N,N                                      0003
+      READ (UNIT=NXYZ) (((T(J,K,L), J = J1,JA,1), K = K1,K2,1), L = 7          4
+     &,9,1)                                                             0004
+      READ (UNIT=NXYZ) (((T(J,K,L), J = J1,JA,1), K = K1,K2,1), L = 4          5
+     &,6,1)                                                             0005
+      READ (UNIT=NXYZ) (((T(J,K,L), J = J1,JA,1), K = K1,K2,1), L = 1          6
+     &,3,1)                                                             0006
+      DO 88 K = K1,K2,1
+         DO 88 J = J1,JA,1
+            T(J,K,10) = (((KI2*T(J,K,7))+(LI2*T(J,K,4)))+(MI2*T(J,K,1         11
+     &      )))                                                         0011
+         ENDDO
+      ENDDO
+      DO 88 K = K1,K2,1
+         DO 88 J = J1,JA,1
+            T(J,K,11) = (((KI2*T(J,K,8))+(LI2*T(J,K,5)))+(MI2*T(J,K,2         12
+     &      )))                                                         0012
+         ENDDO
+      ENDDO
+      DO 88 K = K1,K2,1
+         DO 88 J = J1,JA,1
+            T(J,K,12) = (((KI2*T(J,K,9))+(LI2*T(J,K,6)))+(MI2*T(J,K,3         13
+     &      )))                                                         0013
+         ENDDO
+      ENDDO
+\end{verbatim}
+\begin{verbatim}
+C     BUFFER OUT (NGEO,0) (T(1,1,17),T(JMAX,KMAX,25))
+      CALL COEF(N10, N7, N17, I2, KPRE, ID)                             0015
+      IF ((UNIT(NGEO).LT.0)) THEN                                       0026
+      ELSE
+         GOTO 99995
+      ENDIF
+99993 CONTINUE                                                          0016
+C     BUFFER OUT (NGEO,0) (T(1,1,17),T(JMAX,KMAX,25))
+      CALL COEF(N7, N4, N17, I2M1, KPRE, ID)                            0027
+      IF ((UNIT(NGEO).LT.0)) THEN                                       0037
+      ELSE
+         GOTO 99991
+      ENDIF
+99989 CONTINUE                                                          0028
+      CALL COEF(N7, N4, N17, I2, KCOR, ID)                              0038
+      CALL NORM(N10, N7, N4, N14, N17, I2)                              0039
+C     BUFFER OUT (NGEO,0) (T(1,1,17),T(JMAX,KMAX,25))
+      CALL EXTR(N7, N17)                                                0040
+      IF ((UNIT(NGEO).LT.0)) THEN                                       0050
+      ELSE
+         GOTO 99987
+      ENDIF
+99985 CONTINUE
+C     BUFFER OUT (NGEO,0) (T(1,1,14),T(JMAX,KMAX,16))
+22    CONTINUE                                                          0041
+      IF ((UNIT(NGEO).LT.0)) THEN                                       0060
+      ELSE
+         GOTO 99983
+      ENDIF
+99981 CONTINUE                                                          0051
+      DO 111 K = K1,K2,1
+         DO 111 J = J1,J2,1
+            T(J,K,13) = SQRT(AMIN1(T(J,K,ID), T(J,K,(ID+2))))           0065
+         ENDDO
+      ENDDO
+      IF ((UNIT(NDIST).LT.0)) THEN                                      0076
+      ELSE
+         GOTO 99979
+      ENDIF
+99977 CONTINUE                                                          0067
+      II = I1P1
+99976 IF ((II.LE.I2M1)) THEN
+      ELSE
+         GOTO 99975
+      ENDIF
+      I = ((I1+I2)-II)                                                  0079
+      IM = (I-1)                                                        0080
+      IF ((I.EQ.I2M1)) THEN                                             0086
+      ELSE
+         GOTO 99972
+      ENDIF
+\end{verbatim}
+\begin{verbatim}
+99970 CONTINUE                                                          0081
+C     BUFFER OUT (NGEO,0) (T(1,1,17),T(JMAX,KMAX,25))
+      CALL COEF(N4, N1, N17, IM, KPRE, ID)                              0090
+      IF ((UNIT(NGEO).LT.0)) THEN                                       0100
+      ELSE
+         GOTO 99967
+      ENDIF
+99965 CONTINUE                                                          0091
+      CALL COEF(N4, N1, N17, I, KCOR, ID)                               0101
+      CALL NORM(N7, N4, N1, N14, N17, I)                                0102
+C     BUFFER OUT (NGEO,0) (T(1,1,17),T(JMAX,KMAX,25))
+      CALL EXTR(N4, N17)                                                0103
+      IF ((UNIT(NGEO).LT.0)) THEN                                       0113
+      ELSE
+         GOTO 99963
+      ENDIF
+99961 CONTINUE                                                          0104
+      DO 222 K = K1,K2,1
+         DO 222 J = J1,J2,1
+            T(J,K,13) = SQRT(AMIN1(T(J,K,ID), T(J,K,(ID+2))))           0118
+         ENDDO
+      ENDDO
+      IF ((UNIT(NDIST).LT.0)) THEN                                      0129
+      ELSE
+         GOTO 99959
+      ENDIF
+99957 CONTINUE                                                          0120
+100   CONTINUE                                                          0130
+      II = (II+1)
+      GOTO 99976
+99959 IF ((UNIT(NDIST).EQ.0)) THEN                                      0126
+      ELSE
+         GOTO 99954
+      ENDIF
+99952 CONTINUE                                                          0018
+      STOP                                                              0175
+99951 RETURN
+      GOTO 99949
+99954 GOTO 99952
+99963 IF ((UNIT(NGEO).EQ.0)) THEN                                       0110
+      ELSE
+         GOTO 99948
+      ENDIF
+      GOTO 99952
+99948 GOTO 99952
+99967 IF ((UNIT(NGEO).EQ.0)) THEN                                       0097
+      ELSE
+         GOTO 99946
+      ENDIF
+      GOTO 99952
+99946 GOTO 99952
+99972 CONTINUE                                                          0083
+      CALL POUSSE(N4, N3, N7)                                           0087
+      CALL POUSSE(N1, N3, N4)                                           0088
+      READ (UNIT=NXYZ) (((T(J,K,L), J = J1,JA,1), K = K1,K2,1), L = 1         89
+     &,3,1)                                                             0089
+      GOTO 99970
+\end{verbatim}
+\begin{verbatim}
+99975 DOALL 89 K = K1,K2,1
+         T((/I,I=J1,JA,1/),K,10) = (((KI1*T((/I,I=J1,JA,1/),K,1))+(           -1
+     &   LI1*T((/I,I=J1,JA,1/),K,4)))+(MI1*T((/I,I=J1,JA,1/),K,7)))
+      ENDDO
+      DOALL 89 K = K1,K2,1
+         T((/I,I=J1,JA,1/),K,11) = (((KI1*T((/I,I=J1,JA,1/),K,2))+(           -1
+     &   LI1*T((/I,I=J1,JA,1/),K,5)))+(MI1*T((/I,I=J1,JA,1/),K,8)))
+      ENDDO
+      DOALL 89 K = K1,K2,1
+         T((/I,I=J1,JA,1/),K,12) = (((KI1*T((/I,I=J1,JA,1/),K,3))+(           -1
+     &   LI1*T((/I,I=J1,JA,1/),K,6)))+(MI1*T((/I,I=J1,JA,1/),K,9)))
+      ENDDO
+      CALL COEF(N1, N10, N17, I1, KCOR, ID)                             0139
+      CALL NORM(N4, N1, N10, N14, N17, I1)                              0140
+C     BUFFER OUT (NGEO,0) (T(1,1,17),T(JMAX,KMAX,25))
+      CALL EXTR(N1, N17)                                                0141
+      IF ((UNIT(NGEO).LT.0)) THEN                                       0151
+      ELSE
+         GOTO 99941
+      ENDIF
+99939 CONTINUE                                                          0142
+      DOALL 333 K = K1,K2,1
+         T((/I,I=J1,J2,1/),K,13) = SQRT(AMIN1(T(J,K,ID), T(J,K,(ID+2)         -1
+     &   )))
+      ENDDO
+      IF ((UNIT(NDIST).LT.0)) THEN                                      0167
+      ELSE
+         GOTO 99937
+      ENDIF
+99935 CONTINUE                                                          0158
+      ENDFILE (UNIT=NDIST)                                              0168
+      ENDFILE (UNIT=NGEO)                                               0169
+      REWIND (UNIT=NDIST)                                               0170
+      REWIND (UNIT=NGEO)                                                0171
+      REWIND (UNIT=NXYZ)                                                0172
+      GOTO 99951
+99937 IF ((UNIT(NDIST).EQ.0)) THEN                                      0164
+      ELSE
+         GOTO 99934
+      ENDIF
+      GOTO 99952
+99934 GOTO 99952
+99941 IF ((UNIT(NGEO).EQ.0)) THEN                                       0148
+      ELSE
+         GOTO 99932
+      ENDIF
+      GOTO 99952
+99932 GOTO 99952
+99979 IF ((UNIT(NDIST).EQ.0)) THEN                                      0073
+      ELSE
+         GOTO 99930
+      ENDIF
+      GOTO 99952
+99930 GOTO 99952
+99983 IF ((UNIT(NGEO).EQ.0)) THEN                                       0057
+      ELSE
+         GOTO 99928
+      ENDIF
+      GOTO 99952
+99928 GOTO 99952
+99987 IF ((UNIT(NGEO).EQ.0)) THEN                                       0047
+      ELSE
+         GOTO 99926
+      ENDIF
+      GOTO 99952
+99926 GOTO 99952
+99991 IF ((UNIT(NGEO).EQ.0)) THEN                                       0034
+      ELSE
+         GOTO 99924
+      ENDIF
+      GOTO 99952
+99924 GOTO 99952
+99995 IF ((UNIT(NGEO).EQ.0)) THEN                                       0023
+      ELSE
+         GOTO 99922
+      ENDIF
+      GOTO 99952
+99922 GOTO 99952
+99949 CONTINUE
+      END
+\end{verbatim}
+
+\section{Conclusion}
+
+Cette première version du paralléliseur PIPS donne des résultats
+satisfaisants sur les programmes de test. Les objectifs définis dans le
+contrat sont atteints mais il reste encore beaucoup de travail à
+effectuer pour exploiter l'investissement réalisé jusqu'ici. 
+
+D'une part, il faudrait examiner en détail le code parallèle produit
+pour voir ce qui n'a pas été trouvé et tâcher d'y remédier. Il
+faudrait que ce travail soit effectué sur un nombre de programmes aussi
+grand que possible ce qui améliorera aussi la fiabilité de PIPS.
+Ce travail est à la fois ingrat, coûteux en temps et difficilement
+publiable.
+
+D'autre part, il faudrait choisir une machine cible et ajouter les
+transformations de programme nécessaires à une bonne exploitation du
+parallélisme en fonction de la hiérarchie mémoire et des divers
+overheads associés à cette machine cible. Cette machine cible et son
+compilateur faciliteraient aussi la validation des résultats et
+permettraient de quantifier les résultats des optimisations et analyses
+effectuées.
+
+\end{document}
