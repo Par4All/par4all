@@ -1,3 +1,3 @@
 # $Id$
 
-FWD_DIRS	= drivers misc epips davinci
+FWD_DIRS	= drivers misc epips davinci validation
