@@ -16,4 +16,5 @@ else
 ROOT    = ../../..
 endif
 
+PROJECT = pips
 include $(ROOT)/makes/main.mk

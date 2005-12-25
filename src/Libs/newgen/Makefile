@@ -32,6 +32,7 @@ CPPOPT	= -I$(inc_dir)
 	# $(inc_dir)/$@
 	ln -s $(inc_dir)/$@
 
+PROJECT = pips
 include $(ROOT)/makes/main.mk
 
 clean: local-clean

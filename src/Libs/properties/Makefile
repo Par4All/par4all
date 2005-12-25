@@ -17,6 +17,7 @@ else
 ROOT    = ../../..
 endif
 
+PROJECT = pips
 include $(ROOT)/makes/main.mk
 
 properties.h: properties.c
