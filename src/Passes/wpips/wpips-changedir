@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /usr/bin/env wish
 #
 # $Id$
 #
@@ -8,14 +8,10 @@
 # What: This script allows to chose a directory interactively. 
 #       the chosen directory (when clicking "Ok") is put on stdout.
 #
-# Usage: Wchangedir [ -- default-start-directory ]
+# Usage: wpips-changedir [ -- default-start-directory ]
 #
 # Wish is started without assumption on its location.
 # (because here it is not in /usr/local/bin as usual).
-sed '1,/^###/d' $0 | wish "$@" 
-exit $?
-#
-###
 #
 # Wish script
 #
@@ -210,7 +206,6 @@ proc changedir { root currentdir } {
 
 #
 # default startpoint directory is .
-# may be specifyed by invoking "$RCSfile: Wchangedir,v $ -- some/directory"
 #
 if {$argc == 0} {
     set dir .
