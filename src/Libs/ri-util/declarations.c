@@ -703,8 +703,16 @@ static string default_common_hook(entity module, entity common)
 }
 
 static string (*common_hook)(entity, entity) = default_common_hook; 
-void set_prettyprinter_common_hook(string(*f)(entity,entity)){ common_hook=f;}
-void reset_prettyprinter_common_hook(){ common_hook=default_common_hook;}
+
+void set_prettyprinter_common_hook(string(*f)(entity,entity))
+{
+  common_hook=f;
+}
+
+void reset_prettyprinter_common_hook(void)
+{
+  common_hook=default_common_hook;
+}
 
 /* debugging for equivalences */
 #define EQUIV_DEBUG 8

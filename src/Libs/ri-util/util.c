@@ -200,8 +200,7 @@ char *s;
 }
 
 string 
-module_entitiesfilename(e)
-entity e;
+module_entitiesfilename(entity e)
 {
     return(string_entitiesfilename(entity_local_name(e)));
 }
@@ -209,9 +208,7 @@ entity e;
 /* functions for expressions */
 
 expression 
-make_entity_expression(e, inds)
-entity e;
-cons *inds;
+make_entity_expression(entity e, cons *inds)
 {
     reference E = make_reference(e, inds);
 
@@ -220,8 +217,7 @@ cons *inds;
 }
 
 string 
-new_label_name(module)
-entity module;
+new_label_name(entity module)
 {
     static char name[ 64 ];
     static int init = 99999;
