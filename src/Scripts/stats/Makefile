@@ -1,6 +1,4 @@
-#
 # $Id$
-#
 
 SCRIPTS = 	print-dg-statistics \
 		print-regions-op-statistics \
@@ -8,9 +6,7 @@ SCRIPTS = 	print-dg-statistics \
 		parallelization_statistics \
 		cumulate_statistics.pl
 
-FILES =		dg-statistics.awk \
-		dg-statistics.texheader \
-		dg-statistics.textrailer \
+F.awk =		dg-statistics.awk \
 		print-dependence.awk \
 		region-binary-op.awk \
 		region-proj-param-op.awk \
@@ -27,9 +23,14 @@ FILES =		dg-statistics.awk \
 		region_trans_stat_offset.awk \
 		region_trans_stat_type.awk 
 
-SOURCES	=	$(SCRIPTS) $(FILES)
+INSTALL_UTL = 	$(SCRIPTS) $(F.awk)
 
-INSTALL_UTL = 	$(SCRIPTS) $(FILES)
+# common stuff
+ifdef PIPS_ROOT
+ROOT    = $(PIPS_ROOT)
+else
+ROOT    = ../../..
+endif
 
-# that is all
-#
+#PROJECT = pips
+include $(ROOT)/makes/main.mk
