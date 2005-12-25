@@ -7,7 +7,8 @@ INSTALL_UTL =	pips-deal-with-include \
 		replace_file_name.pl \
 		insert_alias_checks_in_source.pl \
 		remove_useless_includes.pl \
-		check_for_recursions.pl
+		check_for_recursions.pl \
+		logfile_to_tpips
 
 # common stuff
 ifdef PIPS_ROOT
