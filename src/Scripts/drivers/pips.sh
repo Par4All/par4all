@@ -22,10 +22,10 @@ error()
 [ "${PIPS_ARCH}" ] || error 1 "\$PIPS_ARCH is undefined!"
 [ "${PIPS_ROOT}" ] || error 2 "\$PIPS_ROOT is undefined!"
 
-PATH=./${PIPS_ARCH}:${PIPS_ROOT}/Bin/${PIPS_ARCH}:${PATH}
+PATH=./${PIPS_ARCH}:${PIPS_ROOT}/bin/${PIPS_ARCH}:${PATH}
 
 # how to avoid a recursion of no actual binary is found:
-PATH=./${PIPS_ARCH}:${PIPS_ROOT}/Bin/${PIPS_ARCH} \
+PATH=./${PIPS_ARCH}:${PIPS_ROOT}/bin/${PIPS_ARCH} \
     type ${what} > /dev/null || error 3 "no ${what} binary found!"
 
 exec "${what}" "$@"
