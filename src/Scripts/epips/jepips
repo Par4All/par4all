@@ -1,12 +1,11 @@
 #! /bin/sh
 #
-# $RCSfile: jepips,v $ (version $Revision$)
-# $Date: 1998/11/12 16:44:26 $, 
+# $Id$
 #
 
 ${EPIPS_EMACS:-emacs} \
      "$@" \
-     -l ${EPIPS_LISP:-${PIPS_ROOT}/Share/epips.el} \
+     -l ${EPIPS_LISP:-${PIPS_ROOT}/share/epips.el} \
      -iconic \
      -name Epips \
      -title Epips \
