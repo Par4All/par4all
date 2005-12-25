@@ -1,4 +1,0 @@
-#! /bin/sh
-# Trap control-C
-trap 'exit 1' 2
-fsplit "$@"
