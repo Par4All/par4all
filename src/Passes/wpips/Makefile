@@ -54,6 +54,8 @@ LIB_TARGET	= lib$(TARGET).a
 
 BIN_TARGET	= $(TARGET)
 
+INSTALL_EXE	= Wchangedir
+
 # common stuff
 ifdef PIPS_ROOT
 ROOT    = $(PIPS_ROOT)
