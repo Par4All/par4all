@@ -1,4 +1,4 @@
 # $Id$
 
-# not needed: stats stf
-FWD_DIRS =	drivers env misc epips validation davinci
+# not needed? stats stf hpfc jpips make
+FWD_DIRS =	drivers dev env misc epips validation davinci
