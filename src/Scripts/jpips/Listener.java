@@ -1,27 +1,5 @@
 /*
   $Id$
- 
-  $Log: Listener.java,v $
-  Revision 1.7  1998/10/16 14:48:18  coelho
-  typo.
-
-  Revision 1.6  1998/10/16 14:42:00  coelho
-  fixed again.
-
-  Revision 1.5  1998/10/16 14:39:10  coelho
-  BufferedReader used.
-
-  Revision 1.4  1998/07/01 13:55:41  coelho
-  fixed import.
- 
-  Revision 1.3  1998/07/01 13:32:25  coelho
-  cleaner.
- 
-  Revision 1.2  1998/07/01 07:04:47  coelho
-  cleaner.
- 
-  Revision 1.1  1998/06/30 15:00:28  didry
-  Initial revision
 */
 
 package JPips;

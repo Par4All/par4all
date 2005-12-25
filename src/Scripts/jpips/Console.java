@@ -15,47 +15,7 @@
 
 /*
  * $Id$
- *
- * $Log: Console.java,v $
- * Revision 1.5  1999/02/15 14:13:18  coelho
- * javax
- *
- * Revision 1.4  1998/10/30 15:44:56  ancourt
- * Jpanel resized
- *
- * Revision 1.3  1998/10/17 09:51:45  coelho
- * background color is white.
- *
- * Revision 1.2  1998/10/16 13:40:56  coelho
- * fixed.
- *
- * Revision 1.1  1998/06/30 17:35:33  coelho
- * Initial revision
- *
- * Revision 1.6  1998/05/27 06:39:33  keryell
- * Swing version.
- * Small caps package name.
- *
- * Revision 1.5  1998/04/21 12:04:47  keryell
- * Now the end of the Console is always displayed when sized up.
- *
- * Revision 1.4  1998/04/09 08:53:17  keryell
- * New version using JVC stuff to switch between a reduced size and a
- * full size ConsoleLinePanel.
- *
- * Revision 1.3  1998/04/08 14:31:48  keryell
- * New version using the CardLayout. But in fact, it does not fit the
- * requirement... :-(
- *
- * Revision 1.2  1998/04/01 13:24:45  keryell
- * Added getConsoleTextField() and getConsoleLinePanel().
- *
- * Revision 1.1  1998/03/12 16:20:45  keryell
- * Initial revision
- *
  */
-
-
 package JPips;
 
 import java.io.*;

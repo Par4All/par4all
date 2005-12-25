@@ -6,17 +6,6 @@
 !
 ! $Id$
 !
-! $Log: hpfc_stubs.f,v $
-! Revision 1.12  1997/05/02 11:51:35  coelho
-! *** empty log message ***
-!
-! Revision 1.11  1997/05/02 11:29:08  coelho
-! more args to hpfc8 for regions.
-!
-! Revision 1.10  1997/03/19 17:52:42  coelho
-! better RCS headers
-!
-!     
 ! synchronization 
       subroutine hpfc1
 !!fcd$ fake

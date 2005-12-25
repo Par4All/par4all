@@ -1,39 +1,5 @@
 /*
   $Id$
-  
-  $Log: Pawt.java,v $
-  Revision 1.10  1999/02/15 14:14:25  coelho
-  *** empty log message ***
-
-  Revision 1.9  1998/11/17 22:15:37  ancourt
-  new colors
-  ,
-
-  Revision 1.8  1998/10/17 12:19:54  coelho
-  re-indentation.
-  colors fixed.
-  new factory to set default colors.
-
-  Revision 1.7  1998/10/17 09:50:08  coelho
-  white background color.
- 
-  Revision 1.6  1998/10/16 16:53:06  coelho
-  swing package updated.
- 
-  Revision 1.5  1998/10/16 13:55:59  coelho
-  import fixed.
- 
-  Revision 1.4  1998/07/03 16:36:51  coelho
-  PComboBox includes a direct field.
- 
-  Revision 1.3  1998/07/03 08:13:33  coelho
-  simpler constructors. tips added to labels and buttons.
- 
-  Revision 1.2  1998/06/30 17:35:33  coelho
-  abstarct wt for jpips.
- 
-  Revision 1.1  1998/06/30 16:40:14  coelho
-  Initial revision
 */
 
 package JPips;

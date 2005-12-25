@@ -2,23 +2,6 @@
 # 
 # $Id$
 # 
-# $Log: hpfc,v $
-# Revision 1.29  1997/06/07 09:14:11  coelho
-# little fix.
-#
-# Revision 1.28  1997/06/07 09:12:30  coelho
-# -T option passed to hpfc_compile.
-#
-# Revision 1.26  1997/05/03 15:32:46  coelho
-# more help.
-#
-# Revision 1.25  1997/04/15 09:46:54  coelho
-# -E option (not tested...)
-#
-# Revision 1.24  1997/03/19 17:48:49  coelho
-# better RCS headers.
-#
-#
 # HPFC scripts very front-end.
 # just an easy way not to have to remember the name of some scripts.
 #

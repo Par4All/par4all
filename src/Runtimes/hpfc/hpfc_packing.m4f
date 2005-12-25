@@ -2,17 +2,6 @@
 ! everything about packing
 !
 ! $Id$
-! $Log: hpfc_packing.m4f,v $
-! Revision 1.19  1997/07/03 11:08:26  zory
-! pvm specific constructions are replaced by hpfc general ones
-!
-! Revision 1.18  1997/06/09 14:01:43  zory
-! include hpfc_commons_pvm (temporary)
-!
-!
-! Revision 1.16  1997/03/20 07:50:01  coelho
-! better RCS headers.
-!
 !
 ! macros for code generation
 !

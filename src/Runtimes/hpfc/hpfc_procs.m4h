@@ -2,20 +2,6 @@
 ! COMMON /HPFC PROCS/
 !
 ! $Id$
-! $Log: hpfc_procs.m4h,v $
-! Revision 1.16  1997/06/03 13:14:32  zory
-! NODE TIDS is now including HOST TID !
-!
-! Revision 1.15  1997/06/03 08:05:58  zory
-! *** empty log message ***
-!
-! Revision 1.14  1997/06/03 08:00:06  zory
-! new common HOST LID
-!
-! Revision 1.13  1997/03/20 07:49:10  coelho
-! better RCS headers.
-!
-!
 !
       common /HPFC PROCS/
      $     MY LID,

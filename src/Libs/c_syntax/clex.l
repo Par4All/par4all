@@ -1,23 +1,4 @@
-/* $Id$
-   $Log: clex.l,v $
-   Revision 1.6  2005/11/16 09:49:28  nguyen
-   debug...
-
-   Revision 1.5  2003/09/05 14:19:52  nguyen
-   Modify pips debug levels
-
-   Revision 1.4  2003/08/13 08:00:33  nguyen
-   Correct the regular expressions for floating number, ...
-
-   Revision 1.3  2003/08/06 14:12:44  nguyen
-   Correct pragma comment
-
-   Revision 1.2  2003/08/04 14:20:59  nguyen
-   Preliminary version of the C parser
-
-   Revision 1.1  2003/06/24 08:48:47  nguyen
-   Initial revision
- */
+/* $Id$ */
 
 /******************** LEXICAL ANALYZER **************************
 

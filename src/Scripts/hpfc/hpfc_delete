@@ -1,10 +1,6 @@
 #! /bin/sh
 #
 # $Id$
-# $Log: hpfc_delete,v $
-# Revision 1.5  1997/03/19 17:50:44  coelho
-# better RCS headers.
-#
 #
 
 script=`basename $0`

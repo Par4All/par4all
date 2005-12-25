@@ -1,12 +1,5 @@
 /*
   $Id$
-
-  $Log: Watcher.java,v $
-  Revision 1.2  1998/10/16 14:23:42  coelho
-  re-indented.
-
-  Revision 1.1  1998/06/30 15:03:42  didry
-  Initial revision
 */
 
 package JPips;

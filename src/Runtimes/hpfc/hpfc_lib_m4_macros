@@ -2,19 +2,6 @@ dnl
 dnl GENERAL M4 MACROS
 dnl
 dnl $Id$
-dnl $Log: hpfc_lib_m4_macros,v $
-dnl Revision 1.15  1997/07/03 11:05:02  zory
-dnl pvm constructions replaced by hpfc ones
-dnl
-dnl Revision 1.14  1997/06/10 09:47:18  zory
-dnl M4_PVM_LENGTH is now working on HPFC types
-dnl
-dnl Revision 1.13  1997/06/10 09:32:48  zory
-dnl m4_type_name is now working on HPFC Types
-dnl
-dnl Revision 1.12  1997/03/19 16:51:31  coelho
-dnl better RCS headers
-dnl
 dnl
 dnl THIS MACRO BUILDS A NAME FROM ITS ARGUMENTS, SEPARATED BY _
 dnl

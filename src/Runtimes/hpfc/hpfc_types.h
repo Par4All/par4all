@@ -1,14 +1,6 @@
 !
 ! $Id$
 !
-! $Log: hpfc_types.h,v $
-! Revision 1.2  1997/07/03 11:11:54  zory
-! type manipulation is pvm/mpi independent
-!
-! Revision 1.1  1997/06/10 07:55:57  zory
-! Initial revision
-!
-!
 
 ! 
 ! HPFC Types definition 

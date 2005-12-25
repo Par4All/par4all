@@ -1,17 +1,6 @@
 !
 ! $Id$
 !
-! $Log: hpfc_specific_mpi.h,v $
-! Revision 1.3  1997/07/21 14:30:58  zory
-! new commons are useful with buffered communications
-!
-! Revision 1.2  1997/07/03 11:10:32  zory
-! specific mpi commons
-!
-! Revision 1.1  1997/06/16 12:52:20  zory
-! Initial revision
-!
-!
 
 !
 ! MPI commons 

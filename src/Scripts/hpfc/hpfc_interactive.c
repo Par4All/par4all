@@ -1,11 +1,4 @@
 /* $Id$
- * $Log: hpfc_interactive.c,v $
- * Revision 1.19  1997/05/24 08:26:34  coelho
- * sprintf returns an int on linux... fixed csq.
- *
- * Revision 1.18  1997/03/19 17:52:04  coelho
- * better RCS headers.
- *
  *
  * interactive interface to hpfc,
  * based on the GNU READLINE library for interaction,

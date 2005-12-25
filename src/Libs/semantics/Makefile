@@ -35,17 +35,6 @@
 # A main program, main.c, provides an easy way (i.e. dbxtool compatible) to try
 # semantic analysis and to test the library. it is now obsolete
 #
-# $Log: config.makefile,v $
-# Revision 1.9  2001/12/05 17:25:02  irigoin
-# ri_to_total_preconditions.c added
-#
-# Revision 1.8  2001/07/19 18:25:41  irigoin
-# New files added: expression.c and loop.c. Previously, unstructured.c had
-# been separated. The restructuring is not complete. Loop stuff is still in
-# ri_to_transformers.c and ri_to_preconditions.c. And so is interprocedural
-# stuff.
-#
-#
 # Source, header and object files used to build the library.
 # Do not include the main program source file.
 

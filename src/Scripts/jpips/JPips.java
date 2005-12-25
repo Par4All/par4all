@@ -1,35 +1,5 @@
 /*
  * $Id$
- *
- * $Log: JPips.java,v $
- * Revision 1.9  1999/02/15 14:12:51  coelho
- * javax.
- *
- * Revision 1.8  1998/11/14 13:37:48  ancourt
- * emacs jpips prop may be empty.
- *
- * Revision 1.7  1998/11/12 17:20:36  coelho
- * basic emacs display.
- *
- * Revision 1.6  1998/10/30 15:43:57  ancourt
- * graphdisplayer instance added
- *
- * Revision 1.5  1998/10/17 12:21:09  coelho
- * indentation fixed.
- * colors fixed.
- *
- * Revision 1.4  1998/10/16 17:17:18  coelho
- * updates for 1.2b4
- *
- * Revision 1.3  1998/07/03 11:55:17  coelho
- * workspace menu moved to workspace.
- *
- * Revision 1.2  1998/07/01 15:55:22  coelho
- * jpips.menus property used for the menus file.
- *
- * Revision 1.1  1998/06/30 17:34:07  coelho
- * Initial revision
- *
  */
 
 package JPips;

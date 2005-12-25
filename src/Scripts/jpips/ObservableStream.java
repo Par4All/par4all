@@ -14,20 +14,6 @@
 
 /*
  * $Id$
- *
- * $Log: ObservableStream.java,v $
- * Revision 1.2  1998/10/16 13:52:58  coelho
- * reindentation...
- *
- * Revision 1.1  1998/06/30 17:35:33  coelho
- * Initial revision
- *
- * Revision 1.2  1998/05/27 08:45:24  keryell
- * Small caps package name.
- *
- * Revision 1.1  1998/03/12 16:24:11  keryell
- * Initial revision
- *
  */
 
 package JPips;

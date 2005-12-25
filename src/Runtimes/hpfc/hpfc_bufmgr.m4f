@@ -1,35 +1,6 @@
 !
 ! $Id$
 !
-! $Log: hpfc_bufmgr.m4f,v $
-! Revision 1.20  1997/07/03 11:00:57  zory
-! pvm types replaced by hpfc type
-!
-! Revision 1.19  1997/06/09 13:00:43  zory
-! bufid has been deleted in recv calls
-!
-! Revision 1.18  1997/06/02 15:52:54  zory
-! HPFC RECEIVE is now waiting for a LID
-!
-! Revision 1.17  1997/05/30 09:14:56  zory
-! more debug messages
-!
-! Revision 1.16  1997/05/29 16:11:11  coelho
-! *** empty log message ***
-!
-! Revision 1.15  1997/05/28 12:46:56  zory
-! *** empty log message ***
-!
-! Revision 1.14  1997/05/28 12:46:03  zory
-! replace pvm calls by hpfc subroutines
-!
-! Revision 1.13  1997/05/02 16:36:18  coelho
-! global buffer id shared with reception.
-!
-! Revision 1.12  1997/04/17 11:55:22  coelho
-! better headers.
-!
-!
 ! First routines to fake the pack/unpack of data.
 ! The issue is to allow quite simply to measure the different
 ! overheads in the enumaration/packing/message stuff.

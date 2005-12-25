@@ -1,42 +1,5 @@
 /*
   $Id$
- 
-  $Log: OptionParser.java,v $
-  Revision 1.12  1999/02/15 14:18:12  coelho
-  *** empty log message ***
-
-  Revision 1.11  1998/10/30 09:46:02  ancourt
-  removes spaces around keywords.
-
-  Revision 1.10  1998/10/17 12:21:22  coelho
-  colors fixed.
-
-  Revision 1.9  1998/10/16 14:50:22  coelho
-  import fixed.
- 
-  Revision 1.8  1998/07/03 22:14:50  coelho
-  cleaner.
- 
-  Revision 1.7  1998/07/03 17:42:37  coelho
-  checkbox width fixed.
- 
-  Revision 1.6  1998/07/03 17:32:35  coelho
-  cleaner withMenu stuff...
- 
-  Revision 1.5  1998/07/03 16:36:24  coelho
-  new INDIRECT label and button with choice...
- 
-  Revision 1.4  1998/07/03 08:12:45  coelho
-  tip line added.
- 
-  Revision 1.3  1998/07/01 15:54:45  coelho
-  jpips.menus used for chosing the menus file.
- 
-  Revision 1.2  1998/07/01 07:08:01  coelho
-  cleaner.
- 
-  Revision 1.1  1998/06/30 17:35:33  coelho
-  Initial revision
 */
 
 package JPips;

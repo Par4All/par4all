@@ -2,11 +2,6 @@
 #
 # $Id$
 #
-# $Log: analyze_libraries,v $
-# Revision 1.4  1997/06/03 16:19:25  coelho
-# *** empty log message ***
-#
-#
 # create couples (function library) of uses and definitions for all libraries
 # used in PIPS (default option -a), including Linear and NewGen, or for
 # all PIPS libraries (option -p)

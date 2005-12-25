@@ -1,35 +1,6 @@
 #
 # $Id$
 # 
-# $Log: config.makefile,v $
-# Revision 1.66  1997/09/22 08:37:00  zory
-# clean MPI_HEADERS
-#
-# Revision 1.65  1997/09/19 07:46:50  zory
-# mpif.h must be copied at the beginning ...
-#
-# Revision 1.64  1997/07/21 15:05:48  zory
-# hpfc_misc -> hpfc_misc + hpfc_misc_mpi + hpfc_misc_pvm
-#
-# Revision 1.63  1997/07/03 10:59:49  zory
-# add mpi library manipulation
-#
-# Revision 1.62  1997/06/09 09:53:20  coelho
-# separate hpfc pvm lib.
-#
-# Revision 1.61  1997/06/06 14:54:21  zory
-# hpfc_communication -> hpfc_communication_pvm
-#
-# Revision 1.56  1997/05/29 13:31:49  zory
-# _HPFC_DEBUG_ added
-#
-# Revision 1.54  1997/05/28 15:47:49  zory
-# -ansi added to g77.
-#
-# Revision 1.53  1997/04/17 11:54:47  coelho
-# better RCS headers.
-#
-#
 # depends on 
 # + PVM_ARCH 
 # + PVM_ROOT

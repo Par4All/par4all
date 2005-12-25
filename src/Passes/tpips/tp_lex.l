@@ -1,48 +1,5 @@
 %{
-/*
- * $Id$
- *
- * $Log: tp_lex.l,v $
- * Revision 1.41  2003/12/16 13:39:21  irigoin
- * '%' replaced by '!' as compilation unit name separator (FILE_SEP_STRING)
- *
- * Revision 1.40  2003/12/04 16:04:12  irigoin
- * % added to deal with C file declarations
- *
- * Revision 1.39  2001/08/06 13:33:49  coelho
- * \r added.
- *
- * Revision 1.38  1998/07/03 21:27:01  coelho
- * check active token added.
- *
- * Revision 1.37  1998/05/05 08:49:43  coelho
- * bye == quit
- *
- * Revision 1.36  1998/04/29 08:24:27  coelho
- * "show" keyword added.
- *
- * Revision 1.35  1997/12/15 13:49:14  coelho
- * new syntax. () -> [] and $ALL -> %ALL
- *
- * Revision 1.34  1997/12/12 22:17:06  coelho
- * order fix for lonely comments.
- *
- * Revision 1.33  1997/12/12 12:28:39  coelho
- * ! == shell.
- *
- * Revision 1.32  1997/12/11 16:07:48  coelho
- * if unknow, and implicit shell is assumed.
- *
- * Revision 1.31  1997/12/05 16:50:16  coelho
- * checkpoint added.
- *
- * Revision 1.30  1997/12/05 13:29:21  coelho
- * CAPPLY keyword added.
- *
- * Revision 1.29  1997/11/27 12:12:59  coelho
- * ; as valid separator.
- *
- */
+/* $Id$ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

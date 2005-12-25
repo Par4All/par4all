@@ -3,22 +3,6 @@
 # Installation in directory...
 #
 # $Id$
-# $Log: hpfc_install,v $
-# Revision 1.37  1997/11/22 15:32:13  coelho
-# fix for new database organization.
-#
-# Revision 1.36  1997/10/27 15:47:03  coelho
-# unsplit should work fine ?
-#
-# Revision 1.35  1997/10/27 13:55:24  coelho
-# new version with Src
-#
-# Revision 1.33  1997/03/20 09:48:43  coelho
-# *_both.f files also copied.
-#
-# Revision 1.32  1997/03/19 17:51:37  coelho
-# better RCS headers
-#
 #
 
 # defaults

@@ -2,17 +2,6 @@
   $Id$
 
   Send displays to emacs.
-
-  $Log: EmacsDisplayer.java,v $
-  Revision 1.3  1998/11/17 22:08:06  coelho
-  try to display the file.
-
-  Revision 1.2  1998/11/17 21:41:52  ancourt
-  *** empty log message ***
-
-  Revision 1.1  1998/11/12 17:20:51  coelho
-  Initial revision
-
 */
 
 package JPips;

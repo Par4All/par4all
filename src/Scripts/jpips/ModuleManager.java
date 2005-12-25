@@ -1,24 +1,5 @@
 /*
   $Id$
-
-  $Log: ModuleManager.java,v $
-  Revision 1.6  1999/02/15 14:20:14  coelho
-  *** empty log message ***
-
-  Revision 1.5  1998/11/20 17:32:18  coelho
-  %MAIN added to the menu.
-
-  Revision 1.4  1998/10/17 12:19:24  coelho
-  border++.
-
-  Revision 1.3  1998/10/16 18:06:37  coelho
-  obscure bug tmp fix...
-
-  Revision 1.2  1998/10/16 17:16:40  coelho
-  attempt to port to jdk1.2b4
-
-  Revision 1.1  1998/06/30 17:35:33  coelho
-  Initial revision
 */
 
 

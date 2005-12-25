@@ -1,13 +1,5 @@
 /*
  * $Id$  
- *
- * $Log: Option.java,v $
- * Revision 1.2  1998/10/16 17:17:49  coelho
- * updates for 1.2b4
- *
- * Revision 1.1  1998/06/30 17:35:33  coelho
- * Initial revision
- *
  */
 
 package JPips;

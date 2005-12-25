@@ -1,47 +1,4 @@
-/* $Id$ 
-   $Log: cyacc.y,v $
-   Revision 1.13  2005/12/16 10:54:51  irigoin
-   Bug fix in calls to simplicy_C_expression()
-
-   Revision 1.12  2005/12/15 16:19:50  irigoin
-   Bug fix attemps for entity_initial and unknown_value
-
-   Revision 1.11  2005/12/15 15:35:13  irigoin
-   Action changed for "init_declarator:" first clause.
-
-   Revision 1.10  2005/11/28 16:04:02  irigoin
-   call to simplify_C_expression() added for assignment
-
-   Revision 1.9  2005/11/16 09:49:03  nguyen
-   debug...
-
-   Revision 1.8  2004/02/19 14:07:30  nguyen
-   Correct some small bugs (struct vs union, forgetten MakeTenaryCall, order
-   of qualifiers)
-
-   Revision 1.7  2004/02/18 10:34:25  nguyen
-   Rewrite code for declarators : UpdateEntity is done later, in declaration
-   level
-   Correct incomplete struct type declaration
-
-   Revision 1.6  2003/12/05 17:15:26  nguyen
-   Replace global variables by stacks to handle C recursive structures
-
-   Revision 1.5  2003/09/05 14:19:17  nguyen
-   Handle SPEC 2000 CFP cases
-
-   Revision 1.4  2003/08/13 08:01:08  nguyen
-   Take into account the old-style function prototype
-
-   Revision 1.3  2003/08/06 14:12:19  nguyen
-   Upgraded version of C parser
-
-   Revision 1.2  2003/08/04 14:20:24  nguyen
-   Preliminary version of the C parser
-
-   Revision 1.1  2003/06/24 08:45:56  nguyen
-   Initial revision
- */
+/* $Id$ */
 
 /******************** SYNTAX ANALYZER ************************************
 

@@ -1,16 +1,5 @@
 /*
  * $Id$
- *
- * $Log: StreamObserver.java,v $
- * Revision 1.1  1998/06/30 17:35:33  coelho
- * Initial revision
- *
- * Revision 1.2  1998/05/27 08:48:46  keryell
- * Small caps package name.
- *
- * Revision 1.1  1998/03/12 16:30:42  keryell
- * Initial revision
- *
  */
 
 /*

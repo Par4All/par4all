@@ -1,47 +1,5 @@
 /*
  * $Id$
- *
- * $Log: TPips.java,v $
- * Revision 1.13  1999/02/15 14:17:19  coelho
- * *** empty log message ***
- *
- * Revision 1.12  1998/11/21 15:04:48  coelho
- * cleaner?
- *
- * Revision 1.11  1998/11/17 21:49:09  ancourt
- * properties for emacs
- *
- * Revision 1.10  1998/11/12 17:21:47  coelho
- * emacs displayer added.
- *
- * Revision 1.9  1998/10/30 15:36:22  ancourt
- * add an entry to display davinci graph
- *
- * Revision 1.8  1998/10/28 18:45:44  coelho
- * + user request.
- * fixed a bug in method getText() when dealing with tpips.
- *
- * Revision 1.7  1998/10/16 17:17:33  coelho
- * updates for 1.2b4
- *
- * Revision 1.6  1998/10/16 13:58:34  coelho
- * import fixed.
- *
- * Revision 1.5  1998/07/03 08:14:37  coelho
- * a little bit cleaner.
- *
- * Revision 1.4  1998/07/02 15:03:34  coelho
- * synchronized sendCommand...
- *
- * Revision 1.3  1998/07/01 13:32:34  coelho
- * more comments.
- *
- * Revision 1.2  1998/06/30 17:35:33  coelho
- * last version of FD.
- *
- * Revision 1.1  1998/06/30 16:42:54  coelho
- * Initial revision
- *
  */
 
 package JPips;

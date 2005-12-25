@@ -1,32 +1,5 @@
 /*
   $Id$
-
-  $Log: TextDisplayer.java,v $
-  Revision 1.8  1998/11/12 17:21:36  coelho
-  smaller and buffer...
-
-  Revision 1.7  1998/10/30 15:42:42  ancourt
-  class extension moved in Displayer
-
-  Revision 1.6  1998/10/17 12:20:33  coelho
-  indentation fixed.
-  Borders++.
-
-  Revision 1.5  1998/10/17 09:53:01  coelho
-  typo.
-  
-  Revision 1.4  1998/10/17 09:42:01  coelho
-  frame title now includes the date (to check for recomputations).
-  more comments.
-  
-  Revision 1.3  1998/10/16 13:58:55  coelho
-  *** empty log message ***
-  
-  Revision 1.2  1998/06/30 15:03:02  didry
-  manages a new panel
-  
-  Revision 1.1  1998/06/09 07:28:28  didry
-  Initial revision
 */
 
 package JPips;

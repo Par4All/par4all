@@ -1,35 +1,6 @@
 #
 # $Id$
 # 
-# $Log: hpfc_Makefile_init,v $
-# Revision 1.66  1997/09/19 08:47:51  zory
-# diffmpi is now available, but the MPI_LAM implementation inserts some
-# comments in stdout ... So diff is created even if the output is
-# correct !!
-#
-# Revision 1.65  1997/09/18 13:47:06  zory
-# Quick mpi control added
-#
-# Revision 1.64  1997/07/21 14:29:29  zory
-# paradyn action added (link with the good files)
-#
-# Revision 1.63  1997/07/03 10:51:41  zory
-# MPI runtime version is now available
-# The pvm one can be examinated with the paradyn performance tool
-#
-# Revision 1.62  1997/06/09 09:53:06  coelho
-# *** empty log message ***
-#
-# Revision 1.60  1997/05/16 14:26:36  coelho
-# LINUX case added.
-#
-# Revision 1.59  1997/05/03 17:10:23  coelho
-# diff does not need host and node executables, main and out are enough.
-#
-# Revision 1.54  1997/03/19 17:05:25  coelho
-# _both.f files considered as common files for host and node.
-#
-#
 # This is the initial makefile for HPFC compilation
 # a NAME macro is expected somewhere... could be derived automatically?
 # Makefile for PVM and HPFC, Fabien COELHO, 08/06/94

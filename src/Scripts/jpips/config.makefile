@@ -3,59 +3,6 @@
 #
 # JPips is a java interface to tpips. It is based on swing.
 #
-# $Log: config.makefile,v $
-# Revision 1.17  1999/02/15 14:27:31  coelho
-# new java path.
-#
-# Revision 1.16  1998/11/12 17:38:32  coelho
-# typo--
-#
-# Revision 1.15  1998/11/12 17:33:01  coelho
-# more menus.
-#
-# Revision 1.14  1998/11/12 17:21:20  coelho
-# EmacsDisplayer added.
-#
-# Revision 1.13  1998/10/30 15:44:21  ancourt
-# graphdisplayer entry added
-#
-# Revision 1.12  1998/10/17 12:28:48  coelho
-# zip -> jar installation.
-#
-# Revision 1.11  1998/10/17 10:09:35  coelho
-# jar 1.2b4 not yet as expected.
-#
-# Revision 1.10  1998/10/17 10:01:51  coelho
-# simpler jar generation.
-#
-# Revision 1.9  1998/10/16 17:16:54  coelho
-# updated for 1.2b4
-#
-# Revision 1.8  1998/07/03 08:57:48  coelho
-# basic menu forgotten...
-#
-# Revision 1.7  1998/07/03 08:55:18  coelho
-# install fixed.
-#
-# Revision 1.6  1998/07/03 08:51:26  coelho
-# use .class files for dependences.
-#
-# Revision 1.5  1998/07/03 08:28:32  coelho
-# mode fixed for java classes.
-#
-# Revision 1.4  1998/07/02 17:47:01  coelho
-# dependencies updated.
-#
-# Revision 1.3  1998/07/02 15:02:01  coelho
-# also cleans jar and zip files.
-#
-# Revision 1.2  1998/07/02 14:57:40  coelho
-# jpips.jar entry added.
-#
-# Revision 1.1  1998/07/01 17:08:48  coelho
-# Initial revision
-#
-#
 
 jdk_dir	=	/usr/local/java1.2
 jdk_bin	=	$(jdk_dir)/bin

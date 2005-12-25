@@ -11,15 +11,6 @@
  * C macros of interest: FPIPS_WITHOUT_{,T,W}PIPS to disable some versions.
  *
  * FC, Mon Aug 18 09:09:32 GMT 1997
- *
- * $Log: fpips.c,v $
- * Revision 1.12  1998/07/25 09:35:52  coelho
- * more comments.
- * verbose when default chosen.
- *
- * Revision 1.11  1998/07/21 17:46:06  coelho
- * options with getopt. -v option added.
- *
  */
 
 #include <stdio.h>

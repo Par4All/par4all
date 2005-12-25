@@ -1,15 +1,5 @@
 /*
  * $Id$ 
- *
- * $Log: JPipsComponent.java,v $
- * Revision 1.3  1998/06/30 17:35:33  coelho
- * a graphical and logical component in jpips.
- *
- * Revision 1.2  1998/06/30 16:22:26  coelho
- * cleaner (wrt my standards).
- *
- * Revision 1.1  1998/06/09 07:28:28  didry
- * Initial revision
  */
 
 package JPips;

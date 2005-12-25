@@ -1,40 +1,4 @@
-/* $Id$
-   $Log: splitc.y,v $
-   Revision 1.10  2003/12/16 13:37:06  irigoin
-   Explicit reference to character '%' replaced by an occurence of FILE_SEP_STRING
-
-   Revision 1.9  2003/09/01 15:00:40  irigoin
-   Small bug for Rule 4 fixed.
-
-   Revision 1.8  2003/08/14 16:12:36  irigoin
-   Simplified signature with fewer useless SPACES, failed attempt at retrieving
-   multiple names types declared with one typedef statement, additional
-   debugging statements
-
-   Revision 1.7  2003/08/14 08:58:28  coelho
-   { YYACCEPT; } instead of { YYACCEPT }
-
-   Revision 1.6  2003/08/12 15:45:09  irigoin
-   Bug fix for Rule 2 type signature
-
-   Revision 1.5  2003/08/08 15:59:27  irigoin
-   A lot of free_partial_signature added. Rule 4 is now implemented. Symbols
-   such as enum elements can now be used to size an array.
-
-   Revision 1.4  2003/08/04 16:53:07  irigoin
-   Intermediate version. A few more rules to derive signatures thanks to SPEC2000.
-
-   Revision 1.3  2003/08/01 16:42:39  irigoin
-   Intermediate version, compatible with the C-syntax Validation, coupled
-   with the parser and the controlizer, if not yet the C prettyprinter.
-
-   Revision 1.2  2003/08/01 06:00:37  irigoin
-   Intermediate version installed to let Production link
-
-   Revision 1.1  2003/07/29 15:12:37  irigoin
-   Initial revision
-
- */
+/* $Id$ */
 
 /******************** SYNTAX ANALYZER ************************************
 

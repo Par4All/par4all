@@ -1,23 +1,8 @@
 #
 # $Id$
 #
-# Basic menus for jpips.
+# Menus for developers.
 #
-# $Log: jpips_menus.basic,v $
-# Revision 1.4  1998/07/03 22:15:15  coelho
-# new groups added.
-#
-# Revision 1.3  1998/07/03 16:37:29  coelho
-# new menus with ILABEL and IBUTTON _WITH_CHOICE...
-#
-# Revision 1.2  1998/07/03 11:54:58  coelho
-# new attemps with menus...
-#
-# Revision 1.1  1998/07/03 08:14:59  coelho
-# Initial revision
-#
-#
-
 
 TOP_MENU
 Options

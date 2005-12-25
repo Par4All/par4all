@@ -2,20 +2,6 @@
 #
 # $Id$
 # 
-# $Log: install_pips_sources,v $
-# Revision 1.18  1997/08/06 12:23:11  coelho
-# co afert -ko.
-#
-# Revision 1.17  1997/05/22 08:50:55  coelho
-# debug off.
-#
-# Revision 1.13  1997/05/20 14:48:40  coelho
-# ok for both RCS and SCCS?
-#
-# Revision 1.12  1997/03/26 13:50:25  coelho
-# RCS headers.
-#
-#
 
 script=`basename $0`
 verb=':'

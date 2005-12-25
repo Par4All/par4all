@@ -1,24 +1,5 @@
 /*
   $Id$
- 
-  $Log: DirectoryManager.java,v $
-  Revision 1.6  1999/02/15 14:19:43  coelho
-  *** empty log message ***
-
-  Revision 1.5  1998/10/17 12:20:50  coelho
-  border++.
-
-  Revision 1.4  1998/10/16 17:16:20  coelho
-  nope.
-
-  Revision 1.3  1998/10/16 14:55:44  coelho
-  chooser fixed to 1.2b4.
- 
-  Revision 1.2  1998/07/01 07:02:57  coelho
-  cleaner (wrt my standards).
- 
-  Revision 1.1  1998/06/30 17:35:33  coelho
-  Initial revision
 */
 
 package JPips;

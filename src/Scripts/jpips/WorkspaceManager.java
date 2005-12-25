@@ -1,33 +1,5 @@
 /*
   $Id$
-  
-  $Log: WorkspaceManager.java,v $
-  Revision 1.9  1999/02/15 14:20:51  coelho
-  *** empty log message ***
-
-  Revision 1.8  1998/11/20 18:15:46  coelho
-  fixed multi-selection...
-
-  Revision 1.7  1998/11/20 18:01:22  coelho
-  fix of file management...
-
-  Revision 1.6  1998/11/06 10:42:34  ancourt
-  allow xx*yy.f/F to be added
-
-  Revision 1.5  1998/10/17 12:20:43  coelho
-  borders++.
-
-  Revision 1.4  1998/10/16 17:45:28  coelho
-  ok.
-
-  Revision 1.3  1998/10/16 17:15:46  coelho
-  attempt to update to 1.2b4.
-
-  Revision 1.2  1998/07/03 11:55:30  coelho
-  workspace menu moved here.
-  
-  Revision 1.1  1998/06/30 17:35:33  coelho
-  Initial revision
 */
 
 

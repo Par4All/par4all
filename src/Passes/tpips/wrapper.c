@@ -24,20 +24,6 @@
  *                         <---------------+
  *
  * @author Fabien Coelho (with some advises from Ronan Keryell)
- *
- * $Log: wrapper.c,v $
- * Revision 1.4  1998/06/26 08:10:25  coelho
- * flush added.
- *
- * Revision 1.3  1998/06/26 08:01:01  coelho
- * additionnal message added.
- *
- * Revision 1.2  1998/05/27 14:49:12  coelho
- * stdout of wrapper not used any more.
- *
- * Revision 1.1  1998/05/27 10:30:50  coelho
- * Initial revision
- *
  */
 
 /* UNIX headers.

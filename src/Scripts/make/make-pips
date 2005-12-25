@@ -2,23 +2,6 @@
 #
 # $Id$
 #
-# $Log: make-pips,v $
-# Revision 1.46  1997/08/22 07:15:18  coelho
-# *** empty log message ***
-#
-# Revision 1.45  1997/08/22 07:14:52  coelho
-# nop.
-#
-# Revision 1.44  1997/08/22 07:07:25  coelho
-# was broken by rcs conversion.
-#
-# Revision 1.43  1997/07/08 12:18:26  coelho
-# more debug...
-#
-# Revision 1.42  1997/06/28 08:08:29  coelho
-# RCS headers improved.
-#
-#
 # (c) Fabien COELHO July 1996
 #
 # changed a lot. it happens that -r does what you expect from it...

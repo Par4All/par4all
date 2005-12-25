@@ -1,28 +1,4 @@
-/* $Id$
-   $Log: splitc.l,v $
-   Revision 1.6  2005/03/22 10:26:16  nguyen
-   Correct the regular expressions for character constants
-
-   Revision 1.5  2003/08/08 16:00:29  irigoin
-   LF counted in comments. Lexical problems with floating point constants and
-   C comments fixed.
-
-   Revision 1.4  2003/08/04 16:51:35  irigoin
-   strdup() declaration updated, bug indicated in comment lexing
-
-   Revision 1.3  2003/08/01 16:42:58  irigoin
-   Intermediate version, compatible with the C-syntax Validation, coupled
-   with the parser and the controlizer, if not yet the C prettyprinter.
-
-   Revision 1.2  2003/08/01 06:00:47  irigoin
-   Intermediate version installed to let Production link
-
-   Revision 1.1  2003/07/29 15:12:00  irigoin
-   Initial revision
-
-   Revision 1.1  2003/06/24 08:48:47  nguyen
-   Initial revision
- */
+/* $Id$ */
 
 /******************** LEXICAL ANALYZER **************************
 

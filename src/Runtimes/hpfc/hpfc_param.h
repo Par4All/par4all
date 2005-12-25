@@ -2,10 +2,6 @@
 ! COMMON /HPFC PARAM/
 !
 ! $Id$
-! $Log: hpfc_param.h,v $
-! Revision 1.7  1997/03/20 07:50:40  coelho
-! better RCS headers.
-!
 !
 ! the following files has to be included:
 !     include 'parameters.h'

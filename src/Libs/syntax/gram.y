@@ -54,55 +54,6 @@
   *    IO statements
   *
   * $Id$
-  *
-  * $Log: gram.y,v $
-  * Revision 1.67  2005/08/24 15:14:34  irigoin
-  * calls to fix_if_condition() in logical expression to catch type mismatch
-  * and fix them. For instance, WHILE(N) is transformed into WHILE(N.NE.0).
-  *
-  * Revision 1.66  2003/08/11 16:26:37  irigoin
-  * Rule "entity_name:" : further attempts at identifying earlier the nature
-  * of symbols or variables encountered.
-  *
-  * Revision 1.65  2003/08/02 13:51:01  irigoin
-  * Three obsolete functions removed to silence gcc: MakeData, ValMakeDataVar,
-  * ExpandDataVar. Comments improved in one place.
-  *
-  * Revision 1.64  2002/06/27 15:01:39  irigoin
-  * Bug fix in MakeDataValueSet() to deal with complex constant in DATA statements
-  *
-  * Revision 1.63  2002/06/21 13:48:42  irigoin
-  * Complexification of DATA handling. The repeat function is no longer
-  * systematically called when the repeat factor is 1.
-  *
-  * Revision 1.62  2002/06/20 15:49:59  irigoin
-  * New handling of DATA, replacement of datavar and dataval by
-  * expression. Complex constants are now lost as in regular expressions.
-  *
-  * Revision 1.61  2002/06/12 10:40:39  irigoin
-  * Small comments to recuperate user source code of data statement
-  *
-  * Revision 1.60  2002/06/08 16:21:58  irigoin
-  * Instead of ignoring formal and actual return labels, replace them by
-  * string variables as suggested by Fabien Coelho
-  *
-  * Revision 1.59  2002/04/23 12:11:46  coelho
-  * syntax error --
-  *
-  * Revision 1.58  2002/04/23 12:07:25  coelho
-  * syntax error--
-  *
-  * Revision 1.57  2001/07/19 12:47:57  irigoin
-  * code for pointer_inst: moved from gram.y into declaration.c. New function DeclarePointer().
-  *
-  * Revision 1.56  2001/07/19 08:29:48  coelho
-  * substring initialization fixed.
-  *
-  * Revision 1.55  2001/07/18 17:53:11  irigoin
-  * Feature added for EDF code: pointers can be declared several times
-  * pointing to different allocatable arrays
-  *
-  *
   */
 
 %type <chain>	        latom

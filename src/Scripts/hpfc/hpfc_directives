@@ -1,16 +1,6 @@
 #! /bin/sh
 #
 # $Id$
-# $Log: hpfc_directives,v $
-# Revision 1.77  1998/03/17 10:05:48  coelho
-# dimension is a declaration also.
-#
-# Revision 1.76  1997/03/31 09:21:37  coelho
-# data is a declaration
-#
-# Revision 1.75  1997/03/19 17:48:20  coelho
-# better RCS headers.
-#
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
 # by the PIPS Fortran 77 parser. 

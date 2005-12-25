@@ -3,24 +3,6 @@
 # HPFC driver, Fabien COELHO
 #
 # $Id$
-# $Log: hpfc_compile,v $
-# Revision 1.55  1997/10/27 15:53:28  coelho
-# *** empty log message ***
-#
-# Revision 1.54  1997/10/27 15:49:37  coelho
-# dump of generated files.
-#
-# Revision 1.53  1997/06/26 08:50:03  coelho
-# path fixed to look for pips.
-#
-# Revision 1.52  1997/06/07 09:14:28  coelho
-# little fix.
-#
-# Revision 1.51  1997/06/07 09:11:19  coelho
-# -T time option added.
-#
-# Revision 1.50  1997/03/19 17:50:00  coelho
-# better RCS headers.
 #
 
 sh=`basename $0`

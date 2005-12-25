@@ -1,24 +1,5 @@
 /*
   $Id$
-
-  $Log: Displayer.java,v $
-  Revision 1.6  1999/02/15 14:15:12  coelho
-  *** empty log message ***
-
-  Revision 1.5  1998/10/30 15:43:21  ancourt
-  class Entension moved from TextDisplayer and toString added
-
-  Revision 1.4  1998/10/17 12:07:53  coelho
-  Border++.
-
-  Revision 1.3  1998/10/16 14:20:38  coelho
-  import fixed.
-
-  Revision 1.2  1998/06/30 14:57:56  didry
-  do not manage the panel anymore
-  
-  Revision 1.1  1998/06/09 07:28:28  didry
-  Initial revision
 */
 
 package JPips;

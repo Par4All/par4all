@@ -1,15 +1,5 @@
 /*
  * $Id$
- *
- * $Log: Parser.java,v $
- * Revision 1.3  1998/07/02 18:31:24  coelho
- * simpler parser.
- *
- * Revision 1.2  1998/07/01 07:06:22  coelho
- * cleaner.
- *
- * Revision 1.1  1998/06/30 17:35:33  coelho
- * Initial revision
  */
 
 package JPips;
