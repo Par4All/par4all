@@ -22,7 +22,7 @@ unsigned int timeout_error = 16;
 /* catch all */
 unsigned int any_exception_error = ~0;
 
-char * get_exception_name(unsigned int exception)
+char * get_exception_name(const unsigned int exception)
 {
   if (exception==overflow_error)
     return "overflow_error exception";
@@ -136,10 +136,10 @@ void dump_exception_stack()
  */
 jmp_buf * 
 push_exception_on_stack(
-    int what,
-    char * function,
-    char * file,
-    int line)
+    const int what,
+    const char * function,
+    const char * file,
+    const int line)
 {
   exception_debug_trace("PUSH ");
 
@@ -172,10 +172,10 @@ push_exception_on_stack(
  */
 void
 pop_exception_from_stack(
-    int what,
-    char * function,
-    char * file,
-    int line)
+    const int what,
+    const char * function,
+    const char * file,
+    const int line)
 {  
   exception_debug_trace("POP  ");
 
@@ -216,10 +216,10 @@ pop_exception_from_stack(
    the specified 'what' in the current exception stack.
 */
 void throw_exception(
-    int what,
-    char * function,
-    char * file,
-    int line)
+    const int what,
+    const char * function,
+    const char * file,
+    const int line)
 {
   int i;
   
