@@ -14,7 +14,7 @@ LINEAR_LIBS	= -lmatrice -lunion -lpolyedre -lsparse_sc -lsc -lcontrainte \
 
 ######################################################################## OTHERS
 
-OTHER_LIBS = 	-lm -lrx
+OTHER_LIBS = 	-lm
 
 ##################################################################### EXTERNALS
 
