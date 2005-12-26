@@ -76,16 +76,11 @@ void ExchangeRows(Matrix *M, int Row1, int Row2) {
 void ExchangeColumns(Matrix *M, int Column1, int Column2) {
   
   int i;
-  Value temp;
   
-  value_init(temp);
-  for (i = 0; i < (int)M->NbRows; i++) {
-    value_assign(temp,M->p[i][Column1]);
-    value_assign(M->p[i][Column1],M->p[i][Column2]);
-    value_assign(M->p[i][Column2],temp);
-  }
-  value_clear(temp);
-  return ;
+  for (i = 0; i < M->NbRows; i++)
+    value_swap(M->p[i][Column1],M->p[i][Column2]);
+
+  return;
 } /* ExchangeColumns */
 
 /* 
