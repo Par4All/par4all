@@ -40,9 +40,6 @@
 
 #include "preprocessor.h"
 
-extern char * strdup(const char *);
-extern int putenv(char *); /* Supposedly in stdlib.h */
-
 #define skip_line_p(s) \
   ((*(s))=='\0' || (*(s))=='!' || (*(s))=='*' || (*(s))=='c' || (*(s))=='C')
 
@@ -172,7 +169,7 @@ static bool pips_process_file(string file_name)
 
 #else
 
-#include "rxposix.h"
+#include <regex.h>
 
 #define IMPLICIT_NONE_RX "^[ \t]*implicit[ \t]*none"
 #define INCLUDE_FILE_RX  "^[ \t]*include[ \t]*['\"]\\([^'\"]*\\)['\"]"

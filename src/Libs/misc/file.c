@@ -14,8 +14,7 @@
 #include <sys/param.h>
 
 #include <dirent.h>
-
-#include "rxposix.h"
+#include <regex.h>
 
 #include "genC.h"
 #include "misc.h"

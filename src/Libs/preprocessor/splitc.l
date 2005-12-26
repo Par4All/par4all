@@ -58,9 +58,6 @@
 #include <string.h>
 #include <ctype.h>
 
-extern char * strdup(const char *);
-
-
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"

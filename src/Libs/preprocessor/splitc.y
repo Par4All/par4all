@@ -65,8 +65,6 @@
 #include "c_syntax.h"
 #include "preprocessor.h"
 
-extern char * strdup(const char *);
-
 #define C_ERROR_VERBOSE 1 /* much clearer error messages with bison */
 
 extern int splitc_lex(void);

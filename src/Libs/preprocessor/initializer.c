@@ -4,8 +4,6 @@
 #include <stdio.h>
 #include <string.h>
 
-extern char * strdup(const char *);
-
 #include "genC.h"
 #include "text.h"
 
