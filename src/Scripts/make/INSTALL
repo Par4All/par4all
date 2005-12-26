@@ -1,25 +1,62 @@
 # $Id$
 
+Please read the README file NOW. Thanks.
+
+If you have downloaded several pips sources. Good.
+You would like to install them: there is still but some work ahead!
+
+
+HOW TO GET THE SOURCES:
+-----------------------
+
+The pips sources also includes the newgen and linear libraries.
+
+On the edge version:
+
+	sh> svn co http://svn.cri.ensmp.fr/svn/pips/bundles/trunks MYPIPS
+
+Current production version?
+
+Source distribution version?
+
+
+DEPENDENCIES:
+-------------
+
+Compiling pips requires the following softwares:
+
+ - "cproto" C header generation [debian package "cproto"]
+ - GNU make (no other will do) [debian package "make"]
+ - a C compiler such as "gcc"
+ - "flex" and "bison", or other lex/yacc instances.
+ - the "perl" interpreter.
+ - "latex" if you want to have the documentation.
+
+
+You MUST also install the PolyLib library:
+
+ - polylib: http://icps.u-strasbg.fr/polylib/
+
+
+
 INSTALLATION INSTRUCTIONS:
 --------------------------
 
-If you have downloaded several parts of pips (sources, binaries, public
-softwares), you must first merge the different trees together. 
 
-The, run the install_pips script in this directory:
+Run the install_pips script in this directory:
 
          sh install_pips
 
 You may wish to set the PIPS_ARCH variable to a value depending on you
 local architecture. If you have GNU compilers, GNU or GNULL should be a
 good choice. Otherwise, good luck;-) This must be done before sourcing the
-pipsrc file (a default is provided).
+pipsrc file (a default is provided there).
 
          export PIPS_ARCH=GNU
 
 The install_pips script first generates "pipsrc.{sh,csh}" files that
 contain reasonnable environment variable settings for using PIPS. You can
-source, and eventually edit this file, especially with IBM.
+source, and eventually edit this file, especially with IBM AIX.
 
          source pipsrc.sh
 

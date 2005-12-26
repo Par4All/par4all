@@ -163,9 +163,6 @@ test "${PIPS_ARCH}" = FREEBSD -o "${PIPS_ARCH}" = FREEBSDLL && \
 test ${uname_s} = Linux && \
 	PIPS_PING="ping -c 1"
 
-test ${uname_s} = Linux && \
-	PIPS_TAR="tar"
-
 # under solaris basename is refexpr based.
 test ${uname_s} = SunOS && \
 	PIPS_BASENAME="/usr/ucb/basename"

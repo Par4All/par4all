@@ -1,12 +1,8 @@
 # $Id$
 
-INSTALL_UTL = 	make-pips \
-		make_release \
-		make_pips_release \
-		install_pips
+INSTALL_UTL =	install_pips
 
-INSTALL_DOC =	install.README \
-		install.INSTALL
+INSTALL_DOC =	README INSTALL
 
 # common stuff
 ifdef PIPS_ROOT
@@ -15,5 +11,5 @@ else
 ROOT    = ../../..
 endif
 
-#PROJECT = pips
+PROJECT = pips
 include $(ROOT)/makes/main.mk

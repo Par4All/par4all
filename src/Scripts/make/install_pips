@@ -4,6 +4,7 @@
 #
 # installation for pips softwares and automatic generation of pipsrc
 #
+# TODO: use autogen/autoconf and the like for real portable software.
 
 unset archdir type
 
@@ -112,7 +113,7 @@ library()
     comment=$2
     shift 2
     verbn "looking for $lib ($comment): "
-    for l in `echo $LD_LIBRARY_PATH:./Extern/Lib/$ARCH | tr : ' '`
+    for l in `echo $LD_LIBRARY_PATH:./extern/lib/$ARCH | tr : ' '`
     do
 	test -r $l/$lib && { echo found ; return 0 ; } ;
     done
@@ -140,49 +141,21 @@ environment()
     fi
 }
 
-mksubdirs()
-{
-    dir=$1
-    for d in Bin Lib Share Utils Include Html Doc Runtime Examples Validation;
-    do
-	test -d $dir/$d || { echo creating $dir/$d ; mkdir $dir/$d ; }
-    done;
-}
-
-checksubdir()
-{
-    verbn "looking for $1: "
-    if test -d ./$1
-    then
-	echo found
-	mksubdirs ./$1
-    else
-	warning "not found!"
-    fi
-}
-
 ################################################################## SOFTWARES
 
 pwd=`pwd`
-
-checksubdir Extern
-checksubdir Newgen
-checksubdir Linear
-checksubdir Pips
 
 #
 # Pips
 #
 
-if test -d ./Pips 
+if test -d ./pips 
 then
-    PIPS_ROOT=$pwd/Pips
-    test -d $PIPS_ROOT/Lib && archdir=$PIPS_ROOT/Lib
-    test -d $PIPS_ROOT/Bin && archdir=$PIPS_ROOT/Bin
+    PIPS_ROOT=$pwd/pips
 
     # cleans pipsrc files...
-    test -d $PIPS_ROOT/Share && {
-	x=$PIPS_ROOT/Share/pipsrc
+    test -d $PIPS_ROOT/etc && {
+	x=$PIPS_ROOT/etc/pipsrc
 	rm -f $x.*.old
 	test $x.sh && mv $x.sh $x.sh.old
 	test $x.csh && mv $x.sh $x.csh.old
@@ -228,46 +201,11 @@ fi
 #
 # the default pips ARCH is chosen depending on the unix we're on
 #
-case ${uname_s} in
-    SunOS) 
-	case ${uname_r} in
-	    4.*) ARCH=GNU ;;
-	    5.*) ARCH=GNUSOL2LL ;;
-	    *) ARCH=GNU ;;
-	esac ;;
-    AIX)
-	ARCH=IBMAIX ;;
-    Linux)
-	ARCH=LINUXI86 ;;
-    HP-UX)
-	ARCH=HPUXLL ;;
-    *) 
-	ARCH=GNU ;;
-esac
 
-#
-# if some binaries are available, they are used...
-#
-
-if test "$archdir" -a -d $archdir/.
-then
-    for d in $archdir/*
-    do
-	test -d $d && ARCH=`basename $d`
-    done
-fi
-
-# 
-# expands fpips if necessary
-#
-
-for d in ./Pips/Bin/* ;
-do
-    [ -f $d/fpips ] && {
-	verb expanding fpips in $d
-	for x in pips tpips wpips ; do ln $d/fpips $d/$x ; done
-    }
-done
+test -x ${PIPS_ROOT}/makes/arch.sh &&
+{
+    ARCH=`${PIPS_ROOT}/makes/arch.sh`
+}
 
 #
 # confirmation of the chosen ARCH
@@ -294,22 +232,22 @@ cat > pipsrc.tmp <<EOF
 SOFT_ROOT=$pwd
 #
 # Pips root directory
-PIPS_ROOT="\${SOFT_ROOT}/Pips"
+PIPS_ROOT="\${SOFT_ROOT}/pips"
 #
 # Newgen root directory
-NEWGEN_ROOT="\${SOFT_ROOT}/Newgen"
+NEWGEN_ROOT="\${SOFT_ROOT}/newgen"
 #
 # Linear root directory
-LINEAR_ROOT="\${SOFT_ROOT}/Linear"
+LINEAR_ROOT="\${SOFT_ROOT}/linear"
 #
 # Extern root directory
 # external libraries and so expected for building tpips
-EXTERN_ROOT="\${SOFT_ROOT}/Extern"
+EXTERN_ROOT="\${SOFT_ROOT}/extern"
 #
-# PATH and MANPATH updates
-PATH="\${EXTERN_ROOT}/Share:\${EXTERN_ROOT}/Bin/\${PIPS_ARCH}:\${PATH}"
-PATH="\${PIPS_ROOT}/Share:\${PIPS_ROOT}/Bin/\${PIPS_ARCH}:\${PIPS_ROOT}/Utils:\${PATH}"
-MANPATH="\${PIPS_ROOT}/Doc:\${MANPATH}"
+# path updates
+PATH="\${EXTERN_ROOT}/bin:\${PATH}"
+PATH="\${PIPS_ROOT}/bin:\${PIPS_ROOT}/utils:\${PATH}"
+MANPATH="\${PIPS_ROOT}/man:\${MANPATH}"
 #
 ############################################################################
 #
@@ -322,9 +260,6 @@ MANPATH="\${PIPS_ROOT}/Doc:\${MANPATH}"
 # PIPS_COSTDIR (\${PIPS_ROOT}/Share/complexity_cost_tables)
 #  - where to find const tables for the complexity analysis
 #
-# PIPS_TAR (gtar)
-#  - tar command to be used to make a distribution
-# 
 # PIPS_ZIP (gzip -v9)
 #  - command to compress the distribution
 # 
@@ -359,11 +294,11 @@ MANPATH="\${PIPS_ROOT}/Doc:\${MANPATH}"
 # EPIPS_EMACS (emacs)
 #  - emacs to run epips
 #
-# EPIPS_LISP (\${PIPS_ROOT}/Share/epips.el)
+# EPIPS_LISP (\${PIPS_ROOT}/share/epips.el)
 #  - emacs-lisp file for epips
 #
 #
-# HPFC_RUNTIME (\${PIPS_ROOT}/Runtime/hpfc)
+# HPFC_RUNTIME (\${PIPS_ROOT}/runtime/hpfc)
 #  - where to find HPFC runtime
 #
 # HPFC_SED (gsed)
@@ -383,11 +318,11 @@ MANPATH="\${PIPS_ROOT}/Doc:\${MANPATH}"
 #    the scripts (sun: "shift not implemented", and problems with dec/cray/ibm)
 #
 #
-# XPOMP_RUNTIME (\${PIPS_ROOT}/Runtime/xpomp)
+# XPOMP_RUNTIME (\${PIPS_ROOT}/runtime/xpomp)
 #  - where to find xpomp runtime
 #
 #
-# WP65_RUNTIME (\${PIPS_ROOT}/Runtime/wp65)
+# WP65_RUNTIME (\${PIPS_ROOT}/runtime/wp65)
 #  - where to find wp65 runtime
 #
 #############################################################################
@@ -429,7 +364,6 @@ test ${uname_s} = Linux && cat >> pipsrc.tmp <<EOF
 #
 PIPS_CPP='gcc -E'
 PIPS_PING='ping -c 1'
-PIPS_TAR='tar'
 PIPS_FLINT='g77 -c -Wall -Wimplicit'
 #
 HPFC_SED='sed'
@@ -471,7 +405,7 @@ rm -f pipsrc.tmp
 free="freeware - see http://www.cri.ensmp.fr/pips/distribution.html"
 unix="should be available on any UN*X"
 
-test -d ./Pips &&
+test -d ./pips &&
 {
     question "do you plan to run PIPS? -- should be yes!" &&
     {
@@ -510,7 +444,7 @@ test -d ./Pips &&
     }
 }
 
-test -d ./Pips/Src &&
+test -d ./pips/src &&
 {
     question "do you plan to compile HPFC runtime?" &&
     {
@@ -521,17 +455,18 @@ test -d ./Pips/Src &&
     }
 }
 
-test -d ./Pips/Src -o -d ./Newgen/Src -o -d ./Linear/Src &&
+test -d ./pips/src -o -d ./newgen/src -o -d ./linear/src &&
 {
     question "do you plan to compile PIPS, NEWGEN or LINEAR?" &&
     {
 	# compile
-	executable gmake "mandatory" $free
-	executable cproto "mandatory?" $free
-	executable flex "GNU Fast lex -- mandatory?" $free
-	executable bison "GNU yacc -- not mandatory" $free
+	# how to check that it is GNU make?
+	executable make "mandatory" $free
+	executable cproto "mandatory" $free
+	executable flex "GNU Fast lex -- mandatory" $free
+	executable bison "GNU yacc -- mandatory" $free
 	executable gcc "GNU cc -- useful" $free
-	executable g77 "GNU f77 -- nice" $free
+	#executable g77 "GNU f77 -- nice" $free
 
 	# doc
 	executable latex "useful" $free
@@ -545,11 +480,11 @@ test -d ./Pips/Src -o -d ./Newgen/Src -o -d ./Linear/Src &&
     }
 }
 
-test -d ./Pips/Src &&
+test -d ./pips/src &&
 {
     question "do you plan to compile PIPS?" &&
     {
-	library librx.a "mandatory" $free
+	library libreadline.a "mandatory" $free
     }
 
     question "do you plan to compile wpips?" &&
