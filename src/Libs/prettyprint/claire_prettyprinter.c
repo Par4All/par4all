@@ -7,6 +7,7 @@
    print_claire_code        > MODULE.claire_printed_file
                             < PROGRAM.entities
                             < MODULE.code
+
 */
 
 #define DEBUG_CLAIRE 1
@@ -24,6 +25,12 @@
 #include "ri-util.h"
 #include "pipsdbm.h"
 #include "text-util.h"
+
+#include "effects-convex.h"
+#include "effects-generic.h"
+#include "complexity_ri.h"
+#include "complexity.h"
+#include "transformations.h"
 
 #define COMMA         ","
 #define EMPTY         ""
@@ -46,23 +53,36 @@
 #define QUOTE         "\""
 
 
-/* array containing extern loop indices names */
-gen_array_t extern_indices_array;
-/* array containing intern loop indices (name : "M_") */
-gen_array_t intern_indices_array;
-/* array containing extern upperbounds */
-gen_array_t extern_upperbounds_array;
-/* array containing intern upperbounds */
-gen_array_t intern_upperbounds_array; 
-/* array containing the tasks names*/
-gen_array_t tasks_names;
+#define CLAIRE_TASK_PREFIX "T_"
+#define CLAIRE_MOTIF_PREFIX "M_"
+#define CLAIRE_ARRAY_PREFIX "A_"
 
-string global_module_name;
+#define CLAIRE_RL      NL,TAB,TAB
+
+/* array containing extern loop indices names */
+static gen_array_t extern_indices_array;
+/* array containing intern loop indices (name : "M_") */
+static gen_array_t intern_indices_array;
+/* array containing extern upperbounds */
+static gen_array_t extern_upperbounds_array;
+/* array containing intern upperbounds */
+static gen_array_t intern_upperbounds_array; 
+/* array containing the tasks names*/
+static gen_array_t tasks_names;
+
+static string global_module_name;
 
 /**************************************************************** MISC UTILS */
 
 #define current_module_is_a_function() \
   (entity_function_p(get_current_module_entity()))
+
+static bool variable_p(entity e)
+{
+  storage s = entity_storage(e);
+  return type_variable_p(entity_type(e)) &&
+    (storage_ram_p(s) || storage_return_p(s));
+}
 
 
 #define RESULT_NAME	"result"
@@ -101,24 +121,6 @@ static string claire_entity_local_name(entity var)
   return name;
 }
 
-static bool variable_p(entity e)
-{
-  storage s = entity_storage(e);
-  return type_variable_p(entity_type(e)) &&
-    (storage_ram_p(s) || storage_return_p(s));
-}
-
-int is_all_null(string totest[], int dim){
-  int i;
-
-  for(i = 0; i<dim && same_string_p(totest[i], "0"); i++);
-
-  if(i == dim)
-    return 1;
-  else
-    return 0;
-}
-      
 
 /************************************************************** DECLARATIONS */
 
@@ -135,7 +137,6 @@ int_to_string(int i)
   return strdup(buffer);
 }
 
-static string claire_reference(reference r);
 
 /* Code duplicated from Newgen build.c */
 static char * itoa(int i)
@@ -145,41 +146,11 @@ static char * itoa(int i)
   return buf;
 }
 
-static string claire_expression(expression e)
-{
-  string result = string_undefined;
-  syntax s = expression_syntax(e);
-
-  switch (syntax_tag(s))
-    {
-    case is_syntax_reference:
-      result = claire_reference(syntax_reference(s));
-      break;
-    case is_syntax_call: {
-      value ev = EvalExpression(e);
-      constant ec = value_constant(ev);
-      int eiv = 0;
-
-      if(!value_constant_p(ev)) {
-	pips_user_error("Constant expected for CLAIRE loop bounds.\n");
-      }
-      if(!constant_int_p(ec)) {
-	pips_user_error("Integer constant expected for CLAIRE loop bounds.\n");
-      }
-      eiv = constant_int(ec);
-      result = strdup(itoa(eiv));
-
-      /* result = claire_entity_local_name(call_function(syntax_call(s))); */
-      break;
-    }
-    default:
-      pips_internal_error("unexpected syntax tag");
-    }
-  return result;
-}
+/* forward declaration */
+static string claire_expression(expression);
 
 /* Attention with Fortran: the indices are reversed. */
-static string claire_reference(reference r)
+static string claire_reference_with_explicit_motif(reference r)
 {
   string result = strdup(EMPTY), old, svar;
   MAP(EXPRESSION, e, 
@@ -200,12 +171,45 @@ static string claire_reference(reference r)
   return result;
 }
 
+static string claire_expression(expression e)
+{
+  string result = string_undefined;
+  syntax s = expression_syntax(e);
+
+  switch (syntax_tag(s))
+    {
+    case is_syntax_reference:
+      result = claire_reference_with_explicit_motif(syntax_reference(s));
+      break;
+    case is_syntax_call: {
+      value ev = EvalExpression(e);
+      constant ec = value_constant(ev);
+      int eiv = 0;
+
+      if(!value_constant_p(ev)) {
+	pips_user_error("Constant expected for CLAIRE loop bounds.\n");
+      }
+      if(!constant_int_p(ec)) {
+	pips_user_error("Integer constant expected for CLAIRE loop bounds.\n");
+      }
+      eiv = constant_int(ec);
+      result = strdup(itoa(eiv));
+
+     
+      break;
+    }
+    default:
+      pips_internal_error("unexpected syntax tag");
+    }
+  return result;
+}
+
 gen_array_t array_names;
 gen_array_t array_dims;
 
 #define ITEM_NOT_IN_ARRAY -1
 
-int gen_array_index(gen_array_t ar, string item){
+static int gen_array_index(gen_array_t ar, string item){
   int i;
 
   for(i = 0; i<gen_array_nitems(ar); i++){
@@ -277,7 +281,6 @@ static string this_entity_clairedeclaration(entity var)
   string result = strdup("");
   string name = strdup(concatenate("A_", entity_local_name(var), NULL));
   type t = entity_type(var);
-  storage s = entity_storage(var);
   pips_debug(2,"Entity name : %s\n",entity_name(var));
   /*  Many possible combinations */
 
@@ -317,7 +320,7 @@ static string this_entity_clairedeclaration(entity var)
 }
 
 static string 
-claire_declarations(entity module,
+claire_declarations_with_explicit_motif(entity module,
 	       bool (*consider_this_entity)(entity),
 	       string separator,
 	       bool lastsep)
@@ -351,7 +354,6 @@ static string claire_array_in_task(reference r, bool first, int task_number);
 static string claire_call_from_assignation(call c, int task_number, bool * input_provided){
   /* All arguments of this call are in Rmode (inputs of the task) */
   /* This function is called recursively */
-  entity called = call_function(c);
   list arguments = call_arguments(c);
   syntax syn;
   string result = "";
@@ -505,7 +507,6 @@ static string claire_array_in_task(reference r, bool first, int task_number){
   string fitting_array[index_of_array][intern_nb];
   int i;
   int j;
-  int is_all_null_2D = 1;
   int depth = 0;
 
   bool null_fitting_p = TRUE;
@@ -859,7 +860,6 @@ static string claire_loop_from_sequence(loop l, int task_number){
   string result;
 
   instruction ins = statement_instruction(s);
-  list li = statement_declarations(s);
   string * name = malloc(sizeof(string));
   string * up = malloc(sizeof(string));
   int u, low;
@@ -954,7 +954,6 @@ static string claire_loop_from_sequence(loop l, int task_number){
    the prettyprinter.*/
 static string claire_statement_from_sequence(statement s, int task_number){
   string result = "";
-  int j;
   instruction i = statement_instruction(s);
 
   switch(instruction_tag(i)){
@@ -1006,7 +1005,7 @@ static string claire_sequence_from_task(sequence seq){
 /* Manages tasks. The code is very defensive and hangs if sth not
    predicted happens. Here basically we begin the code in itself
    and thus $stat is obligatory a sequence. */
-static string claire_tasks(statement stat){
+static string claire_tasks_with_motif(statement stat){
   int j;
   instruction i;
   string result = "tasks\n";
@@ -1053,8 +1052,8 @@ static string claire_code_string(entity module, statement stat)
       print_entities(statement_declarations(stat));
     }
 
-  decls       = claire_declarations(module, variable_p, "", TRUE);
-  tasks       = claire_tasks(stat);
+  decls       = claire_declarations_with_explicit_motif(module, variable_p, "", TRUE);
+  tasks       = claire_tasks_with_motif(stat);
   
   result = strdup(concatenate(decls, NL, tasks, NL, NULL));
   ifdebug(2)
@@ -1071,7 +1070,7 @@ static string claire_code_string(entity module, statement stat)
 
 /* Initiates claire pretty print modules
  */
-bool print_claire_code(string module_name)
+bool print_claire_code_with_explicit_motif(string module_name)
 {
   FILE * out;
   string ppt, claire, dir, filename;
@@ -1116,3 +1115,815 @@ bool print_claire_code(string module_name)
 
   return TRUE;
 }
+
+
+/* ======================================================= */ 
+
+
+
+typedef struct 
+{
+  stack  loops_for_call;
+  stack loop_indices;
+  stack current_stat;
+  gen_array_t nested_loops;
+  gen_array_t nested_loop_indices;
+  gen_array_t nested_call;
+} 
+nest_context_t, 
+  * nest_context_p;
+
+
+static void
+claire_declarations(entity module, string_buffer result)
+{ 
+  bool comma = FALSE;
+  list dim;
+  int nb_dim =0;
+  string up_string ;
+  MAP ( ENTITY, var,
+  {
+    if (variable_p(var) && ( variable_entity_dimension(var) >0))
+      {
+	string_buffer result_up = string_buffer_make();
+	nb_dim = variable_entity_dimension(var);
+	string_buffer_append(result,
+			     strdup(concatenate(CLAIRE_ARRAY_PREFIX,entity_user_name(var), 
+						" :: DATA_ARRAY(name = symbol!(", QUOTE,
+						CLAIRE_ARRAY_PREFIX,entity_user_name(var), QUOTE,"),"
+						, CLAIRE_RL, NULL)));
+	string_buffer_append(result,
+			     strdup(concatenate("dim = ", 
+						i2a(nb_dim), ",", CLAIRE_RL,NULL)));
+	
+	string_buffer_append(result,strdup("origins = list<integer>("));
+	comma = FALSE; 
+	for (dim = variable_dimensions(type_variable(entity_type(var))); !ENDP(dim); dim = CDR(dim)) {
+
+	  int low;
+	  int  up;
+	  expression elow = dimension_lower(DIMENSION(CAR(dim)));
+	  expression eup = dimension_upper(DIMENSION(CAR(dim)));
+	 if (expression_integer_value(elow, &low) && expression_integer_value(eup, &up)){
+	    string_buffer_append(result,
+				 strdup(concatenate((comma)? ",":"", i2a(low),NULL)));
+	    string_buffer_append(result_up,
+				 strdup(concatenate((comma)? ",":"", i2a(up-low+1),NULL)));
+	  }
+	  else pips_user_error("Array dimensions must be integer\n");
+	  comma = TRUE; 
+	}	
+
+	string_buffer_append(result,
+			     strdup(concatenate("),", CLAIRE_RL,NULL)));
+	
+	string_buffer_append(result,
+			     strdup("dimSizes = list<integer>("));	
+	up_string=string_buffer_to_string(result_up); 
+	/*	string_buffer_free(&result_up,FALSE);*/
+	string_buffer_append(result,up_string);
+	
+	string_buffer_append(result,
+			     strdup(concatenate("),", CLAIRE_RL,NULL)));
+	string_buffer_append(result,
+			     strdup(concatenate("dataType = INTEGER)", 
+						NL,NL,NULL)));     
+
+      }
+  },
+	entity_declarations(module));
+
+
+}
+
+
+static void 
+push_current_statement(statement s, nest_context_p nest)
+{ 
+    stack_push(s , nest->current_stat); 
+}
+
+static void 
+pop_current_statement(statement s, nest_context_p nest)
+{ 
+  /*   if (debug) print_statement(s);*/
+  stack_pop(nest->current_stat); 
+}
+ 
+static void 
+push_loop(loop l, nest_context_p nest)
+{ 
+  /* on sauve le statement associe a la boucle courante */ 
+  statement sl = (statement) stack_head(nest->current_stat);
+   stack_push(sl , nest->loops_for_call); 
+   stack_push(loop_index(l) , nest->loop_indices); 
+}
+
+static void 
+pop_loop(loop l, nest_context_p nest)
+{ 
+ stack_pop(nest->loops_for_call); 
+ stack_pop(nest->loop_indices); 
+}
+ 
+static bool call_selection(call c, nest_context_p nest) 
+{ 
+
+  /* CA il faut implemeter  un choix judicieux ... distribution ou encapsulation*/
+  /* pour le moment distribution systematique de tout call */
+  /* il faut recuperer les appels de fonction value_code_p(entity_initial(f)*/
+  entity f = call_function(c); 
+  if  (ENTITY_ASSIGN_P(f) || entity_subroutine_p(f))
+    {  
+      return TRUE;
+    }
+  else return FALSE;
+
+  /*  statement s = (statement) stack_head(nest->current_stat);
+      return ((!return_statement_p(s) && !continue_statement_p(s)));*/
+}
+
+static void store_call_context(call c, nest_context_p nest)
+{
+  stack sl = stack_copy(nest->loops_for_call);
+  stack si = stack_copy(nest->loop_indices);
+  /* on sauve le statement associe au call */ 
+  statement statc = (statement) stack_head(nest->current_stat) ;
+  gen_array_append(nest->nested_loop_indices,si);
+  gen_array_append(nest->nested_loops,sl);
+  gen_array_append(nest->nested_call,statc);
+}
+
+static bool push_test(test t,  nest_context_p nest)
+{
+  /* encapsulation de l'ensemble des instructions appartenant au test*/
+  /* on ne fait rien pour le moment */
+  return FALSE;
+}
+
+
+static void pop_test(test t,  nest_context_p nest)
+{
+  /* encapsulation de l'ensemble des instructions appartenant au test*/
+ 
+}
+
+
+static void
+search_nested_loops_and_calls(statement stmp, nest_context_p nest)
+{
+  gen_context_multi_recurse(stmp,nest, loop_domain,push_loop,pop_loop,
+			    statement_domain, push_current_statement,pop_current_statement,
+			    test_domain, push_test, pop_test,
+			    call_domain,call_selection,store_call_context,
+			    NULL);
+}
+
+static void  print_call_selection(nest_context_p nest)
+{
+  int j;
+  int numberOfTasks=gen_array_nitems(nest->nested_call);
+  for (j = 0; j<numberOfTasks; j++)
+    {  
+      statement s = gen_array_item(nest->nested_call,j);
+      stack st = gen_array_item(nest->nested_loops,j);      
+      /*   print_statement(s);
+	   stack_map( st, print_statement);*/
+    }
+}
+
+					   
+static expression expression_plusplus(expression e)
+{
+  expression new_e;
+   if (expression_constant_p(e)) {
+    new_e = int_to_expression(1+ expression_to_int(e));
+  } 
+  else {
+    entity add_ent = gen_find_entity("TOP-LEVEL:+");
+    new_e =  make_call_expression(add_ent, 
+            CONS(EXPRESSION, e, CONS(EXPRESSION,  int_to_expression(1), NIL)));
+  }
+   return new_e; 
+}
+
+static void claire_loop(stack st, string_buffer result)
+{
+  bool comma_needed = FALSE;
+  string_buffer buffer_lower = string_buffer_make();
+  string_buffer buffer_upper = string_buffer_make();
+  string_buffer buffer_names = string_buffer_make();
+  string lower_bounds = "";
+  string upper_bounds = "";
+  string name_bounds = "";
+
+  string_buffer_append(result,
+		       strdup("exLoopNest = LOOPNEST(deep = "));
+  string_buffer_append(result,strdup(concatenate(i2a(stack_size(st)),",",NULL)));
+
+  STACK_MAP_X(s, statement, 
+  {   
+    loop l = instruction_loop(statement_instruction(s));
+    expression el =range_lower(loop_range(l));  
+    expression eu =range_upper(loop_range(l));
+    expression new_eu= expression_plusplus(eu);
+    
+  string_buffer_append(buffer_lower,
+		       strdup(concatenate(comma_needed? ",": "",
+					  "vartype!(",
+					  words_to_string(words_expression(el)), 
+					  ")",NULL)));
+  string_buffer_append(buffer_upper,
+		       strdup(concatenate(comma_needed? ",": "",
+					  "vartype!(", 
+					  words_to_string(words_expression(new_eu)), 
+					  ")",NULL)));
+  string_buffer_append(buffer_names,
+		       strdup(concatenate(comma_needed? ",": "",
+					  QUOTE,entity_user_name(loop_index(l)), 
+					  QUOTE,NULL)));
+  comma_needed = TRUE;
+  },
+	      st, 0);
+  
+  /* Lower bounds generation*/
+ 
+  string_buffer_append(result,
+		       strdup(concatenate(CLAIRE_RL,TAB, "lowerBound = list<VARTYPE>(", NULL)));
+  lower_bounds =string_buffer_to_string(buffer_lower);
+  string_buffer_append(result,lower_bounds);
+  string_buffer_append(result,strdup("),"));
+
+  /* Upper bounds generation */
+ string_buffer_append(result,
+		       strdup(concatenate(CLAIRE_RL,TAB, "upperBound = list<VARTYPE>(", NULL)));
+
+  upper_bounds =string_buffer_to_string(buffer_upper);
+  string_buffer_append(result,upper_bounds);
+  string_buffer_append(result,strdup("),"));
+
+  /* Loop Indices generation */
+  string_buffer_append(result,
+		       strdup(concatenate(CLAIRE_RL,TAB, "names = list<string>(", NULL)));
+  name_bounds =string_buffer_to_string(buffer_names);
+  string_buffer_append(result,name_bounds);
+  
+  string_buffer_append(result,strdup(")"));
+  
+  
+  string_buffer_append(result,strdup(concatenate("),",CLAIRE_RL,NULL)));
+}
+
+
+
+static void claire_reference(int taskNumber, reference r, bool wmode, 
+		      string_buffer result)
+{
+
+ string varname = entity_user_name(reference_variable(r));
+ string_buffer_append
+   (result,
+    strdup(concatenate("name = symbol!(\"",
+		       CLAIRE_TASK_PREFIX,i2a(taskNumber),
+		       "\" /+ \"", CLAIRE_ARRAY_PREFIX, varname, "\"),",
+		       CLAIRE_RL, TAB,
+		       "darray = ", CLAIRE_ARRAY_PREFIX, varname, ",",
+		       CLAIRE_RL,TAB,
+		       "accessMode = ", 
+		       (wmode?"Wmode,":"Rmode,"), CLAIRE_RL,TAB,
+		       NULL)));
+ 
+}
+
+static void  find_motif(Psysteme ps, Pvecteur nested_indices, int dim, int nb_dim, Pcontrainte *bound_inf, Pcontrainte *bound_sup, Pcontrainte *iterator, int *motif_up_bound)
+{ 
+  
+  Variable phi;
+  Value	v;
+  Pvecteur pi;
+  Pcontrainte c, next, cl, cu, cl_dup, cu_dup,lind, lind_dup,
+    list_cl=NULL , 
+    list_cu=NULL,
+    list_ind=NULL;
+  int lower =1;
+  int upper =2;
+  int ind =3;
+  Pcontrainte bounds[3][3];
+  int nb_bounds =0;
+  int nb_lower = 0;
+  int nb_upper = 0;
+  int nb_indices=0;
+  int i,j;
+  Pbase vars_to_eliminate = BASE_NULLE;
+
+   
+  for (i=1; i<=3;i++)
+    for (j=1; j<=3;j++)
+      bounds[i][j]=CONTRAINTE_UNDEFINED;
+  
+  phi = (Variable) make_phi_entity(dim); 
+ 
+  
+  /* elimination des variables autres de les phi et les indices de boucles englobants
+copie de la base + mise a zero des indices englobants + projection selon les elem de ce vecteur*/
+
+  vars_to_eliminate = vect_copy(ps->base); 
+  /* printf("Base des variables :\n");
+  vect_print(vars_to_eliminate, entity_local_name);
+  */
+  vect_erase_var(&vars_to_eliminate, phi);
+  for (pi = nested_indices; !VECTEUR_NUL_P(pi); pi = pi->succ)  
+    vect_erase_var(&vars_to_eliminate, var_of(pi));
+  
+  /* printf("Elimination des variables :\n");
+  vect_print(vars_to_eliminate, entity_local_name);
+  */
+
+  sc_projection_along_variables_ofl_ctrl(&ps,vars_to_eliminate , NO_OFL_CTRL);
+
+  for(c = sc_inegalites(ps), next=(c==NULL ? NULL : c->succ); 
+      c!=NULL; 
+      c=next, next=(c==NULL ? NULL : c->succ))
+    { 
+      Pvecteur indices_in_vecteur = VECTEUR_NUL;
+      /* printf("Tri de la contrainte :\n");
+      vect_print(c->vecteur, entity_local_name);
+      */
+      v = vect_coeff(phi, c->vecteur);
+      for (pi = nested_indices; !VECTEUR_NUL_P(pi); pi = pi->succ)
+	{  
+	  int coeff_index = vect_coeff(var_of(pi),c->vecteur);
+	  if (coeff_index)
+	    vect_add_elem(&indices_in_vecteur,var_of(pi), coeff_index);
+	}
+      
+
+      nb_indices=vect_size(indices_in_vecteur);
+      nb_indices = (nb_indices >2) ? 2 : nb_indices;
+      
+      if (value_pos_p(v)) {
+	c->succ = bounds[upper][nb_indices+1]; 
+	bounds[upper][nb_indices+1] = c;
+       	/* printf(" bornes inf avec indices de boucles englobants :\n");
+	   vect_print(bounds[upper][nb_indices+1]->vecteur, entity_local_name); */
+	nb_upper ++;
+      }
+      else if (value_neg_p(v)) {
+	c->succ = bounds[lower][nb_indices+1]; 
+	bounds[lower][nb_indices+1] = c;
+       	/* printf(" bornes inf avec indices de boucles englobants :\n");
+	   vect_print(bounds[lower][nb_indices+1]->vecteur, entity_local_name);*/
+	lind = contrainte_make(indices_in_vecteur); 
+	lind->succ = bounds[ind][nb_indices+1]; 
+	bounds[ind][nb_indices+1] = lind;
+	/* printf(" indices contenus dans la contrainte :\n");
+	   vect_print(bounds[ind][nb_indices+1]->vecteur, entity_local_name); */
+	nb_lower ++;
+      }
+    }
+  /* printf("Nb borne inf = %d, Nb borne sup = %d ;\n",nb_lower,nb_upper); */
+  
+
+   if  (!CONTRAINTE_UNDEFINED_P(bounds[lower][2])) {
+     /* case with 1 loop index in the loop bound constraints */ 
+     for(cl = bounds[lower][2], lind= bounds[ind][2]; cl !=NULL; cl=cl->succ,lind=lind->succ)  {
+       for(cu = bounds[upper][2]; cu !=NULL; cu =cu->succ) {
+	 /*  printf("Tests de la negation des  contraintes :\n");
+	 vect_print(cl->vecteur, entity_local_name);
+	 vect_print(cu->vecteur, entity_local_name); */
+	 if (vect_opposite_except(cl->vecteur,cu->vecteur,TCST)){
+	   cl_dup = contrainte_dup(cl);
+	   cl_dup->succ = list_cl, list_cl=cl_dup;
+	   cu_dup = contrainte_dup(cu);
+	   cu_dup->succ = list_cu, list_cu=cu_dup;
+	   lind_dup = contrainte_dup(lind);
+	   lind_dup->succ = list_ind, list_ind = lind_dup;
+	   nb_bounds ++;
+	 }
+       }
+     }  
+     *bound_inf= list_cl;
+     *bound_sup = list_cu;
+     *iterator = list_ind;
+     *motif_up_bound =- vect_coeff(TCST,list_cl->vecteur) - vect_coeff(TCST,list_cu->vecteur) +1;
+   }
+   else if (!CONTRAINTE_UNDEFINED_P(bounds[lower][1]) && !CONTRAINTE_UNDEFINED_P(bounds[upper][1])) {
+     /* case where loop bounds are numeric */
+     *bound_inf= bounds[lower][1];
+     *bound_sup = bounds[upper][1];
+     *iterator =  bounds[ind][1];
+     *motif_up_bound = - vect_coeff(TCST,bounds[lower][1]->vecteur) 
+       - vect_coeff(TCST,bounds[upper][1]->vecteur)+1;
+   } else {
+     /* Only bounds with several loop indices */ 
+     /* printf("PB - Only bounds with several loop indices\n"); */ 
+    *bound_inf= CONTRAINTE_UNDEFINED;
+    *bound_sup = CONTRAINTE_UNDEFINED;
+    *iterator = CONTRAINTE_UNDEFINED;
+    *motif_up_bound = 1;
+    
+   }
+  
+}
+
+
+static void claire_tiling(int taskNumber, reference ref,  region reg, stack indices,  string_buffer result)
+{
+  
+  Psysteme ps_reg = sc_dup(region_system(reg));
+  
+  entity var = reference_variable(ref);
+  int dim = gen_length(variable_dimensions(type_variable(entity_type(var))));
+  int i, j ;
+  string_buffer buffer_lower = string_buffer_make();
+  string_buffer buffer_upper = string_buffer_make();
+  string_buffer buffer_names = string_buffer_make();
+  string_buffer buffer_offset = string_buffer_make();
+  string_buffer buffer_fitting = string_buffer_make();
+  string_buffer buffer_paving = string_buffer_make();
+ 
+  string string_lower = "";
+  string string_upper = "";
+  string string_names = "";
+  string string_offset = "";
+  string string_paving = "";
+  string string_fitting =  "";
+  bool comma = FALSE;            
+
+  Pvecteur iterat, pi= VECTEUR_NUL;
+  Pcontrainte bound_inf = CONTRAINTE_UNDEFINED;
+  Pcontrainte bound_up = CONTRAINTE_UNDEFINED;
+  Pcontrainte iterator = CONTRAINTE_UNDEFINED;
+  int motif_up_bound =0;
+  int dim_indices= stack_size(indices);
+  int pav_matrix[10][10], fit_matrix[10][10];
+
+  for (i=1; i<=9;i++)
+    for (j=1;j<=9;j++)
+      pav_matrix[i][j]=0, fit_matrix[i][j]=0;
+
+  /* if (debug)  printf("matrix pavage dimension:[%d][%d]\n",dim,dim_indices); */
+  
+  STACK_MAP_X(index,entity,
+  { 
+    vect_add_elem (&pi,(Variable) index ,VALUE_ONE);
+  }, indices,1);
+  
+  /* if (debug) 
+    {
+      printf("liste des indices de boucles englobants :\n");
+      vect_print(pi, entity_local_name);
+      }*/
+
+  for(i=1; i<=dim ; i++)
+    { 
+      Psysteme ps = sc_dup(ps_reg); 
+      sc_transform_eg_in_ineg(ps);
+     
+      find_motif(ps, pi, i,  dim, &bound_inf, &bound_up, &iterator, &motif_up_bound);  
+
+
+	/*	extraction offset = terme / partie constante de lower*/
+     	string_buffer_append(buffer_offset,
+			     strdup(concatenate((comma)?",":"",
+						"vartype!(", 
+						(CONTRAINTE_UNDEFINED_P(bound_inf))? "0" : 
+						i2a(vect_coeff(TCST,bound_inf->vecteur)),
+					      ")",NULL)));	
+    
+      
+      /* paving = coef de l'indice de boucle */
+     	if (!CONTRAINTE_UNDEFINED_P(iterator)) {
+	  for (iterat = pi, j=1; !VECTEUR_NUL_P(iterat); iterat = iterat->succ, j++)   
+	      pav_matrix[i][j]= vect_coeff(var_of(iterat),iterator->vecteur);
+	}
+      
+      /* fitting = 1 */
+	if (!CONTRAINTE_UNDEFINED_P(bound_inf))
+	  fit_matrix[i][i]= (motif_up_bound >1) ? 1:0;
+	
+
+	/* motif = boucle prof = dim */
+
+	/* lower bound = 1 et upper bound = upper - lower */
+      string_buffer_append(buffer_lower,
+			   strdup(concatenate(comma? ",": "",
+					      "vartype!(0)",NULL))); 
+      string_buffer_append(buffer_upper,
+			   strdup(concatenate(comma? ",": "",
+					      "vartype!(",i2a(motif_up_bound),")",NULL)));
+      /* motif name = M_ numero = dim */
+
+      string_buffer_append(buffer_names,
+		       strdup(concatenate(comma? ",": "",
+					  QUOTE, 
+					  CLAIRE_MOTIF_PREFIX, i2a(taskNumber),"_",
+					  entity_user_name(var), "_",i2a(i), 
+					  QUOTE,NULL)));
+      comma = TRUE;
+    } 
+  for (j=1; j<=dim_indices ; j++){
+    if (j>1)  string_buffer_append(buffer_paving,strdup("),list("));
+    for(i=1; i<=dim ; i++)
+      string_buffer_append(buffer_paving,
+			   strdup(concatenate((i>1)?",":"",
+					      "vartype!(", 
+					      i2a( pav_matrix[i][j]),
+					      ")",NULL)));
+  }
+  for(i=1; i<=dim ; i++) { 
+    if (i>1)  
+      string_buffer_append(buffer_fitting,strdup("),list("));
+    for(j=1; j<=dim ; j++)
+      string_buffer_append(buffer_fitting,
+			   strdup(concatenate((j>1)?",":"",
+					      "vartype!(", 
+					      i2a( fit_matrix[i][j]),
+					      ")",NULL)));
+     }
+  
+  
+  string_buffer_append(result,strdup("offset = list<VARTYPE>("));
+  string_offset =string_buffer_to_string(buffer_offset);
+  string_buffer_append(result,string_offset);
+  string_buffer_append(result,strdup(concatenate("),",CLAIRE_RL,TAB,NULL)));
+  string_buffer_append(result,strdup("fitting = list<list[VARTYPE]>(list("));
+  string_fitting =string_buffer_to_string(buffer_fitting);
+  string_buffer_append(result,string_fitting);
+  string_buffer_append(result,strdup(concatenate(")),",CLAIRE_RL,TAB,NULL)));
+  string_buffer_append(result,strdup("paving = list<list[VARTYPE]>(list("));
+  string_paving =string_buffer_to_string(buffer_paving);
+  string_buffer_append(result,string_paving);
+  string_buffer_append(result,strdup(concatenate(")),",CLAIRE_RL,TAB,NULL)));
+  string_buffer_append(result,strdup("inLoopNest = LOOPNEST(deep = "));
+  string_buffer_append(result,i2a(dim));
+  string_buffer_append(result,strdup(concatenate(",",CLAIRE_RL,NULL)));
+  
+  /* Motif Lower bounds generation*/
+   string_buffer_append(result,
+		       strdup(concatenate(TAB,TAB,"lowerBound = list<VARTYPE>(", NULL)));
+  string_lower =string_buffer_to_string(buffer_lower);
+  string_buffer_append(result,string_lower);
+  string_buffer_append(result,strdup("),"));
+ 
+  /*  Motif Upper bounds generation */
+  string_buffer_append(result,
+		       strdup(concatenate(CLAIRE_RL,TAB,TAB, "upperBound = list<VARTYPE>(", NULL)));
+  
+  string_upper =string_buffer_to_string(buffer_upper);
+  string_buffer_append(result,string_upper);
+  string_buffer_append(result,strdup("),"));
+  
+  /*  Motif Loop Indices generation */
+  string_buffer_append(result,
+		       strdup(concatenate(CLAIRE_RL,TAB,TAB, "names = list<string>(", NULL)));
+  string_names =string_buffer_to_string(buffer_names);
+  string_buffer_append(result,string_names);
+  
+  string_buffer_append(result,strdup(")"));
+  string_buffer_append(result,strdup(concatenate(")",NULL)));
+
+}
+static void claire_references(int taskNumber, list l_regions, stack indices, string_buffer result)
+{ 
+  list lr; 
+  bool atleast_one_read_ref = FALSE;
+  bool atleast_one_written_ref = FALSE;
+  bool comma = FALSE;
+/*   Read array references first */
+   for ( lr = l_regions; !ENDP(lr); lr = CDR(lr))
+     {
+       region re = REGION(CAR(lr));
+       reference ref = region_reference(re);
+       if (array_reference_p(ref) && region_read_p(re)) {
+	 atleast_one_read_ref = TRUE;
+	 if (comma) string_buffer_append(result,strdup(concatenate(",",CLAIRE_RL,NULL)));
+	 string_buffer_append(result,strdup(concatenate(TAB,  "DATA(",NULL)));
+	 claire_reference(taskNumber, ref,  region_write_p(re), result);
+	 /* fprintf(stderr, "\n la  region ");    
+	    print_regions(lr);*/
+	 
+	 claire_tiling(taskNumber, ref,re, indices, result);
+	 string_buffer_append(result,strdup(concatenate(TAB, ")",NULL)));
+	 comma = TRUE;
+       } 
+      }
+   if (!atleast_one_read_ref) 
+     string_buffer_append(result,strdup(concatenate(TAB, "dummyDATA, ", 
+						    CLAIRE_RL,NULL)));
+   
+   for ( lr = l_regions; !ENDP(lr); lr = CDR(lr))
+     {
+       region re = REGION(CAR(lr));
+       reference ref = region_reference(re);
+       if (array_reference_p(ref) && region_write_p(re)) { 
+	 atleast_one_written_ref = TRUE;
+	 if (comma) string_buffer_append(result,strdup(concatenate(",",CLAIRE_RL,NULL)));
+	 string_buffer_append(result,strdup(concatenate(TAB, "DATA(",NULL)));
+	 claire_reference(taskNumber, ref,  region_write_p(re), result);
+	 /* fprintf(stderr, "\n la  region ");    
+	    print_regions(lr); */
+   	 claire_tiling(taskNumber, ref,re, indices, result); 
+	 string_buffer_append(result,strdup(")"));
+	 comma = TRUE;
+    }  
+     }   
+   if (!atleast_one_written_ref) 
+     string_buffer_append(result,strdup(concatenate(TAB,", dummyDATA ",NULL)));
+   
+}
+
+static void claire_data(int taskNumber,statement s, stack indices, string_buffer result )
+{  
+
+  list  l_regions = regions_dup(load_statement_local_regions(s)); 
+  string_buffer_append(result,strdup(concatenate("data = list<DATA>(",
+						 CLAIRE_RL,NULL)));
+  /* 
+  ifdebug(2) {
+    fprintf(stderr, "\n list of regions ");    
+    print_regions(l_regions);
+    fprintf(stderr, "\n for the statement");    
+    print_statement(s);    
+  }  
+  */
+   claire_references(taskNumber, l_regions, indices, result);
+ 
+   /*
+    claire_tiling();
+    claire_motif();
+   */
+        string_buffer_append(result,strdup(concatenate(")",CLAIRE_RL,NULL)));
+}
+    
+static string task_complexity(statement s)
+{
+  complexity stat_comp = load_statement_complexity(s);
+  string r;
+    if(stat_comp != (complexity) HASH_UNDEFINED_VALUE && !complexity_zero_p(stat_comp)) {
+	cons *pc = CHAIN_SWORD(NIL, complexity_sprint(stat_comp, FALSE,
+						TRUE));
+	 r = words_to_string(pc);
+    }
+    else r = i2a(1);
+    return  (r);
+}
+static void claire_task( int taskNumber, nest_context_p nest, string_buffer result)
+{
+  
+  statement s = gen_array_item(nest->nested_call,taskNumber);
+  stack st = gen_array_item(nest->nested_loops,taskNumber); 
+  stack sindices = gen_array_item(nest->nested_loop_indices,taskNumber); 
+  
+  string_buffer_append(result, strdup(CLAIRE_TASK_PREFIX));
+  string_buffer_append(result, i2a(taskNumber));
+  string_buffer_append(result, strdup(" :: TASK(unitSpentTime = vartype!("));
+  string_buffer_append(result,task_complexity(s)); 
+  string_buffer_append(result,strdup(concatenate("),",CLAIRE_RL,NULL)));
+  
+  claire_loop(st, result);
+  claire_data (taskNumber, s,sindices, result);
+  string_buffer_append(result, strdup(concatenate(")",NL,NL,NULL)));
+ 
+}
+
+static void  claire_tasks(statement stat, string_buffer result){
+
+  string  module_name = get_current_module_name();
+  nest_context_t nest;
+  int taskNumber =0;
+  nest.loops_for_call = stack_make(statement_domain,0,0);
+  nest.loop_indices = stack_make(entity_domain,0,0);
+  nest.current_stat = stack_make(statement_domain,0,0);
+  nest.nested_loops=  gen_array_make(0);
+  nest.nested_loop_indices =  gen_array_make(0);
+  nest.nested_call=  gen_array_make(0);
+  
+  if(statement_undefined_p(stat)) {
+    pips_internal_error("statement error");
+  }
+  
+  search_nested_loops_and_calls(stat,&nest);
+  /* ifdebug(2)  print_call_selection(&nest); */
+
+  for (taskNumber = 0; taskNumber<gen_array_nitems(nest.nested_call); taskNumber++)
+    
+    claire_task(taskNumber, &nest,result);
+  
+    
+  string_buffer_append(result,
+		       strdup(concatenate(NL, NL, 
+					  "PRES:APPLICATION := APPLICATION(name = symbol!(", 
+					  QUOTE, module_name, QUOTE, "), ", 
+					  NL, TAB,NULL)));
+  string_buffer_append(result, strdup(concatenate( "tasks = list<TASK>(", 
+						   NULL)));
+  
+  for(taskNumber = 0; taskNumber<gen_array_nitems(nest.nested_call)-1; taskNumber++)
+   string_buffer_append(result,strdup(concatenate(CLAIRE_TASK_PREFIX,
+						  i2a(taskNumber), ", ", NULL)));  
+  string_buffer_append(result,strdup(concatenate(CLAIRE_TASK_PREFIX,
+						 i2a(taskNumber) , "))", NL, NULL)));
+  
+  
+  gen_array_free(nest.nested_loops);
+  gen_array_free(nest.nested_loop_indices);
+  gen_array_free(nest.nested_call);
+  stack_free(&(nest.loops_for_call));
+  stack_free(&(nest.loop_indices));
+  stack_free(&(nest.current_stat));
+
+}
+
+
+/* Creates string for claire pretty printer.
+   This string divides in declarations (array decl.) and 
+   tasks which are loopnests with an instruction at the core.
+*/
+static string claire_code(entity module, statement stat)
+{
+  string_buffer result=string_buffer_make();
+  string result2;
+
+  claire_declarations(module,result);
+  claire_tasks(stat,result);
+
+  result2=string_buffer_to_string(result); 
+  /*  string_buffer_free(&result,TRUE); */
+  /* ifdebug(2)
+    {
+      printf("%s", result2);
+      } */
+  return result2;
+}
+
+static bool valid_specification_p(entity module, statement stat)
+{ return TRUE;
+}
+
+/******************************************************** PIPSMAKE INTERFACE */
+
+#define CLAIREPRETTY    ".cl"
+
+/* Initiates claire pretty print modules
+ */
+bool print_claire_code(string module_name)
+{
+  FILE * out;
+  string ppt;
+ 
+  entity module = local_name_to_top_level_entity(module_name);
+  string claire = db_build_file_resource_name(DBR_CLAIRE_PRINTED_FILE, 
+					      module_name, CLAIREPRETTY);
+  string  dir = db_get_current_workspace_directory();
+  string filename = strdup(concatenate(dir, "/", claire, NULL));
+  
+  statement stat=(statement) db_get_memory_resource(DBR_CODE, 
+						    module_name, TRUE);
+
+  init_cost_table();
+ /* Get the READ and WRITE regions of the module */
+   set_rw_effects((statement_effects) 
+		 db_get_memory_resource(DBR_REGIONS, module_name, TRUE)); 
+
+  set_complexity_map( (statement_mapping)
+	db_get_memory_resource(DBR_COMPLEXITIES, module_name, TRUE));
+
+  if(statement_undefined_p(stat))
+    {
+      pips_internal_error("No statement for module %s\n", module_name);
+    }
+  set_current_module_entity(module);
+  set_current_module_statement(stat);
+
+  debug_on("CLAIREPRETTYPRINTER_DEBUG_LEVEL"); 
+  pips_debug(1, "Spec validation before Claire prettyprinter for %s\n", 
+	     entity_name(module));
+  if (valid_specification_p(module,stat)){ 
+    pips_debug(1, "Spec is valid\n");
+    pips_debug(1, "Begin Claire prettyprinter for %s\n", entity_name(module));
+    
+    ppt = claire_code(module, stat);
+    pips_debug(1, "end\n");
+    debug_off();  
+    
+    /* save to file */
+    out = safe_fopen(filename, "w");
+    fprintf(out, "// Claire pretty print for module %s. \n%s", 
+	    module_name, ppt);
+    safe_fclose(out, filename);
+    free(ppt);
+  }
+
+  free(dir);
+  free(filename);
+
+  DB_PUT_FILE_RESOURCE(DBR_CLAIRE_PRINTED_FILE, module_name, claire);
+
+  reset_current_module_statement();
+  reset_current_module_entity();
+
+  return TRUE;
+}
+
+ 
