@@ -3200,15 +3200,15 @@ assigns it to its value function of the new index and the second one
 (after the end of the loop) assigns it to its final value.
 %%!UserManualDocumentation
 
-\begin{verbatim}
-alias loop_normalize 'Loop Normalize'
-\end{verbatim}
+% \begin{verbatim}
+% alias loop_normalize 'Loop Normalize'
+% \end{verbatim}
 
-\begin{verbatim}
-loop_normalize          > MODULE.code
-        < PROGRAM.entities
-        < MODULE.code
-\end{verbatim}
+% \begin{verbatim}
+% loop_normalize          > MODULE.code
+%         < PROGRAM.entities
+%         < MODULE.code
+% \end{verbatim}
 
 
 \subsubsection{Guard Elimination and Loop Transformations}
@@ -6432,6 +6432,10 @@ This part of \PIPS{} was implemented at Centre d'Etudes Atomiques,
 Limeil-Brévannes, by Benoît de Dinechin, Arnauld Leservot and Alexis
 Platonoff.
 
+%%
+%% PAF-related code
+%%
+
 \subsection{Static Control Detection}
 \label{subsection-static-control-detection}
 
@@ -6450,12 +6454,12 @@ is not specified here for implementation bug purpose.
 The definition of a static control program is given in~\cite{Fea91}.
 %%!UserManualDocumentation
 
-\begin{verbatim}
-alias static_controlize 'Static Controlize'
-static_controlize               > MODULE.static_control
-        < PROGRAM.entities
-        < MODULE.code
-\end{verbatim}
+% \begin{verbatim}
+% alias static_controlize 'Static Controlize'
+% static_controlize               > MODULE.static_control
+%         < PROGRAM.entities
+%         < MODULE.code
+% \end{verbatim}
 
 See the alias \verb|print_code_static_control| and function
 \verb|print_code_static_control| in
@@ -6493,26 +6497,26 @@ there is an execution of R.
 
 Known bug: what happens if the input is not a static control program?
 
-\begin{verbatim}
+% \begin{verbatim}
 
-array_dfg                       > MODULE.adfg
-        < PROGRAM.entities
-        < MODULE.code
-        < MODULE.static_control
-        < MODULE.dg
-        < MODULE.preconditions
-\end{verbatim}
+% array_dfg                       > MODULE.adfg
+%         < PROGRAM.entities
+%         < MODULE.code
+%         < MODULE.static_control
+%         < MODULE.dg
+%         < MODULE.preconditions
+% \end{verbatim}
 
 
-\begin{verbatim}
+% \begin{verbatim}
 
-alias adfg_file 'Array Data Flow Graph'
+% alias adfg_file 'Array Data Flow Graph'
 
-print_array_dfg                 > MODULE.adfg_file
-        < PROGRAM.entities
-        < MODULE.code
-        < MODULE.adfg
-\end{verbatim}
+% print_array_dfg                 > MODULE.adfg_file
+%         < PROGRAM.entities
+%         < MODULE.code
+%         < MODULE.adfg
+% \end{verbatim}
 
 \subsection{Scheduling}
 \label{subsection-scheduling}
@@ -6531,24 +6535,24 @@ The output of the scheduling is of the following form:
 of the loop counters of the surrounding loops. 
 
 
-\begin{verbatim}
+% \begin{verbatim}
 
-scheduling              > MODULE.bdt
-        < PROGRAM.entities
-        < MODULE.code
-        < MODULE.static_control
-        < MODULE.adfg
-\end{verbatim}
+% scheduling              > MODULE.bdt
+%         < PROGRAM.entities
+%         < MODULE.code
+%         < MODULE.static_control
+%         < MODULE.adfg
+% \end{verbatim}
 
-\begin{verbatim}
+% \begin{verbatim}
 
-alias bdt_file 'Time stamps'
+% alias bdt_file 'Time stamps'
 
-print_bdt              > MODULE.bdt_file
-        < PROGRAM.entities
-        < MODULE.code
-        < MODULE.bdt
-\end{verbatim}
+% print_bdt              > MODULE.bdt_file
+%         < PROGRAM.entities
+%         < MODULE.code
+%         < MODULE.bdt
+% \end{verbatim}
 
 \subsection{Mapping (a.k.a. Placement)}
 
@@ -6569,24 +6573,24 @@ The output of the placement is:
 grid, in function of the loop counters of the surrounding loops.
 
 
-\begin{verbatim}
-prgm_mapping            > MODULE.plc
-        < PROGRAM.entities
-        < MODULE.code
-        < MODULE.static_control
-        < MODULE.adfg
-        < MODULE.bdt
-\end{verbatim}
+% \begin{verbatim}
+% prgm_mapping            > MODULE.plc
+%         < PROGRAM.entities
+%         < MODULE.code
+%         < MODULE.static_control
+%         < MODULE.adfg
+%         < MODULE.bdt
+% \end{verbatim}
 
-\begin{verbatim}
+% \begin{verbatim}
 
-alias plc_file 'Placement'
+% alias plc_file 'Placement'
 
-print_plc               > MODULE.plc_file
-        < PROGRAM.entities
-        < MODULE.code
-        < MODULE.plc
-\end{verbatim}
+% print_plc               > MODULE.plc_file
+%         < PROGRAM.entities
+%         < MODULE.code
+%         < MODULE.plc
+% \end{verbatim}
 
 \subsection{Code Generation}
 
@@ -6594,15 +6598,15 @@ Function \texttt{reindexing} transforms the code using the schedule
 (\texttt{bdt}) and the mapping (\texttt{plc}) (see~\cite{Col93,Pla95a}). The
 result is a new resource named \verb/reindexed_code/.
 
-\begin{verbatim}
-reindexing            > MODULE.reindexed_code
-        < PROGRAM.entities
-        < MODULE.code
-        < MODULE.static_control
-        < MODULE.adfg
-        < MODULE.bdt
-        < MODULE.plc
-\end{verbatim}
+% \begin{verbatim}
+% reindexing            > MODULE.reindexed_code
+%         < PROGRAM.entities
+%         < MODULE.code
+%         < MODULE.static_control
+%         < MODULE.adfg
+%         < MODULE.bdt
+%         < MODULE.plc
+% \end{verbatim}
 
 \subsection{Prettyprinters for CM Fortran}
 
@@ -6612,10 +6616,10 @@ result is stored in a file suffixed by \verb+.fcm+. The second one
 produces CRAFT Fortran and the result is stored in a file suffixed by
 \verb+.craft+.
 
-\begin{verbatim}
-alias print_parallelizedCMF_code 'CM Fortran'
-alias print_parallelizedCRAFT_code 'CRAFT Fortran'
-\end{verbatim}
+% \begin{verbatim}
+% alias print_parallelizedCMF_code 'CM Fortran'
+% alias print_parallelizedCRAFT_code 'CRAFT Fortran'
+% \end{verbatim}
 
 %%@UserManualDocumentation: print_parallelizedCMF_code
 Use the polyhedric method to parallelize the code and display the
@@ -6623,14 +6627,14 @@ reindexed code in a CMF (parallel Fortran extension from TMC, Thinking
 Machine Corporation) style.
 %%!UserManualDocumentation
 
-\begin{verbatim}
-print_parallelizedCMF_code       > MODULE.parallelprinted_file
-        < PROGRAM.entities
-        < MODULE.adfg
-        < MODULE.bdt
-        < MODULE.plc
-        < MODULE.reindexed_code
-\end{verbatim}
+% \begin{verbatim}
+% print_parallelizedCMF_code       > MODULE.parallelprinted_file
+%         < PROGRAM.entities
+%         < MODULE.adfg
+%         < MODULE.bdt
+%         < MODULE.plc
+%         < MODULE.reindexed_code
+% \end{verbatim}
 
 %%@UserManualDocumentation: print_parallelizedCRAFT_code
 Use the polyhedric method to parallelize the code and display the
@@ -6638,14 +6642,14 @@ reindexed code in a CRAFT (parallel Fortran used on the Cray T3 serie)
 style.
 %%!UserManualDocumentation
 
-\begin{verbatim}
-print_parallelizedCRAFT_code     > MODULE.parallelprinted_file
-        < PROGRAM.entities
-        < MODULE.adfg
-        < MODULE.bdt
-        < MODULE.plc
-        < MODULE.reindexed_code
-\end{verbatim}
+% \begin{verbatim}
+% print_parallelizedCRAFT_code     > MODULE.parallelprinted_file
+%         < PROGRAM.entities
+%         < MODULE.adfg
+%         < MODULE.bdt
+%         < MODULE.plc
+%         < MODULE.reindexed_code
+% \end{verbatim}
 
 
 \section{User Interface Menu Layouts}
