@@ -67,9 +67,6 @@
 
 #include "c_syntax.h"
 
-/* To avoid warnings */
-extern char *strdup(const char *s1);
-
 #define C_ERROR_VERBOSE 1 /* much clearer error messages with bison */
 
 extern int c_lex(void);

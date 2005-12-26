@@ -68,9 +68,6 @@
 #include "c_syntax.h"
 #include "cyacc.h"
 
-/* To avoid warnings */
-extern char *strdup(const char *s1);
-extern int fileno(FILE *stream);
 %}
 
 decdigit [0-9]

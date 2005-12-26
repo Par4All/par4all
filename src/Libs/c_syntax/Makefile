@@ -4,13 +4,15 @@ TARGET	= c_syntax
 
 YOPT	=	-d
 
-LIB_CFILES =	c_parser.c \
+INC_CFILES =	c_parser.c \
 		statement.c \
 		util.c
 
 DERIVED_HEADERS = cyacc.h
 
 DERIVED_CFILES = cyaccer.c clexer.c
+
+LIB_CFILES = 	$(INC_CFILES) $(DERIVED_CFILES)
 
 $(TARGET).h: $(DERIVED_HEADERS) $(DERIVED_CFILES) 
 
