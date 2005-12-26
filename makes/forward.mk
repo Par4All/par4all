@@ -69,11 +69,13 @@ la_cible_par_defaut_si_aucune_n_est_precisee_sur_la_ligne_de_commande: all
 	  echo "FWD_OUT=$(FWD_OUT)"; \
 	fi;\
 	for d in $(FWD_DIRS) ; do \
-	  if test -d $$d ; \
+	  if test -d $$d && test -f $$d/Makefile ; \
 	  then \
-	    echo Forwarding $@ to $(FWD_ROOT)/$$d >&2 ;\
+	    echo "Forwarding $@ to $(FWD_ROOT)/$$d" >&2 ;\
 	    if $(MAKE) -C $$d $(FWD_MKFLAGS) FWD_ROOT="$(FWD_ROOT)/$$d" $@ ;\
 	    then report=succeeded ; else report=failed ; fi ;\
 	    echo "$(FWD_MSG) $(FWD_ROOT)/$$d: $@ $$report" $(FWD_REPORT);\
+	  else \
+	    echo "Ignoring directory $$d" >&2 ;\
 	  fi ; \
 	 done $(FWD_OUT)

@@ -6,14 +6,14 @@
 
 CPPFLAGS += \
 	-I. \
-	-I$(NEWGEN_ROOT)/Include \
-	-I$(LINEAR_ROOT)/Include \
-	-I$(PIPS_ROOT)/Include \
-	-I$(EXTERN_ROOT)/Include 
+	-I$(NEWGEN_ROOT)/include \
+	-I$(LINEAR_ROOT)/include \
+	-I$(PIPS_ROOT)/include \
+	-I$(EXTERN_ROOT)/include 
 
 LDFLAGS += \
 	-L./$(ARCH) \
-	-L$(PIPS_ROOT)/Lib/$(ARCH) \
-	-L$(NEWGEN_ROOT)/Lib/$(ARCH) \
-	-L$(LINEAR_ROOT)/Lib/$(ARCH) \
-	-L$(EXTERN_ROOT)/Lib/$(ARCH)
+	-L$(PIPS_ROOT)/lib/$(ARCH) \
+	-L$(NEWGEN_ROOT)/lib/$(ARCH) \
+	-L$(LINEAR_ROOT)/lib/$(ARCH) \
+	-L$(EXTERN_ROOT)/lib/$(ARCH)

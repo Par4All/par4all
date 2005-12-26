@@ -2,30 +2,38 @@
 
 # expected macros:
 # ROOT
+ifndef ROOT
+$(error "expected ROOT macro not found!")
+endif
+
 # ARCH (or default provided)
 
 # INC_TARGET: header file for directory (on INC_CFILES or LIB_CFILES)
 
 # LIB_CFILES: C files that are included in the library
 # LIB_TARGET: generated library file
-
 # BIN_TARGET: generated binary files
 
+# files to be installed in subdirectories:
 # INSTALL_INC: headers to be installed (INC_TARGET not included)
 # INSTALL_LIB: libraries to be added (LIB_TARGET not included)
 # INSTALL_BIN: added binaries (BIN_TARGET not included)
+# INSTALL_EXE: added executable (shell scripts or the like)
+# INSTALL_ETC: configuration files
+# INSTALL_SHR: shared (cross platform) files
+# INSTALL_UTL: script utilities
+# INSTALL_RTM: runtime-related stuff
+# INSTALL_MAN DOC HTM: various documentations
 
 all: recompile
 
-recompile: phase0 phase1 phase2 phase3 phase4 phase5
+recompile: phase0 phase1 phase2 phase3 phase4 phase5 phase6
 
 ########################################################################## ROOT
 
-ifdef ROOT
+ifndef INSTALL_DIR
 INSTALL_DIR	= $(ROOT)
-else
-$(error "no root directory!")
-endif # ROOT
+endif # INSTALL_DIR
 
 ifndef PIPS_ROOT
 PIPS_ROOT	= $(ROOT)/../pips
@@ -43,16 +51,8 @@ ifndef EXTERN_ROOT
 EXTERN_ROOT	= $(ROOT)/../extern
 endif # EXTERN_ROOT
 
-# where to install stuff
-BIN.d	= $(INSTALL_DIR)/Bin
-LIB.d	= $(INSTALL_DIR)/Lib
-INC.d	= $(INSTALL_DIR)/Include
-DOC.d	= $(INSTALL_DIR)/Doc
-HTM.d	= $(INSTALL_DIR)/Html
-UTL.d	= $(INSTALL_DIR)/Utils
-SHR.d	= $(INSTALL_DIR)/Bin
-RTM.d	= $(INSTALL_DIR)/Runtime
-MAKE.d	= $(INSTALL_DIR)/makes
+# where are make files
+MAKE.d	= $(ROOT)/makes
 
 ########################################################################## ARCH
 
@@ -76,16 +76,37 @@ ifndef ARCH
 $(error "ARCH macro is not defined")
 endif
 
+# where to install stuff
+BIN.d	= $(INSTALL_DIR)/bin/$(ARCH)
+EXE.d	= $(INSTALL_DIR)/bin
+LIB.d	= $(INSTALL_DIR)/lib
+INC.d	= $(INSTALL_DIR)/include
+ETC.d	= $(INSTALL_DIR)/etc
+DOC.d	= $(INSTALL_DIR)/doc
+MAN.d	= $(INSTALL_DIR)/man
+HTM.d	= $(INSTALL_DIR)/html
+UTL.d	= $(INSTALL_DIR)/utils
+SHR.d	= $(INSTALL_DIR)/share
+RTM.d	= $(INSTALL_DIR)/runtime
+
+clean: NO_INCLUDES=1
+
+# ??? do not include for some targets such as "clean"
+ifndef NO_INCLUDES
 include $(MAKE.d)/$(ARCH).mk
 include $(MAKE.d)/svn.mk
-#include $(MAKE.d)/local.mk
+ifdef PROJECT
+include $(MAKE.d)/$(PROJECT).mk
+endif # PROJECT
+endif # NO_INCLUDES
+
+# ??? fix path...
+PATH	:= $(PATH):$(NEWGEN_ROOT)/bin:$(NEWGEN_ROOT)/bin/$(ARCH)
 
 ###################################################################### DO STUFF
 
-all:
-
-UTC_DATE = $(shell date -u | tr ' ' '_')
-CPPFLAGS += -DSOFT_ARCH='"$(ARCH)"' -I$(ROOT)/Include
+UTC_DATE := $(shell date -u | tr ' ' '_')
+CPPFLAGS += -DSOFT_ARCH='"$(ARCH)"' -I$(ROOT)/include
 
 # {C,CPP,LD,L,Y}OPT macros allow to *add* things from the command line
 # as gmake CPPOPT="-DFOO=bar" ... that will be added to the defaults
@@ -107,13 +128,21 @@ COPY	= cp
 MOVE	= mv
 JAVAC	= javac
 JNI	= javah -jni
-MKDIR	= mkdir -p
+MKDIR	= mkdir -p -m 755
 RMDIR	= rmdir
 INSTALL	= install
+CMP	= cmp -s
+
+# misc filters
+FLTVERB	= sed  '/^\\begin{verbatim}/,/^\\end{verbatim}/!d;\
+		/^\\begin{verbatim}/d;/^\\end{verbatim}/s,.*,,'
+UPPER	= tr '[a-z]' '[A-Z]'
 
 # for easy debugging... e.g. gmake ECHO='something' echo
 echo:; @echo $(ECHO)
 
+%: %.c
+%: %.o
 $(ARCH)/%.o: %.c; $(COMPILE) $< -o $@
 $(ARCH)/%.o: %.f; $(F77CMP) $< -o $@
 
@@ -133,11 +162,6 @@ $(ARCH)/%.o: %.f; $(F77CMP) $< -o $@
 	$(LATEX) $<
 	touch $@
 
-%.newgen: %.tex
-	$(RM) $@
-	remove-latex-comments $<
-	chmod a-w $@
-
 ################################################################## DEPENDENCIES
 
 ifdef LIB_CFILES
@@ -154,23 +178,58 @@ DEPEND	= .depend.$(ARCH)
 
 phase0: $(DEPEND)
 
+ifndef NO_INCLUDES
 -include $(DEPEND)
+endif
 
 # generation by make recursion
-$(DEPEND): $(LIB_CFILES) $(OTHER_CFILES) $(DERIVED_LIB_HEADERS)
+$(DEPEND): $(LIB_CFILES) $(OTHER_CFILES) $(DERIVED_CFILES)
 	touch $@
 	test -s $(DEPEND) || $(MAKE) depend
 
 # actual generation is done on demand only
-depend:
-	$(MAKEDEP) $(LIB_CFILES) $(OTHER_CFILES) | \
-		sed 's,^\(.*\.o:\),$(ARCH)/\1,' > $(DEPEND)
+depend: $(DERIVED_HEADERS) $(INC_TARGET)
+	$(MAKEDEP) $(LIB_CFILES) $(OTHER_CFILES) $(DERIVED_CFILES) | \
+	sed    's,^\(.*\.o:\),$(ARCH)/\1,;\
+		s,$(PIPS_ROOT),$$(PIPS_ROOT),g;\
+		s,$(LINEAR_ROOT),$$(LINEAR_ROOT),g;\
+		s,$(NEWGEN_ROOT),$$(NEWGEN_ROOT),g;\
+		s,$(ROOT),$$(ROOT),g' > $(DEPEND)
 
 clean: depend-clean
 
 depend-clean:; $(RM) .depend.*
 
 endif # need_depend
+
+########################################################### CONFIGURATION FILES
+
+ifdef ETC_TARGET
+
+INSTALL_ETC	+= $(ETC_TARGET)
+
+endif # ETC_TARGET
+
+ifdef INSTALL_ETC
+
+$(ETC.d):
+	$(MKDIR) $@
+
+.build_etc: $(INSTALL_ETC) $(ETC.d)
+	for f in $(INSTALL_ETC) ; do \
+	  $(CMP) $$f $(ETC.d)/$$f || \
+	    $(INSTALL) -m 644 $$f $(ETC.d) ; \
+	done
+	touch $@
+
+clean: etc-clean
+
+etc-clean:
+	$(RM) .build_etc
+
+phase1: .build_etc
+
+endif # INSTALL_ETC
 
 ####################################################################### HEADERS
 
@@ -181,7 +240,7 @@ ifndef INC_CFILES
 INC_CFILES	= $(LIB_CFILES)
 endif # INC_CFILES
 
-name	= $(subst -, _, $(notdir $(CURDIR)))
+name	= $(subst -,_, $(notdir $(CURDIR)))
 
 build-header-file:
 	$(COPY) $(TARGET)-local.h $(INC_TARGET); \
@@ -191,7 +250,10 @@ build-header-file:
 	  echo "#define $(name)_header_included";\
 	  cat $(TARGET)-local.h;\
 	  $(PROTOIZE) $(INC_CFILES) | \
-	  sed 's/struct _iobuf/FILE/g;s/__const/const/g;/_BUFFER_STATE/d;/__inline__/d;' ;\
+	  sed 's/struct _iobuf/FILE/g;\
+	       s/__const/const/g;\
+	       /_BUFFER_STATE/d;\
+	       /__inline__/d;' ; \
 	  echo "#endif /* $(name)_header_included */";\
 	} > $(INC_TARGET).tmp
 	$(MOVE) $(INC_TARGET).tmp $(INC_TARGET)
@@ -225,7 +287,7 @@ $(INC.d):; $(MKDIR) $(INC.d)
 
 .build_inc: $(INSTALL_INC) $(INC.d)
 	for f in $(INSTALL_INC) ; do \
-	  cmp $$f $(INC.d)/$$f || \
+	  $(CMP) $$f $(INC.d)/$$f || \
 	    $(INSTALL) -m 644 $$f $(INC.d) ; \
 	done
 	touch $@
@@ -240,7 +302,8 @@ endif # INSTALL_INC
 ####################################################################### LIBRARY
 
 # ARCH subdirectory
-$(ARCH):; test -d $(ARCH) || $(MKDIR) $(ARCH)
+$(ARCH):
+	test -d $(ARCH) || $(MKDIR) $(ARCH)
 
 clean: arch-clean
 
@@ -269,7 +332,7 @@ ifdef INSTALL_LIB
 
 phase2: $(ARCH)
 
-phase3:	.build_lib.$(ARCH)
+phase4:	.build_lib.$(ARCH)
 
 $(INSTALL_LIB): $(ARCH)
 
@@ -281,7 +344,7 @@ $(LIB.d)/$(ARCH): $(LIB.d)
 
 .build_lib.$(ARCH): $(INSTALL_LIB) $(LIB.d)/$(ARCH)
 	for l in $(INSTALL_LIB) ; do \
-	  cmp $$l $(LIB.d)/$$l || \
+	  $(CMP) $$l $(LIB.d)/$$l || \
 	    $(INSTALL) -m 644 $$l $(LIB.d)/$(ARCH) ; \
 	done
 	touch $@
@@ -303,6 +366,7 @@ compile:
 	$(MAKE) phase3
 	$(MAKE) phase4
 	$(MAKE) phase5
+	$(MAKE) phase6
 
 install: recompile
 
@@ -313,6 +377,26 @@ phase2:
 phase3:
 phase4:
 phase5:
+phase6:
+
+ifdef INSTALL_EXE
+
+phase2: .build_exe
+
+$(EXE.d):
+	$(MKDIR) $@
+
+.build_exe: $(INSTALL_EXE) $(EXE.d)
+	$(INSTALL) -m 755 $(INSTALL_EXE) $(EXE.d)
+	touch $@
+
+clean: exe-clean
+
+exe-clean:
+	$(RM) .build_exe
+
+endif # INSTALL_EXE
+
 
 # binaries
 ifdef BIN_TARGET
@@ -321,7 +405,7 @@ endif # BIN_TARGET
 
 ifdef INSTALL_BIN
 
-phase3: .build_bin.$(ARCH)
+phase5: .build_bin.$(ARCH)
 
 $(INSTALL_BIN): $(ARCH)
 
@@ -345,7 +429,7 @@ endif # INSTALL_BIN
 # documentation
 ifdef INSTALL_DOC
 
-phase4: .build_doc
+phase6: .build_doc
 
 $(DOC.d):; $(MKDIR) $(DOC.d)
 
@@ -360,15 +444,51 @@ doc-clean:
 
 endif # INSTALL_DOC
 
+# manuel
+ifdef INSTALL_MAN
+
+phase6: .build_man
+
+$(MAN.d):; $(MKDIR) $(MAN.d)
+
+.build_man: $(INSTALL_MAN) $(MAN.d)
+	$(INSTALL) -m 644 $(INSTALL_MAN) $(MAN.d)
+	touch $@
+
+clean: man-clean
+
+man-clean:
+	$(RM) .build_man
+
+endif # INSTALL_MAN
+
+# documentations html
+ifdef INSTALL_HTM
+
+phase6: .build_htm
+
+$(HTM.d):; $(MKDIR) $(HTM.d)
+
+.build_htm: $(INSTALL_HTM) $(HTM.d)
+	$(INSTALL) -m 644 $(INSTALL_HTM) $(HTM.d)
+	touch $@
+
+clean: htm-clean
+
+htm-clean:
+	$(RM) .build_htm
+
+endif # INSTALL_HTM
+
 # shared
 ifdef INSTALL_SHR
 
-phase2: .build_shr 
+phase2: .build_shr
 
 $(SHR.d):; $(MKDIR) $(SHR.d)
 
 .build_shr: $(INSTALL_SHR) $(SHR.d)
-	$(INSTALL) -m 755 $(INSTALL_SHR) $(SHR.d)
+	$(INSTALL) -m 644 $(INSTALL_SHR) $(SHR.d)
 	touch $@
 
 clean: shr-clean
@@ -395,3 +515,10 @@ utl-clean:
 	$(RM) .build_utl
 
 endif # INSTALL_UTL
+
+# other targets
+
+clean: main-clean
+
+main-clean:
+	$(RM) *~ *.tmp

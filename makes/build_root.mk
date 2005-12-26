@@ -2,7 +2,10 @@
 
 FWD_DIRS	= src
 
-build:
+build: compile
+	$(MAKE) -C src phase6
+
+compile:
 	$(MAKE) -C src phase0
 	$(MAKE) -C src phase1
 	$(MAKE) -C src phase2
@@ -10,8 +13,13 @@ build:
 	$(MAKE) -C src phase4
 	$(MAKE) -C src phase5
 
+# do not include dependencies for some target
+clean: NO_INCLUDES=1
+export NO_INCLUDES
+
 unbuild: clean
-	$(RM) -r ./Bin ./Include ./Lib ./Share ./Utils ./Doc ./Runtime TAGS
+	$(RM) -rf ./bin ./include ./lib ./share ./utils ./doc ./runtime ./etc
+	$(RM) -f TAGS
 
 # todo: install, uninstall
 install:
