@@ -11,8 +11,8 @@
 #include <strings.h>
 #include <unistd.h>
 
-#include "readline.h"
-#include "history.h"
+#include <readline/readline.h>
+#include <readline/history.h>
 
 #define HPFC_PROMPT "hpfc> " 		/* prompt for readline  */
 #define HPFC_SHELL "hpfc"   		/* forked shell script  */

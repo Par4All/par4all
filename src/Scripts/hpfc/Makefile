@@ -19,10 +19,13 @@ else
 ROOT    = ../../..
 endif
 
-#PROJECT = pips
+PROJECT = pips
+
 include $(ROOT)/makes/main.mk
 
 # local stuff
+$(ARCH)/hpfc_interactive.o: $(ARCH)
+
 $(ARCH)/hpfc_interactive: $(ARCH)/hpfc_interactive.o
 	$(LINK) $(ARCH)/hpfc_interactive \
 		$(ARCH)/hpfc_interactive.o -lreadline -ltermcap
