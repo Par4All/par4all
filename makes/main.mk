@@ -89,12 +89,26 @@ UTL.d	= $(INSTALL_DIR)/utils
 SHR.d	= $(INSTALL_DIR)/share
 RTM.d	= $(INSTALL_DIR)/runtime
 
+# do not include for some targets such as "clean"
 clean: NO_INCLUDES=1
+export NO_INCLUDES
 
-# ??? do not include for some targets such as "clean"
 ifndef NO_INCLUDES
+
+# special definitions for the target architecture
 include $(MAKE.d)/$(ARCH).mk
-include $(MAKE.d)/svn.mk
+
+# svn related targets...
+# include $(MAKE.d)/svn.mk
+
+# site specific stuff...
+-include $(MAKE.d)/config.mk
+
+# auto generate config if necessary
+$(MAKE.d)/config.mk:
+	touch $@
+
+# project specific rules
 ifdef PROJECT
 include $(MAKE.d)/$(PROJECT).mk
 endif # PROJECT
