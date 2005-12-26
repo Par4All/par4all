@@ -67,13 +67,13 @@ public class JPips
     */
   static public void main(String args[]) 
   {
-    console = true;
-    if(args.length>0 && args[0].equals(noConsole)) console = false;
-    frame = new PFrame(title);
-    GridBagLayout fLayout = new GridBagLayout();
-    frame.getContentPane().setLayout(fLayout);
-    JPips jpips = new JPips();
-    jpips.init();
+      console = args.length>0 && args[0].equals(noConsole);
+      console = false; // ???
+      frame = new PFrame(title);
+      GridBagLayout fLayout = new GridBagLayout();
+      frame.getContentPane().setLayout(fLayout);
+      JPips jpips = new JPips();
+      jpips.init();
   }
 
   /** Launches TPips.
@@ -82,15 +82,15 @@ public class JPips
   public void init() 
   {
     super.init();
-    
     tpips = new TPips(this);
     tpips.start();
     
     GridBagConstraints c = new GridBagConstraints();
     optionVector = new Vector();
-    
+
     buildJPipsPanel();
     buildOptionVector();
+
     frame.setJMenuBar(getMenuBar());
     add((Container)frame.getContentPane(),getJPipsPanel(),
 	0,0,1,1,1,1,1.0,1.0,5,
@@ -169,18 +169,14 @@ public class JPips
   {
     filePanel = new PPanel(new GridBagLayout());
     GridBagConstraints c = new GridBagConstraints();
-    PPanel p;
-    PButton b;
-    ActionListener a;
-    PTextField tf;
-    
-      //displayer panel
+
+    // displayer panel
     textDisplayer = new TextDisplayer(frame);
     add((Container)filePanel,(PPanel)textDisplayer.getComponent(),
 	1,2,2,1,1,1,1.0,0.0,5,
 	GridBagConstraints.NONE,GridBagConstraints.EAST,c);
     tpips.textDisplayer = textDisplayer;
-    
+
     graphDisplayer = new GraphDisplayer(frame);
     tpips.graphDisplayer = graphDisplayer;
 
@@ -194,24 +190,26 @@ public class JPips
 
     //directory
     directoryManager = new DirectoryManager(frame, tpips);
-    p = (PPanel)directoryManager.getComponent();
-    add((Container)filePanel,p,0,0,3,1,1,1,1.0,0.0,5,
+    PPanel p = (PPanel) directoryManager.getComponent();
+    add((Container) filePanel, p, 0, 0, 3, 1, 1, 1, 1.0, 0.0, 5,
 	GridBagConstraints.HORIZONTAL,GridBagConstraints.WEST,c);
+
+    System.err.println("x4");
     
     //modules
     moduleManager = new ModuleManager(tpips);
     p = (PPanel)moduleManager.getComponent();
-    add((Container)filePanel,p,0,2,1,1,1,1,0.0,0.0,5,
+    add((Container)filePanel, p, 0, 2, 1, 1, 1, 1, 0.0, 0.0, 5,
 	GridBagConstraints.NONE,GridBagConstraints.WEST,c);
     tpips.list = moduleManager.list;
-    
+
     //workspace
     workspaceManager = new WorkspaceManager(tpips, frame, directoryManager,
 					    moduleManager, textDisplayer);
     p = (PPanel)workspaceManager.getComponent();
     add((Container)filePanel,p,0,1,1,1,1,1,0.0,0.0,5,
 	GridBagConstraints.NONE,GridBagConstraints.WEST,c);
-    
+
     //console
     if(console)
     {
