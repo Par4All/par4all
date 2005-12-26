@@ -624,6 +624,7 @@ generate_domain(
 	fprintf(header, 
 		"/* %s\n */\n"
 		"#define %s(x) ((%s)((x).p))\n"
+		"#define %s_(x) ((x).e)\n"
 		"#define %s_TYPE %s\n"
 		"#define %s_undefined ((%s)gen_chunk_undefined)\n"
 		"#define %s_undefined_p(x) ((x)==%s_undefined)\n"
@@ -633,8 +634,9 @@ generate_domain(
 		"extern %s check_%s(%s);\n"
 		"extern bool %s_consistent_p(%s);\n"
 		"extern bool %s_defined_p(%s);\n",
-		Name,
+		Name, /* comments */
 		Name, name, /* defines... */
+		Name,
 		Name, name,
 		name, name,
 		name, name,
