@@ -412,11 +412,8 @@ $(INSTALL_BIN): $(ARCH)
 $(BIN.d):
 	$(MKDIR) $@
 
-$(BIN.d)/$(ARCH): $(BIN.d)
-	$(MKDIR) $@
-
-.build_bin.$(ARCH): $(INSTALL_BIN) $(BIN.d)/$(ARCH)
-	$(INSTALL) -m 755 $(INSTALL_BIN) $(BIN.d)/$(ARCH)
+.build_bin.$(ARCH): $(INSTALL_BIN) $(BIN.d)
+	$(INSTALL) -m 755 $(INSTALL_BIN) $(BIN.d)
 	touch $@
 
 clean: bin-clean
