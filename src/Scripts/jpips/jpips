@@ -51,8 +51,23 @@ forward="${forward} $@"
 # default menu is "jpips_basic.menu"
 men=jpips_${menu_type:-basic}.menu
 
+[ "$PIPS_ROOT" ] ||
+{
+    # try to define PIPS_ROOT if none available
+    case $0 in
+	/*) 
+	    where=`dirname $0`
+	    ;;
+	*)
+	    where=`type -p jpips`
+	    ;;
+    esac
+    PIPS_ROOT=`dirname $where`
+    export PIPS_ROOT
+}
+
 #
-# which jpips.zip file
+# which jpips.jar file
 
 if [ -f ${jar} ]
 then

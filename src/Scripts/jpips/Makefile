@@ -36,14 +36,10 @@ F.menu	=	jpips_test.menu \
 
 F.gif	=	DownArrow.gif
 
-# do not install if java is not available
-ifdef _HAS_JAVA_
-
+# do not install if java is not available?
 INSTALL_EXE = 	jpips
 
 INSTALL_SHR =	jpips.jar $(F.gif) $(F.menu)
-
-endif
 
 # common stuff
 ifdef PIPS_ROOT
@@ -52,11 +48,11 @@ else
 ROOT    = ../../..
 endif
 
-#PROJECT = pips
+PROJECT = pips
 include $(ROOT)/makes/main.mk
 
 # local stuff
-pkg	=	fr.ensmp.cri.jpips
+pkg	= fr.ensmp.cri.jpips
 
 JAVAC	= javac
 JAR	= jar
@@ -71,11 +67,20 @@ $(CLASS.d):
 manifest.mf:
 	echo "Main-Class: $(pkg).JPips" > $@
 
+ifdef _HAS_JAVA_
+
 jpips.jar: $(CLASS.d) manifest.mf
 	$(JAVAC) -classpath $(CLASS.d) -d $(CLASS.d) $(F.java)
 	# should put everything in the jar file: menus, images...
 	cd $(CLASS.d) && \
 	$(JAR) cmf ../manifest.mf ../$@ $(subst .,/,$(pkg))/*.class
+
+else
+
+jpips.jar:
+	touch $@
+
+endif
 
 clean: local-clean
 
