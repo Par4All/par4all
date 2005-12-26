@@ -61,7 +61,9 @@ OTHER_CFILES=\
 	genSML.c
 
 INSTALL_INC	= $(LIB_HEADERS) $(DERIVED_LIB_HEADERS)
+
 LIB_TARGET	= libgenC.a
+
 BIN_TARGET	= newC
 
 ################################################################## COMMON STUFF
