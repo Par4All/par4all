@@ -104,7 +104,7 @@ then
 else
     if [ -f ${PIPS_ROOT}/share/${men} ]
     then
-	props="${props} -Djpips.menus=${PIPS_ROOT}/Share/${men}"
+	props="${props} -Djpips.menus=${PIPS_ROOT}/share/${men}"
 	unset men
     fi
 fi
