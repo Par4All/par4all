@@ -60,4 +60,4 @@ completion_list.h :	$(PIPS_ROOT)/include/resources.h \
 			$(PIPS_ROOT)/include/phases.h \
 			$(PIPS_ROOT)/include/printable_resources.h \
 			$(PIPS_ROOT)/etc/properties.rc
-	./build_completion_lists.sh > $@
+	./build_completion_lists.sh $(PIPS_ROOT) > $@
