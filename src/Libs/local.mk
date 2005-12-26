@@ -1,4 +1,7 @@
-# $Id$
+# $Id$ clean
+
+clean: NO_INCLUDES=1
+export NO_INCLUDES
 
 # old stuff:
 # paf-util pip prgm_mapping scheduling static_controlize reindexing array_dfg
