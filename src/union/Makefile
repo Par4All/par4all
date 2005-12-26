@@ -34,6 +34,7 @@ ROOT    = $(LINEAR_ROOT)
 else
 ROOT    = ../..
 endif
+PROJECT = linear
 include $(ROOT)/makes/main.mk
 
 # ignore default rules
