@@ -308,8 +308,7 @@ $(ARCH):
 clean: arch-clean
 
 arch-clean:
-	-$(RM) $(ARCH)/*.o $(ARCH)/lib*.a
-	-$(RMDIR) $(ARCH)
+	-test -d $(ARCH) && $(RM) -r $(ARCH)
 
 ifdef LIB_CFILES
 ifndef LIB_OBJECTS
