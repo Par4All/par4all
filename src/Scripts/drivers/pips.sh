@@ -19,13 +19,37 @@ error()
   exit ${status}
 }
 
-[ "${PIPS_ARCH}" ] || error 1 "\$PIPS_ARCH is undefined!"
-[ "${PIPS_ROOT}" ] || error 2 "\$PIPS_ROOT is undefined!"
+[ "${PIPS_ROOT}" ] || 
+{
+    case $0 in
+	/*)
+	    where=`dirname $0`
+	    ;;
+	*)
+	    name=`basename $0`
+	    where=`type -p $name`
+	    ;;
+    esac
 
-PATH=./${PIPS_ARCH}:${PIPS_ROOT}/bin/${PIPS_ARCH}:${PATH}
+    PIPS_ROOT=`dirname $where`
+    export PIPS_ROOT
+}
+
+[ -d ${PIPS_ROOT} ] || error 2 "no such directory: $PIPS_ROOT"
+
+[ "${PIPS_ARCH}" ] || 
+{
+    arch=${PIPS_ROOT}/makes/arch.sh
+    test -x $arch || error 3 "no $arch script to build PIPS_ARCH"
+    PIPS_ARCH=`$arch`
+    export PIPS_ARCH
+}
 
 # how to avoid a recursion of no actual binary is found:
 PATH=./${PIPS_ARCH}:${PIPS_ROOT}/bin/${PIPS_ARCH} \
     type ${what} > /dev/null || error 3 "no ${what} binary found!"
+
+# fix path according to pips architecture
+PATH=./${PIPS_ARCH}:${PIPS_ROOT}/bin/${PIPS_ARCH}:${PATH}
 
 exec "${what}" "$@"
