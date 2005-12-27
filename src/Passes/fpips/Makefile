@@ -16,6 +16,8 @@ LIB_TARGET	= lib$(TARGET).a
 
 BIN_TARGET	= $(TARGET)
 
+INSTALL_LIB = 	$(ARCH)/main_fpips.o
+
 # common stuff
 ifdef PIPS_ROOT
 ROOT    = $(PIPS_ROOT)
