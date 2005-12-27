@@ -23,3 +23,21 @@ endif
 
 #PROJECT = pips
 include $(ROOT)/makes/main.mk
+
+# local stuff:
+LINKS =	pips tpips wpips fpips
+
+.build_exe: .build_links
+
+.build_links: 
+	$(MAKE) links
+	touch $@
+
+links: 
+	for l in $(LINKS) ; do $(RM) $(EXE.d)/$$l ; done
+	for l in $(LINKS) ; do ln -s pips.sh $(EXE.d)/$$l ; done
+
+clean: links-clean
+
+links-clean:
+	$(RM) .build_links
