@@ -15,23 +15,26 @@ phase3: build-header-file .build_inc
 
 endif
 
+main.dir =	./$(ARCH)
+
 # build pips executables on request
 $(ARCH)/pips:
-	$(LINK) $@ $(ARCH)/$(PIPS_MAIN) -lpips $(PIPS_LIBS)
+	$(LINK) $@ $(main.dir)/$(PIPS_MAIN) -lpips $(PIPS_LIBS)
 
 $(ARCH)/tpips:
 	$(LINK) $@ $(TPIPS_LDFLAGS) \
-		$(ARCH)/$(TPIPS_MAIN) -ltpips $(PIPS_LIBS) $(TPIPS_LIBS)
+		$(main.dir)/$(TPIPS_MAIN) -ltpips $(PIPS_LIBS) $(TPIPS_LIBS)
 
 $(ARCH)/wpips:
 	$(LINK) $@ $(WPIPS_LDFLAGS) \
-		$(ARCH)/$(WPIPS_MAIN) -lwpips $(PIPS_LIBS) $(WPIPS_LIBS)
+		$(main.dir)/$(WPIPS_MAIN) -lwpips $(PIPS_LIBS) $(WPIPS_LIBS)
 
 $(ARCH)/fpips:
 	$(LINK) $@ $(FPIPS_LDFLAGS) \
-		$(ARCH)/$(FPIPS_MAIN) -lfpips $(PIPS_LIBS) $(FPIPS_LIBS)
+		$(main.dir)/$(FPIPS_MAIN) -lfpips $(PIPS_LIBS) $(FPIPS_LIBS)
 
-test: $(ARCH)/pips
-ttest: $(ARCH)/tpips
-wtest: $(ARCH)/wpips
-ftest: $(ARCH)/fpips
+# building a test executable
+test:;  $(MAKE) main.dir=$(PIPS_ROOT)/lib/$(ARCH) $(ARCH)/pips
+ttest:; $(MAKE) main.dir=$(PIPS_ROOT)/lib/$(ARCH) $(ARCH)/tpips
+wtest:; $(MAKE) main.dir=$(PIPS_ROOT)/lib/$(ARCH) $(ARCH)/wpips
+ftest:; $(MAKE) main.dir=$(PIPS_ROOT)/lib/$(ARCH) $(ARCH)/fpips
