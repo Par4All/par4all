@@ -1,8 +1,8 @@
 /**
-  * $Id$
-  * 
-  * A component which can be activated or de-activated.
-  */
+ * $Id$
+ * 
+ * A component which can be activated or de-activated.
+ */
 
 package fr.ensmp.cri.jpips;
 

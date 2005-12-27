@@ -22,5 +22,5 @@ package fr.ensmp.cri.jpips;
 
 public interface StreamObserver 
 {
-    public abstract void streamChanged();
+  public abstract void streamChanged();
 }

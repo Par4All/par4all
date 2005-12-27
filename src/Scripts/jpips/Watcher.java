@@ -1,6 +1,6 @@
 /*
-  $Id$
-*/
+ $Id$
+ */
 
 package fr.ensmp.cri.jpips;
 
@@ -9,18 +9,18 @@ import java.util.*;
 import java.io.*;
 
 /** A class that checks for the tpips output stream.
-  * @author Francois Didry
-  */  
+ * @author Francois Didry
+ */  
 public class Watcher 
   implements Runnable
 {
-  public Process tpips;		//tpips instance
+  public Process tpips;  //tpips instance
   
   public Watcher(Process tpips)
   {
     this.tpips = tpips;
   }
-
+  
   public void run()
   {
     try

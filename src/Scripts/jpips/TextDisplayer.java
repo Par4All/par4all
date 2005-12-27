@@ -1,6 +1,6 @@
 /*
-  $Id$
-*/
+ $Id$
+ */
 
 package fr.ensmp.cri.jpips;
 
@@ -16,27 +16,27 @@ import java.awt.*;
 
 
 /** A window manager for text windows.
-  * It manages the displaying of windows on the screen.
-  * It regulates the amount of windows displayed at the same time.
-  * @author Francois Didry
-  */
+ * It manages the displaying of windows on the screen.
+ * It regulates the amount of windows displayed at the same time.
+ * @author Francois Didry
+ */
 public class TextDisplayer extends Displayer
 {
-  public Vector	infos;		//contains the extensions
-  public PFrame	frame;		//frame of jpips
+  public Vector infos;  //contains the extensions
+  public PFrame frame;  //frame of jpips
   
   /** Sets the number of displayed windows to 0.
-    * Creates the vector of windows.
-    */
+   * Creates the vector of windows.
+   */
   public TextDisplayer(PFrame frame)
   {
     super();
     this.frame = frame;
     setInfos();
   }
-
+  
   /** Sets the extension info table.
-    */
+   */
   public void setInfos()
   {
     infos = new Vector();
@@ -60,49 +60,49 @@ public class TextDisplayer extends Displayer
     infos.addElement(new Extension("dg","Dependence graph view"));  
     infos.addElement(new Extension("stco","Static control view"));  
   }
-
+  
   /** Displays a text frame from a text file.
-      @param file the file to display.
-      @param locked whether the display is locked.
-      @param writable whether the text can be edited.
-      @return whether a new frame was created to display the file.
+   @param file the file to display.
+   @param locked whether the display is locked.
+   @param writable whether the text can be edited.
+   @return whether a new frame was created to display the file.
    */
   public boolean display(File file, boolean locked, boolean writable)
   {
     // the title includes the description, the filename and a date.
     String title = 
       getInfo(file) + ": " + file.getName() + " (" + file.lastModified() + ")";
-
+    
     // first look for a frame with already holds this file.
     for(int i=0; i<frameVector.size(); i++)
     {
       PTextFrame f = (PTextFrame) frameVector.elementAt(i);
       if(title.equals(f.getTitle()))
       {
-	f.setVisible(true);
-	f.toFront();
-	return false;
+        f.setVisible(true);
+        f.toFront();
+        return false;
       }
     }
-
+    
     PTextFrame frame = getFreeFrame();
     String text = getText(file);
-
+    
     if(text != null)
     {
       if(frame != null)
       {
-	frame.setTitle(title);
-	frame.ta.setText(text);
-	frame.panelButton.setText(title);
-	frame.locked = locked;
-	frame.writable = writable;
+        frame.setTitle(title);
+        frame.ta.setText(text);
+        frame.panelButton.setText(title);
+        frame.locked = locked;
+        frame.writable = writable;
       }
       else
       {
-	frame = new PTextFrame(title, text, locked, writable);
-	register(frame);
-	frame.setVisible(true);
+        frame = new PTextFrame(title, text, locked, writable);
+        register(frame);
+        frame.setVisible(true);
       }
     }
     return true;
@@ -110,9 +110,9 @@ public class TextDisplayer extends Displayer
   
   
   /** Displays a text frame from a string.
-    */
+   */
   public void display(String title, String text,
-  		      boolean locked, boolean writable)
+                      boolean locked, boolean writable)
   {
     PTextFrame f = getFreeFrame();
     if(f != null)
@@ -130,92 +130,92 @@ public class TextDisplayer extends Displayer
       f.setVisible(true);
     }
   }
-
-
+  
+  
   /** @return info from the specified file
-    */
+   */
   public String getInfo(File file)
+  {
+    String name = file.getName();
+    int index = name.indexOf(".");
+    if(index == -1) return "Unknown file";
+    String extension = name.substring(index+1);
+    for(int i=0; i<infos.size(); i++)
     {
-      String name = file.getName();
-      int index = name.indexOf(".");
-      if(index == -1) return "Unknown file";
-      String extension = name.substring(index+1);
-      for(int i=0; i<infos.size(); i++)
-        {
-	  Extension e = (Extension)infos.elementAt(i);
-	  if(e.getExtension().equals(extension)) return e.getInfo();
-	}
-      return "Unknown file";
+      Extension e = (Extension)infos.elementAt(i);
+      if(e.getExtension().equals(extension)) return e.getInfo();
     }
-
-
+    return "Unknown file";
+  }
+  
+  
   /** Adds a windowlistener to a window.
-    */
+   */
   public void register(PTextFrame f)
+  {
+    frameVector.addElement(f);
+    WindowListener w = new WindowListener()
     {
-      frameVector.addElement(f);
-      WindowListener w = new WindowListener()
-        {
-	  public void windowClosing(WindowEvent e) { removeWindow(e); }
-	  public void windowOpened(WindowEvent e) { addWindow(e); }
-	  public void windowClosed(WindowEvent e) { removeWindow(e); }
-	  public void windowActivated(WindowEvent e) {}
-	  public void windowDeactivated(WindowEvent e) {}
-	  public void windowIconified(WindowEvent e) {}
-	  public void windowDeiconified(WindowEvent e) {}
-        }; 
-      f.addWindowListener(w);
-    }
-
-
+      public void windowClosing(WindowEvent e) { removeWindow(e); }
+      public void windowOpened(WindowEvent e) { addWindow(e); }
+      public void windowClosed(WindowEvent e) { removeWindow(e); }
+      public void windowActivated(WindowEvent e) {}
+      public void windowDeactivated(WindowEvent e) {}
+      public void windowIconified(WindowEvent e) {}
+      public void windowDeiconified(WindowEvent e) {}
+    }; 
+    f.addWindowListener(w);
+  }
+  
+  
   /** Adds a window.
-    */
+   */
   public void addWindow(WindowEvent e)
-    {
-      PTextFrame f = (PTextFrame)e.getSource();
-      incNoWindows();
-      updatePanel();
-    }
-
-
+  {
+    PTextFrame f = (PTextFrame)e.getSource();
+    incNoWindows();
+    updatePanel();
+  }
+  
+  
   /** Removes a window.
-    */
+   */
   public void removeWindow(WindowEvent e)
-    {
-      PTextFrame f = (PTextFrame)e.getSource();
-      decNoWindows();
-      frameVector.removeElement(f);
-      updatePanel();
-    }
-
-
+  {
+    PTextFrame f = (PTextFrame)e.getSource();
+    decNoWindows();
+    frameVector.removeElement(f);
+    updatePanel();
+  }
+  
+  
   /** @return a free window if possible
-    */
+   */
   public PTextFrame getFreeFrame()
+  {
+    for(int i=0; i<frameVector.size(); i++)
     {
-      for(int i=0; i<frameVector.size(); i++)
-        {
-	  PTextFrame f = (PTextFrame)frameVector.elementAt(i);
-	  if(!f.locked) return f;
-	}
-      return null;
+      PTextFrame f = (PTextFrame)frameVector.elementAt(i);
+      if(!f.locked) return f;
     }
-
-
+    return null;
+  }
+  
+  
   /** Closes all the windows.
-    */
+   */
   public void closeAll()
+  {
+    for(int i=0; i<frameVector.size(); i++)
     {
-      for(int i=0; i<frameVector.size(); i++)
-        {
-	  PTextFrame f = (PTextFrame)frameVector.elementAt(i);
-	  f.dispose();
-	}
+      PTextFrame f = (PTextFrame)frameVector.elementAt(i);
+      f.dispose();
     }
-
-
+  }
+  
+  
   /** @return the text of a text file
-    */
+   */
   public static String getText(File f)
   {
     try
@@ -226,7 +226,7 @@ public class TextDisplayer extends Displayer
       int nch;
       while ((nch = reader.read(buff, 0, buff.length)) != -1)
       {
-	s.append(buff, 0, nch);
+        s.append(buff, 0, nch);
       }
       return s.toString();
     }
@@ -236,10 +236,10 @@ public class TextDisplayer extends Displayer
     }
     return null;
   }
-
-
+  
+  
   /** Updates the panel.
-    */
+   */
   public void updatePanel()
   {
     panel.removeAll();
@@ -260,6 +260,6 @@ public class TextDisplayer extends Displayer
     frame.repaint();
     frame.pack();
   }
-
-
+  
+  
 }

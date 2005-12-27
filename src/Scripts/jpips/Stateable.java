@@ -1,8 +1,8 @@
 /**
-  * $Id$
-  * 
-  * A component which has a state field
-  */
+ * $Id$
+ * 
+ * A component which has a state field
+ */
 
 package fr.ensmp.cri.jpips;
 
@@ -10,5 +10,5 @@ import java.util.Vector;
 
 public interface Stateable
 {
-    public Vector getState();
+  public Vector getState();
 }

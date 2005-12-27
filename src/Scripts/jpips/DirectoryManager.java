@@ -1,6 +1,6 @@
 /*
-  $Id$
-*/
+ $Id$
+ */
 
 package fr.ensmp.cri.jpips;
 
@@ -16,21 +16,21 @@ import javax.swing.border.*;
 import fr.ensmp.cri.jpips.Pawt.*;
 
 /** A manager for the current directory of JPips 
-  * 
-  * @author Francois Didry
-  */  
+ * 
+ * @author Francois Didry
+ */  
 public class DirectoryManager implements JPipsComponent
 {
-  public	TPips		tpips;		//tpips instance
-  public	File		directory;	//current directory
-  public	PPanel		panel;		//jpips directory panel
-  public	PTextField	tf;		//textfield in the panel
-  public	PButton		browse;		//button in the panel
-  public	PFrame		frame;		//frame of jpips
-
+  public TPips  tpips;  //tpips instance
+  public File  directory; //current directory
+  public PPanel  panel;  //jpips directory panel
+  public PTextField tf;  //textfield in the panel
+  public PButton  browse;  //button in the panel
+  public PFrame  frame;  //frame of jpips
+  
   /** Creates and opens the root directory file.
-    * Builds the panel for JPips.
-    */  
+   * Builds the panel for JPips.
+   */  
   public DirectoryManager(PFrame frame, TPips tpips)
   {
     this.frame = frame;
@@ -39,16 +39,16 @@ public class DirectoryManager implements JPipsComponent
     buildPanel();
     check();
   }
-
+  
   /** @return the current directory.
-    */  
+   */  
   public String getDirectory()
   {
     return directory.getAbsolutePath();
   }
   
   /** Creates the directory panel for jpips.
-    */  
+   */  
   public void buildPanel()
   {
     panel = new PPanel(new GridBagLayout());
@@ -63,20 +63,20 @@ public class DirectoryManager implements JPipsComponent
     ActionListener a = new ActionListener() {
       public void actionPerformed(ActionEvent e)
       {
-	PTextField tf = (PTextField)e.getSource();
-	tf.setFont(new Font("Monospaced", Font.PLAIN, 12));
-	File f = new File(tf.getText());
-	if(f.isDirectory())
-	{
-	  directory = f;
-	  open(directory);
-	}
-	else
-	{
-	  JOptionPane.showMessageDialog
-	  (frame, "Invalid directory","Error",JOptionPane.ERROR_MESSAGE);
-	  tf.setText(directory.getAbsolutePath());
-	}
+        PTextField tf = (PTextField)e.getSource();
+        tf.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        File f = new File(tf.getText());
+        if(f.isDirectory())
+        {
+          directory = f;
+          open(directory);
+        }
+        else
+        {
+          JOptionPane.showMessageDialog
+            (frame, "Invalid directory","Error",JOptionPane.ERROR_MESSAGE);
+          tf.setText(directory.getAbsolutePath());
+        }
       }
     };
     tf.addActionListener(a);
@@ -96,27 +96,27 @@ public class DirectoryManager implements JPipsComponent
     c.fill = GridBagConstraints.NONE;
     panel.add(browse,c);
   }
-
+  
   /** @return the directory panel for JPips
-    */  
+   */  
   public Component getComponent()
   {
     return (Component) panel;
   }
   
   /** Opens the specified directory in tpips.
-    * Updates the textfield.
-    * @param f the directory file
-    */  
+   * Updates the textfield.
+   * @param f the directory file
+   */  
   public void open(File f)
   {
     directory = f;
     tpips.sendCommand("cd " + directory.getAbsolutePath());
     check();
   }
-
+  
   /** Checks if the tpips and the jpips directory are similar.
-    */
+   */
   public void check()
   {
     String s = tpips.sendCommand("info directory");
@@ -126,7 +126,7 @@ public class DirectoryManager implements JPipsComponent
   }
   
   /** Displays a file chooser to select a directory.
-    */
+   */
   public void choose()
   {
     JFileChooser chooser = Pawt.createFileChooser(directory.getAbsolutePath());
@@ -134,7 +134,7 @@ public class DirectoryManager implements JPipsComponent
     {
       File f = chooser.getSelectedFile();
       if(f == null || !f.isDirectory())
-	    f = chooser.getCurrentDirectory();
+        f = chooser.getCurrentDirectory();
       open(f);
     }
     frame.pack();
@@ -150,7 +150,7 @@ public class DirectoryManager implements JPipsComponent
     tf.setEnabled(yes);
     browse.setEnabled(yes);      
   }
-
+  
   public void reset()
   {
     check();

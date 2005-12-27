@@ -8,9 +8,9 @@ import fr.ensmp.cri.jpips.Pawt.*;
 import java.awt.*;
 
 /** An interface that defines methods for JPips components.
-  *
-  * @author Francois Didry
-  */
+ *
+ * @author Francois Didry
+ */
 public interface JPipsComponent
   extends Activatable
 {

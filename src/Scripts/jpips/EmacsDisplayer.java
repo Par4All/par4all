@@ -1,8 +1,8 @@
 /*
-  $Id$
-
-  Send displays to emacs.
-*/
+ $Id$
+ 
+ Send displays to emacs.
+ */
 
 package fr.ensmp.cri.jpips;
 
@@ -13,10 +13,10 @@ public class EmacsDisplayer
 {
   static public final String BEGIN = "\200";
   static public final String END = "\201";
-  public Process	g2davinci;	
-  public Process	davinci;	
+  public Process g2davinci; 
+  public Process davinci; 
   PrintStream to_emacs;
-
+  
   public EmacsDisplayer(PrintStream out)
   {
     this.to_emacs = out;
@@ -25,7 +25,7 @@ public class EmacsDisplayer
   boolean display(File file, boolean locked, boolean writable)
   {
     to_emacs.print(BEGIN + "WINDOW_NUMBER:" + 4 + END +
-		   BEGIN + "Sequential View:" + file + END);
+                   BEGIN + "Sequential View:" + file + END);
     to_emacs.flush();
     return true;
   }
@@ -34,7 +34,7 @@ public class EmacsDisplayer
   {
     display(new File(name), locked, writable);
   }
- 
+  
   boolean graphdisplay(File file, boolean locked, boolean writable)
   {
     String filename = file.getPath();
@@ -51,20 +51,20 @@ public class EmacsDisplayer
     }
     
     /*
-      int index = filename.lastIndexOf('-');
-      String ft = filename.substring(1,index);
-      String davinciname = ft + "-daVinci";
-      String pstring1 =  "daVinci " + davinciname;
-      try
-      {
-	davinci = Runtime.getRuntime().exec(pstring1);
-      }
-      catch (Exception e)
-      {
-	System.err.println("EmacsDisplayer.graphdisplay Exception :" + e);
-      }
-    */      
-      
+     int index = filename.lastIndexOf('-');
+     String ft = filename.substring(1,index);
+     String davinciname = ft + "-daVinci";
+     String pstring1 =  "daVinci " + davinciname;
+     try
+     {
+     davinci = Runtime.getRuntime().exec(pstring1);
+     }
+     catch (Exception e)
+     {
+     System.err.println("EmacsDisplayer.graphdisplay Exception :" + e);
+     }
+     */      
+    
     //to_emacs.print(BEGIN + "VIEW_DAVINCI_GRAPH:" + filename + END);
     //to_emacs.flush(); 
     

@@ -1,6 +1,6 @@
 /*
-  $Id$
-*/
+ $Id$
+ */
 
 package fr.ensmp.cri.jpips;
 
@@ -15,18 +15,18 @@ import javax.swing.border.*;
 
 
 /** A window manager.
-    It manages the displaying of windows on the screen.
-    @author Francois Didry
-*/
+ It manages the displaying of windows on the screen.
+ @author Francois Didry
+ */
 abstract class Displayer implements JPipsComponent
 {
-  public  Vector	frameVector;	//contains the displayed windows
-  public  int		noWindows;	//number of displayed windows
-  public  PPanel	panel;		//panel of the displayer
-
+  public  Vector frameVector; //contains the displayed windows
+  public  int  noWindows; //number of displayed windows
+  public  PPanel panel;  //panel of the displayer
+  
   /** Sets the number of displayed windows to 0.
-    * Creates the displayer panel for JPips.
-    */
+   * Creates the displayer panel for JPips.
+   */
   public Displayer()
   {
     noWindows = 0;
@@ -35,42 +35,42 @@ abstract class Displayer implements JPipsComponent
   }
   
   /** Builds the panel for JPips.
-    */
+   */
   public void buildPanel()
   {
     panel = new PPanel(new BorderLayout());
     panel.setPreferredSize(new Dimension(300,150));      
     panel.setBorder(Pawt.createTitledBorder("Windows"));
   }
-
+  
   /** Adds a window to the count.
-    */
+   */
   public void incNoWindows()
   {
     noWindows++;
   }
-
+  
   /** Removes a window from the count.
-    */
+   */
   public void decNoWindows()
   {
     noWindows--;
   }
   
   /** @return the current number of windows
-    */
+   */
   public int getNoWindows()
   {
     return noWindows;
   }
   
   /** @return the displayer panel for JPips
-    */
+   */
   public Component getComponent()
   {
     return panel;
   }
-
+  
   abstract boolean display(File file, boolean locked, boolean writable);
   
   abstract void display(String name, String string,
@@ -81,16 +81,16 @@ abstract class Displayer implements JPipsComponent
   public void setActivated(boolean yes) {}
   
   public void reset() {}
-
-    /** A link between an extension and its representative string..
+  
+  /** A link between an extension and its representative string..
    * @author Francois Didry
    */
   static public class Extension
   {
     
     
-    public String		extension,	//extension 
-      info;		//information about the extension
+    public String  extension, //extension 
+      info;  //information about the extension
     
     
     /** Sets the extension and its info..
@@ -116,11 +116,11 @@ abstract class Displayer implements JPipsComponent
     {
       return info;
     }
-
+    
     public String toString()
     { 
-	return this.getExtension();
+      return this.getExtension();
     }
   }
-
+  
 }

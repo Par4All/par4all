@@ -1,6 +1,6 @@
 /*
-  $Id$
-*/
+ $Id$
+ */
 
 
 package fr.ensmp.cri.jpips;
@@ -19,25 +19,25 @@ import javax.swing.border.*;
 
 
 /** A module manager for TPips.
-  * @author Francois Didry
-  */  
+ * @author Francois Didry
+ */  
 public class ModuleManager implements JPipsComponent
 {
-  public TPips	tpips;		//tpips instance
-  public PList	list;		//contains the modules
+  public TPips tpips;  //tpips instance
+  public PList list;  //contains the modules
   public DefaultListModel modules;
-  public PPanel panel;		//jpips module panel
-
-
+  public PPanel panel;  //jpips module panel
+  
+  
   /** Sets the model of the list containing the modules names.
-      Sets the tpips instance.
-  */  
+   Sets the tpips instance.
+   */  
   public ModuleManager(TPips tpips)
   {
     this.tpips = tpips;
     buildPanel();
   }
-
+  
   /** Creates the module panel for jpips.
    */  
   public void buildPanel()
@@ -53,7 +53,7 @@ public class ModuleManager implements JPipsComponent
     PButton b = new PButton("Select All");
     b.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) { 
-	setAllSelected(); 
+        setAllSelected(); 
       }
     });
     panel.add(b,BorderLayout.SOUTH);
@@ -97,23 +97,23 @@ public class ModuleManager implements JPipsComponent
       String module;
       while(tok.hasMoreTokens())
       {
-	module = tok.nextToken();
-	// quite obscure swing bug...
-	// modules.addElement(module);
-	modules.add(0, module); 
+        module = tok.nextToken();
+        // quite obscure swing bug...
+        // modules.addElement(module);
+        modules.add(0, module); 
       }
       modules.add(0, "%MAIN"); // add so as to select the main.
     }
   }
-
+  
   /** Clears the modules list.
-    */
+   */
   public void unsetModules()
   {
     DefaultListModel dlm = (DefaultListModel) list.getModel();
     dlm.removeAllElements();
   }
-
+  
   public PMenu getMenu()
   {
     return null;
@@ -123,7 +123,7 @@ public class ModuleManager implements JPipsComponent
   {
     // nope.
   }
-
+  
   public void reset()
   {
     DefaultListModel dlm = (DefaultListModel) list.getModel();
