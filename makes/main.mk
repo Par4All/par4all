@@ -263,8 +263,8 @@ build-header-file:
 	  echo "#define $(name)_header_included";\
 	  cat $(TARGET)-local.h;\
 	  $(PROTOIZE) $(INC_CFILES) | \
-	  sed -f $(MAKE.d)/proto.sed ;
-	  echo "#endif /* $(name)_header_included */";\
+	  sed -f $(MAKE.d)/proto.sed ; \
+	  echo "#endif /* $(name)_header_included */"; \
 	} > $(INC_TARGET).tmp
 	$(MOVE) $(INC_TARGET).tmp $(INC_TARGET)
 
