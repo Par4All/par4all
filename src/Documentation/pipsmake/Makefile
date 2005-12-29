@@ -50,13 +50,7 @@ resources.h: pipsmake.rc
 	#
 	# building $@
 	# 
-	sed    '/>/!d;\
-		s/^.*MODULE\.//;\
-		s/^.*PROGRAM\.//;\
-		s/^.*CALLERS\.//;\
-		s/^.*ALL\.//;\
-		s/^.*MAIN\.//;\
-		s/^.*COMPILATION_UNIT\.//;' $< | \
+	sed -f resources.sed $< | \
 	$(UPPER) | sort -u | sed 's/.*/#define DBR_& "&"/' > $@
 
 printable_resources.h: resources.h
