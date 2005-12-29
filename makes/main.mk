@@ -148,8 +148,7 @@ INSTALL	= install
 CMP	= cmp -s
 
 # misc filters
-FLTVERB	= sed  '/^\\begin{verbatim}/,/^\\end{verbatim}/!d;\
-		/^\\begin{verbatim}/d;/^\\end{verbatim}/s,.*,,'
+FLTVERB	= sed -f $(MAKE.d)/verbatim.sed
 UPPER	= tr '[a-z]' '[A-Z]'
 
 # for easy debugging... e.g. gmake ECHO='something' echo
@@ -264,7 +263,7 @@ build-header-file:
 	  echo "#define $(name)_header_included";\
 	  cat $(TARGET)-local.h;\
 	  $(PROTOIZE) $(INC_CFILES) | \
-	  sed 's/struct _iobuf/FILE/g;s/__const/const/g;/_BUFFER_STATE/d;/__inline__/d;' ; \
+	  sed -f $(MAKE.d)/proto.sed ;
 	  echo "#endif /* $(name)_header_included */";\
 	} > $(INC_TARGET).tmp
 	$(MOVE) $(INC_TARGET).tmp $(INC_TARGET)
