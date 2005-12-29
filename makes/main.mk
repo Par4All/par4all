@@ -264,10 +264,7 @@ build-header-file:
 	  echo "#define $(name)_header_included";\
 	  cat $(TARGET)-local.h;\
 	  $(PROTOIZE) $(INC_CFILES) | \
-	  sed 's/struct _iobuf/FILE/g;\
-	       s/__const/const/g;\
-	       /_BUFFER_STATE/d;\
-	       /__inline__/d;' ; \
+	  sed 's/struct _iobuf/FILE/g;s/__const/const/g;/_BUFFER_STATE/d;/__inline__/d;' ; \
 	  echo "#endif /* $(name)_header_included */";\
 	} > $(INC_TARGET).tmp
 	$(MOVE) $(INC_TARGET).tmp $(INC_TARGET)
