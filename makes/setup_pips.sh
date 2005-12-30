@@ -117,7 +117,7 @@ echo "### generating csh environment"
 $prod/pips/utils/sh2csh.pl < $destination/pipsrc.sh > $destination/pipsrc.csh
 
 echo "### checking useful softwares"
-for exe in m4 wish
+for exe in bash m4 wish
 do
   type $exe || echo "no such executable, consider installing: $exe"
 done
