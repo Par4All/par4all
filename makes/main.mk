@@ -99,7 +99,7 @@ ifndef NO_INCLUDES
 include $(MAKE.d)/$(ARCH).mk
 
 # svn related targets...
-# include $(MAKE.d)/svn.mk
+include $(MAKE.d)/svn.mk
 
 # site specific stuff...
 -include $(MAKE.d)/config.mk
@@ -545,8 +545,8 @@ force-create-branch:
 
 # create a new private branch
 create-branch:
-	@if $(IS_SVN_WC) ; then \
-	  if $(IS_SVN_BRANCH) . ; then \
+	-@if $(IS_SVN_WC) ; then \
+	  if $(IS_BRANCH) . ; then \
 	    echo "should not create a branch on a branch?!" ; \
 	  else \
 	    if test -d $(DEVDIR)/.svn ; then \
@@ -563,11 +563,12 @@ create-branch:
 # hum...
 force-install-branch: 
 	$(MAKE) BRANCH_FLAGS+=--commit install-branch
+	-test -d $(ROOT)/.svn && $(SVN) update $(ROOT)
 
 # install the branch into trunk (production version)
 install-branch:
-	@if $(IS_SVN_WC) ; then \
-	  if $(IS_SVN_BRANCH) . ; then \
+	-@if $(IS_SVN_WC) ; then \
+	  if $(IS_BRANCH) . ; then \
 	    echo "installing current directory..." ; \
 	    $(BRANCH) join $(BRANCH_FLAGS) . ; \
 	  else \
@@ -576,3 +577,9 @@ install-branch:
 	else \
 	  echo "cannot install current directory, not under svn" ; \
 	fi
+
+branch-diff:
+	-@$(IS_BRANCH) . && $(BRANCH) diff
+
+branch-info:
+	-@$(IS_BRANCH) . && $(BRANCH) info

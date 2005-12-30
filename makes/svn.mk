@@ -3,9 +3,22 @@
 # subversion related targets
 #
 
-SVN	= svn
+SVN =		svn
+SVN_FLAGS =
+IS_SVN_WC =	test -d .svn
 
-diff:;	$(SVN) $@
-status:;$(SVN) $@
-info:;	$(SVN) $@
-commit:;$(SVN) $@
+BRANCH = 	svn_branch.sh
+BRANCH_FLAGS =
+IS_BRANCH =	$(BRANCH) test --quiet
+
+diff:
+	-@$(IS_SVN_WC) && $(SVN) $(SVN_FLAGS) $@
+
+status:
+	-@$(IS_SVN_WC) && $(SVN) $(SVN_FLAGS) $@
+
+info:
+	-@$(IS_SVN_WC) && $(SVN) $(SVN_FLAGS) $@
+
+commit:
+	-@$(IS_SVN_WC) && $(SVN) $(SVN_FLAGS) $@
