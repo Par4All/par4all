@@ -2,7 +2,7 @@
 #
 # $Id$
 #
-# Setup a pips installation from scratch
+# Setup a basic pips installation from scratch
 #
 
 # where to get pips
@@ -43,6 +43,12 @@ svn checkout $PIPS_SVN/bundles/trunks $prod || error "cannot checkout pips"
 PIPS_ARCH=`$prod/pips/makes/arch.sh`
 export PIPS_ARCH
 
+# this should fail if not a developer
+echo "### getting user development branches"
+svn checkout $PIPS_SVN/branches/$developer $destination/pips_dev
+#svn checkout $LINEAR_SVN/branches/$developer $destination/linear_dev
+#svn checkout $NEWGEN_SVN/branches/$developer $destination/newgen_dev
+
 echo "### downloading $POLYLIB"
 cd /tmp
 test -f $POLYLIB.tar.gz && error "some $POLYLIB.tar.gz file already there"
@@ -65,6 +71,13 @@ echo "### fixing $POLYLIB"
 mkdir $prod/extern/lib/$PIPS_ARCH || error "cannot mkdir"
 cd $prod/extern/lib/$PIPS_ARCH || error "cannot cd"
 ln -s ../libpolylib*.a libpolylib.a || error "cannot create links"
+
+echo "### testing special commands for config.mk"
+config=$prod/pips/makes/config.mk
+type javac && echo '_HAS_JDK_ = 1' >> $config
+type latex && echo '_HAS_LATEX_ = 1' >> $config
+type emacs && echo '_HAS_EMACS_ = 1' >> $config
+# others? copy config to newgen and linear?
 
 echo "### building newgen"
 cd $prod/newgen
@@ -112,7 +125,3 @@ export PIPS_ROOT
 # path
 PATH=\$PIPS_ROOT/bin:\$PIPS_ROOT/utils:\$PATH
 EOF
-
-# this should fail if not a developer
-echo "### getting pips development"
-svn checkout $PIPS_SVN/branches/$developer $destination/pips_dev

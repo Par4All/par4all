@@ -6,6 +6,7 @@ build: compile
 	$(MAKE) -C src phase6
 
 compile:
+	-test -d ./makes && $(MAKE) -C makes build
 	$(MAKE) -C src phase0
 	$(MAKE) -C src phase1
 	$(MAKE) -C src phase2
@@ -21,12 +22,11 @@ unbuild: clean
 	$(RM) -rf ./bin ./include ./lib ./share ./utils ./doc ./runtime ./etc
 	$(RM) -f TAGS
 
-# todo: install, uninstall
 install:
-	@echo "NOT IMPLEMENTED YET"
+	@echo "try 'build' target"
 
 uninstall:
-	@echo "NOT IMPLEMENTED YET"
+	@echo "try 'unbuild' target"
 
 local-clean:
 	$(RM) TAGS

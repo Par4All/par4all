@@ -377,7 +377,7 @@ compile:
 	$(MAKE) phase5
 	$(MAKE) phase6
 
-install: recompile
+#install: recompile
 
 # empty dependencies to please compile targets
 phase0:
@@ -528,3 +528,55 @@ clean: main-clean
 
 main-clean:
 	$(RM) *~ *.tmp
+
+################################################################### DEVELOPMENT
+
+# try development directory under setup_pips.sh
+DEVDIR	= $(ROOT)/../../$(PROJECT)_dev
+
+# can be overriden... for instance there are 2 'pipsmake' directories
+NEW_BRANCH_NAME	= $(notdir $(CURDIR))
+
+# the old pips development target
+install: 
+	@echo "See 'create-branch' target to create a development branch"
+	@echo "See 'install-branch' target to install a development branch"
+
+# should be ok
+force-create-branch: 
+	$(MAKE) BRANCH_FLAGS+=--commit create-branch
+	-test -d $(DEVDIR)/.svn && $(SVN) update $(DEVDIR)
+
+# create a new private branch
+create-branch:
+	@if $(IS_SVN_WC) ; then \
+	  if $(IS_SVN_BRANCH) . ; then \
+	    echo "should not create a branch on a branch?!" ; \
+	  else \
+	    if test -d $(DEVDIR)/.svn ; then \
+		branch=$(DEVDIR)/$(NEW_BRANCH_NAME) ; \
+	    else \
+		branch=branches/$(USERNAME)/$(NEW_BRANCH_NAME) ; \
+	    fi ; \
+	    $(BRANCH) $(BRANCH_FLAGS) create . $$branch ; \
+	  fi ; \
+	else \
+	  echo "cannot create branch, not a wcpath" ; \
+	fi
+
+# hum...
+force-install-branch: 
+	$(MAKE) BRANCH_FLAGS+=--commit install-branch
+
+# install the branch into trunk (production version)
+install-branch:
+	@if $(IS_SVN_WC) ; then \
+	  if $(IS_SVN_BRANCH) . ; then \
+	    echo "installing current directory..." ; \
+	    $(BRANCH) $(BRANCH_FLAGS) join . ; \
+	  else \
+	    echo "cannot install current directory, not a branch" ; \
+	  fi ; \
+	else \
+	  echo "cannot install current directory, not under svn" ; \
+	fi
