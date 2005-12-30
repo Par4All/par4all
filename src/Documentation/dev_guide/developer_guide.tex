@@ -7,13 +7,12 @@
 
 \documentclass[a4paper]{article}
 
-\usepackage{epsfig,amstext,alltt}
+\usepackage[latin1]{inputenc}
+
+\newcommand{\LINK}[1]{\texttt{\small{#1}}}
 
 \title{\bf {\Huge PIPS} \\ 
   Development Environment \\
-  ~ \\
-  THIS DOCUMENTATION \\
-  IS OBSOLETE!
 }
 
 \author{
@@ -30,49 +29,177 @@
 \end{tabular}
 }
 
-\date{August 1996 - April 2003}
+\date{August 1996 - December 2005}
 
 \renewcommand{\indexname}{Index}
 \makeindex
 
-\sloppy
-
 \begin{document}
 \maketitle
 
-{\small
-\begin{verbatim}
-$Id$
-\end{verbatim}
+{\small\vfill\hfill
+ \verb$Id$
 }
 
-%%\begin{latexonly}
-  \clearpage
-  \tableofcontents  
-%%\end{latexonly}
+\clearpage
+\tableofcontents  
 
 \newpage
-\section*{Introduction}
+\section{Introduction}
 
-This document aims at presenting PIPS' development environment. It is
+This document aims at presenting PIPS development environment. It is
 not linearly organized: PIPS is made of several, sometimes
 interdependent, components.  This paper thus begins with a
 presentation of PIPS directories.  Then the shell environment is
 described. The next two chapters are devoted to two external tools on
-which PIPS relies: NewGen and the linear library.
-Section~\ref{sec:makefiles} will then present PIPS' make file policy.
+which PIPS relies: NewGen and the Linear library.
+Section~\ref{sec:makefiles} will then present PIPS make file policy.
 Sections~\ref{sec:library_internal_organization}
 and~\ref{sec:pass_organization} are devoted to PIPS libraries and
 passes. The next section briefly describes some conventions usually
-respected when developing in PIPS\@. The last two sections describe
-the {\em bug policy\/} of PIPS and some save and restore information.
+respected when developing in PIPS. The last two sections describe
+the \emph{bug policy} of PIPS and some save and restore information.
 
 This manual is not exhaustive. You can add your own sections and update
 existing ones if you find missing or erroneous information.
 
 The reader is supposed to be a PIPS user~\cite{Pips:96a}, and to have read
-the reports about NewGen~\cite{Jouv:89,Jouv:90}. A good understanding of {\tt
-  pipsmake} mechanisms would also be helpful.
+the reports about NewGen~\cite{Jouv:89,Jouv:90}. A good understanding of 
+\texttt{pipsmake} mechanisms would also be helpful.
+
+\section{Getting PIPS sources}
+
+The sources of NewGen, Linear and Pips are managed under subversion.
+They are accessible from anywhere in the world by the http protocol
+at:
+\par \centerline{\LINK{http://svn.cri.ensmp.fr/pips.html}}
+
+There are 4 repositories for the various softwares:
+\begin{description}
+\item[nlpmake] common makefiles for Newgen, Linear and Pips.
+\item[newgen] Newgen software.
+\item[linear] Linear/C3 mathematical libraries.
+\item[pips] PIPS software.
+\end{description}
+
+The subversion repositories are organised in standard subdirectories 
+as advised for best subversion practices:
+\begin{description}
+\item[trunk] production version, should be stable enough
+  to pass the validation.
+\item[branches] development branches of all or part of
+  the software for each developer. developments are to be performed
+  here and installed (joined, merged) once finished into \texttt{trunk}.
+\item[tags] tagged revisions.
+\end{description}
+
+Moreover the \texttt{pips} repository includes
+\begin{description}
+\item[bundles] group of softwares.
+\item[bundles/trunks] convenient extraction of all 3 softwares trunk 
+  versions ready for compilation.
+\end{description}
+
+A crude script on the web site allows to download polylib, newgen, 
+linear and pips and to build a local installation of the softwares.
+For instance developer \texttt{calvin} can do the following to
+setup its own pips environment:
+\begin{verbatim}
+sh> setup_pips.sh /tmp/MYPIPS calvin
+...
+sh> source /tmp/MYPIPS/pipsrc.sh
+sh> # enjoy
+\end{verbatim}
+
+\section{Developing PIPS under SVN}
+\label{sec:dev-svn}
+
+The development policy within the pips-related software is
+that the \texttt{trunk} version should hold a production quality
+software which pass all non-regression tests. Thus day-to-day
+development should not occur within this part, but in independent
+per-developer \texttt{branches} which should be validated before being
+merged back into the \texttt{trunk}.
+
+A basic understanding of svn operations and concepts such as 
+\emph{repository, checkout, commit} are necessary to develop
+in pips. 
+
+In order to help with the branch management, we propose the following 
+procedure based on the \texttt{svn\_branch.sh} script also provided.
+
+\begin{enumerate}
+\item Obtain an svn user account on \texttt{svn.cri.ensmp.fr}. 
+  For instance, a login \texttt{calvin} and some password may be given.
+  Calvin will have his own development area under \texttt{branches/calvin}
+  in the subversion repository.
+\item Extract your own pips with the setup script mentionned above.
+  The resulting directory may contains at the end of the building process:
+  \begin{description}
+  \item[prod] compiled production version of pips, newgen, linear and
+    the external polylib library.
+  \item[pips\_dev] Calvin's development area which points to
+    \texttt{branches/calvin} and should be empty at the beginning.
+  \item[pipsrc.sh] sh-compatible shell initialisation
+  \item[pipsrc.csh] csh-compatible shell initialisation
+  \end{description}
+\item Create your development branch refering to a given library directory
+  in the production version. Assuming that Calvin wants to develop 
+  in the \texttt{hpfc} library in pips:
+\begin{verbatim}
+sh> cd /tmp/MYPIPS/prod/pips/src/Libs/hpfc
+sh> make USERNAME=calvin create-branch
+# ... not really created before the commit
+sh> svn commit /tmp/svn_branch.XXXXXX/
+\end{verbatim}
+  It creates a new branch, not yet committed, in some directory. 
+  USERNAME is not necessary if the svn and unix account share
+  the same name. This directory must be committed, or its
+  creation may be committed automatically with the
+  \texttt{force-create-branch} target.
+\item If necessary, update your development area to make the branch appear.
+\begin{verbatim}
+sh> cd /tmp/MYPIPS/pips_dev
+sh> svn update
+A    hpfc
+sh> cd hpfc
+\end{verbatim}
+\item Develop, test, commit within your branch\ldots
+  Some makefile targets of interest to the developer:
+  \begin{description}
+  \item[diff] svn diff of local directory.
+  \item[info] svn info of local directory.
+  \item[branch-diff] what you have develop in your branch, i.e. the
+    differences between your branch and the production version.
+  \item[branch-info] information about your branch.
+  \end{description}
+\item When you're done with your developments, they are committed into
+  your branch, you want to install them back to the pips main line.
+\begin{verbatim}
+sh> make install-branch
+# ... create a temporary merge
+# ... there may be Conflicts to be dealt with
+# ... TEST IT!
+sh> svn commit /tmp/svn_branch.XXXXXX/
+\end{verbatim}
+  You must have write access to the \texttt{trunk} in order to do that.
+\end{enumerate}
+
+It is also possible to use the \texttt{svn\_branch.sh} script
+directly to create a branch for any part of pips, including the
+full software.
+
+It is also possible to use \texttt{svn} directly to create and
+manage your branches with copies. The \texttt{svn\_branch.sh}
+adds convinient administrative data in the directory to know about the
+status of the branch: what is its source, what was merged from
+the source of joined back to it, and so on.
+
+\newpage
+
+
+{\huge OBSOLETE DOWN FROM HERE}
+
 
 \section{Shell environment (sh, ksh, bash, csh, tcsh)}
 \label{sec:shell}
@@ -168,7 +295,7 @@ The organisation of the Newgen (\verb+/projects/Newgen+) and C3/Linear
 This directory contains the current reference versions of library and
 passes. You can find the following subdirectories:
 
-\subsubsection{Bin}
+\subsubsection{bin}
 
 Pips current binaries that can be executed. These binaries include
 \texttt{pips} (the main program), \texttt{tpips} (the same program with a
@@ -180,8 +307,9 @@ which describes the current architecture, as discussed in
 Section~\ref{sec:shell}. 
 
 
+\subsubsection{etc}
 
-\subsubsection{Share}
+\subsubsection{share}
 
 Non architecture-dependent executables needed or used by pips. They
 include shell (sh and csh), sed, awk, perl and lisp scripts! Examples:
@@ -207,7 +335,7 @@ Important files are \verb+pipsmake.rc+, \verb+properties.rc+ and
 
 
 
-\subsubsection{Doc}
+\subsubsection{doc}
 
 Pips documentation, namely many postscript files describing various
 aspects of PIPS, the internal data structures and so on.  Important
@@ -221,14 +349,14 @@ The \verb|Doc/manl| subdirectory contains local (obsolete?) man pages.
 
 
 
-\subsubsection{Html}
+\subsubsection{html}
 
 Html documentation of PIPS. Some real html files, and some generated from
 \LaTeX{} files.
 
 
     
-\subsubsection{Runtime}
+\subsubsection{runtime}
 
 Environments needed for executing pips-compiled files.  Namely
 \texttt{hpfc} and \texttt{wp65} use a PVM-based runtime and also
@@ -240,14 +368,14 @@ sources.
 
 
 
-\subsubsection{Src}
+\subsubsection{src}
 
 PIPS Sources. Having a copy of the \verb+Src+ subtree is enough for fully
 recompiling PIPS, including the documentation, configuration files and
 various scripts used for running and developping the PIPS sofware.
 
 \begin{description}
-\item[Src/Documentation]:
+\item[src/Documentation]:
   This directory contains the sources of the documentation of
   PIPS. From some of these are derived automatically header and
   configuration files. 
@@ -270,18 +398,18 @@ various scripts used for running and developping the PIPS sofware.
   \LaTeX{} file, from which are derived the \verb+pipsmake.rc+
   configuration file used by PIPS at runtime.
   
-\item[Src/Passes]: This directory contains the sources of the
+\item[src/Passes]: This directory contains the sources of the
   different passes, in several sub-directories named from the passes
   (\verb+pips+, \verb+tpips+, \verb+wpips+). If you add a pass, it is
   mandatory that the name of the directory is the name of the pass (or
   redefine the TARGET macro in the config.makefile).
   
-\item[Src/Libs]: This directory contains the source of the several
+\item[src/Libs]: This directory contains the source of the several
   libraries of PIPS\@.  It is divided into sub-directories named from
   the libraries. The name of the subdirectory must be the name of the
   library.
   
-\item[Src/Scripts]:
+\item[src/Scripts]:
   This directory contains the source of the shell scripts which are
   useful for PIPS, the linear library and NewGen. It is further
   divided into several directories. In each sub-directory a local
@@ -290,7 +418,7 @@ various scripts used for running and developping the PIPS sofware.
   \verb+$PIPS_ROOT/Utils+, depending whether the scripts is used for
   \emph{running} or \emph{developping} PIPS.
   
-\item[Src/Runtimes]: This directory contains the sources of the
+\item[src/Runtimes]: This directory contains the sources of the
   libraries used when executing codes generated by PIPS; in fact,
   there are only two libraries: The first for the HPF compiler
   \verb+hpfc+, and the second one for the WP65 project.
@@ -299,7 +427,7 @@ various scripts used for running and developping the PIPS sofware.
 
 
 
-\subsubsection{Utils}
+\subsubsection{utils}
 
 Other architecture independent tools and files used for \emph{developing}
 pips (as opposed to \emph{running} it).
@@ -420,7 +548,7 @@ pips (as opposed to \emph{running} it).
     
 
 
-\subsubsection{Include}
+\subsubsection{include}
 
 This directory contains all shared files needed for building PIPS.  It
 includes C header files automatically generated from NewGen specifications
@@ -429,7 +557,7 @@ architecture configuration file that define makefile macros are there.
 
 
 
-\subsubsection{Lib}
+\subsubsection{lib}
 
 This directory contains PIPS compiled libraries ({\tt lib*.a}) ready
 to be linked. They are stored under their \verb|$PIPS_ARCH| %% $
