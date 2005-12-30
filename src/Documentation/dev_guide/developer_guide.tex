@@ -2,14 +2,19 @@
 %% $Id$
 %%
 %
-% PIPS development environment documentation; translated and updated from 
-% dret146.f.tex
-%
+% PIPS development environment documentation;
+% translated and updated from dret146.f.tex
+
 \documentclass[a4paper]{article}
 
-\usepackage{epsfig,amstext,alltt,html}
+\usepackage{epsfig,amstext,alltt}
 
-\title{\bf {\Huge PIPS} \\ Development Environment}
+\title{\bf {\Huge PIPS} \\ 
+  Development Environment \\
+  ~ \\
+  THIS DOCUMENTATION \\
+  IS OBSOLETE!
+}
 
 \author{
 \begin{tabular}{rl}
@@ -41,10 +46,10 @@ $Id$
 \end{verbatim}
 }
 
-\begin{latexonly}
+%%\begin{latexonly}
   \clearpage
   \tableofcontents  
-\end{latexonly}
+%%\end{latexonly}
 
 \newpage
 \section*{Introduction}
@@ -874,7 +879,7 @@ Here are now the steps to install a new library named {\tt mylib}:
   \item declare the new phase to {\tt pipsmake} by adding the necessary
     rules in the file {\tt pipsmake-rc.tex}. Each rule describes the
     dependances between the input and output resources of each phase. Just
-    have a look at hte other rules to build your owns. You can also add
+    have a look at the other rules to build your owns. You can also add
     aliases to obtain nice menus in the \verb+wpips+ interface.
     
     For instance, for a phase {\em myphase} which reads a resource {\em res1}
@@ -944,7 +949,7 @@ is available.
   \item Declare the new resource \texttt{myres} by modifying the file 
     \texttt{pipsmake-rc.tex}. Each rule describes the
     dependances between the input and output resources of each phase. Just
-    have a look at hte other rules to build your owns. You can also add
+    have a look at the other rules to build your owns. You can also add
     aliases to obtain nice menus in the \verb+wpips+ interface.
     
     For instance, for a phase {\em myphase} which reads a resource {\tt
