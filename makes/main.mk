@@ -554,7 +554,7 @@ create-branch:
 	    else \
 		branch=branches/$(USERNAME)/$(NEW_BRANCH_NAME) ; \
 	    fi ; \
-	    $(BRANCH) $(BRANCH_FLAGS) create . $$branch ; \
+	    $(BRANCH) create $(BRANCH_FLAGS) . $$branch ; \
 	  fi ; \
 	else \
 	  echo "cannot create branch, not a wcpath" ; \
@@ -569,7 +569,7 @@ install-branch:
 	@if $(IS_SVN_WC) ; then \
 	  if $(IS_SVN_BRANCH) . ; then \
 	    echo "installing current directory..." ; \
-	    $(BRANCH) $(BRANCH_FLAGS) join . ; \
+	    $(BRANCH) join $(BRANCH_FLAGS) . ; \
 	  else \
 	    echo "cannot install current directory, not a branch" ; \
 	  fi ; \
