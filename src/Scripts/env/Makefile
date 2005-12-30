@@ -1,9 +1,8 @@
 # $Id$
 
-ENV	=	pipsrc.sh pipsrc.csh
+INSTALL_SHR	= pipsrc.sh pipsrc.csh
 
-# is it still needed?
-INSTALL_SHR	= $(ENV)
+INSTALL_UTL	= sh2csh.pl
 
 # common stuff
 ifdef PIPS_ROOT
@@ -16,15 +15,10 @@ endif
 include $(ROOT)/makes/main.mk
 
 # local stuff
-pipsrc.sh: pipsrc.ref
-	make-pipsrc.sh > $@
-	chmod a-w $@
-
 pipsrc.csh: pipsrc.sh
-	make-pipsrc.csh < $< > $@
-	chmod a-w $@
+	sh2csh.pl $< > $@
 
 clean: local-clean
 
 local-clean:
-	$(RM) $(ENV)
+	$(RM) pipsrc.csh

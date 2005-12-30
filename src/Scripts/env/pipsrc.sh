@@ -11,8 +11,6 @@
 
 set -a
 
-
-
 #
 #           ##    #####    ####   #    #
 #          #  #   #    #  #    #  #    #
@@ -31,21 +29,21 @@ uname_s=`uname -s`
 uname_r=`uname -r`
 
 # default architecture for building pips
-PIPS_ARCH="GNU"
+export PIPS_ARCH="GNU"
 
 # the makefile_macros.$(PIPS_ARCH) file is used for compilers and options
 
 test ${uname_s} = SunOS && expr ${uname_r} : '^5' > /dev/null && \
-	PIPS_ARCH="GNUSOL2LL"
+	export PIPS_ARCH="GNUSOL2LL"
 
 test ${uname_s} = SunOS && expr ${uname_r} : '^4' > /dev/null && \
-	PIPS_ARCH="GNUSOL1"
+	export PIPS_ARCH="GNUSOL1"
 
 test ${uname_s} = Linux && \
-	PIPS_ARCH="LINUXI86LL"
+	export PIPS_ARCH="LINUXI86LL"
 
 test ${uname_s} = FreeBSD && \
-	PIPS_ARCH="FREEBSDLL"
+	export PIPS_ARCH="FREEBSDLL"
 
 # 
 #         #    #  ######  #    #   ####   ######  #    #
@@ -60,10 +58,10 @@ test ${uname_s} = FreeBSD && \
 newgen_dir=/projects/Newgen
 
 # the root location of where to find the newgen to use 
-NEWGEN_ROOT=${newgen_dir}/prod
+export NEWGEN_ROOT=${newgen_dir}/prod
 
 # PATH update
-PATH="${PATH}:${NEWGEN_ROOT}/bin:${NEWGEN_ROOT}/bin/${PIPS_ARCH}"
+export PATH="${PATH}:${NEWGEN_ROOT}/bin:${NEWGEN_ROOT}/bin/${PIPS_ARCH}"
 
 #
 #         #          #    #    #  ######    ##    #####
@@ -78,7 +76,7 @@ PATH="${PATH}:${NEWGEN_ROOT}/bin:${NEWGEN_ROOT}/bin/${PIPS_ARCH}"
 linear_dir=/projects/C3/Linear
 
 # the version to use
-LINEAR_ROOT=${linear_dir}/prod
+export LINEAR_ROOT=${linear_dir}/prod
 
 #
 #         ######   ####   #       ######
@@ -95,7 +93,7 @@ LINEAR_ROOT=${linear_dir}/prod
 
 eole_dir=/projects/Eole
 
-EOLE_ROOT=${eole_dir}/prod
+export EOLE_ROOT=${eole_dir}/prod
 
 PATH="${PATH}:${EOLE_ROOT}/bin/${PIPS_ARCH}"
 
@@ -114,7 +112,7 @@ PATH="${PATH}:${EOLE_ROOT}/bin/${PIPS_ARCH}"
 # Pips project sources and binaries
 pips_dir=/projects/Pips
 
-PIPS_ROOT="${pips_dir}/prod"
+export PIPS_ROOT="${pips_dir}/prod"
 
 # man pages?
 MANPATH="${MANPATH}:${PIPS_ROOT}/man"
@@ -123,8 +121,8 @@ PATH="${PATH}:${PIPS_ROOT}/bin:${PIPS_ROOT}/bin/${PIPS_ARCH}"
 
 # to get some determinism...
 
-PIPS_CPP='gcc -E -C'
-PIPS_FPP='gcc -E -C'
+export PIPS_CPP='gcc -E -C'
+export PIPS_FPP='gcc -E -C'
 test "${PIPS_ARCH}" = GNUSOL2LL && \
 	PIPS_FPP="fpp"
 
@@ -145,36 +143,36 @@ test "${PIPS_ARCH}" = GNUSOL2LL && \
 
 # hosts for Validate:
 test "${PIPS_ARCH}" = GNUSOL2LL && \
-	PIPS_HOSTS="champeaux"
+	export PIPS_HOSTS="champeaux"
 
 test "${PIPS_ARCH}" = . -o "${PIPS_ARCH}" = GNU && \
-	PIPS_HOSTS=""
+	export PIPS_HOSTS=""
 
 test "${PIPS_ARCH}" = LINUXI86 -o "${PIPS_ARCH}" = LINUXI86LL && \
-	PIPS_HOSTS=""
+	export PIPS_HOSTS=""
 
 test "${PIPS_ARCH}" = FREEBSD -o "${PIPS_ARCH}" = FREEBSDLL && \
-	PIPS_HOSTS=""
+	export PIPS_HOSTS=""
 
 #
 # others... they are mainly documented in install_pips...
 #
 
 test ${uname_s} = Linux && \
-	PIPS_PING="ping -c 1"
+	export PIPS_PING="ping -c 1"
 
 # under solaris basename is refexpr based.
 test ${uname_s} = SunOS && \
-	PIPS_BASENAME="/usr/ucb/basename"
+	export PIPS_BASENAME="/usr/ucb/basename"
 
 test ${uname_s} = Linux && \
-	PIPS_FLINT="g77 -c -Wall -Wimplicit"
+	export PIPS_FLINT="g77 -c -Wall -Wimplicit"
 
 test ${uname_s} = Linux && \
-	PIPS_MAKE="make"
+	export PIPS_MAKE="make"
 
 test ${uname_s} = FreeBSD && \
-	PIPS_MAKE="gmake"
+	export PIPS_MAKE="gmake"
 
 
 #
@@ -189,12 +187,12 @@ test ${uname_s} = FreeBSD && \
 # home directory for openwin (only used by the XView interface: wpips)
 #
 
-OPENWINHOME="/usr/openwin"
+export OPENWINHOME="/usr/openwin"
 
-X11_ROOT="$OPENWINHOME"
+export X11_ROOT="$OPENWINHOME"
 
 test ${uname_s} = Linux && \
-	X11_ROOT="/usr/X11"
+	export X11_ROOT="/usr/X11"
 
 
 
@@ -244,10 +242,9 @@ test ${uname_s} = Linux && \
 # default: HPFC_M4='gm4'
 
 test ${uname_s} = Linux && \
-	HPFC_SED=sed
+	export HPFC_SED=sed
 test ${uname_s} = Linux && \
-	HPFC_M4=m4
-
+	export HPFC_M4=m4
 
 
 #
@@ -312,12 +309,12 @@ test ${uname_s} = Linux && \
 # the readline or rx libraries may be expected here for instance, 
 # if not available in a standard location.
 
-EXTERN_ROOT="${pips_dir}/Externals"
+export EXTERN_ROOT="${pips_dir}/Externals"
 
 PATH="${PATH}:${EXTERN_ROOT}/Share:${EXTERN_ROOT}/Utils"
 PATH="${PATH}:${EXTERN_ROOT}/Bin/${PIPS_ARCH}"
 
-LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${EXTERN_ROOT}/Lib/${PIPS_ARCH}"
+#LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${EXTERN_ROOT}/Lib/${PIPS_ARCH}"
 
 
 
