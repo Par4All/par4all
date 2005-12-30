@@ -54,7 +54,7 @@ script=`${PIPS_BASENAME:-basename} $0`
 unset valid_option warning performance
 
 vdir="$PIPS_VALIDDIR"
-VALID="$PIPS_ROOT/Utils/validate-sequential"
+VALID="$PIPS_ROOT/utils/validate-sequential"
 
 # so as to find the right ping, mail and date...
 PATH="/usr/ucb:/usr/etc:/usr/bin:/usr/games:.:$PATH"
@@ -136,8 +136,7 @@ alive()
 
 which_executable()
 {
-  PATH="${PWD}/${PIPS_ARCH}:${PIPS_ROOT}/Bin/${PIPS_ARCH}:${PWD}:." \
-    type $1 | sed "s,.* is ,,"
+  PATH="${PWD}/${PIPS_ARCH}:${PIPS_ROOT}/bin/${PIPS_ARCH}:${PWD}" type -p $1
 }
 
 #
@@ -169,7 +168,7 @@ validate_usage()
 	  -f file: what file in a module (use with -n)
 	  -x pips: pips to be used
 	  -y tpips: tpips to be used 
-	    default {,t}pips: . ./\$PIPS_ARCH \$PIPS_ROOT/Bin/\$PIPS_ARCH type)
+	    default {,t}pips: . ./\$PIPS_ARCH \$PIPS_ROOT/bin/\$PIPS_ARCH type)
 	  modules: if none, from file \$PIPS_VALIDDIR/defaults.\$PIPS_ARCH
 	           else from file \$PIPS_VALIDDIR/defaults
 EOF

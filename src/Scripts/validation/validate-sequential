@@ -36,6 +36,8 @@
 PIPS_VALIDDIR=${PIPS_VALIDDIR:-${PIPS_ROOT}/Validation}
 export PIPS_VALIDDIR
 
+# some validation use error messages, which must not be translated!
+unset LANG
 umask 002
 
 vdir=${PIPS_VALIDDIR}
@@ -96,8 +98,7 @@ debug()
 
 which_executable()
 {
-  PATH="${PWD}/${PIPS_ARCH}:${PIPS_ROOT}/Bin/${PIPS_ARCH}:${PWD}:." \
-    type $1 | sed "s,.* is ,," | sed "s,.* est ,,"
+  PATH="${PWD}/${PIPS_ARCH}:${PIPS_ROOT}/bin/${PIPS_ARCH}:${PWD}" type -p $1
 }
 
 usage()
