@@ -280,7 +280,7 @@ int HasParenthesis;
 		if(!basic_string_p(bt)) {
 		  /* pips_assert("Substring can only be applied to a string",
 				 basic_string_p(bt)); */
-		  if(!get_bool_property("PARSER_ACCEPT_ARRAY_RANGE_EXTENSIONS"))
+		  if(!get_bool_property("PARSER_ACCEPT_ARRAY_RANGE_EXTENSION"))
 		    ParserError("MakeAtom",
 				"Substring operations can only be applied to "
 				"strings in Fortran 77\n");
