@@ -96,32 +96,28 @@ cat <<EOF > $destination/pipsrc.sh
 # minimum rc file for sh-compatible shells
 
 # default architecture
-PIPS_ARCH=$PIPS_ARCH
-export PIPS_ARCH
+export PIPS_ARCH=$PIPS_ARCH
 
 # subversion repositories
-NEWGEN_SVN=$SVN_CRI/newgen
-export NEWGEN_SVN
-
-LINEAR_SVN=$SVN_CRI/linear
-export LINEAR_SVN
-
-PIPS_SVN=$SVN_CRI/pips
-export PIPS_SVN
+export NEWGEN_SVN=$SVN_CRI/newgen
+export LINEAR_SVN=$SVN_CRI/linear
+export PIPS_SVN=$SVN_CRI/pips
 
 # software roots
-EXTERN_ROOT=$prod/extern
-export EXTERN_ROOT
-
-NEWGEN_ROOT=$prod/newgen
-export NEWGEN_ROOT
-
-LINEAR_ROOT=$prod/linear
-export LINEAR_ROOT
-
-PIPS_ROOT=$prod/pips
-export PIPS_ROOT
+export EXTERN_ROOT=$prod/extern
+export NEWGEN_ROOT=$prod/newgen
+export LINEAR_ROOT=$prod/linear
+export PIPS_ROOT=$prod/pips
 
 # path
 PATH=\$PIPS_ROOT/bin:\$PIPS_ROOT/utils:\$PATH
 EOF
+
+echo "### generating csh environment"
+$prod/pips/utils/sh2csh.pl < $destination/pipsrc.sh > $destination/pipsrc.csh
+
+echo "### checking useful softwares"
+for exe in m4 wish
+do
+  type $exe || echo "no such executable, consider installing: $exe"
+done
