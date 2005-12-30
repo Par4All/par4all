@@ -67,7 +67,7 @@ $(CLASS.d):
 manifest.mf:
 	echo "Main-Class: $(pkg).JPips" > $@
 
-ifdef _HAS_JAVA_
+ifdef _HAS_JDK_
 
 jpips.jar: $(CLASS.d) manifest.mf
 	$(JAVAC) -classpath $(CLASS.d) -d $(CLASS.d) $(F.java)
@@ -77,6 +77,7 @@ jpips.jar: $(CLASS.d) manifest.mf
 
 else
 
+# hmmm...
 jpips.jar:
 	touch $@
 
