@@ -40,8 +40,11 @@ done
 
 echo "### downloading pips"
 svn checkout $PIPS_SVN/bundles/trunks $prod || error "cannot checkout pips"
+
+# clean environment so as not to interfere with another installation
 PIPS_ARCH=`$prod/pips/makes/arch.sh`
 export PIPS_ARCH
+unset NEWGEN_ROOT LINEAR_ROOT PIPS_ROOT
 
 # this should fail if not a developer
 echo "### getting user development branches"
