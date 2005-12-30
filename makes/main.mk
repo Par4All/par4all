@@ -203,11 +203,7 @@ $(DEPEND): $(LIB_CFILES) $(OTHER_CFILES) $(DERIVED_CFILES)
 # actual generation is done on demand only
 depend: $(DERIVED_HEADERS) $(INC_TARGET)
 	$(MAKEDEP) $(LIB_CFILES) $(OTHER_CFILES) $(DERIVED_CFILES) | \
-	sed    's,^\(.*\.o:\),$(ARCH)/\1,;\
-		s,$(PIPS_ROOT),$$(PIPS_ROOT),g;\
-		s,$(LINEAR_ROOT),$$(LINEAR_ROOT),g;\
-		s,$(NEWGEN_ROOT),$$(NEWGEN_ROOT),g;\
-		s,$(ROOT),$$(ROOT),g' > $(DEPEND)
+	sed 's,^\(.*\.o:\),$(ARCH)/\1,;s,$(PIPS_ROOT),$$(PIPS_ROOT),g;s,$(LINEAR_ROOT),$$(LINEAR_ROOT),g;s,$(NEWGEN_ROOT),$$(NEWGEN_ROOT),g;s,$(ROOT),$$(ROOT),g' > $(DEPEND)
 
 clean: depend-clean
 
