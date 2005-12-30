@@ -6,8 +6,7 @@ INSTALL_UTL =	analyze_libraries \
 		order_libraries_from_include \
 		pips_at_night \
 		pips_at_night_at_cri \
-		build_so_files \
-		svn_branch.sh
+		build_so_files
 
 # common stuff
 ifdef PIPS_ROOT
