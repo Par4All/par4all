@@ -82,17 +82,21 @@ type latex && echo '_HAS_LATEX_ = 1' >> $config
 type emacs && echo '_HAS_EMACS_ = 1' >> $config
 # others? copy config to newgen and linear?
 
+# whether to build the documentation depends on latex
+target=compile
+type latex && target=build
+
 echo "### building newgen"
 cd $prod/newgen
-make compile
+make $target
 
 echo "### building linear"
 cd $prod/linear
-make compile
+make $target
 
 echo "### building pips"
 cd $prod/pips
-make compile
+make $target
 
 echo "### creating pipsrc.sh"
 cat <<EOF > $destination/pipsrc.sh
@@ -120,7 +124,7 @@ echo "### generating csh environment"
 $prod/pips/utils/sh2csh.pl < $destination/pipsrc.sh > $destination/pipsrc.csh
 
 echo "### checking useful softwares"
-for exe in bash m4 wish
+for exe in bash m4 wish latex javac emacs
 do
   type $exe || echo "no such executable, consider installing: $exe"
 done
