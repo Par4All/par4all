@@ -7,7 +7,7 @@ SVN =		svn
 SVN_FLAGS =
 IS_SVN_WC =	test -d .svn
 
-BRANCH = 	svn_branch.sh
+BRANCH = 	$(MAKE.d)/svn_branch.sh
 BRANCH_FLAGS =
 IS_BRANCH =	$(BRANCH) test --quiet
 
