@@ -584,7 +584,7 @@ remove-branch:
 	    echo "removing current branch..." ; \
 	    svn rm . ; \
 	    echo "please commit .. if you agree" ; \
-	  else
+	  else \
 	    echo "cannot remove branch, not a branch" ; \
 	  fi ; \
 	else \
