@@ -114,6 +114,10 @@ sh> # enjoy
 \section{Developing PIPS under SVN}
 \label{sec:dev-svn}
 
+A basic understanding of svn operations and concepts such as 
+\emph{repository, checkout, status, commit} are necessary to develop
+in pips. 
+
 The development policy within the pips-related software is
 that the \texttt{trunk} version should hold a production quality
 software which pass all non-regression tests. Thus day-to-day
@@ -121,9 +125,7 @@ development should not occur within this part, but in independent
 per-developer \texttt{branches} which should be validated before being
 merged back into the \texttt{trunk}.
 
-A basic understanding of svn operations and concepts such as 
-\emph{repository, checkout, commit} are necessary to develop
-in pips. 
+\subsection{Pips development branches}
 
 In order to help with the branch management, we propose the following 
 procedure based on the \texttt{svn\_branch.sh} script also provided.
@@ -185,15 +187,29 @@ sh> svn commit /tmp/svn_branch.XXXXXX/
   You must have write access to the \texttt{trunk} in order to do that.
 \end{enumerate}
 
-It is also possible to use the \texttt{svn\_branch.sh} script
+\subsection{Other approaches}
+
+You may decide that the above procedure is not for you.
+Here are other possible approaches for developping in pips,
+that you may use provided that you do not break the development
+policy which requires all changes committed to the \texttt{trunk}
+not to break the non-regression tests.
+
+It is possible to use the \texttt{svn\_branch.sh} script
 directly to create a branch for any part of pips, including the
 full software.
 
-It is also possible to use \texttt{svn} directly to create and
+It is possible to use \texttt{svn} directly to create and
 manage your branches with copies. The \texttt{svn\_branch.sh}
 adds convinient administrative data in the directory to know about the
 status of the branch: what is its source, what was merged from
 the source of joined back to it, and so on.
+
+It is finally possible to edit directly your production working
+copy, and just commit from there when you're happy with your changes.
+This may be advisable for small easy to test global changes, such as adding
+a new library in pips. This is not advisable for long development, as
+it is often useful to have an history of such developments.
 
 \newpage
 
