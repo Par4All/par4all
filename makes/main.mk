@@ -578,6 +578,19 @@ install-branch:
 	  echo "cannot install current directory, not under svn" ; \
 	fi
 
+remove-branch:
+	-@if $(IS_SVN_WC) ; then \
+	  if $(IS_BRANCH) . ; then \
+	    echo "removing current branch..." ; \
+	    svn rm . ; \
+	    echo "please commit .. if you agree" ; \
+	  else
+	    echo "cannot remove branch, not a branch" ; \
+	  fi ; \
+	else \
+	  echo "cannot remove branch, not under svn" ; \
+	fi
+
 branch-diff:
 	-@$(IS_BRANCH) . && $(BRANCH) diff
 
