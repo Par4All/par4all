@@ -570,7 +570,7 @@ install-branch:
 	-@if $(IS_SVN_WC) ; then \
 	  if $(IS_BRANCH) . ; then \
 	    echo "installing current directory..." ; \
-	    $(BRANCH) join $(BRANCH_FLAGS) . ; \
+	    $(BRANCH) push $(BRANCH_FLAGS) . ; \
 	  else \
 	    echo "cannot install current directory, not a branch" ; \
 	  fi ; \

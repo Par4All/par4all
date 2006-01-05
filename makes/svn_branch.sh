@@ -1,6 +1,6 @@
 #! /bin/bash
 #
-# $Id: svn_branch.sh 344 2005-12-29 18:58:59Z coelho $
+# $Id: svn_branch.sh 367 2006-01-04 10:34:49Z coelho $
 #
 # $URL: file:///users/cri/coelho/SVN/svn/svn_branch.sh $
 #
@@ -31,13 +31,13 @@
 # This "svnbranch" script aims at having a more stable 'production' trunk 
 # and manage development in less stable branches, which are expected to hold
 # long standing developments. The branches can get some trunk changes,
-# and are to be joined back to the trunk when the development is over.
+# and are to be pushed back to the trunk when the development is over.
 # So mergings are to be managed in both directions. Also, less commands
 # are required wrt "svnmerge".
 #
 # trunk/____________*__+_____*__+_____X__
 #   |               |        |        A
-#   | initial copy  | some merges...  | join (merge back)
+#   | initial copy  | some pulls...   | push (merge back)
 #   V               V        V        |
 # branches/dev/__x__*_____x__*_____x__/
 #
@@ -49,16 +49,16 @@
 #    future svn release.
 #
 # TODO:
-#  - add svnmerge revision list management.
-#  - option for giving a source wc path to join
-#  - test/validate scenario
-#
+#  - option for giving a source wc path to push
+#  - option to include logs on push? log pointer is enough??
+#  - add file option to put the suggested commit message
+#  - store pulled revisions in compact form
 
 # keep command name
 command=${0/*\//}
 
 # keep revision number
-cmd_rev='$Rev: 344 $'
+cmd_rev='$Rev: 367 $'
 cmd_rev=${cmd_rev/*: /}
 cmd_rev=${cmd_rev/ \$/}
 
@@ -89,11 +89,15 @@ usage="usage: $command action [options...] arguments
     --url url: source and destination can be relative to this url.
   * diff [options] wc_path...
     . show differences between branches and their sources.
-  * merge [options] wc_path...
+  * pull [options] wc_path...
     . merge into the branches from their sources.
-  * join [options] wc_path...
+  * push [options] wc_path...
     . merge back from the branches into their sources.
-    --remove: automatically remove branch after join.
+    --remove: automatically remove branch after push.
+  * avail path...
+    . revisions available from source for merging
+  * log branch_path
+    . log of revisions of the branch source 
   * relocate source_url branch
     . change location of branch source.
   * test dir
@@ -105,7 +109,7 @@ usage="usage: $command action [options...] arguments
     --quiet: be quiet (not advisable)
     --tmp tmp: directory for temporary files or directories, default is /tmp
     --commit: try to perform all commits (not really advisable)
-    --revision rev: revision to consider (for create, merge, join...)
+    --revision rev: revision to consider (for create, pull, push...)
     --dry-run: just pretend"
 
 # useful for pattern matching
@@ -142,6 +146,16 @@ function is_svn_url()
     return 1
 }
 
+function is_action()
+{
+    # idem
+    case $1 in 
+	create|diff|pull|push|relocate|test|info|avail|log|help|version) 
+	    return 0 ;;
+    esac
+    return 1
+}
+
 # is_svn_working_url tested-url
 # returns whether the url exists and is working
 function is_svn_working_url()
@@ -151,28 +165,33 @@ function is_svn_working_url()
 
 function is_svn_wcpath()
 {
-    test -d $1 -a -d $1/.svn
+    test -d $1 && test -d $1/.svn
 }
 
 function is_svn_branch()
 {
-    is_svn_wcpath $1 || return 1
     local version=$(do_svn propget 'svnbranch:version' $1)
     [ "$version" ]
+}
+
+function is_svn_branch_wcpath()
+{
+    is_svn_wcpath $1 || return 1
+    is_svn_branch $1
 }
 
 # perform a svn command but quit on error.
 function safe_svn()
 {
-    verb 2 $svn "$@"
-    $nodo $svn "$@" || error 2 "svn failed: $svn $@"
+    verb 2 $svn $svn_options "$@"
+    $nodo $svn $svn_options "$@" || error 2 "svn failed: $svn $@"
 }
 
 # same as above, but to it anyway even under dry-run
 function do_svn()
 {
-    verb 2 $svn "$@"
-    $svn "$@" || error 2 "svn failed: $svn $@"
+    verb 2 $svn $svn_options "$@"
+    $svn $svn_options "$@" || error 2 "svn failed: $svn $@"
 }
 
 function get_info()
@@ -201,7 +220,7 @@ function reset_property()
     local pname=$1 pval=$2 path=$3 ; shift 3
 
     if [ "$pval" ] ; then
-	safe_svn propset $pname $pval $path
+	safe_svn propset $pname "$pval" $path
     else
 	safe_svn propdel $pname $path
     fi
@@ -285,19 +304,22 @@ function perform_merge()
     local save_src_ver=$(safe_svn propget 'svnbranch:version'    $dir)
     local save_src_url=$(safe_svn propget 'svnbranch:source-url' $dir)
     local save_src_rev=$(safe_svn propget 'svnbranch:source-rev' $dir)
-    local save_mrg_rev=$(safe_svn propget 'svnbranch:merged-rev' $dir)
-    local save_joi_rev=$(safe_svn propget 'svnbranch:joined-rev' $dir)
+    local save_pll_rev=$(safe_svn propget 'svnbranch:pulled-rev' $dir)
+    local save_psh_rev=$(safe_svn propget 'svnbranch:pushed-rev' $dir)
 
     # apply differences
     # obscure issue with 1.2.3: svn: Move failed...
-    safe_svn merge --revision $revs $src_url $dir
+    ##safe_svn merge --revision $revs $src_url $dir
+    pushd $dir
+    safe_svn merge --revision $revs $src_url .
+    popd
 
     # restore saved svnbranch:* props
     reset_property 'svnbranch:version'    "$save_src_ver" $dir
     reset_property 'svnbranch:source-url' "$save_src_url" $dir
     reset_property 'svnbranch:source-rev' "$save_src_rev" $dir
-    reset_property 'svnbranch:merged-rev' "$save_mrg_rev" $dir
-    reset_property 'svnbranch:joined-rev' "$save_joi_rev" $dir
+    reset_property 'svnbranch:pulled-rev' "$save_pll_rev" $dir
+    reset_property 'svnbranch:pushed-rev' "$save_psh_rev" $dir
 
     # ???
     safe_svn update $dir
@@ -318,6 +340,102 @@ function safe_svn_commit()
 	echo "suggested message:"
 	echo "$message"
     fi
+}
+
+################################################################# REVISION LIST
+# revision lists come in two flavors.
+# expanded: " 1 2 3 7 9 10 11 20 21"
+# compact: " 1:3 7 9:11 20:21"
+
+# get all revisions in log...
+function get_all_revisions()
+{
+    local revs=$1 target=$2 ; shift 2
+    do_svn log --quiet --revision $revs $target |
+    while read rev line ; do
+	case $rev in r*) echo -n " ${rev/r/}" ;; esac
+    done
+}
+
+# substract from expanded list $1 list $2
+function list_sub()
+{
+    local l1="${1# } " l2="${2# } " ; shift 2
+    local h1 h2
+    while [[ $l1 && $l2 ]] ; do
+	[[ $h1 ]] || h1=${l1%% *} l1=${l1#* }
+	[[ $h2 ]] || h2=${l2%% *} l2=${l2#* }
+	if [[ $h1 -eq $h2 ]] ; then
+	    h1= h2=
+	elif [[ $h1 -lt $h2 ]] ; then
+	    echo -n " $h1"
+	    h1=
+	else
+	    h2=
+	fi
+    done
+    [[ $h1 ]] && echo -n " $h1"
+    [[ $l1 ]] && echo -n " $l1"
+}
+
+# union of both expanded lists
+function list_union()
+{
+    local l1="${1# } " l2="${2# } " ; shift 2
+    local h1 h2
+    while [[ $l1 && $l2 ]] ; do
+	[[ $h1 ]] || h1=${l1%% *} l1=${l1#* }
+	[[ $h2 ]] || h2=${l2%% *} l2=${l2#* }
+	if [[ $h1 -eq $h2 ]] ; then
+	    echo -n " $h1" 
+	    h1= h2=
+	elif [[ $h1 -lt $h2 ]] ; then
+	    echo -n " $h1"
+	    h1=
+	else
+	    echo -n " $h2"
+	    h2=
+	fi
+    done
+    [[ $h1 ]] && echo -n " $h1"
+    [[ $h2 ]] && echo -n " $h2"
+    [[ $l1 ]] && echo -n " $l1"
+    [[ $l2 ]] && echo -n " $l2"
+}
+
+# build a compact form for a list of revisions
+function compact()
+{
+    local prev=$1 expect=$1 start=$1
+    for r ; do
+	if [[ $r -ne $expect ]] ; then
+	    echo -n " $start"
+	    [[ $prev -ne $start ]] && echo -n ":$prev"
+	    start=$r
+	fi
+	prev=$r expect=$r
+	let expect++
+    done
+    echo -n " $start"
+    [[ $prev -ne $start ]] && echo -n ":$prev"
+}
+
+# build an expanded list of revisions from a compact form
+function expand()
+{
+    local i
+    for i ; do
+	if [[ $i == *:* ]] ; then
+	    local n=${i/:*/} end=${i/*:/}
+	    while true ; do
+		echo -n " $n"
+		[ $n -eq $end ] && break
+		let n++
+	    done
+	else
+	    echo -n " $i"
+	fi
+    done
 }
 
 ################################################################### DO THE JOBS
@@ -352,95 +470,117 @@ function create()
     safe_svn copy --revision $src_rev $src $tmp_co/$branch
 
     # set administrativa data
-    safe_svn propset 'svnbranch:version'    1        $tmp_co/$branch
-    safe_svn propset 'svnbranch:source-url' $src     $tmp_co/$branch
+    safe_svn propset 'svnbranch:version'           1 $tmp_co/$branch
+    safe_svn propset 'svnbranch:source-url'     $src $tmp_co/$branch
     safe_svn propset 'svnbranch:source-rev' $src_rev $tmp_co/$branch
-    safe_svn propset 'svnbranch:merged-rev' $src_rev $tmp_co/$branch
-    # the revision of the next commit would be better.
-    safe_svn propset 'svnbranch:joined-rev' $src_rev $tmp_co/$branch
+    safe_svn propset 'svnbranch:pulled-rev'       '' $tmp_co/$branch
+    safe_svn propset 'svnbranch:pushed-rev'       '' $tmp_co/$branch
+    #store "pushable" or "non-pushable" revisions somewhere?
+    # the point is that when pushing differences and reusing the
+    # logs, logs due to pull of the master source should not be included.
+    # this could be managed with svn more easily?
 
     safe_svn_commit 'create new branch' $tmp_co	\
 	$nodo rm -rf $tmp_co 
 }
 
-# merge wc_path
+# pull wc_path
 # globals: 
-function merge()
+function pull()
 {
     local dir=$1 ; shift
     test -d $dir || error 7 "no such directory $dir"
     is_svn_branch $dir || error 8 "$dir is not a branch"
 
     local src_url=$(do_svn propget 'svnbranch:source-url' $dir)
-    local merged_rev=$(do_svn propget 'svnbranch:merged-rev' $dir)
+    local pulled_rev=$(do_svn propget 'svnbranch:pulled-rev' $dir)
+    
+    if [[ ! $revision ]] ; then
+	local last_pulled_rev=${pulled_rev/* /}
+	last_pulled_rev=${last_pulled_rev/*:/}
+	[[ $last_pulled_rev ]] || \
+	    last_pulled_rev=$(do_svn propget 'svnbranch:source-rev' $dir)
+	src_rev=$(get_last_revision $src_url)
+	if [ $src_rev -gt $last_pulled_rev ] ; then
+	    revision=$last_pulled_rev:$src_rev
+	else
+	    revision=
+	fi
+    fi
 
-    local src_rev=$revision
-    [[ ! $revision ]] && src_rev=$(get_last_revision $src_url)
+    if [[ $revision ]] ; then
+	# fix revision
+	[[ $revision == *:* ]] || revision=$(( $revision - 1 )):$revision
 
-    if [ $src_rev -gt $merged_rev ] ; then
+	perform_merge $revision $dir $(get_url $dir) $src_url
 
-	perform_merge $merged_rev:$src_rev $dir $(get_url $dir) $src_url 
+	local pulled_stuff=$(get_all_revisions $revision $src_url)
+	local new_pulled=$(list_union "$pulled_rev" "$pulled_stuff")
 
 	# update merged status with respect to merge above.
-	safe_svn propset 'svnbranch:merged-rev' $src_rev $dir
+	safe_svn propset 'svnbranch:pulled-rev' "$new_pulled" $dir
 
 	# ??? this seems necessary for some obscure reasons.
 	safe_svn update $dir
 
 	local br_url=$(get_url $dir)
 	local message=$(
-	    echo "merge revisions $merged_rev:$src_rev"
-	    echo "from $src_url"
+	    echo "pulled revisions $revision"
+	    echo "from master $src_url"
 	    echo "to branch $br_url"
 	)
 	safe_svn_commit "$message" $dir
     else
-	verb 1 "nothing to merge into $dir"
+	verb 1 "nothing to pull into $dir"
     fi
 }
 
 # -- merge back developments into source url
-# merge wc_path subname
+# push wc_path subname
 # globals: revision do_remove
-function join()
+function push()
 {
     local dir=$1 sub=$2 ; shift 2
     test -d $dir || error 9 "no such directory $dir" 
     is_svn_branch $dir || error 10 "$dir is not a branch"
-    all_is_committed $dir || error 11 "$dir is not committed, cannot join"
+    all_is_committed $dir || error 11 "$dir is not committed, cannot push"
 
     # update needed so that last revision is ok.
     safe_svn update $dir
     local src_url=$(do_svn propget 'svnbranch:source-url' $dir)
-    local joined_rev=$(do_svn propget 'svnbranch:joined-rev' $dir)
+
+    local pushed_rev=$(do_svn propget 'svnbranch:pushed-rev' $dir)
+    [[ ! $pushed_rev ]] && \
+	pushed_rev=$(do_svn propget 'svnbranch:source-rev' $dir)
+
     local current_rev=$revision
     [[ ! $revision ]] && current_rev=$(get_last_revision $dir)
 
     #TODO: should check that all merged are already done? or not??
 
-    if [ $current_rev -gt $joined_rev ] ; then
+    if [ $current_rev -gt $pushed_rev ] ; then
 
 	local tmp_co=$tmp/$command.$$.$sub
 	test -d $tmp_co && error 5 "temporary directory $tmp_co already exists"
 	local branch_url=$(get_url $dir)
 
-	perform_merge $joined_rev:$current_rev $tmp_co $src_url $branch_url
+	perform_merge $pushed_rev:$current_rev $tmp_co $src_url $branch_url
 
 	if [[ $do_remove ]] ; then
 	    # ???
 	    safe_svn remove $dir
 	else
-	    # fix svnbranch joined-rev status in $dir
-	    safe_svn propset 'svnbranch:joined-rev' $current_rev $dir
+	    # fix svnbranch pushed-rev status in $dir
+	    safe_svn propset 'svnbranch:pushed-rev' $current_rev $dir
 	fi
 
 	verb 1 "status of $dir"
 	safe_svn status --ignore-externals $dir
 
 	local message=$(
-	    echo "join revisions $joined_rev:$current_rev"
+	    echo "pushed revisions $pushed_rev:$current_rev"
 	    echo "from branch $branch_url"
-	    echo "to $src_url"
+	    echo "to master $src_url"
 	)
 
 	safe_svn_commit "$message" $tmp_co \
@@ -452,7 +592,7 @@ function join()
 	
 	safe_svn_commit "$message" $dir
     else
-	verb 1 "nothing to join into $src_url from $dir"
+	verb 1 "nothing to push into $src_url from $dir"
     fi
 }
 
@@ -472,10 +612,10 @@ function info()
 	echo "Branch Source Initial Rev:" \
 	    $(do_svn $rev propget 'svnbranch:source-rev' $dir)
 	echo "Branch Source Current Rev:" $(get_last_revision $src_url)
-	echo "Branch Last Merged Rev:" \
-	    $(do_svn $rev propget 'svnbranch:merged-rev' $dir)
-	echo "Branch Last Joined Rev:" \
-	    $(do_svn $rev propget 'svnbranch:joined-rev' $dir)
+	echo "Branch Pulled Rev:" \
+	    $(do_svn $rev propget 'svnbranch:pulled-rev' $dir)
+	echo "Branch Last Pushed Rev:" \
+	    $(do_svn $rev propget 'svnbranch:pushed-rev' $dir)
     else
 	echo "Branch Management: none"
     fi
@@ -514,26 +654,55 @@ function relocate()
     safe_svn_commit "$message" $branch
 }
 
-#################################################################### GET ACTION
+function default_revisions()
+{
+    local pname=$1 dir=$2 ; shift 2
+    [[ $revision ]] || \
+    {
+	local start=$(do_svn propget $pname $dir)
+	let start++ # log is inclusive
+	revision=$start:HEAD
+    }
+    echo $revision
+}
 
-[ $# -eq 0 ] && usage 1
-action=$1
-shift
+function avail()
+{
+    local dir=$1 ; shift
+    is_svn_branch $dir || error 33 "expecting a branch target"
+    local src_url=$(do_svn propget 'svnbranch:source-url' $dir)
+    local revisions=$(default_revisions 'svnbranch:source-rev' $dir)
+    local all_src_revs=$(get_all_revisions $revisions $src_url)
+    local pulled_revs=$(do_svn propget 'svnbranch:pulled-rev' $dir)
+    echo $(list_sub "$all_src_revs" "$(expand $pulled_revs)")
+}
+
+function log()
+{
+    local dir=$1 ; shift
+    local rev= src_url=$(do_svn propget 'svnbranch:source-url' $dir)
+    for rev in $(avail $dir) ; do
+	safe_svn log --revision $rev $src_url
+    done
+}
 
 ################################################################# PARSE OPTIONS
 
+action=
 do_commit=
 do_remove=
 url=
 nodo=
 revision=
+svn_options=
 
-while true ; do
-  opt=$1
-  if [[ $opt == -* ]] ; then # is it an option?
+while [[ $# -gt 0 ]] ; do
+  arg=$1
+  if [[ $arg == -* ]] ; then # is it an option?
       shift 
-      verb 4 "handling option $opt"
-      case $opt in
+      verb 4 "handling argument $arg"
+      case $arg in
+	  # other options
 	  -d|--debug)
 	      let verbosity+=3
 	      ;;
@@ -543,23 +712,32 @@ while true ; do
 	  -q|--no-verbose|--quiet)
 	      verbosity=0
 	      ;;
-	  -h|--help)
-	      usage 0
+	  -h)
+	      action='help'
 	      ;;
 	  -s|--svn)
 	      svn=$1
 	      shift
 	      ;;
 	  --svn=*)
-	      svn=${opt/*=/}
+	      svn=${arg/*=/}
 	      ;;
 	  -t|--tmp|--temporary)
 	      tmp=$1
 	      shift
 	      ;;
 	  --tmp=*|--temporary=*)
-	      tmp=${opt/*=/}
+	      tmp=${arg/*=/}
 	      ;;
+	  # forward some options to svn
+	  --username|--password|--config-dir)
+	      svn_options="$svn_options $arg $1"
+	      shift
+	      ;;
+	  --no-auth-cache|--non-interactive)
+	      svn_options="$svn_options $arg"
+	      ;;
+	  # level of operations
 	  --commit|--checkin|--ci)
 	      # I'm not sure it is a good idea to propose this option...
 	      do_commit=1
@@ -573,34 +751,51 @@ while true ; do
 	      shift
 	      ;;
 	  --url=*)
-	      url=${opt/*=/}
+	      url=${arg/*=/}
 	      ;;
 	  -r|--revision)
 	      revision=$1
 	      shift
 	      ;;
 	  --revision=*)
-	      revision=${opt/*=/}
+	      revision=${arg/*=/}
 	      ;;
-	  --dry-run)
+	  -n|--dry-run)
 	      nodo=:
 	      ;;
-	  --force)
+	  -f|--force)
 	      force=1
 	      ;;
 	  --)
 	      break # manual end of options
 	      ;;
+	  # actions provided as options
+	  --*)
+	      [[ $action ]] && error 30 "got two actions: $action and $arg"
+	      action=${arg/--/}
+	      is_action $action || error 31 "unexpected option $arg"
+	      ;;
+	  # unexpected
 	  *)
-	      error 1 "unexpected option $opt"
+	      error 1 "unexpected option $arg"
 	      ;;
       esac
   else
-      break # end of options
+      if [[ ! $action ]] ; then
+	  # first encountered bare word must be the action
+	  action=$arg
+	  shift
+      else
+	  break # end of options
+      fi
   fi
 done
 
-verb 4 "remaining arguments: $@"
+# default is to show some help
+[[ $action ]] || action='help'
+is_action $action || error 31 "unexpected action $action"
+
+verb 4 "action=$action args=$@"
 verb 4 "svn=$svn tmp=$tmp url=$url nodo=$nodo"
 verb 4 "do_commit=$do_commit do_remove=$do_remove"
 
@@ -609,7 +804,7 @@ test -d $tmp || error 10 "temporary directory $tmp not available"
 ################################################################ HANDLE ACTIONS
 
 case $action in
-    create|--create)
+    create)
 	# get arguments
 	[ $# -eq 2 -o $# -eq 3 ] || \
 	    error 11 "create expect 2 or 3 arguments, got $# instead"
@@ -678,45 +873,46 @@ case $action in
 
 	verb 1 "source url: $src_url"
 	verb 1 "branch url: $bch_url"
+	verb 1 "local working copy: $lwc"
 
 	# do the job
 	create $src_url $bch_url
 
-	[[ $do_commit ]] && safe_svn checkout $bch_url $lwc
+	[[ $do_commit && $lwc ]] && safe_svn checkout $bch_url $lwc
 	;;
-    merge|--merge)
+    pull)
 	[ $# -eq 0 ] && set .
 	for dir ; do
-	    merge $dir
+	    pull $dir
 	done
 	;;
-    join|--join)
+    push)
 	# does not provide current directory under the --remove option
 	[[ $# -eq 0 && ! $do_remove ]] && set .
 	number=1
 	for dir ; do
-	    join $dir $number
+	    push $dir $number
 	    let number++
 	done
 	;;
-    info|--info)
+    info)
 	[ $# -eq 0 ] && set .
 	for dir ; do
 	    info $dir
 	done
 	;;
-    diff|--diff)
+    diff)
 	[ $# -eq 0 ] && set .
 	for dir ; do
 	    diff $dir
 	done
 	;;
-    relocate|--relocate)
+    relocate)
 	[ $# -eq 2 ] || usage 20 "expecting 2 arguments"
 	new_src=$1 branch=$2 ; shift 2
 	relocate $new_src $branch
 	;;
-    test|--test)
+    test)
 	[ $# -eq 0 ] && set .
 	[ $# -eq 1 ] || usage 21 "expecting 1 argument"
 	dir=$1 ; shift
@@ -724,13 +920,29 @@ case $action in
 	is_svn_branch $dir || { verb 1 "$dir is not a branch" ; exit 1 ; }
 	verb 1 "$dir is a branch" ; exit 0
 	;;
-    help|--help)
+    avail)
+	[ $# -eq 0 ] && set .
+	[ $# -eq 1 ] || usage 21 "expecting 1 argument"
+	for dir ; do
+	    echo -n "$dir: " ; avail $dir
+	done
+	;;
+    log)
+	[ $# -eq 0 ] && set .
+	[ $# -eq 1 ] || usage 21 "expecting 1 argument"
+	dir=$1 ; shift
+	log $dir
+	;;
+    help)
 	usage 0
 	;;
-    version|--version)
+    version)
 	echo "$command version is $cmd_rev"
+	exit 0
 	;;
     *)
 	usage 1 "unexpected action '$action'"
 	;;
 esac
+
+exit 0
