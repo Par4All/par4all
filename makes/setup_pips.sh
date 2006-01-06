@@ -46,11 +46,14 @@ PIPS_ARCH=`$prod/pips/makes/arch.sh`
 export PIPS_ARCH
 unset NEWGEN_ROOT LINEAR_ROOT PIPS_ROOT
 
-# this should fail if not a developer
-echo "### getting user development branches"
-svn checkout $PIPS_SVN/branches/$developer $destination/pips_dev
-#svn checkout $LINEAR_SVN/branches/$developer $destination/linear_dev
-#svn checkout $NEWGEN_SVN/branches/$developer $destination/newgen_dev
+[ "$developer" ] &&
+{
+  # this fails if no such developer...
+  echo "### getting user development branches"
+  svn checkout $PIPS_SVN/branches/$developer $destination/pips_dev
+  #svn checkout $LINEAR_SVN/branches/$developer $destination/linear_dev
+  #svn checkout $NEWGEN_SVN/branches/$developer $destination/newgen_dev
+}
 
 echo "### downloading $POLYLIB"
 cd /tmp
