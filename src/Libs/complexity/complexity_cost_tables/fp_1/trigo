@@ -1,0 +1,28 @@
+# cost_trigo  - Sample costs of intrinsic trigonometrical function
+
+%1.0	# Global scale factor: to be tuned
+
+#	int	float	double	complex	double-complex    <-- type of argument(s)
+
+SIN	1	1	2	2	4
+DSIN	2	2	4	4	8
+CSIN	4	4	8	8	16
+COS	1	1	2	2	4
+DCOS	2	2	4	4	8
+CCOS	4	4	8	8	16
+TAN	1	1	2	2	4
+DTAN	2	2	4	4	8
+ASIN	1	1	2	2	4
+DASIN	2	2	4	4	8
+ACOS	1	1	2	2	4
+DACOS	2	2	4	4	8
+ATAN	1	1	2	2	4
+DATAN	2	2	4	4	8
+ATAN2	1	1	2	2	4
+DATAN2	2	2	4	4	8
+SINH	1	1	2	2	4
+DSINH	2	2	4	4	8
+COSH	1	1	2	2	4
+DCOSH	2	2	4	4	8
+TANH	1	1	2	2	4
+DTANH	2	2	4	4	8

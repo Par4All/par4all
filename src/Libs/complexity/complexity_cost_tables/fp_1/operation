@@ -1,0 +1,11 @@
+# cost_basic_ops_1  - Unity cost for basic operations
+
+#	int	float	double	complex	double-complex    <-- type of argument(s)
+
++	0	1	0	0	0
+-	0	1	0	0	0
+*	0	1	0	0	0
+/	0	1	0	0	0
+--	0	1	0	0	0
+**	0	1	0	0	0
+
