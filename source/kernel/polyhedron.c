@@ -2806,7 +2806,9 @@ Polyhedron *DomainAddRays(Polyhedron *Pol,Matrix *Ray,unsigned NbMaxConstrs) {
     }
     
     /* If the new polyheron is not redundant, add it ('p3') to the list */
-    if (!Redundant) { 
+    if (Redundant)
+      Polyhedron_Free(p3);
+    else { 
       if (!PolEndA)
 	PolEndA = PolA = p3;
       else {
@@ -4381,9 +4383,9 @@ Polyhedron *DomainAddConstraints(Polyhedron *Pol,Matrix *Mat,unsigned NbMaxRays)
     }
     
     /* If the new polyhedron 'p3' is not redundant, add it to the domain */
-    if (!Redundant) { 
-      
-      /* Add 'p3' to 'PolA' */
+    if (Redundant)
+      Polyhedron_Free(p3);
+    else { 
       if (!PolEndA)
 	PolEndA = PolA = p3;
       else {
