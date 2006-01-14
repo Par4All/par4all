@@ -3765,7 +3765,9 @@ Polyhedron *Polyhedron_Scan(Polyhedron *D, Polyhedron *C,unsigned NbMaxRays) {
   dim = D->Dimension - C->Dimension;
   res = last = (Polyhedron *) 0;
   if (dim==0) return (Polyhedron *)0;
-  
+
+  assert(!D->next);
+
   POL_ENSURE_FACETS(D);
   POL_ENSURE_VERTICES(D);
   POL_ENSURE_FACETS(C);
