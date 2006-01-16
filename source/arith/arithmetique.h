@@ -4,7 +4,7 @@
 
 /* package arithmetique
  *
- * $Id: arithmetique.h,v 1.10 2005/09/22 13:30:00 loechner Exp $
+ * $Id: arithmetique.h,v 1.11 2006/01/16 17:41:33 verdoolaege Exp $
  *
  * Francois Irigoin, mai 1989
  *
@@ -277,6 +277,13 @@ typedef mpz_t Value;
 #define value_lt(v1,v2) (mpz_cmp((v1),(v2))  < 0)
 #define value_le(v1,v2) (mpz_cmp((v1),(v2)) <= 0)
 
+#define value_abs_eq(v1,v2) (mpz_cmpabs((v1),(v2)) == 0)
+#define value_abs_ne(v1,v2) (mpz_cmpabs((v1),(v2)) != 0)
+#define value_abs_gt(v1,v2) (mpz_cmpabs((v1),(v2))  > 0)
+#define value_abs_ge(v1,v2) (mpz_cmpabs((v1),(v2)) >= 0)
+#define value_abs_lt(v1,v2) (mpz_cmpabs((v1),(v2))  < 0)
+#define value_abs_le(v1,v2) (mpz_cmpabs((v1),(v2)) <= 0)
+
 /* Trian operators on 'Value' */
 
 #define value_sign(val)      (mpz_sgn(val))
@@ -351,6 +358,13 @@ typedef mpz_t Value;
 #define value_ge(v1,v2) ((v1)>=(v2))
 #define value_lt(v1,v2) ((v1)<(v2))
 #define value_le(v1,v2) ((v1)<=(v2))
+
+#define value_abs_eq(v1,v2) (value_abs(v1)==value_abs(v2))
+#define value_abs_ne(v1,v2) (value_abs(v1)!=value_abs(v2))
+#define value_abs_gt(v1,v2) (value_abs(v1)>value_abs(v2))
+#define value_abs_ge(v1,v2) (value_abs(v1)>=value_abs(v2))
+#define value_abs_lt(v1,v2) (value_abs(v1)<value_abs(v2))
+#define value_abs_le(v1,v2) (value_abs(v1)<=value_abs(v2))
 
 /* Trian operators on 'Value' */
 
