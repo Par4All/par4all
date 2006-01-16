@@ -1962,6 +1962,51 @@ Polyhedron *Universe_Polyhedron(unsigned Dimension) {
   return Pol;
 } /* Universe_Polyhedron */
 
+/*
+
+Sort constraints and remove trivially redundant constraints.
+
+*/
+static void SortConstraints(Matrix *Constraints, unsigned NbEq)
+{
+    int i, j, k;
+    for (i = NbEq; i < Constraints->NbRows; ++i) {
+	int max = i;
+	for (k = i+1; k < Constraints->NbRows; ++k) {
+	    for (j = 1; j < Constraints->NbColumns-1; ++j) {
+		if (value_eq(Constraints->p[k][j],
+			     Constraints->p[max][j]))
+		    continue;
+		if (value_abs_lt(Constraints->p[k][j],
+				 Constraints->p[max][j]))
+		    break;
+		if (value_abs_eq(Constraints->p[k][j],
+				 Constraints->p[max][j]) &&
+		    value_pos_p(Constraints->p[max][j]))
+			break;
+		max = k;
+		break;
+	    }
+	    /* equal, except for possibly the constant */
+	    if (j == Constraints->NbColumns-1) {
+		if (value_lt(Constraints->p[k][j], Constraints->p[max][j]))
+		    max = k;
+		else {
+		    Constraints->NbRows--;
+		    if (k < Constraints->NbRows)
+		        Vector_Exchange(Constraints->p[k], 
+					Constraints->p[Constraints->NbRows], 
+				        Constraints->NbColumns);
+		    k--;
+		}
+	    }
+	}
+	if (max != i)
+	    Vector_Exchange(Constraints->p[max], Constraints->p[i], 
+			    Constraints->NbColumns);
+    }
+}
+
 /**
 
 Given a matrix of constraints ('Constraints'), construct and return a 
@@ -2005,6 +2050,7 @@ Polyhedron *Constraints2Polyhedron(Matrix *Constraints,unsigned NbMaxRays) {
 	++NbEq;
       }
     Rank = Gauss(Constraints, NbEq, Dimension);
+    SortConstraints(Constraints, NbEq);
     Pol = Polyhedron_Alloc(Dimension-1, Constraints->NbRows - (NbEq-Rank), 0);
     Vector_Copy(Constraints->p[0], Pol->Constraint[0], 
 		Rank * Constraints->NbColumns);
