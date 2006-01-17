@@ -98,22 +98,22 @@ Matrix * int_mod_basis(Matrix * Bp, Matrix * Cp, Matrix * d) {
   int nb_eqs = Bp->NbRows;
   unsigned int nb_parms=Bp->NbColumns;
   unsigned int i, j;
-  Matrix *H, *U, *Q, *M, *inv_H_M, *Ha, *Np_0, *N_0, *G;
+  Matrix *H, *U, *Q, *M, *inv_H_M, *Ha, *Np_0, *N_0, *G, *K, *S, *KS;
 
   /*   a/ compute K and S */
   /* simplify the constraints */
   for (i=0; i< Bp->NbRows; i++)
     for (j=0; j< Bp->NbColumns; j++) 
       value_pmodulus(Bp->p[i][j], Bp->p[i][j], d->p[0][i]);
-  Matrix * K = int_ker(Bp);
-  Matrix * S = affine_periods(Bp, d);
+  K = int_ker(Bp);
+  S = affine_periods(Bp, d);
   // show_matrix(K);
   // show_matrix(S);
   
   /*   b/ compute the linear part of G : HNF(K|S) */
 
   /* fill K|S */
-  Matrix * KS = Matrix_Alloc(nb_parms, K->NbColumns+ nb_parms);
+  KS = Matrix_Alloc(nb_parms, K->NbColumns+ nb_parms);
   for(i=0; i< KS->NbRows; i++) {
     for(j=0; j< K->NbColumns; j++) value_assign(KS->p[i][j], K->p[i][j]);
     for(j=0; j< S->NbColumns; j++) value_assign(KS->p[i][j+K->NbColumns], S->p[i][j]);
