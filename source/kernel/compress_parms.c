@@ -118,6 +118,7 @@ Matrix * int_mod_basis(Matrix * Bp, Matrix * Cp, Matrix * d) {
     for(j=0; j< K->NbColumns; j++) value_assign(KS->p[i][j], K->p[i][j]);
     for(j=0; j< S->NbColumns; j++) value_assign(KS->p[i][j+K->NbColumns], S->p[i][j]);
   }
+  Matrix_Free(K);
 
   // show_matrix(KS);
 
@@ -158,6 +159,7 @@ Matrix * int_mod_basis(Matrix * Bp, Matrix * Cp, Matrix * d) {
   
   //       compute inv_H_M, the inverse of the HNF H of M = (B' D)
   left_hermite(M, &H, &Q, &U);
+  Matrix_Free(M);
   inv_H_M=Matrix_Alloc(nb_eqs, nb_eqs+1);
   /* again, do a square Matrix from H, using the non-used Matrix Ha */
   Ha = Matrix_Alloc(nb_eqs, nb_eqs);
@@ -210,6 +212,7 @@ Matrix * int_mod_basis(Matrix * Bp, Matrix * Cp, Matrix * d) {
       return NULL;
     }
   }
+  Matrix_Free(inv_H_M);
   // show_matrix(Np_0);
 
   /* now compute the actual particular solution N_0 = U_M. N'_0 */
