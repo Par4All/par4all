@@ -1,12 +1,19 @@
-/* B. Meister 12/2003-2005
- LSIIT -ICPS 
- UMR 7005 CNRS
- Louis Pasteur University (ULP), Strasbourg, France 
+/** 
+ * $Id: compress_parms.c,v 1.13 2006/02/10 04:41:55 loechner Exp $
+ *
+ * The integer points in a parametric linear subspace of Q^n are generally
+ * lying on a sub-lattice of Z^n.  To simplify, the funcitons here compress
+ * some parameters so that the variables are integer for any intger values of
+ * the parameters.
+ * @author B. Meister 12/2003-2005
+ * LSIIT -ICPS 
+ * UMR 7005 CNRS
+ * Louis Pasteur University (ULP), Strasbourg, France 
 */
 
 #include <polylib/polylib.h>
 
-/* given a full-row-rank nxm matrix M(made of m row-vectors), 
+/* given a full-row-rank nxm matrix M made of m row-vectors), 
  computes the basis K (made of n-m column-vectors) 
  of the integer kernel of the rows of M
  so we have: M.K = 0 */
@@ -45,11 +52,15 @@ Matrix * int_ker(Matrix * M) {
   Matrix_Free(U);
   Matrix_Free(Q);
   return K;
-}
+} /* int_ker */
 
-/* Compute the overall period of the variables I for (MI) mod |d|,
- where M is a matrix and |d| a vector
- Produce a diagonal matrix S = (s_k) where s_k is the overall period of i_k */
+
+/** Compute the overall period of the variables I for (MI) mod |d|, where M is
+a matrix and |d| a vector. Produce a diagonal matrix S = (s_k) where s_k is the
+overall period of i_k
+@param M the matrix
+@param d a column-vector encoded in a matrix
+*/
 Matrix * affine_periods(Matrix * M, Matrix * d) {
   Matrix * S;
   unsigned int i,j;
@@ -80,19 +91,20 @@ Matrix * affine_periods(Matrix * M, Matrix * d) {
   for(i=0; i< M->NbColumns; i++) value_clear(periods[i]);
   free(periods);
   return S;
-}
+} /* affine_periods */
 
-/* 
+
+/** 
 given a matrix B' with m rows and m-vectors C' and d, computes the 
  basis of the integer solutions to (B'N+C') mod d = 0 (1).
  the Ns verifying the system B'N+C' = 0 are solutions of (1)
- K is a basis of the integer kernel of B: its column-vectors link two solutions of (1)
- Moreover, B'_iN mod d is periodic of period (s_ik):
- B'N mod d is periodic of period (s_k) = lcm_i(s_ik)
- The linear part of G is given by the HNF of (K | S), 
- where S is the full-dimensional diagonal matrix (s_k)
- the constant part of G is a particular solution of (1)
- if no integer constant part is found, there is no solution and this function returns NULL. 
+ K is a basis of the integer kernel of B: its column-vectors link two solutions
+ of (1)
+ Moreover, B'_iN mod d is periodic of period (s_ik): B'N mod d is periodic of
+ period (s_k) = lcm_i(s_ik) The linear part of G is given by the HNF of (K |
+ S), where S is the full-dimensional diagonal matrix (s_k) the constant part of
+ G is a particular solution of (1) if no integer constant part is found, there
+ is no solution and this function returns NULL.
 */
 Matrix * int_mod_basis(Matrix * Bp, Matrix * Cp, Matrix * d) {
   int nb_eqs = Bp->NbRows;
@@ -116,7 +128,8 @@ Matrix * int_mod_basis(Matrix * Bp, Matrix * Cp, Matrix * d) {
   KS = Matrix_Alloc(nb_parms, K->NbColumns+ nb_parms);
   for(i=0; i< KS->NbRows; i++) {
     for(j=0; j< K->NbColumns; j++) value_assign(KS->p[i][j], K->p[i][j]);
-    for(j=0; j< S->NbColumns; j++) value_assign(KS->p[i][j+K->NbColumns], S->p[i][j]);
+    for(j=0; j< S->NbColumns; j++) value_assign(KS->p[i][j+K->NbColumns],
+						S->p[i][j]);
   }
   Matrix_Free(K);
 
@@ -130,8 +143,8 @@ Matrix * int_mod_basis(Matrix * Bp, Matrix * Cp, Matrix * d) {
   
   // printf("HNF(K|S) = ");show_matrix(H);
 
-  /* put HNF(K|S) in the p x p matrix S 
-     (which has already the appropriate size so we spare a Matrix_Alloc) */
+  /* put HNF(K|S) in the p x p matrix S (which has already the appropriate size
+     so we spare a Matrix_Alloc) */
   for (i=0; i< nb_parms; i++) {
     for (j=0; j< nb_parms; j++) 
       value_assign(S->p[i][j], H->p[i][j]);
@@ -241,7 +254,20 @@ Matrix * int_mod_basis(Matrix * Bp, Matrix * Cp, Matrix * d) {
 } /* int_mod_basis */
 
 
-/* 
+/** 
+ *  Does equality-row-vector r involve variables ? 
+ *  @param r the row-vector
+*/
+static int involves_vars(Value * r, unsigned nb_vars) {
+  int i;
+  for(i=1; i<= nb_vars; i++) {
+    if (value_notzero_p(r[i])) return 1;
+  }
+  return 0;
+}
+
+
+/** 
 utility function: given a matrix containing the equations AI+BN+C=0, 
  compute the HNF of A : A = [Ha 0].Q and return :  
  . B'= H^-1.(-B) 
@@ -249,26 +275,46 @@ utility function: given a matrix containing the equations AI+BN+C=0,
  . U = Q^-1 (-> return value)
  . D, where Ha^-1 = D^-1.H^-1 with H and D integer matrices 
  in fact, as D is diagonal, we return d, a column-vector 
+ Note: ignores the equalities that involve only parameters
 */
-Matrix * extract_funny_stuff(Matrix const * E, int nb_parms, 
+static Matrix * extract_funny_stuff(Matrix * const E, int nb_parms, 
 			     Matrix ** Bp, Matrix **Cp, Matrix **d) {
 unsigned int i,j, k, nb_eqs=E->NbRows;
   int nb_vars=E->NbColumns - nb_parms -2;
   Matrix * A, * Ap, * Ha, * U, * Q, * H, *B, *C, *Ha_pre_inv;
 
-  /* particular case: */
+  /* Only deal with the equalities involving variables:
+     - don't count them
+     - mark them (a 2 instead of the 0 in 1st column
+  */
+  for (i=0; i< E->NbRows; i++) {
+    if (!involves_vars(E->p[i], nb_vars) {
+      value_assign(E->p[i][0], 2);
+      nb_eqs--;
+    }
+  }
+
+  /* particular case: 
+    - no equality (of interest) in E */
   if (nb_eqs==0) {
     *Bp = Matrix_Alloc(0, E->NbColumns);
     *Cp = Matrix_Alloc(0, E->NbColumns);
     *d = NULL;
+    /* unmark the equaltities that we filtered out */
+    for (i=0; i< E->NbRows; i++) {
+      value_assign(E->p[i][0], 0);
+    }
     return NULL;
   }
-
+    
   /* 1- build A, the part of E corresponding to the variables */
   A = Matrix_Alloc(nb_eqs, nb_vars);
   for (i=0; i< E->NbRows; i++) {
-    for (j=0; j< nb_vars; j++)
-      value_assign(A->p[i][j],E->p[i][j+1]);
+    if (value_zero_p(E->p[0])) {
+      for (j=0; j< nb_vars; j++) {
+	value_assign(A->p[i][j],E->p[i][j+1]);
+      }
+    }
   }
   
   /* 2- Compute Ha^-1, where Ha is the left HNF of A
@@ -291,9 +337,9 @@ unsigned int i,j, k, nb_eqs=E->NbRows;
   /*  c/ Invert Ha */
   Ha_pre_inv = Matrix_Alloc(nb_eqs, nb_eqs+1);
   if(!MatInverse(Ha, Ha_pre_inv)) { 
-    fprintf(stderr,"extract_funny_stuff > Matrix Ha is non-invertible.");
+    fprintf(stderr,"extract_funny_stuff > Matrix Ha is non-invertible.\n");
   }
-  /* store back Ha^-1  in Ha, to spare a MatrixAlloc/MatrixFree */
+  /* store back Ha^-1  in Ha, to save a MatrixAlloc/MatrixFree */
   for(i=0; i< nb_eqs; i++) {
     for(j=0; j< nb_eqs; j++) {
       value_assign(Ha->p[i][j],Ha_pre_inv->p[i][j]);
@@ -304,37 +350,42 @@ unsigned int i,j, k, nb_eqs=E->NbRows;
      the last column of Ha_pre_inv (property of MatInverse). */
   (*d) = Matrix_Alloc(Ha_pre_inv->NbRows, 1);
 
-  for (i=0; i< Ha_pre_inv->NbRows; i++) 
+  for (i=0; i< Ha_pre_inv->NbRows; i++) {
     value_assign((*d)->p[i][0], Ha_pre_inv->p[i][Ha_pre_inv->NbColumns-1]);
+  }
  
-  // show_matrix(Ha);
-  // show_matrix(*d);
   Matrix_Free(Ha_pre_inv);
 
   /* 3- Build B'and C'
       compute B' */
   B = Matrix_Alloc(nb_eqs,nb_parms);
   for(i=0; i< E->NbRows; i++) {
-    for(j=0; j< nb_parms; j++)
-      value_assign(B->p[i][j], E->p[i][1+nb_vars+j]);
+    if (value_zero_p(E->p[0])) {
+      for(j=0; j< nb_parms; j++) {
+	value_assign(B->p[i][j], E->p[i][1+nb_vars+j]);
+      }
+    }
   }
 
   (*Bp) = Matrix_Alloc(B->NbRows,B->NbColumns);
-  // show_matrix(B);
   Matrix_Product(Ha, B, (*Bp));
-  // show_matrix(*Bp);
   Matrix_Free(B);
   
   /* compute C' */
   C = Matrix_Alloc(nb_eqs,1);
   for(i=0; i< E->NbRows; i++) {
-    value_assign(C->p[i][0], E->p[i][E->NbColumns-1]);
+    if (value_zero_p(E->p[0])) {
+      value_assign(C->p[i][0], E->p[i][E->NbColumns-1]);
+    }
   }
-
-  // show_matrix(C);
+  
+  /* unmark the equaltities that we filtered out */
+  for (i=0; i< E->NbRows; i++) {
+    value_assign(E->p[i][0], 0);
+  }
+  
   (*Cp) = Matrix_Alloc(nb_eqs, 1);
   Matrix_Product(Ha, C, (*Cp));
-  // show_matrix(*Cp);
   Matrix_Free(C);
 
   Matrix_Free(Ha);
@@ -342,10 +393,11 @@ unsigned int i,j, k, nb_eqs=E->NbRows;
 }
   
 
-/* 
-given a parameterized constraints matrix with m equalities, computes the compression matrix 
- G such that there is an integer solution in the variables space for each value of N', with 
- N = G N' (N are the "nb_parms" parameters) 
+/** 
+Given a parameterized constraints matrix with m equalities, computes the
+ compression matrix G such that there is an integer solution in the variables
+ space for each value of N', with N = G N' (N are the "nb_parms" parameters)
+ @param E a matrix of parametric equalities
 */
 Matrix * compress_parms(Matrix * E, int nb_parms) {
   unsigned int i,j, k, nb_eqs=0;
@@ -358,16 +410,16 @@ Matrix * compress_parms(Matrix * E, int nb_parms) {
   U = extract_funny_stuff(E, nb_parms, &Bp, & Cp, &d); 
 
   Matrix_Free(U);
-  /* The compression matrix N = G.N' must be such that (B'N+C') mod d = 0 (1) */
+  /* The compression matrix N = G.N' must be such that (B'N+C') mod d = 0 (1)
+  */
 
-  /* the Ns verifying the system B'N+C' = 0 are solutions of (1)
-     K is a basis of the integer kernel of B: its column-vectors link two solutions of (1)
-     Moreover, B'_iN mod d is periodic of period (s_ik):
-     B'N mod d is periodic of period (s_k) = lcm_i(s_ik)
-     The linear part of G is given by the HNF of (K | S), 
-     where S is the full-dimensional diagonal matrix (s_k)
-     the constant part of G is a particular solution of (1)
-     if no integer constant part is found, there is no solution. */
+  /* the Ns verifying the system B'N+C' = 0 are solutions of (1) K is a basis
+     of the integer kernel of B: its column-vectors link two solutions of (1)
+     Moreover, B'_iN mod d is periodic of period (s_ik): B'N mod d is periodic
+     of period (s_k) = lcm_i(s_ik) The linear part of G is given by the HNF of
+     (K | S), where S is the full-dimensional diagonal matrix (s_k) the
+     constant part of G is a particular solution of (1) if no integer constant
+     part is found, there is no solution. */
 
   G = int_mod_basis(Bp, Cp, d);
   Matrix_Free(Bp);
@@ -376,14 +428,14 @@ Matrix * compress_parms(Matrix * E, int nb_parms) {
   return G;
 }
 
-/* given a matrix with m parameterized equations, 
- compress the nb_parms parameters and n-m variables so that 
- m variables are intaseger,
- and transform the variable space into a n-m space 
- by eliminating the m variables (using the equalities)
- the variables to be eliminated are chosen automatically by the function
+/* given a matrix with m parameterized equations, compress the nb_parms
+ parameters and n-m variables so that m variables are intaseger, and transform
+ the variable space into a n-m space by eliminating the m variables (using the
+ equalities) the variables to be eliminated are chosen automatically by the
+ function
 */
-Matrix * full_dimensionize(Matrix const * M, int nb_parms, Matrix ** Validity_Lattice) {
+Matrix * full_dimensionize(Matrix const * M, int nb_parms, 
+			   Matrix ** Validity_Lattice) {
   Matrix * Eqs, * Ineqs;
   Matrix * Permuted_Eqs, * Permuted_Ineqs;
   Matrix * Full_Dim;
@@ -424,7 +476,8 @@ Matrix * full_dimensionize(Matrix const * M, int nb_parms, Matrix ** Validity_La
 
   /* 4- get rid of the first (zero) columns, 
      which are now useless, and put the parameters back at the end */
-  Full_Dim = Matrix_Alloc(Permuted_Ineqs->NbRows, Permuted_Ineqs->NbColumns-nb_elim_vars);
+  Full_Dim = Matrix_Alloc(Permuted_Ineqs->NbRows,
+			  Permuted_Ineqs->NbColumns-nb_elim_vars);
   for (i=0; i< Permuted_Ineqs->NbRows; i++) {
     value_set_si(Full_Dim->p[i][0], 1);
     for (j=0; j< nb_parms; j++) 
