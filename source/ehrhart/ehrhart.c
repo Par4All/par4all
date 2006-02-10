@@ -2356,7 +2356,7 @@ Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,unsigned MA
   printf("\n");
   
   
-  /* the expansion can be actually writen as denoms_det.L^{-1} */
+  /* the expansion can be actually writen as global_var_lcm.L^{-1} */
   /* this is equivalent to multiply the rows of P by denoms_det */
   for (i=0; i< nb_vars; i++) value_division(denoms->p[0][i], global_var_lcm, denoms->p[0][i]);
   

@@ -1,5 +1,5 @@
 /** 
- * $Id: compress_parms.c,v 1.13 2006/02/10 04:41:55 loechner Exp $
+ * $Id: compress_parms.c,v 1.14 2006/02/10 05:04:41 loechner Exp $
  *
  * The integer points in a parametric linear subspace of Q^n are generally
  * lying on a sub-lattice of Z^n.  To simplify, the funcitons here compress
@@ -288,8 +288,8 @@ unsigned int i,j, k, nb_eqs=E->NbRows;
      - mark them (a 2 instead of the 0 in 1st column
   */
   for (i=0; i< E->NbRows; i++) {
-    if (!involves_vars(E->p[i], nb_vars) {
-      value_assign(E->p[i][0], 2);
+    if (!involves_vars(E->p[i], nb_vars)) {
+      value_set_si(E->p[i][0], 2);
       nb_eqs--;
     }
   }
@@ -300,9 +300,9 @@ unsigned int i,j, k, nb_eqs=E->NbRows;
     *Bp = Matrix_Alloc(0, E->NbColumns);
     *Cp = Matrix_Alloc(0, E->NbColumns);
     *d = NULL;
-    /* unmark the equaltities that we filtered out */
+    /* unmark the equalities that we filtered out */
     for (i=0; i< E->NbRows; i++) {
-      value_assign(E->p[i][0], 0);
+      value_set_si(E->p[i][0], 0);
     }
     return NULL;
   }
@@ -310,7 +310,7 @@ unsigned int i,j, k, nb_eqs=E->NbRows;
   /* 1- build A, the part of E corresponding to the variables */
   A = Matrix_Alloc(nb_eqs, nb_vars);
   for (i=0; i< E->NbRows; i++) {
-    if (value_zero_p(E->p[0])) {
+    if (value_zero_p(E->p[i][0])) {
       for (j=0; j< nb_vars; j++) {
 	value_assign(A->p[i][j],E->p[i][j+1]);
       }
@@ -360,7 +360,7 @@ unsigned int i,j, k, nb_eqs=E->NbRows;
       compute B' */
   B = Matrix_Alloc(nb_eqs,nb_parms);
   for(i=0; i< E->NbRows; i++) {
-    if (value_zero_p(E->p[0])) {
+    if (value_zero_p(E->p[i][0])) {
       for(j=0; j< nb_parms; j++) {
 	value_assign(B->p[i][j], E->p[i][1+nb_vars+j]);
       }
@@ -374,14 +374,14 @@ unsigned int i,j, k, nb_eqs=E->NbRows;
   /* compute C' */
   C = Matrix_Alloc(nb_eqs,1);
   for(i=0; i< E->NbRows; i++) {
-    if (value_zero_p(E->p[0])) {
+    if (value_zero_p(E->p[i][0])) {
       value_assign(C->p[i][0], E->p[i][E->NbColumns-1]);
     }
   }
   
-  /* unmark the equaltities that we filtered out */
+  /* unmark the equalities that we filtered out */
   for (i=0; i< E->NbRows; i++) {
-    value_assign(E->p[i][0], 0);
+    value_set_si(E->p[i][0], 0);
   }
   
   (*Cp) = Matrix_Alloc(nb_eqs, 1);
@@ -398,6 +398,7 @@ Given a parameterized constraints matrix with m equalities, computes the
  compression matrix G such that there is an integer solution in the variables
  space for each value of N', with N = G N' (N are the "nb_parms" parameters)
  @param E a matrix of parametric equalities
+ @param nb_parms the number of parameters
 */
 Matrix * compress_parms(Matrix * E, int nb_parms) {
   unsigned int i,j, k, nb_eqs=0;
