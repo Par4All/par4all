@@ -16,20 +16,22 @@
 
 #include <polylib/polylib.h>
 
-/* #define EVAL_EHRHART_DEBUG */
+/* #define EVAL_EHRHART_DEBUG  */
 
 /********************************************************/
 /* function in domain                                   */
 /*    check if the parameters in list_args              */
-/*    verifies the constraints of Polyhedron P          */
+/*    verifies the constraints of Domain P              */
 /********************************************************/
 int in_domain(Polyhedron *P, Value *list_args) {
   
   int col,row;
   Value v; /* value of the constraint of a row when
-	       parameters are instanciated*/
+               parameters are instanciated*/
   //  Value tmp;
 
+  if( !P )
+          return( 0 );
   POL_ENSURE_FACETS(P);
   POL_ENSURE_VERTICES(P);
 
@@ -45,21 +47,21 @@ int in_domain(Polyhedron *P, Value *list_args) {
       value_addmul(v, P->Constraint[row][col], list_args[col-1]); 
     }  
     if (value_notzero_p(P->Constraint[row][0])) {
-	
+        
       /*if v is not >=0 then this constraint is not respected */
       if (value_neg_p(v)) {
-	value_clear(v);
-	// value_clear(tmp);
-	return 0;
-      }	
+        value_clear(v);
+        // value_clear(tmp);
+        return( in_domain(P->next, list_args) );
+      }        
     }
     else {
       
       /*if v is not = 0 then this constraint is not respected */
       if (value_notzero_p(v)) {
-	value_clear(v);
-	// value_clear(tmp);
-	return 0;
+        value_clear(v);
+        // value_clear(tmp);
+        return( in_domain(P->next, list_args) );
       }
     }
   }
@@ -92,7 +94,7 @@ static double compute_enode(enode *p, Value *list_args) {
 
   if (p->type == polynomial) {
     if (p->size > 1)
-	 	value_assign(param,list_args[p->pos-1]);
+                 value_assign(param,list_args[p->pos-1]);
     
     /* Compute the polynomial using Horner's rule */
     for (i=p->size-1;i>0;i--) {
@@ -147,15 +149,15 @@ double compute_evalue(evalue *e,Value *list_args) {
 Value *compute_poly(Enumeration *en,Value *list_args) {
 
   Value *tmp;
-  /*	double d; int i; */
+  /*        double d; int i; */
 
   tmp = (Value *) malloc (sizeof(Value));
   assert(tmp != NULL);
   value_init(*tmp);
   value_set_si(*tmp,0);
-  
+
   if(!en)
-    return(tmp);	/* no ehrhart polynomial */
+    return(tmp);        /* no ehrhart polynomial */
   if(en->ValidityDomain) {
     if(!en->ValidityDomain->Dimension) { /* no parameters */
       value_set_double(*tmp,compute_evalue(&en->EP,list_args)+.25);
@@ -168,13 +170,13 @@ Value *compute_poly(Enumeration *en,Value *list_args) {
     if(in_domain(en->ValidityDomain,list_args)) {
       
 #ifdef EVAL_EHRHART_DEBUG
-      Print_Domain(stdout,en->ValidityDomain);
-      print_evalue(stdout,&en->EP);
+      Print_Domain(stdout,en->ValidityDomain,NULL);
+      print_evalue(stdout,&en->EP,NULL);
 #endif
       
-      /*			d = compute_evalue(&en->EP,list_args);
-				i = d;
-				printf("(double)%lf = %d\n", d, i ); */
+      /*                        d = compute_evalue(&en->EP,list_args);
+                                i = d;
+                                printf("(double)%lf = %d\n", d, i ); */
       value_set_double(*tmp,compute_evalue(&en->EP,list_args)+.25);
       return(tmp);
     }
