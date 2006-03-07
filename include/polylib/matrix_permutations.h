@@ -25,6 +25,23 @@ Matrix * mtransformation_permute(Matrix * transf, unsigned int * permutation);
 // permutes the variables of a matrix seen as a polyhedron
 Matrix * mpolyhedron_permute(Matrix * polyh, unsigned int * permutation);
 
+
+/** Given a set of <i>equalities</i>, find a set of variables that can be
+ * eliminated using these equalities.  The variables that we agree to eliminate
+ * are in a zone of contiguous variables (or parameters).  <p>
+ * Notes: 
+ <ul>
+ <li>brute force, surely enhanceable algorithm</li>
+ <li>limited number of variables in the zone: limit = bitwidth of long long
+ </ul>
+ * @param Eqs the matrix of equalities.
+ * @param start the rank of the first variable (inclusive) of the zone in Eqs
+ * @param end the rank of the last variable (inclusive) of the zone
+ * return a bitfield where bits set to one define the variables to eliminate
+*/
+unsigned long long int eliminable_vars(Matrix * Eqs, unsigned start, 
+				       unsigned end);
+
 // find a valid permutation : for a set of m equations, find m variables that will be put at the beginning (to be eliminated)
 // it must be possible to eliminate these variables : the submatrix built with their columns must be full-rank.
 // brute force method, that tests all the combinations until finding one which works.

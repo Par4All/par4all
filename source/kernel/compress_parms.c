@@ -1,5 +1,5 @@
 /** 
- * $Id: compress_parms.c,v 1.14 2006/02/10 05:04:41 loechner Exp $
+ * $Id: compress_parms.c,v 1.15 2006/03/07 04:23:26 loechner Exp $
  *
  * The integer points in a parametric linear subspace of Q^n are generally
  * lying on a sub-lattice of Z^n.  To simplify, the funcitons here compress
@@ -55,7 +55,7 @@ Matrix * int_ker(Matrix * M) {
 } /* int_ker */
 
 
-/** Compute the overall period of the variables I for (MI) mod |d|, where M is
+/** Computes the overall period of the variables I for (MI) mod |d|, where M is
 a matrix and |d| a vector. Produce a diagonal matrix S = (s_k) where s_k is the
 overall period of i_k
 @param M the matrix
@@ -95,11 +95,11 @@ Matrix * affine_periods(Matrix * M, Matrix * d) {
 
 
 /** 
-given a matrix B' with m rows and m-vectors C' and d, computes the 
+ Given a matrix B' with m rows and m-vectors C' and d, computes the 
  basis of the integer solutions to (B'N+C') mod d = 0 (1).
  the Ns verifying the system B'N+C' = 0 are solutions of (1)
  K is a basis of the integer kernel of B: its column-vectors link two solutions
- of (1)
+ of (1) <p>
  Moreover, B'_iN mod d is periodic of period (s_ik): B'N mod d is periodic of
  period (s_k) = lcm_i(s_ik) The linear part of G is given by the HNF of (K |
  S), where S is the full-dimensional diagonal matrix (s_k) the constant part of
@@ -255,19 +255,6 @@ Matrix * int_mod_basis(Matrix * Bp, Matrix * Cp, Matrix * d) {
 
 
 /** 
- *  Does equality-row-vector r involve variables ? 
- *  @param r the row-vector
-*/
-static int involves_vars(Value * r, unsigned nb_vars) {
-  int i;
-  for(i=1; i<= nb_vars; i++) {
-    if (value_notzero_p(r[i])) return 1;
-  }
-  return 0;
-}
-
-
-/** 
 utility function: given a matrix containing the equations AI+BN+C=0, 
  compute the HNF of A : A = [Ha 0].Q and return :  
  . B'= H^-1.(-B) 
@@ -288,7 +275,7 @@ unsigned int i,j, k, nb_eqs=E->NbRows;
      - mark them (a 2 instead of the 0 in 1st column
   */
   for (i=0; i< E->NbRows; i++) {
-    if (!involves_vars(E->p[i], nb_vars)) {
+    if (First_Non_Zero(E->p[i], E->NbColumns)>= nb_vars+1) {
       value_set_si(E->p[i][0], 2);
       nb_eqs--;
     }
@@ -332,20 +319,18 @@ unsigned int i,j, k, nb_eqs=E->NbRows;
   }
   Matrix_Free(H);
 
-  // show_matrix(Ha);
 
   /*  c/ Invert Ha */
   Ha_pre_inv = Matrix_Alloc(nb_eqs, nb_eqs+1);
-  if(!MatInverse(Ha, Ha_pre_inv)) { 
-    fprintf(stderr,"extract_funny_stuff > Matrix Ha is non-invertible.\n");
-  }
+  assert (MatInverse(Ha, Ha_pre_inv));
+
   /* store back Ha^-1  in Ha, to save a MatrixAlloc/MatrixFree */
   for(i=0; i< nb_eqs; i++) {
     for(j=0; j< nb_eqs; j++) {
       value_assign(Ha->p[i][j],Ha_pre_inv->p[i][j]);
     }
   }
-  // show_matrix(Ha_pre_inv);
+
   /* the diagonal elements of D are stored in 
      the last column of Ha_pre_inv (property of MatInverse). */
   (*d) = Matrix_Alloc(Ha_pre_inv->NbRows, 1);
@@ -390,7 +375,7 @@ unsigned int i,j, k, nb_eqs=E->NbRows;
 
   Matrix_Free(Ha);
   return U;
-}
+} /* extract_funny_stuff */
   
 
 /** 
@@ -427,10 +412,232 @@ Matrix * compress_parms(Matrix * E, int nb_parms) {
   Matrix_Free(Cp);
   Matrix_Free(d);
   return G;
-}
+}/* compress_parms */
 
-/* given a matrix with m parameterized equations, compress the nb_parms
- parameters and n-m variables so that m variables are intaseger, and transform
+
+/** removes the equalities that involve only parameters, by eliminating some
+   parameters in the polyhedron's constraints and in the context.<p> 
+   <b>Updates M and Ctxt.</b>
+   @param M1 the polyhedron's constraints
+   @param Ctxt1 the constraints of the polyhedron's context
+   @param renderSpace tells if the returned equalities must be expressed in the
+   parameters space (renderSpace=0) or in the combined var/parms space
+   (renderSpace = 1)
+   @return the system of equalities that involve only parameters.
+ */
+Matrix * Constraints_Remove_parm_eqs(Matrix ** M1, Matrix ** Ctxt1, 
+				     int renderSpace) {
+  int i, j, k, nbEqsParms =0;
+  int nbEqsM, nbEqsCtxt, allZeros, nbTautoM = 0, nbTautoCtxt = 0;
+  Matrix * M = (*M1);
+  Matrix * Ctxt = (*Ctxt1);
+  int nbVars = M->NbColumns-Ctxt->NbColumns;
+  Matrix * Eqs;
+  Matrix * EqsMTmp;
+  
+  /* 1- build the equality matrix(ces) */
+  nbEqsM = 0;
+  for (i=0; i< M->NbRows; i++) {
+    k = First_Non_Zero(M->p[i], M->NbColumns);
+    /* if it is a tautology, count it as such */
+    if (k==-1) {
+      nbTautoM++;
+    }
+    else {
+      /* if it only involves parameters, count it */
+      if (k>= nbVars+1) nbEqsM++;
+    }
+  }
+
+  nbEqsCtxt = 0;
+  for (i=0; i< Ctxt->NbRows; i++) {
+    if (value_zero_p(Ctxt->p[i][0])) {
+      if (First_Non_Zero(Ctxt->p[i], Ctxt->NbColumns)==-1) {
+	nbTautoCtxt++;
+      }
+      else {
+	nbEqsCtxt ++;
+      }
+    }
+  }
+  nbEqsParms = nbEqsM + nbEqsCtxt; 
+
+  /* nothing to do in this case */
+  if (nbEqsParms+nbTautoM+nbTautoCtxt==0) {
+    if (renderSpace==0) {
+      return Matrix_Alloc(0,Ctxt->NbColumns);
+    }
+    else {
+      return Matrix_Alloc(0,M->NbColumns);
+    }
+  }
+  
+  Eqs= Matrix_Alloc(nbEqsParms, Ctxt->NbColumns);
+  EqsMTmp= Matrix_Alloc(nbEqsParms, M->NbColumns);
+  
+  /* copy equalities from the context */
+  k = 0;
+  for (i=0; i< Ctxt->NbRows; i++) {
+    if (value_zero_p(Ctxt->p[i][0]) 
+		     && First_Non_Zero(Ctxt->p[i], Ctxt->NbColumns)!=-1) {
+      Vector_Copy(Ctxt->p[i], Eqs->p[k], Ctxt->NbColumns);
+      Vector_Copy(Ctxt->p[i]+1, EqsMTmp->p[k]+nbVars+1, 
+		  Ctxt->NbColumns-1);
+      k++;
+    }
+  }
+  for (i=0; i< M->NbRows; i++) {
+    j=First_Non_Zero(M->p[i], M->NbColumns);
+    /* copy equalities that involve only parameters from M */
+    if (j>=nbVars+1) {
+      Vector_Copy(M->p[i]+nbVars+1, Eqs->p[k]+1, Ctxt->NbColumns-1);
+      Vector_Copy(M->p[i]+nbVars+1, EqsMTmp->p[k]+nbVars+1, 
+		  Ctxt->NbColumns-1);
+      /* mark these equalities for removal */
+      value_set_si(M->p[i][0], 2);
+      k++;
+    }
+    /* mark the all-zero equalities for removal */
+    if (j==-1) {
+      value_set_si(M->p[i][0], 2);
+    }
+  }
+
+  /* 2- eliminate parameters until all equalities are unsed or until we find a
+  contradiction (overconstrained system) */
+  allZeros = 0;
+  for (i=0; i< Eqs->NbRows; i++) {
+    /* find a variable that can be eliminated */
+    k = First_Non_Zero(Eqs->p[i], Eqs->NbColumns);
+    if (k!=-1) { /* nothing special to do for tautologies */
+
+      /* if there is a contradiction, return empty matrices */
+      if (k==Eqs->NbColumns-1) {
+	printf("Contradiction in %dth row of Eqs: ",k);
+	show_matrix(Eqs);
+	Matrix_Free(Eqs);
+	Matrix_Free(EqsMTmp);
+	(*M1) = Matrix_Alloc(0, M->NbColumns);
+	Matrix_Free(M);
+	(*Ctxt1) = Matrix_Alloc(0,Ctxt->NbColumns);
+	Matrix_Free(Ctxt);
+	if (renderSpace==1) {
+	  return Matrix_Alloc(0,(*M1)->NbColumns);
+	}
+	else {
+	  return Matrix_Alloc(0,(*Ctxt1)->NbColumns);
+	}
+      }	
+      /* if we have something we can eliminate, do it in 3 places:
+	 Eqs, Ctxt, and M */
+      else {
+	k--; /* k is the rank of the variable, now */
+	for (j=0; j< Eqs->NbRows; j++) {
+	  if (i!=j) {
+	    eliminate_var_with_constr(Eqs, i, Eqs, j, k);
+	    eliminate_var_with_constr(EqsMTmp, i, EqsMTmp, j, k+nbVars);
+	  }
+	}
+	for (j=0; j< Ctxt->NbRows; j++) {
+	  if (value_notzero_p(Ctxt->p[i][0])) {
+	    eliminate_var_with_constr(Eqs, i, Ctxt, j, k);
+	  }
+	}
+	for (j=0; j< M->NbRows; j++) {
+	  if (value_cmp_si(M->p[i][0], 2)) {
+	    eliminate_var_with_constr(EqsMTmp, i, M, j, k+nbVars);
+	  }
+	}
+      }
+    }
+    /* if (k==-1): count the tautologies in Eqs to remove them later */
+    else {
+      allZeros++;
+    }
+  }
+
+  Matrix_Free(EqsMTmp);
+
+  /* 3- remove the "bad" equalities from the input matrices
+     and copy the equalities involving only parameters */
+  EqsMTmp = Matrix_Alloc(M->NbRows-nbEqsM-nbTautoM, M->NbColumns);
+  k=0;
+  for (i=0; i< M->NbRows; i++) {
+    if (value_cmp_si(M->p[i][0], 2)) {
+      Vector_Copy(M->p[i], EqsMTmp->p[k], M->NbColumns);
+      k++;
+    }
+  }
+  Matrix_Free(M);
+  (*M1) = EqsMTmp;
+  
+  EqsMTmp = Matrix_Alloc(Ctxt->NbRows-nbEqsCtxt-nbTautoCtxt, Ctxt->NbColumns);
+  k=0;
+  for (i=0; i< Ctxt->NbRows; i++) {
+    if (value_notzero_p(Ctxt->p[i][0])) {
+      Vector_Copy(Ctxt->p[i], EqsMTmp->p[k], Ctxt->NbColumns);
+      k++;
+    }
+  }
+  Matrix_Free(Ctxt);
+  (*Ctxt1) = EqsMTmp;
+  
+  if (renderSpace==0) {// renderSpace = 0: equalities in the parameter space
+    EqsMTmp = Matrix_Alloc(Eqs->NbRows-allZeros, Eqs->NbColumns);
+    k=0;
+    for (i=0; i<Eqs->NbRows; i++) {
+      if (First_Non_Zero(Eqs->p[i], Eqs->NbColumns)!=-1) {
+	Vector_Copy(Eqs->p[i], EqsMTmp->p[k], Eqs->NbColumns);
+	k++;
+      }
+    }
+  }
+  else {// renderSpace = 1: equalities rendered in the combined space
+    EqsMTmp = Matrix_Alloc(Eqs->NbRows-allZeros, (*M1)->NbColumns);
+    k=0;
+    for (i=0; i<Eqs->NbRows; i++) {
+      if (First_Non_Zero(Eqs->p[i], Eqs->NbColumns)!=-1) {
+	Vector_Copy(Eqs->p[i], &(EqsMTmp->p[k][nbVars]), Eqs->NbColumns);
+	k++;
+      }
+    }
+  }
+  Matrix_Free(Eqs);
+  Eqs = EqsMTmp;
+
+  return Eqs;
+} /* Constraints_Remove_parm_eqs */
+
+
+/** Removes equalities involving onlt parameters, but starting from a
+ * Polyhedron and its context */
+Polyhedron * Polyhedron_Remove_parm_eqs(Polyhedron ** P, Polyhedron ** C, 
+					int renderSpace, int maxRays) {
+  Matrix * M = Polyhedron2Constraints((*P));
+  Matrix * Ct = Polyhedron2Constraints((*C));
+  Matrix * Eqs = Constraints_Remove_parm_eqs(&M, &Ct, renderSpace);
+  Polyhedron * Peqs = Constraints2Polyhedron(Eqs, maxRays);
+  Matrix_Free(Eqs);
+
+  /* particular case: no equality involving only parms is found */
+  if (Eqs->NbRows==0) {
+    Matrix_Free(M);
+    Matrix_Free(Ct);
+    return Peqs;
+  }
+  Polyhedron_Free(*P);
+  Polyhedron_Free(*C);
+  (*P) = Constraints2Polyhedron(M, maxRays);
+  (*C) = Constraints2Polyhedron(Ct, maxRays);
+  Matrix_Free(M);
+  Matrix_Free(Ct);
+  return Peqs;
+} /* Polyhedron_Remove_parm_eqs */
+
+
+/**
+ given a matrix with m parameterized equations, compress the nb_parms
+ parameters and n-m variables so that m variables are integer, and transform
  the variable space into a n-m space by eliminating the m variables (using the
  equalities) the variables to be eliminated are chosen automatically by the
  function

@@ -72,7 +72,7 @@ multi_noinst_programs = $(foreach B,$(ALL_BITS), \
 	polytest$(B)$(EXEEXT) \
 	verif_ehrhart$(B)$(EXEEXT) \
 )
-	
+
 noinst_PROGRAMS = \
 	testlib \
 	example \
@@ -84,8 +84,9 @@ multi_bin_programs = $(foreach B,$(ALL_BITS), \
 	ehrhart_union$(B)$(EXEEXT) \
 	pp$(B)$(EXEEXT) \
 	testehrhart$(B)$(EXEEXT) \
+	testCompressParms$(B)$(EXEEXT) \
 )
-	
+
 bin_PROGRAMS = \
 	c2p \
 	r2p \
@@ -116,6 +117,9 @@ EXTRA_PROGRAMS = \
 	testehrhart32 \
 	testehrhart64 \
 	testehrhartgmp \
+	testCompressParms32 \
+	testCompressParms64 \
+	testCompressParmsgmp \
 	verif_ehrhart32 \
 	verif_ehrhart64 \
 	verif_ehrhartgmp
@@ -186,6 +190,15 @@ testehrhart64_LDADD = libpolylib64.la
 testehrhartgmp_CPPFLAGS = $(libpolylibgmp_la_CPPFLAGS)
 testehrhartgmp_SOURCES = $(poly_src)/testehrhart.c
 testehrhartgmp_LDADD = libpolylibgmp.la
+testCompressParms32_CPPFLAGS = $(libpolylib32_la_CPPFLAGS)
+testCompressParms32_SOURCES = $(poly_src)/testCompressParms.c
+testCompressParms32_LDADD = libpolylib32.la
+testCompressParms64_CPPFLAGS = $(libpolylib64_la_CPPFLAGS)
+testCompressParms64_SOURCES = $(poly_src)/testCompressParms.c
+testCompressParms64_LDADD = libpolylib64.la
+testCompressParmsgmp_CPPFLAGS = $(libpolylibgmp_la_CPPFLAGS)
+testCompressParmsgmp_SOURCES = $(poly_src)/testCompressParms.c
+testCompressParmsgmp_LDADD = libpolylibgmp.la
 verif_ehrhart32_CPPFLAGS = $(libpolylib32_la_CPPFLAGS)
 verif_ehrhart32_SOURCES = $(poly_src)/verif_ehrhart.c
 verif_ehrhart32_LDADD = libpolylib32.la
