@@ -103,6 +103,13 @@ usage="usage: $command action [options...] arguments
   * test dir
     . tell whether dir is a branch
 
+  SVN options forwarded to the 'svn' command:
+    --username user: svn login name
+    --password pass: svn password
+    --config-dir dir: svn configuration directory
+    --no-auth-cache: do not cache svn authentication data
+    --non-interactive: svn non interactive mode
+
   Other common options:
     --verbose: be more verbose (show issued svn commands)
     --debug: be really more verbose (you don't want that)
