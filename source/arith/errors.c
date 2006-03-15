@@ -1,10 +1,13 @@
 /*
-  $Id: errors.c,v 1.5 2004/08/31 18:01:56 verdoolaege Exp $
+  $Id: errors.c,v 1.6 2006/03/15 19:59:37 verdoolaege Exp $
 
   Exception management.
   See "arithmetic_errors.h".
 
   $Log: errors.c,v $
+  Revision 1.6  2006/03/15 19:59:37  verdoolaege
+  arith: add some missing consts
+
   Revision 1.5  2004/08/31 18:01:56  verdoolaege
   remove warning
 
@@ -154,8 +157,8 @@ typedef struct
 
   /* location of the CATCH to be matched against the UNCATCH.
    */
-  char * function;
-  char * file;
+  const char * function;
+  const char * file;
   int    line;
 } 
   linear_exception_holder;
@@ -228,8 +231,8 @@ void dump_exception_stack()
 jmp_buf * 
 push_exception_on_stack(
     int what,
-    char * function,
-    char * file,
+    const char * function,
+    const char * file,
     int line)
 {
   exception_debug_trace("PUSH ");
@@ -264,8 +267,8 @@ push_exception_on_stack(
 void
 pop_exception_from_stack(
     int what,
-    char * function,
-    char * file,
+    const char * function,
+    const char * file,
     int line)
 {  
   exception_debug_trace("POP  ");

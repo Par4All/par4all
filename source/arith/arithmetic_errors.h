@@ -1,5 +1,5 @@
 /* 
- * $Id: arithmetic_errors.h,v 1.3 2004/02/08 21:53:27 kienhuis Exp $
+ * $Id: arithmetic_errors.h,v 1.4 2006/03/15 19:59:37 verdoolaege Exp $
  *
  * managing arithmetic errors...
  * detecting and managing arithmetic errors on Values should be
@@ -9,6 +9,9 @@
  * (c) CA et FC, Sept 1997
  *
  * $Log: arithmetic_errors.h,v $
+ * Revision 1.4  2006/03/15 19:59:37  verdoolaege
+ * arith: add some missing consts
+ *
  * Revision 1.3  2004/02/08 21:53:27  kienhuis
  * Update from Fabien Coelho, via Bart Kienhuis
  *
@@ -75,7 +78,7 @@
 
 #include <setjmp.h>
 
-typedef void (*exception_callback_t)(char *, char *, int);
+typedef void (*exception_callback_t)(const char *, const char *, int);
 
 /*
 const unsigned int overflow_error = 1;
