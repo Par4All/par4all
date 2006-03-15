@@ -1,5 +1,5 @@
 /** 
- * $Id: compress_parms.c,v 1.15 2006/03/07 04:23:26 loechner Exp $
+ * $Id: compress_parms.c,v 1.16 2006/03/15 19:59:20 verdoolaege Exp $
  *
  * The integer points in a parametric linear subspace of Q^n are generally
  * lying on a sub-lattice of Z^n.  To simplify, the funcitons here compress
@@ -650,7 +650,7 @@ Matrix * full_dimensionize(Matrix const * M, int nb_parms,
   Matrix * WVL; /* The Whole Validity Lattice (vars+parms) */
   unsigned int i,j;
   int nb_elim_vars;
-  int * permutation, * permutation_inv;
+  unsigned int * permutation, * permutation_inv;
   /* 0- Split the equalities and inequalities from each other */
   split_constraints(M, &Eqs, &Ineqs);
 
