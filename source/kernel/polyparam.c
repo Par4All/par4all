@@ -1695,7 +1695,10 @@ Param_Polyhedron *Polyhedron2Param_Domain(Polyhedron *Din,Polyhedron *Cin,int wo
 Param_Polyhedron *Polyhedron2Param_SimplifiedDomain(Polyhedron **Din,Polyhedron *Cin,int working_space,Polyhedron **CEq,Matrix **CT) {
 						     
   Param_Polyhedron *result;
-  
+
+  assert(CEq != NULL);
+  assert(CT != NULL);
+
   POL_ENSURE_FACETS(*Din);
   POL_ENSURE_VERTICES(*Din);
   POL_ENSURE_FACETS(Cin);
