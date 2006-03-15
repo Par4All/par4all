@@ -4,7 +4,7 @@
 
 /* package arithmetique
  *
- * $Id: arithmetique.h,v 1.11 2006/01/16 17:41:33 verdoolaege Exp $
+ * $Id: arithmetique.h,v 1.12 2006/03/15 19:58:46 verdoolaege Exp $
  *
  * Francois Irigoin, mai 1989
  *
@@ -629,7 +629,6 @@ extern unsigned int user_exception_error;
 extern unsigned int parser_exception_error;
 extern unsigned int any_exception_error; 
 extern unsigned int the_last_just_thrown_exception;
-extern int linear_exception_debug_mode;
 extern void dump_exception_stack_to_file(FILE * /*f*/);
 extern void dump_exception_stack(void);
 extern jmp_buf *push_exception_on_stack(int /*what*/, char * /*function*/, char * /*file*/, int /*line*/);
