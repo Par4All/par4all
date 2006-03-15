@@ -737,20 +737,23 @@ Enumeration *Domain_Enumerate(Polyhedron *D, Polyhedron *C, unsigned MAXRAYS,cha
      
 	for (lp1=lp ; lp1; lp1=lp1->next)
 	{
+		Enumeration *enext;
 		lp1next = lp1->next;
 		lp1->next = NULL;
 		en= Polyhedron_Enumerate(lp1, C, MAXRAYS,NULL);
 		lp1->next = lp1next;
 		sen= NULL;
-		for(e=en;e;e=e->next)
-			if(!Degenerate(e))
-			{
-				pr = (Enumeration  *)malloc(sizeof(Enumeration));
-				pr->EP=e->EP;     
-				pr->ValidityDomain=e->ValidityDomain;
-				pr->next=sen;
-				sen=pr;
+		for (e=en;e;e=enext) {
+			enext = e->next;
+			if (!Degenerate(e)) {
+				e->next = sen;
+				sen=e;
+			} else {
+				free_evalue_refs(&e->EP);
+				Domain_Free(e->ValidityDomain);
+				free(e);
 			}
+		}
 
 		if(sen!= NULL)
 		{
@@ -769,6 +772,7 @@ Enumeration *Domain_Enumerate(Polyhedron *D, Polyhedron *C, unsigned MAXRAYS,cha
 	}
       
 	while(Polun->next != NULL)  {
+		Enumeration *enext;
 		res=NULL;
 		en1=Polun->pt;
 		en2=(Polun->next)->pt;
@@ -776,55 +780,53 @@ Enumeration *Domain_Enumerate(Polyhedron *D, Polyhedron *C, unsigned MAXRAYS,cha
 		d1=DMUnion(en1, MAXRAYS);
 		d2=DMUnion(en2, MAXRAYS);
 
-		for(en1=Polun->pt;en1;en1=en1->next)
-		{
-
+		for (en1=Polun->pt;en1;en1=enext) {
+			enext = en1->next;
 			for(en2=(Polun->next)->pt;en2;en2=en2->next)
 			{
 				d = DomainIntersection(en1->ValidityDomain,en2->ValidityDomain,MAXRAYS);
 				if( d && !emptyQ(d)&&!IncludeInRes(d,res,MAXRAYS))  {
-					evalue ev;
-					value_init(ev.d);
-					value_assign( ev.d, en2->EP.d );
-					if(value_zero_p(ev.d))
-						ev.x.p=ecopy(en2->EP.x.p);
+					tmp = (Enumeration  *)malloc(sizeof(Enumeration));
+					value_init(tmp->EP.d);
+					value_assign( tmp->EP.d, en2->EP.d );
+					if(value_zero_p(tmp->EP.d))
+						tmp->EP.x.p=ecopy(en2->EP.x.p);
 					else
 					{
-						value_init(ev.x.n);
-						value_assign( ev.x.n, en2->EP.x.n );
+						value_init(tmp->EP.x.n);
+						value_assign( tmp->EP.x.n, en2->EP.x.n );
 					}
 
-					new_eadd(&en1->EP,&ev);
-					tmp = (Enumeration  *)malloc(sizeof(Enumeration));
+					new_eadd(&en1->EP,&tmp->EP);
 					tmp->ValidityDomain =d;
-					tmp->EP=ev;
 					tmp->next= res;
 					res=tmp;
 				}
 			}
 			d=DomainDifference(en1->ValidityDomain,d2 ,MAXRAYS);
-			if( d && !emptyQ(d)&&!IncludeInRes(d,res,MAXRAYS))
-			{
-				tmp = (Enumeration  *)malloc(sizeof(Enumeration));
-				tmp->ValidityDomain =d;
-
-				tmp->EP=en1->EP;
-				tmp->next= res;
-				res=tmp;
+			if (d && !emptyQ(d) && !IncludeInRes(d,res,MAXRAYS)) {
+				en1->ValidityDomain = d;
+				en1->next= res;
+				res=en1;
+			} else {
+				free_evalue_refs(&en1->EP);
+				free(en1);
 			}
 		}
-		for(en2=(Polun->next)->pt; en2; en2= en2->next)
-		{
+		for (en2=(Polun->next)->pt; en2; en2 = enext) {
+			enext = en2->next;
 			d= DomainDifference(en2->ValidityDomain,d1,MAXRAYS);
-			if( d && !emptyQ(d)&&!IncludeInRes(d,res,MAXRAYS) )
-			{
-				tmp = (Enumeration  *)malloc(sizeof(Enumeration));
-				tmp->ValidityDomain =d;
-				tmp->EP=en2->EP;
-				tmp->next= res;
-				res=tmp;
+			if (d && !emptyQ(d)&&!IncludeInRes(d,res,MAXRAYS)) {
+				en2->ValidityDomain = d;
+				en2->next = res;
+				res = en2;
+			} else {
+				free_evalue_refs(&en2->EP);
+				free(en2);
 			}
 		}
+		Domain_Free(d1);
+		Domain_Free(d2);
 	    
 		Polun->pt=res;
 	        		     
