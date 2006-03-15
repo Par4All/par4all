@@ -4,7 +4,7 @@
 
 /* package arithmetique
  *
- * $Id: arithmetique.h,v 1.13 2006/03/15 19:58:49 verdoolaege Exp $
+ * $Id: arithmetique.h,v 1.14 2006/03/15 19:58:53 verdoolaege Exp $
  *
  * Francois Irigoin, mai 1989
  *
@@ -374,8 +374,8 @@ typedef mpz_t Value;
 #define value_mod(v1,v2)   		((v1)%(v2))
 #define value_direct_multiply(v1,v2)	((v1)*(v2)) /* direct! */
 #define value_minus(v1,v2) 		((v1)-(v2))
-#define value_pdiv(v1,v2)  		(divide((v1),(v2)))
-#define value_pmod(v1,v2)  		(modulo((v1),(v2)))
+#define value_pdiv(v1,v2)  		(DIVIDE((v1),(v2)))
+#define value_pmod(v1,v2)  		(MODULO((v1),(v2)))
 #define value_min(v1,v2)   		(value_le((v1),(v2))? (v1): (v2))
 #define value_max(v1,v2)   		(value_ge((v1),(v2))? (v1): (v2))
 #define value_or(v1,v2)  		((v1)|(v2))
@@ -607,17 +607,6 @@ typedef mpz_t Value;
 #define POSITIVE_MODULO(x,y) ((x) > 0 ? (x)%(y) : \
 			      ((x)%(y) == 0 ? 0 : ((y)-(-(x))%(y))))
 			      
-/* Pour la recherche de performance, selection d'une implementation
- * particuliere des fonctions
- */
-
-#define divide(a,b) DIVIDE(a,b)
-
-#define modulo(a,b) MODULO(a,b)
-
-typedef struct {Value num, den; int numero ; } frac ;
-typedef struct col{int taille, existe ; frac *colonne ;} tableau ;
-
 /* errors.c */ 
 extern unsigned int overflow_error;
 extern unsigned int simplex_arithmetic_error;
