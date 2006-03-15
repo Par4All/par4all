@@ -13,6 +13,7 @@
 */
 
 #include <stdio.h>
+#include <polylib/polylib.h>
 
 extern int Pol_status;
 
