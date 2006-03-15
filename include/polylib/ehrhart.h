@@ -33,6 +33,9 @@ extern void print_enode ( FILE *DST, enode *p, char **pname );
 extern void print_evalue ( FILE *DST, evalue *e, char **pname );
 extern void reduce_evalue (evalue *e);
 extern void Enumeration_Free(Enumeration *en);
+extern Enumeration *Ehrhart_Quick_Apx(Matrix * M, Matrix * C, 
+		Matrix ** Validity_Lattice, unsigned MAXRAYS, char ** param_name);
+
 
 #if defined(__cplusplus)
 }
