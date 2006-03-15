@@ -1,5 +1,5 @@
 /** 
- * $Id: matrix_addon.c,v 1.8 2006/03/07 04:23:26 loechner Exp $
+ * $Id: matrix_addon.c,v 1.9 2006/03/15 19:59:26 verdoolaege Exp $
  * 
  * Polylib matrix addons
  * Mainly, deals with polyhedra represented as a matrix (implicit form)
@@ -214,12 +214,8 @@ void eliminate_var_with_constr(Matrix * Eliminator,
     value_absolute(tmp, b);
     value_division(sb, tmp, b); // sb represents the sign of b
     // multiplication factor for the constraint to project
-#ifdef GNUMP
-    mpz_divexact(tmp, cur_lcm, a);
+    value_division(tmp, cur_lcm, a);
     value_multiply(mul_b, tmp, sb);
-#else
-    mul_b = cur_lcm / a * sb;
-#endif
 
     value_assign(Victim->p[victim_row][0], Victim->p[victim_row][0]);
     for (k=1; k<Victim->NbColumns; k++) {

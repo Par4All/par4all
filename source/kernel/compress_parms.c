@@ -1,5 +1,5 @@
 /** 
- * $Id: compress_parms.c,v 1.16 2006/03/15 19:59:20 verdoolaege Exp $
+ * $Id: compress_parms.c,v 1.17 2006/03/15 19:59:26 verdoolaege Exp $
  *
  * The integer points in a parametric linear subspace of Q^n are generally
  * lying on a sub-lattice of Z^n.  To simplify, the funcitons here compress
@@ -111,7 +111,9 @@ Matrix * int_mod_basis(Matrix * Bp, Matrix * Cp, Matrix * d) {
   unsigned int nb_parms=Bp->NbColumns;
   unsigned int i, j;
   Matrix *H, *U, *Q, *M, *inv_H_M, *Ha, *Np_0, *N_0, *G, *K, *S, *KS;
+  Value tmp;
 
+  value_init(tmp);
   /*   a/ compute K and S */
   /* simplify the constraints */
   for (i=0; i< Bp->NbRows; i++)
@@ -208,15 +210,11 @@ Matrix * int_mod_basis(Matrix * Bp, Matrix * Cp, Matrix * d) {
      denominator of the rows of H_M. If these rows are not divisible, 
      there is no integer N'_0 so return NULL */
   for (i=0; i< nb_eqs; i++) {
-
-#ifdef GNUMP
-    if (mpz_divisible_p(Np_0->p[i][0], inv_H_M->p[i][nb_eqs])) 
-      mpz_divexact(Np_0->p[i][0], Np_0->p[i][0], inv_H_M->p[i][nb_eqs]);
-#else
-    if (!(Np_0->p[i][0]%inv_H_M->p[i][nb_eqs])) 
-      Np_0->p[i][0]/=inv_H_M->p[i][nb_eqs];
-#endif
+    value_modulus(tmp, Np_0->p[i][0], inv_H_M->p[i][nb_eqs]);
+    if (value_zero_p(tmp))
+      value_division(Np_0->p[i][0], Np_0->p[i][0], inv_H_M->p[i][nb_eqs]);
     else {
+      value_clear(tmp);
       Matrix_Free(S);
       Matrix_Free(inv_H_M);
       Matrix_Free(Np_0);
@@ -248,6 +246,7 @@ Matrix * int_mod_basis(Matrix * Bp, Matrix * Cp, Matrix * d) {
   value_set_si(G->p[S->NbRows][S->NbRows],1);
 
   /* clean up */
+  value_clear(tmp);
   Matrix_Free(S);
   Matrix_Free(N_0);
   return G;
