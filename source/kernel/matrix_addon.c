@@ -1,5 +1,5 @@
 /** 
- * $Id: matrix_addon.c,v 1.9 2006/03/15 19:59:26 verdoolaege Exp $
+ * $Id: matrix_addon.c,v 1.10 2006/03/15 19:59:55 verdoolaege Exp $
  * 
  * Polylib matrix addons
  * Mainly, deals with polyhedra represented as a matrix (implicit form)
@@ -7,6 +7,7 @@
  * 
  */
 
+#include <stdlib.h>
 #include<polylib/polylib.h>
 #include <polylib/matrix_addon.h>
 

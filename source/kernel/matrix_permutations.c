@@ -1,5 +1,5 @@
 /** 
- * $Id: matrix_permutations.c,v 1.5 2006/03/07 04:23:26 loechner Exp $
+ * $Id: matrix_permutations.c,v 1.6 2006/03/15 19:59:55 verdoolaege Exp $
  *
  * Permutations on matrices Matrices are seen either as transformations
  * (mtransformation) or as polyhedra (mpolyhedron)
@@ -12,6 +12,7 @@
  * vector is the position of the k^th variable in the permuted object.
  */
 
+#include <stdlib.h>
 #include <polylib/matrix_permutations.h>
 
 /** utility function : bit count (i know, there are faster methods) */

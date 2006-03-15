@@ -1,5 +1,6 @@
 #define WS 0
 
+#include <stdlib.h>
 #include <polylib/polylib.h>
 
 int main() {

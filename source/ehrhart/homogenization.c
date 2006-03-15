@@ -3,6 +3,8 @@
 **/
 
 #include <assert.h>
+#include <stdlib.h>
+#include <string.h>
 #include <polylib/polylib.h>
 #include <polylib/homogenization.h>
 

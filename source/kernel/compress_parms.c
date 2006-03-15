@@ -1,5 +1,5 @@
 /** 
- * $Id: compress_parms.c,v 1.17 2006/03/15 19:59:26 verdoolaege Exp $
+ * $Id: compress_parms.c,v 1.18 2006/03/15 19:59:55 verdoolaege Exp $
  *
  * The integer points in a parametric linear subspace of Q^n are generally
  * lying on a sub-lattice of Z^n.  To simplify, the funcitons here compress
@@ -11,6 +11,7 @@
  * Louis Pasteur University (ULP), Strasbourg, France 
 */
 
+#include <stdlib.h>
 #include <polylib/polylib.h>
 
 /* given a full-row-rank nxm matrix M made of m row-vectors), 
