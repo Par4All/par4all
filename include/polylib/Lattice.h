@@ -37,7 +37,7 @@ extern void PrintLatticeUnion ( FILE *fp, char *format, LatticeUnion
                                 *Head );
 extern Bool sameAffinepart ( Lattice *A, Lattice *B );
 extern Bool sameLattice ( Lattice *A, Lattice *B );
-extern LatticeUnion *Lattice2LatticeUnion(/* Lattice *X,Lattice *Y*/);
+extern LatticeUnion *Lattice2LatticeUnion(Lattice *X,Lattice *Y);
 
 #if defined(__cplusplus)
 }
