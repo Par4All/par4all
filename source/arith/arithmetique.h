@@ -4,7 +4,7 @@
 
 /* package arithmetique
  *
- * $Id: arithmetique.h,v 1.15 2006/03/15 19:59:37 verdoolaege Exp $
+ * $Id: arithmetique.h,v 1.16 2006/03/15 20:08:08 verdoolaege Exp $
  *
  * Francois Irigoin, mai 1989
  *
@@ -34,6 +34,12 @@
 #ifdef GNUMP
 #include <gmp.h>
 #endif 
+
+#ifdef CLN
+#include <sstream>
+#define WANT_OBFUSCATING_OPERATORS
+#include <cln/cln.h>
+#endif
 
 /* 
    #        ####   #    #   ####           #        ####   #    #   ####
@@ -230,7 +236,7 @@ typedef int Value;
 
 /* end LINEAR_VALUE_IS_INT */
 
-#else  /* If defined(GNUMP) */
+#elif defined(GNUMP)
 
 #define LINEAR_VALUE_STRING "gmp"
 typedef mpz_t Value;
@@ -245,11 +251,87 @@ typedef mpz_t Value;
 #define VALUE_TO_FLOAT(val) ((float)((int)mpz_get_si(val)))
 #define VALUE_TO_DOUBLE(val) (mpz_get_d(val))
 
+#elif defined(CLN)
+
+#define LINEAR_VALUE_STRING "cln"
+typedef cln::cl_I Value;
+#define VALUE_FMT "%s"
+
+#define VALUE_TO_INT(val) (cln::cl_I_to_int(val))
+#define VALUE_TO_DOUBLE(val) (cln::double_approx(val))
+
 #endif 
 
 /* ***************** MACROS FOR MANIPULATING VALUES ******************** */
 
-#if defined(GNUMP)
+#if defined(CLN)
+
+#define value_init(val)        	((val).word = ((cln::cl_uint)cl_FN_tag) << cl_tag_shift)
+#define value_assign(v1,v2)    	((v1) = (v2))
+#define value_set_si(val,i)    	((val) = (i))    
+#define value_set_double(val,d)	((val) = cln::truncate1(cln::cl_R(d)))
+#define value_clear(val)       	((val) = 0)
+#define value_read(val,str)    	((val) = (str))
+#define value_print(Dst,fmt,val)  {std::ostringstream strm; strm << val; \
+				   fprintf((Dst),(fmt),strm.str().c_str()); \
+				  }
+#define value_swap(v1,v2)          {Value tmp; tmp = v2; \
+                                    v2 = v1; v1 = tmp;   \
+                                   }
+
+/* Boolean operators on 'Value' */
+
+#define value_eq(v1,v2) ((v1)==(v2))
+#define value_ne(v1,v2) ((v1)!=(v2))
+#define value_gt(v1,v2) ((v1)>(v2))
+#define value_ge(v1,v2) ((v1)>=(v2))
+#define value_lt(v1,v2) ((v1)<(v2))
+#define value_le(v1,v2) ((v1)<=(v2))
+
+#define value_abs_eq(v1,v2) (cln::abs(v1)==cln::abs(v2))
+#define value_abs_ne(v1,v2) (cln::abs(v1)!=cln::abs(v2))
+#define value_abs_gt(v1,v2) (cln::abs(v1)>cln::abs(v2))
+#define value_abs_ge(v1,v2) (cln::abs(v1)>=cln::abs(v2))
+#define value_abs_lt(v1,v2) (cln::abs(v1)<cln::abs(v2))
+#define value_abs_le(v1,v2) (cln::abs(v1)<=cln::abs(v2))
+
+#define value_sign(val)      (cln::signum(val))
+#define value_compare(v1,v2) (cln::compare((v1),(v2)))
+
+#define value_addto(ref,val1,val2) 	((ref) = (val1)+(val2))
+#define value_add_int(ref,val,vint)     ((ref) = (val)+(vint))
+#define value_addmul(ref, val1, val2)   ((ref) += (val1)*(val2))
+#define value_increment(ref,val) 	((ref) = (val)+1)
+#define value_multiply(ref,val1,val2)	((ref) = (val1)*(val2))
+#define value_subtract(ref,val1,val2) 	((ref) = (val1)-(val2))
+#define value_sub_int(ref,val1,val2) 	((ref) = (val1)-(val2))
+#define value_decrement(ref,val) 	((ref) = (val)-1)
+#define value_division(ref,val1,val2)   ((ref) = cln::truncate1(val1,val2))
+#define value_modulus(ref,val1,val2)    ((ref) = cln::truncate2(val1,val2).remainder)
+#define value_pdivision(ref,val1,val2)  ((ref) = cln::floor1(val1,val2))
+#define value_pmodulus(ref,val1,val2)   ((ref) = cln::floor2(val1,val2).remainder)
+#define value_oppose(ref,val)    	((ref) = -(val))
+#define value_absolute(ref,val)		((ref) = cln::abs(val))
+#define value_minimum(ref,val1,val2)	((ref) = cln::min((val1),(val2)))
+#define value_maximum(ref,val1,val2)	((ref) = cln::max((val1),(val2)))
+#define value_orto(ref,val1,val2)	((ref) = (val1)|(val2))
+#define value_andto(ref,val1,val2)	((ref) = (val1)&(val2))
+
+/* Conditional operations on 'Value' */
+
+#define value_pos_p(val)         ((val) >  0)
+#define value_neg_p(val)         ((val) <  0)
+#define value_posz_p(val)        ((val) >= 0)
+#define value_negz_p(val)        ((val) <= 0)
+#define value_zero_p(val)        ((val) == 0)
+#define value_notzero_p(val)     ((val) != 0)
+#define value_one_p(val)         ((val) == 1)
+#define value_notone_p(val)      ((val) != 1)
+#define value_mone_p(val)        ((val) == -1)
+#define value_notmone_p(val)     ((val) != -1)
+#define value_cmp_si(val, n)     (cln::compare(val,n))
+
+#elif defined(GNUMP)
 
 /* Basic macros */
 

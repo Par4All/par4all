@@ -156,9 +156,15 @@ typedef struct _Param_Polyhedron {
 
 typedef enum { polynomial, periodic, evector } enode_type;
 
+#ifdef CLN
+#define POLY_UNION_OR_STRUCT struct
+#else
+#define POLY_UNION_OR_STRUCT union
+#endif
+
 typedef struct _evalue {
   Value d;              /* denominator */
-  union {
+  POLY_UNION_OR_STRUCT {
     Value n;            /* numerator (if denominator != 0) */
     struct _enode *p;	/* pointer   (if denominator == 0) */
   } x;

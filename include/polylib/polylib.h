@@ -10,7 +10,8 @@
 	&& ! defined(LINEAR_VALUE_IS_LONG) \
 	&& ! defined(LINEAR_VALUE_IS_INT) \
 	&& ! defined(LINEAR_VALUE_IS_CHARS) \
-        && ! defined(GNUMP)
+        && ! defined(GNUMP) \
+        && ! defined(CLN)
 #error Please define LINEAR_VALUE_IS_* or #include polylib32.h or polylib64.h
 #endif
 
