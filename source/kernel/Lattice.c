@@ -1572,7 +1572,7 @@ static Bool AffinePartSimplify(LatticeUnion *curlist, LatticeUnion **newlist) {
 	  for (tmp = nextlist; tmp->next; tmp=tmp->next);
 	  tmp->next = curlist;
 	}
-	change = change | chng ;
+	change = (Bool)(change | chng);
 	curlist = next;
       }
       curr = next;
@@ -1633,7 +1633,7 @@ LatticeUnion *LatticeSimplify(LatticeUnion *latlist) {
       if (!SameLinearPart(curr, next)) {
 	curr->next = NULL; 
 	chng = AffinePartSimplify(curlist, &nextlist);
-	change = change | chng ;
+	change = (Bool)(change | chng);
 	curlist = next; 
       }
       curr = next; 
