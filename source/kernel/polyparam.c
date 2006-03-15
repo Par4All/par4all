@@ -1680,6 +1680,7 @@ Param_Polyhedron *Polyhedron2Param_Domain(Polyhedron *Din,Polyhedron *Cin,int wo
   if(result && CEqualities)
     for(D=result->D;D;D=D->next)
       D->Domain = Add_CEqualities(D->Domain);
+  Polyhedron_Free(CEqualities); 
   
 #ifdef DEBUGPP
   fprintf(stderr, "domains found at : %.2fs\n", (float)clock()/CLOCKS_PER_SEC);
