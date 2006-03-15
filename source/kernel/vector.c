@@ -741,17 +741,17 @@ void Vector_Sort(Value *vector,unsigned n) {
  * old is the constraint; v points to an initialized
  * value that this procedure can use.
  * Return non-zero if something changed.
- * Result is placed in new.
+ * Result is placed in newp.
  */
-int ConstraintSimplify(Value *old, Value *new, int len, Value* v)
+int ConstraintSimplify(Value *old, Value *newp, int len, Value* v)
 {
     Vector_Gcd(old+1, len - 2, v);
 
     if (value_one_p(*v))
 	return 0;
 
-    Vector_AntiScale(old+1, new+1, *v, len-2);
-    value_pdivision(new[len-1], old[len-1], *v);
+    Vector_AntiScale(old+1, newp+1, *v, len-2);
+    value_pdivision(newp[len-1], old[len-1], *v);
     return 1;
 }
 

@@ -1051,7 +1051,7 @@ Polyhedron *old_Polyhedron_Preprocess(Polyhedron *D,Value size,unsigned MAXRAYS)
     int p, p1, ub, lb;
     Value a, a1, b, b1, g, aa;
     Value abs_a, abs_b, size_copy;
-    int dim, con, new, needed;
+    int dim, con, newi, needed;
     Value **C;
     Matrix *M;
     Polyhedron *D1;
@@ -1063,7 +1063,7 @@ Polyhedron *old_Polyhedron_Preprocess(Polyhedron *D,Value size,unsigned MAXRAYS)
     dim = D->Dimension;
     con = D->NbConstraints;
     M = Matrix_Alloc(MAXRAYS,dim+2);
-    new = 0;
+    newi = 0;
     value_assign(size_copy,size);
     C = D->Constraint;
     for (p=1; p<=dim; p++) {
@@ -1094,20 +1094,20 @@ Polyhedron *old_Polyhedron_Preprocess(Polyhedron *D,Value size,unsigned MAXRAYS)
                 Gcd(abs_a,abs_b,&g);
                 value_division(a1,a,g);
                 value_division(b1,b,g);
-                value_set_si(M->p[new][0],1);
+                value_set_si(M->p[newi][0],1);
                 value_oppose(abs_a,a1);           /* abs_a = -a1 */
-                Vector_Combine(&(C[ub][1]),&(C[lb][1]),&(M->p[new][1]),
+                Vector_Combine(&(C[ub][1]),&(C[lb][1]),&(M->p[newi][1]),
                         b1,abs_a,dim+1);
                 value_multiply(aa,a1,b1);
                 // value_multiply(abs_a,aa,size_copy);
-                // value_addto(M->p[new][dim+1],M->p[new][dim+1],abs_a);
-		value_addmul(M->p[new][dim+1], aa, size_copy);
-                Vector_Normalize(&(M->p[new][1]),(dim+1));
-                new++;
+                // value_addto(M->p[newi][dim+1],M->p[newi][dim+1],abs_a);
+		value_addmul(M->p[newi][dim+1], aa, size_copy);
+                Vector_Normalize(&(M->p[newi][1]),(dim+1));
+                newi++;
             }
         }
     }
-    D1 = AddConstraints(M->p_Init,new,D,MAXRAYS);
+    D1 = AddConstraints(M->p_Init,newi,D,MAXRAYS);
     Matrix_Free(M);
   
     value_clear(a); value_clear(a1); value_clear(b);
