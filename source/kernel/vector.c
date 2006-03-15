@@ -549,8 +549,9 @@ void Vector_Gcd(Value *p,unsigned length,Value *min) {
  * Given vectors 'p1', 'p2', and a pointer to a function returning 'Value type,
  * compute p3[i] = f(p1[i],p2[i]).  
  */ 
-void Vector_Map(Value *p1,Value *p2,Value *p3,unsigned length,Value *(*f)()) {
-  
+void Vector_Map(Value *p1,Value *p2,Value *p3,unsigned length,
+		Value *(*f)(Value,Value))
+{
   Value *cp1, *cp2, *cp3;
   int i;
   

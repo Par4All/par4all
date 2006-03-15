@@ -45,7 +45,7 @@ extern void Vector_Min_Not_Zero(Value *p,unsigned length,int *index,Value
                      *result);
 extern void Vector_Gcd(Value *p,unsigned length,Value *result);
 extern void Vector_Map(Value *p1,Value *p2,Value *p3,unsigned
-		       length, Value *(*f)());
+		       length, Value *(*f)(Value,Value));
 extern void Vector_Normalize(Value *p,unsigned length);
 extern void Vector_Normalize_Positive(Value *p,int length,
 				      int pos);
