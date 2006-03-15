@@ -1042,9 +1042,10 @@ Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int wo
   /* CEqualities contains the constraints (to be added again later) */
   /* *CT is the transformation matrix to add the removed parameters */
   if(!CT) {
-    if(C1->NbEq == 0)
+    if (C1->NbEq == 0) {
+      Polyhedron_Free(C1);
       CEqualities = NULL;
-    else {
+    } else {
       Polyhedron *CEq1,	/* CEqualities, in homogeneous dim */
 	         *C2,	/* C1 (temporary) simplified */
 	         *D2;	/* D1, (temporary) simplified */
