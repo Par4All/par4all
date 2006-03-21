@@ -1,6 +1,6 @@
 #! /bin/bash
 #
-# $Id: svn_branch.sh 367 2006-01-04 10:34:49Z coelho $
+# $Id: svn_branch.sh 390 2006-03-21 09:54:05Z coelho $
 #
 # $URL: file:///users/cri/coelho/SVN/svn/svn_branch.sh $
 #
@@ -51,14 +51,12 @@
 # TODO:
 #  - option for giving a source wc path to push
 #  - option to include logs on push? log pointer is enough??
-#  - add file option to put the suggested commit message
-#  - store pulled revisions in compact form
 
 # keep command name
 command=${0/*\//}
 
 # keep revision number
-cmd_rev='$Rev: 367 $'
+cmd_rev='$Rev: 390 $'
 cmd_rev=${cmd_rev/*: /}
 cmd_rev=${cmd_rev/ \$/}
 
@@ -116,6 +114,7 @@ usage="usage: $command action [options...] arguments
     --quiet: be quiet (not advisable)
     --tmp tmp: directory for temporary files or directories, default is /tmp
     --commit: try to perform all commits (not really advisable)
+    --file file: put a possible commit message into this file
     --revision rev: revision to consider (for create, pull, push...)
     --dry-run: just pretend"
 
@@ -177,8 +176,7 @@ function is_svn_wcpath()
 
 function is_svn_branch()
 {
-    local version=$(do_svn propget 'svnbranch:version' $1)
-    [ "$version" ]
+    [ "$(do_svn propget 'svnbranch:version' $1)" ]
 }
 
 function is_svn_branch_wcpath()
@@ -339,13 +337,21 @@ function perform_merge()
 function safe_svn_commit()
 {
     local message=$1 target=$2 ; shift 2
-    if [[ $do_commit ]] ; then
+    if [[ $file && -d $target ]] ; then
+	[[ -e $target/$file ]] && \
+	    error 10 "target message file $target/$file already exists"
+	echo "$message" > $target/$file
+	echo "please commit $target if you agree"
+	echo "suggested message is in $target/$file"
+    elif [[ $do_commit ]] ; then
 	safe_svn commit --message "$message" $target
 	[[ $@ ]] && "$@"
     else
-	echo "please commit $target if you agree"
+	echo "please commit $target if you agree."
 	echo "suggested message:"
+	echo
 	echo "$message"
+	echo
     fi
 }
 
@@ -365,7 +371,7 @@ function get_all_revisions()
 }
 
 # substract from expanded list $1 list $2
-function list_sub()
+function l_sub()
 {
     local l1="${1# } " l2="${2# } " ; shift 2
     local h1 h2
@@ -386,7 +392,7 @@ function list_sub()
 }
 
 # union of both expanded lists
-function list_union()
+function l_union()
 {
     local l1="${1# } " l2="${2# } " ; shift 2
     local h1 h2
@@ -480,8 +486,9 @@ function create()
     safe_svn propset 'svnbranch:version'           1 $tmp_co/$branch
     safe_svn propset 'svnbranch:source-url'     $src $tmp_co/$branch
     safe_svn propset 'svnbranch:source-rev' $src_rev $tmp_co/$branch
-    safe_svn propset 'svnbranch:pulled-rev'       '' $tmp_co/$branch
-    safe_svn propset 'svnbranch:pushed-rev'       '' $tmp_co/$branch
+    #safe_svn propset 'svnbranch:pulled-rev'       '' $tmp_co/$branch
+    #safe_svn propset 'svnbranch:pushed-rev'       '' $tmp_co/$branch
+    
     #store "pushable" or "non-pushable" revisions somewhere?
     # the point is that when pushing differences and reusing the
     # logs, logs due to pull of the master source should not be included.
@@ -516,16 +523,17 @@ function pull()
     fi
 
     if [[ $revision ]] ; then
-	# fix revision
+	# fix revision to needed svn-range
 	[[ $revision == *:* ]] || revision=$(( $revision - 1 )):$revision
 
 	perform_merge $revision $dir $(get_url $dir) $src_url
 
 	local pulled_stuff=$(get_all_revisions $revision $src_url)
-	local new_pulled=$(list_union "$pulled_rev" "$pulled_stuff")
+	local newpulled=$(l_union "$(expand $pulled_rev)" "$pulled_stuff")
 
 	# update merged status with respect to merge above.
-	safe_svn propset 'svnbranch:pulled-rev' "$new_pulled" $dir
+	safe_svn propset 'svnbranch:pulled-rev' \
+             "$(compact $newpulled)" $dir
 
 	# ??? this seems necessary for some obscure reasons.
 	safe_svn update $dir
@@ -681,7 +689,7 @@ function avail()
     local revisions=$(default_revisions 'svnbranch:source-rev' $dir)
     local all_src_revs=$(get_all_revisions $revisions $src_url)
     local pulled_revs=$(do_svn propget 'svnbranch:pulled-rev' $dir)
-    echo $(list_sub "$all_src_revs" "$(expand $pulled_revs)")
+    echo $(l_sub "$all_src_revs" "$(expand $pulled_revs)")
 }
 
 function log()
@@ -702,6 +710,7 @@ url=
 nodo=
 revision=
 svn_options=
+file=
 
 while [[ $# -gt 0 ]] ; do
   arg=$1
@@ -748,6 +757,13 @@ while [[ $# -gt 0 ]] ; do
 	  --commit|--checkin|--ci)
 	      # I'm not sure it is a good idea to propose this option...
 	      do_commit=1
+	      ;;
+	  -F|--file)
+	      file=$1
+	      shift
+	      ;;
+	  --file=*)
+	      file=${arg/*=/}
 	      ;;
 	  --remove|--rm)
 	      # Idem
