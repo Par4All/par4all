@@ -2007,6 +2007,48 @@ static void SortConstraints(Matrix *Constraints, unsigned NbEq)
     }
 }
 
+/*
+
+Search for trivial implicit equalities,
+assuming the constraints have been sorted.
+
+*/
+
+static int ImplicitEqualities(Matrix *Constraints, unsigned NbEq)
+{
+    int row, nrow, k;
+    int found = 0;
+    for (row = NbEq; row < Constraints->NbRows; ++row) {
+	int d = First_Non_Zero(Constraints->p[row]+1, Constraints->NbColumns-2);
+	if (d == -1)
+	    break;
+	if (value_neg_p(Constraints->p[row][1+d]))
+	    continue;
+	for (nrow = row+1; nrow < Constraints->NbRows; ++nrow) {
+	    if (value_zero_p(Constraints->p[nrow][1+d]))
+		break;
+	    if (value_pos_p(Constraints->p[nrow][1+d]))
+		continue;
+	    for (k = d; k < Constraints->NbColumns-1; ++k) {
+		if (value_abs_ne(Constraints->p[row][1+k], 
+				 Constraints->p[nrow][1+k]))
+		    break;
+		if (value_zero_p(Constraints->p[row][1+k]))
+		    continue;
+		if (value_eq(Constraints->p[row][1+k], Constraints->p[nrow][1+k]))
+		    break;
+	    }
+	    if (k == Constraints->NbColumns-1) {
+		value_set_si(Constraints->p[row][0], 0);
+		value_set_si(Constraints->p[nrow][0], 0);
+		found = 1;
+		break;
+	    }
+	}
+    }
+    return found;
+}
+
 /**
 
 Given a matrix of constraints ('Constraints'), construct and return a 
@@ -2040,17 +2082,20 @@ Polyhedron *Constraints2Polyhedron(Matrix *Constraints,unsigned NbMaxRays) {
   }
 
   if (NbMaxRays == POL_NO_DUAL) {
-    unsigned NbEq = 0;
+    unsigned NbEq;
     unsigned Rank;
-    /* Move equalities up */
-    for (i = 0; i < Constraints->NbRows; ++i)
-      if (value_zero_p(Constraints->p[i][0])) {
-	if (i != NbEq)
-	  ExchangeRows(Constraints, i, NbEq);
-	++NbEq;
-      }
-    Rank = Gauss(Constraints, NbEq, Dimension);
-    SortConstraints(Constraints, NbEq);
+    do {
+      NbEq = 0;
+      /* Move equalities up */
+      for (i = 0; i < Constraints->NbRows; ++i)
+	if (value_zero_p(Constraints->p[i][0])) {
+	  if (i != NbEq)
+	    ExchangeRows(Constraints, i, NbEq);
+	  ++NbEq;
+	}
+      Rank = Gauss(Constraints, NbEq, Dimension);
+      SortConstraints(Constraints, NbEq);
+    } while (ImplicitEqualities(Constraints, NbEq));
     Pol = Polyhedron_Alloc(Dimension-1, Constraints->NbRows - (NbEq-Rank), 0);
     Vector_Copy(Constraints->p[0], Pol->Constraint[0], 
 		Rank * Constraints->NbColumns);
