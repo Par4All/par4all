@@ -746,6 +746,11 @@ void Vector_Sort(Value *vector,unsigned n) {
  */
 int ConstraintSimplify(Value *old, Value *newp, int len, Value* v)
 {
+    /* first remove common factor of all coefficients (including "c") */
+    Vector_Gcd(old+1, len - 1, v);
+    if (value_notone_p(*v))
+	Vector_AntiScale(old+1, newp+1, *v, len-1);
+
     Vector_Gcd(old+1, len - 2, v);
 
     if (value_one_p(*v))
