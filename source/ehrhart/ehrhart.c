@@ -1846,7 +1846,7 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS,
   Value *context;
   Enumeration *en, *res;
 
-  if (MAXRAYS == POL_NO_DUAL)
+  if (POL_ISSET(MAXRAYS, POL_NO_DUAL))
     MAXRAYS = 0;
 
   POL_ENSURE_FACETS(Pi);

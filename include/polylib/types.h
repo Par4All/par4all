@@ -63,6 +63,8 @@ extern int Pol_status;
 
 #define POL_HIGH_BIT	(UINT_MAX - (UINT_MAX >> 1))
 #define POL_NO_DUAL	(POL_HIGH_BIT | 0x0001)
+#define POL_INTEGER	(POL_HIGH_BIT | 0x0002)
+#define POL_ISSET(flags,f)  ((flags & f) == f)
 
 typedef struct  {
   unsigned Size;
