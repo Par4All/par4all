@@ -312,7 +312,7 @@ Matrix *RemoveColumn (Matrix *M, int Columnnumber) {
   
   for (i = 0; i < Result->NbRows; i++) {
     Vector_Copy(M->p[i], Result->p[i], Columnnumber);
-    Vector_Copy(M->p[i]+Columnnumber, Result->p[i]+Columnnumber, 
+    Vector_Copy(M->p[i]+Columnnumber+1, Result->p[i]+Columnnumber, 
 		M->NbColumns-1-Columnnumber);
   }
   return Result;
