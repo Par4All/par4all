@@ -1,5 +1,5 @@
 /** 
- * $Id: compress_parms.c,v 1.18 2006/03/15 19:59:55 verdoolaege Exp $
+ * $Id: compress_parms.c,v 1.19 2006/04/02 22:08:32 loechner Exp $
  *
  * The integer points in a parametric linear subspace of Q^n are generally
  * lying on a sub-lattice of Z^n.  To simplify, the funcitons here compress
@@ -14,10 +14,11 @@
 #include <stdlib.h>
 #include <polylib/polylib.h>
 
-/* given a full-row-rank nxm matrix M made of m row-vectors), 
- computes the basis K (made of n-m column-vectors) 
- of the integer kernel of the rows of M
- so we have: M.K = 0 */
+/** 
+ * Given a full-row-rank nxm matrix M made of m row-vectors), computes the
+ * basis K (made of n-m column-vectors) of the integer kernel of the rows of M
+ * so we have: M.K = 0
+*/
 Matrix * int_ker(Matrix * M) {
   Matrix *U, *Q, *H, *H2, *K;
   int i, j, rk;
@@ -56,11 +57,12 @@ Matrix * int_ker(Matrix * M) {
 } /* int_ker */
 
 
-/** Computes the overall period of the variables I for (MI) mod |d|, where M is
-a matrix and |d| a vector. Produce a diagonal matrix S = (s_k) where s_k is the
-overall period of i_k
-@param M the matrix
-@param d a column-vector encoded in a matrix
+/** 
+ * Computes the overall period of the variables I for (MI) mod |d|, where M is
+ * a matrix and |d| a vector. Produce a diagonal matrix S = (s_k) where s_k is
+ * the overall period of i_k 
+ * @param M the set of affine functions of I (row-vectors)
+ * @param d the column-vector representing the modulos
 */
 Matrix * affine_periods(Matrix * M, Matrix * d) {
   Matrix * S;
@@ -96,16 +98,16 @@ Matrix * affine_periods(Matrix * M, Matrix * d) {
 
 
 /** 
- Given a matrix B' with m rows and m-vectors C' and d, computes the 
- basis of the integer solutions to (B'N+C') mod d = 0 (1).
- the Ns verifying the system B'N+C' = 0 are solutions of (1)
- K is a basis of the integer kernel of B: its column-vectors link two solutions
- of (1) <p>
- Moreover, B'_iN mod d is periodic of period (s_ik): B'N mod d is periodic of
- period (s_k) = lcm_i(s_ik) The linear part of G is given by the HNF of (K |
- S), where S is the full-dimensional diagonal matrix (s_k) the constant part of
- G is a particular solution of (1) if no integer constant part is found, there
- is no solution and this function returns NULL.
+ * Given a matrix B' with m rows and m-vectors C' and d, computes the basis of
+ * the integer solutions to (B'N+C') mod d = 0 (1).  the Ns verifying the
+ * system B'N+C' = 0 are solutions of (1) K is a basis of the integer kernel of
+ * B: its column-vectors link two solutions of (1) <p>
+ * Moreover, B'_iN mod d is periodic of period (s_ik): B'N mod d is periodic of
+ * period (s_k) = lcm_i(s_ik). 
+ * The linear part of G is given by the HNF of (K | S), where S is the
+ * full-dimensional diagonal matrix (s_k) the constant part of G is a
+ * particular solution of (1) if no integer constant part is found, there is no
+ * solution and this function returns NULL.
 */
 Matrix * int_mod_basis(Matrix * Bp, Matrix * Cp, Matrix * d) {
   int nb_eqs = Bp->NbRows;
@@ -255,14 +257,17 @@ Matrix * int_mod_basis(Matrix * Bp, Matrix * Cp, Matrix * d) {
 
 
 /** 
-utility function: given a matrix containing the equations AI+BN+C=0, 
- compute the HNF of A : A = [Ha 0].Q and return :  
- . B'= H^-1.(-B) 
- . C'= H^-1.(-C)
- . U = Q^-1 (-> return value)
- . D, where Ha^-1 = D^-1.H^-1 with H and D integer matrices 
- in fact, as D is diagonal, we return d, a column-vector 
- Note: ignores the equalities that involve only parameters
+ * utility function: given a matrix containing the equations AI+BN+C=0, compute
+ * the HNF of A : A = [Ha 0].Q and return :
+ * <ul>
+ * <li> B'= H^-1.(-B) 
+ * <li> C'= H^-1.(-C)
+ * <li> U = Q^-1 (-> return value)
+ * <li> D, 
+ * </ul>
+ * where Ha^-1 = D^-1.H^-1 with H and D integer matrices in fact, as D is
+ * diagonal, we return d, a column-vector Note: ignores the equalities that
+ * involve only parameters
 */
 static Matrix * extract_funny_stuff(Matrix * const E, int nb_parms, 
 			     Matrix ** Bp, Matrix **Cp, Matrix **d) {
@@ -379,11 +384,11 @@ unsigned int i,j, k, nb_eqs=E->NbRows;
   
 
 /** 
-Given a parameterized constraints matrix with m equalities, computes the
- compression matrix G such that there is an integer solution in the variables
- space for each value of N', with N = G N' (N are the "nb_parms" parameters)
- @param E a matrix of parametric equalities
- @param nb_parms the number of parameters
+ * Given a parameterized constraints matrix with m equalities, computes the
+ * compression matrix G such that there is an integer solution in the variables
+ * space for each value of N', with N = G N' (N are the "nb_parms" parameters)
+ * @param E a matrix of parametric equalities @param nb_parms the number of
+ * parameters
 */
 Matrix * compress_parms(Matrix * E, int nb_parms) {
   unsigned int i,j, k, nb_eqs=0;
@@ -415,15 +420,15 @@ Matrix * compress_parms(Matrix * E, int nb_parms) {
 }/* compress_parms */
 
 
-/** removes the equalities that involve only parameters, by eliminating some
-   parameters in the polyhedron's constraints and in the context.<p> 
-   <b>Updates M and Ctxt.</b>
-   @param M1 the polyhedron's constraints
-   @param Ctxt1 the constraints of the polyhedron's context
-   @param renderSpace tells if the returned equalities must be expressed in the
-   parameters space (renderSpace=0) or in the combined var/parms space
-   (renderSpace = 1)
-   @return the system of equalities that involve only parameters.
+/** Removes the equalities that involve only parameters, by eliminating some
+ * parameters in the polyhedron's constraints and in the context.<p> 
+ * <b>Updates M and Ctxt.</b>
+ * @param M1 the polyhedron's constraints
+ * @param Ctxt1 the constraints of the polyhedron's context
+ * @param renderSpace tells if the returned equalities must be expressed in the
+ * parameters space (renderSpace=0) or in the combined var/parms space
+ * (renderSpace = 1)
+ * @return the system of equalities that involve only parameters.
  */
 Matrix * Constraints_Remove_parm_eqs(Matrix ** M1, Matrix ** Ctxt1, 
 				     int renderSpace) {
@@ -609,12 +614,25 @@ Matrix * Constraints_Remove_parm_eqs(Matrix ** M1, Matrix ** Ctxt1,
 } /* Constraints_Remove_parm_eqs */
 
 
-/** Removes equalities involving onlt parameters, but starting from a
- * Polyhedron and its context */
+/** Removes equalities involving only parameters, but starting from a
+ * Polyhedron and its context.
+ * @param P the polyhedron
+ * @param C P's context
+ * @param renderSpace: 0 for the parameter space, =1 for the combined space.
+ * @maxRays Polylib's usual <i>workspace</i>.
+ */
 Polyhedron * Polyhedron_Remove_parm_eqs(Polyhedron ** P, Polyhedron ** C, 
 					int renderSpace, int maxRays) {
   Matrix * M = Polyhedron2Constraints((*P));
   Matrix * Ct = Polyhedron2Constraints((*C));
+
+  /* if the Minkowski representation is not computed yet, do not compute it in
+     Constraints2Polyhedron */
+  if (F_ISSET((*P), POL_VALID | POL_INEQUALITIES) && 
+      (F_ISSET((*C), POL_VALID | POL_INEQUALITIES))) {
+    FL_INIT(maxRays, POL_NO_DUAL);
+  }
+    
   Matrix * Eqs = Constraints_Remove_parm_eqs(&M, &Ct, renderSpace);
   Polyhedron * Peqs = Constraints2Polyhedron(Eqs, maxRays);
   Matrix_Free(Eqs);
@@ -636,14 +654,18 @@ Polyhedron * Polyhedron_Remove_parm_eqs(Polyhedron ** P, Polyhedron ** C,
 
 
 /**
- given a matrix with m parameterized equations, compress the nb_parms
- parameters and n-m variables so that m variables are integer, and transform
- the variable space into a n-m space by eliminating the m variables (using the
- equalities) the variables to be eliminated are chosen automatically by the
- function
+ * Given a matrix with m parameterized equations, compress the nb_parms
+ * parameters and n-m variables so that m variables are integer, and transform
+ * the variable space into a n-m space by eliminating the m variables (using
+ * the equalities) the variables to be eliminated are chosen automatically by
+ * the function.
+ * @param M the constraints 
+ * @param the number of parameters
+ * @param validityLattice the the integer lattice underlying the integer
+ * solutions.
 */
 Matrix * full_dimensionize(Matrix const * M, int nb_parms, 
-			   Matrix ** Validity_Lattice) {
+			   Matrix ** validityLattice) {
   Matrix * Eqs, * Ineqs;
   Matrix * Permuted_Eqs, * Permuted_Ineqs;
   Matrix * Full_Dim;
@@ -657,7 +679,7 @@ Matrix * full_dimensionize(Matrix const * M, int nb_parms,
   /* 1- if the polyhedron is already full-dimensional, return it */
   if (Eqs->NbRows==0) {
     Matrix_Free(Eqs);
-    (*Validity_Lattice) = Identity_Matrix(nb_parms+1);
+    (*validityLattice) = Identity_Matrix(nb_parms+1);
     return Ineqs;
   }
   nb_elim_vars = Eqs->NbRows;
@@ -700,17 +722,17 @@ Matrix * full_dimensionize(Matrix const * M, int nb_parms,
   Matrix_Free(Permuted_Ineqs);
   
   /* 5- Keep only the the validity lattice restricted to the parameters */
-  *Validity_Lattice = Matrix_Alloc(nb_parms+1, nb_parms+1);
+  *validityLattice = Matrix_Alloc(nb_parms+1, nb_parms+1);
   for (i=0; i< nb_parms; i++) {
     for (j=0; j< nb_parms; j++)
-      value_assign((*Validity_Lattice)->p[i][j], 
+      value_assign((*validityLattice)->p[i][j], 
 		   WVL->p[i][j]);
-    value_assign((*Validity_Lattice)->p[i][nb_parms], 
+    value_assign((*validityLattice)->p[i][nb_parms], 
 		 WVL->p[i][WVL->NbColumns-1]);
   }
   for (j=0; j< nb_parms; j++) 
-    value_set_si((*Validity_Lattice)->p[nb_parms][j], 0);
-  value_assign((*Validity_Lattice)->p[nb_parms][nb_parms], 
+    value_set_si((*validityLattice)->p[nb_parms][j], 0);
+  value_assign((*validityLattice)->p[nb_parms][nb_parms], 
 	       WVL->p[WVL->NbColumns-1][WVL->NbColumns-1]);
 
   /* 6- Clean up */
