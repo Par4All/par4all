@@ -4,7 +4,7 @@
 
 /* package arithmetique
  *
- * $Id: arithmetique.h,v 1.16 2006/03/15 20:08:08 verdoolaege Exp $
+ * $Id: arithmetique.h,v 1.17 2006/04/03 10:05:47 verdoolaege Exp $
  *
  * Francois Irigoin, mai 1989
  *
@@ -33,6 +33,7 @@
 
 #ifdef GNUMP
 #include <gmp.h>
+#include <stdlib.h>
 #endif 
 
 #ifdef CLN
