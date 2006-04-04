@@ -76,34 +76,36 @@ at:
 
 There are 4 repositories for the various softwares:
 \begin{description}
-\item[nlpmake] common makefiles for Newgen, Linear and Pips.
-\item[newgen] Newgen software.
-\item[linear] Linear/C3 mathematical libraries.
-\item[pips] PIPS software.
+\item[nlpmake:] common makefiles for Newgen, Linear and Pips.
+\item[newgen:] Newgen software.
+\item[linear:] Linear/C3 mathematical libraries.
+\item[pips:] PIPS software.
 \end{description}
 
 The subversion repositories are organised in standard subdirectories 
 as advised for best subversion practices:
 \begin{description}
 \item[trunk] production version, should be stable enough
-  to pass the validation.
+  to pass the validation;
 \item[branches] development branches of all or part of
-  the software for each developer. developments are to be performed
-  here and installed (joined, merged) once finished into \texttt{trunk}.
-\item[tags] tagged revisions.
+  the software for each developer. Developments are to be performed
+  here and installed (joined, merged) once finished into \texttt{trunk};
+\item[tags] tagged revisions. Note these tags are not related with the
+  tags described in section~\cite{subsec:tags}.
 \end{description}
 
 Moreover the \texttt{pips} repository includes
 \begin{description}
-\item[bundles] group of softwares.
-\item[bundles/trunks] convenient extraction of all 3 softwares trunk 
-  versions ready for compilation.
+\item[bundles:] group of softwares;
+\item[bundles/trunks:] convenient extraction at once of all the 3
+  softwares trunk versions ready for compilation.
 \end{description}
 
-A crude script on the web site allows to download polylib, newgen, 
-linear and pips and to build a local installation of the softwares.
-For instance developer \texttt{calvin} can do the following to
-setup its own pips environment:
+A crude script \verb|setup_pips.sh| on the web site and in
+\texttt{pips/trunk/makes} allows to download \texttt{polylib},
+\texttt{newgen}, \texttt{linear} and \texttt{pips} and to build a local
+installation of the softwares.  For instance developer \texttt{calvin} can
+do the following to setup its own PIPS environment:
 \begin{verbatim}
 sh> setup_pips.sh /tmp/MYPIPS calvin
 ...
@@ -111,39 +113,43 @@ sh> source /tmp/MYPIPS/pipsrc.sh
 sh> # enjoy
 \end{verbatim}
 
+
 \section{Developing PIPS under SVN}
 \label{sec:dev-svn}
 
 A basic understanding of svn operations and concepts such as 
 \emph{repository, checkout, status, commit} are necessary to develop
-in pips. 
+in PIPS. 
 
-The development policy within the pips-related software is
-that the \texttt{trunk} version should hold a production quality
-software which pass all non-regression tests. Thus day-to-day
+The development policy within the PIPS-related software is that the
+\texttt{trunk} version should hold a production quality software which
+pass all non-regression tests that run nightly at CRI. Thus day-to-day
 development should not occur within this part, but in independent
 per-developer \texttt{branches} which should be validated before being
 merged back into the \texttt{trunk}.
 
+
 \subsection{Pips development branches}
 
-In order to help with the branch management, we propose the following 
-procedure based on the \texttt{svn\_branch.sh} script also provided.
+In order to help with the branch management, we propose the following
+procedure based on the \texttt{svn\_branch.sh} script provided in
+\texttt{pips/trunk/makes}.
 
 \begin{enumerate}
 \item Obtain an svn user account on \texttt{svn.cri.ensmp.fr}. 
   For instance, a login \texttt{calvin} and some password may be given.
   Calvin will have his own development area under \texttt{branches/calvin}
   in the subversion repository.
-\item Extract your own pips with the setup script mentionned above.
+\item Extract your own PIPS with the setup script mentionned above.
   The resulting directory may contains at the end of the building process:
   \begin{description}
-  \item[prod] compiled production version of pips, newgen, linear and
-    the external polylib library.
-  \item[pips\_dev] Calvin's development area which points to
-    \texttt{branches/calvin} and should be empty at the beginning.
-  \item[pipsrc.sh] sh-compatible shell initialisation
-  \item[pipsrc.csh] csh-compatible shell initialisation
+  \item[prod:] compiled production version of \texttt{pips},
+    \texttt{newgen}, \texttt{linear} and the external \texttt{polylib}
+    library;
+  \item[pips\_dev:] Calvin's development area which points to
+    \texttt{branches/calvin} and should be empty at the beginning;
+  \item[pipsrc.sh:] sh-compatible shell initialization;
+  \item[pipsrc.csh:] csh-compatible shell initialization.
   \end{description}
 \item Create your development branch refering to a given library directory
   in the production version. Assuming that Calvin wants to develop 
@@ -154,11 +160,10 @@ sh> make USERNAME=calvin create-branch
 # ... not really created before the commit
 sh> svn commit /tmp/svn_branch.XXXXXX/
 \end{verbatim}
-  It creates a new branch, not yet committed, in some directory. 
-  USERNAME is not necessary if the svn and unix account share
-  the same name. This directory must be committed, or its
-  creation may be committed automatically with the
-  \texttt{force-create-branch} target.
+  It creates a new branch, not yet committed, in some directory.
+  \texttt{USERNAME} is not necessary if the svn and unix account share the
+  same name. This directory must be committed, or its creation may be
+  committed automatically with the \texttt{force-create-branch} target.
 \item If necessary, update your development area to make the branch appear.
 \begin{verbatim}
 sh> cd /tmp/MYPIPS/pips_dev
@@ -187,10 +192,11 @@ sh> svn commit /tmp/svn_branch.XXXXXX/
   You must have write access to the \texttt{trunk} in order to do that.
 \end{enumerate}
 
+
 \subsection{Other approaches}
 
 You may decide that the above procedure is not for you.
-Here are other possible approaches for developping in pips,
+Here are other possible approaches for developping in PIPS,
 that you may use provided that you do not break the development
 policy which requires all changes committed to the \texttt{trunk}
 not to break the non-regression tests.
@@ -201,20 +207,20 @@ full software.
 
 It is possible to use \texttt{svn} directly to create and
 manage your branches with copies. The \texttt{svn\_branch.sh}
-adds convinient administrative data in the directory to know about the
+adds convenient administrative data in the directory to know about the
 status of the branch: what is its source, what was merged from
 the source of joined back to it, and so on.
 
-It is finally possible to edit directly your production working
-copy, and just commit from there when you're happy with your changes.
-This may be advisable for small easy to test global changes, such as adding
-a new library in pips. This is not advisable for long development, as
-it is often useful to have an history of such developments.
+It is finally possible to edit directly your production working copy, and
+just commit from there when you're happy with your changes.  This may be
+advisable for small easy to test global changes, such as adding a new
+library in PIPS. This is not advisable for long development, as it is
+often useful to have an history of such developments.
 
 \newpage
 
 
-{\huge OBSOLETE DOWN FROM HERE}
+{\huge IT MAY BE SOMEWHAT OBSOLETE DOWN FROM HERE}
 
 
 \section{Shell environment (sh, ksh, bash, csh, tcsh)}
@@ -752,17 +758,50 @@ similarily to Pips and Newgen.  Thus there are Production
 
 The GNU {\tt make} utility is extensively used to ensure the coherency of
 PIPS components. However, most {\tt Makefile}s are not written by hand,
-but are automatically derived from configurations files called {\tt
-  config.makefile}\index{config.makefile}. This automatic derivation, 
-performed by the {\tt pips-makemake} utility, ensures that dependences and
-installation procedures are respected. It also eases development a lot, by
-providing a homogeneous environment all over the PIPS softwares.
+but are automatically composed according components from \texttt{nlpmake}
+package and automatic dependence computation. It eases development a lot,
+by providing a homogeneous environment all over the PIPS software parts.
+
+If you need some specific rules or targets, you have to write some
+makefile whith named ending with the \texttt{.mk} extension: they will be
+included in the global \texttt{Makefile}.
+
+By default, PIPS \texttt{make} does not stop on error but reports them on
+standard error output. But if you want to have \texttt{make} stopping on
+the first error to help debugging, just add \verb|FWD_STOP_ON_ERROR=1| to
+the \texttt{make} invocation.
 
 The rationale for relying on GNU make rather than make is that in the
 previous situation the software was relying heavily on SUN make special
 features, thus was highly not portable. Now it is more portable, say as
 much as the GNU softwares. The complex makefiles of PIPS rely on GNU
 extensions such as conditionals for instance. 
+
+\subsection{Global targets}
+\label{sec:global-targets}
+
+Global targets are targets useful at the top of PIPS to with global
+meaning such as building a global binary file from the sources.
+
+Useful targets defined:
+\begin{description}
+\item[build:] ???
+\item[compile:] generate a running (hope so...) version;
+\item[clean:] clean up the project directories;
+\item[local-clean:] remove eventually some stuff in the current directory;
+\item[tags:] build a TAGS index file of identifiers found in the
+  subdirectories (see~\ref{subsec:tags});
+\item[unbuild:] ???
+\end{description}
+
+
+\subsection{Local targets}
+\label{sec:local-targets}
+
+Local targets are actions with a more local meaning, such as:
+\begin{description}
+\item[local-clean:] remove eventually some stuff in the current directory;
+\end{description}
 
 {\tt make depend}\index{make!depend} must be used regularly to keep file
 dependencies up-to-date. The local header file corresponding to the current
@@ -884,17 +923,34 @@ library (the parser).
 
 
 
-\subsection{Tags}
+\subsection{Tags used for indexing the code}
 \label{subsec:tags}
 
-Many macros and functions are available from the linear and NewGen
+Many macros and functions are available from the Linear and NewGen
 libraries, but also in PIPS. Their source code can be retrieved using the
-{\em tag\/} mechanism under {\bf\tt emacs} or {\bf\tt vi}. Tags are
-regularly recomputed (every hour) by the PIPS utility \verb+make-tags+.
-This utility uses the environment variable \verb+PIPS_ETAGS+ which the
-local {\tt etags} command, and stores the result in {\tt Pips/Tags/TAGS}.
-They are made from the development source files of linear, NewGen and
-PIPS. But anybody can build his/her own tag
+{\em tag\/} indexing mechanism under editors such as {\bf\tt emacs} or
+{\bf\tt vi}. 
+
+The TAGS file at the PIPS top directory is made with a \texttt{make tags}
+and needs to be remade regularly to have an up to date version of the
+index.
+
+So it is highly recommended to use for example the Emacs editor to benefit
+from the tags.  You can add the PIPS TAGS file by customizing the
+\texttt{Tags Table List} variable from the \texttt{Options} menu or
+directly in your \verb|~/.emacs| with something like:
+\begin{verbatim}
+(setq tags-table-list '("." "~/projets/PIPS/MYPIPS/prod/pips" "/usr/src/linux-2.6.16"))
+\end{verbatim}
+Afterward, you can find, by typing a \texttt{M-.} on an identifier, the
+location where it is defined. Note that completion with \texttt{TAB} works
+with tag searching.
+
+TODO : They are made from the development source files of linear, NewGen
+and PIPS. Indeed, since PIPS is under svn, it is not true anymore and you
+need to make separate TAGS files for Linear and NewGen and put them in the
+\texttt{tags-table-list} Emacs variable.
+
 
 
 \subsection{Library dependencies}
@@ -1514,9 +1570,6 @@ To print a nice version of PIPS output, you can use \verb+tgrind+:
 tgrind -lf extr_doall.f
 \end{verbatim}
 
-
-It is highly recommended to use the Emacs editor to benefit from the tags
-which are updated every hour.
 
 \newpage
 

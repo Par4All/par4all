@@ -54,7 +54,7 @@ allhs: $(ALLHS)
 
 %.newgen: %.tex
 	$(RM) $@
-	remove-latex-comments $<
+	./remove-latex-comments $<
 	chmod a-w $@
 
 all_newgen_headers.h: specs.h

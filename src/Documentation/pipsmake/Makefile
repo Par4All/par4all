@@ -77,7 +77,7 @@ epips_transform_menu_layout.el wpips_transform_menu_layout.h epips_view_menu_lay
 	# 
 	# building menu layout files:
 	#
-	generate_all_menu_documentation -layout < $<
+	./generate_all_menu_documentation -layout < $<
 
 headers: $(DERIVED_INC)
 
