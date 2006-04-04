@@ -120,7 +120,7 @@ PATH	:= $(PATH):$(NEWGEN_ROOT)/bin:$(NEWGEN_ROOT)/bin/$(ARCH)
 ###################################################################### DO STUFF
 
 UTC_DATE := $(shell date -u | tr ' ' '_')
-CPPFLAGS += -DSOFT_ARCH='"$(ARCH)"' -I$(ROOT)/include
+CPPFLAGS += -DSOFT_ARCH='$(ARCH)' -I$(ROOT)/include
 
 # {C,CPP,LD,L,Y}OPT macros allow to *add* things from the command line
 # as gmake CPPOPT="-DFOO=bar" ... that will be added to the defaults
@@ -266,7 +266,7 @@ build-header-file:
 
 header:	.header $(INC_TARGET)
 
-# .header carrie all dependencies for INC_TARGET:
+# .header carries all dependencies for INC_TARGET:
 .header: $(TARGET)-local.h $(DERIVED_HEADERS) $(LIB_CFILES) 
 	$(MAKE) $(GMKNODIR) build-header-file
 	touch .header
