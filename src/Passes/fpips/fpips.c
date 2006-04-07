@@ -67,7 +67,7 @@ static int fpips_usage(int ret)
  */
 static int fpips_version(int ret)
 {
-    fprintf(stderr, "[fpips] (ARCH=" SOFT_ARCH ", DATE=" UTC_DATE ")\n\n");
+  fprintf(stderr, "[fpips] (ARCH=" STRINGIFY(SOFT_ARCH) ", DATE=" STRINGIFY(UTC_DATE) ")\n\n");
     return ret;
 }
 
@@ -75,7 +75,7 @@ static int fpips_version(int ret)
  */
 int fpips_error(char * what, int argc, char ** argv)
 {
-    fprintf(stderr, "[fpips] sorry, %s not available (" SOFT_ARCH ")\n", what);
+    fprintf(stderr, "[fpips] sorry, %s not available (" STRINGIFY(SOFT_ARCH) ")\n", what);
     return fpips_usage(1);
 }
 

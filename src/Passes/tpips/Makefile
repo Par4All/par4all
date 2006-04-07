@@ -6,8 +6,6 @@ TARGET	= tpips
 
 YOPT	= -v -d
 
-CPPOPT 	= -DUTC_DATE='"$(UTC_DATE)"'
-
 INC_CFILES	= tpips.c wrapper.c
 
 OTHER_CFILES	= main_tpips.c

@@ -60,8 +60,8 @@ static void pips_parse_arguments(int argc, char * argv[])
     while ((c = getopt(argc, argv, "vf:m:s:p:b:1:0:")) != -1)
 	switch (c) {
 	case 'v':
-	    fprintf(stderr, "pips: (ARCH=" SOFT_ARCH 
-		    ", DATE=" UTC_DATE ") %s\n", argv[0]);
+	  fprintf(stderr, "pips: (ARCH=" STRINGIFY(SOFT_ARCH)
+		  ", DATE=" STRINGIFY(UTC_DATE) ") %s\n", argv[0]);
 	    break;
 	case 'f':
 	    gen_array_append(source_files, optarg);

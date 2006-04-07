@@ -9,6 +9,10 @@
 #endif
 #include <setjmp.h>
 
+/* To generate a string from a macro: */
+#define STRINGIFY(symbol) #symbol
+
+
 /* Measurement type for mem_spy.c */
 typedef enum {SBRK_MEASURE, NET_MEASURE, GROSS_MEASURE} measurement_type;
 

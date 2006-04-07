@@ -70,7 +70,7 @@ builder_map.h: pipsmake.rc
 	#
 	# building builder_map.h
 	# 
-	make-builder-map < $< > $@
+	./make-builder-map < $< > $@
 
 
 epips_transform_menu_layout.el wpips_transform_menu_layout.h epips_view_menu_layout.el wpips_view_menu_layout.h:  pipsmake-rc.tex

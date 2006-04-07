@@ -16,8 +16,6 @@
 
 TARGET	= pips
 
-CPPOPT	= -DUTC_DATE='"$(UTC_DATE)"'
-
 LIB_CFILES	= pips.c
 
 OTHER_CFILES	= main_pips.c

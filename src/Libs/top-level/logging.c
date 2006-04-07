@@ -74,8 +74,9 @@ log_on_file(char chaine[])
    }
 }
 
-#define PIPS_THANKS_STRING						\
-  "%s (ARCH=" SOFT_ARCH ")\n  running as %s\n\n"			\
+/* The # "stringificator" only works in a macro expansion... */
+#define PIPS_THANKS_STRING(arch)					\
+  "%s (ARCH=" #arch ")\n  running as %s\n\n"			\
   "  (c) 1988-2003 Centre de Recherche en Informatique,\n"		\
   "                École des mines de Paris, France.\n\n"		\
   "  URL: http://www.cri.ensmp.fr/pips/\n"				\
@@ -90,7 +91,7 @@ pips_thanks(string name, string path)
 {
     if (isatty(fileno(stdout)))
     {
-	fprintf(stdout, PIPS_THANKS_STRING, name, path);
+	fprintf(stdout, PIPS_THANKS_STRING(SOFT_ARCH), name, path);
 	fflush(stdout);
     }
 }

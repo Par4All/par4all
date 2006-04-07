@@ -1012,8 +1012,8 @@ static void parse_arguments(int argc, char * argv[])
 	tpips_exec(optarg);
 	break;
       case 'v': 
-	fprintf(stderr, "tpips: (ARCH=" SOFT_ARCH 
-		", DATE=" UTC_DATE ") %s\n", argv[0]);
+	fprintf(stderr, "tpips: (ARCH=" STRINGIFY(SOFT_ARCH)
+		", DATE=" STRINGIFY(UTC_DATE) ") %s\n", argv[0]);
 	break;
       case 'r': 
 	free(tpipsrc);
