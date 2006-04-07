@@ -172,7 +172,7 @@ send_user_warning_to_emacs(char * some_text)
 void
 send_view_to_emacs(char * view_name, char * the_file_name)
 {
-   int number_of_characters_written;
+   unsigned int number_of_characters_written;
    char full_path[1000];
    
    /* Send a complete file path since the current directory in Emacs
@@ -353,13 +353,13 @@ trow_away_epips_input(char * entry_buffer, long int length)
 
 enum { EPIPS_COMMAND_BUFFER_SIZE = 2000 };
 static char command_buffer[EPIPS_COMMAND_BUFFER_SIZE];
-static int command_buffer_length;
+static unsigned int command_buffer_length;
    
 
 /* Copy a part of the entry_buffer in the command_buffer: */
 static void
 add_command_to_buffer(char * entry_buffer,
-                      long int length)
+                      unsigned long int length)
 {
    pips_assert("add_command_to_buffer in emacs.c: command too big !!!",
                length + command_buffer_length < sizeof(command_buffer) - 1);

@@ -120,7 +120,7 @@ direct_change_directory()
     int i=0, c;
     FILE * tmph;
 
-    (void) mktemp(tmp);
+    (void) mkstemp(tmp);
 
     if (wpips_change_directory_inactive)
 	return; /* no cd in this state! */

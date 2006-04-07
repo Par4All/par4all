@@ -15,7 +15,6 @@ char vcid_directory_menu[] = "%A% ($Date: 1998/04/16 14:45:10 $, ) version $Revi
 #include <sys/param.h>
 #include <sys/stat.h>
 
-#include <sys/dirent.h>
 #ifdef __linux
 /* Posix version: */
 #define MAXNAMELEN NAME_MAX
@@ -41,8 +40,9 @@ enum {MENU_PATH_DATA_HANDLER = 54829,
 };
 
 
+/* Note the pedantic way to avoid the warning about unused file_name. :-) */
 static bool
-accept_all_file_names(char * file_name)
+accept_all_file_names(char * file_name __attribute__ ((unused)))
 {
    return TRUE;
 }
@@ -125,7 +125,7 @@ generate_a_directory_menu(char * directory)
 	/* Add its own notifying procedure: */
 	MENU_NOTIFY_PROC, generate_a_directory_menu_notify,
 	NULL);
-    pips_debug(2, "menu = %#x (%s)\n", menu, directory);
+    pips_debug(2, "menu = %p (%s)\n", (void *) menu, directory);
 
    if (db_get_current_workspace_name()) {
        xv_set(menu, MENU_APPEND_ITEM,
@@ -212,8 +212,8 @@ generate_a_directory_menu(char * directory)
                                   entry: */
                                MENU_GEN_PULLRIGHT, directory_gen_pullright,
                                NULL);
-                  pips_debug(2, " menu_item = %#x (%s)\n",
-			     menu_item, file_name);
+                  pips_debug(2, " menu_item = %p (%s)\n",
+			     (void *) menu_item, file_name);
                }
                else
                   /* And disable non-subdirectory entry: */

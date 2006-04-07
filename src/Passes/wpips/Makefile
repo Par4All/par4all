@@ -18,10 +18,6 @@ TARGET	= wpips
 CPPOPT =	-DLARGE_FONTS $(WPIPS_CPPFLAGS) \
 		-DOWTOOLKIT_WARNING_DISABLED
 
-# Current version of XView is not quite ANSI... :-)
-# CANSI = -pedantic
-CANSI	=
-
 INC_CFILES=	emacs.c \
 		directory_menu.c \
 		wpips.c \
