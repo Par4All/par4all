@@ -48,6 +48,11 @@ TPIPS_MAIN	= main_tpips.o
 
 ######################################################################### WPIPS
 
+# The following locations should be parameterized somewhere else
+# or à la autocon
+X11_ROOT=/usr/X11R6
+OPENWINHOME=$(X11_ROOT)
+
 WPIPS_CPPFLAGS 	= -I$(OPENWINHOME)/include -I$(X11_ROOT)/include -Iicons
 WPIPS_LDFLAGS 	= -L$(OPENWINHOME)/lib -L$(X11_ROOT)/lib
 WPIPS_LIBS 	= -lxview -lolgx -lX11
@@ -56,5 +61,7 @@ WPIPS_MAIN 	= main_wpips.o
 ######################################################################### FPIPS
 
 FPIPS_LDFLAGS	= $(WPIPS_ADDED_LDFLAGS)
-FPIPS_LIBS	= -lpips -ltpips -lwpips $(TPIPS_LIBS) $(WPIPS_LIBS)
+FPIPS_LIBS	= -lpips -ltpips $(FPIPS_ADDED_LIBS) $(TPIPS_LIBS) $(TPIPS_ADDED_LIBS)
 FPIPS_MAIN	= main_fpips.o
+# By default, compile with wpips:
+FPIPS_ADDED_LIBS	= -lwpips $(WPIPS_LIBS)

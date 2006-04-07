@@ -6,6 +6,5 @@
 
 CPPFLAGS 	+=	-DFPIPS_WITHOUT_WPIPS 
 
-WPIPS_ADDED_LIBS =
-
-FPIPS_ADDED_LIBS =	-lpips -ltpips $(TPIPS_ADDED_LIBS)
+# Remove the -lwpips:
+FPIPS_ADDED_LIBS =

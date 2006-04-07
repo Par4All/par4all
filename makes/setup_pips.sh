@@ -27,8 +27,16 @@ error()
     exit 1
 }
 
-test -d $destination && error "directory $destination already exists"
-mkdir $destination || error "cannot mkdir $destination"
+warning()
+{
+    echo
+    echo "$@" >&2
+    echo Type return to continue
+    read
+}
+
+test -d $destination  && warning "Warning : directory $destination already exists!" && warning "If you are not trying to finish a previous installation of PIPS in $destination you should stop and choose another directory name."
+mkdir -p $destination || error "cannot mkdir $destination"
 
 prod=$destination/prod
 
@@ -58,7 +66,7 @@ unset NEWGEN_ROOT LINEAR_ROOT PIPS_ROOT
 echo "### downloading $POLYLIB"
 cd /tmp
 test -f $POLYLIB.tar.gz && error "some $POLYLIB.tar.gz file already there"
-wget $POLYLIB_SITE/$POLYLIB.tar.gz || error "cannot wget polylib"
+wget -nd $POLYLIB_SITE/$POLYLIB.tar.gz || error "cannot wget polylib"
 
 echo "### building $POLYLIB"
 gunzip $POLYLIB.tar.gz || error "cannot decompress polylib"
@@ -67,7 +75,7 @@ cd $POLYLIB || error "cannot cd into polylib"
 ./configure --prefix=$prod/extern || error "cannot configure polylib"
 make || error "cannot make polylib"
 
-mkdir $prod/extern || error "cannot mkdir $prod/extern"
+mkdir -p $prod/extern || error "cannot mkdir $prod/extern"
 make install || error "cannot install polylib"
 cd .. || error "cannot cd .."
 rm -rf $POLYLIB || error "cannot remove polylib"

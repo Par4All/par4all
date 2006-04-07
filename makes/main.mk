@@ -224,10 +224,16 @@ ifdef INSTALL_ETC
 $(ETC.d):
 	$(MKDIR) $@
 
+# Deal also with directories.
+# By the way, how to install directories with "install" ?
 .build_etc: $(INSTALL_ETC) $(ETC.d)
 	for f in $(INSTALL_ETC) ; do \
-	  $(CMP) $$f $(ETC.d)/$$f || \
-	    $(INSTALL) -m 644 $$f $(ETC.d) ; \
+	  if [ -d $$f ] ; then \
+	    cp -r $$f $(ETC.d) ; \
+	else \
+	    $(CMP) $$f $(ETC.d)/$$f || \
+	      $(INSTALL) -m 644 $$f $(ETC.d) ; \
+	  fi ; \
 	done
 	touch $@
 
@@ -377,6 +383,11 @@ compile:
 
 # empty dependencies to please compile targets
 phase0:
+	@echo
+	@echo "Bootstrap the .h header files. It displays a lot of error..."
+	@echo "...but it should be normal. Next time in phase3 we should reach a fix point"
+	@echo
+
 phase1:
 phase2:
 phase3:
