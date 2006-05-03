@@ -2020,6 +2020,7 @@ static int ImplicitEqualities(Matrix *Constraints, unsigned NbEq)
 {
     int row, nrow, k;
     int found = 0;
+    Value tmp;
     for (row = NbEq; row < Constraints->NbRows; ++row) {
 	int d = First_Non_Zero(Constraints->p[row]+1, Constraints->NbColumns-2);
 	if (d == -1)
@@ -2046,6 +2047,24 @@ static int ImplicitEqualities(Matrix *Constraints, unsigned NbEq)
 		found = 1;
 		break;
 	    }
+	    if (k != Constraints->NbColumns-2)
+		continue;
+	    /* if the constants are such that 
+	     * the sum c1+c2 is negative then the constraints conflict
+	     */
+	    value_init(tmp);
+	    value_addto(tmp, Constraints->p[row][1+k], 
+			     Constraints->p[nrow][1+k]);
+	    if (value_sign(tmp) < 0) {
+		Vector_Set(Constraints->p[row], 0, Constraints->NbColumns-1);
+		Vector_Set(Constraints->p[nrow], 0, Constraints->NbColumns-1);
+		value_set_si(Constraints->p[row][1+k], 1);
+		value_set_si(Constraints->p[nrow][1+k], 1);
+		found = 1;
+	    }
+	    value_clear(tmp);
+	    if (found)
+		break;
 	}
     }
     return found;
