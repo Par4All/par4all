@@ -2023,8 +2023,14 @@ static int ImplicitEqualities(Matrix *Constraints, unsigned NbEq)
     Value tmp;
     for (row = NbEq; row < Constraints->NbRows; ++row) {
 	int d = First_Non_Zero(Constraints->p[row]+1, Constraints->NbColumns-2);
-	if (d == -1)
+	if (d == -1) {
+	    /* -n >= 0 */
+	    if (value_neg_p(Constraints->p[row][Constraints->NbColumns-1])) {
+		value_set_si(Constraints->p[row][0], 0);
+		found = 1;
+	    }
 	    break;
+	}
 	if (value_neg_p(Constraints->p[row][1+d]))
 	    continue;
 	for (nrow = row+1; nrow < Constraints->NbRows; ++nrow) {
