@@ -1987,18 +1987,20 @@ static void SortConstraints(Matrix *Constraints, unsigned NbEq)
 		max = k;
 		break;
 	    }
-	    /* equal, except for possibly the constant */
+	    /* equal, except for possibly the constant
+	     * => remove constraint with biggest constant
+	     */
 	    if (j == Constraints->NbColumns-1) {
 		if (value_lt(Constraints->p[k][j], Constraints->p[max][j]))
-		    max = k;
-		else {
-		    Constraints->NbRows--;
-		    if (k < Constraints->NbRows)
-		        Vector_Exchange(Constraints->p[k], 
-					Constraints->p[Constraints->NbRows], 
-				        Constraints->NbColumns);
-		    k--;
-		}
+		    Vector_Exchange(Constraints->p[k], 
+				    Constraints->p[max], 
+				    Constraints->NbColumns);
+		Constraints->NbRows--;
+		if (k < Constraints->NbRows)
+		    Vector_Exchange(Constraints->p[k], 
+				    Constraints->p[Constraints->NbRows], 
+				    Constraints->NbColumns);
+		k--;
 	    }
 	}
 	if (max != i)
