@@ -2917,7 +2917,8 @@ Polyhedron *DomainAddRays(Polyhedron *Pol,Matrix *Ray,unsigned NbMaxConstrs) {
   int Redundant;
   
   if (!Pol) return (Polyhedron*) 0;
-  if (!Ray ) return Pol;
+  if (!Ray || Ray->NbRows == 0)
+    return Domain_Copy(Pol);
   if (Pol->Dimension != Ray->NbColumns-2) {
     errormsg1(
 	      "DomainAddRays", "diffdim", "operation on different dimensions");
