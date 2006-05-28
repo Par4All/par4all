@@ -2125,6 +2125,12 @@ Polyhedron *Constraints2Polyhedron(Matrix *Constraints,unsigned NbMaxRays) {
 	    value_clear(tmp);
 	    return Empty_Polyhedron(Dimension-1);
 	  }
+	  /* detect 1 == 0, possibly created by ImplicitEqualities */
+	  if (First_Non_Zero(Constraints->p[i]+1, Dimension-1) == -1 &&
+	      value_notzero_p(Constraints->p[i][Dimension])) {
+	    value_clear(tmp);
+	    return Empty_Polyhedron(Dimension-1);
+	  }
 	  if (i != NbEq)
 	    ExchangeRows(Constraints, i, NbEq);
 	  ++NbEq;
