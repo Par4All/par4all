@@ -1028,7 +1028,6 @@ Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int wo
   /* Compute the true context C1 */
   /* M : lines in the direction of the first n indices (index space) */
   M   = Matrix_Alloc(n, D1->Dimension+2);
-  Vector_Set(M->p[0],0,n*(D1->Dimension+2));
   for (i=0; i<n; i++)
     value_set_si(M->p[i][i+1],1);
   C1 = DomainAddRays(D1,M,ws);
