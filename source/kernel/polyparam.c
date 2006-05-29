@@ -756,29 +756,27 @@ static SatMatrix *Poly2Sat(Polyhedron *Pol,unsigned int **L) {
 } /* Poly2Sat */
 
 /*
- * Create a parametrized polyhedron with zero parametres. This function was 
+ * Create a parametrized polyhedron with zero parameters. This function was 
  * first written by Xavier Redon, and was later modified by others.
  */
 Param_Polyhedron *GenParamPolyhedron(Polyhedron *Pol) {
   
   Param_Polyhedron *result;
-  Matrix *rays;
   int nbRows, nbColumns;
-  int i, size;
+  int i, size, rays;
   
-  rays=Polyhedron2Rays(Pol);
-  nbRows=rays->NbRows;
-  nbColumns=rays->NbColumns;
+  nbRows=Pol->NbRays;
+  nbColumns=Pol->Dimension+2;
   
-  /* Check that the polyhedron is bounded */
-  for(i=0;i<nbRows;i++)
-    if(value_notone_p(rays->p[i][0]) ||
-       value_zero_p(rays->p[i][nbColumns-1]))
-      return NULL;
+  /* Count the number of rays */
+  for(i=0, rays=0; i<nbRows; i++)
+    if(value_notone_p(Pol->Ray[i][0]) ||
+       value_zero_p(Pol->Ray[i][nbColumns-1]))
+      ++rays;
   
   /* Initialize the result */
   result=(Param_Polyhedron *)malloc(sizeof(Param_Polyhedron));
-  result->nbV=nbRows;
+  result->nbV=nbRows-rays;
   result->V=NULL;
   
   /* Build the parametric vertices */
@@ -786,11 +784,15 @@ Param_Polyhedron *GenParamPolyhedron(Polyhedron *Pol) {
     Matrix *vertex;
     Param_Vertices *paramVertex;
     int j;
-    
+
+    if (value_notone_p(Pol->Ray[i][0]) ||
+        value_zero_p(Pol->Ray[i][nbColumns-1]))
+      continue;
+
     vertex=Matrix_Alloc(nbColumns-2,2);
     for(j=1;j<nbColumns-1;j++) {
-      value_assign(vertex->p[j-1][0],rays->p[i][j]);
-      value_assign(vertex->p[j-1][1],rays->p[i][nbColumns-1]);
+      value_assign(vertex->p[j-1][0],Pol->Ray[i][j]);
+      value_assign(vertex->p[j-1][1],Pol->Ray[i][nbColumns-1]);
     }
     paramVertex=(Param_Vertices *)malloc(sizeof(Param_Vertices));
     paramVertex->Vertex=vertex;
@@ -802,7 +804,6 @@ Param_Polyhedron *GenParamPolyhedron(Polyhedron *Pol) {
     paramVertex->next=result->V;
     result->V=paramVertex;
   }
-  Matrix_Free(rays);
   
   /* Build the parametric domains (only one here) */
   if (nbRows > 1)
@@ -992,15 +993,8 @@ Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int wo
 	    "Find_m_faces: ?%d parameters of a %d-polyhedron !\n",m,n);
     return (Param_Polyhedron *) 0;
   }
-  if(m==0) {
-    Param_Polyhedron *result=GenParamPolyhedron(D);
-    if(result)
-      return result;
-    else {
-      fprintf(stderr,"Find_m_faces: polyhedron is not bounded!\n");
-      return (Param_Polyhedron *) 0;
-    }
-  }
+  if (m==0)
+    return GenParamPolyhedron(D);
   
   /* Add constraints from Context to D -> result in D1 */
   C1 = align_context(C,D->Dimension,ws);
@@ -1139,16 +1133,10 @@ Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int wo
 
     /* m changed !!! */
     if(m==0) {
-      Param_Polyhedron *result=GenParamPolyhedron(D1);
-      
       /* return the new D1 too */
       *Di = D1;
-      if(result)
-	return result;
-      else {
-	fprintf(stderr,"Find_m_faces: polyhedron is not bounded!\n");
-	return (Param_Polyhedron *) 0;
-      }
+
+      return GenParamPolyhedron(D1);
     }
   }
 
