@@ -72,6 +72,10 @@ echo "### building $POLYLIB"
 gunzip $POLYLIB.tar.gz || error "cannot decompress polylib"
 tar xf $POLYLIB.tar || error "cannot untar polylib"
 cd $POLYLIB || error "cannot cd into polylib"
+# fix pour Ronan...
+perl -i.old -p -e \
+    's/^static // if 140 and /int linear_exception_debug_mode = FALSE/;' \
+    source/arith/errors.c
 ./configure --prefix=$prod/extern || error "cannot configure polylib"
 make || error "cannot make polylib"
 
