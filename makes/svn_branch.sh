@@ -166,7 +166,9 @@ function is_action()
 # returns whether the url exists and is working
 function is_svn_working_url()
 {
-    is_svn_url $1 && safe_svn proplist $1 > /dev/null 2>&1
+    # we MUST call svn directly here, not the safe version,
+    # otherwise the --dry-run option will be broken.
+    is_svn_url $1 && svn proplist $1 > /dev/null 2>&1
 }
 
 function is_svn_wcpath()
@@ -709,13 +711,8 @@ do_remove=
 url=
 nodo=
 revision=
+svn_options=
 file=
-if [[ -n $USERNAME ]] ; then
-  # Tell svn to use this user name:
-  svn_options="--username $USERNAME"
-else
-  svn_options=
-fi
 
 while [[ $# -gt 0 ]] ; do
   arg=$1
