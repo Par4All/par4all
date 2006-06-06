@@ -554,6 +554,12 @@ force-create-branch:
 	$(MAKE) BRANCH_FLAGS+=--commit create-branch
 	-test -d $(DEVDIR)/.svn && $(SVN) update $(DEVDIR)
 
+ifdef SVN_USERNAME
+devsubdir	= $(SVN_USERNAME)/
+else
+devsubdir	= $(USER)/
+endif
+
 # create a new private branch
 create-branch:
 	-@if $(IS_SVN_WC) ; then \
@@ -563,7 +569,7 @@ create-branch:
 	    if test -d $(DEVDIR)/.svn ; then \
 		branch=$(DEVDIR)/$(NEW_BRANCH_NAME) ; \
 	    else \
-		branch=branches/$(USERNAME)/$(NEW_BRANCH_NAME) ; \
+		branch=branches/$(devsubdir)$(NEW_BRANCH_NAME) ; \
 	    fi ; \
 	    $(BRANCH) create $(BRANCH_FLAGS) . $$branch ; \
 	  fi ; \
