@@ -19,7 +19,7 @@ usage="usage: $command [destination-directory [developer]]"
 
 # arguments
 destination=${1:-`pwd`/MYPIPS}
-developer=${2:-$USERNAME} 
+developer=${2:-${USER:-${LOGNAME:-$USERNAME}}}
 
 error()
 {
