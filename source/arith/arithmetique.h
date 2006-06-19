@@ -4,7 +4,7 @@
 
 /* package arithmetique
  *
- * $Id: arithmetique.h,v 1.17 2006/04/03 10:05:47 verdoolaege Exp $
+ * $Id: arithmetique.h,v 1.18 2006/06/19 19:39:01 skimo Exp $
  *
  * Francois Irigoin, mai 1989
  *
@@ -34,6 +34,7 @@
 #ifdef GNUMP
 #include <gmp.h>
 #include <stdlib.h>
+#include <string.h>
 #endif 
 
 #ifdef CLN
@@ -343,7 +344,8 @@ typedef cln::cl_I Value;
 #define value_clear(val)       (mpz_clear((val)))
 #define value_read(val,str)    (mpz_set_str((val),(str),10))
 #define value_print(Dst,fmt,val)  {char *str; str = mpz_get_str(0,10,(val)); \
-                               fprintf((Dst),(fmt),str); free(str); \
+				fprintf((Dst),(fmt),str); \
+				(*__gmp_free_func) (str, strlen(str)+1); \
                               }
 #define value_swap(val1,val2) (mpz_swap(val1, val2))
                                              
