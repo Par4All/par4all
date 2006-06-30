@@ -164,6 +164,10 @@ else
 		[poly_cv_gmpfatal="yes"])
 	if test "$poly_cv_gmpfatal" = "yes"; then
 		AC_MSG_ERROR([GMP not found])
+	else
+		AC_CHECK_DECLS(mp_get_memory_functions,[],[
+			AC_LIBOBJ(mp_get_memory_functions)
+		],[#include <gmp.h>])
 	fi
 
 	lib_type=gmp

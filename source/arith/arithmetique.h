@@ -4,7 +4,7 @@
 
 /* package arithmetique
  *
- * $Id: arithmetique.h,v 1.18 2006/06/19 19:39:01 skimo Exp $
+ * $Id: arithmetique.h,v 1.19 2006/06/30 11:53:03 skimo Exp $
  *
  * Francois Irigoin, mai 1989
  *
@@ -35,6 +35,12 @@
 #include <gmp.h>
 #include <stdlib.h>
 #include <string.h>
+#if !HAVE_DECL_MP_GET_MEMORY_FUNCTIONS
+void mp_get_memory_functions(
+		void *(**alloc_func_ptr) (size_t),
+		void *(**realloc_func_ptr) (void *, size_t, size_t),
+		void (**free_func_ptr) (void *, size_t));
+#endif
 #endif 
 
 #ifdef CLN
@@ -343,9 +349,12 @@ typedef cln::cl_I Value;
 #define value_set_double(val,d)(mpz_set_d((val),(d)))
 #define value_clear(val)       (mpz_clear((val)))
 #define value_read(val,str)    (mpz_set_str((val),(str),10))
-#define value_print(Dst,fmt,val)  {char *str; str = mpz_get_str(0,10,(val)); \
+#define value_print(Dst,fmt,val)  {char *str; \
+				void (*gmp_free) (void *, size_t); \
+				str = mpz_get_str(0,10,(val)); \
 				fprintf((Dst),(fmt),str); \
-				(*__gmp_free_func) (str, strlen(str)+1); \
+				mp_get_memory_functions(NULL, NULL, &gmp_free); \
+				(*gmp_free) (str, strlen(str)+1); \
                               }
 #define value_swap(val1,val2) (mpz_swap(val1, val2))
                                              
