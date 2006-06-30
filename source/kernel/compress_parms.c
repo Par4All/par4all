@@ -1,5 +1,5 @@
 /** 
- * $Id: compress_parms.c,v 1.19 2006/04/02 22:08:32 loechner Exp $
+ * $Id: compress_parms.c,v 1.20 2006/06/30 09:56:52 skimo Exp $
  *
  * The integer points in a parametric linear subspace of Q^n are generally
  * lying on a sub-lattice of Z^n.  To simplify, the funcitons here compress
@@ -623,6 +623,8 @@ Matrix * Constraints_Remove_parm_eqs(Matrix ** M1, Matrix ** Ctxt1,
  */
 Polyhedron * Polyhedron_Remove_parm_eqs(Polyhedron ** P, Polyhedron ** C, 
 					int renderSpace, int maxRays) {
+  Matrix * Eqs;
+  Polyhedron * Peqs;
   Matrix * M = Polyhedron2Constraints((*P));
   Matrix * Ct = Polyhedron2Constraints((*C));
 
@@ -633,8 +635,8 @@ Polyhedron * Polyhedron_Remove_parm_eqs(Polyhedron ** P, Polyhedron ** C,
     FL_INIT(maxRays, POL_NO_DUAL);
   }
     
-  Matrix * Eqs = Constraints_Remove_parm_eqs(&M, &Ct, renderSpace);
-  Polyhedron * Peqs = Constraints2Polyhedron(Eqs, maxRays);
+  Eqs = Constraints_Remove_parm_eqs(&M, &Ct, renderSpace);
+  Peqs = Constraints2Polyhedron(Eqs, maxRays);
   Matrix_Free(Eqs);
 
   /* particular case: no equality involving only parms is found */
