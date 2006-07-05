@@ -1,8 +1,8 @@
-# $Id$
+# $Id: Makefile 12428 2005-12-30 14:22:06Z coelho $
 
-INSTALL_DOC =	developer_guide.ps
+INSTALL_DOC =	tpips-user-manual.ps
 
-INSTALL_HTM = developer_guide
+INSTALL_HTM = tpips-user-manual
 
 # common stuff
 ifdef PIPS_ROOT

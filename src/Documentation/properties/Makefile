@@ -6,7 +6,7 @@ INSTALL_DOC	= properties-rc.ps
 INSTALL_HTM	= properties-rc
 ETC_TARGET	=  properties.rc
 
-all: $(ETC_TARGET) $(INSTALL_DOC) properties-rc.html
+all: $(ETC_TARGET) $(INSTALL_DOC)
 
 properties.rc: properties-rc.tex
 	#
