@@ -483,7 +483,16 @@ phase6: .build_htm
 $(HTM.d):; $(MKDIR) $(HTM.d)
 
 .build_htm: $(INSTALL_HTM) $(HTM.d)
-	$(INSTALL) -m 644 $(INSTALL_HTM) $(HTM.d)
+# Deal also with directories.
+# By the way, how to install directories with "install" ?
+	for f in $(INSTALL_HTM) ; do \
+	  if [ -d $$f ] ; then \
+	    cp -r $$f $(HTM.d) ; \
+	else \
+	    $(CMP) $$f $(HTM.d)/$$f || \
+	      $(INSTALL) -m 644 $$f $(HTM.d) ; \
+	  fi ; \
+	done
 	touch $@
 
 clean: htm-clean
