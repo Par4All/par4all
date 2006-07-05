@@ -19,7 +19,9 @@ clean: NO_INCLUDES=1
 export NO_INCLUDES
 
 unbuild: clean
-	$(RM) -rf ./bin ./include ./lib ./share ./utils ./doc ./runtime ./etc
+	$(RM) -rf \
+		./bin ./include ./lib ./share ./utils \
+		./doc ./runtime ./etc ./html
 	$(RM) -f TAGS
 
 install:
