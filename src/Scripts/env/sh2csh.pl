@@ -10,7 +10,15 @@ elsif (/^\s*export\s+([A-Za-z_0-9]+)=(.*)/)
 }
 elsif (/^\s*([A-Za-z_0-9]+)=(.*)/)
 {
-    print "set $1=$2\n";
+    # handle PATH especially for csh
+    if ($1 eq 'PATH')
+    {
+	print "setenv $1 $2\n";
+    }
+    else
+    {
+        print "set $1=$2\n";
+    }
 }
 
 END 
