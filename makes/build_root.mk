@@ -35,5 +35,6 @@ local-clean:
 TAGS	= /tmp/tags.$$$$
 
 tags:
-	find $(CURDIR) -name '*.[chly]' -print | xargs etags -o $(TAGS) ; \
+	find $(CURDIR) -name '*.[chly]' -print0 | \
+		xargs -0 etags --append --output=$(TAGS) ; \
 	mv $(TAGS) TAGS
