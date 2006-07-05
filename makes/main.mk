@@ -324,7 +324,7 @@ arch-clean:
 
 ifdef LIB_CFILES
 ifndef LIB_OBJECTS
-LIB_OBJECTS = $(addprefix $(ARCH)/,$(LIB_CFILES:.c=.o))
+LIB_OBJECTS = $(addprefix $(ARCH)/,$(LIB_CFILES:%.c=%.o))
 endif # LIB_OBJECTS
 endif # LIB_CFILES
 
@@ -333,6 +333,19 @@ ifdef LIB_TARGET
 $(ARCH)/$(LIB_TARGET): $(LIB_OBJECTS)
 	$(ARCHIVE) $(ARCH)/$(LIB_TARGET) $(LIB_OBJECTS)
 	ranlib $@
+
+# indirect dependency to trigger the mkdir without triggering a full rebuild
+# $(ARCH) directory must exist, but its date does not matter
+# is there a better way?
+$(LIB_OBJECTS): $(ARCH)/.dir
+
+# creates the architecture directory
+$(ARCH)/.dir:
+	test -d $(ARCH) || $(MAKE) $(ARCH)
+	test -f $@ || touch $@
+
+# alias for FI
+lib: $(ARCH)/$(LIB_TARGET)
 
 INSTALL_LIB	+=   $(addprefix $(ARCH)/,$(LIB_TARGET))
 
