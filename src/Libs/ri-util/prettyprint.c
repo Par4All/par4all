@@ -396,6 +396,31 @@ words_loop_range(range obj)
     return(pc);
 }
 
+list C_loop_range(range obj, entity i)
+{
+    list pc;
+    call c = syntax_call(expression_syntax(range_increment(obj)));
+
+    /* Complete the initialization assignment */
+    pc = words_subexpression(range_lower(obj), 0, TRUE);
+    pc = CHAIN_SWORD(pc,"; ");
+
+    /* Check the final bound */
+    pc = CHAIN_SWORD(pc, entity_local_name(i));
+    /* increasing or decreasing index? To be done later */
+    pc = CHAIN_SWORD(pc," <= ");
+    pc = gen_nconc(pc, words_subexpression(range_upper(obj), 0, TRUE));
+    pc = CHAIN_SWORD(pc,"; ");
+
+    /* Increment the loop index */
+    pc = CHAIN_SWORD(pc, entity_local_name(i));
+    pc = CHAIN_SWORD(pc," += ");
+    pc = gen_nconc(pc, words_expression(range_increment(obj)));
+    pc = CHAIN_SWORD(pc,") {");
+
+    return(pc);
+}
+
 list /* of string */ 
 words_range(range obj)
 {
@@ -1967,18 +1992,28 @@ text_loop_default(
 
     /* LOOP prologue.
      */
-    pc = CHAIN_SWORD(NIL, (doall_loop_p) ? "DOALL " : "DO " );
+    if(is_fortran)
+      pc = CHAIN_SWORD(NIL, (doall_loop_p) ? "DOALL " : "DO " );
+    else
+      pc = CHAIN_SWORD(NIL, "for(" );
     
     if(!structured_do && !doall_loop_p && !do_enddo_p) {
 	pc = CHAIN_SWORD(pc, concatenate(do_label, " ", NULL));
     }
     pc = CHAIN_SWORD(pc, entity_local_name(loop_index(obj)));
     pc = CHAIN_SWORD(pc, " = ");
-    pc = gen_nconc(pc, words_loop_range(loop_range(obj)));
+
+    if(is_fortran) {
+      pc = gen_nconc(pc, words_loop_range(loop_range(obj)));
+    }
+    else {
+      /* Assumed to be C */
+      pc = gen_nconc(pc, C_loop_range(loop_range(obj), loop_index(obj)));
+    }
     u = make_unformatted(strdup(label), n, margin, pc) ;
     ADD_SENTENCE_TO_TEXT(r, first_sentence = 
 			 make_sentence(is_sentence_unformatted, u));
-
+    
     /* builds the PRIVATE scalar declaration if required
      */
     if(!ENDP(loop_locals(obj)) && (doall_loop_p || all_private)
@@ -2001,6 +2036,9 @@ text_loop_default(
 	pp_cray_style_p() || pp_craft_style_p() || pp_cmf_style_p())
     {
 	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDDO"));
+    } 
+    else if(!is_fortran) {
+      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
     }
 
     attach_loop_to_sentence_up_to_end_of_text(first_sentence, r, obj);
