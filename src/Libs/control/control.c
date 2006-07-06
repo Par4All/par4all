@@ -851,13 +851,13 @@ static bool condition_expression_to_final_bound(expression cond,
       strict_p = ENTITY_LESS_THAN_P(op) || ENTITY_GREATER_THAN_P(op);
 
       if(syntax_reference_p(e1_s) && reference_variable(syntax_reference(e1_s))==li) {
-	*pub = copy_expression(e2);
 	*p_is_upper_p = ENTITY_LESS_THAN_P(op) || ENTITY_LESS_OR_EQUAL_P(op);
+	*pub = convert_bound_expression(e2, TRUE, ENTITY_LESS_OR_EQUAL_P(op));
 	success = TRUE;
       }
       else if(syntax_reference_p(e2_s) && reference_variable(syntax_reference(e2_s))==li) {
-	*pub = copy_expression(e1);
 	*p_is_lower_p = ENTITY_GREATER_THAN_P(op) || ENTITY_GREATER_OR_EQUAL_P(op);
+	*pub = convert_bound_expression(e2, FALSE, ENTITY_GREATER_OR_EQUAL_P(op));
 	success = TRUE;
       }
     }

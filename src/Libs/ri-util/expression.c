@@ -3,11 +3,11 @@
   *
   * Functions for the expressions
   *
-  * Yi-Qing YANG, Lei ZHOU, Francois IRIGOIN, Fabien Coelho
+  * Yi-Qing YANG, Lei ZHOU, Francois IRIGOIN, Fabien COELHO
   *
   * 12, Sep, 1991
   *
-  * AP, sep 25th 1995 : I have added some usefull functions from
+  * Alexis PLATONOFF, Sep. 25, 1995 : I have added some usefull functions from
   * static_controlize/utils.c
   */
 
@@ -2061,4 +2061,35 @@ bool simplify_C_expression(expression e)
 
   pips_debug(9, "End: %s\n", bool_to_string(can_be_substituted_p));
   return can_be_substituted_p;
+}
+
+/* Replace a C expression used as FOR bound by a Fortran DO bound
+expression, taking into account the C comparison operator used. */
+expression convert_bound_expression(expression e, bool upper_p, bool non_strict_p)
+{
+  expression b = expression_undefined;
+
+  if(non_strict_p) {
+    b = copy_expression(e);
+  }
+  else {
+    /* */
+    int ib = 0;
+    int nb = 0;
+
+    if(expression_integer_value(e, &ib)) {
+      /* The offset might not be plus or minus one, unless we know the
+	 index is an integer? Does it depend on the step value? More
+	 thought needed than available tonight (FI) */
+      nb = upper_p? ib-1 : ib+1;
+      b = int_to_expression(nb);
+    }
+    else {
+      expression offset = int_to_expression(1);
+      entity op = entity_intrinsic(upper_p? MINUS_OPERATOR_NAME : PLUS_OPERATOR_NAME);
+
+      b = MakeBinaryCall(op, copy_expression(e), offset);
+    }
+  }
+  return b;
 }
