@@ -84,6 +84,8 @@ INC.d	= $(INSTALL_DIR)/include
 ETC.d	= $(INSTALL_DIR)/etc
 DOC.d	= $(INSTALL_DIR)/doc
 MAN.d	= $(INSTALL_DIR)/man
+# By default, install HTML stuff directly into $(HTM.d) but HTM.subd can
+# be used to specify a subdirectory.
 HTM.d	= $(INSTALL_DIR)/html
 UTL.d	= $(INSTALL_DIR)/utils
 SHR.d	= $(INSTALL_DIR)/share
@@ -493,17 +495,17 @@ ifdef INSTALL_HTM
 
 phase6: .build_htm
 
-$(HTM.d):; $(MKDIR) $(HTM.d)
+$(HTM.d)/$(HTM.subd):; $(MKDIR) $(HTM.d)/$(HTM.subd)
 
 .build_htm: $(INSTALL_HTM) $(HTM.d)
 # Deal also with directories.
 # By the way, how to install directories with "install" ?
 	for f in $(INSTALL_HTM) ; do \
 	  if [ -d $$f ] ; then \
-	    cp -r $$f $(HTM.d) ; \
+	    cp -r $$f $(HTM.d)/$(HTM.subd) ; \
 	else \
-	    $(CMP) $$f $(HTM.d)/$$f || \
-	      $(INSTALL) -m 644 $$f $(HTM.d) ; \
+	    $(CMP) $$f $(HTM.d)/$(HTM.subd)/$$f || \
+	      $(INSTALL) -m 644 $$f $(HTM.d)/$(HTM.subd) ; \
 	  fi ; \
 	done
 	touch $@
