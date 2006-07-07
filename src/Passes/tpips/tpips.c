@@ -19,6 +19,7 @@
 
 #include "misc.h"
 #include "newgen.h"
+#include "database.h"
 #include "ri-util.h"
 #include "pipsdbm.h"
 #include "properties.h"
@@ -183,6 +184,7 @@ static char ** current_completion_array;
 enum COMPLETION_TYPES {
     COMP_NONE,
     COMP_FILENAME,
+    COMP_MODULE,
     COMP_RULE,
     COMP_RESOURCE,
     COMP_PROPERTY,
@@ -210,7 +212,7 @@ static struct t_completion_scheme completion_scheme[] =
 { "create",     COMP_NONE,       COMP_FILENAME },
 { "close",      COMP_NONE,       COMP_NONE },
 { "delete",     COMP_NONE,       COMP_NONE },
-{ "module",     COMP_NONE,       COMP_NONE },
+{ "module",     COMP_MODULE,       COMP_NONE },
 { "make",       COMP_RESOURCE,   COMP_NONE },
 { "remove",	COMP_RESOURCE,   COMP_NONE },
 { "apply",      COMP_RULE,       COMP_NONE },
@@ -263,6 +265,39 @@ static char * fun_generator(char *texte, int state)
      
     /* If no names matched, then return NULL. */
     return ((char *)NULL);
+}
+
+
+/* Build an array with the names of all available modules. */
+
+char **get_module_names() {
+  static char **names = NULL;
+  static gen_array_t modules = NULL;
+
+  if (names != NULL) {
+    /* Free after a previous use: */
+    free(names);
+    gen_array_full_free(modules);
+    /* By default, no available module: */
+    names = NULL;
+  }
+
+  /* Mainly inspired from wpips/emacs.c
+
+     Overkilling since most of time, the module list does not change but I
+     guess there is no indicator in PIPS to tell some modules have been
+     created or destroyed. */
+  if (db_get_current_workspace_name() != NULL) {
+    int module_list_length, i;
+    modules = db_get_module_list();
+    module_list_length = gen_array_nitems(modules);
+    /* Note that since calloc initialize the memory to 0, this array will
+       end with a NULL pointer as expected. */
+    names = calloc(module_list_length + 1, sizeof(char *));
+    for(i = 0; i < module_list_length; i++)
+      names[i] = gen_array_item(modules, i);
+  }
+  return names;
 }
 
 /* Generator function for param. completion.  STATE lets us know whether
@@ -334,6 +369,9 @@ static char * param_generator(char *texte, int state)
 	case COMP_FILENAME:
 #define RESERVED_FOR_FILENAME (char**)"should not appear"
 	    current_completion_array = RESERVED_FOR_FILENAME;
+	    break;
+	case COMP_MODULE:
+	  current_completion_array = get_module_names();
 	    break;
 	case COMP_RULE:
 	    current_completion_array = tp_phase_names;
