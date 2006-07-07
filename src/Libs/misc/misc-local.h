@@ -10,7 +10,11 @@
 #include <setjmp.h>
 
 /* To generate a string from a macro: */
-#define STRINGIFY(symbol) #symbol
+#define STRINGIFY_SECOND_STAGE(symbol) #symbol
+/* If not using this 2-stage macro evaluation, the generated string is not
+   the value of the macro but the name of the macro... Who said C was a
+   simple language? :-/ */
+#define STRINGIFY(symbol) STRINGIFY_SECOND_STAGE(symbol)
 
 
 /* Measurement type for mem_spy.c */
