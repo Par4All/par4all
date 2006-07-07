@@ -2511,7 +2511,33 @@ alias rice_data_dependence 'True Dependences Only'
 alias rice_cray 'CRAY Microtasking'
 alias nest_parallelization 'Loop Nest Parallelization'
 alias coarse_grain_parallelization 'Coarse Grain Parallelization'
+alias internalize_parallel_code 'Consider a parallel code as a sequential one'
 \end{verbatim}
+
+
+\subsubsection{Considering a parallel code as a sequential one}
+\label{sec:cons-parall-code}
+
+For historical reasons, a parallelized program in PIPS is no longer a
+classical PIPS program we can work on later because sequential code and
+parallelized code do not have the same resource type. Unfortunately,
+improving the parallelized code with some other transformations (dead-code
+elimination, etc) is also useful. Thus we add a new pseudo-transformation
+that coerce a parallel code into a classical (sequential) one to consider
+parallelization as an internal transformation in PIPS.
+
+\begin{verbatim}
+internalize_parallel_code             > MODULE.code
+        < MODULE.parallelized_code
+\end{verbatim}
+
+If you display the ``generated'' code, it may not be displayed as a
+parallel one if the good properties are not switched. Anyway, it's here.
+
+Note this transformation may no be usable with some special
+parallelization in PIPS such as WP65 or HPFC that generate other resource
+types.
+
 
 \subsubsection{Allen \& Kennedy's Parallelization Algorithm}
 \label{subsubsection-allen-kennedy-parallelization-algorithm}

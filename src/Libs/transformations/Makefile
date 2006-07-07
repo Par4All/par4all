@@ -28,7 +28,8 @@ LIB_CFILES =	replace.c \
 		array_resizing_top_down.c\
 		array_resizing_statistic.c\
 		partial_redundancy_elimination.c \
-		variable_expansion.c
+		variable_expansion.c \
+		internalize_parallel_code.c
 
 INC_TARGET =    $(TARGET).h
 
