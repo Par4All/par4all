@@ -30,7 +30,10 @@
 #include "effects-generic.h"
 #include "effects-simple.h"
 
-#define CONTINUATION PIPS_COMMENT_CONTINUATION "                              "
+static string continuation = string_undefined;
+#define CONTINUATION (string_undefined_p(continuation)? \
+ strdup(concatenate(PIPS_COMMENT_CONTINUATION, "                              ", NULL)) \
+ : continuation)
 
 /* new definitions for action interpretation
  */
@@ -137,8 +140,8 @@ update_an_effect_type(
  * buffer used in effect_to_string() is too small.
  */
 
-#define may_be 		PIPS_COMMENT_SENTINEL "               <may be "
-#define must_be 	PIPS_COMMENT_SENTINEL "               <must be "
+#define may_be 		"               <may be "
+#define must_be 	"               <must be "
 #define must_end	">:"
 #define may_end  	" " must_end
 
@@ -164,10 +167,10 @@ simple_effects_to_text(
     /* These four buffers are used to build the current line of prettyprint
      for a given type of effect. */
   
-    r[0] = '\0'; strcat(r, concatenate(may_be, ifread, may_end, NULL));
-    R[0] = '\0'; strcat(R, concatenate(must_be, ifread, must_end, NULL));
-    w[0] = '\0'; strcat(w, concatenate(may_be, ifwrite, may_end, NULL));
-    W[0] = '\0'; strcat(W, concatenate(must_be, ifwrite, must_end, NULL));
+    r[0] = '\0'; strcat(r, concatenate(PIPS_COMMENT_SENTINEL, may_be, ifread, may_end, NULL));
+    R[0] = '\0'; strcat(R, concatenate(PIPS_COMMENT_SENTINEL, must_be, ifread, must_end, NULL));
+    w[0] = '\0'; strcat(w, concatenate(PIPS_COMMENT_SENTINEL, may_be, ifwrite, may_end, NULL));
+    W[0] = '\0'; strcat(W, concatenate(PIPS_COMMENT_SENTINEL, must_be, ifwrite, must_end, NULL));
 
     /* These four "texts" are used to build all the text of prettyprint
        for a given type of effect. Each sentence contains one line. */
@@ -218,10 +221,10 @@ simple_effects_to_text(
 	free(t);
     }
     
-    close_current_line(r, rt,CONTINUATION);
-    close_current_line(w, wt,CONTINUATION);
-    close_current_line(R, Rt,CONTINUATION);
-    close_current_line(W, Wt,CONTINUATION);
+    close_current_line(r, rt, CONTINUATION);
+    close_current_line(w, wt, CONTINUATION);
+    close_current_line(R, Rt, CONTINUATION);
+    close_current_line(W, Wt, CONTINUATION);
 
     if (rb) { MERGE_TEXTS(sefs_text, rt); } else free_text(rt);
     if (wb) { MERGE_TEXTS(sefs_text, wt); } else free_text(wt);

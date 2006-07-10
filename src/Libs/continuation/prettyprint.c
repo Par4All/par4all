@@ -93,7 +93,8 @@ text_continuation(transformer cont, bool is_must)
     char crt_line[MAX_LINE_LENGTH];
 
     crt_line[0] = '\0'; 
-    append(PIPS_COMMENT_PREFIX " ");
+    append(PIPS_COMMENT_PREFIX);
+    append(" ");
 
     if(cont != (transformer) HASH_UNDEFINED_VALUE ) 
     {

@@ -1791,7 +1791,10 @@ text_block(
 	    pbeg = CHAIN_SWORD(NIL, "BEGIN BLOCK");
 	    pend = CHAIN_SWORD(NIL, "END BLOCK");
 	    
-	    u = make_unformatted(strdup("C"), n, margin, pbeg);
+	    /* Should be guarded by is_fortran as "C" is not OK in C,
+	       however, this option is useless in C since { and } are
+	       visible. Also, the comment prefix should be uniquely declared.*/
+	    u = make_unformatted(strdup(PIPS_COMMENT_SENTINEL), n, margin, pbeg);
 	    ADD_SENTENCE_TO_TEXT(r, 
 				 make_sentence(is_sentence_unformatted, u));
 	}
@@ -1810,7 +1813,7 @@ text_block(
 	(get_bool_property("PRETTYPRINT_ALL_EFFECTS") ||
 	 get_bool_property("PRETTYPRINT_BLOCKS"))) 
     {
-	unformatted u = make_unformatted(strdup("C"), n, margin, pend);
+	unformatted u = make_unformatted(strdup(PIPS_COMMENT_SENTINEL), n, margin, pend);
 	ADD_SENTENCE_TO_TEXT(r, 
 			     make_sentence(is_sentence_unformatted, u));
     }
@@ -2032,14 +2035,14 @@ text_loop_default(
 
     /* LOOP postlogue
      */
-    if (structured_do || doall_loop_p || do_enddo_p ||
+    if(!is_fortran) { /* i.e. is_C for the time being */
+      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
+    }
+    else if (structured_do || doall_loop_p || do_enddo_p ||
 	pp_cray_style_p() || pp_craft_style_p() || pp_cmf_style_p())
     {
 	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDDO"));
     } 
-    else if(!is_fortran) {
-      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
-    }
 
     attach_loop_to_sentence_up_to_end_of_text(first_sentence, r, obj);
 

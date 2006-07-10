@@ -316,6 +316,8 @@ print_source_or_code_effects_engine(
     char *file_name, *file_resource_name;
     bool success = TRUE;
 
+    is_fortran = !get_bool_property("PRETTYPRINT_C_CODE");
+
     file_name = strdup(concatenate(file_suffix,
                                   get_bool_property
 				  ("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? 

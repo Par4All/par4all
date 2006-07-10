@@ -2,9 +2,15 @@
  * $Id$
  */
 
-#define PIPS_COMMENT_SENTINEL 		"C"
+/* is_fortran is declared in ri-util, but it's not the proper location
+   as text-util is supposed to be independent of ri-util. But
+   PIPS_COMMENT_SENTINEL should not be in text-util since it is fully
+   language independent. However, PIPS_COMMENT_CONTINUATION is used in util.c... */
+extern int is_fortran;
+#define PIPS_COMMENT_SENTINEL 		(is_fortran? "C" : "//")
 #define PIPS_COMMENT_PREFIX   		PIPS_COMMENT_SENTINEL
-#define PIPS_COMMENT_CONTINUATION 	PIPS_COMMENT_SENTINEL "    "
+/* #define PIPS_COMMENT_CONTINUATION 	PIPS_COMMENT_SENTINEL "    " */
+#define PIPS_COMMENT_CONTINUATION 	(is_fortran? "C    " : "//    ")
 
 #define FORESYS_CONTINUATION_PREFIX "C$&" "    "
 
