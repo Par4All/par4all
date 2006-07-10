@@ -1,5 +1,5 @@
 /** 
- * $Id: compress_parms.c,v 1.20 2006/06/30 09:56:52 skimo Exp $
+ * $Id: compress_parms.c,v 1.21 2006/07/10 02:03:51 meister Exp $
  *
  * The integer points in a parametric linear subspace of Q^n are generally
  * lying on a sub-lattice of Z^n.  To simplify, the funcitons here compress
@@ -15,6 +15,12 @@
 #include <polylib/polylib.h>
 
 /** 
+ * debug flags (2 levels)
+ */
+#define dbgCompParm 1
+#define dbgCompParmMore 1
+
+/** 
  * Given a full-row-rank nxm matrix M made of m row-vectors), computes the
  * basis K (made of n-m column-vectors) of the integer kernel of the rows of M
  * so we have: M.K = 0
@@ -23,10 +29,14 @@ Matrix * int_ker(Matrix * M) {
   Matrix *U, *Q, *H, *H2, *K;
   int i, j, rk;
 
+  show_matrix(M);
   /* eliminate redundant rows : UM = H*/
   right_hermite(M, &H, &Q, &U);
   for (rk=H->NbRows-1; (rk>=0) && Vector_IsZero(H->p[rk], H->NbColumns); rk--);
   rk++;
+  if (dbgCompParmMore) {
+    printf("rank = %d\n", rk);
+  }
     
   /* there is a non-null kernel if and only if the dimension m of 
      the space spanned by the rows 
@@ -41,6 +51,13 @@ Matrix * int_ker(Matrix * M) {
   H->NbRows=rk;
   /* computes MU = [H 0] */
   left_hermite(H, &H2, &Q, &U); 
+   if (dbgCompParmMore) {
+    printf("-- Int. Kernel -- \n");
+    show_matrix(M);
+    printf(" = \n");
+    show_matrix(H2);
+    show_matrix(U); 
+  }
   H->NbRows==M->NbRows;
   Matrix_Free(H);
   /* obviously, the Integer Kernel is made of the last n-rk columns of U */
@@ -48,6 +65,7 @@ Matrix * int_ker(Matrix * M) {
   for (i=0; i< U->NbRows; i++)
     for(j=0; j< U->NbColumns-rk; j++) 
       value_assign(K->p[i][j], U->p[i][rk+j]);
+
 
   /* clean up */
   Matrix_Free(H2);
@@ -119,13 +137,16 @@ Matrix * int_mod_basis(Matrix * Bp, Matrix * Cp, Matrix * d) {
   value_init(tmp);
   /*   a/ compute K and S */
   /* simplify the constraints */
-  for (i=0; i< Bp->NbRows; i++)
+  /* for (i=0; i< Bp->NbRows; i++)
     for (j=0; j< Bp->NbColumns; j++) 
       value_pmodulus(Bp->p[i][j], Bp->p[i][j], d->p[0][i]);
+  */
   K = int_ker(Bp);
   S = affine_periods(Bp, d);
-  // show_matrix(K);
-  // show_matrix(S);
+  if (dbgCompParmMore) {
+    show_matrix(K); 
+    show_matrix(S);
+  }
   
   /*   b/ compute the linear part of G : HNF(K|S) */
 
@@ -138,7 +159,9 @@ Matrix * int_mod_basis(Matrix * Bp, Matrix * Cp, Matrix * d) {
   }
   Matrix_Free(K);
 
-  // show_matrix(KS);
+  if (dbgCompParmMore) { 
+    show_matrix(KS);
+  }
 
   /* HNF(K|S) */
   left_hermite(KS, &H, &U, &Q);
@@ -146,15 +169,17 @@ Matrix * int_mod_basis(Matrix * Bp, Matrix * Cp, Matrix * d) {
   Matrix_Free(U);
   Matrix_Free(Q);
   
-  // printf("HNF(K|S) = ");show_matrix(H);
+  if (dbgCompParm) {
+    printf("HNF(K|S) = ");
+    show_matrix(H);
+  }
 
   /* put HNF(K|S) in the p x p matrix S (which has already the appropriate size
-     so we spare a Matrix_Alloc) */
+     so we save a Matrix_Alloc) */
   for (i=0; i< nb_parms; i++) {
-    for (j=0; j< nb_parms; j++) 
+    for (j=0; j< nb_parms; j++) {
       value_assign(S->p[i][j], H->p[i][j]);
-
-
+    }
   }
   Matrix_Free(H);
 
@@ -227,13 +252,18 @@ Matrix * int_mod_basis(Matrix * Bp, Matrix * Cp, Matrix * d) {
     }
   }
   Matrix_Free(inv_H_M);
-  // show_matrix(Np_0);
+  if (dbgCompParmMore) {
+    show_matrix(Np_0);
+  }
 
   /* now compute the actual particular solution N_0 = U_M. N'_0 */
   N_0 = Matrix_Alloc(U->NbColumns, 1);
   /* OPT: seules les nb_eq premières valeurs de N_0 sont utiles en fait. */
   Matrix_Product(U, Np_0, N_0);
-  // show_matrix(N_0);
+  
+  if (dbgCompParm) {
+    show_matrix(N_0);
+  }
   Matrix_Free(Np_0);
   Matrix_Free(U);
 
@@ -257,17 +287,17 @@ Matrix * int_mod_basis(Matrix * Bp, Matrix * Cp, Matrix * d) {
 
 
 /** 
- * utility function: given a matrix containing the equations AI+BN+C=0, compute
- * the HNF of A : A = [Ha 0].Q and return :
+ * Utility function: given a matrix containing the equations AI+BN+C=0,
+ * computes the HNF of A : A = [Ha 0].Q and return :
  * <ul>
  * <li> B'= H^-1.(-B) 
  * <li> C'= H^-1.(-C)
  * <li> U = Q^-1 (-> return value)
  * <li> D, 
  * </ul>
- * where Ha^-1 = D^-1.H^-1 with H and D integer matrices in fact, as D is
- * diagonal, we return d, a column-vector Note: ignores the equalities that
- * involve only parameters
+ * where Ha^-1 = D^-1.H^-1 with H and D integer matrices. 
+ * In fact, as D is diagonal, we return a column-vector d.
+ * Note: ignores the equalities that involve only parameters
 */
 static Matrix * extract_funny_stuff(Matrix * const E, int nb_parms, 
 			     Matrix ** Bp, Matrix **Cp, Matrix **d) {
@@ -308,6 +338,9 @@ unsigned int i,j, k, nb_eqs=E->NbRows;
       }
     }
   }
+  if (dbgCompParmMore) {
+    show_matrix(A);
+  }
   
   /* 2- Compute Ha^-1, where Ha is the left HNF of A
       a/ Compute H = [Ha 0] */
@@ -328,6 +361,9 @@ unsigned int i,j, k, nb_eqs=E->NbRows;
   /*  c/ Invert Ha */
   Ha_pre_inv = Matrix_Alloc(nb_eqs, nb_eqs+1);
   assert (MatInverse(Ha, Ha_pre_inv));
+  if (dbgCompParmMore) {
+    show_matrix(Ha_pre_inv);
+  }
 
   /* store back Ha^-1  in Ha, to save a MatrixAlloc/MatrixFree */
   for(i=0; i< nb_eqs; i++) {
@@ -356,6 +392,7 @@ unsigned int i,j, k, nb_eqs=E->NbRows;
       }
     }
   }
+  
 
   (*Bp) = Matrix_Alloc(B->NbRows,B->NbColumns);
   Matrix_Product(Ha, B, (*Bp));
@@ -399,6 +436,11 @@ Matrix * compress_parms(Matrix * E, int nb_parms) {
   if (E->NbRows==0) return Identity_Matrix(nb_parms+1);
 
   U = extract_funny_stuff(E, nb_parms, &Bp, & Cp, &d); 
+  if (dbgCompParmMore) {
+    show_matrix(Bp); 
+    show_matrix(Cp);
+    show_matrix(d);
+  }
 
   Matrix_Free(U);
   /* The compression matrix N = G.N' must be such that (B'N+C') mod d = 0 (1)
@@ -428,10 +470,13 @@ Matrix * compress_parms(Matrix * E, int nb_parms) {
  * @param renderSpace tells if the returned equalities must be expressed in the
  * parameters space (renderSpace=0) or in the combined var/parms space
  * (renderSpace = 1)
+ * @param elimParms the list of parameters that have been removed: an array
+ * whose 1st element is the number of elements in the list.  (returned)
  * @return the system of equalities that involve only parameters.
  */
 Matrix * Constraints_Remove_parm_eqs(Matrix ** M1, Matrix ** Ctxt1, 
-				     int renderSpace) {
+				     int renderSpace, 
+				     unsigned int ** elimParms) {
   int i, j, k, nbEqsParms =0;
   int nbEqsM, nbEqsCtxt, allZeros, nbTautoM = 0, nbTautoCtxt = 0;
   Matrix * M = (*M1);
@@ -469,6 +514,8 @@ Matrix * Constraints_Remove_parm_eqs(Matrix ** M1, Matrix ** Ctxt1,
 
   /* nothing to do in this case */
   if (nbEqsParms+nbTautoM+nbTautoCtxt==0) {
+    (*elimParms) = (unsigned int*) malloc(sizeof(int));
+    (*elimParms)[0] = 0;
     if (renderSpace==0) {
       return Matrix_Alloc(0,Ctxt->NbColumns);
     }
@@ -508,8 +555,10 @@ Matrix * Constraints_Remove_parm_eqs(Matrix ** M1, Matrix ** Ctxt1,
     }
   }
 
-  /* 2- eliminate parameters until all equalities are unsed or until we find a
+  /* 2- eliminate parameters until all equalities are used or until we find a
   contradiction (overconstrained system) */
+  (*elimParms) = (unsigned int *) malloc(Eqs->NbRows * sizeof(int));
+  (*elimParms)[0] = 0;
   allZeros = 0;
   for (i=0; i< Eqs->NbRows; i++) {
     /* find a variable that can be eliminated */
@@ -537,6 +586,8 @@ Matrix * Constraints_Remove_parm_eqs(Matrix ** M1, Matrix ** Ctxt1,
 	 Eqs, Ctxt, and M */
       else {
 	k--; /* k is the rank of the variable, now */
+	(*elimParms)[0]++;
+	(*elimParms)[(*elimParms[0])]=k;
 	for (j=0; j< Eqs->NbRows; j++) {
 	  if (i!=j) {
 	    eliminate_var_with_constr(Eqs, i, Eqs, j, k);
@@ -559,6 +610,12 @@ Matrix * Constraints_Remove_parm_eqs(Matrix ** M1, Matrix ** Ctxt1,
     else {
       allZeros++;
     }
+  }
+  
+  /* elimParms may have been overallocated. Now we know how many parms have
+     been eliminated so we can reallocate the right amount of memory. */
+  if (realloc((*elimParms), (*elimParms)[0])!=(*elimParms)) {
+    fprintf(stderr, "Constraints_Remove_parm_eqs > Cannot realloc()");
   }
 
   Matrix_Free(EqsMTmp);
@@ -622,7 +679,9 @@ Matrix * Constraints_Remove_parm_eqs(Matrix ** M1, Matrix ** Ctxt1,
  * @maxRays Polylib's usual <i>workspace</i>.
  */
 Polyhedron * Polyhedron_Remove_parm_eqs(Polyhedron ** P, Polyhedron ** C, 
-					int renderSpace, int maxRays) {
+					int renderSpace, 
+					unsigned int ** elimParms, 
+					int maxRays) {
   Matrix * Eqs;
   Polyhedron * Peqs;
   Matrix * M = Polyhedron2Constraints((*P));
@@ -635,7 +694,7 @@ Polyhedron * Polyhedron_Remove_parm_eqs(Polyhedron ** P, Polyhedron ** C,
     FL_INIT(maxRays, POL_NO_DUAL);
   }
     
-  Eqs = Constraints_Remove_parm_eqs(&M, &Ct, renderSpace);
+  Eqs = Constraints_Remove_parm_eqs(&M, &Ct, renderSpace, elimParms);
   Peqs = Constraints2Polyhedron(Eqs, maxRays);
   Matrix_Free(Eqs);
 
@@ -690,21 +749,41 @@ Matrix * full_dimensionize(Matrix const * M, int nb_parms,
      and compress the other vars/parms
      -> [ variables to eliminate / parameters / variables to keep ] */
   permutation = find_a_permutation(Eqs, nb_parms);
+  if (dbgCompParm) {
+    printf("Permuting the vars/parms this way: [ ");
+    for (i=0; i< Eqs->NbColumns; i++) {
+      printf("%d ", permutation[i]);
+    }
+    printf("]\n");
+  }
   Permuted_Eqs = mpolyhedron_permute(Eqs, permutation);
   WVL = compress_parms(Permuted_Eqs, Eqs->NbColumns-2-Eqs->NbRows);
+  if (dbgCompParm) {
+    printf("Whole validity lattice: ");
+    show_matrix(WVL);
+  }
   mpolyhedron_compress_last_vars(Permuted_Eqs, WVL);
   Permuted_Ineqs = mpolyhedron_permute(Ineqs, permutation);
+  if (dbgCompParm) {
+    show_matrix(Permuted_Eqs);
+  }
   Matrix_Free(Eqs);
   Matrix_Free(Ineqs);
   mpolyhedron_compress_last_vars(Permuted_Ineqs, WVL);
-
+  if (dbgCompParm) {
+    printf("After compression: ");
+    show_matrix(Permuted_Ineqs);
+  }
   /* 3- eliminate the first variables */
   if (!mpolyhedron_eliminate_first_variables(Permuted_Eqs, Permuted_Ineqs)) {
     fprintf(stderr,"full-dimensionize > variable elimination failed. \n"); 
     return NULL;
   }
   // show_matrix(Permuted_Eqs);
-  // show_matrix(Permuted_Ineqs);
+  if (dbgCompParm) {
+    printf("After elimination of the variables: ");
+    show_matrix(Permuted_Ineqs);
+  }
 
   /* 4- get rid of the first (zero) columns, 
      which are now useless, and put the parameters back at the end */

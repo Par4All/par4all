@@ -1,5 +1,5 @@
 /** 
- * $Id: matrix_addon.h,v 1.4 2006/03/07 04:23:26 loechner Exp $
+ * $Id: matrix_addon.h,v 1.5 2006/07/10 02:03:51 meister Exp $
  * 
  * Polylib matrix addons
  * Mainly, deals with polyhedra represented as a matrix (implicit form)
@@ -14,8 +14,11 @@
 #include<assert.h>
 
 
-#define show_matrix(M) {printf(#M"= \n"); \
-                        Matrix_Print(stderr,P_VALUE_FMT,(M));}
+#define show_matrix(M) { printf(#M"= \n"); \
+                         if (M!=NULL) { \
+			 Matrix_Print(stderr,P_VALUE_FMT,(M));} \
+                         else {printf("<NULL>\n");} \
+                       } 
 
 /* Creates a view of the constraints of a polyhedron as a Matrix * */
 Matrix * constraintsView(Polyhedron * P);

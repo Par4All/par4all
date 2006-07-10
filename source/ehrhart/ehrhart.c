@@ -730,9 +730,7 @@ Polyhedron *Polyhedron_Preprocess(Polyhedron *D,Value *size,unsigned MAXRAYS)
     int i, j, d;
     Polyhedron *T, *S, *H, *C;
     Value *min;
-    //, tmp;
-  
-    // value_init(tmp);
+
     d = D->Dimension;
     if (MAXRAYS < 2*D->NbConstraints)
 	MAXRAYS = 2*D->NbConstraints;
@@ -756,15 +754,14 @@ Polyhedron *Polyhedron_Preprocess(Polyhedron *D,Value *size,unsigned MAXRAYS)
     for(i=0;i<D->NbConstraints;i++) {
         if(value_zero_p(D->Constraint[i][0])) {
             fprintf(stderr,"Polyhedron_Preprocess: ");
-            fprintf(stderr,"an equality was found where I did expect an inequality.\n");
+            fprintf(stderr,
+		    "an equality was found where I did expect an inequality.\n");
             fprintf(stderr,"Trying to continue...\n");
             continue;
         }
         Vector_Copy(D->Constraint[i],M->p[M->NbRows],(d+2));
         for(j=1;j<=d;j++)
             if(value_neg_p(D->Constraint[i][j])) {
-	      // value_multiply(tmp,D->Constraint[i][j],size[j-1]);
-	      // value_addto(M->p[M->NbRows][d+1],M->p[M->NbRows][d+1],tmp);
 	      value_addmul(M->p[M->NbRows][d+1], D->Constraint[i][j], size[j-1]);
             }
     
@@ -870,6 +867,7 @@ Polyhedron *Polyhedron_Preprocess(Polyhedron *D,Value *size,unsigned MAXRAYS)
     return(H);
 } /* Polyhedron_Preprocess */
 
+
 /** This procedure finds an hypercube of size 'size', containing
 polyhedron D increases size and lcm if necessary (and not "too big")
 If this is not possible, an empty polyhedron is returned
@@ -884,7 +882,8 @@ If this is not possible, an empty polyhedron is returned
 @param MAXRAYS
 
 */
-Polyhedron *Polyhedron_Preprocess2(Polyhedron *D,Value *size,Value *lcm,unsigned MAXRAYS) {
+Polyhedron *Polyhedron_Preprocess2(Polyhedron *D,Value *size,
+				   Value *lcm,unsigned MAXRAYS) {
   
     Matrix *c;
     Polyhedron *H;
@@ -972,8 +971,9 @@ Polyhedron *Polyhedron_Preprocess2(Polyhedron *D,Value *size,Value *lcm,unsigned
             fprintf(stderr,"\n");
 #endif
       
-            /* If the needed size is "small enough"(<=20 or less than twice *size) */
-            /* then increase *size, and artificially increase lcm too !*/
+            /* If the needed size is "small enough"(<=20 or less than 
+	       twice *size),
+               then increase *size, and artificially increase lcm too !*/
             value_set_si(tmp1,20);
             value_addto(tmp2,size[i],size[i]);
             if(value_le(s,tmp1)
@@ -1046,7 +1046,8 @@ is not possible, an empty polyhedron is returned
 @param MAXRAYS
 
 */
-Polyhedron *old_Polyhedron_Preprocess(Polyhedron *D,Value size,unsigned MAXRAYS) {
+Polyhedron *old_Polyhedron_Preprocess(Polyhedron *D,Value size,
+				      unsigned MAXRAYS) {
   
     int p, p1, ub, lb;
     Value a, a1, b, b1, g, aa;
@@ -1081,7 +1082,8 @@ Polyhedron *old_Polyhedron_Preprocess(Polyhedron *D,Value size,unsigned MAXRAYS)
                 /* parameter (1..p-1) constrains this parameter (p) */
                 needed=0;
                 for (p1=1; p1<p; p1++) {
-                    if (value_notzero_p(C[ub][p1]) || value_notzero_p(C[lb][p1])) {
+                    if (value_notzero_p(C[ub][p1]) ||
+			value_notzero_p(C[lb][p1])) {
                         needed=1; 
                         break;
                     }
@@ -1229,7 +1231,8 @@ void count_points (int pos,Polyhedron *P,Value *context, Value *res) {
 /*   expression for the enumeration of the polyhedron.               */
 /* A recursive procedure.                                            */
 /*-------------------------------------------------------------------*/
-static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_param,int dim,Value *lcm,char **param_name) {
+static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,
+		     int nb_param,int dim,Value *lcm,char **param_name) {
 
   enode *res,*B,*C;
   int hdim,i,j,rank,flag;
@@ -1257,7 +1260,7 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
   else
   {
 	  /* hdim is the degree of the polynomial + 1 */
-		hdim = dim-nb_param+1;		/* homogenous dim w/o parameters */
+		hdim = dim-nb_param+1; /* homogenous dim w/o parameters */
 		value_assign( lcm_copy, lcm[pos-1] );
   }  
 
@@ -1361,7 +1364,7 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
   }
   
   /* Utility arrays */
-  A = Matrix_Alloc(hdim, 2*hdim+1);		        /* used for Gauss */
+  A = Matrix_Alloc(hdim, 2*hdim+1);               /* used for Gauss */
   B = new_enode(evector, hdim, 0);
   C = new_enode(evector, hdim, 0);
 
@@ -1401,7 +1404,8 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
     value_multiply(nm,hdv,lcm_copy);
     value_addto(nm,nm,nLB);
     i=0;
-    for (value_addto(n,k,noff); value_lt(n,nm); value_addto(n,n,lcm_copy),i++) {
+    for (value_addto(n,k,noff); value_lt(n,nm); 
+	 value_addto(n,n,lcm_copy),i++) {
       
       /* n == i*lcm + k + noff;   */
       /* nlcm <= k < nlcm+lcm     */
@@ -1479,7 +1483,8 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
       else {    /* count is a function of other parameters */
 	/* call P_Enum recursively */
 	value_set_si(B->arr[i].d,0);
-	B->arr[i].x.p = P_Enum(L,LQ->next,context,pos+1,nb_param,dim,lcm,param_name);
+	B->arr[i].x.p = P_Enum(L,LQ->next,context,pos+1,
+			       nb_param,dim,lcm,param_name);
 	
 #ifdef EDEBUG3
 	if( param_name )
@@ -1586,7 +1591,8 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
 	if( param_name )
 	{
       fprintf(stderr, "B.C (evalue)=\n");
-      print_evalue(stderr,&(res->arr[i].x.p->arr[VALUE_TO_INT(k1)]),param_name );
+      print_evalue(stderr,&(res->arr[i].x.p->arr[VALUE_TO_INT(k1)]),
+		   param_name);
       fprintf(stderr,"\n");
 	}
 #endif
@@ -1660,43 +1666,44 @@ static void Scan_Vertices(Param_Polyhedron *PP,Param_Domain *Q,Matrix *CT,
 
   for(i=0,ix=0,bx=MSB,V=PP->V; V && i<PP->nbV; i++,V=V->next) {
     if (Q->F[ix] & bx) {
-		if( param_name )
-		{
-      	if(CT) {
-				Matrix *v;
-				v = VertexCT(V->Vertex,CT);
-				Print_Vertex(stdout,v,param_name);
-				Matrix_Free(v);
-      	}
-      	else
-				Print_Vertex(stdout,V->Vertex,param_name);
-     		fprintf(stdout,"\n");
-		}
-
+      if( param_name )
+	{
+	  if(CT) {
+	    Matrix *v;
+	    v = VertexCT(V->Vertex,CT);
+	    Print_Vertex(stdout,v,param_name);
+	    Matrix_Free(v);
+	  }
+	  else
+	    Print_Vertex(stdout,V->Vertex,param_name);
+	  fprintf(stdout,"\n");
+	}
+      
       for(j=0;j<V->Vertex->NbRows;j++) {
-			/* A matrix */
-			for( l=0 ; l<V->Vertex->NbColumns-1 ; l++ )
-			{
-				if( value_notzero_p(V->Vertex->p[j][l]) )
-				{
-					Gcd(V->Vertex->p[j][V->Vertex->NbColumns-1],V->Vertex->p[j][l], &m1);
-					value_division(k,V->Vertex->p[j][V->Vertex->NbColumns-1],m1);
-					if( value_notzero_p(lcm[l]) )
-					{
-						/* lcm[l] = lcm[l] * k / gcd(k,lcm[l]) */
-						if (value_notzero_p(k) && value_notone_p(k))
-						{
-						  Gcd(lcm[l],k,&m1);
-						  value_division(k,k,m1);
-						  value_multiply(lcm[l],lcm[l],k);
-						}
-					}
-					else
-					{
-						value_assign(lcm[l],k);
-					}
-				}
-			}
+	/* A matrix */
+	for( l=0 ; l<V->Vertex->NbColumns-1 ; l++ )
+	  {
+	    if( value_notzero_p(V->Vertex->p[j][l]) )
+	      {
+		Gcd(V->Vertex->p[j][V->Vertex->NbColumns-1],
+		    V->Vertex->p[j][l],&m1);
+		value_division(k,V->Vertex->p[j][V->Vertex->NbColumns-1],m1);
+		if( value_notzero_p(lcm[l]) )
+		  {
+		    /* lcm[l] = lcm[l] * k / gcd(k,lcm[l]) */
+		    if (value_notzero_p(k) && value_notone_p(k))
+		      {
+			Gcd(lcm[l],k,&m1);
+			value_division(k,k,m1);
+			value_multiply(lcm[l],lcm[l],k);
+		      }
+		  }
+		else
+		  {
+		    value_assign(lcm[l],k);
+		  }
+	      }
+	  }
       }
     }
     NEXT(ix,bx);
@@ -1716,7 +1723,9 @@ Procedure to count points in a non-parameterized polytope.
 @param param_name parameter names
 
 */
-Enumeration *Enumerate_NoParameters(Polyhedron *P,Polyhedron *C,Matrix *CT,Polyhedron *CEq,unsigned MAXRAYS,char **param_name) {
+Enumeration *Enumerate_NoParameters(Polyhedron *P,Polyhedron *C,
+				    Matrix *CT,Polyhedron *CEq,
+				    unsigned MAXRAYS,char **param_name) {
   
     Polyhedron *L;
     Enumeration *res;
@@ -1791,7 +1800,8 @@ Enumeration *Enumerate_NoParameters(Polyhedron *P,Polyhedron *C,Matrix *CT,Polyh
   } else {
     CATCH(overflow_error) {
         fprintf(stderr,"Enumerate: arithmetic overflow error.\n");
-        fprintf(stderr,"You should rebuild PolyLib using GNU-MP or increasing the size of integers.\n");
+        fprintf(stderr,"You should rebuild PolyLib using GNU-MP"
+		" or increasing the size of integers.\n");
         overflow_warning_flag = 0;
         assert(overflow_warning_flag);
     }
@@ -1835,7 +1845,8 @@ Enumeration *Enumerate_NoParameters(Polyhedron *P,Polyhedron *C,Matrix *CT,Polyh
 @return a list of validity domains + evalues EP
 
 */
-Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS,char **param_name)
+Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,
+				  unsigned MAXRAYS,char **param_name)
 {
   Polyhedron *L, *CQ, *CQ2, *LQ, *U, *CEq, *rVD, *P, *Ph = NULL;
   Matrix *CT;
@@ -2115,13 +2126,15 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS,
       
       CATCH(overflow_error) {
 	  fprintf(stderr,"Enumerate: arithmetic overflow error.\n");
-	  fprintf(stderr,"You should rebuild PolyLib using GNU-MP or increasing the size of integers.\n");
+	  fprintf(stderr,"You should rebuild PolyLib using GNU-MP "
+		  "or increasing the size of integers.\n");
 	  overflow_warning_flag = 0;
 	  assert(overflow_warning_flag);
 	
       }
       TRY {
-	  res->EP.x.p = P_Enum(L,LQ,context,1,nb_param+hom,dim+hom,lcm,param_name);
+	  res->EP.x.p = P_Enum(L,LQ,context,1,nb_param+hom,
+			       dim+hom,lcm,param_name);
 	  UNCATCH(overflow_error);	
       }
       if (hom)
@@ -2247,7 +2260,8 @@ Deals with the full-dimensional case.
 @param param_name : names for the parameters (char strings)
 
 */
-Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS, char ** param_name)
+Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,
+					unsigned MAXRAYS, char ** param_name)
 {
   Polyhedron *L, *CQ, *CQ2, *LQ, *U, *CEq, *rVD, *P;
   Matrix *CT;
@@ -2330,7 +2344,8 @@ Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,unsigned MA
   }
   value_init(hdv);
 
-  /* BM: Scan the vertices and make an orthogonal expansion of the variable space */
+  /* Scan the vertices and make an orthogonal expansion of the variable
+     space */
   /* a- prepare the array of common denominators */
   if (!PP->nbV) return 0;
   else {
@@ -2339,7 +2354,7 @@ Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,unsigned MA
     for (i=0; i< nb_vars; i++) value_set_si(denoms->p[0][i], 0);
   }
   
-  /* b- scan the vertices and compute the global variable lcms */
+  /* b- scan the vertices and compute the variables' global lcms */
   for (V_tmp = PP->V; V_tmp; V_tmp=V_tmp->next)
     for (i=0; i< nb_vars; i++) 
       Lcm3(denoms->p[0][i],V_tmp->Vertex->p[i][nb_param+1], &(denoms->p[0][i]));
@@ -2358,7 +2373,8 @@ Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,unsigned MA
   
   /* the expansion can be actually writen as global_var_lcm.L^{-1} */
   /* this is equivalent to multiply the rows of P by denoms_det */
-  for (i=0; i< nb_vars; i++) value_division(denoms->p[0][i], global_var_lcm, denoms->p[0][i]);
+  for (i=0; i< nb_vars; i++) value_division(denoms->p[0][i], 
+					    global_var_lcm, denoms->p[0][i]);
   
   // OPT : we could use a vector instead of a diagonal matrix here (c- and d-).
   /* c- make the quick expansion matrix */
@@ -2396,8 +2412,9 @@ Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,unsigned MA
   /* formerly : Scan the vertices and compute lcm 
      Scan_Vertices_Quick_Apx(PP,Q,CT,lcm,nb_param); */
   /* now : lcm = 1 (by construction) */
-  // OPT : A lot among what happens after this point can be simplified by knowing that lcm[i] = 1
-  // for now, we just conservatively fool the rest of the function with lcm = 1
+  // OPT : A lot among what happens after this point can be simplified by
+  // knowing that lcm[i] = 1 for now, we just conservatively fool the rest of
+  // the function with lcm = 1
   // to do after a first debugging
   for (i=0; i< nb_param; i++) value_set_si(lcm[i], 1);
   
@@ -2576,15 +2593,16 @@ Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,unsigned MA
       value_set_si(context[hdim],1);
       
       CATCH(overflow_error) {
-			fprintf(stderr,"Enumerate: arithmetic overflow error.\n");
-			fprintf(stderr,"You should rebuild PolyLib using GNU-MP or increasing the size of integers.\n");
-			overflow_warning_flag = 0;
-			assert(overflow_warning_flag);
+	fprintf(stderr,"Enumerate: arithmetic overflow error.\n");
+	fprintf(stderr,"You should rebuild PolyLib using GNU-MP "
+		"or increasing the size of integers.\n");
+	overflow_warning_flag = 0;
+	assert(overflow_warning_flag);
 	
       }
       TRY {
-			res->EP.x.p = P_Enum(L,LQ,context,1,nb_param,dim,lcm, param_name);
-			UNCATCH(overflow_error);	
+	res->EP.x.p = P_Enum(L,LQ,context,1,nb_param,dim,lcm, param_name);
+	UNCATCH(overflow_error);	
       }
       
       for(i=0;i<=(hdim);i++)
@@ -2621,7 +2639,8 @@ Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,unsigned MA
 	  fprintf(stdout,"\nEhrhart Polynomial:\n");
 	  print_evalue(stdout,&res->EP, param_name);
 	  fprintf(stdout,"\n");
-	  /* sometimes the final \n lacks (when a single constant is printed) */
+	  /* sometimes the final \n lacks (when a single constant is printed)
+	  */
 	}
       
     }
@@ -2645,16 +2664,19 @@ Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,unsigned MA
 
 Ehrhart_Quick_Apx
 
-computes the approximation of the Ehrhart polynomial of a polyhedron (implicit form -> matrix), treating the non-full-dimensional case.
+Computes the approximation of the Ehrhart polynomial of a polyhedron 
+(implicit form -> matrix), treating the non-full-dimensional case.
 
-@param M a Matrix (polyhedron under implicit form)
-@param C a Matrix (context under implicit form)
-@param Validity_Lattice a pointer to a Matrix (returned : the parameter's validity lattice)
-@param MAXRAYS (the needed "working space" for other polylib functions used here)
-@param param_name (the names of the parameters)
+@param M a polyhedron under implicit form
+@param C  M's context under implicit form
+@param Validity_Lattice a pointer to the parameter's validity lattice
+@param MAXRAYS the needed "working space" for other polylib functions used here
+@param param_name the names of the parameters, 
 
 */
-Enumeration *Ehrhart_Quick_Apx(Matrix * M, Matrix * C, Matrix ** Validity_Lattice, unsigned MAXRAYS, char ** param_name) {
+Enumeration *Ehrhart_Quick_Apx(Matrix * M, Matrix * C, 
+			       Matrix **Validity_Lattice, unsigned maxRays) { 
+			       /* char ** param_name) {*/
 
   // 0- compute a full-dimensional polyhedron with the same number of points,
   // and its parameter's validity lattice
@@ -2663,14 +2685,16 @@ Enumeration *Ehrhart_Quick_Apx(Matrix * M, Matrix * C, Matrix ** Validity_Lattic
   Enumeration *en;
   
   M_full = full_dimensionize(M, C->NbColumns-2, Validity_Lattice);
-  // 1- apply the same tranformation to the context that what has been applied to the parameters space of the polyhedron.
+  // 1- apply the same tranformation to the context that what has been applied
+  // to the parameters space of the polyhedron.
   mpolyhedron_compress_last_vars(C, *Validity_Lattice);
   show_matrix(M_full);
-  P = Constraints2Polyhedron(M_full, MAXRAYS);
-  PC = Constraints2Polyhedron(C, MAXRAYS);
+  P = Constraints2Polyhedron(M_full, maxRays);
+  PC = Constraints2Polyhedron(C, maxRays);
   Matrix_Free(M_full);
   // compute the Ehrhart polynomial of the "equivalent" polyhedron
-  en = Ehrhart_Quick_Apx_Full_Dim(P, PC, MAXRAYS, param_name);
+  en = Ehrhart_Quick_Apx_Full_Dim(P, PC, maxRays, NULL);
+				  /*, param_name);*/
 
   // clean up
   Polyhedron_Free(P);
@@ -2680,3 +2704,67 @@ Enumeration *Ehrhart_Quick_Apx(Matrix * M, Matrix * C, Matrix ** Validity_Lattic
 
 
 
+/** 
+
+Constraints_EhrhartQuickApx
+
+Computes the approximation of the Ehrhart polynomial of a polyhedron (implicit
+form -> matrix), treating the non-full-dimensional case.  If there are some
+equalities involving only parameters, these are used to eliminate useless 
+parameters.
+
+@param M a polyhedron under implicit form
+@param C  M's context under implicit form
+@param validityLattice a pointer to the parameter's validity lattice
+(returned)
+@param parmsEqualities Equalities involving only the parameters
+@param maxRays the needed "working space" for other polylib functions used here
+@param elimParams  array of the indices of the eliminated parameters (returned)
+
+*/
+Enumeration *Constraints_EhrhartQuickApx(Matrix const * M, Matrix const * C, 
+					 Matrix ** validityLattice, 
+					 Matrix ** parmEqualities,
+					 unsigned int ** elimParms, 
+					 unsigned maxRays) {
+  Enumeration *EP;
+  Matrix * Mp = Matrix_Copy(M);
+  Matrix * Cp = Matrix_Copy(C);
+  // remove useless equalities involving only parameters, using these
+  // equalities to remove parameters.
+  (*parmEqualities) = Constraints_Remove_parm_eqs(&Mp, &Cp, 0, elimParms);
+  if (Mp->NbRows>=0) {// if there is no contradiction
+    EP = Ehrhart_Quick_Apx(Mp, Cp, validityLattice, maxRays);
+    return EP;
+  }
+  else {
+    // if there are contradictions, return a zero Ehrhart polynomial
+    return NULL;
+  }
+  
+}
+
+
+/** 
+ * Returns the array of parameter names after some of them have been eliminated.
+ * @param parmNames the initial names of the parameters
+ * @param elimParms a list of parameters that have been eliminated from the
+ * original parameters. The first element of this array is the number of
+ * elements.
+ * <p> Note: does not copy the parameters names themselves. </p>
+ * @param nbParms the initial number of parameters
+*/
+char ** parmsWithoutElim(char const ** parmNames, 
+			       unsigned int const * elimParms, 
+			       unsigned int nbParms) {
+  int i=0, j=0,k;
+  int newParmNb = nbParms - elimParms[0];
+  char ** newParmNames = (char **)malloc (newParmNb * sizeof(char *));
+  for (k=1; k<= elimParms[0]; k++) {
+    while (i!=elimParms[k]) {
+      newParmNames[i-k+1] = parmNames[i];
+      i++;
+    }
+  }
+  return newParmNames;
+}

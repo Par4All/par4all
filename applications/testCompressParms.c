@@ -1,5 +1,5 @@
 /** 
- * $Id: testCompressParms.c,v 1.1 2006/03/13 06:43:49 loechner Exp $
+ * $Id: testCompressParms.c,v 1.2 2006/07/10 02:03:51 meister Exp $
  * 
  * Test routines for kernel/compress_parms.c functions
  * @author B. Meister, 3/2006
@@ -49,6 +49,7 @@ int test_Constraints_Remove_parm_eqs(Matrix * A, Matrix * B) {
   int isOk = 1;
   Matrix * M, *C, *Cp, * Eqs, *M1, *C1;
   Polyhedron *Pm, *Pc, *Pcp, *Peqs, *Pint;
+  unsigned int * elimParms;
   printf("----- test_Constraints_Remove_parm_eqs() -----\n");
   M1 = Matrix_Copy(A);
   C1 = Matrix_Copy(B);
@@ -68,7 +69,7 @@ int test_Constraints_Remove_parm_eqs(Matrix * A, Matrix * B) {
   Matrix_Free(C);
 
   /* extract the parm-equalities, expressed in the combined space */
-  Eqs = Constraints_Remove_parm_eqs(&M1, &C1, 1);
+  Eqs = Constraints_Remove_parm_eqs(&M1, &C1, 1, &elimParms);
 
   printf("Removed equalities: \n");
   show_matrix(Eqs); 
@@ -116,6 +117,7 @@ int test_Polyhedron_Remove_parm_eqs(Matrix * A, Matrix * B) {
   int isOk = 1;
   Matrix * M, *C;
   Polyhedron *Pm, *Pc, *Pcp, *Peqs, *Pint, *Pint1;
+  unsigned int * elimParms;
   printf("----- test_Polyhedron_Remove_parm_eqs() -----\n");
 
   M = Matrix_Copy(A);
@@ -139,7 +141,7 @@ int test_Polyhedron_Remove_parm_eqs(Matrix * A, Matrix * B) {
   Pc = Constraints2Polyhedron(C, maxRays);
   Matrix_Free(M);
   Matrix_Free(C);
-  Peqs = Polyhedron_Remove_parm_eqs(&Pm, &Pc, 1, 200);
+  Peqs = Polyhedron_Remove_parm_eqs(&Pm, &Pc, 1, &elimParms, 200);
   
   /* compute the supposedly-same polyhedron, using the extracted equalities */
   Pcp = align_context(Pc, Pm->Dimension, maxRays);

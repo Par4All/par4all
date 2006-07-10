@@ -33,7 +33,7 @@ int main( int argc, char **argv)
 
   // compute a polynomial approximation of the Ehrhart polynomial
   printf("============ Ehrhart polynomial quick approximation ============\n");
-  e = Ehrhart_Quick_Apx(P1, C1, &Validity_Lattice, 1024, param_name);
+  e = Ehrhart_Quick_Apx(P1, C1, &Validity_Lattice, 1024);
   
   Matrix_Free(C1);
   Matrix_Free(P1);
