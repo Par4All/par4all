@@ -275,22 +275,75 @@ interpret: file TK_EOF
 file: globals			
                         {
 			  /* To handle special case: compilation unit module */
-			  if ($1 != NIL)
+			  list dl = $1;
+
+			  if (dl != NIL) {
+			    pips_assert("Each variable is declared once", gen_once_p(dl));
 			    ModuleStatement = make_statement(entity_empty_label(), 
 							     STATEMENT_NUMBER_UNDEFINED, 
 							     STATEMENT_ORDERING_UNDEFINED, 
 							     string_undefined,
 							     make_instruction_block(NIL),
-							     $1,NULL);
+							     dl,NULL);
+			  }
 			}
 ;
 
 globals:
     /* empty */         { $$ = NIL; }            
 |   {is_external = TRUE; } global globals
-                        { $$ = gen_nconc($2,$3); }            
+                        { 
+			  /* Each variable should be declared only
+			     once. Type and initial value conflict
+			     should have been detected earlier. I
+			     would expect $1 and $2 rather than $2 and
+			     $3. */
+			  pips_assert("Each variable is declared once", gen_once_p($3));
+			  ifdebug(8) {
+			    fprintf(stderr, "New variables $2 (%p) are declared\n", $2);
+			    print_entities($2);
+			    fprintf(stderr, "\n");
+			    fprintf(stderr, "*******Current declarations $3 (%p) are: \n", $3);
+			    print_entities($3);
+			    fprintf(stderr, "\n");
+			  }
+
+			  /* The order of declarations must be
+			     preserved: a structure is declared before
+			     it is used to declare a variable */
+			  /*
+			  $$ = NIL;
+			  MAP(ENTITY, v, {
+			    if(!gen_in_list_p(v, $3))
+			      $$ = gen_nconc($$, CONS(ENTITY, v , NIL));}, $2);
+			  $$ = gen_nconc($$, $3);
+			  */
+			  /* Redeclarations are possible in C as long as they are compatible */
+			  /* It is assumed that compatibility is checked somewhere else... */
+			  $$ = gen_nconc($2, $3);
+
+			  ifdebug(8) {
+			  fprintf(stderr, "*******Updated $$ declarations (%p) are: \n", $$);
+			  fprintf(stderr, "\n");
+			  if(ENDP($$))
+			    fprintf(stderr, "Empty list\n");
+			  else
+			    print_entities($$);
+			    fprintf(stderr, "\n");
+			  }
+
+			  pips_assert("Each variable is declared once", gen_once_p($$));
+			}            
 |   TK_SEMICOLON globals
-                        { $$ = $2; }                 
+                        { 
+			  pips_assert("Declarations are unique", gen_once_p($2));
+			  ifdebug(8) {
+			    fprintf(stderr, "*******Current declarations are: \n");
+			    print_entities($2);
+			    fprintf(stderr, "\n");
+			  }
+			  $$ = $2; 
+			}                 
 ;
 
 location:
@@ -1011,6 +1064,8 @@ for_clause:
 declaration:                               /* ISO 6.7.*/
     decl_spec_list init_declarator_list TK_SEMICOLON
                         {
+			  pips_assert("Declaration list are not redundant", gen_once_p($2));
+			  pips_assert("Variable $1 has not been declared before", !gen_in_list_p($1, $2));
 			  UpdateEntities($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external);
 			  stack_pop(ContextStack);
 			  $$ = gen_nconc($1,$2);
@@ -1044,6 +1099,11 @@ init_declarator:                             /* ISO 6.7 */
 |   declarator TK_EQ init_expression
                         { 
 			  /* Put init_expression in the initial value of entity declarator*/
+			  if(!value_undefined_p(entity_initial($1))){
+			    pips_user_warning("double definition of initial"
+					      " value for variable %s\n", entity_name($1));
+			    pips_internal_error("Scoping not implemented yet\n");
+			  }
 			  entity_initial($1) = make_value_expression($3);
 			}
 ;
@@ -1511,6 +1571,9 @@ direct_decl: /* (* ISO 6.7.5 *) */
                                     * types as variable names *) */
     id_or_typename
                         {
+			  /* FI: A variable cannot be redeclared
+			     within the same scope, but this is not
+			     checked yet. */
 			  $$ = FindOrCreateCurrentEntity($1,ContextStack,FormalStack,FunctionStack,is_external);
 			  /* Initialize the type stack and push the type of found/created entity to the stack. 
 			     It can be undefined if the entity has not been parsed, or a given type which is 
@@ -1814,6 +1877,7 @@ function_def:  /* (* ISO 6.9.1 *) */
 			  /* Make value_code for current module here */
 			  ModuleStatement = $3;
 			  pips_assert("Module statement is consistent",statement_consistent_p(ModuleStatement));
+			  pips_assert("Module declarations are unique", gen_once_p(statement_declarations(ModuleStatement)));
 			  ResetCurrentModule(); 
 			  is_external = TRUE;
 			}	

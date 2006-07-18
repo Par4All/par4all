@@ -54,7 +54,7 @@ bool controlizer(string module_name)
 			       empty_comments,
 			       make_instruction(is_instruction_unstructured,
 						control_graph(module_stat)),
-			       statement_declarations(parsed_mod_stat),NULL);
+			       gen_copy_seq(statement_declarations(parsed_mod_stat)),NULL);
   ifdebug(5) {
     statement_consistent_p(module_stat);
   }

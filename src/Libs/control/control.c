@@ -215,7 +215,7 @@ statement st ;
 hash_table used_labels;
 {
     if( get_debug_level() >= 5 ) {
-	pips_debug(0, "Statement %d: \n ", statement_number( st ));
+	pips_debug(0, "Statement %d (%p): \n ", statement_number( st ), st);
 	print_statement(st);
     }
     HASH_MAP(name, sts, {
@@ -333,7 +333,7 @@ bool controlize(
 	pips_assert("c_res is a successor of pred",
 		    gen_in_list_p(c_res, control_successors(pred)));
 	*/
-	pips_debug(1, "Successors of c_res %p:\n", c_res);
+	pips_debug(1, "Result c_res %p:\n", c_res);
 	display_linked_control_nodes(c_res);
 	check_control_coherency(pred);
 	check_control_coherency(succ);
@@ -344,6 +344,11 @@ bool controlize(
     case is_instruction_block: {
 	controlized = controlize_list(st, instruction_block(i),
 				      pred, succ, c_res, used_labels);
+	/* If st carries local declarations, so should the statement associated to c_res. */
+	if(!ENDP(statement_declarations(st))
+	   && ENDP(statement_declarations(control_statement(c_res)))) {
+	  pips_internal_error("Lost local declarations\n");
+	}
 	break;
     }
     case is_instruction_test:
@@ -395,6 +400,8 @@ bool controlize(
 				      pred, succ, c_res, used_labels);
 	break;
     case is_instruction_forloop:
+      pips_assert("We are really dealing with a for loop",
+		  instruction_forloop_p(statement_instruction(st)));
       controlized = controlize_forloop(st, instruction_forloop(i), 
 				       pred, succ, c_res, used_labels);
       break;
@@ -412,9 +419,13 @@ bool controlize(
     ifdebug(5) {
 	pips_debug(1, "st at exit:\n");
 	print_statement(st);
-	pips_debug(1, "Successors of c_res %p at exit:\n", c_res);
+	pips_debug(1, "Resulting Control c_res %p at exit:\n", c_res);
 	display_linked_control_nodes(c_res);
 	fprintf(stderr, "---\n");
+	if(!ENDP(statement_declarations(st))
+	   && ENDP(statement_declarations(control_statement(c_res)))) {
+	  pips_internal_error("Lost local declarations\n");
+	}
 	check_control_coherency(pred);
 	check_control_coherency(succ);
 	check_control_coherency(c_res);
@@ -571,8 +582,9 @@ hash_table used_labels;
 				      statement_number(st),
 				      STATEMENT_ORDERING_UNDEFINED,
 				      statement_comments(st),
-				      make_instruction(is_instruction_loop, 
-						       new_l),NIL,NULL),
+				      make_instruction(is_instruction_loop, new_l),
+				      statement_declarations(st),
+				      statement_decls_text(st)),
 		       ADD_PRED(pred, c_res),
 		       ADD_SUCC(succ, c_res )) ;
 	controlized = FALSE;
@@ -699,7 +711,9 @@ hash_table used_labels;
 				      STATEMENT_ORDERING_UNDEFINED,
 				      statement_comments(st),
 				      make_instruction(is_instruction_whileloop, 
-						       new_l),NIL,NULL),
+						       new_l),
+				      statement_declarations(st),
+				      statement_decls_text(st)),
 		       ADD_PRED(pred, c_res),
 		       ADD_SUCC(succ, c_res )) ;
 	controlized = FALSE;
@@ -1121,7 +1135,9 @@ hash_table used_labels;
 				  statement_number(st),
 				  STATEMENT_ORDERING_UNDEFINED,
 				  statement_comments(st),
-				  ni, NIL, NULL),
+				  ni, 
+				  statement_declarations(st),
+				  statement_decls_text(st)),
 		   ADD_PRED(pred, c_res),
 		   ADD_SUCC(succ, c_res )) ;
     controlized = FALSE;
@@ -1363,11 +1379,7 @@ control c_res;
 hash_table used_labels;
 {
     hash_table block_used_labels = hash_table_make(hash_string, 0);
-    control c_block = 
-	    (ENDP(sts)) ?
-		/* If the list is empty, return an empty block: */
-		    make_control(make_empty_statement(), NIL, NIL) :
-			    make_conditional_control(STATEMENT(CAR(sts)));
+    control c_block = control_undefined;
     control c_end = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
     control c_last = c_end;
     list ctls;
@@ -1379,6 +1391,24 @@ hash_table used_labels;
 	check_control_coherency(pred);
 	check_control_coherency(succ);
 	check_control_coherency(c_res);
+    }
+
+    if(ENDP(sts)) {
+      list d = gen_copy_seq(statement_declarations(st));
+      string dt
+	= (statement_decls_text(st)==NULL || string_undefined_p(statement_decls_text(st))) ? 
+	NULL
+	: strdup(statement_decls_text(st));
+      string ct = string_undefined_p(statement_comments(st))?
+	string_undefined /* Should be empty_comment() ? */
+	: strdup(statement_comments(st));
+
+      c_block = make_control(make_empty_statement_with_declarations_and_comments(d, dt, ct),
+			     NIL, NIL);
+    }
+    else {
+      /* What happens to the declarations and comments attached to st? */
+      c_block = make_conditional_control(STATEMENT(CAR(sts)));
     }
     
     ctls = controlize_list_1(sts, pred, c_end, c_block, block_used_labels);
@@ -1407,6 +1437,30 @@ hash_table used_labels;
 	    new_st = control_statement(c_block);
 	    control_statement(c_block) = statement_undefined;
 	    free_control(c_block);
+
+	    /* new_st must inherit the declarations of st, if not its comments! */
+	    if(ENDP(statement_declarations(new_st))) {
+	      statement_declarations(new_st) = gen_copy_seq(statement_declarations(st));
+	      if(statement_decls_text(st)!=NULL) {
+		statement_decls_text(new_st) = 
+		  string_undefined_p(statement_decls_text(st))? 
+		  string_undefined
+		  : strdup(statement_decls_text(st));
+	      }
+	    }
+	    else if(!ENDP(statement_declarations(st))) {
+	      /* Both new_st and st carry declarations */
+	      pips_assert("No variable is declared twice in st", gen_once_p(statement_declarations(st)));
+	      pips_assert("No variable is declared twice in new_st", gen_once_p(statement_declarations(new_st)));
+	      MAP(ENTITY, v, 
+	      {if(!gen_in_list_p(v, statement_declarations(new_st))) {
+		pips_debug(1, "Variable %s added to declarations of new_st\n", entity_name(v));
+		statement_declarations(new_st)
+		  = CONS(ENTITY, v, statement_declarations(new_st));}},
+		  statement_declarations(st));
+	      pips_assert("No variable is declared twice in resulting new_st", gen_once_p(statement_declarations(new_st)));
+	      /* pips_internal_error("Declaration conflict in controlizer\n"); */
+	    }
 	}
 	else {
 	    /* The control is kept in an unstructured: */
@@ -1422,7 +1476,9 @@ hash_table used_labels;
 				    statement_number(st),
 				    STATEMENT_ORDERING_UNDEFINED,
 				    statement_comments(st),
-				    i,NIL,NULL);
+				    i,
+				    statement_declarations(st),
+				    statement_decls_text(st));
 	}
 	/* Not a good idea from mine to add this free... RK
 	   free_statement(control_statement(c_res)); */
@@ -1519,8 +1575,9 @@ hash_table used_labels;
 				  statement_number(st),
 				  STATEMENT_ORDERING_UNDEFINED,
 				  statement_comments(st),
-				  make_instruction(is_instruction_test, 
-						   it),NIL,NULL),
+				  make_instruction(is_instruction_test, it),
+				  statement_declarations(st),
+				  statement_decls_text(st)),
 		   ADD_PRED(pred, c_res),
 		   CONS(CONTROL, succ, NIL));
     control_predecessors(succ) = ADD_PRED(c_res, succ);

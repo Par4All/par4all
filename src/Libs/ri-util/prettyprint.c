@@ -2232,7 +2232,7 @@ init_text_statement(
 	      (! get_bool_property("PRETTYPRINT_BLOCKS")))) {
 
 	    if (so != STATEMENT_ORDERING_UNDEFINED) {
-		sprintf(buffer, "C (%d,%d)\n", 
+	      sprintf(buffer, "%s (%d,%d)\n", PIPS_COMMENT_SENTINEL,
 			ORDERING_NUMBER(so), ORDERING_STATEMENT(so)) ;
 		ADD_SENTENCE_TO_TEXT(r, 
 				     make_sentence(is_sentence_formatted, 

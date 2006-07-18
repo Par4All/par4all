@@ -77,6 +77,11 @@ prettyprint_dependence_graph(FILE * fd,
     int dl = -1;
     debug_on("RICEDG_DEBUG_LEVEL");
 
+    ifdebug(8) {
+      /* There is no guarantee that the ordering_to_statement() hash table is the proper one */
+      print_ordering_to_statement();
+    }
+
     if(sru_format_p && !statement_undefined_p(mod_stat)) {
 	/* compute line numbers for statements */
 	s_to_l = statement_to_line_number(mod_stat);
@@ -104,8 +109,10 @@ prettyprint_dependence_graph(FILE * fd,
 
 	    if(!sru_format_p || statement_undefined_p(mod_stat)) {
 		/* factorize line numbers */
-		fprintf(fd, "\t%02d --> %02d with conflicts\n", 
-			statement_number(s1), statement_number(s2));
+		fprintf(fd, "\t%s -->", 
+			statement_identification(s1));
+		fprintf(fd, " %s with conflicts\n", 
+			statement_identification(s2));
 	    }
 
 	    for (pc = dg_arc_label_conflicts(dal); !ENDP(pc); pc = CDR(pc)) {

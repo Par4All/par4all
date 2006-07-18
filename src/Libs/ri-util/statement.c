@@ -519,8 +519,18 @@ instruction i;
 
 /* functions to generate statements */
 
-statement 
-make_empty_statement()
+statement make_empty_statement_with_declarations_and_comments(list d, string dt, string c)
+{
+    return(make_statement(entity_empty_label(), 
+			  STATEMENT_NUMBER_UNDEFINED,
+			  STATEMENT_ORDERING_UNDEFINED, 
+			  c,
+			  make_instruction_block(NIL),
+			  d,
+			  dt));
+}
+
+statement make_empty_statement()
 {
     return(make_statement(entity_empty_label(), 
 			  STATEMENT_NUMBER_UNDEFINED,
@@ -788,7 +798,7 @@ string c; /* comments, default empty_comments (was: "" (was: string_undefined)) 
 				       make_call(called_function,args)),NIL,NULL);
 
   ifdebug(8) {
-    pips_debug(8, "cs is\n");
+    pips_debug(8, "cs is call to %s\n", function_name);
     safe_print_statement(cs);
   }
 
@@ -1374,8 +1384,10 @@ instruction_identification(instruction i)
     return instrstring;
 }
 
-/* Does not work neither undefined statements nor for defined statements
-   with undefined instructions */
+/* Does work neither with undefined statements nor with defined
+   statements with undefined instructions. Returns a statement
+   identity, its number and the breakdown of its ordering, as well as
+   information about the instruction. */
 
 string 
 statement_identification(statement s)

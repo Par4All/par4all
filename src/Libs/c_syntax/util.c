@@ -11,9 +11,11 @@
 #include "ri.h"
 #include "ri-util.h"
 #include "c_parser_private.h"
+#include "parser_private.h" /* FI: for syntax.h */
 
 #include "c_syntax.h"
- 
+#include "syntax.h" /* FI: To dump the symbol table. Should be moved in ri-util? */
+
 #include "cyacc.h"
 
 #include "resources.h"
@@ -23,6 +25,7 @@
 #include "misc.h"
 #include "pipsdbm.h"
 #include "transformations.h"
+#include "properties.h"
 
 extern string compilation_unit_name;
 extern hash_table keyword_typedef_table;
@@ -56,11 +59,13 @@ void init_c_areas()
   entity_type(DynamicArea) = make_type(is_type_area, make_area(0, NIL));
   entity_storage(DynamicArea) = make_storage_rom();
   entity_initial(DynamicArea) = make_value_unknown();
-  
+  AddEntityToDeclarations(DynamicArea, get_current_module_entity());
+
   StaticArea = FindOrCreateEntity(get_current_module_name(), STATIC_AREA_LOCAL_NAME);
   entity_type(StaticArea) = make_type(is_type_area, make_area(0, NIL));
   entity_storage(StaticArea) = make_storage_rom();
   entity_initial(StaticArea) = make_value_unknown();
+  AddEntityToDeclarations(StaticArea, get_current_module_entity());
 }
 
 
@@ -89,7 +94,9 @@ void MakeCurrentCompilationUnitEntity(string name)
 
 void ResetCurrentCompilationUnitEntity()
 {
-  pips_debug(4,"Reset current module entity for compilation unit %s\n",get_current_module_name());
+  if (get_bool_property("PARSER_DUMP_SYMBOL_TABLE"))
+    fprint_environment(stderr, get_current_module_entity());
+   pips_debug(4,"Reset current module entity for compilation unit %s\n",get_current_module_name());
   reset_current_module_entity();
 }
 
@@ -943,12 +950,22 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
 	  int offset = basic_int((basic) stack_head(OffsetStack));
 	  pips_debug(3,"Create formal variable %s for function %s with offset %d\n",
 		     entity_name(e),entity_name(function),offset);
-	  AddToDeclarations(e,function);
+	  if(!value_intrinsic_p(entity_initial(function))) {
+	    /* FI: Intrinsic do not have formal named parameters in PIPS
+	       RI, however such parameters can be named in intrinsic
+	       declarations. Problem with Validation/C_syntax/memcof.c */
+	    AddToDeclarations(e,function);
+	  }
 	  entity_storage(e) = make_storage_formal(make_formal(function,offset));
 	}
       else
 	{
-	  entity_storage(e) = MakeStorageRam(e,is_external,c_parser_context_static(context));
+	  if(type_variable_p(entity_type(e)))
+	    entity_storage(e) = MakeStorageRam(e,is_external,c_parser_context_static(context));
+	  else if (type_functional_p(entity_type(e)))
+	    entity_storage(e) = MakeStorageRom();
+	  else
+	    pips_assert("not implemented yet", FALSE);
 	}
     }
    
@@ -1025,8 +1042,9 @@ void AddToDeclarations(entity e, entity mod)
   if (!gen_in_list_p(e,code_declarations(value_code(entity_initial(mod)))))
     {
       pips_debug(5,"Add entity %s to module %s\n",entity_user_name(e),entity_user_name(mod));
-      code_declarations(value_code(entity_initial(mod))) = gen_nconc(code_declarations(value_code(entity_initial(mod))),
-								     CONS(ENTITY,e,NIL));
+      code_declarations(value_code(entity_initial(mod)))
+	= gen_nconc(code_declarations(value_code(entity_initial(mod))),
+		    CONS(ENTITY,e,NIL));
     }
 }
 /************************* STRUCT/UNION ENTITY*********************/
@@ -1116,7 +1134,10 @@ entity MakeDerivedEntity(string name, list members, bool is_external, int i)
 
 storage MakeStorageRam(entity e, bool is_external, bool is_static)
 {
-  ram r; 
+  ram r = ram_undefined; 
+
+  pips_assert("RAM Storage is used only for variables", type_variable_p(entity_type(e)));
+
   if (is_external)
     {
       if (is_static)
@@ -1232,7 +1253,6 @@ value MakeEnumeratorInitialValue(list enum_list, int counter)
   return v;
 }
 
-
 int ComputeAreaOffset(entity a, entity v)
 {
   type ta = entity_type(a);
@@ -1241,9 +1261,16 @@ int ComputeAreaOffset(entity a, entity v)
   
   /* Update the size and layout of the area aa. 
      This function is called too earlier, we may not have the size of v.
-     To be changed !!!*/
+     To be changed !!!
 
-  area_size(aa) = offset + 0;
+     FI: who wrote this? when should the offsets be computed? how do we deal with
+     scoping?
+  */
+
+  pips_assert("Type is correctly defined", CSafeSizeOfArray(v)!=0);
+
+  /* area_size(aa) = offset + 0; */
+  area_size(aa) = offset + CSafeSizeOfArray(v);
   area_layout(aa) = gen_nconc(area_layout(aa), CONS(ENTITY, v, NIL));
   return offset;
 }

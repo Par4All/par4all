@@ -15,8 +15,18 @@
 
 extern value EvalExpression();
 
-/* this function computes the total size of a variable, ie. the product of
-the number of elements and the size of each element. */
+/* This function computes the total size of a variable, ie. the product of
+the number of elements and the size of each element, when it is a constant. 
+
+Arrays cannot be sized by a variable according to Fortran 77 standard,
+unless they are formal parameters (see SafeSizeOfArray).
+
+Arrays can be sized by expressions according to C latest standard (see
+Validation/C_syntax/array_declarators.c). Then their sizes are not
+available at compile time and their addresses in stack cannot be
+computed (see CSafeSizeOfArray).
+
+*/
 
 bool
 SizeOfArray(entity e, int * s)
@@ -31,7 +41,7 @@ SizeOfArray(entity e, int * s)
 
 	se = SizeOfElements(variable_basic(a));
 	ok = NumberOfElements(variable_dimensions(a), &ne);
-	* s = ne * se;
+	* s = ok? ne * se : se;
 
 	return ok;
 }
@@ -70,13 +80,61 @@ ValueSizeOfArray(entity e)
 /* Lines between BEGIN_EOLE and END_EOLE tags are automatically included
    in the EOLE project (JZ - 11/98) */
 
-/* this function returns the length in bytes of the fortran type
+int CSafeSizeOfArray(entity a)
+{
+  int s;
+
+  if(!SizeOfArray(a, &s)) {
+      pips_user_warning("Varying size for array \"%s\"\n", entity_name(a));
+      /* should be a pips_user_error() to avoid useless and dangerous
+	 results */
+      pips_user_warning("Not yet supported properly by PIPS");
+  }
+
+  return s;
+}
+
+int entity_memory_size(entity dt)
+{
+  /* dt is assumed to be a derived type: struct, union, and maybe enum */
+  type t = entity_type(dt);
+  int s = 0;
+
+  switch(type_tag(t)) {
+  case is_type_statement:
+  case is_type_area:
+  case is_type_functional:
+  case is_type_varargs:
+  case is_type_unknown:
+  case is_type_void:
+    pips_internal_error("arg. with ill. tag %d\n", type_tag(t));
+    break;
+  case is_type_variable:
+    /* Seems to be the case for defined types; FI: why are they
+       allocated in RAM while they only exist at compile time ? */
+    s = SizeOfElements(type_variable(t));
+    break;
+  case is_type_struct:
+    MAP(ENTITY, v, {s+=CSafeSizeOfArray(v);}, type_struct(t));
+    break;
+  case is_type_union:
+    MAP(ENTITY, v, {s = s>CSafeSizeOfArray(v)? s : CSafeSizeOfArray(v);}, type_union(t));
+    break;
+  case is_type_enum:
+    s = 4; /* How is it implemented? 32 bit integer? */
+    break;
+  default:
+    pips_internal_error("arg. with unknown tag %d\n", type_tag(t));
+    break;
+  }
+  return s;
+}
+
+/* this function returns the length in bytes of the fortran or C type
 represented by a basic, except for a varying size string (formal
 parameter). */
 
-int 
-SizeOfElements(b)
-basic b;
+int SizeOfElements(basic b)
 {
   int e = -1;
 
@@ -114,6 +172,19 @@ basic b;
 		 "Sizing of character variable by non-integer constant");
     break;
   }
+  case is_basic_bit:
+    /* Check meaning...*/
+    e = basic_bit(b);
+    break;
+  case is_basic_pointer:
+    e = basic_pointer(b);
+    break;
+  case is_basic_derived:
+    e = entity_memory_size(basic_derived(b));
+    break;
+  case is_basic_typedef:
+    e = CSafeSizeOfArray(basic_typedef(b));
+    break;
   default:
     pips_error("SizeOfElements", "Ill. tag %d for basic", basic_tag(b));
   }

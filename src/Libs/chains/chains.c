@@ -908,7 +908,7 @@ control ct ;
     }
 }
 
-/* PUSHNEW_CONFLICTS adds the conflict FIN->FOUT in the list CS (if it's
+/* PUSHNEW_CONFLICT adds the conflict FIN->FOUT in the list CS (if it's
    not already there. */
 
 static cons *pushnew_conflict( fin, fout, cfs )
@@ -981,9 +981,11 @@ bool (*which)() ;
     }
 
     ifdebug(2) {
-	fprintf( stderr, "Conflicts %d(%p) -> %d(%p) %s\n",
-		statement_number( stin ), stin,
-		statement_number( stout ), stout,
+      int stin_o = statement_ordering(stin);
+      int stout_o = statement_ordering(stout);
+	fprintf( stderr, "Conflicts %d (%d,%d) (%p) -> %d (%d,%d) (%p) %s\n",
+		statement_number(stin), ORDERING_NUMBER(stin_o), ORDERING_STATEMENT(stin_o), stin,
+		statement_number(stout), ORDERING_NUMBER(stout_o), ORDERING_STATEMENT(stout_o), stout,
 		(which == ud) ? "ud" : "dd_du" ) ;
     }
     vin = vertex_statement( stin ) ;
@@ -1183,8 +1185,10 @@ chains(char *module_name, int use)
 	mem_spy_begin();
     }
 
-    ifdebug(2)
-	prettyprint_dependence_graph(stderr, module_stat, module_graph);
+    ifdebug(2) {
+      initialize_ordering_to_statement(module_stat);
+      prettyprint_dependence_graph(stderr, module_stat, module_graph);
+    }
 
     debug_off();
 

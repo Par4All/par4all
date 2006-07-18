@@ -137,6 +137,10 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
     
     debug_on("C_SYNTAX_DEBUG_LEVEL");
  
+    /* FI: not clean, but useful for debugging statement */
+    ifdebug(1)
+      is_fortran = FALSE;
+
     if (compilation_unit_p(module_name))
       {
 	/* Special case, set the compilation unit as the current module */
@@ -158,6 +162,8 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
 	print_statement(ModuleStatement);
 	pips_debug(2,"and declarations: ");
 	print_entities(statement_declarations(ModuleStatement));
+	pips_assert("Variables are declared once",
+		    gen_once_p(statement_declarations(ModuleStatement)));
 	printf("\nList of callees:\n");
 	MAP(STRING,s,
 	{

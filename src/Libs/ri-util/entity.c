@@ -988,6 +988,7 @@ bool static_module_name_p(string name)
 {
   /* An entity is a static module if its name contains the FILE_SEP_STRING
      but the last one is not the last character of the name string */
+  /* FI: I doubt this is true. Maybe if you're sure name is the name of a module? */
   return (!compilation_unit_p(name) && strstr(name, FILE_SEP_STRING) != NULL);
 }
 

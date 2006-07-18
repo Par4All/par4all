@@ -1979,7 +1979,8 @@ text c_text_entity(entity module, entity e, int margin)
   if (strstr(entity_name(e),TYPEDEF_PREFIX) != NULL)
     pc = CHAIN_SWORD(pc,"typedef ");
  
-  if (storage_ram_p(s) && static_area_p(ram_section(storage_ram(s))))
+  if (storage_ram_p(s) && static_area_p(ram_section(storage_ram(s)))
+      || (entity_module_p(e) && static_module_p(e)))
     pc = CHAIN_SWORD(pc,"static ");
 
   /* This part is for type specifiers, type qualifiers, function specifiers and declarator

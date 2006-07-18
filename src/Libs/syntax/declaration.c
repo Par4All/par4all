@@ -1697,6 +1697,7 @@ entity m;
 	       module_local_name(m));
 }
 
+/* This function is called from c_parse() via ResetCurrentModule() and fprint_environment() */
 void 
 print_common_layout(FILE * fd, entity c, bool debug_p)
 {
@@ -1716,7 +1717,7 @@ print_common_layout(FILE * fd, entity c, bool debug_p)
     }
     else {
 	if(area_size(type_area(entity_type(c)))==0
-	   && common_to_size(c)==0
+	   && (common_size_map == hash_table_undefined || common_to_size(c)==0)
 	   && !heap_area_p(c)
 	   && !stack_area_p(c)) {
 	    if(debug_p) {
@@ -1981,6 +1982,10 @@ fprint_functional(FILE * fd, functional f)
     (void) fprintf(fd, " %s\n", basic_to_string(variable_basic(type_variable(tr))));
   else if(type_void_p(tr))
     (void) fprintf(fd, " %s\n", type_to_string(tr));
+  else if(type_unknown_p(tr)){
+    /* Well, seems to occur for C compilation units, instead of void... */
+    (void) fprintf(fd, " %s\n", type_to_string(tr));
+  }
   else if(type_varargs_p(tr)) {
     (void) fprintf(fd, " %s:%s", type_to_string(tr),
 		   basic_to_string(variable_basic(type_variable(type_varargs(tr)))));
