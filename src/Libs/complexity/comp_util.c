@@ -469,7 +469,7 @@ void init_cost_table()
 
     if (!cost_dir) /* the default value */
 	cost_dir = strdup(concatenate(getenv("PIPS_ROOT"),
-				      "/Share/complexity_cost_tables", NULL));
+				      "/etc/complexity_cost_tables", NULL));
     else
 	cost_dir = strdup(cost_dir);
 
