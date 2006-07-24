@@ -278,7 +278,12 @@ file: globals
 			  list dl = $1;
 
 			  if (dl != NIL) {
-			    pips_assert("Each variable is declared once", gen_once_p(dl));
+			    if(!compilation_unit_p(get_current_module_name())) {
+			      pips_assert("Each variable is declared once", gen_once_p(dl));
+			      pips_internal_error("Compilation unit rule used for non"
+						  " compilation unit %s\n",
+						  get_current_module_name());
+			    }
 			    ModuleStatement = make_statement(entity_empty_label(), 
 							     STATEMENT_NUMBER_UNDEFINED, 
 							     STATEMENT_ORDERING_UNDEFINED, 
@@ -298,7 +303,9 @@ globals:
 			     should have been detected earlier. I
 			     would expect $1 and $2 rather than $2 and
 			     $3. */
-			  pips_assert("Each variable is declared once", gen_once_p($3));
+			  if(!compilation_unit_p(get_current_module_name())) {
+			    pips_assert("Each variable is declared once", gen_once_p($3));
+			  }
 			  ifdebug(8) {
 			    fprintf(stderr, "New variables $2 (%p) are declared\n", $2);
 			    print_entities($2);
@@ -323,16 +330,19 @@ globals:
 			  $$ = gen_nconc($2, $3);
 
 			  ifdebug(8) {
-			  fprintf(stderr, "*******Updated $$ declarations (%p) are: \n", $$);
-			  fprintf(stderr, "\n");
-			  if(ENDP($$))
-			    fprintf(stderr, "Empty list\n");
-			  else
-			    print_entities($$);
+			    fprintf(stderr, "*******Updated $$ declarations (%p) are: \n", $$);
+			    fprintf(stderr, "\n");
+			    if(ENDP($$))
+			      fprintf(stderr, "Empty list\n");
+			    else
+			      print_entities($$);
 			    fprintf(stderr, "\n");
 			  }
 
-			  pips_assert("Each variable is declared once", gen_once_p($$));
+			  if(!compilation_unit_p(get_current_module_name())) {
+			    pips_assert("Each variable is declared once", gen_once_p($$));
+			    ResetCurrentModule();
+			  }
 			}            
 |   TK_SEMICOLON globals
                         { 
@@ -771,7 +781,15 @@ one_string:
 ;    
 
 init_expression:
-    expression          { }
+    expression          { 
+                          expression ie = $1;
+			  ifdebug(8) {
+			    fprintf(stderr, "Initialization expression: ");
+			    print_expression(ie);
+			    fprintf(stderr, "\n");
+			  }
+			  $$ = ie;
+                        }
 |   TK_LBRACE initializer_list_opt TK_RBRACE
 			{
 			  /* Deduce the size of an array by its initialization ?*/
@@ -1098,13 +1116,47 @@ init_declarator:                             /* ISO 6.7 */
                         }
 |   declarator TK_EQ init_expression
                         { 
-			  /* Put init_expression in the initial value of entity declarator*/
-			  if(!value_undefined_p(entity_initial($1))){
-			    pips_user_warning("double definition of initial"
-					      " value for variable %s\n", entity_name($1));
-			    pips_internal_error("Scoping not implemented yet\n");
+			  entity v = $1;
+			  expression nie = $3;
+			  value oiv = entity_initial(v);
+
+			  if(expression_undefined_p(nie)) {
+			    /* Do nothing, leave the initial field of entity as it is. */
+			    pips_user_warning("Undefined init_expression, why not use value_unknown?\n");
 			  }
-			  entity_initial($1) = make_value_expression($3);
+			  else {
+
+			    /* Put init_expression in the initial value of entity declarator*/
+			    if(!value_undefined_p(oiv)){
+			      if(value_unknown_p(oiv)) {
+				free_value(oiv);
+			      }
+			      else {
+				if(compilation_unit_p(get_current_module_name())) {
+				  /* The compilation unit has already
+				     been scanned once for
+				     declarations. Double definitions
+				     are no surprise...*/
+				  ;
+				}
+				else {
+				  pips_user_warning("double definition of initial"
+						    " value for variable %s\n", entity_name(v));
+				  fprintf(stderr, "New initial value expression:\n");
+				  print_expression(nie);
+				  fprintf(stderr, "Current initial value:\n");
+				  if(value_expression_p(oiv)) {
+				    print_expression(value_expression(oiv));
+				  }
+				  else {
+				    fprintf(stderr, "Value tag: %d\n", value_tag(entity_initial(v)));
+				  }
+				  pips_internal_error("Scoping not implemented yet, might be the reason\n");
+				}
+			      }
+			    }
+			    entity_initial(v) = make_value_expression(nie);
+			  }
 			}
 ;
 
@@ -1424,8 +1476,10 @@ struct_decl_list: /* (* ISO 6.7.2. Except that we allow empty structs. We
 			  entity_storage(ent) = make_storage_rom();
 			  entity_type(ent) = c_parser_context_type(context); 
 
-			  /* Temporally put the list of struct/union entities defined in $1 to 
-			     initial value of ent*/
+			  /* Temporally put the list of struct/union
+			     entities defined in $1 to initial value
+			     of ent. FI: where is it retrieved? in
+			     TakeDeriveEntities()? */
 			  entity_initial(ent) = (value) $1;
 
 			  $$ = CONS(ENTITY,ent,$3); 
@@ -1878,7 +1932,7 @@ function_def:  /* (* ISO 6.9.1 *) */
 			  ModuleStatement = $3;
 			  pips_assert("Module statement is consistent",statement_consistent_p(ModuleStatement));
 			  pips_assert("Module declarations are unique", gen_once_p(statement_declarations(ModuleStatement)));
-			  ResetCurrentModule(); 
+			  /* Let's delay this? ResetCurrentModule(); */
 			  is_external = TRUE;
 			}	
 

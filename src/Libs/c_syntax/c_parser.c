@@ -105,7 +105,15 @@ extern void c_parse();
 void CParserError(char *msg)
 {
   /* Reset the parser global variables ?*/
-  pips_user_error(msg);
+  pips_debug(4,"Reset current module entity %s\n",get_current_module_name());
+  reset_current_module_entity();
+  stack_free(&SwitchGotoStack);
+  stack_free(&SwitchControllerStack);
+  stack_free(&LoopStack);
+  stack_free(&BlockStack);  
+  pips_user_warning(msg);
+  pips_internal_error("Recovery from C parser failure not implemented yet.\n");
+  /* pips_user_error(msg); */
 }
 
 static bool actual_c_parser(string module_name, string dbr_file, bool is_compilation_unit_parser)
@@ -162,8 +170,9 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
 	print_statement(ModuleStatement);
 	pips_debug(2,"and declarations: ");
 	print_entities(statement_declarations(ModuleStatement));
-	pips_assert("Variables are declared once",
-		    gen_once_p(statement_declarations(ModuleStatement)));
+	if(!compilation_unit_p(module_name))
+	  pips_assert("Variables are declared once",
+		      gen_once_p(statement_declarations(ModuleStatement)));
 	printf("\nList of callees:\n");
 	MAP(STRING,s,
 	{
@@ -205,6 +214,8 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
 
 bool c_parser(string module_name)
 {
+  /* When the compilation_unit is parsed, it is parsed a second time
+     and multiple declarations are certain to happen. */
   return actual_c_parser(module_name,DBR_C_SOURCE_FILE,FALSE);
 }
 

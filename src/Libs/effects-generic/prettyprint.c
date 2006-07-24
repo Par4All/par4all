@@ -366,22 +366,29 @@ list /* of string */ effect_words_reference(reference obj)
     begin_attachment = STRING(CAR(pc));
 
     if (reference_indices(obj) != NIL) {
-	pc = CHAIN_SWORD(pc,"(");
+      string beg = is_fortran? "(" : "[";
+      string mid = is_fortran? "," : "][";
+      string end = is_fortran? ")" : "]";
+
+	pc = CHAIN_SWORD(pc,beg);
 	MAPL(pi, {
 	    pc = gen_nconc(pc, words_expression(EXPRESSION(CAR(pi))));
 	    if (CDR(pi) != NIL)
-		pc = CHAIN_SWORD(pc,",");
+		pc = CHAIN_SWORD(pc,mid);
 	}, reference_indices(obj));
-	pc = CHAIN_SWORD(pc,")");
+	pc = CHAIN_SWORD(pc,end);
     }
     else {
+      string beg = is_fortran? "(*" : "[*";
+      string mid = is_fortran? ",*" : "][*";
+      string end = is_fortran? ")" : "]";
 	int d;
 	if( (d=variable_entity_dimension(reference_variable(obj))) != 0) {
 	    int i;
-	    pc = CHAIN_SWORD(pc,"(*");
+	    pc = CHAIN_SWORD(pc,beg);
 	    for(i = 1; i < d; i++)
-		pc = CHAIN_SWORD(pc,",*");
-	    pc = CHAIN_SWORD(pc,")");
+		pc = CHAIN_SWORD(pc,mid);
+	    pc = CHAIN_SWORD(pc,end);
 	}
     }
     attach_reference_to_word_list(begin_attachment, STRING(CAR(gen_last(pc))),

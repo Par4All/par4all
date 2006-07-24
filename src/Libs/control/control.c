@@ -347,7 +347,7 @@ bool controlize(
 	/* If st carries local declarations, so should the statement associated to c_res. */
 	if(!ENDP(statement_declarations(st))
 	   && ENDP(statement_declarations(control_statement(c_res)))) {
-	  pips_internal_error("Lost local declarations\n");
+	  pips_user_warning("Some local declarations may have been lost\n");
 	}
 	break;
     }
@@ -1450,15 +1450,25 @@ hash_table used_labels;
 	    }
 	    else if(!ENDP(statement_declarations(st))) {
 	      /* Both new_st and st carry declarations */
-	      pips_assert("No variable is declared twice in st", gen_once_p(statement_declarations(st)));
-	      pips_assert("No variable is declared twice in new_st", gen_once_p(statement_declarations(new_st)));
+	      if(!compilation_unit_p(get_current_module_name())) {
+		/* The compilation unit statement does not require any
+		   controlizer action, but its duplication. However,
+		   globals are often declared twice. */
+		pips_assert("No variable is declared twice in st",
+			    gen_once_p(statement_declarations(st)));
+		pips_assert("No variable is declared twice in new_st",
+			    gen_once_p(statement_declarations(new_st)));
+	      }
 	      MAP(ENTITY, v, 
 	      {if(!gen_in_list_p(v, statement_declarations(new_st))) {
 		pips_debug(1, "Variable %s added to declarations of new_st\n", entity_name(v));
 		statement_declarations(new_st)
 		  = CONS(ENTITY, v, statement_declarations(new_st));}},
 		  statement_declarations(st));
-	      pips_assert("No variable is declared twice in resulting new_st", gen_once_p(statement_declarations(new_st)));
+	      if(!compilation_unit_p(get_current_module_name())) {
+		pips_assert("No variable is declared twice in resulting new_st",
+			    gen_once_p(statement_declarations(new_st)));
+	      }
 	      /* pips_internal_error("Declaration conflict in controlizer\n"); */
 	    }
 	}

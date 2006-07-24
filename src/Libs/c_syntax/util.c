@@ -570,6 +570,7 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
       return ent;
     }
   pips_user_warning("Cannot find entity %s\n",name);
+  CParserError("Variable appears to be undefined\n");
   return entity_undefined;
 }
 

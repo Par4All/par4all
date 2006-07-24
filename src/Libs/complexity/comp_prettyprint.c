@@ -71,6 +71,8 @@ statement stat;
 	stat_comp = load_statement_complexity(stat);
 
     if(stat_comp != (complexity) HASH_UNDEFINED_VALUE) {
+      string it = string_undefined;
+
 	complexity_check_and_warn("text_complexity", stat_comp);
 	pc = CHAIN_SWORD(NIL, complexity_sprint(stat_comp, print_stats_p,
 						PRINT_LOCAL_NAMES));
@@ -80,17 +82,19 @@ statement stat;
 	if (nblanks<1) 
 	    nblanks = 1;
 	if ( instruction_block_p(ins) )
-	    sprintf(s, "C    %*s%s (BLOCK)\n", nblanks, "", r);
+	  it = "(BLOCK)";
 	else if ( instruction_test_p(ins) )
-	    sprintf(s, "C    %*s%s (TEST) \n", nblanks, "", r);
+	  it = "(TEST)";
 	else if ( instruction_loop_p(ins) )
-	    sprintf(s, "C    %*s%s (DO)   \n", nblanks, "", r);
+	  it = "(DO)";
 	else if ( instruction_call_p(ins) )
-	    sprintf(s, "C    %*s%s (STMT) \n", nblanks, "", r);
+	  it = "(STMT)";
 	else if ( instruction_unstructured_p(ins) )
-	    sprintf(s, "C    %*s%s (UNSTR)\n", nblanks, "", r);
+	  it = "(UNSTR)";
 	else
 	    pips_error("text_complexity", "Never occur!");
+
+	sprintf(s, "%s    %*s%s %s\n", PIPS_COMMENT_SENTINEL, nblanks, "", r, it);
 
 	pips_assert("text_complexity", strlen(s) < TEXT_COMPLEXITY_BUFFER_SIZE);
 
