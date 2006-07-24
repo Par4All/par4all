@@ -68,6 +68,8 @@ words_value(value obj)
     return(pc);
 }
 
+#define LIST_SEPARATOR (is_fortran? ", " : ",")
+
 static list 
 words_parameters(entity e)
 {
@@ -84,7 +86,7 @@ words_parameters(entity e)
   for (i = 1; i <= nparams; i++) {
     entity param = find_ith_parameter(e, i);
     if (pc != NIL) {
-      pc = CHAIN_SWORD(pc, ",");
+      pc = CHAIN_SWORD(pc, LIST_SEPARATOR);
     }
 
     /* If prettyprint alternate returns... Property to be added. */
@@ -182,7 +184,7 @@ words_declaration(
 		    MAPL(pd, 
 		    {
 		      pl = gen_nconc(pl, words_dimension(DIMENSION(CAR(pd))));
-		      if (CDR(pd) != NIL) pl = CHAIN_SWORD(pl, ",");
+		      if (CDR(pd) != NIL) pl = CHAIN_SWORD(pl, LIST_SEPARATOR);
 		    }, dims);
 		    pl = CHAIN_SWORD(pl, ")");
 		  }
@@ -495,7 +497,7 @@ sentence_area(entity e, entity module, bool pp_dimensions)
 	    
 	    MAP(ENTITY, ee, 
 	     {
-		 if (comma) pc = CHAIN_SWORD(pc, ",");
+		 if (comma) pc = CHAIN_SWORD(pc, LIST_SEPARATOR);
 		 else comma = TRUE;
 		 pc = gen_nconc(pc, 
 			words_declaration(ee, !is_save && pp_dimensions));
@@ -847,11 +849,11 @@ text_equivalence_class(
 	    pips_debug(EQUIV_DEBUG, "easiest case: offsets are the same\n");
 
 	    if (first) lw = CHAIN_SWORD(lw, "EQUIVALENCE"), first = FALSE;
-	    else lw = CHAIN_SWORD(lw, ",");
+	    else lw = CHAIN_SWORD(lw, LIST_SEPARATOR);
 
 	    lw = CHAIN_SWORD(lw, " (");
 	    lw = CHAIN_SWORD(lw, entity_local_name(ent1));
-	    lw = CHAIN_SWORD(lw, ",");
+	    lw = CHAIN_SWORD(lw, LIST_SEPARATOR);
 	    lw = CHAIN_SWORD(lw, entity_local_name(ent2));
 	    lw = CHAIN_SWORD(lw, ")");		
 	    POP(l2);
@@ -902,7 +904,7 @@ text_equivalence_class(
 			   offset, dim_max,size_elt_1);
 		
 		if (first) lw = CHAIN_SWORD(lw, "EQUIVALENCE"), first = FALSE;
-		else lw = CHAIN_SWORD(lw, ",");
+		else lw = CHAIN_SWORD(lw, LIST_SEPARATOR);
 
 		lw = CHAIN_SWORD(lw, " (");
 		lw = CHAIN_SWORD(lw, entity_local_name(ent1));
@@ -939,7 +941,7 @@ text_equivalence_class(
 		    sprintf(buffer+strlen(buffer), "%d", new_decl);		 
 		    lw = CHAIN_SWORD(lw,strdup(buffer));			
 		    if (current_dim < dim_max)
-			lw = CHAIN_SWORD(lw, ",");
+			lw = CHAIN_SWORD(lw, LIST_SEPARATOR);
 		    
 		    POP(l_tmp);
 		    current_dim++;
@@ -947,7 +949,7 @@ text_equivalence_class(
 		} /* while */
 		
 		lw = CHAIN_SWORD(lw, ")");	
-		lw = CHAIN_SWORD(lw, ",");
+		lw = CHAIN_SWORD(lw, LIST_SEPARATOR);
 		lw = CHAIN_SWORD(lw, entity_local_name(ent2));
 		lw = CHAIN_SWORD(lw, ")");	
 		POP(l2);
@@ -1403,7 +1405,7 @@ text_entity_declaration(
 		
 		  default: pips_internal_error("Unexpected integer size");
 		  }
-		*ppi = CHAIN_SWORD(*ppi, *ppi==NIL ? s : ",");
+		*ppi = CHAIN_SWORD(*ppi, *ppi==NIL ? s : ", ");
 		*ppi = gen_nconc(*ppi, words_declaration(e, pp_dim)); 
 	      }
 	    else
@@ -1426,7 +1428,7 @@ text_entity_declaration(
 		    break;
 		  default: pips_internal_error("Unexpected integer size");
 		  }
-		*pph = CHAIN_SWORD(*pph, *pph==NIL ? s : ",");
+		*pph = CHAIN_SWORD(*pph, *pph==NIL ? s : LIST_SEPARATOR);
 		*pph = gen_nconc(*pph, words_declaration(e, pp_dim)); 
 	      }
 	    break;
@@ -1435,12 +1437,12 @@ text_entity_declaration(
 	    switch (basic_float(b))
 	      {
 	      case 4:
-		pf4 = CHAIN_SWORD(pf4, pf4==NIL ? "REAL*4 " : ",");
+		pf4 = CHAIN_SWORD(pf4, pf4==NIL ? "REAL*4 " : LIST_SEPARATOR);
 		pf4 = gen_nconc(pf4, words_declaration(e, pp_dim));
 		break;
 	      case 8:
 	      default:
-		pf8 = CHAIN_SWORD(pf8, pf8==NIL ? "REAL*8 " : ",");
+		pf8 = CHAIN_SWORD(pf8, pf8==NIL ? "REAL*8 " : LIST_SEPARATOR);
 		pf8 = gen_nconc(pf8, words_declaration(e, pp_dim));
 		break;
 	      }
@@ -1450,19 +1452,19 @@ text_entity_declaration(
 	    switch (basic_complex(b))
 	      {
 	      case 8:
-		pc8 = CHAIN_SWORD(pc8, pc8==NIL ? "COMPLEX*8 " : ",");
+		pc8 = CHAIN_SWORD(pc8, pc8==NIL ? "COMPLEX*8 " : LIST_SEPARATOR);
 		pc8 = gen_nconc(pc8, words_declaration(e, pp_dim));
 		break;
 	      case 16:
 	      default:
-		pc16 = CHAIN_SWORD(pc16, pc16==NIL ? "COMPLEX*16 " : ",");
+		pc16 = CHAIN_SWORD(pc16, pc16==NIL ? "COMPLEX*16 " : LIST_SEPARATOR);
 		pc16 = gen_nconc(pc16, words_declaration(e, pp_dim));
 		break;
 	      }
 	    break;
 	  case is_basic_logical:
 	    pips_debug(7, "is a logical\n");
-	    pl = CHAIN_SWORD(pl, pl==NIL ? "LOGICAL " : ",");
+	    pl = CHAIN_SWORD(pl, pl==NIL ? "LOGICAL " : LIST_SEPARATOR);
 	    pl = gen_nconc(pl, words_declaration(e, pp_dim));
 	    break;
 	  case is_basic_overloaded:
@@ -1480,7 +1482,7 @@ text_entity_declaration(
 		    
 		  if (i==1)
 		    {
-		      ps = CHAIN_SWORD(ps, ps==NIL ? "CHARACTER " : ",");
+		      ps = CHAIN_SWORD(ps, ps==NIL ? "CHARACTER " : LIST_SEPARATOR);
 		      ps = gen_nconc(ps, words_declaration(e, pp_dim));
 		    }
 		  else
@@ -1845,7 +1847,7 @@ list c_words_entity(type t, list name)
 	type t1 = parameter_type(p);
 	pips_debug(3,"Parameter type %s\n ",words_to_string(words_type(t1)));
 	if (!first)
-	  pc = gen_nconc(pc,CHAIN_SWORD(NIL,","));
+	  pc = gen_nconc(pc,CHAIN_SWORD(NIL, LIST_SEPARATOR));
 	/* c_words_entity(t1,NIL) should be replaced by c_words_entity(t1,name_of_corresponding_parameter) */
 	pc = gen_nconc(pc,c_words_entity(t1,NIL));
 	pips_debug(3,"List of parameters %s\n ",list_to_string(pc));
@@ -1935,7 +1937,7 @@ list c_words_entity(type t, list name)
       pc = CHAIN_SWORD(pc,"...");
       return gen_nconc(pc,name);
     }  
-  pips_error("c_words_entity","unexpected case\n");
+  pips_error("c_words_entity", "unexpected case\n");
   return NIL;
 }
 
