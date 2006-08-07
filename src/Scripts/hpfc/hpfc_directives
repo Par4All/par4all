@@ -106,7 +106,7 @@
 # the sed version should be able to handle very large lines... 
 # gnu sed is okay. idem tr. SUN sed is not ok.
 
-SED=${HPFC_SED:-gsed}
+SED=${HPFC_SED:-sed}
 TR=${HPFC_TR:-tr}
 RM=rm
 
