@@ -77,9 +77,9 @@ static bool string_is_true(string s)
 		 *s=='o' || *s=='O');
 }
 
-/* whether pips should behave as a shell. can be turned on from
+/* Whether pips should behave as a shell. Can be turned on from
  * the command line, from properties and from the environment.
- * the default is FALSE, but if the user name is coelho.
+ * Default is FALSE.
  */
 #define TPIPS_IS_A_SHELL "TPIPS_IS_A_SHELL"
 
