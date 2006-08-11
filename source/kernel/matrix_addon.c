@@ -1,5 +1,5 @@
 /** 
- * $Id: matrix_addon.c,v 1.10 2006/03/15 19:59:55 verdoolaege Exp $
+ * $Id: matrix_addon.c,v 1.11 2006/08/11 02:03:53 meister Exp $
  * 
  * Polylib matrix addons
  * Mainly, deals with polyhedra represented as a matrix (implicit form)
@@ -24,8 +24,11 @@ void constraintsView_Free(Matrix * M) {
   free(M);
 }
 
-/** splits a matrix of constraints M into a matrix of equalities Eqs and a
-    matrix of inequalities Ineqs allocs the new matrices. */
+/** 
+ * splits a matrix of constraints M into a matrix of equalities Eqs and a
+ *  matrix of inequalities Ineqs allocs the new matrices. 
+ * Allocates Eqs and Ineqs.
+*/
 void split_constraints(Matrix const * M, Matrix ** Eqs, Matrix **Ineqs) {
   unsigned int i, j, k_eq, k_ineq, nb_eqs=0;
 
@@ -68,6 +71,31 @@ Matrix * Identity_Matrix(unsigned int dim) {
   }
   return ret;
 } /* Identity_Matrix */
+
+/** 
+ * returns the dim-dimensional identity matrix. 
+ * If I is set to NULL, allocates it first. 
+ * Else, assumes an existing, allocated Matrix.
+*/
+void Matrix_identity(unsigned int dim, Matrix ** I) {
+  int i,j;
+  if (*I==NULL) {
+    (*I) = Identity_Matrix(dim);
+  }
+  else {
+    assert((*I)->NbRows>=dim && (*I)->NbColumns>=dim);
+    for (i=0; i< dim; i++) {
+      for (j=0; j< dim; j++) {
+	if (i==j) { 
+	    value_set_si((*I)->p[i][j], 1); 
+	  } 
+	else {
+	  value_set_si((*I)->p[i][j], 0);
+	}
+      }
+    }
+  }
+} /* Matrix_identity */
 
 
 /** given a n x n integer transformation matrix transf, compute its inverse
@@ -300,3 +328,62 @@ unsigned int mpolyhedron_eliminate_first_variables(Matrix * Eqs,
   return 1;
 } /* mpolyhedron_eliminate_first_variables */
 
+
+/** returns a contiguous submatrix of a matrix.
+ * @param M the input matrix
+ * @param sr the index of the starting row
+ * @param sc the index of the starting column
+ * @param nbR the number of contiguous rows to take
+ * @param nbC the number of contiguous columns to take
+ * @param sub (returned), the submatrix. Allocated if set to NULL, assumed to
+ * be already allocated else.
+ */
+void Matrix_subMatrix(Matrix * M, unsigned int sr, unsigned int sc, 
+			  unsigned int nbR, unsigned int nbC, Matrix ** sub) {
+  int i;
+  if ((*sub)==NULL) {
+    (*sub) = Matrix_Alloc(nbR, nbC);
+  }
+  if (nbR==0 || nbC==0) return;
+  for (i=0; i< nbR; i++) {
+    Vector_Copy(&(M->p[i+sr][sc]), (*sub)->p[i], nbC);
+  }
+}/* Matrix_subMatrix */
+
+
+/**
+ * Cloning funciton. Similar to Matrix_Copy() but allocates the target matrix
+ * if it is set to NULL 
+ */
+void Matrix_clone(Matrix * M, Matrix ** Cl) {
+  Matrix_subMatrix(M, 0,0, M->NbRows, M->NbColumns, Cl);
+} 
+
+
+/**
+ * Copies a contiguous submatrix of M1 into M2, at the indicated position.
+ * M1 and M2 are assumed t be allocated already.
+ */
+void Matrix_copySubMatrix(Matrix *M1,
+			  unsigned int sr1, unsigned int sc1,
+			  unsigned int nbR, unsigned int nbC,
+			  Matrix * M2,
+			  unsigned int sr2, unsigned int sc2) {
+  int i;
+  for (i=0; i< nbR; i++) {
+    Vector_Copy(&(M1->p[i+sr1][sc1]), &(M2->p[i+sr2][sc2]), nbC);
+  }
+} /* Matrix_copySubMatrix */
+
+
+/** 
+ * transforms a matrix M into -M
+ */
+void Matrix_oppose(Matrix * M) {
+  int i,j;
+  for (i=0; i<M->NbRows; i++) {
+    for (j=0; j< M->NbColumns; j++) {
+      value_oppose(M->p[i][j], M->p[i][j]);
+    }
+  }
+}

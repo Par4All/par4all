@@ -34,9 +34,10 @@ extern void print_evalue ( FILE *DST, evalue *e, char **pname );
 extern void reduce_evalue (evalue *e);
 extern void Enumeration_Free(Enumeration *en);
 extern Enumeration *Ehrhart_Quick_Apx(Matrix * M, Matrix * C, 
-				      Matrix ** Validity_Lattice, unsigned MAXRAYS);
-				      /* , char ** param_name); */
-
+				      Matrix ** Validity_Lattice, 
+				      unsigned MAXRAYS);
+extern Enumeration * Enumeration_zero(unsigned int nbParms, 
+				      unsigned int maxRays);
 
 #if defined(__cplusplus)
 }
@@ -56,6 +57,11 @@ extern void print_enode (/* FILE *DST, enode *p, char **pname */);
 extern void print_evalue (/* FILE *DST, evalue *e, char **pname */);
 extern void reduce_evalue (/* evalue *e */);
 extern void Enumeration_Free(/* Enumeration *en */);
+extern Enumeration *Ehrhart_Quick_Apx(/*Matrix * M, Matrix * C, 
+				      Matrix ** Validity_Lattice, 
+				      unsigned MAXRAYS*/);
+extern Enumeration * Enumeration_zero(/* unsigned int nbParms, 
+					 unsigned int maxRays*/);
 
 #endif /* (defined(__STDC__) || defined(__cplusplus)) */
 #endif /* _ehrhart_H_ */

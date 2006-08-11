@@ -2768,3 +2768,29 @@ char ** parmsWithoutElim(char const ** parmNames,
   }
   return newParmNames;
 }
+
+
+/** 
+ * returns a constant Ehrhart polynomial whose value is zero for any value of
+ * the parameters.
+ * @param nbParms the number of parameters, i.e., the number of arguments to
+ * the Ehrhart polynomial
+ */
+Enumeration * Enumeration_zero(unsigned int nbParms, unsigned int maxRays) {
+  Matrix * Mz = Matrix_Alloc(1, nbParms+3);
+  Polyhedron * emptyP;
+  Polyhedron * universe;
+  Enumeration * zero;
+  /* 1- build an empty polyhedron with the right dimension */
+  /* here we choose to take 2i = -1 */
+  value_assign(Mz->p[0][1], 2);
+  value_assign(Mz->p[0][nbParms+2], 1);
+  emptyP = Constraints2Polyhedron(Mz, maxRays);
+  Matrix_Free(Mz);
+  universe = Universe_Polyhedron(nbParms);
+  zero = Polyhedron_Enumerate(emptyP, universe, maxRays, NULL);
+  Polyhedron_Free(emptyP);
+  Polyhedron_Free(universe);
+  return zero;
+} /* Enumeration_zero() */
+

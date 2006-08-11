@@ -1,10 +1,10 @@
 /** 
- * $Id: matrix_addon.h,v 1.5 2006/07/10 02:03:51 meister Exp $
+ * $Id: matrix_addon.h,v 1.6 2006/08/11 02:03:53 meister Exp $
  * 
  * Polylib matrix addons
- * Mainly, deals with polyhedra represented as a matrix (implicit form)
+ * Mainly, deals with polyhedra represented in implicit form (set of
+ * constraints).
  * @author Benoit Meister 
- * 
  */
 
 #ifndef __BM_MATRIX_ADDON_H__
@@ -67,6 +67,7 @@ void eliminate_var_with_constr(Matrix * Eliminator,
  - adresses the full-rank compressions only
  - modfies M */
 void mpolyhedron_compress_last_vars(Matrix * M, Matrix * compression);
+#define Constraints_compressLastVars(a, b) mpolyhedron_compress_last_vars(a, b)
 
 /* uses a set of m equalities Eqs to eliminate m variables in the polyhedron.
  Ineqs represented as a matrix eliminates the m first variables 
@@ -74,6 +75,25 @@ void mpolyhedron_compress_last_vars(Matrix * M, Matrix * compression);
 - modifies Ineqs */
 unsigned int mpolyhedron_eliminate_first_variables(Matrix * Eqs, 
 						   Matrix * Ineqs);
+#define Constraints_eliminateFirstVars(a,b) mpolyhedron_eliminate_first_variables(a,b)
 
+/** returns a contiguous submatrix of a matrix. */
+void Matrix_subMatrix(Matrix * M, unsigned int sr, unsigned int sc, 
+		      unsigned int nbR, unsigned int nbC, Matrix ** sub);
+
+/**
+ * Copies a contiguous submatrix of M1 into M2, at the indicated position.
+ * M1 and M2 are assumed t be allocated already.
+ */
+void Matrix_copySubMatrix(Matrix *M1,
+			  unsigned int sr1, unsigned int sc1,
+			  unsigned int nbR, unsigned int nbC,
+			  Matrix * M2,
+			  unsigned int sr2, unsigned int sc2);
+
+/** 
+ * given a matrix M into -M
+ */
+void Matrix_oppose(Matrix * M);
 
 #endif // __BM_MATRIX_ADDON_H__

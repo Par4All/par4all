@@ -1,11 +1,11 @@
 /** 
- * $Id: compress_parms.c,v 1.21 2006/07/10 02:03:51 meister Exp $
+ * $Id: compress_parms.c,v 1.22 2006/08/11 02:03:53 meister Exp $
  *
  * The integer points in a parametric linear subspace of Q^n are generally
- * lying on a sub-lattice of Z^n.  To simplify, the funcitons here compress
+ * lying on a sub-lattice of Z^n.  To simplify, the functions here compress
  * some parameters so that the variables are integer for any intger values of
  * the parameters.
- * @author B. Meister 12/2003-2005
+ * @author B. Meister 12/2003-2006 meister@icps.u-strasbg.fr
  * LSIIT -ICPS 
  * UMR 7005 CNRS
  * Louis Pasteur University (ULP), Strasbourg, France 
@@ -19,6 +19,15 @@
  */
 #define dbgCompParm 1
 #define dbgCompParmMore 1
+
+#define dbgStart(a) if (dbgCompParmMore) { printf(" -- begin "); \
+                                           printf(#a);        \
+					   printf(" --\n"); }   \
+                                           while(0)
+#define dbgEnd(a) if (dbgCompParmMore) { printf(" -- end "); \
+                                         printf(#a);      \
+					 printf(" --\n"); } \
+                                         while(0)
 
 /** 
  * Given a full-row-rank nxm matrix M made of m row-vectors), computes the
@@ -73,6 +82,442 @@ Matrix * int_ker(Matrix * M) {
   Matrix_Free(Q);
   return K;
 } /* int_ker */
+
+
+/** 
+ * Computes the intersection of two linear lattices, whose base vectors are
+ * respectively represented in A and B.
+ * <p>
+ * Temporary pre-condition: A and B must represent full-dimensional lattices of
+ * the same dimension.
+ * </p>
+ * If I and/or Lb is set to NULL, then the matrix is allocated. 
+ * Else, the matrix is assumed to be allocated already. 
+ * I and Lb are rk x rk, where rk is the rank of A (or B).
+ * @param A the matrix whose column-vectors are the basis for the first linear
+ * lattice.
+ * @param B the matrix whose column-vectors are the basis for the second linear
+ * lattice.
+ * @param Lb the matrix such that B.Lb = I, where I is the intersection.
+ * @return their intersection.
+ */
+static void linearInter(Matrix * A, Matrix * B, Matrix ** I, Matrix **Lb) {
+  Matrix * AB=NULL;
+  int rk = A->NbRows;
+  int i,j;
+
+  Matrix * H, *U, *Q;
+  assert(A->NbColumns == rk && B->NbRows==rk && B->NbColumns == rk);
+  /* 1- build the matrix 
+   * (A 0 1)
+   * (0 B 1)
+   */
+  AB = Matrix_Alloc(2*rk, A->NbColumns+B->NbColumns+rk);
+  for (i=0; i< rk; i++) {
+    for (j=0; j<rk; j++) {
+      value_assign(AB->p[i][j], A->p[i][j]);
+    }
+  }
+  for (i=0; i< rk; i++) {
+    for (j=0; j<rk; j++) {
+      value_assign(AB->p[i+rk][j+rk], B->p[i][j]);
+    }
+  }
+  for (i=0; i< rk; i++) {
+      value_set_si(AB->p[i][i+2*rk], 1);
+      value_set_si(AB->p[i+rk][i+2*rk], 1);
+  }
+  if (dbgCompParm) {
+    show_matrix(AB);
+  }
+
+  /* 2- Compute its left Hermite normal form. AB.U = [H 0] */
+  left_hermite(AB, &H, &Q, &U);
+  Matrix_Free(AB);
+  Matrix_Free(H);
+  Matrix_Free(Q);
+
+  /* if you split U evenly in 9 submatrices, you have: 
+   * A.U_13 = -U_33
+   * B.U_23 = -U_33 
+   * U_33 is a (the smallest) combination of col-vectors of A and B at the same
+   * time: their intersection.
+  */
+  Matrix_subMatrix(U, 2*rk, 2*rk, rk, rk, I);
+  Matrix_oppose(*I);
+  Matrix_subMatrix(U, rk, 2*rk, rk, rk, Lb);
+  Matrix_oppose(*Lb);
+  if (dbgCompParm) {
+    show_matrix(U);
+  }
+  Matrix_Free(U);
+} /* linearInter */
+
+
+/** 
+ * Given a system of equalities, looks if it has an integer solution in the
+ * combined space, and if yes, returns one solution.
+ * <p>pre-condition: the equalities are full-row rank (without the constant
+ * part)</p>
+ * @param Eqs the system of equations (as constraints)
+ * @return NULL a feasible integer solution if it exists, else NULL.
+ */
+static Matrix * integerSolution(Matrix * Eqs) {
+  Matrix * Hm, *H=NULL, *U, *Q, *M=NULL, *C=NULL, *Hi;
+  Matrix * I, *Ip;
+  int i;
+  Value mod;
+  if (Eqs==NULL) return NULL;
+  /* we use: AI = C = (Ha 0).Q.I = (Ha 0)(I' 0)^T */
+  /* with I = Qinv.I' = U.I'*/
+  /* 1- compute I' = Hainv.C */
+  /* HYP: the equalities are full-row rank */
+  unsigned int rk = Eqs->NbRows;
+  Matrix_subMatrix(Eqs, 0, 1, rk, Eqs->NbColumns-2, &M);
+  left_hermite(M, &Hm, &Q, &U);
+  Matrix_subMatrix(Hm, 0,0, rk,rk, &H);
+  if (dbgCompParmMore) {
+    show_matrix(Hm);
+    show_matrix(H);
+    show_matrix(U);
+  }
+  Matrix_Free(Q);
+  Matrix_Free(Hm);
+  Matrix_subMatrix(Eqs, 0, Eqs->NbColumns-1, rk, 1, &C);
+  Matrix_oppose(C);
+  Hi = Matrix_Alloc(rk, rk+1);
+  MatInverse(H, Hi);
+  if (dbgCompParmMore) {
+    show_matrix(C);
+    show_matrix(Hi);
+  }
+  /* put the numerator of Hinv back into H */
+  Matrix_subMatrix(Hi, 0, 0, rk, rk, &H);
+  Ip = Matrix_Alloc(Eqs->NbColumns-2, 1);
+  /* fool Matrix_Product on the size of Ip */
+  Ip->NbRows = rk;
+  Matrix_Product(H, C, Ip);
+  Ip->NbRows = Eqs->NbColumns-2;
+  Matrix_Free(H);
+  Matrix_Free(C);
+  value_init(mod);
+  for (i=0; i< rk; i++) {
+    /* if Hinv.C is not integer, return NULL (no solution) */
+    value_pmodulus(mod, Ip->p[i][0], Hi->p[i][rk]);
+    if (value_notzero_p(mod)) { 
+      return NULL;
+    }
+    else {
+      value_pdivision(Ip->p[i][0], Ip->p[i][0], Hi->p[i][rk]);
+    }
+  }
+  /* fill the rest of I' with zeros */
+  for (i=rk; i< Eqs->NbColumns-2; i++) {
+    value_set_si(Ip->p[i][0], 0);
+  }
+  value_clear(mod);
+  Matrix_Free(Hi);
+  /* 2 - Compute the particular solution I = U.(I' 0) */
+  I = Matrix_Alloc(Eqs->NbColumns-2, 1);
+  Matrix_Product(U, Ip, I);
+  if (dbgCompParm) {
+    show_matrix(I);
+  }
+  return I;
+}
+
+
+/** 
+ * Returns the smallest linear compression of the parameters necessary for an
+ * integer value of the variables to exist for each integer value of the
+ * parameters.
+ */
+static Matrix * minLinearCompress(Matrix * A, Matrix * B, unsigned int nbParms) {
+  Matrix * Lb= NULL;
+  Matrix * I = NULL;
+  Matrix * Hb = NULL;
+  Matrix * Hg = NULL;
+  Matrix *U, *H, *Q;
+  int rk = A->NbRows;
+  assert(B->NbColumns==nbParms);
+  if (nbParms==0) {
+    Matrix_identity(rk,&Hg);
+    return Hg;
+  }
+  /* HYP: A is square, full-rank. */
+  /* HYP: B is full row-rank. */
+  left_hermite(B, &H, &Q, &U);
+  Matrix_subMatrix(H, 0, 0, rk, rk, &Hb);
+  Matrix_Free(H);
+  linearInter(A, Hb, &I, &Lb);
+  if (dbgCompParm) {
+    show_matrix(I);
+    show_matrix(Lb);
+  }
+  Matrix_Free(I);
+  Matrix_Free(Hb);
+  // HYP: A is square, full-rank.
+  // Note: we juste reuse U, which has the appropriate dimensions
+  Matrix_identity(nbParms, &Hg);
+  Matrix_copySubMatrix(Lb, 0, 0, rk, rk, Hg, 0,0);
+  /* the linear part of the minimal lattice is U.Hg */
+  Matrix_Product(U, Hg, Q);
+  return Q;
+}/* minLinearCompress */
+
+
+/**
+ * Finds the smallest affine compression of the parameters necessary for an
+ * integer value of the variables to exist for each integer value of the
+ * parameters.
+ * @return 0 if there is no solution, 1 if there is one 
+ * (and then this compression lattice is in G)
+ */
+int minAffineCompress(Matrix * Eqs, unsigned int nbParms, 
+			      Matrix ** G) {
+  int nbVars = Eqs->NbColumns - nbParms -2;
+  Matrix * N0 = integerSolution(Eqs);
+  Matrix * A = NULL;
+  Matrix * B = NULL;
+  Matrix * G0=NULL;
+  // if there is no integer solution, return false
+  if (N0==NULL) {
+    return 0;
+  }
+  else {
+    if ((*G)==NULL) {
+      (*G) = Matrix_Alloc(nbParms+1, nbParms+1);
+    }
+    else {
+      assert((*G)->NbRows==nbParms+1 && (*G)->NbColumns==nbParms+1);
+    }
+    Matrix_copySubMatrix(N0, nbVars, 0, nbParms, 1, (*G), 0, nbParms);
+    value_set_si((*G)->p[nbParms][nbParms], 1);
+    Matrix_Free(N0);
+    Matrix_subMatrix(Eqs, 0, 1, Eqs->NbRows, nbVars, &A);
+    Matrix_subMatrix(Eqs, 0, nbVars+1, Eqs->NbRows, nbParms, &B);
+    //HYP: A is square and full-rank
+    G0 = minLinearCompress(A, B, nbParms);
+    Matrix_Free(A);
+    Matrix_Free(B);
+    Matrix_copySubMatrix(G0, 0, 0, nbParms, nbParms, (*G), 0, 0);
+    return 1;
+  }
+}/* minAffineCompress */
+
+
+/**
+ * Eliminate the columns corresponding to the eliminated parameters.
+ * @param M the constraints matrix whose columns are to be removed
+ * @param nbVars an offset to be added to the ranks of the variables to be
+ * removed
+ * @param elimParms the list of ranks of the variables to be removed
+ * @param newM (output) the matrix without the removed columns
+ */
+void Constraints_removeElimCols(Matrix * M, unsigned int nbVars, 
+			   unsigned int *elimParms, Matrix ** newM) {
+  unsigned int i, j, k;
+  if (elimParms[0]==0) {
+    Matrix_clone(M, newM);
+    return;
+  }
+  if ((*newM)==NULL) {
+    (*newM) = Matrix_Alloc(M->NbRows, M->NbColumns - elimParms[0]);
+  }
+  else {
+    assert ((*newM)->NbColumns==M->NbColumns - elimParms[0]);
+  }
+  for (i=0; i< M->NbRows; i++) {
+    value_assign((*newM)->p[i][0], M->p[i][0]); /* kind of cstr */
+    k=0;
+    Vector_Copy(&(M->p[i][1]), &((*newM)->p[i][1]), nbVars);
+    for (j=0; j< M->NbColumns-2-nbVars; j++) {
+      if (j!=elimParms[k+1]) {
+	value_assign((*newM)->p[i][j-k+nbVars+1], M->p[i][j+nbVars+1]);
+      }
+      else {
+	k++;
+      }
+    }
+    value_assign((*newM)->p[i][(*newM)->NbColumns-1], 
+		 M->p[i][M->NbColumns-1]); /* cst part */
+  }
+} /* Constraints_removeElimCols */
+
+
+/**
+ * Eliminates all the equalities in a set of constraints and returns the set of
+ * constraints defining a full-dimensional polyhedron, such that there is a
+ * bijection between integer points of the original polyhedron and these of the
+ * resulting (projected) polyhedron).
+ * If VL is set to NULL, this funciton allocates it. Else, it assumes that
+ * (*VL) points to a matrix of the right size.
+ * <p> The following things are done: 
+ * <ol>
+ * <li> remove equalities involving only parameters, and remove as many
+ *      parameters as there are such equalities. From that, the list of
+ *      eliminated parameters <i>elimParms</i> is built.
+ * <li> remove equalities that involve variables. This requires a compression
+ *      of the parameters and of the other variables that are not eliminated.
+ *      The affine compresson is represented by matrix VL (for <i>validity
+ *      lattice</i>) and is such that (N I 1)^T = VL.(N' I' 1), where N', I'
+ *      are integer (they are the parameters and variables after compression).
+ *</ol>
+ *</p>
+ */
+void Constraints_fullDimensionize(Matrix ** M, Matrix ** C, Matrix ** VL, 
+				  Matrix ** Eqs, Matrix ** ParmEqs, 
+				  unsigned int ** elimVars, 
+				  unsigned int ** elimParms,
+				  int maxRays) {
+  unsigned int i, j;
+  Matrix * A=NULL, *B=NULL;
+  Matrix * Ineqs=NULL;
+  unsigned int nbVars = (*M)->NbColumns - (*C)->NbColumns;
+  unsigned int nbParms;
+  int nbElimVars;
+  Matrix * fullDim = NULL;
+
+  /* variables for permutations */
+  unsigned int * permutation, * permutationInv;
+  Matrix * permutedEqs=NULL, * permutedIneqs=NULL;
+  
+  /* 1- Eliminate the equalities involving only parameters. */
+  (*ParmEqs) = Constraints_removeParmEqs(M, C, 0, elimParms);
+  /* if the polyehdron is empty, return now. */
+  if ((*M)->NbColumns==0) return;
+  /* eliminate the columns corresponding to the eliminated parameters */
+  if (elimParms[0]!=0) {
+    Constraints_removeElimCols(*M, nbVars, (*elimParms), &A);
+    Matrix_Free(*M);
+    (*M) = A;
+    Constraints_removeElimCols(*C, 0, (*elimParms), &B);
+    Matrix_Free(*C);
+    (*C) = B;
+    if (dbgCompParm) {
+      printf("After false parameter elimination: \n");
+      show_matrix(*M);
+      show_matrix(*C);
+    }
+  }
+  nbParms = (*C)->NbColumns-2;
+
+  /* 2- Eliminate the equalities involving variables */
+  /*   a- extract the (remaining) equalities from the poyhedron */
+  split_constraints((*M), Eqs, &Ineqs);
+  nbElimVars = (*Eqs)->NbRows;
+  /*    if the polyhedron is already full-dimensional, return */
+  if ((*Eqs)->NbRows==0) {
+    Matrix_identity(nbParms+1, VL);
+    return;
+  }
+  /*   b- choose variables to be eliminated */
+  permutation = find_a_permutation((*Eqs), nbParms);
+
+  if (dbgCompParm) {
+    printf("Permuting the vars/parms this way: [ ");
+    for (i=0; i< (*Eqs)->NbColumns-2; i++) {
+      printf("%d ", permutation[i]);
+    }
+    printf("]\n");
+  }
+
+  Constraints_permute((*Eqs), permutation, &permutedEqs);
+  minAffineCompress(permutedEqs, (*Eqs)->NbColumns-2-(*Eqs)->NbRows, VL);
+
+  if (dbgCompParm) {
+    printf("Validity lattice: ");
+    show_matrix(*VL);
+  }
+  Constraints_compressLastVars(permutedEqs, (*VL));
+  Constraints_permute(Ineqs, permutation, &permutedIneqs);
+  if (dbgCompParmMore) {
+    show_matrix(permutedIneqs);
+    show_matrix(permutedEqs);
+  }
+  Matrix_Free(*Eqs);
+  Matrix_Free(Ineqs);
+  Constraints_compressLastVars(permutedIneqs, (*VL));
+  if (dbgCompParm) {
+    printf("After compression: ");
+    show_matrix(permutedIneqs);
+  }
+  /*   c- eliminate the first variables */
+  assert(Constraints_eliminateFirstVars(permutedEqs, permutedIneqs));
+  if (dbgCompParmMore) {
+    printf("After elimination of the variables: ");
+    show_matrix(permutedIneqs);
+  }
+
+  /*   d- get rid of the first (zero) columns, 
+       which are now useless, and put the parameters back at the end */
+  fullDim = Matrix_Alloc(permutedIneqs->NbRows,
+			 permutedIneqs->NbColumns-nbElimVars);
+  for (i=0; i< permutedIneqs->NbRows; i++) {
+    value_set_si(fullDim->p[i][0], 1);
+    for (j=0; j< nbParms; j++) {
+      value_assign(fullDim->p[i][j+fullDim->NbColumns-nbParms-1], 
+		   permutedIneqs->p[i][j+nbElimVars+1]);
+    }
+    for (j=0; j< permutedIneqs->NbColumns-nbParms-2-nbElimVars; j++) {
+      value_assign(fullDim->p[i][j+1], 
+		   permutedIneqs->p[i][nbElimVars+nbParms+j+1]);
+    }
+    value_assign(fullDim->p[i][fullDim->NbColumns-1], 
+		 permutedIneqs->p[i][permutedIneqs->NbColumns-1]);
+  }
+  Matrix_Free(permutedIneqs);
+
+} /* Constraints_fullDimensionize */
+
+
+/**
+ * Given a matrix that defines a full-dimensional affine lattice, returns the 
+ * affine sub-lattice spanned in the k first dimensions.
+ * Useful for instance when you only look for the parameters' validity lattice.
+ * @param lat the original full-dimensional lattice
+ * @param subLat the sublattice
+ */
+void Matrix_extractSubLattice(Matrix * lat, unsigned int k, Matrix ** subLat) {
+  Matrix * H, *Q, *U, *linLat = NULL;
+  unsigned int i;
+  dbgStart(Matrix_extractSubLattice);
+  /* if the dimension is already good, just copy the initial lattice */
+  if (k==lat->NbRows-1) {
+    if (*subLat==NULL) {
+      (*subLat) = Matrix_Copy(lat);
+    }
+    else {
+      Matrix_copySubMatrix(lat, 0, 0, lat->NbRows, lat->NbColumns, (*subLat), 0, 0);
+    }
+    return;
+  }
+  assert(k<lat->NbRows-1);
+  /* 1- Make the linear part of the lattice triangular to eliminate terms from 
+     other dimensions */
+  Matrix_subMatrix(lat, 0, 0, lat->NbRows, lat->NbColumns-1, &linLat);
+  // OPT: any integer column-vector elimination is ok indeed.
+  // OPT: could test if the lattice is already in triangular form.
+  left_hermite(linLat, &H, &Q, &U);
+  if (dbgCompParmMore) {
+    show_matrix(H);
+  }
+  Matrix_Free(Q);
+  Matrix_Free(U);
+  Matrix_Free(linLat);
+  /* if not allocated yet, allocate it */
+  if (*subLat==NULL) {
+    (*subLat) = Matrix_Alloc(k+1, k+1);
+  }
+  Matrix_copySubMatrix(H, 0, 0, k, k, (*subLat), 0, 0);
+  Matrix_Free(H);
+  Matrix_copySubMatrix(lat, 0, lat->NbColumns-1, k, 1, (*subLat), 0, k);
+  for (i=0; i<k; i++) {
+    value_set_si((*subLat)->p[k][i], 0);
+  }
+  value_set_si((*subLat)->p[k][k], 1);
+  dbgEnd(Matrix_extractSubLattice);
+} /* Matrix_extractSubLattice */
 
 
 /** 
@@ -557,7 +1002,7 @@ Matrix * Constraints_Remove_parm_eqs(Matrix ** M1, Matrix ** Ctxt1,
 
   /* 2- eliminate parameters until all equalities are used or until we find a
   contradiction (overconstrained system) */
-  (*elimParms) = (unsigned int *) malloc(Eqs->NbRows * sizeof(int));
+  (*elimParms) = (unsigned int *) malloc((Eqs->NbRows+1) * sizeof(int));
   (*elimParms)[0] = 0;
   allZeros = 0;
   for (i=0; i< Eqs->NbRows; i++) {
@@ -575,6 +1020,9 @@ Matrix * Constraints_Remove_parm_eqs(Matrix ** M1, Matrix ** Ctxt1,
 	Matrix_Free(M);
 	(*Ctxt1) = Matrix_Alloc(0,Ctxt->NbColumns);
 	Matrix_Free(Ctxt);
+	free(*elimParms);
+	(*elimParms) = (unsigned int *) malloc(sizeof(int));
+	(*elimParms)[0] = 0;
 	if (renderSpace==1) {
 	  return Matrix_Alloc(0,(*M1)->NbColumns);
 	}
@@ -614,8 +1062,8 @@ Matrix * Constraints_Remove_parm_eqs(Matrix ** M1, Matrix ** Ctxt1,
   
   /* elimParms may have been overallocated. Now we know how many parms have
      been eliminated so we can reallocate the right amount of memory. */
-  if (realloc((*elimParms), (*elimParms)[0])!=(*elimParms)) {
-    fprintf(stderr, "Constraints_Remove_parm_eqs > Cannot realloc()");
+  if (!realloc((*elimParms), ((*elimParms)[0]+1)*sizeof(int))) {
+    fprintf(stderr, "Constraints_Remove_parm_eqs > cannot realloc()");
   }
 
   Matrix_Free(EqsMTmp);

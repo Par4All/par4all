@@ -1,5 +1,5 @@
 /** 
- * $Id: matrix_permutations.c,v 1.6 2006/03/15 19:59:55 verdoolaege Exp $
+ * $Id: matrix_permutations.c,v 1.7 2006/08/11 02:03:53 meister Exp $
  *
  * Permutations on matrices Matrices are seen either as transformations
  * (mtransformation) or as polyhedra (mpolyhedron)
@@ -77,6 +77,30 @@ Matrix * mpolyhedron_permute(Matrix * polyh, unsigned int * permutation) {
   return permuted;
 }
 
+
+/** permutes the variables of the constraints of a polyhedron 
+ * @param C the original set of constraints
+ * @param perm a permutation vector
+ * @param Cp (returned) the set of constraints whose variables are
+ * permuted. Allocated if set to NULL, assumed to be already allocated if not.
+ */
+void Constraints_permute(Matrix * C, unsigned int * perm, Matrix ** Cp) {
+  unsigned int i,j;
+  if ((*Cp)==NULL) {
+    (*Cp) = Matrix_Alloc(C->NbRows, C->NbColumns);
+  }
+  else {
+    assert((*Cp)->NbRows == C->NbRows && (*Cp)->NbColumns==C->NbColumns);
+  }
+  for (i= 0; i< C->NbRows; i++) {
+    value_assign((*Cp)->p[i][0], C->p[i][0]);
+    for (j= 1; j< C->NbColumns; j++) {
+      value_assign((*Cp)->p[i][perm[j-1]+1], C->p[i][j]);
+    }
+  }
+} /* Constraints_permute */
+
+
 /** Given a set of <i>equalities</i>, find a set of variables that can be
  * eliminated using these equalities.  The variables that we agree to eliminate
  * are in a zone of contiguous variables (or parameters).  <p>
@@ -143,7 +167,7 @@ unsigned long long int eliminable_vars(Matrix * Eqs, unsigned start,
 	}
       }
       /* 2- see if the matrix is full-row-rank */
-      right_hermite(Square_Mat, &Q, &H, &U);
+      right_hermite(Square_Mat, &H, &Q, &U);
       Matrix_Free(Q);
       Matrix_Free(U);
 

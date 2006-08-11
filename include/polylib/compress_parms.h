@@ -1,5 +1,5 @@
 /**
- * $Id: compress_parms.h,v 1.4 2006/07/10 02:03:51 meister Exp $
+ * $Id: compress_parms.h,v 1.5 2006/08/11 02:03:53 meister Exp $
  * @author B. Meister 12/2003-2006
  * LSIIT -ICPS 
  * UMR 7005 CNRS
@@ -37,10 +37,13 @@ Matrix * compress_parms(Matrix * E, int nb_parms);
 Matrix * Constraints_Remove_parm_eqs(Matrix ** M, Matrix ** Ctxt, 
 				     int renderSpace, 
 				     unsigned int ** elimParms);
+#define Constraints_removeParmEqs(a,b,c,d) Constraints_Remove_parm_eqs(a,b,c,d)
+
 Polyhedron * Polyhedron_Remove_parm_eqs(Polyhedron ** P, Polyhedron ** C, 
-					int renderSpace, 
-					unsigned int ** elimParms, 
-					int maxRays);
+				      int renderSpace, 
+				      unsigned int ** elimParms, 
+				      int maxRays);
+#define Polyhedron_removeParmEqs(a,b,c,d,e) Polyhedron_Remove_parm_eqs(a,b,c,d,e)
 
 /* given a matrix of m parameterized equations, compress the parameters and
  transform the variable space into a n-m space. */

@@ -453,7 +453,7 @@ void left_hermite(Matrix *A,Matrix **Hp,Matrix **Qp,Matrix **Up) {
   Value tmp;
   
   /* Computes left form: A = HQ , AU = H , 
-     T    T T    T T   T
+                        T    T T    T T   T
      using right form  A  = Q H  , U A = H */
   
   nr = A->NbRows;
