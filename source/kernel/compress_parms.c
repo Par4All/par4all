@@ -1,5 +1,5 @@
 /** 
- * $Id: compress_parms.c,v 1.22 2006/08/11 02:03:53 meister Exp $
+ * $Id: compress_parms.c,v 1.23 2006/08/13 09:37:34 skimo Exp $
  *
  * The integer points in a parametric linear subspace of Q^n are generally
  * lying on a sub-lattice of Z^n.  To simplify, the functions here compress
@@ -17,8 +17,8 @@
 /** 
  * debug flags (2 levels)
  */
-#define dbgCompParm 1
-#define dbgCompParmMore 1
+#define dbgCompParm 0
+#define dbgCompParmMore 0
 
 #define dbgStart(a) if (dbgCompParmMore) { printf(" -- begin "); \
                                            printf(#a);        \
@@ -38,7 +38,8 @@ Matrix * int_ker(Matrix * M) {
   Matrix *U, *Q, *H, *H2, *K;
   int i, j, rk;
 
-  show_matrix(M);
+  if (dbgCompParm)
+    show_matrix(M);
   /* eliminate redundant rows : UM = H*/
   right_hermite(M, &H, &Q, &U);
   for (rk=H->NbRows-1; (rk>=0) && Vector_IsZero(H->p[rk], H->NbColumns); rk--);
