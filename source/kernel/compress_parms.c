@@ -1,5 +1,5 @@
 /** 
- * $Id: compress_parms.c,v 1.23 2006/08/13 09:37:34 skimo Exp $
+ * $Id: compress_parms.c,v 1.24 2006/08/13 09:37:39 skimo Exp $
  *
  * The integer points in a parametric linear subspace of Q^n are generally
  * lying on a sub-lattice of Z^n.  To simplify, the functions here compress
@@ -52,6 +52,9 @@ Matrix * int_ker(Matrix * M) {
      the space spanned by the rows 
      is inferior to the number n of variables */
   if (M->NbColumns <= rk) {
+    Matrix_Free(H);
+    Matrix_Free(Q);
+    Matrix_Free(U);
     K = Matrix_Alloc(M->NbColumns, 0);
     return K;
   }
