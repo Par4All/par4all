@@ -1400,6 +1400,11 @@ void Compute_PDomains(Param_Domain *PD,int nb_domains,int working_space) {
 	 }
        }
      }  /* end of p2 scan */
+     if (p1->Domain->next) {
+	Polyhedron *C = DomainConvex(p1->Domain, working_space);
+	Domain_Free(p1->Domain);
+	p1->Domain = C;
+     }
    } /* end of p1 scan */
 } /* Compute_PDomains */
 					
