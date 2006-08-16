@@ -43,7 +43,7 @@ ALLHS =	all_newgen_headers.h specs.h
 
 INSTALL_INC=	$(F.h) $(F.newgen) $(F.c) $(F.spec) $(ALLHS)
 INSTALL_DOC=	$(F.newgen:%.newgen=%.ps)
-INSTALL_HTM=	$(F.tex:%.tex=%)
+INSTALL_HTM=	$(F.tex:%.tex=%.htdoc)
 # Install in a newgen subdirectory:
 HTM.subd = newgen
 

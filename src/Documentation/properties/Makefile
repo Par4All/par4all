@@ -3,7 +3,7 @@
 SOURCES	= properties-rc.tex
 
 INSTALL_DOC	= properties-rc.ps
-INSTALL_HTM	= properties-rc
+INSTALL_HTM	= properties-rc.htdoc
 ETC_TARGET	=  properties.rc
 
 all: $(ETC_TARGET) $(INSTALL_DOC)

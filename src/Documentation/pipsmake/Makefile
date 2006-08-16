@@ -22,7 +22,7 @@ DERIVED_INC=	resources.h \
 
 INSTALL_INC=	$(DERIVED_INC)
 INSTALL_DOC=	pipsmake-rc.ps
-INSTALL_HTM=	pipsmake-rc 
+INSTALL_HTM=	pipsmake-rc.htdoc 
 
 DERIVED_FILES=	$(INSTALL_ETC) $(DERIVED_INC) $(INSTALL_DOC)
 
