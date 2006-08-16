@@ -17,10 +17,10 @@ PS2PDF	= ps2pdf
 %.pdf: %.ps;	$(PS2PDF) $<
 %.ps: %.dvi;	$(DVIPS) $< -o
 
-# If we want to generate HTML output from file.tex, create a directory "file"
+# If we want to generate HTML output from file.tex, create a directory "file.htdoc"
 # to hide junk details:
-%: %.tex
+%.htdoc: %.tex
 	rm -rf $@
 	mkdir $@
 	# I guess we have kpathsea to deal with TEXINPUTS
-	cd $@; TEXINPUTS=..:: $(LX2HTM) $@; ln -s $@.html index.html
+	cd $@; TEXINPUTS=..:: $(LX2HTM) $*; ln -s $*.html index.html
