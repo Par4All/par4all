@@ -30,18 +30,22 @@ install:
 uninstall:
 	@echo "try 'unbuild' target"
 
-local-clean:
-	$(RM) TAGS
-
-# temporary file
+# all about tags
+# use a temporary file
 TAGS	= /tmp/tags.$$$$
 
-# force tags
-tags:
-	$(RM) TAGS
-	$(MAKE) TAGS
-
+# generate tag file
 TAGS:
 	find $(CURDIR) -name '*.[chly]' -print0 | \
 		xargs -0 etags --append --output=$(TAGS) ; \
 	mv $(TAGS) TAGS
+
+# force tags target
+tags:
+	$(RM) TAGS
+	$(MAKE) TAGS
+
+clean: tags-clean
+
+tags-clean:
+	$(RM) TAGS
