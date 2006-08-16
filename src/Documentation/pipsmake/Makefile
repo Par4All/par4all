@@ -84,7 +84,7 @@ headers: $(DERIVED_INC)
 clean: local-clean
 
 local-clean:
-	$(RM) -r $(DERIVED_FILES) pipsmake-rc \
+	$(RM) -r $(DERIVED_FILES) pipsmake-rc.htdoc \
 		*.aux *.log *.ind *.idx *.toc *.ilg *.dvi
 
 # common stuff
