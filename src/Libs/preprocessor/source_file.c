@@ -133,8 +133,11 @@ string pips_srcpath_append(string pathtoadd)
 {
     string old_path, new_path;
     old_path = getenv(SRCPATH);
-    old_path = strdup(old_path? old_path: "");
-    new_path = strdup(concatenate(SRCPATH "=", old_path, ":", pathtoadd, 0));
+    new_path = 
+      strdup(concatenate(SRCPATH "=", 
+			 old_path? old_path: "", 
+			 old_path? ":": "", 
+			 pathtoadd, 0));
     putenv(new_path);
     return old_path;
 }
