@@ -18,11 +18,10 @@ compile:
 clean: NO_INCLUDES=1
 export NO_INCLUDES
 
-unbuild: clean
+unbuild: clean tags-clean
 	$(RM) -rf \
 		./bin ./include ./lib ./share ./utils \
 		./doc ./runtime ./etc ./html
-	$(RM) -f TAGS
 
 install:
 	@echo "try 'build' target"
@@ -41,8 +40,7 @@ TAGS:
 	mv $(TAGS) TAGS
 
 # force tags target
-tags:
-	$(RM) TAGS
+tags: tags-clean
 	$(MAKE) TAGS
 
 # ARGH. I want both to forward and to clean locals...
