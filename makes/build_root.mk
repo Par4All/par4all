@@ -36,7 +36,12 @@ local-clean:
 # temporary file
 TAGS	= /tmp/tags.$$$$
 
+# force tags
 tags:
+	$(RM) TAGS
+	$(MAKE) TAGS
+
+TAGS:
 	find $(CURDIR) -name '*.[chly]' -print0 | \
 		xargs -0 etags --append --output=$(TAGS) ; \
 	mv $(TAGS) TAGS
