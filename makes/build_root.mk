@@ -45,7 +45,8 @@ tags:
 	$(RM) TAGS
 	$(MAKE) TAGS
 
-clean: tags-clean
+# ARGH. I want both to forward and to clean locals...
+#clean: tags-clean
 
 tags-clean:
 	$(RM) TAGS
