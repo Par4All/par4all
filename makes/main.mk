@@ -113,11 +113,12 @@ include $(MAKE.d)/svn.mk
 $(MAKE.d)/config.mk:
 	touch $@
 
-# project specific rules
+endif # NO_INCLUDES
+
+# project specific rules are included anyway, as there may be clean stuff.
 ifdef PROJECT
 include $(MAKE.d)/$(PROJECT).mk
 endif # PROJECT
-endif # NO_INCLUDES
 
 # ??? fix path...
 PATH	:= $(PATH):$(NEWGEN_ROOT)/bin:$(NEWGEN_ROOT)/bin/$(ARCH)
