@@ -1,6 +1,6 @@
 # $Id$
 
-FWD_DIRS	= src
+FWD_DIRS	= src makes
 
 build: compile
 	$(MAKE) -C src phase6
