@@ -38,6 +38,7 @@ static void push_path(void)
     pips_assert("not set", !saved_pips_src_path);
     dir = db_get_directory_name_for_module(WORKSPACE_SRC_SPACE);
     saved_pips_src_path = pips_srcpath_append(dir);
+    pips_assert("some old path", saved_pips_src_path);
     free(dir);
 }
 

@@ -71,6 +71,7 @@ extern string csplit_current_function_name;
 extern string csplit_definite_function_name;
 extern string csplit_definite_function_signature;
 extern bool csplit_is_static_p;
+extern int check_signature_balance(void);
 
 int csplit_line_number = 1; /* To be exported to the parser */
 

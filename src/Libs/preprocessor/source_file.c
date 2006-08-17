@@ -127,26 +127,25 @@ string pips_change_directory(char *dir)
 
 /********************************************************* PIPS SOURCE PATH */
 
+/* the name of the environment variable where source files are searched for. */
 #define SRCPATH "PIPS_SRCPATH"
-
-string pips_srcpath_append(string pathtoadd)
-{
-    string old_path, new_path;
-    old_path = getenv(SRCPATH);
-    new_path = 
-      strdup(concatenate(SRCPATH "=", 
-			 old_path? old_path: "", 
-			 old_path? ":": "", 
-			 pathtoadd, 0));
-    putenv(new_path);
-    return old_path;
-}
 
 void pips_srcpath_set(string path)
 {
-    putenv(strdup(concatenate(SRCPATH "=", path, 0)));
+  setenv(SRCPATH, path, TRUE);
 }
 
+/* returns an allocated pointer to the old value */
+string pips_srcpath_append(string pathtoadd)
+{
+  string old_path, new_path;
+  old_path = getenv(SRCPATH);
+  if (old_path) old_path = strdup(old_path); /* duplicate? */
+  new_path = concatenate(old_path? old_path: "", old_path? ":": "", 
+			 pathtoadd, 0);
+  pips_srcpath_set(new_path);
+  return old_path;
+}
 
 /*************************** MODULE PROCESSING (INCLUDES and IMPLICIT NONE) */
 
@@ -474,12 +473,14 @@ bool filter_file(string mod_name)
 
 /******************************************************************** SPLIT */
 
-static bool zzz_file_p(string s) /* .../zzz???.f */
-{ int len = strlen(s)-1;
+/* is the file name of the form .../zzz???.f */
+static bool zzz_file_p(string s) 
+{ 
+  int len = strlen(s)-1;
   return len>=8 && s[len-8]=='/' && s[len-7]=='#' && s[len-6]=='#' && 
-      s[len-5]=='#' && s[len-1]=='.' && s[len]=='f'; }
-/* static int cmp(const void * x1, const void * x2)
-{ return strcmp(*(char**)x1, *(char**)x2);} */
+    s[len-5]=='#' && s[len-1]=='.' && s[len]=='f'; 
+}
+
 static void clean_file(string name)
 {
     FILE *f;
@@ -522,7 +523,7 @@ static void clean_file(string name)
 
 static bool pips_split_file(string name, string tempfile)
 {
-  char * err;
+  char * err = NULL;
   FILE * out = safe_fopen(tempfile, "w");
   string dir = db_get_current_workspace_directory();
 
@@ -628,7 +629,8 @@ static string process_thru_C_pp(string name)
     string includes = getenv(SRCPATH);
     string new_includes = includes; /* pointer towards the current
                                        character in includes. */
-    int include_option_length = 5+strlen(includes)+3*colon_number(includes)+1+1;
+    size_t include_option_length = 
+      5+strlen(includes)+3*colon_number(includes)+1+1;
     /* Dynamic size, gcc only? Use malloc() instead */
     char include_options[include_option_length];
     /* Pointer to the current end of include_options: */
@@ -655,7 +657,8 @@ static string process_thru_C_pp(string name)
       new_include_options += 3;
       do {
 	/* Skip leading and trailing colons. */
-	if(*new_includes==':' && new_includes!=includes+1 && *new_includes!='\000') {
+	if(*new_includes==':' && new_includes!=includes+1 && 
+	   *new_includes!='\000') {
 	  new_includes++;
 	  *new_include_options = '\000';
 	  new_include_options = strcat(new_include_options, " -I");

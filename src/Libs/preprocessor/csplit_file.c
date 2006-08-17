@@ -6,11 +6,9 @@
  */
 
 #include <stdio.h>
-
-extern char * strdup(const char *);
+#include <string.h>
 
 #include "genC.h"
-
 #include "misc.h"
 
 /* To import FILE_SEP_STRING... */
@@ -272,12 +270,13 @@ void csplit_copy(string module_name, string signature, int first_line, int last_
   free(unambiguous_module_file_name);
 }
 
+extern void reset_keyword_typedef_table(void);
+extern void reset_csplit_line_number(void);
+
 /* Close open files and reset variables */
 void csplit_error_handler()
 {
   /* Reset keyword table */
-  extern void reset_keyword_typedef_table();
-
   reset_current_input_line();
   reset_csplit_line_number();
   reset_keyword_typedef_table();
@@ -286,8 +285,6 @@ void csplit_error_handler()
 void csplit_reset() 
 {
   /* Reset keyword table */
-  extern void reset_keyword_typedef_table();
-
   reset_current_input_line();
   reset_csplit_line_number();
   reset_keyword_typedef_table();
