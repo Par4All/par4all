@@ -34,6 +34,8 @@ LINKS =	pips tpips wpips fpips
 	touch $@
 
 links: 
+	# no direct dependency, as usual
+	$(MAKE) $(EXE.d)
 	for l in $(LINKS) ; do $(RM) $(EXE.d)/$$l ; done
 	for l in $(LINKS) ; do ln -s pips.sh $(EXE.d)/$$l ; done
 
