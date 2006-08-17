@@ -2,8 +2,8 @@
 
 FWD_DIRS	= src makes
 
-build: compile
-	$(MAKE) -C src phase6
+# default is to "build"
+all: build
 
 compile:
 	-test -d ./makes && $(MAKE) -C makes build
@@ -13,6 +13,15 @@ compile:
 	$(MAKE) -C src phase3
 	$(MAKE) -C src phase4
 	$(MAKE) -C src phase5
+
+doc:
+	$(MAKE) -C src phase6
+
+htdoc:
+	$(MAKE) -C src phase7
+
+build: compile doc
+full-build: build htdoc
 
 # do not include dependencies for some target
 clean: NO_INCLUDES=1

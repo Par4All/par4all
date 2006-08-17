@@ -35,7 +35,11 @@ warning()
     read
 }
 
-test -d $destination  && warning "Warning : directory $destination already exists!" && warning "If you are not trying to finish a previous installation of PIPS in $destination you should stop and choose another directory name."
+test -d $destination  && \
+    warning "Warning : directory $destination already exists!" && \
+    warning \
+      "If you are not trying to finish a previous installation of PIPS" \
+      " in $destination you should stop and choose another directory name."
 mkdir -p $destination || error "cannot mkdir $destination"
 
 prod=$destination/prod
@@ -94,12 +98,14 @@ echo "### testing special commands for config.mk"
 config=$prod/pips/makes/config.mk
 type javac && echo '_HAS_JDK_ = 1' >> $config
 type latex && echo '_HAS_LATEX_ = 1' >> $config
+type htlatex && echo '_HAS_HTLATEX_ = 1' >> $config
 type emacs && echo '_HAS_EMACS_ = 1' >> $config
 # others? copy config to newgen and linear?
 
-# whether to build the documentation depends on latex
+# whether to build the documentation depends on latex and htlatex
 target=compile
 type latex && target=build
+type htlatex && target=full-build
 
 echo "### building newgen"
 cd $prod/newgen
@@ -139,7 +145,7 @@ echo "### generating csh environment"
 $prod/pips/utils/sh2csh.pl < $destination/pipsrc.sh > $destination/pipsrc.csh
 
 echo "### checking useful softwares"
-for exe in bash m4 wish latex javac emacs
+for exe in bash m4 wish latex htlatex javac emacs
 do
   type $exe || echo "no such executable, consider installing: $exe"
 done

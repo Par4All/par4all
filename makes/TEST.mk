@@ -8,9 +8,17 @@ ARFLAGS	= rv
 CC	= gcc
 CFLAGS	= -O2 -g -Wall -msupersparc -pipe
 CMKDEP	= -M
-CPPFLAGS= -DLINEAR_VALUE_IS_CHARS -DLINEAR_NO_OVERFLOW_CONTROL -D__USE_FIXED_PROTOTYPES__ -D__USE_GNU -D__USE_BSD -nostdinc -I$(NEWGEN_ROOT)/Include -I$(LINEAR_ROOT)/Include -I$(PIPS_ROOT)/Include -I$(PIPS_EXTEDIR) -I$(GLIBC)/include -I$(GCCDIR)/include -I/usr/include
+CPPFLAGS= -DLINEAR_VALUE_IS_CHARS -DLINEAR_NO_OVERFLOW_CONTROL \
+		-D__USE_FIXED_PROTOTYPES__ -D__USE_GNU -D__USE_BSD -nostdinc \
+		-I$(NEWGEN_ROOT)/Include -I$(LINEAR_ROOT)/Include \
+		-I$(PIPS_ROOT)/Include -I$(PIPS_EXTEDIR) \
+		-I$(GLIBC)/include -I$(GCCDIR)/include -I/usr/include
 LD	= $(CC) 
-LDFLAGS	= -g -nostdlib $(GLIBC)/lib/crt0.o -L./$(ARCH) -L$(PIPS_ROOT)/Lib/$(ARCH) -L$(NEWGEN_ROOT)/Lib/$(ARCH) -L$(LINEAR_ROOT)/Lib/$(ARCH) -L$(PIPS_EXTEDIR)/$(ARCH) -L$(PIPS_EXTEDIR) -L$(GLIBC)/lib -L$(GCCDIR)/lib -L/usr/lib -lc -lgcc
+LDFLAGS	= -g -nostdlib $(GLIBC)/lib/crt0.o -L./$(ARCH) \
+		-L$(PIPS_ROOT)/Lib/$(ARCH) -L$(NEWGEN_ROOT)/Lib/$(ARCH) \
+		-L$(LINEAR_ROOT)/Lib/$(ARCH) -L$(PIPS_EXTEDIR)/$(ARCH) \
+		-L$(PIPS_EXTEDIR) -L$(GLIBC)/lib -L$(GCCDIR)/lib \
+		-L/usr/lib -lc -lgcc
 RANLIB	= granlib
 LEX	= flex
 LFLAGS	= -l

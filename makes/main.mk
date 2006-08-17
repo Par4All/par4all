@@ -172,15 +172,6 @@ $(ARCH)/%.o: %.f; $(F77CMP) $< -o $@
 %.c: %.m4c;	$(M4FLT) $(M4COPT) $< > $@
 %.h: %.m4h;	$(M4FLT) $(M4HOPT) $< > $@
 
-# latex
-%.dvi: %.tex
-	-grep '\\makeindex' $*.tex && touch $*.ind
-	$(LATEX) $<
-	-grep '\\bibdata{' \*.aux && { $(BIBTEX) $* ; $(LATEX) $< ;}
-	test ! -f $*.idx || { $(MAKEIDX) $*.idx ; $(LATEX) $< ;}
-	$(LATEX) $<
-	touch $@
-
 ################################################################## DEPENDENCIES
 
 ifdef LIB_CFILES
@@ -209,7 +200,12 @@ $(DEPEND): $(LIB_CFILES) $(OTHER_CFILES) $(DERIVED_CFILES)
 # actual generation is done on demand only
 depend: $(DERIVED_HEADERS) $(INC_TARGET)
 	$(MAKEDEP) $(LIB_CFILES) $(OTHER_CFILES) $(DERIVED_CFILES) | \
-	sed 's,^\(.*\.o:\),$(ARCH)/\1,;s,$(PIPS_ROOT),$$(PIPS_ROOT),g;s,$(LINEAR_ROOT),$$(LINEAR_ROOT),g;s,$(NEWGEN_ROOT),$$(NEWGEN_ROOT),g;s,$(ROOT),$$(ROOT),g' > $(DEPEND)
+	sed \
+		-e 's,^\(.*\.o:\),$(ARCH)/\1,;' \
+		-e 's,$(PIPS_ROOT),$$(PIPS_ROOT),g' \
+		-e 's,$(LINEAR_ROOT),$$(LINEAR_ROOT),g' \
+		-e 's,$(NEWGEN_ROOT),$$(NEWGEN_ROOT),g' \
+		-e 's,$(ROOT),$$(ROOT),g' > $(DEPEND)
 
 clean: depend-clean
 
@@ -407,6 +403,9 @@ compile:
 	$(MAKE) phase5
 	$(MAKE) phase6
 
+full-compile: compile
+	$(MAKE) phase7
+
 #install: recompile
 
 # empty dependencies to please compile targets
@@ -426,6 +425,7 @@ phase3:
 phase4:
 phase5:
 phase6:
+phase7:
 
 clean: phase0-clean
 
@@ -520,10 +520,11 @@ man-clean:
 
 endif # INSTALL_MAN
 
-# documentations html
+# html documentations after everything else...
 ifdef INSTALL_HTM
+ifdef _HAS_HTLATEX_
 
-phase6: .build_htm
+phase7: .build_htm
 
 $(HTM.d)/$(HTM.subd):; $(MKDIR) $(HTM.d)/$(HTM.subd)
 
@@ -547,6 +548,7 @@ clean: htm-clean
 htm-clean:
 	$(RM) .build_htm
 
+endif # _HAS_HTLATEX_
 endif # INSTALL_HTM
 
 # shared

@@ -14,11 +14,23 @@ MAKEIDX	= makeindex
 DVIPS	= dvips
 PS2PDF	= ps2pdf
 
+# pdf (portable document format)
 %.pdf: %.ps;	$(PS2PDF) $<
+
+# ps (post script)
 %.ps: %.dvi;	$(DVIPS) $< -o
 
-# If we want to generate HTML output from file.tex, create a directory "file.htdoc"
-# to hide junk details:
+# latex
+%.dvi: %.tex
+	-grep '\\makeindex' $*.tex && touch $*.ind
+	$(LATEX) $<
+	-grep '\\bibdata{' \*.aux && { $(BIBTEX) $* ; $(LATEX) $< ;}
+	test ! -f $*.idx || { $(MAKEIDX) $*.idx ; $(LATEX) $< ;}
+	$(LATEX) $<
+	touch $@
+
+# If we want to generate HTML output from file.tex, 
+# create a "file.htdoc" directory to hide junk details:
 %.htdoc: %.tex
 	rm -rf $@
 	mkdir $@

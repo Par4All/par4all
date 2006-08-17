@@ -77,18 +77,23 @@ la_cible_par_defaut_si_aucune_n_est_precisee_sur_la_ligne_de_commande: all
 	  if test -d $$d && test -f $$d/Makefile ; \
 	  then \
 	    echo "Forwarding $@ to $(FWD_ROOT)/$$d" >&2 ;\
-	    if $(MAKE) -C $$d $(FWD_MKFLAGS) FWD_ROOT="$(FWD_ROOT)/$$d" FWD_STOP_ON_ERROR="$(FWD_STOP_ON_ERROR)" $@ ;\
+	    if $(MAKE) -C $$d $(FWD_MKFLAGS) \
+		FWD_ROOT="$(FWD_ROOT)/$$d" \
+		FWD_STOP_ON_ERROR="$(FWD_STOP_ON_ERROR)" $@ ;\
 	    then report=succeeded ;\
 	    else report=failed ;\
 		 globally_failed=1 ;\
             fi ;\
 	    echo "$(FWD_MSG) $(FWD_ROOT)/$$d: $@ $$report" $(FWD_REPORT);\
-	    [[ "$(FWD_STOP_ON_ERROR)X" == 1X && $$globally_failed == 1 ]] && break;\
+	    [[ "$(FWD_STOP_ON_ERROR)X" == 1X && $$globally_failed == 1 ]] && \
+		break;\
 	  else \
 	    echo "Ignoring directory $$d" >&2 ;\
 	  fi ; \
 	 done $(FWD_OUT) ; \
-	 [ $$globally_failed == 1 ] && echo "$(FWD_MSG) $(FWD_ROOT): some making in `pwd` failed" $(FWD_REPORT);\
+	 [ $$globally_failed == 1 ] && \
+		echo "$(FWD_MSG) $(FWD_ROOT):" \
+			"some making in `pwd` failed" $(FWD_REPORT);\
 	 [ "$(FWD_STOP_ON_ERROR)X" == 1X ] && exit $$globally_failed;\
 	 exit 0
 

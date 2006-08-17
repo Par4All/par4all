@@ -61,7 +61,8 @@ WPIPS_MAIN 	= main_wpips.o
 ######################################################################### FPIPS
 
 FPIPS_LDFLAGS	= $(WPIPS_ADDED_LDFLAGS)
-FPIPS_LIBS	= -lpips -ltpips $(FPIPS_ADDED_LIBS) $(TPIPS_LIBS) $(TPIPS_ADDED_LIBS)
+FPIPS_LIBS	= -lpips -ltpips \
+			$(FPIPS_ADDED_LIBS) $(TPIPS_LIBS) $(TPIPS_ADDED_LIBS)
 FPIPS_MAIN	= main_fpips.o
 # By default, compile with wpips:
 FPIPS_ADDED_LIBS	= -lwpips $(WPIPS_LIBS)
