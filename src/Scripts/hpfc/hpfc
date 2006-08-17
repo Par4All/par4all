@@ -97,6 +97,11 @@ shift `expr $OPTIND - 1`
 
 # DEFAULT if no arguments: interactive. That makes sense.
 
+# fix path to find hpfc_compile
+arch=${PIPS_ARCH:-`arch.sh`}
+bindir=`dirname $0`
+PATH=$PATH:./$arch:$bindir/$arch
+
 [ "$#" -eq 0 ] && exec hpfc_interactive
 
 # ELSE exec the required command.

@@ -28,7 +28,7 @@
  *  - $HPFC_HISTORY (if any)
  *  - $HOME/"HIST"
  */
-static char *default_hist_file_name()
+static char * default_hist_file_name(void)
 {
     char *home, *hist = getenv(HPFC_HISTENV), *name;
 
@@ -42,7 +42,7 @@ static char *default_hist_file_name()
     return name;
 }
 
-static char * initialize_hpfc_history()
+static char * initialize_hpfc_history(void)
 {
     HIST_ENTRY * last_entry;
     char *file_name = default_hist_file_name();
@@ -64,22 +64,22 @@ static char * initialize_hpfc_history()
 
 /* Handlers
  */
-void cdir_handler(char * line)
+void cdir_handler(const char * line)
 {
     if (chdir(line+strlen(CHANGE_DIR)))
 	fprintf(stderr, "error while changing directory\n");
 }
 
-void shell_handler(char * line)
+void shell_handler(const char * line)
 {
     system(line+strlen(SHELL_ESCAPE));
 }
 
-void quit_handler(char * line)
+void quit_handler(const char * line)
 {
     char *file_name = default_hist_file_name();
 
-    /*   close history: truncate list and write history file
+    /* close history: truncate list and write history file
      */
     stifle_history(HPFC_HISTORY_LENGTH);
     write_history(file_name);
@@ -87,7 +87,7 @@ void quit_handler(char * line)
     exit(0);
 }
 
-void default_handler(char * line)
+void default_handler(const char * line)
 {
     char *shll = 
 	(char*) malloc(sizeof(char)*(strlen(HPFC_SHELL)+strlen(line)+2));
@@ -99,7 +99,7 @@ void default_handler(char * line)
 struct t_handler 
 {
     char * name;
-    void (*function)(char *);
+    void (*function)(const char *);
 } ;
 
 static struct t_handler handlers[] =
@@ -114,7 +114,7 @@ static struct t_handler handlers[] =
  */
 #define PREFIX_EQUAL_P(str, prf) (strncmp(str, prf, strlen(prf))==0)
 
-static void (*find_handler(char* line))(char *)
+static void (*find_handler(const char * line))(const char *)
 {
     struct t_handler * x = handlers;
     while ((x->name) && !PREFIX_EQUAL_P(line, x->name)) x++;
@@ -123,7 +123,7 @@ static void (*find_handler(char* line))(char *)
 
 /* MAIN: interactive loop and history management.
  */
-int main()
+int main(void)
 {
     char *last, *line;
 
