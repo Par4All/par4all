@@ -354,7 +354,7 @@ $(LIB_OBJECTS): $(ARCH)/.dir
 # creates the architecture directory
 $(ARCH)/.dir:
 	test -d $(ARCH) || $(MAKE) $(ARCH)
-	test -f $@ || touch $@
+	touch $@
 
 # alias for FI
 lib: $(ARCH)/$(LIB_TARGET)
@@ -366,11 +366,11 @@ endif # LIB_TARGET
 
 ifdef INSTALL_LIB
 
-phase2: $(ARCH)
+phase2: $(ARCH)/.dir
 
 phase4:	.build_lib.$(ARCH)
 
-$(INSTALL_LIB): $(ARCH)
+$(INSTALL_LIB): $(ARCH)/.dir
 
 $(LIB.d):
 	$(MKDIR) $@
@@ -461,7 +461,7 @@ ifdef INSTALL_BIN
 
 phase5: .build_bin.$(ARCH)
 
-$(INSTALL_BIN): $(ARCH)
+$(INSTALL_BIN): $(ARCH)/.dir
 
 $(BIN.d):
 	$(MKDIR) $@

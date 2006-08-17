@@ -28,20 +28,24 @@ endif
 main.dir =	./$(ARCH)
 
 # build pips executables on request
-$(ARCH)/pips: $(ARCH)
+$(ARCH)/pips:
+	$(MAKE) $(ARCH)
 	$(LINK) $@ $(main.dir)/$(PIPS_MAIN) -lpips $(PIPS_LIBS)
 
-$(ARCH)/tpips: $(ARCH)
+$(ARCH)/tpips:
+	$(MAKE) $(ARCH)
 	$(LINK) $@ $(TPIPS_LDFLAGS) \
 		$(main.dir)/$(TPIPS_MAIN) -ltpips $(PIPS_LIBS) $(TPIPS_LIBS)
 
-$(ARCH)/wpips: $(ARCH)
+$(ARCH)/wpips:
+	$(MAKE) $(ARCH)
 	$(LINK) $@ $(WPIPS_LDFLAGS) \
 		$(main.dir)/$(WPIPS_MAIN) -lwpips $(PIPS_LIBS) $(WPIPS_LIBS)
 
-$(ARCH)/fpips: $(ARCH)
+$(ARCH)/fpips:
+	$(MAKE) $(ARCH)
 	$(LINK) $@ $(FPIPS_LDFLAGS) \
-		$(main.dir)/$(FPIPS_MAIN) -lfpips $(PIPS_LIBS) $(FPIPS_LIBS)
+		$(main.dir)/$(FPIPS_MAIN) -lfpips $(FPIPS_LIBS) $(PIPS_LIBS) 
 
 # building a test executable in a library
 test:; $(MAKE) main.dir=$(PIPS_ROOT)/lib/$(ARCH) $(ARCH)/pips
