@@ -96,9 +96,9 @@ debug_on_function(
     pips_assert("stack not full", idls < STACK_LENGTH-1);
     dl = ((level_env = getenv(env)) != NULL) ? atoi(level_env) : 0;
 
-    debug_stack[idls].name = env;
-    debug_stack[idls].function = function;
-    debug_stack[idls].file = file;
+    debug_stack[idls].name = (char*) env;
+    debug_stack[idls].function = (char*) function;
+    debug_stack[idls].file = (char*) file;
     debug_stack[idls].line = line;
     debug_stack[idls].level = dl;
 

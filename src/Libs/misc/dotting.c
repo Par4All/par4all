@@ -50,10 +50,12 @@ static void print_dot()
 /*VARARGS3*/
 void
 start_dotting(FILE * dotting_file,
-              char dotting_character,
-              char * fmt,
+              const char dotting_character,
+              const char * fmt,
               ...)
 {
+   pips_debug(9, "dotting with '%c'", dotting_character);
+
    va_list args;
 
    va_start(args, fmt);

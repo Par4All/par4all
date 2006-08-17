@@ -59,7 +59,7 @@ extern bool get_bool_property(string);
  * where format and arg-list are passed as arguments to vprintf.  
  */
 
-void default_user_log(char * fmt, va_list args)
+void default_user_log(const char * fmt, va_list args)
 {
     if(!get_bool_property("USER_LOG_P")) return;
     (void) vfprintf(stdout, fmt, args);
@@ -74,7 +74,7 @@ void default_user_log(char * fmt, va_list args)
  * USER_LOG_P; this is necessary because (* pips_log_handler) may be called 
  * anywhere (because VARARGS), whithout verifying it.
  */
-void (* pips_log_handler)(char * fmt, va_list args) = default_user_log;
+void (* pips_log_handler)(const char * fmt, va_list args) = default_user_log;
 
 
 /* USER_LOG(format [, arg] ... ) */
@@ -97,9 +97,7 @@ void user_log(char * a_message_format, ...)
  * where format and arg-list are passed as arguments to vprintf.  
  */
 
-string default_user_request(fmt, args)
-char *fmt;
-va_list args;
+string default_user_request(const char * fmt, va_list args)
 {
     printf("\nWaiting for your response: ");
     vfprintf(stdout, fmt, args);
@@ -111,7 +109,7 @@ va_list args;
  * top-level (eg. wpips) may need a special user_request proceedure; they 
  * should let pips_request_handler point toward it.
  */
-string (* pips_request_handler)(char *, va_list) = default_user_request;
+string (* pips_request_handler)(const char *, va_list) = default_user_request;
 
 /* The generic fonction to ask something to the user. Note that if
  * the user cancels his/her request,the empty string "" is returned:
@@ -185,7 +183,7 @@ default_user_warning(const char * calling_function_name,
  * top-level (eg. wpips) may need a special user_warning proceedure; they 
  * should let pips_warning_handler point toward it.
  */
-void (* pips_warning_handler)(char *, char *, va_list *) 
+void (* pips_warning_handler)(const char *, const char *, va_list *) 
      = default_user_warning;
 
 
