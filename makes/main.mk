@@ -231,7 +231,9 @@ $(ETC.d):
 
 # Deal also with directories.
 # By the way, how to install directories with "install" ?
-.build_etc: $(INSTALL_ETC) $(ETC.d)
+.build_etc: $(INSTALL_ETC)
+	# no direct dependency on target directory
+	$(MAKE) $(ETC.d)
 	for f in $(INSTALL_ETC) ; do \
 	  if [ -d $$f ] ; then \
 	    cp -r $$f $(ETC.d) ; \
@@ -305,7 +307,9 @@ phase2: .build_inc
 
 $(INC.d):; $(MKDIR) $(INC.d)
 
-.build_inc: $(INSTALL_INC) $(INC.d)
+.build_inc: $(INSTALL_INC)
+	# no dep on target dir
+	$(MAKE) $(INC.d)
 	for f in $(INSTALL_INC) ; do \
 	  $(CMP) $$f $(INC.d)/$$f || \
 	    $(INSTALL) -m 644 $$f $(INC.d) ; \
@@ -374,7 +378,9 @@ $(LIB.d):
 $(LIB.d)/$(ARCH): $(LIB.d)
 	$(MKDIR) $@
 
-.build_lib.$(ARCH): $(INSTALL_LIB) $(LIB.d)/$(ARCH)
+.build_lib.$(ARCH): $(INSTALL_LIB)
+	# no dep on target dir
+	$(MAKE) $(LIB.d)/$(ARCH)
 	for l in $(INSTALL_LIB) ; do \
 	  $(CMP) $$l $(LIB.d)/$$l || \
 	    $(INSTALL) -m 644 $$l $(LIB.d)/$(ARCH) ; \
@@ -432,7 +438,9 @@ phase2: .build_exe
 $(EXE.d):
 	$(MKDIR) $@
 
-.build_exe: $(INSTALL_EXE) $(EXE.d)
+.build_exe: $(INSTALL_EXE)
+	# no direct deps on target dir
+	$(MAKE) $(EXE.d)
 	$(INSTALL) -m 755 $(INSTALL_EXE) $(EXE.d)
 	touch $@
 
@@ -458,7 +466,9 @@ $(INSTALL_BIN): $(ARCH)
 $(BIN.d):
 	$(MKDIR) $@
 
-.build_bin.$(ARCH): $(INSTALL_BIN) $(BIN.d)
+.build_bin.$(ARCH): $(INSTALL_BIN)
+	# no direct deps on target dir
+	$(MAKE) $(BIN.d)
 	$(INSTALL) -m 755 $(INSTALL_BIN) $(BIN.d)
 	touch $@
 
@@ -476,7 +486,9 @@ phase6: .build_doc
 
 $(DOC.d):; $(MKDIR) $(DOC.d)
 
-.build_doc: $(INSTALL_DOC) $(DOC.d)
+.build_doc: $(INSTALL_DOC)
+	# no direct deps on target dir
+	$(MAKE) $(DOC.d)
 	$(INSTALL) -m 644 $(INSTALL_DOC) $(DOC.d)
 	touch $@
 
@@ -494,7 +506,9 @@ phase6: .build_man
 
 $(MAN.d):; $(MKDIR) $(MAN.d)
 
-.build_man: $(INSTALL_MAN) $(MAN.d)
+.build_man: $(INSTALL_MAN)
+	# no direct deps on target dir
+	$(MAKE) $(MAN.d)
 	$(INSTALL) -m 644 $(INSTALL_MAN) $(MAN.d)
 	touch $@
 
@@ -512,9 +526,11 @@ phase6: .build_htm
 
 $(HTM.d)/$(HTM.subd):; $(MKDIR) $(HTM.d)/$(HTM.subd)
 
-.build_htm: $(INSTALL_HTM) $(HTM.d)
-# Deal also with directories.
-# By the way, how to install directories with "install" ?
+.build_htm: $(INSTALL_HTM)
+	# no direct deps on target dir
+	$(MAKE) $(HTM.d)
+	# Deal also with directories.
+	# By the way, how to install directories with "install" ?
 	for f in $(INSTALL_HTM) ; do \
 	  if [ -d $$f ] ; then \
 	    cp -r $$f $(HTM.d)/$(HTM.subd) ; \
@@ -539,7 +555,9 @@ phase2: .build_shr
 
 $(SHR.d):; $(MKDIR) $(SHR.d)
 
-.build_shr: $(INSTALL_SHR) $(SHR.d)
+.build_shr: $(INSTALL_SHR)
+	# no direct deps on target dir
+	$(MAKE) $(SHR.d)
 	$(INSTALL) -m 644 $(INSTALL_SHR) $(SHR.d)
 	touch $@
 
@@ -557,7 +575,9 @@ phase2: .build_utl
 
 $(UTL.d):; $(MKDIR) $(UTL.d)
 
-.build_utl: $(INSTALL_UTL) $(UTL.d)
+.build_utl: $(INSTALL_UTL)
+	# no direct deps on target dir
+	$(MAKE) $(UTL.d)
 	$(INSTALL) -m 755 $(INSTALL_UTL) $(UTL.d)
 	touch $@
 
