@@ -326,6 +326,11 @@ endif # INSTALL_INC
 $(ARCH):
 	test -d $(ARCH) || $(MKDIR) $(ARCH)
 
+# indirectly creates the architecture directory
+$(ARCH)/.dir:
+	test -d $(ARCH) || $(MAKE) $(ARCH)
+	touch $@
+
 clean: arch-clean
 
 arch-clean:
@@ -347,11 +352,6 @@ $(ARCH)/$(LIB_TARGET): $(LIB_OBJECTS)
 # $(ARCH) directory must exist, but its date does not matter
 # is there a better way?
 $(LIB_OBJECTS): $(ARCH)/.dir
-
-# creates the architecture directory
-$(ARCH)/.dir:
-	test -d $(ARCH) || $(MAKE) $(ARCH)
-	touch $@
 
 # alias for FI
 lib: $(ARCH)/$(LIB_TARGET)
