@@ -11,7 +11,17 @@ ifdef INC_TARGET
 
 # force it again as the first pass was partly wrong
 # because of cross dependencies between library headers
-phase3: build-header-file .build_inc
+# however, do not repeat that every time...
+phase3: .build_inc_second_pass
+
+.build_inc_second_pass:
+	$(MAKE) build-header-file .build_inc
+	touch $@
+
+clean: pips-clean
+
+pips-clean:
+	$(RM) .build_inc_second_pass
 
 endif
 

@@ -25,6 +25,7 @@ endif
 # INSTALL_RTM: runtime-related stuff
 # INSTALL_MAN DOC HTM: various documentations
 
+# the default target is to "recompile" the current directory
 all: recompile
 
 recompile: phase0 phase1 phase2 phase3 phase4 phase5 phase6
@@ -75,6 +76,8 @@ endif # ARCH
 ifndef ARCH
 $(error "ARCH macro is not defined")
 endif
+
+###################################################### INSTALLATION DIRECTORIES
 
 # where to install stuff
 BIN.d	= $(INSTALL_DIR)/bin/$(ARCH)
@@ -272,6 +275,9 @@ build-header-file:
 	} > $(INC_TARGET).tmp
 	$(MOVE) $(INC_TARGET).tmp $(INC_TARGET)
 
+# force local header construction, but only if really necessary;-)
+# the point is that the actual dependency is hold by the ".header" file,
+# so we must just check whether this file is up to date.
 header:	.header $(INC_TARGET)
 
 # .header carries all dependencies for INC_TARGET:
@@ -282,7 +288,7 @@ header:	.header $(INC_TARGET)
 $(INC_TARGET): $(TARGET)-local.h
 	$(RM) .header; $(MAKE) $(GMKNODIR) .header
 
-phase2:	header
+phase2:	$(INC_TARGET)
 
 clean: header-clean
 
@@ -397,11 +403,15 @@ compile:
 #install: recompile
 
 # empty dependencies to please compile targets
-phase0:
+phase0: .build_bootstrap
+
+.build_bootstrap:
 	@echo
-	@echo "Bootstrap the .h header files. It displays a lot of error..."
-	@echo "...but it should be normal. Next time in phase3 we should reach a fix point"
+	@echo "Bootstrap the .h header files."
+	@echo "It displays a lot of error... but it should be normal."
+	@echo "Next time in phase3 we should reach a fix point"
 	@echo
+	touch $@
 
 phase1:
 phase2:
@@ -409,6 +419,11 @@ phase3:
 phase4:
 phase5:
 phase6:
+
+clean: phase0-clean
+
+phase0-clean:
+	$(RM) .build_bootstrap
 
 ifdef INSTALL_EXE
 
