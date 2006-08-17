@@ -100,7 +100,7 @@ shift `expr $OPTIND - 1`
 # fix path to find hpfc_compile
 arch=${PIPS_ARCH:-`arch.sh`}
 bindir=`dirname $0`
-PATH=$PATH:./$arch:$bindir/$arch
+PATH=$PATH:./$arch:$bindir/$arch:$PIPS_ROOT/bin/$arch
 
 [ "$#" -eq 0 ] && exec hpfc_interactive
 

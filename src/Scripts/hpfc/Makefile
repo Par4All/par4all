@@ -24,7 +24,7 @@ PROJECT = pips
 include $(ROOT)/makes/main.mk
 
 # local stuff
-$(ARCH)/hpfc_interactive.o: $(ARCH)
+$(ARCH)/hpfc_interactive.o: $(ARCH)/.dir
 
 $(ARCH)/hpfc_interactive: $(ARCH)/hpfc_interactive.o
 	$(LINK) $(ARCH)/hpfc_interactive \
