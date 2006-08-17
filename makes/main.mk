@@ -543,12 +543,13 @@ $(HTM.d)/$(HTM.subd):; $(MKDIR) $(HTM.d)/$(HTM.subd)
 	done
 	touch $@
 
+endif # _HAS_HTLATEX_
+
 clean: htm-clean
 
 htm-clean:
 	$(RM) .build_htm
 
-endif # _HAS_HTLATEX_
 endif # INSTALL_HTM
 
 # shared
