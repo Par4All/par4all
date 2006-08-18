@@ -39,12 +39,6 @@ absolute_name()
                  s,^${pips_home}/Pips/Production,${PIPS_ROOT},"
 }
 
-# coulommiers.ensmp.fr -> coulommiers
-host_name()
-{
-    hostname | sed 's/\..*//'
-}
-
 ping=${PIPS_PING:-ping}
 
 #
@@ -62,7 +56,7 @@ PATH="/usr/ucb:/usr/etc:/usr/bin:/usr/games:.:$PATH"
 MAIL=${PIPS_MAIL:-Mail}
 export MAIL
 
-hostname=`host_name`
+hostname=`hostname -s`
 user=`whoami`
 PWD=`absolute_name \`pwd\``
 
@@ -506,7 +500,9 @@ fi
 
 [ "$performance" ] && performance="$performance, end `local_date`"
 
-mailfinal "${user}" "${result} for ${PIPS_ARCH}" "${final}" "${warning}" "${performance}"
+mailfinal \
+	"${user}" "${result} for ${PIPS_ARCH}" "${final}" \
+	"${warning}" "${performance}"
 
 #
 # that is all

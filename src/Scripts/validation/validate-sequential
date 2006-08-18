@@ -50,14 +50,8 @@ else
     default_file="$vdir/defaults"
 fi
 
-# coulommiers.ensmp.fr -> coulommiers
-host_name()
-{
-    hostname | sed 's/\..*//'
-}
-
 RUNNER=`whoami`
-hostname=`host_name`
+hostname=`hostname -s`
 PWD=`pwd`
 subject="PIPS Validation:"
 failed=""
@@ -71,9 +65,6 @@ export program
 
 verb=':'
 debg=':'
-
-#MAIL='/usr/ucb/mail'
-#test ! -x $MAIL && MAIL=mail
 
 MAIL=${PIPS_MAIL:-Mail}
 
@@ -157,17 +148,8 @@ done
 
 shift `expr $OPTIND - 1`
 
-#
-# to avoid a which call, where ~/.cshrc is executed and so on!
-#
-# FC, Tue Mar  8 14:19:50 MET 1994
-#
-
 RUNDIR=${RUNDIR:-$PWD}
 cd $RUNDIR || error 2 "cannot cd $RUNDIR ($?)"
-
-# COMDIR=${COMDIR:-${RUNDIR}}
-# test -d $COMDIR || error 2 "no communication dir $COMDIR"
 
 pips_version=${pips_version:-`which_executable pips`}
 tpips_version=${tpips_version:-`which_executable tpips`}
@@ -180,9 +162,7 @@ test "${tpips_version}" -a -x "${tpips_version}" || error 5 "no tpips!"
 $verb "pips to be used: $pips_version"
 $verb "tpips to be used: $tpips_version"
 
-#
 # a special directory is used when the -u option is set.
-#
 [ "$UNIQDIR" ] && { mkdir $UNIQDIR ; cd $UNIQDIR;}
 
 $verb "running in directory `pwd`"
@@ -198,8 +178,8 @@ diffout=${tdir}/diff.$$
 # global variable...
 errors=${tdir}/errors.$$
 
-echo 0 > $errors
-
+# report status-code message [subject]
+# env: directory program hostname pips_version tpips_version
 report()
 {
   result=$1
@@ -268,6 +248,7 @@ make_diff()
     echo "too many lines ($lines), look by hand" > $diffout ;
   fi
 
+  # ca c'est du Pierre... ;-)
   report $status \
   "`echo Run accept on mail message to resynchronize. ;\
   echo Differences for $module in $refresult: ;\
@@ -278,6 +259,7 @@ make_diff()
   test $status -eq 0 && rm -f $refresult.out
 }
 
+# test_aspect name-of-test-directory
 test_aspect()
 {
   aspect=${1}
@@ -315,7 +297,8 @@ test_aspect()
      
      rm -f $tmpout $tmperr
 
-     echo "considering directory `${PIPS_BASENAME:-basename} $aspect` file $name.[cfF]" > $tmperr
+     echo "considering directory `${PIPS_BASENAME:-basename} $aspect`" \
+          "file $name.[cfF]" > $tmperr
 
      #
      # .test case
@@ -329,7 +312,7 @@ test_aspect()
 
        report $STATUS \
          "Execution of $aspect/$name.test failed" || \
-         { $debg " || error $aspect/$name.test"; continue;}
+         { $debg " || error $aspect/$name.test"; continue; }
        
        make_diff $aspect $name test
        continue
@@ -432,50 +415,35 @@ case $# in
   * ) 	aspects="$*" ;;
 esac
 
-# if [ -f pipsmake.rc ] 
-# then
-#   report 2 "validate cannot be run with a local pipsmake.rc."
-#   [ "$LOCKFILE" ] && echo "validate:$hostname" > $LOCKFILE.$hostname
-#   exit 4
-# elif [ -f properties.rc ]
-# then
-#   report 3 "validate cannot be run with a local properties.rc."
-#   [ "$LOCKFILE" ] && echo "validate:$hostname" > $LOCKFILE.$hostname
-#   exit 5
-# fi
-
 echo 0 > $errors 
 
-#
-# Main loop
+# Main loop over directories
 
-for i in $aspects
+for dir in $aspects
 do
   old_errors=`cat $errors`
-  directory=$i
+  directory=$dir
 
-  if [ ! -d "$vdir/$i" ]
+  if [ ! -d "$vdir/$dir" ]
   then
     report 1 \
-      "$i is not a directory in $vdir"
-  elif [ -f $vdir/$i/pipsmake.rc ] 
+	"$dir is not a directory in $vdir"
+  elif [ -f $vdir/$dir/pipsmake.rc ] 
   then
     report 2 \
-    "validate should not be run with a pipsmake.rc in $vdir/$i."
-  elif [ -f $vdir/$i/properties.rc ]
+	"validate should not be run with a pipsmake.rc in $vdir/$dir."
+  elif [ -f $vdir/$dir/properties.rc ]
   then
     report 3 \
-  "validate should not be run with a properties.rc in $vdir/$i."
+	"validate should not be run with a properties.rc in $vdir/$dir."
   else
-
-    $verb "validating $i"
-
-    test_aspect $vdir/$i
+    $verb "validating $dir"
+    test_aspect $vdir/$dir
   fi
 
   if [ "`cat $errors`" -ne "$old_errors" ] 
   then
-    failed="$i-$failed"
+    failed="$dir-$failed"
   fi
 done
 
@@ -489,9 +457,7 @@ else
   final="failed (-$failed)"
 fi
 
-#
 # clean directory and files
-
 rm -f $tmpout $tmperr $diffout $diffout_e
 Delete -a
 rm -f core
@@ -500,9 +466,7 @@ rm -f core
 
 [ "$PERFORMANCE" ] && PERFORMANCE="$PERFORMANCE, end: `date`"
 
-#
 # Final report
-
 directory=
 program=
 
