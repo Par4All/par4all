@@ -9,7 +9,8 @@ ARFLAGS	= rv
 CC	= gcc
 CANSI	= -ansi -pedantic-errors
 CFLAGS	= -g -O2 -Wall -W -pipe
-CMKDEP	= -MM -MG
+# ??? -MG
+CMKDEP	= -MM
 LD	= $(CC) 
 RANLIB	= granlib
 FC	= g77
