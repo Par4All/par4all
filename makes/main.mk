@@ -202,10 +202,10 @@ depend: $(DERIVED_HEADERS) $(INC_TARGET)
 	$(MAKEDEP) $(LIB_CFILES) $(OTHER_CFILES) $(DERIVED_CFILES) | \
 	sed \
 		-e 's,^\(.*\.o:\),$(ARCH)/\1,;' \
-		-e 's,$(PIPS_ROOT),$$(PIPS_ROOT),g' \
-		-e 's,$(LINEAR_ROOT),$$(LINEAR_ROOT),g' \
-		-e 's,$(NEWGEN_ROOT),$$(NEWGEN_ROOT),g' \
-		-e 's,$(ROOT),$$(ROOT),g' > $(DEPEND)
+		-e 's,$(subst .,\.,$(PIPS_ROOT)),$$(PIPS_ROOT),g' \
+		-e 's,$(subst .,\.,$(LINEAR_ROOT)),$$(LINEAR_ROOT),g' \
+		-e 's,$(subst .,\.,$(NEWGEN_ROOT)),$$(NEWGEN_ROOT),g' \
+		-e 's,$(subst .,\.,$(ROOT)),$$(ROOT),g' > $(DEPEND)
 
 clean: depend-clean
 
