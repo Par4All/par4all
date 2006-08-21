@@ -4,38 +4,39 @@
 
 ######################################################################## NEWGEN
 
-NEWGEN_LIBS	= -lgenC
+newgen.libs	= genC
 
 ######################################################################## LINEAR
 
-LINEAR_LIBS	= -lmatrice -lunion -lpolyedre -lsparse_sc -lsc -lcontrainte \
-		  -lsg -lsommet -lray_dte -lpolynome -lmatrix -lvecteur \
-		  -larithmetique
+linear.libs	= matrice union polyedre sparse_sc sc contrainte sg sommet \
+		  ray_dte polynome matrix vecteur arithmetique
 
 ######################################################################## OTHERS
 
-OTHER_LIBS = 	-lm
+other.libs	= m
 
 ##################################################################### EXTERNALS
 
-EXTERN_LIBS =	-lpolylib
+extern.libs	= polylib
 
 ################################################################### PIPS COMMON
 
 # old stuff: 
-# -lprgm_mapping -lscheduling -lreindexing -larray_dfg 
-# -lpaf-util -lstatic_controlize -lpip
+# prgm_mapping scheduling reindexing array_dfg paf-util static_controlize pip
 
-PIPS_LIBS	= \
-	-ltop-level -lpipsmake -lwp65 -lhpfc -lhyperplane \
-	-linstrumentation -lstatistics -lexpressions -ltransformations \
-	-lmovements -lbootstrap -lcallgraph -licfg -lchains -lcomplexity \
-	-lconversion -lprettyprint -latomizer -lsyntax -lc_syntax \
-	-leffects-simple -leffects-convex -leffects-generic -lalias-classes \
-	-lcomp_sections -lsemantics -lcontrol -lcontinuation -lrice -lricedg \
-	-lpipsdbm -ltransformer -lpreprocessor -lri-util -lproperties \
-	-ltext-util -lmisc -lproperties -lreductions -lflint -lsac -lphrase \
-	-lnewgen $(NEWGEN_LIBS) $(LINEAR_LIBS) $(EXTERN_LIBS) $(OTHER_LIBS)
+pipslibs.libs	= \
+	top-level pipsmake wp65 hpfc hyperplane \
+	instrumentation statistics expressions transformations \
+	movements bootstrap callgraph icfg chains complexity \
+	conversion prettyprint atomizer syntax c_syntax \
+	effects-simple effects-convex effects-generic alias-classes \
+	comp_sections semantics control continuation rice ricedg \
+	pipsdbm transformer preprocessor ri-util properties \
+	text-util misc properties reductions flint sac phrase newgen
+
+pips.libs	= \
+	$(pipslibs.libs) $(newgen.libs) $(linear.libs) \
+	$(extern.libs) $(other.libs)
 
 ########################################################################## PIPS
 
@@ -43,7 +44,9 @@ PIPS_MAIN	= main_pips.o
 
 ######################################################################### TPIPS
 
-TPIPS_LIBS	= -lreadline -ltermcap
+tpips_add.libs	= readline termcap
+tpips.libs	= $(pips.libs) $(tpips_add.libs)
+
 TPIPS_MAIN	= main_tpips.o
 
 ######################################################################### WPIPS
@@ -55,14 +58,16 @@ OPENWINHOME=$(X11_ROOT)
 
 WPIPS_CPPFLAGS 	= -I$(OPENWINHOME)/include -I$(X11_ROOT)/include -Iicons
 WPIPS_LDFLAGS 	= -L$(OPENWINHOME)/lib -L$(X11_ROOT)/lib
-WPIPS_LIBS 	= -lxview -lolgx -lX11
+
+wpips_add.libs	= xview olgx X11
+wpips.libs	= $(pips.libs) $(wpips_add.libs)
 WPIPS_MAIN 	= main_wpips.o
 
 ######################################################################### FPIPS
 
-FPIPS_LDFLAGS	= $(WPIPS_ADDED_LDFLAGS)
-FPIPS_LIBS	= -lpips -ltpips \
-			$(FPIPS_ADDED_LIBS) $(TPIPS_LIBS) $(TPIPS_ADDED_LIBS)
-FPIPS_MAIN	= main_fpips.o
+FPIPS_LDFLAGS	= $(WPIPS_LDFLAGS)
+
 # By default, compile with wpips:
-FPIPS_ADDED_LIBS	= -lwpips $(WPIPS_LIBS)
+fpips_add.libs	= wpips $(wpips_add.libs)
+fpips.libs	= pips tpips $(pips.libs) $(fpips_add.libs) $(tpips_add.libs)
+FPIPS_MAIN	= main_fpips.o
