@@ -53,7 +53,10 @@ ttest:;	$(MAKE) main.dir=$(PIPS_ROOT)/lib/$(ARCH) $(ARCH)/tpips
 wtest:;	$(MAKE) main.dir=$(PIPS_ROOT)/lib/$(ARCH) $(ARCH)/wpips
 ftest:;	$(MAKE) main.dir=$(PIPS_ROOT)/lib/$(ARCH) $(ARCH)/fpips
 
-# fix library dependency
 ifdef LIB_TARGET
-test ttest wtest ftest: $(ARCH)/$(LIB_TARGET)
+# fix local library dependency
+$(ARCH)/pips: $(ARCH)/$(LIB_TARGET)
+$(ARCH)/tpips: $(ARCH)/$(LIB_TARGET)
+$(ARCH)/wpips: $(ARCH)/$(LIB_TARGET)
+$(ARCH)/fpips: $(ARCH)/$(LIB_TARGET)
 endif
