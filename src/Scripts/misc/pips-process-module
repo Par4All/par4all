@@ -11,6 +11,3 @@ test "`type perl | grep 'not found'`" && {
 dir=`dirname $0`
 
 perl $dir/pips-deal-with-include $1
-
-# end of $RCSfile: pips-process-module,v $
-#
