@@ -35,16 +35,16 @@
 #include <stdarg.h>
 #include "genC.h"
 
-string strndup(
-    int n, /* le nombre de caracteres a copier */
-    string s /* la chaine a copier */)
+string gen_strndup(
+    string s, /* la chaine a copier */
+    int n /* le nombre de caracteres a copier */)
 {
  	register string r;
 	register int i;
 
 	/* allocation */
 	if ((r = (string) malloc((unsigned) n)) == NULL) {
-		fprintf(stderr, "strndup: out of memory\n");
+		fprintf(stderr, "gen_strndup: out of memory\n");
 		exit(1);
 	}
 
@@ -61,16 +61,16 @@ string strndup(
 	return(r);
 }
 
-string strndup0(
-    int n, /* le nombre de caracteres a copier */
-    string s /* la chaine a copier */)
+string gen_strndup0(
+    string s, /* la chaine a copier */
+    int n /* le nombre de caracteres a copier */)
 {
  	register string r;
 	register int i;
 
 	/* allocation */
 	if ((r = (string) malloc((unsigned) n+1)) == NULL) {
-		fprintf(stderr, "strndup0: out of memory\n");
+		fprintf(stderr, "gen_strndup0: out of memory\n");
 		exit(1);
 	}
 
