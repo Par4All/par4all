@@ -36,10 +36,10 @@ F.menu	=	jpips_test.menu \
 
 F.gif	=	DownArrow.gif
 
-# do not install if java is not available?
+# should not install anything if java is not available?
 INSTALL_EXE = 	jpips
 
-INSTALL_SHR =	$(F.gif) $(F.menu) jpips.jar
+INSTALL_SHR =	$(F.gif) $(F.menu)
 
 # common stuff
 ifdef PIPS_ROOT
@@ -52,6 +52,8 @@ PROJECT = pips
 include $(ROOT)/makes/main.mk
 
 # local stuff
+ifdef _HAS_JDK_
+
 pkg	= fr.ensmp.cri.jpips
 
 JAVAC	= javac
@@ -67,18 +69,17 @@ $(CLASS.d):
 manifest.mf:
 	echo "Main-Class: $(pkg).JPips" > $@
 
-ifdef _HAS_JDK_
+INSTALL_SHR += jpips.jar
+
+# main.mk INSTALL_SHR dependency uses the initial value.
+# the dependency is fixed here.
+.build_shr: jpips.jar
 
 jpips.jar: manifest.mf $(F.java) $(CLASS.d) 
 	$(JAVAC) -classpath $(CLASS.d) -d $(CLASS.d) $(F.java)
 	# should put everything in the jar file: menus, images...
 	cd $(CLASS.d) && \
 	$(JAR) cmf ../manifest.mf ../$@ $(subst .,/,$(pkg))/*.class
-
-else
-# hmmm... should rather not install
-jpips.jar:
-	touch $@
 
 endif
 
