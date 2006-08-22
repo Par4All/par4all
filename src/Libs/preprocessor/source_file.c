@@ -130,9 +130,13 @@ string pips_change_directory(char *dir)
 /* the name of the environment variable where source files are searched for. */
 #define SRCPATH "PIPS_SRCPATH"
 
+/* set to path or unset if null */
 void pips_srcpath_set(string path)
 {
-  setenv(SRCPATH, path, TRUE);
+  if (path)
+    setenv(SRCPATH, path, TRUE);
+  else
+    unsetenv(SRCPATH);
 }
 
 /* returns an allocated pointer to the old value */
