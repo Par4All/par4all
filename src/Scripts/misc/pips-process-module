@@ -1,7 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: pips-process-module,v $ (version $Revision$)
-# $Date: 1996/09/21 17:24:56 $, 
+# $Id$
 #
 
 test "`type perl | grep 'not found'`" && {

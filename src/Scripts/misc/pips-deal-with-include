@@ -1,6 +1,6 @@
+#! /usr/bin/perl -w
 #
-# $RCSfile: pips-deal-with-include,v $ (version $Revision$)
-# $Date: 1996/10/25 21:59:45 $, 
+# $Id$
 #
 ###
 #
@@ -54,6 +54,3 @@ rename $file_name, $file_name.orig
 	|| die "rename $file_name, $file_name.orig failed";
 rename $output_file_name, $file_name
 	|| die "rename $file_name, $file_name.orig failed";
-
-#
-# end of $RCSfile: pips-deal-with-include,v $
