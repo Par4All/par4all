@@ -122,7 +122,8 @@ public class JPips
     
     try
     {
-      FileReader f = new FileReader(System.getProperty(source));
+      String menu_file = System.getProperty(source);
+      FileReader f = new FileReader(menu_file);
       Parser p = new Parser(f);
       String lineContent = p.nextNonEmptyLine();
       while(lineContent != null)

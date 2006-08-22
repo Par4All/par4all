@@ -39,7 +39,7 @@ F.gif	=	DownArrow.gif
 # do not install if java is not available?
 INSTALL_EXE = 	jpips
 
-INSTALL_SHR =	jpips.jar $(F.gif) $(F.menu)
+INSTALL_SHR =	$(F.gif) $(F.menu) jpips.jar
 
 # common stuff
 ifdef PIPS_ROOT
@@ -69,15 +69,14 @@ manifest.mf:
 
 ifdef _HAS_JDK_
 
-jpips.jar: $(CLASS.d) manifest.mf
+jpips.jar: manifest.mf $(F.java) $(CLASS.d) 
 	$(JAVAC) -classpath $(CLASS.d) -d $(CLASS.d) $(F.java)
 	# should put everything in the jar file: menus, images...
 	cd $(CLASS.d) && \
 	$(JAR) cmf ../manifest.mf ../$@ $(subst .,/,$(pkg))/*.class
 
 else
-
-# hmmm...
+# hmmm... should rather not install
 jpips.jar:
 	touch $@
 
@@ -87,4 +86,4 @@ clean: local-clean
 
 local-clean:
 	$(RM) -r $(CLASS.d)
-	$(RM) jpips.jar manifest.mf
+	$(RM) jpips.jar manifest.mf tpips_session.* *.class

@@ -118,4 +118,4 @@ export TPIPS_IS_A_SHELL
 
 # verbose execution...
 set -x
-exec java -jar ${jpips} ${props} ${forward}
+exec java ${props} -jar ${jpips} ${forward}
