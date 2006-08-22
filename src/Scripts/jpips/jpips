@@ -116,6 +116,14 @@ fi
 TPIPS_IS_A_SHELL=1
 export TPIPS_IS_A_SHELL
 
+if [ "$PIPS_SRCPATH" ]
+then
+    PIPS_SRCPATH=$PIPS_SRCPATH:.
+else
+    PIPS_SRCPATH=.
+fi
+export PIPS_SRCPATH
+
 # verbose execution...
 set -x
 exec java ${props} -jar ${jpips} ${forward}
