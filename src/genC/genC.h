@@ -85,9 +85,6 @@ typedef union gen_chunk {
 #define CONSP(x) ((x).l)
 #define SETP(x) ((x).t)
 #define CHUNK(x) ((x).p)
-
-/* added on 02/10/95, FC 
- */
 #define HASH(x) ((x).h)
 #define CHUNKP(x) ((x).p)
 #define LIST(x) ((x).l) 
@@ -108,6 +105,16 @@ typedef union gen_chunk {
 #define CHUNK_TYPE gen_chunkp
 #define CHUNKP_TYPE gen_chunkp
 #define HASH_TYPE hash_table
+
+/* some other macros need the domain number to keep track of the type.
+ * they are provided here for the internal types.
+ */
+#define unit_domain	(0)
+#define bool_domain	(1)
+#define char_domain	(2)
+#define int_domain	(3)
+#define float_domain	(4)
+#define string_domain	(5)
 
 #include "newgen_list.h"
 #include "newgen_stack.h"
