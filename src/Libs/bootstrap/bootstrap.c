@@ -4454,7 +4454,7 @@ AddPackageToName(p, n)
   int l;
   
   l = strlen(p);
-  ps = strndup(l + 1 + strlen(n) +1, p);
+  ps = gen_strndup(p, l + 1 + strlen(n) +1);
   
   *(ps+l) = MODULE_SEP;
   *(ps+l+1) = '\0';

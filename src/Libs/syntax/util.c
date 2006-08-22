@@ -5,8 +5,6 @@
 #include "ri.h"
 #include "constants.h"
 
-extern char *strndup();
-
 /* a few simple functions to build or access internal representation */
 
 /*value MakeValueLitteral()*/

@@ -593,7 +593,10 @@ static string claire_array_in_task(reference r, bool first, int task_number){
   }
   
   if(!null_fitting_p){
-    fitting_declaration2 = strdup(concatenate(strndup0(strlen(fitting_declaration) - 2, fitting_declaration), "),", NL, TAB, TAB, TAB, NULL));
+    fitting_declaration2 = 
+      strdup(concatenate(gen_strndup0(fitting_declaration, 
+				      strlen(fitting_declaration) - 2), 
+			 "),", NL, TAB, TAB, TAB, NULL));
     result = strdup(concatenate(result, fitting_declaration2, NULL));
   }
 
@@ -666,8 +669,12 @@ static string claire_array_in_task(reference r, bool first, int task_number){
   }
   if(!null_fitting_p)
     {
-      result = strdup(concatenate(strndup0(strlen(result) - 2, result), "),", NULL));
-      internal_index_declarations = strdup(concatenate(strndup0(strlen(internal_index_declarations) -2, internal_index_declarations), ")", NULL));
+      result = strdup(concatenate(gen_strndup0(result, strlen(result) - 2), 
+				  "),", NULL));
+      internal_index_declarations = 
+	strdup(concatenate(gen_strndup0(internal_index_declarations,
+				      strlen(internal_index_declarations) -2),
+			   ")", NULL));
     }
 
 
