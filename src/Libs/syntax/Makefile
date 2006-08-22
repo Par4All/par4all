@@ -14,8 +14,7 @@ TARGET	= syntax
 # I wanna the header file for the lexer
 YOPT	=	-d
 
-INC_CFILES=	util.c \
-		declaration.c \
+INC_CFILES= 	declaration.c \
 		expression.c \
 		equivalence.c \
 		parser.c \
