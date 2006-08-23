@@ -750,8 +750,9 @@ bool rmake(string rname, string oname)
 
     if (check_resource_up_to_date (rname, oname)) 
     {
-      pips_debug (8, "Resource %s(%s) becomes up-to-date after applying"
-		  "pre-transformations and building required resources\n",
+      pips_debug(8, 
+		 "Resource %s(%s) becomes up-to-date after applying\n"
+		 "  pre-transformations and building required resources\n",
 		  rname,oname);
     } 
     else 

@@ -942,10 +942,12 @@ bool process_user_file(string file)
 		
 	    if((rf = fopen(abs_res, "r"))!=NULL) { /* Resource name
                                                       conflict */
-	      string ofile = db_get_memory_resource(DBR_USER_FILE, mod_name, TRUE);
+	      string ofile = 
+		db_get_memory_resource(DBR_USER_FILE, mod_name, TRUE);
 
 	      fclose(rf);
-	      pips_user_warning("Duplicate module name \"%s\" from files \"%s\" and \"%s\".\n",
+	      pips_user_warning("Duplicate module name \"%s\""
+				" from files \"%s\" and \"%s\".\n",
 				res_name, ofile, nfile);
 	      resource_name_conflicts++;
 	      break;

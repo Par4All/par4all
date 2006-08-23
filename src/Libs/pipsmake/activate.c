@@ -42,7 +42,7 @@ retrieve_active_phases(void)
 {
     makefile current_makefile = parse_makefile();
 
-    ifdebug(2) {
+    ifdebug(9) {
 	puts("----- BEFORE RETREIVING -----");
 	fprint_activated(stdout);
     }
@@ -53,7 +53,7 @@ retrieve_active_phases(void)
 	makefile_active_phases(current_makefile) = saved_active_phases;
 	saved_active_phases = NIL;
 
-	ifdebug(2) {
+	ifdebug(9) {
 	    puts("----- AFTER RETREIVING -----");
 	    fprint_activated(stdout);
 	}
