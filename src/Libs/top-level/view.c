@@ -71,9 +71,8 @@ static string get_view_file(string print_type, bool displayable)
 	 }
 	 else
 	 {
-	     /* it is relative to pips pwd, or absolute.
-	      */
-	     return file_name;
+	     /* it is relative to pips pwd, or absolute. */
+	     return strdup(file_name);
 	 }
       }
    }
