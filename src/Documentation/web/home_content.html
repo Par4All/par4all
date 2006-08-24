@@ -66,8 +66,14 @@ align=middle> You can get a beta version of the
 <a name="new-features"><h2>What&#039;s new?</h2></a>
 <P>
 <ul>
+  <li> Basic C support
+  <li> code generation for parallel heterogeneous architectures with
+  hardware synthesis for the
+   <A HREF="https://info.enstb.org/projets/phrase">PHRASE</a> and <A
+  HREF="https://comap.enstb.org">CoMap</a> projects
+  <li> PIPS is available with SubVersioN (SVN)
   <li> multimédia instruction set (MMX like) code generation with
-   <a href="http://www.lit.enstb.org/~keryell/eleves/ENSTBr/2002-2003/DEA/Ferrand">SAC</a>
+   <a href="https://info.enstb.org/projets/sac">SAC</a>
    (SIMD Architecture Compiler)
   <li> Semantics analysis of CFG sharpened
   <li> Semantics analysis for non-integer types: boolean, float and strings
@@ -84,7 +90,7 @@ align=middle> You can get a beta version of the
 <hr>
 
 <b>Last update: </b>
-$Date: 2003/10/07 09:12:18 $
+$Date: 2006/08/24 09:12:18 $
 
 <b>URL: </b>http://www.cri.ensmp.fr/pips
 
@@ -114,12 +120,13 @@ boundary checking must be minimized conservatively.
 
 <p>
 
-<b>PIPS</b> is a free open workbench which has been used as support to develop
-new analyses or program transformations by several teams from CEA-DAM,
-Southampton University, SRU and ENS Cachan. These new developments benefit
-at no cost from the general infrastructure and from already available
-analyses and transformations. <b>PIPS</b> has also been used to develop a
-HPF prototype compiler and to study optimizations for HPF.
+<b>PIPS</b> is a free open workbench which has been used as support to
+develop new analyses or program transformations by several teams from
+CEA-DAM, Southampton University, SRU, ENST Bretagne and ENS Cachan. These
+new developments benefit at no cost from the general infrastructure and
+from already available analyses and transformations. <b>PIPS</b> has also
+been used to develop a HPF prototype compiler and to study optimizations
+for HPF.
 
 <p>
 
@@ -136,6 +143,7 @@ comments and, to some extent, the initial statement numbers are preserved.
 <TD>
 <B>INPUTS</B> 
 <UL>
+<LI> C
 <LI> Fortran 77
 <LI> Fortran 77 + High Performance Fortran directives
 </UL>
@@ -183,7 +191,8 @@ comments and, to some extent, the initial statement numbers are preserved.
 <LI> Fortran 77 + OpenMP
 <LI> Fortran 77 + PVM
 <LI> Fortran 77 + MPI
-<LI>
+<LI> C
+<LI> SmallTalk
 </UL>
 <B>TRANSFORMATIONS</B>
   <UL>

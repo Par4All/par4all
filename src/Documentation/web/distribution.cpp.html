@@ -17,43 +17,18 @@
 
 
 
-The PIPS software is distributed both in an executable form and source
-code. Note that the source code is not bullet-proof and is large (200,000
-lines of C code). Its compilation requires many public-domain tools to be
-installed, thus we recommend that you download the compiled version if you
-do not plan to use <a href=http://www.cri.ensmp.fr/pips>PIPS</a> as a base
-for developing new analysis or transformation phases. <p>
+The PIPS software is distributed no longer distributed in an executable
+	  form but only in source code. Note that the source code is not
+	  bullet-proof and is large (200,000 lines of C code). Its compilation
+	  requires many public-domain tools to be installed, thus we recommend
+	  that you use the small script <code>setup_pips.sh</code> to help you
+	  to build a PIPS working version you can use as is or as a base for
+	  developing new analysis or transformation phases. <p>
 
 When installing PIPS on your system, please read the README and INSTALL
 files at the root directory of the distribution for further instructions
 on how to run or compile PIPS. For help mail to
 <code>pipsgroup@cri.ensmp.fr</code>.
-
-
-
-<h2>PIPS executables</h2>
-
-PIPS executables are available for SUN workstations, under SunOS
-or Solaris, under IBM Aix and under Linux. The installation of binaries
-requires 10-20MB. No that Pips has been compiled successfully on a DEC alpha. 
-
-<ul>
-  <li> GET(PIPS for Sparc Solaris 2,pips_GNUSOL2LL.tar.gz)
-       (Ultra Sparc <code>long long int</code> version)  (3.3MB)
-       
-  <li> GET(PIPS for Sparc SunOS 4, pips_GNUSOL1.tar.gz) (3.5MB)
-       
-  <li> GET(PIPS for IBM AIX 4,pips_IBMAIX.tar.gz) (3.7MB)
-       (does not include wpips and epips, but only basic intefaces).
-       
-  <li> GET(PIPS for i86 Linux,pips_LINUXI86LL.tar.gz)
-       (I86 <code>long long int</code> version) (3MB)
-       
-  <li> GET(Public parts for Solaris 2,public_GNUSOL2LL.tar.gz)
-     (toolpack 1.2 and daVinci 2, pips can be run without these, just download
-     if you really need these functionalities) (caution! 10MB!)
-</ul>
-
 
 
 <h2>PIPS and tools at the source level</h2>
@@ -65,32 +40,19 @@ public license (GPL) that you may find quite easily on the net. <p>
 
 GNU make, cproto, flex, bison and some other tools are required to build
 PIPS. See the next section for pointers on how to find and download these
-tools which are not included in the basic distribution. 
+tools which are not included in the basic distribution.
 
-<ul>
-  <li> GET(PIPS sources,pips_sources.tar.gz)
-       (includes Newgen, Linear and Pips) (3.9MB)
-       
-  <li> GET(PIPS validation,pips_valid.tar.gz)
-       (for non regression tests, to be added to the sources) (1.2MB)
-       
-  <li> GET(NEWGEN sources,newgen_sources.tar.gz)
-       (standalone software engineering tool) (0.3MB)
-       
-  <li> GET(LINEAR C3 library sources,linear_sources.tar.gz)
-       (standalone integer linear programming modules) (0.5MB)
-       
-  <li> GET(XPOMP sources,xpomp_sources.tar.gz)
-       (standalone X-based 2D data graphical display) (0.2MB)
-</ul>
-
-
+Now everything is available in a SubVersioN repository as described in <A
+			HREF="http://svn.cri.ensmp.fr/pips.html">http://svn.cri.ensmp.fr/pips.html</a>. An
+			anonymous access is enough to get the software, but if you
+			want to contribute to PIPS, just ask for an account with
+			commit access. 
 
 <h2>Other softwares of interest</h2>
 
-Here are pointers to some external software that is used by PIPS or by
-PIPS generated codes or for building the PIPS software. This sofware
-is generally freely distributed. 
+Here are (some quite old) pointers to some external software that is used
+by PIPS or by PIPS generated codes or for building the PIPS software. This
+sofware is generally freely distributed.
 <ul>
   <li> <a href=http://www.netlib.org/pvm3>PVM 3.3</a>: for the runtime of 
        <a href=http://www.cri.ensmp.fr/pips/hpfc.html>HPFC</a> and
@@ -116,7 +78,7 @@ is generally freely distributed.
        (kit of Fortran to Fortran transformations structurations and so on,
        written in Fortran).
        
-  <li> xtree
+  <li> xtree to display call graphs.
 </ul>
 
 #include "go_back.html"

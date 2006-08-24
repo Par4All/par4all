@@ -2,6 +2,9 @@
 # $Id$
 #
 
+PIPS_HTML_HOST = ssh-cri.ensmp.fr
+PIPS_HTML_DIR = ~pips/public_html
+
 # To deal with non-framed viewer and no server side include:
 HTML_AUTO = \
 	index.cpp.html \
@@ -18,6 +21,9 @@ HTML_AUTO = \
 
 HTML_OTHERS =	\
 	batch-interface.html \
+	go_back.html \
+	home_content.html \
+	images \
 	line-interface.html \
 	outline.html \
 	pips_summary.html \
@@ -25,10 +31,10 @@ HTML_OTHERS =	\
 	poly_meth.html \
 	regions.html \
 	summary_hpfc.html \
+	tpips.css \
 	window-interface.html \
 	wp65.html \
-	wp65_summary.html \
-	home_content.html
+	wp65_summary.html
 
 
 HTMS =	$(HTML_AUTO:.cpp.html=.html) $(HTML_OTHERS)
@@ -58,3 +64,7 @@ index.html : home_content.html
 local-clean:
 	$(RM) $(HTML_AUTO:.cpp.html=.html) 
 
+# Assume that the files are already generated:
+publish :
+	chmod g+w $(HTMS)
+	rsync --archive --update --verbose $(HTMS) $(PIPS_HTML_HOST):$(PIPS_HTML_DIR)
