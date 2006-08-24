@@ -73,17 +73,30 @@ extern string csplit_definite_function_signature;
 extern bool csplit_is_static_p;
 extern int check_signature_balance(void);
 
-int csplit_line_number = 1; /* To be exported to the parser */
+int csplit_line_number = 1; /* To be exported to the parser for
+			  ; splitting the preprocessed file */
+int user_line_number = 1; /* To be exported to the parser for error
+			; messages related to the user file*/
+
+void gdb_marker()
+{
+/* Just to be able to set an easy breakpoint */
+;
+}
 
 void reset_csplit_line_number()
 {
   csplit_line_number = 1;
+  user_line_number = 1;
 }
 
 static int csplit_current_beginning = 1000000;
+static int user_current_beginning = 1000000;
 
 static void update_csplit_current_beginning()
 {
+  user_current_beginning = csplit_current_beginning > csplit_line_number?
+    user_line_number : user_current_beginning;
   csplit_current_beginning = csplit_current_beginning > csplit_line_number?
     csplit_line_number : csplit_current_beginning;
 }
@@ -93,6 +106,7 @@ void reset_csplit_current_beginning()
   int leaked = 0;
 
   csplit_current_beginning = 1000000;
+  user_current_beginning = 1000000;
   csplit_is_static_p = FALSE;
 
   if(!string_undefined_p(csplit_current_function_name)) 
@@ -116,6 +130,11 @@ void reset_csplit_current_beginning()
 int get_csplit_current_beginning()
 {
   return csplit_current_beginning;
+}
+
+int get_user_current_beginning()
+{
+  return user_current_beginning;
 }
 
 static int lf_count(string s)
@@ -168,6 +187,7 @@ oct_escape ('\\'{octdigit}{octdigit}?{octdigit}?)
                                    or closing parts. */
                                 /* Bug FI: line feed are not counted! */
                                 csplit_line_number += lf_count(yytext);
+                                user_line_number += lf_count(yytext);
                                 pips_debug(5,"Comment \"%s\"\n",yytext);
                         }
 "//"[^\n]*                { 
@@ -176,12 +196,27 @@ oct_escape ('\\'{octdigit}{octdigit}?{octdigit}?)
 ^"#"[^\n]*              { 
                                 /* csplit_line_number++; */
                                 pips_debug(5,"Pragma comment %s\n",yytext);
+                                /* Must be a line pragma left by the preprocessor */
+                                gdb_marker();
+                                if(/* strstr(yytext, "#line")==yytext && */ strlen(yytext)>=4) {
+                                   int initial_C_line_number = -1;
+                                   int items = sscanf(yytext+1, "%d", &initial_C_line_number);
+                                   if(items==1) {
+                                      /* Get rid of the pragma LF itslef */
+                                      user_line_number = initial_C_line_number-1;
+                                   }
+                                   else {
+                                      pips_user_warning("No line number in # pragma: \"%s\".\n", yytext);
+                                      CParserError("Ill. formated # pragma\n");
+                                   }
+                                }
                         }
 {blank}			{ 
                                 /* Eat up whitespaces */
                         }
 \n                      { 
                                 csplit_line_number++;
+                                user_line_number++;
                                 pips_debug(5, "New line %d, ext=%d, func=%d\n", csplit_line_number, csplit_is_external, csplit_is_function);
                         }
 "_Pragma" 	        { 
@@ -488,8 +523,8 @@ L\"([^\"]|(\"\")|(\\\"))*\"	{
 void yyerror(char * msg)
 {
     user_warning("yyerror",
-                 "C %s near \"%s\" at line %d\n",
-                 msg, yytext, csplit_line_number);
+                 "C %s near \"%s\" at preprocessed line %d (user line %d)\n",
+                 msg, yytext, csplit_line_number, user_line_number);
     /* I should call csplit_parser_error() or the equivalent module */
     pips_user_error("Syntax error\n");
 }
