@@ -603,6 +603,7 @@ global:
 				      csplit_definite_function_signature,
 				      get_csplit_current_beginning(),
 				      csplit_line_number,
+				      get_user_current_beginning(),
 				      current_function_is_static_p);
 
                           reset_csplit_current_beginning();
@@ -1534,7 +1535,12 @@ type_spec:   /* ISO 6.7.2 */
 |   TK_STRUCT id_or_typename                           
                         {
 			  pips_debug(8, "TK_STRUCT id_or_typename->type_spec\n");
-			  if(strcmp(csplit_current_function_name, $2)==0) {
+			  /* FI: not clean, but the parser
+			     distinguishes between different kinds of
+			     ident and do not process them the same
+			     way. */
+			  if(!string_undefined_p(csplit_current_function_name)
+			     && strcmp(csplit_current_function_name, $2)==0) {
 			    reset_csplit_current_function_name();
 			  }
 			  $$ = build_signature(new_signature("struct"), $2, NULL);
