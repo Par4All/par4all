@@ -371,6 +371,25 @@ void close_prettyprint()
 }
 
 
+/* Can this statement be printed on one line, without enclosing braces? */
+bool one_liner_p(statement s)
+{
+  instruction i = statement_instruction(s);
+  bool yes = (instruction_test_p(i) || instruction_loop_p(i) || instruction_whileloop_p(i)
+	      || instruction_call_p(i) || instruction_forloop_p(i) || instruction_goto_p(i)
+	      || instruction_return_p(i))
+    && ENDP(statement_declarations(s));
+
+  if(!yes && instruction_sequence_p(i)) {
+    list sl = sequence_statements(instruction_sequence(i));
+    int sc = gen_length(sl);
+    
+    yes = (sc <= 1) && ENDP(statement_declarations(s));
+  }
+
+  return yes;
+}
+
 /********************************************************************* WORDS */
 
 static int words_intrinsic_precedence(call);
@@ -399,7 +418,7 @@ words_loop_range(range obj)
 list C_loop_range(range obj, entity i)
 {
     list pc;
-    call c = syntax_call(expression_syntax(range_increment(obj)));
+    /* call c = syntax_call(expression_syntax(range_increment(obj))); */
 
     /* Complete the initialization assignment */
     pc = words_subexpression(range_lower(obj), 0, TRUE);
@@ -416,7 +435,7 @@ list C_loop_range(range obj, entity i)
     pc = CHAIN_SWORD(pc, entity_local_name(i));
     pc = CHAIN_SWORD(pc," += ");
     pc = gen_nconc(pc, words_expression(range_increment(obj)));
-    pc = CHAIN_SWORD(pc,") {");
+    pc = CHAIN_SWORD(pc,")");
 
     return(pc);
 }
@@ -2012,6 +2031,8 @@ text_loop_default(
     else {
       /* Assumed to be C */
       pc = gen_nconc(pc, C_loop_range(loop_range(obj), loop_index(obj)));
+      if(!one_liner_p(body))
+	 pc = CHAIN_SWORD(pc," {");
     }
     u = make_unformatted(strdup(label), n, margin, pc) ;
     ADD_SENTENCE_TO_TEXT(r, first_sentence = 
@@ -2036,7 +2057,8 @@ text_loop_default(
     /* LOOP postlogue
      */
     if(!is_fortran) { /* i.e. is_C for the time being */
-      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
+      if(!one_liner_p(body))
+	 ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
     }
     else if (structured_do || doall_loop_p || do_enddo_p ||
 	pp_cray_style_p() || pp_craft_style_p() || pp_cmf_style_p())
@@ -2287,10 +2309,18 @@ text_block_if(
     text r = make_text(NIL);
     list pc = NIL;
     statement test_false_obj;
+    bool one_liner_true_statement = one_liner_p(test_true(obj));
+    bool one_liner_false_statement = one_liner_p(test_false(obj));
+    bool else_branch_p = FALSE; /* The else branch must be printed */
 
     pc = CHAIN_SWORD(pc, is_fortran?"IF (":"if (");
     pc = gen_nconc(pc, words_expression(test_condition(obj)));
-    pc = CHAIN_SWORD(pc, is_fortran?") THEN":") {");
+    if(is_fortran)
+      pc = CHAIN_SWORD(pc, ") THEN");
+    else if(one_liner_true_statement)
+      pc = CHAIN_SWORD(pc, ")");
+    else
+      pc = CHAIN_SWORD(pc, ") {");
 
     ADD_SENTENCE_TO_TEXT(r, 
 			 make_sentence(is_sentence_unformatted, 
@@ -2314,20 +2344,27 @@ text_block_if(
 	(statement_continue_p(test_false_obj)
 	 && (get_bool_property("PRETTYPRINT_ALL_LABELS"))))
       {
+        else_branch_p = TRUE;
 	if (is_fortran) 
 	  {
 	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
 	  }
 	else
 	  {
-	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
-	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"else {"));
+	    if(!one_liner_true_statement)
+	      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
+	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"else"));
+	    if(!one_liner_false_statement)
+	      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin," {"));
 	  }
 	MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, 
 				      test_false_obj));
       }
     
-    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,strdup(is_fortran?"ENDIF":"}")));
+    if(is_fortran)
+      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,strdup("ENDIF")))
+    else if((!else_branch_p && !one_liner_true_statement) || (else_branch_p && !one_liner_false_statement))
+      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,strdup("}")))
 
     return(r);
 }
@@ -2635,6 +2672,31 @@ text_instruction(
  * Those are handled by text_control.
  */
 
+/* Special handling for C comments which are indented */
+text C_comment_to_text(int margin, string c)
+{
+  text ct = make_text(NIL);
+  string lb = c; /* line beginning */
+  string le = c; /* line end */
+  string cp = c; /* current position, pointer in comments */
+
+  /* Empty comments are different from "", and "", which should never
+     occur by the way, does not neet to be printed. */
+  if(strlen(c)>0) {
+    for(;*cp!='\0';cp++) {
+      if(*cp=='\n') {
+	if(cp!=c)
+	  ADD_SENTENCE_TO_TEXT(ct, MAKE_ONE_WORD_SENTENCE(margin,gen_strndup0(lb, le-lb)));
+	lb = cp+1;
+	le = cp+1;
+      }
+      else
+	le++;
+    }
+  }
+  return ct;
+}
+
 text 
 text_statement(
     entity module,
@@ -2648,6 +2710,8 @@ text_statement(
 	entity_local_name(statement_label(stmt)) + strlen(LABEL_PREFIX);
     string comments = statement_comments(stmt);
     
+    pips_assert("Blocks have no comments", !instruction_block_p(i)||empty_comments_p(comments));
+
     /* 31/07/2003 Nga Nguyen : This code is added for C, because a statement can have its own declarations */
     list l = statement_declarations(stmt);
 
@@ -2697,16 +2761,28 @@ text_statement(
     if(!ENDP(text_sentences(temp))) {
       MERGE_TEXTS(r, init_text_statement(module, margin, stmt));
       if (! string_undefined_p(comments)) {
-	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
-					      strdup(comments)));
+	if(is_fortran) {
+	  ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
+						strdup(comments)));
+	}
+        else {
+	  text ct = C_comment_to_text(margin, comments);
+	  MERGE_TEXTS(r, ct);
+	}
       }
       MERGE_TEXTS(r, temp);
     }
     else {
 	/* Preserve comments */
 	if (! string_undefined_p(comments)) {
+	  if(is_fortran) {
 	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
 						  strdup(comments)));
+	  }
+	  else {
+	    text ct = C_comment_to_text(margin, comments);
+	    MERGE_TEXTS(r, ct);
+	  }
 	}
 	free_text(temp);
     }
@@ -3121,6 +3197,7 @@ static text text_forloop(entity module,string label,int margin,forloop obj,int n
     unformatted u;
     text r = make_text(NIL);
     statement body = forloop_body(obj) ;
+    instruction i = statement_instruction(body);
    
     pc = CHAIN_SWORD(pc,"for (");
     if (!expression_undefined_p(forloop_initialization(obj)))
@@ -3134,9 +3211,15 @@ static text text_forloop(entity module,string label,int margin,forloop obj,int n
     pc = CHAIN_SWORD(pc,")");
     u = make_unformatted(strdup(label), n, margin, pc) ;
     ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
-    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"{"));
-    MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, body));
-    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
+
+    if(one_liner_p(body)) {
+      MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, body));
+    }
+    else {
+      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"{"));
+      MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, body));
+      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
+    }
 
     return r;
 }
