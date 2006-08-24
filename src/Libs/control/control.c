@@ -500,7 +500,7 @@ statement loop_test(statement sl)
 		     MAKE_CONTINUE_STATEMENT(), 
 		     MAKE_CONTINUE_STATEMENT());
   string csl = statement_comments(sl);
-  string prev_comm = empty_comments_p(csl)? strdup("") : strdup(csl);
+  string prev_comm = empty_comments_p(csl)? empty_comments /* strdup("") */ : strdup(csl);
   string lab = string_undefined;
 
   if(entity_empty_label_p(loop_label(l)))
@@ -635,7 +635,7 @@ statement whileloop_test(statement sl)
 		       MAKE_CONTINUE_STATEMENT());
     string csl = statement_comments(sl);
     /* string prev_comm = empty_comments_p(csl)? "" : strdup(csl); */
-    string prev_comm = empty_comments_p(csl)? strdup("") : strdup(csl);
+    string prev_comm = empty_comments_p(csl)? empty_comments /* strdup("") */ : strdup(csl);
 
     if (get_bool_property("PRETTYPRINT_C_CODE"))
       cs = prev_comm;
@@ -767,7 +767,7 @@ statement forloop_test(statement sl)
 		     MAKE_CONTINUE_STATEMENT(), 
 		     MAKE_CONTINUE_STATEMENT());
   string csl = statement_comments(sl);
-  string cs = empty_comments_p(csl)? strdup("") : strdup(csl);
+  string cs = empty_comments_p(csl)? empty_comments /* strdup("") */ : strdup(csl);
 
   statement ts = make_statement(entity_empty_label(), 
 				statement_number(sl),
@@ -977,7 +977,8 @@ static loop for_to_do_loop_conversion(expression init,
 static sequence for_to_while_loop_conversion(expression init,
 					     expression cond,
 					     expression incr,
-					     statement body)
+					     statement body,
+					     string comments)
 {
   syntax s_init = expression_syntax(init);
   syntax s_cond = expression_syntax(cond);
@@ -993,14 +994,14 @@ static sequence for_to_while_loop_conversion(expression init,
     statement init_st = make_statement(entity_empty_label(), 
 				       STATEMENT_NUMBER_UNDEFINED,
 				       STATEMENT_ORDERING_UNDEFINED,
-				       strdup(""),
+				       empty_comments,
 				       make_instruction(is_instruction_call, 
 							syntax_call(s_init)),
 				       NIL,NULL);
     statement incr_st =  make_statement(entity_empty_label(), 
 					STATEMENT_NUMBER_UNDEFINED,
 					STATEMENT_ORDERING_UNDEFINED,
-					strdup(""),
+					empty_comments,
 					make_instruction(is_instruction_call,
 							 syntax_call(s_incr)),
 					NIL,NULL);
@@ -1009,7 +1010,7 @@ static sequence for_to_while_loop_conversion(expression init,
     statement n_body = make_statement(entity_empty_label(), 
 				      STATEMENT_NUMBER_UNDEFINED,
 				      STATEMENT_ORDERING_UNDEFINED,
-				      string_undefined,
+				      empty_comments,
 				      make_instruction(is_instruction_sequence,
 						       body_seq),
 				     NIL,NULL);
@@ -1018,7 +1019,7 @@ static sequence for_to_while_loop_conversion(expression init,
     statement wl_st =  make_statement(entity_empty_label(), 
 				     STATEMENT_NUMBER_UNDEFINED,
 				     STATEMENT_ORDERING_UNDEFINED,
-				     strdup(""),
+				     comments,
 				     make_instruction(is_instruction_whileloop,
 						      wl_i),
 				     NIL,NULL);
@@ -1104,10 +1105,13 @@ hash_table used_labels;
     /* If the DO conversion has failed, the WHILE conversion may be requested */
     if(instruction_undefined_p(ni)) {
       if(get_bool_property("FOR_TO_WHILE_LOOP_IN_CONTROLIZER")) {
+	/* As a sequence cannot carry comments, the for loop comments
+	   are moved to the while loop */
 	sequence wls = for_to_while_loop_conversion(forloop_initialization(l),
 						    forloop_condition(l),
 						    forloop_increment(l),
-						    control_statement(c_body));
+						    control_statement(c_body),
+						    statement_comments(st));
 
 	/* These three fields have been re-used or freed by the previous call */
 	forloop_initialization(l) = expression_undefined;
@@ -1132,9 +1136,11 @@ hash_table used_labels;
       
     UPDATE_CONTROL(c_res,
 		   make_statement(statement_label(st),
-				  statement_number(st),
+				  (!instruction_sequence_p(ni))
+				  ?statement_number(st):STATEMENT_NUMBER_UNDEFINED,
 				  STATEMENT_ORDERING_UNDEFINED,
-				  statement_comments(st),
+				  (!instruction_sequence_p(ni))
+				  ?statement_comments(st):empty_comments,
 				  ni, 
 				  statement_declarations(st),
 				  statement_decls_text(st)),
@@ -1400,7 +1406,7 @@ hash_table used_labels;
 	NULL
 	: strdup(statement_decls_text(st));
       string ct = string_undefined_p(statement_comments(st))?
-	string_undefined /* Should be empty_comment() ? */
+	string_undefined /* Should be empty_comments ? */
 	: strdup(statement_comments(st));
 
       c_block = make_control(make_empty_statement_with_declarations_and_comments(d, dt, ct),
