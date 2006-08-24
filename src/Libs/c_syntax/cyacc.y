@@ -72,6 +72,8 @@
 extern int c_lex(void);
 extern void c_error(char *);
 
+ extern void discard_comments(void);
+
 extern string compilation_unit_name;
 extern statement ModuleStatement;
 
@@ -267,7 +269,7 @@ c_parser_context CreateDefaultContext()
 %type <liste> my_decl_spec_list 
 %type <liste> decl_spec_list_opt_no_named
 %type <liste> decl_spec_list_opt 
-%type <entity> old_proto_decl,direct_old_proto_decl
+%type <entity> old_proto_decl direct_old_proto_decl
 %%
 
 interpret: file TK_EOF
@@ -387,6 +389,7 @@ global:
 			  stack_push((char *) e, FunctionStack);
 			  stack_push((char *) make_basic_logical(TRUE),FormalStack);
 			  stack_push((char *) make_basic_int(1),OffsetStack);
+			  discard_C_comment();
 			} 
     old_parameter_list_ne TK_RPAREN old_pardef_list TK_SEMICOLON
                         { 
@@ -402,6 +405,7 @@ global:
 			  stack_pop(FormalStack);
 			  StackPop(OffsetStack);	
 			  $$ = NIL;	
+			  discard_C_comment();
 			}
 /* Old style function prototype, but without any arguments */
 |   TK_IDENT TK_LPAREN TK_RPAREN TK_SEMICOLON
@@ -419,6 +423,7 @@ global:
 			    entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL)));	 
 			  pips_assert("Current function entity is consistent",entity_consistent_p(e));
 			  $$ = NIL;
+			  discard_C_comment();
 			}
 /* transformer for a toplevel construct */
 |   TK_AT_TRANSFORM TK_LBRACE global TK_RBRACE TK_IDENT /*to*/ TK_LBRACE globals TK_RBRACE 
@@ -970,15 +975,20 @@ statement:
                 	{
 			  $$ = test_to_statement(make_test(MakeCommaExpression($2), $3,
 							   make_empty_block_statement())); 
+                          statement_comments($$) = pop_current_C_comment();
+			  /* statement_number($$) = pop_current_C_line_number(); */
 			}
 |   TK_IF paren_comma_expression statement TK_ELSE statement
 	                {
 			  $$ = test_to_statement(make_test(MakeCommaExpression($2),$3,$5));
+                          statement_comments($$) = pop_current_C_comment();
+			  /* statement_number($$) = pop_current_C_line_number(); */
 			}
 |   TK_SWITCH 
                         {
 			  stack_push((char *) make_sequence(NIL),SwitchGotoStack);
 			  stack_push((char *) make_basic_int(loop_counter++), LoopStack);
+			  /* push_current_C_comment(); */
 			} 
     paren_comma_expression 
                         {
@@ -994,6 +1004,7 @@ statement:
 |   TK_WHILE 
                         {
 			  stack_push((char *) make_basic_int(loop_counter++), LoopStack);
+			  /* push_current_C_comment(); */
 			} 
     paren_comma_expression statement
 	        	{
@@ -1004,6 +1015,7 @@ statement:
 |   TK_DO
                         {
 			  stack_push((char *) make_basic_int(loop_counter++), LoopStack);
+			  /* push_current_C_comment(); */
 			} 
     statement TK_WHILE paren_comma_expression TK_SEMICOLON
 	        	{
@@ -1013,6 +1025,7 @@ statement:
 |   TK_FOR
                         {
 			  stack_push((char *) make_basic_int(loop_counter++), LoopStack);
+			  /* push_current_C_comment(); */
 			} 
     TK_LPAREN for_clause opt_expression TK_SEMICOLON opt_expression TK_RPAREN statement
 	                {
@@ -1039,19 +1052,34 @@ statement:
 			}
 |   TK_RETURN TK_SEMICOLON		 
                         {
-			  $$ = call_to_statement(make_call(CreateIntrinsic(RETURN_FUNCTION_NAME),NIL));
+			  /* $$ =  call_to_statement(make_call(CreateIntrinsic(RETURN_FUNCTION_NAME),NIL)); */
+                          $$ = make_statement(entity_empty_label(), 
+			       get_current_C_line_number(), 
+			       STATEMENT_ORDERING_UNDEFINED, 
+			       get_current_C_comment(),
+			       call_to_instruction(make_call(CreateIntrinsic(RETURN_FUNCTION_NAME),NIL)),
+			       NIL, string_undefined);
+			  statement_consistent_p($$);
 			}
 |   TK_RETURN comma_expression TK_SEMICOLON
 	                {  
-			  $$ =  call_to_statement(make_call(CreateIntrinsic(RETURN_FUNCTION_NAME),$2));
+			  /* $$ =  call_to_statement(make_call(CreateIntrinsic(RETURN_FUNCTION_NAME),$2)); */
+                          $$ = make_statement(entity_empty_label(), 
+			       get_current_C_line_number(), 
+			       STATEMENT_ORDERING_UNDEFINED, 
+			       get_current_C_comment(),
+			       make_instruction(is_instruction_call,
+						make_call(CreateIntrinsic(RETURN_FUNCTION_NAME), $2)),
+			       NIL, string_undefined);
+			  statement_consistent_p($$);
 			}
 |   TK_BREAK TK_SEMICOLON
                         {
-			  $$ = MakeBreakStatement();
+			  $$ = MakeBreakStatement(get_current_C_comment());
 			}
 |   TK_CONTINUE TK_SEMICOLON
                  	{
-			  $$ = MakeContinueStatement();
+			  $$ = MakeContinueStatement(get_current_C_comment());
 			}
 |   TK_GOTO TK_IDENT TK_SEMICOLON
 		        {
@@ -1637,6 +1665,7 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			  entity_storage($$) = (storage) stack_make(type_domain,0,0);
 			  stack_push((char *) entity_type($$), (stack) entity_storage($$));
 			  entity_type($$) = type_undefined;
+			  discard_C_comment();
 			}
 |   TK_LPAREN attributes declarator TK_RPAREN
                         {
@@ -1943,6 +1972,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  stack_pop(ContextStack);
 			  pips_debug(2,"Create current module %s\n",entity_user_name($2));
 			  MakeCurrentModule($2); 
+			  clear_C_comment();
 			  pips_assert("Module is consistent\n",entity_consistent_p($2));
 			}	
 /* (* Old-style function prototype *) */
@@ -1952,6 +1982,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  stack_pop(ContextStack);
 			  pips_debug(2,"Create current module %s with old-style prototype\n",entity_user_name($2));
 			  MakeCurrentModule($2); 
+			  clear_C_comment();
 			  pips_assert("Module is consistent\n",entity_consistent_p($2));
 			}	
 /* (* New-style function that does not have a return type *) */
@@ -1960,6 +1991,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,$1);
 			  pips_debug(2,"Create current module %s with no return type\n",$1);
 			  MakeCurrentModule(e);
+			  clear_C_comment();
 			  stack_push((char *) e, FunctionStack);
 			}
     rest_par_list TK_RPAREN 
@@ -1979,6 +2011,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,$1);
 			  pips_debug(2,"Create current module %s with no return type + old-style parameter list\n",$1);
 			  MakeCurrentModule(e);	
+			  clear_C_comment();
 			  stack_push((char *) e, FunctionStack);
 			  stack_push((char *) make_basic_logical(TRUE),FormalStack);
 			  stack_push((char *) make_basic_int(1),OffsetStack);
@@ -2003,6 +2036,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  entity_type(e) = make_type_functional(f);
 			  pips_debug(2,"Create current module %s with no return type and no parameters\n",$1);
 			  MakeCurrentModule(e);
+			  clear_C_comment();
 			  pips_assert("Current module entity is consistent\n",entity_consistent_p(e));
 			}	
 ;
