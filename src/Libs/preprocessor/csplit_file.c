@@ -184,7 +184,7 @@ static void csplit_skip(FILE * f, int lines)
  and add the module name to the module name list. The compilation unit
  name used for static functions is retrieved from a global variable set by
  csplit_open_compilation_unit(), current_compilation_unit_name. */
-void csplit_copy(string module_name, string signature, int first_line, int last_line, bool is_static_p)
+void csplit_copy(string module_name, string signature, int first_line, int last_line, int user_first_line, bool is_static_p)
 {
   FILE * mfd = NULL;
   /* Unambiguous, unless the user has given the same name to two functions. */
@@ -246,7 +246,9 @@ void csplit_copy(string module_name, string signature, int first_line, int last_
 
   pips_assert("Current position is OK", current_input_line==first_line-1);
 
-  /* Step 3: Copy the function declaration in the compilation unit. */
+  /* Step 3: Copy the function declaration in the compilation unit,
+     starting with its line number in the original file. */
+  fprintf(mfd, "# %d\n", user_first_line);
   while(current_input_line<last_line) {
     char c = fgetc(splitc_in_append);
 
