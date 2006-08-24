@@ -76,12 +76,21 @@ void InitializeBlock()
 
 statement MakeBlock(list decls, list stms)
 { 
+  /* To please the controlizer, blocks cannot carry line numbers nor comments */
+  /* Anyway, it might be much too late to retrieve the comment
+     associated to the beginning of the block. The lost comment
+     appears after the last statement of the block. To save it, as is
+     done in Fortran, an empty statement should be added at the end of
+     the sequence. */
+
   statement s = make_statement(entity_empty_label(), 
-			       STATEMENT_NUMBER_UNDEFINED, 
+			       STATEMENT_NUMBER_UNDEFINED /* get_current_C_line_number() */, 
 			       STATEMENT_ORDERING_UNDEFINED, 
-			       string_undefined,
+			       empty_comments /* get_current_C_comment() */,
 			       make_instruction_sequence(make_sequence(stms)),
-			       decls,string_undefined);
+			       decls, string_undefined);
+
+  discard_C_comment();
 
   ifdebug(1) 
     {
@@ -113,15 +122,16 @@ statement MakeLabeledStatement(string label, statement s)
     {
       st = make_statement(l, STATEMENT_NUMBER_UNDEFINED, 
 			 STATEMENT_ORDERING_UNDEFINED, 
-			 string_undefined, 
+			 get_current_C_comment(), 
 			 statement_instruction(s),
 			 NIL,string_undefined);
       LabeledStatements = CONS(STATEMENT,st,LabeledStatements);
-    }
+   }
   else 
     {
       /* The statement is already created pseudoly, replace it by the real one*/
       statement_instruction(smt) =  statement_instruction(s);
+      statement_comments(smt) = statement_comments(s);
       st = smt;
     }
   return st;
@@ -130,7 +140,8 @@ statement MakeLabeledStatement(string label, statement s)
 statement MakeGotoStatement(string label)
 {
   entity l = MakeCLabel(label);
-  
+  statement gts = statement_undefined;
+
   /* Find the corresponding statement from its label, 
      if not found, create a pseudo one, which will be replaced lately when
      we see the statement (label: statement) */
@@ -140,11 +151,18 @@ statement MakeGotoStatement(string label)
     {
       s = make_statement(l,STATEMENT_NUMBER_UNDEFINED,
 			 STATEMENT_ORDERING_UNDEFINED,
-			 empty_comments, 
+			 string_undefined, 
 			 make_continue_instruction(),NIL,NULL);
       LabeledStatements = CONS(STATEMENT,s,LabeledStatements);
+
     }
-  return instruction_to_statement(make_instruction(is_instruction_goto,s));
+  gts = make_statement(entity_empty_label(),
+		       get_current_C_line_number(),
+		       STATEMENT_ORDERING_UNDEFINED,
+		       get_current_C_comment(), 
+		       make_instruction(is_instruction_goto,s),NIL,NULL);
+
+ return gts;
 }
 
 /* The labels in C have function scope. */
@@ -175,6 +193,7 @@ statement MakeWhileLoop(list lexp, statement s, bool before)
   statement s1 = FindStatementFromLabel(MakeCLabel(lab1));
   string lab2 = strdup(concatenate("break_",int_to_string(i),NULL));
   statement s2 = FindStatementFromLabel(MakeCLabel(lab2));
+
   if (!statement_undefined_p(s1))
     {
       /* This loop has a continue statement which has been transformed to goto 
@@ -184,7 +203,13 @@ statement MakeWhileLoop(list lexp, statement s, bool before)
   w  = make_whileloop(MakeCommaExpression(lexp),
 		      s,entity_empty_label(),
 		      before ? make_evaluation_before(): make_evaluation_after());
-  smt = instruction_to_statement(make_instruction_whileloop(w)); 
+  smt = make_statement(entity_empty_label(), 
+		       get_current_C_line_number(), 
+		       STATEMENT_ORDERING_UNDEFINED, 
+		       pop_current_C_comment(),
+		       make_instruction_whileloop(w),
+		       NIL, string_undefined);
+
   if (!statement_undefined_p(s2))
     {
       /* This loop has a break statement which has been transformed to goto 
@@ -209,14 +234,21 @@ statement MakeForloop(expression e1, expression e2, expression e3, statement s)
   statement s1 = FindStatementFromLabel(MakeCLabel(lab1));
   string lab2 = strdup(concatenate("break_",int_to_string(i),NULL));
   statement s2 = FindStatementFromLabel(MakeCLabel(lab2));
-  if (!statement_undefined_p(s1))
+
+ if (!statement_undefined_p(s1))
     {
       /* This loop has a continue statement which has been transformed to goto 
 	 Add the labeled statement at the end of loop body*/
       insert_statement(s,s1,FALSE);
     }
   f = make_forloop(e1,e2,e3,s);
-  smt = instruction_to_statement(make_instruction_forloop(f));
+  smt = make_statement(entity_empty_label(), 
+		       get_current_C_line_number(), 
+		       STATEMENT_ORDERING_UNDEFINED, 
+		       pop_current_C_comment(),
+		       make_instruction_forloop(f),
+		       NIL, string_undefined);
+
   if (!statement_undefined_p(s2))
     {
       /* This loop has a break statement which has been transformed to goto 
@@ -280,6 +312,9 @@ statement MakeSwitchStatement(statement s)
   string lab = strdup(concatenate("break_",int_to_string(i),NULL));
   statement smt = FindStatementFromLabel(MakeCLabel(lab));
   statement seq = instruction_to_statement(make_instruction_sequence(stack_head(SwitchGotoStack)));
+  /* For the time being, the switch comment is lost. It should already be included in the argument,s  */
+  pop_current_C_comment();
+
   insert_statement(s,seq,TRUE);
 
   if (!statement_undefined_p(smt))
@@ -337,28 +372,47 @@ statement MakeDefaultStatement()
   return s;
 }
 
-statement MakeBreakStatement()
+statement MakeBreakStatement(string cmt)
 {
   /* NN : I did not add a boolean variable to distinguish between loop and switch statements :-(*/
   int i = basic_int((basic) stack_head(LoopStack));
   string lab = strdup(concatenate("break_",int_to_string(i),NULL));
-  return MakeGotoStatement(lab);
+  statement bs = MakeGotoStatement(lab);
+
+  statement_comments(bs) = cmt;
+
+  return bs;
 }
 
-statement MakeContinueStatement()
+statement MakeContinueStatement(string cmt)
 {
   /* Unique label with the LoopStack */
   int i = basic_int((basic) stack_head(LoopStack));
   string lab = strdup(concatenate("loop_end_",int_to_string(i),NULL));
-  return MakeGotoStatement(lab);
+  statement cs = MakeGotoStatement(lab);
+
+  statement_comments(cs) = cmt;
+
+  return cs;
 }
 
 statement ExpressionToStatement(expression e)
 {
   syntax s = expression_syntax(e);
+  statement st = statement_undefined;
+  string c = get_current_C_comment();
+
   if (syntax_call_p(s))
-    return call_to_statement(syntax_call(s));
-  return instruction_to_statement(make_instruction(is_instruction_expression,e));
+    st = call_to_statement(syntax_call(s));
+  else
+    st = instruction_to_statement(make_instruction(is_instruction_expression,e));
+
+  statement_number(st) = get_current_C_line_number();
+  if(!string_undefined_p(c)) {
+    statement_comments(st) = c;
+  }
+
+  return st;
 }
 
 
