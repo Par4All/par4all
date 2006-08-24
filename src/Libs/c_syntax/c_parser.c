@@ -80,6 +80,10 @@ void init_keyword_typedef_table()
   hash_put(keyword_typedef_table,"volatile", (char *) TK_VOLATILE);
   hash_put(keyword_typedef_table,"while", (char *) TK_WHILE);
 
+  /* GNU predefined type(s), expecting no conflict with user named type */
+
+  hash_put(keyword_typedef_table,"__builtin_va_list", (char *) TK_NAMED_TYPE);
+
   /* typedef names are added lately */
 }
 
@@ -105,14 +109,26 @@ extern void c_parse();
 void CParserError(char *msg)
 {
   /* Reset the parser global variables ?*/
+
   pips_debug(4,"Reset current module entity %s\n",get_current_module_name());
   reset_current_module_entity();
-  stack_free(&SwitchGotoStack);
-  stack_free(&SwitchControllerStack);
-  stack_free(&LoopStack);
-  stack_free(&BlockStack);  
+
+  /* Stacks are not allocated yet when dealing with external
+     declarations. I assume that all stacks are declared
+     simultaneously, hence a single test before freeing. */
+  if(!stack_undefined_p(SwitchGotoStack)) {
+    stack_free(&SwitchGotoStack);
+    stack_free(&SwitchControllerStack);
+    stack_free(&LoopStack);
+    stack_free(&BlockStack);  
+  }
+
+  reset_current_C_line_number();
+  /* get rid of all collected comments */
+  reset_C_comment(TRUE);
+
   pips_user_warning(msg);
-  pips_internal_error("Recovery from C parser failure not implemented yet.\n");
+  pips_internal_error("Recovery from C parser failure not (fully) implemented yet.\n");
   /* pips_user_error(msg); */
 }
 
@@ -120,6 +136,8 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
 {
     string dir = db_get_current_workspace_directory();
     string file_name = strdup(concatenate(dir,"/",db_get_file_resource(dbr_file,module_name,TRUE),0));
+    entity built_in_ent = entity_undefined;
+
     free(dir);
 
     if (is_compilation_unit_parser)
@@ -149,6 +167,18 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
     ifdebug(1)
       is_fortran = FALSE;
 
+    /* Predefined type(s): __builtin_va_list */
+    built_in_ent = find_or_create_entity(strdup(concatenate(compilation_unit_name,
+					    TYPEDEF_PREFIX,"__builtin_va_list",NULL)));
+    if(storage_undefined_p(entity_storage(built_in_ent))) {
+      entity_storage(built_in_ent) = make_storage_rom();
+      /* Let's lie about the real type */
+      entity_type(built_in_ent) = make_type(is_type_variable,
+					    make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),
+							  NIL, NIL));
+      entity_initial(built_in_ent) = make_value_unknown();
+    }
+
     if (compilation_unit_p(module_name))
       {
 	/* Special case, set the compilation unit as the current module */
@@ -156,6 +186,10 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
 	/* I do not know to put this where to avoid repeated creations*/
 	MakeTopLevelEntity(); 
       }
+
+    /* discard_C_comment(); */
+    set_current_C_line_number();
+    set_C_comment();
 
     /* yacc parser is called */
     c_in = safe_fopen(file_name, "r");
@@ -202,6 +236,8 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
       }
     free(file_name);
     file_name = NULL;
+    reset_current_C_line_number();
+    reset_C_comment(compilation_unit_p(module_name));
     /*  reset_keyword_typedef_table();*/
     stack_free(&ContextStack);
     stack_free(&FunctionStack);
