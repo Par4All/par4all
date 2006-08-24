@@ -151,7 +151,7 @@ void print_parallelization_statistics(
 bool
 empty_comments_p(string s)
 {
-  /* Could be replaced by a macro. See macro empty_comment */
+  /* Could be replaced by a macro. See macro empty_comments */
   pips_assert("comments cannot be NULL", s!=NULL);
   return (s == NULL || string_undefined_p(s));
 }
