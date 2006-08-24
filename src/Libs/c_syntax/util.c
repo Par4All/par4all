@@ -532,8 +532,8 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
 			      
      with 5 possible prefixes: blank, STRUCT_PREFIX, UNION_PREFIX, ENUM_PREFIX, TYPEDEF_PREFIX */
 
-  entity ent;
-  string global_name; 
+  entity ent = entity_undefined;
+  string global_name = string_undefined; 
 
   pips_debug(5,"Entity local name is %s with prefix %s\n",name,prefix);
 
@@ -569,8 +569,12 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
       pips_debug(5,"Entity global name is %s\n",global_name);
       return ent;
     }
-  pips_user_warning("Cannot find entity %s\n",name);
-  CParserError("Variable appears to be undefined\n");
+  pips_user_warning("Cannot find entity %s with prefix \"%s\" at line %d\n",
+		    name, prefix, get_current_C_line_number());
+  /* It may be a parser error or a normal behavior when an entity is
+     used before it is defined as, for example, a struct in a typedef:
+     typedef struct foo foo; */
+  /* CParserError("Variable appears to be undefined\n"); */
   return entity_undefined;
 }
 
@@ -961,8 +965,10 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
 	}
       else
 	{
-	  if(type_variable_p(entity_type(e)))
-	    entity_storage(e) = MakeStorageRam(e,is_external,c_parser_context_static(context));
+	  if(type_variable_p(entity_type(e))) {
+	    entity_storage(e) = 
+	      MakeStorageRam(e,is_external,c_parser_context_static(context));
+	  }
 	  else if (type_functional_p(entity_type(e)))
 	    entity_storage(e) = MakeStorageRom();
 	  else
@@ -1102,9 +1108,10 @@ void UpdateDerivedEntities(list ld, list le, stack ContextStack)
   },le);
 
 } 
+
 entity MakeDerivedEntity(string name, list members, bool is_external, int i)
 {
-  entity ent;  
+  entity ent = entity_undefined;  
   switch (i) {
   case is_type_struct: 
     {
@@ -1145,19 +1152,22 @@ storage MakeStorageRam(entity e, bool is_external, bool is_static)
 	{
 	  r = make_ram(get_current_compilation_unit_entity(),
 		       StaticArea,
-		       ComputeAreaOffset(StaticArea,e),
+		       UNKNOWN_RAM_OFFSET /* ComputeAreaOffset(StaticArea,e) */,
 		       NIL);
-	  /*the offset must be recomputed lately, when we know the size of the variable */
+	  /*the offset must be recomputed lately, when we know for
+	    sure the size of the variables */
 	}
       else 
 	{
 	  /* This must be a variable, not a function/typedef/struct/union/enum. 
 	     The variable is declared outside any function, and hence is global*/
+	  /* If it is external, it is allocated somewhere else. */
 	  r = make_ram(get_top_level_entity(),
 		       get_top_level_entity(), 
-		       ComputeAreaOffset(get_top_level_entity(),e),
+		       UNKNOWN_RAM_OFFSET /* ComputeAreaOffset(get_top_level_entity(),e) */,
 		       NIL);
-	  /* the offset must be recomputed lately, when we know the size of the variable */
+	  /* the offset must be recomputed lately, when we know for
+	     sure the size of the variable */
 	}
     }
   else
@@ -1167,17 +1177,19 @@ storage MakeStorageRam(entity e, bool is_external, bool is_static)
 	{
 	  r = make_ram(get_current_module_entity(),
 		       StaticArea,
-		       ComputeAreaOffset(StaticArea,e),
+		       UNKNOWN_RAM_OFFSET /* ComputeAreaOffset(StaticArea,e) */,
 		       NIL);
-	  /*the offset must be recomputed lately, when we know the size of the variable */
+	  /*the offset must be recomputed lately, when we know for
+	    sure the size of the variable */
 	}
       else
 	{
 	  r = make_ram(get_current_module_entity(),
 		       DynamicArea,
-		       ComputeAreaOffset(DynamicArea,e),
+		       UNKNOWN_RAM_OFFSET /* ComputeAreaOffset(DynamicArea,e) */,
 		       NIL);
-	  /* the offset must be recomputed lately, when we know the size of the variable */
+	  /* the offset must be recomputed lately, when we know for
+	     sure the size of the variable */
 	}
     }
   return make_storage_ram(r);
