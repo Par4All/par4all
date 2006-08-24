@@ -196,7 +196,7 @@ clean_up_sequences_rewrite(statement s)
 		       "Number=%d, label=\"%s\", comment=\"%s\"\n",
 		       statement_identification(s),
 		       statement_number(s), label_local_name(statement_label(s)),
-		       statement_comments(s));
+		       empty_comments_p(statement_comments(s))? "" : statement_comments(s));
 	      pips_error("text_statement", "This block statement should be labelless, numberless"
 			 
 			 " and commentless.\n");
