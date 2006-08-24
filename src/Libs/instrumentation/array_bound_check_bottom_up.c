@@ -1847,7 +1847,7 @@ cstr_args_check(statement s)
     free(argstab);
 
     if (expr == expression_undefined) {
-        put_a_comment_on_a_statement(s, "/*CHECK WAS NOT CREATED*/");
+        put_a_comment_on_a_statement(s, strdup("/*CHECK WAS NOT CREATED*/"));
         return statement_undefined;
     }
 
