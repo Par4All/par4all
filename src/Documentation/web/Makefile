@@ -2,8 +2,8 @@
 # $Id$
 #
 
-PIPS_HTML_HOST = ssh-cri.ensmp.fr
-PIPS_HTML_DIR = ~pips/public_html
+USER	= $(shell whoami)
+DEST	= $(USER)@ssh.cri.ensmp.fr:~pips/public_html
 
 # To deal with non-framed viewer and no server side include:
 HTML_AUTO = \
@@ -64,7 +64,14 @@ index.html : home_content.html
 local-clean:
 	$(RM) $(HTML_AUTO:.cpp.html=.html) 
 
+droits: $(HTMS)
+	chmod -R a+r,g+w $(HTMS)
+
+# consider --dry-run
+RSOPT	=
+RSYNC	= rsync --rsh=ssh --archive --update --delete --verbose \
+		--exclude=.svn $(RSOPT)
+
 # Assume that the files are already generated:
-publish :
-	chmod g+w $(HTMS)
-	rsync --archive --update --verbose $(HTMS) $(PIPS_HTML_HOST):$(PIPS_HTML_DIR)
+publish : droits
+	$(RSYNC) $(HTMS) $(DEST)
