@@ -4,7 +4,7 @@
 
 /* package arithmetique
  *
- * $Id: arithmetique.h,v 1.20 2006/06/30 12:41:04 skimo Exp $
+ * $Id: arithmetique.h,v 1.21 2006/09/12 13:41:29 skimo Exp $
  *
  * Francois Irigoin, mai 1989
  *
@@ -143,6 +143,8 @@ typedef long Value;
 #define VALUE_NAN LONG_MIN
 #define VALUE_MIN (LONG_MIN+1L)
 #define VALUE_MAX LONG_MAX
+#define VALUE_SQRT_MIN int_to_value(INT_MIN)
+#define VALUE_SQRT_MAX int_to_value(INT_MAX)
 #define VALUE_ZERO 0L
 #define VALUE_ONE  1L
 #define VALUE_MONE -1L
