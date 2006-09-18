@@ -31,7 +31,7 @@ dnl	Makefile in this directory.
 dnl Process this file with autoconf to produce a configure script.
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
-AC_INIT(include/polylib/polylib.h)
+AC_INIT(include/polylib/polylib.h.in)
 AM_INIT_AUTOMAKE(polylib, 5.22.1)
 
 VERSION=5.22.1
@@ -73,38 +73,38 @@ AC_CHECK_SIZEOF(int,1)
 AC_CHECK_SIZEOF(long int,1)
 AC_CHECK_SIZEOF(long long int,1)
 
-AC_SUBST(CPPFLAGS32)
-AC_SUBST(CPPFLAGS64)
-AC_SUBST(CPPFLAGS128)
+AC_SUBST(polylib32_defs)
+AC_SUBST(polylib64_defs)
+AC_SUBST(polylib128_defs)
 
 for type in long_long_int long_int int; do
     case "$type" in
 	int)
 	    bits=`expr $ac_cv_sizeof_int \* 8`
-	    flags="-DLINEAR_VALUE_IS_INT"
+	    defs="#define LINEAR_VALUE_IS_INT"
 	    ;;
 	long_int)
 	    bits=`expr $ac_cv_sizeof_long_int \* 8`
-	    flags="-DLINEAR_VALUE_IS_LONG \
-		   -DLINEAR_VALUE_PROTECT_MULTIPLY \
-		   -DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV"
+	    defs="#define LINEAR_VALUE_IS_LONG
+		   #define LINEAR_VALUE_PROTECT_MULTIPLY
+		   #define LINEAR_VALUE_ASSUME_SOFTWARE_IDIV"
 	    ;;
 	long_long_int)
 	    bits=`expr $ac_cv_sizeof_long_long_int \* 8`
-	    flags="-DLINEAR_VALUE_IS_LONGLONG \
-		   -DLINEAR_VALUE_PROTECT_MULTIPLY \
-		   -DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV"
+	    defs="#define LINEAR_VALUE_IS_LONGLONG
+		   #define LINEAR_VALUE_PROTECT_MULTIPLY
+		   #define LINEAR_VALUE_ASSUME_SOFTWARE_IDIV"
 	    ;;
     esac
     case "$bits" in
 	32)
-	    CPPFLAGS32=$flags
+	    polylib32_defs=$defs
 	    ;;
 	64)
-	    CPPFLAGS64=$flags
+	    polylib64_defs=$defs
 	    ;;
 	128)
-	    CPPFLAGS128=$flags
+	    polylib128_defs=$defs
 	    ;;
     esac
 done
@@ -251,6 +251,7 @@ AC_CONFIG_HEADERS(config.h)
 AC_OUTPUT(Makefile
 	  include/Makefile
 	  include/polylib/Makefile
+	  include/polylib/polylib.h
 	  Test/Makefile
 	  Test/Zpolytest/Makefile
 	  Test/ehrhart/Makefile

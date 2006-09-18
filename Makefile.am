@@ -40,15 +40,15 @@ EXTRA_DIST = doc source/oldpolytest.c
 lib_LTLIBRARIES = @polylibs@
 libpolylib32_la_LDFLAGS = -rpath $(libdir) -version-info @versioninfo@
 libpolylib32_la_SOURCES = $(sources)
-libpolylib32_la_CPPFLAGS = @CPPFLAGS32@
+libpolylib32_la_CPPFLAGS = -DPOLYLIB_BITS=32
 libpolylib32_la_LIBADD = @LTLIBOBJS@
 libpolylib64_la_LDFLAGS = -rpath $(libdir) -version-info @versioninfo@
 libpolylib64_la_SOURCES = $(sources)
-libpolylib64_la_CPPFLAGS = @CPPFLAGS64@
+libpolylib64_la_CPPFLAGS = -DPOLYLIB_BITS=64
 libpolylib64_la_LIBADD = @LTLIBOBJS@
 libpolylib128_la_LDFLAGS = -rpath $(libdir) -version-info @versioninfo@
 libpolylib128_la_SOURCES = $(sources)
-libpolylib128_la_CPPFLAGS = @CPPFLAGS128@
+libpolylib128_la_CPPFLAGS = -DPOLYLIB_BITS=128
 libpolylib128_la_LIBADD = @LTLIBOBJS@
 libpolylibgmp_la_LDFLAGS = -rpath $(libdir) -version-info @versioninfo@
 libpolylibgmp_la_SOURCES = $(sources)

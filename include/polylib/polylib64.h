@@ -1,8 +1,3 @@
-
-
-#define LINEAR_VALUE_IS_LONGLONG
-#define LINEAR_VALUE_PROTECT_MULTIPLY
-#define LINEAR_VALUE_ASSUME_SOFTWARE_IDIV
+#define POLYLIB_BITS=64
 
 #include <polylib/polylib.h>
-
