@@ -86,8 +86,7 @@ for type in long_long_int long_int int; do
 	long_int)
 	    bits=`expr $ac_cv_sizeof_long_int \* 8`
 	    defs="#define LINEAR_VALUE_IS_LONG
-		   #define LINEAR_VALUE_PROTECT_MULTIPLY
-		   #define LINEAR_VALUE_ASSUME_SOFTWARE_IDIV"
+		   #define LINEAR_VALUE_PROTECT_MULTIPLY"
 	    ;;
 	long_long_int)
 	    bits=`expr $ac_cv_sizeof_long_long_int \* 8`
