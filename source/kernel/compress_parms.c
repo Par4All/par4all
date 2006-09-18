@@ -1,5 +1,5 @@
 /** 
- * $Id: compress_parms.c,v 1.25 2006/09/12 16:28:51 skimo Exp $
+ * $Id: compress_parms.c,v 1.26 2006/09/18 03:09:04 meister Exp $
  *
  * The integer points in a parametric linear subspace of Q^n are generally
  * lying on a sub-lattice of Z^n.  To simplify, the functions here compress
@@ -29,13 +29,14 @@
 					 printf(" --\n"); } \
                                          while(0)
 
+
 /** 
  * Given a full-row-rank nxm matrix M made of m row-vectors), computes the
  * basis K (made of n-m column-vectors) of the integer kernel of the rows of M
  * so we have: M.K = 0
 */
 Matrix * int_ker(Matrix * M) {
-  Matrix *U, *Q, *H, *H2, *K;
+  Matrix *U, *Q, *H, *H2, *K=NULL;
   int i, j, rk;
 
   if (dbgCompParm)
@@ -73,12 +74,8 @@ Matrix * int_ker(Matrix * M) {
   }
   H->NbRows==M->NbRows;
   Matrix_Free(H);
-  /* obviously, the Integer Kernel is made of the last n-rk columns of U */
-  K=Matrix_Alloc(U->NbRows, U->NbColumns-rk);
-  for (i=0; i< U->NbRows; i++)
-    for(j=0; j< U->NbColumns-rk; j++) 
-      value_assign(K->p[i][j], U->p[i][rk+j]);
-
+  /* the Integer Kernel is made of the last n-rk columns of U */
+  Matrix_subMatrix(U, 0, rk, U->NbRows, U->NbColumns, &K);
 
   /* clean up */
   Matrix_Free(H2);
@@ -91,15 +88,11 @@ Matrix * int_ker(Matrix * M) {
 /** 
  * Computes the intersection of two linear lattices, whose base vectors are
  * respectively represented in A and B.
- * <p>
- * Temporary pre-condition: A and B must represent full-dimensional lattices of
- * the same dimension.
- * </p>
  * If I and/or Lb is set to NULL, then the matrix is allocated. 
  * Else, the matrix is assumed to be allocated already. 
  * I and Lb are rk x rk, where rk is the rank of A (or B).
- * @param A the matrix whose column-vectors are the basis for the first linear
- * lattice.
+ * @param A the full-row rank matrix whose column-vectors are the basis for the
+ * first linear lattice.
  * @param B the matrix whose column-vectors are the basis for the second linear
  * lattice.
  * @param Lb the matrix such that B.Lb = I, where I is the intersection.
@@ -108,28 +101,23 @@ Matrix * int_ker(Matrix * M) {
 static void linearInter(Matrix * A, Matrix * B, Matrix ** I, Matrix **Lb) {
   Matrix * AB=NULL;
   int rk = A->NbRows;
-  int i,j;
+  int a = A->NbColumns;
+  int b = B->NbColumns;
+  int i,j, z=0;
 
   Matrix * H, *U, *Q;
-  assert(A->NbColumns == rk && B->NbRows==rk && B->NbColumns == rk);
+  /* ensure that the spanning vectors are in the same space */
+  assert(B->NbRows==rk);
   /* 1- build the matrix 
    * (A 0 1)
    * (0 B 1)
    */
-  AB = Matrix_Alloc(2*rk, A->NbColumns+B->NbColumns+rk);
+  AB = Matrix_Alloc(2*rk, a+b+rk);
+  Matrix_copySubMatrix(A, 0, 0, rk, a, AB, 0, 0);
+  Matrix_copySubMatrix(B, 0, 0, rk, b, AB, rk, a);
   for (i=0; i< rk; i++) {
-    for (j=0; j<rk; j++) {
-      value_assign(AB->p[i][j], A->p[i][j]);
-    }
-  }
-  for (i=0; i< rk; i++) {
-    for (j=0; j<rk; j++) {
-      value_assign(AB->p[i+rk][j+rk], B->p[i][j]);
-    }
-  }
-  for (i=0; i< rk; i++) {
-      value_set_si(AB->p[i][i+2*rk], 1);
-      value_set_si(AB->p[i+rk][i+2*rk], 1);
+      value_set_si(AB->p[i][a+b+i], 1);
+      value_set_si(AB->p[i+rk][a+b+i], 1);
   }
   if (dbgCompParm) {
     show_matrix(AB);
@@ -138,19 +126,20 @@ static void linearInter(Matrix * A, Matrix * B, Matrix ** I, Matrix **Lb) {
   /* 2- Compute its left Hermite normal form. AB.U = [H 0] */
   left_hermite(AB, &H, &Q, &U);
   Matrix_Free(AB);
-  Matrix_Free(H);
   Matrix_Free(Q);
-
-  /* if you split U evenly in 9 submatrices, you have: 
+  /* count the number of non-zero colums in H */ 
+  for (z=H->NbColumns-1; H->p[H->NbRows-1][z]==0; z--);
+  z++;
+  Matrix_Free(H);
+  /* if you split U in 9 submatrices, you have: 
    * A.U_13 = -U_33
-   * B.U_23 = -U_33 
+   * B.U_23 = -U_33,
+   * where the nb of cols of U_{*3} equals the nb of zero-cols of H
    * U_33 is a (the smallest) combination of col-vectors of A and B at the same
    * time: their intersection.
   */
-  Matrix_subMatrix(U, 2*rk, 2*rk, rk, rk, I);
-  Matrix_oppose(*I);
-  Matrix_subMatrix(U, rk, 2*rk, rk, rk, Lb);
-  Matrix_oppose(*Lb);
+  Matrix_subMatrix(U, a+b, z, U->NbColumns, U->NbColumns, I);
+  Matrix_subMatrix(U, a, z, a+b, U->NbColumns, Lb);
   if (dbgCompParm) {
     show_matrix(U);
   }
@@ -164,9 +153,9 @@ static void linearInter(Matrix * A, Matrix * B, Matrix ** I, Matrix **Lb) {
  * <p>pre-condition: the equalities are full-row rank (without the constant
  * part)</p>
  * @param Eqs the system of equations (as constraints)
- * @return NULL a feasible integer solution if it exists, else NULL.
+ * @return a feasible integer solution if it exists, else NULL.
  */
-static Matrix * integerSolution(Matrix * Eqs) {
+static Matrix * Equalities_integerSolution(Matrix * Eqs) {
   Matrix * Hm, *H=NULL, *U, *Q, *M=NULL, *C=NULL, *Hi;
   Matrix * I, *Ip;
   int i;
@@ -176,12 +165,12 @@ static Matrix * integerSolution(Matrix * Eqs) {
     return NULL;
   /* we use: AI = C = (Ha 0).Q.I = (Ha 0)(I' 0)^T */
   /* with I = Qinv.I' = U.I'*/
-  /* 1- compute I' = Hainv.C */
+  /* 1- compute I' = Hainv.(-C) */
   /* HYP: the equalities are full-row rank */
   rk = Eqs->NbRows;
-  Matrix_subMatrix(Eqs, 0, 1, rk, Eqs->NbColumns-2, &M);
+  Matrix_subMatrix(Eqs, 0, 1, rk, Eqs->NbColumns-1, &M);
   left_hermite(M, &Hm, &Q, &U);
-  Matrix_subMatrix(Hm, 0,0, rk,rk, &H);
+  Matrix_subMatrix(Hm, 0, 0, rk, rk, &H);
   if (dbgCompParmMore) {
     show_matrix(Hm);
     show_matrix(H);
@@ -189,7 +178,7 @@ static Matrix * integerSolution(Matrix * Eqs) {
   }
   Matrix_Free(Q);
   Matrix_Free(Hm);
-  Matrix_subMatrix(Eqs, 0, Eqs->NbColumns-1, rk, 1, &C);
+  Matrix_subMatrix(Eqs, 0, Eqs->NbColumns-1, rk, Eqs->NbColumns, &C);
   Matrix_oppose(C);
   Hi = Matrix_Alloc(rk, rk+1);
   MatInverse(H, Hi);
@@ -234,82 +223,57 @@ static Matrix * integerSolution(Matrix * Eqs) {
 
 
 /** 
- * Returns the smallest linear compression of the parameters necessary for an
- * integer value of the variables to exist for each integer value of the
- * parameters.
+ * Computes the validity lattice of a set of equalities. I.e., the lattice
+ * induced on the last <tt>b</tt> variables by the equalities involving the
+ * first <tt>a</tt> integer existential variables.  The submatrix of Eqs that
+ * concerns only the existential variables (so the first a columns) is assumed
+ * to be full-row rank.
+ * @param Eqs the equalities
+ * @param a the number of existential integer variables, placed as first
+ * variables
+ * @param vl the (returned) validity lattice, in homogeneous form. It is
+ * allocated if initially set to null, or reused if already allocated.
  */
-static Matrix * minLinearCompress(Matrix * A, Matrix * B, unsigned int nbParms) {
-  Matrix * Lb= NULL;
-  Matrix * I = NULL;
-  Matrix * Hb = NULL;
-  Matrix * Hg = NULL;
-  Matrix *U, *H, *Q;
-  int rk = A->NbRows;
-  assert(B->NbColumns==nbParms);
-  if (nbParms==0) {
-    Matrix_identity(rk,&Hg);
-    return Hg;
-  }
-  /* HYP: A is square, full-rank. */
-  /* HYP: B is full row-rank. */
-  left_hermite(B, &H, &Q, &U);
-  Matrix_subMatrix(H, 0, 0, rk, rk, &Hb);
-  Matrix_Free(H);
-  linearInter(A, Hb, &I, &Lb);
-  if (dbgCompParm) {
-    show_matrix(I);
-    show_matrix(Lb);
-  }
-  Matrix_Free(I);
-  Matrix_Free(Hb);
-  // HYP: A is square, full-rank.
-  // Note: we juste reuse U, which has the appropriate dimensions
-  Matrix_identity(nbParms, &Hg);
-  Matrix_copySubMatrix(Lb, 0, 0, rk, rk, Hg, 0,0);
-  /* the linear part of the minimal lattice is U.Hg */
-  Matrix_Product(U, Hg, Q);
-  return Q;
-}/* minLinearCompress */
+void Equalities_validityLattice(Matrix * Eqs, int a, Matrix** vl) {
+  unsigned int b = Eqs->NbColumns-a;
+  Matrix * A=NULL, * B=NULL, *I = NULL, *Lb=NULL, *sol=NULL;
+  Matrix *H, *U, *Q;
+  unsigned int i;
 
+  /* 1- check that there is an integer solution to the equalities */
+  /* OPT: could change integerSolution's profile to allocate or not*/
+  sol = Equalities_integerSolution(Eqs);
+  /* if there is no integer solution, there is no validity lattice */
+  if (sol==NULL) {
+    if ((*vl)!=NULL) Matrix_Free(*vl);
+    return;
+  }
+  Matrix_subMatrix(Eqs, 0, 0, a, a, &A);
+  Matrix_subMatrix(Eqs, 0, a, a, a+b, &B);
+  linearInter(A, B, &I, &Lb);
+  
+  /* 2- The linear part of the validity lattice is the left HNF of Lb */
+  left_hermite(Lb, &H, &Q, &U);
+  Matrix_Free(Lb);
+  Matrix_Free(Q);
+  Matrix_Free(U);
 
-/**
- * Finds the smallest affine compression of the parameters necessary for an
- * integer value of the variables to exist for each integer value of the
- * parameters.
- * @return 0 if there is no solution, 1 if there is one 
- * (and then this compression lattice is in G)
- */
-int minAffineCompress(Matrix * Eqs, unsigned int nbParms, 
-			      Matrix ** G) {
-  int nbVars = Eqs->NbColumns - nbParms -2;
-  Matrix * N0 = integerSolution(Eqs);
-  Matrix * A = NULL;
-  Matrix * B = NULL;
-  Matrix * G0=NULL;
-  // if there is no integer solution, return false
-  if (N0==NULL) {
-    return 0;
+  /* 3- build the validity lattice */
+  if ((*vl)==NULL) {
+    (*vl) = Matrix_Alloc(b+1, b+1);
   }
   else {
-    if ((*G)==NULL) {
-      (*G) = Matrix_Alloc(nbParms+1, nbParms+1);
-    }
-    else {
-      assert((*G)->NbRows==nbParms+1 && (*G)->NbColumns==nbParms+1);
-    }
-    Matrix_copySubMatrix(N0, nbVars, 0, nbParms, 1, (*G), 0, nbParms);
-    value_set_si((*G)->p[nbParms][nbParms], 1);
-    Matrix_Free(N0);
-    Matrix_subMatrix(Eqs, 0, 1, Eqs->NbRows, nbVars, &A);
-    Matrix_subMatrix(Eqs, 0, nbVars+1, Eqs->NbRows, nbParms, &B);
-    //HYP: A is square and full-rank
-    G0 = minLinearCompress(A, B, nbParms);
-    Matrix_Free(A);
-    Matrix_Free(B);
-    Matrix_copySubMatrix(G0, 0, 0, nbParms, nbParms, (*G), 0, 0);
-    return 1;
+    assert ((*vl)->NbRows==b+1 && (*vl)->NbColumns== b+1);
   }
-}/* minAffineCompress */
+  Matrix_copySubMatrix(H, 0, 0, b, b, (*vl), 0,0);
+  Matrix_Free(H);
+  for (i=0; i< b; i++) {
+    value_assign((*vl)->p[i][b], sol->p[0][a+i]);
+  }
+  Matrix_Free(sol);
+  Vector_Set((*vl)->p[b],0, b);
+  value_set_si((*vl)->p[b][b], 1);
+} /* validityLattice */
 
 
 /**
@@ -429,7 +393,8 @@ void Constraints_fullDimensionize(Matrix ** M, Matrix ** C, Matrix ** VL,
   }
 
   Constraints_permute((*Eqs), permutation, &permutedEqs);
-  minAffineCompress(permutedEqs, (*Eqs)->NbColumns-2-(*Eqs)->NbRows, VL);
+  Equalities_validityLattice(permutedEqs, 
+			     (*Eqs)->NbColumns-2-(*Eqs)->NbRows, VL);
 
   if (dbgCompParm) {
     printf("Validity lattice: ");
@@ -484,10 +449,10 @@ void Constraints_fullDimensionize(Matrix ** M, Matrix ** C, Matrix ** VL,
  * @param lat the original full-dimensional lattice
  * @param subLat the sublattice
  */
-void Matrix_extractSubLattice(Matrix * lat, unsigned int k, Matrix ** subLat) {
+void Lattice_extractSubLattice(Matrix * lat, unsigned int k, Matrix ** subLat) {
   Matrix * H, *Q, *U, *linLat = NULL;
   unsigned int i;
-  dbgStart(Matrix_extractSubLattice);
+  dbgStart(Lattice_extractSubLattice);
   /* if the dimension is already good, just copy the initial lattice */
   if (k==lat->NbRows-1) {
     if (*subLat==NULL) {
@@ -522,8 +487,8 @@ void Matrix_extractSubLattice(Matrix * lat, unsigned int k, Matrix ** subLat) {
     value_set_si((*subLat)->p[k][i], 0);
   }
   value_set_si((*subLat)->p[k][k], 1);
-  dbgEnd(Matrix_extractSubLattice);
-} /* Matrix_extractSubLattice */
+  dbgEnd(Lattice_extractSubLattice);
+} /* Lattice_extractSubLattice */
 
 
 /** 
@@ -567,309 +532,44 @@ Matrix * affine_periods(Matrix * M, Matrix * d) {
 
 
 /** 
- * Given a matrix B' with m rows and m-vectors C' and d, computes the basis of
- * the integer solutions to (B'N+C') mod d = 0 (1).  the Ns verifying the
- * system B'N+C' = 0 are solutions of (1) K is a basis of the integer kernel of
- * B: its column-vectors link two solutions of (1) <p>
- * Moreover, B'_iN mod d is periodic of period (s_ik): B'N mod d is periodic of
- * period (s_k) = lcm_i(s_ik). 
- * The linear part of G is given by the HNF of (K | S), where S is the
- * full-dimensional diagonal matrix (s_k) the constant part of G is a
- * particular solution of (1) if no integer constant part is found, there is no
- * solution and this function returns NULL.
+ * Given an integer matrix B with m rows and integer m-vectors C and d, computes the basis of
+ * the integer solutions to (BN+C) mod d = 0 (1). 
+ * This is an affine lattice (G): (N 1)^T= G(N' 1)^T, forall N' in Z^b.
+ * If there is no solution, returns NULL.
+ * @param B B, a (m x b) matrix
+ * @param C C, a (m x 1) integer matrix
+ * @param d d, a (1 x m) integer matrix
+ * @param imb the affine basis of solutions, in the homogeneous form. Allocated
+ * if initially set to NULL, reused if not.
 */
-Matrix * int_mod_basis(Matrix * Bp, Matrix * Cp, Matrix * d) {
-  int nb_eqs = Bp->NbRows;
-  unsigned int nb_parms=Bp->NbColumns;
-  unsigned int i, j;
-  Matrix *H, *U, *Q, *M, *inv_H_M, *Ha, *Np_0, *N_0, *G, *K, *S, *KS;
-  Value tmp;
+void Equalities_intModBasis(Matrix * B, Matrix * C, Matrix * d, Matrix ** imb) {
+  int b = B->NbColumns;
+  /* FIXME: treat the case d=0 as a regular equality B_kN+C_k = 0: */
+  /* OPT: could keep only equalities for which d>1 */
+  int nbEqs = B->NbRows;
+  unsigned int i;
 
-  value_init(tmp);
-  /*   a/ compute K and S */
-  /* simplify the constraints */
-  /* for (i=0; i< Bp->NbRows; i++)
-    for (j=0; j< Bp->NbColumns; j++) 
-      value_pmodulus(Bp->p[i][j], Bp->p[i][j], d->p[0][i]);
-  */
-  K = int_ker(Bp);
-  S = affine_periods(Bp, d);
-  if (dbgCompParmMore) {
-    show_matrix(K); 
-    show_matrix(S);
+  /* 1- buid the problem DI+BN+C = 0 */
+  Matrix * eqs = Matrix_Alloc(nbEqs, nbEqs+b+1);
+  for (i=0; i< nbEqs; i++) {
+    value_assign(eqs->p[i][i], d->p[0][i]);
   }
-  
-  /*   b/ compute the linear part of G : HNF(K|S) */
+  Matrix_copySubMatrix(B, 0, 0, nbEqs, b, eqs, 0, nbEqs);
+  Matrix_copySubMatrix(C, 0, 0, nbEqs, 1, eqs, 0, nbEqs+b);
 
-  /* fill K|S */
-  KS = Matrix_Alloc(nb_parms, K->NbColumns+ nb_parms);
-  for(i=0; i< KS->NbRows; i++) {
-    for(j=0; j< K->NbColumns; j++) value_assign(KS->p[i][j], K->p[i][j]);
-    for(j=0; j< S->NbColumns; j++) value_assign(KS->p[i][j+K->NbColumns],
-						S->p[i][j]);
-  }
-  Matrix_Free(K);
+  /* 2- the solution is the validity lattice of the equalities */
+  Equalities_validityLattice(eqs, nbEqs, imb);
+  Matrix_Free(eqs);
+}/* Equalities_intModBasis */
 
-  if (dbgCompParmMore) { 
-    show_matrix(KS);
-  }
 
-  /* HNF(K|S) */
-  left_hermite(KS, &H, &U, &Q);
-  Matrix_Free(KS);
-  Matrix_Free(U);
-  Matrix_Free(Q);
-  
-  if (dbgCompParm) {
-    printf("HNF(K|S) = ");
-    show_matrix(H);
-  }
-
-  /* put HNF(K|S) in the p x p matrix S (which has already the appropriate size
-     so we save a Matrix_Alloc) */
-  for (i=0; i< nb_parms; i++) {
-    for (j=0; j< nb_parms; j++) {
-      value_assign(S->p[i][j], H->p[i][j]);
-    }
-  }
-  Matrix_Free(H);
-
-  /*   c/ compute U_M.N'_0 = N_0: */
-  M = Matrix_Alloc(nb_eqs, nb_parms+nb_eqs);
-  /* N'_0 = M_H^{-1}.(-C'), which must be integer
-     and where H_M = HNF(M) with M = (B' D) : M.U_M = [H_M 0] */
-
-  /*      copy the B' part */
-  for (i=0; i< nb_eqs; i++) {
-    for (j=0; j< nb_parms; j++) {
-      value_assign(M->p[i][j], Bp->p[i][j]);
-    }
-    /*    copy the D part */
-    for (j=0; j< nb_eqs; j++) {
-      if (i==j) value_assign(M->p[i][j+nb_parms], d->p[i][0]);
-      else value_set_si(M->p[i][j+nb_parms], 0);
-    }
-  }
-  
-  //       compute inv_H_M, the inverse of the HNF H of M = (B' D)
-  left_hermite(M, &H, &Q, &U);
-  Matrix_Free(M);
-  inv_H_M=Matrix_Alloc(nb_eqs, nb_eqs+1);
-  /* again, do a square Matrix from H, using the non-used Matrix Ha */
-  Ha = Matrix_Alloc(nb_eqs, nb_eqs);
-  for(i=0; i< nb_eqs; i++) {
-    for(j=0; j< nb_eqs; j++) {
-      value_assign(Ha->p[i][j], H->p[i][j]); 
-    }
-  }
-  MatInverse(Ha, inv_H_M);
-  Matrix_Free(Ha);
-  Matrix_Free(H);
-  Matrix_Free(Q); /* only inv_H_M and U_M (alias U) are needed */
-
-  /*       compute (-C') */
-  for (i=0; i< nb_eqs; i++) {
-    value_oppose(Cp->p[i][0], Cp->p[i][0]);
-  }
-
-  /* Compute N'_0 = inv_H_M.(-C')
-     actually compute (N' \\ 0) such that N = U^{-1}.(N' \\ 0) */
-  Np_0 = Matrix_Alloc(U->NbColumns, 1);
-  for(i=0; i< nb_eqs; i++) 
-    {
-      value_set_si(Np_0->p[i][0], 0);
-      for(j=0; j< nb_eqs; j++) {
-	value_addmul(Np_0->p[i][0], inv_H_M->p[i][j], Cp->p[j][0]);
-      }
-    }
-  for(i=nb_eqs; i< U->NbColumns; i++) value_set_si(Np_0->p[i][0], 0);
-  
-
-  /* it is still needed to divide the rows of N'_0 by the common 
-     denominator of the rows of H_M. If these rows are not divisible, 
-     there is no integer N'_0 so return NULL */
-  for (i=0; i< nb_eqs; i++) {
-    value_modulus(tmp, Np_0->p[i][0], inv_H_M->p[i][nb_eqs]);
-    if (value_zero_p(tmp))
-      value_division(Np_0->p[i][0], Np_0->p[i][0], inv_H_M->p[i][nb_eqs]);
-    else {
-      value_clear(tmp);
-      Matrix_Free(S);
-      Matrix_Free(inv_H_M);
-      Matrix_Free(Np_0);
-      fprintf(stderr, "int_mod_basis > "
-              "No particular solution: polyhedron without integer points.\n");
-      return NULL;
-    }
-  }
-  Matrix_Free(inv_H_M);
-  if (dbgCompParmMore) {
-    show_matrix(Np_0);
-  }
-
-  /* now compute the actual particular solution N_0 = U_M. N'_0 */
-  N_0 = Matrix_Alloc(U->NbColumns, 1);
-  /* OPT: seules les nb_eq premières valeurs de N_0 sont utiles en fait. */
-  Matrix_Product(U, Np_0, N_0);
-  
-  if (dbgCompParm) {
-    show_matrix(N_0);
-  }
-  Matrix_Free(Np_0);
-  Matrix_Free(U);
-
-  /* build the whole compression matrix:  */
-  G = Matrix_Alloc(S->NbRows+1, S->NbRows+1);
-  for (i=0; i< S->NbRows; i++) {
-    for(j=0; j< S->NbRows; j++) 
-      value_assign(G->p[i][j], S->p[i][j]);
-    value_assign(G->p[i][S->NbRows], N_0->p[i][0]);
-  }
-
-  for (j=0; j< S->NbRows; j++) value_set_si(G->p[S->NbRows][j],0);
-  value_set_si(G->p[S->NbRows][S->NbRows],1);
-
-  /* clean up */
-  value_clear(tmp);
-  Matrix_Free(S);
-  Matrix_Free(N_0);
-  return G;
+/** kept here for backwards compatiblity. Wrapper to Equalities_intModBasis() */
+Matrix * int_mod_basis(Matrix * B, Matrix * C, Matrix * d) {
+  Matrix * imb = NULL;
+  Equalities_intModBasis(B, C, d, &imb);
+  return imb;
 } /* int_mod_basis */
 
-
-/** 
- * Utility function: given a matrix containing the equations AI+BN+C=0,
- * computes the HNF of A : A = [Ha 0].Q and return :
- * <ul>
- * <li> B'= H^-1.(-B) 
- * <li> C'= H^-1.(-C)
- * <li> U = Q^-1 (-> return value)
- * <li> D, 
- * </ul>
- * where Ha^-1 = D^-1.H^-1 with H and D integer matrices. 
- * In fact, as D is diagonal, we return a column-vector d.
- * Note: ignores the equalities that involve only parameters
-*/
-static Matrix * extract_funny_stuff(Matrix * const E, int nb_parms, 
-			     Matrix ** Bp, Matrix **Cp, Matrix **d) {
-unsigned int i,j, k, nb_eqs=E->NbRows;
-  int nb_vars=E->NbColumns - nb_parms -2;
-  Matrix * A, * Ap, * Ha, * U, * Q, * H, *B, *C, *Ha_pre_inv;
-
-  /* Only deal with the equalities involving variables:
-     - don't count them
-     - mark them (a 2 instead of the 0 in 1st column
-  */
-  for (i=0; i< E->NbRows; i++) {
-    if (First_Non_Zero(E->p[i], E->NbColumns)>= nb_vars+1) {
-      value_set_si(E->p[i][0], 2);
-      nb_eqs--;
-    }
-  }
-
-  /* particular case: 
-    - no equality (of interest) in E */
-  if (nb_eqs==0) {
-    *Bp = Matrix_Alloc(0, E->NbColumns);
-    *Cp = Matrix_Alloc(0, E->NbColumns);
-    *d = NULL;
-    /* unmark the equalities that we filtered out */
-    for (i=0; i< E->NbRows; i++) {
-      value_set_si(E->p[i][0], 0);
-    }
-    return NULL;
-  }
-    
-  /* 1- build A, the part of E corresponding to the variables */
-  A = Matrix_Alloc(nb_eqs, nb_vars);
-  for (i=0; i< E->NbRows; i++) {
-    if (value_zero_p(E->p[i][0])) {
-      for (j=0; j< nb_vars; j++) {
-	value_assign(A->p[i][j],E->p[i][j+1]);
-      }
-    }
-  }
-  if (dbgCompParmMore) {
-    show_matrix(A);
-  }
-  
-  /* 2- Compute Ha^-1, where Ha is the left HNF of A
-      a/ Compute H = [Ha 0] */
-  left_hermite(A, &H, &Q, &U);
-  Matrix_Free(A);
-  Matrix_Free(Q);
-  
-  /*   b/ just keep the m x m matrix Ha */
-  Ha = Matrix_Alloc(nb_eqs, nb_eqs);
-  for (i=0; i< nb_eqs; i++) {
-    for (j=0; j< nb_eqs; j++) {
-      value_assign(Ha->p[i][j],H->p[i][j]);
-    }
-  }
-  Matrix_Free(H);
-
-
-  /*  c/ Invert Ha */
-  Ha_pre_inv = Matrix_Alloc(nb_eqs, nb_eqs+1);
-  assert (MatInverse(Ha, Ha_pre_inv));
-  if (dbgCompParmMore) {
-    show_matrix(Ha_pre_inv);
-  }
-
-  /* store back Ha^-1  in Ha, to save a MatrixAlloc/MatrixFree */
-  for(i=0; i< nb_eqs; i++) {
-    for(j=0; j< nb_eqs; j++) {
-      value_assign(Ha->p[i][j],Ha_pre_inv->p[i][j]);
-    }
-  }
-
-  /* the diagonal elements of D are stored in 
-     the last column of Ha_pre_inv (property of MatInverse). */
-  (*d) = Matrix_Alloc(Ha_pre_inv->NbRows, 1);
-
-  for (i=0; i< Ha_pre_inv->NbRows; i++) {
-    value_assign((*d)->p[i][0], Ha_pre_inv->p[i][Ha_pre_inv->NbColumns-1]);
-  }
- 
-  Matrix_Free(Ha_pre_inv);
-
-  /* 3- Build B'and C'
-      compute B' */
-  B = Matrix_Alloc(nb_eqs,nb_parms);
-  for(i=0; i< E->NbRows; i++) {
-    if (value_zero_p(E->p[i][0])) {
-      for(j=0; j< nb_parms; j++) {
-	value_assign(B->p[i][j], E->p[i][1+nb_vars+j]);
-      }
-    }
-  }
-  
-
-  (*Bp) = Matrix_Alloc(B->NbRows,B->NbColumns);
-  Matrix_Product(Ha, B, (*Bp));
-  Matrix_Free(B);
-  
-  /* compute C' */
-  C = Matrix_Alloc(nb_eqs,1);
-  for(i=0; i< E->NbRows; i++) {
-    if (value_zero_p(E->p[i][0])) {
-      value_assign(C->p[i][0], E->p[i][E->NbColumns-1]);
-    }
-  }
-  
-  /* unmark the equalities that we filtered out */
-  for (i=0; i< E->NbRows; i++) {
-    value_set_si(E->p[i][0], 0);
-  }
-  
-  (*Cp) = Matrix_Alloc(nb_eqs, 1);
-  Matrix_Product(Ha, C, (*Cp));
-  Matrix_Free(C);
-
-  Matrix_Free(Ha);
-  return U;
-} /* extract_funny_stuff */
-  
 
 /** 
  * Given a parameterized constraints matrix with m equalities, computes the
@@ -877,39 +577,13 @@ unsigned int i,j, k, nb_eqs=E->NbRows;
  * space for each value of N', with N = G N' (N are the "nb_parms" parameters)
  * @param E a matrix of parametric equalities @param nb_parms the number of
  * parameters
+ * <b>Note: </b>this function is mostly here for backwards
+ * compatibility. Prefer the use of <tt>Equalities_validityLattice</tt>.
 */
-Matrix * compress_parms(Matrix * E, int nb_parms) {
-  unsigned int i,j, k, nb_eqs=0;
-  int nb_vars=E->NbColumns - nb_parms -2;
-  Matrix *U, *d, *Bp, *Cp, *G;
-
-  /* particular case where there is no equation */
-  if (E->NbRows==0) return Identity_Matrix(nb_parms+1);
-
-  U = extract_funny_stuff(E, nb_parms, &Bp, & Cp, &d); 
-  if (dbgCompParmMore) {
-    show_matrix(Bp); 
-    show_matrix(Cp);
-    show_matrix(d);
-  }
-
-  Matrix_Free(U);
-  /* The compression matrix N = G.N' must be such that (B'N+C') mod d = 0 (1)
-  */
-
-  /* the Ns verifying the system B'N+C' = 0 are solutions of (1) K is a basis
-     of the integer kernel of B: its column-vectors link two solutions of (1)
-     Moreover, B'_iN mod d is periodic of period (s_ik): B'N mod d is periodic
-     of period (s_k) = lcm_i(s_ik) The linear part of G is given by the HNF of
-     (K | S), where S is the full-dimensional diagonal matrix (s_k) the
-     constant part of G is a particular solution of (1) if no integer constant
-     part is found, there is no solution. */
-
-  G = int_mod_basis(Bp, Cp, d);
-  Matrix_Free(Bp);
-  Matrix_Free(Cp);
-  Matrix_Free(d);
-  return G;
+Matrix * compress_parms(Matrix * E, int nbParms) {
+  Matrix * vl=NULL;
+  Equalities_validityLattice(E, E->NbColumns-2-nbParms, &vl);
+  return vl;
 }/* compress_parms */
 
 
@@ -1174,6 +848,7 @@ Polyhedron * Polyhedron_Remove_parm_eqs(Polyhedron ** P, Polyhedron ** C,
  * the variable space into a n-m space by eliminating the m variables (using
  * the equalities) the variables to be eliminated are chosen automatically by
  * the function.
+ * <b>Deprecated.</b> Try to use Constraints_fullDimensionize instead.
  * @param M the constraints 
  * @param the number of parameters
  * @param validityLattice the the integer lattice underlying the integer
@@ -1275,3 +950,5 @@ Matrix * full_dimensionize(Matrix const * M, int nb_parms,
   return Full_Dim;
 } /* full_dimensionize */
 
+#undef dbgCompParm 0
+#undef dbgCompParmMore 0

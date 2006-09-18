@@ -1,5 +1,5 @@
 /** 
- * $Id: matrix_addon.c,v 1.11 2006/08/11 02:03:53 meister Exp $
+ * $Id: matrix_addon.c,v 1.12 2006/09/18 03:09:04 meister Exp $
  * 
  * Polylib matrix addons
  * Mainly, deals with polyhedra represented as a matrix (implicit form)
@@ -71,6 +71,7 @@ Matrix * Identity_Matrix(unsigned int dim) {
   }
   return ret;
 } /* Identity_Matrix */
+
 
 /** 
  * returns the dim-dimensional identity matrix. 
@@ -333,14 +334,16 @@ unsigned int mpolyhedron_eliminate_first_variables(Matrix * Eqs,
  * @param M the input matrix
  * @param sr the index of the starting row
  * @param sc the index of the starting column
- * @param nbR the number of contiguous rows to take
- * @param nbC the number of contiguous columns to take
+ * @param er the index ofthe ending row (excluded)
+ * @param ec the ined of the ending colummn (excluded)
  * @param sub (returned), the submatrix. Allocated if set to NULL, assumed to
  * be already allocated else.
  */
 void Matrix_subMatrix(Matrix * M, unsigned int sr, unsigned int sc, 
-			  unsigned int nbR, unsigned int nbC, Matrix ** sub) {
+			  unsigned int er, unsigned int ec, Matrix ** sub) {
   int i;
+  int nbR = er-sr;
+  int nbC = ec-sc;
   if ((*sub)==NULL) {
     (*sub) = Matrix_Alloc(nbR, nbC);
   }
@@ -363,7 +366,15 @@ void Matrix_clone(Matrix * M, Matrix ** Cl) {
 /**
  * Copies a contiguous submatrix of M1 into M2, at the indicated position.
  * M1 and M2 are assumed t be allocated already.
- */
+ * @param M1 the source matrix
+ * @param sr1 the starting source row
+ * @param sc1 the starting source column
+ * @param nbR the number of rows
+ * @param nbC the number of columns
+ * @param M2 the target matrix
+ * @param sr2 the starting target row
+ * @param sc2 the starting target column
+*/
 void Matrix_copySubMatrix(Matrix *M1,
 			  unsigned int sr1, unsigned int sc1,
 			  unsigned int nbR, unsigned int nbC,

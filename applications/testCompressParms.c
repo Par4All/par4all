@@ -1,5 +1,5 @@
 /** 
- * $Id: testCompressParms.c,v 1.3 2006/08/11 02:03:52 meister Exp $
+ * $Id: testCompressParms.c,v 1.4 2006/09/18 03:09:03 meister Exp $
  * 
  * Test routines for kernel/compress_parms.c functions
  * @author B. Meister, 3/2006
@@ -308,7 +308,7 @@ int test_Constraints_fullDimensionize(Matrix * A, Matrix * B,
      Ehrhart polnomials */
   sample = Matrix_Alloc(1,nbOrigParms);
   transfSample = Matrix_Alloc(1, nbParms);
-  Matrix_extractSubLattice(VL, nbParms, &parmVL);
+  Lattice_extractSubLattice(VL, nbParms, &parmVL);
   VLInv = Matrix_Alloc(parmVL->NbRows, parmVL->NbRows+1);
   MatInverse(parmVL, VLInv);
   if (dbg) {
