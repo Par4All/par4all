@@ -93,6 +93,10 @@ void Matrix_Print(FILE *Dst,char *Format,Matrix *Mat) {
   unsigned NbRows, NbColumns;
   
   fprintf(Dst,"%d %d\n", NbRows=Mat->NbRows, NbColumns=Mat->NbColumns);
+  if (NbColumns ==0) {
+    fprintf(Dst, "\n");
+    return;
+  }
   for (i=0;i<NbRows;i++) {
     p=*(Mat->p+i);
     for (j=0;j<NbColumns;j++) {

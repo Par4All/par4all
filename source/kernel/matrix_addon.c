@@ -1,5 +1,5 @@
 /** 
- * $Id: matrix_addon.c,v 1.12 2006/09/18 03:09:04 meister Exp $
+ * $Id: matrix_addon.c,v 1.13 2006/09/25 03:34:03 meister Exp $
  * 
  * Polylib matrix addons
  * Mainly, deals with polyhedra represented as a matrix (implicit form)
@@ -341,6 +341,7 @@ unsigned int mpolyhedron_eliminate_first_variables(Matrix * Eqs,
  */
 void Matrix_subMatrix(Matrix * M, unsigned int sr, unsigned int sc, 
 			  unsigned int er, unsigned int ec, Matrix ** sub) {
+  assert (er<=M->NbRows && ec<=M->NbColumns);
   int i;
   int nbR = er-sr;
   int nbC = ec-sc;

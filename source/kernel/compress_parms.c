@@ -1,10 +1,11 @@
 /** 
- * $Id: compress_parms.c,v 1.26 2006/09/18 03:09:04 meister Exp $
+ * $Id: compress_parms.c,v 1.27 2006/09/25 03:34:03 meister Exp $
  *
  * The integer points in a parametric linear subspace of Q^n are generally
- * lying on a sub-lattice of Z^n.  To simplify, the functions here compress
- * some parameters so that the variables are integer for any intger values of
- * the parameters.
+ * lying on a sub-lattice of Z^n.  
+ * Functions here use and compute validity lattices, i.e. lattices induced on a
+ * set of variables by such equalities involving another set of integer
+ * variables.
  * @author B. Meister 12/2003-2006 meister@icps.u-strasbg.fr
  * LSIIT -ICPS 
  * UMR 7005 CNRS
@@ -128,8 +129,12 @@ static void linearInter(Matrix * A, Matrix * B, Matrix ** I, Matrix **Lb) {
   Matrix_Free(AB);
   Matrix_Free(Q);
   /* count the number of non-zero colums in H */ 
-  for (z=H->NbColumns-1; H->p[H->NbRows-1][z]==0; z--);
+  for (z=H->NbColumns-1; value_zero_p(H->p[H->NbRows-1][z]); z--);
   z++;
+  if (dbgCompParm) {
+    show_matrix(H);
+    printf("z=%d\n", z);
+  }
   Matrix_Free(H);
   /* if you split U in 9 submatrices, you have: 
    * A.U_13 = -U_33
@@ -153,16 +158,20 @@ static void linearInter(Matrix * A, Matrix * B, Matrix ** I, Matrix **Lb) {
  * <p>pre-condition: the equalities are full-row rank (without the constant
  * part)</p>
  * @param Eqs the system of equations (as constraints)
- * @return a feasible integer solution if it exists, else NULL.
+ * @param I a feasible integer solution if it exists, else NULL. Allocated if
+ * initially set to NULL, else reused.
  */
-static Matrix * Equalities_integerSolution(Matrix * Eqs) {
+void Equalities_integerSolution(Matrix * Eqs, Matrix **I) {
   Matrix * Hm, *H=NULL, *U, *Q, *M=NULL, *C=NULL, *Hi;
-  Matrix * I, *Ip;
+  Matrix *Ip;
   int i;
   Value mod;
   unsigned int rk;
-  if (Eqs==NULL)
-    return NULL;
+  if (Eqs==NULL){
+    if ((*I)!=NULL) Matrix_Free(*I);
+    I = NULL;
+    return;
+  }
   /* we use: AI = C = (Ha 0).Q.I = (Ha 0)(I' 0)^T */
   /* with I = Qinv.I' = U.I'*/
   /* 1- compute I' = Hainv.(-C) */
@@ -200,7 +209,13 @@ static Matrix * Equalities_integerSolution(Matrix * Eqs) {
     /* if Hinv.C is not integer, return NULL (no solution) */
     value_pmodulus(mod, Ip->p[i][0], Hi->p[i][rk]);
     if (value_notzero_p(mod)) { 
-      return NULL;
+      if ((*I)!=NULL) Matrix_Free(*I);
+      value_clear(mod);
+      Matrix_Free(U);
+      Matrix_Free(Ip);
+      Matrix_Free(Hi);
+      I = NULL;
+      return;
     }
     else {
       value_pdivision(Ip->p[i][0], Ip->p[i][0], Hi->p[i][rk]);
@@ -213,12 +228,13 @@ static Matrix * Equalities_integerSolution(Matrix * Eqs) {
   value_clear(mod);
   Matrix_Free(Hi);
   /* 2 - Compute the particular solution I = U.(I' 0) */
-  I = Matrix_Alloc(Eqs->NbColumns-2, 1);
-  Matrix_Product(U, Ip, I);
+  ensureMatrix((*I), Eqs->NbColumns-2, 1);
+  Matrix_Product(U, Ip, (*I));
+  Matrix_Free(U);
+  Matrix_Free(Ip);
   if (dbgCompParm) {
-    show_matrix(I);
+    show_matrix(*I);
   }
-  return I;
 }
 
 
@@ -235,22 +251,37 @@ static Matrix * Equalities_integerSolution(Matrix * Eqs) {
  * allocated if initially set to null, or reused if already allocated.
  */
 void Equalities_validityLattice(Matrix * Eqs, int a, Matrix** vl) {
-  unsigned int b = Eqs->NbColumns-a;
+  if (dbgCompParm) {
+    printf("Computing validity lattice induced by the %d first variables of:"
+	   ,a);
+    show_matrix(Eqs);
+  }
+  unsigned int b = Eqs->NbColumns-2-a;
+  if (b==0) {
+    ensureMatrix((*vl), 1, 1);
+    value_set_si((*vl)->p[0][0], 1);
+    return;
+  }
+  unsigned int r = Eqs->NbRows;
   Matrix * A=NULL, * B=NULL, *I = NULL, *Lb=NULL, *sol=NULL;
   Matrix *H, *U, *Q;
   unsigned int i;
 
   /* 1- check that there is an integer solution to the equalities */
   /* OPT: could change integerSolution's profile to allocate or not*/
-  sol = Equalities_integerSolution(Eqs);
+  Equalities_integerSolution(Eqs, &sol);
   /* if there is no integer solution, there is no validity lattice */
   if (sol==NULL) {
     if ((*vl)!=NULL) Matrix_Free(*vl);
     return;
   }
-  Matrix_subMatrix(Eqs, 0, 0, a, a, &A);
-  Matrix_subMatrix(Eqs, 0, a, a, a+b, &B);
+  Matrix_subMatrix(Eqs, 0, 0, r, a, &A);
+  Matrix_subMatrix(Eqs, 0, a, r, a+b, &B);
   linearInter(A, B, &I, &Lb);
+  Matrix_Free(I);
+  if (dbgCompParm) {
+    show_matrix(Lb);
+  }
   
   /* 2- The linear part of the validity lattice is the left HNF of Lb */
   left_hermite(Lb, &H, &Q, &U);
@@ -259,12 +290,7 @@ void Equalities_validityLattice(Matrix * Eqs, int a, Matrix** vl) {
   Matrix_Free(U);
 
   /* 3- build the validity lattice */
-  if ((*vl)==NULL) {
-    (*vl) = Matrix_Alloc(b+1, b+1);
-  }
-  else {
-    assert ((*vl)->NbRows==b+1 && (*vl)->NbColumns== b+1);
-  }
+  ensureMatrix((*vl), b+1, b+1);
   Matrix_copySubMatrix(H, 0, 0, b, b, (*vl), 0,0);
   Matrix_Free(H);
   for (i=0; i< b; i++) {
@@ -273,11 +299,12 @@ void Equalities_validityLattice(Matrix * Eqs, int a, Matrix** vl) {
   Matrix_Free(sol);
   Vector_Set((*vl)->p[b],0, b);
   value_set_si((*vl)->p[b][b], 1);
+  
 } /* validityLattice */
 
 
 /**
- * Eliminate the columns corresponding to the eliminated parameters.
+ * Eliminate the columns corresponding to a list of eliminated parameters.
  * @param M the constraints matrix whose columns are to be removed
  * @param nbVars an offset to be added to the ranks of the variables to be
  * removed
@@ -349,7 +376,7 @@ void Constraints_fullDimensionize(Matrix ** M, Matrix ** C, Matrix ** VL,
   Matrix * fullDim = NULL;
 
   /* variables for permutations */
-  unsigned int * permutation, * permutationInv;
+  unsigned int * permutation;
   Matrix * permutedEqs=NULL, * permutedIneqs=NULL;
   
   /* 1- Eliminate the equalities involving only parameters. */
@@ -393,8 +420,7 @@ void Constraints_fullDimensionize(Matrix ** M, Matrix ** C, Matrix ** VL,
   }
 
   Constraints_permute((*Eqs), permutation, &permutedEqs);
-  Equalities_validityLattice(permutedEqs, 
-			     (*Eqs)->NbColumns-2-(*Eqs)->NbRows, VL);
+  Equalities_validityLattice(permutedEqs, (*Eqs)->NbRows, VL);
 
   if (dbgCompParm) {
     printf("Validity lattice: ");
@@ -532,15 +558,15 @@ Matrix * affine_periods(Matrix * M, Matrix * d) {
 
 
 /** 
- * Given an integer matrix B with m rows and integer m-vectors C and d, computes the basis of
- * the integer solutions to (BN+C) mod d = 0 (1). 
+ * Given an integer matrix B with m rows and integer m-vectors C and d,
+ * computes the basis of the integer solutions to (BN+C) mod d = 0 (1).
  * This is an affine lattice (G): (N 1)^T= G(N' 1)^T, forall N' in Z^b.
  * If there is no solution, returns NULL.
  * @param B B, a (m x b) matrix
  * @param C C, a (m x 1) integer matrix
  * @param d d, a (1 x m) integer matrix
- * @param imb the affine basis of solutions, in the homogeneous form. Allocated
- * if initially set to NULL, reused if not.
+ * @param imb the affine (b+1)x(b+1) basis of solutions, in the homogeneous
+ * form. Allocated if initially set to NULL, reused if not.
 */
 void Equalities_intModBasis(Matrix * B, Matrix * C, Matrix * d, Matrix ** imb) {
   int b = B->NbColumns;
@@ -560,7 +586,7 @@ void Equalities_intModBasis(Matrix * B, Matrix * C, Matrix * d, Matrix ** imb) {
   /* 2- the solution is the validity lattice of the equalities */
   Equalities_validityLattice(eqs, nbEqs, imb);
   Matrix_Free(eqs);
-}/* Equalities_intModBasis */
+} /* Equalities_intModBasis */
 
 
 /** kept here for backwards compatiblity. Wrapper to Equalities_intModBasis() */
@@ -571,7 +597,7 @@ Matrix * int_mod_basis(Matrix * B, Matrix * C, Matrix * d) {
 } /* int_mod_basis */
 
 
-/** 
+/**
  * Given a parameterized constraints matrix with m equalities, computes the
  * compression matrix G such that there is an integer solution in the variables
  * space for each value of N', with N = G N' (N are the "nb_parms" parameters)
@@ -854,30 +880,30 @@ Polyhedron * Polyhedron_Remove_parm_eqs(Polyhedron ** P, Polyhedron ** C,
  * @param validityLattice the the integer lattice underlying the integer
  * solutions.
 */
-Matrix * full_dimensionize(Matrix const * M, int nb_parms, 
+Matrix * full_dimensionize(Matrix const * M, int nbParms, 
 			   Matrix ** validityLattice) {
   Matrix * Eqs, * Ineqs;
-  Matrix * Permuted_Eqs, * Permuted_Ineqs;
+  Matrix * permutedEqs, * permutedIneqs;
   Matrix * Full_Dim;
   Matrix * WVL; /* The Whole Validity Lattice (vars+parms) */
   unsigned int i,j;
-  int nb_elim_vars;
-  unsigned int * permutation, * permutation_inv;
+  int nbElimVars;
+  unsigned int * permutation, * permutationInv;
   /* 0- Split the equalities and inequalities from each other */
   split_constraints(M, &Eqs, &Ineqs);
 
   /* 1- if the polyhedron is already full-dimensional, return it */
   if (Eqs->NbRows==0) {
     Matrix_Free(Eqs);
-    (*validityLattice) = Identity_Matrix(nb_parms+1);
+    (*validityLattice) = Identity_Matrix(nbParms+1);
     return Ineqs;
   }
-  nb_elim_vars = Eqs->NbRows;
+  nbElimVars = Eqs->NbRows;
 
   /* 2- put the vars to be eliminated at the first positions, 
      and compress the other vars/parms
      -> [ variables to eliminate / parameters / variables to keep ] */
-  permutation = find_a_permutation(Eqs, nb_parms);
+  permutation = find_a_permutation(Eqs, nbParms);
   if (dbgCompParm) {
     printf("Permuting the vars/parms this way: [ ");
     for (i=0; i< Eqs->NbColumns; i++) {
@@ -885,64 +911,64 @@ Matrix * full_dimensionize(Matrix const * M, int nb_parms,
     }
     printf("]\n");
   }
-  Permuted_Eqs = mpolyhedron_permute(Eqs, permutation);
-  WVL = compress_parms(Permuted_Eqs, Eqs->NbColumns-2-Eqs->NbRows);
+  permutedEqs = mpolyhedron_permute(Eqs, permutation);
+  WVL = compress_parms(permutedEqs, Eqs->NbColumns-2-Eqs->NbRows);
   if (dbgCompParm) {
     printf("Whole validity lattice: ");
     show_matrix(WVL);
   }
-  mpolyhedron_compress_last_vars(Permuted_Eqs, WVL);
-  Permuted_Ineqs = mpolyhedron_permute(Ineqs, permutation);
+  mpolyhedron_compress_last_vars(permutedEqs, WVL);
+  permutedIneqs = mpolyhedron_permute(Ineqs, permutation);
   if (dbgCompParm) {
-    show_matrix(Permuted_Eqs);
+    show_matrix(permutedEqs);
   }
   Matrix_Free(Eqs);
   Matrix_Free(Ineqs);
-  mpolyhedron_compress_last_vars(Permuted_Ineqs, WVL);
+  mpolyhedron_compress_last_vars(permutedIneqs, WVL);
   if (dbgCompParm) {
     printf("After compression: ");
-    show_matrix(Permuted_Ineqs);
+    show_matrix(permutedIneqs);
   }
   /* 3- eliminate the first variables */
-  if (!mpolyhedron_eliminate_first_variables(Permuted_Eqs, Permuted_Ineqs)) {
+  if (!mpolyhedron_eliminate_first_variables(permutedEqs, permutedIneqs)) {
     fprintf(stderr,"full-dimensionize > variable elimination failed. \n"); 
     return NULL;
   }
-  // show_matrix(Permuted_Eqs);
+  // show_matrix(permutedEqs);
   if (dbgCompParm) {
     printf("After elimination of the variables: ");
-    show_matrix(Permuted_Ineqs);
+    show_matrix(permutedIneqs);
   }
 
   /* 4- get rid of the first (zero) columns, 
      which are now useless, and put the parameters back at the end */
-  Full_Dim = Matrix_Alloc(Permuted_Ineqs->NbRows,
-			  Permuted_Ineqs->NbColumns-nb_elim_vars);
-  for (i=0; i< Permuted_Ineqs->NbRows; i++) {
+  Full_Dim = Matrix_Alloc(permutedIneqs->NbRows,
+			  permutedIneqs->NbColumns-nbElimVars);
+  for (i=0; i< permutedIneqs->NbRows; i++) {
     value_set_si(Full_Dim->p[i][0], 1);
-    for (j=0; j< nb_parms; j++) 
-      value_assign(Full_Dim->p[i][j+Full_Dim->NbColumns-nb_parms-1], 
-		   Permuted_Ineqs->p[i][j+nb_elim_vars+1]);
-    for (j=0; j< Permuted_Ineqs->NbColumns-nb_parms-2-nb_elim_vars; j++) 
+    for (j=0; j< nbParms; j++) 
+      value_assign(Full_Dim->p[i][j+Full_Dim->NbColumns-nbParms-1], 
+		   permutedIneqs->p[i][j+nbElimVars+1]);
+    for (j=0; j< permutedIneqs->NbColumns-nbParms-2-nbElimVars; j++) 
       value_assign(Full_Dim->p[i][j+1], 
-		   Permuted_Ineqs->p[i][nb_elim_vars+nb_parms+j+1]);
+		   permutedIneqs->p[i][nbElimVars+nbParms+j+1]);
     value_assign(Full_Dim->p[i][Full_Dim->NbColumns-1], 
-		 Permuted_Ineqs->p[i][Permuted_Ineqs->NbColumns-1]);
+		 permutedIneqs->p[i][permutedIneqs->NbColumns-1]);
   }
-  Matrix_Free(Permuted_Ineqs);
+  Matrix_Free(permutedIneqs);
   
   /* 5- Keep only the the validity lattice restricted to the parameters */
-  *validityLattice = Matrix_Alloc(nb_parms+1, nb_parms+1);
-  for (i=0; i< nb_parms; i++) {
-    for (j=0; j< nb_parms; j++)
+  *validityLattice = Matrix_Alloc(nbParms+1, nbParms+1);
+  for (i=0; i< nbParms; i++) {
+    for (j=0; j< nbParms; j++)
       value_assign((*validityLattice)->p[i][j], 
 		   WVL->p[i][j]);
-    value_assign((*validityLattice)->p[i][nb_parms], 
+    value_assign((*validityLattice)->p[i][nbParms], 
 		 WVL->p[i][WVL->NbColumns-1]);
   }
-  for (j=0; j< nb_parms; j++) 
-    value_set_si((*validityLattice)->p[nb_parms][j], 0);
-  value_assign((*validityLattice)->p[nb_parms][nb_parms], 
+  for (j=0; j< nbParms; j++) 
+    value_set_si((*validityLattice)->p[nbParms][j], 0);
+  value_assign((*validityLattice)->p[nbParms][nbParms], 
 	       WVL->p[WVL->NbColumns-1][WVL->NbColumns-1]);
 
   /* 6- Clean up */
@@ -950,5 +976,5 @@ Matrix * full_dimensionize(Matrix const * M, int nb_parms,
   return Full_Dim;
 } /* full_dimensionize */
 
-#undef dbgCompParm 0
-#undef dbgCompParmMore 0
+#undef dbgCompParm
+#undef dbgCompParmMore
