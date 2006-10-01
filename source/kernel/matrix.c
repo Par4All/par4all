@@ -860,7 +860,7 @@ int Matrix_Inverse(Matrix *Mat,Matrix *MatInv ) {
   /* also set to 1.                                                         */ 
   for(i=0;i<k;++i) {
     value_set_si(MatInv->p[i][i],1);	
-    // value_set_si(MatInv->p[i][k],1);	/* denum */
+    /* value_set_si(MatInv->p[i][k],1);	/* denum */
   }  
   /* Apply Gauss-Jordan elimination method on the two matrices 'Mat' and  */
   /* 'MatInv' in parallel.                                                */

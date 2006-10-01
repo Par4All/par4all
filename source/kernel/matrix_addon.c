@@ -1,9 +1,9 @@
 /** 
- * $Id: matrix_addon.c,v 1.13 2006/09/25 03:34:03 meister Exp $
+ * $Id: matrix_addon.c,v 1.14 2006/10/01 02:10:46 meister Exp $
  * 
  * Polylib matrix addons
  * Mainly, deals with polyhedra represented as a matrix (implicit form)
- * @author Benoit Meister 
+ * @author Benoit Meister <meister@icps.u-strasbg.fr>
  * 
  */
 
@@ -177,14 +177,14 @@ void mpolyhedron_inflate(Matrix * polyh, unsigned int nb_parms) {
   unsigned nb_vars = polyh->NbColumns-nb_parms-2;
   Value infl;
   value_init(infl);
-  // substract the sum of the negative coefficients of each inequality
+  /* subtract the sum of the negative coefficients of each inequality */
   for (i=0; i< polyh->NbRows; i++) {
     value_set_si(infl, 0);
     for (j=0; j< nb_vars; j++) {
       if (value_sign(polyh->p[i][j])<0)
 	value_addto(infl, infl, polyh->p[i][j]);
     }
-    // here, we substract a negative value
+    /* here, we subtract a negative value */
     value_subtract(polyh->p[i][polyh->NbColumns-1], 
 		   polyh->p[i][polyh->NbColumns-1], infl);
   }
@@ -215,8 +215,14 @@ void mpolyhedron_deflate(Matrix * polyh, unsigned int nb_parms) {
 } /* mpolyhedron_deflate */
 
 
-// use an eliminator row to eliminate a variable in a victim row (without
-// changing the sign of the victim row -> important if it is an inequality).
+/** use an eliminator row to eliminate a variable in a victim row (without
+ * changing the sign of the victim row -> important if it is an inequality).
+ * @param Eliminator the matrix containing the eliminator row
+ * @param eliminator_row the index of the eliminator row in <tt>Eliminator</tt>
+ * @param Victim the matrix containing the row to be eliminated
+ * @param victim_row the row to be eliminated in <tt>Victim</tt>
+ * @param var_to_elim the variable to be eliminated.
+ */
 void eliminate_var_with_constr(Matrix * Eliminator, 
 			       unsigned int eliminator_row, Matrix * Victim, 
 			       unsigned int victim_row, 
@@ -232,18 +238,18 @@ void eliminate_var_with_constr(Matrix * Eliminator,
   value_init(sb);
   value_init(tmp); 
   value_init(tmp2);
-  // if the victim coefficient is not zero 
+  /* if the victim coefficient is not zero */
   if (value_notzero_p(Victim->p[victim_row][var_to_elim+1])) {
     value_assign(a, Eliminator->p[eliminator_row][var_to_elim+1]);
     value_assign(b, Victim->p[victim_row][var_to_elim+1]);
     Lcm3(a, b, &cur_lcm);
-    // multiplication factor for the current constraint
+    /* multiplication factor for the current constraint */
     value_division(tmp, cur_lcm, b);
     value_absolute(mul_a, tmp); /* IT HAS TO BE POSITIVE (otherwise you may
 				   modify the sign of your constraint) */
     value_absolute(tmp, b);
-    value_division(sb, tmp, b); // sb represents the sign of b
-    // multiplication factor for the constraint to project
+    value_division(sb, tmp, b); /* sb represents the sign of b */
+    /* multiplication factor for the constraint to project */
     value_division(tmp, cur_lcm, a);
     value_multiply(mul_b, tmp, sb);
 
@@ -265,7 +271,7 @@ void eliminate_var_with_constr(Matrix * Eliminator,
   value_clear(tmp); 
   value_clear(tmp2);
 }
-// eliminate_var_with_constr
+/* eliminate_var_with_constr */
 
 
 /* STUFF WITH PARTIAL MAPPINGS (Mappings to a subset of the
@@ -321,10 +327,10 @@ unsigned int mpolyhedron_eliminate_first_variables(Matrix * Eqs,
       eliminate_var_with_constr(Eqs, j, Eqs, k, i);
     for (k=0; k< Ineqs->NbRows; k++)
       eliminate_var_with_constr(Eqs, j, Ineqs, k, i);
-    // mark the row
+    /* mark the row */
     value_set_si(Eqs->p[j][0],2);
   }
-  // un-mark all the rows
+  /* un-mark all the rows */
   for (i=0; i< Eqs->NbRows; i++) value_set_si(Eqs->p[i][0],0);
   return 1;
 } /* mpolyhedron_eliminate_first_variables */

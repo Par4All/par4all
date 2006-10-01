@@ -614,7 +614,7 @@ a integer point inside the context. Kind of weird. cherche_min should
 @param pos
 
 */
- //FIXME: needs to be rewritten !
+/* FIXME: needs to be rewritten ! */
 #define MAXITER 100
 int cherche_min(Value *min,Polyhedron *D,int pos) {
 	
@@ -780,7 +780,6 @@ Polyhedron *Polyhedron_Preprocess(Polyhedron *D,Value *size,unsigned MAXRAYS)
     if (!T || emptyQ(T)) {
         if(T)
             Polyhedron_Free(T);
-        // value_clear(tmp);
         return(NULL);
     }
   
@@ -811,7 +810,6 @@ Polyhedron *Polyhedron_Preprocess(Polyhedron *D,Value *size,unsigned MAXRAYS)
         {
             for(i=0;i<=(d+1);i++)
                 value_clear(min[i]);
-            // value_clear(tmp);
             return(NULL);
         }
     Domain_Free(S);
@@ -862,7 +860,6 @@ Polyhedron *Polyhedron_Preprocess(Polyhedron *D,Value *size,unsigned MAXRAYS)
     for(i=0;i<=(d+1);i++)
         value_clear(min[i]);
     free(min);
-    // value_clear(tmp);
     assert(!emptyQ(H));
     return(H);
 } /* Polyhedron_Preprocess */
@@ -1101,8 +1098,6 @@ Polyhedron *old_Polyhedron_Preprocess(Polyhedron *D,Value size,
                 Vector_Combine(&(C[ub][1]),&(C[lb][1]),&(M->p[newi][1]),
                         b1,abs_a,dim+1);
                 value_multiply(aa,a1,b1);
-                // value_multiply(abs_a,aa,size_copy);
-                // value_addto(M->p[newi][dim+1],M->p[newi][dim+1],abs_a);
 		value_addmul(M->p[newi][dim+1], aa, size_copy);
                 Vector_Normalize(&(M->p[newi][1]),(dim+1));
                 newi++;
@@ -2209,19 +2204,15 @@ void Enumeration_Free(Enumeration *en)
   }
 }
 
-// adds by B. Meister for Ehrhart Polynomial approximation
+/* adds by B. Meister for Ehrhart Polynomial approximation */
 
 /**
-
-void evalue_div (e, n)                                    
-divides the evalue e by the integer n
-recursive function
-Warning :  modifies e
-
-@param e an evalue (to be divided by n)
-@param n
-
-*/
+ * Divides the evalue e by the integer n<br/>
+ * recursive function<br/>
+ * Warning :  modifies e
+ * @param e an evalue (to be divided by n)
+ * @param n
+ */
 
 void evalue_div(evalue * e, Value n) {
   int i;
@@ -2278,7 +2269,7 @@ Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,
   Matrix * expansion;
   Polyhedron * Expanded;
 
-  // BM : used to scan the vertices
+  /* used to scan the vertices */
   Param_Vertices * V_tmp;
 
   res = NULL;
@@ -2376,7 +2367,7 @@ Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,
   for (i=0; i< nb_vars; i++) value_division(denoms->p[0][i], 
 					    global_var_lcm, denoms->p[0][i]);
   
-  // OPT : we could use a vector instead of a diagonal matrix here (c- and d-).
+  /* OPT : we could use a vector instead of a diagonal matrix here (c- and d-).*/
   /* c- make the quick expansion matrix */
   printf("nb vars = %d, nb param = %d", nb_vars, nb_param);
   expansion = Matrix_Alloc(nb_vars+nb_param+1, nb_vars+nb_param+1);
@@ -2412,10 +2403,9 @@ Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,
   /* formerly : Scan the vertices and compute lcm 
      Scan_Vertices_Quick_Apx(PP,Q,CT,lcm,nb_param); */
   /* now : lcm = 1 (by construction) */
-  // OPT : A lot among what happens after this point can be simplified by
-  // knowing that lcm[i] = 1 for now, we just conservatively fool the rest of
-  // the function with lcm = 1
-  // to do after a first debugging
+  /* OPT : A lot among what happens after this point can be simplified by
+     knowing that lcm[i] = 1 for now, we just conservatively fool the rest of
+     the function with lcm = 1 */
   for (i=0; i< nb_param; i++) value_set_si(lcm[i], 1);
   
   for(Q=PP->D;Q;Q=Q->next) {
@@ -2461,8 +2451,6 @@ Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,
     
     overflow_warning_flag = 1;
 
-    // BM : expansion formerly here.
-    
 #ifdef EDEBUG2
     fprintf(stderr,"Denominator = ");
     for( np=0;np<nb_param;np++)
@@ -2661,42 +2649,36 @@ Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,
 
 
 /** 
-
-Ehrhart_Quick_Apx
-
-Computes the approximation of the Ehrhart polynomial of a polyhedron 
-(implicit form -> matrix), treating the non-full-dimensional case.
-
-@param M a polyhedron under implicit form
-@param C  M's context under implicit form
-@param Validity_Lattice a pointer to the parameter's validity lattice
-@param MAXRAYS the needed "working space" for other polylib functions used here
-@param param_name the names of the parameters, 
-
-*/
+ * Computes the approximation of the Ehrhart polynomial of a polyhedron 
+ * (implicit form -> matrix), treating the non-full-dimensional case.
+ * @param M a polyhedron under implicit form
+ * @param C  M's context under implicit form
+ * @param Validity_Lattice a pointer to the parameter's validity lattice
+ * @param MAXRAYS the needed "working space" for other polylib functions used here
+ * @param param_name the names of the parameters, 
+ */
 Enumeration *Ehrhart_Quick_Apx(Matrix * M, Matrix * C, 
 			       Matrix **Validity_Lattice, unsigned maxRays) { 
 			       /* char ** param_name) {*/
 
-  // 0- compute a full-dimensional polyhedron with the same number of points,
-  // and its parameter's validity lattice
+  /* 0- compute a full-dimensional polyhedron with the same number of points,
+     and its parameter's validity lattice */
   Matrix * M_full;
   Polyhedron * P, * PC;
   Enumeration *en;
   
   M_full = full_dimensionize(M, C->NbColumns-2, Validity_Lattice);
-  // 1- apply the same tranformation to the context that what has been applied
-  // to the parameters space of the polyhedron.
+  /* 1- apply the same tranformation to the context that what has been applied
+     to the parameters space of the polyhedron. */
   mpolyhedron_compress_last_vars(C, *Validity_Lattice);
   show_matrix(M_full);
   P = Constraints2Polyhedron(M_full, maxRays);
   PC = Constraints2Polyhedron(C, maxRays);
   Matrix_Free(M_full);
-  // compute the Ehrhart polynomial of the "equivalent" polyhedron
+  /* compute the Ehrhart polynomial of the "equivalent" polyhedron */
   en = Ehrhart_Quick_Apx_Full_Dim(P, PC, maxRays, NULL);
-				  /*, param_name);*/
 
-  // clean up
+  /* clean up */
   Polyhedron_Free(P);
   Polyhedron_Free(PC);
   return en;
@@ -2705,23 +2687,18 @@ Enumeration *Ehrhart_Quick_Apx(Matrix * M, Matrix * C,
 
 
 /** 
-
-Constraints_EhrhartQuickApx
-
-Computes the approximation of the Ehrhart polynomial of a polyhedron (implicit
-form -> matrix), treating the non-full-dimensional case.  If there are some
-equalities involving only parameters, these are used to eliminate useless 
-parameters.
-
-@param M a polyhedron under implicit form
-@param C  M's context under implicit form
-@param validityLattice a pointer to the parameter's validity lattice
-(returned)
-@param parmsEqualities Equalities involving only the parameters
-@param maxRays the needed "working space" for other polylib functions used here
-@param elimParams  array of the indices of the eliminated parameters (returned)
-
-*/
+ * Computes the approximation of the Ehrhart polynomial of a polyhedron (implicit
+ * form -> matrix), treating the non-full-dimensional case.  If there are some
+ * equalities involving only parameters, these are used to eliminate useless 
+ * parameters.
+ * @param M a polyhedron under implicit form
+ * @param C  M's context under implicit form
+ * @param validityLattice a pointer to the parameter's validity lattice
+ * (returned)
+ * @param parmsEqualities Equalities involving only the parameters
+ * @param maxRays the needed "working space" for other polylib functions used here
+ * @param elimParams  array of the indices of the eliminated parameters (returned)
+ */
 Enumeration *Constraints_EhrhartQuickApx(Matrix const * M, Matrix const * C, 
 					 Matrix ** validityLattice, 
 					 Matrix ** parmEqualities,
@@ -2730,15 +2707,15 @@ Enumeration *Constraints_EhrhartQuickApx(Matrix const * M, Matrix const * C,
   Enumeration *EP;
   Matrix * Mp = Matrix_Copy(M);
   Matrix * Cp = Matrix_Copy(C);
-  // remove useless equalities involving only parameters, using these
-  // equalities to remove parameters.
+  /* remove useless equalities involving only parameters, using these 
+     equalities to remove parameters. */
   (*parmEqualities) = Constraints_Remove_parm_eqs(&Mp, &Cp, 0, elimParms);
-  if (Mp->NbRows>=0) {// if there is no contradiction
+  if (Mp->NbRows>=0) {/* if there is no contradiction */
     EP = Ehrhart_Quick_Apx(Mp, Cp, validityLattice, maxRays);
     return EP;
   }
   else {
-    // if there are contradictions, return a zero Ehrhart polynomial
+    /* if there are contradictions, return a zero Ehrhart polynomial */
     return NULL;
   }
   

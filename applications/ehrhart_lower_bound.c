@@ -32,10 +32,11 @@ int main( int argc, char **argv)
    /* Read the name of the parameters */
   param_name = Read_ParamNames(stdin,nb_parms);
 
-  // inflate the polyhedron, so that the inflated EP approximation will be an upper bound for the EP's polyhedron.
+  /* inflate the polyhedron, so that the inflated EP approximation will be an
+     upper bound for the EP's polyhedron. */
   mpolyhedron_deflate(P1,nb_parms);
 
-  // compute a polynomial approximation of the Ehrhart polynomial
+  /* compute a polynomial approximation of the Ehrhart polynomial */
   e = Ehrhart_Quick_Apx(P1, C1, &Validity_Lattice, 1024);
   
   Matrix_Free(C1);

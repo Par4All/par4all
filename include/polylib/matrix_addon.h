@@ -1,5 +1,5 @@
 /** 
- * $Id: matrix_addon.h,v 1.7 2006/09/25 03:34:03 meister Exp $
+ * $Id: matrix_addon.h,v 1.8 2006/10/01 02:10:46 meister Exp $
  * 
  * Polylib matrix addons
  * Mainly, deals with polyhedra represented in implicit form (set of
@@ -103,4 +103,4 @@ void Matrix_copySubMatrix(Matrix *M1,
  */
 void Matrix_oppose(Matrix * M);
 
-#endif // __BM_MATRIX_ADDON_H__
+#endif /* __BM_MATRIX_ADDON_H__ */

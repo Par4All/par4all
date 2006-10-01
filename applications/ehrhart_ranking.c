@@ -1,4 +1,4 @@
-// Program for testing the ranking function.
+/* Program for testing the ranking function. */
 
 #include <stdio.h>
 #include <string.h>
@@ -37,7 +37,7 @@ int main( int argc, char **argv)
    /* Read the name of the parameters */
   param_name = Read_ParamNames(stdin,nb_parms);
 
-  // compute a polynomial approximation of the Ehrhart polynomial
+  /* compute a polynomial approximation of the Ehrhart polynomial */
   printf("============ Ranking function ============\n");
   e = Polyhedron_LexSmallerEnumerate(P, D, D->Dimension-C->Dimension, 
 				     C, POL_NO_DUAL);

@@ -1,8 +1,11 @@
-// Tools to compute the ranking function of an iteration J : the number of integer points in P that are lexicographically inferior to J
-// (C) B. Meister 6/2005
-// LSIIT, UMR 7005 CNRS Université Louis Pasteur
-// HiPEAC Network
-// ICPS
+/**
+ * Tools to compute the ranking function of an iteration J: the number of
+ * integer points in P that are lexicographically inferior to J 
+ * @author B. Meister <meister@icps.u-strasbg.fr>
+ * 6/2005
+ * LSIIT-ICPS, UMR 7005 CNRS Université Louis Pasteur
+ * HiPEAC Network
+ */
 
 #ifndef __BM_POLYLIB_RANKING_H__
 #define __BM_POLYLIB_RANKING_H__
@@ -57,4 +60,4 @@ Enumeration *Polyhedron_LexSmallerEnumerate(Polyhedron *P, Polyhedron *D,
  */
 Enumeration *Polyhedron_Ranking(Polyhedron *P, Polyhedron *C, unsigned MAXRAYS);
 
-#endif // __BM_POLYLIB_RANKING_H__
+#endif /* __BM_POLYLIB_RANKING_H__ */

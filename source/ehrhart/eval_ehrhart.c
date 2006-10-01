@@ -28,7 +28,6 @@ int in_domain(Polyhedron *P, Value *list_args) {
   int col,row;
   Value v; /* value of the constraint of a row when
                parameters are instanciated*/
-  //  Value tmp;
 
   if( !P )
           return( 0 );
@@ -36,14 +35,11 @@ int in_domain(Polyhedron *P, Value *list_args) {
   POL_ENSURE_VERTICES(P);
 
   value_init(v); 
-  // value_init(tmp);
   
-  /*P->Constraint constraint matrice of polyhedron P*/  
+  /* P->Constraint constraint matrice of polyhedron P */  
   for(row=0;row<P->NbConstraints;row++) {
     value_assign(v,P->Constraint[row][P->Dimension+1]); /*constant part*/
     for(col=1;col<P->Dimension+1;col++) {
-      // value_multiply(tmp,P->Constraint[row][col],list_args[col-1]);
-      // value_addto(v,v,tmp);
       value_addmul(v, P->Constraint[row][col], list_args[col-1]); 
     }  
     if (value_notzero_p(P->Constraint[row][0])) {
@@ -51,7 +47,6 @@ int in_domain(Polyhedron *P, Value *list_args) {
       /*if v is not >=0 then this constraint is not respected */
       if (value_neg_p(v)) {
         value_clear(v);
-        // value_clear(tmp);
         return( in_domain(P->next, list_args) );
       }        
     }
@@ -60,16 +55,13 @@ int in_domain(Polyhedron *P, Value *list_args) {
       /*if v is not = 0 then this constraint is not respected */
       if (value_notzero_p(v)) {
         value_clear(v);
-        // value_clear(tmp);
         return( in_domain(P->next, list_args) );
       }
     }
   }
   
-  /*if not return before this point => all 
-    the constraints are respected */
+  /* if not return before this point => all the constraints are respected */
   value_clear(v);
-  // value_clear(tmp);
   return 1;
 } /* in_domain */
 

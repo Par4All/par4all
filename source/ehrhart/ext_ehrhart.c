@@ -36,7 +36,6 @@ Matrix *CalcBase( Matrix *R )
 	int dimbase;
 	int u;		/* vecteur util en cours de calcul */
 	Value  som;
-	// , t;
 	int c;
 	/* diagonalisation de R : algo du pivot */
 	/* avec conservation des pivots nuls */
@@ -65,7 +64,7 @@ Matrix *CalcBase( Matrix *R )
 	dimbase = 0;
 	for( l=0 ; l<R->NbRows ; ++l )
 		if( value_zero_p(R->p[l][l]) )
-			++dimbase;			/* = nb de 0 dans la diagonale */
+			++dimbase;     /* = nb de 0 dans la diagonale */
 
 	B = Matrix_Alloc( dimbase, R->NbRows );
 
@@ -82,38 +81,31 @@ Matrix *CalcBase( Matrix *R )
 		for( i=l-1 ; i>=0 ; --i )	/* i=chaque coord du vecteur */
 		{
 			if(value_zero_p( R->p[i][i]) )
-				value_set_si(B->p[u][i],0);		/* on a deux 0... un seul dans */
-									/* ce vect util suffit */
+			  /* on a deux 0... un seul dans */
+			  /* ce vect util suffit */
+				value_set_si(B->p[u][i],0); 
 			else
 			{
 				/* somme des coef deja calcules * coef dans la matrice */
 				value_set_si(som,0);
-				// value_init( t );
 				for( c=l ; c>i ; --c )
 				{
-			       //som += R->p[i][c] * B->p[u][c];
-				  // value_multiply( t, R->p[i][c] , B->p[u][c]);
-				  // value_addto(som, som, t );
 				  value_addmul(som, R->p[i][c], B->p[u][c]);
-					//B->p[u][c] *= R->p[i][i];
-					value_multiply(B->p[u][c] ,B->p[u][c] , R->p[i][i]);	
+				  value_multiply(B->p[u][c] ,B->p[u][c] , R->p[i][i]);	
 				}
-				// value_clear( t );
 				value_oppose(B->p[u][i] , som );
 			}
 		}
 		/* reste a faire le pgcd du vecteur et a l'orienter */
 		value_set_si(p,0);
 		for( i=0 ; i<R->NbRows ; ++i )
-			//p = pgcd( p, B->p[u][i] );
-		        Gcd( p, B->p[u][i], &p );
+		  Gcd( p, B->p[u][i], &p );
 		if( value_zero_p(p))
 			value_set_si(p,1);
 		for( i=0 ; i<R->NbRows && value_zero_p(B->p[u][i]); ++i )
 			;
 		if( i<R->NbRows )
 			if( value_neg_p(B->p[u][i]) )
-				//p = -p;
 		      value_oppose( p,p );
 
 		for( i=0 ; i<R->NbRows ; ++i )
@@ -122,45 +114,43 @@ Matrix *CalcBase( Matrix *R )
 		/* incrementer le compteur de lignes */
 		++l;
 	}
-       // BTran=Transpose(B);
-	//Matrix_Free(B);
 	return B;
 }
 
 
 /* fonction qui calcule les vect generateurs de l'espace vectoriel
-	contenant le polyhedre P */
+   contenant le polyhedre P */
 /*
 Matrix *CalcPolyhedronBase( Polyhedron *P )
 {
-	Matrix *R;
-	Matrix *B;
-	int n, lines;
-
-	if( emptyQ(P) )
-		return( Matrix_Alloc( 0, P->Dimension ) ); // pas de vect. gen 
-
-	R = Matrix_Alloc( P->Dimension, P->Dimension );
-
-         // recopie le 'lineality space' du polyedre dans la matrice R 
-	for( lines=0,n=0 ; n<P->NbConstraints ; ++n )
+  Matrix *R;
+  Matrix *B;
+  int n, lines;
+  
+  if( emptyQ(P) )
+    return( Matrix_Alloc( 0, P->Dimension ) ); */ /* pas de vect. gen */ /*
+  
+  R = Matrix_Alloc( P->Dimension, P->Dimension );
+  
+  */ /* recopie le 'lineality space' du polyedre dans la matrice R */ /*
+  for( lines=0,n=0 ; n<P->NbConstraints ; ++n )
+    {
+      if( P->Constraint[n][0]==0 )
+	*/ /* c'est une direction definissant un ss-espace */ /*
 	{
-		if( P->Constraint[n][0]==0 )
-		// c'est une direction definissant un ss-espace 
-		{
-			memcpy( &R->p[lines][0], &P->Constraint[n][1],
-					sizeof(int)*P->Dimension );
-			++lines;
-		}
+	  memcpy( &R->p[lines][0], &P->Constraint[n][1],
+		  sizeof(int)*P->Dimension );
+	  ++lines;
 	}
-	// remplit le reste de 0..0 
-	for( ; lines<R->NbRows ; ++lines )
-		memset( &R->p[lines][0], 0, sizeof(int)*P->Dimension );
-
-	B = CalcBase( R );
-	Matrix_Free( R );
-
-	return( B );
+    }
+  */ /* remplit le reste de 0..0 */ /*
+  for( ; lines<R->NbRows ; ++lines )
+    memset( &R->p[lines][0], 0, sizeof(int)*P->Dimension );
+  
+  B = CalcBase( R );
+  Matrix_Free( R );
+  
+  return( B );
 }*/
 
 
@@ -175,27 +165,27 @@ superieure donc il suffit de prendre les premieres. */
 	Matrix *B;
 	int n, lines;
 
-	if( emptyQ(P) ) // pas de vect. gen 
+	if( emptyQ(P) ) */ /* pas de vect. gen */ /*
 	{
-		B = Matrix_Alloc( 1, dim );	//on ne peut pas allouer 0 lignes ! 
+	  B = Matrix_Alloc( 1, dim );	*/ /* on ne peut pas allouer 0 lignes ! */ /*
 		B->NbRows = 0;
 		return( B );
 	}
 
 	R = Matrix_Alloc( dim, dim );
 
-	// recopie le 'lineality space' du polyedre dans la matrice R 
+*/ /* recopie le 'lineality space' du polyedre dans la matrice R */ /*
 	for( lines=0,n=0 ; n<P->NbConstraints && lines<dim ; ++n )
 	{
 		if( P->Constraint[n][0]==0 )
-		// c'est une direction definissant un ss-espace 
+		  */ /* c'est une direction definissant un ss-espace */ /*
 		{
 			memcpy( &R->p[lines][0], &P->Constraint[n][1],
 					sizeof(int)*P->Dimension );
 			++lines;
 		}
 	}
-	// remplit le reste de 0..0 
+*/ /* remplit le reste de 0..0 */ /*
 	for( ; lines<R->NbRows ; ++lines )
 		memset( &R->p[lines][0], 0, sizeof(int)*dim );
 
@@ -204,6 +194,7 @@ superieure donc il suffit de prendre les premieres. */
 
 	return( B );
 }*/
+
 
 /* renvoie la ligne sur laquelle on a trouve un coef non nul */
 /* pareil mais cherche dans toutes les lignes */
@@ -291,11 +282,9 @@ static void Soustraire_ligne(Matrix *R, int l1, int l2, int piv )
 	value_set_si(p,0);
 	for(i = piv + 1;i < R->NbColumns;i ++)
 	{
-		//R->p[l2][i] = a*R->p[l2][i] - b*R->p[l1][i];
 		value_multiply(t,b,R->p[l1][i]);
 		value_multiply(R->p[l2][i],a,R->p[l2][i]);
 		value_subtract(R->p[l2][i],R->p[l2][i],t);
-		//p = pgcd( p, R->p[l2][i] );
 		Gcd(p, R->p[l2][i], &p );
 	}
 	/* Simplification par le pgcd de toute la ligne */
@@ -358,9 +347,9 @@ Value g,m1,m2;
                             return;
                     }
      }
-     // ######### add polynomial or periodic to constant #############
-     //you have to exchange e1 and res, before doing addition 
-     //
+    /* ######### add polynomial or periodic to constant #############
+       you have to exchange e1 and res, before doing addition */
+     
      else if (value_zero_p(e1->d) && value_notzero_p(res->d)) {
               enode *tmp;
 	      evalue x;
@@ -374,12 +363,12 @@ Value g,m1,m2;
 	      value_clear(g); value_clear(m1); value_clear(m2);
               return ;
      }
-     else {   // ((e1->d==0) && (res->d==0)) 
+    else {   /* ((e1->d==0) && (res->d==0)) */
                  if ((e1->x.p->type != res->x.p->type) ) {
-		      // ##### adding to evalues of different type. two cases are possible  #### 
+		   /* ##### adding to evalues of different type. two cases are possible  #### 
 		      
-		      //  #### res is periodic and e1 is polynomial, you have to exchange
-		      //e1 and res then to add e1 to the constant term of res  ####
+		   #### res is periodic and e1 is polynomial, you have to exchange
+		   e1 and res then to add e1 to the constant term of res  #### */
 		     if ((res->x.p->type == periodic)&&(e1->x.p->type == polynomial)) {
 	               
 		          evalue eval;
@@ -390,8 +379,8 @@ Value g,m1,m2;
 			 		         	     
 	             }
                      else if ((res->x.p->type == polynomial)&&(e1->x.p->type == periodic)) {
-                          // #### res is polynomial and e1 is periodic,
-		          //  add e1 to the constant term of res  ####
+		       /* #### res is polynomial and e1 is periodic,
+		          add e1 to the constant term of res  #### */
 			 
 			  new_eadd(e1,&res->x.p->arr[0]);
 		     }
@@ -400,18 +389,18 @@ Value g,m1,m2;
 		     return;
 	         }
 	         else if (e1->x.p->pos  != res->x.p->pos ) { 
-	      	 // ### adding evalues of different position (i.e function of different unknowns
-		 // to case are possible  ###
+		   /* ### adding evalues of different position (i.e function of different unknowns
+		      to case are possible  ### */
 			   
-			 if (res->x.p->type == polynomial) {//  ### res and e1 are polynomials
-			       //  add e1 to the constant term of res
+			 if (res->x.p->type == polynomial) {/*  ### res and e1 are polynomials
+								add e1 to the constant term of res */
 			       
 		               new_eadd(e1,&res->x.p->arr[0]);
 		               value_clear(g); value_clear(m1); value_clear(m2);
 		               return;
 		          }
-		          else {  // ### res and e1 are pointers to periodic numbers
-				   //add e1 to all elements of res 
+		          else {  /* ### res and e1 are pointers to periodic numbers
+				     add e1 to all elements of res */
 				   
 			          for (i=0;i<res->x.p->size;i++) {
 			               new_eadd(e1,&res->x.p->arr[i]);
@@ -421,12 +410,12 @@ Value g,m1,m2;
 		          }
                  
 				          
-	         }  //###
+	         }  /* ### */
                  
                 
-		 //same type , same pos  and same size
+		 /* same type , same pos  and same size */
                  if (e1->x.p->size == res->x.p->size) {
-	              // add any element in e1 to the corresponding element in res 
+		   /* add any element in e1 to the corresponding element in res */
 	              for (i=0; i<res->x.p->size; i++) {
                             new_eadd(&e1->x.p->arr[i], &res->x.p->arr[i]);
                       }
@@ -445,7 +434,7 @@ Value g,m1,m2;
                           tmp = ecopy(e1->x.p);
                           for(i=0;i<res->x.p->size;++i) {
                               new_eadd(&res->x.p->arr[i], &tmp->arr[i]);
-                              //  free_evalue_refs(&res->x.p->arr[i]);
+                              /*  free_evalue_refs(&res->x.p->arr[i]); */
                           }
                           res->x.p = tmp;
     	  
@@ -461,7 +450,7 @@ Value g,m1,m2;
                      } 
                 }
                 
-    // ### add two periodics of the same pos (unknown) but whith different sizes (periods) ###
+		/* ### add two periodics of the same pos (unknown) but whith different sizes (periods) ### */
                 else if (res->x.p->type==periodic) {
 		      /* you have to create a new evalue 'ne' in whitch size equals to the scm
 		       of the sizes of e1 and res, then to copy res periodicaly in ne, after
@@ -505,7 +494,7 @@ Value g,m1,m2;
      return ;
  } /* new_eadd */
    
-// remove the last row and the last column of a matrix Mat
+/* remove the last row and the last column of a matrix Mat */
 Matrix *Reduce_Matrix (Matrix *Mat) {
 	   int i; 
 	   Value *p;
@@ -527,20 +516,15 @@ Matrix *Reduce_Matrix (Matrix *Mat) {
   
 void Scalar_product(Value *p1,Value *p2,unsigned length, Value *r) {
         Value *cp1, *cp2;
-	// , tmp;
 	
         int i;
           cp1=p1;
        	  cp2=p2;
-	  // value_init(tmp);
 	  value_set_si(*r,0);
                for (i=0;i<length;i++) {
-                 // value_multiply(tmp,*cp1,*cp2);    		       
-                 // value_addto(*r,*r,tmp);
 		 value_addmul(*r, *cp1, *cp2);
 		  cp1++; cp2++;
 	       }
-	       // value_clear(tmp);
   } /* Scalar_product */
 
     /* computes the scm of two integrals  */
@@ -562,84 +546,84 @@ void ppcm(Value a, Value b, Value *r) {
 } /* ppcm  */
 
 
-   Matrix *Orthogonal_Base(Matrix *Mat)  {
-     Matrix *OrthMat;
-     Value a,b,c,d;
-     Vector *q,*p,*f;
-     unsigned length;
-     int i,j,k;
-     value_init(a);
-     value_init(b);
-     value_init(c);
-     value_init(d);
-     OrthMat= Matrix_Alloc(Mat->NbRows,Mat->NbColumns);
-     length=Mat->NbColumns;
-        for(k=0; k<length; k++)  {
-               value_assign(OrthMat->p[0][k],Mat->p[0][k]);		
+Matrix *Orthogonal_Base(Matrix *Mat)  {
+  Matrix *OrthMat;
+  Value a,b,c,d;
+  Vector *q,*p,*f;
+  unsigned length;
+  int i,j,k;
+  value_init(a);
+  value_init(b);
+  value_init(c);
+  value_init(d);
+  OrthMat= Matrix_Alloc(Mat->NbRows,Mat->NbColumns);
+  length=Mat->NbColumns;
+  for(k=0; k<length; k++)  {
+    value_assign(OrthMat->p[0][k],Mat->p[0][k]);		
+  }
+  f=Vector_Alloc(length);
+  p=Vector_Alloc(length);
+  q=Vector_Alloc(length);
+  for(i=1; i<Mat->NbRows; i++)  {
+    for(k=0;k<length;k++)  {
+      value_assign(f->p[k],Mat->p[i][k]);
+      value_assign(q->p[k],Mat->p[i][k]);
+    }
+    value_set_si(d,1);
+    for(j=0; j<i; j++) {
+      for(k=0;k<length;k++)  {
+	value_assign(p->p[k],OrthMat->p[j][k]);
       }
-	f=Vector_Alloc(length);
-	p=Vector_Alloc(length);
-	q=Vector_Alloc(length);
-	for(i=1; i<Mat->NbRows; i++)  {
-	      for(k=0;k<length;k++)  {
-		   value_assign(f->p[k],Mat->p[i][k]);
-		   value_assign(q->p[k],Mat->p[i][k]);
-	      }
-	      value_set_si(d,1);
-              for(j=0; j<i; j++) {
-	             for(k=0;k<length;k++)  {
-	              value_assign(p->p[k],OrthMat->p[j][k]);
-	             }
-		  
-	        Scalar_product(p->p,f->p,length,&a);
-	        Scalar_product(p->p,p->p,length,&b);	
-		Gcd(a,b,&c);
-		value_division(a,a,c);
-		value_division(b,b,c);
-		for(k=0;k<length;k++) {
-	           value_multiply(p->p[k],p->p[k],a);
-		}
-				
-		if(value_notone_p(d)|value_notone_p(b))  {
-			ppcm(d,b,&c);
-			value_division(a,c,b);
-			value_division(b,c,d);
-			value_assign(d,c);
-			for(k=0;k<length;k++) {
-				value_multiply(p->p[k],p->p[k],a);
-				value_multiply(q->p[k],q->p[k],b);
-			}
-
-		}
-	              		  
-	           for(k=0;k<length;k++) {
-	               value_subtract(q->p[k],q->p[k],p->p[k]);
-		   }
-				
-            }
-	     Vector_Gcd(q->p,length,&c); 
-	     for(k=0;k<length;k++) {
-		 value_division(OrthMat->p[i][k],q->p[k],c);
-             }
-	  
+      
+      Scalar_product(p->p,f->p,length,&a);
+      Scalar_product(p->p,p->p,length,&b);	
+      Gcd(a,b,&c);
+      value_division(a,a,c);
+      value_division(b,b,c);
+      for(k=0;k<length;k++) {
+	value_multiply(p->p[k],p->p[k],a);
+      }
+      
+      if(value_notone_p(d)|value_notone_p(b))  {
+	ppcm(d,b,&c);
+	value_division(a,c,b);
+	value_division(b,c,d);
+	value_assign(d,c);
+	for(k=0;k<length;k++) {
+	  value_multiply(p->p[k],p->p[k],a);
+	  value_multiply(q->p[k],q->p[k],b);
 	}
-	value_clear(a);
-	value_clear(b);
-	value_clear(c);
-	value_clear(d);
-	return OrthMat;
-  }  /* Orthogaunal_Base  */
+	
+      }
+      
+      for(k=0;k<length;k++) {
+	value_subtract(q->p[k],q->p[k],p->p[k]);
+      }
+      
+    }
+    Vector_Gcd(q->p,length,&c); 
+    for(k=0;k<length;k++) {
+      value_division(OrthMat->p[i][k],q->p[k],c);
+    }
+    
+  }
+  value_clear(a);
+  value_clear(b);
+  value_clear(c);
+  value_clear(d);
+  return OrthMat;
+}  /* Orthogonal_Base  */
      
 
-  // Remove an element of à list  
-  void  Remove_Element(Enumeration *en,Enumeration **re, Enumeration *prev)  {
-	  if (en== *re)  {
-		  *re= (*re)->next;
-	  }
-	  else {
-		  prev->next=en->next;
-	  }
-  } /* Remove_Element */
+/* Remove an element of a list */
+void  Remove_Element(Enumeration *en,Enumeration **re, Enumeration *prev)  {
+  if (en== *re)  {
+    *re= (*re)->next;
+  }
+  else {
+    prev->next=en->next;
+  }
+} /* Remove_Element */
   
  /* Remove validite domains and correspending ehrhart polynomials whitch are redundant after 
   the enumeration of a polyhedron */
@@ -958,7 +942,7 @@ Enumeration *Polyhedron_Image_Enumerate(Polyhedron *D,  Polyhedron *C, Matrix *T
 		       /* Create a new contraint whitch is added to the polyhedron*/
 		       
 		       NCont=Vector_Alloc(d1->NbRows+2);
-		       value_set_si( NCont->p[0],1); // the constraint is an inequalite
+		       value_set_si( NCont->p[0],1); /* the constraint is an inequality */
 				       
 		       for (k=1;k<=D->Dimension;k++) {
 		            value_oppose( NCont->p[k], D->Constraint[j][k]);
@@ -967,7 +951,7 @@ Enumeration *Polyhedron_Image_Enumerate(Polyhedron *D,  Polyhedron *C, Matrix *T
 		       value_subtract(val,val,D->Constraint[j][D->Dimension+1]);
 		       value_assign (NCont->p[D->Dimension+1],val);
 		       value_clear(val);
-                        //add the new constraint to polyhedron D
+		       /* add the new constraint to polyhedron D */
 		       pol=AddConstraints(NCont->p,1,D,MAXRAYS);
 		       polun=AddPolyToDomain(Polyhedron_Copy(pol),polun);
 		       Polyhedron_Free(pol);
@@ -975,7 +959,7 @@ Enumeration *Polyhedron_Image_Enumerate(Polyhedron *D,  Polyhedron *C, Matrix *T
 				 value_clear( val );
 		    }
 	   }
-	  if(polun==NULL) { //  No constraint is added to input polyhedron
+	  if(polun==NULL) { /*  No constraint is added to input polyhedron */
 	      if(emptyQ(D)) {
 		      value_clear(h);
 		      return ((Enumeration *) 0);
@@ -984,7 +968,7 @@ Enumeration *Polyhedron_Image_Enumerate(Polyhedron *D,  Polyhedron *C, Matrix *T
 	         ee= Domain_Enumerate(D,C,MAXRAYS,par_name);
 	      }
 	  }
-      else { // some constraintes are added to input polyhedron 
+	  else { /* some constraintes are added to input polyhedron */
 	      if(emptyQ(polun)){
 		      value_clear(h);
          	      return ((Enumeration *) 0);

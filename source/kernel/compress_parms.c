@@ -1,5 +1,5 @@
 /** 
- * $Id: compress_parms.c,v 1.27 2006/09/25 03:34:03 meister Exp $
+ * $Id: compress_parms.c,v 1.28 2006/10/01 02:10:46 meister Exp $
  *
  * The integer points in a parametric linear subspace of Q^n are generally
  * lying on a sub-lattice of Z^n.  
@@ -493,8 +493,8 @@ void Lattice_extractSubLattice(Matrix * lat, unsigned int k, Matrix ** subLat) {
   /* 1- Make the linear part of the lattice triangular to eliminate terms from 
      other dimensions */
   Matrix_subMatrix(lat, 0, 0, lat->NbRows, lat->NbColumns-1, &linLat);
-  // OPT: any integer column-vector elimination is ok indeed.
-  // OPT: could test if the lattice is already in triangular form.
+  /* OPT: any integer column-vector elimination is ok indeed. */
+  /* OPT: could test if the lattice is already in triangular form. */
   left_hermite(linLat, &H, &Q, &U);
   if (dbgCompParmMore) {
     show_matrix(H);
@@ -798,7 +798,7 @@ Matrix * Constraints_Remove_parm_eqs(Matrix ** M1, Matrix ** Ctxt1,
   Matrix_Free(Ctxt);
   (*Ctxt1) = EqsMTmp;
   
-  if (renderSpace==0) {// renderSpace = 0: equalities in the parameter space
+  if (renderSpace==0) {/* renderSpace=0: equalities in the parameter space */
     EqsMTmp = Matrix_Alloc(Eqs->NbRows-allZeros, Eqs->NbColumns);
     k=0;
     for (i=0; i<Eqs->NbRows; i++) {
@@ -808,7 +808,7 @@ Matrix * Constraints_Remove_parm_eqs(Matrix ** M1, Matrix ** Ctxt1,
       }
     }
   }
-  else {// renderSpace = 1: equalities rendered in the combined space
+  else {/* renderSpace=1: equalities rendered in the combined space */
     EqsMTmp = Matrix_Alloc(Eqs->NbRows-allZeros, (*M1)->NbColumns);
     k=0;
     for (i=0; i<Eqs->NbRows; i++) {
@@ -934,7 +934,6 @@ Matrix * full_dimensionize(Matrix const * M, int nbParms,
     fprintf(stderr,"full-dimensionize > variable elimination failed. \n"); 
     return NULL;
   }
-  // show_matrix(permutedEqs);
   if (dbgCompParm) {
     printf("After elimination of the variables: ");
     show_matrix(permutedIneqs);

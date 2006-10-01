@@ -1,5 +1,5 @@
 /** 
- * $Id: matrix_permutations.c,v 1.7 2006/08/11 02:03:53 meister Exp $
+ * $Id: matrix_permutations.c,v 1.8 2006/10/01 02:10:46 meister Exp $
  *
  * Permutations on matrices Matrices are seen either as transformations
  * (mtransformation) or as polyhedra (mpolyhedron)
@@ -236,10 +236,14 @@ unsigned int * find_a_permutation(Matrix * Eqs, unsigned int nb_parms) {
  * the parameters and finally the variables to be kept.  strongly related to
  * the function compress_to_full_dim2
  */
-unsigned int * permutation_for_full_dim2(unsigned int * vars_to_keep, unsigned int nb_keep, unsigned int nb_vars_parms, unsigned int nb_parms) {
-  unsigned int * permutation = (unsigned int*)malloc(sizeof(unsigned int) * nb_vars_parms+1);
+unsigned int * permutation_for_full_dim2(unsigned int * vars_to_keep, 
+					 unsigned int nb_keep, 
+					 unsigned int nb_vars_parms, 
+					 unsigned int nb_parms) {
+  unsigned int * permutation = 
+    (unsigned int*)malloc(sizeof(unsigned int) * nb_vars_parms+1);
   unsigned int i;
-  int cur_keep =0, cur_go = 0; // current number of variables to eliminate and to keep
+  int cur_keep =0, cur_go = 0;/*current number of variables to eliminate/keep*/
   for (i=0; i< nb_vars_parms - nb_parms; i++) {
     if (i==vars_to_keep[cur_keep]) {
       permutation[i] = nb_vars_parms-nb_keep+cur_keep;
@@ -250,14 +254,11 @@ unsigned int * permutation_for_full_dim2(unsigned int * vars_to_keep, unsigned i
       cur_go++;
     }
   }
-  // parameters are just left-shifted
+  /* parameters are just left-shifted */
   for (i=0; i< nb_parms; i++)
     permutation[i+nb_vars_parms-nb_parms] = i+nb_vars_parms-nb_parms-nb_keep;
 
-  // contants stay where they are
+  /* contants stay where they are */
   permutation[nb_vars_parms] = nb_vars_parms;
   return permutation;
-} // permutation_for_full_dim2
-
-
-// END OF STUFF WITH PERMUTATIONS
+} /* permutation_for_full_dim2 */

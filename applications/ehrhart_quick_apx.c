@@ -31,7 +31,7 @@ int main( int argc, char **argv)
    /* Read the name of the parameters */
   param_name = Read_ParamNames(stdin,nb_parms);
 
-  // compute a polynomial approximation of the Ehrhart polynomial
+  /* compute a polynomial approximation of the Ehrhart polynomial */
   printf("============ Ehrhart polynomial quick approximation ============\n");
   e = Ehrhart_Quick_Apx(P1, C1, &Validity_Lattice, 1024);
   
