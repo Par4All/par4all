@@ -2,18 +2,18 @@
 #ifndef arithmetique_header_included
 #define arithmetique_header_included
 
-/* package arithmetique
+/** package arithmetique
  *
- * $Id: arithmetique.h,v 1.21 2006/09/12 13:41:29 skimo Exp $
+ * $Id: arithmetique.h,v 1.22 2006/10/01 02:49:32 meister Exp $
  *
  * Francois Irigoin, mai 1989
  *
  * Modifications
- *  - reprise de DIVIDE qui etait faux (Remi Triolet, Francois Irigoin, 
+ *  - rewrite of DIVIDE which was wrong (Remi Triolet, Francois Irigoin, 
  *    april 90)
- *  - simplification de POSITIVE_DIVIDE par suppression d'un modulo
- *  - B.Meister : added addmul, operation existing in gmp and useful 
- *    for matrix multiplications (05-2005)
+ *  - simplification of POSITIVE_DIVIDE by suppressing one modulo
+ *  - B.Meister : added addmul, operation existing in gmp and quite useful 
+ *    (05-2005)
  */
 
 /* We would like linear to be generic about the "integer" type used

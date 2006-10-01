@@ -1,5 +1,5 @@
 /** 
- * $Id: matrix_addon.c,v 1.14 2006/10/01 02:10:46 meister Exp $
+ * $Id: matrix_addon.c,v 1.15 2006/10/01 02:49:32 meister Exp $
  * 
  * Polylib matrix addons
  * Mainly, deals with polyhedra represented as a matrix (implicit form)
@@ -227,47 +227,41 @@ void eliminate_var_with_constr(Matrix * Eliminator,
 			       unsigned int eliminator_row, Matrix * Victim, 
 			       unsigned int victim_row, 
 			       unsigned int var_to_elim) {
-  Value cur_lcm, mul_a, mul_b, a, b, sb;
+  Value cur_lcm, mul_a, mul_b;
   Value tmp, tmp2;
   int k; 
+
   value_init(cur_lcm); 
   value_init(mul_a); 
   value_init(mul_b); 
-  value_init(a); 
-  value_init(b); 
-  value_init(sb);
   value_init(tmp); 
   value_init(tmp2);
   /* if the victim coefficient is not zero */
   if (value_notzero_p(Victim->p[victim_row][var_to_elim+1])) {
-    value_assign(a, Eliminator->p[eliminator_row][var_to_elim+1]);
-    value_assign(b, Victim->p[victim_row][var_to_elim+1]);
-    Lcm3(a, b, &cur_lcm);
-    /* multiplication factor for the current constraint */
-    value_division(tmp, cur_lcm, b);
-    value_absolute(mul_a, tmp); /* IT HAS TO BE POSITIVE (otherwise you may
-				   modify the sign of your constraint) */
-    value_absolute(tmp, b);
-    value_division(sb, tmp, b); /* sb represents the sign of b */
-    /* multiplication factor for the constraint to project */
-    value_division(tmp, cur_lcm, a);
-    value_multiply(mul_b, tmp, sb);
-
-    value_assign(Victim->p[victim_row][0], Victim->p[victim_row][0]);
+    Lcm3(Eliminator->p[eliminator_row][var_to_elim+1], 
+	 Victim->p[victim_row][var_to_elim+1], &cur_lcm);
+    /* multiplication factors */
+    value_division(mul_a, cur_lcm, 
+		   Eliminator->p[eliminator_row][var_to_elim+1]);
+    value_division(mul_b, cur_lcm, 
+		   Victim->p[victim_row][var_to_elim+1]);
+    /* the multiplicator for the vitim row has to be positive */
+    if (value_pos_p(mul_b)) {
+      value_oppose(mul_a, mul_a);
+    }
+    else {
+      value_oppose(mul_b, mul_b);
+    }
+    value_clear(cur_lcm); 
+    /* now we have a.mul_a = -(b.mul_b) and mul_a > 0 */
     for (k=1; k<Victim->NbColumns; k++) {
-      value_multiply(tmp, Victim->p[victim_row][k], mul_a);
-      value_multiply(tmp2, Eliminator->p[eliminator_row][k], mul_b);
-      value_subtract(Victim->p[victim_row][k], tmp, tmp2);
-      /* = Victim->p[victim_row][k] * mul_a 
-	 -  Eliminator->p[eliminator_row][k] * mul_b; */
+      value_multiply(tmp, Eliminator->p[eliminator_row][k], mul_a);
+      value_multiply(tmp2, Victim->p[victim_row][k], mul_b);
+      value_addto(Victim->p[victim_row][k], tmp, tmp2);
     }
   }
-  value_clear(cur_lcm); 
   value_clear(mul_a); 
   value_clear(mul_b); 
-  value_clear(a); 
-  value_clear(b); 
-  value_clear(sb);
   value_clear(tmp); 
   value_clear(tmp2);
 }
@@ -347,10 +341,10 @@ unsigned int mpolyhedron_eliminate_first_variables(Matrix * Eqs,
  */
 void Matrix_subMatrix(Matrix * M, unsigned int sr, unsigned int sc, 
 			  unsigned int er, unsigned int ec, Matrix ** sub) {
-  assert (er<=M->NbRows && ec<=M->NbColumns);
   int i;
   int nbR = er-sr;
   int nbC = ec-sc;
+  assert (er<=M->NbRows && ec<=M->NbColumns);
   if ((*sub)==NULL) {
     (*sub) = Matrix_Alloc(nbR, nbC);
   }

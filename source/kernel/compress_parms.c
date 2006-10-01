@@ -1,5 +1,5 @@
 /** 
- * $Id: compress_parms.c,v 1.28 2006/10/01 02:10:46 meister Exp $
+ * $Id: compress_parms.c,v 1.29 2006/10/01 02:49:32 meister Exp $
  *
  * The integer points in a parametric linear subspace of Q^n are generally
  * lying on a sub-lattice of Z^n.  
@@ -251,21 +251,22 @@ void Equalities_integerSolution(Matrix * Eqs, Matrix **I) {
  * allocated if initially set to null, or reused if already allocated.
  */
 void Equalities_validityLattice(Matrix * Eqs, int a, Matrix** vl) {
+  unsigned int b = Eqs->NbColumns-2-a;
+  unsigned int r = Eqs->NbRows;
+  Matrix * A=NULL, * B=NULL, *I = NULL, *Lb=NULL, *sol=NULL;
+  Matrix *H, *U, *Q;
+  unsigned int i;
+
   if (dbgCompParm) {
     printf("Computing validity lattice induced by the %d first variables of:"
 	   ,a);
     show_matrix(Eqs);
   }
-  unsigned int b = Eqs->NbColumns-2-a;
   if (b==0) {
     ensureMatrix((*vl), 1, 1);
     value_set_si((*vl)->p[0][0], 1);
     return;
   }
-  unsigned int r = Eqs->NbRows;
-  Matrix * A=NULL, * B=NULL, *I = NULL, *Lb=NULL, *sol=NULL;
-  Matrix *H, *U, *Q;
-  unsigned int i;
 
   /* 1- check that there is an integer solution to the equalities */
   /* OPT: could change integerSolution's profile to allocate or not*/

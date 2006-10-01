@@ -2760,8 +2760,8 @@ Enumeration * Enumeration_zero(unsigned int nbParms, unsigned int maxRays) {
   Enumeration * zero;
   /* 1- build an empty polyhedron with the right dimension */
   /* here we choose to take 2i = -1 */
-  value_assign(Mz->p[0][1], 2);
-  value_assign(Mz->p[0][nbParms+2], 1);
+  value_set_si(Mz->p[0][1], 2);
+  value_set_si(Mz->p[0][nbParms+2], 1);
   emptyP = Constraints2Polyhedron(Mz, maxRays);
   Matrix_Free(Mz);
   universe = Universe_Polyhedron(nbParms);
