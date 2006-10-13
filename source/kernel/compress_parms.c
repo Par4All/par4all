@@ -1,5 +1,5 @@
 /** 
- * $Id: compress_parms.c,v 1.29 2006/10/01 02:49:32 meister Exp $
+ * $Id: compress_parms.c,v 1.30 2006/10/13 16:52:06 meister Exp $
  *
  * The integer points in a parametric linear subspace of Q^n are generally
  * lying on a sub-lattice of Z^n.  
@@ -18,7 +18,7 @@
 /** 
  * debug flags (2 levels)
  */
-#define dbgCompParm 0
+#define dbgCompParm 1
 #define dbgCompParmMore 0
 
 #define dbgStart(a) if (dbgCompParmMore) { printf(" -- begin "); \
@@ -276,8 +276,8 @@ void Equalities_validityLattice(Matrix * Eqs, int a, Matrix** vl) {
     if ((*vl)!=NULL) Matrix_Free(*vl);
     return;
   }
-  Matrix_subMatrix(Eqs, 0, 0, r, a, &A);
-  Matrix_subMatrix(Eqs, 0, a, r, a+b, &B);
+  Matrix_subMatrix(Eqs, 0, 1, r, 1+a, &A);
+  Matrix_subMatrix(Eqs, 0, 1+a, r, 1+a+b, &B);
   linearInter(A, B, &I, &Lb);
   Matrix_Free(I);
   if (dbgCompParm) {
