@@ -1,5 +1,5 @@
 /** 
- * $Id: compress_parms.c,v 1.30 2006/10/13 16:52:06 meister Exp $
+ * $Id: compress_parms.c,v 1.31 2006/10/22 23:30:51 meister Exp $
  *
  * The integer points in a parametric linear subspace of Q^n are generally
  * lying on a sub-lattice of Z^n.  
@@ -18,7 +18,7 @@
 /** 
  * debug flags (2 levels)
  */
-#define dbgCompParm 1
+#define dbgCompParm 0
 #define dbgCompParmMore 0
 
 #define dbgStart(a) if (dbgCompParmMore) { printf(" -- begin "); \
