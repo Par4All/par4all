@@ -4,7 +4,7 @@
 
 /** package arithmetique
  *
- * $Id: arithmetique.h,v 1.22 2006/10/01 02:49:32 meister Exp $
+ * $Id: arithmetique.h,v 1.23 2006/10/25 20:44:44 skimo Exp $
  *
  * Francois Irigoin, mai 1989
  *
@@ -36,10 +36,16 @@
 #include <stdlib.h>
 #include <string.h>
 #ifndef mp_get_memory_functions
+#if defined(__cplusplus)
+extern "C" {
+#endif
 void mp_get_memory_functions(
 		void *(**alloc_func_ptr) (size_t),
 		void *(**realloc_func_ptr) (void *, size_t, size_t),
 		void (**free_func_ptr) (void *, size_t));
+#if defined(__cplusplus)
+}
+#endif
 #endif
 #endif 
 
