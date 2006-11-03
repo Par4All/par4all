@@ -1,5 +1,5 @@
 /** 
- * $Id: compress_parms.c,v 1.31 2006/10/22 23:30:51 meister Exp $
+ * $Id: compress_parms.c,v 1.32 2006/11/03 17:34:26 skimo Exp $
  *
  * The integer points in a parametric linear subspace of Q^n are generally
  * lying on a sub-lattice of Z^n.  
@@ -179,6 +179,7 @@ void Equalities_integerSolution(Matrix * Eqs, Matrix **I) {
   rk = Eqs->NbRows;
   Matrix_subMatrix(Eqs, 0, 1, rk, Eqs->NbColumns-1, &M);
   left_hermite(M, &Hm, &Q, &U);
+  Matrix_Free(M);
   Matrix_subMatrix(Hm, 0, 0, rk, rk, &H);
   if (dbgCompParmMore) {
     show_matrix(Hm);
@@ -279,6 +280,8 @@ void Equalities_validityLattice(Matrix * Eqs, int a, Matrix** vl) {
   Matrix_subMatrix(Eqs, 0, 1, r, 1+a, &A);
   Matrix_subMatrix(Eqs, 0, 1+a, r, 1+a+b, &B);
   linearInter(A, B, &I, &Lb);
+  Matrix_Free(A);
+  Matrix_Free(B);
   Matrix_Free(I);
   if (dbgCompParm) {
     show_matrix(Lb);
