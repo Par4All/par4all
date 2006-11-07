@@ -1,5 +1,5 @@
 /** 
- * $Id: matrix_addon.c,v 1.15 2006/10/01 02:49:32 meister Exp $
+ * $Id: matrix_addon.c,v 1.16 2006/11/07 19:18:23 skimo Exp $
  * 
  * Polylib matrix addons
  * Mainly, deals with polyhedra represented as a matrix (implicit form)
@@ -17,6 +17,7 @@ Matrix * constraintsView(Polyhedron * P) {
   view->NbRows = P->NbConstraints;
   view->NbColumns = P->Dimension+2;
   view->p = P->Constraint;
+  return view;
 }
 
 /** "Frees" a view of the constraints of a polyhedron */
