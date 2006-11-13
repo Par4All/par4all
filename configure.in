@@ -29,14 +29,12 @@ dnl	Makefile in this directory.
 # 						COPYRIGHTENDKEY
 
 dnl Process this file with autoconf to produce a configure script.
-define([AC_CACHE_LOAD], )dnl
-define([AC_CACHE_SAVE], )dnl
-AC_INIT(include/polylib/polylib.h.in)
-AM_INIT_AUTOMAKE(polylib, 5.22.1)
+
+AC_INIT(polylib, 5.22.1)
+AM_INIT_AUTOMAKE
+AC_CONFIG_SRCDIR(include/polylib/polylib.h.in)
 
 AC_PREREQ(2.60)
-
-VERSION=5.22.1
 
 AC_SUBST(versioninfo)
 versioninfo=6:1:0
@@ -232,8 +230,6 @@ dnl AC_MSG_CHECKING(for Doxygen program)
 AC_CHECK_PROG(DOXYGEN,doxygen,doxygen,test,[$PATH:$doxygen_package/bin:/usr/local/bin])
 dnl AC_MSG_RESULT($DOXYGEN)
 
-
-AC_SUBST(VERSION)
 
 AC_SUBST(LIBS)
 
