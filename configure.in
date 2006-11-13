@@ -34,6 +34,8 @@ define([AC_CACHE_SAVE], )dnl
 AC_INIT(include/polylib/polylib.h.in)
 AM_INIT_AUTOMAKE(polylib, 5.22.1)
 
+AC_PREREQ(2.60)
+
 VERSION=5.22.1
 
 AC_SUBST(versioninfo)
