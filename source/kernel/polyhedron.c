@@ -4154,8 +4154,7 @@ Polyhedron *Polyhedron_Preimage(Polyhedron *Pol,Matrix *Func,unsigned NbMaxRays)
   Polyhedron *NewPol = NULL;
   unsigned NbConstraints, Dimension1, Dimension2;
 
-  POL_ENSURE_FACETS(Pol);
-  POL_ENSURE_VERTICES(Pol);
+  POL_ENSURE_INEQUALITIES(Pol);
 
   CATCH(any_exception_error) {
     if (Constraints) Matrix_Free(Constraints);
