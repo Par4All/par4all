@@ -500,7 +500,7 @@ statement loop_test(statement sl)
 		     MAKE_CONTINUE_STATEMENT(), 
 		     MAKE_CONTINUE_STATEMENT());
   string csl = statement_comments(sl);
-  string prev_comm = empty_comments_p(csl)? empty_comments /* strdup("") */ : strdup(csl);
+  string prev_comm = empty_comments_p(csl)? /* empty_comments */ strdup("")  : strdup(csl);
   string lab = string_undefined;
 
   if(entity_empty_label_p(loop_label(l)))
