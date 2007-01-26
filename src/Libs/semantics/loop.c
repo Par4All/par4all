@@ -1032,7 +1032,7 @@ refine_whileloop_transformer(transformer ltf, transformer pre, whileloop l)
   t_skip = transformer_undefined_p(pre)?
     transformer_identity() :
     transformer_dup(pre);
-  t_skip = transformer_add_condition_information(btf, cond, pre, FALSE);
+  t_skip = transformer_add_condition_information(t_skip, cond, pre, FALSE);
 
   ifdebug(8) {
     pips_debug(8, "skipped loop transformer t_skip=\n");
