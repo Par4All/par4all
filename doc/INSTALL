@@ -1,6 +1,6 @@
 
-This is version 5.02 of the Polyhedral Library.
-http://icps.u-strasbg.fr/~loechner/polylib
+This is version 5.22 of the Polyhedral Library.
+http://icps.u-strasbg.fr/polylib
 
 
 REQUIREMENTS:
@@ -11,7 +11,7 @@ If you want the library to be overflow proof, you might install
 the GNU-MP library, version 2.0.2 or more. You can get it from:
        ftp://ftp.gnu.org
 or from any GNU mirror site.
-You should run './configure --enable-gmpint-lib' to use gmp.
+You should run './configure --with-libgmp' to use gmp.
 
 You can also build the polylib if you don't have gmp, but it will
 fail when an overflow occurs.
@@ -48,5 +48,4 @@ Type './configure --help' to get a complete list of options supported
 by the configure script.
 
 If something fails, send me an e-report: loechner@icps.u-strasbg.fr
-
 --Vincent
