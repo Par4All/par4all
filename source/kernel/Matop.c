@@ -301,6 +301,25 @@ Matrix *RemoveRow(Matrix *M, int Rownumber) {
 } /* RemoveRow */
 
 /*
+ * Remove NumColumns columns starting at column number 'FirstColumnnumber' from matrix 'M'
+ * and return the new matrix.
+ */
+Matrix *RemoveNColumns (Matrix *M, int FirstColumnnumber, int NumColumns) {
+  
+  Matrix *Result;
+  int i;
+  
+  Result = Matrix_Alloc (M->NbRows, M->NbColumns-NumColumns);
+  
+  for (i = 0; i < Result->NbRows; i++) {
+    Vector_Copy(M->p[i], Result->p[i], FirstColumnnumber);
+    Vector_Copy(M->p[i]+FirstColumnnumber+NumColumns, Result->p[i]+FirstColumnnumber, 
+		M->NbColumns-NumColumns-FirstColumnnumber);
+  }
+  return Result;
+} /* RemoveColumn */
+
+/*
  * Remove a column 'Columnnumber' from matrix 'M' and return the new matrix.
  */
 Matrix *RemoveColumn (Matrix *M, int Columnnumber) {
