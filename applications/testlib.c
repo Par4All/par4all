@@ -101,6 +101,9 @@ int main() {
   Matrix_Print(stdout,P_VALUE_FMT,a);
   printf("\nb =");
   Matrix_Print(stdout,P_VALUE_FMT,b);
+
+  Matrix_Free(a);
+  Matrix_Free(b);
   
   /* To intersect the two systems, use the polyhedron formats... */
   C = DomainIntersection(A, B, 200);
