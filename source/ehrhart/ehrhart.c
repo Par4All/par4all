@@ -1914,6 +1914,7 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,
     /* Don't call Polyhedron2Param_Domain if there are no parameters */
     if(nb_param == 0) {
 	res = Enumerate_NoParameters(P,C,CT,CEq,MAXRAYS,param_name);
+	Param_Polyhedron_Free(PP);
 	goto out;
     }  
   }
@@ -1942,6 +1943,7 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,
 	if(rVD)
 	  Polyhedron_Free(rVD);
 	Polyhedron_Free(Dt);
+	Polyhedron_Free(CQ);
 	continue;		/* empty validity domain */
       }
       Polyhedron_Free(Dt);
@@ -2177,13 +2179,21 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,
   value_clear(hdv);
   free(lcm);
   free(m1);
+  /* We can't simply call Param_Polyhedron_Free because we've reused the domains */
+  Param_Vertices_Free(PP->V);
+  while (PP->D) {
+    Q = PP->D;
+    PP->D = PP->D->next;
+    free(Q->F);
+    free(Q);
+  }
+  free(PP);
 
 out:
   if (CEq)
     Polyhedron_Free(CEq);
   if (CT)
     Matrix_Free(CT);
-  free(PP);
   if( P != Pi )
     Polyhedron_Free( P );
 
