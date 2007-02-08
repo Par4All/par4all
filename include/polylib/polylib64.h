@@ -1,3 +1,3 @@
-#define POLYLIB_BITS=64
+#define POLYLIB_BITS 64
 
 #include <polylib/polylib.h>
