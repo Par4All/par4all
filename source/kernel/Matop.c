@@ -38,17 +38,14 @@ Value *Lcm (Value i, Value j)
 /* 
  * Return an identity matrix of size 'size'. 
  */
-Matrix *Identity (unsigned size) {
-  
-  unsigned i, j;
+Matrix *Identity(unsigned size)
+{
+  unsigned i;
   Matrix *A;
   
   A = Matrix_Alloc(size, size);
-  for (i = 0;i < size; i ++)
-    for (j = 0; j < size; j ++)
-      value_set_si(A->p[i][j],0);
-  for (i =0; i < size; i ++)  
-    value_set_si(A->p[i][i],1);
+  for (i = 0; i < size; i++)  
+    value_set_si(A->p[i][i], 1);
   return A;
 } /* Identity */
 
