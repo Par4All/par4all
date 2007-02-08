@@ -607,59 +607,23 @@ static Matrix *ConvertDarMattoPolMat (Value *A, int NbRows, int NbCols) {
 ***         We use Alan Darte's implementation of Smith for computing
 ***         the Smith Normal Form 
 **/
- 
-void Smith (Matrix *A, Matrix **U, Matrix **V, Matrix **Product) {
-  
+void Smith(Matrix *A, Matrix **U, Matrix **V, Matrix **Product)
+{ 
   int i;
-  Value *a, *u, *v, *u_inv, *v_inv;
-  Matrix *temp;
+  Matrix *u, *v;
   
-  u = (Value *) malloc(sizeof(Value) * (A->NbRows) * (A->NbRows));
-  v = (Value *) malloc(sizeof(Value) * A->NbColumns * A->NbColumns);  
-  u_inv = (Value *) malloc(sizeof(Value) * A->NbRows * A->NbRows);
-  v_inv = (Value *) malloc(sizeof(Value) * A->NbColumns * A->NbColumns);
+  u = Identity(A->NbRows);
+  v = Identity(A->NbColumns);
 
-  for (i=0;i < (A->NbRows * A->NbRows);i++)
-    value_init(u[i]);
-  for (i=0;i < (A->NbColumns * A->NbColumns);i++)
-    value_init(v[i]);
-  for (i=0;i < (A->NbRows * A->NbRows);i++)
-    value_init(u_inv[i]);
-  for (i=0;i < (A->NbColumns * A->NbColumns);i++)
-    value_init(v_inv[i]);
+  *U = Identity(A->NbRows);
+  *V = Identity(A->NbColumns);
   
-  identite(u,A->NbRows,A->NbRows);
-  identite(u_inv,A->NbRows,A->NbRows);
-  identite(v, A->NbColumns,A->NbColumns);
-  identite(v_inv,A->NbColumns,A->NbColumns);
-  
-  a = ConvertPolMattoDarMat(A);  
-  smith(a,u,v,u_inv,v_inv,A->NbRows,A->NbColumns,1);  
-  *Product = ConvertDarMattoPolMat(a,A->NbRows,A->NbColumns);
-  temp = ConvertDarMattoPolMat(u,A->NbRows, A->NbRows);
-  *U= Matrix_Alloc(temp->NbRows, temp->NbColumns);
-  Matrix_Inverse(temp, *U);
-  Matrix_Free(temp);
-  
-  temp = ConvertDarMattoPolMat(v,A->NbColumns, A->NbColumns);
-  *V= Matrix_Alloc(temp->NbRows, temp->NbColumns);
-  Matrix_Inverse(temp, *V);
-  Matrix_Free(temp);
+  *Product = Matrix_Copy(A);
+  smith((*Product)->p_Init, u->p_Init, v->p_Init, (*U)->p_Init, (*V)->p_Init,
+	A->NbRows, A->NbColumns, 1);
 
-  for (i=0;i < (A->NbRows * A->NbRows);i++)
-    value_clear(a[i]);
-  for (i=0;i < (A->NbRows * A->NbRows);i++)
-    value_clear(u[i]);
-  for (i=0;i < (A->NbColumns * A->NbColumns);i++)
-    value_clear(v[i]);
-  for (i=0;i < (A->NbRows * A->NbRows);i++)
-    value_clear(u_inv[i]);
-  for (i=0;i < (A->NbColumns * A->NbColumns);i++)
-    value_clear(v_inv[i]);    
-  free (a);
-  free (u); free (v);
-  free (u_inv); free (v_inv);  
-  return;
+  Matrix_Free(u);
+  Matrix_Free(v);
 } /* Smith */
 
 /** Hermite :
