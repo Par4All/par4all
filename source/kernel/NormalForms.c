@@ -647,6 +647,8 @@ void Smith (Matrix *A, Matrix **U, Matrix **V, Matrix **Product) {
   Matrix_Free(temp);
 
   for (i=0;i < (A->NbRows * A->NbRows);i++)
+    value_clear(a[i]);
+  for (i=0;i < (A->NbRows * A->NbRows);i++)
     value_clear(u[i]);
   for (i=0;i < (A->NbColumns * A->NbColumns);i++)
     value_clear(v[i]);
