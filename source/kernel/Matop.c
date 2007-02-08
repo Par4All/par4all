@@ -101,8 +101,8 @@ Matrix *Transpose (Matrix *A) {
 /*
  * Return a copy of the contents of a matrix 'Src'.
  */
-Matrix *Matrix_Copy(Matrix *Src ) {
-  
+Matrix *Matrix_Copy(Matrix const *Src )
+{
   Matrix *Dst;
   unsigned i, j;
   
