@@ -96,10 +96,7 @@ int main() {
   a = Polyhedron2Constraints(A);
   b = Polyhedron2Constraints(B);
 
-
-  Matrix_Free(a);
-  Matrix_Free(b);
- /* Take a look at them if you want */
+  /* Take a look at them if you want */
   printf("\na =");
   Matrix_Print(stdout,P_VALUE_FMT,a);
   printf("\nb =");
