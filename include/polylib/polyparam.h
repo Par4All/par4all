@@ -36,6 +36,8 @@ extern Param_Polyhedron *Polyhedron2Param_Vertices ( Polyhedron *Din,
 extern void Print_Domain ( FILE *DST, Polyhedron *D, char **param_names );
 extern void Print_Vertex ( FILE *DST, Matrix *V, char **param_names );
 extern Matrix *VertexCT( Matrix *V, Matrix *CT );
+void Param_Polyhedron_Scale_Integer(Param_Polyhedron *PP, Polyhedron **P,
+				    Value *det, unsigned MaxRays);
 
 #if defined(__cplusplus)
 }

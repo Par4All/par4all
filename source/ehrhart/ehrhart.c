@@ -2250,7 +2250,7 @@ void evalue_div(evalue * e, Value n) {
 
 Ehrhart_Quick_Apx_Full_Dim(P, C, MAXRAYS, param_names)
 
-Procedure to estimate the nubmer of points in a parameterized polytope.
+Procedure to estimate the number of points in a parameterized polytope.
 Returns a list of validity domains + evalues EP
 B.M.
 The most rough and quick approximation by variables expansion  
@@ -2272,11 +2272,7 @@ Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,
   Value *lcm, *m1, hdv;
   Value *context;
   Enumeration *en, *res;
-  unsigned int nb_vars;
-  Matrix * denoms;
   Value expansion_det;
-  Value global_var_lcm;
-  Matrix * expansion;
   Polyhedron * Expanded;
 
   /* used to scan the vertices */
@@ -2285,9 +2281,7 @@ Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,
   res = NULL;
   P = Pi;
 
-
   value_init(expansion_det);
-  value_init(global_var_lcm);
 
 #ifdef EDEBUG2
   fprintf(stderr,"C = \n");
@@ -2335,6 +2329,10 @@ Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,
     }  
   }
 
+  if (!PP->nbV)
+    /* Leaks memory */
+    return NULL;
+
   /* get memory for Values */
   lcm = (Value *)malloc( nb_param * sizeof(Value));
   m1  = (Value *)malloc( nb_param * sizeof(Value));
@@ -2345,71 +2343,21 @@ Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,
   }
   value_init(hdv);
 
-  /* Scan the vertices and make an orthogonal expansion of the variable
-     space */
-  /* a- prepare the array of common denominators */
-  if (!PP->nbV) return 0;
-  else {
-    nb_vars = P->Dimension-nb_param;
-    denoms = Matrix_Alloc(1, nb_vars);
-    for (i=0; i< nb_vars; i++) value_set_si(denoms->p[0][i], 0);
-  }
-  
-  /* b- scan the vertices and compute the variables' global lcms */
-  for (V_tmp = PP->V; V_tmp; V_tmp=V_tmp->next)
-    for (i=0; i< nb_vars; i++) 
-      Lcm3(denoms->p[0][i],V_tmp->Vertex->p[i][nb_param+1], &(denoms->p[0][i]));
-  printf("denoms = \n");
-  Matrix_Print(stderr, P_VALUE_FMT, denoms);
-  value_set_si(expansion_det, 1);
-  value_set_si(global_var_lcm, 1);
-  for (i=0; i< nb_vars;i++) {
-    value_multiply(expansion_det, expansion_det, denoms->p[0][i]);
-    Lcm3(global_var_lcm, denoms->p[0][i], &global_var_lcm);
-  }
-  printf("expansion_det:\n");
-  value_print(stderr, P_VALUE_FMT, expansion_det);
-  printf("\n");
-  
-  
-  /* the expansion can be actually writen as global_var_lcm.L^{-1} */
-  /* this is equivalent to multiply the rows of P by denoms_det */
-  for (i=0; i< nb_vars; i++) value_division(denoms->p[0][i], 
-					    global_var_lcm, denoms->p[0][i]);
-  
-  /* OPT : we could use a vector instead of a diagonal matrix here (c- and d-).*/
-  /* c- make the quick expansion matrix */
-  printf("nb vars = %d, nb param = %d", nb_vars, nb_param);
-  expansion = Matrix_Alloc(nb_vars+nb_param+1, nb_vars+nb_param+1);
-  for (i=0; i< nb_vars; i++) {
-    for (j=0; j< nb_vars+nb_param+1; j++) {
-      if (i==j) value_assign(expansion->p[i][j], denoms->p[0][i]);
-      else value_set_si(expansion->p[i][j], 0);
-    }
-  }
-  for (i=nb_vars; i< nb_vars+nb_param+1; i++) {
-    for (j=0; j< nb_vars+nb_param+1; j++) {
-      if (i==j) value_assign(expansion->p[i][j], global_var_lcm);
-      else value_set_si(expansion->p[i][j], 0);
-    }
-  }
-  value_clear(global_var_lcm);
-  printf("expansion = \n");
-  Matrix_Print(stderr, P_VALUE_FMT, expansion);
-  
-  /* d- apply the variable expansion to the polyhedron */
 #if EDEBUG2 
   Polyhedron_Print(stderr, P_VALUE_FMT, P);
 #endif
 
-  Expanded = Polyhedron_Preimage(P, expansion, MAXRAYS);
-  
+  Expanded = P;
+  Param_Polyhedron_Scale_Integer(PP, &Expanded, &expansion_det, MAXRAYS);
+
 #if EDEBUG2
   Polyhedron_Print(stderr, P_VALUE_FMT, Expanded);
 #endif
 
-  Polyhedron_Free(P);
+  if (P != Expanded)
+    Polyhedron_Free(P);
   P = Expanded;
+
   /* formerly : Scan the vertices and compute lcm 
      Scan_Vertices_Quick_Apx(PP,Q,CT,lcm,nb_param); */
   /* now : lcm = 1 (by construction) */
