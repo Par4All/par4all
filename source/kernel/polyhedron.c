@@ -1042,11 +1042,7 @@ static Polyhedron *Remove_Redundants(Matrix *Mat,Matrix *Ray,SatMatrix *Sat,unsi
      */
     
     NbEq=0;
- #ifdef JUNK
-    /* JUNK is a temporary flag, the code in the JUNK part, should probably
-       be removed (see with Fabien and Doran) */
-   memset((char *)temp2, 0, RowSize2);       
-#endif
+    memset((char *)temp2, 0, RowSize2);
     
 #ifdef POLY_RR_DEBUG
     fprintf (stderr, " j = ");
@@ -1059,11 +1055,9 @@ static Polyhedron *Remove_Redundants(Matrix *Mat,Matrix *Ray,SatMatrix *Sat,unsi
       fflush (stderr);
 #endif
       
-#ifdef JUNK
       /* If constraint(j) is an equality, mark '1' in array 'temp2' */
       if (Filter && value_zero_p(Mat->p[j][0]))  
 	temp2[jx[j]] |= bx[j]; 
-#endif
       /* Reset the status element of each constraint to zero */
       value_set_si(Mat->p[j][0],0);
       
@@ -1203,8 +1197,22 @@ static Polyhedron *Remove_Redundants(Matrix *Mat,Matrix *Ray,SatMatrix *Sat,unsi
       }
     }
 
-#ifdef JUNK
-    if (Filter)                     /* for SIMPLIFY */
+    /* for SIMPLIFY */
+    if (Filter) {
+      Value mone;
+      value_init(mone);
+      value_set_si(mone, -1);
+      /* Normalize equalities to have lexpositive coefficients to
+       * be able to detect identical equalities.
+       */
+      for (i = 0; i < NbEq; i++) {
+	int pos = First_Non_Zero(Mat->p[i]+1, Dimension);
+	if (pos == -1)
+	  continue;
+	if (value_neg_p(Mat->p[i][1+pos]))
+	  Vector_Scale(Mat->p[i]+1, Mat->p[i]+1, mone, Dimension);
+      }
+      value_clear(mone);
       for (i=0; i<NbEq; i++) {
 	
 	/* Detect implicit constraints such as y>=3 and y<=3 */
@@ -1227,8 +1235,8 @@ static Polyhedron *Remove_Redundants(Matrix *Mat,Matrix *Ray,SatMatrix *Sat,unsi
 	/* Set 'Filter' entry to 1 corresponding to the irredundant equality*/
 	if (!Redundant) Filter[jx[i]] |= bx[i];  /* set flag */
       }
+    }
 
-#endif
 #ifdef POLY_RR_DEBUG
     fprintf(stderr, "[Remove_redundants : Step2]\nConstraints =");
     Matrix_Print(stderr,0,Mat);

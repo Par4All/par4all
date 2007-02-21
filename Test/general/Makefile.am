@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am,v 1.2 2005/10/20 11:35:25 verdoolaege Exp $
+# $Id: Makefile.am,v 1.3 2007/02/21 21:26:35 skimo Exp $
 #
 
 OBJ_DIR = $(top_builddir)
@@ -16,6 +16,8 @@ GENERAL =  \
 	simpl5.in \
 	simpl6.in \
 	simpl7.in \
+	simpl8.in \
+	simpl9.in \
 	test1.in
 
 EXTRA_DIST = $(GENERAL) \
