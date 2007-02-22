@@ -409,52 +409,34 @@ void Vector_Min(Value *p,unsigned length,Value *min) {
 /* 
  * Given Vectors 'p1' and 'p2', return Vector 'p3' = lambda * p1 + mu * p2. 
  */
-void  Vector_Combine(Value *p1,Value *p2, Value *p3,Value lambda,Value  mu,unsigned length) {
-  
-  Value *cp1, *cp2, *cp3;
-  Value tmp1, tmp2;
+void Vector_Combine(Value *p1, Value *p2, Value *p3, Value lambda, Value mu,
+		    unsigned length)
+{
+  Value tmp;
   int i;
   
-  value_init(tmp1); value_init(tmp2);
-  cp1=p1;
-  cp2=p2;
-  cp3=p3;
-  
-  for (i=0;i<length;i++) {
-    
-    /* tmp1 = lambda * *cp1 */
-    value_multiply(tmp1,lambda,*cp1);
-    
-    /* tmp2 = mu * *cp2 */
-    value_multiply(tmp2,mu,*cp2);
-    
-    /* *cp3 = tmp1 + tmp2 */
-    value_addto(*cp3,tmp1,tmp2);
-    cp1++; cp2++; cp3++;
+  value_init(tmp);
+  for (i = 0; i < length; i++) {
+    value_multiply(tmp, lambda, p1[i]);
+    value_addmul(tmp, mu, p2[i]);
+    value_assign(p3[i], tmp);
   }
-  value_clear(tmp1);
-  value_clear(tmp2);
+  value_clear(tmp);
   return;
 } /* Vector_Combine */
 
 /* 
  * Return 1 if 'Vec1' equals 'Vec2', otherwise return 0 
  */
-int Vector_Equal(Value *Vec1,Value *Vec2,unsigned n) {
-  
+int Vector_Equal(Value *Vec1, Value *Vec2, unsigned n)
+{
   int i;
-  Value *p1, *p2;
-  
-  p1=Vec1;
-  p2=Vec2;
-  for(i=0;i<n;i++) {
-  
-    /* if (*p1++!=*p2++) break; */
-    if (value_ne(*p1,*p2))
-      break;
-    p1++; p2++;
-  }
-  return (i==n);
+
+  for (i = 0; i < n; ++i)
+    if (value_ne(Vec1[i], Vec2[i]))
+      return 0;
+
+  return 1;
 } /* Vector_Equal */
 
 /* 
