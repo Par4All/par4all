@@ -4,7 +4,7 @@
 
 /** package arithmetique
  *
- * $Id: arithmetique.h,v 1.23 2006/10/25 20:44:44 skimo Exp $
+ * $Id: arithmetique.h,v 1.24 2007/02/22 09:16:57 skimo Exp $
  *
  * Francois Irigoin, mai 1989
  *
@@ -529,7 +529,7 @@ typedef cln::cl_I Value;
 #define value_notone_p(val)   value_ne(val,VALUE_ONE)
 #define value_mone_p(val)     value_eq(val,VALUE_MONE)
 #define value_notmone_p(val)  value_ne(val,VALUE_MONE)
-#define value_cmp_si(val, n)  (val - VALUE_CONST(n))
+#define value_cmp_si(val, n)  (val - (n))
 #define value_min_p(val)      value_eq(val,VALUE_MIN)
 #define value_max_p(val)      value_eq(val,VALUE_MAX)
 #define value_notmin_p(val)   value_ne(val,VALUE_MIN)
