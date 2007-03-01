@@ -977,6 +977,8 @@ Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int wo
   Param_Polyhedron *res;
   int *p, *ref;
 
+  CEqualities = NULL;
+
   if(CT) {
     *CEq = NULL;
     *CT = NULL;
@@ -1037,7 +1039,6 @@ Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int wo
   if(!CT) {
     if (C1->NbEq == 0) {
       Polyhedron_Free(C1);
-      CEqualities = NULL;
     } else {
       Polyhedron *CEq1,	/* CEqualities, in homogeneous dim */
 	         *C2,	/* C1 (temporary) simplified */
