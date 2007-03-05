@@ -160,6 +160,7 @@ Bool isinHnf(Matrix *A) {
 	return False ;
       }
   }
+  Matrix_Free(temp);
   value_clear(rem);
   return True ;
 } /* isinHnf */
