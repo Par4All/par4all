@@ -142,7 +142,7 @@ PATH=\$PIPS_ROOT/bin:\$PIPS_ROOT/utils:\$PATH
 EOF
 
 echo "### generating csh environment"
-$prod/pips/utils/sh2csh.pl < $destination/pipsrc.sh > $destination/pipsrc.csh
+$prod/pips/src/Scripts/env/sh2csh.pl < $destination/pipsrc.sh > $destination/pipsrc.csh
 
 echo "### checking useful softwares"
 for exe in bash m4 wish latex htlatex javac emacs
