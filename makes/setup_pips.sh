@@ -29,16 +29,19 @@ error()
 
 warning()
 {
-    echo
-    echo "$@" >&2
-    echo Type return to continue
+    {
+    	echo
+    	for msg in "$@" ; do
+      	  echo $msg ;
+	done
+        echo "Type return to continue"
+    } >&2
     read
 }
 
 test -d $destination  && \
-    warning "Warning : directory $destination already exists!" && \
-    warning \
-      "If you are not trying to finish a previous installation of PIPS" \
+    warning "Warning : directory $destination already exists!" \
+      " If you are not trying to finish a previous installation of PIPS" \
       " in $destination you should stop and choose another directory name."
 mkdir -p $destination || error "cannot mkdir $destination"
 
@@ -106,6 +109,8 @@ type emacs && echo '_HAS_EMACS_ = 1' >> $config
 target=compile
 type latex && target=build
 type htlatex && target=full-build
+
+warning "cproto header generation results in many cpp warnings..."
 
 echo "### building newgen"
 cd $prod/newgen
