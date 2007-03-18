@@ -1,5 +1,5 @@
 /** 
- * $Id: matrix_addon.c,v 1.16 2006/11/07 19:18:23 skimo Exp $
+ * $Id: matrix_addon.c,v 1.17 2007/03/18 18:49:08 skimo Exp $
  * 
  * Polylib matrix addons
  * Mainly, deals with polyhedra represented as a matrix (implicit form)
@@ -182,8 +182,8 @@ void mpolyhedron_inflate(Matrix * polyh, unsigned int nb_parms) {
   for (i=0; i< polyh->NbRows; i++) {
     value_set_si(infl, 0);
     for (j=0; j< nb_vars; j++) {
-      if (value_sign(polyh->p[i][j])<0)
-	value_addto(infl, infl, polyh->p[i][j]);
+      if (value_neg_p(polyh->p[i][1+j]))
+	value_addto(infl, infl, polyh->p[i][1+j]);
     }
     /* here, we subtract a negative value */
     value_subtract(polyh->p[i][polyh->NbColumns-1], 
@@ -205,8 +205,8 @@ void mpolyhedron_deflate(Matrix * polyh, unsigned int nb_parms) {
   for (i=0; i< polyh->NbRows; i++) {
     value_set_si(defl, 0);
     for (j=0; j< nb_vars; j++) {
-      if (value_sign(polyh->p[i][j])>0)
-	value_addto(defl, defl, polyh->p[i][j]);
+      if (value_pos_p(polyh->p[i][1+j]))
+	value_addto(defl, defl, polyh->p[i][1+j]);
     }
     /* here, we substract a negative value */
     value_subtract(polyh->p[i][polyh->NbColumns-1], 
