@@ -1799,8 +1799,7 @@ void Param_Polyhedron_Scale_Integer(Param_Polyhedron *PP, Polyhedron **P,
   for (V = PP->V; V; V = V->next)
     for (i = 0; i < nb_vars; i++) {
       Vector_Scale(V->Vertex->p[i], V->Vertex->p[i], denoms->p[i], nb_param+1);
-      Vector_AntiScale(V->Vertex->p[i], V->Vertex->p[i],
-		       V->Vertex->p[i][nb_param+1], nb_param+2);
+      Vector_Normalize(V->Vertex->p[i], nb_param+2);
     }
 
   /* the expansion can be actually writen as global_var_lcm.L^{-1} */
