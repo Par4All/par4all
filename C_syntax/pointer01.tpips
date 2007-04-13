@@ -1,0 +1,21 @@
+delete pointer01
+
+create pointer01 ${PIPS_ROOT}/Validation/C_syntax/pointer01.c
+
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 7
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+
+
+#setenv C_SYNTAX_DEBUG_LEVEL 5
+
+
+activate C_PARSER
+
+display PRINTED_FILE[main]
+
+close
+delete pointer01
+

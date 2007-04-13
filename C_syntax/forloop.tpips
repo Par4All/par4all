@@ -1,0 +1,18 @@
+delete forloop
+create forloop ${PIPS_ROOT}/Validation/C_syntax/forloop.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#setenv C_SYNTAX_DEBUG_LEVEL 7
+activate C_PARSER
+
+
+display PRINTED_FILE[main]
+
+close
+
+delete forloop
+
+quit
+

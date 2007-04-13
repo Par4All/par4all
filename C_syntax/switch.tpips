@@ -1,0 +1,27 @@
+delete switch
+
+create switch ${PIPS_ROOT}/Validation/C_syntax/switch.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Parsed printed file for main
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo Printed file for main
+echo
+
+display PRINTED_FILE[main]
+
+apply UNSPLIT[%PROGRAM]
+close
+
+delete switch
+
+quit

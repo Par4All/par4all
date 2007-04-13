@@ -1,0 +1,16 @@
+delete main_return
+create main_return ${PIPS_ROOT}/Validation/C_syntax/main_return.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+display PRINTED_FILE[%ALL]
+
+
+close
+
+delete main_return
+
+quit

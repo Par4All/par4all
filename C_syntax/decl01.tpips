@@ -1,0 +1,30 @@
+delete decl01
+create decl01 ${PIPS_ROOT}/Validation/C_syntax/decl01.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 1
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 5
+
+echo
+echo PARSED PRINTED FILE
+echo
+
+display PARSED_PRINTED_FILE[%ALL]
+
+echo
+echo PRINTED_FILE
+echo
+
+display PRINTED_FILE[%ALL]
+
+
+close
+delete decl01
+
+quit

@@ -1,0 +1,72 @@
+main()
+{
+   int i;
+   int j;
+   int a[5];
+   for(i = 1; i <= 4; i += 1) {
+      a[i] = i;
+   }
+}
+main()
+{
+   int i;
+   int j;
+   int a[5];
+//               <must be written>: i
+   for(i = 1; i <= 4; i += 1) {
+//               <must be read   >: i
+//               <must be written>: a[i]
+      a[i] = i;
+   }
+}
+
+//  T() {}
+
+main()
+{
+   int i;
+   int j;
+   int a[5];
+
+//  T(i) {1<=i}
+
+   for(i = 1; i <= 4; i += 1) {
+
+//  T() {1<=i, i<=4}
+
+      a[i] = i;
+   }
+}
+
+//  P() {}
+
+main()
+{
+   int i;
+   int j;
+   int a[5];
+
+//  P() {}
+
+   for(i = 1; i <= 4; i += 1) {
+
+//  P(i) {1<=i, i<=4}
+
+      a[i] = i;
+   }
+}
+main()
+{
+   int i;
+   int j;
+   int a[5];
+
+//  <a[PHI1]-W-MAY-{1<=PHI1, PHI1<=4}>
+
+   for(i = 1; i <= 4; i += 1) {
+
+//  <a[PHI1]-W-EXACT-{PHI1==i, 1<=i, i<=4}>
+
+      a[i] = i;
+   }
+}

@@ -1,0 +1,20 @@
+
+Module static_function!
+
+   static void foo(int );
+   extern void main();
+
+Module main
+
+void main()
+{
+   int j;
+}
+
+Module foo
+
+static void foo(int x)
+{
+   float i;
+   i = 5;
+}

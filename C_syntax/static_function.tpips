@@ -1,0 +1,35 @@
+delete static_function
+create static_function ${PIPS_ROOT}/Validation/C_syntax/static_function.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 5
+activate C_PARSER
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 3
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+# display PRINTED_FILE[%ALL]
+
+echo
+echo Module static_function!
+echo
+
+display PRINTED_FILE[static_function!]
+
+echo
+echo Module main
+echo
+
+display PRINTED_FILE[main]
+
+echo
+echo Module foo
+echo
+
+display PRINTED_FILE[static_function!foo]
+
+
+close
+delete static_function
+
+quit

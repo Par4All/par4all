@@ -1,0 +1,97 @@
+main()
+{
+   int i;
+   int j;
+   int a[5];
+   i = 1;
+   while (i<5) {
+      a[i] = i;
+      i = i+1;
+   }
+}
+main()
+{
+   int i;
+   int j;
+   int a[5];
+//               <must be written>: i
+   i = 1;
+//               <must be read   >: i
+   while (i<5) {
+//               <must be read   >: i
+//               <must be written>: a[i]
+      a[i] = i;
+//               <must be read   >: i
+//               <must be written>: i
+      i = i+1;
+   }
+}
+
+//  T() {}
+
+main()
+{
+   int i;
+   int j;
+   int a[5];
+
+//  T(i) {i==1}
+
+   i = 1;
+
+//  T(i) {i#init<=i}
+
+   while (i<5) {
+
+//  T() {i<=4}
+
+      a[i] = i;
+
+//  T(i) {i==i#init+1, i<=5}
+
+      i = i+1;
+   }
+}
+
+//  P() {}
+
+main()
+{
+   int i;
+   int j;
+   int a[5];
+
+//  P() {}
+
+   i = 1;
+
+//  P(i) {i==1}
+
+   while (i<5) {
+
+//  P(i) {1<=i, i<=4}
+
+      a[i] = i;
+
+//  P(i) {1<=i, i<=4}
+
+      i = i+1;
+   }
+}
+main()
+{
+   int i;
+   int j;
+   int a[5];
+   i = 1;
+
+//  <a[PHI1]-W-MAY-{1<=PHI1, PHI1<=4}>
+
+   while (i<5) {
+
+//  <a[PHI1]-W-EXACT-{PHI1==i, 1<=i, i<=4}>
+
+      a[i] = i;
+      i = i+1;
+   }
+}

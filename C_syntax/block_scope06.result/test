@@ -1,0 +1,33 @@
+
+Parser output
+
+   extern int main();
+int main()
+{
+   int k;
+   int m;
+   for (k = 1;k<=m;k++)
+   {
+      int i;
+      int j;
+      i = 1;
+      j = 2;
+   }
+}
+
+Controlizer output
+
+   extern int main();
+int main()
+{
+   int k;
+   int m;
+   for (k = 1;k<=m;k++)
+   {
+      int i;
+      int j;
+      i = 1;
+      j = 2;
+   }
+}
+

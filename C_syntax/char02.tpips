@@ -1,0 +1,15 @@
+delete char02
+create char02 ${PIPS_ROOT}/Validation/C_syntax/char02.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+display PRINTED_FILE[%ALL]
+
+
+close
+delete char02
+
+quit

@@ -1,0 +1,28 @@
+delete string
+create string ${PIPS_ROOT}/Validation/C_syntax/string.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+
+echo
+echo Parser output
+echo
+
+display PARSED_PRINTED_FILE[%ALL]
+
+echo
+echo Controlizer output
+echo
+
+display PRINTED_FILE[%ALL]
+
+close
+
+delete string
+
+

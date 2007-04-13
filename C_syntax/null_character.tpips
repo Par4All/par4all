@@ -1,0 +1,16 @@
+delete null_character
+
+create null_character ${PIPS_ROOT}/Validation/C_syntax/null_character.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+display PRINTED_FILE[main]
+
+close
+
+delete null_character
+
+quit

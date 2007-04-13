@@ -1,0 +1,5 @@
+
+main()
+{
+  static int i;
+}

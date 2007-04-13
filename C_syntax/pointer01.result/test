@@ -1,0 +1,10 @@
+main()
+{
+   int *p;
+   int x;
+   int (*p1)[13];
+   int *a[13];
+   int **pp;
+   int ***ppp;
+}
+

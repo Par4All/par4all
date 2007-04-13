@@ -1,0 +1,21 @@
+delete array_declarators
+
+create array_declarators ${PIPS_ROOT}/Validation/C_syntax/array_declarators.c
+
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#setenv C_SYNTAX_DEBUG_LEVEL 5
+
+activate C_PARSER
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 7
+
+display PRINTED_FILE[%ALL]
+
+apply UNSPLIT[%PROGRAM]
+
+close
+
+delete array_declarators

@@ -1,0 +1,16 @@
+void foo()
+{
+   printf("%d\n", i);
+}
+main()
+{
+   // printf("%d\n",i);
+   foo();
+}
+   extern int i;
+   extern void foo();
+   extern main();
+   static int i = 2;
+   extern void foo();
+   int i = 1;
+

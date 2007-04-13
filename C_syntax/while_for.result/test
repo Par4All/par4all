@@ -1,0 +1,16 @@
+main()
+{
+   int c;
+   int i;
+break_2:   if (!(c>0)) goto l99998;
+   i = 0;
+   if (!(i<5)) {
+      goto break_2;
+   }
+   else {
+      goto break_2;
+   }
+l99998:   ;
+}
+   extern main();
+

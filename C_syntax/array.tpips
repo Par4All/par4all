@@ -1,0 +1,73 @@
+delete array
+
+create array ${PIPS_ROOT}/Validation/C_syntax/array.c
+
+
+#setenv C_SYNTAX_DEBUG_LEVEL 5
+
+activate C_PARSER
+
+#setenv EFFECTS_DEBUG_LEVEL 5
+#make REGIONS[%ALL]
+
+#make TRANSFORMERS[%ALL]
+
+#setenv ARRAY_BOUND_CHECK_BOTTOM_UP_DEBUG_LEVEL 5
+apply ARRAY_BOUND_CHECK_BOTTOM_UP[%ALL]
+
+#capply PARTIAL_REDUNDANCY_ELIMINATION[%ALL]
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 5
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#activate PRINT_CODE_TRANSFORMERS
+
+display PRINTED_FILE[main]
+
+apply UNSPLIT[%PROGRAM]
+
+close
+
+delete array
+
+quit
+
+
+
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+
+#capply RESTRUCTURE_CONTROL[%ALL]
+#display PRINTED_FILE[%ALL]
+
+capply ARRAY_BOUND_CHECK_BOTTOM_UP[%ALL]
+display PRINTED_FILE[%ALL]
+
+capply PARTIAL_REDUNDANCY_ELIMINATION[%ALL]
+display PRINTED_FILE[%ALL]
+
+apply UNSPLIT
+
+close array
+
+delete array
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

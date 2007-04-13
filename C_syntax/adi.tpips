@@ -1,0 +1,28 @@
+delete adi
+
+create adi ${PIPS_ROOT}/Validation/C_syntax/adi.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#setenv C_SYNTAX_DEBUG_LEVEL 4
+
+activate C_PARSER
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 7
+
+#activate PRINT_CODE_TRANSFORMERS
+
+display PRINTED_FILE[%ALL]
+
+apply UNSPLIT[%PROGRAM]
+
+close
+
+delete adi
+
+quit
+
+
+
+

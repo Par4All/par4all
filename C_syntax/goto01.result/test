@@ -1,0 +1,7 @@
+   extern main();
+main()
+{
+   int i = 0;
+lab:   i = i+1;
+   printf("%d\n", i);
+}

@@ -1,0 +1,15 @@
+delete if
+create if ${PIPS_ROOT}/Validation/C_syntax/if.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+display PRINTED_FILE[%ALL]
+
+close
+
+delete if 
+
+quit

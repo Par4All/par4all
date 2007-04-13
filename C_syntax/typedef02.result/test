@@ -1,0 +1,22 @@
+main()
+{
+   typedef int myint;
+   myint n;
+   typedef myint MYINT;
+   MYINT m;
+   struct s {
+      int i;
+   };
+   typedef struct s mystruct;
+   union v {
+      int i;
+   };
+   typedef union v myunion;
+   typedef myunion MYUNION;
+   typedef MYUNION toto;
+   typedef mystruct MYSTRUCT;
+   typedef toto tata;
+   typedef tata titi;
+   n = 1;
+}
+   extern main();

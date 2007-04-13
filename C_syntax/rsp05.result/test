@@ -1,0 +1,465 @@
+
+PARSED PRINTED FILE FOR MODULE resp05!
+
+   extern int convold1(int [13][13],int [6],int ,int );
+   extern int convold2(int [8][13],int [6],int ,int );
+   extern int filtre(int [8][13],int [8][8],int ,int );
+   extern void init_coeff(int [6]);
+   extern int main();
+   extern void init_coeff(int [6]);
+   extern int convold1(int [13][13],int [6],int ,int );
+   extern int convold2(int [8][13],int [6],int ,int );
+   extern int filtre(int [8][13],int [8][8],int ,int );
+
+PRINTED FILE FOR main
+
+int main()
+{
+   int X[13][13];
+   int Y[8][8];
+   int H[8][13];
+   int K[8][8];
+   int OUT[8][8];
+   int COEFF[6];
+   int i;
+   int j;
+   init_coeff(COEFF);
+   for(i = 0; i <= 12; i += 1) {
+      for(j = 0; j <= 12; j += 1) {
+         X[i][j] = j*(j+i)/2;
+      }
+   }
+   for(i = 0; i <= 7; i += 1) {
+      for(j = 0; j <= 12; j += 1) {
+         H[i][j] = convold1(X, COEFF, i, j);
+      }
+   }
+   for(i = 0; i <= 7; i += 1) {
+      for(j = 0; j <= 7; j += 1) {
+         K[i][j] = convold2(H, COEFF, i, j);
+      }
+   }
+   for(i = 0; i <= 7; i += 1) {
+      for(j = 0; j <= 7; j += 1) {
+         Y[i][j] = filtre(H, K, i, j);
+      }
+   }
+   for(i = 0; i <= 7; i += 1) {
+      for(j = 0; j <= 7; j += 1) {
+         OUT[i][j] = Y[i][j];
+      }
+   }
+}
+int main()
+{
+   int X[13][13];
+   int Y[8][8];
+   int H[8][13];
+   int K[8][8];
+   int OUT[8][8];
+   int COEFF[6];
+   int i;
+   int j;
+//               <may be written >: COEFF[*]
+   init_coeff(COEFF);
+//               <must be written>: i
+   for(i = 0; i <= 12; i += 1) {
+//               <must be written>: j
+      for(j = 0; j <= 12; j += 1) {
+//               <must be read   >: i j
+//               <must be written>: X[i][j]
+         X[i][j] = j*(j+i)/2;
+      }
+   }
+//               <must be written>: i
+   for(i = 0; i <= 7; i += 1) {
+//               <must be written>: j
+      for(j = 0; j <= 12; j += 1) {
+//               <may be read    >: COEFF[*] X[*][*]
+//               <must be read   >: i j
+//               <must be written>: H[i][j]
+         H[i][j] = convold1(X, COEFF, i, j);
+      }
+   }
+//               <must be written>: i
+   for(i = 0; i <= 7; i += 1) {
+//               <must be written>: j
+      for(j = 0; j <= 7; j += 1) {
+//               <may be read    >: COEFF[*] H[*][*]
+//               <must be read   >: i j
+//               <must be written>: K[i][j]
+         K[i][j] = convold2(H, COEFF, i, j);
+      }
+   }
+//               <must be written>: i
+   for(i = 0; i <= 7; i += 1) {
+//               <must be written>: j
+      for(j = 0; j <= 7; j += 1) {
+//               <may be read    >: H[*][*] K[*][*]
+//               <must be read   >: i j
+//               <must be written>: Y[i][j]
+         Y[i][j] = filtre(H, K, i, j);
+      }
+   }
+//               <must be written>: i
+   for(i = 0; i <= 7; i += 1) {
+//               <must be written>: j
+      for(j = 0; j <= 7; j += 1) {
+//               <must be read   >: Y[i][j] i j
+//               <must be written>: OUT[i][j]
+         OUT[i][j] = Y[i][j];
+      }
+   }
+}
+
+//  T() {}
+
+int main()
+{
+   int X[13][13];
+   int Y[8][8];
+   int H[8][13];
+   int K[8][8];
+   int OUT[8][8];
+   int COEFF[6];
+   int i;
+   int j;
+
+//  T() {}
+
+   init_coeff(COEFF);
+
+//  T(i,j) {0<=i}
+
+   for(i = 0; i <= 12; i += 1) {
+
+//  T(j) {0<=i, i<=12, 0<=j}
+
+      for(j = 0; j <= 12; j += 1) {
+
+//  T() {0<=i, i<=12, 0<=j, j<=12}
+
+         X[i][j] = j*(j+i)/2;
+      }
+   }
+
+//  T(i,j) {j#init==13, 0<=i}
+
+   for(i = 0; i <= 7; i += 1) {
+
+//  T(j) {0<=i, i<=7, 0<=j}
+
+      for(j = 0; j <= 12; j += 1) {
+
+//  T() {0<=i, i<=7, 0<=j, j<=12}
+
+         H[i][j] = convold1(X, COEFF, i, j);
+      }
+   }
+
+//  T(i,j) {j#init==13, 0<=i}
+
+   for(i = 0; i <= 7; i += 1) {
+
+//  T(j) {0<=i, i<=7, 0<=j}
+
+      for(j = 0; j <= 7; j += 1) {
+
+//  T() {0<=i, i<=7, 0<=j, j<=7}
+
+         K[i][j] = convold2(H, COEFF, i, j);
+      }
+   }
+
+//  T(i,j) {j#init==8, 0<=i}
+
+   for(i = 0; i <= 7; i += 1) {
+
+//  T(j) {0<=i, i<=7, 0<=j}
+
+      for(j = 0; j <= 7; j += 1) {
+
+//  T() {0<=i, i<=7, 0<=j, j<=7}
+
+         Y[i][j] = filtre(H, K, i, j);
+      }
+   }
+
+//  T(i,j) {j#init==8, 0<=i}
+
+   for(i = 0; i <= 7; i += 1) {
+
+//  T(j) {0<=i, i<=7, 0<=j}
+
+      for(j = 0; j <= 7; j += 1) {
+
+//  T() {0<=i, i<=7, 0<=j, j<=7}
+
+         OUT[i][j] = Y[i][j];
+      }
+   }
+}
+
+//  P() {}
+
+int main()
+{
+   int X[13][13];
+   int Y[8][8];
+   int H[8][13];
+   int K[8][8];
+   int OUT[8][8];
+   int COEFF[6];
+   int i;
+   int j;
+
+//  P() {}
+
+   init_coeff(COEFF);
+
+//  P() {}
+
+   for(i = 0; i <= 12; i += 1) {
+
+//  P(i,j) {0<=i, i<=12}
+
+      for(j = 0; j <= 12; j += 1) {
+
+//  P(i,j) {0<=i, i<=12, 0<=j, j<=12}
+
+         X[i][j] = j*(j+i)/2;
+      }
+   }
+
+//  P(i,j) {i==13, j==13}
+
+   for(i = 0; i <= 7; i += 1) {
+
+//  P(i,j) {0<=i, i<=7}
+
+      for(j = 0; j <= 12; j += 1) {
+
+//  P(i,j) {0<=i, i<=7, 0<=j, j<=12}
+
+         H[i][j] = convold1(X, COEFF, i, j);
+      }
+   }
+
+//  P(i,j) {i==8, j==13}
+
+   for(i = 0; i <= 7; i += 1) {
+
+//  P(i,j) {0<=i, i<=7}
+
+      for(j = 0; j <= 7; j += 1) {
+
+//  P(i,j) {0<=i, i<=7, 0<=j, j<=7}
+
+         K[i][j] = convold2(H, COEFF, i, j);
+      }
+   }
+
+//  P(i,j) {i==8, j==8}
+
+   for(i = 0; i <= 7; i += 1) {
+
+//  P(i,j) {0<=i, i<=7}
+
+      for(j = 0; j <= 7; j += 1) {
+
+//  P(i,j) {0<=i, i<=7, 0<=j, j<=7}
+
+         Y[i][j] = filtre(H, K, i, j);
+      }
+   }
+
+//  P(i,j) {i==8, j==8}
+
+   for(i = 0; i <= 7; i += 1) {
+
+//  P(i,j) {0<=i, i<=7}
+
+      for(j = 0; j <= 7; j += 1) {
+
+//  P(i,j) {0<=i, i<=7, 0<=j, j<=7}
+
+         OUT[i][j] = Y[i][j];
+      }
+   }
+}
+int main()
+{
+   int X[13][13];
+   int Y[8][8];
+   int H[8][13];
+   int K[8][8];
+   int OUT[8][8];
+   int COEFF[6];
+   int i;
+   int j;
+
+//  <COEFF[PHI1]-W-EXACT-{0<=PHI1, PHI1<=5}>
+
+   init_coeff(COEFF);
+
+//  <X[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=12, 0<=PHI2, PHI2<=12}>
+
+   for(i = 0; i <= 12; i += 1) {
+
+//  <X[PHI1][PHI2]-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=12, 0<=i, i<=12}>
+
+      for(j = 0; j <= 12; j += 1) {
+
+//  <X[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=12, 0<=j,
+//    j<=12}>
+
+         X[i][j] = j*(j+i)/2;
+      }
+   }
+
+//  <COEFF[PHI1]-R-EXACT-{0<=PHI1, PHI1<=5, j==13}>
+//  <H[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=7, 0<=PHI2, PHI2<=12,
+//    j==13}>
+//  <X[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=12, 0<=PHI2, PHI2<=12,
+//    j==13}>
+
+   for(i = 0; i <= 7; i += 1) {
+
+//  <COEFF[PHI1]-R-EXACT-{0<=PHI1, PHI1<=5, 0<=i, i<=7}>
+//  <H[PHI1][PHI2]-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=12, 0<=i, i<=7}>
+//  <X[PHI1][PHI2]-R-EXACT-{i<=PHI1, 0<=PHI1, PHI1<=5+i, PHI1<=12,
+//    0<=PHI2, PHI2<=12, 0<=i, i<=7}>
+
+      for(j = 0; j <= 12; j += 1) {
+
+//  <COEFF[PHI1]-R-EXACT-{0<=PHI1, PHI1<=5, 0<=i, i<=7, 0<=j, j<=12}>
+//  <H[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=7, 0<=j,
+//    j<=12}>
+//  <X[PHI1][PHI2]-R-EXACT-{j==PHI2, i<=PHI1, 0<=PHI1, PHI1<=5+i,
+//    PHI1<=12, 0<=PHI2, PHI2<=12, 0<=i, i<=7}>
+
+         H[i][j] = convold1(X, COEFF, i, j);
+      }
+   }
+
+//  <COEFF[PHI1]-R-EXACT-{0<=PHI1, PHI1<=5, j==13}>
+//  <H[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=7, 0<=PHI2, PHI2<=12,
+//    j==13}>
+//  <K[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=7, 0<=PHI2, PHI2<=7,
+//    j==13}>
+
+   for(i = 0; i <= 7; i += 1) {
+
+//  <COEFF[PHI1]-R-EXACT-{0<=PHI1, PHI1<=5, 0<=i, i<=7}>
+//  <H[PHI1][PHI2]-R-EXACT-{PHI1==i, 0<=PHI1, PHI1<=7, 0<=PHI2,
+//    PHI2<=12}>
+//  <K[PHI1][PHI2]-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=7, 0<=i, i<=7}>
+
+      for(j = 0; j <= 7; j += 1) {
+
+//  <COEFF[PHI1]-R-EXACT-{0<=PHI1, PHI1<=5, 0<=i, i<=7, 0<=j, j<=7}>
+//  <H[PHI1][PHI2]-R-EXACT-{PHI1==i, 0<=PHI1, PHI1<=7, j<=PHI2,
+//    0<=PHI2, PHI2<=5+j, PHI2<=12, 0<=j, j<=7}>
+//  <K[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=7, 0<=j, j<=7}>
+
+         K[i][j] = convold2(H, COEFF, i, j);
+      }
+   }
+
+//  <H[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=7, 2<=PHI2, PHI2<=9, j==8}>
+//  <K[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=7, 0<=PHI2, PHI2<=7, j==8}>
+//  <Y[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=7, 0<=PHI2, PHI2<=7, j==8}>
+
+   for(i = 0; i <= 7; i += 1) {
+
+//  <H[PHI1][PHI2]-R-EXACT-{PHI1==i, 0<=PHI1, PHI1<=7, 2<=PHI2,
+//    PHI2<=9}>
+//  <K[PHI1][PHI2]-R-EXACT-{PHI1==i, 0<=PHI1, PHI1<=7, 0<=PHI2,
+//    PHI2<=7}>
+//  <Y[PHI1][PHI2]-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=7, 0<=i, i<=7}>
+
+      for(j = 0; j <= 7; j += 1) {
+
+//  <H[PHI1][PHI2]-R-EXACT-{PHI1==i, j==PHI2-2, 0<=PHI1, PHI1<=7,
+//    0<=j, j<=7}>
+//  <K[PHI1][PHI2]-R-EXACT-{PHI1==i, j==PHI2, 0<=PHI1, PHI1<=7,
+//    0<=PHI2, PHI2<=7}>
+//  <Y[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=7, 0<=j, j<=7}>
+
+         Y[i][j] = filtre(H, K, i, j);
+      }
+   }
+
+//  <OUT[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=7, 0<=PHI2, PHI2<=7,
+//    j==8}>
+//  <Y[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=7, 0<=PHI2, PHI2<=7, j==8}>
+
+   for(i = 0; i <= 7; i += 1) {
+
+//  <OUT[PHI1][PHI2]-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=7, 0<=i, i<=7}>
+//  <Y[PHI1][PHI2]-R-EXACT-{PHI1==i, 0<=PHI2, PHI2<=7, 0<=i, i<=7}>
+
+      for(j = 0; j <= 7; j += 1) {
+
+//  <OUT[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=7, 0<=j,
+//    j<=7}>
+//  <Y[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=7, 0<=j, j<=7}>
+
+         OUT[i][j] = Y[i][j];
+      }
+   }
+}
+C                                                                18546 (SUMMARY)
+int main()
+{
+   int X[13][13];
+   int Y[8][8];
+   int H[8][13];
+   int K[8][8];
+   int OUT[8][8];
+   int COEFF[6];
+   int i;
+   int j;
+//                                                                    8 (STMT)
+   init_coeff(COEFF);
+//                                                                 1886 (DO)
+   for(i = 0; i <= 12; i += 1) {
+//                                                                  145 (DO)
+      for(j = 0; j <= 12; j += 1) {
+//                                                                   11 (STMT)
+         X[i][j] = j*(j+i)/2;
+      }
+   }
+//                                                                 8857 (DO)
+   for(i = 0; i <= 7; i += 1) {
+//                                                                 1107 (DO)
+      for(j = 0; j <= 12; j += 1) {
+//                                                                   85 (STMT)
+         H[i][j] = convold1(X, COEFF, i, j);
+      }
+   }
+//                                                                 5457 (DO)
+   for(i = 0; i <= 7; i += 1) {
+//                                                                  682 (DO)
+      for(j = 0; j <= 7; j += 1) {
+//                                                                   85 (STMT)
+         K[i][j] = convold2(H, COEFF, i, j);
+      }
+   }
+//                                                                 1745 (DO)
+   for(i = 0; i <= 7; i += 1) {
+//                                                                  218 (DO)
+      for(j = 0; j <= 7; j += 1) {
+//                                                                   27 (STMT)
+         Y[i][j] = filtre(H, K, i, j);
+      }
+   }
+//                                                                  593 (DO)
+   for(i = 0; i <= 7; i += 1) {
+//                                                                   74 (DO)
+      for(j = 0; j <= 7; j += 1) {
+//                                                                    9 (STMT)
+         OUT[i][j] = Y[i][j];
+      }
+   }
+}

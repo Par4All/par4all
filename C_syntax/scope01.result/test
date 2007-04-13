@@ -1,0 +1,14 @@
+void foo()
+{
+   printf("%d\n", i);
+}
+main()
+{
+   printf("%d\n", i);
+   foo();
+}
+   int i = 1;
+   extern main();
+   int i = 1;
+   extern void foo();
+

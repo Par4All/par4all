@@ -1,0 +1,20 @@
+int main()
+{
+   struct PIPS_STRUCT_2 {
+      int m;
+      float n;
+   };
+   struct PIPS_STRUCT_1 {
+      int a;
+      int b;
+      struct PIPS_STRUCT_2 c;
+   };
+   struct PIPS_STRUCT_1 y;
+   struct PIPS_STRUCT_3 {
+      float k;
+      float l;
+   };
+   struct PIPS_STRUCT_3 z;
+   return 0;
+}
+   extern int main();

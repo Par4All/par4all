@@ -1,0 +1,17 @@
+delete typedef_cast
+create typedef_cast ${PIPS_ROOT}/Validation/C_syntax/typedef_cast.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 5
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+display PRINTED_FILE[%ALL]
+
+close
+
+delete typedef_cast
+
+quit

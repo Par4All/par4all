@@ -1,0 +1,18 @@
+delete memcof
+
+create memcof ${PIPS_ROOT}/Validation/C_syntax/memcof.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+display PRINTED_FILE[%ALL]
+
+apply UNSPLIT[%PROGRAM]
+
+close
+
+# delete memcof
+
+quit

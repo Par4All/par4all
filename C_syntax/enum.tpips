@@ -1,0 +1,15 @@
+delete enum
+create enum ${PIPS_ROOT}/Validation/C_syntax/enum.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+display PRINTED_FILE[main]
+
+close
+
+delete enum
+
+quit

@@ -1,0 +1,24 @@
+delete pips
+create pips ${PIPS_DEVEDIR}/Libs/*/*.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 7
+
+
+#activate PRINT_CODE_TRANSFORMERS
+
+#activate PRINT_CODE_PRECONDITIONS 
+
+display PRINTED_FILE[%ALL]
+
+close
+
+
+
+

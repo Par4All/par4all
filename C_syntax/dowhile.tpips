@@ -1,0 +1,18 @@
+delete dowhile
+
+create dowhile ${PIPS_ROOT}/Validation/C_syntax/dowhile.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+display USER_FILE[main]
+
+display PRINTED_FILE[main]
+
+close
+
+delete dowhile
+
+quit

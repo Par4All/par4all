@@ -1,0 +1,14 @@
+delete short_long_int
+create short_long_int ${PIPS_ROOT}/Validation/C_syntax/short_long_int.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+display PRINTED_FILE[%ALL]
+close
+
+delete short_long_int
+
+quit

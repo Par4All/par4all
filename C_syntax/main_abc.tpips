@@ -1,0 +1,16 @@
+delete main_abc
+create main_abc ${PIPS_ROOT}/Validation/C_syntax/main_abc.c
+
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+display PRINTED_FILE[%ALL]
+
+close
+
+delete main_abc
+
+quit

@@ -1,0 +1,14 @@
+delete keyword
+create keyword ${PIPS_ROOT}/Validation/C_syntax/keyword.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+display PRINTED_FILE[%ALL]
+
+close
+delete keyword
+
+quit

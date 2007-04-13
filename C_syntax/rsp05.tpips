@@ -1,0 +1,57 @@
+delete rsp05
+create rsp05 ${PIPS_ROOT}/Validation/C_syntax/rsp05.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+#setenv C_SYNTAX_DEBUG_LEVEL 7
+activate C_PARSER
+
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+
+activate MUST_REGIONS
+
+echo
+echo PARSED PRINTED FILE FOR MODULE resp05!
+echo
+
+display PARSED_PRINTED_FILE[rsp05!]
+
+# quit
+
+echo
+echo PRINTED FILE FOR main
+echo
+
+display PRINTED_FILE[main]
+
+# quit
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[main]
+
+activate PRINT_CODE_COMPLEXITIES
+display PRINTED_FILE[main]
+
+close
+
+# delete rsp05
+
+quit
+

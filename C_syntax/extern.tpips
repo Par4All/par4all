@@ -1,0 +1,17 @@
+delete extern
+create extern ${PIPS_ROOT}/Validation/C_syntax/extern.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 7
+
+display PRINTED_FILE[%ALL]
+
+
+close
+delete extern
+
+quit

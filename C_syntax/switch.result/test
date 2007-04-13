@@ -1,0 +1,42 @@
+
+Parsed printed file for main
+
+main()
+{
+   int i = 1;
+   if (i==1) {
+      goto switch_1_case_1;
+   }
+   if (i==2) {
+      goto switch_1_case_2;
+   }
+   goto switch_1_default;
+switch_1_case_1:   ;
+   printf("1 = %d", i);
+   goto break_1;
+switch_1_case_2:   ;
+   printf("2 = %d", i);
+   goto break_1;
+switch_1_default:   ;
+break_1:   ;
+}
+
+Printed file for main
+
+main()
+{
+   int i = 1;
+   if (i==1) goto switch_1_case_1;
+   if (i==2) {
+   }
+   else {
+      goto switch_1_default;
+   }
+switch_1_case_2:   ;
+   printf("2 = %d", i);
+   goto switch_1_default;
+switch_1_case_1:   ;
+   printf("1 = %d", i);
+switch_1_default:   ;
+break_1:   ;
+}

@@ -1,0 +1,4 @@
+   extern int verlet(int (*[])());
+int verlet(int (*forces[])())
+{
+}

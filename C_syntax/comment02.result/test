@@ -1,0 +1,32 @@
+
+PARSED PRINTED FILE FOR MODULE comment02!
+
+   extern int filter(int );
+   extern int main();
+   extern int filter(int );
+
+PARSED PRINTED FILE FOR MODULE main
+
+int main()
+{
+   int i;
+   int j;
+   
+   j = filter(i);
+   // Function call comment
+   i = j;
+}
+
+PARSED PRINTED FILE FOR MODULE filter
+
+int filter(int x)
+{
+   int y;
+   int res;
+   
+   
+   y = x;
+   /* Assignment comment */
+   
+   return res;
+}

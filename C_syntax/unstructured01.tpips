@@ -1,0 +1,30 @@
+delete unstructured01
+create unstructured01 ${PIPS_ROOT}/Validation/C_syntax/unstructured01.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 5
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 7
+
+#make PARSED_CODE[unstructured01]
+
+
+#activate PRINT_CODE_TRANSFORMERS
+
+#activate PRINT_CODE_PRECONDITIONS 
+
+display PRINTED_FILE[unstructured01]
+
+close
+
+delete unstructured01
+
+quit
+
+
+
+

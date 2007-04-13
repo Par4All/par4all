@@ -1,0 +1,62 @@
+delete comment02
+create comment02 ${PIPS_ROOT}/Validation/C_syntax/comment02.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+#setenv C_SYNTAX_DEBUG_LEVEL 7
+activate C_PARSER
+
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+
+activate MUST_REGIONS
+
+echo
+echo PARSED PRINTED FILE FOR MODULE comment02!
+echo
+
+display PARSED_PRINTED_FILE[comment02!]
+
+echo
+echo PARSED PRINTED FILE FOR MODULE main
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+# quit
+
+echo
+echo PARSED PRINTED FILE FOR MODULE filter
+echo
+
+display PARSED_PRINTED_FILE[filter]
+
+quit
+
+echo
+echo PRINTED FILE FOR main
+echo
+
+display PRINTED_FILE[main]
+
+echo
+echo PRINTED FILE FOR filter
+echo
+
+display PRINTED_FILE[filter]
+
+close
+
+delete comment02
+
+quit
+

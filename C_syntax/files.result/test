@@ -1,0 +1,29 @@
+void a()
+{
+   i = 1;
+}
+int b()
+{
+}
+void c()
+{
+   j = 1;
+}
+int d()
+{
+}
+void e()
+{
+}
+int f()
+{
+}
+   int i;
+   extern void a();
+   extern int b();
+   int j;
+   extern void c();
+   extern int d();
+   extern void e();
+   extern int f();
+

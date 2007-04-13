@@ -1,0 +1,16 @@
+delete struct_noname
+create struct_noname ${PIPS_ROOT}/Validation/C_syntax/struct_noname.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+display PRINTED_FILE[%ALL]
+
+
+close
+
+delete struct_noname
+
+quit

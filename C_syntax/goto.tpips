@@ -1,0 +1,27 @@
+delete goto
+create goto ${PIPS_ROOT}/Validation/C_syntax/goto.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+echo
+echo PARSED PRINTED FILE
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo PRINTED FILE (after controlization)
+echo
+
+display PRINTED_FILE[main]
+
+apply UNSPLIT[%PROGRAM]
+
+close
+
+delete goto
+
+quit

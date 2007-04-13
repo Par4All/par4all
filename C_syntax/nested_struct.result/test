@@ -1,0 +1,15 @@
+void nested_struct()
+{
+   union PIPS_UNION_2 {
+      float f;
+      int i;
+   };
+   struct PIPS_STRUCT_1 {
+      int type;
+      char name;
+      union PIPS_UNION_2 value;
+      void *next;
+   };
+   typedef struct PIPS_STRUCT_1 VARIABLE;
+   VARIABLE v;
+}

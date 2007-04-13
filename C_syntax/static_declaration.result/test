@@ -1,0 +1,6 @@
+main()
+{
+   x++;
+}
+   static int x = 2;
+   extern main();

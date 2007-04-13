@@ -1,0 +1,15 @@
+delete while_break
+create while_break ${PIPS_ROOT}/Validation/C_syntax/while_break.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#display SOURCE_FILE[%ALL]
+display PRINTED_FILE[%ALL]
+
+close
+delete while_break
+
+quit

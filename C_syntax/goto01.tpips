@@ -1,0 +1,15 @@
+delete goto01
+create goto01 ${PIPS_ROOT}/Validation/C_syntax/goto01.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+display PRINTED_FILE[%ALL]
+
+close
+
+delete goto01
+
+quit

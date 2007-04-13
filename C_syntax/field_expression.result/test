@@ -1,0 +1,12 @@
+int main()
+{
+   struct x {
+      int *a;
+      int b;
+   };
+   typedef struct x f1;
+   int i;
+   int k;
+   f1 *f;
+   (f[k].a)[i] = 0;
+}

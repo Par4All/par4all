@@ -1,0 +1,22 @@
+delete define
+create define ${PIPS_ROOT}/Validation/C_syntax/define.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+
+#setenv C_SYNTAX_DEBUG_LEVEL 8
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+display PRINTED_FILE[main]
+
+apply UNSPLIT[%PROGRAM]
+
+close
+
+delete define
+
+quit
+

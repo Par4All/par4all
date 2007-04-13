@@ -1,0 +1,25 @@
+delete atexit
+create atexit ${PIPS_ROOT}/Validation/C_syntax/atexit.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+
+#setenv C_SYNTAX_DEBUG_LEVEL 6
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 7
+
+display PRINTED_FILE[main]
+
+#apply UNSPLIT[%PROGRAM]
+
+close
+
+delete atexit
+
+quit
+
+

@@ -1,0 +1,14 @@
+main()
+{
+   signed int i1;
+   signed int i2;
+   signed short i3;
+   signed short i4;
+   signed long i5;
+   signed long i6;
+   signed long long i7;
+   signed long long i8;
+   i1 = 1;
+   i2 = 2;
+   i8 = 8;
+}

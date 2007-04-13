@@ -1,0 +1,14 @@
+delete initialization01
+create initialization01 ${PIPS_ROOT}/Validation/C_syntax/initialization01.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+display PRINTED_FILE[%ALL]
+
+close
+delete initialization01
+
+quit

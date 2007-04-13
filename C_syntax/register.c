@@ -1,0 +1,4 @@
+main()
+{
+  register int i;
+}

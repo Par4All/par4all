@@ -1,0 +1,27 @@
+
+PARSED PRINTED FILE FOR MODULE resp01!
+
+   extern int filter(int );
+   extern int main();
+   extern int filter(int );
+
+PARSED PRINTED FILE FOR MODULE main (undefined function "filtre")
+
+int main()
+{
+   int i;
+   int j;
+
+   j = filtre(i);
+}
+
+PARSED PRINTED FILE FOR MODULE filter (undefined variable "res")
+
+int filter(int x)
+{
+   int y;
+
+   y = x;
+
+   return res;
+}

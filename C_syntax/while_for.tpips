@@ -1,0 +1,17 @@
+delete while_for
+create while_for ${PIPS_ROOT}/Validation/C_syntax/while_for.c
+
+activate C_PARSER
+
+#setenv C_SYNTAX_DEBUG_LEVEL 7
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#display PRINTED_FILE[main%c]
+
+display PRINTED_FILE[%ALL]
+
+
+close
+delete while_for

@@ -1,0 +1,10 @@
+void do_elem(char * s)
+{
+  int i;
+  if (i==0)
+    {
+      char *last;
+      i = 1;
+      last = "Hello";
+    }
+}

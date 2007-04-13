@@ -1,0 +1,18 @@
+delete main_hello_world
+create main_hello_world ${PIPS_ROOT}/Validation/C_syntax/main_hello_world.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+
+#setenv C_SYNTAX_DEBUG_LEVEL 7
+
+activate C_PARSER
+
+display PRINTED_FILE[%ALL]
+
+close
+
+delete main_hello_world
+
+quit

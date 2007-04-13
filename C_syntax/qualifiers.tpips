@@ -1,0 +1,16 @@
+delete qualifiers
+create qualifiers ${PIPS_ROOT}/Validation/C_syntax/qualifiers.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+display PRINTED_FILE[h]
+
+
+close
+
+delete qualifiers 
+
+quit

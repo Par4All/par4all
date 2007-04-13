@@ -1,0 +1,31 @@
+
+Parser output
+
+   extern int main();
+int main()
+{
+   int k;
+   int m;
+   if (k>1) {
+      int i;
+      int j;
+      i = 1;
+      j = 2;
+   }
+}
+
+Controlizer output
+
+   extern int main();
+int main()
+{
+   int k;
+   int m;
+   if (k>1) {
+      int i;
+      int j;
+      i = 1;
+      j = 2;
+   }
+}
+

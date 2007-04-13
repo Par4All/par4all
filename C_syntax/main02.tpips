@@ -1,0 +1,25 @@
+delete main02
+create main02 ${PIPS_ROOT}/Validation/C_syntax/main02.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 7
+
+#make PARSED_CODE[main]
+
+display PRINTED_FILE[main]
+
+close
+
+# delete main02
+
+quit
+
+
+
+

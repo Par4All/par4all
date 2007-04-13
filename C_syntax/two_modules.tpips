@@ -1,0 +1,26 @@
+delete two_modules
+
+create two_modules ${PIPS_ROOT}/Validation/C_syntax/two_modules.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 5
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 7
+
+display PRINTED_FILE[%ALL]
+
+apply UNSPLIT[%ALL]
+
+close
+
+delete two_modules 
+
+quit
+
+
+
+

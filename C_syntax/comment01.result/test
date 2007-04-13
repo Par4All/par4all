@@ -1,0 +1,15 @@
+
+PARSED PRINTED FILE FOR MODULE filter
+
+int filter(int x)
+{
+   int y;
+   int res;
+   
+   /* Assignment comment */
+   y = x;
+   
+   /* Return comment */
+   return res;
+   y = 0;
+}

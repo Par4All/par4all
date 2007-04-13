@@ -1,0 +1,8 @@
+main()
+{
+   typedef int node;
+   struct node {
+      int node;
+   };
+}
+   extern main();
