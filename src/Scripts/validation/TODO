@@ -1,5 +1,0 @@
-$Id$
-
-* These scripts are really not up to date wrt the subversion setup. 
-- Validate relies on rsh.
-- Accept and so procedures should change with validation under svn.

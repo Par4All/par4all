@@ -1,12 +1,8 @@
 # $Id$
 
 SCRIPTS = \
-	Validate \
-	validate-sequential \
-	Accept \
-	manual_accept \
-	bug-to-validate \
-	dir-to-validate
+	pips_validate \
+	manual_accept
 
 INSTALL_UTL =	$(SCRIPTS)
 

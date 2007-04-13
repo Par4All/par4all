@@ -30,8 +30,15 @@
 #  - tmperr added
 #  - source environment if necessary
 
-# Ok at CRI...
-[ "$PIPS_ROOT" ] || . /projects/Pips/pipsrc.sh
+# ONLY Ok at CRI...
+if ! [ "$PIPS_ROOT" ] then
+  rc=/projects/Pips/pipsrc.sh
+  if [ -f $rc ] then
+    . $rc
+  else
+    echo "\$PIPS_ROOT must be defined" 1>&2
+    exit 1
+fi
 
 PIPS_VALIDDIR=${PIPS_VALIDDIR:-${PIPS_ROOT}/Validation}
 export PIPS_VALIDDIR

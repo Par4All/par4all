@@ -1,7 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: manual_accept,v $ (version $Revision$)
-# $Date: 2003/09/04 10:48:55 $, 
+# $Id$
 #
 
 CD=$PWD
@@ -28,5 +27,4 @@ do
   fi
 done
 
-# end of $RCSfile: manual_accept,v $
-#
+echo "consider running \"svn ci $@\" to commit changes"
