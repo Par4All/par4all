@@ -31,9 +31,9 @@
 #  - source environment if necessary
 
 # ONLY Ok at CRI...
-if ! [ "$PIPS_ROOT" ] then
+if ! [ "$PIPS_ROOT" ] ; then
   rc=/projects/Pips/pipsrc.sh
-  if [ -f $rc ] then
+  if [ -f $rc ] ; then
     . $rc
   else
     echo "\$PIPS_ROOT must be defined" 1>&2
