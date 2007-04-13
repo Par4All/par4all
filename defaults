@@ -1,0 +1,5 @@
+# $Id$
+# the default validation includes the following subdirectories
+Syntax
+C_syntax
+Semantics
