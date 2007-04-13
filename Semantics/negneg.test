@@ -1,0 +1,17 @@
+#!/bin/sh
+#
+# Script to test pips on the simple program
+#
+# Use of the rule transformers_inter_fast
+#
+if Pips -f $PIPS_ROOT/Validation/Semantics/negneg.f -w negneg -m negneg \
+	-s pcinter -s tfinter -p prcp >&2
+then
+	echo "--- Preconditions for module NEGNEG"
+	Display -l prec
+	exit_code=0
+else
+	exit_code=1
+fi
+Delete negneg >&2
+exit $exit_code

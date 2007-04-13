@@ -1,0 +1,87 @@
+
+C  T(FI,FS,FX) {"Hello World!"==FS, 2.0==FX, FI==1}
+
+
+      SUBROUTINE INIT(FS, FX, FI)
+
+      CHARACTER*(*) FS
+      INTEGER FI
+
+C  T(FS) {"Hello World!"==FS}
+
+
+      FS = "Hello World!"                                               0001
+
+C  T(FX) {2.0==FX}
+
+      FX = 2.0                                                          0002
+
+C  T(FI) {FI==1}
+
+      FI = 1                                                            0003
+
+      END
+
+C  T() {}
+
+      PROGRAM TYPE25
+
+C     Check multi-type initialization routine
+
+      CHARACTER*20 S
+
+C  T(I,S,X) {"Hello World!"==S, 2.0==X, I==1}
+
+
+      CALL INIT(S, X, I)                                                0001
+
+C  T() {}
+
+
+      PRINT *, S, X, I                                                  0002
+
+      END
+
+C  P() {}
+
+
+      SUBROUTINE INIT(FS, FX, FI)
+
+      CHARACTER*(*) FS
+      INTEGER FI
+
+C  P() {}
+
+
+      FS = "Hello World!"                                               0001
+
+C  P(FS) {"Hello World!"==FS}
+
+      FX = 2.0                                                          0002
+
+C  P(FS,FX) {"Hello World!"==FS, 2.0==FX}
+
+      FI = 1                                                            0003
+
+      END
+
+C  P() {}
+
+      PROGRAM TYPE25
+
+C     Check multi-type initialization routine
+
+      CHARACTER*20 S
+
+C  P() {}
+
+
+      CALL INIT(S, X, I)                                                0001
+
+C  P(I,S,X) {"Hello World!"==S, 2.0==X, I==1}
+
+
+      PRINT *, S, X, I                                                  0002
+
+      END
+

@@ -1,0 +1,51 @@
+
+C  T() {}
+
+      PROGRAM EQUIV04
+
+C     Check static alias use for non integer
+
+      EQUIVALENCE (X, Y)
+
+C  T() {}
+
+
+      X = 4.                                                            0001
+
+C  T() {}
+
+
+      Y = 5.                                                            0002
+
+C  T() {}
+
+
+      PRINT *, 'x=', X, 'y=', Y                                         0003
+
+      END
+
+C  P() {}
+
+      PROGRAM EQUIV04
+
+C     Check static alias use for non integer
+
+      EQUIVALENCE (X, Y)
+
+C  P() {}
+
+
+      X = 4.                                                            0001
+
+C  P() {}
+
+
+      Y = 5.                                                            0002
+
+C  P() {}
+
+
+      PRINT *, 'x=', X, 'y=', Y                                         0003
+
+      END
+

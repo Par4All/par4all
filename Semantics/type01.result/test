@@ -1,0 +1,99 @@
+
+C  T() {}
+
+      PROGRAM TYPE01
+
+C     Goal: check the extension of the semantics analysis to non-integer
+C     scalar variables
+
+      LOGICAL L1
+      CHARACTER*4 S1
+      REAL R1
+      DOUBLE PRECISION D1
+      COMPLEX C1
+
+C  T(L1) {L1==1}
+
+
+      L1 = .TRUE.                                                       0001
+
+C  T(L1) {L1==0}
+
+      L1 = .FALSE.                                                      0002
+
+C  T(L1) {L1+L1#init==1, 0<=L1, L1<=1}
+
+      L1 = .NOT.L1                                                      0003
+
+C  T(S1) {"TOTO"==S1}
+
+      S1 = "TOTO"                                                       0004
+
+C  T(R1) {1.57==R1}
+
+      R1 = 1.57                                                         0005
+
+C  T(D1) {1.23456789==D1}
+
+      D1 = 1.23456789                                                   0006
+
+C  T(C1) {}
+
+      C1 = CMPLX(1., 1.)                                                0007
+
+C  T() {}
+
+
+      PRINT *, L1, S1, R1, D1, C1                                       0008
+
+      END
+
+C  P() {}
+
+      PROGRAM TYPE01
+
+C     Goal: check the extension of the semantics analysis to non-integer
+C     scalar variables
+
+      LOGICAL L1
+      CHARACTER*4 S1
+      REAL R1
+      DOUBLE PRECISION D1
+      COMPLEX C1
+
+C  P() {}
+
+
+      L1 = .TRUE.                                                       0001
+
+C  P(L1) {L1==1}
+
+      L1 = .FALSE.                                                      0002
+
+C  P(L1) {L1==0}
+
+      L1 = .NOT.L1                                                      0003
+
+C  P(L1) {L1==1}
+
+      S1 = "TOTO"                                                       0004
+
+C  P(L1,S1) {"TOTO"==S1, L1==1}
+
+      R1 = 1.57                                                         0005
+
+C  P(L1,R1,S1) {"TOTO"==S1, 1.57==R1, L1==1}
+
+      D1 = 1.23456789                                                   0006
+
+C  P(D1,L1,R1,S1) {"TOTO"==S1, 1.23456789==D1, 1.57==R1, L1==1}
+
+      C1 = CMPLX(1., 1.)                                                0007
+
+C  P(C1,D1,L1,R1,S1) {"TOTO"==S1, 1.23456789==D1, 1.57==R1, L1==1}
+
+
+      PRINT *, L1, S1, R1, D1, C1                                       0008
+
+      END
+

@@ -1,0 +1,99 @@
+#
+# Test that preconditions are not disturbed by a subroutine (foo2) which is never called 
+# while the initial precondition really uses all user modules, dynamically called or not.
+# Like all01, but with another level of calls: output is called by foo1 which is called
+# by the main, and by foo3 which is called by foo2 which is never called.
+#
+delete all04
+create all04 ${PIPS_ROOT}/Validation/Semantics/all04.f
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate PRINT_CODE_PRECONDITIONS
+
+echo
+echo Initial code with preconditions for ALL04 after cleanup
+echo
+
+display PRINTED_FILE[ALL04]
+
+echo
+echo Initial code with preconditions for FOO1 after cleanup
+echo
+
+display PRINTED_FILE[FOO1]
+
+echo
+echo Initial code with preconditions for FOO2 after cleanup
+echo
+
+display PRINTED_FILE[FOO2]
+
+echo
+echo Initial code with preconditions for FOO3 after cleanup
+echo
+
+display PRINTED_FILE[FOO3]
+
+echo
+echo Initial code with preconditions for OUTPUT after cleanup
+echo
+
+display PRINTED_FILE[OUTPUT]
+
+#
+# impact on the code..
+#
+capply PARTIAL_EVAL[%ALL]
+
+make PRECONDITIONS[FOO2]
+# setenv SEMANTICS_DEBUG_LEVEL 8
+make SUMMARY_PRECONDITION[FOO3]
+make PRECONDITIONS[FOO3]
+
+# quit
+
+capply SUPPRESS_DEAD_CODE[%ALL]
+# It is not possible to get rid of useless J = 1 in FOO1 because
+# use-def chains are not interprocedural
+# capply USE_DEF_ELIMINATION[%ALL]
+
+# Variables in COMMONs and in DATAs are not removed... which makes sense
+# in an interprocedural framework.
+# capply CLEAN_DECLARATIONS[%ALL]
+
+activate PRINT_CODE
+
+echo
+echo Code for ALL04 after cleanup
+echo
+
+display PRINTED_FILE[ALL04]
+
+echo
+echo Code for FOO1 after cleanup
+echo
+
+display PRINTED_FILE[FOO1]
+
+echo
+echo Code for FOO2 after cleanup
+echo
+
+display PRINTED_FILE[FOO2]
+
+echo
+echo Code for FOO3 after cleanup
+echo
+
+display PRINTED_FILE[FOO3]
+
+echo
+echo Code for OUTPUT after cleanup
+echo
+
+display PRINTED_FILE[OUTPUT]
+
+close
+delete all04
+quit

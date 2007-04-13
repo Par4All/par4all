@@ -1,0 +1,61 @@
+
+C  T() {}
+
+      SUBROUTINE NON_LINEAR06
+
+C  T(I,N) {2<=I}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(N) {}
+
+C (0,2)
+
+C     Check rules for multiplication
+
+      READ *, N                                                         0001
+
+C  T(I) {2<=I}
+
+C (0,3)
+      I = N*N+2                                                         0002
+
+C  T() {}
+
+C (0,4)
+      PRINT *, I                                                        0003
+
+C     END BLOCK
+      END
+
+C  P() {}
+
+      SUBROUTINE NON_LINEAR06
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+
+C     Check rules for multiplication
+
+      READ *, N                                                         0001
+
+C  P(N) {}
+
+C (0,3)
+      I = N*N+2                                                         0002
+
+C  P(I,N) {2<=I}
+
+C (0,4)
+      PRINT *, I                                                        0003
+
+C     END BLOCK
+      END
+

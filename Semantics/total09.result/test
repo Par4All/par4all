@@ -1,0 +1,71 @@
+
+C  T() {}
+
+      PROGRAM TOTAL09
+
+C     Check that executed loops are proprely handled: a condition
+C     on N should be found. How about the second access? It's OK
+
+      REAL A(10)
+
+C  T(I) {I==11, 1<=N, N<=10}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(I) {1<=I}
+
+C (0,2)
+
+      DO I = 1, 10                                                      0001
+
+C  T() {1<=N, N<=10}
+
+C (0,3)
+         A(N) = 0.                                                      0002
+      ENDDO
+
+C  T() {2<=I, I<=11}
+
+C (0,4)
+
+      A(I-1) = 1.                                                       0003
+
+C     END BLOCK
+      END
+
+C TP() {}
+
+      PROGRAM TOTAL09
+
+C     Check that executed loops are proprely handled: a condition
+C     on N should be found. How about the second access? It's OK
+
+      REAL A(10)
+
+C TP() {1<=N, N<=10}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C TP() {1<=N, N<=10}
+
+C (0,2)
+
+      DO I = 1, 10                                                      0001
+
+C TP() {I<=10, 1<=N, N<=10}
+
+C (0,3)
+         A(N) = 0.                                                      0002
+      ENDDO
+
+C TP() {2<=I, I<=11}
+
+C (0,4)
+
+      A(I-1) = 1.                                                       0003
+
+C     END BLOCK
+      END
+

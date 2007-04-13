@@ -1,0 +1,97 @@
+
+C  P() {}
+
+      PROGRAM ZEROTRIP
+
+c     The loop body should not disturb the postcondition
+
+      REAL T(10)
+
+C  P() {}
+
+
+      IF (N.GE.1) THEN                                                  0001
+
+C  P() {1<=N}
+
+
+         K = 3                                                          0002
+
+C  P(K) {K==3, 1<=N}
+
+         DO I = 1, N                                                    0003
+
+C  P(I,K) {1<=I, I<=N, 1<=N}
+
+            K = 2*K                                                     0004
+
+C  P(I,K) {1<=I, I<=N, 1<=N}
+
+            T(I) = 0                                                    0005
+         ENDDO
+
+C  P(I,K) {I==N+1, 2<=I}
+
+         PRINT *, K, I                                                  0006
+
+      ENDIF
+
+C  P(I,K) {}
+
+
+      IF (N.GE.0) THEN                                                  0007
+
+C  P(I,K) {0<=N}
+
+
+         K = 3                                                          0008
+
+C  P(I,K) {K==3, 0<=N}
+
+         DO I = 1, N                                                    0009
+
+C  P(I,K) {1<=I, I<=N, 0<=N}
+
+            K = 2*K                                                     0010
+
+C  P(I,K) {1<=I, I<=N, 0<=N}
+
+            T(I) = 0                                                    0011
+         ENDDO
+
+C  P(I,K) {I==N+1, 1<=I}
+
+         PRINT *, K, I                                                  0012
+
+      ENDIF
+
+C  P(I,K) {}
+
+
+      IF (N.LT.0) THEN                                                  0013
+
+C  P(I,K) {N+1<=0}
+
+
+         K = 3                                                          0014
+
+C  P(I,K) {K==3, N+1<=0}
+
+         DO I = 1, N                                                    0015
+
+C  P() {0==-1}
+
+            K = 2*K                                                     0016
+
+C  P() {0==-1}
+
+            T(I) = 0                                                    0017
+         ENDDO
+
+C  P(I,K) {I==1, K==3, N+1<=0}
+
+         PRINT *, K, I                                                  0018
+
+      ENDIF
+
+      END

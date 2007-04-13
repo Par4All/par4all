@@ -1,0 +1,26 @@
+delete localdata
+create localdata ${PIPS_ROOT}/Validation/Semantics/localdata.f
+
+echo -- intraprocedural transformers
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE($ALL)
+
+echo -- intraprocedural preconditions
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE($ALL)
+
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+
+echo -- interprocedural transformers
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE($ALL)
+
+echo -- interprocedural preconditions
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE($ALL)
+
+close
+delete localdata
+quit

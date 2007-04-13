@@ -1,0 +1,131 @@
+      PROGRAM TEST12
+      INTEGER A, B, C, N, M, K, J, I, DO5_INDEX, DO5_BEGIN, DO5_END, 
+     &DO5_INCREMENT, DO9_INDEX, DO9_BEGIN, DO9_END, DO9_INCREMENT
+      REAL*4 R
+
+      B = 5                                                             0001
+      A = 2                                                             0002
+      C = 3                                                             0003
+      DO5_BEGIN = 1                                                     0004
+      DO5_END = 10                                                      0004
+      DO5_INCREMENT = 1                                                 0004
+      DO5_INDEX = DO5_BEGIN                                             0004
+99993 CONTINUE
+      IF (DO5_INDEX.LE.DO5_END) GOTO 99998                              0004
+      IF (A.LT.B) GOTO 99997                                            0012
+      B = 7                                                             0015
+      A = 89                                                            0016
+99995 CONTINUE
+      IF (A.LT.B) THEN                                                  0017
+      ELSE
+         GOTO 99996
+      ENDIF
+      R = A*R                                                           0018
+      A = A+9                                                           0019
+      GOTO 99995
+99997 CONTINUE
+      B = 5                                                             0013
+      A = 17                                                            0014
+      GOTO 99995
+99998 CONTINUE
+      J = DO5_INDEX                                                     0004
+      B = 5                                                             0005
+      A = 8                                                             0006
+      DO9_BEGIN = 1                                                     0007
+      DO9_END = 10                                                      0007
+      DO9_INCREMENT = 1                                                 0007
+      DO9_INDEX = DO9_BEGIN                                             0007
+99992 CONTINUE
+      IF (DO9_INDEX.LE.DO9_END) GOTO 99994                              0007
+      A = B+K                                                           0011
+      DO5_INDEX = DO5_INDEX+DO5_INCREMENT                               0004
+      GOTO 99993
+99994 CONTINUE
+      I = DO9_INDEX                                                     0007
+      N = A*I+B                                                         0008
+      M = B*I+J                                                         0009
+      K = K+N*M                                                         0010
+      DO9_INDEX = DO9_INDEX+DO9_INCREMENT                               0007
+      GOTO 99992
+99996 CONTINUE
+
+      STOP                                                              0020
+      END
+      PROGRAM TEST12
+      INTEGER A, B, C, N, M, K, J, I, DO5_INDEX, DO5_BEGIN, DO5_END, 
+     &DO5_INCREMENT, DO9_INDEX, DO9_BEGIN, DO9_END, DO9_INCREMENT, 
+     &FSM9_STATE
+      REAL*4 R
+
+      B = 5                                                             0001
+      A = 2                                                             0002
+      C = 3                                                             0003
+      DO5_BEGIN = 1                                                     0004
+      DO5_END = 10                                                      0004
+      DO5_INCREMENT = 1                                                 0004
+      DO5_INDEX = DO5_BEGIN                                             0004
+      FSM9_STATE = 1
+      DO WHILE (FSM9_STATE.NE.0)
+         IF (FSM9_STATE.EQ.1) THEN
+            IF (DO5_INDEX.LE.DO5_END) THEN                              0004
+               FSM9_STATE = 2                                           0004
+            ELSE
+               FSM9_STATE = 6                                           0004
+            ENDIF
+         ELSEIF (FSM9_STATE.EQ.2) THEN
+            J = DO5_INDEX                                               0004
+            B = 5                                                       0005
+            A = 8                                                       0006
+            DO9_BEGIN = 1                                               0007
+            DO9_END = 10                                                0007
+            DO9_INCREMENT = 1                                           0007
+            DO9_INDEX = DO9_BEGIN                                       0007
+            FSM9_STATE = 3
+         ELSEIF (FSM9_STATE.EQ.3) THEN
+            IF (DO9_INDEX.LE.DO9_END) THEN                              0007
+               FSM9_STATE = 4                                           0007
+            ELSE
+               FSM9_STATE = 5                                           0007
+            ENDIF
+         ELSEIF (FSM9_STATE.EQ.4) THEN
+            I = DO9_INDEX                                               0007
+            N = A*I+B                                                   0008
+            M = B*I+J                                                   0009
+            K = K+N*M                                                   0010
+            DO9_INDEX = DO9_INDEX+DO9_INCREMENT                         0007
+            FSM9_STATE = 3
+         ELSEIF (FSM9_STATE.EQ.5) THEN
+            A = B+K                                                     0011
+            DO5_INDEX = DO5_INDEX+DO5_INCREMENT                         0004
+            FSM9_STATE = 1
+         ELSEIF (FSM9_STATE.EQ.6) THEN
+            IF (A.LT.B) THEN                                            0012
+               FSM9_STATE = 7                                           0012
+            ELSE
+               FSM9_STATE = 11                                          0012
+            ENDIF
+         ELSEIF (FSM9_STATE.EQ.7) THEN
+            B = 5                                                       0013
+            A = 17                                                      0014
+            FSM9_STATE = 8
+         ELSEIF (FSM9_STATE.EQ.8) THEN
+            IF (A.LT.B) THEN                                            0017
+               FSM9_STATE = 9                                           0017
+            ELSE
+               FSM9_STATE = 10                                          0017
+            ENDIF
+         ELSEIF (FSM9_STATE.EQ.9) THEN
+            R = A*R                                                     0018
+            A = A+9                                                     0019
+            FSM9_STATE = 8
+         ELSEIF (FSM9_STATE.EQ.10) THEN
+
+            FSM9_STATE = 0                                              0020
+         ELSEIF (FSM9_STATE.EQ.11) THEN
+            B = 7                                                       0015
+            A = 89                                                      0016
+            FSM9_STATE = 8
+         ENDIF
+      ENDDO
+      STOP                                                              0020
+      END

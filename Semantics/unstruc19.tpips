@@ -1,0 +1,66 @@
+# With recursive unstructured, bourdoncle restructuring seems to corrupt
+# the internal representation
+
+delete unstruc19
+create unstruc19 ${PIPS_ROOT}/Validation/Semantics/unstruc19.f
+
+# display PRINTED_FILE[UNSTRUC19]
+
+# quit
+
+setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+
+setproperty PRETTYPRINT_BLOCKS TRUE
+
+setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+
+setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+
+setproperty GATHER_FORMATS_AT_BEGINNING TRUE
+
+setproperty PRETTYPRINT_INTERNAL_RETURN FALSE
+
+setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
+
+setproperty PRETTYPRINT_CHECK_IO_STATEMENTS TRUE
+
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+setproprety SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING TRUE
+
+setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION TRUE
+
+# display CALLGRAPH_FILE
+
+capply RESTRUCTURE_CONTROL[%ALL]
+
+echo 
+echo Before transformer computation
+echo
+
+display PRINTED_FILE[UNSTRUC19]
+
+setenv SEMANTICS_DEBUG_LEVEL 9
+setenv PRETTYPRINT_DEBUG_LEVEL 9
+setenv SEMANTICS_PRINT_DEBUG_LEVEL 9
+
+make TRANSFORMERS[UNSTRUC19]
+
+echo 
+echo After transformer computation, which seems to destroy the internal representation
+echo
+
+# Let's destroy the printed code to avoid a second display of the very same file
+activate PRINT_CODE_TRANSFORMERS
+activate PRINT_CODE
+display PRINTED_FILE
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[UNSTRUC19]
+
+close
+delete unstruc19
+quit

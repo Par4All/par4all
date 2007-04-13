@@ -1,0 +1,517 @@
+'initial exec'
+ -hello     -
+ s == "hello"
+ s == "hello   "
+ s == "hello     "
+ s == "hello          "
+ -hello worl-
+ -hi        -hi -
+ s == t == "hi"
+ -hi        -hi -
+ s == t == "hi "
+ -hi        -hi -
+ s == t == "hi " (2)
+ -hi world  -hi -
+ -hi        -hi -
+ s == t == "hi " (4)
+
+C  T() {}
+
+!
+! argh... :-(
+!
+! comparing a fixed length string seems to ignores trailing spaces:-(
+!
+      PROGRAM CHAINE01
+      CHARACTER*10 S
+      CHARACTER*3 T
+
+C  T(S) {'hello'==S}
+
+
+      S = 'hello'                                                       0001
+
+C  T() {}
+
+      PRINT *, '-', S, '-'                                              0002
+
+C  T() {}
+
+      IF (S.EQ.'hell') THEN                                             0003
+
+C  T() {}
+
+! FALSE         
+         PRINT *, 's == "hello"'                                        0004
+      ENDIF
+
+C  T() {}
+
+      IF (S.EQ.'hello') THEN                                            0005
+
+C  T() {}
+
+! TRUE
+         PRINT *, 's == "hello"'                                        0006
+      ENDIF
+
+C  T() {}
+
+      IF (S.EQ.'hello   ') THEN                                         0007
+
+C  T() {}
+
+! TRUE...
+         PRINT *, 's == "hello   "'                                     0008
+      ENDIF
+
+C  T() {}
+
+      IF (S.EQ.'hello     ') THEN                                       0009
+
+C  T() {}
+
+! TRUE...
+         PRINT *, 's == "hello     "'                                   0010
+      ENDIF
+
+C  T() {}
+
+      IF (S.EQ.'hello          ') THEN                                  0011
+
+C  T() {}
+
+! TRUE...
+         PRINT *, 's == "hello          "'                              0012
+      ENDIF
+
+C  T() {}
+
+      IF (S.EQ.'hello          toto') THEN                              0013
+
+C  T() {}
+
+! FALSE
+         PRINT *, 's == "hello          toto"'                          0014
+      ENDIF
+
+C  T(S) {'hello worl'==S}
+
+
+! ending d is dropped
+      S = 'hello world'                                                 0015
+
+C  T() {}
+
+      PRINT *, '-', S, '-'                                              0016
+
+C  T(S) {'hi'==S}
+
+
+      S = 'hi'                                                          0017
+
+C  T(T) {'hi'==T}
+
+      T = 'hi'                                                          0018
+
+C  T() {}
+
+      PRINT *, '-', S, '-', T, '-'                                      0019
+
+C  T() {}
+
+      IF (S.EQ.T) THEN                                                  0020
+
+C  T() {}
+
+! TRUE
+         PRINT *, 's == t == "hi"'                                      0021
+      ENDIF
+
+C  T(T) {'hi '==T}
+
+
+      T = 'hi '                                                         0022
+
+C  T() {}
+
+      PRINT *, '-', S, '-', T, '-'                                      0023
+
+C  T() {}
+
+      IF (S.EQ.T) THEN                                                  0024
+
+C  T() {}
+
+! TRUE...
+         PRINT *, 's == t == "hi "'                                     0025
+      ENDIF
+
+C  T(T) {'hi '==T}
+
+
+      T = 'hi world'                                                    0026
+
+C  T() {}
+
+      PRINT *, '-', S, '-', T, '-'                                      0027
+
+C  T() {}
+
+      IF (S.EQ.T) THEN                                                  0028
+
+C  T() {}
+
+! TRUE...
+         PRINT *, 's == t == "hi " (2)'                                 0029
+      ENDIF
+
+C  T(S) {'hi world'==S}
+
+
+      S = 'hi world'                                                    0030
+
+C  T(T) {'hi '==T}
+
+      T = 'hi '                                                         0031
+
+C  T() {}
+
+      PRINT *, '-', S, '-', T, '-'                                      0032
+
+C  T() {}
+
+      IF (S.EQ.T) THEN                                                  0033
+
+C  T() {}
+
+! FALSE
+         PRINT *, 's == t == "hi " (3)'                                 0034
+      ENDIF
+
+C  T(S) {'hi        '==S}
+
+
+      S = 'hi        '                                                  0035
+
+C  T(T) {'hi '==T}
+
+      T = 'hi '                                                         0036
+
+C  T() {}
+
+      PRINT *, '-', S, '-', T, '-'                                      0037
+
+C  T() {}
+
+      IF (S.EQ.T) THEN                                                  0038
+
+C  T() {}
+
+! TRUE...
+         PRINT *, 's == t == "hi " (4)'                                 0039
+      ENDIF
+      END
+
+C  P() {}
+
+!
+! argh... :-(
+!
+! comparing a fixed length string seems to ignores trailing spaces:-(
+!
+      PROGRAM CHAINE01
+      CHARACTER*10 S
+      CHARACTER*3 T
+
+C  P() {}
+
+
+      S = 'hello'                                                       0001
+
+C  P(S) {'hello'==S}
+
+      PRINT *, '-', S, '-'                                              0002
+
+C  P(S) {'hello'==S}
+
+      IF (S.EQ.'hell') THEN                                             0003
+
+C  P() {0==-1}
+
+! FALSE         
+         PRINT *, 's == "hello"'                                        0004
+      ENDIF
+
+C  P(S) {'hello'==S, 'hell'<=S}
+
+      IF (S.EQ.'hello') THEN                                            0005
+
+C  P(S) {'hello'==S, 'hell'<=S}
+
+! TRUE
+         PRINT *, 's == "hello"'                                        0006
+      ENDIF
+
+C  P(S) {'hello'==S, 'hell'<=S}
+
+      IF (S.EQ.'hello   ') THEN                                         0007
+
+C  P(S) {'hello   '==S, 'hello'==S, 'hell'<=S}
+
+! TRUE...
+         PRINT *, 's == "hello   "'                                     0008
+      ENDIF
+
+C  P(S) {'hello'==S, 'hell'<=S}
+
+      IF (S.EQ.'hello     ') THEN                                       0009
+
+C  P(S) {'hello     '==S, 'hello'==S, 'hell'<=S}
+
+! TRUE...
+         PRINT *, 's == "hello     "'                                   0010
+      ENDIF
+
+C  P(S) {'hello'==S, 'hell'<=S}
+
+      IF (S.EQ.'hello          ') THEN                                  0011
+
+C  P(S) {'hello          '==S, 'hello'==S, 'hell'<=S}
+
+! TRUE...
+         PRINT *, 's == "hello          "'                              0012
+      ENDIF
+
+C  P(S) {'hello'==S, 'hell'<=S}
+
+      IF (S.EQ.'hello          toto') THEN                              0013
+
+C  P() {0==-1}
+
+! FALSE
+         PRINT *, 's == "hello          toto"'                          0014
+      ENDIF
+
+C  P(S) {'hello'==S, 'hell'<=S, S<='hello          toto'}
+
+
+! ending d is dropped
+      S = 'hello world'                                                 0015
+
+C  P(S) {'hello worl'==S, 'hell'<='hello',
+C    'hello'<='hello          toto'}
+
+      PRINT *, '-', S, '-'                                              0016
+
+C  P(S) {'hello worl'==S, 'hell'<='hello',
+C    'hello'<='hello          toto'}
+
+
+      S = 'hi'                                                          0017
+
+C  P(S) {'hi'==S, 'hell'<='hello', 'hello'<='hello          toto'}
+
+      T = 'hi'                                                          0018
+
+C  P(S,T) {'hi'==S, S==T, 'hell'<='hello',
+C    'hello'<='hello          toto'}
+
+      PRINT *, '-', S, '-', T, '-'                                      0019
+
+C  P(S,T) {'hi'==S, S==T, 'hell'<='hello',
+C    'hello'<='hello          toto'}
+
+      IF (S.EQ.T) THEN                                                  0020
+
+C  P(S,T) {'hi'==S, S==T, 'hell'<='hello',
+C    'hello'<='hello          toto'}
+
+! TRUE
+         PRINT *, 's == t == "hi"'                                      0021
+      ENDIF
+
+C  P(S,T) {'hi'==S, S==T, 'hell'<='hello',
+C    'hello'<='hello          toto'}
+
+
+      T = 'hi '                                                         0022
+
+C  P(S,T) {'hi '==T, 'hi'==S, 'hell'<='hello',
+C    'hello'<='hello          toto'}
+
+      PRINT *, '-', S, '-', T, '-'                                      0023
+
+C  P(S,T) {'hi '==T, 'hi'==S, 'hell'<='hello',
+C    'hello'<='hello          toto'}
+
+      IF (S.EQ.T) THEN                                                  0024
+
+C  P(S,T) {'hi '==S, 'hi'==S, S==T, 'hell'<='hello',
+C    'hello'<='hello          toto'}
+
+! TRUE...
+         PRINT *, 's == t == "hi "'                                     0025
+      ENDIF
+
+C  P(S,T) {'hi '==T, 'hi'==S, 'hell'<='hello',
+C    'hello'<='hello          toto'}
+
+
+      T = 'hi world'                                                    0026
+
+C  P(S,T) {'hi '==T, 'hi'==S, 'hell'<='hello',
+C    'hello'<='hello          toto'}
+
+      PRINT *, '-', S, '-', T, '-'                                      0027
+
+C  P(S,T) {'hi '==T, 'hi'==S, 'hell'<='hello',
+C    'hello'<='hello          toto'}
+
+      IF (S.EQ.T) THEN                                                  0028
+
+C  P(S,T) {'hi '==S, 'hi'==S, S==T, 'hell'<='hello',
+C    'hello'<='hello          toto'}
+
+! TRUE...
+         PRINT *, 's == t == "hi " (2)'                                 0029
+      ENDIF
+
+C  P(S,T) {'hi '==T, 'hi'==S, 'hell'<='hello',
+C    'hello'<='hello          toto'}
+
+
+      S = 'hi world'                                                    0030
+
+C  P(S,T) {'hi '==T, 'hi world'==S, 'hell'<='hello',
+C    'hello'<='hello          toto'}
+
+      T = 'hi '                                                         0031
+
+C  P(S,T) {'hi '==T, 'hi world'==S, 'hell'<='hello',
+C    'hello'<='hello          toto'}
+
+      PRINT *, '-', S, '-', T, '-'                                      0032
+
+C  P(S,T) {'hi '==T, 'hi world'==S, 'hell'<='hello',
+C    'hello'<='hello          toto'}
+
+      IF (S.EQ.T) THEN                                                  0033
+
+C  P() {0==-1}
+
+! FALSE
+         PRINT *, 's == t == "hi " (3)'                                 0034
+      ENDIF
+
+C  P(S,T) {'hi '==T, 'hi world'==S, 'hell'<='hello',
+C    'hello'<='hello          toto', T<=S}
+
+
+      S = 'hi        '                                                  0035
+
+C  P(S,T) {'hi        '==S, 'hi '==T, 'hell'<='hello',
+C    'hello'<='hello          toto', T<='hi world'}
+
+      T = 'hi '                                                         0036
+
+C  P(S,T) {'hi        '==S, 'hi '==T, 'hell'<='hello',
+C    'hello'<='hello          toto', T<='hi world'}
+
+      PRINT *, '-', S, '-', T, '-'                                      0037
+
+C  P(S,T) {'hi        '==S, 'hi '==T, 'hell'<='hello',
+C    'hello'<='hello          toto', T<='hi world'}
+
+      IF (S.EQ.T) THEN                                                  0038
+
+C  P(S,T) {'hi        '==S, 'hi '==S, S==T, 'hell'<='hello',
+C    'hello'<='hello          toto', S<='hi world'}
+
+! TRUE...
+         PRINT *, 's == t == "hi " (4)'                                 0039
+      ENDIF
+      END
+!
+! argh... :-(
+!
+! comparing a fixed length string seems to ignores trailing spaces:-(
+!
+      PROGRAM CHAINE01
+      CHARACTER*10 S
+      CHARACTER*3 T
+
+      S = 'hello'                                                       0001
+      PRINT *, '-', S, '-'                                              0002
+      IF (S.EQ.'hello') THEN                                            0005
+! TRUE
+         PRINT *, 's == "hello"'                                        0006
+      ENDIF
+      IF (S.EQ.'hello   ') THEN                                         0007
+! TRUE...
+         PRINT *, 's == "hello   "'                                     0008
+      ENDIF
+      IF (S.EQ.'hello     ') THEN                                       0009
+! TRUE...
+         PRINT *, 's == "hello     "'                                   0010
+      ENDIF
+      IF (S.EQ.'hello          ') THEN                                  0011
+! TRUE...
+         PRINT *, 's == "hello          "'                              0012
+      ENDIF
+
+! ending d is dropped
+      S = 'hello world'                                                 0015
+      PRINT *, '-', S, '-'                                              0016
+
+      S = 'hi'                                                          0017
+      T = 'hi'                                                          0018
+      PRINT *, '-', S, '-', T, '-'                                      0019
+      IF (S.EQ.T) THEN                                                  0020
+! TRUE
+         PRINT *, 's == t == "hi"'                                      0021
+      ENDIF
+
+      T = 'hi '                                                         0022
+      PRINT *, '-', S, '-', T, '-'                                      0023
+      IF (S.EQ.T) THEN                                                  0024
+! TRUE...
+         PRINT *, 's == t == "hi "'                                     0025
+      ENDIF
+
+      T = 'hi world'                                                    0026
+      PRINT *, '-', S, '-', T, '-'                                      0027
+      IF (S.EQ.T) THEN                                                  0028
+! TRUE...
+         PRINT *, 's == t == "hi " (2)'                                 0029
+      ENDIF
+
+      S = 'hi world'                                                    0030
+      T = 'hi '                                                         0031
+      PRINT *, '-', S, '-', T, '-'                                      0032
+
+      S = 'hi        '                                                  0035
+      T = 'hi '                                                         0036
+      PRINT *, '-', S, '-', T, '-'                                      0037
+      IF (S.EQ.T) THEN                                                  0038
+! TRUE...
+         PRINT *, 's == t == "hi " (4)'                                 0039
+      ENDIF
+      END
+'optimized exec'
+ -hello     -
+ s == "hello"
+ s == "hello   "
+ s == "hello     "
+ s == "hello          "
+ -hello worl-
+ -hi        -hi -
+ s == t == "hi"
+ -hi        -hi -
+ s == t == "hi "
+ -hi        -hi -
+ s == t == "hi " (2)
+ -hi world  -hi -
+ -hi        -hi -
+ s == t == "hi " (4)
+

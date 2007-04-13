@@ -1,0 +1,154 @@
+
+C  T() {}
+
+C     Extract from four2.f
+
+C     No interesting fix-point can be found because the convex hull does
+C     not work and because the transformer fix-point would require
+C     precondition information.
+
+      SUBROUTINE FOUR3(N)
+
+C  T(J,M,NN) {2N==NN, 2M+1<=J+2N, 3J+4N<=4M+3}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(J) {J==1}
+
+C (0,2)
+
+      J = 1                                                             0001
+
+C  T(NN) {2N==NN}
+
+C (0,3)
+      NN = 2*N                                                          0002
+
+C  T(M) {NN<=2M+1, 2M<=NN}
+
+C (0,4)
+      M = NN/2                                                          0003
+
+C  T(J,M) {J#init+2M<=J+2M#init, 3J+4M#init<=3J#init+4M}
+
+C (0,5)
+C     BEGIN UNSTRUCTURED
+
+C  T() {}
+
+C (1,1)
+1     IF (M.GE.2.AND.J.GT.M) THEN                                       0004
+      ELSE
+         GOTO 99998
+      ENDIF
+
+C  T(J,M) {J+M#init==J#init, M#init<=2M+1, 2M<=M#init}
+
+C (2,1)
+C     BEGIN BLOCK
+
+C  T(J) {J+M==J#init}
+
+C (2,2)
+      J = J-M                                                           0005
+
+C  T(M) {M#init<=2M+1, 2M<=M#init}
+
+C (2,3)
+      M = M/2                                                           0006
+C     END BLOCK
+      GOTO 1
+99998 CONTINUE
+
+C     END UNSTRUCTURED
+
+C  T() {}
+
+C (0,6)
+      PRINT *, N, NN, M, J                                              0007
+
+C  T() {}
+
+C (0,7)
+
+      RETURN
+C     END BLOCK
+      END
+
+C  P() {}
+
+C     Extract from four2.f
+
+C     No interesting fix-point can be found because the convex hull does
+C     not work and because the transformer fix-point would require
+C     precondition information.
+
+      SUBROUTINE FOUR3(N)
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+
+      J = 1                                                             0001
+
+C  P(J) {J==1}
+
+C (0,3)
+      NN = 2*N                                                          0002
+
+C  P(J,NN) {J==1, 2N==NN}
+
+C (0,4)
+      M = NN/2                                                          0003
+
+C  P(J,M,NN) {J==1, M==N, 2M==NN}
+
+C (0,5)
+C     BEGIN UNSTRUCTURED
+
+C  P(J,M,NN) {J==1, M==N, 2M==NN}
+
+C (1,1)
+1     IF (M.GE.2.AND.J.GT.M) THEN                                       0004
+      ELSE
+         GOTO 99997
+      ENDIF
+
+C  P() {0==-1}
+
+C (2,1)
+C     BEGIN BLOCK
+
+C  P() {0==-1}
+
+C (2,2)
+      J = J-M                                                           0005
+
+C  P() {0==-1}
+
+C (2,3)
+      M = M/2                                                           0006
+C     END BLOCK
+      GOTO 1
+99997 CONTINUE
+
+C     END UNSTRUCTURED
+
+C  P(J,M,NN) {J==1, M==N, 2M==NN}
+
+C (0,6)
+      PRINT *, N, NN, M, J                                              0007
+
+C  P(J,M,NN) {J==1, M==N, 2M==NN}
+
+C (0,7)
+
+      RETURN
+C     END BLOCK
+      END

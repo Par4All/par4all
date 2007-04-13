@@ -1,0 +1,16 @@
+      SUBROUTINE PMAT(V,W)
+C
+      PARAMETER(NFAC=49)
+      COMMON/OACOF/AA(NFAC,NFAC)
+      DIMENSION V(1),W(1),C(NFAC)
+C
+      DO I = 1, NFAC
+         PRIVATE I
+         DOALL J = 1, NFAC
+            PRIVATE J
+20          C(J) = AA(I,J)                                              0005
+         ENDDO
+C
+         W(I) = SDOT(NFAC, C, 1, V, 1)                                  0006
+      ENDDO
+      END

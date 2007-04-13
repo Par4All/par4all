@@ -1,0 +1,113 @@
+--- Preconditions for module NEGAND2
+
+C  P() {}
+
+C     to test negation of and conditions
+      
+      SUBROUTINE NEGAND2
+      LOGICAL C
+
+C  P() {}
+
+
+      IF (C) THEN                                                       0001
+
+C  P() {}
+
+         I = 1                                                          0002
+      ELSE
+
+C  P() {}
+
+         I = 2                                                          0003
+      ENDIF
+
+C  P(I) {1<=I, I<=2}
+
+
+      IF (I.NE.1) THEN                                                  0004
+
+C  P(I) {I==2}
+
+         J = I                                                          0005
+      ELSE
+
+C  P(I) {I==1}
+
+         J = I+1                                                        0006
+      ENDIF
+
+C  P(I,J) {J==2, 1<=I, I<=2}
+
+
+      I = 4                                                             0007
+
+C  P(I,J) {I==4, J==2}
+
+      PRINT *, J                                                        0008
+
+C  P(I,J) {I==4, J==2}
+
+
+      L = 3                                                             0009
+
+C  P(I,J,L) {I==4, J==2, L==3}
+
+      IF (K.EQ.1.OR.K.EQ.2) THEN                                        0010
+
+C  P(I,J,L) {I==4, J==2, L==3, 1<=K, K<=2}
+
+         L = K                                                          0011
+      ENDIF
+
+C  P(I,J,L) {I==4, J==2, 1<=L, L<=3}
+
+
+      K = 0                                                             0012
+
+C  P(I,J,K,L) {I==4, J==2, K==0, 1<=L, L<=3}
+
+      PRINT *, L                                                        0013
+
+C  P(I,J,K,L) {I==4, J==2, K==0, 1<=L, L<=3}
+
+
+      IF (II.GE.N) THEN                                                 0014
+
+C  P(I,J,K,L) {I==4, J==2, K==0, N<=II, 1<=L, L<=3}
+
+         IF (II.EQ.N) THEN                                              0015
+
+C  P(I,J,K,L) {I==4, II==N, J==2, K==0, 1<=L, L<=3}
+
+            J = II                                                      0016
+
+C  P(I,J,K,L) {I==4, II==J, II==N, K==0, 1<=L, L<=3}
+
+            II = 0                                                      0017
+
+C  P(I,II,J,K,L) {I==4, II==0, J==N, K==0, 1<=L, L<=3}
+
+            PRINT *, J                                                  0018
+         ELSE
+
+C  P(I,J,K,L) {I==4, J==2, K==0, N+1<=II, 1<=L, L<=3}
+
+            J = II                                                      0019
+
+C  P(I,J,K,L) {I==4, II==J, K==0, N+1<=II, 1<=L, L<=3}
+
+            II = 0                                                      0020
+
+C  P(I,II,J,K,L) {I==4, II==0, K==0, N+1<=J, 1<=L, L<=3}
+
+            PRINT *, J                                                  0021
+         ENDIF
+      ENDIF
+
+C  P(I,II,J,K,L) {I==4, K==0, 1<=L, L<=3}
+
+
+      PRINT *, I, II, J, K, L                                           0022
+
+      END

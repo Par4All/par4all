@@ -1,0 +1,120 @@
+Execution times:
+
+rhune: 181.83u 57.83s 6:06.62 65.3% (7 January 1999)
+champeaux: 844.18u 67.90s 19:02.29 79.8% (20 March 2002); 812u for ocean_fi.f alone;
+champeaux: 122.25u 65.88s 4:53.42 64.1% (20 March 2002, without ocean_fi.f)
+
+THE LOOP BODY PRECONDITION DEPENDS ON:
+
+ * the loop index appears in the loop bound expression
+ * the index is integer
+ * the index  is an integer analyzed scalar variable
+ * the fix point operator used
+
+Loopseq:
+
+ * the loop index appears as lower bound
+ * must enter
+
+Loopseq2:
+
+ * same as loopseq, but different index (j instead of i)
+
+Invrw:
+
+ * requires pattern matching fix point
+
+THE LOOP INDEX EXIT CONDITION DEPENDS ON:
+
+ * the enter, non-enter, maybe enter condition
+ * the increment sign, known or not
+ * the increment value, known or not
+ * the increment value, 1, -1 or something else
+ * the body effect on the values of loop bounds and loop increment
+
+Loopexit 8:
+
+ * enter==TRUE
+ * increment==1
+
+Loopexit 7:
+
+ * enter==TRUE
+ * increment==2
+
+Loopexit 6:
+
+ * enter==MAYBE
+ * increment==2
+
+Loopexit 5:
+
+ * enter==MAYBE (=> convex hull of enter and non-enter)
+ * increment==-1
+
+Loopexit 4:
+
+ * enter==TRUE
+ * increment==1
+ * induction variable j
+ * constant k
+
+Loopexit 3:
+
+ * enter==FALSE (index==lower bound when leaving the loop)
+ * increment==1
+ * induction variable j (should have its initial value when leaving the loop)
+
+Loopexit 2:
+
+ * composite test with enter==FALSE, TRUE and MAYBE
+ * increment==1 or -1
+ * induction variable
+
+Loopexit:
+
+ * same as loopexit2.f, but with limit tests
+
+Realindex:
+
+ * make sure that a real index is ignored
+
+Loopinit 3:
+
+ * enter==FALSE
+
+Loopinit 2:
+
+ * same as loopinit3, but PIPS fails because the lower bound
+   is not affine (but its value is known by PIPS!)
+   enter==MAYBE. although it should be FALSE
+
+Loopinit:
+
+ * non-affine lower bound (of known value!)
+
+
+Zerotrip:
+
+ * combination of TRUE/FALSE/MAYBE enter
+
+Modincr:
+
+ * upper bound cannot be used because its value is modified by the loop body
+ * no test about the increment!!!
+
+Nullincr:
+
+ * constant 0 increment
+
+Nullcinr2:
+
+ * increment == 0 because of preconditions
+
+FIX POINT
+---------
+
+The following modules should be used: caveat.f, condinc.f, inc.f, pc.f
+pcpugh.f, rw.f, rw2.f, tme.f (combinatorial explosion on preconditions),
+tme2.f, tme3.f
+

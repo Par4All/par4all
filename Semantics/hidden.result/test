@@ -1,0 +1,28 @@
+
+C  T(PRINTI:I) {PRINTI:I==2}
+
+C     I is indirectly modified by many procedures via a hidden common
+
+      PROGRAM HIDDEN
+
+C  T(PRINTI:I) {PRINTI:I==0}
+
+
+      CALL INIT                                                         0001
+
+C  T(PRINTI:I) {PRINTI:I==PRINTI:I#init+1}
+
+
+      CALL INCR(1)                                                      0002
+
+C  T(PRINTI:I) {PRINTI:I==2PRINTI:I#init}
+
+
+      CALL DOUBLE                                                       0003
+
+C  T() {}
+
+
+      CALL PRINTI                                                       0004
+
+      END

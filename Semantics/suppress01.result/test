@@ -1,0 +1,94 @@
+
+C  T(X) {1.+X#init==X}
+
+
+      SUBROUTINE INCR(X)
+
+C  T(X) {1.+X#init==X}
+
+      X = X+1.                                                          0001
+      END
+
+C  T() {}
+
+      PROGRAM SUPPRESS01
+
+C  T(I) {I==0}
+
+
+C     Check that type mismatches are detected and do not cause core dumps:
+C     this case is not detected but the value of i is lost as it should be.
+C     Floating point scalar variables are not analyzed
+
+      I = 0                                                             0001
+
+C  T(I) {}
+
+
+      CALL INCR(I)                                                      0002
+
+C  T() {}
+
+
+      PRINT *, I                                                        0003
+
+      END
+
+C  P() {}
+
+
+      SUBROUTINE INCR(X)
+
+C  P() {}
+
+      X = X+1.                                                          0001
+      END
+
+C  P() {}
+
+      PROGRAM SUPPRESS01
+
+C  P() {}
+
+
+C     Check that type mismatches are detected and do not cause core dumps:
+C     this case is not detected but the value of i is lost as it should be.
+C     Floating point scalar variables are not analyzed
+
+      I = 0                                                             0001
+
+C  P(I) {I==0}
+
+
+      CALL INCR(I)                                                      0002
+
+C  P(I) {}
+
+
+      PRINT *, I                                                        0003
+
+      END
+
+Warning:
+
+TRANSFORMERS_INTER_FULL[SUPPRESS01] (user_call_to_transformer) Type incompatibility
+INTERPROCEDURAL_SUMMARY_PRECONDITION[INCR] (add_formal_to_actual_bindings) Type incompatibility
+
+
+      SUBROUTINE INCR(X)
+      X = X+1.                                                          0001
+      END
+      PROGRAM SUPPRESS01
+
+C     Check that type mismatches are detected and do not cause core dumps:
+C     this case is not detected but the value of i is lost as it should be.
+C     Floating point scalar variables are not analyzed
+
+      I = 0                                                             0001
+
+      CALL INCR(I)                                                      0002
+
+      PRINT *, I                                                        0003
+
+      END
+

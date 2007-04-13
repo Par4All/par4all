@@ -1,0 +1,46 @@
+
+C  T(S) {"Hello World!"==S}
+
+
+      SUBROUTINE FOO(S)
+
+C     Variable and constant lengths must be taken into account and
+C     substring applied... except when you cannot and have to assume
+C     that the assignment is legal
+
+      CHARACTER*(*) S
+
+C  T(S) {"Hello World!"==S}
+
+
+C     Should not be truncated since the actual lenght of s is unknown
+      S = "Hello World!"                                                0001
+
+      END
+
+C  T() {}
+
+      PROGRAM TYPE24
+
+C     No substring operator is applied interprocedurally although s1 and
+C     s2 should receive different values
+
+      CHARACTER*20 S1
+      CHARACTER*2 S2
+
+C  T(S1) {"Hello World!"==S1}
+
+
+      CALL FOO(S1)                                                      0001
+
+C  T(S2) {"Hello World!"==S2}
+
+      CALL FOO(S2)                                                      0002
+
+C  T() {}
+
+
+      PRINT *, S1, S2                                                   0003
+
+      END
+

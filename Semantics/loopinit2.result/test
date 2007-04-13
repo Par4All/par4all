@@ -1,0 +1,50 @@
+--- Preconditions for LOOPINIT2
+
+C  P() {}
+
+      PROGRAM LOOPINIT2
+
+c     Check that loop index initialization is performed correctly: the initial
+c     value of i is preserved by the loop
+
+c Not handled properly by PIPS: inc(j) is evaluated when the initial value 
+c of index i is computed (this is an assignment and the user call is detected), 
+c but it is not evaluated when the loop range is c computed (because only affine
+c ranges are taken into account)!
+
+C     A fix: add an intermediate value and use it to call inc(j), use it as a
+c     lower loop bound.
+
+      REAL T(10)
+
+C  P() {}
+
+
+      J = 2                                                             0001
+
+C  P(J) {J==2}
+
+
+      N = 0                                                             0002
+
+C  P(J,N) {J==2, N==0}
+
+
+      DO I = INC(J), N                                                  0003
+
+C  P(I,J,N) {N==0, I<=0}
+
+         T(I) = 0.                                                      0004
+
+C  P(I,J,N) {N==0, I<=0}
+
+         J = J+2                                                        0005
+      ENDDO
+
+C  P(I,J,N) {N==0, 1<=I, I<=4}
+
+
+c     The precondition should be: i==3, j==3
+      PRINT *, I, J                                                     0006
+
+      END

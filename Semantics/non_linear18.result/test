@@ -1,0 +1,31 @@
+
+C  T() {}
+
+      SUBROUTINE NON_LINEAR18
+
+C  T(K) {0<=K, 2N<=K}
+
+
+C     Check polynomial analysis: power is more precisely analyzed than
+C     multiply!
+
+
+      K = N**2+N                                                        0002
+
+C  T(K) {0<=K, 0<=K+2N}
+
+
+      K = N**2-N                                                        0003
+
+C  T(K) {N<=K}
+
+
+      K = N*N+N                                                         0004
+
+C  T(K) {0<=K+N}
+
+
+      K = N*N-N                                                         0005
+
+      END
+

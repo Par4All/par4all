@@ -1,0 +1,24 @@
+
+C  P() {}
+
+	INTEGER FUNCTION MINIMU(I,J)
+
+C  P() {}
+
+
+      IF (I.GT.J) THEN                                                  0001
+
+C  P() {J+1<=I}
+
+         MINIMU = J                                                     0002
+      ELSE
+
+C  P() {I<=J}
+
+         MINIMU = I                                                     0003
+      ENDIF
+
+C  P(MINIMU) {MINIMU<=I, MINIMU<=J}
+
+      PRINT *, I, J, MINIMU                                             0004
+      END

@@ -1,0 +1,156 @@
+--- Preconditions for LOOPEXIT
+
+C  P() {}
+
+      PROGRAM LOOPEXIT
+
+c     Is it possible to say something about the exit value of 
+C     loop indices
+
+      REAL T(10)
+
+C  P() {}
+
+
+      IF (N.GE.1) THEN                                                  0001
+
+C  P() {1<=N}
+
+
+         DO I = 1, N                                                    0002
+
+C  P(I) {1<=I, I<=N, 1<=N}
+
+            T(I) = 0.                                                   0003
+         ENDDO
+
+C  P(I) {I==N+1, 2<=I}
+
+
+         PRINT *, I                                                     0004
+
+C  P(I) {I==N+1, 2<=I}
+
+
+         DO I = 1, N, -1                                                0005
+
+C  P(I) {I<=1, N<=I, 1<=N}
+
+            T(I) = 0.                                                   0006
+         ENDDO
+
+C  P(I) {0<=I, I<=1, I+1<=N}
+
+
+         PRINT *, I                                                     0007
+
+      ENDIF
+
+C  P(I) {}
+
+
+      IF (N.GE.0) THEN                                                  0008
+
+C  P(I) {0<=N}
+
+
+         PRINT *, I                                                     0009
+
+C  P(I) {0<=N}
+
+         DO I = 1, N                                                    0010
+
+C  P(I) {1<=I, I<=N, 0<=N}
+
+            T(I) = 0.                                                   0011
+         ENDDO
+
+C  P(I) {I==N+1, 1<=I}
+
+
+         PRINT *, I                                                     0012
+
+C  P(I) {I==N+1, 1<=I}
+
+
+         DO I = 1, N, -1                                                0013
+
+C  P(I) {I<=1, N<=I, 0<=N}
+
+            T(I) = 0.                                                   0014
+         ENDDO
+
+C  P(I) {0<=I+1, I<=1, I+1<=N}
+
+
+         PRINT *, I                                                     0015
+
+      ENDIF
+
+C  P(I) {}
+
+
+      IF (N.LE.1) THEN                                                  0016
+
+C  P(I) {N<=1}
+
+
+         PRINT *, I                                                     0017
+
+C  P(I) {N<=1}
+
+         DO I = 1, N                                                    0018
+
+C  P(I) {1<=I, I<=N, N<=1}
+
+            T(I) = 0.                                                   0019
+         ENDDO
+
+C  P(I) {1<=I, I<=2, N+1<=I}
+
+
+         PRINT *, I                                                     0020
+
+C  P(I) {1<=I, I<=2, N+1<=I}
+
+
+         DO I = 1, N, -1                                                0021
+
+C  P(I) {I<=1, N<=I, N<=1}
+
+            T(I) = 0.                                                   0022
+         ENDDO
+
+C  P(I) {I==N-1, I<=0}
+
+
+         PRINT *, I                                                     0023
+
+      ENDIF
+
+C  P(I) {}
+
+
+      DO I = 1, N                                                       0024
+
+C  P(I) {1<=I, I<=N}
+
+         T(I) = 0.                                                      0025
+      ENDDO
+
+C  P(I) {1<=I, N+1<=I}
+
+
+      PRINT *, I                                                        0026
+
+C  P(I) {1<=I, N+1<=I}
+
+
+      DO I = 1, N, -1                                                   0027
+
+C  P(I) {I<=1, N<=I}
+
+         T(I) = 0.                                                      0028
+      ENDDO
+
+      END

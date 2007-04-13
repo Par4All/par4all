@@ -1,0 +1,29 @@
+delete alias_transformer 
+create alias_transformer ${PIPS_ROOT}/Validation/Semantics/alias_transformer.f
+
+setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
+setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+setproperty PRETTYPRINT_DO_LABEL_AS_COMMENT TRUE
+setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+setproperty PRETTYPRINT_FINAL_RETURN TRUE
+
+#setproperty SEMANTICS_TRUST_ARRAY_REFERENCES TRUE
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+
+#activate MUST_REGIONS
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[%ALL]
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[%ALL]
+
+#activate PRINT_CODE_REGIONS
+#display PRINTED_FILE[%ALL]
+
+close
+# delete alias_transformer 

@@ -1,0 +1,33 @@
+delete suppress01
+create suppress01 ${PIPS_ROOT}/Validation/Semantics/suppress01.f
+
+setproperty SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES TRUE
+setproperty SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES TRUE
+
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[%ALL]
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[%ALL]
+
+close
+
+echo
+echo Warning:
+echo
+shell grep incompatibility suppress01.database/Warnings
+echo
+
+open suppress01
+
+apply SUPPRESS_DEAD_CODE
+
+activate PRINT_CODE
+display PRINTED_FILE[%ALL]
+
+close
+delete suppress01

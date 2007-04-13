@@ -1,0 +1,11 @@
+delete convgfm
+create convgfm ${PIPS_ROOT}/Validation/Semantics/convgfm.f
+
+activate TRANSFORMERS_INTER_FULL
+
+activate PRECONDITIONS_INTER_FULL
+
+activate PRINT_CODE_TRANSFORMERS
+
+display PRINTED_FILE
+

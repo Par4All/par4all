@@ -1,0 +1,54 @@
+
+C  T() {'a'<='b'}
+
+      PROGRAM SUPPRESS02
+
+C  T() {'a'<='b'}
+
+
+C     Check suppress_dead_code for string variables
+
+      IF ('a'.GT.'b') THEN                                              0001
+
+C  T() {}
+
+         PRINT *, 'a is greater than b'                                 0002
+      ELSE
+
+C  T() {}
+
+         PRINT *, 'b is greater than a'                                 0003
+      ENDIF
+
+      END
+
+C  P() {}
+
+      PROGRAM SUPPRESS02
+
+C  P() {}
+
+
+C     Check suppress_dead_code for string variables
+
+      IF ('a'.GT.'b') THEN                                              0001
+
+C  P() {0==-1}
+
+         PRINT *, 'a is greater than b'                                 0002
+      ELSE
+
+C  P() {'a'<='b'}
+
+         PRINT *, 'b is greater than a'                                 0003
+      ENDIF
+
+      END
+      PROGRAM SUPPRESS02
+
+C     Check suppress_dead_code for string variables
+
+      PRINT *, 'b is greater than a'                                    0003
+
+      END
+

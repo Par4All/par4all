@@ -1,0 +1,68 @@
+
+C  T() {1<=N}
+
+      SUBROUTINE INDUC03(A, N)
+
+C     Example submitted by Nga. You want to prove that ij is greater
+C     than 1. Try to compute proper transformer the first time (see
+C     induc02.f). Final print added to obtain an additional block
+
+      REAL A(N)
+
+C  T(IJ,IX,IY) {1<=IX, NX2+1<=IX, 1<=N}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(IJ,IX,IY) {1<=IX, 1<=N}
+
+C (0,2)
+
+      DO IX = 1, NX2                                                    0001
+
+C  T(IJ,IY) {IX+IY<=IJ+1, IJ+2<=IY+N+NX2, IJ<=N+NX2, 1<=IX, IX<=NX2,
+C    1<=IY, IY<=N+1, NY2+1<=IY, 1<=N}
+
+C (0,3)
+C        BEGIN BLOCK
+
+C  T(IJ) {IJ==IX, 1<=IJ, IJ<=NX2, 1<=N}
+
+C (0,4)
+         IJ = IX                                                        0002
+
+C  T(IJ,IY) {IJ#init==IX, IJ#init+IY<=IJ+1, 1<=IJ#init, IJ#init<=NX2,
+C    1<=IY, 1<=N}
+
+C (0,5)
+         DO IY = 1, NY2                                                 0003
+
+C  T(IJ) {IJ#init+NX2==IJ, 1<=IJ#init, IJ#init<=N, 1<=IX, IX<=NX2,
+C    1<=IY, IY<=NY2, 1<=N}
+
+C (0,6)
+C           BEGIN BLOCK
+
+C  T() {1<=IJ, IJ<=N, 1<=IX, IX<=NX2, 1<=IY, IY<=NY2, 1<=N}
+
+C (0,7)
+            A(IJ) = 0.                                                  0004
+
+C  T(IJ) {IJ#init+NX2==IJ, 1<=IJ#init, IJ#init<=N, 1<=IX, IX<=NX2,
+C    1<=IY, IY<=NY2, 1<=N}
+
+C (0,8)
+            IJ = IJ+NX2                                                 0005
+C           END BLOCK
+         ENDDO
+C        END BLOCK
+      ENDDO
+
+C  T() {1<=IX, NX2+1<=IX, 1<=N}
+
+C (0,9)
+      PRINT *, IX                                                       0006
+
+C     END BLOCK
+      END
+

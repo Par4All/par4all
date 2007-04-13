@@ -1,0 +1,26 @@
+#!/bin/sh
+
+tpips=${tpips_version:-tpips}
+
+# Initialization:
+# rm -f funcside4.result/test
+# tpips >funcside4.result/test <<EOF
+
+$tpips <<EOF
+# Check that preconditions are properly computed with user function calls
+# when the transformer is based on an interval.
+
+delete funcside4
+create funcside4 $PIPS_VALIDDIR/Semantics/funcside4.f
+# create funcside4 funcside4.f
+module funcside4
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+close
+delete funcside4
+quit
+EOF
+

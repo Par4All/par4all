@@ -1,0 +1,26 @@
+delete fraer02
+create fraer02 ${PIPS_ROOT}/Validation/Semantics/fraer02.f
+module FRAER02
+
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+
+echo
+echo Transformers for FRAER02 (integer division)
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[FRAER02]
+
+echo
+echo Preconditions for FRAER02 (integer division)
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[FRAER02]
+close
+delete fraer02
+quit

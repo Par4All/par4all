@@ -1,0 +1,14 @@
+delete induc1
+create induc1 ${PIPS_ROOT}/Validation/Semantics/induc1.f
+#
+# Use of the rule transformers_intra_full
+#
+activate TRANSFORMERS_INTRA_FULL
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE
+setenv SEMANTICS_DEBUG_LEVEL 8
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+# close
+# delete induc1

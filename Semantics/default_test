@@ -1,0 +1,27 @@
+#!/bin/sh
+
+uppercase () {
+tr '[a-z]' '[A-Z]' <<%
+$*
+%
+}
+
+echo "PRETTYPRINT_BLOCK_IF_ONLY TRUE" >properties.rc
+if Pips -f $PIPS_ROOT/Validation/Semantics/tested_file.f -w tested_file -m tested_file \
+	-s pcinterfull -s tfinterfull \
+	-s prcp -b PF >&2
+then
+	echo "--- Preconditions for" `uppercase tested_file`
+	if Display -l prec
+	then
+	    exit_status=0
+	else
+	    exit_status=1
+	fi
+else
+	exit_status=1
+fi
+Delete tested_file 
+rm properties.rc
+exit $exit_status
+

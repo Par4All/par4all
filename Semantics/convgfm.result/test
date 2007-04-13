@@ -1,0 +1,50 @@
+--- Transformers for module CONVGFM
+
+C  T() {}
+
+C     Bug: one of the two invariants is lost
+
+C     Modification: the loop body is shortened
+      
+C     MODIFIED VERSION CONVGF: THE TWO INTERNAL LOOPS ARE FUSIONED
+      
+      SUBROUTINE CONVGFM(WKE, WKS, LST, NX, KRN, SCALE, KX, KY)
+      REAL WKE(*)
+      REAL WKS(*)
+      REAL KRN(*)
+      INTEGER VOIS, OFFTAB, COEFDEB, COEF
+
+C  T(IKEND) {IKEND==LST}
+
+
+      IKEND = LST                                                       0001
+
+C  T(OFFTAB) {NX==OFFTAB}
+
+      OFFTAB = 2*NX/2                                                   0002
+
+C  T(COEFDEB) {COEFDEB==3IKEND}
+
+      COEFDEB = 3*IKEND                                                 0003
+
+C  T(IWKE) {IWKE==0}
+
+      IWKE = 0                                                          0004
+
+C  T(IWKS) {IWKS==0}
+
+      IWKS = 0                                                          0005
+
+C  T(I,IWKE,IWKS) {I+IWKS#init==IWKS, IWKE+IWKS#init==IWKE#init+IWKS}
+
+      DO I = 0, NX-1                                                    0006
+
+C  T(IWKE) {IWKE==IWKE#init+1}
+
+         IWKE = IWKE+1                                                  0007
+
+C  T(IWKS) {IWKS==IWKS#init+1}
+
+         IWKS = IWKS+1                                                  0008
+      ENDDO
+      END

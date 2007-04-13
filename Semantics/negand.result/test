@@ -1,0 +1,38 @@
+--- Preconditions for module NEGAND
+
+C  P() {}
+
+C     to test negation of and conditions
+
+      SUBROUTINE NEGAND
+
+C  P() {}
+
+
+      I = 1                                                             0001
+
+C  P(I) {I==1}
+
+      IF (I.EQ.2.AND.J.EQ.3) THEN                                       0002
+
+C  P() {0==-1}
+
+         J = 4                                                          0003
+      ELSE
+
+C  P(I) {I==1}
+
+         J = 5                                                          0004
+      ENDIF
+
+C  P(I,J) {I==1, J==5}
+
+
+      K = J                                                             0005
+
+C  P(I,J,K) {I==1, J==5, K==5}
+
+
+      PRINT *, I, J, K                                                  0006
+
+      END

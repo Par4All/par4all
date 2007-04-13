@@ -1,0 +1,109 @@
+
+C  T() {}
+
+      PROGRAM FIXPOINT02
+
+C  T(J) {J==3}
+
+
+C     Check that constant assignments are taken into account when loop
+C     may be entered or not but when initial values are known
+
+      J = 3                                                             0001
+
+C  T(I,J) {}
+
+
+      DO I = 1, N                                                       0002
+
+C  T(J) {J==4}
+
+         J = 4                                                          0003
+      ENDDO
+
+C  T() {}
+
+
+      PRINT *, J                                                        0004
+
+C  T(I,J) {}
+
+
+      DO I = 1, N                                                       0005
+
+C  T(J) {5<=J, J<=6}
+
+         IF (X.GT.0.) THEN                                              0006
+
+C  T(J) {J==5}
+
+            J = 5                                                       0007
+         ELSE
+
+C  T(J) {J==6}
+
+            J = 6                                                       0008
+         ENDIF
+      ENDDO
+
+C  T() {}
+
+
+      PRINT *, J                                                        0009
+
+      END
+
+C  P() {}
+
+      PROGRAM FIXPOINT02
+
+C  P() {}
+
+
+C     Check that constant assignments are taken into account when loop
+C     may be entered or not but when initial values are known
+
+      J = 3                                                             0001
+
+C  P(J) {J==3}
+
+
+      DO I = 1, N                                                       0002
+
+C  P(I,J) {1<=I, I<=N}
+
+         J = 4                                                          0003
+      ENDDO
+
+C  P(I,J) {J<=I+2, N+1<=I, 3<=J, J<=4}
+
+
+      PRINT *, J                                                        0004
+
+C  P(I,J) {J<=I+2, N+1<=I, 3<=J, J<=4}
+
+
+      DO I = 1, N                                                       0005
+
+C  P(I,J) {1<=I, I<=N}
+
+         IF (X.GT.0.) THEN                                              0006
+
+C  P(I,J) {1<=I, I<=N}
+
+            J = 5                                                       0007
+         ELSE
+
+C  P(I,J) {1<=I, I<=N}
+
+            J = 6                                                       0008
+         ENDIF
+      ENDDO
+
+C  P(I,J) {1<=I, J<=2I+2, N+1<=I, 3<=J, J<=6}
+
+
+      PRINT *, J                                                        0009
+
+      END
+

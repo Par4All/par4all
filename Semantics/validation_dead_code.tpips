@@ -1,0 +1,26 @@
+setproperty PRETTYPRINT_BLOCK_IF_ONLY=TRUE
+
+delete validation_dead_code
+create validation_dead_code validation_dead_code.f
+
+set PRETTYPRINT_FINAL_RETURN TRUE
+set PRETTYPRINT_ALL_LABELS TRUE
+set PRETTYPRINT_EMPTY_BLOCKS TRUE
+set PRETTYPRINT_UNSTRUCTURED TRUE
+
+module VALIDATION_DEAD_CODE
+
+# New processing of unstructured
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+activate PRECONDITIONS_INTER_FAST
+activate TRANSFORMERS_INTER_FAST
+activate PRINT_CODE_PRECONDITIONS
+
+echo --- Preconditions for module VALIDATION_DEAD_CODE
+
+display PRINTED_FILE
+
+close
+delete validation_dead_code
+quit

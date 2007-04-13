@@ -1,0 +1,143 @@
+
+C  T() {}
+
+      PROGRAM TEST01
+
+C  T(I) {I#init<=I+1, I<=I#init}
+
+
+      IF (I.EQ.1) THEN                                                  0001
+
+C  T(I) {I==0}
+
+         I = 0                                                          0002
+      ENDIF
+
+C  T() {}
+
+
+      PRINT *, I                                                        0003
+
+C  T(I) {I#init<=I+1, I<=I#init}
+
+
+      IF (I.GE.1) THEN                                                  0004
+
+C  T(I) {I==I#init-1}
+
+         I = I-1                                                        0005
+      ENDIF
+
+C  T() {}
+
+
+      PRINT *, I                                                        0006
+
+C  T(I) {I==0}
+
+
+      IF (I.NE.0) THEN                                                  0007
+
+C  T(I) {I==0}
+
+         I = 0                                                          0008
+      ENDIF
+
+C  T() {}
+
+
+      PRINT *, I                                                        0009
+
+C  T(I) {I==0}
+
+
+      I = 0                                                             0010
+
+C  T(I) {I#init<=I+1, I<=I#init}
+
+
+      IF (I.EQ.1) THEN                                                  0011
+
+C  T(I) {I==0}
+
+         I = 0                                                          0012
+      ENDIF
+
+C  T() {}
+
+
+      PRINT *, I                                                        0013
+
+      END
+
+C  P() {}
+
+      PROGRAM TEST01
+
+C  P() {}
+
+
+      IF (I.EQ.1) THEN                                                  0001
+
+C  P() {I==1}
+
+         I = 0                                                          0002
+      ENDIF
+
+C  P(I) {}
+
+
+      PRINT *, I                                                        0003
+
+C  P(I) {}
+
+
+      IF (I.GE.1) THEN                                                  0004
+
+C  P(I) {1<=I}
+
+         I = I-1                                                        0005
+      ENDIF
+
+C  P(I) {}
+
+
+      PRINT *, I                                                        0006
+
+C  P(I) {}
+
+
+      IF (I.NE.0) THEN                                                  0007
+
+C  P(I) {}
+
+         I = 0                                                          0008
+      ENDIF
+
+C  P(I) {I==0}
+
+
+      PRINT *, I                                                        0009
+
+C  P(I) {I==0}
+
+
+      I = 0                                                             0010
+
+C  P(I) {I==0}
+
+
+      IF (I.EQ.1) THEN                                                  0011
+
+C  P() {0==-1}
+
+         I = 0                                                          0012
+      ENDIF
+
+C  P(I) {I==0}
+
+
+      PRINT *, I                                                        0013
+
+      END
+

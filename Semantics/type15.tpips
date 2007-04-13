@@ -1,0 +1,21 @@
+delete type15
+create type15 ${PIPS_ROOT}/Validation/Semantics/type15.f
+
+setproperty SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES TRUE
+setproperty SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES TRUE
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[%ALL]
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[%ALL]
+
+activate PRINT_CODE
+# apply PARTIAL_EVAL[%ALL]
+apply SUPPRESS_DEAD_CODE[TYPE15]
+
+display PRINTED_FILE[%ALL]
+
+close
+# delete type15
+delete type15

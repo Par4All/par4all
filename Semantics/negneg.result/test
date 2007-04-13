@@ -1,0 +1,29 @@
+--- Preconditions for module NEGNEG
+
+C  P() {}
+
+C     Test of .NE. handling in the false branch
+
+      SUBROUTINE NEGNEG(I,J)
+
+C  P() {}
+
+
+      IF (I.NE.J) THEN                                                  0001
+
+C  P() {}
+
+         I = J                                                          0002
+      ELSE
+
+C  P() {I==J}
+
+         K = 3                                                          0003
+      ENDIF
+
+C  P(I,K) {I==J}
+
+
+      PRINT *, I, J, K                                                  0004
+
+      END

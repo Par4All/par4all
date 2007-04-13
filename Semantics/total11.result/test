@@ -1,0 +1,139 @@
+
+C  T() {1<=N}
+
+      SUBROUTINE TOTAL11(A, N)
+
+C     Check that executed loops are proprely handled
+
+      REAL A(N)
+
+C  T(I,M) {I==M+1, 2<=I, I<=N+1, 1<=N}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(M) {1<=N}
+
+C (0,2)
+
+      READ *, M                                                         0001
+
+C  T() {1<=M, 1<=N}
+
+C (0,3)
+
+      IF (M.LT.1) THEN                                                  0002
+
+C  T() {0==-1}
+
+C (0,4)
+         STOP                                                           0003
+      ENDIF
+
+C  T(I) {1<=I, 1<=M, 1<=N}
+
+C (0,6)
+
+      DO I = 1, M                                                       0004
+
+C  T() {1<=I, I<=M, I<=N, 1<=M, 1<=N}
+
+C (0,7)
+         A(I) = 0.                                                      0005
+      ENDDO
+
+C     END BLOCK
+      END
+
+C  P() {}
+
+      SUBROUTINE TOTAL11(A, N)
+
+C     Check that executed loops are proprely handled
+
+      REAL A(N)
+
+C  P() {1<=N}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {1<=N}
+
+C (0,2)
+
+      READ *, M                                                         0001
+
+C  P(M) {1<=N}
+
+C (0,3)
+
+      IF (M.LT.1) THEN                                                  0002
+
+C  P(M) {M<=0, 1<=N}
+
+C (0,4)
+         STOP                                                           0003
+      ENDIF
+
+C  P(M) {1<=M, 1<=N}
+
+C (0,6)
+
+      DO I = 1, M                                                       0004
+
+C  P(I,M) {1<=I, I<=M, I<=N, 1<=M, 1<=N}
+
+C (0,7)
+         A(I) = 0.                                                      0005
+      ENDDO
+
+C     END BLOCK
+      END
+
+C TP() {1<=N}
+
+      SUBROUTINE TOTAL11(A, N)
+
+C     Check that executed loops are proprely handled
+
+      REAL A(N)
+
+C TP() {1<=N}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C TP() {1<=N}
+
+C (0,2)
+
+      READ *, M                                                         0001
+
+C TP() {1<=M, M<=N, 1<=N}
+
+C (0,3)
+
+      IF (M.LT.1) THEN                                                  0002
+
+C TP() {0==-1}
+
+C (0,4)
+         STOP                                                           0003
+      ENDIF
+
+C TP() {1<=M, M<=N, 1<=N}
+
+C (0,6)
+
+      DO I = 1, M                                                       0004
+
+C TP() {1<=I, I<=M, I<=N, 1<=M, M<=N, 1<=N}
+
+C (0,7)
+         A(I) = 0.                                                      0005
+      ENDDO
+
+C     END BLOCK
+      END
+

@@ -1,0 +1,109 @@
+
+C  T(KMAX) {KMAX#init<=KMAX+1, KMAX<=KMAX#init}
+
+
+      SUBROUTINE FOO(KMAX)
+
+C  T(KMAX) {KMAX#init<=KMAX+1, KMAX<=KMAX#init}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(KMAX) {KMAX#init<=KMAX+1, KMAX<=KMAX#init}
+
+C (0,2)
+      IF (KMAX.NE.1) THEN                                               0001
+
+C  T(KMAX) {KMAX==KMAX#init-1}
+
+C (0,3)
+         KMAX = KMAX-1                                                  0002
+      ENDIF
+
+C     END BLOCK
+      END
+
+C  P() {KMAX==1}
+
+
+      SUBROUTINE FOO(KMAX)
+
+C  P() {KMAX==1}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {KMAX==1}
+
+C (0,2)
+      IF (KMAX.NE.1) THEN                                               0001
+
+C  P() {0==-1}
+
+C (0,3)
+         KMAX = KMAX-1                                                  0002
+      ENDIF
+
+C     END BLOCK
+      END
+
+C  P() {}
+
+      SUBROUTINE NON_LINEAR17
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+
+C     For EDF KMAX, refine transformers
+
+      KMAX = 1                                                          0001
+
+C  P(KMAX) {KMAX==1}
+
+C (0,3)
+      CALL FOO(KMAX)                                                    0002
+
+C  P(KMAX) {0<=KMAX, KMAX<=1}
+
+C (0,4)
+      PRINT *, KMAX                                                     0003
+
+C     END BLOCK
+      END
+
+C  P() {}
+
+      SUBROUTINE NON_LINEAR17
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+
+C     For EDF KMAX, refine transformers
+
+      KMAX = 1                                                          0001
+
+C  P(KMAX) {KMAX==1}
+
+C (0,3)
+      CALL FOO(KMAX)                                                    0002
+
+C  P(KMAX) {KMAX==1}
+
+C (0,4)
+      PRINT *, KMAX                                                     0003
+
+C     END BLOCK
+      END
+

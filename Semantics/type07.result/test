@@ -1,0 +1,79 @@
+
+C  T() {}
+
+      PROGRAM TYPE07
+
+C     Goal: check the extension of the semantics analysis to lfoat
+C     scalar variables in tests
+
+      REAL X
+
+C  T(X) {0.57==X}
+
+
+      X = 0.57                                                          0001
+
+C  T(X) {}
+
+
+      IF (X.GE.0.58) THEN                                               0002
+
+C  T(X) {}
+
+         READ *, X                                                      0003
+
+C  T() {}
+
+         PRINT *, X                                                     0004
+      ELSE
+
+C  T(X) {}
+
+         READ *, X                                                      0005
+
+C  T() {}
+
+         PRINT *, X                                                     0006
+      ENDIF
+
+      END
+
+C  P() {}
+
+      PROGRAM TYPE07
+
+C     Goal: check the extension of the semantics analysis to lfoat
+C     scalar variables in tests
+
+      REAL X
+
+C  P() {}
+
+
+      X = 0.57                                                          0001
+
+C  P(X) {0.57==X}
+
+
+      IF (X.GE.0.58) THEN                                               0002
+
+C  P() {0==-1}
+
+         READ *, X                                                      0003
+
+C  P() {0==-1}
+
+         PRINT *, X                                                     0004
+      ELSE
+
+C  P(X) {0.57==X, 0.57<=0.58}
+
+         READ *, X                                                      0005
+
+C  P(X) {0.57<=0.58}
+
+         PRINT *, X                                                     0006
+      ENDIF
+
+      END
+

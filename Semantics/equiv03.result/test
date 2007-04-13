@@ -1,0 +1,103 @@
+
+C  T(X,XINCR,Y,Z) {1.+Y#init==Y, 3.==X, 4.==XINCR, Y==Z}
+
+
+      REAL FUNCTION XINCR(Y)
+      COMMON X, Z
+
+C  T(Y) {1.+Y#init==Y}
+
+
+      Y = Y+1.                                                          0001
+
+C  T(X) {3.==X}
+
+      X = 3.                                                            0002
+
+C  T(Z) {Y==Z}
+
+      Z = Y                                                             0003
+
+C  T(XINCR) {4.==XINCR}
+
+
+      XINCR = 4.                                                        0004
+
+      END
+
+C  T(I,Z) {}
+
+      PROGRAM EQUIV03
+
+C     Check alias detection
+
+      COMMON I, Z
+
+C  T(I) {I==0}
+
+
+      I = 0                                                             0001
+
+C  T(I,Y,Z) {1.+Y#init==Z, 2.+4.==Y}
+
+
+      Y = 2.+XINCR(Y)                                                   0002
+
+C  T() {}
+
+
+      PRINT *, I                                                        0003
+
+      END
+
+C  P() {}
+
+      PROGRAM EQUIV03
+
+C     Check alias detection
+
+      COMMON I, Z
+
+C  P() {}
+
+
+      I = 0                                                             0001
+
+C  P(I) {I==0}
+
+
+      Y = 2.+XINCR(Y)                                                   0002
+
+C  P(I,Y,Z) {2.+4.==Y}
+
+
+      PRINT *, I                                                        0003
+
+      END
+
+C  P() {}
+
+
+      REAL FUNCTION XINCR(Y)
+      COMMON X, Z
+
+C  P() {}
+
+
+      Y = Y+1.                                                          0001
+
+C  P(Y) {1.+Y#init==Y}
+
+      X = 3.                                                            0002
+
+C  P(X,Y) {1.+Y#init==Y, 3.==X}
+
+      Z = Y                                                             0003
+
+C  P(X,Y,Z) {1.+Y#init==Y, 3.==X, Y==Z}
+
+
+      XINCR = 4.                                                        0004
+
+      END
+

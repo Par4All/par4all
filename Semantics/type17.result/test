@@ -1,0 +1,170 @@
+
+C  T() {}
+
+      PROGRAM TYPE17
+      CHARACTER*4 S1, S2
+
+C  T(S1) {"toto"==S1}
+
+
+      S1 = "toto"                                                       0001
+
+C  T(S2) {"titi"==S2}
+
+      S2 = "titi"                                                       0002
+
+C  T() {}
+
+
+      IF (S1.EQ.S2) THEN                                                0003
+
+C  T() {}
+
+         PRINT *, 's1 equals s2'                                        0004
+      ELSE
+
+C  T() {}
+
+         PRINT *, 's1 does not equal s2'                                0005
+      ENDIF
+
+C  T(I) {0<=I, I<=1}
+
+
+      IF (S1.LT.S2) THEN                                                0006
+
+C  T(I) {I==0}
+
+         I = 0                                                          0007
+
+C  T() {}
+
+         PRINT *, 's1 is less than s2'                                  0008
+      ELSE
+
+C  T(I) {I==1}
+
+         I = 1                                                          0009
+
+C  T() {}
+
+         PRINT *, 's1 is greater than or equal to s2'                   0010
+      ENDIF
+
+C  T(I) {0<=I, I<=1}
+
+
+      IF (S1.LE.S2) THEN                                                0011
+
+C  T(I) {I==0}
+
+         I = 0                                                          0012
+
+C  T() {}
+
+         PRINT *, 's1 is less than or equal to s2'                      0013
+      ELSE
+
+C  T(I) {I==1}
+
+         I = 1                                                          0014
+
+C  T() {}
+
+         PRINT *, 's1 is greater than s2'                               0015
+      ENDIF
+
+      END
+
+C  P() {}
+
+      PROGRAM TYPE17
+      CHARACTER*4 S1, S2
+
+C  P() {}
+
+
+      S1 = "toto"                                                       0001
+
+C  P(S1) {"toto"==S1}
+
+      S2 = "titi"                                                       0002
+
+C  P(S1,S2) {"titi"==S2, "toto"==S1}
+
+
+      IF (S1.EQ.S2) THEN                                                0003
+
+C  P() {0==-1}
+
+         PRINT *, 's1 equals s2'                                        0004
+      ELSE
+
+C  P(S1,S2) {"titi"==S2, "toto"==S1, S2<=S1}
+
+         PRINT *, 's1 does not equal s2'                                0005
+      ENDIF
+
+C  P(S1,S2) {"titi"==S2, "toto"==S1, S2<=S1}
+
+
+      IF (S1.LT.S2) THEN                                                0006
+
+C  P() {0==-1}
+
+         I = 0                                                          0007
+
+C  P() {0==-1}
+
+         PRINT *, 's1 is less than s2'                                  0008
+      ELSE
+
+C  P(S1,S2) {"titi"==S2, "toto"==S1, S2<=S1}
+
+         I = 1                                                          0009
+
+C  P(I,S1,S2) {"titi"==S2, "toto"==S1, I==1, S2<=S1}
+
+         PRINT *, 's1 is greater than or equal to s2'                   0010
+      ENDIF
+
+C  P(I,S1,S2) {"titi"==S2, "toto"==S1, I==1, S2<=S1}
+
+
+      IF (S1.LE.S2) THEN                                                0011
+
+C  P() {0==-1}
+
+         I = 0                                                          0012
+
+C  P() {0==-1}
+
+         PRINT *, 's1 is less than or equal to s2'                      0013
+      ELSE
+
+C  P(I,S1,S2) {"titi"==S2, "toto"==S1, I==1, S2<=S1}
+
+         I = 1                                                          0014
+
+C  P(I,S1,S2) {"titi"==S2, "toto"==S1, I==1, S2<=S1}
+
+         PRINT *, 's1 is greater than s2'                               0015
+      ENDIF
+
+      END
+      PROGRAM TYPE17
+      CHARACTER*4 S1, S2
+
+      S1 = "toto"                                                       0001
+      S2 = "titi"                                                       0002
+
+      PRINT *, 's1 does not equal s2'                                   0005
+
+      I = 1                                                             0009
+      PRINT *, 's1 is greater than or equal to s2'                      0010
+
+      I = 1                                                             0014
+      PRINT *, 's1 is greater than s2'                                  0015
+
+      END
+

@@ -1,0 +1,21 @@
+
+C  P() {}
+
+      PROGRAM FUNCSIDE3
+
+C  P() {}
+
+
+      I3 = 30                                                           0001
+
+C  P(I3) {I3==30}
+
+
+      I3 = FOO3(I1, I2)                                                 0002
+
+C  P(I1,I2,I3) {I1+I2==I3+3}
+
+
+      PRINT *, I3                                                       0003
+
+      END

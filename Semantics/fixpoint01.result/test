@@ -1,0 +1,99 @@
+
+C  T() {}
+
+      PROGRAM FIXPOINT01
+
+C  T(I,J) {}
+
+
+C     Check that constant assignments are taken into account when loops
+C     are certainly entered
+
+      DO I = 1, 10                                                      0001
+
+C  T(J) {J==4}
+
+         J = 4                                                          0002
+      ENDDO
+
+C  T() {}
+
+
+      PRINT *, J                                                        0003
+
+C  T(I,J) {}
+
+
+      DO I = 1, 10                                                      0004
+
+C  T(J) {4<=J, J<=5}
+
+         IF (X.GT.0.) THEN                                              0005
+
+C  T(J) {J==4}
+
+            J = 4                                                       0006
+         ELSE
+
+C  T(J) {J==5}
+
+            J = 5                                                       0007
+         ENDIF
+      ENDDO
+
+C  T() {}
+
+
+      PRINT *, J                                                        0008
+
+      END
+
+C  P() {}
+
+      PROGRAM FIXPOINT01
+
+C  P() {}
+
+
+C     Check that constant assignments are taken into account when loops
+C     are certainly entered
+
+      DO I = 1, 10                                                      0001
+
+C  P(I,J) {1<=I, I<=10}
+
+         J = 4                                                          0002
+      ENDDO
+
+C  P(I,J) {I==11, J==4}
+
+
+      PRINT *, J                                                        0003
+
+C  P(I,J) {I==11, J==4}
+
+
+      DO I = 1, 10                                                      0004
+
+C  P(I,J) {1<=I, I<=10}
+
+         IF (X.GT.0.) THEN                                              0005
+
+C  P(I,J) {1<=I, I<=10}
+
+            J = 4                                                       0006
+         ELSE
+
+C  P(I,J) {1<=I, I<=10}
+
+            J = 5                                                       0007
+         ENDIF
+      ENDDO
+
+C  P(I,J) {I==11, 4<=J, J<=5}
+
+
+      PRINT *, J                                                        0008
+
+      END
+

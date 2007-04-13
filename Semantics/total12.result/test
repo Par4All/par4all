@@ -1,0 +1,64 @@
+
+C TP() {}
+
+      SUBROUTINE TOTAL12
+
+C     Submitted by Nga Nguyen, excerpt from INITIA in SWIM.f (Perfect
+C     Club)
+
+      PARAMETER (N1 = 513, N2 = 513)
+      COMMON UNEW(N1,N2)
+      COMMON /CONS/ M,N
+
+C TP() {}
+
+      READ (5, *) M, N                                                  0001
+
+C TP() {0<=M, M<=512, 0<=N, N<=512}
+
+
+      DO 20 I = 1, M                                                    0002
+
+C TP() {0<=M, M<=512, 0<=N, N<=512}
+
+         DO 20 J = 1, N                                                 0003
+
+C TP() {0<=I, I<=512, 1<=J, J<=513, 0<=M, M<=512, 0<=N, N<=512}
+
+            UNEW(I+1,J) = (I+1)*J                                       0004
+
+C TP() {0<=M, M<=512, 0<=N, N<=512}
+
+20          CONTINUE                                                    0005
+
+C TP() {0<=M, M<=512, 0<=N, N<=512}
+
+
+      DO 30 J = 1, N                                                    0006
+
+C TP() {1<=J, J<=513, 0<=M, M<=512, 0<=N, N<=512}
+
+         UNEW(1,J) = UNEW(M+1,J)                                        0007
+
+C TP() {0<=M, M<=512, 0<=N, N<=512}
+
+30       CONTINUE                                                       0008
+
+C TP() {0<=M, M<=512, 0<=N, N<=512}
+
+
+      DO 40 I = 1, M                                                    0009
+
+C TP() {0<=I, I<=512, 0<=M, M<=512, 0<=N, N<=512}
+
+         UNEW(I+1,N+1) = UNEW(I+1,1)                                    0010
+
+C TP() {0<=M, M<=512, 0<=N, N<=512}
+
+40       CONTINUE                                                       0011
+
+C TP() {0<=M, M<=512, 0<=N, N<=512}
+
+
+      UNEW(1,N+1) = UNEW(M+1,1)                                         0012
+      END

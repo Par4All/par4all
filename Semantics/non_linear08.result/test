@@ -1,0 +1,115 @@
+
+C  T() {}
+
+      SUBROUTINE NON_LINEAR08(T, L)
+
+C     Check rules for multiplication and loop bounds
+
+      REAL T(L)
+
+C  T(I,N) {1<=I}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(N) {}
+
+C (0,2)
+
+      READ *, N                                                         0001
+
+C  T(I) {2<=I}
+
+C (0,3)
+      DO I = N*N+2, M                                                   0002
+
+C  T() {1<=I, I<=L}
+
+C (0,4)
+         T(I) = 0.                                                      0003
+      ENDDO
+
+C  T() {}
+
+C (0,5)
+
+      PRINT *, I                                                        0004
+
+C  T(I) {1<=I}
+
+C (0,6)
+
+      DO I = 1, M*M+2                                                   0005
+
+C  T() {1<=I, I<=L}
+
+C (0,7)
+         T(I) = 0.                                                      0006
+      ENDDO
+
+C  T() {}
+
+C (0,8)
+
+      PRINT *, I                                                        0007
+
+C     END BLOCK
+      END
+
+C  P() {}
+
+      SUBROUTINE NON_LINEAR08(T, L)
+
+C     Check rules for multiplication and loop bounds
+
+      REAL T(L)
+
+C  P() {1<=L}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {1<=L}
+
+C (0,2)
+
+      READ *, N                                                         0001
+
+C  P(N) {1<=L}
+
+C (0,3)
+      DO I = N*N+2, M                                                   0002
+
+C  P(I,N) {2<=I, I<=L, I<=M, 1<=L}
+
+C (0,4)
+         T(I) = 0.                                                      0003
+      ENDDO
+
+C  P(I,N) {2<=I, 1<=L}
+
+C (0,5)
+
+      PRINT *, I                                                        0004
+
+C  P(I,N) {2<=I, 1<=L}
+
+C (0,6)
+
+      DO I = 1, M*M+2                                                   0005
+
+C  P(I,N) {1<=I, I<=L, 1<=L}
+
+C (0,7)
+         T(I) = 0.                                                      0006
+      ENDDO
+
+C  P(I,N) {1<=I, I<=L+1, 1<=L}
+
+C (0,8)
+
+      PRINT *, I                                                        0007
+
+C     END BLOCK
+      END
+

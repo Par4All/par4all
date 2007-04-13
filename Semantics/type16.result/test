@@ -1,0 +1,87 @@
+
+C  T() {}
+
+      PROGRAM TYPE16
+      REAL A, B
+
+C  T(A) {}
+
+
+      READ *, A                                                         0001
+
+C  T(A) {1.+A#init<=A, 4.<=A, 5.<=A}
+
+
+      A = AMAX1(A+1., 4., 5.)                                           0002
+
+C  T(B) {3.==B}
+
+
+      B = 3.                                                            0003
+
+C  T() {}
+
+
+      IF (A.LT.B-0.5) THEN                                              0004
+
+C  T() {}
+
+         PRINT *, 'a is small'                                          0005
+      ELSE
+
+C  T() {}
+
+         PRINT *, 'a is big'                                            0006
+      ENDIF
+
+      END
+
+C  P() {}
+
+      PROGRAM TYPE16
+      REAL A, B
+
+C  P() {}
+
+
+      READ *, A                                                         0001
+
+C  P(A) {}
+
+
+      A = AMAX1(A+1., 4., 5.)                                           0002
+
+C  P(A) {4.<=A, 5.<=A}
+
+
+      B = 3.                                                            0003
+
+C  P(A,B) {3.==B, 4.<=A, 5.<=A}
+
+
+      IF (A.LT.B-0.5) THEN                                              0004
+
+C  P() {0==-1}
+
+         PRINT *, 'a is small'                                          0005
+      ELSE
+
+C  P(A,B) {3.==B, B<=0.5+A, 4.<=A, 5.<=A}
+
+         PRINT *, 'a is big'                                            0006
+      ENDIF
+
+      END
+      PROGRAM TYPE16
+      REAL A, B
+
+      READ *, A                                                         0001
+
+      A = AMAX1(A+1., 4., 5.)                                           0002
+
+      B = 3.                                                            0003
+
+      PRINT *, 'a is big'                                               0006
+
+      END
+

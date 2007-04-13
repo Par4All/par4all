@@ -1,0 +1,53 @@
+
+C  T() {}
+
+      PROGRAM IREAL01
+
+C     Bug found in spice.f from the PerfectClub Benchmark
+
+C     i=MIN(MAX(k0, k1), k2) should not generate any constraint
+C     but I <= k2
+
+      REAL VALUE(100)
+
+C  T(I) {}
+
+
+      I = 1.2                                                           0001
+
+C  T(I) {}
+
+      I = MIN(1.2, K)                                                   0002
+
+C  T(LWIDTH) {LWIDTH<=132}
+
+      LWIDTH = MIN(MAX(IFIELD, 72), 132)                                0003
+
+C  T(LWIDTH) {}
+
+      LWIDTH = MIN(MAX(IFIELD, 72.0D0), 132)                            0004
+
+C  T(LWIDTH) {}
+
+
+      LWIDTH = MIN(MAX(IFIELD, 72), 132.0D0)                            0005
+
+C  T(LWIDTH) {}
+
+
+      LWIDTH = MIN(MAX(IFIELD, 72.0D0), 132.0D0)                        0006
+
+C  T(LWIDTH) {}
+
+      LWIDTH = MIN(MAX(IFIELD+IFLD, 72.0D0), 132.0D0)                   0007
+
+C  T(LWIDTH) {}
+
+      LWIDTH = MIN(MAX(VALUE(IFIELD+IFLD), 72.0D0), 132.0D0)            0008
+
+C  T() {}
+
+
+      PRINT *, I                                                        0009
+
+      END

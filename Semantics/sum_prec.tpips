@@ -1,0 +1,41 @@
+# Check that summary preconditions are re-evaluated correctly
+# after a code modification, such as a manuel edition
+#
+# This used not to work because summary preconditions were
+# never reset. They were re-used although obsolete. Fixed
+# by Guillaume Oget and Francois Irigoin.
+
+delete sum_prec
+create sum_prec sum_prec.f
+module SEQ
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL # Full Inter-Procedural Analysis
+activate TRANSFORMERS_INTER_FULL # Full Inter-Procedural Computation
+activate PRINT_CODE_PRECONDITIONS # Statements & Preconditions
+display PRINTED_FILE(SEQ)
+module DIGITALIZE
+display PRINTED_FILE(DIGITALIZE)
+
+# the delay is necessary, otherwise on fast machines the delay is
+# too short for pipsdbm to notice the update... FC.
+shell sleep 1
+shell sed 's/!!/  /'  < sum_prec.database/DIGITALIZE/DIGITALIZE.f > foo.f
+shell sleep 1
+
+# echo ===============================
+# shell cat foo.f
+# echo ===============================
+
+shell mv foo.f sum_prec.database/DIGITALIZE/DIGITALIZE.f 
+
+# I had to add this second delay for LINUXI86LL. Otherwise the old
+# version of DIGITALIZE.f is used.
+shell sleep 1
+
+# shell cat sum_prec.database/DIGITALIZE/DIGITALIZE.f
+# echo ===============================
+
+display PRINTED_FILE(DIGITALIZE)
+close
+delete sum_prec
+quit

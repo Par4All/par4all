@@ -1,0 +1,131 @@
+      PROGRAM GUERIN01
+      INTEGER A, B, C, TATA, D, E, TOTO, FSM1
+      FSM1 = 1                                                          0001
+99996 CONTINUE
+      IF (FSM1.NEQV.0) THEN                                             0002
+      ELSE
+         GOTO 99998
+      ENDIF
+      IF (FSM1.EQV.1) GOTO 99997                                        0003
+      FSM1 = 2                                                          0004
+      GOTO 99996
+99997 CONTINUE
+      IF (FSM1.EQV.2) GOTO 99995                                        0005
+      B = 5                                                             0006
+      FSM1 = 3                                                          0007
+      GOTO 99996
+99995 CONTINUE
+      IF (FSM1.EQV.3) GOTO 99994                                        0008
+      A = 2                                                             0009
+      FSM1 = 4                                                          0010
+      GOTO 99996
+99994 CONTINUE
+      IF (FSM1.EQV.4) GOTO 99993                                        0011
+      C = 3                                                             0012
+      FSM1 = 5                                                          0013
+      GOTO 99996
+99993 CONTINUE
+      IF (FSM1.EQV.5) GOTO 99992                                        0014
+      D = 1                                                             0015
+      E = 10                                                            0016
+      TOTO = 1                                                          0017
+      FSM1 = 6                                                          0018
+      GOTO 99996
+99992 CONTINUE
+      IF (FSM1.EQV.6) THEN                                              0019
+      ENDIF
+      IF (TATA.LE.E) GOTO 99991                                         0020
+      FSM1 = 12                                                         0022
+      GOTO 99996
+99991 CONTINUE
+      FSM1 = 7                                                          0021
+      GOTO 99996
+99998 CONTINUE
+
+      STOP                                                              0023
+      END
+      PROGRAM GUERIN01
+      INTEGER A, B, C, TATA, D, E, TOTO, FSM1, FSM3_STATE
+      FSM1 = 1                                                          0001
+      FSM3_STATE = 1
+      DO WHILE (FSM3_STATE.NE.0)
+         IF (FSM3_STATE.EQ.1) THEN
+            IF (FSM1.NEQV.0) THEN                                       0002
+               FSM3_STATE = 2                                           0002
+            ELSE
+               FSM3_STATE = 16                                          0002
+            ENDIF
+         ELSEIF (FSM3_STATE.EQ.2) THEN
+            IF (FSM1.EQV.1) THEN                                        0003
+               FSM3_STATE = 3                                           0003
+            ELSE
+               FSM3_STATE = 15                                          0003
+            ENDIF
+         ELSEIF (FSM3_STATE.EQ.3) THEN
+            IF (FSM1.EQV.2) THEN                                        0005
+               FSM3_STATE = 4                                           0005
+            ELSE
+               FSM3_STATE = 14                                          0005
+            ENDIF
+         ELSEIF (FSM3_STATE.EQ.4) THEN
+            IF (FSM1.EQV.3) THEN                                        0008
+               FSM3_STATE = 5                                           0008
+            ELSE
+               FSM3_STATE = 13                                          0008
+            ENDIF
+         ELSEIF (FSM3_STATE.EQ.5) THEN
+            IF (FSM1.EQV.4) THEN                                        0011
+               FSM3_STATE = 6                                           0011
+            ELSE
+               FSM3_STATE = 12                                          0011
+            ENDIF
+         ELSEIF (FSM3_STATE.EQ.6) THEN
+            IF (FSM1.EQV.5) THEN                                        0014
+               FSM3_STATE = 7                                           0014
+            ELSE
+               FSM3_STATE = 11                                          0014
+            ENDIF
+         ELSEIF (FSM3_STATE.EQ.7) THEN
+            IF (FSM1.EQV.6) THEN                                        0019
+            ENDIF
+            FSM3_STATE = 8                                              0019
+         ELSEIF (FSM3_STATE.EQ.8) THEN
+            IF (TATA.LE.E) THEN                                         0020
+               FSM3_STATE = 9                                           0020
+            ELSE
+               FSM3_STATE = 10                                          0020
+            ENDIF
+         ELSEIF (FSM3_STATE.EQ.9) THEN
+            FSM1 = 7                                                    0021
+            FSM3_STATE = 1                                              0021
+         ELSEIF (FSM3_STATE.EQ.10) THEN
+            FSM1 = 12                                                   0022
+            FSM3_STATE = 1                                              0022
+         ELSEIF (FSM3_STATE.EQ.11) THEN
+            D = 1                                                       0015
+            E = 10                                                      0016
+            TOTO = 1                                                    0017
+            FSM1 = 6                                                    0018
+            FSM3_STATE = 1
+         ELSEIF (FSM3_STATE.EQ.12) THEN
+            C = 3                                                       0012
+            FSM1 = 5                                                    0013
+            FSM3_STATE = 1
+         ELSEIF (FSM3_STATE.EQ.13) THEN
+            A = 2                                                       0009
+            FSM1 = 4                                                    0010
+            FSM3_STATE = 1
+         ELSEIF (FSM3_STATE.EQ.14) THEN
+            B = 5                                                       0006
+            FSM1 = 3                                                    0007
+            FSM3_STATE = 1
+         ELSEIF (FSM3_STATE.EQ.15) THEN
+            FSM1 = 2                                                    0004
+            FSM3_STATE = 1                                              0004
+         ELSEIF (FSM3_STATE.EQ.16) THEN
+
+            FSM3_STATE = 0                                              0023
+         ENDIF
+      ENDDO
+      STOP                                                              0023
+      END

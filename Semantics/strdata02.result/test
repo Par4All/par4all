@@ -1,0 +1,99 @@
+      PROGRAM STRDATA02
+      CHARACTER*12 C
+      DATA C /'hello world'/
+      INTEGER I
+      DATA I /12/
+      REAL*4 R
+      DATA R /1.0/
+      LOGICAL L
+      DATA L /.TRUE./
+      PRINT *, C, I, R, L                                               0001
+      C = 'bye world'                                                   0002
+      I = 3                                                             0003
+      R = 2.0                                                           0004
+      L = .FALSE.                                                       0005
+      PRINT *, C, I, R, L                                               0006
+      END
+
+C  P() {'hello world'==C, 1.0==R, I==12, L==1}
+
+
+C  P() {'hello world'==C, 1.0==R, I==12, L==1}
+
+
+C  T(C,I,L,R) {'bye world'==C, 2.0==R, I==3, L==0}
+
+      PROGRAM STRDATA02
+      CHARACTER*12 C
+      DATA C /'hello world'/
+      INTEGER I
+      DATA I /12/
+      REAL*4 R
+      DATA R /1.0/
+      LOGICAL L
+      DATA L /.TRUE./
+
+C  T() {}
+
+      PRINT *, C, I, R, L                                               0001
+
+C  T(C) {'bye world'==C}
+
+      C = 'bye world'                                                   0002
+
+C  T(I) {I==3}
+
+      I = 3                                                             0003
+
+C  T(R) {2.0==R}
+
+      R = 2.0                                                           0004
+
+C  T(L) {L==0}
+
+      L = .FALSE.                                                       0005
+
+C  T() {}
+
+      PRINT *, C, I, R, L                                               0006
+      END
+
+C  P() {'hello world'==C, 1.0==R, I==12, L==1}
+
+      PROGRAM STRDATA02
+      CHARACTER*12 C
+      DATA C /'hello world'/
+      INTEGER I
+      DATA I /12/
+      REAL*4 R
+      DATA R /1.0/
+      LOGICAL L
+      DATA L /.TRUE./
+
+C  P() {'hello world'==C, 1.0==R, I==12, L==1}
+
+      PRINT *, C, I, R, L                                               0001
+
+C  P() {'hello world'==C, 1.0==R, I==12, L==1}
+
+      C = 'bye world'                                                   0002
+
+C  P(C) {'bye world'==C, 'hello world'==C#init, 1.0==R, I==12, L==1}
+
+      I = 3                                                             0003
+
+C  P(C,I) {'bye world'==C, 'hello world'==C#init, 1.0==R, I==3,
+C    I#init==12, L==1}
+
+      R = 2.0                                                           0004
+
+C  P(C,I,R) {'bye world'==C, 'hello world'==C#init, 1.0==R#init,
+C    2.0==R, I==3, I#init==12, L==1}
+
+      L = .FALSE.                                                       0005
+
+C  P(C,I,L,R) {'bye world'==C, 'hello world'==C#init, 1.0==R#init,
+C    2.0==R, I==3, I#init==12, L==0, L#init==1}
+
+      PRINT *, C, I, R, L                                               0006
+      END

@@ -1,0 +1,28 @@
+delete lecopt
+create lecopt ${PIPS_ROOT}/Validation/Semantics/lecopt.f
+
+setproperty SEMANTICS_ANALYZE_SCALAR_STRING_VARIABLES TRUE
+# setproperty SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES TRUE
+setproperty SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES TRUE
+
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING  "generate"
+
+# activate TRANSFORMERS_INTER_FULL
+# activate PRECONDITIONS_INTER_FULL
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[LECOPT]
+
+close
+open lecopt
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[LECOPT]
+
+# apply SUPPRESS_DEAD_CODE
+# 
+# activate PRINT_CODE
+# display PRINTED_FILE[%ALL]
+
+close
+delete lecopt

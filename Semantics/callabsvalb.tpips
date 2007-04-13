@@ -1,0 +1,13 @@
+# delete callabsval
+# create callabsval ${PIPS_ROOT}/Validation/Semantics/callabsval.f
+open callabsval
+activate TRANSFORMERS_INTER_FAST
+activate PRECONDITIONS_INTER_FAST
+module CALLABSVAL
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[CALLABSVAL]
+# activate PRINT_CODE_PRECONDITIONS
+# display PRINTED_FILE[CALLABSVAL]
+# close 
+# delete callabsval
+quit

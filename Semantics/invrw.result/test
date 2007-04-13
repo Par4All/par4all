@@ -1,0 +1,220 @@
+
+Transformers for INVRW with pattern matching fix-point
+
+
+C  T() {}
+
+      PROGRAM INVRW
+
+C     Check the computation of invariant r+w==0
+
+      INTEGER R, W
+
+C  T(R) {R==0}
+
+
+      R = 0                                                             0001
+
+C  T(W) {W==0}
+
+      W = 0                                                             0002
+
+C  T(I,R,W) {R+W==R#init+W#init, W#init+1<=I+W, W+1<=I+W#init}
+
+
+      DO I = 1, L                                                       0003
+
+C  T(R,W) {R+W==R#init+W#init, W#init<=W+1, W<=W#init+1}
+
+         IF (X.GT.0) THEN                                               0004
+
+C  T(R) {R==R#init+1}
+
+            R = R+1                                                     0005
+
+C  T(W) {W==W#init-1}
+
+            W = W-1                                                     0006
+         ELSE
+
+C  T(R) {R==R#init-1}
+
+            R = R-1                                                     0007
+
+C  T(W) {W==W#init+1}
+
+            W = W+1                                                     0008
+         ENDIF
+      ENDDO
+
+C  T() {}
+
+
+      PRINT *, I, L, R, W                                               0009
+
+      END
+
+Preconditions for INVRW with pattern matching fix-point
+
+
+C  P() {}
+
+      PROGRAM INVRW
+
+C     Check the computation of invariant r+w==0
+
+      INTEGER R, W
+
+C  P() {}
+
+
+      R = 0                                                             0001
+
+C  P(R) {R==0}
+
+      W = 0                                                             0002
+
+C  P(R,W) {R==0, W==0}
+
+
+      DO I = 1, L                                                       0003
+
+C  P(I,R,W) {R+W==0, 1<=I, I<=L, 1<=I+R, R+1<=I}
+
+         IF (X.GT.0) THEN                                               0004
+
+C  P(I,R,W) {R+W==0, 1<=I, I<=L, 1<=I+R, R+1<=I}
+
+            R = R+1                                                     0005
+
+C  P(I,R,W) {R+W==1, 1<=I, I<=L, 2<=I+R, R<=I}
+
+            W = W-1                                                     0006
+         ELSE
+
+C  P(I,R,W) {R+W==0, 1<=I, I<=L, 1<=I+R, R+1<=I}
+
+            R = R-1                                                     0007
+
+C  P(I,R,W) {R+W==-1, 1<=I, I<=L, 0<=I+R, R+2<=I}
+
+            W = W+1                                                     0008
+         ENDIF
+      ENDDO
+
+C  P(I,R,W) {R+W==0, L+1<=I, 1<=I+R, R+1<=I}
+
+
+      PRINT *, I, L, R, W                                               0009
+
+      END
+
+Transformers for INVRW with derivative fix-point
+
+
+C  T() {}
+
+      PROGRAM INVRW
+
+C     Check the computation of invariant r+w==0
+
+      INTEGER R, W
+
+C  T(R) {R==0}
+
+
+      R = 0                                                             0001
+
+C  T(W) {W==0}
+
+      W = 0                                                             0002
+
+C  T(I,R,W) {R+W==R#init+W#init, W#init+1<=I+W, W+1<=I+W#init}
+
+
+      DO I = 1, L                                                       0003
+
+C  T(R,W) {R+W==R#init+W#init, W#init<=W+1, W<=W#init+1}
+
+         IF (X.GT.0) THEN                                               0004
+
+C  T(R) {R==R#init+1}
+
+            R = R+1                                                     0005
+
+C  T(W) {W==W#init-1}
+
+            W = W-1                                                     0006
+         ELSE
+
+C  T(R) {R==R#init-1}
+
+            R = R-1                                                     0007
+
+C  T(W) {W==W#init+1}
+
+            W = W+1                                                     0008
+         ENDIF
+      ENDDO
+
+C  T() {}
+
+
+      PRINT *, I, L, R, W                                               0009
+
+      END
+
+Preconditions for INVRW with derivative fix-point
+
+
+C  P() {}
+
+      PROGRAM INVRW
+
+C     Check the computation of invariant r+w==0
+
+      INTEGER R, W
+
+C  P() {}
+
+
+      R = 0                                                             0001
+
+C  P(R) {R==0}
+
+      W = 0                                                             0002
+
+C  P(R,W) {R==0, W==0}
+
+
+      DO I = 1, L                                                       0003
+
+C  P(I,R,W) {R+W==0, 1<=I, I<=L, 1<=I+R, R+1<=I}
+
+         IF (X.GT.0) THEN                                               0004
+
+C  P(I,R,W) {R+W==0, 1<=I, I<=L, 1<=I+R, R+1<=I}
+
+            R = R+1                                                     0005
+
+C  P(I,R,W) {R+W==1, 1<=I, I<=L, 2<=I+R, R<=I}
+
+            W = W-1                                                     0006
+         ELSE
+
+C  P(I,R,W) {R+W==0, 1<=I, I<=L, 1<=I+R, R+1<=I}
+
+            R = R-1                                                     0007
+
+C  P(I,R,W) {R+W==-1, 1<=I, I<=L, 0<=I+R, R+2<=I}
+
+            W = W+1                                                     0008
+         ENDIF
+      ENDDO
+
+C  P(I,R,W) {R+W==0, L+1<=I, 1<=I+R, R+1<=I}
+
+
+      PRINT *, I, L, R, W                                               0009
+
+      END

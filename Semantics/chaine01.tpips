@@ -1,0 +1,30 @@
+echo 'initial exec'
+shell f77 ${PIPS_ROOT}/Validation/Semantics/chaine01.f && ./a.out
+shell rm a.out
+
+delete chaine01
+create chaine01 ${PIPS_ROOT}/Validation/Semantics/chaine01.f
+setproperty SEMANTICS_ANALYZE_SCALAR_STRING_VARIABLES TRUE
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[%ALL]
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[%ALL]
+
+activate PRINT_CODE
+#apply PARTIAL_EVAL[%ALL]
+apply SUPPRESS_DEAD_CODE[%ALL]
+
+display PRINTED_FILE[%ALL]
+
+apply UNSPLIT
+
+close
+
+echo 'optimized exec'
+shell f77 chaine01.database/Src/chaine01.f && ./a.out
+shell rm a.out
+
+delete chaine01
+

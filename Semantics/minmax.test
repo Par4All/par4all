@@ -1,0 +1,15 @@
+#!/bin/sh
+#
+# Script to test pips on a simple program
+#
+if Pips -f $PIPS_ROOT/Validation/Semantics/minmax.f -w minmax -m minmax \
+	 -p prct >&2
+then
+	exit_code=0
+	echo "--- Transformers for module MINMAX"
+	Display -l tran
+else
+	exit_code=1
+fi
+Delete minmax >&2
+exit $exit_code

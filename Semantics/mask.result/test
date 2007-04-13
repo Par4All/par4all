@@ -1,0 +1,48 @@
+
+First version: masking
+
+
+C  P() {}
+
+      SUBROUTINE MASK
+
+C  P() {}
+
+
+      CALL MASKED_INIT                                                  0001
+
+C  P(INCR:I) {}
+
+
+      CALL MASKED_INCR                                                  0002
+
+C  P(INCR:I) {}
+
+
+      PRINT *, 'hello'                                                  0003
+
+      END
+
+Second version: no masking
+
+
+C  P() {}
+
+      SUBROUTINE MASK
+
+C  P() {}
+
+
+      CALL MASKED_INIT                                                  0001
+
+C  P(INCR:I) {INCR:I==0}
+
+
+      CALL MASKED_INCR                                                  0002
+
+C  P(INCR:I) {INCR:I==1}
+
+
+      PRINT *, 'hello'                                                  0003
+
+      END

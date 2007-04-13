@@ -1,0 +1,19 @@
+delete ocean_fi_2
+create ocean_fi_2 ${PIPS_ROOT}/Validation/Semantics/ocean_fi_2.f
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+setproperty SEMANTICS_FILTERED_PRECONDITIONS TRUE
+
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[%ALL]
+
+module ocean
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+close
+# delete ocean_fi_2
+quit

@@ -1,0 +1,66 @@
+
+C  T() {}
+
+      PROGRAM TYPE28
+
+C     Check impact of equivalence on non-integer types
+
+      REAL X, Y, U, V
+      LOGICAL L, L1, L2, L3
+      CHARACTER*4 S, S1, S2, S3
+
+      EQUIVALENCE (I,X) , (U, V), (I, L1), (L2, L3), (I, S1), (S2, S3)
+
+C  T(Y) {}
+
+
+      Y = X                                                             0001
+
+C  T(Y) {U==Y}
+
+      Y = U                                                             0002
+
+C  T(Y) {U==Y}
+
+      Y = V                                                             0003
+
+C  T() {}
+
+      X = 1.0                                                           0004
+
+C  T(L) {}
+
+
+      L = L1                                                            0005
+
+C  T(L) {L==L2, 0<=L, L<=1}
+
+      L = L2                                                            0006
+
+C  T(L) {L==L2, 0<=L, L<=1}
+
+      L = L3                                                            0007
+
+C  T() {}
+
+      L1 = .TRUE.                                                       0008
+
+C  T(S) {}
+
+
+      S = S1                                                            0009
+
+C  T(S) {S==S2}
+
+      S = S2                                                            0010
+
+C  T(S) {S==S2}
+
+      S = S3                                                            0011
+
+C  T() {}
+
+      S1 = "TOTO"                                                       0012
+
+      END
+

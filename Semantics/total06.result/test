@@ -1,0 +1,63 @@
+
+C  T() {}
+
+      PROGRAM TOTAL06
+
+C     Check that not executed loops are proprely handled: no condition
+C     on N should be found
+
+      REAL A(10)
+
+C  T(I) {I==10}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(I) {10<=I}
+
+C (0,2)
+
+      DO I = 10, 1                                                      0001
+
+C  T() {1<=N, N<=10}
+
+C (0,3)
+         A(N) = 0.                                                      0002
+      ENDDO
+
+c      a(i) = 1.
+
+C     END BLOCK
+      END
+
+C TP() {}
+
+      PROGRAM TOTAL06
+
+C     Check that not executed loops are proprely handled: no condition
+C     on N should be found
+
+      REAL A(10)
+
+C TP() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C TP() {}
+
+C (0,2)
+
+      DO I = 10, 1                                                      0001
+
+C TP() {0==-1}
+
+C (0,3)
+         A(N) = 0.                                                      0002
+      ENDDO
+
+c      a(i) = 1.
+
+C     END BLOCK
+      END
+

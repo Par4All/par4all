@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# Script to test pips on the simple program
+#
+# Use of the rule transformers_inter_fast
+#
+echo "PRETTYPRINT_BLOCK_IF_ONLY TRUE" >properties.rc
+if Pips -f $PIPS_ROOT/Validation/Semantics/or.f -w or -m or \
+	-s pcinter -s tfinter -p prcp >&2
+then
+	exit_code=0
+	echo "--- Preconditions for module OR"
+	Display -l prec
+else
+	exit_code=1
+fi
+Delete or >&2
+rm properties.rc
+exit $exit_code

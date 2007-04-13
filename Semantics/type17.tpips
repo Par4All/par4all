@@ -1,0 +1,24 @@
+delete type17
+create type17 ${PIPS_ROOT}/Validation/Semantics/type17.f
+
+setproperty SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES TRUE
+setproperty SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES TRUE
+setproperty SEMANTICS_ANALYZE_SCALAR_STRING_VARIABLES TRUE
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[%ALL]
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[%ALL]
+
+# delete type17
+
+activate PRINT_CODE
+# apply PARTIAL_EVAL[%ALL]
+apply SUPPRESS_DEAD_CODE[TYPE17]
+
+display PRINTED_FILE[%ALL]
+
+close
+# delete type17
+delete type17

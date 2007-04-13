@@ -1,0 +1,77 @@
+
+C  T() {}
+
+      PROGRAM FIXPOINT05
+
+C  T(I,J) {J<=5, J<=J#init}
+
+
+C     Suppose J is known to be greater than 5 (in fact, equal to 5
+C     because of the previous loop) and the loop certainly entered: the
+C     information is lost!
+
+C     The problem seems to be due to the precondition equation for
+C     entered loops: p' = t(t*(p)). The certainly executed iteration is
+C     applied too late, when the information brought by p is lost thru
+C     t*. However, t*(t(p)) would still not be satisfactory. t* should
+C     be computed for the subset defined by p.
+
+      IF (J.GE.5) THEN                                                  0001
+
+C  T(I,J) {}
+
+
+         DO I = 1, 5                                                    0002
+
+C  T(J) {J<=5, J<=J#init}
+
+            IF (J.GE.5) J = 5                                           0003
+         ENDDO
+
+C  T() {}
+
+
+         PRINT *, J                                                     0005
+
+      ENDIF
+
+      END
+
+C  P() {}
+
+      PROGRAM FIXPOINT05
+
+C  P() {}
+
+
+C     Suppose J is known to be greater than 5 (in fact, equal to 5
+C     because of the previous loop) and the loop certainly entered: the
+C     information is lost!
+
+C     The problem seems to be due to the precondition equation for
+C     entered loops: p' = t(t*(p)). The certainly executed iteration is
+C     applied too late, when the information brought by p is lost thru
+C     t*. However, t*(t(p)) would still not be satisfactory. t* should
+C     be computed for the subset defined by p.
+
+      IF (J.GE.5) THEN                                                  0001
+
+C  P() {5<=J}
+
+
+         DO I = 1, 5                                                    0002
+
+C  P(I,J) {1<=I, I<=5}
+
+            IF (J.GE.5) J = 5                                           0003
+         ENDDO
+
+C  P(I,J) {I==6, J<=5}
+
+
+         PRINT *, J                                                     0005
+
+      ENDIF
+
+      END
+

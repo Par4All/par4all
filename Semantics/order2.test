@@ -1,0 +1,25 @@
+#!/bin/sh
+
+tpips=${tpips_version:-tpips}
+
+# Initialization:
+# rm -f order2.result/test
+# tpips >order2.result/test <<EOF
+
+$tpips <<EOF
+# Check that preconditions are properly ordered
+
+setproperty PRETTYPRINT_BLOCK_IF_ONLY=TRUE
+
+delete order2
+create order2 $PIPS_VALIDDIR/Semantics/order2.f
+# create order2 order2.f
+module order2
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+close
+delete order2
+quit
+EOF
+

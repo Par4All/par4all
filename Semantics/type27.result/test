@@ -1,0 +1,56 @@
+
+C  T() {}
+
+      PROGRAM TYPE27
+
+C     Check multi-type initialization routine
+
+      CHARACTER*20 S
+
+C  T(I,S,X) {"Hello World!"==S, 2.0==X, I==1}
+
+
+      CALL INIT(S, X, I)                                                0001
+
+C  T() {}
+
+
+      CALL INIPRINT(S, X, I)                                            0002
+
+      END
+
+C  P() {}
+
+      PROGRAM TYPE27
+
+C     Check multi-type initialization routine
+
+      CHARACTER*20 S
+
+C  P() {}
+
+
+      CALL INIT(S, X, I)                                                0001
+
+C  P(I,S,X) {"Hello World!"==S, 2.0==X, I==1}
+
+
+      CALL INIPRINT(S, X, I)                                            0002
+
+      END
+
+C  P() {"Hello World!"==FS, 2.0==FX, FI==1}
+
+
+      SUBROUTINE INIPRINT(FS, FX, FI)
+
+      CHARACTER*(*) FS
+      INTEGER FI
+
+C  P() {"Hello World!"==FS, 2.0==FX, FI==1}
+
+
+      PRINT *, FS, FX, FI                                               0001
+
+      END
+

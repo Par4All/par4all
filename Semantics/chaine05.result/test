@@ -1,0 +1,283 @@
+'initial exec'
+ Trailing blanks are ignored
+ Leading blanks are not ignored
+ Trailing blanks are ignored when concatenating
+ hello     hello     world     hello     world     hello     world     
+
+C  T() {}
+
+      PROGRAM CHAINE05
+
+C     Fortran does not take trailing SPACEs into account when comparing
+C     strings because any string is assumed padded with SPACE up to its
+C     declared length
+
+      CHARACTER*10 S
+      CHARACTER*10 T
+      CHARACTER*10 U
+      CHARACTER*20 V
+      CHARACTER*20 W
+
+C  T(S) {"hello"==S}
+
+
+      S = "hello"                                                       0001
+
+C  T(T) {"hello "==T}
+
+      T = "hello "                                                      0002
+
+C  T() {}
+
+
+      IF (S.EQ.T) THEN                                                  0003
+
+C  T() {}
+
+!        FALSE
+         PRINT *, "Trailing blanks are ignored"                         0004
+      ELSE
+
+C  T() {}
+
+!        TRUE 
+         PRINT *, "Trailing blanks are not ignored"                     0005
+      ENDIF
+
+C  T(S) {"hello"==S}
+
+
+      S = "hello"                                                       0006
+
+C  T(T) {" hello"==T}
+
+      T = " hello"                                                      0007
+
+C  T() {}
+
+
+      IF (S.EQ.T) THEN                                                  0008
+
+C  T() {}
+
+!        FALSE
+         PRINT *, "Leading blanks are ignored"                          0009
+      ELSE
+
+C  T() {}
+
+!        TRUE 
+         PRINT *, "Leading blanks are not ignored"                      0010
+      ENDIF
+
+C  T(S) {"hello"==S}
+
+
+      S = "hello"                                                       0011
+
+C  T(T) {"hello "==T}
+
+      T = "hello "                                                      0012
+
+C  T(U) {"world"==U}
+
+      U = "world"                                                       0013
+
+C  T(V) {}
+
+      V = S//U                                                          0014
+
+C  T(W) {}
+
+      W = T//U                                                          0015
+
+C  T() {}
+
+
+      IF (V.EQ.W) THEN                                                  0016
+
+C  T() {}
+
+!        FALSE
+         PRINT *, "Trailing blanks are ignored when concatenating"      0017
+      ELSE
+
+C  T() {}
+
+!        TRUE because s and t are declared with the same length and hence padding
+         PRINT *,                                                       0018
+     &   "Trailing blanks are not ignored when concatenating"           0018
+      ENDIF
+
+C  T() {}
+
+
+      PRINT *, S, T, U, V, W                                            0019
+
+      END
+
+C  P() {}
+
+      PROGRAM CHAINE05
+
+C     Fortran does not take trailing SPACEs into account when comparing
+C     strings because any string is assumed padded with SPACE up to its
+C     declared length
+
+      CHARACTER*10 S
+      CHARACTER*10 T
+      CHARACTER*10 U
+      CHARACTER*20 V
+      CHARACTER*20 W
+
+C  P() {}
+
+
+      S = "hello"                                                       0001
+
+C  P(S) {"hello"==S}
+
+      T = "hello "                                                      0002
+
+C  P(S,T) {"hello "==T, "hello"==S}
+
+
+      IF (S.EQ.T) THEN                                                  0003
+
+C  P(S,T) {"hello "==S, "hello"==S, S==T}
+
+!        FALSE
+         PRINT *, "Trailing blanks are ignored"                         0004
+      ELSE
+
+C  P(S,T) {"hello "==T, "hello"==S}
+
+!        TRUE 
+         PRINT *, "Trailing blanks are not ignored"                     0005
+      ENDIF
+
+C  P(S,T) {"hello "==T, "hello"==S}
+
+
+      S = "hello"                                                       0006
+
+C  P(S,T) {"hello "==T, "hello"==S}
+
+      T = " hello"                                                      0007
+
+C  P(S,T) {" hello"==T, "hello"==S}
+
+
+      IF (S.EQ.T) THEN                                                  0008
+
+C  P() {0==-1}
+
+!        FALSE
+         PRINT *, "Leading blanks are ignored"                          0009
+      ELSE
+
+C  P(S,T) {" hello"==T, "hello"==S, T<=S}
+
+!        TRUE 
+         PRINT *, "Leading blanks are not ignored"                      0010
+      ENDIF
+
+C  P(S,T) {" hello"==T, "hello"==S, T<=S}
+
+
+      S = "hello"                                                       0011
+
+C  P(S,T) {" hello"==T, "hello"==S, T<=S}
+
+      T = "hello "                                                      0012
+
+C  P(S,T) {"hello "==T, "hello"==S, " hello"<=S}
+
+      U = "world"                                                       0013
+
+C  P(S,T,U) {"hello "==T, "hello"==S, "world"==U, " hello"<=S}
+
+      V = S//U                                                          0014
+
+C  P(S,T,U,V) {"hello "==T, "hello"==S, "world"==U, " hello"<=S}
+
+      W = T//U                                                          0015
+
+C  P(S,T,U,V,W) {"hello "==T, "hello"==S, "world"==U, " hello"<=S}
+
+
+      IF (V.EQ.W) THEN                                                  0016
+
+C  P(S,T,U,V,W) {"hello "==T, "hello"==S, "world"==U, V==W,
+C    " hello"<=S}
+
+!        FALSE
+         PRINT *, "Trailing blanks are ignored when concatenating"      0017
+      ELSE
+
+C  P(S,T,U,V,W) {"hello "==T, "hello"==S, "world"==U, " hello"<=S}
+
+!        TRUE because s and t are declared with the same length and hence padding
+         PRINT *,                                                       0018
+     &   "Trailing blanks are not ignored when concatenating"           0018
+      ENDIF
+
+C  P(S,T,U,V,W) {"hello "==T, "hello"==S, "world"==U, " hello"<=S}
+
+
+      PRINT *, S, T, U, V, W                                            0019
+
+      END
+      PROGRAM CHAINE05
+
+C     Fortran does not take trailing SPACEs into account when comparing
+C     strings because any string is assumed padded with SPACE up to its
+C     declared length
+
+      CHARACTER*10 S
+      CHARACTER*10 T
+      CHARACTER*10 U
+      CHARACTER*20 V
+      CHARACTER*20 W
+
+      S = "hello"                                                       0001
+      T = "hello "                                                      0002
+
+      IF (S.EQ.T) THEN                                                  0003
+!        FALSE
+         PRINT *, "Trailing blanks are ignored"                         0004
+      ELSE
+!        TRUE 
+         PRINT *, "Trailing blanks are not ignored"                     0005
+      ENDIF
+
+      S = "hello"                                                       0006
+      T = " hello"                                                      0007
+
+!        TRUE 
+      PRINT *, "Leading blanks are not ignored"                         0010
+
+      S = "hello"                                                       0011
+      T = "hello "                                                      0012
+      U = "world"                                                       0013
+      V = S//U                                                          0014
+      W = T//U                                                          0015
+
+      IF (V.EQ.W) THEN                                                  0016
+!        FALSE
+         PRINT *, "Trailing blanks are ignored when concatenating"      0017
+      ELSE
+!        TRUE because s and t are declared with the same length and hence padding
+         PRINT *,                                                       0018
+     &   "Trailing blanks are not ignored when concatenating"           0018
+      ENDIF
+
+      PRINT *, S, T, U, V, W                                            0019
+
+      END
+'optimized exec'
+ Trailing blanks are ignored
+ Leading blanks are not ignored
+ Trailing blanks are ignored when concatenating
+ hello     hello     world     hello     world     hello     world     
+

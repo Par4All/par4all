@@ -1,0 +1,85 @@
+
+C  T() {}
+
+      PROGRAM CHAINE04
+      CHARACTER*10 S
+      CHARACTER*3 T
+
+C  T(S) {'hello'==S}
+
+
+      S = 'hello'                                                       0001
+
+C  T() {}
+
+
+      IF (S.EQ.'hell') THEN                                             0002
+
+C  T() {}
+
+         PRINT *, 's == "hello"'                                        0003
+      ENDIF
+
+C  T() {}
+
+
+      PRINT *, S                                                        0004
+
+      END
+
+C  P() {}
+
+      PROGRAM CHAINE04
+      CHARACTER*10 S
+      CHARACTER*3 T
+
+C  P() {}
+
+
+      S = 'hello'                                                       0001
+
+C  P(S) {'hello'==S}
+
+
+      IF (S.EQ.'hell') THEN                                             0002
+
+C  P() {0==-1}
+
+         PRINT *, 's == "hello"'                                        0003
+      ENDIF
+
+C  P(S) {'hello'==S, 'hell'<=S}
+
+
+      PRINT *, S                                                        0004
+
+      END
+
+C  P() {}
+
+      PROGRAM CHAINE04
+      CHARACTER*10 S
+      CHARACTER*3 T
+
+C  P() {}
+
+
+      S = 'hello'                                                       0001
+
+C  P(S) {'hello'==S}
+
+
+      IF (S.EQ.'hell') THEN                                             0002
+
+C  P() {0==-1}
+
+         PRINT *, 's == "hello"'                                        0003
+      ENDIF
+
+C  P(S) {'hello'==S, 'hell'<=S}
+
+
+      PRINT *, S                                                        0004
+
+      END
+

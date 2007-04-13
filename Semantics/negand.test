@@ -1,0 +1,17 @@
+#!/bin/sh
+#
+# Script to test pips on the simple program
+#
+# Use of the rule transformers_inter_fast
+#
+if Pips -f $PIPS_ROOT/Validation/Semantics/negand.f -w negand -m negand \
+	-s pcinter -s tfinter -p prcp >&2
+then
+	exit_code=0
+	echo "--- Preconditions for module NEGAND"
+	Display -l prec
+else
+	exit_code=1
+fi
+Delete negand >&2
+exit $exit_code

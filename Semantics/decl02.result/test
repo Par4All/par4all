@@ -1,0 +1,85 @@
+
+C  T() {}
+
+      SUBROUTINE DECL02(X, Y, N, M)
+
+C     Check that declaration information is used in preconditions.
+C     If it is used, i == n+1 && n >= 1 before the print.
+C     If not, i >= 1 && i >=n+1.
+
+      REAL X(N, M), Y(M, N)
+
+C  T(I) {}
+
+
+      DO I = 1, N                                                       0001
+
+C  T() {1<=I, I<=M, I<=N}
+
+         X(I,I) = 0.                                                    0002
+      ENDDO
+
+C  T(I,J) {}
+
+
+      DO I = 1, N                                                       0003
+
+C  T(J) {}
+
+         DO J = 1, M                                                    0004
+
+C  T() {1<=I, I<=N, 1<=J, J<=M}
+
+            Y(J,I) = 1.                                                 0005
+         ENDDO
+      ENDDO
+
+C  T() {}
+
+
+      PRINT *, I, J                                                     0006
+
+      END
+
+C  P() {}
+
+      SUBROUTINE DECL02(X, Y, N, M)
+
+C     Check that declaration information is used in preconditions.
+C     If it is used, i == n+1 && n >= 1 before the print.
+C     If not, i >= 1 && i >=n+1.
+
+      REAL X(N, M), Y(M, N)
+
+C  P() {1<=M, 1<=N}
+
+
+      DO I = 1, N                                                       0001
+
+C  P(I) {1<=I, I<=M, I<=N, 1<=M, 1<=N}
+
+         X(I,I) = 0.                                                    0002
+      ENDDO
+
+C  P(I) {I==N+1, 2<=I, I<=M+1, 1<=M}
+
+
+      DO I = 1, N                                                       0003
+
+C  P(I,J) {1<=I, I<=N, 1<=M, N<=M, 1<=N}
+
+         DO J = 1, M                                                    0004
+
+C  P(I,J) {1<=I, I<=N, 1<=J, J<=M, 1<=M, N<=M, 1<=N}
+
+            Y(J,I) = 1.                                                 0005
+         ENDDO
+      ENDDO
+
+C  P(I,J) {I==N+1, J==M+1, 2<=I, I<=J, 2<=J}
+
+
+      PRINT *, I, J                                                     0006
+
+      END
+

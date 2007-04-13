@@ -1,0 +1,42 @@
+
+C  T() {1<=M, N<=M, 1<=N}
+
+      SUBROUTINE DECL03(X, Y, N, M)
+
+C     Check that continuation condition is present in subroutine
+C     transformer
+
+      REAL X(N, M), Y(M, N)
+
+C  T(I) {1<=M, 1<=N}
+
+
+      DO I = 1, N                                                       0001
+
+C  T() {1<=I, I<=M, I<=N, 1<=M, 1<=N}
+
+         X(I,I) = 0.                                                    0002
+      ENDDO
+
+C  T(I,J) {1<=M, N<=M, 1<=N}
+
+
+      DO I = 1, N                                                       0003
+
+C  T(J) {1<=I, I<=N, 1<=M, N<=M, 1<=N}
+
+         DO J = 1, M                                                    0004
+
+C  T() {1<=I, I<=N, 1<=J, J<=M, 1<=M, N<=M, 1<=N}
+
+            Y(J,I) = 1.                                                 0005
+         ENDDO
+      ENDDO
+
+C  T() {I==N+1, J==M+1, 2<=I, I<=J, 2<=J}
+
+
+      PRINT *, I, J                                                     0006
+
+      END
+

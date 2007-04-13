@@ -1,0 +1,77 @@
+
+C  T() {}
+
+      PROGRAM TYPE09
+
+C  T(R) {}
+
+
+C     Check float behavior after extensions to non-integer types
+
+      READ *, R                                                         0001
+
+C  T() {}
+
+
+      IF (R.GT.0.0.AND.R.LT.1.0) THEN                                   0002
+
+C  T() {}
+
+         PRINT *, R                                                     0003
+
+C  T() {}
+
+         PRINT *, R                                                     0004
+c      else
+c         print *, r
+c         print *, r
+      ENDIF
+
+c      if (r.gt.0.0.or.r.lt.1.0) then
+c         print *, r
+c         print *, r
+c      else
+c         print *, r
+c         print *, r
+c      endif
+
+      END
+
+C  P() {}
+
+      PROGRAM TYPE09
+
+C  P() {}
+
+
+C     Check float behavior after extensions to non-integer types
+
+      READ *, R                                                         0001
+
+C  P(R) {}
+
+
+      IF (R.GT.0.0.AND.R.LT.1.0) THEN                                   0002
+
+C  P(R) {0.0<=R, R<=1.0}
+
+         PRINT *, R                                                     0003
+
+C  P(R) {0.0<=R, R<=1.0}
+
+         PRINT *, R                                                     0004
+c      else
+c         print *, r
+c         print *, r
+      ENDIF
+
+c      if (r.gt.0.0.or.r.lt.1.0) then
+c         print *, r
+c         print *, r
+c      else
+c         print *, r
+c         print *, r
+c      endif
+
+      END
+

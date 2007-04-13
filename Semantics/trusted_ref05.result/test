@@ -1,0 +1,51 @@
+
+C  T() {M<=N, 1<=N}
+
+      SUBROUTINE TRUSTED_REF05(A, N, M)
+
+C     Check that initial condition are propagated upwards at loops
+
+      REAL A(N)
+
+C  T(I) {1<=I, M+1<=I, I<=N+1, 1<=N}
+
+C     BEGIN BLOCK
+
+C  T(I) {1<=I, 1<=N}
+
+
+      DO I = 1, M                                                       0001
+
+C  T() {1<=I, I<=M, I<=N, 1<=N}
+
+         A(I) = 0.                                                      0002
+      ENDDO
+
+C     END BLOCK
+      END
+
+C  P() {}
+
+      SUBROUTINE TRUSTED_REF05(A, N, M)
+
+C     Check that initial condition are propagated upwards at loops
+
+      REAL A(N)
+
+C  P() {1<=N}
+
+C     BEGIN BLOCK
+
+C  P() {1<=N}
+
+
+      DO I = 1, M                                                       0001
+
+C  P(I) {1<=I, I<=M, I<=N, 1<=N}
+
+         A(I) = 0.                                                      0002
+      ENDDO
+
+C     END BLOCK
+      END
+

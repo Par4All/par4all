@@ -1,0 +1,38 @@
+
+C  T() {}
+
+      SUBROUTINE XDR_SEND(MSG, LEN)
+      INTEGER MSG(LEN)
+      INTEGER BUFFER_SIZE
+      PARAMETER (BUFFER_SIZE=1024)
+      INTEGER BUFFER(BUFFER_SIZE)
+
+C  T() {}
+
+
+      CALL RESET(BUFFER)                                                0001
+
+C  T(I,J,K,MLEN) {}
+
+
+      DO I = 1, LEN, BUFFER_SIZE                                        0002
+
+C  T(MLEN) {I+1023<=MLEN, LEN<=MLEN}
+
+         MLEN = MAX(I+BUFFER_SIZE-1, LEN)                               0003
+
+C  T(J) {}
+
+         DO J = I, MLEN                                                 0004
+
+C  T() {}
+
+            BUFFER(J-I+1) = MSG(J)                                      0005
+         ENDDO
+
+C  T(K) {}
+
+         PRINT *, (BUFFER(K), K = 1, MLEN-I+1)                          0006
+      ENDDO
+
+      END

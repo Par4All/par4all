@@ -1,0 +1,127 @@
+
+C  T() {}
+
+      SUBROUTINE INDUC02(A, N)
+
+C     Example submitted by Nga. You want to prove that ij is greater
+C     than 1 in the second loop. a new property was added to semantics
+C     to recompute the loop fixpoints with precondition information.
+
+      REAL A(N)
+
+C  T(IJ,IX,IY) {1<=IX}
+
+
+      DO IX = 1, NX2                                                    0001
+
+C  T(IJ) {IJ==IX}
+
+         IJ = IX                                                        0002
+
+C  T(IJ,IY) {IJ#init<=IJ, 1<=IY}
+
+         DO IY = 1, NY2                                                 0003
+
+C  T(IJ) {IJ#init<=IJ, IJ#init+NX2<=IJ}
+
+            IF (NX2.GT.0) THEN                                          0004
+
+C  T() {}
+
+               A(IJ) = 0.                                               0005
+
+C  T(IJ) {IJ#init+NX2==IJ}
+
+               IJ = IJ+NX2                                              0006
+            ENDIF
+         ENDDO
+      ENDDO
+
+C  T(IJ,IX,IY) {1<=IX}
+
+
+      DO IX = 1, NX2                                                    0007
+
+C  T(IJ) {IJ==IX}
+
+         IJ = IX                                                        0008
+
+C  T(IJ,IY) {1<=IY}
+
+         DO IY = 1, NY2                                                 0009
+
+C  T() {}
+
+            A(IJ) = 0.                                                  0010
+
+C  T(IJ) {IJ#init+NX2==IJ}
+
+            IJ = IJ+NX2                                                 0011
+         ENDDO
+      ENDDO
+
+      END
+
+C  P() {}
+
+      SUBROUTINE INDUC02(A, N)
+
+C     Example submitted by Nga. You want to prove that ij is greater
+C     than 1 in the second loop. a new property was added to semantics
+C     to recompute the loop fixpoints with precondition information.
+
+      REAL A(N)
+
+C  P() {}
+
+
+      DO IX = 1, NX2                                                    0001
+
+C  P(IJ,IX,IY) {1<=IX, IX<=NX2}
+
+         IJ = IX                                                        0002
+
+C  P(IJ,IX,IY) {IJ==IX, 1<=IJ, IJ<=NX2}
+
+         DO IY = 1, NY2                                                 0003
+
+C  P(IJ,IX,IY) {IX+IY<=IJ+1, 1<=IX, IX<=NX2, 1<=IY, IY<=NY2}
+
+            IF (NX2.GT.0) THEN                                          0004
+
+C  P(IJ,IX,IY) {IX+IY<=IJ+1, 1<=IX, IX<=NX2, 1<=IY, IY<=NY2, 1<=NX2}
+
+               A(IJ) = 0.                                               0005
+
+C  P(IJ,IX,IY) {IX+IY<=IJ+1, 1<=IX, IX<=NX2, 1<=IY, IY<=NY2, 1<=NX2}
+
+               IJ = IJ+NX2                                              0006
+            ENDIF
+         ENDDO
+      ENDDO
+
+C  P(IJ,IX,IY) {1<=IX, NX2+1<=IX}
+
+
+      DO IX = 1, NX2                                                    0007
+
+C  P(IJ,IX,IY) {1<=IX, IX<=NX2}
+
+         IJ = IX                                                        0008
+
+C  P(IJ,IX,IY) {IJ==IX, 1<=IJ, IJ<=NX2}
+
+         DO IY = 1, NY2                                                 0009
+
+C  P(IJ,IX,IY) {IX+IY<=IJ+1, 1<=IX, IX<=NX2, 1<=IY, IY<=NY2}
+
+            A(IJ) = 0.                                                  0010
+
+C  P(IJ,IX,IY) {IX+IY<=IJ+1, 1<=IX, IX<=NX2, 1<=IY, IY<=NY2}
+
+            IJ = IJ+NX2                                                 0011
+         ENDDO
+      ENDDO
+
+      END
+

@@ -1,0 +1,19 @@
+
+C  T(S) {"Hello World!"==S}
+
+      SUBROUTINE TYPE23(S)
+
+C     Variable and constant lengths must be taken into account and
+C     substring applied... except when you cannot and have to assume
+C     it's right
+
+      CHARACTER*(*) S
+
+C  T(S) {"Hello World!"==S}
+
+
+C     Should not be truncated since the actual lenght of s is unknown
+      S = "Hello World!"                                                0001
+
+      END
+

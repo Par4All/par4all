@@ -1,0 +1,52 @@
+
+C  P() {}
+
+      PROGRAM IABS01
+
+C  P() {}
+
+
+      READ *, N                                                         0001
+
+C  P(N) {}
+
+
+      I = IABS(N)                                                       0002
+
+C  P(I,N) {0<=I+N, N<=I}
+
+
+      PRINT *, I                                                        0003
+
+C  P(I,N) {0<=I+N, N<=I}
+
+
+      READ *, J                                                         0004
+
+C  P(I,J,N) {0<=I+N, N<=I}
+
+
+      J = IABS(J)                                                       0005
+
+C  P(I,J,N) {0<=I+N, N<=I, 0<=J}
+
+
+      PRINT *, J                                                        0006
+
+C  P(I,J,N) {0<=I+N, N<=I, 0<=J}
+
+
+      READ *, X                                                         0007
+
+C  P(I,J,N) {0<=I+N, N<=I, 0<=J}
+
+
+      K = IABS(X)                                                       0008
+
+C  P(I,J,K,N) {0<=I+N, N<=I, 0<=J, 0<=K}
+
+
+      PRINT *, K                                                        0009
+
+      END
+

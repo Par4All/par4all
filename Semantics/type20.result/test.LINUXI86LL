@@ -1,0 +1,1316 @@
+'initial exec'
+ -hi -hi -
+ s1 == s2
+ s1 <= s2
+ s1 >= s2
+ -hi -hi -
+ s1 == s2
+ s1 <= s2
+ s1 >= s2
+ -bye-hi -
+ s1 != s2
+ s1 <  s2
+ s1 <= s2
+ -hi -bye-
+ s1 != s2
+ s1 >  s2
+ s1 >= s2
+ -hi -hi -
+ s1 == s2
+ s1 <= s2
+ s1 >= s2
+ -   -   -
+ s1 == s2
+ s1 <= s2
+ s1 >= s2
+ 18
+
+C  T() {}
+
+      PROGRAM TYPE20
+      CHARACTER*3 S1, S2
+      INTEGER I
+
+C  T(S1) {'hi '==S1}
+
+!
+      S1 = 'hi '                                                        0001
+
+C  T(S2) {'hi '==S2}
+
+      S2 = 'hi '                                                        0002
+
+C  T(I) {I==0}
+
+      I = 0                                                             0003
+
+C  T() {}
+
+      PRINT *, '-', S1, '-', S2, '-'                                    0004
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.EQ.S2) THEN                                                0005
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0006
+
+C  T() {}
+
+         PRINT *, 's1 == s2'                                            0007
+      ENDIF
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.NE.S2) THEN                                                0008
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0009
+
+C  T() {}
+
+         PRINT *, 's1 != s2'                                            0010
+      ENDIF
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.LT.S2) THEN                                                0011
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0012
+
+C  T() {}
+
+         PRINT *, 's1 <  s2'                                            0013
+      ENDIF
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.GT.S2) THEN                                                0014
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0015
+
+C  T() {}
+
+         PRINT *, 's1 >  s2'                                            0016
+      ENDIF
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.LE.S2) THEN                                                0017
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0018
+
+C  T() {}
+
+         PRINT *, 's1 <= s2'                                            0019
+      ENDIF
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.GE.S2) THEN                                                0020
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0021
+
+C  T() {}
+
+         PRINT *, 's1 >= s2'                                            0022
+      ENDIF
+
+C  T(S1) {'hi'==S1}
+
+!
+      S1 = 'hi'                                                         0023
+
+C  T(S2) {'hi '==S2}
+
+      S2 = 'hi '                                                        0024
+
+C  T() {}
+
+      PRINT *, '-', S1, '-', S2, '-'                                    0025
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.EQ.S2) THEN                                                0026
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0027
+
+C  T() {}
+
+         PRINT *, 's1 == s2'                                            0028
+      ENDIF
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.NE.S2) THEN                                                0029
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0030
+
+C  T() {}
+
+         PRINT *, 's1 != s2'                                            0031
+      ENDIF
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.LT.S2) THEN                                                0032
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0033
+
+C  T() {}
+
+         PRINT *, 's1 <  s2'                                            0034
+      ENDIF
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.GT.S2) THEN                                                0035
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0036
+
+C  T() {}
+
+         PRINT *, 's1 >  s2'                                            0037
+      ENDIF
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.LE.S2) THEN                                                0038
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0039
+
+C  T() {}
+
+         PRINT *, 's1 <= s2'                                            0040
+      ENDIF
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.GE.S2) THEN                                                0041
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0042
+
+C  T() {}
+
+         PRINT *, 's1 >= s2'                                            0043
+      ENDIF
+
+C  T(S1) {'bye'==S1}
+
+!
+      S1 = 'bye'                                                        0044
+
+C  T(S2) {'hi'==S2}
+
+      S2 = 'hi'                                                         0045
+
+C  T() {}
+
+      PRINT *, '-', S1, '-', S2, '-'                                    0046
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.EQ.S2) THEN                                                0047
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0048
+
+C  T() {}
+
+         PRINT *, 's1 == s2'                                            0049
+      ENDIF
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.NE.S2) THEN                                                0050
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0051
+
+C  T() {}
+
+         PRINT *, 's1 != s2'                                            0052
+      ENDIF
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.LT.S2) THEN                                                0053
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0054
+
+C  T() {}
+
+         PRINT *, 's1 <  s2'                                            0055
+      ENDIF
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.GT.S2) THEN                                                0056
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0057
+
+C  T() {}
+
+         PRINT *, 's1 >  s2'                                            0058
+      ENDIF
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.LE.S2) THEN                                                0059
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0060
+
+C  T() {}
+
+         PRINT *, 's1 <= s2'                                            0061
+      ENDIF
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.GE.S2) THEN                                                0062
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0063
+
+C  T() {}
+
+         PRINT *, 's1 >= s2'                                            0064
+      ENDIF
+
+C  T(S1) {'hi'==S1}
+
+!
+      S1 = 'hi'                                                         0065
+
+C  T(S2) {'bye'==S2}
+
+      S2 = 'bye'                                                        0066
+
+C  T() {}
+
+      PRINT *, '-', S1, '-', S2, '-'                                    0067
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.EQ.S2) THEN                                                0068
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0069
+
+C  T() {}
+
+         PRINT *, 's1 == s2'                                            0070
+      ENDIF
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.NE.S2) THEN                                                0071
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0072
+
+C  T() {}
+
+         PRINT *, 's1 != s2'                                            0073
+      ENDIF
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.LT.S2) THEN                                                0074
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0075
+
+C  T() {}
+
+         PRINT *, 's1 <  s2'                                            0076
+      ENDIF
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.GT.S2) THEN                                                0077
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0078
+
+C  T() {}
+
+         PRINT *, 's1 >  s2'                                            0079
+      ENDIF
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.LE.S2) THEN                                                0080
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0081
+
+C  T() {}
+
+         PRINT *, 's1 <= s2'                                            0082
+      ENDIF
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.GE.S2) THEN                                                0083
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0084
+
+C  T() {}
+
+         PRINT *, 's1 >= s2'                                            0085
+      ENDIF
+
+C  T(S1) {'hi '==S1}
+
+!
+      S1 = 'hi world'                                                   0086
+
+C  T(S2) {'hi'==S2}
+
+      S2 = 'hi'                                                         0087
+
+C  T() {}
+
+      PRINT *, '-', S1, '-', S2, '-'                                    0088
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.EQ.S2) THEN                                                0089
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0090
+
+C  T() {}
+
+         PRINT *, 's1 == s2'                                            0091
+      ENDIF
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.NE.S2) THEN                                                0092
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0093
+
+C  T() {}
+
+         PRINT *, 's1 != s2'                                            0094
+      ENDIF
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.LT.S2) THEN                                                0095
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0096
+
+C  T() {}
+
+         PRINT *, 's1 <  s2'                                            0097
+      ENDIF
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.GT.S2) THEN                                                0098
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0099
+
+C  T() {}
+
+         PRINT *, 's1 >  s2'                                            0100
+      ENDIF
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.LE.S2) THEN                                                0101
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0102
+
+C  T() {}
+
+         PRINT *, 's1 <= s2'                                            0103
+      ENDIF
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.GE.S2) THEN                                                0104
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0105
+
+C  T() {}
+
+         PRINT *, 's1 >= s2'                                            0106
+      ENDIF
+
+C  T(S1) {'   '==S1}
+
+!
+      S1 = '   '                                                        0107
+
+C  T(S2) {' '==S2}
+
+      S2 = ' '                                                          0108
+
+C  T() {}
+
+      PRINT *, '-', S1, '-', S2, '-'                                    0109
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.EQ.S2) THEN                                                0110
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0111
+
+C  T() {}
+
+         PRINT *, 's1 == s2'                                            0112
+      ENDIF
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.NE.S2) THEN                                                0113
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0114
+
+C  T() {}
+
+         PRINT *, 's1 != s2'                                            0115
+      ENDIF
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.LT.S2) THEN                                                0116
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0117
+
+C  T() {}
+
+         PRINT *, 's1 <  s2'                                            0118
+      ENDIF
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.GT.S2) THEN                                                0119
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0120
+
+C  T() {}
+
+         PRINT *, 's1 >  s2'                                            0121
+      ENDIF
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.LE.S2) THEN                                                0122
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0123
+
+C  T() {}
+
+         PRINT *, 's1 <= s2'                                            0124
+      ENDIF
+
+C  T(I) {I#init<=I, I<=I#init+1}
+
+      IF (S1.GE.S2) THEN                                                0125
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0126
+
+C  T() {}
+
+         PRINT *, 's1 >= s2'                                            0127
+      ENDIF
+
+C  T() {}
+
+
+      PRINT *, I                                                        0128
+      END
+
+C  P() {}
+
+      PROGRAM TYPE20
+      CHARACTER*3 S1, S2
+      INTEGER I
+
+C  P() {}
+
+!
+      S1 = 'hi '                                                        0001
+
+C  P(S1) {'hi '==S1}
+
+      S2 = 'hi '                                                        0002
+
+C  P(S1,S2) {'hi '==S1, S1==S2}
+
+      I = 0                                                             0003
+
+C  P(I,S1,S2) {'hi '==S1, I==0, S1==S2}
+
+      PRINT *, '-', S1, '-', S2, '-'                                    0004
+
+C  P(I,S1,S2) {'hi '==S1, I==0, S1==S2}
+
+      IF (S1.EQ.S2) THEN                                                0005
+
+C  P(I,S1,S2) {'hi '==S1, I==0, S1==S2}
+
+         I = I+1                                                        0006
+
+C  P(I,S1,S2) {'hi '==S1, I==1, S1==S2}
+
+         PRINT *, 's1 == s2'                                            0007
+      ENDIF
+
+C  P(I,S1,S2) {'hi '==S1, S1==S2, 0<=I, I<=1}
+
+      IF (S1.NE.S2) THEN                                                0008
+
+C  P(I,S1,S2) {'hi '==S1, S1==S2, 0<=I, I<=1}
+
+         I = I+1                                                        0009
+
+C  P(I,S1,S2) {'hi '==S1, S1==S2, 1<=I, I<=2}
+
+         PRINT *, 's1 != s2'                                            0010
+      ENDIF
+
+C  P(I,S1,S2) {'hi '==S1, S1==S2, 0<=I, I<=2}
+
+      IF (S1.LT.S2) THEN                                                0011
+
+C  P(I,S1,S2) {'hi '==S1, S1==S2, 0<=I, I<=2}
+
+         I = I+1                                                        0012
+
+C  P(I,S1,S2) {'hi '==S1, S1==S2, 1<=I, I<=3}
+
+         PRINT *, 's1 <  s2'                                            0013
+      ENDIF
+
+C  P(I,S1,S2) {'hi '==S1, S1==S2, 0<=I, I<=3}
+
+      IF (S1.GT.S2) THEN                                                0014
+
+C  P(I,S1,S2) {'hi '==S1, S1==S2, 0<=I, I<=3}
+
+         I = I+1                                                        0015
+
+C  P(I,S1,S2) {'hi '==S1, S1==S2, 1<=I, I<=4}
+
+         PRINT *, 's1 >  s2'                                            0016
+      ENDIF
+
+C  P(I,S1,S2) {'hi '==S1, S1==S2, 0<=I, I<=4}
+
+      IF (S1.LE.S2) THEN                                                0017
+
+C  P(I,S1,S2) {'hi '==S1, S1==S2, 0<=I, I<=4}
+
+         I = I+1                                                        0018
+
+C  P(I,S1,S2) {'hi '==S1, S1==S2, 1<=I, I<=5}
+
+         PRINT *, 's1 <= s2'                                            0019
+      ENDIF
+
+C  P(I,S1,S2) {'hi '==S1, S1==S2, 0<=I, I<=5}
+
+      IF (S1.GE.S2) THEN                                                0020
+
+C  P(I,S1,S2) {'hi '==S1, S1==S2, 0<=I, I<=5}
+
+         I = I+1                                                        0021
+
+C  P(I,S1,S2) {'hi '==S1, S1==S2, 1<=I, I<=6}
+
+         PRINT *, 's1 >= s2'                                            0022
+      ENDIF
+
+C  P(I,S1,S2) {'hi '==S1, S1==S2, 0<=I, I<=6}
+
+!
+      S1 = 'hi'                                                         0023
+
+C  P(I,S1,S2) {'hi '==S2, 'hi'==S1, 0<=I, I<=6}
+
+      S2 = 'hi '                                                        0024
+
+C  P(I,S1,S2) {'hi '==S2, 'hi'==S1, 0<=I, I<=6}
+
+      PRINT *, '-', S1, '-', S2, '-'                                    0025
+
+C  P(I,S1,S2) {'hi '==S2, 'hi'==S1, 0<=I, I<=6}
+
+      IF (S1.EQ.S2) THEN                                                0026
+
+C  P(I,S1,S2) {'hi '==S1, 'hi'==S1, S1==S2, 0<=I, I<=6}
+
+         I = I+1                                                        0027
+
+C  P(I,S1,S2) {'hi '==S1, 'hi'==S1, S1==S2, 1<=I, I<=7}
+
+         PRINT *, 's1 == s2'                                            0028
+      ENDIF
+
+C  P(I,S1,S2) {'hi '==S2, 'hi'==S1, 0<=I, I<=7}
+
+      IF (S1.NE.S2) THEN                                                0029
+
+C  P(I,S1,S2) {'hi '==S2, 'hi'==S1, 0<=I, I<=7}
+
+         I = I+1                                                        0030
+
+C  P(I,S1,S2) {'hi '==S2, 'hi'==S1, 1<=I, I<=8}
+
+         PRINT *, 's1 != s2'                                            0031
+      ENDIF
+
+C  P(I,S1,S2) {'hi '==S2, 'hi'==S1, 0<=I, I<=8}
+
+      IF (S1.LT.S2) THEN                                                0032
+
+C  P(I,S1,S2) {'hi '==S2, 'hi'==S1, 0<=I, I<=8, S1<=S2}
+
+         I = I+1                                                        0033
+
+C  P(I,S1,S2) {'hi '==S2, 'hi'==S1, 1<=I, I<=9, S1<=S2}
+
+         PRINT *, 's1 <  s2'                                            0034
+      ENDIF
+
+C  P(I,S1,S2) {'hi '==S2, 'hi'==S1, 0<=I, I<=9}
+
+      IF (S1.GT.S2) THEN                                                0035
+
+C  P(I,S1,S2) {'hi '==S2, 'hi'==S1, 0<=I, I<=9, S2<=S1}
+
+         I = I+1                                                        0036
+
+C  P(I,S1,S2) {'hi '==S2, 'hi'==S1, 1<=I, I<=10, S2<=S1}
+
+         PRINT *, 's1 >  s2'                                            0037
+      ENDIF
+
+C  P(I,S1,S2) {'hi '==S2, 'hi'==S1, 0<=I, I<=10}
+
+      IF (S1.LE.S2) THEN                                                0038
+
+C  P(I,S1,S2) {'hi '==S2, 'hi'==S1, 0<=I, I<=10, S1<=S2}
+
+         I = I+1                                                        0039
+
+C  P(I,S1,S2) {'hi '==S2, 'hi'==S1, 1<=I, I<=11, S1<=S2}
+
+         PRINT *, 's1 <= s2'                                            0040
+      ENDIF
+
+C  P(I,S1,S2) {'hi '==S2, 'hi'==S1, 0<=I, I<=11}
+
+      IF (S1.GE.S2) THEN                                                0041
+
+C  P(I,S1,S2) {'hi '==S2, 'hi'==S1, 0<=I, I<=11, S2<=S1}
+
+         I = I+1                                                        0042
+
+C  P(I,S1,S2) {'hi '==S2, 'hi'==S1, 1<=I, I<=12, S2<=S1}
+
+         PRINT *, 's1 >= s2'                                            0043
+      ENDIF
+
+C  P(I,S1,S2) {'hi '==S2, 'hi'==S1, 0<=I, I<=12}
+
+!
+      S1 = 'bye'                                                        0044
+
+C  P(I,S1,S2) {'bye'==S1, 'hi '==S2, 0<=I, I<=12}
+
+      S2 = 'hi'                                                         0045
+
+C  P(I,S1,S2) {'bye'==S1, 'hi'==S2, 0<=I, I<=12}
+
+      PRINT *, '-', S1, '-', S2, '-'                                    0046
+
+C  P(I,S1,S2) {'bye'==S1, 'hi'==S2, 0<=I, I<=12}
+
+      IF (S1.EQ.S2) THEN                                                0047
+
+C  P() {0==-1}
+
+         I = I+1                                                        0048
+
+C  P() {0==-1}
+
+         PRINT *, 's1 == s2'                                            0049
+      ENDIF
+
+C  P(I,S1,S2) {'bye'==S1, 'hi'==S2, 0<=I, I<=12, S1<=S2}
+
+      IF (S1.NE.S2) THEN                                                0050
+
+C  P(I,S1,S2) {'bye'==S1, 'hi'==S2, 0<=I, I<=12, S1<=S2}
+
+         I = I+1                                                        0051
+
+C  P(I,S1,S2) {'bye'==S1, 'hi'==S2, 1<=I, I<=13, S1<=S2}
+
+         PRINT *, 's1 != s2'                                            0052
+      ENDIF
+
+C  P(I,S1,S2) {'bye'==S1, 'hi'==S2, 1<=I, I<=13, S1<=S2}
+
+      IF (S1.LT.S2) THEN                                                0053
+
+C  P(I,S1,S2) {'bye'==S1, 'hi'==S2, 1<=I, I<=13, S1<=S2}
+
+         I = I+1                                                        0054
+
+C  P(I,S1,S2) {'bye'==S1, 'hi'==S2, 2<=I, I<=14, S1<=S2}
+
+         PRINT *, 's1 <  s2'                                            0055
+      ENDIF
+
+C  P(I,S1,S2) {'bye'==S1, 'hi'==S2, 2<=I, I<=14, S1<=S2}
+
+      IF (S1.GT.S2) THEN                                                0056
+
+C  P() {0==-1}
+
+         I = I+1                                                        0057
+
+C  P() {0==-1}
+
+         PRINT *, 's1 >  s2'                                            0058
+      ENDIF
+
+C  P(I,S1,S2) {'bye'==S1, 'hi'==S2, 2<=I, I<=14, S1<=S2}
+
+      IF (S1.LE.S2) THEN                                                0059
+
+C  P(I,S1,S2) {'bye'==S1, 'hi'==S2, 2<=I, I<=14, S1<=S2}
+
+         I = I+1                                                        0060
+
+C  P(I,S1,S2) {'bye'==S1, 'hi'==S2, 3<=I, I<=15, S1<=S2}
+
+         PRINT *, 's1 <= s2'                                            0061
+      ENDIF
+
+C  P(I,S1,S2) {'bye'==S1, 'hi'==S2, 3<=I, I<=15, S1<=S2}
+
+      IF (S1.GE.S2) THEN                                                0062
+
+C  P() {0==-1}
+
+         I = I+1                                                        0063
+
+C  P() {0==-1}
+
+         PRINT *, 's1 >= s2'                                            0064
+      ENDIF
+
+C  P(I,S1,S2) {'bye'==S1, 'hi'==S2, 3<=I, I<=15, S1<=S2}
+
+!
+      S1 = 'hi'                                                         0065
+
+C  P(I,S1,S2) {'hi'==S1, S1==S2, 'bye'<=S1, 3<=I, I<=15}
+
+      S2 = 'bye'                                                        0066
+
+C  P(I,S1,S2) {'bye'==S2, 'hi'==S1, 3<=I, I<=15, S2<=S1}
+
+      PRINT *, '-', S1, '-', S2, '-'                                    0067
+
+C  P(I,S1,S2) {'bye'==S2, 'hi'==S1, 3<=I, I<=15, S2<=S1}
+
+      IF (S1.EQ.S2) THEN                                                0068
+
+C  P() {0==-1}
+
+         I = I+1                                                        0069
+
+C  P() {0==-1}
+
+         PRINT *, 's1 == s2'                                            0070
+      ENDIF
+
+C  P(I,S1,S2) {'bye'==S2, 'hi'==S1, 3<=I, I<=15, S2<=S1}
+
+      IF (S1.NE.S2) THEN                                                0071
+
+C  P(I,S1,S2) {'bye'==S2, 'hi'==S1, 3<=I, I<=15, S2<=S1}
+
+         I = I+1                                                        0072
+
+C  P(I,S1,S2) {'bye'==S2, 'hi'==S1, 4<=I, I<=16, S2<=S1}
+
+         PRINT *, 's1 != s2'                                            0073
+      ENDIF
+
+C  P(I,S1,S2) {'bye'==S2, 'hi'==S1, 4<=I, I<=16, S2<=S1}
+
+      IF (S1.LT.S2) THEN                                                0074
+
+C  P() {0==-1}
+
+         I = I+1                                                        0075
+
+C  P() {0==-1}
+
+         PRINT *, 's1 <  s2'                                            0076
+      ENDIF
+
+C  P(I,S1,S2) {'bye'==S2, 'hi'==S1, 4<=I, I<=16, S2<=S1}
+
+      IF (S1.GT.S2) THEN                                                0077
+
+C  P(I,S1,S2) {'bye'==S2, 'hi'==S1, 4<=I, I<=16, S2<=S1}
+
+         I = I+1                                                        0078
+
+C  P(I,S1,S2) {'bye'==S2, 'hi'==S1, 5<=I, I<=17, S2<=S1}
+
+         PRINT *, 's1 >  s2'                                            0079
+      ENDIF
+
+C  P(I,S1,S2) {'bye'==S2, 'hi'==S1, 5<=I, I<=17, S2<=S1}
+
+      IF (S1.LE.S2) THEN                                                0080
+
+C  P() {0==-1}
+
+         I = I+1                                                        0081
+
+C  P() {0==-1}
+
+         PRINT *, 's1 <= s2'                                            0082
+      ENDIF
+
+C  P(I,S1,S2) {'bye'==S2, 'hi'==S1, 5<=I, I<=17, S2<=S1}
+
+      IF (S1.GE.S2) THEN                                                0083
+
+C  P(I,S1,S2) {'bye'==S2, 'hi'==S1, 5<=I, I<=17, S2<=S1}
+
+         I = I+1                                                        0084
+
+C  P(I,S1,S2) {'bye'==S2, 'hi'==S1, 6<=I, I<=18, S2<=S1}
+
+         PRINT *, 's1 >= s2'                                            0085
+      ENDIF
+
+C  P(I,S1,S2) {'bye'==S2, 'hi'==S1, 6<=I, I<=18, S2<=S1}
+
+!
+      S1 = 'hi world'                                                   0086
+
+C  P(I,S1,S2) {'bye'==S2, 'hi '==S1, S2<='hi', 6<=I, I<=18}
+
+      S2 = 'hi'                                                         0087
+
+C  P(I,S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2, 6<=I, I<=18}
+
+      PRINT *, '-', S1, '-', S2, '-'                                    0088
+
+C  P(I,S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2, 6<=I, I<=18}
+
+      IF (S1.EQ.S2) THEN                                                0089
+
+C  P(I,S1,S2) {'hi '==S1, 'hi'==S1, S1==S2, 'bye'<=S1, 6<=I, I<=18}
+
+         I = I+1                                                        0090
+
+C  P(I,S1,S2) {'hi '==S1, 'hi'==S1, S1==S2, 'bye'<=S1, 7<=I, I<=19}
+
+         PRINT *, 's1 == s2'                                            0091
+      ENDIF
+
+C  P(I,S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2, 6<=I, I<=19}
+
+      IF (S1.NE.S2) THEN                                                0092
+
+C  P(I,S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2, 6<=I, I<=19}
+
+         I = I+1                                                        0093
+
+C  P(I,S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2, 7<=I, I<=20}
+
+         PRINT *, 's1 != s2'                                            0094
+      ENDIF
+
+C  P(I,S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2, 6<=I, I<=20}
+
+      IF (S1.LT.S2) THEN                                                0095
+
+C  P(I,S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2, 6<=I, I<=20, S1<=S2}
+
+         I = I+1                                                        0096
+
+C  P(I,S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2, 7<=I, I<=21, S1<=S2}
+
+         PRINT *, 's1 <  s2'                                            0097
+      ENDIF
+
+C  P(I,S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2, 6<=I, I<=21}
+
+      IF (S1.GT.S2) THEN                                                0098
+
+C  P(I,S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2, 6<=I, I<=21, S2<=S1}
+
+         I = I+1                                                        0099
+
+C  P(I,S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2, 7<=I, I<=22, S2<=S1}
+
+         PRINT *, 's1 >  s2'                                            0100
+      ENDIF
+
+C  P(I,S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2, 6<=I, I<=22}
+
+      IF (S1.LE.S2) THEN                                                0101
+
+C  P(I,S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2, 6<=I, I<=22, S1<=S2}
+
+         I = I+1                                                        0102
+
+C  P(I,S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2, 7<=I, I<=23, S1<=S2}
+
+         PRINT *, 's1 <= s2'                                            0103
+      ENDIF
+
+C  P(I,S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2, 6<=I, I<=23}
+
+      IF (S1.GE.S2) THEN                                                0104
+
+C  P(I,S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2, 6<=I, I<=23, S2<=S1}
+
+         I = I+1                                                        0105
+
+C  P(I,S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2, 7<=I, I<=24, S2<=S1}
+
+         PRINT *, 's1 >= s2'                                            0106
+      ENDIF
+
+C  P(I,S1,S2) {'hi '==S1, 'hi'==S2, 'bye'<=S2, 6<=I, I<=24}
+
+!
+      S1 = '   '                                                        0107
+
+C  P(I,S1,S2) {'   '==S1, 'hi'==S2, 'bye'<=S2, 6<=I, I<=24}
+
+      S2 = ' '                                                          0108
+
+C  P(I,S1,S2) {'   '==S1, ' '==S2, 'bye'<='hi', 6<=I, I<=24}
+
+      PRINT *, '-', S1, '-', S2, '-'                                    0109
+
+C  P(I,S1,S2) {'   '==S1, ' '==S2, 'bye'<='hi', 6<=I, I<=24}
+
+      IF (S1.EQ.S2) THEN                                                0110
+
+C  P(I,S1,S2) {'   '==S1, ' '==S1, S1==S2, 'bye'<='hi', 6<=I, I<=24}
+
+         I = I+1                                                        0111
+
+C  P(I,S1,S2) {'   '==S1, ' '==S1, S1==S2, 'bye'<='hi', 7<=I, I<=25}
+
+         PRINT *, 's1 == s2'                                            0112
+      ENDIF
+
+C  P(I,S1,S2) {'   '==S1, ' '==S2, 'bye'<='hi', 6<=I, I<=25}
+
+      IF (S1.NE.S2) THEN                                                0113
+
+C  P(I,S1,S2) {'   '==S1, ' '==S2, 'bye'<='hi', 6<=I, I<=25}
+
+         I = I+1                                                        0114
+
+C  P(I,S1,S2) {'   '==S1, ' '==S2, 'bye'<='hi', 7<=I, I<=26}
+
+         PRINT *, 's1 != s2'                                            0115
+      ENDIF
+
+C  P(I,S1,S2) {'   '==S1, ' '==S2, 'bye'<='hi', 6<=I, I<=26}
+
+      IF (S1.LT.S2) THEN                                                0116
+
+C  P(I,S1,S2) {'   '==S1, ' '==S2, 'bye'<='hi', 6<=I, I<=26, S1<=S2}
+
+         I = I+1                                                        0117
+
+C  P(I,S1,S2) {'   '==S1, ' '==S2, 'bye'<='hi', 7<=I, I<=27, S1<=S2}
+
+         PRINT *, 's1 <  s2'                                            0118
+      ENDIF
+
+C  P(I,S1,S2) {'   '==S1, ' '==S2, 'bye'<='hi', 6<=I, I<=27}
+
+      IF (S1.GT.S2) THEN                                                0119
+
+C  P(I,S1,S2) {'   '==S1, ' '==S2, 'bye'<='hi', 6<=I, I<=27, S2<=S1}
+
+         I = I+1                                                        0120
+
+C  P(I,S1,S2) {'   '==S1, ' '==S2, 'bye'<='hi', 7<=I, I<=28, S2<=S1}
+
+         PRINT *, 's1 >  s2'                                            0121
+      ENDIF
+
+C  P(I,S1,S2) {'   '==S1, ' '==S2, 'bye'<='hi', 6<=I, I<=28}
+
+      IF (S1.LE.S2) THEN                                                0122
+
+C  P(I,S1,S2) {'   '==S1, ' '==S2, 'bye'<='hi', 6<=I, I<=28, S1<=S2}
+
+         I = I+1                                                        0123
+
+C  P(I,S1,S2) {'   '==S1, ' '==S2, 'bye'<='hi', 7<=I, I<=29, S1<=S2}
+
+         PRINT *, 's1 <= s2'                                            0124
+      ENDIF
+
+C  P(I,S1,S2) {'   '==S1, ' '==S2, 'bye'<='hi', 6<=I, I<=29}
+
+      IF (S1.GE.S2) THEN                                                0125
+
+C  P(I,S1,S2) {'   '==S1, ' '==S2, 'bye'<='hi', 6<=I, I<=29, S2<=S1}
+
+         I = I+1                                                        0126
+
+C  P(I,S1,S2) {'   '==S1, ' '==S2, 'bye'<='hi', 7<=I, I<=30, S2<=S1}
+
+         PRINT *, 's1 >= s2'                                            0127
+      ENDIF
+
+C  P(I,S1,S2) {'   '==S1, ' '==S2, 'bye'<='hi', 6<=I, I<=30}
+
+
+      PRINT *, I                                                        0128
+      END
+      PROGRAM TYPE20
+      CHARACTER*3 S1, S2
+      INTEGER I
+!
+      S1 = 'hi '                                                        0001
+      S2 = 'hi '                                                        0002
+      I = 0                                                             0003
+      PRINT *, '-', S1, '-', S2, '-'                                    0004
+      IF (S1.EQ.S2) THEN                                                0005
+         I = I+1                                                        0006
+         PRINT *, 's1 == s2'                                            0007
+      ENDIF
+      IF (S1.NE.S2) THEN                                                0008
+         I = I+1                                                        0009
+         PRINT *, 's1 != s2'                                            0010
+      ENDIF
+      IF (S1.LT.S2) THEN                                                0011
+         I = I+1                                                        0012
+         PRINT *, 's1 <  s2'                                            0013
+      ENDIF
+      IF (S1.GT.S2) THEN                                                0014
+         I = I+1                                                        0015
+         PRINT *, 's1 >  s2'                                            0016
+      ENDIF
+      IF (S1.LE.S2) THEN                                                0017
+         I = I+1                                                        0018
+         PRINT *, 's1 <= s2'                                            0019
+      ENDIF
+      IF (S1.GE.S2) THEN                                                0020
+         I = I+1                                                        0021
+         PRINT *, 's1 >= s2'                                            0022
+      ENDIF
+!
+      S1 = 'hi'                                                         0023
+      S2 = 'hi '                                                        0024
+      PRINT *, '-', S1, '-', S2, '-'                                    0025
+      IF (S1.EQ.S2) THEN                                                0026
+         I = I+1                                                        0027
+         PRINT *, 's1 == s2'                                            0028
+      ENDIF
+      IF (S1.NE.S2) THEN                                                0029
+         I = I+1                                                        0030
+         PRINT *, 's1 != s2'                                            0031
+      ENDIF
+      IF (S1.LT.S2) THEN                                                0032
+         I = I+1                                                        0033
+         PRINT *, 's1 <  s2'                                            0034
+      ENDIF
+      IF (S1.GT.S2) THEN                                                0035
+         I = I+1                                                        0036
+         PRINT *, 's1 >  s2'                                            0037
+      ENDIF
+      IF (S1.LE.S2) THEN                                                0038
+         I = I+1                                                        0039
+         PRINT *, 's1 <= s2'                                            0040
+      ENDIF
+      IF (S1.GE.S2) THEN                                                0041
+         I = I+1                                                        0042
+         PRINT *, 's1 >= s2'                                            0043
+      ENDIF
+!
+      S1 = 'bye'                                                        0044
+      S2 = 'hi'                                                         0045
+      PRINT *, '-', S1, '-', S2, '-'                                    0046
+      I = I+1                                                           0051
+      PRINT *, 's1 != s2'                                               0052
+      I = I+1                                                           0054
+      PRINT *, 's1 <  s2'                                               0055
+      I = I+1                                                           0060
+      PRINT *, 's1 <= s2'                                               0061
+!
+      S1 = 'hi'                                                         0065
+      S2 = 'bye'                                                        0066
+      PRINT *, '-', S1, '-', S2, '-'                                    0067
+      I = I+1                                                           0072
+      PRINT *, 's1 != s2'                                               0073
+      I = I+1                                                           0078
+      PRINT *, 's1 >  s2'                                               0079
+      I = I+1                                                           0084
+      PRINT *, 's1 >= s2'                                               0085
+!
+      S1 = 'hi world'                                                   0086
+      S2 = 'hi'                                                         0087
+      PRINT *, '-', S1, '-', S2, '-'                                    0088
+      IF (S1.EQ.S2) THEN                                                0089
+         I = I+1                                                        0090
+         PRINT *, 's1 == s2'                                            0091
+      ENDIF
+      IF (S1.NE.S2) THEN                                                0092
+         I = I+1                                                        0093
+         PRINT *, 's1 != s2'                                            0094
+      ENDIF
+      IF (S1.LT.S2) THEN                                                0095
+         I = I+1                                                        0096
+         PRINT *, 's1 <  s2'                                            0097
+      ENDIF
+      IF (S1.GT.S2) THEN                                                0098
+         I = I+1                                                        0099
+         PRINT *, 's1 >  s2'                                            0100
+      ENDIF
+      IF (S1.LE.S2) THEN                                                0101
+         I = I+1                                                        0102
+         PRINT *, 's1 <= s2'                                            0103
+      ENDIF
+      IF (S1.GE.S2) THEN                                                0104
+         I = I+1                                                        0105
+         PRINT *, 's1 >= s2'                                            0106
+      ENDIF
+!
+      S1 = '   '                                                        0107
+      S2 = ' '                                                          0108
+      PRINT *, '-', S1, '-', S2, '-'                                    0109
+      IF (S1.EQ.S2) THEN                                                0110
+         I = I+1                                                        0111
+         PRINT *, 's1 == s2'                                            0112
+      ENDIF
+      IF (S1.NE.S2) THEN                                                0113
+         I = I+1                                                        0114
+         PRINT *, 's1 != s2'                                            0115
+      ENDIF
+      IF (S1.LT.S2) THEN                                                0116
+         I = I+1                                                        0117
+         PRINT *, 's1 <  s2'                                            0118
+      ENDIF
+      IF (S1.GT.S2) THEN                                                0119
+         I = I+1                                                        0120
+         PRINT *, 's1 >  s2'                                            0121
+      ENDIF
+      IF (S1.LE.S2) THEN                                                0122
+         I = I+1                                                        0123
+         PRINT *, 's1 <= s2'                                            0124
+      ENDIF
+      IF (S1.GE.S2) THEN                                                0125
+         I = I+1                                                        0126
+         PRINT *, 's1 >= s2'                                            0127
+      ENDIF
+
+      PRINT *, I                                                        0128
+      END
+'optimized exec'
+ -hi -hi -
+ s1 == s2
+ s1 <= s2
+ s1 >= s2
+ -hi -hi -
+ s1 == s2
+ s1 <= s2
+ s1 >= s2
+ -bye-hi -
+ s1 != s2
+ s1 <  s2
+ s1 <= s2
+ -hi -bye-
+ s1 != s2
+ s1 >  s2
+ s1 >= s2
+ -hi -hi -
+ s1 == s2
+ s1 <= s2
+ s1 >= s2
+ -   -   -
+ s1 == s2
+ s1 <= s2
+ s1 >= s2
+ 18
+

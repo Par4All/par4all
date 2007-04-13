@@ -1,0 +1,42 @@
+--- Preconditions for LOOPEXIT3
+
+C  P() {}
+
+      PROGRAM LOOPEXIT3
+
+c     The postcondition of a non-executed loop should be its precondition 
+c     plus the index initialization
+
+      REAL T(10)
+
+C  P() {}
+
+
+      IF (N.LT.1) THEN                                                  0001
+
+C  P() {N<=0}
+
+
+         J = 0                                                          0002
+
+C  P(J) {J==0, N<=0}
+
+         DO I = 1, N                                                    0003
+
+C  P() {0==-1}
+
+            T(I) = 0.                                                   0004
+
+C  P() {0==-1}
+
+            J = J+2                                                     0005
+         ENDDO
+
+C  P(I,J) {I==1, J==0, N<=0}
+
+
+         PRINT *, I, J                                                  0006
+
+      ENDIF
+
+      END

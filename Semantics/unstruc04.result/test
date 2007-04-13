@@ -1,0 +1,175 @@
+      PROGRAM UNSTRUC04
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+
+C     Check that postconditions are properly propagated forward in
+C     unstructured with unreachable code and multiple joint
+
+      READ *, I                                                         0001
+C (0,3)
+C     BEGIN UNSTRUCTURED
+C (1,1)
+
+      IF (I.LE.5) GOTO 100                                              0002
+C (6,1)
+      J = 6                                                             0004
+      GOTO 200
+C (2,1)
+100   J = 7                                                             0007
+C (3,1)
+      IF (I.LE.2) GOTO 200                                              0008
+C (5,1)
+      I = 4                                                             0010
+C (4,1)
+200   CONTINUE                                                          0011
+C     END UNSTRUCTURED
+C (0,4)
+
+      PRINT *, I, J                                                     0012
+C (0,5)
+
+      RETURN
+C     END BLOCK
+      END
+
+C  T() {}
+
+      PROGRAM UNSTRUC04
+
+C  T(I,J) {6<=J, J<=7}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  T(I) {}
+
+C (0,2)
+
+C     Check that postconditions are properly propagated forward in
+C     unstructured with unreachable code and multiple joint
+
+      READ *, I                                                         0001
+
+C  T(I,J) {I#init+6<=I+J, I+6<=I#init+J, J<=7}
+
+C (0,3)
+C     BEGIN UNSTRUCTURED
+
+C  T() {}
+
+C (1,1)
+
+      IF (I.LE.5) GOTO 100                                              0002
+
+C  T(J) {J==6}
+
+C (6,1)
+      J = 6                                                             0004
+      GOTO 200
+
+C  T(J) {J==7}
+
+C (2,1)
+100   J = 7                                                             0007
+
+C  T() {}
+
+C (3,1)
+      IF (I.LE.2) GOTO 200                                              0008
+
+C  T(I) {I==4}
+
+C (5,1)
+      I = 4                                                             0010
+
+C  T() {}
+
+C (4,1)
+200   CONTINUE                                                          0011
+C     END UNSTRUCTURED
+
+C  T() {}
+
+C (0,4)
+
+      PRINT *, I, J                                                     0012
+
+C  T() {}
+
+C (0,5)
+
+      RETURN
+C     END BLOCK
+      END
+
+C  P() {}
+
+      PROGRAM UNSTRUC04
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+
+C     Check that postconditions are properly propagated forward in
+C     unstructured with unreachable code and multiple joint
+
+      READ *, I                                                         0001
+
+C  P(I) {}
+
+C (0,3)
+C     BEGIN UNSTRUCTURED
+
+C  P(I) {}
+
+C (1,1)
+
+      IF (I.LE.5) GOTO 100                                              0002
+
+C  P(I) {6<=I}
+
+C (6,1)
+      J = 6                                                             0004
+      GOTO 200
+
+C  P(I) {I<=5}
+
+C (2,1)
+100   J = 7                                                             0007
+
+C  P(I,J) {J==7, I<=5}
+
+C (3,1)
+      IF (I.LE.2) GOTO 200                                              0008
+
+C  P(I,J) {J==7, 3<=I, I<=5}
+
+C (5,1)
+      I = 4                                                             0010
+
+C  P(I,J) {6<=J, J<=7}
+
+C (4,1)
+200   CONTINUE                                                          0011
+C     END UNSTRUCTURED
+
+C  P(I,J) {6<=J, J<=7}
+
+C (0,4)
+
+      PRINT *, I, J                                                     0012
+
+C  P(I,J) {6<=J, J<=7}
+
+C (0,5)
+
+      RETURN
+C     END BLOCK
+      END
+
