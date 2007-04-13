@@ -56,6 +56,17 @@ done
 echo "### downloading pips"
 svn checkout $PIPS_SVN/bundles/trunks $prod || error "cannot checkout pips"
 
+valid=$destination/valid
+echo "### downloading validation"
+if svn checkout $PIPS_SVN/validation/trunk $valid
+then
+    # add the expected link...
+    ln -s $valid $prod/pips/Validation
+else
+    # just a warning...
+    warning "cannot checkout validation"
+fi
+
 # clean environment so as not to interfere with another installation
 PIPS_ARCH=`$prod/pips/makes/arch.sh`
 export PIPS_ARCH
