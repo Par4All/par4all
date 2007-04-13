@@ -1,0 +1,2 @@
+in order to use the validation, add a symbolic link from 
+the pips directory to this directory named "Validation".
