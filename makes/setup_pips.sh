@@ -122,7 +122,9 @@ make $target
 
 echo "### building pips"
 cd $prod/pips
-make $target
+# must find newgen executable...
+PATH=$prod/newgen/bin:$PATH \
+    make $target
 
 echo "### creating pipsrc.sh"
 cat <<EOF > $destination/pipsrc.sh
@@ -142,12 +144,14 @@ export NEWGEN_ROOT=$prod/newgen
 export LINEAR_ROOT=$prod/linear
 export PIPS_ROOT=$prod/pips
 
-# path
-PATH=\$PIPS_ROOT/bin:\$PIPS_ROOT/utils:\$PATH
+# fix path
+PATH=\$PIPS_ROOT/bin:\$PIPS_ROOT/utils:\$NEWGEN_ROOT/bin:\$PATH
 EOF
 
 echo "### generating csh environment"
-$prod/pips/src/Scripts/env/sh2csh.pl < $destination/pipsrc.sh > $destination/pipsrc.csh
+$prod/pips/src/Scripts/env/sh2csh.pl \
+    < $destination/pipsrc.sh \
+    > $destination/pipsrc.csh
 
 echo "### checking useful softwares"
 for exe in bash m4 wish latex htlatex javac emacs
