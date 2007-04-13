@@ -1,0 +1,47 @@
+#!/bin/sh
+
+# Please, detect hexadecimal constants at parsing
+
+tpips=${tpips_version:-tpips}
+PIPS_VALIDDIR=${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}
+
+# Initialization:
+# rm -f cachanbug4.result/test
+# tpips >cachanbug4.result/test <<EOF
+
+#
+# Conflict name between common, subroutine and program
+#
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+
+delete cachanbug4
+create cachanbug4 ${PIPS_ROOT}/Validation/Syntax/cachanbug4.f
+
+echo
+echo First try: The initial bug by Nicki Williams-Preston
+echo
+
+module CACHANBUG4
+display PRINTED_FILE(CACHANBUG4)
+
+echo
+echo Second try: A modified version of the initial bug
+echo
+
+module CACHANBUG4B
+display PRINTED_FILE(CACHANBUG4B)
+
+echo
+echo Third try: a correct version with integer parameters
+echo
+
+module CACHANBUG4C
+display PRINTED_FILE(CACHANBUG4C)
+
+close
+delete cachanbug4
+quit
+
+EOF
+

@@ -1,0 +1,87 @@
+user warning in tp_parse: equiv09: No such workspace
+  Module         EQUIV09
+Workspace equiv09 created and opened.
+Module EQUIV09 selected
+Main module PROGRAM "EQUIV09" selected.
+Module EQUIV09 already active.
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+Module EQUIV09 already active.
+Request: build resource PRINTED_FILE for module EQUIV09.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(EQUIV09)
+  PARSER                         building   PARSED_CODE(EQUIV09)
+                                 building   CALLEES(EQUIV09)
+
+Declarations for module EQUIV09 with type  () ->  void
+
+
+Variable list:
+
+
+Declared entity EQUIV09:*DYNAMIC*	with type area with size 812
+Declared entity EQUIV09:*HEAP*	with type area with size 0
+Declared entity EQUIV09:*STACK*	with type area with size 0
+Declared entity EQUIV09:*STATIC*	with type area with size 0
+Declared entity EQUIV09:I	with type variable INTEGER*4
+Declared entity EQUIV09:J	with type variable INTEGER*4
+Declared entity EQUIV09:U	with type variable REAL*4
+Declared entity EQUIV09:V	with type variable REAL*4
+Declared entity EQUIV09:X	with type variable REAL*4
+Declared entity EQUIV09:Y	with type variable REAL*4
+Declared entity EQUIV09:Z	with type variable REAL*4
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 812:
+	Variable EQUIV09:Z,	offset = 0,	size = 4
+	Variable EQUIV09:V,	offset = 4,	size = 4
+	Variable EQUIV09:J,	offset = 404,	size = 4
+	Variable EQUIV09:I,	offset = 408,	size = 4
+	Variable EQUIV09:Y,	offset = 412,	size = 400
+	Variable EQUIV09:X,	offset = 0,	size = 4
+	Variable EQUIV09:U,	offset = 4,	size = 400
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module EQUIV09
+
+  CONTROLIZER                    building   CODE(EQUIV09)
+  PRINT_CODE                     building   PRINTED_FILE(EQUIV09)
+PRINTED_FILE made for EQUIV09.
+      PROGRAM EQUIV09
+
+C     Check that addresses for dynamic variables, implicitly or 
+C     explicitly declared are correct
+
+      REAL Y(100)
+      EQUIVALENCE (X, Z), (U, V)
+      REAL U(100)
+
+      DO I = 2, 10                                                      0001
+         Y(I) = 0.                                                      0002
+      ENDDO
+
+      PRINT *, I, J                                                     0003
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module EQUIV09.
+Closing program.
+Closing workspace.
+Workspace equiv09 closed.
+
+Workspace equiv09 deleted.

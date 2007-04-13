@@ -1,0 +1,60 @@
+user warning in tp_parse: linear: No such workspace
+  Module         RELAX
+  Module         PRMAT
+  Module         MEAN2
+  Module         MEAN1
+  Module         MATMUL
+  Module         LINEAR
+  Module         INIT
+Workspace linear created and opened.
+Main module PROGRAM "LINEAR" selected.
+Module LINEAR selected
+Request: build resource CODE for module RELAX.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(RELAX)
+  PARSER                         building   PARSED_CODE(RELAX)
+                                 building   CALLEES(RELAX)
+user warning in SafeLocalToGlobal: Variable RELAX:F is a formal functional parameter.
+They are not (yet) supported by PIPS.
+user warning in MakeExternalFunction: unsupported formal function RELAX:F
+  CONTROLIZER                    building   CODE(RELAX)
+CODE made for RELAX.
+Module RELAX selected
+Request: build resource PRINTED_FILE for module RELAX.
+  PRINT_CODE                     building   PRINTED_FILE(RELAX)
+PRINTED_FILE made for RELAX.
+
+c------------------------------------------------------------------------------
+      SUBROUTINE RELAX(MAT, D1, D2, N, F)
+c
+      REAL*8 MAT(D1, D2)
+      REAL*8 F
+      INTEGER D1, D2
+c
+      IF (N.LE.0) STOP 'nombre d iterations incorrect'                  0001
+c
+      DO ITER = 1, N                                                    0003
+         DO I = 2, D1-1                                                 0004
+            DO J = 2, D2-1                                              0005
+               Q = (MAT(I-1,J)+MAT(I+1,J)+MAT(I,J-1)+MAT(I,J+1))/4.0    0006
+               MAT(I,J) = F(MAT(I,J), Q)                                0007
+            ENDDO
+         ENDDO
+      ENDDO
+c
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module INIT.
+  Closing module LINEAR.
+  Closing module MATMUL.
+  Closing module MEAN1.
+  Closing module MEAN2.
+  Closing module PRMAT.
+  Closing module RELAX.
+Closing program.
+Closing workspace.
+Workspace linear closed.
+
+Workspace linear deleted.

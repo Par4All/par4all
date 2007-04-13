@@ -1,0 +1,29 @@
+user warning in tp_parse: param01: No such workspace
+  Module         PARAM01
+Workspace param01 created and opened.
+Module PARAM01 selected
+Main module PROGRAM "PARAM01" selected.
+Module PARAM01 already active.
+Module PARAM01 already active.
+Module PARAM01 already active.
+Request: build resource PRINTED_FILE for module PARAM01.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(PARAM01)
+  PARSER                         building   PARSED_CODE(PARAM01)
+                                 building   CALLEES(PARAM01)
+user warning in MakeParameter: Variable NUMTST redefined as parameter
+user error in MakeParameter: Parser error between lines 7 and 7
+A variable cannot be redefined as a parameter
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module PARAM01.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module PARAM01.
+Closing program.
+Closing workspace.
+Workspace param01 closed.
+
+Workspace param01 deleted.

@@ -1,0 +1,6 @@
+delete inc
+create inc ${PIPS_ROOT}/Validation/Syntax/include.f
+display PRINTED_FILE($ALL)
+close
+delete inc
+quit

@@ -1,0 +1,13 @@
+#!/bin/sh
+
+if Pips -f $PIPS_ROOT/Validation/Syntax/formel.f -w formel -m foo -b CODE >&2
+then
+	echo Parser failed to fail for formal functional parameter X in formel.f
+	Delete formel 2>/dev/null
+	exit 1
+else
+	echo Parser failed for formal functional parameter X in formel.f
+	Display -v -m foo -w formel code 2>&1 | grep "^user [ew]"
+	Delete formel 2>/dev/null
+
+fi

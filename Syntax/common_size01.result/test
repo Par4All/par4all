@@ -1,0 +1,68 @@
+user warning in tp_parse: common_size01: No such workspace
+  Module         REORDER
+  Module         COMMON_SIZE01
+Workspace common_size01 created and opened.
+Main module PROGRAM "COMMON_SIZE01" selected.
+Module COMMON_SIZE01 selected
+Module REORDER selected
+Request: build resource PRINTED_FILE for module REORDER.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(REORDER)
+  PARSER                         building   PARSED_CODE(REORDER)
+                                 building   CALLEES(REORDER)
+  CONTROLIZER                    building   CODE(REORDER)
+  PRINT_CODE                     building   PRINTED_FILE(REORDER)
+PRINTED_FILE made for REORDER.
+
+      SUBROUTINE REORDER
+
+C     Common declared after its members are typed
+      CHARACTER*80 MOT
+      DIMENSION X(10)
+c      common /size_ok/mot, x, i
+      COMMON /SIZE_OK/MOT
+
+C     Varying size common
+      COMMON /SIZE_NOT_OK/ T(20)
+
+      PRINT *, I                                                        0001
+
+      END
+Module COMMON_SIZE01 already active.
+Request: build resource PRINTED_FILE for module COMMON_SIZE01.
+  FILTER_FILE                    building   SOURCE_FILE(COMMON_SIZE01)
+  PARSER                         building   PARSED_CODE(COMMON_SIZE01)
+                                 building   CALLEES(COMMON_SIZE01)
+user warning in update_common_sizes: inconsistent size (80 and 40) for common /SIZE_NOT_OK/ in COMMON_SIZE01
+Best results are obtained if all instances of a COMMON are declared the same way.
+  CONTROLIZER                    building   CODE(COMMON_SIZE01)
+  PRINT_CODE                     building   PRINTED_FILE(COMMON_SIZE01)
+PRINTED_FILE made for COMMON_SIZE01.
+      PROGRAM COMMON_SIZE01
+
+C     Check that common instances with different sizes are detected
+C     and that common instances occuring before typing information
+C     is available do not generate a warning
+
+C     Common declared before its members are typed
+c      common /size_ok/mot, x, i
+      COMMON /SIZE_OK/MOT
+      CHARACTER*80 MOT
+      DIMENSION X(10)
+
+C     Varying size common
+      COMMON /SIZE_NOT_OK/ T(10)
+
+      CALL REORDER                                                      0001
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module COMMON_SIZE01.
+  Closing module REORDER.
+Closing program.
+Closing workspace.
+Workspace common_size01 closed.
+
+Workspace common_size01 deleted.

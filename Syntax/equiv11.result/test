@@ -1,0 +1,30 @@
+user warning in tp_parse: equiv11: No such workspace
+  Module         EQUIV11
+Workspace equiv11 created and opened.
+Module EQUIV11 selected
+Main module PROGRAM "EQUIV11" selected.
+Module EQUIV11 already active.
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+Module EQUIV11 already active.
+Request: build resource PRINTED_FILE for module EQUIV11.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(EQUIV11)
+  PARSER                         building   PARSED_CODE(EQUIV11)
+                                 building   CALLEES(EQUIV11)
+user warning in remove_ghost_variable_entities: Entity "EQUIV11:V" does not really exist but appears in an equivalence chain!
+user error in remove_ghost_variable_entities: Parser error between lines 16 and 16
+Cannot remove still accessible ghost variable
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module EQUIV11.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module EQUIV11.
+Closing program.
+Closing workspace.
+Workspace equiv11 closed.
+
+Workspace equiv11 deleted.

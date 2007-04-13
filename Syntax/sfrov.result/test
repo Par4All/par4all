@@ -1,0 +1,70 @@
+user warning in tp_parse: sfrov: No such workspace
+  Module         SFROV
+Workspace sfrov created and opened.
+Module SFROV selected
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+Module SFROV already active.
+Request: build resource PRINTED_FILE for module SFROV.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(SFROV)
+  PARSER                         building   PARSED_CODE(SFROV)
+                                 building   CALLEES(SFROV)
+
+Declarations for module SFROV with type  () ->  void
+
+
+Variable list:
+
+
+Declared entity SFROV:*DYNAMIC*	with type area with size 4
+Declared entity SFROV:*HEAP*	with type area with size 0
+Declared entity SFROV:*STACK*	with type area with size 0
+Declared entity SFROV:*STATIC*	with type area with size 0
+Declared entity SFROV:IC	with type variable INTEGER*4
+Declared entity TOP-LEVEL:ABS	with type functional REAL*4 ->  REAL*4
+Declared entity TOP-LEVEL:EXP	with type functional OVERLOADED ->  OVERLOADED
+Declared entity TOP-LEVEL:FRO	with type functional INTEGER*4 x INTEGER*4 ->  REAL*4
+Declared entity TOP-LEVEL:FRO0	with type functional INTEGER*4 ->  REAL*4
+Declared entity TOP-LEVEL:SQRT	with type functional OVERLOADED ->  OVERLOADED
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 4:
+	Variable SFROV:IC,	offset = 0,	size = 4
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module SFROV
+
+  CONTROLIZER                    building   CODE(SFROV)
+  PRINT_CODE                     building   PRINTED_FILE(SFROV)
+PRINTED_FILE made for SFROV.
+      SUBROUTINE  SFROV
+
+      INTRINSIC ABS,EXP,SQRT
+
+C$PIPS STATEMENT FUNCTION FRO0 SUBSTITUTED
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module SFROV.
+Closing program.
+Closing workspace.
+Workspace sfrov closed.
+
+Workspace sfrov deleted.
+

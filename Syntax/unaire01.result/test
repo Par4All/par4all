@@ -1,0 +1,32 @@
+      PROGRAM UNAIRE01
+
+C     Priority for unary minus
+
+c     print *, -(1+1)
+      PRINT *, -(1+1)                                                   0001
+
+c     print *, -1
+      PRINT *, -1                                                       0002
+
+c     print *, (-1+1)
+      PRINT *, -1+1                                                     0003
+
+c     print *, -(x+y)
+      PRINT *, -(X+Y)                                                   0004
+
+c     print *, -1+1
+      PRINT *, -1+1                                                     0005
+
+c     print *, -1-1
+      PRINT *, -1-1                                                     0006
+
+c     print *, -1+(-1)
+      PRINT *, -1+(-1)                                                  0007
+
+c     print *, x.lt.-1
+      PRINT *, X.LT.-1                                                  0008
+
+c     print *, -1.lt.x
+      PRINT *, -1.LT.X                                                  0009
+
+      END

@@ -1,0 +1,17 @@
+#!/bin/sh
+
+tpips=${tpips_version:-tpips}
+
+Delete equiv06
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+
+# Redundant but compatible equivalence chain: OK
+
+create equiv06 ${PIPS_ROOT}/Validation/Syntax/equiv06.f
+display PRINTED_FILE
+close
+
+delete equiv06
+quit
+EOF

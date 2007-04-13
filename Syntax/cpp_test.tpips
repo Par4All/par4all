@@ -1,0 +1,8 @@
+delete cpp
+create cpp ${PIPS_ROOT}/Validation/Syntax/cpp_test.F
+display PRINTED_FILE(%ALL)
+close
+delete cpp
+quit
+
+

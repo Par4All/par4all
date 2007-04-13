@@ -1,0 +1,33 @@
+user warning in tp_parse: capture02: No such workspace
+  Module         CAPTURE02
+Workspace capture02 created and opened.
+Module CAPTURE02 selected
+Main module PROGRAM "CAPTURE02" selected.
+Module CAPTURE02 already active.
+Module CAPTURE02 already active.
+Module CAPTURE02 already active.
+Request: build resource PRINTED_FILE for module CAPTURE02.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(CAPTURE02)
+  PARSER                         building   PARSED_CODE(CAPTURE02)
+                                 building   CALLEES(CAPTURE02)
+user warning in CheckLeftHandSide: Name conflict between statement function REAL and intrinsics TOP-LEVEL:REAL
+  CONTROLIZER                    building   CODE(CAPTURE02)
+  PRINT_CODE                     building   PRINTED_FILE(CAPTURE02)
+PRINTED_FILE made for CAPTURE02.
+C     test de la (non) capture des intrinsics, e.g. REAL used as a 
+C     statement function.
+
+      PROGRAM CAPTURE02
+C$PIPS STATEMENT FUNCTION REAL SUBSTITUTED
+      IF (1.**2.LT.0.) PRINT *, 2**2                                    0001
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module CAPTURE02.
+Closing program.
+Closing workspace.
+Workspace capture02 closed.
+
+Workspace capture02 deleted.

@@ -1,0 +1,180 @@
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+  Module         RETYPE3
+  Module         RETYPE2
+  Module         RETYPE
+Workspace retype created and opened.
+Module RETYPE selected
+Request: build resource CALLGRAPH_FILE for module RETYPE.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(RETYPE)
+  PARSER                         building   PARSED_CODE(RETYPE)
+                                 building   CALLEES(RETYPE)
+
+Declarations for module RETYPE with type  () ->  void
+
+
+Variable list:
+
+
+Declared entity RETYPE:*DYNAMIC*	with type area with size 0
+Declared entity RETYPE:*HEAP*	with type area with size 0
+Declared entity RETYPE:*STACK*	with type area with size 0
+Declared entity RETYPE:*STATIC*	with type area with size 0
+Declared entity RETYPE:I	with type variable REAL*4
+Declared entity RETYPE:U	with type variable REAL*8
+Declared entity RETYPE:V	with type variable COMPLEX*16
+Declared entity RETYPE:X	with type variable INTEGER*4
+Declared entity RETYPE:Y	with type variable LOGICAL*4
+Declared entity RETYPE:Z	with type variable COMPLEX*8
+Declared entity TOP-LEVEL:RETYPE2	with type functional  () ->  void
+Declared entity TOP-LEVEL:RETYPE3	with type functional  () ->  void
+Declared entity TOP-LEVEL:~FOO	with type area with size 44
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /FOO/ of size 44:
+	Variable RETYPE:X,	offset = 0,	size = 4
+	Variable RETYPE:I,	offset = 4,	size = 4
+	Variable RETYPE:Y,	offset = 8,	size = 4
+	Variable RETYPE:Z,	offset = 12,	size = 8
+	Variable RETYPE:U,	offset = 20,	size = 8
+	Variable RETYPE:V,	offset = 28,	size = 16
+
+End of declarations for module RETYPE
+
+  CONTROLIZER                    building   CODE(RETYPE)
+  FILTER_FILE                    building   SOURCE_FILE(RETYPE3)
+  PARSER                         building   PARSED_CODE(RETYPE3)
+                                 building   CALLEES(RETYPE3)
+
+Declarations for module RETYPE3 with type  () ->  void
+
+
+Variable list:
+
+
+Declared entity RETYPE3:*DYNAMIC*	with type area with size 0
+Declared entity RETYPE3:*HEAP*	with type area with size 0
+Declared entity RETYPE3:*STACK*	with type area with size 0
+Declared entity RETYPE3:*STATIC*	with type area with size 0
+Declared entity RETYPE3:I	with type variable REAL*4
+Declared entity RETYPE3:U	with type variable REAL*8
+Declared entity RETYPE3:V	with type variable COMPLEX*16
+Declared entity RETYPE3:X	with type variable INTEGER*4
+Declared entity RETYPE3:Y	with type variable LOGICAL*4
+Declared entity RETYPE3:Z	with type variable COMPLEX*8
+Declared entity TOP-LEVEL:~FOO	with type area with size 44
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /FOO/ of size 44:
+	Variable RETYPE3:X,	offset = 0,	size = 4
+	Variable RETYPE3:I,	offset = 4,	size = 4
+	Variable RETYPE3:Y,	offset = 8,	size = 4
+	Variable RETYPE3:Z,	offset = 12,	size = 8
+	Variable RETYPE3:U,	offset = 20,	size = 8
+	Variable RETYPE3:V,	offset = 28,	size = 16
+
+End of declarations for module RETYPE3
+
+  CONTROLIZER                    building   CODE(RETYPE3)
+  PRINT_CALL_GRAPH               building   CALLGRAPH_FILE(RETYPE3)
+  FILTER_FILE                    building   SOURCE_FILE(RETYPE2)
+  PARSER                         building   PARSED_CODE(RETYPE2)
+                                 building   CALLEES(RETYPE2)
+
+Declarations for module RETYPE2 with type  () ->  void
+
+
+Variable list:
+
+
+Declared entity RETYPE2:*DYNAMIC*	with type area with size 0
+Declared entity RETYPE2:*HEAP*	with type area with size 0
+Declared entity RETYPE2:*STACK*	with type area with size 0
+Declared entity RETYPE2:*STATIC*	with type area with size 0
+Declared entity RETYPE2:I	with type variable REAL*4
+Declared entity RETYPE2:U	with type variable REAL*8
+Declared entity RETYPE2:V	with type variable COMPLEX*16
+Declared entity RETYPE2:X	with type variable INTEGER*4
+Declared entity RETYPE2:Y	with type variable LOGICAL*4
+Declared entity RETYPE2:Z	with type variable COMPLEX*8
+Declared entity TOP-LEVEL:~FOO	with type area with size 44
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /FOO/ of size 44:
+	Variable RETYPE2:X,	offset = 0,	size = 4
+	Variable RETYPE2:I,	offset = 4,	size = 4
+	Variable RETYPE2:Y,	offset = 8,	size = 4
+	Variable RETYPE2:Z,	offset = 12,	size = 8
+	Variable RETYPE2:U,	offset = 20,	size = 8
+	Variable RETYPE2:V,	offset = 28,	size = 16
+
+End of declarations for module RETYPE2
+
+  CONTROLIZER                    building   CODE(RETYPE2)
+  PRINT_CALL_GRAPH               building   CALLGRAPH_FILE(RETYPE2)
+  PRINT_CALL_GRAPH               building   CALLGRAPH_FILE(RETYPE)
+CALLGRAPH_FILE made for RETYPE.
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module RETYPE.
+  Closing module RETYPE2.
+  Closing module RETYPE3.
+Closing program.
+Closing workspace.
+Workspace retype closed.
+

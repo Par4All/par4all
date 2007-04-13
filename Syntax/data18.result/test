@@ -1,0 +1,18 @@
+
+C  P() {"3"==S, 2.==X, B==1, I==1}
+
+      PROGRAM DATA18
+
+C     Use non-integer variables in DATA
+
+      CHARACTER*10 S
+      LOGICAL B
+
+      DATA I, X, S, B /1, 2., "3", .TRUE./
+
+C  P() {"3"==S, 2.==X, B==1, I==1}
+
+
+      PRINT *, I, X, S, B                                               0001
+
+      END

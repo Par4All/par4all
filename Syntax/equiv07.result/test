@@ -1,0 +1,83 @@
+user warning in tp_parse: equiv07: No such workspace
+  Module         EQUIV07
+Workspace equiv07 created and opened.
+Module EQUIV07 selected
+Main module PROGRAM "EQUIV07" selected.
+Module EQUIV07 already active.
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+Module EQUIV07 already active.
+Request: build resource PRINTED_FILE for module EQUIV07.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(EQUIV07)
+  PARSER                         building   PARSED_CODE(EQUIV07)
+                                 building   CALLEES(EQUIV07)
+
+Declarations for module EQUIV07 with type  () ->  void
+
+
+Variable list:
+
+
+Declared entity EQUIV07:*DYNAMIC*	with type area with size 4
+Declared entity EQUIV07:*HEAP*	with type area with size 0
+Declared entity EQUIV07:*STACK*	with type area with size 0
+Declared entity EQUIV07:*STATIC*	with type area with size 0
+Declared entity EQUIV07:A	with type variable REAL*8
+Declared entity EQUIV07:I	with type variable INTEGER*4
+Declared entity EQUIV07:T	with type variable REAL*4
+Declared entity EQUIV07:U	with type variable REAL*4
+Declared entity TOP-LEVEL:~C_U	with type area with size 120
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 4:
+	Variable EQUIV07:I,	offset = 0,	size = 4
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /C_U/ of size 120:
+	Variable EQUIV07:A,	offset = 0,	size = 80
+	Variable EQUIV07:U,	offset = 80,	size = 40
+	Variable EQUIV07:T,	offset = 80,	size = 40
+
+End of declarations for module EQUIV07
+
+  CONTROLIZER                    building   CODE(EQUIV07)
+  PRINT_CODE                     building   PRINTED_FILE(EQUIV07)
+PRINTED_FILE made for EQUIV07.
+      PROGRAM EQUIV07
+
+C     Check that aliased variable T has proper offset
+
+      REAL T(10), U(10)
+      COMMON /C_U/A, U
+      EQUIVALENCE (T(1),U(1))
+      DOUBLE PRECISION A(10)
+
+      DO I = 2, 10                                                      0001
+         T(I) = U(I-1)                                                  0002
+      ENDDO
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module EQUIV07.
+Closing program.
+Closing workspace.
+Workspace equiv07 closed.
+
+Workspace equiv07 deleted.

@@ -1,0 +1,8 @@
+delete entry12
+create entry12 entry12.f
+echo some entries
+display PRINTED_FILE[FUN1 BLA2 FOO4]
+echo all modules
+display PRINTED_FILE[%ALL]
+close
+delete entry12

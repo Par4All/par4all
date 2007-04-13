@@ -1,0 +1,9 @@
+#
+# fun with hollerith;-)
+#
+create holle ${PIPS_ROOT}/Validation/Syntax/hollerith.f
+display PRINTED_FILE
+close
+delete holle
+quit
+# EOF

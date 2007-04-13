@@ -1,0 +1,27 @@
+  Module         EQUIV05
+Workspace equiv05 created and opened.
+Module EQUIV05 selected
+Main module PROGRAM "EQUIV05" selected.
+Module EQUIV05 already active.
+Module EQUIV05 already active.
+Request: build resource PRINTED_FILE for module EQUIV05.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(EQUIV05)
+  PARSER                         building   PARSED_CODE(EQUIV05)
+                                 building   CALLEES(EQUIV05)
+user warning in ComputeAddresses: Two conflicting offsets for A: 4 and 0
+user error in ComputeAddresses: Parser error between lines 9 and 9
+incompatible addresses
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module EQUIV05.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module EQUIV05.
+Closing program.
+Closing workspace.
+Workspace equiv05 closed.
+
+Workspace equiv05 deleted.

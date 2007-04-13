@@ -1,0 +1,28 @@
+! some header
+      PROGRAM INCLUDE
+
+! MIL-STD-1753 Fortran extension not in PIPS
+!       implicit none
+
+! include "include_inc.h"
+      PRINT *, 'included file'                                          0001
+! end include "include_inc.h"
+!       include 'include_inc.h'
+! include "include_inc.h"
+      PRINT *, 'included file'                                          0002
+! end include "include_inc.h"
+!       include "include_inc.h"
+
+      CALL SUB                                                          0003
+
+      END
+! some space
+      SUBROUTINE SUB
+! MIL-STD-1753 Fortran extension not in PIPS
+!       implicit none
+! include "include_inc.h"
+      PRINT *, 'included file'                                          0001
+! end include "include_inc.h"
+!       include 'include_inc.h'
+! include 'in a comment'
+      END

@@ -1,0 +1,10 @@
+#!/bin/sh
+if Pips -q -f $PIPS_ROOT/Validation/Syntax/prefix.f -w prefix -m prefix -b PRINTED_FILE 2>&1 \
+    | sed '/\//d'
+then
+	exit_code=0
+else
+	exit_code=1
+fi
+Delete prefix 2>/dev/null
+exit $exit_code

@@ -1,0 +1,10 @@
+delete save04
+create save04 ${PIPS_ROOT}/Validation/Syntax/save04.f
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+display PRINTED_FILE[SAVE04]
+
+close
+delete save04
+quit

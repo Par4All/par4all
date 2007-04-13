@@ -1,0 +1,39 @@
+user warning in tp_parse: cmplx01: No such workspace
+  Module         FOO
+  Module         CMPLX01
+Workspace cmplx01 created and opened.
+Main module PROGRAM "CMPLX01" selected.
+Module CMPLX01 selected
+Module CMPLX01 already active.
+Request: build resource PRINTED_FILE for module CMPLX01.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(CMPLX01)
+  PARSER                         building   PARSED_CODE(CMPLX01)
+                                 building   CALLEES(CMPLX01)
+user error in Syntax: Parser error between lines 13 and 13
+Illegal complex constant
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module CMPLX01.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Module FOO selected
+Request: build resource PRINTED_FILE for module FOO.
+  FILTER_FILE                    building   SOURCE_FILE(FOO)
+  PARSER                         building   PARSED_CODE(FOO)
+                                 building   CALLEES(FOO)
+user error in Syntax: Parser error between lines 9 and 9
+Illegal complex constant
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module FOO.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module CMPLX01.
+  Closing module FOO.
+Closing program.
+Closing workspace.
+Workspace cmplx01 closed.
+
+Workspace cmplx01 deleted.

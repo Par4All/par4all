@@ -1,0 +1,89 @@
+user warning in tp_parse: equiv14: No such workspace
+  Module         EQUIV14
+Workspace equiv14 created and opened.
+Module EQUIV14 selected
+Main module PROGRAM "EQUIV14" selected.
+Module EQUIV14 already active.
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+Module EQUIV14 already active.
+Request: build resource PRINTED_FILE for module EQUIV14.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(EQUIV14)
+  PARSER                         building   PARSED_CODE(EQUIV14)
+                                 building   CALLEES(EQUIV14)
+
+Declarations for module EQUIV14 with type  () ->  void
+
+
+Variable list:
+
+
+Declared entity EQUIV14:*DYNAMIC*	with type area with size 8
+Declared entity EQUIV14:*HEAP*	with type area with size 0
+Declared entity EQUIV14:*STACK*	with type area with size 0
+Declared entity EQUIV14:*STATIC*	with type area with size 0
+Declared entity EQUIV14:I	with type variable INTEGER*4
+Declared entity EQUIV14:J	with type variable INTEGER*4
+Declared entity EQUIV14:U	with type variable REAL*4
+Declared entity EQUIV14:X	with type variable REAL*4
+Declared entity EQUIV14:Y	with type variable REAL*4
+Declared entity EQUIV14:Z	with type variable REAL*4
+Declared entity TOP-LEVEL:~FOO	with type area with size 404
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 8:
+	Variable EQUIV14:J,	offset = 0,	size = 4
+	Variable EQUIV14:I,	offset = 4,	size = 4
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /FOO/ of size 404:
+	Variable EQUIV14:X,	offset = 0,	size = 400
+	Variable EQUIV14:U,	offset = 400,	size = 4
+	Variable EQUIV14:Z,	offset = 200,	size = 4
+	Variable EQUIV14:Y,	offset = 4,	size = 400
+
+End of declarations for module EQUIV14
+
+  CONTROLIZER                    building   CODE(EQUIV14)
+  PRINT_CODE                     building   PRINTED_FILE(EQUIV14)
+PRINTED_FILE made for EQUIV14.
+      PROGRAM EQUIV14
+
+C     Check offsets
+
+      REAL X(100), Y(100)
+      COMMON /FOO/X
+      EQUIVALENCE (X(2), Y), (Y(50), Z)
+      COMMON /FOO/U
+
+      DO I = 2, 10                                                      0001
+         Y(I) = 0.                                                      0002
+      ENDDO
+
+      PRINT *, I, J                                                     0003
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module EQUIV14.
+Closing program.
+Closing workspace.
+Workspace equiv14 closed.
+
+Workspace equiv14 deleted.

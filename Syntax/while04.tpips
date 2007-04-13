@@ -1,0 +1,6 @@
+delete while04
+create while04 ${PIPS_ROOT}/Validation/Syntax/while04.f
+display PRINTED_FILE
+close
+delete while04
+quit

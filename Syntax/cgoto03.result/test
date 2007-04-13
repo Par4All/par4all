@@ -1,0 +1,35 @@
+      PROGRAM CGOTO03
+
+C     Check handling of side effects
+
+      ICG0 = 1.                                                         0001
+
+      I = 4                                                             0002
+
+      ICG1 = INCR(I)
+      IF (ICG1.EQ.1) GOTO 100                                           0003
+      IF (ICG1.EQ.2) GOTO 200                                           0003
+      IF (ICG1.EQ.3) GOTO 300                                           0003
+      IF (ICG1.EQ.4) GOTO 400                                           0003
+      J = 1                                                             0004
+      GOTO 500
+400   CONTINUE                                                          0011
+      J = 5                                                             0012
+      GOTO 500
+300   CONTINUE                                                          0009
+      J = 4                                                             0010
+      GOTO 500
+200   CONTINUE                                                          0007
+      J = 3                                                             0008
+      GOTO 500
+100   CONTINUE                                                          0005
+      J = 2                                                             0006
+
+500   CONTINUE                                                          0013
+      PRINT *, I, J                                                     0014
+      END
+
+      INTEGER FUNCTION INCR(K)
+      K = K+1                                                           0001
+      INCR = K                                                          0002
+      END

@@ -1,0 +1,7 @@
+delete mini3
+create mini3 mini3.f
+display PRINTED_FILE[%ALL]
+close
+delete mini3
+quit
+

@@ -1,0 +1,3 @@
+      SUBROUTINE FOO
+      COMMON /TOTO/ X, Y
+      END

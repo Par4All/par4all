@@ -1,0 +1,27 @@
+      PROGRAM USE_DEF_ELIM_SEQ
+
+c     Goal: test the parser recovery capability in spite
+c     of the bug in flip-flop
+
+      PARAMETER (N=10)
+      PARAMETER (LX=32, MX=92, NX=42)
+
+      REAL A(N,N), B(N,N), C(N,N,2)
+
+      REAL D(LX, MX, NX)
+
+      READ *, A                                                         0001
+
+      CALL MATMUL(B, A, A, N, N, N)                                     0002
+
+      CALL SMATMUL(B, A, A, N, N, N)                                    0003
+
+      CALL TRANSPOSE(B, N)                                              0004
+
+      CALL FLIPFLOP(C, N, 0.25)                                         0005
+
+      CALL INIT                                                         0006
+      CALL TESTINIT                                                     0007
+      CALL DIGITALIZE(D, LX, MX, NX)                                    0008
+
+      END

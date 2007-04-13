@@ -1,0 +1,74 @@
+user warning in tp_parse: stack02: No such workspace
+  Module         STACK02
+Workspace stack02 created and opened.
+Module STACK02 selected
+Module STACK02 already active.
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+Module STACK02 already active.
+Request: build resource PRINTED_FILE for module STACK02.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(STACK02)
+  PARSER                         building   PARSED_CODE(STACK02)
+                                 building   CALLEES(STACK02)
+
+Declarations for module STACK02 with type REAL*4 x INTEGER*4 ->  void
+
+
+Variable list:
+
+
+Declared entity STACK02:*DYNAMIC*	with type area with size 40
+Declared entity STACK02:*HEAP*	with type area with size 0
+Declared entity STACK02:*STACK*	with type area with size 0
+Declared entity STACK02:*STATIC*	with type area with size 4
+Declared entity STACK02:A	with type variable REAL*4
+Declared entity STACK02:B	with type variable REAL*4
+Declared entity STACK02:C	with type variable REAL*4
+Declared entity STACK02:M	with type variable INTEGER*4
+Declared entity STACK02:N	with type variable INTEGER*4
+
+Layouts for formal parameters:
+
+	Variable STACK02:B,	offset = 1
+	Variable STACK02:N,	offset = 2
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 40:
+	Variable STACK02:C,	offset = 0,	size = 40
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	Variable STACK02:A,	offset = -1,	size = -1
+
+
+Layout for common /*STATIC*/ of size 4:
+	Variable STACK02:M,	offset = 0,	size = 4
+
+End of declarations for module STACK02
+
+  CONTROLIZER                    building   CODE(STACK02)
+  PRINT_CODE                     building   PRINTED_FILE(STACK02)
+PRINTED_FILE made for STACK02.
+      SUBROUTINE STACK02(B, N)
+      REAL A(N), B(N), C(10)
+      DATA M /1/
+
+      PRINT *, A                                                        0001
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module STACK02.
+Closing program.
+Closing workspace.
+Workspace stack02 closed.
+
+Workspace stack02 deleted.

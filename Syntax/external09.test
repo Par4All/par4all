@@ -1,0 +1,45 @@
+#!/bin/sh
+
+tpips=${tpips_version:-tpips}
+PIPS_VALIDDIR=${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+
+delete external09
+create external09 ${PIPS_ROOT}/Validation/Syntax/external09.f
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+setproperty PARSER_ACCEPT_ANSI_EXTENSIONS FALSE
+setproperty PARSER_TYPE_CHECK_CALL_SITES
+
+echo
+echo Main parsed first
+echo
+
+display PRINTED_FILE[EXTERNAL09]
+display PRINTED_FILE[F]
+display PRINTED_FILE[G]
+display PRINTED_FILE[H]
+
+close
+quit
+
+delete external09
+create external09 ${PIPS_ROOT}/Validation/Syntax/external09.f
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+setproperty PARSER_ACCEPT_ANSI_EXTENSIONS FALSE
+setproperty PARSER_TYPE_CHECK_CALL_SITES
+
+echo
+echo Main parsed last
+echo
+
+display PRINTED_FILE[H]
+display PRINTED_FILE[F]
+display PRINTED_FILE[G]
+display PRINTED_FILE[EXTERNAL09]
+
+close
+quit
+EOF

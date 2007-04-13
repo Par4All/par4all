@@ -1,0 +1,92 @@
+user warning in tp_parse: cachanbug4: No such workspace
+  Module         CACHANBUG4C
+  Module         CACHANBUG4B
+  Module         CACHANBUG4
+Workspace cachanbug4 created and opened.
+echo
+
+echo First try: The initial bug by Nicki Williams-Preston
+First try: The initial bug by Nicki Williams-Preston
+echo
+
+Module CACHANBUG4 selected
+Module CACHANBUG4 already active.
+Request: build resource PRINTED_FILE for module CACHANBUG4.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(CACHANBUG4)
+  PARSER                         building   PARSED_CODE(CACHANBUG4)
+                                 building   CALLEES(CACHANBUG4)
+user warning in gram: Symbolic constant expected: Z
+user warning in gram: Might be a non supported hexadecimal constant
+user error in gram: Parser error between lines 6 and 6
+Error in initializer
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module CACHANBUG4.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+echo
+
+echo Second try: A modified version of the initial bug
+Second try: A modified version of the initial bug
+echo
+
+Module CACHANBUG4B selected
+Module CACHANBUG4B already active.
+Request: build resource PRINTED_FILE for module CACHANBUG4B.
+  FILTER_FILE                    building   SOURCE_FILE(CACHANBUG4B)
+  PARSER                         building   PARSED_CODE(CACHANBUG4B)
+                                 building   CALLEES(CACHANBUG4B)
+user warning in syn_error: Syntax error - parse error, expecting `TK_SLASH' or `TK_COMMA' line 4 near "'7F7F'"
+user warning in syn_error: Non analyzed source text stored in logfile
+
+      end
+user error in syn_error: Parser error between lines 13 and 13
+Syntax error
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module CACHANBUG4B.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+echo
+
+echo Third try: a correct version with integer parameters
+Third try: a correct version with integer parameters
+echo
+
+Module CACHANBUG4C selected
+Module CACHANBUG4C already active.
+Request: build resource PRINTED_FILE for module CACHANBUG4C.
+  FILTER_FILE                    building   SOURCE_FILE(CACHANBUG4C)
+  PARSER                         building   PARSED_CODE(CACHANBUG4C)
+                                 building   CALLEES(CACHANBUG4C)
+  CONTROLIZER                    building   CODE(CACHANBUG4C)
+  PRINT_CODE                     building   PRINTED_FILE(CACHANBUG4C)
+PRINTED_FILE made for CACHANBUG4C.
+
+      SUBROUTINE CACHANBUG4C
+
+C     Bug 4 found by Nicky Williams-Preston: core dump on hexadecimal
+C     constants
+
+C     Check that PIPS is OK for the normal case: compute preconditions
+
+      PARAMETER (M=10)
+
+      INTEGER TAB(M)
+
+      DATA TAB,I/M*M,M/
+
+      J = M                                                             0001
+
+      PRINT *, I, J                                                     0002
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module CACHANBUG4.
+  Closing module CACHANBUG4B.
+  Closing module CACHANBUG4C.
+Closing program.
+Closing workspace.
+Workspace cachanbug4 closed.
+
+Workspace cachanbug4 deleted.

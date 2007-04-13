@@ -1,0 +1,30 @@
+user warning in tp_parse: equiv10: No such workspace
+  Module         EQUIV10
+Workspace equiv10 created and opened.
+Module EQUIV10 selected
+Main module PROGRAM "EQUIV10" selected.
+Module EQUIV10 already active.
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+Module EQUIV10 already active.
+Request: build resource PRINTED_FILE for module EQUIV10.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(EQUIV10)
+  PARSER                         building   PARSED_CODE(EQUIV10)
+                                 building   CALLEES(EQUIV10)
+user warning in MakeEquivAtom: A function call to U has been identified by the parser in an EQUIVALENCE statement. Maybe an array declaration should be moved up ahead of the EQUIVALENCE
+user error in MakeEquivAtom: Parser error between lines 6 and 6
+function call in equivalence chain
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module EQUIV10.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module EQUIV10.
+Closing program.
+Closing workspace.
+Workspace equiv10 closed.
+
+Workspace equiv10 deleted.

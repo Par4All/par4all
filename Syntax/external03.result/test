@@ -1,0 +1,9 @@
+      PROGRAM EXTERNAL03
+
+      EXTERNAL F
+
+      CALL G(F)                                                         0001
+
+      CALL F                                                            0002
+
+      END

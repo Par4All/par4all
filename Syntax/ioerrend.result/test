@@ -1,0 +1,39 @@
+user warning in tp_parse: ioerrend: No such workspace
+  Module         IOERREND
+Workspace ioerrend created and opened.
+Module IOERREND selected
+Main module PROGRAM "IOERREND" selected.
+Module IOERREND already active.
+Module IOERREND already active.
+Request: build resource PRINTED_FILE for module IOERREND.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(IOERREND)
+  PARSER                         building   PARSED_CODE(IOERREND)
+                                 building   CALLEES(IOERREND)
+  CONTROLIZER                    building   CODE(IOERREND)
+  PRINT_CODE                     building   PRINTED_FILE(IOERREND)
+PRINTED_FILE made for IOERREND.
+      PROGRAM IOERREND
+
+      READ (UNIT=*,FMT=100,ERR=1000,END=2000) I                         0001
+100   FORMAT(I5)                                                        0002
+
+      STOP                                                              0003
+
+1000  CONTINUE                                                          0004
+      PRINT *, 'end of file'                                            0005
+      STOP                                                              0006
+
+2000  CONTINUE                                                          0007
+      PRINT *, 'read error'                                             0008
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module IOERREND.
+Closing program.
+Closing workspace.
+Workspace ioerrend closed.
+
+Workspace ioerrend deleted.

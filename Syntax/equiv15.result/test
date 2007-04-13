@@ -1,0 +1,88 @@
+user warning in tp_parse: equiv15: No such workspace
+  Module         EQUIV15
+Workspace equiv15 created and opened.
+Module EQUIV15 selected
+Main module PROGRAM "EQUIV15" selected.
+Module EQUIV15 already active.
+Module EQUIV15 already active.
+echo
+
+echo Symbol table for module EQUIV15
+Symbol table for module EQUIV15
+echo
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+Request: build resource PARSED_CODE for module EQUIV15.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(EQUIV15)
+  PARSER                         building   PARSED_CODE(EQUIV15)
+                                 building   CALLEES(EQUIV15)
+
+Declarations for module EQUIV15 with type  () ->  void
+
+
+Variable list:
+
+
+Declared entity EQUIV15:*DYNAMIC*	with type area with size 132
+Declared entity EQUIV15:*HEAP*	with type area with size 0
+Declared entity EQUIV15:*STACK*	with type area with size 0
+Declared entity EQUIV15:*STATIC*	with type area with size 0
+Declared entity EQUIV15:X	with type variable CHARACTER*132
+Declared entity EQUIV15:Y	with type variable CHARACTER*4
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 132:
+	Variable EQUIV15:Y,	offset = 11,	size = 4
+	Variable EQUIV15:X,	offset = 0,	size = 132
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module EQUIV15
+
+PARSED_CODE made for EQUIV15.
+echo
+
+echo Symbol table for module EQUIV15
+Symbol table for module EQUIV15
+echo
+
+Module EQUIV15 already active.
+Request: build resource PRINTED_FILE for module EQUIV15.
+  CONTROLIZER                    building   CODE(EQUIV15)
+  PRINT_CODE                     building   PRINTED_FILE(EQUIV15)
+PRINTED_FILE made for EQUIV15.
+      PROGRAM EQUIV15
+
+C     Check equivalences and substrings
+
+      CHARACTER*132 X
+      CHARACTER*4 Y
+
+      EQUIVALENCE (X(13:16), Y(2:3))
+
+      PRINT *, X, Y                                                     0001
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module EQUIV15.
+Closing program.
+Closing workspace.
+Workspace equiv15 closed.
+
+Workspace equiv15 deleted.

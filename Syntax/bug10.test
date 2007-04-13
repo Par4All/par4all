@@ -1,0 +1,30 @@
+#!/bin/sh
+
+tpips=${tpips_version:-tpips}
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+#
+# Dixieme bug de Cachan
+#
+
+delete bug10a
+delete bug10b
+#
+# Il y a effectivement une erreur dans test1.f
+#
+create bug10a ${PIPS_ROOT}/Validation/Syntax/bug10.src/test1.f
+module COURC4
+display CALLGRAPH_FILE(COURC4)
+close
+#
+# Mais pas dans test.f. Le parser n'est (n'etait) pas bien reinitialise.
+#
+create bug10b $PIPS_ROOT/Validation/Syntax/bug10.src/test.f
+module COURC4
+display CALLGRAPH_FILE(COURC4)
+close
+
+delete bug10a
+delete bug10b
+quit
+EOF

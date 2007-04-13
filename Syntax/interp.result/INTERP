@@ -1,0 +1,4 @@
+C     initialisation des subroutines implicites
+      PROGRAM INTERP
+      CALL Q(X)                                                         0001
+      END

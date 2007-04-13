@@ -1,0 +1,6 @@
+Parser failed for dimension redeclaration in redeclaredim.f
+user warning in activate: Rule `PRINT_CODE' already active
+user warning in DeclareVariable: Redefinition of dimension for entity X between lines 3 and  3
+user error in DeclareVariable: Parser error between lines 3 and 3
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module REDECLAREDIM.

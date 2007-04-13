@@ -1,0 +1,26 @@
+#!/bin/sh
+
+tpips=${tpips_version:-tpips}
+PIPS_VALIDDIR=${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+delete entry17
+create entry17 ${PIPS_ROOT}/Validation/Syntax/entry17.f
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+echo
+echo Module ENTRY17
+echo
+
+display PRINTED_FILE[ENTRY17]
+
+echo
+echo Entry INCREMENT
+echo
+
+display PRINTED_FILE[INCREMENT]
+close
+delete entry17
+quit
+EOF

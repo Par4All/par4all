@@ -1,0 +1,14 @@
+#! /bin/sh
+ 
+tpips=${tpips_version:-tpips}
+PIPS_VALIDDIR=${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}
+ 
+$tpips <<EOF
+delete cpp
+create cpp $PIPS_VALIDDIR/Syntax/cpp_test.F
+display PRINTED_FILE(\$ALL)
+close
+delete cpp
+quit
+EOF
+

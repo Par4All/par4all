@@ -1,0 +1,9 @@
+delete libere_alloc
+create libere_alloc ${PIPS_ROOT}/Validation/Syntax/libere_alloc.f
+module LIBERE_ALLOC
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+display PRINTED_FILE[LIBERE_ALLOC]
+close
+delete libere_alloc

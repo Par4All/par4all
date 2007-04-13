@@ -1,0 +1,27 @@
+#! /bin/sh
+
+# Check parser property PARSER_WARN_FOR_COLUMNS_73_80
+# Check handling of long comments and long lines of
+# instruction
+
+tpips=${tpips_version:-tpips}
+PIPS_VALIDDIR=${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}
+
+($tpips 2>&1     | sed '/file *\//d') <<EOF
+delete longline2
+create longline2 $PIPS_VALIDDIR/Syntax/longline2.f
+set PARSER_WARN_FOR_COLUMNS_73_80 TRUE
+display PRINTED_FILE[%ALL]
+close
+
+# Cannot be used because time changes all the time:
+# shell touch longline2.database/longline2.f
+
+delete longline2
+create longline2 $PIPS_VALIDDIR/Syntax/longline2.f
+set PARSER_WARN_FOR_COLUMNS_73_80 FALSE
+display PRINTED_FILE[%ALL]
+close
+delete longline2
+quit
+EOF

@@ -1,0 +1,9 @@
+delete data10
+delete data10
+
+create data10 ${PIPS_ROOT}/Validation/Syntax/data10.f
+
+setproperty PARSER_ACCEPT_ANSI_EXTENSIONS FALSE
+display PRINTED_FILE[DATA10]
+close
+delete data10

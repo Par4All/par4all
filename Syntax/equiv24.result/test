@@ -1,0 +1,30 @@
+user warning in tp_parse: equiv24: No such workspace
+  Module         EQUIV24
+Workspace equiv24 created and opened.
+Module EQUIV24 selected
+Main module PROGRAM "EQUIV24" selected.
+Module EQUIV24 already active.
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+Module EQUIV24 already active.
+Request: build resource PRINTED_FILE for module EQUIV24.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(EQUIV24)
+  PARSER                         building   PARSED_CODE(EQUIV24)
+                                 building   CALLEES(EQUIV24)
+user warning in SaveChains: Overlapping initializations for N and M
+user error in SaveChains: Parser error between lines 12 and 12
+ANSI extension: overlapping initializations
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module EQUIV24.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module EQUIV24.
+Closing program.
+Closing workspace.
+Workspace equiv24 closed.
+
+Workspace equiv24 deleted.

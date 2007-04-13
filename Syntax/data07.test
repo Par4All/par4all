@@ -1,0 +1,18 @@
+#!/bin/sh
+
+tpips=${tpips_version:-tpips}
+PIPS_VALIDDIR=${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+delete data07
+create data07 ${PIPS_ROOT}/Validation/Syntax/data07.f
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+setproperty PARSER_ACCEPT_ANSI_EXTENSIONS FALSE
+
+display PRINTED_FILE[DATA07]
+
+close
+delete data07
+quit
+EOF

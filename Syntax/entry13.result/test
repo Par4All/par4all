@@ -1,0 +1,47 @@
+      SUBROUTINE BLA1
+      INTEGER I
+      COMMON /_ENTRY_BLAX/ I
+99996 CONTINUE                                                          0001
+      I = I+1                                                           0002
+      END
+      SUBROUTINE BLA2
+      INTEGER I
+      COMMON /_ENTRY_BLAX/ I
+99997 CONTINUE                                                          0001
+      I = I+1                                                           0002
+99996 CONTINUE                                                          0003
+      I = I+1                                                           0004
+      END
+      SUBROUTINE BLA3
+      INTEGER I
+      COMMON /_ENTRY_BLAX/ I
+99998 CONTINUE                                                          0001
+      I = I+1                                                           0002
+99997 CONTINUE                                                          0003
+      I = I+1                                                           0004
+99996 CONTINUE                                                          0005
+      I = I+1                                                           0006
+      END
+      SUBROUTINE BLAX
+      INTEGER I
+      COMMON /_ENTRY_BLAX/ I
+! warning: this initialization should appear only once...
+      DATA I /0/
+! data => save i
+      PRINT *, 'BLAX:I = ', I                                           0001
+      END
+! ENTRY13
+!
+! a subroutine with entries and a global counter
+!
+      PROGRAM ENTRY13
+      PRINT *, 'entry13'                                                0001
+      CALL BLA1                                                         0002
+      CALL BLA2                                                         0003
+      CALL BLA3                                                         0004
+      CALL BLA2                                                         0005
+      CALL BLA3                                                         0006
+      CALL BLA1                                                         0007
+      CALL BLAX                                                         0008
+      END
+

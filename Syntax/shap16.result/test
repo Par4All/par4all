@@ -1,0 +1,37 @@
+ SHAP16
+!
+      SUBROUTINE SHAP16
+!
+! declarations
+!
+      REAL DFXI(4), XI
+!
+! macros
+!
+C$PIPS STATEMENT FUNCTION DF2 SUBSTITUTED
+C$PIPS STATEMENT FUNCTION DF3 SUBSTITUTED
+!
+! code
+!
+      DFXI(3) = -1.                                                     0001
+
+      END
+!
+      SUBROUTINE SHAP16
+!
+! declarations
+!
+      REAL DFXI(4), XI
+C               <may be written >: DFXI(*)
+!
+! macros
+!
+C$PIPS STATEMENT FUNCTION DF2 SUBSTITUTED
+C$PIPS STATEMENT FUNCTION DF3 SUBSTITUTED
+!
+! code
+!
+      DFXI(3) = -1.                                                     0001
+
+      END
+

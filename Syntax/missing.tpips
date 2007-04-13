@@ -1,0 +1,11 @@
+#
+# testing stub generation
+#
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+delete mis
+create mis missing.f
+display CALLGRAPH_FILE
+display PRINTED_FILE($ALL)
+close
+delete mis
+quit

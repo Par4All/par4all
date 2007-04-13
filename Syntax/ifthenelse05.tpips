@@ -1,0 +1,18 @@
+delete ifthenelse05
+create ifthenelse05 ${PIPS_ROOT}/Validation/Syntax/ifthenelse05.f
+
+echo
+echo PRINTED FILE
+echo
+
+display PRINTED_FILE
+
+echo
+echo RESTRUCTURED FILE
+echo
+
+apply RESTRUCTURE_CONTROL
+display PRINTED_FILE
+close
+delete ifthenelse05
+quit

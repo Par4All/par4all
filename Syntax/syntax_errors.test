@@ -1,0 +1,19 @@
+#! /bin/sh
+
+{
+echo "-- test with the property"
+${pips_version:-pips} \
+	-1 CHECK_FORTRAN_SYNTAX_BEFORE_PIPS \
+	-f ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f \
+ 	syntax_error 
+
+echo "-- test from the environment"
+PIPS_CHECK_FORTRAN=yes
+export PIPS_CHECK_FORTRAN
+${pips_version:-pips} \
+	-f ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f \
+ 	syntax_error 
+} 2>&1 | 
+sed "s,${PIPS_ROOT},\${PIPS_ROOT},g"
+
+Delete syntax_error

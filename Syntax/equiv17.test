@@ -1,0 +1,18 @@
+#!/bin/sh
+
+tpips=${tpips_version:-tpips}
+PIPS_VALIDDIR=${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+
+delete equiv17
+create equiv17 ${PIPS_ROOT}/Validation/Syntax/equiv17.f
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+display PRINTED_FILE[EQUIV17]
+
+close
+delete equiv17
+quit
+EOF

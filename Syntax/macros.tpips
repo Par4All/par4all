@@ -1,0 +1,13 @@
+# 
+# fortran macros...
+#
+setproperty PARSER_EXPAND_STATEMENT_FUNCTIONS=TRUE
+delete macros
+create macros ${PIPS_ROOT}/Validation/Syntax/macros.f
+echo Code...
+display PRINTED_FILE($ALL)
+echo Callgraph...
+display CALLGRAPH_FILE($ALL)
+close
+delete macros
+quit

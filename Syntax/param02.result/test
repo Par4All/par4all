@@ -1,0 +1,29 @@
+user warning in tp_parse: param02: No such workspace
+  Module         PARAM02
+Workspace param02 created and opened.
+Module PARAM02 selected
+Main module PROGRAM "PARAM02" selected.
+Module PARAM02 already active.
+Module PARAM02 already active.
+Module PARAM02 already active.
+Request: build resource PRINTED_FILE for module PARAM02.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(PARAM02)
+  PARSER                         building   PARSED_CODE(PARAM02)
+                                 building   CALLEES(PARAM02)
+user warning in AddVariableToCommon: Module or parameter NUMTST declared in common FOO between line 7 and 7
+user error in AddVariableToCommon: Parser error between lines 7 and 7
+Ill. decl. of function or subroutine in a common
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module PARAM02.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module PARAM02.
+Closing program.
+Closing workspace.
+Workspace param02 closed.
+
+Workspace param02 deleted.

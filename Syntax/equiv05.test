@@ -1,0 +1,17 @@
+#!/bin/sh
+
+Delete equiv05
+
+tpips=${tpips_version:-tpips}
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+
+# Detection of a mistake in an equivalence chain
+
+create equiv05 ${PIPS_ROOT}/Validation/Syntax/equiv05.f
+display PRINTED_FILE
+close
+
+delete equiv05
+quit
+EOF

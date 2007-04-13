@@ -1,0 +1,58 @@
+user warning in tp_parse: data03: No such workspace
+  Module         DATA03
+Workspace data03 created and opened.
+Module DATA03 selected
+Main module PROGRAM "DATA03" selected.
+Module DATA03 already active.
+Selecting rule: PRINT_CODE_PRECONDITIONS
+Module DATA03 already active.
+Request: build resource PRINTED_FILE for module DATA03.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(DATA03)
+  PARSER                         building   PARSED_CODE(DATA03)
+                                 building   CALLEES(DATA03)
+user warning in implied_do_reference_number: Between line 13 and 13:
+Only constant loop bounds with non-zero increment are supported by the PIPS parser in DATA statement
+user warning in expression_reference_number: Cannot deal with non-constant loop bounds
+user warning in expression_reference_number: Cannot deal with non-constant loop bounds
+user warning in store_initial_value: Type coercion needed for variable L and its DATA expression value
+syntax = 1.
+normalized = NORMALIZED UNDEFINED
+  CONTROLIZER                    building   CODE(DATA03)
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(DATA03)
+  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(DATA03)
+  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(DATA03)
+  TRANSFORMERS_INTRA_FAST        building   TRANSFORMERS(DATA03)
+  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(DATA03)
+  INTRAPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(DATA03)
+  PRECONDITIONS_INTRA            building   PRECONDITIONS(DATA03)
+  PRINT_CODE_PRECONDITIONS       building   PRINTED_FILE(DATA03)
+PRINTED_FILE made for DATA03.
+
+C  P() {M==-1}
+
+      PROGRAM DATA03
+
+C     Check triangular data initialization: PIPS parser used to core
+C     dump It does not anymore but the initial value of k is lost with
+C     the current implementation (June 2002).
+
+      REAL X(100,100)
+
+      DATA M, L, ((X(I,J), I = 1, J), J = 1, 10), K /-1, 56*1., 3/
+
+C  P() {M==-1}
+
+
+      PRINT *, X(2,4), K, L, M                                          0001
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module DATA03.
+Closing program.
+Closing workspace.
+Workspace data03 closed.
+
+Workspace data03 deleted.

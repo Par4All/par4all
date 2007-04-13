@@ -1,0 +1,5 @@
+delete nobsn
+create nobsn nobsn.f
+display PRINTED_FILE[NOBSN]
+close
+delete nobsn

@@ -1,0 +1,8 @@
+      PROGRAM STARFORMAT
+
+      WRITE (1, *)                                                      0001
+
+c     This syntax is incorrect, a unit must be specified
+c      write(fmt=*)
+
+      END

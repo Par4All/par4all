@@ -1,0 +1,24 @@
+delete ifthenelse07
+create ifthenelse07 ${PIPS_ROOT}/Validation/Syntax/ifthenelse07.f
+
+echo
+echo PARSED PRINTED FILE
+echo
+
+display PARSED_PRINTED_FILE
+
+echo
+echo PRINTED FILE
+echo
+
+display PRINTED_FILE
+
+echo
+echo RESTRUCTURED FILE
+echo
+
+apply RESTRUCTURE_CONTROL
+display PRINTED_FILE
+close
+delete ifthenelse07
+quit

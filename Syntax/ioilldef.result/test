@@ -1,0 +1,27 @@
+user warning in tp_parse: ioilldef: No such workspace
+  Module         IOILLDEF
+Workspace ioilldef created and opened.
+Module IOILLDEF selected
+Main module PROGRAM "IOILLDEF" selected.
+Module IOILLDEF already active.
+Module IOILLDEF already active.
+Request: build resource PRINTED_FILE for module IOILLDEF.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(IOILLDEF)
+  PARSER                         building   PARSED_CODE(IOILLDEF)
+                                 building   CALLEES(IOILLDEF)
+user error in parser: Parser error between lines 7 and 7
+Illegal default option '*' in IO control list
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module IOILLDEF.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module IOILLDEF.
+Closing program.
+Closing workspace.
+Workspace ioilldef closed.
+
+Workspace ioilldef deleted.

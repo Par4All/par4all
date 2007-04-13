@@ -1,0 +1,85 @@
+user warning in tp_parse: equiv17: No such workspace
+  Module         EQUIV17
+Workspace equiv17 created and opened.
+Module EQUIV17 selected
+Main module PROGRAM "EQUIV17" selected.
+Module EQUIV17 already active.
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+Module EQUIV17 already active.
+Request: build resource PRINTED_FILE for module EQUIV17.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(EQUIV17)
+  PARSER                         building   PARSED_CODE(EQUIV17)
+                                 building   CALLEES(EQUIV17)
+
+Declarations for module EQUIV17 with type  () ->  void
+
+
+Variable list:
+
+
+Declared entity EQUIV17:*DYNAMIC*	with type area with size 608
+Declared entity EQUIV17:*HEAP*	with type area with size 0
+Declared entity EQUIV17:*STACK*	with type area with size 0
+Declared entity EQUIV17:*STATIC*	with type area with size 0
+Declared entity EQUIV17:U	with type variable REAL*4
+Declared entity EQUIV17:W	with type variable REAL*4
+Declared entity EQUIV17:X	with type variable REAL*4
+Declared entity EQUIV17:Y	with type variable REAL*4
+Declared entity EQUIV17:Z1	with type variable REAL*4
+Declared entity EQUIV17:Z2	with type variable REAL*4
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 608:
+	Variable EQUIV17:Y,	offset = 96,	size = 4
+	Variable EQUIV17:W,	offset = 200,	size = 400
+	Variable EQUIV17:Z2,	offset = 600,	size = 4
+	Variable EQUIV17:Z1,	offset = 604,	size = 4
+	Variable EQUIV17:X,	offset = 0,	size = 200
+	Variable EQUIV17:U,	offset = 396,	size = 4
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module EQUIV17
+
+  CONTROLIZER                    building   CODE(EQUIV17)
+  PRINT_CODE                     building   PRINTED_FILE(EQUIV17)
+PRINTED_FILE made for EQUIV17.
+      PROGRAM EQUIV17
+
+C     Check that offsets in the dynamic area are correct regardless of 
+C     equivalences. Variables z1 and z2 are not equivalenced on purpose
+C     to check their allocation offsets.
+
+      REAL X(50), W(100)
+
+      EQUIVALENCE (X(25),Y)
+      EQUIVALENCE (U, W(50))
+
+      X(1) = Y+W(10)+Z1+Z2                                              0001
+
+      PRINT *, U, Y                                                     0002
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module EQUIV17.
+Closing program.
+Closing workspace.
+Workspace equiv17 closed.
+
+Workspace equiv17 deleted.

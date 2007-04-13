@@ -1,0 +1,32 @@
+#!/bin/sh
+
+tpips=${tpips_version:-tpips}
+PIPS_VALIDDIR=${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+
+# The typing of function OVL should not depend on the parsing order
+# The typing of the variable OVL:OVL containing the result should be good
+# In spite of the IMPLICIT declaration
+
+delete blm
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+create blm ${PIPS_ROOT}/Validation/Syntax/blm.f
+display PRINTED_FILE(OVL)
+display PRINTED_FILE(BLM)
+close
+
+delete blm
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+create blm ${PIPS_ROOT}/Validation/Syntax/blm.f
+display PRINTED_FILE(BLM)
+display PRINTED_FILE(OVL)
+close
+
+delete blm
+quit
+
+EOF
+

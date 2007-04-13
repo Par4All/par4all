@@ -1,0 +1,17 @@
+#!/bin/sh
+
+tpips=${tpips_version:-tpips}
+PIPS_VALIDDIR=${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+delete stack02
+create stack02 ${PIPS_ROOT}/Validation/Syntax/stack02.f
+module STACK02
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+display PRINTED_FILE[STACK02]
+close
+delete stack02
+quit
+EOF

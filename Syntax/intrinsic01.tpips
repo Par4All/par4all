@@ -1,0 +1,7 @@
+delete intrinsic01
+create intrinsic01 Tests/intrinsic01.f
+module INTRINSIC01
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+display PRINTED_FILE[INTRINSIC01]
+quit
+

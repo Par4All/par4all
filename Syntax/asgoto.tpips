@@ -1,0 +1,17 @@
+delete asgoto
+setproperty PARSER_SUBSTITUTE_ASSIGNED_GOTO TRUE
+create asgoto asgoto.f
+
+echo
+echo Output of the parser
+echo
+
+display PARSED_PRINTED_FILE[ASGOTO]
+
+echo
+echo Output of the controlizer
+echo
+
+display PRINTED_FILE[ASGOTO]
+close
+delete asgoto

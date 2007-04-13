@@ -1,0 +1,69 @@
+
+PARSED PRINTED FILE
+
+      PROGRAM IFTHENELSE06
+
+C     Labelled else which leads the SUN f77 compiler to raise a user warning
+C     And initially to a user error for PIPS
+
+      READ *, I                                                         0001
+
+      IF (I.EQ.0) THEN                                                  0002
+         PRINT *, I                                                     0003
+         GOTO 1
+      ELSE
+         IF (I.EQ.1) THEN                                               0004
+            PRINT *, I+1                                                0005
+         ELSE
+1           CONTINUE                                                    0006
+            PRINT *, I-1                                                0006
+         ENDIF
+      ENDIF
+
+      END
+
+PRINTED FILE
+
+      PROGRAM IFTHENELSE06
+
+C     Labelled else which leads the SUN f77 compiler to raise a user warning
+C     And initially to a user error for PIPS
+
+      READ *, I                                                         0001
+
+      IF (I.EQ.0) GOTO 99998                                            0002
+      IF (I.EQ.1) GOTO 99997                                            0004
+1     CONTINUE                                                          0006
+      PRINT *, I-1                                                      0006
+      RETURN
+99997 CONTINUE
+      PRINT *, I+1                                                      0005
+      RETURN
+99998 CONTINUE
+      PRINT *, I                                                        0003
+      GOTO 1
+
+      END
+
+RESTRUCTURED FILE
+
+      PROGRAM IFTHENELSE06
+
+C     Labelled else which leads the SUN f77 compiler to raise a user warning
+C     And initially to a user error for PIPS
+
+      READ *, I                                                         0001
+
+      IF (I.EQ.0) GOTO 99996                                            0002
+      IF (I.EQ.1) GOTO 99995                                            0004
+1     CONTINUE                                                          0006
+      PRINT *, I-1                                                      0006
+      RETURN
+99995 CONTINUE
+      PRINT *, I+1                                                      0005
+      RETURN
+99996 CONTINUE
+      PRINT *, I                                                        0003
+      GOTO 1
+
+      END

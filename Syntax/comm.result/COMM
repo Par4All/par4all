@@ -1,0 +1,20 @@
+C     BUG: missing comments
+C
+C     Corrected by Francois Irigoin, 10 March 1991
+C
+      PROGRAM COMM
+C     first comment
+      X = 1                                                             0001
+C     second comment 1
+C     second comment 2
+      X = 2                                                             0002
+C     third comment 1
+C     third comment 2
+C     third comment 3
+      X = 3                                                             0003
+C     fourth comment
+      IF (X.EQ.3) THEN                                                  0004
+      ENDIF
+C     fifth comment
+C     sixth comment
+      END

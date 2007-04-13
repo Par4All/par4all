@@ -1,0 +1,12 @@
+!
+! un nom de programme implicite...
+! 
+! next line added by fsplit() in pips
+      PROGRAM MAIN000
+      INTEGER I
+      CALL FOO(I)                                                       0001
+      PRINT *, I                                                        0002
+      END
+      SUBROUTINE FOO(I)
+      I = 3                                                             0001
+      END

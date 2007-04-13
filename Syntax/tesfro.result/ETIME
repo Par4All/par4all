@@ -1,0 +1,4 @@
+
+      FUNCTION ETIME(TMP)
+      ETIME = 0.3                                                       0001
+      END

@@ -1,0 +1,20 @@
+#!/bin/sh
+
+tpips=${tpips_version:-tpips}
+PIPS_VALIDDIR=${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+
+delete ovl
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+create ovl ${PIPS_ROOT}/Validation/Syntax/ovl.f
+display PRINTED_FILE(OVL)
+
+close
+
+delete ovl
+
+quit
+
+EOF

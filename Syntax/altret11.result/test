@@ -1,0 +1,45 @@
+user warning in tp_parse: altret11: No such workspace
+  Module         ALTRET11
+Workspace altret11 created and opened.
+Module ALTRET11 selected
+setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "STOP"
+user warning, property PARSER_SUBSTITUTE_ALTERNATE_RETURNS redefined
+setproperty PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS TRUE
+user warning, property PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS redefined
+Module ALTRET11 already active.
+Request: build resource PRINTED_FILE for module ALTRET11.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(ALTRET11)
+  PARSER                         building   PARSED_CODE(ALTRET11)
+                                 building   CALLEES(ALTRET11)
+user warning in SubstituteAlternateReturns: Module declarations should be regenerated. Set property PRETTYPRINT_ALL_DECLARATIONS.
+user warning in check_in_declarations: FORMAT statement within declarations. In order to analyze this code, please set property PRETTYPRINT_ALL_DECLARATIONS or move this FORMAT down in executable code.
+user error in Syntax: Parser error between lines 5 and 5
+Source cannot be parsed with current properties
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module ALTRET11.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Request: build phase/rule UNSPLIT for module ALTRET11.
+  PARSER                         building   PARSED_CODE(ALTRET11)
+                                 building   CALLEES(ALTRET11)
+user warning in SubstituteAlternateReturns: Module declarations should be regenerated. Set property PRETTYPRINT_ALL_DECLARATIONS.
+user warning in check_in_declarations: FORMAT statement within declarations. In order to analyze this code, please set property PRETTYPRINT_ALL_DECLARATIONS or move this FORMAT down in executable code.
+user error in Syntax: Parser error between lines 5 and 5
+Source cannot be parsed with current properties
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build phase/rule UNSPLIT for module ALTRET11.
+shell f77 -c altret11.database/Src/altret11.f
+altret11.database/Src/altret11.f:
+Error: Cannot open file altret11.database/Src/altret11.f 
+
+user warning in tp_system: shell returned status (1.0)
+user error in tp_system: shell error (256) in tpips script
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module ALTRET11.
+Closing program.
+Closing workspace.
+Workspace altret11 closed.
+
+Workspace altret11 deleted.

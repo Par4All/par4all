@@ -1,0 +1,16 @@
+#!/bin/sh
+
+tpips=${tpips_version:-tpips}
+PIPS_VALIDDIR=${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+delete sfrov
+create sfrov ${PIPS_ROOT}/Validation/Syntax/sfrov.f 
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+display PRINTED_FILE[SFROV]
+
+close
+delete sfrov
+EOF

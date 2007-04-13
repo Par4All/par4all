@@ -1,0 +1,91 @@
+user warning in tp_parse: save04: No such workspace
+  Module         SAVE04
+Workspace save04 created and opened.
+Module SAVE04 selected
+Main module PROGRAM "SAVE04" selected.
+Module SAVE04 already active.
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+Module SAVE04 already active.
+Request: build resource PRINTED_FILE for module SAVE04.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(SAVE04)
+  PARSER                         building   PARSED_CODE(SAVE04)
+                                 building   CALLEES(SAVE04)
+
+Declarations for module SAVE04 with type  () ->  void
+
+
+Variable list:
+
+
+Declared entity SAVE04:*DYNAMIC*	with type area with size 4
+Declared entity SAVE04:*HEAP*	with type area with size 0
+Declared entity SAVE04:*STACK*	with type area with size 0
+Declared entity SAVE04:*STATIC*	with type area with size 36
+Declared entity SAVE04:T	with type variable REAL*4
+Declared entity SAVE04:U	with type variable REAL*4
+Declared entity SAVE04:W	with type variable REAL*4
+Declared entity SAVE04:X	with type variable REAL*8
+Declared entity SAVE04:Y	with type variable REAL*4
+Declared entity SAVE04:Z	with type variable REAL*4
+Declared entity TOP-LEVEL:~FOO	with type area with size 16
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 4:
+	Variable SAVE04:W,	offset = 0,	size = 4
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 36:
+	Variable SAVE04:U,	offset = 0,	size = 4
+	Variable SAVE04:Y,	offset = 4,	size = 24
+	Variable SAVE04:X,	offset = 28,	size = 8
+
+
+Layout for common /FOO/ of size 16:
+	Variable SAVE04:Z,	offset = 0,	size = 12
+	Variable SAVE04:T,	offset = 12,	size = 4
+
+End of declarations for module SAVE04
+
+  CONTROLIZER                    building   CODE(SAVE04)
+  PRINT_CODE                     building   PRINTED_FILE(SAVE04)
+PRINTED_FILE made for SAVE04.
+      PROGRAM SAVE04
+
+C     Check that offsets in the static area are correct regardless of the
+C     declaration order
+
+      SAVE X
+      SAVE Y
+
+      DOUBLEPRECISION X
+
+      COMMON /FOO/Z, T
+
+      SAVE U
+
+      REAL Z(3), Y(6)
+
+      X = Y+W                                                           0001
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module SAVE04.
+Closing program.
+Closing workspace.
+Workspace save04 closed.
+
+Workspace save04 deleted.

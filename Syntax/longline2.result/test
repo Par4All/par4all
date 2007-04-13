@@ -1,0 +1,80 @@
+user warning in tp_parse: longline2: No such workspace
+  Module         LONGLINE2
+Workspace longline2 created and opened.
+Module LONGLINE2 selected
+Main module PROGRAM "LONGLINE2" selected.
+Module LONGLINE2 already active.
+setproperty PARSER_WARN_FOR_COLUMNS_73_80 TRUE
+Module LONGLINE2 already active.
+Request: build resource PRINTED_FILE for module LONGLINE2.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(LONGLINE2)
+  PARSER                         building   PARSED_CODE(LONGLINE2)
+                                 building   CALLEES(LONGLINE2)
+user warning in GetChar: Line 8 truncated, col=73 and l_getchar=72
+user warning in GetChar: Line 12 truncated, col=73 and l_getchar=72
+  CONTROLIZER                    building   CODE(LONGLINE2)
+  PRINT_CODE                     building   PRINTED_FILE(LONGLINE2)
+PRINTED_FILE made for LONGLINE2.
+      PROGRAM LONGLINE2
+
+C     See if property parser_warn_for_columns_73_80 works
+
+C        1         2         3         4         5         6         7         8
+C2345678901234567890123456789012345678901234567890123456789012345678901234567890
+
+      I = 1                                                             0001
+C        1         2         3         4         5         6         7         8
+C2345678901234567890123456789012345678901234567890123456789012345678901234567890
+
+      I = 1                                                             0002
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module LONGLINE2.
+Closing program.
+Closing workspace.
+Workspace longline2 closed.
+
+Workspace longline2 deleted.
+  Module         LONGLINE2
+Workspace longline2 created and opened.
+Module LONGLINE2 selected
+Main module PROGRAM "LONGLINE2" selected.
+Module LONGLINE2 already active.
+setproperty PARSER_WARN_FOR_COLUMNS_73_80 FALSE
+user warning, property PARSER_WARN_FOR_COLUMNS_73_80 redefined
+Module LONGLINE2 already active.
+Request: build resource PRINTED_FILE for module LONGLINE2.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(LONGLINE2)
+  PARSER                         building   PARSED_CODE(LONGLINE2)
+                                 building   CALLEES(LONGLINE2)
+  CONTROLIZER                    building   CODE(LONGLINE2)
+  PRINT_CODE                     building   PRINTED_FILE(LONGLINE2)
+PRINTED_FILE made for LONGLINE2.
+      PROGRAM LONGLINE2
+
+C     See if property parser_warn_for_columns_73_80 works
+
+C        1         2         3         4         5         6         7         8
+C2345678901234567890123456789012345678901234567890123456789012345678901234567890
+
+      I = 1                                                             0001
+C        1         2         3         4         5         6         7         8
+C2345678901234567890123456789012345678901234567890123456789012345678901234567890
+
+      I = 1                                                             0002
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module LONGLINE2.
+Closing program.
+Closing workspace.
+Workspace longline2 closed.
+
+Workspace longline2 deleted.

@@ -1,0 +1,20 @@
+#!/bin/sh
+
+tpips=${tpips_version:-tpips}
+PIPS_VALIDDIR=${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}
+
+$tpips <<EOF
+delete comments4
+create comments4 $PIPS_VALIDDIR/Syntax/comments4.f
+echo Sequential version:
+display PRINTED_FILE 
+
+echo Parallel version:
+activate COARSE_GRAIN_PARALLELIZATION
+display PARALLELPRINTED_FILE
+
+close
+delete comments4
+quit
+EOF
+

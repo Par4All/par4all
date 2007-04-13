@@ -1,0 +1,27 @@
+user warning in tp_parse: io03: No such workspace
+  Module         IO03
+Workspace io03 created and opened.
+Module IO03 selected
+Main module PROGRAM "IO03" selected.
+Module IO03 already active.
+Module IO03 already active.
+Module IO03 already active.
+Request: build resource PRINTED_FILE for module IO03.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(IO03)
+  PARSER                         building   PARSED_CODE(IO03)
+                                 building   CALLEES(IO03)
+user error in Syntax: Parser error between lines 5 and 5
+The unit identifier and the format identifier must be first and second in the control info list (standard Page F-12)
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module IO03.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module IO03.
+Closing program.
+Closing workspace.
+Workspace io03 closed.
+
+Workspace io03 deleted.

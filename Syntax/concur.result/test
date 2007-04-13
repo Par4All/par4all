@@ -1,0 +1,6 @@
+      SUBROUTINE CUREV(M)
+10    I = 2                                                             0002
+30    M = 6                                                             0003
+100   CONTINUE                                                          0004
+      K = 6                                                             0004
+      END

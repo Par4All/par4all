@@ -1,0 +1,12 @@
+#!/bin/sh
+
+if Pips -f $PIPS_ROOT/Validation/Syntax/linear.f -w linear -m relax -b CODE >&2
+then
+	echo Parser failed to fail for formal functional parameter F in linear.f
+	Delete linear 2>/dev/null
+	exit 1
+else
+	echo Parser failed for formal functional parameter F in linear.f
+	Display -v -m relax -w linear code 2>&1 | grep "^user [ew]"
+	Delete linear 2>/dev/null
+fi

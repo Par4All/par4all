@@ -1,0 +1,9 @@
+delete checktype
+create checktype ${PIPS_ROOT}/Validation/Syntax/checktype.f
+module CHECKTYPE
+setproperty PARSER_TYPE_CHECK_CALL_SITES   TRUE
+display PRINTED_FILE(CHECKTYPE)
+close
+delete checktype
+quit
+

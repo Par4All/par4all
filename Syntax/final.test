@@ -1,0 +1,13 @@
+#! /bin/sh
+
+tpips=${tpips_version:-tpips}
+PIPS_VALIDDIR=${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}
+
+$tpips <<EOF
+delete final
+create final ${PIPS_ROOT}/Validation/Syntax/final.f
+display CALLGRAPH_FILE
+close
+delete final
+quit
+EOF

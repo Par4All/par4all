@@ -1,0 +1,11 @@
+C***********************************************************************
+      REAL*8 FUNCTION SDOT(L,X,INCX,Y,INCY)
+      IMPLICIT REAL*8(A-H,O-Z)
+      DIMENSION X(*),Y(*)
+      IX0 = 1-INCX                                                      0001
+      IY0 = 1-INCY                                                      0002
+      SDOT = 0.                                                         0003
+      DO I = 1, L                                                       0004
+1        SDOT = SDOT+X(IX0+I*INCY)*Y(IY0+I*INCY)                        0005
+      ENDDO
+      END

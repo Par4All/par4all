@@ -1,0 +1,8 @@
+      PROGRAM COMPLEXE04
+      COMPLEX Z
+
+      Z = (1, 0)+Z                                                      0001
+
+      PRINT *, Z                                                        0002
+
+      END

@@ -1,0 +1,34 @@
+
+Module ENTRY22
+
+      SUBROUTINE ENTRY22
+      INTEGER*4 NYY
+      PARAMETER (NYY = 514)
+      INTEGER*4 NCL
+      PARAMETER (NCL = 3*NYY)
+      REAL*4 X(1:NCL)
+      COMMON /FOO/ X
+
+      PRINT *, X                                                        0001
+
+99998 CONTINUE
+
+      X(1) = 0.                                                         0002
+
+      END
+
+Entry INIBND
+
+      SUBROUTINE INIBND
+      INTEGER*4 NYY
+      PARAMETER (NYY = 514)
+      INTEGER*4 NCL
+      PARAMETER (NCL = 3*NYY)
+      REAL*4 X(1:NCL)
+      COMMON /FOO/ X
+
+99998 CONTINUE                                                          0001
+
+      X(1) = 0.                                                         0002
+
+      END

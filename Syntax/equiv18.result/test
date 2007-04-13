@@ -1,0 +1,91 @@
+user warning in tp_parse: equiv18: No such workspace
+  Module         EQUIV18
+Workspace equiv18 created and opened.
+Module EQUIV18 selected
+Main module PROGRAM "EQUIV18" selected.
+Module EQUIV18 already active.
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+Module EQUIV18 already active.
+Request: build resource PRINTED_FILE for module EQUIV18.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(EQUIV18)
+  PARSER                         building   PARSED_CODE(EQUIV18)
+                                 building   CALLEES(EQUIV18)
+
+Declarations for module EQUIV18 with type  () ->  void
+
+
+Variable list:
+
+
+Declared entity EQUIV18:*DYNAMIC*	with type area with size 0
+Declared entity EQUIV18:*HEAP*	with type area with size 0
+Declared entity EQUIV18:*STACK*	with type area with size 0
+Declared entity EQUIV18:*STATIC*	with type area with size 0
+Declared entity EQUIV18:U	with type variable REAL*4
+Declared entity EQUIV18:W	with type variable REAL*4
+Declared entity EQUIV18:X	with type variable REAL*4
+Declared entity EQUIV18:Y	with type variable REAL*4
+Declared entity TOP-LEVEL:~FOO	with type area with size 404
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /FOO/ of size 404:
+	Variable EQUIV18:X,	offset = 0,	size = 200
+	Variable EQUIV18:U,	offset = 200,	size = 4
+	Variable EQUIV18:Y,	offset = 96,	size = 4
+	Variable EQUIV18:W,	offset = 4,	size = 400
+
+End of declarations for module EQUIV18
+
+  CONTROLIZER                    building   CODE(EQUIV18)
+  PRINT_CODE                     building   PRINTED_FILE(EQUIV18)
+PRINTED_FILE made for EQUIV18.
+      PROGRAM EQUIV18
+
+C     Check that offsets in a common area are correct regardless of 
+C     equivalences. Offsets:
+C     x=0
+C     y=96
+C     u=200
+C     w=4
+
+      REAL X(50), W(100)
+
+      EQUIVALENCE (X(25),Y)
+      EQUIVALENCE (U, W(50))
+
+      COMMON /FOO/ X, U
+
+      X(1) = Y+W(10)                                                    0001
+
+      PRINT *, U, Y                                                     0002
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module EQUIV18.
+Closing program.
+Closing workspace.
+Workspace equiv18 closed.
+
+Workspace equiv18 deleted.

@@ -1,0 +1,43 @@
+user warning in tp_parse: alias: No such workspace
+  Module         ALIAS
+Workspace alias created and opened.
+Module ALIAS selected
+Module ALIAS already active.
+Request: build resource PRINTED_FILE for module ALIAS.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(ALIAS)
+  PARSER                         building   PARSED_CODE(ALIAS)
+                                 building   CALLEES(ALIAS)
+  CONTROLIZER                    building   CODE(ALIAS)
+  PRINT_CODE                     building   PRINTED_FILE(ALIAS)
+PRINTED_FILE made for ALIAS.
+      DOUBLE PRECISION FUNCTION ALIAS(ANAM)
+
+c     Problem: detection of Hollerith constants in DATA statements
+
+      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
+      DIMENSION ANAM1(14),ANAM2(14)
+      DATA ANAM1 /'VA ','VB ','CCS','NS ','C2 ','PT ','C4 ',
+     1     'PE ','ME ','PC ','MC ','PS ','MS ','IK '/
+      DATA ANAM2 /'VAF','VAR','CJS','NSS','ISE','XTI','ISC',
+     1            'VJE','MJE','VJC','MJC','VJS','MJS','IKF'/
+C     
+C     THIS FUNCTION RETURNS THE MGP EQUIVALENT OF THE GP PARAMETERS
+C     (THOSE WHICH APPLY)
+C     
+      IKNT = 0                                                          0001
+      ALIAS = ANAM                                                      0002
+10    IKNT = IKNT+1                                                     0003
+      IF (IKNT.GT.14) RETURN                                            0004
+      IF (ANAM1(IKNT).NE.ANAM) GOTO 10                                  0006
+      ALIAS = ANAM2(IKNT)                                               0008
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module ALIAS.
+Closing program.
+Closing workspace.
+Workspace alias closed.
+
+Workspace alias deleted.

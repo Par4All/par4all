@@ -1,0 +1,40 @@
+user warning in tp_parse: checktype: No such workspace
+  Module         CHECKTYPE
+Workspace checktype created and opened.
+Module CHECKTYPE selected
+Main module PROGRAM "CHECKTYPE" selected.
+Module CHECKTYPE already active.
+Module CHECKTYPE already active.
+setproperty PARSER_TYPE_CHECK_CALL_SITES   TRUE
+user warning, property PARSER_TYPE_CHECK_CALL_SITES redefined
+Module CHECKTYPE already active.
+Request: build resource PRINTED_FILE for module CHECKTYPE.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(CHECKTYPE)
+  PARSER                         building   PARSED_CODE(CHECKTYPE)
+                                 building   CALLEES(CHECKTYPE)
+user warning in update_functional_type_with_actual_arguments: incompatible 3rd actual argument and type in call to MAX0 between lines 10 and 10. Current type is not updated
+  CONTROLIZER                    building   CODE(CHECKTYPE)
+  PRINT_CODE                     building   PRINTED_FILE(CHECKTYPE)
+PRINTED_FILE made for CHECKTYPE.
+      PROGRAM CHECKTYPE
+
+C     Goal: see if we know how to type check MAX, MAX0, AMAX1, DMAX1, AMAX0 and MAX1
+
+      DOUBLE PRECISION X, Y, Z
+
+      I = MAX0(I, J)                                                    0001
+
+C     This one is wrong
+      I = MAX0(I, J, 1.)                                                0002
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module CHECKTYPE.
+Closing program.
+Closing workspace.
+Workspace checktype closed.
+
+Workspace checktype deleted.

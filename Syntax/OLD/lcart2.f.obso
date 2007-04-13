@@ -1,0 +1,17 @@
+      subroutine lcart2(isor)
+c     implicit double precision (a-h,o-z)
+      implicit real (a-h,o-z)
+      character*80 carte
+      common /ulogic/ lec,lec2
+1000  continue
+      isor = 0       
+      read (lec,'(a80)') carte
+      if (carte(1:1).eq.'c') goto 1000
+      if (carte(1:1).eq.'*') then
+         isor = 1
+         return
+      endif
+      rewind lec2
+      write (lec2,'(a80)') carte
+      rewind lec2
+      end

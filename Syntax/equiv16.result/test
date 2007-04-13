@@ -1,0 +1,39 @@
+user warning in tp_parse: equiv16: No such workspace
+  Module         EQUIV16
+Workspace equiv16 created and opened.
+Module EQUIV16 selected
+Main module PROGRAM "EQUIV16" selected.
+Module EQUIV16 already active.
+Module EQUIV16 already active.
+Request: build resource PRINTED_FILE for module EQUIV16.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(EQUIV16)
+  PARSER                         building   PARSED_CODE(EQUIV16)
+                                 building   CALLEES(EQUIV16)
+user warning in ComputeAddresses: Two conflicting offsets for X: 4 and 0
+user error in ComputeAddresses: Parser error between lines 10 and 10
+incompatible addresses
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module EQUIV16.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Module EQUIV16 already active.
+Request: build resource PRINTED_FILE for module EQUIV16.
+  PARSER                         building   PARSED_CODE(EQUIV16)
+                                 building   CALLEES(EQUIV16)
+user warning in ComputeAddresses: Two conflicting offsets for X: 4 and 0
+user error in ComputeAddresses: Parser error between lines 10 and 10
+incompatible addresses
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module EQUIV16.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module EQUIV16.
+Closing program.
+Closing workspace.
+Workspace equiv16 closed.
+
+Workspace equiv16 deleted.

@@ -1,0 +1,8 @@
+      PROGRAM WHILE03
+
+      DO 4501 WHILE (IREPERE80(LINE, 'MILIEU', 6).GT.0)                 0001
+         READ (IUNITCOX, *) LINE                                        0002
+         READ (IUNITCOX, *) LINE                                        0003
+4501     CONTINUE                                                       0004
+
+      END

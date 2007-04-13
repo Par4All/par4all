@@ -1,0 +1,7 @@
+      PROGRAM TQUOTE2
+      CHARACTER*10 A
+      PRINT *, "essai avec des quotes, n'hesitons pas! et 'encore'"     0001
+      A = '"'                                                           0002
+      PRINT *, 'la quote " " " " : ', A                                 0003
+      PRINT *, 'c''est tout', "'''", """", ''''                         0004
+      END

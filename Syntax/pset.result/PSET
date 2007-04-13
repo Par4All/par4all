@@ -1,0 +1,218 @@
+C     Bug: too many arguments in the call to RUN (at the end)
+C     Modification: a dummy RUN procedures with a wrong number of
+C     arguments was added
+
+C
+C  *********************************************************************
+C  *   SUBROUTINE TO SET THE ARRAY POINTERS FOR VECTORIZING THE CODE.  *
+C  *********************************************************************
+C
+      SUBROUTINE PSET(NX,NY,NZ,NT,NTIME,NWINDX,NWINDY,NSINKS,NFILT,
+     *XSTART,YSTART,ZSTART,TSTART,DELTAX,DELTAY,DELTAZ,DELTAT,PHI,DL,
+     *DX,DY,DZ,WORK,IB,IK,ITY,NCOUNT,NPRINT,NGRAPH,NPSTEP,NGSTEP)
+      DIMENSION  WORK(*)
+      CHARACTER DUMMY
+      COMMON/LAKE/SX,SIGX,SY,SIGY,ZNOT,SFX,SFY,FLX,FLY,BASE,TSL,H0,ZW,ZL
+      COMMON/SOURCE/INIT(2,2),NSOUR(2),IX(2,2),JY(2,2),KZ(2,2),
+     * IVAL(2,2),NSX(2,2),NSY(2,2),NSZ(2,2),ISR(2,2)
+      COMMON/LEVEL/KK1,KK2,KK3,KK4,IYHOM,IGEO,IUGX,IVGY,LT0,LT1,ICPU
+      COMMON/STRCH/ALP,BET,DH,ZH,UG,VG,T1,T2,DT,TOL,ALPHA,HAMP,BUMP
+      COMMON/CPU/CINIT,CINHC,CINVC,CINHT,CINVT,CINPI,CINHU,CINVU,
+     *CINHV,CINVV,CINHW,CINVW,CINPR,CINBL,CINFL,CINMN,TM1,TM18,TM19
+C
+C **   SEPARATE DIMENSIONALITY OF PROGRAM
+C
+      L3 = NX*NY*NZ                                                     0001
+      L2 = NX*NY                                                        0002
+      L1 = NZ                                                           0003
+C
+C ===== ALLOCATION OF GLOBAL MEMORY FOR PARAMETERS IN VECTOR FORM  =====
+C
+C **   MESO-CONCENTRATION OF ONE POLLUTANT C(X,Y,Z,T)                 **
+      LC = 1                                                            0004
+      LAST = L3                                                         0005
+C **   PREVIOUS STEPS OF C(X,Y,Z,T-1) FOR THE TIME SCHEME             **
+      LCSTEP = LAST+1                                                   0006
+      LAST = LAST+L3                                                    0007
+C **   MESO-PERTURBATION POTENTIAL TEMPERATURE POTT(X,Y,Z,T)          **
+      LPOT = LAST+1                                                     0008
+      LAST = LAST+L3                                                    0009
+C **   PREVIOUS STEPS OF POTT(X,Y,Z,T-1) FOR THE TIME SCHEME          **
+      LTSTEP = LAST+1                                                   0010
+      LAST = LAST+L3                                                    0011
+C **   MESO-PERTURBATION U - WIND COMPONENT UX(X,Y,Z,T)               **
+      LUX = LAST+1                                                      0012
+      LAST = LAST+L3                                                    0013
+C **   PREVIOUS STEPS OF UX(X,Y,Z,T-1) FOR THE TIME SCHEME            **
+      LUSTEP = LAST+1                                                   0014
+      LAST = LAST+L3                                                    0015
+C **   MESO-PERTURBATION V - WIND COMPONENT VY(X,Y,Z,T)               **
+      LVY = LAST+1                                                      0016
+      LAST = LAST+L3                                                    0017
+C **   PREVIOUS STEPS OF VY(X,Y,Z,T-1) FOR THE TIME SCHEME            **
+      LVSTEP = LAST+1                                                   0018
+      LAST = LAST+L3                                                    0019
+C **   MESO-PERTURBATION W - WIND COMPONENT WZ(X,Y,Z,T)               **
+      LWZ = LAST+1                                                      0020
+      LAST = LAST+L3                                                    0021
+C **   MESO-PERTURBATION PRESSURE PI PRESS(X,Y,Z,T)                   **
+      LPI = LAST+1                                                      0022
+      LAST = LAST+L3                                                    0023
+C **   PREVIOUS STEP OF PRESSURE PI PRESS(X,Y,Z,T)                    **
+      LPSTEP = LAST+1                                                   0024
+      LAST = LAST+L3                                                    0025
+C **   SOURCES OR SINKS FOR THE POLLUTANTS  C,  Q(X,Y,Z)              **
+      LQ = LAST+1                                                       0026
+      LAST = LAST+L3                                                    0027
+C **   DIFFUSSIVITY COEFFICIENT FOR MOMENTUM DKZ(X,Y,Z)=DKZM(X,Y,Z)   **
+      LDKZM = LAST+1                                                    0028
+      LAST = LAST+L3                                                    0029
+C **   DIFFUSSIVITY COEFFICIENT FOR HEAT DKZ(X,Y,Z)=DKZH(X,Y,Z)       **
+      LDKZH = LAST+1                                                    0030
+      LAST = LAST+L3                                                    0031
+C **   TERRAIN ELEVATION IN METERS ELEV(X,Y)                          **
+      LELEV = LAST+1                                                    0032
+      LAST = LAST+L2                                                    0033
+C **   TERRAIN X-GRADIENT IN METERS ELEVX(X,Y)                        **
+      LELEVX = LAST+1                                                   0034
+      LAST = LAST+L2                                                    0035
+C **   TERRAIN Y-GRADIENT IN METERS ELEVY(X,Y)                        **
+      LELEVY = LAST+1                                                   0036
+      LAST = LAST+L2                                                    0037
+C **   ROUGHNESS LENGTH OF TERRAIN IN METERS Z0(X,Y)                  **
+      LZ0 = LAST+1                                                      0038
+      LAST = LAST+L2                                                    0039
+C **   MIXING HEIGHT OR BOUNDARY LAYER HEIGHT HMIX(X,Y)               **
+      LHMIX = LAST+1                                                    0040
+      LAST = LAST+L2                                                    0041
+C **   MIXING HEIGHT AT THE PREVIOUS TIME STEP STEPH(X,Y)             **
+      LSTEPH = LAST+1                                                   0042
+      LAST = LAST+L2                                                    0043
+C **   MEAN TEMPERATURE IN THE SURFACE LAYER TAVR(X,Y)                **
+      LTAVR = LAST+1                                                    0044
+      LAST = LAST+L2                                                    0045
+C **   MONIN-OBUKHOV LENGTH OBUK(X,Y)                                 **
+      LOBUK = LAST+1                                                    0046
+      LAST = LAST+L2                                                    0047
+C **   FRICTION VELOCITY USTAR USTR(X,Y)                              **
+      LUSTR = LAST+1                                                    0048
+      LAST = LAST+L2                                                    0049
+C **   TURBULENT  TEMPERATURE THETASTAR TSTR(X,Y)                     **
+      LTSTR = LAST+1                                                    0050
+      LAST = LAST+L2                                                    0051
+C **   DRY DEPOSITION VELOCITY VDEP(X,Y)                              **
+      LVDEP = LAST+1                                                    0052
+      LAST = LAST+L2                                                    0053
+C **   SURFACE DEPOSITION OF  POLLUTANTS  DEP(X,Y)                    **
+      LDEP = LAST+1                                                     0054
+      LAST = LAST+L2                                                    0055
+C **   VERTICAL HEIGHT Z  ZET(Z)                                      **
+      LZET = LAST+1                                                     0056
+      LAST = LAST+L1                                                    0057
+C **   UNEQUAL POINT STRECHED PARAMETER  DH/DZ = HVAR(Z)              **
+      LHVAR = LAST+1                                                    0058
+      LAST = LAST+L1                                                    0059
+C **   MEAN OR SYNOPTIC U-WIND COMPONENT  UM(Z)                       **
+      LUM = LAST+1                                                      0060
+      LAST = LAST+L1                                                    0061
+C **   MEAN OR SYNOPTIC V-WIND COMPONENT  VM(Z)                       **
+      LVM = LAST+1                                                      0062
+      LAST = LAST+L1                                                    0063
+C **   GEOSTROPHIC U-WIND COMPONENT  UG(Z)                            **
+      LUG = LAST+1                                                      0064
+      LAST = LAST+L1                                                    0065
+C **   GEOSTROPHIC V-WIND COMPONENT  VG(Z)                            **
+      LVG = LAST+1                                                      0066
+      LAST = LAST+L1                                                    0067
+C **   MEAN OR SYNOPTIC POTENTIAL TEMPERATURE TM(Z)                   **
+      LTM = LAST+1                                                      0068
+      LAST = LAST+L1                                                    0069
+C **   MEAN OR SYNOPTIC EDDY DIFFUSSIVITY DKM(Z)                      **
+      LKM = LAST+1                                                      0070
+      LAST = LAST+L1                                                    0071
+C
+C  =====       ALLOCATION OF AUXILIARY WORK SPACE     ==================
+C
+C **   DERIVATIVES WITH RESPECT TO X  DCDX(X,Y,Z)                     **
+      LDCDX = LAST+1                                                    0072
+      LAST = LAST+L3                                                    0073
+C **   DERIVATIVES WITH RESPECT TO Y  DCDY(X,Y,Z)                     **
+      LDCDY = LAST+1                                                    0074
+      LAST = LAST+L3                                                    0075
+C **   HELP VECTOR FOR PADE SCHEME -CENTER ELEMENTS-                  **
+      LAN = LAST+1                                                      0076
+      LAST = LAST+L1                                                    0077
+C **   HELP VECTOR FOR PADE SCHEME -LEFT   ELEMENTS-                  **
+      LBN = LAST+1                                                      0078
+      LAST = LAST+L1                                                    0079
+C **   HELP VECTOR FOR PADE SCHEME -RIGHT  ELEMENTS-                  **
+      LCN = LAST+1                                                      0080
+      LAST = LAST+L1                                                    0081
+C **   UTILITY VECTOR FOR NUMERICAL WORK                              **
+      LHELP = LAST+1                                                    0082
+      LAST = LAST+MAX(NX, NY, NZ)                                       0083
+C **   ANOTHER UTILITY VECTOR FOR DIRTY WORK                          **
+      LHELPA = LAST+1                                                   0084
+      LAST = LAST+MAX(NX, NY, NZ)                                       0085
+C **    WORK VECTOR FOR THE X-FFT                                     **
+      LSAVEX = LAST+1                                                   0086
+      LAST = LAST+2*NX+15                                               0087
+C **    WORK VECTOR FOR THE Y-FFT                                     **
+      LSAVEY = LAST+1                                                   0088
+      LAST = LAST+2*NY+15                                               0089
+C **    X-WAVENUMBERS  FOR FIRST DERIVATIVES                          **
+      LFX = LAST+1                                                      0090
+      LAST = LAST+NX*0.5                                                0091
+C **    X- WEIGHTS FOR HEAT AND POLLUTANTS X,Y SPECTRAL DIFFUSION     **
+      LFXC = LAST+1                                                     0092
+      LAST = LAST+NX                                                    0093
+C **    X - WEIGHTS FOR MOMENTUM HORIZONTAL SPECTRAL DIFFUSION        **
+      LFXX = LAST+1                                                     0094
+      LAST = LAST+NX*0.5                                                0095
+C **    Y-WAVENUMBERS FOR FIRST DERIVATIVES                           **
+      LFY = LAST+1                                                      0096
+      LAST = LAST+NY*0.5                                                0097
+C **    Y- WEIGHTS FOR HEAT AND POLLUTANTS X,Y SPECTRAL DIFFUSION     **
+      LFYC = LAST+1                                                     0098
+      LAST = LAST+NY                                                    0099
+C **    Y - WEIGHTS FOR MOMENTUM HORIZONTAL SPECTRAL DIFFUSION        **
+      LFYY = LAST+1                                                     0100
+      LAST = LAST+NY*0.5                                                0101
+C **    X - FILTER FOR DERIVATIVE  DIFFUSION                          **
+      LFILX = LAST+1                                                    0102
+      LAST = LAST+NX                                                    0103
+C **    Y - FILTER FOR DERIVATIVE  DIFFUSION                          **
+      LFILY = LAST+1                                                    0104
+      LAST = LAST+NY                                                    0105
+C **    Z - FILTER FOR THE SPONGE LAYER IN Z                          **
+      LFILZ = LAST+1                                                    0106
+      LAST = LAST+NZ                                                    0107
+C
+C     MAKE A LAST CHECK
+C
+      WRITE (6, '(A,I8,A)') ' WORK ARRAY HAS ', LAST, ' ELEMENTS.  '    0108
+      IF (NWINDX.EQ.1) PAUSE                                            0109
+C
+C
+C   ====================================================================
+C   *   THIS SUBROUTINE RUN DOES ALL CALCULATIONS  AND ALLOCATES       *
+C   *   GLOBAL TO STATIC MEMORY FOR VECTOR OPERATIONS                  *
+C   ====================================================================
+C
+C
+      CALL RUN(NX, NY, NZ, NT, NTIME, NWINDX, NWINDY, NSINKS, NFILT,    0111
+     &XSTART, YSTART, ZSTART, TSTART, DELTAX, DELTAY, DELTAZ, DELTAT    0111
+     &, PHI, DL, DX, DY, DZ, IB, IK, ITY, NCOUNT, NPRINT, NGRAPH,       0111
+     &NPSTEP, NGSTEP, LAST, WORK(LC), WORK(LCSTEP), WORK(LPOT), WORK(   0111
+     &LTSTEP), WORK(LUX), WORK(LUSTEP), WORK(LVY), WORK(LVSTEP), WORK   0111
+     &(LWZ), WORK(LPI), WORK(LPSTEP), WORK(LQ), WORK(LDKZM), WORK(      0111
+     &LDKZH), WORK(LELEV), WORK(LELEVX), WORK(LELEVY), WORK(LZ0),       0111
+     &WORK(LHMIX), WORK(LSTEPH), WORK(LTAVR), WORK(LOBUK), WORK(LUSTR   0111
+     &), WORK(LTSTR), WORK(LVDEP), WORK(LDEP), WORK(LZET), WORK(LHVAR   0111
+     &), WORK(LUM), WORK(LVM), WORK(LUG), WORK(LVG), WORK(LTM), WORK(   0111
+     &LKM), WORK(LDCDX), WORK(LDCDY), WORK(LAN), WORK(LBN), WORK(LCN)   0111
+     &, WORK(LHELP), WORK(LHELPA), WORK(LSAVEX), WORK(LSAVEY), WORK(    0111
+     &LFX), WORK(LFXC), WORK(LFXX), WORK(LFY), WORK(LFYC), WORK(LFYY)   0111
+     &, WORK(LFILX), WORK(LFILY), WORK(LFILZ))                          0111
+C
+      END

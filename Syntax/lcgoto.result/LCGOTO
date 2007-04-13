@@ -1,0 +1,12 @@
+      PROGRAM LCGOTO
+c     check labelled computed go to's
+
+
+10    IF (I.EQ.1) GOTO 100                                              0001
+      IF (I.EQ.2) GOTO 200                                              0001
+
+100   PRINT *, 100                                                      0002
+200   CONTINUE                                                          0003
+      PRINT *, 200                                                      0003
+
+      END

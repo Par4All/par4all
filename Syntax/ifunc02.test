@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# Please, detect hexadecimal constants at parsing
+
+tpips=${tpips_version:-tpips}
+PIPS_VALIDDIR=${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}
+
+#
+# Conflict between declarations
+#
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+
+delete ifunc02
+create ifunc02 ${PIPS_ROOT}/Validation/Syntax/ifunc02.f
+display PRINTED_FILE[FOO]
+close
+delete ifunc02
+quit
+
+EOF
+

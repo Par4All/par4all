@@ -1,0 +1,81 @@
+user warning in tp_parse: external06: No such workspace
+  Module         EXTERNAL06
+Workspace external06 created and opened.
+Module EXTERNAL06 selected
+Main module PROGRAM "EXTERNAL06" selected.
+Module EXTERNAL06 already active.
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+setproperty PARSER_ACCEPT_ANSI_EXTENSIONS FALSE
+user warning, property PARSER_ACCEPT_ANSI_EXTENSIONS redefined
+Module EXTERNAL06 already active.
+Request: build resource PRINTED_FILE for module EXTERNAL06.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(EXTERNAL06)
+  PARSER                         building   PARSED_CODE(EXTERNAL06)
+                                 building   CALLEES(EXTERNAL06)
+user warning in update_functional_type_with_actual_arguments: Functional actual argument F found.
+Functional arguments are not yet suported by PIPS
+
+Declarations for module EXTERNAL06 with type  () ->  void
+
+
+Variable list:
+
+
+Declared entity EXTERNAL06:*DYNAMIC*	with type area with size 8
+Declared entity EXTERNAL06:*HEAP*	with type area with size 0
+Declared entity EXTERNAL06:*STACK*	with type area with size 0
+Declared entity EXTERNAL06:*STATIC*	with type area with size 0
+Declared entity EXTERNAL06:I	with type variable INTEGER*4
+Declared entity EXTERNAL06:J	with type variable INTEGER*4
+Declared entity TOP-LEVEL:F	with type functional INTEGER*4 x INTEGER*4 ->  void
+Declared entity TOP-LEVEL:G	with type functional ( () ->  REAL*4
+) ->  void
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 8:
+	Variable EXTERNAL06:J,	offset = 0,	size = 4
+	Variable EXTERNAL06:I,	offset = 4,	size = 4
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module EXTERNAL06
+
+  CONTROLIZER                    building   CODE(EXTERNAL06)
+  PRINT_CODE                     building   PRINTED_FILE(EXTERNAL06)
+PRINTED_FILE made for EXTERNAL06.
+      PROGRAM EXTERNAL06
+
+C     check the impact of signature refinment: since it comes later, g
+C     signature remains unchanged, unless some sharing is introduced in
+C     the symbole table for types.
+
+      EXTERNAL F
+
+      CALL G(F)                                                         0001
+
+      CALL F(I, J)                                                      0002
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module EXTERNAL06.
+Closing program.
+Closing workspace.
+Workspace external06 closed.
+
+Workspace external06 deleted.

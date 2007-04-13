@@ -1,0 +1,81 @@
+user warning in tp_parse: equiv03: No such workspace
+  Module         EQUIV03
+Workspace equiv03 created and opened.
+Module EQUIV03 selected
+Main module PROGRAM "EQUIV03" selected.
+Module EQUIV03 already active.
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+Module EQUIV03 already active.
+Request: build resource PRINTED_FILE for module EQUIV03.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(EQUIV03)
+  PARSER                         building   PARSED_CODE(EQUIV03)
+                                 building   CALLEES(EQUIV03)
+
+Declarations for module EQUIV03 with type  () ->  void
+
+
+Variable list:
+
+
+Declared entity EQUIV03:*DYNAMIC*	with type area with size 4
+Declared entity EQUIV03:*HEAP*	with type area with size 0
+Declared entity EQUIV03:*STACK*	with type area with size 0
+Declared entity EQUIV03:*STATIC*	with type area with size 0
+Declared entity EQUIV03:I	with type variable INTEGER*4
+Declared entity EQUIV03:T	with type variable REAL*4
+Declared entity EQUIV03:U	with type variable REAL*4
+Declared entity TOP-LEVEL:~C_U	with type area with size 40
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 4:
+	Variable EQUIV03:I,	offset = 0,	size = 4
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /C_U/ of size 40:
+	Variable EQUIV03:U,	offset = 0,	size = 40
+	Variable EQUIV03:T,	offset = 0,	size = 40
+
+End of declarations for module EQUIV03
+
+  CONTROLIZER                    building   CODE(EQUIV03)
+  PRINT_CODE                     building   PRINTED_FILE(EQUIV03)
+PRINTED_FILE made for EQUIV03.
+      PROGRAM EQUIV03
+
+C     Check that aliased variable T is seen as in the common C_U
+C     when a debugging option is used to print out common layouts
+
+      REAL T(10), U(10)
+      COMMON /C_U/U
+      EQUIVALENCE (T(1),U(1))
+
+      DO I = 2, 10                                                      0001
+         T(I) = U(I-1)                                                  0002
+      ENDDO
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module EQUIV03.
+Closing program.
+Closing workspace.
+Workspace equiv03 closed.
+
+Workspace equiv03 deleted.

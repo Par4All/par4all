@@ -1,0 +1,7 @@
+delete cplch
+create cplch ${PIPS_ROOT}/Validation/Syntax/cplch.f
+module CPLCH
+
+display PRINTED_FILE[CPLCH]
+close
+delete cplch

@@ -1,0 +1,73 @@
+user warning in tp_parse: save: No such workspace
+  Module         FOO
+  Module         SAVEGLOBAL
+Workspace save created and opened.
+Main module PROGRAM "SAVEGLOBAL" selected.
+Module SAVEGLOBAL selected
+Selecting rule: INTERPROCEDURAL_SUMMARY_PRECONDITION
+Selecting rule: PRECONDITIONS_INTER_FULL
+Selecting rule: TRANSFORMERS_INTER_FULL
+Selecting rule: PRINT_CODE_PRECONDITIONS
+Module SAVEGLOBAL already active.
+Request: build resource PRINTED_FILE for module SAVEGLOBAL.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(SAVEGLOBAL)
+  PARSER                         building   PARSED_CODE(SAVEGLOBAL)
+                                 building   CALLEES(SAVEGLOBAL)
+  CONTROLIZER                    building   CODE(SAVEGLOBAL)
+  FILTER_FILE                    building   SOURCE_FILE(FOO)
+  PARSER                         building   PARSED_CODE(FOO)
+                                 building   CALLEES(FOO)
+  CONTROLIZER                    building   CODE(FOO)
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(FOO)
+  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(FOO)
+  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(FOO)
+  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(FOO)
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(SAVEGLOBAL)
+  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(SAVEGLOBAL)
+  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(SAVEGLOBAL)
+  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(SAVEGLOBAL)
+  PROGRAM_PRECONDITION           building   PROGRAM_PRECONDITION()
+  TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(FOO)
+  TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(SAVEGLOBAL)
+  CALLGRAPH                      building   CALLERS(FOO)
+                                 building   CALLERS(SAVEGLOBAL)
+                                 building   HEIGHT(FOO)
+                                 building   HEIGHT(SAVEGLOBAL)
+                                 building   DEPTH(FOO)
+                                 building   DEPTH(SAVEGLOBAL)
+  INTERPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(SAVEGLOBAL)
+  PRECONDITIONS_INTER_FULL       building   PRECONDITIONS(SAVEGLOBAL)
+  PRINT_CODE_PRECONDITIONS       building   PRINTED_FILE(SAVEGLOBAL)
+PRINTED_FILE made for SAVEGLOBAL.
+
+C  P() {}
+
+      PROGRAM SAVEGLOBAL
+
+C  P() {}
+
+
+      CALL FOO(I)                                                       0001
+
+C  P(FOO:I,FOO:J) {FOO:I==FOO:J-1, FOO:I==I}
+
+
+      CALL FOO(I+1)                                                     0002
+
+C  P(FOO:I,FOO:J) {FOO:I==FOO:J-1, FOO:I==I+1}
+
+
+      PRINT *, I                                                        0003
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module FOO.
+  Closing module SAVEGLOBAL.
+Closing program.
+Closing workspace.
+Workspace save closed.
+
+Workspace save deleted.

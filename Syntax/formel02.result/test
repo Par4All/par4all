@@ -1,0 +1,85 @@
+user warning in tp_parse: formel02: No such workspace
+  Module         Q
+  Module         FOO
+  Module         FORMEL02
+Workspace formel02 created and opened.
+Main module PROGRAM "FORMEL02" selected.
+Module FORMEL02 selected
+echo
+
+echo Listing for FOO
+Listing for FOO
+echo
+
+Module FOO selected
+Request: build resource PRINTED_FILE for module FOO.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(FOO)
+  PARSER                         building   PARSED_CODE(FOO)
+                                 building   CALLEES(FOO)
+user warning in SafeLocalToGlobal: Variable FOO:X is a formal functional parameter.
+They are not (yet) supported by PIPS.
+user warning in MakeExternalFunction: unsupported formal function FOO:X
+  CONTROLIZER                    building   CODE(FOO)
+  PRINT_CODE                     building   PRINTED_FILE(FOO)
+PRINTED_FILE made for FOO.
+      SUBROUTINE FOO(X)
+      EXTERNAL X
+      REAL Y(100)
+
+      DO 100 J = 1, 100                                                 0001
+         Y(I) = X(I)                                                    0002
+100      CONTINUE                                                       0003
+      END
+echo
+
+echo Listing for FORMEL02
+Listing for FORMEL02
+echo
+
+Module FORMEL02 already active.
+Request: build resource PRINTED_FILE for module FORMEL02.
+  FILTER_FILE                    building   SOURCE_FILE(FORMEL02)
+  PARSER                         building   PARSED_CODE(FORMEL02)
+                                 building   CALLEES(FORMEL02)
+  CONTROLIZER                    building   CODE(FORMEL02)
+  PRINT_CODE                     building   PRINTED_FILE(FORMEL02)
+PRINTED_FILE made for FORMEL02.
+c     passage de procedure formelle
+C     abort "no source file for x"
+      PROGRAM FORMEL02
+      EXTERNAL Q
+
+C     Forbidden in Fortran 77:
+c      p = q
+
+      CALL FOO(Q)                                                       0001
+      END
+echo
+
+echo Listing for Q
+Listing for Q
+echo
+
+Module Q selected
+Request: build resource PRINTED_FILE for module Q.
+  FILTER_FILE                    building   SOURCE_FILE(Q)
+  PARSER                         building   PARSED_CODE(Q)
+                                 building   CALLEES(Q)
+  CONTROLIZER                    building   CODE(Q)
+  PRINT_CODE                     building   PRINTED_FILE(Q)
+PRINTED_FILE made for Q.
+      FUNCTION Q(I)
+      Q = FLOAT(I)                                                      0001
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module FOO.
+  Closing module FORMEL02.
+  Closing module Q.
+Closing program.
+Closing workspace.
+Workspace formel02 closed.
+
+Workspace formel02 deleted.

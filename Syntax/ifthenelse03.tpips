@@ -1,0 +1,6 @@
+delete ifthenelse03
+create ifthenelse03 ${PIPS_ROOT}/Validation/Syntax/ifthenelse03.f
+display PRINTED_FILE
+close
+delete ifthenelse03
+quit

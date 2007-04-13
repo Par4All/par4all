@@ -1,0 +1,26 @@
+#!/bin/sh
+
+tpips=${tpips_version:-tpips}
+PIPS_VALIDDIR=${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+delete altret11
+create altret11 ${PIPS_ROOT}/Validation/Syntax/altret11.f
+
+# Make sure that ParserError cleans up the data structures
+# altret11.f is not compatible with PIPS parser.
+# The first attempt at displaying fails.
+# The second attempt due to UNSPLIT fails too, but gracefully.
+# Then the compilation fails (do not set ABORD_ON_USER_ERROR)
+# or the scheme is dead.
+
+setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "STOP"
+setproperty PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS TRUE
+
+display PRINTED_FILE[ALTRET11]
+apply UNSPLIT
+shell f77 -c altret11.database/Src/altret11.f
+close
+delete altret11
+quit
+EOF

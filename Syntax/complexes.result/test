@@ -1,0 +1,43 @@
+      PROGRAM COMPLEXES
+      INTEGER K
+      COMPLEX*8 I, J
+      COMPLEX*16 I2
+      SAVE J
+
+      DATA J /(1.0, 0.0)/
+      PRINT *, J                                                        0001
+
+      READ (5, 10) K                                                    0002
+      PRINT *, K                                                        0003
+
+! COMPLEX
+
+      I = CMPLX(0.0, 1.0)                                               0004
+      PRINT *, I                                                        0005
+
+      I = (0.0, 1.0)                                                    0006
+      PRINT *, I                                                        0007
+
+      I = (0.0E0, -1.0E0)                                               0008
+      PRINT *, I                                                        0009
+
+! DOUBLE COMPLEX
+
+      I2 = DCMPLX(0.0, 1.0)                                             0010
+      PRINT *, I2                                                       0011
+
+      I2 = (0.0D0, -1.0D0)                                              0012
+      PRINT *, I2                                                       0013
+
+      I2 = (0.428854343225D-31, -1.4564565454326D+12)                   0014
+      PRINT *, I2                                                       0015
+
+10    FORMAT(I5)                                                        0016
+
+      PRINT *, "continuation...", (0., 1.)                              0017
+
+! expansion => continuations
+      PRINT *, 0.00002D12, I, J, K, 2, I+2*J-4, (0.D0, 1.E0), (-0.3,    0018
+     &1.1)                                                              0018
+
+      END

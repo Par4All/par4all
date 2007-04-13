@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# detect unsupported implied do in data statements
+
+tpips=${tpips_version:-tpips}
+PIPS_VALIDDIR=${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+delete data03
+create data03 ${PIPS_ROOT}/Validation/Syntax/data03.f
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE 
+close
+delete data03
+quit
+EOF
+

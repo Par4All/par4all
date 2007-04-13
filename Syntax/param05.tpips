@@ -1,0 +1,7 @@
+delete param05
+create param05 ${PIPS_ROOT}/Validation/Syntax/param05.f
+module PARAM05
+display PRINTED_FILE[PARAM05]
+close
+delete param05
+quit

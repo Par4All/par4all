@@ -1,0 +1,4 @@
+      FUNCTION E(X)
+      D = X                                                             0001
+      E = D                                                             0002
+      END

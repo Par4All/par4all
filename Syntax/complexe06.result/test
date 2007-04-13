@@ -1,0 +1,10 @@
+      PROGRAM COMPLEXE06
+      COMPLEX Z
+
+c     Goal: use real constants
+
+      Z = (0.0E0, -1.0E0)                                               0001
+
+      PRINT *, Z                                                        0002
+
+      END

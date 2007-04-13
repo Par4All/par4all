@@ -1,0 +1,24 @@
+      PROGRAM ALTRET05
+      INTEGER I
+
+C     Check link-edit issues
+
+      I = 0                                                             0001
+
+      CALL FOO("*123", I)                                               0002
+
+      CALL FOO("*123", I)                                               0003
+
+      STOP 0                                                            0004
+
+123   CONTINUE                                                          0005
+      STOP 1                                                            0006
+
+      END
+      SUBROUTINE FOO(FORMAL_RETURN_LABEL_1, I)
+      INTEGER I
+      CHARACTER*(*) FORMAL_RETURN_LABEL_1
+      PRINT *, "foo is entered with ", I                                0001
+      IF (I.GT.0) STOP "1 in FOO"                                       0002
+      I = I+1                                                           0004
+      END

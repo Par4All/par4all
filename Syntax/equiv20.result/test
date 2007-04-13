@@ -1,0 +1,84 @@
+user warning in tp_parse: equiv20: No such workspace
+  Module         EQUIV20
+Workspace equiv20 created and opened.
+Module EQUIV20 selected
+Main module PROGRAM "EQUIV20" selected.
+Module EQUIV20 already active.
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+Module EQUIV20 already active.
+Request: build resource PRINTED_FILE for module EQUIV20.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(EQUIV20)
+  PARSER                         building   PARSED_CODE(EQUIV20)
+                                 building   CALLEES(EQUIV20)
+
+Declarations for module EQUIV20 with type  () ->  void
+
+
+Variable list:
+
+
+Declared entity EQUIV20:*DYNAMIC*	with type area with size 0
+Declared entity EQUIV20:*HEAP*	with type area with size 0
+Declared entity EQUIV20:*STACK*	with type area with size 0
+Declared entity EQUIV20:*STATIC*	with type area with size 0
+Declared entity EQUIV20:X	with type variable INTEGER*4
+Declared entity EQUIV20:X1	with type variable INTEGER*4
+Declared entity EQUIV20:Y	with type variable INTEGER*4
+Declared entity EQUIV20:Y2	with type variable INTEGER*4
+Declared entity TOP-LEVEL:~FOO	with type area with size 12
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /FOO/ of size 12:
+	Variable EQUIV20:X,	offset = 0,	size = 8
+	Variable EQUIV20:Y2,	offset = 8,	size = 4
+	Variable EQUIV20:X1,	offset = 0,	size = 4
+	Variable EQUIV20:Y,	offset = 4,	size = 8
+
+End of declarations for module EQUIV20
+
+  CONTROLIZER                    building   CODE(EQUIV20)
+  PRINT_CODE                     building   PRINTED_FILE(EQUIV20)
+PRINTED_FILE made for EQUIV20.
+      PROGRAM EQUIV20
+
+C     Check that equivalenced variables declared in common are properly allocated
+
+      INTEGER X(2), Y(2)
+      INTEGER X1, Y2
+      COMMON /FOO/ X, Y2
+      EQUIVALENCE (X1,X(1)), (Y(2),Y2)
+
+      X(2) = 3                                                          0001
+
+      PRINT *, Y(1)                                                     0002
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module EQUIV20.
+Closing program.
+Closing workspace.
+Workspace equiv20 closed.
+
+Workspace equiv20 deleted.

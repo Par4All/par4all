@@ -1,0 +1,7 @@
+delete complexes
+create complexes ${PIPS_ROOT}/Validation/Syntax/complexes.f
+setproperty PRETTYPRINT_ALL_DECLARATIONS=TRUE
+display PRINTED_FILE($ALL)
+close
+delete complexes
+quit

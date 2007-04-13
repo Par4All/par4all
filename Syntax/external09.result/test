@@ -1,0 +1,274 @@
+user warning in tp_parse: external09: No such workspace
+  Module         G
+  Module         H
+  Module         F
+  Module         EXTERNAL09
+Workspace external09 created and opened.
+Main module PROGRAM "EXTERNAL09" selected.
+Module EXTERNAL09 selected
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+setproperty PARSER_ACCEPT_ANSI_EXTENSIONS FALSE
+user warning, property PARSER_ACCEPT_ANSI_EXTENSIONS redefined
+setproperty PARSER_TYPE_CHECK_CALL_SITES
+user error in parse_properties: bad value for property PARSER_TYPE_CHECK_CALL_SITES: 
+echo
+
+echo Main parsed first
+Main parsed first
+echo
+
+Module EXTERNAL09 already active.
+Request: build resource PRINTED_FILE for module EXTERNAL09.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(EXTERNAL09)
+  PARSER                         building   PARSED_CODE(EXTERNAL09)
+                                 building   CALLEES(EXTERNAL09)
+user warning in update_functional_type_with_actual_arguments: Functional actual argument F found.
+Functional arguments are not yet suported by PIPS
+
+Declarations for module EXTERNAL09 with type  () ->  void
+
+
+Variable list:
+
+
+Declared entity EXTERNAL09:*DYNAMIC*	with type area with size 16
+Declared entity EXTERNAL09:*HEAP*	with type area with size 0
+Declared entity EXTERNAL09:*STACK*	with type area with size 0
+Declared entity EXTERNAL09:*STATIC*	with type area with size 0
+Declared entity EXTERNAL09:I	with type variable INTEGER*4
+Declared entity EXTERNAL09:J	with type variable INTEGER*4
+Declared entity EXTERNAL09:K	with type variable INTEGER*4
+Declared entity EXTERNAL09:L	with type variable INTEGER*4
+Declared entity TOP-LEVEL:F	with type functional INTEGER*4 x INTEGER*4 ->  INTEGER*4
+Declared entity TOP-LEVEL:G	with type functional ( () ->  INTEGER*4
+) ->  void
+Declared entity TOP-LEVEL:H	with type functional  () ->  INTEGER*4
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 16:
+	Variable EXTERNAL09:L,	offset = 0,	size = 4
+	Variable EXTERNAL09:K,	offset = 4,	size = 4
+	Variable EXTERNAL09:J,	offset = 8,	size = 4
+	Variable EXTERNAL09:I,	offset = 12,	size = 4
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module EXTERNAL09
+
+  CONTROLIZER                    building   CODE(EXTERNAL09)
+  PRINT_CODE                     building   PRINTED_FILE(EXTERNAL09)
+PRINTED_FILE made for EXTERNAL09.
+      PROGRAM EXTERNAL09
+
+C      Same as external07, but for functions
+
+C     Check the type consistency check option: PARSER_TYPE_CHECK_CALL_SITES
+C     (it does not seem to work)
+C     Check two parsing orders: F before or after EXTERNAL09
+C     When F is called first, MakeAtom understands "call g(f)" as call "g(f())"
+
+      EXTERNAL F
+      INTEGER F
+      INTEGER H
+
+      CALL G(F)                                                         0001
+
+      I = 2                                                             0002
+      J = 3                                                             0003
+
+      K = F(I, J)                                                       0004
+
+      L = F(F(I, J), H())                                               0005
+
+      PRINT *, K, L                                                     0006
+
+      END
+Module F selected
+Request: build resource PRINTED_FILE for module F.
+  FILTER_FILE                    building   SOURCE_FILE(F)
+  PARSER                         building   PARSED_CODE(F)
+                                 building   CALLEES(F)
+
+Declarations for module F with type INTEGER*4 x INTEGER*4 ->  INTEGER*4
+
+
+Variable list:
+
+
+Declared entity F:*DYNAMIC*	with type area with size 0
+Declared entity F:*HEAP*	with type area with size 0
+Declared entity F:*STACK*	with type area with size 0
+Declared entity F:*STATIC*	with type area with size 0
+Declared entity F:F	with type variable INTEGER*4
+Declared entity F:I	with type variable INTEGER*4
+Declared entity F:J	with type variable INTEGER*4
+
+Layouts for formal parameters:
+
+	Variable F:I,	offset = 1
+	Variable F:J,	offset = 2
+
+Layout for return variable:
+
+	Variable F:F,	size = 4
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module F
+
+  CONTROLIZER                    building   CODE(F)
+  PRINT_CODE                     building   PRINTED_FILE(F)
+PRINTED_FILE made for F.
+
+      INTEGER FUNCTION F(I, J)
+
+      PRINT *, "f called for ", I, J                                    0001
+
+      F = I+J                                                           0002
+
+      END
+Module G selected
+Request: build resource PRINTED_FILE for module G.
+  FILTER_FILE                    building   SOURCE_FILE(G)
+  PARSER                         building   PARSED_CODE(G)
+                                 building   CALLEES(G)
+user warning in SafeLocalToGlobal: Variable G:F is a formal functional parameter.
+They are not (yet) supported by PIPS.
+user warning in MakeExternalFunction: unsupported formal function G:F
+
+Declarations for module G with type (INTEGER*4 x INTEGER*4 ->  INTEGER*4
+) ->  void
+
+
+Variable list:
+
+
+Declared entity G:*DYNAMIC*	with type area with size 0
+Declared entity G:*HEAP*	with type area with size 0
+Declared entity G:*STACK*	with type area with size 0
+Declared entity G:*STATIC*	with type area with size 0
+Declared entity G:F	with type functional INTEGER*4 x INTEGER*4 ->  INTEGER*4
+
+Layouts for formal parameters:
+
+	Variable G:F,	offset = 1
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module G
+
+  CONTROLIZER                    building   CODE(G)
+  PRINT_CODE                     building   PRINTED_FILE(G)
+PRINTED_FILE made for G.
+
+      SUBROUTINE G(F)
+      INTEGER F
+      EXTERNAL F
+      PRINT *, F(10, 1)                                                 0001
+      END
+Module H selected
+Request: build resource PRINTED_FILE for module H.
+  FILTER_FILE                    building   SOURCE_FILE(H)
+  PARSER                         building   PARSED_CODE(H)
+                                 building   CALLEES(H)
+
+Declarations for module H with type  () ->  INTEGER*4
+
+
+Variable list:
+
+
+Declared entity H:*DYNAMIC*	with type area with size 0
+Declared entity H:*HEAP*	with type area with size 0
+Declared entity H:*STACK*	with type area with size 0
+Declared entity H:*STATIC*	with type area with size 0
+Declared entity H:H	with type variable INTEGER*4
+
+Layout for return variable:
+
+	Variable H:H,	size = 4
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module H
+
+  CONTROLIZER                    building   CODE(H)
+  PRINT_CODE                     building   PRINTED_FILE(H)
+PRINTED_FILE made for H.
+
+      INTEGER FUNCTION H()
+      H = 1                                                             0001
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module EXTERNAL09.
+  Closing module F.
+  Closing module G.
+  Closing module H.
+Closing program.
+Closing workspace.
+Workspace external09 closed.
+

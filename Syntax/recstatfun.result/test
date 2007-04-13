@@ -1,0 +1,10 @@
+      SUBROUTINE STATFUN
+      REAL FXI(4)
+C               <must be written>: FXI(1)
+C$PIPS STATEMENT FUNCTION F2 SUBSTITUTED
+C$PIPS STATEMENT FUNCTION F3 SUBSTITUTED
+      FXI(1) = -1+(-1)                                                  0001
+C               <must be written>: FXI(2)
+      FXI(2) = -(1+1)+(-(1+1))                                          0002
+      END
+

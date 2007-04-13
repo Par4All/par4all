@@ -1,0 +1,11 @@
+      SUBROUTINE STATIC01(N)
+
+C     Check (VMS?) extension STATIC for SAVE
+
+      STATIC M
+
+      I = M                                                             0001
+      M = N                                                             0002
+      N = I                                                             0003
+
+      END

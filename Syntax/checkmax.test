@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# Type check the max operators
+
+tpips=${tpips_version:-tpips}
+
+($tpips 2>&1 | grep "user warning") <<EOF
+delete checkmax
+create checkmax ${PIPS_ROOT}/Validation/Syntax/checkmax.f
+setproperty PARSER_TYPE_CHECK_CALL_SITES   TRUE
+display PRINTED_FILE(CHECKMAX)
+close
+delete checkmax
+quit
+EOF
+

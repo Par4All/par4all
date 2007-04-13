@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# Type check the max operators
+
+tpips=${tpips_version:-tpips}
+
+($tpips 2>&1 |sed '/file *\//d' ) <<EOF
+delete checktype
+create checktype ${PIPS_ROOT}/Validation/Syntax/checktype.f
+module CHECKTYPE
+setproperty PARSER_TYPE_CHECK_CALL_SITES   TRUE
+display PRINTED_FILE(CHECKTYPE)
+close
+delete checktype
+quit
+# EOF

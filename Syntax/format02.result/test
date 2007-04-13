@@ -1,0 +1,16 @@
+      PROGRAM FORMAT02
+      INTEGER I
+      REAL*4 T(1:10)
+
+c     check that formats in declarations are OK if PRETTYPRINT_ALL_DECLARATIONS
+C     is set
+
+1000  FORMAT('Hello world')                                             0001
+
+      WRITE (6, 1000)                                                   0002
+
+      DO I = 1, 10                                                      0003
+         T(I) = 0.                                                      0004
+      ENDDO
+
+      END

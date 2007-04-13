@@ -1,0 +1,14 @@
+#!/bin/sh
+
+tpips=${tpips_version:-tpips}
+PIPS_VALIDDIR=${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+delete cmplx01
+create cmplx01 ${PIPS_ROOT}/Validation/Syntax/cmplx01.f
+display PRINTED_FILE
+display PRINTED_FILE[FOO]
+close
+delete cmplx01
+quit
+EOF

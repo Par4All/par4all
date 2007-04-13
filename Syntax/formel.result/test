@@ -1,0 +1,193 @@
+user warning in tp_parse: formel: No such workspace
+  Module         Q
+  Module         FOO
+  Module         FORMEL
+Workspace formel created and opened.
+Main module PROGRAM "FORMEL" selected.
+Module FORMEL selected
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+setproperty PARSER_ACCEPT_ANSI_EXTENSIONS FALSE
+user warning, property PARSER_ACCEPT_ANSI_EXTENSIONS redefined
+Module FORMEL already active.
+Request: build resource PRINTED_FILE for module FORMEL.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(FORMEL)
+  PARSER                         building   PARSED_CODE(FORMEL)
+                                 building   CALLEES(FORMEL)
+user warning in update_functional_type_with_actual_arguments: Functional actual argument Q found.
+Functional arguments are not yet suported by PIPS
+
+Declarations for module FORMEL with type  () ->  void
+
+
+Variable list:
+
+
+Declared entity FORMEL:*DYNAMIC*	with type area with size 0
+Declared entity FORMEL:*HEAP*	with type area with size 0
+Declared entity FORMEL:*STACK*	with type area with size 0
+Declared entity FORMEL:*STATIC*	with type area with size 0
+Declared entity TOP-LEVEL:FOO	with type functional ( () ->  REAL*4
+) ->  void
+Declared entity TOP-LEVEL:Q	with type functional  () ->  REAL*4
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module FORMEL
+
+  CONTROLIZER                    building   CODE(FORMEL)
+  PRINT_CODE                     building   PRINTED_FILE(FORMEL)
+PRINTED_FILE made for FORMEL.
+c     passage de procedure formelle
+C     abort "no source file for x"
+      PROGRAM FORMEL
+      EXTERNAL Q
+
+C     Forbidden in Fortran 77:
+c      p = q
+
+      CALL FOO(Q)                                                       0001
+      END
+Module FOO selected
+Request: build resource PRINTED_FILE for module FOO.
+  FILTER_FILE                    building   SOURCE_FILE(FOO)
+  PARSER                         building   PARSED_CODE(FOO)
+                                 building   CALLEES(FOO)
+user warning in SafeLocalToGlobal: Variable FOO:X is a formal functional parameter.
+They are not (yet) supported by PIPS.
+user warning in MakeExternalFunction: unsupported formal function FOO:X
+
+Declarations for module FOO with type (INTEGER*4 ->  REAL*4
+) ->  void
+
+
+Variable list:
+
+
+Declared entity FOO:*DYNAMIC*	with type area with size 408
+Declared entity FOO:*HEAP*	with type area with size 0
+Declared entity FOO:*STACK*	with type area with size 0
+Declared entity FOO:*STATIC*	with type area with size 0
+Declared entity FOO:I	with type variable INTEGER*4
+Declared entity FOO:J	with type variable INTEGER*4
+Declared entity FOO:X	with type functional INTEGER*4 ->  REAL*4
+Declared entity FOO:Y	with type variable REAL*4
+
+Layouts for formal parameters:
+
+	Variable FOO:X,	offset = 1
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 408:
+	Variable FOO:I,	offset = 0,	size = 4
+	Variable FOO:J,	offset = 4,	size = 4
+	Variable FOO:Y,	offset = 8,	size = 400
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module FOO
+
+  CONTROLIZER                    building   CODE(FOO)
+  PRINT_CODE                     building   PRINTED_FILE(FOO)
+PRINTED_FILE made for FOO.
+      SUBROUTINE FOO(X)
+      REAL Y(100)
+
+      DO 100 J = 1, 100                                                 0001
+         Y(I) = X(I)                                                    0002
+100      CONTINUE                                                       0003
+      END
+Module Q selected
+Request: build resource PRINTED_FILE for module Q.
+  FILTER_FILE                    building   SOURCE_FILE(Q)
+  PARSER                         building   PARSED_CODE(Q)
+                                 building   CALLEES(Q)
+
+Declarations for module Q with type INTEGER*4 ->  REAL*4
+
+
+Variable list:
+
+
+Declared entity Q:*DYNAMIC*	with type area with size 0
+Declared entity Q:*HEAP*	with type area with size 0
+Declared entity Q:*STACK*	with type area with size 0
+Declared entity Q:*STATIC*	with type area with size 0
+Declared entity Q:I	with type variable INTEGER*4
+Declared entity Q:Q	with type variable REAL*4
+Declared entity TOP-LEVEL:FLOAT	with type functional OVERLOADED ->  REAL*4
+
+Layouts for formal parameters:
+
+	Variable Q:I,	offset = 1
+
+Layout for return variable:
+
+	Variable Q:Q,	size = 4
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module Q
+
+  CONTROLIZER                    building   CODE(Q)
+  PRINT_CODE                     building   PRINTED_FILE(Q)
+PRINTED_FILE made for Q.
+      FUNCTION Q(I)
+      Q = FLOAT(I)                                                      0001
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module FOO.
+  Closing module FORMEL.
+  Closing module Q.
+Closing program.
+Closing workspace.
+Workspace formel closed.
+
+Workspace formel deleted.

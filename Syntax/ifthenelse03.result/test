@@ -1,0 +1,27 @@
+user warning in tp_parse: ifthenelse03: No such workspace
+  Module         IFTHENELSE03
+Workspace ifthenelse03 created and opened.
+Module IFTHENELSE03 selected
+Main module PROGRAM "IFTHENELSE03" selected.
+Module IFTHENELSE03 already active.
+Module IFTHENELSE03 already active.
+Request: build resource PRINTED_FILE for module IFTHENELSE03.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(IFTHENELSE03)
+  PARSER                         building   PARSED_CODE(IFTHENELSE03)
+                                 building   CALLEES(IFTHENELSE03)
+user error in MakeElseInst: Parser error between lines 11 and 11
+block if statement badly nested
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module IFTHENELSE03.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module IFTHENELSE03.
+Closing program.
+Closing workspace.
+Workspace ifthenelse03 closed.
+
+Workspace ifthenelse03 deleted.

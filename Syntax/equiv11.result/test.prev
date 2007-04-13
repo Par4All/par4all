@@ -1,0 +1,78 @@
+user warning in tp_parse: equiv11: No such workspace
+  Module         EQUIV11
+Workspace equiv11 created and opened.
+Module EQUIV11 selected
+Main module PROGRAM "EQUIV11" selected.
+Module EQUIV11 already active.
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+Module EQUIV11 already active.
+Request: build resource PRINTED_FILE for module EQUIV11.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(EQUIV11)
+  PARSER                         building   PARSED_CODE(EQUIV11)
+                                 building   CALLEES(EQUIV11)
+
+Declarations for module EQUIV11
+
+Variable list:
+
+
+Declared entity EQUIV11:*DYNAMIC*	with type area with size 812
+Declared entity EQUIV11:*STATIC*	with type area with size 0
+Declared entity EQUIV11:Y	with type variable REAL*4
+Declared entity EQUIV11:X	with type variable REAL*4
+Declared entity EQUIV11:Z	with type variable REAL*4
+Declared entity EQUIV11:U	with type variable REAL*4
+Declared entity EQUIV11:V	with type variable REAL*4
+Declared entity TOP-LEVEL:V	with type functional  () ->  REAL*4
+Declared entity EQUIV11:I	with type variable INTEGER*4
+Declared entity EQUIV11:J	with type variable INTEGER*4
+
+Layouts for areas (commons):
+
+
+Layout for common /*DYNAMIC*/ of size 812:
+	Variable EQUIV11:Z,	offset = 0,	size = 4
+	Variable EQUIV11:V,	offset = 4,	size = 4
+	Variable EQUIV11:J,	offset = 404,	size = 4
+	Variable EQUIV11:I,	offset = 408,	size = 4
+	Variable EQUIV11:Y,	offset = 412,	size = 400
+	Variable EQUIV11:X,	offset = 0,	size = 4
+	Variable EQUIV11:U,	offset = 4,	size = 400
+
+	Variables aliased to this common:
+
+
+Layout for common /*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module EQUIV11
+
+  CONTROLIZER                    building   CODE(EQUIV11)
+  PRINT_CODE                     building   PRINTED_FILE(EQUIV11)
+PRINTED_FILE made for EQUIV11.
+      PROGRAM EQUIV11
+
+C     Check that an external cannot appear in an EQUIVALENCE: PIPS does not
+
+      REAL Y(100)
+      EQUIVALENCE (X, Z), (U, V)
+      REAL U(100)
+      EXTERNAL V
+
+      DO I = 2, 10                                                      0001
+         Y(I) = 0.                                                      0002
+      ENDDO
+
+      PRINT *, I, J                                                     0003
+
+      END
+Deletion of obsolete resources: none destroyed.
+Closing all modules.
+  Closing module EQUIV11.
+Closing program.
+Closing workspace.
+Workspace equiv11 closed.
+
+Workspace equiv11 deleted.

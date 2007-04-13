@@ -1,0 +1,63 @@
+user warning in tp_parse: capture03: No such workspace
+  Module         MIN
+  Module         FOO
+  Module         CAPTURE03
+Workspace capture03 created and opened.
+Main module PROGRAM "CAPTURE03" selected.
+Module CAPTURE03 selected
+Module CAPTURE03 already active.
+Module CAPTURE03 already active.
+Request: build resource PRINTED_FILE for module CAPTURE03.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(CAPTURE03)
+  PARSER                         building   PARSED_CODE(CAPTURE03)
+                                 building   CALLEES(CAPTURE03)
+  CONTROLIZER                    building   CODE(CAPTURE03)
+  PRINT_CODE                     building   PRINTED_FILE(CAPTURE03)
+PRINTED_FILE made for CAPTURE03.
+C     test de la (non) capture des intrinsics, e.g. MIN used as a 
+C     statement function, while another user module uses a function
+C     with the same name
+
+      PROGRAM CAPTURE03
+C     Here "min" is the Fortran intrinsics
+      I = MIN(2, 3)                                                     0001
+      PRINT *, I                                                        0002
+      CALL FOO(I)                                                       0003
+      PRINT *, I                                                        0004
+      END
+Module FOO selected
+Request: build resource PRINTED_FILE for module FOO.
+  FILTER_FILE                    building   SOURCE_FILE(FOO)
+  PARSER                         building   PARSED_CODE(FOO)
+                                 building   CALLEES(FOO)
+user warning in DeclareExternalFunction: Name conflict between user declared module MIN and intrinsic MIN
+user error in DeclareExternalFunction: Parser error between lines 4 and 4
+Name conflict with intrinsic because PIPS does not support a specific name space for intrinsics. Please change your function or subroutine name.
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module FOO.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Module MIN selected
+Request: build resource PRINTED_FILE for module MIN.
+  FILTER_FILE                    building   SOURCE_FILE(MIN)
+  PARSER                         building   PARSED_CODE(MIN)
+                                 building   CALLEES(MIN)
+user warning in MakeCurrentFunction: Intrinsic MIN redefined.
+This is not supported by PIPS. Please rename MIN
+user error in MakeCurrentFunction: Parser error between lines 2 and 2
+Name conflict between a subroutine and/or a function and an intrinsic
+
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module MIN.
+user error in display_a_resource: Cannot build view file PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module CAPTURE03.
+  Closing module FOO.
+  Closing module MIN.
+Closing program.
+Closing workspace.
+Workspace capture03 closed.
+
+Workspace capture03 deleted.

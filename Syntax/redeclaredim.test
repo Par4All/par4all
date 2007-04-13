@@ -1,0 +1,13 @@
+#!/bin/sh
+
+if Pips -f $PIPS_ROOT/Validation/Syntax/redeclaredim.f -w redeclaredim -m redeclaredim -b CODE >&2
+then
+	echo Parser failed to fail for dimension redeclaration in redeclaredim.f
+	Delete redeclaredim 2>/dev/null
+	exit 1
+else
+	echo Parser failed for dimension redeclaration in redeclaredim.f
+	Display -v -m redeclaredim -w redeclaredim code 2>&1 | grep "^user [ew]"
+	Delete redeclaredim 2>/dev/null
+
+fi

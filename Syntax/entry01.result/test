@@ -1,0 +1,21 @@
+
+Module ENTRY01
+
+      SUBROUTINE ENTRY01(N)
+      INTEGER N, M, K
+
+      PRINT *, N                                                        0001
+
+
+      END
+
+Entry INCREMENT
+
+      SUBROUTINE INCREMENT(N)
+      INTEGER N, M, K
+
+99998 CONTINUE                                                          0001
+
+      M = K+1                                                           0002
+
+      END

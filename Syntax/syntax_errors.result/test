@@ -1,0 +1,52 @@
+-- test with the property
+Registering file ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f
+Checking Fortran syntax of ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f
+${PIPS_ROOT}/Validation/Syntax/syntax_errors.f:
+ MAIN error:
+"${PIPS_ROOT}/Validation/Syntax/syntax_errors.f", line 1: ANSI extension: input contains lower case letters
+"${PIPS_ROOT}/Validation/Syntax/syntax_errors.f", line 2: Error: syntax error at or near character constant 'hello'
+"${PIPS_ROOT}/Validation/Syntax/syntax_errors.f", line 3: Error: unclassifiable statement
+user warning in safe_system_no_abort: Failed (ret: 1, sig: 0) for 'f77 -c -ansi ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f -o ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f.pips.o ; test -f ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f.pips.o && rm ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f.pips.o'
+user warning in check_fortran_syntax_before_pips: 
+
+	Fortran syntax errors in file ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f!
+
+Splitting file    ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f
+  Module         ERROR
+Workspace syntax_error created and opened.
+Module ERROR selected
+Module ERROR selected
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module ERROR.
+Closing program.
+Closing workspace.
+Workspace syntax_error closed.
+
+-- test from the environment
+Registering file ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f
+Checking Fortran syntax of ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f
+${PIPS_ROOT}/Validation/Syntax/syntax_errors.f:
+ MAIN error:
+"${PIPS_ROOT}/Validation/Syntax/syntax_errors.f", line 1: ANSI extension: input contains lower case letters
+"${PIPS_ROOT}/Validation/Syntax/syntax_errors.f", line 2: Error: syntax error at or near character constant 'hello'
+"${PIPS_ROOT}/Validation/Syntax/syntax_errors.f", line 3: Error: unclassifiable statement
+user warning in safe_system_no_abort: Failed (ret: 1, sig: 0) for 'f77 -c -ansi ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f -o ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f.pips.o ; test -f ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f.pips.o && rm ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f.pips.o'
+user warning in check_fortran_syntax_before_pips: 
+
+	Fortran syntax errors in file ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f!
+
+Splitting file    ${PIPS_ROOT}/Validation/Syntax/syntax_errors.f
+  Module         ERROR
+Workspace syntax_error created and opened.
+Module ERROR selected
+Module ERROR selected
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module ERROR.
+Closing program.
+Closing workspace.
+Workspace syntax_error closed.
+

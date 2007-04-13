@@ -1,0 +1,29 @@
+#!/bin/sh
+
+tpips=${tpips_version:-tpips}
+PIPS_VALIDDIR=${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+delete entry23
+create entry23 ${PIPS_ROOT}/Validation/Syntax/entry23.f
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+echo
+echo Module ENTRY23
+echo
+
+display PRINTED_FILE[ENTRY23]
+
+# quit
+
+echo
+echo Entry INIBND
+echo
+
+display PRINTED_FILE[INIBND]
+
+close
+delete entry23
+quit
+EOF
