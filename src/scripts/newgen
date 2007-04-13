@@ -149,6 +149,7 @@ go () {
 	ORDER=/tmp/order$$
 	OK=/tmp/result$$
 
+	# should it be ahead instead?
 	PATH=$PATH:$NEWGEN_ROOT/bin/$NEWGEN_ARCH:$NEWGEN_ROOT/bin/$PIPS_ARCH
 
 	shift 3
