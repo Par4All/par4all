@@ -1,0 +1,24 @@
+#
+# transpose demo for hpfc with tpips
+#
+delete transpose
+shell rm -rf transpose.hpfc
+#
+set HPFC_IGNORE_FCD_TIME TRUE
+set HPFC_IGNORE_FCD_SYNCHRO TRUE
+create transpose ${PIPS_ROOT}/Validation/SC95/transpose.f
+#
+# compile !
+#
+activate MUST_REGIONS 
+apply HPFC_INSTALL
+close
+#
+# result
+#
+shell mv ./transpose.database/hpfc ./transpose.hpfc
+delete transpose
+# shell gmake -C transpose.hpfc
+shell cat transpose.hpfc/TRANSPOSE_*.f 
+shell rm -rf transpose.hpfc
+#

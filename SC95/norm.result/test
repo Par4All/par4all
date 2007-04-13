@@ -1,0 +1,188 @@
+
+      SUBROUTINE NORM(LI,NI,MI,NN,NC,I) 
+C***************************************************************
+C     CALCULE LES NORMALES
+C     LI,NI,MI  : PLANS (I+1), I ,(I-1)
+C     NN : RESULTATS (UNIQUEMENT POUR LES NORM. AUX PLAN I1 ET I2)
+C     NC : STOCKAGE DES NORMALES DANS LE CADRE DU TABLEAU T
+C     MAILLAGE SYMETRIQUE / XOY
+C     CALCULS SPECIFIQUES A L AILE ETUDIEE
+C****************************************************************
+      DIMENSION T(52,21,60)
+      DIMENSION TI(3)
+
+      COMMON/T/T
+      COMMON/I/I1,I2,IMAX,I1P1,I1P2,I2M1,I2M2,IBF
+      COMMON/J/J1,J2,JMAX,J1P1,J1P2,J2M1,J2M2,JA,JB,JAM1,JBP1
+      COMMON/K/K1,K2,KMAX,K1P1,K1P2,K2M1,K2M2
+      COMMON/IO/LEC,IMP,KIMP,NXYZ,NGEO,NDIST
+
+C ....
+
+DO 300 K=K1,K2
+      DO 300 J = J1, JA                                                 0001
+
+         CALL PVNMUT(TI)                                                0002
+         T(J,K,NN) = S*TI(1)                                            0003
+         T(J,K,NN+1) = S*TI(2)                                          0004
+         T(J,K,NN+2) = S*TI(3)                                          0005
+300      CONTINUE                                                       0006
+
+C ....
+
+      END
+
+      SUBROUTINE PVNMUT(C)
+C********************************************
+C     ECRITURE DE C
+C********************************************
+      DIMENSION C(3), CX(3)
+      CX(1) = 1                                                         0001
+      CX(2) = 2                                                         0002
+      CX(3) = 3                                                         0003
+      R = SQRT(CX(1)*CX(1)+CX(2)*CX(2)+CX(3)*CX(3))                     0004
+      IF (R.LT.1.E-12) R = 1.                                           0005
+      DO I = 1, 3                                                       0007
+         C(I) = CX(I)/R                                                 0008
+      ENDDO
+      END
+
+C  <T(PHI1,PHI2,PHI3)-W-MAY-{J1<=PHI1, PHI1<=JA, NN<=PHI3,
+C    PHI3<=2+NN}>
+
+
+      SUBROUTINE NORM(LI,NI,MI,NN,NC,I) 
+C***************************************************************
+C     CALCULE LES NORMALES
+C     LI,NI,MI  : PLANS (I+1), I ,(I-1)
+C     NN : RESULTATS (UNIQUEMENT POUR LES NORM. AUX PLAN I1 ET I2)
+C     NC : STOCKAGE DES NORMALES DANS LE CADRE DU TABLEAU T
+C     MAILLAGE SYMETRIQUE / XOY
+C     CALCULS SPECIFIQUES A L AILE ETUDIEE
+C****************************************************************
+      DIMENSION T(52,21,60)
+      DIMENSION TI(3)
+
+      COMMON/T/T
+      COMMON/I/I1,I2,IMAX,I1P1,I1P2,I2M1,I2M2,IBF
+      COMMON/J/J1,J2,JMAX,J1P1,J1P2,J2M1,J2M2,JA,JB,JAM1,JBP1
+      COMMON/K/K1,K2,KMAX,K1P1,K1P2,K2M1,K2M2
+      COMMON/IO/LEC,IMP,KIMP,NXYZ,NGEO,NDIST
+
+C  <T(PHI1,PHI2,PHI3)-W-EXACT-{PHI2==K, J1<=PHI1, PHI1<=JA, NN<=PHI3,
+C    PHI3<=2+NN}>
+C  <TI(PHI1)-R-EXACT-{1<=PHI1, PHI1<=3, J1<=JA}>
+C  <TI(PHI1)-W-EXACT-{1<=PHI1, PHI1<=3, J1<=JA}>
+
+
+C ....
+
+DO 300 K=K1,K2
+      DO 300 J = J1, JA                                                 0001
+
+C  <TI(PHI1)-W-EXACT-{1<=PHI1, PHI1<=3, J1<=J, J<=JA}>
+
+
+         CALL PVNMUT(TI)                                                0002
+
+C  <T(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==J, PHI2==K, PHI3==NN, J1<=J,
+C    J<=JA}>
+C  <TI(PHI1)-R-EXACT-{PHI1==1, J1<=J, J<=JA}>
+
+         T(J,K,NN) = S*TI(1)                                            0003
+
+C  <T(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==J, PHI2==K, PHI3==NN+1, J1<=J,
+C    J<=JA}>
+C  <TI(PHI1)-R-EXACT-{PHI1==2, J1<=J, J<=JA}>
+
+         T(J,K,NN+1) = S*TI(2)                                          0004
+
+C  <T(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==J, PHI2==K, PHI3==NN+2, J1<=J,
+C    J<=JA}>
+C  <TI(PHI1)-R-EXACT-{PHI1==3, J1<=J, J<=JA}>
+
+         T(J,K,NN+2) = S*TI(3)                                          0005
+300      CONTINUE                                                       0006
+
+C ....
+
+      END
+
+      SUBROUTINE NORM(LI,NI,MI,NN,NC,I) 
+C***************************************************************
+C     CALCULE LES NORMALES
+C     LI,NI,MI  : PLANS (I+1), I ,(I-1)
+C     NN : RESULTATS (UNIQUEMENT POUR LES NORM. AUX PLAN I1 ET I2)
+C     NC : STOCKAGE DES NORMALES DANS LE CADRE DU TABLEAU T
+C     MAILLAGE SYMETRIQUE / XOY
+C     CALCULS SPECIFIQUES A L AILE ETUDIEE
+C****************************************************************
+      DIMENSION T(52,21,60)
+      DIMENSION TI(3)
+
+      COMMON/T/T
+      COMMON/I/I1,I2,IMAX,I1P1,I1P2,I2M1,I2M2,IBF
+      COMMON/J/J1,J2,JMAX,J1P1,J1P2,J2M1,J2M2,JA,JB,JAM1,JBP1
+      COMMON/K/K1,K2,KMAX,K1P1,K1P2,K2M1,K2M2
+      COMMON/IO/LEC,IMP,KIMP,NXYZ,NGEO,NDIST
+
+C ....
+
+DO 300 K=K1,K2
+      DO 300 J = J1, JA                                                 0001
+
+         CALL PVNMUT(TI)                                                0002
+
+C  <TI(PHI1)-IN-EXACT-{PHI1==1, J1<=J, J<=JA}>
+
+         T(J,K,NN) = S*TI(1)                                            0003
+
+C  <TI(PHI1)-IN-EXACT-{PHI1==2, J1<=J, J<=JA}>
+
+         T(J,K,NN+1) = S*TI(2)                                          0004
+
+C  <TI(PHI1)-IN-EXACT-{PHI1==3, J1<=J, J<=JA}>
+
+         T(J,K,NN+2) = S*TI(3)                                          0005
+300      CONTINUE                                                       0006
+
+C ....
+
+      END
+
+      SUBROUTINE NORM(LI,NI,MI,NN,NC,I) 
+C***************************************************************
+C     CALCULE LES NORMALES
+C     LI,NI,MI  : PLANS (I+1), I ,(I-1)
+C     NN : RESULTATS (UNIQUEMENT POUR LES NORM. AUX PLAN I1 ET I2)
+C     NC : STOCKAGE DES NORMALES DANS LE CADRE DU TABLEAU T
+C     MAILLAGE SYMETRIQUE / XOY
+C     CALCULS SPECIFIQUES A L AILE ETUDIEE
+C****************************************************************
+      DIMENSION T(52,21,60)
+      DIMENSION TI(3)
+
+      COMMON/T/T
+      COMMON/I/I1,I2,IMAX,I1P1,I1P2,I2M1,I2M2,IBF
+      COMMON/J/J1,J2,JMAX,J1P1,J1P2,J2M1,J2M2,JA,JB,JAM1,JBP1
+      COMMON/K/K1,K2,KMAX,K1P1,K1P2,K2M1,K2M2
+      COMMON/IO/LEC,IMP,KIMP,NXYZ,NGEO,NDIST
+
+C ....
+
+DO 300 K=K1,K2
+      DO 300 J = J1, JA                                                 0001
+
+C  <TI(PHI1)-OUT-EXACT-{1<=PHI1, PHI1<=3, J1<=J, J<=JA}>
+
+
+         CALL PVNMUT(TI)                                                0002
+         T(J,K,NN) = S*TI(1)                                            0003
+         T(J,K,NN+1) = S*TI(2)                                          0004
+         T(J,K,NN+2) = S*TI(3)                                          0005
+300      CONTINUE                                                       0006
+
+C ....
+
+      END
+

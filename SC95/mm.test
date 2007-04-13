@@ -1,0 +1,41 @@
+#!/bin/sh
+
+tpips=${tpips_version:-tpips}
+
+# Initialization:
+# rm -f mm.result/test
+# tpips >mm.result/test <<EOF
+
+Delete foo > /dev/null 2>&1
+
+($tpips 2>&1 | sed '/file *\//d') <<EOF
+# demo Introduction
+create foo $PIPS_VALIDDIR/SC95/mm.f
+module MM
+display PRINTED_FILE(MM)
+display PARALLELPRINTED_FILE(MM)
+activate PRINT_CODE_PROPER_EFFECTS # Statements & Proper Effects
+activate PRINT_CODE_PROPER_EFFECTS # Statements & Proper Effects
+display PRINTED_FILE(MM)
+activate MUST_REGIONS # MUST regions
+activate PRINT_CODE_REGIONS # Statements & Regions
+display PRINTED_FILE(MM)
+module SAXPY
+display PRINTED_FILE(SAXPY)
+activate PRINT_CODE # Statements Only
+display PRINTED_FILE(SAXPY)
+activate PRINT_CODE_TRANSFORMERS # Statements & Transformers
+activate PRINT_CODE # Statements Only
+activate PRINT_CODE # Statements Only
+display PRINTED_FILE(SAXPY)
+activate PRINT_CODE_COMPLEXITIES # Statements & Complexities
+display PRINTED_FILE(SAXPY)
+module MM
+display PRINTED_FILE(MM)
+module SAXPY
+display PRINTED_FILE(SAXPY)
+close
+delete foo
+quit
+EOF
+

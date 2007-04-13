@@ -1,0 +1,19 @@
+#
+# onde24 demo with tpips
+#
+delete onde24
+shell rm -rf onde24.hpfc
+#
+# compile
+#
+create onde24 ${PIPS_ROOT}/Validation/SC95/onde24.f
+activate MUST_REGIONS
+apply HPFC_INSTALL
+close
+#
+# result!
+# 
+shell cat ./onde24.database/hpfc/*.f
+delete onde24
+quit
+#

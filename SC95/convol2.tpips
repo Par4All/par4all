@@ -1,0 +1,47 @@
+#
+# Loop striping and use-def elimination
+#
+
+delete convol2
+
+setproperty ABORT_ON_USER_ERROR=TRUE
+create convol2 ${PIPS_ROOT}/Validation/SC95/convol2.f
+module CONVOL
+
+echo
+echo Inital code
+echo
+display PRINTED_FILE
+
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+apply PARTIAL_EVAL
+echo
+echo After partial evaluation:
+echo
+display PRINTED_FILE
+
+
+apply LOOP_INTERCHANGE
+200
+echo
+echo After loop interchange:
+echo
+display PRINTED_FILE
+
+
+# strip mining loop 100 (x=1,3) seems quite useless?
+apply STRIP_MINE
+100
+1
+5
+echo
+echo After strip mining
+echo
+display PRINTED_FILE
+
+
+close
+delete convol2
+quit
