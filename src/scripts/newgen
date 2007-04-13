@@ -149,7 +149,7 @@ go () {
 	ORDER=/tmp/order$$
 	OK=/tmp/result$$
 
-	PATH=$PATH:$NEWGEN_ROOT/Bin/$NEWGEN_ARCH:$NEWGEN_ROOT/Bin/$PIPS_ARCH
+	PATH=$PATH:$NEWGEN_ROOT/bin/$NEWGEN_ARCH:$NEWGEN_ROOT/bin/$PIPS_ARCH
 
 	shift 3
 
