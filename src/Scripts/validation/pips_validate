@@ -38,6 +38,7 @@ if ! [ "$PIPS_ROOT" ] then
   else
     echo "\$PIPS_ROOT must be defined" 1>&2
     exit 1
+  fi
 fi
 
 PIPS_VALIDDIR=${PIPS_VALIDDIR:-${PIPS_ROOT}/Validation}
