@@ -122,8 +122,8 @@ make $target
 
 echo "### building pips"
 cd $prod/pips
-# must find newgen executable...
-PATH=$prod/newgen/bin:$PATH \
+# must find newgen and newC executable...
+PATH=$prod/newgen/bin:$prod/newgen/bin/$PIPS_ARCH:$PATH \
     make $target
 
 echo "### creating pipsrc.sh"
