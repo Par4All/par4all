@@ -1,0 +1,26 @@
+delete decl
+create decl ${PIPS_ROOT}/Validation/RegionPrivatization/declarations_priv.f
+
+set PRETTYPRINT_ALL_DECLARATIONS TRUE
+
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate MUST_REGIONS
+activate REGION_CHAINS
+
+module PRIV1
+apply DECLARATIONS_PRIVATIZER
+display PRINTED_FILE
+
+module PRIV2
+apply DECLARATIONS_PRIVATIZER
+display PRINTED_FILE
+
+module LOOP
+apply ARRAY_PRIVATIZER
+display PARALLELPRINTED_FILE
+
+close
+delete decl
+quit

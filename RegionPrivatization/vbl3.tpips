@@ -1,0 +1,15 @@
+set ARRAY_PRIV_FALSE_DEP_ONLY FALSE
+delete vbl3
+create vbl3 ${PIPS_ROOT}/Validation/RegionPrivatization/vbl3.f
+module VBL3
+activate MUST_REGIONS # MUST regions
+activate PRINT_CODE_IN_REGIONS # Statements & IN Regions
+display PRINTED_FILE(VBL3)
+activate PRINT_CODE_OUT_REGIONS # Statements & OUT Regions
+display PRINTED_FILE(VBL3)
+activate PRINT_CODE_PRIVATIZED_REGIONS # Statements & Privatized Regions
+display PRINTED_FILE(VBL3)
+close
+delete vbl3
+
+

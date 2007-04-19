@@ -1,0 +1,601 @@
+
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{5<=PHI1, PHI1<=6, 0<=N}>
+
+      SUBROUTINE VBL3(HYDRO, FREQUENCE, VOIES, ENERGIE, BL, INTC,
+     &     VSTAB, OUTPUT, N)
+
+C     After time and energie fusion
+
+C     parameter (N=1024*1024)
+
+      REAL HYDRO(0:N,0:511)
+      REAL FREQUENCE(0:N,0:255,0:511)
+      REAL VOIES(0:N,0:199,0:127)
+      REAL ENERGIE(0:N,0:199,0:127)
+      REAL BL(0:N,0:127)
+      REAL INTC(0:N,0:127)
+      REAL VSTAB(0:N,0:127)
+      REAL OUTPUT(0:N,0:127)
+
+      INTEGER T1, T2, T3, T4, T5, T6, T7, T8
+      INTEGER F4, F3
+      INTEGER V8, V7, V6, V5, V4, V3 
+c     integer h2
+      INTEGER H1, H2
+
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{5<=PHI1, PHI1<=6, 0<=N}>
+
+
+      DO T8 = 0, N                                                      0001
+
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{PHI1==5, T8<=N, 0<=T8}>
+
+         DO T7 = 8*T8, 8*T8+7                                           0002
+
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{PHI1==5, T8<=N, 8T8<=T7,
+C    T7<=7+8T8, 0<=T8}>
+
+            DO T5 = 8*T7, 8*T7+7                                        0003
+
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{PHI1==5, T8<=N, 8T7<=T5,
+C    T5<=7+8T7, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+
+               DO T1 = 512*T5, 512*T5+511                               0004
+
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{PHI1==5, T8<=N, 512T5<=T1,
+C    T1<=511+512T5, 8T7<=T5, T5<=7+8T7, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+
+                  READ (*, 5) (HYDRO(T1,H1), H1 = 0, 511)               0005
+               ENDDO
+
+C  <HYDRO(PHI1,PHI2)-IN-EXACT-{512T5<=PHI1, 0<=PHI1, PHI1<=N,
+C    PHI1<=511+512T5, 0<=PHI2, PHI2<=511, T1==512T5+512, T8<=N,
+C    8T7<=T5, T5<=7+8T7, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+
+               DO H2 = 0, 511                                           0006
+
+C  <HYDRO(PHI1,PHI2)-IN-EXACT-{H2==PHI2, 512T5<=PHI1, 0<=PHI1,
+C    PHI1<=N, PHI1<=511+512T5, 0<=PHI2, PHI2<=511, T1==512T5+512,
+C    T8<=N, 8T7<=T5, T5<=7+8T7, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+
+                  CALL FFTR(FREQUENCE, T5, H2, HYDRO, N)                0007
+               ENDDO
+
+C  <FREQUENCE(PHI1,PHI2,PHI3)-IN-MAY-{T5==PHI1, PHI1<=N, 28<=PHI2,
+C    PHI2<=227, 0<=PHI3, PHI3<=511, H2==512, T1==512T5+512, T8<=N,
+C    8T7<=T5, T5<=7+8T7, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+
+               DO V3 = 0, 127                                           0008
+
+C  <FREQUENCE(PHI1,PHI2,PHI3)-IN-MAY-{T5==PHI1, 0<=PHI1, PHI1<=N,
+C    28<=PHI2, PHI2<=227, 0<=PHI3, PHI3<=511, H2==512, T1==512T5+512,
+C    T8<=N, 8T7<=T5, T5<=7+8T7, 8T8<=T7, T7<=7+8T8, 0<=T8, 0<=V3,
+C    V3<=127}>
+
+                  DO F3 = 0, 199                                        0009
+
+C  <FREQUENCE(PHI1,PHI2,PHI3)-IN-MAY-{T5==PHI1, F3==PHI2-28, 0<=PHI1,
+C    PHI1<=N, 0<=PHI3, PHI3<=511, H2==512, T1==512T5+512, 0<=F3,
+C    F3<=199, T8<=N, 8T7<=T5, T5<=7+8T7, 8T8<=T7, T7<=7+8T8, 0<=T8,
+C    0<=V3, V3<=127}>
+
+                     CALL FV(VOIES, T5, F3, V3, FREQUENCE, N)           0010
+
+C  <VOIES(PHI1,PHI2,PHI3)-IN-EXACT-{PHI1==T5, PHI2==F3, PHI3==V3,
+C    0<=PHI1, PHI1<=N, 0<=PHI2, PHI2<=199, 0<=PHI3, PHI3<=127,
+C    H2==512, T1==512T5+512, T8<=N, 8T7<=T5, T5<=7+8T7, 8T8<=T7,
+C    T7<=7+8T8, 0<=T8}>
+
+                     CALL MOD2(ENERGIE(T5,F3,V3), VOIES(T5,F3,V3))      0011
+                  ENDDO
+               ENDDO
+
+C  <ENERGIE(PHI1,PHI2,PHI3)-IN-EXACT-{PHI1==T5, 0<=PHI1, PHI1<=N,
+C    0<=PHI2, PHI2<=199, 0<=PHI3, PHI3<=127, F3==200, H2==512,
+C    T1==512T5+512, V3==128, T8<=N, 8T7<=T5, T5<=7+8T7, 8T8<=T7,
+C    T7<=7+8T8, 0<=T8}>
+
+               DO V5 = 0, 127                                           0012
+
+C  <ENERGIE(PHI1,PHI2,PHI3)-IN-EXACT-{PHI1==T5, PHI3==V5, 0<=PHI1,
+C    PHI1<=N, 0<=PHI2, PHI2<=199, 0<=PHI3, PHI3<=127, F3==200,
+C    H2==512, T1==512T5+512, V3==128, T8<=N, 8T7<=T5, T5<=7+8T7,
+C    8T8<=T7, T7<=7+8T8, 0<=T8}>
+
+                  CALL RTBL(BL, ENERGIE, T5, V5, N)                     0013
+               ENDDO
+            ENDDO
+
+C  <BL(PHI1,PHI2)-IN-EXACT-{8T7<=PHI1, 0<=PHI1, PHI1<=N, PHI1<=7+8T7,
+C    0<=PHI2, PHI2<=127, F3==200, H2==512, T1==4096T7+4096, T5==8T7+8,
+C    V3==128, V5==128, T8<=N, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+
+            DO V6 = 0, 127                                              0014
+
+C  <BL(PHI1,PHI2)-IN-EXACT-{V6==PHI2, 8T7<=PHI1, 0<=PHI1, PHI1<=N,
+C    PHI1<=7+8T7, 0<=PHI2, PHI2<=127, F3==200, H2==512,
+C    T1==4096T7+4096, T5==8T7+8, V3==128, V5==128, T8<=N, 8T8<=T7,
+C    T7<=7+8T8, 0<=T8}>
+
+               CALL INTNL(INTC, T7, V6, BL, N)                          0015
+            ENDDO
+
+C  <INTC(PHI1,PHI2)-IN-MAY-{T7==PHI1, 0<=PHI1, PHI1<=N, 0<=PHI2,
+C    PHI2<=127, F3==200, H2==512, T1==4096T7+4096, T5==8T7+8, V3==128,
+C    V5==128, V6==128, T8<=N, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+
+            DO V7 = 0, 127                                              0016
+
+C  <INTC(PHI1,PHI2)-IN-MAY-{T7==PHI1, 0<=PHI1, PHI1<=N, 0<=PHI2,
+C    PHI2<=127, F3==200, H2==512, T1==4096T7+4096, T5==8T7+8, V3==128,
+C    V5==128, V6==128, T8<=N, 8T8<=T7, T7<=7+8T8, 0<=T8, 0<=V7,
+C    V7<=127}>
+
+               CALL STABAZ(VSTAB, INTC, T7, V7, N)                      0017
+            ENDDO
+         ENDDO
+
+C  <VSTAB(PHI1,PHI2)-IN-EXACT-{8T8<=PHI1, 0<=PHI1, PHI1<=N,
+C    PHI1<=7+8T8, 0<=PHI2, PHI2<=127, F3==200, H2==512,
+C    T1==32768T8+32768, T5==64T8+64, T7==8T8+8, V3==128, V5==128,
+C    V6==128, V7==128, T8<=N, 0<=T8}>
+
+         DO V8 = 0, 127                                                 0018
+
+C  <VSTAB(PHI1,PHI2)-IN-EXACT-{V8==PHI2, 8T8<=PHI1, 0<=PHI1, PHI1<=N,
+C    PHI1<=7+8T8, 0<=PHI2, PHI2<=127, F3==200, H2==512,
+C    T1==32768T8+32768, T5==64T8+64, T7==8T8+8, V3==128, V5==128,
+C    V6==128, V7==128, T8<=N, 0<=T8}>
+
+            CALL INTNL(OUTPUT, T8, V8, VSTAB, N)                        0019
+         ENDDO
+
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{PHI1==6, F3==200, H2==512,
+C    T1==32768T8+32768, T5==64T8+64, T7==8T8+8, V3==128, V5==128,
+C    V6==128, V7==128, V8==128, T8<=N, 0<=T8}>
+C  <OUTPUT(PHI1,PHI2)-IN-EXACT-{PHI1==T8, 0<=PHI2, PHI2<=127, F3==200,
+C    H2==512, T1==32768T8+32768, T5==64T8+64, T7==8T8+8, V3==128,
+C    V5==128, V6==128, V7==128, V8==128, T8<=N, 0<=T8}>
+
+         WRITE (*, 6) (OUTPUT(T8,I), I = 0, 127)                        0020
+      ENDDO
+
+      END
+      SUBROUTINE VBL3(HYDRO, FREQUENCE, VOIES, ENERGIE, BL, INTC,
+     &     VSTAB, OUTPUT, N)
+
+C     After time and energie fusion
+
+C     parameter (N=1024*1024)
+
+      REAL HYDRO(0:N,0:511)
+      REAL FREQUENCE(0:N,0:255,0:511)
+      REAL VOIES(0:N,0:199,0:127)
+      REAL ENERGIE(0:N,0:199,0:127)
+      REAL BL(0:N,0:127)
+      REAL INTC(0:N,0:127)
+      REAL VSTAB(0:N,0:127)
+      REAL OUTPUT(0:N,0:127)
+
+      INTEGER T1, T2, T3, T4, T5, T6, T7, T8
+      INTEGER F4, F3
+      INTEGER V8, V7, V6, V5, V4, V3 
+c     integer h2
+      INTEGER H1, H2
+
+      DO T8 = 0, N                                                      0001
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==5, 6+T8<=PHI1+N, 0<=T8}>
+C  <VSTAB(PHI1,PHI2)-OUT-EXACT-{8T8<=PHI1, 0<=PHI1, PHI1<=N,
+C    PHI1<=7+8T8, 0<=PHI2, PHI2<=127, T8<=N, 0<=T8}>
+
+         DO T7 = 8*T8, 8*T8+7                                           0002
+
+C  <BL(PHI1,PHI2)-OUT-EXACT-{8T7<=PHI1, 0<=PHI1, PHI1<=N, PHI1<=7+8T7,
+C    0<=PHI2, PHI2<=127, T8<=N, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==5, T7<=6+N+7T8, T8<=N,
+C    8T8<=T7, T7<=7+8T8, 0<=T8}>
+
+            DO T5 = 8*T7, 8*T7+7                                        0003
+
+C  <HYDRO(PHI1,PHI2)-OUT-EXACT-{512T5<=PHI1, 0<=PHI1, PHI1<=N,
+C    PHI1<=511+512T5, 0<=PHI2, PHI2<=511, T8<=N, 8T7<=T5, T5<=7+8T7,
+C    8T8<=T7, T7<=7+8T8, 0<=T8}>
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==5, T5<=13+N+7T7+7T8,
+C    T8<=N, 8T7<=T5, T5<=7+8T7, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+
+               DO T1 = 512*T5, 512*T5+511                               0004
+
+C  <HYDRO(PHI1,PHI2)-OUT-EXACT-{PHI1==T1, 512T5<=PHI1, 0<=PHI1,
+C    PHI1<=N, PHI1<=511+512T5, 0<=PHI2, PHI2<=511, T8<=N, 8T7<=T5,
+C    T5<=7+8T7, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==5,
+C    T1<=524+N+511T5+7T7+7T8, T8<=N, 512T5<=T1, T1<=511+512T5,
+C    8T7<=T5, T5<=7+8T7, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+
+                  READ (*, 5) (HYDRO(T1,H1), H1 = 0, 511)               0005
+               ENDDO
+
+C  <FREQUENCE(PHI1,PHI2,PHI3)-OUT-MAY-{T5==PHI1, PHI1<=N, 28<=PHI2,
+C    PHI2<=227, 0<=PHI3, PHI3<=511, T1==512T5+512, T8<=N, 8T7<=T5,
+C    T5<=7+8T7, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+
+               DO H2 = 0, 511                                           0006
+
+C  <FREQUENCE(PHI1,PHI2,PHI3)-OUT-MAY-{PHI1==T5, PHI3==H2, PHI1<=N,
+C    28<=PHI2, PHI2<=227, 0<=PHI3, PHI3<=511, 512T5==T1-512, T8<=N,
+C    8T7<=T5, T5<=7+8T7, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+
+                  CALL FFTR(FREQUENCE, T5, H2, HYDRO, N)                0007
+               ENDDO
+
+C  <ENERGIE(PHI1,PHI2,PHI3)-OUT-EXACT-{PHI1==T5, PHI1<=N, 0<=PHI2,
+C    PHI2<=199, 0<=PHI3, PHI3<=127, H2==512, T1==512T5+512, T8<=N,
+C    8T7<=T5, T5<=7+8T7, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+
+               DO V3 = 0, 127                                           0008
+
+C  <ENERGIE(PHI1,PHI2,PHI3)-OUT-EXACT-{T5==PHI1, PHI3==V3, PHI1<=N,
+C    0<=PHI2, PHI2<=199, 0<=PHI3, PHI3<=127, H2==512, 512T5==T1-512,
+C    T8<=N, 8T7<=T5, T5<=7+8T7, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+
+                  DO F3 = 0, 199                                        0009
+
+C  <VOIES(PHI1,PHI2,PHI3)-OUT-EXACT-{PHI1==T5, PHI2==F3, PHI3==V3,
+C    0<=PHI1, PHI1<=N, 0<=PHI2, PHI2<=199, 0<=PHI3, PHI3<=127,
+C    H2==512, T1==512T5+512, T8<=N, 8T7<=T5, T5<=7+8T7, 8T8<=T7,
+C    T7<=7+8T8, 0<=T8}>
+
+                     CALL FV(VOIES, T5, F3, V3, FREQUENCE, N)           0010
+
+C  <ENERGIE(PHI1,PHI2,PHI3)-OUT-EXACT-{PHI1==T5, PHI2==F3, V3==PHI3,
+C    PHI1<=N, 0<=PHI2, PHI2<=199, 0<=PHI3, PHI3<=127, H2==512,
+C    T1==512T5+512, T8<=N, 8T7<=T5, T5<=7+8T7, 8T8<=T7, T7<=7+8T8,
+C    0<=T8}>
+
+                     CALL MOD2(ENERGIE(T5,F3,V3), VOIES(T5,F3,V3))      0011
+                  ENDDO
+               ENDDO
+
+C  <BL(PHI1,PHI2)-OUT-EXACT-{T5==PHI1, 0<=PHI1, PHI1<=N, 0<=PHI2,
+C    PHI2<=127, F3==200, H2==512, T1==512T5+512, V3==128, T8<=N,
+C    8T7<=T5, T5<=7+8T7, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+
+               DO V5 = 0, 127                                           0012
+
+C  <BL(PHI1,PHI2)-OUT-EXACT-{PHI1==T5, PHI2==V5, PHI1<=N, 0<=PHI2,
+C    PHI2<=127, F3==200, H2==512, 512T5==T1-512, V3==128, T8<=N,
+C    8T7<=T5, T5<=7+8T7, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+
+                  CALL RTBL(BL, ENERGIE, T5, V5, N)                     0013
+               ENDDO
+            ENDDO
+
+C  <INTC(PHI1,PHI2)-OUT-MAY-{T7==PHI1, PHI1<=N, 0<=PHI2, PHI2<=127,
+C    F3==200, H2==512, T1==4096T7+4096, T5==8T7+8, V3==128, V5==128,
+C    T8<=N, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+
+            DO V6 = 0, 127                                              0014
+
+C  <INTC(PHI1,PHI2)-OUT-MAY-{PHI1==T7, PHI2==V6, PHI1<=N, 0<=PHI2,
+C    PHI2<=127, F3==200, H2==512, 4096T7==T1-4096, 8T7==T5-8, V3==128,
+C    V5==128, T8<=N, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+
+               CALL INTNL(INTC, T7, V6, BL, N)                          0015
+            ENDDO
+
+C  <VSTAB(PHI1,PHI2)-OUT-EXACT-{T7==PHI1, 0<=PHI1, PHI1<=N, 0<=PHI2,
+C    PHI2<=127, F3==200, H2==512, T1==4096T7+4096, T5==8T7+8, V3==128,
+C    V5==128, V6==128, T8<=N, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+
+            DO V7 = 0, 127                                              0016
+
+C  <VSTAB(PHI1,PHI2)-OUT-EXACT-{PHI1==T7, PHI2==V7, PHI1<=N, 0<=PHI2,
+C    PHI2<=127, F3==200, H2==512, 4096T7==T1-4096, 8T7==T5-8, V3==128,
+C    V5==128, V6==128, T8<=N, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+
+               CALL STABAZ(VSTAB, INTC, T7, V7, N)                      0017
+            ENDDO
+         ENDDO
+
+C  <OUTPUT(PHI1,PHI2)-OUT-EXACT-{PHI1==T8, 0<=PHI1, PHI1<=N, 0<=PHI2,
+C    PHI2<=127, F3==200, H2==512, T1==32768T8+32768, T5==64T8+64,
+C    T7==8T8+8, V3==128, V5==128, V6==128, V7==128}>
+
+         DO V8 = 0, 127                                                 0018
+
+C  <OUTPUT(PHI1,PHI2)-OUT-EXACT-{T8==PHI1, PHI2==V8, 0<=PHI1, PHI1<=N,
+C    0<=PHI2, PHI2<=127, F3==200, H2==512, 32768T8==T1-32768,
+C    64T8==T5-64, 8T8==T7-8, V3==128, V5==128, V6==128, V7==128}>
+
+            CALL INTNL(OUTPUT, T8, V8, VSTAB, N)                        0019
+         ENDDO
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, F3==200, H2==512,
+C    T1==32768T8+32768, T5==64T8+64, T7==8T8+8, V3==128, V5==128,
+C    V6==128, V7==128, V8==128, 1+T8<=N, 0<=T8}>
+
+         WRITE (*, 6) (OUTPUT(T8,I), I = 0, 127)                        0020
+      ENDDO
+
+      END
+      SUBROUTINE VBL3(HYDRO, FREQUENCE, VOIES, ENERGIE, BL, INTC,
+     &     VSTAB, OUTPUT, N)
+
+C     After time and energie fusion
+
+C     parameter (N=1024*1024)
+
+      REAL HYDRO(0:N,0:511)
+      REAL FREQUENCE(0:N,0:255,0:511)
+      REAL VOIES(0:N,0:199,0:127)
+      REAL ENERGIE(0:N,0:199,0:127)
+      REAL BL(0:N,0:127)
+      REAL INTC(0:N,0:127)
+      REAL VSTAB(0:N,0:127)
+      REAL OUTPUT(0:N,0:127)
+
+      INTEGER T1, T2, T3, T4, T5, T6, T7, T8
+      INTEGER F4, F3
+      INTEGER V8, V7, V6, V5, V4, V3 
+c     integer h2
+      INTEGER H1, H2
+
+C  <BL(PHI1,PHI2)-PRIVATE-EXACT-{0<=PHI1, PHI1<=N, 0<=PHI2,
+C    PHI2<=127}>
+C  <ENERGIE(PHI1,PHI2,PHI3)-PRIVATE-EXACT-{0<=PHI1, PHI1<=N, 0<=PHI2,
+C    PHI2<=199, 0<=PHI3, PHI3<=127}>
+C  <F3-PRIVATE-EXACT-{}>
+C  <FREQUENCE(PHI1,PHI2,PHI3)-PRIVATE-EXACT-{0<=PHI1, PHI1<=N,
+C    0<=PHI2, PHI2<=255, 0<=PHI3, PHI3<=511}>
+C  <H1-PRIVATE-EXACT-{}>
+C  <H2-PRIVATE-EXACT-{}>
+C  <HYDRO(PHI1,PHI2)-PRIVATE-EXACT-{0<=PHI1, PHI1<=32767+32768N,
+C    0<=PHI2, PHI2<=511}>
+C  <I-PRIVATE-EXACT-{}>
+C  <INTC(PHI1,PHI2)-PRIVATE-EXACT-{0<=PHI1, PHI1<=N, 0<=PHI2,
+C    PHI2<=127, 0<=N}>
+C  <OUTPUT(PHI1,PHI2)-PRIVATE-EXACT-{0<=PHI1, PHI1<=N, 0<=PHI2,
+C    PHI2<=127}>
+C  <T1-PRIVATE-EXACT-{}>
+C  <T5-PRIVATE-EXACT-{}>
+C  <T7-PRIVATE-EXACT-{}>
+C  <T8-PRIVATE-EXACT-{}>
+C  <V3-PRIVATE-EXACT-{}>
+C  <V5-PRIVATE-EXACT-{}>
+C  <V6-PRIVATE-EXACT-{}>
+C  <V7-PRIVATE-EXACT-{}>
+C  <V8-PRIVATE-EXACT-{}>
+C  <VOIES(PHI1,PHI2,PHI3)-PRIVATE-EXACT-{0<=PHI1, PHI1<=N, 0<=PHI2,
+C    PHI2<=199, 0<=PHI3, PHI3<=127}>
+C  <VSTAB(PHI1,PHI2)-PRIVATE-EXACT-{0<=PHI1, PHI1<=N, 0<=PHI2,
+C    PHI2<=127, 0<=N}>
+
+C     BEGIN BLOCK
+
+      DO T8 = 0, N                                                      0001
+         PRIVATE BL(0:N,0:127),ENERGIE(0:N,0:199,0:127),F3,FREQUENCE(
+     &   0:N,0:255,0:511),H1,H2,HYDRO(0:N,0:511),I,INTC(0:N,0:127),
+     &   OUTPUT(0:N,0:127),T1,T5,T7,T8,V3,V5,V6,V7,V8,VOIES(0:N,0:199
+     &   ,0:127),VSTAB(0:N,0:127)
+
+C  <BL(PHI1,PHI2)-PRIVATE-EXACT-{64T8<=PHI1, PHI1<=N, PHI1<=63+64T8,
+C    0<=PHI2, PHI2<=127, 0<=T8}>
+C  <ENERGIE(PHI1,PHI2,PHI3)-PRIVATE-EXACT-{64T8<=PHI1, PHI1<=N,
+C    PHI1<=63+64T8, 0<=PHI2, PHI2<=199, 0<=PHI3, PHI3<=127, T8<=N,
+C    0<=T8}>
+C  <F3-PRIVATE-EXACT-{}>
+C  <FREQUENCE(PHI1,PHI2,PHI3)-PRIVATE-EXACT-{64T8<=PHI1, PHI1<=N,
+C    PHI1<=63+64T8, 0<=PHI2, PHI2<=255, 0<=PHI3, PHI3<=511, 0<=T8}>
+C  <H1-PRIVATE-EXACT-{}>
+C  <H2-PRIVATE-EXACT-{}>
+C  <HYDRO(PHI1,PHI2)-PRIVATE-EXACT-{32768T8<=PHI1,
+C    PHI1<=32767+32768T8, 0<=PHI2, PHI2<=511, T8<=N, 0<=T8}>
+C  <I-PRIVATE-EXACT-{}>
+C  <INTC(PHI1,PHI2)-PRIVATE-EXACT-{8T8<=PHI1, PHI1<=N, PHI1<=7+8T8,
+C    0<=PHI2, PHI2<=127, T8<=N, 0<=T8}>
+C  <OUTPUT(PHI1,PHI2)-PRIVATE-EXACT-{PHI1==T8, 0<=PHI1, PHI1<=N,
+C    0<=PHI2, PHI2<=127}>
+C  <T1-PRIVATE-EXACT-{}>
+C  <T5-PRIVATE-EXACT-{}>
+C  <T7-PRIVATE-EXACT-{}>
+C  <V3-PRIVATE-EXACT-{}>
+C  <V5-PRIVATE-EXACT-{}>
+C  <V6-PRIVATE-EXACT-{}>
+C  <V7-PRIVATE-EXACT-{}>
+C  <V8-PRIVATE-EXACT-{}>
+C  <VOIES(PHI1,PHI2,PHI3)-PRIVATE-EXACT-{64T8<=PHI1, PHI1<=N,
+C    PHI1<=63+64T8, 0<=PHI2, PHI2<=199, 0<=PHI3, PHI3<=127, 0<=T8}>
+C  <VSTAB(PHI1,PHI2)-PRIVATE-EXACT-{8T8<=PHI1, PHI1<=N, PHI1<=7+8T8,
+C    0<=PHI2, PHI2<=127, T8<=N, 0<=T8}>
+
+C        BEGIN BLOCK
+         DO T7 = 8*T8, 8*T8+7                                           0002
+            PRIVATE BL(0:N,0:127),ENERGIE(0:N,0:199,0:127),F3,
+     &      FREQUENCE(0:N,0:255,0:511),H1,H2,HYDRO(0:N,0:511),INTC(0:
+     &      N,0:127),T1,T5,T7,V3,V5,V6,V7,VOIES(0:N,0:199,0:127),
+     &      VSTAB(0:N,0:127)
+
+C  <BL(PHI1,PHI2)-PRIVATE-EXACT-{8T7<=PHI1, PHI1<=N, PHI1<=7+8T7,
+C    0<=PHI2, PHI2<=127, T8<=N, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+C  <ENERGIE(PHI1,PHI2,PHI3)-PRIVATE-EXACT-{8T7<=PHI1, PHI1<=N,
+C    PHI1<=7+8T7, 0<=PHI2, PHI2<=199, 0<=PHI3, PHI3<=127, T8<=N,
+C    8T8<=T7, T7<=7+8T8, 0<=T8}>
+C  <F3-PRIVATE-EXACT-{}>
+C  <FREQUENCE(PHI1,PHI2,PHI3)-PRIVATE-EXACT-{8T7<=PHI1, PHI1<=N,
+C    PHI1<=7+8T7, 0<=PHI2, PHI2<=255, 0<=PHI3, PHI3<=511, T8<=N,
+C    8T8<=T7, T7<=7+8T8, 0<=T8}>
+C  <H1-PRIVATE-EXACT-{}>
+C  <H2-PRIVATE-EXACT-{}>
+C  <HYDRO(PHI1,PHI2)-PRIVATE-EXACT-{4096T7<=PHI1, PHI1<=4095+4096T7,
+C    0<=PHI2, PHI2<=511, T8<=N, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+C  <INTC(PHI1,PHI2)-PRIVATE-EXACT-{PHI1==T7, PHI1<=N, 0<=PHI2,
+C    PHI2<=127, T8<=N, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+C  <T1-PRIVATE-EXACT-{}>
+C  <T5-PRIVATE-EXACT-{}>
+C  <V3-PRIVATE-EXACT-{}>
+C  <V5-PRIVATE-EXACT-{}>
+C  <V6-PRIVATE-EXACT-{}>
+C  <V7-PRIVATE-EXACT-{}>
+C  <VOIES(PHI1,PHI2,PHI3)-PRIVATE-EXACT-{8T7<=PHI1, PHI1<=N,
+C    PHI1<=7+8T7, 0<=PHI2, PHI2<=199, 0<=PHI3, PHI3<=127, T8<=N,
+C    8T8<=T7, T7<=7+8T8, 0<=T8}>
+C  <VSTAB(PHI1,PHI2)-PRIVATE-EXACT-{PHI1==T7, PHI1<=N, 0<=PHI2,
+C    PHI2<=127, T8<=N, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+
+
+C  <VSTAB(PHI1,PHI2)-COPYOUT-EXACT-{T7==PHI1, 0<=PHI1, PHI1<=N,
+C    0<=PHI2, PHI2<=127, T8<=N, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+
+C           BEGIN BLOCK
+            DO T5 = 8*T7, 8*T7+7                                        0003
+               PRIVATE BL(0:N,0:127),ENERGIE(0:N,0:199,0:127),F3,
+     &         FREQUENCE(0:N,0:255,0:511),H1,H2,HYDRO(0:N,0:511),T1,
+     &         T5,V3,V5,VOIES(0:N,0:199,0:127)
+
+C  <BL(PHI1,PHI2)-PRIVATE-EXACT-{PHI1==T5, PHI1<=N, 0<=PHI2,
+C    PHI2<=127, T8<=N, 8T7<=T5, T5<=7+8T7, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+C  <ENERGIE(PHI1,PHI2,PHI3)-PRIVATE-EXACT-{PHI1==T5, PHI1<=N, 0<=PHI2,
+C    PHI2<=199, 0<=PHI3, PHI3<=127, T8<=N, 8T7<=T5, T5<=7+8T7,
+C    8T8<=T7, T7<=7+8T8, 0<=T8}>
+C  <F3-PRIVATE-EXACT-{}>
+C  <FREQUENCE(PHI1,PHI2,PHI3)-PRIVATE-EXACT-{PHI1==T5, PHI1<=N,
+C    0<=PHI2, PHI2<=255, 0<=PHI3, PHI3<=511, T8<=N, 8T7<=T5,
+C    T5<=7+8T7, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+C  <H1-PRIVATE-EXACT-{}>
+C  <H2-PRIVATE-EXACT-{}>
+C  <HYDRO(PHI1,PHI2)-PRIVATE-EXACT-{512T5<=PHI1, PHI1<=511+512T5,
+C    0<=PHI2, PHI2<=511, T8<=N, 8T7<=T5, T5<=7+8T7, 8T8<=T7,
+C    T7<=7+8T8, 0<=T8}>
+C  <T1-PRIVATE-EXACT-{}>
+C  <V3-PRIVATE-EXACT-{}>
+C  <V5-PRIVATE-EXACT-{}>
+C  <VOIES(PHI1,PHI2,PHI3)-PRIVATE-EXACT-{PHI1==T5, PHI1<=N, 0<=PHI2,
+C    PHI2<=199, 0<=PHI3, PHI3<=127, T8<=N, 8T7<=T5, T5<=7+8T7,
+C    8T8<=T7, T7<=7+8T8, 0<=T8}>
+
+
+C  <BL(PHI1,PHI2)-COPYOUT-EXACT-{T5==PHI1, 0<=PHI1, PHI1<=N, 0<=PHI2,
+C    PHI2<=127, T8<=N, 8T7<=T5, T5<=7+8T7, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+
+C              BEGIN BLOCK
+               DO T1 = 512*T5, 512*T5+511                               0004
+                  PRIVATE H1,HYDRO(0:N,0:511),T1
+
+C  <H1-PRIVATE-EXACT-{}>
+C  <HYDRO(PHI1,PHI2)-PRIVATE-EXACT-{PHI1==T1, 0<=PHI2, PHI2<=511,
+C    T8<=N, 512T5<=T1, T1<=511+512T5, 8T7<=T5, T5<=7+8T7, 8T8<=T7,
+C    T7<=7+8T8, 0<=T8}>
+
+
+C  <HYDRO(PHI1,PHI2)-COPYOUT-EXACT-{PHI1==T1, 0<=PHI1, PHI1<=N,
+C    0<=PHI2, PHI2<=511, T8<=N, 512T5<=T1, T1<=511+512T5, 8T7<=T5,
+C    T5<=7+8T7, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+
+                  READ (*, 5) (HYDRO(T1,H1), H1 = 0, 511)               0005
+               ENDDO
+               DO H2 = 0, 511                                           0006
+                  PRIVATE H2
+                  CALL FFTR(FREQUENCE, T5, H2, HYDRO, N)                0007
+               ENDDO
+               DO V3 = 0, 127                                           0008
+                  PRIVATE ENERGIE(0:N,0:199,0:127),F3,V3,VOIES(0:N,0:
+     &            199,0:127)
+
+C  <ENERGIE(PHI1,PHI2,PHI3)-PRIVATE-EXACT-{PHI1==T5, PHI3==V3,
+C    PHI1<=N, 0<=PHI2, PHI2<=199, 0<=PHI3, PHI3<=127, H2==512,
+C    T1==512T5+512, T8<=N, 8T7<=T5, T5<=7+8T7, 8T8<=T7, T7<=7+8T8,
+C    0<=T8}>
+C  <F3-PRIVATE-EXACT-{}>
+C  <VOIES(PHI1,PHI2,PHI3)-PRIVATE-EXACT-{PHI1==T5, PHI3==V3, PHI1<=N,
+C    0<=PHI2, PHI2<=199, 0<=PHI3, PHI3<=127, H2==512, T1==512T5+512,
+C    T8<=N, 8T7<=T5, T5<=7+8T7, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+
+
+C  <ENERGIE(PHI1,PHI2,PHI3)-COPYOUT-EXACT-{T5==PHI1, PHI3==V3,
+C    PHI1<=N, 0<=PHI2, PHI2<=199, 0<=PHI3, PHI3<=127, H2==512,
+C    512T5==T1-512, T8<=N, 8T7<=T5, T5<=7+8T7, 8T8<=T7, T7<=7+8T8,
+C    0<=T8}>
+
+                  DO F3 = 0, 199                                        0009
+                     PRIVATE ENERGIE(0:N,0:199,0:127),F3,VOIES(0:N,0:
+     &               199,0:127)
+
+C  <ENERGIE(PHI1,PHI2,PHI3)-PRIVATE-EXACT-{PHI1==T5, PHI2==F3,
+C    PHI3==V3, PHI1<=N, 0<=PHI2, PHI2<=199, 0<=PHI3, PHI3<=127,
+C    H2==512, T1==512T5+512, T8<=N, 8T7<=T5, T5<=7+8T7, 8T8<=T7,
+C    T7<=7+8T8, 0<=T8}>
+C  <VOIES(PHI1,PHI2,PHI3)-PRIVATE-EXACT-{PHI1==T5, F3==PHI2, PHI3==V3,
+C    PHI1<=N, 0<=PHI2, PHI2<=199, 0<=PHI3, PHI3<=127, H2==512,
+C    T1==512T5+512, T8<=N, 8T7<=T5, T5<=7+8T7, 8T8<=T7, T7<=7+8T8,
+C    0<=T8}>
+
+
+C  <ENERGIE(PHI1,PHI2,PHI3)-COPYOUT-EXACT-{PHI1==T5, PHI2==F3,
+C    V3==PHI3, PHI1<=N, 0<=PHI2, PHI2<=199, 0<=PHI3, PHI3<=127,
+C    H2==512, T1==512T5+512, T8<=N, 8T7<=T5, T5<=7+8T7, 8T8<=T7,
+C    T7<=7+8T8, 0<=T8}>
+
+C                    BEGIN BLOCK
+                     CALL FV(VOIES, T5, F3, V3, FREQUENCE, N)           0010
+                     CALL MOD2(ENERGIE(T5,F3,V3), VOIES(T5,F3,V3))      0011
+C                    END BLOCK
+                  ENDDO
+               ENDDO
+               DO V5 = 0, 127                                           0012
+                  PRIVATE BL(0:N,0:127),V5
+
+C  <BL(PHI1,PHI2)-PRIVATE-EXACT-{PHI1==T5, V5==PHI2, PHI1<=N, 0<=PHI2,
+C    PHI2<=127, F3==200, H2==512, T1==512T5+512, V3==128, T8<=N,
+C    8T7<=T5, T5<=7+8T7, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+
+
+C  <BL(PHI1,PHI2)-COPYOUT-EXACT-{PHI1==T5, PHI2==V5, PHI1<=N, 0<=PHI2,
+C    PHI2<=127, F3==200, H2==512, 512T5==T1-512, V3==128, T8<=N,
+C    8T7<=T5, T5<=7+8T7, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+
+                  CALL RTBL(BL, ENERGIE, T5, V5, N)                     0013
+               ENDDO
+C              END BLOCK
+            ENDDO
+            DO V6 = 0, 127                                              0014
+               PRIVATE V6
+               CALL INTNL(INTC, T7, V6, BL, N)                          0015
+            ENDDO
+            DO V7 = 0, 127                                              0016
+               PRIVATE V7,VSTAB(0:N,0:127)
+
+C  <VSTAB(PHI1,PHI2)-PRIVATE-EXACT-{PHI1==T7, V7==PHI2, PHI1<=N,
+C    0<=PHI2, PHI2<=127, F3==200, H2==512, T1==4096T7+4096, T5==8T7+8,
+C    V3==128, V5==128, V6==128, T8<=N, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+
+
+C  <VSTAB(PHI1,PHI2)-COPYOUT-EXACT-{PHI1==T7, PHI2==V7, PHI1<=N,
+C    0<=PHI2, PHI2<=127, F3==200, H2==512, 4096T7==T1-4096, 8T7==T5-8,
+C    V3==128, V5==128, V6==128, T8<=N, 8T8<=T7, T7<=7+8T8, 0<=T8}>
+
+               CALL STABAZ(VSTAB, INTC, T7, V7, N)                      0017
+            ENDDO
+C           END BLOCK
+         ENDDO
+         DO V8 = 0, 127                                                 0018
+            PRIVATE OUTPUT(0:N,0:127),V8
+
+C  <OUTPUT(PHI1,PHI2)-PRIVATE-EXACT-{PHI1==T8, V8==PHI2, 0<=PHI1,
+C    PHI1<=N, 0<=PHI2, PHI2<=127, F3==200, H2==512, T1==32768T8+32768,
+C    T5==64T8+64, T7==8T8+8, V3==128, V5==128, V6==128, V7==128}>
+
+
+C  <OUTPUT(PHI1,PHI2)-COPYOUT-EXACT-{T8==PHI1, PHI2==V8, 0<=PHI1,
+C    PHI1<=N, 0<=PHI2, PHI2<=127, F3==200, H2==512, 32768T8==T1-32768,
+C    64T8==T5-64, 8T8==T7-8, V3==128, V5==128, V6==128, V7==128}>
+
+            CALL INTNL(OUTPUT, T8, V8, VSTAB, N)                        0019
+         ENDDO
+         WRITE (*, 6) (OUTPUT(T8,I), I = 0, 127)                        0020
+C        END BLOCK
+      ENDDO
+
+C     END BLOCK
+      END
+
