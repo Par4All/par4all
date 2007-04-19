@@ -125,7 +125,7 @@ PATH	:= $(PATH):$(NEWGEN_ROOT)/bin:$(NEWGEN_ROOT)/bin/$(ARCH)
 
 ###################################################################### DO STUFF
 
-UTC_DATE := $(shell date -u | tr ' ' '_')
+UTC_DATE := $(shell date -u | tr ' ,()' '_')
 CPPFLAGS += -DSOFT_ARCH='$(ARCH)' -I$(ROOT)/include
 
 # {C,CPP,LD,L,Y}OPT macros allow to *add* things from the command line
