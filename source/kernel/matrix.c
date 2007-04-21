@@ -157,7 +157,8 @@ Matrix *Matrix_Read(void) {
   unsigned NbRows, NbColumns;
   char s[1024];
   
-  while(fgets(s, 1024, stdin)==0);
+  if (fgets(s, 1024, stdin) == 0)
+    return NULL;
   while ((*s=='#' || *s=='\n') ||
 	 (sscanf(s, "%d %d", &NbRows, &NbColumns)<2))
     fgets(s, 1024, stdin);
