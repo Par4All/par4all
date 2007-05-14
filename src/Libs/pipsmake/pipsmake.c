@@ -1274,7 +1274,7 @@ static bool safe_do_something(
 
     if (find_rule(name) == rule_undefined)
     {
-	pips_user_warning("Unkown %s \"%s\"\n", what_it_is, name);
+	pips_user_warning("Unknown %s \"%s\"\n", what_it_is, name);
 	success = FALSE;
 	debug_off();
 	return success;
