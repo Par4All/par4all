@@ -77,7 +77,7 @@ log_on_file(char chaine[])
 /* The # "stringificator" only works in a macro expansion... */
 #define PIPS_THANKS_STRING(arch)					\
   "%s (ARCH=" arch ")\n  running as %s\n\n"				\
-  "  (c) 1988-2006 Centre de Recherche en Informatique,\n"		\
+  "  (c) 1988-2007 Centre de Recherche en Informatique,\n"		\
   "                École des mines de Paris, France.\n\n"		\
   "  URL: http://www.cri.ensmp.fr/pips/\n"				\
   "  E-MAIL: pipsgroup@cri.ensmp.fr\n\n"				\
