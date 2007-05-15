@@ -155,7 +155,7 @@ sh> svn co http://svn.cri.ensmp.fr/svn/pips/branches/calvin pips_dev
 \end{verbatim}
     Branches may also be used for linear and newgen development, 
     in which case the local directory name for the checkout must be called
-    \texttt{linear_\dev} or \texttt{newgen\_dev} respectively.
+    \texttt{linear\_dev} or \texttt{newgen\_dev} respectively.
   \item[pipsrc.sh:] sh-compatible shell initialization;
   \item[pipsrc.csh:] csh-compatible shell initialization.
   \end{description}
@@ -446,7 +446,7 @@ Other architecture independent tools and files used for \emph{developing}
 pips (as opposed to \emph{running} it).
 
 \begin{description}      
-\item[Validate]: \index{Validate} Non-regression tests; see ?!?;
+\item[pips\_validate]: \index{Validate} Non-regression tests; see ?!?;
   
   The arguments are names of subdirectories in
   \texttt{\$PIPS\_ROOT/Validation}. 
@@ -916,15 +916,15 @@ several values:
 
 
 Some libraries implement functionalities which are accessible by the users
-via the \verb+pipsmake+ mechanism. For a good comprehension of the material
+via the \texttt{pipsmake} mechanism. For a good comprehension of the material
 contained in this subsection, the reader is referred to the corresponding
 documentation.
 
-A PIPS phase {\em myphase} is implemented as a C function named {\tt
-  myphase} with a single argument, which is the name of the Fortran module
-to analyze. It returns a boolean value, which indicates whether the
-computation has performed well. It therefore resembles the following dummy
-  function:
+A PIPS phase \emph{myphase} is implemented as a C function named 
+\texttt{myphase} with a single argument, which is the name of the 
+Fortran module to analyze. It returns a boolean value, which indicates 
+whether the computation has performed well. 
+It therefore resembles the following dummy function:
 \begin{verbatim}
 bool myphase(char *module_name)
 {
@@ -935,92 +935,84 @@ bool myphase(char *module_name)
   return(good_result_p);
 }
 \end{verbatim}
-This phase is usually located in a library named {\tt myphase}, but this is
+This phase is usually located in a library named \texttt{myphase}, but this is
 not compulsory. It must set the global variables which are necessary for its
-execution using \verb+properties+, and acquire the necessary resources by
-invoking \verb+pipsdbm+. Directly invoking \verb+pipsmake+ is forbidden at
+execution using \texttt{properties}, and acquire the necessary resources by
+invoking \texttt{pipsdbm}. Directly invoking \texttt{pipsmake} is forbidden at
 this level. 
 
-Here are now the steps to install a new library named {\tt mylib}:
+Here are now the steps to install a new library named \texttt{mylib}:
 \begin{itemize}
 
-\item Create a new directory {\tt mylib} in {\tt \$PIPS\_DEVEDIR/Lib} with
-  the files {\tt mylib.c} (where the code for the C {\tt boolean
-    mylib(string name)}, which
-  corresponds to the phase to add, generally is).
-%% and  {\tt main.c} (with the empty function {\tt main()}).
-  
-\item In the directoty {\tt \$PIPS\_DEVEDIR/Lib/mylib}:
+\item Create a new directory \texttt{mylib} in \texttt{src/Libs} with
+  the files \texttt{mylib.c} (where the code for the C 
+  \texttt{boolean mylib(string name)}, which corresponds to the phase 
+  to add, generally is). Add the new directory name to the \texttt{local.mk},
+  so that the recursive make will consider it.
+
+\item In the directory \texttt{src/Libs/mylib}:
   
   \begin{itemize}
     
-  \item Create a file {\tt config.makefile} (examples can be found in the
-    other libraries). 
-    
-  \item Run the command {\tt pips-makemake} (option -l) to automatically 
-    build the local {\tt Makefile} file.
+  \item Create a \texttt{Makefile} (see examples in the other libraries). 
+    This file must list the sources of the library and the targets to
+    be build, then it must include the common makefile \texttt{main.mk}.
     
   \item Then run the commands \texttt{make} and {\tt make install}, to
-    install the library in the {\bf \tt Production} hierarchy.  The file {\tt
-      mylib.h} is installed in \verb|$PIPS_ROOT/Include|, %% $
-    and {\tt libmylib.a} in \verb|$PIPS_ROOT/Lib/$PIPS_ARCH|. The library
-    functions are now accessible by the other libraries and passes.
+    install the library.  The file \texttt{mylib.h} is installed in the
+    \texttt{include} directory, %% $
+    and \texttt{libmylib.a} in the \texttt{lib/\$PIPS\_ARCH} directory. 
+    The library functions are now accessible by the other libraries and passes.
     
-    Notice that the local {\tt Makefile} uses the command {\tt cproto} 
-    which must be installed, to automatically build the header file {\tt
-    mylib.h}. To force this file to be build again, you must successively
-    type {\tt touch mylib-local.h} and {\tt make header}. 
+    Note that the \texttt{cproto} command is used to generate the library
+    header file \texttt{mylib.h}. To force this file to be build again, 
+    do a \texttt{make header}. 
     
   \end{itemize}
   
-\item In the directory {\tt \$PIPS\_DEVEDIR/Scripts/dev}:
+\item In directory \texttt{makes}:
   
   \begin{itemize}
     
-  \item Update the file {\tt define\_libraries.sh}\index{define\_libraries.sh}. It contains
-    the shell environment variables for the PIPS libraries. To update it, just add the
-    character string {\tt -lmylib} in the variable {\tt \$PIPS\_LIBS} and
-    {\tt mylib} to the variable \verb|$PIPS_ORDERED_LIBS|. %$    
-    Notice that the order in which the libraries are added is important :
+  \item Update file \texttt{define\_libraries.mk}\index{define\_libraries.mk}. 
+    It contains the ordered list of PIPS libraries for linking.
+    The order in which the libraries are added is important:
     the new library must be added after the libraries which use its
     modules, but after the libraries whose modules it uses.
     
-  \item Run the {\tt make} command to automaticall build the files
-    \verb|define_libraries.make|. The command {\tt make install} then
-    installs these scripts in \verb+$PIPS_UTILDIR+.
-% $    
-
-
   \end{itemize}
   
-\item In the directory {\tt \$PIPS\_DEVEDIR/Scripts/env}, if you need to
-  introduce new environment variables or to modify old ones:
+\item In directory \texttt{src/Scripts/env}, if you need to
+  introduce new environment variables or to modify old ones
+  (not likely):
+
+  IS THIS OBSOLETE ?
   
   \begin{itemize}
     
-  \item Update the file {\tt pipsrc.ref}\index{pipsrc.ref}. It contains
-    the shell environement variables for PIPS..
+  \item possibly update \texttt{pipsrc.sh}\index{pipsrc.sh} file. 
+    It contains the shell environement variables for PIPS.
     
-  \item Run the {\tt make} command to automaticall build the files {\tt
-    pipsrc.sh} and {\tt pipsrc.csh} respectively for {\tt sh} or {\tt ksh}
-    and {\tt csh} or {\tt tcsh} shells. The command {\tt make install} then
-    installs these scripts in \verb+$PIPS_UTILDIR+.
-% $    
+  \item run the \texttt{make} command to automatically build the files,
+    then \texttt{make install} to install?
+    Note that the \texttt{pipsrc.*sh} files created by the setup 
+    command is not affected, you must create it again by hand, this
+    change will only affects future installations?
 
   \end{itemize}
   
-\item In the directory {\tt\$PIPS\_DEVEDIR/Documentation/pipsmake-rc/}:
+\item In directory \texttt{src/Documentation/pipsmake-rc/}:
   
   \begin{itemize}
     
-  \item declare the new phase to {\tt pipsmake} by adding the necessary
-    rules in the file {\tt pipsmake-rc.tex}. Each rule describes the
+  \item declare the new phase to \texttt{pipsmake} by adding the necessary
+    rules in the \texttt{pipsmake-rc.tex} file. Each rule describes the
     dependances between the input and output resources of each phase. Just
     have a look at the other rules to build your owns. You can also add
-    aliases to obtain nice menus in the \verb+wpips+ interface.
+    aliases to obtain nice menus in the \texttt{wpips} interface.
     
-    For instance, for a phase {\em myphase} which reads a resource {\em res1}
-    andproduces a resource {\em res2} for the current module, the rule and
+    For instance, for a phase \emph{myphase} which reads a resource \emph{res1}
+    andproduces a resource \emph{res2} for the current module, the rule and
     its alias are:
 
 \begin{verbatim}
@@ -1031,36 +1023,34 @@ myphase > MODULE.res2
         < MODULE.res1
 \end{verbatim}
     
-    Notice that libraries generally use the program entities, that is to say
+    Note that libraries generally use the program entities, that is to say
     all the objects from the current Fortran program and which have a name.
-    This resource is named {\tt PROGRAM.entities}.
+    This resource is named \texttt{PROGRAM.entities}.
     
-  \item New {\em properties\/} may be necessary for the new phase. They must
-    be delared in the file {\tt properties-rc.tex}.
+  \item New \emph{properties} may be necessary for the new phase. 
+    They must be delared in the \texttt{properties-rc.tex} file.
     
-  \item Run the command {\tt make all} to now derive from {\tt
-      pipsmake-rc.tex} the files {\tt phases.h}, {\tt resources.h} and
-    {\tt builder-map.h} and to copy them into {\tt \$PIPS\_ROOT/Include};
-    to also derive {\tt pipsmake.rc}, 
-    {\tt properties.rc} and {\tt wpips.rc}, and to copy them into {\tt
-      \$PIPS\_ROOT/Lib}.
+  \item Run the command \texttt{make recompile} to derive the various files 
+    \texttt{pipsmake.rc}, \texttt{phases.h}, \texttt{resources.h} and 
+    \texttt{builder-map.h}, \texttt{make install} to copy them to 
+    \texttt{include} or \texttt{etc}
     
   \end{itemize}
   
-\item In the directory {\tt \$PIPS\_ROOT/Src/Libs/pipsmake}:
+\item In directory \texttt{src/Libs/pipsmake}:
 
 Execute the command \texttt{make recompile} to recompile the pipsmake library.
   
-\item In the directory {\tt \$PIPS\_ROOT/Src/Passes}:
+\item In directory \texttt{src/Passes}:
 
   Execute the command \texttt{make recompile} to recompile and install
-  updated versions of {\tt pips}, {\tt tpips} and {\tt wpips}.
+  updated versions of \texttt{pips}, \texttt{tpips} and \texttt{wpips}.
   
 \end{itemize}
 
-It can also be necessary to update the shell scripts {\tt Init}, {\tt
-  Build}, {\tt Select}, {\tt Perform}, and {\tt Display} in {\tt
-  \$PIPS\_DEVEDIR/Scripts/drivers}.
+It can also be necessary to update the shell scripts \texttt{Init}, 
+\texttt{Build}, \texttt{Select}, \texttt{Perform}, and \texttt{Display} in 
+directory \texttt{src/Scripts/drivers}.
 
 This section did not deal with the case where a new resource is
 introduced. This is the object of the next section.
