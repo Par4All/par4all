@@ -257,7 +257,7 @@ several pips architectures that compile and run on a very same machine.
 
 This set of tools is defined in the corresponding
 \texttt{\$PIPS\_ARCH.mk} makefile,
-where usual \verb+CC+, \verb+CFLAGS+ and so make macros are defined.
+where usual \texttt{CC}, \texttt{CFLAGS} and so make macros are defined.
 
 This configuration file is automatically included by all makefiles, hence
 changing this variable results in different compilers and options to be
@@ -270,19 +270,17 @@ compiled and linked with libraries compiled for the same architecture.
 Here are examples of pips architectures:
 \begin{description}
 \item[.]: default version used locally, so as to be compatible with the
- past. \verb+gcc+, \verb+flex+ and \verb+bison+ are used.
+ past. \texttt{gcc}, \texttt{flex} and \texttt{bison} are used.
 \item[DEFAULT]: default compilers and options expected to run on any
-  machine (\verb+CC=cc+, and so on). The C compiler is expected to support
+  machine (\texttt{CC=cc}, and so on). The C compiler is expected to support
   ANSI features, includes and so.
-\item[GNU]: prefer gnu tools, as \verb+gcc+, \verb+flex+, \verb+bison+,
-  \verb+g77+.
-\item[SUN4]: SUN SUNOS 4 compilers \verb+acc+,\verb+lex+, \verb+yacc+,
-  \verb+f77+, etc.
+\item[GNU]: prefer gnu tools, as \texttt{gcc flex bison g77}.
+\item[SUN4]: SUN SUNOS 4 compilers \texttt{acc lex yacc f77} etc.
 \item[GNUSOL2LL]: version for SUN Solaris 2 compiled with gnu softwares and
   using ``long long'' (64 bits) integers in the mathematical computations
   of the C3/Linear library.
 \item[GPROF]: a gnu version compiled with -pg (which generates a trace
-  file that can be exploited by \verb+gprof+ for extracting profiling
+  file that can be exploited by \texttt{gprof} for extracting profiling
   information)
 \item[IBMAIX]: the compilers and options used on IBM AIX workstations. 
 \item[LINUXI86]: for x86 machines under linux.
