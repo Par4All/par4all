@@ -1,6 +1,7 @@
 #! /bin/sh
 #
 # $Id$
+# $URL$
 #
 # Setup a basic pips installation from scratch
 #
@@ -58,7 +59,7 @@ svn checkout $PIPS_SVN/bundles/trunks $prod || error "cannot checkout pips"
 
 valid=$destination/valid
 echo "### downloading validation"
-if svn checkout $PIPS_SVN/validation/trunk $valid
+if svn checkout $SVN_CRI/validation/trunk $valid
 then
     # add the expected link...
     ln -s $valid $prod/pips/Validation
