@@ -258,10 +258,10 @@ make_diff()
 
   # ca c'est du Pierre... ;-)
   report $status \
-  "`echo Run accept on mail message to resynchronize. ;\
-  echo Differences for $module in $refresult: ;\
-  cat $diffout ;\
-  echo ; `"
+"Run accept on mail message to resynchronize.
+Differences for $module in $refresult:
+`cat $diffout`
+"
 
   # clean if ok.
   test $status -eq 0 && rm -f $refresult.out
@@ -318,8 +318,7 @@ test_aspect()
        STATUS=$?
        [ -f core ] && rm -f core
 
-       report $STATUS \
-         "Execution of $aspect/$name.test failed" || \
+       report $STATUS "Execution of $aspect/$name.test failed" || \
          { $debg " || error $aspect/$name.test"; continue; }
        
        make_diff $aspect $name test
@@ -336,8 +335,7 @@ test_aspect()
        STATUS=$?
        test -f core && rm -f core
        
-       report $STATUS \
-         "Execution of $aspect/$name.tpips failed" || \
+       report $STATUS "Execution of $aspect/$name.tpips failed" || \
          { $debg " || error $aspect/$name.tpips"; continue;}
 
        make_diff $aspect $name test
@@ -434,16 +432,13 @@ do
 
   if [ ! -d "$vdir/$dir" ]
   then
-    report 1 \
-	"$dir is not a directory in $vdir"
+    report 1 "$dir is not a directory in $vdir"
   elif [ -f $vdir/$dir/pipsmake.rc ] 
   then
-    report 2 \
-	"validate should not be run with a pipsmake.rc in $vdir/$dir."
+    report 2 "validate should not be run with a pipsmake.rc in $vdir/$dir."
   elif [ -f $vdir/$dir/properties.rc ]
   then
-    report 3 \
-	"validate should not be run with a properties.rc in $vdir/$dir."
+    report 3 "validate should not be run with a properties.rc in $vdir/$dir."
   else
     $verb "validating $dir"
     test_aspect $vdir/$dir
