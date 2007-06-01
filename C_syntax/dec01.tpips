@@ -1,7 +1,9 @@
 delete dec01
 create dec01 ${PIPS_ROOT}/Validation/C_syntax/dec01.c
 
-#setenv C_SYNTAX_DEBUG_LEVEL 1
+# setenv C_SYNTAX_DEBUG_LEVEL 1
+
+# setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 
 activate C_PARSER
 
@@ -9,7 +11,7 @@ setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 
-#setenv PRETTYPRINT_DEBUG_LEVEL 5
+# setenv PRETTYPRINT_DEBUG_LEVEL 5
 
 echo
 echo PARSED PRINTED FILE

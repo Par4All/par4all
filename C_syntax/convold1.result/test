@@ -1,6 +1,7 @@
 
 User FILE for convold1
 
+# 1
 int convold1(int X[13][13],int coeff[6],int i,int j)
 {
   int m, res;
@@ -20,11 +21,13 @@ int convold1(int X[13][13],int coeff[6],int i,int j)
 {
    int m;
    int res;
+   
+   /* for  (m = 0; m<= 5; m++) */
+   
    res = 0;
    for (m = 0;m<=5;m++)
-   {
       res = res+coeff[m]*X[i+m][j];
-   }
+   
    return res;
 }
 
@@ -34,10 +37,13 @@ int convold1(int X[13][13],int coeff[6],int i,int j)
 {
    int m;
    int res;
+   
+   /* for  (m = 0; m<= 5; m++) */
+   
    res = 0;
-   for(m = 0; m <= 5; m += 1) {
+   for(m = 0; m <= 5; m += 1)
       res = res+coeff[m]*X[i+m][j];
-   }
+   
    return res;
 }
 
@@ -48,14 +54,17 @@ int convold1(int X[13][13],int coeff[6],int i,int j)
    int m;
    int res;
 //               <must be written>: res
+   
+   /* for  (m = 0; m<= 5; m++) */
+   
    res = 0;
 //               <must be written>: m
-   for(m = 0; m <= 5; m += 1) {
+   for(m = 0; m <= 5; m += 1)
 //               <must be read   >: X[i+m][j] coeff[m] i j m res
 //               <must be written>: res
       res = res+coeff[m]*X[i+m][j];
-   }
 //               <must be read   >: res
+   
    return res;
 }
 
@@ -71,19 +80,22 @@ int convold1(int X[13][13],int coeff[6],int i,int j)
 
 //  T(res) {res==0}
 
+   
+   /* for  (m = 0; m<= 5; m++) */
+   
    res = 0;
 
 //  T(m,res) {res#init==0, 0<=m}
 
-   for(m = 0; m <= 5; m += 1) {
+   for(m = 0; m <= 5; m += 1)
 
 //  T(res) {0<=m, m<=5}
 
       res = res+coeff[m]*X[i+m][j];
-   }
 
 //  T() {m==6}
 
+   
    return res;
 }
 
@@ -99,19 +111,22 @@ int convold1(int X[13][13],int coeff[6],int i,int j)
 
 //  P() {}
 
+   
+   /* for  (m = 0; m<= 5; m++) */
+   
    res = 0;
 
 //  P(res) {res==0}
 
-   for(m = 0; m <= 5; m += 1) {
+   for(m = 0; m <= 5; m += 1)
 
 //  P(m,res) {0<=m, m<=5}
 
       res = res+coeff[m]*X[i+m][j];
-   }
 
 //  P(m,res) {m==6}
 
+   
    return res;
 }
 
@@ -125,17 +140,20 @@ int convold1(int X[13][13],int coeff[6],int i,int j)
 {
    int m;
    int res;
+   
+   /* for  (m = 0; m<= 5; m++) */
+   
    res = 0;
 
 //  <X[PHI1][PHI2]-R-MAY-{PHI2==j, i<=PHI1, PHI1<=5+i}>
 //  <coeff[PHI1]-R-MAY-{0<=PHI1, PHI1<=5}>
 
-   for(m = 0; m <= 5; m += 1) {
+   for(m = 0; m <= 5; m += 1)
 
 //  <X[PHI1][PHI2]-R-EXACT-{i+m==PHI1, PHI2==j, 0<=m, m<=5}>
 //  <coeff[PHI1]-R-EXACT-{PHI1==m, 0<=m, m<=5}>
 
       res = res+coeff[m]*X[i+m][j];
-   }
+   
    return res;
 }

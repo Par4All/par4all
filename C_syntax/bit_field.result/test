@@ -9,5 +9,6 @@ int main()
       int PIPS_MEMBER_1:6;
    };
    struct x y;
+   
    return 0;
 }
