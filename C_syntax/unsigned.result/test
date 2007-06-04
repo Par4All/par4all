@@ -8,6 +8,7 @@ main()
    unsigned long i6;
    unsigned long long i7;
    unsigned long long i8;
+   
    i1 = 1;
    i2 = 2;
    i8 = 8;
