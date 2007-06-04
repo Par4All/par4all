@@ -4,12 +4,10 @@ Parsed printed file for main
 main()
 {
    int i = 1;
-   if (i==1) {
+   if (i==1)
       goto switch_1_case_1;
-   }
-   if (i==2) {
+   if (i==2)
       goto switch_1_case_2;
-   }
    goto switch_1_default;
 switch_1_case_1:   ;
    printf("1 = %d", i);
