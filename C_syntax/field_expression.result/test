@@ -8,5 +8,6 @@ int main()
    int i;
    int k;
    f1 *f;
+   
    (f[k].a)[i] = 0;
 }
