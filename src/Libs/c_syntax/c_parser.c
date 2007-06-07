@@ -259,8 +259,3 @@ bool compilation_unit_parser(string module_name)
 {
   return actual_c_parser(module_name,DBR_C_SOURCE_FILE,TRUE);
 }
-
-
-
-
-

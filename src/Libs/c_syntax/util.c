@@ -94,6 +94,7 @@ void MakeCurrentCompilationUnitEntity(string name)
 
 void ResetCurrentCompilationUnitEntity()
 {
+  CMemoryAllocation(get_current_module_entity());
   if (get_bool_property("PARSER_DUMP_SYMBOL_TABLE"))
     fprint_environment(stderr, get_current_module_entity());
    pips_debug(4,"Reset current module entity for compilation unit %s\n",get_current_module_name());
@@ -903,6 +904,27 @@ type UpdateType(type t1, type t2)
   return type_undefined;
 }
 
+/* This function allocates the memory to the C variable by adding it to the area */
+
+void CMemoryAllocation(entity module)
+{
+  pips_debug(8,"MEMORY ALLOCATION BEGINS\n");
+
+  MAP ( ENTITY, var,
+  {
+    if(type_variable_p(entity_type(var)))
+      {
+	//Check the storage is of ram type 
+	storage s = entity_storage(var);
+	ram r = storage_ram(s);
+	entity a = ram_section(r);
+	ram_offset(r) = area_size(type_area(entity_type(a)));
+	add_C_variable_to_area(a,var);
+      }
+  },
+  entity_declarations(module));
+}
+
 void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack FunctionStack,
 		  stack OffsetStack, bool is_external)
 {
@@ -966,6 +988,9 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
       else
 	{
 	  if(type_variable_p(entity_type(e))) {
+	    /* The entities for the type_variable is added to the current module and the declarations*/  
+	    entity function = get_current_module_entity();
+	    AddToDeclarations(e,function);
 	    entity_storage(e) = 
 	      MakeStorageRam(e,is_external,c_parser_context_static(context));
 	  }
@@ -1140,11 +1165,17 @@ entity MakeDerivedEntity(string name, list members, bool is_external, int i)
 /*******************  MISC *******************/
 
 
-storage MakeStorageRam(entity e, bool is_external, bool is_static)
+storage MakeStorageRam(entity v, bool is_external, bool is_static)
 {
   ram r = ram_undefined; 
+  area lsa = type_area(entity_type(StaticArea));
+  area dsa = type_area(entity_type(DynamicArea));
+  entity moduleStaticArea = FindOrCreateEntity(compilation_unit_name,  STATIC_AREA_LOCAL_NAME);
+  area msa = type_area(entity_type(moduleStaticArea));
+  entity globalStaticArea = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,  STATIC_AREA_LOCAL_NAME);
+  area gsa = type_area(entity_type(globalStaticArea));
 
-  pips_assert("RAM Storage is used only for variables", type_variable_p(entity_type(e)));
+  pips_assert("RAM Storage is used only for variables", type_variable_p(entity_type(v)));
 
   if (is_external)
     {
@@ -1156,6 +1187,7 @@ storage MakeStorageRam(entity e, bool is_external, bool is_static)
 		       NIL);
 	  /*the offset must be recomputed lately, when we know for
 	    sure the size of the variables */
+	  area_layout(msa) = gen_nconc(area_layout(msa), CONS(ENTITY, v, NIL));
 	}
       else 
 	{
@@ -1168,6 +1200,7 @@ storage MakeStorageRam(entity e, bool is_external, bool is_static)
 		       NIL);
 	  /* the offset must be recomputed lately, when we know for
 	     sure the size of the variable */
+  	  area_layout(gsa) = gen_nconc(area_layout(gsa), CONS(ENTITY, v, NIL));
 	}
     }
   else
@@ -1181,6 +1214,7 @@ storage MakeStorageRam(entity e, bool is_external, bool is_static)
 		       NIL);
 	  /*the offset must be recomputed lately, when we know for
 	    sure the size of the variable */
+	  area_layout(lsa) = gen_nconc(area_layout(lsa), CONS(ENTITY, v, NIL));
 	}
       else
 	{
@@ -1190,6 +1224,7 @@ storage MakeStorageRam(entity e, bool is_external, bool is_static)
 		       NIL);
 	  /* the offset must be recomputed lately, when we know for
 	     sure the size of the variable */
+	  area_layout(dsa) = gen_nconc(area_layout(dsa), CONS(ENTITY, v, NIL));
 	}
     }
   return make_storage_ram(r);

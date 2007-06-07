@@ -59,6 +59,7 @@ void MakeCurrentModule(entity e)
 
 void ResetCurrentModule()
 {
+  CMemoryAllocation(get_current_module_entity());
   if (get_bool_property("PARSER_DUMP_SYMBOL_TABLE"))
     fprint_environment(stderr, get_current_module_entity());
   pips_debug(4,"Reset current module entity %s\n",get_current_module_name());

@@ -487,35 +487,49 @@ int c;
 }
 
 /* 
- * This function computes the current offset of the area a passed as
+ * These functions compute the current offset of the area a passed as
  * argument. The length of the variable v is also computed and then added
  * to a's offset. The initial offset is returned to the calling function.
- * v is added to a's layout.
+ * v is added to a's layout if not already present. C and Fortran behaviours differ slightly.
  */
-int 
-add_variable_to_area(a, v)
-entity a, v;
+
+int add_variable_to_area(entity a, entity v)
+{
+  return(add_any_variable_to_area(a, v, TRUE));
+}
+
+int add_C_variable_to_area(entity a, entity v)
+{
+ return(add_any_variable_to_area(a, v, FALSE));
+}
+
+int add_any_variable_to_area(entity a, entity v, bool is_fortran_p)
 {
   int OldOffset=-1;
   type ta = entity_type(a);
   area aa = type_area(ta);
 
-  if(top_level_entity_p(a)) {
+  if(top_level_entity_p(a) && is_fortran_p ) {
     /* COMMONs are supposed to havethe same layout in each routine */
     pips_error("add_variable_to_area", "COMMONs should not be modified\n");
   }
   else {
-    /* the local areas are StaticArea and DynamicArea */
+    /* the local areas are StaticArea and DynamicArea in fortran */
+    /* the areas are localStaticArea, localDynamicArea, moduleStaticArea, globalStaticArea in C*/
     int s = 0;
     OldOffset = area_size(aa);
     if(!SizeOfArray(v, &s)) {
-      pips_error("add_variable_to_area",
-		 "Varying size array \"%s\"\n", entity_name(v));
+      pips_internal_error("Varying size array \"%s\"\n", entity_name(v));
     }
     area_size(aa) = OldOffset+s;
   }
-
-  area_layout(aa) = gen_nconc(area_layout(aa), CONS(ENTITY, v, NIL));
+  
+  if(is_fortran_p)
+    area_layout(aa) = gen_nconc(area_layout(aa), CONS(ENTITY, v, NIL));
+  else{
+    if(!gen_in_list_p(v, area_layout(aa)))
+      area_layout(aa) = gen_nconc(area_layout(aa), CONS(ENTITY, v, NIL));
+  }
 
   return(OldOffset);
 }
