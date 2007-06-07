@@ -2,7 +2,7 @@
 
 INSTALL_DOC =	tpips-user-manual.ps
 
-INSTALL_HTM = tpips-user-manual.htdoc
+#INSTALL_HTM = tpips-user-manual.htdoc
 
 # common stuff
 ifdef PIPS_ROOT
