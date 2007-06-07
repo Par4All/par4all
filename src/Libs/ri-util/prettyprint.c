@@ -377,8 +377,9 @@ bool one_liner_p(statement s)
   instruction i = statement_instruction(s);
   bool yes = (instruction_test_p(i) || instruction_loop_p(i) || instruction_whileloop_p(i)
 	      || instruction_call_p(i) || instruction_forloop_p(i) || instruction_goto_p(i)
-	      || instruction_return_p(i))
-    && ENDP(statement_declarations(s));
+	      || instruction_return_p(i));
+
+  yes = yes  && ENDP(statement_declarations(s));
 
   if(!yes && instruction_sequence_p(i)) {
     list sl = sequence_statements(instruction_sequence(i));
