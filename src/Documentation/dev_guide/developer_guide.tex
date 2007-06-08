@@ -102,17 +102,29 @@ Moreover the \texttt{pips} repository includes
   softwares trunk versions ready for compilation.
 \end{description}
 
-A crude script \verb|setup_pips.sh| on the web site and in
+A crude script \texttt{setup\_pips.sh} on the web site and in
 \texttt{pips/trunk/makes} allows to download \texttt{polylib},
 \texttt{newgen}, \texttt{linear} and \texttt{pips} and to build a local
 installation of the softwares.  For instance developer \texttt{calvin} can
 do the following to setup its own PIPS environment:
 \begin{verbatim}
-sh> setup_pips.sh /tmp/MYPIPS calvin
+sh> setup_pips.sh /home/temp/MYPIPS calvin
 ...
-sh> source /tmp/MYPIPS/pipsrc.sh
+sh> source /home/temp/MYPIPS/pipsrc.sh
 sh> # enjoy
 \end{verbatim}
+
+It is important to realize that:
+\begin{enumerate}
+\item PIPS build is much more efficient if it is stored on local disks rather
+  than remote directories accesses through the network (for instance via NFS).
+  Hence the \texttt{/home/temp} directory choice in the above axample.
+\item the local copy editions are not saved unless commits are performed.
+\item in a standard development, commits should not be made directly under
+  the \texttt{trunk}, but rather in development branches, see the next section.
+\item on some Unises, the \texttt{/tmp} temporary directories may be cleaned
+  on reboots, which can be triggered by power failures.
+\end{enumerate}
 
 
 \section{Developing PIPS under SVN}
@@ -163,10 +175,10 @@ sh> svn co http://svn.cri.ensmp.fr/svn/pips/branches/calvin pips_dev
   in the production version. Assuming that Calvin wants to develop 
   in the \texttt{hpfc} library in pips:
 \begin{verbatim}
-sh> cd /tmp/MYPIPS/prod/pips/src/Libs/hpfc
+sh> cd /home/temp/MYPIPS/prod/pips/src/Libs/hpfc
 sh> make USERNAME=calvin create-branch
 # ... not really created before the commit
-sh> svn commit /tmp/svn_branch.XXXXXX/
+sh> svn commit /home/temp/svn_branch.XXXXXX/
 \end{verbatim}
   It creates a new branch, not yet committed, in some directory.
   \texttt{USERNAME} is not necessary if the svn and unix account share the
@@ -174,7 +186,7 @@ sh> svn commit /tmp/svn_branch.XXXXXX/
   committed automatically with the \texttt{force-create-branch} target.
 \item If necessary, update your development area to make the branch appear.
 \begin{verbatim}
-sh> cd /tmp/MYPIPS/pips_dev
+sh> cd /home/temp/MYPIPS/pips_dev
 sh> svn update
 A    hpfc
 sh> cd hpfc
@@ -863,8 +875,8 @@ library (the parser).
 
 Many macros and functions are available from the Linear and NewGen
 libraries, but also in PIPS. Their source code can be retrieved using the
-{\em tag\/} indexing mechanism under editors such as {\bf\tt emacs} or
-{\bf\tt vi}. 
+\emph{tags} indexing mechanism under editors such as \textbf{emacs} or
+\textbf{vi}. 
 
 The TAGS file at the PIPS top directory is made with a \texttt{make tags}
 and needs to be remade regularly to have an up to date version of the
@@ -873,9 +885,11 @@ index.
 So it is highly recommended to use for example the Emacs editor to benefit
 from the tags.  You can add the PIPS TAGS file by customizing the
 \texttt{Tags Table List} variable from the \texttt{Options} menu or
-directly in your \verb|~/.emacs| with something like:
+directly in your \texttt{\~/.emacs} with something like:
 \begin{verbatim}
-(setq tags-table-list '("." "~/projets/PIPS/MYPIPS/prod/pips" "/usr/src/linux-2.6.16"))
+(setq tags-table-list 
+  '("." "~/projets/PIPS/MYPIPS/prod/pips" "/usr/src/linux-2.6.16")
+ )
 \end{verbatim}
 Afterward, you can find, by typing a \texttt{M-.} on an identifier, the
 location where it is defined. Note that completion with \texttt{TAB} works
@@ -887,7 +901,6 @@ need to make separate TAGS files for Linear and NewGen and put them in the
 \texttt{tags-table-list} Emacs variable.
 
 
-
 \subsection{Library dependencies}
 
 Library dependence cycles must be avoided. Links are not easy to manage when
@@ -897,10 +910,11 @@ bad logical organization of libraries. Therefore, PIPS libraries must be
 organized as a DAG, i.e. they must have a partial order.
 
 
-Several utilities, such as {\tt analyze\_libraries}, {\tt order\_libraries},
+Several utilities, such as \texttt{analyze\_libraries}, 
+\texttt{order\_libraries},
 can be used to determine the dependences between libraries, a total order
 compatible with the library partial order, and the possible cycles. The
-results are stored in {\tt /tmp/libs.?} where the question mark stands for
+results are stored in \texttt{/tmp/libs.?} where the question mark stands for
 several values:
 \begin{itemize}
   \item u: uses, modules used by each library.
