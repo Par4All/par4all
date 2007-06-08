@@ -1090,11 +1090,11 @@ is available.
     \texttt{pipsmake-rc.tex}. Each rule describes the
     dependances between the input and output resources of each phase. Just
     have a look at the other rules to build your owns. You can also add
-    aliases to obtain nice menus in the \verb+wpips+ interface.
+    aliases to obtain nice menus in the \textbf{wpips} interface.
     
-    For instance, for a phase {\em myphase} which reads a resource {\tt
-      another\_res} and produces a resource {\em my res} for the current
-    module, the rule and its alias are:
+    For instance, for a phase \emph{myphase} which reads a resource 
+    \texttt{another\_res} and produces a resource \emph{my res} for the 
+    current module, the rule and its alias are:
 
 \begin{verbatim}
 alias myphase 'My Phase'
@@ -1104,13 +1104,14 @@ myphase > MODULE.myres
         < MODULE.another_res
 \end{verbatim}
     
-  \item Run the command {\tt make all} to now derive from {\tt
-      pipsmake-rc.tex} the files {\tt phases.h}, {\tt resources.h} and {\tt
-      builder-map.h} and to copy them into {\tt \$PIPS\_INCLUDEDIR}; to also
-    derive {\tt pipsmake.rc}, {\tt properties.rc} and {\tt wpips.rc} and to
-    copy them into {\tt \$PIPS\_LIBDIR}.
+  \item Run the command \texttt{make all} to now derive from 
+    \texttt{pipsmake-rc.tex} the files \texttt{phases.h}, \texttt{resources.h} 
+    and \texttt{builder-map.h} and to copy them into 
+    \texttt{\$PIPS\_INCLUDEDIR}; to also
+    derive \texttt{pipsmake.rc}, \texttt{properties.rc} and \texttt{wpips.rc} 
+    and to copy them into \texttt{\$PIPS\_LIBDIR}.
 
-  \item Run the command {\tt make install}
+  \item Run the command \texttt{make install}
      
   \end{itemize}
   
@@ -1121,7 +1122,7 @@ myphase > MODULE.myres
   
   \begin{itemize}
     
-  \item Update the file {\tt methods.h} by adding a line for
+  \item Update the file \texttt{methods.h} by adding a line for
     the \texttt{DBR\_MYRES} resource. Macros are predefined 
     for saving, loading, freeing and checking a resource if it is
     a newgen domain, a string, aso. For instance a newgen resource
@@ -1155,8 +1156,8 @@ myphase > MODULE.myres
 \end{itemize}
 
 \paragraph{Remark:} It is necessary to recompile PIPS before any test,
-  because changing the header files generated from {\tt
-  pipsmake-rc.tex} can lead to inconsistencies which only appear at run time
+  because changing the header files generated from \texttt{pipsmake-rc.tex}
+  can lead to inconsistencies which only appear at run time
   (the database cannot be created for instance). 
 
 
@@ -1167,8 +1168,8 @@ NewGen data strutures for PIPS are defined in \LaTeX{} files which are in
 the directory \texttt{\$PIPS\_DEVEDIR/Documentation/newgen}. 
 These files include both the NewGen specifications, and the comments in
 \LaTeX{} format. 
-DDL\footnote{Newgen types are called {\em domains\/} and are defined using a
-  high level specification language called DDL for {\em Domain Definition
+DDL\footnote{Newgen types are called \emph{domains\/} and are defined using a
+  high level specification language called DDL for \emph{Domain Definition
     Language}.} files are automatically generated from the previous \LaTeX{}
 files. When declaring a new data structure, two cases may arise:
 
