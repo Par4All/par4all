@@ -1,0 +1,10 @@
+#!/bin/sh
+#
+# Script to test pips on the Cholesky program
+#
+Init -df $PIPS_VALIDDIR/Complexity/fin.f fin >&2
+echo "--- Complexity"
+Display -m fin comp
+exit_status=$?
+Delete fin >&2
+exit $exit_status

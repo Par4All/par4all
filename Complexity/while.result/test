@@ -1,0 +1,17 @@
+Complexity --- Begin
+C                                                                   15 (SUMMARY)
+      PROGRAM WHILE
+      REAL T(100)
+C                                                                    1 (STMT) 
+
+      I = 1                                                             0001
+C                                                                    0 (STMT) 
+100   CONTINUE                                                          0002
+C                                                                    2 (STMT) 
+      T(I) = 0.                                                         0003
+C                                                                    3 (STMT) 
+      I = I+1                                                           0004
+C                                                                    4 (TEST) 
+      IF (I.LE.N) GOTO 100                                              0005
+      END
+Complexity --- End  

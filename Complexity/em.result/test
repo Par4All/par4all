@@ -1,0 +1,56 @@
+--- Without interprocedural transformers and preconditions
+--- An unknown upper bound variable appears because of N
+C                                                          2*U_N_0 - 8 (SUMMARY)
+      PROGRAM EM
+C                                                                    1 (STMT) 
+      N1 = 10                                                           0001
+C                                                                    1 (STMT) 
+      N2 = 30                                                           0002
+C                                                                    4 (STMT) 
+      CALL ADD(N1, N2, N)                                               0003
+C                                                                    1 (STMT) 
+      PRINT *, N                                                        0004
+C                                                       2*N - 2*N1 + 5 (DO)   
+      DO 100 I = N1, N                                                  0005
+C                                                                    1 (STMT) 
+         U = 1.                                                         0006
+C                                                                    0 (STMT) 
+100      CONTINUE                                                       0007
+      END
+--- With interprocedural transformers (intraprocedural
+--- preconditions are sufficient to analyze a main)
+C                                                                   72 (SUMMARY)
+      PROGRAM EM
+C                                                                    1 (STMT) 
+      N1 = 10                                                           0001
+C                                                                    1 (STMT) 
+      N2 = 30                                                           0002
+C                                                                    4 (STMT) 
+      CALL ADD(N1, N2, N)                                               0003
+C                                                                    1 (STMT) 
+      PRINT *, N                                                        0004
+C                                                       2*N - 2*N1 + 5 (DO)   
+      DO 100 I = N1, N                                                  0005
+C                                                                    1 (STMT) 
+         U = 1.                                                         0006
+C                                                                    0 (STMT) 
+100      CONTINUE                                                       0007
+      END
+--- Keep N1 and N2 unevaluated
+C                                                                   72 (SUMMARY)
+      PROGRAM EM
+C                                                                    1 (STMT) 
+      N1 = 10                                                           0001
+C                                                                    1 (STMT) 
+      N2 = 30                                                           0002
+C                                                                    4 (STMT) 
+      CALL ADD(N1, N2, N)                                               0003
+C                                                                    1 (STMT) 
+      PRINT *, N                                                        0004
+C                                                       2*N - 2*N1 + 5 (DO)   
+      DO 100 I = N1, N                                                  0005
+C                                                                    1 (STMT) 
+         U = 1.                                                         0006
+C                                                                    0 (STMT) 
+100      CONTINUE                                                       0007
+      END

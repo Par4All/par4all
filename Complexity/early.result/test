@@ -1,0 +1,28 @@
+C                                                            8*N + 126 (SUMMARY)
+      SUBROUTINE EARLY(N)
+C                                                                    1 (STMT) 
+
+      M = 10                                                            0001
+C                                                        4*M + 4*N + 2 (DO)   
+      DO 10 I = 1, M                                                    0002
+C                                                       4*M^(-1).N + 3 (DO)   
+         DO 20 J = 1, N, M                                              0003
+C                                                                    3 (STMT) 
+            T = T+1.0                                                   0004
+C                                                                    0 (STMT) 
+20          CONTINUE                                                    0005
+C                                                                    0 (STMT) 
+10       CONTINUE                                                       0006
+C                                                                    1 (STMT) 
+      M = 20                                                            0007
+C                                                        4*M + 4*N + 2 (DO)   
+      DO 30 I = 1, M                                                    0008
+C                                                       4*M^(-1).N + 3 (DO)   
+         DO 40 J = 1, N, M                                              0009
+C                                                                    3 (STMT) 
+            T = T+1.0                                                   0010
+C                                                                    0 (STMT) 
+40          CONTINUE                                                    0011
+C                                                                    0 (STMT) 
+30       CONTINUE                                                       0012
+      END

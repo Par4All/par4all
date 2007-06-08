@@ -1,0 +1,27 @@
+#!/bin/sh
+#
+# Script to test unknown variable name generation :
+# - DO/ENDDO with unknown.f
+# - several nested loops with same label
+# - early or late evaluation (apparently not implemented)
+#
+
+tpips=${tpips_version:-tpips}
+
+# Initialization:
+# rm -f unknown.result/test
+# unknown.test >unknown.result/test
+
+$tpips <<EOF
+# Complexity estimation before and after
+# partial evaluation
+
+delete unknown
+create unknown $PIPS_VALIDDIR/Complexity/unknown.f
+module unknown
+activate PRINT_CODE_COMPLEXITIES
+display PRINTED_FILE
+close
+delete unknown
+quit
+EOF

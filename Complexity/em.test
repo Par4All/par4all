@@ -1,0 +1,39 @@
+#!/bin/sh
+#
+# Script to test comoplexity estimation on em.f
+#
+# Init -df $PIPS_DIR/Tests/Validation/Complexity/em.f em >&2
+# echo "--- Complexity"
+# Display -m em comp
+# exit_status=$?
+# Delete em >&2
+# exit $exit_status
+
+tpips=${tpips_version:-tpips}
+
+# Initialization:
+# rm -f em.result/test
+# em.test >em.result/test
+
+$tpips <<EOF
+# Complexity estimation before and after
+# partial evaluation
+
+delete em
+create em $PIPS_VALIDDIR/Complexity/em.f
+module em
+activate PRINT_CODE_COMPLEXITIES
+echo --- Without interprocedural transformers and preconditions
+echo --- An unknown upper bound variable appears because of N
+display PRINTED_FILE
+activate TRANSFORMERS_INTER_FULL
+echo --- With interprocedural transformers (intraprocedural
+echo --- preconditions are sufficient to analyze a main)
+display PRINTED_FILE
+echo --- Keep N1 and N2 unevaluated
+set COMPLEXITY_PARAMETERS "N1 N2"
+display PRINTED_FILE
+close
+delete em
+quit
+EOF

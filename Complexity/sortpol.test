@@ -1,0 +1,24 @@
+#!/bin/sh
+#
+# Script to test complexity prettyprinter with sortpol.f
+#
+
+tpips=${tpips_version:-tpips}
+
+# Initialization:
+# rm -f sortpol.result/test
+# sortpol.test >sortpol.result/test
+
+$tpips <<EOF
+# Complexity estimation before and after
+# partial evaluation
+
+delete sortpol
+create sortpol $PIPS_VALIDDIR/Complexity/sortpol.f
+module sortpol
+activate PRINT_CODE_COMPLEXITIES
+display PRINTED_FILE
+close
+delete sortpol
+quit
+EOF

@@ -1,0 +1,22 @@
+--- Complexity
+C                                                                  738 (SUMMARY)
+      PROGRAM CA
+      PARAMETER (MN=10)
+      DIMENSION A(MN)
+C                                                                    1 (STMT) 
+      IM = MN                                                           0001
+C                                                                    1 (STMT) 
+      NMAX = 6                                                          0002
+C                                              12*IM.NMAX - 3*NMAX + 2 (DO)   
+      DO 100 I = 1, NMAX                                                0003
+C                                                            12*IM - 4 (STMT) 
+         CALL SUB(IM, A)                                                0004
+C                                                                    0 (STMT) 
+100      CONTINUE                                                       0005
+C                                                             3*IM + 2 (DO)   
+      DO 101 I = 1, IM                                                  0006
+C                                                                    2 (STMT) 
+         PRINT *, A(I)                                                  0007
+C                                                                    0 (STMT) 
+101      CONTINUE                                                       0008
+      END

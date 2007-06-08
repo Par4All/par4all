@@ -1,0 +1,13 @@
+#!/bin/sh
+#
+# Script to test pips on the Early program
+#
+Init -df $PIPS_ROOT/Validation/Complexity/while.f while >&2
+Perform -v -m while UNSPAGHETTIFY
+echo "Complexity --- Begin"
+Display -v -m while comp
+exit_status=$?
+echo "Complexity --- End  "
+# Display -l 
+Delete while >&2
+exit $exit_status
