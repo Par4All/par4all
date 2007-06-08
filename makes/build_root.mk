@@ -38,22 +38,25 @@ install:
 uninstall:
 	@echo "try 'unbuild' target"
 
-# all about tags
-# use a temporary file
-TAGS	= /tmp/tags.$$$$
-
-# generate tag file
+# all about tags, with temporary files
+# should it generate tags only for src/?
+ETAGS	= /tmp/etags.$$$$
 TAGS:
 	find $(CURDIR) -name '*.[chly]' -print0 | \
-		xargs -0 etags --append --output=$(TAGS) ; \
-	mv $(TAGS) TAGS
+		xargs -0 etags --append --output=$(ETAGS) ; \
+	mv $(ETAGS) TAGS
+
+CTAGS	= /tmp/ctags.$$$$
+CTAGS:
+	find $(CURDIR) -name '*.[chly]' -print0 | \
+		xargs -0 ctags --append --output=$(CTAGS) ; \
+	mv $(CTAGS) CTAGS
 
 # force tags target
 tags: tags-clean
-	$(MAKE) TAGS
+	$(MAKE) TAGS CTAGS
 
 # ARGH. I want both to forward and to clean locals...
 #clean: tags-clean
-
 tags-clean:
-	$(RM) TAGS
+	$(RM) TAGS CTAGS
