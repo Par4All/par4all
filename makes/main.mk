@@ -233,8 +233,12 @@ $(ETC.d):
 	$(MAKE) $(ETC.d)
 	for f in $(INSTALL_ETC) ; do \
 	  if [ -d $$f ] ; then \
-	    cp -r $$f $(ETC.d) ; \
-	else \
+	    find $$f -type d -name '.svn' -prune -o -type f -print | \
+	      while read file ; do \
+	        echo "installing $$file" ; \
+		$(INSTALL) -D -m 644 $$file $(ETC.d)/$$file ; \
+	      done ; \
+	  else \
 	    $(CMP) $$f $(ETC.d)/$$f || \
 	      $(INSTALL) -m 644 $$f $(ETC.d) ; \
 	  fi ; \
