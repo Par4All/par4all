@@ -3,7 +3,8 @@
 FIND	= find . -name '.svn' -type d -prune -o
 
 clean:
-	$(FIND) -name '*~' -print0 | xargs -0 $(RM)
+	$(FIND) -name '*~' -type f -print0 | xargs -0 $(RM)
+	$(FIND) -name '*.database' -type d -print0 | xargs -0 $(RM) -r
 	$(RM) */*.result/out
 	$(RM) -r validation_results.*
 
