@@ -12,8 +12,18 @@ do
     for file in *.result/out
     do 
       ref=${file%\/out}/test
-      echo CONSIDERING $ref and $file
-      ${PIPS_DIFF:-diff -b -u} $ref $file | ${PIPS_MORE:-less}
+
+      # show differences
+      if [ -f $file ]
+      then
+	echo "CONSIDERING $ref and $file"
+        ${PIPS_DIFF:-diff -b -u} $ref $file 
+      else
+	echo "NEW OUTPUT $file"
+	cat $file 
+      fi | ${PIPS_MORE:-less}
+      
+      # accept if okay
       echo 
       echo "accept (y|n)?"
       read answer
