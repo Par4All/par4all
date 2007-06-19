@@ -1,2 +1,9 @@
-in order to use the validation, add a symbolic link from 
-the pips directory to this directory named "Validation".
+PIPS validation, i.e. non regression tests
+
+Example usage includes:
+
+	sh> make TARGET=Semantics validate
+
+	sh> make TARGET=Semantics accept
+
+	sh> make clean

@@ -9,7 +9,7 @@ clean:
 	$(RM) -r validation_results.*
 
 # subdirectories to consider
-TARGET	=
+TARGET	= $(shell grep '^[a-zA-Z]' defaults)
 
 validate:
 	PIPS_VALIDDIR=$(PWD) pips_validate -v $(TARGET)
