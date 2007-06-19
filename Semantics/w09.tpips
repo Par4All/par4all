@@ -42,5 +42,5 @@ activate PRINT_CODE
 display PRINTED_FILE
 
 close
-# delete w09
+delete w09
 quit
