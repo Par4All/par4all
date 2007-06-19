@@ -199,14 +199,13 @@ function validate_file()
     
     local reference=$file_resdir/test.$PIPS_ARCH
     [[ -f $reference ]] || reference=$file_resdir/test
-    # create empty reference if necessary
-    [[ -f $reference ]] || touch $reference
 
     ${PIPS_DIFF:-diff -b -c} $reference $out.out > $out.diff
 
     if [[ -s $out.diff ]] ; then
       verb 2 "changed: $file"
       echo "changed: $file" >> $summary
+      cp $out.out $file_resdir/out
     else
       # ok!
       verb 3 "succeeded: $file"
