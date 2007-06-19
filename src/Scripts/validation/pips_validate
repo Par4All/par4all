@@ -212,11 +212,11 @@ function validate_file()
       cp $out.out $file_resdir/out
     else
       # ok!
-      verb 3 "succeeded: $file"
+      verb 3 "succeeded: $rel_file"
       rm -f $out.*
     fi
   else
-      echo "failed: $file" >> $summary
+      echo "failed: $rel_file" >> $summary
   fi
 
   return $status
