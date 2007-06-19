@@ -1,514 +1,248 @@
-#!/bin/sh
-#
+#! /bin/bash
 # $Id$
-#
-# A small Validation Suite test program for PIPS.
-#
-# Validate without arguments takes the contents of the default_file file,
-# else arguments are subdirectories D in vdir. 
-# For each D, one applies test_aspect that checks every file .f F.
-# If a file F.{tpips,test} exists, it is executed and its output is
-# compared to $F.result/test.
-# Otherwise, every module M in F.database/modules is parallelized and its
-# output is compared with $F.result/M (which is assumed to have been
-# created by the user).
-#
-# A mail report is sent to the person running validate (see accept).
-# 
-# Mail problems to jouvelot@cri.ensmp.fr
-#
-# Modifications
-#  - validate used to perform cd's and to execute where the validation
-#    files are; the Production version of pips was used by default,
-#    unless special links were created from Validation towards the
-#    versions to be tested; now validate execute in the current directory
-#    and the databases are created in the current directory; the version
-#    of pips which is used is also reported back to the user;
-#
-#    Mainly, the $aspect variable was changed from a relative directory name
-#    into an absolute directory name
-#  - tmperr added
-#  - source environment if necessary
 
-# ONLY Ok at CRI...
-if ! [ "$PIPS_ROOT" ] ; then
-  rc=/projects/Pips/pipsrc.sh
-  if [ -f $rc ] ; then
-    . $rc
-  else
-    echo "\$PIPS_ROOT must be defined" 1>&2
-    exit 1
-  fi
-fi
+# defaults
+# where is the validation
+vdir=${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}
 
-PIPS_VALIDDIR=${PIPS_VALIDDIR:-${PIPS_ROOT}/Validation}
-export PIPS_VALIDDIR
+# temporary directory
+tdir=${PIPS_TEMPDIR:-/tmp}
 
-# some validation use error messages, which must not be translated!
-unset LANG
-umask 002
+# running directory
+rdir=.
 
-vdir=${PIPS_VALIDDIR}
-tdir=${PIPS_TEMPDIR:=/tmp}
+tpips=$(type -p tpips)
+pips=$(type -p pips)
 
-if test -r $vdir/defaults.$PIPS_ARCH
-then
-    default_file="$vdir/defaults.$PIPS_ARCH"
-else
-    default_file="$vdir/defaults"
-fi
-
-RUNNER=`whoami`
-hostname=`hostname -s`
-PWD=`pwd`
-subject="PIPS Validation:"
-failed=""
-
-# to be used by report for subject generation
-
-directory=
-program=
-export directory
-export program
-
-verb=':'
-debg=':'
-
-MAIL=${PIPS_MAIL:-Mail}
-
-MAX_NB_LINES='100'
-MAX_MAILS=5
-N_MAILS=0
-
-export MAX_NB_LINES
-unset UNIQDIR pips_version tpips_version RUNDIR LOCKFILE PERFORMANCE
-
-verbose()
+# display help
+function usage()
 {
-    echo [validate-sequential:$hostname] "$@"
+  local status=$1 msg=$2
+  [[ $msg ]] && echo "message: $msg" >&2
+  echo -e \
+    "$0 [options] directories or files...\n" \
+    "options:\n" \
+    "  -h: show some help\n" \
+    "  -v: be verbose (repeat for more verbosity)\n" \
+    "  -p pips: use this 'pips' executable, default $pips\n" \
+    "  -t tpips: use this 'tpips' executable, default $tpips\n" \
+    "  -T dir: temporary directory, default '/tmp'\n" \
+    "  -V dir: validation directory, default '$vdir'\n" \
+    "  -R dir: running directory, default '.'\n" \
+    "  -O dir: output directory, default '.'\n" \
+    "arguments:\n" \
+    "  validation directories (e.g. Semantics Regions ...)\n" \
+    "  or files (e.g. Semantics/w14.f ...)\n"
+  exit ${status:-1}
 }
 
-debug()
+# verb level 'message to be shown...'
+verb=0
+function verb()
 {
-    echo [validate-sequential:$hostname] "$@" >&2
+  local level=$1 msg=$2
+  [[ $verb -ge $level ]] && echo "# $msg" >&2
 }
 
-#
-# echos the pips to be run
-# ok, only look for a binary, not the wrapper shell script, hence the PATH.
+# checks
+[[ $PIPS_ROOT ]] || usage 1 'PIPS_ROOT must be defined'
+[[ -d $PIPS_ROOT ]] || usage 2 "no root directory: $PIPS_ROOT"
 
-which_executable()
-{
-  PATH="${PWD}/${PIPS_ARCH}:${PIPS_ROOT}/bin/${PIPS_ARCH}:${PWD}" type -p $1
-}
+mail=
 
-usage()
-{
-  cat 1>&2 <<-EOF
-	$0 [-uvdsth] [-a address] [-[lf] file] [-x pips] [-r dir] [modules]
-	  -u: uniq directory to be used
-	  -t: timing
-	  -h: help
-	  -v: verbose
-	  -s: silent (default)
-	  -d: debug
-	  -a address: mail destination
-	  -l file: lockfile name where to report
-	  -f file: fortran files
-	  -x pips: pips to be used (default as Validate)
-	  -y tpips: tpips to be used (idem)
-	  -r dir: directory where to run (default .)
-	  -i lines: max number of lines for sendig a full message
-	  -p file: properties.rc file
-	  -m file: pipsmake.rc file
-          -M max: maximum number of mails, 0 for nolimit, default $MAX_MAILS
-EOF
-  exit ${1:-1}
-}
-
-error()
-{ ret=$1; shift; echo "[validate-sequential]:" "$@" >&2 ; exit $ret; }
-
-#
 # get options
-
-unset FILES
-
-while getopts tuvsdhx:y:r:f:l:i:a:p:m:M: opt
+while [ "$1" ]
 do
+  opt=$1
   case $opt in
-    t) PERFORMANCE="begin: `date`" ;;
-    v) verb='verbose' ;;
-    s) verb=':' ;;
-    d) debg='debug' ;;
-    u) UNIQDIR=".validate_directory.$hostname.$$" ;;
-    x) pips_version="$OPTARG" ;;
-    y) tpips_version="$OPTARG" ;;
-    r) RUNDIR="$OPTARG" ;;
-    # c) COMDIR="$OPTARG" ;;
-    f) FILES="$FILES $OPTARG" ;;
-    l) LOCKFILE="$OPTARG" ;;
-    h) usage 0 ;;
-    i) MAX_NB_LINES="$OPTARG" ;;
-    a) RUNNER="$OPTARG" ;;
-    p) PIPS_PROPERTIESRC="$OPTARG" ; export PIPS_PROPERTIESRC ;;
-    m) PIPS_PIPSMAKERC="$OPTARG" ; export PIPS_PIPSMAKERC ;;
-    M) MAX_MAILS=$OPTARG ;;
-    *) usage 1
+      --) shift ; break ;;
+      -*) shift ;;
+      *) break ;;
+  esac
+
+  case $opt in
+      -h|--help) usage 0 ;;
+      -v|--verbose) let verb++ ;;
+      -t|--tpips) tpips=$1 ; shift ;;
+      -p|--pips) pips=$1 ; shift ;;
+      -T|--tmp) tdir=$1 ; shift ;;
+      -V|--valid) vdir=$1 ; shift ;;
+      -R|--run) rdir=$1 ; shift ;;
+      -O|--out|--output) odir=$1 ; shift ;;
+      -m|--mail) mail="$mail $1" ; shift ;;
+      *) usage 1 "unexpected option: $opt"
   esac
 done
 
-shift `expr $OPTIND - 1`
+# where to put results
+odir=$rdir
 
-RUNDIR=${RUNDIR:-$PWD}
-cd $RUNDIR || error 2 "cannot cd $RUNDIR ($?)"
+# option checks
+[[ -d $vdir ]] || usage 3 "no validation directory: $vdir"
+[[ -d $tdir ]] || usage 4 "no temporary directory: $tdir"
+[[ -d $rdir ]] || usage 5 "no run directory: $rdir"
+[[ -d $odir ]] || usage 5 "no output directory: $odir"
 
-pips_version=${pips_version:-`which_executable pips`}
-tpips_version=${tpips_version:-`which_executable tpips`}
+[[ -x $pips ]] || usage 7 "not executable: $pips"
+[[ -x $tpips ]] || usage 8 "not executable: $tpips"
 
-export pips_version tpips_version
+[[ -f properties.rc ]] && usage 17 "cannot run with local 'properties.rc'"
+[[ -f pipsmake.rc ]] && usage 18 "cannot run with local 'pipsmake.rc'"
 
-test "${pips_version}" -a -x "${pips_version}" || error 4 "no pips!"
-test "${tpips_version}" -a -x "${tpips_version}" || error 5 "no tpips!"
+[[ $rdir != '.' ]] && pushd $rdir
 
-$verb "pips to be used: $pips_version"
-$verb "tpips to be used: $tpips_version"
+# result directory
+resdir=$odir/validation_results.$$
+mkdir $resdir || usage 9 "error mkdir $resdir"
 
-# a special directory is used when the -u option is set.
-[ "$UNIQDIR" ] && { mkdir $UNIQDIR ; cd $UNIQDIR;}
+# start summary
+summary=$resdir/summary
 
-$verb "running in directory `pwd`"
+echo "validation for $@
+with pips=$pips
+and tpips=$tpips
+running in $rdir
+on $(date)
+" >> $summary
 
-# clean it
-Delete -a
-rm -f core
+# set default directories if necessary
+if [[ ! $@ ]]
+then
+  [[ -r $vdir/defaults ]] || usage 10 "cannot read $vdir/defaults"
+  set - $(cat $vdir/defaults | grep -v '#')
+fi
 
-tmpout=${tdir}/validate.$$
-tmperr=${tdir}/validate_err.$$
-diffout_e=${tdir}/diff_e.$$
-diffout=${tdir}/diff.$$
-# global variable...
-errors=${tdir}/errors.$$
-
-# report status-code message [subject]
-# env: directory program hostname pips_version tpips_version
-report()
+# validate a file
+# returns whether it is a success
+# appends errors to $summary
+function validate_file()
 {
-  result=$1
-  message=$2
-  
-  $debg " || report $1 suggested ${3:-$directory/$program}"
+  # file='/some/path/to/directory/file.f'
+  local file=$1
+  [[ -f $file ]] || usage 12 "no such source file: $file"
+  verb 2 "validating $file..."
 
-  if [ $result -ne 0 ] 
-  then
-    let N_MAILS++
-    
-    if [ $MAX_MAILS -gt 0 -a $N_MAILS -gt $MAX_MAILS ] 
-    then
-	echo "skipping mail, maximum reached: $N_MAILS > $MAX_MAILS" >&2
-	return
-    fi
+  # full_name='/some/path/to/directory/file'
+  # name='file'
+  # upper='FILE'
+  local full_name=${file%.[cfF]} 
+  local name=${full_name/*\//}
+  local upper=$(echo $name | tr '[a-z]' '[A-Z]')
 
-    { 
-      # reports errors if any
-      [ -s "$tmperr" ] && \
-      {
-        echo "--"
-	# [ -s $tmpout ] && cat $tmpout
-	echo "--"
-	cat $tmperr
-	echo "--";
-      }
-      echo "Validate Message from $hostname ($PIPS_ARCH):"
-      echo
-      echo "PIPS: $pips_version"
-      echo "TPIPS: $tpips_version"
-      echo
-      echo "$message" 
-    } | $MAIL -s "$subject ${3:-$directory/$program}" $RUNNER
+  # dir='/some/path/to/directory'
+  local dir=${full_name%/*} 
+  [[ -d $dir ]] || usage 13 "no such 'dir' directory: $dir"
 
-    # beurk!
-    int=`cat $errors`
-    echo `expr $int + 1` > $errors
+  # updir='/some/path/to'
+  local updir=${dir%/*}
+  [[ -d $updir ]] || usage 14 "no such 'updir' directory: $updir"
 
-    return 1
-  fi
+  # output='directory/file'
+  local output=${full_name/$updir\//}
+  # output='directory_file'
+  output=${output/\//_}
+  verb 4 "output suffix is: $output"
 
-  return 0 
-}
+  # out="$resdir/directory_file"
+  local out=$resdir/$output
+  local status
 
-make_diff()
-{
-  aspect=$1
-  name=$2
-  module=$3
+  if [[ -r $full_name.test ]] ; then
+      # *.test
+      verb 3 "$full_name.test method"
+      # ??? what about using default_test substitution?!
+      $full_name.test > $out.out 2> $out.err
+      status=$?
 
-  resdir=$aspect/$name.result
-  test -d $resdir || mkdir $resdir
-  refresult=$resdir/$module
-  test -f $refresult.$PIPS_ARCH && refresult=$refresult.$PIPS_ARCH
+  elif [[ -r $full_name.tpips ]] ; then 
+      # *.tpips
+      verb 3 "$full_name.tpips method"
+      $tpips $full_name.tpips > $out.out 2> $out.err
+      status=$?
 
-  if [ ! -f $refresult ] 
-  then
-    report 1 "Cannot open result file $aspect/$name.result/$module"
-    [ "$LOCKFILE" ] && echo "$aspect:$name:$module" > $LOCKFILE.$hostname
-    return 1
-  fi
+  elif [[ -r $dir/default_test ]] ; then
+      # default_test
+      verb 3 'default_test method'
+      local test=$tdir/default_test_$$.sh
+      # perform some substitutions...
+      sed -e "s/tested_file/${file//\//\\/}/g" \
+	  -e "s/tested_dir/${dir//\//\\/}/g" \
+	  -e "s/tested_name/$name/g" \
+	  -e "s/TESTED_NAME/$upper/g" \
+	  < $dir/default_test > $test
+      chmod +x $test
+      $test > $out.out 2> $out.err
+      status=$?
+      rm -f $test
+      
+  elif [[ -r $dir/default_tpips ]] ; then
+      # default_tpips
+      verb 3 'default_tpips method'
+      FILE=$file WSPACE=$name \
+	  ${tpips} $dir/default_tpips > $out.out 2> $out.err
+      status=$?
 
-  rm -f $refresult.out
-  cp $tmpout $refresult.out
-
-  # diff -e $aspect/$name.result/$module $tmpout > $diffout_e
-  ${PIPS_DIFF:-diff -b} $refresult $tmpout > $diffout
-  status=$?
-  lines=`wc -l $diffout | sed 's,^ *\([0-9][0-9]*\)[^0-9].*,\1,'`
-  if [ $lines -gt $MAX_NB_LINES ] 
-  then 
-    rm -f $diffout ;
-    echo "too many lines ($lines), look by hand" > $diffout ;
-  fi
-
-  # ca c'est du Pierre... ;-)
-  report $status \
-"Run accept on mail message to resynchronize.
-Differences for $module in $refresult:
-`cat $diffout`
-"
-
-  # clean if ok.
-  test $status -eq 0 && rm -f $refresult.out
-}
-
-# test_aspect name-of-test-directory
-test_aspect()
-{
-  aspect=${1}
-  PIPS_SRCPATH=${aspect}:${PIPS_SRCPATH}
-  export PIPS_SRCPATH
-  
-  (
-   for file in ${FILES:-`ls $aspect/*.[cfF]`} ; do     
-     name=`${PIPS_BASENAME:-basename} $file '.f'`
-     name=`${PIPS_BASENAME:-basename} $name '.F'`
-     name=`${PIPS_BASENAME:-basename} $name '.c'`  
-     u_name=`echo $name | tr [a-z] [A-Z]`
-     program=$name
-
-     $debg " || in `pwd` for $file ($name)"
-
-     # This test is stronger than the loop selection because soft links
-     # are ignored.
-     test -r $aspect/$name.f -o -r $aspect/$name.F -o -r $aspect/$name.c || 
-	echo "! no $aspect/$name.[cfF] (can be due to a symbolic link)"
-
-     #
-     # decompose...
-     if test -r $aspect/$name.f 
-     then 
-	ffile=$aspect/$name.f
-     elif test -r $aspect/$name.F
-     then
-	ffile=$aspect/$name.F
-     else
-	ffile=$aspect/$name.c
-     fi
-
-     bfile=`${PIPS_BASENAME:-basename} $ffile`
-     
-     rm -f $tmpout $tmperr
-
-     echo "considering directory `${PIPS_BASENAME:-basename} $aspect`" \
-          "file $name.[cfF]" > $tmperr
-
-     #
-     # .test case
-
-     if [ -f $aspect/$name.test ] 
-     then
-       echo "testing with $name.test" >> $tmperr
-       $aspect/$name.test > $tmpout 2>> $tmperr
-       STATUS=$?
-       [ -f core ] && rm -f core
-
-       report $STATUS "Execution of $aspect/$name.test failed" || \
-         { $debg " || error $aspect/$name.test"; continue; }
-       
-       make_diff $aspect $name test
-       continue
-     fi
-     
-     #
-     # .tpips case
-
-     if [ -r $aspect/$name.tpips ]
-     then
-       echo "testing with $name.tpips" >> $tmperr
-       $tpips_version $aspect/$name.tpips > $tmpout 2>> $tmperr
-       STATUS=$?
-       test -f core && rm -f core
-       
-       report $STATUS "Execution of $aspect/$name.tpips failed" || \
-         { $debg " || error $aspect/$name.tpips"; continue;}
-
-       make_diff $aspect $name test
-       continue
-     fi
-
-     #
-     # default_test case
-     
-     if [ -f $aspect/default_test ]
-     then
-       echo "testing with default_test" >> $tmperr
-       sed "s/tested_file/$name/g;s/TESTED_FILE/$u_name/g" \
-       $aspect/default_test > $aspect/$name.test
-       chmod ugo+x $aspect/$name.test
-       $aspect/$name.test > $tmpout 2>> $tmperr
-       STATUS=$?
-       [ -f core ] && rm -f core
-
-       report $STATUS "Execution of $aspect/default_test on $name.f failed" ||
-	    { $debg " || error $aspect/default_test"; 
-	      rm -f $aspect/$name.test; continue;}
-       
-       rm -f $aspect/$name.test
-       make_diff $aspect $name test
-       continue
-     fi
-
-     #
-     # default_tpips
-
-     if [ -f $aspect/default_tpips ]
-     then
-	echo "testing with default_tpips" >> $tmperr
-	FILE=${ffile}
-	export FILE
-	WSPACE=${name}
-	export WSPACE
-	${tpips_version} $aspect/default_tpips > $tmpout 2>> $tmperr
-	STATUS=$?
-	[ -f core ] && rm -f core
-
-        report $STATUS "Execution of $aspect/default_tpips on $file failed" ||
-	    { $debg " || error $aspect/default_tpips"; continue;}
-       
-	make_diff $aspect $name test
-	continue
-     fi
-     
-     #
-     # default case
-
-     rm -f $tmpout $tmperr
-     echo "testing with none (parallelize) - Init" > $tmperr
-     # arg, no .F...
-     Init -f $aspect/$name.f -d $name > $tmpout 2>> $tmperr
-     report $? "Cannot initialize $file" || continue
-     
-     for module in `cat $name.database/modules` ; do
-       rm -f $tmpout $tmperr
-       echo "testing with none (parallelize) - Display" > $tmperr
-       Display -m $module > $tmpout 2>> $tmperr
-       STATUS=$?
-       [ -f core ] && rm -f core
-
-       report $STATUS "Cannot parallelize module $module in $file" || continue
-       
-       make_diff $aspect $name $module
-     done
-
-     
-     rm -f $tmpout $tmperr
-     echo "testing with none (parallelize) - Delete" > $tmperr
-     Delete $name > $tmpout 2>> $tmperr
-     report $? "Cannot delete workspace $name"
-   done)
-}
-
-# validate command itself
-
-case $# in
-  0 ) 	aspects=`sed -e '/^#/d' ${default_file}` ;;
-  * ) 	aspects="$*" ;;
-esac
-
-echo 0 > $errors 
-
-# Main loop over directories
-
-for dir in $aspects
-do
-  old_errors=`cat $errors`
-  directory=$dir
-
-  if [ ! -d "$vdir/$dir" ]
-  then
-    report 1 "$dir is not a directory in $vdir"
-  elif [ -f $vdir/$dir/pipsmake.rc ] 
-  then
-    report 2 "validate should not be run with a pipsmake.rc in $vdir/$dir."
-  elif [ -f $vdir/$dir/properties.rc ]
-  then
-    report 3 "validate should not be run with a properties.rc in $vdir/$dir."
   else
-    $verb "validating $dir"
-    test_aspect $vdir/$dir
+      verb 3 'default method'
+      usage 0 "default method not implemented yet ($file)"
+      status=1
+  fi
+  # cleanup
+  [[ -f core ]] && rm -f core
+
+  if [[ $status -eq 0 ]]
+  then
+    # generate diff and clean if okay
+    local file_resdir=$full_name.result
+    [[ -d $file_resdir ]] || \
+      usage 15 "no result directory: $file_resdir"
+    
+    local reference=$file_resdir/test.$PIPS_ARCH
+    [[ -f $reference ]] || reference=$file_resdir/test
+    # create empty reference if necessary
+    [[ -f $reference ]] || touch $reference
+
+    ${PIPS_DIFF:-diff -b -c} $reference $out.out > $out.diff
+
+    if [[ -s $out.diff ]] ; then
+      verb 2 "changed: $file"
+      echo "changed: $file" >> $summary
+    else
+      # ok!
+      verb 3 "succeeded: $file"
+      rm -f $out.*
+    fi
+  else
+      echo "failed: $file" >> $summary
   fi
 
-  if [ "`cat $errors`" -ne "$old_errors" ] 
+  return $status
+}
+
+# process directories (or possibly files)
+errors=0
+for obj in "$@"
+do
+  if [ -d $vdir/$obj ]
   then
-    failed="$dir-$failed"
+      verb 1 "considering $obj directory"
+      for file in $vdir/$obj/*.[cfF]
+      do
+	validate_file $file || let errors++
+      done
+  elif [ -f $vdir/$obj ]
+  then
+      validate_file $vdir/$obj || let errors++
+  else
+      usage 11 "unexpected object: $obj"
   fi
 done
 
-#
-# Final situation
+echo "
+$errors errors
+on $(date)" >> $summary
 
-if [ "`cat $errors`" -eq 0 ] 
-then
-  final="succeeded"
-else
-  final="failed (-$failed)"
-fi
-
-# clean directory and files
-rm -f $tmpout $tmperr $diffout $diffout_e
+# cleanup databases?
 Delete -a
-rm -f core
 
-[ "$UNIQDIR" ] && { cd ..; rm -rf $UNIQDIR;}
-
-[ "$PERFORMANCE" ] && PERFORMANCE="$PERFORMANCE, end: `date`"
-
-# Final report
-directory=
-program=
-
-if [ "$LOCKFILE" ]
-then
-  echo $failed > "$LOCKFILE.$hostname"
-else
-
-  # force mail to be sent...
-  N_MAILS=0
-
-  report 1 \
-  "Your Validation Suite Test for
-
-$aspects ${FILES:+($FILES)}
-  
-$final
-   on $hostname ($PIPS_ARCH)
-
-$PERFORMANCE
-
-in case of problems, contact <coelho@cri.ensmp.fr>." "$final"
-
-fi
-
-rm -f $errors
-
-#
-# that's all
-#
+[[ $mail ]] && verb 0 "mail not implemented yet"
