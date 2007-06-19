@@ -485,13 +485,12 @@ void module_to_value_mappings(entity m)
 	test_mapping_entry_consistency();
     }
 
-    /* FI: These two user_log() should be replaced by pips_debug(1,...) */
-    user_log("Number of analyzed variables for module %s: %d\n",
-	     module_local_name(m),
-	     aproximate_number_of_analyzed_variables());
-    user_log("Number of analyzed values for module %s: %d\n",
-	     module_local_name(m),
-	     number_of_analyzed_values());
+    pips_debug(1, "Number of analyzed variables for module %s: %d\n",
+	       module_local_name(m),
+	       aproximate_number_of_analyzed_variables());
+    pips_debug(1, "Number of analyzed values for module %s: %d\n",
+ 	       module_local_name(m),
+	       number_of_analyzed_values());
 
     pips_debug(8,"end for module %s\n", module_local_name(m));
 }
