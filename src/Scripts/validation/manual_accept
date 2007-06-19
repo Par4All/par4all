@@ -1,30 +1,27 @@
-#! /bin/sh
+#! /bin/bash
 #
 # $Id$
-#
 
-CD=$PWD
+svn=
 
 for dir
 do
-  if test -d $dir
+  if [[ -d $dir ]]
   then 
-    cd $dir
-    for f in *.result/*.out
+    pushd $dir > /dev/null
+    test -d .svn && svn=1
+    for file in *.result/out
     do 
-        if [ "$f" != "*.result/*.out" ] 
-        then
-	    ref="`dirname $f`/`${PIPS_BASENAME:-basename} $f .out`"
-	    echo CONSIDERING $ref and $f
-	    ${PIPS_DIFF:-diff} $ref $f | ${PIPS_MORE:-less}
-	    echo 
-	    echo "accept (y|n)?"
-	    read answer
-	    [ "$answer" = 'y' -o "$answer" = 'Y' ] && mv $f $ref
-	fi
+      ref=${file%\/out}/test
+      echo CONSIDERING $ref and $file
+      ${PIPS_DIFF:-diff -b -u} $ref $file | ${PIPS_MORE:-less}
+      echo 
+      echo "accept (y|n)?"
+      read answer
+      [ "$answer" = 'y' -o "$answer" = 'Y' ] && mv $file $ref
     done
-    cd $CD
+    popd > /dev/null
   fi
 done
 
-echo "consider running \"svn ci $@\" to commit changes"
+[[ $svn ]] && echo "Consider running \"svn ci $@\" to commit changes"
