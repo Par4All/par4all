@@ -2,7 +2,7 @@
       PARAMETER      (NPMAX     = 809)
       REAL*8    U     (NPMAX+1,NPMAX,2)
 
-      DOALL I = 1, 10                                                   0001
+      DO 100 I = 1, 10                                                  0001
          U(I,2,3) = 0.                                                  0002
-      ENDDO
+100      CONTINUE                                                       0003
       END

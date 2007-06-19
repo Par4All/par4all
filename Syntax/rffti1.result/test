@@ -20,10 +20,10 @@ C     Bug with data variable and value lists
       NL = NQ                                                           0013
       IF (NTRY.NE.2) GOTO 107                                           0014
       IF (NF.EQ.1) GOTO 107                                             0016
-      DO I = 2, NF                                                      0018
+      DO 106 I = 2, NF                                                  0018
          IB = NF-I+2                                                    0019
          IFAC(IB+2) = IFAC(IB+1)                                        0020
-      ENDDO
+106      CONTINUE                                                       0021
       IFAC(3) = 2                                                       0022
 107   IF (NL.NE.1) GOTO 104                                             0023
       IFAC(1) = N                                                       0025
@@ -34,28 +34,28 @@ C     Bug with data variable and value lists
       NFM1 = NF-1                                                       0030
       L1 = 1                                                            0031
       IF (NFM1.EQ.0) RETURN                                             0032
-      DO K1 = 1, NFM1                                                   0034
+      DO 110 K1 = 1, NFM1                                               0034
          IP = IFAC(K1+2)                                                0035
+         LD = 0                                                         0036
          L2 = L1*IP                                                     0037
          IDO = N/L2                                                     0038
          IPM = IP-1                                                     0039
-         LD = 0                                                         0036
-         DO J = 1, IPM                                                  0040
+         DO 109 J = 1, IPM                                              0040
             LD = LD+L1                                                  0041
-            ARGLD = FLOAT(LD)*ARGH                                      0043
             I = IS                                                      0042
-            IS = IS+IDO                                                 0052
+            ARGLD = FLOAT(LD)*ARGH                                      0043
             FI = 0.                                                     0044
-            DO II = 3, IDO, 2                                           0045
+            DO 108 II = 3, IDO, 2                                       0045
                I = I+2                                                  0046
                FI = FI+1.                                               0047
                ARG = FI*ARGLD                                           0048
                WA(I-1) = COS(ARG)                                       0049
                WA(I) = SIN(ARG)                                         0050
-            ENDDO
-         ENDDO
+108            CONTINUE                                                 0051
+            IS = IS+IDO                                                 0052
+109         CONTINUE                                                    0053
          L1 = L2                                                        0054
-      ENDDO
+110      CONTINUE                                                       0055
       RETURN
 102   NTRY = NTRYH(J)                                                   0006
       GOTO 104

@@ -13,7 +13,7 @@ setproperty PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS TRUE
 
 display PRINTED_FILE[ALTRET11]
 apply UNSPLIT
-shell f77 -c altret11.database/Src/altret11.f
+shell ${PIPS_F77:-f77} -c altret11.database/Src/altret11.f
 close
 delete altret11
 quit

@@ -1,3 +1,7 @@
+
+      FUNCTION ETIME(TMP)
+      ETIME = 0.3                                                       0001
+      END
 c     Bug with cr2cnf.f, modified version
 
       SUBROUTINE TESFRO(A,B,AF,X,Y,N,NC,C,Z)

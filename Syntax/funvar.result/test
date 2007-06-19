@@ -1,3 +1,10 @@
+      FUNCTION D(X)
+      D = X                                                             0001
+      END
+      FUNCTION E(X)
+      D = X                                                             0001
+      E = D                                                             0002
+      END
 C     Declaration bug observed in aile.f: a conflict MAY occur if a local
 C     variable has the same name as a function (may be also true for
 C     other global variables, subroutines and commons);

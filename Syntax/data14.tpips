@@ -8,7 +8,7 @@ echo
 echo Execution with initial code:
 echo
 
-shell f77 ${PIPS_ROOT}/Validation/Syntax/data14.f
+shell ${PIPS_F77:-f77} ${PIPS_ROOT}/Validation/Syntax/data14.f
 shell ./a.out
 
 echo
@@ -23,7 +23,7 @@ echo
 echo Execution with PIPS Code:
 echo
 
-shell f77 data14.database/Src/data14.f
+shell ${PIPS_F77:-f77} data14.database/Src/data14.f
 shell ./a.out
 
 close

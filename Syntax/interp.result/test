@@ -2,3 +2,6 @@ C     initialisation des subroutines implicites
       PROGRAM INTERP
       CALL Q(X)                                                         0001
       END
+      SUBROUTINE Q(X)
+      X = 1                                                             0001
+      END

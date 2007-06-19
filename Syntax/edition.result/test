@@ -36,25 +36,20 @@ C
 C
 C     DEFINITION DES TABLEAUX DE TRI
 C
-      DOALL I = I1, I2                                                  0003
+      DO 10 I = I1, I2                                                  0003
 10       IL(I) = I                                                      0004
-      ENDDO
-      DOALL JP = 1, 3                                                   0005
+      DO 20 JP = 1, 3                                                   0005
 20       JL(JP) = JP                                                    0006
-      ENDDO
       JL(4) = 6                                                         0007
       JL(5) = 9                                                         0008
       JL(6) = 12                                                        0009
       JL(7) = 14                                                        0010
-      DOALL JP = 8, JPM                                                 0011
+      DO 21 JP = 8, JPM                                                 0011
 21       JL(JP) = 7+JP                                                  0012
-      ENDDO
-      DO JP = 1, JPM                                                    0013
+      DO 25 JP = 1, JPM                                                 0013
 25       JL(JP+JPM) = JMAX-1-JL(JP)                                     0014
-      ENDDO
-      DOALL KP = 1, 4                                                   0015
+      DO 30 KP = 1, 4                                                   0015
 30       KL(KP) = KP                                                    0016
-      ENDDO
       KL(5) = KMAX-2                                                    0017
 C
 c     BUFFER IN (NFICH,0) (TITRE(1),IT)
@@ -154,4 +149,7 @@ C*******************************************************************
 2000  FORMAT('1',44X,'   K=',I2,2A10,/,45X,'----------------------------
      &--',/)                                                            0090
 C
+      END
+      FUNCTION UNIT(I)
+      UNIT = I                                                          0001
       END

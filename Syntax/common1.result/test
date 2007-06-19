@@ -4,3 +4,6 @@ C     il faudrait verifier qu'ils ont bien la meme taille
       COMMON /TOTO/ X, Y
       CALL FOO                                                          0001
       END
+      SUBROUTINE FOO
+      COMMON /TOTO/ X, Y
+      END

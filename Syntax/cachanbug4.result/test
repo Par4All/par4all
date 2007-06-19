@@ -35,7 +35,7 @@ Request: build resource PRINTED_FILE for module CACHANBUG4B.
   FILTER_FILE                    building   SOURCE_FILE(CACHANBUG4B)
   PARSER                         building   PARSED_CODE(CACHANBUG4B)
                                  building   CALLEES(CACHANBUG4B)
-user warning in syn_error: Syntax error - parse error, expecting `TK_SLASH' or `TK_COMMA' line 4 near "'7F7F'"
+user warning in syn_error: Syntax error - syntax error, unexpected TK_SCON, expecting TK_SLASH or TK_COMMA line 4 near "'7F7F'"
 user warning in syn_error: Non analyzed source text stored in logfile
 
       end
