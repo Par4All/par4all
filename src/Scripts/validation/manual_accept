@@ -9,7 +9,6 @@ do
   if [[ -d $dir ]]
   then 
     pushd $dir > /dev/null
-    test -d .svn && svn=1
     for file in *.result/out
     do 
       ref=${file%\/out}/test
@@ -18,7 +17,11 @@ do
       echo 
       echo "accept (y|n)?"
       read answer
-      [ "$answer" = 'y' -o "$answer" = 'Y' ] && mv $file $ref
+      if [ "$answer" = 'y' -o "$answer" = 'Y' ] 
+      then 
+	  mv $file $ref
+	  test -d .svn && svn=1
+      fi
     done
     popd > /dev/null
   fi
