@@ -1,5 +1,5 @@
 # echo 'initial exec'
-# shell f77 ${PIPS_ROOT}/Validation/Semantics/chaine07.f && ./a.out
+# shell ${PIPS_F77:-f77} ${PIPS_ROOT}/Validation/Semantics/chaine07.f && ./a.out
 # shell rm a.out
 
 delete chaine07
@@ -23,7 +23,7 @@ activate PRINT_CODE
 close
 
 # echo 'optimized exec'
-# shell f77 chaine07.database/Src/chaine07.f && ./a.out
+# shell ${PIPS_F77:-f77} chaine07.database/Src/chaine07.f && ./a.out
 # shell rm a.out
 
 delete chaine07

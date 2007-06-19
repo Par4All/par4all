@@ -1,5 +1,5 @@
 echo 'initial exec'
-shell f77 ${PIPS_ROOT}/Validation/Semantics/chaine01.f && ./a.out
+shell ${PIPS_F77:-f77} ${PIPS_ROOT}/Validation/Semantics/chaine01.f && ./a.out
 shell rm a.out
 
 delete chaine01
@@ -23,7 +23,7 @@ apply UNSPLIT
 close
 
 echo 'optimized exec'
-shell f77 chaine01.database/Src/chaine01.f && ./a.out
+shell ${PIPS_F77:-f77} chaine01.database/Src/chaine01.f && ./a.out
 shell rm a.out
 
 delete chaine01
