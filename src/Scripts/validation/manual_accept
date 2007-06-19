@@ -3,6 +3,7 @@
 # $Id$
 
 svn=
+shopt -s nullglob
 
 for dir
 do
