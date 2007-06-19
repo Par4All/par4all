@@ -77,6 +77,8 @@ debg=':'
 MAIL=${PIPS_MAIL:-Mail}
 
 MAX_NB_LINES='100'
+MAX_MAILS=5
+N_MAILS=0
 
 export MAX_NB_LINES
 unset UNIQDIR pips_version tpips_version RUNDIR LOCKFILE PERFORMANCE
@@ -119,6 +121,7 @@ usage()
 	  -i lines: max number of lines for sendig a full message
 	  -p file: properties.rc file
 	  -m file: pipsmake.rc file
+          -M max: maximum number of mails, 0 for nolimit, default $MAX_MAILS
 EOF
   exit ${1:-1}
 }
@@ -131,7 +134,7 @@ error()
 
 unset FILES
 
-while getopts tuvsdhx:y:r:f:l:i:a:p:m: opt
+while getopts tuvsdhx:y:r:f:l:i:a:p:m:M: opt
 do
   case $opt in
     t) PERFORMANCE="begin: `date`" ;;
@@ -150,6 +153,7 @@ do
     a) RUNNER="$OPTARG" ;;
     p) PIPS_PROPERTIESRC="$OPTARG" ; export PIPS_PROPERTIESRC ;;
     m) PIPS_PIPSMAKERC="$OPTARG" ; export PIPS_PIPSMAKERC ;;
+    M) MAX_MAILS=$OPTARG ;;
     *) usage 1
   esac
 done
@@ -197,6 +201,14 @@ report()
 
   if [ $result -ne 0 ] 
   then
+    let N_MAILS++
+    
+    if [ $MAX_MAILS -gt 0 -a $N_MAILS -gt $MAX_MAILS ] 
+    then
+	echo "skipping mail, maximum reached: $N_MAILS > $MAX_MAILS" >&2
+	return
+    fi
+
     { 
       # reports errors if any
       [ -s "$tmperr" ] && \
@@ -477,6 +489,10 @@ if [ "$LOCKFILE" ]
 then
   echo $failed > "$LOCKFILE.$hostname"
 else
+
+  # force mail to be sent...
+  N_MAILS=0
+
   report 1 \
   "Your Validation Suite Test for
 
