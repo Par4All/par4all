@@ -34,5 +34,5 @@ activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[W18]
 
 close
-# delete w18
+delete w18
 quit
