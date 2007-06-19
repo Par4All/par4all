@@ -39,32 +39,18 @@ Request: build resource PRINTED_FILE for module ALIAS_TRANSFORMER.
   CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(ALIAS_TRANSFORMER)
   SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(ALIAS_TRANSFORMER)
   INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(ALIAS_TRANSFORMER)
-Number of analyzed variables for module ALIAS_TRANSFORMER: 1
-Number of analyzed values for module ALIAS_TRANSFORMER: 3
   INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(FOO)
-Number of analyzed variables for module FOO: 2
-Number of analyzed values for module FOO: 6
   PROGRAM_PRECONDITION           building   PROGRAM_PRECONDITION()
-Number of analyzed variables for module ALIAS_TRANSFORMER: 1
-Number of analyzed values for module ALIAS_TRANSFORMER: 3
   TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(FOO)
-Number of analyzed variables for module FOO: 2
-Number of analyzed values for module FOO: 6
   TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(ALIAS_TRANSFORMER)
-Number of analyzed variables for module ALIAS_TRANSFORMER: 1
-Number of analyzed values for module ALIAS_TRANSFORMER: 3
 user warning in translate_global_value: Variable FOO:I is probably aliased with a formal parameter by the current call to FOO from ALIAS_TRANSFORMER.
 This is forbidden by the Fortran 77 standard.
 user warning in user_call_to_transformer: Call to FOO seems never to return. This may be due to an infinite loop in FOO, or to a systematic exit in FOO, or to standard violations (see previous messages)
   PRINT_CODE_TRANSFORMERS        building   PRINTED_FILE(ALIAS_TRANSFORMER)
-Number of analyzed variables for module ALIAS_TRANSFORMER: 1
-Number of analyzed values for module ALIAS_TRANSFORMER: 3
 PRINTED_FILE made for ALIAS_TRANSFORMER.
 Module FOO selected
 Request: build resource PRINTED_FILE for module FOO.
   PRINT_CODE_TRANSFORMERS        building   PRINTED_FILE(FOO)
-Number of analyzed variables for module FOO: 2
-Number of analyzed values for module FOO: 6
 PRINTED_FILE made for FOO.
 
 C  T() {0==-1}
@@ -117,21 +103,13 @@ Module ALIAS_TRANSFORMER already active.
 Request: build resource PRINTED_FILE for module ALIAS_TRANSFORMER.
   INTRAPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(ALIAS_TRANSFORMER)
   PRECONDITIONS_INTER_FULL       building   PRECONDITIONS(ALIAS_TRANSFORMER)
-Number of analyzed variables for module ALIAS_TRANSFORMER: 1
-Number of analyzed values for module ALIAS_TRANSFORMER: 3
   PRINT_CODE_PRECONDITIONS       building   PRINTED_FILE(ALIAS_TRANSFORMER)
-Number of analyzed variables for module ALIAS_TRANSFORMER: 1
-Number of analyzed values for module ALIAS_TRANSFORMER: 3
 PRINTED_FILE made for ALIAS_TRANSFORMER.
 Module FOO selected
 Request: build resource PRINTED_FILE for module FOO.
   INTRAPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(FOO)
   PRECONDITIONS_INTER_FULL       building   PRECONDITIONS(FOO)
-Number of analyzed variables for module FOO: 2
-Number of analyzed values for module FOO: 6
   PRINT_CODE_PRECONDITIONS       building   PRINTED_FILE(FOO)
-Number of analyzed variables for module FOO: 2
-Number of analyzed values for module FOO: 6
 PRINTED_FILE made for FOO.
 
 C  P() {}

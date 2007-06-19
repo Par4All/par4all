@@ -20,8 +20,6 @@ Request: build resource PRINTED_FILE for module INCR.
   CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(INCR)
   SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(INCR)
   INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(INCR)
-Number of analyzed variables for module INCR: 0
-Number of analyzed values for module INCR: 0
   FILTER_FILE                    building   SOURCE_FILE(INTER07)
   PARSER                         building   PARSED_CODE(INTER07)
                                  building   CALLEES(INTER07)
@@ -30,26 +28,14 @@ Number of analyzed values for module INCR: 0
   CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(INTER07)
   SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(INTER07)
   INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(INTER07)
-Number of analyzed variables for module INTER07: 1
-Number of analyzed values for module INTER07: 3
   PROGRAM_PRECONDITION           building   PROGRAM_PRECONDITION()
-Number of analyzed variables for module INTER07: 1
-Number of analyzed values for module INTER07: 3
   TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(INCR)
-Number of analyzed variables for module INCR: 0
-Number of analyzed values for module INCR: 0
   PRINT_CODE_TRANSFORMERS        building   PRINTED_FILE(INCR)
-Number of analyzed variables for module INCR: 0
-Number of analyzed values for module INCR: 0
 PRINTED_FILE made for INCR.
 Module INTER07 selected
 Request: build resource PRINTED_FILE for module INTER07.
   TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(INTER07)
-Number of analyzed variables for module INTER07: 1
-Number of analyzed values for module INTER07: 3
   PRINT_CODE_TRANSFORMERS        building   PRINTED_FILE(INTER07)
-Number of analyzed variables for module INTER07: 1
-Number of analyzed values for module INTER07: 3
 PRINTED_FILE made for INTER07.
 
 C  T() {}
@@ -97,23 +83,13 @@ Request: build resource PRINTED_FILE for module INCR.
                                  building   DEPTH(INTER07)
   INTERPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(INTER07)
   PRECONDITIONS_INTER_FULL       building   PRECONDITIONS(INTER07)
-Number of analyzed variables for module INTER07: 1
-Number of analyzed values for module INTER07: 3
   INTERPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(INCR)
-Number of analyzed variables for module INTER07: 1
-Number of analyzed values for module INTER07: 3
   PRECONDITIONS_INTER_FULL       building   PRECONDITIONS(INCR)
-Number of analyzed variables for module INCR: 0
-Number of analyzed values for module INCR: 0
   PRINT_CODE_PRECONDITIONS       building   PRINTED_FILE(INCR)
-Number of analyzed variables for module INCR: 0
-Number of analyzed values for module INCR: 0
 PRINTED_FILE made for INCR.
 Module INTER07 selected
 Request: build resource PRINTED_FILE for module INTER07.
   PRINT_CODE_PRECONDITIONS       building   PRINTED_FILE(INTER07)
-Number of analyzed variables for module INTER07: 1
-Number of analyzed values for module INTER07: 3
 PRINTED_FILE made for INTER07.
 
 C  P() {}

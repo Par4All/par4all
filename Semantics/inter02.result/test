@@ -22,8 +22,6 @@ Request: build resource PRINTED_FILE for module INCR.
   CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(INCR)
   SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(INCR)
   INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(INCR)
-Number of analyzed variables for module INCR: 1
-Number of analyzed values for module INCR: 3
   FILTER_FILE                    building   SOURCE_FILE(INTER02)
   PARSER                         building   PARSED_CODE(INTER02)
                                  building   CALLEES(INTER02)
@@ -32,30 +30,18 @@ Number of analyzed values for module INCR: 3
   CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(INTER02)
   SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(INTER02)
   INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(INTER02)
-Number of analyzed variables for module INTER02: 1
-Number of analyzed values for module INTER02: 3
   PROGRAM_PRECONDITION           building   PROGRAM_PRECONDITION()
-Number of analyzed variables for module INTER02: 1
-Number of analyzed values for module INTER02: 3
   TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(INCR)
-Number of analyzed variables for module INCR: 1
-Number of analyzed values for module INCR: 3
   PRINT_CODE_TRANSFORMERS        building   PRINTED_FILE(INCR)
-Number of analyzed variables for module INCR: 1
-Number of analyzed values for module INCR: 3
 PRINTED_FILE made for INCR.
 Module INTER02 selected
 Request: build resource PRINTED_FILE for module INTER02.
   TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(INTER02)
-Number of analyzed variables for module INTER02: 1
-Number of analyzed values for module INTER02: 3
 user warning in user_call_to_transformer: Type incompatibility
 (formal INTEGER*4/actual REAL*4)
 for formal parameter I (rank 1)
 in call to INCR from INTER02
   PRINT_CODE_TRANSFORMERS        building   PRINTED_FILE(INTER02)
-Number of analyzed variables for module INTER02: 1
-Number of analyzed values for module INTER02: 3
 PRINTED_FILE made for INTER02.
 
 C  T(I) {I==I#init+1}
@@ -101,27 +87,17 @@ Request: build resource PRINTED_FILE for module INCR.
                                  building   DEPTH(INTER02)
   INTERPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(INTER02)
   PRECONDITIONS_INTER_FULL       building   PRECONDITIONS(INTER02)
-Number of analyzed variables for module INTER02: 1
-Number of analyzed values for module INTER02: 3
   INTERPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(INCR)
-Number of analyzed variables for module INTER02: 1
-Number of analyzed values for module INTER02: 3
 user warning in add_formal_to_actual_bindings: Type incompatibility
 (INTEGER*4/REAL*4)
 for formal parameter I (rank 1)
 in call to INCR from INTER02
   PRECONDITIONS_INTER_FULL       building   PRECONDITIONS(INCR)
-Number of analyzed variables for module INCR: 1
-Number of analyzed values for module INCR: 3
   PRINT_CODE_PRECONDITIONS       building   PRINTED_FILE(INCR)
-Number of analyzed variables for module INCR: 1
-Number of analyzed values for module INCR: 3
 PRINTED_FILE made for INCR.
 Module INTER02 selected
 Request: build resource PRINTED_FILE for module INTER02.
   PRINT_CODE_PRECONDITIONS       building   PRINTED_FILE(INTER02)
-Number of analyzed variables for module INTER02: 1
-Number of analyzed values for module INTER02: 3
 PRINTED_FILE made for INTER02.
 
 C  P() {}
