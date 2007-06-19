@@ -74,14 +74,15 @@ do
   esac
 done
 
-# where to put results
-odir=$rdir
-
 # option checks
 [[ -d $vdir ]] || usage 3 "no validation directory: $vdir"
 [[ -d $tdir ]] || usage 4 "no temporary directory: $tdir"
 [[ -d $rdir ]] || usage 5 "no run directory: $rdir"
-[[ -d $odir ]] || usage 5 "no output directory: $odir"
+
+# result directory
+[[ $odir ]] || odir=$rdir/validation_results.$$
+[[ -d $odir ]] && usage 5 "output directory already created: $odir"
+mkdir $odir || usage 9 "error mkdir $odir"
 
 [[ -x $pips ]] || usage 7 "not executable: $pips"
 [[ -x $tpips ]] || usage 8 "not executable: $tpips"
@@ -89,14 +90,11 @@ odir=$rdir
 [[ -f properties.rc ]] && usage 17 "cannot run with local 'properties.rc'"
 [[ -f pipsmake.rc ]] && usage 18 "cannot run with local 'pipsmake.rc'"
 
+# go !
 [[ $rdir != '.' ]] && pushd $rdir
 
-# result directory
-resdir=$odir/validation_results.$$
-mkdir $resdir || usage 9 "error mkdir $resdir"
-
 # start summary
-summary=$resdir/summary
+summary=$odir/summary
 
 echo "validation for $@
 in $vdir
@@ -144,8 +142,8 @@ function validate_file()
   output=${prefix/\//_}
   verb 4 "output suffix is: $output"
 
-  # out="$resdir/directory_file"
-  local out=$resdir/$output
+  # out="$odir/directory_file"
+  local out=$odir/$output
 
   # rel_file='directory/file.f'
   local rel_file=${file/$updir\//}
