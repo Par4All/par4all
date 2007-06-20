@@ -233,9 +233,9 @@ FILE * stream;
 int
 safe_list_files_in_directory(
     gen_array_t files, /* an allocated array */
-    char *dir, /* the directory we're interested in */
-    char *re, /* regular expression */
-    bool (*file_name_predicate)(string) /* condition to list a file */)
+    string dir, /* the directory we're interested in */
+    string re, /* regular expression */
+    bool (*file_name_predicate)(const string) /* condition to list a file */)
 {
     DIR * dirp;
     struct dirent * dp;   
@@ -282,9 +282,9 @@ safe_list_files_in_directory(
 void
 list_files_in_directory(
     gen_array_t files,
-    char * dir,
-    char * re,
-    bool (* file_name_predicate)(char *))
+    string dir,
+    string re,
+    bool (* file_name_predicate)(const string))
 {
     int return_code = safe_list_files_in_directory
 	(files, dir, re, file_name_predicate);
