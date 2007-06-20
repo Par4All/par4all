@@ -1,10 +1,10 @@
 #!/bin/sh
 
 # No core dump please when closing the database after a parser error
-
 # Parser error for Hollerith constants
 
 tpips=${tpips_version:-tpips}
+export PIPS_SRCPATH=$(dirname $0)
 
 # Initialization:
 # rm -f alias.result/test
@@ -12,10 +12,9 @@ tpips=${tpips_version:-tpips}
 
 ($tpips 2>&1 | sed '/file *\//d') <<EOF
 delete alias
-create alias ${PIPS_ROOT}/Validation/Syntax/alias.f
+create alias alias.f
 display PRINTED_FILE 
 close
 delete alias
 quit
 EOF
-
