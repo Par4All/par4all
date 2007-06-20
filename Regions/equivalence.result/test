@@ -1,0 +1,84 @@
+
+C  T() {}
+
+C Nga Nguyen: This example shows a bug in regions
+C J is modified by the loop but the region does not take into account
+C because J is not analysed by semantics analyses. 
+C  
+C    
+      PROGRAM BUGREGION
+      DIMENSION ITAB(2000)
+      EQUIVALENCE (ITAB(10),J)
+
+C  T() {}
+
+      J = 0                                                             0001
+
+C  T(I) {}
+
+C  <ITAB(PHI1)-W-EXACT-{PHI1==J}>
+      DO I = 1, 12                                                      0002
+
+C  T() {}
+
+         J = J+1                                                        0003
+
+C  T() {}
+
+C  <ITAB(PHI1)-W-EXACT-{PHI1==J, 1<=I, I<=12}>
+         ITAB(J) = 1000                                                 0004
+      ENDDO
+      END
+
+C  P() {}
+
+C Nga Nguyen: This example shows a bug in regions
+C J is modified by the loop but the region does not take into account
+C because J is not analysed by semantics analyses. 
+C  
+C    
+      PROGRAM BUGREGION
+      DIMENSION ITAB(2000)
+      EQUIVALENCE (ITAB(10),J)
+
+C  P() {}
+
+      J = 0                                                             0001
+
+C  P() {}
+
+C  <ITAB(PHI1)-W-EXACT-{PHI1==J}>
+      DO I = 1, 12                                                      0002
+
+C  P(I) {1<=I, I<=12}
+
+         J = J+1                                                        0003
+
+C  P(I) {1<=I, I<=12}
+
+C  <ITAB(PHI1)-W-EXACT-{PHI1==J, 1<=I, I<=12}>
+         ITAB(J) = 1000                                                 0004
+      ENDDO
+      END
+C Nga Nguyen: This example shows a bug in regions
+C J is modified by the loop but the region does not take into account
+C because J is not analysed by semantics analyses. 
+C  
+C    
+      PROGRAM BUGREGION
+      DIMENSION ITAB(2000)
+      EQUIVALENCE (ITAB(10),J)
+      J = 0                                                             0001
+
+C  <ITAB(PHI1)-W-MAY-{}>
+
+C  <ITAB(PHI1)-W-EXACT-{PHI1==J}>
+      DO I = 1, 12                                                      0002
+         J = J+1                                                        0003
+
+C  <ITAB(PHI1)-W-MAY-{1<=I, I<=12}>
+
+C  <ITAB(PHI1)-W-EXACT-{PHI1==J, 1<=I, I<=12}>
+         ITAB(J) = 1000                                                 0004
+      ENDDO
+      END

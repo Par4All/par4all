@@ -1,0 +1,18 @@
+delete mm03
+
+# take array bounds into account to keep information lost with MOD
+set REGIONS_WITH_ARRAY_BOUNDS TRUE
+
+create mm03 mm03.f
+
+module SAXPY
+activate MUST_REGIONS # MUST regions
+activate PRINT_CODE_REGIONS # Statements & Regions
+display PRINTED_FILE[SAXPY]
+
+module MM03
+display PRINTED_FILE[MM03]  # Statements & Regions
+
+close
+delete mm03
+quit

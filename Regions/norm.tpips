@@ -1,0 +1,9 @@
+create norm norm.f
+module NORM
+activate TRANSFORMERS_INTER_FAST
+activate PRECONDITIONS_INTER_FAST
+activate MUST_REGIONS
+activate PRINT_CODE_IN_REGIONS
+display PRINTED_FILE[NORM]
+close
+quit

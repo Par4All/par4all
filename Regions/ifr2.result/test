@@ -1,0 +1,44 @@
+--- Regions for IFR2
+
+C  <A(PHI1)-R-EXACT-{1<=PHI1, PHI1<=5}>
+C  <A(PHI1)-W-MAY-{1<=PHI1, PHI1<=5}>
+C  <B(PHI1)-R-MAY-{1<=PHI1, PHI1<=5}>
+C  <B(PHI1)-W-MAY-{1<=PHI1, PHI1<=5}>
+
+C
+C
+      SUBROUTINE IFR2(A,B)
+C
+      IMPLICIT REAL*8 (A-H,O-Z)
+      DIMENSION A(5)
+      DIMENSION B(5)
+
+C  <A(PHI1)-R-EXACT-{1<=PHI1, PHI1<=5}>
+C  <A(PHI1)-W-MAY-{1<=PHI1, PHI1<=5}>
+C  <B(PHI1)-R-MAY-{1<=PHI1, PHI1<=5}>
+C  <B(PHI1)-W-MAY-{1<=PHI1, PHI1<=5}>
+
+C
+      DO I = 1, 5                                                       0001
+
+C  <A(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=5}>
+C  <A(PHI1)-W-MAY-{PHI1==I, 1<=I, I<=5}>
+C  <B(PHI1)-R-MAY-{PHI1==I, 1<=I, I<=5}>
+C  <B(PHI1)-W-MAY-{PHI1==I, 1<=I, I<=5}>
+
+         IF (A(I).GT.2) THEN                                            0002
+
+C  <A(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=5}>
+C  <B(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=5}>
+
+            B(I) = A(I)-1                                               0003
+         ELSE
+
+C  <A(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=5}>
+C  <B(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=5}>
+
+            A(I) = B(I)+1                                               0004
+         ENDIF
+      ENDDO
+C
+      END

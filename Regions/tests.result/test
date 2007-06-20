@@ -1,0 +1,147 @@
+--- Regions for TESTS
+C     REGIONS OF TESTS, WITH VARIOUS CONDITIONS
+C     AND ARRAY ACCESSES
+
+      SUBROUTINE TESTS(N, R, J)
+      
+      INTEGER A(20), B(20), N, J
+      REAL R
+
+C  <A(PHI1)-W-MAY-{PHI1==N, 4<=N}>
+
+
+C     ONLY ONE BRANCH
+      IF (N.GT.3) THEN                                                  0001
+
+C  <A(PHI1)-W-EXACT-{PHI1==N, 4<=N}>
+
+         A(N) = N-1                                                     0002
+      ENDIF
+
+C  <A(PHI1)-R-MAY-{PHI1==N}>
+C  <A(PHI1)-W-MAY-{PHI1==N}>
+
+
+C     TWO BRANCHES WITH THE SAME ARRAY ELEMENTS ACCESSED
+      IF (N.EQ.3) THEN                                                  0003
+
+C  <A(PHI1)-R-EXACT-{PHI1==N, N==3}>
+C  <A(PHI1)-W-EXACT-{PHI1==N, N==3}>
+
+         A(N) = A(N)+N                                                  0004
+      ELSE
+
+C  <A(PHI1)-R-EXACT-{PHI1==N}>
+C  <A(PHI1)-W-EXACT-{PHI1==N}>
+
+         A(N) = A(N)-N                                                  0005
+      ENDIF
+
+C  <A(PHI1)-R-EXACT-{PHI1==N}>
+C  <B(PHI1)-W-EXACT-{PHI1==N}>
+
+
+C     A REAL IN THE CONDITION AND THE SAME ELTS ACCESSED
+      IF (R.GT.0) THEN                                                  0006
+
+C  <A(PHI1)-R-EXACT-{PHI1==N}>
+C  <B(PHI1)-W-EXACT-{PHI1==N}>
+
+         B(N) = A(N)/R                                                  0007
+      ELSE
+
+C  <A(PHI1)-R-EXACT-{PHI1==N}>
+C  <B(PHI1)-W-EXACT-{PHI1==N}>
+
+         B(N) = A(N)*R                                                  0008
+      ENDIF
+
+C  <A(PHI1)-W-MAY-{N<=PHI1, PHI1<=1+N}>
+
+
+C     TWO DIFFERENT ARRAY ELEMENTS ACCESSED IN THE BRANCHES
+      IF (N.GT.3) THEN                                                  0009
+
+C  <A(PHI1)-W-EXACT-{PHI1==N, 4<=N}>
+
+         A(N) = N-1                                                     0010
+      ELSE
+
+C  <A(PHI1)-W-EXACT-{PHI1==N+1, N<=3}>
+
+         A(N+1) = N+1                                                   0011
+      ENDIF
+
+C  <A(PHI1)-W-MAY-{PHI1==M}>
+
+
+C     THE ARRAY INDICES DON'T DEPEND ON THE TEST VARIABLE
+      IF (N.GT.3) THEN                                                  0012
+
+C  <A(PHI1)-W-EXACT-{PHI1==M, 4<=N}>
+
+         A(M) = N-1                                                     0013
+      ELSE
+
+C  <A(PHI1)-W-EXACT-{PHI1==M, N<=3}>
+
+         A(M) = N+1                                                     0014
+      ENDIF
+
+C  <A(PHI1)-R-MAY-{PHI1==N}>
+C  <A(PHI1)-W-MAY-{PHI1==N}>
+C  <B(PHI1)-R-EXACT-{PHI1==N}>
+
+
+C     THE TEST VARIABLE IS AN ARRAY ELEMENT, BUT IS NOT 
+C     ACCESSED IN THE BRANCHES
+      IF (B(N).EQ.N) THEN                                               0015
+
+C  <A(PHI1)-R-EXACT-{PHI1==N}>
+C  <A(PHI1)-W-EXACT-{PHI1==N}>
+
+         A(N) = A(N)+1                                                  0016
+      ENDIF
+
+C  <A(PHI1)-W-EXACT-{PHI1==N}>
+C  <B(PHI1)-R-EXACT-{PHI1==N}>
+
+
+C     THE TEST VARIABLE IS AN ARRAY ELEMENT, AND IS 
+C     ACCESSED IN THE TWO BRANCHES
+      IF (B(N).EQ.N) THEN                                               0017
+
+C  <A(PHI1)-W-EXACT-{PHI1==N}>
+C  <B(PHI1)-R-EXACT-{PHI1==N}>
+
+         A(N) = B(N)+1                                                  0018
+      ELSE
+
+C  <A(PHI1)-W-EXACT-{PHI1==N}>
+C  <B(PHI1)-R-EXACT-{PHI1==N}>
+
+         A(N) = B(N)-1                                                  0019
+      ENDIF
+
+C  <A(PHI1)-R-MAY-{PHI1==N}>
+C  <A(PHI1)-W-EXACT-{PHI1==N}>
+C  <B(PHI1)-R-EXACT-{PHI1==N}>
+
+
+C     THE TEST VARIABLE IS AN ARRAY ELEMENT, AND IS 
+C     ACCESSED IN ONLY ONE BRANCH
+      IF (B(N).EQ.N) THEN                                               0020
+
+C  <A(PHI1)-W-EXACT-{PHI1==N}>
+C  <B(PHI1)-R-EXACT-{PHI1==N}>
+
+         A(N) = B(N)+1                                                  0021
+      ELSE
+
+C  <A(PHI1)-R-EXACT-{PHI1==N}>
+C  <A(PHI1)-W-EXACT-{PHI1==N}>
+
+         A(N) = A(N)-1                                                  0022
+      ENDIF
+
+      END

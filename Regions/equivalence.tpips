@@ -1,0 +1,12 @@
+delete r
+create r equivalence.f
+activate MUST_REGIONS
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[%ALL]
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[%ALL]
+close
+delete r
+quit

@@ -1,0 +1,21 @@
+--- Regions for NOSUBS
+
+C  <A(PHI1)-W-MAY-{0<=PHI1}>
+C  <B(PHI1)-W-EXACT-{PHI1==5}>
+
+      SUBROUTINE NOSUBS(A, B, N, M)
+      INTEGER N, M, A(M), B(M), I, J, K
+
+      I = N*N                                                           0001
+      J = 4                                                             0002
+
+C  <A(PHI1)-W-EXACT-{PHI1==I, J==4, 0<=I}>
+
+      A(I) = 0                                                          0003
+      K = 5                                                             0004
+
+C  <B(PHI1)-W-EXACT-{PHI1==K, J==4, K==5, 0<=I}>
+
+      B(K) = 0                                                          0005
+
+      END

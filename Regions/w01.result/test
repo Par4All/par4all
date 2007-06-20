@@ -1,0 +1,126 @@
+      PROGRAM W01
+      INTEGER I, N
+      I = 1                                                             0001
+      N = 10                                                            0002
+      DO WHILE (I.LT.N)                                                 0003
+         PRINT *, I                                                     0004
+         I = I+1                                                        0005
+      ENDDO
+      END
+      PROGRAM W01
+      INTEGER I, N
+C               <must be written>: I
+      I = 1                                                             0001
+C               <must be written>: N
+      N = 10                                                            0002
+C               <must be read   >: I N
+      DO WHILE (I.LT.N)                                                 0003
+C               <must be read   >: I __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+         PRINT *, I                                                     0004
+C               <must be read   >: I
+C               <must be written>: I
+         I = I+1                                                        0005
+      ENDDO
+      END
+C               <may be read    >: __IO_EFFECTS:LUNS(*)
+C               <may be written >: __IO_EFFECTS:LUNS(*)
+      PROGRAM W01
+      INTEGER I, N
+C               <must be written>: I
+      I = 1                                                             0001
+C               <must be written>: N
+      N = 10                                                            0002
+C               <may be read    >: __IO_EFFECTS:LUNS(*)
+C               <may be written >: __IO_EFFECTS:LUNS(*)
+C               <must be read   >: I N
+C               <must be written>: I
+      DO WHILE (I.LT.N)                                                 0003
+C               <may be read    >: __IO_EFFECTS:LUNS(*)
+C               <may be written >: __IO_EFFECTS:LUNS(*)
+C               <must be read   >: I
+         PRINT *, I                                                     0004
+C               <must be read   >: I
+C               <must be written>: I
+         I = I+1                                                        0005
+      ENDDO
+      END
+
+C  T() {}
+
+      PROGRAM W01
+      INTEGER I, N
+
+C  T(I) {I==1}
+
+      I = 1                                                             0001
+
+C  T(N) {N==10}
+
+      N = 10                                                            0002
+
+C  T(I) {}
+
+      DO WHILE (I.LT.N)                                                 0003
+
+C  T() {}
+
+         PRINT *, I                                                     0004
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0005
+      ENDDO
+      END
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-MAY-{PHI1==6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-MAY-{PHI1==6}>
+
+      PROGRAM W01
+      INTEGER I, N
+      I = 1                                                             0001
+      N = 10                                                            0002
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-MAY-{PHI1==6, N==10}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-MAY-{PHI1==6, N==10}>
+
+      DO WHILE (I.LT.N)                                                 0003
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, N==10, I<=9}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, N==10, I<=9}>
+
+         PRINT *, I                                                     0004
+         I = I+1                                                        0005
+      ENDDO
+      END
+
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-MAY-{PHI1==6}>
+
+      PROGRAM W01
+      INTEGER I, N
+      I = 1                                                             0001
+      N = 10                                                            0002
+
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-MAY-{PHI1==6, N==10}>
+
+      DO WHILE (I.LT.N)                                                 0003
+
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{PHI1==6, N==10, I<=9}>
+
+         PRINT *, I                                                     0004
+         I = I+1                                                        0005
+      ENDDO
+      END
+      PROGRAM W01
+      INTEGER I, N
+      I = 1                                                             0001
+      N = 10                                                            0002
+      DO WHILE (I.LT.N)                                                 0003
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-MAY-{PHI1==6, N==10, I<=9}>
+
+         PRINT *, I                                                     0004
+         I = I+1                                                        0005
+      ENDDO
+      END
+

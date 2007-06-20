@@ -1,0 +1,12 @@
+delete proper
+create proper proper.f
+set PRETTYPRINT_SCALAR_REGIONS TRUE
+activate MUST_REGIONS
+activate PRINT_CODE_PROPER_REGIONS
+display PRINTED_FILE
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE
+activate REGION_CHAINS
+display PARALLELPRINTED_FILE
+close
+delete proper

@@ -1,0 +1,9 @@
+delete incr3
+create incr3 incr3.f
+module INCR3
+activate MUST_REGIONS # MUST regions
+activate PRINT_CODE_REGIONS # Statements & Regions
+display PRINTED_FILE[INCR3]
+close
+delete incr3
+quit

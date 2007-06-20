@@ -1,0 +1,8 @@
+delete env_reg
+create env_reg env_reg.f
+module ENV_REG
+activate MUST_REGIONS
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE
+close
+delete env_reg

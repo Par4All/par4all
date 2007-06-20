@@ -1,0 +1,339 @@
+# code
+      PROGRAM W03
+
+      INTEGER I, N
+      PARAMETER (N=10)
+      REAL A(N)
+
+      I = 1                                                             0001
+
+      DO WHILE (I.LE.10)                                                0002
+         A(I) = I*1.23                                                  0003
+         I = I+1                                                        0004
+      ENDDO
+
+      I = 2                                                             0005
+
+      DO WHILE (I.LT.N)                                                 0006
+         PRINT *, A(I-1)                                                0007
+         I = I+1                                                        0008
+      ENDDO
+
+      PRINT *, 'bye'                                                    0009
+
+      END
+# proper effects
+      PROGRAM W03
+
+      INTEGER I, N
+      PARAMETER (N=10)
+      REAL A(N)
+C               <must be written>: I
+
+      I = 1                                                             0001
+C               <must be read   >: I
+
+      DO WHILE (I.LE.10)                                                0002
+C               <must be read   >: I
+C               <must be written>: A(I)
+         A(I) = I*1.23                                                  0003
+C               <must be read   >: I
+C               <must be written>: I
+         I = I+1                                                        0004
+      ENDDO
+C               <must be written>: I
+
+      I = 2                                                             0005
+C               <must be read   >: I
+
+      DO WHILE (I.LT.N)                                                 0006
+C               <must be read   >: A(I-1) I __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+         PRINT *, A(I-1)                                                0007
+C               <must be read   >: I
+C               <must be written>: I
+         I = I+1                                                        0008
+      ENDDO
+C               <must be read   >: __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+
+      PRINT *, 'bye'                                                    0009
+
+      END
+# cumulated effects
+C               <may be read    >: __IO_EFFECTS:LUNS(*)
+C               <may be written >: __IO_EFFECTS:LUNS(*)
+      PROGRAM W03
+
+      INTEGER I, N
+      PARAMETER (N=10)
+      REAL A(N)
+C               <must be written>: I
+
+      I = 1                                                             0001
+C               <may be written >: A(*)
+C               <must be read   >: I
+C               <must be written>: I
+
+      DO WHILE (I.LE.10)                                                0002
+C               <may be written >: A(*)
+C               <must be read   >: I
+         A(I) = I*1.23                                                  0003
+C               <must be read   >: I
+C               <must be written>: I
+         I = I+1                                                        0004
+      ENDDO
+C               <must be written>: I
+
+      I = 2                                                             0005
+C               <may be read    >: A(*) __IO_EFFECTS:LUNS(*)
+C               <may be written >: __IO_EFFECTS:LUNS(*)
+C               <must be read   >: I
+C               <must be written>: I
+
+      DO WHILE (I.LT.N)                                                 0006
+C               <may be read    >: A(*) __IO_EFFECTS:LUNS(*)
+C               <may be written >: __IO_EFFECTS:LUNS(*)
+C               <must be read   >: I
+         PRINT *, A(I-1)                                                0007
+C               <must be read   >: I
+C               <must be written>: I
+         I = I+1                                                        0008
+      ENDDO
+C               <may be read    >: __IO_EFFECTS:LUNS(*)
+C               <may be written >: __IO_EFFECTS:LUNS(*)
+
+      PRINT *, 'bye'                                                    0009
+
+      END
+# transformers
+
+C  T() {}
+
+      PROGRAM W03
+
+      INTEGER I, N
+      PARAMETER (N=10)
+      REAL A(N)
+
+C  T(I) {I==1}
+
+
+      I = 1                                                             0001
+
+C  T(I) {I#init<=I}
+
+
+      DO WHILE (I.LE.10)                                                0002
+
+C  T() {}
+
+         A(I) = I*1.23                                                  0003
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0004
+      ENDDO
+
+C  T(I) {I==2}
+
+
+      I = 2                                                             0005
+
+C  T(I) {I#init<=I}
+
+
+      DO WHILE (I.LT.N)                                                 0006
+
+C  T() {}
+
+         PRINT *, A(I-1)                                                0007
+
+C  T(I) {I==I#init+1}
+
+         I = I+1                                                        0008
+      ENDDO
+
+C  T() {}
+
+
+      PRINT *, 'bye'                                                    0009
+
+      END
+# preconditions
+
+C  P() {}
+
+      PROGRAM W03
+
+      INTEGER I, N
+      PARAMETER (N=10)
+      REAL A(N)
+
+C  P() {}
+
+
+      I = 1                                                             0001
+
+C  P(I) {I==1}
+
+
+      DO WHILE (I.LE.10)                                                0002
+
+C  P(I) {1<=I, I<=10}
+
+         A(I) = I*1.23                                                  0003
+
+C  P(I) {1<=I, I<=10}
+
+         I = I+1                                                        0004
+      ENDDO
+
+C  P(I) {I==11}
+
+
+      I = 2                                                             0005
+
+C  P(I) {I==2}
+
+
+      DO WHILE (I.LT.N)                                                 0006
+
+C  P(I) {2<=I, I<=9}
+
+         PRINT *, A(I-1)                                                0007
+
+C  P(I) {2<=I, I<=9}
+
+         I = I+1                                                        0008
+      ENDDO
+
+C  P(I) {I==10}
+
+
+      PRINT *, 'bye'                                                    0009
+
+      END
+# must regions
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
+
+      PROGRAM W03
+
+      INTEGER I, N
+      PARAMETER (N=10)
+      REAL A(N)
+
+      I = 1                                                             0001
+
+C  <A(PHI1)-W-MAY-{I<=PHI1, 1<=PHI1, PHI1<=10}>
+
+
+      DO WHILE (I.LE.10)                                                0002
+
+C  <A(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=10}>
+
+         A(I) = I*1.23                                                  0003
+         I = I+1                                                        0004
+      ENDDO
+
+      I = 2                                                             0005
+
+C  <A(PHI1)-R-MAY-{I<=PHI1+1, 1<=PHI1, PHI1<=8}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, I<=9}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, I<=9}>
+
+
+      DO WHILE (I.LT.N)                                                 0006
+
+C  <A(PHI1)-R-EXACT-{PHI1==I-1, 2<=I, I<=9}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 2<=I, I<=9}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 2<=I, I<=9}>
+
+         PRINT *, A(I-1)                                                0007
+         I = I+1                                                        0008
+      ENDDO
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, I==10}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, I==10}>
+
+
+      PRINT *, 'bye'                                                    0009
+
+      END
+# in regions
+
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-MAY-{PHI1==6}>
+
+      PROGRAM W03
+
+      INTEGER I, N
+      PARAMETER (N=10)
+      REAL A(N)
+
+      I = 1                                                             0001
+
+      DO WHILE (I.LE.10)                                                0002
+         A(I) = I*1.23                                                  0003
+         I = I+1                                                        0004
+      ENDDO
+
+      I = 2                                                             0005
+
+C  <A(PHI1)-IN-MAY-{I<=PHI1+1, 1<=PHI1, PHI1<=8}>
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-MAY-{PHI1==6, I<=9}>
+
+
+      DO WHILE (I.LT.N)                                                 0006
+
+C  <A(PHI1)-IN-EXACT-{PHI1==I-1, 2<=I, I<=9}>
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{PHI1==6, 2<=I, I<=9}>
+
+         PRINT *, A(I-1)                                                0007
+         I = I+1                                                        0008
+      ENDDO
+
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{PHI1==6, I==10}>
+
+
+      PRINT *, 'bye'                                                    0009
+
+      END
+# out regions
+      PROGRAM W03
+
+      INTEGER I, N
+      PARAMETER (N=10)
+      REAL A(N)
+
+      I = 1                                                             0001
+
+C  <A(PHI1)-OUT-MAY-{I<=PHI1, 1<=PHI1, PHI1<=8}>
+
+
+      DO WHILE (I.LE.10)                                                0002
+
+C  <A(PHI1)-OUT-MAY-{PHI1==I, 1<=I, I<=10}>
+
+         A(I) = I*1.23                                                  0003
+         I = I+1                                                        0004
+      ENDDO
+
+      I = 2                                                             0005
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, I<=9}>
+
+
+      DO WHILE (I.LT.N)                                                 0006
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-MAY-{PHI1==6, 2<=I, I<=9}>
+
+         PRINT *, A(I-1)                                                0007
+         I = I+1                                                        0008
+      ENDDO
+
+      PRINT *, 'bye'                                                    0009
+
+      END
+

@@ -1,0 +1,9 @@
+delete r
+
+create r formal1.f
+activate MUST_REGIONS
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[%ALL]
+close
+
+delete r

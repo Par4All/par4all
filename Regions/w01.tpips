@@ -1,0 +1,31 @@
+delete w01
+
+create w01 w01.f
+display PRINTED_FILE
+close
+
+open w01
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE
+close
+
+open w01
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE
+close
+
+open w01
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE
+
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE
+
+activate PRINT_CODE_IN_REGIONS
+display PRINTED_FILE
+
+activate PRINT_CODE_OUT_REGIONS
+display PRINTED_FILE
+
+close
+delete w01

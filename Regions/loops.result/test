@@ -1,0 +1,180 @@
+--- Regions for LOOPS
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{4<=PHI1, PHI1<=5}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{4<=PHI1, PHI1<=5}>
+
+      PROGRAM LOOPS
+      INTEGER B(20), A(20,20), L5, U5, S5
+
+C  <B(PHI1)-W-EXACT-{1<=PHI1, PHI1<=20}>
+
+
+      DO I1 = 1, 20                                                     0001
+
+C  <B(PHI1)-W-EXACT-{PHI1==I1, 1<=I1, I1<=20}>
+
+         B(I1) = 0                                                      0002
+      ENDDO
+
+C  <B(PHI1)-W-MAY-{1<=PHI1, PHI1<=19, I1==21}>
+
+
+
+      DO I2 = 1, 20, 2                                                  0003
+
+C  <B(PHI1)-W-EXACT-{PHI1==I2, I1==21, 1<=I2, I2<=20}>
+
+         B(I2) = 0                                                      0004
+      ENDDO
+
+C  <B(PHI1)-W-EXACT-{1<=PHI1, PHI1<=20, I1==21, 21<=I2, I2<=22}>
+
+
+      DO I3 = 20, 1, -1                                                 0005
+
+C  <B(PHI1)-W-EXACT-{PHI1==I3, I1==21, 21<=I2, I2<=22, 1<=I3, I3<=20}>
+
+         B(I3) = 0                                                      0006
+      ENDDO
+
+C  <B(PHI1)-W-MAY-{2<=PHI1, PHI1<=20, I1==21, I3==0, 21<=I2, I2<=22}>
+
+
+      DO I4 = 20, 1, -2                                                 0007
+
+C  <B(PHI1)-W-EXACT-{PHI1==I4, I1==21, I3==0, 21<=I2, I2<=22, 1<=I4,
+C    I4<=20}>
+
+         B(I4) = 0                                                      0008
+      ENDDO
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==4, I1==21, I3==0, 21<=I2,
+C    I2<=22, 0<=1+I4, I4<=0}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==4, I1==21, I3==0, 21<=I2,
+C    I2<=22, 0<=1+I4, I4<=0}>
+
+
+      READ (4, *) L5                                                    0009
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==4, I1==21, I3==0, 21<=I2,
+C    I2<=22, 0<=1+I4, I4<=0}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==4, I1==21, I3==0, 21<=I2,
+C    I2<=22, 0<=1+I4, I4<=0}>
+
+      READ (4, *) U5                                                    0010
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==4, I1==21, I3==0, 21<=I2,
+C    I2<=22, 0<=1+I4, I4<=0}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==4, I1==21, I3==0, 21<=I2,
+C    I2<=22, 0<=1+I4, I4<=0}>
+
+      READ (4, *) S5                                                    0011
+
+C  <B(PHI1)-W-MAY-{I1==21, I3==0, 21<=I2, I2<=22, 0<=1+I4, I4<=0}>
+
+
+      DO I5 = L5, U5, S5                                                0012
+
+C  <B(PHI1)-W-EXACT-{PHI1==I5, I1==21, I3==0, 21<=I2, I2<=22, 0<=1+I4,
+C    I4<=0}>
+
+         B(I5) = 0                                                      0013
+      ENDDO
+
+C  <B(PHI1)-W-EXACT-{1<=PHI1, PHI1<=20, I1==21, I3==0, 21<=I2, I2<=22,
+C    0<=1+I4, I4<=0}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==5, I1==21, I3==0, 21<=I2,
+C    I2<=22, 0<=1+I4, I4<=0}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==5, I1==21, I3==0, 21<=I2,
+C    I2<=22, 0<=1+I4, I4<=0}>
+
+
+
+      READ *, (B(J1), J1 = 1, 20)                                       0014
+
+C  <B(PHI1)-W-MAY-{1<=PHI1, PHI1<=19, I1==21, I3==0, 21<=I2, I2<=22,
+C    0<=1+I4, I4<=0}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==5, I1==21, I3==0, 21<=I2,
+C    I2<=22, 0<=1+I4, I4<=0}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==5, I1==21, I3==0, 21<=I2,
+C    I2<=22, 0<=1+I4, I4<=0}>
+
+      READ *, (B(J2), J2 = 1, 20, 2)                                    0015
+
+C  <B(PHI1)-W-EXACT-{1<=PHI1, PHI1<=20, I1==21, I3==0, 21<=I2, I2<=22,
+C    0<=1+I4, I4<=0}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==5, I1==21, I3==0, 21<=I2,
+C    I2<=22, 0<=1+I4, I4<=0}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==5, I1==21, I3==0, 21<=I2,
+C    I2<=22, 0<=1+I4, I4<=0}>
+
+      READ *, (B(J3), J3 = 20, 1, -1)                                   0016
+
+C  <B(PHI1)-W-MAY-{2<=PHI1, PHI1<=20, I1==21, I3==0, 21<=I2, I2<=22,
+C    0<=1+I4, I4<=0}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==5, I1==21, I3==0, 21<=I2,
+C    I2<=22, 0<=1+I4, I4<=0}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==5, I1==21, I3==0, 21<=I2,
+C    I2<=22, 0<=1+I4, I4<=0}>
+
+      READ *, (B(J4), J4 = 20, 1, -2)                                   0017
+
+C  <B(PHI1)-W-MAY-{I1==21, I3==0, 21<=I2, I2<=22, 0<=1+I4, I4<=0}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==5, I1==21, I3==0, 21<=I2,
+C    I2<=22, 0<=1+I4, I4<=0}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==5, I1==21, I3==0, 21<=I2,
+C    I2<=22, 0<=1+I4, I4<=0}>
+
+      READ *, (B(J5), J5 = L5, U5, S5)                                  0018
+
+C  <A(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=20, 1<=PHI2, PHI2<=20,
+C    I1==21, I3==0, 21<=I2, I2<=22, 0<=1+I4, I4<=0}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==5, I1==21, I3==0, 21<=I2,
+C    I2<=22, 0<=1+I4, I4<=0}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==5, I1==21, I3==0, 21<=I2,
+C    I2<=22, 0<=1+I4, I4<=0}>
+
+
+      READ *, ((A(I6,J6), J6 = 1, 20), I6 = 1, 20)                      0019
+
+C  <A(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=20, 1<=PHI2, PHI2<=20,
+C    I1==21, I3==0, 21<=I2, I2<=22, 0<=1+I4, I4<=0}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==5, I1==21, I3==0, 21<=I2,
+C    I2<=22, 0<=1+I4, I4<=0}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==5, I1==21, I3==0, 21<=I2,
+C    I2<=22, 0<=1+I4, I4<=0}>
+
+
+      DO I7 = 1, 20                                                     0020
+
+C  <A(PHI1,PHI2)-W-EXACT-{PHI1==I7, 1<=PHI2, PHI2<=20, I1==21, I3==0,
+C    21<=I2, I2<=22, 0<=1+I4, I4<=0, 1<=I7, I7<=20}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==5, I1==21, I3==0, 21<=I2,
+C    I2<=22, 0<=1+I4, I4<=0, 1<=I7, I7<=20}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==5, I1==21, I3==0, 21<=I2,
+C    I2<=22, 0<=1+I4, I4<=0, 1<=I7, I7<=20}>
+
+         READ *, (A(I7,J7),I7,J7, J7 = 1, 20)                           0021
+      ENDDO
+
+C  <A(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=20, 1<=PHI2, PHI2<=20,
+C    I1==21, I3==0, I7==21, 21<=I2, I2<=22, 0<=1+I4, I4<=0}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==5, I1==21, I3==0, I7==21,
+C    21<=I2, I2<=22, 0<=1+I4, I4<=0}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==5, I1==21, I3==0, I7==21,
+C    21<=I2, I2<=22, 0<=1+I4, I4<=0}>
+
+
+      DO I8 = 1, 20                                                     0022
+
+C  <A(PHI1,PHI2)-W-EXACT-{PHI1==I8, 1<=PHI2, PHI2<=20, I1==21, I3==0,
+C    I7==21, 21<=I2, I2<=22, 0<=1+I4, I4<=0, 1<=I8, I8<=20}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==5, I1==21, I3==0, I7==21,
+C    21<=I2, I2<=22, 0<=1+I4, I4<=0, 1<=I8, I8<=20}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==5, I1==21, I3==0, I7==21,
+C    21<=I2, I2<=22, 0<=1+I4, I4<=0, 1<=I8, I8<=20}>
+
+         READ *, (A(I8,J8),J8, J8 = 1, 20)                              0023
+      ENDDO
+
+      END

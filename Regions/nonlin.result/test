@@ -1,0 +1,11 @@
+--- Regions for NONLIN
+      SUBROUTINE NONLIN(N)
+      INTEGER A(5), N
+
+C  <A(PHI1)-W-MAY-{0<=PHI1}>
+
+
+
+      A(N*N) = 0                                                        0001
+
+      END

@@ -1,0 +1,55 @@
+--- Regions for ESSAI3
+
+C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N}>
+C  <X(PHI1)-R-EXACT-{1<=PHI1, PHI1+1<=N}>
+C  <X(PHI1)-W-EXACT-{1<=PHI1, PHI1+1<=N}>
+C  <Y(PHI1)-R-EXACT-{1<=PHI1, PHI1<=N}>
+C  <Y(PHI1)-W-EXACT-{1<=PHI1, PHI1<=N}>
+
+C
+C
+      SUBROUTINE ESSAI3(N, A, B, X, Y)
+      INTEGER N
+      REAL A(N,N), B(N), X(N), Y(N)
+
+C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N}>
+C  <X(PHI1)-R-EXACT-{1<=PHI1, PHI1+1<=N}>
+C  <X(PHI1)-W-EXACT-{1<=PHI1, PHI1+1<=N}>
+C  <Y(PHI1)-R-EXACT-{1<=PHI1, PHI1<=N}>
+C  <Y(PHI1)-W-EXACT-{1<=PHI1, PHI1<=N}>
+
+C
+      DO K = 1, 10                                                      0001
+
+C  <A(PHI1,PHI2)-R-EXACT-{PHI1<=N, 1<=PHI2, PHI2<=PHI1, 1<=K, K<=10}>
+C  <Y(PHI1)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=K, K<=10}>
+C  <Y(PHI1)-W-EXACT-{1<=PHI1, PHI1<=N, 1<=K, K<=10}>
+
+         DO I = 1, N                                                    0002
+
+C  <A(PHI1,PHI2)-R-EXACT-{PHI1==I, 1<=PHI2, PHI2<=I, I<=N, 1<=K,
+C    K<=10}>
+C  <Y(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=N, 1<=K, K<=10}>
+C  <Y(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=N, 1<=K, K<=10}>
+
+            DO J = 1, I                                                 0003
+
+C  <A(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==J, J<=I, I<=N, 1<=J, 1<=K,
+C    K<=10}>
+C  <Y(PHI1)-R-EXACT-{PHI1==I, J<=I, I<=N, 1<=J, 1<=K, K<=10}>
+C  <Y(PHI1)-W-EXACT-{PHI1==I, J<=I, I<=N, 1<=J, 1<=K, K<=10}>
+
+               Y(I) = Y(I)+A(I,J)                                       0004
+            ENDDO
+         ENDDO
+
+C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, PHI2<=N, PHI1+1<=PHI2,
+C    1+N<=I, 1<=K, K<=10}>
+C  <X(PHI1)-R-EXACT-{1<=PHI1, PHI1+1<=N, 1+N<=I, 1<=K, K<=10}>
+C  <X(PHI1)-W-EXACT-{1<=PHI1, PHI1+1<=N, 1+N<=I, 1<=K, K<=10}>
+
+C
+         CALL FUNC(N, X, A)                                             0005
+      ENDDO
+C
+      END
