@@ -330,7 +330,7 @@ nth_path(const char * path_list, int n)
 }
 
 static char *
-relative_name_if_necessary(const string name)
+relative_name_if_necessary(const char * name)
 {
     if (name[0]=='/' || name[0]=='.') return strdup(name);
     else return strdup(concatenate("./", name, 0));
