@@ -151,13 +151,11 @@ function validate_file()
   if [[ -r $full_name.test ]] ; then
     verb 3 "$prefix.test method"
     # ??? what about using default_test substitution?!
-    $full_name.test > $out.out 2> $out.err
-    status=$?
+    $full_name.test > $out.out 2> $out.err || status=$?
 
   elif [[ -r $full_name.tpips ]] ; then 
     verb 3 "$prefix.tpips method"
-    $tpips $full_name.tpips > $out.out 2> $out.err
-    status=$?
+    $tpips $full_name.tpips > $out.out 2> $out.err || status=$?
 
   elif [[ -r $dir/default_test ]] ; then
     verb 3 'default_test method'
@@ -169,25 +167,22 @@ function validate_file()
 	-e "s/TESTED_NAME/$upper/g" \
 	< $dir/default_test > $test
     chmod +x $test
-    $test > $out.out 2> $out.err
-    status=$?
+    $test > $out.out 2> $out.err || status=$?
     rm -f $test
     
   elif [[ -r $dir/default_tpips ]] ; then
     verb 3 'default_tpips method'
     FILE=$file WSPACE=$name \
-	${tpips} $dir/default_tpips > $out.out 2> $out.err
-    status=$?
+	${tpips} $dir/default_tpips > $out.out 2> $out.err || status=$?
     
   else
     verb 3 'default method: Init/Display/Delete'
     {
-      Init -f $file -d $name
-      status=$?
+      Init -f $file -d $name || status=$?
       while read module ; do
 	Display -m $module -w $name || status=$?
       done < $name.database/modules
-      Delete $name
+      Delete $name # ignore delete failture... 
     } > $out.out 2> $out.err
   fi
   [[ -f core ]] && rm -f core # cleanup
@@ -206,10 +201,9 @@ function validate_file()
       verb 2 "changed: $rel_file"
       echo "changed: $rel_file" >> $summary
       cp $out.out $file_resdir/out
-      status=1 # something was wrong
+      status=1 # something was wrong...
     else
-      # ok!
-      verb 2 "succeeded: $rel_file"
+      verb 2 "succeeded: $rel_file" # ok!
       rm -f $out.*
     fi
   else
@@ -221,22 +215,26 @@ function validate_file()
 
 # process directories (or possibly files)
 errors=0
-for obj in "$@"
-do
+elist=''
+for obj ; do
+  failed=
   if [ -d $vdir/$obj ] ; then
     verb 1 "considering $obj directory"
     for file in $vdir/$obj/*.[cfF] ; do
-      validate_file $file || let errors++
+      validate_file $file || let errors++ failed=1
     done
   elif [ -f $vdir/$obj ] ; then
-    validate_file $vdir/$obj || let errors++
+    validate_file $vdir/$obj || let errors++ failed=1
   else
     usage 11 "unexpected object: $obj"
   fi
+  [[ $failed ]] && elist="$elist $obj"
 done
-
 echo -e "\n$errors error(s) on $(date)" >> $summary
 Delete -a # cleanup
 
-# summary email if required
-[[ $mail ]] && ${PIPS_MAIL:-Mail} -s "validation summary" $mail < $summary
+# report on stdout and by mail
+msg='SUCCEEDED'
+[[ $errors ]] && msg='FAILED'
+echo -e "validation $msg$elist\n" ; cat $summary
+[[ $mail ]] && ${PIPS_MAIL:-Mail} -s "validation $msg$elist" $mail < $summary
