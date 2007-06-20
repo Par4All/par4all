@@ -43,13 +43,11 @@ C
       SITE = COORD(1)*MOV(1)+COORD(2)*MOV(2)+COORD(3)*MOV(3)+COORD(4)   0005
      &*MOV(4)                                                           0005
       CNT = 1                                                           0006
-      DO J = 1, 6                                                       0007
+      DO 1 J = 1, 6                                                     0007
          COORD(DIR+1) = OTHEND                                          0008
-      ENDDO
-      DO J = 1, 6                                                       0007
 C        CALL SYSLOP(COORD,SITE,PTEMP(CNT),ST(1,J),NCHAR)
          CNT = NCHAR+CNT                                                0009
-      ENDDO
+1        CONTINUE                                                       0010
 C
       PU = ORIGIN+ROT(DIR+1)                                            0011
 C      CALL CHOOS(ST(1,1),U1(PU+1))
