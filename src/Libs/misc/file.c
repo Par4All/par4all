@@ -235,7 +235,7 @@ safe_list_files_in_directory(
     gen_array_t files, /* an allocated array */
     string dir, /* the directory we're interested in */
     string re, /* regular expression */
-    bool (*file_name_predicate)(const string) /* condition to list a file */)
+    bool (*file_name_predicate)(const char *) /* condition to list a file */)
 {
     DIR * dirp;
     struct dirent * dp;   
@@ -284,7 +284,7 @@ list_files_in_directory(
     gen_array_t files,
     string dir,
     string re,
-    bool (* file_name_predicate)(const string))
+    bool (* file_name_predicate)(const char *))
 {
     int return_code = safe_list_files_in_directory
 	(files, dir, re, file_name_predicate);
@@ -296,14 +296,14 @@ list_files_in_directory(
 }
 
 bool 
-directory_exists_p(const string name)
+directory_exists_p(const char * name)
 {
     struct stat buf;
     return (stat(name, &buf) == 0) && S_ISDIR(buf.st_mode);
 }
 
 bool 
-file_exists_p(const string name)
+file_exists_p(const char * name)
 {
     struct stat buf;
     return (stat(name, &buf) == 0) && S_ISREG(buf.st_mode);
@@ -313,7 +313,7 @@ file_exists_p(const string name)
 /* returns the allocated nth path in colon-separated path list.
  */
 static string
-nth_path(const string path_list, int n)
+nth_path(const char * path_list, int n)
 {
     int len=0,i;
     char *result;
