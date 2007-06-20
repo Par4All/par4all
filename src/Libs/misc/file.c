@@ -296,14 +296,14 @@ list_files_in_directory(
 }
 
 bool 
-directory_exists_p(const char * name)
+directory_exists_p(const string name)
 {
     struct stat buf;
     return (stat(name, &buf) == 0) && S_ISDIR(buf.st_mode);
 }
 
 bool 
-file_exists_p(const char * name)
+file_exists_p(const string name)
 {
     struct stat buf;
     return (stat(name, &buf) == 0) && S_ISREG(buf.st_mode);
@@ -313,7 +313,7 @@ file_exists_p(const char * name)
 /* returns the allocated nth path in colon-separated path list.
  */
 static string
-nth_path(const char *path_list, int n)
+nth_path(const string path_list, int n)
 {
     int len=0,i;
     char *result;
@@ -330,7 +330,7 @@ nth_path(const char *path_list, int n)
 }
 
 static char *
-relative_name_if_necessary(const char *name)
+relative_name_if_necessary(const string name)
 {
     if (name[0]=='/' || name[0]=='.') return strdup(name);
     else return strdup(concatenate("./", name, 0));
