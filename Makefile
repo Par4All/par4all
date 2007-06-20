@@ -12,9 +12,10 @@ clean:
 
 # subdirectories to consider
 TARGET	= $(shell grep '^[a-zA-Z]' defaults)
+VOPT	= -v
 
 validate:
-	PIPS_VALIDDIR=$(PWD) pips_validate -v -O RESULTS $(TARGET)
+	PIPS_VALIDDIR=$(PWD) pips_validate $(VOPT) -O RESULTS $(TARGET)
 
 accept:
 	manual_accept $(TARGET)
