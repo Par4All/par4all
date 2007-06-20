@@ -1,0 +1,3 @@
+* validation
+- use only relative filenames
+- should not rely on PIPS_ROOT/Validation to exists
