@@ -54,8 +54,8 @@ while [ "$1" ] ; do
   opt=$1
   case $opt in
       --) shift ; break ;; # end of option
-      -*) shift ;; # one option
-      *) break ;; # must be an argument...
+      -*) shift ;; # one option, processed by next "case"
+      *) break ;; # must be an argument, stop option processing...
   esac
 
   case $opt in
@@ -130,6 +130,7 @@ function validate_file()
   # dir='/some/path/to/directory'
   local dir=${full_name%/*} 
   [[ -d $dir ]] || usage 13 "no such 'dir' directory: $dir"
+  export PIPS_SRCPATH=$dir # set path for tpips?
 
   # updir='/some/path/to'
   local updir=${dir%/*}
