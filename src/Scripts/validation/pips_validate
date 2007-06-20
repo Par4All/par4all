@@ -158,6 +158,11 @@ function validate_file()
     verb 3 "$prefix.tpips method"
     $tpips $full_name.tpips > $out.out 2> $out.err || status=$?
 
+  elif [[ -r $full_name.tpips2 ]] ; then 
+    verb 3 "$prefix.tpips2 method (with stderr... bad idea)"
+    $tpips $full_name.tpips2 2>&1 | sed '/ing file /d' > $out.out 
+    status=$?
+
   elif [[ -r $dir/default_test ]] ; then
     verb 3 'default_test method'
     local test=$tdir/default_test_$$.sh
@@ -232,10 +237,10 @@ for obj ; do
   [[ $failed ]] && elist="$elist$obj "
 done
 echo -e "\n$errors error(s) on $(date)" >> $summary
-Delete -a # cleanup
+rm -rf *.database # cleanup
 
 # report on stdout and by mail
 msg='SUCCEEDED'
-[[ $errors ]] && msg="FAILED ($elist)"
+[[ $errors -gt 0 ]] && msg="FAILED ($elist)"
 echo -e "\nvalidation $msg\n" ; cat $summary
 [[ $mail ]] && ${PIPS_MAIL:-Mail} -s "validation $msg" $mail < $summary
