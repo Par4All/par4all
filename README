@@ -1,9 +1,18 @@
-PIPS validation, i.e. non regression tests
+PIPS validation, i.e. non regression tests.
 
-Example usage includes:
 
+Default validation or just for one directory:
+
+	sh> make validate
 	sh> make TARGET=Semantics validate
 
-	sh> make TARGET=Semantics accept
+
+Interactive acceptation of differences, and commit:
+
+	sh> make accept
+	sh> svn ci
+
+
+Full cleanup of generated files:
 
 	sh> make clean
