@@ -29,4 +29,5 @@ display PRINTED_FILE[F]
 display PRINTED_FILE[EXTERNAL07]
 
 close
+delete external07
 quit

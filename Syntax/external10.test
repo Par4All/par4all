@@ -20,5 +20,6 @@ display PRINTED_FILE[F]
 display PRINTED_FILE[EXTERNAL10]
 
 close
+delete external10
 quit
 EOF
