@@ -792,13 +792,12 @@ static bool check_fortran_syntax_before_pips(string file_name)
 
   user_log("Checking Fortran syntax of %s\n", file_name);
 
-  if (safe_system_no_abort(concatenate(
-				       pips_flint? pips_flint: DEFAULT_PIPS_FLINT, " ",
-				       file_name, 
-				       " -o ", file_name, SUFFIX,
-				       " ; test -f ", file_name, SUFFIX, 
-				       " && rm ", file_name, SUFFIX, NULL))) {
-
+  if (safe_system_no_abort
+      (concatenate(pips_flint? pips_flint: DEFAULT_PIPS_FLINT, " ",
+		   file_name, 
+		   " -o ", file_name, SUFFIX,
+		   " ; test -f ", file_name, SUFFIX, 
+		   " && rm ", file_name, SUFFIX, NULL))) {
     /* f77 is rather silent on errors... which is detected if no
      * file was output as expected.
      */
