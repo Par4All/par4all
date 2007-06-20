@@ -1,7 +1,7 @@
 #! /bin/bash
 # $Id$
 
-# defaults
+# DEFAULTS
 # where is the validation
 vdir=${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}
 
@@ -26,6 +26,7 @@ function usage()
     "  -v: be verbose (repeat for more verbosity)\n" \
     "  -p pips: use this 'pips' executable, default $pips\n" \
     "  -t tpips: use this 'tpips' executable, default $tpips\n" \
+    "  -m email: send mails?\n" \
     "  -T dir: temporary directory, default '/tmp'\n" \
     "  -V dir: validation directory, default '$vdir'\n" \
     "  -R dir: running directory, default '.'\n" \
@@ -48,16 +49,13 @@ function verb()
 [[ $PIPS_ROOT ]] || usage 1 'PIPS_ROOT must be defined'
 [[ -d $PIPS_ROOT ]] || usage 2 "no root directory: $PIPS_ROOT"
 
-mail=
-
 # get options
-while [ "$1" ]
-do
+while [ "$1" ] ; do
   opt=$1
   case $opt in
-      --) shift ; break ;;
-      -*) shift ;;
-      *) break ;;
+      --) shift ; break ;; # end of option
+      -*) shift ;; # one option
+      *) break ;; # must be an argument...
   esac
 
   case $opt in
@@ -94,10 +92,12 @@ mkdir $odir || usage 9 "error mkdir $odir"
 [[ $rdir != '.' ]] && pushd $rdir
 
 # start summary
-summary=$odir/summary
+summary=$odir/SUMMARY
 
 echo "validation for $@
 in $vdir
+for $PIPS_ARCH architecture
+output in $odir
 with pips=$pips
 and tpips=$tpips
 running in $rdir
@@ -105,8 +105,7 @@ on $(date)
 " >> $summary
 
 # set default directories if necessary
-if [[ ! $@ ]]
-then
+if [[ ! $@ ]] ; then
   [[ -r $vdir/defaults ]] || usage 10 "cannot read $vdir/defaults"
   set - $(cat $vdir/defaults | grep -v '#')
 fi
@@ -150,54 +149,53 @@ function validate_file()
   local status
 
   if [[ -r $full_name.test ]] ; then
-      # *.test
-      verb 3 "$prefix.test method"
-      # ??? what about using default_test substitution?!
-      $full_name.test > $out.out 2> $out.err
-      status=$?
+    verb 3 "$prefix.test method"
+    # ??? what about using default_test substitution?!
+    $full_name.test > $out.out 2> $out.err
+    status=$?
 
   elif [[ -r $full_name.tpips ]] ; then 
-      # *.tpips
-      verb 3 "$prefix.tpips method"
-      $tpips $full_name.tpips > $out.out 2> $out.err
-      status=$?
+    verb 3 "$prefix.tpips method"
+    $tpips $full_name.tpips > $out.out 2> $out.err
+    status=$?
 
   elif [[ -r $dir/default_test ]] ; then
-      # default_test
-      verb 3 'default_test method'
-      local test=$tdir/default_test_$$.sh
-      # perform some substitutions...
-      sed -e "s/tested_file/${file//\//\\/}/g" \
-	  -e "s/tested_dir/${dir//\//\\/}/g" \
-	  -e "s/tested_name/$name/g" \
-	  -e "s/TESTED_NAME/$upper/g" \
-	  < $dir/default_test > $test
-      chmod +x $test
-      $test > $out.out 2> $out.err
-      status=$?
-      rm -f $test
-      
+    verb 3 'default_test method'
+    local test=$tdir/default_test_$$.sh
+    # perform some substitutions...
+    sed -e "s/tested_file/${file//\//\\/}/g" \
+	-e "s/tested_dir/${dir//\//\\/}/g" \
+	-e "s/tested_name/$name/g" \
+	-e "s/TESTED_NAME/$upper/g" \
+	< $dir/default_test > $test
+    chmod +x $test
+    $test > $out.out 2> $out.err
+    status=$?
+    rm -f $test
+    
   elif [[ -r $dir/default_tpips ]] ; then
-      # default_tpips
-      verb 3 'default_tpips method'
-      FILE=$file WSPACE=$name \
-	  ${tpips} $dir/default_tpips > $out.out 2> $out.err
-      status=$?
-
+    verb 3 'default_tpips method'
+    FILE=$file WSPACE=$name \
+	${tpips} $dir/default_tpips > $out.out 2> $out.err
+    status=$?
+    
   else
-      verb 3 'default method'
-      usage 0 "default method not implemented yet ($file)"
-      status=1
+    verb 3 'default method: Init/Display/Delete'
+    {
+      Init -f $file -d $name
+      status=$?
+      while read module ; do
+	Display -m $module -w $name || status=$?
+      done < $name.database/modules
+      Delete $name
+    } > $out.out 2> $out.err
   fi
-  # cleanup
-  [[ -f core ]] && rm -f core
+  [[ -f core ]] && rm -f core # cleanup
 
-  if [[ $status -eq 0 ]]
-  then
+  if [[ $status -eq 0 ]] ; then
     # generate diff and clean if okay
     local file_resdir=$full_name.result
-    [[ -d $file_resdir ]] || \
-      usage 15 "no result directory: $file_resdir"
+    [[ -d $file_resdir ]] || usage 15 "no result directory: $file_resdir"
     
     local reference=$file_resdir/test.$PIPS_ARCH
     [[ -f $reference ]] || reference=$file_resdir/test
@@ -208,9 +206,10 @@ function validate_file()
       verb 2 "changed: $rel_file"
       echo "changed: $rel_file" >> $summary
       cp $out.out $file_resdir/out
+      status=1 # something was wrong
     else
       # ok!
-      verb 3 "succeeded: $rel_file"
+      verb 2 "succeeded: $rel_file"
       rm -f $out.*
     fi
   else
@@ -224,26 +223,20 @@ function validate_file()
 errors=0
 for obj in "$@"
 do
-  if [ -d $vdir/$obj ]
-  then
-      verb 1 "considering $obj directory"
-      for file in $vdir/$obj/*.[cfF]
-      do
-	validate_file $file || let errors++
-      done
-  elif [ -f $vdir/$obj ]
-  then
-      validate_file $vdir/$obj || let errors++
+  if [ -d $vdir/$obj ] ; then
+    verb 1 "considering $obj directory"
+    for file in $vdir/$obj/*.[cfF] ; do
+      validate_file $file || let errors++
+    done
+  elif [ -f $vdir/$obj ] ; then
+    validate_file $vdir/$obj || let errors++
   else
-      usage 11 "unexpected object: $obj"
+    usage 11 "unexpected object: $obj"
   fi
 done
 
-echo "
-$errors errors
-on $(date)" >> $summary
+echo -e "\n$errors error(s) on $(date)" >> $summary
+Delete -a # cleanup
 
-# cleanup databases?
-Delete -a
-
-[[ $mail ]] && verb 0 "mail not implemented yet"
+# summary email if required
+[[ $mail ]] && ${PIPS_MAIL:-Mail} -s "validation summary" $mail < $summary
