@@ -1,8 +1,6 @@
 delete alias
-create alias ${PIPS_ROOT}/Validation/Syntax/alias.f
+create alias alias.f
 display PRINTED_FILE 
 close
 delete alias
 quit
-
-

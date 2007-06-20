@@ -1,11 +1,8 @@
 delete array01
-create array01 ${PIPS_ROOT}/Validation/Syntax/array01.f
-
+create array01 array01.f
 # Make sure the array section is not parsed
-
 module ARRAY01
 display PRINTED_FILE[ARRAY01]
 close
 delete array01
 quit
-

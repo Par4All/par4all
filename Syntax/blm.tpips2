@@ -5,20 +5,18 @@
 delete blm
 
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
-create blm ${PIPS_ROOT}/Validation/Syntax/blm.f
-display PRINTED_FILE(OVL)
-quit
-display PRINTED_FILE(BLM)
+create blm blm.f
+display PRINTED_FILE[OVL]
+display PRINTED_FILE[BLM]
 close
 
 delete blm
 
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
-create blm ${PIPS_ROOT}/Validation/Syntax/blm.f
-display PRINTED_FILE(BLM)
-display PRINTED_FILE(OVL)
+create blm blm.f
+display PRINTED_FILE[BLM]
+display PRINTED_FILE[OVL]
 close
 
-# delete blm
+delete blm
 quit
-

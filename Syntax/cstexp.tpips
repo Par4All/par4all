@@ -1,16 +1,7 @@
-#!/bin/sh
-
-tpips=${tpips_version:-tpips}
-
-# Initialization:
-# rm -f cstexp.result/test
-# tpips >cstexp.result/test <<EOF
-
-$tpips <<EOF
 # MAX0 and MIN0 should be accepted in PARAMETER constant expressions
 
 delete cstexp
-create cstexp $PIPS_VALIDDIR/Syntax/cstexp.f
+create cstexp cstexp.f
 module cstexp
 display PRINTED_FILE
 activate PRINT_CODE_PRECONDITIONS
@@ -18,5 +9,3 @@ display PRINTED_FILE
 close
 delete cstexp
 quit
-EOF
-
