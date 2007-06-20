@@ -228,13 +228,13 @@ for obj ; do
   else
     usage 11 "unexpected object: $obj"
   fi
-  [[ $failed ]] && elist="$elist $obj"
+  [[ $failed ]] && elist="$elist$obj "
 done
 echo -e "\n$errors error(s) on $(date)" >> $summary
 Delete -a # cleanup
 
 # report on stdout and by mail
 msg='SUCCEEDED'
-[[ $errors ]] && msg='FAILED'
-echo -e "validation $msg$elist\n" ; cat $summary
-[[ $mail ]] && ${PIPS_MAIL:-Mail} -s "validation $msg$elist" $mail < $summary
+[[ $errors ]] && msg="FAILED ($elist)"
+echo -e "\nvalidation $msg\n" ; cat $summary
+[[ $mail ]] && ${PIPS_MAIL:-Mail} -s "validation $msg" $mail < $summary
