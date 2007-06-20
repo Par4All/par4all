@@ -29,7 +29,7 @@
 \end{tabular}
 }
 
-\date{August 1996 - April 2006}
+\date{August 1996 - June 2007}
 
 \renewcommand{\indexname}{Index}
 \makeindex
@@ -455,44 +455,61 @@ sources.
 Other architecture independent tools and files used for \emph{developing}
 pips (as opposed to \emph{running} it).
 
+It is best \textbf{not} the following validation scripts directly, 
+but rather to rely on the \texttt{Makefile} in the validation directory, 
+with very convenient targets including \texttt{validate accept clean}. 
+Using this approach does not require the validation directory to be under 
+\texttt{\$PIPS\_ROOT}.
+
 \begin{description}      
-\item[pips\_validate]: \index{Validate} Non-regression tests; see ?!?;
+\item[pips\_validate]: \index{Validate} Non-regression tests;
   
-  The arguments are names of subdirectories in
-  \texttt{\$PIPS\_ROOT/Validation}. 
-  See \texttt{Validate -h} for some help and a list of options.
+  The arguments are names of subdirectories in 
+  \texttt{\$PIPS\_ROOT/Validation} or source files within these directories.
+  See \texttt{pips\_validate -h} for help and a list of options.
   
-  Tests are organized on a library basis in \texttt{Validation}
-  while bugs are reported in the same way in \texttt{Bugs}.  Bugs
-  and non-regression tests are characterized by one or more Fortran
-  programs which either core dump (for bugs) or must have a known result
-  (tests).
+  Tests are organized more or less on a library basis in \texttt{Validation}.
+  Non-regression tests are characterized by one or more source
+  programs which must have a known result.
       
   Set \texttt{PIPSDBM\_DEBUG\_LEVEL} to 5 to check data structures when
   they are stored and to 9 to check them when they are delivered; some
   data structures are not checked, among them, all that contain
   external types;
   
-  For each source file found in a directory, the scripts looks for a
-  corresponding \texttt{.test} file, and executes it. If none is found, it
-  looks for a \texttt{.tpips} file which is executed as a tpips script.
-  If none is found, it looks for a \texttt{default\_test} file as a template
-  for a \texttt{.test} file, performs some substitutions
-  (\texttt{tested\_file} and \texttt{TESTED\_FILE} are substituted by the file
-  name prefix in lower or upper case) and executes the generated
-  test file. Otherwise it looks for a \texttt{default\_tpips} file and runs
-  it with tpips. The environment variables \texttt{FILE} and
-  \texttt{WSPACE} contain the full-path file name and the file name prefix.
-  Finally if none of these cases apply, the scripts parallelize
-  all modules.
+  The validation is performed for each source file found in a directory.
+  The scripts looks for  validation scripts in the following order:
+  \begin{enumerate}
+  \item a corresponding. \texttt{.test} file, and executes it.
+  \item a corresponding \texttt{.tpips} file which is executed as a 
+    tpips script.
+  \item a \texttt{default\_test} file as a template for a \texttt{.test} file.
 
-  For maintenance purposes, the \texttt{default\_file} approach is the
-  best (only one source file to maintain for all the sources of a
+    First it performs some substitutions
+    (\texttt{tested\_file}, \texttt{tested\_dir}, \texttt{tested\_name}
+    and \texttt{TESTED\_NAME} are substituted by the full file name,
+    the validation directory, the name prefix in lower or upper)
+    and then it executes the generated test file.
+  \item a \texttt{default\_tpips} file and runs it with tpips. 
+
+    The environment variables \texttt{FILE} and \texttt{WSPACE} contain 
+    the full-path file name and the file name prefix.
+
+  \item if none of these cases apply, the scripts parallelize all modules.
+  \end{enumerate}
+  
+  For maintenance purposes, the \texttt{default\_tpips} approach is the
+  best choice (only one source file to maintain for all the sources of a
   validation directory). However, this can be used only if the very same
   test is to be applied. As a second choice, the \texttt{.tpips} script 
-  is encouraged. It is very important not to validate stderr output and 
-  pips with some level of debugging on, because these outputs are not very
-  stable from one architecture to another.
+  is encouraged. It is very important not to validate \texttt{stderr} output 
+  and pips with some level of debugging on, because these outputs are not 
+  very stable from one architecture to another.
+
+\item[manual\_accept] \index{Validate} interactive script to accept
+  new validation results. Then commit these changes to the validation
+  repository, if and only if the corresponding pips sources are already 
+  committed!
 \end{description}
 
 %%\begin{itemize}
@@ -512,7 +529,6 @@ pips (as opposed to \emph{running} it).
 %%\item there many other things in this directory; volunteers to write their
 %%  documentation here are welcome!
 %%\end{itemize}
-    
 
 \subsubsection{include}
 
