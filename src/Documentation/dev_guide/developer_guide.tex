@@ -478,11 +478,27 @@ Using this approach does not require the validation directory to be under
   external types;
   
   The validation is performed for each source file found in a directory.
+  These validation scripts \textbf{must not} rely on absolute path,
+  otherwise moving the validation around is impossible. 
+  %%
+  If you really need to rely on the directory containing the scripts, 
+  use the \texttt{\$\{VDIR:-.\}} environment variable with a default to
+  the current directory (well, I'm not that sure\ldots).
+
   The scripts looks for  validation scripts in the following order:
   \begin{enumerate}
   \item a corresponding. \texttt{.test} file, and executes it.
+
   \item a corresponding \texttt{.tpips} file which is executed as a 
     tpips script.
+
+  \item a corresponding \texttt{.tpips2} file which is executed as a 
+    tpips script, with the error stream redirect. 
+
+    Validating the error stream is a \textbf{very bad idea} as it leads
+    to never ending regression variations. It is even worth when the
+    output comes from external tools such as compilers error output.
+    
   \item a \texttt{default\_test} file as a template for a \texttt{.test} file.
 
     First it performs some substitutions
@@ -490,6 +506,7 @@ Using this approach does not require the validation directory to be under
     and \texttt{TESTED\_NAME} are substituted by the full file name,
     the validation directory, the name prefix in lower or upper)
     and then it executes the generated test file.
+
   \item a \texttt{default\_tpips} file and runs it with tpips. 
 
     The environment variables \texttt{FILE} and \texttt{WSPACE} contain 
