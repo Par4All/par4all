@@ -29,10 +29,10 @@ F.tex =	ri.tex \
 	message.tex \
 	text.tex \
 	hpf.tex \
-	sac_private.tex
+	sac_private.tex \
+	ri_C.tex
 
-SOURCES = $(F.tex) unstructured.idraw newgen_domain.sty \
-	ri_C.tex optimizer.tex
+SOURCES = $(F.tex) unstructured.idraw newgen_domain.sty optimizer.tex
 
 F.newgen	= $(F.tex:%.tex=%.newgen)
 F.h		= $(F.newgen:%.newgen=%.h)
