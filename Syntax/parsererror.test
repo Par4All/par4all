@@ -5,7 +5,6 @@
 # second module
 
 tpips=${tpips_version:-tpips}
-PIPS_VALIDDIR=${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}
 
 # Initialization:
 # rm -f parsererror.result/test

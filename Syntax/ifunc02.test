@@ -3,7 +3,6 @@
 # Please, detect hexadecimal constants at parsing
 
 tpips=${tpips_version:-tpips}
-PIPS_VALIDDIR=${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}
 
 #
 # Conflict between declarations
