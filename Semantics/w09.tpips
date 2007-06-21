@@ -1,5 +1,5 @@
 delete w09
-create w09 ${PIPS_ROOT}/Validation/Semantics/w09.f
+create w09 w09.f
 
 setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 

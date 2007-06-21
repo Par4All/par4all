@@ -1,6 +1,6 @@
 delete foo
 # create foo Tests/unstructured.f
-create foo ${PIPS_ROOT}/Validation/Semantics/unstruc18.f
+create foo unstruc18.f
 
 setenv SEMANTICS_DEBUG_LEVEL "8"
 activate TRANSFORMERS_INTER_FULL

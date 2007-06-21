@@ -1,5 +1,5 @@
 delete suppress01
-create suppress01 ${PIPS_ROOT}/Validation/Semantics/suppress01.f
+create suppress01 suppress01.f
 
 setproperty SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES TRUE
 setproperty SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES TRUE

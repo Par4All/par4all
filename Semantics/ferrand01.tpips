@@ -1,5 +1,5 @@
 delete ferrand01
-create ferrand01 ${PIPS_ROOT}/Validation/Semantics/ferrand01.f
+create ferrand01 ferrand01.f
 module FERRAND01
 activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE[FERRAND01]

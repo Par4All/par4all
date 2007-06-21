@@ -1,8 +1,0 @@
-#!/bin/sh
-Init -d -f $PIPS_ROOT/Validation/Semantics/choles.f choles >&2
-Perform -v -m choles priv >&2
-Select rsdg >&2
-Display
-exit_code=$?
-Delete choles >&2
-exit $exit_code

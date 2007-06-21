@@ -1,5 +1,5 @@
 delete four5
-create four5 ${PIPS_ROOT}/Validation/Semantics/four5.f
+create four5 four5.f
 
 shell echo "--- Preconditions for module FOUR5"
 

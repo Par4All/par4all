@@ -1,5 +1,5 @@
 # delete testerror
-create testerror ${PIPS_ROOT}/Validation/Semantics/testerror.f
+create testerror testerror.f
 activate PRINT_CODE_TRANSFORMERS
 activate TRANSFORMERS_INTER_FAST
 activate PRECONDITIONS_INTER_FAST

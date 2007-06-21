@@ -280,4 +280,3 @@ C     declared length
  Leading blanks are not ignored
  Trailing blanks are ignored when concatenating
  hello     hello     world     hello     world     hello     world     
-

@@ -1,5 +1,5 @@
 delete trusted_ref01
-create trusted_ref01 ${PIPS_ROOT}/Validation/Semantics/trusted_ref01.f
+create trusted_ref01 trusted_ref01.f
 module TRUSTED_REF01
 activate PRECONDITIONS_INTER_FULL
 activate TRANSFORMERS_INTER_FULL

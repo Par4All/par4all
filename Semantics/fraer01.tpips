@@ -1,5 +1,5 @@
 delete fraer01
-create fraer01 ${PIPS_ROOT}/Validation/Semantics/fraer01.f
+create fraer01 fraer01.f
 
 module FRAER01
 

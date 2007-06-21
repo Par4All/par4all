@@ -1,0 +1,10 @@
+# Check that preconditions are properly ordered
+delete order3
+setproperty PRETTYPRINT_BLOCK_IF_ONLY=TRUE
+create order3 order3.f
+module order3
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+close
+delete order3
+quit

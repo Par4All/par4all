@@ -1,5 +1,5 @@
 delete w10
-create w10 ${PIPS_ROOT}/Validation/Semantics/w10.f
+create w10 w10.f
 
 setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 

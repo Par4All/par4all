@@ -1,5 +1,5 @@
 delete loop02
-create loop02 ${PIPS_ROOT}/Validation/Semantics/loop02.f
+create loop02 loop02.f
 
 activate TRANSFORMERS_INTER_FULL
 

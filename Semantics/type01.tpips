@@ -1,5 +1,5 @@
 delete type01
-create type01 ${PIPS_ROOT}/Validation/Semantics/type01.f
+create type01 type01.f
 module TYPE01
 
 setproperty SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES TRUE

@@ -1,5 +1,5 @@
 delete four1
-create four1 ${PIPS_ROOT}/Validation/Semantics/four1.f
+create four1 four1.f
 
 shell echo "--- Preconditions for module FOUR1"
 

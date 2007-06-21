@@ -1,5 +1,5 @@
 delete non_linear10
-create non_linear10 ${PIPS_ROOT}/Validation/Semantics/non_linear10.f
+create non_linear10 non_linear10.f
 
 # Because array declarations are poor, some loops become full of array
 # overflow exceptions. Hence, unfeasible transformers are many.

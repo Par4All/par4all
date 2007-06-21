@@ -1,5 +1,5 @@
 open non_linear12
-# create non_linear12 ${PIPS_ROOT}/Validation/Semantics/non_linear12.f
+# create non_linear12 non_linear12.f
 # create non_linear12 Tests/non_linear12.f
 
 # setenv SEMANTICS_DEBUG_LEVEL 8

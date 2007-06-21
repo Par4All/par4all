@@ -1,5 +1,5 @@
 delete total12
-create total12 ${PIPS_ROOT}/Validation/Semantics/total12.f
+create total12 total12.f
 
 setproperty SEMANTICS_TRUST_ARRAY_REFERENCES TRUE
 

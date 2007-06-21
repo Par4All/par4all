@@ -2,7 +2,7 @@
 
 delete data02
 
-create data02 ${PIPS_ROOT}/Validation/Semantics/data02.f
+create data02 data02.f
 activate TRANSFORMERS_INTER_FAST
 activate PRECONDITIONS_INTER_FAST
 activate PRINT_CODE_PRECONDITIONS

@@ -1,5 +1,5 @@
 delete inegfloat02
-create inegfloat02 ${PIPS_ROOT}/Validation/Semantics/inegfloat02.f
+create inegfloat02 inegfloat02.f
 
 setproperty SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES TRUE
 setproperty SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES TRUE

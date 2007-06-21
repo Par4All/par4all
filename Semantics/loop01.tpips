@@ -1,5 +1,5 @@
 delete loop01
-create loop01 ${PIPS_ROOT}/Validation/Semantics/loop01.f
+create loop01 loop01.f
 
 # setenv SEMANTICS_DEBUG_LEVEL 8
 

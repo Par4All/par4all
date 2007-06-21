@@ -1,17 +1,13 @@
 #!/bin/sh
 
-echo "PRETTYPRINT_BLOCK_IF_ONLY TRUE" >properties.rc
+echo "PRETTYPRINT_BLOCK_IF_ONLY TRUE" > properties.rc
 if Pips -f tested_file -w tested_name -m TESTED_NAME \
 	-s pcinterfull -s tfinterfull \
 	-s prcp -b PF >&2
 then
 	echo "--- Preconditions for TESTED_NAME"
-	if Display -l prec
-	then
-	    exit_status=0
-	else
-	    exit_status=1
-	fi
+	Display -l prec
+	exit_status=$?
 else
 	exit_status=1
 fi

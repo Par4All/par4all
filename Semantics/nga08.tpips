@@ -1,5 +1,5 @@
 delete nga08
-create nga08 ${PIPS_ROOT}/Validation/Semantics/nga08.f
+create nga08 nga08.f
 
 activate TRANSFORMERS_INTER_FULL
 

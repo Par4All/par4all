@@ -101,4 +101,3 @@ C (0,15)
       PRINT *, MX                                                       0014
 C     END BLOCK
       END
-

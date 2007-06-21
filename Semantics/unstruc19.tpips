@@ -2,7 +2,7 @@
 # the internal representation
 
 delete unstruc19
-create unstruc19 ${PIPS_ROOT}/Validation/Semantics/unstruc19.f
+create unstruc19 unstruc19.f
 
 # display PRINTED_FILE[UNSTRUC19]
 

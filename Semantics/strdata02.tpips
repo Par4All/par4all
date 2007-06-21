@@ -1,5 +1,5 @@
 delete strdata02
-create strdata02 ${PIPS_ROOT}/Validation/Semantics/strdata02.f
+create strdata02 strdata02.f
 display PRINTED_FILE
 
 setproperty SEMANTICS_ANALYZE_SCALAR_STRING_VARIABLES TRUE

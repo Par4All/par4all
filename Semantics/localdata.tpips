@@ -1,5 +1,5 @@
 delete localdata
-create localdata ${PIPS_ROOT}/Validation/Semantics/localdata.f
+create localdata localdata.f
 
 echo -- intraprocedural transformers
 activate PRINT_CODE_TRANSFORMERS

@@ -1,5 +1,5 @@
 delete induc03
-create induc03 ${PIPS_ROOT}/Validation/Semantics/induc03.f
+create induc03 induc03.f
 
 activate TRANSFORMERS_INTER_FULL
 activate PRECONDITIONS_INTER_FULL

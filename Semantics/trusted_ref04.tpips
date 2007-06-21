@@ -1,5 +1,5 @@
 delete trusted_ref04
-create trusted_ref04 ${PIPS_ROOT}/Validation/Semantics/trusted_ref04.f
+create trusted_ref04 trusted_ref04.f
 
 # setenv SEMANTICS_DEBUG_LEVEL 8
 

@@ -1,5 +1,5 @@
 delete decl01
-create decl01 ${PIPS_ROOT}/Validation/Semantics/decl01.f
+create decl01 decl01.f
 
 setproperty SEMANTICS_TRUST_ARRAY_DECLARATIONS TRUE
 

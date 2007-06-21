@@ -1,5 +1,5 @@
 delete spice01
-create spice01 ${PIPS_ROOT}/Validation/Semantics/spice01.f
+create spice01 spice01.f
 module SPICE01
 activate TRANSFORMERS_INTER_FULL
 activate PRECONDITIONS_INTER_FULL

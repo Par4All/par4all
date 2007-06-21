@@ -1,9 +1,9 @@
 # echo 'initial exec'
-# shell ${PIPS_F77:-f77} ${PIPS_ROOT}/Validation/Semantics/chaine07.f && ./a.out
+# shell ${PIPS_F77:-f77} chaine07.f && ./a.out
 # shell rm a.out
 
 delete chaine07
-create chaine07 ${PIPS_ROOT}/Validation/Semantics/chaine07.f
+create chaine07 chaine07.f
 setproperty SEMANTICS_ANALYZE_SCALAR_STRING_VARIABLES TRUE
 
 # activate PRINT_CODE_TRANSFORMERS

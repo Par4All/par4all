@@ -1,0 +1,13 @@
+# Check that visible and invisible variables are
+# handled accordingly to their visibility
+
+delete dummy2
+create dummy2 dummy2.f
+activate TRANSFORMERS_INTER_FAST
+activate PRECONDITIONS_INTER_FAST
+module DUMMY2
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+close
+delete dummy2
+quit

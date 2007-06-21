@@ -1,5 +1,5 @@
 delete power02
-create power02 ${PIPS_ROOT}/Validation/Semantics/power02.f
+create power02 power02.f
 module POWER02
 
 # setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE

@@ -1,4 +1,6 @@
+
 Without explicit dead code elimination:
+
 
 C  P() {I==1}
 
@@ -11,7 +13,9 @@ C  P() {I==1}
       PRINT *, I                                                        0001
 
       END
+
 After dead code elimination:
+
 
 C  P() {I==1}
 

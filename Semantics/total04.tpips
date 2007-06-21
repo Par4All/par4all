@@ -1,6 +1,6 @@
 delete total04
-create total04 ${PIPS_ROOT}/Validation/Semantics/total04.f
-# create total04 ${PIPS_DEVEDIR}/Libs/semantics/Tests/total04.f
+create total04 total04.f
+# create total04 total04.f
 
 # setenv SEMANTICS_DEBUG_LEVEL 8
 

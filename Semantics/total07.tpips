@@ -1,6 +1,6 @@
 delete total07
-create total07 ${PIPS_ROOT}/Validation/Semantics/total07.f
-# create total07 ${PIPS_DEVEDIR}/Libs/semantics/Tests/total07.f
+create total07 total07.f
+# create total07 total07.f
 
 # setenv SEMANTICS_DEBUG_LEVEL 8
 

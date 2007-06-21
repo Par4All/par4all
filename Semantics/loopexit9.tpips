@@ -1,5 +1,5 @@
 delete loopexit9
-create loopexit9 ${PIPS_ROOT}/Validation/Semantics/loopexit9.f
+create loopexit9 loopexit9.f
 
 # Because array declarations are poor, some loops become full of array
 # overflow exceptions. Hence, unfeasible transformers are many.

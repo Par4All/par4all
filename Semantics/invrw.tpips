@@ -1,5 +1,5 @@
 delete invrw
-create invrw ${PIPS_ROOT}/Validation/Semantics/invrw.f
+create invrw invrw.f
 module invrw
 
 setproperty PRETTYPRINT_BLOCK_IF_ONLY=TRUE
@@ -29,7 +29,7 @@ display PRINTED_FILE
 close
 delete invrw
 
-create invrw ${PIPS_ROOT}/Validation/Semantics/invrw.f
+create invrw invrw.f
 module invrw
 
 setproperty PRETTYPRINT_BLOCK_IF_ONLY=TRUE

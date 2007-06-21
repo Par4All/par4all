@@ -1,5 +1,5 @@
 delete four2
-create four2 ${PIPS_ROOT}/Validation/Semantics/four2.f
+create four2 four2.f
 
 # setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 setproperty PRETTYPRINT_BLOCKS TRUE

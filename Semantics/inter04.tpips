@@ -1,5 +1,5 @@
 delete inter04
-create inter04 ${PIPS_ROOT}/Validation/Semantics/inter04.f
+create inter04 inter04.f
 
 setproperty SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES TRUE
 setproperty SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES TRUE

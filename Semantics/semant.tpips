@@ -1,5 +1,5 @@
 delete semant
-create semant ${PIPS_ROOT}/Validation/Semantics/semant.f
+create semant semant.f
 setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
 
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE

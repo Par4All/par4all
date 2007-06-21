@@ -1,5 +1,5 @@
 delete inimod3
-create inimod3 ${PIPS_ROOT}/Validation/Semantics/inimod3.f
+create inimod3 inimod3.f
 
 # setenv SEMANTICS_DEBUG_LEVEL 8
 

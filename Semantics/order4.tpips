@@ -1,0 +1,9 @@
+# Check that preconditions are properly ordered
+delete order4
+create order4 order4.f
+module order4
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+close
+delete order4
+quit

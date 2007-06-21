@@ -1,5 +1,5 @@
 delete side_effect02
-create side_effect02 ${PIPS_ROOT}/Validation/Semantics/side_effect02.f
+create side_effect02 side_effect02.f
 
 setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
 

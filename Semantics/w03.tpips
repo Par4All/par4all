@@ -1,5 +1,5 @@
 delete w03
-create w03 ${PIPS_ROOT}/Validation/Semantics/w03.f
+create w03 w03.f
 
 setproperty PRETTYPRINT_BLOCKS TRUE
 setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE

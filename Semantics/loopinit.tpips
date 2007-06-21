@@ -1,6 +1,6 @@
 
 delete loopinit
-create loopinit ${PIPS_ROOT}/Validation/Semantics/loopinit.f
+create loopinit loopinit.f
 
 activate TRANSFORMERS_INTER_FAST
 activate PRECONDITIONS_INTER_FAST

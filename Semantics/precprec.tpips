@@ -6,7 +6,7 @@
 # by Guillaume Oget.
 
 delete precprec
-create precprec ${PIPS_ROOT}/Validation/Semantics/precprec.f
+create precprec precprec.f
 module PRECPREC
 activate TRANSFORMERS_INTER_FULL
 activate PRECONDITIONS_INTER_FULL

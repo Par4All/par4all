@@ -1,5 +1,5 @@
 delete w11
-create w11 ${PIPS_ROOT}/Validation/Semantics/w11.f
+create w11 w11.f
 
 setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 

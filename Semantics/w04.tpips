@@ -1,5 +1,5 @@
 delete w04
-create w04 ${PIPS_ROOT}/Validation/Semantics/w04.f
+create w04 w04.f
 
 setproperty PRETTYPRINT_BLOCKS TRUE
 setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE

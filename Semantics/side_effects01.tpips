@@ -1,5 +1,5 @@
 delete side_effects01
-create side_effects01 ${PIPS_ROOT}/Validation/Semantics/side_effects01.f
+create side_effects01 side_effects01.f
 
 # setproperty SEMANTICS_ANALYZE_SCALAR_STRING_VARIABLES TRUE
 # setproperty SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES TRUE

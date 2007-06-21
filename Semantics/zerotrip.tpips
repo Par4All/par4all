@@ -1,0 +1,20 @@
+# Check that preconditions are properly ordered
+
+delete zerotrip
+create zerotrip zerotrip.f
+module ZEROTRIP
+
+setproperty PRETTYPRINT_BLOCK_IF_ONLY=TRUE
+
+# setproperty SEMANTICS_PATTERN_MATCHING_FIX_POINT TRUE
+setproperty SEMANTICS_FIX_POINT_OPERATOR "pattern"
+
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+close
+delete zerotrip
+quit

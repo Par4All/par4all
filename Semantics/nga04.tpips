@@ -1,5 +1,5 @@
 delete nga04
-create nga04 ${PIPS_ROOT}/Validation/Semantics/nga04.f
+create nga04 nga04.f
 module NGA04
 
 # activate TRANSFORMERS_INTRA_FULL

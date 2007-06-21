@@ -1,5 +1,5 @@
 delete power01
-create power01 ${PIPS_ROOT}/Validation/Semantics/power01.f
+create power01 power01.f
 module POWER01
 activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE[POWER01]

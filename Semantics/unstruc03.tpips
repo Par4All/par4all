@@ -1,5 +1,5 @@
 delete unstruc03
-create unstruc03 ${PIPS_ROOT}/Validation/Semantics/unstruc03.f
+create unstruc03 unstruc03.f
 module UNSTRUC03
 
 # This property is useless in this case

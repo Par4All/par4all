@@ -1,5 +1,5 @@
 delete w14
-create w14 ${PIPS_ROOT}/Validation/Semantics/w14.f
+create w14 w14.f
 
 setproperty SEMANTICS_ANALYZE_SCALAR_BOOLEAN_VARIABLES TRUE
 

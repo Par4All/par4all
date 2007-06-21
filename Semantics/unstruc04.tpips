@@ -1,5 +1,5 @@
 delete unstruc04
-create unstruc04 ${PIPS_ROOT}/Validation/Semantics/unstruc04.f
+create unstruc04 unstruc04.f
 module UNSTRUC04
 
 # More precise transformers are obtained with this option

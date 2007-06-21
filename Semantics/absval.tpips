@@ -1,5 +1,5 @@
 delete absval
-create absval ${PIPS_ROOT}/Validation/Semantics/absval.f
+create absval absval.f
 activate PRINT_CODE_PRECONDITIONS
 module ABSVAL
 display PRINTED_FILE

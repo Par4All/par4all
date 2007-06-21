@@ -1,5 +1,5 @@
 delete hind
-create hind ${PIPS_ROOT}/Validation/Semantics/hind.f
+create hind hind.f
 
 #setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 # setproperty PRETTYPRINT_BLOCKS TRUE

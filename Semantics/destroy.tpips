@@ -1,11 +1,10 @@
+delete destroy
 
 shell echo
 shell echo First version: no array or real interference in module BAR
 shell echo
 
-create destroy ${PIPS_ROOT}/Validation/Semantics/destroy.f
-
-
+create destroy destroy.f
 activate TRANSFORMERS_INTER_FAST
 activate PRECONDITIONS_INTER_FAST
 
@@ -16,13 +15,14 @@ display PRINTED_FILE
 close
 delete destroy
 
+delete destroy2
 
 shell echo
 shell echo Second version: array and real variable interference in module BAR
 shell echo
 
 shell rm -f destroy2.f
-shell sed s/cfirst// ${PIPS_ROOT}/Validation/Semantics/destroy.f >destroy2.f
+shell sed s/cfirst// ${VDIR:-.}/destroy.f >destroy2.f
 
 create destroy2 destroy2.f
 
@@ -35,8 +35,5 @@ display PRINTED_FILE
 
 close
 delete destroy2
-
-
+shell rm -f destroy2.f
 quit
-
-

@@ -1,5 +1,5 @@
 delete w08
-create w08 ${PIPS_ROOT}/Validation/Semantics/w08.f
+create w08 w08.f
 
 setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 

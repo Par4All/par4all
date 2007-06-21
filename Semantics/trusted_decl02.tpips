@@ -1,5 +1,5 @@
 delete trusted_decl02
-create trusted_decl02 ${PIPS_ROOT}/Validation/Semantics/trusted_decl02.f
+create trusted_decl02 trusted_decl02.f
 
 activate TRANSFORMERS_INTER_FULL
 activate PRECONDITIONS_INTER_FULL

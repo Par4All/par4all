@@ -1,5 +1,5 @@
 delete non_linear14
-create non_linear14 ${PIPS_ROOT}/Validation/Semantics/non_linear14.f
+create non_linear14 non_linear14.f
 
 # setenv SEMANTICS_DEBUG_LEVEL 8
 

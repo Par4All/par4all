@@ -1,5 +1,5 @@
 delete type19
-create type19 ${PIPS_ROOT}/Validation/Semantics/type19.f
+create type19 type19.f
 
 # setproperty SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES TRUE
 # setproperty SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES TRUE

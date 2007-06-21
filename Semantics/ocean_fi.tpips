@@ -1,5 +1,5 @@
 delete ocean_fi
-create ocean_fi ${PIPS_ROOT}/Validation/Semantics/ocean_fi.f
+create ocean_fi ocean_fi.f
 setproperty PRETTYPRINT_BLOCK_IF_ONLY=TRUE
 setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 activate TRANSFORMERS_INTER_FULL

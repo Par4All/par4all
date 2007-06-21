@@ -1,7 +1,7 @@
 # Check that preconditions are properly computed with user function calls
 
 delete funcside5
-create funcside5 ${PIPS_ROOT}/Validation/Semantics/funcside5.f
+create funcside5 funcside5.f
 # create funcside5 funcside5.f
 module funcside5
 activate TRANSFORMERS_INTER_FULL

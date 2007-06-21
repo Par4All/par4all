@@ -1,5 +1,5 @@
 # delete necrir
-create necrir ${PIPS_ROOT}/Validation/Semantics/necrir.f
+create necrir necrir.f
 activate PRINT_CODE_PRECONDITIONS
 activate TRANSFORMERS_INTER_FAST
 activate PRECONDITIONS_INTER_FAST

@@ -1,5 +1,5 @@
 delete inter03
-create inter03 ${PIPS_ROOT}/Validation/Semantics/inter03.f
+create inter03 inter03.f
 
 setproperty SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES TRUE
 setproperty SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES TRUE

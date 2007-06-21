@@ -1,0 +1,9 @@
+delete choles
+create choles choles.f
+apply PRIVATIZE_MODULE[CHOLES]
+activate RICE_SEMANTICS_DEPENDENCE_GRAPH
+activate PRINT_PARALLELIZED77_CODE
+display PARALLELPRINTED_FILE[CHOLES]
+close
+delete choles
+quit

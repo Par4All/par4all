@@ -1,5 +1,5 @@
 delete unstruc17
-create unstruc17 ${PIPS_ROOT}/Validation/Semantics/unstruc17.f
+create unstruc17 unstruc17.f
 
 module UNSTRUC17
 

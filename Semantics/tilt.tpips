@@ -1,5 +1,5 @@
 delete tilt
-create tilt ${PIPS_ROOT}/Validation/Semantics/tilt.f
+create tilt tilt.f
 
 setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
 setproperty PRETTYPRINT_BLOCKS TRUE

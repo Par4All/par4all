@@ -1,5 +1,5 @@
 delete w07
-create w07 ${PIPS_ROOT}/Validation/Semantics/w07.f
+create w07 w07.f
 
 setproperty PRETTYPRINT_BLOCKS TRUE
 setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE

@@ -1,5 +1,5 @@
 delete type27
-create type27 ${PIPS_ROOT}/Validation/Semantics/type27.f
+create type27 type27.f
 
 setproperty SEMANTICS_ANALYZE_SCALAR_STRING_VARIABLES TRUE
 setproperty SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES TRUE

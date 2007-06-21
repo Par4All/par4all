@@ -1,7 +1,7 @@
 # FI: I do not see hwy it is useful...
 
 delete pointer02
-create pointer02 ${PIPS_ROOT}/Validation/Syntax/pointer02.f
+create pointer02 pointer02.f
 
 setproperty PREPROCESSOR_MISSING_FILE_HANDLING  "generate"
 

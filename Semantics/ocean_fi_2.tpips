@@ -1,5 +1,5 @@
 delete ocean_fi_2
-create ocean_fi_2 ${PIPS_ROOT}/Validation/Semantics/ocean_fi_2.f
+create ocean_fi_2 ocean_fi_2.f
 
 setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 setproperty SEMANTICS_FILTERED_PRECONDITIONS TRUE

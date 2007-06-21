@@ -1,5 +1,5 @@
 delete nga03
-create nga03 ${PIPS_ROOT}/Validation/Semantics/nga03.f
+create nga03 nga03.f
 activate TRANSFORMERS_INTRA_FULL
 # activate TRANSFORMERS_INTER_FULL
 # activate PRECONDITIONS_INTER_FULL

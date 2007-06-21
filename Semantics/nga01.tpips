@@ -1,5 +1,5 @@
 delete nga01
-create nga01 ${PIPS_ROOT}/Validation/Semantics/nga01.f
+create nga01 nga01.f
 
 activate TRANSFORMERS_INTER_FULL
 

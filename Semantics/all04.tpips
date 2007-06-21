@@ -5,7 +5,7 @@
 # by the main, and by foo3 which is called by foo2 which is never called.
 #
 delete all04
-create all04 ${PIPS_ROOT}/Validation/Semantics/all04.f
+create all04 all04.f
 activate TRANSFORMERS_INTER_FULL
 activate INTERPROCEDURAL_SUMMARY_PRECONDITION
 activate PRECONDITIONS_INTER_FULL

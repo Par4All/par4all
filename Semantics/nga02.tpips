@@ -1,5 +1,5 @@
 delete nga02
-create nga02 ${PIPS_ROOT}/Validation/Semantics/nga02.f
+create nga02 nga02.f
 module NGA02
 
 activate TRANSFORMERS_INTRA_FULL

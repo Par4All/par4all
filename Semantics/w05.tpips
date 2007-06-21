@@ -1,5 +1,5 @@
 delete w05
-create w05 ${PIPS_ROOT}/Validation/Semantics/w05.f
+create w05 w05.f
 
 setproperty PRETTYPRINT_BLOCKS TRUE
 setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE

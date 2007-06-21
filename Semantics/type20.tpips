@@ -1,9 +1,9 @@
 echo 'initial exec'
-shell ${PIPS_F77:-f77} ${PIPS_ROOT}/Validation/Semantics/type20.f && ./a.out
+shell ${PIPS_F77:-f77} ${VDIR:-.}/type20.f && ./a.out
 shell rm a.out
 
 delete type20
-create type20 ${PIPS_ROOT}/Validation/Semantics/type20.f
+create type20 type20.f
 setproperty SEMANTICS_ANALYZE_SCALAR_STRING_VARIABLES TRUE
 
 activate PRINT_CODE_TRANSFORMERS

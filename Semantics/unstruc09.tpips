@@ -1,5 +1,5 @@
 delete unstruc09
-create unstruc09 ${PIPS_ROOT}/Validation/Semantics/unstruc09.f
+create unstruc09 unstruc09.f
 module UNSTRUC09
 
 # No impact at all:

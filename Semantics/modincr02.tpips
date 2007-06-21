@@ -1,5 +1,5 @@
 delete modincr02
-create modincr02 ${PIPS_ROOT}/Validation/Semantics/modincr02.f
+create modincr02 modincr02.f
 
 setproperty SEMANTICS_TRUST_ARRAY_DECLARATIONS TRUE
 setproperty SEMANTICS_TRUST_ARRAY_REFERENCES TRUE

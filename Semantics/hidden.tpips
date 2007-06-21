@@ -1,5 +1,5 @@
 # delete hidden
-create hidden ${PIPS_ROOT}/Validation/Semantics/hidden.f
+create hidden hidden.f
 activate PRINT_CODE_TRANSFORMERS
 activate TRANSFORMERS_INTER_FAST
 activate PRECONDITIONS_INTER_FAST

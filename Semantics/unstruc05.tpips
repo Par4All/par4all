@@ -1,5 +1,5 @@
 delete unstruc05
-create unstruc05 ${PIPS_ROOT}/Validation/Semantics/unstruc05.f
+create unstruc05 unstruc05.f
 module UNSTRUC05
 
 # Bug visible when property is turned on: fixed (2 August 2005)

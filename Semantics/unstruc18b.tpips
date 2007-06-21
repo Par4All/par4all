@@ -1,6 +1,6 @@
 delete unstruc18b
 # create unstruc18b Tests/unstructured.f
-create unstruc18b ${PIPS_ROOT}/Validation/Semantics/unstruc18.f
+create unstruc18b unstruc18.f
 
 setenv SEMANTICS_DEBUG_LEVEL "8"
 activate TRANSFORMERS_INTER_FULL

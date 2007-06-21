@@ -1,5 +1,5 @@
 delete iabs01
-create iabs01 ${PIPS_ROOT}/Validation/Semantics/iabs01.f
+create iabs01 iabs01.f
 module IABS01
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[IABS01]

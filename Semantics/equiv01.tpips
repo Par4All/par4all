@@ -1,5 +1,5 @@
 delete equiv01
-create equiv01 ${PIPS_ROOT}/Validation/Semantics/equiv01.f
+create equiv01 equiv01.f
 module EQUIV01
 activate TRANSFORMERS_INTER_FULL
 activate PRECONDITIONS_INTER_FULL

@@ -1,5 +1,5 @@
 # delete minimu
-create minimu ${PIPS_ROOT}/Validation/Semantics/minimu.f
+create minimu minimu.f
 activate PRINT_CODE_PRECONDITIONS
 # activate TRANSFORMERS_INTER_FAST
 # activate PRECONDITIONS_INTER_FAST

@@ -1,4 +1,4 @@
---- Preconditions for module ANDNE
+--- Preconditions for ANDNE
 
 C  P() {}
 

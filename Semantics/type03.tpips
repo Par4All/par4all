@@ -1,5 +1,5 @@
 delete type03
-create type03 ${PIPS_ROOT}/Validation/Semantics/type03.f
+create type03 type03.f
 module TYPE03
 
 setproperty SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES TRUE

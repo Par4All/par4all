@@ -1,5 +1,5 @@
 delete loopshared01
-create loopshared01 ${PIPS_ROOT}/Validation/Semantics/loopshared01.f
+create loopshared01 loopshared01.f
 
 activate TRANSFORMERS_INTER_FULL
 activate PRECONDITIONS_INTER_FULL

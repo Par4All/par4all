@@ -1,5 +1,5 @@
 # delete callabsval
-# create callabsval ${PIPS_ROOT}/Validation/Semantics/callabsval.f
+# create callabsval callabsval.f
 open callabsval
 activate TRANSFORMERS_INTER_FAST
 activate PRECONDITIONS_INTER_FAST

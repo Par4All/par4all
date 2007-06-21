@@ -7,7 +7,7 @@ delete altret01
 #
 #############################################################################
 
-create altret01 ${PIPS_ROOT}/Validation/Semantics/altret01.f
+create altret01 altret01.f
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
@@ -15,7 +15,7 @@ setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "HRC"
 # setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
 setproperty PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS TRUE
 
-# shell f77 ${PIPS_ROOT}/Validation/Semantics/altret01.f
+# shell f77 altret01.f
 
 # echo
 # echo Execute initial code
@@ -74,7 +74,7 @@ delete altret01
 #######################################################################
 
 
-create altret01 ${PIPS_ROOT}/Validation/Semantics/altret01.f
+create altret01 altret01.f
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
@@ -82,7 +82,7 @@ setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "STOP"
 # setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
 setproperty PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS TRUE
 
-# shell f77 ${PIPS_ROOT}/Validation/Semantics/altret01.f
+# shell f77 altret01.f
 
 # echo
 # echo Execute initial code

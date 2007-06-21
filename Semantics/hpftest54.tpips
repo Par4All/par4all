@@ -2,7 +2,7 @@
 # when intraprocedural options are chosen
 
 delete hpftest54
-create hpftest54 ${PIPS_ROOT}/Validation/Semantics/hpftest54.f
+create hpftest54 hpftest54.f
 # create hpftest54 hpftest54.f
 module hpftest54
 # Use default options

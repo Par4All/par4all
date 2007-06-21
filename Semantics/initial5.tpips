@@ -1,5 +1,5 @@
 delete initial5
-create initial5 ${PIPS_ROOT}/Validation/Semantics/initial5.f
+create initial5 initial5.f
 
 echo 
 echo Source code for all modules, including block data modules

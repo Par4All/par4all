@@ -1,5 +1,5 @@
 # delete mouse2
-create mouse2 ${PIPS_ROOT}/Validation/Semantics/mouse2.f
+create mouse2 mouse2.f
 activate PRINT_CODE_PRECONDITIONS
 activate INTERPROCEDURAL_SUMMARY_PRECONDITION
 activate TRANSFORMERS_INTER_FAST

@@ -1,5 +1,5 @@
 delete fraer02
-create fraer02 ${PIPS_ROOT}/Validation/Semantics/fraer02.f
+create fraer02 fraer02.f
 module FRAER02
 
 setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE

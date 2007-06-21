@@ -1,5 +1,5 @@
 # delete cbl
-create cbl ${PIPS_ROOT}/Validation/Semantics/cbl.f
+create cbl cbl.f
 activate PRINT_CODE_PRECONDITIONS
 activate TRANSFORMERS_INTER_FAST
 activate PRECONDITIONS_INTER_FAST

@@ -1,5 +1,5 @@
 delete SPEC_swim
-create SPEC_swim ${PIPS_ROOT}/Validation/Semantics/SPEC_swim.f
+create SPEC_swim SPEC_swim.f
 
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty PRETTYPRINT_BLOCKS TRUE

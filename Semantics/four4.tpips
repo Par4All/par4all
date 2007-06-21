@@ -1,5 +1,5 @@
 delete four4
-create four4 ${PIPS_ROOT}/Validation/Semantics/four4.f
+create four4 four4.f
 
 #setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 setproperty PRETTYPRINT_BLOCKS TRUE

@@ -1,5 +1,5 @@
 delete w12
-create w12 ${PIPS_ROOT}/Validation/Semantics/w12.f
+create w12 w12.f
 
 setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 

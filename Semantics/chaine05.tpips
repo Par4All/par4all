@@ -1,9 +1,9 @@
 echo 'initial exec'
-shell ${PIPS_F77:-f77} ${PIPS_ROOT}/Validation/Semantics/chaine05.f && ./a.out
+shell ${PIPS_F77:-f77} ${VDIR:-.}/chaine05.f && ./a.out
 shell rm a.out
 
 delete chaine05
-create chaine05 ${PIPS_ROOT}/Validation/Semantics/chaine05.f
+create chaine05 chaine05.f
 setproperty SEMANTICS_ANALYZE_SCALAR_STRING_VARIABLES TRUE
 
 activate PRINT_CODE_TRANSFORMERS
@@ -27,4 +27,5 @@ shell ${PIPS_F77:-f77} chaine05.database/Src/chaine05.f && ./a.out
 shell rm a.out
 
 delete chaine05
+quit
 

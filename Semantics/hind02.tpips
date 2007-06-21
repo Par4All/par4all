@@ -1,5 +1,5 @@
 delete hind02
-create hind02 ${PIPS_ROOT}/Validation/Semantics/hind02.f
+create hind02 hind02.f
 activate TRANSFORMERS_INTER_FULL
 activate INTERPROCEDURAL_SUMMARY_PRECONDITION
 activate PRECONDITIONS_INTER_FULL

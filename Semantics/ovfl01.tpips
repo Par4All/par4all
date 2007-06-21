@@ -1,5 +1,5 @@
 delete ovfl01
-create ovfl01 ${PIPS_ROOT}/Validation/Semantics/ovfl01.f
+create ovfl01 ovfl01.f
 
 # setproperty SEMANTICS_ANALYZE_SCALAR_STRING_VARIABLES TRUE
 # setproperty SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES TRUE

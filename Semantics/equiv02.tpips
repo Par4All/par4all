@@ -1,5 +1,5 @@
 delete equiv02
-create equiv02 ${PIPS_ROOT}/Validation/Semantics/equiv02.f
+create equiv02 equiv02.f
 module EQUIV02
 
 setproperty SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES TRUE

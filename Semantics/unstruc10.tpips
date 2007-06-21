@@ -1,5 +1,5 @@
 delete unstruc10
-create unstruc10 ${PIPS_ROOT}/Validation/Semantics/unstruc10.f
+create unstruc10 unstruc10.f
 module UNSTRUC10
 
 # Add redundancy to the preconditions. Improves transformers, but still

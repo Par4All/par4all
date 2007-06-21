@@ -1,5 +1,5 @@
 delete sort01
-create sort01 ${PIPS_ROOT}/Validation/Semantics/sort01.f
+create sort01 sort01.f
 module SORT01
 
 setproperty SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES TRUE

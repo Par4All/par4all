@@ -1,5 +1,5 @@
 delete type08
-create type08 ${PIPS_ROOT}/Validation/Semantics/type08.f
+create type08 type08.f
 module TYPE08
 
 setproperty SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES TRUE

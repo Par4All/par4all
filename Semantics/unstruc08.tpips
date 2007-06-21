@@ -1,5 +1,5 @@
 delete unstruc08
-create unstruc08 ${PIPS_ROOT}/Validation/Semantics/unstruc08.f
+create unstruc08 unstruc08.f
 module UNSTRUC08
 
 # Impact on transformers only, no improvement on preconditions

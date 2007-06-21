@@ -1,7 +1,7 @@
 # Bug found by Corinne for pattern fix-point
 
 delete oavitel
-create oavitel ${PIPS_ROOT}/Validation/Semantics/oavitel.f
+create oavitel oavitel.f
 #setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 #setproperty SEMANTICS_FIX_POINT_OPERATOR "transfer"
 setproperty SEMANTICS_FIX_POINT_OPERATOR "pattern"

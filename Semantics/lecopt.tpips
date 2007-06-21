@@ -1,5 +1,5 @@
 delete lecopt
-create lecopt ${PIPS_ROOT}/Validation/Semantics/lecopt.f
+create lecopt lecopt.f
 
 setproperty SEMANTICS_ANALYZE_SCALAR_STRING_VARIABLES TRUE
 # setproperty SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES TRUE

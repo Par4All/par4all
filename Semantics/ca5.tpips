@@ -1,5 +1,5 @@
 delete ca5
-create ca5 ${PIPS_ROOT}/Validation/Semantics/ca5.f
+create ca5 ca5.f
 
 activate TRANSFORMERS_INTER_FULL
 activate INTERPROCEDURAL_SUMMARY_PRECONDITION

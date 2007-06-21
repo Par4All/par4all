@@ -1,0 +1,26 @@
+# Check that tests with no executed branch have no impact
+# display as much information as possible, within Fortran's limits
+setproperty PRETTYPRINT_BLOCK_IF_ONLY=TRUE
+
+delete cst_test1
+create cst_test1 cst_test1.f
+activate TRANSFORMERS_INTER_FAST
+activate PRECONDITIONS_INTER_FAST
+module CST_TEST1
+
+echo
+echo Transformers
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE
+
+echo
+echo Preconditions
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+close
+delete cst_test1
+quit

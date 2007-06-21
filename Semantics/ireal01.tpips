@@ -1,5 +1,5 @@
 delete ireal01
-create ireal01 ${PIPS_ROOT}/Validation/Semantics/ireal01.f
+create ireal01 ireal01.f
 module IREAL01
 
 activate PRECONDITIONS_INTER_FULL

@@ -1,0 +1,15 @@
+# Check that preconditions are properly computed with user function calls
+# The function called is improperly initialized and the old value
+# associated to the returned value must disappear. As a result, all
+# information about funcside2 also disappear.
+
+delete funcside2
+create funcside2 funcside2.f
+module funcside2
+activate TRANSFORMERS_INTER_FULL
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+close
+delete funcside2
+quit

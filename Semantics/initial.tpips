@@ -1,5 +1,5 @@
 delete initial
-create initial ${PIPS_ROOT}/Validation/Semantics/initial.f
+create initial initial.f
 display PRINTED_FILE[%ALL]
 activate PRINT_INITIAL_PRECONDITION
 display PRINTED_FILE[%ALL]

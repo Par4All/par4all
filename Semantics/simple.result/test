@@ -1,4 +1,4 @@
---- Preconditions for module SIMPLE
+--- Preconditions for SIMPLE
 
 C  P() {}
 

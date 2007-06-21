@@ -8,17 +8,16 @@ delete renpar6
 #
 # 1- Create the Workspace
 #
-create renpar6 ${PIPS_ROOT}/Validation/Semantics/renpar6.f
+create renpar6 renpar6.f
 
 ##########################################################################
 # select a specific fix-point operator to debug it                       #
 ##########################################################################
 setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 
-echo
-echo 1- Show RENPAR6
-echo
-
+#
+# 1- Show RENPAR6
+#
 # The purpose is to see that array WORK is only a temporary and can be 
 # privatized.
 # Notice that the value of K is unknown on entry to the I loop, and that
@@ -29,10 +28,9 @@ module RENPAR6
 activate PRINT_CODE
 display PRINTED_FILE
 
-echo
-echo 2- Show its transformers
-echo
-
+#
+# 2- Show its transformers
+#
 # We are interested in the sets of array elements that are referenced in each
 # iteration. However, since the value of K is not the same in the two written
 # references, we cannot summarize the write accesses if we do not know the 
@@ -48,10 +46,9 @@ activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE
 
 
-echo
-echo 3- Show its regions
-echo
-
+#
+# 3- Show its regions
+#
 #  This previous information is used to summarize the sets of elements that are 
 #  read or written by each program structure. In order to compute the summary
 #  for the I loop, we must merge the sets for the two J loops. Be careful that
@@ -67,10 +64,9 @@ activate PRINT_CODE_REGIONS
 display PRINTED_FILE
 
 
-echo
-echo 4- Show its IN and OUT regions
-echo 
-
+#
+# 4- Show its IN and OUT regions
+# 
 #  However, READ and WRITE reigons are not sufficient for array privatization,
 #  because we must verify that every element of WORK that is read by an iteration
 #  is previously written in the same iteration. This is achieved by the IN region.
@@ -83,38 +79,27 @@ activate PRINT_CODE_OUT_REGIONS
 display PRINTED_FILE
 
 
-echo
-echo 5- Array privatization and Parallelization
-echo
+#
+# 5- Array privatization and Parallelization
+#
 
 apply ARRAY_PRIVATIZER
 activate PRINT_PARALLELIZED77_CODE
 display PARALLELPRINTED_FILE
 
 
-echo
-echo 6- after hand induction variable substitution
-echo
+#
+# 6- after hand induction variable substitution
+#
 
 module RENPAR6_2
 
 activate PRINT_CODE
 display PRINTED_FILE
-
-# debugging fix point "derivative"
-
-activate PRINT_CODE_TRANSFORMERS
-display PRINTED_FILE[RENPAR6_2]
-close
-quit
-
-setenv SEMANTICS_DEBUG_LEVEL 9
-activate PRINT_CODE_TRANSFORMERS
-display PRINTED_FILE[RENPAR6]
-
 apply ARRAY_PRIVATIZER
 activate PRINT_PARALLELIZED77_CODE
 display PARALLELPRINTED_FILE
 
 close
 delete renpar6
+quit

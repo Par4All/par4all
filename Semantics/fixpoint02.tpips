@@ -1,5 +1,5 @@
 delete fixpoint02
-create fixpoint02 ${PIPS_ROOT}/Validation/Semantics/fixpoint02.f
+create fixpoint02 fixpoint02.f
 module FIXPOINT02
 activate TRANSFORMERS_INTER_FULL
 activate PRECONDITIONS_INTER_FULL

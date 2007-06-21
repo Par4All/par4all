@@ -1,6 +1,6 @@
 delete total10
-create total10 ${PIPS_ROOT}/Validation/Semantics/total10.f
-# create total10 ${PIPS_DEVEDIR}/Libs/semantics/Tests/total10.f
+create total10 total10.f
+# create total10 total10.f
 
 # setenv SEMANTICS_DEBUG_LEVEL 8
 

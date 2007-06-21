@@ -1,5 +1,5 @@
 delete type13
-create type13 ${PIPS_ROOT}/Validation/Semantics/type13.f
+create type13 type13.f
 
 setproperty SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES TRUE
 setproperty SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES TRUE

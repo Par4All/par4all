@@ -1,5 +1,5 @@
 delete unstruc06
-create unstruc06 ${PIPS_ROOT}/Validation/Semantics/unstruc06.f
+create unstruc06 unstruc06.f
 module UNSTRUC06
 # display PRINTED_FILE[UNSTRUC06]
 
