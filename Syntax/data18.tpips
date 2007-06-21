@@ -1,5 +1,5 @@
 delete data18
-create data18 ${PIPS_ROOT}/Validation/Syntax/data18.f
+create data18 data18.f
 
 setproperty ABORT_ON_USER_ERROR
 

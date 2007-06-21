@@ -8,7 +8,7 @@ Delete equiv06
 
 # Redundant but compatible equivalence chain: OK
 
-create equiv06 ${PIPS_ROOT}/Validation/Syntax/equiv06.f
+create equiv06 equiv06.f
 display PRINTED_FILE
 close
 

@@ -1,5 +1,5 @@
 #!/bin/sh
-Init -d -f $PIPS_ROOT/Validation/Syntax/comments.f comments > /dev/null
+Init -d -f ${VDIR:-.}/comments.f comments > /dev/null
 Display -v -m comments 2>&1 | grep "user error"
 exit_code=$?
 Delete comments 

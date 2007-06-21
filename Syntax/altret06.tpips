@@ -1,10 +1,10 @@
 delete altret06
-create altret06 ${PIPS_ROOT}/Validation/Syntax/altret06.f
+create altret06 altret06.f
 
 setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "HRC"
 setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
 
-shell ${PIPS_F77:-f77} ${PIPS_ROOT}/Validation/Syntax/altret06.f
+shell ${PIPS_F77:-f77} ${VDIR:-.}/altret06.f
 
 echo
 echo Execute initial code

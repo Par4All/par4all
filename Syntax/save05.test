@@ -6,7 +6,7 @@ PIPS_VALIDDIR=${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}
 ($tpips 2>&1 | sed '/file *\//d') <<EOF
 
 delete save05
-create save05 ${PIPS_ROOT}/Validation/Syntax/save05.f
+create save05 save05.f
 
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 

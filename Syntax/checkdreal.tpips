@@ -1,7 +1,7 @@
 # Check that DREAL is recognized as an intrinsic
 
 delete checkdreal
-create checkdreal ${PIPS_ROOT}/Validation/Syntax/checkdreal.f
+create checkdreal checkdreal.f
 module CHECKDREAL
 display CALLGRAPH_FILE[CHECKDREAL]
 close

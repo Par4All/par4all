@@ -1,5 +1,5 @@
 delete dim
-create dim ${PIPS_ROOT}/Validation/Syntax/dim.f
+create dim dim.f
 setproperty PARSER_DUMP_SYMBOL_TABLE=TRUE
 setproperty PRETTYPRINT_ALL_DECLARATIONS=TRUE
 display PRINTED_FILE(MAIN)

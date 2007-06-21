@@ -1,5 +1,5 @@
 delete capture03
-create capture03 ${PIPS_ROOT}/Validation/Syntax/capture03.f
+create capture03 capture03.f
 module CAPTURE03
 display PRINTED_FILE[CAPTURE03]
 display PRINTED_FILE[FOO]

@@ -1,3 +1,4 @@
+
 Sequential version:
       SUBROUTINE COMMENTS3(T,N)
       REAL T(N)
@@ -12,6 +13,7 @@ c     this comment might be lost!
       ENDDO
 
       END
+
 Parallel version:
       SUBROUTINE COMMENTS3(T,N)
       REAL T(N)

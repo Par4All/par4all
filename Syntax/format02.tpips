@@ -1,5 +1,5 @@
 delete format02
-create format02 ${PIPS_ROOT}/Validation/Syntax/format02.f
+create format02 format02.f
 setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
 display PRINTED_FILE 
 close

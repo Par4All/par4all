@@ -1,12 +1,13 @@
+shell rm -f corinne1.f corinne2.f corinne3.f
 echo
 
 echo First try: detect extra ENDDO
 First try: detect extra ENDDO
 echo
 
+shell sed /cfirst/s/cfirst// ${VDIR:-.}/corinne.f >corinne1.f
+shell sleep 1
 user warning in tp_parse: corinne: No such workspace
-Registering file corinne1.f
-Splitting file    ./corinne1.f
   Module         IFENDDO
   Module         DOENDIF
   Module         CORINNE
@@ -36,14 +37,15 @@ Closing workspace.
 Workspace corinne closed.
 
 Workspace corinne deleted.
+shell rm corinne1.f
 echo
 
 echo Second try: detect wrong lhs
 Second try: detect wrong lhs
 echo
 
-Registering file corinne2.f
-Splitting file    ./corinne2.f
+shell sed /csecond/s/csecond// ${VDIR:-.}/corinne.f >corinne2.f
+shell sleep 1
   Module         IFENDDO
   Module         DOENDIF
   Module         CORINNE
@@ -73,14 +75,15 @@ Closing workspace.
 Workspace corinne closed.
 
 Workspace corinne deleted.
+shell rm corinne2.f
 echo
 
 echo Third try: detect extra ENDDIF
 Third try: detect extra ENDDIF
 echo
 
-Registering file corinne3.f
-Splitting file    ./corinne3.f
+shell sed /cthird/s/cthird// ${VDIR:-.}/corinne.f >corinne3.f
+shell sleep 1
   Module         IFENDDO
   Module         DOENDIF
   Module         CORINNE
@@ -110,6 +113,7 @@ Closing workspace.
 Workspace corinne closed.
 
 Workspace corinne deleted.
+shell rm corinne3.f
 echo
 
 echo Fourth try: detect IF/ENDDO pair

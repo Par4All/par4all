@@ -1,5 +1,5 @@
 delete static01
-create static01 ${PIPS_ROOT}/Validation/Syntax/static01.f
+create static01 static01.f
 module STATIC01
 display PRINTED_FILE[STATIC01]
 close

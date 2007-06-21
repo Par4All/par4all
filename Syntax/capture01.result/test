@@ -5,7 +5,6 @@ Module CAPTURE01 selected
 Main module PROGRAM "CAPTURE01" selected.
 Module CAPTURE01 already active.
 Module CAPTURE01 already active.
-Module CAPTURE01 already active.
 Request: build resource PRINTED_FILE for module CAPTURE01.
   BOOTSTRAP                      building   ENTITIES()
   FILTER_FILE                    building   SOURCE_FILE(CAPTURE01)

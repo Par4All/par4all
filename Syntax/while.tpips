@@ -1,5 +1,5 @@
 delete while
-create while ${PIPS_ROOT}/Validation/Syntax/while.f
+create while while.f
 display PRINTED_FILE
 close
 delete while

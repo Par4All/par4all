@@ -1,5 +1,5 @@
 delete edited02
-create edited02 ${PIPS_ROOT}/Validation/Syntax/edited02.f
+create edited02 edited02.f
 display PRINTED_FILE
 shell mv edited02.database/EDITED02/EDITED02.f foo.f ; sleep 2 ; \
 	sed 's,!%,,' < foo.f > edited02.database/EDITED02/EDITED02.f ; rm foo.f

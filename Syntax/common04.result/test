@@ -1,4 +1,5 @@
 user warning in tp_parse: common04: No such workspace
+Registering file common04.f
   Module         BAR
   Module         FOO
   Module         COMMON04

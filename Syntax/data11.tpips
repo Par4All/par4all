@@ -1,5 +1,5 @@
 delete data11
-create data11 ${PIPS_ROOT}/Validation/Syntax/data11.f
+create data11 data11.f
 
 setproperty PRETTYPRINT_ALL_DECLARATIONS=TRUE
 display PRINTED_FILE[DATA11]

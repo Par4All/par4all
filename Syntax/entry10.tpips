@@ -1,5 +1,5 @@
 delete entry10
-create entry10 ${PIPS_ROOT}/Validation/Syntax/entry10.f
+create entry10 entry10.f
 
 # Check that functions are handled
 

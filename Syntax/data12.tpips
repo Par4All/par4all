@@ -1,5 +1,5 @@
 delete data12
-create data12 ${PIPS_ROOT}/Validation/Syntax/data12.f
+create data12 data12.f
 
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
@@ -8,7 +8,7 @@ echo
 echo Execution of the input code:
 echo
 
-shell ${PIPS_F77:-f77} ${PIPS_ROOT}/Validation/Syntax/data12.f
+shell ${PIPS_F77:-f77} ${VDIR:-.}/data12.f
 shell ./a.out
 
 echo

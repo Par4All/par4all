@@ -1,5 +1,5 @@
 delete external09
-create external09 ${PIPS_ROOT}/Validation/Syntax/external09.f
+create external09 external09.f
 
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 setproperty PARSER_ACCEPT_ANSI_EXTENSIONS FALSE
@@ -18,7 +18,7 @@ close
 quit
 
 delete external09
-create external09 ${PIPS_ROOT}/Validation/Syntax/external09.f
+create external09 external09.f
 
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 setproperty PARSER_ACCEPT_ANSI_EXTENSIONS FALSE

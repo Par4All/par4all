@@ -1,5 +1,5 @@
 delete cas01_f90
-create cas01_f90 ${PIPS_ROOT}/Validation/Syntax/cas01_f90.f
+create cas01_f90 cas01_f90.f
 display PRINTED_FILE 
 close
 delete cas01_f90

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if Pips -f $PIPS_ROOT/Validation/Syntax/lcart2.f -w lcart2 -m lcart2 -b CODE >&2
+if Pips -f lcart2.f -w lcart2 -m lcart2 -b CODE >&2
 then
 	echo Parser failed to detect unsupported substring in lcart2.f
 	Delete lcart2 2>/dev/null

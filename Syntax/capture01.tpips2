@@ -1,0 +1,6 @@
+delete capture01
+create capture01 capture01.f
+display PRINTED_FILE[CAPTURE01]
+close
+delete capture01
+quit

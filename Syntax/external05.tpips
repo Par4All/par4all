@@ -1,5 +1,5 @@
 delete external05
-create external05 ${PIPS_ROOT}/Validation/Syntax/external05.f
+create external05 external05.f
 
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 setproperty PARSER_ACCEPT_ANSI_EXTENSIONS FALSE

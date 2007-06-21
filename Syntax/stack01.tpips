@@ -1,5 +1,5 @@
 delete stack01
-create stack01 ${PIPS_ROOT}/Validation/Syntax/stack01.f
+create stack01 stack01.f
 module STACK01
 
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE

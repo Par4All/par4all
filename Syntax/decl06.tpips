@@ -1,5 +1,5 @@
 delete decl06
-create decl06 ${PIPS_ROOT}/Validation/Syntax/decl06.f
+create decl06 decl06.f
 module DECL06
 module FOO
 display PRINTED_FILE[FOO]

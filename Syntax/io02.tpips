@@ -1,5 +1,5 @@
 delete io02
-create io02 ${PIPS_ROOT}/Validation/Syntax/io02.f
+create io02 io02.f
 module IO02
 display PRINTED_FILE[IO02]
 close

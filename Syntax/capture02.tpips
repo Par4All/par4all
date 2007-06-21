@@ -1,5 +1,5 @@
 delete capture02
-create capture02 ${PIPS_ROOT}/Validation/Syntax/capture02.f
+create capture02 capture02.f
 module CAPTURE02
 display PRINTED_FILE[CAPTURE02]
 close

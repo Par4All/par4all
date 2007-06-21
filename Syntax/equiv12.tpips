@@ -1,5 +1,5 @@
 delete equiv12
-create equiv12 ${PIPS_ROOT}/Validation/Syntax/equiv12.f
+create equiv12 equiv12.f
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 display PRINTED_FILE 
 close

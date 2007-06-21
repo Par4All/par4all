@@ -1,5 +1,5 @@
 delete ifthenelse05
-create ifthenelse05 ${PIPS_ROOT}/Validation/Syntax/ifthenelse05.f
+create ifthenelse05 ifthenelse05.f
 
 echo
 echo PRINTED FILE

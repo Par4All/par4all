@@ -1,5 +1,5 @@
 delete data06
-create data06 ${PIPS_ROOT}/Validation/Syntax/data06.f
+create data06 data06.f
 
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 setproperty PARSER_ACCEPT_ANSI_EXTENSIONS FALSE

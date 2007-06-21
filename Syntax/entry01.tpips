@@ -1,5 +1,5 @@
 delete entry01
-create entry01 ${PIPS_ROOT}/Validation/Syntax/entry01.f
+create entry01 entry01.f
 
 echo
 echo Module ENTRY01

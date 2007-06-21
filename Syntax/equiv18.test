@@ -5,7 +5,7 @@ PIPS_VALIDDIR=${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}
 
 ($tpips 2>&1 | sed '/file *\//d') <<EOF
 delete equiv18
-create equiv18 ${PIPS_ROOT}/Validation/Syntax/equiv18.f
+create equiv18 equiv18.f
 
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 

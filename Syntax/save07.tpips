@@ -1,5 +1,5 @@
 delete save07
-create save07 ${PIPS_ROOT}/Validation/Syntax/save07.f
+create save07 save07.f
 
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 

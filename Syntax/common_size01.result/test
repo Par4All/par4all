@@ -1,4 +1,5 @@
 user warning in tp_parse: common_size01: No such workspace
+Registering file common_size01.f
   Module         REORDER
   Module         COMMON_SIZE01
 Workspace common_size01 created and opened.

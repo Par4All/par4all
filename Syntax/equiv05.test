@@ -8,7 +8,7 @@ tpips=${tpips_version:-tpips}
 
 # Detection of a mistake in an equivalence chain
 
-create equiv05 ${PIPS_ROOT}/Validation/Syntax/equiv05.f
+create equiv05 equiv05.f
 display PRINTED_FILE
 close
 

@@ -1,0 +1,14 @@
+delete comments3
+create comments3 comments3.f
+
+echo
+echo Sequential version:
+display PRINTED_FILE 
+
+echo
+echo Parallel version:
+display PARALLELPRINTED_FILE
+
+close
+delete comments3
+quit

@@ -7,7 +7,7 @@ echo
 echo EXTERNAL declaration parsed first
 echo
 
-create mtrinit ${PIPS_ROOT}/Validation/Syntax/mtrinit.f
+create mtrinit mtrinit.f
 display PRINTED_FILE[MTRINIT]
 display PRINTED_FILE[TRINIT]
 activate INTERPROCEDURAL_SUMMARY_PRECONDITION
@@ -22,7 +22,7 @@ echo
 echo EXTERNAL declaration parsed second
 echo
 
-create mtrinit ${PIPS_ROOT}/Validation/Syntax/mtrinit.f
+create mtrinit mtrinit.f
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 display PRINTED_FILE[TRINIT]
 display PRINTED_FILE[MTRINIT]

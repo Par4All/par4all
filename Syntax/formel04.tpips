@@ -1,5 +1,5 @@
 delete formel04
-create formel04 ${PIPS_ROOT}/Validation/Syntax/formel04.f
+create formel04 formel04.f
 display PRINTED_FILE
 close
 delete formel04

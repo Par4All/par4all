@@ -2,7 +2,7 @@
 # data can be anywhere...
 #
 delete anywhere
-create anywhere ${PIPS_ROOT}/Validation/Syntax/anywhere.f
+create anywhere anywhere.f
 display PRINTED_FILE
 close
 delete anywhere

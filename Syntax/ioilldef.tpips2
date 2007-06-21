@@ -1,0 +1,8 @@
+# No core dump please when closing the database after a parser error
+# Parser error for IO illegal default parameter
+delete ioilldef
+create ioilldef ioilldef.f
+display PRINTED_FILE 
+close
+delete ioilldef
+quit

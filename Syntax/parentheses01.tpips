@@ -1,5 +1,5 @@
 delete parentheses01
-create parentheses01 ${PIPS_ROOT}/Validation/Syntax/parentheses01.f
+create parentheses01 parentheses01.f
 display PRINTED_FILE(PARENTHESES01)
 
 close

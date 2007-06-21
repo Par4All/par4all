@@ -1,5 +1,5 @@
 delete entry09
-create entry09 ${PIPS_ROOT}/Validation/Syntax/entry09.f
+create entry09 entry09.f
 
 # Check that static variables (and implicitly DATA) are taken into account
 

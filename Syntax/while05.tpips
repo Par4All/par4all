@@ -1,5 +1,5 @@
 delete while05
-create while05 ${PIPS_ROOT}/Validation/Syntax/while05.f
+create while05 while05.f
 display PRINTED_FILE
 close
 delete while05

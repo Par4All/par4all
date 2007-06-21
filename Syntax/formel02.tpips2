@@ -1,0 +1,23 @@
+delete formel02
+create formel02 formel02.f
+
+echo
+echo Listing for FOO
+echo
+
+display PRINTED_FILE[FOO]
+
+echo
+echo Listing for FORMEL02
+echo
+
+display PRINTED_FILE[FORMEL02]
+
+echo
+echo Listing for Q
+echo
+
+display PRINTED_FILE[Q]
+close
+delete formel02
+quit

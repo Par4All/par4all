@@ -1,4 +1,5 @@
 user warning in tp_parse: ifunc02: No such workspace
+Registering file ifunc02.f
   Module         FOO
   Module         BLA
   Module         IFUNC02

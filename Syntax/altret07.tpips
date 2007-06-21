@@ -1,5 +1,5 @@
 delete altret07
-create altret07 ${PIPS_ROOT}/Validation/Syntax/altret07.f
+create altret07 altret07.f
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
@@ -7,7 +7,7 @@ setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "HRC"
 # setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
 setproperty PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS TRUE
 
-shell ${PIPS_F77:-f77} ${PIPS_ROOT}/Validation/Syntax/altret07.f
+shell ${PIPS_F77:-f77} ${VDIR:-.}/altret07.f
 
 echo
 echo Execute initial code

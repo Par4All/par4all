@@ -1,5 +1,5 @@
 #!/bin/sh
-if Pips -q -f $PIPS_ROOT/Validation/Syntax/prefix.f -w prefix -m prefix -b PRINTED_FILE 2>&1 \
+if Pips -q -f ${VDIR:-.}/prefix.f -w prefix -m prefix -b PRINTED_FILE 2>&1 \
     | sed '/\//d'
 then
 	exit_code=0

@@ -7,7 +7,7 @@ PIPS_VALIDDIR=${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}
 
 ($tpips 2>&1 | sed '/file *\//d') <<EOF
 delete data03
-create data03 ${PIPS_ROOT}/Validation/Syntax/data03.f
+create data03 data03.f
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE 
 close

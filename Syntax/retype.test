@@ -12,7 +12,7 @@ fi
 
 echo "PARSER_DUMP_SYMBOL_TABLE TRUE" >properties.rc
 
-if Pips -q -f $PIPS_ROOT/Validation/Syntax/retype.f -w retype -m retype -b CALLGRAPH_FILE 2>&1 \
+if Pips -q -f ${VDIR:-.}/retype.f -w retype -m retype -b CALLGRAPH_FILE 2>&1 \
     | sed '/file *\//d'
 then
 	exit_code=0

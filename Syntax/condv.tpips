@@ -1,5 +1,5 @@
 delete condv
-create condv ${PIPS_ROOT}/Validation/Syntax/condv.f
+create condv condv.f
 
 # check that SUN pointers can be redeclared (for EDF)
 

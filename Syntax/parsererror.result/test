@@ -1,4 +1,5 @@
 user warning in tp_parse: parsererror: No such workspace
+Registering file parsererror.f
   Module         PARSERERROR2
   Module         PARSERERROR1
 Workspace parsererror created and opened.

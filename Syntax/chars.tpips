@@ -1,5 +1,5 @@
 delete chars
-create chars ${PIPS_ROOT}/Validation/Syntax/chars.f
+create chars chars.f
 setproperty PRETTYPRINT_ALL_DECLARATIONS=TRUE
 display PRINTED_FILE
 close

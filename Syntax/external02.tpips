@@ -1,5 +1,5 @@
 delete external02
-create external02 ${PIPS_ROOT}/Validation/Syntax/external02.f
+create external02 external02.f
 
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 setproperty PARSER_ACCEPT_ANSI_EXTENSIONS FALSE

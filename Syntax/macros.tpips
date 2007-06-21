@@ -3,7 +3,7 @@
 #
 setproperty PARSER_EXPAND_STATEMENT_FUNCTIONS=TRUE
 delete macros
-create macros ${PIPS_ROOT}/Validation/Syntax/macros.f
+create macros macros.f
 echo Code...
 display PRINTED_FILE($ALL)
 echo Callgraph...

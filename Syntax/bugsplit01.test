@@ -11,7 +11,7 @@ echo "However because of fsplit bugs & hacks:"
 ${tpips_version:-tpips} 2>&1 <<EOF | grep "  Module"
 
 delete b01
-create b01 ${PIPS_ROOT}/Validation/Syntax/bugsplit01.f
+create b01 bugsplit01.f
 close
 delete b01
 quit

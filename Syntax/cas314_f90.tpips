@@ -1,5 +1,5 @@
 delete cas314_f90
-create cas314_f90 ${PIPS_ROOT}/Validation/Syntax/cas314_f90.f
+create cas314_f90 cas314_f90.f
 display PRINTED_FILE 
 close
 delete cas314_f90

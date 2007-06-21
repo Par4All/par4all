@@ -1,5 +1,5 @@
 delete entry23
-create entry23 ${PIPS_ROOT}/Validation/Syntax/entry23.f
+create entry23 entry23.f
 
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 

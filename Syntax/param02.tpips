@@ -1,5 +1,5 @@
 delete param02
-create param02 ${PIPS_ROOT}/Validation/Syntax/param02.f
+create param02 param02.f
 module PARAM02
 display PRINTED_FILE[PARAM02]
 close

@@ -1,5 +1,5 @@
 delete equiv15
-create equiv15 ${PIPS_ROOT}/Validation/Syntax/equiv15.f
+create equiv15 equiv15.f
 module EQUIV15
 
 echo

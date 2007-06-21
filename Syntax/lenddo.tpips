@@ -1,5 +1,5 @@
 delete lenddo
-create lenddo ${PIPS_ROOT}/Validation/Syntax/lenddo.f
+create lenddo lenddo.f
 display PRINTED_FILE
 close
 delete lenddo

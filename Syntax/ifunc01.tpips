@@ -1,5 +1,5 @@
 delete ifunc01
-create ifunc01 ${PIPS_ROOT}/Validation/Syntax/ifunc01.f
+create ifunc01 ifunc01.f
 module IFUNC01
 activate TRANSFORMERS_INTER_FULL
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE

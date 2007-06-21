@@ -1,5 +1,5 @@
 delete altret12
-create altret12 ${PIPS_ROOT}/Validation/Syntax/altret12.f
+create altret12 altret12.f
 
 # Make sure that the parser cleans up the data structures when restarted
 

@@ -1,5 +1,5 @@
 delete complexe01
-create complexe01 ${PIPS_ROOT}/Validation/Syntax/complexe01.f
+create complexe01 complexe01.f
 module COMPLEXE01
 display PRINTED_FILE[COMPLEXE01]
 close

@@ -1,3 +1,4 @@
+
 Sequential version:
       SUBROUTINE COMMENTS4(T,N)
       REAL T(N)
@@ -16,6 +17,7 @@ c     And how about this one?
       ENDDO
 
       END
+
 Parallel version:
       SUBROUTINE COMMENTS4(T,N)
       REAL T(N)

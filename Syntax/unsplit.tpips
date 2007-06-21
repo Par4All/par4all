@@ -1,5 +1,5 @@
 delete unsplit
-create unsplit ${PIPS_ROOT}/Validation/Syntax/unsplit.f
+create unsplit unsplit.f
 apply UNSPLIT
 display USER_FILE($PROGRAM)
 shell cat unsplit.database/Src/*

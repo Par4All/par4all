@@ -1,5 +1,5 @@
 delete save
-create save ${PIPS_ROOT}/Validation/Syntax/save.f
+create save save.f
 activate INTERPROCEDURAL_SUMMARY_PRECONDITION
 activate PRECONDITIONS_INTER_FULL 
 activate TRANSFORMERS_INTER_FULL 
@@ -8,5 +8,3 @@ display PRINTED_FILE
 close
 delete save
 quit
-EOF
-

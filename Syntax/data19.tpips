@@ -1,5 +1,5 @@
 delete data19
-create data19 ${PIPS_ROOT}/Validation/Syntax/data19.f
+create data19 data19.f
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
@@ -13,7 +13,7 @@ close
 # quit
 
 delete data19
-create data19 ${PIPS_ROOT}/Validation/Syntax/data19.f
+create data19 data19.f
 
 setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
 

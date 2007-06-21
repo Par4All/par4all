@@ -1,5 +1,5 @@
 delete external07
-create external07 ${PIPS_ROOT}/Validation/Syntax/external07.f
+create external07 external07.f
 
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 setproperty PARSER_ACCEPT_ANSI_EXTENSIONS FALSE
@@ -14,7 +14,7 @@ display PRINTED_FILE[F]
 
 close
 delete external07
-create external07 ${PIPS_ROOT}/Validation/Syntax/external07.f
+create external07 external07.f
 
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 setproperty PARSER_ACCEPT_ANSI_EXTENSIONS FALSE

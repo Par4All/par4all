@@ -1,5 +1,5 @@
 delete data09
-create data09 ${PIPS_ROOT}/Validation/Syntax/data09.f
+create data09 data09.f
 
 # setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 display PRINTED_FILE[DATA09]
@@ -19,7 +19,7 @@ quit
 close
 delete data09
 
-create data09 ${PIPS_ROOT}/Validation/Syntax/data09.f
+create data09 data09.f
 
 setproperty PARSER_ACCEPT_ANSI_EXTENSIONS FALSE
 display PRINTED_FILE[INIT1]
