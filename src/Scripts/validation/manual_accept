@@ -5,18 +5,18 @@
 svn=
 shopt -s nullglob
 
-for dir
-do
-  if [[ -d $dir ]]
-  then 
+# what is the current arch?
+arch=${PIPS_ARCH:-$($PIPS_ROOT/makes/arch.sh)}
+
+for dir ; do
+  if [[ -d $dir ]] ;  then 
     pushd $dir > /dev/null
-    for file in *.result/out
-    do 
+    for file in *.result/out ; do 
       ref=${file%\/out}/test
+      [ -f $ref.$arch ] && ref=$ref.$arch
 
       # show differences
-      if [ -f $file ]
-      then
+      if [ -f $file ] ; then
 	echo "CONSIDERING $ref and $file"
         ${PIPS_DIFF:-diff -b -u} $ref $file 
       else
@@ -24,14 +24,11 @@ do
 	cat $file 
       fi | ${PIPS_MORE:-less}
       
-      # accept if okay
-      echo 
-      echo "accept (y|n)?"
+      echo -e "accept (y|n)?\a"
       read answer
-      if [ "$answer" = 'y' -o "$answer" = 'Y' ] 
-      then 
+      if [[ $answer == [yY]* ]] ; then 
 	  mv $file $ref
-	  test -d .svn && svn=1
+	  [[ -d '.svn' ]] && svn=1
       fi
     done
     popd > /dev/null
@@ -39,3 +36,5 @@ do
 done
 
 [[ $svn ]] && echo "Consider running \"svn ci $@\" to commit changes"
+
+exit 0
