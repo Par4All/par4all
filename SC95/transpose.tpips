@@ -6,7 +6,7 @@ shell rm -rf transpose.hpfc
 #
 set HPFC_IGNORE_FCD_TIME TRUE
 set HPFC_IGNORE_FCD_SYNCHRO TRUE
-create transpose ${PIPS_ROOT}/Validation/SC95/transpose.f
+create transpose transpose.f
 #
 # compile !
 #
@@ -21,4 +21,4 @@ delete transpose
 # shell gmake -C transpose.hpfc
 shell cat transpose.hpfc/TRANSPOSE_*.f 
 shell rm -rf transpose.hpfc
-#
+quit

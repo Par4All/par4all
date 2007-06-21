@@ -2,7 +2,7 @@
 # and by partial evaluation
 
 delete convol
-create convol ${PIPS_ROOT}/Validation/SC95/convol.f
+create convol convol.f
 module CONVOL
 activate INTERPROCEDURAL_SUMMARY_PRECONDITION
 activate PRECONDITIONS_INTER_FULL 

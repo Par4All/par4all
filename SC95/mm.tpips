@@ -3,29 +3,25 @@
 #
 delete foo
 create foo mm.f
-module MM
-display PRINTED_FILE(MM)
-display PARALLELPRINTED_FILE(MM)
+display PRINTED_FILE[MM]
+display PARALLELPRINTED_FILE[MM]
 activate PRINT_CODE_PROPER_EFFECTS # Statements & Proper Effects
 activate PRINT_CODE_PROPER_EFFECTS # Statements & Proper Effects
-display PRINTED_FILE(MM)
+display PRINTED_FILE[MM]
 activate MUST_REGIONS # MUST regions
 activate PRINT_CODE_REGIONS # Statements & Regions
-display PRINTED_FILE(MM)
-module SAXPY
-display PRINTED_FILE(SAXPY)
+display PRINTED_FILE[MM]
+display PRINTED_FILE[SAXPY]
 activate PRINT_CODE # Statements Only
-display PRINTED_FILE(SAXPY)
+display PRINTED_FILE[SAXPY]
 activate PRINT_CODE_TRANSFORMERS # Statements & Transformers
 activate PRINT_CODE # Statements Only
 activate PRINT_CODE # Statements Only
-display PRINTED_FILE(SAXPY)
+display PRINTED_FILE[SAXPY]
 activate PRINT_CODE_COMPLEXITIES # Statements & Complexities
-display PRINTED_FILE(SAXPY)
-module MM
-display PRINTED_FILE(MM)
-module SAXPY
-display PRINTED_FILE(SAXPY)
+display PRINTED_FILE[SAXPY]
+display PRINTED_FILE[MM]
+display PRINTED_FILE[SAXPY]
 close
 quit
 # EOF

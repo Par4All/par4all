@@ -1,0 +1,17 @@
+#
+# matrix multiply
+#
+delete foo
+create foo matmul2.f
+module MATMUL
+#
+# CRAFT Fortran
+#
+activate PRINT_PARALLELIZEDCRAFT_CODE 
+display PARALLELPRINTED_FILE[MATMUL]
+#
+# clean
+#
+close foo
+delete foo
+quit

@@ -7,15 +7,15 @@
 
 delete wgauss1
 set ABORT_ON_USER_ERROR TRUE
-create wgauss1 ${PIPS_ROOT}/Validation/SC95/gauss1.f
+create wgauss1 gauss1.f
 module GAUSS
 activate PRINT_CODE_STATIC_CONTROL # Statements & Static Controls
-display PRINTED_FILE(GAUSS)
-display ADFG_FILE(GAUSS)
-display BDT_FILE(GAUSS)
-display PLC_FILE(GAUSS)
+display PRINTED_FILE[GAUSS]
+display ADFG_FILE[GAUSS]
+display BDT_FILE[GAUSS]
+display PLC_FILE[GAUSS]
 activate PRINT_PARALLELIZEDCRAFT_CODE # CRAFT Fortran
-display PARALLELPRINTED_FILE(GAUSS)
+display PARALLELPRINTED_FILE[GAUSS]
 close
 delete wgauss1
 quit

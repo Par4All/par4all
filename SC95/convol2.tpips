@@ -5,7 +5,7 @@
 delete convol2
 
 setproperty ABORT_ON_USER_ERROR=TRUE
-create convol2 ${PIPS_ROOT}/Validation/SC95/convol2.f
+create convol2 convol2.f
 module CONVOL
 
 echo

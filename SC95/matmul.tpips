@@ -6,7 +6,7 @@ shell rm -rf matmul.hpfc
 #
 set HPFC_IGNORE_FCD_TIME TRUE
 set HPFC_IGNORE_FCD_SYNCHRO TRUE
-create matmul ${PIPS_ROOT}/Validation/SC95/matmul.f
+create matmul matmul.f
 #
 # compile !
 #
@@ -22,3 +22,4 @@ delete matmul
 shell cat matmul.hpfc/MATMUL_*.f 
 shell rm -rf matmul.hpfc
 #
+quit

@@ -1,17 +1,11 @@
-#! /bin/sh
-
-tpips=${tpips_version:-tpips}
-dir=$PIPS_VALIDDIR/SC95
-
-$tpips <<%
 #
 # get the model
 delete foo
 shell rm -f model.rc
-shell cp $dir/model3.rc model.rc
+shell cp ${VDIR}/model3.rc model.rc
 #
 # compile
-create foo $dir/matmul3.f 
+create foo matmul3.f 
 apply PRIVATIZE_MODULE 
 apply WP65
 close foo
@@ -20,5 +14,4 @@ close foo
 shell cat foo.database/MATMUL.bank foo.database/MATMUL.wp65 
 delete foo
 shell rm -f model.rc
-%
-
+quit

@@ -133,8 +133,8 @@ C
 7- Show D with MUST regions 
 
 
-C  <T(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==JP, 2<=PHI1, K<=PHI2, PHI2<=1+K,
-C    L<=PHI3, PHI3<=2+L, J==JP, K==KP-1, 2<=K, 1<=L, L<=7}>
+C  <T(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==JP, 2<=PHI1, KP<=PHI2+1,
+C    PHI2<=KP, L<=PHI3, PHI3<=2+L, J==JP, KP==K+1, 3<=KP, 1<=L, L<=7}>
 
 C
       REAL FUNCTION D(J,K,JP,KP)
@@ -145,8 +145,8 @@ C*****************************************
       COMMON/CT/T
       COMMON/CNI/L
 
-C  <T(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==JP, 2<=PHI1, K<=PHI2, PHI2<=1+K,
-C    L<=PHI3, PHI3<=2+L, J==JP, K==KP-1, 2<=K, 1<=L, L<=7}>
+C  <T(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==JP, 2<=PHI1, KP<=PHI2+1,
+C    PHI2<=KP, L<=PHI3, PHI3<=2+L, J==JP, KP==K+1, 3<=KP, 1<=L, L<=7}>
 
 C     
       D = SQRT((T(J,K,L)-T(JP,KP,L))**2+(T(J,K,L+1)-T(JP,KP,L+1))**2+   0001
@@ -394,8 +394,8 @@ C     ....
       DO 300 K = K1, K2                                                 0001
 
 C  <T(PHI1,PHI2,PHI3)-OUT-EXACT-{PHI2==K, J1<=PHI1, 1<=PHI1, PHI1<=JA,
-C    PHI1<=52, K1<=PHI2, 1<=PHI2, PHI2<=K2, PHI2<=21, 14<=PHI3,
-C    PHI3<=16, MI==4, NC==17, NI==7, NN==14}>
+C    PHI1<=52, 1<=PHI2, PHI2<=21, 14<=PHI3, PHI3<=16, MI==4, NC==17,
+C    NI==7, NN==14, K1<=K, K<=K2}>
 
          DO 300 J = J1, JA                                              0002
 

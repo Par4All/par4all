@@ -104,8 +104,8 @@ C
      &(T(J,K,L+2)-T(JP,KP,L+2))**2)                                     0001
       END
 
-C  <T(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==JP, 2<=PHI1, K<=PHI2, PHI2<=1+K,
-C    L<=PHI3, PHI3<=2+L, J==JP, K==KP-1, 2<=K, 1<=L, L<=7}>
+C  <T(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==JP, 2<=PHI1, KP<=PHI2+1,
+C    PHI2<=KP, L<=PHI3, PHI3<=2+L, J==JP, KP==K+1, 3<=KP, 1<=L, L<=7}>
 
       REAL FUNCTION D(J,K,JP,KP)
 C*****************************************
@@ -115,8 +115,8 @@ C*****************************************
       COMMON/CT/T
       COMMON/CNI/L
 
-C  <T(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==JP, 2<=PHI1, K<=PHI2, PHI2<=1+K,
-C    L<=PHI3, PHI3<=2+L, J==JP, K==KP-1, 2<=K, 1<=L, L<=7}>
+C  <T(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==JP, 2<=PHI1, KP<=PHI2+1,
+C    PHI2<=KP, L<=PHI3, PHI3<=2+L, J==JP, KP==K+1, 3<=KP, 1<=L, L<=7}>
 
 C     
       D = SQRT((T(J,K,L)-T(JP,KP,L))**2+(T(J,K,L+1)-T(JP,KP,L+1))**2+   0001
@@ -153,4 +153,3 @@ C********************************************************
       ENDDO
 
       END
-

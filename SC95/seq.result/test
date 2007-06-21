@@ -1,25 +1,3 @@
-user warning in tp_parse: seq: No such workspace
-  Module         INIT
-  Module         TESTINIT
-  Module         DIGITALIZE
-  Module         FLIPFLOP
-  Module         TRANSPOSE
-  Module         SMATMUL
-  Module         MATMUL
-  Module         SEQ
-Workspace seq created and opened.
-Main module PROGRAM "SEQ" selected.
-Module SEQ selected
-Module SEQ already active.
-Module SEQ already active.
-Request: build resource PRINTED_FILE for module SEQ.
-  BOOTSTRAP                      building   ENTITIES()
-  FILTER_FILE                    building   SOURCE_FILE(SEQ)
-  PARSER                         building   PARSED_CODE(SEQ)
-                                 building   CALLEES(SEQ)
-  CONTROLIZER                    building   CODE(SEQ)
-  PRINT_CODE                     building   PRINTED_FILE(SEQ)
-PRINTED_FILE made for SEQ.
       PROGRAM SEQ
 
 c     Goal: show different dependence tests and privatization
@@ -46,20 +24,6 @@ c     Goal: show different dependence tests and privatization
       CALL DIGITALIZE(D, LX, MX, NX)                                    0008
 
       END
-Module MATMUL selected
-Module MATMUL already active.
-Request: build resource PARALLELPRINTED_FILE for module MATMUL.
-  FILTER_FILE                    building   SOURCE_FILE(MATMUL)
-  PARSER                         building   PARSED_CODE(MATMUL)
-                                 building   CALLEES(MATMUL)
-  CONTROLIZER                    building   CODE(MATMUL)
-  PROPER_EFFECTS                 building   PROPER_EFFECTS(MATMUL)
-  ATOMIC_CHAINS                  building   CHAINS(MATMUL)
-  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(MATMUL)
-  RICE_FAST_DEPENDENCE_GRAPH     building   DG(MATMUL)
-  RICE_ALL_DEPENDENCE            building   PARALLELIZED_CODE(MATMUL)
-  PRINT_PARALLELIZED77_CODE      building   PARALLELPRINTED_FILE(MATMUL)
-PARALLELPRINTED_FILE made for MATMUL.
 
       SUBROUTINE MATMUL(X, Y, Z, L, M, N)
 c     compute x := y * z
@@ -79,10 +43,6 @@ c     compute x := y * z
       ENDDO
 
       END
-Module MATMUL already active.
-Request: build resource DG_FILE for module MATMUL.
-  PRINT_EFFECTIVE_DEPENDENCE_GRAPH building   DG_FILE(MATMUL)
-DG_FILE made for MATMUL.
 
  **************** Effective Dependence Graph ****************
 
@@ -102,20 +62,6 @@ DG_FILE made for MATMUL.
 		from <J-W-MUST> to <J-W-MUST> at levels  1
 
 ****************** End of Dependence Graph ******************
-Module SMATMUL selected
-Module SMATMUL already active.
-Request: build resource PARALLELPRINTED_FILE for module SMATMUL.
-  FILTER_FILE                    building   SOURCE_FILE(SMATMUL)
-  PARSER                         building   PARSED_CODE(SMATMUL)
-                                 building   CALLEES(SMATMUL)
-  CONTROLIZER                    building   CODE(SMATMUL)
-  PROPER_EFFECTS                 building   PROPER_EFFECTS(SMATMUL)
-  ATOMIC_CHAINS                  building   CHAINS(SMATMUL)
-  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(SMATMUL)
-  RICE_FAST_DEPENDENCE_GRAPH     building   DG(SMATMUL)
-  RICE_ALL_DEPENDENCE            building   PARALLELIZED_CODE(SMATMUL)
-  PRINT_PARALLELIZED77_CODE      building   PARALLELPRINTED_FILE(SMATMUL)
-PARALLELPRINTED_FILE made for SMATMUL.
 
       SUBROUTINE SMATMUL(X, Y, Z, L, M, N)
 c     compute x := y * z
@@ -132,10 +78,6 @@ c     compute x := y * z
       ENDDO
 
       END
-Module SMATMUL already active.
-Request: build resource DG_FILE for module SMATMUL.
-  PRINT_EFFECTIVE_DEPENDENCE_GRAPH building   DG_FILE(SMATMUL)
-DG_FILE made for SMATMUL.
 
  **************** Effective Dependence Graph ****************
 
@@ -169,18 +111,6 @@ DG_FILE made for SMATMUL.
 		from <J-W-MUST> to <J-W-MUST> at levels  1
 
 ****************** End of Dependence Graph ******************
-Request: build phase/rule PRIVATIZE_MODULE for module SMATMUL.
-  PRIVATIZE_MODULE               updating   CODE(SMATMUL)
-PRIVATIZE_MODULE made for SMATMUL.
-Module SMATMUL already active.
-Request: build resource PARALLELPRINTED_FILE for module SMATMUL.
-  PROPER_EFFECTS                 building   PROPER_EFFECTS(SMATMUL)
-  ATOMIC_CHAINS                  building   CHAINS(SMATMUL)
-  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(SMATMUL)
-  RICE_FAST_DEPENDENCE_GRAPH     building   DG(SMATMUL)
-  RICE_ALL_DEPENDENCE            building   PARALLELIZED_CODE(SMATMUL)
-  PRINT_PARALLELIZED77_CODE      building   PARALLELPRINTED_FILE(SMATMUL)
-PARALLELPRINTED_FILE made for SMATMUL.
 
       SUBROUTINE SMATMUL(X, Y, Z, L, M, N)
 c     compute x := y * z
@@ -199,10 +129,6 @@ c     compute x := y * z
       ENDDO
 
       END
-Module SMATMUL already active.
-Request: build resource DG_FILE for module SMATMUL.
-  PRINT_EFFECTIVE_DEPENDENCE_GRAPH building   DG_FILE(SMATMUL)
-DG_FILE made for SMATMUL.
 
  **************** Effective Dependence Graph ****************
 
@@ -222,20 +148,6 @@ DG_FILE made for SMATMUL.
 		from <S-W-MUST> to <S-W-MUST> at levels  3
 
 ****************** End of Dependence Graph ******************
-Module TRANSPOSE selected
-Module TRANSPOSE already active.
-Request: build resource PARALLELPRINTED_FILE for module TRANSPOSE.
-  FILTER_FILE                    building   SOURCE_FILE(TRANSPOSE)
-  PARSER                         building   PARSED_CODE(TRANSPOSE)
-                                 building   CALLEES(TRANSPOSE)
-  CONTROLIZER                    building   CODE(TRANSPOSE)
-  PROPER_EFFECTS                 building   PROPER_EFFECTS(TRANSPOSE)
-  ATOMIC_CHAINS                  building   CHAINS(TRANSPOSE)
-  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(TRANSPOSE)
-  RICE_FAST_DEPENDENCE_GRAPH     building   DG(TRANSPOSE)
-  RICE_ALL_DEPENDENCE            building   PARALLELIZED_CODE(TRANSPOSE)
-  PRINT_PARALLELIZED77_CODE      building   PARALLELPRINTED_FILE(TRANSPOSE)
-PARALLELPRINTED_FILE made for TRANSPOSE.
 
       SUBROUTINE TRANSPOSE(X,N)
       REAL X(N,N)
@@ -249,10 +161,6 @@ PARALLELPRINTED_FILE made for TRANSPOSE.
       ENDDO
 
       END
-Module TRANSPOSE already active.
-Request: build resource DG_FILE for module TRANSPOSE.
-  PRINT_EFFECTIVE_DEPENDENCE_GRAPH building   DG_FILE(TRANSPOSE)
-DG_FILE made for TRANSPOSE.
 
  **************** Effective Dependence Graph ****************
 
@@ -282,19 +190,6 @@ DG_FILE made for TRANSPOSE.
 		from <J-W-MUST> to <J-W-MUST> at levels  1
 
 ****************** End of Dependence Graph ******************
-Selecting rule: RICE_FULL_DEPENDENCE_GRAPH
-Request: build phase/rule PRIVATIZE_MODULE for module TRANSPOSE.
-  PRIVATIZE_MODULE               updating   CODE(TRANSPOSE)
-PRIVATIZE_MODULE made for TRANSPOSE.
-Module TRANSPOSE already active.
-Request: build resource PARALLELPRINTED_FILE for module TRANSPOSE.
-  PROPER_EFFECTS                 building   PROPER_EFFECTS(TRANSPOSE)
-  ATOMIC_CHAINS                  building   CHAINS(TRANSPOSE)
-  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(TRANSPOSE)
-  RICE_FULL_DEPENDENCE_GRAPH     building   DG(TRANSPOSE)
-  RICE_ALL_DEPENDENCE            building   PARALLELIZED_CODE(TRANSPOSE)
-  PRINT_PARALLELIZED77_CODE      building   PARALLELPRINTED_FILE(TRANSPOSE)
-PARALLELPRINTED_FILE made for TRANSPOSE.
 
       SUBROUTINE TRANSPOSE(X,N)
       REAL X(N,N)
@@ -310,10 +205,6 @@ PARALLELPRINTED_FILE made for TRANSPOSE.
       ENDDO
 
       END
-Module TRANSPOSE already active.
-Request: build resource DG_FILE for module TRANSPOSE.
-  PRINT_EFFECTIVE_DEPENDENCE_GRAPH building   DG_FILE(TRANSPOSE)
-DG_FILE made for TRANSPOSE.
 
  **************** Effective Dependence Graph ****************
 
@@ -325,15 +216,6 @@ DG_FILE made for TRANSPOSE.
 		from <X(I,J)-R-MUST> to <X(I,J)-W-MUST> at levels  3
 
 ****************** End of Dependence Graph ******************
-Module FLIPFLOP selected
-Module FLIPFLOP already active.
-Request: build resource PRINTED_FILE for module FLIPFLOP.
-  FILTER_FILE                    building   SOURCE_FILE(FLIPFLOP)
-  PARSER                         building   PARSED_CODE(FLIPFLOP)
-                                 building   CALLEES(FLIPFLOP)
-  CONTROLIZER                    building   CODE(FLIPFLOP)
-  PRINT_CODE                     building   PRINTED_FILE(FLIPFLOP)
-PRINTED_FILE made for FLIPFLOP.
 
       SUBROUTINE FLIPFLOP(X,N,C)
       INTEGER N
@@ -357,15 +239,6 @@ PRINTED_FILE made for FLIPFLOP.
       IF (ABS(X(5,5,NEW)-X(5,5,OLD)).GT.0.01) GOTO 10                   0008
 
       END
-Module FLIPFLOP already active.
-Request: build resource PARALLELPRINTED_FILE for module FLIPFLOP.
-  PROPER_EFFECTS                 building   PROPER_EFFECTS(FLIPFLOP)
-  ATOMIC_CHAINS                  building   CHAINS(FLIPFLOP)
-  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(FLIPFLOP)
-  RICE_FULL_DEPENDENCE_GRAPH     building   DG(FLIPFLOP)
-  RICE_ALL_DEPENDENCE            building   PARALLELIZED_CODE(FLIPFLOP)
-  PRINT_PARALLELIZED77_CODE      building   PARALLELPRINTED_FILE(FLIPFLOP)
-PARALLELPRINTED_FILE made for FLIPFLOP.
 
       SUBROUTINE FLIPFLOP(X,N,C)
       INTEGER N
@@ -389,17 +262,6 @@ PARALLELPRINTED_FILE made for FLIPFLOP.
       IF (ABS(X(5,5,NEW)-X(5,5,OLD)).GT.0.01) GOTO 10                   0008
 
       END
-Selecting rule: RICE_SEMANTICS_DEPENDENCE_GRAPH
-Selecting rule: PRINT_CODE_PRECONDITIONS
-Module FLIPFLOP already active.
-Request: build resource PRINTED_FILE for module FLIPFLOP.
-  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(FLIPFLOP)
-  TRANSFORMERS_INTRA_FAST        building   TRANSFORMERS(FLIPFLOP)
-  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(FLIPFLOP)
-  INTRAPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(FLIPFLOP)
-  PRECONDITIONS_INTRA            building   PRECONDITIONS(FLIPFLOP)
-  PRINT_CODE_PRECONDITIONS       building   PRINTED_FILE(FLIPFLOP)
-PRINTED_FILE made for FLIPFLOP.
 
 C  P() {}
 
@@ -450,12 +312,6 @@ C  P(I,J,NEW,OLD) {NEW+OLD==3, N<=J}
       IF (ABS(X(5,5,NEW)-X(5,5,OLD)).GT.0.01) GOTO 10                   0008
 
       END
-Module FLIPFLOP already active.
-Request: build resource PARALLELPRINTED_FILE for module FLIPFLOP.
-  RICE_SEMANTICS_DEPENDENCE_GRAPH building   DG(FLIPFLOP)
-  RICE_ALL_DEPENDENCE            building   PARALLELIZED_CODE(FLIPFLOP)
-  PRINT_PARALLELIZED77_CODE      building   PARALLELPRINTED_FILE(FLIPFLOP)
-PARALLELPRINTED_FILE made for FLIPFLOP.
 
       SUBROUTINE FLIPFLOP(X,N,C)
       INTEGER N
@@ -479,16 +335,6 @@ PARALLELPRINTED_FILE made for FLIPFLOP.
       IF (ABS(X(5,5,NEW)-X(5,5,OLD)).GT.0.01) GOTO 10                   0008
 
       END
-Module DIGITALIZE selected
-Selecting rule: PRINT_CODE
-Module DIGITALIZE already active.
-Request: build resource PRINTED_FILE for module DIGITALIZE.
-  FILTER_FILE                    building   SOURCE_FILE(DIGITALIZE)
-  PARSER                         building   PARSED_CODE(DIGITALIZE)
-                                 building   CALLEES(DIGITALIZE)
-  CONTROLIZER                    building   CODE(DIGITALIZE)
-  PRINT_CODE                     building   PRINTED_FILE(DIGITALIZE)
-PRINTED_FILE made for DIGITALIZE.
 
       SUBROUTINE DIGITALIZE(X, LX, MX, NX)
       REAL X(MX,NX,LX)
@@ -507,26 +353,6 @@ PRINTED_FILE made for DIGITALIZE.
       ENDDO
 
       END
-Request: build phase/rule PRIVATIZE_MODULE for module DIGITALIZE.
-  PROPER_EFFECTS                 building   PROPER_EFFECTS(DIGITALIZE)
-  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(DIGITALIZE)
-  ATOMIC_CHAINS                  building   CHAINS(DIGITALIZE)
-  PRIVATIZE_MODULE               updating   CODE(DIGITALIZE)
-PRIVATIZE_MODULE made for DIGITALIZE.
-Module DIGITALIZE already active.
-Request: build resource PARALLELPRINTED_FILE for module DIGITALIZE.
-  PROPER_EFFECTS                 building   PROPER_EFFECTS(DIGITALIZE)
-  ATOMIC_CHAINS                  building   CHAINS(DIGITALIZE)
-  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(DIGITALIZE)
-  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(DIGITALIZE)
-  TRANSFORMERS_INTRA_FAST        building   TRANSFORMERS(DIGITALIZE)
-  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(DIGITALIZE)
-  INTRAPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(DIGITALIZE)
-  PRECONDITIONS_INTRA            building   PRECONDITIONS(DIGITALIZE)
-  RICE_SEMANTICS_DEPENDENCE_GRAPH building   DG(DIGITALIZE)
-  RICE_ALL_DEPENDENCE            building   PARALLELIZED_CODE(DIGITALIZE)
-  PRINT_PARALLELIZED77_CODE      building   PARALLELPRINTED_FILE(DIGITALIZE)
-PARALLELPRINTED_FILE made for DIGITALIZE.
 
       SUBROUTINE DIGITALIZE(X, LX, MX, NX)
       REAL X(MX,NX,LX)
@@ -546,79 +372,6 @@ PARALLELPRINTED_FILE made for DIGITALIZE.
       ENDDO
 
       END
-Selecting rule: RICE_SEMANTICS_DEPENDENCE_GRAPH
-user warning in activate: Rule `RICE_SEMANTICS_DEPENDENCE_GRAPH' already active
-Selecting rule: INTERPROCEDURAL_SUMMARY_PRECONDITION
-Selecting rule: PRECONDITIONS_INTER_FULL
-Selecting rule: TRANSFORMERS_INTER_FULL
-Selecting rule: PRINT_CODE_PRECONDITIONS
-Module DIGITALIZE already active.
-Request: build resource PRINTED_FILE for module DIGITALIZE.
-  FILTER_FILE                    building   SOURCE_FILE(INIT)
-  PARSER                         building   PARSED_CODE(INIT)
-                                 building   CALLEES(INIT)
-  CONTROLIZER                    building   CODE(INIT)
-  PROPER_EFFECTS                 building   PROPER_EFFECTS(INIT)
-  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(INIT)
-  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(INIT)
-  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(INIT)
-  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(MATMUL)
-  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(MATMUL)
-  FILTER_FILE                    building   SOURCE_FILE(TESTINIT)
-  PARSER                         building   PARSED_CODE(TESTINIT)
-                                 building   CALLEES(TESTINIT)
-  CONTROLIZER                    building   CODE(TESTINIT)
-  PROPER_EFFECTS                 building   PROPER_EFFECTS(TESTINIT)
-  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(TESTINIT)
-  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(TESTINIT)
-  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(TRANSPOSE)
-  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(SMATMUL)
-  PROPER_EFFECTS                 building   PROPER_EFFECTS(SEQ)
-  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(SEQ)
-  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(SEQ)
-  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(SEQ)
-  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(SMATMUL)
-  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(TESTINIT)
-  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(TRANSPOSE)
-  PROGRAM_PRECONDITION           building   PROGRAM_PRECONDITION()
-  TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(DIGITALIZE)
-  CALLGRAPH                      building   CALLERS(DIGITALIZE)
-                                 building   CALLERS(FLIPFLOP)
-                                 building   CALLERS(INIT)
-                                 building   CALLERS(MATMUL)
-                                 building   CALLERS(SEQ)
-                                 building   CALLERS(SMATMUL)
-                                 building   CALLERS(TESTINIT)
-                                 building   CALLERS(TRANSPOSE)
-                                 building   HEIGHT(DIGITALIZE)
-                                 building   HEIGHT(FLIPFLOP)
-                                 building   HEIGHT(INIT)
-                                 building   HEIGHT(MATMUL)
-                                 building   HEIGHT(SEQ)
-                                 building   HEIGHT(SMATMUL)
-                                 building   HEIGHT(TESTINIT)
-                                 building   HEIGHT(TRANSPOSE)
-                                 building   DEPTH(DIGITALIZE)
-                                 building   DEPTH(FLIPFLOP)
-                                 building   DEPTH(INIT)
-                                 building   DEPTH(MATMUL)
-                                 building   DEPTH(SEQ)
-                                 building   DEPTH(SMATMUL)
-                                 building   DEPTH(TESTINIT)
-                                 building   DEPTH(TRANSPOSE)
-  TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(TESTINIT)
-  TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(INIT)
-  TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(FLIPFLOP)
-  TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(TRANSPOSE)
-  TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(SMATMUL)
-  TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(MATMUL)
-  TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(SEQ)
-  INTERPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(SEQ)
-  PRECONDITIONS_INTER_FULL       building   PRECONDITIONS(SEQ)
-  INTERPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(DIGITALIZE)
-  PRECONDITIONS_INTER_FULL       building   PRECONDITIONS(DIGITALIZE)
-  PRINT_CODE_PRECONDITIONS       building   PRINTED_FILE(DIGITALIZE)
-PRINTED_FILE made for DIGITALIZE.
 
 C  P() {LX==32, MM1==MP1-2, MX==92, NX==42, 1<=MM1, MM1<=91}
 
@@ -670,12 +423,6 @@ C    MM1<=91, 2MS<=MM1, MM1<=2MS+1}
       ENDDO
 
       END
-Module DIGITALIZE already active.
-Request: build resource PARALLELPRINTED_FILE for module DIGITALIZE.
-  RICE_SEMANTICS_DEPENDENCE_GRAPH building   DG(DIGITALIZE)
-  RICE_ALL_DEPENDENCE            building   PARALLELIZED_CODE(DIGITALIZE)
-  PRINT_PARALLELIZED77_CODE      building   PARALLELPRINTED_FILE(DIGITALIZE)
-PARALLELPRINTED_FILE made for DIGITALIZE.
 
       SUBROUTINE DIGITALIZE(X, LX, MX, NX)
       REAL X(MX,NX,LX)
@@ -696,19 +443,3 @@ PARALLELPRINTED_FILE made for DIGITALIZE.
       ENDDO
 
       END
-Deletion of obsolete resources:
-none destroyed.
-Closing all modules.
-  Closing module DIGITALIZE.
-  Closing module FLIPFLOP.
-  Closing module INIT.
-  Closing module MATMUL.
-  Closing module SEQ.
-  Closing module SMATMUL.
-  Closing module TESTINIT.
-  Closing module TRANSPOSE.
-Closing program.
-Closing workspace.
-Workspace seq closed.
-
-Workspace seq deleted.

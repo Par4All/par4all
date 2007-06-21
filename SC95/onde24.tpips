@@ -6,7 +6,7 @@ shell rm -rf onde24.hpfc
 #
 # compile
 #
-create onde24 ${PIPS_ROOT}/Validation/SC95/onde24.f
+create onde24 onde24.f
 activate MUST_REGIONS
 apply HPFC_INSTALL
 close
