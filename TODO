@@ -1,3 +1,14 @@
 * validation
 - use only relative filenames
 - should not rely on PIPS_ROOT/Validation to exists
+
+* done for
+- Regions
+- Semantics
+- SC95
+- RegionPrivatization
+- Complexity
+
+* to be done for
+- Syntax
+- C_Syntax
