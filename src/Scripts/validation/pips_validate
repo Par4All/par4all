@@ -19,7 +19,7 @@ pips=$(type -p pips)
 function usage()
 {
   local status=$1 msg=$2
-  [[ $msg ]] && echo "message: $msg" >&2
+  [[ $msg ]] && echo -e "message: $msg\n" >&2
   echo -e \
     "$0 [options] directories or files...\n" \
     "options:\n" \
@@ -165,13 +165,15 @@ function validate_file()
 
   elif [[ -r $full_name.tpips2 ]] ; then 
     verb 3 "$prefix.tpips2 method (with stderr... bad idea)"
-    $tpips $full_name.tpips2 2>&1 | sed '/ing file /d' > $out.out 
+    $tpips $full_name.tpips2 2>&1 | \
+	sed -e '/ing file /d' \
+	    -e "s/${VDIR//\//\\/}/\$VDIR/g" > $out.out 
     status=$?
 
   elif [[ -r $dir/default_test ]] ; then
     verb 3 'default_test method'
     local test=$tdir/default_test_$$.sh
-    # perform some substitutions...
+    # perform some substitutions...  (could try to "| sh" :-)
     sed -e "s/tested_file/${file//\//\\/}/g" \
 	-e "s/tested_dir/${dir//\//\\/}/g" \
 	-e "s/tested_name/$name/g" \
