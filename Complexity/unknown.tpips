@@ -4,4 +4,5 @@ module unknown
 activate PRINT_CODE_COMPLEXITIES
 display PRINTED_FILE
 close
+delete unknown
 quit

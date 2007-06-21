@@ -1,0 +1,18 @@
+#
+# Script to test COMPLEXITY on lower0.f
+#
+# Complexity estimation before and after
+# partial evaluation
+
+delete lower0
+create lower0 lower0.f
+module lower0
+activate PRINT_CODE_COMPLEXITIES
+echo --- Before partial eval
+display PRINTED_FILE
+apply PARTIAL_EVAL 
+echo --- After partial eval
+display PRINTED_FILE
+close
+delete lower0
+quit

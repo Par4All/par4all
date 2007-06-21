@@ -1,10 +1,9 @@
---- Complexity
 C                                                                    4 (SUMMARY)
       PROGRAM FIN
-C                                                                    3 (STMT) 
+C                                                                    3 (STMT)
       T = T+1.                                                          0001
-C                                                                    1 (STMT) 
+C                                                                    1 (STMT)
       PRINT *, T                                                        0002
-C                                                                    0 (STMT) 
-      STOP                                                              0003
+C                                                                    0 (STMT)
+      STOP 'fin normal'                                                 0003
       END

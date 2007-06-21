@@ -1,26 +1,10 @@
-#!/bin/sh
 #
 # Script to test comoplexity estimation on em.f
 #
-# Init -df $PIPS_DIR/Tests/Validation/Complexity/em.f em >&2
-# echo "--- Complexity"
-# Display -m em comp
-# exit_status=$?
-# Delete em >&2
-# exit $exit_status
-
-tpips=${tpips_version:-tpips}
-
-# Initialization:
-# rm -f em.result/test
-# em.test >em.result/test
-
-$tpips <<EOF
 # Complexity estimation before and after
 # partial evaluation
-
 delete em
-create em $PIPS_VALIDDIR/Complexity/em.f
+create em em.f
 module em
 activate PRINT_CODE_COMPLEXITIES
 echo --- Without interprocedural transformers and preconditions
@@ -36,4 +20,3 @@ display PRINTED_FILE
 close
 delete em
 quit
-EOF

@@ -1,0 +1,11 @@
+# Complexity estimation before and after
+# partial evaluation
+
+delete sortpol
+create sortpol sortpol.f
+module sortpol
+activate PRINT_CODE_COMPLEXITIES
+display PRINTED_FILE
+close
+delete sortpol
+quit
