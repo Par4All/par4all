@@ -11,6 +11,7 @@ tdir=${PIPS_TEMPDIR:-/tmp}
 # running directory
 rdir=.
 
+arch=${PIPS_ARCH:-$($PIPS_ROOT/makes/arch.sh)}
 tpips=$(type -p tpips)
 pips=$(type -p pips)
 
@@ -96,7 +97,7 @@ summary=$odir/SUMMARY
 
 echo "validation for $@
 in $vdir
-for $PIPS_ARCH architecture
+for $arch architecture
 output in $odir
 with pips=$pips
 and tpips=$tpips
@@ -202,7 +203,7 @@ function validate_file()
     local file_resdir=$full_name.result
     [[ -d $file_resdir ]] || usage 15 "no result directory: $file_resdir"
     
-    local reference=$file_resdir/test.$PIPS_ARCH
+    local reference=$file_resdir/test.$arch
     [[ -f $reference ]] || reference=$file_resdir/test
 
     ${PIPS_DIFF:-diff -b -u} $reference $out.out > $out.diff
