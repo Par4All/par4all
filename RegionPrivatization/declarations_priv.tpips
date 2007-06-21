@@ -1,5 +1,5 @@
 delete decl
-create decl ${PIPS_ROOT}/Validation/RegionPrivatization/declarations_priv.f
+create decl declarations_priv.f
 
 set PRETTYPRINT_ALL_DECLARATIONS TRUE
 

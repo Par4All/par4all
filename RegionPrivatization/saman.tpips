@@ -1,6 +1,6 @@
 delete saman
 
-create saman ${PIPS_ROOT}/Validation/RegionPrivatization/saman.f
+create saman saman.f
 
 module SAMAN
 
@@ -32,4 +32,4 @@ display PRINTED_FILE
 
 close
 delete saman
-
+quit

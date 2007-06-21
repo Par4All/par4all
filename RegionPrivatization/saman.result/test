@@ -100,7 +100,7 @@ C  <WORK(PHI1)-OUT-EXACT-{51<=PHI1, PHI1<=100, N==50}>
 
       DO J = 1, 100                                                     0002
 
-C  <WORK(PHI1)-OUT-EXACT-{J==PHI1, 51<=PHI1, PHI1<=100, N==50}>
+C  <WORK(PHI1)-OUT-EXACT-{J==PHI1, 51<=PHI1, N==50, J<=100}>
 
          WORK(J) = 0                                                    0003
       ENDDO
@@ -111,8 +111,7 @@ C  <WORK(PHI1)-OUT-EXACT-{1<=PHI1, PHI1<=50, N==50, 1<=J, J<=200}>
 
          DO I = 1, N                                                    0005
 
-C  <WORK(PHI1)-OUT-EXACT-{I==PHI1, 1<=PHI1, N==50, I<=50, 1<=J,
-C    J<=200}>
+C  <WORK(PHI1)-OUT-EXACT-{I==PHI1, N==50, 1<=I, I<=50, 1<=J, J<=200}>
 
             WORK(I) = I+J                                               0006
          ENDDO
@@ -163,4 +162,3 @@ C        END BLOCK
       ENDDO
 C     END BLOCK
       END
-
