@@ -5,9 +5,6 @@
 # where is the validation
 vdir=${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}
 
-# temporary directory
-tdir=${PIPS_TEMPDIR:-/tmp}
-
 # running directory
 rdir=.
 
@@ -28,7 +25,6 @@ function usage()
     "  -p pips: use this 'pips' executable, default $pips\n" \
     "  -t tpips: use this 'tpips' executable, default $tpips\n" \
     "  -m email: send mails?\n" \
-    "  -T dir: temporary directory, default '/tmp'\n" \
     "  -V dir: validation directory, default '$vdir'\n" \
     "  -R dir: running directory, default '.'\n" \
     "  -O dir: output directory, default '.'\n" \
@@ -67,7 +63,6 @@ while [ "$1" ] ; do
       -v|--verbose) let verb++ ;;
       -t|--tpips) tpips=$1 ; shift ;;
       -p|--pips) pips=$1 ; shift ;;
-      -T|--tmp) tdir=$1 ; shift ;;
       -V|--valid) vdir=$1 ; shift ;;
       -R|--run) rdir=$1 ; shift ;;
       -O|--out|--output) odir=$1 ; shift ;;
@@ -78,7 +73,6 @@ done
 
 # option checks
 [[ -d $vdir ]] || usage 3 "no validation directory: $vdir"
-[[ -d $tdir ]] || usage 4 "no temporary directory: $tdir"
 [[ -d $rdir ]] || usage 5 "no run directory: $rdir"
 
 # result directory
