@@ -1,0 +1,7 @@
+
+Module main
+
+main()
+{
+  const volatile int i;
+}

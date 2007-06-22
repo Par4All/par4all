@@ -1,0 +1,11 @@
+delete zroots
+create zroots zroots.c
+
+# quit
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+
+display PRINTED_FILE[zroots]
+quit

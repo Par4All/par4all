@@ -1,0 +1,11 @@
+
+File expdev.database/expdev/expdev.c
+
+# 3
+float expdev(idum)
+int *idum;
+{
+        float ran1();
+
+        return -log(ran1(idum));
+}

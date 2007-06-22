@@ -1,0 +1,12 @@
+delete source02
+
+# In case of preprocessing, UNPSLIT does not regenerate user files but
+# preprocessed user files
+
+create source02 source02.src/*.F
+
+display PRINTED_FILE[%ALL]
+
+apply UNSPLIT[%PROGRAM]
+
+quit

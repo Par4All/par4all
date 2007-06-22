@@ -1,0 +1,13 @@
+
+File struct_scope4.database/main/main.c
+
+# 1
+struct toto
+{
+  float f;
+}
+
+main()
+{
+  struct toto y;
+}

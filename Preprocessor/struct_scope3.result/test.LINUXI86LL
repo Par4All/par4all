@@ -1,0 +1,13 @@
+
+File struct_scope3.database/foo/foo.c
+
+# 1
+struct toto
+{
+  int i;
+}
+
+foo()
+{
+  struct toto x;
+}

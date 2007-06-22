@@ -1,0 +1,8 @@
+
+File external_static.database/foo/foo.c
+
+# 2
+int foo()
+{
+  i = 1;
+}

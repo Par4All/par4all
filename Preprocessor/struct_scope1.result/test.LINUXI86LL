@@ -1,0 +1,12 @@
+
+Module foo
+
+# 1
+struct s
+{
+  int i;
+}
+foo ()
+{
+  struct s x;
+}

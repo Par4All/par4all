@@ -1,0 +1,11 @@
+delete csplit11
+create csplit11 csplit11.c
+
+# quit
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+
+display PRINTED_FILE[csplit11]
+
+quit

@@ -1,0 +1,10 @@
+
+File enum.database/main/main.c
+
+# 1
+main()
+{
+  enum fleurs {rose, margaritte, jasmine};
+  enum fleurs ma;
+  ma = rose;
+}

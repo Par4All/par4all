@@ -1,0 +1,21 @@
+delete csplit15
+create csplit15 csplit15.c
+
+# do not forget the COMPILATION_UNIT_PREFIX and the FILE_SEP_STRING
+# because we want to check the signature 
+# Redundant with csplit10.tpips
+
+shell for i in csplit15.database/[#a-z_]*[a-z_0-9!]/*.c; do echo;echo Module `basename $i .c`;echo; \
+	cat $i; done
+
+close
+delete csplit15
+quit
+
+activate C_PARSER
+
+display PRINTED_FILE[main]
+
+close
+delete csplit15
+quit

@@ -1,0 +1,13 @@
+delete char02
+create char02 char02.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+display PRINTED_FILE
+
+close
+delete char02
+quit

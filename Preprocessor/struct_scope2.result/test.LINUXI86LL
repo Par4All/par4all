@@ -1,0 +1,8 @@
+
+File struct_scope2.database/bar/bar.c
+
+# 2
+bar ()
+{
+  extern struct s x;
+}

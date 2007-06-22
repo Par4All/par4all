@@ -1,0 +1,10 @@
+delete source01
+create source01 source01.src/*.f
+
+display PRINTED_FILE[%ALL]
+
+apply UNSPLIT[%PROGRAM]
+
+close
+delete source01
+quit

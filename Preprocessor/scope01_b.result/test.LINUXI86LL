@@ -1,0 +1,8 @@
+
+File scope01_b.database/foo/foo.c
+
+# 2
+void foo()
+{
+  printf("%d\n",i);
+}

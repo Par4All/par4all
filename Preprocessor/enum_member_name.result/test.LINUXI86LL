@@ -1,0 +1,11 @@
+
+File enum_member_name.database/main/main.c
+
+# 1
+main()
+{
+  enum hue {node,nide};
+  enum hue1 {node1,nide1};
+  enum hue x;
+  int hue;
+}

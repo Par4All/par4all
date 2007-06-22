@@ -1,0 +1,7 @@
+
+Module main
+
+main()
+{
+  int i = 1 ;
+}

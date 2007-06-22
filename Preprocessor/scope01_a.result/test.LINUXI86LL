@@ -1,0 +1,9 @@
+
+File scope01_a.database/main/main.c
+
+# 2
+main()
+{
+  printf("%d\n",i);
+  foo();
+}

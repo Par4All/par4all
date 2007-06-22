@@ -1,0 +1,18 @@
+
+File tutest.database/tutest/tutest.c
+
+# 6
+void tutest(data1,n1,data2,n2,t,prob)
+float data1[],data2[],*t,*prob;
+int n1,n2;
+{
+        float var1,var2,df,ave1,ave2;
+        void avevar();
+        float betai();
+
+        avevar(data1,n1,&ave1,&var1);
+        avevar(data2,n2,&ave2,&var2);
+        *t=(ave1-ave2)/sqrt(var1/n1+var2/n2);
+        df=(sqrarg=(var1/n1+var2/n2),sqrarg*sqrarg)/((sqrarg=(var1/n1),sqrarg*sqrarg)/(n1-1)+(sqrarg=(var2/n2),sqrarg*sqrarg)/(n2-1));
+        *prob=betai(0.5*df,0.5,df/(df+(sqrarg=(*t),sqrarg*sqrarg)));
+}

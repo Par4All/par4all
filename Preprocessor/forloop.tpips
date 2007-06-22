@@ -1,0 +1,12 @@
+delete forloop
+create forloop forloop.c
+
+quit
+
+activate C_PARSER
+
+display PRINTED_FILE[main]
+
+close
+delete forloop
+quit

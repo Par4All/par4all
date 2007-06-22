@@ -1,0 +1,25 @@
+
+File qromb.database/qromb/qromb.c
+
+# 8
+float qromb(func,a,b)
+float a,b;
+float (*func)();
+{
+        float ss,dss,trapzd();
+        float s[20 +1 +1],h[20 +1 +1];
+        int j;
+        void polint(),nrerror();
+
+        h[1]=1.0;
+        for (j=1;j<=20;j++) {
+                s[j]=trapzd(func,a,b,j);
+                if (j >= 5) {
+                        polint(&h[j-5],&s[j-5],5,0.0,&ss,&dss);
+                        if (fabs(dss) < 1.0e-6*fabs(ss)) return ss;
+                }
+                s[j+1]=s[j];
+                h[j+1]=0.25*h[j];
+        }
+        nrerror("Too many steps in routine QROMB");
+}

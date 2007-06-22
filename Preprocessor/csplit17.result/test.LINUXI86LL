@@ -1,0 +1,26 @@
+
+/* Module csplit17! */
+
+# 1 "/export/temp/irigoin/MYPIPS/prod/pips/Validation/Preprocessor/csplit17.c"
+# 1 "<built-in>"
+# 1 "<command line>"
+# 1 "/export/temp/irigoin/MYPIPS/prod/pips/Validation/Preprocessor/csplit17.c"
+/* See what happens with specific parsing for compilation units */
+
+extern int csplit17(int i, int * pj, int k, int * * pl);
+
+extern int csplit17(int i, int *pj, int k, int **pl);
+
+/* Module csplit17 */
+
+# 5
+int csplit17(int i, int * pj, int k, int * * pl)
+{
+  *pj = i;
+  **pl = k;
+}
+int csplit17(int i,int *pj,int k,int **pl)
+{
+    *pj = i;
+    * *pl = k;
+}

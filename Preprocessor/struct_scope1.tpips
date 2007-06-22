@@ -1,0 +1,18 @@
+delete struct_scope1
+create struct_scope1 struct_scope1.c
+
+shell for i in struct_scope1.database/[a-z_]*[a-z_0-9]/*.c; do echo;echo Module `basename $i .c`;echo; \
+	cat $i; done
+
+close
+delete struct_scope1
+quit
+
+# How can you guess whether it is a C file or a Fortran file?
+activate C_PARSER
+
+display PRINTED_FILE
+
+close
+delete struct_scope1
+quit

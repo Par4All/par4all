@@ -1,0 +1,8 @@
+
+File variable_scope2.database/foo/foo.c
+
+# 2
+foo()
+{
+  i = 2;
+}

@@ -1,0 +1,7 @@
+
+Module main
+
+main()
+{
+  restrict int i;
+}

@@ -1,0 +1,77 @@
+
+File sfroid.database/main/main.c
+
+# 19
+main() /* Program SFROID */
+{
+        int i,itmax,k,indexv[3 +1];
+        float conv,deriv,fac1,fac2,q1,slowc,scalv[3 +1];
+        float **y,**s,***c,**matrix(),plgndr();
+        void solvde(),free_matrix();
+
+        y=matrix(1,3,1,41);
+        s=matrix(1,3,1,(2*3 +1));
+        c=(float ***)malloc((unsigned) 3*sizeof(float **))-1;
+        for (i=1;i<=3;i++) c[i]=matrix(1,(3 -1 +1),1,(41 +1));
+        itmax=100;
+        conv=5.0e-6;
+        slowc=1.0;
+        h=1.0/(41 -1);
+        printf("\nenter m n\n");
+        scanf("%d %d",&mm,&n);
+        if ((n+mm) % 2 == 1) {
+                indexv[1]=1;
+                indexv[2]=2;
+                indexv[3]=3;
+        } else {
+                indexv[1]=2;
+                indexv[2]=1;
+                indexv[3]=3;
+        }
+        anorm=1.0;
+        if (mm) {
+                q1=n;
+                for (i=1;i<=mm;i++) {
+                        anorm = -0.5*anorm*(n+i)*(q1/i);
+                        q1 -= 1.0;
+                }
+        }
+        for (k=1;k<=(41 -1);k++) {
+                x[k]=(k-1)*h;
+                fac1=1.0-x[k]*x[k];
+                fac2=exp((-mm/2.0)*log(fac1));
+                y[1][k]=plgndr(n,mm,x[k])*fac2;
+                deriv = -((n-mm+1)*plgndr(n+1,mm,x[k])-
+                        (n+1)*x[k]*plgndr(n,mm,x[k]))/fac1;
+                y[2][k]=mm*x[k]*y[1][k]/fac1+deriv*fac2;
+                y[3][k]=n*(n+1)-mm*(mm+1);
+        }
+        x[41]=1.0;
+        y[1][41]=anorm;
+        y[3][41]=n*(n+1)-mm*(mm+1);
+        y[2][41]=(y[3][41]-c2)*y[1][41]/(2.0*(mm+1.0));
+        scalv[1]=fabs(anorm);
+        if (y[2][41] > fabs(anorm))
+                scalv[2]=y[2][41];
+        else
+                scalv[2]=fabs(anorm);
+        if (y[3][41] > 1.0)
+                scalv[3]=y[3][41];
+        else
+                scalv[3]=1.0;
+        for (;;) {
+                printf("\nEnter c**2 or 999 to end.\n");
+                scanf("%f",&c2);
+                if (c2 == 999) {
+                        for (i=1;i<=3;i++) free_matrix(c[i],1,(3 -1 +1),1,(41 +1));
+                        free(c+1);
+                        free_matrix(s,1,3,1,(2*3 +1));
+                        free_matrix(y,1,3,1,41);
+                        return;
+                }
+                solvde(itmax,conv,slowc,scalv,indexv,3,1,41,y,c,s);
+                printf("\n %s %2d %s %2d %s %7.3f %s %10.6f\n",
+                        "m =",mm,"  n =",n,"  c**2 =",c2,
+                        " lam =",y[3][1]+mm*(mm+1));
+        }
+}

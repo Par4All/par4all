@@ -1,0 +1,47 @@
+
+File struct_scope.database/foo/foo.c
+
+# 23
+int foo()
+{
+  struct key
+  {
+    int node;
+  };
+  return 1;
+}
+
+File struct_scope.database/main/main.c
+
+# 6
+main()
+{
+  int i = 1;
+  struct key
+  {
+    int node;
+  };
+  if (i>1)
+    {
+      struct key
+      {
+        float node;
+      };
+    }
+  printf("Test\n");
+}
+
+File struct_scope.database/toto/toto.c
+
+# 32
+int toto()
+{
+  int i = 1;
+  if (i>0)
+    {
+      struct test
+      {
+        float a;
+      };
+    }
+}

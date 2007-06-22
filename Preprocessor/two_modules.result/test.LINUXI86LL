@@ -1,0 +1,24 @@
+
+File two_modules.database/foo/foo.c
+
+# 3
+void foo()
+{
+  int c = 5;
+  while (c>0)
+    {
+      c -= 1;
+    }
+}
+
+File two_modules.database/main/main.c
+
+# 12
+main()
+{
+  typedef int myint;
+  typedef myint MYINT;
+  myint n;
+  MYINT m;
+  n = 1;
+}

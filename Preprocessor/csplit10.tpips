@@ -1,0 +1,20 @@
+delete csplit10
+create csplit10 csplit10.c
+
+# do not forget the COMPILATION_UNIT_PREFIX and the FILE_SEP_STRING
+# because we want to check the signature
+
+shell for i in csplit10.database/[#a-z_]*[a-z_0-9!]/*.c; do echo;echo Module `basename $i .c`;echo; \
+	cat $i; done
+
+close
+delete csplit10
+quit
+
+activate C_PARSER
+
+display PRINTED_FILE[csplit10]
+
+close
+delete csplit10
+quit

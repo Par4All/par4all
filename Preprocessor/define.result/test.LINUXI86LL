@@ -1,0 +1,8 @@
+
+File define.database/main/main.c
+
+# 4
+main()
+{
+  int i = 1;
+}

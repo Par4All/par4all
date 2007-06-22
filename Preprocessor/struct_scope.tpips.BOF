@@ -1,0 +1,24 @@
+delete struct_scope
+create struct_scope ${PIPS_ROOT}/Validation/Preprocessor/struct_scope.c
+
+# This file is not syntactically correct
+
+#shell echo `gcc -c ${PIPS_ROOT}/Validation/Preprocessor/struct_scope.c 2>&1`
+
+quit
+
+shell for i in struct_scope.database/[a-z_]*[a-z_%]/*.c; do echo;echo Module `basename $i .c`;echo; \
+	cat $i; done
+
+close
+# delete struct_scope
+quit
+
+# How can you guess whether it is a C file or a Fortran file?
+activate C_PARSER
+
+display PRINTED_FILE
+
+close
+delete struct_scope
+quit

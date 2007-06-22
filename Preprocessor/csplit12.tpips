@@ -1,0 +1,15 @@
+delete csplit12
+create csplit12 csplit12.c
+
+close
+delete csplit12
+quit
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+
+display PRINTED_FILE[main]
+
+close
+delete csplit12
+quit

@@ -1,0 +1,25 @@
+delete laguer
+create laguer laguer.c
+
+# This file cannot be preprocessed because "complex.h" is not available
+
+shell echo `gcc -C -E laguer.c`
+
+quit
+
+# echo cat laguer.database/[a-z_]*[a-z_]/*.c
+shell for i in laguer.database/[a-z_]*[a-z_]/*.c; do echo;echo Module `basename $i .c`;echo; \
+	cat $i; done
+
+close
+# delete laguer
+quit
+
+# How can you guess whether it is a C file or a Fortran file?
+activate C_PARSER
+
+display PRINTED_FILE
+
+close
+delete laguer
+quit

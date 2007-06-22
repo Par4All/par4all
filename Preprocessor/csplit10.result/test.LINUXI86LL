@@ -1,0 +1,20 @@
+
+Module csplit10!
+
+# 1 "$VDIR/csplit10.c"
+# 1 "<built-in>"
+# 1 "<command line>"
+# 1 "$VDIR/csplit10.c"
+/* See what happens with old style declarations. */
+
+extern int csplit10();
+
+Module csplit10
+
+# 3
+int csplit10(i, pj)
+     int i;
+     int * pj;
+{
+  *pj = i;
+}

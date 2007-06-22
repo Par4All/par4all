@@ -1,0 +1,9 @@
+
+File main_hello_world.database/main/main.c
+
+# 4
+main()
+{
+  int i = 0;
+  printf("Hello, world %d\n",i);
+}

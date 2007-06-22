@@ -1,0 +1,9 @@
+
+File keyword.database/main/main.c
+
+# 1
+main()
+{
+  auto int i;
+  static int j;
+}

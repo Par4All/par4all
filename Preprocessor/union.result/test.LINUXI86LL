@@ -1,0 +1,14 @@
+
+File union.database/main/main.c
+
+# 1
+main()
+{
+  union x
+  {
+    int a;
+    float b;
+  };
+
+  union x y;
+}

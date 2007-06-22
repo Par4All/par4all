@@ -1,0 +1,8 @@
+
+File variable_scope3.database/main/main.c
+
+# 4
+main()
+{
+  i = 1;
+}

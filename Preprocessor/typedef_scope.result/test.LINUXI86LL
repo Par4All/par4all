@@ -1,0 +1,30 @@
+
+File typedef_scope.database/foo/foo.c
+
+# 18
+foo()
+{
+  typedef int node;
+  //int node; 
+  struct node
+  {
+    int node;
+  };
+}
+
+File typedef_scope.database/main/main.c
+
+# 4
+main()
+{
+  typedef int node;
+  //int node; 
+  struct node
+  {
+    int node;
+  };
+
+  node n;
+  n = 5;
+  printf("Test\n");
+}

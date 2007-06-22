@@ -1,0 +1,13 @@
+
+File while02.database/main/main.c
+
+# 1
+main()
+{
+  int c = 5; /* initialization not treated yet*/
+  while (c>0)
+    {
+      c -= 1;
+      break;
+    }
+}

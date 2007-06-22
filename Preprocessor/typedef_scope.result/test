@@ -1,0 +1,28 @@
+
+Module foo
+
+foo()
+{
+  typedef int node;
+  //int node; 
+  struct node
+  {
+    int node;
+  };
+}
+
+Module main
+
+main()
+{
+  typedef int node;
+  //int node; 
+  struct node
+  {
+    int node;
+  };
+
+  node n;
+  n = 5;
+  printf("Test\n");
+}

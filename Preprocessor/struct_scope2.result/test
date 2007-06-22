@@ -1,0 +1,7 @@
+
+Module bar
+
+bar ()
+{
+  extern struct s x; 
+}

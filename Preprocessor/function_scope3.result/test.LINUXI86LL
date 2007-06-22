@@ -1,0 +1,7 @@
+
+File function_scope3.database/foo/foo.c
+
+# 3
+extern foo()
+{
+}

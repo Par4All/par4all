@@ -1,0 +1,13 @@
+
+Module foo
+
+foo()
+{
+  i = 2;
+}
+
+Module main
+
+main()
+{
+}

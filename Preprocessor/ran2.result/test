@@ -1,0 +1,28 @@
+
+Module ran2
+
+float ran2(idum)
+long *idum;
+{
+	static long iy,ir[98];
+	static int iff=0;
+	int j;
+	void nrerror();
+
+	if (*idum < 0 || iff == 0) {
+		iff=1;
+		if ((*idum=(150889 -(*idum)) % 714025 ) < 0) *idum = -(*idum);
+		for (j=1;j<=97;j++) {
+			*idum=(1366 *(*idum)+ 150889 ) % 714025 ;
+			ir[j]=(*idum);
+		}
+		*idum=(1366 *(*idum)+ 150889 ) % 714025 ;
+		iy=(*idum);
+	}
+	j=1 + 97.0*iy/ 714025 ;
+	if (j > 97 || j < 1) nrerror("RAN2: This cannot happen.");
+	iy=ir[j];
+	*idum=(1366 *(*idum)+ 150889 ) % 714025 ;
+	ir[j]=(*idum);
+	return (float) iy/ 714025 ;
+}

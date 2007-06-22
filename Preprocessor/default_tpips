@@ -1,0 +1,17 @@
+delete ${WSPACE}
+create ${WSPACE} ${FILE}
+
+# Display result of csplit, except for the compilation unit(s) Because of
+# static functions, do not forget the COMPILATION_UNIT_PREFIX, but no
+# static functions in validation files using default_tpips?
+
+shell for f in ${WSPACE}.database/[a-z_]*[a-z_0-9]/*.c; do \
+	echo ; \
+	echo File $f ; \
+	echo ; \
+	cat $f ; \
+      done
+
+close
+delete ${WSPACE}
+quit

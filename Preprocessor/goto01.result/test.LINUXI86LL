@@ -1,0 +1,11 @@
+
+File goto01.database/main/main.c
+
+# 1
+main()
+{
+  int i = 0;
+  goto lab;
+ lab: i = i+1;
+  printf("%d\n",i);
+}

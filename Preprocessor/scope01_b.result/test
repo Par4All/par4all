@@ -1,0 +1,7 @@
+
+Module foo
+
+void foo()
+{
+  printf("%d\n",i);
+}

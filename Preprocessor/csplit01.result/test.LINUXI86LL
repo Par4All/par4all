@@ -1,0 +1,26 @@
+
+Module csplit01!print_hello
+
+# 5
+static void print_hello()
+{
+  printf("Hello World!\n");
+}
+
+Module main
+
+# 15
+main()
+{
+  print_hello();
+  /* Let's print hello again! */
+  print_hello_too();
+}
+
+Module print_hello_too
+
+# 10
+void print_hello_too()
+{
+  printf("Hello World!\n");
+}

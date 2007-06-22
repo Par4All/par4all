@@ -1,0 +1,10 @@
+
+File old_prototype.database/foo/foo.c
+
+# 1
+void foo(a,b,c)
+     int a,c;
+     float b;
+{
+
+}

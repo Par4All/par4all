@@ -1,0 +1,22 @@
+
+      SUBROUTINE BAR01
+
+      PRINT *, "bar01"                                                  0001
+
+      END
+
+      SUBROUTINE BAR02
+
+      PRINT *, "bar02"                                                  0001
+
+      END
+      SUBROUTINE FOO01
+
+      PRINT *, "foo01"                                                  0001
+
+      END
+      SUBROUTINE FOO02
+
+      PRINT *, "foo02"                                                  0001
+
+      END

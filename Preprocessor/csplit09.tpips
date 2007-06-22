@@ -1,0 +1,22 @@
+delete csplit09
+
+# Although a mistake is detected, PIPS goes on... The precompilation
+# is tentatively applied to csplit09.F without preprocessing.
+
+# The fsplit fails because csplit09.h is missing.
+
+# You end up with a core dump...
+
+# setenv PIPS_CHECK_FORTRAN TRUE
+
+setproperty CHECK_FORTRAN_SYNTAX_BEFORE_PIPS TRUE
+
+create csplit09 csplit09.F
+
+# The creation is doomed on purpose, see source code.
+
+display PRINTED_FILE
+
+echo OK, we are going on...
+
+quit

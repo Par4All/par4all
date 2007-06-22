@@ -1,0 +1,12 @@
+delete csplit20
+create csplit20 csplit20.c
+
+# Bug: the workspace cannot because the source file does not exist.
+
+# quit
+
+activate C_PARSER
+
+display PRINTED_FILE[main]
+
+quit

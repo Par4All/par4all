@@ -1,0 +1,7 @@
+
+Module foo
+
+foo()
+{
+  i = 2;
+}

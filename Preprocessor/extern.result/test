@@ -1,0 +1,7 @@
+
+Module main
+
+main()
+{
+  extern int i,j;
+}

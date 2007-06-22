@@ -1,0 +1,13 @@
+delete enum_scope
+create enum_scope enum_scope.c
+
+close
+delete enum_scope
+quit
+
+activate C_PARSER
+
+display PRINTED_FILE[main]
+display PRINTED_FILE[hue]
+display PRINTED_FILE[test]
+quit

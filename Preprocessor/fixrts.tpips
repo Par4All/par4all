@@ -1,0 +1,25 @@
+delete fixrts
+create fixrts fixrts.c
+
+# This file cannot be preprocessed because "complex.h" is not available
+
+shell echo `gcc -C -E fixrts.c`
+
+quit
+
+# echo cat fixrts.database/[a-z_]*[a-z_]/*.c
+shell for i in fixrts.database/[a-z_]*[a-z_]/*.c; do echo;echo Module `basename $i .c`;echo; \
+	cat $i; done
+
+close
+# delete fixrts
+quit
+
+# How can you guess whether it is a C file or a Fortran file?
+activate C_PARSER
+
+display PRINTED_FILE
+
+close
+delete fixrts
+quit

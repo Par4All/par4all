@@ -1,0 +1,15 @@
+
+Module foo
+
+void foo()
+{
+  printf("%d\n",i);
+}
+
+Module main
+
+main()
+{
+  // printf("%d\n",i);
+  foo();
+}

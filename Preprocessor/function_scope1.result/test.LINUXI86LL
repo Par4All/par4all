@@ -1,0 +1,15 @@
+
+File function_scope1.database/foo/foo.c
+
+# 2
+foo()
+{
+  i = 2;
+}
+
+File function_scope1.database/main/main.c
+
+# 7
+main()
+{
+}
