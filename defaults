@@ -1,6 +1,7 @@
 # $Id$
 # the default validation includes the following subdirectories
 Syntax
+Control
 C_syntax
 Semantics
 RegionPrivatization

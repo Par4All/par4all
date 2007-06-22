@@ -1,0 +1,18 @@
+
+List of callees:
+For loop statement: 
+Declaration list: Switch statement: 
+Declaration list: 
+List of callees:
+void gl_enable()
+{
+   int cap;
+   int p;
+   if (cap==1) {
+   }
+switch_1_case_1:   ;
+   p = 0;
+   if (!(p<6)) {
+   }
+break_2:   ;
+}
