@@ -1,0 +1,32 @@
+C     This sub has the same structure as FFT
+C     this program "core dumped"
+C     During the semantical analysis, MMAX is unknown in the both loops 
+C
+C     Modifications:
+C      - add a second IF THEN ENDIF to preserve the information about N and NN
+      SUBROUTINE FSTR2(DATA,NN,ISIGN)
+      REAL*8 WR,WI,WPR,WPI,WTEMP,THETA
+      DIMENSION DATA(2*NN)
+      N = 2*NN                                                          0001
+      MMAX = 2                                                          0002
+      IF (N.GT.MMAX) THEN                                               0003
+2        IF (N.GT.MMAX) THEN                                            0004
+         ELSE
+            GOTO 99998
+         ENDIF
+         ISTEP = 2*MMAX                                                 0005
+         WI = 0.D0                                                      0006
+         DO M = 1, MMAX, 2                                              0007
+            DO I = M, N, 2*MMAX                                         0008
+               J = I+MMAX                                               0009
+            ENDDO
+         ENDDO
+         DO M = 1, MMAX, 2                                              0007
+            WTEMP = WR                                                  0011
+         ENDDO
+         MMAX = ISTEP                                                   0013
+         GOTO 2
+99998    CONTINUE
+         I = 2                                                          0014
+      ENDIF
+      END

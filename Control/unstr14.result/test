@@ -1,0 +1,30 @@
+      PROGRAM UNSTR
+      INTEGER I,J,K
+      READ *, J, K                                                      0001
+      I = 4                                                             0002
+
+c     500      
+500   IF (J.GE.11) GOTO 501                                             0003
+c     goto 502
+502   PRINT *, '502'                                                    0005
+c     goto 501
+c     501
+501   PRINT *, '501'                                                    0004
+c     goto 502      
+      GOTO 502
+      END
+      PROGRAM UNSTR
+      INTEGER I,J,K
+      READ *, J, K                                                      0001
+      I = 4                                                             0002
+
+c     500      
+500   IF (J.GE.11) GOTO 501                                             0003
+c     goto 502
+502   PRINT *, '502'                                                    0005
+c     goto 501
+c     501
+501   PRINT *, '501'                                                    0004
+c     goto 502      
+      GOTO 502
+      END

@@ -1,0 +1,62 @@
+      PROGRAM UNSTRUC01
+
+C     Check bug in controlizer when controlize_test() calls itself
+C     recursively
+
+      IF (NASS.EQ.157) GOTO 99986                                       0001
+      IF (NASS.EQ.60) GOTO 99985                                        0003
+C     BEGIN BLOCK
+
+      RETURN
+C     END BLOCK
+99985 CONTINUE
+      NQ = 1                                                            0004
+99984 CONTINUE
+      RETURN
+99986 CONTINUE
+      NQ = 4                                                            0002
+      GOTO 99984
+      END
+
+Try Bourdoncle's restructuring...
+
+
+C  T() {}
+
+      PROGRAM UNSTRUC01
+
+C  T() {}
+
+
+C     Check bug in controlizer when controlize_test() calls itself
+C     recursively
+
+      IF (NASS.EQ.157) GOTO 99983                                       0001
+
+C  T() {}
+
+      IF (NASS.EQ.60) GOTO 99982                                        0003
+
+C  T() {}
+
+C     BEGIN BLOCK
+
+C  T() {}
+
+
+      RETURN
+C     END BLOCK
+99982 CONTINUE
+
+C  T(NQ) {NQ==1}
+
+      NQ = 1                                                            0004
+99981 CONTINUE
+      RETURN
+99983 CONTINUE
+
+C  T(NQ) {NQ==4}
+
+      NQ = 4                                                            0002
+      GOTO 99981
+      END

@@ -1,0 +1,112 @@
+      PROGRAM UNSTR
+      INTEGER I,J,K
+      READ *, J, K                                                      0001
+      I = 4                                                             0002
+
+      IF (I.GE.3) GOTO 99998                                            0003
+      I = 1                                                             0005
+100   PRINT *, J                                                        0006
+
+
+      IF (I.GE.34) THEN                                                 0007
+      ENDIF
+c     else goto 150
+c     then goto 150
+150   PRINT *, J                                                        0008
+
+
+      IF (J.GE.3) GOTO 99997                                            0009
+      I = 1                                                             0014
+      GOTO 100
+99997 CONTINUE
+      I = 3                                                             0010
+      IF (K.LT.6) GOTO 99996                                            0011
+      I = I-1                                                           0013
+
+200   PRINT *, I+6                                                      0015
+
+      IF (K.GE.10) GOTO 202                                             0016
+201   IF (J.GE.11) GOTO 202                                             0017
+203   PRINT *, 'j < 11'                                                 0019
+
+400   IF (K.GE.10) GOTO 401                                             0020
+
+c     500      
+500   IF (J.GE.11) GOTO 501                                             0024
+c     goto 502
+502   PRINT *, '502'                                                    0026
+c     goto 501
+c     501
+501   PRINT *, '501'                                                    0025
+c     goto 502      
+      GOTO 502
+c     Some irreductible graphs
+401   IF (J.GE.10) GOTO 402                                             0021
+403   PRINT *, '403'                                                    0023
+402   PRINT *, '402'                                                    0022
+      GOTO 403
+202   PRINT *, 'j >= 11'                                                0018
+      GOTO 400
+99996 CONTINUE
+      I = 7                                                             0012
+      GOTO 200
+99998 CONTINUE
+      I = 3                                                             0004
+      GOTO 100
+      END
+      PROGRAM UNSTR
+      INTEGER I,J,K
+      READ *, J, K                                                      0001
+      I = 4                                                             0002
+
+      IF (I.GE.3) THEN                                                  0003
+         I = 3                                                          0004
+      ELSE
+         I = 1                                                          0005
+      ENDIF
+100   PRINT *, J                                                        0006
+
+
+      IF (I.GE.34) THEN                                                 0007
+      ENDIF
+c     else goto 150
+c     then goto 150
+150   PRINT *, J                                                        0008
+
+
+      IF (J.GE.3) GOTO 99995                                            0009
+      I = 1                                                             0014
+      GOTO 100
+99995 CONTINUE
+      I = 3                                                             0010
+      IF (K.LT.6) THEN                                                  0011
+         I = 7                                                          0012
+      ELSE
+         I = I-1                                                        0013
+      ENDIF
+
+200   PRINT *, I+6                                                      0015
+
+      IF (K.GE.10) GOTO 202                                             0016
+201   IF (J.GE.11) GOTO 202                                             0017
+203   PRINT *, 'j < 11'                                                 0019
+
+400   IF (K.GE.10) GOTO 401                                             0020
+
+c     500      
+500   IF (J.GE.11) GOTO 501                                             0024
+c     goto 502
+502   PRINT *, '502'                                                    0026
+c     goto 501
+c     501
+501   PRINT *, '501'                                                    0025
+c     goto 502      
+      GOTO 502
+c     Some irreductible graphs
+401   IF (J.GE.10) GOTO 402                                             0021
+403   PRINT *, '403'                                                    0023
+402   PRINT *, '402'                                                    0022
+      GOTO 403
+202   PRINT *, 'j >= 11'                                                0018
+      GOTO 400
+      END

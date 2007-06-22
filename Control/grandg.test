@@ -1,0 +1,4 @@
+#! /bin/sh
+Init -f ${VDIR:-.}/grandg.f grandg >&2
+Display -m GRANDG
+Delete grandg

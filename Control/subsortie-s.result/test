@@ -1,0 +1,8 @@
+      SUBROUTINE SUBSORTIE()
+      IF (A.EQ.B) THEN                                                  0001
+      ENDIF
+      END
+      SUBROUTINE SUBSORTIE()
+      IF (A.EQ.B) THEN                                                  0001
+      ENDIF
+      END

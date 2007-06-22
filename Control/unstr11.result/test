@@ -1,0 +1,20 @@
+      PROGRAM EMPTY
+      INTEGER A, B
+
+      J = 3                                                             0001
+
+c     commentaire sur un goto :
+10    CONTINUE                                                          0003
+      PRINT *, J                                                        0004
+
+      END
+      PROGRAM EMPTY
+      INTEGER A, B
+
+      J = 3                                                             0001
+
+c     commentaire sur un goto :
+10    CONTINUE                                                          0003
+      PRINT *, J                                                        0004
+
+      END

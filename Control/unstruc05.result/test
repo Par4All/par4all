@@ -1,0 +1,70 @@
+      PROGRAM UNSTRUC05
+
+C     Check special case of unique successor
+
+      IF (NASS.EQ.157) GOTO 99994                                       0001
+c        false branch
+      CONTINUE
+C     BEGIN BLOCK
+      CONTINUE
+
+100   PRINT *, NASS                                                     0002
+
+      RETURN
+C     END BLOCK
+99994 CONTINUE
+c        true branch
+      CONTINUE
+      GOTO 100
+      CONTINUE
+      END
+
+Try Bourdoncle's restructuring...
+
+
+C  T() {}
+
+      PROGRAM UNSTRUC05
+
+C  T() {}
+
+
+C     Check special case of unique successor
+
+      IF (NASS.EQ.157) GOTO 99993                                       0001
+
+C  T() {}
+
+c        false branch
+      CONTINUE
+
+C  T() {}
+
+C     BEGIN BLOCK
+
+C  T() {}
+
+      CONTINUE
+
+C  T() {}
+
+
+100   PRINT *, NASS                                                     0002
+
+C  T() {}
+
+
+      RETURN
+C     END BLOCK
+99993 CONTINUE
+
+C  T() {}
+
+c        true branch
+      CONTINUE
+      GOTO 100
+
+C  T() {}
+
+      CONTINUE
+      END

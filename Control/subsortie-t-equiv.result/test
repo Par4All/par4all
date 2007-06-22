@@ -1,0 +1,16 @@
+      SUBROUTINE SUBSORTIE()
+383   A = 3                                                             0001
+      IF (A.EQ.B) THEN                                                  0002
+      ELSE
+         GOTO 383
+      ENDIF
+384   CONTINUE                                                          0004
+      END
+      SUBROUTINE SUBSORTIE()
+383   A = 3                                                             0001
+      IF (A.EQ.B) THEN                                                  0002
+      ELSE
+         GOTO 383
+      ENDIF
+384   CONTINUE                                                          0004
+      END

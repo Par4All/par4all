@@ -1,0 +1,29 @@
+      PROGRAM UNSTR
+      INTEGER A, B
+
+c     10 j = 3
+10    J = 3                                                             0001
+c     20   continue: could be fuse with node 30
+
+c     if (a .eq. 0) goto 30
+30    IF (A.EQ.0) GOTO 30                                               0004
+c     if:
+      IF (B.EQ.0) THEN                                                  0006
+         GOTO 30
+      ELSE
+         GOTO 10
+      ENDIF
+      END
+      PROGRAM UNSTR
+      INTEGER A, B
+
+c     10 j = 3
+10    J = 3                                                             0001
+c     20   continue: could be fuse with node 30
+
+c     if (a .eq. 0) goto 30
+30    IF (A.EQ.0) GOTO 30                                               0004
+c     if:
+      IF (B.EQ.0) GOTO 30                                               0006
+      GOTO 10
+      END

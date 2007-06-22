@@ -1,0 +1,10 @@
+      PROGRAM UNSTR
+
+10    CONTINUE                                                          0001
+      GOTO 10
+      END
+      PROGRAM UNSTR
+
+10    CONTINUE                                                          0001
+      GOTO 10
+      END

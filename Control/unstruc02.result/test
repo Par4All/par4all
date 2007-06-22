@@ -1,0 +1,94 @@
+      PROGRAM UNSTRUC02
+
+C     Check bug in controlizer when controlize_test() is called from controlize_list()
+
+      REAL P(10,10,10), A0(10,10,10)
+C     BEGIN BLOCK
+
+      DO 31 I = 1, NIM1                                                 0001
+         DO 31 J = 1, NJM1                                              0002
+            IF (P(I,J,KM).EQ.0.) THEN                                   0003
+C$PIPS STATEMENT FUNCTION AO SUBSTITUTED
+            ELSE
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+            IF (P(I,J,KM).EQ.0.) GOTO 99964                             0005
+C           BEGIN BLOCK
+C           END BLOCK
+C           BEGIN BLOCK
+            ENBAS = 0.                                                  0007
+C           END BLOCK
+31          CONTINUE                                                    0008
+            GOTO 99963
+99964       CONTINUE
+            GOTO 31
+99963       CONTINUE
+
+C     END BLOCK
+      END
+
+Try Bourdoncle's restructuring...
+
+
+C  T() {}
+
+      PROGRAM UNSTRUC02
+
+C     Check bug in controlizer when controlize_test() is called from controlize_list()
+
+      REAL P(10,10,10), A0(10,10,10)
+
+C  T(I,J) {NIM1+1<=I}
+
+C     BEGIN BLOCK
+
+C  T(I,J) {}
+
+
+      DO 31 I = 1, NIM1                                                 0001
+
+C  T(J) {}
+
+         DO 31 J = 1, NJM1                                              0002
+
+C  T() {}
+
+            IF (P(I,J,KM).EQ.0.) THEN                                   0003
+C$PIPS STATEMENT FUNCTION AO SUBSTITUTED
+            ELSE
+
+C  T() {}
+
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+
+C  T() {}
+
+            IF (P(I,J,KM).EQ.0.) GOTO 99962                             0005
+
+C  T() {}
+
+C           BEGIN BLOCK
+C           END BLOCK
+
+C  T() {}
+
+C           BEGIN BLOCK
+
+C  T() {}
+
+            ENBAS = 0.                                                  0007
+C           END BLOCK
+
+C  T() {}
+
+31          CONTINUE                                                    0008
+            GOTO 99961
+99962       CONTINUE
+            GOTO 31
+99961       CONTINUE
+
+C     END BLOCK
+      END

@@ -1,0 +1,36 @@
+      PROGRAM UNSTR
+      INTEGER I,J,K
+      READ *, J, K                                                      0001
+
+c     An asymetrical then test
+      IF (J.GE.3) GOTO 99998                                            0002
+100   PRINT *, J                                                        0004
+
+c     A null test
+      IF (K.GT.27) THEN                                                 0005
+         GOTO 200
+      ELSE
+         GOTO 200
+      ENDIF
+99998 CONTINUE
+      I = 3                                                             0003
+      GOTO 100
+200   CONTINUE                                                          0007
+      PRINT *, K                                                        0007
+
+      END
+      PROGRAM UNSTR
+      INTEGER I,J,K
+      READ *, J, K                                                      0001
+
+c     An asymetrical then test
+      IF (J.GE.3) I = 3                                                 0002
+100   PRINT *, J                                                        0004
+
+c     A null test
+      IF (K.GT.27) THEN                                                 0005
+      ENDIF
+200   CONTINUE                                                          0007
+      PRINT *, K                                                        0007
+
+      END

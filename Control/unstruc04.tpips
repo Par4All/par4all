@@ -1,0 +1,42 @@
+delete unstruc04
+create unstruc04 unstruc04.f
+
+# Make sure that labels referenced thru END= are not lost
+
+# setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+
+setproperty PRETTYPRINT_BLOCKS TRUE
+
+setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+
+# setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+
+# setproperty GATHER_FORMATS_AT_BEGINNING TRUE
+
+# setproperty PRETTYPRINT_FINAL_RETURN TRUE
+
+# setproperty PRETTYPRINT_INTERNAL_RETURN FALSE
+
+# setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
+
+# setproperty PRETTYPRINT_CHECK_IO_STATEMENTS TRUE
+
+# setproperty PRETTYPRINT_ALL_LABELS TRUE
+
+setenv CONTROL_DEBUG_LEVEL 8
+
+setproperty UNSPAGHETTIFY_IN_CONTROLIZER FALSE
+
+display PRINTED_FILE[UNSTRUC04]
+
+echo
+echo Try Bourdoncle's restructuring...
+echo
+
+activate TRANSFORMERS_INTER_FULL
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[UNSTRUC04]
+
+close
+delete unstruc04
+quit

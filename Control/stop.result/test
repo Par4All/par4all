@@ -1,0 +1,9 @@
+C               <may be read    >: __IO_EFFECTS:LUNS(*)
+C               <may be written >: __IO_EFFECTS:LUNS(*)
+	PROGRAM ST
+C               <must be written>: I
+      I = 1                                                             0001
+C               <may be read    >: __IO_EFFECTS:LUNS(*)
+C               <may be written >: __IO_EFFECTS:LUNS(*)
+      STOP                                                              0002
+      END

@@ -1,0 +1,6 @@
+delete t
+create t io_statement.f
+# apply TYPE_CHECKER[%ALL]
+display PRINTED_FILE
+close
+delete t
