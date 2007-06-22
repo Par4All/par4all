@@ -24,7 +24,7 @@ function usage()
     "$0 [options] directories or files...\n" \
     "options:\n" \
     "  -h: show some help\n" \
-    "  -v: be verbose (repeat for more verbosity)\n" \
+    "  -v: be verbose (repeat for more verbosity, 3 or more is debug)\n" \
     "  -p pips: use this 'pips' executable, default $pips\n" \
     "  -t tpips: use this 'tpips' executable, default $tpips\n" \
     "  -m email: send mails?\n" \
@@ -43,7 +43,10 @@ verb=0
 function verb()
 {
   local level=$1 msg=$2
-  [[ $verb -ge $level ]] && echo "# $msg" >&2
+  [[ $verb -ge $level ]] && {
+      while let level-- ; do echo -n '#' ; done
+      echo " $msg" 
+  } >&2
 }
 
 # checks
@@ -119,7 +122,7 @@ function validate_file()
   # file='/some/path/to/directory/file.f'
   local file=$1
   [[ -f $file ]] || usage 12 "no such source file: $file"
-  verb 2 "validating $file..."
+  verb 4 "validating $file..."
 
   # full_name='/some/path/to/directory/file'
   # name='file'
@@ -157,47 +160,48 @@ function validate_file()
   if [[ -r $full_name.test ]] ; then
     verb 3 "$prefix.test method"
     # ??? what about using default_test substitution?!
-    $full_name.test > $out.out 2> $out.err || status=$?
+    $full_name.test 2> $out.err || status=$?
 
   elif [[ -r $full_name.tpips ]] ; then 
     verb 3 "$prefix.tpips method"
-    $tpips $full_name.tpips > $out.out 2> $out.err || status=$?
+    $tpips $full_name.tpips 2> $out.err || status=$?
 
   elif [[ -r $full_name.tpips2 ]] ; then 
     verb 3 "$prefix.tpips2 method (with stderr... bad idea)"
-    $tpips $full_name.tpips2 2>&1 | \
-	sed -e '/ing file /d' \
-	    -e "s/${VDIR//\//\\/}/\$VDIR/g" > $out.out 
-    status=$?
+    $tpips $full_name.tpips2 2>&1 || status=*? 
 
   elif [[ -r $dir/default_test ]] ; then
     verb 3 'default_test method'
-    local test=$tdir/default_test_$$.sh
-    # perform some substitutions...  (could try to "| sh" :-)
+    # perform some substitutions...
     sed -e "s/tested_file/${file//\//\\/}/g" \
 	-e "s/tested_dir/${dir//\//\\/}/g" \
 	-e "s/tested_name/$name/g" \
 	-e "s/TESTED_NAME/$upper/g" \
-	< $dir/default_test > $test
-    chmod +x $test
-    $test > $out.out 2> $out.err || status=$?
-    rm -f $test
+	< $dir/default_test | /bin/sh 2> $out.err
+    status=$?
     
   elif [[ -r $dir/default_tpips ]] ; then
     verb 3 'default_tpips method'
     FILE=$file WSPACE=$name \
-	${tpips} $dir/default_tpips > $out.out 2> $out.err || status=$?
+	${tpips} $dir/default_tpips 2> $out.err || status=$?
     
   else
     verb 3 'default method: Init/Display/Delete'
     {
+      Delete $name 2> /dev/null 1>&2 # ignore delete failure... 
       Init -f $file -d $name || status=$?
       while read module ; do
 	Display -m $module -w $name || status=$?
       done < $name.database/modules
-      Delete $name # ignore delete failture... 
-    } > $out.out 2> $out.err
-  fi
+      Delete $name 2> /dev/null 1>&2 # ignore delete failure... 
+    } 2> $out.err
+  fi > $out.tmp 
+
+  # filter out validation directory path for all output...
+  # the if/fi output above cannot be piped directly because
+  # it would hide the "status" variable setting in a subshell.
+  sed -e "s/${VDIR//\//\\/}/\$VDIR/g" $out.tmp > $out.out && rm -f $out.tmp
+
   [[ -f core ]] && rm -f core # cleanup
 
   if [[ $status -eq 0 ]] ; then
@@ -211,15 +215,16 @@ function validate_file()
     ${PIPS_DIFF:-diff -b -u} $reference $out.out > $out.diff
 
     if [[ -s $out.diff ]] ; then
-      verb 2 "changed: $rel_file"
+      verb 2 "$rel_file: CHANGED"
       echo "changed: $rel_file" >> $summary
       cp $out.out $file_resdir/out
       status=1 # something was wrong...
     else
-      verb 2 "succeeded: $rel_file" # ok!
+      verb 3 "$rel_file: SUCCEEDED" # ok!
       rm -f $out.*
     fi
   else
+      verb 2 "$rel_file: FAILED"
       echo "failed: $rel_file" >> $summary
   fi
 
@@ -232,7 +237,7 @@ elist=''
 for obj ; do
   failed=
   if [ -d $vdir/$obj ] ; then
-    verb 1 "considering $obj directory"
+    verb 1 "considering '$obj' directory"
     for file in $vdir/$obj/*.[cfF] ; do
       validate_file $file || let errors++ failed=1
     done
