@@ -1,4 +1,6 @@
 user warning in tp_parse: alias_transformer: No such workspace
+Registering file alias_transformer.f
+Splitting file    $VDIR/alias_transformer.f
   Module         FOO
   Module         ALIAS_TRANSFORMER
 Workspace alias_transformer created and opened.

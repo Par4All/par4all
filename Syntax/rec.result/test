@@ -1,4 +1,6 @@
 user warning in tp_parse: rec: No such workspace
+Registering file rec.f
+Splitting file    $VDIR/rec.f
   Module         REC
 Workspace rec created and opened.
 Module REC selected

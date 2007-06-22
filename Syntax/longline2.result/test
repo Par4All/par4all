@@ -1,4 +1,6 @@
 user warning in tp_parse: longline2: No such workspace
+Registering file longline2.f
+Splitting file    $VDIR/longline2.f
   Module         LONGLINE2
 Workspace longline2 created and opened.
 Module LONGLINE2 selected
@@ -39,6 +41,8 @@ Closing workspace.
 Workspace longline2 closed.
 
 Workspace longline2 deleted.
+Registering file longline2.f
+Splitting file    $VDIR/longline2.f
   Module         LONGLINE2
 Workspace longline2 created and opened.
 Module LONGLINE2 selected

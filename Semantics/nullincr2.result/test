@@ -1,5 +1,7 @@
 setproperty PRETTYPRINT_BLOCK_IF_ONLY=TRUE
 user warning, property PRETTYPRINT_BLOCK_IF_ONLY redefined
+Registering file nullincr2.f
+Splitting file    $VDIR/nullincr2.f
   Module         NULLINCR2
 Workspace nullincr2 created and opened.
 Module NULLINCR2 selected

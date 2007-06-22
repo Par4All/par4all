@@ -1,4 +1,6 @@
 user warning in tp_parse: save: No such workspace
+Registering file save.f
+Splitting file    $VDIR/save.f
   Module         FOO
   Module         SAVEGLOBAL
 Workspace save created and opened.

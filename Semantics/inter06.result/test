@@ -1,4 +1,6 @@
 user warning in tp_parse: inter06: No such workspace
+Registering file inter06.f
+Splitting file    $VDIR/inter06.f
   Module         INCR
   Module         INTER06
 Workspace inter06 created and opened.

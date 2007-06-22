@@ -8,6 +8,8 @@ echo
 shell sed /cfirst/s/cfirst// ${VDIR:-.}/corinne.f >corinne1.f
 shell sleep 1
 user warning in tp_parse: corinne: No such workspace
+Registering file corinne1.f
+Splitting file    ./corinne1.f
   Module         IFENDDO
   Module         DOENDIF
   Module         CORINNE
@@ -46,6 +48,8 @@ echo
 
 shell sed /csecond/s/csecond// ${VDIR:-.}/corinne.f >corinne2.f
 shell sleep 1
+Registering file corinne2.f
+Splitting file    ./corinne2.f
   Module         IFENDDO
   Module         DOENDIF
   Module         CORINNE
@@ -84,6 +88,8 @@ echo
 
 shell sed /cthird/s/cthird// ${VDIR:-.}/corinne.f >corinne3.f
 shell sleep 1
+Registering file corinne3.f
+Splitting file    ./corinne3.f
   Module         IFENDDO
   Module         DOENDIF
   Module         CORINNE
@@ -120,6 +126,8 @@ echo Fourth try: detect IF/ENDDO pair
 Fourth try: detect IF/ENDDO pair
 echo
 
+Registering file corinne.f
+Splitting file    $VDIR/corinne.f
   Module         IFENDDO
   Module         DOENDIF
   Module         CORINNE
@@ -156,6 +164,8 @@ echo Fifth try: detect DO/ENDIF pair
 Fifth try: detect DO/ENDIF pair
 echo
 
+Registering file corinne.f
+Splitting file    $VDIR/corinne.f
   Module         IFENDDO
   Module         DOENDIF
   Module         CORINNE

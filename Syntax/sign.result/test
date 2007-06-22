@@ -1,4 +1,6 @@
 user warning in tp_parse: sign: No such workspace
+Registering file sign.f
+Splitting file    $VDIR/sign.f
   Module         SIGN
 Workspace sign created and opened.
 Module SIGN selected

@@ -1,6 +1,8 @@
 user warning in tp_parse: blm: No such workspace
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+Registering file blm.f
+Splitting file    $VDIR/blm.f
   Module         OVL
   Module         BLM
 Workspace blm created and opened.
@@ -154,6 +156,8 @@ Workspace blm closed.
 
 Workspace blm deleted.
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+Registering file blm.f
+Splitting file    $VDIR/blm.f
   Module         OVL
   Module         BLM
 Workspace blm created and opened.

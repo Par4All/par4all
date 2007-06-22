@@ -1,4 +1,3 @@
---- IN_Regions for NORM
 
       SUBROUTINE NORM(LI,NI,MI,NN,NC,I) 
 C***************************************************************
