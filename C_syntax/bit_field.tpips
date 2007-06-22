@@ -1,6 +1,6 @@
 delete bit_field
 
-create bit_field ${PIPS_ROOT}/Validation/C_syntax/bit_field.c
+create bit_field bit_field.c
 
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE

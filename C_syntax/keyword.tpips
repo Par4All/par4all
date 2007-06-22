@@ -1,5 +1,5 @@
 delete keyword
-create keyword ${PIPS_ROOT}/Validation/C_syntax/keyword.c
+create keyword keyword.c
 
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE

@@ -1,5 +1,5 @@
 delete switch_for
-create switch_for ${PIPS_ROOT}/Validation/C_syntax/switch_for.c
+create switch_for switch_for.c
 
 activate C_PARSER
 

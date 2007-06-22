@@ -1,5 +1,5 @@
 delete forloop04
-create forloop04 ${PIPS_ROOT}/Validation/C_syntax/forloop04.c
+create forloop04 forloop04.c
 
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE

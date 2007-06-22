@@ -1,5 +1,5 @@
 delete if02
-create if02 ${PIPS_ROOT}/Validation/C_syntax/if02.c
+create if02 if02.c
 
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE

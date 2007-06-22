@@ -1,6 +1,6 @@
 delete memcof
 
-create memcof ${PIPS_ROOT}/Validation/C_syntax/memcof.c
+create memcof memcof.c
 
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE

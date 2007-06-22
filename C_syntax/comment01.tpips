@@ -1,5 +1,5 @@
 delete comment01
-create comment01 ${PIPS_ROOT}/Validation/C_syntax/comment01.c
+create comment01 comment01.c
 
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE

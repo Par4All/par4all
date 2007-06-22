@@ -1,5 +1,5 @@
 delete struct_member_name
-create struct_member_name ${PIPS_ROOT}/Validation/C_syntax/struct_member_name.c
+create struct_member_name struct_member_name.c
 
 activate C_PARSER
 

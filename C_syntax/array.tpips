@@ -1,6 +1,6 @@
 delete array
 
-create array ${PIPS_ROOT}/Validation/C_syntax/array.c
+create array array.c
 
 
 #setenv C_SYNTAX_DEBUG_LEVEL 5

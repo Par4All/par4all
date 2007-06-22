@@ -1,5 +1,5 @@
 delete include
-create include ${PIPS_ROOT}/Validation/C_syntax/include.c
+create include include.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 5 
 

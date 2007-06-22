@@ -1,5 +1,5 @@
 delete formal_function
-create formal_function ${PIPS_ROOT}/Validation/C_syntax/formal_function.c
+create formal_function formal_function.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 5
 

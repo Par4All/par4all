@@ -1,6 +1,6 @@
 delete two_modules
 
-create two_modules ${PIPS_ROOT}/Validation/C_syntax/two_modules.c
+create two_modules two_modules.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 5
 

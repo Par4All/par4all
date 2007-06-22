@@ -1,5 +1,5 @@
 delete while_break
-create while_break ${PIPS_ROOT}/Validation/C_syntax/while_break.c
+create while_break while_break.c
 
 activate C_PARSER
 

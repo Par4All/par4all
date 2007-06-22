@@ -1,5 +1,5 @@
 delete typedef_cast
-create typedef_cast ${PIPS_ROOT}/Validation/C_syntax/typedef_cast.c
+create typedef_cast typedef_cast.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 5
 

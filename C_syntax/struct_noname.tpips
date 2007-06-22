@@ -1,5 +1,5 @@
 delete struct_noname
-create struct_noname ${PIPS_ROOT}/Validation/C_syntax/struct_noname.c
+create struct_noname struct_noname.c
 
 activate C_PARSER
 

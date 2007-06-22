@@ -1,5 +1,5 @@
 delete struct_scope
-create struct_scope ${PIPS_ROOT}/Validation/C_syntax/struct_scope.c
+create struct_scope struct_scope.c
 
 activate C_PARSER
 

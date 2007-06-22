@@ -1,5 +1,5 @@
 delete string
-create string ${PIPS_ROOT}/Validation/C_syntax/string.c
+create string string.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 

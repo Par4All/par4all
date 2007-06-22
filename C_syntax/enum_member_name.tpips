@@ -1,5 +1,5 @@
 delete enum_member_name
-create enum_member_name ${PIPS_ROOT}/Validation/C_syntax/enum_member_name.c
+create enum_member_name enum_member_name.c
 
 activate C_PARSER
 

@@ -1,6 +1,6 @@
 delete array_declarators
 
-create array_declarators ${PIPS_ROOT}/Validation/C_syntax/array_declarators.c
+create array_declarators array_declarators.c
 
 
 setproperty PRETTYPRINT_C_CODE TRUE

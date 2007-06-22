@@ -1,5 +1,5 @@
 delete rsp01
-create rsp01 ${PIPS_ROOT}/Validation/C_syntax/rsp01.c
+create rsp01 rsp01.c
 
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE

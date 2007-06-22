@@ -1,6 +1,6 @@
 delete pointer01
 
-create pointer01 ${PIPS_ROOT}/Validation/C_syntax/pointer01.c
+create pointer01 pointer01.c
 
 
 #setenv PRETTYPRINT_DEBUG_LEVEL 7

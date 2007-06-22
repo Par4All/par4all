@@ -1,6 +1,6 @@
 delete switch
 
-create switch ${PIPS_ROOT}/Validation/C_syntax/switch.c
+create switch switch.c
 
 activate C_PARSER
 

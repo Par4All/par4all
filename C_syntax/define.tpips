@@ -1,5 +1,5 @@
 delete define
-create define ${PIPS_ROOT}/Validation/C_syntax/define.c
+create define define.c
 
 setproperty PRETTYPRINT_C_CODE TRUE
 

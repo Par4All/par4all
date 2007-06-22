@@ -1,5 +1,5 @@
 delete enum_scope
-create enum_scope ${PIPS_ROOT}/Validation/C_syntax/enum_scope.c
+create enum_scope enum_scope.c
 
 activate C_PARSER
 

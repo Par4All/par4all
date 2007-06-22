@@ -1,5 +1,5 @@
 delete conditional
-create conditional ${PIPS_ROOT}/Validation/C_syntax/conditional.c
+create conditional conditional.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 

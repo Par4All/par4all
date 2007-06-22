@@ -1,5 +1,5 @@
 delete if
-create if ${PIPS_ROOT}/Validation/C_syntax/if.c
+create if if.c
 
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE

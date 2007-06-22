@@ -1,5 +1,5 @@
 delete main
-create main ${PIPS_ROOT}/Validation/C_syntax/main.c
+create main main.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 

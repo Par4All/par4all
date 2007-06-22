@@ -1,5 +1,5 @@
 delete struct
-create struct ${PIPS_ROOT}/Validation/C_syntax/struct.c
+create struct struct.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 5
 

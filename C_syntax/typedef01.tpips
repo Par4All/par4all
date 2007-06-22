@@ -1,5 +1,5 @@
 delete typedef01
-create typedef01 ${PIPS_ROOT}/Validation/C_syntax/typedef01.c
+create typedef01 typedef01.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 5
 

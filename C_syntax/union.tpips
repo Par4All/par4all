@@ -1,5 +1,5 @@
 delete union
-create union ${PIPS_ROOT}/Validation/C_syntax/union.c
+create union union.c
 
 activate C_PARSER
 

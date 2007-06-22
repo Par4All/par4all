@@ -1,6 +1,6 @@
 delete dowhile
 
-create dowhile ${PIPS_ROOT}/Validation/C_syntax/dowhile.c
+create dowhile dowhile.c
 
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE

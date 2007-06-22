@@ -1,6 +1,6 @@
 delete local_declaration
 
-create local_declaration ${PIPS_ROOT}/Validation/C_syntax/local_declaration.c
+create local_declaration local_declaration.c
 
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE

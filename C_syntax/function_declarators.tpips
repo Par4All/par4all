@@ -1,6 +1,6 @@
 delete function_declarators
 
-create function_declarators ${PIPS_ROOT}/Validation/C_syntax/function_declarators.c
+create function_declarators function_declarators.c
 
 
 setproperty PRETTYPRINT_C_CODE TRUE

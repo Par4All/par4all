@@ -1,5 +1,5 @@
 delete typedef02
-create typedef02 ${PIPS_ROOT}/Validation/C_syntax/typedef02.c
+create typedef02 typedef02.c
 
 
 setproperty PRETTYPRINT_C_CODE TRUE

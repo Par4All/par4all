@@ -1,5 +1,5 @@
 delete adi02
-create adi02 ${PIPS_ROOT}/Validation/C_syntax/adi02.c
+create adi02 adi02.c
 
 # echo cat adi02.database/[a-z_]*[a-z_]/*.c
 # shell for i in adi.database/[a-z_]*[a-z_]/*.c; do echo;echo Module `basename $i .c`;echo; \

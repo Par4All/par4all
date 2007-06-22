@@ -1,5 +1,5 @@
 delete field_expression
-create field_expression ${PIPS_ROOT}/Validation/C_syntax/field_expression.c
+create field_expression field_expression.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 5
 

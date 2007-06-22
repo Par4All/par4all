@@ -1,5 +1,5 @@
 delete const
-create const ${PIPS_ROOT}/Validation/C_syntax/const.c
+create const const.c
 
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE

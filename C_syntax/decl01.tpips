@@ -1,5 +1,5 @@
 delete decl01
-create decl01 ${PIPS_ROOT}/Validation/C_syntax/decl01.c
+create decl01 decl01.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 1
 

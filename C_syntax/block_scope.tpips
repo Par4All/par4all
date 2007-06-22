@@ -1,5 +1,5 @@
 delete block_scope
-create block_scope ${PIPS_ROOT}/Validation/C_syntax/block_scope.c
+create block_scope block_scope.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 

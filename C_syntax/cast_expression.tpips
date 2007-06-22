@@ -1,5 +1,5 @@
 delete cast_expression
-create cast_expression ${PIPS_ROOT}/Validation/C_syntax/cast_expression.c
+create cast_expression cast_expression.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 

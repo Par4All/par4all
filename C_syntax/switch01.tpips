@@ -1,6 +1,6 @@
 delete switch01
 
-create switch01 ${PIPS_ROOT}/Validation/C_syntax/switch01.c
+create switch01 switch01.c
 
 activate C_PARSER
 

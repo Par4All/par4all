@@ -1,5 +1,5 @@
 delete extern
-create extern ${PIPS_ROOT}/Validation/C_syntax/extern.c
+create extern extern.c
 
 activate C_PARSER
 

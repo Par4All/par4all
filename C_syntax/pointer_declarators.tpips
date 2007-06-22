@@ -1,6 +1,6 @@
 delete pointer_declarators
 
-create pointer_declarators ${PIPS_ROOT}/Validation/C_syntax/pointer_declarators.c
+create pointer_declarators pointer_declarators.c
 
 
 setproperty PRETTYPRINT_C_CODE TRUE

@@ -1,5 +1,5 @@
 delete nested_struct
-create nested_struct ${PIPS_ROOT}/Validation/C_syntax/nested_struct.c
+create nested_struct nested_struct.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 5
 

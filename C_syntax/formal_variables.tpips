@@ -1,5 +1,5 @@
 delete formal_variables
-create formal_variables ${PIPS_ROOT}/Validation/C_syntax/formal_variables.c
+create formal_variables formal_variables.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 

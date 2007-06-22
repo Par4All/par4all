@@ -1,5 +1,5 @@
 delete typedef_name
-create typedef_name ${PIPS_ROOT}/Validation/C_syntax/typedef_name.c
+create typedef_name typedef_name.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 5
 

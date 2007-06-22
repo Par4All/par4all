@@ -1,5 +1,5 @@
 delete internal_static
-create internal_static ${PIPS_ROOT}/Validation/C_syntax/internal_static.c
+create internal_static internal_static.c
 
 activate C_PARSER
 

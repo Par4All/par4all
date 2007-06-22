@@ -1,5 +1,5 @@
 delete function_scope
-create function_scope ${PIPS_ROOT}/Validation/C_syntax/function_scope.c
+create function_scope function_scope.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 

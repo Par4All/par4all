@@ -1,6 +1,6 @@
 delete adi
 
-create adi ${PIPS_ROOT}/Validation/C_syntax/adi.c
+create adi adi.c
 
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE

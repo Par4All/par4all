@@ -1,5 +1,5 @@
 delete goto01
-create goto01 ${PIPS_ROOT}/Validation/C_syntax/goto01.c
+create goto01 goto01.c
 
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE

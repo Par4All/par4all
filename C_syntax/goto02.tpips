@@ -1,5 +1,5 @@
 delete goto02
-create goto02 ${PIPS_ROOT}/Validation/C_syntax/goto02.c
+create goto02 goto02.c
 
 #setenv CONTROL_DEBUG_LEVEL 5
 

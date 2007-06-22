@@ -2,7 +2,7 @@
 
 delete volatile
 
-create volatile ${PIPS_ROOT}/Validation/C_syntax/volatile.c
+create volatile volatile.c
 
 
 activate C_PARSER

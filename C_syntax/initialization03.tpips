@@ -1,5 +1,5 @@
 delete initialization03
-create initialization03 ${PIPS_ROOT}/Validation/C_syntax/initialization03.c
+create initialization03 initialization03.c
 
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE

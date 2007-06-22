@@ -1,6 +1,6 @@
 delete pointer
 
-create pointer ${PIPS_ROOT}/Validation/C_syntax/pointer.c
+create pointer pointer.c
 
 
 setproperty PRETTYPRINT_C_CODE TRUE

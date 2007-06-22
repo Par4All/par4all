@@ -1,5 +1,5 @@
 delete restrict
-create restrict ${PIPS_ROOT}/Validation/C_syntax/restrict.c
+create restrict restrict.c
 
 activate C_PARSER
 

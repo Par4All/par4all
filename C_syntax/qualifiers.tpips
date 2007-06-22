@@ -1,5 +1,5 @@
 delete qualifiers
-create qualifiers ${PIPS_ROOT}/Validation/C_syntax/qualifiers.c
+create qualifiers qualifiers.c
 
 activate C_PARSER
 

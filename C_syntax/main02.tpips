@@ -1,5 +1,5 @@
 delete main02
-create main02 ${PIPS_ROOT}/Validation/C_syntax/main02.c
+create main02 main02.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 

@@ -1,5 +1,5 @@
 delete while_continue
-create while_continue ${PIPS_ROOT}/Validation/C_syntax/while_continue.c
+create while_continue while_continue.c
 
 activate C_PARSER
 

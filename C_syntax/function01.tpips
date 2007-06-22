@@ -1,6 +1,6 @@
 delete function01
 
-create function01 ${PIPS_ROOT}/Validation/C_syntax/function01.c
+create function01 function01.c
 
 
 setproperty PRETTYPRINT_C_CODE TRUE

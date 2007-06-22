@@ -1,5 +1,5 @@
 delete characters
-create characters ${PIPS_ROOT}/Validation/C_syntax/characters.c
+create characters characters.c
 
 activate C_PARSER
 

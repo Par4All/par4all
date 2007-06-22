@@ -1,5 +1,5 @@
 delete forloop
-create forloop ${PIPS_ROOT}/Validation/C_syntax/forloop.c
+create forloop forloop.c
 
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE

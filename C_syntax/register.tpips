@@ -1,5 +1,5 @@
 delete register
-create register ${PIPS_ROOT}/Validation/C_syntax/register.c
+create register register.c
 
 activate C_PARSER
 

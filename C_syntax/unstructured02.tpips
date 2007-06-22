@@ -1,5 +1,5 @@
 delete unstructured02
-create unstructured02 ${PIPS_ROOT}/Validation/C_syntax/unstructured02.c
+create unstructured02 unstructured02.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 

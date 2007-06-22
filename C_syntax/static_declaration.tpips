@@ -1,6 +1,6 @@
 delete static_declaration
 
-create static_declaration ${PIPS_ROOT}/Validation/C_syntax/static_declaration.c
+create static_declaration static_declaration.c
 
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE

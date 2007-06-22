@@ -1,5 +1,5 @@
 delete unsigned
-create unsigned ${PIPS_ROOT}/Validation/C_syntax/unsigned.c
+create unsigned unsigned.c
 
 activate C_PARSER
 

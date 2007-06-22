@@ -1,5 +1,5 @@
 delete convold1
-create convold1 ${PIPS_ROOT}/Validation/C_syntax/convold1.c
+create convold1 convold1.c
 
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
