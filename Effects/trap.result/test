@@ -1,0 +1,14 @@
+      PROGRAM PTRAP
+
+      INTEGER A(10)
+C               <may be written >: A(*)
+C               <must be read   >: TRAP:C
+C               <must be written>: TRAP:C
+
+      CALL TRAP(A, 10)                                                  0001
+C               <may be written >: A(*)
+C               <must be read   >: TRAP:C
+C               <must be written>: TRAP:C
+      CALL TRAP(A, 10)                                                  0002
+
+      END

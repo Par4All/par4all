@@ -1,0 +1,371 @@
+      SUBROUTINE DGESL(A,LDA,N,IPVT,B,JOB)
+      INTEGER LDA,N,IPVT(1),JOB
+      DOUBLE PRECISION A(LDA,1),B(1)
+c
+c     dgesl solves the double precision system
+c     a * x = b  or  trans(a) * x = b
+c     using the factors computed by dgeco or dgefa.
+c
+c     on entry
+c
+c        a       double precision(lda, n)
+c                the output from dgeco or dgefa.
+c
+c        lda     integer
+c                the leading dimension of the array  a .
+c
+c        n       integer
+c                the order of the matrix  a .
+c
+c        ipvt    integer(n)
+c                the pivot vector from dgeco or dgefa.
+c
+c        b       double precision(n)
+c                the right hand side vector.
+c
+c        job     integer
+c                = 0         to solve  a*x = b ,
+c                = nonzero   to solve  trans(a)*x = b  where
+c                            trans(a)  is the transpose.
+c
+c     on return
+c
+c        b       the solution vector  x .
+c
+c     error condition
+c
+c        a division by zero will occur if the input factor contains a
+c        zero on the diagonal.  technically this indicates singularity
+c        but it is often caused by improper arguments or improper
+c        setting of lda .  it will not occur if the subroutines are
+c        called correctly and if dgeco has set rcond .gt. 0.0
+c        or dgefa has set info .eq. 0 .
+c
+c     to compute  inverse(a) * c  where  c  is a matrix
+c     with  p  columns
+c           call dgeco(a,lda,n,ipvt,rcond,z)
+c           if (rcond is too small) go to ...
+c           do 10 j = 1, p
+c              call dgesl(a,lda,n,ipvt,c(1,j),0)
+c        10 continue
+c
+c     linpack. this version dated 08/14/78 .
+c     cleve moler, university of new mexico, argonne national lab.
+c
+c     subroutines and functions
+c
+c     blas daxpy,ddot
+c
+c     internal variables
+c
+      DOUBLE PRECISION DDOT,T
+      INTEGER K,KB,L,NM1
+C               <must be read   >: N
+C               <must be written>: NM1
+c
+      NM1 = N-1                                                         0001
+C               <must be read   >: JOB
+      IF (JOB.NE.0) GOTO 50                                             0002
+C               <must be read   >: NM1
+c
+c        job = 0 , solve  a * x = b
+c        first solve  l*y = b
+c
+      IF (NM1.LT.1) GOTO 30                                             0004
+C               <must be read   >: NM1
+C               <must be written>: K
+      DO 20 K = 1, NM1                                                  0006
+C               <must be read   >: IPVT(K) K NM1
+C               <must be written>: L
+         L = IPVT(K)                                                    0007
+C               <must be read   >: B(L) L NM1
+C               <must be written>: T
+         T = B(L)                                                       0008
+C               <must be read   >: K L NM1
+         IF (L.EQ.K) GOTO 10                                            0009
+C               <must be read   >: B(K) K L NM1
+C               <must be written>: B(L)
+         B(L) = B(K)                                                    0011
+C               <must be read   >: K NM1 T
+C               <must be written>: B(K)
+         B(K) = T                                                       0012
+C               <must be read   >: NM1
+10       CONTINUE                                                       0013
+C               <may be read    >: A(*,*) B(*) T
+C               <may be written >: B(*)
+C               <must be read   >: K N NM1
+         CALL DAXPY(N-K, T, A(K+1,K), 1, B(K+1), 1)                     0014
+C               <must be read   >: NM1
+20       CONTINUE                                                       0015
+30    CONTINUE                                                          0016
+C               <must be read   >: N
+C               <must be written>: KB
+c
+c        now solve  u*x = y
+c
+      DO 40 KB = 1, N                                                   0017
+C               <must be read   >: KB N
+C               <must be written>: K
+         K = N+1-KB                                                     0018
+C               <must be read   >: A(K,K) B(K) K N
+C               <must be written>: B(K)
+         B(K) = B(K)/A(K,K)                                             0019
+C               <must be read   >: B(K) K N
+C               <must be written>: T
+         T = -B(K)                                                      0020
+C               <may be read    >: A(*,*) B(*) T
+C               <may be written >: B(*)
+C               <must be read   >: K N
+         CALL DAXPY(K-1, T, A(1,K), 1, B(1), 1)                         0021
+C               <must be read   >: N
+40       CONTINUE                                                       0022
+      GOTO 90
+50    CONTINUE                                                          0023
+C               <must be read   >: N
+C               <must be written>: K
+c
+c        job = nonzero, solve  trans(a) * x = b
+c        first solve  trans(u)*y = b
+c
+      DO 60 K = 1, N                                                    0024
+C               <may be read    >: A(*,*) B(*)
+C               <must be read   >: K N
+C               <must be written>: T
+         T = DDOT(K-1, A(1,K), 1, B(1), 1)                              0025
+C               <must be read   >: A(K,K) B(K) K N T
+C               <must be written>: B(K)
+         B(K) = (B(K)-T)/A(K,K)                                         0026
+C               <must be read   >: N
+60       CONTINUE                                                       0027
+C               <must be read   >: NM1
+c
+c        now solve trans(l)*x = y
+c
+      IF (NM1.LT.1) GOTO 90                                             0028
+C               <must be read   >: NM1
+C               <must be written>: KB
+      DO 80 KB = 1, NM1                                                 0030
+C               <must be read   >: KB N NM1
+C               <must be written>: K
+         K = N-KB                                                       0031
+C               <may be read    >: A(*,*) B(*)
+C               <must be read   >: B(K) K N NM1
+C               <must be written>: B(K)
+         B(K) = B(K)+DDOT(N-K, A(K+1,K), 1, B(K+1), 1)                  0032
+C               <must be read   >: IPVT(K) K NM1
+C               <must be written>: L
+         L = IPVT(K)                                                    0033
+C               <must be read   >: K L NM1
+         IF (L.EQ.K) GOTO 70                                            0034
+C               <must be read   >: B(L) L NM1
+C               <must be written>: T
+         T = B(L)                                                       0036
+C               <must be read   >: B(K) K L NM1
+C               <must be written>: B(L)
+         B(L) = B(K)                                                    0037
+C               <must be read   >: K NM1 T
+C               <must be written>: B(K)
+         B(K) = T                                                       0038
+C               <must be read   >: NM1
+70       CONTINUE                                                       0039
+C               <must be read   >: NM1
+80       CONTINUE                                                       0040
+90    CONTINUE                                                          0041
+100   CONTINUE                                                          0042
+      END
+C               <may be read    >: A(*,*) B(*) IPVT(*) JOB
+C               <may be written >: B(*)
+C               <must be read   >: LDA N
+      SUBROUTINE DGESL(A,LDA,N,IPVT,B,JOB)
+      INTEGER LDA,N,IPVT(1),JOB
+      DOUBLE PRECISION A(LDA,1),B(1)
+c
+c     dgesl solves the double precision system
+c     a * x = b  or  trans(a) * x = b
+c     using the factors computed by dgeco or dgefa.
+c
+c     on entry
+c
+c        a       double precision(lda, n)
+c                the output from dgeco or dgefa.
+c
+c        lda     integer
+c                the leading dimension of the array  a .
+c
+c        n       integer
+c                the order of the matrix  a .
+c
+c        ipvt    integer(n)
+c                the pivot vector from dgeco or dgefa.
+c
+c        b       double precision(n)
+c                the right hand side vector.
+c
+c        job     integer
+c                = 0         to solve  a*x = b ,
+c                = nonzero   to solve  trans(a)*x = b  where
+c                            trans(a)  is the transpose.
+c
+c     on return
+c
+c        b       the solution vector  x .
+c
+c     error condition
+c
+c        a division by zero will occur if the input factor contains a
+c        zero on the diagonal.  technically this indicates singularity
+c        but it is often caused by improper arguments or improper
+c        setting of lda .  it will not occur if the subroutines are
+c        called correctly and if dgeco has set rcond .gt. 0.0
+c        or dgefa has set info .eq. 0 .
+c
+c     to compute  inverse(a) * c  where  c  is a matrix
+c     with  p  columns
+c           call dgeco(a,lda,n,ipvt,rcond,z)
+c           if (rcond is too small) go to ...
+c           do 10 j = 1, p
+c              call dgesl(a,lda,n,ipvt,c(1,j),0)
+c        10 continue
+c
+c     linpack. this version dated 08/14/78 .
+c     cleve moler, university of new mexico, argonne national lab.
+c
+c     subroutines and functions
+c
+c     blas daxpy,ddot
+c
+c     internal variables
+c
+      DOUBLE PRECISION DDOT,T
+      INTEGER K,KB,L,NM1
+C               <must be read   >: N
+C               <must be written>: NM1
+c
+      NM1 = N-1                                                         0001
+C               <must be read   >: JOB
+      IF (JOB.NE.0) GOTO 50                                             0002
+C               <must be read   >: NM1
+c
+c        job = 0 , solve  a * x = b
+c        first solve  l*y = b
+c
+      IF (NM1.LT.1) GOTO 30                                             0004
+C               <may be read    >: A(*,*) B(*) IPVT(*) K L N T
+C               <may be written >: B(*) L T
+C               <must be read   >: NM1
+C               <must be written>: K
+      DO 20 K = 1, NM1                                                  0006
+C               <may be read    >: IPVT(*)
+C               <must be read   >: K NM1
+C               <must be written>: L
+         L = IPVT(K)                                                    0007
+C               <may be read    >: B(*)
+C               <must be read   >: L NM1
+C               <must be written>: T
+         T = B(L)                                                       0008
+C               <must be read   >: K L NM1
+         IF (L.EQ.K) GOTO 10                                            0009
+C               <may be read    >: B(*)
+C               <may be written >: B(*)
+C               <must be read   >: K L NM1
+         B(L) = B(K)                                                    0011
+C               <may be written >: B(*)
+C               <must be read   >: K NM1 T
+         B(K) = T                                                       0012
+C               <must be read   >: NM1
+10       CONTINUE                                                       0013
+C               <may be read    >: A(*,*) B(*) T
+C               <may be written >: B(*)
+C               <must be read   >: K N NM1
+         CALL DAXPY(N-K, T, A(K+1,K), 1, B(K+1), 1)                     0014
+C               <must be read   >: NM1
+20       CONTINUE                                                       0015
+30    CONTINUE                                                          0016
+C               <may be read    >: A(*,*) B(*) K KB T
+C               <may be written >: B(*) K T
+C               <must be read   >: N
+C               <must be written>: KB
+c
+c        now solve  u*x = y
+c
+      DO 40 KB = 1, N                                                   0017
+C               <must be read   >: KB N
+C               <must be written>: K
+         K = N+1-KB                                                     0018
+C               <may be read    >: A(*,*) B(*)
+C               <may be written >: B(*)
+C               <must be read   >: K N
+         B(K) = B(K)/A(K,K)                                             0019
+C               <may be read    >: B(*)
+C               <must be read   >: K N
+C               <must be written>: T
+         T = -B(K)                                                      0020
+C               <may be read    >: A(*,*) B(*) T
+C               <may be written >: B(*)
+C               <must be read   >: K N
+         CALL DAXPY(K-1, T, A(1,K), 1, B(1), 1)                         0021
+C               <must be read   >: N
+40       CONTINUE                                                       0022
+      GOTO 90
+50    CONTINUE                                                          0023
+C               <may be read    >: A(*,*) B(*) K T
+C               <may be written >: B(*) T
+C               <must be read   >: N
+C               <must be written>: K
+c
+c        job = nonzero, solve  trans(a) * x = b
+c        first solve  trans(u)*y = b
+c
+      DO 60 K = 1, N                                                    0024
+C               <may be read    >: A(*,*) B(*)
+C               <must be read   >: K N
+C               <must be written>: T
+         T = DDOT(K-1, A(1,K), 1, B(1), 1)                              0025
+C               <may be read    >: A(*,*) B(*)
+C               <may be written >: B(*)
+C               <must be read   >: K N T
+         B(K) = (B(K)-T)/A(K,K)                                         0026
+C               <must be read   >: N
+60       CONTINUE                                                       0027
+C               <must be read   >: NM1
+c
+c        now solve trans(l)*x = y
+c
+      IF (NM1.LT.1) GOTO 90                                             0028
+C               <may be read    >: A(*,*) B(*) IPVT(*) K KB L N T
+C               <may be written >: B(*) K L T
+C               <must be read   >: NM1
+C               <must be written>: KB
+      DO 80 KB = 1, NM1                                                 0030
+C               <must be read   >: KB N NM1
+C               <must be written>: K
+         K = N-KB                                                       0031
+C               <may be read    >: A(*,*) B(*)
+C               <may be written >: B(*)
+C               <must be read   >: K N NM1
+         B(K) = B(K)+DDOT(N-K, A(K+1,K), 1, B(K+1), 1)                  0032
+C               <may be read    >: IPVT(*)
+C               <must be read   >: K NM1
+C               <must be written>: L
+         L = IPVT(K)                                                    0033
+C               <must be read   >: K L NM1
+         IF (L.EQ.K) GOTO 70                                            0034
+C               <may be read    >: B(*)
+C               <must be read   >: L NM1
+C               <must be written>: T
+         T = B(L)                                                       0036
+C               <may be read    >: B(*)
+C               <may be written >: B(*)
+C               <must be read   >: K L NM1
+         B(L) = B(K)                                                    0037
+C               <may be written >: B(*)
+C               <must be read   >: K NM1 T
+         B(K) = T                                                       0038
+C               <must be read   >: NM1
+70       CONTINUE                                                       0039
+C               <must be read   >: NM1
+80       CONTINUE                                                       0040
+90    CONTINUE                                                          0041
+100   CONTINUE                                                          0042
+      END
+

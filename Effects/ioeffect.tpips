@@ -1,0 +1,39 @@
+delete ioeffect
+create ioeffect ioeffect.f 
+
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+#apply RESTRUCTURE_CONTROL[%ALL]
+
+#setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+#activate PRECONDITIONS_INTER_FULL
+#activate TRANSFORMERS_INTER_FULL
+activate MUST_REGIONS
+
+activate PRINT_CODE_IN_EFFECTS
+display PRINTED_FILE[%ALL]
+
+#activate PRINT_CODE_OUT_EFFECTS
+#display PRINTED_FILE[%ALL]
+
+#activate PRINT_CODE_IN_REGIONS
+#display PRINTED_FILE[%ALL]
+#display PRINTED_FILE[IOEFFECT]
+
+#activate PRINT_CODE_OUT_REGIONS
+#display PRINTED_FILE[%ALL]
+
+#activate PRINT_CODE_PROPER_EFFECTS
+#display PRINTED_FILE[%ALL]
+
+#setenv IN_EFFECTS_DEBUG_LEVEL 8
+#setenv REGIONS_OPERATORS_DEBUG_LEVEL 8
+
+#setenv USED_BEFORE_SET_DEBUG_LEVEL 1
+
+#make UBS[IOEFFECT]
+close
+delete ioeffect
+
+#quit
+

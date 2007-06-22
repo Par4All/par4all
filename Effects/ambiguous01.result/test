@@ -1,0 +1,32 @@
+
+Effects for AMBIGUOUS01 are first expressed in BAR scope
+
+C               <must be written>: BAR:I
+      PROGRAM AMBIGUOUS01
+C               <must be written>: BAR:I
+
+C     Purpose: to show that effects on I are not translated in a unique way.
+C     Its name depends on the parsing order.
+
+      CALL FOO                                                          0001
+C               <must be written>: BAR:I
+
+      CALL BAR                                                          0002
+
+      END
+
+Effects for AMBIGUOUS01 are now expressed in FOO scope
+
+C               <must be written>: FOO:I
+      PROGRAM AMBIGUOUS01
+C               <must be written>: FOO:I
+
+C     Purpose: to show that effects on I are not translated in a unique way.
+C     Its name depends on the parsing order.
+
+      CALL FOO                                                          0001
+C               <must be written>: FOO:I
+
+      CALL BAR                                                          0002
+
+      END

@@ -1,0 +1,27 @@
+      SUBROUTINE MASK(N)
+C               <must be read   >: N
+
+c     Check that MUST effects mask MAY effects
+
+      IF (N.GT.2) THEN                                                  0001
+C               <must be read   >: N
+C               <must be written>: N
+         N = N+1                                                        0002
+      ENDIF
+
+      END
+C               <may be written >: N
+C               <must be read   >: N
+      SUBROUTINE MASK(N)
+C               <may be written >: N
+C               <must be read   >: N
+
+c     Check that MUST effects mask MAY effects
+
+      IF (N.GT.2) THEN                                                  0001
+C               <must be read   >: N
+C               <must be written>: N
+         N = N+1                                                        0002
+      ENDIF
+
+      END

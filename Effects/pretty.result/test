@@ -1,0 +1,16 @@
+C               <must be written>: BAR:ALPHA BAR:BETA BAR:DELTA 
+C                                  BAR:GAMMA FOO:ALPHA FOO:BETA 
+C                                  FOO:DELTA FOO:GAMMA
+      PROGRAM PRETTY
+C               <must be written>: FOO:ALPHA FOO:BETA FOO:DELTA 
+C                                  FOO:GAMMA
+
+c     Check prettyprinting of effects
+
+      CALL FOO                                                          0001
+C               <must be written>: BAR:ALPHA BAR:BETA BAR:DELTA 
+C                                  BAR:GAMMA
+
+      CALL BAR                                                          0002
+
+      END

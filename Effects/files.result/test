@@ -1,0 +1,27 @@
+C     There should no parallelization possible
+C     because of the write instruction ...
+      PROGRAM FILES
+      INTEGER I(10)
+      INTEGER J
+C               <must be written>: J
+
+      DO 10 J = 1, 20                                                   0001
+C               <must be read   >: I(J) J __IO_EFFECTS:LUNS(5)
+C               <must be written>: __IO_EFFECTS:LUNS(5)
+c         WRITE (UNIT=5,*) I(J)
+         WRITE (5, *) I(J)                                              0002
+10       CONTINUE                                                       0003
+
+      END
+C     There should no parallelization possible
+C     because of the write instruction ...
+      PROGRAM FILES
+      INTEGER I(10)
+      INTEGER J
+
+      DO J = 1, 20                                                      0001
+c         WRITE (UNIT=5,*) I(J)
+         WRITE (5, *) I(J)                                              0002
+      ENDDO
+
+      END

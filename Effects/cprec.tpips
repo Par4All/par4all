@@ -1,0 +1,8 @@
+delete cprec
+create cprec cprec.f
+module CPREC
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE
+close
+delete cprec
+quit

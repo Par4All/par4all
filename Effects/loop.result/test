@@ -1,0 +1,16 @@
+C     Bug: the first loop is not parallelized because N is not privatized
+
+      PROGRAM LOOP
+      REAL T(100)
+
+      DOALL I = 1, M                                                    0001
+         PRIVATE N
+         N = I                                                          0002
+         T(N) = 0.                                                      0003
+      ENDDO
+
+      DOALL N = 1, M                                                    0004
+         T(N) = 1.                                                      0005
+      ENDDO
+
+      END

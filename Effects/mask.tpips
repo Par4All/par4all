@@ -1,0 +1,10 @@
+setproperty PRETTYPRINT_BLOCK_IF_ONLY=TRUE
+delete mask
+create mask mask.f
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE
+close
+delete mask
+quit

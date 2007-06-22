@@ -1,0 +1,13 @@
+#!/bin/sh
+Delete tested_name >&2
+if Pips -f tested_file -w tested_name -m TESTED_NAME \
+        -s prcpe -b PF >&2
+then
+	echo "--- Proper effects for TESTED_NAME"
+	Display -l prop
+	exit_status=0
+else
+	exit_status=1
+fi
+Delete tested_name
+exit $exit_status

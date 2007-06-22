@@ -1,0 +1,5 @@
+--- Proper effects for FOO
+	PROGRAM FOO
+C               <must be written>: I
+      CALL BAR(I)                                                       0001
+      END

@@ -1,0 +1,12 @@
+Selecting rule: PRINT_CODE_PROPER_EFFECTS
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(CONDINC)
+  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(CONDINC)
+  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(CONDINC)
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(INC)
+  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(INC)
+  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(INC)
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(BUGMAY)
+module CONDINC called by module BUGMAY:
+	possible write effect on non-variable actual parameter thru 1st formal parameter K
+module INC called by module BUGMAY:
+	write effect on non-variable actual parameter thru 1st formal parameter K

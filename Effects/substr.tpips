@@ -1,0 +1,8 @@
+delete substr
+create substr substr.f
+module SUBSTR
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE
+close
+delete substr
+quit

@@ -1,0 +1,8 @@
+delete trap
+create trap trap.f
+module PTRAP
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE
+close
+delete trap
+quit
