@@ -632,7 +632,7 @@ i_open:	TK_OPEN TK_NAME TK_ENDOFLINE
 	;
 
 i_create: TK_CREATE TK_NAME /* workspace name */ 
-		filename_list /* fortran files */ TK_ENDOFLINE
+		filename_list /* source files */ TK_ENDOFLINE
 	{
 	    string main_module_name;
 	    pips_debug(7,"reduce rule i_create\n");
