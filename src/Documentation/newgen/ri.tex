@@ -50,12 +50,12 @@ more information about NewGen see \cite{JT89,JT90}.
 This document is part of PIPS documentation and its Latex version is
 located in \verb+$PIPS_ROOT/Src/Documentation/newgen/ri.tex+\footnote{The
   development version is located in \texttt{\$PIPS\_DIR/Development/Documentation/newgen/ri.tex}.} (\verb+ri+
-stands for Internal Representation, {\em représentation interne} in
+stands for Internal Representation, \emph{représentation interne} in
 French). It is used to generate a PIPS include file called
 \verb+$PIPS_ROOT/Include/ri.h+. The functions available to manipulate
 these data structures are grouped in library
 \verb+$PIPS_ROOT/Src/Libs/ri-util+. These functions are grouped in files
-according to the {\em main} type in their signatures. There is no partial order
+according to the \emph{main} type in their signatures. There is no partial order
 between types used to build the internal representation, but they are
 clustered in a (hopefully) meaningful way.
 
@@ -94,7 +94,7 @@ représentation interne de PIPS, nous présentons successivement les
 notions d'entités, de code et d'expressions et la manie`re dont elles
 sont utilisées pour encoder un programme Fortran. Nous détaillons
 ensuite deux structures de données supplémentaires, les effets et les
-{\em transformers} qui sont utilisés pour le calcul de dépendance
+\emph{transformers} qui sont utilisés pour le calcul de dépendance
 interprocédural et pour l'analyse syntaxique interprocédurale.
 \end{comment}
 
@@ -128,39 +128,39 @@ complexity in pipsmake-rc documentation)
 \domain{External Pvecteur}
 {}
 
-Type {\tt Pvecteur} is used to represent affine expressions such as {\tt
-3I+2} (see also type {\tt normalized} in Section~\ref{expression}) or
-affine constraints such as {\tt 3I + J <= 2} or {\tt 3I == J}. The
-representation is sparse and a special dimension, called {\tt
-TCST}, is used for numerical constants. The constraints are used to
+Type \texttt{Pvecteur} is used to represent affine expressions such as 
+\texttt{3I+2} (see also type \texttt{normalized} in Section~\ref{expression}) or
+affine constraints such as \texttt{3I + J <= 2} or \texttt{3I == J}. The
+representation is sparse and a special dimension, called 
+\texttt{TCST}, is used for numerical constants. The constraints are used to
 build systems of equations and inequalities. Such systems are of type
-{\tt Psysteme}.
+\texttt{Psysteme}.
 
 \begin{comment}
-Le domaine {\tt Pvecteur} est utilisé pour représenter les
-expressions linéaires telles que {\tt 3I+2} (voir le domaine {\tt
-normalized}) ou des contraintes linéaires telles que {\tt 3I + J <= 2}
-ou {\tt 3I == J}. Ces contraintes sont utilisées dans les syste`mes
-linéaires (voir le domaine {\tt Psysteme}).
+Le domaine \texttt{Pvecteur} est utilisé pour représenter les
+expressions linéaires telles que \texttt{3I+2} (voir le domaine 
+\texttt{normalized}) ou des contraintes linéaires telles que \texttt{3I + J <= 2}
+ou \texttt{3I == J}. Ces contraintes sont utilisées dans les syste`mes
+linéaires (voir le domaine \texttt{Psysteme}).
 \end{comment}
 
-An object of type {\tt Pvecteur} is a list of pairs $(c,v)$ where $c$ is
+An object of type \texttt{Pvecteur} is a list of pairs $(c,v)$ where $c$ is
 a numerical coefficient and $v$ is a variable. The coefficient is an
 integer, strictly greater or lesser than zero, since zero components are
-not part of a sparse representation. For objects of type {\tt Pvecteur}
-used in PIPS, the variable must be either an {\tt entity} (see
-Section~\ref{entity}) or a special predefined variable {\tt TCST}. Since
+not part of a sparse representation. For objects of type \texttt{Pvecteur}
+used in PIPS, the variable must be either an \texttt{entity} (see
+Section~\ref{entity}) or a special predefined variable \texttt{TCST}. Since
 module names are used to prefix names of regular variables, no name
-conflict with a program variable called {\tt TCST} can occur.
+conflict with a program variable called \texttt{TCST} can occur.
 
 \begin{comment}
 Un Pvecteur est une suite de monômes, un monôme étant un couple
 (coefficient,variable).  Le coefficient d'un tel couple est un entier,
 positif ou négatif. La variable est une entité, sauf dans le cas du
 terme constant qui est représenté par la variable prédéfinie de nom
-{\tt TCST}\footnote{Comme on rajoute le nom des modules devant les
+\texttt{TCST}\footnote{Comme on rajoute le nom des modules devant les
 noms de variables, il ne peut pas y avoir de conflict avec une
-éventuelle variable {\tt TCST}.}.
+éventuelle variable \texttt{TCST}.}.
 \end{comment}
 
 Expressions in programs are stored as affine integer expressions,
@@ -174,7 +174,7 @@ Les expressions apparaissant dans le programme analysé sont mises
 sous cette forme quand c'est possible.
 \end{comment}
 
-The type {\tt Pvecteur} is imported from our Integer Linear Algebra
+The type \texttt{Pvecteur} is imported from our Integer Linear Algebra
 Library, also called C3 library because its development was funded by
 the CNRS C3 program. See~??? for more details about this library and its
 content.
@@ -191,22 +191,22 @@ linéaire en nombres entiers du CRI.
 \domain{External Psysteme}
 {}
 
-Type {\tt Psystem} is used to store systems of affine equalities and
+Type \texttt{Psystem} is used to store systems of affine equalities and
 inequalities. They are used in many areas of PIPS such as semantics
 analysis, region analysis, dependence testing, code generation,... They
-appear here for the semantics analysis and are used by the {\tt
-predicate} type (see Section~\ref{semantics}).
+appear here for the semantics analysis and are used by the 
+\texttt{predicate} type (see Section~\ref{semantics}).
 
 \begin{comment}
-Le domaine {\tt Psysteme} est utilisé pour représenter les syste`mes
+Le domaine \texttt{Psysteme} est utilisé pour représenter les syste`mes
 d'équations et d'inéquations linéaires qui apparaissent lors
-de la phase d'analyse sémantique (voir le domaine {\tt predicate}).
+de la phase d'analyse sémantique (voir le domaine \texttt{predicate}).
 
 Les Psystemes sont aussi implicitement utilisés pour effectuer le
 calcul de dépendance.
 \end{comment}
 
-Objects of type {\tt Psysteme} contain six fields:
+Objects of type \texttt{Psysteme} contain six fields:
 
 \begin{itemize}
   \item a list of equalities,
@@ -232,7 +232,7 @@ Un Psysteme est formé de six champs:
 \end{itemize}
 \end{comment}
 
-Like the {\tt Pvecteur} type, data structure {\tt Psysteme} is imported
+Like the \texttt{Pvecteur} type, data structure \texttt{Psysteme} is imported
 from our Integer Linear Algebra Library. This library contains an
 extensive set of functions on Psystems. See ??? for more details.
 
@@ -260,21 +260,21 @@ accessed by name.
 \domain{tabulated entity = name:string x type x storage x initial:value}
 
 Any named object in a Fortran program is represented by an object of
-type {\tt entity}. Such object could be a module (function or subroutine
+type \texttt{entity}. Such object could be a module (function or subroutine
 or program), a variable, a common, an operator, an
-intrinsic\index{Intrinsic}, a constant, a label,... Field {\tt name}
+intrinsic\index{Intrinsic}, a constant, a label,... Field \texttt{name}
 contains the name of the object, more or less as it appears in the
 source code, concatenated to a prefix string and a special one-character
 separator, \verb/MODULE_SEP_STRING/.  The prefix string is the name of
 the package defining the scope of the object. The package name may be a
-module name, the reserved name {\tt TOP-LEVEL} for global objects, or
+module name, the reserved name \texttt{TOP-LEVEL} for global objects, or
 some other reserved names for objects specific to some analysis,
 e.g. \verb+*SEMANTICS*+ for value names used in the semantics
 analysis. Note the use of star, \verb+*+, to avoid name collision with
 user defined name.
 
-To sum up, an entity name is unique and known internally as a {\em
-global} name. It is made of a {\em local} name and a {\em module} name.
+To sum up, an entity name is unique and known internally as a 
+\emph{global} name. It is made of a \emph{local} name and a \emph{module} name.
 
 Several other tricks are used to store information in names. To spot
 main modules which cannot be distinguished from subroutines by the
@@ -283,19 +283,19 @@ character, \verb/MAIN_PREFIX/. Local names of labels\index{Label} also
 are prefixed by one character, \verb/LABEL_PREFIX/. Two special label
 entities are used and defined by two special names: 
 \verb/EMPTY_LABEL_NAME/, which is used for statements with no label (see
-Function {\tt empty\_label\_p()}), and
+Function \texttt{empty\_label\_p()}), and
 \verb/RETURN_LABEL_NAME/ which is used to define the unique return point
-of a module. Every {\tt RETURN} statement is translated into a jump to
+of a module. Every \texttt{RETURN} statement is translated into a jump to
 this artificial return point.
 
-As expected, field {\tt type} specifies the type of the object (see
-Section~\ref{subsection-type}), field {\tt storage} defines the memory
+As expected, field \texttt{type} specifies the type of the object (see
+Section~\ref{subsection-type}), field \texttt{storage} defines the memory
 allocation class (see Section~\ref{subsection-storage}) for the object
 (e.g. dynamic, static,...).
 
-The last field, {\tt initial}, contains the initial {\tt value} of the
+The last field, \texttt{initial}, contains the initial \texttt{value} of the
 object, it is known. A value can be anything that makes sense. For
-instance, the value of a module is its {\tt code}.
+instance, the value of a module is its \texttt{code}.
 
 \begin{comment}
 Tout objet ayant un nom dans un programme Fortran est représenté par
@@ -316,7 +316,7 @@ Functions mostly dealing with entities are grouped in
 \verb/ri-util/entity.c/ and \verb/ri-util/variable.c/ for entities used
 to represent program variables.
 
-Note the {\em tabulated} attribute. It means that NewGen keeps track
+Note the \emph{tabulated} attribute. It means that NewGen keeps track
 implicitly of all entities allocated. All entities (and objects of other
 tabulated types) are accessible through a huge hash table using their
 names as keys.
@@ -334,19 +334,19 @@ etc.
 
 \domain{Type = statement:unit + area + variable + functional + varargs:type + unknown:unit + void:unit + struct:entity* + union:entity* + enum:entity*}
 
-Obviously, type {\tt type} is used to represent the type of an
+Obviously, type \texttt{type} is used to represent the type of an
 entity. This type is defined as union to cover the needs of different
-kinds of entities. Member {\tt statement} is used for statement
+kinds of entities. Member \texttt{statement} is used for statement
 labels\index{Label}, since a label points towards a statement. Member
-{\tt area} is used for commons\index{Common}. Two additional areas are
+\texttt{area} is used for commons\index{Common}. Two additional areas are
 defined as implicit common, the static and the dynamic areas associated
-to a module. Their specific names are defined in {\tt ri-util.h}.
+to a module. Their specific names are defined in \texttt{ri-util.h}.
 
-Member {\tt variable} is used for all variables and symbolic constants. It
+Member \texttt{variable} is used for all variables and symbolic constants. It
 also is used for formal parameters and for results of functions. Member
-{\tt functional} is used for modules which are functions, subroutines and
-main programs. Member {\tt varargs} is used to declare intrinsics with
-varying number of arguments such as \verb/MAX/. Member {\tt void} is used
+\texttt{functional} is used for modules which are functions, subroutines and
+main programs. Member \texttt{varargs} is used to declare intrinsics with
+varying number of arguments such as \verb/MAX/. Member \texttt{void} is used
 to declare the functional types of subroutines and programs.
 
 \begin{comment}
@@ -368,8 +368,8 @@ ou d'un programme principal.
 
 \domain{Area = size:int x layout:entity*}
 
-Type {\tt area} is used to represent storage sections for variables such
-as commons or static or dynamic area. Areas are {\em global} objects in
+Type \texttt{area} is used to represent storage sections for variables such
+as commons or static or dynamic area. Areas are \emph{global} objects in
 the current implementation. The package name used in the corresponding
 entity name must be \verb/TOP-LEVEL/, but this is not explictly
 enforced. Dynamic commons defined by the Fortran standard are not
@@ -378,14 +378,14 @@ commons cannot be statically identified because a dynamic binding is
 used.
 
 \begin{comment}
-Le domaine {\tt area} est utilisé pour représenter les aires de
+Le domaine \texttt{area} est utilisé pour représenter les aires de
 stockage des variables telles que les commons et les aires statiques ou
 dynamiques. Ces aires sont des objets globaux et leur package de
 rattachement est donc \verb/TOP-LEVEL/.
 \end{comment}
 
-Field {\tt size} is the amount of memory space expressed in bytes, or
-according to the Fortran standard in {\em character storage unit}
+Field \texttt{size} is the amount of memory space expressed in bytes, or
+according to the Fortran standard in \emph{character storage unit}
 (X3.9-1978, \S~2.13), which is required to allocate the area in memory.
 This space is the largest\footnote{It may even be larger than the space
   required in any module if some typing information is given after the
@@ -396,22 +396,22 @@ to enforce a unique size for all declarations of a common, but this is not
 true in the current version which only emits a warning.
 
 \begin{comment}
-Le sous-domaine {\tt size} donne la taille de l'aire
-exprimée en octets ({\em character storage unit} de la norme ANSI
+Le sous-domaine \texttt{size} donne la taille de l'aire
+exprimée en octets (\emph{character storage unit} de la norme ANSI
 X3.9-1978, \S~2.13). Cette taille est la taille maximum rencontrée
 parmi les modules d'un programme. 
 \end{comment}
 
-Field {\tt layout} is the list of all variables declared allocated in the
+Field \texttt{layout} is the list of all variables declared allocated in the
 area. These variables may have been declared in different modules, where
 the common itself is declared. They may have been declared explicitly in a
 COMMON declaration or implicitly through EQUIVALENCE declarations. Their
 names are non-ambiguous because PIPS entity names include a package name
-as prefix. Their offsets in the common are stored in Type {\tt storage}
+as prefix. Their offsets in the common are stored in Type \texttt{storage}
 (see Section~\ref{subsubsection-ram}).
 
 \begin{comment}
-Le sous-domaine {\tt layout} donne la
+Le sous-domaine \texttt{layout} donne la
 liste des entités stockées dans cette aire. Il s'agit des variables
 déclarées dans ce common dans n'importe quel module.
 \end{comment}
@@ -419,15 +419,15 @@ déclarées dans ce common dans n'importe quel module.
 As long as no program transformation has been applied, the textual order
 for common declarations is preserved in the layout list. This can be used
 to regenerate declarations close to the programmer declarations. Note that
-equivalenced variables appear {\em after} all variables explictly declared
+equivalenced variables appear \emph{after} all variables explictly declared
 in a common\footnote{This is not true for the *dynamic* area used to
   allocate stack variables. The bug should be fixed... soon.}. It is
 possible to detect the first implicit variable by checking that the
 increasing offsets of variables is suddenly no longer increasing. The
 first variable whose offset is less than or equal to the previous offset
-is the first variable declared in the common through an {\tt EQUIVALENCE}
+is the first variable declared in the common through an \texttt{EQUIVALENCE}
 statement. All variables declared in the same module and appearing beyond
-this one also have been declared with an {\tt EQUIVALENCE} statement.
+this one also have been declared with an \texttt{EQUIVALENCE} statement.
 
 To provide the best possible user-friendliness, remember that programmer
 declarations are in fact stored as a huge string which is used by
@@ -447,11 +447,11 @@ absolue.}.
 
 \domain{Variable = basic x dimensions:dimension* x qualifiers:qualifier*}
 
-Type {\tt variable} represents the type of usual non-functional
-variables. Field {\tt basic} is the underlying scalar type, e.g. {\tt
-REAL*8} or {\tt INTEGER*4}. Field {\tt dimensions} is a list of lower
-and upper bound pairs. Scalar variables are of dimension 0 and have an
-empty dimension list.
+Type \texttt{variable} represents the type of usual non-functional
+variables. Field \texttt{basic} is the underlying scalar type, e.g. 
+\texttt{REAL*8} or \texttt{INTEGER*4}. 
+Field \texttt{dimensions} is a list of lower and upper bound pairs. 
+Scalar variables are of dimension 0 and have an empty dimension list.
 
 \begin{comment}
 Le domaine \verb/variable/ représente le type d'une variable.  Le
@@ -466,8 +466,8 @@ constant expressions. Formal parameters can be used to specify the
 dimensions of other formal parameters. A special predefined constant
 entity is used for arrays with no defined dimension which often are
 declared in libraries such as (\verb/DIMENSION T(*)/). Its name is
-'*D*'\footnote{In {\tt ri-util}, the unbounded dimension name is {\tt
-UNBOUNDED-DIMENSION}.}.
+'*D*'\footnote{In \texttt{ri-util}, the unbounded dimension name is 
+\texttt{UNBOUNDED-DIMENSION}.}.
 
 \begin{comment}
 Chaque dimension est une expression, qui n'est pas nécessairement
@@ -483,11 +483,11 @@ nom '*D*' est utilisée pour les tableaux de taille non définie
 
 \domain{Basic = int:int + float:int + logical:int + overloaded:unit + complex:int + string:value + bit:int + pointer:type + derived:entity + typedef:entity}
 
-Type {\tt basic} is used to store basic type information such has {\tt
-REAL} or {\tt INTEGER}. Each member includes a precision information,
+Type \texttt{basic} is used to store basic type information such has 
+\texttt{REAL} or \texttt{INTEGER}. Each member includes a precision information,
 namely the number of bytes required to store one scalar object of this
 type. The precision information is numerically known for all basic types
-but for {\tt string}.
+but for \texttt{string}.
 
 \begin{comment}
 Le domaine \verb/basic/ permet de représenter un type Fortran tel que
@@ -495,11 +495,11 @@ INTEGER ou REAL. La valeur de ce domaine donne la longueur en octets de
 la zone mémoire occupée par une variable de ce type.
 \end{comment}
 
-Note that no {\em default} type is provided. Untyped object are given
+Note that no \emph{default} type is provided. Untyped object are given
 the current default type when they are first encountered. They only can
 be typed explictly if they still have their default type when the type
 declaration is encountered. PIPS parser is implemented in such a way
-that {\tt IMPLICIT} statements should appear as early as possible in a
+that \texttt{IMPLICIT} statements should appear as early as possible in a
 module declarations.
 
 It is not clear that mapping caracter strings on \verb/string:value/ was
@@ -512,7 +512,7 @@ array of one character.
 
 \domain{Dimension = lower:expression x upper:expression}
 
-Type {\tt dimension} is used to represent intervals, with a lower and
+Type \texttt{dimension} is used to represent intervals, with a lower and
 an upper bounds. These bounds may not be numerically known at compile
 time when they are used to define formal arrays.
 
@@ -534,15 +534,15 @@ tableau, c'est-a`-dire un couple borne inférieure -- sous-domaine
 
 \domain{Functional = parameters:parameter* x result:type}
 
-Type {\tt functional} is used for objects representing the explicit
+Type \texttt{functional} is used for objects representing the explicit
 syntactic type of a module, function, subroutine or main program. It
 also is used for Fortran operators and intrinsics. Even constants have a
 functional type because they are seen as 0-ary functions. This reduces
 the amount of coding because many Fortran constructs can be handled as
 (pseudo) function calls. Effects on global variables are not taken into
-account for typing. Field {\tt parameters} contains the type of each
-formal parameter, and the in/out information. Field {\tt result}
-contains the result type. Type {\tt void} is used for subroutines and
+account for typing. Field \texttt{parameters} contains the type of each
+formal parameter, and the in/out information. Field \texttt{result}
+contains the result type. Type \texttt{void} is used for subroutines and
 main programs.
 
 \begin{comment}
@@ -557,9 +557,9 @@ programmes principaux.
 There is no provision to represent functions or subroutines with varying
 number of formal parameters. This facility is not supported by Fortran
 for programmer-defined modules, but it is used for intrinsics such as
-\verb+MIN0+ which expects a {\em list} of integer parameters, and for
+\verb+MIN0+ which expects a \emph{list} of integer parameters, and for
 Fortran primitives\footnote{Fortran primitives are encoded like
-intrinsics and called {\em intrinsics} in PIPS.} such as {\tt WRITE}
+intrinsics and called \emph{intrinsics} in PIPS.} such as \texttt{WRITE}
 which is highly polymorphic.
 
 \begin{comment}
@@ -580,7 +580,7 @@ predicate to recognize intrinsics entities.
 
 \domain{Parameter = type x mode}
 
-Objects of type {\tt parameter} represents type and inout information
+Objects of type \texttt{parameter} represents type and inout information
 for formal parameters.
 
 \begin{comment}
@@ -591,9 +591,9 @@ parame`tre formel de module.
 \index{Mode}
 \domain{Mode = value:unit + reference:unit}
 
-Type {\tt mode} is used to carry inout information for formal
-parameters. Member {\tt value} is used for calling by value. Member {\tt
-reference} is used for calling by reference. Fortran uses calls by reference.
+Type \texttt{mode} is used to carry inout information for formal
+parameters. Member \texttt{value} is used for calling by value. Member 
+\texttt{reference} is used for calling by reference. Fortran uses calls by reference.
 
 \begin{comment}
 Le domaine \verb/mode/ représente le mode de passage d'un parame`tre
@@ -609,7 +609,7 @@ par adresse.
 \domain{Storage = return:entity + ram + formal + rom:unit}
 {}
 
-Type {\tt storage} is used to specify where an entity is stored. There
+Type \texttt{storage} is used to specify where an entity is stored. There
 are many storage spaces, but they do not have to exist physically in the
 machine. Some of them would not appear in a simple compiler.
 
@@ -620,11 +620,11 @@ correspondent pas nécessairement a` la réalité, c'est-a`-dire aux
 zones de mémoire qui seraient affectées par un compilateur.
 \end{comment}
 
-Member {\tt return} is appropriate for Fortran functions. The value
+Member \texttt{return} is appropriate for Fortran functions. The value
 returned by a function is locally stored in a variable whose name is the
 function name. This variable can be used by the Fortran programmer like
 any other variable in statements and expressions. The entity accessible
-thru the {\tt return} field is the corresponding function.
+thru the \texttt{return} field is the corresponding function.
 
 \begin{comment}
 Le sous-domaine \verb/return/ permet de représenter les variables ayant
@@ -633,9 +633,9 @@ fonction doit retourner. L'entité pointée par \verb/return/ est la
 fonction concernée.
 \end{comment}
 
-Member {\tt ram} is only used for variables having an address in
+Member \texttt{ram} is only used for variables having an address in
 some memory space. The memory space may be linked to a module or to a
-common. Those may be accessed thru the {\tt ram} field.
+common. Those may be accessed thru the \texttt{ram} field.
 
 \begin{comment}
 Le sous-domaine \verb/ram/ est reservé aux variables ayant une adresse
@@ -643,7 +643,7 @@ en mémoire. Il permet de préciser dans quelle fonction et
 éventuellement dans quel common ces variables ont été déclarées.
 \end{comment}
 
-Member {\tt formal} is the special space for formal parameters. Of
+Member \texttt{formal} is the special space for formal parameters. Of
 course, they do not have their own address.
 
 \begin{comment}
@@ -651,9 +651,9 @@ Le sous-domaine \verb/formal/ est réservé aux parame`tres formels des
 modules.
 \end{comment}
 
-Member {\tt rom} is used for all entities whose value cannot change. This
+Member \texttt{rom} is used for all entities whose value cannot change. This
 set of entities includes modules, labels, intrinsic operators, symbolic
-values (defined by Fortran {\tt PARAMETER} statement or by the semantics
+values (defined by Fortran \texttt{PARAMETER} statement or by the semantics
 analysis or by the region analyses), numerical constant,...
 
 \begin{comment}
@@ -669,39 +669,40 @@ opérateurs, etc.
 \domain{Ram = function:entity x section:entity x offset:int x shared:entity*}
 {}
 
-Type {\tt ram} contains all information required to locate a variable in
-memory and to guess what its scope is. Member {\tt function} contains
+Type \texttt{ram} contains all information required to locate a variable in
+memory and to guess what its scope is. Member \texttt{function} contains
 the module in which a variable is declared. In Fortran, a variable scope
 is a module. Variables with the same name and with the same offset in
 the same common are two different variables. They are aliased but they
 are different. They have different global names
 (see~Section~\ref{subsection-entity}).
 
-Member {\tt section} contains the {\em area} in which the variable is
+Member \texttt{section} contains the \emph{area} in which the variable is
 stored. It is an entity of type area (see
 Section~\ref{subsubsection-area}). For each module, there is one area for
 each declared common\footnote{Note that a module may have effects on
   variables beyond its scope via procedure calls and common variables.}
 and two specific areas called \verb/*STATIC*/ and \verb/*DYNAMIC*/ used
-for local variables. Static variables are explicitly declared in a {\tt
-  SAVE} statement or implicitly made static by a {\tt DATA}
+for local variables. Static variables are explicitly declared in a 
+\texttt{SAVE} statement or implicitly made static by a \texttt{DATA}
 statement\footnote{See Fortran standard Section~(8-11) about SAVE and
-  Section~(9-1) about DATA.} unless they are explicitly declared in a {\tt
-  COMMON} because PIPS sets all commons as static. In other words, dynamic
+  Section~(9-1) about DATA.} unless they are explicitly declared in a 
+  \texttt{COMMON} because PIPS sets all commons as static. 
+  In other words, dynamic
 commons are not handled by PIPS\footnote{The decision not to handle
   dynamic commons was based on two remarks: (1) no Fortran compiler in
   1988 handled dynamic commons and (2) dynamic commons are not lexically
   scoped which make static analyses very difficult or even impossible.}. By default, variables
 can be stack allocated and are called dynamic variables.
 
-Member {\tt offset} is the variable address in its area. Addresses are
+Member \texttt{offset} is the variable address in its area. Addresses are
 allocated according to the declaration or occurence order. Increasing
 values starting at 0 are used. The memory unit is defined by Fortran
 standard and is one byte for PIPS.
 
-Member {\tt shared} contains a list of variables which are statically
+Member \texttt{shared} contains a list of variables which are statically
 aliased with variable whose storage is described. Static aliasing is
-generated by {\tt EQUIVALENCE} statements\index{Equivalence} and by
+generated by \texttt{EQUIVALENCE} statements\index{Equivalence} and by
 multiple declarations of the same common in different
 procedures. Dynamic aliasing created at call sites is not taken into
 account. Dependence tests, use-def chain computations, semantics
@@ -715,8 +716,8 @@ entité est déclarée. Le sous-domaine \verb/section/ indique dans
 quelle aire une entité est stockée; il y a une aire par common
 déclaré et deux aires spéciales nommées \verb/STATIC/ et
 \verb/DYNAMIC/ pour les entités locales. Le sous-domaine \verb/offset/
-donne l'adresse dans l'aire de la variable. Enfin, le sous-domaine {\tt
-shared} donne la liste des entités qui partagent statiquement un
+donne l'adresse dans l'aire de la variable. Enfin, le sous-domaine 
+\texttt{shared} donne la liste des entités qui partagent statiquement un
 morceau d'espace mémoire avec la variable concerné. En Fortran, le
 partage de mémoire vient des equivalences entre variables.
 \end{comment}
@@ -728,8 +729,8 @@ partage de mémoire vient des equivalences entre variables.
 \domain{Formal = function:entity x offset:int}
 {}
 
-Type {\tt formal} defines the module related to a formal parameter
-through the {\tt function} member and the rank of this parameter in the
+Type \texttt{formal} defines the module related to a formal parameter
+through the \texttt{function} member and the rank of this parameter in the
 formal parameter list. The first parameter has rank 1, not 0.
 
 \begin{comment}
@@ -750,20 +751,20 @@ Le premier parame`tre a un rang de 1 et non de 0.
 Type \verb/value/ is used to store initial values of all kinds of
 entities, as long as something makes sense as initial value. Member
 \verb/code/ is used for modules. Member \verb/symbolic/ is used for symbolic
-constants, declared in Fortran by keyword {\tt PARAMETER}. Member 
+constants, declared in Fortran by keyword \texttt{PARAMETER}. Member 
 \verb/constant/ is used for numerical and litteral constants\footnote{It might
-also be used for variables which are initialized by a {\tt DATA}
+also be used for variables which are initialized by a \texttt{DATA}
 statement. To be checked.}. Their values always are stored in their
 entity names\footnote{Their local name is the external representation of
 their value as defined by the language.}, but integer constants which
 are more important for automatic parallelization and code optimization
-also are stored in binary representation. Member {\tt intrinsic} is used
+also are stored in binary representation. Member \texttt{intrinsic} is used
 for entities which are language-defined, such as Fortran intrinsics,
-operators, IO instructions,... Member {\tt unknown} is used for entities
+operators, IO instructions,... Member \texttt{unknown} is used for entities
 with no initial values. For instance, areas might not have any initial
 values because there is no sensible information to use as initial
-value. Also, variables which are not statically initialized by a {\tt
-DATA} statement, (probably) have an {\tt unknown} initial value.
+value. Also, variables which are not statically initialized by a 
+\texttt{DATA} statement, (probably) have an \texttt{unknown} initial value.
 
 \begin{comment}
 Le domaine \verb/value/ permet de représenter les
@@ -789,12 +790,12 @@ initial value since a common represented an address.
 \domain{Symbolic = expression x constant}
 {}
 
-Type {\tt symbolic} is used to represent the declared value of a symbolic
-constant defined by a Fortran {\tt PARAMETER} or a Pascal {\tt CONST}
-declaration. Member {\tt expression} contains the hopefully constant
+Type \texttt{symbolic} is used to represent the declared value of a symbolic
+constant defined by a Fortran \texttt{PARAMETER} or a Pascal \texttt{CONST}
+declaration. Member \texttt{expression} contains the hopefully constant
 expression which is statically evaluated by the compiler to find the
-numerical initial value. This value is stored in member {\tt
-constant}. Member {\tt expression} is used to restore user-frinedly
+numerical initial value. This value is stored in member \texttt{constant}. 
+Member \texttt{expression} is used to restore user-frinedly
 declarations but has no other known use. 
 
 \begin{comment}
@@ -848,16 +849,16 @@ expression in \verb/symbolic/.
 \domain{Code = declarations:entity* x decls\_text:string x initializations:sequence}
 {}
 
-Type {\tt code} is not used to stored module bodies. The effective code
-body must be retrieved from the PIPS database through a call to {\tt
-pipsdbm} (see \cite{Trio90}). There is no direct link
+Type \texttt{code} is not used to stored module bodies. The effective code
+body must be retrieved from the PIPS database through a call to 
+\texttt{pipsdbm} (see \cite{Trio90}). There is no direct link
 between the symbol table and the pieces of code to make these data
 structures independent with respect to NewGen. The pieces of code can be
 stored and retrieved without storing and retrieving the symbol
 table. However, note that the symbol table, which is unique for a whole
 program, must be loaded before any piece of code can be loaded.
 
-Type {\tt code} only is used for declarations. Member {\tt declarations}
+Type \texttt{code} only is used for declarations. Member \texttt{declarations}
 contains a list of entities in the module scope. Local variables, formal
 parameters and commons are in this list. It also may contain symbolic
 constants, operators and intrinsics declared or referenced in the module.
@@ -888,7 +889,7 @@ It is sometimes useful to regenerate declarations because lazy users
 include every single common in every procedure.
 
 \begin{comment}
-Le sous-domaine {\tt decls\_text} contient le texte exact de toutes les
+Le sous-domaine \texttt{decls\_text} contient le texte exact de toutes les
 déclarations du module; ce texte est utilisé par défaut par le
 prettyprinter tant qu'il existe. Quand le code a été fortement
 transformé, le prettyprinter régéne`re des déclarations
@@ -904,21 +905,21 @@ synthétiques.
 \domain{Callees = callees:string*}
 {}
 
-Type {\tt callees} is a list of string. It was given the name {\tt
-callees} by mistaken a variable for a type. It is used to store the
+Type \texttt{callees} is a list of string. It was given the name 
+\texttt{callees} by mistaken a variable for a type. It is used to store the
 global (?) names of subroutines and functions directly called from a
 piece of code. Such objects are initialized by the parser.
 
 It is a tiny part of the call graph which is stored as a tree of strings
 rather than a tree of entities (it probaly was quicker to implement
-initially). The call graph is stored implictly, using {\tt pipsdbm}. A
-list {\tt callees} is associated to each module and can be retrieved
-through a call to {\tt pipsdbm}.
+initially). The call graph is stored implictly, using \texttt{pipsdbm}. A
+list \texttt{callees} is associated to each module and can be retrieved
+through a call to \texttt{pipsdbm}.
 
 \begin{comment}
-Le domaine {\tt callees} sert a` porter des informations
-interprocédurales, et sera enrichi dans le futur.  Le sous-domaine {\tt
-callees} contient la liste des noms des sous-programmes et fonctions
+Le domaine \texttt{callees} sert a` porter des informations
+interprocédurales, et sera enrichi dans le futur.  Le sous-domaine 
+\texttt{callees} contient la liste des noms des sous-programmes et fonctions
 directement appelés dans le code. Il contient une partie du callgraph.
 \end{comment}
 
@@ -940,13 +941,13 @@ handle.
 \domain{Statement = label:entity x number:int x ordering:int x comments:string x instruction x declarations:entity* x decls_text:string}
 {}
 
-Type {\tt statement} is used as a container of instructions. Methods for
-statements are in Library {\tt ri-util/statement.c}. Member {\tt
-label} is an entity of kind label. Such entities can be recognized by
+Type \texttt{statement} is used as a container of instructions. Methods for
+statements are in Library \texttt{ri-util/statement.c}. Member 
+\texttt{label} is an entity of kind label. Such entities can be recognized by
 their names. See Section~\ref{subsection-entity} for more details about
 name structures and handling of statements with no labels and return
-points. Note that statements containing a {\tt block} or {\tt
-unstructured} instruction should not have a label, as you might find out
+points. Note that statements containing a \texttt{block} or 
+\texttt{unstructured} instruction should not have a label, as you might find out
 when using the prettyprinter.
 
 \begin{comment}
@@ -960,7 +961,7 @@ spécial. Un autre label spécial, \verb/empty_label/, est utilisé pour
 les statements sans label.
 \end{comment}
 
-Member {\tt number} contains an external number which is not used by
+Member \texttt{number} contains an external number which is not used by
 PIPS. This number may be used as a statement identifier for debugging
 purposes or for user interaction because PIPS components try to propagate
 it as much as possible when new code derived. For instance, several
@@ -996,9 +997,9 @@ principe) jamais modifié par PIPS. Apre`s déroulage de boucle,
 plusieurs \verb/statement/s peuvent avoir le me^me numéro.
 \end{comment}
 
-Member {\tt ordering} is a 32-bit statement internal identifier. It is
-made out of two 16-bit fields: the most-significant field is a {\tt
-control} number and the least-significant one is a statement number
+Member \texttt{ordering} is a 32-bit statement internal identifier. It is
+made out of two 16-bit fields: the most-significant field is a 
+\texttt{control} number and the least-significant one is a statement number
 within a structured code piece. Two statements are textually comparable
 if their control numbers are equal. If they are comparable, their
 textual order is given by the least significant 16 bits.
@@ -1037,7 +1038,7 @@ créer une table de correspondance entre \verb/ordering/ et
 interne et doit cond e^tre calculée explicitement.
 \end{comment}
 
-Member {\tt ordering} is not computed for all statements reachable
+Member \texttt{ordering} is not computed for all statements reachable
 through the NewGen internal representation. Specifically, statements
 which are not reachable forwards or backwards through the control flow
 graph only using the entry point of an unstructured are not ordered. For
@@ -1063,11 +1064,11 @@ ou de manie`re systématique avec les fonctions de parcours de NewGen,
 \verb/gen_multi_recurse/\index{gen\_multi\_recurse},...
 \end{comment}
 
-Member {\tt comments} contains the comments associated to the
+Member \texttt{comments} contains the comments associated to the
 statement in the source program. This string\footnote{To avoid
   problems with static buffers, a list of strings should have been
   used to store comments.} is used by the prettyprinter. Comments are
-associated to the {\em next} executable statement. For statements with
+associated to the \emph{next} executable statement. For statements with
 no comments, this member receives a special value,
 \verb/empty_comments/\footnote{This special value used to be
   \texttt{string\_undefined}, but its name carried less semantics.
@@ -1088,7 +1089,7 @@ that may disappear during processing, such as CONTINUE, RETURN and
 GO~TO, may disappear too.
 
 \begin{comment}
-Le sous-domaine {\tt comments} contient le texte du commentaire associé
+Le sous-domaine \texttt{comments} contient le texte du commentaire associé
 a ce statement dans le programme initial; ce texte est utilisé par le
 prettyprinter. Ce sont les commentaires qui préce`dent le statement
 qui s'y trouvent associés. En l'absence de commentaires, ce champ
@@ -1097,7 +1098,7 @@ des instructions qui peuvent disparaître au cours des traitements comme
 CONTINUE, RETURN et GOTO, peuvent aussi disparaitre.
 \end{comment}
 
-Member {\tt instruction} contains the instruction itself.
+Member \texttt{instruction} contains the instruction itself.
 
 \begin{comment}
 Le sous-domaine \verb/instruction/ contient
@@ -1119,9 +1120,9 @@ instead.
 \domain{persistant\_statement\_to\_statement = persistant statement -> persistant statement}
 {}
 
-Type {\tt persistant\_statement\_to\_statement} is used for example in
+Type \texttt{persistant\_statement\_to\_statement} is used for example in
 \verb/use_def_elimination()/ to store the eventual statement father of a
-statement. The {\em persistant} pragma is needed to avoid freeing the
+statement. The \emph{persistant} pragma is needed to avoid freeing the
 statements when the mapping is freed. See NewGen documentation in
 \cite{JT90}.
 
@@ -1130,7 +1131,7 @@ statements when the mapping is freed. See NewGen documentation in
 \domain{persistant\_statement\_to\_int = persistant statement -> int}
 {}
 
-Type {\tt persistant\_statement\_to\_int} is used for instance to
+Type \texttt{persistant\_statement\_to\_int} is used for instance to
 associate line number to a statement.
 
 \subsection{Instruction}
@@ -1139,28 +1140,28 @@ associate line number to a statement.
 
 \domain{Instruction = sequence + test + loop + whileloop + goto:statement + call + unstructured + multitest + forloop + return:expression + expression}
 
-Type {\tt instruction} is used to represent the command associated to a
+Type \texttt{instruction} is used to represent the command associated to a
 statement. An instruction can either be a sequence, a test, a loop,
-parallel or sequential, an unconditional branch ({\tt goto}) pointing to
-the branch target, an elementary command ({\tt call}) or a whole control
+parallel or sequential, an unconditional branch (\texttt{goto}) pointing to
+the branch target, an elementary command (\texttt{call}) or a whole control
 flow graph.
 
 Elementary commands are used for Fortran statements and intrinsics and
-operators. There are {\tt call}'s for assignments\index{Assignment},
+operators. There are \texttt{call}'s for assignments\index{Assignment},
 subroutine calls, input-outputs, returns, stops, modulos, the overloaded
-{\tt +}, and so on. This is detailed in
+\texttt{+}, and so on. This is detailed in
 Section~\ref{subsubsection-call}.
 
 The code of a module is either in a user-defined form or in so-called
-{\tt controlized} form. In the former case, no {\tt unstructured}
-instruction is allowed and explicit {\tt goto}'s are used. In the later
-case, {\tt goto}'s are forbidden and abstracted by {\tt
-unstructered}. of course, a fully-structured code does not contain
-either {\tt goto} or {\tt unstructured}\footnote{PIPS does not contain a
+\texttt{controlized} form. In the former case, no \texttt{unstructured}
+instruction is allowed and explicit \texttt{goto}'s are used. In the later
+case, \texttt{goto}'s are forbidden and abstracted by 
+\texttt{unstructered}. of course, a fully-structured code does not contain
+either \texttt{goto} or \texttt{unstructured}\footnote{PIPS does not contain a
 control restructurer but it is interfaced to Toolpack.}. The
 user-defined form only is used by the parser and some
-pretty-printers. The pretty-printers are able to restore Fortran-77 {\tt
-goto}'s from the {\tt unstructured}. More on this in
+pretty-printers. The pretty-printers are able to restore Fortran-77 
+\texttt{goto}'s from the \texttt{unstructured}. More on this in
 Section~\ref{subsubsection-unstructured}.
 
 \begin{comment}
@@ -1188,9 +1189,9 @@ expression, so we have to add \verb/expression/ to \verb/instruction/.
 \index{Sequence}
 \domain{Sequence = statements:statement*}
 
-Type {\tt sequence} is self-explanatory. This is the standard sequence
+Type \texttt{sequence} is self-explanatory. This is the standard sequence
 constructor. The empty sequence is used to represent an instruction with
-no effect, a {\tt NOP}. See {\tt empty\_statement\_p()}.
+no effect, a \texttt{NOP}. See \texttt{empty\_statement\_p()}.
 
 Note that the statement owning the sequence cannot have information
 such as \verb|comment|, etc. on it. See~\ref{}
@@ -1299,23 +1300,23 @@ Figure~\ref{figure-hierarchical-control-flow-graph}).
 
 \domain{Test = condition:expression x true:statement x false:statement}
 
-Type {\tt test} is used to represent conditional statements. Field {\tt
-condition} must contain a {\em boolean}\footnote{Note that expressions
+Type \texttt{test} is used to represent conditional statements. Field 
+\texttt{condition} must contain a \emph{boolean}\footnote{Note that expressions
 are untyped in PIPS internal representation. They are kept in an
 overloaded form because typing does not matter for parallelization. An
 new pass would be required to insert the conversion operators. Besides,
 fully typed Fortran operators would have to be added.} expression to
-evaluate. Fields {\tt true} and {\tt false} contain the statement to
+evaluate. Fields \texttt{true} and \texttt{false} contain the statement to
 execute if the test evaluates to true or false.
 
-If the false branch is empty, an {\em empty} statement is inserted. It might
-be an empty sequence or a {\tt CONTINUE} statement or... (see Function
-{\tt empty\_statement\_p}). Of course, an empty statement {\em must} have
+If the false branch is empty, an \emph{empty} statement is inserted. It might
+be an empty sequence or a \texttt{CONTINUE} statement or... (see Function
+\texttt{empty\_statement\_p}). Of course, an empty statement \emph{must} have
 an empty label (see Section~\ref{subsection-entity}).
 
 Fortran control instructions, but DO loops with no internal exits, are decomposed into
-combinations of such {\tt test} instructions and other PIPS instructions
-by the parser, which may add {\tt goto} statements, and by the controlizer.
+combinations of such \texttt{test} instructions and other PIPS instructions
+by the parser, which may add \texttt{goto} statements, and by the controlizer.
 
 \begin{comment}
 Le domaine \verb/test/ permet de représenter toutes les instructions a` base
@@ -1335,14 +1336,15 @@ et de \verb/goto/s.
 
 \domain{Loop = index:entity x range x body:statement x label:entity x execution x locals:entity*}
 
-Type {\tt loop} is used to represent Fortran DO loops or Pascal FOR
-loops. Field {\tt index} points to the loop index, an entity. Field {\tt
-range} contains the lower and upper bounds, as well as the step. Field
-{\tt body} points to the loop body, a unique statement which usually is
-a sequence. Field {\tt label} is used for Fortran labelled DO loops. It
-is the label of the last statement in the loop body. Field {\tt
-execution} specifies if the loop should be executed sequentially or
-concurrently. Entities in the {\tt local}\index{Private} field are loop-private
+Type \texttt{loop} is used to represent Fortran DO loops or Pascal FOR
+loops. Field \texttt{index} points to the loop index, an entity. Field 
+\texttt{range} contains the lower and upper bounds, as well as the step. Field
+\texttt{body} points to the loop body, a unique statement which usually is
+a sequence. Field \texttt{label} is used for Fortran labelled DO loops. It
+is the label of the last statement in the loop body. Field \texttt{execution}
+specifies if the loop should be executed sequentially or
+concurrently. Entities in the \texttt{local}\index{Private} field 
+are loop-private
 variables. They can be stack-allocated on body entrance and deallocated
 on exit. The read and write effects on these variables are not visible
 from outside the loop body. They can be privatized and their effects can
@@ -1369,9 +1371,9 @@ masqués quand on sort de la boucle).
 \index{Execution}\index{Sequential Loop}\index{Parallel Loop}
 \domain{Execution = sequential:unit + parallel:unit}
 
-Type {\tt execution} is used to specify if a loop must be executed
-sequentially ({\tt sequential} or if it may be executed concurrently
-({\tt parallel}). The parser only
+Type \texttt{execution} is used to specify if a loop must be executed
+sequentially (\texttt{sequential} or if it may be executed concurrently
+(\texttt{parallel}). The parser only
 recognizes sequential loops.
 
 \begin{comment}
@@ -1400,7 +1402,7 @@ supérieure et l'incrément.
 Expressions of type range can be used in other context. For instance,
 Fortran~90 triplet construct is a range. See
 Section~\ref{section-expressions} for details about expressions. For
-loops, other ranges are {\em not} expected in bound and step expressions.
+loops, other ranges are \emph{not} expected in bound and step expressions.
 
 
 \subsubsection{While Loop}
@@ -1429,8 +1431,8 @@ Type \verb/call/ is used to represent Fortran commands as well as
 user-defined function and subroutine calls in a pseudo-functional
 way. These pseudo-functions with side effects are very important for the
 PIPS internal representation since constants, operators such as + and *,
-intrinsics like {\tt MOD} or {\tt SIN}, and basic Fortran statements
-such as assignment {\tt =},{\tt READ, WRITE, PAUSE, OPEN, CLOSE, RETURN,
+intrinsics like \texttt{MOD} or \texttt{SIN}, and basic Fortran statements
+such as assignment \texttt{=},\texttt{READ, WRITE, PAUSE, OPEN, CLOSE, RETURN,
 CALL, FORMAT}, and so on... are all encoded in the same way, like
 user-defined function calls. The number of arguments depends on the
 pseudo-function: 0 for constants, 1 or 2 for operators, and so
@@ -1444,9 +1446,9 @@ Le domaine \verb/call/ permet de représenter les commandes et les
 appels de fonctions Fortran sous une forme unique pseudo-fonctionelle.
 Ces pseudo-fonctions jouent un rôle important dans notre
 représentation intermédiaire puisque les constantes, les opérateurs
-comme + et *, les intrinse`ques comme {\tt MOD} ou {\tt SIN} et surtout
+comme + et *, les intrinse`ques comme \texttt{MOD} ou \texttt{SIN} et surtout
 les commandes (i.e. instructions) Fortran, a` commencer par
-l'assignation et en continuant avec {\tt READ, WRITE, PAUSE, OPEN,
+l'assignation et en continuant avec \texttt{READ, WRITE, PAUSE, OPEN,
 CLOSE, RETURN, CALL, FORMAT,}
 etc., sont représentées comme les appels de fonctions définies par
 l'utilisateur. Le nombre d'arguments de chaque pseudo-fonction varie: 0
@@ -1476,7 +1478,7 @@ appelée. Le sous-domaine \verb/arguments/ est une liste de sous-domaines
 {}
 
 
-Domain \verb/control/ is the type of {\em nodes} used to implement the
+Domain \verb/control/ is the type of \emph{nodes} used to implement the
 CFG implied by an unstructured instruction (see Domain
 \verb/unstructured/, Section~\ref{subsubsection-unstructured}). Each
 control node points towards a statement which can represent an arbitrary
@@ -1571,20 +1573,20 @@ representation of affine integer expressions stored as
 
 \begin{comment}
 Le domaine \verb/expression/ permet de stocker les expressions.  Le
-sous-domaine {\tt syntax} contient la description de l'expression telle
+sous-domaine \texttt{syntax} contient la description de l'expression telle
 qu'elle apparaît dans le texte source du programme. Le sous-domaine
-{\tt normalized} contient une forme compilée des expressions
+\texttt{normalized} contient une forme compilée des expressions
 linéaires, sous forme de \verb/Pvecteur/\index{Pvecteur}.
 \end{comment}
 
-If field {\tt normalized} is set to value {\tt
-normalized\_undefined}, this implies that the PIPS function used to
+If field \texttt{normalized} is set to value 
+\texttt{normalized\_undefined}, this implies that the PIPS function used to
 detect affine expressions and sub-expressions has not been called. This
 {\bf does not} imply that the expression is not affine.
 
 \begin{comment}
-Si le sous-domaine {\tt normalized} contient la valeur {\tt
-normalized\_undefined}, cela signifie que la fonction de linéarisation
+Si le sous-domaine \texttt{normalized} contient la valeur 
+\texttt{normalized\_undefined}, cela signifie que la fonction de linéarisation
 n'a pas été appelée pour cette expression; cela {\bf ne} signifie
 {\bf pas} que l'expression n'est pas linéaire.
 \end{comment}
@@ -1596,8 +1598,8 @@ reset. Else some normalized expressions end up with non-normalized
 sub-expressions, and with a non-consistent normalized form.
 
 Expressions synthesized by program transformations, such as partial
-evaluation or loop interchange, should all have their {\tt normalized}
-field set to {\tt normalized\_undefined}.
+evaluation or loop interchange, should all have their \texttt{normalized}
+field set to \texttt{normalized\_undefined}.
 
 \subsubsection{Mapping between Expressions and effects}
 
@@ -1615,11 +1617,11 @@ defined in the program source code. A \verb/syntax/ object is either a
 \verb/reference/ object pointing towards an array
 element\footnote{Scalar variables are represented as 0-dimensional
   arrays.}, or a \verb/call/ to a function\footnote{All operators and
-  commands, including assignment, are encoded as {\em functions}. This
-  explains why the \texttt{call} type is defined in the {\em
-    Instruction} section.}, or a \verb/range/ as in loop
+  commands, including assignment, are encoded as \emph{functions}. This
+  explains why the \texttt{call} type is defined in the 
+  \emph{Instruction} section.}, or a \verb/range/ as in loop
 definitions\footnote{This explains why type \texttt{range} is defined
-  in the {\em Instruction} section.} and array declarations.
+  in the \emph{Instruction} section.} and array declarations.
 
 New kinds of syntax are added to handle C language. They are {\it cast},
  {\it sizeof}, {\it subscripting array} and
@@ -1637,10 +1639,10 @@ qu'elles apparaissent dans le texte source du programme. Un
 (on rappelle que les scalaires sont des tableaux a` 0 dimension) , soit
 un \verb/call/ a` une fonction (les opérateurs sont représentés par
 des fonctions pré-définies, y compris l'assignation; c'est pourquoi le
-domaine {\tt call} est défini dans la section {\em Instructions}), soit
+domaine \texttt{call} est défini dans la section \emph{Instructions}), soit
 un \verb/range/, dans le cas des expressions bornes de boucles (le domaine
-{\tt range} est présenté au niveau des boucles, aussi dans la section
-{\em Instructions}).
+\texttt{range} est présenté au niveau des boucles, aussi dans la section
+\emph{Instructions}).
 \end{comment}
 
 \subsubsection{Reference}
@@ -1672,7 +1674,7 @@ référence a` un élément de tableau\footnote{Les variables scalaires
 a des scalaires sont aussi prises en compte. Elles contiennent une liste
 vide d'expressions d'indices.}.  Le sous-domaine \verb/variable/
 contient une entité définissant la variable référencée. Le
-sous-domaine \verb/indices/ contient une liste {\tt expression}s qui sont les
+sous-domaine \verb/indices/ contient une liste \texttt{expression}s qui sont les
 indices de la référence.
 \end{comment}
 
@@ -1724,22 +1726,22 @@ with side effect. See Section~\ref{subsubsection-call}.
 Type \verb/normalized/ is used to check if an expression is an affine
 integer expression using only integer scalar variables (Field
 \verb/linear/) or not (Field \verb/complex/\footnote{This does not mean
-that the expression is {\em complex} in the mathematical sense.}).
+that the expression is \emph{complex} in the mathematical sense.}).
 
 \begin{comment}
-Le domaine {\tt normalized} permet de savoir si une expression est une
+Le domaine \texttt{normalized} permet de savoir si une expression est une
 expression linéaire construite sur les variables simples entie`res
-(sous-domaine {\tt linear}) ou non (sous-domaine {\tt complex}).
+(sous-domaine \texttt{linear}) ou non (sous-domaine \texttt{complex}).
 \end{comment}
 
-Field \verb/complex/ is used if the expression is not affine, e.g. {\tt
-I*J+4}, or if it is affine but contains references to non integer scalar
-variables, e.g. {\tt T(I-1) + T(I) + T(I+1)}.
+Field \verb/complex/ is used if the expression is not affine, e.g. 
+\texttt{I*J+4}, or if it is affine but contains references to non integer scalar
+variables, e.g. \texttt{T(I-1) + T(I) + T(I+1)}.
 
 \begin{comment}
-Le sous-domaine {\tt complex} est utilisé si l'expression n'est pas
-linéaire (ex: {\tt I*J+4}) ou si elle est linéaire mais contient autre
-chose que des références a` des scalaires entiers (ex: {\tt T(I-1) +
+Le sous-domaine \texttt{complex} est utilisé si l'expression n'est pas
+linéaire (ex: \texttt{I*J+4}) ou si elle est linéaire mais contient autre
+chose que des références a` des scalaires entiers (ex: \texttt{T(I-1) +
 T(I) + T(I+1)}).
 \end{comment}
 
@@ -1774,7 +1776,7 @@ parallelize programs. Several analyses provide different approximations
 of the statement effects on memory.
 
 Each program variable is a unique set of memory locations. Effects can
-be expressed as effects on these sets. They are called {\em atomic}
+be expressed as effects on these sets. They are called \emph{atomic}
 effects, because a whole data structure is seen as read or written as
 soon as one element is read or written.
 
@@ -1782,25 +1784,25 @@ The memory location representation can be refined for arrays. Certain
 sets of array locations are handled, for instance intervals like
 \verb/A[I:J]/ or even the so-called regular sections or Fortran~90
 triplets, like \verb/A[0:N:2]/, which adds a stride to the concept of
-interval. PIPS is able to handle polyhedral sets, called {\em array
+interval. PIPS is able to handle polyhedral sets, called \emph{array
 regions}. Extension to non-convex sets, intersections of a lattice and a
 polyhedron, is under investigation.
 
 Memory effects are not always perfectly known. It is undecidable in the
-general case. Effects can be labelled as {\tt MAY} if they might happen,
-{\tt MUST} if they always happen, and {\tt EXACT} if the abstract set
+general case. Effects can be labelled as \texttt{MAY} if they might happen,
+\texttt{MUST} if they always happen, and \texttt{EXACT} if the abstract set
 used to represent them is equal to the dynamic set of effects. For
-historical reasons, exact effects are labelled {\tt MUST} and must
+historical reasons, exact effects are labelled \texttt{MUST} and must
 effects are not computed.
 
 Finally, read and write effects are not precise enough for compound
-statements. It is more interesting to known if the {\em initial} value
-of a memory location is {\em used} by a statement, which is called a
-{\tt IN} effect, or if the memory location only is used for temporary
+statements. It is more interesting to known if the \emph{initial} value
+of a memory location is \emph{used} by a statement, which is called a
+\texttt{IN} effect, or if the memory location only is used for temporary
 storage. In the same way, it is important to know if the value left by a
 statement in a memory location is dead when leaving a statement or if it
 is used later by another statement execution. In the later case, it is
-called an {\tt OUT} effect.
+called an \texttt{OUT} effect.
 
 Note that spurious effects are added in loop bodies to avoid... and/or
 simulate later a control dependence by a data dependence (see
@@ -1809,7 +1811,7 @@ PJ).  These effects are \verb/read/ effects on the loop bounds
 
 Note also that \verb/read/ effects of loop indices due to the
 incrementations are ignored because they are never upward exposed. This is
-due to the {\em compound} nature of the PIPS \verb/DO/ construct. It if
+due to the \emph{compound} nature of the PIPS \verb/DO/ construct. It if
 were decomposed into elementary parts, there would be no such surprising
 approximations. Note that read effects which might be due to bound or
 increment expressions as in \verb/DO I = I, 10*I, I/ must be preserved.
@@ -1818,11 +1820,11 @@ increment expressions as in \verb/DO I = I, 10*I, I/ must be preserved.
 \label{subsection-effects}
 \index{Effects}
 
-The {\tt effects} domain is a list of individual effects. Each effect
+The \texttt{effects} domain is a list of individual effects. Each effect
 can only be a read or a write and is related to only one variable. Lots
 of individual effects are linked to each statements, especially compound
-statements like {\tt blocks}, {\tt tests}, {\tt loops} and {\tt
-unstructured}. 
+statements like \texttt{blocks}, \texttt{tests}, \texttt{loops} and 
+\texttt{unstructured}. 
 
 Control effects, such as \verb/STOP/ or exception, are not
 computed. PIPS only deals with memory effects. Fortran exceptions like
@@ -1831,7 +1833,7 @@ behaviors are not taken into account in PIPS analyses.
 
 Effects and the types defined in the following subsections are not used to
 represent code, but to store analysis result. These types are declared in
-the {\em internal representation\/} for historical reasons.
+the \emph{internal representation\/} for historical reasons.
 
 \domain{Effects = effects:effect*}
 
@@ -1854,8 +1856,8 @@ Should be used for proper and cumulated effects and references.
 \domain{Effects\_classes = classes:effects*}
 {}
 
-The type {\tt effects\_classes} is used to store equivalence classes of
-dynamic aliases, i.e. aliases created at call sites. {\tt Effects\_classes}
+The type \texttt{effects\_classes} is used to store equivalence classes of
+dynamic aliases, i.e. aliases created at call sites. \texttt{Effects\_classes}
 are lists of effects, i.e. lists of lists of regions.
 
 \subsection{Effect}
@@ -1897,8 +1899,8 @@ allocation is difficult to manage when the persistant attribute is
 declared at the type level and not at the object level.
 
 \begin{comment}
-Le sous-domaine {\tt reference} indique sur quelle variable, scalaire ou
-tableau, a lieu un effet. L'attribut {\tt persistant} lui est donne'
+Le sous-domaine \texttt{reference} indique sur quelle variable, scalaire ou
+tableau, a lieu un effet. L'attribut \texttt{persistant} lui est donne'
 parce que les re'fe'rences concerne'es font directement partie des
 statements du programme, au moins quand il s'agit d'effets simples. Cet
 attribut est naturellement gênant pour les re'gions qui utilisent des
@@ -1921,8 +1923,8 @@ sequence, must effects\footnote{Needless to say, reality is much more
   intuition about may and must and exact information.}.
 
 \begin{comment}
-Le sous-domaine {\tt action} pre'cise si la
-re'fe'rence est lue ou e'crite, et le sous-domaine {\tt approximation}
+Le sous-domaine \texttt{action} pre'cise si la
+re'fe'rence est lue ou e'crite, et le sous-domaine \texttt{approximation}
 permet de savoir si la re'fe'rence (pour les effets) ou l'ensemble des
 e'le'ments de tableaux de'fini par le contexte (pour les re'gions) est lu ou
 e'crit a` coup sûr ou non. 
@@ -1939,7 +1941,7 @@ is used to prefix the variable name. There is no known trivial choice
 for this module. Currently, the module name of the first variable in the
 common variable list is used:
 \begin{quote}
- {\tt ram\_section(storage\_ram(entity\_storage(<my\_common>)))}
+ \texttt{ram\_section(storage\_ram(entity\_storage(<my\_common>)))}
 \end{quote}
 Unfortunately, this name depends on the module parsing order. It would
 be much better to use the lexicographic order among callees, assuming
@@ -1951,7 +1953,7 @@ in \cite{Trio90}\cite{Baro91}).
 \begin{comment}
 Lors de la traduction interproce'durale des effets ou des re'gions portant
 sur une variable globale non de'clare'e dans le module appelant ou sur une
-variable statique apparaissant dans un {\tt SAVE}, il est important de
+variable statique apparaissant dans un \texttt{SAVE}, il est important de
 re'cupe'rer une re'fe'rence qui sera la même pour tous les sites d'appels.
 Pour cela on choisit un module de re'fe'rence (dans lequel le common ou le
 save est de'clare'), dont le nom pre'fixera le nom de la variable. Le choix
@@ -1959,7 +1961,7 @@ de ce module n'est pas trivial. A` l'heure actuelle, il s'agit du nom du
 module de la premie`re variable apparaissant dans la liste des variables du
 common:
 \begin{quote}
- {\tt ram\_section(storage\_ram(entity\_storage(<my\_common>)))}
+ \texttt{ram\_section(storage\_ram(entity\_storage(<my\_common>)))}
 \end{quote}
 Selon l'ordre dans lequel les modules sont analyse's, le nom de module
 trouve' sera diffe'rent. Il faudrait en re'alite' prendre le premier nom
@@ -1975,20 +1977,20 @@ as well as pseudo-variables, known as \verb/PHI/ variables. There is one
 \verb/PHI/ variable per array dimension.
 
 \begin{comment}
-Le sous-domaine {\tt reference} permet de pre'ciser qu'un effet n'a lieu que
-sur un sous-tableau en utilisant un {\tt range} comme expression d'indice.
+Le sous-domaine \texttt{reference} permet de pre'ciser qu'un effet n'a lieu que
+sur un sous-tableau en utilisant un \texttt{range} comme expression d'indice.
 Ceci est utilise' lors de la traduction des effets cumule's d'un proce'dure
 en les effets propres d'un call site. Pour les re'gions, ce sous-domaine
 pre'cise l'entite' concerne'e ainsi que la liste des variables $\phi$ qui
 de'crivent ses dimensions.
 \end{comment}
 
-Field \verb/context/ only is used for effects known as {\em array
+Field \verb/context/ only is used for effects known as \emph{array
 regions}. They were defined by Rémi Triolet in~\cite{Trio84} and
 extended by Béatrice Creusillet in~\cite{Creu96}.
 
 \begin{comment}
-Le sous-domaine {\tt context} n'est utilise' que pour repre'senter les
+Le sous-domaine \texttt{context} n'est utilise' que pour repre'senter les
 effets des instructions par des re'gions (telles que de'finies par Re'mi
 Triolet).
 \end{comment}
@@ -2032,18 +2034,18 @@ on the statement occurence. Such effects are of the \verb/may/ kind.
 \begin{comment}
 La pre'sence de tests et boucles ne permet pas de de'terminer en ge'ne'ral
 si une variable est effectivement lue ou e'crite lors de l'exe'cution
-d'un {\tt statement}. Il se peut même que certaines exe'cutions
+d'un \texttt{statement}. Il se peut même que certaines exe'cutions
 y acce`dent et que d'autres n'y fassent pas re'fe'rence. Les effets
-calcule's sont alors de type {\tt may}.
+calcule's sont alors de type \texttt{may}.
 \end{comment}
 
-Sometimes, a simple statement, such as an assignment like {\tt J = 2},
-has a known effect. Here {\tt J} \verb/must/ be written. Such
-\verb/must/ effects can be used in {\em use/def chains} analysis to {\em
-kill} some scalar variables. A simple effect, proper, cumulated or
-summary, with a \verb/must/ attribute does not mean that the {\em whole}
+Sometimes, a simple statement, such as an assignment like \texttt{J = 2},
+has a known effect. Here \texttt{J} \verb/must/ be written. Such
+\verb/must/ effects can be used in \emph{use/def chains} analysis to 
+\emph{kill} some scalar variables. A simple effect, proper, cumulated or
+summary, with a \verb/must/ attribute does not mean that the \emph{whole}
 array is read or written, but that at least one of its elements is read
-or written. Such information is not {\em kill information}. Region
+or written. Such information is not \emph{kill information}. Region
 effects must be used to that effect.
 
 Must effects may be detected for tests and loops. For instance, a
@@ -2051,10 +2053,10 @@ variable may be read in both test branches, or a loop range may be
 numerically known.
 
 \begin{comment}
-Dans quelques cas particuliers, comme une affectation simple {\tt I = 2},
-l'effet est certain ({\em must}). Il peut alors être utilise' dans
-le calcul des {\em use-def chains} pour effectuer un {\em kill} sur les
-variables scalaires. Un effet {\em must} sur un tableau ne signifie pas
+Dans quelques cas particuliers, comme une affectation simple \texttt{I = 2},
+l'effet est certain (\emph{must}). Il peut alors être utilise' dans
+le calcul des \emph{use-def chains} pour effectuer un \emph{kill} sur les
+variables scalaires. Un effet \emph{must} sur un tableau ne signifie pas
 que tout le tableau est lu ou e'crit mais qu'au moins un de ses
 e'le'ments l'est.
 \end{comment}
@@ -2062,11 +2064,11 @@ e'le'ments l'est.
 \subsection{Mapping from Statements to Effects}
 
 A different mapping from reachable statements to effect lists is
-computed by each effect analysis. Because NewGen did not offer the {\em
-map} type construct, there is no NewGen type for these mappings. They
+computed by each effect analysis. Because NewGen did not offer the 
+\emph{map} type construct, there is no NewGen type for these mappings. They
 are encoded as hash tables and used with primitives provided by the
 NewGen library. They are stored on and read from disk by PIPS
-interprocedural database manager, {\em pipsdbm}.
+interprocedural database manager, \emph{pipsdbm}.
 
 For details about effect analyses available see the Effects Section in the
 PIPS phase descriptions).
@@ -2084,26 +2086,26 @@ PIPS phase descriptions).
 
 Type \verb/transformer/ defines a relationship between two stores,
 i.e. two memory states, associated to two control points (i.e. two
-statements). This relation is limited to {\em integer scalar} variables
-in the {\em dynamic} scope of a module: global and static integer scalar
+statements). This relation is limited to \emph{integer scalar} variables
+in the \emph{dynamic} scope of a module: global and static integer scalar
 variables are taken into account. Note that the data structure does not
 enforce the integer and scalar conditions.
 
 \begin{comment}
-Le domaine {\tt transformer} de'finit une relation entre deux e'tats
+Le domaine \texttt{transformer} de'finit une relation entre deux e'tats
 me'moire. Cette relation
 porte sur les valeurs des variables scalaires entie`res d'un module ou
 des variables globales au programme.
 \end{comment}
 
-Variables in the list \verb/arguments/ are variables whose values {\em
-may} have changed between the two control points. Two values are denoted
+Variables in the list \verb/arguments/ are variables whose values 
+\emph{may} have changed between the two control points. Two values are denoted
 for each variable in the \verb/arguments/ list, the initial value and
 the final value. The initial values are pure values, i.e. entities
 specific to the semantics library. The final values are identified with
 the variable entities, in order to decrease the total number of pure
-values. Variables that do not appear in the \verb/arguments/ list {\em
-must} have the same initial and final values, by definition. This unique
+values. Variables that do not appear in the \verb/arguments/ list 
+\emph{must} have the same initial and final values, by definition. This unique
 value is considered a final value and no value entity is allocated.
 
 \begin{comment}
@@ -2127,19 +2129,19 @@ line'aires entre valeurs.
 
 Two kinds of transformers are used in PIPS. The first kind is linked to
 a statement and is an abstraction of the corresponding command, limited
-to integer scalar variables. Such transformers are called {\em
-transformers}. The second kind of transformer, also associated to a
+to integer scalar variables. Such transformers are called 
+\emph{transformers}. The second kind of transformer, also associated to a
 statement, abstracts the relationship between the initial store of a
 module or of a whole program and the store just before the execution of
-this statement. Such a transformer si called a {\em precondition}.
+this statement. Such a transformer si called a \emph{precondition}.
 
 \begin{comment}
 Deux types de transformers sont utilise's. Le premier est propre a` un
-{\tt statement} et donne une abstraction de son effet sur les variables
+\texttt{statement} et donne une abstraction de son effet sur les variables
 entie`res. Les variables qui apparaissent dans la liste des arguments
 sont celles qui sont affecte'es lors de son exe'cution.  Le second,
-aussi associe' a` un {\tt statement}, donne une relation entre l'e'tat
-initial d'un module et l'e'tat pre'ce'dent l'exe'cution de ce {\tt statement}.
+aussi associe' a` un \texttt{statement}, donne une relation entre l'e'tat
+initial d'un module et l'e'tat pre'ce'dent l'exe'cution de ce \texttt{statement}.
 \end{comment}
 
 Transformers and preconditions are computed by semantics analyses,
@@ -2160,17 +2162,17 @@ Type \verb/predicate/ defines a relationship between values of integer
 variables and other integer entities such as \verb/PHI/ variables (see
 Section~\ref{subsection-psysteme} for external data type Psysteme). Its
 meaning depends on its use. It may be an invariant predicate, always
-true before a statement execution ({\em precondition}), or a predicate
-linking two different points of a program ({\em transformer}). It may
+true before a statement execution (\emph{precondition}), or a predicate
+linking two different points of a program (\emph{transformer}). It may
 also define an array region (see Section~\ref{subsection-effect}).
 
 \begin{comment}
-Le domaine {\tt predicate} de'finit une relation entre valeurs de
+Le domaine \texttt{predicate} de'finit une relation entre valeurs de
 variables scalaires entie`res. Son interpre'tation est fonction de
 son utilisation. Il peut s'agir soit d'un pre'dicat valable en
 un point du programme (i.e. un invariant), soit d'un pre'dicat
 valable entre deux points du programme. Il s'agit alors d'une
-abstraction d'une commande, c'est-a`-dire d'un {\tt transformer}.
+abstraction d'une commande, c'est-a`-dire d'un \texttt{transformer}.
 \end{comment}
 
 
@@ -2191,10 +2193,10 @@ Section~\ref{ubsection-newgen-consistency} and Reference~\cite{JT90}).
 
 \subsection{Program consistency}
 
-PIPS handles {\em constant} call graphs. It expects to find every callee
+PIPS handles \emph{constant} call graphs. It expects to find every callee
 in a piece of code. If library routines are used, stubs must be added.
 
-Interprocedural consistency can be checked with the {\tt Flinter}
+Interprocedural consistency can be checked with the \texttt{Flinter}
 analysis (see \cite{TrIr91}).
 
 \subsection{Implicit consistency}
@@ -2220,8 +2222,8 @@ objects by setting the proper debugging level for PIPSDBM (see
 
 \section{Disk Storage}
 
-The implicit global symbol table\footnote{This is implied by the {\tt
-tabulated} attribute.} of Section~\ref{section-entity} is stored on or
+The implicit global symbol table\footnote{This is implied by the 
+\texttt{tabulated} attribute.} of Section~\ref{section-entity} is stored on or
 loaded from disk as a whole. It must be stored last and read first
 because other NewGen data structures contain pointers to it (every field
 of type \verb/entity/ is suchj a pointer). Pointers to entity are
@@ -2252,41 +2254,41 @@ have been added to NewGen. They are not systematically used.
 
 % pipsmake
 \bibitem{Baro91} B. Baron,
-{\em Construction flexible et cohérente pour la compilation
+\emph{Construction flexible et cohérente pour la compilation
 interprocédurale}, 
 Rapport interne EMP-CRI-E157, juillet 1991
 
-\bibitem{Bern66} A. J. Bernstein, {\em Analysis of Programs for
+\bibitem{Bern66} A. J. Bernstein, \emph{Analysis of Programs for
 Parallel Processing}, IEEE Transactions on Electronic Computers,
 Vol.~15, n.~5, pp. 757-763, Oct. 1966.
 
 \bibitem{Creu96} B. Creusillet,
-{\em Analyses de régions de tableaux et applications}, Thèse de
+\emph{Analyses de régions de tableaux et applications}, Thèse de
 Docteurat, École des mines de Paris, Décembre 1996
 
 \bibitem{JT89} P. Jouvelot, R. Triolet,
-{\em NewGen: A Language Independent Program Generator},
+\emph{NewGen: A Language Independent Program Generator},
 Rapport Interne CAII 191, 1989
 
 \bibitem{JT90} P. Jouvelot, R. Triolet,
-{\em NewGen User Manual},
+\emph{NewGen User Manual},
 Rapport Interne CAII ???, 1990
 
 \bibitem{Trio90} R. Triolet,
-{\em PIPSMAKE and PIPSDBM: Motivations et fonctionalités},
+\emph{PIPSMAKE and PIPSDBM: Motivations et fonctionalités},
 Rapport Interne CAII TR~E/133
 
 \bibitem{Trio84} R. Triolet,
-{\em Contribution à la parallélisation automatique de programmes
+\emph{Contribution à la parallélisation automatique de programmes
 Fortran comportant des appels de procédures}, Thèse de
 Docteur-Ingénieur, Université Pierre et Marie Curie, décembre 1984.
 
 \bibitem{TrIr91} R. Triolet,  F. Irigoin,
-{\em PIPS High-Level Software Interface: Pipsmake}
+\emph{PIPS High-Level Software Interface: Pipsmake}
 Documentation PIPS
 
 \bibitem{ZhIr91} L. Zhou, F. Irigoin,
-{\em Properties: Low Level Tuning of PIPS},
+\emph{Properties: Low Level Tuning of PIPS},
 PIPS Documentation
 
 \end{thebibliography}
