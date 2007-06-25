@@ -214,15 +214,14 @@ FILE%MODULE:BLOCK~name
 \end{itemize} 
 The name of a label is MODULE:@label because it has function scope. 
 
-In addition, to distinguish a structure, an union or 
-an enumerator that has the same name as other program variables, we have to add 
-special constant characters such as \verb/STRUCT_PREFIX, UNION_PREFIX, ENUM_PREFIX/ to the name
-prefix. We also have to keep the
-name of the structure and the union in the global name of its members in
-order to distinguish these members with other program variables, and so a
-\verb/MEMBER_SEP_STRING/ is needed. It is not
-necessary for the enum member, because the name of a variable must be
-different to the name of an enumerator member. 
+In addition, to distinguish a structure, an union or an enumerator that has 
+the same name as other program variables, we have to add special constant 
+characters such as \verb/STRUCT_PREFIX, UNION_PREFIX, ENUM_PREFIX/ to 
+the name prefix. We also have to keep the name of the structure and the union 
+in the global name of its members in order to distinguish these members with 
+other program variables, and so a \verb/MEMBER_SEP_STRING/ is needed. 
+It is not necessary for the enum member, because the name of a variable must 
+be different to the name of an enumerator member. 
 A prefix for typedef \verb/TYPEDEF_PREFIX/ is necessary to distinguish a
 defined name and to regenerate code. 
 \begin{verbatim}
@@ -259,7 +258,7 @@ The storage class determines the location and lifetime of the storage
 associated with a variable. 
 \subsection{External variables}
 \label{external}
-External variables are defined outside  any function, and are thus
+External variables are defined outside any function, and are thus
 potentially available to many functions. Any function may access an
 external variable by referring to it by name, if the name has been
 declared somehow. If an external variable is to be referred to before it
@@ -271,16 +270,29 @@ Storage = ram
 Ram_function = TOP-LEVEL-ENTITY 
 Ram_section = TOP-LEVEL area 
 \end{verbatim}
-In Fortran, the scope of a variable is the module, or in another words, a global variable is always associated to the list of entities
+In Fortran, the scope of a variable is the module, or in another words, 
+a global variable is always associated to the list of entities
 of a module, which facilitates code regeneration. 
-The question with C is how to regenerate the declaration related to
-external variables, such as: 
+
+In the old versions of C, we can declare (extern is not a real declaration, 
+since it doesn't allocate memory per se) the same variable in multiple places 
+(files) with no problem at link time. This is probably what we had in mind 
+when we designed this part of the RI. 
+%%
+This is not working anymore with more recent versions of C. As it produces 
+linking error, multiple declarations are though allowed by some explicit 
+arguments to the compilers (like \verb /-z muldefs/ in gcc) but it is not
+cleaned either. Hence there should be some way to know the difference between
+the declarations of external variable and global variables and how to 
+regenerate the declaration related to external variables, such as:
+
 \begin{verbatim}
 in file1.c
    int m
    void func1 { }
 
 in file2.c 
+   int i
    extern int m 
    void func2 { }
 
@@ -292,18 +304,12 @@ in file3.c
 \end{verbatim}
 A source file can be considered as a module, and in the first case, the
 entity m can be added to the list of entities associated to this source
-file. For the second and third cases, we use the \verb/decls_text/ field
-as in the \verb/code/ Newgen structure (see section \ref{statement}) to
-prettyprint the source code? Problem : the position of the variable
-declaration in the source file. 
- 
-Note: we have to consider the impact of different 
-global variable treatments between C and Fortran on the analyses of PIPS. For example,
-the translation of global variables from callees to callers is more
-complicated with Fortran: we have to find the common block and the
-offset of variable, ... So remember to add a simple test for C in each
-place where we do the translation. 
-  
+file. They are stored as \verb /TOP-LEVEL:m/.For the second and third case 
+there should not be any memory allocation for entity m. The real problem lies 
+to differentiate between entity i and entity m for second case and hence 
+allocate memory to ibut not m. We need to have some information at internal 
+representation for the same.
+
 \subsection{Static variables}
 \subsubsection{Internal static variables}
 \begin{verbatim}
@@ -320,9 +326,10 @@ Storage = ram
 Ram_function = current module
 Ram_section = *STATIC* area of current module
 \end{verbatim}
-The outermost block can be omitted, since in fact it is considered as the current module. It is not necessary to generate an entity for each block, we only need to
-number the blocks. The offset of a variable is computed from the
-declarations of variables in the same block. So variables with the same
+The outermost block can be omitted, since in fact it is considered as 
+the current module. It is not necessary to generate an entity for each block, 
+we only need to number the blocks. The offset of a variable is computed from 
+the declarations of variables in the same block. So variables with the same
 offset but in different blocks are different. 
 \subsubsection{External static variables}
 An external static variable is defined outside of any function, and is
@@ -341,8 +348,8 @@ Storage = ram
 Ram_function = source file  
 Ram_section = *STATIC* area of source file 
 \end{verbatim}
-In addition, another entities are generated for the source file and the *STATIC* area of this
-source file.
+In addition, another entities are generated for the source file and the 
+\texttt{*STATIC*} area of this source file.
 \begin{verbatim}
 Source file
    name = TOP-LEVEL:source_file_name
@@ -355,10 +362,11 @@ Area
    storage = rom
 \end{verbatim}
  The prettyprint of the external static variable is based on the list of
-entities associated to the source file entity. Problem : the position of the variable
-declaration in the source file ? 
+entities associated to the source file entity. Problem: the position of the 
+variable declaration in the source file? 
 \subsection{Automatic variables}
-Like dynamic local variables in Fortran \cite{Coel01}. The outermost block can be omitted. 
+Like dynamic local variables in Fortran \cite{Coel01}. 
+The outermost block can be omitted. 
 \begin{verbatim}
 Name prefix =  [file%]module:[block~]
 Storage = ram 
@@ -376,10 +384,10 @@ Storage = formal
 \end{verbatim}
 \subsection{Register variables}
 A declaration of an identifier for an object with storage-class specifier
-\verb/register/ suggests that access to the object be as fast as possible and the
-address of any part of an object declared with register cannot be
-computed.  A \verb/register/ declaration can only be applied to automatic variables
-and to the formal parameters of a function. 
+\verb/register/ suggests that access to the object be as fast as possible and 
+the address of any part of an object declared with register cannot be
+computed.  A \verb/register/ declaration can only be applied to automatic 
+variables and to the formal parameters of a function. 
  
 \begin{verbatim}
 f(c,n)

@@ -86,7 +86,7 @@ void MakeCurrentCompilationUnitEntity(string name)
      declared with extern, we use the ram storage to put this list in ram_shared*/
   entity_storage(e) = make_storage_ram(make_ram(entity_undefined,entity_undefined,0,NIL));
   entity_type(e) = make_type_functional(make_functional(NIL,make_type_unknown()));
-  entity_initial(e) = make_value(is_value_code, make_code(NIL,strdup(""), make_sequence(NIL)));
+  entity_initial(e) = make_value(is_value_code, make_code(NIL,strdup(""), make_sequence(NIL),NIL));
   pips_debug(4,"Set current module entity for compilation unit %s\n",name);
   set_current_module_entity(e);
   init_c_areas(); 
@@ -298,7 +298,7 @@ expression IdentifierToExpression(string s)
       ent = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,s);
       entity_storage(ent) = make_storage_return(ent);
       entity_type(ent) = make_type_functional(make_functional(NIL,make_type_unknown()));
-      entity_initial(ent) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL)));
+      entity_initial(ent) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL));
       return make_expression(make_syntax_reference(make_reference(ent,NIL)),normalized_undefined);
       /*return MakeNullaryCall(ent);*/
     }

@@ -93,7 +93,7 @@ CreateArrays()
   
   entity ent;
   sequence s = make_sequence(NIL);
-  code c = make_code(NIL, strdup(""), s);
+  code c = make_code(NIL, strdup(""), s, NIL);
 
   code_initializations(c) = s;
   

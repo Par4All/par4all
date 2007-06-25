@@ -385,7 +385,7 @@ global:
 			  if (storage_undefined_p(entity_storage(e))) 
 			    entity_storage(e) = make_storage_return(e);
 			  if (value_undefined_p(entity_initial(e)))
-			    entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL)));
+			    entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL));
 			  stack_push((char *) e, FunctionStack);
 			  stack_push((char *) make_basic_logical(TRUE),FormalStack);
 			  stack_push((char *) make_basic_int(1),OffsetStack);
@@ -420,7 +420,7 @@ global:
 			  if (storage_undefined_p(entity_storage(e))) 
 			    entity_storage(e) = make_storage_return(e);
 			  if (value_undefined_p(entity_initial(e)))
-			    entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL)));	 
+			    entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL));	 
 			  pips_assert("Current function entity is consistent",entity_consistent_p(e));
 			  $$ = NIL;
 			  discard_C_comment();
@@ -1348,7 +1348,7 @@ type_spec:   /* ISO 6.7.2 */
 			}
 |   TK_STRUCT id_or_typename TK_LBRACE 
                         {
-			  code c = make_code(NIL,$2,sequence_undefined);
+			  code c = make_code(NIL,$2,sequence_undefined,NIL);
 			  stack_push((char *) c, StructNameStack);
 			}
     struct_decl_list TK_RBRACE
@@ -1366,7 +1366,7 @@ type_spec:   /* ISO 6.7.2 */
 |   TK_STRUCT TK_LBRACE
                         {
 			  code c = make_code(NIL,strdup(concatenate("PIPS_STRUCT_",
-								    int_to_string(derived_counter++),NULL)),sequence_undefined);
+								    int_to_string(derived_counter++),NULL)),sequence_undefined, NIL);
 			  stack_push((char *) c, StructNameStack);
                         }
     struct_decl_list TK_RBRACE
@@ -1394,7 +1394,7 @@ type_spec:   /* ISO 6.7.2 */
 			}
 |   TK_UNION id_or_typename TK_LBRACE 
                         {
-			  code c = make_code(NIL,$2,sequence_undefined);
+			  code c = make_code(NIL,$2,sequence_undefined, NIL);
 			  stack_push((char *) c, StructNameStack);
 			}
     struct_decl_list TK_RBRACE
@@ -1410,7 +1410,7 @@ type_spec:   /* ISO 6.7.2 */
 |   TK_UNION TK_LBRACE
                         { 
 			  code c = make_code(NIL,strdup(concatenate("PIPS_UNION_",
-								    int_to_string(derived_counter++),NULL)),sequence_undefined);
+								    int_to_string(derived_counter++),NULL)),sequence_undefined, NIL);
 			  stack_push((char *) c, StructNameStack);
                         }
     struct_decl_list TK_RBRACE
@@ -1692,7 +1692,7 @@ direct_decl: /* (* ISO 6.7.5 *) */
 |   direct_decl parameter_list_startscope 
                         {
 			  if (value_undefined_p(entity_initial($1)))
-			    entity_initial($1) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL)));
+			    entity_initial($1) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL), NIL));
 			  stack_push((char *) $1,FunctionStack);
 			}
     rest_par_list TK_RPAREN
@@ -1783,7 +1783,7 @@ direct_old_proto_decl:
     direct_decl TK_LPAREN
                         { 
 			  if (value_undefined_p(entity_initial($1)))
-			    entity_initial($1) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL)));
+			    entity_initial($1) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL));
 			  stack_push((char *) $1, FunctionStack);
 			  stack_push((char *) make_basic_logical(TRUE),FormalStack);
 			  stack_push((char *) make_basic_int(1),OffsetStack);
@@ -1924,7 +1924,7 @@ abs_direct_decl: /* (* ISO 6.7.6. We do not support optional declarator for
 |   abs_direct_decl_opt parameter_list_startscope 
                         {
 			  if (value_undefined_p(entity_initial($1)))
-			    entity_initial($1) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL)));
+			    entity_initial($1) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL));
 			  stack_push((char *) $1,FunctionStack);
 			}
     rest_par_list TK_RPAREN

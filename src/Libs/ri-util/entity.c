@@ -34,12 +34,13 @@ make_empty_module(
 
     pips_assert("undefined", e == entity_undefined);
 
-    e = make_entity(strdup(full_name), 
-		    make_type(is_type_functional, 
-			      make_functional(NIL, r)),
-		    MakeStorageRom(),
-		    make_value(is_value_code,
-			       make_code(NIL, strdup(""), make_sequence(NIL))));
+    e = make_entity
+      (strdup(full_name), 
+       make_type(is_type_functional, 
+		 make_functional(NIL, r)),
+       MakeStorageRom(),
+       make_value(is_value_code,
+		  make_code(NIL, strdup(""), make_sequence(NIL),NIL)));
 
     name = module_local_name(e);
     DynamicArea = FindOrCreateEntity(name, DYNAMIC_AREA_LOCAL_NAME);
