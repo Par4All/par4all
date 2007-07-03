@@ -114,7 +114,9 @@ typedef struct interval {
 } Interval;
 
 /* Test whether P is an empty polyhedron */
-#define emptyQ(P) (P->NbRays==0)
+#define emptyQ(P)							\
+	((F_ISSET(P, POL_INEQUALITIES) && P->NbEq > P->Dimension) ||	\
+	 (F_ISSET(P, POL_POINTS) && P->NbRays == 0))
 
 /* Test whether P is a universe polyheron */
 #define universeQ(P) (P->Dimension==P->NbBid)
