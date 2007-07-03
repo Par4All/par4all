@@ -2327,7 +2327,24 @@ Polyhedron *AddConstraints(Value *Con,unsigned NbConstraints,Polyhedron *Pol,uns
   if (NbConstraints == 0)
     return Polyhedron_Copy(Pol);
   
-  POL_ENSURE_FACETS(Pol);
+  POL_ENSURE_INEQUALITIES(Pol);
+  Dimension	= Pol->Dimension + 2;	/* Homogeneous Dimension + Status */
+
+  if (POL_ISSET(NbMaxRays, POL_NO_DUAL)) {
+    NbCon      	= Pol->NbConstraints + NbConstraints;
+    
+    Mat = Matrix_Alloc(NbCon, Dimension);
+    if (!Mat) {
+      errormsg1("AddConstraints", "outofmem", "out of memory space");
+      return NULL;
+    }
+    Vector_Copy(Pol->Constraint[0], Mat->p[0], Pol->NbConstraints * Dimension);
+    Vector_Copy(Con, Mat->p[Pol->NbConstraints], NbConstraints * Dimension);  
+    NewPol = Constraints2Polyhedron(Mat, NbMaxRays);
+    Matrix_Free(Mat);  
+    return NewPol;
+  }
+
   POL_ENSURE_VERTICES(Pol);
 
   CATCH(any_exception_error) {
@@ -2340,11 +2357,6 @@ Polyhedron *AddConstraints(Value *Con,unsigned NbConstraints,Polyhedron *Pol,uns
   TRY {
     NbRay	= Pol->NbRays;
     NbCon      	= Pol->NbConstraints + NbConstraints;
-    Dimension	= Pol->Dimension + 2;	/* Homogeneous Dimension + Status */
-
-    /* Ignore for now */
-    if (POL_ISSET(NbMaxRays, POL_NO_DUAL))
-      NbMaxRays = 0;
 
     if (NbRay > NbMaxRays)
       NbMaxRays = NbRay;
@@ -4644,16 +4656,24 @@ static Polyhedron *p_simplify_constraints(Polyhedron *P, Vector *row,
 
     /* Also look at equalities.
      * If an equality can be "simplified" then there
-     * are no integer solutions anyway and the following loop
-     * will add a conflicting constraint
+     * are no integer solutions and we return an empty polyhedron
      */
     for (r = 0; r < R->NbConstraints; ++r) {
 	if (ConstraintSimplify(R->Constraint[r], row->p, len, g)) {
 	    T = R;
-	    R = AddConstraints(row->p, 1, R, MaxRays);
+	    if (value_zero_p(R->Constraint[r][0])) {
+		R = Empty_Polyhedron(R->Dimension);
+		r = R->NbConstraints;
+	    } else if (POL_ISSET(MaxRays, POL_NO_DUAL)) {
+		R = Polyhedron_Copy(R);
+		F_CLR(R, POL_FACETS | POL_VERTICES | POL_POINTS);
+		Vector_Copy(row->p+1, R->Constraint[r]+1, R->Dimension+1);
+	    } else {
+		R = AddConstraints(row->p, 1, R, MaxRays);
+		r = -1;
+	    }
 	    if (T != P)
 		Polyhedron_Free(T);
-	    r = -1;
 	}
     }
     if (R != P)

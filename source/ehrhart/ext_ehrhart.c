@@ -953,6 +953,7 @@ Enumeration *Polyhedron_Image_Enumerate(Polyhedron *D,  Polyhedron *C, Matrix *T
 		       value_clear(val);
 		       /* add the new constraint to polyhedron D */
 		       pol=AddConstraints(NCont->p,1,D,MAXRAYS);
+		       POL_ENSURE_VERTICES(pol);
 		       polun=AddPolyToDomain(Polyhedron_Copy(pol),polun);
 		       Polyhedron_Free(pol);
 		       Vector_Free(NCont);
