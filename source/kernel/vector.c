@@ -444,39 +444,30 @@ int Vector_Equal(Value *Vec1, Value *Vec2, unsigned n)
  * points to the component index that has the minimum value. If no such value
  * and index is found, Value 1 is returned.
  */
-void Vector_Min_Not_Zero(Value *p,unsigned length,int *index,Value *min) {
+void Vector_Min_Not_Zero(Value *p,unsigned length,int *index,Value *min)
+{
+  Value aux;
+  int i;
   
-  Value *cp, aux;
-  int i,j;
   
-  value_init(aux);
-  
-  cp=p;
-  for(i=0;i<length;i++) {
-    if (value_notzero_p(*cp)) {
-      value_absolute(*min,*cp);
-      *index = i;
-      break;
-    }
-    ++cp;
-  }
-  if (i == length) {
+  i = First_Non_Zero(p, length);
+  if (i == -1) {
     value_set_si(*min,1);
-    value_clear(aux);
-    cp = NULL;
     return;
   }
-  ++cp;
-  for(j=i+1;j<length;j++) {
-    value_absolute(aux,*cp);
-    if (value_lt(aux,*min) && value_notzero_p(aux)) {
+  *index = i;
+  value_absolute(*min, p[i]);
+  value_init(aux);
+  for (i = i+1; i < length; i++) {
+    if (value_zero_p(p[i]))
+      continue;
+    value_absolute(aux, p[i]);
+    if (value_lt(aux,*min)) {
       value_assign(*min,aux);
-      *index = j;
+      *index = i;
     }  
-    cp++;
   }
   value_clear(aux);
-  cp = NULL;
 } /* Vector_Min_Not_Zero */
 
 /* 
