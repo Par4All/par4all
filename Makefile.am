@@ -75,6 +75,7 @@ multi_noinst_programs = $(foreach B,$(ALL_BITS), \
 	Zpolytest$(B)$(EXEEXT) \
 	polytest$(B)$(EXEEXT) \
 	verif_ehrhart$(B)$(EXEEXT) \
+	testCompressParms$(B)$(EXEEXT) \
 )
 
 noinst_PROGRAMS = \
@@ -88,7 +89,6 @@ multi_bin_programs = $(foreach B,$(ALL_BITS), \
 	ehrhart_union$(B)$(EXEEXT) \
 	pp$(B)$(EXEEXT) \
 	testehrhart$(B)$(EXEEXT) \
-	testCompressParms$(B)$(EXEEXT) \
 )
 
 bin_PROGRAMS = \
