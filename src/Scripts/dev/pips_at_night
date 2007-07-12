@@ -80,7 +80,7 @@ then
     popd
 else
     echo '### no compile'
-done
+fi
 
 if [[ $validate ]]
 then
