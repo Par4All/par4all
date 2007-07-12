@@ -7,6 +7,16 @@ Default validation or just for one directory:
 	sh> make TARGET=Semantics validate
 
 
+To tell which tpips/pips should be used, you must give additional options 
+to "pips_validate" through the VOPT makefile macro:
+
+	sh> make VOPT='-v -t /path/to/tpips -p /path/to/pips' validate
+
+It can also be done by fixing the PATH environment variable:
+
+	sh> PATH=/path/to:$PATH make validate
+
+
 Interactive acceptation of differences, and commit:
 
 	sh> make accept
