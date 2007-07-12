@@ -1,285 +1,93 @@
-#! /bin/sh
+#! /bin/bash
 #
 # $Id$
 #
-# (c) Fabien COELHO July 1996
+# (c) Fabien COELHO July 1996-2007
 # 
 # what to do at night...
 #
 
-#
-# source environment if needed (as from cron)
-# and insures that PIPS_ARCH and PIPS_HOSTS are not overwritten by 
-# the sources to get the environment.
-
-pips_arch="$PIPS_ARCH"
-pips_hosts="$PIPS_HOSTS"
-
-# not a good idea, the environment is set thru pips_at_night_at_cri.
-# test -r $HOME/.profile && . $HOME/.profile
-test "${PIPS_ROOT}" || . /projects/Pips/pipsrc.sh
-
-PIPS_ARCH=${pips_arch:-$PIPS_ARCH}
-PIPS_HOSTS=${pips_hosts:-$PIPS_HOSTS}
-
-#
-# initialization of variables
-
-unset no_cleaning no_newgen no_linear no_pips no_validation no_general 
-unset validate_dir
-
-# use this mail (not /bin/mail...)
-PATH=/usr/ucb:${PATH}
-mail=${PIPS_MAIL:-Mail}
-
-arch=${PIPS_ARCH:-GNU}
-user=`whoami`
-host=`hostname`
-email=${MAILTO:-${REPLYTO:-$user}}
-script=`basename $0`
-verbose=:
-vopt=
-debug=:
-msg=
-
-# for temporary files
-report=/tmp/${script}.${user}.$$
-rm -f ${report}*
-
-#
-# Functions
-
-verb() 
-{ echo "[$script]" "$@" "(`date`)" >&2 ;}
-
-deb() 
-{ echo "[$script]" "$@" >&2 ;}
-
-usage()
+function err()
 {
-    ret=$1
-    shift
-    cat <<-EOF
-	$script: $@
-	Description
-	  This shell script checks pips sources and functionalities.
-	  It is intended to be run from cron at night, hence its name.
-	  It cleans pips directories, recompiles newgen, linear and pips
-	  for various "architectures" and validates. Reports about 
-	  successes or failures are sent. 
-	Summary of options:
-	  -h: this help
-	  -v: verbose
-	  -D: debug
-	  -d dir: change to directory
-	  -c arch: compile for (can be a list, default: \$PIPS_ARCH then .)
-	  -a email: address to report (default: \$REPLYTO else \`whoami\`)
-	  -G: skip general cleaning
-	  -C: skip cleaning
-	  -N: skip newgen
-	  -L: skip linear
-	  -P: skip pips
-	  -V: skip validation
-	EOF
-    exit $ret
+    local msg=$1 code=${2:-1}
+    echo -e "$0 ...\n"
+    echo $msg >&2
+    exit $code
 }
 
-# MAKE nlp(=what) name file(=report) 'targets' arch...
-# make 'target' for all specified arch.
-# the detailed report is sent only on failures.
-makeit()
-{
-    ${debug} makeit: "$@"
+# what to do
+download=
+update=
+compile=
+validate=
 
-    what=$1; name=$2; report=$3; targets="$4"; shift 4
-    detailed=$report.detailed
-    summary=$report.summary
+# where to do it
+target=~/PIPS
 
-    touch ${detailed} ${summary}
+setup='http://svn.cri.ensmp.fr/svn/nlpmake/trunk/makes/setup_pips.sh'
 
-    ${debug} makeit: "$@"
+for opt in "$@" ; do
+    case $opt in
+	--) shift ; break ;;
+	-*) shift ;;
+	*) break ;;
+    esac
 
-    for a in "$@" ; do
-	${debug} "makeit: Making $targets in $name ARCH=$a (`pwd`)"
-        [ "${debug}" = : ] || set -x
-	make-pips -k${vopt} -$what -o $summary -m $a ARCH=$a $targets \
-		    2>> $detailed > /dev/null
-        [ "${debug}" = : ] || set +x
-     
-    done
-
-    cat $summary >> $report
-
-    # send the detailed report if some failures occured
-    grep 'failed$' $summary > /dev/null 2>&1 &&
-	$mail -s "$script: $name report" $email \
-	< $detailed > /dev/null 2>&1
-
-    rm -f $detailed $summary
-}
-
-#
-# Get command line options
-
-while getopts hvDd:GCNLPVc:a: OPT
-do
-    case $OPT in
-	h) usage 0 "some help" ;;
-	v) verbose=verb ; vopt="${vopt}v" ;;
-	D) debug=deb ; vopt="${vopt}g" ;;
-	d) cd $OPTARG ; 
-	   validate_dir="-r $OPTARG" ;;
-	a) email=$OPTARG ;;
-	c) arch="$OPTARG" ;;
-    # skipping parts:
-	C) no_cleaning=1 ;;
-	N) no_newgen=1 ;;
-	L) no_linear=1 ;;
-	P) no_pips=1 ;;
-	V) no_validation=1 ;;
-	G) no_general=1 ;;
-	*) usage 2 "invalid option" ;;
+    case $opt in
+	-t|--target) target=$1 ; shift ;;
+	-V|--vopt) validate_option=$1 ; shift ;;
+	-d|--download) download=1 ;;
+        -u|--update) update=1 ;;
+	-c|--compile) compile=1 ;;
+	-v|--validate) validate=1 ;;
+	-h|--help) err 'display help message' 0 ;;
+	*) err "unexpected option '$opt'" 1 ;;
     esac
 done
 
-shift `expr $OPTIND - 1`
+# force dowload if target does not exist
+test -d $target || download=1
 
-[ $# -eq 0 ] || usage 3 "unexpected args: $@" 
+if [[ $download ]]
+then
+    test -d $target && err "will not overwrite target directory: $target" 4
+    # full download
+    wget $setup
+    # should be silent?
+    sh ./setup_pips.sh $target 
+elif [[ $update ]]
+then
+    test -d $target || err "no target directory: $target" 2
+    pushd $target
+    svn update prod valid
+    popd
+else
+    echo '### no download, no update'
+fi
 
-#
-# Debug
+# use this PIPS
+test -d $target || err "no target directory: $target" 3
+source $target/pipsrc.sh
 
-$debug "arch=$arch"
-$debug "user=$user"
-$debug "REPLYTO=$REPLYTO"
-$debug "email=$email"
-$debug "mail=$mail (`type mail`)"
-$debug "PIPS_HOSTS=$PIPS_HOSTS"
-$debug "GCNLPV: $no_general/$no_cleaning/$no_newgen/$no_linear/$no_pips/$no_validation"
-$debug "report=$report"
+if [[ $compile && ! $download ]] 
+then
+    pushd $target
+    # build? verbosity? clean+recompile?
+    # skip documentation?
+    cd prod/newgen ; make recompile
+    cd ../linear ; make recompile
+    cd ../pips ; make recompile
+    popd
+else
+    echo '### no compile'
+done
 
-#
-# Do the job and send reports
-
-{
-    $debug "within the script body"
-
-    $verbose "Starting $user/$host"
-    
-    #
-    # CLEANING
-
-    test "$no_general" && {
-	$verbose Skipping General
-    } || {
-	$verbose "General cleaning of pips"
-
-	$verbose - Deleting old workspaces...
-	find ${pips_home}/Pips -name '*.database' -type d -mtime +4 -print | 
-	    xargs ${PIPS_ROOT}/Share/Delete
-	    
-	$verbose - Removing core files older than one week
-	find ${pips_home}/Pips -name core -mtime +4 -print | 
-	    xargs rm -f
-
-	$verbose - Deleting forgotten validation directories and files
-	find ${pips_home}/Pips -name '.validate_*' -mtime +4 -print |
-	    xargs rm -rf
-
-	$verbose - Removing .pips executables in Validation...
-	find ${PIPS_ROOT}/Validation -type f \( -name '[twf]pips' \
-	    -o -name pips \) -print | xargs rm -f
-
-	$verbose - Removing generated files in Production...
-	msg="${msg}C"
-        makeit nlp cleaning $report full-clean .
-    }
-
-    test "$no_cleaning" && {
-	$verbose Skipping Cleaning
-    } || {
-	$verbose "Cleaning pips old binaries"
-
-        for a in $arch ; 
-        do 
-	    name=PIPS_DIRECTORY_FOR_${a}_BINARIES
-	    test "`env | grep ${name}`" && {
-		dir=`eval echo \\\${$name}`
-		test "${dir}" -a -d "${dir}" && {
-		$verbose cleaning files of ${a} [${name}: ${dir}]
-		find $dir \
-		    \( -name '*.[ao]' -o -name '*.so' -o \
-		       -name pips -o -name '[twf]pips' \) \
-		    -mtime +4 -type f -print -o -name EXTERN -prune | \
-			xargs rm -rf
-		}
-	    }
-	done
-    }
-
-    #
-    # COMPILE
-
-    # 1: NEWGEN
-    test "$no_newgen" && {
-	$verbose Skipping Newgen compilation
-    } || {
-	$verbose "Compiling Newgen/Production"
-	msg="${msg}N"
-	makeit n newgen $report "clean recompile" $arch
-    }
-    
-    # 2: LINEAR
-    test "$no_linear" && {
-	$verbose Skipping Linear compilation
-    } || {
-	$verbose "Compiling Linear/Production"
-	msg="${msg}L"
-	makeit l linear $report "clean recompile" $arch
-    }
-
-    # 3: PIPS
-    test "$no_pips" && {
-	$verbose Skipping Pips compilation
-    } || {
-	$verbose "Compiling Pips/Production"
-	msg="${msg}P"
-	makeit p pips $report "clean recompile" $arch
-    }
-
-    # 4: SUMMARY
-    test "$no_newgen$no_linear$no_pips" = '111' ||
-    {
-	$verbose "Generating summary"
-	summary=SUCCEEDED
-	grep 'failed$' $report > $report.failed && summary=FAILED
-	$mail -s "$script: compile ${msg} ($arch): ${summary}" $email \
-	    < $report.failed > /dev/null 2>&1
-    }
-
-    #
-    # VALIDATE Pips
-
-    test "$no_validation" && {
-	$verbose Skipping Pips validation
-    } || {
-	$verbose "Validating PIPS with $PIPS_ARCH"
-	Validate -vti 50 -a ${email} ${validate_dir}
-    }
-
-    $verbose "Ending $user/$host"
-} > $report.output 2>&1 
-
-#
-# send the report...
-
-test $debug = : || cat $report.output
-# $debug "${mail} -s \"${script}: report\" ${email} < ${report}.output"
-${mail} -s "${script}: report" ${email} < ${report}.output
-
-rm -f $report*
-
-$debug done
-
-# That is all!
-#
+if [[ $validate ]]
+then
+    pushd $target/valid
+    make clean
+    make $validate_option validate
+    popd
+else
+    echo '### no validate'
+fi

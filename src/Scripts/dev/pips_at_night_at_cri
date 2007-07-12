@@ -1,212 +1,26 @@
-#! /usr/local/bin/bash
+#! /bin/bash
 #
 # $Id$
 #
-# what to do at night from the pips account at cri on chailly.
-# dispatch cleanings, compilations and validations on different
-# architectures and machines. 
-#
+# what to do at night from the pips account at cri.
 
-#
-# SET some variables
+umask 022
 
-script=/projects/Pips/Production/Utils/pips_at_night
-mailto=pips_validation
-remote=rsh
-verb=:
-add=
+start=$(date)
+email=coelho@cri.ensmp.fr
+target=~/PIPS
+test -f $target/pipsrc.sh && source $target/pipsrc.sh
 
-# main machines for each os.
+pips_at_night -t $target -V VOPT=$email -u -c -v \
+    > $target/out 2> $target/err
 
-sun4="chailly   /projects/Pips/Experiments"
-sol2="champeaux /tmp"
-i386="tirnanog  /projects/Pips/Experiments3"
-i586="loreto    /projects/Pips/Experiments3"
-i686="marseille /projects/Pips/Experiments3"
+end=$(date)
 
-#
-# FUNCTIONS
-
-function usage()
 {
-    cat <<-EOF 
-	$0 [-a address] [-dDhnvV] [keyword]
-	    -a address: email address for messages
-	    -d: debug script (just do echo)
-	    -D: debug forwarded to pips_at_night
-	    -h: this help
-	    -v: verbose
-	    -V: verbose forwarded to pips_at_night
-	    -n: do nothing in pips_at_night
-	    keyword: usual|long|short|compile|validate|gnusol2ll|debug
-	    return status is ${1:-1}
-	EOF
-    exit ${1:-1}
-}
-
-function verb()
-{
-    echo "[pips_at_night_at_cri]" "$@" `date`;
-}
-
-
-
-#
-# OPTIONS
-
-while getopts a:dDhvVn opt
-do
-    case ${opt} in
-        a) mailto=${OPTARG} ;;
-	d) script=echo ;;
-	D) add=${add}D ;;
-	h) usage 0 ;;
-	v) verb=verb ;;
-	V) add=${add}v ;;
-	n) add=${add}CNLPV ;;
-	*) usage 1;;
-    esac
-done
-
-shift $(( $OPTIND - 1 ))
-
-job=${1:-usual}
-
-
-
-# 
-# to get the ENVIRONMENT when launched by cron...
-# done *after* getting options because the args are destroyed somewhere...
-
-test -f ~/.bashrc && source ~/.bashrc
-
-
-
-#
-# FUNCTIONS for the various jobs to be performed.
-
-
-# what host dir archs
-function doit()
-{
-    local what=$1 host=$2 dir=$3 archs=$4
-
-    $verb "[doit $#] ${script} ${mailto}" \""$@"\"
-
-    ${PIPS_PING:-ping} ${host} && ${remote} ${host} \
-	${script} -${what}${add}va ${mailto} -d ${dir} -c \""${archs}"\"
-}
-
-
-# GENERAL cleaning:  host dir archs
-function general()
-{
-    ${verb} "[general] $@"
-    doit CNLPV "$@" ;
-}
-
-
-# COMPILE: host dir archs
-function compile()
-{
-    ${verb} "[compile] $@"
-    doit GV "$@" ;
-}
-
-
-# VALIDATE (*** in background ***): host dir archs
-function validate()
-{
-    ${verb} "[validate] $@"
-    doit GCNLP "$@" &
-    ${verb} "[validate] background pid: $!"
-}
-
-
-# COmpile and VALIDate: host dir arch
-function covalid()
-{
-    ${verb} "[covalid] $@"
-    compile "$@" ;
-    validate "$@" ;
-}
-
-
-
-#
-# DO THE JOB!
-
-case ${job} in
-
-    usual)
-	${verb} "USUAL stuff" ;
-	general ${sun4} GNUSOL1 ;
-	covalid ${sol2} GNUSOL2LL ;
-	covalid ${i586} LINUXI86LL ;
-	compile ${sun4} GNUSOL1 ;
-        compile ${i386} LINUXI86 ;;
-
-    long)
-	${verb} "LONG stuff (more compilations and validations)" ;
-	general ${sun4} GNUSOL1 ;
-	covalid ${sun4} GNUSOL1 ;
-	covalid ${sol2} GNUSOL2LL ;
-	covalid ${i586} LINUXI86LL ;
-	compile ${sol2} SOL2LL ;
-	compile ${sun4} "GNU SUN4 GPROF" ;
-	compile ${i386} "LINUXI86" ;;
-
-    short)
-	${verb} "SHORT stuff (one validation)" ;
-	covalid ${i586} LINUXI86LL ;
-	compile ${i386} LINUXI86 ;
-	compile ${sol2} GNUSOL2LL ;
-	compile ${sun4} GNUSOL1 ;;
-
-    compile)
-	${verb} "COMPILE stuff" ;
-	compile ${i586} "LINUXI86LL" ;
-	compile ${i386} "LINUXI86" ;
-	compile ${sun4} "GNU GNUSOL1 SUN4 GPROF" ;
-	compile ${sol2} "GNUSOL2LL SOL2LL" ;;
-
-    validate)
-	${verb} "VALIDATE stuff (with necessary compilations)" ;
-	covalid ${sun4} GNUSOL1 ;
-	covalid ${i586} LINUXI86LL ;
-	covalid ${sol2} GNUSOL2LL ;;
-
-    gnusol2ll)
-	${verb} "VALIDATE stuff (with necessary compilations)" ;
-	compile ${sol2} GNUSOL2LLPROF ;
-	covalid ${sol2} GNUSOL2LL ;;
-
-    linuxi86ll)
-	${verb} "COMPILE stuff only for Linux I86 (Long long)" ;
-	compile ${i686} LINUXI86LL ;;
-
-    debug)
-	${verb} "DEBUG stuff..." ;
-	validate ${i586} LINUXI86LL ;;
-
-    *)
-	${verb} "unexpected job=${job}" ;
-	usage 2 ;;
-
-esac
-
-
-
-#
-# WAIT...
-
-${verb} waiting
-
-wait
-
-${verb} done
-
-
-
-# DONE
-#
+  echo "  target=$target"
+  echo "  out=$target/out"
+  echo "  err=$target/err"
+  echo "  email=$email"
+  echo "  start=$start"
+  echo "  end=$end"
+} | ${PIPS_MAIL:-Mail} -s '[pips] night job summary' $email
