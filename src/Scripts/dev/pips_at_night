@@ -26,23 +26,25 @@ target=~/PIPS
 
 setup='http://svn.cri.ensmp.fr/svn/nlpmake/trunk/makes/setup_pips.sh'
 
-for opt in "$@" ; do
-    case $opt in
-	--) shift ; break ;;
-	-*) shift ;;
-	*) break ;;
-    esac
-
-    case $opt in
-	-t|--target) target=$1 ; shift ;;
-	-V|--vopt) validate_option=$1 ; shift ;;
-	-d|--download) download=1 ;;
-        -u|--update) update=1 ;;
-	-c|--compile) compile=1 ;;
-	-v|--validate) validate=1 ;;
-	-h|--help) err 'display help message' 0 ;;
-	*) err "unexpected option '$opt'" 1 ;;
-    esac
+while [ "$1" ] 
+do
+  opt=$1
+  case $opt in
+      --) shift ; break ;;
+      -*) shift ;;
+      *) break ;;
+  esac
+  
+  case $opt in
+      -t|--target) target=$1 ; shift ;;
+      -V|--vopt) vopt=$1 ; shift ;;
+      -d|--download) download=1 ;;
+      -u|--update) update=1 ;;
+      -c|--compile) compile=1 ;;
+      -v|--validate) validate=1 ;;
+      -h|--help) err 'display help message' 0 ;;
+      *) err "unexpected option '$opt'" 1 ;;
+  esac
 done
 
 # force dowload if target does not exist
@@ -74,9 +76,9 @@ then
     pushd $target
     # build? verbosity? clean+recompile?
     # skip documentation?
-    cd prod/newgen ; make recompile
-    cd ../linear ; make recompile
-    cd ../pips ; make recompile
+    cd prod/newgen ; make clean recompile
+    cd ../linear ; make clean recompile
+    cd ../pips ; make clean recompile
     popd
 else
     echo '### no compile'
@@ -86,7 +88,7 @@ if [[ $validate ]]
 then
     pushd $target/valid
     make clean
-    make $validate_option validate
+    make $vopt validate
     popd
 else
     echo '### no validate'
