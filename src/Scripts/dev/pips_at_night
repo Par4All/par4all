@@ -94,7 +94,6 @@ if [[ $validate ]]
 then
     pushd $target/valid
     make clean
-    echo "vopt=$vopt"
     make $vopt validate
     popd
 else
