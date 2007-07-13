@@ -2,7 +2,7 @@
 # $Id$
 
 # DEFAULTS
-# where is the validation
+# where is the validation?
 vdir=${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}
 
 # running directory
@@ -99,7 +99,9 @@ output in $odir
 with pips=$pips
 and tpips=$tpips
 running in $rdir
-on $(date)
+on $(hostname) 
+by $(whoami)
+at $(date)
 " >> $summary
 
 # set default directories if necessary
