@@ -6,13 +6,19 @@
 
 umask 022
 
-start=$(date)
 email=coelho@cri.ensmp.fr
 target=~/PIPS
+
+# set environment...
 test -f $target/pipsrc.sh && source $target/pipsrc.sh
 
+start=$(date)
+
 pips_at_night -t $target -V VOPT=$email -u -c -v \
-    > $target/out 2> $target/err
+    > out.$$ 2> err.$$
+
+mv out.$$ $target/out
+mv err.$$ $target/err
 
 end=$(date)
 
