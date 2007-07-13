@@ -1,0 +1,3 @@
+# PIPS account cron at CRI
+# $Id$
+03 03 * * 1-5 /users/soft/pips/PIPS/prod/pips/utils/pips_at_night_at_cri
