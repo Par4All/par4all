@@ -23,10 +23,10 @@ mv err.$$ $target/err
 end=$(date)
 
 {
-  echo "  target=$target"
-  echo "  out=$target/out"
-  echo "  err=$target/err"
-  echo "  email=$email"
-  echo "  start=$start"
-  echo "  end=$end"
+  echo "target=$target"
+  echo "out=$target/out"
+  echo "err=$target/err"
+  echo "email=$email"
+  echo "start=$start"
+  echo "end=$end"
 } | ${PIPS_MAIL:-Mail} -s '[pips] night job summary' $email
