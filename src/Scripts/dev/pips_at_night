@@ -20,6 +20,7 @@ download=
 update=
 compile=
 validate=
+vopt=
 
 # where to do it by default
 target=~/PIPS
@@ -37,7 +38,7 @@ do
   
   case $opt in
       -t|--target) target=$1 ; shift ;;
-      -V|--vopt) vopt=$1 ; shift ;;
+      -m|--mail) vopt="VOPT='-m $1'" ; shift ;;
       # what to do
       -d|--download) download=1 ;;
       -nd|--no-download) download= ;;
@@ -60,7 +61,7 @@ if [[ $download ]]
 then
     test -d $target && err "will not overwrite target directory: $target" 4
     # full download
-    wget --non-verbose $setup
+    wget --no-verbose $setup
     # should be silent?
     sh ./setup_pips.sh $target 
 elif [[ $update ]]
