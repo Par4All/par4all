@@ -38,7 +38,7 @@ do
   
   case $opt in
       -t|--target) target=$1 ; shift ;;
-      -m|--mail) vopt="VOPT='-m $1'" ; shift ;;
+      -m|--mail) vopt="VOPT=-m $1" ; shift ;;
       # what to do
       -d|--download) download=1 ;;
       -nd|--no-download) download= ;;
