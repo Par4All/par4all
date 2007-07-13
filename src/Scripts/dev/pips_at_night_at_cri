@@ -14,7 +14,7 @@ test -f $target/pipsrc.sh && source $target/pipsrc.sh
 
 start=$(date)
 
-pips_at_night -t $target -V 'VOPT="-m $email"' -u -c -v "$@" \
+pips_at_night -t $target -V "VOPT='-m $email'" -u -c -v "$@" \
     > out.$$ 2> err.$$
 
 mv out.$$ $target/out
