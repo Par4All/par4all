@@ -95,7 +95,7 @@ if [[ $validate ]]
 then
     pushd $target/valid
     make clean
-    make $vopt validate
+    make "$vopt" validate
     popd
 else
     echo '### no validate'
