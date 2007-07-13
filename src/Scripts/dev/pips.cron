@@ -1,3 +1,4 @@
-# PIPS account cron at CRI
 # $Id$
+# PIPS account cron at CRI, bootstrap with:
+# pips@verone> setup_pips.sh ~/PIPS
 03 03 * * 1-5 /users/soft/pips/PIPS/prod/pips/utils/pips_at_night_at_cri
