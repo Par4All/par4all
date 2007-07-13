@@ -6,7 +6,7 @@
 
 umask 022
 
-email=coelho@cri.ensmp.fr
+email=pips-validation@cri.ensmp.fr
 target=~/PIPS
 
 # set environment...
