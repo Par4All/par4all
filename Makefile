@@ -10,7 +10,7 @@ clean:
 	$(FIND) -name '*.database' -type d -print0 \
 	     -o -name 'validation_results.*' -type d -print0 | \
 		xargs -0 $(RM) -r
-	$(RM) */*.result/out
+	$(RM) */*.result/out properties.rc
 	$(RM) -r RESULTS
 
 # subdirectories to consider
