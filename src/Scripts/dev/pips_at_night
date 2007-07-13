@@ -21,7 +21,7 @@ update=
 compile=
 validate=
 
-# where to do it
+# where to do it by default
 target=~/PIPS
 
 setup='http://svn.cri.ensmp.fr/svn/nlpmake/trunk/makes/setup_pips.sh'
@@ -38,10 +38,16 @@ do
   case $opt in
       -t|--target) target=$1 ; shift ;;
       -V|--vopt) vopt=$1 ; shift ;;
+      # what to do
       -d|--download) download=1 ;;
+      -nd|--no-download) download= ;;
       -u|--update) update=1 ;;
+      -nu|--no-update) update= ;;
       -c|--compile) compile=1 ;;
+      -nc|--no-compile) compile= ;;
       -v|--validate) validate=1 ;;
+      -nv|--no-validate) validate= ;;
+      # help
       -h|--help) err 'display help message' 0 ;;
       *) err "unexpected option '$opt'" 1 ;;
   esac
@@ -54,7 +60,7 @@ if [[ $download ]]
 then
     test -d $target && err "will not overwrite target directory: $target" 4
     # full download
-    wget $setup
+    wget --non-verbose $setup
     # should be silent?
     sh ./setup_pips.sh $target 
 elif [[ $update ]]
@@ -88,6 +94,7 @@ if [[ $validate ]]
 then
     pushd $target/valid
     make clean
+    echo "vopt=$vopt"
     make $vopt validate
     popd
 else
