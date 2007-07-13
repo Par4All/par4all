@@ -582,9 +582,9 @@ string preprocessed_to_user_file(string preprocessed_user_file)
 
 /* default preprocessor and basic options
  */
-#define CPP_CPP			"cpp -C" /* alternative values: "gcc -E -C" or "fpp" */
+#define CPP_CPP			"cpp -C -ansi" /* alternative values: "gcc -E -C" or "fpp" */
 /* #define CPP_CPPFLAGS		" -P -D__PIPS__ -D__HPFC__ " */
-#define CPP_CPPFLAGS		" -D__PIPS__ -D__HPFC__ "
+#define CPP_CPPFLAGS		" -D__PIPS__ -D__HPFC__ -U__GNUC__"
 #define FPP_CPP			"cpp -C" /* alternative values: "gcc -E -C" or "fpp" */
 #define FPP_CPPFLAGS		" -P -D__PIPS__ -D__HPFC__ "
 
