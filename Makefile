@@ -18,7 +18,7 @@ TARGET	= $(shell grep '^[a-zA-Z]' defaults)
 VOPT	= -v
 
 validate:
-	pips_validate $(VOPT) -V $(PWD) -O RESULTS $(TARGET)
+	PIPS_MORE=cat pips_validate $(VOPT) -V $(PWD) -O RESULTS $(TARGET)
 
 accept:
 	manual_accept $(TARGET)
