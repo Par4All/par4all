@@ -1,0 +1,532 @@
+\section{polyparam.c File Reference}
+\label{polyparam_8c}\index{polyparam.c@{polyparam.c}}
+{\tt \#include $<$stdio.h$>$}\par
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$string.h$>$}\par
+{\tt \#include $<$assert.h$>$}\par
+{\tt \#include $<$polylib/polylib.h$>$}\par
+\subsection*{Compounds}
+\begin{CompactItemize}
+\item 
+struct {\bf Sat\-Matrix}
+\end{CompactItemize}
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+void {\bf traite\_\-m\_\-face} ()
+\item 
+void {\bf scan\_\-m\_\-face} ()
+\item 
+Polyhedron $\ast$ {\bf PDomain\-Intersection} (Polyhedron $\ast$Pol1, Polyhedron $\ast$Pol2, unsigned Nb\-Max\-Rays)
+\item 
+Polyhedron $\ast$ {\bf PDomain\-Difference} (Polyhedron $\ast$Pol1, Polyhedron $\ast$Pol2, unsigned Nb\-Max\-Rays)
+\item 
+int {\bf Test\-Rank} (Matrix $\ast$Mat)
+\item 
+{\bf Sat\-Matrix} $\ast$ {\bf SMAlloc} (int rows, int cols)
+\item 
+void {\bf SMFree} ({\bf Sat\-Matrix} $\ast$matrix)
+\item 
+Polyhedron $\ast$ {\bf Add\_\-CEqualities} (Polyhedron $\ast$D)
+\item 
+void {\bf traite\_\-m\_\-face} (Polyhedron $\ast$D, int $\ast$mf)
+\item 
+int {\bf count\_\-sat} (unsigned int $\ast$mf)
+\item 
+void {\bf scan\_\-m\_\-face} (int pos, int nb\_\-un, Polyhedron $\ast$D, unsigned int $\ast$mf)
+\item 
+{\bf Sat\-Matrix} $\ast$ {\bf Poly2Sat} (Polyhedron $\ast$Pol, unsigned int $\ast$$\ast$L)
+\item 
+Param\_\-Polyhedron $\ast$ {\bf Gen\-Param\-Polyhedron} (Polyhedron $\ast$Pol)
+\item 
+Matrix $\ast$ {\bf Pre\-Elim\_\-Columns} (Polyhedron $\ast$E, int $\ast$p, int $\ast$ref, int {\bf m})
+\item 
+Polyhedron $\ast$ {\bf Elim\_\-Columns} (Polyhedron $\ast$A, Polyhedron $\ast$E, int $\ast$p, int $\ast$ref)
+\item 
+Param\_\-Polyhedron $\ast$ {\bf Find\_\-m\_\-faces} (Polyhedron $\ast$$\ast$Di, Polyhedron $\ast$C, int keep\_\-dom, int working\_\-space, Polyhedron $\ast$$\ast$CEq, Matrix $\ast$$\ast$CT)
+\item 
+void {\bf Compute\_\-PDomains} (Param\_\-Domain $\ast$PD, int nb\_\-domains, int working\_\-space)
+\item 
+Param\_\-Polyhedron $\ast$ {\bf Polyhedron2Param\_\-Vertices} (Polyhedron $\ast$Din, Polyhedron $\ast$Cin, int working\_\-space)
+\item 
+void {\bf Param\_\-Vertices\_\-Free} (Param\_\-Vertices $\ast$PV)
+\item 
+void {\bf Print\_\-Vertex} (FILE $\ast$DST, Matrix $\ast$V, char $\ast$$\ast$param\_\-names)
+\item 
+Matrix $\ast$ {\bf Vertex\-CT} (Matrix $\ast$V, Matrix $\ast$CT)
+\item 
+void {\bf Print\_\-Domain} (FILE $\ast$DST, Polyhedron $\ast$D, char $\ast$$\ast$pname)
+\item 
+void {\bf Param\_\-Vertices\_\-Print} (FILE $\ast$DST, Param\_\-Vertices $\ast$PV, char $\ast$$\ast$param\_\-names)
+\item 
+Param\_\-Polyhedron $\ast$ {\bf Polyhedron2Param\_\-Domain} (Polyhedron $\ast$Din, Polyhedron $\ast$Cin, int working\_\-space)
+\item 
+Param\_\-Polyhedron $\ast$ {\bf Polyhedron2Param\_\-Simplified\-Domain} (Polyhedron $\ast$$\ast$Din, Polyhedron $\ast$Cin, int working\_\-space, Polyhedron $\ast$$\ast$CEq, Matrix $\ast$$\ast$CT)
+\item 
+void {\bf Param\_\-Domain\_\-Free} (Param\_\-Domain $\ast$PD)
+\item 
+void {\bf Param\_\-Polyhedron\_\-Free} (Param\_\-Polyhedron $\ast$P)
+\end{CompactItemize}
+\subsection*{Variables}
+\begin{CompactItemize}
+\item 
+int {\bf m}
+\item 
+int {\bf m\_\-dim}
+\item 
+int {\bf n}
+\item 
+int {\bf ws}
+\item 
+int {\bf nr}
+\item 
+Polyhedron $\ast$ {\bf CEqualities}
+\item 
+{\bf Sat\-Matrix} $\ast$ {\bf Sat}
+\item 
+int $\ast$ {\bf egalite}
+\item 
+Matrix $\ast$ {\bf Xi}
+\item 
+Matrix $\ast$ {\bf Pi}
+\item 
+Matrix $\ast$ {\bf Pi\-Test}
+\item 
+Matrix $\ast$ {\bf Pi\-Inv}
+\item 
+Matrix $\ast$ {\bf Rays\-Di}
+\item 
+int {\bf KD}
+\item 
+int {\bf nb\-PV}
+\item 
+Param\_\-Vertices $\ast$ {\bf PV\_\-Result}
+\item 
+Param\_\-Domain $\ast$ {\bf PDomains}
+\item 
+int {\bf cntbit} [256]
+\end{CompactItemize}
+
+
+\subsection{Function Documentation}
+\index{polyparam.c@{polyparam.c}!Add_CEqualities@{Add\_\-CEqualities}}
+\index{Add_CEqualities@{Add\_\-CEqualities}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Polyhedron$\ast$ Add\_\-CEqualities (Polyhedron $\ast$ {\em D})\hspace{0.3cm}{\tt  [static]}}\label{polyparam_8c_a25}
+
+
+
+
+Definition at line 274 of file polyparam.c.
+
+Referenced by Polyhedron2Param\_\-Domain(), and traite\_\-m\_\-face().
+
+\index{polyparam.c@{polyparam.c}!Compute_PDomains@{Compute\_\-PDomains}}
+\index{Compute_PDomains@{Compute\_\-PDomains}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Compute\_\-PDomains (Param\_\-Domain $\ast$ {\em PD}, int {\em nb\_\-domains}, int {\em working\_\-space})}\label{polyparam_8c_a34}
+
+
+
+
+Definition at line 1189 of file polyparam.c.
+
+Referenced by Polyhedron2Param\_\-Domain(), and Polyhedron2Param\_\-Simplified\-Domain().
+
+\index{polyparam.c@{polyparam.c}!Elim_Columns@{Elim\_\-Columns}}
+\index{Elim_Columns@{Elim\_\-Columns}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Polyhedron$\ast$ Elim\_\-Columns (Polyhedron $\ast$ {\em A}, Polyhedron $\ast$ {\em E}, int $\ast$ {\em p}, int $\ast$ {\em ref})}\label{polyparam_8c_a32}
+
+
+
+
+Definition at line 848 of file polyparam.c.
+
+Referenced by Find\_\-m\_\-faces().
+
+\index{polyparam.c@{polyparam.c}!Find_m_faces@{Find\_\-m\_\-faces}}
+\index{Find_m_faces@{Find\_\-m\_\-faces}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Param\_\-Polyhedron$\ast$ Find\_\-m\_\-faces (Polyhedron $\ast$$\ast$ {\em Di}, Polyhedron $\ast$ {\em C}, int {\em keep\_\-dom}, int {\em working\_\-space}, Polyhedron $\ast$$\ast$ {\em CEq}, Matrix $\ast$$\ast$ {\em CT})}\label{polyparam_8c_a33}
+
+
+
+
+Definition at line 912 of file polyparam.c.
+
+Referenced by Polyhedron2Param\_\-Domain(), Polyhedron2Param\_\-Simplified\-Domain(), and Polyhedron2Param\_\-Vertices().
+
+\index{polyparam.c@{polyparam.c}!GenParamPolyhedron@{GenParamPolyhedron}}
+\index{GenParamPolyhedron@{GenParamPolyhedron}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Param\_\-Polyhedron$\ast$ Gen\-Param\-Polyhedron (Polyhedron $\ast$ {\em Pol})}\label{polyparam_8c_a30}
+
+
+
+
+Definition at line 707 of file polyparam.c.
+
+Referenced by Find\_\-m\_\-faces().
+
+\index{polyparam.c@{polyparam.c}!PDomainDifference@{PDomainDifference}}
+\index{PDomainDifference@{PDomainDifference}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Polyhedron$\ast$ PDomain\-Difference (Polyhedron $\ast$ {\em Pol1}, Polyhedron $\ast$ {\em Pol2}, unsigned {\em Nb\-Max\-Rays})}\label{polyparam_8c_a21}
+
+
+
+
+Definition at line 86 of file polyparam.c.
+
+Referenced by Compute\_\-PDomains().
+
+\index{polyparam.c@{polyparam.c}!PDomainIntersection@{PDomainIntersection}}
+\index{PDomainIntersection@{PDomainIntersection}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Polyhedron$\ast$ PDomain\-Intersection (Polyhedron $\ast$ {\em Pol1}, Polyhedron $\ast$ {\em Pol2}, unsigned {\em Nb\-Max\-Rays})}\label{polyparam_8c_a20}
+
+
+
+
+Definition at line 50 of file polyparam.c.
+
+Referenced by Compute\_\-PDomains().
+
+\index{polyparam.c@{polyparam.c}!Param_Domain_Free@{Param\_\-Domain\_\-Free}}
+\index{Param_Domain_Free@{Param\_\-Domain\_\-Free}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Param\_\-Domain\_\-Free (Param\_\-Domain $\ast$ {\em PD})}\label{polyparam_8c_a43}
+
+
+
+
+Definition at line 1655 of file polyparam.c.
+
+Referenced by Param\_\-Polyhedron\_\-Free().
+
+\index{polyparam.c@{polyparam.c}!Param_Polyhedron_Free@{Param\_\-Polyhedron\_\-Free}}
+\index{Param_Polyhedron_Free@{Param\_\-Polyhedron\_\-Free}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Param\_\-Polyhedron\_\-Free (Param\_\-Polyhedron $\ast$ {\em P})}\label{polyparam_8c_a44}
+
+
+
+
+Definition at line 1672 of file polyparam.c.\index{polyparam.c@{polyparam.c}!Param_Vertices_Free@{Param\_\-Vertices\_\-Free}}
+\index{Param_Vertices_Free@{Param\_\-Vertices\_\-Free}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Param\_\-Vertices\_\-Free (Param\_\-Vertices $\ast$ {\em PV})}\label{polyparam_8c_a36}
+
+
+
+
+Definition at line 1386 of file polyparam.c.
+
+Referenced by Param\_\-Polyhedron\_\-Free().
+
+\index{polyparam.c@{polyparam.c}!Param_Vertices_Print@{Param\_\-Vertices\_\-Print}}
+\index{Param_Vertices_Print@{Param\_\-Vertices\_\-Print}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Param\_\-Vertices\_\-Print (FILE $\ast$ {\em DST}, Param\_\-Vertices $\ast$ {\em PV}, char $\ast$$\ast$ {\em param\_\-names})}\label{polyparam_8c_a40}
+
+
+
+
+Definition at line 1555 of file polyparam.c.\index{polyparam.c@{polyparam.c}!Poly2Sat@{Poly2Sat}}
+\index{Poly2Sat@{Poly2Sat}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf Sat\-Matrix}$\ast$ Poly2Sat (Polyhedron $\ast$ {\em Pol}, unsigned int $\ast$$\ast$ {\em L})\hspace{0.3cm}{\tt  [static]}}\label{polyparam_8c_a29}
+
+
+
+
+Definition at line 654 of file polyparam.c.
+
+Referenced by Find\_\-m\_\-faces().
+
+\index{polyparam.c@{polyparam.c}!Polyhedron2Param_Domain@{Polyhedron2Param\_\-Domain}}
+\index{Polyhedron2Param_Domain@{Polyhedron2Param\_\-Domain}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Param\_\-Polyhedron$\ast$ Polyhedron2Param\_\-Domain (Polyhedron $\ast$ {\em Din}, Polyhedron $\ast$ {\em Cin}, int {\em working\_\-space})}\label{polyparam_8c_a41}
+
+
+
+
+Definition at line 1580 of file polyparam.c.\index{polyparam.c@{polyparam.c}!Polyhedron2Param_SimplifiedDomain@{Polyhedron2Param\_\-SimplifiedDomain}}
+\index{Polyhedron2Param_SimplifiedDomain@{Polyhedron2Param\_\-SimplifiedDomain}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Param\_\-Polyhedron$\ast$ Polyhedron2Param\_\-Simplified\-Domain (Polyhedron $\ast$$\ast$ {\em Din}, Polyhedron $\ast$ {\em Cin}, int {\em working\_\-space}, Polyhedron $\ast$$\ast$ {\em CEq}, Matrix $\ast$$\ast$ {\em CT})}\label{polyparam_8c_a42}
+
+
+
+
+Definition at line 1616 of file polyparam.c.
+
+Referenced by Polyhedron\_\-Enumerate().
+
+\index{polyparam.c@{polyparam.c}!Polyhedron2Param_Vertices@{Polyhedron2Param\_\-Vertices}}
+\index{Polyhedron2Param_Vertices@{Polyhedron2Param\_\-Vertices}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Param\_\-Polyhedron$\ast$ Polyhedron2Param\_\-Vertices (Polyhedron $\ast$ {\em Din}, Polyhedron $\ast$ {\em Cin}, int {\em working\_\-space})}\label{polyparam_8c_a35}
+
+
+
+
+Definition at line 1360 of file polyparam.c.\index{polyparam.c@{polyparam.c}!PreElim_Columns@{PreElim\_\-Columns}}
+\index{PreElim_Columns@{PreElim\_\-Columns}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Matrix$\ast$ Pre\-Elim\_\-Columns (Polyhedron $\ast$ {\em E}, int $\ast$ {\em p}, int $\ast$ {\em ref}, int {\em m})}\label{polyparam_8c_a31}
+
+
+
+
+Definition at line 775 of file polyparam.c.
+
+Referenced by Find\_\-m\_\-faces().
+
+\index{polyparam.c@{polyparam.c}!Print_Domain@{Print\_\-Domain}}
+\index{Print_Domain@{Print\_\-Domain}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Print\_\-Domain (FILE $\ast$ {\em DST}, Polyhedron $\ast$ {\em D}, char $\ast$$\ast$ {\em pname})}\label{polyparam_8c_a39}
+
+
+
+
+Definition at line 1505 of file polyparam.c.
+
+Referenced by Enumerate\_\-No\-Parameters(), Param\_\-Vertices\_\-Print(), Polyhedron\_\-Enumerate(), compute\_\-poly(), and main().
+
+\index{polyparam.c@{polyparam.c}!Print_Vertex@{Print\_\-Vertex}}
+\index{Print_Vertex@{Print\_\-Vertex}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Print\_\-Vertex (FILE $\ast$ {\em DST}, Matrix $\ast$ {\em V}, char $\ast$$\ast$ {\em param\_\-names})}\label{polyparam_8c_a37}
+
+
+
+
+Definition at line 1402 of file polyparam.c.
+
+Referenced by Param\_\-Vertices\_\-Print(), and Scan\_\-Vertices().
+
+\index{polyparam.c@{polyparam.c}!SMAlloc@{SMAlloc}}
+\index{SMAlloc@{SMAlloc}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf Sat\-Matrix}$\ast$ SMAlloc (int {\em rows}, int {\em cols})\hspace{0.3cm}{\tt  [static]}}\label{polyparam_8c_a23}
+
+
+
+
+Definition at line 205 of file polyparam.c.
+
+Referenced by Build\-Sat(), Constraints2Polyhedron(), Find\-Simple(), Poly2Sat(), Rays2Polyhedron(), and Transform\-Sat().
+
+\index{polyparam.c@{polyparam.c}!SMFree@{SMFree}}
+\index{SMFree@{SMFree}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void SMFree ({\bf Sat\-Matrix} $\ast$ {\em matrix})\hspace{0.3cm}{\tt  [static]}}\label{polyparam_8c_a24}
+
+
+
+
+Definition at line 229 of file polyparam.c.
+
+Referenced by Add\-Constraints(), Add\-Rays(), Build\-Sat(), Constraints2Polyhedron(), Find\-Simple(), Find\_\-m\_\-faces(), Rays2Polyhedron(), Simplify\-Constraints(), and Sub\-Constraint().
+
+\index{polyparam.c@{polyparam.c}!TestRank@{TestRank}}
+\index{TestRank@{TestRank}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int Test\-Rank (Matrix $\ast$ {\em Mat})\hspace{0.3cm}{\tt  [static]}}\label{polyparam_8c_a22}
+
+
+
+
+Definition at line 127 of file polyparam.c.
+
+Referenced by traite\_\-m\_\-face().
+
+\index{polyparam.c@{polyparam.c}!VertexCT@{VertexCT}}
+\index{VertexCT@{VertexCT}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Matrix$\ast$ Vertex\-CT (Matrix $\ast$ {\em V}, Matrix $\ast$ {\em CT})}\label{polyparam_8c_a38}
+
+
+
+
+Definition at line 1475 of file polyparam.c.
+
+Referenced by Scan\_\-Vertices().
+
+\index{polyparam.c@{polyparam.c}!count_sat@{count\_\-sat}}
+\index{count_sat@{count\_\-sat}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int count\_\-sat (unsigned int $\ast$ {\em mf})\hspace{0.3cm}{\tt  [static]}}\label{polyparam_8c_a27}
+
+
+
+
+Definition at line 482 of file polyparam.c.
+
+Referenced by scan\_\-m\_\-face().
+
+\index{polyparam.c@{polyparam.c}!scan_m_face@{scan\_\-m\_\-face}}
+\index{scan_m_face@{scan\_\-m\_\-face}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void scan\_\-m\_\-face (int {\em pos}, int {\em nb\_\-un}, Polyhedron $\ast$ {\em D}, unsigned int $\ast$ {\em mf})\hspace{0.3cm}{\tt  [static]}}\label{polyparam_8c_a28}
+
+
+
+
+Definition at line 539 of file polyparam.c.\index{polyparam.c@{polyparam.c}!scan_m_face@{scan\_\-m\_\-face}}
+\index{scan_m_face@{scan\_\-m\_\-face}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void scan\_\-m\_\-face ()\hspace{0.3cm}{\tt  [static]}}\label{polyparam_8c_a19}
+
+
+
+
+Referenced by Find\_\-m\_\-faces(), and scan\_\-m\_\-face().
+
+\index{polyparam.c@{polyparam.c}!traite_m_face@{traite\_\-m\_\-face}}
+\index{traite_m_face@{traite\_\-m\_\-face}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void traite\_\-m\_\-face (Polyhedron $\ast$ {\em D}, int $\ast$ {\em mf})\hspace{0.3cm}{\tt  [static]}}\label{polyparam_8c_a26}
+
+
+
+
+Definition at line 303 of file polyparam.c.\index{polyparam.c@{polyparam.c}!traite_m_face@{traite\_\-m\_\-face}}
+\index{traite_m_face@{traite\_\-m\_\-face}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void traite\_\-m\_\-face ()\hspace{0.3cm}{\tt  [static]}}\label{polyparam_8c_a18}
+
+
+
+
+Referenced by scan\_\-m\_\-face().
+
+
+
+\subsection{Variable Documentation}
+\index{polyparam.c@{polyparam.c}!CEqualities@{CEqualities}}
+\index{CEqualities@{CEqualities}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Polyhedron$\ast$ CEqualities\hspace{0.3cm}{\tt  [static]}}\label{polyparam_8c_a5}
+
+
+
+
+Definition at line 249 of file polyparam.c.\index{polyparam.c@{polyparam.c}!KD@{KD}}
+\index{KD@{KD}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int KD\hspace{0.3cm}{\tt  [static]}}\label{polyparam_8c_a13}
+
+
+
+
+Definition at line 258 of file polyparam.c.\index{polyparam.c@{polyparam.c}!PDomains@{PDomains}}
+\index{PDomains@{PDomains}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Param\_\-Domain$\ast$ PDomains\hspace{0.3cm}{\tt  [static]}}\label{polyparam_8c_a16}
+
+
+
+
+Definition at line 263 of file polyparam.c.\index{polyparam.c@{polyparam.c}!PV_Result@{PV\_\-Result}}
+\index{PV_Result@{PV\_\-Result}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Param\_\-Vertices$\ast$ PV\_\-Result\hspace{0.3cm}{\tt  [static]}}\label{polyparam_8c_a15}
+
+
+
+
+Definition at line 262 of file polyparam.c.\index{polyparam.c@{polyparam.c}!Pi@{Pi}}
+\index{Pi@{Pi}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Matrix $\ast$ Pi\hspace{0.3cm}{\tt  [static]}}\label{polyparam_8c_a9}
+
+
+
+
+Definition at line 252 of file polyparam.c.\index{polyparam.c@{polyparam.c}!PiInv@{PiInv}}
+\index{PiInv@{PiInv}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Matrix$\ast$ Pi\-Inv\hspace{0.3cm}{\tt  [static]}}\label{polyparam_8c_a11}
+
+
+
+
+Definition at line 254 of file polyparam.c.\index{polyparam.c@{polyparam.c}!PiTest@{PiTest}}
+\index{PiTest@{PiTest}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Matrix$\ast$ Pi\-Test\hspace{0.3cm}{\tt  [static]}}\label{polyparam_8c_a10}
+
+
+
+
+Definition at line 253 of file polyparam.c.\index{polyparam.c@{polyparam.c}!RaysDi@{RaysDi}}
+\index{RaysDi@{RaysDi}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Matrix$\ast$ Rays\-Di\hspace{0.3cm}{\tt  [static]}}\label{polyparam_8c_a12}
+
+
+
+
+Definition at line 256 of file polyparam.c.\index{polyparam.c@{polyparam.c}!Sat@{Sat}}
+\index{Sat@{Sat}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf Sat\-Matrix}$\ast$ Sat\hspace{0.3cm}{\tt  [static]}}\label{polyparam_8c_a6}
+
+
+
+
+Definition at line 250 of file polyparam.c.\index{polyparam.c@{polyparam.c}!Xi@{Xi}}
+\index{Xi@{Xi}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Matrix$\ast$ Xi\hspace{0.3cm}{\tt  [static]}}\label{polyparam_8c_a8}
+
+
+
+
+Definition at line 252 of file polyparam.c.\index{polyparam.c@{polyparam.c}!cntbit@{cntbit}}
+\index{cntbit@{cntbit}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int cntbit[256]}\label{polyparam_8c_a17}
+
+
+{\bf Initial value:}
+
+\footnotesize\begin{verbatim} {                              
+0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4,
+1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+
+1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+
+1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+
+2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8 }\end{verbatim}\normalsize 
+
+
+Definition at line 461 of file polyparam.c.\index{polyparam.c@{polyparam.c}!egalite@{egalite}}
+\index{egalite@{egalite}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int$\ast$ egalite\hspace{0.3cm}{\tt  [static]}}\label{polyparam_8c_a7}
+
+
+
+
+Definition at line 251 of file polyparam.c.\index{polyparam.c@{polyparam.c}!m@{m}}
+\index{m@{m}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int m\hspace{0.3cm}{\tt  [static]}}\label{polyparam_8c_a0}
+
+
+
+
+Definition at line 243 of file polyparam.c.\index{polyparam.c@{polyparam.c}!m_dim@{m\_\-dim}}
+\index{m_dim@{m\_\-dim}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int m\_\-dim\hspace{0.3cm}{\tt  [static]}}\label{polyparam_8c_a1}
+
+
+
+
+Definition at line 244 of file polyparam.c.\index{polyparam.c@{polyparam.c}!n@{n}}
+\index{n@{n}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int n\hspace{0.3cm}{\tt  [static]}}\label{polyparam_8c_a2}
+
+
+
+
+Definition at line 245 of file polyparam.c.\index{polyparam.c@{polyparam.c}!nbPV@{nbPV}}
+\index{nbPV@{nbPV}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int nb\-PV\hspace{0.3cm}{\tt  [static]}}\label{polyparam_8c_a14}
+
+
+
+
+Definition at line 261 of file polyparam.c.\index{polyparam.c@{polyparam.c}!nr@{nr}}
+\index{nr@{nr}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int nr\hspace{0.3cm}{\tt  [static]}}\label{polyparam_8c_a4}
+
+
+
+
+Definition at line 247 of file polyparam.c.\index{polyparam.c@{polyparam.c}!ws@{ws}}
+\index{ws@{ws}!polyparam.c@{polyparam.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ws\hspace{0.3cm}{\tt  [static]}}\label{polyparam_8c_a3}
+
+
+
+
+Definition at line 246 of file polyparam.c.

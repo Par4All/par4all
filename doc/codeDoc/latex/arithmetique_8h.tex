@@ -1,0 +1,847 @@
+\section{arithmetique.h File Reference}
+\label{arithmetique_8h}\index{arithmetique.h@{arithmetique.h}}
+{\tt \#include $<$stdio.h$>$}\par
+{\tt \#include $<$limits.h$>$}\par
+{\tt \#include \char`\"{}arithmetic\_\-errors.h\char`\"{}}\par
+\subsection*{Defines}
+\begin{CompactItemize}
+\item 
+\#define {\bf \_\-\_\-LONG\_\-LONG\_\-MAX\_\-\_\-}\ 9223372036854775807LL
+\item 
+\#define {\bf LONG\_\-LONG\_\-MAX}\ \_\-\_\-LONG\_\-LONG\_\-MAX\_\-\_\-
+\item 
+\#define {\bf LONG\_\-LONG\_\-MIN}\ (-LONG\_\-LONG\_\-MAX-1)
+\item 
+\#define {\bf ULONG\_\-LONG\_\-MAX}\ (LONG\_\-LONG\_\-MAX $\ast$ 2ULL + 1)
+\item 
+\#define {\bf LINEAR\_\-VALUE\_\-STRING}\ \char`\"{}gmp\char`\"{}
+\item 
+\#define {\bf VALUE\_\-FMT}\ \char`\"{}\%s\char`\"{}
+\item 
+\#define {\bf VALUE\_\-TO\_\-LONG}(val)\ (mpz\_\-get\_\-si(val))
+\item 
+\#define {\bf VALUE\_\-TO\_\-INT}(val)\ ((int)mpz\_\-get\_\-si(val))
+\item 
+\#define {\bf VALUE\_\-TO\_\-FLOAT}(val)\ ((float)((int)mpz\_\-get\_\-si(val)))
+\item 
+\#define {\bf VALUE\_\-TO\_\-DOUBLE}(val)\ (mpz\_\-get\_\-d(val))
+\item 
+\#define {\bf value\_\-init}(val)\ ((val) = 0)
+\item 
+\#define {\bf value\_\-assign}(v1, v2)\ ((v1)  = (v2))
+\item 
+\#define {\bf value\_\-set\_\-si}(val, i)\ ((val) = (Value)(i))
+\item 
+\#define {\bf value\_\-set\_\-double}(val, d)\ ((val) = (Value)(d))
+\item 
+\#define {\bf value\_\-clear}(val)\ ((val) = 0)
+\item 
+\#define {\bf value\_\-read}(val, str)\ (sscanf((str),VALUE\_\-FMT,\&(val)))
+\item 
+\#define {\bf value\_\-print}(Dst, fmt, val)\ (fprintf((Dst),(fmt),(val)))
+\item 
+\#define {\bf value\_\-swap}(v1, v2)
+\item 
+\#define {\bf int\_\-to\_\-value}(i)\ ((Value)(i))
+\item 
+\#define {\bf long\_\-to\_\-value}(l)\ ((Value)(l))
+\item 
+\#define {\bf float\_\-to\_\-value}(f)\ ((Value)(f))
+\item 
+\#define {\bf double\_\-to\_\-value}(d)\ ((Value)(d))
+\item 
+\#define {\bf value\_\-eq}(v1, v2)\ ((v1)==(v2))
+\item 
+\#define {\bf value\_\-ne}(v1, v2)\ ((v1)!=(v2))
+\item 
+\#define {\bf value\_\-gt}(v1, v2)\ ((v1)$>$(v2))
+\item 
+\#define {\bf value\_\-ge}(v1, v2)\ ((v1)$>$=(v2))
+\item 
+\#define {\bf value\_\-lt}(v1, v2)\ ((v1)$<$(v2))
+\item 
+\#define {\bf value\_\-le}(v1, v2)\ ((v1)$<$=(v2))
+\item 
+\#define {\bf value\_\-sign}(v)\ (value\_\-eq(v,VALUE\_\-ZERO)?0:value\_\-lt(v,VALUE\_\-ZERO)?-1:1)
+\item 
+\#define {\bf value\_\-compare}(v1, v2)\ (value\_\-eq(v1,v2)?0:value\_\-lt(v1,v2)?-1:1)
+\item 
+\#define {\bf value\_\-plus}(v1, v2)\ ((v1)+(v2))
+\item 
+\#define {\bf value\_\-div}(v1, v2)\ ((v1)/(v2))
+\item 
+\#define {\bf value\_\-mod}(v1, v2)\ ((v1)\%(v2))
+\item 
+\#define {\bf value\_\-direct\_\-multiply}(v1, v2)\ ((v1)$\ast$(v2))
+\item 
+\#define {\bf value\_\-minus}(v1, v2)\ ((v1)-(v2))
+\item 
+\#define {\bf value\_\-pdiv}(v1, v2)\ (divide((v1),(v2)))
+\item 
+\#define {\bf value\_\-pmod}(v1, v2)\ (modulo((v1),(v2)))
+\item 
+\#define {\bf value\_\-min}(v1, v2)\ (value\_\-le((v1),(v2))? (v1): (v2))
+\item 
+\#define {\bf value\_\-max}(v1, v2)\ (value\_\-ge((v1),(v2))? (v1): (v2))
+\item 
+\#define {\bf value\_\-or}(v1, v2)\ ((v1)$|$(v2))
+\item 
+\#define {\bf value\_\-and}(v1, v2)\ ((v1)\&(v2))
+\item 
+\#define {\bf value\_\-lshift}(v1, v2)\ ((v1)$<$$<$(v2))
+\item 
+\#define {\bf value\_\-rshift}(v1, v2)\ ((v1)$>$$>$(v2))
+\item 
+\#define {\bf value\_\-addto}(ref, val1, val2)\ ((ref) = (val1)+(val2))
+\item 
+\#define {\bf value\_\-add\_\-int}(ref, val, vint)\ ((ref) = (val)+(Value)(vint))
+\item 
+\#define {\bf value\_\-increment}(ref, val)\ ((ref) = (val)+VALUE\_\-ONE)
+\item 
+\#define {\bf value\_\-direct\_\-product}(ref, val1, val2)\ ((ref) = (val1)$\ast$(val2))
+\item 
+\#define {\bf value\_\-multiply}(ref, val1, val2)\ ((ref) = value\_\-mult((val1),(val2)))
+\item 
+\#define {\bf value\_\-substract}(ref, val1, val2)\ ((ref) = (val1)-(val2))
+\item 
+\#define {\bf value\_\-sub\_\-int}(ref, val, vint)\ ((ref) = (val)-(Value)(vint))
+\item 
+\#define {\bf value\_\-decrement}(ref, val)\ ((ref) = (val)-VALUE\_\-ONE)
+\item 
+\#define {\bf value\_\-division}(ref, val1, val2)\ ((ref) = (val1)/(val2))
+\item 
+\#define {\bf value\_\-modulus}(ref, val1, val2)\ ((ref) = (val1)\%(val2))
+\item 
+\#define {\bf value\_\-pdivision}(ref, val1, val2)\ ((ref) = value\_\-pdiv((val1),(val2)))
+\item 
+\#define {\bf value\_\-oppose}(ref, val)\ ((ref) = value\_\-uminus((val)))
+\item 
+\#define {\bf value\_\-absolute}(ref, val)\ ((ref) = value\_\-abs((val)))
+\item 
+\#define {\bf value\_\-minimum}(ref, val1, val2)\ ((ref) = value\_\-min((val1),(val2)))
+\item 
+\#define {\bf value\_\-maximum}(ref, val1, val2)\ ((ref) = value\_\-max((val1),(val2)))
+\item 
+\#define {\bf value\_\-orto}(ref, val1, val2)\ ((ref) = (val1)$|$(val2))
+\item 
+\#define {\bf value\_\-andto}(ref, val1, val2)\ ((ref) = (val1)\&(val2))
+\item 
+\#define {\bf value\_\-uminus}(val)\ (-(val))
+\item 
+\#define {\bf value\_\-not}(val)\ ($\sim$(val))
+\item 
+\#define {\bf value\_\-abs}(val)
+\item 
+\#define {\bf value\_\-pos\_\-p}(val)\ value\_\-gt(val,VALUE\_\-ZERO)
+\item 
+\#define {\bf value\_\-neg\_\-p}(val)\ value\_\-lt(val,VALUE\_\-ZERO)
+\item 
+\#define {\bf value\_\-posz\_\-p}(val)\ value\_\-ge(val,VALUE\_\-ZERO)
+\item 
+\#define {\bf value\_\-negz\_\-p}(val)\ value\_\-le(val,VALUE\_\-ZERO)
+\item 
+\#define {\bf value\_\-zero\_\-p}(val)\ value\_\-eq(val,VALUE\_\-ZERO)
+\item 
+\#define {\bf value\_\-notzero\_\-p}(val)\ value\_\-ne(val,VALUE\_\-ZERO)
+\item 
+\#define {\bf value\_\-one\_\-p}(val)\ value\_\-eq(val,VALUE\_\-ONE)
+\item 
+\#define {\bf value\_\-notone\_\-p}(val)\ value\_\-ne(val,VALUE\_\-ONE)
+\item 
+\#define {\bf value\_\-mone\_\-p}(val)\ value\_\-eq(val,VALUE\_\-MONE)
+\item 
+\#define {\bf value\_\-notmone\_\-p}(val)\ value\_\-ne(val,VALUE\_\-MONE)
+\item 
+\#define {\bf value\_\-min\_\-p}(val)\ value\_\-eq(val,VALUE\_\-MIN)
+\item 
+\#define {\bf value\_\-max\_\-p}(val)\ value\_\-eq(val,VALUE\_\-MAX)
+\item 
+\#define {\bf value\_\-notmin\_\-p}(val)\ value\_\-ne(val,VALUE\_\-MIN)
+\item 
+\#define {\bf value\_\-notmax\_\-p}(val)\ value\_\-ne(val,VALUE\_\-MAX)
+\item 
+\#define {\bf value\_\-protected\_\-hard\_\-idiv\_\-multiply}(v, w, throw)
+\item 
+\#define {\bf value\_\-protected\_\-multiply}(v, w, throw)\ value\_\-protected\_\-hard\_\-idiv\_\-multiply(v,w,throw)
+\item 
+\#define {\bf value\_\-protected\_\-mult}(v, w)\ value\_\-protected\_\-multiply(v,w,THROW(overflow\_\-error))
+\item 
+\#define {\bf value\_\-protected\_\-product}(v, w)\ v=value\_\-protected\_\-mult(v,w)
+\item 
+\#define {\bf value\_\-mult}(v, w)
+\item 
+\#define {\bf value\_\-product}(v, w)\ v=value\_\-mult(v,w)
+\item 
+\#define {\bf ABS}(x)\ (((x)$>$=0) ? (x) : -(x))
+\item 
+\#define {\bf MIN}(x, y)\ (((x)$>$=(y))?(y):(x))
+\item 
+\#define {\bf MAX}(x, y)\ (((x)$>$=(y))?(x):(y))
+\item 
+\#define {\bf SIGN}(x)\ (((x)$>$0)? 1 : ((x)==0? 0 : -1))
+\item 
+\#define {\bf DIVIDE}(x, y)
+\item 
+\#define {\bf POSITIVE\_\-DIVIDE}(x, y)\ ((x)$>$0 ? (x)/(y) : - (-(x)+(y)-1)/(y))
+\item 
+\#define {\bf MODULO}(x, y)\ ((y)$>$0 ? POSITIVE\_\-MODULO(x,y) : POSITIVE\_\-MODULO(-x,-y))
+\item 
+\#define {\bf POSITIVE\_\-MODULO}(x, y)
+\item 
+\#define {\bf divide}(a, b)\ DIVIDE(a,b)
+\item 
+\#define {\bf modulo}(a, b)\ MODULO(a,b)
+\end{CompactItemize}
+
+
+\subsection{Define Documentation}
+\index{arithmetique.h@{arithmetique.h}!ABS@{ABS}}
+\index{ABS@{ABS}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define ABS(x)\ (((x)$>$=0) ? (x) : -(x))}\label{arithmetique_8h_a83}
+
+
+\index{arithmetique.h@{arithmetique.h}!DIVIDE@{DIVIDE}}
+\index{DIVIDE@{DIVIDE}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define DIVIDE(x, y)}\label{arithmetique_8h_a87}
+
+
+{\bf Value:}
+
+\footnotesize\begin{verbatim}((y)>0? POSITIVE_DIVIDE(x,y) : \
+                     -POSITIVE_DIVIDE((x),(-(y))))\end{verbatim}\normalsize 
+\index{arithmetique.h@{arithmetique.h}!LINEAR_VALUE_STRING@{LINEAR\_\-VALUE\_\-STRING}}
+\index{LINEAR_VALUE_STRING@{LINEAR\_\-VALUE\_\-STRING}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define LINEAR\_\-VALUE\_\-STRING\ \char`\"{}gmp\char`\"{}}\label{arithmetique_8h_a4}
+
+
+\index{arithmetique.h@{arithmetique.h}!LONG_LONG_MAX@{LONG\_\-LONG\_\-MAX}}
+\index{LONG_LONG_MAX@{LONG\_\-LONG\_\-MAX}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define LONG\_\-LONG\_\-MAX\ \_\-\_\-LONG\_\-LONG\_\-MAX\_\-\_\-}\label{arithmetique_8h_a1}
+
+
+\index{arithmetique.h@{arithmetique.h}!LONG_LONG_MIN@{LONG\_\-LONG\_\-MIN}}
+\index{LONG_LONG_MIN@{LONG\_\-LONG\_\-MIN}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define LONG\_\-LONG\_\-MIN\ (-LONG\_\-LONG\_\-MAX-1)}\label{arithmetique_8h_a2}
+
+
+\index{arithmetique.h@{arithmetique.h}!MAX@{MAX}}
+\index{MAX@{MAX}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define MAX(x, y)\ (((x)$>$=(y))?(x):(y))}\label{arithmetique_8h_a85}
+
+
+\index{arithmetique.h@{arithmetique.h}!MIN@{MIN}}
+\index{MIN@{MIN}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define MIN(x, y)\ (((x)$>$=(y))?(y):(x))}\label{arithmetique_8h_a84}
+
+
+\index{arithmetique.h@{arithmetique.h}!MODULO@{MODULO}}
+\index{MODULO@{MODULO}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define MODULO(x, y)\ ((y)$>$0 ? POSITIVE\_\-MODULO(x,y) : POSITIVE\_\-MODULO(-x,-y))}\label{arithmetique_8h_a89}
+
+
+\index{arithmetique.h@{arithmetique.h}!POSITIVE_DIVIDE@{POSITIVE\_\-DIVIDE}}
+\index{POSITIVE_DIVIDE@{POSITIVE\_\-DIVIDE}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define POSITIVE\_\-DIVIDE(x, y)\ ((x)$>$0 ? (x)/(y) : - (-(x)+(y)-1)/(y))}\label{arithmetique_8h_a88}
+
+
+\index{arithmetique.h@{arithmetique.h}!POSITIVE_MODULO@{POSITIVE\_\-MODULO}}
+\index{POSITIVE_MODULO@{POSITIVE\_\-MODULO}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define POSITIVE\_\-MODULO(x, y)}\label{arithmetique_8h_a90}
+
+
+{\bf Value:}
+
+\footnotesize\begin{verbatim}((x) > 0 ? (x)%(y) : \
+                              ((x)%(y) == 0 ? 0 : ((y)-(-(x))%(y))))\end{verbatim}\normalsize 
+\index{arithmetique.h@{arithmetique.h}!SIGN@{SIGN}}
+\index{SIGN@{SIGN}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define SIGN(x)\ (((x)$>$0)? 1 : ((x)==0? 0 : -1))}\label{arithmetique_8h_a86}
+
+
+\index{arithmetique.h@{arithmetique.h}!ULONG_LONG_MAX@{ULONG\_\-LONG\_\-MAX}}
+\index{ULONG_LONG_MAX@{ULONG\_\-LONG\_\-MAX}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define ULONG\_\-LONG\_\-MAX\ (LONG\_\-LONG\_\-MAX $\ast$ 2ULL + 1)}\label{arithmetique_8h_a3}
+
+
+\index{arithmetique.h@{arithmetique.h}!VALUE_FMT@{VALUE\_\-FMT}}
+\index{VALUE_FMT@{VALUE\_\-FMT}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define VALUE\_\-FMT\ \char`\"{}\%s\char`\"{}}\label{arithmetique_8h_a5}
+
+
+\index{arithmetique.h@{arithmetique.h}!VALUE_TO_DOUBLE@{VALUE\_\-TO\_\-DOUBLE}}
+\index{VALUE_TO_DOUBLE@{VALUE\_\-TO\_\-DOUBLE}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define VALUE\_\-TO\_\-DOUBLE(val)\ (mpz\_\-get\_\-d(val))}\label{arithmetique_8h_a9}
+
+
+
+
+Referenced by compute\_\-enode(), and compute\_\-evalue().
+
+\index{arithmetique.h@{arithmetique.h}!VALUE_TO_FLOAT@{VALUE\_\-TO\_\-FLOAT}}
+\index{VALUE_TO_FLOAT@{VALUE\_\-TO\_\-FLOAT}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define VALUE\_\-TO\_\-FLOAT(val)\ ((float)((int)mpz\_\-get\_\-si(val)))}\label{arithmetique_8h_a8}
+
+
+\index{arithmetique.h@{arithmetique.h}!VALUE_TO_INT@{VALUE\_\-TO\_\-INT}}
+\index{VALUE_TO_INT@{VALUE\_\-TO\_\-INT}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define VALUE\_\-TO\_\-INT(val)\ ((int)mpz\_\-get\_\-si(val))}\label{arithmetique_8h_a7}
+
+
+
+
+Referenced by P\_\-Enum(), Simplify(), Split\-Lattice(), and count\_\-points().
+
+\index{arithmetique.h@{arithmetique.h}!VALUE_TO_LONG@{VALUE\_\-TO\_\-LONG}}
+\index{VALUE_TO_LONG@{VALUE\_\-TO\_\-LONG}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define VALUE\_\-TO\_\-LONG(val)\ (mpz\_\-get\_\-si(val))}\label{arithmetique_8h_a6}
+
+
+\index{arithmetique.h@{arithmetique.h}!__LONG_LONG_MAX__@{\_\-\_\-LONG\_\-LONG\_\-MAX\_\-\_\-}}
+\index{__LONG_LONG_MAX__@{\_\-\_\-LONG\_\-LONG\_\-MAX\_\-\_\-}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define \_\-\_\-LONG\_\-LONG\_\-MAX\_\-\_\-\ 9223372036854775807LL}\label{arithmetique_8h_a0}
+
+
+\index{arithmetique.h@{arithmetique.h}!divide@{divide}}
+\index{divide@{divide}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define divide(a, b)\ DIVIDE(a,b)}\label{arithmetique_8h_a91}
+
+
+\index{arithmetique.h@{arithmetique.h}!double_to_value@{double\_\-to\_\-value}}
+\index{double_to_value@{double\_\-to\_\-value}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define double\_\-to\_\-value(d)\ ((Value)(d))}\label{arithmetique_8h_a21}
+
+
+\index{arithmetique.h@{arithmetique.h}!float_to_value@{float\_\-to\_\-value}}
+\index{float_to_value@{float\_\-to\_\-value}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define float\_\-to\_\-value(f)\ ((Value)(f))}\label{arithmetique_8h_a20}
+
+
+\index{arithmetique.h@{arithmetique.h}!int_to_value@{int\_\-to\_\-value}}
+\index{int_to_value@{int\_\-to\_\-value}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define int\_\-to\_\-value(i)\ ((Value)(i))}\label{arithmetique_8h_a18}
+
+
+\index{arithmetique.h@{arithmetique.h}!long_to_value@{long\_\-to\_\-value}}
+\index{long_to_value@{long\_\-to\_\-value}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define long\_\-to\_\-value(l)\ ((Value)(l))}\label{arithmetique_8h_a19}
+
+
+\index{arithmetique.h@{arithmetique.h}!modulo@{modulo}}
+\index{modulo@{modulo}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define modulo(a, b)\ MODULO(a,b)}\label{arithmetique_8h_a92}
+
+
+\index{arithmetique.h@{arithmetique.h}!value_abs@{value\_\-abs}}
+\index{value_abs@{value\_\-abs}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-abs(val)}\label{arithmetique_8h_a62}
+
+
+{\bf Value:}
+
+\footnotesize\begin{verbatim}(value_posz_p(val)? \
+    (val) :                                \
+    (value_ne((val), VALUE_NAN) ?          \
+     value_uminus(val) :                   \
+    (THROW (overflow_error), VALUE_NAN )))\end{verbatim}\normalsize 
+\index{arithmetique.h@{arithmetique.h}!value_absolute@{value\_\-absolute}}
+\index{value_absolute@{value\_\-absolute}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-absolute(ref, val)\ ((ref) = value\_\-abs((val)))}\label{arithmetique_8h_a55}
+
+
+
+
+Referenced by Combine(), Gauss\-Simplify(), Gcd(), Print\_\-Vertex(), Vector\_\-Gcd(), Vector\_\-Min\_\-Not\_\-Zero(), compute\_\-enode(), encore(), hermite(), old\_\-Polyhedron\_\-Preprocess(), petit\_\-c(), and petit\_\-l().
+
+\index{arithmetique.h@{arithmetique.h}!value_add_int@{value\_\-add\_\-int}}
+\index{value_add_int@{value\_\-add\_\-int}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-add\_\-int(ref, val, vint)\ ((ref) = (val)+(Value)(vint))}\label{arithmetique_8h_a44}
+
+
+
+
+Referenced by Find\-Simple(), P\_\-Enum(), Polyhedron\_\-Preprocess2(), count\_\-points(), and lower\_\-upper\_\-bounds().
+
+\index{arithmetique.h@{arithmetique.h}!value_addto@{value\_\-addto}}
+\index{value_addto@{value\_\-addto}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-addto(ref, val1, val2)\ ((ref) = (val1)+(val2))}\label{arithmetique_8h_a43}
+
+
+
+
+Referenced by Add\-Lattice(), Affine\-Smith(), Build\-Sat(), Calc\-Base(), Chernikova(), Domain\-Cost(), Find\-Simple(), Inner\_\-Product(), Matrix\_\-Product(), Matrix\_\-Vector\_\-Product(), P\_\-Enum(), Poly2Sat(), Polyhedron\-Includes(), Polyhedron\_\-Image(), Polyhedron\_\-Preimage(), Polyhedron\_\-Preprocess(), Polyhedron\_\-Preprocess2(), Scalar\_\-product(), Simplify(), Solve\-Diophantine(), Vector\_\-Add(), Vector\_\-Combine(), Vector\_\-Matrix\_\-Product(), colonne(), eadd(), hermite(), in\_\-domain(), ligne(), new\_\-eadd(), old\_\-Polyhedron\_\-Preprocess(), and rat\_\-prodmat().
+
+\index{arithmetique.h@{arithmetique.h}!value_and@{value\_\-and}}
+\index{value_and@{value\_\-and}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-and(v1, v2)\ ((v1)\&(v2))}\label{arithmetique_8h_a40}
+
+
+\index{arithmetique.h@{arithmetique.h}!value_andto@{value\_\-andto}}
+\index{value_andto@{value\_\-andto}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-andto(ref, val1, val2)\ ((ref) = (val1)\&(val2))}\label{arithmetique_8h_a59}
+
+
+\index{arithmetique.h@{arithmetique.h}!value_assign@{value\_\-assign}}
+\index{value_assign@{value\_\-assign}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-assign(v1, v2)\ ((v1)  = (v2))}\label{arithmetique_8h_a11}
+
+
+
+
+Referenced by Add\-ANull\-Column(), Add\-ANull\-Row(), Affine\-Part\-Simplify(), Affine\-Smith(), Canonical\-Form(), Change\-Lattice\-Dimension(), Combine(), Convert\-Dar\-Matto\-Pol\-Mat(), Convert\-Pol\-Matto\-Dar\-Mat(), Domain\-Cost(), Domain\_\-Enumerate(), Elim\_\-Columns(), Exchange\-Columns(), Exchange\-Rows(), Extract\-Linear\-Part(), Find\-Hermite\-Basisof\-Domain(), Find\-Simple(), Find\_\-m\_\-faces(), Gauss\-Simplify(), Gcd(), Gen\-Param\-Polyhedron(), Lattice2Lattice\-Union(), Lattice\-Intersection(), Lattice\-Preimage(), Mat\-Inverse(), Matrix\_\-Copy(), Matrix\_\-Inverse(), Matrix\_\-Product(), Orthogonal\_\-Base(), P\_\-Enum(), Polyhedron\-LTQ(), Polyhedron\_\-Image(), Polyhedron\_\-Image\_\-Enumerate(), Polyhedron\_\-Preimage(), Polyhedron\_\-Preprocess2(), Put\-Column\-First(), Put\-Column\-Last(), Put\-Row\-First(), Put\-Row\-Last(), Rearrange\-Matfor\-Solve\-Dio(), Remove\-Column(), Remove\-Row(), Remove\_\-Redundants(), Scan\_\-Vertices(), Simplify(), Solve\-Diophantine(), Sub\-Constraint(), Test\-Rank(), Transpose(), Vector\_\-Copy(), Vector\_\-Map(), Vector\_\-Max(), Vector\_\-Min(), Vector\_\-Min\_\-Not\_\-Zero(), Vector\_\-Reduce(), Vector\_\-Sort(), Vertex\-CT(), align\_\-context(), cherche\_\-min(), compute\_\-enode(), count\_\-points(), echange\_\-c(), echange\_\-l(), ecopy(), exist\_\-points(), find\-Hermite\-Basis(), hermite(), in\_\-domain(), is\-Integral(), isin\-Hnf(), left\_\-hermite(), lower\_\-upper\_\-bounds(), new\_\-eadd(), old\_\-Polyhedron\_\-Preprocess(), petit\_\-c(), petit\_\-l(), rat\_\-prodmat(), right\_\-hermite(), smith(), swap\_\-line(), traite\_\-m\_\-face(), and transpose().
+
+\index{arithmetique.h@{arithmetique.h}!value_clear@{value\_\-clear}}
+\index{value_clear@{value\_\-clear}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-clear(val)\ ((val) = 0)}\label{arithmetique_8h_a14}
+
+
+
+
+Referenced by Add\-Lattice(), Affine\-Part\-Simplify(), Affine\-Smith(), Binomial(), Build\-Sat(), CNP(), Calc\-Base(), Canonical\-Form(), Chernikova(), Combine(), Domain\-Cost(), Domain\_\-Free(), Elim\_\-Columns(), Enumerate\_\-No\-Parameters(), Exchange\-Columns(), Exchange\-Rows(), Factorial(), Find\-Hermite\-Basisof\-Domain(), Find\-Simple(), Gauss(), Gauss\-Simplify(), Gcd(), Hermite(), Inner\_\-Product(), Lattice2Lattice\-Union(), Lattice\-Preimage(), Lcm(), Mat\-Inverse(), Matrix\_\-Free(), Matrix\_\-Inverse(), Matrix\_\-Product(), Matrix\_\-Vector\_\-Product(), Orthogonal\_\-Base(), P\_\-Enum(), Poly2Sat(), Polyhedron\-Includes(), Polyhedron\_\-Enumerate(), Polyhedron\_\-Free(), Polyhedron\_\-Image(), Polyhedron\_\-Image\_\-Enumerate(), Polyhedron\_\-Not\_\-Empty(), Polyhedron\_\-Preimage(), Polyhedron\_\-Preprocess(), Polyhedron\_\-Preprocess2(), Print\_\-Vertex(), Put\-Column\-First(), Put\-Column\-Last(), Put\-Row\-First(), Put\-Row\-Last(), Reduce\_\-Matrix(), Remove\_\-Redundants(), Scalar\_\-product(), Scan\_\-Vertices(), Simplify(), Smith(), Solve\-Diophantine(), Soustraire\_\-ligne(), Test\-Rank(), Vector\_\-Combine(), Vector\_\-Free(), Vector\_\-Gcd(), Vector\_\-Matrix\_\-Product(), Vector\_\-Min\_\-Not\_\-Zero(), Vector\_\-Normalize(), Vector\_\-Normalize\_\-Positive(), Vector\_\-Sort(), cherche\_\-min(), colonne(), compute\_\-enode(), count\_\-points(), eadd(), echange\_\-c(), echange\_\-l(), emul(), encore(), exist\_\-points(), free\_\-evalue\_\-refs(), hermite(), in\_\-domain(), is\-Integral(), isin\-Hnf(), left\_\-hermite(), ligne(), lower\_\-upper\_\-bounds(), new\_\-eadd(), old\_\-Polyhedron\_\-Preprocess(), petit\_\-c(), petit\_\-l(), rat\_\-prodmat(), right\_\-hermite(), smith(), and transpose().
+
+\index{arithmetique.h@{arithmetique.h}!value_compare@{value\_\-compare}}
+\index{value_compare@{value\_\-compare}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-compare(v1, v2)\ (value\_\-eq(v1,v2)?0:value\_\-lt(v1,v2)?-1:1)}\label{arithmetique_8h_a29}
+
+
+\index{arithmetique.h@{arithmetique.h}!value_decrement@{value\_\-decrement}}
+\index{value_decrement@{value\_\-decrement}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-decrement(ref, val)\ ((ref) = (val)-VALUE\_\-ONE)}\label{arithmetique_8h_a50}
+
+
+
+
+Referenced by Affine\-Smith(), Find\-Simple(), Polyhedron\_\-Image\_\-Enumerate(), Sub\-Constraint(), add\-To\-Filter(), cherche\_\-min(), hermite(), and smith().
+
+\index{arithmetique.h@{arithmetique.h}!value_direct_multiply@{value\_\-direct\_\-multiply}}
+\index{value_direct_multiply@{value\_\-direct\_\-multiply}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-direct\_\-multiply(v1, v2)\ ((v1)$\ast$(v2))}\label{arithmetique_8h_a33}
+
+
+\index{arithmetique.h@{arithmetique.h}!value_direct_product@{value\_\-direct\_\-product}}
+\index{value_direct_product@{value\_\-direct\_\-product}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-direct\_\-product(ref, val1, val2)\ ((ref) = (val1)$\ast$(val2))}\label{arithmetique_8h_a46}
+
+
+\index{arithmetique.h@{arithmetique.h}!value_div@{value\_\-div}}
+\index{value_div@{value\_\-div}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-div(v1, v2)\ ((v1)/(v2))}\label{arithmetique_8h_a31}
+
+
+\index{arithmetique.h@{arithmetique.h}!value_division@{value\_\-division}}
+\index{value_division@{value\_\-division}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-division(ref, val1, val2)\ ((ref) = (val1)/(val2))}\label{arithmetique_8h_a51}
+
+
+
+
+Referenced by Affine\-Smith(), Binomial(), CNP(), Calc\-Base(), Combine(), Find\-Hermite\-Basisof\-Domain(), Gauss(), Gauss\-Simplify(), Lattice2Lattice\-Union(), Lcm(), Mat\-Inverse(), Matrix\_\-Inverse(), Orthogonal\_\-Base(), P\_\-Enum(), Polyhedron\_\-Preprocess2(), Print\_\-Vertex(), Scan\_\-Vertices(), Simplify(), Solve\-Diophantine(), Soustraire\_\-ligne(), Test\-Rank(), Vector\_\-Anti\-Scale(), Vector\_\-Normalize(), Vector\_\-Normalize\_\-Positive(), eadd(), emul(), hermite(), lower\_\-upper\_\-bounds(), new\_\-eadd(), old\_\-Polyhedron\_\-Preprocess(), ppcm(), rat\_\-prodmat(), and smith().
+
+\index{arithmetique.h@{arithmetique.h}!value_eq@{value\_\-eq}}
+\index{value_eq@{value\_\-eq}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-eq(v1, v2)\ ((v1)==(v2))}\label{arithmetique_8h_a22}
+
+
+
+
+Referenced by Domain\-Cost(), Find\-Simple(), Remove\_\-Redundants(), and Simplify().
+
+\index{arithmetique.h@{arithmetique.h}!value_ge@{value\_\-ge}}
+\index{value_ge@{value\_\-ge}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-ge(v1, v2)\ ((v1)$>$=(v2))}\label{arithmetique_8h_a25}
+
+
+
+
+Referenced by Gauss(), Gauss\-Simplify(), Simplify(), cherche\_\-min(), isin\-Hnf(), petit\_\-c(), and petit\_\-l().
+
+\index{arithmetique.h@{arithmetique.h}!value_gt@{value\_\-gt}}
+\index{value_gt@{value\_\-gt}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-gt(v1, v2)\ ((v1)$>$(v2))}\label{arithmetique_8h_a24}
+
+
+
+
+Referenced by Affine\-Part\-Compare(), Domain\-Cost(), Find\-Simple(), Linear\-Part\-Compare(), P\_\-Enum(), Polyhedron\_\-Preprocess2(), Simplify(), Vector\_\-Normalize(), and lower\_\-upper\_\-bounds().
+
+\index{arithmetique.h@{arithmetique.h}!value_increment@{value\_\-increment}}
+\index{value_increment@{value\_\-increment}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-increment(ref, val)\ ((ref) = (val)+VALUE\_\-ONE)}\label{arithmetique_8h_a45}
+
+
+
+
+Referenced by Find\-Simple(), P\_\-Enum(), Remove\_\-Redundants(), Simplify(), cherche\_\-min(), count\_\-points(), and exist\_\-points().
+
+\index{arithmetique.h@{arithmetique.h}!value_init@{value\_\-init}}
+\index{value_init@{value\_\-init}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-init(val)\ ((val) = 0)}\label{arithmetique_8h_a10}
+
+
+
+
+Referenced by Add\-Lattice(), Affine\-Part\-Simplify(), Affine\-Smith(), Binomial(), Build\-Sat(), CNP(), Calc\-Base(), Canonical\-Form(), Chernikova(), Combine(), Convert\-Pol\-Matto\-Dar\-Mat(), Domain\-Cost(), Domain\_\-Enumerate(), Elim\_\-Columns(), Enumerate\_\-No\-Parameters(), Exchange\-Columns(), Exchange\-Rows(), Factorial(), Find\-Hermite\-Basisof\-Domain(), Find\-Simple(), Gauss(), Gauss\-Simplify(), Gcd(), Hermite(), Inner\_\-Product(), Lattice2Lattice\-Union(), Lattice\-Preimage(), Lcm(), Mat\-Inverse(), Matrix\_\-Alloc(), Matrix\_\-Inverse(), Matrix\_\-Product(), Matrix\_\-Vector\_\-Product(), Orthogonal\_\-Base(), P\_\-Enum(), Poly2Sat(), Polyhedron\-Includes(), Polyhedron\_\-Alloc(), Polyhedron\_\-Enumerate(), Polyhedron\_\-Image(), Polyhedron\_\-Image\_\-Enumerate(), Polyhedron\_\-Not\_\-Empty(), Polyhedron\_\-Preimage(), Polyhedron\_\-Preprocess(), Polyhedron\_\-Preprocess2(), Print\_\-Vertex(), Put\-Column\-First(), Put\-Column\-Last(), Put\-Row\-First(), Put\-Row\-Last(), Remove\_\-Redundants(), Scalar\_\-product(), Scan\_\-Vertices(), Simplify(), Smith(), Solve\-Diophantine(), Soustraire\_\-ligne(), Test\-Rank(), Vector\_\-Alloc(), Vector\_\-Combine(), Vector\_\-Gcd(), Vector\_\-Matrix\_\-Product(), Vector\_\-Min\_\-Not\_\-Zero(), Vector\_\-Normalize(), Vector\_\-Normalize\_\-Positive(), Vector\_\-Sort(), cherche\_\-min(), colonne(), compute\_\-enode(), compute\_\-poly(), count\_\-points(), eadd(), echange\_\-c(), echange\_\-l(), edot(), emul(), encore(), exist\_\-points(), hermite(), in\_\-domain(), is\-Integral(), isin\-Hnf(), left\_\-hermite(), ligne(), lower\_\-upper\_\-bounds(), new\_\-eadd(), new\_\-enode(), old\_\-Polyhedron\_\-Preprocess(), petit\_\-c(), petit\_\-l(), ppcm(), rat\_\-prodmat(), right\_\-hermite(), smith(), and transpose().
+
+\index{arithmetique.h@{arithmetique.h}!value_le@{value\_\-le}}
+\index{value_le@{value\_\-le}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-le(v1, v2)\ ((v1)$<$=(v2))}\label{arithmetique_8h_a27}
+
+
+
+
+Referenced by Polyhedron\_\-Preprocess2(), cherche\_\-min(), count\_\-points(), and exist\_\-points().
+
+\index{arithmetique.h@{arithmetique.h}!value_lshift@{value\_\-lshift}}
+\index{value_lshift@{value\_\-lshift}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-lshift(v1, v2)\ ((v1)$<$$<$(v2))}\label{arithmetique_8h_a41}
+
+
+\index{arithmetique.h@{arithmetique.h}!value_lt@{value\_\-lt}}
+\index{value_lt@{value\_\-lt}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-lt(v1, v2)\ ((v1)$<$(v2))}\label{arithmetique_8h_a26}
+
+
+
+
+Referenced by Affine\-Part\-Compare(), Domain\-Cost(), Linear\-Part\-Compare(), P\_\-Enum(), Polyhedron\_\-Preprocess2(), Remove\_\-Redundants(), Simplify(), Vector\_\-Min\_\-Not\_\-Zero(), Vector\_\-Sort(), count\_\-points(), exist\_\-points(), hermite(), and lower\_\-upper\_\-bounds().
+
+\index{arithmetique.h@{arithmetique.h}!value_max@{value\_\-max}}
+\index{value_max@{value\_\-max}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-max(v1, v2)\ (value\_\-ge((v1),(v2))? (v1): (v2))}\label{arithmetique_8h_a38}
+
+
+\index{arithmetique.h@{arithmetique.h}!value_max_p@{value\_\-max\_\-p}}
+\index{value_max_p@{value\_\-max\_\-p}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-max\_\-p(val)\ value\_\-eq(val,VALUE\_\-MAX)}\label{arithmetique_8h_a74}
+
+
+\index{arithmetique.h@{arithmetique.h}!value_maximum@{value\_\-maximum}}
+\index{value_maximum@{value\_\-maximum}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-maximum(ref, val1, val2)\ ((ref) = value\_\-max((val1),(val2)))}\label{arithmetique_8h_a57}
+
+
+
+
+Referenced by Vector\_\-Max().
+
+\index{arithmetique.h@{arithmetique.h}!value_min@{value\_\-min}}
+\index{value_min@{value\_\-min}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-min(v1, v2)\ (value\_\-le((v1),(v2))? (v1): (v2))}\label{arithmetique_8h_a37}
+
+
+\index{arithmetique.h@{arithmetique.h}!value_min_p@{value\_\-min\_\-p}}
+\index{value_min_p@{value\_\-min\_\-p}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-min\_\-p(val)\ value\_\-eq(val,VALUE\_\-MIN)}\label{arithmetique_8h_a73}
+
+
+\index{arithmetique.h@{arithmetique.h}!value_minimum@{value\_\-minimum}}
+\index{value_minimum@{value\_\-minimum}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-minimum(ref, val1, val2)\ ((ref) = value\_\-min((val1),(val2)))}\label{arithmetique_8h_a56}
+
+
+
+
+Referenced by Vector\_\-Min().
+
+\index{arithmetique.h@{arithmetique.h}!value_minus@{value\_\-minus}}
+\index{value_minus@{value\_\-minus}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-minus(v1, v2)\ ((v1)-(v2))}\label{arithmetique_8h_a34}
+
+
+\index{arithmetique.h@{arithmetique.h}!value_mod@{value\_\-mod}}
+\index{value_mod@{value\_\-mod}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-mod(v1, v2)\ ((v1)\%(v2))}\label{arithmetique_8h_a32}
+
+
+\index{arithmetique.h@{arithmetique.h}!value_modulus@{value\_\-modulus}}
+\index{value_modulus@{value\_\-modulus}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-modulus(ref, val1, val2)\ ((ref) = (val1)\%(val2))}\label{arithmetique_8h_a52}
+
+
+
+
+Referenced by Affine\-Smith(), Gcd(), P\_\-Enum(), Solve\-Diophantine(), Vector\_\-Gcd(), compute\_\-enode(), encore(), hermite(), is\-Integral(), lower\_\-upper\_\-bounds(), and smith().
+
+\index{arithmetique.h@{arithmetique.h}!value_mone_p@{value\_\-mone\_\-p}}
+\index{value_mone_p@{value\_\-mone\_\-p}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-mone\_\-p(val)\ value\_\-eq(val,VALUE\_\-MONE)}\label{arithmetique_8h_a71}
+
+
+
+
+Referenced by Degenerate(), Print\_\-Domain(), and Print\_\-Vertex().
+
+\index{arithmetique.h@{arithmetique.h}!value_mult@{value\_\-mult}}
+\index{value_mult@{value\_\-mult}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-mult(v, w)}\label{arithmetique_8h_a81}
+
+
+{\bf Value:}
+
+\footnotesize\begin{verbatim}value_protected_multiply(v,w,                                                 \
+    (fprintf(stderr,"[value_mult] value overflow!\n"),THROW(overflow_error)))\end{verbatim}\normalsize 
+\index{arithmetique.h@{arithmetique.h}!value_multiply@{value\_\-multiply}}
+\index{value_multiply@{value\_\-multiply}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-multiply(ref, val1, val2)\ ((ref) = value\_\-mult((val1),(val2)))}\label{arithmetique_8h_a47}
+
+
+
+
+Referenced by Add\-Lattice(), Affine\-Smith(), Binomial(), Build\-Sat(), CNP(), Calc\-Base(), Chernikova(), Domain\-Cost(), Elim\_\-Columns(), Factorial(), Find\-Hermite\-Basisof\-Domain(), Find\-Simple(), Gauss(), Inner\_\-Product(), Lattice\-Preimage(), Lcm(), Mat\-Inverse(), Matrix\_\-Inverse(), Matrix\_\-Product(), Matrix\_\-Vector\_\-Product(), Orthogonal\_\-Base(), P\_\-Enum(), Poly2Sat(), Polyhedron\-Includes(), Polyhedron\_\-Enumerate(), Polyhedron\_\-Image(), Polyhedron\_\-Preimage(), Polyhedron\_\-Preprocess(), Polyhedron\_\-Preprocess2(), Scalar\_\-product(), Scan\_\-Vertices(), Solve\-Diophantine(), Soustraire\_\-ligne(), Test\-Rank(), Vector\_\-Combine(), Vector\_\-Matrix\_\-Product(), Vector\_\-Scale(), colonne(), eadd(), emul(), hermite(), in\_\-domain(), ligne(), new\_\-eadd(), old\_\-Polyhedron\_\-Preprocess(), ppcm(), and rat\_\-prodmat().
+
+\index{arithmetique.h@{arithmetique.h}!value_ne@{value\_\-ne}}
+\index{value_ne@{value\_\-ne}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-ne(v1, v2)\ ((v1)!=(v2))}\label{arithmetique_8h_a23}
+
+
+
+
+Referenced by Almost\-Same\-Affine\-Part(), Domain\-Cost(), Polyhedron\_\-Preprocess(), Remove\_\-Redundants(), Same\-Linear\-Part(), Solve\-Diophantine(), Vector\_\-Equal(), eequal(), same\-Affinepart(), and same\-Lattice().
+
+\index{arithmetique.h@{arithmetique.h}!value_neg_p@{value\_\-neg\_\-p}}
+\index{value_neg_p@{value\_\-neg\_\-p}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-neg\_\-p(val)\ value\_\-lt(val,VALUE\_\-ZERO)}\label{arithmetique_8h_a64}
+
+
+
+
+Referenced by Affine\-Smith(), Calc\-Base(), Chernikova(), Gauss(), Gauss\-Simplify(), Matrix\_\-Inverse(), P\_\-Enum(), Polyhedron\-Includes(), Polyhedron\-LTQ(), Polyhedron\_\-Preprocess(), Ray\-Sort(), Vector\_\-Normalize\_\-Positive(), cherche\_\-min(), hermite(), in\_\-domain(), lower\_\-upper\_\-bounds(), and smith().
+
+\index{arithmetique.h@{arithmetique.h}!value_negz_p@{value\_\-negz\_\-p}}
+\index{value_negz_p@{value\_\-negz\_\-p}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-negz\_\-p(val)\ value\_\-le(val,VALUE\_\-ZERO)}\label{arithmetique_8h_a66}
+
+
+
+
+Referenced by old\_\-Polyhedron\_\-Preprocess().
+
+\index{arithmetique.h@{arithmetique.h}!value_not@{value\_\-not}}
+\index{value_not@{value\_\-not}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-not(val)\ ($\sim$(val))}\label{arithmetique_8h_a61}
+
+
+\index{arithmetique.h@{arithmetique.h}!value_notmax_p@{value\_\-notmax\_\-p}}
+\index{value_notmax_p@{value\_\-notmax\_\-p}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-notmax\_\-p(val)\ value\_\-ne(val,VALUE\_\-MAX)}\label{arithmetique_8h_a76}
+
+
+\index{arithmetique.h@{arithmetique.h}!value_notmin_p@{value\_\-notmin\_\-p}}
+\index{value_notmin_p@{value\_\-notmin\_\-p}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-notmin\_\-p(val)\ value\_\-ne(val,VALUE\_\-MIN)}\label{arithmetique_8h_a75}
+
+
+\index{arithmetique.h@{arithmetique.h}!value_notmone_p@{value\_\-notmone\_\-p}}
+\index{value_notmone_p@{value\_\-notmone\_\-p}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-notmone\_\-p(val)\ value\_\-ne(val,VALUE\_\-MONE)}\label{arithmetique_8h_a72}
+
+
+\index{arithmetique.h@{arithmetique.h}!value_notone_p@{value\_\-notone\_\-p}}
+\index{value_notone_p@{value\_\-notone\_\-p}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-notone\_\-p(val)\ value\_\-ne(val,VALUE\_\-ONE)}\label{arithmetique_8h_a70}
+
+
+
+
+Referenced by Enumerate\_\-No\-Parameters(), Gauss\-Simplify(), Gen\-Param\-Polyhedron(), Is\-Lattice(), Mat\-Inverse(), Matrix\_\-Inverse(), Orthogonal\_\-Base(), Print\_\-Vertex(), Scan\_\-Vertices(), Vector\_\-Gcd(), Vector\_\-Normalize\_\-Positive(), compute\_\-evalue(), eadd(), emul(), new\_\-eadd(), and print\_\-evalue().
+
+\index{arithmetique.h@{arithmetique.h}!value_notzero_p@{value\_\-notzero\_\-p}}
+\index{value_notzero_p@{value\_\-notzero\_\-p}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-notzero\_\-p(val)\ value\_\-ne(val,VALUE\_\-ZERO)}\label{arithmetique_8h_a68}
+
+
+
+
+Referenced by Build\-Sat(), Calc\-Base(), Chernikova(), Degenerate(), Domain\-Difference(), Elim\_\-Columns(), Find\-Hermite\-Basisof\-Domain(), Find\-Simple(), Find\_\-m\_\-faces(), First\_\-Non\_\-Zero(), Gauss(), Gauss\-Simplify(), Gcd(), Is\-Lattice(), Mat\-Inverse(), Matrix\_\-Inverse(), P\_\-Enum(), Polyhedron\-Includes(), Polyhedron\_\-Enumerate(), Polyhedron\_\-Print(), Pre\-Elim\_\-Columns(), Print\_\-Domain(), Print\_\-Vertex(), Rearrange\-Matfor\-Solve\-Dio(), Remove\_\-Redundants(), Scan\_\-Vertices(), Simplify\-Equalities(), Solve\-Diophantine(), Sub\-Constraint(), Test\-Rank(), Vector\_\-Gcd(), Vector\_\-Min\_\-Not\_\-Zero(), Vertex\-CT(), addeliminatedparams\_\-evalue(), aep\_\-evalue(), compute\_\-evalue(), eadd(), eequal(), emul(), encore(), existepivot(), find\-Hermite\-Basis(), free\_\-evalue\_\-refs(), hermite(), in\_\-domain(), is\-Empty\-Lattice(), is\-Integral(), is\-Linear(), isin\-Hnf(), lower\_\-upper\_\-bounds(), new\_\-eadd(), old\_\-Polyhedron\_\-Preprocess(), petit\_\-c(), petit\_\-l(), print\_\-evalue(), reduce\_\-evalue(), and smith().
+
+\index{arithmetique.h@{arithmetique.h}!value_one_p@{value\_\-one\_\-p}}
+\index{value_one_p@{value\_\-one\_\-p}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-one\_\-p(val)\ value\_\-eq(val,VALUE\_\-ONE)}\label{arithmetique_8h_a69}
+
+
+
+
+Referenced by Gauss\-Simplify(), Lattice\-Image(), Polyhedron\-LTQ(), Print\_\-Domain(), Remove\_\-Redundants(), is\-Empty\-Lattice(), rat\_\-prodmat(), and reduce\_\-evalue().
+
+\index{arithmetique.h@{arithmetique.h}!value_oppose@{value\_\-oppose}}
+\index{value_oppose@{value\_\-oppose}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-oppose(ref, val)\ ((ref) = value\_\-uminus((val)))}\label{arithmetique_8h_a54}
+
+
+
+
+Referenced by Calc\-Base(), Chernikova(), Combine(), Domain\-Cost(), Gauss\-Simplify(), Lattice\-Preimage(), Make\-Dio\-Eqfor\-Inter(), Matrix\_\-Inverse(), Polyhedron\-LTQ(), Polyhedron\_\-Image\_\-Enumerate(), Polyhedron\_\-Preprocess(), Polyhedron\_\-Preprocess2(), Solve\-Diophantine(), Sub\-Constraint(), Vector\_\-Normalize\_\-Positive(), hermite(), lower\_\-upper\_\-bounds(), moins\_\-c(), moins\_\-l(), old\_\-Polyhedron\_\-Preprocess(), and smith().
+
+\index{arithmetique.h@{arithmetique.h}!value_or@{value\_\-or}}
+\index{value_or@{value\_\-or}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-or(v1, v2)\ ((v1)$|$(v2))}\label{arithmetique_8h_a39}
+
+
+\index{arithmetique.h@{arithmetique.h}!value_orto@{value\_\-orto}}
+\index{value_orto@{value\_\-orto}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-orto(ref, val1, val2)\ ((ref) = (val1)$|$(val2))}\label{arithmetique_8h_a58}
+
+
+
+
+Referenced by Vector\_\-Or().
+
+\index{arithmetique.h@{arithmetique.h}!value_pdiv@{value\_\-pdiv}}
+\index{value_pdiv@{value\_\-pdiv}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-pdiv(v1, v2)\ (divide((v1),(v2)))}\label{arithmetique_8h_a35}
+
+
+\index{arithmetique.h@{arithmetique.h}!value_pdivision@{value\_\-pdivision}}
+\index{value_pdivision@{value\_\-pdivision}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-pdivision(ref, val1, val2)\ ((ref) = value\_\-pdiv((val1),(val2)))}\label{arithmetique_8h_a53}
+
+
+\index{arithmetique.h@{arithmetique.h}!value_plus@{value\_\-plus}}
+\index{value_plus@{value\_\-plus}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-plus(v1, v2)\ ((v1)+(v2))}\label{arithmetique_8h_a30}
+
+
+\index{arithmetique.h@{arithmetique.h}!value_pmod@{value\_\-pmod}}
+\index{value_pmod@{value\_\-pmod}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-pmod(v1, v2)\ (modulo((v1),(v2)))}\label{arithmetique_8h_a36}
+
+
+\index{arithmetique.h@{arithmetique.h}!value_pos_p@{value\_\-pos\_\-p}}
+\index{value_pos_p@{value\_\-pos\_\-p}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-pos\_\-p(val)\ value\_\-gt(val,VALUE\_\-ZERO)}\label{arithmetique_8h_a63}
+
+
+
+
+Referenced by Find\-Simple(), P\_\-Enum(), Polyhedron\-LTQ(), Polyhedron\_\-Image\_\-Enumerate(), Print\_\-Domain(), cherche\_\-min(), exist\_\-points(), and lower\_\-upper\_\-bounds().
+
+\index{arithmetique.h@{arithmetique.h}!value_posz_p@{value\_\-posz\_\-p}}
+\index{value_posz_p@{value\_\-posz\_\-p}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-posz\_\-p(val)\ value\_\-ge(val,VALUE\_\-ZERO)}\label{arithmetique_8h_a65}
+
+
+
+
+Referenced by Find\-Simple(), Print\_\-Vertex(), add\-To\-Filter(), and old\_\-Polyhedron\_\-Preprocess().
+
+\index{arithmetique.h@{arithmetique.h}!value_print@{value\_\-print}}
+\index{value_print@{value\_\-print}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-print(Dst, fmt, val)\ (fprintf((Dst),(fmt),(val)))}\label{arithmetique_8h_a16}
+
+
+
+
+Referenced by Affine\-Smith(), Chernikova(), Enumerate\_\-No\-Parameters(), Matrix\_\-Print(), P\_\-Enum(), Polyhedron\_\-Enumerate(), Polyhedron\_\-Preprocess(), Polyhedron\_\-Preprocess2(), Polyhedron\_\-Print(), Polyhedron\_\-Print\-Constraints(), Print\_\-Domain(), Print\_\-Vertex(), Vector\_\-Print(), cherche\_\-min(), count\_\-points(), and print\_\-evalue().
+
+\index{arithmetique.h@{arithmetique.h}!value_product@{value\_\-product}}
+\index{value_product@{value\_\-product}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-product(v, w)\ v=value\_\-mult(v,w)}\label{arithmetique_8h_a82}
+
+
+\index{arithmetique.h@{arithmetique.h}!value_protected_hard_idiv_multiply@{value\_\-protected\_\-hard\_\-idiv\_\-multiply}}
+\index{value_protected_hard_idiv_multiply@{value\_\-protected\_\-hard\_\-idiv\_\-multiply}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-protected\_\-hard\_\-idiv\_\-multiply(v, w, throw)}\label{arithmetique_8h_a77}
+
+
+{\bf Value:}
+
+\footnotesize\begin{verbatim}((value_zero_p(w) || value_zero_p(v))? VALUE_ZERO:              \
+   value_lt(value_abs(v),value_div(VALUE_MAX,value_abs(w)))?    \
+   value_direct_multiply(v,w): (throw, VALUE_NAN))\end{verbatim}\normalsize 
+\index{arithmetique.h@{arithmetique.h}!value_protected_mult@{value\_\-protected\_\-mult}}
+\index{value_protected_mult@{value\_\-protected\_\-mult}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-protected\_\-mult(v, w)\ value\_\-protected\_\-multiply(v,w,THROW(overflow\_\-error))}\label{arithmetique_8h_a79}
+
+
+\index{arithmetique.h@{arithmetique.h}!value_protected_multiply@{value\_\-protected\_\-multiply}}
+\index{value_protected_multiply@{value\_\-protected\_\-multiply}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-protected\_\-multiply(v, w, throw)\ value\_\-protected\_\-hard\_\-idiv\_\-multiply(v,w,throw)}\label{arithmetique_8h_a78}
+
+
+\index{arithmetique.h@{arithmetique.h}!value_protected_product@{value\_\-protected\_\-product}}
+\index{value_protected_product@{value\_\-protected\_\-product}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-protected\_\-product(v, w)\ v=value\_\-protected\_\-mult(v,w)}\label{arithmetique_8h_a80}
+
+
+\index{arithmetique.h@{arithmetique.h}!value_read@{value\_\-read}}
+\index{value_read@{value\_\-read}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-read(val, str)\ (sscanf((str),VALUE\_\-FMT,\&(val)))}\label{arithmetique_8h_a15}
+
+
+
+
+Referenced by Matrix\_\-Read\_\-Input(), and Vector\_\-Read().
+
+\index{arithmetique.h@{arithmetique.h}!value_rshift@{value\_\-rshift}}
+\index{value_rshift@{value\_\-rshift}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-rshift(v1, v2)\ ((v1)$>$$>$(v2))}\label{arithmetique_8h_a42}
+
+
+\index{arithmetique.h@{arithmetique.h}!value_set_double@{value\_\-set\_\-double}}
+\index{value_set_double@{value\_\-set\_\-double}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-set\_\-double(val, d)\ ((val) = (Value)(d))}\label{arithmetique_8h_a13}
+
+
+
+
+Referenced by compute\_\-poly().
+
+\index{arithmetique.h@{arithmetique.h}!value_set_si@{value\_\-set\_\-si}}
+\index{value_set_si@{value\_\-set\_\-si}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-set\_\-si(val, i)\ ((val) = (Value)(i))}\label{arithmetique_8h_a12}
+
+
+
+
+Referenced by Add\-ANull\-Column(), Add\-ANull\-Row(), Add\-Lattice(), Affine\-Smith(), Binomial(), Build\-Sat(), CNP(), Calc\-Base(), Change\-Lattice\-Dimension(), Constraints2Polyhedron(), Domain\-Cost(), Empty\-Lattice(), Empty\_\-Polyhedron(), Enumerate\_\-No\-Parameters(), Factorial(), Find\-Hermite\-Basisof\-Domain(), Find\-Simple(), Find\_\-m\_\-faces(), Gauss(), Gauss\-Simplify(), Gen\-Param\-Polyhedron(), Identity(), Lattice\-Intersection(), Lattice\-Preimage(), Make\-Dio\-Eqfor\-Inter(), Mat\-Inverse(), Matrix\_\-Inverse(), Matrix\_\-Product(), Matrix\_\-Vector\_\-Product(), Orthogonal\_\-Base(), P\_\-Enum(), Poly2Sat(), Polyhedron\-Includes(), Polyhedron\-LTQ(), Polyhedron\_\-Enumerate(), Polyhedron\_\-Image(), Polyhedron\_\-Image\_\-Enumerate(), Polyhedron\_\-Not\_\-Empty(), Polyhedron\_\-Preimage(), Polyhedron\_\-Preprocess(), Polyhedron\_\-Preprocess2(), Polyhedron\_\-Scan(), Pre\-Elim\_\-Columns(), Rays2Polyhedron(), Remove\_\-Redundants(), Scalar\_\-product(), Scan\_\-Vertices(), Simplify(), Solve\-Diophantine(), Soustraire\_\-ligne(), Sub\-Constraint(), Universe\_\-Polyhedron(), Vector\_\-Matrix\_\-Product(), Vector\_\-Min\_\-Not\_\-Zero(), Vector\_\-Normalize(), Vector\_\-Set(), Vertex\-CT(), add\-To\-Filter(), cherche\_\-min(), compute\_\-enode(), compute\_\-poly(), count\_\-points(), edot(), emul(), exist\_\-points(), identite(), left\_\-hermite(), lower\_\-upper\_\-bounds(), new\_\-eadd(), new\_\-enode(), old\_\-Polyhedron\_\-Preprocess(), rat\_\-prodmat(), right\_\-hermite(), and smith().
+
+\index{arithmetique.h@{arithmetique.h}!value_sign@{value\_\-sign}}
+\index{value_sign@{value\_\-sign}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-sign(v)\ (value\_\-eq(v,VALUE\_\-ZERO)?0:value\_\-lt(v,VALUE\_\-ZERO)?-1:1)}\label{arithmetique_8h_a28}
+
+
+\index{arithmetique.h@{arithmetique.h}!value_sub_int@{value\_\-sub\_\-int}}
+\index{value_sub_int@{value\_\-sub\_\-int}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-sub\_\-int(ref, val, vint)\ ((ref) = (val)-(Value)(vint))}\label{arithmetique_8h_a49}
+
+
+
+
+Referenced by P\_\-Enum(), Polyhedron\_\-Preprocess(), Polyhedron\_\-Preprocess2(), and lower\_\-upper\_\-bounds().
+
+\index{arithmetique.h@{arithmetique.h}!value_substract@{value\_\-substract}}
+\index{value_substract@{value\_\-substract}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-substract(ref, val1, val2)\ ((ref) = (val1)-(val2))}\label{arithmetique_8h_a48}
+
+
+
+
+Referenced by Elim\_\-Columns(), Find\-Hermite\-Basisof\-Domain(), Lattice\-Preimage(), Mat\-Inverse(), Matrix\_\-Inverse(), Orthogonal\_\-Base(), P\_\-Enum(), Polyhedron\_\-Image\_\-Enumerate(), Polyhedron\_\-Preprocess2(), Solve\-Diophantine(), Soustraire\_\-ligne(), Test\-Rank(), Vector\_\-Sub(), count\_\-points(), exist\_\-points(), and hermite().
+
+\index{arithmetique.h@{arithmetique.h}!value_swap@{value\_\-swap}}
+\index{value_swap@{value\_\-swap}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-swap(v1, v2)}\label{arithmetique_8h_a17}
+
+
+{\bf Value:}
+
+\footnotesize\begin{verbatim}{Value tmp; tmp = v2; \
+                                    v2 = v1; v1 = tmp;   \
+                                   }\end{verbatim}\normalsize 
+
+
+Referenced by Vector\_\-Exchange().
+
+\index{arithmetique.h@{arithmetique.h}!value_uminus@{value\_\-uminus}}
+\index{value_uminus@{value\_\-uminus}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-uminus(val)\ (-(val))}\label{arithmetique_8h_a60}
+
+
+\index{arithmetique.h@{arithmetique.h}!value_zero_p@{value\_\-zero\_\-p}}
+\index{value_zero_p@{value\_\-zero\_\-p}!arithmetique.h@{arithmetique.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define value\_\-zero\_\-p(val)\ value\_\-eq(val,VALUE\_\-ZERO)}\label{arithmetique_8h_a67}
+
+
+
+
+Referenced by Calc\-Base(), Chernikova(), Disjoint\_\-Domain(), Domain\-Cost(), Domain\_\-Enumerate(), Enumerate\_\-No\-Parameters(), Find\-Hermite\-Basisof\-Domain(), Find\-Simple(), Gauss\-Simplify(), Mat\-Inverse(), Matrix\_\-Inverse(), P\_\-Enum(), Poly2Sat(), Polyhedron\-Includes(), Polyhedron\-LTQ(), Polyhedron\_\-Enumerate(), Polyhedron\_\-Image\_\-Enumerate(), Polyhedron\_\-Preprocess(), Polyhedron\_\-Preprocess2(), Pre\-Elim\_\-Columns(), Ray\-Sort(), Rearrange\-Matfor\-Solve\-Dio(), Remove\_\-Redundants(), Soustraire\_\-ligne(), Test\-Rank(), eadd(), ecopy(), emul(), encore(), existepivot(), find\-Hermite\-Basis(), hermite(), isfulldim(), lower\_\-upper\_\-bounds(), and new\_\-eadd().
+

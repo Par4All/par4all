@@ -1,0 +1,61 @@
+\section{eval\_\-ehrhart.c File Reference}
+\label{eval__ehrhart_8c}\index{eval_ehrhart.c@{eval\_\-ehrhart.c}}
+{\tt \#include $<$stdio.h$>$}\par
+{\tt \#include $<$math.h$>$}\par
+{\tt \#include $<$assert.h$>$}\par
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$polylib/polylib.h$>$}\par
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+int {\bf in\_\-domain} (Polyhedron $\ast$P, Value $\ast$list\_\-args)
+\item 
+double {\bf compute\_\-enode} (enode $\ast$p, Value $\ast$list\_\-args)
+\item 
+double {\bf compute\_\-evalue} (evalue $\ast$e, Value $\ast$list\_\-args)
+\item 
+Value $\ast$ {\bf compute\_\-poly} (Enumeration $\ast$en, Value $\ast$list\_\-args)
+\end{CompactItemize}
+
+
+\subsection{Function Documentation}
+\index{eval_ehrhart.c@{eval\_\-ehrhart.c}!compute_enode@{compute\_\-enode}}
+\index{compute_enode@{compute\_\-enode}!eval_ehrhart.c@{eval\_\-ehrhart.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double compute\_\-enode (enode $\ast$ {\em p}, Value $\ast$ {\em list\_\-args})\hspace{0.3cm}{\tt  [static]}}\label{eval__ehrhart_8c_a1}
+
+
+
+
+Definition at line 77 of file eval\_\-ehrhart.c.
+
+Referenced by compute\_\-evalue().
+
+\index{eval_ehrhart.c@{eval\_\-ehrhart.c}!compute_evalue@{compute\_\-evalue}}
+\index{compute_evalue@{compute\_\-evalue}!eval_ehrhart.c@{eval\_\-ehrhart.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}double compute\_\-evalue (evalue $\ast$ {\em e}, Value $\ast$ {\em list\_\-args})}\label{eval__ehrhart_8c_a2}
+
+
+
+
+Definition at line 120 of file eval\_\-ehrhart.c.
+
+Referenced by compute\_\-enode(), and compute\_\-poly().
+
+\index{eval_ehrhart.c@{eval\_\-ehrhart.c}!compute_poly@{compute\_\-poly}}
+\index{compute_poly@{compute\_\-poly}!eval_ehrhart.c@{eval\_\-ehrhart.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Value$\ast$ compute\_\-poly (Enumeration $\ast$ {\em en}, Value $\ast$ {\em list\_\-args})}\label{eval__ehrhart_8c_a3}
+
+
+
+
+Definition at line 143 of file eval\_\-ehrhart.c.\index{eval_ehrhart.c@{eval\_\-ehrhart.c}!in_domain@{in\_\-domain}}
+\index{in_domain@{in\_\-domain}!eval_ehrhart.c@{eval\_\-ehrhart.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int in\_\-domain (Polyhedron $\ast$ {\em P}, Value $\ast$ {\em list\_\-args})}\label{eval__ehrhart_8c_a0}
+
+
+
+
+Definition at line 26 of file eval\_\-ehrhart.c.
+
+Referenced by compute\_\-poly().
+

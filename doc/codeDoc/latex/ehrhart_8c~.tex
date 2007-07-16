@@ -1,0 +1,596 @@
+\section{ehrhart.c$\sim$ File Reference}
+\label{ehrhart_8c~}\index{ehrhart.c~@{ehrhart.c$\sim$}}
+{\tt \#include $<$stdio.h$>$}\par
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$ctype.h$>$}\par
+{\tt \#include $<$string.h$>$}\par
+{\tt \#include $<$unistd.h$>$}\par
+{\tt \#include $<$assert.h$>$}\par
+{\tt \#include $<$polylib/polylib.h$>$}\par
+\subsection*{Defines}
+\begin{CompactItemize}
+\item 
+\#define {\bf EPRINT\_\-ALL\_\-VALIDITY\_\-CONSTRAINTS}
+\begin{CompactList}\small\item\em define this to print all constraints on the validity domains if not defined, only new constraints (not in validity domain given by the user) are printed.\item\end{CompactList}\item 
+\#define {\bf REDUCE\_\-DEGREE}
+\begin{CompactList}\small\item\em Reduce the degree of resulting polynomials.\item\end{CompactList}\item 
+\#define {\bf ALL\_\-OVERFLOW\_\-WARNINGS}
+\begin{CompactList}\small\item\em define this to print one warning message per domain overflow these overflows should no longer happen since version 4.20.\item\end{CompactList}\item 
+\#define {\bf EPRINT}
+\item 
+\#define {\bf MAXITER}\ 100
+\begin{CompactList}\small\item\em This procedure finds an integer point contained in polyhedron D / first checks for positive values, then for negative values returns TRUE on success.\item\end{CompactList}\end{CompactItemize}
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+enode $\ast$ {\bf new\_\-enode} (enode\_\-type type, int size, int pos)
+\begin{CompactList}\small\item\em EHRHART POLYNOMIAL SYMBOLIC ALGEBRA SYSTEM.\item\end{CompactList}\item 
+void {\bf free\_\-evalue\_\-refs} (evalue $\ast$e)
+\begin{CompactList}\small\item\em releases all memory referenced by e.\item\end{CompactList}\item 
+enode $\ast$ {\bf ecopy} (enode $\ast$e)
+\item 
+void {\bf print\_\-evalue} (FILE $\ast$DST, evalue $\ast$e, char $\ast$$\ast$pname)
+\item 
+void {\bf print\_\-enode} (FILE $\ast$DST, enode $\ast$p, char $\ast$$\ast$pname)
+\begin{CompactList}\small\item\em prints the enode to DST.\item\end{CompactList}\item 
+int {\bf eequal} (evalue $\ast$e1, evalue $\ast$e2)
+\item 
+void {\bf reduce\_\-evalue} (evalue $\ast$e)
+\item 
+void {\bf emul} (evalue $\ast$e1, evalue $\ast$e2, evalue $\ast$res)
+\begin{CompactList}\small\item\em multiplies two evalues and puts the result in res.\item\end{CompactList}\item 
+void {\bf eadd} (evalue $\ast$e1, evalue $\ast$res)
+\begin{CompactList}\small\item\em adds one evalue to evalue 'res.\item\end{CompactList}\item 
+void {\bf edot} (enode $\ast$v1, enode $\ast$v2, evalue $\ast$res)
+\begin{CompactList}\small\item\em computes the inner product of two vectors.\item\end{CompactList}\item 
+void {\bf aep\_\-evalue} (evalue $\ast$e, int $\ast$ref)
+\begin{CompactList}\small\item\em local recursive function used in the following ref contains the new position for each old index position.\item\end{CompactList}\item 
+void {\bf addeliminatedparams\_\-evalue} (evalue $\ast$e, Matrix $\ast$CT)
+\begin{CompactList}\small\item\em Comments.\item\end{CompactList}\item 
+int {\bf cherche\_\-min} (Value $\ast$min, Polyhedron $\ast$D, int pos)
+\item 
+Polyhedron $\ast$ {\bf Polyhedron\_\-Preprocess} (Polyhedron $\ast$D, Value $\ast$size, unsigned MAXRAYS)
+\begin{CompactList}\small\item\em This procedure finds the smallest parallelepiped of size '{\em size[i]}' for every dimension i, contained in polyhedron D If this is not possible, an empty polyhedron is returned.\item\end{CompactList}\item 
+Polyhedron $\ast$ {\bf Polyhedron\_\-Preprocess2} (Polyhedron $\ast$D, Value $\ast$size, Value $\ast$lcm, unsigned MAXRAYS)
+\begin{CompactList}\small\item\em This procedure finds an hypercube of size 'size', containing polyhedron D increases size and lcm if necessary (and not \char`\"{}too big\char`\"{}) If this is not possible, an empty polyhedron is returned.\item\end{CompactList}\item 
+Polyhedron $\ast$ {\bf old\_\-Polyhedron\_\-Preprocess} (Polyhedron $\ast$D, Value size, unsigned MAXRAYS)
+\begin{CompactList}\small\item\em This procedure adds additional constraints to D so that as each parameter is scanned, it will have a minimum of 'size' points If this is not possible, an empty polyhedron is returned.\item\end{CompactList}\item 
+int {\bf count\_\-points} (int pos, Polyhedron $\ast$P, Value $\ast$context)
+\begin{CompactList}\small\item\em PROCEDURES TO COMPUTE ENUMERATION.\item\end{CompactList}\item 
+enode $\ast$ {\bf P\_\-Enum} (Polyhedron $\ast$L, Polyhedron $\ast$LQ, Value $\ast$context, int pos, int nb\_\-param, int dim, Value $\ast$lcm)
+\item 
+void {\bf Scan\_\-Vertices} (Param\_\-Polyhedron $\ast$PP, Param\_\-Domain $\ast$Q, Matrix $\ast$CT, Value $\ast$lcm, int nbp)
+\item 
+Enumeration $\ast$ {\bf Enumerate\_\-No\-Parameters} (Polyhedron $\ast$P, Polyhedron $\ast$C, Matrix $\ast$CT, Polyhedron $\ast$CEq, unsigned MAXRAYS)
+\begin{CompactList}\small\item\em Procedure to count points in a non-parameterized polytope.\item\end{CompactList}\item 
+Enumeration $\ast$ {\bf Polyhedron\_\-Enumerate} (Polyhedron $\ast${\bf Pi}, Polyhedron $\ast$C, unsigned MAXRAYS)
+\begin{CompactList}\small\item\em Procedure to count points in a parameterized polytope.\item\end{CompactList}\end{CompactItemize}
+\subsection*{Variables}
+\begin{CompactItemize}
+\item 
+int {\bf overflow\_\-warning\_\-flag} = 1
+\begin{CompactList}\small\item\em EPRINT : print results while computing the ehrhart polynomial.\item\end{CompactList}\item 
+char $\ast$$\ast$ {\bf param\_\-name}
+\end{CompactItemize}
+
+
+\subsection{Define Documentation}
+\index{ehrhart.c~@{ehrhart.c$\sim$}!ALL_OVERFLOW_WARNINGS@{ALL\_\-OVERFLOW\_\-WARNINGS}}
+\index{ALL_OVERFLOW_WARNINGS@{ALL\_\-OVERFLOW\_\-WARNINGS}!ehrhart.c~@{ehrhart.c$\sim$}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define ALL\_\-OVERFLOW\_\-WARNINGS}\label{ehrhart_8c~_a2}
+
+
+define this to print one warning message per domain overflow these overflows should no longer happen since version 4.20.
+
+
+
+Definition at line 72 of file ehrhart.c$\sim$.\index{ehrhart.c~@{ehrhart.c$\sim$}!EPRINT@{EPRINT}}
+\index{EPRINT@{EPRINT}!ehrhart.c~@{ehrhart.c$\sim$}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define EPRINT}\label{ehrhart_8c~_a3}
+
+
+
+
+Definition at line 97 of file ehrhart.c$\sim$.\index{ehrhart.c~@{ehrhart.c$\sim$}!EPRINT_ALL_VALIDITY_CONSTRAINTS@{EPRINT\_\-ALL\_\-VALIDITY\_\-CONSTRAINTS}}
+\index{EPRINT_ALL_VALIDITY_CONSTRAINTS@{EPRINT\_\-ALL\_\-VALIDITY\_\-CONSTRAINTS}!ehrhart.c~@{ehrhart.c$\sim$}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define EPRINT\_\-ALL\_\-VALIDITY\_\-CONSTRAINTS}\label{ehrhart_8c~_a0}
+
+
+define this to print all constraints on the validity domains if not defined, only new constraints (not in validity domain given by the user) are printed.
+
+
+
+Definition at line 27 of file ehrhart.c$\sim$.\index{ehrhart.c~@{ehrhart.c$\sim$}!MAXITER@{MAXITER}}
+\index{MAXITER@{MAXITER}!ehrhart.c~@{ehrhart.c$\sim$}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define MAXITER\ 100}\label{ehrhart_8c~_a4}
+
+
+This procedure finds an integer point contained in polyhedron D / first checks for positive values, then for negative values returns TRUE on success.
+
+Result is in min. returns FALSE if no integer point is found
+
+
+
+
+
+This is the maximum number of iterations for a given parameter to find a integer point inside the context. Kind of weird. cherche\_\-min should
+
+
+
+\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+min}]\item[{\em 
+D}]\item[{\em 
+pos}]\end{description}
+\end{Desc}
+
+
+Definition at line 634 of file ehrhart.c$\sim$.\index{ehrhart.c~@{ehrhart.c$\sim$}!REDUCE_DEGREE@{REDUCE\_\-DEGREE}}
+\index{REDUCE_DEGREE@{REDUCE\_\-DEGREE}!ehrhart.c~@{ehrhart.c$\sim$}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define REDUCE\_\-DEGREE}\label{ehrhart_8c~_a1}
+
+
+Reduce the degree of resulting polynomials.
+
+
+
+Definition at line 66 of file ehrhart.c$\sim$.
+
+\subsection{Function Documentation}
+\index{ehrhart.c~@{ehrhart.c$\sim$}!Enumerate_NoParameters@{Enumerate\_\-NoParameters}}
+\index{Enumerate_NoParameters@{Enumerate\_\-NoParameters}!ehrhart.c~@{ehrhart.c$\sim$}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Enumeration$\ast$ Enumerate\_\-No\-Parameters (Polyhedron $\ast$ {\em P}, Polyhedron $\ast$ {\em C}, Matrix $\ast$ {\em CT}, Polyhedron $\ast$ {\em CEq}, unsigned {\em MAXRAYS})}\label{ehrhart_8c~_a26}
+
+
+Procedure to count points in a non-parameterized polytope.
+
+\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+P}]Polyhedron to count \item[{\em 
+C}]Parameter Context domain \item[{\em 
+CT}]Matrix to transform context to original \end{description}
+\end{Desc}
+\begin{Desc}
+\item[ma CEq     additionnal equalities in context]\par
+\end{Desc}
+\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+MAXRAYS}]workspace size \end{description}
+\end{Desc}
+
+
+Definition at line 1701 of file ehrhart.c$\sim$.
+
+Referenced by Polyhedron\_\-Enumerate().
+
+\index{ehrhart.c~@{ehrhart.c$\sim$}!P_Enum@{P\_\-Enum}}
+\index{P_Enum@{P\_\-Enum}!ehrhart.c~@{ehrhart.c$\sim$}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}enode$\ast$ P\_\-Enum (Polyhedron $\ast$ {\em L}, Polyhedron $\ast$ {\em LQ}, Value $\ast$ {\em context}, int {\em pos}, int {\em nb\_\-param}, int {\em dim}, Value $\ast$ {\em lcm})\hspace{0.3cm}{\tt  [static]}}\label{ehrhart_8c~_a24}
+
+
+
+
+Definition at line 1232 of file ehrhart.c$\sim$.
+
+Referenced by Enumerate\_\-No\-Parameters(), P\_\-Enum(), and Polyhedron\_\-Enumerate().
+
+\index{ehrhart.c~@{ehrhart.c$\sim$}!Polyhedron_Enumerate@{Polyhedron\_\-Enumerate}}
+\index{Polyhedron_Enumerate@{Polyhedron\_\-Enumerate}!ehrhart.c~@{ehrhart.c$\sim$}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Enumeration$\ast$ Polyhedron\_\-Enumerate (Polyhedron $\ast$ {\em Pi}, Polyhedron $\ast$ {\em C}, unsigned {\em MAXRAYS})}\label{ehrhart_8c~_a27}
+
+
+Procedure to count points in a parameterized polytope.
+
+\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+P}]Polyhedron to enumerate \item[{\em 
+C}]Context Domain \item[{\em 
+MAXRAYS}]size of workspace \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+a list of validity domains + evalues EP \end{Desc}
+
+
+Definition at line 1809 of file ehrhart.c$\sim$.
+
+Referenced by Domain\_\-Enumerate().
+
+\index{ehrhart.c~@{ehrhart.c$\sim$}!Polyhedron_Preprocess@{Polyhedron\_\-Preprocess}}
+\index{Polyhedron_Preprocess@{Polyhedron\_\-Preprocess}!ehrhart.c~@{ehrhart.c$\sim$}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Polyhedron$\ast$ Polyhedron\_\-Preprocess (Polyhedron $\ast$ {\em D}, Value $\ast$ {\em size}, unsigned {\em MAXRAYS})}\label{ehrhart_8c~_a20}
+
+
+This procedure finds the smallest parallelepiped of size '{\em size[i]}' for every dimension i, contained in polyhedron D If this is not possible, an empty polyhedron is returned.
+
+
+
+
+
+\small\begin{alltt}
+written by vin100, 2000, for version 4.19
+modified 2002, version 5.10
+\end{alltt}\normalsize 
+
+
+
+
+
+
+It first finds the coordinates of the lexicographically smallest edge of the hypercube, obtained by transforming the constraints of D (by adding 'size' as many times as there are negative coeficients in each constraint), and finding the lexicographical min of this polyhedron. Then it builds the hypercube and returns it.
+
+
+
+ \begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+D}]\item[{\em 
+size}]\item[{\em 
+MAXRAYS}]\end{description}
+\end{Desc}
+
+
+Definition at line 743 of file ehrhart.c$\sim$.
+
+Referenced by Polyhedron\_\-Enumerate().
+
+\index{ehrhart.c~@{ehrhart.c$\sim$}!Polyhedron_Preprocess2@{Polyhedron\_\-Preprocess2}}
+\index{Polyhedron_Preprocess2@{Polyhedron\_\-Preprocess2}!ehrhart.c~@{ehrhart.c$\sim$}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Polyhedron$\ast$ Polyhedron\_\-Preprocess2 (Polyhedron $\ast$ {\em D}, Value $\ast$ {\em size}, Value $\ast$ {\em lcm}, unsigned {\em MAXRAYS})}\label{ehrhart_8c~_a21}
+
+
+This procedure finds an hypercube of size 'size', containing polyhedron D increases size and lcm if necessary (and not \char`\"{}too big\char`\"{}) If this is not possible, an empty polyhedron is returned.
+
+
+
+
+
+\small\begin{alltt} written by vin100, 2001, for version 4.19\end{alltt}\normalsize 
+\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+D}]\item[{\em 
+size}]\item[{\em 
+lcm}]\item[{\em 
+MAXRAYS}]\end{description}
+\end{Desc}
+
+
+Definition at line 898 of file ehrhart.c$\sim$.
+
+Referenced by Polyhedron\_\-Enumerate().
+
+\index{ehrhart.c~@{ehrhart.c$\sim$}!Scan_Vertices@{Scan\_\-Vertices}}
+\index{Scan_Vertices@{Scan\_\-Vertices}!ehrhart.c~@{ehrhart.c$\sim$}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Scan\_\-Vertices (Param\_\-Polyhedron $\ast$ {\em PP}, Param\_\-Domain $\ast$ {\em Q}, Matrix $\ast$ {\em CT}, Value $\ast$ {\em lcm}, int {\em nbp})\hspace{0.3cm}{\tt  [static]}}\label{ehrhart_8c~_a25}
+
+
+
+
+Definition at line 1625 of file ehrhart.c$\sim$.
+
+Referenced by Polyhedron\_\-Enumerate().
+
+\index{ehrhart.c~@{ehrhart.c$\sim$}!addeliminatedparams_evalue@{addeliminatedparams\_\-evalue}}
+\index{addeliminatedparams_evalue@{addeliminatedparams\_\-evalue}!ehrhart.c~@{ehrhart.c$\sim$}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void addeliminatedparams\_\-evalue (evalue $\ast$ {\em e}, Matrix $\ast$ {\em CT})\hspace{0.3cm}{\tt  [static]}}\label{ehrhart_8c~_a18}
+
+
+Comments.
+
+
+
+Definition at line 588 of file ehrhart.c$\sim$.
+
+Referenced by Polyhedron\_\-Enumerate().
+
+\index{ehrhart.c~@{ehrhart.c$\sim$}!aep_evalue@{aep\_\-evalue}}
+\index{aep_evalue@{aep\_\-evalue}!ehrhart.c~@{ehrhart.c$\sim$}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void aep\_\-evalue (evalue $\ast$ {\em e}, int $\ast$ {\em ref})\hspace{0.3cm}{\tt  [static]}}\label{ehrhart_8c~_a17}
+
+
+local recursive function used in the following ref contains the new position for each old index position.
+
+\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+e}]pointer to an evalue \item[{\em 
+ref}]transformation Matrix \end{description}
+\end{Desc}
+
+
+Definition at line 568 of file ehrhart.c$\sim$.
+
+Referenced by addeliminatedparams\_\-evalue(), and aep\_\-evalue().
+
+\index{ehrhart.c~@{ehrhart.c$\sim$}!cherche_min@{cherche\_\-min}}
+\index{cherche_min@{cherche\_\-min}!ehrhart.c~@{ehrhart.c$\sim$}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int cherche\_\-min (Value $\ast$ {\em min}, Polyhedron $\ast$ {\em D}, int {\em pos})}\label{ehrhart_8c~_a19}
+
+
+
+
+Definition at line 635 of file ehrhart.c$\sim$.
+
+Referenced by Polyhedron\_\-Preprocess(), and cherche\_\-min().
+
+\index{ehrhart.c~@{ehrhart.c$\sim$}!count_points@{count\_\-points}}
+\index{count_points@{count\_\-points}!ehrhart.c~@{ehrhart.c$\sim$}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int count\_\-points (int {\em pos}, Polyhedron $\ast$ {\em P}, Value $\ast$ {\em context})}\label{ehrhart_8c~_a23}
+
+
+PROCEDURES TO COMPUTE ENUMERATION.
+
+recursive procedure, recurse for each imbriquation\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+pos}]index position of current loop index (1..hdim-1) \item[{\em 
+P}]loop domain \item[{\em 
+context}]context values for fixed indices  \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+the number of integer points in this polyhedron \end{Desc}
+
+
+Definition at line 1141 of file ehrhart.c$\sim$.
+
+Referenced by count\_\-points().
+
+\index{ehrhart.c~@{ehrhart.c$\sim$}!eadd@{eadd}}
+\index{eadd@{eadd}!ehrhart.c~@{ehrhart.c$\sim$}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void eadd (evalue $\ast$ {\em e1}, evalue $\ast$ {\em res})}\label{ehrhart_8c~_a15}
+
+
+adds one evalue to evalue 'res.
+
+result = res + e1\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+e1}]an evalue  \item[{\em 
+res}]\end{description}
+\end{Desc}
+
+
+Definition at line 409 of file ehrhart.c$\sim$.
+
+Referenced by eadd(), and edot().
+
+\index{ehrhart.c~@{ehrhart.c$\sim$}!ecopy@{ecopy}}
+\index{ecopy@{ecopy}!ehrhart.c~@{ehrhart.c$\sim$}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}enode$\ast$ ecopy (enode $\ast$ {\em e})}\label{ehrhart_8c~_a9}
+
+
+\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+e}]pointer to an evalue  \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+description \end{Desc}
+
+
+Definition at line 170 of file ehrhart.c$\sim$.
+
+Referenced by Domain\_\-Enumerate(), eadd(), ecopy(), and new\_\-eadd().
+
+\index{ehrhart.c~@{ehrhart.c$\sim$}!edot@{edot}}
+\index{edot@{edot}!ehrhart.c~@{ehrhart.c$\sim$}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void edot (enode $\ast$ {\em v1}, enode $\ast$ {\em v2}, evalue $\ast$ {\em res})}\label{ehrhart_8c~_a16}
+
+
+computes the inner product of two vectors.
+
+Result = result (evalue) = v1.v2 (dot product)\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+v1}]an enode (vector) \item[{\em 
+v2}]an enode (vector of constants) \item[{\em 
+res}]result (evalue) \end{description}
+\end{Desc}
+
+
+Definition at line 525 of file ehrhart.c$\sim$.
+
+Referenced by P\_\-Enum().
+
+\index{ehrhart.c~@{ehrhart.c$\sim$}!eequal@{eequal}}
+\index{eequal@{eequal}!ehrhart.c~@{ehrhart.c$\sim$}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int eequal (evalue $\ast$ {\em e1}, evalue $\ast$ {\em e2})\hspace{0.3cm}{\tt  [static]}}\label{ehrhart_8c~_a12}
+
+
+\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+e1}]pointers to evalues \item[{\em 
+e2}]pointers to evalues \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+1 (true) if they are equal, 0 (false) if not \end{Desc}
+
+
+Definition at line 261 of file ehrhart.c$\sim$.
+
+Referenced by eequal(), and reduce\_\-evalue().
+
+\index{ehrhart.c~@{ehrhart.c$\sim$}!emul@{emul}}
+\index{emul@{emul}!ehrhart.c~@{ehrhart.c$\sim$}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void emul (evalue $\ast$ {\em e1}, evalue $\ast$ {\em e2}, evalue $\ast$ {\em res})\hspace{0.3cm}{\tt  [static]}}\label{ehrhart_8c~_a14}
+
+
+multiplies two evalues and puts the result in res.
+
+\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+e1}]pointer to an evalue \item[{\em 
+e2}]pointer to a constant evalue \item[{\em 
+res}]pointer to result evalue = e1 $\ast$ e2 \end{description}
+\end{Desc}
+
+
+Definition at line 368 of file ehrhart.c$\sim$.
+
+Referenced by edot(), and emul().
+
+\index{ehrhart.c~@{ehrhart.c$\sim$}!free_evalue_refs@{free\_\-evalue\_\-refs}}
+\index{free_evalue_refs@{free\_\-evalue\_\-refs}!ehrhart.c~@{ehrhart.c$\sim$}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void free\_\-evalue\_\-refs (evalue $\ast$ {\em e})}\label{ehrhart_8c~_a8}
+
+
+releases all memory referenced by e.
+
+(recursive)  \begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+e}]pointer to an evalue \end{description}
+\end{Desc}
+
+
+Definition at line 143 of file ehrhart.c$\sim$.
+
+Referenced by eadd(), edot(), free\_\-evalue\_\-refs(), and reduce\_\-evalue().
+
+\index{ehrhart.c~@{ehrhart.c$\sim$}!new_enode@{new\_\-enode}}
+\index{new_enode@{new\_\-enode}!ehrhart.c~@{ehrhart.c$\sim$}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}enode$\ast$ new\_\-enode (enode\_\-type {\em type}, int {\em size}, int {\em pos})}\label{ehrhart_8c~_a7}
+
+
+EHRHART POLYNOMIAL SYMBOLIC ALGEBRA SYSTEM.
+
+The newly allocated enode can be freed with a simple free(x)\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+type}]: enode type \item[{\em 
+size}]: degree+1 for polynomial, period for periodic \item[{\em 
+pos}]: 1..nb\_\-param, position of parameter  \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns: ]\par
+a newly allocated enode \end{Desc}
+
+
+Definition at line 117 of file ehrhart.c$\sim$.
+
+Referenced by P\_\-Enum(), ecopy(), emul(), and new\_\-eadd().
+
+\index{ehrhart.c~@{ehrhart.c$\sim$}!old_Polyhedron_Preprocess@{old\_\-Polyhedron\_\-Preprocess}}
+\index{old_Polyhedron_Preprocess@{old\_\-Polyhedron\_\-Preprocess}!ehrhart.c~@{ehrhart.c$\sim$}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Polyhedron$\ast$ old\_\-Polyhedron\_\-Preprocess (Polyhedron $\ast$ {\em D}, Value {\em size}, unsigned {\em MAXRAYS})}\label{ehrhart_8c~_a22}
+
+
+This procedure adds additional constraints to D so that as each parameter is scanned, it will have a minimum of 'size' points If this is not possible, an empty polyhedron is returned.
+
+\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+D}]\item[{\em 
+size}]\item[{\em 
+MAXRAYS}]\end{description}
+\end{Desc}
+
+
+Definition at line 1060 of file ehrhart.c$\sim$.\index{ehrhart.c~@{ehrhart.c$\sim$}!print_enode@{print\_\-enode}}
+\index{print_enode@{print\_\-enode}!ehrhart.c~@{ehrhart.c$\sim$}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void print\_\-enode (FILE $\ast$ {\em DST}, enode $\ast$ {\em p}, char $\ast$$\ast$ {\em pname})}\label{ehrhart_8c~_a11}
+
+
+prints the enode to DST.
+
+\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+DST}]destination file  \item[{\em 
+p}]pointer to enode to be printed  \item[{\em 
+pname}]array of strings, name of the parameters \end{description}
+\end{Desc}
+
+
+Definition at line 216 of file ehrhart.c$\sim$.
+
+Referenced by P\_\-Enum(), and print\_\-evalue().
+
+\index{ehrhart.c~@{ehrhart.c$\sim$}!print_evalue@{print\_\-evalue}}
+\index{print_evalue@{print\_\-evalue}!ehrhart.c~@{ehrhart.c$\sim$}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void print\_\-evalue (FILE $\ast$ {\em DST}, evalue $\ast$ {\em e}, char $\ast$$\ast$ {\em pname})}\label{ehrhart_8c~_a10}
+
+
+\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+DST}]destination file \item[{\em 
+e}]pointer to evalue to be printed \end{description}
+\end{Desc}
+
+
+Definition at line 192 of file ehrhart.c$\sim$.
+
+Referenced by Enumerate\_\-No\-Parameters(), P\_\-Enum(), Polyhedron\_\-Enumerate(), compute\_\-poly(), main(), and print\_\-enode().
+
+\index{ehrhart.c~@{ehrhart.c$\sim$}!reduce_evalue@{reduce\_\-evalue}}
+\index{reduce_evalue@{reduce\_\-evalue}!ehrhart.c~@{ehrhart.c$\sim$}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void reduce\_\-evalue (evalue $\ast$ {\em e})\hspace{0.3cm}{\tt  [static]}}\label{ehrhart_8c~_a13}
+
+
+\begin{Desc}
+\item[Parameters: ]\par
+\begin{description}
+\item[{\em 
+e}]pointer to an evalue \end{description}
+\end{Desc}
+
+
+Definition at line 295 of file ehrhart.c$\sim$.
+
+Referenced by Polyhedron\_\-Enumerate(), and reduce\_\-evalue().
+
+
+
+\subsection{Variable Documentation}
+\index{ehrhart.c~@{ehrhart.c$\sim$}!overflow_warning_flag@{overflow\_\-warning\_\-flag}}
+\index{overflow_warning_flag@{overflow\_\-warning\_\-flag}!ehrhart.c~@{ehrhart.c$\sim$}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int overflow\_\-warning\_\-flag = 1}\label{ehrhart_8c~_a5}
+
+
+EPRINT : print results while computing the ehrhart polynomial.
+
+this is done by default if you build the executable ehrhart. (If EMAIN is defined). Don't define EMAIN here, it is defined when necessary in the makefile.
+
+
+
+
+
+Notice: you may however define EPRINT without defining EMAIN, but in this case, you have to initialize the global variable param\_\-name by calling Read\_\-Param\-Names before any call to ehrhart. This is NOT recommanded, unless you know what you do. EPRINT causes more debug messages to be printed. 
+
+Definition at line 93 of file ehrhart.c$\sim$.\index{ehrhart.c~@{ehrhart.c$\sim$}!param_name@{param\_\-name}}
+\index{param_name@{param\_\-name}!ehrhart.c~@{ehrhart.c$\sim$}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}char$\ast$$\ast$ param\_\-name}\label{ehrhart_8c~_a6}
+
+
+
+
+Definition at line 100 of file ehrhart.c$\sim$.

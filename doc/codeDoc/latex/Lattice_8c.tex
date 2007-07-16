@@ -1,0 +1,484 @@
+\section{Lattice.c File Reference}
+\label{Lattice_8c}\index{Lattice.c@{Lattice.c}}
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$polylib/polylib.h$>$}\par
+\subsection*{Compounds}
+\begin{CompactItemize}
+\item 
+struct {\bf factor}
+\end{CompactItemize}
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+{\bf factor} {\bf allfactors} (int num)
+\item 
+void {\bf Print\-Lattice\-Union} (FILE $\ast$fp, char $\ast$format, Lattice\-Union $\ast$Head)
+\item 
+void {\bf Lattice\-Union\_\-Free} (Lattice\-Union $\ast$Head)
+\item 
+Lattice\-Union $\ast$ {\bf Lattice\-Union\_\-Alloc} (void)
+\item 
+Bool {\bf same\-Affinepart} (Lattice $\ast$A, Lattice $\ast$B)
+\item 
+Lattice $\ast$ {\bf Empty\-Lattice} (int dimension)
+\item 
+Bool {\bf is\-Empty\-Lattice} (Lattice $\ast$A)
+\item 
+Bool {\bf is\-Linear} (Lattice $\ast$A)
+\item 
+void {\bf Affine\-Hermite} (Lattice $\ast$A, Lattice $\ast$$\ast$H, Matrix $\ast$$\ast$U)
+\item 
+void {\bf Affine\-Smith} (Lattice $\ast$A, Lattice $\ast$$\ast$U, Lattice $\ast$$\ast$V, Lattice $\ast$$\ast$Diag)
+\item 
+Lattice $\ast$ {\bf Homogenise} (Lattice $\ast$A, Bool Forward)
+\item 
+Bool {\bf Lattice\-Includes} (Lattice $\ast$A, Lattice $\ast$B)
+\item 
+Bool {\bf same\-Lattice} (Lattice $\ast$A, Lattice $\ast$B)
+\item 
+Lattice $\ast$ {\bf Change\-Lattice\-Dimension} (Lattice $\ast$A, int dimension)
+\item 
+Lattice $\ast$ {\bf Extract\-Linear\-Part} (Lattice $\ast$A)
+\item 
+Matrix $\ast$ {\bf Make\-Dio\-Eqfor\-Inter} (Matrix $\ast$A, Matrix $\ast$B)
+\item 
+Lattice $\ast$ {\bf Lattice\-Intersection} (Lattice $\ast$X, Lattice $\ast$Y)
+\item 
+Matrix $\ast$ {\bf Make\-Dio\-Eqfor\-Inter} (Lattice $\ast$A, Lattice $\ast$B)
+\item 
+void {\bf Add\-Lattice} (Lattice\-Union $\ast$, Matrix $\ast$, Matrix $\ast$, int, int)
+\item 
+Lattice\-Union $\ast$ {\bf Split\-Lattice} (Matrix $\ast$, Matrix $\ast$, Matrix $\ast$)
+\item 
+Lattice\-Union $\ast$ {\bf Lattice2Lattice\-Union} (Lattice $\ast$X, Lattice $\ast$Y)
+\item 
+Lattice\-Union $\ast$ {\bf Lattice\-Difference} (Lattice $\ast$A, Lattice $\ast$B)
+\begin{CompactList}\small\item\em Method :.\item\end{CompactList}\item 
+Lattice\-Union $\ast$ {\bf Split\-Lattice} (Lattice $\ast$B1, Lattice $\ast$B2, Matrix $\ast$C)
+\item 
+int {\bf Find\-Hermite\-Basisof\-Domain} (Polyhedron $\ast$A, Matrix $\ast$$\ast$B)
+\item 
+Lattice $\ast$ {\bf Lattice\-Image} (Lattice $\ast$A, Matrix $\ast$M)
+\item 
+Lattice $\ast$ {\bf Lattice\-Preimage} (Lattice $\ast$L, Matrix $\ast$G)
+\item 
+Bool {\bf Is\-Lattice} (Matrix $\ast${\bf m})
+\item 
+Bool {\bf isfulldim} (Matrix $\ast${\bf m})
+\item 
+Bool {\bf Simplify} (Lattice\-Union $\ast$$\ast$Input\-List, Lattice\-Union $\ast$$\ast$Result\-List, int dim)
+\item 
+int {\bf Linear\-Part\-Compare} (const void $\ast$A, const void $\ast$B)
+\item 
+void {\bf Linear\-Part\-Sort} (Lattice\-Union $\ast$Head)
+\item 
+int {\bf Affine\-Part\-Compare} (const void $\ast$A, const void $\ast$B)
+\item 
+void {\bf Affine\-Part\-Sort} (Lattice\-Union $\ast$List)
+\item 
+Bool {\bf Almost\-Same\-Affine\-Part} (Lattice\-Union $\ast$A, Lattice\-Union $\ast$B)
+\item 
+Bool {\bf Affine\-Part\-Simplify} (Lattice\-Union $\ast$curlist, Lattice\-Union $\ast$$\ast$newlist)
+\item 
+Bool {\bf Same\-Linear\-Part} (Lattice\-Union $\ast$A, Lattice\-Union $\ast$B)
+\item 
+Lattice\-Union $\ast$ {\bf Lattice\-Simplify} (Lattice\-Union $\ast$latlist)
+\item 
+int {\bf intcompare} (const void $\ast$a, const void $\ast$b)
+\item 
+int {\bf polylib\_\-sqrt} (int i)
+\end{CompactItemize}
+
+
+\subsection{Function Documentation}
+\index{Lattice.c@{Lattice.c}!AddLattice@{AddLattice}}
+\index{AddLattice@{AddLattice}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Add\-Lattice (Lattice\-Union $\ast$ {\em Head}, Matrix $\ast$ {\em B1}, Matrix $\ast$ {\em B2}, int {\em Numof\-Times}, int {\em Colnumber})\hspace{0.3cm}{\tt  [static]}}\label{Lattice_8c_a18}
+
+
+
+
+Definition at line 912 of file Lattice.c.
+
+Referenced by Split\-Lattice().
+
+\index{Lattice.c@{Lattice.c}!AffineHermite@{AffineHermite}}
+\index{AffineHermite@{AffineHermite}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Affine\-Hermite (Lattice $\ast$ {\em A}, Lattice $\ast$$\ast$ {\em H}, Matrix $\ast$$\ast$ {\em U})}\label{Lattice_8c_a8}
+
+
+
+
+Definition at line 159 of file Lattice.c.
+
+Referenced by Add\-Lattice(), Add\-ZPolyto\-ZDomain(), Canonical\-Form(), Lattice\-Difference(), Lattice\-Includes(), Lattice\-Intersection(), Split\-Zpolyhedron(), and same\-Lattice().
+
+\index{Lattice.c@{Lattice.c}!AffinePartCompare@{AffinePartCompare}}
+\index{AffinePartCompare@{AffinePartCompare}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int Affine\-Part\-Compare (const void $\ast$ {\em A}, const void $\ast$ {\em B})\hspace{0.3cm}{\tt  [static]}}\label{Lattice_8c_a31}
+
+
+
+
+Definition at line 1462 of file Lattice.c.\index{Lattice.c@{Lattice.c}!AffinePartSimplify@{AffinePartSimplify}}
+\index{AffinePartSimplify@{AffinePartSimplify}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Bool Affine\-Part\-Simplify (Lattice\-Union $\ast$ {\em curlist}, Lattice\-Union $\ast$$\ast$ {\em newlist})\hspace{0.3cm}{\tt  [static]}}\label{Lattice_8c_a34}
+
+
+
+
+Definition at line 1527 of file Lattice.c.
+
+Referenced by Lattice\-Simplify().
+
+\index{Lattice.c@{Lattice.c}!AffinePartSort@{AffinePartSort}}
+\index{AffinePartSort@{AffinePartSort}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Affine\-Part\-Sort (Lattice\-Union $\ast$ {\em List})\hspace{0.3cm}{\tt  [static]}}\label{Lattice_8c_a32}
+
+
+
+
+Definition at line 1484 of file Lattice.c.
+
+Referenced by Affine\-Part\-Simplify().
+
+\index{Lattice.c@{Lattice.c}!AffineSmith@{AffineSmith}}
+\index{AffineSmith@{AffineSmith}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Affine\-Smith (Lattice $\ast$ {\em A}, Lattice $\ast$$\ast$ {\em U}, Lattice $\ast$$\ast$ {\em V}, Lattice $\ast$$\ast$ {\em Diag})}\label{Lattice_8c_a9}
+
+
+
+
+Definition at line 204 of file Lattice.c.\index{Lattice.c@{Lattice.c}!AlmostSameAffinePart@{AlmostSameAffinePart}}
+\index{AlmostSameAffinePart@{AlmostSameAffinePart}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Bool Almost\-Same\-Affine\-Part (Lattice\-Union $\ast$ {\em A}, Lattice\-Union $\ast$ {\em B})\hspace{0.3cm}{\tt  [static]}}\label{Lattice_8c_a33}
+
+
+
+
+Definition at line 1508 of file Lattice.c.
+
+Referenced by Affine\-Part\-Simplify().
+
+\index{Lattice.c@{Lattice.c}!ChangeLatticeDimension@{ChangeLatticeDimension}}
+\index{ChangeLatticeDimension@{ChangeLatticeDimension}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Lattice$\ast$ Change\-Lattice\-Dimension (Lattice $\ast$ {\em A}, int {\em dimension})}\label{Lattice_8c_a13}
+
+
+
+
+Definition at line 393 of file Lattice.c.
+
+Referenced by Canonical\-Form(), Find\-Hermite\-Basisof\-Domain(), and Lattice2Lattice\-Union().
+
+\index{Lattice.c@{Lattice.c}!EmptyLattice@{EmptyLattice}}
+\index{EmptyLattice@{EmptyLattice}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Lattice$\ast$ Empty\-Lattice (int {\em dimension})}\label{Lattice_8c_a5}
+
+
+
+
+Definition at line 78 of file Lattice.c.
+
+Referenced by Empty\-ZPolyhedron(), Lattice\-Image(), Lattice\-Intersection(), and Lattice\-Preimage().
+
+\index{Lattice.c@{Lattice.c}!ExtractLinearPart@{ExtractLinearPart}}
+\index{ExtractLinearPart@{ExtractLinearPart}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Lattice$\ast$ Extract\-Linear\-Part (Lattice $\ast$ {\em A})}\label{Lattice_8c_a14}
+
+
+
+
+Definition at line 423 of file Lattice.c.
+
+Referenced by Lattice2Lattice\-Union().
+
+\index{Lattice.c@{Lattice.c}!FindHermiteBasisofDomain@{FindHermiteBasisofDomain}}
+\index{FindHermiteBasisofDomain@{FindHermiteBasisofDomain}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int Find\-Hermite\-Basisof\-Domain (Polyhedron $\ast$ {\em A}, Matrix $\ast$$\ast$ {\em B})}\label{Lattice_8c_a23}
+
+
+
+
+Definition at line 975 of file Lattice.c.
+
+Referenced by Canonical\-Form().
+
+\index{Lattice.c@{Lattice.c}!Homogenise@{Homogenise}}
+\index{Homogenise@{Homogenise}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Lattice$\ast$ Homogenise (Lattice $\ast$ {\em A}, Bool {\em Forward})}\label{Lattice_8c_a10}
+
+
+
+
+Definition at line 296 of file Lattice.c.
+
+Referenced by Affine\-Hermite(), Affine\-Smith(), and isin\-Hnf().
+
+\index{Lattice.c@{Lattice.c}!IsLattice@{IsLattice}}
+\index{IsLattice@{IsLattice}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Bool Is\-Lattice (Matrix $\ast$ {\em m})}\label{Lattice_8c_a26}
+
+
+
+
+Definition at line 1217 of file Lattice.c.
+
+Referenced by ZPolyhedron\_\-Alloc().
+
+\index{Lattice.c@{Lattice.c}!Lattice2LatticeUnion@{Lattice2LatticeUnion}}
+\index{Lattice2LatticeUnion@{Lattice2LatticeUnion}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Lattice\-Union$\ast$ Lattice2Lattice\-Union (Lattice $\ast$ {\em X}, Lattice $\ast$ {\em Y})}\label{Lattice_8c_a20}
+
+
+
+
+Definition at line 658 of file Lattice.c.
+
+Referenced by Lattice\-Difference(), and Split\-Zpolyhedron().
+
+\index{Lattice.c@{Lattice.c}!LatticeDifference@{LatticeDifference}}
+\index{LatticeDifference@{LatticeDifference}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Lattice\-Union$\ast$ Lattice\-Difference (Lattice $\ast$ {\em A}, Lattice $\ast$ {\em B})}\label{Lattice_8c_a21}
+
+
+Method :.
+
+
+
+Definition at line 798 of file Lattice.c.
+
+Referenced by ZPolyhedron\-Difference().
+
+\index{Lattice.c@{Lattice.c}!LatticeImage@{LatticeImage}}
+\index{LatticeImage@{LatticeImage}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Lattice$\ast$ Lattice\-Image (Lattice $\ast$ {\em A}, Matrix $\ast$ {\em M})}\label{Lattice_8c_a24}
+
+
+
+
+Definition at line 1104 of file Lattice.c.
+
+Referenced by Integralise\-Lattice(), and ZPolyhedron\-Image().
+
+\index{Lattice.c@{Lattice.c}!LatticeIncludes@{LatticeIncludes}}
+\index{LatticeIncludes@{LatticeIncludes}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Bool Lattice\-Includes (Lattice $\ast$ {\em A}, Lattice $\ast$ {\em B})}\label{Lattice_8c_a11}
+
+
+
+
+Definition at line 324 of file Lattice.c.
+
+Referenced by ZPolyhedron\-Includes().
+
+\index{Lattice.c@{Lattice.c}!LatticeIntersection@{LatticeIntersection}}
+\index{LatticeIntersection@{LatticeIntersection}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Lattice$\ast$ Lattice\-Intersection (Lattice $\ast$ {\em X}, Lattice $\ast$ {\em Y})}\label{Lattice_8c_a16}
+
+
+
+
+Definition at line 459 of file Lattice.c.
+
+Referenced by Lattice2Lattice\-Union(), Lattice\-Includes(), and ZPolyhedron\-Intersection().
+
+\index{Lattice.c@{Lattice.c}!LatticePreimage@{LatticePreimage}}
+\index{LatticePreimage@{LatticePreimage}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Lattice$\ast$ Lattice\-Preimage (Lattice $\ast$ {\em L}, Matrix $\ast$ {\em G})}\label{Lattice_8c_a25}
+
+
+
+
+Definition at line 1143 of file Lattice.c.
+
+Referenced by Lattice\-Image(), and ZPolyhedron\-Preimage().
+
+\index{Lattice.c@{Lattice.c}!LatticeSimplify@{LatticeSimplify}}
+\index{LatticeSimplify@{LatticeSimplify}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Lattice\-Union$\ast$ Lattice\-Simplify (Lattice\-Union $\ast$ {\em latlist})}\label{Lattice_8c_a36}
+
+
+
+
+Definition at line 1614 of file Lattice.c.
+
+Referenced by Lattice\-Difference(), and ZDomain\-Simplify().
+
+\index{Lattice.c@{Lattice.c}!LatticeUnion_Alloc@{LatticeUnion\_\-Alloc}}
+\index{LatticeUnion_Alloc@{LatticeUnion\_\-Alloc}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Lattice\-Union$\ast$ Lattice\-Union\_\-Alloc (void)}\label{Lattice_8c_a3}
+
+
+
+
+Definition at line 43 of file Lattice.c.\index{Lattice.c@{Lattice.c}!LatticeUnion_Free@{LatticeUnion\_\-Free}}
+\index{LatticeUnion_Free@{LatticeUnion\_\-Free}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Lattice\-Union\_\-Free (Lattice\-Union $\ast$ {\em Head})}\label{Lattice_8c_a2}
+
+
+
+
+Definition at line 27 of file Lattice.c.
+
+Referenced by ZDomain\-Simplify().
+
+\index{Lattice.c@{Lattice.c}!LinearPartCompare@{LinearPartCompare}}
+\index{LinearPartCompare@{LinearPartCompare}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int Linear\-Part\-Compare (const void $\ast$ {\em A}, const void $\ast$ {\em B})\hspace{0.3cm}{\tt  [static]}}\label{Lattice_8c_a29}
+
+
+
+
+Definition at line 1407 of file Lattice.c.\index{Lattice.c@{Lattice.c}!LinearPartSort@{LinearPartSort}}
+\index{LinearPartSort@{LinearPartSort}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Linear\-Part\-Sort (Lattice\-Union $\ast$ {\em Head})\hspace{0.3cm}{\tt  [static]}}\label{Lattice_8c_a30}
+
+
+
+
+Definition at line 1430 of file Lattice.c.
+
+Referenced by Lattice\-Simplify().
+
+\index{Lattice.c@{Lattice.c}!MakeDioEqforInter@{MakeDioEqforInter}}
+\index{MakeDioEqforInter@{MakeDioEqforInter}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Matrix$\ast$ Make\-Dio\-Eqfor\-Inter (Lattice $\ast$ {\em A}, Lattice $\ast$ {\em B})\hspace{0.3cm}{\tt  [static]}}\label{Lattice_8c_a17}
+
+
+
+
+Definition at line 553 of file Lattice.c.
+
+Referenced by Lattice\-Intersection().
+
+\index{Lattice.c@{Lattice.c}!MakeDioEqforInter@{MakeDioEqforInter}}
+\index{MakeDioEqforInter@{MakeDioEqforInter}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Matrix$\ast$ Make\-Dio\-Eqfor\-Inter (Matrix $\ast$ {\em A}, Matrix $\ast$ {\em B})\hspace{0.3cm}{\tt  [static]}}\label{Lattice_8c_a15}
+
+
+\index{Lattice.c@{Lattice.c}!PrintLatticeUnion@{PrintLatticeUnion}}
+\index{PrintLatticeUnion@{PrintLatticeUnion}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Print\-Lattice\-Union (FILE $\ast$ {\em fp}, char $\ast$ {\em format}, Lattice\-Union $\ast$ {\em Head})}\label{Lattice_8c_a1}
+
+
+
+
+Definition at line 15 of file Lattice.c.\index{Lattice.c@{Lattice.c}!SameLinearPart@{SameLinearPart}}
+\index{SameLinearPart@{SameLinearPart}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Bool Same\-Linear\-Part (Lattice\-Union $\ast$ {\em A}, Lattice\-Union $\ast$ {\em B})\hspace{0.3cm}{\tt  [static]}}\label{Lattice_8c_a35}
+
+
+
+
+Definition at line 1598 of file Lattice.c.
+
+Referenced by Lattice\-Simplify().
+
+\index{Lattice.c@{Lattice.c}!Simplify@{Simplify}}
+\index{Simplify@{Simplify}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Bool Simplify (Lattice\-Union $\ast$$\ast$ {\em Input\-List}, Lattice\-Union $\ast$$\ast$ {\em Result\-List}, int {\em dim})\hspace{0.3cm}{\tt  [static]}}\label{Lattice_8c_a28}
+
+
+
+
+Definition at line 1284 of file Lattice.c.
+
+Referenced by Affine\-Part\-Simplify().
+
+\index{Lattice.c@{Lattice.c}!SplitLattice@{SplitLattice}}
+\index{SplitLattice@{SplitLattice}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Lattice\-Union$\ast$ Split\-Lattice (Lattice $\ast$ {\em B1}, Lattice $\ast$ {\em B2}, Matrix $\ast$ {\em C})}\label{Lattice_8c_a22}
+
+
+
+
+Definition at line 885 of file Lattice.c.
+
+Referenced by Lattice2Lattice\-Union().
+
+\index{Lattice.c@{Lattice.c}!SplitLattice@{SplitLattice}}
+\index{SplitLattice@{SplitLattice}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Lattice\-Union$\ast$ Split\-Lattice (Matrix $\ast$, Matrix $\ast$, Matrix $\ast$)}\label{Lattice_8c_a19}
+
+
+\index{Lattice.c@{Lattice.c}!allfactors@{allfactors}}
+\index{allfactors@{allfactors}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf factor} allfactors (int {\em num})\hspace{0.3cm}{\tt  [static]}}\label{Lattice_8c_a0}
+
+
+
+
+Definition at line 1655 of file Lattice.c.
+
+Referenced by Simplify().
+
+\index{Lattice.c@{Lattice.c}!intcompare@{intcompare}}
+\index{intcompare@{intcompare}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int intcompare (const void $\ast$ {\em a}, const void $\ast$ {\em b})}\label{Lattice_8c_a37}
+
+
+
+
+Definition at line 1641 of file Lattice.c.\index{Lattice.c@{Lattice.c}!isEmptyLattice@{isEmptyLattice}}
+\index{isEmptyLattice@{isEmptyLattice}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Bool is\-Empty\-Lattice (Lattice $\ast$ {\em A})}\label{Lattice_8c_a6}
+
+
+
+
+Definition at line 101 of file Lattice.c.
+
+Referenced by Integralise\-Lattice(), Lattice2Lattice\-Union(), Lattice\-Difference(), Lattice\-Intersection(), Split\-Zpolyhedron(), ZPolyhedron\-Image(), ZPolyhedron\-Intersection(), ZPolyhedron\-Preimage(), ZPolyhedron\_\-Alloc(), and is\-Empty\-ZPolyhedron().
+
+\index{Lattice.c@{Lattice.c}!isLinear@{isLinear}}
+\index{isLinear@{isLinear}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Bool is\-Linear (Lattice $\ast$ {\em A})}\label{Lattice_8c_a7}
+
+
+
+
+Definition at line 128 of file Lattice.c.
+
+Referenced by Affine\-Hermite().
+
+\index{Lattice.c@{Lattice.c}!isfulldim@{isfulldim}}
+\index{isfulldim@{isfulldim}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Bool isfulldim (Matrix $\ast$ {\em m})}\label{Lattice_8c_a27}
+
+
+
+
+Definition at line 1245 of file Lattice.c.
+
+Referenced by ZPolyhedron\_\-Alloc().
+
+\index{Lattice.c@{Lattice.c}!polylib_sqrt@{polylib\_\-sqrt}}
+\index{polylib_sqrt@{polylib\_\-sqrt}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int polylib\_\-sqrt (int {\em i})\hspace{0.3cm}{\tt  [static]}}\label{Lattice_8c_a38}
+
+
+
+
+Definition at line 1717 of file Lattice.c.
+
+Referenced by allfactors().
+
+\index{Lattice.c@{Lattice.c}!sameAffinepart@{sameAffinepart}}
+\index{sameAffinepart@{sameAffinepart}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Bool same\-Affinepart (Lattice $\ast$ {\em A}, Lattice $\ast$ {\em B})}\label{Lattice_8c_a4}
+
+
+
+
+Definition at line 57 of file Lattice.c.\index{Lattice.c@{Lattice.c}!sameLattice@{sameLattice}}
+\index{sameLattice@{sameLattice}!Lattice.c@{Lattice.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Bool same\-Lattice (Lattice $\ast$ {\em A}, Lattice $\ast$ {\em B})}\label{Lattice_8c_a12}
+
+
+
+
+Definition at line 355 of file Lattice.c.
+
+Referenced by Add\-ZPolyto\-ZDomain(), and Lattice\-Includes().
+

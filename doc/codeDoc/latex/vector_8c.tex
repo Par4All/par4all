@@ -1,0 +1,325 @@
+\section{vector.c File Reference}
+\label{vector_8c}\index{vector.c@{vector.c}}
+{\tt \#include $<$stdio.h$>$}\par
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$polylib/polylib.h$>$}\par
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+void {\bf Factorial} (int {\bf n}, Value $\ast$fact)
+\item 
+void {\bf Binomial} (int {\bf n}, int p, Value $\ast$result)
+\item 
+void {\bf CNP} (int a, int b, Value $\ast$result)
+\item 
+void {\bf Gcd} (Value a, Value b, Value $\ast$result)
+\item 
+int {\bf First\_\-Non\_\-Zero} (Value $\ast$p, unsigned length)
+\item 
+Vector $\ast$ {\bf Vector\_\-Alloc} (unsigned length)
+\item 
+void {\bf Vector\_\-Free} (Vector $\ast$vector)
+\item 
+void {\bf Vector\_\-Print} (FILE $\ast$Dst, char $\ast$Format, Vector $\ast$vector)
+\item 
+Vector $\ast$ {\bf Vector\_\-Read} ()
+\item 
+void {\bf Vector\_\-Set} (Value $\ast$p, int {\bf n}, unsigned length)
+\item 
+void {\bf Vector\_\-Exchange} (Value $\ast$p1, Value $\ast$p2, unsigned length)
+\item 
+void {\bf Vector\_\-Copy} (Value $\ast$p1, Value $\ast$p2, unsigned length)
+\item 
+void {\bf Vector\_\-Add} (Value $\ast$p1, Value $\ast$p2, Value $\ast$p3, unsigned length)
+\item 
+void {\bf Vector\_\-Sub} (Value $\ast$p1, Value $\ast$p2, Value $\ast$p3, unsigned length)
+\item 
+void {\bf Vector\_\-Or} (Value $\ast$p1, Value $\ast$p2, Value $\ast$p3, unsigned length)
+\item 
+void {\bf Vector\_\-Scale} (Value $\ast$p1, Value $\ast$p2, Value lambda, unsigned length)
+\item 
+void {\bf Vector\_\-Anti\-Scale} (Value $\ast$p1, Value $\ast$p2, Value lambda, unsigned length)
+\item 
+void {\bf Inner\_\-Product} (Value $\ast$p1, Value $\ast$p2, unsigned length, Value $\ast$ip)
+\item 
+void {\bf Vector\_\-Max} (Value $\ast$p, unsigned length, Value $\ast$max)
+\item 
+void {\bf Vector\_\-Min} (Value $\ast$p, unsigned length, Value $\ast$min)
+\item 
+void {\bf Vector\_\-Combine} (Value $\ast$p1, Value $\ast$p2, Value $\ast$p3, Value lambda, Value mu, unsigned length)
+\item 
+int {\bf Vector\_\-Equal} (Value $\ast$Vec1, Value $\ast$Vec2, unsigned {\bf n})
+\item 
+void {\bf Vector\_\-Min\_\-Not\_\-Zero} (Value $\ast$p, unsigned length, int $\ast$index, Value $\ast$min)
+\item 
+void {\bf Vector\_\-Gcd} (Value $\ast$p, unsigned length, Value $\ast$min)
+\item 
+void {\bf Vector\_\-Map} (Value $\ast$p1, Value $\ast$p2, Value $\ast$p3, unsigned length, Value $\ast$($\ast$f)())
+\item 
+void {\bf Vector\_\-Normalize} (Value $\ast$p, unsigned length)
+\item 
+void {\bf Vector\_\-Normalize\_\-Positive} (Value $\ast$p, int length, int pos)
+\item 
+void {\bf Vector\_\-Reduce} (Value $\ast$p, unsigned length, void($\ast$f)(Value, Value $\ast$), Value $\ast$r)
+\item 
+void {\bf Vector\_\-Sort} (Value $\ast$vector, unsigned {\bf n})
+\end{CompactItemize}
+
+
+\subsection{Function Documentation}
+\index{vector.c@{vector.c}!Binomial@{Binomial}}
+\index{Binomial@{Binomial}!vector.c@{vector.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Binomial (int {\em n}, int {\em p}, Value $\ast$ {\em result})}\label{vector_8c_a1}
+
+
+
+
+Definition at line 44 of file vector.c.\index{vector.c@{vector.c}!CNP@{CNP}}
+\index{CNP@{CNP}!vector.c@{vector.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void CNP (int {\em a}, int {\em b}, Value $\ast$ {\em result})}\label{vector_8c_a2}
+
+
+
+
+Definition at line 72 of file vector.c.\index{vector.c@{vector.c}!Factorial@{Factorial}}
+\index{Factorial@{Factorial}!vector.c@{vector.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Factorial (int {\em n}, Value $\ast$ {\em fact})}\label{vector_8c_a0}
+
+
+
+
+Definition at line 26 of file vector.c.
+
+Referenced by Binomial().
+
+\index{vector.c@{vector.c}!First_Non_Zero@{First\_\-Non\_\-Zero}}
+\index{First_Non_Zero@{First\_\-Non\_\-Zero}!vector.c@{vector.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int First\_\-Non\_\-Zero (Value $\ast$ {\em p}, unsigned {\em length})}\label{vector_8c_a4}
+
+
+
+
+Definition at line 120 of file vector.c.\index{vector.c@{vector.c}!Gcd@{Gcd}}
+\index{Gcd@{Gcd}!vector.c@{vector.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Gcd (Value {\em a}, Value {\em b}, Value $\ast$ {\em result})}\label{vector_8c_a3}
+
+
+
+
+Definition at line 99 of file vector.c.
+
+Referenced by Calc\-Base(), Combine(), Gauss\-Simplify(), Lcm(), Mat\-Inverse(), Matrix\_\-Inverse(), Orthogonal\_\-Base(), P\_\-Enum(), Print\_\-Vertex(), Scan\_\-Vertices(), Soustraire\_\-ligne(), Test\-Rank(), eadd(), emul(), new\_\-eadd(), old\_\-Polyhedron\_\-Preprocess(), ppcm(), and rat\_\-prodmat().
+
+\index{vector.c@{vector.c}!Inner_Product@{Inner\_\-Product}}
+\index{Inner_Product@{Inner\_\-Product}!vector.c@{vector.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Inner\_\-Product (Value $\ast$ {\em p1}, Value $\ast$ {\em p2}, unsigned {\em length}, Value $\ast$ {\em ip})}\label{vector_8c_a17}
+
+
+
+
+Definition at line 362 of file vector.c.
+
+Referenced by lower\_\-upper\_\-bounds().
+
+\index{vector.c@{vector.c}!Vector_Add@{Vector\_\-Add}}
+\index{Vector_Add@{Vector\_\-Add}!vector.c@{vector.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Vector\_\-Add (Value $\ast$ {\em p1}, Value $\ast$ {\em p2}, Value $\ast$ {\em p3}, unsigned {\em length})}\label{vector_8c_a12}
+
+
+
+
+Definition at line 269 of file vector.c.\index{vector.c@{vector.c}!Vector_Alloc@{Vector\_\-Alloc}}
+\index{Vector_Alloc@{Vector\_\-Alloc}!vector.c@{vector.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Vector$\ast$ Vector\_\-Alloc (unsigned {\em length})}\label{vector_8c_a5}
+
+
+
+
+Definition at line 137 of file vector.c.
+
+Referenced by Orthogonal\_\-Base(), Polyhedron\_\-Image\_\-Enumerate(), Solve\-Diophantine(), and Vector\_\-Read().
+
+\index{vector.c@{vector.c}!Vector_AntiScale@{Vector\_\-AntiScale}}
+\index{Vector_AntiScale@{Vector\_\-AntiScale}!vector.c@{vector.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Vector\_\-Anti\-Scale (Value $\ast$ {\em p1}, Value $\ast$ {\em p2}, Value {\em lambda}, unsigned {\em length})}\label{vector_8c_a16}
+
+
+
+
+Definition at line 344 of file vector.c.\index{vector.c@{vector.c}!Vector_Combine@{Vector\_\-Combine}}
+\index{Vector_Combine@{Vector\_\-Combine}!vector.c@{vector.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Vector\_\-Combine (Value $\ast$ {\em p1}, Value $\ast$ {\em p2}, Value $\ast$ {\em p3}, Value {\em lambda}, Value {\em mu}, unsigned {\em length})}\label{vector_8c_a20}
+
+
+
+
+Definition at line 422 of file vector.c.
+
+Referenced by Combine(), Gauss\-Simplify(), and old\_\-Polyhedron\_\-Preprocess().
+
+\index{vector.c@{vector.c}!Vector_Copy@{Vector\_\-Copy}}
+\index{Vector_Copy@{Vector\_\-Copy}!vector.c@{vector.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Vector\_\-Copy (Value $\ast$ {\em p1}, Value $\ast$ {\em p2}, unsigned {\em length})}\label{vector_8c_a11}
+
+
+
+
+Definition at line 252 of file vector.c.
+
+Referenced by Add\-Constraints(), Add\-Rays(), Chernikova(), Domain\-Simplify(), Find\-Simple(), Find\_\-m\_\-faces(), Polyhedron2Constraints(), Polyhedron2Rays(), Polyhedron\_\-Copy(), Polyhedron\_\-Preprocess(), Remove\_\-Redundants(), Simplify\-Constraints(), Simplify\-Equalities(), Stras\_\-Domain\-Simplify(), Sub\-Constraint(), right\_\-hermite(), and traite\_\-m\_\-face().
+
+\index{vector.c@{vector.c}!Vector_Equal@{Vector\_\-Equal}}
+\index{Vector_Equal@{Vector\_\-Equal}!vector.c@{vector.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int Vector\_\-Equal (Value $\ast$ {\em Vec1}, Value $\ast$ {\em Vec2}, unsigned {\em n})}\label{vector_8c_a21}
+
+
+
+
+Definition at line 453 of file vector.c.\index{vector.c@{vector.c}!Vector_Exchange@{Vector\_\-Exchange}}
+\index{Vector_Exchange@{Vector\_\-Exchange}!vector.c@{vector.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Vector\_\-Exchange (Value $\ast$ {\em p1}, Value $\ast$ {\em p2}, unsigned {\em length})}\label{vector_8c_a10}
+
+
+
+
+Definition at line 239 of file vector.c.
+
+Referenced by Chernikova(), Gauss(), Gauss\-Simplify(), Ray\-Sort(), Remove\_\-Redundants(), and hermite().
+
+\index{vector.c@{vector.c}!Vector_Free@{Vector\_\-Free}}
+\index{Vector_Free@{Vector\_\-Free}!vector.c@{vector.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Vector\_\-Free (Vector $\ast$ {\em vector})}\label{vector_8c_a6}
+
+
+
+
+Definition at line 162 of file vector.c.
+
+Referenced by Lattice\-Intersection(), Lattice\-Preimage(), Polyhedron\_\-Image\_\-Enumerate(), and find\-Hermite\-Basis().
+
+\index{vector.c@{vector.c}!Vector_Gcd@{Vector\_\-Gcd}}
+\index{Vector_Gcd@{Vector\_\-Gcd}!vector.c@{vector.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Vector\_\-Gcd (Value $\ast$ {\em p}, unsigned {\em length}, Value $\ast$ {\em min})}\label{vector_8c_a23}
+
+
+
+
+Definition at line 513 of file vector.c.
+
+Referenced by Gauss(), Gauss\-Simplify(), Mat\-Inverse(), Matrix\_\-Inverse(), Orthogonal\_\-Base(), Vector\_\-Normalize(), and Vector\_\-Normalize\_\-Positive().
+
+\index{vector.c@{vector.c}!Vector_Map@{Vector\_\-Map}}
+\index{Vector_Map@{Vector\_\-Map}!vector.c@{vector.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Vector\_\-Map (Value $\ast$ {\em p1}, Value $\ast$ {\em p2}, Value $\ast$ {\em p3}, unsigned {\em length}, Value $\ast$($\ast$ {\em f})())}\label{vector_8c_a24}
+
+
+
+
+Definition at line 562 of file vector.c.\index{vector.c@{vector.c}!Vector_Max@{Vector\_\-Max}}
+\index{Vector_Max@{Vector\_\-Max}!vector.c@{vector.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Vector\_\-Max (Value $\ast$ {\em p}, unsigned {\em length}, Value $\ast$ {\em max})}\label{vector_8c_a18}
+
+
+
+
+Definition at line 385 of file vector.c.\index{vector.c@{vector.c}!Vector_Min@{Vector\_\-Min}}
+\index{Vector_Min@{Vector\_\-Min}!vector.c@{vector.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Vector\_\-Min (Value $\ast$ {\em p}, unsigned {\em length}, Value $\ast$ {\em min})}\label{vector_8c_a19}
+
+
+
+
+Definition at line 402 of file vector.c.\index{vector.c@{vector.c}!Vector_Min_Not_Zero@{Vector\_\-Min\_\-Not\_\-Zero}}
+\index{Vector_Min_Not_Zero@{Vector\_\-Min\_\-Not\_\-Zero}!vector.c@{vector.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Vector\_\-Min\_\-Not\_\-Zero (Value $\ast$ {\em p}, unsigned {\em length}, int $\ast$ {\em index}, Value $\ast$ {\em min})}\label{vector_8c_a22}
+
+
+
+
+Definition at line 475 of file vector.c.
+
+Referenced by Vector\_\-Gcd().
+
+\index{vector.c@{vector.c}!Vector_Normalize@{Vector\_\-Normalize}}
+\index{Vector_Normalize@{Vector\_\-Normalize}!vector.c@{vector.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Vector\_\-Normalize (Value $\ast$ {\em p}, unsigned {\em length})}\label{vector_8c_a25}
+
+
+
+
+Definition at line 582 of file vector.c.
+
+Referenced by Combine(), Gauss\-Simplify(), and old\_\-Polyhedron\_\-Preprocess().
+
+\index{vector.c@{vector.c}!Vector_Normalize_Positive@{Vector\_\-Normalize\_\-Positive}}
+\index{Vector_Normalize_Positive@{Vector\_\-Normalize\_\-Positive}!vector.c@{vector.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Vector\_\-Normalize\_\-Positive (Value $\ast$ {\em p}, int {\em length}, int {\em pos})}\label{vector_8c_a26}
+
+
+
+
+Definition at line 610 of file vector.c.
+
+Referenced by Mat\-Inverse(), and rat\_\-prodmat().
+
+\index{vector.c@{vector.c}!Vector_Or@{Vector\_\-Or}}
+\index{Vector_Or@{Vector\_\-Or}!vector.c@{vector.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Vector\_\-Or (Value $\ast$ {\em p1}, Value $\ast$ {\em p2}, Value $\ast$ {\em p3}, unsigned {\em length})}\label{vector_8c_a14}
+
+
+
+
+Definition at line 307 of file vector.c.\index{vector.c@{vector.c}!Vector_Print@{Vector\_\-Print}}
+\index{Vector_Print@{Vector\_\-Print}!vector.c@{vector.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Vector\_\-Print (FILE $\ast$ {\em Dst}, char $\ast$ {\em Format}, Vector $\ast$ {\em vector})}\label{vector_8c_a7}
+
+
+
+
+Definition at line 176 of file vector.c.\index{vector.c@{vector.c}!Vector_Read@{Vector\_\-Read}}
+\index{Vector_Read@{Vector\_\-Read}!vector.c@{vector.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Vector$\ast$ Vector\_\-Read ()}\label{vector_8c_a8}
+
+
+
+
+Definition at line 198 of file vector.c.\index{vector.c@{vector.c}!Vector_Reduce@{Vector\_\-Reduce}}
+\index{Vector_Reduce@{Vector\_\-Reduce}!vector.c@{vector.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Vector\_\-Reduce (Value $\ast$ {\em p}, unsigned {\em length}, void($\ast$ {\em f})(Value, Value $\ast$), Value $\ast$ {\em r})}\label{vector_8c_a27}
+
+
+
+
+Definition at line 630 of file vector.c.\index{vector.c@{vector.c}!Vector_Scale@{Vector\_\-Scale}}
+\index{Vector_Scale@{Vector\_\-Scale}!vector.c@{vector.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Vector\_\-Scale (Value $\ast$ {\em p1}, Value $\ast$ {\em p2}, Value {\em lambda}, unsigned {\em length})}\label{vector_8c_a15}
+
+
+
+
+Definition at line 326 of file vector.c.\index{vector.c@{vector.c}!Vector_Set@{Vector\_\-Set}}
+\index{Vector_Set@{Vector\_\-Set}!vector.c@{vector.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Vector\_\-Set (Value $\ast$ {\em p}, int {\em n}, unsigned {\em length})}\label{vector_8c_a9}
+
+
+
+
+Definition at line 223 of file vector.c.
+
+Referenced by Constraints2Polyhedron(), Empty\_\-Polyhedron(), Enumerate\_\-No\-Parameters(), Find\-Simple(), Find\_\-m\_\-faces(), Mat\-Inverse(), Matrix\_\-Inverse(), Polyhedron\-LTQ(), Polyhedron\_\-Enumerate(), Polyhedron\_\-Not\_\-Empty(), Polyhedron\_\-Scan(), Rays2Polyhedron(), Remove\_\-Redundants(), Universe\_\-Polyhedron(), align\_\-context(), left\_\-hermite(), and right\_\-hermite().
+
+\index{vector.c@{vector.c}!Vector_Sort@{Vector\_\-Sort}}
+\index{Vector_Sort@{Vector\_\-Sort}!vector.c@{vector.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Vector\_\-Sort (Value $\ast$ {\em vector}, unsigned {\em n})}\label{vector_8c_a28}
+
+
+
+
+Definition at line 646 of file vector.c.\index{vector.c@{vector.c}!Vector_Sub@{Vector\_\-Sub}}
+\index{Vector_Sub@{Vector\_\-Sub}!vector.c@{vector.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Vector\_\-Sub (Value $\ast$ {\em p1}, Value $\ast$ {\em p2}, Value $\ast$ {\em p3}, unsigned {\em length})}\label{vector_8c_a13}
+
+
+
+
+Definition at line 288 of file vector.c.

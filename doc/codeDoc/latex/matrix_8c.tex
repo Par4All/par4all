@@ -1,0 +1,176 @@
+\section{matrix.c File Reference}
+\label{matrix_8c}\index{matrix.c@{matrix.c}}
+{\tt \#include $<$stdio.h$>$}\par
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$string.h$>$}\par
+{\tt \#include $<$ctype.h$>$}\par
+{\tt \#include $<$polylib/polylib.h$>$}\par
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+Matrix $\ast$ {\bf Matrix\_\-Alloc} (unsigned Nb\-Rows, unsigned Nb\-Columns)
+\item 
+void {\bf Matrix\_\-Free} (Matrix $\ast$Mat)
+\item 
+void {\bf Matrix\_\-Print} (FILE $\ast$Dst, char $\ast$Format, Matrix $\ast$Mat)
+\item 
+void {\bf Matrix\_\-Read\_\-Input} (Matrix $\ast$Mat)
+\item 
+Matrix $\ast$ {\bf Matrix\_\-Read} (void)
+\item 
+int {\bf hermite} (Matrix $\ast$H, Matrix $\ast$U, Matrix $\ast$Q)
+\item 
+void {\bf right\_\-hermite} (Matrix $\ast$A, Matrix $\ast$$\ast$Hp, Matrix $\ast$$\ast$Up, Matrix $\ast$$\ast$Qp)
+\item 
+void {\bf left\_\-hermite} (Matrix $\ast$A, Matrix $\ast$$\ast$Hp, Matrix $\ast$$\ast$Qp, Matrix $\ast$$\ast$Up)
+\item 
+int {\bf Mat\-Inverse} (Matrix $\ast$Mat, Matrix $\ast$Mat\-Inv)
+\item 
+void {\bf rat\_\-prodmat} (Matrix $\ast$S, Matrix $\ast$X, Matrix $\ast$P)
+\item 
+void {\bf Matrix\_\-Vector\_\-Product} (Matrix $\ast$Mat, Value $\ast$p1, Value $\ast$p2)
+\item 
+void {\bf Vector\_\-Matrix\_\-Product} (Value $\ast$p1, Matrix $\ast$Mat, Value $\ast$p2)
+\item 
+void {\bf Matrix\_\-Product} (Matrix $\ast$Mat1, Matrix $\ast$Mat2, Matrix $\ast$Mat3)
+\item 
+int {\bf Matrix\_\-Inverse} (Matrix $\ast$Mat, Matrix $\ast$Mat\-Inv)
+\end{CompactItemize}
+
+
+\subsection{Function Documentation}
+\index{matrix.c@{matrix.c}!MatInverse@{MatInverse}}
+\index{MatInverse@{MatInverse}!matrix.c@{matrix.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int Mat\-Inverse (Matrix $\ast$ {\em Mat}, Matrix $\ast$ {\em Mat\-Inv})}\label{matrix_8c_a8}
+
+
+
+
+Definition at line 556 of file matrix.c.
+
+Referenced by traite\_\-m\_\-face().
+
+\index{matrix.c@{matrix.c}!Matrix_Alloc@{Matrix\_\-Alloc}}
+\index{Matrix_Alloc@{Matrix\_\-Alloc}!matrix.c@{matrix.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Matrix$\ast$ Matrix\_\-Alloc (unsigned {\em Nb\-Rows}, unsigned {\em Nb\-Columns})}\label{matrix_8c_a0}
+
+
+
+
+Definition at line 28 of file matrix.c.
+
+Referenced by Add\-ANull\-Column(), Add\-ANull\-Row(), Add\-Constraints(), Add\-Rays(), Add\-ZPolyto\-ZDomain(), Affine\-Smith(), Calc\-Base(), Canonical\-Form(), Change\-Lattice\-Dimension(), Constraints2Polyhedron(), Convert\-Dar\-Matto\-Pol\-Mat(), Domain\-Simplify(), Elim\_\-Columns(), Empty\-Lattice(), Extract\-Linear\-Part(), Find\-Hermite\-Basisof\-Domain(), Find\-Simple(), Find\_\-m\_\-faces(), Gen\-Param\-Polyhedron(), Identity(), Lattice2Lattice\-Union(), Lattice\-Image(), Lattice\-Intersection(), Lattice\-Preimage(), Make\-Dio\-Eqfor\-Inter(), Matrix\_\-Copy(), Matrix\_\-Read(), Orthogonal\_\-Base(), P\_\-Enum(), Polyhedron2Constraints(), Polyhedron2Rays(), Polyhedron\-LTQ(), Polyhedron\_\-Image(), Polyhedron\_\-Image\_\-Enumerate(), Polyhedron\_\-Preimage(), Polyhedron\_\-Preprocess(), Polyhedron\_\-Preprocess2(), Polyhedron\_\-Scan(), Pre\-Elim\_\-Columns(), Rays2Polyhedron(), Rearrange\-Matfor\-Solve\-Dio(), Remove\-Column(), Remove\-Row(), Simplify\-Constraints(), Simplify\-Equalities(), Smith(), Solve\-Diophantine(), Stras\_\-Domain\-Simplify(), Sub\-Constraint(), Transpose(), Union\_\-Read(), Vertex\-CT(), align\_\-context(), find\-Hermite\-Basis(), left\_\-hermite(), old\_\-Polyhedron\_\-Preprocess(), right\_\-hermite(), and traite\_\-m\_\-face().
+
+\index{matrix.c@{matrix.c}!Matrix_Free@{Matrix\_\-Free}}
+\index{Matrix_Free@{Matrix\_\-Free}!matrix.c@{matrix.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Matrix\_\-Free (Matrix $\ast$ {\em Mat})}\label{matrix_8c_a1}
+
+
+
+
+Definition at line 85 of file matrix.c.
+
+Referenced by Add\-Constraints(), Add\-Lattice(), Add\-Rays(), Add\-ZPolyto\-ZDomain(), Affine\-Hermite(), Affine\-Smith(), Canonical\-Form(), Constraints2Polyhedron(), Domain\-Simplify(), Elim\_\-Columns(), Empty\-ZPolyhedron(), Find\-Hermite\-Basisof\-Domain(), Find\-Simple(), Find\_\-m\_\-faces(), Hermite(), Integralise\-Lattice(), Lattice2Lattice\-Union(), Lattice\-Difference(), Lattice\-Image(), Lattice\-Includes(), Lattice\-Intersection(), Lattice\-Preimage(), Lattice\-Union\_\-Free(), P\_\-Enum(), Param\_\-Vertices\_\-Free(), Polyhedron\-LTQ(), Polyhedron\_\-Image(), Polyhedron\_\-Image\_\-Enumerate(), Polyhedron\_\-Preimage(), Polyhedron\_\-Preprocess(), Polyhedron\_\-Preprocess2(), Polyhedron\_\-Scan(), Rays2Polyhedron(), Rearrange\-Matfor\-Solve\-Dio(), Scan\_\-Vertices(), Simplify(), Simplify\-Constraints(), Simplify\-Equalities(), Smith(), Solve\-Diophantine(), Split\-Zpolyhedron(), Stras\_\-Domain\-Simplify(), Sub\-Constraint(), Union\_\-Read(), ZPolyhedron\-Difference(), ZPolyhedron\-Image(), ZPolyhedron\-Intersection(), ZPolyhedron\-Preimage(), ZPolyhedron\_\-Free(), align\_\-context(), find\-Hermite\-Basis(), isfulldim(), isin\-Hnf(), left\_\-hermite(), old\_\-Polyhedron\_\-Preprocess(), and same\-Lattice().
+
+\index{matrix.c@{matrix.c}!Matrix_Inverse@{Matrix\_\-Inverse}}
+\index{Matrix_Inverse@{Matrix\_\-Inverse}!matrix.c@{matrix.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int Matrix\_\-Inverse (Matrix $\ast$ {\em Mat}, Matrix $\ast$ {\em Mat\-Inv})}\label{matrix_8c_a13}
+
+
+
+
+Definition at line 873 of file matrix.c.
+
+Referenced by Affine\-Smith(), Canonical\-Form(), Find\-Hermite\-Basisof\-Domain(), Lattice2Lattice\-Union(), Lattice\-Image(), Smith(), and Solve\-Diophantine().
+
+\index{matrix.c@{matrix.c}!Matrix_Print@{Matrix\_\-Print}}
+\index{Matrix_Print@{Matrix\_\-Print}!matrix.c@{matrix.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Matrix\_\-Print (FILE $\ast$ {\em Dst}, char $\ast$ {\em Format}, Matrix $\ast$ {\em Mat})}\label{matrix_8c_a2}
+
+
+
+
+Definition at line 109 of file matrix.c.
+
+Referenced by Chernikova(), Constraints2Polyhedron(), Elim\_\-Columns(), Find\_\-m\_\-faces(), Gauss(), P\_\-Enum(), Polyhedron\-LTQ(), Polyhedron\_\-Image\_\-Enumerate(), Polyhedron\_\-Preprocess(), Polyhedron\_\-Preprocess2(), Pre\-Elim\_\-Columns(), Print\-Lattice\-Union(), Rays2Polyhedron(), Remove\_\-Redundants(), ZPolyhedron\-Print(), hermite(), and traite\_\-m\_\-face().
+
+\index{matrix.c@{matrix.c}!Matrix_Product@{Matrix\_\-Product}}
+\index{Matrix_Product@{Matrix\_\-Product}!matrix.c@{matrix.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Matrix\_\-Product (Matrix $\ast$ {\em Mat1}, Matrix $\ast$ {\em Mat2}, Matrix $\ast$ {\em Mat3})}\label{matrix_8c_a12}
+
+
+
+
+Definition at line 825 of file matrix.c.
+
+Referenced by Add\-ZPolyto\-ZDomain(), Canonical\-Form(), Find\-Hermite\-Basisof\-Domain(), Lattice2Lattice\-Union(), and Lattice\-Image().
+
+\index{matrix.c@{matrix.c}!Matrix_Read@{Matrix\_\-Read}}
+\index{Matrix_Read@{Matrix\_\-Read}!matrix.c@{matrix.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Matrix$\ast$ Matrix\_\-Read (void)}\label{matrix_8c_a4}
+
+
+
+
+Definition at line 170 of file matrix.c.
+
+Referenced by Union\_\-Read().
+
+\index{matrix.c@{matrix.c}!Matrix_Read_Input@{Matrix\_\-Read\_\-Input}}
+\index{Matrix_Read_Input@{Matrix\_\-Read\_\-Input}!matrix.c@{matrix.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Matrix\_\-Read\_\-Input (Matrix $\ast$ {\em Mat})}\label{matrix_8c_a3}
+
+
+
+
+Definition at line 133 of file matrix.c.
+
+Referenced by Matrix\_\-Read(), and Union\_\-Read().
+
+\index{matrix.c@{matrix.c}!Matrix_Vector_Product@{Matrix\_\-Vector\_\-Product}}
+\index{Matrix_Vector_Product@{Matrix\_\-Vector\_\-Product}!matrix.c@{matrix.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Matrix\_\-Vector\_\-Product (Matrix $\ast$ {\em Mat}, Value $\ast$ {\em p1}, Value $\ast$ {\em p2})}\label{matrix_8c_a10}
+
+
+
+
+Definition at line 753 of file matrix.c.\index{matrix.c@{matrix.c}!Vector_Matrix_Product@{Vector\_\-Matrix\_\-Product}}
+\index{Vector_Matrix_Product@{Vector\_\-Matrix\_\-Product}!matrix.c@{matrix.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Vector\_\-Matrix\_\-Product (Value $\ast$ {\em p1}, Matrix $\ast$ {\em Mat}, Value $\ast$ {\em p2})}\label{matrix_8c_a11}
+
+
+
+
+Definition at line 791 of file matrix.c.\index{matrix.c@{matrix.c}!hermite@{hermite}}
+\index{hermite@{hermite}!matrix.c@{matrix.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int hermite (Matrix $\ast$ {\em H}, Matrix $\ast$ {\em U}, Matrix $\ast$ {\em Q})\hspace{0.3cm}{\tt  [static]}}\label{matrix_8c_a5}
+
+
+
+
+Definition at line 192 of file matrix.c.\index{matrix.c@{matrix.c}!left_hermite@{left\_\-hermite}}
+\index{left_hermite@{left\_\-hermite}!matrix.c@{matrix.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void left\_\-hermite (Matrix $\ast$ {\em A}, Matrix $\ast$$\ast$ {\em Hp}, Matrix $\ast$$\ast$ {\em Qp}, Matrix $\ast$$\ast$ {\em Up})}\label{matrix_8c_a7}
+
+
+
+
+Definition at line 471 of file matrix.c.\index{matrix.c@{matrix.c}!rat_prodmat@{rat\_\-prodmat}}
+\index{rat_prodmat@{rat\_\-prodmat}!matrix.c@{matrix.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void rat\_\-prodmat (Matrix $\ast$ {\em S}, Matrix $\ast$ {\em X}, Matrix $\ast$ {\em P})}\label{matrix_8c_a9}
+
+
+
+
+Definition at line 684 of file matrix.c.
+
+Referenced by traite\_\-m\_\-face().
+
+\index{matrix.c@{matrix.c}!right_hermite@{right\_\-hermite}}
+\index{right_hermite@{right\_\-hermite}!matrix.c@{matrix.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void right\_\-hermite (Matrix $\ast$ {\em A}, Matrix $\ast$$\ast$ {\em Hp}, Matrix $\ast$$\ast$ {\em Up}, Matrix $\ast$$\ast$ {\em Qp})}\label{matrix_8c_a6}
+
+
+
+
+Definition at line 401 of file matrix.c.

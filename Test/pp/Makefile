@@ -1,0 +1,38 @@
+#
+# $Id: Makefile,v 1.1 2002/10/14 15:27:53 olaru Exp $
+#
+
+ROOT  = ../..
+
+PP =  \
+	c6.in \
+	c7.in \
+	c10.in
+
+	#c5.in \
+#	c4.in \
+#	c9.in \
+
+test:
+	@failedtest=0; \
+	for x in $(PP) ; do \
+		echo "Verify file $$x"; \
+		$(ROOT)/bin/polytest.exec < $$x > xyz;\
+		diff -w xyz `basename $$x .in`.out ; \
+		result=$$?; \
+		if [ "$$result" -eq "1" ]; then \
+			echo "Error: $$x is not the same"; \
+			failedtest=`expr $$failedtest + 1`; \
+		else \
+			echo "$$x passed"; \
+	        fi; \
+	done ; \
+        if [ $$failedtest != 0 ]; then \
+		echo "$$failedtest tests failed"; \
+	else \
+	        echo "Test pp works correctly"; \
+        fi
+
+# Include the shared compilation rules
+include $(ROOT)/vars.mk
+include $(ROOT)/default_functions.mk

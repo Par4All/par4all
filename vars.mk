@@ -1,33 +1,6 @@
-# Modified by Vincent Loechner, may 2000.
 
-# Copyright (c) 2000 The Regents of the University of California.
-# All rights reserved.
-# Permission is hereby granted, without written agreement and without
-# license or royalty fees, to use, copy, modify, and distribute this
-# software and its documentation for any purpose, provided that the above
-# copyright notice and the following two paragraphs appear in all copies
-# of this software.
-#
-# IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO ANY PARTY
-# FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES
-# ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF
-# THE UNIVERSITY OF CALIFORNIA HAS BEEN ADVISED OF THE POSSIBILITY OF
-# SUCH DAMAGE.
-#
-# THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
-# INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE SOFTWARE
-# PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND THE UNIVERSITY OF
-# CALIFORNIA HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
-# ENHANCEMENTS, OR MODIFICATIONS.
-#
-#                                        PT_COPYRIGHT_VERSION_2
-#                                        COPYRIGHTENDKEY
-#
-# Version identification:
-# $Id: vars.mk,v 1.19 2002/09/25 15:11:36 loechner Exp $
-# Date of creation: 7/31/96
-# Author: Bart Kienhuis
+# @Author: Bart Kienhuis
+# $Id: vars.mk,v 1.21 2002/10/14 14:05:38 olaru Exp $
 
 VERSION = 5.11.1
 
@@ -35,7 +8,7 @@ VERSION = 5.11.1
 # edit vars.mk.in, which is read by configure
 
 # Default top-level directory.
-prefix =	/usr
+prefix =	/home/kienhuis/projects/work/Polylib/Polylib
 
 # Usually the same as prefix. 
 # exec_prefix is part of the autoconf standard.
@@ -78,13 +51,13 @@ GMP_BITS = gmp
 INSTALL_LIB = install-static install-shared
 
 # Commands used to install scripts and data
-INSTALL =		/usr/bin/install -c
+INSTALL =		/usr/bin/ginstall -c
 INSTALL_PROGRAM =	${INSTALL}
 INSTALL_DATA =		${INSTALL} -m 644
 
 ## GNU-MP stuff
-EXTRA_INCLUDES=
-EXTRA_LIBS=-lgmp 
+EXTRA_INCLUDES=-I/home/kienhuis/projects/gmp-3.1.1/include
+EXTRA_LIBS=-L/home/kienhuis/projects/gmp-3.1.1/lib -lgmp 
 
 # Platform specific variables
 OSTYPE	= linux-gnu
@@ -93,14 +66,6 @@ BUILD   = i686
 
 
 EXEC_EXTRA_SUFFIX = 
-
-## make install puts everything here: relays on --prefix 
-INSTALLDIR = /usr
-BINDIR = $(INSTALLDIR)/bin
-LIBDIR = $(INSTALLDIR)/lib
-INCLUDEDIR = $(INSTALLDIR)/include
-MANDIR = $(INSTALLDIR)/man
-DOCSDIR = $(INSTALLDIR)/doc/packages/polylib-$(VERSION)
 
 # When compiling the tests, we need to link additional libraries
 # include polylib
@@ -116,26 +81,38 @@ AFLAGS=-DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY			-DLINEAR_VAL
 OBJ_DIR = Obj.$(BITS).$(BUILD)-$(HOST)-$(OSTYPE)
 LIB = $(OBJ_DIR)/$(PSTATIC)
 EXEC_EXTRA_LIBS = $(LIB)
+CFLAGS +=  $(EXTRA_INCLUDE) $(AFLAGS) $(EXTRA_FLAGS) -I $(ROOT)/include
 
-POLYLIB_INC = ./include/polylib
-POLYLIB_SRC = ./source
-ARITH_DIR = ./ArithLib
-CFLAGS +=  $(EXTRA_INCLUDE) $(AFLAGS) $(EXTRA_FLAGS) 
-
-PSTATIC = libpolylib$(BITS).a.$(VERSION)
-PSHARED =  libpolylib$(BITS).$(SHEXT).$(VERSION)
 
 ############################################################
-# Variables to be used in a used makefile 
+# Documentation Generation 
 ############################################################
-# POLYLIBDIR must be set by the Makefile calling vars.mk
-#POLYLIBDIR=./
-###########################################################
-CFLAGS += -I $(POLYLIBDIR)/include
-POLYOBJDIR=$(POLYLIBDIR)/$(OBJ_DIR)
-POLYOBJS = $(POLYOBJDIR)/Lattice.o  $(POLYOBJDIR)/Zpolyhedron.o \
-	 $(POLYOBJDIR)/errormsg.o  $(POLYOBJDIR)/Matop.o \
-	     $(POLYOBJDIR)/eval_ehrhart.o  $(POLYOBJDIR)/polyhedron.o \
-	 $(POLYOBJDIR)/vector.o $(POLYOBJDIR)/NormalForms.o \
-	$(POLYOBJDIR)/SolveDio.o      $(POLYOBJDIR)/matrix.o \
-	$(POLYOBJDIR)/errors.o
+
+DOXYGEN = /usr/local/src/doxygen-1.2.11.1/
+
+############################################################
+# Library Definitions
+############################################################
+
+STATIC_LIB = libpolylib$(BITS).a
+SHARED_LIB = libpolylib$(BITS).$(SHEXT)
+
+PSTATIC = $(STATIC_LIB).$(VERSION)
+PSHARED = $(SHARED_LIB).$(VERSION)
+
+############################################################
+# Install Definitions
+############################################################
+
+INSTALLDIR = ${prefix}
+BINDIR = $(INSTALLDIR)/bin
+LIBDIR = $(INSTALLDIR)/lib
+INCLUDEDIR = $(INSTALLDIR)/include
+MANDIR = $(INSTALLDIR)/man
+DOCSDIR = $(INSTALLDIR)/doc/packages/polylib-$(VERSION)
+
+############################################################
+# Shell script to create required directories
+############################################################
+
+mkinstalldirs = $(SHELL) ./mkinstalldirs

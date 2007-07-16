@@ -247,10 +247,20 @@ AC_ARG_WITH(ldconfig-cache, [ --with-ldconfig-cache=FILE Run ldconfig -C <FILE>]
 		LDCONFIG="$LDCONFIG -C $withval"
 	fi])
 
+dnl /********************************************************************/
+dnl Check for DOXYGEN package
+AC_ARG_WITH(doxygen, [ --with-doxygen            DIR Location of the Doxygen Distribution (http://www.doxygen.org)], doxygen_package=$withval)
 
-dnl /*****************************************************************************/
+dnl AC_MSG_CHECKING(for Doxygen program)
+AC_CHECK_PROG(DOXYGEN,doxygen,$withval,test,[$PATH:$doxygen_package/bin:/usr/local/bin])
+dnl AC_MSG_RESULT($DOXYGEN)
+
+
+
+
+dnl /********************************************************************/
 dnl Check for GMP library
-AC_ARG_WITH(libgmp, [ --with-libgmp            DIR Location of the GMP Distribution], gmp_package=$withval,gmp_package=yes)
+AC_ARG_WITH(libgmp, [ --with-libgmp            DIR Location of the GMP Distribution], gmp_package=$withval,gmp_package=yes)	
 
 EXTRA_LIBS=
 EXTRA_INCLUDE=
@@ -329,6 +339,9 @@ AC_SUBST(EXEC_EXTRA_LIBS)
 
 dnl Used with CYGWIN platform
 AC_SUBST(EXTRA_FLAGS)
+
+dnl Used with doxygen
+AC_SUBST(DOXYGEN)
 
 
 AC_OUTPUT(vars.mk)

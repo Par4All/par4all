@@ -1,5 +1,5 @@
 /* 
- * $Id: arithmetic_errors.h,v 1.1 2001/07/16 15:01:22 risset Exp $
+ * $Id: arithmetic_errors.h,v 1.3 2002/10/14 14:56:31 olaru Exp $
  *
  * managing arithmetic errors...
  * detecting and managing arithmetic errors on Values should be
@@ -9,8 +9,11 @@
  * (c) CA et FC, Sept 1997
  *
  * $Log: arithmetic_errors.h,v $
- * Revision 1.1  2001/07/16 15:01:22  risset
- * Initial revision
+ * Revision 1.3  2002/10/14 14:56:31  olaru
+ * New structurated version
+ *
+ * Revision 1.1.1.1  2001/07/16 15:01:22  risset
+ * initial import into CVS
  *
  * Revision 1.29  2000/07/27 15:01:55  coelho
  * hop.

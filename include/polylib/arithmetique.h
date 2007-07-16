@@ -4,7 +4,7 @@
 
 /* package arithmetique
  *
- * $Id: arithmetique.h,v 1.3 2002/08/19 12:14:50 loechner Exp $
+ * $Id: arithmetique.h,v 1.5 2002/10/14 14:56:31 olaru Exp $
  *
  * Francois Irigoin, mai 1989
  *

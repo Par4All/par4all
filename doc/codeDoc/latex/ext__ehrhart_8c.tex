@@ -1,0 +1,282 @@
+\section{ext\_\-ehrhart.c File Reference}
+\label{ext__ehrhart_8c}\index{ext_ehrhart.c@{ext\_\-ehrhart.c}}
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$polylib/polylib.h$>$}\par
+\subsection*{Compounds}
+\begin{CompactItemize}
+\item 
+struct {\bf \_\-Polyhedron\_\-union}
+\end{CompactItemize}
+\subsection*{Defines}
+\begin{CompactItemize}
+\item 
+\#define {\bf WS}\ 200
+\end{CompactItemize}
+\subsection*{Typedefs}
+\begin{CompactItemize}
+\item 
+typedef {\bf \_\-Polyhedron\_\-union} {\bf Polyhedron\_\-union}
+\end{CompactItemize}
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+int {\bf ppcm1} (int a, int b)
+\item 
+Matrix $\ast$ {\bf Calc\-Base} (Matrix $\ast$R)
+\item 
+void {\bf Soustraire\_\-ligne} (Matrix $\ast$R, int l1, int l2, int piv)
+\item 
+int {\bf existepivot} (Matrix $\ast$R, int l)
+\item 
+void {\bf swap\_\-line} (Matrix $\ast$R, int l1, int l2)
+\item 
+int {\bf pgcd1} (int a, int b)
+\item 
+void {\bf new\_\-eadd} (evalue $\ast$e1, evalue $\ast$res)
+\item 
+Matrix $\ast$ {\bf Reduce\_\-Matrix} (Matrix $\ast$Mat)
+\item 
+void {\bf Scalar\_\-product} (Value $\ast$p1, Value $\ast$p2, unsigned length, Value $\ast$r)
+\item 
+void {\bf ppcm} (Value a, Value b, Value $\ast$r)
+\item 
+Matrix $\ast$ {\bf Orthogonal\_\-Base} (Matrix $\ast$Mat)
+\item 
+void {\bf Remove\_\-Element} (Enumeration $\ast$en, Enumeration $\ast$$\ast$re, Enumeration $\ast$prev)
+\item 
+void {\bf Remove\_\-Redundant\-Domains} (Enumeration $\ast$$\ast$Ures)
+\item 
+int {\bf Include\-In\-Res} (Polyhedron $\ast$p, Enumeration $\ast$e, unsigned MR)
+\item 
+Polyhedron $\ast$ {\bf DMUnion} (Enumeration $\ast$en, unsigned MR)
+\item 
+void {\bf Aff\-Constraints} (Polyhedron $\ast$Poldisj)
+\item 
+int {\bf Degenerate} (Enumeration $\ast$en)
+\item 
+Enumeration $\ast$ {\bf Domain\_\-Enumerate} (Polyhedron $\ast$D, Polyhedron $\ast$C, unsigned MAXRAYS, char $\ast$$\ast$pn)
+\item 
+Enumeration $\ast$ {\bf Polyhedron\_\-Image\_\-Enumerate} (Polyhedron $\ast$D, Polyhedron $\ast$C, Matrix $\ast$T, unsigned MAXRAYS, char $\ast$$\ast$par\_\-name)
+\end{CompactItemize}
+
+
+\subsection{Define Documentation}
+\index{ext_ehrhart.c@{ext\_\-ehrhart.c}!WS@{WS}}
+\index{WS@{WS}!ext_ehrhart.c@{ext\_\-ehrhart.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define WS\ 200}\label{ext__ehrhart_8c_a0}
+
+
+
+
+Definition at line 4 of file ext\_\-ehrhart.c.
+
+\subsection{Typedef Documentation}
+\index{ext_ehrhart.c@{ext\_\-ehrhart.c}!Polyhedron_union@{Polyhedron\_\-union}}
+\index{Polyhedron_union@{Polyhedron\_\-union}!ext_ehrhart.c@{ext\_\-ehrhart.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}typedef struct {\bf \_\-Polyhedron\_\-union}  Polyhedron\_\-union}\label{ext__ehrhart_8c_a1}
+
+
+
+
+\subsection{Function Documentation}
+\index{ext_ehrhart.c@{ext\_\-ehrhart.c}!AffConstraints@{AffConstraints}}
+\index{AffConstraints@{AffConstraints}!ext_ehrhart.c@{ext\_\-ehrhart.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Aff\-Constraints (Polyhedron $\ast$ {\em Poldisj})}\label{ext__ehrhart_8c_a17}
+
+
+
+
+Definition at line 687 of file ext\_\-ehrhart.c.
+
+Referenced by Domain\_\-Enumerate(), and Polyhedron\_\-Image\_\-Enumerate().
+
+\index{ext_ehrhart.c@{ext\_\-ehrhart.c}!CalcBase@{CalcBase}}
+\index{CalcBase@{CalcBase}!ext_ehrhart.c@{ext\_\-ehrhart.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Matrix $\ast$ Calc\-Base (Matrix $\ast$ {\em R})}\label{ext__ehrhart_8c_a3}
+
+
+
+
+Definition at line 29 of file ext\_\-ehrhart.c.
+
+Referenced by Polyhedron\_\-Image\_\-Enumerate().
+
+\index{ext_ehrhart.c@{ext\_\-ehrhart.c}!DMUnion@{DMUnion}}
+\index{DMUnion@{DMUnion}!ext_ehrhart.c@{ext\_\-ehrhart.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Polyhedron$\ast$ DMUnion (Enumeration $\ast$ {\em en}, unsigned {\em MR})}\label{ext__ehrhart_8c_a16}
+
+
+
+
+Definition at line 675 of file ext\_\-ehrhart.c.
+
+Referenced by Domain\_\-Enumerate().
+
+\index{ext_ehrhart.c@{ext\_\-ehrhart.c}!Degenerate@{Degenerate}}
+\index{Degenerate@{Degenerate}!ext_ehrhart.c@{ext\_\-ehrhart.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int Degenerate (Enumeration $\ast$ {\em en})}\label{ext__ehrhart_8c_a18}
+
+
+
+
+Definition at line 697 of file ext\_\-ehrhart.c.
+
+Referenced by Domain\_\-Enumerate().
+
+\index{ext_ehrhart.c@{ext\_\-ehrhart.c}!Domain_Enumerate@{Domain\_\-Enumerate}}
+\index{Domain_Enumerate@{Domain\_\-Enumerate}!ext_ehrhart.c@{ext\_\-ehrhart.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Enumeration$\ast$ Domain\_\-Enumerate (Polyhedron $\ast$ {\em D}, Polyhedron $\ast$ {\em C}, unsigned {\em MAXRAYS}, char $\ast$$\ast$ {\em pn})}\label{ext__ehrhart_8c_a19}
+
+
+
+
+Definition at line 709 of file ext\_\-ehrhart.c.
+
+Referenced by Polyhedron\_\-Image\_\-Enumerate(), and main().
+
+\index{ext_ehrhart.c@{ext\_\-ehrhart.c}!IncludeInRes@{IncludeInRes}}
+\index{IncludeInRes@{IncludeInRes}!ext_ehrhart.c@{ext\_\-ehrhart.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int Include\-In\-Res (Polyhedron $\ast$ {\em p}, Enumeration $\ast$ {\em e}, unsigned {\em MR})}\label{ext__ehrhart_8c_a15}
+
+
+
+
+Definition at line 665 of file ext\_\-ehrhart.c.
+
+Referenced by Domain\_\-Enumerate().
+
+\index{ext_ehrhart.c@{ext\_\-ehrhart.c}!Orthogonal_Base@{Orthogonal\_\-Base}}
+\index{Orthogonal_Base@{Orthogonal\_\-Base}!ext_ehrhart.c@{ext\_\-ehrhart.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Matrix$\ast$ Orthogonal\_\-Base (Matrix $\ast$ {\em Mat})}\label{ext__ehrhart_8c_a12}
+
+
+
+
+Definition at line 559 of file ext\_\-ehrhart.c.\index{ext_ehrhart.c@{ext\_\-ehrhart.c}!Polyhedron_Image_Enumerate@{Polyhedron\_\-Image\_\-Enumerate}}
+\index{Polyhedron_Image_Enumerate@{Polyhedron\_\-Image\_\-Enumerate}!ext_ehrhart.c@{ext\_\-ehrhart.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Enumeration$\ast$ Polyhedron\_\-Image\_\-Enumerate (Polyhedron $\ast$ {\em D}, Polyhedron $\ast$ {\em C}, Matrix $\ast$ {\em T}, unsigned {\em MAXRAYS}, char $\ast$$\ast$ {\em par\_\-name})}\label{ext__ehrhart_8c_a20}
+
+
+
+
+Definition at line 832 of file ext\_\-ehrhart.c.\index{ext_ehrhart.c@{ext\_\-ehrhart.c}!Reduce_Matrix@{Reduce\_\-Matrix}}
+\index{Reduce_Matrix@{Reduce\_\-Matrix}!ext_ehrhart.c@{ext\_\-ehrhart.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Matrix$\ast$ Reduce\_\-Matrix (Matrix $\ast$ {\em Mat})}\label{ext__ehrhart_8c_a9}
+
+
+
+
+Definition at line 505 of file ext\_\-ehrhart.c.
+
+Referenced by Polyhedron\_\-Image\_\-Enumerate().
+
+\index{ext_ehrhart.c@{ext\_\-ehrhart.c}!Remove_Element@{Remove\_\-Element}}
+\index{Remove_Element@{Remove\_\-Element}!ext_ehrhart.c@{ext\_\-ehrhart.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Remove\_\-Element (Enumeration $\ast$ {\em en}, Enumeration $\ast$$\ast$ {\em re}, Enumeration $\ast$ {\em prev})}\label{ext__ehrhart_8c_a13}
+
+
+
+
+Definition at line 629 of file ext\_\-ehrhart.c.
+
+Referenced by Remove\_\-Redundant\-Domains().
+
+\index{ext_ehrhart.c@{ext\_\-ehrhart.c}!Remove_RedundantDomains@{Remove\_\-RedundantDomains}}
+\index{Remove_RedundantDomains@{Remove\_\-RedundantDomains}!ext_ehrhart.c@{ext\_\-ehrhart.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Remove\_\-Redundant\-Domains (Enumeration $\ast$$\ast$ {\em Ures})}\label{ext__ehrhart_8c_a14}
+
+
+
+
+Definition at line 641 of file ext\_\-ehrhart.c.
+
+Referenced by Domain\_\-Enumerate().
+
+\index{ext_ehrhart.c@{ext\_\-ehrhart.c}!Scalar_product@{Scalar\_\-product}}
+\index{Scalar_product@{Scalar\_\-product}!ext_ehrhart.c@{ext\_\-ehrhart.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Scalar\_\-product (Value $\ast$ {\em p1}, Value $\ast$ {\em p2}, unsigned {\em length}, Value $\ast$ {\em r})}\label{ext__ehrhart_8c_a10}
+
+
+
+
+Definition at line 524 of file ext\_\-ehrhart.c.
+
+Referenced by Orthogonal\_\-Base(), and Polyhedron\_\-Image\_\-Enumerate().
+
+\index{ext_ehrhart.c@{ext\_\-ehrhart.c}!Soustraire_ligne@{Soustraire\_\-ligne}}
+\index{Soustraire_ligne@{Soustraire\_\-ligne}!ext_ehrhart.c@{ext\_\-ehrhart.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Soustraire\_\-ligne (Matrix $\ast$ {\em R}, int {\em l1}, int {\em l2}, int {\em piv})\hspace{0.3cm}{\tt  [static]}}\label{ext__ehrhart_8c_a4}
+
+
+
+
+Definition at line 270 of file ext\_\-ehrhart.c.
+
+Referenced by Calc\-Base().
+
+\index{ext_ehrhart.c@{ext\_\-ehrhart.c}!existepivot@{existepivot}}
+\index{existepivot@{existepivot}!ext_ehrhart.c@{ext\_\-ehrhart.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int existepivot (Matrix $\ast$ {\em R}, int {\em l})\hspace{0.3cm}{\tt  [static]}}\label{ext__ehrhart_8c_a5}
+
+
+
+
+Definition at line 209 of file ext\_\-ehrhart.c.
+
+Referenced by Calc\-Base().
+
+\index{ext_ehrhart.c@{ext\_\-ehrhart.c}!new_eadd@{new\_\-eadd}}
+\index{new_eadd@{new\_\-eadd}!ext_ehrhart.c@{ext\_\-ehrhart.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void new\_\-eadd (evalue $\ast$ {\em e1}, evalue $\ast$ {\em res})}\label{ext__ehrhart_8c_a8}
+
+
+
+
+Definition at line 313 of file ext\_\-ehrhart.c.
+
+Referenced by Domain\_\-Enumerate().
+
+\index{ext_ehrhart.c@{ext\_\-ehrhart.c}!pgcd1@{pgcd1}}
+\index{pgcd1@{pgcd1}!ext_ehrhart.c@{ext\_\-ehrhart.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int pgcd1 (int {\em a}, int {\em b})}\label{ext__ehrhart_8c_a7}
+
+
+
+
+Definition at line 248 of file ext\_\-ehrhart.c.
+
+Referenced by ppcm1().
+
+\index{ext_ehrhart.c@{ext\_\-ehrhart.c}!ppcm@{ppcm}}
+\index{ppcm@{ppcm}!ext_ehrhart.c@{ext\_\-ehrhart.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void ppcm (Value {\em a}, Value {\em b}, Value $\ast$ {\em r})}\label{ext__ehrhart_8c_a11}
+
+
+
+
+Definition at line 550 of file ext\_\-ehrhart.c.
+
+Referenced by Orthogonal\_\-Base().
+
+\index{ext_ehrhart.c@{ext\_\-ehrhart.c}!ppcm1@{ppcm1}}
+\index{ppcm1@{ppcm1}!ext_ehrhart.c@{ext\_\-ehrhart.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ppcm1 (int {\em a}, int {\em b})\hspace{0.3cm}{\tt  [static]}}\label{ext__ehrhart_8c_a2}
+
+
+
+
+Definition at line 542 of file ext\_\-ehrhart.c.
+
+Referenced by new\_\-eadd().
+
+\index{ext_ehrhart.c@{ext\_\-ehrhart.c}!swap_line@{swap\_\-line}}
+\index{swap_line@{swap\_\-line}!ext_ehrhart.c@{ext\_\-ehrhart.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void swap\_\-line (Matrix $\ast$ {\em R}, int {\em l1}, int {\em l2})\hspace{0.3cm}{\tt  [static]}}\label{ext__ehrhart_8c_a6}
+
+
+
+
+Definition at line 232 of file ext\_\-ehrhart.c.
+
+Referenced by Calc\-Base().
+

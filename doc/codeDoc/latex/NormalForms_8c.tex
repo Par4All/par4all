@@ -1,0 +1,242 @@
+\section{Normal\-Forms.c File Reference}
+\label{NormalForms_8c}\index{NormalForms.c@{Normal\-Forms.c}}
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$polylib/polylib.h$>$}\par
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+void {\bf moins\_\-l} (Value $\ast$a, int i, int {\bf n}, int p)
+\item 
+void {\bf moins\_\-c} (Value $\ast$a, int i, int {\bf n}, int p)
+\item 
+void {\bf echange\_\-l} (Value $\ast$a, int i, int j, int {\bf n}, int p)
+\item 
+void {\bf echange\_\-c} (Value $\ast$a, int i, int j, int {\bf n}, int p)
+\item 
+void {\bf ligne} (Value $\ast$a, int i, int j, Value x, int {\bf n}, int p)
+\item 
+void {\bf colonne} (Value $\ast$a, int i, int j, Value x, int {\bf n}, int p)
+\item 
+int {\bf petit\_\-l} (Value $\ast$a, int {\bf n}, int p, int q)
+\item 
+int {\bf petit\_\-c} (Value $\ast$a, int {\bf n}, int p, int q)
+\item 
+void {\bf identite} (Value $\ast$a, int {\bf n}, int p)
+\item 
+void {\bf transpose} (Value $\ast$a, int {\bf n}, int q)
+\item 
+int {\bf encore} (Value $\ast$a, int {\bf n}, int p, int q, Value val)
+\item 
+void {\bf smith} (Value $\ast$a, Value $\ast$b, Value $\ast$c, Value $\ast$b\_\-inverse, Value $\ast$c\_\-inverse, int {\bf n}, int p, int q)
+\item 
+void {\bf hermite} (Value $\ast$a, Value $\ast$b, Value $\ast$d, int {\bf n}, int p, int q)
+\item 
+Value $\ast$ {\bf Convert\-Pol\-Matto\-Dar\-Mat} (Matrix $\ast$A)
+\begin{CompactList}\small\item\em Convert Polmatto\-Darmat : This function converts the matrix of a Polylib to a int $\ast$ as necessary for the functions in Darte's implementation.\item\end{CompactList}\item 
+Matrix $\ast$ {\bf Convert\-Dar\-Matto\-Pol\-Mat} (Value $\ast$A, int Nb\-Rows, int Nb\-Cols)
+\begin{CompactList}\small\item\em Convert Darmatto\-Polmat This function converts the matrix from Darte representation to a matrix in Poly\-Lib.\item\end{CompactList}\item 
+void {\bf Smith} (Matrix $\ast$A, Matrix $\ast$$\ast$U, Matrix $\ast$$\ast$V, Matrix $\ast$$\ast$Product)
+\begin{CompactList}\small\item\em Smith : This function takes a Matrix A of dim n $\ast$ l as its input and returns the three matrices U, V and Product such that Product = U $\ast$ A $\ast$ V, where U is an unimodular matrix of dimension n $\ast$ n and V is an unimodular matrix of dimension l $\ast$ l.\item\end{CompactList}\item 
+void {\bf Hermite} (Matrix $\ast$A, Matrix $\ast$$\ast$H, Matrix $\ast$$\ast$U)
+\begin{CompactList}\small\item\em Hermite : This function takes a Matrix as its input and finds its HNF ( Left form ).\item\end{CompactList}\end{CompactItemize}
+
+
+\subsection{Function Documentation}
+\index{NormalForms.c@{Normal\-Forms.c}!ConvertDarMattoPolMat@{ConvertDarMattoPolMat}}
+\index{ConvertDarMattoPolMat@{ConvertDarMattoPolMat}!NormalForms.c@{Normal\-Forms.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Matrix$\ast$ Convert\-Dar\-Matto\-Pol\-Mat (Value $\ast$ {\em A}, int {\em Nb\-Rows}, int {\em Nb\-Cols})\hspace{0.3cm}{\tt  [static]}}\label{NormalForms_8c_a14}
+
+
+Convert Darmatto\-Polmat This function converts the matrix from Darte representation to a matrix in Poly\-Lib.
+
+Input : The matrix (a pointer to it), number of Rows, number of columns Output : The matrix of the Poly\-Lib 
+
+Definition at line 595 of file Normal\-Forms.c.
+
+Referenced by Hermite(), and Smith().
+
+\index{NormalForms.c@{Normal\-Forms.c}!ConvertPolMattoDarMat@{ConvertPolMattoDarMat}}
+\index{ConvertPolMattoDarMat@{ConvertPolMattoDarMat}!NormalForms.c@{Normal\-Forms.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}Value$\ast$ Convert\-Pol\-Matto\-Dar\-Mat (Matrix $\ast$ {\em A})\hspace{0.3cm}{\tt  [static]}}\label{NormalForms_8c_a13}
+
+
+Convert Polmatto\-Darmat : This function converts the matrix of a Polylib to a int $\ast$ as necessary for the functions in Darte's implementation.
+
+Input : A Polylib Matrix ( a pointer to it ); Output : An int $\ast$ with the matrix copied into it 
+
+Definition at line 571 of file Normal\-Forms.c.
+
+Referenced by Hermite(), and Smith().
+
+\index{NormalForms.c@{Normal\-Forms.c}!Hermite@{Hermite}}
+\index{Hermite@{Hermite}!NormalForms.c@{Normal\-Forms.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Hermite (Matrix $\ast$ {\em A}, Matrix $\ast$$\ast$ {\em H}, Matrix $\ast$$\ast$ {\em U})}\label{NormalForms_8c_a16}
+
+
+Hermite : This function takes a Matrix as its input and finds its HNF ( Left form ).
+
+Input : A Matrix A (The Matrix A is not necessarily a Polylib matrix. It is just a matrix as far as Hermite is concerned. It does not even check if the matrix is a Polylib matrix or not)  Output : The Hnf matrix H and the Unimodular matrix U such that A = H $\ast$ U.
+
+We use Alan Darte's implementation of Hermite to compute the HNF. Alan Darte's implementation computes the Upper Triangular HNF. So We work on the fact that if A = H $\ast$ U then  A (transpose) = U(transpose) $\ast$ H (transpose) There are a set of interface functions written in Interface.c which convert a matrix from Polylib representationt to that of Alan Darte's and vice versa.
+
+This Function Does the Following Step 1 : Given the matrix A it finds its Transpose. Step 2 : Finds the HNF (Right Form) using Alan Darte's Algorithm. Step 3 : The H1 and U1 obtained in Step2 are both Transposed to get the actual H and U such that A = HU. 
+
+Definition at line 695 of file Normal\-Forms.c.
+
+Referenced by Affine\-Hermite(), Rearrange\-Matfor\-Solve\-Dio(), Solve\-Diophantine(), find\-Hermite\-Basis(), and isfulldim().
+
+\index{NormalForms.c@{Normal\-Forms.c}!Smith@{Smith}}
+\index{Smith@{Smith}!NormalForms.c@{Normal\-Forms.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void Smith (Matrix $\ast$ {\em A}, Matrix $\ast$$\ast$ {\em U}, Matrix $\ast$$\ast$ {\em V}, Matrix $\ast$$\ast$ {\em Product})}\label{NormalForms_8c_a15}
+
+
+Smith : This function takes a Matrix A of dim n $\ast$ l as its input and returns the three matrices U, V and Product such that Product = U $\ast$ A $\ast$ V, where U is an unimodular matrix of dimension n $\ast$ n and V is an unimodular matrix of dimension l $\ast$ l.
+
+Product is a diagonal matrix of dimension n $\ast$ l.
+
+We use Alan Darte's implementation of Smith for computing the Smith Normal Form 
+
+Definition at line 619 of file Normal\-Forms.c.
+
+Referenced by Affine\-Smith(), and Lattice2Lattice\-Union().
+
+\index{NormalForms.c@{Normal\-Forms.c}!colonne@{colonne}}
+\index{colonne@{colonne}!NormalForms.c@{Normal\-Forms.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void colonne (Value $\ast$ {\em a}, int {\em i}, int {\em j}, Value {\em x}, int {\em n}, int {\em p})\hspace{0.3cm}{\tt  [static]}}\label{NormalForms_8c_a5}
+
+
+
+
+Definition at line 133 of file Normal\-Forms.c.
+
+Referenced by hermite(), and smith().
+
+\index{NormalForms.c@{Normal\-Forms.c}!echange_c@{echange\_\-c}}
+\index{echange_c@{echange\_\-c}!NormalForms.c@{Normal\-Forms.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void echange\_\-c (Value $\ast$ {\em a}, int {\em i}, int {\em j}, int {\em n}, int {\em p})\hspace{0.3cm}{\tt  [static]}}\label{NormalForms_8c_a3}
+
+
+
+
+Definition at line 76 of file Normal\-Forms.c.
+
+Referenced by hermite(), and smith().
+
+\index{NormalForms.c@{Normal\-Forms.c}!echange_l@{echange\_\-l}}
+\index{echange_l@{echange\_\-l}!NormalForms.c@{Normal\-Forms.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void echange\_\-l (Value $\ast$ {\em a}, int {\em i}, int {\em j}, int {\em n}, int {\em p})\hspace{0.3cm}{\tt  [static]}}\label{NormalForms_8c_a2}
+
+
+
+
+Definition at line 50 of file Normal\-Forms.c.
+
+Referenced by hermite(), and smith().
+
+\index{NormalForms.c@{Normal\-Forms.c}!encore@{encore}}
+\index{encore@{encore}!NormalForms.c@{Normal\-Forms.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int encore (Value $\ast$ {\em a}, int {\em n}, int {\em p}, int {\em q}, Value {\em val})\hspace{0.3cm}{\tt  [static]}}\label{NormalForms_8c_a10}
+
+
+
+
+Definition at line 320 of file Normal\-Forms.c.
+
+Referenced by smith().
+
+\index{NormalForms.c@{Normal\-Forms.c}!hermite@{hermite}}
+\index{hermite@{hermite}!NormalForms.c@{Normal\-Forms.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void hermite (Value $\ast$ {\em a}, Value $\ast$ {\em b}, Value $\ast$ {\em d}, int {\em n}, int {\em p}, int {\em q})\hspace{0.3cm}{\tt  [static]}}\label{NormalForms_8c_a12}
+
+
+
+
+Definition at line 483 of file Normal\-Forms.c.
+
+Referenced by Hermite(), left\_\-hermite(), and right\_\-hermite().
+
+\index{NormalForms.c@{Normal\-Forms.c}!identite@{identite}}
+\index{identite@{identite}!NormalForms.c@{Normal\-Forms.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void identite (Value $\ast$ {\em a}, int {\em n}, int {\em p})\hspace{0.3cm}{\tt  [static]}}\label{NormalForms_8c_a8}
+
+
+
+
+Definition at line 263 of file Normal\-Forms.c.
+
+Referenced by Hermite(), and Smith().
+
+\index{NormalForms.c@{Normal\-Forms.c}!ligne@{ligne}}
+\index{ligne@{ligne}!NormalForms.c@{Normal\-Forms.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void ligne (Value $\ast$ {\em a}, int {\em i}, int {\em j}, Value {\em x}, int {\em n}, int {\em p})\hspace{0.3cm}{\tt  [static]}}\label{NormalForms_8c_a4}
+
+
+
+
+Definition at line 104 of file Normal\-Forms.c.
+
+Referenced by hermite(), and smith().
+
+\index{NormalForms.c@{Normal\-Forms.c}!moins_c@{moins\_\-c}}
+\index{moins_c@{moins\_\-c}!NormalForms.c@{Normal\-Forms.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void moins\_\-c (Value $\ast$ {\em a}, int {\em i}, int {\em n}, int {\em p})\hspace{0.3cm}{\tt  [static]}}\label{NormalForms_8c_a1}
+
+
+
+
+Definition at line 31 of file Normal\-Forms.c.
+
+Referenced by hermite(), and smith().
+
+\index{NormalForms.c@{Normal\-Forms.c}!moins_l@{moins\_\-l}}
+\index{moins_l@{moins\_\-l}!NormalForms.c@{Normal\-Forms.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void moins\_\-l (Value $\ast$ {\em a}, int {\em i}, int {\em n}, int {\em p})\hspace{0.3cm}{\tt  [static]}}\label{NormalForms_8c_a0}
+
+
+
+
+Definition at line 12 of file Normal\-Forms.c.
+
+Referenced by hermite(), and smith().
+
+\index{NormalForms.c@{Normal\-Forms.c}!petit_c@{petit\_\-c}}
+\index{petit_c@{petit\_\-c}!NormalForms.c@{Normal\-Forms.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int petit\_\-c (Value $\ast$ {\em a}, int {\em n}, int {\em p}, int {\em q})\hspace{0.3cm}{\tt  [static]}}\label{NormalForms_8c_a7}
+
+
+
+
+Definition at line 216 of file Normal\-Forms.c.
+
+Referenced by hermite(), and smith().
+
+\index{NormalForms.c@{Normal\-Forms.c}!petit_l@{petit\_\-l}}
+\index{petit_l@{petit\_\-l}!NormalForms.c@{Normal\-Forms.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int petit\_\-l (Value $\ast$ {\em a}, int {\em n}, int {\em p}, int {\em q})\hspace{0.3cm}{\tt  [static]}}\label{NormalForms_8c_a6}
+
+
+
+
+Definition at line 164 of file Normal\-Forms.c.
+
+Referenced by smith().
+
+\index{NormalForms.c@{Normal\-Forms.c}!smith@{smith}}
+\index{smith@{smith}!NormalForms.c@{Normal\-Forms.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void smith (Value $\ast$ {\em a}, Value $\ast$ {\em b}, Value $\ast$ {\em c}, Value $\ast$ {\em b\_\-inverse}, Value $\ast$ {\em c\_\-inverse}, int {\em n}, int {\em p}, int {\em q})\hspace{0.3cm}{\tt  [static]}}\label{NormalForms_8c_a11}
+
+
+
+
+Definition at line 374 of file Normal\-Forms.c.
+
+Referenced by Smith().
+
+\index{NormalForms.c@{Normal\-Forms.c}!transpose@{transpose}}
+\index{transpose@{transpose}!NormalForms.c@{Normal\-Forms.c}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void transpose (Value $\ast$ {\em a}, int {\em n}, int {\em q})\hspace{0.3cm}{\tt  [static]}}\label{NormalForms_8c_a9}
+
+
+
+
+Definition at line 288 of file Normal\-Forms.c.

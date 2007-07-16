@@ -1,0 +1,85 @@
+\section{arithmetic\_\-errors.h File Reference}
+\label{arithmetic__errors_8h}\index{arithmetic_errors.h@{arithmetic\_\-errors.h}}
+{\tt \#include $<$setjmp.h$>$}\par
+\subsection*{Defines}
+\begin{CompactItemize}
+\item 
+\#define {\bf linear\_\-arithmetic\_\-error\_\-included}
+\item 
+\#define {\bf \_\-\_\-CURRENT\_\-FUNCTION\_\-NAME\_\-\_\-}\ \char`\"{}$<$unknown$>$\char`\"{}
+\item 
+\#define {\bf EXCEPTION}\ extern const unsigned int
+\item 
+\#define {\bf THROW}(what)\ (throw\_\-exception(what, \_\-\_\-CURRENT\_\-FUNCTION\_\-NAME\_\-\_\-, \_\-\_\-FILE\_\-\_\-, \_\-\_\-LINE\_\-\_\-))
+\item 
+\#define {\bf CATCH}(what)
+\item 
+\#define {\bf UNCATCH}(what)
+\item 
+\#define {\bf TRY}\ else
+\item 
+\#define {\bf RETHROW}()\ THROW(the\_\-last\_\-just\_\-thrown\_\-exception)
+\end{CompactItemize}
+
+
+\subsection{Define Documentation}
+\index{arithmetic_errors.h@{arithmetic\_\-errors.h}!CATCH@{CATCH}}
+\index{CATCH@{CATCH}!arithmetic_errors.h@{arithmetic\_\-errors.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CATCH(what)}\label{arithmetic__errors_8h_a4}
+
+
+{\bf Value:}
+
+\footnotesize\begin{verbatim}if (setjmp(*push_exception_on_stack(what, __CURRENT_FUNCTION_NAME__,    \
+                                     __FILE__, __LINE__)))\end{verbatim}\normalsize 
+
+
+Referenced by Add\-Constraints(), Add\-Rays(), Build\-Sat(), Chernikova(), Constraints2Polyhedron(), Domain\-Convex(), Domain\-Cost(), Domain\-Image(), Domain\-Preimage(), Enumerate\_\-No\-Parameters(), Find\-Simple(), Gauss(), Polyhedron\_\-Enumerate(), Polyhedron\_\-Image(), Polyhedron\_\-Preimage(), Rays2Polyhedron(), Remove\_\-Redundants(), Simplify\-Constraints(), Stras\_\-Domain\-Simplify(), Sub\-Constraint(), and align\_\-context().
+
+\index{arithmetic_errors.h@{arithmetic\_\-errors.h}!EXCEPTION@{EXCEPTION}}
+\index{EXCEPTION@{EXCEPTION}!arithmetic_errors.h@{arithmetic\_\-errors.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define EXCEPTION\ extern const unsigned int}\label{arithmetic__errors_8h_a2}
+
+
+\index{arithmetic_errors.h@{arithmetic\_\-errors.h}!RETHROW@{RETHROW}}
+\index{RETHROW@{RETHROW}!arithmetic_errors.h@{arithmetic\_\-errors.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define RETHROW()\ THROW(the\_\-last\_\-just\_\-thrown\_\-exception)}\label{arithmetic__errors_8h_a7}
+
+
+
+
+Referenced by Add\-Constraints(), Add\-Rays(), Build\-Sat(), Chernikova(), Constraints2Polyhedron(), Domain\-Convex(), Domain\-Cost(), Domain\-Image(), Domain\-Preimage(), Find\-Simple(), Gauss(), Polyhedron\_\-Image(), Polyhedron\_\-Preimage(), Rays2Polyhedron(), Remove\_\-Redundants(), Simplify\-Constraints(), Stras\_\-Domain\-Simplify(), Sub\-Constraint(), and align\_\-context().
+
+\index{arithmetic_errors.h@{arithmetic\_\-errors.h}!THROW@{THROW}}
+\index{THROW@{THROW}!arithmetic_errors.h@{arithmetic\_\-errors.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define THROW(what)\ (throw\_\-exception(what, \_\-\_\-CURRENT\_\-FUNCTION\_\-NAME\_\-\_\-, \_\-\_\-FILE\_\-\_\-, \_\-\_\-LINE\_\-\_\-))}\label{arithmetic__errors_8h_a3}
+
+
+\index{arithmetic_errors.h@{arithmetic\_\-errors.h}!TRY@{TRY}}
+\index{TRY@{TRY}!arithmetic_errors.h@{arithmetic\_\-errors.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define TRY\ else}\label{arithmetic__errors_8h_a6}
+
+
+\index{arithmetic_errors.h@{arithmetic\_\-errors.h}!UNCATCH@{UNCATCH}}
+\index{UNCATCH@{UNCATCH}!arithmetic_errors.h@{arithmetic\_\-errors.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define UNCATCH(what)}\label{arithmetic__errors_8h_a5}
+
+
+{\bf Value:}
+
+\footnotesize\begin{verbatim}(pop_exception_from_stack(what, __CURRENT_FUNCTION_NAME__,      \
+                               __FILE__, __LINE__))\end{verbatim}\normalsize 
+
+
+Referenced by Add\-Constraints(), Add\-Rays(), Build\-Sat(), Chernikova(), Constraints2Polyhedron(), Domain\-Convex(), Domain\-Cost(), Domain\-Image(), Domain\-Preimage(), Enumerate\_\-No\-Parameters(), Find\-Simple(), Gauss(), Polyhedron\_\-Enumerate(), Polyhedron\_\-Image(), Polyhedron\_\-Preimage(), Rays2Polyhedron(), Remove\_\-Redundants(), Simplify\-Constraints(), Stras\_\-Domain\-Simplify(), Sub\-Constraint(), and align\_\-context().
+
+\index{arithmetic_errors.h@{arithmetic\_\-errors.h}!__CURRENT_FUNCTION_NAME__@{\_\-\_\-CURRENT\_\-FUNCTION\_\-NAME\_\-\_\-}}
+\index{__CURRENT_FUNCTION_NAME__@{\_\-\_\-CURRENT\_\-FUNCTION\_\-NAME\_\-\_\-}!arithmetic_errors.h@{arithmetic\_\-errors.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define \_\-\_\-CURRENT\_\-FUNCTION\_\-NAME\_\-\_\-\ \char`\"{}$<$unknown$>$\char`\"{}}\label{arithmetic__errors_8h_a1}
+
+
+\index{arithmetic_errors.h@{arithmetic\_\-errors.h}!linear_arithmetic_error_included@{linear\_\-arithmetic\_\-error\_\-included}}
+\index{linear_arithmetic_error_included@{linear\_\-arithmetic\_\-error\_\-included}!arithmetic_errors.h@{arithmetic\_\-errors.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define linear\_\-arithmetic\_\-error\_\-included}\label{arithmetic__errors_8h_a0}
+
+
