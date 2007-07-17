@@ -3,5 +3,3 @@ main()
    int z;
    int x = (myint *)z;
 }
-   typedef int myint;
-   extern main();

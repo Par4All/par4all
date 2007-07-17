@@ -1,24 +1,21 @@
-
-File zbrac.database/zbrac/zbrac.c
-
 # 6
 int zbrac(func,x1,x2)
 float *x1,*x2;
 float (*func)(); /* ANSI: float (*func)(float); */
 {
-        int j;
-        float f1,f2;
-        void nrerror();
+ int j;
+ float f1,f2;
+ void nrerror();
 
-        if (*x1 == *x2) nrerror("Bad initial range in ZBRAC");
-        f1=(*func)(*x1);
-        f2=(*func)(*x2);
-        for (j=1;j<=50;j++) {
-                if (f1*f2 < 0.0) return 1;
-                if (fabs(f1) < fabs(f2))
-                        f1=(*func)(*x1 += 1.6*(*x1-*x2));
-                else
-                        f2=(*func)(*x2 += 1.6*(*x2-*x1));
-        }
-        return 0;
+ if (*x1 == *x2) nrerror("Bad initial range in ZBRAC");
+ f1=(*func)(*x1);
+ f2=(*func)(*x2);
+ for (j=1;j<=50;j++) {
+  if (f1*f2 < 0.0) return 1;
+  if (fabs(f1) < fabs(f2))
+   f1=(*func)(*x1 += 1.6*(*x1-*x2));
+  else
+   f2=(*func)(*x2 += 1.6*(*x2-*x1));
+ }
+ return 0;
 }

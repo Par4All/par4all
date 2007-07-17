@@ -1,7 +1,7 @@
-# 1 "/export/temp/irigoin/MYPIPS/prod/pips/Validation/C_syntax/dowhile.c"
+# 1 "$VDIR/dowhile.c"
 # 1 "<built-in>"
 # 1 "<command line>"
-# 1 "/export/temp/irigoin/MYPIPS/prod/pips/Validation/C_syntax/dowhile.c"
+# 1 "$VDIR/dowhile.c"
 main()
 {
   int c = 5; /* declaration comment that should be lost by parser */

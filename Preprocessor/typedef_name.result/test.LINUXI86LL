@@ -1,11 +1,8 @@
-
-File typedef_name.database/main/main.c
-
 # 1
 main()
 {
   typedef int node;
-  //int node; 
+  //int node;
   struct node
   {
     int node;

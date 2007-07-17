@@ -10,7 +10,6 @@ main()
    }
 break_1:   ;
 }
-   extern main();
 
 Controlizer output
 
@@ -22,4 +21,3 @@ main()
    c -= 1;
 break_1:   ;
 }
-   extern main();

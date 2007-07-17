@@ -6,4 +6,3 @@ main()
    };
    union x y;
 }
-   extern main();

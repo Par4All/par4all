@@ -2,12 +2,6 @@ delete csplit18
 create csplit18 csplit18.c
 
 # check signatures with parameter names are parsed (about csplit16.c)
-
-# shell for i in csplit18.database/[#a-z_]*[a-z_0-9%]/*.c; do echo;echo '/*' Module `basename $i .c` '*/';echo; \
-	cat $i; done
-
-# quit
-
 # This has nothing to do with the preprocessing
 
 close

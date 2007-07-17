@@ -16,4 +16,3 @@ main()
    int key2;
    int node;
 }
-   extern main();

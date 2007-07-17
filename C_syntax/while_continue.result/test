@@ -6,4 +6,3 @@ main()
 loop_end_1:      ;
    }
 }
-   extern main();

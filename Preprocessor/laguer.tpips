@@ -8,8 +8,7 @@ shell echo `gcc -C -E laguer.c`
 quit
 
 # echo cat laguer.database/[a-z_]*[a-z_]/*.c
-shell for i in laguer.database/[a-z_]*[a-z_]/*.c; do echo;echo Module `basename $i .c`;echo; \
-	cat $i; done
+display C_SOURCE_FILE[%ALL]
 
 close
 # delete laguer

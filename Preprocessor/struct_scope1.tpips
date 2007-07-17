@@ -1,8 +1,7 @@
 delete struct_scope1
 create struct_scope1 struct_scope1.c
+display C_SOURCE_FILE[%ALL]
 
-shell for i in struct_scope1.database/[a-z_]*[a-z_0-9]/*.c; do echo;echo Module `basename $i .c`;echo; \
-	cat $i; done
 
 close
 delete struct_scope1

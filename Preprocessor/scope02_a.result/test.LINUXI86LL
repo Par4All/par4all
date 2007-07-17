@@ -1,14 +1,8 @@
-
-File scope02_a.database/foo/foo.c
-
 # 13
 void foo()
 {
   printf("%d\n",i);
 }
-
-File scope02_a.database/main/main.c
-
 # 5
 main()
 {

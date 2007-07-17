@@ -19,4 +19,3 @@ main()
    typedef tata titi;
    n = 1;
 }
-   extern main();

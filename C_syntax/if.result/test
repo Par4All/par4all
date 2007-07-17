@@ -1,4 +1,3 @@
-   extern main();
 main()
 {
    int i = 1;

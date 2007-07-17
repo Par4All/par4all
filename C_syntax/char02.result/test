@@ -1,4 +1,3 @@
-   extern main();
 main()
 {
    char c1;

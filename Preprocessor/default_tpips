@@ -5,12 +5,7 @@ create ${WSPACE} ${FILE}
 # static functions, do not forget the COMPILATION_UNIT_PREFIX, but no
 # static functions in validation files using default_tpips?
 
-shell for f in ${WSPACE}.database/[a-z_]*[a-z_0-9]/*.c; do \
-	echo ; \
-	echo File $f ; \
-	echo ; \
-	cat $f ; \
-      done
+display C_SOURCE_FILE[%ALL]
 
 close
 delete ${WSPACE}

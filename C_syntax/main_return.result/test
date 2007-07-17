@@ -2,4 +2,3 @@ int main()
 {
    return 1;
 }
-   extern int main();

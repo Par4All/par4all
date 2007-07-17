@@ -14,7 +14,6 @@ main()
    c4 = '\'';
    c5 = '\0';
 }
-   extern main();
 
 Controlizer output
 
@@ -31,5 +30,4 @@ main()
    c4 = '\'';
    c5 = '\0';
 }
-   extern main();
 

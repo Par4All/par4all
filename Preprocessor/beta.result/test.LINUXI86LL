@@ -1,11 +1,8 @@
-
-File beta.database/beta/beta.c
-
 # 3
 float beta(z,w)
 float z,w;
 {
-        float gammln();
+ float gammln();
 
-        return exp(gammln(z)+gammln(w)-gammln(z+w));
+ return exp(gammln(z)+gammln(w)-gammln(z+w));
 }

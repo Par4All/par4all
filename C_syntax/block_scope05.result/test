@@ -1,7 +1,6 @@
 
 Parser output
 
-   extern int main();
 int main()
 {
    int k;
@@ -9,6 +8,7 @@ int main()
    if (k>1) {
       int i;
       int j;
+      
       i = 1;
       j = 2;
    }
@@ -16,7 +16,6 @@ int main()
 
 Controlizer output
 
-   extern int main();
 int main()
 {
    int k;
@@ -24,6 +23,7 @@ int main()
    if (k>1) {
       int i;
       int j;
+      
       i = 1;
       j = 2;
    }

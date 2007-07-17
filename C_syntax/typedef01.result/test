@@ -11,4 +11,3 @@ int main()
    typedef struct PIPS_STRUCT_1 *TREEPTR;
    TREE t;
 }
-   extern int main();

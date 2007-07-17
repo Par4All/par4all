@@ -5,4 +5,3 @@ main()
       c -= 1;
    }
 }
-   extern main();

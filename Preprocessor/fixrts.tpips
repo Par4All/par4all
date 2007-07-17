@@ -8,8 +8,7 @@ shell echo `gcc -C -E fixrts.c`
 quit
 
 # echo cat fixrts.database/[a-z_]*[a-z_]/*.c
-shell for i in fixrts.database/[a-z_]*[a-z_]/*.c; do echo;echo Module `basename $i .c`;echo; \
-	cat $i; done
+display C_SOURCE_FILE[%ALL]
 
 close
 # delete fixrts

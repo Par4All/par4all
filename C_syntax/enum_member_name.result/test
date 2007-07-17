@@ -1,4 +1,3 @@
-   extern main();
 main()
 {
    enum hue {node, nide};

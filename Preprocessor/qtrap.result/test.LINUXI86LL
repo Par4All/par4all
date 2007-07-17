@@ -1,20 +1,17 @@
-
-File qtrap.database/qtrap/qtrap.c
-
 # 6
 float qtrap(func,a,b)
 float a,b;
 float (*func)();
 {
-        int j;
-        float s,olds,trapzd();
-        void nrerror();
+ int j;
+ float s,olds,trapzd();
+ void nrerror();
 
-        olds = -1.0e30;
-        for (j=1;j<=20;j++) {
-                s=trapzd(func,a,b,j);
-                if (fabs(s-olds) < 1.0e-5*fabs(olds)) return s;
-                olds=s;
-        }
-        nrerror("Too many steps in routine QTRAP");
+ olds = -1.0e30;
+ for (j=1;j<=20;j++) {
+  s=trapzd(func,a,b,j);
+  if (fabs(s-olds) < 1.0e-5*fabs(olds)) return s;
+  olds=s;
+ }
+ nrerror("Too many steps in routine QTRAP");
 }

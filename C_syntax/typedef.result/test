@@ -6,4 +6,3 @@ main()
    MYINT m;
    n = 1;
 }
-   extern main();

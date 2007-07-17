@@ -1,5 +1,5 @@
 delete altret11
-create altret11 ${PIPS_ROOT}/Validation/Syntax/altret11.f
+create altret11 altret11.f
 
 # Make sure that ParserError cleans up the data structures
 # altret11.f is not compatible with PIPS parser.

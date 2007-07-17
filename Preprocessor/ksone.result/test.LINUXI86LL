@@ -1,26 +1,23 @@
-
-File ksone.database/ksone/ksone.c
-
 # 7
 void ksone(data,n,func,d,prob)
 float data[],*d,*prob;
 float (*func)(); /* ANSI: float (*func)(float); */
 int n;
 {
-        int j;
-        float fo=0.0,fn,ff,en,dt;
-        void sort();
-        float probks();
+ int j;
+ float fo=0.0,fn,ff,en,dt;
+ void sort();
+ float probks();
 
-        sort(n,data);
-        en=n;
-        *d=0.0;
-        for (j=1;j<=n;j++) {
-                fn=j/en;
-                ff=(*func)(data[j]);
-                dt = (maxarg1=(fabs(fo-ff)),maxarg2=(fabs(fn-ff)),(maxarg1) > (maxarg2) ? (maxarg1) : (maxarg2));
-                if (dt > *d) *d=dt;
-                fo=fn;
-        }
-        *prob=probks(sqrt(en)*(*d));
+ sort(n,data);
+ en=n;
+ *d=0.0;
+ for (j=1;j<=n;j++) {
+  fn=j/en;
+  ff=(*func)(data[j]);
+  dt = (maxarg1=(fabs(fo-ff)),maxarg2=(fabs(fn-ff)),(maxarg1) > (maxarg2) ? (maxarg1) : (maxarg2));
+  if (dt > *d) *d=dt;
+  fo=fn;
+ }
+ *prob=probks(sqrt(en)*(*d));
 }

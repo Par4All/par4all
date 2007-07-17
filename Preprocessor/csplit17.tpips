@@ -2,9 +2,7 @@ delete csplit17
 create csplit17 csplit17.c
 
 # check signatures with parameter names are parsed (about csplit16.c)
-
-shell for i in csplit17.database/[#a-z_]*[a-z_0-9!]/*.c; do echo;echo '/*' Module `basename $i .c` '*/';echo; \
-	cat $i; done
+display C_SOURCE_FILE[%ALL]
 
 # quit
 

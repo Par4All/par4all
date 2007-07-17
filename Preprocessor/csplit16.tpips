@@ -2,11 +2,7 @@ delete csplit16
 create csplit16 csplit16.c
 
 # check that the compilation unit can be parser specially
-
-shell for i in csplit16.database/[#a-z_]*[a-z_0-9!]/*.c; do echo;echo '/*' Module `basename $i .c` '*/';echo; \
-	cat $i; done
-
-# quit
+display C_SOURCE_FILE[%ALL]
 
 # This has nothing to do with the preprocessing
 
