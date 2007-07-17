@@ -69,26 +69,21 @@ add_arrow_in_ctrl_graph(statement s1, statement s2)
     control_predecessors(c2) = gen_once(c1, control_predecessors(c2));
 }
 
-static void add_arrows_in_ctrl_graph(s, l)
-statement s;
-list /* of statements */ l;
+static void add_arrows_in_ctrl_graph(statement s, /* statement */ list l)
 {
     for(; !ENDP(l); l=CDR(l))
 	add_arrow_in_ctrl_graph(s, STATEMENT(CAR(l)));
 }
 
 list /* of statement */ 
-control_list_to_statement_list(
-    list /* of control */ lc)
+control_list_to_statement_list(/* control */ list lc)
 {
     list /* of statements */ ls = NIL;
     MAP(CONTROL, c, ls = CONS(STATEMENT, control_statement(c), ls), lc);
     return ls;
 }
 
-static void statement_arrows(s, next)
-statement s;
-list /* of statements */ next;
+static void statement_arrows(statement s, /* statement */ list next)
 {
     instruction i = statement_instruction(s);
     tag t = instruction_tag(i);
@@ -210,15 +205,13 @@ list /* of statements */ next;
     }
 }
 
-static void stmt_rewrite(s)
-statement s;
+static void stmt_rewrite(statement s)
 {
     if (!bound_ctrl_graph_p(s))
 	store_ctrl_graph(s, make_control(s, NIL, NIL));
 }
 
-void build_full_ctrl_graph(s)
-statement s;
+void build_full_ctrl_graph(statement s)
 {
     pips_debug(3, "statement (%d,%d:%d)\n", 
 	       ORDERING_NUMBER(statement_ordering(s)), 
@@ -239,8 +232,7 @@ statement s;
 
 /* FULL CONTROL GRAPH for module NAME
  */
-void full_control_graph(name)
-string name;
+void full_control_graph(string name)
 {
     statement s = (statement) db_get_memory_resource(DBR_CODE, name, TRUE);
     build_full_ctrl_graph(s);
@@ -271,35 +263,32 @@ string name;
  */
 DEFINE_LOCAL_STACK(to_see, statement)
 GENERIC_LOCAL_MAPPING(stacked, bool, statement)
-static bool (*travel_decision)();
+static bool (*travel_decision)(statement);
 
-static void push_if_necessary(s)
-statement s;
+static void push_if_necessary(statement s)
 {
-    if (load_statement_stacked(s)!=TRUE)
-	to_see_push(s),
-	store_statement_stacked(s, TRUE);
+  if (load_statement_stacked(s)!=TRUE)
+  {
+    to_see_push(s);
+    store_statement_stacked(s, TRUE);
+  }
 }
 
 /* it is pushed in *reverse* order to preserve the depth first view.
  */
-static void push(l) 
-/* control */ list l;
+static void push(/* control */ list l)
 {
     if (!ENDP(l)) 
 	push(CDR(l)),
 	push_if_necessary(control_statement(CONTROL(CAR(l))));
 }
 
-static void push_successors(s)
-statement s;
+static void push_successors(statement s)
 {
     push(control_successors(load_ctrl_graph(s)));
 }
 
-void init_ctrl_graph_travel(s, decision)
-statement s;
-bool (*decision)();
+void init_ctrl_graph_travel(statement s, bool (*decision)(statement))
 {
     make_to_see_stack();             /* initializations */
     make_stacked_map();
@@ -309,8 +298,7 @@ bool (*decision)();
     push_successors(s);
 }
 
-bool next_ctrl_graph_travel(ps)
-statement *ps;
+bool next_ctrl_graph_travel(statement *ps)
 {
     while (!to_see_empty_p())
     {
@@ -325,12 +313,11 @@ statement *ps;
     return FALSE;
 }
 
-void close_ctrl_graph_travel()
+void close_ctrl_graph_travel(void)
 {
     free_to_see_stack();
     free_stacked_map();
 }
-
 
 /*  That's all
  */
