@@ -11,6 +11,8 @@
 #include "private.h"
 #include "pipsdbm_private.h"
 
+extern bool compilation_unit_p(string); /* alas in c_syntax.h */
+
 /******************************************************************** UTILS */
 
 /* shorthands
@@ -947,6 +949,7 @@ gen_array_t db_get_module_list_initial_order(void)
 
 /* returns an allocated array a with the sorted list of modules. 
  * strings are duplicated.
+ * compilation units are not added.
  */
 gen_array_t db_get_module_list(void)
 {
@@ -958,7 +961,7 @@ gen_array_t db_get_module_list(void)
 	string on = db_symbol_name(os);
 	pips_assert("some symbol name", on);
 	pips_debug(9, "considering %s -> %p\n", on, or);
-	if (!same_string_p(on, ""))
+	if (!same_string_p(on, "") && !compilation_unit_p(on))
 	    gen_array_dupappend(a, on);
     },
 	get_pips_database());
