@@ -1,5 +1,5 @@
 /* $Id$ 
-*/
+ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -14,7 +14,7 @@
 #include "parser_private.h" /* FI: for syntax.h */
 
 #include "c_syntax.h"
-#include "syntax.h" /* FI: To dump the symbol table. Should be moved in ri-util? */
+#include "syntax.h" /* FI: To dump the symbol table. move in ri-util? */
 
 #include "cyacc.h"
 
@@ -483,9 +483,11 @@ bool static_module_p(entity e)
   return static_module_name_p(entity_name(e));
 }
 
+/* FC: move to ri-util? */
 bool compilation_unit_p(string module_name)
 {
-  /* A module name is a compilation unit if and only if its last character is FILE_SEP */
+  /* A module name is a compilation unit if and only if its last character is 
+     FILE_SEP */
   if (module_name[strlen(module_name)-1]==FILE_SEP)
     return TRUE;
   return FALSE;
