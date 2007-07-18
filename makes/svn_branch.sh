@@ -1,6 +1,6 @@
 #! /bin/bash
 #
-# $Id: svn_branch.sh 390 2006-03-21 09:54:05Z coelho $
+# $Id: svn_branch.sh 535 2007-07-18 09:23:26Z coelho $
 #
 # $URL: file:///users/cri/coelho/SVN/svn/svn_branch.sh $
 #
@@ -33,7 +33,8 @@
 # long standing developments. The branches can get some trunk changes,
 # and are to be pushed back to the trunk when the development is over.
 # So mergings are to be managed in both directions. Also, less commands
-# are required wrt "svnmerge".
+# are required wrt "svnmerge". The push/pull terminology comes from svk.
+# "svnbranch" includes most "svnmerge" functionnalities.
 #
 # trunk/____________*__+_____*__+_____X__
 #   |               |        |        A
@@ -56,7 +57,7 @@
 command=${0/*\//}
 
 # keep revision number
-cmd_rev='$Rev: 390 $'
+cmd_rev='$Rev: 535 $'
 cmd_rev=${cmd_rev/*: /}
 cmd_rev=${cmd_rev/ \$/}
 
@@ -947,7 +948,6 @@ case $action in
 	;;
     avail)
 	[ $# -eq 0 ] && set .
-	[ $# -eq 1 ] || usage 21 "expecting 1 argument"
 	for dir ; do
 	    echo -n "$dir: " ; avail $dir
 	done
