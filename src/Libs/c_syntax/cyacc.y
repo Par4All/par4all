@@ -72,7 +72,7 @@
 extern int c_lex(void);
 extern void c_error(char *);
 
- extern void discard_comments(void);
+extern void discard_comments(void);
 
 extern string compilation_unit_name;
 extern statement ModuleStatement;
@@ -103,6 +103,8 @@ extern stack FormalStack; /* to know if the entity is a formal parameter or not 
 extern stack OffsetStack; /* to know the offset of the formal argument */
 
 static c_parser_context context;
+
+
 
 c_parser_context CreateDefaultContext()
 {
@@ -1662,8 +1664,11 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			     used later to check if the declarations are the same for one entity. 
 			     This stack is put temporarily in the storage of the entity, not a global variable 
 			     for each declarator to avoid being erased by recursion */
-			  entity_storage($$) = (storage) stack_make(type_domain,0,0);
-			  stack_push((char *) entity_type($$), (stack) entity_storage($$));
+			  stack s = stack_make(type_domain,0,0);
+			  
+			  stack_push((char *) entity_type($$),s);
+			  put_to_entity_type_stack_table($$,s);
+			 
 			  entity_type($$) = type_undefined;
 			  discard_C_comment();
 			}
@@ -1672,7 +1677,8 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			  /* Add attributes such as const, restrict, ... to variable's qualifiers */
 			  UpdateParenEntity($3,$2);
 			  $$ = $3;
-			  stack_push((char *) entity_type($$),(stack) entity_storage($$));
+			  stack_push((char *) entity_type($$),
+			     get_from_entity_type_stack_table($$));
 			  entity_type($$) = type_undefined;
 			}
 |   direct_decl TK_LBRACKET attributes comma_expression_opt TK_RBRACKET
@@ -1891,12 +1897,14 @@ abstract_decl: /* (* ISO 6.7.6. *) */
 							 ContextStack,FormalStack,FunctionStack,is_external);
 			  UpdatePointerEntity($$,$1,NIL);
 			  /* Initialize the type stack and push the type of found/created entity to the stack. 
-			     It can be undefined if the entity has not been parsed, or a given type which is 
+			     It can be undefined if the entity hasnot been parsed, or a given type which is 
 			     used later to check if the declarations are the same for one entity. 
 			     This stack is put temporarily in the storage of the entity, not a global variable 
 			     for each declarator to avoid being erased by recursion */
-			  entity_storage($$) = (storage) stack_make(type_domain,0,0);
-			  stack_push((char *) entity_type($$), (stack) entity_storage($$));
+			  stack s = stack_make(type_domain, 0, 0);
+			  //entity_storage($$) = (storage) s;
+			  stack_push((char *) entity_type($$),s);
+			  put_to_entity_type_stack_table($$, s);
 			  /*entity_type($$) = type_undefined;*/
 			}
 ;
@@ -1908,7 +1916,8 @@ abs_direct_decl: /* (* ISO 6.7.6. We do not support optional declarator for
                         {
 			  UpdateParenEntity($3,$2);
 			  $$ = $3;
-			  stack_push((char *) entity_type($$),(stack) entity_storage($$));
+			  stack_push((char *) entity_type($$),
+				     get_from_entity_type_stack_table($$));
 			  entity_type($$) = type_undefined;
 			}
 |   TK_LPAREN error TK_RPAREN
@@ -1943,8 +1952,10 @@ abs_direct_decl_opt:
 			  $$ = FindOrCreateCurrentEntity(strdup(concatenate("PIPS_ABSTRACT_",
 									    int_to_string(abstract_counter++),NULL)),
 							 ContextStack,FormalStack,FunctionStack,is_external);
-			  entity_storage($$) = (storage) stack_make(type_domain,0,0);
-			  stack_push((char *) entity_type($$), (stack) entity_storage($$));
+			  stack s = stack_make(type_domain,0,0);
+			  //entity_storage($$) = (storage) s;
+			  stack_push((char *) entity_type($$),s);
+			  put_to_entity_type_stack_table($$, s);
 			  entity_type($$) = type_undefined;
     }
 ;

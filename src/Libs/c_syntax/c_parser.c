@@ -39,7 +39,33 @@ stack StructNameStack = stack_undefined;
 /* Global counter */
 int loop_counter = 1; 
 int derived_counter = 1; 
- 
+ 
+// to store the mapping between the entity and its type stack
+
+static hash_table entity_to_type_stack_table = hash_table_undefined;
+
+void init_entity_type_storage_table()
+{
+  entity_to_type_stack_table = hash_table_make(hash_pointer,0);
+  //put_stack_storage_table("test","T");
+}
+
+void put_to_entity_type_stack_table(entity key, stack value)
+{
+  hash_put(entity_to_type_stack_table,(char *) key,(void *) value);
+}
+
+stack get_from_entity_type_stack_table(entity key)
+{
+  return ((stack) hash_get(entity_to_type_stack_table, key));
+}
+
+void reset_entity_type_stack_table()
+{
+  hash_table_free(entity_to_type_stack_table);
+  entity_to_type_stack_table = hash_table_undefined;
+}
+
 hash_table keyword_typedef_table = hash_table_undefined;
 
 void init_keyword_typedef_table()
@@ -113,6 +139,8 @@ void CParserError(char *msg)
   pips_debug(4,"Reset current module entity %s\n",get_current_module_name());
   reset_current_module_entity();
 
+  reset_entity_type_stack_table();
+
   /* Stacks are not allocated yet when dealing with external
      declarations. I assume that all stacks are declared
      simultaneously, hence a single test before freeing. */
@@ -122,7 +150,7 @@ void CParserError(char *msg)
     stack_free(&LoopStack);
     stack_free(&BlockStack);  
   }
-
+  
   reset_current_C_line_number();
   /* get rid of all collected comments */
   reset_C_comment(TRUE);
@@ -193,7 +221,10 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
 
     /* yacc parser is called */
     c_in = safe_fopen(file_name, "r");
+
+    init_entity_type_storage_table();
     c_parse();
+        
     safe_fclose(c_in, file_name);
 
     pips_assert("Module statement is consistent",statement_consistent_p(ModuleStatement));
@@ -212,11 +243,11 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
 	{
 	  printf("\t%s\n",s);
 	},CalledModules);
-      }
-
+      }  
+       
     if (compilation_unit_p(module_name))
       {
-	ResetCurrentCompilationUnitEntity();	
+	ResetCurrentCompilationUnitEntity(is_compilation_unit_parser);	
       }
   
     if (is_compilation_unit_parser)
@@ -234,6 +265,7 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
 			       module_name, 
 			       (char *) make_callees(CalledModules));
       }
+
     free(file_name);
     file_name = NULL;
     reset_current_C_line_number();
@@ -252,7 +284,7 @@ bool c_parser(string module_name)
 {
   /* When the compilation_unit is parsed, it is parsed a second time
      and multiple declarations are certain to happen. */
-  return actual_c_parser(module_name,DBR_C_SOURCE_FILE,FALSE);
+   return actual_c_parser(module_name,DBR_C_SOURCE_FILE,FALSE);
 }
 
 bool compilation_unit_parser(string module_name)

@@ -34,6 +34,12 @@ extern list CalledModules;
 extern entity StaticArea;
 extern entity DynamicArea;
 
+/* The data structure to tackle the memory allocation problem due to reparsing of compilatio unit 
+static int previoussizeofGlobalArea;
+entity previouscompunit;
+
+*/
+
 /******************* TOP LEVEL ENTITY  **********************/
 
 entity get_top_level_entity()
@@ -52,6 +58,14 @@ void MakeTopLevelEntity()
 
 
 /******************* CURRENT MODULE AREAS **********************/
+/* In C we have 4 areas 
+   1. globalStaticArea: For the Global Variables, these variables are added into StaticArea.
+   2. moduleStaticArea: For the Static module variables
+   3. localStaticArea(SticArea): General Static variables
+   4. DynamicArea
+   The GlobalStaticArea and ModuleStaticArea are basically static areas but they are not defined globally.
+   It is to be added to the Declarations for C
+*/
 
 void init_c_areas()
 {
@@ -66,6 +80,39 @@ void init_c_areas()
   entity_storage(StaticArea) = make_storage_rom();
   entity_initial(StaticArea) = make_value_unknown();
   AddEntityToDeclarations(StaticArea, get_current_module_entity());
+
+  /*HeapArea = FindOrCreateEntity(compilation_unit_name, HEAP_AREA_LOCAL_NAME);
+    entity_type(HeapArea) = make_type(is_type_area, make_area(0, NIL));
+    entity_storage(HeapArea) = MakeStorageRom();
+    entity_initial(HeapArea) = MakeValueUnknown();
+    AddEntityToDeclarations(HeapArea, get_current_module_entity());*/
+
+  // Dynamic variables whose size are not known are stored in Stack area 
+  StackArea = FindOrCreateEntity(get_current_module_name(), STACK_AREA_LOCAL_NAME);
+  entity_type(StackArea) = make_type(is_type_area, make_area(0, NIL));
+  entity_storage(StackArea) = MakeStorageRom();
+  entity_initial(StackArea) = MakeValueUnknown();
+  AddEntityToDeclarations(StackArea, get_current_module_entity());
+
+  entity msae = FindOrCreateEntity(compilation_unit_name,  STATIC_AREA_LOCAL_NAME);
+  AddEntityToDeclarations(msae, get_current_module_entity());
+  
+  entity gsae = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,  STATIC_AREA_LOCAL_NAME);
+  AddEntityToDeclarations(gsae, get_current_module_entity());
+
+  /* This is because of the reparsing of the compilation unit 
+     The area is set to zero and all the declarations are overrided and the memory is reallocated
+     The area is reset to only when it is called by same compilation unit twice. 
+     The code is dangerous hence it is commented. Please have a look
+
+     if( get_current_compilation_unit_entity() == get_current_module_entity() &&
+     (get_current_compilation_unit_entity() == previouscompilationunit))
+     area_size(type_area(entity_type(msae))) = 0;
+  
+     if( get_current_compilation_unit_entity() == get_current_module_entity() && 
+     (get_current_compilation_unit_entity() == previouscompilationunit))
+     area_size(type_area(entity_type(gsae))) = previoussizeofGlobalArea ;
+  */
 }
 
 
@@ -89,15 +136,18 @@ void MakeCurrentCompilationUnitEntity(string name)
   entity_initial(e) = make_value(is_value_code, make_code(NIL,strdup(""), make_sequence(NIL),NIL));
   pips_debug(4,"Set current module entity for compilation unit %s\n",name);
   set_current_module_entity(e);
+  //init_stack_storage_table();
   init_c_areas(); 
 }
 
-void ResetCurrentCompilationUnitEntity()
+void ResetCurrentCompilationUnitEntity(bool is_compilation_unit_parser)
 {
-  CMemoryAllocation(get_current_module_entity());
+  if(is_compilation_unit_parser)
+    CCompilationUnitMemoryAllocation(get_current_module_entity());
+  reset_entity_type_stack_table();
   if (get_bool_property("PARSER_DUMP_SYMBOL_TABLE"))
-    fprint_environment(stderr, get_current_module_entity());
-   pips_debug(4,"Reset current module entity for compilation unit %s\n",get_current_module_name());
+    fprint_C_environment(stderr, get_current_module_entity());
+  pips_debug(4,"Reset current module entity for compilation unit %s\n",get_current_module_name());
   reset_current_module_entity();
 }
 
@@ -291,6 +341,7 @@ expression IdentifierToExpression(string s)
   pips_debug(5,"Identifier is: %s\n",s);
   if (entity_undefined_p(ent))
     {
+      /* Could this be non declared variables ?*/
       /* This identifier has not been passed by the parser. 
          It is probably a function call => try this case now and complete others later.
          The scope of this function is global */
@@ -510,6 +561,7 @@ entity FindEntityFromLocalName(string name)
 	return ent;
     }
   pips_user_warning("Cannot find entity %s\n",name);
+
   return entity_undefined;
 }
 
@@ -906,25 +958,109 @@ type UpdateType(type t1, type t2)
   return type_undefined;
 }
 
-/* This function allocates the memory to the C variable by adding it to the area */
+/* This function allocates the memory to the Current Compilation Unit */
 
-void CMemoryAllocation(entity module)
+void CCompilationUnitMemoryAllocation(entity module)
 {
-  pips_debug(8,"MEMORY ALLOCATION BEGINS\n");
+  /* Should be followed by preconditions */
+  entity msae = FindOrCreateEntity(compilation_unit_name,  STATIC_AREA_LOCAL_NAME);
+  area msa = type_area(entity_type(msae));
+  entity gsae = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,  STATIC_AREA_LOCAL_NAME);
+  area gsa = type_area(entity_type(gsae));
+  entity fdae = FindOrCreateEntity(get_current_module_name(), DYNAMIC_AREA_LOCAL_NAME);
+  area fda = type_area(entity_type(fdae));
+  entity fsae = FindOrCreateEntity(get_current_module_name(), STATIC_AREA_LOCAL_NAME);
+  area fsa = type_area(entity_type(fsae));
+  
+  /* Code for reallocation of memory problem due to reparsing of compilation unit
+     previouscompunit = get_current_compilation_unit_entity();
+     previoussizeofGlobalArea = area_size(gsa);
+  */
+  
+  nodecl_p(module,ModuleStatement);
+  list ld = entity_declarations(module);
+  entity var = entity_undefined;
 
-  MAP ( ENTITY, var,
-  {
-    if(type_variable_p(entity_type(var)))
-      {
-	//Check the storage is of ram type 
-	storage s = entity_storage(var);
-	ram r = storage_ram(s);
-	entity a = ram_section(r);
-	ram_offset(r) = area_size(type_area(entity_type(a)));
-	add_C_variable_to_area(a,var);
-      }
-  },
-  entity_declarations(module));
+  //printf("\n\nArea Layout: %s\n\n", area_layout(fsa));
+  
+  pips_debug(8,"MEMORY ALLOCATION BEGINS\n");
+    
+  for(; !ENDP(ld); ld = CDR(ld))
+    {
+      var = ENTITY(CAR(ld));
+      if(type_variable_p(entity_type(var)))
+	{
+	  // Add some preconditions here
+	  storage s = entity_storage(var);
+	  if(storage_ram_p(s))
+	    {
+	      ram r = storage_ram(s);
+	      entity a = ram_section(r);
+	      /* check the type of variable here to avoid conflict declarations */
+	      if(!gen_in_list_p(var, code_externs(value_code(entity_initial(module))))) {
+		  if(ram_offset(r) != UNDEFINED_RAM_OFFSET 
+			    && ram_offset(r) != UNKNOWN_RAM_OFFSET 
+			    && ram_offset(r) != DYNAMIC_RAM_OFFSET )
+		    pips_internal_error("Multiple Declarations of variable %s in different files\n"
+				    ,entity_local_name(var));
+
+		ram_offset(r) = area_size(type_area(entity_type(a)));
+		add_C_variable_to_area(a,var);
+	      }
+	      else
+		{
+		  /* Donot allocate the memory for external variables:
+		     Set the offset of ram -2 which signifies UNKNOWN offset
+		  */
+
+		  // Check type here to avoid conflict declarations
+		  if(ram_offset(r) == UNKNOWN_RAM_OFFSET)
+		    ram_offset(r) = UNDEFINED_RAM_OFFSET;
+		}
+	    }
+	}
+    }
+}
+
+/* This function is for MemoryAllocation for Module of C programs*/
+
+void CModuleMemoryAllocation(entity module)
+{
+  list ld = entity_declarations(module);
+  entity var = entity_undefined;
+  
+  pips_debug(8,"MEMORY ALLOCATION BEGINS\n");
+  nodecl_p(module,ModuleStatement);
+  //print_entities(ld);
+  for(; !ENDP(ld); ld = CDR(ld))
+    {
+      var = ENTITY(CAR(ld));
+     
+      if(type_variable_p(entity_type(var)))
+	{
+	  storage s = entity_storage(var);
+	  if(storage_ram_p(s))
+	    {
+	      ram r = storage_ram(s);
+	      entity a = ram_section(r);
+	      if(!gen_in_list_p(var, code_externs(value_code(entity_initial(module))))) {
+		ram_offset(r) = area_size(type_area(entity_type(a)));
+		if(a == StackArea)
+		  ram_offset(r) = DYNAMIC_RAM_OFFSET;
+		else
+		  add_C_variable_to_area(a,var);
+	      }
+	      else{
+		if(ram_offset(r) == UNKNOWN_RAM_OFFSET)
+		ram_offset(r) = UNDEFINED_RAM_OFFSET;
+	      }
+	    }
+	  if(storage_formal_p(s))
+	    {
+	      //DO NOTHING
+	    }
+	}
+    }
 }
 
 void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack FunctionStack,
@@ -932,7 +1068,8 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
 {
   /* Update the entity with final type, storage, initial value */
   
-  stack s = (stack) entity_storage(e); 
+  //stack s = (stack) entity_storage(e); 
+  stack s = get_from_entity_type_stack_table(e);
   type t = entity_type(e);
   c_parser_context context = stack_head(ContextStack);
   type tc = c_parser_context_type(context);
@@ -962,8 +1099,14 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
       t2 = UpdateType(t1,t2);
     }
   entity_type(e) = t2;
+  
    
+    
+      
   /************************* STORAGE PART *******************************************/
+
+  /* this field is always pre-defined. It is temporarilly used to store a type. See cyacc.y rule direct-decl: */
+
 
   if (!storage_undefined_p(c_parser_context_storage(context)))
     {
@@ -971,7 +1114,7 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
 		 storage_tag(c_parser_context_storage(context)));
       entity_storage(e) = c_parser_context_storage(context);
     }
-  else
+  else 
     {
       if (!stack_undefined_p(FormalStack) && (FormalStack != NULL) && !stack_empty_p(FormalStack))
 	{
@@ -992,16 +1135,38 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
 	  if(type_variable_p(entity_type(e))) {
 	    /* The entities for the type_variable is added to the current module and the declarations*/  
 	    entity function = get_current_module_entity();
+	    
+	    if(extern_entity_p(function, e))
+	      AddToExterns(e,function);
+	    
+	    /* To avoid multiple declarations */
+	    if(!gen_in_list_p(e, code_externs(value_code(entity_initial(function)))) &&
+	       gen_in_list_p(e, code_declarations(value_code(entity_initial(function)))))
+	      {
+		user_log("Multiple declarations of variable %s in file\n",
+			 entity_local_name(e));
+		CParserError("Illegal Input");
+		
+	      }
+
 	    AddToDeclarations(e,function);
-	    entity_storage(e) = 
-	      MakeStorageRam(e,is_external,c_parser_context_static(context));
+
+	    // Check here if already stored the value
+	    if(storage_undefined_p(entity_storage(e)))
+	      entity_storage(e) = 
+		MakeStorageRam(e,is_external,c_parser_context_static(context));
 	  }
-	  else if (type_functional_p(entity_type(e)))
+	  else if (type_functional_p(entity_type(e))){
+	    /* The function should also added to the declarations */
+	    if(!entity_undefined_p(get_current_module_entity()))
+	      AddToDeclarations(e,get_current_module_entity());
 	    entity_storage(e) = MakeStorageRom();
+	  }
 	  else
 	    pips_assert("not implemented yet", FALSE);
 	}
     }
+  
    
   /************************* INITIAL VALUE PART ****************************************/
   if(value_undefined_p(entity_initial(e))) {
@@ -1028,7 +1193,8 @@ void UpdateAbstractEntity(entity e, stack ContextStack)
 {
   /* Update the entity with final type, storage */
  
-  stack s = (stack) entity_storage(e); 
+  //stack s = (stack) entity_storage(e); 
+  stack s = get_from_entity_type_stack_table(e);
   type t = entity_type(e);
   c_parser_context context = stack_head(ContextStack);
   type tc = c_parser_context_type(context);
@@ -1071,6 +1237,17 @@ bool entity_in_list_p(entity e, list le)
   return FALSE;
 }
 
+void AddToExterns(entity e, entity mod)
+{
+  // the entity e can be extern variable and extern functions
+  if(!gen_in_list_p(e, code_externs(value_code(entity_initial(mod)))))
+  {
+    pips_debug(5,"Add entity %s to extern declaration %s \n", entity_user_name(e), entity_user_name(mod));
+    code_externs(value_code(entity_initial(mod)))
+      = gen_nconc(code_externs(value_code(entity_initial(mod))),
+		  CONS(ENTITY,e,NIL));
+  }
+}
 void AddToDeclarations(entity e, entity mod)
 {
   if (!gen_in_list_p(e,code_declarations(value_code(entity_initial(mod)))))
@@ -1091,7 +1268,8 @@ void UpdateDerivedEntity(list ld, entity e, stack ContextStack)
   pips_debug(3,"Update derived entity %s\n",entity_name(e));
   if (!bit_type_p(t))
     {
-      stack s = (stack) entity_storage(e); 
+      //stack s = (stack) entity_storage(e); 
+      stack s = get_from_entity_type_stack_table(e);
       c_parser_context context = stack_head(ContextStack);
       type tc = c_parser_context_type(context);
       type t1,t2;
@@ -1166,6 +1344,8 @@ entity MakeDerivedEntity(string name, list members, bool is_external, int i)
 
 /*******************  MISC *******************/
 
+  /* The storage part should not be called twice when reparsing compilation unit.
+     We assume that double declarations are dealt with someone else */
 
 storage MakeStorageRam(entity v, bool is_external, bool is_static)
 {
@@ -1176,7 +1356,10 @@ storage MakeStorageRam(entity v, bool is_external, bool is_static)
   area msa = type_area(entity_type(moduleStaticArea));
   entity globalStaticArea = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,  STATIC_AREA_LOCAL_NAME);
   area gsa = type_area(entity_type(globalStaticArea));
-
+  area stack = type_area(entity_type(StackArea));
+  area heap = type_area (entity_type(HeapArea));
+  entity m = get_current_module_entity();
+  
   pips_assert("RAM Storage is used only for variables", type_variable_p(entity_type(v)));
 
   if (is_external)
@@ -1184,25 +1367,30 @@ storage MakeStorageRam(entity v, bool is_external, bool is_static)
       if (is_static)
 	{
 	  r = make_ram(get_current_compilation_unit_entity(),
-		       StaticArea,
+		       moduleStaticArea,
 		       UNKNOWN_RAM_OFFSET /* ComputeAreaOffset(StaticArea,e) */,
 		       NIL);
+	    
 	  /*the offset must be recomputed lately, when we know for
 	    sure the size of the variables */
-	  area_layout(msa) = gen_nconc(area_layout(msa), CONS(ENTITY, v, NIL));
+	  if(get_current_compilation_unit_entity() != get_current_module_entity() 
+	     || !gen_in_list_p(v,area_layout(msa)))  
+	    area_layout(msa) = gen_nconc(area_layout(msa), CONS(ENTITY, v, NIL));
 	}
       else 
 	{
 	  /* This must be a variable, not a function/typedef/struct/union/enum. 
 	     The variable is declared outside any function, and hence is global*/
-	  /* If it is external, it is allocated somewhere else. */
+	  
 	  r = make_ram(get_top_level_entity(),
-		       get_top_level_entity(), 
+		       globalStaticArea, 
 		       UNKNOWN_RAM_OFFSET /* ComputeAreaOffset(get_top_level_entity(),e) */,
 		       NIL);
 	  /* the offset must be recomputed lately, when we know for
 	     sure the size of the variable */
-  	  area_layout(gsa) = gen_nconc(area_layout(gsa), CONS(ENTITY, v, NIL));
+	  /* Global variable can be declared in many different file */
+	  if(!gen_in_list_p(v,area_layout(gsa)))
+	    area_layout(gsa) = gen_nconc(area_layout(gsa), CONS(ENTITY, v, NIL));
 	}
     }
   else
@@ -1220,13 +1408,24 @@ storage MakeStorageRam(entity v, bool is_external, bool is_static)
 	}
       else
 	{
-	  r = make_ram(get_current_module_entity(),
-		       DynamicArea,
-		       UNKNOWN_RAM_OFFSET /* ComputeAreaOffset(DynamicArea,e) */,
-		       NIL);
-	  /* the offset must be recomputed lately, when we know for
-	     sure the size of the variable */
-	  area_layout(dsa) = gen_nconc(area_layout(dsa), CONS(ENTITY, v, NIL));
+	  int s = 0;
+	  if(!SizeOfArray(v, &s))
+	    {
+	      r = make_ram(get_current_module_entity(),
+			   StackArea,
+			   DYNAMIC_RAM_OFFSET,
+			   NIL);
+	      area_layout(stack) = gen_nconc(area_layout(stack), CONS(ENTITY, v, NIL));
+	    }
+	  else {
+	    r = make_ram(get_current_module_entity(),
+			 DynamicArea,
+			 UNKNOWN_RAM_OFFSET /* ComputeAreaOffset(DynamicArea,e) */,
+			 NIL);
+	    /* the offset must be recomputed lately, when we know for
+	       sure the size of the variable */
+	    area_layout(dsa) = gen_nconc(area_layout(dsa), CONS(ENTITY, v, NIL));
+	  }
 	}
     }
   return make_storage_ram(r);
@@ -1308,6 +1507,8 @@ int ComputeAreaOffset(entity a, entity v)
   type ta = entity_type(a);
   area aa = type_area(ta);
   int offset = area_size(aa);
+
+  pips_assert("Not used", FALSE);
   
   /* Update the size and layout of the area aa. 
      This function is called too earlier, we may not have the size of v.
@@ -1409,6 +1610,53 @@ void AddToCalledModules(entity e)
 	  CalledModules = CONS(STRING, strdup(n), CalledModules);
 	}
     }
+}
+
+// No Declaration Check for variables and functions 
+static bool declarationerror_p;
+
+static bool referencenodeclfilter(reference r)
+{
+  entity e = reference_variable(r);
+    
+  if(variable_entity_p(e)){
+  if(!(gen_in_list_p(e, entity_declarations(get_current_module_entity())) 
+       || gen_in_list_p(e, entity_declarations(get_current_compilation_unit_entity()))))
+    {
+      declarationerror_p = TRUE;
+      user_log("\n\nNo declaration of variable: %s in module: %s \n",
+	       entity_local_name(e),get_current_module_name());
+    }
+  }
+  // There cannot a reference to variable of storage return 
+  if(storage_return_p(entity_storage(e))){
+    declarationerror_p = TRUE;
+     user_log("\n\nNo declaration of variable: %s in module: %s \n",
+	      entity_local_name(e),get_current_module_name());
+  }
+}
+static bool callnodeclfilter(call c)
+{
+  entity e = call_function(c);
+  if(value_code_p(entity_initial(e))) {
+  if(!(gen_in_list_p(e, entity_declarations(get_current_module_entity())) 
+       || gen_in_list_p(e, entity_declarations(get_current_compilation_unit_entity()))))
+    {
+      declarationerror_p = TRUE;
+      user_log("\n\nNo declaration of function: %s in module: %s \n",
+	       entity_local_name(e), get_current_module_name());
+    }
+  }
+}
+
+void nodecl_p(entity module, statement stat)
+{
+  declarationerror_p = FALSE;
+  gen_multi_recurse(stat, reference_domain,referencenodeclfilter,gen_null,
+		    call_domain,callnodeclfilter,gen_null, NULL);
+
+  if(declarationerror_p)
+    CParserError("Illegal Input\n");
 }
 
 /******************** STACK *******************************/
