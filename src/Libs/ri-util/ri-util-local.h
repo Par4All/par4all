@@ -360,7 +360,6 @@
                 (basic_overloaded_p(b1) && basic_overloaded_p(b2)) ||\
                 (basic_undefined_p(b1) && basic_undefined_p(b2)))
 
-
 /*  constant sizes
  */
 #define LABEL_SIZE 5
@@ -371,6 +370,11 @@
  */
 #define STATEMENT_NUMBER_UNDEFINED (-1)
 #define UNKNOWN_RAM_OFFSET (-1)
+// It is for extern variables whose ram offset is not known
+#define UNDEFINED_RAM_OFFSET (-2)
+// It is for dynamic allocation of arrays whose ram offset is not known either.
+#define DYNAMIC_RAM_OFFSET (-3)
+
 
 /* On devrait utiliser Newgen pour cela, mais comme on ne doit pas
    les utiliser directement (mais via statement_less_p), cela devrait
@@ -572,6 +576,7 @@ entity get_ith_##lname##_prime(int i)\
 #define DEFAULT_LONG_INTEGER_TYPE_SIZE (6)
 #define DEFAULT_LONG_LONG_INTEGER_TYPE_SIZE (8)
 
+#define DEFAULT_POINTER_TYPE_SIZE (4) // could be 4 or 8
 #define DEFAULT_UNSIGNED_TYPE_SIZE (1)
 #define DEFAULT_SIGNED_TYPE_SIZE (2)
 

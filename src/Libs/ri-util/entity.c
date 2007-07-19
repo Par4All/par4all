@@ -739,45 +739,48 @@ common_members_of_module(
     entity module,
     bool only_primary /* not the equivalenced... */)
 {
-    list result = NIL;
-    int cumulated_offset = 0;
-    pips_assert("entity is a common", type_area_p(entity_type(common)));
+  list result = NIL;
+  int cumulated_offset = 0;
+  pips_assert("entity is a common", type_area_p(entity_type(common)));
 
-    MAP(ENTITY, v,
-    {    
-	storage s = entity_storage(v);
-	ram r;
-	pips_assert("storage ram", storage_ram_p(s));
-	r = storage_ram(s);
-	if (ram_function(r)==module)
-	{
-	    int offset = ram_offset(r);
-	    int size = 0;
+  list ld =  area_layout(type_area(entity_type(common)));
+  entity v = entity_undefined;
 
-	    if(heap_area_p(ram_section(r))) {
-		size = 0;
-	    }
-	    else if(stack_area_p(ram_section(r))) {
-		size = 0;
-	    }
-	    else {
-		if(!SizeOfArray(v, &size)) {
-		    pips_error("common_members_of_module",
-			       "Varying size array \"%s\"\n", entity_name(v));
-		}
-	    }
+  for(; !ENDP(ld);ld = CDR(ld))
+  {    
+    v = ENTITY(CAR(ld));
+    storage s = entity_storage(v);
+    ram r;
+    pips_assert("storage ram", storage_ram_p(s));
+    r = storage_ram(s);
+    if (ram_function(r)==module)
+    {
+	int offset = ram_offset(r);
+	int size = 0;
 
-	    if (cumulated_offset==offset || !only_primary)
-		result = CONS(ENTITY, v, result);
-	    else 
-		break; /* drop equivalenced that come hereafter... */
+	if(heap_area_p(ram_section(r))) {
+	  size = 0;
+	}
+	else if(stack_area_p(ram_section(r))) {
+	  size = 0;
+	}
+	else {
+	  if(!SizeOfArray(v, &size)) {
+	    pips_error("common_members_of_module",
+		       "Varying size array \"%s\"\n", entity_name(v));
+	  }
+	}
 
-	    cumulated_offset+=size;
-	    }
-    },
-        area_layout(type_area(entity_type(common))));
+	if (cumulated_offset==offset || !only_primary)
+	  result = CONS(ENTITY, v, result);
+	else 
+	  break; /* drop equivalenced that come hereafter... */
 
-    return gen_nreverse(result);
+	cumulated_offset+=size;
+	}
+  }
+       
+  return gen_nreverse(result);
 }
 
 /* returns if l contains an entity with same type, local name and offset.
@@ -1004,7 +1007,28 @@ bool extern_entity_p(entity module, entity e)
      - The current module is a compilation unit and the entity is in the ram_shared list of 
      the ram storage of the compilation unit.
      - The current module is a normal function and the entity has a global scope.*/
-
-  return ((compilation_unit_entity_p(module) && gen_in_list_p(e,ram_shared(storage_ram(entity_storage(module)))))
+  // Check if e belongs to module
+  /* bool isbelong = TRUE;
+  list ld = entity_declarations(m);
+  //ifdebug(1) {
+    pips_assert("e is visible in module",gen_in_list_p(e,ld));
+  //  pips_assert("module is a module or compilation unit",entity_module_p(m)||compilation_unit_entity_p(m));
+    pips_assert("e is either variable or function", variable_entity_p(e),functional_entity_p(e));
+  //}
+  if(variable_entity_p(e))
+  //{
+    if (compilation_unit_entity_p(m){
+   //   return(strstr(entity_name(e),
+    //}
+    //else
+      {
+	//return(strstr(entity_name(e),TOP_LEVEL_MODULE_NAME) != NULL);
+      //}
+   //}
+  //else
+    //return(static_module_name_p(e));
+  */ 
+    return ((compilation_unit_entity_p(module) && gen_in_list_p(e,ram_shared(storage_ram(entity_storage(module)))))
 	  ||(!compilation_unit_entity_p(module) && (strstr(entity_name(e),TOP_LEVEL_MODULE_NAME) != NULL)));
+  
 }

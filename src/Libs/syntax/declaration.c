@@ -905,6 +905,14 @@ DeclareIntrinsic(entity e)
  */
 static hash_table common_size_map = hash_table_undefined;
 
+// This function is needed to check area consistency when dumping symbol table
+
+bool fortran_relevant_area_entity_p(entity c)
+{
+  return ((common_size_map == hash_table_undefined || common_to_size(c)==0)
+	 && !heap_area_p(c)
+	  && !stack_area_p(c));
+}
 void 
 initialize_common_size_map()
 {
@@ -1627,77 +1635,7 @@ entity e;
 
     return(FALSE);
 }
-
-/* 
- * Check... and fix, if needed!
- *
- * Only user COMMONs are checked. The two implicit areas, DynamicArea and 
- * StaticArea, have not been initialized yet (see ComputeAddress() and the
- * calls in EndOfProcedure()).
- */
 
-void 
-update_user_common_layouts(m)
-entity m;
-{
-    list decls = NIL;
-    list sorted_decls = NIL;
-
-    pips_assert("update_user_common_layouts", entity_module_p(m));
-
-    decls = code_declarations(value_code(entity_initial(m)));
-    sorted_decls = gen_append(decls, NIL);
-    sort_list_of_entities(sorted_decls);
-
-    ifdebug(1) {
-	pips_debug(1, "\nDeclarations for module %s\n", module_local_name(m));
-
-	/* List of implicitly and explicitly declared variables, 
-	   functions and areas */
-
-	pips_debug(1, "%s\n", ENDP(decls)? 
-		   "* empty declaration list *\n\n": "Variable list:\n\n");
-
-	MAP(ENTITY, e, 
-	    fprintf(stderr, "Declared entity %s\n", entity_name(e)),
-	    sorted_decls);
-
-	/* Structure of each area/common */
-	if(!ENDP(decls)) {
-	    (void) fprintf(stderr, "\nLayouts for areas (commons):\n\n");
-	}
-    }
-
-    MAP(ENTITY, e, {
-	if(type_area_p(entity_type(e))) {
-	    ifdebug(1) {
-		print_common_layout(stderr, e, TRUE);
-	    }
-	    if(!SPECIAL_AREA_P(e)) {
-		/* User declarations of commons imply the offset and
-		   cannot conflict with equivalences, whereas static and
-		   dynamic variables must first comply with
-		   equivalences. Hence the layouts of user commons must be
-		   updated before equivalences are satisfied whereas
-		   layouts of the static and dynamic areas must be
-		   satisfied after the equiavelences have been
-		   processed. */
-		if(update_common_layout(m, e)) {
-		    ifdebug(1) {
-			print_common_layout(stderr, e, TRUE);
-		    }
-		}
-	    }
-	}
-    }, sorted_decls);
-
-    gen_free_list(sorted_decls);
-
-    pips_debug(1, "End of declarations for module %s\n\n",
-	       module_local_name(m));
-}
-
-/* This function is called from c_parse() via ResetCurrentModule() and fprint_environment() */
 void 
 print_common_layout(FILE * fd, entity c, bool debug_p)
 {
@@ -1810,6 +1748,77 @@ print_common_layout(FILE * fd, entity c, bool debug_p)
     }
     gen_free_list(members);
 }
+
+
+/* 
+ * Check... and fix, if needed!
+ *
+ * Only user COMMONs are checked. The two implicit areas, DynamicArea and 
+ * StaticArea, have not been initialized yet (see ComputeAddress() and the
+ * calls in EndOfProcedure()).
+ */
+
+void 
+update_user_common_layouts(m)
+entity m;
+{
+    list decls = NIL;
+    list sorted_decls = NIL;
+
+    pips_assert("update_user_common_layouts", entity_module_p(m));
+
+    decls = code_declarations(value_code(entity_initial(m)));
+    sorted_decls = gen_append(decls, NIL);
+    sort_list_of_entities(sorted_decls);
+
+    ifdebug(1) {
+	pips_debug(1, "\nDeclarations for module %s\n", module_local_name(m));
+
+	/* List of implicitly and explicitly declared variables, 
+	   functions and areas */
+
+	pips_debug(1, "%s\n", ENDP(decls)? 
+		   "* empty declaration list *\n\n": "Variable list:\n\n");
+
+	MAP(ENTITY, e, 
+	    fprintf(stderr, "Declared entity %s\n", entity_name(e)),
+	    sorted_decls);
+
+	/* Structure of each area/common */
+	if(!ENDP(decls)) {
+	    (void) fprintf(stderr, "\nLayouts for areas (commons):\n\n");
+	}
+    }
+
+    MAP(ENTITY, e, {
+	if(type_area_p(entity_type(e))) {
+	    ifdebug(1) {
+		print_common_layout(stderr, e, TRUE);
+	    }
+	    if(!SPECIAL_AREA_P(e)) {
+		/* User declarations of commons imply the offset and
+		   cannot conflict with equivalences, whereas static and
+		   dynamic variables must first comply with
+		   equivalences. Hence the layouts of user commons must be
+		   updated before equivalences are satisfied whereas
+		   layouts of the static and dynamic areas must be
+		   satisfied after the equiavelences have been
+		   processed. */
+		if(update_common_layout(m, e)) {
+		    ifdebug(1) {
+			print_common_layout(stderr, e, TRUE);
+		    }
+		}
+	    }
+	}
+    }, sorted_decls);
+
+    gen_free_list(sorted_decls);
+
+    pips_debug(1, "End of declarations for module %s\n\n",
+	       module_local_name(m));
+}
+
 
 /* (Re)compute offests of all variables allocated in common c from module m
  * and update (if necessary) the size of common c for the *whole* program or
@@ -1940,149 +1949,6 @@ entity c;
     return updated;
 }
 
-void
-fprint_functional(FILE * fd, functional f)
-{
-  type tr = functional_result(f);
-
-  MAPL(cp, {
-    parameter p = PARAMETER(CAR(cp));
-    type ta = parameter_type(p);
-
-    pips_assert("Argument type is variable or varags:variable or functional",
-		type_variable_p(ta)
-		|| (type_varargs_p(ta) && type_variable_p(type_varargs(ta)))
-		|| type_functional_p(ta));
-
-    if(type_functional_p(ta)) {
-      functional fa = type_functional(ta);
-      /* (void) fprintf(fd, " %s:", type_to_string(ta)); */
-      (void) fprintf(fd, "(");
-      fprint_functional(fd, fa);
-      (void) fprintf(fd, ")");
-    }
-    else {
-      if(type_varargs_p(ta)) {
-	(void) fprintf(fd, " %s:", type_to_string(ta));
-	ta = type_varargs(ta);
-      }
-      (void) fprintf(fd, "%s", basic_to_string(variable_basic(type_variable(ta))));
-    }
-    if(!ENDP(cp->cdr))
-      (void) fprintf(fd, " x ");
-  },
-       functional_parameters(f));
-
-  if(ENDP(functional_parameters(f))) {
-    (void) fprintf(fd, " ()");
-  }
-  (void) fprintf(fd, " -> ");
-
-  if(type_variable_p(tr))
-    (void) fprintf(fd, " %s\n", basic_to_string(variable_basic(type_variable(tr))));
-  else if(type_void_p(tr))
-    (void) fprintf(fd, " %s\n", type_to_string(tr));
-  else if(type_unknown_p(tr)){
-    /* Well, seems to occur for C compilation units, instead of void... */
-    (void) fprintf(fd, " %s\n", type_to_string(tr));
-  }
-  else if(type_varargs_p(tr)) {
-    (void) fprintf(fd, " %s:%s", type_to_string(tr),
-		   basic_to_string(variable_basic(type_variable(type_varargs(tr)))));
-  }
-  else
-    /* An argument can be functional, but not (yet) a result. */
-    pips_error("fprint_functional", "Ill. type %d\n", type_tag(tr));
-}
-
-void 
-fprint_environment(FILE * fd, entity m)
-{
-    list decls = gen_copy_seq(code_declarations(value_code(entity_initial(m))));
-    int nth = 0; /* rank of formal parameter */
-    entity rv = entity_undefined; /* return variable */
-
-    pips_assert("fprint_environment", entity_module_p(m));
-
-    /* To simplify validation, at the expense of some information about
-       the parsing process. */
-    gen_sort_list(decls, compare_entities);
-
-    (void) fprintf(fd, "\nDeclarations for module %s with type ", 
-		   module_local_name(m));
-    fprint_functional(fd, type_functional(entity_type(m)));
-    (void) fprintf(fd, "\n\n");
-
-    /* List of implicitly and explicitly declared variables, 
-       functions and areas */
-
-    (void) fprintf(fd, "%s\n", ENDP(decls)? 
-		   "* empty declaration list *\n\n": "Variable list:\n\n");
-
-    MAP(ENTITY, e, {
-	type t = entity_type(e);
-
-	fprintf(fd, "Declared entity %s\twith type %s ", entity_name(e), type_to_string(t));
-
-	if(type_variable_p(t))
-	    fprintf(fd, "%s\n", basic_to_string(variable_basic(type_variable(t))));
-	else if(type_functional_p(t)) {
-	    fprint_functional(fd, type_functional(t));
-	}
-	else if(type_area_p(t)) {
-	    (void) fprintf(fd, "with size %d\n", area_size(type_area(t)));
-	}
-	else
-	    (void) fprintf(fd, "\n");
-	    },
-	decls);
-
-    /* Formal parameters */
-    nth = 0;
-    MAP(ENTITY, v, {
-	storage vs = entity_storage(v);
-
-	pips_assert("All storages are defined", !storage_undefined_p(vs));
-
-	if(storage_formal_p(vs)) {
-	    nth++;
-	    if(nth==1) {
-		(void) fprintf(fd, "\nLayouts for formal parameters:\n\n");
-	    }
-	    (void) fprintf(fd,
-			   "\tVariable %s,\toffset = %d\n", 
-			   entity_name(v), formal_offset(storage_formal(vs)));
-	}
-	else if(storage_return_p(vs)) {
-	    pips_assert("No more than one return variable", entity_undefined_p(rv));
-	    rv = v;
-	}
-    }, decls);
-
-    /* Return variable */
-    if(!entity_undefined_p(rv)) {
-	(void) fprintf(fd, "\nLayout for return variable:\n\n");
-	(void) fprintf(fd, "\tVariable %s,\tsize = %d\n", 
-			   entity_name(rv), SafeSizeOfArray(rv));
-    }
-
-    /* Structure of each area/common */
-    if(!ENDP(decls)) {
-	(void) fprintf(fd, "\nLayouts for areas (commons):\n\n");
-    }
-
-    MAP(ENTITY, e, {
-	if(type_area_p(entity_type(e))) {
-	    print_common_layout(fd, e, FALSE);
-	}
-    }, 
-	decls);
-
-    (void) fprintf(fd, "End of declarations for module %s\n\n",
-		   module_local_name(m));
-
-    gen_free_list(decls);
-}
 
 /* Problem: A functional global entity may be referenced without
    parenthesis or CALL keyword in a function or subroutine call as

@@ -521,16 +521,19 @@ int add_any_variable_to_area(entity a, entity v, bool is_fortran_p)
     if(!SizeOfArray(v, &s)) {
       pips_internal_error("Varying size array \"%s\"\n", entity_name(v));
     }
-    area_size(aa) = OldOffset+s;
-  }
   
-  if(is_fortran_p)
-    area_layout(aa) = gen_nconc(area_layout(aa), CONS(ENTITY, v, NIL));
-  else{
-    if(!gen_in_list_p(v, area_layout(aa)))
-      area_layout(aa) = gen_nconc(area_layout(aa), CONS(ENTITY, v, NIL));
+    if(is_fortran_p)
+      {
+	area_layout(aa) = gen_nconc(area_layout(aa), CONS(ENTITY, v, NIL));
+	area_size(aa) = OldOffset+s;
+      }
+    else
+      {
+	if(!gen_in_list_p(v, area_layout(aa)))
+	  area_layout(aa) = gen_nconc(area_layout(aa), CONS(ENTITY, v, NIL));
+	area_size(aa) = OldOffset+s;
+      }
   }
-
   return(OldOffset);
 }
 

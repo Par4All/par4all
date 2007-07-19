@@ -177,7 +177,7 @@ int SizeOfElements(basic b)
     e = basic_bit(b);
     break;
   case is_basic_pointer:
-    e = basic_pointer(b);
+    e = DEFAULT_POINTER_TYPE_SIZE;
     break;
   case is_basic_derived:
     e = entity_memory_size(basic_derived(b));

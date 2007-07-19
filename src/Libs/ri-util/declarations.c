@@ -1977,11 +1977,13 @@ text c_text_entity(entity module, entity e, int margin)
   /* This part is for storage specifiers */
   if (!entity_undefined_p(module) && extern_entity_p(module, e))
     pc = CHAIN_SWORD(pc,"extern ");
-
+  
   if (strstr(entity_name(e),TYPEDEF_PREFIX) != NULL)
     pc = CHAIN_SWORD(pc,"typedef ");
  
-  if (storage_ram_p(s) && static_area_p(ram_section(storage_ram(s)))
+  /* The global variables stored in static area and in ram but they are not static so a condition is needed which checks if it not a global variable*/
+  entity m = get_current_module_entity();
+  if ((storage_ram_p(s) && static_area_p(ram_section(storage_ram(s))) && !strstr(entity_name(e),TOP_LEVEL_MODULE_NAME)) 
       || (entity_module_p(e) && static_module_p(e)))
     pc = CHAIN_SWORD(pc,"static ");
 
@@ -2070,20 +2072,279 @@ text c_text_entity(entity module, entity e, int margin)
   return r; 
 }
 
+
+/* The fprint_functional() and fprint_environment() functions are moved from syntax/declaration.c */ 
 
+/* C Version of print_common_layout this is called by fprint_environment(). This function is much simpler than Fortran Version */
 
+list get_common_members(entity common, entity module, bool only_primary)
+{
+  list result = NIL;
+  int cumulated_offset = 0;
+  pips_assert("entity is a common", type_area_p(entity_type(common)));
 
+  list ld = area_layout(type_area(entity_type(common)));
+  entity v = entity_undefined;
 
+  for(; !ENDP(ld); ld = CDR(ld))
+    {
+      v = ENTITY(CAR(ld));
+      storage s = entity_storage(v);
+      if(storage_ram_p(s))
+	{
+	  result = CONS(ENTITY, v, result);
+	}
+    }
+  return gen_nreverse(result);
+}
 
+void print_C_common_layout(FILE * fd, entity c, bool debug_p)
+{
+  entity mod = get_current_module_entity();
+  list members = get_common_members(c, mod, FALSE);
+  list equiv_members = NIL;
 
+  (void) fprintf(fd, "\nLayout for common %s of size %d: \n",
+		 entity_name(c), area_size(type_area(entity_type(c))));
 
+  if(ENDP(members)) {
+    pips_assert("An empty area has size 0", area_size(type_area(entity_type(c))) ==0);
+    (void) fprintf(fd, "\t* empty area *\n\n");
+  }
+  else {
+    if(area_size(type_area(entity_type(c))) == 0)
+      {
+	if(debug_p) {
+	  user_warning("print_common_layout","Non-empty area %s should have a final size greater than 0\n",
+		       entity_module_name(c));
+	}
+	else {
+	  // The non-empty area can have size zero if the entity is extern
+	  //pips_error("print_common_layout",
+	  //     "Non-empty area %s should have a size greater than 0\n",
+	  //     entity_module_name(c));
+	}
+      }
+    MAP(ENTITY, m, 
+    {
+      pips_assert("RAM storage",
+		  storage_ram_p(entity_storage(m)));
+      int s;
+      // There can be a Array whose size is not known (Dynamic Variables)
+      SizeOfArray(m, &s);
+      
+      pips_assert("An area has no offset as -1",
+		  (ram_offset(storage_ram(entity_storage(m)))!= -1));
+      if(ram_offset(storage_ram(entity_storage(m))) == DYNAMIC_RAM_OFFSET) {
+	(void) fprintf(fd,
+		       "\tDynamic Variable %s, \toffset = UNKNOWN, \tsize = DYNAMIC\n",
+		       entity_name(m));
+      }
+      else if(ram_offset(storage_ram(entity_storage(m))) == UNDEFINED_RAM_OFFSET) {
+	    
+	(void) fprintf(fd,
+		       "\tExternal Variable %s,\toffset = UNKNOWN,\tsize = %d\n", 
+		       entity_name(m),s);
+      }
+      else {
+	(void) fprintf(fd,
+		       "\tVariable %s,\toffset = %d,\tsize = %d\n", 
+		       entity_name(m),
+		       ram_offset(storage_ram(entity_storage(m))),
+		       s);
+      }
+      //}
+    }, 
+	members);
+    (void) fprintf(fd, "\n");
+    /* Look for variables aliased with a variable in this common */
+    MAP(ENTITY, m, 
+    {
+      list equiv = ram_shared(storage_ram(entity_storage(m)));
 
+      equiv_members = arguments_union(equiv_members, equiv);
+    }, 
+	members);
 
+    if(!ENDP(equiv_members)){
 
+      equiv_members = arguments_difference(equiv_members, members);
+      if(!ENDP(equiv_members)) {
+	sort_list_of_entities(equiv_members);
 
+	(void) fprintf(fd, "\tVariables aliased to this common:\n");
 
+	MAP(ENTITY, m, 
+	{
+	  pips_assert("RAM storage",
+		      storage_ram_p(entity_storage(m)));
+	  (void) fprintf(fd,
+			 "\tVariable %s,\toffset = %d,\tsize = %d\n", 
+			 entity_name(m),
+			 ram_offset(storage_ram(entity_storage(m))),
+			 SafeSizeOfArray(m));
+	}, 
+	    equiv_members);
+	(void) fprintf(fd, "\n");
+	gen_free_list(equiv_members);
+      }
+    }
+  }
+  gen_free_list(members);
+}
 
+/* This function is called from c_parse() via ResetCurrentModule() and fprint_environment() */
+void fprint_functional(FILE * fd, functional f)
+{
+  type tr = functional_result(f);
 
+  MAPL(cp, {
+    parameter p = PARAMETER(CAR(cp));
+    type ta = parameter_type(p);
 
+    pips_assert("Argument type is variable or varags:variable or functional",
+		type_variable_p(ta)
+		|| (type_varargs_p(ta) && type_variable_p(type_varargs(ta)))
+		|| type_functional_p(ta));
 
+    if(type_functional_p(ta)) {
+      functional fa = type_functional(ta);
+      /* (void) fprintf(fd, " %s:", type_to_string(ta)); */
+      (void) fprintf(fd, "(");
+      fprint_functional(fd, fa);
+      (void) fprintf(fd, ")");
+    }
+    else {
+      if(type_varargs_p(ta)) {
+	(void) fprintf(fd, " %s:", type_to_string(ta));
+	ta = type_varargs(ta);
+      }
+      (void) fprintf(fd, "%s", basic_to_string(variable_basic(type_variable(ta))));
+    }
+    if(!ENDP(cp->cdr))
+      (void) fprintf(fd, " x ");
+  },
+       functional_parameters(f));
 
+  if(ENDP(functional_parameters(f))) {
+    (void) fprintf(fd, " ()");
+  }
+  (void) fprintf(fd, " -> ");
+
+  if(type_variable_p(tr))
+    (void) fprintf(fd, " %s\n", basic_to_string(variable_basic(type_variable(tr))));
+  else if(type_void_p(tr))
+    (void) fprintf(fd, " %s\n", type_to_string(tr));
+  else if(type_unknown_p(tr)){
+    /* Well, seems to occur for C compilation units, instead of void... */
+    (void) fprintf(fd, " %s\n", type_to_string(tr));
+  }
+  else if(type_varargs_p(tr)) {
+    (void) fprintf(fd, " %s:%s", type_to_string(tr),
+		   basic_to_string(variable_basic(type_variable(type_varargs(tr)))));
+  }
+  else
+    /* An argument can be functional, but not (yet) a result. */
+    pips_error("fprint_functional", "Ill. type %d\n", type_tag(tr));
+}
+
+void fprint_environment(FILE *fd, entity m)
+{
+  fprint_any_environment(fd, m, TRUE);
+}
+
+void fprint_C_environment(FILE *fd, entity m)
+{
+  fprint_any_environment(fd, m, FALSE);
+}
+
+fprint_any_environment(FILE * fd, entity m, bool is_fortran)
+{
+    list decls = gen_copy_seq(code_declarations(value_code(entity_initial(m))));
+    int nth = 0; /* rank of formal parameter */
+    entity rv = entity_undefined; /* return variable */
+
+    pips_assert("fprint_environment", entity_module_p(m));
+
+    /* To simplify validation, at the expense of some information about
+       the parsing process. */
+    gen_sort_list(decls, compare_entities);
+
+    (void) fprintf(fd, "\nDeclarations for module %s with type ", 
+		   module_local_name(m));
+    fprint_functional(fd, type_functional(entity_type(m)));
+    (void) fprintf(fd, "\n\n");
+
+    /* List of implicitly and explicitly declared variables, 
+       functions and areas */
+
+    (void) fprintf(fd, "%s\n", ENDP(decls)? 
+		   "* empty declaration list *\n\n": "Variable list:\n\n");
+
+    MAP(ENTITY, e, {
+	type t = entity_type(e);
+
+	fprintf(fd, "Declared entity %s\twith type %s ", entity_name(e), type_to_string(t));
+
+	if(type_variable_p(t))
+	    fprintf(fd, "%s\n", basic_to_string(variable_basic(type_variable(t))));
+	else if(type_functional_p(t)) {
+	    fprint_functional(fd, type_functional(t));
+	}
+	else if(type_area_p(t)) {
+	    (void) fprintf(fd, "with size %d\n", area_size(type_area(t)));
+	}
+	else
+	    (void) fprintf(fd, "\n");
+	    },
+	decls);
+
+    /* Formal parameters */
+    nth = 0;
+    MAP(ENTITY, v, {
+	storage vs = entity_storage(v);
+
+	pips_assert("All storages are defined", !storage_undefined_p(vs));
+
+	if(storage_formal_p(vs)) {
+	    nth++;
+	    if(nth==1) {
+		(void) fprintf(fd, "\nLayouts for formal parameters:\n\n");
+	    }
+	    (void) fprintf(fd,
+			   "\tVariable %s,\toffset = %d\n", 
+			   entity_name(v), formal_offset(storage_formal(vs)));
+	}
+	else if(storage_return_p(vs)) {
+	    pips_assert("No more than one return variable", entity_undefined_p(rv));
+	    rv = v;
+	}
+    }, decls);
+
+    /* Return variable */
+    if(!entity_undefined_p(rv)) {
+	(void) fprintf(fd, "\nLayout for return variable:\n\n");
+	(void) fprintf(fd, "\tVariable %s,\tsize = %d\n", 
+			   entity_name(rv), SafeSizeOfArray(rv));
+    }
+
+    /* Structure of each area/common */
+    if(!ENDP(decls)) {
+	(void) fprintf(fd, "\nLayouts for areas (commons):\n\n");
+    }
+
+    MAP(ENTITY, e, {
+      if(type_area_p(entity_type(e))) {
+	if(is_fortran)
+	  print_common_layout(fd, e, FALSE);
+	else
+	  print_C_common_layout(fd, e, FALSE);
+      }
+    }, 
+	decls);
+    
+    (void) fprintf(fd, "End of declarations for module %s\n\n",
+		   module_local_name(m));
+
+    gen_free_list(decls);
+}
