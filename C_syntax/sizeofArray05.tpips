@@ -1,0 +1,18 @@
+
+delete sizeofArray05
+create sizeofArray05 sizeofArray05.c
+
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+activate C_SYMBOL_TABLE
+activate C_PARSER
+
+display SYMBOL_TABLE_FILE[%ALL]
+display PARSED_PRINTED_FILE[%ALL]
+close
+delete sizeofArray05
+quit

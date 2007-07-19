@@ -1,0 +1,6 @@
+   extern void foo();
+void foo()
+{
+   extern int i;
+}
+

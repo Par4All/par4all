@@ -1,0 +1,77 @@
+allocation05!
+
+Declarations for module allocation05! with type () -> unknow
+Variable list:
+
+Declared entity TOP-LEVEL:*STATIC*	with type area with size 4
+Declared entity TOP-LEVEL:a	with type variable INTEGER*4
+Declared entity TOP-LEVEL:b	with type variable INTEGER*4
+Declared entity TOP-LEVEL:foo	with type functional  () -> INTEGER*4
+Declared entity allocation05!:*DYNAMIC*	with type area with size 0
+Declared entity allocation05!:*STACK*	with type area with size 0
+Declared entity allocation05!:*STATIC*	with type area with size 0
+
+Layouts for areas (commons):
+
+Layout for common /TOP-LEVEL:*STATIC*/ of size 4:
+	Variable TOP-LEVEL:a	offset = 0	size = 4
+	External VariableTOP-LEVEL:b	offset = UNKNOWN,	size = 4
+
+
+Layout for common /allocation05!:*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /allocation05!:*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /allocation05!:*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module allocation05!
+
+foo
+
+Declarations for module foo with type () -> INTEGER*4
+Variable list:
+
+Declared entity TOP-LEVEL:*STATIC*	with type area with size 4
+Declared entity allocation05!:*STATIC*	with type area with size 0
+Declared entity foo:*DYNAMIC*	with type area with size 0
+Declared entity foo:*STACK*	with type area with size 0
+Declared entity foo:*STATIC*	with type area with size 0
+
+Layouts for areas (commons):
+
+Layout for common /TOP-LEVEL:*STATIC*/ of size 4:
+	Variable TOP-LEVEL:a	offset = 0	size = 4
+	External VariableTOP-LEVEL:b	offset = UNKNOWN,	size = 4
+
+
+Layout for common /allocation05!:*STATIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /foo:*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /foo:*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /foo:*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module foo
+
+   int a;
+   extern int b;
+   extern int foo();
+int foo()
+{
+   a = 1;
+   b = 2;
+   return a;
+}

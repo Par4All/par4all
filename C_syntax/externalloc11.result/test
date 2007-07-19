@@ -1,0 +1,189 @@
+bar
+
+Declarations for module bar with type () -> void
+Variable list:
+
+Declared entity TOP-LEVEL:*STATIC*	with type area with size 0
+Declared entity bar!:*STATIC*	with type area with size 0
+Declared entity bar:*DYNAMIC*	with type area with size 4
+Declared entity bar:*STACK*	with type area with size 0
+Declared entity bar:*STATIC*	with type area with size 0
+Declared entity bar:bar	with type variable INTEGER*4
+
+Layouts for areas (commons):
+
+Layout for common /TOP-LEVEL:*STATIC*/ of size 0:
+	External VariableTOP-LEVEL:i	offset = UNKNOWN,	size = 4
+	External VariableTOP-LEVEL:foobar	offset = UNKNOWN,	size = 4
+
+
+Layout for common /bar!:*STATIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /bar:*DYNAMIC*/ of size 4:
+	Variable bar:bar	offset = 0	size = 4
+
+
+Layout for common /bar:*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /bar:*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module bar
+
+bar!
+
+Declarations for module bar! with type () -> unknow
+Variable list:
+
+Declared entity TOP-LEVEL:*STATIC*	with type area with size 0
+Declared entity TOP-LEVEL:bar	with type functional  () -> void
+Declared entity TOP-LEVEL:foobar	with type variable INTEGER*4
+Declared entity TOP-LEVEL:i	with type variable INTEGER*4
+Declared entity bar!:*DYNAMIC*	with type area with size 0
+Declared entity bar!:*STACK*	with type area with size 0
+Declared entity bar!:*STATIC*	with type area with size 0
+
+Layouts for areas (commons):
+
+Layout for common /TOP-LEVEL:*STATIC*/ of size 0:
+	External VariableTOP-LEVEL:i	offset = UNKNOWN,	size = 4
+	External VariableTOP-LEVEL:foobar	offset = UNKNOWN,	size = 4
+
+
+Layout for common /bar!:*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /bar!:*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /bar!:*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module bar!
+
+foo!
+
+Declarations for module foo! with type () -> unknow
+Variable list:
+
+Declared entity TOP-LEVEL:*STATIC*	with type area with size 4
+Declared entity TOP-LEVEL:i	with type variable INTEGER*4
+Declared entity foo!:*DYNAMIC*	with type area with size 0
+Declared entity foo!:*STACK*	with type area with size 0
+Declared entity foo!:*STATIC*	with type area with size 0
+
+Layouts for areas (commons):
+
+Layout for common /TOP-LEVEL:*STATIC*/ of size 4:
+	Variable TOP-LEVEL:i	offset = 0	size = 4
+	External VariableTOP-LEVEL:foobar	offset = UNKNOWN,	size = 4
+
+
+Layout for common /foo!:*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /foo!:*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /foo!:*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module foo!
+
+foobar!
+
+Declarations for module foobar! with type () -> unknow
+Variable list:
+
+Declared entity TOP-LEVEL:*STATIC*	with type area with size 12
+Declared entity TOP-LEVEL:foobar	with type variable INTEGER*4
+Declared entity TOP-LEVEL:j	with type variable INTEGER*4
+Declared entity TOP-LEVEL:main	with type functional  () -> INTEGER*4
+Declared entity foobar!:*DYNAMIC*	with type area with size 0
+Declared entity foobar!:*STACK*	with type area with size 0
+Declared entity foobar!:*STATIC*	with type area with size 0
+
+Layouts for areas (commons):
+
+Layout for common /TOP-LEVEL:*STATIC*/ of size 12:
+	Variable TOP-LEVEL:i	offset = 0	size = 4
+	Variable TOP-LEVEL:foobar	offset = 4	size = 4
+	Variable TOP-LEVEL:j	offset = 8	size = 4
+
+
+Layout for common /foobar!:*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /foobar!:*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /foobar!:*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module foobar!
+
+main
+
+Declarations for module main with type () -> INTEGER*4
+Variable list:
+
+Declared entity TOP-LEVEL:*STATIC*	with type area with size 12
+Declared entity TOP-LEVEL:i	with type variable INTEGER*4
+Declared entity foobar!:*STATIC*	with type area with size 0
+Declared entity main:*DYNAMIC*	with type area with size 0
+Declared entity main:*STACK*	with type area with size 0
+Declared entity main:*STATIC*	with type area with size 0
+
+Layouts for areas (commons):
+
+Layout for common /TOP-LEVEL:*STATIC*/ of size 12:
+	Variable TOP-LEVEL:i	offset = 0	size = 4
+	Variable TOP-LEVEL:foobar	offset = 4	size = 4
+	Variable TOP-LEVEL:j	offset = 8	size = 4
+
+
+Layout for common /foobar!:*STATIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /main:*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /main:*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /main:*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module main
+
+void bar()
+{
+   int bar;
+   foobar = 10;
+}
+   extern int i;
+   extern int foobar;
+   extern void bar();
+   int i;
+   int foobar;
+   int j;
+   extern int main();
+int main()
+{
+   extern int i;
+   i = 10;
+   return 0;
+}
