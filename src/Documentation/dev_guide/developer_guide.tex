@@ -8,8 +8,9 @@
 \documentclass[a4paper]{article}
 
 \usepackage[latin1]{inputenc}
+\usepackage{url}
 
-\newcommand{\LINK}[1]{\texttt{\small{#1}}}
+\newcommand{\LINK}[1]{\url{#1}}
 
 \title{\bf {\Huge PIPS} \\ 
   Development Environment \\
@@ -131,12 +132,13 @@ It is important to realize that:
 \label{sec:dev-svn}
 
 A basic understanding of svn operations and concepts such as 
-\emph{repository, checkout, status, commit} are necessary to develop
-in PIPS. 
+\emph{repository, checkout, status, commit} are necessary to develop in PIPS. 
+See for instance the SVN book at \LINK{http://svnbook.red-bean.com/}
+and other resources on the Internet.
 
 The development policy within the PIPS-related software is that the
 \texttt{trunk} version should hold a production quality software which
-pass all non-regression tests that run nightly at CRI. Thus day-to-day
+passes all non-regression tests that run nightly at CRI. Thus day-to-day
 development should not occur within this part, but in independent
 per-developer \texttt{branches} which should be validated before being
 merged back into the \texttt{trunk}.
@@ -149,17 +151,20 @@ procedure based on the \texttt{svn\_branch.sh} script provided in
 \texttt{pips/trunk/makes}.
 
 \begin{enumerate}
-\item Obtain an svn user account on \texttt{svn.cri.ensmp.fr}. 
-  For instance, a login \texttt{calvin} and some password may be given.
+\item Obtain an svn user account on \texttt{svn.cri.ensmp.fr}
+  by asking for it to Fabien Coelho.
+  For instance, a login \texttt{calvin} and some password may be attributed.
   Calvin will have his own development area under \texttt{branches/calvin}
   in the subversion repository.
-\item Extract your own PIPS with the setup script mentionned above.
-  The resulting directory may contains at the end of the building process:
+
+\item Extract your own PIPS with the setup script (\texttt{setup\_pips.sh}) 
+  mentionned above.
+  The resulting directory may contain at the end of the building process:
   \begin{description}
-  \item[prod:] compiled production version of \texttt{pips},
+  \item[prod] compiled production version of \texttt{pips},
     \texttt{newgen}, \texttt{linear} and the external \texttt{polylib}
     library;
-  \item[pips\_dev:] Calvin's private development area which points to
+  \item[pips\_dev] Calvin's private development area which points to
     \texttt{branches/calvin} and should be empty at the beginning;
     It can be created afterwards with a manual checkout if necessary.
 \begin{verbatim}
@@ -168,10 +173,12 @@ sh> svn co http://svn.cri.ensmp.fr/svn/pips/branches/calvin pips_dev
     Branches may also be used for linear and newgen development, 
     in which case the local directory name for the checkout must be called
     \texttt{linear\_dev} or \texttt{newgen\_dev} respectively.
-  \item[pipsrc.sh:] sh-compatible shell initialization;
-  \item[pipsrc.csh:] csh-compatible shell initialization.
+  \item[valid] a working copy of pips non regression tests for validation.
+  \item[pipsrc.sh] sh-compatible shell initialization;
+  \item[pipsrc.csh] csh-compatible shell initialization.
   \end{description}
-\item Create your development branch refering to a given library directory
+
+\item Create your own development branch refering to a given library directory
   in the production version. Assuming that Calvin wants to develop 
   in the \texttt{hpfc} library in pips:
 \begin{verbatim}
@@ -180,10 +187,11 @@ sh> make USERNAME=calvin create-branch
 # ... not really created before the commit
 sh> svn commit /home/temp/svn_branch.XXXXXX/
 \end{verbatim}
-  It creates a new branch, not yet committed, in some directory.
+  It creates a new branch, not yet committed, in some temporary directory.
   \texttt{USERNAME} is not necessary if the svn and unix account share the
-  same name. This directory \textbf{must} be committed, or its creation may be
-  committed automatically with the \texttt{force-create-branch} target.
+  same login name. This directory \textbf{must} then be committed, 
+  or its creation may be committed automatically with the 
+  \texttt{force-create-branch} target.
 \item If necessary, update your development area to make the branch appear.
 \begin{verbatim}
 sh> cd /home/temp/MYPIPS/pips_dev
@@ -197,21 +205,51 @@ sh> cd hpfc
   \item[diff] svn diff of local directory.
   \item[info] svn info of local directory.
   \item[branch-diff] what you have developed in your branch, i.e. the
-    differences between your branch and the production version.
+    differences between your branch and the production version 
+    (\texttt{trunk}).
   \item[branch-info] information about your branch.
+  \item[branch-avail] list of commits on the trunk that where not pulled
+    into the branch.
   \end{description}
+
+  It may be desirable to look for the differences between the branch
+  and trunk with additional options, for instance to ignore space changes.
+  In order to do that:
+  \begin{enumerate}
+  \item get the branch initial revision with \texttt{make branch-info}.
+    Let us assume that the result is 12345.
+  \item perform a svn diff:
+{\small
+\begin{verbatim}
+sh> svn diff --revision 12345:HEAD -x -b
+sh> svn diff --revision 12345:HEAD -x -w
+\end{verbatim}
+}
+  \end{enumerate}
+  
 \item When you are done with your developments, they are committed into
   your branch, you want to install them back to the pips main line.
   You must have write access to the \texttt{trunk} in order to do the commit.
+{\small
 \begin{verbatim}
 sh> make install-branch
-# ... create a temporary merge
-# ... there may be Conflicts to be dealt with
-# ... TEST IT!
+# ... create a temporary merged library
+# ... there may be conflicts to be dealt with
 sh> svn commit /tmp/svn_branch.XXXXXX/
+sh> svn commit .
 \end{verbatim}
+}
   The \texttt{XXXXXX} part in the directory name is some temporary number 
   created for the nonce by the branch script.
+
+  There are two commits: 
+  \begin{itemize}
+  \item the first one is in trunk to install the new version of the library.
+  \item the second one in the branch to update bookeeping informations stored
+    within the branch.
+  \end{itemize}
+
+  It may be possible (not tried) to commit several libraries at once.
 \end{enumerate}
 
 
