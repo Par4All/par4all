@@ -57,6 +57,8 @@ MAKE.d	= $(ROOT)/makes
 
 ########################################################################## ARCH
 
+include $(MAKE.d)/arch.mk
+
 ifndef ARCH
 ifdef PIPS_ARCH
 ARCH	= $(PIPS_ARCH)
