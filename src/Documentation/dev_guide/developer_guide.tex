@@ -174,6 +174,8 @@ sh> svn co http://svn.cri.ensmp.fr/svn/pips/branches/calvin pips_dev
     in which case the local directory name for the checkout must be called
     \texttt{linear\_dev} or \texttt{newgen\_dev} respectively.
   \item[valid] a working copy of pips non regression tests for validation.
+    See Section~\ref{sec:utils} for informations about the validation,
+    and the really read the \texttt{README} file to run it.
   \item[pipsrc.sh] sh-compatible shell initialization;
   \item[pipsrc.csh] csh-compatible shell initialization.
   \end{description}
@@ -489,6 +491,7 @@ make files or compiled libraries), but not necessarily the corresponding
 sources.
 
 \subsubsection{utils}
+\label{sec:utils}
 
 Other architecture independent tools and files used for \emph{developing}
 pips (as opposed to \emph{running} it).
@@ -503,7 +506,7 @@ Using this approach does not require the validation directory to be under
 \item[pips\_validate]: \index{Validate} Non-regression tests;
   
   The arguments are names of subdirectories in 
-  \texttt{\$PIPS\_ROOT/Validation} or source files within these directories.
+  \texttt{\$PIPS\_ROOT/../../valid} or source files within these directories.
   See \texttt{pips\_validate -h} for help and a list of options.
   
   Tests are organized more or less on a library basis in \texttt{Validation}.

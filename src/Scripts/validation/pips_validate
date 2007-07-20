@@ -3,7 +3,7 @@
 
 # DEFAULTS
 # where is the validation?
-vdir=${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}
+vdir=${PIPS_VALIDDIR:-$PIPS_ROOT/../../valid}
 
 # running directory
 rdir=.
