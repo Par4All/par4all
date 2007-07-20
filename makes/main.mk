@@ -680,3 +680,6 @@ branch-diff:
 
 branch-info:
 	-@$(IS_BRANCH) . && $(BRANCH) info
+
+branch-avail:	
+	-@$(IS_BRANCH) . && $(BRANCH) avail
