@@ -11,7 +11,6 @@ void decl01(char *dir)
    struct c x;
    x.foo = 1;
 }
-   extern void decl01(char *);
 
 PRINTED_FILE
 
@@ -25,4 +24,3 @@ void decl01(char *dir)
    struct c x;
    x.foo = 1;
 }
-   extern void decl01(char *);

@@ -1,34 +1,3 @@
-externalloc06!
-
-Declarations for module externalloc06! with type () -> unknow
-Variable list:
-
-Declared entity TOP-LEVEL:*STATIC*	with type area with size 0
-Declared entity TOP-LEVEL:bar	with type functional  () -> INTEGER*4
-Declared entity TOP-LEVEL:foo	with type functional  () -> INTEGER*4
-Declared entity externalloc06!:*DYNAMIC*	with type area with size 0
-Declared entity externalloc06!:*STACK*	with type area with size 0
-Declared entity externalloc06!:*STATIC*	with type area with size 0
-
-Layouts for areas (commons):
-
-Layout for common /TOP-LEVEL:*STATIC*/ of size 0:
-	* empty area *
-
-
-Layout for common /externalloc06!:*DYNAMIC*/ of size 0:
-	* empty area *
-
-
-Layout for common /externalloc06!:*STACK*/ of size 0:
-	* empty area *
-
-
-Layout for common /externalloc06!:*STATIC*/ of size 0:
-	* empty area *
-
-End of declarations for module externalloc06!
-
 foo
 
 Declarations for module foo with type () -> INTEGER*4
@@ -63,8 +32,6 @@ Layout for common /foo:*STATIC*/ of size 0:
 
 End of declarations for module foo
 
-   extern int bar();
-   extern int foo();
 int foo()
 {
    return 0;

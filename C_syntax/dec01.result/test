@@ -1,7 +1,6 @@
 
 PARSED PRINTED FILE
 
-   extern void do_elem(char *);
 void do_elem(char *dir)
 {
    int abc;
@@ -18,7 +17,6 @@ void do_elem(char *dir)
 
 PRINTED_FILE
 
-   extern void do_elem(char *);
 void do_elem(char *dir)
 {
    int abc;

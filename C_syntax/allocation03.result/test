@@ -1,35 +1,3 @@
-allocation03!
-
-Declarations for module allocation03! with type () -> unknow
-Variable list:
-
-Declared entity TOP-LEVEL:*STATIC*	with type area with size 4
-Declared entity TOP-LEVEL:a	with type variable INTEGER*4
-Declared entity TOP-LEVEL:foo	with type functional  () -> void
-Declared entity TOP-LEVEL:main	with type functional  () -> INTEGER*4
-Declared entity allocation03!:*DYNAMIC*	with type area with size 0
-Declared entity allocation03!:*STACK*	with type area with size 0
-Declared entity allocation03!:*STATIC*	with type area with size 0
-
-Layouts for areas (commons):
-
-Layout for common /TOP-LEVEL:*STATIC*/ of size 4:
-	Variable TOP-LEVEL:a	offset = 0	size = 4
-
-
-Layout for common /allocation03!:*DYNAMIC*/ of size 0:
-	* empty area *
-
-
-Layout for common /allocation03!:*STACK*/ of size 0:
-	* empty area *
-
-
-Layout for common /allocation03!:*STATIC*/ of size 0:
-	* empty area *
-
-End of declarations for module allocation03!
-
 foo
 
 Declarations for module foo with type () -> void
@@ -106,9 +74,6 @@ Layout for common /main:*STATIC*/ of size 4:
 
 End of declarations for module main
 
-   int a;
-   extern void foo();
-   extern int main();
 void foo()
 {
    int k;
