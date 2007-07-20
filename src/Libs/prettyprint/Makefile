@@ -6,8 +6,10 @@ LIB_CFILES = \
 	print.c \
 	print_code_as_a_graph.c \
 	cprettyprinter.c \
+	xml_prettyprinter.c \
 	claire_prettyprinter.c \
 	symbol_table.c
+
 
 INC_TARGET = $(TARGET).h
 
