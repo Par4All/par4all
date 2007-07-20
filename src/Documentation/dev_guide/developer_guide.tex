@@ -164,14 +164,19 @@ procedure based on the \texttt{svn\_branch.sh} script provided in
   \item[prod] compiled production version of \texttt{pips},
     \texttt{newgen}, \texttt{linear} and the external \texttt{polylib}
     library;
+
+    %% should the dev directory be called calvin?
+    %% however how to differentiate newgen/linear/pips branches in such cases?
   \item[pips\_dev] Calvin's private development area which points to
     \texttt{branches/calvin} and should be empty at the beginning;
     It can be created afterwards with a manual checkout if necessary.
+{\small
 \begin{verbatim}
 sh> svn co http://svn.cri.ensmp.fr/svn/pips/branches/calvin pips_dev
 \end{verbatim}
+}
     Branches may also be used for linear and newgen development, 
-    in which case the local directory name for the checkout must be called
+    in which case the local directory name for the checkout should be called
     \texttt{linear\_dev} or \texttt{newgen\_dev} respectively.
   \item[valid] a working copy of pips non regression tests for validation.
     See Section~\ref{sec:utils} for informations about the validation,
