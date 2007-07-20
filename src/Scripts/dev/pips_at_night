@@ -83,9 +83,24 @@ then
     pushd $target
     # build? verbosity? clean+recompile?
     # skip documentation?
-    cd prod/newgen ; make clean recompile
-    cd ../linear ; make clean recompile
-    cd ../pips ; make clean recompile
+
+    cd prod/newgen ; 
+    make clean recompile
+
+    cd ../linear ; 
+    make clean recompile
+
+    cd ../pips ; 
+    rm -rf bin/$PIPS_ARCH lib/$PIPS_ARCH
+    make clean recompile
+
+    if [ -f bin/$PIPS_ARCH/tpips ]
+    then
+	echo "### recompilation succeeded"
+    else
+	echo "### recompilation failed"
+	validate=
+    fi
     popd
 else
     echo '### no compile'
