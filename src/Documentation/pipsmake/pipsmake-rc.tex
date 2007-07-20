@@ -6428,6 +6428,32 @@ assignment. The right-hand side expression must be a function call.
 
 If the input code does not meet these conditions, a user error is generated.
 
+%%@UserManualDocumentation: print_xml_code
+This pass is used for the specification input and transformation in the XML format which can further be used by number of application as input. This function can be viewed as a XML pretty-printer of a subset of C and Fortran programs.
+%%@!UserManualDocumentation
+
+\begin{verbatim}
+alias print_xml_code 'Xml Pretty-Printer'
+
+print_xml_code		> MODULE.xml_printed_file
+	< PROGRAM.entities
+	< MODULE.code
+	< MODULE.preconditions
+	< MODULE.regions
+\end{verbatim}
+
+%%@UserManualDocumentation: print_xml_code_with_explicit_motif
+This pass generates XML code like the print\_xml\_code pass, but the input contains explicitly loops to scan motifs.
+%%!UserManualDocumentation
+
+\begin{verbatim}
+alias print_xml_code_with_explicit_motif 'Xml Pretty-Printer with explicit motif'
+
+print_xml_code_with_explicit_motif       > MODULE.xml_printed_file
+        < PROGRAM.entities
+	< MODULE.code
+\end{verbatim}
+		
 %%@UserManualDocumentation: print_claire_code
 This pass is used in the DREAM-UP project for specification input and
 transformation. This function can be viewed as a CLAIRE pretty-printer of
