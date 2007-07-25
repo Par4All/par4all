@@ -157,11 +157,13 @@ Matrix *Matrix_Read(void) {
   unsigned NbRows, NbColumns;
   char s[1024];
   
-  if (fgets(s, 1024, stdin) == 0)
+  if (fgets(s, 1024, stdin) == NULL)
     return NULL;
   while ((*s=='#' || *s=='\n') ||
-	 (sscanf(s, "%d %d", &NbRows, &NbColumns)<2))
-    fgets(s, 1024, stdin);
+	 (sscanf(s, "%d %d", &NbRows, &NbColumns)<2)) {
+    if (fgets(s, 1024, stdin) == NULL)
+      return NULL;
+  }
   Mat = Matrix_Alloc(NbRows,NbColumns);
   if(!Mat) {
     errormsg1("Matrix_Read", "outofmem", "out of memory space");
