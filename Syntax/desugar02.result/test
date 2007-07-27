@@ -1,9 +1,9 @@
       SUBROUTINE DESUGAR02(X, Y, *, *)
+400   CONTINUE
 
 C     Check desugaring of labelled DO loops
 
 c     labelled loop
-400   CONTINUE
       DO 500 I = 1, N                                                   0001
          PRINT *, I                                                     0002
 500      CONTINUE                                                       0003

@@ -17,8 +17,8 @@ c     labelled logical if with assigned go to
 300   IF (X.LT.0.) GOTO 99996                                           0010
 
 c     labelled loop
-
 400   CONTINUE
+
       DO 500 I = 1, N                                                   0013
          PRINT *, I                                                     0014
 500      CONTINUE                                                       0015

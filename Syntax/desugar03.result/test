@@ -6,9 +6,9 @@ C     Check desugaring of labelled DO loops with a forward reference
 
       IF (I.LT.0) THEN                                                  0002
       ENDIF
+400   CONTINUE
 
 c     labelled loop
-400   CONTINUE
       DO 500 I = 1, N                                                   0004
          PRINT *, I                                                     0005
 500      CONTINUE                                                       0006
