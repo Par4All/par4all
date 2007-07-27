@@ -599,32 +599,51 @@ bool number_it;
 	/* Because of labelled loop desugaring, new_i may be different from i */
 	instruction new_i = statement_instruction(s);
 	if(instruction_block_p(new_i)) {
-	    statement fs = statement_undefined;
+	    statement fs = statement_undefined; // first statement of the block
+	    statement ss = statement_undefined; // second statement, if it exist
+	    statement cs = statement_undefined; // commented statement
 
-	    /* Only desugared constructs such as computed go to or IO with
+	    /* Only desugared constructs such as labelled loop, computed go to or IO with
 	     * error handling should produce blocks. Such blocks should be
 	     * non-empty and not commented.
 	     */
 	    pips_assert("The block is non empty", !ENDP(instruction_block(new_i)));
-	    fs = STATEMENT(CAR(instruction_block(new_i)));
+	    /* Sometimes, we generate blocks with only one statement in it. E.g. alternate returns 
+	    pips_assert("The block has at least two statements", !ENDP(CDR(instruction_block(new_i))));
+	    */
 
+	    fs = STATEMENT(CAR(instruction_block(new_i)));
+	    /* For keeping pragma attached to a loop attached to it,
+	       we have to find the loop instruction within the
+	       block */
+	    if(!ENDP(CDR(instruction_block(new_i)))) {
+	      ss = STATEMENT(CAR(CDR(instruction_block(new_i))));
+
+	      if(statement_continue_p(fs) && statement_loop_p(ss))
+		cs = ss;
+	      else
+		cs = fs;
+	    }
+	    else {
+		cs = fs;
+	    }
 	    /*
 	    pips_assert("The first statement has no comments",
-			statement_comments(fs) == empty_comments);
+			statement_comments(cs) == empty_comments);
 			*/
-	    if(statement_comments(fs) != empty_comments) {
-		user_log("Current comment of first statement: \"%s\"\n",
-			 statement_comments(fs));
+	    if(statement_comments(cs) != empty_comments) {
+		user_log("Current comment of chosen statement: \"%s\"\n",
+			 statement_comments(cs));
 		user_log("Block comment to be carried by first statement: \"%s\"\n",
 			 PrevComm);
 		pips_error("LinkInstToCurrentBlock", 
 			   "The first statement of the block should have no comments\n");
 	    }
 
-	    pips_assert("The first statement is not a block",
-			!instruction_block_p(statement_instruction(fs)));
+	    pips_assert("The chosen statement is not a block",
+			!instruction_block_p(statement_instruction(cs)));
 
-	    statement_comments(fs) = strdup(PrevComm);
+	    statement_comments(cs) = strdup(PrevComm);
 	}
 	else {
 	    statement_comments(s) = strdup(PrevComm);
