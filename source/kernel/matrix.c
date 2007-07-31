@@ -86,8 +86,8 @@ void Matrix_Free(Matrix *Mat)
 /* 
  * Print the contents of the Matrix 'Mat'
  */
-void Matrix_Print(FILE *Dst,char *Format,Matrix *Mat) {
-  
+void Matrix_Print(FILE *Dst, const char *Format, Matrix *Mat)
+{
   Value *p;
   int i, j;
   unsigned NbRows, NbColumns;

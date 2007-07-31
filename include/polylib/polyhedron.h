@@ -75,7 +75,8 @@ extern Polyhedron *DomainUnion(Polyhedron *Pol1,Polyhedron *Pol2,
 			       unsigned NbMaxRays);
 extern Polyhedron *Domain_Copy(Polyhedron *Pol);
 extern void Domain_Free (Polyhedron *Pol);
-extern void Domain_PrintConstraints(FILE *Dst,char *Format,Polyhedron *Pol);
+extern void Domain_PrintConstraints(FILE *Dst, const char *Format,
+				    Polyhedron *Pol);
 extern Polyhedron *Empty_Polyhedron(unsigned Dimension);
 extern int Gauss(Matrix *Mat,int NbEq,int Dimension);
 extern int lower_upper_bounds(int pos,Polyhedron *P,Value *context,
@@ -91,8 +92,8 @@ extern Polyhedron *Polyhedron_Image(Polyhedron *Pol,Matrix *Func,
 				    unsigned NbMaxConstrs);
 extern Polyhedron *Polyhedron_Preimage(Polyhedron *Pol,Matrix *Func,
 				       unsigned NbMaxRays);
-extern void Polyhedron_Print(FILE *Dst,char *Format,Polyhedron *Pol);
-extern void Polyhedron_PrintConstraints(FILE *Dst,char *Format,
+extern void Polyhedron_Print(FILE *Dst, const char *Format, const Polyhedron *Pol);
+extern void Polyhedron_PrintConstraints(FILE *Dst, const char *Format,
                 Polyhedron *Pol);
 extern Polyhedron *Polyhedron_Scan(Polyhedron *D,Polyhedron *C,
 				   unsigned MAXRAYS);

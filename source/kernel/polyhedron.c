@@ -1655,8 +1655,8 @@ void Domain_Free(Polyhedron *Pol)
 /*
  * Print the contents of a polyhedron. 
  */
-void Polyhedron_Print(FILE *Dst,char *Format,Polyhedron *Pol) { 
-
+void Polyhedron_Print(FILE *Dst, const char *Format, const Polyhedron *Pol)
+{
   unsigned Dimension, NbConstraints, NbRays;
   int      i, j;
   Value    *p;
@@ -4625,7 +4625,7 @@ Polyhedron *Disjoint_Domain( Polyhedron *P, int flag, unsigned NbMaxRays )
 
 
 /* Procedure to print constraint matrix of a polyhedron */
-void Polyhedron_PrintConstraints(FILE *Dst,char *Format,Polyhedron *Pol)
+void Polyhedron_PrintConstraints(FILE *Dst, const char *Format, Polyhedron *Pol)
 {
 	int i,j;
 
@@ -4640,7 +4640,7 @@ void Polyhedron_PrintConstraints(FILE *Dst,char *Format,Polyhedron *Pol)
 }
 
 /* Procedure to print constraint matrix of a domain */
-void Domain_PrintConstraints(FILE *Dst,char *Format,Polyhedron *Pol)
+void Domain_PrintConstraints(FILE *Dst, const char *Format, Polyhedron *Pol)
 {
     Polyhedron *Q;
     for (Q = Pol; Q; Q = Q->next)
