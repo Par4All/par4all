@@ -743,6 +743,18 @@ basic_of_expression(expression exp)
     return b;
 }
 
+type expression_to_type(expression e)
+{
+  /* Could be more elaborated with array types for array expressions */
+  type t = type_undefined;
+  basic b = basic_of_expression(e);
+  variable v = make_variable(b, NIL, NIL);
+
+  t = make_type(is_type_variable, v);
+
+  return t;
+}
+
 /* basic basic_of_call(call c): returns the basic of the result given by the
  * call "c".
  *
