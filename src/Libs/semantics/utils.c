@@ -351,3 +351,38 @@ expression_and_precondition_to_integer_interval(expression e,
   }
     
 }
+
+/* Could be used for boolean expressions too? Extended to any kind of expression? */
+void integer_expression_and_precondition_to_integer_interval(expression e,
+							     transformer p,
+							     int * plb,
+							     int * pub)
+{
+  type t = expression_to_type(e);
+  entity tmp = make_local_temporary_value_entity(t);
+  transformer et = integer_expression_to_transformer(tmp, e, p, TRUE);
+
+  /* If expression e is transformer-wise side-effect free (i.e. the ABSTRACT store is not modified)*/
+  if(ENDP(transformer_arguments(et))) {
+    transformer p = transformer_range_intersection(transformer_dup(p), et);
+    Psysteme s = transformer_undefined_p(p) ?
+      sc_make(CONTRAINTE_UNDEFINED, CONTRAINTE_UNDEFINED) :
+      sc_dup((Psysteme) predicate_system(transformer_relation(p)));
+    Value lb = VALUE_ZERO, ub = VALUE_ZERO;
+
+    if(sc_minmax_of_variable(s, (Variable) tmp, 
+			     &lb, &ub)) {
+      *plb = value_min_p(lb)? INT_MIN : VALUE_TO_INT(lb);
+      *pub = value_max_p(ub)? INT_MAX : VALUE_TO_INT(ub);
+    }
+    else {
+      /* precondition p is not feasible */
+      *plb = 1;
+      *pub = 0;
+    }
+  }
+  else {
+    *plb = INT_MIN;
+    *pub = INT_MAX;
+  }
+}

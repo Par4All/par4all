@@ -951,8 +951,11 @@ integer_multiply_to_transformer(entity v,
     expression ev1 = entity_to_expression(v1);
     expression ev2 = entity_to_expression(v2);
 
-    t1 = transformer_safe_image_intersection(t1, pre);
-    t2 = transformer_safe_image_intersection(t2, pre);
+    /* FI: I had to switch the arguments to satisfy a reasonnable
+       assert in image_intersection(), but the switch may be
+       detrimental to memory allocation. */
+    t1 = transformer_safe_image_intersection(pre, t1);
+    t2 = transformer_safe_image_intersection(pre, t2);
 
     expression_and_precondition_to_integer_interval(ev1, t1, &lb1, &ub1);
     expression_and_precondition_to_integer_interval(ev2, t2, &lb2, &ub2);
