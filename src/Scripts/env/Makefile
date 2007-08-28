@@ -16,7 +16,7 @@ include $(ROOT)/makes/main.mk
 
 # local stuff
 pipsrc.csh: pipsrc.sh
-	sh2csh.pl $< > $@
+	./sh2csh.pl $< > $@
 
 clean: local-clean
 
