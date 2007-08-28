@@ -28,13 +28,14 @@
 #include "effects-simple.h"
 #include "conversion.h"
 #include "text-util.h" /* for words_to_string*/
+#include "alias_private.h"
 #include "instrumentation.h"
 #include "transformations.h"
 
 static int number_of_right_array_declarations = 0;
 static string current_mod ="";
 static int opt = 0; /* 0 <= opt <= 7*/
-static file_name = "";
+static char *file_name = NULL;
 static FILE * instrument_file; /*To store new array declarations*/
 
 #define PREFIX "$ARRAY_DECLARATION"
