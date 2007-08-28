@@ -35,4 +35,9 @@ PS2PDF	= ps2pdf
 	rm -rf $@
 	mkdir $@
 	# I guess we have kpathsea to deal with TEXINPUTS
+	# Assume that an eventual index has been managed by the $(MAKEIDX) above.
 	cd $@; TEXINPUTS=..:: $(LX2HTM) $*; ln -s $*.html index.html
+
+
+clean:
+	$(RM) -rf $(INSTALL_HTM)

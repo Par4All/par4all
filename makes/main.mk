@@ -507,16 +507,17 @@ man-clean:
 endif # INSTALL_MAN
 
 # html documentations after everything else...
+# Build the documentation only if it is expected and possible:
 ifdef INSTALL_HTM
 ifdef _HAS_HTLATEX_
 
 phase7: .build_htm
 
-$(HTM.d)/$(HTM.subd):; $(MKDIR) $(HTM.d)/$(HTM.subd)
+$(HTM.d)/$(HTM.subd):; $(MKDIR) -p $(HTM.d)/$(HTM.subd)
 
 .build_htm: $(INSTALL_HTM)
 	# no direct deps on target dir
-	$(MAKE) $(HTM.d)
+	$(MAKE) $(HTM.d)/$(HTM.subd)
 	# Deal also with directories.
 	# By the way, how to install directories with "install" ?
 	for f in $(INSTALL_HTM) ; do \
