@@ -27,6 +27,10 @@ full-build: build htdoc
 clean: NO_INCLUDES=1
 export NO_INCLUDES
 
+# Clean up everything below:
+clean:
+	$(MAKE) -C src clean
+
 unbuild: clean tags-clean
 	$(RM) -rf \
 		./bin ./include ./lib ./share ./utils \
