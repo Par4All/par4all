@@ -11,8 +11,10 @@ SVN_CRI='http://svn.cri.ensmp.fr/svn'
 PIPS_SVN=$SVN_CRI/pips
 
 #POLYLIB_SITE='http://icps.u-strasbg.fr/polylib/polylib_src'
-POLYLIB_SITE='http://www.cri.ensmp.fr/pips'
-POLYLIB='polylib-5.22.1'
+#POLYLIB_SITE='http://www.cri.ensmp.fr/pips'
+#POLYLIB='polylib-5.22.1'
+POLYLIB_SITE='http://icps.u-strasbg.fr/polylib/polylib_src'
+POLYLIB='polylib-5.22.3'
 
 # help
 command=${0/*\//}
@@ -21,6 +23,10 @@ usage="usage: $command [destination-directory [developer]]"
 # arguments
 destination=${1:-`pwd`/MYPIPS}
 developer=${2:-${USER:-${LOGNAME:-$USERNAME}}}
+
+# If the destination directory is relative, transform it in an absolute
+# path name:
+[[ $destination != /* ]] && destination=`pwd`/$destination
 
 error()
 {
@@ -88,6 +94,7 @@ test -f $POLYLIB.tar.gz && error "some $POLYLIB.tar.gz file already there"
 wget -nd $POLYLIB_SITE/$POLYLIB.tar.gz || error "cannot wget polylib"
 
 echo "### building $POLYLIB"
+mkdir -p $prod/extern || error "cannot mkdir $prod/extern"
 gunzip $POLYLIB.tar.gz || error "cannot decompress polylib"
 tar xf $POLYLIB.tar || error "cannot untar polylib"
 cd $POLYLIB || error "cannot cd into polylib"
@@ -98,7 +105,6 @@ perl -i.old -p -e \
 ./configure --prefix=$prod/extern || error "cannot configure polylib"
 make || error "cannot make polylib"
 
-mkdir -p $prod/extern || error "cannot mkdir $prod/extern"
 make install || error "cannot install polylib"
 cd .. || error "cannot cd .."
 rm -rf $POLYLIB || error "cannot remove polylib"
