@@ -30,7 +30,7 @@
 \end{tabular}
 }
 
-\date{August 1996 - June 2007}
+\date{August 1996 - August 2007}
 
 \renewcommand{\indexname}{Index}
 \makeindex
@@ -182,7 +182,7 @@ sh> svn co http://svn.cri.ensmp.fr/svn/pips/branches/calvin pips_dev
     \texttt{linear\_dev} or \texttt{newgen\_dev} respectively.
   \item[valid] a working copy of pips non regression tests for validation.
     See Section~\ref{sec:utils} for informations about the validation,
-    and the really read the \texttt{README} file to run it.
+    and then really read the \texttt{README} file to run it.
   \item[pipsrc.sh] sh-compatible shell initialization;
   \item[pipsrc.csh] csh-compatible shell initialization.
   \end{description}
@@ -342,6 +342,8 @@ Here are examples of pips architectures:
 \item[IBMAIX]: the compilers and options used on IBM AIX workstations. 
 \item[LINUXI86]: for x86 machines under linux.
 \item[LINUXI86LL]: for x86 machines under linux with long long integers.
+\item[LINUX_x86_64_LL]: for 64-bit x86 machines under linux with long long
+  integers.
 \item[OSF1]: for DEC Alpha machines under OSF1. 
 \end{description}
 
@@ -514,7 +516,7 @@ Using this approach does not require the validation directory to be under
   \texttt{\$PIPS\_ROOT/../../valid} or source files within these directories.
   See \texttt{pips\_validate -h} for help and a list of options.
   
-  Tests are organized more or less on a library basis in \texttt{Validation}.
+  Tests are organized more or less on a library basis in \texttt{valid}.
   Non-regression tests are characterized by one or more source
   programs which must have a known result.
       
@@ -811,13 +813,17 @@ meaning such as building a global binary file from the sources.
 
 Useful targets defined:
 \begin{description}
-\item[build:] ???
+\item[build:] generate a running version with the documentation;
 \item[compile:] generate a running (hope so...) version;
+\item[doc:] build the documentation (such as the one you are reading right
+  now);
 \item[clean:] clean up the project directories;
 \item[local-clean:] remove eventually some stuff in the current directory;
 \item[tags:] build a TAGS index file of identifiers found in the
   subdirectories (see~\ref{subsec:tags});
-\item[unbuild:] ???
+\item[unbuild:] clean up things;
+\item[htdoc:] generate an HTML version of the documentation
+\item[full-build:] like \texttt{build} but with \texttt{htdoc} too.
 \end{description}
 
 
@@ -885,6 +891,8 @@ LIB_OBJECTS= $(LIB_CFILES:.c=.o)
 The source files for the library {\tt L} are in the directory {\tt
   Development/Libs/L}. 
 
+\textbf{TODO} : update this section since config.makefile does no longer
+exist !
 
 A {\tt config.makefile}\index{config.makefile} must be created in this
 directory. It can be copied from an existing library, but it must be updated
@@ -1366,6 +1374,9 @@ The source files for a pass {\tt p} can be found in the directory {\tt
   Development/Passes/p}. A pass, as opposed to a library, corresponds to an
   executable, which can be used by the users. 
 
+\textbf{TODO} : update this section since config.makefile does no longer
+exist !
+
 In this directory, a local {\tt config.makefile} must be created. It must be
 updated with the names of the source files. Then the local {\tt Makefile}
 can be automatically derived using {\tt pips-makemake -p}. This {\tt
@@ -1499,6 +1510,8 @@ do not forget to run {\tt make install} in all the libraries.
 \subsection{The {\bf \tt Validation} directories}
 \label{subsec:the_validation_directory}
 
+\textsc{TODO} : update this section to the valid svn directory.
+
 These directories {\tt /Tests/Validation/Xxx} contain the non-regression
 tests for each significant library {\tt xxx}, as well as demonstration
 programs, benchmarks, \dots.
@@ -1585,11 +1598,14 @@ problem is. You can also type {\tt Validate} to check everything.
 \section{Miscellaneous}
 \label{sec:misc}
 
-To print a nice version of PIPS output, you can use \verb+tgrind+:
+To print a nice version of PIPS output, you can use commands like
+\verb+tgrind+:
 \begin{verbatim}
 tgrind -lf extr_doall.f
 \end{verbatim}
 
+All the source of PIPS can be pretty-printed with Doxygen and are
+browsable. For example, see \LINK{http://doxygen.pips.enstb.org}.
 
 \newpage
 

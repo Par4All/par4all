@@ -948,7 +948,8 @@ not necessarily an entity but can be any expression that denotes a function.
 \subsection{Application}
 \verb/application = function:expression x arguments:expression*/
 
-For example, we can have this complicated function call in C: (*ctx->Driver.RendererString)().
+For example, we can have this complicated function call in C:
+\verb|(*ctx->Driver.RendererString)()|.
 \subsection{Special calls }
 
 \subsubsection{Member references }
@@ -956,7 +957,7 @@ For example, we can have this complicated function call in C: (*ctx->Driver.Rend
 There are different solutions:
 \begin{enumerate}
 \item A special call expression, FIELD\_MEMBER\_CALL(exp1, exp2), to handle for example
-str[1].fld[2]. 
+\verb|str[1].fld[2]|
 \item \verb/reference = variable:entity x indices:expression x offset:entity*/ 
 This is not sufficient because we can have foo.x where foo is a function
 returning a struct,... 
