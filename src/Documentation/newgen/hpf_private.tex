@@ -20,43 +20,69 @@
 \section*{Introduction}
 
 \domain{import align from "hpf.newgen"}
+{}
 \domain{import distribute from "hpf.newgen"}
+{}
 \domain{import entity from "ri.newgen"}
+{}
 \domain{import entity\_int from "ri.newgen"}
+{}
 \domain{import statement from "ri.newgen"}
+{}
 \domain{import reduction\_operator from "reductions\_private.newgen"}
+{}
 
 \domain{entities = list:entity*}
+{}
 \domain{entity\_entities = entity->entities}
+{}
 
 \domain{renaming = old:entity x new:entity}
+{}
 \domain{statement\_renamings = persistant statement->renaming*}
+{}
 \domain{statement\_entities = persistant statement->entities}
+{}
 
 \domain{entitymap = entity->entity}
+{}
 
 \domain{overlap = lower:int x upper:int}
+{}
 \domain{overlapsmap = entity->overlap*}
+{}
 
 \domain{hpf\_newdecl = \{ none , alpha , beta , gamma , delta \}}
+{}
 \domain{hpf\_newdecls = dimensions:hpf\_newdecl*}
+{}
 
 \domain{alignmap = entity->align}
+{}
 \domain{distributemap = entity->distribute}
+{}
 \domain{newdeclmap = entity->hpf\_newdecls}
+{}
 
 \domain{entity\_status = new\_host:entitymap x new\_node:entitymap x old\_host:entitymap x old\_node:entitymap x referenced:entity\_int}
+{}
 
 \domain{data\_status = newdeclmap x alignmap x distributemap x arrays:entity* x templates:entity* x processors:entity*}
+{}
 
 \domain{numbers\_status = numbermap:entity\_int x arrays:int x templates:int x processors:int}
+{}
 
 \domain{dynamic\_status = dynamics:entity\_entities x primary:entitymap x renamings:statement\_renamings x tokeep:statement\_entities}
+{}
 
 \domain{remapping = renaming x referenced:entity*}
+{}
 
 \domain{hpfc\_status = overlapsmap x data\_status x numbers\_status x entity\_status x commons:entity* x dynamic\_status x pures:entity* x ios:entity* x computed:remapping* x reductions:statement\_entities}
+{}
 
 \domain{hpfc\_reductions = initial:entity x replacement:entity x operator:reduction\_operator}
+{}
 
 \end{document}

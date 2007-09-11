@@ -31,8 +31,10 @@
 % Le = devient un séparateur de style :
 \catcode `==\active%
 %% Mange les accolades de premier niveau terminées par un retour charriot:
-\gdef\hack@domain{#1}^^M^^01\def=^^01\egroup\bgroup\string=^^02\texttt\bgroup\textit\bgroup#1\egroup\egroup\endgroup\medskip\par^^02%
+\gdef\hack@domain{#1}^^M^^01\def=^^01\egroup\bgroup\string=^^02\texttt\bgroup\textit\bgroup#1\egroup\egroup\endgroup\medskip\par\LONGtextit^^02%
 \endgroup
+
+\long\def\LONGtextit#1{{\em #1}}
 
 %% end of $RCSfile: newgen_domain.sty,v $
 %%

@@ -18,9 +18,13 @@ informations to some word of text, mainly to use in the hypertext Emacs
 interface.
 
 \domain{import call from "ri.newgen"}
+{}
 \domain{import entity from "ri.newgen"}
+{}
 \domain{import loop from "ri.newgen"}
+{}
 \domain{import reference from "ri.newgen"}
+{}
 
 I need to store pointer object:
 \domain{External void_star}
@@ -30,6 +34,7 @@ I need to store pointer object:
 Are only a list of {\tt attachment}s:
 
 \domain{attachments = attachment*}
+{}
 
 
 \section{Attachment}
@@ -37,12 +42,14 @@ Are only a list of {\tt attachment}s:
 Here is what can be attached to a word:
 
 \domain{attachment = attachee x begin:int x end:int}
+{}
 
 {\tt begin} is the position of the attachment begin in the output
 file and {\tt end} the position of its end.
 
 The various objects that can be attached:
 \domain{attachee = statement_line_number:int + persistent reference + persistent call + persistent declaration:entity + type:string + persistent loop + persistent module_head:entity + complementary_sections:unit + complexities:unit + continuation_conditions:unit + cumulated_effects:unit + out_regions:unit + preconditions:unit + privatized_regions:unit + proper_effects:unit + proper_regions:unit + regions:unit + static_control:unit + transformers:unit + decoration:unit + comment:unit}
+{}
 
 Persistence is need because we do not want the RI to be broken when
 the attachments are freed.
@@ -56,7 +63,7 @@ the attachments are freed.
 
 Each word can have a list of attachments:
 \domain{word_to_attachments = word_pointer:void_star->attachments}
-
+{}
 \verb|word_pointer| is an {\tt int} instead of a {\tt string} since
 the address must be used instead of the string content. So it needs a
 cast...

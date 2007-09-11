@@ -19,7 +19,10 @@ par le prototype de compilateur {\tt hpfc} pour décrire les directives
 de placement d'un programme HPF.
 
 \domain{import entity from "ri.newgen"}
+{}
+
 \domain{import expression from "ri.newgen"}
+{}
 
 \section{Directives}
   Les directives HPF considérées sont l'alignement et la distribution.
@@ -27,15 +30,17 @@ L'alignement d'un tableau a lieu sur un {\tt template}, et la
 distribution d'un {\em template} est faite sur un {\tt processors}.
 
 \domain{align =  alignment* x template:entity}
+{}
 \domain{distribute = distribution* x processors:entity}
+{}
 
 \section{Alignements et Distributions}
   L'alignement d'une dimension de tableau sur une dimension de {\em
 template} est décrit au moyen du domaine Newgen {\tt alignment}~:
 
 \domain{alignment = arraydim:int x templatedim:int x rate:expression x constant:expression}
-
-  la dimension du tableau {\tt arraydim} est alignée avec la dimension
+{
+  La dimension du tableau {\tt arraydim} est alignée avec la dimension
 de {\em template} {\tt templatedim} avec pour paramètres {\tt rate} et
 {\tt constant}.
 
@@ -44,8 +49,11 @@ de {\em template} {\tt templatedim} avec pour paramètres {\tt rate} et
 qui permet de retrouver le paramètre de distribution d'une part ({\tt
 parameter}, et le {\tt style} de la distribution, nulle, par blocks ou
 cyclique.
+}
 
 \domain{distribution = style x parameter:expression}
+{}
 \domain{style = \{ none , block , cyclic \}}
+{}
 
 \end{document}

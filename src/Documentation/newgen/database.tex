@@ -25,14 +25,14 @@ name}), le répertoire dans lequel il a été créé, et les
 informations qui ont été calculées pour les différents modules ({\tt
 resources}). En fait, le nom de la base et le nom de la directory
 utilisée sont directement lié, en pratique. Le nom de la directory est
-le nom de la base suffisé par \verb+database+.
+le nom de la base suffisé par \textsc{database}.
 
 Un élément de type {\tt resource} est ajouté à la liste {\tt resources}
 pour chaque objet calculé pour ce programme par les phases d'analyse ou
 de transformation de Pips. 
 
 La bibliothèque qui exploite cette structure de données est
-\verb+pipsdbm+.  Elle devrait être nommée \verb+database-util+ si une
+\texttt{pipsdbm}.  Elle devrait être nommée \texttt{database-util} si une
 règle de nommage était observée.
 
 }
@@ -54,7 +54,7 @@ pipsdbm de choisir la fonction pour lire, écrire ou libérer une
 ressource.
 
 A un moment donné, chaque ressource est identifiée demanière unique
-par son nom, \verb+name+, et le nom de son {\em owner}, \verb+owner_name+.
+par son nom, \texttt{name}, et le nom de son {\em owner}, \texttt{owner\_name}.
 
 Nous avons longement discute de l'utilité d'avoir un owner\_type pour
 preciser ce que décore la ressource: un programme (cas des entités),
@@ -63,7 +63,7 @@ instruction, etc. Nous y avons renoncé car à l'heure actuelle, nous
 n'avons que des ressources attachables à des programmes ou à des
 modules, et que cette information peut être déduite du {\tt name} de
 la ressource. En fait, nous n'avons qu'une ressource attachable à un
-programme, ce sont les entités (et les \verb/user_file/, mais ils sont
+programme, ce sont les entités (et les \texttt{user\_file}, mais ils sont
 largement maltraités pour le moment).}
 
 \domain{Status = memory:string + file:string}
@@ -75,7 +75,7 @@ a priori jamais chargée en mémoire. Dans
 ce dernier cas, le sous-domaine {\tt file} donne le nom de ce fichier.
 Le nom du fichier doit être relatif au workspace, s'il se trouve dans
 le workspace, et doit être absolu, s'il se trouve hors du workspace, de
-sorte qu'on puisse faire des \verb+mv+ et des \verb+cp -pr+ sur le workspace.
+sorte qu'on puisse faire des \texttt{mv} et des \texttt{cp -pr} sur le workspace.
 Si la ressource est en mémoire, le sous-domaine {\tt memory} contient
 un pointeur vers cette ressource.
 

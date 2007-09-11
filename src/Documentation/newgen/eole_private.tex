@@ -18,17 +18,24 @@ $Date: 1999/01/05 08:56:05 $
 \section{Pips to Eole data structures} 
 
 \domain{import expression from "ri.newgen"}
+{}
 \domain{import entity from "ri.newgen"}
+{}
 \domain{expressionwithlevel = level:entity* x expression}
+{}
 \domain{lexpressionwithlevel = list:expressionwithlevel*}
+{}
 
 
 \section{Nested sequence data structure}
 
 \domain{function = op:entity x args:entity*}
+{}
 \domain{assignment = lhs:function x rhs:function x dependences:entity* }
+{}
 
 
 \domain{persistant\_expression\_to\_entity = persistant expression -> entity}
+{}
 
 \end{document}

@@ -3,11 +3,12 @@
 %%
 
 \documentclass{article}
+%\usepackage{newgen_domain}
+\newcommand{\domain}[1]{\par{#1}}
 
 \title{Simple reductions}
 \author{Fabien Coelho}
 
-\newcommand{\domain}[1]{\par{#1}}
 
 \begin{document}
 \maketitle
@@ -28,7 +29,7 @@ We could add user defined operators if required.
 None is used to mark dead reductions. 
 
 \domain{reduction\_operator = \{ none , min , max , sum , prod , and , or \}}
-
+{}
 
 \section{Reduction}
 \label{sec:reduction}
@@ -42,10 +43,12 @@ contribute to the reduction. They are only used and significant in the
 proper reductions construction algorithm.
 
 \domain{reduction = reference x op:reduction\_operator x dependences:entity* x trusted:preference*}
+{}
 
 List of reductions are separated.
 
 \domain{reductions = list:reduction*}
+{}
 
 
 \section{Functions}
@@ -55,6 +58,7 @@ Function from statement to reductions to be used for proper and cumulated
 reductions. 
 
 \domain{pstatement\_reductions = persistent statement->reductions}
+{}
 
 
 
