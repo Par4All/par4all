@@ -71,6 +71,10 @@ verbosity=1
 # executable to be used to issue svn commands
 svn='svn'
 
+# This script parses svn output and assumes all is in English... If not,
+# it just fails.
+export LANG=C
+
 # directory for temporary data
 tmp='/tmp'
 
