@@ -12,7 +12,17 @@
 
 \documentclass[a4paper]{article}
 %\usepackage{alltt,html,fancybox,amstext,xspace,epsfig}
-\usepackage{epsfig,amstext,alltt}
+\usepackage{epsfig,amstext,alltt,fullpage}
+\usepackage[ps2pdf,backref,pagebackref]{hyperref}
+\usepackage[hyper,procnames]{listings}
+\lstset{extendedchars=true, language=Fortran, basicstyle=\footnotesize\ttfamily, numbers=left,
+  numberstyle=\tiny, stepnumber=2, numberfirstline=true, showspaces=true,
+  showstringspaces=false, showtabs=true,
+  tabsize=8, tab=\rightarrowfill, keywordstyle=\orange\bf,
+  stringstyle=\rmfamily, commentstyle=\rmfamily\itshape,
+  index=[1][keywords],indexprocnames=true}
+
+
 \title{Properties \\
     Low Level Tuning of PIPS}
 \author{Lei Zhou \hspace{2cm} 
@@ -32,7 +42,7 @@ $~$Date: 2005/12/09 15:39:06 $~$
 % \addtolength{\textheight}{172pt}
 % \addtolength{\topmargin}{-60pt}
 
-\newcommand{\LINK}[2]{#1 (#2)}
+\newcommand{\LINK}[2]{#1 (\url{#2})}
 
 \newcommand{\PIPS}{\LINK{{\em PIPS}}{http://www.cri.ensmp.fr/pips}}
 \newcommand{\PIPSMAKE}{\LINK{\emph{pipsmake/}}{http://www.cri.ensmp.fr/pips/pipsmake.html}}
@@ -2028,6 +2038,43 @@ which takes into account the actual SIMD instructions.
 SIMD_AUTO_UNROLL_SIMPLE_CALCULATION TRUE
 \end{verbatim}
 
+\subsubsection{Memory Organisation}
+
+This property is used by the sac library to know which elements of
+multi-dimensional array are consecutive in memory. Let us consider the
+three following references \lstinline|a(i,j,k)|, \lstinline|a(i,j,k+1)|
+and \lstinline|a(i+1,j,k)|.  Then, if \verb|SIMD_FORTRAN_MEM_ORGANISATION|
+is set to \texttt{TRUE}, it means that \lstinline|a(i,j,k)| and
+\lstinline|a(i+1,j,k)| are consecutive in memory but \lstinline|a(i,j,k)|
+and \lstinline|a(i,j,k+1)| are not. However, if
+\verb|SIMD_FORTRAN_MEM_ORGANISATION| is set to \texttt{FALSE},
+\lstinline|a(i,j,k)| and \lstinline|a(i,j,k+1)| are consecutive in memory
+but \lstinline|a(i,j,k)| and \lstinline|a(i+1,j,k)| are not.
+
+\begin{verbatim}
+SIMD_FORTRAN_MEM_ORGANISATION TRUE
+\end{verbatim}
+
+\subsection{PHRASE ComEngine}
+
+This property is set to TRUE if we want to synthesize only one 
+process on the HRE.
+
+\begin{verbatim}
+COMENGINE_CONTROL_IN_HRE TRUE
+\end{verbatim}
+
+This property holds the fifo size of the ComEngine.
+
+\begin{verbatim}
+COMENGINE_SIZE_OF_FIFO 128
+\end{verbatim}
+
+This property holds the number of fifos in the ComEngine.
+
+\begin{verbatim}
+COMENGINE_NUMBER_OF_FIFO 100
+\end{verbatim}
 
 %%
 %% PRETTYPRINTER
