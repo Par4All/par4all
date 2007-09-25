@@ -32,10 +32,15 @@ instruction sets, such as MMX, SSE or VIS.
 {}
 \domain{import reference from "ri.newgen"}
 {}
+\domain{import reduction from "reductions_private.newgen"}
+{}
+
+\domain{reductionTester = reduction x redAllowed:bool}
+{}
 
 \section*{Opcodes and opcode classes}
 
-\domain{opcode = name:string x vectorSize:int x subwordSize:int}
+\domain{opcode = name:string x vectorSize:int x argType:int* x cost:float}
 {}
 
 \domain{tabulated opcodeClass = name:string x nbArgs:int x opcodes:opcode*}
@@ -86,7 +91,7 @@ arguments (list of \verb+patternArg+).
 
 \section*{Statement information}
 
-\domain{referenceInfo = entity x nbDimensions:int x index:reference x offset:int}
+\domain{referenceInfo = reference x nbDimensions:int x lExp:expression* x lIndex:reference* x lOffset:int*}
 {}
 
 The \verb+referenceInfo+ domain reprensents an easier to use
