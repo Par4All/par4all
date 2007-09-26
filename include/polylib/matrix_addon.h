@@ -1,6 +1,4 @@
 /** 
- * $Id: matrix_addon.h,v 1.8 2006/10/01 02:10:46 meister Exp $
- * 
  * Polylib matrix addons
  * Mainly, deals with polyhedra represented in implicit form (set of
  * constraints).

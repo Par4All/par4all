@@ -1,5 +1,4 @@
 /**
- * $Id: matrix_permutations.h,v 1.3 2006/08/11 02:03:53 meister Exp $
  * Permutations on matrices
  * Matrices are seen either as transformations (mtransformation) or as
  * polyhedra (mpolyhedron or Constraints).

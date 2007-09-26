@@ -1,5 +1,4 @@
 /**
- * $Id: compress_parms.h,v 1.6 2006/09/25 03:34:03 meister Exp $
  * @author B. Meister 12/2003-2006
  * LSIIT -ICPS 
  * UMR 7005 CNRS

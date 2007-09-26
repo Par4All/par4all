@@ -229,15 +229,3 @@ typedef struct ZPolyhedron {
 #endif
 
 #endif /* _types_polylib_h_ */
-
-
-
-
-
-
-
-
-
-
-
-
