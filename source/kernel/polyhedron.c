@@ -750,7 +750,7 @@ static int Gauss4(Value **p, int NbEq, int NbRows, int Dimension)
 {
   int i, j, k, pivot, Rank;
   int *column_index = NULL;
-  Value gcd, *cp;
+  Value gcd;
 
   value_init(gcd);
   column_index=(int *)malloc(Dimension * sizeof(int));
@@ -783,24 +783,11 @@ static int Gauss4(Value **p, int NbEq, int NbRows, int Dimension)
 	/* gcd = Vector_Gcd(p[Rank]+1,Dimension) */
 	Vector_Gcd(p[Rank]+1,Dimension,&gcd);
 	
-	/* if (gcd >= 2) */
-	if (value_cmp_si(gcd, 2) >= 0) { 
-	  cp = &p[Rank][1];
-	  for (k=0; k<Dimension; k++) {
-	    value_division (*cp,*cp,gcd);       /* *cp /= gcd */    
-	    cp++;
-	  }
-	}
+	if (value_cmp_si(gcd, 2) >= 0)
+	  Vector_AntiScale(p[Rank]+1, p[Rank]+1, gcd, Dimension);
 	
-	/* if (Mat->p[Rank][j] < 0) */
-	if (value_neg_p(p[Rank][j])) { 
-	  cp = p[Rank]+1;	
-	  for (k=0; k<Dimension; k++) { 
-	    value_oppose(*cp, *cp); /* *cp *= -1 */ 
-	    cp++;
-	  }
-	}
-	/* End of normalize */
+	if (value_neg_p(p[Rank][j]))
+	  Vector_Oppose(p[Rank]+1, p[Rank]+1, Dimension);
 	
 	pivot=i;
 	for (i=pivot+1; i<NbEq; i++) {  /* Zero out the rest of the column */
