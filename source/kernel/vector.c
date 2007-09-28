@@ -356,6 +356,17 @@ void Vector_AntiScale(Value *p1,Value *p2,Value lambda,unsigned length) {
   }
 } /* Vector_AntiScale */
 
+/*
+ * Puts negative of 'p1' in 'p2'
+ */
+void Vector_Oppose(Value *p1, Value *p2, unsigned len)
+{
+  unsigned i;
+
+  for (i = 0; i < len; ++i)
+    value_oppose(p2[i], p1[i]);
+}
+
 /* 
  * Return the inner product of the two Vectors 'p1' and 'p2' 
  */

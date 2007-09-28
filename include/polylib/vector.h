@@ -28,6 +28,7 @@ extern void Vector_Scale(Value *p1, Value *p2, Value lambda, unsigned
 			 length);
 extern void Vector_AntiScale(Value *p1,Value *p2,Value lambda,
 			                unsigned length);
+extern void Vector_Oppose(Value *p1, Value *p2, unsigned length);
 extern void Inner_Product(Value *p1,Value *p2,unsigned length, Value *result);
 extern void Vector_Max(Value *p,unsigned length, Value *result);
 extern void Vector_Min(Value *p,unsigned length, Value *result);
