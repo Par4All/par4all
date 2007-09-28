@@ -1,6 +1,6 @@
 # $Id$
 
-INSTALL_DOC =	developer_guide.ps
+INSTALL_DOC =	developer_guide.ps developer_guide.pdf
 
 INSTALL_HTM = developer_guide
 
