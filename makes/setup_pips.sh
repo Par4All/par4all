@@ -90,7 +90,7 @@ unset NEWGEN_ROOT LINEAR_ROOT PIPS_ROOT
 
 echo "### downloading $POLYLIB"
 cd /tmp
-test -f $POLYLIB.tar.gz && error "some $POLYLIB.tar.gz file already there"
+test -f $POLYLIB.tar.gz && warning "some /tmp/$POLYLIB.tar.gz file already there. Continue?"
 wget -nd $POLYLIB_SITE/$POLYLIB.tar.gz || error "cannot wget polylib"
 
 echo "### building $POLYLIB"
@@ -111,8 +111,10 @@ rm -rf $POLYLIB || error "cannot remove polylib"
 rm -f $POLYLIB.tar || error "cannot remove polylib tar"
 
 echo "### fixing $POLYLIB"
-mkdir $prod/extern/lib/$PIPS_ARCH || error "cannot mkdir"
+mkdir -p $prod/extern/lib/$PIPS_ARCH || error "cannot mkdir"
 cd $prod/extern/lib/$PIPS_ARCH || error "cannot cd"
+# Just in case a previous version was here:
+rm -f libpolylib.a
 ln -s ../libpolylib*.a libpolylib.a || error "cannot create links"
 
 echo "### testing special commands for config.mk"
@@ -132,14 +134,17 @@ warning "cproto header generation results in many cpp warnings..."
 
 echo "### building newgen"
 cd $prod/newgen
+make clean
 make $target
 
 echo "### building linear"
 cd $prod/linear
+make clean
 make $target
 
 echo "### building pips"
 cd $prod/pips
+make clean
 # must find newgen and newC executable...
 PATH=$prod/newgen/bin:$prod/newgen/bin/$PIPS_ARCH:$PATH \
     make $target
