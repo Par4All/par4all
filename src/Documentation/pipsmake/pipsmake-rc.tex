@@ -2781,16 +2781,7 @@ The \HPFcompiler{} is a project by itself, developed by Fabien Coelho in
 A whole set of rules is used by the \PIPS{} \HPFcompiler{}, \HPFC{}. 
 By the way, the whole compiler is just a big hack. {\em Fabien Coelho}.
 
-
-
-
 \paragraph{HPFC Filter}
-
-\begin{verbatim}
-parad              > MODULE.code
-   < PROGRAM.entities
-   < MODULE.code
-\end{verbatim}
 
 The first rule is used to apply a shell to put HPF-directives in an f77 parsable form.
 Some shell script based on sed is used. The \verb+hpfc_parser+ must be
