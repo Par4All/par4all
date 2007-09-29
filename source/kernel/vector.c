@@ -340,20 +340,14 @@ void Vector_Scale(Value *p1,Value *p2,Value lambda,unsigned length) {
 
 /* 
  * Antiscale Vector 'p1' by lambda and store in 'p2' 
+ * Assumes all elements of 'p1' are divisble by lambda.
  */
-void Vector_AntiScale(Value *p1,Value *p2,Value lambda,unsigned length) {
-  
-  Value *cp1, *cp2;
+void Vector_AntiScale(Value *p1, Value *p2, Value lambda, unsigned length)
+{
   int i;
   
-  cp1=p1;
-  cp2=p2;
-  for (i=0;i<length;i++) {
-    
-    /* *cp2++=*cp1++ / lambda; */
-    value_division(*cp2,*cp1,lambda);
-    cp1++; cp2++;
-  }
+  for (i = 0; i < length; i++)
+    value_divexact(p2[i], p1[i], lambda);
 } /* Vector_AntiScale */
 
 /*
@@ -556,26 +550,17 @@ void Vector_Map(Value *p1,Value *p2,Value *p3,unsigned length,
  */
 void Vector_Normalize(Value *p,unsigned length) {
   
-  Value *cp, gcd,tmp;
+  Value gcd;
   int i;
   
-  value_init(tmp);value_init(gcd);
+  value_init(gcd);
 
   Vector_Gcd(p,length,&gcd);
-  value_set_si(tmp,1);
   
-  if (value_gt(gcd,tmp)) {
-    cp = p;    
-    for (i=0; i<length; i++) { 
-      
-      /* *cp /= gcd */
-      value_division(*cp,*cp,gcd);
-      cp++;
-    }
-  }
-  value_clear(tmp);
+  if (value_notone_p(gcd))
+    Vector_AntiScale(p, p, gcd, length);
+
   value_clear(gcd);
-  return;
 } /* Vector_Normalize */
 
 /* 
@@ -592,11 +577,8 @@ void Vector_Normalize_Positive(Value *p,int length,int pos) {
   if (value_neg_p(p[pos]))
     value_oppose(gcd,gcd);
   if(value_notone_p(gcd))
-    for(i=0; i<length; i++)
-      value_division(p[i],p[i],gcd);
+    Vector_AntiScale(p, p, gcd, length);
   value_clear(gcd);
-
-  return;
 } /* Vector_Normalize_Positive */
 
 /* 
