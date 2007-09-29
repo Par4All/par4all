@@ -67,7 +67,7 @@
     calling program (e.g. Domlib.c, ReadAlpha, etc...).
     See errormsg.c for an example of such a function.  */
 
-void errormsg1(char *f , char *msgname, char *msg);
+void errormsg1(const char *f, const char *msgname, const char *msg);
 
 int Pol_status;                    /* error status after operations */
 

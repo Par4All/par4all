@@ -15,7 +15,7 @@ extern ZPolyhedron *ZDomainImage ( ZPolyhedron *A, Matrix *Func );
 extern Bool ZDomainIncludes ( ZPolyhedron *A, ZPolyhedron *B );
 extern ZPolyhedron *ZDomainIntersection ( ZPolyhedron *A, ZPolyhedron *B );
 extern ZPolyhedron *ZDomainPreimage ( ZPolyhedron *A, Matrix *Func );
-extern void ZDomainPrint ( FILE *fp, char *format, ZPolyhedron *A );
+extern void ZDomainPrint(FILE *fp, const char *format, ZPolyhedron *A);
 extern ZPolyhedron *ZDomainSimplify ( ZPolyhedron *ZDom );
 extern ZPolyhedron *ZDomainUnion ( ZPolyhedron *A, ZPolyhedron *B );
 extern ZPolyhedron *ZDomain_Copy ( ZPolyhedron *Head );

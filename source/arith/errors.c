@@ -116,7 +116,7 @@ typedef int boolean;
 #define TRUE    1
 #endif
 
-char * get_exception_name(unsigned int exception)
+const char *get_exception_name(unsigned int exception)
 {
   if (exception==overflow_error)
     return "overflow_error exception";

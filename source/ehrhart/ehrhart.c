@@ -2689,12 +2689,13 @@ Enumeration *Constraints_EhrhartQuickApx(Matrix const * M, Matrix const * C,
  * <p> Note: does not copy the parameters names themselves. </p>
  * @param nbParms the initial number of parameters
 */
-char ** parmsWithoutElim(char const ** parmNames, 
-			       unsigned int const * elimParms, 
-			       unsigned int nbParms) {
+const char **parmsWithoutElim(char const **parmNames, 
+			      unsigned int const *elimParms, 
+			      unsigned int nbParms)
+{
   int i=0, j=0,k;
   int newParmNb = nbParms - elimParms[0];
-  char ** newParmNames = (char **)malloc (newParmNb * sizeof(char *));
+  const char **newParmNames = (const char **)malloc(newParmNb * sizeof(char *));
   for (k=1; k<= elimParms[0]; k++) {
     while (i!=elimParms[k]) {
       newParmNames[i-k+1] = parmNames[i];

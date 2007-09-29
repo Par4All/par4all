@@ -8,7 +8,7 @@ static ZPolyhedron * ZPolyhedronDifference(ZPolyhedron *, ZPolyhedron *);
 static ZPolyhedron * ZPolyhedronImage(ZPolyhedron *, Matrix *);
 static ZPolyhedron * ZPolyhedronPreimage(ZPolyhedron *, Matrix *);
 static ZPolyhedron *AddZPolytoZDomain(ZPolyhedron *A, ZPolyhedron *Head);
-static void ZPolyhedronPrint(FILE *fp, char *format, ZPolyhedron *A);
+static void ZPolyhedronPrint(FILE *fp, const char *format, ZPolyhedron *A);
 
 typedef struct forsimplify {
   Polyhedron *Pol;
@@ -318,8 +318,8 @@ Bool ZPolyhedronIncludes(ZPolyhedron *A, ZPolyhedron *B) {
 /*
  * Print the contents of a Z-domain 'A' 
  */
-void ZDomainPrint(FILE *fp,char *format,ZPolyhedron *A) {
-  
+void ZDomainPrint(FILE *fp, const char *format, ZPolyhedron *A)
+{
 #ifdef DOMDEBUG
   FILE *fp1;
   fp1 = fopen("_debug", "a");
@@ -338,8 +338,8 @@ void ZDomainPrint(FILE *fp,char *format,ZPolyhedron *A) {
 /*
  * Print the contents of a ZPolyhderon 'A'
  */
-static void ZPolyhedronPrint (FILE *fp, char *format, ZPolyhedron *A) {
-  
+static void ZPolyhedronPrint (FILE *fp, const char *format, ZPolyhedron *A)
+{
   if (A == NULL)
     return ;
   fprintf(fp,"\nZPOLYHEDRON: Dimension %d \n",A->Lat->NbRows-1);

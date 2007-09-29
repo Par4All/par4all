@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-extern void errormsg1(char *f, char *msgname, char *msg);
+extern void errormsg1(const char *f, const char *msgname, const char *msg);
 
 #if defined(__cplusplus)
 }

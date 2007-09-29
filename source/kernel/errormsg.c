@@ -26,8 +26,8 @@ extern int Pol_status;
     the call to errormsg1. Therefore, no Compound statement is sent to
     Mathematica.
 */
-void errormsg1(char *f , char *msgname, char *msg) {
-  
+void errormsg1(const char *f, const char *msgname, const char *msg)
+{
   Pol_status = 1;
 
 #ifdef MATHLINK
