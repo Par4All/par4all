@@ -323,6 +323,7 @@ typedef cln::cl_I Value;
 #define value_sub_int(ref,val1,val2) 	((ref) = (val1)-(val2))
 #define value_decrement(ref,val) 	((ref) = (val)-1)
 #define value_division(ref,val1,val2)   ((ref) = cln::truncate1(val1,val2))
+#define value_divexact(ref,val1,val2)   ((ref) = cln::exquo(val1,val2))
 #define value_modulus(ref,val1,val2)    ((ref) = cln::truncate2(val1,val2).remainder)
 #define value_pdivision(ref,val1,val2)  ((ref) = cln::floor1(val1,val2))
 #define value_pmodulus(ref,val1,val2)   ((ref) = cln::floor2(val1,val2).remainder)
@@ -398,6 +399,7 @@ typedef cln::cl_I Value;
 #define value_sub_int(ref,val,vint)     (mpz_sub_ui((ref),(val),(long)(vint)))
 #define value_decrement(ref,val)       (mpz_sub_ui((ref),(val),1))
 #define value_division(ref,val1,val2)  (mpz_tdiv_q((ref),(val1),(val2)))
+#define value_divexact(ref,val1,val2)  (mpz_divexact((ref),(val1),(val2)))
 #define value_modulus(ref,val1,val2)   (mpz_tdiv_r((ref),(val1),(val2)))
 #define value_pdivision(ref,val1,val2) (mpz_fdiv_q((ref),(val1),(val2)))
 #define value_pmodulus(ref,val1,val2)  (mpz_fdiv_r((ref),(val1),(val2)))
@@ -497,6 +499,7 @@ typedef cln::cl_I Value;
 #define value_sub_int(ref,val,vint)     ((ref) = (val)-(Value)(vint))
 #define value_decrement(ref,val) 	((ref) = (val)-VALUE_ONE)
 #define value_division(ref,val1,val2) 	((ref) = (val1)/(val2))
+#define value_divexact(ref,val1,val2) 	((ref) = (val1)/(val2))
 #define value_modulus(ref,val1,val2) 	((ref) = (val1)%(val2))
 #define value_pdivision(ref,val1,val2)	((ref) = value_pdiv((val1),(val2)))
 #define value_pmodulus(ref,val1,val2)	((ref) = value_pmod((val1),(val2)))
@@ -644,6 +647,8 @@ typedef cln::cl_I Value;
 #define value_modulus(v1,v2) value_addto(v1,v2)
 #undef value_division
 #define value_division(v1,v2) value_addto(v1,v2)
+#undef value_divexact
+#define value_divexact(v1,v2) value_addto(v1,v2)
 #undef value_increment
 #define value_increment(v) value_addto(v,VALUE_ONE)
 #undef value_decrement
