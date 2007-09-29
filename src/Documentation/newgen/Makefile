@@ -42,7 +42,7 @@ F.spec		= $(F.newgen:%.newgen=%.spec)
 ALLHS =	all_newgen_headers.h specs.h
 
 INSTALL_INC=	$(F.h) $(F.newgen) $(F.c) $(F.spec) $(ALLHS)
-INSTALL_DOC=	$(F.newgen:%.newgen=%.ps)
+INSTALL_DOC=	$(F.newgen:%.newgen=%.pdf)
 INSTALL_HTM=	$(F.tex:%.tex=%.htdoc)
 # Install in a newgen subdirectory:
 HTM.subd = newgen
@@ -50,7 +50,7 @@ HTM.subd = newgen
 all: $(ALLHS) $(INSTALL_DOC)
 
 dvi: $(F.newgen:%.newgen=%.dvi)
-ps: $(F.newgen:%.newgen=%.ps)
+pdf: $(F.newgen:%.newgen=%.pdf)
 newgen: $(F.newgen)
 allhs: $(ALLHS)
 
@@ -84,7 +84,7 @@ clean: local-clean
 
 local-clean:
 	$(RM) $(INSTALL_INC) $(F.newgen) 
-	$(RM) *.dvi *.ind *.log *.ps *.aux *.idx *.ilg *.toc
+	$(RM) *.dvi *.ind *.log *.ps *.pdf *.aux *.idx *.ilg *.toc
 	$(RM) -r $(INSTALL_HTM) ri.html dg.html
 
 

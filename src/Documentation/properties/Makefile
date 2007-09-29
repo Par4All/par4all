@@ -2,7 +2,7 @@
 
 SOURCES	= properties-rc.tex
 
-INSTALL_DOC	= properties-rc.ps
+INSTALL_DOC	= properties-rc.pdf
 INSTALL_HTM	= properties-rc.htdoc
 ETC_TARGET	=  properties.rc
 
@@ -17,7 +17,8 @@ properties.rc: properties-rc.tex
 clean: local-clean
 local-clean:
 	$(RM) -r $(INSTALL_HTM) $(INSTALL_DOC) $(ETC_TARGET)
-	$(RM) properties-rc.html *.dvi *.ind *.log *.aux *.idx *.ilg *.toc *~
+	$(RM) properties-rc.html *.dvi *.ind *.log *.aux *.idx *.ilg \
+		*.toc *~ *.brf *.out *.ps
 
 # common stuff
 ifdef PIPS_ROOT

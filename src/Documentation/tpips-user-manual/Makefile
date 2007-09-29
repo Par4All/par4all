@@ -1,6 +1,6 @@
 # $Id: Makefile 12428 2005-12-30 14:22:06Z coelho $
 
-INSTALL_DOC =	tpips-user-manual.ps
+INSTALL_DOC =	tpips-user-manual.pdf
 
 #INSTALL_HTM = tpips-user-manual.htdoc
 
@@ -18,4 +18,4 @@ include $(ROOT)/makes/main.mk
 clean: local-clean
 
 local-clean:
-	$(RM) $(INSTALL_DOC) *.aux *.toc *.idx *.ilg *.ind *.log
+	$(RM) $(INSTALL_DOC) *.aux *.toc *.idx *.ilg *.ind *.log *.ps *.pdf
