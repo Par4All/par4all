@@ -357,8 +357,8 @@ void Matrix_subMatrix(Matrix * M, unsigned int sr, unsigned int sc,
 
 
 /**
- * Cloning funciton. Similar to Matrix_Copy() but allocates the target matrix
- * if it is set to NULL 
+ * Cloning function. Similar to Matrix_Copy() but allocates the target matrix
+ * if it is set to NULL.
  */
 void Matrix_clone(Matrix * M, Matrix ** Cl) {
   Matrix_subMatrix(M, 0,0, M->NbRows, M->NbColumns, Cl);
