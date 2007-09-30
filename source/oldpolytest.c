@@ -361,9 +361,9 @@ int GaussSimplify(Matrix *Mat1,Matrix *Mat2) {
 	    value_init(a); value_init(a1); value_init(a2);
 	    value_absolute(a1,Mat1->p[i][j]);
 	    value_absolute(a2,Mat1->p[Rank][j]);
-	    Gcd(a1,a2,&a));
-	    value_division(a1,a1,a);
-	    value_division(a2,a2,a);
+	    value_gcd(a, a1, a2));
+	    value_divexact(a1, a1, a);
+	    value_divexact(a2, a2, a);
 	    value_oppose(a1,a1);
 	    Vector_Combine(Mat1->p[i],Mat1->p[Rank],Mat1->p[i],a2, 
 			   a1,NbCols);
@@ -396,9 +396,9 @@ int GaussSimplify(Matrix *Mat1,Matrix *Mat2) {
 	  value_init(a); value_init(a1); value_init(a2);
 	  value_absolute(a1,Mat2->p[i][j]);
 	  value_absolute(a2,Mat2->p[k][j]);
-	  Gcd(a1,a2,&a);
-	  value_division(a1,a1,a);
-	  value_division(a2,a2,a);
+	  value_gcd(a, a1, a2);
+	  value_divexact(a1, a1, a);
+	  value_divexact(a2, a2, a);
 	  value_oppose(a1,a1);
 	  if (value_one_p(a2)) {
 	    Vector_Combine(Mat2->p[i],Mat1->p[k],Mat2->p[i],a2,

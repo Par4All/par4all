@@ -180,7 +180,7 @@ static int TestRank(Matrix *Mat) {
     for(j=k+1;j<Mat->NbRows;++j) {
       
       /* Make every other entry (below row(k)) in column(k) zero */
-      Gcd(Mat->p[j][k],Mat->p[k][k],&gcd);
+      value_gcd(gcd, Mat->p[j][k], Mat->p[k][k]);
       for(i=k+1;i<Mat->NbColumns;++i) {
 	
 	/* pour tous les indices i > k */
@@ -1478,26 +1478,23 @@ void Print_Vertex(FILE *DST,Matrix *V,char **param_names){
     fprintf(DST, " " );
     for(v=0;v < V->NbColumns-2;++v) {
       if(value_notzero_p(V->p[l][v])) {
-	Gcd(V->p[l][v],V->p[l][V->NbColumns-1],&gcd);
-	value_absolute(gcd,gcd);
-	value_division(tmp,V->p[l][v],gcd);
+	value_gcd(gcd, V->p[l][v], V->p[l][V->NbColumns-1]);
+	value_divexact(tmp, V->p[l][v], gcd);
 	if(value_posz_p(tmp)) {
 	  if(!first) 
 	    fprintf(DST, "+");
-	  value_division(tmp,V->p[l][v],gcd);
 	  if(value_notone_p(tmp)) { 
 	    value_print(DST,VALUE_FMT,tmp);
 	  }  
 	}
 	else { /* V->p[l][v]/gcd<0 */
-	  value_division(tmp,V->p[l][v],gcd);
 	  if(value_mone_p(tmp))
 	    fprintf(DST, "-" );
 	  else {
 	    value_print(DST,VALUE_FMT,tmp);
 	  }
 	}
-	value_division(tmp,V->p[l][V->NbColumns-1],gcd);
+	value_divexact(tmp, V->p[l][V->NbColumns-1], gcd);
 	if(value_notone_p(tmp)) {
 	  fprintf(DST, "%s/", param_names[v]);
 	  value_print(DST,VALUE_FMT,tmp);
@@ -1512,11 +1509,10 @@ void Print_Vertex(FILE *DST,Matrix *V,char **param_names){
     if(value_notzero_p(V->p[l][v]) || first) {
       if(value_posz_p(V->p[l][v]) && !first)
 	fprintf(DST,"+");
-	Gcd(V->p[l][v],V->p[l][V->NbColumns-1],&gcd);
-      value_absolute(gcd,gcd);
-      value_division(tmp,V->p[l][v],gcd);
+	value_gcd(gcd, V->p[l][v], V->p[l][V->NbColumns-1]);
+	value_divexact(tmp, V->p[l][v], gcd);
       value_print(DST,VALUE_FMT,tmp);
-      value_division(tmp,V->p[l][V->NbColumns-1],gcd);
+	value_divexact(tmp, V->p[l][V->NbColumns-1], gcd);
       if(value_notone_p(tmp)) {
 	fprintf(DST,"/");
 	value_print(DST,VALUE_FMT,tmp);
@@ -1787,12 +1783,12 @@ void Param_Polyhedron_Scale_Integer(Param_Polyhedron *PP, Polyhedron **P,
   /* b- scan the vertices and compute the variables' global lcms */
   for (V = PP->V; V; V = V->next)
     for (i = 0; i < nb_vars; i++)
-      Lcm3(denoms->p[i], V->Vertex->p[i][nb_param+1], &denoms->p[i]);
+      value_lcm(denoms->p[i], denoms->p[i], V->Vertex->p[i][nb_param+1]);
 
   value_set_si(global_var_lcm, 1);
   for (i = 0; i < nb_vars; i++) {
     value_multiply(*det, *det, denoms->p[i]);
-    Lcm3(global_var_lcm, denoms->p[i], &global_var_lcm);
+    value_lcm(global_var_lcm, global_var_lcm, denoms->p[i]);
   }
 
   /* scale vertices */

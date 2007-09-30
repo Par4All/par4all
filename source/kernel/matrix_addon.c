@@ -120,7 +120,7 @@ void mtransformation_inverse(Matrix * transf, Matrix ** inverse, Value * g) {
   /* b - as it is rational, put it to the same denominator*/
   (*inverse) = Matrix_Alloc(transf->NbRows, transf->NbRows);
   for (i=0; i< inv->NbRows; i++) 
-    Lcm3(*g, inv->p[i][inv->NbColumns-1],g);
+    value_lcm(*g, *g, inv->p[i][inv->NbColumns-1]);
   for (i=0; i< inv->NbRows; i++) {
     value_division(factor, *g, inv->p[i][inv->NbColumns-1]);
     for (j=0; j< (*inverse)->NbColumns; j++) 
@@ -157,13 +157,10 @@ void mpolyhedron_simplify(Matrix * polyh) {
   Value cur_gcd;
   value_init(cur_gcd);
   for (i=0; i< polyh->NbRows; i++) {
-    value_set_si(cur_gcd, 0);
-    for (j=1; j< polyh->NbColumns; j++) 
-      Gcd(cur_gcd, polyh->p[i][j], &cur_gcd);
+    Vector_Gcd(polyh->p[i]+1, polyh->NbColumns-1, &cur_gcd);
     printf(" gcd[%d] = ", i); 
     value_print(stdout, VALUE_FMT, cur_gcd);printf("\n");
-    for (j=1; j< polyh->NbColumns; j++) 
-      value_division(polyh->p[i][j], polyh->p[i][j], cur_gcd);
+    Vector_AntiScale(polyh->p[i]+1, polyh->p[i]+1, cur_gcd, polyh->NbColumns-1);
   }
   value_clear(cur_gcd);
 } /* mpolyhedron_simplify */
@@ -239,8 +236,8 @@ void eliminate_var_with_constr(Matrix * Eliminator,
   value_init(tmp2);
   /* if the victim coefficient is not zero */
   if (value_notzero_p(Victim->p[victim_row][var_to_elim+1])) {
-    Lcm3(Eliminator->p[eliminator_row][var_to_elim+1], 
-	 Victim->p[victim_row][var_to_elim+1], &cur_lcm);
+    value_lcm(cur_lcm, Eliminator->p[eliminator_row][var_to_elim+1], 
+	      Victim->p[victim_row][var_to_elim+1]);
     /* multiplication factors */
     value_division(mul_a, cur_lcm, 
 		   Eliminator->p[eliminator_row][var_to_elim+1]);

@@ -114,9 +114,9 @@ static evalue *dehomogenize_polynomial(enode *en){
   }
   
   /** simplify num/den **/
-  Gcd(num, den, &gcd);
-  value_division(num, num, gcd);
-  value_division(den, den, gcd);
+  value_gcd(gcd, num, den);
+  value_divexact(num, num, gcd);
+  value_divexact(den, den, gcd);
 
   /** create new evalue representing num/den**/
   enn = (evalue*)malloc(sizeof(evalue));

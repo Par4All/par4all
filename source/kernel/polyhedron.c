@@ -220,13 +220,13 @@ static void Combine(Value *p1, Value *p2, Value *p3, int pos, unsigned length) {
   value_absolute(abs_a2,a2);
 
   /* gcd  = Gcd(abs(a1), abs(a2)) */
-  Gcd(abs_a1,abs_a2,&gcd);
+  value_gcd(gcd, abs_a1, abs_a2);
 
   /* a1 = a1/gcd */
-  value_division (a1,a1,gcd);
+  value_divexact(a1, a1, gcd);
 
   /* a2 = a2/gcd */
-  value_division (a2,a2,gcd);
+  value_divexact(a2, a2, gcd);
 
   /* neg_a1 = -(a1) */
   value_oppose(neg_a1,a1);

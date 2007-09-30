@@ -540,9 +540,9 @@ Matrix * affine_periods(Matrix * M, Matrix * d) {
   }
   for (i=0; i<M->NbRows; i++) {
     for (j=0; j< M->NbColumns; j++) {
-      Gcd(d->p[i][0], M->p[i][j], &tmp);
-      value_division(tmp, d->p[i][0], tmp);
-      Lcm3(periods[j], tmp, &(periods[j]));
+      value_gcd(tmp, d->p[i][0], M->p[i][j]);
+      value_divexact(tmp, d->p[i][0], tmp);
+      value_lcm(periods[j], periods[j], tmp);
      }
   }
   value_clear(tmp);

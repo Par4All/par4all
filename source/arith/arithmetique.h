@@ -331,6 +331,8 @@ typedef cln::cl_I Value;
 #define value_absolute(ref,val)		((ref) = cln::abs(val))
 #define value_minimum(ref,val1,val2)	((ref) = cln::min((val1),(val2)))
 #define value_maximum(ref,val1,val2)	((ref) = cln::max((val1),(val2)))
+#define value_gcd(ref,val1,val2)	((ref) = cln::gcd((val1),(val2)))
+#define value_lcm(ref,val1,val2)	((ref) = cln::lcm((val1),(val2)))
 #define value_orto(ref,val1,val2)	((ref) = (val1)|(val2))
 #define value_andto(ref,val1,val2)	((ref) = (val1)&(val2))
 
@@ -411,6 +413,8 @@ typedef cln::cl_I Value;
 #define value_maximum(ref,val1,val2)   (value_ge((val1),(val2)) ?  \
                                         mpz_set((ref),(val1)) :    \
                                         mpz_set((ref),(val2)))  
+#define value_gcd(ref,val1,val2)	(mpz_gcd(ref,val1,val2))
+#define value_lcm(ref,val1,val2)	(mpz_lcm(ref,val1,val2))
 #define value_orto(ref,val1,val2)      (mpz_ior((ref),(val1),(val2)))
 #define value_andto(ref,val1,val2)     (mpz_and((ref),(val1),(val2)))
 
@@ -507,6 +511,8 @@ typedef cln::cl_I Value;
 #define value_absolute(ref,val)		((ref) = value_abs((val)))
 #define value_minimum(ref,val1,val2)	((ref) = value_min((val1),(val2)))
 #define value_maximum(ref,val1,val2)	((ref) = value_max((val1),(val2)))
+#define value_gcd(ref,val1,val2)	Gcd((val1),(val2),&(ref))
+#define value_lcm(ref,val1,val2)	Lcm3((val1),(val2),&(ref))
 #define value_orto(ref,val1,val2)	((ref) = (val1)|(val2))
 #define value_andto(ref,val1,val2)	((ref) = (val1)&(val2))
 

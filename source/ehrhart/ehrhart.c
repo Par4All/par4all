@@ -365,10 +365,10 @@ static void emul (evalue *e1,evalue *e2,evalue *res) {
         /* Product of two rational numbers */
         value_multiply(res->d,e1->d,e2->d);
         value_multiply(res->x.n,e1->x.n,e2->x.n );
-        Gcd(res->x.n, res->d,&g);
+        value_gcd(g, res->x.n, res->d);
         if (value_notone_p(g)) {
-            value_division(res->d,res->d,g);
-            value_division(res->x.n,res->x.n,g);
+            value_divexact(res->d, res->d, g);
+            value_divexact(res->x.n, res->x.n, g);
         }
     }
     else { /* e1 is an expression */    
@@ -406,10 +406,10 @@ void eadd(evalue *e1,evalue *res) {
     value_multiply(m2,res->x.n,e1->d);
     value_addto(res->x.n,m1,m2);
     value_multiply(res->d,e1->d,res->d);  
-    Gcd(res->x.n,res->d,&g);
+    value_gcd(g, res->x.n, res->d);
     if (value_notone_p(g)) {  
-      value_division(res->d,res->d,g);
-      value_division(res->x.n,res->x.n,g);
+      value_divexact(res->d, res->d, g);
+      value_divexact(res->x.n, res->x.n, g);
     }
     value_clear(g); value_clear(m1); value_clear(m2);
     return;
@@ -1090,9 +1090,9 @@ Polyhedron *old_Polyhedron_Preprocess(Polyhedron *D,Value size,
                 value_absolute(abs_b,b);
 
                 /* Create new constraint: b*UB-a*LB >= a*b*size */
-                Gcd(abs_a,abs_b,&g);
-                value_division(a1,a,g);
-                value_division(b1,b,g);
+                value_gcd(g, abs_a, abs_b);
+                value_divexact(a1, a, g);
+                value_divexact(b1, b, g);
                 value_set_si(M->p[newi][0],1);
                 value_oppose(abs_a,a1);           /* abs_a = -a1 */
                 Vector_Combine(&(C[ub][1]),&(C[lb][1]),&(M->p[newi][1]),
@@ -1564,11 +1564,11 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,
       
       /* Set up coefficient vector C from i-th row of inverted matrix */
       for (j=0; j<rank; j++) {
-	Gcd(A->p[i][i+1],A->p[i][j+1+hdim],&g);
+	value_gcd(g, A->p[i][i+1], A->p[i][j+1+hdim]);
 	value_init(C->arr[j].d);
-	value_division(C->arr[j].d,A->p[i][i+1],g);
+	value_divexact(C->arr[j].d, A->p[i][i+1], g);
 	value_init(C->arr[j].x.n);
-	value_division(C->arr[j].x.n,A->p[i][j+1+hdim],g);
+	value_divexact(C->arr[j].x.n, A->p[i][j+1+hdim], g);
       }
       
 #ifdef EDEBUG
@@ -1680,16 +1680,16 @@ static void Scan_Vertices(Param_Polyhedron *PP,Param_Domain *Q,Matrix *CT,
 	  {
 	    if( value_notzero_p(V->Vertex->p[j][l]) )
 	      {
-		Gcd(V->Vertex->p[j][V->Vertex->NbColumns-1],
-		    V->Vertex->p[j][l],&m1);
-		value_division(k,V->Vertex->p[j][V->Vertex->NbColumns-1],m1);
+		value_gcd(m1, V->Vertex->p[j][V->Vertex->NbColumns-1],
+			  V->Vertex->p[j][l]);
+		value_divexact(k, V->Vertex->p[j][V->Vertex->NbColumns-1], m1);
 		if( value_notzero_p(lcm[l]) )
 		  {
 		    /* lcm[l] = lcm[l] * k / gcd(k,lcm[l]) */
 		    if (value_notzero_p(k) && value_notone_p(k))
 		      {
-			Gcd(lcm[l],k,&m1);
-			value_division(k,k,m1);
+			value_gcd(m1, lcm[l], k);
+			value_divexact(k, k, m1);
 			value_multiply(lcm[l],lcm[l],k);
 		      }
 		  }
@@ -2236,10 +2236,10 @@ void evalue_div(evalue * e, Value n) {
   else {
     value_multiply(e->d, e->d, n);
     /* simplify the new rational if needed */
-    Gcd(e->x.n, e->d, &gc);
-    if (value_notone_p(gc)&&(value_notzero_p(gc))) {
-      value_division(e->d, e->d, gc);
-      value_division(e->x.n, e->x.n, gc);
+    value_gcd(gc, e->x.n, e->d);
+    if (value_notone_p(gc)) {
+      value_divexact(e->d, e->d, gc);
+      value_divexact(e->x.n, e->x.n, gc);
     }
   }
   value_clear(gc);

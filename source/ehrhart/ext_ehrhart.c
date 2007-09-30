@@ -99,7 +99,7 @@ Matrix *CalcBase( Matrix *R )
 		/* reste a faire le pgcd du vecteur et a l'orienter */
 		value_set_si(p,0);
 		for( i=0 ; i<R->NbRows ; ++i )
-		  Gcd( p, B->p[u][i], &p );
+			value_gcd(p, p, B->p[u][i]);
 		if( value_zero_p(p))
 			value_set_si(p,1);
 		for( i=0 ; i<R->NbRows && value_zero_p(B->p[u][i]); ++i )
@@ -109,7 +109,7 @@ Matrix *CalcBase( Matrix *R )
 		      value_oppose( p,p );
 
 		for( i=0 ; i<R->NbRows ; ++i )
-			value_division(B->p[u][i],B->p[u][i], p);
+			value_divexact(B->p[u][i], B->p[u][i], p);
 
 		/* incrementer le compteur de lignes */
 		++l;
@@ -274,9 +274,9 @@ static void Soustraire_ligne(Matrix *R, int l1, int l2, int piv )
 	value_init(p);
 	value_init(t);
 
-	Gcd( R->p[l1][piv], R->p[l2][piv], &p );
-	value_division(a, R->p[l1][piv] , p);
-	value_division(b , R->p[l2][piv] , p);
+	value_gcd(p, R->p[l1][piv], R->p[l2][piv]);
+	value_divexact(a, R->p[l1][piv], p);
+	value_divexact(b, R->p[l2][piv], p);
 
 	value_set_si(R->p[l2][piv] , 0);
 	value_set_si(p,0);
@@ -285,11 +285,11 @@ static void Soustraire_ligne(Matrix *R, int l1, int l2, int piv )
 		value_multiply(t,b,R->p[l1][i]);
 		value_multiply(R->p[l2][i],a,R->p[l2][i]);
 		value_subtract(R->p[l2][i],R->p[l2][i],t);
-		Gcd(p, R->p[l2][i], &p );
+		value_gcd(p, p, R->p[l2][i]);
 	}
 	/* Simplification par le pgcd de toute la ligne */
 	for( i=piv+1 ; i<R->NbColumns && p!=0 ; i++ )
-		value_division(R->p[l2][i],R->p[l2][i], p);
+		value_divexact(R->p[l2][i], R->p[l2][i], p);
 
 	value_clear(a);
 	value_clear(b);
@@ -316,10 +316,10 @@ Value g,m1,m2;
          value_multiply(m2,res->x.n,e1->d);
          value_addto(res->x.n,m1,m2);
          value_multiply(res->d,e1->d,res->d);
-         Gcd(res->x.n,res->d,&g);
+         value_gcd(g, res->x.n,res->d);
          if (value_notone_p(g)) {
-              value_division(res->d,res->d,g);
-              value_division(res->x.n,res->x.n,g);
+              value_divexact(res->d, res->d, g);
+              value_divexact(res->x.n, res->x.n, g);
          }
          value_clear(g); value_clear(m1); value_clear(m2);
          return ;
@@ -534,16 +534,6 @@ void Scalar_product(Value *p1,Value *p2,unsigned length, Value *r) {
 	   t = (a*b)/ pgcd1(a,b);
 	  return t;
        } /* ppcm1 */
-  
-/* computes the scm of two values */
-
-void ppcm(Value a, Value b, Value *r) {
-	Value g;
-	value_init(g); 
-	Gcd(a,b,&g);
-	value_multiply(*r,a,b);
-	value_division(*r,*r,g);
-} /* ppcm  */
 
 
 Matrix *Orthogonal_Base(Matrix *Mat)  {
@@ -577,17 +567,17 @@ Matrix *Orthogonal_Base(Matrix *Mat)  {
       
       Scalar_product(p->p,f->p,length,&a);
       Scalar_product(p->p,p->p,length,&b);	
-      Gcd(a,b,&c);
-      value_division(a,a,c);
-      value_division(b,b,c);
+      value_gcd(c, a, b);
+      value_divexact(a, a, c);
+      value_divexact(b, b, c);
       for(k=0;k<length;k++) {
 	value_multiply(p->p[k],p->p[k],a);
       }
       
       if(value_notone_p(d)|value_notone_p(b))  {
-	ppcm(d,b,&c);
-	value_division(a,c,b);
-	value_division(b,c,d);
+	value_lcm(c, d, b);
+	value_divexact(a, c, b);
+	value_divexact(b, c, d);
 	value_assign(d,c);
 	for(k=0;k<length;k++) {
 	  value_multiply(p->p[k],p->p[k],a);
@@ -602,10 +592,7 @@ Matrix *Orthogonal_Base(Matrix *Mat)  {
       
     }
     Vector_Gcd(q->p,length,&c); 
-    for(k=0;k<length;k++) {
-      value_division(OrthMat->p[i][k],q->p[k],c);
-    }
-    
+    Vector_AntiScale(q->p, OrthMat->p[i], c, length);
   }
   value_clear(a);
   value_clear(b);

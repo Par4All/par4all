@@ -1016,7 +1016,7 @@ int FindHermiteBasisofDomain(Polyhedron *A, Matrix **B) {
     if ((value_notzero_p(A->Ray[i][0])) && value_notzero_p(A->Ray[i][A->Dimension+1])) {
       for(j = 1; j < A->Dimension+2; j++) 
 	value_assign(vert->p[vercount][j-1],A->Ray[i][j]);
-      Lcm3(lcm, A->Ray[i][j-1], &lcm);
+      value_lcm(lcm, lcm, A->Ray[i][j-1]);
       vercount++;
     }
     else {
