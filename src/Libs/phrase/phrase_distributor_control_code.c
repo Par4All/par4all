@@ -117,7 +117,8 @@ void store_new_module (string module_name,
 		       statement module_statement) 
 {
   string source_file;
-  
+  text code;
+
   pips_debug(2, "[BEGIN] store_new_module [%s]\n", module_name);
   ifdebug(2) {
     entity set_entity = get_current_module_entity();
@@ -135,10 +136,11 @@ void store_new_module (string module_name,
   }
 
   init_prettyprint(empty_text);
+  code = text_module(module, module_statement);
   make_text_resource(module_name,
 		     DBR_SOURCE_FILE, 
 		     ".f",
-		     text_module(module, module_statement));
+		     code);
   close_prettyprint();
   
   source_file = db_build_file_resource_name(DBR_SOURCE_FILE, module_name, ".f");
@@ -147,6 +149,13 @@ void store_new_module (string module_name,
   
   DB_PUT_NEW_FILE_RESOURCE (DBR_USER_FILE, module_name, source_file);
   DB_PUT_NEW_FILE_RESOURCE (DBR_INITIAL_FILE, module_name, source_file);
+
+  init_prettyprint(empty_text);
+  make_text_resource(module_name,
+		     DBR_INITIAL_FILE, 
+		     ".f_initial",
+		     code);
+  close_prettyprint();
 
   pips_debug(2, "[END] store_new_module [%s]\n", module_name);
 }
@@ -782,7 +791,6 @@ static statement controlize_distribution (statement module_stat,
 	      sscanf(resp,"%d",&unit_id);	    
 	    }
 	    while ((unit_id <1) || (unit_id > number_of_deployment_units));
-	    free(question);
 	    
 	    /* Some debug */
 	    pips_debug(2, "Externalized function [%s] being executed on unit %d:\n", function_name, unit_id);

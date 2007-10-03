@@ -13,9 +13,19 @@
 #include "effects-generic.h"
 #include "transformations.h"
 
+#include "dg.h"
+
+typedef dg_arc_label arc_label;
+typedef dg_vertex_label vertex_label;
+
+#include "graph.h"
+
 #include "reductions_private.h"
 #include "reductions.h"
 #include "sac.h"
+
+#include "effects-convex.h"
+#include "effects-simple.h"
 
 #include "control.h"
 
@@ -52,13 +62,56 @@ static void free_reductionInfo(reductionInfo ri)
 /* END of PIPSMAKE.RC generated aprt */
 
 
-#define reduction_basic(x) (variable_basic(type_variable(entity_type(reference_variable(reduction_reference(x))))))
-     
+#define reduction_basic(x) (get_basic_from_array_ref(reduction_reference(x)))
+
+entity make_float_constant_entity(float c)
+{
+   entity ce;
+   char *num = (char*) malloc(32);
+   string cn;
+
+   sprintf(num, "%f", c);
+
+   cn = concatenate(TOP_LEVEL_MODULE_NAME,MODULE_SEP_STRING,num,(char *)NULL);
+   ce = gen_find_tabulated(cn,entity_domain);
+
+   if (ce==entity_undefined)
+   {
+      functional cf = 
+      make_functional(NIL, 
+		      make_type(is_type_variable, 
+				make_variable(make_basic(is_basic_float, (void*)sizeof(float)),
+					      NIL,NIL)));
+     type ct = make_type(is_type_functional, cf);
+     ce = make_entity(strdup(cn), ct, MakeStorageRom(),
+		      make_value(is_value_constant, 
+				 make_constant(is_constant_litteral, NULL)));
+   }
+   else 
+      free(num);
+
+   return (ce);
+}
+
+expression make_float_constant_expression(float c)
+{
+   expression ex_cons;
+   entity ce;   
+   
+   ce = make_float_constant_entity(c);
+   /* make expression for the constant c*/
+   ex_cons = make_expression(
+			     make_syntax(is_syntax_call,
+					 make_call(ce,NIL)), 
+			     normalized_undefined);
+   return (ex_cons);
+}
+
 static entity make_reduction_vector_entity(reduction r)
 {
    extern list integer_entities, real_entities, double_entities;
    entity var = reference_variable(reduction_reference(r));
-   basic base = copy_basic(variable_basic(type_variable(entity_type(var))));
+   basic base = get_basic_from_array_ref(reduction_reference(r));
    entity new_ent, mod_ent;
    char *name, num[32];
    static int number = 0;
@@ -127,11 +180,16 @@ static bool same_reduction_p(reduction r1, reduction r2)
 	    (reduction_operator_tag(reduction_op(r1)) == reduction_operator_tag(reduction_op(r2))) );
 }
 
+/* The first part of the function check that the reduction is allowed. If not,
+the function returns NULL. If the reduction is allowed, the function updates the
+reductionInfo list reds or add the reduction to the list.*/
 static reductionInfo add_reduction(list* reds, reduction r)
 {
    list l;
    list prev = NIL;
    reductionInfo ri;
+
+   pips_debug(1, "reduction reference %s\n", entity_local_name(reference_variable(reduction_reference(r))));
 
    //See if the reduction has already been encountered
    for(l = *reds; l != NIL; l = CDR(l))
@@ -188,14 +246,63 @@ static void rename_reduction_ref(statement s, reductionInfo ri)
    gen_context_recurse(s, ri, expression_domain, gen_true, rename_reduction_rewrite);
 }
 
-static void rename_statement_reductions(statement s, list * reds)
+static bool gRedInStat;
+
+static void redInExpr(expression e, reduction red)
+{
+   syntax s = expression_syntax(e);
+
+   if (syntax_reference_p(s) &&
+       reference_equal_p(syntax_reference(s), reduction_reference(red)))
+     gRedInStat = TRUE;
+}
+
+static bool redInStat(reduction red, statement stat)
+{
+   gRedInStat = FALSE;
+
+   gen_context_recurse(stat, red, expression_domain, gen_true, redInExpr);
+
+   return gRedInStat;
+}
+
+/* This function gets the possible reduction thanks to get_reductions() function. 
+Then, for each possible reduction, the function call add_reduction() to know if 
+the reduction is allowed and if it is, the function calls rename_reduction_ref()
+to do the reduction. */
+static void rename_statement_reductions(statement s, list * reds, list lRed)
 {
    MAP(REDUCTION,
        r,
-       rename_reduction_ref(s, add_reduction(reds, r)),
-       reductions_list(get_reductions(s)));
+   {
+     bool bContinue = TRUE;
+
+     printf("red bas\n");
+     print_reference(reduction_reference(r));
+     printf("\n");
+
+     bContinue = !redInStat(r, s);
+
+     if(bContinue)
+        continue;
+
+     basic bas = get_basic_from_array_ref(reduction_reference(r));
+
+     if(basic_undefined_p(bas))
+        continue;
+
+     reductionInfo l = add_reduction(reds, r);
+
+     if(l != NULL)
+       rename_reduction_ref(s, l);
+   },
+       lRed);
 }
 
+/*
+This function make an expression that represents
+the maximum value
+ */
 static expression make_maxval_expression(basic b)
 {
    switch(basic_tag(b))
@@ -214,6 +321,10 @@ static expression make_maxval_expression(basic b)
    }
 }
 
+/*
+This function make an expression that represents
+the minimum value
+ */
 static expression make_minval_expression(basic b)
 {
    switch(basic_tag(b))
@@ -232,12 +343,16 @@ static expression make_minval_expression(basic b)
    }
 }
 
+/*
+This function make an expression that represents
+a zero value
+ */
 static expression make_0val_expression(basic b)
 {
    switch(basic_tag(b))
    {
       case is_basic_float:
-	 return expression_undefined;
+	 return make_float_constant_expression(0);
 
       case is_basic_int:
 	 return make_integer_constant_expression(0);
@@ -247,12 +362,16 @@ static expression make_0val_expression(basic b)
    }
 }
 
+/*
+This function make an expression that represents
+a one value
+ */
 static expression make_1val_expression(basic b)
 {
    switch(basic_tag(b))
    {
       case is_basic_float:
-	 return expression_undefined;
+	 return make_float_constant_expression(1);
 
       case is_basic_int:
 	 return make_integer_constant_expression(1);
@@ -261,12 +380,17 @@ static expression make_1val_expression(basic b)
 	 return expression_undefined;
    }
 }
+
+/*
+This function generate the reduction prelude
+ */
 static statement generate_prelude(reductionInfo ri)
 {
    expression initval;
    list prelude = NIL;
    int i;
 
+   // According to the operator, get the correct initialization value
    switch(reduction_operator_tag(reduction_op(reductionInfo_reduction(ri))))
    {
       default:
@@ -299,13 +423,17 @@ static statement generate_prelude(reductionInfo ri)
 	 break;
    }
 
+   // For each reductionInfo_vector reference, make an initialization
+   // assign statement and add it to the prelude
    for(i=0; i<reductionInfo_count(ri); i++)
    {
       instruction is;
-
+      
       is = make_assign_instruction(
 	 reference_to_expression(make_reference(
-	    reductionInfo_vector(ri), CONS(EXPRESSION, int_expr(i), NIL))),
+	 reductionInfo_vector(ri), CONS(EXPRESSION, 
+                                        int_expr(reductionInfo_count(ri)-i-1),
+                                        NIL))),
 	 copy_expression(initval));
       
       prelude = CONS(STATEMENT, 
@@ -318,14 +446,17 @@ static statement generate_prelude(reductionInfo ri)
    return instruction_to_statement(make_instruction_sequence(make_sequence(prelude)));
 }
 
+/*
+This function generate the reduction postlude
+ */
 static statement generate_compact(reductionInfo ri)
 {
    expression rightExpr;
-   reference redVar;
    entity operator;
    instruction compact;
    int i;
-   
+
+   // According to the operator, get the correct entity
    switch(reduction_operator_tag(reduction_op(reductionInfo_reduction(ri))))
    {
       default:
@@ -345,6 +476,10 @@ static statement generate_compact(reductionInfo ri)
 	 operator = entity_intrinsic(PLUS_OPERATOR_NAME);
 	 break;
 
+      case is_reduction_operator_csum:
+	 operator = entity_intrinsic(PLUS_C_OPERATOR_NAME);
+	 break;
+
       case is_reduction_operator_prod:
 	 operator = entity_intrinsic(MULTIPLY_OPERATOR_NAME);
 	 break;
@@ -358,8 +493,10 @@ static statement generate_compact(reductionInfo ri)
 	 break;
    }
 
-   redVar = copy_reference(reduction_reference(reductionInfo_reduction(ri)));
-   rightExpr = reference_to_expression(redVar);
+   // Get the reduction variable
+   rightExpr = reference_to_expression(copy_reference(reduction_reference(reductionInfo_reduction(ri))));
+
+   // For each reductionInfo_vector reference, add it to the compact statement
    for(i=0; i<reductionInfo_count(ri); i++)
    {
       call c;
@@ -373,13 +510,17 @@ static statement generate_compact(reductionInfo ri)
       rightExpr = call_to_expression(c);
    }
 
+   // Make the compact assignment statement
    compact = make_assign_instruction(
-      reference_to_expression(redVar),
+      reference_to_expression(copy_reference(reduction_reference(reductionInfo_reduction(ri)))),
       rightExpr);
 
    return make_stmt_of_instr(compact);
 }
 
+/*
+This function attempts to find reductions for each loop
+ */
 static void reductions_rewrite(statement s)
 {
    instruction i = statement_instruction(s);
@@ -408,19 +549,22 @@ static void reductions_rewrite(statement s)
 	 return;
    }
 
+   //Compute the reductions list for the loop
+   list lRed = reductions_list(get_reductions(s));
+
    //Lookup the reductions in the loop's body, and change the loop body accordingly
    ibody = statement_instruction(body);
    switch(instruction_tag(ibody))
    {
       case is_instruction_sequence:
 	 MAP(STATEMENT,
-	     s,
-	     rename_statement_reductions(s, &reductions),
+	     curStat,
+	     rename_statement_reductions(curStat, &reductions, lRed),
 	     sequence_statements(instruction_sequence(ibody)));
 	 break;
 
       case is_instruction_call:
-	 rename_statement_reductions(s, &reductions);
+	 rename_statement_reductions(s, &reductions, lRed);
 	 break;
 
       default:
@@ -431,25 +575,26 @@ static void reductions_rewrite(statement s)
    MAP(REDUCTIONINFO,
        ri,
    {
-      statement s;
+      statement curStat;
 
-      s = generate_prelude(ri);
-      if (s != statement_undefined)
-	 preludes = CONS(STATEMENT, s, preludes);
+      curStat = generate_prelude(ri);
+      if (curStat != statement_undefined)
+         preludes = CONS(STATEMENT, curStat, preludes);
 
-      s = generate_compact(ri);
-      if (s != statement_undefined)
-	 compacts = CONS(STATEMENT, s, compacts);
+      curStat = generate_compact(ri);
+      if (curStat != statement_undefined)
+	 compacts = CONS(STATEMENT, curStat, compacts);
 
       free_reductionInfo(ri);
    },
        reductions);
    gen_free_list(reductions);
 
+   // Replace the old statement instruction by the new one
    statement_instruction(s) = make_instruction_sequence(make_sequence(
       gen_concatenate(preludes, 
 		      CONS(STATEMENT, copy_statement(s),
-			   compacts))));
+		          compacts))));
 
    statement_label(s) = entity_empty_label();
    statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
@@ -478,7 +623,7 @@ bool simd_remove_reductions(char * mod_name)
    gen_recurse(mod_stmt, statement_domain,
 	       gen_true, reductions_rewrite);
 
-   pips_assert("Statement is consistent after SIMDIZER", 
+   pips_assert("Statement is consistent after remove reductions", 
 	       statement_consistent_p(mod_stmt));
 
    /* Reorder the module, because new statements have been added */  

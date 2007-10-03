@@ -7,6 +7,14 @@
 #include "misc.h"
 #include "ri-util.h"
 
+#include "dg.h"
+
+typedef dg_arc_label arc_label;
+typedef dg_vertex_label vertex_label;
+
+#include "graph.h"
+
+#include "sac-local.h"
 #include "sac.h"
 #include "patterns.tab.h"
 
@@ -19,6 +27,7 @@ static oper_id_mapping operators[] =
 {
    { ASSIGN_OPERATOR_NAME,            ASSIGN_OPERATOR_TOK },
    { PLUS_OPERATOR_NAME,              PLUS_OPERATOR_TOK },
+   { PLUS_C_OPERATOR_NAME,            PLUS_OPERATOR_TOK },
    { MINUS_OPERATOR_NAME,             MINUS_OPERATOR_TOK },
    { UNARY_MINUS_OPERATOR_NAME,       UNARY_MINUS_OPERATOR_TOK },
    { MULTIPLY_OPERATOR_NAME,          MULTIPLY_OPERATOR_TOK },
@@ -49,11 +58,12 @@ static oper_id_mapping operators[] =
    { TRUE_OPERATOR_NAME,              TRUE_OPERATOR_TOK },
    { FALSE_OPERATOR_NAME,             FALSE_OPERATOR_TOK },
 
-   { GREATER_OR_EQUAL_OPERATOR_NAME,  GREATER_OR_EQUAL_OPERATOR_TOK },
-   { GREATER_THAN_OPERATOR_NAME,      GREATER_THAN_OPERATOR_TOK },
-   { LESS_OR_EQUAL_OPERATOR_NAME,     LESS_OR_EQUAL_OPERATOR_TOK },
-   { LESS_THAN_OPERATOR_NAME,         LESS_THAN_OPERATOR_TOK },
-   { EQUAL_OPERATOR_NAME,             EQUAL_OPERATOR_TOK },
+   { C_GREATER_OR_EQUAL_OPERATOR_NAME,  GREATER_OR_EQUAL_OPERATOR_TOK },
+   { C_GREATER_THAN_OPERATOR_NAME,      GREATER_THAN_OPERATOR_TOK },
+   { C_LESS_OR_EQUAL_OPERATOR_NAME,     LESS_OR_EQUAL_OPERATOR_TOK },
+   { C_LESS_THAN_OPERATOR_NAME,         LESS_THAN_OPERATOR_TOK },
+   { C_EQUAL_OPERATOR_NAME,             EQUAL_OPERATOR_TOK },
+   { SIMD_PHI_NAME,                   PHI_TOK },
 
    { NULL }
 };

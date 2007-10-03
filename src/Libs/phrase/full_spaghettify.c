@@ -93,7 +93,7 @@ static statement full_spaghettify_module (statement module_statement,
 			      new_unstructured,
 			      entry,
 			      exit);
-  
+
   returned_statement = make_statement(entity_empty_label(),
 				      stat_number,
 				      stat_ordering,
@@ -133,6 +133,13 @@ static void reduce_sequence (control current_control,
   control new_control = NULL;
   bool is_first_control;
   int i;
+
+  if(gen_length(sequence_statements(seq)) == 0)
+  {
+    *new_entry = control_undefined;
+    *new_exit = control_undefined;
+    return;
+  }
 
   /* Conserve lists of predecessors and successors */
   list predecessors = gen_copy_seq (control_predecessors(current_control));
@@ -220,7 +227,6 @@ static void reduce_sequence (control current_control,
     last_control = new_control;
     *new_exit = new_control;
   }, sequence_statements(seq)); 
-  
 }
 			     
 
@@ -281,7 +287,7 @@ static void flatten_unstructured (unstructured the_unstructured)
     MAP (CONTROL, current_control, {
       instruction i = statement_instruction(control_statement(current_control));
       control new_entry_of_imbricated; 
-      control new_exit_of_imbricated; 
+      control new_exit_of_imbricated;
       pips_debug(2,"Imbricated sequence: REDUCING\n"); 
       debug_control ("REDUCE SEQUENCE: ", current_control, 5);
       reduce_sequence (current_control, 
@@ -420,16 +426,15 @@ static control replace_control_with_unstructured (unstructured the_unstructured,
   }
 
   flatten_unstructured (the_unstructured);
-  
+
   entry = unstructured_entry (the_unstructured);
   exit = unstructured_exit (the_unstructured);
 
-  pips_assert("Entry of unstructured has no predecessor", 
-	      gen_length(control_predecessors(entry)) == 0);
+  /*pips_assert("Entry of unstructured has no predecessor", 
+    gen_length(control_predecessors(entry)) == 0);*/
 
   pips_assert("Exit of unstructured has no successor", 
 	      gen_length(control_successors(exit)) == 0);
-
 
   /* Reconnect all the predecessors */
   /* ATTENTION link_2_control_nodes add to the list at the first position,
@@ -484,7 +489,7 @@ static control full_spaghettify_statement (statement stat,
   switch (instruction_tag(i)) {
   case is_instruction_test: 
     {
-      pips_debug(2, "full_spaghettify_statement: TEST\n");   
+      pips_debug(2, "full_spaghettify_statement: TEST\n"); 
       return 
 	connect_unstructured (spaghettify_test (stat, module_name),
 			      current_control,
@@ -525,9 +530,10 @@ static control full_spaghettify_statement (statement stat,
     break;
   }
   case is_instruction_forloop: {
-    pips_debug(2, "full_spaghettify_statement: FORLOOP\n");   
-    pips_user_warning("FORLOOP spaghettifier not yet implemented !!!\n");
-    return current_control;
+    pips_debug(2, "full_spaghettify_statement: FORLOOP\n");
+    return connect_unstructured (spaghettify_forloop (stat, module_name),
+				 current_control,
+				 next_control);
     break;
   }
   case is_instruction_call: {

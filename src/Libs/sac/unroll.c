@@ -15,6 +15,13 @@
 
 #include "control.h"
 
+#include "dg.h"
+
+typedef dg_arc_label arc_label;
+typedef dg_vertex_label vertex_label;
+
+#include "graph.h"
+
 #include "sac.h"
 
 #include "properties.h"
@@ -44,8 +51,6 @@ static bool should_unroll_p(instruction i)
       }
 
       case is_instruction_test:
-	 return TRUE;
-
       case is_instruction_loop:
       case is_instruction_whileloop:
       case is_instruction_goto:
@@ -95,7 +100,7 @@ static bool simple_simd_unroll_loop_filter(statement s)
    /* Compute variable size */
    varwidths.min = INT_MAX;
    varwidths.max = 0;
-   gen_context_recurse(iBody, &varwidths, statement_domain, gen_true, 
+   gen_context_recurse(loop_body(l), &varwidths, statement_domain, gen_true, 
 		       compute_variable_size);
 
    /* Decide between min and max unroll factor */
@@ -120,7 +125,7 @@ static bool simple_simd_unroll_loop_filter(statement s)
    }
 
    /* Unroll as many times as needed by the variables width */
-   loop_unroll(s, regWidth / varwidth);
+   simd_loop_unroll(s, regWidth / varwidth);
 
    /* Do not recursively analyse the loop */
    return FALSE;
@@ -138,7 +143,7 @@ static void compute_parallelism_factor(statement s, MinMaxVar* factor)
       MAP(OPCODE,
 	  o,
       {
-	 if (opcode_subwordSize(o) >= varwidth) //opcode may be used
+	 if (get_subwordSize_from_opcode(o, 0) >= varwidth) //opcode may be used
 	 {
 	    if (opcode_vectorSize(o) > factor->max)
 	       factor->max = opcode_vectorSize(o);
@@ -172,14 +177,14 @@ static bool full_simd_unroll_loop_filter(statement s)
    /* look at each of the statements in the body */
    factor.min = INT_MAX;
    factor.max = 1;
-   gen_context_recurse(iBody, &factor, statement_domain, gen_true, 
+   gen_context_recurse(loop_body(l), &factor, statement_domain, gen_true, 
 		       compute_parallelism_factor);
 
    /* Decide between min and max unroll factor, and unroll */
    if (get_bool_property("SIMD_AUTO_UNROLL_MINIMIZE_UNROLL"))
-      loop_unroll(s, factor.min);
+      simd_loop_unroll(s, factor.min);
    else
-      loop_unroll(s, factor.max);
+      simd_loop_unroll(s, factor.max);
 
    /* Do not recursively analyse the loop */
    return FALSE;

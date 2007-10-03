@@ -8,6 +8,13 @@
 #include "ri-util.h"
 #include "pipsdbm.h"
 
+#include "dg.h"
+
+typedef dg_arc_label arc_label;
+typedef dg_vertex_label vertex_label;
+
+#include "graph.h"
+
 #include "sac.h"
 
 static list transformations = NIL; /* <transformation> */
@@ -51,7 +58,7 @@ static bool best_transformation_p(transformation t1, transformation t2)
 statement generate_transformation_statement(simdStatementInfo si, int line)
 {
    int vectorLength = opcode_vectorSize(simdStatementInfo_opcode(si));
-   int subwordSize = opcode_subwordSize(simdStatementInfo_opcode(si));
+   //MOIint subwordSize = opcode_subwordSize(simdStatementInfo_opcode(si));
    int offset = line * vectorLength;
 
    list t;
@@ -71,8 +78,8 @@ statement generate_transformation_statement(simdStatementInfo si, int line)
 
       //Dismiss transformation that do not have the right kind of
       //arguments
-      if ((transformation_vectorLengthOut(tr) != vectorLength) ||
-	  (transformation_subwordSizeOut(tr) != subwordSize))
+      if ((transformation_vectorLengthOut(tr) != vectorLength) /*MOI||
+	  (transformation_subwordSizeOut(tr) != subwordSize)*/)
 	 continue;
 
       //Find out if some vectors may be used, based on the first element
@@ -83,8 +90,9 @@ statement generate_transformation_statement(simdStatementInfo si, int line)
       {
 	 vectorElement ve = VECTORELEMENT(CAR(l));
 
-	 if ( (vectorElement_vectorLength(ve) != transformation_vectorLengthIn(tr)) ||
-	      (vectorElement_subwordSize(ve) != transformation_subwordSizeIn(tr)) )
+	 if ( (vectorElement_vectorLength(ve) != transformation_vectorLengthIn(tr)) //||
+	      //MOI	      (vectorElement_subwordSize(ve) != transformation_subwordSizeIn(tr)) 
+)
 	    continue;
 
 	 if (vectorElement_element(ve) == transformation_mapping(tr)[0])

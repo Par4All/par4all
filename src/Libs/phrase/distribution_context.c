@@ -46,7 +46,7 @@ typedef dg_vertex_label vertex_label;
 
 #include "phrase_distribution.h"
 
-static boolean internal_compute_distribution_context (statement externalized_code,
+boolean internal_compute_distribution_context (statement externalized_code,
 						      hash_table* ht_params,
 						      hash_table* ht_private,
 						      hash_table* ht_in_regions,
@@ -322,7 +322,7 @@ list compute_regions_union (list l_in, list l_out)
  * Internally used to compute distribution context for statement
  * externalized_code
  */
-static boolean internal_compute_distribution_context (statement externalized_code,
+boolean internal_compute_distribution_context (statement externalized_code,
 						      hash_table* ht_params,
 						      hash_table* ht_private,
 						      hash_table* ht_in_regions,

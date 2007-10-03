@@ -250,7 +250,7 @@ static statement isolate_code_portion (statement begin_tag_statement,
  * This function return a list of statements that were previously marked
  * for externalization during phase PHRASE_DISTRIBUTOR_INIT
  */
-static list identify_analyzed_statements_to_distribute (statement stat) 
+list identify_analyzed_statements_to_distribute (statement stat) 
 {
   /* We identify all the statement containing an analyzed tag */
   return get_statements_with_comments_containing(EXTERNALIZED_CODE_PRAGMA_ANALYZED,
@@ -382,7 +382,7 @@ static void distribute_code (string function_name,
     call_params = CONS(EXPRESSION, make_expression_from_entity(reference_variable(ref)), call_params);
   }, references_for_regions(l_params));
   
-  /* Insert an analyzed tag */
+  // Insert an analyzed tag 
   {
     char* new_tag = malloc(256);
     sprintf (new_tag, 
@@ -401,7 +401,7 @@ static void distribute_code (string function_name,
 				  make_instruction(is_instruction_call,
 						   make_call(new_module,call_params)),
 				  NIL,NULL);
-
+  
   pips_debug(5, "BEFORE REPLACING\n");
   pips_debug(5, "externalized_code=\n");
   print_statement(externalized_code);
@@ -674,11 +674,11 @@ void replace_reference (statement stat, reference ref, entity new_variable)
  * parameter of the module), and replace all occurences to the old
  * variable by the new created
  */
-static void add_parameter_variable_to_module (reference ref,
-					      entity module,
-					      statement stat, /* Statement of the new module */
-					      string new_module_name,
-					      int param_nb)
+void add_parameter_variable_to_module (reference ref,
+				       entity module,
+				       statement stat, /* Statement of the new module */
+				       string new_module_name,
+				       int param_nb)
 {
   parameter new_parameter;
   list module_declarations;
@@ -723,7 +723,7 @@ static void add_parameter_variable_to_module (reference ref,
  * private to the module), and replace all occurences to the old
  * variable by the new created
  */
-static void add_private_variable_to_module (reference ref,
+void add_private_variable_to_module (reference ref,
 					    entity module,
 					    statement stat, /* Statement of the new module */
 					    string new_module_name)
@@ -767,6 +767,7 @@ static entity create_module_with_statement (statement stat,
 {
   entity new_module;
   string source_file;
+  text text_code;
   int param_nb = 0;
 
   pips_debug(2, "Creating new module: [%s]\n", new_module_name);
@@ -781,7 +782,7 @@ static entity create_module_with_statement (statement stat,
 				    new_module_name);
   },references_for_regions (l_priv));
   
-  /* Deal with parameters variables */
+  // Deal with parameters variables 
   param_nb = gen_length(l_params);
   MAP (REFERENCE, ref, {
     add_parameter_variable_to_module (ref, 
@@ -799,10 +800,11 @@ static entity create_module_with_statement (statement stat,
   }
 
   init_prettyprint(empty_text);
+  text_code = text_module(new_module,stat);
   make_text_resource(new_module_name,
 		     DBR_SOURCE_FILE, 
 		     ".f",
-		     text_module(new_module,stat));
+		     text_code);
   close_prettyprint();
 
   source_file = db_build_file_resource_name(DBR_SOURCE_FILE, new_module_name, ".f");
@@ -810,7 +812,13 @@ static entity create_module_with_statement (statement stat,
   pips_debug(5, "Source file : [%s]\n", source_file);
 
   DB_PUT_NEW_FILE_RESOURCE (DBR_USER_FILE, new_module_name, source_file);
-  DB_PUT_NEW_FILE_RESOURCE (DBR_INITIAL_FILE, new_module_name, source_file);
+
+  init_prettyprint(empty_text);
+  make_text_resource(new_module_name,
+		     DBR_INITIAL_FILE, 
+		     ".f_initial",
+		     text_code);
+  close_prettyprint();
 
   return new_module;
 }
@@ -909,7 +917,6 @@ bool phrase_distributor(string module_name)
 	db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE));
     set_out_effects((statement_effects) 
 	db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE));
-   
 
   /* Now do the job */
 
@@ -917,7 +924,7 @@ bool phrase_distributor(string module_name)
   distribute (module_stat, module);
   pips_debug(2, "END of PHRASE_DISTRIBUTOR\n");
 
-  print_statement(module_stat);
+  //print_statement(module_stat);
 
   pips_assert("Statement structure is consistent after PHRASE_DISTRIBUTOR", 
 	      gen_consistent_p((gen_chunk*)module_stat));

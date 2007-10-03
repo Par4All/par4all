@@ -3,9 +3,9 @@
 TARGET	= sac
 
 INC_CFILES = \
-	simdizer.c varwidth.c codegen.c unroll.c operatorid.c \
+	simd_loop_const_elim.c if_conversion_compact.c if_conversion_init.c simd_loop_unroll.c simdizer.c varwidth.c codegen.c unroll.c operatorid.c \
 	treematch.c atomizer.c vectransform.c reductions.c \
-	singleass.c
+	singleass.c deatomizer.c if_conversion.c
 
 DERIVED_CFILES = patterns.tab.c patterns.lex.c
 

@@ -13,14 +13,28 @@
 #include "effects-generic.h"
 #include "transformations.h"
 
-#include "sac.h"
+#include "dg.h"
 
+typedef dg_arc_label arc_label;
+typedef dg_vertex_label vertex_label;
+
+#include "graph.h"
+
+#include "sac.h"
+#include "patterns.tab.h"
+
+#include "properties.h"
+
+#include <ctype.h>
+#include "c_syntax.h"
 
 #define MAX_PACK 16
 
 static argumentInfo* arguments = NULL;
 static int nbArguments = 0;
 static int nbAllocatedArguments = 0;
+
+static float gSimdCost;
 
 entity vectorElement_vector(vectorElement ve)
 {
@@ -32,9 +46,79 @@ int vectorElement_vectorLength(vectorElement ve)
    return opcode_vectorSize(simdStatementInfo_opcode(vectorElement_statement(ve)));
 }
 
-int vectorElement_subwordSize(vectorElement ve)
+/*
+This function return the basic corresponding to the argNum-th
+argument of opcode oc
+*/
+int get_basic_from_opcode(opcode oc, int argNum)
 {
-   return opcode_subwordSize(simdStatementInfo_opcode(vectorElement_statement(ve)));
+   int type = INT(gen_nth(argNum, opcode_argType(oc)));
+
+   switch(type)
+   {
+      case QI_REF_TOK:
+	return is_basic_int;
+      case HI_REF_TOK:
+	return is_basic_int;
+      case SI_REF_TOK:
+	return is_basic_int;
+      case DI_REF_TOK:
+	return is_basic_int;
+      case SF_REF_TOK:
+	return is_basic_float;
+      case DF_REF_TOK:
+	return is_basic_float;
+      default:
+	pips_internal_error("subword size unknown.\n");
+   }
+
+   return is_basic_int;
+}
+
+int get_subwordSize_from_opcode(opcode oc, int argNum)
+{
+   int type = INT(gen_nth(argNum, opcode_argType(oc)));
+
+   switch(type)
+   {
+      case QI_REF_TOK:
+	return 8;
+      case HI_REF_TOK:
+	return 16;
+      case SI_REF_TOK:
+	return 32;
+      case DI_REF_TOK:
+	return 64;
+      case SF_REF_TOK:
+	return 32;
+      case DF_REF_TOK:
+	return 64;
+      default:
+	pips_internal_error("subword size unknown.\n");
+   }
+
+   return 8;
+}
+
+int get_subwordSize_from_vector(entity vec)
+{
+   char * name = entity_local_name(vec);
+
+   switch(name[2])
+   {
+      case 'q':
+	return 8;
+      case 'h':
+	return 16;
+      case 's':
+	return 32;
+      case 'd':
+	return 64;
+      default:
+	pips_internal_error("subword size unknown.\n");
+   }
+
+   return 8;
 }
 
 /* Computes the optimal opcode for simdizing 'argc' statements of the
@@ -42,40 +126,9 @@ int vectorElement_subwordSize(vectorElement ve)
  */
 static opcode get_optimal_opcode(opcodeClass kind, int argc, list* args)
 {
-   int max_width = 0;
    int i;
    opcode best;
    list l;
-
-   //Find out the maximum width of all variables used
-   for(i = 0; i < argc; i++)
-   {
-      MAP(EXPRESSION,
-	  arg,
-      {
-	 int width;
-	 type t;
-	 basic b;
-
-	 if (!expression_reference_p(arg))
-	    continue;
-
-	 t = entity_type(reference_variable(expression_reference(arg)));
-	    
-	 switch(basic_tag(b = variable_basic(type_variable(t))))
-	 {
-	    case is_basic_int: width = 8*basic_int(b); break;
-	    case is_basic_float: width = 8*basic_float(b); break;
-	    case is_basic_logical: width = 8*basic_logical(b); break;
-	    default: /* HELP: what to do ? */
-	       printf("unsuppported basic type\n");
-	       return opcode_undefined;
-	 }
-	 if (width > max_width)
-	    max_width = width;
-      },
-	  args[i]);
-   }
 
    /* Based on the available implementations of the operation, decide
     * how many statements to pack together
@@ -86,9 +139,54 @@ static opcode get_optimal_opcode(opcodeClass kind, int argc, list* args)
 	l = CDR(l) )
    {
       opcode oc = OPCODE(CAR(l));
+      bool bTagDiff = FALSE;
 
-      if ( (opcode_subwordSize(oc) >= max_width) &&
-	   (opcode_vectorSize(oc) <= argc) &&
+      for(i = 0; i < argc; i++)
+      {
+	 int count = 0;
+	 int width = 0;
+
+         MAP(EXPRESSION, arg,
+         {
+	    int bTag;
+	    basic bas;
+
+	    if (!expression_reference_p(arg))
+	    {
+	       count++;
+	       continue;
+	    }
+
+	    bas = get_basic_from_array_ref(expression_reference(arg));
+            bTag = basic_tag(bas);
+
+	    if((bTag != get_basic_from_opcode(oc, count)) &&
+	       (bTag != is_basic_logical))
+	    {
+	       bTagDiff = TRUE;
+	       break;
+	    }
+
+            switch(bTag)
+            {
+	       case is_basic_int: width = 8 * basic_int(bas); break;
+	       case is_basic_float: width = 8 * basic_float(bas); break;
+	       case is_basic_logical: width = 1; break;
+            }
+
+	    if(width > get_subwordSize_from_opcode(oc, count))
+	    {
+	       bTagDiff = TRUE;
+	       break;
+	    }
+
+	    count++;
+
+         }, args[i]);
+      }
+
+      if ( (!bTagDiff) &&
+           (opcode_vectorSize(oc) <= argc) &&
 	   ((best == opcode_undefined) || 
 	    (opcode_vectorSize(oc) > opcode_vectorSize(best))) )
 	 best = oc;
@@ -105,137 +203,434 @@ entity get_function_entity(string name)
    return e;
 }
 
-static bool analyse_reference(reference r, referenceInfo i)
+/* 
+This function aims to fill the referenceInfo i from the reference r. 
+referenceInfo is used later to detect consecutive reference in a
+simd_load parameter list.
+This function returns TRUE if successful.
+*/
+bool analyse_reference(reference r, referenceInfo i)
 {
    syntax s;
 
-   referenceInfo_entity(i) = reference_variable(r);
+   // Fill the two first fields of referenceInfo
+   referenceInfo_reference(i) = r;
    referenceInfo_nbDimensions(i) = gen_length(reference_indices(r));
 
+   // If r is not an array, then FALSE is returned
    if (referenceInfo_nbDimensions(i) == 0)
       return FALSE;
 
-   s = expression_syntax(EXPRESSION(CAR(reference_indices(r))));
-   switch(syntax_tag(s))
+   //Initialization of the two list of referenceInfo
+   referenceInfo_lExp(i) = NIL;
+   referenceInfo_lOffset(i) = NIL;
+
+   // For each indices of r
+   MAP(EXPRESSION, exp,
    {
-      case is_syntax_call:
-      {
-	 call c = syntax_call(s);
+     s = expression_syntax(exp);
+     switch(syntax_tag(s))
+     {
+        // exp is a call expression
+        case is_syntax_call:
+        {
+           call c = syntax_call(s);
 
-	 /* this should be a reference + a constant int offset */
-	 if (call_constant_p(c))
-	 {
-	    constant cn;
+	   // r is for exemple A(2)
+	   if (call_constant_p(c))
+	   {
+	      constant cn;
 
-	    cn = value_constant(entity_initial(call_function(c)));
+	      cn = value_constant(entity_initial(call_function(c)));
 
-	    if (constant_int_p(cn))
-	       referenceInfo_offset(i) = constant_int(cn);
-	    else
-	       return FALSE;
+	      if (constant_int_p(cn))
+	         referenceInfo_lOffset(i) = CONS(INT, constant_int(cn), referenceInfo_lOffset(i));
+	      else
+	         return FALSE;
 
-	    referenceInfo_index(i) = reference_undefined;
-	 }
-	 else if (ENTITY_PLUS_P(call_function(c)))
-	 {
-	    cons * arg = call_arguments(c);
-	    bool order; /* TRUE means reference+constant, 
-			   FALSE means constant+reference */
-	    syntax e;
+	      referenceInfo_lExp(i) = CONS(REFERENCE, expression_undefined, referenceInfo_lExp(i));
+	   }
+	   // r is for exemple A(EXP + 3)(it is supported)
+	   // or A(EXP1 + EXP2)(it's not supported)
+	   else if (ENTITY_PLUS_P(call_function(c)))
+	   {
+	      cons * arg = call_arguments(c);
 
-	    if ((arg == NIL) || (CDR(arg) == NIL))
-	       return FALSE;
+	      syntax e;
 
-	    e = expression_syntax(EXPRESSION(CAR(arg)));
-	    switch(syntax_tag(e))
-	    {
-	       case is_syntax_call:
-	       {
-		  call cc = syntax_call(e);
-		  if (!call_constant_p(cc))  //prevent non-constant call
-		     return FALSE;
+	      // Strange error
+	      if ((arg == NIL) || (CDR(arg) == NIL))
+	         return FALSE;
 
-		  order = FALSE;
-		  referenceInfo_offset(i) = constant_int(value_constant(entity_initial(call_function(cc))));
-		  break;
-	       }
+	      e = expression_syntax(EXPRESSION(CAR(CDR(arg))));
+	      // If r is A(EXP + 3), e should contain 3
+	      // If r is A(EXP1 + EXP2), e should contain EXP2
+	      switch(syntax_tag(e))
+	      {
+	         // Fill referenceInfo in the following situation:
+		 // "If r is A(EXP + 3), e should contain 3"
+	         case is_syntax_call:
+	         {
+                    referenceInfo_lExp(i) = CONS(REFERENCE, EXPRESSION(CAR(arg)), referenceInfo_lExp(i));
 
-	       case is_syntax_reference:
-		  order = TRUE;
-		  referenceInfo_index(i) = syntax_reference(e);		 
-		  break;
-		  
-	       default:
-	       case is_syntax_range:
-		  return FALSE;
-	    }
+		    call cc = syntax_call(e);
 
-	    e = expression_syntax(EXPRESSION(CAR(CDR(arg))));
-	    switch(syntax_tag(e))
-	    {
-	       case is_syntax_call:
-	       {
-		  call cc = syntax_call(e);
-		  if ( (order == FALSE) ||    //prevent constant+call
-		       !call_constant_p(cc) ) //prevent reference+call
-		     return FALSE;
+		    if(!call_constant_p(cc))
+		       return FALSE;
 
-		  referenceInfo_offset(i) = constant_int(value_constant(entity_initial(call_function(cc))));
-		  break;
-	       }
+ 	            constant ccn = value_constant(entity_initial(call_function(cc)));
 
-	       case is_syntax_reference:
-		  if (order == TRUE)  //prevent reference+reference
-		     return FALSE;
-		  referenceInfo_index(i) = syntax_reference(e); 
-		  break;
+                    if (constant_int_p(ccn))
+		       referenceInfo_lOffset(i) = CONS(INT, constant_int(ccn), referenceInfo_lOffset(i));
+		    else
+		       return FALSE;
+		    break;
+	         }
 
-	       default:
-	       case is_syntax_range:
-		  return FALSE;
-	    }	    
-	 }
-	 else
-	    return FALSE;
-	 break;
-      }
-	 
-      case is_syntax_reference:
-	 referenceInfo_index(i) = syntax_reference(s);
-	 referenceInfo_offset(i) = 0;
-	 break;
+	         // Fill referenceInfo in the following situation:
+		 // "If r is A(EXP1 + EXP2), e should contain EXP2"
+	         case is_syntax_reference:
+	         {
+	            referenceInfo_lExp(i) = CONS(REFERENCE, exp, referenceInfo_lExp(i));
+	            referenceInfo_lOffset(i) = CONS(INT, 0, referenceInfo_lOffset(i));
+		    break;
+	         }
+
+	         default:
+	         case is_syntax_range:
+		    return FALSE;
+	      }	    
+	   }
+	   // Same comments as for ENTITY_MINUS_P(call_function(c))
+	   else if (ENTITY_MINUS_P(call_function(c)))
+	   {
+	      cons * arg = call_arguments(c);
+
+	      syntax e;
+
+	      if ((arg == NIL) || (CDR(arg) == NIL))
+	         return FALSE;
+
+	      e = expression_syntax(EXPRESSION(CAR(CDR(arg))));
+	      switch(syntax_tag(e))
+	      {
+	         case is_syntax_call:
+	         {
+                    referenceInfo_lExp(i) = CONS(REFERENCE, EXPRESSION(CAR(arg)), referenceInfo_lExp(i));
+
+		    call cc = syntax_call(e);
+
+		    if(!call_constant_p(cc))
+		       return FALSE;
+
+ 	            constant ccn = value_constant(entity_initial(call_function(cc)));
+
+                    if (constant_int_p(ccn))
+		       referenceInfo_lOffset(i) = CONS(INT, -constant_int(ccn), referenceInfo_lOffset(i));
+		    else
+		       return FALSE;
+		    break;
+	         }
+
+	         case is_syntax_reference:
+	         {
+	            referenceInfo_lExp(i) = CONS(REFERENCE, exp, referenceInfo_lExp(i));
+	            referenceInfo_lOffset(i) = CONS(INT, 0, referenceInfo_lOffset(i));
+		    break;
+	         }
+
+	         default:
+	         case is_syntax_range:
+		    return FALSE;
+	      }	    
+	   }
+	   // If nothing special has been detected
+	   else
+	   {
+	      referenceInfo_lExp(i) = CONS(REFERENCE, exp, referenceInfo_lExp(i));
+	      referenceInfo_lOffset(i) = CONS(INT, 0, referenceInfo_lOffset(i));
+	   }
+	   break;
+        }
+
+	// If nothing special has been detected
+        case is_syntax_reference:
+	   referenceInfo_lExp(i) = CONS(REFERENCE, exp, referenceInfo_lExp(i));
+	   referenceInfo_lOffset(i) = CONS(INT, 0, referenceInfo_lOffset(i));
+	   break;
 	    
-      default:
-	 return FALSE;
-   }
+        default:
+	   return FALSE;
+     }
+   }, reference_indices(r));
+
    return TRUE;
 }
 
+/*
+This function returns the expression of the index that corresponds
+to the "consecutive index" according to the memory disposition of
+arrays.
+
+For instance:
+In a fortran program, let's define A[I][J][K],
+then the "consecutive index" is I.
+In a C program, let's define A[I][J][K],
+then the "consecutive index" is K.
+ */
+static expression get_consec_exp(referenceInfo refInfo)
+{
+   if(get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION"))
+   {
+      return EXPRESSION(CAR(gen_last(referenceInfo_lExp(refInfo))));
+   }
+
+   return EXPRESSION(CAR(referenceInfo_lExp(refInfo)));
+}
+
+/*
+This function returns the int of the index that corresponds
+to the "consecutive index" according to the memory disposition of
+arrays.
+
+See above.
+*/
+static int get_consec_offset(referenceInfo refInfo)
+{
+   if(get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION"))
+   {
+      return INT(CAR(gen_last(referenceInfo_lOffset(refInfo))));
+   }
+
+   return INT(CAR(referenceInfo_lOffset(refInfo)));
+}
+
+/*
+This function returns the position of the index that corresponds
+to the "consecutive index" according to the memory disposition of
+arrays.
+
+See above.
+*/
+static int get_consec_ind_number(referenceInfo refInfo)
+{
+   if(get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION"))
+   {
+     return gen_length(referenceInfo_lOffset(refInfo));
+   }
+
+   return 1;
+}
+
+/*
+This function returns TRUE if firstRef and cRef have consecutive 
+memory locations.
+*/
 static bool consecutive_refs_p(referenceInfo firstRef, int lastOffset, referenceInfo cRef)
 {
-   return ( same_entity_p(referenceInfo_entity(firstRef), 
-			  referenceInfo_entity(cRef)) &&
+   bool bIndEq = TRUE;
+   bool bConsIndEq = FALSE;
+   int counter = 0;
+
+   // If firstRef and cRef don't have the same dimension,
+   // then they are not consecutive references.
+   if(referenceInfo_nbDimensions(firstRef) != referenceInfo_nbDimensions(cRef))
+      return FALSE;
+
+   list lOff1 = referenceInfo_lOffset(firstRef);
+   list lOff2 = referenceInfo_lOffset(cRef);
+   list lInd2 = referenceInfo_lExp(cRef);
+
+   int off1;
+   int off2;
+   expression ind2;
+
+   // Let's look at each index of the references
+   MAP(EXPRESSION, ind1,
+   {
+      counter++;
+
+      // If TRUE, it means that ind1 corresponds to
+      // the "consecutive index" (See get_consec_ind_number()
+      // comments for further information), so let's not
+      // check ind1 right now.
+      if(counter == get_consec_ind_number(firstRef))
+      {
+         lOff1 = CDR(lOff1);
+         lOff2 = CDR(lOff2);
+         lInd2 = CDR(lInd2);
+	 continue;
+      }
+
+      ind2 = EXPRESSION(CAR(lInd2));
+      off1 = INT(CAR(lOff1));
+      off2 = INT(CAR(lOff2));
+
+      // If TRUE, it means that the two indices are different, so return FALSE.
+      if(((ind1 == expression_undefined) && (ind2 != expression_undefined)) ||
+	 ((ind1 != expression_undefined) && (ind2 == expression_undefined)))
+      {
+	 bIndEq = FALSE;
+      }
+      // If TRUE, it means that the two indices can be identical, 
+      // let's check the offsets.
+      else if((ind1 == expression_undefined) && (ind2 == expression_undefined))
+      {
+	 // If TRUE, it means that the two indices are different, so return FALSE.
+	 if(off1 != off2)
+	    bIndEq = FALSE;
+      }
+      else
+      {
+	 // If TRUE, it means that the two indices are identical
+         if(!(same_expression_p(ind1, ind2) &&
+               (off1 == off2)))
+	    bIndEq = FALSE;
+      }
+
+      lOff1 = CDR(lOff1);
+      lOff2 = CDR(lOff2);
+      lInd2 = CDR(lInd2);
+
+   }, referenceInfo_lExp(firstRef));
+
+   // This if-elseif-else statement checks if get_consec_exp(firstRef)
+   // and get_consec_exp(cRef) are identical
+   if((get_consec_exp(firstRef) == expression_undefined) &&
+      (get_consec_exp(cRef) == expression_undefined))
+   {
+      bConsIndEq = TRUE;
+   }
+   else if((get_consec_exp(firstRef) == expression_undefined) ||
+	   (get_consec_exp(cRef) == expression_undefined))
+   {
+      bConsIndEq = FALSE;
+   }
+   else
+   {
+      bConsIndEq = same_expression_p(get_consec_exp(firstRef),
+			     get_consec_exp(cRef));
+   }
+
+   return ( same_entity_p(reference_variable(referenceInfo_reference(firstRef)), 
+			  reference_variable(referenceInfo_reference(cRef))) &&
 	    (referenceInfo_nbDimensions(firstRef) == referenceInfo_nbDimensions(cRef)) &&
-	    (( (referenceInfo_index(firstRef) == reference_undefined) &&
-	       (referenceInfo_index(cRef) == reference_undefined) ) ||
-	     (same_entity_p(reference_variable(referenceInfo_index(firstRef)),
-			   reference_variable(referenceInfo_index(cRef))))) &&
-	    (lastOffset + 1 == referenceInfo_offset(cRef)) );
+	     bConsIndEq &&
+	    (lastOffset + 1 == get_consec_offset(cRef)) && bIndEq);
 }
 
-static referenceInfo make_empty_referenceInfo()
+referenceInfo make_empty_referenceInfo()
 {
-   return make_referenceInfo(entity_undefined,
+   return make_referenceInfo(reference_undefined,
 			     0,
-			     reference_undefined,
-			     0);
+			     NIL,
+			     NIL,
+                             NIL);
 }
 
-static void free_empty_referenceInfo(referenceInfo ri)
+void free_empty_referenceInfo(referenceInfo ri)
 {
-   referenceInfo_entity(ri) = entity_undefined;
-   referenceInfo_index(ri) = reference_undefined;
+   referenceInfo_reference(ri) = reference_undefined;
+   gen_free_list(referenceInfo_lExp(ri));
+   gen_free_list(referenceInfo_lIndex(ri));
+   gen_free_list(referenceInfo_lOffset(ri));
+   referenceInfo_lExp(ri) = NIL;
+   referenceInfo_lIndex(ri) = NIL;
+   referenceInfo_lOffset(ri) = NIL;
    free_referenceInfo(ri);
+}
+
+/*
+ This function returns the vector type string by reading the name of the first 
+ element of lExp
+ */
+static string get_simd_vector_type(list lExp)
+{
+   string result = NULL;
+
+   MAP(EXPRESSION, exp,
+   {
+      type t = entity_type(reference_variable(
+                  syntax_reference(expression_syntax(
+                  exp))));
+
+      if(type_variable_p(t))
+      {
+	 basic bas = variable_basic(type_variable(t));
+
+	 if(basic_typedef_p(bas))
+	 {
+	    char * car;
+
+	    result = strdup(strstr(strdup(entity_name(basic_typedef(bas))), TYPEDEF_PREFIX) + 1);
+
+            /* switch to upper cases... */
+            for (car = result; *car; car++)
+               *car = (char) toupper(*car);
+
+	    break;
+	 }
+      }
+   }, lExp);
+
+   return result;
+}
+
+/*
+ This function returns the name of a vector from the data inside it
+ */
+static string get_vect_name_from_data(int argc, expression exp)
+{
+   char prefix[5];
+   string result;
+   basic bas;
+   int itemSize;
+   char * car;
+
+   bas = get_basic_from_array_ref(syntax_reference(expression_syntax(exp)));
+
+   prefix[0] = 'v';
+   prefix[1] = '0'+argc;
+
+   switch(basic_tag(bas))
+   {
+      case is_basic_int:
+         prefix[3] = 'i';
+         itemSize = 8 * basic_int(bas);
+	 break;
+
+      case is_basic_float:
+         prefix[3] = 'f';
+         itemSize = 8 * basic_float(bas);
+	 break;
+
+      case is_basic_logical:
+         prefix[3] = 'i';
+         itemSize = 8 * basic_logical(bas);
+	 break;
+
+      default:
+         return strdup("");
+	 break;
+   }
+
+   switch(itemSize)
+   {
+      case 8:  prefix[2] = 'q'; break;
+      case 16: prefix[2] = 'h'; break;
+      case 32: prefix[2] = 's'; break;
+      case 64: prefix[2] = 'd'; break;
+   }
+
+   prefix[4] = 0;
+
+   result = strdup(prefix);
+
+   /* switch to upper cases... */
+   for (car = result; *car; car++)
+      *car = (char) toupper(*car);
+
+   return result;
 }
 
 static statement make_loadsave_statement(int argc, list args, bool isLoad)
@@ -246,31 +641,20 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad)
       OTHER
    } argsType;
    const char funcNames[3][2][20] = {
-      { "SIMD_SAVE",          "SIMD_LOAD"          },
-      { "SIMD_CONSTANT_SAVE", "SIMD_CONSTANT_LOAD" },
-      { "SIMD_GENERIC_SAVE",  "SIMD_GENERIC_LOAD"  } };
+      { SIMD_SAVE_NAME"_",          SIMD_LOAD_NAME"_"          },
+      { SIMD_CONS_SAVE_NAME"_", SIMD_CONS_LOAD_NAME"_" },
+      { SIMD_GEN_SAVE_NAME"_",  SIMD_GEN_LOAD_NAME"_"  } };
    referenceInfo firstRef = make_empty_referenceInfo();
    referenceInfo cRef = make_empty_referenceInfo();
    int lastOffset = 0;
    cons * argPtr;
    expression e;
    char functionName[30];
-   long long unsigned int constantValue = 0;
-   int constantShift = 0;
-   int bitmask;
+
+   string lsType = get_simd_vector_type(args);
 
    /* the function should not be called with an empty arguments list */
    assert((argc > 1) && (args != NIL));
-
-   /* Compute the bitmask with the formula:
-    *    bitmask = (1 << (64 / argc)) - 1
-    * There is a bug when argc = 2 on SPARC, thus we do it in two times,
-    * in order to never shift by 32 bits at a time
-    */
-   bitmask = 1;
-   bitmask <<= ((64/argc + 1) >> 1);
-   bitmask <<= ((64/argc) >> 1);
-   bitmask --;
 
    /* first, find out if the arguments are:
     *    - consecutive references to the same array
@@ -283,27 +667,13 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad)
    e = EXPRESSION(CAR(CDR(args)));
    if (expression_constant_p(e))
    {
-      unsigned int val;
       argsType = CONSTANT;
-
-      if (!isLoad)
-      {
-	 printf("Error: should not save something into a constant expression!"
-		"\nAborting...\n");
-	 abort();
-      }
-
-      val = constant_int(value_constant(entity_initial(call_function(
-	 syntax_call(expression_syntax(e))))));
-      
-      val &= bitmask; //mask bits that would be truncated
-      constantValue = val;
-      constantShift = (64 / argc);
    }
+   // If e is a reference expression, let's analyse this reference
    else if ( (expression_reference_p(e)) &&
 	     (analyse_reference(expression_reference(e), firstRef)) )
    {
-      lastOffset = referenceInfo_offset(firstRef);
+      lastOffset = get_consec_offset(firstRef);
       argsType = CONSEC_REFS;
    }
    else
@@ -319,18 +689,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad)
 	 break;
       else if (argsType == CONSTANT)
       {
-	 if (expression_constant_p(e))
-	 {
-	    unsigned int val;
-      
-	    val = constant_int(value_constant(entity_initial(call_function(
-	       syntax_call(expression_syntax(e))))));
-
-	    val &= bitmask; //mask bits that would be truncated
-	    constantValue |= (((unsigned long long)val) << constantShift);
-	    constantShift += (64 / argc);
-	 }
-	 else
+	 if (!expression_constant_p(e))
 	 {
 	    argsType = OTHER;
 	    break;
@@ -338,11 +697,13 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad)
       }
       else if (argsType == CONSEC_REFS)
       {
+         // If e is a reference expression, let's analyse this reference
+	 // and see if e is consecutive to the previous references
 	 if ( (expression_reference_p(e)) &&
 	      (analyse_reference(expression_reference(e), cRef)) &&
 	      (consecutive_refs_p(firstRef, lastOffset, cRef)) )
 	 {
-	    lastOffset = referenceInfo_offset(cRef);
+	    lastOffset = get_consec_offset(cRef);
 	 }
 	 else
 	 {
@@ -359,30 +720,42 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad)
    {
       case CONSEC_REFS:
       {
-	 /* build a new list of arguments */
-	 args = gen_make_list( expression_domain, 
-			       EXPRESSION(CAR(args)),
-			       entity_to_expression(
-				  referenceInfo_entity(firstRef)),
-			       make_integer_constant_expression(
-				  referenceInfo_offset(firstRef)),
-			       referenceInfo_index(firstRef) == reference_undefined ?
-			          make_integer_constant_expression(0) : 
-			          reference_to_expression(referenceInfo_index(firstRef)),
-			       NULL);
+
+	 string realVectName = get_vect_name_from_data(argc, EXPRESSION(CAR(CDR(args))));
+
+	 if(strcmp(realVectName, lsType))
+	 {
+	    string temp = lsType;
+
+	    lsType = strdup(concatenate(realVectName,
+			     "_TO_", temp, (char *) NULL));
+	 }
+	 if(get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION"))
+	 {
+	    args = gen_make_list( expression_domain, 
+			          EXPRESSION(CAR(args)),
+			          reference_to_expression(referenceInfo_reference(firstRef)),
+			          NULL);
+	 }
+	 else
+	 {
+	   //expression addr = MakeUnaryCall(CreateIntrinsic("&"), reference_to_expression(referenceInfo_reference(firstRef)));
+	   expression addr = reference_to_expression(referenceInfo_reference(firstRef));
+	    args = gen_make_list( expression_domain, 
+			          EXPRESSION(CAR(args)),
+			          addr,
+			          NULL);
+	 }
+
+	 gSimdCost += - argc + 1;
+
 	 break;
       }
 
       case CONSTANT:
       {
-	 /* build a new list of arguments */
-	 args = gen_make_list( expression_domain,
-			       EXPRESSION(CAR(args)),
-			       make_integer_constant_expression(
-				  (int)(constantValue&0xFFFFFFFF)),
-			       make_integer_constant_expression(
-				  (int)(constantValue>>32)),
-			       NULL);
+	 gSimdCost += - argc + 1;
+
 	 break;
       }
 
@@ -394,7 +767,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad)
    free_empty_referenceInfo(firstRef);
    free_empty_referenceInfo(cRef);
 
-   sprintf(functionName, "%s%i", funcNames[argsType][isLoad], argc);
+   sprintf(functionName, "%s%s", funcNames[argsType][isLoad], lsType);
    return call_to_statement(make_call(get_function_entity(functionName), 
 				      args));
 
@@ -416,13 +789,15 @@ static statement make_exec_statement(opcode oc, list args)
 				      args));
 }
 
-static entity make_new_simd_vector(int itemSize, int nbItems, bool isInt)
+/*
+This function creates a simd vector.
+ */
+static entity make_new_simd_vector(int itemSize, int nbItems, int basicTag)
 {
-   extern list integer_entities, real_entities, double_entities;
+   //extern list integer_entities, real_entities, double_entities;
   
-   basic simdVector = isInt ? 
-      make_basic_int(itemSize/8) :
-      make_basic_float(itemSize/8);
+   basic simdVector;
+
    entity new_ent, mod_ent;
    char prefix[5], *name, *num;
    static int number = 0;
@@ -438,10 +813,25 @@ static entity make_new_simd_vector(int itemSize, int nbItems, bool isInt)
       case 32: prefix[2] = 's'; break;
       case 64: prefix[2] = 'd'; break;
    }
-   if (isInt)
-      prefix[3] = 'i';
-   else
-      prefix[3] = 'f';
+
+   switch(basicTag)
+   {
+      case is_basic_int:
+	 simdVector = make_basic_int(itemSize/8);
+         prefix[3] = 'i';
+	 break;
+
+      case is_basic_float:
+	 simdVector = make_basic_float(itemSize/8);
+         prefix[3] = 'f';
+	 break;
+
+      default:
+	 simdVector = make_basic_int(itemSize/8);
+         prefix[3] = 'i';
+	 break;
+   }
+
    prefix[4] = 0;
 
    mod_ent = get_current_module_entity();
@@ -449,55 +839,46 @@ static entity make_new_simd_vector(int itemSize, int nbItems, bool isInt)
    sprintf(num, "_vec%i", number++);
    name = strdup(concatenate(entity_local_name(mod_ent),
 			     MODULE_SEP_STRING, prefix, num, (char *) NULL));
-   
+
+   entity str_dec = FindOrCreateEntityFromLocalNameAndPrefix(strdup(prefix), TYPEDEF_PREFIX, FALSE);
+
+   variable v = make_variable(make_basic_typedef(str_dec),NIL,NIL);
+
    new_ent = make_entity(name,
-			 make_type(is_type_variable,
-				   make_variable(simdVector, 
-						 CONS(DIMENSION, 
-						      make_dimension(int_expr(0),
-								     int_expr(nbItems-1)), 
-						      NIL),
-						 NIL)),
+			 make_type_variable(v),
 			 storage_undefined,
 			 make_value(is_value_unknown, UU));
+
    dynamic_area = global_name_to_entity(module_local_name(mod_ent),
 					DYNAMIC_AREA_LOCAL_NAME);
+
+   area aa = type_area(entity_type(dynamic_area));
+   int OldOffset = area_size(aa);
+   area_size(aa) = OldOffset + itemSize * nbItems;
+   area_layout(aa) = gen_nconc(area_layout(aa), CONS(ENTITY, new_ent, NIL));
+
    entity_storage(new_ent) = make_storage(is_storage_ram,
 					  make_ram(mod_ent,
 						   dynamic_area,
-						   add_variable_to_area(dynamic_area, new_ent),
+						   OldOffset,
 						   NIL));
+
    add_variable_declaration_to_module(mod_ent, new_ent);
-   
-   /* The new entity is stored in the list of entities of the same type. */
-   switch(basic_tag(simdVector))
-   {
-      case is_basic_int:
-      {
-	 integer_entities = CONS(ENTITY, new_ent, integer_entities);
-	 break;
-      }
-      case is_basic_float:
-      {
-	 if(basic_float(simdVector) == DOUBLE_PRECISION_SIZE)
-	    double_entities = CONS(ENTITY, new_ent, double_entities);
-	 else
-	    real_entities = CONS(ENTITY, new_ent, real_entities);
-	 break;
-      }
-      default:
-	 break;
-   }
-   
+
    return new_ent;
 }
 
 void reset_argument_info()
 {
    int i;
-   
-  for(i=0; i<nbArguments; i++)
-     free_argumentInfo(arguments[i]);
+
+   for(i=0; i<nbArguments; i++)
+   {
+      argumentInfo_expression(arguments[i]) = expression_undefined;
+      gen_free_list(argumentInfo_placesAvailable(arguments[i]));
+      argumentInfo_placesAvailable(arguments[i]) = NIL;
+      free_argumentInfo(arguments[i]);
+   }
    nbArguments = 0;
 }
 
@@ -595,12 +976,19 @@ static statementInfo make_simd_statement_info(opcodeClass kind, opcode oc, list*
 				   opcode_vectorSize(oc)));
    si = make_statementInfo_simd(ssi);
 
+   list temp = args[0];
    /* create the simd vector entities */
    for(j=0; j<nbargs; j++)
-      simdStatementInfo_vectors(ssi)[j] = 
-	 make_new_simd_vector(opcode_subwordSize(oc),
-			      opcode_vectorSize(oc),
-			      TRUE);
+   {
+       int basicTag = get_basic_from_opcode(oc, j);
+
+       simdStatementInfo_vectors(ssi)[j] = 
+	  make_new_simd_vector(get_subwordSize_from_opcode(oc, j),
+			       opcode_vectorSize(oc),
+			       basicTag);
+
+       temp = CDR(temp);
+   }
 
    /* Fill the matrix of arguments */
    for(j=0; j<opcode_vectorSize(oc); j++)
@@ -614,7 +1002,7 @@ static statementInfo make_simd_statement_info(opcodeClass kind, opcode oc, list*
       for(i=nbargs-1; i>=0; i--)
       {
 	 e = EXPRESSION(CAR(l));
-	 
+
 	 //Store it in the argument's matrix
 	 ssa = make_statementArgument(e, NIL);
 	 simdStatementInfo_arguments(ssi)[j + opcode_vectorSize(oc) * i] = ssa;
@@ -672,10 +1060,14 @@ list make_simd_statements(list kinds, cons* first, cons* last)
    list instr; 
    list all_instr;
 
+   printf("make_simd_statements 1\n");
+
    if (first == last)
       return CONS(STATEMENT_INFO,
 		  make_nonsimd_statement_info(STATEMENT(CAR(first))),
 		  NIL);
+
+   printf("make_simd_statements 2\n");
 
    i = first;
    all_instr = CONS(STATEMENT_INFO, NULL, NIL);
@@ -718,7 +1110,9 @@ list make_simd_statements(list kinds, cons* first, cons* last)
 	 for(index = 0; 
              (index<opcode_vectorSize(oc)) && (i!=CDR(last)); 
              index++)
+	 {
 	    i = CDR(i);
+	 }
 
          /* generate the statement information */
 	 CDR(instr) = CONS(STATEMENT_INFO, 
@@ -731,7 +1125,7 @@ list make_simd_statements(list kinds, cons* first, cons* last)
    instr = CDR(all_instr);
    CDR(all_instr) = NIL;
    gen_free_list(all_instr);
-
+   printf("make_simd_statements 3\n");
    return instr;
 }
 
@@ -746,6 +1140,8 @@ static statement generate_exec_statement(simdStatementInfo si)
 		  entity_to_expression(simdStatementInfo_vectors(si)[i]),
 		  args);
    }
+
+   gSimdCost += opcode_cost(simdStatementInfo_opcode(si));
 
    return make_exec_statement(simdStatementInfo_opcode(si), args);
 }
@@ -813,8 +1209,8 @@ static statement generate_load_statement(simdStatementInfo si, int line)
    {
       if (vectorElement_element(ve) == 0)
 	 sourcesCopy = CONS(VECTORELEMENT, ve, sourcesCopy);
-      if ( (vectorElement_subwordSize(ve) == 16) &&
-	   (vectorElement_vectorLength(ve) == 4) )
+      if ( FALSE)//(vectorElement_subwordSize(ve) == 16) &&
+	//(vectorElement_vectorLength(ve) == 4) )
       {
 	 vectorElement e = copy_vector_element(ve);
 	 sourcesShuffle = CONS(VECTORELEMENT, e, sourcesShuffle);
@@ -848,15 +1244,28 @@ static statement generate_load_statement(simdStatementInfo si, int line)
       sourcesShuffle = new_sources;
    }
 
-   //Best case is we already have the same thing in another register
+   bool bSameSubwordSize = TRUE;
+
    if (sourcesCopy != NIL)
+   {
+      bSameSubwordSize = (get_subwordSize_from_opcode(simdStatementInfo_opcode(si), line+1) 
+         == get_subwordSize_from_vector(vectorElement_vector(VECTORELEMENT(CAR(sourcesCopy)))));
+   }
+   else if(sourcesShuffle != NIL)
+   {
+      bSameSubwordSize = (get_subwordSize_from_opcode(simdStatementInfo_opcode(si), line+1) 
+         == get_subwordSize_from_vector(vectorElement_vector(VECTORELEMENT(CAR(sourcesShuffle)))));
+   }
+
+   //Best case is we already have the same thing in another register
+   if ((sourcesCopy != NIL) && bSameSubwordSize)
    {
       vectorElement vec = VECTORELEMENT(CAR(sourcesCopy));
       simdStatementInfo_vectors(si)[line] = vectorElement_vector(vec);
       return statement_undefined;
    }
    //Else, maybe we can use a shuffle instruction
-   else if (sourcesShuffle != NIL)
+   else if ((sourcesShuffle != NIL) && bSameSubwordSize)
    {
       vectorElement ve = VECTORELEMENT(CAR(sourcesShuffle));
       return make_shuffle_statement(simdStatementInfo_vectors(si)[line],
@@ -878,7 +1287,7 @@ static statement generate_load_statement(simdStatementInfo si, int line)
       args = CONS(EXPRESSION,
 		  entity_to_expression(simdStatementInfo_vectors(si)[line]),
 		  args);
-      
+
       //Make a load statement
       return make_load_statement(
 	 opcode_vectorSize(simdStatementInfo_opcode(si)), 
@@ -911,12 +1320,16 @@ static statement generate_save_statement(simdStatementInfo si)
 			      args);
 }
 
-list generate_simd_code(list/* <statementInfo> */ sil)
+list generate_simd_code(list/* <statementInfo> */ sil, float * simdCost)
 {
    list sl_begin; /* <statement> */
    list sl; /* <statement> */
 
    sl = sl_begin = CONS(STATEMENT, NULL, NIL);
+
+   gSimdCost = 0;
+
+   printf("generate_simd_code 1\n");
 
    for(; sil != NIL; sil=CDR(sil))
    {
@@ -951,9 +1364,11 @@ list generate_simd_code(list/* <statementInfo> */ sil)
       }
    }
 
+   *simdCost = gSimdCost;
+
    sl = CDR(sl_begin);
    CDR(sl_begin) = NIL;
    gen_free_list(sl_begin);
-   
+      printf("generate_simd_code 2\n");
    return sl;
 }

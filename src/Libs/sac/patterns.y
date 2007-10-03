@@ -12,6 +12,11 @@
 #include "ri-util.h"
 #include "pipsdbm.h"
 
+#include "dg.h"
+typedef dg_arc_label arc_label;
+typedef dg_vertex_label vertex_label;
+#include "graph.h"
+
 #include "sac-local.h"
 #include "sac.h"
 
@@ -24,12 +29,15 @@ int patterns_yylex();
 
 %union {
       int tokenId;
+      int typeId;
       list tokenList;
+      list typeList;
 
       patternArg argument;
       list argsList;
 
       int iVal;
+      float fVal;
       char * strVal;
 
       opcode opVal;
@@ -39,7 +47,9 @@ int patterns_yylex();
 }
 
 %type <tokenId> token;
+%type <typeId> type;
 %type <tokenList> tokens_list;
+%type <typeList> types_list;
 
 %type <argument> argument;
 %type <argsList> arguments_list;
@@ -51,6 +61,13 @@ int patterns_yylex();
 
 %token UNKNOWN_TOK
 %token REFERENCE_TOK
+%token QI_REF_TOK
+%token HI_REF_TOK
+%token SI_REF_TOK
+%token DI_REF_TOK
+%token SF_REF_TOK
+%token DF_REF_TOK
+%token LOG_REF_TOK
 %token CONSTANT_TOK
 
 %token ASSIGN_OPERATOR_TOK
@@ -90,8 +107,10 @@ int patterns_yylex();
 %token LESS_OR_EQUAL_OPERATOR_TOK
 %token LESS_THAN_OPERATOR_TOK
 %token EQUAL_OPERATOR_TOK
+%token PHI_TOK
 
 %token <iVal> INTEGER_TOK
+%token <fVal> FLOAT_TOK
 %token <strVal> IDENTIFIER_TOK
 
 %%
@@ -113,22 +132,43 @@ definition:
  
 operation:
        IDENTIFIER_TOK '[' INTEGER_TOK ']' '{' opcodes_list '}' 
-                                        { insert_opcodeClass($1, $3, $6); }
+                                        {
+                                           insert_opcodeClass($1, $3, $6);
+                                        }
 
 opcodes_list:
        opcodes_list opcode              { $$ = CONS(OPCODE, $2, $1); }
      |                                  { $$ = NIL; }
 
 opcode:
-       IDENTIFIER_TOK ':' INTEGER_TOK ',' INTEGER_TOK ';'      
-                                        { $$ = make_opcode($1, $3, $5); }
+       IDENTIFIER_TOK ':' INTEGER_TOK ',' types_list ',' INTEGER_TOK ';'      
+                                        { 
+                                           $$ = make_opcode($1, $3, $5, $7);
+                                        }
 
 pattern:
        IDENTIFIER_TOK ':' tokens_list merge_arguments ';'      
-                                        { insert_pattern($1, $3, $4); }
+                                        {
+                                           insert_pattern($1, $3, $4);
+                                        }
+
+types_list:
+       type types_list                  { $$ = CONS(TYPE, $1, $2); }
+     |                                  { $$ = NIL; }
+
+type:
+       QI_REF_TOK                       { $$ = QI_REF_TOK; }
+     | HI_REF_TOK                       { $$ = HI_REF_TOK; }
+     | SI_REF_TOK                       { $$ = SI_REF_TOK; }
+     | DI_REF_TOK                       { $$ = DI_REF_TOK; }
+     | SF_REF_TOK                       { $$ = SF_REF_TOK; }
+     | DF_REF_TOK                       { $$ = DF_REF_TOK; }
+     | LOG_REF_TOK                      { $$ = LOG_REF_TOK; }
 
 tokens_list:
-       token tokens_list                { $$ = CONS(TOKEN, $1, $2); }
+       token tokens_list                {
+                                           $$ = CONS(TOKEN, $1, $2);
+                                        }
      |                                  { $$ = NIL; }
 
 token:
@@ -168,6 +208,7 @@ token:
      | LESS_OR_EQUAL_OPERATOR_TOK	{ $$ = LESS_OR_EQUAL_OPERATOR_TOK; }
      | LESS_THAN_OPERATOR_TOK		{ $$ = LESS_THAN_OPERATOR_TOK; }
      | EQUAL_OPERATOR_TOK		{ $$ = EQUAL_OPERATOR_TOK; }
+     | PHI_TOK		                { $$ = PHI_TOK; }
 
 merge_arguments:
        ':' arguments_list               { $$ = $2; }

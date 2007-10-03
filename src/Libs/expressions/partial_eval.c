@@ -1373,6 +1373,14 @@ partial_eval(char *module_name)
   case is_instruction_call:
     if (return_statement_p(module_statement) || continue_statement_p(module_statement))
       break;
+
+  case is_instruction_test:
+  case is_instruction_loop:
+  case is_instruction_whileloop:
+  case is_instruction_goto:
+    recursiv_partial_eval(module_statement);
+    break;
+
   default:
     pips_error("partial_eval", "Non-acceptable instruction tag %d\n",
 	       instruction_tag (mod_inst));

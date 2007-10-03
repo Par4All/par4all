@@ -12,6 +12,11 @@
 #include "ri-util.h"
 #include "pipsdbm.h"
 
+#include "dg.h"
+typedef dg_arc_label arc_label;
+typedef dg_vertex_label vertex_label;
+#include "graph.h"
+
 #include "sac-local.h"
 #include "sac.h"
 #include "patterns.tab.h"
@@ -19,7 +24,14 @@
 int patterns_yyerror(char* s);
 %}
 %%
-"REFERENCE"             return REFERENCE_TOK;
+"REFERENCE"               return REFERENCE_TOK;
+"QI_REF"                return QI_REF_TOK;
+"HI_REF"                return HI_REF_TOK;
+"SI_REF"                return SI_REF_TOK;
+"DI_REF"                return DI_REF_TOK;
+"SF_REF"                return SF_REF_TOK;
+"DF_REF"                return DF_REF_TOK;
+"LOG_REF"               return LOG_REF_TOK;
 "CONSTANT"              return CONSTANT_TOK;
 "="			return ASSIGN_OPERATOR_TOK;
 "+"			return PLUS_OPERATOR_TOK;
@@ -55,7 +67,8 @@ int patterns_yyerror(char* s);
 "<="		        return LESS_OR_EQUAL_OPERATOR_TOK;
 "<"      		return LESS_THAN_OPERATOR_TOK;
 "=="			return EQUAL_OPERATOR_TOK;
-[0-9]+                  { patterns_yylval.iVal = atoi(patterns_yytext); return INTEGER_TOK; }
+"SIMD_PHI"		return PHI_TOK;
+[0-9.-]+                  { patterns_yylval.iVal = atoi(patterns_yytext); return INTEGER_TOK; }
 [A-Za-z][0-9A-Za-z_]*   { patterns_yylval.strVal = strdup(patterns_yytext); return IDENTIFIER_TOK; }
 [ \t\n]                 ;
 "#".*                   ;

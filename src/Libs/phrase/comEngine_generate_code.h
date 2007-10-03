@@ -1,0 +1,6 @@
+#ifndef COMENGINE_GENERATE_CODE_DEFS
+#define COMENGINE_GENERATE_CODE_DEFS
+
+extern bool gGenHRE;
+
+#endif

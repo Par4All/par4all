@@ -8,12 +8,175 @@
 #include "ri-util.h"
 #include "pipsdbm.h"
 
+#include "dg.h"
+
+typedef dg_arc_label arc_label;
+typedef dg_vertex_label vertex_label;
+
+#include "graph.h"
+
 #include "sac.h"
 #include "patterns.tab.h"
 
 
 static bool patterns_initialized = FALSE;
 static matchTree patterns_tree = NULL;
+
+static list finalArgType = NIL;
+static list curArgType = NIL;
+
+static int gIndexCount = 0;
+
+static basic get_basic_from_pointer(basic inBas, int nbIndex)
+{
+   basic outBas = basic_undefined;
+   type t = basic_pointer(inBas);
+
+   if(!type_variable_p(t))
+      return outBas;
+
+   outBas = variable_basic(type_variable(t));
+
+   switch(basic_tag(outBas))
+   {
+      case is_basic_int:
+      case is_basic_float:
+      case is_basic_logical:
+         if(gIndexCount != nbIndex)
+	    outBas = basic_undefined;
+	 break;
+
+      case is_basic_pointer:
+	 gIndexCount++;
+	 outBas = get_basic_from_pointer(outBas, nbIndex);
+         break;
+   }
+
+   return outBas;
+}
+
+basic get_basic_from_array_ref(reference ref)
+{
+   basic bas = basic_undefined;
+   int nbIndex = gen_length(reference_indices(ref));
+
+   type t = entity_type(reference_variable(ref));
+
+   if(!type_variable_p(t))
+      return bas;
+
+   bas = variable_basic(type_variable(t));
+
+   gIndexCount = 0;
+
+   switch(basic_tag(bas))
+   {
+      case is_basic_int:
+      case is_basic_float:
+      case is_basic_logical:
+	 break;
+
+      case is_basic_pointer:
+	 gIndexCount++;
+	 bas = get_basic_from_pointer(bas, nbIndex);
+         break;
+   }
+
+   return bas;
+}
+
+void simd_reset_finalArgType()
+{
+   gen_free_list(finalArgType);
+   finalArgType = NIL;
+
+   gen_free_list(curArgType);
+   curArgType = NIL;
+}
+
+static void simd_fill_curArgType_call(call ca)
+{
+   MAP(EXPRESSION,
+       arg,
+   {
+      syntax s = expression_syntax(arg);
+
+      switch(syntax_tag(s))
+      {
+	 case is_syntax_call:
+	 {
+	    call c = syntax_call(s);
+
+	    if (call_constant_p(c))
+	    {
+	       curArgType = CONS(BASIC, make_basic(is_basic_int, 0), curArgType);
+	    }
+	    else
+	       simd_fill_curArgType_call(c);
+	    break;
+	 }
+	    
+	 case is_syntax_reference:
+	 {
+	    basic bas = get_basic_from_array_ref(syntax_reference(s));
+	    curArgType = CONS(BASIC, copy_basic(bas), curArgType);
+	 }
+
+      }
+   },
+       call_arguments(ca));
+
+}
+
+void simd_fill_finalArgType(statement stat)
+{
+   simd_fill_curArgType_call(statement_call(stat));
+
+   finalArgType = gen_copy_seq(curArgType);
+}
+
+void simd_fill_curArgType(statement stat)
+{
+   simd_fill_curArgType_call(statement_call(stat));
+}
+
+bool simd_check_argType()
+{
+   list pCurBas = curArgType;
+
+   MAPL(pFinBas,
+   {
+      basic curBas = BASIC(CAR(pCurBas));
+      basic finBas = BASIC(CAR(pFinBas));
+
+      if((!(((basic_int_p(finBas)) &&  (basic_int(finBas) == 0)) ||
+	    ((basic_int_p(curBas)) &&  (basic_int(curBas) == 0)))) &&
+	 !basic_equal_p(curBas, finBas))
+      {
+	 return FALSE;
+      }
+
+      if(((basic_int_p(finBas)) &&  (basic_int(finBas) == 0)))
+      {
+	 basic_tag(finBas) = basic_tag(curBas);
+
+	 switch(basic_tag(curBas))
+	 {
+	    case is_basic_int: basic_int(finBas) = basic_int(curBas); break;
+	    case is_basic_float: basic_float(finBas) = basic_float(curBas); break;
+	    case is_basic_logical: basic_logical(finBas) = basic_logical(curBas); break;
+	 }
+      }
+
+      pCurBas = CDR(pCurBas);
+
+   }, finalArgType);
+
+   gen_free_list(curArgType);
+   curArgType = NIL;
+
+   return TRUE;
+}
 
 static matchTree make_tree()
 {
@@ -70,8 +233,16 @@ static matchTree match_call(call c, matchTree t, list *args)
 	    
 	 case is_syntax_reference:
 	 {
-	    t = select_tree_branch(t, REFERENCE_TOK);
-	    *args = CONS(EXPRESSION, arg, *args);
+	    basic bas = get_basic_from_array_ref(syntax_reference(s));
+	    if(bas == basic_undefined)
+	    {
+	       return matchTree_undefined;
+	    }
+	    else
+	    {
+	       t = select_tree_branch(t, REFERENCE_TOK);
+	       *args = CONS(EXPRESSION, arg, *args);
+	    }
 	    break;
 	 }
 
@@ -160,25 +331,6 @@ void insert_opcodeClass(char * s, int nbArgs, list opcodes)
    //Add the class and name in the map
    make_opcodeClass(s, nbArgs, opcodes);
 }
-
-char * get_opcodeClass_opcode(opcodeClass op, int vecSize, int subwordSize)
-{
-   list opcodes;
-
-   if (op == opcodeClass_undefined)
-      return NULL;
-
-   for(opcodes = opcodeClass_opcodes(op); opcodes != NIL; opcodes = CDR(opcodes))
-   {
-      opcode oc = OPCODE(CAR(opcodes));
-
-      if ( (opcode_vectorSize(oc) == vecSize) &&
-	   (opcode_subwordSize(oc) == subwordSize) )
-	 return opcode_name(oc);
-   }
-
-   return NULL;
-} 
 
 opcodeClass get_opcodeClass(char * s)
 {

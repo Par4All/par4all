@@ -9,6 +9,13 @@
 #include "ri-util.h"
 #include "pipsdbm.h"
 
+#include "dg.h"
+
+typedef dg_arc_label arc_label;
+typedef dg_vertex_label vertex_label;
+
+#include "graph.h"
+
 #include "sac.h"
 
 
@@ -38,9 +45,27 @@ static bool variables_width_filter(reference r)
 	 width = 8*basic_float(b);
 	 break;
 
-      case is_basic_logical:
+      /*case is_basic_logical:
 	 width = 8*basic_logical(b);
+	 break;*/
+
+      case is_basic_pointer:
+      {
+	 basic bas = get_basic_from_array_ref(r);
+	 if(!basic_undefined_p(bas))
+	 {
+	    switch(basic_tag(bas))
+	    {
+	       case is_basic_int: width = 8*basic_int(bas); break;
+	       case is_basic_float: width = 8*basic_float(bas); break;
+	    }
+	 }
+	 else
+	 {
+	    return TRUE;
+	 }
 	 break;
+      }
 
       default:
 	 return TRUE; /* don't know what to do with this... keep searching */

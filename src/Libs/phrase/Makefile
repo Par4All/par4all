@@ -2,7 +2,15 @@
 
 TARGET = phrase
 
-LIB_CFILES =    phrase_distributor.c \
+LIB_CFILES =    comEngine_optimization_function.c \
+                comEngine_HRE_distribute.c \
+                comEngine_generate_code.c \
+                phrase_remove_dependences.c \
+                comEngine_generate_HRECode.c \
+                comEngine_generate_procCode.c \
+                comEngine_feasability.c \
+                comEngine_distribute.c \
+                phrase_distributor.c \
 		phrase_distributor_control_code.c \
 		phrase_distributor_communication.c \
 		distribution_context.c \

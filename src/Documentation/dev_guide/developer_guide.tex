@@ -293,14 +293,34 @@ that you may use provided that you do not break the development
 policy which requires all changes committed to the \texttt{trunk}
 not to break the non-regression tests.
 
-It is possible to use the \texttt{svn\_branch.sh} script directly to 
-create a branch for any part of pips, including the full software.
+It is possible to use the \texttt{svn\_branch.sh} script directly to
+create a branch for any part of pips, including the full
+software. \verb|svn_branch.sh| has been developed because \textsc{svn}
+cannot yet deal natively with branching but it is planned to change with
+version 1.5.
 
-It is possible to use \texttt{svn} directly to create and
-manage your branches with copies. The \texttt{svn\_branch.sh}
-adds convenient administrative data in the directory to know about the
-status of the branch: what is its source, what was merged (pulled) from
-the source or joined back (pushed) to it, and so on.
+It is possible to use \texttt{svn} directly to create and manage your
+branches with copies. The \texttt{svn\_branch.sh} adds convenient
+administrative data in the directory to know about the status of the
+branch: what is its source, what was merged (pulled) from the source or
+joined back (pushed) to it, and so on. These informations are stored in
+\texttt{svnbranch:...} properties. So if you want to play around with
+home-made branching, think about them too...
+
+For example, if you want to merge directly and atomically in your own
+working copy of the trunk your own copy of several branch pieces such as
+\texttt{pips>trunk/src/Libs/expressions} that is from the trunk at
+revision 12475 and so on, you can do something like:
+\begin{verbatim}
+cd .../svn/pips/trunk/src/Libs/expressions
+svn merge -r 12475:HEAD ../../../../branches/godet/expressions
+cd .../svn/pips/trunk/src/Libs/sac
+svn merge -r 12356:HEAD ../../../../branches/godet/sac
+cd .../svn/pips/trunk/src/Libs/phrase
+svn merge -r 12356:HEAD ../../../../branches/godet/phrase
+cd cd .../svn/pips/trunk
+svn commit
+\end{verbatim}
 
 It is finally possible to edit directly your production working copy, and
 just commit from there when you're happy with your changes.  This may be
