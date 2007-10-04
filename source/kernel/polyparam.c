@@ -33,13 +33,8 @@
 
 #include <polylib/polylib.h>
 
-#ifdef __STDC__
-static void traite_m_face(Polyhedron *, unsigned int *);
+static void traite_m_face(Polyhedron *, unsigned int *, unsigned int *);
 static void scan_m_face(int,int,Polyhedron *,unsigned int *);
-#else
-static void traite_m_face();
-static void scan_m_face();
-#endif /* __STDC__ */
 
 /*
  * Return the intersection of two polyhedral domains 'Pol1' and 'Pol2' such 
@@ -324,14 +319,33 @@ static Polyhedron *Add_CEqualities(Polyhedron *D) {
   }
 } /* Add_CEqualities */
 
+#define INT_BITS (sizeof(unsigned) * 8)
+
+unsigned int *int_array2bit_vector(unsigned int *array, int n)
+{
+  int i, ix;
+  unsigned bx;
+  int words = (n+INT_BITS-1)/INT_BITS;
+  unsigned int *bv = (unsigned int *)calloc(words, sizeof(unsigned));
+  assert(bv);
+  for (i = 0, ix = 0, bx = MSB; i < n; ++i) {
+    if (array[i])
+      bv[ix] |= bx;
+    NEXT(ix, bx);
+  }
+  return bv;
+}
+
 /*----------------------------------------------------------------------*/
 /* traite_m_face                                                        */
 /*       Given an m-face, compute the parameterized vertex              */
+/* D  	   - The entire domain						*/
+/* mf 	   - Bit vector marking the lines/rays in the m-face		*/
+/* egalite - boolean vector marking saturated constraints in m-face	*/
 /*----------------------------------------------------------------------*/
-static void traite_m_face(Polyhedron *D,unsigned int *mf) {
-     /* D  - The entire domain */
-     /* mf - Bit vector marking the lines/rays in the m-face */
-
+static void traite_m_face(Polyhedron *D, unsigned int *mf,
+			  unsigned int *egalite)
+{
   Matrix *Si;				/* Solution */
   Polyhedron *PDi;		        /* polyhedron Di */
   Param_Vertices *PV;
@@ -450,6 +464,7 @@ static void traite_m_face(Polyhedron *D,unsigned int *mf) {
   PV->next = PV_Result;
   PV->Vertex = Si;
   PV->Domain = NULL;
+  PV->Facets = int_array2bit_vector(egalite, D->NbConstraints);
   PV_Result = PV;
   nbPV++;         /* increment vertex count */
   
@@ -522,6 +537,22 @@ static int count_sat (unsigned int *mf) {
   }
   return cnt;
 } /* count_sat */
+
+/* Returns true if all bits in part are also set in bv */
+static bit_vector_includes(unsigned int *bv, int len, unsigned int *part)
+{
+  int j;
+
+  for (j = 0; j < len; j++) {
+#ifdef DEBUGPP4
+    fprintf(stderr, "mf=%08X Sat=%08X &=%08X\n",
+		    part[j],bv[j], (part[j] & bv[j]));
+#endif
+    if ((part[j] & bv[j]) != part[j])
+      return 0;
+  }
+  return 1;
+}
 
 /*----------------------------------------------------------------------*/
 /* let D + E + L be the dimension of the polyhedron                     */
@@ -600,28 +631,27 @@ static void scan_m_face(int pos,int nb_un,Polyhedron *D,unsigned int *mf) {
 			continue;       /* already selected */
       
 		/* if Sat[i] & mf == mf then it's redundant */
-		for (j=0;j<nr;j++)
-		{
-	
 #ifdef DEBUGPP4
-			fprintf(stderr,"mf=%08X Sat[%d]=%08X &=%08X\n",mf[j],i,Sat->p[i][j],
-				(mf[j] & Sat->p[i][j]) );
+		fprintf(stderr, "Sat[%d]\n", i);
 #endif
-
-			if (((mf[j]) & (Sat->p[i][j])) != mf[j])
-				break;	/* it's not redundant */
+		if (bit_vector_includes(Sat->p[i], nr, mf)) {
+#ifdef DEBUGPP4
+		  fprintf(stderr, "Redundant with constraint %d\n", i);
+#endif
+		  return;	/* it is redundant */
 		}
-      
-#ifdef DEBUGPP4
-		if (j==nr) fprintf(stderr, "Redundant with constraint %d\n", i);
-#endif
-    
-		if (j==nr) return;	/* it is redundant */
 	}
     /********* END OF ELIMINATION OF DEGENERATE FACES *********/    
+    /* Now check for other constraints that are verified */
+    for (i = pos; i < D->NbConstraints; ++i) {
+      if (bit_vector_includes(Sat->p[i], nr, mf))
+	egalite[i] = 1;
+    }
     /* if we haven't found a constraint verified by all */
     /* the rays, its OK, it's a new face. */
-    traite_m_face(D,mf);
+    traite_m_face(D, mf, egalite);
+    for (i = pos; i < D->NbConstraints; ++i)
+      egalite[i] = 0;
     return;
   }
 
@@ -778,6 +808,7 @@ Param_Polyhedron *GenParamPolyhedron(Polyhedron *Pol) {
   result=(Param_Polyhedron *)malloc(sizeof(Param_Polyhedron));
   result->nbV=nbRows-rays;
   result->V=NULL;
+  result->Constraints = Polyhedron2Constraints(Pol);
   
   /* Build the parametric vertices */
   for(i=0;i<nbRows;i++) {
@@ -801,6 +832,7 @@ Param_Polyhedron *GenParamPolyhedron(Polyhedron *Pol) {
     paramVertex->Domain=Matrix_Alloc(1,2);
     value_set_si(paramVertex->Domain->p[0][0],1);
     value_set_si(paramVertex->Domain->p[0][1],1);    
+    paramVertex->Facets = NULL;
     paramVertex->next=result->V;
     result->V=paramVertex;
   }
@@ -1219,15 +1251,17 @@ Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int wo
 	}
   */
 
+  res = (Param_Polyhedron *) malloc (sizeof(Param_Polyhedron));
+  res->nbV = nbPV;
+  res->V = PV_Result;
+  res->D = PDomains;
+  res->Constraints = Polyhedron2Constraints(D1);
+
   if(CT)		/* return the new D1 too ! */
     *Di = D1;
   else
     Domain_Free(D1);
 
-  res = (Param_Polyhedron *) malloc (sizeof(Param_Polyhedron));
-  res->nbV = nbPV;
-  res->V = PV_Result;
-  res->D = PDomains;
   return(res);
 } /* Find_m_faces */
 
@@ -1454,6 +1488,7 @@ void Param_Vertices_Free(Param_Vertices *PV) {
     next_pv = PV->next;
     if (PV->Vertex) Matrix_Free(PV->Vertex);
     if (PV->Domain) Matrix_Free(PV->Domain);
+    if (PV->Facets) free(PV->Facets);
     free(PV);  
     PV = next_pv;
   }
@@ -1750,6 +1785,8 @@ void Param_Polyhedron_Free(Param_Polyhedron *P) {
   if (!P) return;
   Param_Vertices_Free(P->V);
   Param_Domain_Free(P->D);
+  if (P->Constraints)
+    Matrix_Free(P->Constraints);
   free(P);
   return;
 } /* Param_Polyhedron_Free */

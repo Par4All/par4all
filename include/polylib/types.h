@@ -127,6 +127,7 @@ typedef struct _Param_Vertex {
 	          /* parameters. The (m+1)th value is the constant, the */
 	          /* The (m+2)th value is the common denominator.       */
   Matrix *Domain; /* Constraints on parameters (in Polyhedral format)   */
+  unsigned *Facets; /* Bit array of facets defining the vertex.		*/
   struct _Param_Vertex *next;          /* Pointer to the next structure */
 } Param_Vertices;
 
@@ -140,6 +141,7 @@ typedef struct _Param_Polyhedron {
 	int nbV;	    /* Number of parameterized vertices            */
 	Param_Vertices *V;  /* Pointer to the list of parameteric vertices */
 	Param_Domain *D;    /* Pointer to the list of validity domains     */
+	Matrix *Constraints;/* Constraints referred to by V->Facets	   */
 } Param_Polyhedron;
 
 #define FORALL_PVertex_in_ParamPolyhedron(_V, _D, _P)   \
