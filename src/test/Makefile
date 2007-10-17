@@ -17,7 +17,10 @@ test_hash: hash_test
 	./hash_test 100
 
 spec.h: newres.newgen
-	$(SHR.d)/newgen -c $< | $(SHR.d)/make_all_specs > $@
+	$(EXE.d)/newgen -c $< | $(EXE.d)/make_all_specs > $@
+
+%.h: %.newgen
+	$(EXE.d)/newgen -c $< | $(EXE.d)/make_all_specs > $@
 
 hash_test: hash_test.c
 	$(COMPILE) $< -o $@
