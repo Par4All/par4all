@@ -18,6 +18,7 @@
  */
 
 #include <stdio.h>
+#include <stdint.h>
 #include <string.h>
 #include <malloc.h>
 #include <stdlib.h>
@@ -567,12 +568,14 @@ static char * hash_print_key(hash_key_type t, void * key)
 
   if (t == hash_string)
     return (char*) key; /* hey, this is just what we need! */
+  /* Use extensive C99 printf formats and stdint.h types to avoid
+     truncation warnings: */
   else if (t == hash_int)
-    sprintf(buffer, "%d", (int) key);
+    sprintf(buffer, "%td", (intptr_t) key);
   else if (t == hash_pointer)
-    sprintf(buffer, "%x", (unsigned int) key);
+    sprintf(buffer, "%p", key);
   else if (t == hash_chunk)
-    sprintf(buffer, "%x", (unsigned int)((gen_chunk *)key)->p);	    
+    sprintf(buffer, "%zx", (uintptr_t) ((gen_chunk *)key)->p);	    
   else {
     fprintf(stderr, "[hash_print_key] bad type : %d\n", t);
     abort();

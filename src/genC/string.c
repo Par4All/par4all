@@ -1,5 +1,5 @@
 /*
-  convinient functions to deal with strings.
+  convenient functions to deal with strings.
   moved from pips by FC, 16/09/1998.
 
   $Id$
@@ -37,13 +37,13 @@
 
 string gen_strndup(
     string s, /* la chaine a copier */
-    int n /* le nombre de caracteres a copier */)
+    size_t n /* le nombre de caracteres a copier */)
 {
  	register string r;
-	register int i;
+	register size_t i;
 
 	/* allocation */
-	if ((r = (string) malloc((unsigned) n)) == NULL) {
+	if ((r = (string) malloc(n)) == NULL) {
 		fprintf(stderr, "gen_strndup: out of memory\n");
 		exit(1);
 	}
@@ -63,13 +63,13 @@ string gen_strndup(
 
 string gen_strndup0(
     string s, /* la chaine a copier */
-    int n /* le nombre de caracteres a copier */)
+    size_t n /* le nombre de caracteres a copier */)
 {
  	register string r;
-	register int i;
+	register size_t i;
 
 	/* allocation */
-	if ((r = (string) malloc((unsigned) n+1)) == NULL) {
+	if ((r = (string) malloc(n+1)) == NULL) {
 		fprintf(stderr, "gen_strndup0: out of memory\n");
 		exit(1);
 	}
@@ -95,8 +95,8 @@ string gen_strndup0(
 #endif
 
 static string buffer = (string) NULL;
-static int buffer_size = 0;
-static int current = 0;
+static size_t buffer_size = 0;
+static size_t current = 0;
 
 void init_the_buffer(void)
 {
@@ -115,7 +115,7 @@ void init_the_buffer(void)
 
 string append_to_the_buffer(string s) /* what to append to the buffer */
 {
-    int len = strlen(s);
+    size_t len = strlen(s);
 
     /* reallocates if needed
      */
@@ -128,7 +128,7 @@ string append_to_the_buffer(string s) /* what to append to the buffer */
     }
 
     (void) memcpy(&buffer[current], s, len);
-    current+=len;
+    current += len;
     buffer[current] = '\0' ;
 
     return buffer;

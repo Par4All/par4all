@@ -109,12 +109,14 @@ typedef union gen_chunk {
 /* some other macros need the domain number to keep track of the type.
  * they are provided here for the internal types.
  */
-#define unit_domain	(0)
-#define bool_domain	(1)
-#define char_domain	(2)
-#define int_domain	(3)
-#define float_domain	(4)
-#define string_domain	(5)
+enum internal_type {
+  unit_domain = 0,
+  bool_domain = 1,
+  char_domain = 2,
+  int_domain  = 3,
+  float_domain = 4,
+  string_domain = 5
+};
 
 #include "newgen_list.h"
 #include "newgen_stack.h"

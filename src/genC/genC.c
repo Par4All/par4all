@@ -27,8 +27,8 @@
   "\"[newgen internal error]\""  \
   "\"inconsistent domain number for %s: %%d (expecting %%d)\\n\""
 
-/* might be use to generate optimized versions
-   (say macros instread of functions).
+/* Might be used to generate optimized versions
+   (say macros instead of functions).
  */
 static void sharp_ifopt(FILE * out)
 { fprintf(out, "#if defined(" OPTIMIZE_NEWGEN ")\n"); }
@@ -128,6 +128,8 @@ static string newgen_type_name(union domain * dp)
     case CONSTRUCTED_DT:
 	switch (dp->co.op) {
 	case ARROW_OP: return "hash_table";
+	default:
+	  break;
 	}
     default: fatal("[newgen_type_name] unexpected domain type %d\n", 
 		   dp->ba.type);
@@ -774,7 +776,7 @@ static FILE * fopen_suffix(string prefix, string suffix)
  */
 void gencode(string file)
 {
-    int no_warning = (int)sharp_ifopt + (int)sharp_else + (int) sharp_endif;
+    size_t no_warning = (size_t)sharp_ifopt + (size_t)sharp_else + (size_t) sharp_endif;
     int i;
     FILE * header, * code;
 

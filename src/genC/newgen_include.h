@@ -19,21 +19,25 @@
 
 /* Types of domain
  */
-#define UNDEF_DT 0
-#define EXTERNAL_DT 1
-#define BASIS_DT 2
-#define LIST_DT 3
-#define ARRAY_DT 4
-#define CONSTRUCTED_DT 5
-#define IMPORT_DT 6
-#define SET_DT 7
+enum type_of_domain {
+  UNDEF_DT = 0,
+  EXTERNAL_DT = 1,
+  BASIS_DT = 2,
+  LIST_DT = 3,
+  ARRAY_DT = 4,
+  CONSTRUCTED_DT = 5,
+  IMPORT_DT = 6,
+  SET_DT = 7
+};
 
 /* Operators for CONSTRUCTED domains
  */
-#define UNDEF_OP 0
-#define AND_OP 1
-#define OR_OP 2
-#define ARROW_OP 3
+enum domain_operator {
+  UNDEF_OP = 0,
+  AND_OP = 1,
+  OR_OP = 2,
+  ARROW_OP = 3
+};
 
 /* The UNIT_TYPE_NAME is the used to type expressions which only perform 
    side-effects. It is mainly used to build sets. */
@@ -96,7 +100,7 @@ union domain {
     int (*allocated_memory)(void*);
   } ex ;
   struct { /* BASIC */
-    int type ;
+    enum type_of_domain type;
     char *constructor ;
     int persistant ;
     struct gen_binding *constructand ;
@@ -123,7 +127,7 @@ union domain {
   } ar ;
   struct { /* CONSTRUCTED */
     int type ;
-    int op ;
+    enum domain_operator op ;
     int first ;
     struct domainlist *components ;
   } co ;
@@ -187,12 +191,12 @@ extern int Read_spec_mode ;
 
 #define same_string_p(s1, s2) (strcmp((s1), (s2)) == 0)
 
-#define IS_UNIT_TYPE(n)		((n)==0)
-#define IS_BOOL_TYPE(n)		((n)==1)
-#define IS_CHAR_TYPE(n)		((n)==2)
-#define IS_INT_TYPE(n)		((n)==3)
-#define IS_FLOAT_TYPE(n)	((n)==4)
-#define IS_STRING_TYPE(n)	((n)==5)
+#define IS_UNIT_TYPE(n)		((n)==unit_domain)
+#define IS_BOOL_TYPE(n)		((n)==bool_domain)
+#define IS_CHAR_TYPE(n)		((n)==char_domain)
+#define IS_INT_TYPE(n)		((n)==int_domain)
+#define IS_FLOAT_TYPE(n)	((n)==float_domain)
+#define IS_STRING_TYPE(n)	((n)==string_domain)
 
 /*
  * MACROS added for code checking

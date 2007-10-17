@@ -177,7 +177,7 @@ static int array_own_allocated_memory(union domain *dp)
 /*VARARGS2*/
 static void gen_alloc_component(union domain * dp,
 				gen_chunk * cp,
-				va_list * ap,
+				va_list ap,
 				int gen_check_p)
 {
   message_assert("gen_check_p parameter value ok", 
@@ -185,34 +185,34 @@ static void gen_alloc_component(union domain * dp,
 
   switch( dp->ba.type ) {
   case ARRAY_DT :
-    if( (cp->p = va_arg( *ap, gen_chunk * )) == NULL )
+    if( (cp->p = va_arg( ap, gen_chunk * )) == NULL )
       cp->p =  init_array( dp ) ;
     break ;
   case LIST_DT:
-    cp->l = va_arg( *ap, cons * ) ; 
+    cp->l = va_arg( ap, cons * ) ; 
     break ;
   case SET_DT:
-    cp->t = va_arg( *ap, set ) ; 
+    cp->t = va_arg( ap, set ) ; 
     break ;
   case BASIS_DT:
     if( IS_INLINABLE( dp->ba.constructand )) {
       switch( *dp->ba.constructand->name ) {
-      case 'u': cp->u = va_arg( *ap, unit ) ; break ;
-      case 'b': cp->b = va_arg( *ap, bool ) ; break ;
-      case 'c': cp->c = va_arg( *ap, int ) ; break ;
-      case 'i': cp->i = va_arg( *ap, int ) ; break ;
-      case 'f': cp->f = va_arg( *ap, double ) ; break ;
-      case 's': cp->s = va_arg( *ap, string ) ; break ;
+      case 'u': cp->u = va_arg( ap, unit ) ; break ;
+      case 'b': cp->b = va_arg( ap, bool ) ; break ;
+      case 'c': cp->c = va_arg( ap, int ) ; break ;
+      case 'i': cp->i = va_arg( ap, int ) ; break ;
+      case 'f': cp->f = va_arg( ap, double ) ; break ;
+      case 's': cp->s = va_arg( ap, string ) ; break ;
       default:
 	fatal( "gen_alloc: unknown inlinable %s\n",
 	       dp->ba.constructand->name ) ;
       }
     }
     else if( IS_EXTERNAL( dp->ba.constructand )) {
-      cp->s = va_arg( *ap, char * ) ;
+      cp->s = va_arg( ap, char * ) ;
     }
     else {
-      cp->p = va_arg( *ap, gen_chunk * ) ;
+      cp->p = va_arg( ap, gen_chunk * ) ;
       
       if( gen_debug & GEN_DBG_CHECK || gen_check_p ) {
 	(void) gen_check( cp->p, dp->ba.constructand-Domains ) ;
@@ -247,7 +247,7 @@ static void gen_alloc_constructed(va_list ap,
     for( dlp=dp->co.components, cpp=cp+data ;
 	 dlp != NULL ; 
 	 dlp=dlp->cdr, cpp++ ) {
-      gen_alloc_component( dlp->domain, cpp, &ap, gen_check_p ) ;
+      gen_alloc_component( dlp->domain, cpp, ap, gen_check_p ) ;
     }
     break ;
   }
@@ -263,7 +263,7 @@ static void gen_alloc_constructed(va_list ap,
     if( dlp == NULL ) {
       user( "gen_alloc: unknown tag for type %s\n", bp->name ) ;
     }
-    gen_alloc_component( dlp->domain, cp+data+1, &ap, gen_check_p ) ;
+    gen_alloc_component( dlp->domain, cp+data+1, ap, gen_check_p ) ;
     break ;
   }
   case ARROW_OP: {
@@ -696,6 +696,8 @@ union domain *dp ;
 	return( !dp->se.persistant ) ;
     case ARRAY_DT:
 	return( !dp->ar.persistant ) ;
+    default:
+      break;
     }
     fatal( "shared_simple_in: unknown type %s\n", itoa( dp->ba.type )) ;
 
@@ -889,7 +891,9 @@ static void free_simple_out(gen_chunk *obj, union domain *dp)
     /* ??? where is the size of the array? */
     newgen_free( (char *) obj->p ) ;
     break ;
-  }
+  default:
+    break;
+ }
 }
 
 /* FREE_OBJ_OUT just frees the object OBJ. */
@@ -936,6 +940,8 @@ union domain *dp ;
 	return( !dp->se.persistant && obj->t && obj->t != set_undefined ) ;
     case ARRAY_DT:
 	return( !dp->ar.persistant && obj->p && obj->p != array_undefined ) ;
+    default:
+      break;
     }
     fatal( "persistant_simple_in: unknown type %s\n", itoa( dp->ba.type )) ;
 
@@ -1110,6 +1116,8 @@ copy_simple_in(
 	return(!persistence && obj->t!=set_undefined);
     case ARRAY_DT:
 	return(!persistence && obj->p!=array_undefined);
+    default:
+      break;
     }
     fatal("copy_simple_in: unknown type %s\n", itoa(dp->ba.type));
 
@@ -1262,6 +1270,8 @@ union domain *dp ;
 	copy_hput(copy_table, (char *)obj->p,
 		 (char *)gen_copy_array(obj->p, dp));
 	break ;
+    default:
+      break;
     }
 }
 
@@ -1537,6 +1547,8 @@ static int write_obj_in(gen_chunk *obj, struct driver *dr)
       putc('%', user_file) ;
     }
     break ;
+  default:
+    break;
   }
   return GO;
 }
@@ -1558,6 +1570,8 @@ static void write_obj_out(gen_chunk * obj,
 	  putc(')', user_file);
 	}
 	break ;
+    default:
+      break;
     }
     putc(')', user_file);
 }
@@ -1676,6 +1690,8 @@ union domain *dp ;
       }
       fputci('$', array_size(dp->ar.dimensions), user_file);
       break ;
+    default:
+      break;
     }
     return GO;
 }
@@ -1716,6 +1732,8 @@ write_simple_out(gen_chunk * obj, union domain * dp)
   case ARRAY_DT:
     putc(')', user_file);
     break ;
+  default:
+    break;
   }
 }
 
@@ -2475,6 +2493,8 @@ static int sharing_simple_in(gen_chunk * obj, union domain * dp)
     for( p=obj->l ; p!=NIL ; p=p->cdr ) {
       check_sharing( (char *)p, "CONS *" ) ;
     }
+  default:
+    break;
   }
   return( persistant_simple_in( obj, dp )) ;
 }
@@ -2641,6 +2661,8 @@ allocated_memory_simple_in(
 	else
 	    return FALSE;
     }
+    default:
+      break;
     }
 
     fatal("allocated_memory_simple_in: unknown type %s\n", itoa(dp->ba.type));
@@ -2863,7 +2885,7 @@ union domain *dp;
     case SET_DT:
 	if (gen_debug & GEN_DBG_RECURSE)
 	    fprintf(stderr,
-		    " - setting %s (%d) contains %s (%d)\n",
+		    " - setting %s (%d) contains %s (%td)\n",
 		    Domains[target].name, target,
 		    dp->se.element->name, dp->se.element-Domains);
 	DirectDomainsTable[dp->se.element-Domains][target] = TRUE;
@@ -3159,7 +3181,7 @@ gen_internal_context_multi_recurse(void * o, void * context, va_list pvar)
     
     /*    read the arguments
      */
-    while((domain=va_arg(pvar, int))!=(int)NULL)
+    while((domain=va_arg(pvar, int)) != 0)
     {
 	message_assert("domain specified more than once",
 		       !new_domain_table[domain]);
