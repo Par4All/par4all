@@ -169,7 +169,7 @@ function validate_file()
   elif [[ -r $full_name.tpips2 ]] ; then 
     verb 3 "$prefix.tpips2 method (with stderr... bad idea)"
     verb 4 "$tpips $full_name.tpips"
-    $tpips $full_name.tpips2 2>&1 ; status=*? 
+    $tpips $full_name.tpips2 2>&1 ; status=$?
 
   elif [[ -r $dir/default_test ]] ; then
     verb 3 'default_test method'
