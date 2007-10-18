@@ -171,57 +171,63 @@ static int array_own_allocated_memory(union domain *dp)
   return sizeof(gen_chunk)*array_size(dp->ar.dimensions);
 }
 
-/* GEN_ALLOC_COMPONENT updates the gen_chunk CP from the arg list AP according
-   to the domain DP. */
+/** gen_alloc_component updates the gen_chunk CP from the arg list AP
+    according to the domain DP.
 
-/*VARARGS2*/
+    It is now a macro to be able to update the va_list ap from
+    gen_alloc_constructed and respect the C norm. It should work both on x86
+    and x86_64...
+
 static void gen_alloc_component(union domain * dp,
 				gen_chunk * cp,
 				va_list ap,
 				int gen_check_p)
-{
-  message_assert("gen_check_p parameter value ok", 
-		 gen_check_p==0 || gen_check_p==1);
-
-  switch( dp->ba.type ) {
-  case ARRAY_DT :
-    if( (cp->p = va_arg( ap, gen_chunk * )) == NULL )
-      cp->p =  init_array( dp ) ;
-    break ;
-  case LIST_DT:
-    cp->l = va_arg( ap, cons * ) ; 
-    break ;
-  case SET_DT:
-    cp->t = va_arg( ap, set ) ; 
-    break ;
-  case BASIS_DT:
-    if( IS_INLINABLE( dp->ba.constructand )) {
-      switch( *dp->ba.constructand->name ) {
-      case 'u': cp->u = va_arg( ap, unit ) ; break ;
-      case 'b': cp->b = va_arg( ap, bool ) ; break ;
-      case 'c': cp->c = va_arg( ap, int ) ; break ;
-      case 'i': cp->i = va_arg( ap, int ) ; break ;
-      case 'f': cp->f = va_arg( ap, double ) ; break ;
-      case 's': cp->s = va_arg( ap, string ) ; break ;
-      default:
-	fatal( "gen_alloc: unknown inlinable %s\n",
-	       dp->ba.constructand->name ) ;
-      }
-    }
-    else if( IS_EXTERNAL( dp->ba.constructand )) {
-      cp->s = va_arg( ap, char * ) ;
-    }
-    else {
-      cp->p = va_arg( ap, gen_chunk * ) ;
-      
-      if( gen_debug & GEN_DBG_CHECK || gen_check_p ) {
-	(void) gen_check( cp->p, dp->ba.constructand-Domains ) ;
-      }
-    }
-    break ;
-  default:
-    fatal( "gen_alloc_component: unknown type %s\n", itoa( dp->ba.type )) ;
-  }
+*/
+#define gen_alloc_component(dp, cp, ap, gen_check_p)			\
+{									\
+  message_assert("gen_check_p parameter value ok",			\
+		 gen_check_p==0 || gen_check_p==1);			\
+									\
+  switch( dp->ba.type ) {						\
+  case ARRAY_DT :							\
+    if( ((cp)->p = va_arg( ap, gen_chunk * )) == NULL )			\
+      (cp)->p =  init_array( dp ) ;					\
+    break ;								\
+  case LIST_DT:								\
+    (cp)->l = va_arg( ap, cons * ) ;					\
+    break ;								\
+  case SET_DT:								\
+    (cp)->t = va_arg( ap, set ) ;					\
+    break ;								\
+  case BASIS_DT:							\
+    if( IS_INLINABLE( dp->ba.constructand )) {				\
+      switch( *dp->ba.constructand->name ) {				\
+      case 'u': (cp)->u = va_arg( ap, unit ) ; break ;			\
+      case 'b': (cp)->b = va_arg( ap, bool ) ; break ;			\
+      case 'c': (cp)->c = va_arg( ap, int ) ; break ;			\
+      case 'i': (cp)->i = va_arg( ap, int ) ; break ;			\
+      case 'f': (cp)->f = va_arg( ap, double ) ; break ;		\
+      case 's': (cp)->s = va_arg( ap, string ) ; break ;		\
+      default:								\
+	fatal( "gen_alloc: unknown inlinable %s\n",			\
+	       dp->ba.constructand->name ) ;				\
+      }									\
+    }									\
+    else if( IS_EXTERNAL( dp->ba.constructand )) {			\
+      (cp)->s = va_arg( ap, char * ) ;					\
+    }									\
+    else {								\
+      (cp)->p = va_arg( ap, gen_chunk * ) ;				\
+									\
+      if( gen_debug & GEN_DBG_CHECK || gen_check_p ) {			\
+	(void) gen_check( (cp)->p, dp->ba.constructand-Domains ) ;	\
+      }									\
+    }									\
+    break ;								\
+  default:								\
+    fatal("gen_alloc_component: unknown type %s\n",			\
+	  itoa(dp->ba.type)) ;						\
+  }									\
 }
 
 /* GEN_ALLOC allocates SIZE bytes to implement an object whose TYPE is

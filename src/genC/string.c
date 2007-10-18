@@ -113,8 +113,12 @@ void init_the_buffer(void)
     buffer[0] = '\0';
 }
 
-string append_to_the_buffer(string s) /* what to append to the buffer */
+string append_to_the_buffer(string s /* what to append to the buffer */)
 {
+  /* If the string is undefined, just skip it. Well, I hope it will not
+     hide some bugs by masking some deliberate string_undefined put to
+     trigger a wrong assertion is some higher parts of the code... */
+  if (s != string_undefined) {
     size_t len = strlen(s);
 
     /* reallocates if needed
@@ -130,8 +134,9 @@ string append_to_the_buffer(string s) /* what to append to the buffer */
     (void) memcpy(&buffer[current], s, len);
     current += len;
     buffer[current] = '\0' ;
+  }
 
-    return buffer;
+  return buffer;
 }
 
 string get_the_buffer(void)
