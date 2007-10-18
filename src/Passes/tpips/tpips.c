@@ -504,13 +504,18 @@ static void tpips_user_log(char *fmt, va_list args)
 
     /* It goes to stderr to have only displayed files on stdout.
      */
+
+    /* To be C99 compliant, a va_list can be used only once...  Also to avoid exploding on x86_64: */
+    va_list args_copy;
+    va_copy (args_copy, args);
+    
     vfprintf(stderr, fmt, args); 
     fflush(stderr);
 
     if (!log_file || !get_bool_property("USER_LOG_P"))
 	return;
 
-    if (vfprintf(log_file, fmt, args) <= 0) {
+    if (vfprintf(log_file, fmt, args_copy) <= 0) {
 	perror("tpips_user_log");
 	abort();
     }
