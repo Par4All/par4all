@@ -151,20 +151,25 @@ function validate_file()
 
   # rel_file='directory/file.f'
   local rel_file=${file/$updir\//}
-  local status
+  # Just in case pips command are not found and all the following tests
+  # fail, initialize the status:
+  local status=-1
 
   if [[ -r $full_name.test ]] ; then
     verb 3 "$prefix.test method"
+    verb 4 "$full_name.tes"
     # ??? what about using default_test substitution?!
-    $full_name.test 2> $out.err || status=$?
+    $full_name.test 2> $out.err ; status=$?
 
   elif [[ -r $full_name.tpips ]] ; then 
     verb 3 "$prefix.tpips method"
-    $tpips $full_name.tpips 2> $out.err || status=$?
+    verb 4 "$tpips $full_name.tpips"
+    $tpips $full_name.tpips 2> $out.err ; status=$?
 
   elif [[ -r $full_name.tpips2 ]] ; then 
     verb 3 "$prefix.tpips2 method (with stderr... bad idea)"
-    $tpips $full_name.tpips2 2>&1 || status=*? 
+    verb 4 "$tpips $full_name.tpips"
+    $tpips $full_name.tpips2 2>&1 ; status=*? 
 
   elif [[ -r $dir/default_test ]] ; then
     verb 3 'default_test method'
@@ -178,20 +183,23 @@ function validate_file()
     
   elif [[ -r $dir/default_tpips ]] ; then
     verb 3 'default_tpips method'
+    verb 4 "FILE=$file WSPACE=$name ${tpips} $dir/default_tpips"
     FILE=$file WSPACE=$name \
-	${tpips} $dir/default_tpips 2> $out.err || status=$?
+	${tpips} $dir/default_tpips 2> $out.err ; status=$?
     
   else
     verb 3 'default method: Init/Display/Delete'
     {
       Delete $name 2> /dev/null 1>&2 # ignore delete failure... 
-      Init -f $file -d $name || status=$?
+      Init -f $file -d $name ; status=$?
       while read module ; do
-	Display -m $module -w $name || status=$?
+	Display -m $module -w $name ; status=$?
       done < $name.database/modules
       Delete $name 2> /dev/null 1>&2 # ignore delete failure... 
     } 2> $out.err
   fi > $out.tmp 
+
+  verb 4 "Status = $status"
 
   # filter out validation directory path for all output...
   # the if/fi output above cannot be piped directly because
