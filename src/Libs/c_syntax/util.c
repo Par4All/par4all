@@ -81,11 +81,11 @@ void init_c_areas()
   entity_initial(StaticArea) = make_value_unknown();
   AddEntityToDeclarations(StaticArea, get_current_module_entity());
 
-  /*HeapArea = FindOrCreateEntity(compilation_unit_name, HEAP_AREA_LOCAL_NAME);
-    entity_type(HeapArea) = make_type(is_type_area, make_area(0, NIL));
-    entity_storage(HeapArea) = MakeStorageRom();
-    entity_initial(HeapArea) = MakeValueUnknown();
-    AddEntityToDeclarations(HeapArea, get_current_module_entity());*/
+  HeapArea = FindOrCreateEntity(compilation_unit_name, HEAP_AREA_LOCAL_NAME);
+  entity_type(HeapArea) = make_type(is_type_area, make_area(0, NIL));
+  entity_storage(HeapArea) = MakeStorageRom();
+  entity_initial(HeapArea) = MakeValueUnknown();
+  AddEntityToDeclarations(HeapArea, get_current_module_entity());
 
   // Dynamic variables whose size are not known are stored in Stack area 
   StackArea = FindOrCreateEntity(get_current_module_name(), STACK_AREA_LOCAL_NAME);
