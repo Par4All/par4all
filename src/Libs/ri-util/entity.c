@@ -262,9 +262,17 @@ entity_minimal_name(entity e)
 
     pips_assert("some current entity", !entity_undefined_p(m));
 
-    return (strcmp(module_local_name(m), entity_module_name(e)) == 0) ? 
-	    entity_local_name(e) : entity_name(e) ;
+    string local_name = module_local_name(m);
+    if (strcmp(module_local_name(m), entity_module_name(e)) == 0) {
+      free(local_name);
+      return entity_local_name(e);
+    }
+    else {
+      free(local_name);
+      return entity_name(e);
+    }
 }
+
 
 string 
 entity_and_common_name(entity e)
@@ -942,8 +950,10 @@ list /* of entity */ string_to_entity_list(string module, string names)
    are taken into account. 
    Function strstr locates the occurence of the last special character 
    which can appear just before the initial name, so the order of test is
-   important.*/
+   important.
 
+   @return the user name in a new string (allocated with strdup!)
+*/
 string entity_user_name(entity e)
 {
   string global_name = entity_name(e);
