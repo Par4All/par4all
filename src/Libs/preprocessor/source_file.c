@@ -75,7 +75,7 @@ string hpfc_generate_path_name_of_file_name(string file_name)
 {
     string dir_name = db_get_current_workspace_directory(),
 	name = strdup(concatenate(
-	    dir_name, "/", HPFC_COMPILED_FILE_DIR, "/", file_name, 0));
+	    dir_name, "/", HPFC_COMPILED_FILE_DIR, "/", file_name, NULL));
     free(dir_name);
     return name;
 }
@@ -146,7 +146,7 @@ string pips_srcpath_append(string pathtoadd)
   old_path = getenv(SRCPATH);
   if (old_path) old_path = strdup(old_path); /* duplicate? */
   new_path = concatenate(old_path? old_path: "", old_path? ":": "", 
-			 pathtoadd, 0);
+			 pathtoadd, NULL);
   pips_srcpath_set(new_path);
   return old_path;
 }
@@ -221,7 +221,7 @@ static string find_file(string name)
     string srcpath = getenv(SRCPATH), result;
     string path = strdup(concatenate(
 	srcpath? srcpath: "", ":", 
-	user_file_directory? user_file_directory: "", ":.:..", 0));
+	user_file_directory? user_file_directory: "", ":.:..", NULL));
     result = find_file_in_directories(name, path);
     free(path);
     return result;
@@ -456,8 +456,8 @@ bool filter_file(string mod_name)
 	(DBR_SOURCE_FILE, mod_name, FORTRAN_FILE_SUFFIX);
     
     dir_name = db_get_current_workspace_directory();
-    abs_name = strdup(concatenate(dir_name, "/", name, 0));
-    abs_new_name = strdup(concatenate(dir_name, "/", new_name, 0));
+    abs_name = strdup(concatenate(dir_name, "/", name, NULL));
+    abs_new_name = strdup(concatenate(dir_name, "/", new_name, NULL));
     free(dir_name);
     
     if (!pips_process_file(abs_name, abs_new_name)) 
@@ -647,8 +647,8 @@ static string process_thru_C_pp(string name)
     new_include_options = include_options+strlen(include_options);
     dir_name = db_get_directory_name_for_module(WORKSPACE_TMP_SPACE);
     simpler = pips_basename(name, ".c");
-    new_name = strdup(concatenate(dir_name, "/", simpler, PP_C_ED, 0));
-    cpp_err  = strdup(concatenate(new_name, PP_ERR, 0));
+    new_name = strdup(concatenate(dir_name, "/", simpler, PP_C_ED, NULL));
+    cpp_err  = strdup(concatenate(new_name, PP_ERR, NULL));
     free(dir_name);
     free(simpler);
 
@@ -686,17 +686,17 @@ static string process_thru_C_pp(string name)
       (concatenate(cpp? cpp: CPP_CPP,
 		   CPP_CPPFLAGS, cpp_options? cpp_options: "", 
 		   old_include_options,
-		   name, " > ", new_name, " 2> ", cpp_err, 0));
+		   name, " > ", new_name, " 2> ", cpp_err, NULL));
 
     if(status) {
-      (void) safe_system_no_abort(concatenate("cat ", cpp_err, 0));
+      (void) safe_system_no_abort(concatenate("cat ", cpp_err, NULL));
 
       /* check "test" could be performed before "cat" but not after, and
 	 the error file may be useful for the user. Why should we remove
 	 it so soon?
 
 			    " && test ! -s ", cpp_err, 
-			    " && rm -f ", cpp_err, 0)); */
+			    " && rm -f ", cpp_err, NULL)); */
       free(new_name);
       new_name = NULL;
     }
@@ -711,8 +711,8 @@ static string process_thru_fortran_pp(string name)
 
     dir_name = db_get_directory_name_for_module(WORKSPACE_TMP_SPACE);
     simpler = pips_basename(name, ".F");
-    new_name = strdup(concatenate(dir_name, "/", simpler, PP_FORTRAN_ED, 0));
-    fpp_err  = strdup(concatenate(new_name, PP_ERR, 0));
+    new_name = strdup(concatenate(dir_name, "/", simpler, PP_FORTRAN_ED, NULL));
+    fpp_err  = strdup(concatenate(new_name, PP_ERR, NULL));
     free(dir_name);
     free(simpler);
 
@@ -739,13 +739,13 @@ static string process_thru_fortran_pp(string name)
 				 name, " > ", new_name, " 2> ", fpp_err, 
 				 " && cat ", fpp_err, 
          			 " && test ! -s ", fpp_err, 
-			         " && rm -f ", fpp_err, 0));
+			         " && rm -f ", fpp_err, NULL));
 
     /* fpp was wrong... */
     if (status)
     {
       /* show errors */
-      (void) safe_system_no_abort(concatenate("cat ", fpp_err, 0));
+      (void) safe_system_no_abort(concatenate("cat ", fpp_err, NULL));
       free(new_name);
       new_name = NULL;
     }
@@ -888,7 +888,7 @@ bool process_user_file(string file)
   file_list = 
     strdup(concatenate(dir_name,
 		       dot_c_file_p(nfile)? 
-		         "/.csplit_file_list" : "/.fsplit_file_list", 0));
+		         "/.csplit_file_list" : "/.fsplit_file_list", NULL));
   unlink(file_list);
 
   user_log("Splitting file    %s\n", nfile);
@@ -938,7 +938,7 @@ bool process_user_file(string file)
 		(DBR_INITIAL_FILE, mod_name, ".f_initial");
 	    }
 	    
-	    abs_res = strdup(concatenate(dir_name, "/", res_name, 0));
+	    abs_res = strdup(concatenate(dir_name, "/", res_name, NULL));
 		
 	    if((rf = fopen(abs_res, "r"))!=NULL) { /* Resource name
                                                       conflict */
