@@ -591,7 +591,7 @@ local_name_to_top_level_entity(string n)
       {
 	for(i=0; i<4 && entity_undefined_p(module); i++)
 	  module = gen_find_tabulated(concatenate
-				      (TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, prefixes[i], n, 0),
+				      (TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, prefixes[i], n, NULL),
 				      entity_domain);
       }
     
@@ -602,7 +602,7 @@ entity
 global_name_to_entity(string m, string n)
 {
 
-    return gen_find_tabulated(concatenate(m, MODULE_SEP_STRING, n, 0),
+    return gen_find_tabulated(concatenate(m, MODULE_SEP_STRING, n, NULL),
 			      entity_domain);
 }
 
@@ -663,7 +663,7 @@ FindOrCreateEntity(
 {
     entity e = entity_undefined;
 
-    e = find_or_create_entity(concatenate(package, MODULE_SEP_STRING, name, 0));
+    e = find_or_create_entity(concatenate(package, MODULE_SEP_STRING, name, NULL));
 
     return e;
 }

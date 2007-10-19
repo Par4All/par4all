@@ -43,7 +43,7 @@ get_new_user_file(string dir_name, string preprocessed_user_file)
 	       " and for preprocessed_user_file \"%s\".\n"
 	       "in table %p\n",
 	       s, user_file, preprocessed_user_file, user_files);
-    s = strdup(concatenate(dir_name, "/", name, 0));
+    s = strdup(concatenate(dir_name, "/", name, NULL));
     hash_put(user_files, user_file, s);
     /* could check that the file does not exist...
      * there could be homonymes...
@@ -103,7 +103,7 @@ unsplit(string name)
     user_files = hash_table_make(hash_string, 2*n);
 
     dir_name = db_get_current_workspace_directory();
-    summary_full_name = strdup(concatenate(dir_name, "/", summary_name, 0));
+    summary_full_name = strdup(concatenate(dir_name, "/", summary_name, NULL));
 
     /* Get rid of previous unsplitted files */
 
@@ -130,7 +130,7 @@ unsplit(string name)
 	pips_debug(1, "Module: \"%s\", user_file: \"%s\"\n", module, user_file);
 	new_user_file = get_new_user_file(src_dir, user_file);
 	printed_file = db_get_memory_resource(DBR_PRINTED_FILE, module, TRUE);
-	full = strdup(concatenate(dir_name, "/", printed_file, 0));
+	full = strdup(concatenate(dir_name, "/", printed_file, NULL));
 
 	out = safe_fopen(new_user_file, "a");
 	in = safe_fopen(full, "r");

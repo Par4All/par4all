@@ -46,7 +46,7 @@ stub_var_decl(parameter p, int n)
 	string comment = strdup(concatenate(
         "!     Unable to determine the type of parameter number ", name, "\n", 
 	"!     ", basic_to_string(variable_basic(type_variable(t))),
-	" ", name, "\n", 0));
+	" ", name, "\n", NULL));
 	free(name);
 	result = make_sentence(is_sentence_formatted, comment);
     }
@@ -159,14 +159,14 @@ missing_file_initializer(string module_name)
     
     /* pips' current directory is just above the workspace
      */
-    file_name = strdup(concatenate(module_name, ".f", 0));
+    file_name = strdup(concatenate(module_name, ".f", NULL));
     file_name = strlower(file_name, file_name);
     dir_name = db_get_current_workspace_directory();
-    src_name = strdup(concatenate(WORKSPACE_TMP_SPACE, "/", file_name, 0));
-    full_name = strdup(concatenate(dir_name, "/", src_name, 0));
+    src_name = strdup(concatenate(WORKSPACE_TMP_SPACE, "/", file_name, NULL));
+    full_name = strdup(concatenate(dir_name, "/", src_name, NULL));
     init_name = 
       db_build_file_resource_name(DBR_INITIAL_FILE, module_name, ".f_initial");
-    finit_name = strdup(concatenate(dir_name, "/", init_name, 0));
+    finit_name = strdup(concatenate(dir_name, "/", init_name, NULL));
 
     /* builds the stub.
      */

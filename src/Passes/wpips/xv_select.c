@@ -125,7 +125,7 @@ direct_change_directory()
     if (wpips_change_directory_inactive)
 	return; /* no cd in this state! */
 
-    safe_system(concatenate("wpips-changedir -- ", get_cwd(), " > ", tmp, 0));
+    safe_system(concatenate("wpips-changedir -- ", get_cwd(), " > ", tmp, NULL));
 
     tmph = safe_fopen(tmp, "r");
     while ((c=getc(tmph))!=EOF && i<MAXPATHLEN)

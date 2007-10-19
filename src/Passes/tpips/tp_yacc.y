@@ -88,7 +88,7 @@ static void set_env_log_and_free(string var, string val)
 {
     string ival = getenv(var);
     if (!ival || !same_string_p(val, ival))
-	putenv(strdup(concatenate(var, "=", val, 0)));
+	putenv(strdup(concatenate(var, "=", val, NULL)));
     user_log("setenv %s \"%s\"\n", var, val);
     free(var); free(val);
 }
@@ -168,7 +168,7 @@ static bool display_a_resource(string rname, string mname)
     }
     else if (pager)
     {
-	safe_system(concatenate(pager, " ", fname, 0));
+	safe_system(concatenate(pager, " ", fname, NULL));
     }
     else
     {

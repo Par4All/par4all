@@ -400,7 +400,7 @@ extern string db_get_meta_data_directory(void); /* in pipsdbm */
 static string get_property_file_name(void)
 {
     string dir_name = db_get_meta_data_directory(),
-	name = strdup(concatenate(dir_name, "/properties", 0));
+	name = strdup(concatenate(dir_name, "/properties", NULL));
     free(dir_name); return name;
 }
 

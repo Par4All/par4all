@@ -114,7 +114,7 @@ static char unk[2]; /* one char lines are not implicit shells */
 
 <KEY,INITIAL>[ \t\r]+	/* skip blanks... */
 
-<UNK>[^\n]*		{ yylval.name = strdup(concatenate(unk, yytext, 0));
+<UNK>[^\n]*		{ yylval.name = strdup(concatenate(unk, yytext, NULL));
 			  KEYWORD(TK_UNKNOWN); }
 
 <LIT>[^\n]* 		{ yylval.name = strdup(yytext); RETURN(TK_LINE); }

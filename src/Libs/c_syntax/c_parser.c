@@ -163,7 +163,9 @@ void CParserError(char *msg)
 static bool actual_c_parser(string module_name, string dbr_file, bool is_compilation_unit_parser)
 {
     string dir = db_get_current_workspace_directory();
-    string file_name = strdup(concatenate(dir,"/",db_get_file_resource(dbr_file,module_name,TRUE),0));
+    string file_name = 
+      strdup(concatenate(dir, "/", 
+		     db_get_file_resource(dbr_file,module_name,TRUE), NULL));
     entity built_in_ent = entity_undefined;
 
     free(dir);

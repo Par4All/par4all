@@ -119,7 +119,7 @@ callgraph_module_name(
     {
 	string n = entity_local_name(e);
 	string f = db_get_memory_resource(DBR_CALLGRAPH_FILE, n, TRUE);
-	string full = strdup(concatenate(dir, "/", f, 0));
+	string full = strdup(concatenate(dir, "/", f, NULL));
 
 	safe_append(fp, full, CALLGRAPH_INDENT, TRUE);
 
@@ -141,7 +141,7 @@ module_to_callgraph(
     name = module_local_name(module);
     local = db_build_file_resource_name(DBR_CALLGRAPH_FILE, name, ".cg");
     dir = db_get_current_workspace_directory();
-    full = strdup(concatenate(dir, "/", local, 0));
+    full = strdup(concatenate(dir, "/", local, NULL));
     free(dir);
 
     fp = safe_fopen(full, "w");

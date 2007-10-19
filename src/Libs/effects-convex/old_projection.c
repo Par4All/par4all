@@ -82,7 +82,7 @@ void print_proj_op_statistics(char *mod_name, char *prefix)
 
     filename = "proj_param_op_stat";
     filename = strdup(concatenate(db_get_current_workspace_directory(), "/", 
-				  mod_name, ".", prefix, filename, 0));
+				  mod_name, ".", prefix, filename, NULL));
     fp = safe_fopen(filename, "w");
     fprintf(fp,"%s",mod_name);
     fprintf(fp," %d %d %d %d %d %d\n", nb_proj_param, nb_proj_param_pot_must, 
@@ -93,7 +93,7 @@ void print_proj_op_statistics(char *mod_name, char *prefix)
 
     filename = "proj_var_op_stat";
     filename = strdup(concatenate(db_get_current_workspace_directory(), "/", 
-				  mod_name, ".", prefix, filename, 0));
+				  mod_name, ".", prefix, filename, NULL));
     fp = safe_fopen(filename, "w");
     fprintf(fp,"%s",mod_name);
     fprintf(fp," %d %d %d %d \n", nb_proj_var, nb_proj_var_pot_must, 

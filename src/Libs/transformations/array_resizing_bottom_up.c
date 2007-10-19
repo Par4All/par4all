@@ -489,12 +489,12 @@ bool array_resizing_bottom_up(char* mod_name)
   transformer mod_pre;
   Psysteme pre;
   string dir_name = db_get_current_workspace_directory();
-  string instrument_file_name = strdup(concatenate(dir_name, "/BU_instrument.out", 0));
+  string instrument_file_name = strdup(concatenate(dir_name, "/BU_instrument.out", NULL));
   string user_file = db_get_memory_resource(DBR_USER_FILE,mod_name,TRUE);
   string base_name = pips_basename(user_file, NULL);
   instrument_file = safe_fopen(instrument_file_name, "a");  
   file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), 
-				 "/",base_name,0));
+				 "/",base_name,NULL));
   current_mod = mod_name;  
   set_precondition_map((statement_mapping)
 		       db_get_memory_resource(DBR_PRECONDITIONS,mod_name,TRUE));

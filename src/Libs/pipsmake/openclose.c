@@ -41,7 +41,7 @@ extern void save_makefile(void);
 string build_pgm_makefile(string n)
 {
     string dir_name = db_get_meta_data_directory(),
-	res = strdup(concatenate(dir_name, PIPSMAKE_FILE, 0));
+	res = strdup(concatenate(dir_name, PIPSMAKE_FILE, NULL));
     free(dir_name); return res;
 }
 

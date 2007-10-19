@@ -1219,7 +1219,7 @@ generate_hpf_remapping_file(renaming r)
     /* put it in a file
      */
     dir = db_get_directory_name_for_module(WORKSPACE_SRC_SPACE);
-    file_name = strdup(concatenate(dir, "/", remapping_file_name(r), 0));
+    file_name = strdup(concatenate(dir, "/", remapping_file_name(r), NULL));
     free(dir);
 
     f = hpfc_fopen(file_name);

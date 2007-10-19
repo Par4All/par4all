@@ -70,8 +70,10 @@ text_region_no_action(effect reg)
     if(effect_undefined_p(reg))
     {
 	user_log("[text_region] unexpected effect undefined\n");
-	return make_text(CONS(SENTENCE, make_sentence(is_sentence_formatted,
-	   strdup(concatenate(str_prefix, "<REGION_UNDEFINED>\n", 0))), NIL));
+	return 
+	  make_text(CONS(SENTENCE, make_sentence(is_sentence_formatted,
+	    strdup(concatenate(str_prefix, "<REGION_UNDEFINED>\n", NULL))), 
+			 NIL));
     }
     /* else the effect is defined...
      */

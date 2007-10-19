@@ -333,7 +333,7 @@ static char *
 relative_name_if_necessary(const char * name)
 {
     if (name[0]=='/' || name[0]=='.') return strdup(name);
-    else return strdup(concatenate("./", name, 0));
+    else return strdup(concatenate("./", name, NULL));
 }
 
 /* returns an allocated string pointing to the file, possibly 
@@ -357,7 +357,8 @@ find_file_in_directories(const char *file_name, const char *dir_path)
      */
     while ((path=nth_path(dir_path, n++))) 
     {
-	char *name = strdup(concatenate(path, "/", file_name, 0)), *res=NULL;
+	char *name = strdup(concatenate(path, "/", file_name, NULL)), 
+	  *res=NULL;
 	free(path);
 	if (file_exists_p(name)) 
 	    res = relative_name_if_necessary(name);
@@ -631,7 +632,7 @@ safe_system_output(char * what)
 char *
 safe_system_substitute(char * what)
 {
-    return safe_system_output(concatenate("echo ", what, 0));
+    return safe_system_output(concatenate("echo ", what, NULL));
 }
 
 /* SunOS forgets to declare this one.

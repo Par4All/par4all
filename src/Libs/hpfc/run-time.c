@@ -471,7 +471,7 @@ bound_parameter_name(
 {
     return strdup(concatenate(hpfc_main_entity_name(array), " ",
 			      entity_local_name(array), " ",
-			      side, i2a(dim), 0));
+			      side, i2a(dim), NULL));
 }
 
 entity 

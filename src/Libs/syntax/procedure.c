@@ -1242,7 +1242,7 @@ MakeCurrentFunction(
      */
     if (gen_find_tabulated(concatenate
 	   (TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING,
-	    COMMON_PREFIX, cfn, 0), 
+	    COMMON_PREFIX, cfn, NULL), 
 			   entity_domain) != entity_undefined)
     {
 	pips_user_warning("global name %s used for a module and for a common\n",
@@ -2072,12 +2072,12 @@ NameToFunctionalEntity(string name)
 {
     entity f = gen_find_tabulated
 	(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING,
-		     BLOCKDATA_PREFIX, name, 0),
+		     BLOCKDATA_PREFIX, name, NULL),
 	 entity_domain);
 
     if(entity_undefined_p(f)) {
 	f = gen_find_tabulated
-	    (concatenate(CurrentPackage, MODULE_SEP_STRING, name, 0),
+	    (concatenate(CurrentPackage, MODULE_SEP_STRING, name, NULL),
 	     entity_domain);
 
 	/* Ignore ghost variables, they are *not* in the current scope */

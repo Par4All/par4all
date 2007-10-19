@@ -1136,7 +1136,7 @@ string get_first_main_module(void)
     debug_on("PIPSMAKE_DEBUG_LEVEL");
 
     /* Let's look for a Fortran main */
-    main_name = strdup(concatenate(dir_name, "/.fsplit_main_list", 0));
+    main_name = strdup(concatenate(dir_name, "/.fsplit_main_list", NULL));
 
     if (file_exists_p(main_name)) 
     {
@@ -1148,7 +1148,7 @@ string get_first_main_module(void)
 
     if(string_undefined_p(name)) {
       /* Let's now look for a C main */
-      main_name = strdup(concatenate(dir_name, "/main/main.c", 0));
+      main_name = strdup(concatenate(dir_name, "/main/main.c", NULL));
       if (file_exists_p(main_name)) 
 	name = strdup("main");
       free(main_name);

@@ -513,7 +513,7 @@ sentence_area(entity e, entity module, bool pp_dimensions)
 	    return make_sentence(is_sentence_formatted,
 	       strdup(concatenate("!! empty common ", entity_local_name(e),
 				  " in module ", entity_local_name(module),
-				  "\n", 0)));
+				  "\n", NULL)));
 	}
     }
 
@@ -610,7 +610,7 @@ include(string file)
     return make_text
 	(CONS(SENTENCE, 
 	      make_sentence(is_sentence_formatted,
-		  strdup(concatenate("      include '", file, "'\n", 0))),
+		  strdup(concatenate("      include '", file, "'\n", NULL))),
 	      NIL));
 }
 
@@ -626,8 +626,8 @@ text_area_included(
     name = module_local_name(common);
     if (same_string_p(name, BLANK_COMMON_LOCAL_NAME))
 	name = "blank";
-    local = strdup(concatenate(name, ".h", 0));
-    file = strdup(concatenate(dir, "/", local, 0));
+    local = strdup(concatenate(name, ".h", NULL));
+    file = strdup(concatenate(dir, "/", local, NULL));
     free(dir);
 
     if (file_exists_p(file))
@@ -638,7 +638,7 @@ text_area_included(
     else 
     {
 	string nofile = 
-	    strdup(concatenate(file, ".sorry_common_not_homogeneous", 0));
+	    strdup(concatenate(file, ".sorry_common_not_homogeneous", NULL));
 	t = text_common_declaration(common, module);
 	if (!file_exists_p(nofile))
 	{

@@ -1022,10 +1022,10 @@ bool used_before_set(char *module_name)
   string base_name = pips_basename(user_file, NULL);
   /* File instrument.out is used to store ubs checks*/
   string dir_name = db_get_current_workspace_directory();
-  string instrument_file = strdup(concatenate(dir_name, "/instrument.out", 0));
+  string instrument_file = strdup(concatenate(dir_name, "/instrument.out", NULL));
   out = safe_fopen(instrument_file, "a");  
   file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), 
-				 "/",base_name,0));
+				 "/",base_name,NULL));
   number_of_processed_modules ++;
   if (!same_string_p(rule_phase(find_rule_by_resource("REGIONS")),"MUST_REGIONS"))
     pips_user_warning("\nMUST REGIONS not selected - " "Do not expect wonderful results\n");
@@ -1057,7 +1057,7 @@ bool used_before_set(char *module_name)
     {
       /* File xxx.database/Src/initialization.f contains all the initializations of 
 	 global variables */
-      initialization_file = strdup(concatenate(dir_name, "/Src/initialization.f", 0));
+      initialization_file = strdup(concatenate(dir_name, "/Src/initialization.f", NULL));
       out2 = safe_fopen(initialization_file, "a");  
       MAP(REGION,reg,
       {

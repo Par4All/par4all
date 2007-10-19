@@ -63,7 +63,7 @@ string db_get_current_workspace_name(void)
 /* returns an allocated string. */
 string db_get_workspace_directory_name(string name)
 {
-    return strdup(concatenate("./", name, ".database", 0)); 
+    return strdup(concatenate("./", name, ".database", NULL)); 
 }
 
 string db_get_current_workspace_directory(void)
@@ -116,7 +116,7 @@ string db_get_meta_data_directory()
 static string meta_data_db_file_name(string data)
 {
     string dir_name = db_get_meta_data_directory(),
-	res = strdup(concatenate(dir_name, "/" MD_DATABASE ".", data, 0));
+	res = strdup(concatenate(dir_name, "/" MD_DATABASE ".", data, NULL));
     free(dir_name); return res;
 }
 

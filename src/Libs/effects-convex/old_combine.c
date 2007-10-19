@@ -97,7 +97,7 @@ void print_umust_statistics(char *mod_name, char *prefix)
 
     filename = "umust_op_stat";
     filename = strdup(concatenate(db_get_current_workspace_directory(), "/", 
-				  mod_name, ".", prefix, filename, 0));
+				  mod_name, ".", prefix, filename, NULL));
 
     fp = safe_fopen(filename, "w");
     fprintf(fp,"%s",mod_name);
@@ -118,7 +118,7 @@ void print_umay_statistics(char *mod_name, char *prefix)
 
     filename = "umay_op_stat";
     filename = strdup(concatenate(db_get_current_workspace_directory(), "/", 
-				  mod_name, ".", prefix, filename, 0));
+				  mod_name, ".", prefix, filename, NULL));
 
     fp = safe_fopen(filename, "w");
     fprintf(fp,"%s",mod_name);
@@ -137,7 +137,7 @@ void print_dsup_statistics(char *mod_name, char *prefix)
 
     filename = "dsup_op_stat";
     filename = strdup(concatenate(db_get_current_workspace_directory(), "/", 
-				  mod_name, ".", prefix, filename, 0));
+				  mod_name, ".", prefix, filename, NULL));
 
     fp = safe_fopen(filename, "w");
     fprintf(fp,"%s",mod_name);
@@ -156,7 +156,7 @@ void print_dinf_statistics(char *mod_name, char *prefix)
 
     filename = "dinf_op_stat";
     filename = strdup(concatenate(db_get_current_workspace_directory(), "/", 
-				  mod_name, ".", prefix, filename, 0));
+				  mod_name, ".", prefix, filename, NULL));
 
     fp = safe_fopen(filename, "w");
     fprintf(fp,"%s",mod_name);

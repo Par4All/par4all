@@ -408,7 +408,7 @@ static void insert_test_before_statement(expression flags, expression condition,
   string mod_name = module_local_name(current_mod);
   string user_file = db_get_memory_resource(DBR_USER_FILE,mod_name,TRUE);
   string base_name = pips_basename(user_file, NULL);
-  string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,0));
+  string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,NULL));
   if (true_expression_p(condition))
     cond = copy_expression(flags);
   else
@@ -447,7 +447,7 @@ static void insert_flag_before_call_site(list flags,list path)
       string call_name = module_local_name(caller);
       string user_file = db_get_memory_resource(DBR_USER_FILE,call_name,TRUE);
       string base_name = pips_basename(user_file, NULL);
-      string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,0));
+      string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,NULL));
       fprintf(out,"%s\t%s\t%s\t(%d,%d)\n",PREFIX1,file_name,module_local_name(caller),
 	      ORDERING_NUMBER(order),ORDERING_STATEMENT(order));
       print_text(out,text_statement(entity_undefined,0,s_flag));
@@ -470,7 +470,7 @@ static void insert_test_before_caller(expression condition, expression e_flag)
   statement s_flag = make_assign_statement(e_flag,make_true_expression());
   string user_file = db_get_memory_resource(DBR_USER_FILE,caller_name,TRUE);
   string base_name = pips_basename(user_file, NULL);
-  string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,0));
+  string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,NULL));
   if (true_expression_p(condition))
     {
       fprintf(out,"%s\t%s\t%s\t(%d,%d)\n",PREFIX1,file_name,module_local_name(current_caller),
@@ -584,7 +584,7 @@ static void insert_check_alias_before_statement(entity e1, expression subval,
   string mod_name = module_local_name(current_mod);
   string user_file = db_get_memory_resource(DBR_USER_FILE,mod_name,TRUE);
   string base_name = pips_basename(user_file, NULL);
-  string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,0));
+  string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,NULL));
   l = CONS(EXPRESSION,entity_to_expression(e2),l);
   l = CONS(EXPRESSION,subval,l);
   l = CONS(EXPRESSION,entity_to_expression(e1),l);
@@ -2005,7 +2005,7 @@ bool alias_check(char * module_name)
 {
   /* File instrument.out is used to store alias checks and flags*/
   string dir_name = db_get_current_workspace_directory();
-  string instrument_file = strdup(concatenate(dir_name, "/instrument.out", 0));
+  string instrument_file = strdup(concatenate(dir_name, "/instrument.out", NULL));
   free(dir_name), dir_name = NULL;
   out = safe_fopen(instrument_file, "a");  
   number_of_processed_modules++;

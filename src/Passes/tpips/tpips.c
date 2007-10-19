@@ -600,7 +600,7 @@ static string default_hist_file_name(void)
     /* else builds the default name. 
      */
     home = getenv("HOME");
-    return strdup(concatenate(home? home: "", "/", TPIPS_HISTORY, 0));
+    return strdup(concatenate(home? home: "", "/", TPIPS_HISTORY, NULL));
 }
 
 static void initialize_tpips_history(void)
@@ -997,7 +997,7 @@ void tpips_process_a_file(FILE * file, bool use_rl)
  */
 static string default_tpipsrc(void)
 {
-    return strdup(concatenate(getenv("HOME"), "/.tpipsrc", 0));
+    return strdup(concatenate(getenv("HOME"), "/.tpipsrc", NULL));
 }
 
 extern char *optarg;

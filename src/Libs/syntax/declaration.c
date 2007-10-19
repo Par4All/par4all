@@ -1988,12 +1988,12 @@ SafeFindOrCreateEntity(
 
   if(strcmp(package, TOP_LEVEL_MODULE_NAME) == 0) {
     /* This is a request for a global variable */
-    e = find_or_create_entity(concatenate(package, MODULE_SEP_STRING, name, 0));
+    e = find_or_create_entity(concatenate(package, MODULE_SEP_STRING, name, NULL));
   }
   else { /* May be a local or a global entity */
     /* This is a request for a local or a global variable. If a local
        variable with name "name" exists, return it. */
-    string full_name = concatenate(package, MODULE_SEP_STRING, name, 0);
+    string full_name = concatenate(package, MODULE_SEP_STRING, name, NULL);
     entity le = gen_find_tabulated(full_name, entity_domain);
 
     if(entity_undefined_p(le)) { /* No such local variable yet. */
@@ -2002,13 +2002,13 @@ SafeFindOrCreateEntity(
 	    
       /* let s hope concatenate s buffer lasts long enough... */
       string full_top_name = concatenate(TOP_LEVEL_MODULE_NAME,
-					 MODULE_SEP_STRING, name, 0);
+					 MODULE_SEP_STRING, name, NULL);
 
       entity fe = gen_find_tabulated(full_top_name, entity_domain);
 
       if(entity_undefined_p(fe)) {
 	/* There is no such global variable. Let's make a new local variable */
-	full_name = concatenate(package, MODULE_SEP_STRING, name, 0);
+	full_name = concatenate(package, MODULE_SEP_STRING, name, NULL);
 	e = make_entity(strdup(full_name),
 			type_undefined, storage_undefined, value_undefined);
       }
@@ -2028,7 +2028,7 @@ SafeFindOrCreateEntity(
 	else { /* The global variable is not be in the scope. */
 	  /* A local variable must be created. It is later replaced by a
 	     global variable if necessary and becomes a ghost variable. */
-	  full_name = concatenate(package, MODULE_SEP_STRING, name, 0);
+	  full_name = concatenate(package, MODULE_SEP_STRING, name, NULL);
 	  e = make_entity(strdup(full_name),
 			  type_undefined, storage_undefined, value_undefined);
 	}
@@ -2037,7 +2037,7 @@ SafeFindOrCreateEntity(
     else { /* A local variable has been found */
       if(ghost_variable_entity_p(le)) {
 	string full_top_name = concatenate(TOP_LEVEL_MODULE_NAME,
-					   MODULE_SEP_STRING, name, 0);
+					   MODULE_SEP_STRING, name, NULL);
 
 	entity fe = gen_find_tabulated(full_top_name, entity_domain);
 

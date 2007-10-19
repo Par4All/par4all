@@ -107,7 +107,7 @@ build_statement_for_clone(
 
 	statement_comments(check_arg_value) = strdup(concatenate(
 	    "!! PIPS: ", entity_local_name(arg),
-	    " is assumed a constant reaching value\n", 0));	    
+	    " is assumed a constant reaching value\n", NULL));	    
     }
     else
 	check_arg_value = make_continue_statement(entity_undefined);
@@ -180,7 +180,7 @@ build_a_clone_for(
       "!! version, especially after program transformations such as dead\n"
       "!! code elimination and partial evaluation, hence the function may\n"
       "!! not have the initial behavior, if called under some other context.\n"
-      "!!\n", 0));
+      "!!\n", NULL));
     text_sentences(t) = 
 	CONS(SENTENCE, make_sentence(is_sentence_formatted, comments),
 	     text_sentences(t));

@@ -47,7 +47,7 @@ open_log_file(void)
     {
 	string 
 	    dir = db_get_current_workspace_directory(),
-	    log_file_name = strdup(concatenate(dir, "/", LOG_FILE, 0));
+	    log_file_name = strdup(concatenate(dir, "/", LOG_FILE, NULL));
 	free(dir);
 	
 	if ((log_file = fopen(log_file_name, "a")) == NULL) {

@@ -110,7 +110,7 @@ string db_get_directory_name_for_module(string name)
     string dir_name, ws_dir_name;
     pips_assert("some valid name", name && !same_string_p(name, ""));
     ws_dir_name = db_get_current_workspace_directory();
-    dir_name = strdup(concatenate(ws_dir_name, "/", name, 0));
+    dir_name = strdup(concatenate(ws_dir_name, "/", name, NULL));
     free(ws_dir_name);
     if (!directory_exists_p(dir_name))
 	if (!create_directory(dir_name)) /* MKDIR */
@@ -133,7 +133,7 @@ string db_build_file_resource_name(string rname, string oname, string suffix)
    * it may depend on the builder function maybe (if pipsmake tells)
    * may include the resource name? as lower letters?
    */       
-  result = strdup(concatenate(oname, "/", oname, suffix, 0));
+  result = strdup(concatenate(oname, "/", oname, suffix, NULL));
 
   pips_debug(8, "file name for %s[%s] with suffix '%s' is '%s'\n", 
 	     rname, oname, suffix, result);
@@ -147,7 +147,7 @@ static string get_resource_file_name(string rname, string oname)
     string dir_name, file_name;
     if (same_string_p(oname, "")) oname = DEFAULT_OWNER_NAME;
     dir_name = db_get_directory_name_for_module(oname);
-    file_name = strdup(concatenate(dir_name, "/", rname, 0));
+    file_name = strdup(concatenate(dir_name, "/", rname, NULL));
     free(dir_name);
     return file_name;
 }
@@ -212,7 +212,7 @@ int dbll_stat_local_file(string file_name, bool okifnotthere)
     int time;
     if (file_name[0]!='/' && file_name[0]!='.') {
 	string dir_name = db_get_current_workspace_directory();
-	full_name = strdup(concatenate(dir_name, "/", file_name, 0));
+	full_name = strdup(concatenate(dir_name, "/", file_name, NULL));
 	free(dir_name);
     } else full_name = strdup(file_name);
     time = dbll_stat_file(full_name, okifnotthere);

@@ -97,7 +97,7 @@ graph_of_calls(string name)
     string dir_name, file_name, full_name;
     dir_name = db_get_current_workspace_directory();
     file_name = db_build_file_resource_name(DBR_DVCG_FILE, name, DV_SUFFIX);
-    full_name = strdup(concatenate(dir_name, "/", file_name, 0));
+    full_name = strdup(concatenate(dir_name, "/", file_name, NULL));
     free(dir_name), dir_name = NULL;
     out = safe_fopen(full_name, "w");
     init_seen();
@@ -134,7 +134,7 @@ bool full_graph_of_calls(string name)
     file_name = db_build_file_resource_name
 	(DBR_DVCG_FILE, PROGRAM_RESOURCE_OWNER, DV_SUFFIX);
     
-    full_name = strdup(concatenate(dir_name, "/", file_name, 0));
+    full_name = strdup(concatenate(dir_name, "/", file_name, NULL));
 
     out = safe_fopen(full_name, "w");
 

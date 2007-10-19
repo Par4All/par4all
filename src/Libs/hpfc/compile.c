@@ -17,7 +17,7 @@
 extern void AddEntityToDeclarations(entity e, entity f); /* in syntax.h */
 
 #define src(name, suf) \
-	strdup(concatenate(WORKSPACE_SRC_SPACE "/", name, suf, 0))
+	strdup(concatenate(WORKSPACE_SRC_SPACE "/", name, suf, NULL))
 
 void 
 make_host_and_node_modules (entity module)
@@ -39,11 +39,11 @@ make_host_and_node_modules (entity module)
 
 	/* HOST and NODE empty routines...
 	 */
-	tmp = strdup(concatenate(name, "_", HOST_NAME, 0));
+	tmp = strdup(concatenate(name, "_", HOST_NAME, NULL));
 	host = make_empty_subroutine(tmp);
 	free(tmp);
 
-	tmp = strdup(concatenate(name, "_", NODE_NAME, 0));
+	tmp = strdup(concatenate(name, "_", NODE_NAME, NULL));
 	node = make_empty_subroutine(tmp);
 	free(tmp);
 
@@ -452,8 +452,8 @@ compile_a_special_io_function(entity module)
     dir_name = db_get_current_workspace_directory();
     h_name = src(prefix, HOST_SUFFIX);
 
-    fs = strdup(concatenate(dir_name, "/", file_name, 0));
-    ft = strdup(concatenate(dir_name, "/", h_name, 0));
+    fs = strdup(concatenate(dir_name, "/", file_name, NULL));
+    ft = strdup(concatenate(dir_name, "/", h_name, NULL));
     safe_copy(fs, ft);
     free(fs);
     free(ft);
@@ -478,8 +478,8 @@ compile_a_pure_function(entity module)
     file_name = db_get_file_resource(DBR_SOURCE_FILE, prefix, TRUE);
     hn_name = src(prefix, BOTH_SUFFIX);
 
-    fs = strdup(concatenate(dir_name, "/", file_name, 0));
-    ft = strdup(concatenate(dir_name, "/", hn_name, 0));
+    fs = strdup(concatenate(dir_name, "/", file_name, NULL));
+    ft = strdup(concatenate(dir_name, "/", hn_name, NULL));
     safe_copy(fs, ft);
     free(fs), free(ft);
 

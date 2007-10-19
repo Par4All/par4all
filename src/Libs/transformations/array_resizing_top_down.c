@@ -640,7 +640,7 @@ static list translate_reference_to_callee_frame(expression e, reference ref, tra
 	  string callee_name = module_local_name(current_callee);
 	  string user_file = db_get_memory_resource(DBR_USER_FILE,callee_name,TRUE);
 	  string base_name = pips_basename(user_file, NULL);
-	  string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,0));
+	  string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,NULL));
 	  string pips_variable_name = entity_local_name(en);
 	  string pips_common_name = strstr(entity_local_name(en),"PIPS_");
 	  string new_decl = strdup(concatenate("      INTEGER*8 ",pips_variable_name,"\n",
@@ -1450,7 +1450,7 @@ static void top_down_adn_callers_arrays(list l_arrays,list l_callers)
   string callee_name = module_local_name(current_callee);
   string user_file = db_get_memory_resource(DBR_USER_FILE,callee_name,TRUE);
   string base_name = pips_basename(user_file, NULL);
-  string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,0));
+  string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,NULL));
   
   while (!ENDP(l_arrays))
     {
@@ -1596,7 +1596,7 @@ static void top_down_adn_callers_arrays(list l_arrays,list l_callers)
 		  string user_file_caller = db_get_memory_resource(DBR_USER_FILE,caller_name,TRUE);
 		  string base_name_caller = pips_basename(user_file_caller, NULL);
 		  file_name_caller = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE),
-							"/",base_name_caller,0));
+							"/",base_name_caller,NULL));
 		  current_variable_caller = make_new_integer_scalar_common_variable(pips_variable_name,current_caller,
 										    pips_common);
 		  fprintf(instrument_file, "%s\t%s\t%s\t(%d,%d)\n",PREFIX2,file_name_caller,caller_name,0,1);
@@ -1673,7 +1673,7 @@ bool array_resizing_top_down(char *module_name)
 							module_name,NEW_DECLARATIONS);
   string dir_name = db_get_current_workspace_directory();
   string declaration_file_name = strdup(concatenate(dir_name, "/", new_declarations, NULL));
-  string instrument_file_name = strdup(concatenate(dir_name, "/TD_instrument.out", 0));
+  string instrument_file_name = strdup(concatenate(dir_name, "/TD_instrument.out", NULL));
   instrument_file = safe_fopen(instrument_file_name, "a");  
   current_callee = local_name_to_top_level_entity(module_name);
 
