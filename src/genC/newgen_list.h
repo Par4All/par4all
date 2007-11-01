@@ -69,7 +69,7 @@ extern void *gen_find_if GEN_PROTO(( bool (*)(), list ,
 extern void *gen_find_if_from_end GEN_PROTO((bool (*)(), list , 
 					      void *(*)())) ;
 extern void *gen_find_tabulated GEN_PROTO(( char *, int )) ;
-extern list gen_filter_tabulated GEN_PROTO(( int (*)(), int )) ;
+extern list gen_filter_tabulated GEN_PROTO(( bool (*)(gen_chunk*), int )) ;
 extern void gen_free_area GEN_PROTO((void**, int)) ;
 extern void gen_free_list GEN_PROTO(( list )) ;
 extern void gen_full_free_list GEN_PROTO(( list ));

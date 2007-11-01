@@ -27,10 +27,16 @@
 
 */
 
-/* typedef enum { false, true } bool; */
-typedef int bool;
-#define	TRUE     1
-#define	FALSE    0
+/* same as linear boolean.h */
+#ifndef BOOLEAN_INCLUDED
+#define BOOLEAN_INCLUDED
+typedef enum { false, true } boolean;
+#define	TRUE     true
+#define	FALSE    false
+#endif /* BOOLEAN_INCLUDED */
+
+/* newgen compatibility */
+typedef boolean bool;
 
 /* STRING
  */

@@ -253,7 +253,7 @@ gen_do_enter_tabulated(int domain, string id, gen_chunk * cp, bool is_a_ref)
    ID and value CHUNKP.
  */
 gen_chunk * 
-gen_enter_tabulated(int domain, string id, gen_chunk * cp, int allow_ref)
+gen_enter_tabulated(int domain, string id, gen_chunk * cp, bool allow_ref)
 {
   gen_chunk * gp = gen_find_tabulated(id, domain);
   
