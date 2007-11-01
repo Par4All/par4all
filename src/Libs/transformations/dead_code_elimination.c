@@ -502,10 +502,10 @@ static bool
 dead_deal_with_test(statement s,
                     test t) 
 {  
-  statement true = test_true(t);
-  statement false = test_false(t);
+  statement st_true = test_true(t);
+  statement st_false = test_false(t);
 
-  switch (dead_test_filter(true, false)) {
+  switch (dead_test_filter(st_true, st_false)) {
     
   case then_is_dead :
     /* Delete the test and the useless true : */ 
@@ -518,11 +518,10 @@ dead_deal_with_test(statement s,
     statement_instruction(s) =
        make_instruction_block(CONS(STATEMENT,
                                   make_stmt_of_instr(statement_instruction(s)),
-                                  CONS(STATEMENT,
-                                       false, NIL)));
+                                  CONS(STATEMENT, st_false, NIL)));
     
     /* Go on the recursion on the remaining branch : */
-    suppress_dead_code_statement(false);
+    suppress_dead_code_statement(st_false);
     dead_code_if_true_branch_removed++;
     return FALSE;
     break;
@@ -538,8 +537,7 @@ dead_deal_with_test(statement s,
     statement_instruction(s) =
        make_instruction_block(CONS(STATEMENT,
                                   make_stmt_of_instr(statement_instruction(s)),
-                                  CONS(STATEMENT,
-                                       true, NIL)));
+                                  CONS(STATEMENT, st_true, NIL)));
     /* Go on the recursion on the remaining branch : */
     suppress_dead_code_statement(true);
     dead_code_if_false_branch_removed++;
@@ -745,17 +743,17 @@ dead_statement_rewrite(statement s)
     
    case is_instruction_test: 
    {
-       statement true, false;
+       statement st_true, st_false;
        test te;
 
        pips_debug(2, "is_instruction_test\n\n");
        stdebug(9, "dead_statement_rewrite: test", s);
     
        te = instruction_test(i);
-       true = test_true(te);
-       false = test_false(te);
-       if (empty_statement_or_continue_p(true)
-	   && empty_statement_or_continue_p(false)) {
+       st_true = test_true(te);
+       st_false = test_false(te);
+       if (empty_statement_or_continue_p(st_true)
+	   && empty_statement_or_continue_p(st_false)) {
 	 /* Even if there is a label, it is useless since it is not
 	    an unstructured. */
 	 pips_debug(2, "test deletion\n");
