@@ -30,6 +30,11 @@ AUTO =	$(PIPS_ROOT)/Include/auto
 
 all: $(DERIVED_FILES)
 
+# the documentation must generate its derived headers as soon as possible
+# beacause it is expected to compute the dependencies of some librairies
+# especially Passes/tpips
+phase0: .build_inc
+
 # skip latex 2 html if needed:
 simple: $(DERIVED_INC) $(INSTALL_ETC) $(INSTALL_DOC)
 simpleinstall: simple; $(MAKE) INSTALL_HTM= install

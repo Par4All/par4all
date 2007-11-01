@@ -27,3 +27,6 @@ else
 ROOT    = ../../..
 endif
 include $(ROOT)/makes/main.mk
+
+# this is needed by phase0 of Passes/tpips
+phase0: .build_etc
