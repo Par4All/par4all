@@ -51,7 +51,7 @@ FWD_MSG		=
 FWD_REPORT	= >&2
 FWD_ROOT	= .
 FWD_OUT		=
-FWD_STOP_ON_ERROR =
+FWD_STOP_ON_ERROR = 1
 FWD_MKFLAGS	=
 
 la_cible_par_defaut_si_aucune_n_est_precisee_sur_la_ligne_de_commande: all

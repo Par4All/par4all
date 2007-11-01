@@ -15,10 +15,10 @@ compile:
 	$(MAKE) -C src phase5
 
 doc:
-	$(MAKE) -C src phase6
+	$(MAKE) -C src FWD_STOP_ON_ERROR= phase6
 
 htdoc:
-	$(MAKE) -C src phase7
+	$(MAKE) -C src FWD_STOP_ON_ERROR= phase7
 
 build: compile doc
 full-build: build htdoc
