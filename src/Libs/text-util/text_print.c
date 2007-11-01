@@ -77,8 +77,6 @@ void
 print_sentence(FILE * fd,
 	       sentence s)
 {
-  extern int is_fortran;
-
     if (sentence_formatted_p(s)) {
 	string ps = sentence_formatted(s);
 	

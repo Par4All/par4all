@@ -6,7 +6,7 @@
    as text-util is supposed to be independent of ri-util. But
    PIPS_COMMENT_SENTINEL should not be in text-util since it is fully
    language independent. However, PIPS_COMMENT_CONTINUATION is used in util.c... */
-extern int is_fortran;
+extern bool is_fortran;
 #define PIPS_COMMENT_SENTINEL 		(is_fortran? "C" : "//")
 #define PIPS_COMMENT_PREFIX   		PIPS_COMMENT_SENTINEL
 /* #define PIPS_COMMENT_CONTINUATION 	PIPS_COMMENT_SENTINEL "    " */
