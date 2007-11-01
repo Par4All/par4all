@@ -140,10 +140,10 @@ dead_test_filter(statement true, statement false)
       fprintf(stderr,"NN true and false branches");
       sc_fprint(stderr,
 		predicate_system(transformer_relation(pretrue)),
-		entity_local_name);
+		(char* (*)(Variable)) entity_local_name);
       sc_fprint(stderr,
 		predicate_system(transformer_relation(prefalse)),
-		entity_local_name);
+		(char* (*)(Variable)) entity_local_name);
     }
 
   if (!statement_strongly_feasible_p(true)) {
@@ -276,7 +276,7 @@ static bool loop_executed_once_p(statement s, loop l)
   Psysteme ps, precondition_ps;
   Pvecteur pv3;
   Pcontrainte pc3;
-  bool m3_negatif, m3_positif, retour;
+  bool m3_negatif = false, m3_positif = false, retour;
 
   retour = FALSE;
   ind = loop_index(l);
@@ -539,7 +539,7 @@ dead_deal_with_test(statement s,
                                   make_stmt_of_instr(statement_instruction(s)),
                                   CONS(STATEMENT, st_true, NIL)));
     /* Go on the recursion on the remaining branch : */
-    suppress_dead_code_statement(true);
+    suppress_dead_code_statement(st_true);
     dead_code_if_false_branch_removed++;
     return FALSE;
     break;
@@ -576,7 +576,7 @@ dead_unstructured_test_filter(statement st)
     ifdebug(6)
 	sc_fprint(stderr,
 		  predicate_system(transformer_relation(pre)),
-		  entity_local_name);
+		  (char* (*)(Variable)) entity_local_name);
 
     /* Compute the precondition for each branch: */
     pre_true =
@@ -587,7 +587,7 @@ dead_unstructured_test_filter(statement st)
     ifdebug(6)
 	sc_fprint(stderr,
 		  predicate_system(transformer_relation(pre_true)),
-		  entity_local_name);
+		  (char* (*)(Variable)) entity_local_name);
 
     pre_false =
 	precondition_add_condition_information(transformer_dup(pre),
@@ -597,7 +597,7 @@ dead_unstructured_test_filter(statement st)
     ifdebug(6)
 	sc_fprint(stderr,
 		  predicate_system(transformer_relation(pre_false)),
-		  entity_local_name);
+		  (char* (*)(Variable)) entity_local_name);
 
     if (transformer_empty_p(pre_true)) {
 	pips_debug(5, "then_is_dead\n");
@@ -803,7 +803,7 @@ dead_statement_filter(statement s)
        transformer pre = load_statement_precondition(s);
        sc_fprint(stderr,
 		 predicate_system(transformer_relation(pre)),
-		 entity_local_name);
+		 (char* (*)(Variable)) entity_local_name);
      }
 
    stdebug(9, "dead_statement_filter: The current statement", s);
@@ -856,7 +856,7 @@ dead_statement_filter(statement s)
       if (instruction_loop_p(i)) {
          loop l = instruction_loop(i);
          if (dead_loop_p(l)) {
-	   pips_debug(2, "Dead loop %d at statement %d (%d, %d)\n",
+	   pips_debug(2, "Dead loop %s at statement %d (%d, %d)\n",
 		      label_local_name(loop_label(l)),
 		      statement_number(s),
 		      ORDERING_NUMBER(statement_ordering(s)),
@@ -870,7 +870,8 @@ dead_statement_filter(statement s)
 	     /* This piece of code is not ready yet */
 	     statement body = loop_body(l);
 	     ifdebug(2) {
-	       pips_debug(2, "loop %d at %d (%d, %d) executed once and only once\n",
+	       pips_debug(2, 
+		"loop %s at %d (%d, %d) executed once and only once\n",
 		label_local_name(loop_label(l)),
 		statement_number(s),
 		ORDERING_NUMBER(statement_ordering(s)),
