@@ -314,7 +314,6 @@ transformer precond;
 list effects_list;
 {
     complexity comp = make_zero_complexity();
-    extern int default_is_inferior_pvarval(Pvecteur *, Pvecteur *);
     int block_length = gen_length( block );
     int i;
 
