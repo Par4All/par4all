@@ -402,6 +402,9 @@
 
 #define entity_variable_p(e) (type_variable_p(entity_type(e)))
 
+#define entity_symbolic_p(e) (type_functional_p(entity_type(e)) && \
+  storage_rom_p(entity_storage(e)) && value_symbolic_p(entity_initial(e)))
+
 #define make_simple_effect(reference,action,approximation)\
     make_effect(make_cell(is_cell_preference, make_preference(reference)),\
     (action),(approximation), \

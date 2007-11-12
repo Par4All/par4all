@@ -173,13 +173,14 @@ expression ex;
 /* if v is a constant, returns a constant call.
  * if v is a variable, returns a reference to v.
  */
-expression entity_to_expression(e)
-entity e;
+expression entity_to_expression(entity e)
 {
-    if (entity_constant_p(e))
-	return call_to_expression(make_call(e, NIL));
-    else /* should be a scalar variable! */
-	return reference_to_expression(make_reference(e, NIL));
+ if(entity_symbolic_p(e))
+   return call_to_expression(make_call(e, NIL));
+ else if (entity_constant_p(e))
+   return call_to_expression(make_call(e, NIL));
+ else /* should be a scalar variable! */
+   return reference_to_expression(make_reference(e, NIL));
 }
 
 /*
