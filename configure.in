@@ -37,7 +37,7 @@ AC_CONFIG_SRCDIR(include/polylib/polylib.h.in)
 AC_PREREQ(2.60)
 
 AC_SUBST(versioninfo)
-versioninfo=7:0:0
+versioninfo=8:0:1
 
 if test "x$prefix" != "xNONE"; then
     prefix_wd=`cd $prefix && pwd`
