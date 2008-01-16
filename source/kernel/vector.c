@@ -173,8 +173,8 @@ void Vector_Free(Vector *vector) {
 /* 
  * Print the contents of a Vector 
  */
-void Vector_Print(FILE *Dst,char *Format,Vector *vector) {
-  
+void Vector_Print(FILE *Dst, const char *Format, Vector *vector)
+{
   int i;
   Value *p;
   unsigned length;

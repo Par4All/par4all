@@ -16,7 +16,7 @@ extern void Gcd(Value a,Value b,Value *result);
 extern int First_Non_Zero(Value *p, unsigned length);
 extern Vector *Vector_Alloc(unsigned length);
 extern void Vector_Free(Vector *vector);
-extern void  Vector_Print(FILE *Dst,char *Format,Vector *Vec);
+extern void  Vector_Print(FILE *Dst, const char *Format, Vector *Vec);
 extern Vector *Vector_Read(void);
 extern void Vector_Set(Value *p,int n,unsigned length);
 extern void Vector_Exchange(Value *p1, Value *p2, unsigned length);
