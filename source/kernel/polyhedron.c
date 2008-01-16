@@ -1945,8 +1945,9 @@ Polyhedron *Constraints2Polyhedron(Matrix *Constraints,unsigned NbMaxRays) {
     if (POL_ISSET(NbMaxRays, POL_INTEGER))
       value_clear(tmp);
     Pol = Polyhedron_Alloc(Dimension-1, Constraints->NbRows - (NbEq-Rank), 0);
-    Vector_Copy(Constraints->p[0], Pol->Constraint[0], 
-		Rank * Constraints->NbColumns);
+    if (Rank > 0)
+	Vector_Copy(Constraints->p[0], Pol->Constraint[0], 
+		    Rank * Constraints->NbColumns);
     if (Constraints->NbRows > NbEq)
 	Vector_Copy(Constraints->p[NbEq], Pol->Constraint[Rank], 
 		    (Constraints->NbRows - NbEq) * Constraints->NbColumns);
