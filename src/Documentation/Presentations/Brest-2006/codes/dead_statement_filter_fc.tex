@@ -1,0 +1,19 @@
+{\small
+\begin{alltt}
+static bool dead\Ul{}statement\Ul{}filter(\Ng{statement} s)
+\Ob
+  \Ng{instruction} i = \Ng{statement\Ul{}instruction}(s);
+
+  if (!statement\Ul{}weakly\Ul{}feasible\Ul{}p(s))
+    \Cm{empty precondition}
+    remove\Ul{}dead\Ul{}statement(s, i);
+  else \Ob
+    switch (\Ng{instruction\Ul{}tag}(i)) \Ob
+    case \Ng{is\Ul{}instruction\Ul{}loop}:
+      \Ng{loop} l = \Ng{instruction\Ul{}loop}(i);
+      ...
+    case \Ng{is\Ul{}instruction\Ul{}test}:
+      \Ng{test} t = \Ng{instruction\Ul{}test}(i);
+      ...
+\end{alltt}
+}

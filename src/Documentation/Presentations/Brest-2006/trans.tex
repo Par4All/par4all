@@ -1,0 +1,408 @@
+\documentclass[11pt,a4]{powersem}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,wasysym,marvosym}
+\usepackage{verbatim,alltt,pst-node}
+%\usepackage[linkbordercolor={1 1 1},bookmarks=true,colorlinks=false,urlbordercolor={1 1 1},runbordercolor={1 1 1},citebordercolor={1 1 1},bookmarksnumbered=true,hypertexnames=false]{hyperref}
+\usepackage{perso2e,bbold2e,trans2e_rk,license_rk,LienPDF,example,makeidx}
+\usepackage{listings,multicol,tabularx,soul}
+\usepackage{fixseminar}
+\usepackage[display]{texpower}
+
+\usepackage[francais]{babel}
+
+\usepackage{barrer}
+\usepackage{bbold2e,du_tt_rapide,epsfig}
+
+\input{abbrev_pomp}
+
+
+\renewcommand{\textepieds}{\vbox{%
+    \hbox to \longpieds{\hss%\moinspetit
+      \href{http://www.cri.ensmp.fr/pips}{PIPS}\hfil {\bf---\theslidepart---}}
+    \hbox to \longpieds{%
+      \tiny \hfil \href{http://www.cri.ensmp.fr}{CENTRE DE RECHERCHE EN INFORMATIQUE --- ÉCOLE DES MINES DE PARIS}%
+      \hfil}}%
+  }
+
+
+\renewcommand{\LeLogoEnBasADroite}{\hyperlink{contenu}{\psfig{file=logo/logo-pips.eps,%
+    height=\hauteurdessinspieds}}}
+%%\renewcommand{\LeLogoEnBasADroite}{}
+
+\slidepagestyle{empty}
+
+\title{PIPS : un système d'analyse, de transformation et de
+  compilation de programmes scientifiques}
+
+\author{
+  $\left.
+  \begin{array}[c]{r@{}}
+     \text{Corinne Ancourt}\\
+    \text{Fabien Coelho}\\
+    \text{François Irigoin}\\
+    \text{Ronan Keryell}
+  \end{array}
+  \right\}\text{\tt @cri.ensmp.fr}$\\
+  ---\\
+  Centre de Recherche en Informatique de\\
+  l'École des Mines de Paris}
+
+\date{25 août 2006}
+
+\DealWithTwoUp
+
+\begin{document}
+
+\noiretblanc
+%%\couleur
+%% Le fond du transparent :
+%%\fondcouleur
+
+\TRANSTITLESIZE
+\slideframe{none}
+\begin{slide}
+  \couleurtexte
+  \maketitle
+  \addtocounter{slide}{-1}
+  \slidepagestyle{empty}
+\end{slide}
+\TRANSNORMALSIZE
+
+
+\DealWithColors
+
+\slidepagestyle{CRI}
+
+
+\slidepart{Introduction}
+
+\begin{trans}{Introduction}
+  PIPS = Paralléliseur Interprocédural de Programmes Scientifiques
+  \begin{itemizer}
+  \item Projet démarré en 1988 avec financement DRET, puis ESPRIT,
+    CNRS \& École des Mines
+  \item Faire avancer l'état de l'art
+    \begin{itemizet}
+    \item Analyse sémantique
+    \item Parallélisation \& vectorisation automatique
+    \end{itemizet}
+  \item Franchir le mur de l'interprocéduralité
+  \item Travailler sur des programmes réels
+    \begin{itemizet}
+    \item Fortran
+    \end{itemizet}
+  \end{itemizer}
+\end{trans}
+
+
+\begin{trans}{Aujourd'hui...}
+  \begin{itemizer}
+  \item Ouverture du cadre de la parallélisation
+  \item Programmes complets
+  \item Interprocédural
+  \item Analyse \vavers{} rétro-ingéniérie \& vérification
+  \item Transformations
+  \item Compilation
+  \item Optimisation (parallélisation = cas particulier)
+  \item Faciliter le développement d'outils et extensibilité
+  \end{itemizer}
+\end{trans}
+
+
+\begin{trans}{Optimisation de code}
+  \belleboite{Motivation économique}
+  \begin{itemizer}
+  \item Coût d'exécution, latence, taille des modèles 3D, faisabilité\\
+    \emph{$\searrow$ coût d'exécution $\Rightarrow$ $\searrow$ coût de
+      maintenance matériel, $\searrow$ coût d'administration,...}
+  \item Potentiel croissant : options de compilation, ILP, localité,
+    parallélisme {\em gain de 1,2 en 1978, de 2 à 5 en 1998}
+  \item Accélération de 2 = 18 mois {\em time-to-market}
+  \item Choix de l'architecture matérielle (PE, SoC, MP-SoC...)
+  \item SAGEM, IBM, LMC, RP-RORER,...
+  \end{itemizer}
+\end{trans}
+
+
+\begin{trans}{Exemples : l'expérience du CRI}
+  À la main ou automatiquement :
+  \begin{itemizer}
+  \item Codes industriels : SAGEM, Renault, KFA, IFP, CEA, RP-RORER
+  \item Académiques : ENSMP/CIG, CG
+  \item IBM SP2, CRAY T3D, Suns, Maspar, Convex MPP1200\\
+    \emph{Alliant, CRAY YMP, TMC CM5, IBM 3090...}
+  \item Gains de 2 à 50 en séquentiel
+  \item Gains de 2 à 16$\,$000 en parallèle (selon machine~!)
+  \end{itemizer}
+\end{trans}
+
+
+\begin{trans}{IFP : propagation d'ondes sismiques 2D}
+  \begin{minipage}{0.38\hsize}
+    \psfig{file=images/ifp.ps,angle=270,width=\hsize}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.6\hsize}
+    \begin{itemizer}
+    \item IBM SP2, Power2
+    \item Gain séq : 2,5 (= 110 Mflop/s) 
+      \begin{itemizet}
+      \item Re-parenthésage d'une expression
+      \item Déroulage d'une boucle (4)
+      \item Ordonnancement des calculs
+      \end{itemizet}
+    \item HPF : gain de 2,5 (4~PE, avec I/O)
+    \end{itemizer}
+  \end{minipage}
+
+  \newslide
+
+\begin{alltt}
+{\red{!hpf$ independent}}
+      DO J = 3,NP-2
+{\red{!hpf$   independent}}
+        DO I = 3, NP-2
+          U(I,J,KP) = 
+            {\red{(}}2. {\green{*}} U(I,J,KM) {\green{-}} U(I,J,KP){\red{)}}
+           {\green{-}} V(I,J) {\green{*}} ( 60. {\green{*}} U(I,J,KM) 
+           {\green{+}} {\red{(}}U(I+2,J,KM) + U(I-2,J,KM)
+             + U(I,J-2,KM) + U(I,J+2,KM){\red{)}}
+           {\green{-}} 16. {\green{*}} (U(I+1,J,KM) + U(I-1,J,KM)
+                  + U(I,J-1,KM) + U(I,J+1,KM)))
+        ENDDO
+      ENDDO
+\end{alltt}
+\end{trans}
+
+
+\begin{trans}{Comparaison d'empreintes digitales}
+  \centerline{$\vcenter{\psfig{file=sagem.eps,width=0.2\hsize}} \quad
+    \vcenter{\psfig{file=morpho_petit.eps,width=0.2\hsize}} \quad
+    \vcenter{\psfig{file=images/lmclogo.ps,width=0.5\hsize}}$}
+  \begin{itemizer}
+  \item Traitement d'empreintes par logiciel
+  \item Portage/optimisation : SUN, IBM, Maspar MP2, Convex
+  \item Gain séquentiel : 10, parallèle 16$\,$000
+    \begin{itemizet}
+    \item Compactage des données, ILP, pipeline logiciel
+    \item Ordonnancement et fusion de boucles
+    \end{itemizet}
+  \end{itemizer}
+\end{trans}
+
+
+\begin{trans}{Comment optimiser ?}
+  \begin{enumerate}
+  \item Analyse de l'application : complexité,...
+  \item Changements d'algorithmes (en amont)\\
+    e.g. méthode directe \(\rightarrow\) gradient conjugué
+  \item Utilisation de librairies optimisées\\
+    IMSL, Lapack, ESSL, ScaLapack, P-ESSL
+  \item Options de compilation\\ 
+    IBM \verb|xlf| : +150 options et sous-options !
+  \item Transformations de programmes
+    \begin{itemizet}
+    \item Selon langage, application, architecture
+    \item Futurs pragma ou options de compilation
+    \end{itemizet}
+  \end{enumerate}
+\end{trans}
+
+
+\begin{trans}{Pourquoi de tels gains ?}
+  \begin{itemizer}
+  \item Processeurs : unités fonctionnelles multiples, chargements
+    doubles,...
+  \item Hiérarchie mémoire : ordres de grandeur en temps d'accès\\
+    registre (0) \(\leftrightarrow\) cache~1 (3) \(\leftrightarrow\)
+    cache~2 (10) \(\leftrightarrow\) mémoire (80) \(\leftrightarrow\)
+    mémoire distante (1000) \(\leftrightarrow\) disque (1000000)...
+  \item Multiprocesseurs : volumes de mémoire et de cache plus grands
+    \vavers parfois effets superlinéaires
+  \end{itemizer}
+\end{trans}
+
+
+\begin{trans}{Techniques utilisées avec PIPS}
+  \centerline{\textbf{Validité, décision, application}}
+  \begin{itemizer}
+  \item Inversion, fusion, distribution... de boucles
+  \item \emph{Tiling} des itérations
+  \item Restructuration du contrôle
+  \item Restructuration d'expressions
+  \item Annotations HPF pour le parallélisme~: HPFC
+  \end{itemizer}
+\end{trans}
+
+
+\begin{trans}{Importance de l'automatisation}
+  \textbf{Problèmes :}
+  \begin{itemize}
+  \item Connaissances très spécifiques nécessaires
+  \item Dégradation de la qualité du source optimisé...
+  \item Portabilité des optimisations ?
+  \end{itemize}
+
+  \textbf{Conséquences :}
+  \begin{itemize}
+  \item Coût de développement et coût de maintenance (KLOCs)
+  \item Source à source (PIPS)
+  \item Éventuellement assistée de conseils ({\em pragma})
+  \end{itemize}
+  \textbf{Conclusion :} importance de l'automatisation
+\end{trans}
+
+
+\begin{trans}{Plan}
+  \begin{itemizec}
+  \item Rétro-ingéniérie
+    \begin{itemizer}
+    \item \hyperlink{Compr}{Compréhension de code}
+    \item Simplification de code
+    \item Spécialisation de code
+    \item Vérification, test, preuve
+    \end{itemizer}
+  \item \hyperlink{Synth}{Synthèse de code \& compilation de
+      spécifications}
+    %%  \item HPF
+  \item \hyperlink{EOLE}{Optimisation d'expressions}
+  \item \hyperlink{Environnement}{Environnement de développement}
+  \end{itemizec}
+\end{trans}
+
+
+\input{retro-ingenierie}
+
+
+\input{synthese-code}
+
+
+\input{eole}
+
+
+\input{environnement}
+
+
+\slidepart{Conclusion}
+
+
+\begin{trans}{Modes ou recherche ?}
+  \begin{itemizer}
+  \item Crayettes, MPP (réseaux de Transputers), réseau neuronal,
+    algorithme génétique,...    
+  \item Parallélisation interprocédurale : 1982--1996/97--????
+  \item Tiling: 1985--????--1997/98 (HP puis SGI et MIPS)
+  \item Synthèse de code et de communication : 1987--1991--????
+  \item Exploitation de l'investissement fait dans PIPS\\
+    {\em robustesse de la bibliothèque linéaire}
+  \end{itemizer}
+\end{trans}
+
+
+\begin{trans}{Évolutions du workbench PIPS}
+  \psfighautcentre{dessins/pips-accent.idraw}
+\end{trans}
+
+\begin{trans}{PIPS : industrialisation ou freeware ?}
+  \begin{itemizer}
+  \item Connexité (automne 1993)
+  \item Simulog (septembre 97 et mars 1998)
+    \begin{itemizet}
+    \item Réécriture
+    \item Analyses trop compliquées (Dassault) ou pas encore assez fines (EDF)
+    \item Tentative de coopération dans le cadre post-Ariane~4
+    \end{itemizet}
+  \item CEA-DAM~: propriété des sources ou co-développement\\
+    \emph{Intégration de la méthode polyédrale dans PIPS, thèses
+      d'A.~Platonoff et d'A.~Leservot}
+  \item EDF : co-développement si sources dans le domaine public\\
+    \emph{développement d'une phase de calcul d'alias, CIFRE
+      ENS-Cachan/EDF}
+  \end{itemizer}
+\end{trans}
+
+
+\begin{trans}{Conclusion générale}
+  \begin{itemizer}
+  \item Évolution des thèmes de recherche largement au-delà du cadre
+    {\em parallélisation automatique}\\
+    \vavers{} \emph{optimisations en coût et en temps de réponse, génie
+      logiciel,...}
+  \item Sans perdre de vue les objectifs économiques ni sacrifier la
+    qualité de la recherche    
+  \item Les expériences ne sont pas oubliées\\    
+    {\em théorie et pratique}   
+  \item Les contacts industriels non plus\\
+    {\em vitesse contre précision, implémentation contre papiers}   
+  \item Et donc le financement contractuel
+\end{itemizer}
+\end{trans}
+
+
+\begin{trans}{Génie logiciel et rétro-ingénierie}
+  \begin{itemizer}
+  \item Importance du {\em source-à-source} (vs projet SUIF de Stanford)
+  \item Réduction des coûts en rétro-ingénierie\\
+    {\em \vavers{} travail supplémentaire dans PIPS...}
+  \item Réduction des coûts de maintenance\\
+    {\em pour du code optimisé}
+  \item Réduction du coût de développement\\
+    {\em par la compilation de spécifications}
+  \end{itemizer}
+\end{trans}
+
+
+\begin{trans}{Conclusion}
+  \begin{itemizer}
+  \item PIPS = interprocéduralité + sémantique + programmation linéaire
+  \item Aborde des programmes réels
+  \item Beaucoup d'autres choses (encore)
+  \item PIPS $\equiv$ établi + boîte à outils, environnement ouvert
+  \item Environnement de génie logiciel ouvert (NewGen, PIPSmake,
+    PIPSdbm,...)
+  \item \vavers rajout simplifié de nouvelles phases
+  \item Bonne plateforme pour étudier l'interprocéduralité   
+  \item Disponible gratuitement
+  \end{itemizer}
+  \belleboite{\href{http://www.cri.ensmp.fr/pips}%
+    {\texttt{http://www.cri.ensmp.fr/pips}}}
+\end{trans}
+
+
+\begin{trans}{Extensions futures}
+  \begin{itemizer}
+  \item Rajout d'un parser C restreint (pas de structures ?) pour le
+    traitement du signal
+  \item Java pour le calcul scientifique (tableaux)... part de très bas en
+    performances ! :-)
+    \begin{itemizet}
+    \item Rajout d'un parser Java
+    \item Élimination des vérifications d'accès aux tableaux
+    \item Spécialisation de code
+    \item Élimination déréférencements méthodes
+    \item Couplage JVM avec un JIT : optimisation code 3 adresses,
+      détection et optimisation de boucle
+  \end{itemizet}
+\end{itemizer}
+\end{trans}
+
+
+\begin{trans}{Table des matières}
+  \begin{multicols}{2}
+    \tiny
+    \couleurtexte
+    \hypertarget{contenu}{}
+    \Slidecontents
+
+    \listofslides
+  \end{multicols}
+\end{trans}
+
+
+\end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

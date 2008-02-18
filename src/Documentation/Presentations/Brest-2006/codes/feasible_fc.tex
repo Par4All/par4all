@@ -1,0 +1,12 @@
+{\small
+\begin{alltt}
+bool statement\_weakly\_feasible\_p(\Ng{statement} s)
+\Ob
+  \Cm{load the precondition system sc associated to s}
+  \Ng{transformer} p = load\_statement\_precondition(s);
+  \Ln{Psysteme} sc = \Ng{predicate\_system}(\Ng{transformer\_relation}(p));
+  \Cm{return whether there may be a solution}
+  return !\Ln{sc\_empty\_p}(sc);
+\Cb
+\end{alltt}
+}
