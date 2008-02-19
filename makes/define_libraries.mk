@@ -2,6 +2,8 @@
 # $Id$
 #
 
+#debug_output := $(shell echo define_library.mk  > /dev/tty)
+
 ######################################################################## NEWGEN
 
 newgen.libs	= genC
@@ -65,9 +67,14 @@ WPIPS_MAIN 	= main_wpips.o
 
 ######################################################################### FPIPS
 
-FPIPS_LDFLAGS	= $(WPIPS_LDFLAGS)
+ifndef NOWPIPS
+	FPIPS_LDFLAGS	= $(WPIPS_LDFLAGS)
 
-# By default, compile with wpips:
-fpips_add.libs	= wpips $(wpips_add.libs)
+	# By default, compile with wpips:
+	fpips_add.libs	= wpips $(wpips_add.libs)
+else
+	fpips_add.libs	=
+endif
+
 fpips.libs	= pips tpips $(pips.libs) $(fpips_add.libs) $(tpips_add.libs)
 FPIPS_MAIN	= main_fpips.o
