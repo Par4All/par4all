@@ -30,14 +30,14 @@
 /* Might be used to generate optimized versions
    (say macros instead of functions).
  */
-static void sharp_ifopt(FILE * out)
-{ fprintf(out, "#if defined(" OPTIMIZE_NEWGEN ")\n"); }
+static int sharp_ifopt(FILE * out)
+{ return fprintf(out, "#if defined(" OPTIMIZE_NEWGEN ")\n"); }
 
-static void sharp_else(FILE * out)
-{ fprintf(out, "#else\n"); }
+static int sharp_else(FILE * out)
+{ return fprintf(out, "#else\n"); }
 
-static void sharp_endif(FILE * out)
-{ fprintf(out, "#endif /* " OPTIMIZE_NEWGEN " */\n"); }
+static int sharp_endif(FILE * out)
+{ return fprintf(out, "#endif /* " OPTIMIZE_NEWGEN " */\n"); }
 
 /* GEN_SIZE returns the size (in gen_chunks) of an object of type defined by
  * the BP type.
@@ -776,12 +776,13 @@ static FILE * fopen_suffix(string prefix, string suffix)
  */
 void gencode(string file)
 {
-    size_t no_warning = (size_t)sharp_ifopt + (size_t)sharp_else + (size_t) sharp_endif;
+    // Just a hack to pretend we use these functions
+    void * no_warning = &sharp_ifopt - &sharp_else + &sharp_endif;
     int i;
     FILE * header, * code;
 
     if (file==NULL) 
-      fatal("[gencode] no file name specified (%d)\n", no_warning);
+      fatal("[gencode] no file name specified (%p)\n", no_warning);
 
     if (sizeof(void *)!=sizeof(gen_chunk))
 	fatal("[gencode] newgen fundamental layout hypothesis broken\n");

@@ -28,8 +28,8 @@
  */
 typedef struct __stack_bucket
 {
-    int n_item;                 /* next available item in the bucket */
-    int max_items;              /* the max number of items of this bucket */
+    size_t n_item;                 /* next available item in the bucket */
+    size_t max_items;              /* the max number of items of this bucket */
     void **items;               /* the items (only pointers at the moment) */
     struct __stack_bucket *succ;/* the next bucket */
     /* we could keep the privious bucket? */
@@ -40,12 +40,12 @@ typedef struct __stack_bucket
  */
 typedef struct __stack_head
 {
-    int size;        /* current number of elements in stack */
-    int max_extent;  /* maximum extension of the stack */
+    size_t size;        /* current number of elements in stack */
+    size_t max_extent;  /* maximum extension of the stack */
     _stack_ptr stack;/* buckets in use by the stack */
     _stack_ptr avail;/* allocated buckets not in use anymore */
-    int bucket_size; /* reference bucket size for allocation */
-    int n_buckets;   /* number of allocated buckets */
+    size_t bucket_size; /* reference bucket size for allocation */
+    size_t n_buckets;   /* number of allocated buckets */
     int type;        /* as BASIC, LIST, EXTERNAL, CHUNK, domain? */
     int policy;      /* may be used to indicate an allocation policy */
 }
@@ -63,7 +63,7 @@ typedef struct __stack_iterator
 {
     _stack_ptr bucket; /* current bucket */
     int downward;      /* true if downward iterations */
-    int index;         /* current index in bucket */
+    size_t index;         /* current index in bucket */
     _stack_ptr list;   /* all buckets */
 }
     _stack_iterator; /* and also *stack_iterator (in headers) */
@@ -84,9 +84,9 @@ static void update_iterator_upward(stack_iterator i)
 #define DEFINE_ITERATOR(i,blk,idx,dwn,lst) \
     { i->bucket=(blk), i->index=(idx), i->list=lst, i->downward=dwn;}
 #define UPDATE_ITERATOR_DOWNWARD(i)\
- if (i->index==-1) \
+  if (i->index == (size_t) -1)	   \
  { i->bucket = i->bucket->succ,\
-   i->index = (i->bucket) ? (i->bucket->n_item)-1 : -1; }
+   i->index = (i->bucket) ? (i->bucket->n_item)-1 : (size_t) -1; }
 #define UPDATE_ITERATOR_UPWARD(i)\
  if (i->index==i->bucket->n_item) update_iterator_upward(i);
 #define NEXT_ITERATION(i) \
@@ -300,7 +300,7 @@ void stack_info(FILE * f, stack s)
 		return;
     }
     /* else */
-    fprintf(f, " - type %d, size %d, max extent %d\n", 
+    fprintf(f, " - type %d, size %zd, max extent %zd\n", 
 	    s->type, s->size, s->max_extent);
     fprintf(f, " - buckets: %d in use, %d available\n",
 	    number_of_buckets(s->stack), number_of_buckets(s->avail));

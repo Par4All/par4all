@@ -64,7 +64,7 @@ struct inlinable ;
 struct gen_binding {
   char * name;
   int compiled;
-  int size; /* number of chunks to hold this data. */
+  size_t size; /* number of chunks to hold this data. */
   gen_tabulated_p tabulated;
   union domain *domain ;
   struct inlinable *inlined ;

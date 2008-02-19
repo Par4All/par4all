@@ -82,7 +82,7 @@ extern bool hash_defined_p GEN_PROTO((hash_table, void *));
 extern void hash_put GEN_PROTO((hash_table, void *, void *));
 extern void hash_table_clear GEN_PROTO((hash_table));
 extern void hash_table_free GEN_PROTO((hash_table));
-extern hash_table hash_table_make GEN_PROTO((hash_key_type, int));
+extern hash_table hash_table_make GEN_PROTO((hash_key_type key_type, size_t size));
 extern void hash_table_print_header GEN_PROTO((hash_table, FILE *));
 extern void hash_table_print GEN_PROTO((hash_table));
 extern void hash_table_fprintf GEN_PROTO((FILE *, char *(*)(), 

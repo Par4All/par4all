@@ -21,6 +21,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <setjmp.h>
@@ -2891,7 +2892,7 @@ union domain *dp;
     case SET_DT:
 	if (gen_debug & GEN_DBG_RECURSE)
 	    fprintf(stderr,
-		    " - setting %s (%d) contains %s (%td)\n",
+		    " - setting %s (%d) contains %s (%zd)\n",
 		    Domains[target].name, target,
 		    dp->se.element->name, dp->se.element-Domains);
 	DirectDomainsTable[dp->se.element-Domains][target] = TRUE;

@@ -43,7 +43,7 @@ static char * string_to_parse = (char*) 0; /* shared pointer! */
 
 #define YY_INPUT(buffer, result, max_size)		\
 {							\
-    int i=0;						\
+    size_t i = 0;						\
     if (string_to_parse) /* we're parsing a string */	\
     {							\
 	while(i<max_size && *string_to_parse)		\
@@ -62,34 +62,21 @@ void yyset_string_to_parse(char *s) { string_to_parse = s;}
 void yyreset_string_to_parse() { string_to_parse = (char *) 0;}
 
 #else /* ATT/POSIX just seem to like parsing yyin... */
-
-extern char *mktemp();
-char * tmp_spec_file_name = (char *) 0;
-void yyset_string_to_parse(char *s)
+// I guess this code won't be use again anyway... RK
+void genspec_set_string_to_parse(char *s)
 {
-    tmp_spec_file_name = mktemp(strdup("/tmp/newgen.XXXXXX"));
-
-    if( (yyin = fopen( tmp_spec_file_name, "w" )) == NULL ) {
-	user( "Cannot open temp spec file in write mode\n" ) ;
+  if ((genspec_in =  tmpfile()) == NULL) {
+	user( "Cannot create temp spec file in read/write mode\n" ) ;
 	return ;
     }
-    fprintf( yyin , "%s", s ) ;
-    fclose( yyin  ) ;
-    
-    if( (yyin = fopen( tmp_spec_file_name, "r" )) == NULL ) {
-	user( "Cannot open temp spec file in read mode\n" ) ;
-	return ;
-    }
+    fprintf( genspec_in , "%s", s ) ;
 }
 
-void yyreset_string_to_parse()
+void genspec_reset_string_to_parse()
 {
-    fclose(yyin);
-    if( unlink( tmp_spec_file_name )) {
-        fatal( "Cannot unlink tmp file %s\n", tmp_spec_file_name ) ;
-    }
+  // The file created by tmpfile() is automatically deleted on close:
+    fclose(genspec_in);
 }
-
 #endif
 
 %}

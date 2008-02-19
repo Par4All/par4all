@@ -8,6 +8,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <setjmp.h>
 
 #include "genC.h"
@@ -162,11 +163,11 @@ static int gen_put_tabulated(int domain, gen_chunk * gc)
   return 0;
 }
 
-static void gen_put_tabulated_name(int domain, char * id, int number)
+static void gen_put_tabulated_name(int domain, char * id, intptr_t number)
 {
   gen_tabulated_p gtp = get_tabulated_from_domain(domain);
   message_assert("positive tabulated number", number>0);
-  hash_put(gtp->names, id, (void*)number);
+  hash_put(gtp->names, id, (void *) number);
 }
 
 
@@ -186,17 +187,17 @@ static void gen_delete_tabulated_name(gen_chunk * obj)
   // free(okey);
 }
 
-static int gen_get_tabulated_name_basic(int domain, char * id)
+static intptr_t gen_get_tabulated_name_basic(int domain, char * id)
 {
   gen_tabulated_p gtp = get_tabulated_from_domain(domain);
-  return (int) hash_get(gtp->names, id);
+  return (intptr_t) hash_get(gtp->names, id);
 }
 
 void * gen_find_tabulated(char * key, int domain)
 {
-  int number = gen_get_tabulated_name_basic(domain, key);
+  intptr_t number = gen_get_tabulated_name_basic(domain, key);
 
-  if (number == (int) HASH_UNDEFINED_VALUE)
+  if (number == (intptr_t) HASH_UNDEFINED_VALUE)
   {
     return gen_chunk_undefined;
   }

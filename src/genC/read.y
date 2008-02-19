@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 
 #include "genC.h"
@@ -54,8 +55,8 @@ gen_chunk *Read_chunk ;
  * maps a shared pointer number to its gen_chunk pointer value.
  * warning: big hack.
  */
-static int shared_number;
-static int shared_size;
+static size_t shared_number;
+static size_t shared_size;
 static gen_chunk ** shared_table ;
 
 /* The GEN_TABULATED_NAMES hash table maps ids to index in the table of
@@ -103,7 +104,7 @@ static stack current_chunk_size;
   gen_chunk chunk ;
   gen_chunk *chunkp ;
   cons *consp ;
-  int val ;
+  intptr_t val ;
   char * s;
   double d;
   char c;
@@ -142,7 +143,7 @@ Read	: Nb_of_shared_pointers Contents
 Nb_of_shared_pointers 
   	: Int
         { 
-	  int i;
+	  size_t i;
 	  shared_number = 0;
 	  shared_size = $1;
 	  shared_table = (gen_chunk **)alloc($1*sizeof(gen_chunk*)); 
@@ -195,8 +196,8 @@ Chunk 	: Shared_chunk CHUNK_BEGIN Type
           {
 	    $$ = stack_pop(current_chunk);
 	    message_assert("all data copied", 
-			   (int) stack_pop(current_chunk_index) ==
-			   (int) stack_pop(current_chunk_size));
+			   (int) (stack_pop(current_chunk_index) ==
+				  stack_pop(current_chunk_size)));
 	  }
 	;
 
@@ -223,12 +224,12 @@ Datas2 : Datas2 Data { }
 
 Datas3 : Datas3 Data 
          { 
-	   int i = (int) stack_pop(current_chunk_index);
-	   int size = (int) stack_head(current_chunk_size);
+	   size_t i = (size_t) stack_pop(current_chunk_index);
+	   size_t size = (size_t) stack_head(current_chunk_size);
 	   gen_chunk * current = stack_head(current_chunk); 
 	   message_assert("index ok", i<size);
 	   *(current+i) = $2;
-	   stack_push((void*) (i+1), current_chunk_index);
+	   stack_push((void *)(i+1), current_chunk_index);
 	 }
        | { }
        ;

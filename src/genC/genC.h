@@ -28,6 +28,7 @@
  */
 /* #include <sys/stdtypes.h> */
 #include <stdio.h>
+#include <stdint.h>
 #include <malloc.h>
 #include <strings.h>
 /* extern char * strdup(const char *);*/
@@ -58,7 +59,7 @@ typedef union gen_chunk {
   unit u;
   bool b;
   char c;
-  int i;
+  intptr_t i;
   float f;
   string s;
   void * e; /* for externals */

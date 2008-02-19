@@ -21,6 +21,7 @@
    The syntax of tokens written by GEN_WRITE. */
 
 #include <stdio.h>
+#include <stdint.h>
 #include <string.h>
 #include <math.h>
 
@@ -55,9 +56,9 @@ static void append_to_literal(string s)
     strcat(literal, s);
 }
 
-static int newgen_line_number;
-static int newgen_char_number;
-static int newgen_col_number;
+static size_t newgen_line_number;
+static size_t newgen_char_number;
+static size_t newgen_col_number;
 
 void newgen_start_lexer(FILE * in)
 {
@@ -69,7 +70,7 @@ void newgen_start_lexer(FILE * in)
 
 void newgen_lexer_position(FILE * out)
 {
-  fprintf(out, "newgen lexer at line %d (column %d, char %d)\n", 
+  fprintf(out, "newgen lexer at line %zd (column %zd, char %zd)\n", 
 	  newgen_line_number, newgen_col_number, newgen_char_number);
 }
 

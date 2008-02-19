@@ -8,18 +8,18 @@ typedef struct _gen_array_chunk_t * gen_array_t;
 
 /* declarations...
  */
-gen_array_t gen_array_make(int);
+gen_array_t gen_array_make(size_t);
 void gen_array_free(gen_array_t);
 void gen_array_full_free(gen_array_t);
-void gen_array_addto(gen_array_t, int, void *);
-void gen_array_remove(gen_array_t, int);
-void gen_array_dupaddto(gen_array_t, int, void *);
+void gen_array_addto(gen_array_t, size_t, void *);
+void gen_array_remove(gen_array_t, size_t);
+void gen_array_dupaddto(gen_array_t, size_t, void *);
 void gen_array_append(gen_array_t, void *);
 void gen_array_dupappend(gen_array_t, void *);
 void ** gen_array_pointer(gen_array_t);
-int gen_array_nitems(gen_array_t);
-int gen_array_size(gen_array_t);
-void * gen_array_item(gen_array_t, int);
+size_t gen_array_nitems(gen_array_t);
+size_t gen_array_size(gen_array_t);
+void * gen_array_item(gen_array_t, size_t);
 void gen_array_sort(gen_array_t);
 void gen_array_sort_with_cmp(gen_array_t, int (*)(const void *, const void *));
 
@@ -28,7 +28,7 @@ list list_from_gen_array(gen_array_t);
 
 #define GEN_ARRAY_MAP(s, code, array)			\
   {							\
-      int _i, _nitems = gen_array_nitems(array);	\
+      size_t _i, _nitems = gen_array_nitems(array);	\
       for(_i=0; _i<_nitems; _i++)			\
       {							\
 	  void * s = gen_array_item(array, _i);		\

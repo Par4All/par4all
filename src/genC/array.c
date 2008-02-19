@@ -10,16 +10,16 @@
 #define GEN_ARRAY_SIZE_INCREMENT (50)
 
 struct _gen_array_chunk_t {
-    int size;
+    size_t size;
     int nitems;
     void ** array;
 };
 
 gen_array_t
-gen_array_make(int size)
+gen_array_make(size_t size)
 {
     gen_array_t a;
-    int i;
+    size_t i;
     if (size<=0) size= GEN_ARRAY_SIZE_INCREMENT; /* default size */
     a = (gen_array_t) malloc(sizeof(struct _gen_array_chunk_t));
     message_assert("array ok", a);
@@ -35,8 +35,8 @@ static void
 gen_array_resize(gen_array_t a, int min)
 {
   int N = GEN_ARRAY_SIZE_INCREMENT;
-  int nsize = ((min%N)==0)?min:((int)(min/N) +1)*N;
-  int i;
+  size_t nsize = ((min%N)==0)?min:((int)(min/N) +1)*N;
+  size_t i;
   /* int nsize = a->size+GEN_ARRAY_SIZE_INCREMENT, i;*/
   a->array = (void**) realloc(a->array, nsize*sizeof(void*));
   message_assert("realloc ok", a->array);
@@ -55,7 +55,7 @@ gen_array_free(gen_array_t a)
 void 
 gen_array_full_free(gen_array_t a)
 {
-  int i;
+  size_t i;
   for (i=0; i<a->size; i++)
     if (a->array[i])
       free(a->array[i]); /* what is it? */
@@ -63,19 +63,19 @@ gen_array_full_free(gen_array_t a)
 }
 
 void
-gen_array_addto(gen_array_t a, int i, void * what)
+gen_array_addto(gen_array_t a, size_t i, void * what)
 {
     if (i>=a->size) gen_array_resize(a,i+1);
-    message_assert("valid index", 0<=i && i<a->size);
+    message_assert("valid index", /* 0<=i &&  */ i < a->size);
     if (a->array[i]!=(void *)NULL) a->nitems--;
     a->array[i] = what;
     if (a->array[i]!=(void *)NULL) a->nitems++;
 }
 
 void 
-gen_array_remove(gen_array_t a, int i) 
+gen_array_remove(gen_array_t a, size_t i) 
 {
-  message_assert("valid index", 0<=i && i<a->size);
+  message_assert("valid index", /* 0<=i && */ i < a->size);
   if (a->array[i]!=(void *)NULL) a->nitems--;
   a->array[i] = (void *)NULL;
 }
@@ -87,7 +87,7 @@ gen_array_append(gen_array_t a, void * what)
 }
 
 void
-gen_array_dupaddto(gen_array_t a, int i, void * what)
+gen_array_dupaddto(gen_array_t a, size_t i, void * what)
 {
     gen_array_addto(a, i, strdup(what));
 }
@@ -106,22 +106,22 @@ gen_array_pointer(gen_array_t a)
     return a->array;
 }
 
-int 
+size_t 
 gen_array_nitems(gen_array_t a)
 {
     return a->nitems;
 }
 
-int 
+size_t 
 gen_array_size(gen_array_t a)
 {
     return a->size;
 }
 
 void *
-gen_array_item(gen_array_t a, int i)
+gen_array_item(gen_array_t a, size_t i)
 {
-    message_assert("valid index", 0<=i && i<a->size);
+  message_assert("valid index", /* 0<=i && */ i < a->size);
     return a->array[i];
 }
 

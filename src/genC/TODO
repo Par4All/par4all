@@ -1,0 +1,4 @@
+Verify int printf formats in build.c
+
+hash.c:778: attention : déréférencement du pointeur type-punned brisera les strictes d'aliases
+???
