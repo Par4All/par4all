@@ -47,7 +47,7 @@ uninstall:
 ETAGS	= /tmp/etags.$$$$
 TAGS:
 	find $(CURDIR) -name '*.[chly]' -print0 | \
-		xargs -0 etags --append --output=$(ETAGS) ; \
+		xargs -0 etags --append -o $(ETAGS) ; \
 	mv $(ETAGS) TAGS
 
 CTAGS	= /tmp/ctags.$$$$
