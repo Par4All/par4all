@@ -144,8 +144,10 @@ echo:; @echo $(ECHO)
 
 %: %.c
 %: %.o
-$(ARCH)/%.o: %.c; $(COMPILE) $< -o $@
-$(ARCH)/%.o: %.f; $(F77CMP) $< -o $@
+# Add global file path to help compile mode from editors such as Emacs to
+# be clickable:
+$(ARCH)/%.o: %.c; $(COMPILE) `pwd`/$< -o $@
+$(ARCH)/%.o: %.f; $(F77CMP) `pwd`/$< -o $@
 
 %.class: %.java; $(JAVAC) $<
 %.h: %.class; $(JNI) $*
