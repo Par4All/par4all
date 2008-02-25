@@ -1,0 +1,208 @@
+\slidepart{Synthèse de code}
+
+
+\begin{trans}{Compilation de spécification}
+  \begin{itemizer}
+  \item \hypertarget{Synth}{Application} traitement du signal systématique
+  \item Langage de type Fortran 90, Alpha
+  \item Temps infini
+  \item Séquence de nids de boucles parallèles
+  \item Assignation unique
+  \item Modulo
+  \end{itemizer}
+\end{trans}
+
+
+\begin{trans}{Veille à Bande Large}
+  %%/users/cri/ancourt/RAPPORT/SLIDES/INRIA/talk97.tex
+  {\small
+  \begin{verbatim}
+doall t,h
+  call FFT(t,h)
+enddo
+doall t,f,v 
+  call BeamForming(t,f,v)
+enddo
+doall t,f,v
+  call Energy(t,f,v)
+enddo 
+doall t,v
+  call ShortIntegration(t,v)
+enddo
+doall t,v
+  call AzimutStabilization(t,v)
+enddo
+doall t,v
+  call LongIntegration(t,v)
+enddo
+\end{verbatim}
+    }
+\end{trans}
+
+
+\begin{trans}{Machines cibles}
+  \begin{itemizer}
+  \item Multiprocesseurs à mémoire distribuée 
+  \item Pas de topologie particulière
+  \item Programmation SIMD/SPMD
+    \begin{itemizet}
+    \item Une tâche de calculs à la fois (temps d'exécution fixe) 
+    \item Temps de synchronisation et communications
+    \end{itemizet}
+  \item Possibilité recouvrement calculs/communications
+  \end{itemizer}
+  \belleboite{Programmation Logique par Contraintes}
+\end{trans}
+
+
+\begin{trans}{Ordonnancement maquette VBL}
+{\footnotesize
+\begin{alltt}
+ do t8 = 0, infini
+   do t7 = 8*t8, 8*t8+7 {\orange
+     FFT
+     FFT
+     FORMATION DE VOIES ; ENERGIE }
+     do t5 = 8*t7,8*t7+7 {\orange
+        FFT
+        FORMATION DE VOIES ;  ENERGIE
+        REGROUPEMENT LARGE BANDE }
+     enddo {\orange
+     FORMATION DE VOIES ; ENERGIE
+     REGROUPEMENT LARGE BANDE
+     REGROUPEMENT LARGE BANDE
+     INTEGRATION COURTE
+     STABILISATION EN AZIMUT }
+   enddo {\orange
+  INTEGRATION LONGUE 
+  STABILISATION EN AZIMUT }
+ enddo
+\end{alltt}
+}
+\end{trans}
+
+
+\begin{trans}{FFT}
+\begin{alltt}
+  do t=0,infinity
+   do h=0,511
+{\orange{}c          Read/IN Region:   
+c                HYDRO(h,512*t:512*t+511)}
+{\green{}c          Write/OUT Region: 
+c                TABFFT(h,0:255,t)}
+    call FFTDbl({\orange{}HYDRO(h,512*t:512*t+511)}, {\green{}TABFFT(h,0:255,t)})
+   enddo
+  enddo
+\end{alltt}
+\end{trans}
+
+
+\newcommand{\boitea}[1]{\psframebox*[fillcolor=wheat,framesep=1pt]{\black #1}}
+\newcommand{\boiteb}[1]{\psframebox*[fillcolor=salmon,framesep=1pt]{\black
+    #1}}
+\newcommand{\boitec}[1]{\psframebox*[fillcolor=red,framesep=1pt]{\black
+    #1}}
+\newcommand{\boited}[1]{\psframebox*[fillcolor=yellow,framesep=1pt]{\black #1}}
+\newcommand{\boitee}[1]{\psframebox*[fillcolor=springgreen,framesep=1pt]{\black #1}}
+\newcommand{\boitef}[1]{\psframebox*[fillcolor=green,framesep=1pt]{\black
+    #1}}
+\newcommand{\boiteg}[1]{\psframebox*[fillcolor=cyan,framesep=1pt]{\black #1}}
+\newcommand{\boiteh}[1]{\psframebox*[fillcolor=violet,framesep=1pt]{\black
+    #1}}
+
+\begin{trans}{Contribution de PIPS : (ré)allocation de tableaux}
+{\footnotesize
+\begin{alltt}    
+real \boitea{Hydro}(0:N,0:511)
+real \boiteb{Frequence}(0:N,0:255,0:511)
+real \boitec{Voies}(0:N,0:199,0:127)
+real \boited{Energie}(0:N,0:199,0:127)
+real \boitee{BL}(0:N,0:127)
+real \boitef{INTC}(0:N,0:127)
+real \boiteg{VSTAB}(0:N,0:127)
+real \boiteh{OUTPUT}(0:N,0:127)
+DO t8 = 0, N
+   DO t7 = 8*t8, 8*t8+7
+      DO t5 = 8*t7, 8*t7 + 7
+         DO t1 = 512*t5, 512*t5+511
+            read 5, (\boitea{Hydro}(t1,h1), h1 = 0 , 511)
+         DO h2 = 0, 511
+            call FFTr(\boiteb{Frequence},t5, h2, \boitea{Hydro}, N)
+\newslide
+         DO v3 = 0, 127
+            DO f3 = 0, 199
+               call FV(\boitec{Voies}, t5, f3, v3, \boiteb{Frequence}, N)
+               call MOD2(\boited{Energie}(t5,f3,v3), \boitec{Voies}(t5,f3,v3))
+         DO v5 = 0, 127
+            call RtBL(\boitee{BL}, \boited{Energie},t5,v5,N)
+      DO v6 = 0, 127
+         call INTnL(\boitef{INTC},t7,v6, \boitee{BL}, N)
+      DO v7 = 0, 127
+         call STABAz(\boiteg{VSTAB}, \boitef{INTC},t7,v7,N)
+   DO v8 = 0, 127
+      call INTnL(\boiteh{OUTPUT},t8,v8, \boiteg{VSTAB}, N)
+   print 6, (\boiteh{OUTPUT}(t8,i), i = 0, 127)
+  \end{alltt}
+}  
+\end{trans}
+
+
+\begin{trans}{VBL réallouée}
+{\footnotesize
+\begin{alltt}
+DO t8 = 0, N
+   real \boiteg{VSTAB}(0:7,0:127)
+   real OUTPUT(0:0,0:127)
+   DO t7 = 8*t8, 8*t8+7
+      real \boitee{BL}(0:7,0:127)
+      real \boitef{INTC}(0:0,0:127)
+      DO t5 = 8*t7, 8*t7 + 7
+         real \boitea{Hydro}(0:511,0:511)
+         real \boiteb{Frequence}(0:0,0:255,0:511)
+         real \boited{Energie}(0:0,0:199,0:127)
+         DO t1 = 0, 511
+            read 5, (\boitea{Hydro}(t1,h1), h1 = 0 , 511)
+         DO h2 = 0, 511
+            call FFTr(\boiteb{Frequence},0, h2, \boitea{Hydro}, N)
+\newslide
+         DO v3 = 0, 127
+            DO f3 = 0, 199
+               real \boitec{Voies}(0:0,0:199,0:127)
+               call FV(\boitec{Voies}, 0, f3, v3, \boiteb{Frequence}, N)
+               call MOD2(\boited{Energie}(0,f3,v3), \boitec{Voies}(0,f3,v3))
+         DO v5 = 0, 127
+            call RtBL(\boitee{BL}, \boited{Energie},t5,v5,N)
+      DO v6 = 0, 127
+         call INTnL(\boitef{INTC},0,v6, \boitee{BL}, N)
+      DO v7 = 0, 127
+         call STABAz(\boiteg{VSTAB}, \boitef{INTC},t7,v7,N)
+   DO v8 = 0, 127
+      call INTnL(OUTPUT,t8,v8, \boiteg{VSTAB}, N)
+   print 6, (\boiteh{OUTPUT}(0,i), i = 0, 127)
+  \end{alltt}
+}  
+\end{trans}
+
+
+\begin{trans}{Programmation logique concurrente par contraintes}
+  \psfighautcentre{dessins/relation2.idraw}
+\end{trans}
+
+
+\begin{trans}{Compilation de spécifications fonctionnelles}
+  \begin{itemizer}
+  \item Programmation concurrente par contraintes 
+  \item Traitement global du problème du placement (non-linéaire)
+  \item Démonstration de faisabilité
+  \item Études de modélisation (communications dans PSP RBE2)
+  \item Extension en robustesse et applicabilité (thèse)
+  \item Projet recherche exploratoire RNRT PROMPT
+  \item plan d'étude amont DGA NARVAL action Paradis
+  \end{itemizer}
+\end{trans}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "trans"
+%%% End: 

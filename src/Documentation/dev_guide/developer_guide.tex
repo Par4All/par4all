@@ -38,7 +38,7 @@
 \end{tabular}
 }
 
-\date{August 1996 - August 2007}
+\date{August 1996 - February 2008}
 
 \renewcommand{\indexname}{Index}
 \makeindex
@@ -327,6 +327,37 @@ just commit from there when you're happy with your changes.  This may be
 advisable for small easy to test global changes, such as adding a new
 library in PIPS. This is not advisable for long development, as it is
 often useful to have an history of such developments.
+
+
+\subsection{Understanding the Makefile infrastructure inside the SVN
+  infrastructure}
+\label{sec:underst-makef-infr}
+
+This section is to be skipped at first reading and is only of interest for
+people wanting to modify more globally the PIPS infrastructure.
+
+The compilation directories are managed by some global variables
+initialized as described in section~\ref{sec:shell}.
+
+If you compile into a directory, in the \verb/prod/ directory installed by
+the installation script, your branch directory or whatever, the compiled
+stuff from a directory goes to \verb/$NEWGEN_ROOT/, \verb/$LINEAR_ROOT/
+\verb/PIPS_ROOT/ respectively, use the Makefile definitions from their
+\verb/$/\emph{*}\verb/_ROOT/ and are build with library found in the other
+\verb/$/\emph{*}\verb/_ROOT/ directory. The Makefile parts are picked into
+\verb/$/\emph{*}\verb|ROOT/makes| directory, \emph{except} for
+\emph{Makefile} that are local symbolic links.
+%$
+
+For example, if you have a local PIPS copy in the \texttt{svn/pips/trunk}
+and you compile with \texttt{make}, it will build against
+\verb/$NEWGEN_ROOT/ and \verb/$LINEAR_ROOT/, it will install into
+\verb/$PIPS_ROOT/ and will use \texttt{Makefile} stuff from
+\verb|$PIPS_ROOT/makes|, and only few forwarding \texttt{Makefile} are
+sym-linked to \texttt{svn/pips/trunk/makes}. So if you want to modify the
+\texttt{Makefile} infrastructure, modify mainly \verb|$PIPS_ROOT/makes| %$
+and commit it. It will be commited into the \texttt{svn/nlpmake/trunk}
+repository anyway.
 
 
 \section{Shell environment (sh, ksh, bash, csh, tcsh)}

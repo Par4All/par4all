@@ -1,0 +1,662 @@
+\slidepart{Rétroingéniérie}
+
+
+\begin{trans}{Compréhension de code}
+  \belleboite{Motivation économique}
+  \begin{itemizer}
+  \item \hypertarget{Compréhension}{Beaucoup} de codes existent dans
+    l'industrie
+  \item Capital souvent important (100k-1M lignes)
+  \item Coûts importants en maintenance et évolution
+  \item Estimation des coûts de maintenance contre coûts de développement
+  \item Vérification de programme, certification, test
+  \item Vérification de codes importés : \emph{parallélisme, débordement
+      de tableau}
+  \item Détections d'erreurs (allocation,...)
+  \item Utile pendant tout le cycle de vie : codage, mise au point,
+    optimisation, certification, maintenance, réingéniérie
+  \item Bug de l'an 2000
+  \item EDF, CEA-DAM
+  \end{itemizer}
+  \belleboite{Outils de rétro-ingéniérie nécessaires}
+\end{trans}
+
+
+\begin{trans}{Graphe d'appel}
+  \begin{multicols}{2}
+    \psfig{file=dessins/cr2cnf-CG.eps,width=0.6\hsize}
+    \begin{itemizer}
+    \item Indispensable pour appréhender un gros code
+    \item Outil de navigation
+    \end{itemizer}
+  \end{multicols}
+\end{trans}
+
+
+\begin{trans}{Signature --- D}
+  Détection de passage de paramètres cachés
+\begin{verbatim}
+C  <T(PHI1,PHI2,PHI3)-IN-EXACT-{PHI1==J, PHI1==JP, KP<=PHI2+1,
+C    PHI2<=KP, L<=PHI3, PHI3<=2+L, K==KP-1, 2<=J, 3<=KP}>
+      REAL*4 FUNCTION D(J,K,JP,KP)
+C*****************************************
+C     CALCULE D=DISTANCE
+C*****************************************
+C     
+      INTEGER J,K,JP,KP,L
+      REAL*4 D,T(1:52,1:21,1:60)
+      COMMON /CNI/ L
+      COMMON /CT/ T
+...
+\end{verbatim}
+\end{trans}
+
+
+\begin{trans}{Signature --- CR2CNF}
+  \psfiglarge{dessins/invfro-signature.eps}
+\end{trans}
+
+
+\begin{trans}{Signature de INVFRO}
+  \begin{itemizer}
+  \item Aucune valeur de "Z1", "Z2" ou "Z3" nécessaire (pas de région
+    IN)
+  \item Aucune valeur de "Z1", "Z2" ou "Z3" utilisé ultérieurement
+    (pas de région OUT)
+  \item Utilisation localisée du "COMMON /TOTO/" par rapport à
+    l'application complète CR2CNF
+  \end{itemizer}
+\end{trans}
+
+
+\begin{trans}{Privatisation}
+  \begin{itemizer}
+  \item Cerner la durée de vie de variables scalaires ou tableaux \vavers
+    structuration \& modularité
+  \item Transformation de programme sur scalaires, tableaux, "COMMON"s
+    {\small
+\begin{alltt}
+      SUBROUTINE INVFRO(A,AF,Y,N,NC,X,Z,NP)
+      REAL*8 \emph{Z2_P(1:640)},\emph{Z1_P(1:640)},A(1:N,1:N,1:3),AF(1:N,1:N,1:NC),
+     &Y(1:N,1:NC),X(1:N,1:NC),Z(1:N),\emph{Z1(1:640)},\emph{Z2(1:640)},\emph{Z3(1:640)}
+      COMMON /TOTO/ \emph{Z1},\emph{Z2},\emph{Z3}
+\end{alltt}}
+Remplacement des références à "Z1" \& "Z2" par "Z1_P" \& "Z2_P"
+  \end{itemizer}
+\end{trans}
+
+
+\begin{trans}{ICFG : Graphe d'appel décoré}
+  {\footnotesize
+\begin{verbatim}
+  EXTRMAIN
+    if
+    then
+C  <T(PHI1,PHI2,PHI3)-R-MAY-{J1<=PHI1, PHI1<=JA, 1<=PHI2, PHI2<=3+K1,
+C    PHI2<=21, J2==2JA-1, 2<=J1, 2<=K1}>
+C  <T(PHI1,PHI2,PHI3)-W-MAY-{PHI2==1, J1<=PHI1, PHI1+1<=2JA,
+C    3+NC<=PHI3, PHI3<=5+NC, J2==2JA-1, 2<=J1, J1<=JA, 2<=K1}>
+        EXTR
+            do J       
+        C  <T(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==J, PHI1==JP, KP<=PHI2+1,
+        C    PHI2<=KP, L<=PHI3, PHI3<=2+L, K==KP-1, 2<=J, 3<=KP}>        
+                D        
+        C  <T(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==J, PHI1==JP, KP<=PHI2+1,
+        C    PHI2<=KP, L<=PHI3, PHI3<=2+L, K==KP-1, 2<=J, 3<=KP}>        
+                D        
+        C  <T(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==J, PHI1==JP, KP<=PHI2+1,
+        C    PHI2<=KP, L<=PHI3, PHI3<=2+L, K==KP-1, 2<=J, 3<=KP}>        
+                D
+            enddo
+    endif
+\end{verbatim}
+    }
+\end{trans}
+
+
+\begin{trans}{Distribution \& vectorisation}
+  \begin{minipage}{0.4\hsize}
+\begin{alltt}
+do i = ...
+  a(i) = ...
+  b(3*i + 4) = ...
+enddo
+\end{alltt}
+  \end{minipage}
+  \vavers
+  \begin{minipage}{0.4\hsize}
+\begin{alltt}
+  a(1:1000) = ...
+  b(7:3004:3) = ...
+\end{alltt}
+  \end{minipage}
+  \begin{itemizer}
+  \item Effet de bord de la vectorisation
+  \item Casser des grosses boucles en instructions élémentaires
+  \item Retrouver formalisme mathématique à base de vecteurs \&
+    matrices
+  \end{itemizer}
+\end{trans}
+
+
+\begin{trans}{Parallélisation \& Détection des conflits}
+  \begin{itemizer}
+  \item Code parallélisé $\equiv$ manipulation point à point de champs
+    de données
+  \item Parallélisation $\equiv$ slicing par indépendance des
+    itérations...
+  \item Détection des conflicts entre itération : régions Read \&
+    Write, AILE:EXTR
+
+    \newslide
+
+{\footnotesize
+\begin{verbatim}
+          DO 300 J = J1, JA
+C  <T(PHI1,PHI2,PHI3)-R-EXACT-{J==PHI1, PHI1<=52, K<=PHI2, PHI2<=1+K,
+C    PHI2<=21, L<=PHI3, 1<=PHI3, PHI3<=2+L, PHI3<=60, J2==2JA-1,
+C    K==K1, L==NI, J1<=J, J<=JA, 2<=J1, 2<=K}>
+         S1 = D(J, K, J, K+1)
+         ...
+C  <T(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==J, PHI2==1, PHI3==NC+3,
+C    J2==2JA-1, K==K1, L==NI, J1<=J, J<=JA, 2<=J1, 2<=K1}>
+         T(J,1,NC+3) = S2*S3/((S1-S2)*(S1-S3))
+         ...
+C  <T(PHI1,PHI2,PHI3)-R-EXACT-{PHI1==J, PHI2==1, PHI3==NC+3,
+C    J+JH==J1+2JA-1, J2==2JA-1, K==K1, L==NI, J1<=J, J<=JA, 2<=J1,
+C    2<=K1}>
+C  <T(PHI1,PHI2,PHI3)-W-EXACT-{PHI1==JH, PHI2==1, PHI3==NC+3,
+C    J+JH==J1+2JA-1, J2==2JA-1, K==K1, L==NI, J1<=J, J<=JA, 2<=J1,
+C    2<=K1}>
+         T(JH,1,NC+3) = T(J,1,NC+3)
+300      CONTINUE
+\end{verbatim}
+  }
+
+\newslide
+
+\item Privatisation dans une itération (régions In/Out) +
+  parallélisation à gros grain (régions Read/Write). OA118\\
+  {\footnotesize
+\begin{alltt}
+{\orange{}CHPF$ INDEPENDENT, NEW(JI,JE,I,O(1:NFAC),PHW(1:NFAC))}
+      DO 998 J = 1, NKJ
+         CALL PHWAK(PHW, J)
+         CALL GRAD1(PHW, O)
+{\orange{}CHPF$    INDEPENDENT, NEW(JI,JE)}
+         DO 116 I = 1, NKJ
+            JE = JEX(I)
+            JI = JIX(I)
+            IF (1.LE.JE.AND.JE.LE.NFAC.AND.1.LE.JI.AND.JI.LE.NFAC)
+     &       CC(J,I) = O(JE)-O(JI)
+116         CONTINUE
+998      CONTINUE
+\end{alltt}
+      }
+  \end{itemizer}
+\end{trans}
+
+
+\begin{trans}{Vérification, preuve, génération de tests}
+  Motivation économique
+  \begin{itemizer}
+  \item Coût des tests (Ariane~4 \vavers{} Ariane~5)
+  \item Coût de développement
+  \item Aérospatiale, Dassault-Aviation, EDF, ESA,...
+  \end{itemizer}
+\end{trans}
+
+
+\begin{trans}{Calculs d'invariants}
+  \begin{itemizer}
+  \item Compréhension avec expressions symboliques
+  \item Préconditions sur les variables scalaires entières
+  \item Détection des variables inductives
+  \item Complexité : $\mathcal{O}(N^2M)$ \vavers 2 boucles en $N$ \& 1
+    en $M$ imbriquées, preuve de terminaison
+  \end{itemizer}
+\end{trans}
+
+
+\begin{trans}{Invariants}
+  \begin{itemizer}
+  \item Compréhension
+    \begin{itemizer}
+    \item Extraction d'invariants
+    \item Bornes sur variables
+    \item Preuves de propriétés
+    \end{itemizer}
+  \item Optimisation \& spécialisation : élimination de code mort,
+    évaluation partielle,...
+  \end{itemizer}
+  Exemple de système de transition : 1 producteur ("b") \& 2
+  consommateurs ("o1" \& "o2")
+\end{trans}
+
+
+\begin{trans}{Espace d'états pour producteur consommateur}
+  Invariant
+  \[
+  A = O_1 + O_2 + B + I 
+  \]
+  \psfiglarge{dessins/pcpugh.idraw}
+
+  Bonne terminaison quand tout a été produit et que le buffer est
+  vide
+  \[
+  A = O_1 + O_2
+  \]
+\end{trans}
+
+
+\begin{trans}{Producteur consommateur --- PCPUGH}
+  \deuxcolonnes{\footnotesize\verbatiminput{codes/pcpugh.f}}
+\end{trans}
+
+
+\begin{trans}{Terminaison producteur/consommateur}
+  \begin{multicols}{2}
+  {\footnotesize
+    \begin{alltt}
+      PROGRAM PCPUGH
+      ...
+      DO K = 1, N
+{\orange{C  P(A,B,I,K,O1,O2) \{B+I+O1+O2==A, 1<=A,
+C    B+2O1+2O2+1<=K, 0<=B+O1+O2,
+C    1<=K, K<=N, 0<=O1, 0<=O2\}}}
+      ...
+      IF (I.EQ.0.AND.B.EQ.0) THEN
+{\orange{C  P(A,B,I,K,O1,O2) \{O1+O2==A, B==0, I==0,
+C    1<=A, A+O1+O2<=K, K<=N, 
+C    O1+O2+1<=K, 0<=O1, 0<=O2\}}}
+          PRINT *, 'The End', O1, O2, A
+      ENDIF
+      ENDDO
+    \end{alltt}
+    } Les invariants peuvent être réinterprétés:
+  \begin{itemize}    
+  \item $0 \le B + O_1 + O_2 \Longleftrightarrow I \le A$
+  \item $0 \le O_1, 0 \le O_2 \Longleftrightarrow B + I \le A$
+  \item $B + 2 \times O_1 + 2 \times O_2 + 1 \le K$ : nombre de
+    transitions effectuées $<$ nombre de transitions essayées
+  \end{itemize}     
+  \end{multicols}
+\end{trans}
+
+
+
+\slidepart{Simplification de code}
+
+
+\begin{trans}{Simplification de code}
+  \begin{itemizer}
+  \item Élimination des « scories » de mise au point dans les vieux
+    codes
+  \item Renormalisation (graphe de contrôle, détection de boucles)
+  \item Adaptation du logiciel à son utilisation réelle
+  \item Facilite la rétro-ingéniérie
+  \end{itemizer}
+\end{trans}
+
+
+\begin{trans}{Restructuration du graphe de contrôle}
+  \deuxcolonnes{\psfighautcentre{dessins/ocean-graph.ps}
+    \psfighautcentre{dessins/ocean-graph-restructure.ps}}
+
+  OCEAN (PerfectClub) : 16 tests non structurés \vavers 15 tests
+  restructurés
+
+  \begin{itemizet}
+  \item 3 "IF"/"THEN"/"ELSE"
+  \item 0 "IF"/"THEN" (branche "ELSE" vide)
+  \item 11 "IF"/"ELSE" (branche "THEN" vide)
+  \item 1 "IF" vide !
+\begin{verbatim}
+2     IF (LMAPP.NE.2) THEN
+         GOTO 3
+      ENDIF
+3     CONTINUE
+\end{verbatim}
+  \end{itemizet}
+  
+  \newslide
+
+  \begin{itemizer}
+  \item Transformer plat de spaghetti en "IF"/"THEN"/"ELSE" sans
+    "GOTO", "WHILE",...
+  \item Techniques des années 1960
+  \item Bénéficier de la programmation structurée
+    \begin{itemizer}
+    \item Lisibilité
+    \item Maintenance
+    \end{itemizer}
+  \item Disponibles dans d'autres outils (Foresys, etc)
+  \item Amélioration de la précision d'analyses ultérieures
+  \end{itemizer}
+\end{trans}
+
+
+\begin{trans}{Élimination de code mort via préconditions}
+  Exemple d'OCEAN (PerfectClub) : 57 tests\\
+  \psfiglarge{dessins/epips_ocean_prec.eps}
+  \begin{itemizer}
+  \item Élimination des instructions infaisables : 1
+  \item Élimination de tests toujours vrais ou faux : 25 (17 "THEN" \&
+    8 "ELSE")
+  \item Élimination de boucles jamais exécutées : 0
+  \item Garder un corps de boucle exécuté 1 seule fois : 0
+  \end{itemizer}
+  $\Rightarrow$ Nombre de chemins de contrôle réduit par facteur
+  25--16~000~000\\
+  \vavers{} amélioration d'analyses ultérieures
+\end{trans}
+
+
+\begin{trans}{Élimination par chaînes use/def}
+  \begin{itemizer}
+  \item \emph{Slicing} sur les E/S. OCEAN : 13 lignes supprimées    
+  \item Utilisation des chaînes In/Out possible (exemple sur code RPC)
+  \item \emph{Slicing} par effet de bord : enlever toutes les E/S et
+    mettre un "print" d'une variable...
+  \end{itemizer}
+\end{trans}
+
+
+\slidepart{Spécialisation de code}
+
+\begin{trans}{Spécialisation de code}
+  \begin{itemizer}
+  \item Optimisation de code pour une architecture donnée
+  \item Optimisation pour une utilisation donnée (bibliothèques)
+  \item Déroulage des petites boucles internes
+  \item Post-phase de clonage : séparation d'une routine à fonctionalités
+    multiples (DYNA:MAKEPRF initialisation \& calcul)
+  \end{itemizer}
+\end{trans}
+
+
+\begin{trans}{DYNA:MAKEPRF}
+  {\footnotesize
+\begin{alltt}
+C     IF MODE=0 IN THE MIDDLE OF TIME STEP
+C     KEYTAU=1
+C     KEYLUM=1
+C     KSTATE=-1
+C     KVISCOS=0
+C     IF MODE=1  IN THE END OF TIME STEP
+C     KEYTAU=1
+C     KEYLUM=1
+C     KSTATE=1
+C     KVISCOS=1
+C     -------------------------------------------------
+\newslide
+C     IF KEYTAU=0 DONT CALCULATE TAUA(J)
+C     IF KEYLUM=0 DONT CALCULATE FRA(J) AND FCA(J)
+C     IF KEYLUM=1 CALCULATE EXACT FRA AND FCA
+C     IF KEYLUM=-1  CAL. FLUX ONLY FROM  DER.
+C     IF KSTATE=-1 CALCULATE VARIABLES FROM DERIVATIVES
+C     IF KSTATE=1 CALCULATE EXACT  VARIABLES FROM STATE
+C     IF KVISCOS=0 DO NOT CALCULATE VISCOSITY
+C     IF KVISCOS=1 CALCULATE VISCOSITY
+C     -------------------------------------------------
+C     IF KCONVEC=0  INSTATENIOUS  CONVECTION
+C     IF KCONVEC=1  TIME DEPENDENT CONVECTION
+C     -------------------------------------------------
+\end{alltt}
+    }
+\end{trans}
+
+
+\begin{trans}{Bibliothèque SDOT}
+\begin{alltt}
+{\orange{}C  P() {INCX==1, INCY==1, N==49}}
+      REAL*4 FUNCTION SDOT(N,X,INCX,Y,INCY)
+      INTEGER N,INCX,INCY,IX,IY,I
+      REAL*4 X(1:1),Y(1:1),SDOT
+      
+{\yellow{}      SDOT = 0.0                  0001}
+      IX = 1                      0002
+      IY = 1                      0003
+      DO 10 I = 1, N              0004
+{\yellow{}         SDOT = SDOT+X(IX)*Y(IY)  0005}
+         IX = IX+INCX             006
+         IY = IY+INCY             0007
+10       CONTINUE                 0008
+      END
+\end{alltt}
+\end{trans}
+
+
+\begin{trans}{SDOT optimisée}
+  Après évaluation partielle, déroulage, évaluation partielle \&
+  élimination use-def
+  {\footnotesize
+\begin{verbatim}
+      SDOT = 0.0             
+      SDOT = SDOT+X(1)*Y(1)  
+      SDOT = SDOT+X(2)*Y(2)  
+      SDOT = SDOT+X(3)*Y(3)  
+      SDOT = SDOT+X(4)*Y(4)  
+      SDOT = SDOT+X(5)*Y(5)  
+      SDOT = SDOT+X(6)*Y(6)  
+      SDOT = SDOT+X(7)*Y(7)  
+...                          
+      SDOT = SDOT+X(48)*Y(48)
+      SDOT = SDOT+X(49)*Y(49)
+\end{verbatim}
+  }
+\end{trans}
+
+
+\begin{trans}{CONVOL générique}
+  {\footnotesize
+\begin{alltt}
+{\red{}C                                    46058140 (SUMMARY)}
+      SUBROUTINE CONVOL(NEW_IMAGE,IMAGE,ISI,ISJ,KERNEL,
+     &HKSI,HKSJ)
+      INTEGER ISI,ISJ,HKSI,HKSJ,I,J,KI,KJ
+      REAL*4 NEW_IMAGE(1:ISI,1:ISJ),IMAGE(1:ISI,1:ISJ),
+     &KERNEL(-HKSI:HKSI,-HKSJ:HKSJ),S
+      
+      DO I = 1, ISI
+         DO J = 1, ISJ
+            NEW_IMAGE(I,J) = IMAGE(I,J)
+         ENDDO
+      ENDDO
+\newslide
+      DO 300 J = 1+HKSJ, ISJ-HKSJ
+         DO 400 I = 1+HKSI, ISI-HKSI
+            S = 0.
+{\yellow            DO 200 KI = -HKSI, HKSI
+               DO 100 KJ = -HKSJ, HKSJ
+                  S = S+IMAGE(I+KI,J+KJ)*KERNEL(KI,KJ)
+100               CONTINUE
+200            CONTINUE}
+            NEW_IMAGE(I,J) = S/((2*HKSI+1)*(2*HKSJ+1))
+400         CONTINUE
+300      CONTINUE
+      END
+\end{alltt}
+    }
+\end{trans}
+
+
+\begin{trans}{Vérification accès tableaux CONVOL}
+  {\small
+\begin{alltt}
+{\red{}C  <{\green{}IMAGE}(PHI1,PHI2)-{\green{}R-EXACT}-\{1<=PHI1, PHI1<=ISI, 1<=PHI2, PHI2<=ISJ,
+C    1<=HKSI, 1<=HKSJ\}>
+C  <{\green{}KERNEL}(PHI1,PHI2)-{\green{}R-EXACT}-\{0<=PHI1+HKSI, PHI1<=HKSI, 0<=PHI2+HKSJ,
+C    PHI2<=HKSJ, 1<=HKSI, 1+2HKSI<=ISI, 1<=HKSJ, 1+2HKSJ<=ISJ,
+C    1<=ISJ\}>
+C  <{\green{}NEW_IMAGE}(PHI1,PHI2)-{\magenta{}W-EXACT}-\{1<=PHI1, PHI1<=ISI, 1<=PHI2,
+C    PHI2<=ISJ, 1<=HKSI, 1<=HKSJ\}>}
+\end{alltt}
+}
+\iffalse
+\begin{verbatim}
+C  <IMAGE(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=512, 1<=PHI2,
+C    PHI2<=512, HKSI==1, HKSJ==1, ISI==512, ISJ==512}>
+C  <KERNEL(PHI1,PHI2)-R-EXACT-{0<=PHI1+1, PHI1<=1, 0<=PHI2+1,
+C    PHI2<=1, HKSI==1, HKSJ==1, ISI==512, ISJ==512}>
+C  <NEW_IMAGE(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=512,
+C    1<=PHI2, PHI2<=512, HKSI==1, HKSJ==1, ISI==512, ISJ==512}>
+\end{verbatim}
+\fi
+\end{trans}
+
+
+\begin{trans}{CONVOL après optimisation}
+  Clonage + évaluation partielle + 2 déroulages de boucle +
+  élimination use-def :{\footnotesize
+\begin{alltt}
+  C                                              32532940 (SUMMARY)
+  ...
+      DO 300 J = 2, 511                                        0004
+         DO 400 I = 2, 511                                     0005
+            S = 0.                                             0006
+{\green{}            S = S+IMAGE(I-1,J-1)*KERNEL(-1,-1)                 0009
+            S = S+IMAGE(I-1,J)*KERNEL(-1,0)                    0009
+            S = S+IMAGE(I-1,J+1)*KERNEL(-1,1)                  0009
+            S = S+IMAGE(I,J-1)*KERNEL(0,-1)                    0009
+            S = S+IMAGE(I,J)*KERNEL(0,0)                       0009
+            S = S+IMAGE(I,J+1)*KERNEL(0,1)                     0009
+            S = S+IMAGE(I+1,J-1)*KERNEL(1,-1)                  0009
+            S = S+IMAGE(I+1,J)*KERNEL(1,0)                     0009
+            S = S+IMAGE(I+1,J+1)*KERNEL(1,1)                   0009}
+            NEW_IMAGE(I,J) = S/9                               0012
+400         CONTINUE
+300      CONTINUE
+\end{alltt}
+    }
+\end{trans}
+
+
+\begin{trans}{Temps d'exécution}
+  \small
+  \begin{tabular}{|l|r||r|r||r|r|} \hline
+    & Estimation SS2 &\multicolumn{2}{c||}{SuperSparc-II
+      }&\multicolumn{2}{c|}{UltraSPARC} \\ \cline{3-6}
+    & (cycles) & f77 -O3 & f77    & f77 -O3 & f77 \\ \hline
+    Code initial      & 66358440 & 29.6s   & 195.2s & 9.59s    & 105.3s \\
+    Code spécialisé & 28612020 & 13.1s   &  69.2s & 5.58s    &  34.0s\\ \hline
+    Rapports          &     2.32 & 2.26    &  2.82  & 1.71    & 3.09 \\ \hline
+  \end{tabular}
+\end{trans}
+
+
+\slidepart{Vérification de programme}
+
+
+\begin{trans}{Une étude EDF}
+  Vérification d'un programme en cours de parallélisation
+  \begin{itemizer}
+  \item Seulement 600 procédures parmi les 2000 d'une application
+  \item Graphe des appels long de 82 pages: impossible à traiter manuellement
+  \item 40\,617 lignes de code
+  \item La boucle \emph{machin} dans la procédure \emph{truc} est-elle
+    vraiment parallèle ?
+  \end{itemizer}
+\end{trans}
+
+
+\begin{trans}{Graphe de flot de données quotient}
+  \psfighautcentre{dessins/edf-common.idraw}
+\end{trans}
+
+
+\begin{trans}{Résultats de cette étude EDF}
+  \begin{itemizer}
+  \item une variable non initialisée
+  \item nettoyage des déclarations
+    \begin{itemizet}
+    \item réduction du nombre de commons: 36~\%
+    \item réduction du nombre d'équivalence: 98~\%
+    \item réduction du nombre de paramètres: 95~\%
+    \end{itemizet}
+  \item vérification de la validité de la parallélisation
+  \end{itemizer}
+\end{trans}
+
+
+\begin{trans}{Array data flow graph}
+  \begin{itemizer}
+  \item Méthode polyédrique (PAF, UVSQ/PRISM)
+  \item Pouvoir tracer les éléments de tableau
+  \item Passage en assignation unique dynamique
+  \item Détection des erreurs d'accès
+  \item Restreint aux cas simples (contrôle statique, intraprocédural)
+  \end{itemizer}
+\end{trans}
+
+
+\begin{trans}{Multiplication de matrice}
+  {\small
+\begin{alltt}
+      PARAMETER (N = 10)
+     
+      DO J = 1, N
+         DO I = 1, N                          0002
+            A(I,J) = REAL(I-N/2)/REAL(J)      0004
+            B(I,J) = REAL(J-3)/REAL(I)        0005
+         ENDDO                                
+      ENDDO                                   
+      DO J = 1, N                             0006
+         DO I = 1, N                          0008
+            {\red{}C(I,J) = 0.}                       0010
+            DO K = 1, N                       0011
+               {\orange{}C(I,J) = C(I,J)}+A(I,K)*B(K,J)  0013
+            ENDDO
+         ENDDO
+      ENDDO
+\end{alltt}
+}
+\end{trans}
+
+
+\begin{trans}{ADFG de la multiplication de matrice}
+  {\footnotesize
+    \begin{multicols}{2}
+\begin{verbatim}
+INS_100:
+********
+ Execution Domain for 100:
+{
+  I - 10 <= 0 ,
+- I + 1 <= 0 ,
+  J - 10 <= 0 ,
+- J + 1 <= 0 ,
+} 
+ ---Def-Use---> ins_130:
+  Reference: C(I,J)
+  Transformation: [J,I]
+  Governing predicate:
+{
+  K - 1 <= 0 ,
+} 
+  Execution Domain for 130:
+{
+  K - 10 <= 0 ,
+- K + 1 <= 0 ,
+  I - 10 <= 0 ,
+- I + 1 <= 0 ,
+  J - 10 <= 0 ,
+- J + 1 <= 0 ,
+}
+\end{verbatim}
+    \end{multicols}
+}
+\end{trans}
+
+
+\begin{trans}{(Non) initialisation de tableaux}
+  \begin{itemizer}
+  \item Régions IN : variable locale avec région IN \vavers erreur
+  \item ADFG : source indéfinie \vavers erreur
+  \end{itemizer}
+\end{trans}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "trans"
+%%% End: 

@@ -1,0 +1,564 @@
+\documentclass[12pt,compress]{beamer}
+%\documentclass[12pt,handout,compress]{beamer}
+%\documentclass[handout,compress,10pt]{beamer}
+%\usepackage{pgfpages}
+%\pgfpagesuselayout{4 on 1}[a4paper,landscape,border shrink=5mm]
+%\documentclass[11pt,a4]{powersem}
+\usepackage[latin9]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,soul}
+\usepackage[hyper,procnames]{listings}
+\usepackage{alltt}%verbatim,
+%\usepackage[linkbordercolor={1 1 1},bookmarks=true,colorlinks=false,urlbordercolor={1 1 1},runbordercolor={1 1 1},citebordercolor={1 1 1},bookmarksnumbered=true,hypertexnames=false]{hyperref}
+\usepackage{tabularx}
+\usepackage{tikz}
+\usepackage{beamer_rk,perso2e,bbold2e,abbrev_reactive,getVersion,exemple}
+\usepackage[francais]{babel}
+\frenchbsetup{og=«, fg=», ThinColonSpace=true,
+  % ShowOptions, 
+  % Évite de casser les références bibliographiques du style harvard avec
+  % des ":" dedans :
+  %AutoSpacePunctuation=false
+}
+% S'arrange pour avoir une virgule qui ne rajoute pas de blanc dans les
+% nombres à virgule :
+%\iffalse
+\DecimalMathComma
+% Et pour avoir \nombre qui marche :
+\usepackage[autolanguage]{numprint}
+%\usepackage{/usr/share/doc/texlive-doc-de/german/latex-tipps-und-tricks/fraktur}
+
+\makeindex
+
+\lstset{extendedchars=true, language=C, basicstyle=\footnotesize\ttfamily, numbers=left,
+  numberstyle=\tiny, stepnumber=2, numberfirstline=true, showspaces=true,
+  showstringspaces=false, showtabs=true,
+  tabsize=8, tab=\rightarrowfill, keywordstyle=\color{orange}\bf,
+  stringstyle=\rmfamily, commentstyle=\rmfamily\itshape,
+  index=[1][keywords],indexprocnames=true}
+%\lstloadlanguages{Basic}
+
+%\usepackage{beamerthemesplit}
+%{\usebeamercolor{palette primary}}
+%\setbeamertemplate{sidebar canvas}[vertical shading][top=palette primary.bg,middle=white,bottom=palette primary.bg]
+
+\getRCSDollarsVersion$Revision: 1.22 $
+
+\usepackage[dvips]{preview}
+\PreviewEnvironment{trans}
+\PreviewEnvironment{frame}
+%\fi
+
+% Le plan est petit :
+\renewcommand{\OutlineColumnNumbers}{1}
+
+\title[PIPS @ TB]{PIPS-related projects at TÉLÉCOM Bretagne}
+
+%\subtitle{SympA'2008, Fribourg, Suisse}
+
+%\subject{Partie \Atb}
+
+\author[R. \textsc{Keryell}]{Ronan \bsc{Keryell} \texttt{rk@enstb.org}}
+
+\institute[T\rlap{\red \'E}EL\rlap{\red \'E}ECOM Bretagne --- Département
+Informatique]{Institut T\rlap{\red \'E}EL\rlap{\red \'E}ECOM, T\rlap{\red
+    \'E}EL\rlap{\red \'E}ECOM Bretagne, Département Informatique,
+  Lab-STICC/CAC/HPCAS\\
+  Plouzané, France}
+
+\date{22 février 2008}
+
+
+\begin{document}
+
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+%\newcommand{\Idee}{{\red\Handwash}\xspace}
+%\Stopsign \Laserbeam \Estatically \Attention \Idee
+%\FilledRainCloud\Coffeecup
+
+\section{CryptoPage}
+\label{sec:cryptopage}
+
+\subsection{Introduction}
+\label{sec:introduction}
+
+
+\begin{trans}{Introduction}
+  Computer Science department at TÉLÉCOM Bretagne involved in the SAFESCALE
+  project:
+  \begin{itemize}
+  \item Refining secure high-performance processor: CryptoPage
+  \item Simulating this processor
+  \item Writing a parallelizing tool to transform classical applications
+    for the SAFESCALE architecture based on Kaapi execution model
+  \end{itemize}
+\end{trans}
+
+\subsection{Compilation}
+\label{sec:compilation}
+
+
+\begin{trans}{SAFESCALE execution model}
+  \begin{itemize}
+  \item Parallel applications describes as a task graph
+  \item Communicating tasks with a data-flow model with consumer-producer
+    paradigm
+  \item SAFESCALE adds secure execution through different mechanisms (from
+    more to less efficient)
+    \begin{itemize}
+    \item Use inherently fault tolerant algorithm if possible (fix point,
+      iterative solvers...)
+      \begin{itemize}
+      \item Open question: how many applications are in this category?
+      \end{itemize}
+    \item Secure execution platform (if available)
+      \begin{itemize}
+      \item Trust the microprocessor factory...
+      \item Right now, only ``smartcard supercomputers'' (LaBRI) or
+        military computing platforms (SAGEM Fox...) \frownie
+      \end{itemize}
+    \item Use fault tolerant property to component based-applications
+    \item Replay few tasks on some more (``verifiers'') or less secure
+      nodes to verify they produce the same results
+      \begin{itemize}
+      \item Use a probabilistic approach to grant a probabilistic security
+        level
+      \item Use the dependence graph to optimize task verification
+        selection
+      \end{itemize}
+    \item Use the BCP (\emph{Best Current Practices}) to secure execution
+      in \emph{the} real world
+    \end{itemize}
+  \end{itemize}
+\end{trans}
+
+
+\begin{trans}{Writing SAFESCALE applications}
+  \begin{itemize}
+  \item Write application as a task DAG
+  \item Task DAG $\approx$ SSA for imperative programs
+    \begin{itemize}
+    \item If loops with task calls in them, need to unroll them...
+    \item May not be quite convenient for average programmers \smiley
+    \end{itemize}
+  \item Need to study more deeply Kaapi model and API
+  \item Need to define a SAFESCALE API (Kaapi is a good starting point
+    \smiley)
+  \item A tool to help writing SAFESCALE applications could be nice...
+  \end{itemize}
+\end{trans}
+
+
+\begin{trans}{Automatic compilation for SAFESCALE}
+  \begin{itemize}
+  \item Real programmers love big sequential machines \smiley
+  \item Need to split a big application in several tasks...
+  \item ...if tasks are parallel, it is better \smiley
+  \item Need to figure out
+    \begin{itemize}
+    \item Data needed by a task to run
+    \item Data produced by a task used later by other tasks to run
+    \end{itemize}
+  \item Add some Kaapi/SAFESCALE glue to
+    \begin{itemize}
+    \item Define and calling the tasks
+    \item Map the task inputs to actual variables used in each task
+    \item Map the task variable productions to task output
+    \end{itemize}
+  \item Orchestrate all these tasks to preserve the initial program
+    semantics
+  \end{itemize}
+  Idea : use the PIPS source-to-source compiler from ENSMP to automate
+  this process
+\end{trans}
+
+
+\begin{trans}{Code distribution}
+  \begin{itemize}
+  \item General problem already studied and going on at ENSMP, ENSTB and
+    in many other places
+    \begin{itemize}
+    \item Compilation for SoC with hardware accelerators : CoMap project
+      with UBO \& ENSTB
+      \begin{itemize}
+      \item Extract pieces of code in an application
+      \item Compile them in hardware accelerators
+      \item Add some glue to interface to the sequential program (bus, bus
+        API, DMA generation...)
+      \end{itemize}
+      PhD thesis at UBO and MSc of Matthieu \textsc{Godet}
+    \item Poor man OpenMP : INT with ENSTB
+      \begin{itemize}
+      \item Offer distributed shared memory computing without... shared
+        memory ! \smiley
+      \item Compute more or less the memory zones used as input and output
+      \item Mimic the shared memory semantics with different API (remote
+        write, MPI...)
+      \end{itemize}
+    \item Mobython at INT, CNAM and ENSTB
+      \begin{itemize}
+      \item Build a grid on cellular phones \smiley
+      \item Transform an application into distributed tasks
+      \end{itemize}
+    \item HPF compilation : Jean-Louis \textsc{Pazat} \smiley, ENSMP
+    \item SAFESCALE !
+    \end{itemize}
+  \item Idea \vavers factorizing these transformations in PIPS
+  \item MSc of The Nhan \textsc{Luong} and 1-year post-doc to be found for
+    SAFESCALE... Done ! \smiley
+  \end{itemize}
+\end{trans}
+
+
+\begin{trans}{Distribution concepts in PIPS}
+  \begin{itemize}
+  \item Many semantics analysis and code transformations available in PIPS
+  \item Parallelization transformations usable here to extract parallel
+    tasks
+  \item Interprocedural dependence graph usable to feed the Kaapi
+    scheduler
+  \item PIPS compute ``Regions'' that define storage areas used by a piece
+    of code : use them to generate communications
+  \item Parallelization is in the general case not decidable : need to
+    think about SAFESCALE directives to help the compiler too
+  \end{itemize}
+\end{trans}
+
+
+\newcommand{\RegionRE}{\green\textsl{-r-exact}}
+\newcommand{\RegionWE}{\green\textsl{-w-exact}}
+\newcommand{\RegionRI}{\magenta\textsl{-r-inexact}}
+\newcommand{\RegionWI}{\magenta\textsl{-w-inexact}}
+\newcommand{\RegionIE}{\green\textsl{-in-exact}}
+\newcommand{\RegionOE}{\green\textsl{-out-exact}}
+\newcommand{\RegionII}{\magenta\textsl{-in-inexact}}
+\newcommand{\RegionOI}{\magenta\textsl{-out-inexact}}
+
+\begin{trans}{PIPS read and write array regions}
+  \begin{itemize}
+  \item Array elements described as integer polyhedra
+  \item Integer polyhedra: compromise between expressivity and easy
+    mathematical management
+  \item Not all the memory accessed can be sum up with polyhedra
+  \item \vavers Array regions can be exact (the elements accessed are
+    exactly described) or inexact (with more points than really accessed,
+    to be conservative)
+  \item Regions are built up bottom-up through hierarchical statements
+  \end{itemize}
+%\begin{multicols}{2}
+\begin{lstlisting}[escapechar=\%]
+// %N\RegionRE\{\}%
+double b[N], a[N]; int i; ...
+
+// %i\RegionWE\{\}%
+// %i\RegionRE\{\}%
+// %N\RegionRE\{\}%
+// %a[$\varphi_1$]\RegionRE\{$0 \leq \varphi_1 \bigwedge \varphi_1 \leq \mathrm{N}$\}%
+// %b[$\varphi_1$]\RegionRI\{$0 \leq \varphi_1 \bigwedge \varphi_1 \leq \mathrm{N}$\}%
+// Code to execute somewhere else: 
+{ 
+  // %s\RegionWE\{\}%
+  double s = 0;
+  // %i\RegionWE\{\}%
+  // %i\RegionRE\{\}%
+  // %N\RegionRE\{\}%
+  // %a[$\varphi_1$]\RegionRE\{$0 \leq \varphi_1 \bigwedge \varphi_1 \leq \mathrm{N}$\}%
+  // %b[$\varphi_1$]\RegionRI\{$0 \leq \varphi_1 \bigwedge \varphi_1 \leq \mathrm{N}$\}%
+  for(i = 0; i < N; i++) {
+    // %i\RegionRE\{\}%
+    // %a[$\varphi_1$]\RegionRE\{$\varphi_1 == \mathrm{i}$\}%
+    // %s\RegionRE\{\}%
+    // %s\RegionWE\{\}%
+    s += a[i];
+    // %s\RegionRE\{\}%
+    // %i\RegionRI\{\}%
+    // %a[$\varphi_1$]\RegionRI\{$\varphi_1 == \mathrm{i}$\}%
+    // %b[$\varphi_1$]\RegionWI\{$\varphi_1 == \mathrm{i}$\}%
+    if (s > 0)
+      // %i\RegionRE\{\}%
+      // %a[$\varphi_1$]\RegionRE\{$\varphi_1 == \mathrm{i}$\}%
+      // %b[$\varphi_1$]\RegionWE\{$\varphi_1 == \mathrm{i}$\}%
+      b[i] = 2*a[i];
+  }
+}
+// b is used later
+...
+\end{lstlisting}
+%\end{multicols}
+Read and write regions are overkill for us because some statements may
+write elements that are not used later\ldots
+\end{trans}
+
+
+\begin{trans}{PIPS in and out array regions}
+  \begin{itemize}
+  \item Use the dependence graph to compute elements that are
+    \emph{really} used by a statement (\emph{in} regions) and that are
+    written and will \emph{really} be needed by a future statement
+    (\emph{out} regions)
+  \end{itemize}
+\begin{lstlisting}[escapechar=\%]
+// %N\RegionIE\{\}%
+double b[N], a[N]; int i; ...
+
+// %N\RegionIE\{\}%
+// %a[$\varphi_1$]\RegionIE\{$0 \leq \varphi_1 \bigwedge \varphi_1 \leq \mathrm{N}$\}%
+// %b[$\varphi_1$]\RegionOI\{$0 \leq \varphi_1 \bigwedge \varphi_1 \leq \mathrm{N}$\}%
+// Code to execute somewhere else: 
+{ 
+  // %s\RegionOE\{\}%
+  double s = 0;
+  // %N\RegionIE\{\}%
+  // %a[$\varphi_1$]\RegionIE\{$0 \leq \varphi_1 \bigwedge \varphi_1 \leq \mathrm{N}$\}%
+  // %b[$\varphi_1$]\RegionOI\{$0 \leq \varphi_1 \bigwedge \varphi_1 \leq \mathrm{N}$\}%
+  // %s\RegionIE\{\}%
+  for(i = 0; i < N; i++) {
+    // %i\RegionIE\{\}%
+    // %a[$\varphi_1$]\RegionIE\{$\varphi_1 == \mathrm{i}$\}%
+    // %s\RegionIE\{\}%
+    // %s\RegionOE\{\}%
+    s += a[i];
+    // %s\RegionIE\{\}%
+    // %i\RegionII\{\}%
+    // %a[$\varphi_1$]\RegionII\{$\varphi_1 == \mathrm{i}$\}%
+    // %b[$\varphi_1$]\RegionOI\{$\varphi_1 == \mathrm{i}$\}%
+    if (s > 0)
+      // %i\RegionIE\{\}%
+      // %a[$\varphi_1$]\RegionIE\{$\varphi_1 == \mathrm{i}$\}%
+      // %b[$\varphi_1$]\RegionOE\{$\varphi_1 == \mathrm{i}$\}%
+      b[i] = 2*a[i];
+  }
+}
+// b is used later
+...
+\end{lstlisting}
+  
+\end{trans}
+
+
+\begin{trans}{SAFESCALE generation blueprint}
+  To distribute a statement $\mathcal{S}$ on a node $\mathcal{N}$:
+  \begin{itemize}
+  \item $\mathtt{receive}_{\mathcal{N}}(e\in \mathrm{InExact}(\mathcal{S}) \bigcup
+    \mathrm{InInexact}(\mathcal{S}))$
+  \item $\mathtt{receive}_{\mathcal{N}}(e\in \mathrm{OutInexact}(\mathcal{S}))$
+  \item $\mathtt{executeTask}_{\mathcal{N}}(\mathcal{S})$
+  \item $\mathtt{send}_{\mathcal{N}}(e\in \mathrm{OutExact}(\mathcal{S}) \bigcup
+    \mathrm{OutInexact}(\mathcal{S}))$
+  \end{itemize}
+\end{trans}
+
+
+\begin{trans}{Optimized SAFESCALE generation}
+  \begin{itemize}
+  \item For inexact out regions, may use combining write instead of
+    read-then-write
+    \begin{itemize}
+    \item Need to track modified elements with a run-time resolution
+    \item May use inspector-executors
+    \item Need to detect loop invariant region patterns
+    \end{itemize}
+  \item In the generation sketch up, guess that variables are allocated in
+    the same way on each task using them
+    \begin{itemize}
+    \item Quite inefficient if a task use only few element
+    \item Use a more compact allocation
+    \end{itemize}
+  \item What about the general pointers ?
+  \item Some science fiction: reorganize globally variables for more
+    efficient communications and data access (spitting red-black
+    relaxation data into red and black in 2 different arrays\ldots)
+  \item Big collaboration needed here in SAFESCALE : everything still to
+    do \smiley
+  \end{itemize}
+\end{trans}
+
+
+
+\subsection{Conclusion}
+\label{sec:conclusion}
+
+
+
+\begin{trans}{Conclusion}
+  \begin{itemize}
+  \item CryptoPage architecture developing at good pace with PhD and MSc
+    students
+  \item Good simulation results : only 3\,\% slowdown on average by
+    combining HIDE, fast cipher at page level and speculative insecure
+    execution (presentation at ACSAC 12/2006)
+  \item Interesting side effects: need SAFESCALE to simulate
+    \st{SAFESCALE}CryptoPage \smiley
+  \item Still looking for a (good \smiley) 1-year post-doc to work on
+    compilation aspect with \vavers cold start for this part of the
+    project with IMAG team \frownie
+  \item Factorizing compilation aspects for other heterogeneous parallel
+    machines 
+  \end{itemize}
+\end{trans}
+
+
+\section{Phases développées à TÉLÉCOM Bretagne}
+\label{sec:phases-dveloppes-}
+
+\begin{frame}{Projet PHRASE}
+  Générer code pour acélérateurs configurables
+  \begin{itemize}
+  \item Détourage de code marqué par directives qui est déporté sur
+    accélérateur
+  \item Atomiseur de code 3 adresses
+  \item Génération bus logiciel/matériel
+  \item Transformation graphe de contrôle en FSM hiérarchique ou à plat
+  \item Prettyprinter SmallTalk pour outil de synthèse Madeo du
+    Lab-SSTIC/CAC/AS
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Projet SAC}
+  SIMD Architecture Compiler
+  \begin{itemize}
+  \item Vectoriseur par déroulage et rassemblement d'instructions « en
+    vrac »
+  \item Calcul taille opérandes à partir des précondition
+  \item Génération d'intrinsèques à partir fichier configuration
+    architecture
+  \item Gère réduction
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Projet CoMap}
+  \begin{itemize}
+  \item Détourage de code marqué par directives
+  \item Génération de descripteur DMA et des synchronisations
+  \item Génération code de contrôle
+  \item Génération du code des opérateurs
+  \end{itemize}
+\end{frame}
+
+
+\section{Moult travaux futurs}
+\label{sec:moult-travaux-futurs}
+
+
+
+\begin{frame}{NewGen}
+  Échanger données avec autres outils ?
+  \begin{itemize}
+  \item Rajouter un backend \Axml
+  \item Regarder STEP/EXPRESS ISO 10303 pour échanger données ?
+  \end{itemize}
+  \Attention La syntaxe ne fait pas tout... Quid de la sémantique \frownie
+\end{frame}
+
+
+\begin{frame}{Interfaces graphiques}
+  {\red \Estatically} Remettre en ordre...
+  \begin{itemize}
+  \item \texttt{Jpips} (au dessus de \texttt{tpips}) devrait encore
+    marcher ?
+  \item \texttt{wpips} utilise \texttt{XView} plus maintenu \frownie
+  \item \texttt{epips} utilise GNU/Emacs mais au dessus de \texttt{wpips}
+  \end{itemize}
+  \belleboite{{\red \Laserbeam} Epips dans Eclipse ?}
+
+  Rajouter snapshot dans PIPSdbm pour permettre de défaire des actions
+\end{frame}
+
+
+\begin{frame}{PIPS \& checkpoint}
+  Problème de robustesse des machines à moult processeurs\\
+  \begin{example}
+    BlueGene EPFL : 1 panne/2,17 jours
+  \end{example}
+  \begin{itemize}
+  \item Contact avec le LRI sur snapshot/checkpoint
+  \item Collaboration avec TÉLÉCOM SudParis qui travaille dans le domaine
+    ?
+
+  \end{itemize}
+\end{frame}
+
+
+\begin{trans}{Relations avec IEF}
+  \begin{itemize}
+  \item IEF QUAFF génère code à partir de templates C++ pour programmes
+    basés sur squelettes algorithmiques
+  \item Utilisation de PIPS
+    \begin{itemize}
+    \item Front-end : génère programmes QUAFF
+    \item Back-end/Middle-end : optimise/transforme sortie de QUAFF
+    \end{itemize}
+  \item Question : peut-on récupérer C++ détemplatisé sans génération de
+    code ? Comment générer du C++ (compilable par la suite y compris avec
+    des templates) plutôt que de l'objet ?
+
+    Si oui, permettrait d'utiliser QUAFF comme middle-end moult simplement
+    pour moult cibles
+    \begin{itemize}
+    \item Langages StreamC, RapidMind, CUDA, HMPP (CAPS Entreprise)
+    \item Bibliothèques AMD FrameWave, Intel Threading Building Blocks,
+      KAAPI (LIG)
+    \item MPI (\textsc{Skell} BE)
+    \item OpenMP, \textsc{Forest}GOMP (LaBRI)
+    \item Implémentations de C++ STL PaSTeL (multi-c½urs, LIG), MCSTL
+      (Karlsruhe), STXXL, STAPL...
+    \item FREIA : templates pour C++ ou SystemC synthétisable
+    \item PIPS en post-production : rajouter des annotations
+      éventuellement pour raffiner avec PIPS en post-production ?
+    \end{itemize}
+  \end{itemize}
+\end{trans}
+
+
+\begin{trans}{À rajouter/faire dans PIPS}
+  \begin{itemize}
+  \item Terminer passage en 64 bits
+  \item Refaire un site WWW moderne
+    \begin{itemize}
+    \item Utiliser un CMS collaboratif, style bibliographie interactive
+      \LienPDF{hpcas.enstb.org/resources-related-projects}
+    \end{itemize}
+  \item Généralisation de la transformation de programmes
+  \item Utiliser langage de réécriture de graphes ? Pattern matching dans
+    PIPS ?
+  \item Tiling généralisé et paramétrable
+  \item Pipeline logiciel
+  \item Généralisation factorisation sous-expressions communes
+  \item Faire état des lieux de tout ce qui a été fait et refactoriser
+  \end{itemize}  
+\end{trans}
+
+
+\begin{frame}{Conclusion}
+  \begin{itemize}
+  \item Moult choses disponibles dans PIPS
+  \item Moult choses encore à faire
+  \item Projet toujours vivant au bout de 20 ans ! {\yellow \Sun}
+  \item {\FilledSunCloud} Gros travail de public relation à faire...
+  \item {\red \Coffeecup} Organiser fiesta pour les 20 ans de PIPS !
+    {\yellow \smiley}
+  \end{itemize}
+\end{frame}
+
+
+\section*{Table des matières}
+
+% Do not use frame environment because it does not split multicols
+\begin{multicols}{2}
+  \tiny
+  \tableofcontents[frametitles]
+  \textbf{Vous êtes ici      !}\hfill\expandafter\the\csname c@page\endcsname
+\end{multicols}
+
+
+\end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 
