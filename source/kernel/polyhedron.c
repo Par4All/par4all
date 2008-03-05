@@ -3643,6 +3643,7 @@ Polyhedron *align_context(Polyhedron *Pol,int align_dimension,int NbMaxRays) {
   
   int i, j, k;
   Polyhedron *p = NULL, **next, *result = NULL;
+  unsigned dim;
 
   CATCH(any_exception_error) {
     if (result) Polyhedron_Free(result);
@@ -3651,26 +3652,34 @@ Polyhedron *align_context(Polyhedron *Pol,int align_dimension,int NbMaxRays) {
   TRY {
     
     if (!Pol) return Pol;
+    dim = Pol->Dimension;
     if (align_dimension < Pol->Dimension) {
       errormsg1("align_context", "diffdim", "context dimension exceeds data");
       UNCATCH(any_exception_error);
-      return Pol;
+      return NULL;
     }
     if (align_dimension == Pol->Dimension) {
       UNCATCH(any_exception_error);
-      return Polyhedron_Copy(Pol);
+      return Domain_Copy(Pol);
     }
 
     /* 'k' is the dimension increment */
     k = align_dimension - Pol->Dimension;
     next = &result;
 
-    /* Expand the dimension of all polyhedron in the polyhedral domain 'Pol' */
+    /* Expand the dimension of all polyhedra in the polyhedral domain 'Pol' */
     for (; Pol; Pol=Pol->next) {
       int have_cons = !F_ISSET(Pol, POL_VALID) || F_ISSET(Pol, POL_INEQUALITIES);
       int have_rays = !F_ISSET(Pol, POL_VALID) || F_ISSET(Pol, POL_POINTS);
       unsigned NbCons = have_cons ? Pol->NbConstraints : 0;
       unsigned NbRays = have_rays ? Pol->NbRays + k : 0;
+
+      if (Pol->Dimension != dim) {
+	Domain_Free(result);
+	errormsg1("align_context", "diffdim", "context not of uniform dimension");
+	UNCATCH(any_exception_error);
+	return NULL;
+      }
 
       p = Polyhedron_Alloc(align_dimension, NbCons, NbRays);
       if (have_cons) {
