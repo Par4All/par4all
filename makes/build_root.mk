@@ -53,12 +53,16 @@ TAGS:
 CTAGS	= /tmp/ctags.$$$$
 CTAGS:
 	find $(CURDIR) -name '*.[chly]' -print0 | \
-		xargs -0 ctags --append --output=$(CTAGS) ; \
+		xargs -0 ctags --append -o $(CTAGS) ; \
 	mv $(CTAGS) CTAGS
 
 # force tags target
 tags: tags-clean
 	$(MAKE) TAGS CTAGS
+
+# Force recompilation if the user ask for explicit TAGS or CTAGS
+.PHONY: TAGS CTAGS
+
 
 # ARGH. I want both to forward and to clean locals...
 #clean: tags-clean
