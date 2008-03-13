@@ -135,7 +135,7 @@ char *f;
 void ray_dte_fprint(f, rd, nom_var)
 FILE * f;
 Pray_dte rd;
-char * (*nom_var)();
+char * (*nom_var)(Variable);
 {   
     if(rd->vecteur==NULL) 
 	(void) fprintf(f,"( vecteur nul )\n");
@@ -169,7 +169,7 @@ Pray_dte rd;
 void fprint_lray_dte(f,listrd, nom_var)
 FILE * f;
 Pray_dte listrd;
-char * (*nom_var)();
+char * (*nom_var)(Variable);
 {
     Pray_dte e;
     for (e = listrd; e != NULL; e = e->succ) {

@@ -33,6 +33,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <assert.h>
 #include <string.h>
 
@@ -560,11 +561,11 @@ int ofl_ctrl;
 {
     Psysteme sc1 = SC_UNDEFINED;
     Pcontrainte pos, neg, nul;
-    Pcontrainte pc, pcp, pcn;
+    Pcontrainte pcp, pcn;
     Value c;
     int nnul;
 
-    if ((pc = sc->inegalites) == NULL) {
+    if ((sc->inegalites) == NULL) {
       return(TRUE);
     }
 
@@ -587,6 +588,7 @@ int ofl_ctrl;
     }
     TRY 
     {
+      Pcontrainte pc = sc->inegalites;
 #ifdef FILTERING
 	signal(SIGALRM, catch_alarm_projection);   
 	alarm(FILTERING_TIMEOUT_PROJECTION);
@@ -595,7 +597,6 @@ int ofl_ctrl;
 
     pos = neg = nul = NULL;
     nnul = 0;
-    
     while (pc != NULL) {
 	Pcontrainte pcs = pc->succ;
 	c = vect_coeff(v,pc->vecteur);
@@ -693,13 +694,14 @@ Psysteme sc;
 Pbase index_base;
 Pvecteur pv;
 {
-    Pvecteur pv1,pv2,lvar_proj;
+    Pvecteur lvar_proj;
     Psysteme sc1=sc_init_with_sc(sc);
     Psysteme sc2;
     Variable var;
 
     if (!VECTEUR_NUL_P(pv)) {
-	lvar_proj = vect_copy(pv);
+        Pvecteur pv1,pv2;
+        lvar_proj = vect_copy(pv);
 	for (pv1 = index_base;!VECTEUR_NUL_P(pv1); pv1=pv1->succ) {
 	    sc2 = sc_copy(sc);
 	    var = vecteur_var(pv1);
@@ -920,17 +922,15 @@ int ofl_ctrl;
 
 
 
-Psysteme sc_projection_optim_along_vecteur(sc,pv)
-Psysteme sc;
-Pvecteur pv;
+Psysteme sc_projection_optim_along_vecteur(Psysteme sc,
+					   Pvecteur pv)
 {
-    Psysteme sc1 = sc_copy(sc);
     CATCH(overflow_error) {
 	/* sc_rm(sc1); */
-	sc1=NULL;
-	return sc;
+        return sc;
     }
     TRY {
+        Psysteme sc1 = sc_copy(sc);
 	boolean exact = TRUE;
 	sc1 = sc_projection_ofl_along_variables_with_test(sc1,pv,&exact);
 	sc_rm(sc);
@@ -1051,10 +1051,10 @@ Psysteme *psc;
 Variable v;
 int ofl_ctrl;
 {
-  static boolean DN = FALSE;
+  /* static boolean DN = FALSE; */
   Psysteme sc; 
   Pbase base_saved;
-  static projection_sc_counter = 0;
+  static int projection_sc_counter = 0;
   
   sc= sc_copy(*psc);
   base_saved = base_copy((*psc)->base);

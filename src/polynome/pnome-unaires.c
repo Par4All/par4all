@@ -190,7 +190,7 @@ Ppolynome ppinf, ppsup;
  */
 Ppolynome polynome_sort(ppp, is_inferior_var)
 Ppolynome *ppp;
-boolean (*is_inferior_var)(Pvecteur *, Pvecteur *);
+int (*is_inferior_var)(Pvecteur *, Pvecteur *);
 {
     Ppolynome ppcur;
     Ppolynome ppsearchmin;
@@ -231,7 +231,9 @@ Variable v_old,v_new;
 
     for (ppcur = *ppp; ppcur != POLYNOME_NUL; ppcur = polynome_succ(ppcur)) {
 	Pmonome pmcur = polynome_monome(ppcur);
-	if ( pmcur != POLYNOME_NUL ) {
+	/* Should it be comparated against MONOME_NUL (that is different
+	   of 0) instead? */
+	if ( pmcur != NULL ) {
 	    Pvecteur pvcur = monome_term(pmcur);
 
 	    vect_chg_var(&pvcur,v_old,v_new);

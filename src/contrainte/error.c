@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <stdarg.h>
+#include <stdlib.h>
 	
 /* void contrainte_error(va_dcl va_alist) should be called to terminate
  * execution and to core dump when data structures are corrupted or when

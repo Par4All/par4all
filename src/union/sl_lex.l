@@ -41,4 +41,4 @@
 %%
 
 int yywrap() { return(-1); }
-int sl_init_lex() { BEGIN TEXT; }
+void sl_init_lex() { BEGIN TEXT; }

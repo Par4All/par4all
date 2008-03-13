@@ -43,7 +43,7 @@
 
 #line 148 "reduc.w"
 
-static char* hspara_string[10] = 
+static char* hspara_string[10] __attribute__ ((unused)) = 
 {  
   "unpara",
   /**/                

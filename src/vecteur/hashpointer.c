@@ -8,6 +8,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include <limits.h>
 #include <assert.h>
 
 /* expected headers: the internal structure does not need to be available!
@@ -38,17 +40,20 @@ typedef struct {
  */
 typedef struct linear_hashtable_st 
 {
-  int nitems;	    /* number of association stored */
-  int size;	    /* size of internal array */
+  size_t nitems;	    /* number of association stored */
+  size_t size;	    /* size of internal array */
   paire * contents; /* array storing key&value paires */
 }
   * linear_hashtable_pt;
 
 /* returns the location to put or get k in h.
  */
-static int key_location(linear_hashtable_pt h, void * k, boolean toget)
+static uintptr_t key_location(linear_hashtable_pt h, void * k, boolean toget)
 {
-  register int index = ((((int)k)&(0x7fffffff))%(h->size)), loop = h->size;
+  uintptr_t index = ((((uintptr_t) k)
+		      & ~(((uintptr_t)1) << ((sizeof(uintptr_t)*CHAR_BIT) - 1)))
+		     % (h->size));
+  uintptr_t loop = h->size;
 
   while (loop-- && !(h->contents[index].key==FREE_CHUNK ||
 		   h->contents[index].key==k ||
@@ -72,17 +77,17 @@ static int key_location(linear_hashtable_pt h, void * k, boolean toget)
 
 static void linear_hashtable_print(FILE * file, linear_hashtable_pt h)
 {
-  register int i;
+  uintptr_t i;
 
-  fprintf(file, "[linear_hashtable_dump] hash=%p size=%d nitems=%d\n",
+  fprintf(file, "[linear_hashtable_dump] hash=%p size=%zd nitems=%zd\n",
 	  h, h->size, h->nitems);
   
   for (i=0; i<h->size; i++)
   {
-    register void * k = h->contents[i].key;
-    fprintf(file, "%d (%d): 0x%p -> 0x%p\n", 
+    void * k = h->contents[i].key;
+    fprintf(file, "%zd (%td): 0x%p -> 0x%p\n", 
 	    i, 
-	    (k!=FREE_CHUNK && k!=EMPTIED_CHUNK)? key_location(h, k, true): -1,
+	    (k!=FREE_CHUNK && k!=EMPTIED_CHUNK)? key_location(h, k, true): ~(uintptr_t)0,
 	    k, h->contents[i].val);
   }
 
@@ -98,7 +103,7 @@ void linear_hashtable_dump(linear_hashtable_pt h)
 /* check hashtable coherency */
 boolean linear_hashtable_coherent_p(linear_hashtable_pt h)
 {
-  register int i, n;
+  uintptr_t i, n;
 
   /* coherent size/nitems. */
   if (h->nitems >= h->size) 
@@ -107,11 +112,11 @@ boolean linear_hashtable_coherent_p(linear_hashtable_pt h)
   /* check number of item stored. */
   for(i=0, n=0; i<h->size; i++)
   {
-    register void * k = h->contents[i].key;
+    void * k = h->contents[i].key;
     if (k!=FREE_CHUNK && k!=EMPTIED_CHUNK)
     {
       /* check key index */
-      register int index = key_location(h, k, true);
+      uintptr_t index = key_location(h, k, true);
       if (index!=i) return false;
       n++;
     }
@@ -167,8 +172,8 @@ void linear_hashtable_free(linear_hashtable_pt h)
 
 static void linear_hashtable_extend(linear_hashtable_pt h)
 {
-  register paire * oldcontents;
-  register int i, oldsize, moved_nitems;
+  paire * oldcontents;
+  uintptr_t i, oldsize, moved_nitems;
 
   debug_assert_coherent(h);
 

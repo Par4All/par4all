@@ -233,7 +233,7 @@ Value vect_sum(Pvecteur v)
 {
     Value sum = VALUE_ZERO;
 
-    for (v; v!=NULL; v=v->succ)
+    for (; v!=NULL; v=v->succ)
 	value_addto(sum, val_of(v));
 
     return sum;
@@ -458,11 +458,12 @@ Pvecteur v1,v2;
 	    prop = value_eq(tmp1,tmp2);
 	}
 
-	if(prop!=0)
+	if(prop!=0) {
 	    if (value_pos_p(value_mult(c1,c2)))
 		prop = 1;
 	    else
 		prop = -1;
+	}
     }
 
     return prop;

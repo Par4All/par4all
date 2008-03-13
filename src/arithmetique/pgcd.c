@@ -4,6 +4,7 @@
 
  /*LINTLIBRARY*/
 
+#include <stdlib.h>
 #include <stdio.h>
 
 #include "arithmetique.h"

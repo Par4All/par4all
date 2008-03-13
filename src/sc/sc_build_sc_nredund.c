@@ -396,8 +396,8 @@ Psysteme ps;
 Pbase index_base;
 int tab_info[][3];
 int loop_level;
-int dim_h;
-int n;
+int dim_h __attribute__ ((unused));
+int n __attribute__ ((unused));
 {
 
     Psysteme sc = sc_new();

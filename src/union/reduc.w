@@ -146,7 +146,7 @@ enum hspara_elem
 
 
 @D global reduc @{
-static char* hspara_string[10] = 
+static char* hspara_string[10] __attribute__ ((unused)) = 
 {  
   "unpara",
   /**/                

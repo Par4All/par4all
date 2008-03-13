@@ -7,6 +7,7 @@
 %{
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "boolean.h"
@@ -210,7 +211,7 @@ ident : IDENT
      if(VARIABLE_UNDEFINED_P(va_yacc)) {
        (void) fprintf(stderr, 
             "Variable %s not declared. Add it to the VAR list!\n",
-            variable_default_name(yytext));
+            variable_default_name((Variable) yytext));
        exit(1);
      }
      $$ = va_yacc;

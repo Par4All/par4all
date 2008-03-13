@@ -14,7 +14,7 @@
 
 #include <setjmp.h>
 
-typedef void (*exception_callback_t)(char *, char *, int);
+typedef void (*exception_callback_t)(char const *, char const *, int const);
 
 /*
 const unsigned int overflow_error = 1;
@@ -48,7 +48,6 @@ const unsigned int any_exception_error = ~0;
 
 #define TRY else
 
-extern unsigned int the_last_just_thrown_exception;
 #define RETHROW() THROW(the_last_just_thrown_exception)
 
 #endif /* linear_arithmetic_error_included */

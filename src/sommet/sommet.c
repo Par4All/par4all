@@ -103,7 +103,7 @@ char *f;
 void sommet_fprint(f, s, nom_var)
 FILE * f;
 Psommet s;
-char * (*nom_var)();
+char * (*nom_var)(Variable);
 {
     if(value_notone_p(s->denominateur)) {
 	(void) fprintf(f,"denominator = ");
@@ -150,7 +150,7 @@ Psommet s;
 void fprint_lsom(f, ls, nom_var)
 FILE * f;
 Psommet ls;
-char * (*nom_var)();
+char * (*nom_var)(Variable);
 {
     Psommet e;
     for (e = ls; e != NULL; e = e->succ) {

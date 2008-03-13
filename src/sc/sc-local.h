@@ -137,6 +137,12 @@ typedef struct Ssysteme {
 void sc_add_egalite(Psysteme, Pcontrainte);
 void sc_add_inegalite(Psysteme, Pcontrainte);
 
+/* For the parsers: */
+extern void sc_init_lex(void);
+extern int syst_parse ();
+extern void syst_restart(FILE * input_file );
+
+
 /* old compatible... */
 #define sc_add_eg(p,c) sc_add_egalite(p, c)
 #define sc_add_ineg(p,c) sc_add_inegalite(p, c)

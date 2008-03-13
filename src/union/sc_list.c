@@ -42,10 +42,10 @@
 
 
 #ifdef DEBUG_UNION_PIPS
-extern char* entity_local_name();
-char* (*union_variable_name)() = entity_local_name;
+extern char* entity_local_name(Variable);
+char* (*union_variable_name)(Variable) = entity_local_name;
 #else
-char* (*union_variable_name)() = variable_default_name;
+char* (*union_variable_name)(Variable) = variable_default_name;
 #endif
 
 

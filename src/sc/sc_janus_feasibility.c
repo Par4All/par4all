@@ -270,7 +270,7 @@ sc_to_iproblem(Psysteme sc)
 }
 */
 boolean 
-sc_janus_feasibility(Psysteme sc) 
+sc_janus_feasibility(Psysteme sc __attribute__ ((unused))) 
 { 
 return TRUE;
 }

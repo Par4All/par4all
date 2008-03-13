@@ -145,12 +145,12 @@ Pcontrainte *pc1, *pc2;
 			 value_compare(val_2,val_1): 
 			 value_compare(val_1,val_2));
 
-	if (null_1 ^ null_2) 
+	if (null_1 ^ null_2) {
 	    if (irank==0)
 	    { RETURN_ORDER(value_compare(null_1,null_2));}
 	    else
 	    { RETURN_HARDER(value_compare(null_1,null_2));} 
-
+	}
 	if (irank==0 && (!null_1||!null_2)) 
 	    val=val_1, val_p=val_2, irank=i, high=b;
     }

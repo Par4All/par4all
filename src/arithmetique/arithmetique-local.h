@@ -31,6 +31,20 @@
 #include <limits.h>
 #include "boolean.h"
 
+/* Global constants to designate exceptions.
+   To be used in the type field.
+*/
+typedef enum {
+  overflow_error = 1,
+  simplex_arithmetic_error = 2,
+  user_exception_error = 4,
+  parser_exception_error = 8,
+  timeout_error = 16,
+  /* catch all */
+  any_exception_error = ~0
+} linear_exception_t;
+
+
 /* 
    #        ####   #    #   ####           #        ####   #    #   ####
    #       #    #  ##   #  #    #          #       #    #  ##   #  #    #

@@ -1,7 +1,7 @@
 /* Version "abort" de l'assert de /usr/include/assert.h 
  * Il est installe dans Linear de maniere a masquer /usr/include/assert.h
  *
- * Il faut faire un include de <stdio.h> pour l'utiliser.
+ * You need an include of <stdio.h> and <stdlib.h> to use it.
  */
 
 # ifndef NDEBUG

@@ -26,8 +26,9 @@ extern char * strdup();
 #define DEBUG 0
 #define DEBUG1 0
 #define DEBUG2 0
-#define PTR_NIL -32001
-#define INFINI 32700
+/* Hmmm. To be compatible with some weird old 16-bit constants... RK */
+#define PTR_NIL (INTPTR_MIN+767)
+#define INFINI (INTPTR_MAX-767)
 #define NB_INEQ sc->nb_ineq
 #define NONTCST (vect_coeff(pv->var,sc_base(sc)))
 #define SIMPL(A,B) {if(A!=1 && B!=1){long I1,J1,K;I1=A,J1=B;while((K=I1%J1)!=0)I1=J1,J1=K;A=A/J1;B=B/J1;if(B<0)A=-A,B=-B;}}

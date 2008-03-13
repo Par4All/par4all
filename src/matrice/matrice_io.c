@@ -17,10 +17,9 @@
  *
  * FI: a quoi sert le parametre b? A quoi sert la variable d? =>ARGSUSED
  */
-static void pr_quot(f,a,b)
-FILE * f;
-Value a;
-Value b;
+static void pr_quot(FILE * f,
+		    Value a,
+		    Value b __attribute__((unused)))
 {
     if (value_pos_p(a))
 	fprintf(f, " ");

@@ -182,7 +182,7 @@ void vect_fprint_as_monome(f, v, b, variable_name, mult_symbol)
 FILE * f;
 Pvecteur v;
 Pbase b;
-char * (*variable_name)();
+char * (*variable_name)(Variable);
 char *mult_symbol;
 {
     char *s = vect_sprint_as_monome(v, b, variable_name, mult_symbol);
@@ -199,7 +199,7 @@ char *mult_symbol;
 char *vect_sprint_as_monome(v, b, variable_name, mult_symbol)
 Pvecteur v;
 Pbase b;
-char * (*variable_name)();
+char * (*variable_name)(Variable);
 char *mult_symbol;
 {
     Pvecteur p;
@@ -291,7 +291,7 @@ Pvecteur v;
  */
 void vect_print(v,variable_name)
 Pvecteur v;
-char * (*variable_name)();
+char * (*variable_name)(Variable);
 {
     vect_fprint(stdout, v, variable_name);
 }

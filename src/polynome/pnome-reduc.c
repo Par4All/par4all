@@ -5,6 +5,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <assert.h>
 
 #include "boolean.h"
@@ -178,7 +179,7 @@ Ppolynome pp;
  */
 Pbase polynome_used_var(pp, is_inferior_var)
 Ppolynome pp;
-boolean (*is_inferior_var)(Pvecteur *, Pvecteur *);
+int (*is_inferior_var)(Pvecteur *, Pvecteur *);
 {
     Pbase b = BASE_NULLE;
     Pbase b2 = BASE_NULLE;

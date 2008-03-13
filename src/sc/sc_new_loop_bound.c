@@ -221,7 +221,7 @@ algorithm_row_echelon(
     (scn, base_index, pcondition, penumeration, FALSE);  
 }
 
-void sc_set_row_echelon_redundancy(boolean b)
+void sc_set_row_echelon_redundancy(boolean b __attribute__ ((unused)))
 {
   return;
 }

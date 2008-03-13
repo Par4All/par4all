@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 #include "assert.h"
 #include "boolean.h"
@@ -48,7 +50,7 @@
 boolean SC_CONVEX_HULL_timeout = FALSE;
 
 void 
-catch_alarm_SC_CONVEX_HULL (int sig)
+catch_alarm_SC_CONVEX_HULL (int sig  __attribute__ ((unused)))
 {  
   fprintf(stderr,"CATCH ALARM sc_convex_hull !!!\n");
   //put inside CATCH(any_exception_error) alarm(0); //clear the alarm
@@ -57,10 +59,6 @@ catch_alarm_SC_CONVEX_HULL (int sig)
   THROW(timeout_error);
 }
 
-EXCEPTION timeout_error; // needed for sc_convex_hull
-// I saw a CATCH(any_exception_error) inside sc_convex_hull, 
-// That's why I put the timeout here.
-/*****duong*****/
 
 static void my_Matrix_Free(Matrix ** m)
 {
@@ -542,11 +540,9 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
     Matrix *a = NULL;
     Psysteme sc = NULL;
     Polyhedron *A = NULL;
-    unsigned int i1,i2,j;
+    unsigned int i1, i2;
+    int j;
     int Dimension,cp;
-
-    char * filename;
-    char * label;
 
     CATCH(any_exception_error)
     {
@@ -573,6 +569,8 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
 
 	/* need to install sc before to run, because of Production/Include/sc.h
         ifscprint(4) {
+	char * filename;
+	char * label;
 	  // if  print to stderr
 	  //fprintf(stderr, "Timeout [sc_convex_hull] considering:\n");
 	  //sc_default_dump(sc1) 

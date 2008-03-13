@@ -4,25 +4,17 @@
   Exception management. See "arithmetic_errors.h".
 */
 
+#include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
 
-/* global constants to designate exceptions.
-   to be put in the type field bellow.
-   cproto 4.6 does not line 'const'...
-*/
-unsigned int overflow_error = 1;
-unsigned int simplex_arithmetic_error = 2;
-unsigned int user_exception_error = 4;
-unsigned int parser_exception_error = 8;
-unsigned int timeout_error = 16;
 
-/* catch all */
-unsigned int any_exception_error = ~0;
-
-char * get_exception_name(const unsigned int exception)
+/* This can be overrided in the PolyLib */
+char const *  __attribute__ ((weak))
+get_exception_name(const linear_exception_t exception)
 {
   if (exception==overflow_error)
     return "overflow_error exception";
@@ -42,7 +34,8 @@ char * get_exception_name(const unsigned int exception)
 
 /* keep track of last thrown exception for RETHROW()
  */
-unsigned int the_last_just_thrown_exception = 0;
+/* This can be overrided in the PolyLib */
+linear_exception_t the_last_just_thrown_exception __attribute__ ((weak)) = 0;
 
 /* whether to run in debug mode (that is to trace catch/uncatch/throw)
  */
@@ -63,15 +56,15 @@ typedef struct
 
   /* location of the CATCH to be matched against the UNCATCH.
    */
-  char * function;
-  char * file;
-  int    line;
+  char const * function;
+  char const * file;
+  int          line;
 } 
   linear_exception_holder;
 
 /* exception stack.
    maximum extension.
-   current index (next available bucket)
+-   current index (next available bucket)
  */
 #define MAX_STACKED_CONTEXTS 64
 static linear_exception_holder exception_stack[MAX_STACKED_CONTEXTS];
@@ -82,8 +75,9 @@ static int exception_index = 0;
 static exception_callback_t push_callback = NULL;
 static exception_callback_t pop_callback = NULL;
 
-void set_exception_callbacks(exception_callback_t push, 
-			     exception_callback_t pop)
+/* This can be overrided in the PolyLib */
+void __attribute__ ((weak)) set_exception_callbacks(exception_callback_t push, 
+						    exception_callback_t pop)
 {
   if (push_callback!=NULL || pop_callback!=NULL)
   {
@@ -98,11 +92,13 @@ void set_exception_callbacks(exception_callback_t push,
 
 /* total number of exceptions thrown, for statistics.
  */
-int linear_number_of_exception_thrown = 0;
+/* This can be overrided in the PolyLib */
+int linear_number_of_exception_thrown __attribute__ ((weak)) = 0;
 
 /* dump stack
  */
-void dump_exception_stack_to_file(FILE * f)
+/* This can be overrided in the PolyLib */
+void __attribute__ ((weak)) dump_exception_stack_to_file(FILE * f)
 {
   int i;
   fprintf(f, "[dump_exception_stack_to_file] size=%d\n", exception_index);
@@ -119,7 +115,8 @@ void dump_exception_stack_to_file(FILE * f)
   fprintf(f, "\n");
 }
 
-void dump_exception_stack()
+/* This can be overrided in the PolyLib */
+void __attribute__ ((weak)) dump_exception_stack()
 {
   dump_exception_stack_to_file(stderr);
 }
@@ -134,7 +131,8 @@ void dump_exception_stack()
 
 /* push a what exception on stack.
  */
-jmp_buf * 
+/* This can be overrided in the PolyLib */
+jmp_buf * __attribute__ ((weak))
 push_exception_on_stack(
     const int what,
     const char * function,
@@ -151,7 +149,8 @@ push_exception_on_stack(
     abort();
   }
 
-  if (push_callback) push_callback(file, function, line);
+  if (push_callback != NULL)
+    push_callback(file, function, line);
 
   the_last_just_thrown_exception = 0;
 
@@ -170,7 +169,8 @@ push_exception_on_stack(
 /* pop a what exception.
    check for any mismatch!
  */
-void
+/* This can be overrided in the PolyLib */
+void __attribute__ ((weak))
 pop_exception_from_stack(
     const int what,
     const char * function,
@@ -215,11 +215,12 @@ pop_exception_from_stack(
 /* throws an exception of a given type by searching for 
    the specified 'what' in the current exception stack.
 */
-void throw_exception(
-    const int what,
-    const char * function,
-    const char * file,
-    const int line)
+/* This can be overrided in the PolyLib */
+void __attribute__ ((weak)) throw_exception(const int what,
+					    const char * function,
+					    const char * file,
+					    const int line)
+
 {
   int i;
   
@@ -270,10 +271,11 @@ void throw_exception(
   abort();
 }
 
-void linear_initialize_exception_stack(
-  unsigned int verbose_exceptions,
-  exception_callback_t push, 
-  exception_callback_t pop)
+/* This can be overrided in the PolyLib */
+void __attribute__ ((weak))
+ linear_initialize_exception_stack(unsigned int verbose_exceptions,
+				   exception_callback_t push, 
+				   exception_callback_t pop)
 {
   linear_exception_verbose = verbose_exceptions;
   set_exception_callbacks(push, pop);

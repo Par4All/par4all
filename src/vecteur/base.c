@@ -16,6 +16,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "assert.h"
 
@@ -144,7 +145,7 @@ Variable v;
 Variable base_find_variable_name(b, v, variable_name)
 Pbase b;
 Variable v;
-char * (*variable_name)();
+char * (*variable_name)(Variable);
 {
     char * nv;
     char * nb;
@@ -168,7 +169,7 @@ char * (*variable_name)();
 int base_find_variable_rank(b, v, variable_name)
 Pbase b;
 Variable v;
-char * (*variable_name)();
+char * (*variable_name)(Variable);
 {
     char * nv;
     char * nb;
@@ -221,7 +222,7 @@ Pbase b_in;
 Pvecteur vect_rename(v, b, variable_name)
 Pvecteur v;
 Pbase b;
-char * (*variable_name)();
+char * (*variable_name)(Variable);
 {
     Pvecteur coord;
 
@@ -254,8 +255,8 @@ char * (*variable_name)();
  */
 Pvecteur vect_rename_variables(v, renamed_p, new_variable)
 Pvecteur v;
-boolean (*renamed_p)(/*Variable*/);
-Variable (*new_variable)(/*Variable*/);
+boolean (*renamed_p)(Variable);
+Variable (*new_variable)(Variable);
 {
     Pvecteur i=v; /* initial vector is kept */
     Variable var;
@@ -284,7 +285,7 @@ Variable (*new_variable)(/*Variable*/);
 Pvecteur vect_translate(v, b, variable_name)
 Pvecteur v;
 Pbase b;
-char * (*variable_name)();
+char * (*variable_name)(Variable);
 {
     Pvecteur coord;
 

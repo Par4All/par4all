@@ -59,3 +59,5 @@ y.tab.h sl_gram.c: sl_gram.y
 clean: local-clean
 
 local-clean:; $(RM) $(DERIVED_CFILES) $(DERIVED_HEADERS)
+# If we were sure to have nuweb...
+#local-clean:; $(RM) $(DERIVED_CFILES) $(DERIVED_HEADERS) $(CWEB_CFILE)

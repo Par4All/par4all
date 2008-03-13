@@ -227,7 +227,7 @@ Ptsg sg;
 void sg_fprint(f, sg, nom_var)
 FILE * f;
 Ptsg sg;
-char * (*nom_var)();
+char * (*nom_var)(Variable);
 {
     (void) fprintf(f,"Generating system:\n");
     (void) fprintf(f,"%d Vert%s \n",sg_nbre_sommets(sg),

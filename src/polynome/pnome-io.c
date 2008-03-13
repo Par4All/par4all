@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 
 #include <assert.h>
 #include <ctype.h>
@@ -42,12 +43,13 @@ float x;
 	    if ((((x*i) - ((int) (x*i+0.5))) < (fprecision)) &&  
 		(((x*i) - ((int) (x*i+0.5))) > (-fprecision))) { 
 		/* if x is close enough up to a little fraction */
-		if ((((int) (x*i+0.5)) < PNOME_FLOAT_TO_FRAC_LEVEL) || (i==1))
+	        if ((((int) (x*i+0.5)) < PNOME_FLOAT_TO_FRAC_LEVEL) || (i==1)) {
 		    /*print it as a fraction */
 		    if (i==1)
 			sprintf(*ps, "%d", (int) (x*i+0.5));
 		    else
 			sprintf(*ps, "%d/%d", (int) (x*i+0.5), i);
+		}
 		break;
 	    }
     }
@@ -64,7 +66,7 @@ FILE *fd;
 Pmonome pm;
 Pbase pb;
 boolean plus_sign;
-char * (*variable_name)();
+char * (*variable_name)(Variable);
 {
     char *s = monome_sprint(pm, pb, plus_sign, variable_name);
 
@@ -82,7 +84,7 @@ char *monome_sprint(pm, pb, plus_sign, variable_name)
 Pmonome pm;
 Pbase pb;
 boolean plus_sign;
-char * (*variable_name)();
+char * (*variable_name)(Variable);
 {
     float x;
     char t[99];
@@ -145,8 +147,8 @@ char * (*variable_name)();
 void polynome_fprint(fd, pp, variable_name, is_inferior_var)
 FILE *fd;
 Ppolynome pp;
-char * (*variable_name)();
-boolean (*is_inferior_var)();
+char * (*variable_name)(Variable);
+int (*is_inferior_var)(Pvecteur *, Pvecteur *);
 {
     char *s = polynome_sprint(pp, variable_name, is_inferior_var);
 
@@ -168,8 +170,8 @@ boolean (*is_inferior_var)();
  */
 char *polynome_sprint(pp, variable_name, is_inferior_var)
 Ppolynome pp;
-char * (*variable_name)();
-boolean (*is_inferior_var)();
+char * (*variable_name)(Variable);
+int (*is_inferior_var)(Pvecteur *, Pvecteur *);
 {
 #define POLYNOME_BUFFER_SIZE 1024
     static char t[POLYNOME_BUFFER_SIZE];
@@ -207,12 +209,15 @@ boolean (*is_inferior_var)();
 /* char *default_variable_name(Variable var)
  *  returns for variable var the name "Vxxxx" where xxxx are
  *  four letters computed from (int) var.
+
+ * I guess that many variables can have the same name since the naming is
+ * done modulo 26^4 ? RK. To be fixed...
  */
 char *default_variable_name(var)
 Variable var;
 {
     char *s = (char *) malloc(6);
-    int i = (int) var;
+    int i = (intptr_t) var;
     
     if (var != TCST) {
 	sprintf(s, "V%c%c%c%c",
@@ -231,7 +236,7 @@ Variable var;
  *  return TRUE if var1 is before var2, lexicographically,
  *  according to the "default_variable_name" naming.
  */
-boolean default_is_inferior_var(var1, var2)
+int default_is_inferior_var(var1, var2)
 Variable var1, var2;
 {
     return (0 < strcmp(default_variable_name(var1), default_variable_name(var2)));
@@ -241,7 +246,7 @@ Variable var1, var2;
  *  return TRUE if var1 is before var2, lexicographically,
  *  according to the "default_variable_name" naming.
  */
-boolean default_is_inferior_varval(Pvecteur varval1, Pvecteur varval2)
+int default_is_inferior_varval(Pvecteur varval1, Pvecteur varval2)
 {
     return (0 < strcmp(default_variable_name(vecteur_var(varval1)),
 		       default_variable_name(vecteur_var(varval2))));
@@ -251,7 +256,7 @@ boolean default_is_inferior_varval(Pvecteur varval1, Pvecteur varval2)
  *  return TRUE if var1 is before var2, lexicographically,
  *  according to the "default_variable_name" naming.
  */
-boolean default_is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
+int default_is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
 {
     return (0 < strcmp(default_variable_name(vecteur_var(* pvarval1)),
 		       default_variable_name(vecteur_var(* pvarval2))));
@@ -326,7 +331,7 @@ char **ps;
  */
 Ppolynome polynome_sscanf(sp, name_to_variable)
 char *sp;
-Variable (*name_to_variable)();
+Variable (*name_to_variable)(Variable);
 {
     Ppolynome pp = POLYNOME_NUL;
     Pmonome curpm;

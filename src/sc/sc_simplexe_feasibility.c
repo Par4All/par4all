@@ -11,6 +11,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <malloc.h>
 #include <string.h>
 #include <limits.h>
@@ -76,17 +77,20 @@ control_catch_alarm_Simplex (int sig)
 
 /*************************************************************** CONSTANTS */
 
-#define PTR_NIL ((char*)0xdeadbeef)
-#define INFINI VALUE_MAX
-#define MAX_VAR 1971 /* nombre max de variables */
-
-/* seuil au dela duquel on se mefie d'un overflow
- */
+/* Hmmm. To be compatible with some weird old 16-bit constants... RK */
+enum {
+  PTR_NIL = INTPTR_MIN+767,
+  INFINI = INTPTR_MAX-767,
+  MAX_VAR = 1971, /* nombre max de variables */
+  /* seuil au dela duquel on se mefie d'un overflow
+   */
 #if defined(LINEAR_VALUE_IS_LONGLONG)
-#define MAXVAL 576
+  MAXVAL = 576,
 #else
-#define MAXVAL 24  
+  MAXVAL = 24  
 #endif
+};
+
 
 #define DIMENSION sc->dimension
 #define NUMERO hashtable[h].numero
@@ -488,9 +492,9 @@ typedef struct
     int succ ;
 } hashtable_t;
 
-static void
-dump_hashtable(hashtable_t hashtable[])
-{
+/* For debugging: */
+static void  __attribute__ ((unused))
+dump_hashtable(hashtable_t hashtable[]) {
     int i;
     for(i=0;i<MAX_VAR;i++) 
 	if(hashtable[i].nom != 0) 
@@ -515,8 +519,9 @@ static void printfrac(frac x) {
     printf("/"); print_Value(x.den);
 }
 
-static void 
-dump_tableau(char *msg, tableau *t,int colonnes) {
+/* For debugging: */
+static void  __attribute__ ((unused))
+dump_tableau(char *msg, tableau *t, int colonnes) {
     int i,j, k, w;
     int max=0;
     for(i=0;i<colonnes;i++) 
@@ -571,7 +576,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 {
     Pcontrainte pc, pc_tmp ;
     Pvecteur pv ;
-    int premier_hash = (int) PTR_NIL; /* tete de liste des noms de variables */
+    intptr_t premier_hash = PTR_NIL; /* tete de liste des noms de variables */
     /* Necessaire de declarer "hashtable" static 
      *  pour initialiser tout automatiquement a` 0.
      * Necessaire de chainer les enregistrements
@@ -587,9 +592,9 @@ sc_simplexe_feasibility_ofl_ctrl(
     tableau *t = NULL; /* tableau des inegalite's  */
     /* les colonnes 0 et 1 sont reservees au terme const: */
     int compteur = 2 ;
-    long i, j, k, h, trouve, hh=0, ligne, i0, i1, jj, ii ;
+    intptr_t i, j, k, h, trouve, hh=0, ligne, i0, i1, jj, ii ;
     Value poidsM, valeur, tmpval;
-    long w ;
+    intptr_t w ;
     int soluble; /* valeur retournee par feasible */
     frac *nlle_colonne = NULL, *colo;
     frac objectif[2] ; /* objectif de max pour simplex : 
@@ -664,7 +669,7 @@ sc_simplexe_feasibility_ofl_ctrl(
       */
       DEBUG(fprintf(stderr, "arithmetic error or timeout in simplex\n");)
       
-      for(i=premier_hash ; i!=(int)PTR_NIL; i=hashtable[i].succ)
+      for(i = premier_hash ; i != PTR_NIL; i = hashtable[i].succ)
 	hashtable[i].nom = 0 ;
       if(NB_EQ > 0) {
 	for(i=0 ; i<(3+DIMENSION) ; i++)
@@ -789,7 +794,7 @@ sc_simplexe_feasibility_ofl_ctrl(
      *   et les termes d'ecart
      * Le tableau a une derniere colonne temporaire pour 
      *  pivoter un vecteur unitaire.
-     */
+     *     */
     
     t = (tableau*)malloc((3 + NB_INEQ + NB_EQ + DIMENSION)*sizeof(tableau));
     for(i=0;i<(3 + NB_INEQ + NB_EQ + DIMENSION); i++) {
@@ -1426,7 +1431,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 
     DEBUG(fprintf(stderr,"END SIMPLEX: %d th\n",simplex_sc_counter);)
 
-    for(i=premier_hash ; i!=(int)PTR_NIL; i=hashtable[i].succ)
+    for(i = premier_hash ; i != PTR_NIL; i = hashtable[i].succ)
       hashtable[i].nom = 0 ;
     
     if (NB_EQ > 0) {

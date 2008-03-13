@@ -148,10 +148,7 @@ Value *det_q;
 /* int matrice_hermite_rank(matrice a, int n, int m): rang d'une matrice
  * en forme de hermite
  */
-int matrice_hermite_rank(a, n, m)
-matrice a;
-int n;
-int m;
+int matrice_hermite_rank(matrice a, int n, int m __attribute__ ((unused)))
 {
     int i;
     int r = 0;

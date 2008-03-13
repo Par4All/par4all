@@ -203,7 +203,7 @@ int n,m;
 
 	for (vect = ps->base,j=1;j<=m;vect=vect->succ,j++) {
 	    coeff = ACCESS(A,n,i,j);
-	    if (value_notzero_p(coeff))
+	    if (value_notzero_p(coeff)) {
 		if (trouve) 
 		    vect_chg_coeff(&pv, vecteur_var(vect),
 				   value_mult(denb,coeff));
@@ -212,6 +212,7 @@ int n,m;
 				  value_mult(denb,coeff));
 		    trouve = TRUE;
 		}
+	    }
 	}
 	cp->vecteur = pv;
 	cp->succ = pc;
@@ -371,7 +372,7 @@ int n,m1,m2;
 
 	for (vect = ps->base,j=1;j<=m1;vect=vect->succ,j++) {
 	    coeff = ACCESS(A,n,i,j);
-	    if (value_notzero_p(coeff))
+	    if (value_notzero_p(coeff)) {
 		if (trouve) 
 		    vect_chg_coeff(&pv, vecteur_var(vect),
 				   value_mult(denb,coeff));
@@ -380,11 +381,12 @@ int n,m1,m2;
 		    pv = vect_new(vecteur_var(vect), value_mult(denb,coeff));
 		    trouve = TRUE;
 		}
+	    }
 	}
 
 	for (j=1;j<=m2-1;vect=vect->succ,j++) {
 	    coeff = ACCESS(B,n,i,j);
-	    if (value_notzero_p(coeff))
+	    if (value_notzero_p(coeff)) {
 		if (trouve) 
 		    vect_chg_coeff(&pv, vecteur_var(vect),
 				   value_mult(denb,coeff));
@@ -393,6 +395,7 @@ int n,m1,m2;
 		    pv = vect_new(vecteur_var(vect), value_mult(denb,coeff));
 		    trouve = TRUE;
 		}
+	    }
 	}
 	cp->vecteur = pv;
 	cp->succ = pc;
@@ -497,7 +500,7 @@ Pmatrix A, B;
 
 	for (vect = b,j=1;j<=m;vect=vect->succ,j++) {
 	    coeff = MATRIX_ELEM(A,i,j);
-	    if (value_notzero_p(coeff))
+	    if (value_notzero_p(coeff)) {
 		if (found)
 		    vect_chg_coeff(&pv, vecteur_var(vect),
 				   value_mult(denb,coeff));
@@ -507,6 +510,7 @@ Pmatrix A, B;
 				   value_mult(denb,coeff));
 		    found = TRUE;
 		}
+	    }
 	}
 	/* the constraints are in reverse order */
 	cp->vecteur = pv;
@@ -616,7 +620,7 @@ Pmatrix A, B;
 	vect = base_union(index_base, const_base);
 	for (j=1;j<=m1;vect=vect->succ,j++) {
 	    coeff = MATRIX_ELEM(A,i,j);
-	    if (value_notzero_p(coeff))
+	    if (value_notzero_p(coeff)) {
 		if (found)
 		    vect_chg_coeff(&pv, vecteur_var(vect),
 				   value_mult(denb,coeff));
@@ -626,11 +630,12 @@ Pmatrix A, B;
 				  value_mult(denb,coeff));
 		    found = TRUE;
 		}
+	    }
 	}
 
 	for (j=1;j<=m2-1;vect=vect->succ,j++) {
 	    coeff = MATRIX_ELEM(B,i,j);
-	    if (value_notzero_p(coeff))
+	    if (value_notzero_p(coeff)) {
 		if (found)
 		    vect_chg_coeff(&pv, vecteur_var(vect),
 				   value_mult(denb,coeff));
@@ -640,6 +645,7 @@ Pmatrix A, B;
 				  value_mult(denb,coeff));
 		    found = TRUE;
 		}
+	    }
 	}
 	cp->vecteur = pv;
 	cp->succ = newpc;

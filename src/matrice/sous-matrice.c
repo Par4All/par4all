@@ -78,10 +78,11 @@ int level;
  * Il est inutile de faire souffrir notre chip SPARC! (FI)
  */
 /*ARGSUSED*/
-void mat_perm_col(MAT,n,m,k,level)
-matrice MAT;
-int n,m,k;
-int level;
+void mat_perm_col(matrice MAT,
+		  int n __attribute__ ((unused)),
+		  int m __attribute__ ((unused)),
+		  int k,
+		  int level)
 {
     int i,j;
 
@@ -114,10 +115,11 @@ int level;
  *		     a prendre en compte les elements de la matrice
  */
 /*ARGSUSED*/
-void mat_perm_lig(MAT,n,m,k,level)
-matrice MAT;
-int n,m,k;
-int level;
+void mat_perm_lig(matrice MAT,
+		  int n __attribute__ ((unused)),
+		  int m __attribute__ ((unused)),
+		  int k,
+		  int level)
 {
     int i,j;
 
@@ -220,11 +222,11 @@ int level;
  *		     a prendre en compte les elements de la matrice
  */
 /*ARGSUSED*/
-void mat_maj_col(A,n,m,P,level)
-matrice A;
-int n,m;
-matrice P;
-int level;
+void mat_maj_col(matrice A,
+		 int n __attribute__ ((unused)),
+		 int m __attribute__ ((unused)),
+		 matrice P,
+		 int level)
 {
     register Value A11;
     register Value x;
@@ -330,16 +332,13 @@ int level;
 
     for(i = level+1; i <= n; i++) {
 	for(j = level+1; j <= n; j++) {
-	    if(i==j)
+	    if(i==j) {
 		if(value_notone_p(ACCESS(ID,n,i,i)))
 		    return(FALSE);
-		else
-		    ;
+	    }
 	    else /* i!=j */
 		if(value_notzero_p(ACCESS(ID,n,i,j)))
 		    return(FALSE);
-		else
-		    ;
 	}
     }
     return(TRUE);
@@ -375,10 +374,10 @@ int level;
  *
  */
 /*ARGSUSED*/
-int mat_col_el(MAT,n,m,level)
-matrice MAT;
-int n,m;
-int level;
+int mat_col_el(matrice MAT,
+	       int n,
+	       int m __attribute__ ((unused)),
+	       int level)
 {
     int i;
     int i_min=0;

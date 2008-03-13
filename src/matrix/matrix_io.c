@@ -1,6 +1,7 @@
   /* package matrice */
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "assert.h"
 
@@ -108,10 +109,9 @@ int * m;			/* row size */
  * FI: a quoi sert le parametre b? A quoi sert la variable d? =>ARGSUSED
  */
 /*ARGSUSED*/
-void matrix_pr_quot(f,a,b)
-FILE * f;
-Value a;
-Value b;
+void matrix_pr_quot(FILE * f,
+		    Value a,
+		    Value b __attribute__ ((unused)))
 {	
     if (value_pos_p(a))
 	fprintf(f, " ");

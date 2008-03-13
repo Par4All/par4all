@@ -138,17 +138,20 @@ int n;
 }
 
 
-/* boolean is_inferior_monome(Pmonome pm1, pm2, boolean (*is_inferior_var)())
- *  returns the boolean (pm1<pm2)
+/* boolean is_inferior_monome(Pmonome pm1, pm2, int (*is_inferior_var)())
+ *  returns the qsort comparison (pm1<pm2)
  *  we follow the "lexicographic" order: decreasing powers of the main variable,
  *  (according to the variable order relation passed in is_inferior_var)
  *  the decreasing powers of the next main variable, ...
  *  When pm1=pm2 we return FALSE.
  *  When pm1 or pm2 is MONOME_NUL or MONOME_UNDEFINED we return FALSE.
+ *
+ * is_inferior_var is indeed to be understood as the qsort comparator
+ * method and so is ill-defined here. RK
  */
 boolean is_inferior_monome(pm1, pm2, is_inferior_var)
 Pmonome pm1, pm2;
-boolean (*is_inferior_var)(Pvecteur *, Pvecteur *);
+int (*is_inferior_var)(Pvecteur *, Pvecteur *);
 {
     if (MONOME_UNDEFINED_P(pm1) || MONOME_UNDEFINED_P(pm2)
 	||    MONOME_NUL_P(pm1) || MONOME_NUL_P(pm2))

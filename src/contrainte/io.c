@@ -12,6 +12,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <assert.h>
 
 #include "boolean.h"
@@ -346,8 +347,6 @@ boolean a_la_fortran;
 		    (void) sprintf(s+strlen(s),"%s", variable_name(var));
 		}
 	}
-	else
-	    ;
     }
 
     if(negative_terms == 0)
@@ -360,8 +359,6 @@ boolean a_la_fortran;
 
 	sprint_Value(s+strlen(s), value_uminus(const_coeff));
     }
-    else
-	;
 
     return s;
 }

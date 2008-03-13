@@ -93,11 +93,12 @@ int ofl_ctrl;
 	 *   v = vect_chain(v,var_of(u),lambda*val_of(u));
 	 */
 	v = vect_dup(u);
-	if (value_notone_p(lambda))
+	if (value_notone_p(lambda)) {
 	    if (value_mone_p(lambda))
 		vect_chg_sgn(v);
 	    else 
 		v = vect_multiply(v, lambda);
+	}
     }
     else
 	if (value_one_p(lambda)) /* == 1 */

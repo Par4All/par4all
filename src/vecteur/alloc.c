@@ -112,9 +112,8 @@ Value coeff;
  * Apparemment obsolete.
  */
 /*ARGSUSED*/
-void dbg_vect_rm(v,f)
-Pvecteur v;
-char *f;
+void dbg_vect_rm(Pvecteur v,
+		 char __attribute__((unused)) *f)
 {
     Pvecteur v1,v2;
     v1 = v;

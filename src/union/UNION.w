@@ -314,7 +314,7 @@ les versions antérieures.
 #define IS_DJ                         3
 #define IS_PA                         4
 
-extern char* (*union_variable_name)();
+extern char* (*union_variable_name)(Variable);
 
 #if(defined(DEBUG_UNION_C3) || defined(DEBUG_UNION_PIPS))
 #define C3_DEBUG( fun, code )         \
@@ -329,6 +329,10 @@ extern char* (*union_variable_name)();
 #define C3_DEBUG( fun, code )
 #define C3_RETURN( type, val )        {return val;}
 #endif
+
+/* For the parsers: */
+extern void sl_init_lex();
+extern int slx_parse ();
 @}
 
 \section{Entête de fichiers C.}

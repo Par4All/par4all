@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <malloc.h>
+#include <stdlib.h>
 
 #include "assert.h"
 
@@ -370,18 +371,15 @@ boolean inferieure;
     int i,j;
 
     for (i=1; i <= n; i++)
-	if(inferieure)
+        if(inferieure) {
 	    for (j=i+1; j <= m; j++)
 		if(value_notzero_p(ACCESS(Z,n,i,j)))
 		    return(FALSE);
-		else
-		    ;
+	}
 	else
 	    for (j=1; j <= i-1; j++)
 		if(value_notzero_p(ACCESS(Z,n,i,j)))
 		    return(FALSE);
-		else
-		    ;
     return(TRUE);
 }
 
@@ -494,11 +492,12 @@ int n,m;           /* input */
  * int  c2        :  numero du colonne
  * int  x         : 
  */
-void matrice_soustraction_colonne(MAT,n,m,c1,c2,x)
-matrice MAT;        
-int n,m; 
-int c1,c2;
-Value x;
+void matrice_soustraction_colonne(matrice MAT,
+				  int n,
+				  int m __attribute__((unused)),
+				  int c1,
+				  int c2,
+				  Value x)
 {
     int i;
     register Value p;
