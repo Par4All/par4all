@@ -25,7 +25,7 @@ PRFLAGS    = -evcf2
 
 # A dummy target for the flymake-mode in Emacs:
 check-syntax:
-	gcc -o nul -S ${CHK_SOURCES}
+	$(COMPILE) -o nul.o -S ${CHK_SOURCES}
 
 # end of it!
 #
