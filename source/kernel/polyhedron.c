@@ -3799,8 +3799,14 @@ int lower_upper_bounds(int pos,Polyhedron *P,Value *context,Value *LBp,Value *UB
   flag = LB_INFINITY | UB_INFINITY;
   for (i=0; i<P->NbConstraints; i++) {
     value_assign(d,P->Constraint[i][pos]);
-    if (value_zero_p(d)) continue;    
     Inner_Product(&context[1],&(P->Constraint[i][1]),P->Dimension+1,&n);
+    if (value_zero_p(d)) {
+      /* If context doesn't satisfy constraints, return empty loop. */
+      if (value_neg_p(n) ||
+	  (value_zero_p(P->Constraint[i][0]) && value_notzero_p(n)))
+	goto empty_loop;
+      continue;
+    }
     value_oppose(n,n);
     
     /*---------------------------------------------------*/
@@ -3819,15 +3825,9 @@ int lower_upper_bounds(int pos,Polyhedron *P,Value *context,Value *LBp,Value *UB
       value_modulus(tmp,n,d);
       
       /* if not integer, return 0; */
-      if(value_notzero_p(tmp)) {
-	value_set_si(*LBp,1);
-	value_set_si(*UBp,0);	/* empty loop */
-	
-	/* Clear all the 'Value' variables */
-	value_clear(LB); value_clear(UB); value_clear(tmp);
-	value_clear(n); value_clear(n1); value_clear(d);
-	return 0;
-      }
+      if (value_notzero_p(tmp))
+	goto empty_loop;
+
       value_division(n1,n,d);
       
       /* Upper and Lower bounds found */
@@ -3877,6 +3877,13 @@ int lower_upper_bounds(int pos,Polyhedron *P,Value *context,Value *LBp,Value *UB
   }
   if ((flag & LB_INFINITY)==0) value_assign(*LBp,LB);
   if ((flag & UB_INFINITY)==0) value_assign(*UBp,UB);
+
+  if (0) {
+empty_loop:
+    flag = 0;
+    value_set_si(*LBp, 1);
+    value_set_si(*UBp, 0);	/* empty loop */
+  }
   
   /* Clear all the 'Value' variables */
   value_clear(LB); value_clear(UB); value_clear(tmp);
