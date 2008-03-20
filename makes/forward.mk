@@ -63,7 +63,7 @@ la_cible_par_defaut_si_aucune_n_est_precisee_sur_la_ligne_de_commande: all
 # Report the result of the forward.
 .DEFAULT:
 	@echo Making $@ in $(FWD_ROOT) >&2;\
-	globally_failed=0;\
+	globally_failed=;\
 	if test "$@" = debug_forward_makefile ; \
 	then \
 	  echo "FWD_DIRS=$(FWD_DIRS)"; \
@@ -85,15 +85,13 @@ la_cible_par_defaut_si_aucune_n_est_precisee_sur_la_ligne_de_commande: all
 		 globally_failed=1 ;\
             fi ;\
 	    echo "$(FWD_MSG) $(FWD_ROOT)/$$d: $@ $$report" $(FWD_REPORT);\
-	    [[ "$(FWD_STOP_ON_ERROR)X" == 1X && $$globally_failed == 1 ]] && \
-		break;\
+	    [ "$(FWD_STOP_ON_ERROR)" -a "$$globally_failed" ] && break;\
 	  else \
 	    echo "Ignoring directory $$d" >&2 ;\
 	  fi ; \
 	 done $(FWD_OUT) ; \
-	 [ $$globally_failed == 1 ] && \
+	 [ "$$globally_failed" ] && \
 		echo "$(FWD_MSG) $(FWD_ROOT):" \
 			"some making in `pwd` failed" $(FWD_REPORT);\
-	 [ "$(FWD_STOP_ON_ERROR)X" == 1X ] && exit $$globally_failed;\
+	 [ "$(FWD_STOP_ON_ERROR)" ] && exit $$globally_failed;\
 	 exit 0
-
