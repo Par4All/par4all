@@ -236,17 +236,18 @@ Variable var;
  *  return TRUE if var1 is before var2, lexicographically,
  *  according to the "default_variable_name" naming.
  */
-int default_is_inferior_var(var1, var2)
+boolean default_is_inferior_var(var1, var2)
 Variable var1, var2;
 {
-    return (0 < strcmp(default_variable_name(var1), default_variable_name(var2)));
+    return (0 < strcmp(default_variable_name(var1), 
+		       default_variable_name(var2)));
 }
 
 /* boolean default_is_inferior_varval(Pvecteur varval1, Pvecteur varval2)
  *  return TRUE if var1 is before var2, lexicographically,
  *  according to the "default_variable_name" naming.
  */
-int default_is_inferior_varval(Pvecteur varval1, Pvecteur varval2)
+boolean default_is_inferior_varval(Pvecteur varval1, Pvecteur varval2)
 {
     return (0 < strcmp(default_variable_name(vecteur_var(varval1)),
 		       default_variable_name(vecteur_var(varval2))));
@@ -256,7 +257,7 @@ int default_is_inferior_varval(Pvecteur varval1, Pvecteur varval2)
  *  return TRUE if var1 is before var2, lexicographically,
  *  according to the "default_variable_name" naming.
  */
-int default_is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
+boolean default_is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
 {
     return (0 < strcmp(default_variable_name(vecteur_var(* pvarval1)),
 		       default_variable_name(vecteur_var(* pvarval2))));
