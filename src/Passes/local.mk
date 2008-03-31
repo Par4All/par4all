@@ -19,6 +19,6 @@ FWD_DIRS	= pips tpips fpips
 
 # Skip compiling WPips is not required:
 
-ifndef NOWPIPS
+ifndef PIPS_NO_WPIPS
 	FWD_DIRS	+= wpips
 endif
