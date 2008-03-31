@@ -31,5 +31,5 @@ DEPFILE = *.u
 TPIPS_ADDED_LIBS =	-lreadline -lcurses
 
 # wpips was never compiled under aix.
-include $(ROOT)/makes/nowpips.mk
+include $(ROOT)/makes/no_wpips.mk
 

@@ -4,9 +4,9 @@
 # updates if no wpips on a pips architecture
 # wpips was never compiled with aix for instance, hence
 
-#debug_output := $(shell echo nowpips.mk  > /dev/tty)
+#debug_output := $(shell echo no_wpips.mk  > /dev/tty)
 
 CPPFLAGS 	+=	-DFPIPS_WITHOUT_WPIPS 
 
 # Skip compiling WPips:
-NOWPIPS = 1
+PIPS_NO_WPIPS = 1

@@ -67,7 +67,7 @@ WPIPS_MAIN 	= main_wpips.o
 
 ######################################################################### FPIPS
 
-ifndef NOWPIPS
+ifndef PIPS_NO_WPIPS
 	FPIPS_LDFLAGS	= $(WPIPS_LDFLAGS)
 
 	# By default, compile with wpips:
