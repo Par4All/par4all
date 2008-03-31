@@ -3,10 +3,13 @@ DOXYGEN_GENERATED_DIR = html latex
 # To bublish on a WWW server:
 RSYNC = rsync --archive --hard-links --delete --force --partial --compress --verbose
 
-# Where we want the documentation to be published:
-PUBLISH_LOCATION := doxygen.pips.enstb.org:/var/www/pips/doxygen/$(PROJECT_NAME)
+# Where we want the documentation to be published if not redefined in the
+# environment:
+PUBLISH_LOCATION ?= doxygen.pips.enstb.org:/var/www/pips/doxygen/$(PROJECT_NAME)
 
-DEFAULT_DOXYGEN_CONFIG ?= $(ROOT)/makes/share/doxygen/Doxyfile
+# The configuration stuff:
+DEFAULT_DOXYGEN_DIR ?= $(ROOT)/makes/share/doxygen
+DEFAULT_DOXYGEN_CONFIG ?= $(DEFAULT_DOXYGEN_DIR)/Doxyfile
 
 # Now some high end hackery since I cannot send a variable content with newlines to the shell:
 
@@ -29,20 +32,28 @@ ifdef GENERATE_TAGFILE_NAME
 	DOXYGEN_PARAMETERS_WITHOUT_EOL += $(bn)GENERATE_TAGFILE=$(GENERATE_TAGFILE_NAME)
 endif
 
+.PHONY: doxygen doxygen-plain doxygen-plain do-doxygen-graph do-doxygen-graph do-doxygen publish
 
 # We generate 2 versions, one without callers/callees graphs, and another full-fledged heavy one:
 doxygen : doxygen-plain doxygen-graph
 
-doxygen-plain : OUTPUT_DIRECTORY       = plain
-doxygen-plain : DOXYGEN_MORE_PARAMETERS = $(bn)OUTPUT_DIRECTORY       = $(OUTPUT_DIRECTORY)
+# To force a different evaluation of varables with different targets (have
+# a look to GNU Make documentation at the end of "6.10 Target-specific
+# Variable Values" for the rationale):
+doxygen-plain doxygen-graph:
+	$(MAKE) do-$@
 
-doxygen-plain : do-doxygen
+do-doxygen-plain : OUTPUT_DIRECTORY       = plain
+do-doxygen-plain : DOXYGEN_MORE_PARAMETERS = $(bn)OUTPUT_DIRECTORY       = $(OUTPUT_DIRECTORY)
 
-doxygen-graph : DOXYGEN_MORE_PARAMETERS = $(bn)OUTPUT_DIRECTORY       = graph$(bn)HAVE_DOT               = YES
+do-doxygen-plain : do-doxygen
 
-doxygen-graph : do-doxygen
+do-doxygen-graph : DOXYGEN_MORE_PARAMETERS = $(bn)OUTPUT_DIRECTORY       = graph$(bn)HAVE_DOT               = YES
 
-# Now do the reverse transformation once in the shell:
+do-doxygen-graph : do-doxygen
+
+# Now do the reverse transformation once in the shell.
+# Add the PATH to the pips-doxygen-filter too.
 do-doxygen :
 	( cat $(DEFAULT_DOXYGEN_CONFIG); echo "$(DOXYGEN_PARAMETERS_WITHOUT_EOL)$(DOXYGEN_MORE_PARAMETERS)" | sed s/\\\\n/$(bn)/g ) | doxygen -
 
