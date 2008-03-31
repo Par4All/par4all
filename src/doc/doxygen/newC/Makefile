@@ -6,7 +6,6 @@ else
 ROOT    = ../../..
 endif
 
-# If it is not defined:
 NEWGEN_SOURCE_DIR ?= ../../../genC
 
 # To get the file lists:
@@ -14,16 +13,10 @@ include $(NEWGEN_SOURCE_DIR)/standard_defines.mk
 
 # Some pure local Doxygen parameters:
 define DOXYGEN_PARAMETERS
-INPUT                  = $(addprefix $(NEWGEN_SOURCE_DIR)/, $(LIB_CFILES) $(LIB_HEADERS) $(DERIVED_HEADERS))
+INPUT                  = $(addprefix $(NEWGEN_SOURCE_DIR)/, $(LIB_CFILES) $(LIB_HEADERS) $(DERIVED_HEADERS) new.c) 
 endef
 
-# PIPS use linear and newgen library that are also documented with
-# Doxygen. Use these tags files to get the information and then to link
-# to.  Indeed it is not used because if we want to build the caller graph
-# we need to build the documentation at once.
-GENERATE_TAGFILE_NAME       = NewGen.doxygen-tag
-
-PROJECT_NAME           = libgenC
+PROJECT_NAME           = newC
 
 # Where we want the documentation to be published:
 #PUBLISH_LOCATION := /tmp/$(PROJECT_NAME)
