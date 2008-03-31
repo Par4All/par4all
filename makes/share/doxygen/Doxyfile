@@ -565,7 +565,9 @@ IMAGE_PATH             =
 # to standard output.  If FILTER_PATTERNS is specified, this tag will be 
 # ignored.
 
-INPUT_FILTER           = pips-doxygen-filter
+# To force the normal comments to be understood as Doxygen ones, that is
+# transform the '/*' into '/**':
+INPUT_FILTER           = "sed 's,/\*[^*],/**,g'"
 
 # The FILTER_PATTERNS tag can be used to specify filters on a per file pattern 
 # basis.  Doxygen will compare the file name with each pattern and apply the 
@@ -574,13 +576,13 @@ INPUT_FILTER           = pips-doxygen-filter
 # info on how filters are used. If FILTER_PATTERNS is empty, INPUT_FILTER 
 # is applied to all files.
 
-FILTER_PATTERNS        = *.h *.c *.y *.l
+FILTER_PATTERNS        =
 
 # If the FILTER_SOURCE_FILES tag is set to YES, the input filter (if set using 
 # INPUT_FILTER) will be used to filter the input files when producing source 
 # files to browse (i.e. when SOURCE_BROWSER is set to YES).
 
-FILTER_SOURCE_FILES    = YES
+FILTER_SOURCE_FILES    = NO
 
 #---------------------------------------------------------------------------
 # configuration options related to source browsing
