@@ -34,6 +34,10 @@ F.tex =	ri.tex \
 
 SOURCES = $(F.tex) unstructured.idraw newgen_domain.sty optimizer.tex
 
+# Install in a newgen subdirectory:
+HTM.subd = newgen
+DOC.subd = newgen
+
 F.newgen	= $(F.tex:%.tex=%.newgen)
 F.h		= $(F.newgen:%.newgen=%.h)
 F.c		= $(F.newgen:%.newgen=%.c)
@@ -44,8 +48,6 @@ ALLHS =	all_newgen_headers.h specs.h
 INSTALL_INC=	$(F.h) $(F.newgen) $(F.c) $(F.spec) $(ALLHS)
 INSTALL_DOC=	$(F.newgen:%.newgen=%.pdf)
 INSTALL_HTM=	$(F.tex:%.tex=%.htdoc)
-# Install in a newgen subdirectory:
-HTM.subd = newgen
 
 all: $(ALLHS) $(INSTALL_DOC)
 

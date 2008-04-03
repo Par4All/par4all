@@ -39,7 +39,7 @@ local-clean:
 	$(RM) $(DERIVED_CFILES) $(DERIVED_HEADERS) y.tab.c y.tab.h
 
 splitcyaccer.c splitc.h: splitc.y
-	$(PARSE) splitc.y
+	$(PARSE) `pwd`/splitc.y
 	sed 's/YY/SPLITC_/g;s/yy/splitc_/g' y.tab.c > splitcyaccer.c
 	sed 's/YY/SPLITC_/g;s/yy/splitc_/g' y.tab.h > splitc.h
 	$(RM) y.tab.c y.tab.h

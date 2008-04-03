@@ -7,8 +7,10 @@
 
 \documentclass[a4paper]{article}
 
-\usepackage[latin1]{inputenc}
-%\usepackage[ps2pdf,backref,pagebackref]{hyperref}
+\usepackage[latin9]{inputenc}
+\usepackage[backref,pagebackref]{hyperref}
+\usepackage{xspace}
+\usepackage{url}
 \usepackage[hyper,procnames]{listings}
 \lstset{extendedchars=true, language=C, basicstyle=\footnotesize\ttfamily, numbers=left,
   numberstyle=\tiny, stepnumber=2, numberfirstline=true, showspaces=true,
@@ -16,9 +18,15 @@
   tabsize=8, tab=\rightarrowfill, keywordstyle=\bf,
   stringstyle=\rmfamily, commentstyle=\rmfamily\itshape,
   index=[1][keywords],indexprocnames=true}
-\usepackage{url}
 
-\newcommand{\LINK}[1]{\url{#1}}
+\newcommand{\LINK}[1]{\url{#1}\xspace}
+
+
+\newcommand{\PipsOldWWW}{\LINK{http://www.cri.ensmp.fr/pips/}}
+\newcommand{\PipsNewWWW}{\LINK{https://freia.enstb.org/pips}}
+\newcommand{\PipsDevGuidePDF}{\LINK{http://www.cri.ensmp.fr/pips/pips/developer_guide.htdoc/developer_guide.pdf}}
+\newcommand{\PipsDevGuideHTDOC}{\LINK{http://www.cri.ensmp.fr/pips/developer_guide.htdoc}}
+\newcommand{\DoxygenSources}{\LINK{https://freia.enstb.org/pips/source}}
 
 \title{\bf {\Huge PIPS} \\ 
   Development Environment \\
@@ -38,7 +46,7 @@
 \end{tabular}
 }
 
-\date{August 1996 - February 2008}
+\date{August 1996 - April 2008}
 
 \renewcommand{\indexname}{Index}
 \makeindex
@@ -49,6 +57,11 @@
 {\small\vfill\hfill
  \verb$Id$
 }
+
+You can get a printable version of this document on\\
+\PipsDevGuidePDF and a HTML version on \PipsDevGuideHTDOC.
+
+The legacy WWW site is at \PipsOldWWW and the new one is at \PipsNewWWW.
 
 \clearpage
 \tableofcontents  
@@ -149,7 +162,84 @@ It is important to realize that:
 \end{enumerate}
 
 
-\section{Developing PIPS under SVN}
+\section{Developing environment}
+\label{sec:devel-envir}
+
+
+\subsection{Browsing the source files with Doxygen}
+\label{sec:brows-source-files}
+
+To help digging into the sources, Doxygen is used to generate an
+interactive on-line version of the sources that can be seen at
+\DoxygenSources. The call and caller graphs are useful to figure out what
+are the functions used, and more subtly what are the functions that call a
+given function (if you need to verify a function is correctly used or you
+want to change a function name).
+
+As an experimented user, you may need to generate them again. Go to the
+\texttt{doxygen} directories in the documentation directory of the
+products (NewGen, Linear and PIPS) and use \texttt{make} and \texttt{make
+  publish} to push them on the WWW site. The \texttt{make} target
+\texttt{doxygen-plain} or \texttt{doxygen-graph} can be used to generate
+only a documentation without or with call and caller graphs. Note that
+generating the graph version for PIPS lasts several hours...
+
+
+\subsection{Developing with the Emacs editor}
+\label{sec:developing-with-emacs}
+
+There are many modes in Emacs that can help developments in PIPS.
+
+To compile the sources you can use the menu \texttt{Tools/Compile...}. It
+presents errors in red and if you click on them you jump to the sources at
+the right location.
+
+The check-compilation-errors-on-the-fly is quite fun (it is equivalent in
+programming to the on-the-fly spell checker \texttt{flyspell-mode}). PIPS
+makefiles support it. Try it with \texttt{M-x flymake-mode}.
+
+The \texttt{speedbar} mode helps with a navigation window. More descrete,
+to have access from the menu to functions and other symbols in the local
+source file, test the \texttt{imenu-add-to-menubar} Emacs function.
+
+You can use tags to index source files as explained in
+section~\ref{sec:using-tags}.
+
+Most PIPS contributors use Emacs to develop in PIPS, so some goodies have
+been added to ease those developers.
+
+Most documentation (like the one you are reading) is written in LaTeX and
+some parts even use literate programming with a \LaTeX{} base, so the
+AUCTeX, PreviewLaTeX and RefTeX mode are quite useful.
+
+\subsection{Using tags to index source files and ease access in your text editor}
+\label{sec:using-tags}
+
+PIPS makefiles can generate tags index files to find the definition of
+symbols in the source files with your favorite editor.
+
+PIPS can produce tags files for VI by invoking \verb|make CTAGS| or tags
+for Emacs by invoking \verb|make CTAGS|
+
+This should be done for example in your \texttt{newgen/trunk},
+\texttt{pips/trunk} and \texttt{linear/trunk}.
+
+Then you need to configure your editor to use these tags files, for
+example in Emacs by using the customization of the \texttt{Tags Table
+  List} with the \texttt{Options/Customize Emacs} menu or more
+directly in you \texttt{.emacs} with stuff like :
+\begin{verbatim}
+(custom-set-variables
+  ;; ...
+ '(tags-table-list (quote
+    ("/home/keryell/projets/PIPS/svn/newgen/trunk/TAGS"
+     "/home/keryell/projets/PIPS/svn/linear/trunk/TAGS"
+     "/home/keryell/projets/PIPS/svn/pips/trunk/TAGS")))
+ )
+\end{verbatim}
+
+
+\subsection{Developing PIPS under SVN}
 \label{sec:dev-svn}
 
 A basic understanding of svn operations and concepts such as 
@@ -165,7 +255,7 @@ per-developer \texttt{branches} which should be validated before being
 merged back into the \texttt{trunk}.
 
 
-\subsection{Pips development branches}
+\subsubsection{Pips development branches}
 
 In order to help with the branch management, we propose the following
 procedure based on the \texttt{svn\_branch.sh} script provided in
@@ -283,7 +373,7 @@ sh> svn commit .
 \end{enumerate}
 
 
-\subsection{Other approaches}
+\subsubsection{Other approaches}
 
 You may decide that the above procedure is not for you. 
 Well, I would not advise it.
@@ -329,7 +419,7 @@ library in PIPS. This is not advisable for long development, as it is
 often useful to have an history of such developments.
 
 
-\subsection{Understanding the Makefile infrastructure inside the SVN
+\subsubsection{Understanding the Makefile infrastructure inside the SVN
   infrastructure}
 \label{sec:underst-makef-infr}
 
@@ -549,21 +639,27 @@ Important files are \verb+pipsmake.rc+, \verb+properties.rc+ and
 
 \subsubsection{doc}
 
-Pips documentation, namely many postscript files describing various
+Pips documentation, namely many PDF files describing various
 aspects of PIPS, the internal data structures and so on.  Important
 documents: \texttt{pipsmake-rc} (the dependence rules between pips
 interprocedural analyses), \texttt{developer\_guide} (this document!),
 \texttt{ri} (the description of the pips Intermediate Representation, also
 known as the Abstract Syntax Tree (\textsc{ast})).
 
+This directory is used to build the static PIPS home page.
+
 %% \subsubsection{man}
 %% Local (obsolete?) man pages.
 
+
 \subsubsection{html}
 
-Html documentation of PIPS. Some real html files, and some generated from
+HTML documentation of PIPS. Some real HTML files, and some generated from
 \LaTeX{} files.
     
+This directory is used to build the static PIPS home page.
+
+
 \subsubsection{runtime}
 
 Environments needed for executing pips-compiled files.  Namely
@@ -1549,7 +1645,6 @@ and verify that the bug has been eliminated.
     does not build new executables in {\tt \$PIPS\_BINDIR}. This can be done
     with the {\tt make-pips} command, but this is not compulsory, because
     this command is automatically run each night.
-  \item 
   \end{itemize}
 \end{itemize}
 
@@ -1684,5 +1779,6 @@ browsable. For example, see \LINK{http://doxygen.pips.enstb.org}.
 
 %%% Local Variables: 
 %%% mode: latex
+%%% TeX-master: t
 %%% ispell-local-dictionary: "american"
 %%% End: 

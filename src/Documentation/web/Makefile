@@ -2,8 +2,8 @@
 # $Id$
 #
 
-USER	= $(shell whoami)
-DEST	= $(USER)@ssh.cri.ensmp.fr:~pips/public_html
+#USER	= $(shell whoami)
+#DEST	= $(USER)@ssh.cri.ensmp.fr:~pips/public_html
 
 # To deal with non-framed viewer and no server side include:
 HTML_AUTO = \
@@ -61,17 +61,27 @@ home.html : home_content.html
 
 index.html : home_content.html
 
+clean: local-clean
+
 local-clean:
 	$(RM) $(HTML_AUTO:.cpp.html=.html) 
 
 droits: $(HTMS)
 	chmod -R a+r,g+w $(HTMS)
 
-# consider --dry-run
-RSOPT	=
-RSYNC	= rsync --rsh=ssh --archive --update --delete --verbose \
-		--exclude=.svn $(RSOPT)
+# # consider --dry-run
+# RSOPT	=
+# RSYNC	= rsync --rsh=ssh --archive --update --delete --verbose \
+# 		--exclude=.svn $(RSOPT)
 
-# Assume that the files are already generated:
-publish : droits
-	$(RSYNC) $(HTMS) $(DEST)
+# # Assume that the files are already generated:
+# publish : droits
+# 	$(RSYNC) $(HTMS) $(DEST)
+
+# common stuff
+ifdef PIPS_ROOT
+ROOT    = $(PIPS_ROOT)
+else
+ROOT    = ../../..
+endif
+include $(ROOT)/makes/main.mk

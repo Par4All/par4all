@@ -1,23 +1,26 @@
 \documentclass[a4paper]{report}
-\usepackage{epsfig,html,xr,fancybox,amstext,alltt,pstricks}
+\usepackage[latin9]{inputenc}
+\usepackage[backref,pagebackref]{hyperref}
+\usepackage{xspace}
+\usepackage{url}
+\usepackage{epsfig,xr,fancybox,amstext,alltt,pstricks}
 %% Since it includes some parts of pipsmake-rc.tex, add some external
 %% references from it:
-\externallabels{http://www.cri.ensmp.fr/pips/pipsmake-rc}{/projects/Pips/Documentation/public_html/pipsmake-rc/labels.pl}
+%\externallabels{http://www.cri.ensmp.fr/pips/pipsmake-rc}{/projects/Pips/Documentation/public_html/pipsmake-rc/labels.pl}
+%\externaldocument{../pipsmake/pipsmake-rc}
 %% Idem for LaTeX with "xr":
-\externaldocument{../pipsmake/pipsmake-rc}
 %% Je voudrais bien trouver un moyen de rajouter un préfixe à ces
 %% labels... :-(
 
 \newenvironment{PipsExample}{\VerbatimEnvironment
 \begin{Verbatim}}{\end{Verbatim}}
 
+\newcommand{\PipsWEpipsPDF}{\url{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual.htdoc/wpips-epips-user-manual.pdf}}
+\newcommand{\PipsWEpipsHTDOC}{\url{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual.htdoc}}
+
 \input{wpips-epips-declarations.tex}
 
 \begin{document}
-
-%% Add a link to PIPS in the navigation panel:
-\htmladdtonavigation{\htmladdnormallink{\htmladdimg{http://www.cri.ensmp.fr/pips/images/logo-pips-36x36.gif}}{http://www.cri.ensmp.fr/pips}}
-
 
 \title{WPips \& EPips User Manual\\ (Paralléliseur Interprocédural de
   Programmes Scientifiques) \\
@@ -28,6 +31,9 @@
 \author{Ronan Keryell}
 
 \maketitle
+
+A WWW version of this report can be shown at \PipsWEpipsHTDOC and a
+printable version of this report at \PipsWEpipsPDF.
 
 \setcounter{tocdepth}{6}
 \tableofcontents
@@ -79,11 +85,7 @@ Three interfaces are available: a shell interface ({\em Pips\/}), an X-WindowS i
 ({\tt wpips\/}) and a hypertextual interface ({\tt epips\/}).
 
 To have more information:
-\htmladdnormallink{http://www.cri.ensmp.fr/pips}{http://www.cri.ensmp.fr/pips}.
-A WWW version of this report can be shown at
-\htmladdnormallink{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual/wpips-epips-user-manual.html}{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual/wpips-epips-user-manual.html}
-and a PostScript version of this report at
-\htmladdnormallink{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual/wpips-epips-user-manual.ps}{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual/wpips-epips-user-manual.ps}
+\url{http://www.cri.ensmp.fr/pips}.
 
 This report give a user manual on the X-WindowS (XView) interface
 \WPIPS{} and the hypertextual GNU-Emacs based interface \EPIPS{}.

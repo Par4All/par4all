@@ -1,4 +1,10 @@
 \documentclass[a4paper,12pt]{article}
+\usepackage[latin9]{inputenc}
+\usepackage[backref,pagebackref]{hyperref}
+\usepackage{xspace}
+\usepackage{url}
+\newcommand{\PipsTpipsPDF}{\url{http://www.cri.ensmp.fr/pips/tpips-user-manual.htdoc/tpips-user-manual.pdf}\xspace}
+\newcommand{\PipsTpipsHTDOC}{\url{http://www.cri.ensmp.fr/pips/tpips-user-manual.htdoc}\xspace}
 
 
 \title{Tpips: command line interpreter}
@@ -12,6 +18,9 @@
 \setlength{\parindent}{0in}
 
 \maketitle
+
+You can get a printable version of this document on\\
+\PipsTpipsPDF and a HTML version on \PipsTpipsHTDOC.
 
 
 \tableofcontents
@@ -1086,3 +1095,9 @@ bash, or Pips/pipsrc.csh for any csh compatible shell, e.g.
 tcsh.
 
 \end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% ispell-local-dictionary: "american"
+%%% End: 

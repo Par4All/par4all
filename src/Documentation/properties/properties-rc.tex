@@ -14,6 +14,8 @@
 %\usepackage{alltt,html,fancybox,amstext,xspace,epsfig}
 \usepackage{epsfig,amstext,alltt,fullpage}
 \usepackage[ps2pdf,backref,pagebackref]{hyperref}
+\usepackage{xspace}
+\usepackage{url}
 \usepackage[hyper,procnames]{listings}
 \lstset{extendedchars=true, language=Fortran, basicstyle=\footnotesize\ttfamily, numbers=left,
   numberstyle=\tiny, stepnumber=2, numberfirstline=true, showspaces=true,
@@ -26,7 +28,8 @@
 \title{Properties \\
     Low Level Tuning of PIPS}
 \author{Lei Zhou \hspace{2cm} 
-        Fran\c{c}ois Irigoin\thanks{E-mail: {\tt irigoin@cri.ensmp.fr}} \vspace{1cm}\\
+        Fran\c{c}ois Irigoin\thanks{E-mail: {\tt irigoin@cri.ensmp.fr}}\\
+        with many other contributors\\[1cm]
         Centre de Recherche en Informatique \\
         Ecole des Mines de Paris \\
         77305 Fontainebleau Cedex \\
@@ -42,21 +45,21 @@ $~$Date: 2005/12/09 15:39:06 $~$
 % \addtolength{\textheight}{172pt}
 % \addtolength{\topmargin}{-60pt}
 
-\newcommand{\LINK}[2]{#1 (\url{#2})}
+\newcommand{\LINK}[2]{\href{#2}{#1}\footnote{\url{#2}}\xspace}
 
 \newcommand{\PIPS}{\LINK{{\em PIPS}}{http://www.cri.ensmp.fr/pips}}
 \newcommand{\PIPSMAKE}{\LINK{\emph{pipsmake/}}{http://www.cri.ensmp.fr/pips/pipsmake.html}}
 \newcommand{\PLinear}{\emph{Linear C$^3$}}
 \newcommand{\PNEWGEN}{\LINK{\emph{NewGen}}{http://www.cri.ensmp.fr/pips/newgen-manual/newgen-manual.html}}
 \newcommand{\PdaVinci}{\LINK{\emph{daVinci}}{http://www.informatik.uni-bremen.de/~davinci}}
-\newcommand{\Pri}{\LINK{\emph{Internal\space{}Representation}}{http://www.cri.ensmp.fr/pips/ri/ri.html}}
+\newcommand{\Pri}{\LINK{\emph{Internal\space{}Representation}}{http://www.cri.ensmp.fr/pips/newgen/ri.htdoc}}
 \newcommand{\WPsc}{\LINK{\emph{WP65}}{http://www.cri.ensmp.fr/pips/wp65.html}}
 
 %% Now the interface names :
 \newcommand{\pips}{\LINK{\texttt{pips}}{http://www.cri.ensmp.fr/pips/batch-interface.html}}
-\newcommand{\EPIPS}{\LINK{\texttt{epips}}{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual/wpips-epips-user-manual.html}}
+\newcommand{\EPIPS}{\LINK{\texttt{epips}}{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual.htdoc}}
 \newcommand{\TPIPS}{\LINK{\texttt{tpips}}{http://www.cri.ensmp.fr/pips/line-interface.html}}
-\newcommand{\WPIPS}{\LINK{\texttt{wpips}}{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual/wpips-epips-user-manual.html}}
+\newcommand{\WPIPS}{\LINK{\texttt{wpips}}{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual.htdoc}}
 \newcommand{\Init}{\LINK{\texttt{Init}}{http://www.cri.ensmp.fr/pips/Init.html}}
 \newcommand{\Select}{\LINK{\texttt{Select}}{http://www.cri.ensmp.fr/pips/Select.html}}
 \newcommand{\Perform}{\LINK{\texttt{Perform}}{http://www.cri.ensmp.fr/pips/Perform.html}}
@@ -2622,3 +2625,9 @@ septembre 1994. Technical Report A/255.
 \input{properties-rc.ind}
 
 \end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% ispell-local-dictionary: "american"
+%%% End: 

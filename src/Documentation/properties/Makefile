@@ -4,6 +4,9 @@ SOURCES	= properties-rc.tex
 
 INSTALL_DOC	= properties-rc.pdf
 INSTALL_HTM	= properties-rc.htdoc
+# Hide the PDF into the HTML documentation directory
+DOC.subd = $(INSTALL_HTM)
+
 ETC_TARGET	=  properties.rc
 
 all: $(ETC_TARGET) $(INSTALL_DOC)

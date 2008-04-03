@@ -1,0 +1,43 @@
+
+# Since we need to compute the caller graphs for NewGen and Linear, we
+# must generate Doxygen documentation for NewGen, Linear and PIPS in the
+# same run.
+
+# Assume that NEWGEN_ROOT and LINEAR_ROOT are set and that PIPS has
+# already been compiled to have the newgen objects already generated.
+
+# Newgen
+NEWGEN_SOURCE_DIR=$(NEWGEN_ROOT)/src/genC
+
+# To get the file lists:
+include $(NEWGEN_SOURCE_DIR)/standard_defines.mk
+
+DOXYGEN_INPUT                  = $(addprefix $(NEWGEN_SOURCE_DIR)/, $(LIB_CFILES) $(LIB_HEADERS) $(DERIVED_HEADERS))
+
+# Linear
+LINEAR_SOURCE_DIR=$(LINEAR_ROOT)/src
+DOXYGEN_INPUT += $(LINEAR_SOURCE_DIR)
+
+
+# Some pure local Doxygen parameters:
+define DOXYGEN_PARAMETERS
+INPUT                  = ../../Libs ../../Passes $(DOXYGEN_INPUT) ../../../include
+endef
+
+PROJECT_NAME           = PIPS
+
+## Where we want the documentation to be published:
+#PUBLISH_LOCATION := /tmp/$(PROJECT_NAME)
+
+# common stuff
+ifdef PIPS_ROOT
+ROOT    = $(PIPS_ROOT)
+else
+ROOT    = ../../..
+endif
+
+include $(ROOT)/makes/doxygen.mk
+
+# If needed:
+#make_destination_dir :
+#	mkdir -p $(PUBLISH_LOCATION)

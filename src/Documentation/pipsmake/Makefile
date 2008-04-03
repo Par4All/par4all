@@ -23,6 +23,8 @@ DERIVED_INC=	resources.h \
 INSTALL_INC=	$(DERIVED_INC)
 INSTALL_DOC=	pipsmake-rc.pdf
 INSTALL_HTM=	pipsmake-rc.htdoc 
+# Hide the PDF into the HTML documentation directory
+DOC.subd = $(INSTALL_HTM)
 
 DERIVED_FILES=	$(INSTALL_ETC) $(DERIVED_INC) $(INSTALL_DOC)
 

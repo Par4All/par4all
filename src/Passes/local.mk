@@ -11,6 +11,7 @@ ROOT    = $(PIPS_ROOT)
 else
 ROOT    = ../..
 endif
+
 MAKE.d	= $(ROOT)/makes
 include $(MAKE.d)/arch.mk
 include $(MAKE.d)/$(ARCH).mk
