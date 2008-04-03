@@ -13,6 +13,9 @@ RMAN	= rman
 MAKEIDX	= makeindex
 DVIPS	= dvips
 PS2PDF	= ps2pdf
+# To publish on a WWW server:
+RSYNC = rsync --archive --hard-links --delete --force --partial --compress --verbose
+
 
 # pdf (portable document format)
 %.pdf: %.ps;	$(PS2PDF) $<
@@ -27,6 +30,8 @@ PS2PDF	= ps2pdf
 	-grep '\\bibdata{' \*.aux && { $(BIBTEX) $* ; $(LATEX) $< ;}
 	test ! -f $*.idx || { $(MAKEIDX) $*.idx ; $(LATEX) $< ;}
 	$(LATEX) $<
+	# Twice for the backref bibliography with hyperref:
+	$(LATEX) $<
 	touch $@
 
 # If we want to generate HTML output from file.tex, 
@@ -36,8 +41,28 @@ PS2PDF	= ps2pdf
 	mkdir $@
 	# I guess we have kpathsea to deal with TEXINPUTS
 	# Assume that an eventual index has been managed by the $(MAKEIDX) above.
-	cd $@; TEXINPUTS=..:: $(LX2HTM) $*; ln -s $*.html index.html
+	cd $@; TEXINPUTS=.:..:: $(LX2HTM) $*
+	# To have a hyperlinked index:
+	cd $@; export TEXINPUTS=.:..:: ; if [ -r $*.idg ]; then \
+		tex "\def\filename{{$*}{idx}{4dx}{ind}} \input  idxmake.4ht" ;\
+		$(MAKEIDX) -o $*.ind $*.4dx; fi ; \
+	$(LX2HTM) $* ; \
+	$(LX2HTM) $*
+	# The document is displayed as the directory default view:
+	ln -s $*.html $@/index.html
+
+# Too dangerous (cf Documentation/web):
+#clean:
+#	$(RM) -rf $(INSTALL_HTM)
+
+ifdef PUBLISH_LOCATION
+
+publish: make_destination_dir
+	$(RSYNC) $(TO_BE_PUBLISH) $(PUBLISH_LOCATION)
 
 
-clean:
-	$(RM) -rf $(INSTALL_HTM)
+# Just to avoid publish to complaining if not implemented in the including
+# Makefile:
+make_destination_dir :
+
+endif

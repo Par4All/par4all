@@ -67,10 +67,12 @@ EXE.d	= $(INSTALL_DIR)/bin
 LIB.d	= $(INSTALL_DIR)/lib
 INC.d	= $(INSTALL_DIR)/include
 ETC.d	= $(INSTALL_DIR)/etc
+# By default, install the documentation directly into $(DOC.d) but DOC.subd can
+# be used to specify a subdirectory:
 DOC.d	= $(INSTALL_DIR)/doc
 MAN.d	= $(INSTALL_DIR)/man
 # By default, install HTML stuff directly into $(HTM.d) but HTM.subd can
-# be used to specify a subdirectory.
+# be used to specify a subdirectory:
 HTM.d	= $(INSTALL_DIR)/html
 UTL.d	= $(INSTALL_DIR)/utils
 SHR.d	= $(INSTALL_DIR)/share
@@ -473,12 +475,12 @@ ifdef INSTALL_DOC
 
 phase6: .build_doc
 
-$(DOC.d):; $(MKDIR) $(DOC.d)
+$(DOC.d)/$(DOC.subd):; $(MKDIR) $(DOC.d)/$(DOC.subd)
 
 .build_doc: $(INSTALL_DOC)
 	# no direct deps on target dir
-	$(MAKE) $(DOC.d)
-	$(INSTALL) -m 644 $(INSTALL_DOC) $(DOC.d)
+	$(MAKE) $(DOC.d)/$(DOC.subd)
+	$(INSTALL) -m 644 $(INSTALL_DOC) $(DOC.d)/$(DOC.subd)
 	touch $@
 
 clean: doc-clean
@@ -522,9 +524,10 @@ $(HTM.d)/$(HTM.subd):; $(MKDIR) -p $(HTM.d)/$(HTM.subd)
 	$(MAKE) $(HTM.d)/$(HTM.subd)
 	# Deal also with directories.
 	# By the way, how to install directories with "install" ?
+	# The cp -r*f*. is to overide read-only that may exist in the target
 	for f in $(INSTALL_HTM) ; do \
 	  if [ -d $$f ] ; then \
-	    cp -r $$f $(HTM.d)/$(HTM.subd) ; \
+	    cp -rf $$f $(HTM.d)/$(HTM.subd) ; \
 	else \
 	    $(CMP) $$f $(HTM.d)/$(HTM.subd)/$$f || \
 	      $(INSTALL) -m 644 $$f $(HTM.d)/$(HTM.subd) ; \

@@ -1,11 +1,10 @@
 DOXYGEN_GENERATED_DIR = html latex
 
-# To bublish on a WWW server:
-RSYNC = rsync --archive --hard-links --delete --force --partial --compress --verbose
+include doc.mk
 
 # Where we want the documentation to be published if not redefined in the
 # environment:
-PUBLISH_LOCATION ?= doxygen.pips.enstb.org:/var/www/pips/doxygen/$(PROJECT_NAME)
+DOXYGEN_PUBLISH_LOCATION ?= doxygen.pips.enstb.org:/var/www/pips/doxygen/$(PROJECT_NAME)
 
 # The configuration stuff:
 DEFAULT_DOXYGEN_DIR ?= $(ROOT)/makes/share/doxygen
@@ -57,11 +56,11 @@ do-doxygen-graph : do-doxygen
 do-doxygen :
 	( cat $(DEFAULT_DOXYGEN_CONFIG); echo "$(DOXYGEN_PARAMETERS_WITHOUT_EOL)$(DOXYGEN_MORE_PARAMETERS)" | sed s/\\\\n/$(bn)/g ) | doxygen -
 
-ifdef PUBLISH_LOCATION
+ifdef DOXYGEN_PUBLISH_LOCATION
 
 publish: make_destination_dir
-	$(RSYNC) plain/html/ $(PUBLISH_LOCATION)/plain
-	$(RSYNC) graph/html/ $(PUBLISH_LOCATION)/graph
+	$(RSYNC) plain/html/ $(DOXYGEN_PUBLISH_LOCATION)/plain
+	$(RSYNC) graph/html/ $(DOXYGEN_PUBLISH_LOCATION)/graph
 
 
 # Just to avoid publish to complaining if not implemented in the including
