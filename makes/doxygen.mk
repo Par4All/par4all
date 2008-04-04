@@ -1,6 +1,9 @@
+# where are make files
+MAKE.d	= $(ROOT)/makes
+
 DOXYGEN_GENERATED_DIR = html latex
 
-include doc.mk
+include $(MAKE.d)/doc.mk
 
 # Where we want the documentation to be published if not redefined in the
 # environment:
@@ -56,12 +59,14 @@ do-doxygen-graph : do-doxygen
 do-doxygen :
 	( cat $(DEFAULT_DOXYGEN_CONFIG); echo "$(DOXYGEN_PARAMETERS_WITHOUT_EOL)$(DOXYGEN_MORE_PARAMETERS)" | sed s/\\\\n/$(bn)/g ) | doxygen -
 
+clean:
+	$(RM) -r plain graph
+
 ifdef DOXYGEN_PUBLISH_LOCATION
 
 publish: make_destination_dir
 	$(RSYNC) plain/html/ $(DOXYGEN_PUBLISH_LOCATION)/plain
 	$(RSYNC) graph/html/ $(DOXYGEN_PUBLISH_LOCATION)/graph
-
 
 # Just to avoid publish to complaining if not implemented in the including
 # Makefile:
