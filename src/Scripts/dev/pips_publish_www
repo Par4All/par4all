@@ -1,0 +1,20 @@
+#! /bin/sh -vx
+
+# Publish the WWW pages on the PIPS web site.
+
+if [ -z "$PIPS_ROOT" ] ; then
+    echo The PIPS_ROOT variable must be defined first
+    exit
+fi
+
+cd $PIPS_ROOT 
+
+# Make files as readable by group member so that on the web site group
+# members can overwrite the files:
+chmod -R g+w doc html
+
+# Add the sticky bit for group to inherit the parent group with BSD semantics:
+find doc html -type d -exec chmod g+ws '{}' +  
+
+# Publish without deleting:
+rsync -av doc/. html/. ssh.cri.ensmp.fr:~pips/public_html
