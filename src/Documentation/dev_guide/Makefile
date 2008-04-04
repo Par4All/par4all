@@ -23,4 +23,4 @@ include $(ROOT)/makes/main.mk
 clean: local-clean
 
 local-clean:
-	$(RM) $(INSTALL_DOC) $(INSTALL_HTM) *.aux *.toc *.idx *.ilg *.ind *.log *.dvi *.ps
+	$(RM) -rf $(INSTALL_DOC) $(INSTALL_HTM) *.aux *.toc *.idx *.ilg *.ind *.log *.dvi *.ps
