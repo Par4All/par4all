@@ -1050,8 +1050,12 @@ Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int wo
   
   Domain_Free(C1);
 
-  if(!D1 || emptyQ(D1))
+  if (!D1)
     return(NULL);
+  if (emptyQ(D1)) {
+    Polyhedron_Free(D1);
+    return(NULL);
+  }
   
   /* Compute the true context C1 */
   /* M : lines in the direction of the first n indices (index space) */
@@ -1186,7 +1190,10 @@ Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int wo
   PV_Result = NULL;
   nbPV = 0;
   
-  if (D1->NbRays==0) return 0;
+  if (emptyQ(D1)) {
+    Polyhedron_Free(D1);
+    return NULL;
+  }
   
   /* mf : a bit array indicating which rays are part of the m-face */
   /* Poly2Sat initializes mf to all ones */
@@ -1683,6 +1690,9 @@ Param_Polyhedron *Polyhedron2Param_Domain(Polyhedron *Din,Polyhedron *Cin,int wo
   POL_ENSURE_VERTICES(Din);
   POL_ENSURE_FACETS(Cin);
   POL_ENSURE_VERTICES(Cin);
+
+  if (emptyQ(Din) || emptyQ(Cin))
+    return NULL;
  
 #ifdef DEBUGPP
   fprintf(stderr,"Polyhedron2Param_Polyhedron algorithm starting at : %.2fs\n",
