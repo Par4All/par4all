@@ -33,9 +33,9 @@ void prettyprint_graph_text(FILE * out_f, list l_of_vers)
 /* print a graph to daVinci format, each label of successor is represented by 
  * a circular node, each vertex is represented by a square node
  */
-void prettyprint_graph_daVinci(FILE * out_f, list l_of_vers)
-{
-    string gr_buffer = "";
+void prettyprint_graph_daVinci(FILE * out_f, list l_of_vers) {
+    /* To match the call to the free() at the end: */
+    string gr_buffer = strdup(""); 
     bool first_node_parent = TRUE;
     fprintf(out_f, "[\n");
 
