@@ -18,11 +18,12 @@ POLYLIB='polylib-5.22.3'
 
 # help
 command=${0/*\//}
-usage="usage: $command [destination-directory [developer]]"
+usage="usage: $command [destination-directory [developer [checkout|export]]]"
 
 # arguments
 destination=${1:-`pwd`/MYPIPS}
 developer=${2:-${USER:-${LOGNAME:-$USERNAME}}}
+subcmd=${3:-checkout}
 
 # If the destination directory is relative, transform it in an absolute
 # path name:
@@ -52,6 +53,9 @@ test -d $destination  && \
       " in $destination you should stop and choose another directory name."
 mkdir -p $destination || error "cannot mkdir $destination"
 
+[ $subcmd = 'export' -o $subcmd = 'checkout' ] || \
+    error "Third argument must be 'checkout' or 'export', got '$subcmd'"
+
 prod=$destination/prod
 
 echo "### checking needed softwares"
@@ -61,11 +65,11 @@ do
 done
 
 echo "### downloading pips"
-svn checkout $PIPS_SVN/bundles/trunks $prod || error "cannot checkout pips"
+svn $subcmd $PIPS_SVN/bundles/trunks $prod || error "cannot checkout pips"
 
 valid=$destination/valid
 echo "### downloading validation"
-if svn checkout $SVN_CRI/validation/trunk $valid
+if svn $subcmd $SVN_CRI/validation/trunk $valid
 then
     # add the expected link...
     ln -s $valid $prod/pips/Validation
@@ -83,9 +87,9 @@ unset NEWGEN_ROOT LINEAR_ROOT PIPS_ROOT
 {
   # this fails if no such developer...
   echo "### getting user development branches"
-  svn checkout $PIPS_SVN/branches/$developer $destination/pips_dev
-  #svn checkout $LINEAR_SVN/branches/$developer $destination/linear_dev
-  #svn checkout $NEWGEN_SVN/branches/$developer $destination/newgen_dev
+  svn $subcmd $PIPS_SVN/branches/$developer $destination/pips_dev
+  #svn $subcmd $LINEAR_SVN/branches/$developer $destination/linear_dev
+  #svn $subcmd $NEWGEN_SVN/branches/$developer $destination/newgen_dev
 }
 
 echo "### downloading $POLYLIB"
