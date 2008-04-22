@@ -33,7 +33,7 @@ const unsigned int any_exception_error = ~0;
 #endif
 
 /* 'const' out because of cproto 4.6. FC 13/06/2003 */
-#define EXCEPTION extern unsigned int
+#define EXCEPTION extern linear_exception_t
 
 #define THROW(what) \
    (throw_exception(what, __CURRENT_FUNCTION_NAME__, __FILE__, __LINE__))
