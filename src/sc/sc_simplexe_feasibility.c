@@ -586,8 +586,6 @@ sc_simplexe_feasibility_ofl_ctrl(
     static hashtable_t hashtable[MAX_VAR];
     Pbase saved_base;
     int saved_dimension;
-    EXCEPTION simplex_arithmetic_error;
-    EXCEPTION timeout_error;
     tableau *eg = NULL; /* tableau des egalite's  */
     tableau *t = NULL; /* tableau des inegalite's  */
     /* les colonnes 0 et 1 sont reservees au terme const: */
