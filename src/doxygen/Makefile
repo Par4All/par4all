@@ -1,6 +1,12 @@
 # $Id$	
 
-LINEAR_SOURCE_DIR ?= ../../src
+ifdef LINEAR_ROOT
+ROOT    = $(LINEAR_ROOT)
+else
+ROOT    = ../..
+endif
+
+LINEAR_SOURCE_DIR = $(ROOT)/src
 
 # Some pure Doxygen parameters:
 define DOXYGEN_PARAMETERS
@@ -16,7 +22,6 @@ PROJECT_NAME           = Linear
 # the documentation at once.
 GENERATE_TAGFILE_NAME       = Linear.doxygen-tag
 
-
 DEFAULT_DOXYGEN_CONFIG = $(LINEAR_SOURCE_DIR)/../makes/share/doxygen/Doxyfile
 
 include $(LINEAR_SOURCE_DIR)/../makes/doxygen.mk
@@ -24,3 +29,8 @@ include $(LINEAR_SOURCE_DIR)/../makes/doxygen.mk
 # If needed:
 #make_destination_dir :
 #	mkdir -p $(PUBLISH_LOCATION)
+
+clean: local-clean
+
+local-clean:
+	$(RM) $(GENERATE_TAGFILE_NAME)
