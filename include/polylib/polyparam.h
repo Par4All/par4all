@@ -11,8 +11,8 @@ extern Param_Polyhedron *GenParamPolyhedron (Polyhedron *Pol);
 extern void Param_Domain_Free (Param_Domain *PD);
 extern void Param_Polyhedron_Free ( Param_Polyhedron *P );
 extern void Param_Vertices_Free ( Param_Vertices *PV );
-extern void Param_Vertices_Print ( FILE *DST, Param_Vertices *PV,
-                                   char **param_names );
+extern void Param_Vertices_Print(FILE *DST, Param_Vertices *PV,
+                                   const char **param_names);
 extern Polyhedron *PDomainDifference ( Polyhedron *Pol1, Polyhedron
                                        *Pol2, unsigned NbMaxRays );
 extern Polyhedron *PDomainIntersection ( Polyhedron *Pol1, Polyhedron
@@ -26,8 +26,8 @@ extern Param_Polyhedron *Polyhedron2Param_SimplifiedDomain (
 extern Param_Polyhedron *Polyhedron2Param_Vertices ( Polyhedron *Din,
                                                      Polyhedron *Cin, int
                                                      working_space );
-extern void Print_Domain ( FILE *DST, Polyhedron *D, char **param_names );
-extern void Print_Vertex ( FILE *DST, Matrix *V, char **param_names );
+extern void Print_Domain(FILE *DST, Polyhedron *D, const char **param_names);
+extern void Print_Vertex(FILE *DST, Matrix *V, const char **param_names);
 extern Matrix *VertexCT( Matrix *V, Matrix *CT );
 void Param_Polyhedron_Scale_Integer(Param_Polyhedron *PP, Polyhedron **P,
 				    Value *det, unsigned MaxRays);

@@ -25,7 +25,8 @@
 
 #define maxRays 200
 
-char * origNames[] = {"n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"};
+const char *origNames[] =
+	{"n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"};
 
 int main(int argc, char ** argv) {
   int isOk = 0;
@@ -213,9 +214,10 @@ void valuesWithoutElim(Matrix * origParms, unsigned int * elimParms,
  * reused if not.
  * @return the number of names in the returned list.
  */
-unsigned int namesWithoutElim(char ** parms, unsigned nbParms,
+unsigned int namesWithoutElim(const char **parms, unsigned nbParms,
 			      unsigned int * elimParms,
-			      char *** newParms) {
+			      const char ***newParms)
+{
   unsigned int i, j=0;
   unsigned int newSize = nbParms -elimParms[0];
   if (dbg) {
@@ -264,7 +266,7 @@ int test_Constraints_fullDimensionize(Matrix * A, Matrix * B,
   Polyhedron * P, *PC;
   Matrix * M, *C;
   Enumeration * origEP, * fullEP=NULL;
-  char ** fullNames = NULL;
+  const char **fullNames = NULL;
   int isOk = 1; /* holds the result */
 
   /* compute the origial Ehrhart polynomial */

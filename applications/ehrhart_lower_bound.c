@@ -8,7 +8,7 @@
 int main( int argc, char **argv)
 {
   int i;
-  char ** param_name;
+  const char **param_name;
   Matrix *C1, *P1;
   Polyhedron *P, *C;
   Enumeration *e, *en;
@@ -86,8 +86,6 @@ int main( int argc, char **argv)
       free( e );
       e = en;
     }
-  for( i=0 ; i<nb_parms ; i++ )
-    free( param_name[i] );
-  free(param_name);
+  Free_ParamNames(param_name, nb_parms);
   return 0;
 }

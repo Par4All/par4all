@@ -11,8 +11,8 @@
 /*  use default names                               */
 /* returns an n-array of strings                    */
 /****************************************************/
-char **Read_ParamNames(FILE *in,int m) {
-	
+const char **Read_ParamNames(FILE *in,int m)
+{
   char **param_name;
   int c, i, j, f;
   char s[1024],param[32];
@@ -58,6 +58,12 @@ char **Read_ParamNames(FILE *in,int m) {
       sprintf(param_name[i], "%c", PCHAR+i+1);
     }
   }
-  return(param_name);
+  return (const char**)param_name;
 } /* Read_ParamNames */
 
+void Free_ParamNames(const char **params, int m)
+{
+    while (--m >= 0)
+	free((char *)params[m]);
+    free(params);
+}

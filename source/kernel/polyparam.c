@@ -1504,8 +1504,8 @@ void Param_Vertices_Free(Param_Vertices *PV) {
 /*
  * Print a list of parametrized vertices *
  */
-void Print_Vertex(FILE *DST,Matrix *V,char **param_names){
-  
+void Print_Vertex(FILE *DST, Matrix *V, const char **param_names)
+{
   int l, v;
   int first;
   Value gcd,tmp;
@@ -1603,8 +1603,8 @@ Matrix *VertexCT(Matrix *V,Matrix *CT) {
 /*
  * Print the validity Domain 'D' of a parametric polyhedron 
  */ 
-void Print_Domain(FILE *DST,Polyhedron *D,char **pname) {
-  
+void Print_Domain(FILE *DST, Polyhedron *D, const char **pname)
+{
   int l, v;
   int first;
   
@@ -1656,8 +1656,8 @@ void Print_Domain(FILE *DST,Polyhedron *D,char **pname) {
  * Given a list of parametrized vertices and an array of parameter names, Print
  * a list of parametrized vertices in a comprehensible format. 
  */
-void Param_Vertices_Print(FILE *DST,Param_Vertices *PV,char **param_names) {
-   
+void Param_Vertices_Print(FILE *DST, Param_Vertices *PV, const char **param_names)
+{
   Polyhedron *poly;
   
   while(PV) {

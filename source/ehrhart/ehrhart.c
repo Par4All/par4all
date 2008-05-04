@@ -172,8 +172,8 @@ enode *ecopy(enode *e) {
 @param pname array of strings, name of the parameters
 
 */
-void print_evalue(FILE *DST,evalue *e,char **pname) {
-  
+void print_evalue(FILE *DST, evalue *e, const char **pname)
+{
   if(value_notzero_p(e->d)) {    
     if(value_notone_p(e->d)) {
       value_print(DST,VALUE_FMT,e->x.n);
@@ -196,8 +196,8 @@ void print_evalue(FILE *DST,evalue *e,char **pname) {
 @param pname array of strings, name of the parameters
 
 */
-void print_enode(FILE *DST,enode *p,char **pname) {
-  
+void print_enode(FILE *DST, enode *p, const char **pname)
+{
   int i;
   
   if (!p) {
@@ -1227,8 +1227,8 @@ void count_points (int pos,Polyhedron *P,Value *context, Value *res) {
 /* A recursive procedure.                                            */
 /*-------------------------------------------------------------------*/
 static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,
-		     int nb_param,int dim,Value *lcm,char **param_name) {
-
+		     int nb_param,int dim,Value *lcm, const char **param_name)
+{
   enode *res,*B,*C;
   int hdim,i,j,rank,flag;
   Value n,g,nLB,nUB,nlcm,noff,nexp,k1,nm,hdv,k,lcm_copy;
@@ -1641,7 +1641,7 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,
 /*    param_name : name of the parameters                         */
 /*----------------------------------------------------------------*/
 static void Scan_Vertices(Param_Polyhedron *PP,Param_Domain *Q,Matrix *CT,
-   Value *lcm, int nbp, char **param_name )
+   Value *lcm, int nbp, const char **param_name)
 {
   Param_Vertices *V;
   int i, j, ix, l, np;
@@ -1720,8 +1720,8 @@ Procedure to count points in a non-parameterized polytope.
 */
 Enumeration *Enumerate_NoParameters(Polyhedron *P,Polyhedron *C,
 				    Matrix *CT,Polyhedron *CEq,
-				    unsigned MAXRAYS,char **param_name) {
-  
+				    unsigned MAXRAYS, const char **param_name)
+{
     Polyhedron *L;
     Enumeration *res;
     Value *context;
@@ -1841,7 +1841,7 @@ Enumeration *Enumerate_NoParameters(Polyhedron *P,Polyhedron *C,
 
 */
 Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,
-				  unsigned MAXRAYS,char **param_name)
+				  unsigned MAXRAYS, const char **param_name)
 {
   Polyhedron *L, *CQ, *CQ2, *LQ, *U, *CEq, *rVD, *P, *Ph = NULL;
   Matrix *CT;
@@ -2262,7 +2262,7 @@ Deals with the full-dimensional case.
 
 */
 Enumeration *Ehrhart_Quick_Apx_Full_Dim(Polyhedron *Pi,Polyhedron *C,
-					unsigned MAXRAYS, char ** param_name)
+					unsigned MAXRAYS, const char **param_name)
 {
   Polyhedron *L, *CQ, *CQ2, *LQ, *U, *CEq, *rVD, *P;
   Matrix *CT;

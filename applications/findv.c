@@ -8,7 +8,7 @@ int main() {
   Matrix *a, *b;
   Polyhedron *A, *B;
   Param_Polyhedron *PA;
-  char **param_name;
+  const char **param_name;
   
   a = Matrix_Read();
   A = Constraints2Polyhedron(a,200);

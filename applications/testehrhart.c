@@ -116,7 +116,7 @@ int main(int argc, char **argv)
     Matrix *C1, *P1;
     Polyhedron *C, *P;
     Enumeration *en;
-    char **param_name;
+    const char **param_name;
     int c, ind = 0;
     int hom = 0;
   
@@ -156,7 +156,8 @@ int main(int argc, char **argv)
     /* Read the name of the parameters */
     param_name = Read_ParamNames(stdin,C->Dimension - hom);
     if (hom) {
-	char **param_name2 = (char**)malloc(sizeof(char*) * (C->Dimension));
+	const char **param_name2;
+	param_name2 = (const char**)malloc(sizeof(char*) * (C->Dimension));
 	for (i = 0; i < C->Dimension - 1; i++)
 	    param_name2[i] = param_name[i];
 	param_name2[C->Dimension-1] = "_H";
@@ -207,9 +208,7 @@ int main(int argc, char **argv)
 #endif /* EP_EVALUATION */
   
     Enumeration_Free(en);
-    for( i=0 ; i < C->Dimension - hom; i++ )
-        free( param_name[i] );
-    free(param_name);
+    Free_ParamNames(param_name, C->Dimension-hom);
     Polyhedron_Free( P );
     Polyhedron_Free( C );
 
