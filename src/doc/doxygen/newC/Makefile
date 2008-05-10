@@ -6,6 +6,7 @@ else
 ROOT    = ../../..
 endif
 
+# If it is not defined:
 NEWGEN_SOURCE_DIR ?= ../../../genC
 
 # To get the file lists:
@@ -22,7 +23,7 @@ PROJECT_NAME           = newC
 #PUBLISH_LOCATION := /tmp/$(PROJECT_NAME)
 
 
-include $(NEWGEN_SOURCE_DIR)/../../makes/doxygen.mk
+include $(ROOT)/makes/doxygen.mk
 
 # If needed:
 #make_destination_dir :

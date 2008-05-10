@@ -29,8 +29,13 @@ PROJECT_NAME           = libgenC
 #PUBLISH_LOCATION := /tmp/$(PROJECT_NAME)
 
 
-include $(NEWGEN_SOURCE_DIR)/../../makes/doxygen.mk
+include $(ROOT)/makes/doxygen.mk
 
 # If needed:
 #make_destination_dir :
 #	mkdir -p $(PUBLISH_LOCATION)
+
+clean: local-clean
+
+local-clean:
+	$(RM) $(GENERATE_TAGFILE_NAME)
