@@ -77,7 +77,7 @@ typedef union gen_chunk {
 #define chunk_undefined gen_chunk_undefined 
 #define chunk_undefined_p(c) gen_chunk_undefined_p(c)
 
-#define UNIT(x) "You don't want to take the value of a unit type, do you!"
+#define UNIT(x) "You don't want to take the value of a unit type, do you?"
 #define BOOL(x) ((x).b)
 #define CHAR(x) ((x).c)
 #define INT(x) ((x).i)
@@ -93,7 +93,7 @@ typedef union gen_chunk {
 
 /* for the MAP macro to handle simple types correctly. FC.
  */
-#define UNIT_TYPE "You don't want a unit type, do you!"
+#define UNIT_TYPE "You don't want a unit type, do you?"
 #define BOOL_TYPE bool
 #define CHAR_TYPE char
 #define INT_TYPE int
@@ -188,8 +188,8 @@ extern int gen_defined_p GEN_PROTO((gen_chunk *));
 
 /*  recursion and utilities
  */
-extern bool gen_true GEN_PROTO((void *)) ;
-extern bool gen_false GEN_PROTO((void *)) ;
+extern bool gen_true GEN_PROTO((gen_chunk *)) ;
+extern bool gen_false GEN_PROTO((gen_chunk *)) ;
 extern void gen_null GEN_PROTO((void *)) ;
 extern void gen_core GEN_PROTO((void *)) ;
 

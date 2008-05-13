@@ -11,7 +11,7 @@
 #include "genC.h"
 #include "newgen_include.h"
 
-#define INDENT "  " /* indendation unit when generating the files */
+#define INDENT "\t" /* indendation unit when generating the files */
 #define FIELD  "" /* was: "field_" */
 #define STRUCT "_newgen_struct_" /* structure names */
 
@@ -91,7 +91,7 @@ static bool inline_directly(union domain * dp)
 	struct gen_binding * bp = dp->ba.constructand;
 	string name = bp->name;
 	if (!IS_INLINABLE(bp)) return FALSE;
-	if ((same_string_p(name, "int") && same_size(int)) ||
+	if ((same_string_p(name, "int") && same_size(intptr_t)) ||
 	    (same_string_p(name, "string") && same_size(string)) ||
 	    (same_string_p(name, "unit") && same_size(unit)))
 	    return TRUE;
@@ -101,12 +101,12 @@ static bool inline_directly(union domain * dp)
 
 static string int_type(void)
 {
-    return (sizeof(int)==sizeof(gen_chunk))? "int": "gen_chunk";
+    return same_size(intptr_t) ? "intptr_t": "gen_chunk";
 }
 
 static string int_type_access_complement(void)
 {
-    return (sizeof(int)==sizeof(gen_chunk))? "": ".i";
+    return same_size(intptr_t) ? "": ".i";
 }
 
 /* newgen type name for holder.
@@ -120,7 +120,10 @@ static string newgen_type_name(union domain * dp)
 	if (IS_INLINABLE(bp))
 	    if (!inline_directly(dp))
 		return "gen_chunk";
-	return bp->name;
+	if (same_string_p(bp->name, "int"))
+	  /* Even if the NewGen name is int, the C name can be intptr_t: */
+	  return int_type();
+ 	return bp->name;
     }
     case SET_DT: return "set";
     case LIST_DT: return "list";
@@ -137,12 +140,16 @@ static string newgen_type_name(union domain * dp)
     return NULL;
 }
 
-/* type for generated function arguments.
+/* C type name for generated function arguments.
  */
 static string newgen_argument_type_name(union domain * dp)
 {
     switch (dp->ba.type) {
-    case BASIS_DT: return dp->ba.constructand->name;
+    case BASIS_DT: 
+      if (same_string_p(dp->ba.constructand->name, "int"))
+	/* Even if the NewGen name is int, the C name can be intptr_t: */
+	return int_type();
+      return dp->ba.constructand->name;
     case LIST_DT: return "list";
     case SET_DT: return "set";
     case ARRAY_DT: return dp->ar.element->name;
@@ -213,7 +220,7 @@ static void generate_make(
 			newgen_type_name_close(dlp->domain));
 	    break;
 	case OR_OP:
-	    fprintf(header, "int, void *");
+	    fprintf(header, "intptr_t domain, void * content");
 	    break;
 	case ARROW_OP:
 	    fprintf(header, "void");
@@ -249,7 +256,7 @@ static void generate_make(
 			newgen_type_name_close(dlp->domain), i);
 	    break;
 	case OR_OP:
-	    fprintf(code, "int tag, void * val");
+	    fprintf(code, "intptr_t tag, void * val");
 	    break;
 	case ARROW_OP:
 	    fprintf(code, "void");
@@ -266,7 +273,8 @@ static void generate_make(
     }
 
     fprintf(code,
-	    ")\n{ return (%s) "
+	    ") {\n"
+	    INDENT "return (%s) "
 	    "gen_alloc(%d*sizeof(gen_chunk), GEN_CHECK_ALLOC, %s_domain",
 	    name, gen_size(domain), name);
     
@@ -294,7 +302,8 @@ static void generate_make(
 	break;
     }
 
-    fprintf(code, "); }\n");
+    fprintf(code, ");\n}"
+	    "\n");
 
     /* additionnal constructors for OR,
        so as to improve type checking.
@@ -316,8 +325,9 @@ static void generate_make(
 	    
 	    /* code */
 	    fprintf(code, 
-		    "%s make_%s_%s(void)\n"
-		    "{ return make_%s(is_%s_%s, UU);}\n",
+		    "%s make_%s_%s(void) {\n"
+		    INDENT "return make_%s(is_%s_%s, UU);\n"
+		    "}\n",
 		    name, name, field, name, name, field);
 	  }
 	  else
@@ -328,8 +338,9 @@ static void generate_make(
 	    
 	    /* code */
 	    fprintf(code, 
-		    "%s make_%s_%s(%s _field_)\n"
-		    "{ return make_%s(is_%s_%s, (void*) _field_);}\n",
+		    "%s make_%s_%s(%s _field_) {\n"
+		    INDENT "return make_%s(is_%s_%s, (void*) _field_);\n"
+		    "}\n",
 		    name, name, field, typen,
 		    name, name, field);
 	  }
@@ -518,8 +529,9 @@ static void generate_arrow(
 
     name = bp->name;
     Name = strup(name);
-    kname = key->ba.constructand->name;
-    vname = val->ba.constructand->name;
+    // To deal with long int version:
+    kname = newgen_argument_type_name(key);
+    vname = newgen_argument_type_name(val);
 
     /* how to extract the key and value from the hash_table chunks.
      */
@@ -547,16 +559,21 @@ static void generate_arrow(
 	    name, name, kname /* bound_p */);
 
     fprintf(code, 
-	    "%s apply_%s(%s f, %s k)\n"
-	    "{ return (%s) HASH_GET(%c, %c, %s_hash_table(f), k); }\n"
-	    "void update_%s(%s f, %s k, %s v)\n"
-	    "{ HASH_UPDATE(%c, %c, %s_hash_table(f), k, v); }\n"
-	    "void extend_%s(%s f, %s k, %s v)\n"
-	    "{ HASH_EXTEND(%c, %c, %s_hash_table(f), k, v); }\n"
-	    "%s delete_%s(%s f, %s k)\n"
-	    "{ return (%s) HASH_DELETE(%c, %c, %s_hash_table(f), k); }\n"
-	    "bool bound_%s_p(%s f, %s k)\n"
-	    "{ return HASH_BOUND_P(%c, %c, %s_hash_table(f), k); }\n",
+	    "%s apply_%s(%s f, %s k) {\n"
+	    INDENT "return (%s) HASH_GET(%c, %c, %s_hash_table(f), k);\n"
+	    "}\n"
+	    "void update_%s(%s f, %s k, %s v) {\n"
+	    INDENT "HASH_UPDATE(%c, %c, %s_hash_table(f), k, v);\n"
+	    "}\n"
+	    "void extend_%s(%s f, %s k, %s v) {\n"
+	    INDENT "HASH_EXTEND(%c, %c, %s_hash_table(f), k, v);\n"
+	    "}\n"
+	    "%s delete_%s(%s f, %s k) {\n"
+	    INDENT "return (%s) HASH_DELETE(%c, %c, %s_hash_table(f), k);\n"
+	    "}\n"
+	    "bool bound_%s_p(%s f, %s k) {\n"
+	    INDENT "return HASH_BOUND_P(%c, %c, %s_hash_table(f), k);\n"
+	    "}\n",
 	    vname, name, name, kname, vname, kc, vc, name, /* apply */
 	    name, name, kname, vname, kc, vc, name, /* update */
 	    name, name, kname, vname, kc, vc, name, /* extend */
@@ -650,16 +667,20 @@ generate_domain(
 	
 	fprintf(code,
 		"/* %s\n */\n"
-		"%s copy_%s(%s p)\n"
-		"{ return (%s) gen_copy_tree((gen_chunk*)p); }\n"
-		"void free_%s(%s p)\n"
-		"{ gen_free((gen_chunk*)p); }\n"
-		"%s check_%s(%s p)\n"
-		"{ return (%s) gen_check((gen_chunk*)p, %s_domain); }\n"
-		"bool %s_consistent_p(%s p)\n"
-		"{ check_%s(p); return gen_consistent_p((gen_chunk*)p); }\n"
-		"bool %s_defined_p(%s p)\n"
-		"{ return gen_defined_p((gen_chunk*)p); }\n",
+		"%s copy_%s(%s p) {\n"
+		INDENT "return (%s) gen_copy_tree((gen_chunk*)p);\n"
+		"}\n"
+		"void free_%s(%s p) {\n"
+		INDENT "gen_free((gen_chunk*)p);}\n"
+		"%s check_%s(%s p) {\n"
+		INDENT "return (%s) gen_check((gen_chunk*)p, %s_domain);\n"
+		"}\n"
+		"bool %s_consistent_p(%s p) {\n"
+		INDENT "check_%s(p); return gen_consistent_p((gen_chunk*)p);\n"
+		"}\n"
+		"bool %s_defined_p(%s p) {\n"
+		INDENT "return gen_defined_p((gen_chunk*)p);\n"
+		"}\n",
 		Name,
 		name, name, name, name, /* copy */
 		name, name, /* free */

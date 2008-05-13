@@ -2741,12 +2741,12 @@ void gen_null(void * p)
   message_assert("argument not used", p==p);
   return; 
 }
-bool gen_true(void * p)
+bool gen_true(gen_chunk * p)
 { 
   message_assert("argument not used", p==p);
   return TRUE; 
 }
-bool gen_false(void * p)
+bool gen_false(gen_chunk * p)
 { 
   message_assert("argument not used", p==p);
   return FALSE; 

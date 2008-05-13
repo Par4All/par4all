@@ -95,14 +95,14 @@ int gen_eq(void * obj1, void * obj2)
     return obj1 == obj2;
 }
 
-int gen_length(list cp)
+size_t gen_length(list cp)
 {
   int i ;
   for( i=0; cp != NIL ; cp = cp->cdr, i++);
   return i;
 }
 
-int list_own_allocated_memory(list l)
+size_t list_own_allocated_memory(list l)
 {
     return gen_length(l)*sizeof(cons);
 }

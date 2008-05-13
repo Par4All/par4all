@@ -400,14 +400,14 @@ void hash_update(hash_table htp, void * key, void * val)
 void hash_table_print_header(hash_table htp, FILE *fout)
 {
   fprintf(fout, "hash_key_type:     %d\n", htp->type);
-  fprintf(fout, "size:         %td\n", htp->size);
+  fprintf(fout, "size:         %zd\n", htp->size);
   /* to be used by pips, we should not print this
      as it is only for debugging NewGen and it is not important data
      I (go) comment it.
      
      fprintf(fout, "limit    %d\n", htp->limit);
   */
-  fprintf(fout, "n_entry: %td\n", htp->n_entry);
+  fprintf(fout, "n_entry: %zd\n", htp->n_entry);
 }
  
 /* this function prints the content of the hash_table pointed to by htp
