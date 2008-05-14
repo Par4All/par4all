@@ -1,0 +1,80 @@
+#! /bin/sh
+
+pips_svn_dir="nlpmake newgen linear pips validation"
+
+month=""
+
+# Mmmm... The multiline mode of sed does not seems to work...
+#  Switch to perl instead
+#sed --regexp-extended -e 's/\\n/1/gm' <s
+#sed --regexp-extended -e 's/^------------------------------------------------------------------------\r/1/gm' <s
+#sed 's/------------------------------------------------------------------------\\nr.\(*$\)/\1/mg' <s
+#exit
+
+html_output=0
+
+echo_html () {
+    [ $html_output == 1 ] && echo $@
+}
+
+
+svn_log_to_html () {
+    if [ $html_output == 1 ]; then
+	# unfortunately the undef $/ is too late for the first line...
+	perl -p -e 'undef $/;
+s/&/&amp;/g;
+s/</&lt;/g;
+s/>/&gt;/g;
+s,(-{72}\n)?(r[^\n]+)\n+(.+?)(?=\n-{72}\n),<h2>\2</h2>\n<pre>\3</pre>,msg;
+s,-{72},,g'
+    else
+	cat
+    fi
+}
+
+
+display_help_and_exit () {
+    echo "Syntax to report svn activity:"
+    echo "$0 [--html] -m|-month <month>"
+    echo "with <month> as a month begin date such as 2008-05-01"
+    echo "Use --html for an HTML formated output."
+    exit 1
+}
+
+
+# cf /usr/share/doc/util-linux/examples/getopt-parse.bash
+TEMP=`getopt -o m: --long month: --long html -n $0 -- "$@"`
+eval set -- "$TEMP"
+while true ; do
+	case "$1" in
+		-m|--month) the_date=$2 ; shift 2 ;;
+	        --html) html_output=1 ; shift ;;
+		--) shift ; break ;;
+		*) display_help_and_exit
+		   exit 1 ;;
+	esac
+done
+
+if [ -z $the_date ]; then
+    display_help_and_exit
+fi
+
+# Normalize the date for svn:
+starting_date=`date --date="$the_date" +%Y-%m-%d`
+# Normalize the date for svn and compute the date 1 month later:
+ending_date=`date --date="$the_date +1 month" +%Y-%m-%d`
+
+revision_range="-r {$starting_date}:{$ending_date}"
+
+echo_html "<html>"
+echo_html '<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />'
+
+for d in $pips_svn_dir
+do
+    echo_html "<h1>"
+    echo Developements in the \"$d\" depository:
+    echo_html "</h1>"
+    ( cd $d; LC_ALL=en_US.utf8 svn log $revision_range | svn_log_to_html )
+    echo
+done
+echo_html "</html>"
