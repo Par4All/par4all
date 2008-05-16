@@ -193,7 +193,7 @@ make_new_scalar_variable_with_prefix(string prefix,
 				       NULL),
 			   entity_domain) != entity_undefined);
    
-  pips_debug(9, "var %s, tag %d\n", buffer, basic_tag(b));
+  pips_debug(9, "var %s, tag %td\n", buffer, basic_tag(b));
    
   e = make_scalar_entity(&buffer[0], module_name, b);
   AddEntityToDeclarations(e, module);
@@ -453,19 +453,17 @@ entity v;
 
 /* entity make_integer_constant_entity(int c)
  * make entity for integer constant c
- */
 
-/* WARNING : the basic integer size is fixed to sizeof(int) */
-
+ WARNING : the basic integer size is fixed to sizeof(intptr_t) */
 entity 
-make_integer_constant_entity(c)
-int c;
-{
+make_integer_constant_entity(intptr_t c) {
   entity ce;
-  char *num = (char*) malloc(32);
+  /* 64 bits numbers are printed in decimal in 20 digits, so with - and \0
+     32 is enough. */
+  char num[32];
   string cn;
 
-  sprintf(num, "%d", c);
+  sprintf(num, "%td", c);
   cn = concatenate(TOP_LEVEL_MODULE_NAME,MODULE_SEP_STRING,num,(char *)NULL);
   ce = gen_find_tabulated(cn,entity_domain);
   if (ce==entity_undefined) {		/* make entity for the constant c */ 
@@ -479,10 +477,6 @@ int c;
 		     make_value(is_value_constant, 
 				make_constant(is_constant_int, (void*)c)));
   }
-    
-  else 
-    free(num);
-
   return(ce);
 }
 
