@@ -1,2 +1,2 @@
-Makefiles common to "newgen", "linear" and "pips" repositories.
+Common Makefiles for "newgen", "linear" and "pips" repositories.
 See http://www.cri.ensmp.fr/pips/ for details.
