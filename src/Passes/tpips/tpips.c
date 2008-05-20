@@ -161,7 +161,7 @@ void jpips_done(void)
     jpips_tag("done");
 }
 
-void jpips_string(string a_message_format, va_list * some_arguments)
+void jpips_string(const string a_message_format, va_list * some_arguments)
 {
     vfprintf(out_to_jpips, a_message_format, * some_arguments);
     fflush(out_to_jpips);
@@ -169,7 +169,7 @@ void jpips_string(string a_message_format, va_list * some_arguments)
 
 #include <stdarg.h>
 
-void jpips_printf(string format, ...)
+void jpips_printf(const string format, ...)
 {
    va_list some_arguments;
    va_start(some_arguments, format);
@@ -240,7 +240,7 @@ static char *tp_help_topics[] =
  * to start from scratch; without any state (i.e. STATE == 0), then we
  * start at the top of the list. 
  */
-static char * fun_generator(char *texte, int state)
+static char * fun_generator(const char *texte, int state)
 {
     static int list_index, len;
     char *name;
@@ -270,7 +270,7 @@ static char * fun_generator(char *texte, int state)
 
 /* Build an array with the names of all available modules. */
 
-char **get_module_names() {
+char **get_module_names(void) {
   static char **names = NULL;
   static gen_array_t modules = NULL;
 
@@ -304,7 +304,7 @@ char **get_module_names() {
  * to start from scratch; without any state (i.e. STATE == 0), then we
  * start at the top of the list. 
  */
-static char * param_generator(char *texte, int state)
+static char * param_generator(const char *texte, int state)
 {
     static int list_index, len;
     char *name;
@@ -398,7 +398,7 @@ static char * param_generator(char *texte, int state)
     if (current_completion_array == NULL)
 	return NULL;
     else if (current_completion_array == RESERVED_FOR_FILENAME)
-	return filename_completion_function(texte,state);
+	return rl_filename_completion_function(texte,state);
     
     /* Return the next name which partially matches from the command list. */
     while ((name = current_completion_array[list_index]))
@@ -432,7 +432,7 @@ static char ** fun_completion(char *texte, int start, int end)
     {
 	pips_debug (9, "completing function (START = %d, END= %d)\n\n",
 		    start, end);
-	matches = completion_matches (texte , fun_generator);
+	matches = rl_completion_matches (texte , fun_generator);
     }
     return (matches);
 }
@@ -453,7 +453,7 @@ static void initialize_readline(void)
     rl_attempted_completion_function = (CPPFunction *) fun_completion;
 
     /* function for completing parameters */
-    rl_completion_entry_function = (Function *) param_generator;
+    rl_completion_entry_function = (rl_compentry_func_t *) param_generator;
 }
 
 
@@ -498,7 +498,7 @@ static char * tpips_read_a_line(char * main_prompt)
 
 /************************************************* TPIPS HANDLERS FOR PIPS */
 
-static void tpips_user_log(char *fmt, va_list args)
+static void tpips_user_log(const char *fmt, va_list args)
 {
     FILE * log_file = get_log_file();
 
@@ -527,7 +527,7 @@ static void tpips_user_log(char *fmt, va_list args)
 #define BEGIN_RQ	"begin_user_request"
 #define END_RQ		"end_user_request"
 
-static string tpips_user_request(string fmt, va_list args)
+static string tpips_user_request(const char * fmt, va_list args)
 {
     char * response;
 
@@ -536,7 +536,7 @@ static string tpips_user_request(string fmt, va_list args)
     if (jpips_is_running)
     {
 	jpips_tag(BEGIN_RQ);
-	jpips_string(fmt, & args);
+	jpips_string((string) fmt, & args);
 	jpips_printf("\n");
 	jpips_tag(END_RQ);
     }
@@ -561,8 +561,8 @@ static string tpips_user_request(string fmt, va_list args)
 #define END_UE		"end_user_error"
 
 static void tpips_user_error(
-    string calling_function_name,
-    string a_message_format,
+    const char * calling_function_name,
+    const char * a_message_format,
     va_list *some_arguments)
 {
    /* print name of function causing error and
@@ -575,7 +575,7 @@ static void tpips_user_error(
     {
       jpips_tag(BEGIN_UE);
       jpips_printf("%s\n", calling_function_name);
-      jpips_string(a_message_format, some_arguments);
+      jpips_string((string) a_message_format, some_arguments);
       jpips_tag(END_UE);
     }
     
