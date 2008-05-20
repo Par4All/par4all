@@ -12,6 +12,8 @@
 \usepackage{xspace}
 \usepackage{url}
 \usepackage[hyper,procnames]{listings}
+
+%% heu...
 \lstset{extendedchars=true, language=C, basicstyle=\footnotesize\ttfamily, numbers=left,
   numberstyle=\tiny, stepnumber=2, numberfirstline=true, showspaces=true,
   showstringspaces=false, showtabs=true,
@@ -20,7 +22,6 @@
   index=[1][keywords],indexprocnames=true}
 
 \newcommand{\LINK}[1]{\url{#1}\xspace}
-
 
 \newcommand{\PipsOldWWW}{\LINK{http://www.cri.ensmp.fr/pips/}}
 \newcommand{\PipsNewWWW}{\LINK{https://freia.enstb.org/pips}}
@@ -46,7 +47,7 @@
 \end{tabular}
 }
 
-\date{August 1996 - April 2008}
+\date{August 1996 - May 2008}
 
 \renewcommand{\indexname}{Index}
 \makeindex
@@ -100,12 +101,13 @@ at:
 \subsection{Directories overview}
 \label{sec:directories-overview}
 
-There are 4 repositories for the various softwares:
+There are 5 repositories for the various files:
 \begin{description}
-\item[nlpmake:] common makefiles for Newgen, Linear and Pips.
-\item[newgen:] Newgen software.
-\item[linear:] Linear/C3 mathematical libraries.
-\item[pips:] PIPS software.
+\item[nlpmake] common makefiles for Newgen, Linear and Pips.
+\item[newgen] Newgen software.
+\item[linear] Linear/C3 mathematical libraries.
+\item[pips] PIPS software.
+\item[validation] Pips non-regression tests
 \end{description}
 
 The subversion repositories are organised in standard subdirectories 
@@ -512,34 +514,32 @@ Here are examples of pips architectures:
 \end{description}
 
 
-\section{PIPS directories}
+\section{PIPS Project directories}
 \label{sec:directories}
 
-This section describes PIPS directory hierarchy. 
-Here at CRI, École des mines de Paris, Pips resides in \texttt{/projects/Pips}.
-This directory is owned by the \texttt{pips} user.
-From this directory, several sub directories can be found. 
-The most important is the \texttt{Production} directory which SHOULD contain 
-an up to date copy of Pips, including \emph{all} sources, compiled libraries 
-and executables, documentation, include files, and so on. 
+This section describes the PIPS directory hierarchy. 
+When extracting a repository with the \texttt{setup\_pips.sh} script,
+three subprojects are extracted: \texttt{newgen} (software engineering tool,
+Section~\ref{sec:newgen}),
+\texttt{linear} (mathematical library, Section~\ref{sec:linear}) 
+and \texttt{pips} (the project).
+The three projects are organized in a similar way, with a \texttt{makes}
+directory with makefiles and a \texttt{src} directory for the sources.
+Other directories \texttt{bin share runtime doc} are generated on
+compilation (\texttt{make compile} or \texttt{make build}).
 
-The \texttt{bin share runtime doc} directories offer a working pips 
-\emph{running} environment.
-The organisation of the Newgen (\texttt{/projects/Newgen}) and C3/Linear 
-(\texttt{/projects/C3/Linear}) is very similar.
+\subsection{The \texttt{pips} directory}
 
-\subsection{Production (\texttt{PIPS\_ROOT})}
-
-This directory must contain the current production version,
-namely pips subversion trunk directory. 
-
+This directory contains the current version, namely pips subversion 
+\texttt{trunk} directory. 
+The \texttt{\$PIPS\_ROOT} environment variable should point to this directory.
 You can find the following subdirectories:
 
-\subsubsection{makes}
+\subsubsection{The \texttt{makes} subdirectory}
 
 PIPS makefiles, and some helper scripts.
 
-\subsubsection{src}
+\subsubsection{The \texttt{src} subdirectory}
 
 PIPS Sources. 
 
@@ -596,48 +596,44 @@ various scripts used for running and developping the PIPS sofware.
   \texttt{hpfc}, and the second one for the WP65 project.
 \end{description}
 
-\subsubsection{bin}
+\subsubsection{The \texttt{bin} subdirectory}
 
 Pips current binaries that can be executed. 
+
 These binaries include \texttt{pips} (the main program), 
 \texttt{tpips} (the same program with a interactive interface based on the 
 GNU readline library) and \texttt{wpips} (the window interface). 
 
-It also includes other architecture-dependent executables. 
-Actual binaries for different architectures are stored in
+Non architecture-dependent executables needed or used by pips
+are also available, such as old \texttt{Init Select Perform Display Pips}
+pips shell interfaces, and \texttt{pips tpips wpips epips jepips} launchers.
+  
+Actual architecture-dependent binaries are stored in
 different sub-directories depending on \texttt{\$PIPS\_ARCH}
 which describes the current architecture, as discussed in
 Section~\ref{sec:shell}. 
 
-\subsubsection{etc}
+\subsubsection{The \texttt{etc} subdirectory}
 
 Configuration files, such as properties and pipsmake settings.
 
-\subsubsection{share}
+Also some configuration files, automatically generated from
+the \LaTeX{} documentation in \texttt{src/Documentation}.
+Important files are \texttt{pipsmake.rc}, \texttt{properties.rc} and
+\texttt{wpips.rc}. 
 
-Non architecture-dependent executables needed or used by pips.
-They include shell (sh and csh), sed, awk, perl and lisp scripts! Examples:
+\subsubsection{The \texttt{share} subdirectory}
+
+They include shell (sh and csh), sed, awk, perl and lisp scripts.
+Examples (OBSOLETE?):
 \begin{itemize}
-\item  \verb+Init, Select, Perform, Display, Pips+:
-  \index{Init}\index{Select}\index{Perform}\index{Display}\index{Pips}
-  batch interface for PIPS; it is described in PIPS Web pages. 
-  
-\item \verb+epips+: a shell to launch the emacs pips interface (which
-  uses \verb+wpips+ and \verb+emacs+)
-  
 \item \verb+stf-workspace+: \index{stf-workspace} calls Toolpack
   restructurer \verb+stf+ on each Fortran file in a workspace; also
   directly available as a PIPS transformation.
-  
 \item and others.
 \end{itemize}
 
-Also some configuration files, automatically generated from
-the \LaTeX{} documentation in \verb+$PIPS_ROOT/Src/Documentation+. %% $
-Important files are \verb+pipsmake.rc+, \verb+properties.rc+ and
-\verb+wpips.rc+. 
-
-\subsubsection{doc}
+\subsubsection{The \texttt{doc} subdirectory}
 
 Pips documentation, namely many PDF files describing various
 aspects of PIPS, the internal data structures and so on.  Important
@@ -646,21 +642,21 @@ interprocedural analyses), \texttt{developer\_guide} (this document!),
 \texttt{ri} (the description of the pips Intermediate Representation, also
 known as the Abstract Syntax Tree (\textsc{ast})).
 
-This directory is used to build the static PIPS home page.
+%% IS IT ?
+%% This directory is used to build the static PIPS home page.
 
 %% \subsubsection{man}
 %% Local (obsolete?) man pages.
 
-
-\subsubsection{html}
+\subsubsection{The \texttt{html} subdirectory}
 
 HTML documentation of PIPS. Some real HTML files, and some generated from
 \LaTeX{} files.
-    
+
+%% IS IT?    
 This directory is used to build the static PIPS home page.
 
-
-\subsubsection{runtime}
+\subsubsection{The \texttt{runtime} subdirectory}
 
 Environments needed for executing pips-compiled files.  Namely
 \texttt{hpfc} and \texttt{wp65} use a PVM-based runtime and also
@@ -669,7 +665,7 @@ includes the files needed for executing the generated files (as header and
 make files or compiled libraries), but not necessarily the corresponding
 sources.
 
-\subsubsection{utils}
+\subsubsection{The \texttt{utils} subdirectory}
 \label{sec:utils}
 
 Other architecture independent tools and files used for \emph{developing}
@@ -780,31 +776,31 @@ This directory contains PIPS compiled libraries ({\tt lib*.a}) ready
 to be linked. They are stored under their \texttt{\$PIPS\_ARCH}
 subdirectory.
 
+\section{Validation}
+\label{sec:validation}
 
+The validation is stored in a separate subversion repository 
+\par\centerline{\LINK{http://svn.cri.ensmp.fr/svn/validation}}. 
+Different phases are validated in distinct sub-directories.
+Running the validation uses the \texttt{pips\_validation} script
+mentionned above.
+
+See the \texttt{README} at the root of the \texttt{trunk} for details on
+how to run the validation. Basically, one must simply type \texttt{make}.
+
+See various examples around to add new validation files. 
+The prefered way is to provide a source file \texttt{MyTest.f},
+a corresponding \texttt{MyTest.tpips} script, and store
+the standard output of the tpips script into \texttt{MyTest.result/out}.
+
+\textbf{CAUTION:} use a relative and local path in the tpips file to 
+reference the source file.
 
 \newpage
+\noindent
+{\huge OBSOLETE DOWN FROM HERE\ldots}
 
-{\huge IT MAY BE SOMEWHAT OBSOLETE DOWN FROM HERE}
-
-
-\subsection{Validation}
-
-This directory holds the validation directories. Each directory contains
-source files \verb|foo.f|, a test program for them (typically
-\verb|foo.test|, and store the expected result of the run in the 
-\verb|foo.result| subdirectory.
-
-The \verb|default| file within this directory contains the subdirectories
-to be tested by the default validation (see the \texttt{Validate}
-command). For instance, \texttt{Validate Hpfc} performs all tests of the
-\verb|${PIPS_ROOT}/Validation/Hpfc| directory. %% $
-
-Caution: The test scripts must be location independent, and will not be
-run in the directory. Thus you \emph{must} use the \verb|${PIPS_ROOT}| %%$
-environment variable to specify the access path to the source file.
-
-
-\subsection{Development (\texttt{PIPS\_DEVEDIR})}
+\section{Development (\texttt{PIPS\_DEVEDIR})}
 
 This directory contains the version of PIPS currently being developed. 
 It is a mirror of the organization under \verb+$PIPS_ROOT/src+. %%$
