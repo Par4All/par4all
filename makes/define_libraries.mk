@@ -19,7 +19,11 @@ other.libs	= m
 
 ##################################################################### EXTERNALS
 
+ifeq ($(ARCH),LINUXAMD64LL)
+extern.libs	= polylib64
+else
 extern.libs	= polylib
+endif
 
 ################################################################### PIPS COMMON
 
