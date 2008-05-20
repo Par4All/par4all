@@ -253,10 +253,10 @@ char * (*variable_name)(Variable);
  * bugs or features:
  *  - was written by FC...
  */
-Pvecteur vect_rename_variables(v, renamed_p, new_variable)
-Pvecteur v;
-boolean (*renamed_p)(Variable);
-Variable (*new_variable)(Variable);
+Pvecteur vect_rename_variables(
+    Pvecteur v,
+    boolean (*renamed_p)(Variable),
+    Variable (*new_variable)(Variable))
 {
     Pvecteur i=v; /* initial vector is kept */
     Variable var;
