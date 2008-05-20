@@ -475,12 +475,21 @@ ifdef INSTALL_DOC
 
 phase6: .build_doc
 
-$(DOC.d)/$(DOC.subd):; $(MKDIR) $(DOC.d)/$(DOC.subd)
+$(DOC.d):; $(MKDIR) $(DOC.d)
+
+# there may be, but not necessarily, a subdirectory...
+ifdef DOC.subd
+DOC.dest	= $(DOC.d)/(DOC.subd)
+$(DOC.dest): $(DOC.d)
+	$(MKDIR) $(DOC.dest)
+else # no subdir
+DOC.dest	= $(DOC.d)
+endif # DOC.subd
 
 .build_doc: $(INSTALL_DOC)
 	# no direct deps on target dir
-	$(MAKE) $(DOC.d)/$(DOC.subd)
-	$(INSTALL) -m 644 $(INSTALL_DOC) $(DOC.d)/$(DOC.subd)
+	$(MAKE) $(DOC.dest)
+	$(INSTALL) -m 644 $(INSTALL_DOC) $(DOC.dest)
 	touch $@
 
 clean: doc-clean
