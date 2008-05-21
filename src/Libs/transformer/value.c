@@ -654,7 +654,7 @@ void print_value_mappings()
 
 static int mapping_to_value_number(hash_table h)
 {
-  int count = 0;
+  size_t count = 0;
   list values = NIL;
 
   HASH_MAP(var, val, {

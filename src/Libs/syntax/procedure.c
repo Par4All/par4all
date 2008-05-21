@@ -597,7 +597,7 @@ static list find_target_position(list cvl, int ctp, int * pmin_cp, int * pmax_cp
   list lcvl = cvl; /* Local Current Value expression List*/
 
   pips_debug(2, "Begin for target ctp=%d with window [%d, %d]\n", ctp, *pmin_cp, *pmax_cp);
-  pips_debug(2, "and with %d value sets\n", gen_length(cvl));
+  pips_debug(2, "and with %zd value sets\n", gen_length(cvl));
 
   while(ctp > *pmax_cp) {
     expression vs = expression_undefined; /* Value Set */
@@ -721,7 +721,7 @@ static void store_initial_value(entity var, expression val)
 
   /* Storage if a proper initial value has been found */
   if(!expression_undefined_p(coerced_val)) {
-    int b = -1;
+    intptr_t b = -1;
     int sign = 1;
     call c = syntax_call(expression_syntax(coerced_val));
     entity f = call_function(c);
@@ -741,9 +741,9 @@ static void store_initial_value(entity var, expression val)
 
     switch(basic_tag(var_bt)) {
     case is_basic_int:
-      sscanf(entity_local_name(f), "%d", &b);
+      sscanf(entity_local_name(f), "%td", &b);
       fv = make_value(is_value_constant,
-		     make_constant(is_constant_int, (value *) (sign*b)));
+		      make_constant(is_constant_int, (value *) (sign*b)));
       break;
     case is_basic_logical:
       if(ENTITY_TRUE_P(f)) {
@@ -759,7 +759,7 @@ static void store_initial_value(entity var, expression val)
 	ParserError("store_initial_value", "Illegal initialization of a LOGICAL variable");
       }
       fv = make_value(is_value_constant,
-		     make_constant(is_constant_int, (value *) b));
+		      make_constant(is_constant_int, (value *) b));
       break;
     case is_basic_float:
     case is_basic_complex:
@@ -838,14 +838,14 @@ static void process_static_initialization(call c)
   list args = call_arguments(c);
   list isvs = NIL; /* Initialized Scalar VariableS */
   list svps = NIL; /* Scalar Value PositionS */
-  int cvp = 0; /* Current Variable Position */
+  intptr_t cvp = 0; /* Current Variable Position */
   list al = args; /* Value list from the second element on */
   list rl = list_undefined; /* Reference list, hanging from call to DATA LIST function */
   entity rlf = entity_undefined; /* DATA LIST function */
   expression rle = expression_undefined; /* reference list expression, with call to DATA LIST */
   list vl = list_undefined; /* Value List, with repeat operator */
 
-  pips_debug(2, "Begin with %d arguments\n", gen_length(args));
+  pips_debug(2, "Begin with %zd arguments\n", gen_length(args));
 
   pips_assert("This is a call to the static initialization function",
 	      ENTITY_STATIC_INITIALIZATION_P(ife));
@@ -1907,7 +1907,7 @@ static void
 ProcessEntry(
     entity cm,
     entity e,
-    entity l,
+    entity __attribute__ ((unused)) l,
     statement t)
 {
     statement es = statement_undefined; /* so as not to compute anything

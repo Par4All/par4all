@@ -113,7 +113,7 @@ property_equal_p(property p1, property p2)
             equal_p = (strcmp(property_string(p1),property_string(p2))==0);
             break;
         default:
-	    error("illegal tag %d\n", property_tag(p1));
+	    error("illegal tag %td\n", property_tag(p1));
         }
     }
 
@@ -167,8 +167,8 @@ parse_properties(void)
 	    pr = make_property(is_property_bool, (void*) FALSE);
 	    break;
 	case TNUMB:
-	    pr = make_property(is_property_int, (void*) atoi(yytext));
-	    break;
+	    pr = make_property(is_property_int, (void*) atol(yytext));
+ 	    break;
 	case TSTRING: {
 	    /* GO: We need to free(s) so the skeep now 
 	       the quote and do not use s+1 anymore*/
@@ -346,7 +346,7 @@ void fprint_property_direct(FILE * fd, string pname)
 	    fprintf(fd, "%s", property_bool(p)? "TRUE": "FALSE");
 	    break;
 	case is_property_int:
-	    fprintf(fd, "%d", property_int(p));
+	    fprintf(fd, "%td", property_int(p));
 	    break;
 	case is_property_string:
 	    fprintf(fd, "%s", property_string(p));
@@ -369,7 +369,7 @@ fprint_property(FILE * fd, string pname)
 	    fprintf(fd, "%s %s\n", pname, property_bool(p)? "TRUE": "FALSE");
 	    break;
 	case is_property_int:
-	    fprintf(fd, "%s %d\n", pname, property_int(p));
+	    fprintf(fd, "%s %td\n", pname, property_int(p));
 	    break;
 	case is_property_string:
 	    fprintf(fd, "%s \"%s\"\n", pname, property_string(p));

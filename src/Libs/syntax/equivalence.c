@@ -365,7 +365,7 @@ chain c;
 	for (pca = chain_atoms(c); pca != NIL; pca = CDR(pca)) {
 	    a = ATOM(CAR(pca));
 
-	    (void) fprintf(stderr, "(%s,%d) ; ",
+	    (void) fprintf(stderr, "(%s,%td) ; ",
 			   entity_name(atom_equivar(a)), atom_equioff(a));
 	}
 	(void) fprintf(stderr, "\n");

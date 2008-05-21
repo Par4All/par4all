@@ -148,7 +148,7 @@ static void dump_db_resource(string rname, string oname, db_resource r)
     pips_debug(1, "rname=%s, oname=%s, r=%p\n", rname, oname, r);
     if (!db_resource_undefined_p(r)) {
       db_status s = db_resource_db_status(r);
-      pips_debug(1, "pointer=%p, status=%s, time=%d, file_time=%d\n", 
+      pips_debug(1, "pointer=%p, status=%s, time=%td, file_time=%td\n", 
 		 db_resource_pointer(r), db_status_string(s),
 		 db_resource_time(r), db_resource_file_time(r));
     }
@@ -165,7 +165,7 @@ void dump_all_db_resource_status(FILE * file, string where)
     {
       string rn = db_symbol_name(rs);
       string on = db_symbol_name(os);
-      fprintf(file, "resource %s[%s] status '%s' since %d (%d) 0x%p\n",
+      fprintf(file, "resource %s[%s] status '%s' since %td (%td) 0x%p\n",
 	      rn, on, 
 	      db_status_string(db_resource_db_status(r)), 
 	      db_resource_time(r),

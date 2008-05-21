@@ -213,7 +213,7 @@ pipsdbm_write_statement_function(
     gen_chunkp map /* statement function */)
 {
     hash_table h = (map+1)->h;
-    fprintf(fd, "%d\n%d\n", map->i, number_of_ordered_statements(h));
+    fprintf(fd, "%td\n%d\n", map->i, number_of_ordered_statements(h));
     STATEMENT_FUNCTION_MAP(s, x, 
     {
 	int order = statement_ordering(s);
@@ -297,7 +297,7 @@ void declarations_write(FILE * f, hash_table h)
   HASH_MAP(k,v,
   {
     fprintf(f, "%s\n", (char *) k);
-    fprintf(f, "%d\n", (int) v);
+    fprintf(f, "%td\n", (intptr_t) v);
   },h);
 }
 

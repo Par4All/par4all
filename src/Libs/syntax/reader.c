@@ -214,7 +214,7 @@ resize_stmt_buffer(void)
 
 /* indexes in the buffer...
  */
-static int iStmt = 0, lStmt = 0;
+static size_t iStmt = 0, lStmt = 0;
 
 /*************************************************************** LINE BUFFER */
 

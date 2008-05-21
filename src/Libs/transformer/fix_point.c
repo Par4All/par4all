@@ -1022,7 +1022,7 @@ transformer transformer_derivative_fix_point(transformer tf)
     fix_tf = transformer_identity();
   }
   else {
-    transformer inv_tf = transformer_undefined; /* invariant constraints of tf */
+    //transformer inv_tf = transformer_undefined; /* invariant constraints of tf */
     /* sc is going to be modified and destroyed and eventually replaced in 
        fix_tf */
     Psysteme sc = predicate_system(transformer_relation(fix_tf));

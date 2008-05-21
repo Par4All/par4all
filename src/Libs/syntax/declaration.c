@@ -329,7 +329,7 @@ AnalyzeData(list ldvr, list ldvl)
      * pips_assert("AnalyseData", gen_length(ldvr) == gen_length(ldvl));
      */
 
-    pips_debug(8, "number of reference groups: %d\n", gen_length(ldvr));
+    pips_debug(8, "number of reference groups: %td\n", gen_length(ldvr));
 
     pcl = ldvl;
     dvl = DATAVAL(CAR(pcl));
@@ -451,13 +451,13 @@ AnalyzeData(list ldvr, list ldvl)
       while (i > 0 && pcl != NIL) 
       {
 	if (i <= dataval_nboccurrences(dvl)) {
-	  pips_debug(8, "uses %d values out of %d\n",
+	  pips_debug(8, "uses %d values out of %td\n",
 		     i, dataval_nboccurrences(dvl));
 	  dataval_nboccurrences(dvl) -= i;
 	  i = 0;
 	}
 	else {
-	  pips_debug(8, "satisfies %d references out of %d\n",
+	  pips_debug(8, "satisfies %td references out of %d\n",
 		     dataval_nboccurrences(dvl), i);
 	  i -= dataval_nboccurrences(dvl);
 	  dataval_nboccurrences(dvl) = 0;
@@ -963,10 +963,10 @@ common_to_defined_size_p(entity a)
 int
 common_to_size(entity a)
 {
-    int size;
+    size_t size;
 
-    if((size = (int) hash_get(common_size_map,(char *) a))
-       == (int) HASH_UNDEFINED_VALUE) {
+    if((size = (size_t) hash_get(common_size_map,(char *) a))
+       == (size_t) HASH_UNDEFINED_VALUE) {
 	    pips_error("common_to_size",
 		       "common_size_map uninitialized for common %s\n",
 		       entity_name(a));
@@ -976,17 +976,15 @@ common_to_size(entity a)
 }
 
 void
-set_common_to_size(entity a, int size)
+set_common_to_size(entity a, size_t size)
 {
-    (void) hash_put(common_size_map, (char *) a,
-		       (char *) (size));
+    (void) hash_put(common_size_map, (char *) a, (char *) (size));
 }
 
 void
-update_common_to_size(entity a, int new_size)
+update_common_to_size(entity a, size_t new_size)
 {
-    (void) hash_update(common_size_map, (char *) a,
-		       (char *) (new_size));
+    (void) hash_update(common_size_map, (char *) a, (char *) (new_size));
 }
 
 /* updates the common entity if necessary with the common prefix
@@ -1203,16 +1201,16 @@ update_common_sizes()
     sort_list_of_entities(commons);
 
     MAP(ENTITY, c, {
-	int s = common_to_size(c);
+	size_t s = common_to_size(c);
 	type tc = entity_type(c);
 	area ac = type_area(tc);
 
-	pips_assert("update_common_sizes", s != (int) HASH_UNDEFINED_VALUE);
+	pips_assert("update_common_sizes", s != (size_t) HASH_UNDEFINED_VALUE);
 
 	if(area_size(ac) == 0) {
 	    area_size(ac) = s;
 	    debug(1, "update_common_sizes",
-		       "set size %d for common %s\n", s, entity_name(c));
+		  "set size %zd for common %s\n", s, entity_name(c));
 	}
 	else if (area_size(ac) != s) {
 	    /* I'm afraid this warning might be printed because area_size is given
@@ -1241,7 +1239,7 @@ update_common_sizes()
 
 /* local variables for implicit type implementation */
 static tag tag_implicit[26];
-static int int_implicit[26];
+static size_t int_implicit[26];
 
 /* this function initializes the data structure used to compute implicit
 types */
@@ -1486,7 +1484,7 @@ tag t;
 value v;
 {
   basic b;
-  int l;
+  size_t l;
 
   if (t == is_basic_string) {
     if (v == value_undefined) {
@@ -1646,7 +1644,7 @@ print_common_layout(FILE * fd, entity c, bool debug_p)
     list members = common_members_of_module(c, mod , FALSE);
     list equiv_members = NIL;
 
-    (void) fprintf(fd,"\nLayout for common /%s/ of size %d:\n",
+    (void) fprintf(fd,"\nLayout for common /%s/ of size %td:\n",
 		   module_local_name(c), area_size(type_area(entity_type(c))));
 
     if(ENDP(members)) {
@@ -1703,7 +1701,7 @@ print_common_layout(FILE * fd, entity c, bool debug_p)
 		    }
 
 		    (void) fprintf(fd,
-				   "\tVariable %s,\toffset = %d,\tsize = %d\n", 
+				   "\tVariable %s,\toffset = %td,\tsize = %d\n", 
 				   entity_name(m),
 				   ram_offset(storage_ram(entity_storage(m))),
 				   s);
@@ -1735,7 +1733,7 @@ print_common_layout(FILE * fd, entity c, bool debug_p)
 			pips_assert("RAM storage",
 				    storage_ram_p(entity_storage(m)));
 			(void) fprintf(fd,
-				       "\tVariable %s,\toffset = %d,\tsize = %d\n", 
+				       "\tVariable %s,\toffset = %td,\tsize = %d\n", 
 				       entity_name(m),
 				       ram_offset(storage_ram(entity_storage(m))),
 				       SafeSizeOfArray(m));
