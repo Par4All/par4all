@@ -280,13 +280,13 @@ static boolean sc_fm_project_variables
 
     vect_erase_var(&b, var);
 
-    ifscdebug(8)
-      {
-	fprintf(stderr, 
-		"[sc_fm_project_variables] system before %s projection:\n", 
-		var);
-	sc_fprint(stderr, *ps1, default_variable_to_string);
-      }
+    ifscdebug(8) {
+      // Guess the variable is printable as a string if you debug...
+      fprintf(stderr, 
+	      "[sc_fm_project_variables] system before %s projection:\n", 
+	      (char *) var);
+      sc_fprint(stderr, *ps1, default_variable_to_string);
+    }
 	    
     sc_projection_along_variable_ofl_ctrl(ps1, var, ofl_ctrl);
 

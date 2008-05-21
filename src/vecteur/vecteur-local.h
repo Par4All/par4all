@@ -33,7 +33,9 @@
 #include "arithmetique.h" 
 
 /* le type des variables (ou coordonnees) dans les vecteurs */
-typedef char * Variable;
+typedef void * Variable;
+// The method type that return the name of a varible:
+typedef char * (*get_variable_name_t)(Variable);
 
 #define VARIABLE_UNDEFINED ((Variable) 0)
 #define VARIABLE_UNDEFINED_P(v) ((v)==VARIABLE_UNDEFINED)

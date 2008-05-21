@@ -495,12 +495,12 @@ typedef struct
 /* For debugging: */
 static void  __attribute__ ((unused))
 dump_hashtable(hashtable_t hashtable[]) {
-    int i;
-    for(i=0;i<MAX_VAR;i++) 
-	if(hashtable[i].nom != 0) 
-	    printf("%s %d ", hashtable[i].nom, hashtable[i].numero),
-	    print_Value(hashtable[i].val),
-	    printf("\n");
+  int i;
+  for(i=0;i<MAX_VAR;i++) 
+    if(hashtable[i].nom != 0) 
+      printf("%s %d ", (char *) hashtable[i].nom, hashtable[i].numero),
+	print_Value(hashtable[i].val),
+	printf("\n");
 }
 
 /* Le nombre de variables visibles est : compteur-2

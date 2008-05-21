@@ -132,9 +132,7 @@ char * (*variable_name)(Variable);
 /* void egalite_dump(Pcontrainte c): impression "physique" d'une egalite;
  * utilise en debugging
  */
-void egalite_dump(c)
-Pcontrainte c;
-{
+void egalite_dump(Pcontrainte c) {
     egalite_fprint(stderr, c, variable_dump_name);
 }
 
@@ -156,9 +154,7 @@ char * (*variable_name)(Variable);
 /* void inegalite_dump(Pcontrainte c): impression "physique" d'une inegalite;
  * utilise en debugging
  */
-void inegalite_dump(c)
-Pcontrainte c;
-{
+void inegalite_dump(Pcontrainte c) {
     inegalite_fprint(stderr, c, variable_dump_name);
 }
 

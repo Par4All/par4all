@@ -6,6 +6,7 @@
   *  - variable_equal() and variable_default_name() should be overriden
   *    by application specific routines
   *  - the same holds for variable_make()
+  *  - variable are identified by opaque void * (Variable)
   *
   * Modifications:
   */
@@ -54,23 +55,23 @@ Variable v;
     return((char *)v);
 }
 
-/* char * variable_dump_name(Variable v): returns an unambiguous name
- * for variable v, based on the pointer used to really identify variables
- * in the vecteur package; the name starts with the letter X and contains
- * the hexadecimal representation of v
+/* variable_dump_name() returns an unambiguous name for variable v, based
+ * on the pointer used to really identify variables in the vecteur
+ * package; the name starts with the letter X and contains the hexadecimal
+ * representation of v
  *
  * Bugs:
- *  - the name is build in a local buffer; multiple calls would produce
- *    chaos
+ *  - the name is build in a local buffer; so a call to this function
+ *    overwrite the previous returned value
  */
-char * variable_dump_name(v)
-Variable v;
-{
-    static char buffer[10];
+char * variable_dump_name(Variable v) {
+  /* Room for X0x1234567812345678\0 for example on 64 bit address
+     architecture since Variable is a pointer to something: */
+  static char buffer[sizeof(void *)*2+4]; 
 
-    buffer[0] = 'X';
-    (void) sprintf(&buffer[1],"%p", v);
-    return(buffer);
+  buffer[0] = 'X';
+  (void) sprintf(&buffer[1],"%p", v);
+  return(buffer);
 }
 
 /* Variable variable_make(char * name): defines a new variable of a given

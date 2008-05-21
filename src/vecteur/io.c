@@ -97,11 +97,7 @@ Pbase * b;
  *    Resultat : core dump (FC, 28/11/94)
  *    Fixed, (BC, 6/12/94)
  */
-void vect_fprint(f, v, variable_name)
-FILE * f;
-Pvecteur v;
-char * (*variable_name)(Variable);
-{
+void vect_fprint(FILE * f, Pvecteur v, get_variable_name_t variable_name) {
     Pvecteur p;
 
     if(v==NULL) 
@@ -178,13 +174,11 @@ Pbase b;
  * le vecteur de base special TCST n'est pas affiche: seulement son coefficient.
  * Pas de \n a la fin de l'affichage.
  */
-void vect_fprint_as_monome(f, v, b, variable_name, mult_symbol)
-FILE * f;
-Pvecteur v;
-Pbase b;
-char * (*variable_name)(Variable);
-char *mult_symbol;
-{
+void vect_fprint_as_monome(FILE * f,
+			   Pvecteur v,
+			   Pbase b,
+			   get_variable_name_t variable_name,
+			   char * mult_symbol) {
     char *s = vect_sprint_as_monome(v, b, variable_name, mult_symbol);
 
     fprintf(f, "%s", s);
@@ -196,12 +190,10 @@ char *mult_symbol;
  * Retourne dans une chaine le Pvecteur considere comme un monome sans coefficient.
  * (voir ci-dessus)
  */
-char *vect_sprint_as_monome(v, b, variable_name, mult_symbol)
-Pvecteur v;
-Pbase b;
-char * (*variable_name)(Variable);
-char *mult_symbol;
-{
+char * vect_sprint_as_monome(Pvecteur v,
+			     Pbase b,
+			     get_variable_name_t variable_name,
+			     char * mult_symbol) {
     Pvecteur p;
     char t[99];
     char *r = t;
@@ -279,30 +271,23 @@ char *mult_symbol;
 /* void vect_dump(Pvecteur v): impression "physique" d'un vecteur creux 
  * sur stderr
  */
-void vect_dump(v)
-Pvecteur v;
-{
-    vect_fprint(stderr, v, variable_dump_name);
+void vect_dump(Pvecteur v) {
+  vect_fprint(stderr, v, variable_dump_name);
 }
 
 /* void vect_print(Pvecteur v, char * (*variable_name)()):
  * impression d'un vecteur creux v sur stdout; le nom de chaque
  * coordonnee est donne par la fonction variable_name(); voir vect_fprint()
  */
-void vect_print(v,variable_name)
-Pvecteur v;
-char * (*variable_name)(Variable);
+void vect_print(Pvecteur v, get_variable_name_t variable_name)
 {
-    vect_fprint(stdout, v, variable_name);
+  vect_fprint(stdout, v, variable_name);
 }
 
 /* void vect_fdump(FILE * f, Pvecteur v): impression d'un vecteur creux
  * par vect_fprint() avec passage de la fonction variable_dump_name()
  */
-void vect_fdump(f, v)
-FILE * f;
-Pvecteur v;
-{
+void vect_fdump(FILE * f, Pvecteur v) {
     vect_fprint(f, v, variable_dump_name);
 }
 
@@ -324,11 +309,9 @@ Pvecteur v;
  * Note: attention au linefeed final
  *       il n'existe pas de fonction relisant une base sous cette forme
  */
-void base_fprint(f, b, variable_name)
-FILE * f;
-Pbase b;
-char * (*variable_name)(Variable);
-{
+void base_fprint(FILE * f,
+		 Pbase b,
+		 get_variable_name_t variable_name) {
     if(VECTEUR_NUL_P(b)) 
 	(void) fprintf(f,"base vide\n");
     else
