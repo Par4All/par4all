@@ -42,10 +42,10 @@
  *
  */
 
-#define sys_debug(level, msg, sc)			\
-    ifdebug(level) {					\
-	pips_debug(level, msg);				\
-	sc_fprint(stderr, sc, entity_local_name);	\
+#define sys_debug(level, msg, sc)					\
+    ifdebug(level) {							\
+	pips_debug(level, msg);						\
+	sc_fprint(stderr, sc, (get_variable_name_t) entity_local_name);	\
     }
 
 Pbase build_image_base(
@@ -271,10 +271,8 @@ int dim;
 }
 
 Pbase 
-variables_in_declaration_list(module,ce)
-entity module;
-code  ce;
-{
+variables_in_declaration_list(entity __attribute__ ((unused)) module,
+			      code ce) {
     Pbase b= BASE_NULLE;
     MAPL(p,{
 	entity e = ENTITY(CAR(p));
@@ -358,16 +356,20 @@ movement_computation(
        for generating module code */
 
     btmp =  variables_in_declaration_list(module,entity_code(module));
-    sc_image = sc_variables_rename(sc_image, bank_indices,
-				   btmp,entity_local_name);
-    sc_image = sc_variables_rename(sc_image, const_base,
-				  btmp,entity_local_name);
-    sc_image = sc_variables_rename(sc_image,tile_indices,
-				  btmp,entity_local_name);
-    bank_indices= vect_rename(bank_indices,btmp,entity_local_name);
-    tile_indices= vect_rename(tile_indices,btmp,entity_local_name);
-    const_base= vect_rename( const_base,btmp,entity_local_name);
-    ppid = vect_rename(ppid,btmp,entity_local_name);
+    sc_image = sc_variables_rename(sc_image, bank_indices, btmp,
+				   (get_variable_name_t) entity_local_name);
+    sc_image = sc_variables_rename(sc_image, const_base, btmp,
+				   (get_variable_name_t) entity_local_name);
+    sc_image = sc_variables_rename(sc_image,tile_indices, btmp,
+				   (get_variable_name_t) entity_local_name);
+    bank_indices= vect_rename(bank_indices, btmp,
+			      (get_variable_name_t) entity_local_name);
+    tile_indices= vect_rename(tile_indices, btmp,
+			      (get_variable_name_t) entity_local_name);
+    const_base= vect_rename(const_base, btmp,
+			    (get_variable_name_t) entity_local_name);
+    ppid = vect_rename(ppid, btmp,
+		       (get_variable_name_t) entity_local_name);
 
     const_base2 =base_dup(const_base);
     sc_image2 = sc_dup(sc_image);
@@ -383,8 +385,8 @@ movement_computation(
 
     update_basis(sc_image2->base,&index_base,&const_base2,&image_base,
 		 bank_indices,tile_indices,&lindex,&lvar_coeff_nunit,
-		 &lvar_coeff_unit,&loop_body_offsets,&loop_body_indices
-		 ,bank_code,ppid);
+		 &lvar_coeff_unit,&loop_body_offsets,&loop_body_indices,
+		 bank_code,ppid);
 
 
     dim_h2 = vect_size(image_base);
@@ -609,7 +611,8 @@ int *n,*dim_h;
 	*const_base = pv1;
 	ifdebug(8) {
 	    pips_debug(8,"\n constant basis - sc_image_computation:");
-	    base_fprint(stderr,*const_base, entity_local_name);
+	    base_fprint(stderr, *const_base,
+			(get_variable_name_t) entity_local_name);
 	}
 
 	/* initialisation du nombre de constantes symboliques du systeme */

@@ -449,7 +449,7 @@ AllocateDadStruct(int Rank)
 {
   dad_struct Dad;
   bound_pair Bounds;
-  unsigned cnt;
+  int cnt;
   list RefTempList = NIL;
   list BoundList = NIL;
   rtype Ref = make_rtype(is_rtype_nonlinear, UU);
@@ -621,7 +621,7 @@ TransRefTemp(loop ThisLoop, comp_desc Desc)
 {
   tVariants Vars;
   simple_section Dad;
-  unsigned DimNo, Rank;
+  intptr_t DimNo, Rank;
   normalized Nexpr;
   expression TmpExpr;
   list OldList, NewList, NewEle;

@@ -9,6 +9,7 @@
 #include <stdlib.h>
 
 #include "linear.h"
+#include "vecteur.h"
 
 #include "genC.h"
 
@@ -20,9 +21,8 @@
 
 /************************************************************* VECTEUR STUFF */
 
-void vect_debug(Pvecteur v)
-{
-    vect_fprint(stderr, v, entity_local_name);
+void vect_debug(Pvecteur v) {
+  vect_fprint(stderr, v, (get_variable_name_t) entity_local_name);
 }
 
 /* comparison function for Pvecteur in pips
@@ -36,23 +36,20 @@ Pvecteur *pv1, *pv2;
 
 /******************************************************************* SYSTEME */
 
-void sc_syst_debug(Psysteme s)
-{
-    sc_fprint(stderr, s, entity_local_name);
+void sc_syst_debug(Psysteme s) {
+    sc_fprint(stderr, s, (get_variable_name_t) entity_local_name);
 }
 
 /******************************************** FOR PRETTYPRINTING CONSTRAINTS */
 
 void 
-inegalite_debug(Pcontrainte c)
-{
-    inegalite_fprint(stderr, c, entity_local_name);
+inegalite_debug(Pcontrainte c) {
+    inegalite_fprint(stderr, c, (get_variable_name_t) entity_local_name);
 }
 
 void 
-egalite_debug(Pcontrainte c)
-{
-    egalite_fprint(stderr, c, entity_local_name);
+egalite_debug(Pcontrainte c) {
+    egalite_fprint(stderr, c, (get_variable_name_t) entity_local_name);
 }
 
 static string
@@ -126,7 +123,7 @@ contrainte_to_text_1(
     boolean is_inegalite,
     char * (*variable_name)(Variable),
     boolean a_la_fortran,
-    boolean first_line)
+    boolean __attribute__ ((unused)) first_line)
 {
     short int debut = 1;
     Value constante = VALUE_ZERO;
@@ -177,7 +174,7 @@ contrainte_to_text_2(
     boolean is_inegalite,
     char * (*variable_name)(Variable),
     boolean a_la_fortran,
-    boolean first_line)
+    boolean __attribute__ ((unused)) first_line)
 {
     Pvecteur coord;
     short int debut = TRUE;

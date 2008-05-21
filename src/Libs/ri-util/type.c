@@ -164,7 +164,7 @@ MakeCharacterParameter()
 }
 
 parameter 
-MakeAnyScalarParameter(tag t, int size)
+MakeAnyScalarParameter(tag t, intptr_t size)
 {
     return(make_parameter((MakeTypeArray(make_basic(t, UUINT(size)), NIL)),
 			  make_mode(is_mode_reference, UU)));
@@ -226,7 +226,7 @@ MakeCharacterResult()
 }
 
 type 
-MakeAnyScalarResult(tag t, int size)
+MakeAnyScalarResult(tag t, intptr_t size)
 {
     return MakeTypeArray(make_basic(t, UUINT(size)), NIL);
 }
@@ -283,7 +283,7 @@ type t2;
     return FALSE; /* just to avoid a warning */
 }
 
-type make_scalar_integer_type(int n)
+type make_scalar_integer_type(intptr_t n)
 {
     type t = make_type(is_type_variable,
 		       make_variable(make_basic(is_basic_int, UUINT(n)), NIL,NIL));
@@ -933,7 +933,7 @@ basic_maximum(basic b1, basic b2)
 
   /* FI: I do not believe this is correct for all intrinsics! */
 
-  pips_debug(7, "Tags: tag exp1 = %d, tag exp2 = %d\n",
+  pips_debug(7, "Tags: tag exp1 = %td, tag exp2 = %td\n",
 	     basic_tag(b1), basic_tag(b2));
 
 
@@ -964,8 +964,8 @@ basic_maximum(basic b1, basic b2)
 
     case is_basic_logical:
       if(basic_logical_p(b2)) {
-	int s1 = basic_logical(b1);
-	int s2 = basic_logical(b2);
+	intptr_t s1 = basic_logical(b1);
+	intptr_t s2 = basic_logical(b2);
 
 	b = make_basic(is_basic_logical,UUINT(s1>s2?s1:s2));
       }
@@ -975,8 +975,8 @@ basic_maximum(basic b1, basic b2)
 
     case is_basic_complex:
       if(basic_complex_p(b2) || basic_float_p(b2) || basic_int_p(b2)) {
-	int s1 = SizeOfElements(b1);
-	int s2 = SizeOfElements(b2);
+	intptr_t s1 = SizeOfElements(b1);
+	intptr_t s2 = SizeOfElements(b2);
 
 	b = make_basic(is_basic_complex, UUINT(s1>s2?s1:s2));
       }
@@ -986,14 +986,14 @@ basic_maximum(basic b1, basic b2)
 
     case is_basic_float:
       if(basic_complex_p(b2)) {
-	int s1 = SizeOfElements(b1);
-	int s2 = SizeOfElements(b2);
+	intptr_t s1 = SizeOfElements(b1);
+	intptr_t s2 = SizeOfElements(b2);
 
 	b = make_basic(is_basic_complex, UUINT(s1>s2?s1:s2));
       }
       else if(basic_float_p(b2) || basic_int_p(b2)) {
-	int s1 = SizeOfElements(b1);
-	int s2 = SizeOfElements(b2);
+	intptr_t s1 = SizeOfElements(b1);
+	intptr_t s2 = SizeOfElements(b2);
 
 	b = make_basic(is_basic_float, UUINT(s1>s2?s1:s2));
       }
@@ -1003,14 +1003,14 @@ basic_maximum(basic b1, basic b2)
 
     case is_basic_int:
       if(basic_complex_p(b2) || basic_float_p(b2)) {
-	int s1 = SizeOfElements(b1);
-	int s2 = SizeOfElements(b2);
+	intptr_t s1 = SizeOfElements(b1);
+	intptr_t s2 = SizeOfElements(b2);
 	
 	b = make_basic(basic_tag(b2), UUINT(s1>s2?s1:s2));
       }
       else if(basic_int_p(b2)) {
-	int s1 = SizeOfElements(b1);
-	int s2 = SizeOfElements(b2);
+	intptr_t s1 = SizeOfElements(b1);
+	intptr_t s2 = SizeOfElements(b2);
 
 	b = make_basic(is_basic_int, UUINT(s1>s2?s1:s2));
       }
@@ -1133,11 +1133,11 @@ simple_basic_dup(basic b)
 	return(make_basic(is_basic_overloaded, UU));
     else {
 	user_warning("simple_basic_dup",
-		     "(tag %d) isn't that simple\n", basic_tag(b));
+		     "(tag %td) isn't that simple\n", basic_tag(b));
 	if (basic_string_p(b))
-	    fprintf(stderr, "string: value tag = %d\n", 
+	    fprintf(stderr, "string: value tag = %td\n", 
 		             value_tag(basic_string(b)));
-	return (make_basic(basic_tag(b), UUINT(basic_int(b)))); 
+	return make_basic(basic_tag(b), UUINT(basic_int(b)));
     }
 }
 

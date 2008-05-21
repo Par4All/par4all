@@ -238,7 +238,7 @@ expression MemberDerivedIdentifierToExpression(type t,string m)
   if (type_variable_p(t))
     {
       basic b = variable_basic(type_variable(t));
-      pips_debug(6,"Basic tag is %d",basic_tag(b));
+      pips_debug(6,"Basic tag is %td",basic_tag(b));
       switch (basic_tag(b)) {
       case is_basic_pointer:
 	{
@@ -529,21 +529,6 @@ type make_standard_long_integer_type(type t)
 /******************* ENTITIES *******************/
 
 
-bool static_module_p(entity e)
-{
-  return static_module_name_p(entity_name(e));
-}
-
-/* FC: move to ri-util? */
-bool compilation_unit_p(string module_name)
-{
-  /* A module name is a compilation unit if and only if its last character is 
-     FILE_SEP */
-  if (module_name[strlen(module_name)-1]==FILE_SEP)
-    return TRUE;
-  return FALSE;
-}
-
 entity FindEntityFromLocalName(string name)
 {
   /* Find an entity from its local name.
@@ -812,7 +797,7 @@ type UpdateFinalPointer(type pt, type t)
   /* This function replaces the type pointed by the pointer pt
      (this can be a pointer of pointer,... so we have to go until the last one)
      by the type t*/
-  pips_debug(3,"Update final pointer type %d and %d\n",type_tag(pt),type_tag(t));
+  pips_debug(3,"Update final pointer type %td and %td\n",type_tag(pt),type_tag(t));
   if (type_variable_p(pt) && basic_pointer_p(variable_basic(type_variable(pt))))
     {
       type ppt = basic_pointer(variable_basic(type_variable(pt)));
@@ -964,13 +949,13 @@ void CCompilationUnitMemoryAllocation(entity module)
 {
   /* Should be followed by preconditions */
   entity msae = FindOrCreateEntity(compilation_unit_name,  STATIC_AREA_LOCAL_NAME);
-  area msa = type_area(entity_type(msae));
+  //area msa = type_area(entity_type(msae));
   entity gsae = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,  STATIC_AREA_LOCAL_NAME);
-  area gsa = type_area(entity_type(gsae));
+  //area gsa = type_area(entity_type(gsae));
   entity fdae = FindOrCreateEntity(get_current_module_name(), DYNAMIC_AREA_LOCAL_NAME);
-  area fda = type_area(entity_type(fdae));
+  //area fda = type_area(entity_type(fdae));
   entity fsae = FindOrCreateEntity(get_current_module_name(), STATIC_AREA_LOCAL_NAME);
-  area fsa = type_area(entity_type(fsae));
+  //area fsa = type_area(entity_type(fsae));
   
   /* Code for reallocation of memory problem due to reparsing of compilation unit
      previouscompunit = get_current_compilation_unit_entity();
@@ -1110,7 +1095,7 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
 
   if (!storage_undefined_p(c_parser_context_storage(context)))
     {
-      pips_debug(3,"Current storage context is %d\n",
+      pips_debug(3,"Current storage context is %td\n",
 		 storage_tag(c_parser_context_storage(context)));
       entity_storage(e) = c_parser_context_storage(context);
     }
@@ -1357,8 +1342,8 @@ storage MakeStorageRam(entity v, bool is_external, bool is_static)
   entity globalStaticArea = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,  STATIC_AREA_LOCAL_NAME);
   area gsa = type_area(entity_type(globalStaticArea));
   area stack = type_area(entity_type(StackArea));
-  area heap = type_area (entity_type(HeapArea));
-  entity m = get_current_module_entity();
+  //area heap = type_area (entity_type(HeapArea));
+  //entity m = get_current_module_entity();
   
   pips_assert("RAM Storage is used only for variables", type_variable_p(entity_type(v)));
 
@@ -1461,21 +1446,6 @@ string CreateMemberScope(string derived, bool is_external)
   return s;
 }
 
-/* Move this to ri-util !!!*/
-
-string list_to_string(list l)
-{
-  string result = NULL;
-  if (l==NIL) return "";
-  MAP(STRING,s, 
-  {
-    if (result==NULL)
-      result = strdup((const char *)s);
-    else 
-      result = strdup(concatenate(result,s,NULL)); 
-  }, l);
-  return result;
-}
 
 value MakeEnumeratorInitialValue(list enum_list, int counter)
 {
@@ -1649,7 +1619,8 @@ static bool callnodeclfilter(call c)
   }
 }
 
-void nodecl_p(entity module, statement stat)
+void
+nodecl_p(entity __attribute__ ((unused)) module, statement stat)
 {
   declarationerror_p = FALSE;
   gen_multi_recurse(stat, reference_domain,referencenodeclfilter,gen_null,

@@ -106,7 +106,7 @@ entity
 make_constant_entity(
     string name,
     tag bt,
-    int size)
+    size_t size)
 {
     entity e;
 
@@ -130,7 +130,7 @@ make_constant_entity(
 
 	if (bt == is_basic_int)
 	{
-	  ce = make_constant(is_constant_int, (void*) atoi(name));
+	  ce = make_constant(is_constant_int, (void*) atol(name));
 	}
 	else
 	{

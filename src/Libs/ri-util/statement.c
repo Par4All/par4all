@@ -232,7 +232,7 @@ statement st1, st2;
     int o2 = statement_ordering( st2 ) ;
 
     if (ORDERING_NUMBER( o1 ) != ORDERING_NUMBER( o2 )) {
-	fprintf(stderr, "cannot compare %d (%d,%d) and %d (%d,%d)\n",
+	fprintf(stderr, "cannot compare %td (%d,%d) and %td (%d,%d)\n",
 		statement_number(st1), 
 		ORDERING_NUMBER( o1 ), ORDERING_STATEMENT( o1 ),
 		statement_number(st2), 
@@ -1005,7 +1005,7 @@ set r;
     fprintf(fd, "Set contains statements");
 
     SET_MAP(s, {
-	fprintf(fd, " %02d", statement_number((statement) s));
+	fprintf(fd, " %02td", statement_number((statement) s));
     }, r);
 
     fprintf(fd, "\n");
@@ -1097,7 +1097,7 @@ statement s;
 }
 
 statement
-apply_number_to_statement(hash_table nts, int n)
+apply_number_to_statement(hash_table nts, intptr_t n)
 {
     /* This function used to be inline in prettyprinting functions for user views.
      * It was assumed that all statements produced by the parser had a defined
@@ -1147,7 +1147,7 @@ print_number_to_statement(nts)
 hash_table nts;
 {
     HASH_MAP(number, stmt, {
-	fprintf(stderr,"%d\t", (int) number);
+	fprintf(stderr,"%td\t", (intptr_t) number);
 	print_statement((statement) stmt);
     }, nts);
 }
@@ -1402,7 +1402,7 @@ statement_identification(statement s)
 	called = call_function(instruction_call(i));
     }
 
-    sprintf(buffer, "%d (%d, %d) at %p: %s %s\n",
+    sprintf(buffer, "%td (%d, %d) at %p: %s %s\n",
 	    statement_number(s),
 	    ORDERING_NUMBER(so),
 	    ORDERING_STATEMENT(so),
@@ -2271,7 +2271,7 @@ static bool undefined_statement_found_p(statement s, bool * p_undefined_p)
 	abort();
       }
       else {
-	pips_debug(9,"checking statement %03d (%d,%d) with address %p:\n",
+	pips_debug(9,"checking statement %03td (%td,%td) with address %p:\n",
 		   statement_number(s), ORDERING_NUMBER(statement_ordering(s)), 
 		   ORDERING_STATEMENT(statement_ordering(s)), s);
       }

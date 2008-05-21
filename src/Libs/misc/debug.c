@@ -58,12 +58,12 @@ typedef struct
 /* idls points to the first free bucket in debug_stack
  */
 static debug_level debug_stack[STACK_LENGTH];
-static int idls = 0;
+static intptr_t idls = 0;
 
 /* The pair get_ and set_debug_stack_pointer() should never be used
 except to clean up the stack after a long jump */
 
-int get_debug_stack_pointer(void)
+intptr_t get_debug_stack_pointer(void)
 {
     return idls;
 }

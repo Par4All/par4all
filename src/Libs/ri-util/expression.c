@@ -1823,15 +1823,15 @@ static bool  davinci_dump_expression_rc(
   }
   
     /* daVinci node prolog. */
-  fprintf(out, "l(\"%x\",n(\"\",[a(\"OBJECT\",\"%s\")%s%s],[", 
-	  (unsigned int) e, name, color, shape);
+  fprintf(out, "l(\"%zx\",n(\"\",[a(\"OBJECT\",\"%s\")%s%s],[", 
+	  (uintptr_t) e, name, color, shape);
   
   MAP(EXPRESSION, son, 
   {      
     if (!first) fprintf(out, ",\n");
     else { fprintf(out, "\n"); first=FALSE; }
-    fprintf(out, " l(\"%x->%x\",e(\"\",[],r(\"%x\")))", 
-	    (unsigned int) e, (unsigned int) son, (unsigned int) son);
+    fprintf(out, " l(\"%zx->%zx\",e(\"\",[],r(\"%zx\")))", 
+	    (uintptr_t) e, (uintptr_t) son, (uintptr_t) son);
   },
     sons);
 

@@ -28,6 +28,7 @@
 #include "pipsdbm.h"
 #include "text-util.h"
 #include "properties.h"
+#include "instrumentation.h"
 
 extern statement ModuleStatement;
 

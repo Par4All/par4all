@@ -33,11 +33,28 @@ update_list_from_array(list l, gen_array_t a)
 void
 sort_list_of_strings(list l)
 {
-    int number_of_strings = gen_length(l);
+    size_t number_of_strings = gen_length(l);
     gen_array_t a = gen_array_make(number_of_strings); 
     list_to_array(l, a);
-    pips_assert("same length", number_of_strings==gen_array_nitems(a));
+    pips_assert("same length", number_of_strings == gen_array_nitems(a));
     gen_array_sort(a);
     update_list_from_array(l, a);
     gen_array_free(a);
+}
+
+
+/* Return the malloc()ed version of the concatenation of all the strings in
+   the list */
+string
+list_to_string(list l)
+{
+  string result = NULL;
+  if (l == NIL) return strdup("");
+  MAP(STRING,s, {
+      if (result == NULL)
+	result = strdup((const char *)s);
+      else 
+	result = strdup(concatenate(result,s,NULL)); 
+    }, l);
+  return result;
 }

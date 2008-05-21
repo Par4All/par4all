@@ -4,6 +4,7 @@
 
 #include "all.h"
 #include "text-util.h"
+#include "text.h"
 #include "prettyprint.h"
 #include "top-level.h"
 
@@ -212,10 +213,10 @@ static text get_any_comp_regions_text(string module_name,
  * comment  : if the number of array comp_regions is not nul, then empty lines are
  *            added before and after the text of the list of comp_regions.
  */
-static text text_statement_array_comp_regions(module, margin, stat)
-entity module;
-int margin;
-statement stat;
+static text
+text_statement_array_comp_regions(entity __attribute__ ((unused)) module,
+				  int __attribute__ ((unused)) margin,
+				  statement stat)
 {
     list l_reg = NIL;
 
@@ -364,7 +365,7 @@ effect reg;
     }
     else
     {
-	gen_free(t_reg);
+	free_text(t_reg);
 	t_reg = words_predicate_to_commentary(words_comp_region(reg), str_prefix);
     }
 

@@ -178,7 +178,7 @@ store_this_entity(entity var)
     if (!bound_referenced_variables_in_list_p(var))
     {
 	storage s = entity_storage(var);
-	pips_debug(4, "new reference to %s (storage: %d)\n",
+	pips_debug(4, "new reference to %s (storage: %td)\n",
 		   entity_name(var), storage_tag(s));
 	referenced_variables_list = 
 	    CONS(ENTITY, var, referenced_variables_list);

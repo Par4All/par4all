@@ -538,7 +538,7 @@ static bool normalize_first_expressions_filter(expression e)
 	    n = NORMALIZE_EXPRESSION(e);
 
 	ifdebug(8)
-	    fprintf(stderr, "[NormExpr] result (0x%x)\n", (int) n),
+	    fprintf(stderr, "[NormExpr] result (%p)\n", n),
 	    print_expression(e);
     }
 

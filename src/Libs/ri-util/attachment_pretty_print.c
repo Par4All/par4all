@@ -415,7 +415,7 @@ attach_preconditions_decoration_to_text(text t)
 
 /* Attach a total preconditions decoration: */
 void
-attach_total_preconditions_decoration_to_text(text t)
+attach_total_preconditions_decoration_to_text(text __attribute__ ((unused)) t)
 {
   if (is_emacs_pretty_print_asked)
     pips_assert("not implemented yet", FALSE);
@@ -818,7 +818,7 @@ put_an_attachment_in_the_list(attachment a)
 
 /* Nothing to do... */
 static void
-rewrite_an_attachment(attachment a)
+rewrite_an_attachment(attachment __attribute__ ((unused)) a)
 {
     return;
 }

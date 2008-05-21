@@ -698,7 +698,8 @@ text_area_included(
  */
 /* hook for commons, when not generated...
  */
-static string default_common_hook(entity module, entity common)
+static string default_common_hook(entity __attribute__ ((unused)) module,
+				  entity common)
 {
     return strdup(concatenate
         ("common to include: ", entity_local_name(common), "\n", NULL));
@@ -970,7 +971,7 @@ text_equivalence_class(
  */
 static text 
 text_equivalences(
-    entity module     /* the module dealt with */, 
+    entity __attribute__ ((unused)) module     /* the module dealt with */, 
     list ldecl        /* the list of declarations to consider */, 
     bool no_commons /* whether to print common equivivalences */)
 {
@@ -1196,7 +1197,7 @@ text text_initializations(entity m)
   text t = make_text(NIL);
   list il = list_undefined;
 
-  pips_assert("m is a module", entity_module_p);
+  pips_assert("m is a module", entity_module_p(m));
 
   il = sequence_statements(code_initializations(value_code(entity_initial(m))));
 
@@ -1215,8 +1216,8 @@ text text_initializations(entity m)
  * limited to integers, because I do not know where is the value
  * for other types...
  */
-static text 
-text_data(entity module, list /* of entity */ ldecl)
+static text __attribute__ ((unused))
+text_data(entity __attribute__ ((unused)) module, list /* of entity */ ldecl)
 {
     list /* of sentence */ ls = NIL;
 
@@ -1825,7 +1826,7 @@ list c_words_entity(type t, list name)
       list lparams = functional_parameters(f);
       bool first = TRUE;  
 
-      pips_debug(7,"Function type with name = %s and length %d\n", list_to_string(name), gen_length(name));
+      pips_debug(7,"Function type with name = %s and length %zd\n", list_to_string(name), gen_length(name));
  
       if ((gen_length(name) > 1) || ((gen_length(name) == 1) && (strcmp(STRING(CAR(name)),"*")==0)))
 	{
@@ -1982,7 +1983,7 @@ text c_text_entity(entity module, entity e, int margin)
     pc = CHAIN_SWORD(pc,"typedef ");
  
   /* The global variables stored in static area and in ram but they are not static so a condition is needed which checks if it not a global variable*/
-  entity m = get_current_module_entity();
+  // entity m = get_current_module_entity();
   if ((storage_ram_p(s) && static_area_p(ram_section(storage_ram(s))) && !strstr(entity_name(e),TOP_LEVEL_MODULE_NAME)) 
       || (entity_module_p(e) && static_module_p(e)))
     pc = CHAIN_SWORD(pc,"static ");
@@ -2077,10 +2078,12 @@ text c_text_entity(entity module, entity e, int margin)
 
 /* C Version of print_common_layout this is called by fprint_environment(). This function is much simpler than Fortran Version */
 
-list get_common_members(entity common, entity module, bool only_primary)
+list get_common_members(entity common,
+			entity __attribute__ ((unused)) module,
+			bool __attribute__ ((unused)) only_primary)
 {
   list result = NIL;
-  int cumulated_offset = 0;
+  //int cumulated_offset = 0;
   pips_assert("entity is a common", type_area_p(entity_type(common)));
 
   list ld = area_layout(type_area(entity_type(common)));
@@ -2104,7 +2107,7 @@ void print_C_common_layout(FILE * fd, entity c, bool debug_p)
   list members = get_common_members(c, mod, FALSE);
   list equiv_members = NIL;
 
-  (void) fprintf(fd, "\nLayout for common %s of size %d: \n",
+  (void) fprintf(fd, "\nLayout for common %s of size %td: \n",
 		 entity_name(c), area_size(type_area(entity_type(c))));
 
   if(ENDP(members)) {
@@ -2148,7 +2151,7 @@ void print_C_common_layout(FILE * fd, entity c, bool debug_p)
       }
       else {
 	(void) fprintf(fd,
-		       "\tVariable %s,\toffset = %d,\tsize = %d\n", 
+		       "\tVariable %s,\toffset = %td,\tsize = %d\n", 
 		       entity_name(m),
 		       ram_offset(storage_ram(entity_storage(m))),
 		       s);
@@ -2179,7 +2182,7 @@ void print_C_common_layout(FILE * fd, entity c, bool debug_p)
 	  pips_assert("RAM storage",
 		      storage_ram_p(entity_storage(m)));
 	  (void) fprintf(fd,
-			 "\tVariable %s,\toffset = %d,\tsize = %d\n", 
+			 "\tVariable %s,\toffset = %td,\tsize = %d\n", 
 			 entity_name(m),
 			 ram_offset(storage_ram(entity_storage(m))),
 			 SafeSizeOfArray(m));
@@ -2258,7 +2261,7 @@ void fprint_C_environment(FILE *fd, entity m)
   fprint_any_environment(fd, m, FALSE);
 }
 
-fprint_any_environment(FILE * fd, entity m, bool is_fortran)
+void fprint_any_environment(FILE * fd, entity m, bool is_fortran)
 {
     list decls = gen_copy_seq(code_declarations(value_code(entity_initial(m))));
     int nth = 0; /* rank of formal parameter */
@@ -2292,7 +2295,7 @@ fprint_any_environment(FILE * fd, entity m, bool is_fortran)
 	    fprint_functional(fd, type_functional(t));
 	}
 	else if(type_area_p(t)) {
-	    (void) fprintf(fd, "with size %d\n", area_size(type_area(t)));
+	    (void) fprintf(fd, "with size %td\n", area_size(type_area(t)));
 	}
 	else
 	    (void) fprintf(fd, "\n");
@@ -2312,7 +2315,7 @@ fprint_any_environment(FILE * fd, entity m, bool is_fortran)
 		(void) fprintf(fd, "\nLayouts for formal parameters:\n\n");
 	    }
 	    (void) fprintf(fd,
-			   "\tVariable %s,\toffset = %d\n", 
+			   "\tVariable %s,\toffset = %td\n", 
 			   entity_name(v), formal_offset(storage_formal(vs)));
 	}
 	else if(storage_return_p(vs)) {

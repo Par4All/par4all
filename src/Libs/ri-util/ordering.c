@@ -38,30 +38,30 @@ ordering_to_statement_initialized_p()
 void 
 print_ordering_to_statement(void)
 {
-    HASH_MAP(ko, vs,{
-	int o = (int) ko;
+    HASH_MAP(ko, vs, {
+	intptr_t o = (intptr_t) ko;
 	statement s = (statement) vs;
 
-	fprintf(stderr,"%d (%d,%d)->%s\n",
+	fprintf(stderr,"%td (%td,%td)->%s\n",
 		o, ORDERING_NUMBER(o), ORDERING_STATEMENT(o),
 		statement_identification(s));
-    },OrderingToStatement);
+    }, OrderingToStatement);
 }
 
 static statement 
-apply_ordering_to_statement(hash_table ots, int o)
+apply_ordering_to_statement(hash_table ots, intptr_t o)
 {
     statement s;
     pips_assert("defined hash table...",
 		ots != NULL && ots != hash_table_undefined);
 
     if(o == STATEMENT_ORDERING_UNDEFINED)
-	pips_internal_error("Illegal ordering %d\n", o);
+	pips_internal_error("Illegal ordering %td\n", o);
 
     s = (statement) hash_get(ots, (char *) o);
 
     if(s == statement_undefined) 
-	pips_internal_error("no statement for order %d=(%d,%d)\n",
+	pips_internal_error("no statement for order %td=(%td,%td)\n",
 			    o, ORDERING_NUMBER(o), ORDERING_STATEMENT(o));
 
     return s;

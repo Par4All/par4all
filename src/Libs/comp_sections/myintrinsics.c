@@ -285,10 +285,10 @@ transformer context;
 /*}}}*/
 /*{{{  no_write_comp_regions*/
 /*===============================================================================*/
-list no_write_comp_regions(e, args, context)
-entity e;
-list args;
-transformer context;
+list
+no_write_comp_regions(entity __attribute__ ((unused)) e,
+		      list args,
+		      transformer context)
 {
     list lr;
 
@@ -302,10 +302,10 @@ transformer context;
 /*}}}*/
 /*{{{  affect_comp_regions*/
 /*===============================================================================*/
-list affect_comp_regions(e, args, context)
-entity e;
-list args;
-transformer context;
+list
+affect_comp_regions(entity __attribute__ ((unused)) e,
+		    list args,
+		    transformer context)
 {
     list le = NIL;
 

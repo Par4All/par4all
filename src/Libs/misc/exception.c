@@ -18,7 +18,7 @@ void push_pips_context(char const * file, char const * function, int line)
 {
   pips_debug(9, "%s %s:%d\n", function, file, line);
   if (!debug_stack) debug_stack = stack_make(0, 50, 0);
-  stack_push((void*) get_debug_stack_pointer(), debug_stack);
+  stack_push((void *) get_debug_stack_pointer(), debug_stack);
 }
 
 void pop_pips_context(char const * file, char const * function, int line)
@@ -27,7 +27,7 @@ void pop_pips_context(char const * file, char const * function, int line)
   if (!debug_stack) 
     pips_internal_error("unexpected pop without push %s %s:%d\n",
 			function, file, line);
-  set_debug_stack_pointer((int) stack_pop(debug_stack));
+  set_debug_stack_pointer((intptr_t) stack_pop(debug_stack));
 }
 
 /* That's all */

@@ -109,10 +109,10 @@ loops_mapping_of_statement(statement stat)
 
     if (get_debug_level() >= 7) {
 	STATEMENT_MAPPING_MAP(stat, loops, {
-	    fprintf(stderr, "statement %d in loops ", 
+	    fprintf(stderr, "statement %td in loops ", 
 		    statement_number((statement) stat));
 	    MAP(STATEMENT, s, 
-		fprintf(stderr, "%d ", statement_number(s)),
+		fprintf(stderr, "%td ", statement_number(s)),
 		(list) loops);
 	    fprintf(stderr, "\n");
 	}, loops_map)

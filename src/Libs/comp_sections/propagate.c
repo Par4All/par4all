@@ -20,20 +20,20 @@
 DEFINE_CURRENT_MAPPING(local_comp_regions, list)
 
 /* {{{  auxilliary functions*/
-void CheckStride(loop Loop)
+void CheckStride(loop __attribute__ ((unused)) Loop)
 {
     /* expression Stride = range_increment(loop_range(Loop)); */
 
 }
 
 /* just concatentate list for now : change later */
-list CompRegionsExactUnion(list l1, list l2, bool (*union_combinable_p)(effect,effect))
+list CompRegionsExactUnion(list l1, list l2, bool __attribute__ ((unused)) (*union_combinable_p)(effect,effect))
 {
    return(gen_nconc(l1,l2));
 }
 
 /* just concatentate list for now : change later */
-list CompRegionsMayUnion(list l1, list l2, bool (*union_combinable_p)(effect,effect))
+list CompRegionsMayUnion(list l1, list l2, bool __attribute__ ((unused)) (*union_combinable_p)(effect,effect))
 {
    return(gen_nconc(l1,l2));
 }
@@ -150,7 +150,7 @@ list comp_regions_of_statement(statement s)
   
   ifdebug(3)
   {
-	  pips_debug(3, "begin\n\tComputation of regions of statement %03d\n", 
+	  pips_debug(3, "begin\n\tComputation of regions of statement %03td\n", 
 		 statement_number(s));
   }
   /* }}} */
@@ -253,7 +253,7 @@ list comp_regions_of_instruction(instruction i, transformer t_inst, transformer 
       break;
       /* }}} */
       default:
-          pips_debug(3, "unexpected tag %d\n", instruction_tag(i));
+          pips_debug(3, "unexpected tag %td\n", instruction_tag(i));
       /* }}} */
     }
     
@@ -344,8 +344,10 @@ list comp_regions_of_block(list linst)
  * output   : the corresponding list of regions.
  * modifies : nothing.
  */
-list comp_regions_of_test(test t, transformer context, list *plpropreg)
-{
+list
+comp_regions_of_test(test t,
+		     transformer context,
+		     list __attribute__ ((unused)) *plpropreg) {
     /* {{{  init*/
     list le, lt, lf, lc, lr;
     
@@ -383,9 +385,11 @@ list comp_regions_of_test(test t, transformer context, list *plpropreg)
  * modifies : nothing.
  * comment  :	
  */
-list comp_regions_of_loop(loop l, transformer loop_trans, transformer context,
-		     list *plpropreg)
-{
+list
+comp_regions_of_loop(loop l,
+		     transformer __attribute__ ((unused)) loop_trans,
+		     transformer context,
+		     list __attribute__ ((unused)) *plpropreg) {
     /* {{{  init*/
     list index_reg, body_reg, le;
     /*

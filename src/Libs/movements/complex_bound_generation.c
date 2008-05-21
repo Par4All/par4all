@@ -34,17 +34,19 @@ extern Variable variable_of_rank();
  * where exp(s) are Pvecteur(s) corresponding to parts of complex bound 
  */
 
-expression complex_bound_generation(coeff1,coeff2,coeff3,exp1,var1,exp2,var2)
-Value coeff1,coeff2,coeff3;
-Pvecteur exp1;
-Variable var1;
-Pvecteur exp2;
-Variable var2;
+expression
+complex_bound_generation(Value coeff1,
+			 Value coeff2,
+			 Value coeff3,
+			 Pvecteur exp1,
+			 Variable __attribute__ ((unused)) var1,
+			 Pvecteur exp2,
+			 Variable __attribute__ ((unused)) var2)
 {
     expression ex1,ex2,ex4,ex5,ex6,expr,expr1,expr2;
     expression ex3=expression_undefined;
     entity operateur_multi = gen_find_tabulated("TOP-LEVEL:*",entity_domain);
-     entity operateur_add = gen_find_tabulated(
+    entity operateur_add = gen_find_tabulated(
 					      make_entity_fullname(TOP_LEVEL_MODULE_NAME,
 								   PLUS_OPERATOR_NAME), 
 					      entity_domain);
@@ -89,13 +91,12 @@ Variable var2;
 
 
 
-expression complex_bound_computation(sc,index_base,ineq1,ineq2,rank)
-Psysteme sc;
-Pbase index_base;
-Pcontrainte ineq1;
-Pcontrainte ineq2;
-int rank;
-{
+expression
+complex_bound_computation(Psysteme __attribute__ ((unused)) sc,
+			  Pbase index_base,
+			  Pcontrainte ineq1,
+			  Pcontrainte ineq2,
+			  int rank) {
 
     Variable right_var,left_var;
     Value right_coeff,left_coeff;

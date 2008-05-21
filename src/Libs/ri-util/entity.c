@@ -131,10 +131,8 @@ char * module_name;
 }
 
 entity 
-make_loop_label(desired_number, module_name)
-int desired_number;
-char *module_name;
-{
+make_loop_label(int __attribute__ ((unused)) desired_number,
+		char * module_name) {
     entity e = make_new_label(module_name);
     return e;
 }
@@ -210,7 +208,7 @@ entity_local_name(entity e)
 /* Used instead of the macro to pass as formal argument */
 string entity_global_name(entity e)
 {
-    string null_name = "null";
+  //string null_name = "null";
     pips_assert("entity is defined", !entity_undefined_p(e));
     return entity_name(e);
 }
@@ -1004,6 +1002,20 @@ bool static_module_name_p(string name)
      but the last one is not the last character of the name string */
   /* FI: I doubt this is true. Maybe if you're sure name is the name of a module? */
   return (!compilation_unit_p(name) && strstr(name, FILE_SEP_STRING) != NULL);
+}
+
+bool static_module_p(entity e)
+{
+  return static_module_name_p(entity_name(e));
+}
+
+bool compilation_unit_p(string module_name)
+{
+  /* A module name is a compilation unit if and only if its last character is 
+     FILE_SEP */
+  if (module_name[strlen(module_name)-1]==FILE_SEP)
+    return TRUE;
+  return FALSE;
 }
 
 bool compilation_unit_entity_p(entity e)

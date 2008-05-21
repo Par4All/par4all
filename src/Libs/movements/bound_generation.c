@@ -383,7 +383,7 @@ bound_generation(
 	    ps = lsystem[n0_loop];
 	    ifdebug(8) {
 		(void) fprintf(stderr,"LE SYSTEME  est :\n");
-		(void) sc_fprint(stderr,ps,noms_var);
+		(void) sc_fprint(stderr, ps, (get_variable_name_t) noms_var);
 	    }
 	    number_of_lower_bounds = 0;
 	    number_of_upper_bounds = 0;
@@ -452,9 +452,12 @@ bound_generation(
 		ifdebug(8) {
 		    wp65_debug_print_text(entity_undefined, loopbody);
 		    pips_debug(8,"systeme pour la %d boucle \n",n0_loop);
-		    (void) sc_fprint(stderr,sc_neg[n0_loop],noms_var);
-		    (void) sc_fprint(stderr,sc_pos[n0_loop],noms_var);
-		    (void) sc_fprint(stderr,sc_test,noms_var);
+		    (void) sc_fprint(stderr, sc_neg[n0_loop],
+				     (get_variable_name_t) noms_var);
+		    (void) sc_fprint(stderr, sc_pos[n0_loop],
+				     (get_variable_name_t) noms_var);
+		    (void) sc_fprint(stderr, sc_test,
+				     (get_variable_name_t) noms_var);
 		}
 	    }
 	}

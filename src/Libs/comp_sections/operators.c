@@ -46,12 +46,14 @@ comp_desc InitCompDesc(reference ref, tag ReadWrite)
 /* The multidimensional union of two complementary sections
  * performed on a 2-d basis
  */
-comp_sec CompUnion(comp_sec cs1, comp_sec cs2)
+comp_sec
+CompUnion(comp_sec __attribute__ ((unused)) cs1,
+	  comp_sec __attribute__ ((unused)) cs2)
 {
   comp_sec result;
-  int i;
-  unsigned Rank = 0;
-  unsigned NoOfImages = (Rank*Rank)/2;
+  unsigned int i;
+  unsigned int Rank = 0;
+  unsigned int NoOfImages = (Rank*Rank)/2;
   
   for (i = 0; i < NoOfImages; i++)  {
   }
@@ -60,8 +62,10 @@ comp_sec CompUnion(comp_sec cs1, comp_sec cs2)
   return(result);
 }
 
-bool CompIntersection(comp_sec cs1, comp_sec cs2)
+bool
+CompIntersection(comp_sec __attribute__ ((unused)) cs1,
+		 comp_sec __attribute__ ((unused)) cs2)
 {
-
+  return FALSE;
 }
 

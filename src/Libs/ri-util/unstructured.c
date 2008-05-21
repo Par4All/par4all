@@ -462,8 +462,8 @@ dump_control_to_label_name(hash_table h)
 
     fprintf(stderr,"[dump_control_to_label_name] Begin\n");
     HASH_MAP(c,l,{
-	fprintf(stderr, "Label %s -> %s", l,
-		statement_identification(control_statement((control) c)));
+	fprintf(stderr, "Label %s -> %s", (char *) l,
+		(char *) statement_identification(control_statement((control) c)));
 	i++;
     }, h);
     fprintf(stderr,"[dump_control_to_label_name] %d labels, end\n", i);

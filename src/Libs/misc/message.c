@@ -358,7 +358,7 @@ calling PIPS_ERROR, and where format and arg-list are passed as
 arguments to vprintf. PIPS_ERROR terminates execution with abort.
 */
 
-void
+void __attribute__ ((noreturn))
 pips_error(
     const char * calling_function_name,
     const char * a_message_format,

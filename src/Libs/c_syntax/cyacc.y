@@ -1179,7 +1179,7 @@ init_declarator:                             /* ISO 6.7 */
 				    print_expression(value_expression(oiv));
 				  }
 				  else {
-				    fprintf(stderr, "Value tag: %d\n", value_tag(entity_initial(v)));
+				    fprintf(stderr, "Value tag: %td\n", value_tag(entity_initial(v)));
 				  }
 				  pips_internal_error("Scoping not implemented yet, might be the reason\n");
 				}

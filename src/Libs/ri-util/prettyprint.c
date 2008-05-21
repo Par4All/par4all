@@ -290,6 +290,7 @@ char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "linear.h"
 
@@ -347,8 +348,11 @@ pp_style_p(string s)
 
 /********************************************************************* MISC */
 
-text empty_text(entity e, int m, statement s)
-{ return make_text(NIL);}
+text empty_text(entity __attribute__ ((unused)) e,
+		int __attribute__ ((unused)) m,
+		statement __attribute__ ((unused)) s) {
+  return make_text(NIL);
+}
 
 static text (*text_statement_hook)(entity, int, statement) = empty_text;
 
@@ -735,8 +739,9 @@ words_genuine_regular_call(call obj, bool is_a_subroutine)
 
 
 static list 
-words_assign_op(call obj, int precedence, bool leftmost)
-{
+words_assign_op(call obj,
+		int __attribute__ ((unused)) precedence,
+		bool __attribute__ ((unused)) leftmost) {
     list pc = NIL, args = call_arguments(obj);
     int prec = words_intrinsic_precedence(obj);
 
@@ -752,8 +757,9 @@ words_assign_op(call obj, int precedence, bool leftmost)
 }
 
 static list 
-words_substring_op(call obj, int precedence, bool leftmost)
-{
+words_substring_op(call obj,
+		   int __attribute__ ((unused)) precedence,
+		   bool __attribute__ ((unused)) leftmost) {
   /* The substring function call is reduced to a syntactic construct */
     list pc = NIL;
     expression r = expression_undefined;
@@ -790,7 +796,9 @@ words_substring_op(call obj, int precedence, bool leftmost)
 }
 
 static list 
-words_assign_substring_op(call obj, int precedence, bool leftmost)
+words_assign_substring_op(call obj,
+			  int __attribute__ ((unused)) precedence,
+			  bool __attribute__ ((unused)) leftmost)
 {
   /* The assign substring function call is reduced to a syntactic construct */
     list pc = NIL;
@@ -809,7 +817,9 @@ words_assign_substring_op(call obj, int precedence, bool leftmost)
 }
 
 static list 
-words_nullary_op(call obj, int precedence, bool leftmost)
+words_nullary_op(call obj,
+		 int precedence,
+		 bool __attribute__ ((unused)) leftmost)
 {
     list pc = NIL;
     list args = call_arguments(obj);
@@ -845,7 +855,9 @@ words_nullary_op(call obj, int precedence, bool leftmost)
 }
 
 static list 
-words_io_control(list *iol, int precedence, bool leftmost)
+words_io_control(list *iol,
+		 int __attribute__ ((unused)) precedence,
+		 bool __attribute__ ((unused)) leftmost)
 {
     list pc = NIL;
     list pio = *iol;
@@ -883,7 +895,9 @@ words_io_control(list *iol, int precedence, bool leftmost)
 }
 
 static list 
-words_implied_do(call obj, int precedence, bool leftmost)
+words_implied_do(call obj,
+		 int __attribute__ ((unused)) precedence,
+		 bool __attribute__ ((unused)) leftmost)
 {
     list pc = NIL;
 
@@ -919,7 +933,9 @@ words_implied_do(call obj, int precedence, bool leftmost)
 }
 
 static list 
-words_unbounded_dimension(call obj, int precedence, bool leftmost)
+words_unbounded_dimension(call __attribute__ ((unused)) obj,
+			  int __attribute__ ((unused)) precedence,
+			  bool __attribute__ ((unused)) leftmost)
 {
     list pc = NIL;
 
@@ -929,7 +945,9 @@ words_unbounded_dimension(call obj, int precedence, bool leftmost)
 }
 
 static list 
-words_list_directed(call obj, int precedence, bool leftmost)
+words_list_directed(call __attribute__ ((unused)) obj,
+		    int __attribute__ ((unused)) precedence,
+		    bool __attribute__ ((unused)) leftmost)
 {
     list pc = NIL;
 
@@ -1083,13 +1101,17 @@ words_io_inst(call obj,
 }
 
 static list 
-null(call obj, int precedence, bool leftmost)
+null(call __attribute__ ((unused)) obj,
+     int __attribute__ ((unused)) precedence,
+     bool __attribute__ ((unused)) leftmost)
 {
     return(NIL);
 }
 
 static list
-words_prefix_unary_op(call obj, int precedence, bool leftmost)
+words_prefix_unary_op(call obj,
+		      int __attribute__ ((unused)) precedence,
+		      bool __attribute__ ((unused)) leftmost)
 {
     list pc = NIL;
     expression e = EXPRESSION(CAR(call_arguments(obj)));
@@ -1116,7 +1138,9 @@ words_prefix_unary_op(call obj, int precedence, bool leftmost)
 }
 
 static list
-words_postfix_unary_op(call obj, int precedence, bool leftmost)
+words_postfix_unary_op(call obj,
+		       int __attribute__ ((unused)) precedence,
+		       bool __attribute__ ((unused)) leftmost)
 {
     list pc = NIL;
     expression e = EXPRESSION(CAR(call_arguments(obj)));
@@ -1158,7 +1182,9 @@ words_unary_minus(call obj, int precedence, bool leftmost)
 /* WARNING : the floating point division is used wether b is an int or not
    ! (1.0/b) -- in fact b should not be an int ! */
 static list /* of string */ 
-words_inverse_op(call obj, int precedence, bool leftmost)
+words_inverse_op(call obj,
+		 int precedence,
+		 bool __attribute__ ((unused)) leftmost)
 {
   list /* of string */ pc = NIL;
   
@@ -1195,7 +1221,10 @@ words_goto_label(string tlabel)
 }
 
 static list 
-eole_fmx_specific_op(call obj, int precedence, bool leftmost, bool isadd)
+eole_fmx_specific_op(call obj,
+		     int __attribute__ ((unused)) precedence,
+		     bool __attribute__ ((unused)) leftmost,
+		     bool isadd)
 {
   list /* of strings */ pc = NIL;
   list /* of expressions */ args = call_arguments(obj);
@@ -1426,7 +1455,9 @@ words_infix_binary_op(call obj, int precedence, bool leftmost)
 /* Nga Nguyen : this case is added for comma expression in C, but I am not sure about its precedence
    => to look more carefully */
 
-static list words_comma_op(call obj, int precedence, bool leftmost)
+static list words_comma_op(call obj,
+			   int __attribute__ ((unused)) precedence,
+			   bool __attribute__ ((unused)) leftmost)
 {
   list pc = NIL, args = call_arguments(obj);
   int prec = words_intrinsic_precedence(obj);
@@ -1442,7 +1473,9 @@ static list words_comma_op(call obj, int precedence, bool leftmost)
   return(pc);
 }
 
-static list words_conditional_op(call obj, int precedence, bool leftmost)
+static list words_conditional_op(call obj,
+				 int __attribute__ ((unused)) precedence,
+				 bool __attribute__ ((unused)) leftmost)
 {
   list pc = NIL, args = call_arguments(obj);
   int prec = words_intrinsic_precedence(obj);
@@ -1747,7 +1780,7 @@ sentence_tail(void)
 /* exported for unstructured.c */
 sentence 
 sentence_goto_label(
-    entity module,
+    entity __attribute__ ((unused)) module,
     string label,
     int margin,
     string tlabel,
@@ -1871,7 +1904,7 @@ loop_private_variables(loop obj)
     }, 
 	loop_locals(obj)) ; /* end of MAP */
     
-    pips_debug(5, "#printed %d/%d\n", gen_length(l), 
+    pips_debug(5, "#printed %zd/%zd\n", gen_length(l), 
 	       gen_length(loop_locals(obj)));
 
     /* stuff around if not empty
@@ -2274,7 +2307,7 @@ init_text_statement(
 
 static text 
 text_logical_if(
-    entity module,
+    entity __attribute__ ((unused)) module,
     string label,
     int margin,
     test obj,
@@ -2439,10 +2472,10 @@ text_block_ifthen(
 static text 
 text_block_else(
     entity module,
-    string label,
+    string __attribute__ ((unused)) label,
     int margin,
     statement stmt,
-    int n)
+    int __attribute__ ((unused)) n)
 {    
     text r = make_text(NIL);
 
@@ -3068,10 +3101,10 @@ output_a_graph_view_of_the_unstructured_from_a_control(text r,
 void
 output_a_graph_view_of_the_unstructured(text r,
                                         entity module,
-                                        string label,
+                                        string __attribute__ ((unused)) label,
                                         int margin,
                                         unstructured u,
-                                        int num)
+                                        int __attribute__ ((unused)) num)
 {
    bool exit_node_has_been_displayed = FALSE;
    control begin_control = unstructured_control(u);
@@ -3192,13 +3225,17 @@ static list words_application(application a)
   return pc;
 }
 
-static text text_forloop(entity module,string label,int margin,forloop obj,int n)
+static text text_forloop(entity module,
+			 string label,
+			 int margin,
+			 forloop obj,
+			 int n)
 {
     list pc = NIL;
     unformatted u;
     text r = make_text(NIL);
     statement body = forloop_body(obj) ;
-    instruction i = statement_instruction(body);
+    //instruction i = statement_instruction(body);
    
     pc = CHAIN_SWORD(pc,"for (");
     if (!expression_undefined_p(forloop_initialization(obj)))

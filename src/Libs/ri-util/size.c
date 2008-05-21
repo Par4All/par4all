@@ -433,6 +433,7 @@ int
 storage_space_of_variable(entity v)
 {
     /* Storage size is expressed in bytes */
+    char * s;
     int l;
 
     if (entity_to_size == hash_table_undefined) {
@@ -440,14 +441,14 @@ storage_space_of_variable(entity v)
 		     "hash table should have been allocated\n");
 	entity_to_size = hash_table_make(hash_pointer, 0);
     }
-
-    if ((l = (int) hash_get(entity_to_size, (char *) v))
-	== (int) HASH_UNDEFINED_VALUE) {
-	if(!SizeOfArray(v, &l)) {
-	    fprintf(stderr, "[storage_space_of_variable] Non constant array size\n");
-	    abort();
-	}
-	hash_put(entity_to_size, (char *) v, (char *) l);
+    s = hash_get(entity_to_size, (char *) v);
+    if (s == HASH_UNDEFINED_VALUE) {
+      l = (intptr_t) s;
+      if(!SizeOfArray(v, &l)) {
+	fprintf(stderr, "[storage_space_of_variable] Non constant array size\n");
+	abort();
+      }
+      hash_put(entity_to_size, (char *) v, (char *) (intptr_t) l);
     }
 
     return l;

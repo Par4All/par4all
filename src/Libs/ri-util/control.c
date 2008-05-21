@@ -229,10 +229,10 @@ void
 display_linked_control_nodes(control c) {
     list blocs = NIL;
     CONTROL_MAP(ctl, {
-	fprintf(stderr, "%p (pred (#%d)=", ctl,
+	fprintf(stderr, "%p (pred (#%zd)=", ctl,
 		gen_length(control_predecessors(ctl)));
 	display_address_of_control_nodes(control_predecessors(ctl));
-	fprintf(stderr, " succ (#%d)=", gen_length(control_successors(ctl)));
+	fprintf(stderr, " succ (#%zd)=", gen_length(control_successors(ctl)));
 	display_address_of_control_nodes(control_successors(ctl));
 	fprintf(stderr, "), ");
 	ifdebug(8) {
