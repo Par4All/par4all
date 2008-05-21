@@ -87,9 +87,9 @@ static void reset_dfn(control c)
 
 static void copy_dfn(control new_c, control old_c)
 {
-  int d = 0;
+  intptr_t d = 0;
   
-  if((d = (int) hash_get(dfn, (void *) old_c)) == (int) (HASH_UNDEFINED_VALUE))
+  if((d = (intptr_t) hash_get(dfn, (void *) old_c)) == (intptr_t) (HASH_UNDEFINED_VALUE))
     pips_internal_error("No dfn value for control %p\n", old_c);
   
   hash_put(dfn, (void *) new_c, (void *) d);
@@ -97,15 +97,15 @@ static void copy_dfn(control new_c, control old_c)
 
 static int get_dfn(control c)
 {
-  int d = 0;
+  intptr_t d = 0;
   
-  if((d = (int) hash_get(dfn, (void *) c)) == (int) (HASH_UNDEFINED_VALUE))
+  if((d = (intptr_t) hash_get(dfn, (void *) c)) == (intptr_t) (HASH_UNDEFINED_VALUE))
     pips_internal_error("No dfn value for control %p\n", c);
 
   return d;
 }
 
-static void update_dfn(control c, int d)
+static void update_dfn(control c, intptr_t d)
 {
   hash_update(dfn, (void *) c, (void *) d);
 }
@@ -253,7 +253,7 @@ static bool check_control_statement(control c)
 static void print_and_check_control_node(control c, bool check_p)
 {
   fprintf(stderr,
-	  "ctr %p, %d preds, %d succs: %s", 
+	  "ctr %p, %zd preds, %zd succs: %s", 
           c,
 	  gen_length(control_predecessors(c)),
 	  gen_length(control_successors(c)),
@@ -1211,10 +1211,11 @@ void intersect_successors_with_partition_complement(control c,
   intersect_successors_with_partition_or_complement(c, partition, TRUE);
 }
 
-static void insert_non_deterministic_control_node(list succs,
-						  control pred,
-						  control new_c,
-						  control old_c)
+static void __attribute__ ((unused))
+insert_non_deterministic_control_node(list succs,
+				      control pred,
+				      control new_c,
+				      control old_c)
 {
   if(FALSE) {
     /* Can we do without a extra-node? */
@@ -1295,8 +1296,8 @@ static void update_predecessors_of_successor(control succ, control new_c, contro
 static void add_test_successor(control t, control new_s, bool is_true_successor)
 {
   bool slot_found = FALSE;
-  int rank = 0;
-  int pos = 0;
+  size_t rank = 0;
+  size_t pos = 0;
 
   pips_debug(8, "Begin with t=%p, new_s=%p and is_true_successor=%d",
 	     t, new_s, is_true_successor);
@@ -1321,7 +1322,7 @@ static void add_test_successor(control t, control new_s, bool is_true_successor)
   } , control_successors(t));
 
   if(!slot_found) {
-    if( (gen_length(control_successors(t))%2) == is_true_successor) {
+    if( ((intptr_t)gen_length(control_successors(t))%2) == is_true_successor) {
       /* Allocate a meaningless control */
       control mlc = make_meaningless_control(CONS(CONTROL, t, NIL), NIL);
       
@@ -1338,7 +1339,7 @@ static void add_test_successor(control t, control new_s, bool is_true_successor)
     }
   }
 
-  pips_debug(8, "End with slot_found=%s, rank=%d and pos=%d\n",
+  pips_debug(8, "End with slot_found=%s, rank=%zd and pos=%zd\n",
 	     bool_to_string(slot_found), rank, pos);
 
   pips_assert("The position is consistent with is_true_successor",
@@ -2052,7 +2053,7 @@ static void update_partition(control root,
      algorithm is not aware of this.  */
   list embedding_nodes = node_to_linked_nodes(root);
   int changes = 0;
-  int eliminations = 0;
+  size_t eliminations = 0;
   list eliminated = NIL;
   
   pips_assert("The head is in the partition", gen_in_list_p(root, partition));
@@ -2182,11 +2183,11 @@ static void update_partition(control root,
 		 changes);
     }
     else if(changes==0){
-      pips_debug(2, "End with reduced partition (no renamings, %d eliminations)\n",
+      pips_debug(2, "End with reduced partition (no renamings, %zd eliminations)\n",
 		 eliminations);
     }
     else{
-      pips_debug(2, "End with new partition (%d renamings, %d eliminations):\n",
+      pips_debug(2, "End with new partition (%d renamings, %zd eliminations):\n",
 		 changes, eliminations);
       print_control_nodes(partition);
     }

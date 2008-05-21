@@ -229,9 +229,9 @@ fuse_sequences_in_unstructured(statement s)
 		    if (gen_length(control_successors(c)) == 1) {
 			control the_successor = CONTROL(CAR(control_successors(c)));
 
-			int number_of_successors_of_the_successor = gen_length(control_successors(the_successor));
-			int number_of_predecessors_of_the_successor = gen_length(control_predecessors(the_successor));
-			pips_debug(3, "Control %p: (gen_length(control_successors(c)) == 1), number_of_successors_of_the_successor = %d, number_of_predecessors_of_the_successor = %d, the successor is the entry node: %d, empty_statement_or_continue_p(control_statement(c)) = %d\n",
+			size_t number_of_successors_of_the_successor = gen_length(control_successors(the_successor));
+			size_t number_of_predecessors_of_the_successor = gen_length(control_predecessors(the_successor));
+			pips_debug(3, "Control %p: (gen_length(control_successors(c)) == 1), number_of_successors_of_the_successor = %zd, number_of_predecessors_of_the_successor = %zd, the successor is the entry node: %d, empty_statement_or_continue_p(control_statement(c)) = %d\n",
 				   c,
 				   number_of_successors_of_the_successor,
 				   number_of_predecessors_of_the_successor,
@@ -281,7 +281,7 @@ fuse_sequences_in_unstructured(statement s)
 			}
 		    }
 		    else {
-			pips_debug(3, "(gen_length(control_successors(c)) == %d)\n",
+			pips_debug(3, "(gen_length(control_successors(c)) == %zd)\n",
 				   gen_length(control_successors(c)));
 		    }
 		},
@@ -498,7 +498,7 @@ take_out_the_entry_node_of_the_unstructured(statement s,
    is returned in new_unstructured_statement: */
 
 /* Still buggy. No longer used. */
-static bool
+static bool __attribute__ ((unused)) 
 try_to_structure_the_unstructured(statement s,
                                   statement * new_unstructured_statement)
 {

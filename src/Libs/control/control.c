@@ -215,7 +215,7 @@ statement st ;
 hash_table used_labels;
 {
     if( get_debug_level() >= 5 ) {
-	pips_debug(0, "Statement %d (%p): \n ", statement_number( st ), st);
+	pips_debug(0, "Statement %td (%p): \n ", statement_number( st ), st);
 	print_statement(st);
     }
     HASH_MAP(name, sts, {

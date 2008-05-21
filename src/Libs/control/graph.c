@@ -30,7 +30,7 @@ void clean_ctrl_graph()
 {
     CONTROLMAP_MAP(s, c, 
       {
-	  pips_debug(7, "statement (%d,%d)\n", 
+	  pips_debug(7, "statement (%td,%td)\n", 
 		     ORDERING_NUMBER(statement_ordering(s)),
 		     ORDERING_STATEMENT(statement_ordering(s)));
 
@@ -57,7 +57,7 @@ add_arrow_in_ctrl_graph(statement s1, statement s2)
 	c1 = load_ctrl_graph(s1), 
 	c2 = load_ctrl_graph(s2);
 
-    pips_debug(7, "(%d,%d:%d) -> (%d,%d;%d)\n", 
+    pips_debug(7, "(%td,%td:%td) -> (%td,%td;%td)\n", 
 	       ORDERING_NUMBER(statement_ordering(s1)),
 	       ORDERING_STATEMENT(statement_ordering(s1)),
 	       statement_number(s1),
@@ -213,7 +213,7 @@ static void stmt_rewrite(statement s)
 
 void build_full_ctrl_graph(statement s)
 {
-    pips_debug(3, "statement (%d,%d:%d)\n", 
+    pips_debug(3, "statement (%td,%td:%td)\n", 
 	       ORDERING_NUMBER(statement_ordering(s)), 
 	       ORDERING_STATEMENT(statement_ordering(s)),
 	       statement_number(s));

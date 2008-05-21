@@ -143,7 +143,7 @@ add_node_to_interval(graph intervals,
 
 /* Add the interval from (node, intervals) to interval graph
    intervals and update selected_nodes accordingly if : */
-static void
+static void __attribute__ ((unused)) 
 add_to_interval_or_create_new_interval(vertex node,
 				       graph intervals,
 				       set selected_nodes)

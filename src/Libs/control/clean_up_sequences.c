@@ -209,7 +209,7 @@ clean_up_sequences_rewrite(statement s)
 			&& unlabelled_statement_p(s));
 			*/
 
-	    pips_debug(3, "A sequence of %d statements\n",
+	    pips_debug(3, "A sequence of %zd statements\n",
 		       gen_length(sequence_statements(instruction_sequence(i))));
 	    ifdebug(5) {
 		pips_debug(5,
@@ -271,7 +271,7 @@ clean_up_sequences_rewrite(statement s)
 			    /* By default, it should be useful: */
 			    useful_sts = gen_nconc(useful_sts,
 						   CONS(STATEMENT, st, NIL));
-			    pips_debug(4, "Statement useful... %d\n",
+			    pips_debug(4, "Statement useful... %zd\n",
 				       gen_length(useful_sts));
 			}
 
