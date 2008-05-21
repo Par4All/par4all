@@ -60,7 +60,7 @@
   PREFIX __attribute__ ((unused)) type##_value_type load_##name(type##_key_type k) { \
     return(apply_##type(name##_object, k));				\
   }									\
-  PREFIX __attribute__ ((unused)) type##_value_type delete_##name(type##_key_type k) { \
+  PREFIX type##_value_type __attribute__ ((unused)) delete_##name(type##_key_type k) { \
     return(delete_##type(name##_object, k));				\
   }									\
   PREFIX bool __attribute__ ((unused)) bound_##name##_p(type##_key_type k) { \
