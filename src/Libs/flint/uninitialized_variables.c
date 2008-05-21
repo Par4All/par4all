@@ -26,7 +26,7 @@ flint_initialize_statement_def_use_variables(graph dependence_graph)
 	{
 	    statement s1 = vertex_to_statement(a_vertex);
 
-	    pips_debug(7, "\tSuccessor list: %p for statement ordering %d\n", 
+	    pips_debug(7, "\tSuccessor list: %p for statement ordering %td\n", 
 		       vertex_successors(a_vertex),
 		       dg_vertex_label_statement(vertex_vertex_label(a_vertex)));
 	    MAP(SUCCESSOR, a_successor,
@@ -99,8 +99,8 @@ flint_initialize_statement_def_use_variables(graph dependence_graph)
 						(char *)  a_variable);
 
 				pips_debug(6, "\tUse: statement %p (%#x). Def: statement %p (%#x), variable \"%s\".\n",
-					   use, statement_ordering(use),
-					   def, statement_ordering(def),
+					   use, (uintptr_t) statement_ordering(use),
+					   def, (uintptr_t) statement_ordering(def),
 					   entity_minimal_name(a_variable));
 			    }
                         

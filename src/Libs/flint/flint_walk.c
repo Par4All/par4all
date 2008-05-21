@@ -114,7 +114,7 @@ void            flint_syntax(s)
 	flint_call(c);
 	break;
     default:
-	FATAL("flint_syntax: unexpected tag %d\n", syntax_tag(s));
+	FATAL("flint_syntax: unexpected tag %td\n", syntax_tag(s));
     }
 }
 
@@ -222,7 +222,7 @@ instruction i;
 	flint_call(c);
 	break;
     default:
-	FATAL("flint_instruction: unexpected tag %d\n", instruction_tag(i));
+	FATAL("flint_instruction: unexpected tag %td\n", instruction_tag(i));
     }
 
     return (i);

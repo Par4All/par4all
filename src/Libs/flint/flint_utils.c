@@ -69,9 +69,10 @@ bool            size_of_dimension(d, the_int)
  * TRUE. read find_bd_ as "find basic and dimensions" and not find comics!
  */
 
-bool            control_type_in_expression(a_basic, a_dim, exp)
-    int             a_basic, a_dim;
-    expression      exp;
+bool
+control_type_in_expression(int a_basic,
+			   int __attribute__ ((unused)) a_dim,
+			   expression exp)
 {
     basic           b;
     list            d;
@@ -136,7 +137,7 @@ bool            find_bd_expression(exp, base, dims)
 	c = syntax_call(s);
 	return (find_bd_call(c, base, dims));
     default:
-	FATAL("find_bd_expression : unexpected tag %d\n", syntax_tag(s));
+	FATAL("find_bd_expression : unexpected tag %td\n", syntax_tag(s));
     }
 
     return (FALSE);

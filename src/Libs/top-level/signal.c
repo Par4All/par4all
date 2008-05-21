@@ -5,6 +5,7 @@
  * moved from misc to top level so as to interact with pipsmake/pipsdbm...
  */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <signal.h>
 

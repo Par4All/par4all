@@ -159,9 +159,10 @@ bool check_the_call(c)
  * should be considered as ok. overloaded basics are not checked, and no
  * message is broadcast.
  */
-bool check_call_intrinsic(la, lt, c)
-    list            la, lt;
-    call            c;
+bool
+check_call_intrinsic(list la,
+		     list __attribute__ ((unused)) lt,
+		     call c)
 {
     entity          the_fnct = call_function(c);
     bool            ok1, ok2;
@@ -547,7 +548,7 @@ bool look_at_the_commons(module)
 		list            llayout = area_layout(type_area(entity_type(local)));
 		while (llayout != NULL) {
 
-		    fprintf(stdout, "variable %s at offset %d\n",
+		    fprintf(stdout, "variable %s at offset %td\n",
 			    entity_name(ENTITY(CAR(llayout))),
 			    ram_offset(storage_ram(entity_storage(ENTITY(CAR(llayout))))));
 		    llayout = CDR(llayout);

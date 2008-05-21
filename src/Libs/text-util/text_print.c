@@ -93,7 +93,8 @@ print_sentence(FILE * fd,
 	/* col: the next column number, starting from 1.
 	 * it means tha columns 1 to col-1 have been output. I guess. FC.
 	 */
-	int col, i, line_num = 1;
+	int i, line_num = 1;
+	unsigned int col;
 	unformatted u = sentence_unformatted(s);
 	string label = unformatted_label(u);
 	int em = unformatted_extra_margin(u);
@@ -104,7 +105,7 @@ print_sentence(FILE * fd,
 	 */
 	/* 05/08/2003 - Nga Nguyen - Add code for C prettyprinter */
 
-	if (label != (char *) NULL && !string_undefined_p(label)) {
+	if (label != NULL && !string_undefined_p(label)) {
 	    /* Keep track of the attachment against the padding: */
 	    deal_with_attachments_in_this_string(label,
 						 position_in_the_output);
@@ -148,7 +149,7 @@ print_sentence(FILE * fd,
 	     * use the 88 algorithm to break as few
 	     * syntactic constructs as possible */
 	    else
-		if((int)strlen(w) < 70-7-em) {
+	      if((int)strlen(w) < 70-7-em) {
 		    if (col + strlen(w) > 70) {
 			/* Complete current line with the statement
                            line number, if it is significative: */
@@ -329,7 +330,7 @@ debug_formatted(string s)
 static void 
 debug_unformatted(unformatted u)
 {
-    fprintf(stderr, "# unformatted\n# label %s, %d, %d\n",
+    fprintf(stderr, "# unformatted\n# label %s, %td, %td\n",
 	    unformatted_label(u)? unformatted_label(u): "<null>", 
 	    unformatted_number(u), unformatted_extra_margin(u));
     debug_words(unformatted_words(u));

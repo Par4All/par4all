@@ -541,7 +541,7 @@ character_to_character_type(int n)
 }
 
 static type 
-substring_type(int n)
+substring_type(size_t n)
 {
   type t = type_undefined;
   functional ft = functional_undefined;
@@ -563,7 +563,7 @@ substring_type(int n)
 }
 
 static type 
-assign_substring_type(int n)
+assign_substring_type(size_t n)
 {
   type t = type_undefined;
   functional ft = functional_undefined;
@@ -2084,13 +2084,15 @@ typing_function_constant_dcomplex(call c, type_context_p context)
 }
 
 static basic
-typing_function_overloaded(call c, type_context_p context)
+typing_function_overloaded(call __attribute__ ((unused)) c,
+			   type_context_p __attribute__ ((unused)) context)
 {
   return make_basic_overloaded();
 }
 
 static basic
-typing_function_format_name(call c, type_context_p context)
+typing_function_format_name(call __attribute__ ((unused)) c,
+			    type_context_p __attribute__ ((unused)) context)
 {
   return make_basic_int(4);
 }
@@ -2281,7 +2283,8 @@ typing_buffer_inout(call c, type_context_p context)
   return basic_undefined;
 }
 
-static basic no_typing(call c, type_context_p context)
+static basic no_typing(call __attribute__ ((unused)) c,
+		       type_context_p __attribute__ ((unused)) context)
 {
   basic bt = basic_undefined;
   pips_internal_error("This should not be type-checked because it is not Fortran function\n");
@@ -3528,7 +3531,7 @@ integer_to_overloaded_type(int n)
   return t;
 }
 
-static type 
+static type __attribute__ ((unused)) 
 void_to_overloaded_type(int n)
 {
   type t = type_undefined;

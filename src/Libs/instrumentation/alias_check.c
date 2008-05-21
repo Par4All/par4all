@@ -274,10 +274,12 @@ static bool tail_call_path_p(call_site cs, list l1, list l2)
 }
 
 
-string int_to_string(int i)
+string
+int_to_string(intptr_t i)
 {
-  char buffer[10];
-  sprintf(buffer, "%d", i);
+  // If it is enough for an octal number it will be OK for a decimal :-)
+  char buffer[2+sizeof(intptr_t)*CHAR_BIT/3];
+  sprintf(buffer, "%td", i);
   return strdup(buffer);
 }
 
