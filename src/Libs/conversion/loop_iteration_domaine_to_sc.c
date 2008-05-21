@@ -48,7 +48,7 @@ Pbase *baseindex;
     sc_creer_base(sc);
 
     ifdebug(8) {
-	vect_fprint(stderr,*baseindex,entity_local_name);
+	vect_fprint(stderr, *baseindex, (get_variable_name_t) entity_local_name);
     }
 
     debug(8,"loop_iteration_domaine_to_sc", "end\n");

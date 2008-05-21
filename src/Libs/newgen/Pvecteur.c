@@ -97,9 +97,8 @@ void vect_gen_write(FILE *fd, Pvecteur v)
     putc(')', fd);
 }
 
-Pvecteur vect_gen_read(fd, f)
-FILE *fd; /* ignored */
-int (*f)();
+Pvecteur vect_gen_read(FILE * fd __attribute__ ((unused)),
+		       int (*f)())
 {
   Pvecteur p = NULL;
   string svar, sval;

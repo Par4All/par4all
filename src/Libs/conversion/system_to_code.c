@@ -363,7 +363,7 @@ constraints_to_loop_bound(
   ifdebug(6)
   {
       fprintf(stderr, "[constraints_to_loop_bound] constraints are:\n");
-      inegalites_fprint(stderr, c, entity_local_name);
+      inegalites_fprint(stderr, c, (get_variable_name_t) entity_local_name);
   }
 
   message_assert("some constraints", !CONTRAINTE_UNDEFINED_P(c));
