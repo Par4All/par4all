@@ -470,16 +470,16 @@ bin-clean:
 
 endif # INSTALL_BIN
 
-# documentation
+# Documentation
 ifdef INSTALL_DOC
 
 phase6: .build_doc
 
 $(DOC.d):; $(MKDIR) $(DOC.d)
 
-# there may be, but not necessarily, a subdirectory...
+# There may be, but not necessarily, a subdirectory...
 ifdef DOC.subd
-DOC.dest	= $(DOC.d)/(DOC.subd)
+DOC.dest	= $(DOC.d)/$(DOC.subd)
 $(DOC.dest): $(DOC.d)
 	$(MKDIR) $(DOC.dest)
 else # no subdir
