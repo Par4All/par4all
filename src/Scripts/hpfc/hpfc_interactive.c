@@ -75,7 +75,7 @@ void shell_handler(const char * line)
     system(line+strlen(SHELL_ESCAPE));
 }
 
-void quit_handler(const char * line)
+void quit_handler(const char __attribute__ ((unused)) * line)
 {
     char *file_name = default_hist_file_name();
 
