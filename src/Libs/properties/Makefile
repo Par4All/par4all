@@ -23,7 +23,7 @@ include $(ROOT)/makes/main.mk
 properties.h: properties.c
 
 properties.c: properties.l
-	$(SCAN) $(abspath $<) | \
+	$(SCAN) $(PWD)/$< | \
 	sed -e '/^FILE \*yyin/s/=[^,;]*//g;s/YY/PROP_/g;s/yy/prop_/g;s/\(void *\*prop_alloc\)/static \1/;s/\(void *\*prop_realloc\)/static \1/;' \
 		 > $@
 
