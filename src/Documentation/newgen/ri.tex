@@ -1120,7 +1120,7 @@ information of this kind is needed, it should be attached to the first
 statement of the sequence or on a CONTINUE (for an empty sequence)
 instead.
 
-\paragraph{Mappings from statement to statement}
+\subsubsection{Mappings from statement to statement}
 
 \domain{persistant\_statement\_to\_statement = persistant statement -> persistant statement}
 {}
@@ -1131,7 +1131,7 @@ statement. The \emph{persistant} pragma is needed to avoid freeing the
 statements when the mapping is freed. See NewGen documentation in
 \cite{JT90}.
 
-\paragraph{Mappings from statement to integer}
+\subsubsection{Mappings from statement to integer}
 
 \domain{persistant\_statement\_to\_int = persistant statement -> int}
 {}
@@ -1556,6 +1556,7 @@ the control graph when the mapping is freed.
 \subsubsection{For loop}
 \label{subsubsection-forloop}
 \index{Forloop}
+
 \domain{Forloop = initialization:expression x condition:expression x increment:expression x body:statement}
 
 % \section{Représentation des expressions}
@@ -1606,7 +1607,7 @@ Expressions synthesized by program transformations, such as partial
 evaluation or loop interchange, should all have their \texttt{normalized}
 field set to \texttt{normalized\_undefined}.
 
-\subsubsection{Mapping between Expressions and effects}
+\subsection{Mapping between Expressions and effects}
 
 \domain{persistant\_expression\_to\_effects = persistant expression -> effects}
 
@@ -1633,7 +1634,7 @@ New kinds of syntax are added to handle C language. They are {\it cast},
 {\it function application} expressions. The subscripting array expression
 is an extension of the reference expression, which includes other
 more complicated array objects such as pointer, function, 
-structure or union member, ... The same extension is made to call
+structure or union member... The same extension is made to call
 expression, named function application, because the called function is
 not necessarily an entity but can be any expression that denotes a function.   
 
@@ -2208,7 +2209,7 @@ analysis (see \cite{TrIr91}).
 
 All links are not declared explictly in the internal representation, if
 only to break cycles between data structures. For instance, the code
-associated to a  module is not obtained thru a pointer dereferencing but
+associated to a module is not obtained thru a pointer dereferencing but
 thru an explicit request to the PIPS database manager.
 
 \subsection{NewGen consistency}
@@ -2307,3 +2308,9 @@ PIPS Documentation
 
 \end{document}
 \end
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% ispell-local-dictionary: "american"
+%%% End: 

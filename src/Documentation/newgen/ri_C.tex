@@ -1,5 +1,9 @@
-\documentclass[a4paper]{article}
+\documentclass[a4paper]{report}
 \usepackage{verbatim,newgen_domain}
+\usepackage{listings}
+\lstset{extendedchars=true, language=C}
+
+% Ou est le fichier de biblio ?
 
 \title{PIPS: Extension of the Internal Representation for C}
 \author{
@@ -13,11 +17,17 @@
 \noindent
 \maketitle
 \tableofcontents
-\newpage
-\section*{Introduction}
-This document contains the high-level description of data structures
-used in PIPS as internal representations of C programs.  These data
-structures are declared using the Newgen Data Definition Language. 
+
+
+\chapter*{Introduction}
+
+This document discusses the implementation choices of the high-level
+description of data structures used in PIPS as internal representations
+(RI) of C programs.
+
+These data structures are declared using the Newgen Data Definition
+Language in the Abstract Syntax Tree \texttt{ri.tex} companion document.
+
 Here are the goals of our work:
 \begin{itemize}
 \item Enough information
@@ -31,8 +41,10 @@ The reader is assumed knowledgeable in Newgen \cite{Jouv90} and the internal
 representation used for Fortran \cite{Coel01}. Another important reference
 is CIL, a C Intermediate Language developed at University of California
 \cite{Necu02}, which is used to compare to our work. 
-\newpage
-\section{Naming}
+
+
+\chapter{Naming}
+
 In C, the scope of a local variable is the
 block where it is declared, the scope of an external static variable is
 the source file where it is declared, not the module as in Fortran. So when it is
@@ -46,12 +58,14 @@ different kinds of entities:
 \item As uniform as possible
 \item As efficient as possible
 \item To be able to recompile after modifying a file (???)
-\item Faithful wrt the original declarations 
+\item Faithful with respect to the original declarations 
 \item Compatible with the existing internal representation (Fortran)  
 \end{itemize}
 Before entering the details related to this naming issue, here are some
 recalls of the C standard \cite{ISOC}.
-\subsection{ISO C concepts}
+
+\section{ISO C concepts}
+
 An identifier can denote
 \begin{itemize}
 \item an object
@@ -61,7 +75,9 @@ An identifier can denote
 \item a typedef name
 \item a label name
 \end{itemize}
-\subsubsection{Scopes of identifiers (6.2.1)}
+
+\subsection{Scopes of identifiers (6.2.1)}
+
 There are 4 kinds of scopes: function, file, block and function prototype.
 \begin{itemize}
 \item A label name has {\it function scope}.
@@ -75,15 +91,20 @@ There are 4 kinds of scopes: function, file, block and function prototype.
   appears within the list of parameter declarations in a function prototype, the identifier has
  {\it function prototype scope}.
 \end{itemize}
-\subsubsection{Linkages of identifiers (6.2.2)}
+
+\subsection{Linkages of identifiers (6.2.2)}
+
 An identifier declared in different scopes or in the same scope more than
 once can be made to refer to the same object or function by the {\it
   linkage} (external, internal and none). 
 
 So the concept of global entity (\verb/TOP_LEVEL/) does not exist for C, but we
 can use it to refer to external linkage entities, which include functions
-and objects but not tags for structures, unions, enumerations and typedef name. 
-\subsubsection{Name spaces of identifiers (6.2.3)}
+and objects but not tags for structures, unions, enumerations and typedef
+name. 
+
+\subsection{Name spaces of identifiers (6.2.3)}
+
 There are separate name spaces : 
 \begin{itemize}
 \item label names
@@ -92,16 +113,22 @@ There are separate name spaces :
 \item ordinary identifiers 
 \end{itemize}
 
-\subsection{File name scope}
+\section{File name scope}
+
 There may be functions or variables that have the same name but in physically
   different files, such as :
-\begin{verbatim}
-  in Directory1/foo.c   
-     static bar()
 
-  in Directory2/foo.c   
-     static bar()
-\end{verbatim}
+\begin{itemize}
+\item in \texttt{Directory1/foo.c}:
+  \begin{lstlisting}
+    static bar()
+  \end{lstlisting}
+\item in \texttt{Directory2/foo.c}:
+  \begin{lstlisting}
+    static bar()
+  \end{lstlisting}
+\end{itemize}
+
 In order to distinguish these two static functions, the two different absolute file names must be taken into account. The same situation can arrive with \verb/typedef, struct, union/
  and  \verb/enum/ types, i.e two structures with the same name in
  different files are different. 
@@ -123,7 +150,8 @@ Another possible whole program compilation problem: different compilation units 
  types. CIL \cite{Necu02} resolves this problem by some merging phases : merge types and
  tags and rewrite variable declarations and function bodies.
 
-\subsection{Block scope}
+\section{Block scope}
+
 There are different solutions to handle the blocks:
 \begin{enumerate}
 \item Flattening like CIL \cite{Necu02} and then ignoring completely these block
@@ -142,7 +170,7 @@ programs are transformed too much, which is not appropriated for a source-to-sou
 compiler, although the separation of declaration and code makes it more
 easier to analyze the program. For example, in CIL, local variables in inner scopes are pulled to
 function scope with variable renaming like this: 
-\begin{verbatim}
+\begin{lstlisting}
 int main() {
   int x = 6;
   {
@@ -160,12 +188,13 @@ int main() {
   }
   return x__0;
 }
-\end{verbatim}
+\end{lstlisting}
 Impact of block scope on analyses of PIPS ? When propagating transformers or
 preconditions, we must take into account the block scope of variables, and pay
 attention to the different variables that have the same name.  
 
-\subsection{Current naming mechanism}
+\section{Current naming mechanism}
+
 An entity name contains the name of the object, concatenated to a prefix
 string and a special separator \verb/MODULE_SEP_STRING/ (":"). The prefix
 string is the name of the package defining the scope of the object which
@@ -180,7 +209,9 @@ There are also special prefix to represent a main program or a label:
 TOP-LEVEL:%MAIN
 TOP-LEVEL:@LAB
 \end{verbatim}  
-\subsection{Proposed solution}
+
+\section{Proposed solution}
+
 The name of an entity can be \verb/TOP-LEVEL:name/ if the entity is a
 global object or  
 \verb/[file][module][block]name/ if its scope depends on the current source file,
@@ -252,11 +283,14 @@ Note: C distinguishes between uppercases and lowercases. PIPS : all upper
 The scope of struct, union, enum and typedef is the current compilation
 unit (current source file).
  
-\newpage
-\section{Storage}
+
+\chapter{Storage}
+
 The storage class determines the location and lifetime of the storage
 associated with a variable. 
-\subsection{External variables}
+
+\section{External variables}
+
 \label{external}
 External variables are defined outside any function, and are thus
 potentially available to many functions. Any function may access an
@@ -270,7 +304,7 @@ Storage = ram
 Ram_function = TOP-LEVEL-ENTITY 
 Ram_section = TOP-LEVEL area 
 \end{verbatim}
-In Fortran, the scope of a variable is the module, or in another words, 
+In Fortran, the scope of a variable is the module, or in other words, 
 a global variable is always associated to the list of entities
 of a module, which facilitates code regeneration. 
 
@@ -281,46 +315,53 @@ when we designed this part of the RI.
 %%
 This is not working anymore with more recent versions of C. As it produces 
 linking error, multiple declarations are though allowed by some explicit 
-arguments to the compilers (like \verb /-z muldefs/ in gcc) but it is not
+arguments to the compilers (like \verb/-z muldefs/ in \textsc{gcc}) but it is not
 cleaned either. Hence there should be some way to know the difference between
 the declarations of external variable and global variables and how to 
 regenerate the declaration related to external variables, such as:
+\begin{itemize}
+\item in \texttt{file1.c}:
+\begin{lstlisting}
+  int m;
+  void func1 { }
+\end{lstlisting}
+\item in \texttt{file2.c}:
+\begin{lstlisting}
+  int i;
+  extern int m;
+  void func2 { }
+\end{lstlisting}
+in \texttt{file3.c}:
+\begin{lstlisting}
+  void func3() {
+    extern int m;
+  }
+\end{lstlisting}
+\end{itemize}
 
-\begin{verbatim}
-in file1.c
-   int m
-   void func1 { }
-
-in file2.c 
-   int i
-   extern int m 
-   void func2 { }
-
-in file3.c
-   void func3() 
-   { 
-      extern int m
-   } 
-\end{verbatim}
 A source file can be considered as a module, and in the first case, the
-entity m can be added to the list of entities associated to this source
-file. They are stored as \verb /TOP-LEVEL:m/.For the second and third case 
-there should not be any memory allocation for entity m. The real problem lies 
-to differentiate between entity i and entity m for second case and hence 
-allocate memory to ibut not m. We need to have some information at internal 
+entity $m$ can be added to the list of entities associated to this source
+file. They are stored as \verb/TOP-LEVEL:/$m$. For the second and third case 
+there should not be any memory allocation for entity $m$. The real problem lies 
+to differentiate between entity $i$ and entity $m$ for second case and hence 
+allocate memory to $i$ but not $m$. We need to have some information at internal 
 representation for the same.
 
-\subsection{Static variables}
-\subsubsection{Internal static variables}
-\begin{verbatim}
+\section{Static variables}
+
+\subsection{Internal static variables}
+
+\begin{lstlisting}
 int foo() {
   ...
   {
      static int i;
      ...
   } 
-}
+}  
+\end{lstlisting}
 
+\begin{verbatim}
 Name = FOO:11~I
 Storage = ram 
 Ram_function = current module
@@ -331,24 +372,27 @@ the current module. It is not necessary to generate an entity for each block,
 we only need to number the blocks. The offset of a variable is computed from 
 the declarations of variables in the same block. So variables with the same
 offset but in different blocks are different. 
-\subsubsection{External static variables}
+
+\subsection{External static variables}
+
 An external static variable is defined outside of any function, and is
 known within the remainder of the source file in which it is declared, but
 not in any other file. 
-\begin{verbatim}
-in file foo.c
+
+In file \texttt{foo.c}
+\begin{lstlisting}
 static int i = 0; 
 int f() {
 }
-\end{verbatim}
-We have a corresponding entity to this external static variable:
+\end{lstlisting}
+we have a corresponding entity to this external static variable:
 \begin{verbatim}
 Name = FOO%I
 Storage = ram 
 Ram_function = source file  
 Ram_section = *STATIC* area of source file 
 \end{verbatim}
-In addition, another entities are generated for the source file and the 
+In addition, other entities are generated for the source file and the 
 \texttt{*STATIC*} area of this source file.
 \begin{verbatim}
 Source file
@@ -364,7 +408,9 @@ Area
  The prettyprint of the external static variable is based on the list of
 entities associated to the source file entity. Problem: the position of the 
 variable declaration in the source file? 
-\subsection{Automatic variables}
+
+\section{Automatic variables}
+
 Like dynamic local variables in Fortran \cite{Coel01}. 
 The outermost block can be omitted. 
 \begin{verbatim}
@@ -376,26 +422,31 @@ Ram_section = *DYNAMIC* area of current module
 The keyword \verb/auto/ is kept in variable qualifiers, presented in
 \ref{type_qualifiers}. 
 
-\subsection{Formal variables}
+\section{Formal variables}
+
 Like formal variables in Fortran \cite{Coel01}. 
 \begin{verbatim}
 Name prefix = [file%]module:
 Storage = formal 
 \end{verbatim}
-\subsection{Register variables}
+
+\section{Register variables}
+
 A declaration of an identifier for an object with storage-class specifier
 \verb/register/ suggests that access to the object be as fast as possible and 
 the address of any part of an object declared with register cannot be
 computed.  A \verb/register/ declaration can only be applied to automatic 
 variables and to the formal parameters of a function. 
  
-\begin{verbatim}
+\begin{lstlisting}
 f(c,n)
 register int c,n;
 {
   register int i;
 }
+\end{lstlisting}
 
+\begin{verbatim}
 storage = return:entity + ram + formal + rom:unit
 \end{verbatim}
 
@@ -406,8 +457,9 @@ code. So we only need to add this information some where in the type
 structure. A solution is presented in \ref{type_qualifiers}, together with
 \verb/const, volatile/ and \verb/restrict/.
 
-\newpage
-\section{Type}
+
+\chapter{Type}
+
 The type system of C is much more extended than Fortran 77's
 which makes the backward compatibility difficult to ensure.  
 Beside some usual data types such as int, float and char, C also has 
@@ -463,9 +515,12 @@ bugs with malloc, free and it is not easy for debugging.
 \end{enumerate}
 The third solution is chosen because it requires less modifications in
 the actual internal representation. 
-\subsection{Basic types}
-\subsubsection{Integer type}
+
+\section{Basic types}
+
+\subsection{Integer type}
 \label{int}
+
 C has different kinds of integer type : int, signed int, unsigned int,
 short, long, long long, ... and char, signed char, unsigned char. Since 
 \verb/int x/ and  \verb/signed int x/ declarations are
@@ -515,7 +570,8 @@ long_long_int          = 8
 \end{verbatim}
 \end{enumerate}
 
-\subsubsection{Character type} 
+\subsection{Character type} 
+
 \begin{enumerate}
 \item A character variable is in fact an integral variable, so it can be
 associated to the basic \verb/int/, as in the first solution of \ref{int}.
@@ -538,7 +594,9 @@ signed_char            = 31
 Ambiguity between string and array of characters ?
 \end{enumerate}
 The first solution is choosen.
-\subsubsection{Bit type}
+
+\subsection{Bit type}
+
 We have to add a basic type \verb/bit/ to represent the integral bit fields
 occurred in a structure declaration.   
 
@@ -548,14 +606,17 @@ int a:1
 unsigned b:2 
 signed c:3
 \end{verbatim}
-\subsection{Pointers}
+
+\section{Pointers}
+
 Pointer can point to any variable: to a scalar variable, to an array variable, to a function, ...
 To represent an array of pointers and to keep the initial internal representation, a new type \verb/pointer/ is
 added to \verb/basic/.   
 
 \verb/basic +=  pointer:type/
 
-\subsubsection{Pointer to integers}
+\subsection{Pointer to integers}
+
 \begin{verbatim}
 int *p1
 name = p1
@@ -567,9 +628,9 @@ type = variable
              dimension = NIL.
 \end{verbatim}
 with this dynamic allocation:
-\begin{verbatim}
+\begin{lstlisting}
 p = malloc(5*sizeof(int));
-\end{verbatim}
+\end{lstlisting}
 to store the size of the corresponding memory zone, the dimension of the
 pointer can be changed to : 
 \begin{verbatim}
@@ -584,13 +645,14 @@ type = variable
 \end{verbatim}
 But how about the following case ?
 
-\subsubsection{Pointer to pointer}
-\begin{verbatim}
+\subsection{Pointer to pointer}
+
+\begin{lstlisting}
 char **p;
 p = malloc(n*sizeof(char *));
 for (i=0;i<n;i++)
    p[i] = malloc((i+1)*sizeof(char));
-\end{verbatim}
+\end{lstlisting}
 Initially, with the declaration, we have :
 \begin{verbatim}
 name = p
@@ -614,8 +676,9 @@ i-related ...? p[i] represents an entity or p only ? The zise of p[i] is
 lost  There is a particular case where (i+1) is replaced by m (arrays of
 same size), we can keep this information in dimension of the 2nd pointer. 
 
-\subsubsection{Pointer to an array}
-\verb/int (*p2)[13]/ is a pointer to an array of 13 integers
+\subsection{Pointer to an array}
+
+\lstinline/int (*p2)[13]/ is a pointer to an array of 13 integers
 \begin{verbatim}
 name = p2
 type = variable
@@ -625,8 +688,10 @@ type = variable
              basic = int
              dimension = [13].
 \end{verbatim}
-\subsubsection{Array of pointers}
-\verb/int *a[13]/ is an array of 13 pointers to integers
+
+\subsection{Array of pointers}
+
+\lstinline/int *a[13]/ is an array of 13 pointers to integers
 \begin{verbatim}
 name = a
 type = variable
@@ -636,8 +701,10 @@ type = variable
              basic = int
              dimension = NIL.
 \end{verbatim}
-\subsubsection{Function returning a pointer}
-\verb/char *f(n)/, f is a function that returns a pointer to a character
+
+\subsection{Function returning a pointer}
+
+\lstinline/char *f(n)/, f is a function that returns a pointer to a character
 string
 \begin{verbatim}
 name = f
@@ -649,8 +716,10 @@ type = functional
                  basic = char
                  dimension = NIL. 
 \end{verbatim}
-\subsubsection{Pointer to a function}
-\verb/int (*p)()/
+
+\subsection{Pointer to a function}
+
+\lstinline/int (*p)()/
 \begin{verbatim}
 name = p
 type = variable
@@ -660,7 +729,9 @@ type = variable
                 parameters = undefined
                 result = int.
 \end{verbatim}
-\subsection{Structure, Union and Enumerated Types} 
+
+\section{Structure, Union and Enumerated Types} 
+
 The common point between  a structure, an union or an enumerated type is that each of these
 types has a name and a list of members. In addition, these 
  members can be represented as entities, because they have name,
@@ -697,17 +768,17 @@ the offset of the member in the struct.
 All the above discussions talk about the entity related to the
 struct/union/enum declaration (this template about the shape of a
 structure create no storage) such as 
-\begin{verbatim}
+\begin{lstlisting}
 struct key {
   int tab[3];
   int keycount;
 };
-\end{verbatim}
+\end{lstlisting}
 This entity \verb/key/ is of type \verb/struct/ and is associated to a list
 of members.\\
 
-In the declaration like \verb/struct key var = {{1,2,3}, 3}/, the entity
-\verb/var/ is of type \verb/struct key/ and there are two possibilities to
+In the declaration like \lstinline/struct key var = {{1,2,3}, 3}/, the entity
+\verb/var/ is of type \lstinline/struct key/ and there are two possibilities to
 represent its type: 
 \begin{enumerate}
 \item Associate directly  to the entity \verb/key/
@@ -715,7 +786,7 @@ represent its type:
 and the list of
 members, etc. This solution is redundant because we have to store the same
 information for each variable of type
-\verb/struct key/. 
+\lstinline/struct key/. 
 \end{enumerate}
 So to represent a variable whose type is struct/union/enum, we add to \verb/basic/ the \verb/derived/ type to point to
 these new types. 
@@ -724,16 +795,20 @@ these new types.
 
 The initial value of \verb/var/ in this case is a list of lists, which is
 not representable actually in Newgen. But since we know statically the
-size of the array \verb/tab/ in the \verb/struct key/, we can represent
+size of the array \verb/tab/ in the \lstinline/struct key/, we can represent
 this value as a normal list \{1,2,3,3\} and the information can be extracted
 when needed. 
-\subsubsection{Structure declaration}
-\begin{verbatim}
+
+\subsection{Structure declaration}
+
+\begin{lstlisting}
 struct key {
   char *keyword;
   int keycount;
 };
+\end{lstlisting}
 
+\begin{verbatim}
 name = key
 type = struct 
 
@@ -763,10 +838,14 @@ solution (which is more logic ...).
      name = keycount
      type = basic = int
 \end{verbatim}
-\subsubsection{Pointer to structures}
-\begin{verbatim}
-struct key *p;
 
+\subsection{Pointer to structures}
+
+\begin{lstlisting}
+  struct key *p;
+\end{lstlisting}
+
+\begin{verbatim}
 name = p
 type = variable
     dimension = NIL
@@ -774,19 +853,27 @@ type = variable
           basic = derived = entity key
           dimension = NIL
 \end{verbatim}
-\subsubsection{Array of structures}
-\begin{verbatim}
-struct key keytab[10];
 
+\subsection{Array of structures}
+
+\begin{lstlisting}
+  struct key keytab[10];
+\end{lstlisting}
+
+\begin{verbatim}
 name = keytab
 type = variable
      dimension = [0:9]
      basic = derived = entity key
 \end{verbatim}
-\subsubsection{Pointer to structures}
-\begin{verbatim}
-struct key *p;
 
+\subsection{Pointer to structures}
+
+\begin{lstlisting}
+  struct key *p;
+\end{lstlisting}
+
+\begin{verbatim}
 name = p
 type = variable
     dimension = NIL
@@ -794,13 +881,17 @@ type = variable
           basic = derived = entity key
           dimension = NIL
 \end{verbatim}
-\subsubsection{Self-referential Structure}
-\begin{verbatim}
+
+\subsection{Self-referential Structure}
+
+\begin{lstlisting}
 struct node {
   char word[10];
   struct node * next;
 };
+\end{lstlisting}
 
+\begin{verbatim}
 name = node
 type = struct 
 
@@ -816,15 +907,16 @@ type = struct
                   basic = derived = entity node
                   dimension = NIL
 \end{verbatim}
- 
-\subsection{Typedef}
-\begin{verbatim}
+
+\section{Typedef}
+
+\begin{lstlisting}
 typedef char *STRING;
 typedef int A[2][3];
 typedef int (*PFI)();
-typedef struct {} TREE,*TREEPRT;
-\end{verbatim}
-\verb/STRING, A, PFI, TREE, TREEPRT/ are entities with:
+typedef struct {} TREE,*TREEPTR;
+\end{lstlisting}
+\verb/STRING, A, PFI, TREE, TREEPTR/ are entities with:
 \begin{itemize}
 \item Global name = \verb/TYPEDEF_PREFIX/ + local name. The \verb/TYPEDEF_PREFIX/ is
   used to regenerate code. 
@@ -842,11 +934,13 @@ To represent variables whose type is a \verb/typedef/ entity, we add to
 
 \verb/basic += typedef:entity/ 
 
-\begin{verbatim}
+\begin{lstlisting}
 typedef struct key {...} key;
 key k1;
 struct key k2; 
+\end{lstlisting}  
 
+\begin{verbatim}
 name = STRUCT_PREFIX:key
 type = struct  
 storage = rom 
@@ -866,8 +960,10 @@ name = k2
 type = variable 
      dimension = NIL
      basic = derived = entity STRUCT_PREFIX:key
-\end{verbatim}  
-\subsection{Functional Type}
+\end{verbatim}
+
+\section{Functional Type}
+
 Functional type has already been treated for Fortran, except some small details.
 
 \verb/type = functional + .../
@@ -877,21 +973,23 @@ Functional type has already been treated for Fortran, except some small details.
 \verb/parameter = type x mode /
 
 \begin{itemize}
-\item For \verb/extern int f(void);/, \verb/parameters/ is a list of one element of type
-\verb/void/.
-\item How to represent \verb/extern int f();/ (the same for Fortran with
+\item For \lstinline/extern int f(void);/, \verb/parameters/ is a list of one element of type
+\lstinline/void/.
+\item How to represent \lstinline/extern int f();/ (the same for Fortran with
 \verb/EXTERNAL F/ ?) \verb/parameters_undefined/ creates
 consistency/updating problems ?
 \item We can add a Newgen structure for the function qualifier \verb/inline/ but
 it is not necessary for this moment (no inline function in SPEC 2000).
 \end{itemize}
-\subsection{Type qualifiers : Const, Restrict, Volatile}
+
+\section{Type qualifiers : Const, Restrict, Volatile}
 \label{type_qualifiers}
-\begin{verbatim}
+
+\begin{lstlisting}
 const int *p;
-void func(const a)
-void h(int * const restrict p)
-\end{verbatim}
+void func(const a);
+void h(int * const restrict p);
+\end{lstlisting}
 Although only a small percent of variables are declared with these
 qualifiers and it is expensive, we choose to create a new Newgen structure for them. Attempts
 to put these information in existing Newgen
@@ -913,8 +1011,8 @@ and \verb/auto/ cases.
 
 There are about 36 make\_variable in PIPS source code to modify.
 
-\newpage
-\section{Expressions}
+
+\chapter{Expressions}
 
 Expressions in Fortran PIPS must be extended to handle new kinds of
 expressions with C language.
@@ -930,62 +1028,73 @@ New kinds of syntax are added to handle C language. They are {\it cast},
 {\it function application} expressions. The subscripting array expression
 is an extension of the reference expression, which includes other
 more complicated array objects such as pointer, function, 
-structure or union member, ... The same extension is made to call
+structure or union member... The same extension is made to call
 expression, named function application, because the called function is
 not necessarily an entity but can be any expression that denotes a function.   
 
 \verb/syntax += cast + sizeofexpression + subscript + application/
 
-\subsection{Cast}
+\section{Cast}
 \verb/cast = type x expression/
 
-\subsection{Sizeof}
+\section{Sizeof}
 \verb/sizeofexpression = type + expression/
 
-\subsection{Subscript}
+\section{Subscript}
 \verb/subscript = array:expression x indices:expression*/
 
-\subsection{Application}
+\section{Application}
 \verb/application = function:expression x arguments:expression*/
 
 For example, we can have this complicated function call in C:
-\verb|(*ctx->Driver.RendererString)()|.
-\subsection{Special calls }
+\begin{lstlisting}
+  (*ctx->Driver.RendererString)()
+\end{lstlisting}
 
-\subsubsection{Member references }
+
+\section{Special calls }
+
+\subsection{Member references }
 
 There are different solutions:
 \begin{enumerate}
-\item A special call expression, FIELD\_MEMBER\_CALL(exp1, exp2), to handle for example
-\verb|str[1].fld[2]|
-\item \verb/reference = variable:entity x indices:expression x offset:entity*/ 
-This is not sufficient because we can have foo.x where foo is a function
-returning a struct,... 
+\item A special call expression, \lstinline/FIELD_MEMBER_CALL(exp1, exp2)/, to handle for example
+\lstinline|str[1].fld[2]|
+\item
+  \verb/reference = variable:entity x indices:expression x offset:entity*/
+  This is not sufficient because we can have in C99 \lstinline|foo().x|
+  where foo is a function returning a struct... That means that we need to
+  extract fields from non l-values too.
 
 More explaination here !
 \end{enumerate}
- Distinguish between . and \verb/->/ ? The last one can be represented by
- the first one and *. 
+ Distinguish between \texttt{.} and \verb/->/ ? The last one can be represented by
+ the first one and \texttt{*}. 
  Disadvantages for type checking, program
 analyses, transformations ?
 
-\subsubsection{Address of, value of}
-Special call expressions for \verb/&/ and *.
+\subsection{Address of, value of}
 
-\subsubsection{Comma operator - list of expressions}
-f(a, (t=3,t+2),c)
+Special call expressions for \verb/&/ and \texttt{*}.
+
+\subsection{Comma operator - list of expressions}
+
+\lstinline|f(a, (t=3,t+2),c)|
 
 Special call expression COMMA\_OPERATOR: n-ary or binary call ?
-The same for \verb/a=b=c=d/. 
+The same for \lstinline/a=b=c=d/. 
 
-\subsubsection{Conditional expression}
-e1? e2 : e3 
+\subsection{Conditional expression}
+
+\lstinline|e1 ? e2 : e3 |
 
 Special call expression CONDITIONAL\_OPERATOR.
 
-\newpage
-\section{Control Flow}
-\subsection{Module Code}
+
+\chapter{Control Flow}
+
+\section{Module Code}
+
 \verb/code = declarations:entity* x decls_text:string x initializations:sequence/
 
 As discussed in section \ref{external}, external variables that are
@@ -1015,7 +1124,8 @@ is j ?
   in Fortran. 
 \end{itemize}
 The first solution is choosen. 
-\subsection{Statement}
+
+\section{Statement}
 \label{statement}
  
 \verb/statement = label x number x ordering x comments x instruction/
@@ -1040,7 +1150,7 @@ Member \verb/declarations/ contains a list of entities in the statement
 scope (all kinds of entities such as intrinsics, ... or only those that
 are effectively declared).  Member \verb/decls_text/ is used to generate source code (as for module code).
 
-\subsection{Instruction}
+\section{Instruction}
 
 \verb/sequence + test + loop + whileloop + goto + call + unstructured/
 
@@ -1052,7 +1162,8 @@ However, to make PIPS backward compatible, we try to create a call
 statement for each call expression. Expression statement is only used for
 special cases, such as cast expression.
  
-\subsubsection{Switch}
+\subsection{Switch}
+
 There are two solutions: we can add a new kind of instruction
 \verb/multitest/ (the keyword \verb/switch/ cannot be used) or we can
 represent a switch through \verb/if/ and \verb/goto/ statements.  
@@ -1074,48 +1185,49 @@ special name for default.
 
 The \verb/break/ statement can be treated as a \verb/goto/.
 
-\begin{verbatim}
+\begin{lstlisting}
    switch (c) {
      case 1:
-     s1;
+       s1;
      case 2: 
-     s2;  
+       s2;  
+       break;
      default: 
-     sd;
-     }
+       sd;
+   }
 
-     if (c==1) goto switch_xxx_case_1;
-     if (c==2) goto switch_xxx_case_2;
-     goto switch_xxx_default;
-     switch_xxx_case_1: ;
-     s1;
-     switch_xxx_case_2: ;
-     s2;
-     switch_xxx_default: ;
-     sd;      
-
-   In si, we can have goto switch_exit_xxx; (which was a break) 
-
-   and switch_exit_xxx: ; is inserted at the end of the switch statement
-             
-\end{verbatim}
+   if (c==1) goto switch_xxx_case_1;
+   if (c==2) goto switch_xxx_case_2;
+   goto switch_xxx_default;
+ switch_xxx_case_1: ;
+   s1;
+ switch_xxx_case_2: ;
+   s2;
+   goto switch_exit_xxx;
+ switch_xxx_default: ;
+   sd;      
+ switch_exit_xxx:
+\end{lstlisting}
 How about code regeneration ? 
-\subsubsection{While Loop}
-The \verb/while (expression) statement/ and 
-\verb/do statement while (expression)/ in C can be represented together
+
+\subsection{While Loop}
+
+The ``\lstinline/while (expression) statement/'' and 
+``\lstinline/do statement while (expression)/'' in C can be represented together
  by adding a new field to distinguish
 if the evaluation of the
 controlling expression takes place before or after each execution of the
 loop body.   
 
-\verb/whileloop=condition:expressionxbody:statementxlabel:entityxevaluation/
-
-\verb/evaluation = before:unit + after:unit/
-
-To keep the readability, evaluation:bool is not used here, as in another
+\begin{verbatim}
+whileloop = condition:expression x body:statement x label:entity x evaluation
+evaluation = before:unit + after:unit
+\end{verbatim}
+To keep the readability, \verb|evaluation:bool| is not used here, as in other
 cases in the internal representation (mode, action, ...).
 
-\subsubsection{For Loop}
+\subsection{For Loop}
+
 There is always a trade-off between regrouping different loop structures
 and separating them. The first case makes program analyses more compact,
 with less code to write but it makes pretty-printing original code
@@ -1124,31 +1236,36 @@ difficult. It is reverse for the second case.
 We have different possibilities to choose
 \begin{enumerate}
 \item Represent for loop as while loop
-\item Represent for loop as loop (do loop in Fortran),but it is not always
+\item Represent for loop as loop (do loop in Fortran), but it is not always
   possible. Loops could be pretty-printed as for loops but for loops cannot
   always be represented as loops (several loop indexes).
 \item In order to keep the initial program structures, we can treat the for loop
 separately from the other loops. 
 
-\verb/forloop = initialization:expression x condition:expression x/
-
-\verb/incrementation:expression x body:statement/
+\begin{verbatim}
+forloop = initialization:expression x condition:expression
+          x incrementation:expression x body:statement
+\end{verbatim}
 \end{enumerate}
 
 The ISO C standard \cite{ISOC} states that
 the initialization of a for loop may contain variable declaration, which
-is not the case for \cite{Kern78}. 
+is not the case for \cite{Kern78}.
 
-\subsubsection{Null statement}
+Initializations could be put into the very statement containing the
+\texttt{for} instruction and naming the block in a way to prettyprint
+correctly the declaration into the \texttt{for}.
+
+\subsection{Null statement}
 Null statement in C is treated as CONTINUE statement in Fortran. We only need to make the
 differences at the prettyprinter level. 
 
-\subsubsection{Return statement}
+\subsection{Return statement}
 Return statement in C (return; or return (exp);) is treated as RETURN statement in Fortran, which is
 considered as nullary operator but can have 0 or 1 argument, such as the
 cases of STOP and PAUSE statements. 
 
-\subsubsection{Break, Continue, Exit, Jump, Interruption}
+\subsection{Break, Continue, Exit, Jump, Interruption}
 
 We can add new kinds of instruction to handle break and continue: 
 
@@ -1159,12 +1276,20 @@ easier? The semantic difference between \verb/continue/ in Fortran and
 \verb/continue/ in C?
 
 Another solution is to treat \verb/break/ and \verb/continue/ as
-\verb/goto/, which is choosen as solution for the moment. How about code regeneration ?  
+\verb/goto/, which is choosen as solution for the moment. How about code
+regeneration ? Some semantics can be added into the generated label names.
 
-\section*{Conclusion}
+\chapter*{Conclusion}
+
 \nocite{Kern78, Necu02}
-\newpage
-\section{Appendix A : Current internal representation}
+
+The choices that have been done are in the companion file \texttt{ri.tex}
+
+
+\appendix{}
+
+\chapter{Old Fortran-oriented internal representation}
+
 \begin{verbatim}
 action = read:unit + write:unit ;
 approximation = may:unit + must:unit + exact:unit ;
@@ -1217,8 +1342,9 @@ value = code + symbolic + constant + intrinsic:unit + unknown:unit ;
 variable = basic x dimensions:dimension* ;
 whileloop = condition:expression x body:statement x label:entity ;
 \end{verbatim}
-\newpage
-\section{Appendix B : Proposed internal representation (modified structures only)}
+
+\chapter{Proposed new internal representation (modified structures only)}
+
 \begin{verbatim}
 basic = int:int + float:int + logical:int + overloaded:unit + complex:int 
 + string:value + bit:int + pointer:type + derived:entity + typedef:entity;
@@ -1256,21 +1382,15 @@ evaluation = before:unit + after:unit ;
 
 value = code + symbolic + constant + intrinsic:unit + unknown:unit + expression;
 \end{verbatim}
-\newpage
+
 \bibliographystyle{abbrv}
 \bibliography{biblio}
 
 
 \end{document}
 
-
-
-
-
-
-
-
-
-
-
-
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% ispell-local-dictionary: "american"
+%%% End: 
