@@ -433,8 +433,8 @@ int
 storage_space_of_variable(entity v)
 {
     /* Storage size is expressed in bytes */
-    char * s;
     int l;
+    char * s;
 
     if (entity_to_size == hash_table_undefined) {
 	user_warning("storage_space_of_variable",
@@ -442,8 +442,8 @@ storage_space_of_variable(entity v)
 	entity_to_size = hash_table_make(hash_pointer, 0);
     }
     s = hash_get(entity_to_size, (char *) v);
+    l = (intptr_t) s;
     if (s == HASH_UNDEFINED_VALUE) {
-      l = (intptr_t) s;
       if(!SizeOfArray(v, &l)) {
 	fprintf(stderr, "[storage_space_of_variable] Non constant array size\n");
 	abort();
