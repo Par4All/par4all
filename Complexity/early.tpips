@@ -1,5 +1,5 @@
 delete early
-create early ${PIPS_ROOT}/Validation/Complexity/early.f
+create early early.f
 module EARLY
 activate PRINT_CODE_COMPLEXITIES # Statements & Complexities
 display PRINTED_FILE(EARLY)
