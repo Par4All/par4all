@@ -152,7 +152,7 @@ static int lf_count(string s)
 extern int csplit_is_external;
 extern int csplit_is_function;
 
-extern int is_c_keyword_typedef(char * s);
+extern intptr_t is_c_keyword_typedef(char * s);
 %}
 
 decdigit [0-9]

@@ -73,6 +73,7 @@ extern int get_csplit_current_beginning(void);
 extern void reset_csplit_current_beginning(void);
 extern int csplit_line_number;
 extern string splitc_text;
+extern int get_user_current_beginning();
 
 extern hash_table keyword_typedef_table;
 
