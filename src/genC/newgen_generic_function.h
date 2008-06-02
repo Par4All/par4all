@@ -57,7 +57,7 @@
   PREFIX void __attribute__ ((unused)) update_##name(type##_key_type k, type##_value_type v) { \
     update_##type(name##_object, k, v);					\
   }									\
-  PREFIX __attribute__ ((unused)) type##_value_type load_##name(type##_key_type k) { \
+  PREFIX type##_value_type __attribute__ ((unused)) load_##name(type##_key_type k) { \
     return(apply_##type(name##_object, k));				\
   }									\
   PREFIX type##_value_type __attribute__ ((unused)) delete_##name(type##_key_type k) { \
