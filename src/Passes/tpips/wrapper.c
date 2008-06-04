@@ -58,9 +58,13 @@
  */
 static pid_t tpips_pid = 0;
 
-/* anable log with -DLOG for debug.
+/* Enable log with -DLOG for debug.
  */
-static void tpw_log(char * message)
+static void tpw_log(char * 
+#if !defined(LOG)
+		    __attribute__ ((unused)) 
+#endif
+		    message)
 {
 #if defined(LOG)
     fprintf(stderr, WRAPPER "%s\n", message);

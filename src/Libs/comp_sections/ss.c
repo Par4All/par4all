@@ -310,11 +310,11 @@ PutBoundPair(simple_section Dad, int DimNo, LinExpr Low, LinExpr Up)
     if (bound_pair_index(bp) == DimNo) {
       if (Low != NULL) {
 	  /* check later vect_rm(bound_pair_lb(bp));  */
-	  bound_pair_lb_(bp) = (char*) Low;
+	  bound_pair_lb_(bp) = (Pvecteur *) Low;
       }
       if (Up != NULL) {
 	  /* check later vect_rm(bound_pair_ub(bp)); */
-	  bound_pair_ub_(bp) = (char*) Up;
+	  bound_pair_ub_(bp) = (Pvecteur *) Up;
       }
       return;
     }
@@ -1022,9 +1022,9 @@ SimpUnion(simple_section S1, simple_section S2)
 {
   simple_section UnionDad;
   tag Variant;
-  int i;
+  size_t i;
   LinExpr Low, Up;
-  unsigned Rank = context_info_rank(simple_section_context(S1));
+  size_t Rank = context_info_rank(simple_section_context(S1));
 
   /* allocate a simple_section */
 

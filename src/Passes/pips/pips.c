@@ -125,7 +125,7 @@ char *rule_name;
 
 /* Pips user log */
 
-static void pips_user_log(char *fmt, va_list args)
+static void pips_user_log(const char * fmt, va_list args)
 {
     FILE * log_file = get_log_file();
 

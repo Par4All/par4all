@@ -73,7 +73,9 @@ static int fpips_version(int ret)
 
 /* non static to avoid a gcc warning if not called.
  */
-int fpips_error(char * what, int argc, char ** argv)
+int fpips_error(char * what,
+		int __attribute__ ((unused)) argc,
+		char __attribute__ ((unused)) ** argv)
 {
     fprintf(stderr, "[fpips] sorry, %s not available (" STRINGIFY(SOFT_ARCH) ")\n", what);
     return fpips_usage(1);

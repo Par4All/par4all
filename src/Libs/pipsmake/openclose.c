@@ -38,11 +38,12 @@ extern void save_makefile(void);
 /* returns the program makefile file name
  */
 #define PIPSMAKE_FILE "/pipsmake"
-string build_pgm_makefile(string n)
+string build_pgm_makefile(string __attribute__ ((unused)) n)
 {
     string dir_name = db_get_meta_data_directory(),
 	res = strdup(concatenate(dir_name, PIPSMAKE_FILE, NULL));
-    free(dir_name); return res;
+    free(dir_name);
+    return res;
 }
 
 string  make_open_workspace(string name)

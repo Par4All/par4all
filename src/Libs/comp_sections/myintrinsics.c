@@ -83,7 +83,7 @@ static IoElementDescriptor IoElementDescriptorTable[] = {
     {"WRITE",     "END=",         is_action_read, is_approximation_must},
     {"WRITE",     "IOSTAT=",      is_action_write, is_approximation_may},
     {"WRITE",     "IOLIST=",      is_action_read, is_approximation_must},
-    {0,           0,              0}
+    {0,           0,              0,              0}
 };
 
 

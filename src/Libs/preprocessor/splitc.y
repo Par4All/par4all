@@ -70,6 +70,7 @@
 extern int splitc_lex(void);
 extern void splitc_error(char *);
 extern int get_csplit_current_beginning(void);
+extern int get_user_current_beginning(void);
 extern void reset_csplit_current_beginning(void);
 extern int csplit_line_number;
 extern string splitc_text;
