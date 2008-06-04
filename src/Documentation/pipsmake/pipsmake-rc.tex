@@ -58,7 +58,7 @@
 %  - continuation added, BC, 26/2/96.
 %  - reductions added, FC 15/06/96
 
-\documentclass[a4paper]{article}
+\documentclass[a4paper]{report}
 \usepackage[latin9]{inputenc}
 %\usepackage{alltt,html,fancybox,amstext,xspace,psfig}
 \usepackage{epsfig,amstext,alltt}
@@ -71,6 +71,10 @@
 \newenvironment{PipsExample}{\VerbatimEnvironment
 \begin{Verbatim}}{\end{Verbatim}}
 
+\newcommand{\PipsPIPSmakePDF}{\url{http://www.cri.ensmp.fr/pips/pipsmake-rc.htdoc/pipsmake-rc.pdf}\xspace}
+\newcommand{\PipsPIPSmakeHTDOC}{\url{http://www.cri.ensmp.fr/pips/pipsmake-rc.htdoc}\xspace}
+
+
 
 \title{PIPS High-Level Software Interface \\
     Pipsmake}
@@ -81,8 +85,13 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Id$~$
+  $~$Id$~$\\[3cm]
+  You can get a printable version of this document on\\
+  \PipsPIPSmakePDF and a HTML version on \PipsPIPSmakeHTDOC.
 }
+
+% Number everything in the TOC:
+\setcounter{secnumdepth}{10}
 
 % \addtolength{\textwidth}{72pt}
 % \addtolength{\oddsidemargin}{-48pt}
@@ -110,7 +119,7 @@ $~$Id$~$
 \newcommand{\PGOTO}{{\tt GOTO}}
 \newcommand{\PIF}{{\tt IF}}
 \newcommand{\PIPS}{\LINK{\emph{PIPS}}{http://www.cri.ensmp.fr/pips}}
-\newcommand{\PIPSMAKE}{\LINK{\emph{pipsmake/}}{http://www.cri.ensmp.fr/pips/pipsmake.html}}
+\newcommand{\PIPSMAKE}{\LINK{\emph{pipsmake}}{http://www.cri.ensmp.fr/pips/pipsmake.html}\xspace}
 \newcommand{\PLinear}{\emph{Linear C$^3$}}
 \newcommand{\PNEWGEN}{\LINK{\emph{NewGen}}{http://www.cri.ensmp.fr/pips/newgen-manual/newgen-manual.html}}
 \newcommand{\PROPERTIES}{\LINK{\emph{properties}}{http://www.cri.ensmp.fr/pips/properties-rc}}
@@ -120,7 +129,7 @@ $~$Id$~$
 \newcommand{\PCompileAnHPFProgram}{{Compile an HPF Program}}
 \newcommand{\Pcontrolgraph}{{control flow graph}}
 \newcommand{\Pcurrentmodule}{{current module}}
-\newcommand{\PdaVinci}{\LINK{\emph{daVinci}}{http://www.informatik.uni-bremen.de/~davinci}}
+\newcommand{\PuDrawGraph}{\LINK{\emph{uDrawGraph}}{http://www.informatik.uni-bremen.de/uDrawGraph}\xspace}
 \newcommand{\PDependenceGraphView}{{Dependence Graph View}}
 \newcommand{\PDistributedView}{{Distributed View}}
 \newcommand{\PEdit}{{Edit}}
@@ -184,29 +193,25 @@ $~$Id$~$
 \newenvironment{PipsMenu}[1]{\par{\bf #1}\\\begin{alltt}}{\end{alltt}}
 
 
-\newcommand{\PipsPIPSmakePDF}{\url{http://www.cri.ensmp.fr/pips/pipsmake-rc.htdoc/pipsmake-rc.pdf}\xspace}
-\newcommand{\PipsPIPSmakeHTDOC}{\url{http://www.cri.ensmp.fr/pips/pipsmake-rc.htdoc}\xspace}
 
-You can get a printable version of this document on\\
-\PipsPIPSmakePDF and a HTML version on \PipsPIPSmakeHTDOC.
-
-
-\section*{Introduction}
+\chapter{Introduction}
 
 This paper describes high-level objects and functions which are
 potentially user-visible in a \PIPS{}~\cite{IJT91} interactive environment.
 It defines the internal {\em software} interface between a user interface and
-program analyses and transformations. This clearly is not a user guide
+program analyses and transformations. This is clearly not a user guide
 but can be used as a reference guide, the best one before source code...
 
 Objects can be viewed and functions activated by one of \PIPS{}
-existing user interfaces: \TPIPS{}, the tty style interface,
-\pips{}~\cite{BIJ91}, the batch interface, improved by many shell
+existing user interfaces: \TPIPS{}, the tty style interface (the preferred
+one to be used),
+\pips{}~\cite{BIJ91}, the old batch interface, improved by many shell
 scripts\footnote{Manual pages are available for \Init{}, \Select{},
   \Perform{}, \Display{}, and \Delete{}, and \pips{}.}, \WPIPS{} and
 {\tt epips}, the X-Window System interfaces.  The {\tt epips}
 interface is an extension of \WPIPS{} which uses {\tt Emacs} to
-display more information in a more convenient way.
+display more information in a more convenient way. Unfortunately, right
+now they are no longer working.
 
 From a theoretical point of view, the object types and functions available
 in \PIPS{} define an heterogeneous algebra with constructors (e.g. parser),
@@ -215,17 +220,17 @@ few combinations of functions make sense, but many functions and object
 types are available. This abundance is confusing for casual and
 experiences users and it was deemed necessary to assist them by providing
 default computation rules and automatic consistency management. The rule
-interpretor is called \verb/pipsmake/ and described in~\cite{B91}.
+interpretor is called \PIPSMAKE{} and described in~\cite{B91}.
 
 For debugging purposes and for advanced users, the precise choice and
 tuning of an algorithm can be made using \PROPERTIES{}. Default properties
 are installed with \PIPS{} but they can be redefined, partly or entirely,
 by a {\tt properties.rc} file located in the current directory. Properties
-can also be redefined when the \TPIPS{} interface is used (command {\tt
-  setproperty}).
+can also be redefined from the user interfaces, for example with the command
+\texttt{setproperty} when the \TPIPS{} interface is used).
 
 As far as their static structures are concerned, most object types are
-described in more details in {\em \PIPS{} Internal Representation}. A
+described in more details in \Pri. A
 dynamic view is given here. In which order should functions be applied?
 Which object do they produce and vice-versa which function does produce
 such and such objects? How does \PIPS{} cope with bottom-up and top-down
@@ -244,52 +249,91 @@ caveat is that \emph{all} resources the name of which is suffixed with
 \verb|_file| are considered printable or displayable, and the others
 are considered binary data.
 
-This Latex file is used by several procedures to derive some pieces of C
+This \LaTeX{} file is used by several procedures to derive some pieces of C
 code and ASCII files. The useful information is located in the {\em
   verbatim} areas, a very simple literate programming environment... For
 instance \verb+alias+ information is used to generate automatically menus
 for \verb+wpips+. Object (a.k.a resource) types and functions are renamed
 using the alias declaration. The name space of aliases is global. All
 aliases must have different names. Function declarations are used to build
-a mapping table between function names and pointer to C functions, {tt
-  phases.h}. Object suffixes are used to derive a header file, {\tt
+a mapping table between function names and pointer to C functions,
+\texttt{phases.h}. Object suffixes are used to derive a header file, {\tt
   resources.h}, with all resource names. Parts of this file are also
 extracted to generate on-line information for {\tt wpips}.
 
-Rules and objects are grouped in the first five sections: input files,
-syntax analysis and abstract syntax tree, analyses, transformations and
-parallelizations, and prettyprinters of output files.
-Section~\ref{section-feautrier-methods} describes several analyses defined
-by P. Feautrier. Section~\ref{section-user-interface-menu-layouts}
+Rules and objects are grouped in the first five chapters: input files
+(chapter~\ref{section-abstract-syntax-tree}, syntax analysis and abstract
+syntax tree (chapter~\ref{section-abstract-syntax-tree}), analyses
+(chapter~\ref{section-analyses}), parallelizations
+(chapter~\ref{section-program-transformations-parallelization-distribution}),
+program transformations (chapter~\ref{section-program-transformations})
+and prettyprinters of output files (chapter~\ref{section-output-files}).
+Chapter~\ref{section-feautrier-methods} describes several analyses defined
+by Paul
+\textsc{Feautrier}. Chapter~\ref{section-user-interface-menu-layouts}
 contains a set of menu declarations for the window-based interfaces.
 
-\newpage
 
+\subsection{Informal syntax}
+\label{sec:informal-syntax}
+
+To understand and to be able to write some rules, few things need to be
+understood.
+
+\subsubsection{Example}
+\label{sec:example}
+
+\begin{alltt}
+proper_references       > MODULE.proper_references
+        < PROGRAM.entities
+        < MODULE.code
+        < CALLEES.summary_effects
+\end{alltt}
+means that the method \verb|proper_references| is used to generate the
+\verb|proper_references| resource of a given \texttt{MODULE}. But to
+generate this resource, the method needs access to the resource holding
+the \texttt{entities} (the variable...) of the \texttt{PROGRAM} currently
+analyzed, the \texttt{code} resource (the instructions) of the given
+\texttt{MODULE} and the \verb/summary_effects/ resource (the side effects
+on the memory) of the functions and procedures called by the given
+\texttt{MODULE}, the \texttt{CALLEES}.
+
+\subsubsection{Program pieces}
+\label{sec:program-pieces}
+
+
+The following program pieces are defined:
+\begin{description}
+\item[\texttt{PROGRAM}:] the whole program currently analyzed;
+\item[\texttt{MODULE}:] the given \texttt{MODULE} (a procedure or
+  function);
+\item[\texttt{ALL}:] all the \texttt{MODULE} of the \texttt{PROGRAM};
+\item[\texttt{CALLEES}:] all the \texttt{MODULE}s called in the given
+  \texttt{MODULE};
+\item[\texttt{CALLERS}:] all the \texttt{MODULE}s that call the given
+  \texttt{MODULE}.
+\end{description}
 \tableofcontents
 
-\newpage
-
-% PROGRAM, MODULE, CALLERS, CALLEES.
 
 
 
-
-\section{Input Files}
+\chapter{Input Files}
 \label{section-input-files}
 \index{Input File}
  
-\subsection{User File}
+\section{User File}
 \label{subsection-user-file}
 \index{User File}
 
-An input program is a set of user Fortran~77 source files and a name,
+An input program is a set of user Fortran~77 or C source files and a name,
 called a {\em workspace}. The files are looked for in the current
 directory, then by using the colon-separated \verb|PIPS_SRCPATH| variable
 for other directories where they might be found. The first occurrence of
-the file name in the ordered directories is chosen, what is consistent
-with \texttt{PATH} and \texttt{MANPATH} for instance. 
+the file name in the ordered directories is chosen, which is consistent
+with \texttt{PATH} and \texttt{MANPATH} behaviour.
 
-The Fortran files are splitted by \PIPS{} at the
+The source files are splitted by \PIPS{} at the
 program initialization phase to produce one \PIPS{}-private source file
 for each procedure, subroutine or function, and for each block data. A
 function like \verb+fsplit+ is used and the new files are stored in the
@@ -306,7 +350,7 @@ is properly typed (see Section~\ref{subsection-source-file}).
 The {\em user} source files should not be edited by the user once \PIPS{}
 has been started because these editions are not going to be taken into
 account unless a new workspace is created.
- Their preprocessed copies, the
+But their preprocessed copies, the
 \PIPS{} source files, safely can be edited while running \PIPS{}. The
 automatic consistency mechanism makes sure that any information
 displayed to the user is consistent with the current state of the
@@ -314,15 +358,15 @@ sources files in the workspace. These source files have names terminated
 by the standard suffix, {\tt .f}.
 
 New user source files should be automatically and completely re-built when the program
-is no longer under \PIPS{} control\footnote{FI: the file reconstruction
-procedure has not been implemented (September 1997).}, i.e. when the
+is no longer under \PIPS{} control, i.e. when the
 workspace is closed. An executable application can easily be regenerated
 after code transformations using the \TPIPS{} interface and requesting the
 {\tt PRINTED\_FILE} resources for all modules:
-
 \begin{quote}
-{\tt display PRINTED\_FILE(\$ALL)}
+{\tt display PRINTED\_FILE[\%ALL]}
 \end{quote}
+But this is what is done by explicitly requesting the code regeneration as
+described in \S~\ref{sec:regen-user-source}.
 
 Note that \PIPS{} expects proper ANSI Fortran 77 code. Its parser was not
 designed to locate syntax errors. It is highly recommended to check source
@@ -331,7 +375,7 @@ Section~\ref{subsection-preprocessing-and-splitting}) before submitting them to
 \PIPS{}.
 
 
-\subsection{Preprocessing and Splitting}
+\section{Preprocessing and Splitting}
 \label{subsection-preprocessing-and-splitting}
 \index{Preprocessing}
 \index{Splitting}
@@ -381,7 +425,7 @@ per-module subdirectories. They constitute the resource
 \verb|INITIAL_FILE|.
 
 
-\subsection{Syntactic Preprocessing}
+\section{Syntactic Preprocessing}
 \label{subsection-syntactic-preprocessing}
 \index{Preprocessing}
 \index{Include}
@@ -414,7 +458,7 @@ Figure~\ref{figure-user-and-source-files}.
 
 \end{description}
 
-\subsection{Source File}
+\section{Source File}
 \label{subsection-source-file}
 \index{Source File}
 \index{Missing Code}
@@ -424,21 +468,21 @@ A \verb/source_file/ contains the code of exactly one module. Source files
 are created from user source files at program initialization by
 \texttt{fsplit} or a similar function if \texttt{fsplit} is not available (see
 Section~\ref{subsection-preprocessing-and-splitting}).  A
-source file may be updated by the user, but not by \PIPS{}\footnote{The
+source file may be updated by the user\footnote{The
   X-window interface, \texttt{wpips} has an \texttt{edit} entry in the
-  transformation menu.}. Program
+  transformation menu.}, but not by \PIPS{}. Program
 transformations are performed on the internal representation
 (see~\ref{section-abstract-syntax-tree}) and visible in the prettyprinted
-output (see~ref{section-output-files}).
+output (see~\ref{section-output-files}).
 
 Source code splitting and preprocessing, e.g. \texttt{cpp}, are performed
-by Function \verb/create_workspace()/ from the \texttt{top-level} library,
+by the function \verb/create_workspace()/ from the \texttt{top-level} library,
 in collaboration with \verb/db_create_workspace()/ from library
 \texttt{pipsdbm} which creates the workspace directory. The user source
 files have names suffixed by \texttt{.f} or \texttt{.F} if \texttt{cpp}
 must be applied. They are split into {\em original} \verb/user_files/ with
 suffix \texttt{.f.orig}. These so-called original user files are in fact
-copies stored in the workspace. The a syntactic PIPS preprocessor is
+copies stored in the workspace. The syntactic PIPS preprocessor is
 applied to generate what is known as a \verb/source_file/ by PIPS. This
 process is fully automatized and not visible from PIPS user interfaces.
 However, the cpp preprocessor actions can be controlled using the Shell
@@ -449,7 +493,7 @@ found. If the user code is properly typed, it is possible to force
 \verb/initializer/ to generate empty stubs by setting properties
 \verb/GENERATE_MISSING_SOURCE_FILES/ and, to avoid inconsistency,
 \verb/PARSER_TYPE_CHECK_CALL_SITES/. But remember that many Fortran codes
-use subroutine with variable numbers of arguments and with polymorphic
+use subroutines with variable numbers of arguments and with polymorphic
 types. Fortran varargs mechanism can be achieved by using or not the
 second argument according to the first one. Polymorphism can be useful to
 design an IO package or generic array subroutine, e.g. a subroutine
@@ -461,10 +505,10 @@ is missing. This decision was made for two reasons:
 
 \begin{enumerate}
 
-\item Too many warnings about typing are generated as soon as polymorphism
-  is used.
+\item too many warnings about typing are generated as soon as polymorphism
+  is used;
 
-\item Analysis results and code transformations are potentially wrong
+\item analysis results and code transformations are potentially wrong
   because no memory effects are synthesized
 
 \end{enumerate}
@@ -478,7 +522,7 @@ initializer                     > MODULE.user_file
 
 Note: the generation of the resource \verb|user_file| here above is mainly 
 directed in having the resource concept here. More thought is needed to
-have the concept of user files managed by pipsmake.
+have the concept of user files managed by \PIPSMAKE.
 
 MUST appear after initializer:
 
@@ -495,7 +539,9 @@ In C, the initializer can generate directly a \verb|c_source_file|.
 c_initializer                     > MODULE.c_source_file
 \end{verbatim}
 
-\subsection{Regeneration of user source files}
+\section{Regeneration of user source files}
+\label{sec:regen-user-source}
+
 
 The \texttt{unsplit} phase regenerates user files from available
 \verb|printed_file|. The various modules that where initialy stored in
@@ -517,7 +563,7 @@ unsplit                         > PROGRAM.user_file
                 < ALL.printed_file
 \end{verbatim}
 
-\section{Abstract Syntax Tree}
+\chapter{Abstract Syntax Tree}
 \label{section-abstract-syntax-tree}
 \index{AST}
 \index{IR}
@@ -527,7 +573,7 @@ unsplit                         > PROGRAM.user_file
 The abstract syntax tree, a.k.a intermediate representation,
 a.k.a. internal representation, is presented in~\cite{IJT92} and in \Pri{}.
 
-\subsection{Entities}
+\section{Entities}
 \label{subsubsection-entities}
 \index{Entity}
 \index{Variable}
@@ -541,7 +587,7 @@ tabulated} type declaration.}, called \verb+entities+. Fortran entities,
 like intrinsics and operators, are created by \verb+bootstrap+ at
 program initialization. The symbol table is updated with user local and
 global variables when modules are parsed or linked together. This side
-effect is not disclosed to {\em pipsmake}.
+effect is not disclosed to \PIPSMAKE.
 
 \begin{verbatim}
 bootstrap                       > PROGRAM.entities
@@ -551,22 +597,29 @@ The entity data structure is described in \Pri{}.
 
 The declaration of new intrinsics is not easy because it was assumed that
 there number was fixed and limited by the Fortran standard. In fact,
-Fortran extensions define new ones. To add a new intrinsic C code in
+Fortran extensions define new ones. To add a new intrinsic, C code in
 \texttt{bootstrap/bootstrap.c} and in \texttt{effects-generic/intrinsics.c}
-must be added to declare its name and type and Read/Write memory effects.
+must be added to declare its name, type and Read/Write memory effects.
 
 Information about entities generated by the parser is printed out
 conditionally to property: \texttt{PARSER\_DUMP\_SYMBOL\_TABLE}.
 which is set to false by default.
 
-\subsection{Parsed Code and Callees}
+\section{Parsed Code and Callees}
 \label{subsection-parsed-code-and-callees}
 \index{Parsed Code}
 \index{Callees}
 
 Each module source code is parsed to produce an internal representation
 called \verb+parsed_code+ and a list of called module names,
-\verb+callees+. Source code is assumed to be fully Fortran-77
+\verb+callees+.
+
+
+\subsection{Fortran}
+\label{sec:fortran}
+
+
+ Source code is assumed to be fully Fortran-77
 compliant. On the first encountered error, the parser may be able to
 emit a useful message or the non-analyzed part of the source code is
 printed out.
@@ -576,7 +629,7 @@ restrictions. The input character set includes underscore, \verb/_/, and
 varying length variable names, i.e. they are not restricted to 6
 characters.
 
-\paragraph{The restrictions are:}
+\subsubsection{Fortran restrictions}
 
 \begin{enumerate}
 
@@ -585,7 +638,7 @@ generated. Very few cases of this obsolete feature were
 encountered in the codes initially used to benchmark \PIPS{}. ENTRY statements have to be replaced manually by \texttt{SUBROUTINE} or
 \texttt{FUNCTION} and appropriate commons.  If the parser bumps into a
 call to an ENTRY point, it may wrongly diagnose a missing source code
-for this entry, or even generate a useless but pipsmake satisfying stub if the corresponding
+for this entry, or even generate a useless but \PIPSMAKE{} satisfying stub if the corresponding
 property has been set (see Section~\ref{subsection-source-file}).
 
   \item Multiple returns are not in \PIPS{} Fortran.
@@ -597,7 +650,7 @@ property has been set (see Section~\ref{subsection-source-file}).
     replaced by a \texttt{IF...ELSEIF...ENDIF} construct in the parser.
 
   \item Functional formal parameters are not accepted. This is deeply
-    exploited in {\em pipsmake}.
+    exploited in \PIPSMAKE.
 
   \item Integer PARAMETERs must be initialized with integer constant
     expressions because conversion functions are not implemented.
@@ -631,7 +684,8 @@ benchmarks are handled without manual editing, but for ENTRY statements
 which are obsoleted by the current Fortran standard.
 
 
-\paragraph{Some additional remarks:}
+\subsubsection{Some additional remarks}
+
 \begin{itemize}
 \item The PIPS preprocessing stage included in \texttt{fsplit()} is going
   to name unnamed modules \texttt{MAIN000} and unnamed  blockdata
@@ -642,7 +696,7 @@ which are obsoleted by the current Fortran standard.
 
 \end{itemize}
 
-\paragraph{Some unfriendly features:}
+\subsubsection{Some unfriendly features}
 
 \begin{enumerate}
 
@@ -677,35 +731,31 @@ generated for lines ending after column 72.
 
 \end{enumerate}
 
-\paragraph{Declaration of the standard parser:}
+\subsubsection{Declaration of the standard parser}
 
 \begin{verbatim}
-parser                          > MODULE.parsed_code 
-                                > MODULE.callees      
-        < PROGRAM.entities 
+parser                          > MODULE.parsed_code
+                                > MODULE.callees
+        < PROGRAM.entities
         < MODULE.source_file
 \end{verbatim}
 
-A prettyprint of the symbol table for one module can be generated,
-either for C or Fortran modules.
+A prettyprint of the symbol table for a Fortran module is generated with:
 \begin{verbatim}
-fortran_symbol_table		> MODULE.symbol_table_file
-	< PROGRAM.entities
-	< MODULE.parsed_code
-
-c_symbol_table		> MODULE.symbol_table_file
-	< PROGRAM.entities
-	< MODULE.parsed_code
+fortran_symbol_table        > MODULE.symbol_table_file
+    < PROGRAM.entities
+    < MODULE.parsed_code
 \end{verbatim}
 
-\paragraph{Declaration of HPFC parser:}
+
+\subsection{Declaration of HPFC parser}
 
 This parser takes a different Fortran file but applies the same
 processing as the previous parser. The Fortran file is the result of the
 preprocessing by the \verb|hpfc_filter| phase of the original file in
 order to extract the directives and switch them to a Fortran~77 parsable
 form. As another side-effect, this parser hides some callees from
-pipsmake. This callees are temporary functions used to encode HPF
+\PIPSMAKE. This callees are temporary functions used to encode HPF
 directives. Their call sites are removed from the code before requesting full analyses
 to PIPS. This parser is triggered automatically by the \verb|hpfc_close|
 phase when requested. It should never be selected or activated by hand.
@@ -717,20 +767,21 @@ hpfc_parser                     > MODULE.parsed_code
         < MODULE.hpfc_filtered_file
 \end{verbatim}
 
-\paragraph{Declaration of the C parsers:}
 
-The compilation unit does not contain any function definitions after the
+\subsection{Declaration of the C parsers}
+
+The compilation unit does not contain any function definitions after the\marginpar{gnih?}
 workspace creation. The compilation units must be parsed before the
 function definitions can be parsed.
-
 \begin{verbatim}
 compilation_unit_parser         > COMPILATION_UNIT.declarations
         < COMPILATION_UNIT.c_source_file
 \end{verbatim}
 
 DECLARATIONS is a special resource to impose that each compilation unit
-must be parsed before its functions. It is in fact a hash table 
-containing C keywords and typedef names in each compilation unit.  
+must be parsed before its functions. It is in fact a hash table
+containing C keywords and typedef names in each compilation
+unit.\marginpar{mais de quoi ça cause ?}
 
 \begin{verbatim}
 c_parser                        > MODULE.parsed_code
@@ -739,8 +790,22 @@ c_parser                        > MODULE.parsed_code
         < MODULE.c_source_file
         < COMPILATION_UNIT.declarations
 \end{verbatim}
+If you want to parse some C code, it is a good idea to select the C
+parser with
+\begin{alltt}
+activate C_PARSER
+\end{alltt}
+for example in \texttt{tpips}.
 
-\subsection{Controlized Code}
+A prettyprint of the symbol table for a C module can be generated with
+\begin{verbatim}
+c_symbol_table      > MODULE.symbol_table_file
+        < PROGRAM.entities
+        < MODULE.parsed_code
+\end{verbatim}
+
+
+\section{Controlized Code (hierarchical control flow graph)}
 \label{subsection-controlized-code}
 \index{Controlizer}
 \index{CFG}
@@ -750,23 +815,24 @@ c_parser                        > MODULE.parsed_code
 control flow graph, which preserves structured part of code as such, and
 uses a control flow graph only when no syntactic representation is
 available (see~\cite{IJT91}). The encoding of the relationship between
-structured and unstructured parts of code is explained elsewhere
+structured and unstructured parts of code is explained elsewhere, mainly
+in the \Pri.
 %% in \externalref{section-code}.
 
 The \verb+controlizer+ removes \verb+GOTO+
 statements in the parsed code and generates a similar representation
 with small CFGs.
 
-The hierarchical control flow graph built by the \texttt{Controlizer} is
+The hierarchical control flow graph built by the \texttt{controlizer} is
 pretty crude. The partial control flow graphs, called
 \texttt{unstructured} statements, are derived from syntactic
 constructs. The control scope of an unstructured is the smallest
 enclosing structured construct, whether a loop, a test or a sequence.
-Thus statements which might be seen as part of structured code end up
-nodes of an unstructured.
+Thus some statements, which might be seen as part of structured code, end up
+as nodes of an unstructured.
 
 Note that sequences of statements are identified as such by
-\texttt{Controlizer}. Each of them appears as a unique node.
+\texttt{controlizer}. Each of them appears as a unique node.
 
 Also, useless CONTINUE statements may be added as provisional landing
 pads and not removed. The exit node should never have successors but this
@@ -775,13 +841,13 @@ exit node, as well as several other nodes, also may be unreachable. After
 clean up, there should be no unreachable node or the only unreachable node
 should be the exit node.
 Function \texttt{unspaghettify} (see
-Section~\ref{subsubsection-unspaghettify}) is applied by default to clean
-up and to reduce the control flow graphs after \texttt{Controlizer}.
+Section~\ref{sec:unspaghettify}) is applied by default to clean
+up and to reduce the control flow graphs after \texttt{controlizer}.
 
 The {\tt GOTO} statements are transformed in arcs but also in {\tt
 CONTINUE} statements to preserve as many user comments as possible.
 
-The top statement of a module returned by the \texttt{Controlizer} used to
+The top statement of a module returned by the \texttt{controlizer} used to
 contain always an unstructured instruction with only one node. Several phases
 in \PIPS{} assumed that this always is the case, although other program
 transformations may well return any kind of top statement, most likely a
@@ -801,7 +867,7 @@ controlizer                     > MODULE.code
 
 
 
-\section{Analyses}
+\chapter{Analyses}
 \label{section-analyses}
 \index{Analysis}
 
@@ -811,13 +877,13 @@ reductions, use-def chains, dependence graphs, interprocedural checks
 continuations, complexities, array regions, dynamic aliases and
 complementary regions.
 
-\subsection{Call Graph}
+\section{Call Graph}
 \label{subsection-call-graph}
 \index{Call Graph}
 
 All lists of callees are needed to build the global lists of callers
-for each module. The callers and callees lists are used by {\em
-pipsmake} to control top-down and bottom-up analyses. The call graph is
+for each module. The callers and callees lists are used by \PIPSMAKE{}
+to control top-down and bottom-up analyses. The call graph is
 assumed to be a DAG, i.e. no recursive cycle exists, but it is not
 necessarily connected.
 
@@ -836,9 +902,9 @@ callgraph                       > ALL.callers
         < ALL.callees
 \end{verbatim}
 
-This pass generates a daVinci version of the callgraph.  Its quite partial
-since it should rely on an hypothetical \emph{all callees}, direct and
-indirect, resource.
+The following pass generates a \PuDrawGraph version of the callgraph.  Its
+quite partial since it should rely on an hypothetical \emph{all callees},
+direct and indirect, resource.
 
 \begin{verbatim}
 alias dvcg_file 'Graphical Call Graph'
@@ -852,7 +918,7 @@ full_graph_of_calls          > PROGRAM.dvcg_file
         < ALL.callees
 \end{verbatim}
 
-\subsection{Effects}
+\section{Effects}
 \label{subsection-effects}
 \index{Effect}
 \index{Memory Effect}
@@ -862,7 +928,7 @@ described in~\cite{IJT92}. Another description is available on line, in
 \Pri{} Technical
 Report.
 
-\subsubsection{Proper Effects}
+\subsection{Proper Effects}
 \label{subsubsection-proper-effects}
 \index{Proper Effects}
 \index{Effects (Proper)}
@@ -890,13 +956,13 @@ proper_effects                  > MODULE.proper_effects
 \end{verbatim}
 
 
-\subsubsection{Filtered Proper Effects}
+\subsection{Filtered Proper Effects}
 \label{subsubsection-filtered-proper-effects}
 
 This phase collects information about where a given global variable is
 actually modified in the program.
 
-To be continued...
+\marginpar{To be continued...}
 
 \begin{verbatim}
 filter_proper_effects         > MODULE.filtered_proper_effects
@@ -907,7 +973,7 @@ filter_proper_effects         > MODULE.filtered_proper_effects
 \end{verbatim}
 
 
-\subsubsection{Cumulated Effects}
+\subsection{Cumulated Effects}
 \label{subsubsection-cumulated-effects}
 \index{Cumulated Effects}
 \index{Effects (Cumulated)}
@@ -926,6 +992,7 @@ cumulated_effects               > MODULE.cumulated_effects
 
 Cumulated effects do not take into account local effects on private
 variables. Interprocedurally, effects on dynamic variables are ignored.
+\marginpar{Not clear}
 
 Cumulated references integrate proper references over the program code. 
 
@@ -954,7 +1021,7 @@ would be necessary to assume either a general \verb+READ+ or a general
 \verb+WRITE+ for each read or written formal parameter with no actual
 counterpart.
 
-\subsubsection{Summary Data Flow Information (SDFI)}
+\subsection{Summary Data Flow Information (SDFI)}
 \label{subsubection-summary-data-flow-information}
 \index{SDFI}
 
@@ -975,15 +1042,15 @@ summary_effects                 > MODULE.summary_effects
 \end{verbatim}
 
 
-\subsubsection{IN and OUT Effects}
+\subsection{IN and OUT Effects}
 \label{subsubsection-in-and-out-effects}
 \index{IN Effects}
 \index{OUT Effects}
 \index{Effects (IN)}
 \index{Effects (OUT)}
 
+\marginpar{What are they?}
 \begin{verbatim}
-
 in_effects > MODULE.in_effects
            > MODULE.cumulated_in_effects
          < PROGRAM.entities 
@@ -1006,11 +1073,9 @@ out_effects > MODULE.out_effects
         < MODULE.code 
         < MODULE.out_summary_effects   
         < MODULE.cumulated_in_effects   
-
-
 \end{verbatim}
 
-\subsection{Reductions}
+\section{Reductions}
 \label{sec:reductions}
 
 The proper reductions are computed from a code.
@@ -1057,7 +1122,7 @@ loop_reductions > MODULE.code
   < MODULE.cumulated_reductions
 \end{verbatim}
 
-\subsection{Chains (Use-Def Chains)}
+\section{Chains (Use-Def Chains)}
 \label{subsection-chains}
 \index{Use-Def Chains}
 \index{Def-Use Chains}
@@ -1071,14 +1136,13 @@ the dependence graph. Chains based on regions (see
 Section~\ref{subsection-array-regions}) are more effective for
 interprocedural parallelization.
 
-\paragraph{Note:} 
 If chains based on regions have been selected, the simplest dependence
 test must be used because regions carry more information than any kind
 of preconditions. Preconditions and loop bound information already are
 included in the region predicate.
 %%!UserManualDocumentation
 
-\subsubsection{Menu for Use-Def Chains}
+\subsection{Menu for Use-Def Chains}
 
 \begin{verbatim}
 alias chains 'Use-Def Chains'
@@ -1088,7 +1152,7 @@ alias region_chains 'Regions'
 alias in_out_regions_chains 'In-Out Regions'
 \end{verbatim}
 
-\subsubsection{Standard Use-Def Chains (a.k.a. Atomic Chains)}
+\subsection{Standard Use-Def Chains (a.k.a. Atomic Chains)}
 \label{subsubsection-atomic-chains}
 \index{Use-Def Chains}
 \index{Atomic Chains}
@@ -1126,7 +1190,7 @@ atomic_chains                   > MODULE.chains
         < MODULE.proper_effects
 \end{verbatim}
 
-\subsubsection{READ/WRITE Region-Based Chains}
+\subsection{READ/WRITE Region-Based Chains}
 
 %%@UserManualDocumentation: region_chains
 \label{subsubsection-read-write-region-based-chains}
@@ -1140,7 +1204,7 @@ Section~\ref{subsection-array-regions}).
 Region-based chains only are compatible with the Rice Fast Dependence Graph
 option (see Section~\ref{subsubsection-menu-for-dependence-tests}).  Other
 dependence tests are likely to lack accuracy because a transitive check has
-been added by Be'atrice Creusillet to improve speed. The other tests could
+been added by Béatrice \textsc{Creusillet} to improve speed. The other tests could
 not improve the simplest test based on regions. Note that it is not fast
 anymore when coping with regions.
 %%!UserManualDocumentation
@@ -1152,7 +1216,7 @@ region_chains                   > MODULE.chains
         < MODULE.proper_regions
 \end{verbatim}
 
-\subsubsection{IN/OUT Region-Based Chains}
+\subsection{IN/OUT Region-Based Chains}
 
 %%@UserManualDocumentation: in_out_regions_chains
 \label{subsubsection-in-out-region-based-chains}
@@ -1163,7 +1227,7 @@ usual regions are used. Arrays and scalars which are {\em logically}
 local to callees are ignored but the resulting parallel loops require
 some reallocation work. Ideally, the logically local variables should be
 made {\em physically} local automatically, but this is not (yet)
-implemented in \PIPS{}. 
+implemented in \PIPS{}. \marginpar{Not clear}
 
 As for region-based chains (see
 Section~\ref{subsubsection-read-write-region-based-chains}), the
@@ -1179,7 +1243,7 @@ in_out_regions_chains           > MODULE.chains
         < MODULE.out_regions
 \end{verbatim}
 
-The loop in Subroutine \verb+inout+ cannot be parallelized legally
+The following loop in Subroutine \verb+inout+ cannot be parallelized legally
 because Subroutine \verb+foo+ uses a static variable, \verb+y+. However,
 \PIPS{} will display this loop as (potentially) parallel if the
 \verb+in_out+ option is selected for use-def chain computation. Remember
@@ -1204,7 +1268,7 @@ that IN/OUT regions require MUST regions to obtain interesting results
 \verb!      !\\
 \verb!      end!\\
 
-\subsection{Dependence Graph (DG)}
+\section{Dependence Graph (DG)}
 \label{subsection-dependence-graph}
 \index{DG}
 \index{Dependence Graph}
@@ -1214,16 +1278,16 @@ The dependence graph is used primarily by the parallelization
 algorithms. A dependence graph is a refinement of use-def chains
 (Section~\ref{subsection-chains}). If is {\em location}-based and not
 {\em value}-based. See Section~\ref{subsection-array-data-flow-graph}
-for information about \PIPS{} value-based dependence graph, Feautrier's
+for information about \PIPS{} value-based dependence graph, \textsc{Feautrier}'s
 DFG.
 
 There are several ways to compute a dependence graph. Some of them are
-fast (Banerjee's one for instance) but provide poor results, others
-might be slower (R\'emi's one for instance) but produce better
+fast (\textsc{Banerjee}'s one for instance) but provide poor results, others
+might be slower (Rémi's one for instance) but produce better
 results.
 
 Three different dependence tests are available, all based on
-Fourier-Motzkin elimination improved with a heuristics for the integer
+\textsc{Fourier}-\textsc{Motzkin} elimination improved with a heuristics for the integer
 domain. The \verb+fast+ version uses subscript expressions only (unless regions
 were used to compute use-def chains, in which case regions are used
 instead). The \verb+full+ version uses subscript expressions and loop
@@ -1238,7 +1302,7 @@ Section~\ref{subsubsection-read-write-region-based-chains}).
 There are several kinds of dependence graphs. Most of them share the
 same overall data structure: a graph with labels on arcs and vertices.
 usually, the main differences are in the labels that decorate arcs;
-for instance, Kennedy's algorithm requires dependence levels (which
+for instance, \textsc{Kennedy}'s algorithm requires dependence levels (which
 loop actually creates the dependence) while algorithms originated from
 CSRD prefer DDVs (relations between loop indices when the dependence
 occurs). Dependence cones introduced in~\cite{I87,IT87a,IT87b,IT88a}
@@ -1251,7 +1315,7 @@ dependence levels are exploited by parallelization algorithms.
 The dependence graph can be printed with or without filters (see
 Section~\ref{subsection-dependence-graph-file}). The standard dependence
 graph includes all arcs taken into account by the parallelization
-process (Allen \& Kennedy~\cite{AK87}), except those that are due to scalar private
+process (\textsc{Allen} \& \textsc{Kennedy}~\cite{AK87}), except those that are due to scalar private
 variables and that impact the distribution process only. The loop
 carried dependence graph does not include intra-iteration dependences
 and is a good basis for iteration scheduling. The whole graph includes
@@ -1264,12 +1328,12 @@ on property \verb/RICEDG_PROVIDE_STATISTICS/ (more details in the
 most relevant information for a whole program.
 
 The main contributors for the design and development of dependence
-analysis are R\'emi Triolet, Fran\c{c}ois Irigoin and Yi-qing
-Yang~\cite{Y93}. The code was improved by Corinne Ancourt and B\'eatrice
-Creusillet.
+analysis are Rémi \textsc{Triolet}, François \textsc{Irigoin} and Yi-qing
+\textsc{Yang}~\cite{Y93}. The code was improved by Corinne
+\textsc{Ancourt} and Béatrice \textsc{Creusillet}.
 %%!UserManualDocumentation
 
-\subsubsection{Menu for Dependence Tests}
+\subsection{Menu for Dependence Tests}
 \label{subsubsection-menu-for-dependence-tests}
 
 \begin{verbatim}
@@ -1281,7 +1345,7 @@ alias rice_semantics_dependence_graph 'Preconditions Used'
 alias rice_regions_dependence_graph 'Regions Used'
 \end{verbatim}
 
-\subsubsection{Fast Dependence Test}
+\subsection{Fast Dependence Test}
 \label{subsubsection-fast-dependence-test}
 \index{Fast Dependence Test}
 
@@ -1300,7 +1364,7 @@ rice_fast_dependence_graph      > MODULE.dg
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{Full Dependence Test}
+\subsection{Full Dependence Test}
 \label{subsubsection-full-dependence-test}
 \index{Full Dependence Test}
 
@@ -1316,7 +1380,7 @@ rice_full_dependence_graph      > MODULE.dg
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{Semantics Dependence Test}
+\subsection{Semantics Dependence Test}
 \label{subsubsection-semantics-dependence-test}
 \index{Fast Dependence Test}
 
@@ -1334,7 +1398,7 @@ rice_semantics_dependence_graph > MODULE.dg
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{Dependence Test with Array Regions}
+\subsection{Dependence Test with Array Regions}
 \label{subsubsection-regions-dependence-test}
 \index{Fast Dependence Test}
 
@@ -1351,14 +1415,14 @@ rice_regions_dependence_graph      > MODULE.dg
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsection{Flinter}
+\section{Flinter}
 \label{subsection-flinter}
 \index{Flinter}
 
 Function \verb+flinter+ performs some intra and interprocedural checks
-about formal/actual argument pairs, use of COMMONs,... It was developed
-by Laurent Aniort and Fabien Coelho. Ronan Keryell added the
-uninitialized variable checking.
+about formal/actual argument pairs, use of COMMONs,... It was developed by
+Laurent \textsc{Aniort} and Fabien \textsc{Coelho}. Ronan \textsc{Keryell}
+added the uninitialized variable checking.
 
 \begin{verbatim}
 alias flinted_file 'Flint View'
@@ -1378,7 +1442,7 @@ detected by the effect analysis... which was required by flinter.
 Resource \texttt{CALLEES.code} is not explicitly required but it produces the
 global symbols which function \texttt{flinter} needs to check parameter lists.
 
-\subsection{Loop statistics}
+\section{Loop statistics}
 
 Computes statistics about loops in module. It computes the number of
 perfectly and imperfectly  nested loops and gives their depths. And it gives
@@ -1390,7 +1454,7 @@ loop_statistics > MODULE.stats_file
         < MODULE.code
 \end{verbatim}
 
-\subsection{Semantics Analysis}
+\section{Semantics Analysis}
 \label{subsection-semantics-analysis}
 \index{Semantics Analysis}
 \index{Analysis (Semantics)}
@@ -1414,11 +1478,14 @@ polynomial} equations between scalar integer variables. SUIF~\cite{}
 also performs some kind of semantics analysis.
 
 The semantics analysis part of \PIPS{} was designed and developed by
-Fran\c{c}ois Irigoin.
+François \textsc{Irigoin}.
 
-\subsubsection{Transformers}
+\subsection{Transformers}
 \label{subsubsection-transformers}
 \index{Transformer}
+
+\marginpar{The following is hard to read without any example for someone
+  that knows nothing about PIPS...}
 
 %%@UserManualDocumentation: transformers
 A transformer is an approximate relation between the symbolic initial
@@ -1432,10 +1499,10 @@ statements are accepted. Interprocedural algorithms use the
 
 Fast algorithms use a very primitive non-iterative fix-point algorithm
 (two possible version: flow sensitive or flow insensitive).  Full
-algorithms use a fix-point on vector subspace (i.e. à la K{\sc
+algorithms use a fix-point on vector subspace (i.e. \emph{à la} K{\sc
   arr}~\cite{Karr76}) or a fix-point on polyhedra (i.e. H{\sc
   albwachs}/C{\sc ousot}~\cite{HC78}; implemented... but not connected
-as of Sept. 95).
+as of Sept. 95).\marginpar{Still true?}
 
 A transformer map contains a transformer for each statement of a
 module. It is a mapping from statements to transformers (type
@@ -1443,10 +1510,10 @@ module. It is a mapping from statements to transformers (type
 are stored on and retrieved from disk by {\em pipsdbm}.
 
 Note: summary effects should not be used but the summary transformer is
-in fact computed along with the transformers (François Irigoin, 4 Sept. 90).
+in fact computed along with the transformers (François \textsc{Irigoin}, 4 Sept. 90).
 %%!UserManualDocumentation
 
-\paragraph{Menu for Transformers}
+\subsubsection{Menu for Transformers}
 
 \begin{verbatim}
 alias transformers 'Transformers'
@@ -1457,7 +1524,7 @@ alias transformers_inter_full 'Full Inter-Procedural Computation'
 alias refine_transformers 'Refine Transformers'
 \end{verbatim}
 
-\paragraph{Fast Intraprocedural Transformers}
+\subsubsection{Fast Intraprocedural Transformers}
 
 %%@UserManualDocumentation: transformers_intra_fast
 Build the fast intraprocedural transformers.
@@ -1472,7 +1539,7 @@ transformers_intra_fast         > MODULE.transformers
         < MODULE.proper_effects
 \end{verbatim}
 
-\paragraph{Full Intraprocedural Transformers}
+\subsubsection{Full Intraprocedural Transformers}
                 
 %%@UserManualDocumentation: transformers_intra_full
 Build the improved intraprocedural transformers.
@@ -1487,7 +1554,7 @@ transformers_intra_full         > MODULE.transformers
         < MODULE.proper_effects
 \end{verbatim}
 
-\paragraph{Fast Interprocedural Transformers}
+\subsubsection{Fast Interprocedural Transformers}
 
 %%@UserManualDocumentation: transformers_inter_fast
 Build the fast interprocedural transformers.
@@ -1504,7 +1571,7 @@ transformers_inter_fast         > MODULE.transformers
         < PROGRAM.program_precondition
 \end{verbatim}
 
-\paragraph{Full Interprocedural Transformers}
+\subsubsection{Full Interprocedural Transformers}
 
 %%@UserManualDocumentation: transformers_inter_full
 Build the improved interprocedural transformers.
@@ -1521,7 +1588,7 @@ transformers_inter_full         > MODULE.transformers
         < PROGRAM.program_precondition
 \end{verbatim}
 
-\paragraph{Full Interprocedural Transformers}
+\subsubsection{Full Interprocedural Transformers}
 
 %%@UserManualDocumentation: refine_transformers
 Rebuild the interprocedural transformers using interprocedural
@@ -1543,7 +1610,7 @@ refine_transformers         > MODULE.transformers
         < PROGRAM.program_precondition
 \end{verbatim}
 
-\subsubsection{Summary Transformer}
+\subsection{Summary Transformer}
 \label{subsubsection-summary-transformer}
 \index{Transformer (Summary)}
 \index{Summary Transformer}
@@ -1562,7 +1629,7 @@ summary_transformer             > MODULE.summary_transformer
         < MODULE.summary_effects
 \end{verbatim}
 
-\subsubsection{Initial Precondition}
+\subsection{Initial Precondition}
 \label{subsubsection-initial-precs}
 \index{Precondition (Initial)}
 \index{Initial Precondition}
@@ -1597,7 +1664,7 @@ main procedure. Although it appears below for all interprocedural analyses
 and it always is computed, it only is used when a main procedure is
 available.
 
-\subsubsection{Intraprocedural Summary Precondition}
+\subsection{Intraprocedural Summary Precondition}
 \index{Intraprocedural Summary Precondition}
 \index{Precondition (Summary)}
 
@@ -1621,7 +1688,7 @@ precondition resource at the right place in \verb/pipsmake.rc/.
 No menu is declared to select either intra- or interprocedural summary
 preconditions.
 
-\subsubsection{Preconditions}
+\subsection{Preconditions}
 \label{subsubsection-preconditions}
 \index{Precondition}
 
@@ -1642,10 +1709,10 @@ inter}-procedural transformers. This is faster that a full
 interprocedural analysis because there is no need for a top-down
 propagation of summary preconditions. This is compatible with code
 transformations like partial evaluation (see
-Section~\ref{subsubsection-partial-evaluation}), dead code elimination
-(see Section~\ref{subsubsection-dead-code-elimination}) and use-def
+Section~\ref{sec:partial-evaluation}), dead code elimination
+(see Section~\ref{sec:dead-code-elimination}) and use-def
 based dead code elimination (see
-Section~\ref{subsubsection-dead-code-elimination}).
+Section~\ref{sec:dead-code-elimination}).
 
 Since these two options for transformer and precondition computations are
 independent and that \verb/transformer_full_inter/ and
@@ -1658,7 +1725,7 @@ to obtain the best possible results.
 % not added (yet).
 %%!UserManualDocumentation
 
-\paragraph{Menu for Preconditions}
+\subsubsection{Menu for Preconditions}
 
 \begin{verbatim}
 alias preconditions 'Preconditions'
@@ -1669,7 +1736,7 @@ alias preconditions_inter_full 'Full Inter-Procedural Analysis'
 alias preconditions_intra_fast 'Fast intra-Procedural Analysis'
 \end{verbatim}
 
-\paragraph{Intra-Procedural Preconditions}
+\subsubsection{Intra-Procedural Preconditions}
 
 %%@UserManualDocumentation: preconditions_intra
 Only build the preconditions in a module without any interprocedural
@@ -1699,7 +1766,7 @@ preconditions_intra_fast            > MODULE.preconditions
         < MODULE.code
 \end{verbatim}
 
-\paragraph{Fast Inter-Procedural Preconditions}
+\subsubsection{Fast Inter-Procedural Preconditions}
 
 %%@UserManualDocumentation: preconditions_inter_fast
 Option \verb+preconditions_inter_fast+ uses the module own precondition
@@ -1724,7 +1791,7 @@ preconditions_inter_fast        > MODULE.preconditions
         < MODULE.summary_transformer
 \end{verbatim}
 
-\paragraph{Full Inter-Procedural Preconditions}
+\subsubsection{Full Inter-Procedural Preconditions}
 
 %%@UserManualDocumentation: preconditions_inter_full
 Option \verb+preconditions_inter_full+ uses the module own precondition
@@ -1748,7 +1815,7 @@ preconditions_inter_full        > MODULE.preconditions
 
 \end{verbatim}
 
-\subsubsection{Interprocedural Summary Precondition}
+\subsection{Interprocedural Summary Precondition}
 \index{Summary Precondition}
 \index{Precondition (Summary)}
 
@@ -1802,7 +1869,7 @@ summary_precondition            > MODULE.summary_precondition
         < MODULE.callers
 \end{verbatim}
 
-\subsubsection{Total Preconditions}
+\subsection{Total Preconditions}
 \label{subsubsection-ototal-preconditions}
 \index{Total Precondition}
 
@@ -1835,7 +1902,7 @@ independent, \verb/transformer_full_inter/ and
 to obtain the best possible results.
 %%!UserManualDocumentation
 
-\paragraph{Menu for Total Preconditions}
+\subsubsection{Menu for Total Preconditions}
 
 \begin{verbatim}
 alias total_preconditions 'Total Preconditions'
@@ -1844,7 +1911,7 @@ alias total_preconditions_intra 'Total Intra-Procedural Analysis'
 alias total_preconditions_inter 'Total Inter-Procedural Analysis'
 \end{verbatim}
 
-\paragraph{Intra-Procedural Total Preconditions}
+\subsubsection{Intra-Procedural Total Preconditions}
 
 %%@UserManualDocumentation: preconditions_intra
 Only build the total preconditions in a module without any interprocedural
@@ -1861,7 +1928,7 @@ total_preconditions_intra            > MODULE.total_preconditions
         < MODULE.code
 \end{verbatim}
 
-\paragraph{Inter-Procedural Total Preconditions}
+\subsubsection{Inter-Procedural Total Preconditions}
 
 %%@UserManualDocumentation: preconditions_inter_fast
 Option \verb+total_preconditions_inter+ uses the module own total postcondition
@@ -1887,7 +1954,7 @@ total_preconditions_inter        > MODULE.total_preconditions
 
 The program postcondition is only used for the main module.
 
-\subsubsection{Summary Total Precondition}
+\subsection{Summary Total Precondition}
 \index{Summary Total Precondition}
 \index{Total Precondition (Summary)}
 
@@ -1903,7 +1970,7 @@ summary_total_precondition            > MODULE.summary_total_precondition
         < CALLERS.total_preconditions
 \end{verbatim}
 
-\subsubsection{Summary Total Postcondition}
+\subsection{Summary Total Postcondition}
 \index{Summary Total Postcondition}
 \index{Total Postcondition (Summary)}
 
@@ -1928,7 +1995,7 @@ summary_total_postcondition            > MODULE.summary_total_postcondition
         < MODULE.callers
 \end{verbatim}
 
-\subsubsection{Final Postcondition}
+\subsection{Final Postcondition}
 \label{subsubsection-final-postcondition}
 \index{Postcondition (Final)}
 \index{Final Postcondition}
@@ -1943,7 +2010,7 @@ e.g. \verb+KMAX==1+, or signs,\verb+KMAX>1+ or relationships
 program_postcondition     > PROGRAM.program_postcondition
 \end{verbatim}
 
-\subsection{Continuation conditions}
+\section{Continuation conditions}
 \label{subsection-continuation-conditions}
 
 Continuation conditions are attached to each statement. They represent the
@@ -1963,7 +2030,7 @@ continuation_conditions > MODULE.must_continuation
         < CALLEES.may_summary_continuation
 \end{verbatim}
 
-\subsection{Complexities}
+\section{Complexities}
 \label{subsection-complexities}
 \index{Complexity}
 
@@ -1991,10 +2058,10 @@ delays evaluation of variable values as long as possible but does not
 really use local states.
 
 The first version of the complexity estimator was designed and
-developed by Pierre berthomier. It was restricted to intra-procedural
+developed by Pierre \textsc{Berthomier}. It was restricted to intra-procedural
 analysis. This first version was enlarged and validated on real code for
 SPARC-2 machines by Lei Z{\sc hou}~\cite{Z94}. Since, it has been modified
-slightly by Fran\c{c}ois I{\sc rigoin}. For simple programs, complexity
+slightly by François I{\sc rigoin}. For simple programs, complexity
 estimation are strongly correlated with execution times. The estimations
 can be used to see if program transformations are beneficial.
 
@@ -2002,7 +2069,7 @@ Known bugs: tests and while loops are not correctly handled because a
 fixed probably of 0.5 is systematically assumed.
 %%!UserManualDocumentation
 
-\subsubsection{Menu for Complexities}
+\subsection{Menu for Complexities}
 
 \begin{verbatim}
 alias complexities      'Complexities'
@@ -2011,7 +2078,7 @@ alias fp_complexities   'FLOPs'
 alias any_complexities  'Any'
 \end{verbatim}
 
-\subsubsection{Uniform Complexities}
+\subsection{Uniform Complexities}
 \label{subsubsection-uniform-complexities}
 \index{Uniform Complexity}
 \index{Complexity (Uniform)}
@@ -2019,7 +2086,7 @@ alias any_complexities  'Any'
 %%@UserManualDocumentation: uniform_complexities
 Complexity estimation is based on a set of basic operations and fixed
 execution times for these basic operation. The choice of the set is
-critical but fixed. Experiments by Lei Zhou showed that it should be
+critical but fixed. Experiments by Lei \textsc{Zhou} showed that it should be
 enlarged. However, the basic times, which also are critical, are
 tabulated. New sets of tables can easily be developed for new
 processors.
@@ -2036,7 +2103,7 @@ uniform_complexities                    > MODULE.complexities
         < CALLEES.summary_complexity
 \end{verbatim}
 
-\subsubsection{Summary Complexity}
+\subsection{Summary Complexity}
 \label{subsubsection-summary-complexity}
 \index{Summary Complexity}
 \index{Complexity (Summary)}
@@ -2052,7 +2119,7 @@ summary_complexity              > MODULE.summary_complexity
         < MODULE.code MODULE.complexities 
 \end{verbatim}
 
-\subsubsection{Floating Point Complexities}
+\subsection{Floating Point Complexities}
 \label{subsubsection-floating-point-complexities}
 \index{Floating Point Complexity}
 \index{Complexity (Floating Point)}
@@ -2082,7 +2149,7 @@ any_complexities                    > MODULE.complexities
         < CALLEES.summary_complexity
 \end{verbatim}
 
-\subsection{Array Regions}
+\section{Array Regions}
 \label{subsection-array-regions}
 \index{Region}
 \index{Array Region}
@@ -2139,12 +2206,12 @@ of the element \verb+A(I,I)+.
 
 
 \verb+MAY+ \verb+READ+ and \verb+WRITE+ region analysis was first designed
-by R\'emi Triolet and then revisited by Fran\c{c}ois Irigoin. The concept of
-region is being revisited by B\'eatrice Creusillet, who added \verb+MUST+,
-\verb+IN+ and \verb+OUT+ regions. Alexis Platonoff implemented the first
+by Rémi \textsc{Triolet} and then revisited by François \textsc{Irigoin}. The concept of
+region is being revisited by Béatrice \textsc{Creusillet}, who added \verb+MUST+,
+\verb+IN+ and \verb+OUT+ regions. Alexis \textsc{Platonoff} implemented the first
 version of region analysis in \PIPS{}. These regions were computed with
-respect to the initial stores of the modules. Fran\c{c}ois Irigoin and,
-mainly, B\'eatrice Creusillet added new functionalities to this first
+respect to the initial stores of the modules. François \textsc{Irigoin} and,
+mainly, Béatrice \textsc{Creusillet} added new functionalities to this first
 version, as well as functions to compute the new kinds of regions.
 
 Internally, regions are of type \texttt{effect} and as such can be used to build
@@ -2163,7 +2230,7 @@ which are merely appended the regions of the expressions passed as argument
 
 %%!UserManualDocumentation
 
-\subsubsection{Menu for Array Regions}
+\subsection{Menu for Array Regions}
 
 \begin{verbatim}
 alias regions 'Array regions'
@@ -2172,7 +2239,7 @@ alias may_regions 'MAY regions'
 alias must_regions 'EXACT or MAY regions'
 \end{verbatim}
 
-\subsubsection{MAY READ/WRITE Regions}
+\subsection{MAY READ/WRITE Regions}
 \label{subsubsection-may-regions}
 \index{MAY Region}
 
@@ -2191,7 +2258,7 @@ may_regions                     > MODULE.regions
         < CALLEES.summary_regions 
 \end{verbatim}
 
-\subsubsection{MUST READ/WRITE Regions}
+\subsection{MUST READ/WRITE Regions}
 \label{subsubsection-must-regions}
 \index{MUST Region}
 
@@ -2210,7 +2277,7 @@ must_regions                    > MODULE.regions
         < CALLEES.summary_regions 
 \end{verbatim}
 
-\subsubsection{Summary READ/WRITE Regions}
+\subsection{Summary READ/WRITE Regions}
 \label{subsubsection-summary-regions}
 \index{Summary Region}
 \index{Region (Summary)}
@@ -2227,7 +2294,7 @@ summary_regions                 > MODULE.summary_regions
         < MODULE.regions   
 \end{verbatim}
 
-\subsubsection{IN Regions}
+\subsection{IN Regions}
 \label{subsubsection-in-regions}
 \index{IN Regions}
 \index{Regions (IN)}
@@ -2235,7 +2302,7 @@ summary_regions                 > MODULE.summary_regions
 \verb+IN+ regions are flow sensitive regions. They are read regions not
 covered (i.e. not previously written) by assignments in the local
 hierarchical control-flow graph. There is no way with the current
-pipsmake-rc and pipsmake to express the fact that \verb+IN+ (and \verb+OUT+)
+pipsmake-rc and \PIPSMAKE{} to express the fact that \verb+IN+ (and \verb+OUT+)
 regions must be calculated using \verb+must_regions+ (a new kind of
 resources, \verb+must_region+, should be added). The user must be
 knowledgeable enough to select \verb+must_regions+ first.
@@ -2255,7 +2322,7 @@ in_regions                      > MODULE.in_regions
         < CALLEES.in_summary_regions
 \end{verbatim}
 
-\subsubsection{IN Summary Regions}
+\subsection{IN Summary Regions}
 \label{subsubsection-in-summary-regions}
 \index{IN Summary Regions}
 \index{Summary Regions (IN)}
@@ -2270,7 +2337,7 @@ in_summary_regions              > MODULE.in_summary_regions
 \end{verbatim}
 
 
-\subsubsection{OUT Summary Regions}
+\subsection{OUT Summary Regions}
 \label{subsubsection-out-summary-regions}
 \index{OUT Summary Regions}
 \index{Summary Regions (OUT)}
@@ -2284,7 +2351,7 @@ out_summary_regions             > MODULE.out_summary_regions
 \end{verbatim}
 
 
-\subsubsection{OUT Regions}
+\subsection{OUT Regions}
 \label{subsubsection-out-regions}
 \index{OUT Regions}
 \index{Regions (OUT)}
@@ -2311,11 +2378,11 @@ out_regions                     > MODULE.out_regions
         < MODULE.out_summary_regions
 \end{verbatim}
 
-\subsection{Alias Analysis}
+\section{Alias Analysis}
 \label{subsection-alias-analysis}
 \index{Alias Analysis}
 
-\subsubsection{Dynamic Aliases}
+\subsection{Dynamic Aliases}
 \label{subsubsection-dynamic-aliases}
 \index{Dynamic Aliases}
 \index{Alias Classes}
@@ -2368,7 +2435,7 @@ alias_classes > MODULE.alias_classes
 \end{verbatim}
 
 
-\subsubsection{Menu for Alias Views}
+\subsection{Menu for Alias Views}
 
 \begin{verbatim}
 alias alias_file 'Alias View'
@@ -2423,7 +2490,7 @@ print_alias_classes > MODULE.alias_file
 \end{verbatim}
 
 
-\subsection{Complementary Sections}
+\section{Complementary Sections}
 \label{subsection-complementary-sections}
 \index{Complementary Sections}
 \index{Array Region}
@@ -2432,9 +2499,10 @@ print_alias_classes > MODULE.alias_file
 alias compsec 'Complementary Sections'
 \end{verbatim}
 
-A new type of array regions, from Manjunathaiah Muniyappa.
+A new type of array regions, from Manjunathaiah \textsc{Muniyappa}.
+\marginpar{Sounds great ! :-)}
 
-\subsubsection{READ/WRITE Complementary Sections}
+\subsection{READ/WRITE Complementary Sections}
 \label{subsubsection-complementary-sections}
 
 %%@UserManualDocumentation complementary_sections
@@ -2450,7 +2518,7 @@ complementary_sections > MODULE.compsec
         < CALLEES.summary_compsec 
 \end{verbatim}
 
-\subsubsection{Summary READ/WRITE Complementary Sections}
+\subsection{Summary READ/WRITE Complementary Sections}
 \label{subsubsection-summary-complementary-sections}
 \index{Summary Complementary Sections}
 \index{Complementary Sections (Summary)}
@@ -2469,12 +2537,12 @@ summary_complementary_sections > MODULE.summary_compsec
 
 
 
-\section{Parallelization and Distribution}
+\chapter{Parallelization and Distribution}
 \label{section-program-transformations-parallelization-distribution}
 \index{Transformation}
 \index{Program Transformation}
 
-\subsection{Code Parallelization}
+\section{Code Parallelization}
 \label{subsection-parallelization}
 \index{Parallelization}
 
@@ -2482,7 +2550,7 @@ summary_complementary_sections > MODULE.summary_compsec
 \PIPS{} basic parallelization function, \verb+rice_all_dependence+,
 produces a new version of the Module code with DOALL loops exhibited using
 A{\sc llen} \& K{\sc ennedy}'s algorithm. The DOALL syntactic construct is
-non-standard but easy to understand and usual in text book like Wolfe 96.
+non-standard but easy to understand and usual in text book like \cite{Wolfe96}.
 As parallel prettyprinter option, it is possible to use Fortran~90 array
 syntax (see Section~\ref{subsection-parallel-printed-files}).
 
@@ -2501,7 +2569,7 @@ after the loop end and because no copy-out scheme is supported.
 
 A better privatization algorithm for all scalar variable may be used as
 a preliminary code transformation. An array privatizer is also available
-(see Section~\ref{subsubsection-scalar-and-array-privatization}). A
+(see Section~\ref{sec:scalar-and-array-privatization}). A
 non-standard {\tt PRIVATE} declaration is used to specify which variables
 should be allocated on stack for each loop iteration. An HPF format can
 also be selected.
@@ -2514,7 +2582,7 @@ re-parse it (although it would be interesting to compute the complexity
 of a parallel code).
 %%!UserManualDocumentation
 
-\subsubsection{Menu for Parallelization Algorithm Selection}
+\subsection{Menu for Parallelization Algorithm Selection}
 
 Entries in menu for the resource \verb/parallelized_code/ and for the
 different parallelization algorithms with may be activated or
@@ -2532,7 +2600,7 @@ alias internalize_parallel_code 'Consider a parallel code as a sequential one'
 \end{verbatim}
 
 
-\subsubsection{Considering a parallel code as a sequential one}
+\subsection{Considering a parallel code as a sequential one}
 \label{sec:cons-parall-code}
 
 For historical reasons, a parallelized program in PIPS is no longer a
@@ -2556,7 +2624,7 @@ parallelization in PIPS such as WP65 or HPFC that generate other resource
 types.
 
 
-\subsubsection{Allen \& Kennedy's Parallelization Algorithm}
+\subsection{Allen \& Kennedy's Parallelization Algorithm}
 \label{subsubsection-allen-kennedy-parallelization-algorithm}
 \index{Parallelization}
 \index{Allen \& Kennedy Algorithm}
@@ -2572,7 +2640,7 @@ rice_all_dependence             > MODULE.parallelized_code
         < MODULE.code MODULE.dg
 \end{verbatim}
 
-\subsubsection{Def-Use Based Parallelization Algorithm}
+\subsection{Def-Use Based Parallelization Algorithm}
 
 %%@UserManualDocumentation: rice_data_dependence
 Several other parallelization functions for shared-memory target
@@ -2580,7 +2648,7 @@ machines are available. Function \verb+rice_data_dependence+ only takes into
 account data flow dependences, a.k.a true dependences. It is of limited
 interest because transitive dependences are computed. It is not
 equivalent at all to performing array and scalar expansion based on direct
-dependence computation (Brandes, Feautrier, Pugh).
+dependence computation (\textsc{Brandes}, \textsc{Feautrier}, \textsc{Pugh}).
 %%!UserManualDocumentation
 
 \begin{verbatim}
@@ -2589,7 +2657,7 @@ rice_data_dependence            > MODULE.parallelized_code
         < MODULE.code MODULE.dg
 \end{verbatim}
 
-\subsubsection{Parallelization and Vectorization for Cray Multiprocessors}
+\subsection{Parallelization and Vectorization for Cray Multiprocessors}
 \index{Cray}
 
 %%@UserManualDocumentation: rice_cray
@@ -2606,7 +2674,7 @@ rice_cray                   > MODULE.parallelized_code
         < MODULE.code MODULE.dg
 \end{verbatim}
 
-\subsubsection{Global Loop Nest Parallelization}
+\subsection{Global Loop Nest Parallelization}
 
 %%@UserManualDocumentation: nest_parallelization
 Function \verb+nest_parallelization+ is an attempt at combining loop
@@ -2621,7 +2689,9 @@ For each loop direction, the amount of spatial and temporal localities
 is estimated. The loop with maximal locality is chosen as innermost
 loop.
 
-This algorithm still is in the development stage. Do not use it!
+This algorithm still is in the development stage. Do not use
+it!\marginpar{Who is working on ? :-/}
+
 %%!UserManualDocumentation
 
 \begin{verbatim}
@@ -2631,7 +2701,11 @@ nest_parallelization                    > MODULE.parallelized_code
 \end{verbatim}
 
 
-\subsubsection{SIMDizer for SIMD multimedia instruction set}
+\subsection{SIMDizer for SIMD multimedia instruction set}
+
+The SAC project aims at generating efficient code for processors with SIMD
+extension instruction set such as VMX, SSE4, etc. For more information,
+see \url{https://info.enstb.org/projets/sac}.
 
 %%@UserManualDocumentation:  simd_atomizer
 Here is yet another atomizer, based on 'new atomizer'. There are only
@@ -2713,7 +2787,7 @@ simdizer                    > MODULE.code
 \end{verbatim}
 
 
-\subsubsection{Coarse Grain Parallelization}
+\subsection{Coarse Grain Parallelization}
 \label{subsubsection-coarse-grain-parallelization}
 
 %%@UserManualDocumentation: coarse_grain_parallelization
@@ -2721,7 +2795,7 @@ Function \verb+coarse_grain_parallelization+ implements a loop parallelization
 algorithm based on array regions. It considers only one loop at a time, its
 body being abstracted by its invariant read and write regions. No loop
 distribution is performed, but any kind of loop body is acceptable
-whereas Allen\&Kennedy algorithm only copes with very simple loop bodies. 
+whereas \textsc{Allen} \& \textsc{Kennedy} algorithm only copes with very simple loop bodies. 
 %%!UserManualDocumentation
 
 \begin{verbatim}
@@ -2731,16 +2805,18 @@ coarse_grain_parallelization > MODULE.parallelized_code
         < MODULE.inv_regions
 \end{verbatim}
 
-\subsection{Code Distribution}
+\section{Code Distribution}
 \label{subsection-code-distribution}
 \index{Distribution}
 \index{Automatic Distribution}
 
-Two automatic code distribution techniques are implemented in \PIPS{} for
+Different automatic code distribution techniques are implemented in \PIPS{} for
 distributed-memory machines. The first one is based on the emulation of
-a shared-memory. The second one is based on HPF.
+a shared-memory. The second one is based on HPF. A third one target
+architectures with hardware coprocessors. Another one is currently
+developed at IT Sud Paris that generate MPI code from OpenMP one.
 
-\subsubsection{Shared-Memory Emulation}
+\subsection{Shared-Memory Emulation}
 \label{subsubsection-shared-memory-emulation}
 \index{Emulated Shared Memory}
 \index{Software Caching}
@@ -2753,17 +2829,17 @@ performs the computations, while the other one, \verb+wp65_bank_file+,
 emulates a shared memory.
 
 This rule does not have data structure outputs, as the two new program
-generated have computed names. This does not fit the {\em pipsmake} framework
+generated have computed names. This does not fit the \PIPSMAKE{} framework
 too well, but is OK as long as nobody wishes to apply \PIPS{} on the
 generated code, e.g. to propagate constant or eliminate dead code.
 
 Note that use-use dependencies are used to allocate temporary arrays in
 local memory (i.e. in the software cache).
 
-This compilation scheme was designed by Corinne Ancourt and Fran\c{c}ois
-Irigoin. It uses theoretical results in~\cite{AI91}. Its input is a very
+This compilation scheme was designed by Corinne \textsc{Ancourt} and François
+\textsc{Irigoin}. It uses theoretical results in~\cite{AI91}. Its input is a very
 small subset of Fortran program (e.g. procedure calls are not supported).
-It was implemented by the designers, with help from Lei Zhou.
+It was implemented by the designers, with help from Lei \textsc{Zhou}.
 
 \begin{verbatim}
 alias wp65_compute_file 'Distributed View'
@@ -2780,18 +2856,19 @@ wp65                            > MODULE.wp65_compute_file
 
 \end{verbatim}
 
-\subsubsection{HPF Compiler}
+\subsection{HPF Compiler}
 \label{subsubsection-hpf-compiler}
 \index{HPF}
 \index{HPFC}
 
-The \HPFcompiler{} is a project by itself, developed by Fabien Coelho in
-\PIPS{} framework.
+The \HPFcompiler{} is a project by itself, developed by Fabien
+\textsc{Coelho} in the \PIPS{} framework.
 
-A whole set of rules is used by the \PIPS{} \HPFcompiler{}, \HPFC{}. 
-By the way, the whole compiler is just a big hack. {\em Fabien Coelho}.
+A whole set of rules is used by the \PIPS{} \HPFcompiler{}, \HPFC{}.  By
+the way, the whole compiler is just a big hack according to Fabien
+\textsc{Coelho}.
 
-\paragraph{HPFC Filter}
+\subsubsection{HPFC Filter}
 
 The first rule is used to apply a shell to put HPF-directives in an f77 parsable form.
 Some shell script based on sed is used. The \verb+hpfc_parser+ must be
@@ -2803,7 +2880,7 @@ hpfc_filter             > MODULE.hpfc_filtered_file
     < MODULE.source_file
 \end{verbatim}
 
-\paragraph{HPFC Initialization}
+\subsubsection{HPFC Initialization}
 
 The second HPFC rule is used to initialize the hpfc status and other data
 structures global to the compiler. The HPF compiler
@@ -2817,7 +2894,7 @@ hpfc_init              > PROGRAM.entities
     < PROGRAM.entities
 \end{verbatim}
 
-\paragraph{HPF Directive removal}
+\subsubsection{HPF Directive removal}
 
 This phase removes the directives (some special calls) from the code.
 The remappings (implicit or explicit) are also managed at this level,
@@ -2854,12 +2931,12 @@ hpfc_dynamic_directives         > MODULE.code
     < MODULE.proper_effects
 \end{verbatim}
 
-\paragraph{HPFC actual compilation}
+\subsubsection{HPFC actual compilation}
 
 This rule launches the actual compilation. Four files are generated:
 
 \begin{enumerate}
-\item  the host code that mainly deal with I/Os, 
+\item  the host code that mainly deals with I/Os, 
 \item the SPMD node code, 
 \item and some initialization stuff for the runtime (2 files).
 \end{enumerate}
@@ -2885,12 +2962,12 @@ hpfc_compile           > MODULE.hpfc_host
     < CALLEES.hpfc_host
 \end{verbatim}
 
-\paragraph{HPFC completion}
+\subsubsection{HPFC completion}
 
 This rule deals with the compiler closing. It must deal with commons. The
 hpfc parser selection is put here. Maybe not a very good idea? (FC:
 explain! why not in \verb/hpfc_init/?) I guess
-nobody should have to require intermediate targets such as ???. Ya!
+nobody should have to require intermediate targets such as ???. Ya!\marginpar{hmmm}
 
 \begin{verbatim}
 hpfc_close             > PROGRAM.hpfc_commons
@@ -2903,7 +2980,7 @@ hpfc_close             > PROGRAM.hpfc_commons
     < MAIN.hpfc_host
 \end{verbatim}
 
-\paragraph{HPFC install}
+\subsubsection{HPFC install}
 
 This rule performs the installation of HPFC generated files in a separate
 directory. This rule is added to make hpfc usable from wpips and epips. I
@@ -2920,7 +2997,14 @@ hpfc_run
 
 \end{verbatim}
 
-\subsubsection{PHRASE: high-level language transformation for partial evaluation in reconfigurable logic}
+
+\subsection{STEP: MPI code generation from OpenMP programs}
+\label{sec:step:-mpi-code}
+
+\marginpar{IT SudParis : include your work here}
+
+
+\subsection{PHRASE: high-level language transformation for partial evaluation in reconfigurable logic}
 \label{subsubsection-phrase-code-distribution}
 \index{Code Distribution}
 \index{PHRASE}
@@ -2935,7 +3019,7 @@ them. Those portions of code are intented, after transformations, to
 be executed in reconfigurable logic (in PHRASE projects, reconfigurable 
 logic is synthetized with smalltalk code).
 
-\paragraph{Phrase Distributor Initialisation}
+\subsubsection{Phrase Distributor Initialisation}
 \index{Phrase Distributor Initialisation}
 
 %%@UserManualDocumentation:  phrase_distributor_init
@@ -2953,7 +3037,7 @@ phrase_distributor_init                  > MODULE.code
 \end{verbatim}
 
 
-\paragraph{Phrase Distributor}
+\subsubsection{Phrase Distributor}
 \index{Phrase Distributor}
 
 %%@UserManualDocumentation:  phrase_distributor
@@ -2975,7 +3059,7 @@ phrase_distributor                       > MODULE.code
         < MODULE.dg
 \end{verbatim}
 
-\paragraph{Phrase Distributor Control Code}
+\subsubsection{Phrase Distributor Control Code}
 \index{Phrase Distributor Control Code}
 
 %%@UserManualDocumentation:  phrase_distributor_control_code
@@ -2995,7 +3079,14 @@ phrase_distributor_control_code          > MODULE.code
         < MODULE.dg
 \end{verbatim}
 
-\section{Program Transformations}
+
+\subsection{CoMap: code generation for accelerators with DMA}
+\label{sec:comap:-code}
+
+\marginpar{Ronan : include Mathieu Godet's work}
+
+
+\chapter{Program Transformations}
 \label{section-program-transformations}
 \index{Transformation}
 \index{Program Transformation}
@@ -3022,7 +3113,7 @@ resource. Since the first rule producing code, described in this file,
 is \verb+controlizer+ and since it is the only non-cyclic rule, the
 internal representation always is initialized with it.
 
-As program transformations produce nothing else, pipsmake cannot guess
+As program transformations produce nothing else, \PIPSMAKE{} cannot guess
 when to apply these rules automatically. This is exactly what the user
 want most of the time: program transformations are under explicit
 control by the user. Transformations are applied when the user pushes
@@ -3033,18 +3124,18 @@ user interfaces.
 
 Unfortunately, it is sometime nice to be able to chain several
 transformations without any user interaction. No general macro mechanism is
-available in pipsmake, but it is possible to impose some program
+available in \PIPSMAKE, but it is possible to impose some program
 transformations with the '!' command.
 
 User inputs are not well-integrated although a \verb+user_query+ rule
 and a \verb+string+ resource could easily be added. User interaction
-with a phase are performed directly without notifying {\em pipsmake} to be
+with a phase are performed directly without notifying \PIPSMAKE{} to be
 more flexible and to allow dialogues between a transformation and the user.
 %%!UserManualDocumentation
 
-\subsection{Loop Transformations}
+\section{Loop Transformations}
 
-\subsubsection{Loop Distribution}
+\subsection{Loop Distribution}
 \label{subsection-loop-distribution}
 \index{Loop Distribution}
 
@@ -3068,23 +3159,23 @@ distributer                    > MODULE.code
         < MODULE.dg
 \end{verbatim}
 
-\subsubsection{Loop Unrolling}
+\subsection{Loop Unrolling}
 \label{subsection-loop-unrolling}
 \index{Loop Unrolling}
 
-\paragraph{Regular Loop Unroll}
+\subsubsection{Regular Loop Unroll}
 
 %%@UserManualDocumentation: unroll
 Unroll requests a loop label and an unrolling factor from the user.
 Then it unrolls the specified loop as specified. The transformation is
-very general, and it is interesting to run \verb+partial_eval+ and
+very general, and it is interesting to run \verb+partial_eval+,
 \verb+suppress_dead_code+ and \verb+use_def_elimination+ after this
 transformation.
 
 Labels in the body are deleted. To unroll nested loops, start with the
 innermost loop.
 
-This transformation always is legal.
+This transformation is always legal.
 %%!UserManualDocumentation
 
 \begin{verbatim}
@@ -3094,7 +3185,7 @@ unroll                          > MODULE.code
         < MODULE.code
 \end{verbatim}
 
-\paragraph{Full Loop Unroll}
+\subsubsection{Full Loop Unroll}
 
 %%@UserManualDocumentation: full_unroll
 A loop can also be fully unrolled if the range is numerically known.
@@ -3103,7 +3194,7 @@ A loop can also be fully unrolled if the range is numerically known.
 This is only useful for small loop ranges.
 
 Unrolling can be interactively applied and the user is requested a loop
-label. Or pragma can be inserted as comments for loops to be unrolled.
+label:
 %%!UserManualDocumentation
 
 \begin{verbatim}
@@ -3112,15 +3203,18 @@ full_unroll                          > MODULE.code
         < PROGRAM.entities
         < MODULE.code
 \end{verbatim}
-
+Or directives can be inserted as comments for loops to be unrolled with:
 \begin{verbatim}
 alias full_unroll_pragma 'Full Loop Unroll (Pragma)'
 full_unroll_pragma                   > MODULE.code
         < PROGRAM.entities
         < MODULE.code
 \end{verbatim}
+The directive is a comment containing the string \texttt{Cxxx} just before
+a loop to fully unroll (it is reserved to Fortran right now and should be
+generalized).
 
-\subsubsection{Strip-mining}
+\subsection{Strip-mining}
 \label{subsection-strip-mining}
 \index{Strip-Mining}
 
@@ -3137,7 +3231,7 @@ strip_mine                          > MODULE.code
         < MODULE.code
 \end{verbatim}
 
-\subsubsection{Loop Interchange}
+\subsection{Loop Interchange}
 \label{subsection-loop-interchange}
 \index{Loop Interchange}
 \index{General Loop Interchange}
@@ -3157,7 +3251,7 @@ loop_interchange                            > MODULE.code
         < MODULE.code
 \end{verbatim}
 
-\subsubsection{Hyperplane Method}
+\subsection{Hyperplane Method}
 \label{subsection-hyperplane-method}
 \index{Hyperplane Method}
 
@@ -3176,7 +3270,7 @@ loop_hyperplane                            > MODULE.code
         < MODULE.code
 \end{verbatim}
 
-\subsubsection{Loop Nest Tiling}
+\subsection{Loop Nest Tiling}
 \label{subsection-loop-nest-tiling}
 \index{Tiling}
 
@@ -3199,8 +3293,9 @@ matrix must be numerically known, it is not possible to generate a block
 distribution unless all loop bounds are numerically known. It is assumed
 that the loop nest is fully parallel.
 
-Jingling Xue published an advanced code generation algorithm for tiling in
-Parallel Processing Letters (http://cs.une.edu.au/~xue/pub.html).
+Jingling \textsc{Xue} published an advanced code generation algorithm for
+tiling in Parallel Processing Letters
+(\url{http://cs.une.edu.au/~xue/pub.html}).
 %%!UserManualDocumentation
 
 \begin{verbatim}
@@ -3210,7 +3305,7 @@ loop_tiling                            > MODULE.code
         < MODULE.code
 \end{verbatim}
 
-\subsubsection{Loop Normalize}
+\subsection{Loop Normalize}
 \label{subsection-loop-normalize}
 \index{Loop Normalize}
 
@@ -3254,10 +3349,11 @@ assigns it to its value function of the new index and the second one
 % \end{verbatim}
 
 
-\subsubsection{Guard Elimination and Loop Transformations}
+\subsection{Guard Elimination and Loop Transformations}
 \label{subsection-guard-elimination}
 
-Youcef Bouchebaba's implementation of unimodular loop transformations\ldots
+Youcef \textsc{Bouchebaba}'s implementation of unimodular loop
+transformations\ldots
 
 \begin{verbatim}
 guard_elimination       > MODULE.code
@@ -3265,14 +3361,15 @@ guard_elimination       > MODULE.code
         < MODULE.code
 \end{verbatim}
 
-\subsubsection{Tiling for sequences of loop nests }
+\subsection{Tiling for sequences of loop nests }
 \label{subsection-tiling-for-sequences-loop-ness}
 
 %%@UserManualDocumentation: tiling_sequence
 Tiling for sequences of loop nests
 %%!UserManualDocumentation
 
-Youcef Bouchebaba's implementation of Tiling for sequences of loop nests  \ldots
+Youcef \textsc{Bouchebaba}'s implementation of tiling for sequences of
+loop nests \ldots
   
 \begin{verbatim}
 alias tiling_sequence 'Tiling sequence of loop nests'
@@ -3288,9 +3385,9 @@ tiling_sequence      > MODULE.code
 
 %-----------End of Loop Transformations -------------------------
 
-\subsection{Redundancy Elimination}
+\section{Redundancy Elimination}
 
-\subsubsection{Invariant Code Motion}
+\subsection{Invariant Code Motion}
 \label{subsection-invariant_code_motion}
 
 
@@ -3305,7 +3402,7 @@ invariant_code_motion             > MODULE.code
         < MODULE.code MODULE.dg
 \end{verbatim}
 
-\subsubsection{Partial Redundancy Elimination}
+\subsection{Partial Redundancy Elimination}
 \label{subsection-partial_redundancy_elimination}
 
 
@@ -3317,7 +3414,7 @@ partial redundancy elimination transformation for logical
 expressions such as bound checks by using informations given by
 precondition analyses.
 
-This transformation is implemented by NGUYEN Thi Viet Nga.
+This transformation is implemented by Thi Viet Nga \textsc{Nguyen}.
 %%!UserManualDocumentation
 
 \begin{verbatim}
@@ -3332,10 +3429,10 @@ partial_redundancy_elimination             > MODULE.code
 
 %-----------End of Redundancy Elimination -------------------------
 
-\subsection{Control-flow Optimizations}
+\section{Control-flow Optimizations}
 
-\subsubsection{Dead Code Elimination}
-\label{subsection-dead-code-elimination}
+\subsection{Dead Code Elimination}
+\label{sec:dead-code-elimination}
 \index{Dead Code Elimination}
 \index{Unreachable Code Elimination}
 \index{If Simplification}
@@ -3372,9 +3469,9 @@ and Unreachable-code elimination. {\em Unreachable code} is code that
 cannot possibly be executed, regardless of the input data. {\em Dead code}
 elimination removes code that is executable but that has no effect on the
 result of the computation being performed (see Section $18.1$ and Section
-$18.10$ of~\cite{Much97} ). So \verb+suppress_dead_code+ in PIPS is in
+$18.10$ of~\cite{Much97}). So \verb+suppress_dead_code+ in PIPS is in
 fact unreachable code elimination. Dead code elimination is performed by
-phase \verb|use_def_elimination| (see Section~\ref{Use-Def Elimination}).
+phase \verb|use_def_elimination| (see Section~\ref{sec:use-def-elimination}).
 
 The \verb+suppress_dead_code+ phase also performs some {\em If
   Simplifications} and {\em Loop Simplifications}~\cite{Much97}.
@@ -3394,8 +3491,8 @@ suppress_dead_code          > MODULE.code
         < MODULE.preconditions
 \end{verbatim}
 
-\subsubsection{Use-Def Elimination}
-\label{subsection-use-def-elimination}
+\subsection{Use-Def Elimination}
+\label{sec:use-def-elimination}
 \index{Use-Def Elimination}
 
 %%@UserManualDocumentation: use_def_elimination
@@ -3414,13 +3511,13 @@ update a formal parameter although this formal parameter is no longer used
 by the callers.
 
 The dependence graph may be used instead of the use-def chains, but
-Ronan Keryell, designer and implementer, did not produce convincing
+Ronan \textsc{Keryell}, designer and implementer, did not produce convincing
 evidence of the benefit... The drawback is the additional CPU time
 required.
 
 Known bug: FORMAT are found useless and eliminated.
 
-Comments from Nga Nguyen : According to~\cite{Aho86} p. 595,  and~\cite{Much97} p. 592, a
+Comments from Nga \textsc{Nguyen} : According to~\cite{Aho86} p. 595,  and~\cite{Much97} p. 592, a
 variable is {\it dead} if it is not used on any path from the location in
 the code where it is defined to the exit point of the routine in the
 question ; an instruction is {\it dead} if it computes only values that
@@ -3440,23 +3537,23 @@ use_def_elimination          > MODULE.code
         < MODULE.chains
 \end{verbatim}
 
-\subsubsection{Control Restructurers}
-\label{subsection-unspaghettify}
-\index{Unspaghettify}
+\subsection{Control Restructurers}
 \index{Restructurer}
 \index{Control Restructurer}
 
 Two control restructurers are available: \verb/unspaghettify/ which is
 used by default in conjunction with \verb/controlizer/ and
 \verb/restructurer/ which must be explicitly applied\footnote{A property
-  can be used to force the call to \texttt{restructurer} by
-  \texttt{Controlizer}.}
+  can be used to force the call to \texttt{restructurer} by the
+  \texttt{controlizer}.}
 
-\paragraph{Unspaghettify}
+\subsubsection{Unspaghettify}
+\label{sec:unspaghettify}
+\index{Unspaghettify}
 
 %%@UserManualDocumentation: unspaghettify
 The \texttt{unspaghettifier} is a heuristic to clean up and to simplify
-the control graphs of a module. It was developed by Ronan Keryell. It
+the control graphs of a module. It
 is useful because the controlizer (see
 Section~\ref{subsection-controlized-code}) or some transformation phases
 can generate some {\em spaghetti} code with a lot of useless
@@ -3466,22 +3563,18 @@ elimination, for example, uses \texttt{unspaghettify}.
 This control restructuring transformation can be automatically applied
 in the \texttt{controlizer} phase (see
 Section~\ref{subsection-controlized-code}) if the
-\begin{center}
 \verb|UNSPAGHETTIFY_IN_CONTROLIZER| 
-\end{center}
 property is true.
 
 To add flexibility, the behavior of \texttt{unspaghettifier} is
 controlled by the properties 
-\begin{center}
 \verb|UNSPAGHETTIFY_TEST_RESTRUCTURING|
 and \verb|UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION|
-\end{center}
 to allow more
 restructuring from \verb|restructure_control| to be added in the
 \texttt{controlizer} for example.
 
-This function was designed and implemented by Ronan K{\sc eryell}.
+This function was designed and implemented by Ronan \textsc{Keryell}.
 %%!UserManualDocumentation
 %% Control Graph Restructuring
 \begin{verbatim}
@@ -3494,12 +3587,12 @@ unspaghettify          > MODULE.code
         < MODULE.code
 \end{verbatim}
 
-\paragraph{Spaghettify}
+\subsubsection{Spaghettify}
 \label{paragraph-spaghettify}
 
 %%@UserManualDocumentation: spaghettify
-The \texttt{spaghettifier} is used in context of PHRASE project while
-creating "Finite State Machine"-like code portions in order to synthetise
+The \texttt{spaghettifier} is used in the context of the PHRASE project while
+creating "Finite State Machine"-like code portions in order to synthesize
 them in reconfigurables units.
 
 This phases transforms structured code portions (eg. loops) in
@@ -3529,7 +3622,7 @@ spaghettify          > MODULE.code
         < MODULE.code
 \end{verbatim}
 
-\paragraph{Full Spaghettify}
+\subsubsection{Full Spaghettify}
 \label{paragraph-full-spaghettify}
 
 %%@UserManualDocumentation: full_spaghettify
@@ -3559,7 +3652,7 @@ full_spaghettify          > MODULE.code
         < MODULE.code
 \end{verbatim}
 
-\paragraph{Restructure Control}
+\subsubsection{Restructure Control}
 
 %%@UserManualDocumentation: restructure_control
 \verb|restructure_control| is a more complete restructuring phase that
@@ -3585,7 +3678,7 @@ restructure_control          > MODULE.code
         < MODULE.code
 \end{verbatim}
 
-\subsubsection{Control Structure Normalisation (STF)}
+\subsection{Control Structure Normalisation (STF)}
 \label{subsection-control-structure-normalization-stf}
 \index{STF}
 \index{Control Restructurer}
@@ -3604,7 +3697,7 @@ applied before \texttt{stf} are lost. This should be changed in the near
 future.
 
 This transformation is now assumed redundant with respect to the native
-PIPS control restucturers.
+PIPS control restructurers that deal with other languages too.
 %%!UserManualDocumentation
 
 \begin{verbatim}
@@ -3613,7 +3706,7 @@ stf                      > MODULE.source_file
         < MODULE.source_file
 \end{verbatim}
 
-\subsubsection{Trivial Test Elimination}
+\subsection{Trivial Test Elimination}
 \label{subsection-trivial-test-elimination}
 \index{Trivial Test Elimination}
 
@@ -3623,7 +3716,7 @@ trivial test instruction. After apply \verb+suppress_trivial_test+, the conditio
 new test instruction is the condition correspondent to the branch FALSE of
 the test initial.
 
-This function was designed and implemented by Trinh Quoc Anh.
+This function was designed and implemented by Trinh Quoc \textsc{Anh}.
 %%!UserManualDocumentation
 
 \begin{verbatim}
@@ -3633,7 +3726,7 @@ suppress_trivial_test          > MODULE.code
         < MODULE.code
 \end{verbatim}
 
-\subsubsection{Finite State Machine Generation}
+\subsection{Finite State Machine Generation}
 \label{subsection-fsm-generation}
 \index{Finite State Machine Generation}
 \index{PHRASE}
@@ -3646,9 +3739,9 @@ logic (such as FPGAs or DataPaths).
 
 This library provides phases allowing to build and modify "Finite State
 Machine"-like code portions which will be later synthetized in
-reconfigurable units.
+reconfigurable units. This was implemented by Sylvain \textsc{Guérin}.
 
-\paragraph{FSM Generation}
+\subsubsection{FSM Generation}
 \label{paragraph-fsm-generation}
 
 %%@UserManualDocumentation: fsm_generation
@@ -3657,7 +3750,7 @@ This phase tries to generate finite state machine from arbitrary code by
 applying rules numeroting branches of the syntax tree and using it as
 state variable for the finite state machine.
 
-This phase recursively transform each UNSTRUCTURED statement in a
+This phase recursively transforms each UNSTRUCTURED statement in a
 WHILE-LOOP statement controlled by a state variable, whose different
 values are associated to the different statements.
 
@@ -3666,7 +3759,7 @@ controlled by the property
 \begin{center}
 \verb|FSMIZE_WITH_GLOBAL_VARIABLE|
 \end{center}
-which control the fact that the same global variable (global to the
+which controls the fact that the same global variable (global to the
 current module) must be used for each FSMized statements.
 
 %%!UserManualDocumentation
@@ -3680,7 +3773,7 @@ fsm_generation        > MODULE.code
         < MODULE.code
 \end{verbatim}
 
-\paragraph{Full FSM Generation}
+\subsubsection{Full FSM Generation}
 \label{paragraph-full-fsm-generation}
 
 %%@UserManualDocumentation: full_fsm_generation
@@ -3694,8 +3787,8 @@ WHILE-LOOP statement controlled by a state variable, whose different
 values are associated to the different statements.
 
 In fact, this phase is the succession of the 2 phases
-\texttt{FULL\_SPAGHETTIFY}\ref{paragraph-full-spaghettify} and
-\texttt{FSM\_GENERATION}\ref{paragraph-fsm-generation}
+\texttt{FULL\_SPAGHETTIFY} (\S~ref{paragraph-full-spaghettify}) and
+\texttt{FSM\_GENERATION} (\S~\ref{paragraph-fsm-generation})
 
 
 %%!UserManualDocumentation
@@ -3711,7 +3804,7 @@ full_fsm_generation   > MODULE.code
         < MODULE.code
 \end{verbatim}
 
-\paragraph{FSM Split State}
+\subsubsection{FSM Split State}
 \label{paragraph-fsm-split-state}
 
 %%@UserManualDocumentation: fsm_split_state
@@ -3723,7 +3816,7 @@ state variable for the finite state machine.
 This phase transform a state of a FSM-like statement and split it into n
 new states where the portion of code to execute is smaller.
 
-NB: Phase \texttt{FULL\_SPAGHETTIFY}\ref{paragraph-full-spaghettify}
+NB: Phase \texttt{FULL\_SPAGHETTIFY} (\S~\ref{paragraph-full-spaghettify})
 must have been applied first !
 
 %%!UserManualDocumentation
@@ -3736,7 +3829,7 @@ fsm_split_state    > MODULE.code
         < MODULE.code
 \end{verbatim}
 
-\paragraph{FSM Merge States}
+\subsubsection{FSM Merge States}
 \label{paragraph-fsm-merge-states}
 
 %%@UserManualDocumentation: fsm_merge_states
@@ -3748,7 +3841,7 @@ state variable for the finite state machine.
 This phase transform 2 or more states of a FSM-like statement and merge
 them into a new state where the portion of code to execute is bigger.
 
-NB: Phase \texttt{FULL\_SPAGHETTIFY}\ref{paragraph-full-spaghettify}
+NB: Phase \texttt{FULL\_SPAGHETTIFY} (\S~\ref{paragraph-full-spaghettify})
 must have been applied first !
 
 %%!UserManualDocumentation
@@ -3762,7 +3855,7 @@ fsm_merge_states    > MODULE.code
 \end{verbatim}
 
 
-%\subsubsection{Declaration Common Addition}
+%\subsection{Declaration Common Addition}
 %\label{subsection-declaration-common-addition}
 %\index{Declaration Common Addition}%
 
@@ -3785,9 +3878,9 @@ fsm_merge_states    > MODULE.code
 %-----------End of Control-flow Optimizations -------------------------
 
 
-\subsection{Expression Transformations}
+\section{Expression Transformations}
 
-\subsubsection{Atomizers}
+\subsection{Atomizers}
 \label{subsection-atomizers}
 \index{Atomizer}
 \index{Three-Address Code}
@@ -3804,7 +3897,7 @@ distribution phases. For instance, indirect addressing like
 \verb/A(B(I)) = .../ is replaced by \verb/T=B(I);A(T) = .../.
 %%!UserManualDocumentation
 
-\paragraph{General Atomizer}
+\subsubsection{General Atomizer}
 
 \begin{verbatim}
 alias atomizer 'Atomizer'
@@ -3815,7 +3908,7 @@ atomizer                      > MODULE.code
         < MODULE.dg
 \end{verbatim}
 
-\paragraph{Limited Atomizer}
+\subsubsection{Limited Atomizer}
 
 %%@UserManualDocumentation:  new_atomizer
 Here is a new version of the atomizer using a small atomizer from
@@ -3831,8 +3924,8 @@ new_atomizer                      > MODULE.code
 An atomizer is also used by WP65 (see
 Section~\ref{subsubsection-shared-memory-emulation})
 
-\subsubsection{Partial Evaluation}
-\label{subsection-partial-evaluation}
+\subsection{Partial Evaluation}
+\label{sec:partial-evaluation}
 \index{Partial Evaluation}
 
 %%@UserManualDocumentation: partial_eval
@@ -3857,7 +3950,7 @@ more than one partial evaluation in a row, because the first partial
 evaluation may linearize some initially non-linear expressions. Perfect
 Club benchmark {\tt ocean} is a case in point.
 
-Comments from Nga Nguyen: According to~\cite{Aho86} and~\cite{Much97}, the
+Comments from Nga \textsc{Nguyen}: According to~\cite{Aho86} and~\cite{Much97}, the
 name of this optimization should be Constant-Expression Evaluation or
 Constant Folding for integer values. This transformation produces well
 error message at compile time indicating potential error such as division
@@ -3874,21 +3967,21 @@ partial_eval                    > MODULE.code
         < MODULE.preconditions
 \end{verbatim}
 
-This function was implemented initially by Bruno Baron.
+This function was implemented initially by Bruno \textsc{Baron}.
 
-\subsubsection{Reduction Detection}
+\subsection{Reduction Detection}
 \label{subsection-reduction-detection}
 \index{Reduction Detection}
 
 Phase \texttt{Reductions} detects generalized instructions and replaces
 them by calls to a run-time library supporting parallel reductions. It was
-developed by Pierre Jouvelot in CommonLISP, as a prototype, to show than
+developed by Pierre \textsc{Jouvelot} in CommonLISP, as a prototype, to show than
 NewGen data structures were language-neutral. Thus it by-passes some of 
-{\em pipsmake/dbm} facilities.
+\PIPSMAKE/dbm facilities.
 
 This phase is now obsolete, although reduction detection is critical for
 code restructuring and optimization... A new reduction detection phase was
-implemented by Fabien Coelho. It does not include a code transformation.
+implemented by Fabien \textsc{Coelho}. It does not include a code transformation.
 Its result could be prettyprinted in an HPF style (FC: implementation?).
 
 \begin{verbatim}
@@ -3898,7 +3991,7 @@ old_reductions                      > MODULE.code
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{Forward Substitution}
+\subsection{Forward Substitution}
 
 Scalars can be forward substitute. The effect is to undo already performed
 optimizations such as invariant code motion and common subexpressions, or
@@ -3915,11 +4008,11 @@ forward_substitute      > MODULE.code
 \end{verbatim}
 
 
-\subsubsection{Expression Optimizations}
+\subsection{Expression Optimizations}
 \label{subsection-expression-optimizations}
 
 %%@UserManualDocumentation: optimize_expressions
-This is an experimental section developped by Julien Zory as PhD work.
+This is an experimental section developped by Julien \textsc{Zory} as PhD work.
 This phase aims at optimizing expression evaluation using algebraic
 properties such as associativity, commutativity, neutral elements and so
 forth.
@@ -3965,9 +4058,9 @@ instruction_selection > MODULE.code
 
 %-----------End of Expression Transformations -------------------------
 
-\subsection{Declaration Transformations}
+\section{Declaration Transformations}
 
-\subsubsection{Declarations cleaning}
+\subsection{Declarations cleaning}
 
 Clean the declarations of unused variables and commons and so.
 It is not really a code transformation, since only the module entity is
@@ -3986,7 +4079,7 @@ clean_declarations      > MODULE.code
         < MODULE.code
 \end{verbatim}
 
-\subsubsection{Array Resizing}
+\subsection{Array Resizing}
 \label{subsubsection-array-resizing}
 
 One problem of Fortran code is the unnormalized array bound
@@ -4012,7 +4105,7 @@ logfile, you have to use the script
 \$PIPS\_ROOT/Src/Script/misc/array\_resizing\_instrumentation.pl to replace the unnormalized
 declarations and add new assignments in the source code. 
 
-\paragraph{ Top Down Array Resizing}
+\subsubsection{ Top Down Array Resizing}
 %%@UserManualDocumentation: array_resizing_top_down
 
 The  method uses the relationship between actual and formal arguments from parameter-passing
@@ -4020,7 +4113,7 @@ rules. New array declarations in the called procedure are
 computed with respect to the declarations in the calling procedures. 
 It is  faster than the first one because array regions are not needed. 
 
-This phase is implemented by NGUYEN Thi Viet Nga.
+This phase is implemented by Thi Viet Nga \textsc{Nguyen}.
 %%!UserManualDocumentation
 
 \begin{verbatim}
@@ -4033,7 +4126,7 @@ array_resizing_top_down         > MODULE.new_declarations
         < CALLERS.preconditions
 \end{verbatim}
 
-\paragraph{Bottom Up Array Resizing}
+\subsubsection{Bottom Up Array Resizing}
 
 %%@UserManualDocumentation: array_resizing_bottom_up
 
@@ -4041,10 +4134,10 @@ The approach is based on an array region analysis that gives
   information about the set of array elements accessed during the
   execution of code. The regions READ and WRITE of each
 array in each module are merged and a new value for the upper bound of the last
-dimension is calculated and then it will replace the 1 or *. 
+dimension is calculated and then it will replace the 1 or *.
 
-This function is firstly implemented by Trinh Quoc Anh, and ameliorated by
-Corinne Ancourt, Nguyen Thi Viet Nga.
+This function is firstly implemented by Trinh Quoc \textsc{Anh}, and
+ameliorated by Corinne \textsc{Ancourt}, Thi Viet Nga \textsc{Nguyen}.
 %%!UserManualDocumentation
 
 \begin{verbatim}
@@ -4056,7 +4149,7 @@ array_resizing_bottom_up         > MODULE.code
         < MODULE.regions
 \end{verbatim}
 
-\paragraph{Array Resizing Statistic }
+\subsubsection{Array Resizing Statistic}
 
 We provide here a tool to calculate the number of pointer-type A(,1) and
 assumed-size A(,*) array declarators as well as other information.
@@ -4064,13 +4157,13 @@ assumed-size A(,*) array declarators as well as other information.
 \begin{verbatim}
 alias array_resizing_statistic 'Array Resizing Statistic'
 array_resizing_statistic   > MODULE.code
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code
 \end{verbatim}
 
 %-----------End of Declaration Transformations -------------------------
 
-\subsection{Array Bound Checking}
+\section{Array Bound Checking}
 \label{subsection-array-bound-checking}
 
 Array bound checking refers to determining whether all array references
@@ -4080,7 +4173,7 @@ interprocedurally, depending on the need for accuracy.
 
 There are two versions of intraprocedural array bounds checking: 
 
-\subsubsection{Elimination of Redundant Tests}
+\subsection{Elimination of Redundant Tests}
 \label{subsection-array-bound-check_bottom_up}
 
 %%@UserManualDocumentation: array_bound_check_bottom_up 
@@ -4109,7 +4202,7 @@ array_bound_check_bottom_up            > MODULE.code
 \end{verbatim}
 
 
-\subsubsection{Insertion of Unavoidable Tests}
+\subsection{Insertion of Unavoidable Tests}
 \label{subsection-array-bound-check_top_down}
 
 %%@UserManualDocumentation: array_bound_check_top_down
@@ -4151,11 +4244,11 @@ array_bound_check_top_down   > MODULE.code
         < MODULE.regions
 \end{verbatim}
 
-\subsubsection{Interprocedural Array Bound Checking}
+\subsection{Interprocedural Array Bound Checking}
 \label{subsection-array-bound-check_interprocedural}
 
 %%@UserManualDocumentation: array_bound_check_interprocedural
-This phase checks for out of bound error when passing arrays or array
+This phase checks for out of bound errors when passing arrays or array
 elements as arguments in procedure call. It ensures that there is no bound
 violation in every array access in the callee procedure, with respect to
 the array declarations in the caller procedure.
@@ -4164,12 +4257,12 @@ the array declarations in the caller procedure.
 \begin{verbatim}
 alias array_bound_check_interprocedural 'Interprocedural Array Bound Checking'
 array_bound_check_interprocedural             > MODULE.code
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code
         < MODULE.preconditions
 \end{verbatim}
 
-\subsubsection{Array Bound Checking Instrumentation }
+\subsection{Array Bound Checking Instrumentation}
 \label{subsection-array-bound-check_instrumentation}
 
 %%@UserManualDocumentation: array_bound_check_instrumentation
@@ -4177,20 +4270,20 @@ array_bound_check_interprocedural             > MODULE.code
 We provide here a tool to calculate the number of dynamic bound checks
 from both initial and PIPS generated code.
 
-These transformations are implemented by NGUYEN Thi Viet Nga.
+These transformations are implemented by Thi Viet Nga \textsc{Nguyen}.
 %%!UserManualDocumentation
 
 \begin{verbatim}
 alias array_bound_check_instrumentation 'Array Bound Checking Instrumentation'
 array_bound_check_instrumentation > MODULE.code
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code
 \end{verbatim}
 
-\subsection{Alias Verification}
+\section{Alias Verification}
 \label{subsection-alias-verification}
 
-\subsubsection{Alias Propagation}
+\subsection{Alias Propagation}
 \label{subsubsection-alias-propagation}
 \index{Alias Propagation}
 
@@ -4231,7 +4324,7 @@ offsets of actual parameters to formal parameters following a certain call
 path. Precise alias information are computed for both scalar and array
 variables. The analysis is called alias propagation.
 
-This analysis is implemented by NGUYEN Thi Viet Nga.
+This analysis is implemented by Thi Viet Nga \textsc{Nguyen}.
 %%!UserManualDocumentation
 
 \begin{verbatim}
@@ -4244,7 +4337,7 @@ alias_propagation           > MODULE.alias_associations
 
 \end{verbatim}
 
-\subsubsection{Alias Checing}
+\subsection{Alias Checing}
 \label{subsubsection-alias-check}
 \index{Alias Checking}
 
@@ -4262,7 +4355,7 @@ Restrictions on association of entities in Fortran 77 (Section 15.9.3.6
 common block may become defined during execution
 of the called subprogram or the others subprograms in the call chain.
 
-This phase uses information from the alias\_propagation
+This phase uses information from the \verb/alias_propagation/
 analysis and computes the definition
 informations of variables in a program, and then to verify
 statically if the program violates the standard restriction on alias or
@@ -4270,7 +4363,7 @@ not. If these informations are not known at compile-time, we instrument
 the code with tests that check the violation dynamically during
 execution of program. 
 
-This verification is implemented by NGUYEN Thi Viet Nga.
+This verification is implemented by Thi Viet Nga \textsc{Nguyen}.
 %%!UserManualDocumentation
 
 % Attention : will we use the preconditions, regions, effects ? 
@@ -4285,7 +4378,7 @@ alias_check   > MODULE.code
         < ALL.code
 \end{verbatim}
 
-\subsection{Used Before Set}
+\section{Used Before Set}
 \label{subsection-used-before_set}
 
 %%@UserManualDocumentation: used_before_set
@@ -4308,7 +4401,7 @@ check for the formal parameters in the current module or not. In addition,
 we produce information in the resource MODULE.ubs to tell if the formal
 parameters of the called procedures have to be checked or not.  
  
-This verification is implemented by NGUYEN Thi Viet Nga.
+This verification is implemented by Thi Viet Nga \textsc{Nguyen}.
 %%!UserManualDocumentation
 
 \begin{verbatim}
@@ -4321,9 +4414,9 @@ used_before_set   > MODULE.ubs
 \end{verbatim}
 
 
-\subsection{Miscellanous Transformations}
+\section{Miscellanous Transformations}
 
-\subsubsection{Type Checker}
+\subsection{Type Checker}
 \label{subsection-type-checker}
 \index{TypeChecker}
 
@@ -4343,8 +4436,8 @@ type_checker            > MODULE.code
 \end{verbatim}
 
 
-\subsubsection{Scalar and Array Privatization}
-\label{subsection-scalar-and-array-privatization}
+\subsection{Scalar and Array Privatization}
+\label{sec:scalar-and-array-privatization}
 \index{Privatization}
 \index{Array Privatization}
 
@@ -4358,7 +4451,7 @@ Section~\ref{subsection-dependence-graph}). The scalar privatization should
 be applied before any serious parallelization attempt. The array
 privatization is much more expensive and still is mainly experimental.
 
-\paragraph{Scalar Privatization}
+\subsubsection{Scalar Privatization}
 \index{Scalar Privatization}
 
 %%@UserManualDocumentation: privatize_module 
@@ -4378,7 +4471,7 @@ privatize_module                    > MODULE.code
         < MODULE.chains
 \end{verbatim}
 
-\paragraph{Array Privatization}
+\subsubsection{Array Privatization}
 \index{Array Privatization}
 
 %%@UserManualDocumentation: array_privatizer
@@ -4457,7 +4550,7 @@ declarations_privatizer              > MODULE.code
 
 \end{verbatim}
 
-\subsubsection{Scalar and Array Expansion}
+\subsection{Scalar and Array Expansion}
 \label{subsection-scalar-and-array-expansion}
 \index{Expansion}
 \index{Array Expansion}
@@ -4472,7 +4565,7 @@ It is assumed that the variables to be expanded are the private
 variables. So this phase only is useful if a privatization has been
 performed earlier.
 
-\paragraph{Scalar Expansion}
+\subsubsection{Scalar Expansion}
 \index{Scalar Expansion}
 
 %%@UserManualDocumentation: scalar_expansion 
@@ -4487,18 +4580,19 @@ variable_expansion                    > MODULE.code
         < MODULE.code 
 \end{verbatim}
 
-\paragraph{Array Expansion}
+\subsubsection{Array Expansion}
 \index{Array Expansion}
 
 Not implemented yet.
 
-\subsubsection{Freeze variables}
+\subsection{Freeze variables}
 \label{subsection-freeze-variables}
 \index{freeze variables}
 
 %%@UserManualDocumentation: freeze_variables
 Function \verb+freeze_variables+ produces code where variables 
-given by the user are frozen.
+given by the user are frozen.\marginpar{? Does it depends of the global
+  climate warming?}
 %%!UserManualDocumentation
 
 \begin{verbatim}
@@ -4510,21 +4604,21 @@ freeze_variables                   > MODULE.code
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{Manual Editing}
+\subsection{Manual Editing}
 
 The window interfaces let the user edit the source files. As with
 \texttt{stf}, editing is not integrated like other program
 transformations, and previously applied transformations are lost.
 Consistency is however always preserved.
 
-A general edit facility fully integrated in \texttt{pipsmake} is planned
+A general edit facility fully integrated in \PIPSMAKE{} is planned
 for the (not so) near future. Not so near because user demand for this
 feature is low.
 
-\subsubsection{Cloning}
+\subsection{Cloning}
 
 %%@UserManualDocumentation: clone
-User assisted cloning.
+User assisted cloning.\marginpar{terse}
 %%!UserManualDocumentation
 \begin{verbatim}
 
@@ -4557,9 +4651,9 @@ clone_substitute        > CALLERS.code
 %%@UserManualDocumentation: clone_on_argument
 
 Cloning of a subroutine according to an integer scalar argument.
-The argument is specified thru integer property 
+The argument is specified thru integer property
 \verb|TRANSFORMATION_CLONE_ON_ARGUMENT|. If set to $0$, a user request is
-performed. 
+performed.
 %%!UserManualDocumentation
 
 \begin{verbatim}
@@ -4576,12 +4670,12 @@ clone_on_argument       > CALLERS.code
         < CALLERS.code
 \end{verbatim}
 
-\subsubsection{Transformation Test}
+\subsection{Transformation Test}
 \label{subsection-transformation_test}
 
 %%@UserManualDocumentation: transformation_test
 This is plug to implement quickly a program transformation requested by a
-user. Currently, it is a full loop distribution suggested by Alain Darte
+user. Currently, it is a full loop distribution suggested by Alain \textsc{Darte}
 to compare different implementations, namely Nestor and PIPS.
 %%!UserManualDocumentation
 \begin{verbatim}
@@ -4593,7 +4687,7 @@ transformation_test    > MODULE.code
 \end{verbatim}
 
 
-\section{Output Files (Prettyprinted Files)}
+\chapter{Output Files (Prettyprinted Files)}
 \label{section-output-files}
 \index{Prettyprinter}
 
@@ -4601,16 +4695,16 @@ transformation_test    > MODULE.code
 displayed in several different formats. User views are the closest one
 to the initial user source code. Sequential views are obtained by
 prettyprinting the \PIPS{} internal representation of modules. Code
-can also be displayed graphically or using EMACS facilities (through a
+can also be displayed graphically or using Emacs facilities (through a
 property). Of course, parallelized versions are available. At the
 program level, call graph and interprocedural control flow graphs,
-with different degrees of elipse, provide interesting summaries.
+with different degrees of ellipse, provide interesting summaries.
 
 Dependence graphs can be shown, but they are not user-friendly. No
 filtering interface is available. They mainly are useful for debugging
 and for teaching purposes.
 
-\subsection{Parsed Printed Files (User View)}
+\section{Parsed Printed Files (User View)}
 
 %%@UserManualDocumentation: parsed_printed_file
 \label{sec:parsed_printed_files}
@@ -4634,7 +4728,7 @@ Transformers and preconditions require cumulated effects to build the
 module value basis.
 %%!UserManualDocumentation
 
-\subsubsection{Menu for User Views}
+\subsection{Menu for User Views}
 
 \begin{verbatim}
 alias parsed_printed_file 'User View'
@@ -4654,7 +4748,7 @@ alias print_source_out_effects 'With OUT Effects'
 alias print_source_continuation_conditions 'With Continuation Conditions'
 \end{verbatim}
 
-\subsubsection{Standard User View}
+\subsection{Standard User View}
 
 %%@UserManualDocumentation: print_source
 Display the code without any decoration.
@@ -4666,7 +4760,7 @@ print_source         > MODULE.parsed_printed_file
         < MODULE.parsed_code
 \end{verbatim}
 
-\subsubsection{User View with Transformers}
+\subsection{User View with Transformers}
 
 %%@UserManualDocumentation: print_source_transformers
 Display the code decorated with the transformers.
@@ -4682,7 +4776,7 @@ print_source_transformers         > MODULE.parsed_printed_file
         < MODULE.summary_effects
 \end{verbatim}
 
-\subsubsection{User View with Preconditions}
+\subsection{User View with Preconditions}
 
 %%@UserManualDocumentation: print_source_preconditions
 Display the code decorated with the preconditions.
@@ -4698,7 +4792,7 @@ print_source_preconditions        > MODULE.parsed_printed_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{User View with Total Preconditions}
+\subsection{User View with Total Preconditions}
 
 %%@UserManualDocumentation: print_source_total_preconditions
 Display the code decorated with the total preconditions.
@@ -4714,7 +4808,7 @@ print_source_total_preconditions        > MODULE.parsed_printed_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{User View with Continuation Conditions}
+\subsection{User View with Continuation Conditions}
 
 %%@UserManualDocumentation: print_source_continuation_conditions
 Display the code decorated with the continuation conditions.
@@ -4731,7 +4825,7 @@ print_source_continuation_conditions   > MODULE.parsed_printed_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{User View with Regions}
+\subsection{User View with Regions}
 
 %%@UserManualDocumentation: print_source_regions
 Display the code decorated with the regions.
@@ -4748,7 +4842,7 @@ print_source_regions              > MODULE.parsed_printed_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{User View with IN Regions}
+\subsection{User View with IN Regions}
 
 %%@UserManualDocumentation: print_source_in_regions
 Display the code decorated with the IN regions.
@@ -4765,7 +4859,7 @@ print_source_in_regions              > MODULE.parsed_printed_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{User View with OUT Regions}
+\subsection{User View with OUT Regions}
 
 %%@UserManualDocumentation: print_source_out_regions
 Display the code decorated with the OUT regions.
@@ -4783,7 +4877,7 @@ print_source_out_regions              > MODULE.parsed_printed_file
 \end{verbatim}
 
 
-\subsubsection{User View with Complexities}
+\subsection{User View with Complexities}
 \index{Complexity}
 
 %%@UserManualDocumentation: print_source_complexities
@@ -4798,7 +4892,7 @@ print_source_complexities         > MODULE.parsed_printed_file
         < MODULE.summary_complexity
 \end{verbatim}
 
-\subsubsection{User View with Proper Effects}
+\subsection{User View with Proper Effects}
 
 %%@UserManualDocumentation: print_source_proper_effects
 Display the code decorated with the proper effects.
@@ -4811,7 +4905,7 @@ print_source_proper_effects       > MODULE.parsed_printed_file
         <  MODULE.proper_effects
 \end{verbatim}
 
-\subsubsection{User View with Cumulated Effects}
+\subsection{User View with Cumulated Effects}
 
 %%@UserManualDocumentation: print_source_cumulated_effects
 Display the code decorated with the cumulated effects.
@@ -4825,7 +4919,7 @@ print_source_cumulated_effects    > MODULE.parsed_printed_file
         < MODULE.summary_effects
 \end{verbatim}
 
-\subsubsection{User View with IN Effects}
+\subsection{User View with IN Effects}
 %%@UserManualDocumentation: print_source_in_effects
 Display the code decorated with its IN effects.
 %%!UserManualDocumentation
@@ -4838,7 +4932,7 @@ print_source_in_effects       > MODULE.parsed_printed_file
         < MODULE.in_summary_effects
 \end{verbatim}
 
-\subsubsection{User View with OUT Effects}
+\subsection{User View with OUT Effects}
 %%@UserManualDocumentation: print_source_out_effects
 Display the code decorated with its OUT effects.
 %%!UserManualDocumentation
@@ -4853,21 +4947,27 @@ print_source_out_effects       > MODULE.parsed_printed_file
 
 
 
-\subsection{Printed File (Sequential Views)}
+\section{Printed File (Sequential Views)}
 
 %%@UserManualDocumentation: printed_file
 These are files containing a pretty-printed version of the internal
 representation, \verb+code+.
 
-The Fortran statements may be decorated with the result of any analysis,
+The statements may be decorated with the result of any analysis,
 e.g.complexities, preconditions, transformers, regions,\ldots{} depending on
-the printer used to produce this file.
+the pretty printer used to produce this file.
+
+To view C programs, it is a good idea to select a C pretty printer, for
+example in \texttt{tpips} with:
+\begin{alltt}
+setproperty PRETTYPRINT_C_CODE TRUE
+\end{alltt}
 
 Transformers and preconditions (and regions?) require cumulated effects
 to build the module value basis.
 %%!UserManualDocumentation
 
-\subsubsection{Menu for Sequential Views}
+\subsection{Menu for Sequential Views}
 
 \begin{verbatim}
 alias printed_file 'Sequential View'
@@ -4896,7 +4996,7 @@ alias print_code_cumulated_references 'Statements & Cumulated References'
 alias print_initial_precondition 'Initial Preconditions'
 \end{verbatim}
 
-\subsubsection{Standard Sequential View}
+\subsection{Standard Sequential View}
 \label{subsubsection-standard-sequential-view}
 \index{Sequential View}
 
@@ -4910,7 +5010,7 @@ print_code                      > MODULE.printed_file
         < MODULE.code
 \end{verbatim}
 
-\subsubsection{Sequential View with Transformers}
+\subsection{Sequential View with Transformers}
 
 %%@UserManualDocumentation: print_code_transformers
 Display the code decorated with the transformers.
@@ -4926,7 +5026,7 @@ print_code_transformers         > MODULE.printed_file
         < MODULE.summary_effects
 \end{verbatim}
 
-\subsubsection{Initial Preconditions}
+\subsection{Initial Preconditions}
 
 \begin{verbatim}
 print_initial_precondition  > MODULE.printed_file
@@ -4938,7 +5038,7 @@ print_program_precondition  > PROGRAM.printed_file
         < PROGRAM.entities
 \end{verbatim}
 
-\subsubsection{Sequential View with Complexities}
+\subsection{Sequential View with Complexities}
 
 %%@UserManualDocumentation: print_code_complexities
 Display the code decorated with the complexities.
@@ -4952,7 +5052,7 @@ print_code_complexities         > MODULE.printed_file
         < MODULE.summary_complexity
 \end{verbatim}
 
-\subsubsection{Sequential View with Preconditions}
+\subsection{Sequential View with Preconditions}
 
 %%@UserManualDocumentation: print_code_preconditions
 Display the code decorated with the preconditions.
@@ -4968,7 +5068,7 @@ print_code_preconditions        > MODULE.printed_file
         < MODULE.summary_effects
 \end{verbatim}
 
-\subsubsection{Sequential View with Total Preconditions}
+\subsection{Sequential View with Total Preconditions}
 
 %%@UserManualDocumentation: print_code_preconditions
 Display the code decorated with the total preconditions.
@@ -4984,7 +5084,7 @@ print_code_total_preconditions        > MODULE.printed_file
         < MODULE.summary_effects
 \end{verbatim}
 
-\subsubsection{Sequential View with Continuation Conditions}
+\subsection{Sequential View with Continuation Conditions}
 
 %%@UserManualDocumentation: print_code_continuation_conditions
 Display the code decorated with the continuation preconditions.
@@ -4997,12 +5097,12 @@ print_code_continuation_conditions   > MODULE.printed_file
         < MODULE.must_continuation
         < MODULE.may_continuation
         < MODULE.must_summary_continuation
-        < MODULE.may_summary_continuation        
+        < MODULE.may_summary_continuation
         < MODULE.cumulated_effects
 \end{verbatim}
 
 
-\subsubsection{Sequential View with Regions}
+\subsection{Sequential View with Regions}
 
 %%@UserManualDocumentation: print_code_regions
 Display the code decorated with the regions.
@@ -5011,7 +5111,7 @@ Display the code decorated with the regions.
 \begin{verbatim}
 print_code_regions              > MODULE.printed_file
         < PROGRAM.entities
-        < MODULE.code 
+        < MODULE.code
         < MODULE.regions
         < MODULE.summary_regions
         < MODULE.preconditions
@@ -5019,7 +5119,7 @@ print_code_regions              > MODULE.printed_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{Sequential View with Proper Regions}
+\subsection{Sequential View with Proper Regions}
 
 %%@UserManualDocumentation: print_code_proper_regions
 Display the code decorated with the proper regions.
@@ -5028,7 +5128,7 @@ Display the code decorated with the proper regions.
 \begin{verbatim}
 print_code_proper_regions              > MODULE.printed_file
         < PROGRAM.entities
-        < MODULE.code 
+        < MODULE.code
         < MODULE.proper_regions
         < MODULE.summary_regions
         < MODULE.preconditions
@@ -5036,7 +5136,7 @@ print_code_proper_regions              > MODULE.printed_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{Sequential View with IN Regions}
+\subsection{Sequential View with IN Regions}
 
 %%@UserManualDocumentation: print_code_in_regions
 Display the code decorated with the IN regions.
@@ -5045,7 +5145,7 @@ Display the code decorated with the IN regions.
 \begin{verbatim}
 print_code_in_regions              > MODULE.printed_file
         < PROGRAM.entities
-        < MODULE.code 
+        < MODULE.code
         < MODULE.in_regions
         < MODULE.in_summary_regions
         < MODULE.preconditions
@@ -5053,7 +5153,7 @@ print_code_in_regions              > MODULE.printed_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{Sequential View with OUT Regions}
+\subsection{Sequential View with OUT Regions}
 
 %%@UserManualDocumentation: print_code_out_regions
 Display the code decorated with the OUT regions.
@@ -5062,7 +5162,7 @@ Display the code decorated with the OUT regions.
 \begin{verbatim}
 print_code_out_regions              > MODULE.printed_file
         < PROGRAM.entities
-        < MODULE.code 
+        < MODULE.code
         < MODULE.out_regions
         < MODULE.out_summary_regions
         < MODULE.preconditions
@@ -5070,7 +5170,7 @@ print_code_out_regions              > MODULE.printed_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{Sequential View with Privatized Regions}
+\subsection{Sequential View with Privatized Regions}
 
 %%@UserManualDocumentation: print_code_privatized_regions
 Display the code decorated with the privatized regions.
@@ -5079,14 +5179,14 @@ Display the code decorated with the privatized regions.
 \begin{verbatim}
 print_code_privatized_regions       > MODULE.printed_file
         < PROGRAM.entities
-        < MODULE.code 
+        < MODULE.code
         < MODULE.cumulated_effects
         < MODULE.summary_effects
         < MODULE.privatized_regions
         < MODULE.copy_out_regions
 \end{verbatim}
 
-\subsubsection{Sequential View with Complementary Sections}
+\subsection{Sequential View with Complementary Sections}
 
 %%@UserManualDocumentation: print_code_complementary_sections
 Display the code decorated with complementary sections.
@@ -5095,7 +5195,7 @@ Display the code decorated with complementary sections.
 \begin{verbatim}
 print_code_complementary_sections > MODULE.printed_file
         < PROGRAM.entities
-        < MODULE.code 
+        < MODULE.code
         < MODULE.compsec
         < MODULE.summary_compsec
         < MODULE.preconditions
@@ -5103,7 +5203,7 @@ print_code_complementary_sections > MODULE.printed_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{Sequential View with Proper Effects}
+\subsection{Sequential View with Proper Effects}
 
 %%@UserManualDocumentation: print_code_proper_effects
 Display the code decorated with the proper effects.
@@ -5127,7 +5227,7 @@ print_code_proper_references       > MODULE.printed_file
         < MODULE.proper_references
 \end{verbatim}
 
-\subsubsection{Sequential View with Cumulated Effects}
+\subsection{Sequential View with Cumulated Effects}
 
 %%@UserManualDocumentation: print_code_cumulated_effects
 Display the code decorated with the cumulated effects.
@@ -5153,7 +5253,7 @@ print_code_cumulated_references    > MODULE.printed_file
 \end{verbatim}
 
 
-\subsubsection{Sequential View with IN Effects}
+\subsection{Sequential View with IN Effects}
 %%@UserManualDocumentation: print_code_in_effects
 Display the code decorated with its IN effects.
 %%!UserManualDocumentation
@@ -5166,7 +5266,7 @@ print_code_in_effects       > MODULE.printed_file
         < MODULE.in_summary_effects
 \end{verbatim}
 
-\subsubsection{Sequential View with OUT Effects}
+\subsection{Sequential View with OUT Effects}
 %%@UserManualDocumentation: print_code_out_effects
 Display the code decorated with its OUT effects.
 %%!UserManualDocumentation
@@ -5179,7 +5279,7 @@ print_code_out_effects       > MODULE.printed_file
         < MODULE.out_summary_effects
 \end{verbatim}
 
-\subsubsection{Sequential View with Proper Reductions} 
+\subsection{Sequential View with Proper Reductions}
 
 %%@UserManualDocumentation: print_code_proper_reductions
 Display the code decorated with the proper reductions.
@@ -5192,7 +5292,7 @@ print_code_proper_reductions > MODULE.printed_file
   < MODULE.proper_reductions
 \end{verbatim}
 
-\subsubsection{Sequential View with Cumulated Reductions}
+\subsection{Sequential View with Cumulated Reductions}
 
 %%@UserManualDocumentation: print_code_cumulated_reductions
 Display the code decorated with the cumulated reductions.
@@ -5207,7 +5307,7 @@ print_code_cumulated_reductions > MODULE.printed_file
 \end{verbatim}
 
 
-\subsubsection{Sequential View with Static Control Information}
+\subsection{Sequential View with Static Control Information}
 
 %%@UserManualDocumentation: print_code_static_control
 Display the code decorated with the static control.
@@ -5220,19 +5320,22 @@ print_code_static_control       > MODULE.printed_file
         < MODULE.static_control
 \end{verbatim}
 
-\subsection{Printed Files with the Intraprocedural Control Graph}
+\section{Printed Files with the Intraprocedural Control Graph}
 
 %%@UserManualDocumentation: graph_printed_file
 These are files containing a pretty-printed version of code to be
-displayed with its intraprocedural control graph as a graph, for
-example using the \PdaVinci{} program.
+displayed with its intraprocedural control graph as a graph, for example
+using the \PuDrawGraph program (formerly known as daVinci) or
+\textsc{dot}/\textsc{GraphViz} tools. More concretely, use some scripts
+like \verb/pips_unstructured2daVinci/ or \verb/pips_unstructured2dot/ to
+display graphically these \texttt{.pref-graph} files.
 
-The Fortran statements may be decorated with complexities,
+The statements may be decorated with complexities,
 preconditions, transformers, regions,\ldots{} depending on the printer
 used to produce this file.
 %%!UserManualDocumentation
 
-\subsubsection{Menu for Graph Views}
+\subsection{Menu for Graph Views}
 
 \begin{verbatim}
 alias graph_printed_file 'Control Graph Sequential View'
@@ -5249,7 +5352,7 @@ alias print_code_as_a_graph_proper_effects 'Graph with Statements & Proper Effec
 alias print_code_as_a_graph_cumulated_effects 'Graph with Statements & Cumulated Effects'
 \end{verbatim}
 
-\subsubsection{Standard Graph View}
+\subsection{Standard Graph View}
 
 %%@UserManualDocumentation: print_code_as_a_graph
 Display the code without any decoration.
@@ -5261,7 +5364,7 @@ print_code_as_a_graph                      > MODULE.graph_printed_file
         < MODULE.code
 \end{verbatim}
 
-\subsubsection{Graph View with Transformers}
+\subsection{Graph View with Transformers}
 
 %%@UserManualDocumentation: print_code_as_a_graph_transformers
 Display the code decorated with the transformers.
@@ -5277,7 +5380,7 @@ print_code_as_a_graph_transformers         > MODULE.graph_printed_file
         < MODULE.summary_effects
 \end{verbatim}
 
-\subsubsection{Graph View with Complexities}
+\subsection{Graph View with Complexities}
 
 %%@UserManualDocumentation: print_code_as_a_graph_complexities
 Display the code decorated with the complexities.
@@ -5291,7 +5394,7 @@ print_code_as_a_graph_complexities         > MODULE.graph_printed_file
         < MODULE.summary_complexity
 \end{verbatim}
 
-\subsubsection{Graph View with Preconditions}
+\subsection{Graph View with Preconditions}
 
 %%@UserManualDocumentation: print_code_as_a_graph_preconditions
 Display the code decorated with the preconditions.
@@ -5307,7 +5410,7 @@ print_code_as_a_graph_preconditions        > MODULE.graph_printed_file
         < MODULE.summary_effects
 \end{verbatim}
 
-\subsubsection{Graph View with Preconditions}
+\subsection{Graph View with Preconditions}
 
 %%@UserManualDocumentation: print_code_as_a_graph_preconditions
 Display the code decorated with the preconditions.
@@ -5323,7 +5426,7 @@ print_code_as_a_graph_total_preconditions        > MODULE.graph_printed_file
         < MODULE.summary_effects
 \end{verbatim}
 
-\subsubsection{Graph View with Regions}
+\subsection{Graph View with Regions}
 
 %%@UserManualDocumentation: print_code_as_a_graph_regions
 Display the code decorated with the regions.
@@ -5332,7 +5435,7 @@ Display the code decorated with the regions.
 \begin{verbatim}
 print_code_as_a_graph_regions              > MODULE.graph_printed_file
         < PROGRAM.entities
-        < MODULE.code 
+        < MODULE.code
         < MODULE.regions
         < MODULE.summary_regions
         < MODULE.preconditions
@@ -5340,7 +5443,7 @@ print_code_as_a_graph_regions              > MODULE.graph_printed_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{Graph View with IN Regions}
+\subsection{Graph View with IN Regions}
 
 %%@UserManualDocumentation: print_code_as_a_graph_in_regions
 Display the code decorated with the IN regions.
@@ -5349,7 +5452,7 @@ Display the code decorated with the IN regions.
 \begin{verbatim}
 print_code_as_a_graph_in_regions              > MODULE.graph_printed_file
         < PROGRAM.entities
-        < MODULE.code 
+        < MODULE.code
         < MODULE.in_regions
         < MODULE.in_summary_regions
         < MODULE.preconditions
@@ -5357,7 +5460,7 @@ print_code_as_a_graph_in_regions              > MODULE.graph_printed_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{Graph View with OUT Regions}
+\subsection{Graph View with OUT Regions}
 
 %%@UserManualDocumentation: print_code_as_a_graph_out_regions
 Display the code decorated with the OUT regions.
@@ -5366,7 +5469,7 @@ Display the code decorated with the OUT regions.
 \begin{verbatim}
 print_code_as_a_graph_out_regions              > MODULE.graph_printed_file
         < PROGRAM.entities
-        < MODULE.code 
+        < MODULE.code
         < MODULE.out_regions
         < MODULE.out_summary_regions
         < MODULE.preconditions
@@ -5374,7 +5477,7 @@ print_code_as_a_graph_out_regions              > MODULE.graph_printed_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{Graph View with Proper Effects}
+\subsection{Graph View with Proper Effects}
 
 %%@UserManualDocumentation: print_code_as_a_graph_proper_effects
 Display the code decorated with the proper effects.
@@ -5387,7 +5490,7 @@ print_code_as_a_graph_proper_effects       > MODULE.graph_printed_file
         < MODULE.proper_effects
 \end{verbatim}
 
-\subsubsection{Graph View with Cumulated Effects}
+\subsection{Graph View with Cumulated Effects}
 
 %%@UserManualDocumentation: print_code_as_a_graph_cumulated_effects
 Display the code decorated with the cumulated effects.
@@ -5402,7 +5505,7 @@ print_code_as_a_graph_cumulated_effects    > MODULE.graph_printed_file
 \end{verbatim}
 
 
-\subsection{Parallel Printed Files}
+\section{Parallel Printed Files}
 \label{subsection-parallel-printed-files}
 
 %%@UserManualDocumentation: parallelprinted_file
@@ -5420,7 +5523,7 @@ depending on the property variable \verb+PRETTYPRINT_FORTRAN90+ (out of
 date). The result is stored in a file suffixed by \verb+.parf+.
 %%!UserManualDocumentation
 
-\subsubsection{Menu for Parallel View}
+\subsection{Menu for Parallel View}
 
 \begin{verbatim}
 alias parallelprinted_file 'Parallel View'
@@ -5432,7 +5535,7 @@ alias print_parallelized90_code 'Fortran 90'
 alias print_parallelizedcray_code 'Fortran Cray'
 \end{verbatim}
 
-\subsubsection{Fortran 77 Parallel View}
+\subsection{Fortran 77 Parallel View}
 
 %%@UserManualDocumentation: print_parallelized77_code
 Output a Fortran-77 code extended with {\tt DOALL} parallel constructs.
@@ -5448,7 +5551,7 @@ print_parallelized77_code       > MODULE.parallelprinted_file
 %%        < PROGRAM.entities
 %%        < MODULE.parallelized_code
 
-\subsubsection{HPF Directives Parallel View}
+\subsection{HPF Directives Parallel View}
 
 %%@UserManualDocumentation: print_parallelizedHPF_code
 Output the code decorated with HPF or OMP directives.
@@ -5464,7 +5567,7 @@ print_parallelizedOMP_code     > MODULE.parallelprinted_file
         < MODULE.parallelized_code
 \end{verbatim}
 
-\subsubsection{Fortran 90 Parallel View}
+\subsection{Fortran 90 Parallel View}
 
 %%@UserManualDocumentation: print_parallelized90_code
 Output the code with some Fortran-90 array construct style.
@@ -5476,7 +5579,7 @@ print_parallelized90_code       > MODULE.parallelprinted_file
         < MODULE.parallelized_code
 \end{verbatim}
 
-\subsubsection{Cray Fortran Parallel View}
+\subsection{Cray Fortran Parallel View}
 
 %%@UserManualDocumentation: print_parallelizedcray_code
 Output the code decorated with parallel Cray directives. Note that the
@@ -5491,7 +5594,7 @@ print_parallelizedcray_code     > MODULE.parallelprinted_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsection{Call Graph Files}
+\section{Call Graph Files}
 \label{subsection-call-graph-files}
 \index{Call Graph}
 
@@ -5511,19 +5614,18 @@ The resource defined in this section is \verb/callgraph_file/ (note the
 missing underscore between call and graph in callgraph...). This is a {\em
   file} resource which cannot be loaded in memory by {\em pipsdbm}.
 
+Note that input resource lists could be reduced to one resource, the
+decoration. \PIPSMAKE{} would deduce the other ones. There is no need
+for a transitive closure, but some people like it that way to make
+resource usage verification possible...\marginpar{explain...}
+
+\subsection{Menu for Call Graphs}
+
 Aliases for call graphs must de different from aliases for
 interprocedural control flow graphs (ICFG). A simple trick, a trailing
 SPACE character, is used.
 
-Note that input resource lists could be reduced to one resource, the
-decoration. {\em pipsmake} would deduce the other ones. There is no need
-for a transitive closure, but some people like it that way to make
-resource usage verification possible...
-
-\subsubsection{Menu for Call Graphs}
-
 \begin{verbatim}
-
 alias callgraph_file 'Callgraph View'
 
 alias print_call_graph 'Calls'
@@ -5538,7 +5640,7 @@ alias print_call_graph_with_in_regions 'Calls & In Regions'
 alias print_call_graph_with_out_regions 'Calls & Out regions'
 \end{verbatim}
 
-\subsubsection{Standard Call Graphs}
+\subsection{Standard Call Graphs}
 
 %%@UserManualDocumentation: print_call_graph
 To have the call graph without any decoration.
@@ -5550,7 +5652,7 @@ print_call_graph                         > MODULE.callgraph_file
         < CALLEES.callgraph_file
 \end{verbatim}
 
-\subsubsection{Call Graphs with Complexities}
+\subsection{Call Graphs with Complexities}
 
 %%@UserManualDocumentation: print_call_graph_with_complexities
 To have the call graph decorated with the complexities.
@@ -5564,7 +5666,7 @@ print_call_graph_with_complexities     > MODULE.callgraph_file
         < MODULE.complexities
 \end{verbatim}
 
-\subsubsection{Call Graphs with Preconditions}
+\subsection{Call Graphs with Preconditions}
 
 %%@UserManualDocumentation: print_call_graph_with_preconditions
 To have the call graph decorated with the preconditions.
@@ -5580,7 +5682,7 @@ print_call_graph_with_preconditions      > MODULE.callgraph_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{Call Graphs with Total Preconditions}
+\subsection{Call Graphs with Total Preconditions}
 
 %%@UserManualDocumentation: print_call_graph_with_total_preconditions
 To have the call graph decorated with the total preconditions.
@@ -5596,7 +5698,7 @@ print_call_graph_with_total_preconditions      > MODULE.callgraph_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{Call Graphs with Transformers}
+\subsection{Call Graphs with Transformers}
 
 %%@UserManualDocumentation: print_call_graph_with_transformers
 To have the call graph decorated with the transformers.
@@ -5612,7 +5714,7 @@ print_call_graph_with_transformers       > MODULE.callgraph_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{Call Graphs with Proper Effects}
+\subsection{Call Graphs with Proper Effects}
 
 %%@UserManualDocumentation: print_call_graph_with_proper_effects
 To have the call graph decorated with the proper effects.
@@ -5625,7 +5727,7 @@ print_call_graph_with_proper_effects     > MODULE.callgraph_file
         < MODULE.proper_effects
 \end{verbatim}
 
-\subsubsection{Call Graphs with Cumulated Effects}
+\subsection{Call Graphs with Cumulated Effects}
 
 %%@UserManualDocumentation: print_call_graph_with_cumulated_effects
 To have the call graph decorated with the cumulated effects.
@@ -5639,7 +5741,7 @@ print_call_graph_with_cumulated_effects  > MODULE.callgraph_file
         < MODULE.summary_effects
 \end{verbatim}
 
-\subsubsection{Call Graphs with Regions}
+\subsection{Call Graphs with Regions}
 
 %%@UserManualDocumentation: print_call_graph_with_regions
 To have the call graph decorated with the regions.
@@ -5656,7 +5758,7 @@ print_call_graph_with_regions            > MODULE.callgraph_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{Call Graphs with IN Regions}
+\subsection{Call Graphs with IN Regions}
 
 %%@UserManualDocumentation: print_call_graph_with_in_regions
 To have the call graph decorated with the IN regions.
@@ -5673,7 +5775,7 @@ print_call_graph_with_in_regions         > MODULE.callgraph_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{Call Graphs with OUT Regions}
+\subsection{Call Graphs with OUT Regions}
 
 %%@UserManualDocumentation: print_call_graph_with_out_regions
 To have the call graph decorated with the OUT regions.
@@ -5690,21 +5792,22 @@ print_call_graph_with_out_regions        > MODULE.callgraph_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsection{daVinci Interprocedural Control Flow Graph Files (DVICFG)}
+\section{uDrawGraph Interprocedural Control Flow Graph Files (DVICFG)}
 
 %%@UserManualDocumentation: dvicfg_file
-This is the file icfg with format of graph daVinci
+This is the file ICFG with format of graph \PuDrawGraph (formerly
+daVinci). This should be generalized to be less tool-dependent.
 
 %%!UserManualDocumentation
 
-\subsubsection{Menu for DVICFG's}
+\subsection{Menu for DVICFG's}
 \begin{verbatim}
 alias dvicfg_file 'DVICFG View'
 
 alias print_dvicfg_with_filtered_proper_effects 'Graphical Calls & Filtered proper effects'
 \end{verbatim}
 
-\subsubsection{Minimal ICFG with graphical filtered Proper Effects}
+\subsection{Minimal ICFG with graphical filtered Proper Effects}
 %%@UserManualDocumentation: print_dvicfg_with_filtered_proper_effects
 Display the ICFG graphically decorated with the write proper effects filtered for a variable.
 %%!UserManualDocumentation
@@ -5717,14 +5820,14 @@ print_dvicfg_with_filtered_proper_effects           > MODULE.dvicfg_file
         < CALLEES.summary_effects
 \end{verbatim}
 
-\subsection{Interprocedural Control Flow Graph Files (ICFG)}
+\section{Interprocedural Control Flow Graph Files (ICFG)}
 
 %%@UserManualDocumentation: icfg_file
 This kind of file contains a more or less precise interprocedural
 control graph. The graph can be restricted to call sites only, to call
 sites and enclosing DO loops or to call sites, enclosing DO loops and
 controlling IF tests. This abstraction option is orthogonal to the set
-of decorations, but {\em pipsmake} does not support this
+of decorations, but \PIPSMAKE does not support this
 orthogonality. All combinations are listed below.
 
 Each call site can be decorated by associated information computed by one
@@ -5734,11 +5837,11 @@ of \PIPS{} analyses.
 
 %%!UserManualDocumentation
 
-\subsubsection{Menu for ICFG's}
+\subsection{Menu for ICFG's}
 
 Note: In order to avoid conflicts with callgraph aliases, a space
 character is appended at each alias shared with call graph related
-functions (Guillaume Oget).
+functions (Guillaume \textsc{Oget}).
 
 \begin{verbatim}
 alias icfg_file 'ICFG View'
@@ -5778,7 +5881,7 @@ alias print_icfg_with_control_in_regions 'Calls & Control & In Regions'
 alias print_icfg_with_control_out_regions 'Calls & Control & Out regions'
 \end{verbatim}
 
-\subsubsection{Minimal ICFG}
+\subsection{Minimal ICFG}
 
 %%@UserManualDocumentation: print_icfg
 Display the plain ICFG, without any decoration.
@@ -5790,7 +5893,7 @@ print_icfg                      > MODULE.icfg_file
         < CALLEES.icfg_file
 \end{verbatim}
 
-\subsubsection{Minimal ICFG with Complexities}
+\subsection{Minimal ICFG with Complexities}
 
 %%@UserManualDocumentation: print_icfg_with_complexities
 Display the ICFG decorated with complexities.
@@ -5804,7 +5907,7 @@ print_icfg_with_complexities            > MODULE.icfg_file
         < MODULE.complexities
 \end{verbatim}
 
-\subsubsection{Minimal ICFG with Preconditions}
+\subsection{Minimal ICFG with Preconditions}
 
 %%@UserManualDocumentation: print_icfg_with_preconditions
 Display the ICFG decorated with preconditions. They are expressed in the
@@ -5822,7 +5925,7 @@ print_icfg_with_preconditions            > MODULE.icfg_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{Minimal ICFG with Preconditions}
+\subsection{Minimal ICFG with Preconditions}
 
 %%@UserManualDocumentation: print_icfg_with_total_preconditions
 Display the ICFG decorated with total preconditions. They are expressed in the
@@ -5840,7 +5943,7 @@ print_icfg_with_total_preconditions            > MODULE.icfg_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{Minimal ICFG with Transformers}
+\subsection{Minimal ICFG with Transformers}
 
 %%@UserManualDocumentation: print_icfg_with_transformers
 Display the ICFG decorated with transformers.
@@ -5855,7 +5958,7 @@ print_icfg_with_transformers             > MODULE.icfg_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{Minimal ICFG with Proper Effects}
+\subsection{Minimal ICFG with Proper Effects}
 
 %%@UserManualDocumentation: print_icfg_with_proper_effects
 Display the ICFG decorated with the proper effects.
@@ -5868,7 +5971,7 @@ print_icfg_with_proper_effects           > MODULE.icfg_file
         < MODULE.proper_effects
 \end{verbatim}
 
-\subsubsection{Minimal ICFG with filtered Proper Effects}
+\subsection{Minimal ICFG with filtered Proper Effects}
 %%@UserManualDocumentation: print_icfg_with_filtered_proper_effects
 Display the ICFG decorated with the write proper effects filtered for a variable.
 %%!UserManualDocumentation
@@ -5881,7 +5984,7 @@ print_icfg_with_filtered_proper_effects           > MODULE.icfg_file
         < CALLEES.summary_effects
 \end{verbatim}
 
-\subsubsection{Minimal ICFG with Cumulated Effects}
+\subsection{Minimal ICFG with Cumulated Effects}
 
 %%@UserManualDocumentation: print_icfg_with_cumulated_effects
 Display the ICFG decorated with cumulated effects.
@@ -5895,7 +5998,7 @@ print_icfg_with_cumulated_effects        > MODULE.icfg_file
         < MODULE.summary_effects
 \end{verbatim}
 
-\subsubsection{Minimal ICFG with Regions}
+\subsection{Minimal ICFG with Regions}
 
 %%@UserManualDocumentation: print_icfg_with_regions
 Display the ICFG decorated with regions.
@@ -5912,7 +6015,7 @@ print_icfg_with_regions                  > MODULE.icfg_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{Minimal ICFG with IN Regions}
+\subsection{Minimal ICFG with IN Regions}
 
 %%@UserManualDocumentation: print_icfg_with_in_regions
 Display the ICFG decorated with IN regions.
@@ -5929,7 +6032,7 @@ print_icfg_with_in_regions               > MODULE.icfg_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{Minimal ICFG with OUT Regions}
+\subsection{Minimal ICFG with OUT Regions}
 
 %%@UserManualDocumentation: print_icfg_with_out_regions
 Display the ICFG decorated with OUT regions.
@@ -5946,7 +6049,7 @@ print_icfg_with_out_regions              > MODULE.icfg_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{ICFG with Loops}
+\subsection{ICFG with Loops}
 
 %%@UserManualDocumentation: print_icfg_with_loops 
 Display the plain ICFG with loops, without any decoration.
@@ -5958,7 +6061,7 @@ print_icfg_with_loops                    > MODULE.icfg_file
         < CALLEES.icfg_file
 \end{verbatim}
 
-\subsubsection{ICFG with Loops and Complexities}
+\subsection{ICFG with Loops and Complexities}
 
 %%@UserManualDocumentation: print_icfg_with_loops_complexities
 Display the ICFG decorated with loops and complexities.
@@ -5972,7 +6075,7 @@ print_icfg_with_loops_complexities       > MODULE.icfg_file
         < MODULE.complexities
 \end{verbatim}
 
-\subsubsection{ICFG with Loops and Preconditions}
+\subsection{ICFG with Loops and Preconditions}
 
 %%@UserManualDocumentation: print_icfg_with_loops_preconditions
 Display the ICFG decorated with preconditions.
@@ -5987,7 +6090,7 @@ print_icfg_with_loops_preconditions      > MODULE.icfg_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{ICFG with Loops and Total Preconditions}
+\subsection{ICFG with Loops and Total Preconditions}
 
 %%@UserManualDocumentation: print_icfg_with_loops_total_preconditions
 Display the ICFG decorated with total preconditions.
@@ -6002,7 +6105,7 @@ print_icfg_with_loops_total_preconditions      > MODULE.icfg_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{ICFG with Loops and Transformers}
+\subsection{ICFG with Loops and Transformers}
 
 %%@UserManualDocumentation: print_icfg_with_loops_transformers
 Display the ICFG decorated with transformers.
@@ -6017,7 +6120,7 @@ print_icfg_with_loops_transformers       > MODULE.icfg_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{ICFG with Loops and Proper Effects}
+\subsection{ICFG with Loops and Proper Effects}
 
 %%@UserManualDocumentation: print_icfg_with_loops_proper_effects
 Display the ICFG decorated with proper effects.
@@ -6030,7 +6133,7 @@ print_icfg_with_loops_proper_effects     > MODULE.icfg_file
         < MODULE.proper_effects
 \end{verbatim}
 
-\subsubsection{ICFG with Loops and Cumulated Effects}
+\subsection{ICFG with Loops and Cumulated Effects}
 
 %%@UserManualDocumentation: print_icfg_with_loops_cumulated_effects
 Display the ICFG decorated with cumulated effects.
@@ -6044,7 +6147,7 @@ print_icfg_with_loops_cumulated_effects        > MODULE.icfg_file
         < MODULE.summary_effects
 \end{verbatim}
 
-\subsubsection{ICFG with Loops and Regions}
+\subsection{ICFG with Loops and Regions}
 
 %%@UserManualDocumentation: print_icfg_with_loops_regions
 Display the ICFG decorated with regions.
@@ -6061,7 +6164,7 @@ print_icfg_with_loops_regions            > MODULE.icfg_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{ICFG with Loops and IN Regions}
+\subsection{ICFG with Loops and IN Regions}
 
 %%@UserManualDocumentation: print_icfg_with_loops_in_regions
 Display the ICFG decorated with IN regions.
@@ -6078,7 +6181,7 @@ print_icfg_with_loops_in_regions         > MODULE.icfg_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{ICFG with Loops and OUT Regions}
+\subsection{ICFG with Loops and OUT Regions}
 
 %%@UserManualDocumentation: print_icfg_with_loops_out_regions
 Display the ICFG decorated with the OUT regions.
@@ -6095,7 +6198,7 @@ print_icfg_with_loops_out_regions        > MODULE.icfg_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{ICFG with Control}
+\subsection{ICFG with Control}
 
 %%@UserManualDocumentation: print_icfg_with_control
 Display the plain ICFG with loops, without any decoration.
@@ -6107,7 +6210,7 @@ print_icfg_with_control         > MODULE.icfg_file
         < CALLEES.icfg_file
 \end{verbatim}
 
-\subsubsection{ICFG with Control and Complexities}
+\subsection{ICFG with Control and Complexities}
 
 %%@UserManualDocumentation: print_icfg_with_control_complexities
 Display the ICFG decorated with the complexities.
@@ -6121,7 +6224,7 @@ print_icfg_with_control_complexities    > MODULE.icfg_file
         < MODULE.complexities
 \end{verbatim}
 
-\subsubsection{ICFG with Control and Preconditions}
+\subsection{ICFG with Control and Preconditions}
 
 %%@UserManualDocumentation: print_icfg_with_control_preconditions
 Display the ICFG decorated with the preconditions.
@@ -6136,7 +6239,7 @@ print_icfg_with_control_preconditions   > MODULE.icfg_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{ICFG with Control and Total Preconditions}
+\subsection{ICFG with Control and Total Preconditions}
 
 %%@UserManualDocumentation: print_icfg_with_control_total_preconditions
 Display the ICFG decorated with the preconditions.
@@ -6151,7 +6254,7 @@ print_icfg_with_control_total_preconditions   > MODULE.icfg_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{ICFG with Control and Transformers}
+\subsection{ICFG with Control and Transformers}
 
 %%@UserManualDocumentation: print_icfg_with_control_transformers
 Display the ICFG decorated with the transformers.
@@ -6166,7 +6269,7 @@ print_icfg_with_control_transformers    > MODULE.icfg_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{ICFG with Control and Proper Effects}
+\subsection{ICFG with Control and Proper Effects}
 
 %%@UserManualDocumentation: print_icfg_with_control_proper_effects
 Display the ICFG decorated with the proper effects.
@@ -6179,7 +6282,7 @@ print_icfg_with_control_proper_effects  > MODULE.icfg_file
         < MODULE.proper_effects
 \end{verbatim}
 
-\subsubsection{ICFG with Control and Cumulated Effects}
+\subsection{ICFG with Control and Cumulated Effects}
 
 %%@UserManualDocumentation: print_icfg_with_control_cumulated_effects
 Display the ICFG decorated with the cumulated effects.
@@ -6193,7 +6296,7 @@ print_icfg_with_control_cumulated_effects   > MODULE.icfg_file
         < MODULE.summary_effects
 \end{verbatim}
 
-\subsubsection{ICFG with Control and Regions}
+\subsection{ICFG with Control and Regions}
 
 %%@UserManualDocumentation: print_icfg_with_control_regions
 Display the ICFG decorated with the regions.
@@ -6210,7 +6313,7 @@ print_icfg_with_control_regions         > MODULE.icfg_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{ICFG with Control and IN Regions}
+\subsection{ICFG with Control and IN Regions}
 
 %%@UserManualDocumentation: print_icfg_with_control_in_regions
 Display the ICFG decorated with the IN regions.
@@ -6227,7 +6330,7 @@ print_icfg_with_control_in_regions      > MODULE.icfg_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsubsection{ICFG with Control and OUT Regions}
+\subsection{ICFG with Control and OUT Regions}
 
 %%@UserManualDocumentation: print_icfg_with_control_out_regions
 Display the ICFG decorated with the OUT regions.
@@ -6244,7 +6347,7 @@ print_icfg_with_control_out_regions     > MODULE.icfg_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\subsection{Dependence Graph File}
+\section{Dependence Graph File}
 \label{subsection-dependence-graph-file}
 \index{DG}
 \index{Dependence Graph}
@@ -6261,14 +6364,14 @@ dependence cone and a SRU format which packs all information about one
 arc on one line and which replaces the dependence cone by the
 dependence direction vector (DDV). The line numbers given with this
 format are in fact relative (approximatively...) to the statement line
-in the \PIPS{} output.  The SRU format was defined by researchers at
+in the \PIPS{} output.  The SRU format was defined with researchers at
 Slippery Rock University (PA). The property
 \begin{center}
 \verb/PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT/
 \end{center}
 is set to FALSE by default.
 
-\subsubsection{Menu For Dependence Graph Views}
+\subsection{Menu For Dependence Graph Views}
 
 \begin{verbatim}
 alias dg_file 'Dependence Graph View'
@@ -6278,11 +6381,11 @@ alias   print_loop_carried_dependence_graph 'Loop Carried Only'
 alias   print_whole_dependence_graph        'All arcs'
 alias   print_chains_graph                  'Chains'
 alias   print_filtered_dependence_graph     'Filtered Arcs'
-alias   print_filtered_dependence_daVinci_graph   'Filtered Arcs Output to daVinci'
+alias   print_filtered_dependence_daVinci_graph   'Filtered Arcs Output to uDrawGraph'
 alias   impact_check                        'Check alias impact'
 \end{verbatim}
 
-\subsubsection{Effective Dependence Graph View}
+\subsection{Effective Dependence Graph View}
 
 %%@UserManualDocumentation: print_effective_dependence_graph
 Display dependence levels for loop-carried and non-loop-carried dependence
@@ -6291,12 +6394,12 @@ arcs due to non-privatized variables. Do not display dependence cones.
 
 \begin{verbatim}
 print_effective_dependence_graph          > MODULE.dg_file
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code
         < MODULE.dg
 \end{verbatim}
 
-\subsubsection{Loop-Carried Dependence Graph View}
+\subsection{Loop-Carried Dependence Graph View}
 
 %%@UserManualDocumentation: print_loop_carried_dependence_graph
 Display dependence levels for loop-carried dependence arcs only. Ignore
@@ -6305,12 +6408,12 @@ arcs labeled by private variables and do not print dependence cones.
 
 \begin{verbatim}
 print_loop_carried_dependence_graph          > MODULE.dg_file
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code
         < MODULE.dg
 \end{verbatim}
 
-\subsubsection{Whole Dependence Graph View}
+\subsection{Whole Dependence Graph View}
 
 %%@UserManualDocumentation: print_whole_dependence_graph
 Display dependence levels and dependence polyhedra/cones for all
@@ -6321,57 +6424,59 @@ not. Dependence cones labeling arcs are printed too.
 
 \begin{verbatim}
 print_whole_dependence_graph          > MODULE.dg_file
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code
         < MODULE.dg
 \end{verbatim}
 
-\subsubsection{Filtered Dependence Graph View}
+\subsection{Filtered Dependence Graph View}
 
 %%@UserManualDocumentation: print_filtered_dependence_graph
-Same as print\_whole\_dependence\_graph but it's filtered by some variables.
+Same as \texttt{print\_whole\_dependence\_graph} but it's filtered by some
+variables.\marginpar{which one?}
 %%!UserManualDocumentation
 
 \begin{verbatim}
 print_filtered_dependence_graph          > MODULE.dg_file
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code
         < MODULE.dg
 \end{verbatim}
 
-\subsubsection{Filtered Dependence daVinci Graph View}
+\subsection{Filtered Dependence daVinci Graph View}
 
 %%@UserManualDocumentation: print_filtered_dependence_daVinci_graph
-Same as print\_filtered\_dependence\_graph but its output is daVinci format.
+Same as \texttt{print\_filtered\_dependence\_graph} but its output is
+\PuDrawGraph format.
 %%!UserManualDocumentation
 
 \begin{verbatim}
 print_filtered_dependence_daVinci_graph          > MODULE.dvdg_file
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code
         < MODULE.dg
 \end{verbatim}
 
-\subsubsection{Filtered Dependence Graph View}
+\subsection{Filtered Dependence Graph View}
 
 %%@UserManualDocumentation: impact_check
-Check impact of alias on the dependance graphe
+Check impact of alias on the dependance graph.\marginpar{What is that?}
 %%!UserManualDocumentation
 
 \begin{verbatim}
 impact_check    > MODULE.code
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.alias_associations
         < MODULE.cumulated_effects
-    < MODULE.summary_effects
+        < MODULE.summary_effects
         < MODULE.proper_effects
-    < MODULE.preconditions
-    < MODULE.summary_precondition
+        < MODULE.preconditions
+        < MODULE.summary_precondition
         < MODULE.dg
         < ALL.code
 \end{verbatim}
 
-\subsubsection{Chains Graph View}
+\subsection{Chains Graph View}
 
 \begin{verbatim}
 print_chains_graph      > MODULE.dg_file
@@ -6381,9 +6486,11 @@ print_chains_graph      > MODULE.dg_file
 \end{verbatim}
 
 
-\subsection{Prettyprinters for C}
+\section{Prettyprinters for C}
 
-A very basic and experimental C dumper. 
+A very basic and experimental C dumper to output a Fortran program in C
+code. It is not the same as the default pretty printer that is used the
+normal way to pretty print C code in C.
 
 \begin{verbatim}
 print_crough  > MODULE.crough
@@ -6394,22 +6501,23 @@ print_c_code  > MODULE.c_printed_file
               < MODULE.crough
 \end{verbatim}
 
-\subsection{Prettyprinters Smalltalk}
+\section{Prettyprinters Smalltalk}
 \label{subsection-prettyprinters-smalltalk}
 \index{Prettyprinters Smalltalk}
 \index{PHRASE}
 
-This pass is used for PHRASE project.
-
-NB: The PHRASE project is an attempt to automatically (or semi-automatically) 
-transform high-level language for partial evaluation in reconfigurable 
-logic (such as FPGAs or DataPaths).
+This pass is used by the \textsc{phrase} project, which is an attempt to
+automatically (or semi-automatically) transform high-level language
+application into control code with reconfigurable logic accelerators (such
+as \textsc{fpga}s or data-paths with \textsc{alu}).
 
 %%@UserManualDocumentation: print_code_smalltalk
-This pass is used in context of PHRASE project for synthetisation of 
-reconfigurable logic for a portion of initial code. This function can 
-be viewed as a Smalltalk pretty-printer of a subset of Fortran.
+This pass is used in context of PHRASE project for synthetisation of
+reconfigurable logic for a portion of initial code. This function can
+be viewed as a SmallTalk pretty-printer of a subset of Fortran.
 %%!UserManualDocumentation
+
+It is an interesting language fusion...
 
 \begin{verbatim}
 alias print_code_smalltalk 'Smalltalk Pretty-Printer'
@@ -6419,15 +6527,15 @@ print_code_smalltalk        > MODULE.smalltalk_code_file
         < MODULE.code
 \end{verbatim}
 
-\subsection{Prettyprinter for CLAIRE}
+\section{Prettyprinter for CLAIRE}
 \label{subsection-prettyprinter-claire}
 \index{Prettyprinter Claire}
 \index{DREAM-UP}
 
 This pass is used for the DREAM-UP project. The internal representation of
-a C or Fortran program is dumped as CLAIRE objects, either DATA\_ARRAY or
-TASK. CLAIRE is an object-oriented language used to develop constraint
-solvers.
+a C or Fortran program is dumped as CLAIRE objects, either
+\texttt{DATA\_ARRAY} or \texttt{TASK}. CLAIRE is an object-oriented
+language used to develop constraint solvers.
 
 The only type constructor is array. Basic types must be storable on a
 fixed number of bytes.
@@ -6445,16 +6553,17 @@ This pass is used for the specification input and transformation in the XML form
 \begin{verbatim}
 alias print_xml_code 'Xml Pretty-Printer'
 
-print_xml_code		> MODULE.xml_printed_file
-	< PROGRAM.entities
-	< MODULE.code
-	< MODULE.complexities
-	< MODULE.preconditions
-	< MODULE.regions
+print_xml_code      > MODULE.xml_printed_file
+    < PROGRAM.entities
+    < MODULE.code
+    < MODULE.complexities
+    < MODULE.preconditions
+    < MODULE.regions
 \end{verbatim}
 
 %%@UserManualDocumentation: print_xml_code_with_explicit_motif
-This pass generates XML code like the print\_xml\_code pass, but the input contains explicitly loops to scan motifs.
+This pass generates XML code like the \textsc{print\_xml\_code} pass, but
+the input contains explicitly loops to scan motifs.\marginpar{gnih?}
 %%!UserManualDocumentation
 
 \begin{verbatim}
@@ -6462,9 +6571,9 @@ alias print_xml_code_with_explicit_motif 'Xml Pretty-Printer with explicit motif
 
 print_xml_code_with_explicit_motif       > MODULE.xml_printed_file
         < PROGRAM.entities
-	< MODULE.code
+    < MODULE.code
 \end{verbatim}
-		
+
 %%@UserManualDocumentation: print_claire_code
 This pass is used in the DREAM-UP project for specification input and
 transformation. This function can be viewed as a CLAIRE pretty-printer of
@@ -6483,7 +6592,7 @@ print_claire_code        > MODULE.claire_printed_file
 
 
 %%@UserManualDocumentation: print_claire_code_with_explicit_motif
-This pass generates CLAIRE code like the print\_claire\_code pass, but the input contains explicitly loops to scan motifs.  
+This pass generates CLAIRE code like the \textsc{print\_claire\_code} pass, but the input contains explicitly loops to scan motifs.
 %%!UserManualDocumentation
 
 \begin{verbatim}
@@ -6495,18 +6604,21 @@ print_claire_code_with_explicit_motif       > MODULE.claire_printed_file
 \end{verbatim}
 
 
-\section{Feautrier Methods (a.k.a. Polyhedral Method)}
+\chapter{Feautrier Methods (a.k.a. Polyhedral Method)}
 \label{section-feautrier-methods}
 
-This part of \PIPS{} was implemented at Centre d'Etudes Atomiques,
-Limeil-Brévannes, by Benoît de Dinechin, Arnauld Leservot and Alexis
-Platonoff.
+This part of \PIPS{} was implemented at Centre d'Études Atomiques,
+Limeil-Brévannes, by Benoît de \textsc{Dinechin}, Arnauld
+\textsc{Leservot} and Alexis \textsc{Platonoff}.
+
+Unfortunately, this part is no longer used in PIPS right now because of
+some typing issues in the code. To be fixed...
 
 %%
 %% PAF-related code
 %%
 
-\subsection{Static Control Detection}
+\section{Static Control Detection}
 \label{subsection-static-control-detection}
 
 %%@UserManualDocumentation: static_controlize
@@ -6535,7 +6647,7 @@ See the alias \verb|print_code_static_control| and function
 \verb|print_code_static_control| in
 Section~\ref{sec:parsed_printed_files} and so on.
 
-\subsection{Array Data Flow Graph}
+\section{Array Data Flow Graph}
 \label{subsection-array-data-flow-graph}
 \index{DFG}
 \index{Array Data Flow Graph}
@@ -6546,25 +6658,27 @@ on static-control code, otherwise an error occurs. Function
 \verb+print_array_dfg+ prints the Data Flow Graph.
 
 In the ouput produced by the array DFG analysis, 
-each statement is renamed ``ins\_'' followed by the statement number it had in the original
+each statement is renamed ``\texttt{ins\_}'' followed by the statement number it had in the original
 program and by a digit representing its position among the different
 statements coming from the same statement of the original program.
 
 The following describes the output of an Array DFG analysis:
 
-\paragraph{\tt W: }  Statement examined. It can be ``ENTRY'' 
-\paragraph{\tt Execution domain:} The conditions on the surrouding loop
-counters for which W is executed at least once  
-\paragraph{\tt ----Def-Use- > R:} Statement reading a value produced by an
-execution of W
-\paragraph{\tt Reference:}  Expression of the variable read at statement R.
-\paragraph{\tt Transformation:} Transformation that must be applied on the
-loop counters of R to find those of W for which there is dependence
-\paragraph{\tt Governing predicate:} Conditions on the loop counters of the loops surrounding
-R for which there is a dependence
-\paragraph{\tt Execution domain:} Conditions on the loop counters for which
-there is an execution of R.
-
+\begin{description}
+\item[\texttt{W}:] Statement examined. It can be ``ENTRY''
+\item[\texttt{Execution domain}:] The conditions on the surrouding loop
+  counters for which W is executed at least once
+\item[\texttt{-{}-{}-{}-Def-Use- > R}:] Statement reading a value produced by
+  an execution of W
+\item[\texttt{Reference}:] Expression of the variable read at statement
+  R.
+\item[\texttt{Transformation}:] Transformation that must be applied on
+  the loop counters of R to find those of W for which there is dependence
+\item[\texttt{Governing predicate}:] Conditions on the loop counters of
+  the loops surrounding R for which there is a dependence
+\item[\texttt{Execution domain}:] Conditions on the loop counters for
+  which there is an execution of R.
+\end{description}
 Known bug: what happens if the input is not a static control program?
 
 % \begin{verbatim}
@@ -6588,7 +6702,7 @@ Known bug: what happens if the input is not a static control program?
 %         < MODULE.adfg
 % \end{verbatim}
 
-\subsection{Scheduling}
+\section{Scheduling}
 \label{subsection-scheduling}
 \index{Scheduling}
 
@@ -6599,11 +6713,13 @@ computation is based on the Array Data Flow Graph (see~\cite{Fea92a,Fea92b}).
 The output of the scheduling is of the following form:
 (the statements are named in the same manner as in the array DFG)
 
-\paragraph{\tt W:} Statement examined 
-\paragraph{\tt  pred:} Conditions for which the following schedule is valid
-\paragraph{\tt  dims:} Time at which the execution of W is schedule, in function
-of the loop counters of the surrounding loops. 
-
+\begin{description}
+\item[\texttt{W}:] Statement examined
+\item[\texttt{pred}:] Conditions for which the following schedule is
+  valid
+\item[\texttt{dims}:] Time at which the execution of W is schedule, in function of
+  the loop counters of the surrounding loops.
+\end{description}
 
 % \begin{verbatim}
 
@@ -6624,7 +6740,7 @@ of the loop counters of the surrounding loops.
 %         < MODULE.bdt
 % \end{verbatim}
 
-\subsection{Mapping (a.k.a. Placement)}
+\section{Mapping (a.k.a. Placement)}
 
 Function \verb+prgm_mapping+ computes one mapping for
 each assignment instruction of the program. Each iteration of the
@@ -6638,10 +6754,12 @@ Platonoff (see~\cite{Fea93,Pla95b}), who also implemented this analysis.
 The output of the placement is:
 (the statements are named in the same manner as in the array DFG)
 
-\paragraph{\tt S:} Statement examined 
-\paragraph{\tt (..,..,..)}  Coordinates of the execution of the statement on a processor
-grid, in function of the loop counters of the surrounding loops.
-
+\begin{description}
+\item[S:] Statement examined
+\item[(..,..,..)]  Coordinates of the execution of the statement on a
+  processor grid, in function of the loop counters of the surrounding
+  loops.
+\end{description}
 
 % \begin{verbatim}
 % prgm_mapping            > MODULE.plc
@@ -6662,7 +6780,7 @@ grid, in function of the loop counters of the surrounding loops.
 %         < MODULE.plc
 % \end{verbatim}
 
-\subsection{Code Generation}
+\section{Code Generation}
 
 Function \texttt{reindexing} transforms the code using the schedule
 (\texttt{bdt}) and the mapping (\texttt{plc}) (see~\cite{Col93,Pla95a}). The
@@ -6678,7 +6796,7 @@ result is a new resource named \verb/reindexed_code/.
 %         < MODULE.plc
 % \end{verbatim}
 
-\subsection{Prettyprinters for CM Fortran}
+\section{Prettyprinters for CM Fortran}
 
 How to get a pretty-printed version of \verb+reindexed_code+ ? Two
 prettyprinters are available. The first one produces CM Fortran and the
@@ -6722,7 +6840,7 @@ style.
 % \end{verbatim}
 
 
-\section{User Interface Menu Layouts}
+\chapter{User Interface Menu Layouts}
 \label{sec:menu_layout}
 \label{section-user-interface-menu-layouts}
 
@@ -6733,14 +6851,14 @@ among the \PIPS{} phases described above.
 
 For each menu, the left part before the arrow, \verb|->|, is the menu
 item title and the right part is the \PIPS{} procedure to be called when
-the item is selected. For the view menu (section \label{view_menu},
+the item is selected. For the view menu (section~\ref{sec:view_menu},
 there is two display methods to view resources separated by a comma,
 the first one is the method for \WPIPS, the second one is the one
 used in \EPIPS, followed by the icon to use.
 
 Use a blank line to insert a menu separator.
 
-\subsection{View menu}
+\section{View menu}
 \label{sec:view_menu}
 
 The view menu is displayed according to the following layout and
@@ -6768,7 +6886,7 @@ methods (\WPIPS{} method, \EPIPS{} method, icon name for the frame):
 \end{PipsMenu}%{View} important for generate_all_menu_documentation
 
 
-\subsection{Transformation menu}
+\section{Transformation menu}
 \label{sec:transformation_menu}
 
 The transformation menu is displayed as here:
@@ -6819,7 +6937,7 @@ The transformation menu is displayed as here:
 
 %%  optimize_expressions
 
-At the end of this menu is added a special entry in \WPIPS, the ''Edit'' line
+At the end of this menu is added a special entry in \WPIPS, the ``Edit'' line
 that allows the user to edit the original file. It is seen as a very
 special transformation, since the user can apply whatever
 transformation (s)he wants...
@@ -6830,17 +6948,18 @@ transformation (s)he wants...
 
 
 
-\section*{Conclusion}
+\chapter{Conclusion}
 
 New functionalities can easily be added to \PIPS{}. The new function names
-must be declared somewhere in this file as well as the resources
-required and produced. Then, {\tt make} must be run in the {\tt
-Documentation} directory and the pipsmake library must be recompiled and
-\PIPS{} interfaces (pips, tpips, wpips) linked with the new C modules.
+must be declared somewhere in this file as well as the resources required
+and produced. Then, {\tt make} must be run in the {\tt Documentation}
+directory and the \PIPSMAKE library must be recompiled and \PIPS{}
+interfaces (\textsc{pips}, \textsc{tpips}, \textsc{wpips}) linked with the
+new C modules.
 
 It is much more difficult to add a new type of resources, because \PIPS{}
 database manager, \texttt{pipsdbm}, is not as automatized as
-\texttt{pipsmake}. This is explained in~\cite{I94}.
+\PIPSMAKE. This is explained in~\cite{I94}.
 
 
 
@@ -6848,13 +6967,13 @@ database manager, \texttt{pipsdbm}, is not as automatized as
 
 
 
-\section*{Known Problems}
+\chapter{Known Problems}
 
 \begin{enumerate}
 
-\item {\em pipsmake} behavior may be erratic if files are accessed
-across a NFS network of non-synchronized workstations (see for instance
-UNIX \texttt{rdate} command).
+\item {\em pipsmake} behavior may be erratic if files are accessed across
+  a \textsc{nfs} network of non-synchronized workstations (see for
+  instance UNIX \texttt{rdate} command or better \textsc{ntp} daemon).
 
 \item \texttt{STOP} statements in subroutines (i.e. control effects and
 control dependencies) are not taken into account when parallelizing the
@@ -6862,7 +6981,6 @@ caller.
 
 \end{enumerate}
 
-\newpage
 
 \begin{thebibliography}{99}
 
