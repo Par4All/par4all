@@ -830,9 +830,11 @@ full_unroll(char * mod_name)
 static int number_of_unrolled_loops = 0;
 static int number_of_requested_unrollings = 0;
 
-/* Trailing spaces and tabs are not accepted. C must be a capital C... but
-   it does not have to be in column 1! This should be improved with
-   regular expressions.
+/* C must be a capital C... This should be improved with
+   regular expressions, with a property to set the pragma or comment...
+
+   This algorithm is more efficient if we have far more loops than
+   comments... :-)
 
    Furthermore, people want to unroll only loops that are designated or
    all loops but those that are designated.
@@ -841,7 +843,7 @@ static int number_of_requested_unrollings = 0;
 
    A lot of improvement ahead before we can think of matching TSF
    flexibility... */
-#define FULL_UNROLL_PRAGMA "Cxxx\n"
+#define FULL_UNROLL_PRAGMA "Cxxx"
 
 bool find_unroll_pragma_and_fully_unroll(statement s)
 {
