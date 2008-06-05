@@ -6,11 +6,10 @@
 % translated and updated from dret146.f.tex
 
 \documentclass[a4paper]{article}
-
 \usepackage[latin9]{inputenc}
 \usepackage[backref,pagebackref]{hyperref}
-\usepackage{xspace}
-\usepackage{url}
+\usepackage{breakurl}
+\usepackage{xspace,makeidx}
 \usepackage[hyper,procnames]{listings}
 
 %% heu...
@@ -29,13 +28,13 @@
 \newcommand{\PipsDevGuideHTDOC}{\LINK{http://www.cri.ensmp.fr/pips/developer_guide.htdoc}}
 \newcommand{\DoxygenSources}{\LINK{https://freia.enstb.org/pips/source}}
 
-\title{\bf {\Huge PIPS} \\ 
+\title{\bf {\Huge PIPS} \\
   Development Environment \\
 }
 
 \author{
 \begin{tabular}{rl}
-  François & IRIGOIN \\ 
+  François & IRIGOIN \\
   Pierre & JOUVELOT \\
   Rémi & TRIOLET \\
   Arnauld & LESERVOT \\
@@ -47,10 +46,13 @@
 \end{tabular}
 }
 
-\date{August 1996 - May 2008}
+\date{August 1996 - June 2008}
 
 \renewcommand{\indexname}{Index}
 \makeindex
+
+% Number everything in the TOC:
+\setcounter{secnumdepth}{10}
 
 \begin{document}
 \maketitle
@@ -65,7 +67,7 @@ You can get a printable version of this document on\\
 The legacy WWW site is at \PipsOldWWW and the new one is at \PipsNewWWW.
 
 \clearpage
-\tableofcontents  
+\tableofcontents
 
 \newpage
 
@@ -88,15 +90,14 @@ This manual is not exhaustive. You can add your own sections and update
 existing ones if you find missing or erroneous information.
 
 The reader is supposed to be a PIPS user~\cite{Pips:96a}, and to have read
-the reports about NewGen~\cite{Jouv:89,Jouv:90}. A good understanding of 
+the reports about NewGen~\cite{Jouv:89,Jouv:90}. A good understanding of
 \texttt{pipsmake} mechanisms would also be helpful.
 
 \section{Getting PIPS sources}
 
-The sources of NewGen, Linear and Pips are managed under subversion.
-They are accessible from anywhere in the world by the http protocol
-at:
-\par \centerline{\LINK{http://svn.cri.ensmp.fr/pips.html}}
+The sources of NewGen, Linear and Pips are managed under subversion.  They
+are accessible from anywhere in the world by the http protocol at
+\url{http://svn.cri.ensmp.fr/pips.html}
 
 \subsection{Directories overview}
 \label{sec:directories-overview}
@@ -110,8 +111,8 @@ There are 5 repositories for the various files:
 \item[validation] Pips non-regression tests
 \end{description}
 
-The subversion repositories are organised in standard subdirectories 
-as advised for best subversion practices:
+The subversion repositories are organised in standard subdirectories as
+advised for best subversion practices:
 \begin{description}
 \item[trunk] production version, should be stable enough
   to pass the validation;
@@ -148,6 +149,7 @@ sh> # enjoy
 In order to build only the PIPS infrastructure, just do \texttt{make} into
 the \verb|$PIPS_ROOT| directory.
 
+For more information about the PIPS Makefile infrastructure, see
 
 \subsection{Important Note}
 
@@ -160,7 +162,8 @@ It is important to realize that:
 \item in a standard development, commits should not be made directly under
   the \texttt{trunk}, but rather in development branches, see the next section.
 \item on some Unises, the \texttt{/tmp} temporary directories may be cleaned
-  on reboots, which can be triggered by power failures.
+  on reboots, which can be triggered by power failures. So you could try
+  \texttt{/var/tmp} that is usually not cleaned-up during the boot phase.
 \end{enumerate}
 
 
@@ -214,22 +217,56 @@ Most documentation (like the one you are reading) is written in LaTeX and
 some parts even use literate programming with a \LaTeX{} base, so the
 AUCTeX, PreviewLaTeX and RefTeX mode are quite useful.
 
-\subsection{Using tags to index source files and ease access in your text editor}
+
+\subsection{Using tags to index source files and to ease access in your
+  text editor}
 \label{sec:using-tags}
 
-PIPS makefiles can generate tags index files to find the definition of
-symbols in the source files with your favorite editor.
+Many macros and functions are available from the Linear and NewGen
+libraries, but also in PIPS. Their source code can be retrieved using the
+\emph{tags} indexing mechanism under editors such as \textbf{emacs} or
+\textbf{vi}.
+
+So the PIPS makefiles can generate tags index files to find the definition
+of symbols in the source files with your favorite editor and it is highly
+recommended to use the Emacs or VI editors to benefit from the tags.  For
+example in Emacs, you can find, by typing a \texttt{M-.} on an identifier,
+the location where it is defined, \texttt{M-,} allows to find another
+location. Note that completion with \texttt{TAB} works with tag searching
+too. With \textbf{vi}, you can use \texttt{C-]} to jump on a definition of
+an identifier.
+
 
 PIPS can produce tags files for VI by invoking \verb|make CTAGS| or tags
-for Emacs by invoking \verb|make CTAGS|
+for Emacs by invoking \verb|make TAGS| in the PIPS \texttt{prod} top
+directory and it will produce the tags files into the \texttt{linear},
+\texttt{newgen} and \texttt{pips} subdirectories.
 
-This should be done for example in your \texttt{newgen/trunk},
-\texttt{pips/trunk} and \texttt{linear/trunk}.
+To build the tags for both VI and Emacs, just use a simple \texttt{make
+  tags}.  The tags files at the PIPS top directories need to be remade
+regularly to have an up to date version of the index.  should be used for
+\textbf{vi} users.
+
+You can also build specifically the tags for a development version of PIPS
+for example by making these tags explicitly in the \texttt{newgen/trunk},
+\texttt{pips/trunk} and \texttt{linear/trunk} directories.
 
 Then you need to configure your editor to use these tags files, for
 example in Emacs by using the customization of the \texttt{Tags Table
   List} with the \texttt{Options/Customize Emacs} menu or more
-directly in you \texttt{.emacs} with stuff like :
+directly in you \texttt{.emacs} with stuff like:
+\begin{itemize}
+\item for a production version of the tags :
+\begin{verbatim}
+(custom-set-variables
+  ;; ...
+ '(tags-table-list (quote
+    ("/home/keryell/projets/PIPS/MYPIPS/prod/newgen/TAGS"
+     "/home/keryell/projets/PIPS/MYPIPS/prod/linear/TAGS"
+     "/home/keryell/projets/PIPS/MYPIPS/prod/pips/TAGS")))
+ )
+\end{verbatim}
+\item for a development version of the tags :
 \begin{verbatim}
 (custom-set-variables
   ;; ...
@@ -239,19 +276,20 @@ directly in you \texttt{.emacs} with stuff like :
      "/home/keryell/projets/PIPS/svn/pips/trunk/TAGS")))
  )
 \end{verbatim}
+\end{itemize}
 
 
 \subsection{Developing PIPS under SVN}
 \label{sec:dev-svn}
 
-A basic understanding of svn operations and concepts such as 
-\emph{repository, checkout, status, commit} are necessary to develop in PIPS. 
-See for instance the SVN book at \LINK{http://svnbook.red-bean.com/}
-and other resources on the Internet.
+A basic understanding of svn operations and concepts such as
+\emph{repository, checkout, status, commit} are necessary to develop in
+PIPS.  See for instance the SVN book at
+\LINK{http://svnbook.red-bean.com/} and other resources on the Internet.
 
 The development policy within the PIPS-related software is that the
 \texttt{trunk} version should hold a production quality software which
-passes all non-regression tests that run nightly at CRI. Thus day-to-day
+should pass all non-regression tests that run nightly at CRI. Thus day-to-day
 development should not occur within this part, but in independent
 per-developer \texttt{branches} which should be validated before being
 merged back into the \texttt{trunk}.
@@ -270,7 +308,7 @@ procedure based on the \texttt{svn\_branch.sh} script provided in
   Calvin will have his own development area under \texttt{branches/calvin}
   in the subversion repository.
 
-\item Extract your own PIPS with the setup script (\texttt{setup\_pips.sh}) 
+\item Extract your own PIPS with the setup script (\texttt{setup\_pips.sh})
   mentionned above.
   The resulting directory may contain at the end of the building process:
   \begin{description}
@@ -288,7 +326,7 @@ procedure based on the \texttt{svn\_branch.sh} script provided in
 sh> svn co http://svn.cri.ensmp.fr/svn/pips/branches/calvin pips_dev
 \end{verbatim}
 }
-    Branches may also be used for linear and newgen development, 
+    Branches may also be used for linear and newgen development,
     in which case the local directory name for the checkout should be called
     \texttt{linear\_dev} or \texttt{newgen\_dev} respectively.
   \item[valid] a working copy of pips non regression tests for validation.
@@ -299,7 +337,7 @@ sh> svn co http://svn.cri.ensmp.fr/svn/pips/branches/calvin pips_dev
   \end{description}
 
 \item Create your own development branch refering to a given library directory
-  in the production version. Assuming that Calvin wants to develop 
+  in the production version. Assuming that Calvin wants to develop
   in the \texttt{hpfc} library in pips:
 \begin{verbatim}
 sh> cd /home/temp/MYPIPS/prod/pips/src/Libs/hpfc
@@ -323,7 +361,7 @@ sh> cd hpfc
   \item[diff] svn diff of local directory.
   \item[info] svn info of local directory.
   \item[branch-diff] what you have developed in your branch, i.e. the
-    differences between your branch and the production version 
+    differences between your branch and the production version
     (\texttt{trunk}).
   \item[branch-info] information about your branch.
   \item[branch-avail] list of commits on the trunk that where not pulled
@@ -348,7 +386,7 @@ sh> svn diff --revision 12345:HEAD -x -w
 \end{verbatim}
 }
   \end{enumerate}
-  
+
 \item When you are done with your developments, they are committed into
   your branch, you want to install them back to the pips main line.
   You must have write access to the \texttt{trunk} in order to do the commit.
@@ -361,10 +399,10 @@ sh> svn commit /tmp/svn_branch.XXXXXX/
 sh> svn commit .
 \end{verbatim}
 }
-  The \texttt{XXXXXX} part in the directory name is some temporary number 
+  The \texttt{XXXXXX} part in the directory name is some temporary number
   created for the nonce by the branch script.
 
-  There are two commits: 
+  There are two commits:
   \begin{itemize}
   \item the first one is in trunk to install the new version of the library.
   \item the second one in the branch to update bookeeping informations stored
@@ -377,7 +415,7 @@ sh> svn commit .
 
 \subsubsection{Other approaches}
 
-You may decide that the above procedure is not for you. 
+You may decide that the above procedure is not for you.
 Well, I would not advise it.
 
 Here are other possible approaches for developping in PIPS,
@@ -401,7 +439,7 @@ home-made branching, think about them too...
 
 For example, if you want to merge directly and atomically in your own
 working copy of the trunk your own copy of several branch pieces such as
-\texttt{pips>trunk/src/Libs/expressions} that is from the trunk at
+\texttt{pips/trunk/src/Libs/expressions} that is from the trunk at
 revision 12475 and so on, you can do something like:
 \begin{verbatim}
 cd .../svn/pips/trunk/src/Libs/expressions
@@ -437,7 +475,7 @@ stuff from a directory goes to \verb/$NEWGEN_ROOT/, \verb/$LINEAR_ROOT/
 \verb/PIPS_ROOT/ respectively, use the Makefile definitions from their
 \verb/$/\emph{*}\verb/_ROOT/ and are build with library found in the other
 \verb/$/\emph{*}\verb/_ROOT/ directory. The Makefile parts are picked into
-\verb/$/\emph{*}\verb|ROOT/makes| directory, \emph{except} for
+\verb/$/\emph{*}\verb|_ROOT/makes| directory, \emph{except} for
 \emph{Makefile} that are local symbolic links.
 %$
 
@@ -541,7 +579,7 @@ PIPS makefiles, and some helper scripts.
 
 \subsubsection{The \texttt{src} subdirectory}
 
-PIPS Sources. 
+The PIPS Sources are here.
 
 Having a copy of this subtree and of the makes directory is enough for fully
 recompiling PIPS, including the documentation, configuration files and
@@ -551,45 +589,45 @@ various scripts used for running and developping the PIPS sofware.
 \item[src/Documentation]:
   This directory contains the sources of the documentation of
   PIPS. From some of these are derived automatically header and
-  configuration files. 
-  
+  configuration files.
+
   The \texttt{newgen} sub-directory contains the description (in \LaTeX{})
   of the internal data structures used in the project, as they are used
-  in the development and production hierarchies. 
+  in the development and production hierarchies.
   %%
   The local makefile transforms the \texttt{*.tex} files
   describing PIPS data structures into NewGen and header files, and
   exports them to the \texttt{include} directory. %%$
   Thus the documentation actually \emph{is} the sources for the data
-  structures. 
-  
+  structures.
+
   The \texttt{wpips-epips-user-manual} sub-directory contains the user
-  manual. 
-  
+  manual.
+
   The \texttt{pipsmake} sub-directory contains the definition of the
   dependences between the different interprocedural analyses as a
   \LaTeX{} file, from which are derived the \texttt{pipsmake.rc}
   configuration file used by PIPS at runtime.
-  
+
 \item[src/Passes]: This directory contains the sources of the
   different passes, in several sub-directories named from the passes
   (\texttt{pips tpips wpips fpips}). If you add a pass, it is
   mandatory that the name of the directory is the name of the pass.
-  
+
 \item[src/Libs]: This directory contains the source of the several
   libraries of PIPS\@.  It is divided into sub-directories named from
   the libraries. The name of the subdirectory must be the name of the
   library.
-  
+
 \item[src/Scripts]:
   This directory contains the source of the shell scripts which are
   useful for PIPS, the linear library and NewGen. It is further
   divided into several directories. In each sub-directory a local
   \texttt{Makefile} performs automatic tasks such as the installation of
-  the sources where expected (usually in \texttt{utils}), 
+  the sources where expected (usually in \texttt{utils}),
   depending whether the scripts is used for
   \emph{running} or \emph{developing} PIPS.
-  
+
 \item[src/Runtimes]: This directory contains the sources of the
   libraries used when executing codes generated by PIPS; in fact,
   there are only two libraries: The first for the HPF compiler
@@ -625,13 +663,7 @@ Important files are \texttt{pipsmake.rc}, \texttt{properties.rc} and
 \subsubsection{The \texttt{share} subdirectory}
 
 They include shell (sh and csh), sed, awk, perl and lisp scripts.
-Examples (OBSOLETE?):
-\begin{itemize}
-\item \verb+stf-workspace+: \index{stf-workspace} calls Toolpack
-  restructurer \verb+stf+ on each Fortran file in a workspace; also
-  directly available as a PIPS transformation.
-\item and others.
-\end{itemize}
+
 
 \subsubsection{The \texttt{doc} subdirectory}
 
@@ -642,19 +674,20 @@ interprocedural analyses), \texttt{developer\_guide} (this document!),
 \texttt{ri} (the description of the pips Intermediate Representation, also
 known as the Abstract Syntax Tree (\textsc{ast})).
 
-%% IS IT ?
-%% This directory is used to build the static PIPS home page.
+This directory populated from the various \texttt{src} directories and is
+also used to build the static PIPS home page.
 
 %% \subsubsection{man}
 %% Local (obsolete?) man pages.
 
 \subsubsection{The \texttt{html} subdirectory}
 
-HTML documentation of PIPS. Some real HTML files, and some generated from
-\LaTeX{} files.
+This HTML documentation of PIPS is populated from the various \texttt{src}
+directories. There are real HTML files, and some generated from \LaTeX{}
+files.
 
-%% IS IT?    
-This directory is used to build the static PIPS home page.
+This directory is also used to build the static PIPS home page.
+
 
 \subsubsection{The \texttt{runtime} subdirectory}
 
@@ -669,35 +702,185 @@ sources.
 \label{sec:utils}
 
 Other architecture independent tools and files used for \emph{developing}
-pips (as opposed to \emph{running} it).
+pips (as opposed to \emph{running} it), such as validating PIPS, dealing
+with the SVN organization.
 
-It is best \textbf{not} the following validation scripts directly, 
-but rather to rely on the \texttt{Makefile} in the validation directory, 
-with very convenient targets including \texttt{validate accept clean}. 
-Using this approach does not require the validation directory to be under 
-\texttt{\$PIPS\_ROOT}.
+But there are also some scripts used to help PIPS usage, such as
+displaying some graphs or dealing with PIPS output.
 
-\begin{description}      
+
+\subsubsection{include}
+
+This directory contains all shared files needed for building PIPS.  It
+includes C header files automatically generated from NewGen specifications
+and for each library, and from some file in the documentation. Also pips
+architecture configuration file that define makefile macros are there.
+
+\subsubsection{lib}
+
+This directory contains PIPS compiled libraries ({\tt lib*.a}) ready
+to be linked. They are stored under their \texttt{\$PIPS\_ARCH}
+subdirectory.
+
+\section{Makefiles}
+\label{sec:makefiles}
+
+The GNU {\tt make} utility is extensively used to ensure the coherency of
+PIPS components. However, most {\tt Makefile}s are not written by hand,
+but are automatically composed according components from \texttt{nlpmake}
+package and automatic dependence computation. It eases development a lot,
+by providing a homogeneous environment all over the PIPS software parts.
+
+If you need some specific rules or targets, you have to write some
+makefile whith named ending with the \texttt{.mk} extension: they will be
+included in the global \texttt{Makefile}.
+
+By default, PIPS \texttt{make} does not stop on error but reports them on
+standard error output. But if you want to have \texttt{make} stopping on
+the first error to help debugging, just add \verb|FWD_STOP_ON_ERROR=1| to
+the \texttt{make} invocation.
+
+The rationale for relying on GNU make rather than make is that in the
+previous situation the software was relying heavily on SUN make special
+features, thus was highly not portable. Now it is more portable, say as
+much as the GNU softwares. The complex makefiles of PIPS rely on GNU
+extensions such as conditionals for instance. 
+
+\subsection{Global targets}
+\label{sec:global-targets}
+
+Global targets are targets useful at the top of PIPS to with global
+meaning such as building a global binary file from the sources.
+
+Useful targets defined:
+\begin{description}
+\item[build:] generate a running version with the documentation;
+\item[compile:] generate a running (hope so...) version. It is the default
+  target to \texttt{make} if you don't precise one;
+\item[doc:] build the documentation (such as the one you are reading right
+  now);
+\item[clean:] clean up the project directories;
+\item[local-clean:] remove eventually some stuff in the current directory;
+\item[tags:] build the TAGS index files of identifiers found in the
+  subdirectories (see~\ref{subsec:tags} for more precision and other
+  specific targets);
+\item[unbuild:] clean up things;
+\item[htdoc:] generate an HTML version of the documentation
+\item[full-build:] like \texttt{build} but with \texttt{htdoc} too.
+\end{description}
+
+
+\subsection{Local targets}
+\label{sec:local-targets}
+
+Local targets are actions with a more local meaning, such as:
+\begin{description}
+\item[local-clean:] remove eventually some stuff in the current directory;
+\end{description}
+
+{\tt make depend}\index{make!depend} must be used regularly to keep file
+dependencies up-to-date. The local header file corresponding to the current
+pass or library must have been created before, otherwise {\tt make depend}
+selects the header file from \verb+$PIPS_ROOT/Include+, and the local header
+will never be created. %% $
+
+{\tt make test}\index{make!test}, {\tt make ttest}\index{make!ttest} and
+{\tt make wtest}\index{make!wtest} generate local versions of PIPS
+executables (respectively \verb+pips+, \verb+tpips+ and \verb+wpips+), to
+verify that the local library or pass links properly with PIPS, linear and
+NewGen, and to test the modifications.
+
+{\tt make libxxx.a} just recompiles the local {\tt *.c} files, and creates
+the local library file {\tt libxxx.a}. This is useful when making a lot of
+changes to check the syntax; or when making changes in several directories
+at the same time: in this case, the proper policy is to a) chose one of these
+directories as the master directory, b) build the {\tt libxxx.a} in the other
+directories, c) make symbolic links towards them in from the master
+directory, d) and finally link in this last directory. If your pips
+architecture is not \verb|.|, don't forget to link the proper libraries
+in the proper sub-directory.
+
+A typical example of {\tt config.makefile}\index{config.makefile}
+file is provided in Figure~\ref{fig:config_makefile}.
+
+\begin{figure}[p]
+  \begin{center}
+    \leavevmode
+    \begin{verbatim}
+#
+# The following macros define your pass.
+#
+# Name of the target (default is the name of directory)
+# TARGET=         parallelize
+#
+# Source, header and object files used to build the target
+LIB_CFILES=  kennedy.c scan.c util.c dependence.c algebre.c \
+                divar.c debug.c codegen.c scc.c
+LIB_HEADERS= parallelize-local.h
+LIB_OBJECTS= $(LIB_CFILES:.c=.o)
+#
+# that is all
+#
+\end{verbatim}
+    \caption{Example of {\tt config.makefile}.}
+    \label{fig:config_makefile}
+  \end{center}
+\end{figure} %% $
+
+
+
+\section{Validation}
+\label{sec:validation}
+
+The validation is stored in a separate subversion repository
+\url{http://svn.cri.ensmp.fr/svn/validation}
+
+Different phases are validated in distinct sub-directories.  Running the
+validation uses the \texttt{pips\_validation} script mentioned above.
+
+See the \texttt{README} at the root of the \texttt{trunk} for details on
+how to run the validation. Basically, one must simply type \texttt{make}.
+
+See various examples around to add new validation files.  The preferred
+way is to provide a source file \texttt{MyTest.f}, a corresponding
+\texttt{MyTest.tpips} script, and store the standard output of the
+\texttt{.tpips} script into \texttt{MyTest.result/out}.
+
+\textbf{CAUTION:} use a relative and local path in the \texttt{.tpips}
+file to reference the source file.
+
+To do more subtle things (nightly validation with mail notification, etc)
+it is possible to use validation scripts instead.
+
+But it is best \textbf{not} using the following validation scripts
+directly, but rather to rely on the \texttt{Makefile} in the validation
+directory, which has very convenient targets including \texttt{validate
+  accept clean}.  Using this approach does not require the validation
+directory to be under \texttt{\$PIPS\_ROOT}.
+
+Two validation scripts are available:
+\begin{description}
 \item[pips\_validate]: \index{Validate} Non-regression tests;
-  
-  The arguments are names of subdirectories in 
-  \texttt{\$PIPS\_ROOT/../../valid} or source files within these directories.
-  See \texttt{pips\_validate -h} for help and a list of options.
-  
+
+  The arguments are names of subdirectories in
+  \texttt{\$PIPS\_ROOT/../../valid} or source files within these
+  directories.  See \texttt{pips\_validate -h} for help and a list of
+  options.
+
   Tests are organized more or less on a library basis in \texttt{valid}.
   Non-regression tests are characterized by one or more source
   programs which must have a known result.
-      
+
   Set \texttt{PIPSDBM\_DEBUG\_LEVEL} to 5 to check data structures when
   they are stored and to 9 to check them when they are delivered; some
   data structures are not checked, among them, all that contain
   external types;
-  
+
   The validation is performed for each source file found in a directory.
   These validation scripts \textbf{must not} rely on absolute path,
-  otherwise moving the validation around is impossible. 
+  otherwise moving the validation around is impossible.
   %%
-  If you really need to rely on the directory containing the scripts, 
+  If you really need to rely on the directory containing the scripts,
   use the \texttt{\$\{VDIR:-.\}} environment variable with a default to
   the current directory (well, I'm not that sure\ldots).
 
@@ -705,16 +888,16 @@ Using this approach does not require the validation directory to be under
   \begin{enumerate}
   \item a corresponding. \texttt{.test} file, and executes it.
 
-  \item a corresponding \texttt{.tpips} file which is executed as a 
+  \item a corresponding \texttt{.tpips} file which is executed as a
     tpips script.
 
-  \item a corresponding \texttt{.tpips2} file which is executed as a 
-    tpips script, with the error stream redirect. 
+  \item a corresponding \texttt{.tpips2} file which is executed as a
+    tpips script, with the error stream redirect.
 
     Validating the error stream is a \textbf{very bad idea} as it leads
     to never ending regression variations. It is even worth when the
     output comes from external tools such as compilers error output.
-    
+
   \item a \texttt{default\_test} file as a template for a \texttt{.test} file.
 
     First it performs some substitutions
@@ -723,25 +906,25 @@ Using this approach does not require the validation directory to be under
     the validation directory, the name prefix in lower or upper)
     and then it executes the generated test file.
 
-  \item a \texttt{default\_tpips} file and runs it with tpips. 
+  \item a \texttt{default\_tpips} file and runs it with \textsc{tpips}.
 
-    The environment variables \texttt{FILE} and \texttt{WSPACE} contain 
+    The environment variables \texttt{FILE} and \texttt{WSPACE} contain
     the full-path file name and the file name prefix.
 
   \item if none of these cases apply, the scripts parallelize all modules.
   \end{enumerate}
-  
+
   For maintenance purposes, the \texttt{default\_tpips} approach is the
   best choice (only one source file to maintain for all the sources of a
   validation directory). However, this can be used only if the very same
-  test is to be applied. As a second choice, the \texttt{.tpips} script 
-  is encouraged. It is very important not to validate \texttt{stderr} output 
-  and pips with some level of debugging on, because these outputs are not 
+  test is to be applied. As a second choice, the \texttt{.tpips} script is
+  encouraged. It is very important not to validate \texttt{stderr} output
+  and pips with some level of debugging on, because these outputs are not
   very stable from one architecture to another.
 
 \item[manual\_accept] \index{Validate} interactive script to accept
   new validation results. Then commit these changes to the validation
-  repository, if and only if the corresponding pips sources are already 
+  repository, if and only if the corresponding pips sources are already
   committed!
 \end{description}
 
@@ -763,50 +946,17 @@ Using this approach does not require the validation directory to be under
 %%  documentation here are welcome!
 %%\end{itemize}
 
-\subsubsection{include}
-
-This directory contains all shared files needed for building PIPS.  It
-includes C header files automatically generated from NewGen specifications
-and for each library, and from some file in the documentation. Also pips
-architecture configuration file that define makefile macros are there.
-
-\subsubsection{lib}
-
-This directory contains PIPS compiled libraries ({\tt lib*.a}) ready
-to be linked. They are stored under their \texttt{\$PIPS\_ARCH}
-subdirectory.
-
-\section{Validation}
-\label{sec:validation}
-
-The validation is stored in a separate subversion repository 
-\par\centerline{\LINK{http://svn.cri.ensmp.fr/svn/validation}}. 
-Different phases are validated in distinct sub-directories.
-Running the validation uses the \texttt{pips\_validation} script
-mentionned above.
-
-See the \texttt{README} at the root of the \texttt{trunk} for details on
-how to run the validation. Basically, one must simply type \texttt{make}.
-
-See various examples around to add new validation files. 
-The prefered way is to provide a source file \texttt{MyTest.f},
-a corresponding \texttt{MyTest.tpips} script, and store
-the standard output of the tpips script into \texttt{MyTest.result/out}.
-
-\textbf{CAUTION:} use a relative and local path in the tpips file to 
-reference the source file.
 
 \newpage
 \noindent
-{\huge OBSOLETE DOWN FROM HERE\ldots}
+{\huge MAY BE OBSOLETE DOWN FROM HERE\ldots}
 
 \section{Development (\texttt{PIPS\_DEVEDIR})}
 
-This directory contains the version of PIPS currently being developed. 
-It is a mirror of the organization under \verb+$PIPS_ROOT/src+. %%$
-Each library is developped and tested under this subtree, linking by
-default with the \emph{installed} libraries in
-\verb+$PIPS_ROOT/Lib+. %%$
+This directory contains the version of PIPS currently being developed.  It
+is a mirror of the organization under \verb+$PIPS_ROOT/src+. %%$
+Each library is developed and tested under this subtree, linking by
+default with the \emph{installed} libraries in \verb+$PIPS_ROOT/Lib+. %%$
 
 Thus new versions can be developed without interfering with other
 developments. Once a new version of a library (or pass, or script, or
@@ -814,17 +964,18 @@ anything) is okay and validated, it is installed under the
 \verb+$PIPS_ROOT/Src+ subtree and becomes the reference for all other
 developers who may use its services. %%$
 
-When developing or debugging several related libraries at the same
-time, you can used the development version of these libraries by
-using unix links (\texttt{ln -s}) to one of the directory under the
-corresponding \verb|$PIPS_ARCH| subdirectory. When building %%$
-a new binary, the linker takes these local libraries first. 
+When developing or debugging several related libraries at the same time,
+you can used the development version of these libraries by using unix
+links (\texttt{ln -s}) to one of the directory under the corresponding
+\verb|$PIPS_ARCH| subdirectory. When building %%$
+a new binary, the linker takes these local libraries first.
 
 \subsection{Experiments}
-  
-This directory is a large piece of disk space to be used temporarily to
-analyze large programs and to core dump large {\tt pips} processes; no
-permanent, non-deductible information should be stored there;
+
+At CRI, this directory is a large piece of disk space to be used
+temporarily to analyze large programs and to core dump large {\tt pips}
+processes; no permanent, non-deductible information should be stored
+there.
 
 
 \section{NewGen}
@@ -939,113 +1090,6 @@ similarily to Pips and Newgen.  Thus there are Production
 (dot)) can be used for building the library.
 
 
-
-
-
-\section{Makefiles}
-\label{sec:makefiles}
-
-The GNU {\tt make} utility is extensively used to ensure the coherency of
-PIPS components. However, most {\tt Makefile}s are not written by hand,
-but are automatically composed according components from \texttt{nlpmake}
-package and automatic dependence computation. It eases development a lot,
-by providing a homogeneous environment all over the PIPS software parts.
-
-If you need some specific rules or targets, you have to write some
-makefile whith named ending with the \texttt{.mk} extension: they will be
-included in the global \texttt{Makefile}.
-
-By default, PIPS \texttt{make} does not stop on error but reports them on
-standard error output. But if you want to have \texttt{make} stopping on
-the first error to help debugging, just add \verb|FWD_STOP_ON_ERROR=1| to
-the \texttt{make} invocation.
-
-The rationale for relying on GNU make rather than make is that in the
-previous situation the software was relying heavily on SUN make special
-features, thus was highly not portable. Now it is more portable, say as
-much as the GNU softwares. The complex makefiles of PIPS rely on GNU
-extensions such as conditionals for instance. 
-
-\subsection{Global targets}
-\label{sec:global-targets}
-
-Global targets are targets useful at the top of PIPS to with global
-meaning such as building a global binary file from the sources.
-
-Useful targets defined:
-\begin{description}
-\item[build:] generate a running version with the documentation;
-\item[compile:] generate a running (hope so...) version;
-\item[doc:] build the documentation (such as the one you are reading right
-  now);
-\item[clean:] clean up the project directories;
-\item[local-clean:] remove eventually some stuff in the current directory;
-\item[tags:] build a TAGS index file of identifiers found in the
-  subdirectories (see~\ref{subsec:tags});
-\item[unbuild:] clean up things;
-\item[htdoc:] generate an HTML version of the documentation
-\item[full-build:] like \texttt{build} but with \texttt{htdoc} too.
-\end{description}
-
-
-\subsection{Local targets}
-\label{sec:local-targets}
-
-Local targets are actions with a more local meaning, such as:
-\begin{description}
-\item[local-clean:] remove eventually some stuff in the current directory;
-\end{description}
-
-{\tt make depend}\index{make!depend} must be used regularly to keep file
-dependencies up-to-date. The local header file corresponding to the current
-pass or library must have been created before, otherwise {\tt make depend}
-selects the header file from \verb+$PIPS_ROOT/Include+, and the local header
-will never be created. %% $
-
-{\tt make test}\index{make!test}, {\tt make ttest}\index{make!ttest} and
-{\tt make wtest}\index{make!wtest} generate local versions of PIPS
-executables (respectively \verb+pips+, \verb+tpips+ and \verb+wpips+), to
-verify that the local library or pass links properly with PIPS, linear and
-NewGen, and to test the modifications.
-
-{\tt make libxxx.a} just recompiles the local {\tt *.c} files, and creates
-the local library file {\tt libxxx.a}. This is useful when making a lot of
-changes to check the syntax; or when making changes in several directories
-at the same time: in this case, the proper policy is to a) chose one of these
-directories as the master directory, b) build the {\tt libxxx.a} in the other
-directories, c) make symbolic links towards them in from the master
-directory, d) and finally link in this last directory. If your pips
-architecture is not \verb|.|, don't forget to link the proper libraries
-in the proper sub-directory.
-
-A typical example of {\tt config.makefile}\index{config.makefile}
-file is provided in Figure~\ref{fig:config_makefile}.
-
-\begin{figure}[p]
-  \begin{center}
-    \leavevmode
-    \begin{verbatim}
-#
-# The following macros define your pass.
-#
-# Name of the target (default is the name of directory)
-# TARGET=         parallelize
-#
-# Source, header and object files used to build the target
-LIB_CFILES=  kennedy.c scan.c util.c dependence.c algebre.c \
-                divar.c debug.c codegen.c scc.c
-LIB_HEADERS= parallelize-local.h
-LIB_OBJECTS= $(LIB_CFILES:.c=.o)
-#
-# that is all
-#
-\end{verbatim}
-    \caption{Example of {\tt config.makefile}.}
-    \label{fig:config_makefile}
-  \end{center}
-\end{figure} %% $
-
-
 \section{Library internal organization}
 \label{sec:library_internal_organization}
 
@@ -1111,38 +1155,6 @@ reasons, there are numerous exceptions. Many functions are in fact in the
 library where they were first necessary. An example is the {\tt syntax}
 library (the parser).
 
-
-
-\subsection{Tags used for indexing the code}
-\label{subsec:tags}
-
-Many macros and functions are available from the Linear and NewGen
-libraries, but also in PIPS. Their source code can be retrieved using the
-\emph{tags} indexing mechanism under editors such as \textbf{emacs} or
-\textbf{vi}. 
-
-The TAGS file at the PIPS top directory is made with a \texttt{make tags}
-and needs to be remade regularly to have an up to date version of the
-index. The CTAGS file at the same place and built by the same target 
-should be used for \textbf{vi} users.
-
-So it is highly recommended to use for example the Emacs editor to benefit
-from the tags.  You can add the PIPS TAGS file by customizing the
-\texttt{Tags Table List} variable from the \texttt{Options} menu or
-directly in your \texttt{\~/.emacs} with something like:
-\begin{verbatim}
-(setq tags-table-list 
-  '("." "~/projets/PIPS/MYPIPS/prod/pips" "/usr/src/linux-2.6.16")
- )
-\end{verbatim}
-Afterward, you can find, by typing a \texttt{M-.} on an identifier, the
-location where it is defined. Note that completion with \texttt{TAB} works
-with tag searching.
-
-TODO : They are made from the development source files of linear, NewGen
-and PIPS. Indeed, since PIPS is under svn, it is not true anymore and you
-need to make separate TAGS files for Linear and NewGen and put them in the
-\texttt{tags-table-list} Emacs variable.
 
 
 \subsection{Library dependencies}
@@ -1768,7 +1780,7 @@ browsable. For example, see \LINK{http://doxygen.pips.enstb.org}.
 \bibliography{developer_guide}
 }
 
-\input{developer_guide.ind}
+\printindex
 
 \end{document}
 
