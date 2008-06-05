@@ -12,6 +12,7 @@
 
 \documentclass[a4paper]{article}
 %\usepackage{alltt,html,fancybox,amstext,xspace,epsfig}
+\usepackage{makeidx}
 \usepackage{epsfig,amstext,alltt,fullpage}
 \usepackage[ps2pdf,backref,pagebackref]{hyperref}
 \usepackage{xspace}
@@ -24,6 +25,7 @@
   stringstyle=\rmfamily, commentstyle=\rmfamily\itshape,
   index=[1][keywords],indexprocnames=true}
 
+\makeindex
 
 \title{Properties \\
     Low Level Tuning of PIPS}
@@ -2622,7 +2624,7 @@ septembre 1994. Technical Report A/255.
 
 % Cross-references for points and keywords
 
-\input{properties-rc.ind}
+\printindex
 
 \end{document}
 

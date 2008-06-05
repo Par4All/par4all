@@ -8,7 +8,13 @@
 \documentclass[a4paper]{article}
 \usepackage[latin9]{inputenc}
 \usepackage[backref,pagebackref]{hyperref}
-\usepackage{breakurl}
+\makeatletter
+% Test for a TeX4ht command:
+\@ifundefined{HCode}{%
+  % We are generating PDF, so allow to break down URL:
+  \usepackage{breakurl}}{%
+  % else we are generating HTML with TeX4ht, use plain url:
+  \usepackage{url}}
 \usepackage{xspace,makeidx}
 \usepackage[hyper,procnames]{listings}
 
@@ -22,9 +28,9 @@
 
 \newcommand{\LINK}[1]{\url{#1}\xspace}
 
-\newcommand{\PipsOldWWW}{\LINK{http://www.cri.ensmp.fr/pips/}}
-\newcommand{\PipsNewWWW}{\LINK{https://freia.enstb.org/pips}}
-\newcommand{\PipsDevGuidePDF}{\LINK{http://www.cri.ensmp.fr/pips/pips/developer_guide.htdoc/developer_guide.pdf}}
+\newcommand{\PipsOldWWW}{\LINK{http://www.cri.ensmp.fr/pips/}\xspace}
+\newcommand{\PipsNewWWW}{\LINK{https://freia.enstb.org/pips}\xspace}
+\newcommand{\PipsDevGuidePDF}{\LINK{http://www.cri.ensmp.fr/pips/developer_guide.htdoc/developer_guide.pdf}}
 \newcommand{\PipsDevGuideHTDOC}{\LINK{http://www.cri.ensmp.fr/pips/developer_guide.htdoc}}
 \newcommand{\DoxygenSources}{\LINK{https://freia.enstb.org/pips/source}}
 
@@ -64,7 +70,7 @@
 You can get a printable version of this document on\\
 \PipsDevGuidePDF and a HTML version on \PipsDevGuideHTDOC.
 
-The legacy WWW site is at \PipsOldWWW and the new one is at \PipsNewWWW.
+The legacy WWW site is at \PipsOldWWW and a new one is at \PipsNewWWW.
 
 \clearpage
 \tableofcontents
@@ -773,23 +779,48 @@ Useful targets defined:
 \subsection{Local targets}
 \label{sec:local-targets}
 
-Local targets are actions with a more local meaning, such as:
+Local targets are actions with a more local meaning to help developing
+some passes or documentation parts, such as:
 \begin{description}
-\item[local-clean:] remove eventually some stuff in the current directory;
+\item[\texttt{local-clean}:] remove eventually some stuff in the current
+  directory;
+\item[\texttt{lib}:] just recompiles the local source files to create the
+  local library into the local \verb|$PIPS_ARCH|%$
+  without installing into the production directory. It is useful to test
+  the compilation of a local library without cluttering the production
+  version. See also the \texttt{ttest} target.
+\item[\texttt{depend}:] \texttt{make depend}\index{make!depend} must be
+  used regularly to keep file dependencies up-to-date. The local header
+  file corresponding to the current pass or library must have been
+  created\marginpar{Is this line obsolete?} before, otherwise \texttt{make
+    depend} selects the header file from \verb+$PIPS_ROOT/include+, and
+  the local header will never be created;%% $
+\item[\texttt{ttest}:] {\tt make ttest}\index{make!ttest} generate a local
+  version of \texttt{tpips} into the local \verb|$PIPS_ARCH| directory by
+  compiling the local files and linking them against the other libraries
+  already installed in \verb|$PIPS_ROOT|. This allows to verify that the
+  local library or pass links properly with PIPS, linear and NewGen, and
+  to test and validate the modifications. If you want to test several
+  libraries at once, without cluttering the production version, it is more
+  subtle. Once you have chosen the directory of one library seen as the
+  master one, you need to make accessible the other libraries from the
+  local \verb|$PIPS_ARCH|, for example with a symbolic links that can be
+  created in the master library directory like:
+\begin{verbatim}
+ln -s ../semantics/$PIPS_ARCH/libsemantics.a $PIPS_ARCH
+\end{verbatim}
+\item[\texttt{test}:] same as \texttt{ttest} but build a \texttt{pips}
+  instead of \texttt{tpips};
+\item[\texttt{wtest}:] same as \texttt{ttest} but build a \texttt{wpips}
+  instead of \texttt{tpips};
+\item[\texttt{phase6}:] builds the documentation;\marginpar{these rules
+    should have user-friendly names?}
+\item[\texttt{phase7}:] builds the documentation for web publication;
 \end{description}
+\marginpar{There are other rules to describe...}
 
-{\tt make depend}\index{make!depend} must be used regularly to keep file
-dependencies up-to-date. The local header file corresponding to the current
-pass or library must have been created before, otherwise {\tt make depend}
-selects the header file from \verb+$PIPS_ROOT/Include+, and the local header
-will never be created. %% $
-
-{\tt make test}\index{make!test}, {\tt make ttest}\index{make!ttest} and
-{\tt make wtest}\index{make!wtest} generate local versions of PIPS
-executables (respectively \verb+pips+, \verb+tpips+ and \verb+wpips+), to
-verify that the local library or pass links properly with PIPS, linear and
-NewGen, and to test the modifications.
-
+THIS PARAGRAPH IS OBSOLETE.\marginpar{I cannot see how to compile without
+  installing to the PROD directory...}
 {\tt make libxxx.a} just recompiles the local {\tt *.c} files, and creates
 the local library file {\tt libxxx.a}. This is useful when making a lot of
 changes to check the syntax; or when making changes in several directories
@@ -800,32 +831,35 @@ directory, d) and finally link in this last directory. If your pips
 architecture is not \verb|.|, don't forget to link the proper libraries
 in the proper sub-directory.
 
-A typical example of {\tt config.makefile}\index{config.makefile}
-file is provided in Figure~\ref{fig:config_makefile}.
+A typical example of a local \texttt{Makefile}\index{config.makefile} file
+is provided in Figure~\ref{fig:config_makefile}.
 
-\begin{figure}[p]
-  \begin{center}
-    \leavevmode
-    \begin{verbatim}
-#
-# The following macros define your pass.
-#
-# Name of the target (default is the name of directory)
-# TARGET=         parallelize
-#
-# Source, header and object files used to build the target
-LIB_CFILES=  kennedy.c scan.c util.c dependence.c algebre.c \
-                divar.c debug.c codegen.c scc.c
-LIB_HEADERS= parallelize-local.h
-LIB_OBJECTS= $(LIB_CFILES:.c=.o)
-#
-# that is all
-#
+\begin{figure}
+\begin{verbatim}
+# The following macros define your pass:
+TARGET	= rice
+
+# Sources used to build the target
+LIB_CFILES =	rice.c codegen.c scc.c icm.c
+
+# Headers used to build the target
+INC_TARGET =    $(TARGET).h
+
+LIB_TARGET =    lib$(TARGET).a
+
+# common stuff
+ifdef PIPS_ROOT
+ROOT    = $(PIPS_ROOT)
+else
+ROOT    = ../../..
+endif
+
+PROJECT = pips
+include $(ROOT)/makes/main.mk
 \end{verbatim}
-    \caption{Example of {\tt config.makefile}.}
-    \label{fig:config_makefile}
-  \end{center}
-\end{figure} %% $
+  \caption{Example of \texttt{Makefile}.}
+  \label{fig:config_makefile}
+\end{figure}
 
 
 
@@ -945,6 +979,31 @@ Two validation scripts are available:
 %%\item there many other things in this directory; volunteers to write their
 %%  documentation here are welcome!
 %%\end{itemize}
+
+
+\section{Documentation}
+\label{sec:documentation}
+
+\subsection{Source documentation}
+\label{sec:source-documentation}
+
+The various documentations, including the source of the web pages, are
+stored in the \texttt{src/Documentation} directory.
+
+For example this guide is stored in \verb|src/Documentation/dev_guide|.
+
+
+\subsection{Web site}
+\label{sec:web-site}
+
+The various PIPS documentations can be published on the web site
+\PipsOldWWW with the \verb|pips_publish_www| once you have compiled it.
+
+There is also a new dynamic web site \PipsNewWWW that reference better the
+information stored on\PipsOldWWW. The idea is to have the content edited
+naturally and collaboratively onto \PipsNewWWW and from time to time
+injecting back the content into the \PipsOldWWW by editing the
+\texttt{src/Documentation/web} directory.
 
 
 \newpage
