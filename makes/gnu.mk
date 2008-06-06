@@ -11,9 +11,15 @@ CANSI	= -ansi -pedantic-errors
 CFLAGS	= -g -O2 -Wall -W -pipe
 # ??? -MG
 CMKDEP	= -MM
-LD	= $(CC) 
+LD	= $(CC)
 RANLIB	= granlib
-FC	= g77
+
+ifdef PIPS_F77
+	FC	= $(PIPS_F77)
+else
+	FC	= f77
+endif
+
 FFLAGS	= -O2 -g -Wimplicit -pipe
 
 LDFLAGS += -g

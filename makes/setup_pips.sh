@@ -58,12 +58,14 @@ mkdir -p $destination || error "cannot mkdir $destination"
 
 prod=$destination/prod
 
+echo
 echo "### checking needed softwares"
 for exe in svn wget tar gunzip make cproto flex bison gcc perl sed tr
 do
   type $exe || error "no such executable, please install: $exe"
 done
 
+echo
 echo "### downloading pips"
 svn $subcmd $PIPS_SVN/bundles/trunks $prod || error "cannot checkout pips"
 
@@ -92,35 +94,13 @@ unset NEWGEN_ROOT LINEAR_ROOT PIPS_ROOT
   #svn $subcmd $NEWGEN_SVN/branches/$developer $destination/newgen_dev
 }
 
+echo
 echo "### downloading $POLYLIB"
 cd /tmp
 test -f $POLYLIB.tar.gz && warning "some /tmp/$POLYLIB.tar.gz file already there. Continue?"
 wget -nd $POLYLIB_SITE/$POLYLIB.tar.gz || error "cannot wget polylib"
 
-echo "### building $POLYLIB"
-mkdir -p $prod/extern || error "cannot mkdir $prod/extern"
-gunzip $POLYLIB.tar.gz || error "cannot decompress polylib"
-tar xf $POLYLIB.tar || error "cannot untar polylib"
-cd $POLYLIB || error "cannot cd into polylib"
-# fix pour Ronan...
-perl -i.old -p -e \
-    's/^static // if 140 and /int linear_exception_debug_mode = FALSE/;' \
-    source/arith/errors.c
-./configure --prefix=$prod/extern || error "cannot configure polylib"
-make || error "cannot make polylib"
-
-make install || error "cannot install polylib"
-cd .. || error "cannot cd .."
-rm -rf $POLYLIB || error "cannot remove polylib"
-rm -f $POLYLIB.tar || error "cannot remove polylib tar"
-
-echo "### fixing $POLYLIB"
-mkdir -p $prod/extern/lib/$PIPS_ARCH || error "cannot mkdir"
-cd $prod/extern/lib/$PIPS_ARCH || error "cannot cd"
-# Just in case a previous version was here:
-rm -f libpolylib.a
-ln -s ../libpolylib*.a libpolylib.a || error "cannot create links"
-
+echo
 echo "### testing special commands for config.mk"
 config=$prod/pips/makes/config.mk
 type javac && echo '_HAS_JDK_ = 1' >> $config
@@ -134,25 +114,11 @@ target=compile
 type latex && target=build
 type htlatex && target=full-build
 
-warning "cproto header generation results in many cpp warnings..."
+# Find the Fortran compiler:
+type gfortran && export PIPS_F77=gfortran
+type g77 && export PIPS_F77=g77
 
-echo "### building newgen"
-cd $prod/newgen
-make clean
-make $target
-
-echo "### building linear"
-cd $prod/linear
-make clean
-make $target
-
-echo "### building pips"
-cd $prod/pips
-make clean
-# must find newgen and newC executable...
-PATH=$prod/newgen/bin:$prod/newgen/bin/$PIPS_ARCH:$PATH \
-    make $target
-
+echo
 echo "### creating pipsrc.sh"
 cat <<EOF > $destination/pipsrc.sh
 # minimum rc file for sh-compatible shells
@@ -175,11 +141,63 @@ export PIPS_ROOT=$prod/pips
 PATH=\$PIPS_ROOT/bin:\$PIPS_ROOT/utils:\$NEWGEN_ROOT/bin:\$PATH
 EOF
 
+if [ -n "$PIPS_F77" ]; then
+    echo >> $destination/pipsrc.sh
+    echo "# The Fortran compiler to use:" >> $destination/pipsrc.sh
+    echo "export PIPS_F77=$PIPS_F77" >> $destination/pipsrc.sh
+fi
+
+echo
 echo "### generating csh environment"
 $prod/pips/src/Scripts/env/sh2csh.pl \
     < $destination/pipsrc.sh \
     > $destination/pipsrc.csh
 
+echo
+echo "### building $POLYLIB"
+mkdir -p $prod/extern || error "cannot mkdir $prod/extern"
+gunzip $POLYLIB.tar.gz || error "cannot decompress polylib"
+tar xf $POLYLIB.tar || error "cannot untar polylib"
+cd $POLYLIB || error "cannot cd into polylib"
+./configure --prefix=$prod/extern || error "cannot configure polylib"
+make || error "cannot make polylib"
+
+make install || error "cannot install polylib"
+cd .. || error "cannot cd .."
+rm -rf $POLYLIB || error "cannot remove polylib"
+rm -f $POLYLIB.tar || error "cannot remove polylib tar"
+
+echo
+echo "### fixing $POLYLIB"
+mkdir -p $prod/extern/lib/$PIPS_ARCH || error "cannot mkdir"
+cd $prod/extern/lib/$PIPS_ARCH || error "cannot cd"
+# Just in case a previous version was here:
+rm -f libpolylib.a
+ln -s ../libpolylib*.a libpolylib.a || error "cannot create links"
+
+warning "cproto header generation results in many cpp warnings..."
+
+echo
+echo "### building newgen"
+cd $prod/newgen
+make clean
+make $target
+
+echo
+echo "### building linear"
+cd $prod/linear
+make clean
+make $target
+
+echo
+echo "### building pips"
+cd $prod/pips
+make clean
+# must find newgen and newC executable...
+PATH=$prod/newgen/bin:$prod/newgen/bin/$PIPS_ARCH:$PATH \
+    make $target
+
+echo
 echo "### checking useful softwares"
 for exe in bash m4 wish latex htlatex javac emacs
 do
