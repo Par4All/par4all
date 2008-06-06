@@ -64,9 +64,14 @@
 \usepackage{epsfig,amstext,alltt}
 \usepackage[backref,pagebackref]{hyperref}
 \usepackage{xspace}
-\usepackage{makeidex}
-
-\usepackage{url}
+\makeatletter
+% Test for a TeX4ht command:
+\@ifundefined{HCode}{%
+  % We are generating PDF, so allow to break down URL:
+  \usepackage{breakurl}}{%
+  % else we are generating HTML with TeX4ht, use plain url:
+  \usepackage{url}}
+\usepackage{makeidx}
 
 %% Cannot work with verbatim: \begin{verbatim} absorbs \end{example}
 %% \newenvironment{example}{\begin{verbatim}}{\end{verbatim}}
