@@ -64,6 +64,8 @@
 \usepackage{epsfig,amstext,alltt}
 \usepackage[backref,pagebackref]{hyperref}
 \usepackage{xspace}
+\usepackage{makeidex}
+
 \usepackage{url}
 
 %% Cannot work with verbatim: \begin{verbatim} absorbs \end{example}
@@ -100,6 +102,7 @@
 % \addtolength{\topmargin}{-60pt}
 
 \renewcommand{\indexname}{Index}
+\makeindex
 
 %% short term fix to html style
 \newcommand{\LINK}[2]{\href{#2}{#1}\footnote{\url{#2}}\xspace}
@@ -7171,7 +7174,7 @@ Thèse de doctorat de l'Université Pierre et Marie Curie,
 
 % Cross-references for points and keywords
 
-\input{pipsmake-rc.ind}
+\printindex
 
 \end{document}
 
