@@ -13,7 +13,7 @@ echo
 echo Execute initial code
 echo
 
-shell ./a.out
+shell ./a.out; echo -n
 shell rm a.out
 
 echo
