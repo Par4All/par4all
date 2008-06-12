@@ -219,6 +219,12 @@ section~\ref{sec:using-tags}.
 Most PIPS contributors use Emacs to develop in PIPS, so some goodies have
 been added to ease those developers.
 
+Have a look for example at section~\ref{sec:newgen} for debugging. You
+should use the \texttt{gud-tooltip-modes} to display the value of an
+object under the mouse. Setting the \texttt{gdb-many-windows} to
+\texttt{t} transform Emacs (from version 22) in an interesting graphical
+IDE. You can select a frame by just clicking it and so on.
+
 Most documentation (like the one you are reading) is written in LaTeX and
 some parts even use literate programming with a \LaTeX{} base, so the
 AUCTeX, PreviewLaTeX and RefTeX mode are quite useful.
@@ -1037,7 +1043,7 @@ processes; no permanent, non-deductible information should be stored
 there.
 
 
-\section{NewGen}
+\section{Debugging and NewGen}
 \label{sec:newgen}
 
 NewGen is a software engineering tool, from which almost all PIPS data
@@ -1048,23 +1054,19 @@ required for building pips from scratch, and the Newgen runtime library
 
 NewGen sources are in the directory \verb+$NEWGEN_DIR+. %% $
 The global organization is similar to the PIPS organization.
-(Production and Development, then under Production one can find Include,
-Lib, Bin, Share, Doc\ldots). 
+
 \verb+$NEWGEN_ROOT+ and \verb+$NEWGEN_ARCH+ refer to the current version
 and architecture to be used. If \verb+$NEWGEN_ARCH+ is not defined, is
-defaults to \verb+$PIPS_ARCH+ and then to \verb+.+ (dot), so that if one
-develop or update Newgen as part of PIPS there is no trouble.
+defaults to \verb+$PIPS_ARCH+ and then to ``\verb+.+'', so that if one
+develop or update NewGen as part of PIPS there is no trouble.
 
 It may (alas!) sometimes be useful to consult them. Several
-functionalities are useful when debugging: 
+functionalities are useful when debugging:
 \begin{itemize}
-  
-\item \verb+gen_consistent_p()+ \index{gen\_consistent\_p}checks whether an
-  existing NewGen data structure is (recursively) well formed. 
-  
+\item \verb+gen_consistent_p()+ \index{gen\_consistent\_p}checks whether
+  an existing NewGen data structure is (recursively) well formed.
 \item \verb+gen_defined_p()+ \index{gen\_defined\_p}checks whether an
   existing NewGen data structure is (recursively) completely defined.
-  
 \item \verb+gen_debug+ \index{gen\_debug}is an external variable to
   dynamically check the coherence of NewGen data structures.
 
@@ -1080,57 +1082,106 @@ functionalities are useful when debugging:
   \begin{quote}
     \verb+ gen_debug = GEN_TRAV_OBJ+
   \end{quote}
-  
-\item To print the type number of a NewGen object under \verb+dbx+ or \verb+gdb+:
+\item To print the type (the domain) number of a NewGen object under
+  \verb+dbx+ or \verb+gdb+:
   \begin{quote}
-    \verb|print obj->i|
+    \verb|print obj->_type_|
   \end{quote}
-  
-\item To print the name of an entity \verb+e+ (an entity is a PIPS data
-  structure, see \verb+ri.tex+):
+\item \item To print the type (domain) name of a NewGen Object from its
+  number:
   \begin{quote}
-    \verb|print (e+2)->s|
+    \verb|p Domains[obj->_type_].name|
   \end{quote}
-  
-\item To print the label of a statement \verb+stmt+:
-  \begin{quote}
-    \verb|print ((stmt+1)->p+2)->s|
-  \end{quote}
-  
-\item To print the domain of a NewGen Object from its number
-  (\verb+obj->i+): 
-  \begin{quote}
-    \verb|print Domains[obj->i].name|
-  \end{quote}
-  
+\item To directly dig into a NewGen object, you can access an attribute
+  \texttt{a} of an object \texttt{obj} of type \texttt{type} with its
+  field name \verb|_type_a_|, thus such as \verb|obj->_type_a_|.
+
+  For example, picked from the RI:
+  \begin{itemize}
+  \item To print the name of an entity \verb+e+ (an entity is a PIPS data
+    structure, see \verb+ri.tex+):
+    \begin{quote}
+      \verb|p e->_entity_name_|
+    \end{quote}
+  \item To print the label of a statement \verb+stmt+, by studying the RI
+    you can see that:
+\begin{verbatim}
+statement = label:entity x number:int x ordering:int
+          x comments:string x instruction:instruction
+          x declarations:entity* x decls_text:string;
+\end{verbatim}
+    and since a \texttt{label} is an \texttt{entity} as declared with:
+\begin{verbatim}
+tabulated entity = name:string x type x storage x initial:value
+\end{verbatim}
+    you can get the information you want with:
+    \begin{quote}
+      \verb|print stmt->_statement_label_->_entity_name_|
+    \end{quote}
+  \end{itemize}
+\item To print a statement \texttt{s} as human code, \texttt{call
+    print_statement(s)}. You may need to position some internal variable
+  to have the correct meaning, such as if you are dealing with C program
+  with:
+\begin{verbatim}
+set is_fortran=0
+\end{verbatim}
+\item To print an expression \texttt{e} as human code, use
+\begin{verbatim}
+call print_expression(e)
+\end{verbatim}
 \end{itemize}
 
-In the future, {\tt gdb} macros compatible with Newgen generated C macros
-will be provided. (Well, we just need GNU people to add interactive macros
-to gdb and then we will provide the macros:-)
+\marginpar{Fabien: NewGen should be simplified to use
+  \texttt{stmt->label->name}}
 
-Any way, with the Emacs debugger mode some keyboard accelerators can
-be defined such as:
+It should be also possible to use PIPS and NewGen macros (accessors and so
+on) from GDB instead of these NewGen internals, if the sources are
+compiled with the good options (\texttt{-ggdb -g3}). You may remove the
+\texttt{-O} option from the \texttt{CFLAGS} in the makefiles to avoid
+variable optimizations into registers. A good and simple practice to
+achieve this is to use:
+\begin{verbatim}
+make CFLAGS='-ggdb -g3'
+\end{verbatim}
+
+In the future, {\tt gdb} functions compatible with Newgen generated C
+macros will be provided\footnote{Well, we just need GNU people to add
+  interactive functions to \texttt{gdb} and then we will provide the
+  macros.}.
+
+To ease this kind of inspection, some keyboard accelerators can be defined
+inside the Emacs debugger mode by adding into you \texttt{.emacs}such as:
 \begin{verbatim}
 (add-hook 'gdb-mode-hook
  (function
   (lambda ()
-   (gud-def gud-affiche-domain-pointe "p Domains[%e->i]" "d"
-            "Display the domain (that is its type) of the NewGen object.")
-   (gud-def gud-affiche-nom-entite "p (%e+2)->s" "e"
-            "Display the name of an entity.")
-   (gud-def gud-affiche-expression "p print_expression(%e)" "E"
-            "Display an expression.")
-   (gud-def gud-affiche-statement "p print_statement(%e)" "S"
-            "Print a statement.")
+   (gud-def pips-display-type "print Domains[%e->_type_].name" "t"
+            "Display the domain (that is the type) of the selected NewGen object")
+   (gud-def pips-display-entity-name "print %e->_entity_name_" "n"
+            "Display the name of the selected entity")
+   (gud-def gud-affiche-expression "call print_expression(%e)" "e"
+            "Print a PIPS expression")
+   (gud-def gud-affiche-statement "call print_statement(%e)" "s"
+            "Print a PIPS statement")
+   (setq
+    ;; Use Emacs with many GDB buffers as an IDE:
+    gdb-many-windows t
+    ;; Don't mix up gdb output with PIPS output
+    gdb-use-separate-io-buffer t
+    )
+   )
   )
  )
-)
 \end{verbatim}
-In such a way, typing \verb|^C ^A S| with the cursor on a variable of
-type statement will ask gdb to display this statement.
-
-
+These function are then available with the \verb|C-x C-a|
+binding, so you click on an interesting variable and then use
+\begin{description}
+  \item[\texttt{C-x C-a t}] to display the type of a NewGen object;
+  \item[\texttt{C-x C-a n}] to display the name of a PIPS entity;
+  \item[\texttt{C-x C-a e}] to display the type of a PIPS expression;
+  \item[\texttt{C-x C-a s}] to display the type of a PIPS statement.
+\end{description}
 
 
 
