@@ -1495,18 +1495,18 @@ static Pvecteur global_to_last_dims_offset(int dim_min, bool *p_linear_p)
 
 	nlb = NORMALIZE_EXPRESSION(dimension_lower(dims_1[dim_min-1]));
 	nub = NORMALIZE_EXPRESSION(dimension_upper(dims_1[dim_min-1]));
-	
-	pips_assert("linear expressions", 
-		    normalized_linear_p(nlb) && normalized_linear_p(nub))
+
+	pips_assert("linear expressions",
+		    normalized_linear_p(nlb) && normalized_linear_p(nub));
 
 	vlb = normalized_linear(nlb);
 	vub = normalized_linear(nub);
-	
+
 	if (vect_constant_p(vlb) && vect_constant_p(vub))
 	{
-	  Value dim_size = 
+	  Value dim_size =
 	    value_plus(VALUE_ONE, value_minus(vub->val,vlb->val));
-	  pv_offset = vect_div(pv_offset, dim_size);    
+	  pv_offset = vect_div(pv_offset, dim_size);
 	}
 	else
 	{

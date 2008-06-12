@@ -186,7 +186,7 @@ alignment_p(list /* of expressions */ align_src,
 
     /*  the alignment should be a simple affine expression
      */
-    pips_user_assert("affine align subscript", *pshift==0 ? size<=1 : size<=2)
+    pips_user_assert("affine align subscript", *pshift==0 ? size<=1 : size<=2);
 
     /*   constant alignment case
      */

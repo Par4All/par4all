@@ -1089,7 +1089,7 @@ unstructured partition_to_unstructured(control vertex, list partition)
       else {
 	pips_assert("If a successor is not in partition,"
 		    " then there must be two successors",
-		    gen_length(control_successors(c_new))==2)
+		    gen_length(control_successors(c_new))==2);
 	/* This successor is irrelevant but irrelevant true branches must
            be preserved */
 	if(c_c==control_successors(c_new)) {
@@ -2000,7 +2000,7 @@ static bool partition_successor_p(control b, control e, list partition)
   list not_seen = gen_copy_seq(partition);
   int length = 0;
 
-  pips_debug(3, "Begin with b=%p abd e=%p\n", b, e)
+  pips_debug(3, "Begin with b=%p abd e=%p\n", b, e);
 
   ifdebug(3) {
     pips_assert("b is in partition", gen_in_list_p(b, partition));

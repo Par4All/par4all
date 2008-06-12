@@ -114,9 +114,9 @@ live_loop_index_p(entity i)
 static void
 add_live_loop_index(entity i)
 {
-    pips_assert("add_live_index",!live_loop_index_p(i))
-	live_loop_indices = gen_nconc(live_loop_indices,
-				      CONS(ENTITY, i, NIL));
+  pips_assert("add_live_index",!live_loop_index_p(i));
+  live_loop_indices = gen_nconc(live_loop_indices,
+				CONS(ENTITY, i, NIL));
 }
 
 static void

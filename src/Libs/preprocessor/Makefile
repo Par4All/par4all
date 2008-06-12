@@ -45,5 +45,5 @@ splitcyaccer.c splitc.h: splitc.y
 	$(RM) y.tab.c y.tab.h
 
 splitclexer.c: splitc.l splitc.h
-	$(SCAN) splitc.l | \
+	$(SCAN) `pwd`/splitc.l | \
 	sed '/^FILE \*yyin/s/=[^,;]*//g;s/YY/SPLITC_/g;s/yy/splitc_/g' > $@

@@ -498,16 +498,15 @@ L\"([^\"]|(\"\")|(\\\"))*\"	{
 				       pips_debug(5,"TK_IDENT: %s\n",yytext);
                                        /* Might not work if a function returns a struct declared locally in the function declaration, or a pointer to such a structrue */
                                        if(string_undefined_p(csplit_current_function_name)) {
-                                       csplit_current_function_name = strdup(yytext);
-                                       pips_debug(5, "Temptative function name found: \"%s\"\n",
-                                                  csplit_current_function_name)
+					 csplit_current_function_name = strdup(yytext);
+					 pips_debug(5, "Temptative function name found: \"%s\"\n",
+						    csplit_current_function_name);
                                        }
-                                       else {
-                                       pips_debug(5, "Identifier ignored: \"%s\"\n",
-                                                  yytext)
+                                       else
+					 pips_debug(5, "Identifier ignored: \"%s\"\n",
+						    yytext);
   
-                                       }
-                                       yylval.string = strdup(yytext);
+				       yylval.string = strdup(yytext);
 				       return(TK_IDENT); 
 				   }
 			}

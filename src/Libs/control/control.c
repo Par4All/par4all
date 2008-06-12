@@ -881,9 +881,9 @@ static bool condition_expression_to_final_bound(expression cond,
     if(success) {
       pips_debug(5, "End with expression\n");
       print_expression(cond);
-      pips_debug(5, "Loop counter is increasing: %s\n", bool_to_string(*p_is_upper_p))
-	pips_debug(5, "Loop condition is strict: %s\n", bool_to_string(*p_is_lower_p))
-	}
+      pips_debug(5, "Loop counter is increasing: %s\n", bool_to_string(*p_is_upper_p));
+      pips_debug(5, "Loop condition is strict: %s\n", bool_to_string(*p_is_lower_p));
+    }
     else {
       pips_debug(5, "End: no final bound available\n");
     }

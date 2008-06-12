@@ -698,7 +698,7 @@ static bool loop_flt(loop l)
 {
   statement sofl = current_statement_head();
   pips_assert("statement of loop", 
-	      instruction_loop(statement_instruction(sofl))==l)
+	      instruction_loop(statement_instruction(sofl))==l);
   push_nesting(sofl);
   return TRUE;
 }
