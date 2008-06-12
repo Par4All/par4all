@@ -987,62 +987,6 @@ Two validation scripts are available:
 %%\end{itemize}
 
 
-\section{Documentation}
-\label{sec:documentation}
-
-\subsection{Source documentation}
-\label{sec:source-documentation}
-
-The various documentations, including the source of the web pages, are
-stored in the \texttt{src/Documentation} directory.
-
-For example this guide is stored in \verb|src/Documentation/dev_guide|.
-
-
-\subsection{Web site}
-\label{sec:web-site}
-
-The various PIPS documentations can be published on the web site
-\PipsOldWWW with the \verb|pips_publish_www| once you have compiled it.
-
-There is also a new dynamic web site \PipsNewWWW that reference better the
-information stored on\PipsOldWWW. The idea is to have the content edited
-naturally and collaboratively onto \PipsNewWWW and from time to time
-injecting back the content into the \PipsOldWWW by editing the
-\texttt{src/Documentation/web} directory.
-
-
-\newpage
-\noindent
-{\huge MAY BE OBSOLETE DOWN FROM HERE\ldots}
-
-\section{Development (\texttt{PIPS\_DEVEDIR})}
-
-This directory contains the version of PIPS currently being developed.  It
-is a mirror of the organization under \verb+$PIPS_ROOT/src+. %%$
-Each library is developed and tested under this subtree, linking by
-default with the \emph{installed} libraries in \verb+$PIPS_ROOT/Lib+. %%$
-
-Thus new versions can be developed without interfering with other
-developments. Once a new version of a library (or pass, or script, or
-anything) is okay and validated, it is installed under the
-\verb+$PIPS_ROOT/Src+ subtree and becomes the reference for all other
-developers who may use its services. %%$
-
-When developing or debugging several related libraries at the same time,
-you can used the development version of these libraries by using unix
-links (\texttt{ln -s}) to one of the directory under the corresponding
-\verb|$PIPS_ARCH| subdirectory. When building %%$
-a new binary, the linker takes these local libraries first.
-
-\subsection{Experiments}
-
-At CRI, this directory is a large piece of disk space to be used
-temporarily to analyze large programs and to core dump large {\tt pips}
-processes; no permanent, non-deductible information should be stored
-there.
-
-
 \section{Debugging and NewGen}
 \label{sec:newgen}
 
@@ -1120,7 +1064,7 @@ tabulated entity = name:string x type x storage x initial:value
     \end{quote}
   \end{itemize}
 \item To print a statement \texttt{s} as human code, \texttt{call
-    print_statement(s)}. You may need to position some internal variable
+    print\_statement(s)}. You may need to position some internal variable
   to have the correct meaning, such as if you are dealing with C program
   with:
 \begin{verbatim}
@@ -1183,6 +1127,62 @@ binding, so you click on an interesting variable and then use
   \item[\texttt{C-x C-a s}] to display the type of a PIPS statement.
 \end{description}
 
+
+
+\section{Documentation}
+\label{sec:documentation}
+
+\subsection{Source documentation}
+\label{sec:source-documentation}
+
+The various documentations, including the source of the web pages, are
+stored in the \texttt{src/Documentation} directory.
+
+For example this guide is stored in \verb|src/Documentation/dev_guide|.
+
+
+\subsection{Web site}
+\label{sec:web-site}
+
+The various PIPS documentations can be published on the web site
+\PipsOldWWW with the \verb|pips_publish_www| once you have compiled it.
+
+There is also a new dynamic web site \PipsNewWWW that reference better the
+information stored on\PipsOldWWW. The idea is to have the content edited
+naturally and collaboratively onto \PipsNewWWW and from time to time
+injecting back the content into the \PipsOldWWW by editing the
+\texttt{src/Documentation/web} directory.
+
+
+\newpage
+\noindent
+{\huge MAY BE OBSOLETE DOWN FROM HERE\ldots}
+
+\section{Development (\texttt{PIPS\_DEVEDIR})}
+
+This directory contains the version of PIPS currently being developed.  It
+is a mirror of the organization under \verb+$PIPS_ROOT/src+. %%$
+Each library is developed and tested under this subtree, linking by
+default with the \emph{installed} libraries in \verb+$PIPS_ROOT/Lib+. %%$
+
+Thus new versions can be developed without interfering with other
+developments. Once a new version of a library (or pass, or script, or
+anything) is okay and validated, it is installed under the
+\verb+$PIPS_ROOT/Src+ subtree and becomes the reference for all other
+developers who may use its services. %%$
+
+When developing or debugging several related libraries at the same time,
+you can used the development version of these libraries by using unix
+links (\texttt{ln -s}) to one of the directory under the corresponding
+\verb|$PIPS_ARCH| subdirectory. When building %%$
+a new binary, the linker takes these local libraries first.
+
+\subsection{Experiments}
+
+At CRI, this directory is a large piece of disk space to be used
+temporarily to analyze large programs and to core dump large {\tt pips}
+processes; no permanent, non-deductible information should be stored
+there.
 
 
 \section{Linear library}
