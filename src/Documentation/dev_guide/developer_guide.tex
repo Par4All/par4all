@@ -10,11 +10,12 @@
 \usepackage[backref,pagebackref]{hyperref}
 \makeatletter
 % Test for a TeX4ht command:
-\@ifundefined{HCode}{%
-  % We are generating PDF, so allow to break down URL:
-  \usepackage{breakurl}}{%
-  % else we are generating HTML with TeX4ht, use plain url:
-  \usepackage{url}}
+%%\@ifundefined{HCode}{%
+%%  % We are generating PDF, so allow to break down URL:
+%%  \usepackage{breakurl}}{%
+%%  % else we are generating HTML with TeX4ht, use plain url:
+%%  \usepackage{url}}
+\usepackage{url}
 \usepackage{xspace,makeidx}
 \usepackage[hyper,procnames]{listings}
 
