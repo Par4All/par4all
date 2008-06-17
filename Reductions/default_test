@@ -1,0 +1,24 @@
+#! /bin/sh
+#
+# Reductions (simple ones:-) 
+# $RCSfile: default_test,v $ version $Revision: 1.6 $
+# $Date: 1996/09/24 15:02:43 $, 
+
+DIR=${PIPS_VALIDDIR}/Reductions
+TPIPS=${tpips_version:-tpips}
+
+echo "--- considering tested_file"
+echo
+
+sed -n "1i\\
+	delete tested_file \\
+	create tested_file $DIR/tested_file.f
+	/^!tps\\\$ /s,^!tps\\\$ ,,p
+	\$a\\
+	close \\
+	delete tested_file
+	" $DIR/tested_file.f |
+$TPIPS
+
+# end of $RCSfile: default_test,v $
+#

@@ -1,0 +1,54 @@
+--- considering interpol
+
+PROPER REDUCTIONS
+      SUBROUTINE ADDTO(X, J)
+!  call sum[X],
+      X = X+J                                                           0001
+      END
+      SUBROUTINE ADDTOS(I, J)
+      COMMON /SUM/ S(10)
+!  call sum[S(I)],
+      S(I) = S(I)+J                                                     0001
+      END
+      PROGRAM INTERPOL
+      COMMON /SUM/ S(10)
+      S = 2.0                                                           0001
+      DO J = 1, 10                                                      0002
+         DO I = 1, 10                                                   0003
+!  call sum[S(I)],
+            S(I) = S(I)+I                                               0004
+!  call sum[S(I)],
+            CALL ADDTO(S(I), J)                                         0005
+!  call sum[S],
+            CALL ADDTOS(I, J)                                           0006
+         ENDDO
+      ENDDO
+      END
+!  summary sum[X],
+      SUBROUTINE ADDTO(X, J)
+!  call sum[X],
+      X = X+J                                                           0001
+      END
+!  summary sum[S(I)],
+      SUBROUTINE ADDTOS(I, J)
+      COMMON /SUM/ S(10)
+!  call sum[S(I)],
+      S(I) = S(I)+J                                                     0001
+      END
+      PROGRAM INTERPOL
+      COMMON /SUM/ S(10)
+      S = 2.0                                                           0001
+!  loop sum[S],
+      DO J = 1, 10                                                      0002
+!  loop sum[S],
+         DO I = 1, 10                                                   0003
+!  call sum[S(I)],
+            S(I) = S(I)+I                                               0004
+!  call sum[S(I)],
+            CALL ADDTO(S(I), J)                                         0005
+!  call sum[S],
+            CALL ADDTOS(I, J)                                           0006
+         ENDDO
+      ENDDO
+      END
+

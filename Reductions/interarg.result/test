@@ -1,0 +1,35 @@
+--- considering interarg
+
+PROPER REDUCTIONS
+      SUBROUTINE ADDTO(X, J)
+      INTEGER X, J
+!  call sum[X],
+      X = X+J                                                           0001
+      END
+      PROGRAM INTERARG
+      INTEGER S, I
+      S = 0                                                             0001
+      DO I = 1, 10                                                      0002
+!  call sum[S],
+         CALL ADDTO(S, I)                                               0003
+      ENDDO
+      PRINT *, S                                                        0004
+      END
+CUMULATED REDUCTIONS
+!  summary sum[X],
+      SUBROUTINE ADDTO(X, J)
+      INTEGER X, J
+!  call sum[X],
+      X = X+J                                                           0001
+      END
+      PROGRAM INTERARG
+      INTEGER S, I
+      S = 0                                                             0001
+!  loop sum[S],
+      DO I = 1, 10                                                      0002
+!  call sum[S],
+         CALL ADDTO(S, I)                                               0003
+      ENDDO
+      PRINT *, S                                                        0004
+      END
+

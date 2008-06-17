@@ -1,0 +1,46 @@
+--- considering indexes
+
+      PROGRAM INDEXES
+      INTEGER I,J
+      INTEGER S(10)
+      DO I = 1, 10                                                      0001
+         DO J = 1, 10                                                   0002
+!  call sum[S(J)],
+            S(J) = S(J)+I                                               0003
+         ENDDO
+!  call sum[S(I)],
+         S(I) = S(I)+2                                                  0004
+      ENDDO
+      DO I = 1, 10                                                      0005
+!  call sum[S(3)],
+         S(3) = S(3)+I+J                                                0006
+!  call sum[S(5)],
+         S(5) = I+S(5)+J                                                0007
+!  call sum[S(7)],
+         S(7) = I+J+S(7)                                                0008
+      ENDDO
+      END
+      PROGRAM INDEXES
+      INTEGER I,J
+      INTEGER S(10)
+!  loop sum[S],
+      DO I = 1, 10                                                      0001
+!  loop sum[S(*)],
+         DO J = 1, 10                                                   0002
+!  call sum[S(J)],
+            S(J) = S(J)+I                                               0003
+         ENDDO
+!  call sum[S(I)],
+         S(I) = S(I)+2                                                  0004
+      ENDDO
+!  loop sum[S],
+      DO I = 1, 10                                                      0005
+!  call sum[S(3)],
+         S(3) = S(3)+I+J                                                0006
+!  call sum[S(5)],
+         S(5) = I+S(5)+J                                                0007
+!  call sum[S(7)],
+         S(7) = I+J+S(7)                                                0008
+      ENDDO
+      END
+

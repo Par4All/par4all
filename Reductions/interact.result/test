@@ -1,0 +1,78 @@
+--- considering interact
+
+      REAL FUNCTION FSUMPROD(X, Y, Z)
+!  call sum[X],
+      X = X+Z                                                           0001
+!  call prod[Y],
+      Y = Y*Z                                                           0002
+      FSUMPROD = Z                                                      0003
+      END
+      PROGRAM INTERACT
+      S = 0.                                                            0001
+      P = 1.                                                            0002
+!  call prod[P],sum[S],
+      CALL SUMPROD(S, P, 2.1)                                           0003
+!  call prod[P],sum[S],
+      CALL SUMPROD(S, P, 2.+I)                                          0004
+      DO I = 1, N                                                       0005
+!  call prod[P],sum[S],
+         CALL SUMPROD(S, P, 2.+I)                                       0006
+!  call prod[P],sum[S],
+         CALL SUMPROD(S, P, FSUMPROD(S, P, 3.))                         0007
+      ENDDO
+      DO I = 1, N                                                       0008
+         CALL SUMPROD(P, S, FSUMPROD(S, P, 3.))                         0009
+      ENDDO
+      DO I = 1, N                                                       0010
+!  call prod[P],sum[S],
+         CALL SUMPROD(S, P, 2.+I)                                       0011
+!  call prod[S],sum[P],
+         CALL SUMPROD(P, S, 1.-I)                                       0012
+      ENDDO
+      END
+      SUBROUTINE SUMPROD(X, Y, Z)
+!  call sum[X],
+      X = X+Z                                                           0001
+!  call prod[Y],
+      Y = Y*Z                                                           0002
+      END
+!  summary sum[X],prod[Y],
+      REAL FUNCTION FSUMPROD(X, Y, Z)
+!  call sum[X],
+      X = X+Z                                                           0001
+!  call prod[Y],
+      Y = Y*Z                                                           0002
+      FSUMPROD = Z                                                      0003
+      END
+      PROGRAM INTERACT
+      S = 0.                                                            0001
+      P = 1.                                                            0002
+!  call prod[P],sum[S],
+      CALL SUMPROD(S, P, 2.1)                                           0003
+!  call prod[P],sum[S],
+      CALL SUMPROD(S, P, 2.+I)                                          0004
+!  loop prod[P],sum[S],
+      DO I = 1, N                                                       0005
+!  call prod[P],sum[S],
+         CALL SUMPROD(S, P, 2.+I)                                       0006
+!  call prod[P],sum[S],
+         CALL SUMPROD(S, P, FSUMPROD(S, P, 3.))                         0007
+      ENDDO
+      DO I = 1, N                                                       0008
+         CALL SUMPROD(P, S, FSUMPROD(S, P, 3.))                         0009
+      ENDDO
+      DO I = 1, N                                                       0010
+!  call prod[P],sum[S],
+         CALL SUMPROD(S, P, 2.+I)                                       0011
+!  call prod[S],sum[P],
+         CALL SUMPROD(P, S, 1.-I)                                       0012
+      ENDDO
+      END
+!  summary sum[X],prod[Y],
+      SUBROUTINE SUMPROD(X, Y, Z)
+!  call sum[X],
+      X = X+Z                                                           0001
+!  call prod[Y],
+      Y = Y*Z                                                           0002
+      END
+

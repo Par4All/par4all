@@ -1,0 +1,67 @@
+--- considering interstis
+
+      SUBROUTINE INIT
+      COMMON /REDUCED/ S, P, X, N
+      S = 0.                                                            0001
+      P = 1.                                                            0002
+      X = -1000.                                                        0003
+      N = 1000.                                                         0004
+      END
+      PROGRAM INTERSTIS
+      CALL INIT                                                         0001
+      DO I = 1, 10                                                      0002
+         A = 1/I                                                        0003
+!  call min[N],max[X],prod[P],sum[S],
+         CALL REDUCE(A)                                                 0004
+      ENDDO
+      CALL PRINTRED                                                     0005
+      END
+      SUBROUTINE PRINTRED
+      COMMON /REDUCED/ S, P, X, N
+      PRINT *, 's=', S, ' p=', P, ' x=', X, ' n=', N                    0001
+      END
+      SUBROUTINE REDUCE(A)
+      COMMON /REDUCED/ S, P, X, N
+!  call sum[S],
+      S = S+A                                                           0001
+!  call prod[P],
+      P = P*A                                                           0002
+!  call max[X],
+      X = MAX(X, A)                                                     0003
+!  call min[N],
+      N = MIN(N, A)                                                     0004
+      END
+      SUBROUTINE INIT
+      COMMON /REDUCED/ S, P, X, N
+      S = 0.                                                            0001
+      P = 1.                                                            0002
+      X = -1000.                                                        0003
+      N = 1000.                                                         0004
+      END
+      PROGRAM INTERSTIS
+      CALL INIT                                                         0001
+!  loop min[N],max[X],prod[P],sum[S],
+      DO I = 1, 10                                                      0002
+         A = 1/I                                                        0003
+!  call min[N],max[X],prod[P],sum[S],
+         CALL REDUCE(A)                                                 0004
+      ENDDO
+      CALL PRINTRED                                                     0005
+      END
+      SUBROUTINE PRINTRED
+      COMMON /REDUCED/ S, P, X, N
+      PRINT *, 's=', S, ' p=', P, ' x=', X, ' n=', N                    0001
+      END
+!  summary sum[S],prod[P],max[X],min[N],
+      SUBROUTINE REDUCE(A)
+      COMMON /REDUCED/ S, P, X, N
+!  call sum[S],
+      S = S+A                                                           0001
+!  call prod[P],
+      P = P*A                                                           0002
+!  call max[X],
+      X = MAX(X, A)                                                     0003
+!  call min[N],
+      N = MIN(N, A)                                                     0004
+      END
+
