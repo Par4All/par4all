@@ -24,7 +24,7 @@ function usage()
     "  -v: be verbose (repeat for more verbosity, 3 or more is debug)\n" \
     "  -p pips: use this 'pips' executable, default $pips\n" \
     "  -t tpips: use this 'tpips' executable, default $tpips\n" \
-    "  -m email: send mails?\n" \
+    "  -m email: send mails (not a good idea?)\n" \
     "  -V dir: validation directory, default '$vdir'\n" \
     "  -R dir: running directory, default '.'\n" \
     "  -O dir: output directory, default '.'\n" \
@@ -93,12 +93,12 @@ mkdir $odir || usage 9 "error mkdir $odir"
 summary=$odir/SUMMARY
 
 echo "validation for $@
-in $vdir
+in directory ${vdir}/
 for $arch architecture
-output in $odir
+output in directory ${odir}/
 with pips=$pips
 and tpips=$tpips
-running in $rdir
+running in directory ${rdir}/
 on $(hostname) 
 by $(whoami)
 at $(date)
