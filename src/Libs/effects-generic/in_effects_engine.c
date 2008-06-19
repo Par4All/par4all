@@ -98,7 +98,7 @@ static void list_gen_consistent_p(list l)
 static bool 
 in_effects_stmt_filter(statement s)
 {
-    pips_debug(1, "Entering statement %03d :\n", statement_ordering(s));
+    pips_debug(1, "Entering statement %03zd :\n", statement_ordering(s));
     effects_private_current_stmt_push(s);
     return TRUE;
 }
@@ -109,7 +109,7 @@ in_effects_of_statement(statement s)
     store_invariant_in_effects_list(s, NIL);
     debug_consistent(NIL);
     effects_private_current_stmt_pop();
-    pips_debug(1, "End statement %03d :\n", statement_ordering(s));
+    pips_debug(1, "End statement %03zd :\n", statement_ordering(s));
 }
 
 static list 
@@ -193,7 +193,7 @@ in_effects_of_sequence(sequence block)
     statement current_stat = effects_private_current_stmt_head();
     list l_inst = sequence_statements(block);
 
-    pips_debug(2, "Effects for statement %03d:\n",
+    pips_debug(2, "Effects for statement %03zd:\n",
 	       statement_ordering(current_stat)); 
 
     if (ENDP(l_inst))
@@ -208,7 +208,7 @@ in_effects_of_sequence(sequence block)
 
     ifdebug(2)
 	{
-	    pips_debug(2, "IN effects for statement%03d:\n",
+	    pips_debug(2, "IN effects for statement%03zd:\n",
 		       statement_ordering(current_stat));  
 	    (*effects_prettyprint_func)(l_in);
 	    pips_debug(2, "end\n");
@@ -227,7 +227,7 @@ in_effects_of_test(test t)
     list lt, lf, lc_in;
     list l_in = NIL;
 
-    pips_debug(2, "Effects for statement %03d:\n",
+    pips_debug(2, "Effects for statement %03zd:\n",
 	       statement_ordering(current_stat)); 
 
       /* IN effects of the true branch */
@@ -248,7 +248,7 @@ in_effects_of_test(test t)
 
     ifdebug(2)
     {
-	pips_debug(2, "IN effects for statement %03d:\n",
+	pips_debug(2, "IN effects for statement %03zd:\n",
 		   statement_ordering(current_stat));  
 	(*effects_prettyprint_func)(l_in);
 	pips_debug(2, "end\n");
@@ -452,8 +452,8 @@ static void in_effects_of_loop(loop l)
 			NORMALIZE_EXPRESSION(range_increment(r))));
 		v_i_i_prime = vect_make(
 		    VECTEUR_NUL, 
-		    (Variable) value_pos_p(incr)? i_prime : i, VALUE_ONE,
-		    (Variable) value_pos_p(incr)? i : i_prime, VALUE_MONE,
+		    (Variable) (value_pos_p(incr)? i_prime : i), VALUE_ONE,
+		    (Variable) (value_pos_p(incr)? i : i_prime), VALUE_MONE,
 		    TCST, VALUE_ONE);
 		range_descriptor =
 		    descriptor_inequality_add(range_descriptor, v_i_i_prime);
@@ -539,6 +539,7 @@ static bool written_before_read_p(entity ent,list args)
     MAP(REFERENCE,ref,
     {
       entity e = reference_variable(ref);
+      extern boolean reference_scalar_p(reference); /* located in wp65? */
       if (same_entity_p(e,ent))
 	{
 	  /* the variable is in the reference list, check if it is written or read*/

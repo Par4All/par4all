@@ -136,7 +136,7 @@ static IoElementDescriptor IoElementDescriptorTable[] = {
     {"printf",     "FMT=",        is_action_read, is_approximation_must},
     {"fprintf",     "&",        is_action_read, is_approximation_must},
 
-    {0,           0,              0}
+    {0,           0,              0,              0}
 };
 
 
@@ -680,7 +680,7 @@ generic_proper_effects_of_intrinsic(entity e, list args)
 
 
 static list 
-no_write_effects(entity e,list args)
+no_write_effects(entity e __attribute__ ((__unused__)),list args)
 {
     list lr;
 
@@ -691,7 +691,7 @@ no_write_effects(entity e,list args)
 }
 
 static list 
-affect_effects(entity e,list args)
+affect_effects(entity e __attribute__ ((__unused__)),list args)
 {
     list le = NIL;
 
@@ -715,7 +715,7 @@ affect_effects(entity e,list args)
 }
 
 static list 
-update_effects(entity e,list args)
+update_effects(entity e __attribute__ ((__unused__)),list args)
 {
     list le = NIL;
 
@@ -741,7 +741,7 @@ update_effects(entity e,list args)
 }
 
 static list 
-unique_update_effects(entity e,list args)
+unique_update_effects(entity e __attribute__ ((__unused__)),list args)
 {
     list le = NIL;
 
@@ -763,7 +763,7 @@ unique_update_effects(entity e,list args)
 }
 
 static list
-assign_substring_effects(entity e, list args)
+assign_substring_effects(entity e __attribute__ ((__unused__)), list args)
 {
     list le = NIL;
 
@@ -790,7 +790,7 @@ assign_substring_effects(entity e, list args)
 }
 
 static list
-substring_effect(entity e, list args)
+substring_effect(entity e __attribute__ ((__unused__)), list args)
 {
     list le = NIL;
     expression expr = EXPRESSION(CAR(args));
@@ -828,7 +828,7 @@ SearchIoElement(char *s, char *i)
 }
 
 static list
-some_io_effects(entity e, list args)
+some_io_effects(entity e __attribute__ ((__unused__)), list args __attribute__ ((__unused__)))
 {
     /* Fortran standard deliberately does not define the exact output
        device of a PAUSE or STOP statement. See Page B-6 in ANSI X3.9-1978

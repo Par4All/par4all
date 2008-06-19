@@ -155,8 +155,8 @@ load_list(statement_effects m, statement s)
  */
 static text
 resource_text(
-    entity module, 
-    int margin, 
+    entity module __attribute__ ((__unused__)), 
+    int margin __attribute__ ((__unused__)), 
     statement stat,
     p_prettyprint_stuff pps)
 {
@@ -172,14 +172,14 @@ resource_text(
 	if (!statement_undefined_p
 	    (i = apply_number_to_statement(nts, statement_number(stat))))
 	{
-	    l_eff = load_list(pps->resource, i);
+	    l_eff = load_list((statement_effects) pps->resource, i);
 	}
 	else
 	    l_eff = (list) HASH_UNDEFINED_VALUE;
     }
     else
     {
-	l_eff = load_list(pps->resource, stat);
+	l_eff = load_list((statement_effects) pps->resource, stat);
 	ifdebug(1)
 	 {
 	     if (l_eff != (list) HASH_UNDEFINED_VALUE &&
@@ -202,7 +202,7 @@ resource_text(
  */
 static text
 text_summary_any_effect_type(
-    entity module)
+    entity module __attribute__ ((__unused__)))
 {
     text result = make_text(NIL);
     list l;

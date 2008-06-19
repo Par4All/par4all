@@ -240,7 +240,7 @@ generic_proper_effects_of_subscript(subscript s)
     return(le);
 }
 
-list generic_proper_effects_of_application(application a)
+list generic_proper_effects_of_application(application a __attribute__((__unused__)))
 {
   list le = NIL;
 
@@ -452,7 +452,7 @@ proper_effects_of_call(call c)
     /* Is the call an instruction, or a sub-expression? */
     if (instruction_call_p(inst) && (instruction_call(inst) == c))
     {
-	pips_debug(2, "Effects for statement%03d:\n",
+	pips_debug(2, "Effects for statement%03zd:\n",
 		   statement_ordering(current_stat)); 
 	l_proper = generic_r_proper_effects_of_call(c);
 	l_proper = gen_nconc(l_proper, effects_dup(l_cumu_range));
@@ -460,7 +460,7 @@ proper_effects_of_call(call c)
 	if (contract_p)
 	    l_proper = proper_effects_contract(l_proper);
 	ifdebug(2) {
-	  pips_debug(2, "Proper effects for statement%03d:\n",
+	  pips_debug(2, "Proper effects for statement%03zd:\n",
 		     statement_ordering(current_stat));  
 	  (*effects_prettyprint_func)(l_proper);
 	  pips_debug(2, "end\n");
@@ -471,7 +471,7 @@ proper_effects_of_call(call c)
 }
 
 static void 
-proper_effects_of_unstructured(unstructured u)
+proper_effects_of_unstructured(unstructured u __attribute__((__unused__)))
 {
     statement current_stat = effects_private_current_stmt_head();
     store_proper_rw_effects_list(current_stat,NIL);
@@ -499,7 +499,7 @@ static void proper_effects_of_loop(loop l)
 
     list li = NIL, lb = NIL;
 
-    pips_debug(2, "Effects for statement%03d:\n",
+    pips_debug(2, "Effects for statement%03zd:\n",
 	       statement_ordering(current_stat)); 
 
     free_cumu_range_effects();
@@ -535,7 +535,53 @@ static void proper_effects_of_loop(loop l)
   
     ifdebug(2)
     {
-	pips_debug(2, "Proper effects for statement%03d:\n",
+	pips_debug(2, "Proper effects for statement%03zd:\n",
+		   statement_ordering(current_stat));  
+	(*effects_prettyprint_func)(l_proper);
+	pips_debug(2, "end\n");
+    }
+
+    if (contract_p)
+	l_proper = proper_effects_contract(l_proper);
+
+    store_proper_rw_effects_list(current_stat, l_proper);
+}
+
+static void proper_effects_of_forloop(forloop l)
+{
+    statement current_stat = effects_private_current_stmt_head();
+    list l_proper = NIL;
+    list l_cumu_range = NIL;
+
+    //    entity i = loop_index(l);
+    // range r = loop_range(l);
+
+    list li = NIL, lc = NIL, linc = NIL;
+
+    pips_debug(2, "Effects for statement%03zd:\n",
+	       statement_ordering(current_stat)); 
+
+    // What is this about? See Fabien...
+    // free_cumu_range_effects();
+    //current_downward_cumulated_range_effects_pop();
+    //l_cumu_range = cumu_range_effects();
+    
+    /* proper_effects first */
+
+    li = generic_proper_effects_of_expression(forloop_initialization(l));
+
+    /* effects of condition expression */
+    lc = generic_proper_effects_of_expression(forloop_condition(l));
+    /* effects of incrementation expression  */
+    linc = generic_proper_effects_of_expression(forloop_increment(l));
+
+    l_proper = gen_nconc(li, lc);
+    l_proper = gen_nconc(l_proper, linc);
+    l_proper = gen_nconc(l_proper, effects_dup(l_cumu_range));
+  
+    ifdebug(2)
+    {
+	pips_debug(2, "Proper effects for statement%03zd:\n",
 		   statement_ordering(current_stat));  
 	(*effects_prettyprint_func)(l_proper);
 	pips_debug(2, "end\n");
@@ -561,7 +607,7 @@ static void proper_effects_of_test(test t)
     statement current_stat = effects_private_current_stmt_head();
     list l_cumu_range = cumu_range_effects();
 
-    pips_debug(2, "Effects for statement%03d:\n",
+    pips_debug(2, "Effects for statement%03zd:\n",
 	       statement_ordering(current_stat)); 
 
     /* effects of the condition */
@@ -570,7 +616,7 @@ static void proper_effects_of_test(test t)
     
     ifdebug(2)
     {
-	pips_debug(2, "Proper effects for statement%03d:\n",
+	pips_debug(2, "Proper effects for statement%03zd:\n",
 		   statement_ordering(current_stat));  
 	(*effects_prettyprint_func)(l_proper);
 	pips_debug(2, "end\n");
@@ -581,7 +627,7 @@ static void proper_effects_of_test(test t)
     store_proper_rw_effects_list(current_stat, l_proper);
 }
 
-static void proper_effects_of_sequence(sequence block)
+static void proper_effects_of_sequence(sequence block __attribute__((__unused__)))
 {
     statement current_stat = effects_private_current_stmt_head();   
     store_proper_rw_effects_list(current_stat, NIL);
@@ -589,7 +635,7 @@ static void proper_effects_of_sequence(sequence block)
 
 static bool stmt_filter(statement s)
 {
-  pips_debug(1, "Entering statement %03d :\n", statement_ordering(s));
+  pips_debug(1, "Entering statement %03zd :\n", statement_ordering(s));
   effects_private_current_stmt_push(s);
   effects_private_current_context_push((*load_context_func)(s));
   return(TRUE);
@@ -605,7 +651,7 @@ static void proper_effects_of_statement(statement s)
     effects_private_current_stmt_pop();
     effects_private_current_context_pop();
 
-    pips_debug(1, "End statement%03d :\n", statement_ordering(s));
+    pips_debug(1, "End statement%03zd :\n", statement_ordering(s));
   
 }
 
@@ -624,6 +670,7 @@ void proper_effects_of_module_statement(statement module_stat)
 	 call_domain, gen_true, proper_effects_of_call,
 	 loop_domain, loop_filter, proper_effects_of_loop,
 	 whileloop_domain, gen_true, proper_effects_of_while,
+	 forloop_domain, gen_true, proper_effects_of_forloop,
 	 unstructured_domain, gen_true, proper_effects_of_unstructured,
 	 expression_domain, gen_false, gen_null, /* NOT THESE CALLS */
 	 NULL); 

@@ -95,7 +95,7 @@ out_effects_from_call_site_to_callee(call c)
 static bool 
 summary_out_effects_stmt_filter(statement s)
 {
-    pips_debug(1, "statement %03d\n", statement_number(s));    
+    pips_debug(1, "statement %03zd\n", statement_number(s));    
     current_stmt = s;
     return(TRUE);
 }
@@ -368,25 +368,26 @@ out_effects_from_loop_to_body(loop l)
 	i_prime_gt_i = 
 	    vect_make(
 		VECTEUR_NUL,
-		(Variable) value_one_p(incr)? i : i_prime, VALUE_ONE,
-		(Variable) value_one_p(incr)? i_prime : i, VALUE_MONE,
+		(Variable) (value_one_p(incr)? i : i_prime), VALUE_ONE,
+		(Variable) (value_one_p(incr)? i_prime : i), VALUE_MONE,
 		TCST, VALUE_ONE);
 	d_i_i_prime = copy_descriptor(range_descriptor);
 	d_i_i_prime = descriptor_inequality_add(d_i_i_prime, i_prime_gt_i); 
 	c_i_i_prime = descriptor_to_context(d_i_i_prime);
 	free_descriptor(d_i_i_prime);
 
+
 	i_d_prime_gt_i = 
 	    vect_make(
 		VECTEUR_NUL,
-		(Variable) value_one_p(incr)? i : i_d_prime, VALUE_ONE,
-		(Variable) value_one_p(incr)? i_d_prime : i, VALUE_MONE,
+		(Variable) (value_one_p(incr)? i : i_d_prime), VALUE_ONE,
+		(Variable) (value_one_p(incr)? i_d_prime : i), VALUE_MONE,
 		TCST, VALUE_ONE);
 	i_prime_gt_i_d_prime = 
 	    vect_make(
 		VECTEUR_NUL,
-		(Variable) value_one_p(incr)? i_d_prime : i_prime, VALUE_ONE,
-		(Variable) value_one_p(incr)? i_prime : i_d_prime, VALUE_MONE,
+		(Variable) (value_one_p(incr)? i_d_prime : i_prime), VALUE_ONE,
+		(Variable) (value_one_p(incr)? i_prime : i_d_prime), VALUE_MONE,
 		TCST, VALUE_ONE);
 	d_i_i_prime_i_d_prime = copy_descriptor(range_descriptor);
 	descriptor_variable_rename(d_i_i_prime_i_d_prime, i, i_prime);
@@ -691,7 +692,7 @@ out_effects_from_block_to_statements(sequence seq)
 static bool 
 out_effects_statement_filter(statement s)
 {
-    pips_debug(1, "Entering statement %03d :\n", statement_ordering(s));
+    pips_debug(1, "Entering statement %03zd :\n", statement_ordering(s));
     effects_private_current_stmt_push(s);   
     return TRUE;
 }
@@ -700,7 +701,7 @@ static void
 out_effects_statement_leave(statement s)
 {
     effects_private_current_stmt_pop();
-    pips_debug(1, "End statement %03d :\n", statement_ordering(s));
+    pips_debug(1, "End statement %03zd :\n", statement_ordering(s));
 }
 
 

@@ -209,6 +209,29 @@ static void rw_effects_of_while(whileloop w)
     store_rw_effects_list(current_stat, l_body);
 }
 
+/* Amira: To be refined later... */
+static void rw_effects_of_forloop(forloop w)
+{
+    statement current_stat = effects_private_current_stmt_head();
+    list l_prop, l_body;
+    statement b = forloop_body(w);
+    transformer trans;
+    
+    pips_user_warning("Ongoing implementation! Amira mensi\n");
+
+    l_prop = effects_dup(load_proper_rw_effects_list(current_stat)); /* R[C] */
+    l_body = effects_dup(load_rw_effects_list(b)); /* R[S] */
+    /* I use the famous over-approximation of E[C]: Id */
+    trans = (*load_transformer_func)(current_stat); /* T*[while(C)S] */
+
+    l_body = (*effects_union_op)(l_body, l_prop, effects_same_action_p);
+    l_body = (*effects_transformer_composition_op)(l_body, trans);
+
+    (*effects_descriptor_normalize_func)(l_body);
+
+    store_rw_effects_list(current_stat, l_body);
+}
+
 static void rw_effects_of_loop(loop l)
 {
     statement current_stat = effects_private_current_stmt_head();
@@ -441,7 +464,7 @@ static void rw_effects_of_sequence(sequence seq)
 
 static bool rw_effects_stmt_filter(statement s)
 {
-    pips_debug(1, "Entering statement %03d :\n", statement_ordering(s));
+    pips_debug(1, "Entering statement %03zd :\n", statement_ordering(s));
     effects_private_current_stmt_push(s);
     return(TRUE);
 }
@@ -450,7 +473,7 @@ static void rw_effects_of_statement(statement s)
 {
     store_invariant_rw_effects_list(s, NIL);
     effects_private_current_stmt_pop();
-    pips_debug(1, "End statement %03d :\n", statement_ordering(s));
+    pips_debug(1, "End statement %03zd :\n", statement_ordering(s));
 }
 
 
@@ -468,6 +491,7 @@ void rw_effects_of_module_statement(statement module_stat)
 	 call_domain, gen_true, rw_effects_of_call,
 	 loop_domain, gen_true, rw_effects_of_loop,
 	 whileloop_domain, gen_true, rw_effects_of_while,
+	 forloop_domain, gen_true, rw_effects_of_forloop,
 	 unstructured_domain, gen_true, rw_effects_of_unstructured,
 	 expression_domain, gen_false, gen_null, /* NOT THESE CALLS */
 	 NULL); 

@@ -6,6 +6,7 @@
  * This File contains the mappings necessary for the computation of effects.
  *
  */
+#include "stdlib.h"
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"

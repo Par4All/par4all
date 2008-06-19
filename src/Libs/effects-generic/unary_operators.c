@@ -204,7 +204,7 @@ effects_free(list l_eff)
  * modifies : nothing
  * comment  : 
  */
-list effect_to_nil_list(effect eff)
+list effect_to_nil_list(effect eff __attribute__((__unused__)))
 {
     return(NIL);
 }
@@ -215,7 +215,7 @@ list effect_to_nil_list(effect eff)
  * modifies : nothing
  * comment  : 	
  */
-list effects_to_nil_list(effect eff1, effect eff2)
+list effects_to_nil_list(effect eff1  __attribute__((__unused__)), effect eff2 __attribute__((__unused__))   )
 {
     return(NIL);
 }
@@ -239,13 +239,13 @@ list effect_to_may_effect_list(effect eff)
 /* Composition with transformers */
 
 list
-effects_undefined_composition_with_transformer(list l_eff, transformer trans)
+effects_undefined_composition_with_transformer(list l_eff __attribute__((__unused__)), transformer trans __attribute__((__unused__)))
 {
     return list_undefined;
 }
 
 list
-effects_composition_with_transformer_nop(list l_eff, transformer trans)
+effects_composition_with_transformer_nop(list l_eff, transformer trans __attribute__((__unused__)))
 {
     return l_eff;
 }
@@ -256,13 +256,13 @@ effects_composition_with_transformer_nop(list l_eff, transformer trans)
 /* Composition with preconditions */
 
 list
-effects_undefined_composition_with_preconditions(list l_eff, transformer trans)
+effects_undefined_composition_with_preconditions(list l_eff __attribute__((__unused__)), transformer trans __attribute__((__unused__)))
 {
     return list_undefined;
 }
 
 list
-effects_composition_with_preconditions_nop(list l_eff, transformer trans)
+effects_composition_with_preconditions_nop(list l_eff, transformer trans __attribute__((__unused__)))
 {
     return l_eff;
 }
@@ -270,60 +270,66 @@ effects_composition_with_preconditions_nop(list l_eff, transformer trans)
 /* Union over a range */
 
 descriptor
-loop_undefined_descriptor_make(loop l)
+loop_undefined_descriptor_make(loop l __attribute__((__unused__)))
 {
     return descriptor_undefined;
 }
 
 list 
 effects_undefined_union_over_range(
-    list l_eff, entity index, range r, descriptor d)
+    list l_eff __attribute__((__unused__)), entity index __attribute__((__unused__)), range r __attribute__((__unused__)), descriptor d __attribute__((__unused__)))
 {
     return list_undefined;
 }
 
 list 
-effects_union_over_range_nop(list l_eff, entity index, range r, descriptor d)
+effects_union_over_range_nop(list l_eff, entity index __attribute__((__unused__)), range r __attribute__((__unused__)), descriptor d __attribute__((__unused__)))
 {
     return l_eff;
 }
 
 
 list
-effects_undefined_descriptors_variable_change(list l_eff, entity orig_ent,
-					      entity new_ent)
+effects_undefined_descriptors_variable_change(list l_eff __attribute__((__unused__)),
+					      entity orig_ent __attribute__((__unused__)),
+					      entity new_ent __attribute__((__unused__)))
 {
     return list_undefined;
 }
 
 list
-effects_descriptors_variable_change_nop(list l_eff, entity orig_ent,
-					      entity new_ent)
+effects_descriptors_variable_change_nop(list l_eff, entity orig_ent __attribute__((__unused__)),
+					      entity new_ent __attribute__((__unused__)))
 {
     return l_eff;
 }
 
 
 descriptor
-effects_undefined_vector_to_descriptor(Pvecteur v)
+effects_undefined_vector_to_descriptor(Pvecteur v __attribute__((__unused__)))
 {
     return descriptor_undefined;
 }
 
 list 
-effects_undefined_loop_normalize(list l_eff, entity index, range r,
+effects_undefined_loop_normalize(list l_eff __attribute__((__unused__)),
+				 entity index __attribute__((__unused__)),
+				 range r __attribute__((__unused__)),
 				 entity *new_index, 
-				 descriptor range_descriptor,
-				 bool descriptor_update_p)
+				 descriptor range_descriptor __attribute__((__unused__)),
+				 bool descriptor_update_p __attribute__((__unused__)))
 {
   *new_index = entity_undefined;
   return list_undefined; 
 }
 
 list 
-effects_loop_normalize_nop(list l_eff, entity index, range r,
-			   entity *new_index, descriptor range_descriptor,
-			   bool descriptor_update_p)
+effects_loop_normalize_nop(list l_eff, 
+			   entity index __attribute__((__unused__)), 
+			   range r __attribute__((__unused__)),
+			   entity *new_index __attribute__((__unused__)), 
+			   descriptor range_descriptor __attribute__((__unused__)),
+			   bool descriptor_update_p __attribute__((__unused__)))
 {
     return l_eff; 
 }

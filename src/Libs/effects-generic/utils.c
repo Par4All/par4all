@@ -148,6 +148,10 @@ typedef gen_chunk* (*chunks_function)();
 typedef list (*list_function)();
 typedef bool (*bool_function)();
 typedef descriptor (*descriptor_function)();
+typedef effect (*effect_function)();
+typedef transformer (*transformer_function)();
+typedef statement_effects (*statement_effects_function)();
+typedef text (*text_function)();
 
 void 
 generic_effects_reset_all_methods()
@@ -155,10 +159,10 @@ generic_effects_reset_all_methods()
     effects_computation_init_func = (void_function) UNDEF;
     effects_computation_reset_func = (void_function) UNDEF;
 
-    effect_dup_func = (chunks_function) UNDEF;
+    effect_dup_func = (effect_function) UNDEF;
     effect_free_func = (void_function) UNDEF;
 
-    effect_union_op = (chunks_function) UNDEF;
+    effect_union_op = (effect_function) UNDEF;
     effects_union_op = (list_function) UNDEF;
     effects_test_union_op = (list_function) UNDEF;
     effects_intersection_op = (list_function) UNDEF;
@@ -172,39 +176,39 @@ generic_effects_reset_all_methods()
     effects_loop_normalize_func = (list_function) UNDEF;
     effects_union_over_range_op = (list_function) UNDEF;
 
-    reference_to_effect_func = (chunks_function) UNDEF;
-    loop_descriptor_make_func = (chunks_function) UNDEF;
-    vector_to_descriptor_func = (chunks_function) UNDEF;
+    reference_to_effect_func = (effect_function) UNDEF;
+    loop_descriptor_make_func = (descriptor_function) UNDEF;
+    vector_to_descriptor_func = (descriptor_function) UNDEF;
 
     effects_backward_translation_op = (list_function) UNDEF;
     effects_forward_translation_op = (list_function) UNDEF;
     effects_local_to_global_translation_op = (list_function) UNDEF;
 
-    load_context_func = (chunks_function) UNDEF;
-    load_transformer_func = (chunks_function) UNDEF;
+    load_context_func = (transformer_function) UNDEF;
+    load_transformer_func = (transformer_function) UNDEF;
     empty_context_test = (bool_function) UNDEF;
-    proper_to_summary_effect_func = (descriptor_function) UNDEF;
+    proper_to_summary_effect_func = (effect_function) UNDEF;
     effects_descriptor_normalize_func = (void_function) UNDEF;
 
-    db_get_proper_rw_effects_func = (chunks_function) UNDEF;
+    db_get_proper_rw_effects_func = (statement_effects_function) UNDEF;
     db_put_proper_rw_effects_func = (void_function) UNDEF;
-    db_get_invariant_rw_effects_func = (chunks_function) UNDEF;
+    db_get_invariant_rw_effects_func = (statement_effects_function) UNDEF;
     db_put_invariant_rw_effects_func = (void_function) UNDEF;
-    db_get_rw_effects_func = (chunks_function) UNDEF;
+    db_get_rw_effects_func = (statement_effects_function) UNDEF;
     db_put_rw_effects_func = (void_function) UNDEF;
     db_get_summary_rw_effects_func = (list_function) UNDEF;
     db_put_summary_rw_effects_func = (void_function) UNDEF;
-    db_get_in_effects_func = (chunks_function) UNDEF;
+    db_get_in_effects_func = (statement_effects_function) UNDEF;
     db_put_in_effects_func = (void_function) UNDEF;
-    db_get_cumulated_in_effects_func = (chunks_function) UNDEF;
+    db_get_cumulated_in_effects_func = (statement_effects_function) UNDEF;
     db_put_cumulated_in_effects_func = (void_function) UNDEF;
-    db_get_invariant_in_effects_func = (chunks_function) UNDEF;
+    db_get_invariant_in_effects_func = (statement_effects_function) UNDEF;
     db_put_invariant_in_effects_func = (void_function) UNDEF;
     db_get_summary_in_effects_func = (list_function) UNDEF;
     db_put_summary_in_effects_func = (void_function) UNDEF;
     db_get_summary_out_effects_func = (list_function) UNDEF;
     db_put_summary_out_effects_func = (void_function) UNDEF;
-    db_get_out_effects_func = (chunks_function) UNDEF;
+    db_get_out_effects_func = (statement_effects_function) UNDEF;
     db_put_out_effects_func = (void_function) UNDEF;
 
     set_contracted_proper_effects(TRUE);
@@ -218,7 +222,7 @@ generic_effects_reset_all_methods()
     set_prettyprint_with_attachments(FALSE);
 
     effects_prettyprint_func = (void_function) UNDEF;
-    effects_to_text_func = (chunks_function) UNDEF;
+    effects_to_text_func = (text_function) UNDEF;
     attach_effects_decoration_to_text_func = (void_function) UNDEF;
 
     reset_generic_prettyprints();
@@ -401,31 +405,31 @@ descriptor_append(descriptor d1, descriptor d2)
 /***********************************************************************/
 
 transformer
-load_undefined_context(statement s)
+load_undefined_context(statement s __attribute__ ((__unused__)) )
 {
     return transformer_undefined;
 }
 
 transformer
-load_undefined_transformer(statement s)
+load_undefined_transformer(statement s __attribute__ ((__unused__)) )
 {
     return transformer_undefined;
 }
 
 bool
-empty_context_test_false(transformer context)
+empty_context_test_false(transformer context __attribute__ ((__unused__)) )
 {
     return FALSE;
 }
 
 void 
-effects_computation_no_init(string module_name)
+effects_computation_no_init(string module_name __attribute__ ((__unused__)) )
 {
     return;
 }
 
 void 
-effects_computation_no_reset(string module_name)
+effects_computation_no_reset(string module_name __attribute__ ((__unused__)) )
 {
     return;
 }
