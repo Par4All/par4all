@@ -4,8 +4,8 @@
  * regenerate user files. the modules are put in a file which has the
  * same name as the original user file. All regenerated files are stored
  * in the subdirectory Src of the database. If some includes are
- * generated, they should also be stored there. 
- * 
+ * generated, they should also be stored there.
+ *
  */
 
 #include <stdio.h>
@@ -24,7 +24,7 @@ static hash_table user_files = hash_table_undefined;
 
 /* returns the new user file where to store user_file
  */
-static string 
+static string
 get_new_user_file(string dir_name, string preprocessed_user_file)
 {
   /* C or Fortran preprocessing may have or have not occured */
@@ -52,6 +52,7 @@ get_new_user_file(string dir_name, string preprocessed_user_file)
       pips_internal_error("Rewriting existing file \"%s\" for user_file \"%s\""
 			  " and for preprocessed_user_file \"%s\".\n",
 			  s, user_file, preprocessed_user_file);
+      fclose(tmp);
     }
     tmp = safe_fopen(s, "w");
     if(dot_f_file_p(user_file)) {
@@ -120,7 +121,7 @@ unsplit(string name)
     /* each module PRINTED_FILE is appended to a new user file
      * depending on its initial user file.
      */
-    for (i=0; i<n; i++) 
+    for (i=0; i<n; i++)
     {
 	string module, user_file, new_user_file, printed_file, full;
 	FILE * out, * in;
@@ -144,8 +145,7 @@ unsplit(string name)
 	free(full);
     }
 
-    /* clean 
-     */
+    /* clean */
     safe_fclose(summary, summary_full_name);
     free(summary_full_name), free(src_dir), free(dir_name);
     gen_array_full_free(modules);
