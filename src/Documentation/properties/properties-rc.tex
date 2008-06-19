@@ -681,21 +681,6 @@ property is set to false by default and should disappear soon.
 FOR_TO_DO_LOOP_IN_CONTROLIZER   FALSE
 \end{verbatim}
 
-\subsection{Spaghettifier}
-\index{Spaghettifier}
-\index{DESTRUCTURE\_TESTS}
-\index{DESTRUCTURE\_LOOPS}
-\index{DESTRUCTURE\_WHILELOOPS}
-\index{DESTRUCTURE\_FORLOOPS}
-
-Thoses properties allow to fine tune \verb|spaghettify| phase
-
-\begin{verbatim}
-DESTRUCTURE_TESTS TRUE 
-DESTRUCTURE_LOOPS TRUE
-DESTRUCTURE_WHILELOOPS TRUE
-DESTRUCTURE_FORLOOPS TRUE
-\end{verbatim}
 
 \subsection{Chains}
 \index{Use-Def Chains}
@@ -1723,10 +1708,11 @@ DEAD_CODE_DISPLAY_STATISTICS TRUE
 \index{UNSPAGHETTIFY\_DISPLAY\_STATISTICS}
 \index{UNSPAGHETTIFY\_TEST\_RESTRUCTURING}
 \index{UNSPAGHETTIFY\_RECURSIVE\_DECOMPOSITION}
+\index{RESTRUCTURE\_WHILE\_RECOVER}
 
 
-To display the statistics about unspaghettify and control graph
-restructuring.
+To display the statistics about \texttt{unspaghettify} and control graph
+restructuring \verb/restructure_control/.
 \begin{verbatim}
 UNSPAGHETTIFY_DISPLAY_STATISTICS TRUE
 \end{verbatim}
@@ -1736,11 +1722,18 @@ when applying unspaghettify:
 \begin{verbatim}
 UNSPAGHETTIFY_TEST_RESTRUCTURING FALSE
 \end{verbatim}
+It is assumed as true for \verb/restructure_control/.
 
 The following option enables the use of control graph hierarchisation
 when applying unspaghettify:
 \begin{verbatim}
 UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION FALSE
+\end{verbatim}
+It is assumed as true for \verb/restructure_control/.
+
+The restructurer can recover some while loops if this property is set:
+\begin{verbatim}
+UNSPAGHETTIFY_WHILE_RECOVER FALSE
 \end{verbatim}
 
 
@@ -1765,6 +1758,22 @@ following options in the unspaghettify or control restructuring phase.
 \begin{verbatim}
 GATHER_FORMATS_AT_BEGINNING FALSE
 GATHER_FORMATS_AT_END FALSE
+\end{verbatim}
+
+\subsection{Spaghettifier}
+\index{Spaghettifier}
+\index{DESTRUCTURE\_TESTS}
+\index{DESTRUCTURE\_LOOPS}
+\index{DESTRUCTURE\_WHILELOOPS}
+\index{DESTRUCTURE\_FORLOOPS}
+
+Thoses properties allow to fine tune \verb|spaghettify| phase
+
+\begin{verbatim}
+DESTRUCTURE_TESTS TRUE 
+DESTRUCTURE_LOOPS TRUE
+DESTRUCTURE_WHILELOOPS TRUE
+DESTRUCTURE_FORLOOPS TRUE
 \end{verbatim}
 
 \subsubsection{FSM Generation}

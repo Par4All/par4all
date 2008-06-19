@@ -3552,7 +3552,7 @@ use_def_elimination          > MODULE.code
 
 Two control restructurers are available: \verb/unspaghettify/ which is
 used by default in conjunction with \verb/controlizer/ and
-\verb/restructurer/ which must be explicitly applied\footnote{A property
+\verb/restructure_control/ which must be explicitly applied\footnote{A property
   can be used to force the call to \texttt{restructurer} by the
   \texttt{controlizer}.}
 
@@ -3561,7 +3561,7 @@ used by default in conjunction with \verb/controlizer/ and
 \index{Unspaghettify}
 
 %%@UserManualDocumentation: unspaghettify
-The \texttt{unspaghettifier} is a heuristic to clean up and to simplify
+The \emph{unspaghettifier} is a heuristic to clean up and to simplify
 the control graphs of a module. It
 is useful because the controlizer (see
 Section~\ref{subsection-controlized-code}) or some transformation phases
@@ -3575,7 +3575,7 @@ Section~\ref{subsection-controlized-code}) if the
 \verb|UNSPAGHETTIFY_IN_CONTROLIZER| 
 property is true.
 
-To add flexibility, the behavior of \texttt{unspaghettifier} is
+To add flexibility, the behavior of \texttt{unspaghettify} is
 controlled by the properties 
 \verb|UNSPAGHETTIFY_TEST_RESTRUCTURING|
 and \verb|UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION|
@@ -3592,6 +3592,33 @@ alias unspaghettify 'Unspaghettify the Control Graph'
 
 \begin{verbatim}
 unspaghettify          > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{verbatim}
+
+
+\subsubsection{Restructure Control}
+
+%%@UserManualDocumentation: restructure_control
+\verb|restructure_control| is a more complete restructuring phase that
+is useful to improve the accuracy of various \PIPS{} phases.
+
+It recursively implement TEST restructuring (replacing IF/THEN/ELSE
+with GOTOs with structured IF/THEN/ELSE without any GOTOs when
+possible) by applying pattern matching methods.
+
+It also implement a recursive decomposition of the control flow graph
+by an interval graph partitioning method.
+
+Other restructuring methods are available in \PIPS{} with the TOOLPACK's
+restructurer (see
+Section~\ref{subsection-control-structure-normalization-stf}).
+%%!UserManualDocumentation
+
+\begin{verbatim}
+alias restructure_control 'Restructure the Control Graph'
+
+restructure_control          > MODULE.code
         < PROGRAM.entities
         < MODULE.code
 \end{verbatim}
@@ -3661,31 +3688,6 @@ full_spaghettify          > MODULE.code
         < MODULE.code
 \end{verbatim}
 
-\subsubsection{Restructure Control}
-
-%%@UserManualDocumentation: restructure_control
-\verb|restructure_control| is a more complete restructuring phase that
-is useful to improve the accuracy of various \PIPS{} phases.
-
-It recursively implement TEST restructuring (replacing IF/THEN/ELSE
-with GOTOs with structured IF/THEN/ELSE without any GOTOs when
-possible) by applying pattern matching methods.
-
-It also implement a recursive decomposition of the control flow graph
-by an interval graph partitioning method.
-
-Other restructuring methods are available in \PIPS{} with the TOOLPACK's
-restructurer (see
-Section~\ref{subsection-control-structure-normalization-stf}).
-%%!UserManualDocumentation
-
-\begin{verbatim}
-alias restructure_control 'Restructure the Control Graph'
-
-restructure_control          > MODULE.code
-        < PROGRAM.entities
-        < MODULE.code
-\end{verbatim}
 
 \subsection{Control Structure Normalisation (STF)}
 \label{subsection-control-structure-normalization-stf}
