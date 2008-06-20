@@ -955,7 +955,7 @@ list /* of entity */ string_to_entity_list(string module, string names)
 string entity_user_name(entity e)
 {
   string global_name = entity_name(e);
- 
+
   /* All possible prefixes first */
 
   if (strstr(global_name,STRUCT_PREFIX) != NULL)
@@ -963,7 +963,7 @@ string entity_user_name(entity e)
   if (strstr(global_name,UNION_PREFIX) != NULL)
     return strdup(strstr(global_name,UNION_PREFIX) + 1);
   if (strstr(global_name,ENUM_PREFIX) != NULL)
-    return strdup(strstr(global_name,ENUM_PREFIX) + 1);      
+    return strdup(strstr(global_name,ENUM_PREFIX) + 1);
   if (strstr(global_name,TYPEDEF_PREFIX) != NULL)
     return strdup(strstr(global_name,TYPEDEF_PREFIX) + 1);
 
@@ -990,8 +990,9 @@ string entity_user_name(entity e)
   /* Then file seperator */
   if (strstr(global_name,FILE_SEP_STRING) != NULL)
     return strdup(strstr(global_name,FILE_SEP_STRING) + 1);
-  
+
   pips_error("entity_user_name", "no seperator ?\n");
+  return NULL;
 }
 
 
@@ -1011,7 +1012,7 @@ bool static_module_p(entity e)
 
 bool compilation_unit_p(string module_name)
 {
-  /* A module name is a compilation unit if and only if its last character is 
+  /* A module name is a compilation unit if and only if its last character is
      FILE_SEP */
   if (module_name[strlen(module_name)-1]==FILE_SEP)
     return TRUE;

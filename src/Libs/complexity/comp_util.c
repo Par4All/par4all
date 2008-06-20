@@ -47,6 +47,7 @@
 #include "pipsdbm.h"
 #include "text-util.h"     /* print_text */
 #include "effects-generic.h"
+#include "effects-simple.h"
 #include "misc.h"
 #include "constants.h"     /* IMPLIED_DO_NAME is defined there */
 #include "properties.h"    /* get_string_property is defined there */
@@ -159,17 +160,17 @@ boolean print_stats_p, print_local_names_p;
 	ifcount ic    = complexity_ifcount(comp);
 
 	if ( print_stats_p ) {
-	    sprintf(s, "[(var:%d/%d/%d/%d)", varcount_symbolic(vc),
+	    sprintf(s, "[(var:%td/%td/%td/%td)", varcount_symbolic(vc),
 		                             varcount_guessed(vc),
 		                             varcount_bounded(vc), 
 		                             varcount_unknown(vc));
-	    sprintf(s+strlen(s), " (rng:%d/%d/%d/%d)", 
+	    sprintf(s+strlen(s), " (rng:%td/%td/%td/%td)", 
 		                             rangecount_profiled(rc),
 		                             rangecount_guessed(rc),
 		                             rangecount_bounded(rc), 
 		                             rangecount_unknown(rc));
 
-	    sprintf(s+strlen(s), " (ifs:%d/%d/%d)]  ", 
+	    sprintf(s+strlen(s), " (ifs:%td/%td/%td)]  ", 
 		                             ifcount_profiled(ic), 
 		                             ifcount_computed(ic),
 		                             ifcount_halfhalf(ic));
@@ -438,7 +439,7 @@ FILE *fd;
 		fprintf(fd, "%25s|\n", "");
 		skip_one_line = FALSE;
 	    }
-	    fprintf(fd, "%22.21s   |%6d %6d %7d %8d %8d\n",
+	    fprintf(fd, "%22.21s   |%6td %6td %7td %8td %8td\n",
 		    p->name, p->int_cost, p->float_cost,
 		    p->double_cost, p->complex_cost, p->dcomplex_cost);
 	}

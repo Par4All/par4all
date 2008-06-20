@@ -51,7 +51,7 @@ translate_reduction(
     list /* of reference */ lref = summary_to_proper_reference(c, ref),
          /* of reduction */ lrds = NIL;
 
-    pips_debug(7, "reduction %s[%s] (%d reductions)\n", 
+    pips_debug(7, "reduction %s[%s] (%td reductions)\n", 
 	       reduction_name(external_red),
 	       entity_name(var), gen_length(lref));
 

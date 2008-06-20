@@ -33,7 +33,7 @@
 #include "transformer.h"
 #include "semantics.h"
 
-#include "icfg-local.h"
+#include "icfg.h"
 
 /* get all the callees of the module module_name,return the no-empty
    list of string.
@@ -87,12 +87,12 @@ entity mod;
 void topological_number_assign_to_module(hash_module_to_depth, mod, n)
 hash_table hash_module_to_depth;
 entity mod;
-int n;
+size_t n;
 {
-    int depth = (int) hash_get(hash_module_to_depth, (char *) mod);
+    size_t depth = (size_t) hash_get(hash_module_to_depth, (char *) mod);
     list callees_list = module_to_callees(mod);
 
-    if ((depth == (int) ICFG_NOT_FOUND) || (depth < n))
+    if ((depth == (size_t) ICFG_NOT_FOUND) || (depth < n))
 	hash_put(hash_module_to_depth, (char *) mod, (char *) n);
 	      
     if ( callees_list != NIL ) {
@@ -109,12 +109,12 @@ list module_list_sort(hash_module_to_depth, current_list, mod, n)
 hash_table hash_module_to_depth;
 list current_list;
 entity mod;
-int n;
+size_t n;
 {
     list callees_list = NIL;
     static list same_depth_list = NIL;
-    int depth;
-	
+    size_t depth;
+
     /* create the callees list whose caller has the depth n */
     if ( same_depth_list == NIL )
 	callees_list = module_to_callees(mod);
@@ -133,11 +133,11 @@ int n;
     /* create same_depth_list whose depth is n+1 */
     if ( callees_list != NIL ) {
 	MAPL(pm,{ entity e = ENTITY(CAR(pm));
-	          depth = (int) hash_get(hash_module_to_depth, (char *) e);
+	          depth = (size_t) hash_get(hash_module_to_depth, (char *) e);
 	          if ( depth == n+1 ) {
-		      same_depth_list = gen_nconc(same_depth_list, 
+		      same_depth_list = gen_nconc(same_depth_list,
 					     CONS(ENTITY, e, NIL));
-		      hash_put(hash_module_to_depth, 
+		      hash_put(hash_module_to_depth,
 			       (char *) e, (char *) -1);
 		  }
 	        },

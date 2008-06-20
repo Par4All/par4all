@@ -832,7 +832,7 @@ loop_to_transformer(loop l, transformer pre, list e)
 
   ifdebug(8) {
     pips_debug(8, "intermediate fix-point tf=\n");
-    fprint_transformer(stderr, tf, external_value_name);
+    fprint_transformer(stderr, tf, (get_variable_name_t) external_value_name);
   }
 
   /* restrict the domain of tf by the range of pre, except for the loop
@@ -919,7 +919,7 @@ refine_loop_transformer(transformer ltf, transformer pre, loop l)
 
   ifdebug(8) {
     pips_debug(8, "entered loop transformer t_enter=\n");
-    fprint_transformer(stderr, t_enter, external_value_name);
+    fprint_transformer(stderr, t_enter, (get_variable_name_t) external_value_name);
   }
 
   /* add the entry condition */
@@ -932,7 +932,7 @@ refine_loop_transformer(transformer ltf, transformer pre, loop l)
 
   ifdebug(8) {
     pips_debug(8, "entered and exited loop transformer t_enter=\n");
-    fprint_transformer(stderr, t_enter, external_value_name);
+    fprint_transformer(stderr, t_enter, (get_variable_name_t) external_value_name);
   }
 
   /* add initialization for the unconditional initialization of the loop
@@ -945,7 +945,7 @@ refine_loop_transformer(transformer ltf, transformer pre, loop l)
 
   ifdebug(8) {
     pips_debug(8, "skipped loop transformer t_skip=\n");
-    fprint_transformer(stderr, t_skip, external_value_name);
+    fprint_transformer(stderr, t_skip, (get_variable_name_t) external_value_name);
   }
 
   /* It might be better not to compute useless transformer, but it's more
@@ -968,7 +968,7 @@ refine_loop_transformer(transformer ltf, transformer pre, loop l)
 
   ifdebug(8) {
     pips_debug(8, "full refined loop transformer tf=\n");
-    fprint_transformer(stderr, tf, external_value_name);
+    fprint_transformer(stderr, tf, (get_variable_name_t) external_value_name);
     pips_debug(8, "end\n");
   }
 
@@ -1016,7 +1016,7 @@ refine_whileloop_transformer(transformer ltf, transformer pre, whileloop l)
 
   ifdebug(8) {
     pips_debug(8, "entered loop transformer t_enter=\n");
-    fprint_transformer(stderr, t_enter, external_value_name);
+    fprint_transformer(stderr, t_enter, (get_variable_name_t) external_value_name);
   }
 
   /* add the exit condition */
@@ -1024,7 +1024,7 @@ refine_whileloop_transformer(transformer ltf, transformer pre, whileloop l)
 
   ifdebug(8) {
     pips_debug(8, "entered and exited loop transformer t_enter=\n");
-    fprint_transformer(stderr, t_enter, external_value_name);
+    fprint_transformer(stderr, t_enter, (get_variable_name_t) external_value_name);
   }
 
   /* add initialization for the unconditional initialization of the loop
@@ -1036,7 +1036,7 @@ refine_whileloop_transformer(transformer ltf, transformer pre, whileloop l)
 
   ifdebug(8) {
     pips_debug(8, "skipped loop transformer t_skip=\n");
-    fprint_transformer(stderr, t_skip, external_value_name);
+    fprint_transformer(stderr, t_skip, (get_variable_name_t) external_value_name);
   }
 
   /* It might be better not to compute useless transformer, but it's more
@@ -1059,7 +1059,7 @@ refine_whileloop_transformer(transformer ltf, transformer pre, whileloop l)
 
   ifdebug(8) {
     pips_debug(8, "full refined loop transformer tf=\n");
-    fprint_transformer(stderr, tf, external_value_name);
+    fprint_transformer(stderr, tf, (get_variable_name_t) external_value_name);
     pips_debug(8, "end\n");
   }
 
@@ -1160,7 +1160,7 @@ static transformer recompute_loop_transformer(loop l, transformer pre)
 /* NOT USED. NOT FULLY IMPLEMENTED YET. SHOULD BE REDUNDANT WITH whileloop_to_tramsformer() */
 /* Recompute a fixpoint conditionnally to a valid precondition for all iterations */
 /* Could/Should be later called from whileloop_to_postcondition() */
-static transformer recompute_whileloop_transformer(whileloop wl, transformer pre)
+static transformer __attribute__ ((unused)) recompute_whileloop_transformer(whileloop wl, transformer pre)
 {
   transformer new_tf = transformer_undefined;
   pips_assert("To shut up gcc", wl==wl && pre==pre);
@@ -1249,7 +1249,7 @@ whileloop_to_transformer(whileloop l, transformer pre, list e) /* effects of whi
 
     ifdebug(8) {
       pips_debug(8, "Precondition for loop body pre_n=\n");
-      fprint_transformer(stderr, pre_n, external_value_name);
+      fprint_transformer(stderr, pre_n, (get_variable_name_t) external_value_name);
     }
 
     /* compute the whileloop body transformer, including the initial conditions */
@@ -1303,7 +1303,7 @@ whileloop_to_transformer(whileloop l, transformer pre, list e) /* effects of whi
 
       ifdebug(8) {
 	pips_debug(8, "intermediate fix-point tf=\n");
-	fprint_transformer(stderr, tf, external_value_name);
+	fprint_transformer(stderr, tf, (get_variable_name_t) external_value_name);
       }
 
     }

@@ -142,7 +142,7 @@ Pvecteur tile_indices, tile_local_indices;
 	pc = contrainte_make(pv);
 	sc_add_ineg(sc,pc);
     }
-  
+
     /* build the constraints    0 <= ti  */
     for (ti =tile_indices; !VECTEUR_NUL_P(ti); ti = ti->succ) {
 	pv = vect_new(vecteur_var(ti), VALUE_MONE);
@@ -150,7 +150,8 @@ Pvecteur tile_indices, tile_local_indices;
 	sc_add_ineg(sc,pc);
     }
     ifdebug(8) { fprintf(stderr,"TILE SYSTEM:\n");
-		 sc_fprint(stderr,sc,entity_local_name);}
+		 sc_fprint(stderr, sc, (get_variable_name_t) entity_local_name);
+    }
     debug(8,"loop_bounds_to_tile_bounds","end\n");
     debug_off();
     return(sc);

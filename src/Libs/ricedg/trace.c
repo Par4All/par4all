@@ -113,21 +113,21 @@ list make_filtered_dg_or_dvdg(statement mod_stat, graph mod_graph)
 			successor succ = NULL;
 			memset(node_name_parent, 0, sizeof(string)*strlen(variable_name_parent) + 30);
 			memset(node_name_child, 0, sizeof(string)*strlen(variable_name_child) + 30);
-			sprintf(node_name_parent, "%d-<%s>-%c", l1, variable_name_parent, statement_action_parent);
-			sprintf(node_name_child, "%d-<%s>-%c", l2, variable_name_child, statement_action_child);
+			sprintf(node_name_parent, "%td-<%s>-%c", l1, variable_name_parent, statement_action_parent);
+			sprintf(node_name_child, "%td-<%s>-%c", l2, variable_name_child, statement_action_child);
 
 			/* Additional information for EDF prettyprint. 
 			   Instruction calls are given with  statement numbers
 			*/
 			if (get_bool_property("PRETTYPRINT_WITH_COMMON_NAMES")) {
 			    if (instruction_call_p(statement_instruction(s1)))
-			        sprintf(node_name_parent + strlen(node_name_parent), " %d-%s", statement_number(s1),
+			        sprintf(node_name_parent + strlen(node_name_parent), " %td-%s", statement_number(s1),
 					entity_local_name(call_function(instruction_call(statement_instruction(s1)))));
-			    else sprintf(node_name_parent + strlen(node_name_parent), " %d", statement_number(s1));
+			    else sprintf(node_name_parent + strlen(node_name_parent), " %td", statement_number(s1));
 			    if (instruction_call_p(statement_instruction(s2)))
-			        sprintf(node_name_child + strlen(node_name_child), " %d-%s", statement_number(s2),
+			        sprintf(node_name_child + strlen(node_name_child), " %td-%s", statement_number(s2),
 					entity_local_name(call_function(instruction_call(statement_instruction(s2)))));
-			    else sprintf(node_name_child + strlen(node_name_child), " %d", statement_number(s2));
+			    else sprintf(node_name_child + strlen(node_name_child), " %td", statement_number(s2));
 			}
 			
 			memset(succ_label, 0, strlen(succ_label));
@@ -136,7 +136,7 @@ list make_filtered_dg_or_dvdg(statement mod_stat, graph mod_graph)
 			        strcat(succ_label, "levels(");
 				MAPL(pl, {
 				    sprintf(succ_label + strlen(succ_label), 
-					    pl == cone_levels(conflict_cone(c)) ? "%d" : ",%d", INT(CAR(pl)));
+					    pl == cone_levels(conflict_cone(c)) ? "%td" : ",%td", INT(CAR(pl)));
 				}, cone_levels(conflict_cone(c)));
 				strcat(succ_label, ")");
 			    }

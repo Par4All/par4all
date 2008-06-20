@@ -833,7 +833,7 @@ transformer_normalize(transformer t, int level)
   ifdebug(8) {
     fprintf(stderr, "After normalization of transformer t=%p at level %d:\n",
 	    t, level);
-    fprint_transformer(stderr, t, entity_local_name);
+    fprint_transformer(stderr, t, (get_variable_name_t) entity_local_name);
   }
 
   ifdebug(1) {
@@ -997,7 +997,7 @@ transformer transformer_projection_with_redundancy_elimination_and_check(
     pips_debug(9, "Begin for transformer %p\n", t);
     /* sc_fprint(stderr, r, exernal_value_name); */
     /* sc_fprint(stderr, r, (char * (*)(Variable)) entity_local_name); */
-    fprint_transformer(stderr, t, entity_global_name);
+    fprint_transformer(stderr, t, (get_variable_name_t) entity_global_name);
     pips_debug(9, "and entities to be projected: ");
     print_arguments(args);
     pips_assert("t is weakly consistent", transformer_weak_consistency_p(t));
@@ -1127,7 +1127,7 @@ transformer transformer_projection_with_redundancy_elimination_and_check(
 	     && base_contains_variable_p(sc_base(r), (Variable) old_e)) {
 	    fprintf(stderr, "Value %s should have been eliminated earlier\n",
 		    entity_name(old_e));
-	    fprint_transformer(stderr, t, entity_global_name);
+	    fprint_transformer(stderr, t, (get_variable_name_t) entity_global_name);
 	    pips_internal_error("Wrong set of projected variables\n");
 	  }
 	}
@@ -1149,7 +1149,7 @@ transformer transformer_projection_with_redundancy_elimination_and_check(
   ifdebug(9) {
     pips_debug(9, "Transformer after argument list update\n");
     /* sc_fprint(stderr, r, exernal_value_name); */
-    fprint_transformer(stderr, t, entity_global_name);
+    fprint_transformer(stderr, t, (get_variable_name_t) entity_global_name);
   }
 
   ifdebug(1) {
@@ -1288,7 +1288,7 @@ cons * args;
     pips_debug(9, "Begin for transformer %p\n", t);
     /* sc_fprint(stderr, r, exernal_value_name); */
     /* sc_fprint(stderr, r, (char * (*)(Variable)) entity_local_name); */
-    fprint_transformer(stderr, t, entity_global_name);
+    fprint_transformer(stderr, t, (get_variable_name_t) entity_global_name);
     pips_debug(9, "and entities to be projected: ");
     dump_arguments(args);
     pips_assert("t is weakly consistent", transformer_weak_consistency_p(t));
@@ -1353,7 +1353,7 @@ cons * args;
   ifdebug(9) {
     pips_debug(9, "Transformer after argument list update\n");
     /* sc_fprint(stderr, r, exernal_value_name); */
-    fprint_transformer(stderr, t, entity_global_name);
+    fprint_transformer(stderr, t, (get_variable_name_t) entity_global_name);
   }
 
   ifdebug(1) {

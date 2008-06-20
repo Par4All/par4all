@@ -99,7 +99,7 @@ static bool postcondition_filter(statement stat)
 
 	StorePost(test_true(t), post);
 	StorePost(test_false(t), post);
-	
+
         break;
     }
     case is_instruction_loop:
@@ -120,7 +120,8 @@ static bool postcondition_filter(statement stat)
 
 	pips_debug(6, "in unstructured\n");
 
-	CONTROL_MAP(ct,	{}, c, blocks); /* generates the full list */
+	/* generates the full list */
+	CONTROL_MAP(__attribute__ ((unused)) ct, {}, c, blocks);
 
 	blocks = gen_nreverse(blocks);
 
@@ -150,7 +151,7 @@ static bool postcondition_filter(statement stat)
  * statement_mapping post_map, pre_map;
  *
  * computes the postcondition mapping post_map from the
- * precondition mapping pre_map and the related statement tree 
+ * precondition mapping pre_map and the related statement tree
  * starting from stat. The rule applied is that the postcondition
  * of one statement is the precondition of the following one.
  * The last postcondition is arbitrary set to transformer_identity,

@@ -125,7 +125,7 @@ void reset_keyword_typedef_table()
 intptr_t
 is_c_keyword_typedef(char * s)
 {
-  intptr_t i = hash_get(keyword_typedef_table,s);
+  intptr_t i = (intptr_t) hash_get(keyword_typedef_table,s);
   return ((char *) i == HASH_UNDEFINED_VALUE) ? 0: i;
 }
 

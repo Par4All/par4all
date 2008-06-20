@@ -435,7 +435,7 @@ translate_array_effect(entity called_func, list real_args, reference real_ref,
 
     if (get_debug_level() >= 5) {
 	fprintf(stderr, "\nBinding equations: ");
-	sc_fprint(stderr, equations, vect_debug_entity_name);
+	sc_fprint(stderr, equations, (get_variable_name_t) vect_debug_entity_name);
     }
 
     /* 
@@ -447,12 +447,12 @@ translate_array_effect(entity called_func, list real_args, reference real_ref,
     offset = offset_of_reference(real_ref, formal_ndims);
     if (get_debug_level() >= 5) {
 	fprintf(stderr, "size of formal: ");
-	vect_fprint(stderr, size_formal, vect_debug_entity_name);
+	vect_fprint(stderr, size_formal, (get_variable_name_t) vect_debug_entity_name);
 	fprintf(stderr, "size of real: ");
-	vect_fprint(stderr, size_real, vect_debug_entity_name);
+	vect_fprint(stderr, size_real, (get_variable_name_t) vect_debug_entity_name);
 	if(offset != (Pvecteur) -1) {
 	    fprintf(stderr, "offset: ");
-	    vect_fprint(stderr, offset, vect_debug_entity_name);
+	    vect_fprint(stderr, offset, (get_variable_name_t) vect_debug_entity_name);
 	}
 	else {
 	    fprintf(stderr, "offset: could not be computed\n");
@@ -479,9 +479,9 @@ translate_array_effect(entity called_func, list real_args, reference real_ref,
 
 	ifdebug(5) {
 	    fprintf(stderr, "contrainte: ");
-	    vect_fprint(stderr, ineq, vect_debug_entity_name);
+	    vect_fprint(stderr, ineq, (get_variable_name_t) vect_debug_entity_name);
 	    fprintf(stderr, "\nsysteme a prouver: ");
-	    sc_fprint(stderr, equations, vect_debug_entity_name);
+	    sc_fprint(stderr, equations, (get_variable_name_t) vect_debug_entity_name);
 	}
 
 	bad_reshaping = FALSE;
@@ -688,7 +688,7 @@ summary_to_proper_effects(
         fprintf(stderr,"%d formal arguments for module %s:\n",
 		n_formals,module_local_name(func));
 	dump_arguments(l_formals);
-	fprintf(stderr,"%d actual arguments:\n",gen_length(args));
+	fprintf(stderr,"%zd actual arguments:\n",gen_length(args));
 	print_expressions(args);
 	pips_user_error("\nCall to module %s: "
 			  "insufficient number of actual arguments.\n",
@@ -700,7 +700,7 @@ summary_to_proper_effects(
       fprintf(stderr,"%d formal arguments for module%s:\n",
 	      n_formals,module_local_name(func));
 	dump_arguments(l_formals);
-	fprintf(stderr,"%d actual arguments:\n",gen_length(args));
+	fprintf(stderr,"%zd actual arguments:\n",gen_length(args));
 	print_expressions(args);
 
 	pips_user_warning("\nCall to module %s: "
@@ -714,8 +714,6 @@ summary_to_proper_effects(
     {
         expression expr = EXPRESSION(CAR(pc));
         syntax sexpr = expression_syntax(expr);
-	boolean substringp = FALSE;
-	boolean refp = FALSE;
 	list la = NULL;
 
 	if (syntax_call_p(sexpr)) {

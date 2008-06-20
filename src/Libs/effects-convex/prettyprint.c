@@ -81,12 +81,12 @@ region_sc_to_string(string s, Psysteme ps)
  *            representing the region
  * modifies : nothing
  */
-text 
+text
 text_region(effect reg)
 {
     text t_reg;
     boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
-    string str_prefix = foresys? 
+    string str_prefix = foresys?
 	FORESYS_CONTINUATION_PREFIX: PIPS_COMMENT_CONTINUATION;
     char line_buffer[MAX_LINE_LENGTH];
     reference r;
@@ -99,8 +99,10 @@ text_region(effect reg)
     if(effect_undefined_p(reg))
     {
 	user_log("[text_region] unexpected effect undefined\n");
-	return make_text(make_sentence(is_sentence_formatted,
-	   strdup(concatenate(str_prefix, "<REGION_UNDEFINED>\n", NULL))));
+	return make_text(CONS(SENTENCE,
+			      make_sentence(is_sentence_formatted,
+					    strdup(concatenate(str_prefix, "<REGION_UNDEFINED>\n", NULL))),
+			      NIL));
     }
     /* else the effect is defined...
      */
@@ -123,7 +125,7 @@ text_region(effect reg)
      */
     ac = effect_action(reg);
     ap = effect_approximation(reg);
-	
+
     if (foresys)
     {
 	append(", RGSTAT(");
@@ -145,8 +147,9 @@ text_region(effect reg)
     sc = sc_dup(region_system(reg));
     region_sc_sort(sc, sorted_base);
 
-    system_sorted_text_format(line_buffer, str_prefix, t_reg, sc, 
-	       pips_region_user_name, vect_contains_phi_p, foresys);
+    system_sorted_text_format(line_buffer, str_prefix, t_reg, sc,
+			      (get_variable_name_t) pips_region_user_name,
+			      vect_contains_phi_p, foresys);
 
     sc_rm(sc);
     base_rm(sorted_base);

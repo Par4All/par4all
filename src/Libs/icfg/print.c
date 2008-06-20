@@ -18,7 +18,7 @@
 #include "database.h"
 #include "pipsdbm.h"
 #include "resources.h"
-#include "icfg-local.h"
+#include "icfg.h"
 
 /*
  * This function prints out a graph that contains callees only

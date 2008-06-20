@@ -410,7 +410,8 @@ movement_computation(
 					  TRUE,FALSE);
     ifdebug(2) {
 	pips_debug(2," After FM projection  and sort:\n");
-	sc_fprint(stderr,sc_proj,entity_local_name);    }
+	sc_fprint(stderr, sc_proj, (get_variable_name_t) entity_local_name);
+    }
 
     /* Projection on the others variables having to be eliminated from 
        the system. In case of Copy-in local memory code generation, the 
@@ -432,7 +433,7 @@ movement_computation(
     ifdebug(2) {
 	sys_debug(2," Before contrainte sort :\n",sc_proj);
 	pips_debug(2," Base index :\n");
-	vect_fprint(stderr, index_base,entity_local_name);   
+	vect_fprint(stderr, index_base, (get_variable_name_t) entity_local_name);
     }
     sc_proj->inegalites = contrainte_sort(sc_proj->inegalites, 
 					  sc_proj->base,  index_base,
@@ -512,13 +513,13 @@ movement_computation(
 	list_of_systems[i] = elim_redund_sc_with_sc(list_of_systems[i],
 						    sc_on_constants,
 						    index_base,
-						    dim_h2);	
+						    dim_h2);
 	ifdebug(8) {
 	    pips_debug(8,"Constraints on the %d-th var.:\n",i);
-	    sc_fprint(stderr,list_of_systems[i],entity_local_name); 
+	    sc_fprint(stderr, list_of_systems[i], (get_variable_name_t) entity_local_name);
 	}
     }
-	  
+
     var_id = (bank_code) ? vect_dup(ppid) : 
     vect_new(vecteur_var(bank_indices), VALUE_ONE);
     stat = bound_generation(module,bank_code,receive_code,
@@ -584,13 +585,13 @@ int *n,*dim_h;
     debug_on("MOVEMENT_DEBUG_LEVEL");
     debug(3,"sc_image_computation","begin\n");
 
-    ifdebug(3) { 
+    ifdebug(3) {
 	pips_debug(3,"ITERATION DOMAIN:\n");
-	sc_fprint(stderr,sc_domain2,entity_local_name);
+	sc_fprint(stderr, sc_domain2, (get_variable_name_t) entity_local_name);
 	pips_debug(3,"ARRAY FUNCTION :\n");
-	sc_fprint(stderr,sc_array_function,entity_local_name);
+	sc_fprint(stderr, sc_array_function, (get_variable_name_t) entity_local_name);
     }
-    if (!sc_faisabilite(sc_domain2)) 
+    if (!sc_faisabilite(sc_domain2))
 	(void) fprintf(stderr,"systeme non faisable en  reels  \n");
     else {
 
@@ -655,8 +656,8 @@ int *n,*dim_h;
 
 	/* mise sous forme normale de matrice_hermite */
 	matrice_hermite(F,n2,ma,P,HERM,Q,&det_p,&det_q);
-	ifdebug(8) { 
-	    sc_fprint(stderr,sc_array_function,entity_local_name);
+	ifdebug(8) {
+	    sc_fprint(stderr, sc_array_function, (get_variable_name_t) entity_local_name);
 	    (void) fprintf(stderr," matrice F\n");
 	    matrice_fprint(stderr,F,n2,ma);
 	  }
@@ -705,11 +706,11 @@ int *n,*dim_h;
 		sc_add_inegalite(sc_image,contrainte_make(pvnew));
 	    }
 	}
-	ifdebug(3) { 
+	ifdebug(3) {
 	    pips_debug(3,"NEW ITERATION DOMAIN:\n");
-	    sc_fprint(stderr,sc_image,entity_local_name);
+	    sc_fprint(stderr, sc_image, (get_variable_name_t) entity_local_name);
 	}
-    
+
 	/** Computation of the new matrix for array function **/
 	matrice_multiply(P,HERM,HERF,n2,n2,ma);
 	ifdebug(3) { 
@@ -726,7 +727,7 @@ int *n,*dim_h;
 			    ma,mb);
 	ifdebug(3) { 
 	    pips_debug(3,"New Array Function :\n");
-	    sc_fprint(stderr,sc_array_function,entity_local_name);
+	    sc_fprint(stderr, sc_array_function, (get_variable_name_t) entity_local_name);
 	}
     }
    
@@ -735,9 +736,10 @@ int *n,*dim_h;
     sort_tile_indices(tile_indices,new_tile_indices,F,n2);
 
 
-    ifdebug(3) { 
+    ifdebug(3) {
 	pips_debug(3,"New Iteration Domain :\n");
-	sc_fprint(stderr,sc_image,entity_local_name); }
+	sc_fprint(stderr, sc_image, (get_variable_name_t) entity_local_name);
+    }
     debug(3,"sc_image_computation","end\n");
     debug_off();
 

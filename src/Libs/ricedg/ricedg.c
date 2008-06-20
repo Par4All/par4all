@@ -445,7 +445,7 @@ statement stat;
 	    
 	    ifdebug(1) 
 	    {
-		fprintf( stderr, "[rdg_loop] skipping loop %d (but recursing)\n", 
+		fprintf( stderr, "[rdg_loop] skipping loop %dd (but recursing)\n", 
 			statement_number(stat));
 	    }
 	    rdg_statement(loop_body(instruction_loop(i))) ;
@@ -603,9 +603,9 @@ rice_update_dependence_graph(
 			
 		   
 		ifdebug(4) {
-		    fprintf(stderr, "dep %02d (", statement_number(s1));
+		    fprintf(stderr, "dep %02td (", statement_number(s1));
 		    print_words(stderr, words_effect(e1));
-		    fprintf(stderr, ") --> %02d (", statement_number(s2));
+		    fprintf(stderr, ") --> %02td (", statement_number(s2));
 		    print_words(stderr, words_effect(e2));
 		    fprintf(stderr, ") \n");
 		}
@@ -705,10 +705,10 @@ rice_update_dependence_graph(
 			{
 			    ifdebug(4)  
 			    {
-				fprintf(stderr, "\n dep %02d (", 
+				fprintf(stderr, "\n dep %02td (", 
 					statement_number(s2));
 				print_words(stderr, words_effect(e1bis));
-				fprintf(stderr, ") --> %02d (", 
+				fprintf(stderr, ") --> %02td (", 
 					statement_number(s1));
 				print_words(stderr, words_effect(e2bis));
 				fprintf(stderr, ") \n");
@@ -770,10 +770,10 @@ rice_update_dependence_graph(
 				}
 				else 
 				{ 
-				    /* This successor has only one 
-				       conflict that has been killed.*/  
+				    /* This successor has only one
+				       conflict that has been killed.*/
 				    successor_vertex(s2su) = vertex_undefined;
-				    successor_arc_label_(s2su) = (char *) 
+				    successor_arc_label_(s2su) = (arc_label)
 					dg_arc_label_undefined;
 				    free_successor(s2su);
 				    ps2su = CDR(ps2su);
@@ -814,7 +814,7 @@ rice_update_dependence_graph(
 	    else 
 	    {
 		successor_vertex(su) = vertex_undefined;
-		successor_arc_label_(su) = (char *) dg_arc_label_undefined;
+		successor_arc_label_(su) = (arc_label) dg_arc_label_undefined;
 		free_successor(su);
 		ps = CDR(ps);
 		if (pss == NIL) 
@@ -926,7 +926,7 @@ TestCoupleOfReferences(
     list * levelsop, 
     Ptsg * gsop)
 {
-    int i, cl, dims, ty;
+    intptr_t i, cl, dims, ty;
     list levels = NIL, levels1 = NIL;
 
     entity e1 = reference_variable(r1), 
@@ -941,9 +941,9 @@ TestCoupleOfReferences(
 
     if(e1 != e2) 
     {
-	fprintf(stderr, "dep %02d (", statement_number(s1));
+	fprintf(stderr, "dep %02td (", statement_number(s1));
 	print_words(stderr, words_effect(ef1));
-	fprintf(stderr, ") --> %02d (", statement_number(s2));
+	fprintf(stderr, ") --> %02td (", statement_number(s2));
 	print_words(stderr, words_effect(ef2));
 	fprintf(stderr, ") \n");
 	user_warning("TestCoupleOfReferences",
@@ -2181,7 +2181,7 @@ statement s1, s2;
 effect ef1, ef2;
 {
     list levels = NIL;
-    int l;
+    intptr_t l;
     boolean all_level_founds = FALSE;
 
     pips_debug(7, "maximum common level (cl): %d\n", cl);

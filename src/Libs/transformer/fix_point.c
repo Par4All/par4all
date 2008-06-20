@@ -267,7 +267,7 @@ transformer tf;
 
     ifdebug(8) {
 	debug(8, "transformer_equality_fix_point", "begin for transformer %p\n", tf);
-	fprint_transformer(stderr, tf, external_value_name);
+	fprint_transformer(stderr, tf, (get_variable_name_t) external_value_name);
     }
  
     /* If the input transformer is not feasible, so is not its fixpoint
@@ -277,7 +277,7 @@ transformer tf;
       /* fix_tf = transformer_identity(); */
 	ifdebug(8) {
 	    debug(8, "transformer_equality_fix_point", "fix-point fix_tf=\n");
-	    fprint_transformer(stderr, fix_tf, external_value_name);
+	    fprint_transformer(stderr, fix_tf, (get_variable_name_t) external_value_name);
 	    debug(8, "transformer_equality_fix_point", "end\n");
 	}
 	return fix_tf;
@@ -396,7 +396,7 @@ transformer tf;
 
     ifdebug(8) {
 	debug(8, "transformer_equality_fix_point", "fix-point fix_tf=\n");
-	fprint_transformer(stderr, fix_tf, external_value_name);
+	fprint_transformer(stderr, fix_tf, (get_variable_name_t) external_value_name);
 	debug(8, "transformer_equality_fix_point", "end\n");
     }
 
@@ -698,7 +698,7 @@ transformer tf;
 
     ifdebug(8) {
 	debug(8, "transformer_pattern_fix_point", "Begin for transformer %p:\n", tf);
-	fprint_transformer(stderr, tf, external_value_name);
+	fprint_transformer(stderr, tf, (get_variable_name_t) external_value_name);
     }
 
     /* Look for the best loop counter: the smallest increment is chosen */
@@ -761,7 +761,7 @@ transformer tf;
 
     ifdebug(8) {
 	debug(8, "transformer_pattern_fix_point", "fix-point fix_tf=\n");
-	fprint_transformer(stderr, fix_tf, external_value_name);
+	fprint_transformer(stderr, fix_tf, (get_variable_name_t) external_value_name);
 	debug(8, "transformer_pattern_fix_point", "end\n");
     }
 
@@ -1011,7 +1011,7 @@ transformer transformer_derivative_fix_point(transformer tf)
 
   ifdebug(8) {
     pips_debug(8, "Begin for transformer %p:\n", tf);
-    fprint_transformer(stderr, tf, external_value_name);
+    fprint_transformer(stderr, tf, (get_variable_name_t) external_value_name);
   }
 
   if(transformer_empty_p(tf)) {
@@ -1039,7 +1039,7 @@ transformer transformer_derivative_fix_point(transformer tf)
 
     ifdebug(8) {
       pips_debug(8, "Begin for transformer %p:\n", tf);
-      fprint_transformer(stderr, tf, external_value_name);
+      fprint_transformer(stderr, tf, (get_variable_name_t) external_value_name);
     }
 
     /* Compute constraints with difference equations */
@@ -1257,7 +1257,7 @@ transformer transformer_derivative_fix_point(transformer tf)
   
   ifdebug(8) {
     pips_debug(8, "fix-point fix_tf=\n");
-    fprint_transformer(stderr, fix_tf, external_value_name);
+    fprint_transformer(stderr, fix_tf, (get_variable_name_t) external_value_name);
     transformer_consistency_p(fix_tf);
     pips_debug(8, "end\n");
   }

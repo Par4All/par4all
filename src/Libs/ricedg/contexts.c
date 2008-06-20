@@ -63,9 +63,9 @@ statement stat;
 	}
 	
 	ifdebug(5) {
-	    fprintf(stderr, "Execution context of loop %d is:\n", 
+	    fprintf(stderr, "Execution context of loop %td is:\n", 
 		statement_number(stat));
-	    sc_fprint(stderr, cil, entity_local_name);
+	    sc_fprint(stderr, cil, (get_variable_name_t) entity_local_name);
 	}
 
 	return(cil);
@@ -149,9 +149,9 @@ statement stat;
 	    statement stp = (statement) st;
 
 	    if (statement_call_p(stp)) {
-		fprintf(stderr, "Execution context of statement %d :\n", 
+		fprintf(stderr, "Execution context of statement %td :\n", 
 			statement_number(stp));
-		sc_fprint(stderr, (Psysteme) context, entity_local_name);
+		sc_fprint(stderr, (Psysteme) context, (get_variable_name_t) entity_local_name);
 	    }
 	}, contexts_map);
     }

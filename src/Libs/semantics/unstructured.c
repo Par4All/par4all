@@ -88,7 +88,7 @@
 static void print_control_node(control c)
 {
   fprintf(stderr,
-	  "ctr %p, %d preds, %d succs: %s", 
+	  "ctr %p, %zd preds, %zd succs: %s", 
           c,
 	  gen_length(control_predecessors(c)),
 	  gen_length(control_successors(c)),
@@ -113,7 +113,7 @@ static void print_control_nodes(list l)
   }
   else {
     MAP(CONTROL, c, {
-      fprintf(stderr, "%x, %s", (unsigned int) c,
+      fprintf(stderr, "%p, %s", c,
 	      safe_statement_identification(control_statement(c)));
     }, l);
   }

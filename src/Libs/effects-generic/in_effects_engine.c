@@ -452,8 +452,8 @@ static void in_effects_of_loop(loop l)
 			NORMALIZE_EXPRESSION(range_increment(r))));
 		v_i_i_prime = vect_make(
 		    VECTEUR_NUL, 
-		    (Variable) (value_pos_p(incr)? i_prime : i), VALUE_ONE,
-		    (Variable) (value_pos_p(incr)? i : i_prime), VALUE_MONE,
+		    (Variable) (value_pos_p(incr) ? i_prime : i), VALUE_ONE,
+		    (Variable) (value_pos_p(incr) ? i : i_prime), VALUE_MONE,
 		    TCST, VALUE_ONE);
 		range_descriptor =
 		    descriptor_inequality_add(range_descriptor, v_i_i_prime);

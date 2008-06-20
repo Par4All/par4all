@@ -95,7 +95,7 @@ out_effects_from_call_site_to_callee(call c)
 static bool 
 summary_out_effects_stmt_filter(statement s)
 {
-    pips_debug(1, "statement %03zd\n", statement_number(s));    
+    pips_debug(1, "statement %03zd\n", statement_number(s));
     current_stmt = s;
     return(TRUE);
 }
@@ -166,7 +166,7 @@ summary_out_effects_engine(char *module_name)
 
     ifdebug(1)
     {
-	pips_debug(1, "begin for %s with %d callers\n",
+	pips_debug(1, "begin for %s with %td callers\n",
 	      module_name,
 	      gen_length(callees_callees(callers)));
 	MAP(STRING, caller_name, {fprintf(stderr, "%s, ", caller_name);},

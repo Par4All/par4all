@@ -96,7 +96,7 @@ text_region_no_action(effect reg)
      */
 /*    ac = effect_action(reg); */
     ap = effect_approximation(reg);
-	
+
     if (foresys)
     {
 	append(", RGSTAT(");
@@ -118,18 +118,18 @@ text_region_no_action(effect reg)
     sc = sc_dup(region_system(reg));
     region_sc_sort(sc, sorted_base);
 
-    system_sorted_text_format(line_buffer, str_prefix, t_reg, sc, 
-	       pips_region_user_name, vect_contains_phi_p, foresys);
+    system_sorted_text_format(line_buffer, str_prefix, t_reg, sc,
+	       (get_variable_name_t) pips_region_user_name,
+ vect_contains_phi_p, foresys);
 
     sc_rm(sc);
     base_rm(sorted_base);
 
-    /* CLOSE 
-     */
+    /* CLOSE */
     if (!foresys) append(">");
     close_current_line(line_buffer, t_reg,str_prefix);
 
-    return t_reg;   
+    return t_reg;
 }
 
 

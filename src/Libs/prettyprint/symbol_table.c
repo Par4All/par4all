@@ -29,7 +29,6 @@
 
 #define NL       "\n"
 
-static string global_module_name;
 /* This function is called from c_parse() via ResetCurrentModule() and fprint_environment() */
 
 void dump_common_layout(string_buffer result, entity c, bool debug_p, bool isfortran)

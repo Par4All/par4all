@@ -176,13 +176,13 @@ Psysteme build_sc_machine(
 
 
     /* build the constraints 0 <= L   */
- 
- 
+
     pc = contrainte_make(vect_new(vligne,VALUE_MONE));
     sc_add_ineg(sc,pc);
     ifdebug(8)  {
 	(void) fprintf(stderr,"Domain Machine :\n");
-	sc_fprint(stderr,sc,entity_local_name);    }
+	sc_fprint(stderr, sc, (get_variable_name_t) entity_local_name);
+    }
     debug(8,"build_sc_machine","end\n");
 
     return(sc);

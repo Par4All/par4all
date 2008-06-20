@@ -128,7 +128,7 @@ int l;
 
     ifdebug(8) {
 	fprintf(stderr, "\n[ignore_this_conflict] verifing the following conflit at level %d: \n",l);
-	fprintf(stderr, "\t%02d --> %02d ", statement_number(s1), statement_number(s2));
+	fprintf(stderr, "\t%02td --> %02td ", statement_number(s1), statement_number(s2));
 	fprintf(stderr, "\t\tfrom ");
 	print_words(stderr, (list) words_effect(conflict_source(c)));
 
@@ -235,7 +235,7 @@ int level;
 				    ifdebug(7) {
 					fprintf(stderr, 
 						"\n[contains_level_l_dependence] containing conflit at level %d: ",level);  
-					fprintf(stderr, "\t%02d --> %02d ", 
+					fprintf(stderr, "\t%02td --> %02td ", 
 						statement_number(s1), statement_number(s2));
 					fprintf(stderr, "\t\tfrom ");
 					print_words(stderr, (list) words_effect(conflict_source(c)));

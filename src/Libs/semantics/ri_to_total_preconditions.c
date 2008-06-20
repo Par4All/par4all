@@ -327,8 +327,8 @@ statement_to_total_precondition(
   pips_assert("The statement total postcondition is defined", t_post != transformer_undefined);
 
   ifdebug(1) {
-    int so = statement_ordering(s);
-    (void) fprintf(stderr, "statement %03d (%d,%d), total postcondition %p:\n",
+    intptr_t so = statement_ordering(s);
+    (void) fprintf(stderr, "statement %03td (%td,%td), total postcondition %p:\n",
 		   statement_number(s), ORDERING_NUMBER(so),
 		   ORDERING_STATEMENT(so), t_post);
     (void) print_transformer(t_post) ;
@@ -336,8 +336,8 @@ statement_to_total_precondition(
 
   pips_assert("The statement transformer is defined", tf != transformer_undefined);
   ifdebug(1) {
-    int so = statement_ordering(s);
-    pips_debug(9,"statement %03d (%d,%d), transformer %p:\n",
+    intptr_t so = statement_ordering(s);
+    pips_debug(9,"statement %03td (%td,%td), transformer %p:\n",
 	       statement_number(s), ORDERING_NUMBER(so),
 	       ORDERING_STATEMENT(so), tf);
     (void) print_transformer(tf) ;
@@ -377,8 +377,8 @@ statement_to_total_precondition(
     t_pre = transformer_normalize(t_pre, 4);
 
     if(!transformer_consistency_p(t_pre)) {
-      int so = statement_ordering(s);
-      fprintf(stderr, "statement %03d (%d,%d), precondition %p end:\n",
+      intptr_t so = statement_ordering(s);
+      fprintf(stderr, "statement %03td (%td,%td), precondition %p end:\n",
 	      statement_number(s), ORDERING_NUMBER(so),
 	      ORDERING_STATEMENT(so), t_pre);
       print_transformer(t_pre);
@@ -393,26 +393,26 @@ statement_to_total_precondition(
     gen_free_list(non_initial_values);
   }
   else {
-    int so = statement_ordering(s);
+    intptr_t so = statement_ordering(s);
     pips_debug(8, "total precondition already available:\n");
     (void) print_transformer(t_pre);
-    pips_debug(8, "for statement %03d (%d,%d), total precondition %p end:\n",
+    pips_debug(8, "for statement %03td (%td,%td), total precondition %p end:\n",
 	    statement_number(s), ORDERING_NUMBER(so),
 	    ORDERING_STATEMENT(so), load_statement_total_precondition(s));
     pips_internal_error("total precondition already computed\n");
   }
 
   ifdebug(1) {
-    int so = statement_ordering(s);
-    fprintf(stderr, "statement %03d (%d,%d), total precondition %p end:\n",
+    intptr_t so = statement_ordering(s);
+    fprintf(stderr, "statement %03td (%td,%td), total precondition %p end:\n",
 	    statement_number(s), ORDERING_NUMBER(so),
 	    ORDERING_STATEMENT(so), load_statement_total_precondition(s));
     print_transformer(load_statement_total_precondition(s)) ;
   }
 
   ifdebug(1) {
-    int so = statement_ordering(s);
-    fprintf(stderr, "statement %03d (%d,%d), total_precondition %p:\n",
+    intptr_t so = statement_ordering(s);
+    fprintf(stderr, "statement %03td (%td,%td), total_precondition %p:\n",
 	    statement_number(s), ORDERING_NUMBER(so),
 	    ORDERING_STATEMENT(so), t_pre);
     print_transformer(t_pre) ;

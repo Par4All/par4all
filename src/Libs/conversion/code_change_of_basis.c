@@ -55,7 +55,7 @@ Pvecteur pvg[];
 
     for (pv=pv_old; pv!=NULL; pv=pv->succ)
     {
-	r = base_find_variable_rank(base_oldindex, pv->var, nom_de_variable);
+	r = base_find_variable_rank(base_oldindex, pv->var, (get_variable_name_t) nom_de_variable);
 
 	if (r != -1) 
 	{ /* var is in base_oldindex */

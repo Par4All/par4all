@@ -635,7 +635,7 @@ entity v;
 
   if(!storage_ram_p(store)) {
     if(storage_rom_p(store)) {
-      pips_debug(7, "%s is not translatable: store tag %d\n",
+      pips_debug(7, "%s is not translatable: store tag %td\n",
 		 entity_name(v), storage_tag(store));
       /* Should it be projected? No, this should occur later for xxxx#init
        * variables when the xxxx is translated. Or before if xxxx has been
@@ -918,7 +918,7 @@ entity e2;
       same = TRUE;
     else {
       pips_debug(7,
-		 "Different offsets %d for %s in section %s and %d for %s in section %s\n",
+		 "Different offsets %td for %s in section %s and %td for %s in section %s\n",
 		 ram_offset(r1), entity_name(e1), entity_name(s1),
 		 ram_offset(r2), entity_name(e2), entity_name(s2));
     }

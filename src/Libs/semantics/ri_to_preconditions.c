@@ -541,7 +541,7 @@ transformer statement_to_postcondition(
 
     ifdebug(1) {
 	int so = statement_ordering(s);
-	(void) fprintf(stderr, "statement %03d (%d,%d), precondition %p:\n",
+	(void) fprintf(stderr, "statement %03td (%d,%d), precondition %p:\n",
 		       statement_number(s), ORDERING_NUMBER(so),
 		       ORDERING_STATEMENT(so), pre);
 	(void) print_transformer(pre) ;
@@ -550,7 +550,7 @@ transformer statement_to_postcondition(
     pips_assert("The statement transformer is defined", tf != transformer_undefined);
     ifdebug(1) {
 	int so = statement_ordering(s);
-	(void) fprintf(stderr, "statement %03d (%d,%d), transformer %p:\n",
+	(void) fprintf(stderr, "statement %03td (%d,%d), transformer %p:\n",
 		       statement_number(s), ORDERING_NUMBER(so),
 		       ORDERING_STATEMENT(so), tf);
 	(void) print_transformer(tf) ;
@@ -622,7 +622,7 @@ transformer statement_to_postcondition(
 	foo = transformer_identity();
 	if(!transformer_consistency_p(pre)) {
 	    int so = statement_ordering(s);
-	    fprintf(stderr, "statement %03d (%d,%d), precondition %p end:\n",
+	    fprintf(stderr, "statement %03td (%d,%d), precondition %p end:\n",
 			   statement_number(s), ORDERING_NUMBER(so),
 			   ORDERING_STATEMENT(so), pre);
 	    print_transformer(pre);
@@ -648,7 +648,7 @@ transformer statement_to_postcondition(
 
     ifdebug(1) {
 	int so = statement_ordering(s);
-	fprintf(stderr, "statement %03d (%d,%d), precondition %p end:\n",
+	fprintf(stderr, "statement %03td (%d,%d), precondition %p end:\n",
 		statement_number(s), ORDERING_NUMBER(so),
 		ORDERING_STATEMENT(so), load_statement_precondition(s));
 	print_transformer(load_statement_precondition(s)) ;
@@ -656,7 +656,7 @@ transformer statement_to_postcondition(
 
     ifdebug(1) {
 	int so = statement_ordering(s);
-	fprintf(stderr, "statement %03d (%d,%d), postcondition %p:\n",
+	fprintf(stderr, "statement %03td (%d,%d), postcondition %p:\n",
 		statement_number(s), ORDERING_NUMBER(so),
 		ORDERING_STATEMENT(so), post);
 	print_transformer(post) ;

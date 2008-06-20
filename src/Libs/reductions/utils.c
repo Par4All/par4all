@@ -561,10 +561,11 @@ call_proper_reduction_p(
     pips_assert("lhs reference", syntax_reference_p(expression_syntax(elhs)));
     lhs = syntax_reference(expression_syntax(elhs));
 
-    /* the lhs and rhs must be functionnal 
+    /* the lhs and rhs must be functionnal
      * (same location on different evaluations)
      */
-    if (!functional_object_p(lhs) || !functional_object_p(erhs))
+    if (!functional_object_p((gen_chunk *) lhs)
+	|| !functional_object_p((gen_chunk *) erhs))
 	return FALSE;
     pips_debug(8, "lsh and rhs are functional\n");
 

@@ -109,7 +109,8 @@ text_continuation(transformer cont, bool is_must)
 
 	    append(is_must? "C-MUST-":"C-MAY-");
 	    system_text_format(crt_line, continuation, txt, ps, 
-			       pips_user_value_name, FALSE);
+			       (get_variable_name_t) pips_user_value_name,
+			       FALSE);
 	}
       
 	close_current_line(crt_line, txt,continuation);

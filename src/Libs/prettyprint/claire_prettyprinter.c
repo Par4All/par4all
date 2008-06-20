@@ -1286,20 +1286,20 @@ search_nested_loops_and_calls(statement stmp, nest_context_p nest)
 			    NULL);
 }
 
-static void  print_call_selection(nest_context_p nest)
+static void __attribute__ ((unused)) print_call_selection(nest_context_p nest)
 {
   int j;
   int numberOfTasks=gen_array_nitems(nest->nested_call);
   for (j = 0; j<numberOfTasks; j++)
-    {  
-      statement s = gen_array_item(nest->nested_call,j);
-      stack st = gen_array_item(nest->nested_loops,j);      
+    {
+      //statement s = gen_array_item(nest->nested_call,j);
+      //stack st = gen_array_item(nest->nested_loops,j);
       /*   print_statement(s);
 	   stack_map( st, print_statement);*/
     }
 }
 
-					   
+
 static expression expression_plusplus(expression e)
 {
   expression new_e;

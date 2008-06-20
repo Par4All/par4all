@@ -73,11 +73,11 @@ set_prettyprint_with_attachments(bool attachments_p)
 
 /****************************************************** PRETTYPRINT STUFFS */
 
-typedef struct 
+typedef struct
 {
     string name;
     bool is_a_summary;
-    gen_chunk * resource;
+    gen_chunk* resource;
     generic_text_function get_text;
     generic_prettyprint_function prettyprint;
     generic_attachment_function attach;
@@ -143,7 +143,7 @@ load_resources(string module_name)
     }
 }
 
-static list 
+static list
 load_list(statement_effects m, statement s)
 {
     return effects_effects(apply_statement_effects(m, s));

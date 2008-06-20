@@ -125,10 +125,10 @@ bool continuation_conditions(char *module_name)
  * comment  :
  */
 static void module_continuation_conditions(statement mod_stat)
-{    
+{
     make_current_stmt_stack();
     gen_recurse(mod_stat, statement_domain, gen_true,
-		statement_continuation_conditions); 
+		statement_continuation_conditions);
     free_current_stmt_stack();
 }
 
@@ -144,7 +144,7 @@ static void statement_continuation_conditions(statement s)
 {
     instruction i = statement_instruction(s);
 
-    pips_debug(1, "BEGIN: statement %03d\n", statement_number(s));
+    pips_debug(1, "BEGIN: statement %03td\n", statement_number(s));
 
     current_stmt_push(s);
     switch(instruction_tag(i))
@@ -154,7 +154,7 @@ static void statement_continuation_conditions(statement s)
 	store_statement_may_continuation(s,transformer_identity());
         break;
 
-    case is_instruction_block: 
+    case is_instruction_block:
 	pips_debug(3, "block\n");
 	block_continuation_conditions(instruction_block(i));
 	break;
@@ -174,22 +174,22 @@ static void statement_continuation_conditions(statement s)
         call_continuation_conditions(instruction_call(i));
         break;
 
-    case is_instruction_unstructured: 
+    case is_instruction_unstructured:
 	pips_debug(3, "unstructured\n");
 	unstructured_continuation_conditions(instruction_unstructured( i ));
 	break ;
 
     default:
-        pips_debug(1, "unexpected tag %d\n", instruction_tag(i));
+        pips_debug(1, "unexpected tag %td\n", instruction_tag(i));
     }
     current_stmt_pop();
-    pips_debug(1,"END: statement %03d\n", statement_number(s));
+    pips_debug(1,"END: statement %03td\n", statement_number(s));
 }
 
 static void block_continuation_conditions(list l_stat)
 {
     statement s = current_stmt_head();
-   
+
     store_statement_must_continuation(s,transformer_empty());
     store_statement_may_continuation(s,transformer_identity());
 }
@@ -205,7 +205,7 @@ static void test_continuation_conditions(test t)
 static void loop_continuation_conditions(loop l)
 {
     statement s = current_stmt_head();
-    
+
     store_statement_must_continuation(s,transformer_empty());
     store_statement_may_continuation(s,transformer_identity());
 }

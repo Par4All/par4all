@@ -33,3 +33,4 @@ typedef dg_vertex_label vertex_label;
 #include "chains.h"
 #include "ricedg.h"
 #include "rice.h"
+#include "effects-simple.h"

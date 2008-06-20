@@ -239,17 +239,17 @@ void project_regions_along_loop_index(list l_reg, entity index, range l_range)
 
     debug_on("REGIONS_OPERATORS_DEBUG_LEVEL");
     debug_regions_consistency(l_reg);
-    
+
 
     index = loop_regions_normalize(l_reg, index, l_range,
 				   &projection_of_index_safe,FALSE,&sc_tmp);
 
-    if (must_regions_p && projection_of_index_safe)
+    if (must_regions_p() && projection_of_index_safe)
     {
-	
+
 	MAPL(ll_reg, {
 	    region_exact_projection_along_variable(EFFECT(CAR(ll_reg)), index);
-	}, l_reg);	
+	}, l_reg);
     }
     else
     {
@@ -258,10 +258,10 @@ void project_regions_along_loop_index(list l_reg, entity index, range l_range)
 	    region_non_exact_projection_along_variables(reg, l);
 	}, l_reg);
 	gen_free_list(l);
-    }  
+    }
     debug_regions_consistency(l_reg);
     debug_off();
-  
+
 }
 
 
@@ -381,7 +381,7 @@ void regions_transformer_apply(list l_reg, transformer trans,
 	ifdebug(8)
 	    {
 		fprintf(stderr,"transformer:\n");
-		sc_print(sc_trans,entity_local_name);
+		sc_print(sc_trans, (get_variable_name_t) entity_local_name);
 	    }	
 	
 	/* addition of the predicate of the transformer to the predicate of 
@@ -846,7 +846,7 @@ void region_exact_projection_along_parameters(region reg, list l_param)
 void region_non_exact_projection_along_variables(region reg, list l_var)
 {
     Psysteme ps;
-    int tmp;
+    
     ps = region_system(reg);
 
     if (!sc_empty_p(ps) && !sc_rn_p(ps))

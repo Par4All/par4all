@@ -22,14 +22,14 @@
 transformer
 print_transformer(transformer tf)
 {
-    return fprint_transformer(stderr, tf, external_value_name);
+    return fprint_transformer(stderr, tf, (get_variable_name_t) external_value_name);
 }
 
 
 transformer
 fprint_transformer(FILE * fd,
 		   transformer tf,
-		   char * (*value_name)(entity))
+		   get_variable_name_t value_name)
 {
     /* print_transformer returns an int to be compatible with the debug()
        function; however, debug being a function and not a macro, its
@@ -53,7 +53,7 @@ fprint_transformer(FILE * fd,
 		  sc,
 		  value_name);
     }
-    else 
+    else
 	(void) fprintf(fd, "TRANSFORMER_UNDEFINED\n");
     return tf;
 }
@@ -72,5 +72,5 @@ entity e;
 void dump_transformer(tf)
 transformer tf;
 {
-    (void) fprint_transformer(stderr, tf, dump_value_name);
+    (void) fprint_transformer(stderr, tf, (get_variable_name_t) dump_value_name);
 }

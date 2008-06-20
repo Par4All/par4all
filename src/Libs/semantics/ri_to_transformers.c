@@ -1077,7 +1077,7 @@ transformer statement_to_transformer(
   transformer te = transformer_undefined; /* nt updated with loop exit information */
   transformer pre = transformer_undefined;
 
-  pips_debug(8,"begin for statement %03d (%d,%d) with precondition %p:\n",
+  pips_debug(8,"begin for statement %03td (%td,%td) with precondition %p:\n",
 	     statement_number(s), ORDERING_NUMBER(statement_ordering(s)), 
 	     ORDERING_STATEMENT(statement_ordering(s)), spre);
   ifdebug(8) {
@@ -1130,8 +1130,8 @@ transformer statement_to_transformer(
     nt = transformer_normalize(nt, 4);
 
     if(!transformer_consistency_p(nt)) {
-      int so = statement_ordering(s);
-      (void) fprintf(stderr, "statement %03d (%d,%d):\n",
+      intptr_t so = statement_ordering(s);
+      (void) fprintf(stderr, "statement %03td (%td,%td):\n",
 		     statement_number(s),
 		     ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
       /* (void) print_transformer(load_statement_transformer(s)); */
@@ -1159,7 +1159,7 @@ transformer statement_to_transformer(
       ifdebug(1) {
 	pips_assert("transformers are computed in context",
 		    get_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT"));
-	pips_debug(1, "Convex hull for transformer of statement  %03d (%d,%d)\n",
+	pips_debug(1, "Convex hull for transformer of statement  %03td (%td,%td)\n",
 		   statement_number(s), ORDERING_NUMBER(statement_ordering(s)), 
 		   ORDERING_STATEMENT(statement_ordering(s)));
 	pips_debug(1, "Previous transformer:\n");
@@ -1190,10 +1190,10 @@ transformer statement_to_transformer(
   }
 
   ifdebug(1) {
-    int so = statement_ordering(s);
+    intptr_t so = statement_ordering(s);
     transformer stf = load_statement_transformer(s);
 
-    (void) fprintf(stderr, "statement %03d (%d,%d), transformer %p:\n",
+    (void) fprintf(stderr, "statement %03td (%td,%td), transformer %p:\n",
 		   statement_number(s),
 		   ORDERING_NUMBER(so), ORDERING_STATEMENT(so),
 		   stf);
@@ -1233,7 +1233,7 @@ transformer statement_to_transformer(
 		all_statements_defined_p(s));
   }
 
-  pips_debug(8,"end for statement %03d (%d,%d) with t=%p, nt=%p and te=%p\n",
+  pips_debug(8,"end for statement %03td (%td,%td) with t=%p, nt=%p and te=%p\n",
 	     statement_number(s), ORDERING_NUMBER(statement_ordering(s)), 
 	     ORDERING_STATEMENT(statement_ordering(s)), t, nt, te);
 

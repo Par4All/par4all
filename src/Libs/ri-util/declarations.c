@@ -34,7 +34,7 @@ static list words_dimensions(list dims);
 
 /********************************************************************* WORDS */
 
-static list 
+static list
 words_constant(constant obj)
 {
     list pc=NIL;
@@ -44,12 +44,12 @@ words_constant(constant obj)
     }
     else {
 	pips_internal_error("unexpected tag");
-    }   
+    }
     /*What about real, double, string constants ... ?*/
     return(pc);
 }
 
-static list 
+static list
 words_value(value obj)
 {
     list pc;

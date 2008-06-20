@@ -16,7 +16,7 @@ char vcid_syntax_expression[] = "%A% ($Date: 2005/08/24 15:19:31 $, ) version $R
 #include "parser_private.h"
 
 #include "misc.h"
-#include "property.h"
+#include "properties.h"
 
 #include "syntax.h"
 

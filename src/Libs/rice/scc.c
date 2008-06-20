@@ -326,7 +326,7 @@ int l;
 		vertex v = VERTEX(CAR(pv));
 		statement st = vertex_to_statement(v);
 
-		fprintf(stderr, "%d ", statement_number(st));
+		fprintf(stderr, "%td ", statement_number(st));
 	    }, scc_vertices(s));
 	    fprintf(stderr, ")   -->   ");
 	}, lsccs);
@@ -375,9 +375,9 @@ scc s;
 	vertex v = VERTEX(CAR(pv));
 	statement st = vertex_to_statement(v);
 
-	fprintf(stderr, "%02d ", statement_number(st));
+	fprintf(stderr, "%02td ", statement_number(st));
     }, scc_vertices(s));
-    fprintf(stderr, " -  in degree : %d\n", scc_indegree(s));
+    fprintf(stderr, " -  in degree : %td\n", scc_indegree(s));
 }
 
 void PrintSccs(ss)

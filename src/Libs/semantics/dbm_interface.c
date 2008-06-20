@@ -1237,7 +1237,7 @@ void cumulated_effects_map_print(void)
     /* hash_table_print_header (htp,f); */
 
     STATEMENT_EFFECTS_MAP(k, v, {
-	fprintf(f, "\n\n%d", statement_ordering((statement) k));
+	fprintf(f, "\n\n%td", statement_ordering((statement) k));
 	print_effects( effects_effects(v));
     },
 	     htp);

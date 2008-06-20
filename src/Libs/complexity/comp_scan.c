@@ -229,7 +229,7 @@ list eff_list;
     }
 
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
-	fprintf(stderr,"complexity for statement (%d,%d) at %p\n",
+	fprintf(stderr,"complexity for statement (%td,%td) at %p\n",
 		(statement_ordering(stat) >> 16), 
 		(statement_ordering(stat) & 0xffff), comp);
 	complexity_fprint(stderr, comp, TRUE, TRUE);

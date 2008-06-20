@@ -163,7 +163,7 @@ statement st ;
 	vertex v ;
 
 	ifdebug(2) {
-	    fprintf(stderr, "Init statement %d with effects %p\n", 
+	    fprintf(stderr, "Init statement %td with effects %p\n", 
 		    statement_number( st ), load_statement_effects(st) );
 	    print_effects( load_statement_effects(st) ) ;
 	}
@@ -768,7 +768,7 @@ statement st ;
     */
     
     ifdebug(2) {
-	fprintf( stderr, "%*s> Statement %p (%d):\n", 
+	fprintf( stderr, "%*s> Statement %p (%td):\n", 
 		 indent++, "", st, statement_number( st )) ;
 	local_print_statement_set( "DEF_IN", DEF_IN( st )) ;
 	local_print_statement_set( "DEF_OUT", DEF_OUT( st )) ;
@@ -801,7 +801,7 @@ statement st ;
 	pips_error( "inout_statement", "Unknown tag %d\n", i ) ;
     }
     ifdebug(2) {
-	fprintf( stderr, "%*s> Statement %p (%d):\n", 
+	fprintf( stderr, "%*s> Statement %p (%td):\n", 
 		 indent--, "", st, statement_number( st )) ;
 	local_print_statement_set( "DEF_IN", DEF_IN( st )) ;
 	local_print_statement_set( "DEF_OUT", DEF_OUT( st )) ;
@@ -981,9 +981,9 @@ bool (*which)() ;
     }
 
     ifdebug(2) {
-      int stin_o = statement_ordering(stin);
-      int stout_o = statement_ordering(stout);
-	fprintf( stderr, "Conflicts %d (%d,%d) (%p) -> %d (%d,%d) (%p) %s\n",
+      intptr_t stin_o = statement_ordering(stin);
+      intptr_t stout_o = statement_ordering(stout);
+	fprintf( stderr, "Conflicts %td (%td,%td) (%p) -> %td (%td,%td) (%p) %s\n",
 		statement_number(stin), ORDERING_NUMBER(stin_o), ORDERING_STATEMENT(stin_o), stin,
 		statement_number(stout), ORDERING_NUMBER(stout_o), ORDERING_STATEMENT(stout_o), stout,
 		(which == ud) ? "ud" : "dd_du" ) ;
@@ -1422,7 +1422,7 @@ set s ;
 {
     fprintf( stderr, "\t%s ", msg ) ;
     SET_MAP( st, {
-	fprintf(stderr, ",%p (%d) ", 
+	fprintf(stderr, ",%p (%td) ", 
 		st, statement_number( (statement)st ));
     }, s ) ;
     fprintf( stderr, "\n" );

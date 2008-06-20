@@ -52,7 +52,7 @@ statement stat;
     text t = make_text(NIL);
 
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
-	fprintf(stderr, "statement %s, ordering (%d %d)\n", 
+	fprintf(stderr, "statement %s, ordering (%td %td)\n", 
 		module_local_name(statement_label(stat)),
 		ORDERING_NUMBER(statement_ordering(stat)), 
 		ORDERING_STATEMENT(statement_ordering(stat)));

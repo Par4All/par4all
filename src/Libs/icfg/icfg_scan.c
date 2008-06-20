@@ -26,7 +26,7 @@
 #include "complexity.h"
 #include "pipsdbm.h"      /* DB_PUT_FILE_RESOURCE is defined there */
 #include "text-util.h"
-#include "icfg-local.h"
+#include "icfg.h"
 
 static int current_margin;
 
@@ -95,7 +95,7 @@ static bool statement_flt(statement s)
 {
     bool res = TRUE;
     text t = make_text (NIL);
-    
+
     pips_debug (5,"going down\n");
 
     /* process the not call statement to print out filtered proper effects */
@@ -103,19 +103,19 @@ static bool statement_flt(statement s)
         entity e_caller = get_current_module_entity();
 	string caller_name = module_local_name(e_caller);
 	statement_effects m = (statement_effects)db_get_memory_resource(DBR_PROPER_EFFECTS, caller_name, TRUE);
-	
+
 	list l_effs = effects_effects(apply_statement_effects(m, s));
 	list l_effs_flt;
 	if (list_vars_to_filter == NIL)
 	    list_vars_to_filter = get_list_of_variable_to_filter();
 	l_effs_flt = effects_filter(l_effs, list_vars_to_filter);
-	
+
 	if (l_effs_flt != NIL) {
 	    instruction i = statement_instruction(s);
 
 	    /* do not display comments in the decoration */
 	    if (!string_undefined_p(statement_comments(s)))
-	        statement_comments(s)[0] = NULL;
+	        statement_comments(s)[0] = '\0';
 
 	    if (instruction_call_p(i)) {
 	        call callee = instruction_call(i);
@@ -354,7 +354,7 @@ static void instruction_rwt (instruction i)
     bool text_in_unstructured_p = FALSE;
 
     pips_debug (5,"going up\n");
-    pips_debug (9,"instruction tag = %d\n", instruction_tag (i));
+    pips_debug (9,"instruction tag = %td\n", instruction_tag (i));
     
     switch (instruction_tag (i)) {
     case is_instruction_block:

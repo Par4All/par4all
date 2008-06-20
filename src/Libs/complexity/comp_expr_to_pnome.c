@@ -560,7 +560,7 @@ int maximize;
 	char *precondition_to_string();
 
 	if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
-	    sc_fprint(stderr,ps,noms_var);
+	  sc_fprint(stderr, ps, (get_variable_name_t) noms_var);
 	}
 
 	for ( pv=ps->base; !VECTEUR_NUL_P(pv); pv=pv->succ) {
@@ -585,7 +585,7 @@ int maximize;
 
 	if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 	    fprintf(stderr, "Prec=%s", precondition_to_string(precond));
-	    sc_fprint(stderr,ps,noms_var);
+	    sc_fprint(stderr, ps, (get_variable_name_t) noms_var);
 
 	    if ( !SC_UNDEFINED_P(ps) )
 		fprintf(stderr,"ps OK\n");
@@ -695,7 +695,7 @@ Variable var;
     Value var_coeff=VALUE_ONE; 
 
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
-	sc_fprint(stderr,ps,noms_var);
+	sc_fprint(stderr, ps, (get_variable_name_t) noms_var);
     }
 
     if ( !SC_UNDEFINED_P(ps) && !CONTRAINTE_UNDEFINED_P(ps->egalites) ) {

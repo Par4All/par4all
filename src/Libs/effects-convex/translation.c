@@ -56,14 +56,14 @@ extern bool get_bool_property(string);
 
 static void reg_v_debug(v)
 Pvecteur v;
-{    
-    vect_fprint(stderr, v, pips_region_user_name);
+{
+    vect_fprint(stderr, v, (get_variable_name_t) pips_region_user_name);
 }
 
 static void reg_sc_debug(sc)
 Psysteme sc;
 {
-    sc_fprint(stderr, sc, pips_region_user_name);
+    sc_fprint(stderr, sc, (get_variable_name_t) pips_region_user_name);
 }
 
 /*********************************************************************************/
@@ -1858,7 +1858,7 @@ entity val;
     {
 	if(storage_rom_p(store)) 
 	{
-	  pips_debug(8, "%s is not translatable: store tag %d\n",
+	  pips_debug(8, "%s is not translatable: store tag %td\n",
 		     entity_name(val), storage_tag(store));
 	  /* Should it be projected? No, this should occur later for xxx#init
 	   * variables when the xxx is translated. Or before if xxx has been

@@ -359,7 +359,7 @@ static effect get_effect_write_of_statement_on_variable(statement s, entity var)
   return NULL;
 }
 
-static int expression_approximation(statement s, expression ex)
+static int __attribute__ ((unused)) expression_approximation(statement s, expression ex)
 {
   normalized n = NORMALIZE_EXPRESSION(ex);
   transformer pre = load_statement_precondition(s);
@@ -473,7 +473,7 @@ static set create_or_get_a_set_from_control(control c,
     return (set) hash_get(control_to_set_of_dominators, (char *)c);
 }
 
-static void computing_dominators(hash_table control_to_set_of_dominators, control n0)
+static void __attribute__ ((unused)) computing_dominators(hash_table control_to_set_of_dominators, control n0)
 {
   bool change = TRUE;
   list blocs = NIL;
@@ -549,7 +549,7 @@ static void computing_dominators(hash_table control_to_set_of_dominators, contro
   }, dominator_dn);
 }
 
-static int control_approximation_between_statement_p(statement s1, statement s2)
+static int __attribute__ ((unused)) control_approximation_between_statement_p(statement s1, statement s2)
 {
   /* control_graph does not work until load_ctrl_graph is called
    * control

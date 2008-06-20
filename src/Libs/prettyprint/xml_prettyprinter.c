@@ -1139,10 +1139,8 @@ nest_context_t,
 static void
 xml_declarations(entity module, string_buffer result)
 { 
-  bool comma = FALSE;
   list dim;
   int nb_dim =0;
-  string up_string ;
   list ldecl = code_declarations(value_code(entity_initial(module)));
   list ld;
 
@@ -1156,7 +1154,6 @@ for(ld = ldecl; !ENDP(ld); ld = CDR(ld)){
     
 	if (variable_p(var) && ( variable_entity_dimension(var) > 0))
         {
-	 string_buffer result_up = string_buffer_make();
 	 nb_dim = variable_entity_dimension(var);
  	 printf("inside p, %d",nb_dim);
 	 
@@ -1283,50 +1280,47 @@ search_nested_loops_and_calls(statement stmp, nest_context_p nest)
 			    NULL);
 }
 
-static void  print_call_selection(nest_context_p nest)
+static void __attribute__ ((unused)) print_call_selection(nest_context_p nest)
 {
   int j;
   int numberOfTasks=gen_array_nitems(nest->nested_call);
   for (j = 0; j<numberOfTasks; j++)
-    {  
-      statement s = gen_array_item(nest->nested_call,j);
-      stack st = gen_array_item(nest->nested_loops,j);      
+    {
+      //statement s = gen_array_item(nest->nested_call,j);
+      //stack st = gen_array_item(nest->nested_loops,j);
       /*   print_statement(s);
 	   stack_map( st, print_statement);*/
     }
 }
 
-					   
+
 static expression expression_plusplus(expression e)
 {
   expression new_e;
    if (expression_constant_p(e)) {
     new_e = int_to_expression(1+ expression_to_int(e));
-  } 
+  }
   else {
     entity add_ent = gen_find_entity("TOP-LEVEL:+");
-    new_e =  make_call_expression(add_ent, 
+    new_e =  make_call_expression(add_ent,
             CONS(EXPRESSION, e, CONS(EXPRESSION,  int_to_expression(1), NIL)));
   }
-   return new_e; 
+   return new_e;
 }
 
 static void xml_loop(stack st, string_buffer result)
 {
-  string lower_bounds = "";
-  string upper_bounds = "";
-  string name_bounds = "";
   string_buffer_append(result,strdup(concatenate(TAB,SPACE, OPENANGLE, "outLoop", CLOSEANGLE, NL, NULL)));
   string_buffer_append(result,strdup(concatenate(TAB,SPACE, SPACE, OPENANGLE, "loopNest", CLOSEANGLE, NL, NULL)));
   string_buffer_append(result,strdup(concatenate(TAB,SPACE, SPACE, SPACE, OPENANGLE, "bounds", CLOSEANGLE, NL, NULL)));
-     
-STACK_MAP_X(s, statement, 
-  {   
+
+STACK_MAP_X(s, statement,
+  {
     loop l = instruction_loop(statement_instruction(s));
-    expression el =range_lower(loop_range(l));  
+    expression el =range_lower(loop_range(l));
     expression eu =range_upper(loop_range(l));
     expression new_eu= expression_plusplus(eu);
-    
+
   string_buffer_append(result,
 		       strdup(concatenate(TAB,SPACE,SPACE,SPACE,SPACE,OPENANGLE,"bound idx =",QUOTE,entity_user_name(loop_index(l)),QUOTE,NULL)));
   string_buffer_append(result,
@@ -1335,37 +1329,33 @@ STACK_MAP_X(s, statement,
 		       strdup(concatenate(SPACE, "upper =", QUOTE, words_to_string(words_expression(new_eu)),QUOTE, SLASH, CLOSEANGLE,NL,NULL)));
   },
 	      st, 0);
-  
+
   string_buffer_append(result,strdup(concatenate(TAB,SPACE, SPACE, SPACE,  OPENANGLE,SLASH "bounds", CLOSEANGLE, NL, NULL)));
   string_buffer_append(result,strdup(concatenate(TAB,SPACE, SPACE, OPENANGLE,SLASH, "loopNest", CLOSEANGLE, NL, NULL)));
   string_buffer_append(result,strdup(concatenate(TAB,SPACE,  OPENANGLE, SLASH, "openLoop", CLOSEANGLE, NL, NULL)));
-     
-  
 }
 
 
 
-static void xml_reference(int taskNumber, reference r, bool wmode, 
+static void xml_reference(int taskNumber, reference r, bool wmode,
 		      string_buffer result)
 {
 
  string varname = entity_user_name(reference_variable(r));
  string_buffer_append
    (result,
-    strdup(concatenate(SPACE, QUOTE, XML_ARRAY_PREFIX, varname, QUOTE, SPACE, "accessMode =", QUOTE,  
+    strdup(concatenate(SPACE, QUOTE, XML_ARRAY_PREFIX, varname, QUOTE, SPACE, "accessMode =", QUOTE,
 		       (wmode?"W":"R"),QUOTE, CLOSEANGLE,NL,
 		       NULL)));
- 
 }
 
 static void  find_motif(Psysteme ps, Pvecteur nested_indices, int dim, int nb_dim, Pcontrainte *bound_inf, Pcontrainte *bound_sup, Pcontrainte *iterator, int *motif_up_bound, int *lowerbound, int *upperbound)
-{ 
-  
+{
   Variable phi;
   Value	v;
   Pvecteur pi;
   Pcontrainte c, next, cl, cu, cl_dup, cu_dup,lind, lind_dup,
-    list_cl=NULL , 
+    list_cl=NULL,
     list_cu=NULL,
     list_ind=NULL;
   int lower =1;
@@ -1515,8 +1505,7 @@ static void xml_tiling(int taskNumber, reference ref,  region reg, stack indices
   string string_offset = "";
   string string_paving = "";
   string string_fitting =  "";
-  bool comma = FALSE;            
-
+  
   Pvecteur iterat, pi= VECTEUR_NUL;
   Pcontrainte bound_inf = CONTRAINTE_UNDEFINED;
   Pcontrainte bound_up = CONTRAINTE_UNDEFINED;
@@ -1651,8 +1640,7 @@ static void xml_references(int taskNumber, list l_regions, stack indices, string
   list lr; 
   bool atleast_one_read_ref = FALSE;
   bool atleast_one_written_ref = FALSE;
-  bool comma = FALSE;
-/*   Read array references first */
+  /*   Read array references first */
    for ( lr = l_regions; !ENDP(lr); lr = CDR(lr))
      {
        region re = REGION(CAR(lr));

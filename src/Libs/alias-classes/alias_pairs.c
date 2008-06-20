@@ -198,7 +198,7 @@ approx_convert(region reg)
 static bool stmt_filter(s)
 statement s;
 {
-    pips_debug(9, "statement %03d\n", statement_number(s));
+    pips_debug(9, "statement %td\n", statement_number(s));
     
     current_caller_stmt = s;
     return(TRUE);

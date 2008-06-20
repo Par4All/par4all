@@ -77,7 +77,7 @@ Variable index;
 	    ),normalized_undefined);	
 	return(ex);
     }
-    else 
+    else
 	return(ex1);
 
 }
@@ -106,12 +106,12 @@ expression *upper;
     int i;
     int rank_index ;
 
-    /* compute the rank d of the  index in the basis */  
-    rank_index = base_find_variable_rank(base,index,nom_de_variable);
+    /* compute the rank d of the  index in the basis */
+    rank_index = base_find_variable_rank(base, index, (get_variable_name_t) nom_de_variable);
     debug(7, "make_bound_expression", "index :%s\n", nom_de_variable(index));
     debug(8, "make_bound_expression", "rank_index = %d\n", rank_index);
 
-    /*search constraints referencing "index" and create the list of 
+    /*search constraints referencing "index" and create the list of
       expressions for lower and upper bounds */
     for (pc=sc->inegalites; pc!=NULL; pc=pc->succ) {
 	i = level_contrainte(pc, base);
@@ -119,7 +119,7 @@ expression *upper;
 	if (ABS(i)==rank_index){	/* found */
 	    ifdebug(7) {
 		(void) fprintf(stderr, "\n constraint before :");
-		contrainte_fprint(stderr, pc, TRUE, 
+		contrainte_fprint(stderr, pc, TRUE,
 				  (variable_name_type) entity_local_name);
 	    }
 	    ex = make_contrainte_expression(pc, (Variable) index);
@@ -138,7 +138,7 @@ expression *upper;
 
     /* make expressions of  lower and  upper  bounds*/
     min = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
-						  "MIN"), 
+						  "MIN"),
 			     entity_domain);
     max = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
 						  "MAX"), 

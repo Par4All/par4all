@@ -70,7 +70,7 @@ compute_summary_reductions(entity f)
     lc = reductions_list
 	(load_cumulated_reductions(get_current_module_statement()));
 
-    pips_debug(3, "module %s: %d cumulated reductions\n",
+    pips_debug(3, "module %s: %td cumulated reductions\n",
 	       entity_name(f), gen_length(lc));
 
     MAP(REDUCTION, r,
@@ -440,7 +440,7 @@ build_creductions_of_statement(
     /* list of candidate entities */
     le = list_of_reduced_variables(node, ls);
 
-    pips_debug(5, "stat %s %p: %d candidate(s)\n",
+    pips_debug(5, "stat %s %p: %td candidate(s)\n",
 	       note_for_statement(node), node, gen_length(le));
 
     /* for each candidate, extract the reduction if any */
@@ -450,7 +450,7 @@ build_creductions_of_statement(
 	le);
 
     /* store the result */
-    pips_debug(5, "stat %s %p -> %d reductions\n", 
+    pips_debug(5, "stat %s %p -> %td reductions\n", 
 	       note_for_statement(node), node, gen_length(lr));
 
     store_cumulated_reductions(node, make_reductions(lr)); 
@@ -487,7 +487,7 @@ static void cr_test_rwt(test t)
 static void cr_unstructured_rwt(unstructured u)
 {
     list /* of control */ lc = NIL, /* of statement */ ls;
-    CONTROL_MAP(c, {}, unstructured_control(u), lc);
+    CONTROL_MAP(__attribute__ ((unused)) c, {}, unstructured_control(u), lc);
     ls = control_list_to_statement_list(lc);
     build_creductions_of_statement(crt_stat_head(), ls);
     gen_free_list(ls); gen_free_list(lc);

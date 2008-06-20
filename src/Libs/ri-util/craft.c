@@ -17,7 +17,7 @@
 #include "text-util.h"
 #include "ri.h"
 #include "misc.h"
-#include "property.h"
+#include "properties.h"
 
 #include "ri-util.h"
 /*=======================================================================*/

@@ -52,7 +52,7 @@ dump_sef(statement_effects se)
     fprintf(stderr, "\n");
     STATEMENT_EFFECTS_MAP(s, e, {
 	fprintf(stderr, 
-		"%02d(%X) -> (%d) : ", 
+		"%02td (%p) -> (%td) : ", 
 		statement_number(s), 
 		s,
 		gen_length(effects_effects(e)));
@@ -95,7 +95,7 @@ prettyprint_successor(FILE *fd, successor su)
 {
     vertex v = successor_vertex(su);
     fprintf(fd, 
-	    "link with %02d :\n", 
+	    "link with %02td :\n", 
 	    statement_number(vertex_to_statement(v)));
 
     MAP(CONFLICT, c, { 
@@ -111,7 +111,7 @@ static void
 prettyprint_vertex(FILE *fd, vertex v)
 {
     fprintf(fd, 
-	    "vertex %02d :\n", 
+	    "vertex %02td :\n", 
 	    statement_number(vertex_to_statement(v)));
     MAP(SUCCESSOR, s, { 
 	prettyprint_successor(fd, s); 
@@ -265,7 +265,7 @@ dependance_vertices_p(vertex v1, vertex v2, int dependance_type, int level)
 	if (dependance_type & INPUT_DEPENDANCE) fprintf(stderr, "I ");
 	fprintf(stderr, "dep. at level >= %d ", level);
 	fprintf(stderr, 
-		"between %02d and %02d ? ", 
+		"between %02td and %02td ? ", 
 		statement_number(vertex_to_statement(v1)), 
 		statement_number(vertex_to_statement(v2))); 
     }
@@ -484,7 +484,7 @@ remove_dependance(vertex v1, /* Successors of this vertex are updated */
 		level_max);
 
 	fprintf(stderr, 
-		"between %02d and %02d.\n", 
+		"between %02td and %02td.\n", 
 		statement_number(vertex_to_statement(v1)), 
 		statement_number(vertex_to_statement(v2))); 
     } 
@@ -578,7 +578,7 @@ statement_depend_of_indices_p(statement st,
 
     ifdebug(6) {
 	debug(6, "statement_depend_of_indices_p", "");
-	fprintf(stderr, "Statement %02d depend of ", statement_number(st));
+	fprintf(stderr, "Statement %02td depend of ", statement_number(st));
 	print_list_entities(indices);
     }
 
@@ -663,7 +663,7 @@ vertex_partially_invariant_p(vertex v,
 		    ifdebug(6) {
 			debug(6, "vertex_partially_invariant_p", "");
 			fprintf(stderr, 
-				"statement %02d is partially invariant "
+				"statement %02td is partially invariant "
 				"(known array access).\n", 
 				statement_number(st));
 		    }
@@ -673,7 +673,7 @@ vertex_partially_invariant_p(vertex v,
 		    ifdebug(6) {
 			debug(6, "vertex_partially_invariant_p", "");
 			fprintf(stderr, 
-				"statement %02d is not partially invariant "
+				"statement %02td is not partially invariant "
 				"(known array access).\n", 
 				statement_number(st));
 		    }
@@ -687,7 +687,7 @@ vertex_partially_invariant_p(vertex v,
 		    ifdebug(6) {
 			debug(6, "vertex_partially_invariant_p", "");
 			fprintf(stderr, 
-				"statement %02d is not partially invariant "
+				"statement %02td is not partially invariant "
 				"(UNKNOWN array access).\n", 
 				statement_number(st));
 
@@ -700,7 +700,7 @@ vertex_partially_invariant_p(vertex v,
 		    ifdebug(6) {
 			debug(6, "vertex_partially_invariant_p", "");
 			fprintf(stderr, 
-				"statement %02d is partially invariant "
+				"statement %02td is partially invariant "
 				"(scalar access).\n", 
 				statement_number(st));
 		    }
@@ -713,7 +713,7 @@ vertex_partially_invariant_p(vertex v,
     ifdebug(6) {
 	debug(6, "vertex_partially_invariant_p", "");
 	fprintf(stderr, 
-		"statement %02d is not partially invariant.\n",
+		"statement %02td is not partially invariant.\n",
 		statement_number(st));
     }
     
@@ -740,7 +740,7 @@ vertex_invariant_p(vertex v,
 	ifdebug(6) { 
 	    debug(6, "vertex_invariant_p", "");
 	    fprintf(stderr, 
-		    "statement %02d is not invariant (depend of indices).\n",
+		    "statement %02td is not invariant (depend of indices).\n",
 		    statement_number(st));
 	}
 
@@ -752,7 +752,7 @@ vertex_invariant_p(vertex v,
 	ifdebug(6) { 
 	    debug(6, "vertex_invariant_p", "");
 	    fprintf(stderr, 
-		    "statement %02d is not invariant (self flow dep).\n",
+		    "statement %02td is not invariant (self flow dep).\n",
 		    statement_number(st));
 	}
 	return FALSE;
@@ -770,8 +770,8 @@ vertex_invariant_p(vertex v,
 		ifdebug(6) { 
 		    debug(6, "vertex_invariant_p", "");
 		    fprintf(stderr, 
-			    "statement %02d is not invariant "
-			    "(dep. of %02d).\n",
+			    "statement %02td is not invariant "
+			    "(dep. of %02td).\n",
 			    statement_number(st), 
 			    statement_number(y_st)); 
 		}
@@ -784,7 +784,7 @@ vertex_invariant_p(vertex v,
     ifdebug(6) { 
 	debug(6, "vertex_invariant_p", "");
 	fprintf(stderr, 
-		"statement %02d is invariant.\n",
+		"statement %02td is invariant.\n",
 		statement_number(st));
     }
 
@@ -937,7 +937,7 @@ vertex_redundant_p(vertex v,
 	ifdebug(6) {
 	    debug(6, "vertex_redundant_p", "");
 	    fprintf(stderr, 
-		    "statement %02d is not redundant (variable address).\n", 
+		    "statement %02td is not redundant (variable address).\n", 
 		    statement_number(st));
 	}
 	return FALSE;

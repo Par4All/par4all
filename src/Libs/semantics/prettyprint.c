@@ -364,7 +364,7 @@ is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
 
 #define append(s) add_to_current_line(crt_line, s, str_prefix, txt)
 
-static bool value_is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
+static bool __attribute__ ((unused)) value_is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
 {
     bool is_inferior = TRUE;
     

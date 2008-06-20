@@ -213,7 +213,7 @@ int sc_info[][3];
     ifdebug(8) {
 	for (i=1;i<=vect_size(index_base);i++) {
 	    (void) fprintf(stderr,"Le systeme sur la var. %d est:\n",i);
-	    sc_fprint(stderr,bound_systems[i],entity_local_name);
+	    sc_fprint(stderr, bound_systems[i], (get_variable_name_t) entity_local_name);
 	}
     }
 

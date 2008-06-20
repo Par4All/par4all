@@ -1517,10 +1517,10 @@ void psi_to_phi_region(region reg)
 	    sc_variable_rename(ps, (Variable) make_psi_entity(i), 
 			       (Variable) make_phi_entity(i));
     }
-    
-    reg_ref = make_regions_reference(region_entity(reg)); 
+
+    reg_ref = make_regions_reference(region_entity(reg));
     reference_variable(effect_reference(reg)) = entity_undefined;
-    gen_free(effect_reference(reg));
+    free_reference(effect_reference(reg));
     effect_reference(reg) = reg_ref;
 }
 
@@ -1545,7 +1545,7 @@ void phi_to_psi_region(region reg)
     }
     reg_ref = make_regions_psi_reference(region_entity(reg)); 
     reference_variable(effect_reference(reg)) = entity_undefined;
-    gen_free(effect_reference(reg));
+    free_reference(effect_reference(reg));
     effect_reference(reg) = reg_ref;
 }
 
@@ -2155,20 +2155,20 @@ Psysteme sc_loop_proper_precondition(loop l)
     transformer loop_prec;
     transformer loop_body_trans = load_statement_transformer(loop_body(l));
 
-    loop_prec = make_transformer(NIL, 
-       make_predicate((char *) sc_rn((Pbase)
+    loop_prec = make_transformer(NIL,
+       make_predicate((Psysteme) sc_rn((Pbase)
 				     vect_new((Variable) i, VALUE_ONE))));
-    loop_prec = 
-	add_index_range_conditions(loop_prec, 
-				   i, 
-				   loop_range(l), 
+    loop_prec =
+	add_index_range_conditions(loop_prec,
+				   i,
+				   loop_range(l),
 				   loop_body_trans);
-    
+
     sc = predicate_system(transformer_relation(loop_prec));
-    predicate_system_(transformer_relation(loop_prec)) = 
+    predicate_system_(transformer_relation(loop_prec)) =
 	newgen_Psysteme(SC_UNDEFINED);
-    gen_free(loop_prec);
-    
+    free_transformer(loop_prec);
+
     return sc;
 }
 

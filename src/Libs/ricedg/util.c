@@ -144,13 +144,13 @@ prettyprint_dependence_graph(FILE * fd,
 		       */
 		    if (get_bool_property("PRETTYPRINT_WITH_COMMON_NAMES")) {
 			if (instruction_call_p(statement_instruction(s1)))
-			    fprintf(fd, " %d-%s",statement_number(s1),
+			    fprintf(fd, " %td-%s",statement_number(s1),
 				    entity_local_name(call_function(instruction_call(statement_instruction(s1)))));
-			else  fprintf(fd, " %d",statement_number(s1));
+			else  fprintf(fd, " %td",statement_number(s1));
 			if (instruction_call_p(statement_instruction(s2)))
-			    fprintf(fd, " %d-%s",statement_number(s2),
+			    fprintf(fd, " %td-%s",statement_number(s2),
 				    entity_local_name(call_function(instruction_call(statement_instruction(s2)))));
-			else  fprintf(fd, " %d",statement_number(s2));
+			else  fprintf(fd, " %td",statement_number(s2));
 		    }
 		    
 		}
@@ -166,7 +166,7 @@ prettyprint_dependence_graph(FILE * fd,
 		    if(sru_format_p && !statement_undefined_p(mod_stat)) {
 			fprintf(fd, " levels(");
 			MAPL(pl, {
-			    fprintf(fd, pl==cone_levels(conflict_cone(c))? "%d" : ",%d",
+			    fprintf(fd, pl==cone_levels(conflict_cone(c))? "%td" : ",%td",
 				    INT(CAR(pl)));
 			}, cone_levels(conflict_cone(c)));
 			fprintf(fd, ") ");
@@ -174,7 +174,7 @@ prettyprint_dependence_graph(FILE * fd,
 		    else {
 			fprintf(fd, " at levels ");
 			MAPL(pl, {
-			    fprintf(fd, " %d", INT(CAR(pl)));
+			    fprintf(fd, " %td", INT(CAR(pl)));
 			}, cone_levels(conflict_cone(c)));
 			fprintf(fd, "\n");
 		    }
@@ -202,7 +202,7 @@ prettyprint_dependence_graph(FILE * fd,
 				    Psysteme sc1 = sc_new();
 				    sc1 = sg_to_sc_chernikova(gs);
 				    (void) fprintf(fd,"syst. lin. correspondant au syst. gen.:\n");
-				    sc_fprint(fd,sc1,entity_local_name);
+				    sc_fprint(fd, sc1, (get_variable_name_t) entity_local_name);
 				}
 			    }
 			} 
@@ -275,7 +275,7 @@ prettyprint_dependence_graph_view(FILE * fd,
 		    cons *llsred =NIL;
 		    if (get_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS")){
 			MAPL(pl,{
-			    int level = INT(CAR(pl));
+			    intptr_t level = INT(CAR(pl));
 			    if (level <= nbrcomloops) {
 				if (! ignore_this_conflict(v1,v2,c,level)) {
 				    llsred = gen_nconc(llsred, CONS(INT, level, NIL));
@@ -295,7 +295,7 @@ prettyprint_dependence_graph_view(FILE * fd,
 			/*if (!	entity_scalar_p(reference_variable
 			  (effect_reference(conflict_source(c))))) { */
 
-			fprintf(fd, "\t%02d --> %02d with conflicts\n", 
+			fprintf(fd, "\t%02td --> %02td with conflicts\n", 
 				statement_number(s1), statement_number(s2));
 			
 			fprintf(fd, "\t\tfrom ");
@@ -306,7 +306,7 @@ prettyprint_dependence_graph_view(FILE * fd,
 			
 			fprintf(fd, " at levels ");
 			MAPL(pl, {
-			    fprintf(fd, " %d", INT(CAR(pl)));
+			    fprintf(fd, " %td", INT(CAR(pl)));
 			}, llsred);
 
 			fprintf(fd, "\n");
@@ -320,7 +320,7 @@ prettyprint_dependence_graph_view(FILE * fd,
 				    Psysteme sc1 = sc_new();
 				    sc1 = sg_to_sc_chernikova(gs);
 				    (void) fprintf(fd,"syst. lin. correspondant au  syst. gen.:\n");
-				    sc_fprint(fd,sc1,entity_local_name);
+				    sc_fprint(fd, sc1, (get_variable_name_t) entity_local_name);
 				}
 			    }
 			    fprintf(fd, "\n");
@@ -363,7 +363,7 @@ Pbase basis;
     if (SG_UNDEFINED_P(dc)) fprintf(fd, "NULL \n");
     else {
 	fprintf(fd,"basis :");
-	base_fprint(fd,basis,entity_local_name);
+	base_fprint(fd, basis, (get_variable_name_t) entity_local_name);
 	fprintf(fd,"%d vertice(s) :",sg_nbre_sommets(dc));
 	v = sg_sommets(dc);
 	for(; v!=NULL; v= v->succ) {

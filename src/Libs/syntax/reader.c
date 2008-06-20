@@ -983,7 +983,7 @@ ReadStmt(FILE * fp)
 
 	ifdebug(7) {
 	  int i;
-	  pips_debug(7, "stmt: (%d)\n", lStmt);
+	  pips_debug(7, "stmt: (%td)\n", lStmt);
 	  for(i=0; i<lStmt; i++)
 	    putc((int) stmt_buffer[i], stderr);
 	}

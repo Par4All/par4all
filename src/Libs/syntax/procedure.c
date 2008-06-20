@@ -872,7 +872,7 @@ static void process_static_initialization(call c)
 	  ParserError("", "Redundant/Conflicting initialization");
 	}
 	nr = 1;
-	pips_debug(2, "Variable %s with value at position %d\n",
+	pips_debug(2, "Variable %s with value at position %td\n",
 		   entity_local_name(v), cvp);
 	isvs = gen_nconc(isvs, CONS(ENTITY, v, NIL));
 	svps = gen_nconc(svps, CONS(INT,cvp, NIL));
@@ -906,7 +906,7 @@ static void process_static_initialization(call c)
 	POP(lp);
       }, isvs);
     }
-    pips_debug(2, "The DATA statement is %s decoded (cvp=%d)\n",
+    pips_debug(2, "The DATA statement is %s decoded (cvp=%td)\n",
 	       ((gen_length(isvs)==0)? "not" : ((cvp==-1)? "partially" : "fully")), cvp);
   }
 

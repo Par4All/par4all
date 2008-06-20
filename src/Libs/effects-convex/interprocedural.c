@@ -84,7 +84,7 @@ list get_out_summary_regions_list()
 static bool stmt_filter(s)
 statement s;
 {
-    pips_debug(1, "statement %03d\n", statement_number(s));
+    pips_debug(1, "statement %td\n", statement_number(s));
     
     current_stmt = s;
     return(TRUE);

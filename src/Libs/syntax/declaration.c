@@ -70,7 +70,7 @@ SafeSizeOfArray(entity a)
   return s;
 }
 
-void 
+void
 InitAreas()
 {
     DynamicArea = FindOrCreateEntity(CurrentPackage, DYNAMIC_AREA_LOCAL_NAME);
@@ -104,7 +104,7 @@ InitAreas()
 
 /* functions for the SAVE declaration */
 
-void 
+void
 save_all_entities()
 {
     entity mod = get_current_module_entity();
@@ -1592,7 +1592,7 @@ int i;
  * See also range_count().
  */
 
-int 
+int
 SizeOfRange(r)
 range r;
 {
@@ -1620,10 +1620,10 @@ range r;
  * type integer
  */
 
-int 
-IsIntegerScalar(e) 
-entity e; 
-{ 
+int
+IsIntegerScalar(e)
+entity e;
+{
     if (type_variable_p(entity_type(e))) {
 	variable a = type_variable(entity_type(e));
 
@@ -1634,7 +1634,7 @@ entity e;
     return(FALSE);
 }
 
-void 
+void
 print_common_layout(FILE * fd, entity c, bool debug_p)
 {
     entity mod = get_current_module_entity();
@@ -1672,7 +1672,7 @@ print_common_layout(FILE * fd, entity c, bool debug_p)
 	 * of the parser steps by pipsmake and the user. Maybe, the list should
 	 * be filtered and restricted to the current module: YES!
 	 */
-	MAP(ENTITY, m, 
+	MAP(ENTITY, m,
 	    {
 		pips_assert("RAM storage",
 			    storage_ram_p(entity_storage(m)));
