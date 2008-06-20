@@ -91,7 +91,7 @@ PREFIX void __attribute__ ((unused)) store_##type##_##name(type s, result t) { \
   message_assert("value defined", t != result##_undefined);		\
   hash_put((hash_table) name##_map, (void*) s, (void*) t);		\
 }									\
-PREFIX void update_##type##_##name(type s, result t) {			\
+PREFIX void __attribute__ ((unused)) update_##type##_##name(type s, result t) {	\
   message_assert("key defined", s != type##_undefined);			\
   message_assert("value defined", t != result##_undefined);		\
   hash_update((hash_table) name##_map, (void*) s, (void*) t);		\

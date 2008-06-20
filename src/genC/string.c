@@ -35,6 +35,9 @@
 #include <stdarg.h>
 #include "genC.h"
 
+/* Like strdup() but copy at most n characters.
+   The return string *is not* null terminated. if the original string is a
+   least n-byte long. */
 string gen_strndup(
     string s, /* la chaine a copier */
     size_t n /* le nombre de caracteres a copier */)
@@ -61,6 +64,8 @@ string gen_strndup(
 	return(r);
 }
 
+/* Like strdup() but copy at most n characters.
+   The return string is null terminated. */
 string gen_strndup0(
     string s, /* la chaine a copier */
     size_t n /* le nombre de caracteres a copier */)
@@ -113,11 +118,11 @@ void init_the_buffer(void)
     buffer[0] = '\0';
 }
 
+/* If the string is undefined, just skip it. Well, I hope it will not hide
+   some bugs by masking some deliberate string_undefined put to trigger a
+   wrong assertion is some higher parts of the code... */
 string append_to_the_buffer(string s /* what to append to the buffer */)
 {
-  /* If the string is undefined, just skip it. Well, I hope it will not
-     hide some bugs by masking some deliberate string_undefined put to
-     trigger a wrong assertion is some higher parts of the code... */
   if (s != string_undefined) {
     size_t len = strlen(s);
 
@@ -144,8 +149,12 @@ string get_the_buffer(void)
     return buffer;
 }
 
-/* concatenation is based on a static dynamic buffer
- * which is shared from one call to another. beurk.
+/* Return the concatenation of the given strings.
+ *
+ * concatenation is based on a static dynamic buffer
+ * which is shared from one call to another.
+ *
+ * Note that if a string is string_undefined, it is just skiped.
  *
  * FC.
  */
@@ -153,7 +162,7 @@ string concatenate(string next, ...)
 {
     int count = 0;
     va_list args;
-    
+
     init_the_buffer();
 
     /* now gets the strings and concatenates them
