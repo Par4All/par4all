@@ -165,9 +165,7 @@ Psysteme sc;
  * Obsolete. Better use sc_default_dump()
  *
  */
-void sc_print(ps, nom_var)
-Psysteme ps;
-char * (*nom_var)();
+void sc_print(Psysteme ps, get_variable_name_t nom_var)
 {
     sc_fprint(stderr, ps, nom_var);
 }
@@ -193,10 +191,9 @@ char * (*nom_var)();
  *  - can add the information like #dimension, nb_eq, nb_ineq or label in the beginning
  *  - been implemented as sc_fprint_for_sc_fscan(), without infeasibility issue.
  */
-void sc_fprint(fp, ps, nom_var)
-FILE *fp;
-Psysteme ps;
-char * (*nom_var)(Variable);
+void sc_fprint(FILE * fp,
+	       Psysteme ps,
+	       get_variable_name_t nom_var)
 {
     register Pbase b;
     Pcontrainte peq;

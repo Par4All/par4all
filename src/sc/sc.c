@@ -164,11 +164,10 @@ Variable (*new_variable)(/*Variable*/);
  * reecriture du systeme s remplacant toutes les occurences des coordonnees
  * de pv_old par des occurences de pv_new
  */
-Psysteme sc_variables_rename(s, pv_old, pv_new,variable_name)
-Psysteme s;
-Pvecteur pv_old;
-Pvecteur pv_new;
-char * (*variable_name)();
+Psysteme sc_variables_rename(Psysteme s,
+			     Pvecteur pv_old,
+			     Pvecteur pv_new,
+			     get_variable_name_t variable_name)
 {
     Pvecteur pv;
     for (pv = pv_old; !VECTEUR_UNDEFINED_P(pv); pv = pv->succ) {
