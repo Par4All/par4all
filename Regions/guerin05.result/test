@@ -1,0 +1,68 @@
+      PROGRAM GUERIN05
+
+C     Bugs in IN and OUT scalar regions for the specified sections:
+C     scalar k is not seen as imported by the loop, although it is
+C     imported by the loop body. But, if k is replaced by k(1), k(1) is
+C     seen as simported.
+
+! MIL-STD-1753 Fortran extension not in PIPS
+!       implicit none
+
+      INTEGER K, I
+
+C  <I-W-EXACT-{}>
+C  <K-R-EXACT-{}>
+C  <K-W-EXACT-{}>
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  <K-W-EXACT-{}>
+
+C (0,2)
+
+      K = 0                                                             0001
+
+C  <I-W-EXACT-{}>
+C  <K-R-EXACT-{}>
+C  <K-W-EXACT-{}>
+
+C (0,3)
+      DO I = 1, 1                                                       0002
+
+C  <K-R-EXACT-{}>
+C  <K-W-EXACT-{}>
+
+C (0,4)
+         K = K+1                                                        0003
+      ENDDO
+
+C     END BLOCK
+      END
+      PROGRAM GUERIN05
+
+C     Bugs in IN and OUT scalar regions for the specified sections:
+C     scalar k is not seen as imported by the loop, although it is
+C     imported by the loop body. But, if k is replaced by k(1), k(1) is
+C     seen as simported.
+
+! MIL-STD-1753 Fortran extension not in PIPS
+!       implicit none
+
+      INTEGER K, I
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+
+      K = 0                                                             0001
+C (0,3)
+      DO I = 1, 1                                                       0002
+
+C  <K-IN-EXACT-{}>
+
+C (0,4)
+         K = K+1                                                        0003
+      ENDDO
+
+C     END BLOCK
+      END
