@@ -1,6 +1,8 @@
 #! /bin/bash
 #
 # $Id$
+#
+# accept validation files differences...
 
 svn=
 shopt -s nullglob
@@ -8,30 +10,54 @@ shopt -s nullglob
 # what is the current arch?
 arch=${PIPS_ARCH:-$($PIPS_ROOT/makes/arch.sh)}
 
-for dir ; do
-  if [[ -d $dir ]] ;  then 
-    pushd $dir > /dev/null
-    for file in *.result/out ; do 
-      ref=${file%\/out}/test
-      [ -f $ref.$arch ] && ref=$ref.$arch
+function handle_out_file()
+{
+    local outfile=$1
+    shift
+    local ref=${outfile%\/out}/test
+    [ -f $ref.$arch ] && ref=$ref.$arch
+    
+    # show differences
+    if [ -f $file ] ; then
+	echo "CONSIDERING $ref and $outfile"
+        ${PIPS_DIFF:-diff -b -u} $ref $outfile 
+    else
+	echo "NEW OUTPUT $outfile"
+	cat $outfile 
+    fi | ${PIPS_MORE:-less}
+    
+    # ask...
+    echo -e "accept (y|n)? \a"
+    read answer
+    if [[ $answer == [yY]* ]] ; then 
+	mv $outfile $ref
+	[[ -d '.svn' ]] && svn=1
+    else
+	echo "$outfile not accepted"
+    fi
+}
 
-      # show differences
-      if [ -f $file ] ; then
-	echo "CONSIDERING $ref and $file"
-        ${PIPS_DIFF:-diff -b -u} $ref $file 
-      else
-	echo "NEW OUTPUT $file"
-	cat $file 
-      fi | ${PIPS_MORE:-less}
-      
-      echo -e "accept (y|n)?\a"
-      read answer
-      if [[ $answer == [yY]* ]] ; then 
-	  mv $file $ref
-	  [[ -d '.svn' ]] && svn=1
-      fi
+function handle_directory()
+{
+    local dir=$1 outfile
+    shift
+    for outfile in $dir/*.result/out ; do
+	handle_out_file $outfile
     done
-    popd > /dev/null
+}
+
+for arg ; do
+  if [[ -d $arg ]] ; then 
+      handle_directory $arg
+  elif [[ -f $arg ]] ; then
+      outfile=${arg%.[Ffc]}.result/out
+      if [[ -f $outfile ]] ; then
+	  handle_out_file $outfile
+      else
+	  echo "$arg skipped, no '$outfile' out file"
+      fi
+  else
+      echo "$arg skipped, no '$file' file"
   fi
 done
 
