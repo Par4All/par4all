@@ -57,7 +57,7 @@ for arg ; do
 	  echo "$arg skipped, no '$outfile' out file"
       fi
   else
-      echo "$arg skipped, no '$file' file"
+      echo "$arg skipped, no such file"
   fi
 done
 
