@@ -236,6 +236,7 @@ function validate_file()
 }
 
 # process directories (or possibly files)
+dones=0
 errors=0
 elist=''
 for obj ; do
@@ -243,20 +244,27 @@ for obj ; do
   if [ -d $vdir/$obj ] ; then
     verb 1 "considering '$obj' directory"
     for file in $vdir/$obj/*.[cfF] ; do
+      verb 3 " - considering '${file//$vdir\//}' file"
       validate_file $file || let errors++ failed=1
+      let dones++
     done
   elif [ -f $vdir/$obj ] ; then
+    verb 1 "considering '$obj' file"
     validate_file $vdir/$obj || let errors++ failed=1
+    let dones++
   else
     usage 11 "unexpected object: $obj"
   fi
   [[ $failed ]] && elist="$elist$obj "
 done
-echo -e "\n$errors error(s) on $(date)" >> $summary
+echo -e "\n$errors failed out of $dones on $(date)" >> $summary
 rm -rf *.database # cleanup
 
 # report on stdout and by mail
-msg='SUCCEEDED'
-[[ $errors -gt 0 ]] && msg="FAILED ($elist)"
+if [[ $errors -eq 0 ]] ; then
+    msg='SUCCEEDED'
+else
+    msg="FAILED $errors/$dones ($elist)"
+fi
 echo -e "\nvalidation $msg\n" ; cat $summary
 [[ $mail ]] && ${PIPS_MAIL:-Mail} -s "validation $msg" $mail < $summary
