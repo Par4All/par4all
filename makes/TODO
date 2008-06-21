@@ -1,11 +1,4 @@
-* notion de production
-- création et maintenance d'un tag "prod"
-- mise a jours partielles (librairies pips ou linear)
-- version partagée (script automatique ? rapide ? incrémental ?)
-- documentation des procédures
-
-* construction
-- séparer l'installation du trunk ?
-- développement d'une seule librairie + production "stable" ?
-- corriger les d�pendances headers ?
+* building pips
+- fix "header" dependency so that "make -j2" runs correctly?
 - make ttest => cd root + make recompile ?
+- if so, add link for local tpips to help running the debugger?
