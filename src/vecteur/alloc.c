@@ -129,38 +129,37 @@ void dbg_vect_rm(Pvecteur v,
  * Variable var;
  * Value val;
  *
- * builds a vector from the list of arguments, by successive additions.
- * ends when a 0 Variable is encountered (that is TCST if any!)
- * caution: because of the var val order, this function cannot be
- * called directly with a va_list, but (va_list, 0) should be used,
- * since the val argument is expected and read.
+ * Builds a vector from the list of arguments, by successive additions.
+ * ends when a 0 Variable (that is TCST!) is encountered.
+ *
+ * Because of the var val order, this function cannot be called directly 
+ * with a va_list, but (va_list, 0) should be used, since the val argument 
+ * is expected, read and used anyway.
  *
  * CAUTION: the initial vector is modified by the process!
  */
-
 Pvecteur 
-vect_make(Pvecteur v, ...)
+vect_make(Pvecteur v, Variable var, Value val, ...)
 {
     va_list the_args;
-    Variable var;
-    Value val;
 
-    va_start (the_args, v);
+    /* handle fist argument */
+    vect_add_elem(&v, var, val);
 
-    do
+    /* get others */
+    va_start (the_args, val);
+
+    while (var != (Variable) 0)
     {
 	var = va_arg(the_args, Variable);
 	val = va_arg(the_args, Value);
-
 	vect_add_elem(&v, var, val);
     }
-    while (var != (Variable)0);
 
     va_end (the_args);
 
-    return(v);
+    return v;
 }
-
 
 
 /* direct duplication. 
