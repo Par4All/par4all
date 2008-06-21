@@ -15,13 +15,16 @@ to "pips_validate" through the VOPT makefile macro:
 
 It can also be done by fixing the PATH environment variable:
 
-	sh> PATH=/path/to:$PATH make validate
+	sh> PATH=/path/to/pips/binaries:$PATH make validate
 
 
-Interactive acceptation of differences, and commit:
+Interactive acceptation of differences, possibly for some
+directories or files, and commit:
 
 	sh> make accept
-	sh> svn ci
+	sh> make TARGET=Semantics accept
+	sh> make TARGET=Semantics/loopequiv.f accept
+	sh> svn ci -m 'what has been done...'
 
 
 Full cleanup of generated files:
