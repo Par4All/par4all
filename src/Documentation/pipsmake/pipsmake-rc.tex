@@ -779,18 +779,39 @@ hpfc_parser                     > MODULE.parsed_code
 
 \subsection{Declaration of the C parsers}
 
-The compilation unit does not contain any function definitions after the\marginpar{gnih?}
-workspace creation. The compilation units must be parsed before the
-function definitions can be parsed.
+A C file is a compilation unit with macros, include statements, local
+and global variable definitions, type definitions, and with some or no
+function definitions. When the PIPS workspace is created by PIPS
+preprocessor, each C file is preprocessed\footnote{Macros are
+interpreted and include files are expanded. The result depends on the
+C preprocessor used,on its option and on the system environment
+(/usr/include,...).} using for instance
+\texttt{gcc -E}\footnote{It can be redefined using
+\texttt{CPP\_PIPS\_ENV} and \texttt{CPP\ PIPS\_OPTIONS\_ENV} environment
+variables} and broken into a new compilation unit which contains only
+variable and function and type definitions and one C file for each C
+function defined in the initial C file.
+
+The compilation unit does not contain any function definitions after
+the\marginpar{RK: gnih? to be deleted (FI)} workspace creation.
+
+The new compilation units must be parsed before the new files
+containing each one function definition can be parsed. The new
+compilation units are named like the initial file name with a bang
+extension. For instance, file \texttt{foo.c} will lead to a new
+\texttt{foo!.c} compilation unit. This new compilation unit may be empty.
+
 \begin{verbatim}
 compilation_unit_parser         > COMPILATION_UNIT.declarations
         < COMPILATION_UNIT.c_source_file
 \end{verbatim}
 
-DECLARATIONS is a special resource to impose that each compilation unit
-must be parsed before its functions. It is in fact a hash table
-containing C keywords and typedef names in each compilation
-unit.\marginpar{mais de quoi ça cause ?}
+The resource \verb/COMPILATION_UNIT.declarations/ produced by
+\verb/compilation_unit_parser/ is a special resource used to force the
+parsing of the new compilation unit before the parsing of its
+associated functions. It is in fact a hash table containing C keywords
+and typedef names in each compilation unit.\marginpar{RK: mais de quoi ça
+cause ? (FI: to be deleted?)}
 
 \begin{verbatim}
 c_parser                        > MODULE.parsed_code
@@ -799,12 +820,13 @@ c_parser                        > MODULE.parsed_code
         < MODULE.c_source_file
         < COMPILATION_UNIT.declarations
 \end{verbatim}
-If you want to parse some C code, it is a good idea to select the C
+
+If you want to parse some C code using \texttt{tpips}, it is necessary to select the C
 parser with
 \begin{alltt}
 activate C_PARSER
 \end{alltt}
-for example in \texttt{tpips}.
+
 
 A prettyprint of the symbol table for a C module can be generated with
 \begin{verbatim}
@@ -927,15 +949,18 @@ full_graph_of_calls          > PROGRAM.dvcg_file
         < ALL.callees
 \end{verbatim}
 
-\section{Effects}
+\section{Memory Effects}
 \label{subsection-effects}
 \index{Effect}
 \index{Memory Effect}
 
-The data structures used to represent effects and their computation are
-described in~\cite{IJT92}. Another description is available on line, in
-\Pri{} Technical
-Report.
+The data structures used to represent memory effects and their
+computation are described in~\cite{IJT92}. Another description is
+available on line, in \Pri{} Technical Report.
+
+Note that the standard name in the Dragon book is likely ot be {\em
+Gen} and {\em Kill} sets, but PIPS used the more general concept of
+{\em effect} developped by P.~Jouvelot and D.~Gifford.
 
 \subsection{Proper Effects}
 \label{subsubsection-proper-effects}
@@ -990,7 +1015,7 @@ filter_proper_effects         > MODULE.filtered_proper_effects
 Cumulated effects of statements are also lists of read or written
 variables. Cumulated means that the effects of a compound statement, do
 loop, test or unstructured, include the effects of the lower level
-statements.
+statements such as a loop body or a test branch.
 
 \begin{verbatim}
 cumulated_effects               > MODULE.cumulated_effects
@@ -999,9 +1024,14 @@ cumulated_effects               > MODULE.cumulated_effects
         < MODULE.proper_effects
 \end{verbatim}
 
-Cumulated effects do not take into account local effects on private
-variables. Interprocedurally, effects on dynamic variables are ignored.
-\marginpar{Not clear}
+Cumulated memory effects do not take into account local effects on
+private variables, such as variables declared in C blocks or in
+Fortran parallel DO loops. Interprocedurally, memory effects on
+dynamic (a.k.a. stack allocated) variables are ignored in summary
+effects because they cannot be observed by the callers\footnote{Unless
+it accesses illegally the stack: see Tom Reps,
+http://pages.cs.wisc.edu/~reps}.
+\marginpar{RK: Not clear (FI: To be deleted)}
 
 Cumulated references integrate proper references over the program code. 
 
@@ -1019,16 +1049,18 @@ cumulated_references    > MODULE.cumulated_references
         < MODULE.proper_references
 \end{verbatim}
 
-Cumulated effects of a all module are used to compute the proper effects
-the corresponding call sites. They are translated from the callee's scope
-into the caller's scope. The translation is based on the actual-to-formal
-binding. If too many actual arguments are defined, a user warning is
-issued but the processing goes on because a simple semantics is available:
-ignore useless actual arguments. If too few actual arguments are provided,
-a user error is issued because the effects of the call are not defined. It
-would be necessary to assume either a general \verb+READ+ or a general
-\verb+WRITE+ for each read or written formal parameter with no actual
-counterpart.
+Cumulated effects of a all module are used to compute the proper
+effects of the corresponding call sites. They are translated from the
+callee's scope into the caller's scope. The translation is based on
+the actual-to-formal binding. If too many actual arguments are
+defined, a user warning is issued but the processing goes on because a
+simple semantics is available: ignore useless actual arguments. If too
+few actual arguments are provided, a user error is issued because the
+effects of the call are not defined. It would be necessary to assume
+either a general \verb+READ+ or a general \verb+WRITE+ for each read
+or written formal parameter with no actual counterpart\marginpar{This
+is implemented for calls by reference as in Fortran. The call-by-value
+implementation is on-going. See Amira Mensi.}.
 
 \subsection{Summary Data Flow Information (SDFI)}
 \label{subsubection-summary-data-flow-information}
@@ -1058,7 +1090,15 @@ summary_effects                 > MODULE.summary_effects
 \index{Effects (IN)}
 \index{Effects (OUT)}
 
-\marginpar{What are they?}
+IN and OUT memory effects of a statement $s$ are memory locations
+whose input values are used by statement $s$ or whose output values
+are used by statement $s$ continuation. Variables allocated in the
+statement are not part of the IN or OUT effects. Variables defined
+before they are used ar not part of the IN effects. OUT effects
+require an interprocedural analysis\footnote{They are not validated as
+of June 21, 2008 (FI).}
+\marginpar{RK: What are they? (FI: To be deleted)}
+
 \begin{verbatim}
 in_effects > MODULE.in_effects
            > MODULE.cumulated_in_effects
