@@ -1,6 +1,12 @@
 #! /bin/bash
 # $Id$
 
+script=${0/*\//}
+
+rev='$Rev$'
+rev=${rev/*: //}
+rev=${rev/ */}
+
 # DEFAULTS
 # where is the validation?
 vdir=${PIPS_VALIDDIR:-$PIPS_ROOT/../../valid}
@@ -67,6 +73,7 @@ while [ "$1" ] ; do
       -R|--run) rdir=$1 ; shift ;;
       -O|--out|--output) odir=$1 ; shift ;;
       -m|--mail) mail="$mail $1" ; shift ;;
+      --version) echo "$script revision $rev" ; exit 0 ;;
       *) usage 1 "unexpected option: $opt"
   esac
 done
