@@ -17,7 +17,16 @@ clean:
 TARGET	= $(shell grep '^[a-zA-Z]' defaults)
 VOPT	= -v
 
-validate:
+.check_validate:
+	@if [ -d RESULTS ] ; then \
+	  echo \
+	    "cannot run validation with prior results still available." \
+	    "\nbefore trying to run the validation, do:\n" \
+	    "\n\t\tshell> make clean\n" ; \
+	  exit 1; \
+	fi
+
+validate: .check_validate
 	PIPS_MORE=cat pips_validate $(VOPT) -V $(PWD) -O RESULTS $(TARGET)
 
 accept:
