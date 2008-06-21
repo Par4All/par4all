@@ -95,7 +95,7 @@ include $(MAKE.d)/svn.mk
 
 # auto generate config if necessary
 $(MAKE.d)/config.mk:
-	touch $@
+	echo "MAKEFLAGS = -j1" > $@
 
 endif # NO_INCLUDES
 
