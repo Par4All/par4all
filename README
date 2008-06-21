@@ -5,6 +5,7 @@ Default validation or just for one directory:
 
 	sh> make validate
 	sh> make TARGET=Semantics validate
+	sh> make TARGET=Semantics/loopequiv.f validate
 
 
 To tell which tpips/pips should be used, you must give additional options 
