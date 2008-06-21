@@ -6,11 +6,13 @@
 
 AR	= gar
 ARFLAGS	= rv
+
 CC	= gcc
 CANSI	= -ansi -pedantic-errors
 CFLAGS	= -g -O2 -Wall -W -pipe
 # ??? -MG
 CMKDEP	= -MM
+
 LD	= $(CC)
 RANLIB	= granlib
 
@@ -31,3 +33,8 @@ LDFLAGS += -g
 CPPFLAGS += \
 	-D__USE_FIXED_PROTOTYPES__
 
+LEX	= flex
+LFLAGS	= 
+
+LINT	= lint
+LINTFLAGS= -habxu
