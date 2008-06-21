@@ -24,7 +24,8 @@ function usage()
   local status=$1 msg=$2
   [[ $msg ]] && echo -e "message: $msg\n" >&2
   echo -e \
-    "$0 [options] directories or files...\n" \
+    "$script [options] directories or files...\n" \
+    "revision $rev\n" \
     "options:\n" \
     "  -h: show some help\n" \
     "  -v: be verbose (repeat for more verbosity, 3 or more is debug)\n" \
