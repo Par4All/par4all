@@ -1,27 +1,18 @@
 # $Id$
 
-SVNVERSION	= $(MAKE.d)/version.sh
+VERSION	= $(MAKE.d)/version.sh
 
-ifdef NEWGEN_ROOT
-ifndef NEWGEN_REV
-NEWGEN_REV	:= $(shell $(SVNVERSION) $(NEWGEN_ROOT))
-endif # NEWGEN_REV
-CPPFLAGS	+= -DNEWGEN_REV=$(NEWGEN_REV)
-endif # NEWGEN_ROOT
+.revisions_h:
+	$(RM) revisions.h
+	{ \
+	  echo '#define NEWGEN_REV "$(shell $(VERSION) $(NEWGEN_ROOT))"'; \
+	  echo '#define LINEAR_REV "$(shell $(VERSION) $(LINEAR_ROOT))"'; \
+	  echo '#define PIPS_REV "$(shell $(VERSION) $(PIPS_ROOT))"'; \
+	  echo '#define NLPMAKE_REV "$(shell $(VERSION) $(PIPS_ROOT)/makes)"'; \
+	} > revisions.h
 
-ifdef LINEAR_ROOT
-ifndef LINEAR_REV
-LINEAR_REV	:= $(shell $(SVNVERSION) $(LINEAR_ROOT))
-endif # LINEAR_REV
-CPPFLAGS	+= -DLINEAR_REV=$(LINEAR_REV)
-endif # LINEAR_ROOT
+revisions.h: .revisions_h
 
-ifdef PIPS_ROOT
-ifndef PIPS_REV
-PIPS_REV	:= $(shell $(SVNVERSION) $(PIPS_ROOT))
-endif # PIPS_REV
-ifndef NLPMAKE_REV
-NLPMAKE_REV	:= $(shell $(SVNVERSION) $(PIPS_ROOT)/makes)
-endif # NLPMAKE_REV
-CPPFLAGS	+= -DPIPS_REV=$(PIPS_REV) -DNLPMAKE_REV=$(NLPMAKE_REV)
-endif # PIPS_ROOT
+clean: version-clean
+version-clean:
+	$(RM) revisions.h
