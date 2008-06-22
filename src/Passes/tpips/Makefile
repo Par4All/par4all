@@ -4,7 +4,7 @@
 
 TARGET	= tpips
 YOPT	= -v -d
-INC_CFILES	= tpips.c wrapper.c
+INC_CFILES	= tpips.c wrapper.c revisions.c
 OTHER_CFILES	= main_tpips.c
 DERIVED_HEADERS	= tp_yacc.h completion_list.h
 DERIVED_CFILES	= tp_yacc.c tp_lex.c
@@ -34,7 +34,7 @@ local-clean:
 	$(RM) $(DERIVED_CFILES) $(DERIVED_HEADERS) $(DERIVED_FILES)
 
 $(ARCH)/tpips: $(ARCH)/$(TPIPS_MAIN)
-$(ARCH)/main_tpips.o: .revisions_h
+$(ARCH)/revisions.o: .revisions_h
 $(ARCH)/$(LIB_TARGET): completion_list.h
 
 tp_lex.c: tp_lex.l tp_yacc.h
