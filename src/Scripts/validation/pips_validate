@@ -11,9 +11,10 @@ rev=${rev/ */}
 # where is the validation?
 vdir=${PIPS_VALIDDIR:-$PIPS_ROOT/../../valid}
 
-# running directory
+# default running directory
 rdir=.
 
+# get default architecture and tpips/pips
 arch=${PIPS_ARCH:-$($PIPS_ROOT/makes/arch.sh)}
 tpips=$(type -p tpips)
 pips=$(type -p pips)
@@ -81,12 +82,12 @@ done
 
 # option checks
 [[ -d $vdir ]] || usage 3 "no validation directory: $vdir"
-[[ -d $rdir ]] || usage 5 "no run directory: $rdir"
+[[ -d $rdir ]] || usage 4 "no run directory: $rdir"
 
 # result directory
 [[ $odir ]] || odir=$rdir/validation_results.$$
-[[ -d $odir ]] && usage 5 "output directory already created: $odir"
-mkdir $odir || usage 9 "error mkdir $odir"
+[[ -d $odir ]] && usage 5 "output directory already exists: $odir"
+mkdir $odir || usage 6 "error on mkdir $odir"
 
 [[ -x $pips ]] || usage 7 "not executable: $pips"
 [[ -x $tpips ]] || usage 8 "not executable: $tpips"
@@ -165,7 +166,7 @@ function validate_file()
 
   if [[ -r $full_name.test ]] ; then
     verb 3 "$prefix.test method"
-    verb 4 "$full_name.tes"
+    verb 4 "$full_name.test"
     # ??? what about using default_test substitution?!
     $full_name.test 2> $out.err ; status=$?
 
@@ -181,7 +182,7 @@ function validate_file()
 
   elif [[ -r $dir/default_test ]] ; then
     verb 3 'default_test method'
-    # perform some substitutions...
+    # perform some substitutions on the fly...
     sed -e "s/tested_file/${file//\//\\/}/g" \
 	-e "s/tested_dir/${dir//\//\\/}/g" \
 	-e "s/tested_name/$name/g" \
@@ -247,6 +248,7 @@ function validate_file()
 dones=0
 errors=0
 elist=''
+
 for obj ; do
   failed=
   if [ -d $vdir/$obj ] ; then
@@ -268,7 +270,7 @@ done
 echo -e "\n$errors failed out of $dones on $(date)" >> $summary
 rm -rf *.database # cleanup
 
-# report on stdout and by mail
+# report on stdout and possibly by mail
 if [[ $errors -eq 0 ]] ; then
     msg='SUCCEEDED'
 else
