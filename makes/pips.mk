@@ -47,9 +47,15 @@ $(ARCH)/tpips:
 	$(RM) $@
 	ln -s $(PIPS_ROOT)/bin/$@ $@
 
-ttest: $(ARCH)/tpips
+full-ttest: $(ARCH)/tpips
 	$(MAKE) compile
 	$(MAKE) -C $(PIPS_ROOT) compile
+
+fast-ttest: $(ARCH)/tpips
+	$(MAKE) compile
+	$(MAKE) -C $(PIPS_ROOT)/src/Passes/tpips compile
+
+ttest: fast-ttest
 
 endif # BIN_TARGET
 endif # OLD_TEST
