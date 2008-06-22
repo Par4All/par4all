@@ -1055,8 +1055,13 @@ static void parse_arguments(int argc, char * argv[])
 	tpips_exec(optarg);
 	break;
       case 'v': 
-	fprintf(stderr, "tpips: (ARCH=" STRINGIFY(SOFT_ARCH)
-		", DATE=" STRINGIFY(UTC_DATE) ") %s\n", argv[0]);
+	fprintf(stderr, "tpips: (%s)\n"
+		"\tARCH=" STRINGIFY(SOFT_ARCH) "\n"
+		"\tREVS newgen=" STRINGIFY(NEWGEN_REV) 
+		", linear=" STRINGIFY(LINEAR_REV) 
+		", pips=" STRINGIFY(PIPS_REV)
+		", nlpmake=" STRINGIFY(NLPMAKE_REV) "\n" 
+		"\tDATE=" STRINGIFY(UTC_DATE) "\n", argv[0]);
 	break;
       case 'r': 
 	free(tpipsrc);
