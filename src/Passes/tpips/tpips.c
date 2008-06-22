@@ -1057,6 +1057,7 @@ static void parse_arguments(int argc, char * argv[])
       case 'v': 
 	fprintf(stderr, "tpips: (%s)\n"
 		"\tARCH=" STRINGIFY(SOFT_ARCH) "\n"
+		/* ??? revisions should updated at every link... */
 		"\tREVS newgen=" STRINGIFY(NEWGEN_REV) 
 		", linear=" STRINGIFY(LINEAR_REV) 
 		", pips=" STRINGIFY(PIPS_REV)
