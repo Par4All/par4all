@@ -42,6 +42,7 @@ static bool use_readline = FALSE;
 static FILE * logfile;
 static FILE * current_file; /* current file being processed */
 
+extern char * soft_revisions;
 extern int tgetnum();
 extern void tp_restart( FILE * ); /* tp_lex.c */
 
@@ -1058,11 +1059,8 @@ static void parse_arguments(int argc, char * argv[])
 	fprintf(stderr, "tpips: (%s)\n"
 		"\tARCH=" STRINGIFY(SOFT_ARCH) "\n"
 		/* ??? revisions should updated at every link... */
-		"\tREVS newgen=" STRINGIFY(NEWGEN_REV) 
-		", linear=" STRINGIFY(LINEAR_REV) 
-		", pips=" STRINGIFY(PIPS_REV)
-		", nlpmake=" STRINGIFY(NLPMAKE_REV) "\n" 
-		"\tDATE=" STRINGIFY(UTC_DATE) "\n", argv[0]);
+		"\tREVS %s\n" 
+		"\tDATE=" STRINGIFY(UTC_DATE) "\n", argv[0], soft_revisions);
 	break;
       case 'r': 
 	free(tpipsrc);
