@@ -47,15 +47,28 @@ $(ARCH)/tpips:
 	$(RM) $@
 	ln -s $(PIPS_ROOT)/bin/$@ $@
 
-full-ttest: $(ARCH)/tpips
-	$(MAKE) compile
+$(ARCH)/pips:
+	$(RM) $@
+	ln -s $(PIPS_ROOT)/bin/$@ $@
+
+# full recompilation from a library
+full: $(ARCH)/tpips $(ARCH)/pips
 	$(MAKE) -C $(PIPS_ROOT) compile
 
-fast-ttest: $(ARCH)/tpips
-	$(MAKE) compile
+# fast tpips recompilation
+fast-tpips: $(ARCH)/tpips compile
 	$(MAKE) -C $(PIPS_ROOT)/src/Passes/tpips compile
 
-ttest: fast-ttest
+# fast pips recompilation
+fast-pips: $(ARCH)/pips compile
+	$(MAKE) -C $(PIPS_ROOT)/src/Passes/pips compile
+
+# generate both pips and tpips, useful for validation
+fast: fast-tpips fast-pips
+
+# helper with old targets
+test ttest ftest: 
+	@echo "\a\n\ttry 'fast' (just link) or 'full' (recompilation)\n"
 
 endif # BIN_TARGET
 endif # OLD_TEST
