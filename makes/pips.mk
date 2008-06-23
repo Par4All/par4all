@@ -68,7 +68,7 @@ fast: fast-tpips fast-pips
 
 # helper with old targets
 test ttest ftest: 
-	@echo "\a\n\ttry 'fast' (just link) or 'full' (recompilation)\n"
+	@echo -e "\a\n\ttry 'fast' (just link) or 'full' (recompilation)\n"
 
 endif # BIN_TARGET
 endif # OLD_TEST
