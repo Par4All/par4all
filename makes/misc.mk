@@ -11,3 +11,4 @@ DIFF	= gdiff
 M4	= gm4
 M4FLAGS	=
 INSTALL	= $(MAKE.d)/install.sh
+ECHO	= echo
