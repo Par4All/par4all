@@ -996,7 +996,7 @@ proper_effects                  > MODULE.proper_effects
 This phase collects information about where a given global variable is
 actually modified in the program.
 
-\marginpar{To be continued...}
+\marginpar{To be continued...by whom?}
 
 \begin{verbatim}
 filter_proper_effects         > MODULE.filtered_proper_effects
@@ -1269,14 +1269,24 @@ region_chains                   > MODULE.chains
 
 %%@UserManualDocumentation: in_out_regions_chains
 \label{subsubsection-in-out-region-based-chains}
+
 When \verb+in_out_regions_chains+ is selected, IN and OUT regions (see
 Sections~\ref{subsubsection-in-regions} and
-\ref{subsubsection-out-regions}) are used only for calls. Otherwise,
-usual regions are used. Arrays and scalars which are {\em logically}
-local to callees are ignored but the resulting parallel loops require
-some reallocation work. Ideally, the logically local variables should be
-made {\em physically} local automatically, but this is not (yet)
-implemented in \PIPS{}. \marginpar{Not clear}
+\ref{subsubsection-out-regions}) are used instead of READ and WRITE
+regions, only at call sites. Otherwise, usual regions are used. 
+
+Arrays and scalars which are {\em logically} local to callees, but
+exposed to callers because they are statically allocated or formal
+parameters, are ignored. The resulting parallel loops require some
+reallocation work in the callees. Ideally, the logically local
+variables should be made {\em physically} local automatically,
+e.g. stack allocated or dynsmically allocated, but this memory
+allocation transformation is not (yet) implemented in
+\PIPS{}. \marginpar{RK: Not clear (FI: To be deleted?)}
+
+Thus \verb+in_out_regions_chains+ are not safe: the resulting code is
+not equivalent to the input code. It is only useful for manual
+experimentss.
 
 As for region-based chains (see
 Section~\ref{subsubsection-read-write-region-based-chains}), the
@@ -1533,33 +1543,101 @@ François \textsc{Irigoin}.
 \label{subsubsection-transformers}
 \index{Transformer}
 
-\marginpar{The following is hard to read without any example for someone
-  that knows nothing about PIPS...}
+\marginpar{RK: The following is hard to read without any example for someone
+  that knows nothing about PIPS... FI: do you want to have everything in this documentation?}
 
 %%@UserManualDocumentation: transformers
 A transformer is an approximate relation between the symbolic initial
-values of integer scalar variables and their values after the execution
-of a statement (see~\cite{IJT92} and~\cite{Ir92}).
+values of scalar variables and their values after the execution of a
+statement, simple or compound (see~\cite{IJT92} and~\cite{Ir92}). In abstract
+interpretation terminology, a transformer is an abstract command
+linking the input abstract state of a statement and its output
+abstract state. 
+
+By default, only integer scalar variables are analyzed, but properties
+can be set to handle boolean, string and floating point scalar
+variables\footnote{Floating point values are combined exactly, which
+is not correct but still useful when dead code can be eliminated
+according to some parameter value.}.
+
+\texttt{
+SEMANTICS\_ANALYZE\_SCALAR\_INTEGER\_VARIABLES TRUE
+SEMANTICS\_ANALYZE\_SCALAR\_BOOLEAN\_VARIABLES FALSE
+SEMANTICS\_ANALYZE\_SCALAR\_STRING\_VARIABLES FALSE
+SEMANTICS\_ANALYZE\_SCALAR\_FLOAT\_VARIABLES FALSE
+SEMANTICS\_ANALYZE\_SCALAR\_COMPLEX\_VARIABLES FALSE
+}
+
+Transformers can be computed intraprocedurally by looking at each
+function independently or they can be computed interprocedurally
+starting with the leaves of the call tree\footnote{Recursive calls are
+not handled. Hopefully, they are detected by pipsmake to avoid looping
+forever.}.
 
 Intraprocedural algorithms use \verb+cumulated_effects+ to handle
-procedure calls. In some respect, they are interprocedural since call
-statements are accepted. Interprocedural algorithms use the
+procedure calls correctly. In some respect, they are interprocedural
+since call statements are accepted. Interprocedural algorithms use the
 \verb+summary_transformers+ of the called procedures.
 
-Fast algorithms use a very primitive non-iterative fix-point algorithm
-(two possible version: flow sensitive or flow insensitive).  Full
-algorithms use a fix-point on vector subspace (i.e. \emph{à la} K{\sc
-  arr}~\cite{Karr76}) or a fix-point on polyhedra (i.e. H{\sc
-  albwachs}/C{\sc ousot}~\cite{HC78}; implemented... but not connected
-as of Sept. 95).\marginpar{Still true?}
+Fast algorithms use a very primitive non-iterative transitive closure
+algorithm (two possible versions: flow sensitive or flow insensitive).
+Full algorithms use a transitive closure algorithm based on vector
+subspace (i.e. \emph{à la} K{\sc arr}~\cite{Karr76}) or one based on
+the discrete derivatives~\cite{Irigoin2006}. The iterative fixpoint
+algorithm for transformers (i.e. H{\sc albwachs}/C{\sc
+ousot}~\cite{HC78} is implemented but not used because the results
+obtained with transitive closure algorithms are faster and up-to-now
+sufficient.\marginpar{RK: Still true? FI: To be deleted?} Properties
+are set to select the transitive closure algorithm used (see the
+Semantics section of the property documentation~\cite{}).
+
+\texttt{
+SEMANTICS\_FIX\_POINT\_OPERATOR "derivative"
+}
+
+Additional information, such as array declarations and array
+references, can be used to improve transformers. See the property
+documentation for:
+
+\texttt{SEMANTICS\_TRUST\_ARRAY\_DECLARATIONS FALSE}
+\texttt{SEMANTICS\_TRUST\_ARRAY\_REFERENCES FALSE}
+
+Within one procedure, the transformers can be computed in forward
+mode, using precondition information gathered along. Transformers can
+also be recomputed once the preconditions are available. In both
+cases, more precise transformers are obtained because the statement
+can be better modelized using precondition information. For instance,
+a non-linear expression can turn out to be linear because the values
+of some variables are numerically known and can be used to simplify
+the initial expression. See properties:
+
+\texttt{
+SEMANTICS\_RECOMPUTE\_EXPRESSION\_TRANSFORMERS FALSE
+SEMANTICS\_COMPUTE\_TRANSFORMERS\_IN\_CONTEXT FALSE
+SEMANTICS\_RECOMPUTE\_FIX\_POINTS\_WITH\_PRECONDITIONS FALSE
+}
+
+and phase \verb/refine_transformers/.
+
+Unstructured control flow graphs can lead to very long transformer computations, whose results are usually not interesting. Their sizes are limited by two properties:
+
+\texttt{
+SEMANTICS\_MAX\_CFG\_SIZE2 20
+SEMANTICS\_MAX\_CFG\_SIZE1 20
+}
+
+discussed in the property documentation.
+
+Default value were set in the early nineties to obtain results fast
+enough for live demonstrations. They have not been changed to preserve the
+non-regression tests. However since 2005, processors are fast enough to use
+the most precise options in all cases.
 
 A transformer map contains a transformer for each statement of a
 module. It is a mapping from statements to transformers (type
 \verb+statement_mapping+, which is not a NewGen file). Transformers maps
 are stored on and retrieved from disk by {\em pipsdbm}.
 
-Note: summary effects should not be used but the summary transformer is
-in fact computed along with the transformers (François \textsc{Irigoin}, 4 Sept. 90).
 %%!UserManualDocumentation
 
 \subsubsection{Menu for Transformers}
@@ -1623,7 +1701,8 @@ transformers_inter_fast         > MODULE.transformers
 \subsubsection{Full Interprocedural Transformers}
 
 %%@UserManualDocumentation: transformers_inter_full
-Build the improved interprocedural transformers.
+Build the improved interprocedural transformers (This should be used
+as default option.).
 %%!UserManualDocumentation
 
 \begin{verbatim}
@@ -1665,9 +1744,10 @@ refine_transformers         > MODULE.transformers
 \index{Summary Transformer}
 
 A summary transformer is an interprocedural version of the module
-statement transformer, obtained by eliminating dynamic local variables. The
-filtering is based on the module summary effects. Note: each module has
-a UNIQUE top-level statement.
+statement transformer, obtained by eliminating dynamic local,
+a.k.a. stack allocated, variables. The filtering is based on the
+module summary effects. Note: each module has a UNIQUE top-level
+statement.
 
 A \verb+summary_transformer+ is of Newgen type \texttt{transformer}.
 
@@ -1689,6 +1769,9 @@ Note that variables statically initialized behave as static variables and
 are preserved between calls according to Fortran standard. The module
 initial states are abstracted by an initial precondition based on integer
 scalar variables only.
+
+Note: To be extended to handle C code. To be extended to handle properly
+unknown modules.
 
 \begin{verbatim}
 initial_precondition     > MODULE.initial_precondition
@@ -1766,7 +1849,7 @@ Section~\ref{sec:dead-code-elimination}).
 Since these two options for transformer and precondition computations are
 independent and that \verb/transformer_full_inter/ and
 \verb/preconditions_full_inter/ must be both (independently) selected
-to obtain the best possible results.
+to obtain the best possible results. These two options are recommended.
 
 % Known bug: the postcondition of a loop, computed with the {\em full}
 % option for transformers and preconditions is wrong because the last
@@ -2549,7 +2632,7 @@ alias compsec 'Complementary Sections'
 \end{verbatim}
 
 A new type of array regions, from Manjunathaiah \textsc{Muniyappa}.
-\marginpar{Sounds great ! :-)}
+\marginpar{RK: Sounds great ! :-) FI: Validation? Experimental?}
 
 \subsection{READ/WRITE Complementary Sections}
 \label{subsubsection-complementary-sections}
@@ -2739,7 +2822,7 @@ is estimated. The loop with maximal locality is chosen as innermost
 loop.
 
 This algorithm still is in the development stage. Do not use
-it!\marginpar{Who is working on ? :-/}
+it!\marginpar{RK: Who is working on ? :-/ FI! Could be redesigned by IEF.}
 
 %%!UserManualDocumentation
 
@@ -3016,7 +3099,7 @@ hpfc_compile           > MODULE.hpfc_host
 This rule deals with the compiler closing. It must deal with commons. The
 hpfc parser selection is put here. Maybe not a very good idea? (FC:
 explain! why not in \verb/hpfc_init/?) I guess
-nobody should have to require intermediate targets such as ???. Ya!\marginpar{hmmm}
+nobody should have to require intermediate targets such as ???. Ya!\marginpar{RK: hmmm; FC?}
 
 \begin{verbatim}
 hpfc_close             > PROGRAM.hpfc_commons
@@ -3050,7 +3133,7 @@ hpfc_run
 \subsection{STEP: MPI code generation from OpenMP programs}
 \label{sec:step:-mpi-code}
 
-\marginpar{IT SudParis : include your work here}
+\marginpar{RK: IT SudParis : include your work here}
 
 
 \subsection{PHRASE: high-level language transformation for partial evaluation in reconfigurable logic}
@@ -4641,9 +4724,13 @@ Not implemented yet.
 \index{freeze variables}
 
 %%@UserManualDocumentation: freeze_variables
-Function \verb+freeze_variables+ produces code where variables 
-given by the user are frozen.\marginpar{? Does it depends of the global
-  climate warming?}
+Function \verb+freeze_variables+ produces code where variables
+interactively specified by the user are transformed into
+constants. This is useful when the functionality of a code must be
+reduced. For instance, a code designed for N dimensions could be
+reduced to a 3-D code by setting N to 3. This is not obvious when N
+changes within the code. \marginpar{CA? More information? The variable
+names are requested from the PIPS user?}
 %%!UserManualDocumentation
 
 \begin{verbatim}
@@ -4669,7 +4756,11 @@ feature is low.
 \subsection{Cloning}
 
 %%@UserManualDocumentation: clone
-User assisted cloning.\marginpar{terse}
+Procedures can be cloned to obtain several specialized versions. The
+call sites must be updated to refer to the desired version.
+
+User assisted cloning.See examples in clone vslidation
+suite. \marginpar{RK: terse; to be improved by FC}
 %%!UserManualDocumentation
 \begin{verbatim}
 
@@ -5650,25 +5741,32 @@ print_parallelizedcray_code     > MODULE.parallelprinted_file
 \index{Call Graph}
 
 %%@UserManualDocumentation: callgraph_file
-This kind of file contains the sub call graph of a module. Of course,
-the call graph associated to the MAIN module is the program call graph.
+This kind of file contains the sub call graph\footnote{It is not a
+graph but a tree.} of a module. Of course, the call graph associated
+to the MAIN module is the program call graph.
 
 Each module can be decorated by {\em summary} information computed by
 {\em one} of \PIPS{} analyses.
 
 If one module has different callers, its sub call tree is replicated
-once for each caller. No fun, but how could we avoid it with a text
-output?
+once for each caller\footnote{In the ICFG , the replication would
+occur for each call site.}. 
+
+No fun to read, but how could we avoid it with a
+text output? But it is useful to check large analyses.
 %%!UserManualDocumentation
 
-The resource defined in this section is \verb/callgraph_file/ (note the
-missing underscore between call and graph in callgraph...). This is a {\em
-  file} resource which cannot be loaded in memory by {\em pipsdbm}.
+The resource defined in this section is \verb/callgraph_file/ (note
+the missing underscore between call and graph in callgraph...). This
+is a {\em file} resource to be displayed, which cannot be loaded in
+memory by {\em pipsdbm}.
 
-Note that input resource lists could be reduced to one resource, the
-decoration. \PIPSMAKE{} would deduce the other ones. There is no need
-for a transitive closure, but some people like it that way to make
-resource usage verification possible...\marginpar{explain...}
+Note that the input resource lists could be reduced to one resource,
+the decoration. \PIPSMAKE{} would deduce the other ones. There is no
+need for a transitive closure, but some people like it that way to
+make resource usage verification possible...\marginpar{RK:
+explain... FI: no idea; we would like to display any set of resources,
+but the sets are too numerous to have a phase for each.}
 
 \subsection{Menu for Call Graphs}
 
@@ -6483,8 +6581,9 @@ print_whole_dependence_graph          > MODULE.dg_file
 \subsection{Filtered Dependence Graph View}
 
 %%@UserManualDocumentation: print_filtered_dependence_graph
-Same as \texttt{print\_whole\_dependence\_graph} but it's filtered by some
-variables.\marginpar{which one?}
+Same as \texttt{print\_whole\_dependence\_graph} but it's filtered by
+some variables.\marginpar{RK: which one? FI: user\_request? Not found
+in validation suite.}
 %%!UserManualDocumentation
 
 \begin{verbatim}
@@ -6511,7 +6610,8 @@ print_filtered_dependence_daVinci_graph          > MODULE.dvdg_file
 \subsection{Filtered Dependence Graph View}
 
 %%@UserManualDocumentation: impact_check
-Check impact of alias on the dependance graph.\marginpar{What is that?}
+Check impact of alias on the dependance graph.\marginpar{RK: What is
+that? FI: Maybe, we should sign how contributions? See validation?}
 %%!UserManualDocumentation
 
 \begin{verbatim}
@@ -6613,8 +6713,11 @@ print_xml_code      > MODULE.xml_printed_file
 \end{verbatim}
 
 %%@UserManualDocumentation: print_xml_code_with_explicit_motif
-This pass generates XML code like the \textsc{print\_xml\_code} pass, but
-the input contains explicitly loops to scan motifs.\marginpar{gnih?}
+This phase was developped for the DREAM-UP/Ter@ops project to generate models
+of functions used for automatic mapping by APOTRES \cite{}. It
+generates XML code like the \textsc{print\_xml\_code} pass, but the
+input contains explicitly loops to scan motifs. It is useless for
+other purposes. \marginpar{RK: gnih? FI: to be deleted? CA: more to say?}
 %%!UserManualDocumentation
 
 \begin{verbatim}
@@ -6626,9 +6729,9 @@ print_xml_code_with_explicit_motif       > MODULE.xml_printed_file
 \end{verbatim}
 
 %%@UserManualDocumentation: print_claire_code
-This pass is used in the DREAM-UP project for specification input and
-transformation. This function can be viewed as a CLAIRE pretty-printer of
-a subset of Fortran.
+This pass is used in the DREAM-UP project for module specification
+input and transformation (?)~\cite{}. This function can be viewed as a
+CLAIRE pretty-printer of a subset of Fortran.
 %%!UserManualDocumentation
 
 \begin{verbatim}
@@ -6643,7 +6746,8 @@ print_claire_code        > MODULE.claire_printed_file
 
 
 %%@UserManualDocumentation: print_claire_code_with_explicit_motif
-This pass generates CLAIRE code like the \textsc{print\_claire\_code} pass, but the input contains explicitly loops to scan motifs.
+This pass generates CLAIRE code like the \textsc{print\_claire\_code}
+pass, but the input contains explicitly loops to scan motifs.
 %%!UserManualDocumentation
 
 \begin{verbatim}
@@ -6663,7 +6767,7 @@ Limeil-Brévannes, by Benoît de \textsc{Dinechin}, Arnauld
 \textsc{Leservot} and Alexis \textsc{Platonoff}.
 
 Unfortunately, this part is no longer used in PIPS right now because of
-some typing issues in the code. To be fixed...
+some typing issues in the code. To be fixed when somebody needs it.
 
 %%
 %% PAF-related code
