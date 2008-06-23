@@ -39,7 +39,6 @@ close_log_file(void)
 void
 open_log_file(void)
 {
-
     if (log_file != NULL)
 	close_log_file();
 

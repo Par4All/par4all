@@ -34,8 +34,11 @@ local-clean:
 	$(RM) $(DERIVED_CFILES) $(DERIVED_HEADERS) $(DERIVED_FILES)
 
 $(ARCH)/tpips: $(ARCH)/$(TPIPS_MAIN)
-$(ARCH)/revisions.o: .revisions_h
 $(ARCH)/$(LIB_TARGET): completion_list.h
+
+# revision string...
+include $(MAKE.d)/version.mk
+$(ARCH)/revisions.o: .revisions_h
 
 tp_lex.c: tp_lex.l tp_yacc.h
 	$(SCAN) tp_lex.l | \
