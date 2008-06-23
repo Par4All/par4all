@@ -31,27 +31,47 @@ $(addprefix $(ARCH)/,$(OTHER_CFILES:.c=.o)) $(LIB_OBJECTS): $(DERIVED_HEADERS)
 newgen_auto_%.h: %.c
 	$(RM) $@ ; $(PROTOIZE) $< > $@
 
-genread.h genread_yacc.c: read.y
+#
+# GENREAD
+#
+
+YY2GR	= sed '/^FILE *\*/s,=[^,;]*,,g;s,YY,GENREAD_,g;s,yy,genread_,g'
+
+genread_yacc.c: read.y
 	$(PARSE) $< 
-	sed 's,YY,GENREAD_,g;s,yy,genread_,g' < y.tab.c > genread_yacc.c
-	sed 's,YY,GENREAD_,g;s,yy,genread_,g' < y.tab.h > genread.h
+	$(YY2GR) < y.tab.c > genread_yacc.c
+	$(YY2GR) < y.tab.h > genread.h
 	$(RM) y.output y.tab.c y.tab.h
 
-#genread_lex.o: genread.h
-genread_lex.c: read.l 
-	$(SCAN) $< | \
-	sed '/^FILE *\*/s,=[^,;]*,,g;s,YY,GENREAD_,g;s,yy,genread_,g;' > $@
+genread.h: genread_yacc.c
 
-genspec.h genspec_yacc.c: gram.y
+genread_lex.c: read.l genread.h
+	$(SCAN) $< | \
+	$(YY2GR) > $@
+
+#
+# GENSPEC
+#
+
+YY2GS	= sed '/^FILE *\*/s,=[^,;]*,,g;s,YY,GENSPEC_,g;s,yy,genspec_,g'
+
+genspec_yacc.c: gram.y
 	$(PARSE) $< 
-	sed 's,YY,GENSPEC_,g;s,yy,genspec_,g' < y.tab.c > genspec_yacc.c
-	sed 's,YY,GENSPEC_,g;s,yy,genspec_,g' < y.tab.h > genspec.h
+	$(YY2GS) < y.tab.c > genspec_yacc.c
+	$(YY2GS) < y.tab.h > genspec.h
 	$(RM) y.output y.tab.c y.tab.h
 
-#genspec_lex.o: genspec.h
-genspec_lex.c: token.l
+genspec.h: genspec_yacc.c
+
+genspec_lex.c: token.l genspec.h
 	$(SCAN) $< | \
-	sed '/^FILE *\*/s,=[^,;]*,,g;s,YY,GENSPEC_,g;s,yy,genspec_,g' > $@
+	$(YY2GS) > $@
+
+#
+# AH AH AH: parallel make issue
+# artificial dependency otherwise there is a conflict y.tab.[ch]
+#
+genspec_yacc.c: genread.h
 
 $(ARCH)/newC:	$(ARCH)/new.o $(ARCH)/libgenC.a
 	$(LINK) $@ $(ARCH)/new.o $(ARCH)/libgenC.a
