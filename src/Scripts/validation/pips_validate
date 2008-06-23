@@ -268,7 +268,7 @@ for obj ; do
   [[ $failed ]] && elist="$elist$obj "
 done
 echo -e "\n$errors failed out of $dones on $(date)" >> $summary
-rm -rf *.database # cleanup
+rm -rf *.database # cold cleanup
 
 # report on stdout and possibly by mail
 if [[ $errors -eq 0 ]] ; then
@@ -277,4 +277,10 @@ else
     msg="FAILED $errors/$dones ($elist)"
 fi
 echo -e "\nvalidation $msg\n" ; cat $summary
-[[ $mail ]] && ${PIPS_MAIL:-Mail} -s "validation $msg" $mail < $summary
+if [[ $mail ]]
+then
+    ${PIPS_MAIL:-Mail} -s "validation $msg" $mail < $summary
+fi
+
+# ensure okay to make
+exit 0
