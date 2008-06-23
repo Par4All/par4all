@@ -2,26 +2,27 @@
 
 FWD_DIRS	= src makes
 
-# default is to "build"
+# default is to "build" (phase 0 to 6)
 all: build
 
 compile:
-	-test -d ./makes && $(MAKE) -C makes build
+	-test -d ./makes && $(MAKE) -C ./makes build
 	$(MAKE) -C src phase0
 	$(MAKE) -C src phase1
 	$(MAKE) -C src phase2
 	$(MAKE) -C src phase3
 	$(MAKE) -C src phase4
 	$(MAKE) -C src phase5
+	$(MAKE) tags
 
-doc:
+doc: compile
 	$(MAKE) -C src FWD_STOP_ON_ERROR= phase6
 
-htdoc:
+htdoc: doc
 	$(MAKE) -C src FWD_STOP_ON_ERROR= phase7
 
-build: compile doc
-full-build: build htdoc
+build: doc
+full-build: build 
 
 # do not include dependencies for some target
 clean: NO_INCLUDES=1
@@ -61,8 +62,7 @@ tags: tags-clean
 	$(MAKE) TAGS CTAGS
 
 # Force recompilation if the user ask for explicit TAGS or CTAGS
-.PHONY: TAGS CTAGS
-
+.PHONY: tags TAGS CTAGS
 
 # ARGH. I want both to forward and to clean locals...
 #clean: tags-clean
