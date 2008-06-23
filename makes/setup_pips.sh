@@ -107,8 +107,6 @@ type javac && echo '_HAS_JDK_ = 1' >> $config
 type latex && echo '_HAS_LATEX_ = 1' >> $config
 type htlatex && echo '_HAS_HTLATEX_ = 1' >> $config
 type emacs && echo '_HAS_EMACS_ = 1' >> $config
-# temporary hack around dependency bug
-echo "MAKEFLAGS = -j1" >> $config
 # others? copy config to newgen and linear?
 
 # whether to build the documentation depends on latex and htlatex

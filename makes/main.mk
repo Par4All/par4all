@@ -27,8 +27,7 @@ endif
 
 # the default target is to "recompile" the current directory
 all: recompile
-
-recompile: phase0 phase1 phase2 phase3 phase4 phase5 phase6
+recompile: compile
 
 ########################################################################## ROOT
 
@@ -95,7 +94,7 @@ include $(MAKE.d)/svn.mk
 
 # auto generate config if necessary
 $(MAKE.d)/config.mk:
-	echo "MAKEFLAGS = -j1" > $@
+	touch $@
 
 endif # NO_INCLUDES
 
@@ -251,8 +250,8 @@ endif # INC_CFILES
 
 name	= $(subst -,_, $(notdir $(CURDIR)))
 
-build-header-file:
-	$(COPY) $(TARGET)-local.h $(INC_TARGET); \
+$(INC_TARGET).tmp:
+	$(COPY) $(TARGET)-local.h $(INC_TARGET);
 	{ \
 	  echo "/* header file built by $(PROTO) */"; \
 	  echo "#ifndef $(name)_header_included";\
@@ -261,13 +260,19 @@ build-header-file:
 	  $(PROTOIZE) $(INC_CFILES) | \
 	  sed -f $(MAKE.d)/proto.sed ; \
 	  echo "#endif /* $(name)_header_included */"; \
-	} > $(INC_TARGET).tmp
-	$(MOVE) $(INC_TARGET).tmp $(INC_TARGET)
+	} > $@ ;
+
+build-header-file: $(INC_TARGET).tmp
+	$(MOVE) $< $(INC_TARGET)
+
+.PHONY: build-header-file
 
 # force local header construction, but only if really necessary;-)
 # the point is that the actual dependency is hold by the ".header" file,
 # so we must just check whether this file is up to date.
 header:	.header $(INC_TARGET)
+
+.PHONY: header
 
 # .header carries all dependencies for INC_TARGET:
 .header: $(TARGET)-local.h $(DERIVED_HEADERS) $(LIB_CFILES) 
@@ -417,8 +422,9 @@ phase5:
 phase6:
 phase7:
 
-clean: phase0-clean
+.PHONY: phase0 phase1 phase2 phase3 phase4 phase5 phase6 phase7
 
+clean: phase0-clean
 phase0-clean:
 	$(RM) .build_bootstrap
 
