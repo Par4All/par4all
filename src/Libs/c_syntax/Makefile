@@ -1,7 +1,6 @@
 # $Id$
 
 TARGET	= c_syntax
-
 YOPT	=	-d
 
 INC_CFILES =	c_parser.c \
@@ -9,15 +8,11 @@ INC_CFILES =	c_parser.c \
 		util.c
 
 DERIVED_HEADERS = cyacc.h
-
 DERIVED_CFILES = cyaccer.c clexer.c
 
 LIB_CFILES = 	$(INC_CFILES) $(DERIVED_CFILES)
 
-$(TARGET).h: $(DERIVED_HEADERS) $(DERIVED_CFILES) 
-
 INC_TARGET =    $(TARGET).h
-
 LIB_TARGET =    lib$(TARGET).a
 
 # common stuff
@@ -30,18 +25,25 @@ endif
 PROJECT = pips
 include $(ROOT)/makes/main.mk
 
+$(TARGET).h: $(DERIVED_HEADERS) $(DERIVED_CFILES) 
+
 # local stuff
 clean: local-clean
 
 local-clean:
 	$(RM) $(DERIVED_CFILES) $(DERIVED_HEADERS)
 
-cyaccer.c cyacc.h: cyacc.y
+# C parser
+
+YY2C	= sed '/^FILE \*yyin/s/=[^,;]*//g;s/YY/C_/g;s/yy/c_/g'
+
+cyaccer.c: cyacc.y
 	$(PARSE) cyacc.y
-	sed 's/YY/C_/g;s/yy/c_/g' y.tab.c > cyaccer.c
-	sed 's/YY/C_/g;s/yy/c_/g' y.tab.h > cyacc.h
+	$(YY2C) y.tab.c > cyaccer.c
+	$(YY2C) y.tab.h > cyacc.h
 	$(RM) y.tab.c y.tab.h
 
+cyacc.h: cyacc.c
+
 clexer.c: clex.l cyacc.h
-	$(SCAN) clex.l | \
-	sed '/^FILE \*yyin/s/=[^,;]*//g;s/YY/C_/g;s/yy/c_/g' > $@
+	$(SCAN) clex.l | $(YY2C) > $@
