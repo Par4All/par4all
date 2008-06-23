@@ -11,7 +11,7 @@
 #include "arithmetique.h"
 #include "vecteur.h"
 
-#include "y.tab.h"
+#include "sl_gram.h"
 #ifdef SCAN_VIEW
 #define RETURN(token,string) fprintf(stderr,"%s ", string) ; \
                              return(token)

@@ -57,14 +57,16 @@ include $(ROOT)/makes/main.mk
 YY2SYST	= sed '/extern char \*malloc/d;/^FILE *\*/s,=[^,;]*,,g;\
 	s/YY/SYST_/g;s/yy/syst_/g;' 
 
-sc_lex.c: sc_lex.l
+sc_lex.c: sc_lex.l sc_gram.h
 	$(SCAN) $< | $(YY2SYST)	> $@
 
-sc_gram.c sc_gram.h: sc_gram.y
+sc_gram.c: sc_gram.y
 	$(PARSE) -d $<
 	$(YY2SYST) y.tab.c > sc_gram.c
 	$(YY2SYST) y.tab.h > sc_gram.h
 	$(RM) y.tab.c y.tab.h
+
+sc_gram.h: sc_gram.c
 
 clean: local-clean
 
