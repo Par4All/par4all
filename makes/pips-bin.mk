@@ -1,7 +1,5 @@
 # $Id$
 
-include $(MAKE.d)/version.mk
-
 # build pips executables on request
 main.dir =	./$(ARCH)
 
