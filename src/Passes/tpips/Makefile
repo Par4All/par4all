@@ -40,16 +40,21 @@ $(ARCH)/$(LIB_TARGET): completion_list.h
 include $(MAKE.d)/version.mk
 $(ARCH)/revisions.o: .revisions_h
 
-tp_lex.c: tp_lex.l tp_yacc.h
-	$(SCAN) tp_lex.l | \
-	sed '/^FILE *\*/s,=[^,;]*,,g;s/YY/TP_/g;s/yy/tp_/g' > tp_lex.c
+# tpips parser
+YY2TP	= sed '/^FILE *\*/s,=[^,;]*,,g;s/YY/TP_/g;s/yy/tp_/g'
 
-tp_yacc.c tp_yacc.h: tp_yacc.y
+tp_lex.c: tp_lex.l tp_yacc.h
+	$(SCAN) tp_lex.l | $(YY2TP) > tp_lex.c
+
+tp_yacc.c: tp_yacc.y
 	$(PARSE) tp_yacc.y
-	sed 's/YY/TP_/g;s/yy/tp_/g' y.tab.c > tp_yacc.c
-	sed -e 's/YY/TP_/g;s/yy/tp_/g' y.tab.h > tp_yacc.h
+	$(YY2TP) y.tab.c > tp_yacc.c
+	$(YY2TP) y.tab.h > tp_yacc.h
 	$(RM) y.output y.tab.c y.tab.h
 
+tp_yacc.h: tp_yacc.c
+
+# tpips completion
 completion_list.h :	$(PIPS_ROOT)/include/resources.h \
 			$(PIPS_ROOT)/include/phases.h \
 			$(PIPS_ROOT)/include/printable_resources.h \
