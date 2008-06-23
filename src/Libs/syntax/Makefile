@@ -1,13 +1,6 @@
 #
 # $Id$
 #
-# -O2 is too much indeed for syntax, FC 09/06/94:-)
-# bof...
-#ifeq ($(CC),gcc)
-#CFLAGS=	-g -Wall -ansi
-#else
-#CFLAGS=	-g
-#endif
 
 TARGET	= syntax
 
@@ -27,13 +20,11 @@ INC_CFILES= 	declaration.c \
 		macros.c
 
 DERIVED_HEADERS = keywtbl.h tokyacc.h syn_yacc.h yacc.in
-
 DERIVED_CFILES = syn_yacc.c scanner.c
 
 LIB_CFILES	= $(INC_CFILES) $(DERIVED_CFILES)
 
 INC_TARGET =    $(TARGET).h
-
 LIB_TARGET =    lib$(TARGET).a
 
 # common stuff
@@ -54,21 +45,21 @@ local-clean:
 
 $(TARGET).h: $(DERIVED_HEADERS) $(DERIVED_CFILES) 
 
-syn_yacc.c syn_yacc.h yacc.in: tokyacc.h gram.y
+YY2SYN	= sed '/^FILE \*yyin/s/=[^,;]*//g;s/YY/SYN_/g;s/yy/syn_/g'
+
+yacc.in: tokyacc.h gram.y
 	cat tokyacc.h gram.y > yacc.in
-	$(PARSE) yacc.in
-	sed 's/YY/SYN_/g;s/yy/syn_/g' y.tab.c > syn_yacc.c
-	sed 's/YY/SYN_/g;s/yy/syn_/g' y.tab.h > syn_yacc.h
+
+syn_yacc.c: yacc.in
+	$(PARSE) $<
+	$(YY2SYN) y.tab.c > syn_yacc.c
+	$(YY2SYN) y.tab.h > syn_yacc.h
 	$(RM) y.tab.c y.tab.h
 
-
-# For gcc: lex generated array initializations are reformatted with sed to
-# avoid lots of gcc warnings; the two calls to sed are *not* mandatory;
-#
+sync_yacc.h: sync_yacc.c
 
 scanner.c: scanner.l syn_yacc.h
-	$(SCAN) scanner.l | \
-	sed '/^FILE \*yyin/s/=[^,;]*//g;s/YY/SYN_/g;s/yy/syn_/g' > $@
+	$(SCAN) scanner.l | $(YY2SYN) > $@
 
 keywtbl.h: warning.h f77keywords
 	# Generating $@
