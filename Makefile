@@ -19,9 +19,9 @@ VOPT	= -v
 
 .check_validate:
 	@if [ -d RESULTS ] ; then \
-	  echo \
-	    "cannot run validation with prior results still available." \
-	    "\nbefore trying to run the validation, do:\n" \
+	  echo -e \
+	    "\ncannot run validation with prior RESULTS still available." \
+	    "\nbefore trying to run the validation, do a cleanup with:\n" \
 	    "\n\t\tshell> make clean\n" ; \
 	  exit 1; \
 	fi
