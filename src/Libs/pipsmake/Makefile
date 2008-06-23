@@ -3,9 +3,7 @@
 #
 
 TARGET	= pipsmake
-
 YOPT	= -d
-
 INC_CFILES =	pipsmake.c \
 		activate.c \
 		callgraph.c \
@@ -15,13 +13,10 @@ INC_CFILES =	pipsmake.c \
 		stubs.c
 
 DERIVED_HEADERS = pipsmake_yacc.h
-
 DERIVED_CFILES = pipsmake_yacc.c pipsmake_lex.c
 
 LIB_CFILES =	$(DERIVED_CFILES)  $(INC_CFILES) 
-
 INC_TARGET = $(TARGET).h
-
 LIB_TARGET = lib$(TARGET).a
 
 # common stuff
@@ -43,13 +38,17 @@ local-clean:
 
 $(TARGET).h: $(DERIVED_CFILES)
 
-pipsmake_lex.c: readmakefile.l pipsmake_yacc.h
-	$(SCAN) readmakefile.l | \
-	sed -e '/^FILE \*yyin/s/=[^,;]*//g;s/YY/PIPSMAKE_/g;s/yy/pipsmake_/g' \
-		> $@
+# pipsmake parser
 
-pipsmake_yacc.c pipsmake_yacc.h: readmakefile.y
+YY2PM	= sed -e '/^FILE \*yyin/s/=[^,;]*//g;s/YY/PIPSMAKE_/g;s/yy/pipsmake_/g'
+
+pipsmake_lex.c: readmakefile.l 
+	$(SCAN) readmakefile.l | $(YY2PM) > $@
+
+pipsmake_yacc.c: readmakefile.y
 	$(PARSE) readmakefile.y
-	sed 's/YY/PIPSMAKE_/g;s/yy/pipsmake_/g' y.tab.c > pipsmake_yacc.c
-	sed 's/YY/PIPSMAKE_/g;s/yy/pipsmake_/g' y.tab.h > pipsmake_yacc.h
+	$(YY2PM) y.tab.c > pipsmake_yacc.c
+	$(YY2PM) y.tab.h > pipsmake_yacc.h
 	$(RM) y.tab.[hc] y.output
+
+pipsmake_yacc.h: pipsmake_yacc.c
