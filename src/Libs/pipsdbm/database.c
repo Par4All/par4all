@@ -947,9 +947,17 @@ gen_array_t db_get_module_list_initial_order(void)
   return a;  
 }
 
-/* returns an allocated array a with the sorted list of modules. 
- * strings are duplicated.
- * compilation units are not added.
+/* returns an allocated array a with the sorted list of modules.
+ * strings are duplicated.  
+ *
+ * Compilation units were not added because Fabien Coelho wanted to
+ * avoid them in validation files: they do depend on include files
+ * varying from machine to machine. Another reason to avoid them could
+ * be that they are not real module with a signature and
+ * code. However, the semantics of tpips %ALL does include them. It's
+ * up to the validation designer to avoid including varying stuff in
+ * test files. Another possibility would be to regenerate include
+ * statements...
  */
 gen_array_t db_get_module_list(void)
 {
@@ -961,7 +969,7 @@ gen_array_t db_get_module_list(void)
 	string on = db_symbol_name(os);
 	pips_assert("some symbol name", on);
 	pips_debug(9, "considering %s -> %p\n", on, or);
-	if (!same_string_p(on, "") && !compilation_unit_p(on))
+	if (!same_string_p(on, "") /* && !compilation_unit_p(on) */)
 	    gen_array_dupappend(a, on);
     },
 	get_pips_database());
