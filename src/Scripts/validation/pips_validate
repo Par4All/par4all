@@ -101,9 +101,6 @@ mkdir $odir || usage 6 "error on mkdir $odir"
 # start summary
 summary=$odir/SUMMARY
 
-# ??? what is the point?
-# [[ $vdir ]] && validation_diff $@
-
 echo "validation for $@
 in directory ${vdir}/
 for $arch architecture
