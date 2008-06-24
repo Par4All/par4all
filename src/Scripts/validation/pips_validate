@@ -29,7 +29,7 @@ function usage()
     "revision $rev\n" \
     "options:\n" \
     "  -h|--help: show some help\n" \
-    "  -v|--verbose: be verbose (repeat for more verbosity, 3 or more is debug)\n" \
+    "  -v|--verbose: be verbose (repeat for more verbosity, over 2 is debug)\n"
     "  -p|--pips pips: use this 'pips' executable, default $pips\n" \
     "  -t|--tpips tpips: use this 'tpips' executable, default $tpips\n" \
     "  -m|--mail email: send mails (not a good idea?)\n" \
@@ -108,8 +108,9 @@ in directory ${vdir}/
 for $arch architecture
 output in directory ${odir}/
 with pips=$pips
+$(${pips} -v)
 and tpips=$tpips
-$(tpips -v)
+$(${tpips} -v)
 running in directory ${rdir}/
 on $(hostname)
 by $(whoami)

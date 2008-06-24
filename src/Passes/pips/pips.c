@@ -55,13 +55,19 @@ static void pips_parse_arguments(int argc, char * argv[])
     int c;
     extern char *optarg;
     extern int optind;
+    extern char * soft_revisions;
     source_files = gen_array_make(5);
 
     while ((c = getopt(argc, argv, "vf:m:s:p:b:1:0:")) != -1)
 	switch (c) {
 	case 'v':
-	  fprintf(stderr, "pips: (ARCH=" STRINGIFY(SOFT_ARCH)
-		  ", DATE=" STRINGIFY(UTC_DATE) ") %s\n", argv[0]);
+	    fprintf(stdout, 
+		    "pips (%s)\n"
+		    "\tARCH=" STRINGIFY(SOFT_ARCH) "\n"
+		    "\tREVS %s\n"
+		    "\tDATE=" STRINGIFY(UTC_DATE) "\n", 
+		    argv[0], soft_revisions);
+	    exit(0);
 	    break;
 	case 'f':
 	    gen_array_append(source_files, optarg);

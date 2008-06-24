@@ -16,14 +16,11 @@
 
 TARGET	= pips
 
-LIB_CFILES	= pips.c
-
+LIB_CFILES	= pips.c revisions.c
 OTHER_CFILES	= main_pips.c
 
 INC_TARGET =    $(TARGET).h
-
 LIB_TARGET =    lib$(TARGET).a
-
 BIN_TARGET =	$(TARGET)
 
 INSTALL_LIB = 	$(ARCH)/main_pips.o
@@ -37,6 +34,10 @@ endif
 
 PROJECT	= pips
 include $(ROOT)/makes/main.mk
+
+# version...
+include $(MAKE.d)/version.mk
+$(ARCH)/revisions.o: .revisions_h
 
 # local stuff
 $(ARCH)/pips: $(ARCH)/$(PIPS_MAIN)
