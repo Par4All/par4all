@@ -161,7 +161,7 @@
     Compiler Output}}
 \newcommand{\Pri}{\LINK{\emph{Internal\space{}Representation}}{http://www.cri.ensmp.fr/pips/newgen/ri.htdoc}}
 \newcommand{\WPsc}{\LINK{\emph{WP65}}{http://www.cri.ensmp.fr/pips/wp65.html}}
- 
+
 %% Now the interface names :
 \newcommand{\pips}{\LINK{\texttt{pips}}{http://www.cri.ensmp.fr/pips/batch-interface.html}}
 \newcommand{\EPIPS}{\LINK{\texttt{epips}}{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual.htdoc}}
@@ -283,13 +283,13 @@ by Paul
 contains a set of menu declarations for the window-based interfaces.
 
 
-\subsection{Informal syntax}
+\section{Informal syntax}
 \label{sec:informal-syntax}
 
 To understand and to be able to write some rules, few things need to be
 understood.
 
-\subsubsection{Example}
+\subsection{Example}
 \label{sec:example}
 
 \begin{alltt}
@@ -307,7 +307,7 @@ analyzed, the \texttt{code} resource (the instructions) of the given
 on the memory) of the functions and procedures called by the given
 \texttt{MODULE}, the \texttt{CALLEES}.
 
-\subsubsection{Program pieces}
+\subsection{Program pieces}
 \label{sec:program-pieces}
 
 
@@ -330,7 +330,7 @@ The following program pieces are defined:
 \chapter{Input Files}
 \label{section-input-files}
 \index{Input File}
- 
+
 \section{User File}
 \label{subsection-user-file}
 \index{User File}
@@ -395,12 +395,12 @@ The Fortran files specified as input to \PIPS{} by the user are
 preprocessed in various ways.
 
 \begin{description}
-  
+
 \item[Fortran syntax:] if the \verb|PIPS_CHECK_FORTRAN| shell environment
   variable is defined to true, the syntax of the file is checked by
   compiling it with \verb|f77| (namely, the \verb|PIPS_FLINT| variable is
   used for that purpose, and defaults to \verb|f77 -c -ansi|).
-  
+
   In case of failure, a warning is displayed. Note that if the program
   cannot be compiled properly with a Fortran compiler, it is likely that
   many problems will be encountered within \PIPS{}.
@@ -416,7 +416,7 @@ preprocessed in various ways.
 
   The Shell variable \verb|PIPS_CPP_FLAGS| may be used to locate the include
   files. Directories to search are specified with the \verb/-I/ option.
-  
+
 \item[Fortran Split:] the file is then split into one file per module
   using a PIPS specialized version of \texttt{fsplit}\footnote{The PIPS
     version of \texttt{fsplit} is derived from the BSD \texttt{fsplit}.
@@ -429,9 +429,8 @@ preprocessed in various ways.
 
 \end{description}
 
-The output of this phase is a set of \verb|.f_initial| files in 
-per-module subdirectories. They constitute the resource 
-\verb|INITIAL_FILE|.
+The output of this phase is a set of \verb|.f_initial| files in per-module
+subdirectories. They constitute the resource \verb|INITIAL_FILE|.
 
 
 \section{Syntactic Preprocessing}
@@ -444,7 +443,7 @@ per-module subdirectories. They constitute the resource
 A second step of preprocessing is performed to produce \verb/SOURCE_FILE/
 files with standard Fortran suffix \texttt{.f} from the \verb|.f_initial|
 files. The two preprocessing steps are shown in
-Figure~\ref{figure-user-and-source-files}. 
+Figure~\ref{figure-user-and-source-files}.
 
 \begin{figure}
 \begin{center}
@@ -455,7 +454,7 @@ Figure~\ref{figure-user-and-source-files}.
 \end{figure}
 
 \begin{description}
-  
+
 \item[Cleaning:] each module source file is then processed by
   \texttt{top-level} to handle Fortran \verb|include| and to comment out
   \texttt{IMPLICIT NONE} which are not managed by \PIPS{}. Also this phase
@@ -821,10 +820,17 @@ c_parser                        > MODULE.parsed_code
         < COMPILATION_UNIT.declarations
 \end{verbatim}
 
-If you want to parse some C code using \texttt{tpips}, it is necessary to select the C
-parser with
+If you want to parse some C code using \texttt{tpips}, it is necessary to
+select the C parser with
 \begin{alltt}
 activate C_PARSER
+\end{alltt}
+Some good properties of interest (have a look at \PROPERTIES) to deal with
+a C program are
+\begin{alltt}
+PRETTYPRINT_C_CODE TRUE
+PRETTYPRINT_STATEMENT_NUMBER FALSE
+PRETTYPRINT_BLOCK_IF_ONLY TRUE
 \end{alltt}
 
 
@@ -980,12 +986,12 @@ test or an unstructured.
 Variables private to loop are handled like regular variable.
 
 Proper references try to keep the local references as much as possible. WE
-have to think a little more about this concept. 
+have to think a little more about this concept.
 
 \begin{verbatim}
 proper_effects                  > MODULE.proper_effects
-        < PROGRAM.entities 
-        < MODULE.code 
+        < PROGRAM.entities
+        < MODULE.code
         < CALLEES.summary_effects
 \end{verbatim}
 
@@ -1019,8 +1025,8 @@ statements such as a loop body or a test branch.
 
 \begin{verbatim}
 cumulated_effects               > MODULE.cumulated_effects
-        < PROGRAM.entities 
-        < MODULE.code 
+        < PROGRAM.entities
+        < MODULE.code
         < MODULE.proper_effects
 \end{verbatim}
 
