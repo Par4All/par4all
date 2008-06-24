@@ -219,7 +219,7 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
 
     /* discard_C_comment(); */
     set_current_C_line_number();
-    set_C_comment();
+    init_C_comment();
 
     /* yacc parser is called */
     c_in = safe_fopen(file_name, "r");

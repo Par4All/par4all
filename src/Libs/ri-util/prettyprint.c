@@ -2702,36 +2702,43 @@ text_instruction(
   return(r);
 }
 
-/* Handles all statements but tests that are nodes of an unstructured.
- * Those are handled by text_control.
- */
+/* Special handling for C comments with each line indented according to
+   the context.
 
-/* Special handling for C comments which are indented */
-text C_comment_to_text(int margin, string c)
+   I do not see the interest if the user code is already indented... RK
+   OK, since the blanks outside the comments are removed by the parser.
+*/
+text C_comment_to_text(int margin, string comment)
 {
+  string line;
+  string le = comment; /* position of a line end */
   text ct = make_text(NIL);
-  string lb = c; /* line beginning */
-  string le = c; /* line end */
-  string cp = c; /* current position, pointer in comments */
 
-  /* Empty comments are different from "", and "", which should never
-     occur by the way, does not neet to be printed. */
-  if(strlen(c)>0) {
-    for(;*cp!='\0';cp++) {
-      if(*cp=='\n') {
-	if(cp!=c)
-	  ADD_SENTENCE_TO_TEXT(ct, MAKE_ONE_WORD_SENTENCE(margin,gen_strndup0(lb, le-lb)));
-	lb = cp+1;
-	le = cp+1;
-      }
-      else
-	le++;
+  do {
+    /* Find the first end of line: */
+    le = strchr(comment, '\n');
+    if (le == NULL)
+      /* No end-of-line, so use all the rest of the comment: */
+      line = strdup(comment);
+    else {
+      /* Skip the '\n' at the end since the line concept is the notion of
+	 sentence */
+      line = gen_strndup0(comment, le - comment);
+      /* Analyze the next line: */
+      comment = le + 1;
     }
-  }
+    /* Do not indent if the line is empty */
+    ADD_SENTENCE_TO_TEXT(ct,
+			 MAKE_ONE_WORD_SENTENCE(line[0] == '\0' ? 0 : margin,
+						line));
+  } while (le != NULL);
   return ct;
 }
 
-text 
+/* Handles all statements but tests that are nodes of an unstructured.
+ * Those are handled by text_control.
+ */
+text
 text_statement(
     entity module,
     int margin,
@@ -2740,7 +2747,7 @@ text_statement(
     instruction i = statement_instruction(stmt);
     text r= make_text(NIL);
     text temp;
-    string label = 
+    string label =
 	entity_local_name(statement_label(stmt)) + strlen(LABEL_PREFIX);
     string comments = statement_comments(stmt);
     

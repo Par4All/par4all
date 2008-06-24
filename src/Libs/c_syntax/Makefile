@@ -38,7 +38,7 @@ local-clean:
 YY2C	= sed '/^FILE \*yyin/s/=[^,;]*//g;s/YY/C_/g;s/yy/c_/g'
 
 cyaccer.c: cyacc.y
-	$(PARSE) cyacc.y
+	$(PARSE) `pwd`/cyacc.y
 	$(YY2C) y.tab.c > cyaccer.c
 	$(YY2C) y.tab.h > cyacc.h
 	$(RM) y.tab.c y.tab.h
@@ -46,4 +46,4 @@ cyaccer.c: cyacc.y
 cyacc.h: cyacc.c
 
 clexer.c: clex.l cyacc.h
-	$(SCAN) clex.l | $(YY2C) > $@
+	$(SCAN) `pwd`/clex.l | $(YY2C) > $@

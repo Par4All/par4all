@@ -22,7 +22,6 @@
 #include "misc.h"
 #include "properties.h"
 #include "prettyprint.h"
-#include "c_syntax.h"
 
 /*===================== Variables and Function prototypes for C ===========*/
 

@@ -61,8 +61,9 @@
 #include "ri-util.h"
 #include "misc.h"
 #include "transformations.h"
+#include "alias_private.h"
 #include "instrumentation.h"
-  
+
 #include "c_parser_private.h"
 
 #include "c_syntax.h"

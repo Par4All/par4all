@@ -2,8 +2,8 @@
 
 /******************** LEXICAL ANALYZER **************************
 
-  Here are the lexical rules, based on the work of people from 
-  Open Source Quality projects (http://osq.cs.berkeley.edu/), used 
+  Here are the lexical rules, based on the work of people from
+  Open Source Quality projects (http://osq.cs.berkeley.edu/), used
   by the CCured source-to-source translator for C
 
 
@@ -17,7 +17,7 @@
  *  Wes Weimer          <weimer@cs.berkeley.edu>
  *  Ben Liblit          <liblit@cs.berkeley.edu>
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
  * met:
@@ -75,6 +75,18 @@ static int C_line_number = UNDEFINED_C_LINE_NUMBER;
 
 DEFINE_LOCAL_STACK(line_number, int)
 
+/* Count the number of c in s. */
+int character_occurences_in_string(string s, char c)
+{
+  string p = string_undefined;
+  int count = 0;
+
+  for(p=s; *p!='\0'; p++) {
+    count += (*p==c)? 1 : 0 ;
+  }
+  return count;
+}
+
 int get_current_C_line_number()
 {
   return C_line_number;
@@ -119,22 +131,27 @@ void reset_current_C_line_number()
 
 /* Comment management:
 
-   - comments in declarations are lost (because there is no
-corresponding attachment point)
+   - comments in declarations are lost (because there is no corresponding
+     attachment point)
 
-   - comments for structured control structures such as "for", "switch", "while",... are stacked;
+   - comments for structured control structures such as "for", "switch",
+     "while",... are stacked;
+
      "do .... while()" is not handled properly; "else" cannot carry a comment;
 
    - the comments for other statements are the current comments
 
-   - end-of-line comments placed after a statement are stored as
-comment for the next statement
+   - end-of-line comments placed after a statement are stored as comment
+     for the next statement
 
-   - comments appearing by the end of a block are lost (no NOP
-statement is generated to carry them)
+   - end-of-line before comments that can be retained by the C parser are
+     gathered with the comment
 
-   - linefeed and comments inside a statement are collected as a before statement
-(weird impact on print-out);
+   - comments appearing by the end of a block are lost (no NOP statement
+     is generated to carry them yet)
+
+   - linefeed and comments inside a statement are collected as a comment
+     before statement (some weird impact on print-out may occur);
 
    - some comments are still ignored, although available (to be implemented)
 
@@ -144,23 +161,41 @@ static string C_current_comment = string_undefined;
 
 DEFINE_LOCAL_STACK(comments, string)
 
+/* Return the current comment as a string to be freed (if not undefined)
+   by the caller and reset the current comment. */
 string get_current_C_comment()
 {
-  string cc = empty_comments;
-
-  if(!string_undefined_p(C_current_comment)) {
-    if(*C_current_comment=='\n')
-      cc = strdup(C_current_comment);
-    else
-      cc = strdup(C_current_comment);
-    free(C_current_comment);
-    C_current_comment = string_undefined;
-    if(*cc=='\000') {
+  string cc = C_current_comment;
+  C_current_comment = string_undefined;
+  if (cc != string_undefined) {
+    if (cc[0] == '\n') {
+      /* If the comment begins with a new-line, it is indeed the new-line
+	 that ends the previous statement, so skip it. Quicker than strlen()
+	 + memmove(): */
+      char * p = &cc[0];
+      do {
+	p[0] = p[1];
+      }
+      while (*p++ != '\0');
+      /* Note there won't be a memory leak since the orginal '\0' is in the
+	 malloc() bloc to be free()ed anyway... */
+    }
+    /* If the comment is only an empty one, do not retain it: */
+    if (cc[0] == '\0') {
       free(cc);
-      cc = empty_comments;
+      cc = string_undefined;
+    }
+    else {
+      /* Remove the trailing new-line if any since the RI is already
+	 line-oriented at the comment level: */
+      char * last_newline = strrchr(cc, '\n');
+      if (last_newline != NULL && last_newline[1] == '\0')
+	/* It is a trailing new-line: just get rid of it: */
+	last_newline[0] = '\0';
     }
   }
-
+  /* pips_debug(3, "get_current_C_comment comment \"%s\"\n",
+     cc); */
   return cc;
 }
 
@@ -168,41 +203,52 @@ void push_current_C_comment()
 {
   string cc = get_current_C_comment();
 
-  if(!string_undefined_p(cc)) {
-    pips_debug(8, "comment \"%s\" pushed at line %d\n", cc, get_current_C_line_number());
-    comments_push(cc);
-  }
+  if (string_undefined_p(cc))
+    pips_debug(3, "empty comment pushed at line %d\n",
+	       get_current_C_line_number());
+  else
+    pips_debug(3, "comment \"%s\" pushed at line %d\n", cc,
+	       get_current_C_line_number());
+   comments_push(cc);
 }
 
 string pop_current_C_comment()
 {
   string cc = comments_pop();
-
+  if (string_undefined_p(cc))
+    pips_debug(3, "empty comment poped at line %d\n",
+	       get_current_C_line_number());
+  else
+    pips_debug(3, "comment \"%s\" poped at line %d\n", cc,
+	       get_current_C_line_number());
   return cc;
 }
 
-string update_C_comment(string cc, string nc)
+/* Add a comment to the current one */
+void
+update_C_comment(string a_comment)
 {
-  if(string_undefined_p(cc)) {
-    /* We duplicate too many LF */
-    /* if(strcmp(nc, "\n")!=0) { */
-      cc = strdup(nc);
-    /* } */
-  }
-  else {
-    string oc = cc;
-    cc = strdup(concatenate(cc, nc, NULL));
-    free(oc);
-  }
-  return cc;
+  string new_comment = strdup(concatenate(C_current_comment, a_comment, NULL));
+  if (!string_undefined_p(C_current_comment))
+    free(C_current_comment);
+  C_current_comment = new_comment;
+
+  pips_debug(3,"update_C_comment %s\n", C_current_comment);
 }
 
+/* Discard a C comment because we don't know how to deal with them */
 void discard_C_comment()
 {
   if(!string_undefined_p(C_current_comment)) {
-    pips_user_warning("Comment \"%s\" is lost at line %d, "
-		      "probably because comments cannot be attached to declarations.\n",
-		      C_current_comment, C_line_number);
+    if (character_occurences_in_string(C_current_comment, '\n')
+	== strlen(C_current_comment)) {
+      /* The comments are only made of '\n', just silently discarding them */
+      pips_debug(3,"The \\n are lost, so the code presentation may be wrong...");
+    }
+    else
+      pips_user_warning("Comment \"%s\" is lost at line %d, "
+			"probably because comments cannot be attached to declarations.\n",
+			C_current_comment, C_line_number);
     free(C_current_comment);
     C_current_comment = string_undefined;
   }
@@ -215,11 +261,11 @@ void reset_C_comment(bool is_compilation_unit_p)
     free(C_current_comment);
     C_current_comment = string_undefined;
   }
-  /* Comments in the compilation unit are lost because they are related only to 
-     declarations and because comments on declarations are lost. Also, comments 
+  /* Comments in the compilation unit are lost because they are related only to
+     declarations and because comments on declarations are lost. Also, comments
      located at the end of a block are lost, as we do not generate an extra NOP to carry them. */
   if(!is_compilation_unit_p && !comments_empty_p()) {
-    int count = 0; 
+    int count = 0;
     pips_user_warning("Comments stack is not empty (only meaningful comments are shown):\n");
     while(!comments_empty_p()) {
       string c = comments_pop();
@@ -240,23 +286,23 @@ void clear_C_comment()
     free(C_current_comment);
     C_current_comment = string_undefined;
   }
-  /* Comments in the compilation unit and outside of function bodies 
-     are lost because they are related only to 
+  /* Comments in the compilation unit and outside of function bodies
+     are lost because they are related only to
      declarations and because comments on declarations are lost.*/
   if(!comments_empty_p()) {
-    int count = 0; 
-    pips_debug(8, "Comments stack is not empty:\n");
+    int count = 0;
+    pips_debug(3, "Comments stack is not empty:\n");
     while(!comments_empty_p()) {
       string c = comments_pop();
       count++;
-      pips_debug(8, "Element %d: \"%s\"\n", count, c);
+      pips_debug(3, "Element %d: \"%s\"\n", count, c);
       free(c);
     }
   }
   pips_assert("The comment stack is empty\n", comments_empty_p());
 }
 
-void set_C_comment()
+void init_C_comment()
 {
   if(!string_undefined_p(C_current_comment)) {
     pips_internal_error("Missing reset for C_current_comment");
@@ -267,18 +313,15 @@ void set_C_comment()
   make_comments_stack();
 }
 
-int character_occurences_in_string(string s, char c)
-{
-  string p = string_undefined;
-  int count = 0;
-
-  for(p=s; *p!='\0'; p++) {
-    count += (*p==c)? 1 : 0 ;
-  }
-  return count;
-}
-
 %}
+
+/* This should be used instead of the manual computation of
+   C_line_number...
+   %option   yylineno
+*/
+ /* To deal more cleanly with the comments:
+    %x COMMENT
+ */
 
 decdigit [0-9]
 octdigit [0-7]
@@ -293,30 +336,30 @@ octnum (0{octdigit}+{intsuffix}?)
 hexnum ({hexprefix}{hexdigit}+{intsuffix}?)
 exponent ([eE][\+\-]?{decdigit}+)
 fraction (\.{decdigit}+)
-decfloat (({intnum}?{fraction})|({intnum}{exponent})|({intnum}?{fraction}{exponent})|({intnum}\.)|({intnum}\.{exponent})) 
+decfloat (({intnum}?{fraction})|({intnum}{exponent})|({intnum}?{fraction}{exponent})|({intnum}\.)|({intnum}\.{exponent}))
 hexfraction (({hexdigit}*"."{hexdigit}+)|({hexdigit}+))
 binexponent ([pP]["+""-"]?{decdigit}+)
 hexfloat (({hexprefix}{hexfraction}{binexponent})|({hexprefix}{hexdigit}+{binexponent}))
 floatsuffix [fFlL]
 floatnum (({decfloat}|{hexfloat}){floatsuffix}?)
-ident ({letter}|"_")({letter}|{decdigit}|"_")* 
+ident ({letter}|"_")({letter}|{decdigit}|"_")*
 attribident (({letter}|"_")({letter}|{decdigit}|"_"|":"))
 blank [ \t\r]+
 escape ('\\'_)
 hex_escape ('\\'[xX]{hexdigit}+)
-oct_escape ('\\'{octdigit}{octdigit}?{octdigit}?) 
+oct_escape ('\\'{octdigit}{octdigit}?{octdigit}?)
 
 %%
-"/*"([^\*]|(\*+[^\/\*]))*(\*)+"/"	{ 
+"/*"([^\*]|(\*+[^\/\*]))*(\*)+"/"	{
                                 pips_debug(9,"Comment %s\n",yytext);
                                 C_line_number += character_occurences_in_string(yytext, '\n');
-                                C_current_comment = update_C_comment(C_current_comment, yytext);
+                                update_C_comment(yytext);
                         }
-"//"[^\n]*              { 
+"//"[^\n]*              {
                                 pips_debug(9,"Comment %s\n",yytext);
-                                C_current_comment = update_C_comment(C_current_comment, yytext);
+                                update_C_comment(yytext);
                         }
-^"#"[^\n]*              { 
+^"#"[^\n]*              {
                                 pips_debug(9,"Pragma comment %s\n",yytext);
                                 /* Is it a #line pragma? It has to be after preprocessing */
                                 if(/* strstr(yytext, "#line")==yytext && */ strlen(yytext)>=4) {
@@ -332,81 +375,86 @@ oct_escape ('\\'{octdigit}{octdigit}?{octdigit}?)
                                    }
                                 }
                         }
-{blank}			{ 
+{blank}			{
                                 /* Eat up whitespaces */
                         }
-\n                      { 
+\n                      {
                                 pips_debug(9,"New line %d\n", C_line_number);
 
-                                /* If in comment area (not checked...), append to current comment */
-                                C_current_comment = update_C_comment(C_current_comment, yytext);
+                                /* Gather a free "\n" as a comment to keep
+				   user presentation information. If it is
+				   in a place where we can not store a
+				   comment in the RI, it will be silenty
+				   lost. */
+				update_C_comment(yytext);
+				pips_debug(3,"CNew line %s\n", yytext);
                                 C_line_number++;
                         }
 
-"_Pragma" 	        { 
+"_Pragma" 	        {
                                 pips_debug(9,"Pragma not implemented %s\n",yytext);
 				return(TK_PRAGMA);
                         }
 
-\'[^\\]\'               { 
+\'[^\\]\'               {
                                 pips_debug(9,"TK_CHARCON: %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_CHARCON);
                         }
-\'\\[abfnrtv\'\\]\'     { 
+\'\\[abfnrtv\'\\]\'     {
                                 pips_debug(9,"TK_CHARCON: %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_CHARCON);
                         }
-\'\\0[0-9]*\'           { 
+\'\\0[0-9]*\'           {
                                 pips_debug(9,"TK_CHARCON: %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_CHARCON);
                         }
-L\'[^\\]\'              { 
+L\'[^\\]\'              {
                                 pips_debug(9,"TK_CHARCON wide character constant: %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_CHARCON);
                         }
-L\'\\[abfnrtv\'\\]\'    { 
+L\'\\[abfnrtv\'\\]\'    {
                                 pips_debug(9,"TK_CHARCON wide character constant: %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_CHARCON);
                         }
-L\'\\0[0-9]*\'          { 
+L\'\\0[0-9]*\'          {
                                 pips_debug(9,"TK_CHARCON wide character constant: %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_CHARCON);
                         }
 
-\"([^\"]|(\"\")|(\\\"))*\"	{ 
+\"([^\"]|(\"\")|(\\\"))*\"	{
                                 pips_debug(9,"TK_STRINGCON regular or wide string: %s\n",yytext);
-                                /* the "world" in L"Hello, " "world" should be treated as 
+                                /* the "world" in L"Hello, " "world" should be treated as
                                    wide even though there's no L immediately preceding it */
                                 yylval.string = strdup(yytext);
 				return(TK_STRINGCON);
                         }
-L\"([^\"]|(\"\")|(\\\"))*\"	{ 
+L\"([^\"]|(\"\")|(\\\"))*\"	{
                                 pips_debug(9,"TK_WSTRINGCON wide string: %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_WSTRINGCON);
                         }
-{floatnum}		{ 
+{floatnum}		{
                                 pips_debug(9,"TK_FLOATCON %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_FLOATCON);
                         }
-{hexnum}		{ 
+{hexnum}		{
                                 pips_debug(9,"Hexnum TK_INTCON %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_INTCON);
                         }
-{octnum}		{ 
+{octnum}		{
                                 pips_debug(9,"Octnum TK_INTCON %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_INTCON);
                         }
-{intnum}		{ 
+{intnum}		{
                                 pips_debug(9,"TK_INTCON %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_INTCON);
@@ -562,7 +610,7 @@ L\"([^\"]|(\"\")|(\\\"))*\"	{
 "~"			{
 				pips_debug(9,"TK_TILDE %s\n",yytext);
 				return(TK_TILDE);
-			}	
+			}
 "\{"                    {
 				pips_debug(9,"TK_LBRACE %s\n",yytext);
                                 discard_C_comment();
@@ -609,12 +657,12 @@ L\"([^\"]|(\"\")|(\\\"))*\"	{
 "__asm"                 {
 				pips_debug(9,"TK_ASM %s\n",yytext);
 				return(TK_ASM);
-			} 
-{ident}			{ 
+			}
+{ident}			{
                                 /* C keywords or identifiers */
 				int t = is_c_keyword_typedef(yytext);
-                                if (t>0) 
-				   { 
+                                if (t>0)
+				   {
 				       pips_debug(9,"Keyword or typedef name: %s\n",yytext);
                                        yylval.string = strdup(yytext);
                                        /* Some of the pushes are unfortunately in cyacc.y */
@@ -631,7 +679,7 @@ L\"([^\"]|(\"\")|(\\\"))*\"	{
 				       pips_debug(9,"Identifier: %s\n",yytext);
                                        yylval.string = strdup(yytext);
                                        /* push_current_C_comment(); */
-				       return(TK_IDENT); 
+				       return(TK_IDENT);
 				   }
 			}
 <<EOF>>			{

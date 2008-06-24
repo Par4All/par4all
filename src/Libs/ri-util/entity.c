@@ -14,7 +14,32 @@
 
 #include "ri-util.h"
 
-static entity 
+void print_entities(list l)
+{
+  MAP(ENTITY, e, {
+    fprintf(stderr, "%s ", entity_name(e));
+  }, l);
+}
+
+
+bool unbounded_expression_p(expression e)
+{
+  syntax s = expression_syntax(e);
+  if (syntax_call_p(s))
+    {
+      string n = entity_local_name(call_function(syntax_call(s)));
+      if (same_string_p(n, UNBOUNDED_DIMENSION_NAME))
+	return TRUE;
+    }
+  return FALSE;
+}
+
+expression make_unbounded_expression()
+{
+  return MakeNullaryCall(CreateIntrinsic(UNBOUNDED_DIMENSION_NAME));
+}
+
+static entity
 make_empty_module(
     string full_name,
     type r)
@@ -23,11 +48,10 @@ make_empty_module(
     entity e = gen_find_tabulated(full_name, entity_domain);
     entity DynamicArea, StaticArea;
 
-    /* FC: added to allow reintrance in HPFC 
-     */
+    /* FC: added to allow reintrance in HPFC */
     if (e!=entity_undefined)
     {
-	pips_user_warning("module %s already exists, returning it\n", 
+	pips_user_warning("module %s already exists, returning it\n",
 			  full_name);
 	return e;
     }
@@ -35,8 +59,8 @@ make_empty_module(
     pips_assert("undefined", e == entity_undefined);
 
     e = make_entity
-      (strdup(full_name), 
-       make_type(is_type_functional, 
+      (strdup(full_name),
+       make_type(is_type_functional,
 		 make_functional(NIL, r)),
        MakeStorageRom(),
        make_value(is_value_code,

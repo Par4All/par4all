@@ -198,28 +198,11 @@ entity make_new_integer_scalar_common_variable(string name, entity mod, entity c
   return e;
 }
 
-bool unbounded_expression_p(expression e)
-{
-  syntax s = expression_syntax(e);
-  if (syntax_call_p(s)) 
-    {
-      string n = entity_local_name(call_function(syntax_call(s)));
-      if (same_string_p(n, UNBOUNDED_DIMENSION_NAME))
-	return TRUE;
-    }
-  return FALSE;  
-}
- 
-expression make_unbounded_expression()
-{
-  return MakeNullaryCall(CreateIntrinsic(UNBOUNDED_DIMENSION_NAME));
-}
-
 bool array_entity_p(entity e)
 {
   if (entity_variable_p(e))
     {
-      variable var = type_variable(entity_type(e));   
+      variable var = type_variable(entity_type(e));
       if (!ENDP(variable_dimensions(var)))  return TRUE;
     }
   return FALSE;
@@ -283,18 +266,11 @@ bool pointer_type_array_p(entity e)
 }
 
 bool unnormalized_array_p(entity e)
-{  
+{
   /* return TRUE if e is an assumed-size array or a pointer-type array*/
   if (assumed_size_array_p(e) || pointer_type_array_p(e))
     return TRUE;
   return FALSE;
-}
-
-void print_entities(list l)
-{
-  MAP(ENTITY, e, { 
-    fprintf(stderr, "%s ", entity_name(e));
-  }, l);
 }
 
 static list my_list_intersection(list l1, list l2)

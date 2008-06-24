@@ -948,13 +948,13 @@ type UpdateType(type t1, type t2)
 void CCompilationUnitMemoryAllocation(entity module)
 {
   /* Should be followed by preconditions */
-  entity msae = FindOrCreateEntity(compilation_unit_name,  STATIC_AREA_LOCAL_NAME);
+  //entity msae = FindOrCreateEntity(compilation_unit_name,  STATIC_AREA_LOCAL_NAME);
   //area msa = type_area(entity_type(msae));
-  entity gsae = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,  STATIC_AREA_LOCAL_NAME);
+  //entity gsae = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,  STATIC_AREA_LOCAL_NAME);
   //area gsa = type_area(entity_type(gsae));
-  entity fdae = FindOrCreateEntity(get_current_module_name(), DYNAMIC_AREA_LOCAL_NAME);
+  //entity fdae = FindOrCreateEntity(get_current_module_name(), DYNAMIC_AREA_LOCAL_NAME);
   //area fda = type_area(entity_type(fdae));
-  entity fsae = FindOrCreateEntity(get_current_module_name(), STATIC_AREA_LOCAL_NAME);
+  //entity fsae = FindOrCreateEntity(get_current_module_name(), STATIC_AREA_LOCAL_NAME);
   //area fsa = type_area(entity_type(fsae));
   
   /* Code for reallocation of memory problem due to reparsing of compilation unit
@@ -1582,15 +1582,16 @@ void AddToCalledModules(entity e)
     }
 }
 
-// No Declaration Check for variables and functions 
+
+// No Declaration Check for variables and functions
 static bool declarationerror_p;
 
 static bool referencenodeclfilter(reference r)
 {
   entity e = reference_variable(r);
-    
+
   if(variable_entity_p(e)){
-  if(!(gen_in_list_p(e, entity_declarations(get_current_module_entity())) 
+  if(!(gen_in_list_p(e, entity_declarations(get_current_module_entity()))
        || gen_in_list_p(e, entity_declarations(get_current_compilation_unit_entity()))))
     {
       declarationerror_p = TRUE;
@@ -1598,18 +1599,22 @@ static bool referencenodeclfilter(reference r)
 	       entity_local_name(e),get_current_module_name());
     }
   }
-  // There cannot a reference to variable of storage return 
+  // There cannot a reference to variable of storage return
   if(storage_return_p(entity_storage(e))){
     declarationerror_p = TRUE;
      user_log("\n\nNo declaration of variable: %s in module: %s \n",
 	      entity_local_name(e),get_current_module_name());
   }
+
+  return TRUE;
 }
+
+
 static bool callnodeclfilter(call c)
 {
   entity e = call_function(c);
   if(value_code_p(entity_initial(e))) {
-  if(!(gen_in_list_p(e, entity_declarations(get_current_module_entity())) 
+  if(!(gen_in_list_p(e, entity_declarations(get_current_module_entity()))
        || gen_in_list_p(e, entity_declarations(get_current_compilation_unit_entity()))))
     {
       declarationerror_p = TRUE;
@@ -1617,7 +1622,10 @@ static bool callnodeclfilter(call c)
 	       entity_local_name(e), get_current_module_name());
     }
   }
+
+  return TRUE;
 }
+
 
 void
 nodecl_p(entity __attribute__ ((unused)) module, statement stat)
