@@ -107,6 +107,7 @@ for $arch architecture
 output in directory ${odir}/
 with pips=$pips
 and tpips=$tpips
+$(tpips -v)
 running in directory ${rdir}/
 on $(hostname) 
 by $(whoami)
