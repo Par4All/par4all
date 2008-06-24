@@ -28,14 +28,14 @@ function usage()
     "$script [options] directories or files...\n" \
     "revision $rev\n" \
     "options:\n" \
-    "  -h: show some help\n" \
-    "  -v: be verbose (repeat for more verbosity, 3 or more is debug)\n" \
-    "  -p pips: use this 'pips' executable, default $pips\n" \
-    "  -t tpips: use this 'tpips' executable, default $tpips\n" \
-    "  -m email: send mails (not a good idea?)\n" \
-    "  -V dir: validation directory, default '$vdir'\n" \
-    "  -R dir: running directory, default '.'\n" \
-    "  -O dir: output directory, default '.'\n" \
+    "  -h|--help: show some help\n" \
+    "  -v|--verbose: be verbose (repeat for more verbosity, 3 or more is debug)\n" \
+    "  -p|--pips pips: use this 'pips' executable, default $pips\n" \
+    "  -t|--tpips tpips: use this 'tpips' executable, default $tpips\n" \
+    "  -m|--mail email: send mails (not a good idea?)\n" \
+    "  -V|--valid dir: validation directory, default '$vdir'\n" \
+    "  -R|--run dir: running directory, default '.'\n" \
+    "  -O|--out|--output dir: output directory, default '.'\n" \
     "arguments:\n" \
     "  validation directories (e.g. Semantics Regions ...)\n" \
     "  or files (e.g. Semantics/w14.f ...)\n"
@@ -49,7 +49,7 @@ function verb()
   local level=$1 msg=$2
   [[ $verb -ge $level ]] && {
       while let level-- ; do echo -n '#' ; done
-      echo " $msg" 
+      echo " $msg"
   } >&2
 }
 
@@ -101,6 +101,8 @@ mkdir $odir || usage 6 "error on mkdir $odir"
 # start summary
 summary=$odir/SUMMARY
 
+[[ $vdir ]] && validation_diff $@
+
 echo "validation for $@
 in directory ${vdir}/
 for $arch architecture
@@ -109,7 +111,7 @@ with pips=$pips
 and tpips=$tpips
 $(tpips -v)
 running in directory ${rdir}/
-on $(hostname) 
+on $(hostname)
 by $(whoami)
 at $(date)
 " >> $summary
@@ -133,12 +135,12 @@ function validate_file()
   # full_name='/some/path/to/directory/file'
   # name='file'
   # upper='FILE'
-  local full_name=${file%.[cfF]} 
+  local full_name=${file%.[cfF]}
   local name=${full_name/*\//}
   local upper=$(echo $name | tr '[a-z]' '[A-Z]')
 
   # dir='/some/path/to/directory'
-  local dir=${full_name%/*} 
+  local dir=${full_name%/*}
   [[ -d $dir ]] || usage 13 "no such 'dir' directory: $dir"
 
   # fix path to help more or less relative validation?
@@ -171,12 +173,12 @@ function validate_file()
     # ??? what about using default_test substitution?!
     $full_name.test 2> $out.err ; status=$?
 
-  elif [[ -r $full_name.tpips ]] ; then 
+  elif [[ -r $full_name.tpips ]] ; then
     verb 3 "$prefix.tpips method"
     verb 4 "$tpips $full_name.tpips"
     $tpips $full_name.tpips 2> $out.err ; status=$?
 
-  elif [[ -r $full_name.tpips2 ]] ; then 
+  elif [[ -r $full_name.tpips2 ]] ; then
     verb 3 "$prefix.tpips2 method (with stderr... bad idea)"
     verb 4 "$tpips $full_name.tpips"
     $tpips $full_name.tpips2 2>&1 ; status=$?
@@ -190,24 +192,24 @@ function validate_file()
 	-e "s/TESTED_NAME/$upper/g" \
 	< $dir/default_test | /bin/sh 2> $out.err
     status=$?
-    
+
   elif [[ -r $dir/default_tpips ]] ; then
     verb 3 'default_tpips method'
     verb 4 "FILE=$file WSPACE=$name ${tpips} $dir/default_tpips"
     FILE=$file WSPACE=$name \
 	${tpips} $dir/default_tpips 2> $out.err ; status=$?
-    
+
   else
     verb 3 'default method: Init/Display/Delete'
     {
-      Delete $name 2> /dev/null 1>&2 # ignore delete failure... 
+      Delete $name 2> /dev/null 1>&2 # ignore delete failure...
       Init -f $file -d $name ; status=$?
       while read module ; do
 	Display -m $module -w $name ; status=$?
       done < $name.database/modules
-      Delete $name 2> /dev/null 1>&2 # ignore delete failure... 
+      Delete $name 2> /dev/null 1>&2 # ignore delete failure...
     } 2> $out.err
-  fi > $out.tmp 
+  fi > $out.tmp
 
   verb 4 "Status = $status"
 
@@ -222,7 +224,7 @@ function validate_file()
     # generate diff and clean if okay
     local file_resdir=$full_name.result
     [[ -d $file_resdir ]] || usage 15 "no result directory: $file_resdir"
-    
+
     local reference=$file_resdir/test.$arch
     [[ -f $reference ]] || reference=$file_resdir/test
 

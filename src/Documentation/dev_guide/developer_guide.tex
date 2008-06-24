@@ -963,10 +963,18 @@ Two validation scripts are available:
   and pips with some level of debugging on, because these outputs are not
   very stable from one architecture to another.
 
-\item[manual\_accept] \index{Validate} interactive script to accept
-  new validation results. Then commit these changes to the validation
-  repository, if and only if the corresponding pips sources are already
-  committed!
+\item[manual\_accept] \index{Validate} interactive script to accept new
+  validation results. It accepts a list of directories to ask for
+  accepting or it deals with all the validation by default.
+
+  Once you have accepts the new states as a reference for some validation
+  items, you need to commit these changes to the validation repository, if
+  and only if the corresponding pips sources are already in the subversion
+  repository of course!
+
+  If you are Emacs oriented, setting the \verb|PIPS_DIFF| environment
+  variable to \verb|pips_emacs_diff| to use graphical Ediff mode sounds
+  like a good idea.
 \end{description}
 
 %%\begin{itemize}
@@ -1141,12 +1149,20 @@ stored in the \texttt{src/Documentation} directory.
 
 For example this guide is stored in \verb|src/Documentation/dev_guide|.
 
+Have a look also on \S~\ref{sec:brows-source-files} about Doxygen
+documentation of the sources.
+
 
 \subsection{Web site}
 \label{sec:web-site}
 
 The various PIPS documentations can be published on the web site
 \PipsOldWWW with the \verb|pips_publish_www| once you have compiled it.
+
+To publish the Doxygen documentation of the sources, as explained in
+\S~\ref{sec:brows-source-files}, once you have compiled the Doxygen
+version, use a \texttt{make publish} to push the files on the PIPS Doxygen
+server.
 
 There is also a new dynamic web site \PipsNewWWW that reference better the
 information stored on\PipsOldWWW. The idea is to have the content edited

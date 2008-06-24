@@ -2,7 +2,8 @@
 
 SCRIPTS = \
 	pips_validate \
-	manual_accept
+	manual_accept \
+	pips_emacs_diff
 
 INSTALL_UTL =	$(SCRIPTS)
 
