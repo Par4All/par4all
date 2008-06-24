@@ -91,7 +91,7 @@ local-clean:
 
 
 # what to do depending on phases
-phase2: allhs
+phase1: allhs
 
 # common stuff
 ifdef PIPS_ROOT
