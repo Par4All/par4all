@@ -1,30 +1,5 @@
 #! /bin/bash
-# $Id: pips_validate 12881 2008-06-22 09:50:39Z coelho $
+# $Id$
 
-# Display the Ediff of 2 files in Emacs
-
-# Old code I've first test in pips_validate
-#     "  -d|--diff [file_name]: quickly launch an Emacs in Ediff mode to show the difference in the validation of a given file or for all the validation\n" \
-# function validation_diff()
-# {
-#     files=$@
-#     if [[ ! $files ]] ; then
-# 	# No argument give, use all the validation results
-# 	files=`sed -n -e 's/^\(changed\|failed:\): //p' $vdir/RESULTS/SUMMARY`
-#     fi
-
-#     echo $@
-#     for f in $files; do
-# 	echo $f
-# 	# To be optimized by Fabien :-)
-# 	d=`echo $f | sed "s/\..*$//"`.result
-# 	# To speed up launching (because emacsclient can not finely
-# 	# command an Emacs), use the quick mode to skip *any*
-# 	# initialization.
-# 	emacs -Q --eval='(ediff-files "'$d/test'" "'$d/out'")'
-#     done
-#     exit 0
-# }
-
-
+# should it rather be emacs-client?
 emacs -Q --eval='(ediff-files "'$1'" "'$2'")'
