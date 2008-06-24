@@ -48,7 +48,7 @@ $(TARGET).h: $(DERIVED_HEADERS) $(DERIVED_CFILES)
 YY2SYN	= sed '/^FILE \*yyin/s/=[^,;]*//g;s/YY/SYN_/g;s/yy/syn_/g'
 
 yacc.in: tokyacc.h gram.y
-	cat tokyacc.h gram.y > yacc.in
+	cat tokyacc.h gram.y > $@
 
 syn_yacc.c: yacc.in
 	$(PARSE) $<
@@ -56,21 +56,20 @@ syn_yacc.c: yacc.in
 	$(YY2SYN) y.tab.h > syn_yacc.h
 	$(RM) y.tab.c y.tab.h
 
-sync_yacc.h: sync_yacc.c
+syn_yacc.h: syn_yacc.c
 
 scanner.c: scanner.l syn_yacc.h
 	$(SCAN) scanner.l | $(YY2SYN) > $@
 
 keywtbl.h: warning.h f77keywords
-	# Generating $@
 	{ cat warning.h ; \
 	  echo "#include \"syn_yacc.h\"" ; \
 	  echo "static struct Skeyword keywtbl[] = {" ;\
 	  sed "s/^.*/{\"&\", TK_&},/" f77keywords ;\
 	  echo "{0, 0}" ;\
-	  echo "};" ; } > keywtbl.h
+	  echo "};" ; } > $@
 
 tokyacc.h: warning.h f77keywords f77symboles
 	{ cat warning.h ; \
 	sed 's,\([^A-Z]*\)\(.*\),%token \1 TK_\2,' f77keywords f77symboles ;\
-	} > tokyacc.h
+	} > $@
