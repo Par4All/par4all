@@ -34,7 +34,6 @@ void adi(double **a,double **b,double **c,double **d,double **e,double **f,doubl
    void tridag();
    if (jmax>50)
       nrerror("in ADI, increase JJ");
-   
    if (k>6-1)
       nrerror("in ADI, increase KK");
    psi = dmatrix(1, 50, 1, 50);
@@ -79,7 +78,6 @@ void adi(double **a,double **b,double **c,double **d,double **e,double **f,doubl
       for (l = 2;l<=jmax-1;l++)
       {
          anormg += fabs(g[j][l]);
-         
          psi[j][l] = -(d[j][l]*u[j][l-1])+(r[1]-e[j][l])*u[j][l]-f[j][l]*u[j][l+1];
       }
    nits = 100/nr;
@@ -100,7 +98,6 @@ void adi(double **a,double **b,double **c,double **d,double **e,double **f,doubl
             }
             tridag(aa, bb, cc, rr, uu, jmax-2);
             for (j = 2;j<=jmax-1;j++)
-               
                psi[j][l] = -psi[j][l]+2.0*r[n]*uu[j-1];
          }
          for (j = 2;j<=jmax-1;j++)
@@ -124,9 +121,7 @@ void adi(double **a,double **b,double **c,double **d,double **e,double **f,doubl
       for (j = 2;j<=jmax-1;j++)
          for (l = 2;l<=jmax-1;l++)
          {
-            
             resid = a[j][l]*u[j-1][l]+(b[j][l]+e[j][l])*u[j][l];
-            
             resid += c[j][l]*u[j+1][l]+d[j][l]*u[j][l-1]+f[j][l]*u[j][l+1]+g[j][l];
             anorm += fabs(resid);
          }
@@ -146,8 +141,6 @@ void adi(double **a,double **b,double **c,double **d,double **e,double **f,doubl
    }
    nrerror("in ADI, too many iterations");
 }
-   extern void adi();
-   extern void tridag();
 void tridag(double *a,double *b,double *c,double *r,double *u,int n)
 {
    int j;
@@ -156,19 +149,22 @@ void tridag(double *a,double *b,double *c,double *r,double *u,int n)
    double *dvector();
    void nrerror();
    void free_dvector();
-   
    gam = dvector(1, n);
-   if (b[1]==0.0) nrerror("error 1 in TRIDAG");
+   if (b[1]==0.0)
+      nrerror("error 1 in TRIDAG");
    bet = b[1];
    u[1] = r[1]/bet;
    for (j = 2;j<=n;j++)
    {
       gam[j] = c[j-1]/bet;
       bet = b[j]-a[j]*gam[j];
-      if (bet==0.0) nrerror("error 2 in TRIDAG");
+      if (bet==0.0)
+         nrerror("error 2 in TRIDAG");
       u[j] = (r[j]-a[j]*u[j-1])/bet;
    }
    for (j = n-1;j>=1;j--)
       u[j] -= gam[j+1]*u[j+1];
    free_dvector(gam, 1, n);
 }
+   extern void adi();
+   extern void tridag();
