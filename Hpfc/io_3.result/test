@@ -1,4 +1,4 @@
---- Hpfc Validation for io_3
+--- Hpfc Validation for $VDIR/io_3.f
 
 !
 ! File IO_host.f
@@ -18,12 +18,14 @@
       PRINT *, 'i = ', I
       PRINT *, 'bye'
 ! updating shared variable I
-      BUF INDEX = 0
-      SEND NOT INITIALIZED = .TRUE.
-      BUF INDEX = BUF INDEX+1
-      HPFC INTEGER4 BUFF(BUF INDEX) = I
-      CALL HPFC INTEGER4 BUFPCK
-      CALL HPFC HCAST
+      IF (I.EQ.1) THEN
+         BUF INDEX = 0
+         SEND NOT INITIALIZED = .TRUE.
+         BUF INDEX = BUF INDEX+1
+         HPFC INTEGER4 BUFF(BUF INDEX) = I
+         CALL HPFC INTEGER4 BUFPCK
+         CALL HPFC HCAST
+      ENDIF
 ! end of update
       CALL HPFC HOST END
       END
@@ -54,13 +56,15 @@
       CALL HPFC INIT NODE
       I = 0
 ! updating shared variable I
-      BUF INDEX = 0
-      RECEIVED NOT PERFORMED = .FALSE.
-      SIZE OF RECEIVED BUFFER = 0
-      CALL HPFC NCAST
-      CALL HPFC INTEGER4 BUFUPK
-      BUF INDEX = BUF INDEX+1
-      I = HPFC INTEGER4 BUFF(BUF INDEX)
+      IF (I.EQ.1) THEN
+         BUF INDEX = 0
+         RECEIVED NOT PERFORMED = .FALSE.
+         SIZE OF RECEIVED BUFFER = 0
+         CALL HPFC NCAST
+         CALL HPFC INTEGER4 BUFUPK
+         BUF INDEX = BUF INDEX+1
+         I = HPFC INTEGER4 BUFF(BUF INDEX)
+      ENDIF
 ! end of update
       CALL HPFC NODE END
       END
