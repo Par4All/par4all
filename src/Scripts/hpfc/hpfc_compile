@@ -157,7 +157,7 @@ done
 
 FAKES="`egrep '^[Cc!\*][Ff][Cc][Dd]\\\$ [ 	]*([Ss][Yy][Nn][Cc][Hh][Rr][Oo]|[Tt][Ii][Mm][Ee]|[Hh][Oo][Ss][Tt]|[Kk][Ii][Ll][Ll]|[Tt][Ee][Ll][Ll])' $HPFFILES`"
 
-dir=${HPFC_RUNTIME:-${PIPS_ROOT}/Share}
+dir=${HPFC_RUNTIME:-${PIPS_ROOT}/share}
 
 if [ "$FAKES" ] 
 then
@@ -183,14 +183,14 @@ stubs="`eval echo $stubs`"
 $debug "stubs: $stubs"
 
 # looks for the specified stubs file in
-# (1) ./ (2) $PIPS_ROOT/Share
+# (1) ./ (2) $PIPS_ROOT/share
 # prefers preprocessed versions (.direct) to .f
 
 for s in $stubs
 do
     x=`basename $s .f`
     NOTDONE=1
-    for f in $x.direct $s $PIPS_ROOT/Share/$x.direct $PIPS_ROOT/Share/$s
+    for f in $x.direct $s $PIPS_ROOT/share/$x.direct.f $PIPS_ROOT/share/$s
     do
 	test -f $f -a "$NOTDONE" && {
 	    HPFFILES="$HPFFILES $f"
