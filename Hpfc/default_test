@@ -2,25 +2,12 @@
 #
 # HPFC default test
 #
-# (c) Fabien COELHO, 07/03/94
-# 
 # $Id$
 #
 
-dir=${PIPS_ROOT}/Validation/`basename \`dirname $0\``
-PIPS="${pips_version:-pips}"
-
-echo "pips is ${PIPS}" >&2
 echo "--- Hpfc Validation for tested_file"
 echo
 
-file=${dir}/tested_file.f
-test -f ${dir}/tested_file.F && file=${dir}/tested_file.F
-
-#
 # uses the validate command of the hpfc driver.
 
-hpfc validate -p ${PIPS} ${file} ${dir}/include/stub.f
-
-# that is all
-# 
+hpfc validate tested_file include/stub.f
