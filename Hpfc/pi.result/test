@@ -1,4 +1,4 @@
---- Hpfc Validation for pi
+--- Hpfc Validation for $VDIR/pi.f
 
 !
 ! File PI_host.f
@@ -12,7 +12,7 @@
       include "PI_parameters.h"
       INTEGER*4 N
       PARAMETER (N = 1000)
-      REAL*8 GSUM,W
+      REAL*8 GSUM, W
       CALL HPFC INIT HOST
       W = 1.0/REAL(N)
       GSUM = 0.0
@@ -66,8 +66,8 @@
       include "PI_parameters.h"
       INTEGER*4 N
       PARAMETER (N = 1000)
-      INTEGER I_3,I_2,I_1,I_0,I
-      REAL*8 V(1:125),X,GSUM,W
+      INTEGER I_3, I_2, I_1, I_0, I
+      REAL*8 V(1:125), X, GSUM, W
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_1, I_2, I_3, 1, N, 1, 1)
       W = 1.0/REAL(N)

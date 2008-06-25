@@ -1,4 +1,4 @@
---- Hpfc Validation for kill_and_remaps
+--- Hpfc Validation for $VDIR/kill_and_remaps.f
 
 !
 ! File KILLANDREMAP_A_1_2_node.h
@@ -9,7 +9,7 @@
 ! send part
 ! remapping A[2]: A_1[1] -> A[2]
             PSI1 = MY POS(1,1)
-            IF (MY LID.LE.2) THEN
+            IF (MY LID.LE.2.AND.1.LE.PSI1.AND.PSI1.LE.2) THEN
                DO PSIp1 = (-3+8*PSI1)/5, 2
                   T LID = PSIp1
                   IF (MY LID.NE.T LID) THEN
@@ -38,7 +38,7 @@
             ENDIF
 ! receive part
             PSIp1 = MY POS(1,1)
-            IF (MY LID.LE.2) THEN
+            IF (MY LID.LE.2.AND.1.LE.PSIp1.AND.PSIp1.LE.2) THEN
                DO PSI1 = 1, (7+5*PSIp1)/8
                   T LID = PSI1
                   IF (MY LID.NE.T LID) THEN
@@ -153,8 +153,8 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "KILLANDREMAP_parameters.h"
-      INTEGER LALPHA1,LALPHAp1,PSI1,PSIp1,T LID,I_3,I_2,I_1
-      INTEGER A(1:5),A_1(1:8)
+      INTEGER LALPHA1, LALPHAp1, PSI1, PSIp1, T LID, I_3, I_2, I_1
+      INTEGER A(1:5), A_1(1:8)
       CALL HPFC INIT NODE
 ! all livenesss for A
       LIVE MAPPING(2) = .FALSE.

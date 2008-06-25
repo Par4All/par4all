@@ -1,4 +1,4 @@
---- Hpfc Validation for hpftest73b
+--- Hpfc Validation for $VDIR/hpftest73b.f
 
 !
 ! File TEST73_A_2_5_node.h
@@ -10,7 +10,8 @@
 ! remapping A[5]: A_1[2] -> A[5]
             PSI1 = MY POS(1,1)
             PSI2 = MY POS(2,1)
-            IF (MY LID.LE.4) THEN
+            IF (MY LID.LE.4.AND.1.LE.PSI1.AND.PSI1.LE.2.AND.PSI2.LE.2
+     &      .AND.1.LE.PSI2) THEN
                DO PSIp1 = 1, 2
                   DO PSIp2 = 1, 2
                      T LID = -2+2*PSIp1+PSIp2
@@ -41,7 +42,8 @@
 ! receive part
             PSIp1 = MY POS(1,1)
             PSIp2 = MY POS(2,1)
-            IF (MY LID.LE.4) THEN
+            IF (MY LID.LE.4.AND.1.LE.PSIp1.AND.PSIp1.LE.2.AND.1.LE.
+     &      PSIp2.AND.PSIp2.LE.2) THEN
                DO PSI1 = 1, 2
                   DO PSI2 = 1, 2
                      T LID = -2+2*PSI1+PSI2
@@ -96,7 +98,8 @@
 ! remapping A[5]: A[5] -> A_1[2]
             PSI1 = MY POS(1,1)
             PSI2 = MY POS(2,1)
-            IF (MY LID.LE.4) THEN
+            IF (MY LID.LE.4.AND.1.LE.PSI1.AND.PSI1.LE.2.AND.PSI2.LE.2
+     &      .AND.1.LE.PSI2) THEN
                DO PSIp1 = 1, 2
                   DO PSIp2 = 1, 2
                      T LID = -2+2*PSIp1+PSIp2
@@ -127,7 +130,8 @@
 ! receive part
             PSIp1 = MY POS(1,1)
             PSIp2 = MY POS(2,1)
-            IF (MY LID.LE.4) THEN
+            IF (MY LID.LE.4.AND.1.LE.PSIp1.AND.PSIp1.LE.2.AND.1.LE.
+     &      PSIp2.AND.PSIp2.LE.2) THEN
                DO PSI1 = 1, 2
                   DO PSI2 = 1, 2
                      T LID = -2+2*PSI1+PSI2
@@ -182,7 +186,8 @@
 ! remapping B[4]: B_2[1] -> B_1[3]
             PSI1 = MY POS(1,1)
             PSI2 = MY POS(2,1)
-            IF (MY LID.LE.4) THEN
+            IF (MY LID.LE.4.AND.1.LE.PSI1.AND.PSI1.LE.2.AND.PSI2.LE.2
+     &      .AND.1.LE.PSI2) THEN
                DO PSIp1 = 1, 2
                   DO PSIp2 = 1, 2
                      T LID = -2+2*PSIp1+PSIp2
@@ -213,7 +218,8 @@
 ! receive part
             PSIp1 = MY POS(1,1)
             PSIp2 = MY POS(2,1)
-            IF (MY LID.LE.4) THEN
+            IF (MY LID.LE.4.AND.1.LE.PSIp1.AND.PSIp1.LE.2.AND.1.LE.
+     &      PSIp2.AND.PSIp2.LE.2) THEN
                DO PSI1 = 1, 2
                   DO PSI2 = 1, 2
                      T LID = -2+2*PSI1+PSI2
@@ -268,7 +274,8 @@
 ! remapping B[4]: B_1[3] -> B_2[1]
             PSI1 = MY POS(1,1)
             PSI2 = MY POS(2,1)
-            IF (MY LID.LE.4) THEN
+            IF (MY LID.LE.4.AND.1.LE.PSI1.AND.PSI1.LE.2.AND.PSI2.LE.2
+     &      .AND.1.LE.PSI2) THEN
                DO PSIp1 = 1, 2
                   DO PSIp2 = 1, 2
                      T LID = -2+2*PSIp1+PSIp2
@@ -299,7 +306,8 @@
 ! receive part
             PSIp1 = MY POS(1,1)
             PSIp2 = MY POS(2,1)
-            IF (MY LID.LE.4) THEN
+            IF (MY LID.LE.4.AND.1.LE.PSIp1.AND.PSIp1.LE.2.AND.1.LE.
+     &      PSIp2.AND.PSIp2.LE.2) THEN
                DO PSI1 = 1, 2
                   DO PSI2 = 1, 2
                      T LID = -2+2*PSI1+PSI2
@@ -354,7 +362,8 @@
 ! remapping B[4]: B[4] -> B_1[3]
             PSI1 = MY POS(1,1)
             PSI2 = MY POS(2,1)
-            IF (MY LID.LE.4) THEN
+            IF (MY LID.LE.4.AND.1.LE.PSI2.AND.PSI2.LE.2.AND.1.LE.PSI1
+     &      .AND.PSI1.LE.2) THEN
                PSIp1 = PSI1
                DO PSIp2 = 1, 2
                   T LID = -2+2*PSIp1+PSIp2
@@ -383,7 +392,8 @@
 ! receive part
             PSIp1 = MY POS(1,1)
             PSIp2 = MY POS(2,1)
-            IF (MY LID.LE.4) THEN
+            IF (MY LID.LE.4.AND.1.LE.PSIp1.AND.PSIp1.LE.2.AND.1.LE.
+     &      PSIp2.AND.PSIp2.LE.2) THEN
                PSI1 = PSIp1
                DO PSI2 = 1, 2
                   T LID = -2+2*PSI1+PSI2
@@ -647,11 +657,11 @@ c
       PARAMETER (N = 1024)
       INTEGER*4 NTIME
       PARAMETER (NTIME = 10)
-      INTEGER HPFC BUFID,HPFC INFO,LALPHA1,LALPHA2,LALPHAp1,LALPHAp2,
-     &PSI1,PSI2,PSIp1,PSIp2,T LID,I_17,I_16,I_15,I_14,I_13,I_12,I_11,
-     &I_10,I,J,TIME
-      REAL*4 A(1:512,1:512),B(1:512,1:512),B_1(1:512,1:512),A_1(1:512
-     &,1:512),B_2(1:512,1:512)
+      INTEGER HPFC BUFID, HPFC INFO, LALPHA1, LALPHA2, LALPHAp1, 
+     &LALPHAp2, PSI1, PSI2, PSIp1, PSIp2, T LID, I_17, I_16, I_15, 
+     &I_14, I_13, I_12, I_11, I_10, I, J, TIME
+      REAL*4 A(1:512, 1:512), B(1:512, 1:512), B_1(1:512, 1:512), A_1
+     &(1:512, 1:512), B_2(1:512, 1:512)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_15, I_16, I_17, 1, N, 4, 1)
       CALL HPFC LOOP BOUNDS(I_11, I_12, I_13, 1, N, 4, 2)

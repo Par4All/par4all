@@ -1,4 +1,4 @@
---- Hpfc Validation for tell
+--- Hpfc Validation for $VDIR/tell.f
 
 !
 ! File TELL_host.f
@@ -57,7 +57,7 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "TELL_parameters.h"
-      INTEGER I_0,I
+      INTEGER I_0, I
       REAL*4 A(1:5)
       CALL HPFC INIT NODE
 
