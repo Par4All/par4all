@@ -69,7 +69,12 @@ void ResetCurrentModule()
   stack_free(&SwitchGotoStack);
   stack_free(&SwitchControllerStack);
   stack_free(&LoopStack);
-  stack_free(&BlockStack);  
+  stack_free(&BlockStack);
+  /* Reset them to stack_undefined_p instead of STACK_NULL */
+  SwitchGotoStack = stack_undefined;
+  SwitchControllerStack = stack_undefined;
+  LoopStack = stack_undefined;
+  BlockStack = stack_undefined;
 }
 
 void InitializeBlock()

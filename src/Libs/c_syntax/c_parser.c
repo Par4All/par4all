@@ -149,15 +149,21 @@ void CParserError(char *msg)
     stack_free(&SwitchControllerStack);
     stack_free(&LoopStack);
     stack_free(&BlockStack);  
+    /* Reset them to stack_undefined_p instead of STACK_NULL */
+    SwitchGotoStack = stack_undefined;
+    SwitchControllerStack = stack_undefined;
+    LoopStack = stack_undefined;
+    BlockStack = stack_undefined;
   }
   
   reset_current_C_line_number();
   /* get rid of all collected comments */
   reset_C_comment(TRUE);
 
-  pips_user_warning(msg);
-  pips_internal_error("Recovery from C parser failure not (fully) implemented yet.\n");
-  /* pips_user_error(msg); */
+  pips_user_warning("Recovery from C parser failure not (fully) implemented yet.\n"
+		    "C parser is likely to fail later if re-used.\n");
+  pips_user_error(msg);
+  debug_off();
 }
 
 static bool actual_c_parser(string module_name, string dbr_file, bool is_compilation_unit_parser)

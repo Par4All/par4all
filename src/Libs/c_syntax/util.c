@@ -985,9 +985,12 @@ void CCompilationUnitMemoryAllocation(entity module)
 	      if(!gen_in_list_p(var, code_externs(value_code(entity_initial(module))))) {
 		  if(ram_offset(r) != UNDEFINED_RAM_OFFSET 
 			    && ram_offset(r) != UNKNOWN_RAM_OFFSET 
-			    && ram_offset(r) != DYNAMIC_RAM_OFFSET )
-		    pips_internal_error("Multiple Declarations of variable %s in different files\n"
-				    ,entity_local_name(var));
+		     && ram_offset(r) != DYNAMIC_RAM_OFFSET ) {
+		    pips_user_warning
+		      ("Multiple declarations of variable %s in different files\n"
+		       ,entity_local_name(var));
+		    CParserError("Fix your source code!\n");
+		  }
 
 		ram_offset(r) = area_size(type_area(entity_type(a)));
 		add_C_variable_to_area(a,var);
