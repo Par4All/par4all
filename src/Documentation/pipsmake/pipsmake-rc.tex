@@ -3102,10 +3102,11 @@ hpfc_compile           > MODULE.hpfc_host
 
 \subsubsection{HPFC completion}
 
-This rule deals with the compiler closing. It must deal with commons. The
-hpfc parser selection is put here. Maybe not a very good idea? (FC:
-explain! why not in \verb/hpfc_init/?) I guess
-nobody should have to require intermediate targets such as ???. Ya!\marginpar{RK: hmmm; FC?}
+This rule deals with the compiler closing. It must deal with commons. 
+The hpfc parser selection is put here. 
+%% Maybe not a very good idea? (FC: explain! why not in \verb/hpfc_init/?) 
+%% I guess nobody should have to require intermediate targets such as ???. Ya!
+%% \marginpar{RK: hmmm; FC?}
 
 \begin{verbatim}
 hpfc_close             > PROGRAM.hpfc_commons
