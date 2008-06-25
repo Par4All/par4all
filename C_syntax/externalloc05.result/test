@@ -5,6 +5,7 @@ Variable list:
 
 Declared entity TOP-LEVEL:*STATIC*	with type area with size 0
 Declared entity TOP-LEVEL:bar	with type functional  () -> INTEGER*4
+Declared entity externalloc05!:*HEAP*	with type area with size 0
 Declared entity externalloc05!:*STATIC*	with type area with size 0
 Declared entity foo:*DYNAMIC*	with type area with size 0
 Declared entity foo:*STACK*	with type area with size 0
@@ -13,6 +14,10 @@ Declared entity foo:*STATIC*	with type area with size 0
 Layouts for areas (commons):
 
 Layout for common /TOP-LEVEL:*STATIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /externalloc05!:*HEAP*/ of size 0:
 	* empty area *
 
 

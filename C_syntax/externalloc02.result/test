@@ -5,6 +5,7 @@ Variable list:
 
 Declared entity TOP-LEVEL:*STATIC*	with type area with size 4
 Declared entity TOP-LEVEL:b	with type variable INTEGER*4
+Declared entity externalloc02!:*HEAP*	with type area with size 0
 Declared entity externalloc02!:*STATIC*	with type area with size 0
 Declared entity foo:*DYNAMIC*	with type area with size 0
 Declared entity foo:*STACK*	with type area with size 0
@@ -14,6 +15,10 @@ Layouts for areas (commons):
 
 Layout for common /TOP-LEVEL:*STATIC*/ of size 4:
 	Variable TOP-LEVEL:b	offset = 0	size = 4
+
+
+Layout for common /externalloc02!:*HEAP*/ of size 0:
+	* empty area *
 
 
 Layout for common /externalloc02!:*STATIC*/ of size 0:

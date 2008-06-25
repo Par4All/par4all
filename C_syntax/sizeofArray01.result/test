@@ -10,6 +10,7 @@ Declared entity fcompat:*STATIC*	with type area with size 0
 Declared entity fcompat:a	with type variable INTEGER*4
 Declared entity fcompat:c	with type variable INTEGER*4
 Declared entity fcompat:p	with type variable INTEGER*4*
+Declared entity sizeofArray01!:*HEAP*	with type area with size 0
 Declared entity sizeofArray01!:*STATIC*	with type area with size 0
 
 Layouts for areas (commons):
@@ -32,11 +33,59 @@ Layout for common /fcompat:*STATIC*/ of size 0:
 	* empty area *
 
 
+Layout for common /sizeofArray01!:*HEAP*/ of size 0:
+	* empty area *
+
+
 Layout for common /sizeofArray01!:*STATIC*/ of size 0:
 	* empty area *
 
 End of declarations for module fcompat
 
+sizeofArray01!
+
+Declarations for module sizeofArray01! with type () -> unknow
+Variable list:
+
+Declared entity TOP-LEVEL:*STATIC*	with type area with size 0
+Declared entity TOP-LEVEL:fcompat	with type functional  () -> void
+Declared entity TOP-LEVEL:m	with type variable INTEGER*4
+Declared entity TOP-LEVEL:n	with type variable INTEGER*4
+Declared entity sizeofArray01!:*DYNAMIC*	with type area with size 0
+Declared entity sizeofArray01!:*HEAP*	with type area with size 0
+Declared entity sizeofArray01!:*STACK*	with type area with size 0
+Declared entity sizeofArray01!:*STATIC*	with type area with size 0
+
+Layouts for areas (commons):
+
+Layout for common /TOP-LEVEL:*STATIC*/ of size 0:
+	External VariableTOP-LEVEL:n	offset = UNKNOWN,	size = 4
+	External VariableTOP-LEVEL:m	offset = UNKNOWN,	size = 4
+
+
+Layout for common /sizeofArray01!:*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /sizeofArray01!:*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /sizeofArray01!:*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /sizeofArray01!:*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module sizeofArray01!
+
+
+Parsed code
+
+   extern int n;
+   extern int m;
+   extern void fcompat();
 void fcompat()
 {
    int a[n-1+1];

@@ -15,13 +15,13 @@ echo
 echo PARSED PRINTED FILE
 echo
 
-display PARSED_PRINTED_FILE[%ALL]
+display PARSED_PRINTED_FILE[decl01]
 
 echo
 echo PRINTED_FILE
 echo
 
-display PRINTED_FILE[%ALL]
+display PRINTED_FILE[decl01]
 
 
 close

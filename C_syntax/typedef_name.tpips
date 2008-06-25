@@ -9,7 +9,7 @@ setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 #setenv  PRETTYPRINT_DEBUG_LEVEL 9
-display PRINTED_FILE[%ALL]
+display PRINTED_FILE[main]
 
 close
 delete typedef_name

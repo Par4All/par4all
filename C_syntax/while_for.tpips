@@ -10,7 +10,7 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 #display PRINTED_FILE[main%c]
 
-display PRINTED_FILE[%ALL]
+display PRINTED_FILE[main]
 
 
 close

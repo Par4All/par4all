@@ -1,0 +1,41 @@
+externalloc08!
+
+Declarations for module externalloc08! with type () -> unknow
+Variable list:
+
+Declared entity TOP-LEVEL:*STATIC*	with type area with size 81
+Declared entity TOP-LEVEL:a	with type variable REAL*4
+Declared entity TOP-LEVEL:i	with type variable INTEGER*4
+Declared entity TOP-LEVEL:j	with type variable REAL*4
+Declared entity TOP-LEVEL:m	with type variable INTEGER*1
+Declared entity externalloc08!:*DYNAMIC*	with type area with size 0
+Declared entity externalloc08!:*HEAP*	with type area with size 0
+Declared entity externalloc08!:*STACK*	with type area with size 0
+Declared entity externalloc08!:*STATIC*	with type area with size 0
+
+Layouts for areas (commons):
+
+Layout for common /TOP-LEVEL:*STATIC*/ of size 81:
+
+
+Layout for common /externalloc08!:*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /externalloc08!:*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /externalloc08!:*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /externalloc08!:*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module externalloc08!
+
+   extern int i;
+   float a[20];
+   extern float j;
+   char m;

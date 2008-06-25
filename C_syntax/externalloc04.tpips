@@ -9,7 +9,7 @@ setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 
 activate C_PARSER
 
-display PARSED_PRINTED_FILE[%ALL]
+display PARSED_PRINTED_FILE[foo]
 
 delete externalloc04
 close

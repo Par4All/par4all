@@ -1,5 +1,5 @@
 delete scope02
-create scope02 scope02/*.c 
+create scope02 scope02/scope02_a.c  scope02/scope02_b.c  scope02/scope02_c.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 6
 
@@ -8,10 +8,40 @@ activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
+echo
+echo Printed file for scope02_c
+echo
 
-display PRINTED_FILE[%ALL]
+
+display PRINTED_FILE[scope02_c!]
+display PRINTED_FILE[foo]
+
+echo
+echo Printed file for scope02_a
+echo
+
+display PRINTED_FILE[scope02_a!]
+display PRINTED_FILE[main]
+
+echo
+echo Printed file for scope02_b
+echo
+
+display PRINTED_FILE[scope02_b!]
+display PRINTED_FILE[main]
+
+echo
+echo Unsplit the application
+echo
+
+apply UNSPLIT[%PROGRAM]
+shell cat scope02.database/Src/scope02_a.c
+shell cat scope02.database/Src/scope02_b.c
+shell cat scope02.database/Src/scope02_c.c
 
 close
 
-delete scope02
+# delete scope02
+quit
+
 

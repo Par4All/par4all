@@ -1,14 +1,12 @@
+
+Printed file for scope01_b
+
+   int i = 1;
+   extern void foo();
 void foo()
 {
    printf("%d\n", i);
 }
-main()
-{
-   printf("%d\n", i);
-   foo();
-}
-   int i = 1;
-   extern main();
-   int i = 1;
-   extern void foo();
+
+Printed file for scope01_a: should not work because of variable i
 

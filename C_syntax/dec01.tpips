@@ -17,13 +17,13 @@ echo
 echo PARSED PRINTED FILE
 echo
 
-display PARSED_PRINTED_FILE[%ALL]
+display PARSED_PRINTED_FILE[do_elem]
 
 echo
 echo PRINTED_FILE
 echo
 
-display PRINTED_FILE[%ALL]
+display PRINTED_FILE[do_elem]
 
 
 close
