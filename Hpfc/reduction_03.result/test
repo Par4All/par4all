@@ -1,4 +1,4 @@
---- Hpfc Validation for reduction_03
+--- Hpfc Validation for $VDIR/reduction_03.f
 
 !
 ! File REDONVECT_host.f
@@ -14,7 +14,7 @@
       PARAMETER (N = 10)
       INTEGER*4 N
       PARAMETER (N = 10)
-      INTEGER I
+      INTEGER I, J
       REAL*8 S(1:N)
       CALL HPFC INIT HOST
 
@@ -28,12 +28,14 @@
 
       PRINT *, (S(I), I = 1, N)
 ! updating shared variable I
-      BUF INDEX = 0
-      SEND NOT INITIALIZED = .TRUE.
-      BUF INDEX = BUF INDEX+1
-      HPFC INTEGER4 BUFF(BUF INDEX) = I
-      CALL HPFC INTEGER4 BUFPCK
-      CALL HPFC HCAST
+      IF (J.EQ.11) THEN
+         BUF INDEX = 0
+         SEND NOT INITIALIZED = .TRUE.
+         BUF INDEX = BUF INDEX+1
+         HPFC INTEGER4 BUFF(BUF INDEX) = I
+         CALL HPFC INTEGER4 BUFPCK
+         CALL HPFC HCAST
+      ENDIF
 ! end of update
 
       CALL HPFC HOST END
@@ -95,9 +97,9 @@
       PARAMETER (N = 10)
       INTEGER*4 N
       PARAMETER (N = 10)
-      INTEGER I_15,I_14,I_13,I_12,I_11,I_10,I_9,I_8,I_7,I_6,I_5,I_4,
-     &I_3,I_2,I_1,I_0,I,J
-      REAL*8 A(1:5,1:5),S(1:N)
+      INTEGER I_15, I_14, I_13, I_12, I_11, I_10, I_9, I_8, I_7, I_6
+     &, I_5, I_4, I_3, I_2, I_1, I_0, I, J
+      REAL*8 A(1:5, 1:5), S(1:N)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_13, I_14, I_15, 1, N, 1, 1)
       CALL HPFC LOOP BOUNDS(I_9, I_10, I_11, 1, N, 1, 2)
@@ -128,13 +130,15 @@
       ENDDO
       CALL NPOST SUM HPFC REAL8(S, 10)
 ! updating shared variable I
-      BUF INDEX = 0
-      RECEIVED NOT PERFORMED = .FALSE.
-      SIZE OF RECEIVED BUFFER = 0
-      CALL HPFC NCAST
-      CALL HPFC INTEGER4 BUFUPK
-      BUF INDEX = BUF INDEX+1
-      I = HPFC INTEGER4 BUFF(BUF INDEX)
+      IF (J.EQ.11) THEN
+         BUF INDEX = 0
+         RECEIVED NOT PERFORMED = .FALSE.
+         SIZE OF RECEIVED BUFFER = 0
+         CALL HPFC NCAST
+         CALL HPFC INTEGER4 BUFUPK
+         BUF INDEX = BUF INDEX+1
+         I = HPFC INTEGER4 BUFF(BUF INDEX)
+      ENDIF
 ! end of update
 
       CALL HPFC NODE END

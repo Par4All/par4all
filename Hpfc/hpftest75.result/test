@@ -1,4 +1,4 @@
---- Hpfc Validation for hpftest75
+--- Hpfc Validation for $VDIR/hpftest75.f
 
 !
 ! File DLA_A_1_3_node.h
@@ -9,7 +9,7 @@
 ! send part
 ! remapping A[3]: A_2[1] -> A[3]
             PSI1 = MY POS(1,1)
-            IF (MY LID.LE.4) THEN
+            IF (MY LID.LE.4.AND.1.LE.PSI1.AND.PSI1.LE.4) THEN
                DO PSIp1 = 1, 2
                   DO PSIp2 = (2+3*PSI1)/5, MIN(2, (4+3*PSI1)/5)
                      T LID = -2+2*PSIp1+PSIp2
@@ -45,7 +45,8 @@
 ! receive part
             PSIp1 = MY POS(1,2)
             PSIp2 = MY POS(2,2)
-            IF (MY LID.LE.4) THEN
+            IF (MY LID.LE.4.AND.PSIp2.LE.2.AND.1.LE.PSIp2.AND.PSIp1
+     &      .LE.2.AND.1.LE.PSIp1) THEN
                DO PSI1 = (-2+5*PSIp2)/3, (2+5*PSIp2)/3
                   T LID = PSI1
                   IF (MY LID.NE.T LID) THEN
@@ -100,7 +101,7 @@
 ! send part
 ! remapping A[3]: A_1[2] -> A[3]
             PSI1 = MY POS(1,1)
-            IF (MY LID.LE.4) THEN
+            IF (MY LID.LE.4.AND.PSI1.LE.4.AND.1.LE.PSI1) THEN
                DO PSIp1 = (2+3*PSI1)/5, MIN(2, (4+3*PSI1)/5)
                   DO PSIp2 = 1, 2
                      T LID = -2+2*PSIp1+PSIp2
@@ -136,7 +137,8 @@
 ! receive part
             PSIp1 = MY POS(1,2)
             PSIp2 = MY POS(2,2)
-            IF (MY LID.LE.4) THEN
+            IF (MY LID.LE.4.AND.PSIp2.LE.2.AND.1.LE.PSIp2.AND.PSIp1
+     &      .LE.2.AND.1.LE.PSIp1) THEN
                DO PSI1 = (-2+5*PSIp1)/3, (2+5*PSIp1)/3
                   T LID = PSI1
                   IF (MY LID.NE.T LID) THEN
@@ -192,7 +194,8 @@
 ! remapping A[3]: A[3] -> A_2[1]
             PSI1 = MY POS(1,2)
             PSI2 = MY POS(2,2)
-            IF (MY LID.LE.4) THEN
+            IF (MY LID.LE.4.AND.1.LE.PSI2.AND.PSI2.LE.2.AND.1.LE.PSI1
+     &      .AND.PSI1.LE.2) THEN
                DO PSIp1 = (-2+5*PSI2)/3, (2+5*PSI2)/3
                   T LID = PSIp1
                   IF (MY LID.NE.T LID) THEN
@@ -225,7 +228,7 @@
             ENDIF
 ! receive part
             PSIp1 = MY POS(1,1)
-            IF (MY LID.LE.4) THEN
+            IF (MY LID.LE.4.AND.PSIp1.LE.4.AND.1.LE.PSIp1) THEN
                DO PSI1 = 1, 2
                   DO PSI2 = (2+3*PSIp1)/5, MIN(2, (4+3*PSIp1)/5)
                      T LID = -2+2*PSI1+PSI2
@@ -283,7 +286,8 @@
 ! remapping A[3]: A[3] -> A_1[2]
             PSI1 = MY POS(1,2)
             PSI2 = MY POS(2,2)
-            IF (MY LID.LE.4) THEN
+            IF (MY LID.LE.4.AND.1.LE.PSI2.AND.PSI2.LE.2.AND.1.LE.PSI1
+     &      .AND.PSI1.LE.2) THEN
                DO PSIp1 = (-2+5*PSI1)/3, (2+5*PSI1)/3
                   T LID = PSIp1
                   IF (MY LID.NE.T LID) THEN
@@ -316,7 +320,7 @@
             ENDIF
 ! receive part
             PSIp1 = MY POS(1,1)
-            IF (MY LID.LE.4) THEN
+            IF (MY LID.LE.4.AND.1.LE.PSIp1.AND.PSIp1.LE.4) THEN
                DO PSI1 = (2+3*PSIp1)/5, MIN(2, (4+3*PSIp1)/5)
                   DO PSI2 = 1, 2
                      T LID = -2+2*PSI1+PSI2
@@ -374,35 +378,42 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "DLA_parameters.h"
-      INTEGER ALPHA1,ALPHA2,LALPHA1,LALPHA2,PSI1,T LID,ANSWER
-      REAL*4 A(1:10,1:10)
+      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, T LID, I, J, 
+     &ANSWER, I_4, I_5
+      REAL*4 A(1:10, 1:10)
+      LOGICAL L_0
       CALL HPFC INIT HOST
       PRINT *, '1 or 0'
       READ *, ANSWER
 ! updating shared variable ANSWER
-      BUF INDEX = 0
-      SEND NOT INITIALIZED = .TRUE.
-      BUF INDEX = BUF INDEX+1
-      HPFC INTEGER4 BUFF(BUF INDEX) = ANSWER
-      CALL HPFC INTEGER4 BUFPCK
-      CALL HPFC HCAST
+      IF (I.EQ.11.AND.J.EQ.11) THEN
+         BUF INDEX = 0
+         SEND NOT INITIALIZED = .TRUE.
+         BUF INDEX = BUF INDEX+1
+         HPFC INTEGER4 BUFF(BUF INDEX) = ANSWER
+         CALL HPFC INTEGER4 BUFPCK
+         CALL HPFC HCAST
+      ENDIF
 ! end of update
-      IF (ANSWER.EQ.1) THEN
+      L_0 = ANSWER.EQ.1
+      IF (L_0) THEN
       ELSE
 ! collecting distributed variable A_2
-         PSI1 = 2
-         BUF INDEX = 0
-         RECEIVED NOT PERFORMED = .FALSE.
-         SIZE OF RECEIVED BUFFER = 0
-         T LID = PSI1
-         CALL HPFC RCV FROM NODE(T LID)
-         CALL HPFC REAL4 BUFUPK
-         ALPHA2 = 5
-         ALPHA1 = 5
-         LALPHA1 = ALPHA1
-         LALPHA2 = 3+ALPHA2-3*PSI1
-         BUF INDEX = BUF INDEX+1
-         A(ALPHA1,ALPHA2) = HPFC REAL4 BUFF(BUF INDEX)
+         IF (I_5.EQ.11.AND.J.EQ.11.AND.I.EQ.11.AND.I_4.EQ.11) THEN
+            PSI1 = 2
+            BUF INDEX = 0
+            RECEIVED NOT PERFORMED = .FALSE.
+            SIZE OF RECEIVED BUFFER = 0
+            T LID = PSI1
+            CALL HPFC RCV FROM NODE(T LID)
+            CALL HPFC REAL4 BUFUPK
+            ALPHA2 = 5
+            ALPHA1 = 5
+            LALPHA1 = ALPHA1
+            LALPHA2 = 3+ALPHA2-3*PSI1
+            BUF INDEX = BUF INDEX+1
+            A(ALPHA1,ALPHA2) = HPFC REAL4 BUFF(BUF INDEX)
+         ENDIF
 ! end of collect
          PRINT *, A(5,5)
       ENDIF
@@ -518,11 +529,12 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "DLA_parameters.h"
-      INTEGER ALPHA1,ALPHA2,LALPHA1,LALPHA2,LALPHAp1,LALPHAp2,PSI1,
-     &PSI2,PSIp1,PSIp2,T LID,I_28,I_27,I_26,I_25,I_24,I_23,I_22,I_21,
-     &I_20,I_19,I_18,I_17,I_16,I_15,I_14,I_13,I_12,I_11,I_10,I_9,I,J,
-     &ANSWER,I_8
-      REAL*4 A(1:5,1:5),A_1(1:3,1:10),A_2(1:10,1:3)
+      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, LALPHAp1, LALPHAp2, 
+     &PSI1, PSI2, PSIp1, PSIp2, T LID, I_28, I_27, I_26, I_25, I_24, 
+     &I_23, I_22, I_21, I_20, I_19, I_18, I_17, I_16, I_15, I_14, 
+     &I_13, I_12, I_11, I_10, I_9, I, J, ANSWER, I_4, I_5, I_8
+      REAL*4 A(1:5, 1:5), A_1(1:3, 1:10), A_2(1:10, 1:3)
+      LOGICAL L_0
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_26, I_27, I_28, 1, 10, 3, 1)
       CALL HPFC LOOP BOUNDS(I_22, I_23, I_24, 1, 10, 3, 2)
@@ -546,15 +558,18 @@
          ENDDO
       ENDDO
 ! updating shared variable ANSWER
-      BUF INDEX = 0
-      RECEIVED NOT PERFORMED = .FALSE.
-      SIZE OF RECEIVED BUFFER = 0
-      CALL HPFC NCAST
-      CALL HPFC INTEGER4 BUFUPK
-      BUF INDEX = BUF INDEX+1
-      ANSWER = HPFC INTEGER4 BUFF(BUF INDEX)
+      IF (I.EQ.11.AND.J.EQ.11) THEN
+         BUF INDEX = 0
+         RECEIVED NOT PERFORMED = .FALSE.
+         SIZE OF RECEIVED BUFFER = 0
+         CALL HPFC NCAST
+         CALL HPFC INTEGER4 BUFUPK
+         BUF INDEX = BUF INDEX+1
+         ANSWER = HPFC INTEGER4 BUFF(BUF INDEX)
+      ENDIF
 ! end of update
-      IF (ANSWER.EQ.1) THEN
+      L_0 = ANSWER.EQ.1
+      IF (L_0) THEN
 ! begin remappings
       include 'DLA_A_3_2_node.h'
 ! liveness management
@@ -578,18 +593,20 @@
 ! end of liveness management
 ! end remappings
 ! collecting distributed variable A_2
-         PSI1 = MY POS(1,1)
-         IF (PSI1.LE.2.AND.2.LE.PSI1) THEN
-            BUF INDEX = 0
-            SEND NOT INITIALIZED = .TRUE.
-            ALPHA2 = 5
-            ALPHA1 = 5
-            LALPHA1 = ALPHA1
-            LALPHA2 = 3+ALPHA2-3*PSI1
-            BUF INDEX = BUF INDEX+1
-            HPFC REAL4 BUFF(BUF INDEX) = A_2(LALPHA1,LALPHA2)
-            CALL HPFC REAL4 BUFPCK
-            CALL HPFC SND TO HOST
+         IF (I_5.EQ.11.AND.J.EQ.11.AND.I.EQ.11.AND.I_4.EQ.11) THEN
+            PSI1 = MY POS(1,1)
+            IF (PSI1.LE.2.AND.2.LE.PSI1) THEN
+               BUF INDEX = 0
+               SEND NOT INITIALIZED = .TRUE.
+               ALPHA2 = 5
+               ALPHA1 = 5
+               LALPHA1 = ALPHA1
+               LALPHA2 = 3+ALPHA2-3*PSI1
+               BUF INDEX = BUF INDEX+1
+               HPFC REAL4 BUFF(BUF INDEX) = A_2(LALPHA1,LALPHA2)
+               CALL HPFC REAL4 BUFPCK
+               CALL HPFC SND TO HOST
+            ENDIF
          ENDIF
 ! end of collect
       ENDIF

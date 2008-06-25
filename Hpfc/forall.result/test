@@ -1,4 +1,4 @@
---- Hpfc Validation for forall
+--- Hpfc Validation for $VDIR/forall.f
 
 !
 ! File FORALL_host.f
@@ -10,8 +10,8 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "FORALL_parameters.h"
-      INTEGER I,J
-      REAL*4 A(1:10),B(1:10,1:10)
+      INTEGER I, J
+      REAL*4 A(1:10), B(1:10, 1:10)
       CALL HPFC INIT HOST
       DO I = 1, 10
          A(I) = 1.0
@@ -46,8 +46,8 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "FORALL_parameters.h"
-      INTEGER I,J
-      REAL*4 A(1:10),B(1:10,1:10)
+      INTEGER I, J
+      REAL*4 A(1:10), B(1:10, 1:10)
       CALL HPFC INIT NODE
       DO I = 1, 10
          A(I) = 1.0

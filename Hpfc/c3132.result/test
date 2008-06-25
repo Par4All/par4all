@@ -1,4 +1,4 @@
---- Hpfc Validation for c3132
+--- Hpfc Validation for $VDIR/c3132.f
 
 !
 ! File C3132_T31P_3_1_node.h
@@ -9,7 +9,7 @@
 ! send part
 ! remapping T31P[3]: T31P[3] -> T31P_1[1]
             PSI1 = MY POS(1,2)
-            IF (MY LID.LE.16) THEN
+            IF (MY LID.LE.16.AND.PSI1.LE.16.AND.1.LE.PSI1) THEN
                DO PSIp1 = 1, 10
                   T LID = PSIp1
                   IF (MY LID.NE.T LID) THEN
@@ -44,7 +44,7 @@
             ENDIF
 ! receive part
             PSIp1 = MY POS(1,1)
-            IF (MY LID.LE.10) THEN
+            IF (MY LID.LE.10.AND.PSIp1.LE.10.AND.1.LE.PSIp1) THEN
                DO PSI1 = 1, 16
                   T LID = PSI1
                   IF (MY LID.NE.T LID) THEN
@@ -110,26 +110,29 @@
       PARAMETER (NI = 8)
       INTEGER*4 NR
       PARAMETER (NR = 160)
-      INTEGER ALPHA1,ALPHA2,ALPHA3,LALPHA1,LALPHA2,LALPHA3,PSI1,T LID
-      REAL*4 T31P(1:NF,1:NR,1:NI)
+      INTEGER ALPHA1, ALPHA2, ALPHA3, LALPHA1, LALPHA2, LALPHA3, PSI1
+     &, T LID, I_0, I_1, I_2
+      REAL*4 T31P(1:NF, 1:NR, 1:NI)
       CALL HPFC INIT HOST
 
 ! collecting distributed variable T31P_1
-      PSI1 = 1
-      BUF INDEX = 0
-      RECEIVED NOT PERFORMED = .FALSE.
-      SIZE OF RECEIVED BUFFER = 0
-      T LID = PSI1
-      CALL HPFC RCV FROM NODE(T LID)
-      CALL HPFC REAL4 BUFUPK
-      ALPHA3 = 1
-      ALPHA2 = 1
-      ALPHA1 = 1
-      LALPHA1 = ALPHA1
-      LALPHA2 = 16+ALPHA2-16*PSI1
-      LALPHA3 = ALPHA3
-      BUF INDEX = BUF INDEX+1
-      T31P(ALPHA1,ALPHA2,ALPHA3) = HPFC REAL4 BUFF(BUF INDEX)
+      IF (I_1.EQ.161.AND.I_2.EQ.321.AND.I_0.EQ.9) THEN
+         PSI1 = 1
+         BUF INDEX = 0
+         RECEIVED NOT PERFORMED = .FALSE.
+         SIZE OF RECEIVED BUFFER = 0
+         T LID = PSI1
+         CALL HPFC RCV FROM NODE(T LID)
+         CALL HPFC REAL4 BUFUPK
+         ALPHA3 = 1
+         ALPHA2 = 1
+         ALPHA1 = 1
+         LALPHA1 = ALPHA1
+         LALPHA2 = 16+ALPHA2-16*PSI1
+         LALPHA3 = ALPHA3
+         BUF INDEX = BUF INDEX+1
+         T31P(ALPHA1,ALPHA2,ALPHA3) = HPFC REAL4 BUFF(BUF INDEX)
+      ENDIF
 ! end of collect
 
       PRINT *, T31P(1,1,1)
@@ -276,9 +279,10 @@
       PARAMETER (NI = 8)
       INTEGER*4 NR
       PARAMETER (NR = 160)
-      INTEGER ALPHA1,ALPHA2,ALPHA3,LALPHA1,LALPHA2,LALPHA3,LALPHAp1,
-     &LALPHAp2,LALPHAp3,PSI1,PSIp1,T LID,I_3
-      REAL*4 T31P(1:20,1:NR,1:NI),T31P_1(1:NF,1:16,1:NI)
+      INTEGER ALPHA1, ALPHA2, ALPHA3, LALPHA1, LALPHA2, LALPHA3, 
+     &LALPHAp1, LALPHAp2, LALPHAp3, PSI1, PSIp1, T LID, I_3, I_0, I_1
+     &, I_2
+      REAL*4 T31P(1:20, 1:NR, 1:NI), T31P_1(1:NF, 1:16, 1:NI)
       CALL HPFC INIT NODE
 ! all livenesss for T31P
       LIVE MAPPING(3) = .FALSE.
@@ -300,20 +304,23 @@
 ! end of liveness management
 ! end remappings
 ! collecting distributed variable T31P_1
-      PSI1 = MY POS(1,1)
-      IF (PSI1.LE.1) THEN
-         BUF INDEX = 0
-         SEND NOT INITIALIZED = .TRUE.
-         ALPHA3 = 1
-         ALPHA2 = 1
-         ALPHA1 = 1
-         LALPHA1 = ALPHA1
-         LALPHA2 = 16+ALPHA2-16*PSI1
-         LALPHA3 = ALPHA3
-         BUF INDEX = BUF INDEX+1
-         HPFC REAL4 BUFF(BUF INDEX) = T31P_1(LALPHA1,LALPHA2,LALPHA3)
-         CALL HPFC REAL4 BUFPCK
-         CALL HPFC SND TO HOST
+      IF (I_1.EQ.161.AND.I_2.EQ.321.AND.I_0.EQ.9) THEN
+         PSI1 = MY POS(1,1)
+         IF (PSI1.LE.1.AND.1.LE.PSI1) THEN
+            BUF INDEX = 0
+            SEND NOT INITIALIZED = .TRUE.
+            ALPHA3 = 1
+            ALPHA2 = 1
+            ALPHA1 = 1
+            LALPHA1 = ALPHA1
+            LALPHA2 = 16+ALPHA2-16*PSI1
+            LALPHA3 = ALPHA3
+            BUF INDEX = BUF INDEX+1
+            HPFC REAL4 BUFF(BUF INDEX) = T31P_1(LALPHA1,LALPHA2,
+     &      LALPHA3)
+            CALL HPFC REAL4 BUFPCK
+            CALL HPFC SND TO HOST
+         ENDIF
       ENDIF
 ! end of collect
 

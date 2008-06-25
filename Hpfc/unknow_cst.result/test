@@ -1,4 +1,4 @@
---- Hpfc Validation for unknow_cst
+--- Hpfc Validation for $VDIR/unknow_cst.f
 
 !
 ! File CST_host.f
@@ -89,8 +89,8 @@
       include "CST_parameters.h"
       INTEGER*4 N
       PARAMETER (N = 10)
-      INTEGER I_8,I_7,I_6,I_5,I_4,I_3,I_2,I_1,L
-      REAL*4 A(1:5,1:5)
+      INTEGER I_8, I_7, I_6, I_5, I_4, I_3, I_2, I_1, L
+      REAL*4 A(1:5, 1:5)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_6, I_7, I_8, 1, N, 1, 1)
 

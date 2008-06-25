@@ -1,4 +1,4 @@
---- Hpfc Validation for miscio
+--- Hpfc Validation for $VDIR/miscio.f
 
 !
 ! File MISCIO_host.f
@@ -14,8 +14,8 @@
       PARAMETER (N = 10)
       INTEGER*4 N
       PARAMETER (N = 10)
-      INTEGER ALPHA1,LALPHA1,PSI1,T LID,I
-      REAL*4 A(1:N),B(1:N)
+      INTEGER ALPHA1, LALPHA1, PSI1, T LID, I
+      REAL*4 A(1:N), B(1:N)
       CALL HPFC INIT HOST
 
       PRINT *, 'read b(n)'
@@ -151,8 +151,8 @@
       include "MISCIO_parameters.h"
       INTEGER*4 N
       PARAMETER (N = 10)
-      INTEGER ALPHA1,LALPHA1,PSI1,I
-      REAL*4 A(1:5),B(1:N)
+      INTEGER ALPHA1, LALPHA1, PSI1, I
+      REAL*4 A(1:5), B(1:N)
       CALL HPFC INIT NODE
 
 ! updating shared variable B
@@ -186,16 +186,18 @@
 ! end of update
 ! updating distributed variable A
       PSI1 = MY POS(1,1)
-      BUF INDEX = 0
-      RECEIVED NOT PERFORMED = .FALSE.
-      SIZE OF RECEIVED BUFFER = 0
-      CALL HPFC RCV FROM HOST
-      CALL HPFC REAL4 BUFUPK
-      DO ALPHA1 = -4+5*PSI1, 5*PSI1
-         LALPHA1 = 5+ALPHA1-5*PSI1
-         BUF INDEX = BUF INDEX+1
-         A(LALPHA1) = HPFC REAL4 BUFF(BUF INDEX)
-      ENDDO
+      IF (PSI1.LE.2.AND.1.LE.PSI1) THEN
+         BUF INDEX = 0
+         RECEIVED NOT PERFORMED = .FALSE.
+         SIZE OF RECEIVED BUFFER = 0
+         CALL HPFC RCV FROM HOST
+         CALL HPFC REAL4 BUFUPK
+         DO ALPHA1 = -4+5*PSI1, 5*PSI1
+            LALPHA1 = 5+ALPHA1-5*PSI1
+            BUF INDEX = BUF INDEX+1
+            A(LALPHA1) = HPFC REAL4 BUFF(BUF INDEX)
+         ENDDO
+      ENDIF
 ! end of update
 ! updating shared variable I
       BUF INDEX = 0
@@ -208,15 +210,17 @@
 ! end of update
 ! collecting distributed variable A
       PSI1 = MY POS(1,1)
-      BUF INDEX = 0
-      SEND NOT INITIALIZED = .TRUE.
-      DO ALPHA1 = -4+5*PSI1, 5*PSI1
-         LALPHA1 = 5+ALPHA1-5*PSI1
-         BUF INDEX = BUF INDEX+1
-         HPFC REAL4 BUFF(BUF INDEX) = A(LALPHA1)
-      ENDDO
-      CALL HPFC REAL4 BUFPCK
-      CALL HPFC SND TO HOST
+      IF (PSI1.LE.2.AND.1.LE.PSI1) THEN
+         BUF INDEX = 0
+         SEND NOT INITIALIZED = .TRUE.
+         DO ALPHA1 = -4+5*PSI1, 5*PSI1
+            LALPHA1 = 5+ALPHA1-5*PSI1
+            BUF INDEX = BUF INDEX+1
+            HPFC REAL4 BUFF(BUF INDEX) = A(LALPHA1)
+         ENDDO
+         CALL HPFC REAL4 BUFPCK
+         CALL HPFC SND TO HOST
+      ENDIF
 ! end of collect
 ! updating shared variable I
       BUF INDEX = 0

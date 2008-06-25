@@ -1,4 +1,4 @@
---- Hpfc Validation for io_1
+--- Hpfc Validation for $VDIR/io_1.f
 
 !
 ! File IO_1_host.f
@@ -10,21 +10,23 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "IO_1_parameters.h"
-      INTEGER ALPHA1,LALPHA1,PSI1,T LID,N
+      INTEGER ALPHA1, LALPHA1, PSI1, T LID, I, N
       REAL*4 A(1:100)
       CALL HPFC INIT HOST
       READ *, N
 ! updating shared variable N
-      BUF INDEX = 0
-      SEND NOT INITIALIZED = .TRUE.
-      BUF INDEX = BUF INDEX+1
-      HPFC INTEGER4 BUFF(BUF INDEX) = N
-      CALL HPFC INTEGER4 BUFPCK
-      CALL HPFC HCAST
+      IF (I.EQ.101) THEN
+         BUF INDEX = 0
+         SEND NOT INITIALIZED = .TRUE.
+         BUF INDEX = BUF INDEX+1
+         HPFC INTEGER4 BUFF(BUF INDEX) = N
+         CALL HPFC INTEGER4 BUFPCK
+         CALL HPFC HCAST
+      ENDIF
 ! end of update
 ! collecting distributed variable A
-      IF (0.LE.4+N.AND.N.LE.100) THEN
-         DO PSI1 = MAX(1, HPFC DIVIDE(24+N, 25)), MIN(4, HPFC DIVIDE(
+      IF (0.LE.4+N.AND.N.LE.100.AND.I.EQ.101) THEN
+         DO PSI1 = MAX(HPFC DIVIDE(24+N, 25), 1), MIN(4, HPFC DIVIDE(
      &   29+N, 25))
             BUF INDEX = 0
             RECEIVED NOT PERFORMED = .FALSE.
@@ -32,7 +34,7 @@
             T LID = PSI1
             CALL HPFC RCV FROM NODE(T LID)
             CALL HPFC REAL4 BUFUPK
-            DO ALPHA1 = MAX(-24+25*PSI1, N), MIN(5+N, 25*PSI1)
+            DO ALPHA1 = MAX(N, -24+25*PSI1), MIN(5+N, 25*PSI1)
                LALPHA1 = 25+ALPHA1-25*PSI1
                BUF INDEX = BUF INDEX+1
                A(ALPHA1) = HPFC REAL4 BUFF(BUF INDEX)
@@ -84,7 +86,7 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "IO_1_parameters.h"
-      INTEGER ALPHA1,LALPHA1,PSI1,I_3,I_2,I_1,I_0,I,N
+      INTEGER ALPHA1, LALPHA1, PSI1, I_3, I_2, I_1, I_0, I, N
       REAL*4 A(1:25)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_1, I_2, I_3, 1, 100, 1, 1)
@@ -94,21 +96,24 @@
          A(I_0) = REAL(100-I)
       ENDDO
 ! updating shared variable N
-      BUF INDEX = 0
-      RECEIVED NOT PERFORMED = .FALSE.
-      SIZE OF RECEIVED BUFFER = 0
-      CALL HPFC NCAST
-      CALL HPFC INTEGER4 BUFUPK
-      BUF INDEX = BUF INDEX+1
-      N = HPFC INTEGER4 BUFF(BUF INDEX)
+      IF (I.EQ.101) THEN
+         BUF INDEX = 0
+         RECEIVED NOT PERFORMED = .FALSE.
+         SIZE OF RECEIVED BUFFER = 0
+         CALL HPFC NCAST
+         CALL HPFC INTEGER4 BUFUPK
+         BUF INDEX = BUF INDEX+1
+         N = HPFC INTEGER4 BUFF(BUF INDEX)
+      ENDIF
 ! end of update
 ! collecting distributed variable A
-      IF (0.LE.4+N.AND.N.LE.100) THEN
+      IF (0.LE.4+N.AND.N.LE.100.AND.I.EQ.101) THEN
          PSI1 = MY POS(1,1)
-         IF (25*PSI1.LE.29+N.AND.N.LE.25*PSI1) THEN
+         IF (25*PSI1.LE.29+N.AND.PSI1.LE.4.AND.N.LE.25*PSI1.AND.1.LE.
+     &   PSI1) THEN
             BUF INDEX = 0
             SEND NOT INITIALIZED = .TRUE.
-            DO ALPHA1 = MAX(-24+25*PSI1, N), MIN(5+N, 25*PSI1)
+            DO ALPHA1 = MAX(N, -24+25*PSI1), MIN(5+N, 25*PSI1)
                LALPHA1 = 25+ALPHA1-25*PSI1
                BUF INDEX = BUF INDEX+1
                HPFC REAL4 BUFF(BUF INDEX) = A(LALPHA1)

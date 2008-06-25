@@ -1,4 +1,4 @@
---- Hpfc Validation for opshift
+--- Hpfc Validation for $VDIR/opshift.f
 
 !
 ! File FOO_host.f
@@ -81,8 +81,8 @@
       include "FOO_parameters.h"
       INTEGER*4 N
       PARAMETER (N = 100)
-      INTEGER I_9,I_8,I_7,I_6,I_5,I_4,I_3,I_2,M
-      REAL*4 A(1:50,0:50)
+      INTEGER I_9, I_8, I_7, I_6, I_5, I_4, I_3, I_2, M
+      REAL*4 A(1:50, 0:50)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_7, I_8, I_9, 1, N, 1, 1)
 

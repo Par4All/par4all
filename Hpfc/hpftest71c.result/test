@@ -1,4 +1,4 @@
---- Hpfc Validation for hpftest71c
+--- Hpfc Validation for $VDIR/hpftest71c.f
 
 !
 ! File FULLCOPY_A_4_1_node.h
@@ -10,7 +10,8 @@
 ! remapping A[4]: A[4] -> A_1[1]
             PSI1 = MY POS(1,1)
             PSI2 = MY POS(2,1)
-            IF (MY LID.LE.4) THEN
+            IF (MY LID.LE.4.AND.PSI1.LE.2.AND.PSI2.LE.2.AND.1.LE.PSI2
+     &      .AND.1.LE.PSI1) THEN
                PSIp1 = PSI2
                PSIp2 = PSI1
                T LID = -2+2*PSIp1+PSIp2
@@ -42,7 +43,8 @@
 ! receive part
             PSIp1 = MY POS(1,1)
             PSIp2 = MY POS(2,1)
-            IF (MY LID.LE.4) THEN
+            IF (MY LID.LE.4.AND.PSIp1.LE.2.AND.1.LE.PSIp1.AND.1.LE.
+     &      PSIp2.AND.PSIp2.LE.2) THEN
                PSI1 = PSIp2
                PSI2 = PSIp1
                T LID = -2+2*PSI1+PSI2
@@ -94,7 +96,8 @@
 ! remapping B[3]: B[3] -> B_1[2]
             PSI1 = MY POS(1,1)
             PSI2 = MY POS(2,1)
-            IF (MY LID.LE.4) THEN
+            IF (MY LID.LE.4.AND.1.LE.PSI1.AND.PSI1.LE.2.AND.PSI2.LE.2
+     &      .AND.1.LE.PSI2) THEN
                DO PSIp1 = 1, 2
                   DO PSIp2 = 1, 2
                      T LID = -2+2*PSIp1+PSIp2
@@ -129,7 +132,8 @@
 ! receive part
             PSIp1 = MY POS(1,1)
             PSIp2 = MY POS(2,1)
-            IF (MY LID.LE.4) THEN
+            IF (MY LID.LE.4.AND.1.LE.PSIp1.AND.PSIp1.LE.2.AND.1.LE.
+     &      PSIp2.AND.PSIp2.LE.2) THEN
                DO PSI1 = 1, 2
                   DO PSI2 = 1, 2
                      T LID = -2+2*PSI1+PSI2
@@ -350,9 +354,10 @@ c
       include "FULLCOPY_parameters.h"
       INTEGER*4 N
       PARAMETER (N = 100)
-      INTEGER LALPHA1,LALPHA2,LALPHAp1,LALPHAp2,PSI1,PSI2,PSIp1,PSIp2
-     &,T LID,I_11,I_10,I_9,I_8,I_7,I_6,I_5,I_4,I,J
-      REAL*4 A(1:50,1:50),B(1:50,1:50),B_1(1:50,1:50),A_1(1:50,1:50)
+      INTEGER LALPHA1, LALPHA2, LALPHAp1, LALPHAp2, PSI1, PSI2, PSIp1
+     &, PSIp2, T LID, I_11, I_10, I_9, I_8, I_7, I_6, I_5, I_4, I, J
+      REAL*4 A(1:50, 1:50), B(1:50, 1:50), B_1(1:50, 1:50), A_1(1:50
+     &, 1:50)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_9, I_10, I_11, 1, N, 3, 1)
       CALL HPFC LOOP BOUNDS(I_5, I_6, I_7, 1, N, 3, 2)

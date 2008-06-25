@@ -1,4 +1,4 @@
---- Hpfc Validation for repl_src
+--- Hpfc Validation for $VDIR/repl_src.f
 
 !
 ! File REPLICATED_SOURCE_A_2_1_node.h
@@ -11,7 +11,8 @@
             PSI1 = MY POS(1,2)
             PSI2 = MY POS(2,2)
             PSI3 = MY POS(3,2)
-            IF (MY LID.LE.8) THEN
+            IF (MY LID.LE.8.AND.PSI3.LE.2.AND.1.LE.PSI3.AND.PSI1.LE.2
+     &      .AND.1.LE.PSI1.AND.1.LE.PSI2.AND.PSI2.LE.2) THEN
                DO TMP3 = 0, 1
                   DO PSIp1 = -2+PSI1+2*PSI3+4*TMP3, MIN(5, -2+PSI1+2*
      &            PSI3+4*TMP3)
@@ -43,7 +44,8 @@
 ! receive part
             PSIp1 = MY POS(1,1)
             PSIp2 = MY POS(2,1)
-            IF (MY LID.LE.10) THEN
+            IF (MY LID.LE.10.AND.1.LE.PSIp1.AND.PSIp1.LE.5.AND.PSIp2
+     &      .LE.2.AND.1.LE.PSIp2) THEN
                DO PSI1 = 1, 2
                   DO PSI2 = 1, 2
                      DO PSI3 = 1, 2
@@ -174,9 +176,9 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "REPLICATED_SOURCE_parameters.h"
-      INTEGER GAMMAp1,LALPHA1,LALPHAp1,PSI1,PSI2,PSI3,PSIp1,PSIp2,
-     &T LID,TMP3,I_6,I_5,I_4,I_3,I_2,I_1
-      REAL*4 F_0,A(1:10),A_1(1:6)
+      INTEGER GAMMAp1, LALPHA1, LALPHAp1, PSI1, PSI2, PSI3, PSIp1, 
+     &PSIp2, T LID, TMP3, I_6, I_5, I_4, I_3, I_2, I_1
+      REAL*4 F_0, A(1:10), A_1(1:6)
       CALL HPFC INIT NODE
 ! all livenesss for A
       LIVE MAPPING(2) = .FALSE.

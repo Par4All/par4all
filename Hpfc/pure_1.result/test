@@ -1,4 +1,4 @@
---- Hpfc Validation for pure_1
+--- Hpfc Validation for $VDIR/pure_1.f
 
       real function cube(x)
 cfcd$ pure
@@ -15,21 +15,23 @@ cfcd$ pure
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "PURE_1_parameters.h"
-      INTEGER ALPHA1,LALPHA1,PSI1,T LID
+      INTEGER ALPHA1, LALPHA1, PSI1, T LID, I
       REAL*4 A(1:100)
       CALL HPFC INIT HOST
 ! collecting distributed variable A
-      PSI1 = 3
-      BUF INDEX = 0
-      RECEIVED NOT PERFORMED = .FALSE.
-      SIZE OF RECEIVED BUFFER = 0
-      T LID = PSI1
-      CALL HPFC RCV FROM NODE(T LID)
-      CALL HPFC REAL4 BUFUPK
-      ALPHA1 = 51
-      LALPHA1 = 25+ALPHA1-25*PSI1
-      BUF INDEX = BUF INDEX+1
-      A(ALPHA1) = HPFC REAL4 BUFF(BUF INDEX)
+      IF (I.EQ.101) THEN
+         PSI1 = 3
+         BUF INDEX = 0
+         RECEIVED NOT PERFORMED = .FALSE.
+         SIZE OF RECEIVED BUFFER = 0
+         T LID = PSI1
+         CALL HPFC RCV FROM NODE(T LID)
+         CALL HPFC REAL4 BUFUPK
+         ALPHA1 = 51
+         LALPHA1 = 25+ALPHA1-25*PSI1
+         BUF INDEX = BUF INDEX+1
+         A(ALPHA1) = HPFC REAL4 BUFF(BUF INDEX)
+      ENDIF
 ! end of collect
       PRINT *, A(51)
       CALL HPFC HOST END
@@ -77,7 +79,8 @@ cfcd$ pure
       include "PURE_1_parameters.h"
       REAL*4 CUBE
       EXTERNAL CUBE
-      INTEGER ALPHA1,LALPHA1,PSI1,I_7,I_6,I_5,I_4,I_3,I_2,I_1,I_0,I
+      INTEGER ALPHA1, LALPHA1, PSI1, I_7, I_6, I_5, I_4, I_3, I_2, 
+     &I_1, I_0, I
       REAL*4 A(1:25)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_5, I_6, I_7, 1, 100, 1, 1)
@@ -91,16 +94,18 @@ cfcd$ pure
          A(I_4) = CUBE(A(I_4))
       ENDDO
 ! collecting distributed variable A
-      PSI1 = MY POS(1,1)
-      IF (PSI1.LE.3.AND.3.LE.PSI1) THEN
-         BUF INDEX = 0
-         SEND NOT INITIALIZED = .TRUE.
-         ALPHA1 = 51
-         LALPHA1 = 25+ALPHA1-25*PSI1
-         BUF INDEX = BUF INDEX+1
-         HPFC REAL4 BUFF(BUF INDEX) = A(LALPHA1)
-         CALL HPFC REAL4 BUFPCK
-         CALL HPFC SND TO HOST
+      IF (I.EQ.101) THEN
+         PSI1 = MY POS(1,1)
+         IF (PSI1.LE.3.AND.3.LE.PSI1) THEN
+            BUF INDEX = 0
+            SEND NOT INITIALIZED = .TRUE.
+            ALPHA1 = 51
+            LALPHA1 = 25+ALPHA1-25*PSI1
+            BUF INDEX = BUF INDEX+1
+            HPFC REAL4 BUFF(BUF INDEX) = A(LALPHA1)
+            CALL HPFC REAL4 BUFPCK
+            CALL HPFC SND TO HOST
+         ENDIF
       ENDIF
 ! end of collect
       CALL HPFC NODE END

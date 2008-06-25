@@ -1,4 +1,4 @@
---- Hpfc Validation for io_2
+--- Hpfc Validation for $VDIR/io_2.f
 
 !
 ! File IO_2_host.f
@@ -14,34 +14,38 @@
       PARAMETER (N = 20)
       INTEGER*4 N
       PARAMETER (N = 20)
-      INTEGER ALPHA1,LALPHA1,PSI1,T LID,I,L,U
+      INTEGER ALPHA1, LALPHA1, PSI1, T LID, I, L, U
       INTEGER A(1:N)
       CALL HPFC INIT HOST
       L = N/2-3
       U = N/2+2
 ! collecting distributed variable A
-      DO PSI1 = 2, 3
-         BUF INDEX = 0
-         RECEIVED NOT PERFORMED = .FALSE.
-         SIZE OF RECEIVED BUFFER = 0
-         T LID = PSI1
-         CALL HPFC RCV FROM NODE(T LID)
-         CALL HPFC INTEGER4 BUFUPK
-         DO ALPHA1 = MAX(-4+5*PSI1, L), MIN(5*PSI1, U)
-            LALPHA1 = 5+ALPHA1-5*PSI1
-            BUF INDEX = BUF INDEX+1
-            A(ALPHA1) = HPFC INTEGER4 BUFF(BUF INDEX)
+      IF (L.EQ.7.AND.U.EQ.12.AND.I.EQ.21) THEN
+         DO PSI1 = 2, 3
+            BUF INDEX = 0
+            RECEIVED NOT PERFORMED = .FALSE.
+            SIZE OF RECEIVED BUFFER = 0
+            T LID = PSI1
+            CALL HPFC RCV FROM NODE(T LID)
+            CALL HPFC INTEGER4 BUFUPK
+            DO ALPHA1 = MAX(L, -4+5*PSI1), MIN(5*PSI1, U)
+               LALPHA1 = 5+ALPHA1-5*PSI1
+               BUF INDEX = BUF INDEX+1
+               A(ALPHA1) = HPFC INTEGER4 BUFF(BUF INDEX)
+            ENDDO
          ENDDO
-      ENDDO
+      ENDIF
 ! end of collect
       PRINT *, (A(I), I = L, U)
 ! updating shared variable I
-      BUF INDEX = 0
-      SEND NOT INITIALIZED = .TRUE.
-      BUF INDEX = BUF INDEX+1
-      HPFC INTEGER4 BUFF(BUF INDEX) = I
-      CALL HPFC INTEGER4 BUFPCK
-      CALL HPFC HCAST
+      IF (L.EQ.7.AND.U.EQ.12) THEN
+         BUF INDEX = 0
+         SEND NOT INITIALIZED = .TRUE.
+         BUF INDEX = BUF INDEX+1
+         HPFC INTEGER4 BUFF(BUF INDEX) = I
+         CALL HPFC INTEGER4 BUFPCK
+         CALL HPFC HCAST
+      ENDIF
 ! end of update
       CALL HPFC HOST END
       END
@@ -88,7 +92,7 @@
       include "IO_2_parameters.h"
       INTEGER*4 N
       PARAMETER (N = 20)
-      INTEGER ALPHA1,LALPHA1,PSI1,I_3,I_2,I_1,I_0,I,L,U
+      INTEGER ALPHA1, LALPHA1, PSI1, I_3, I_2, I_1, I_0, I, L, U
       INTEGER A(1:5)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_1, I_2, I_3, 1, N, 1, 1)
@@ -100,27 +104,31 @@
       L = N/2-3
       U = N/2+2
 ! collecting distributed variable A
-      PSI1 = MY POS(1,1)
-      IF (5*PSI1.LE.4+U.AND.L.LE.5*PSI1) THEN
-         BUF INDEX = 0
-         SEND NOT INITIALIZED = .TRUE.
-         DO ALPHA1 = MAX(-4+5*PSI1, L), MIN(5*PSI1, U)
-            LALPHA1 = 5+ALPHA1-5*PSI1
-            BUF INDEX = BUF INDEX+1
-            HPFC INTEGER4 BUFF(BUF INDEX) = A(LALPHA1)
-         ENDDO
-         CALL HPFC INTEGER4 BUFPCK
-         CALL HPFC SND TO HOST
+      IF (L.EQ.7.AND.U.EQ.12.AND.I.EQ.21) THEN
+         PSI1 = MY POS(1,1)
+         IF (5*PSI1.LE.4+U.AND.L.LE.5*PSI1) THEN
+            BUF INDEX = 0
+            SEND NOT INITIALIZED = .TRUE.
+            DO ALPHA1 = MAX(L, -4+5*PSI1), MIN(5*PSI1, U)
+               LALPHA1 = 5+ALPHA1-5*PSI1
+               BUF INDEX = BUF INDEX+1
+               HPFC INTEGER4 BUFF(BUF INDEX) = A(LALPHA1)
+            ENDDO
+            CALL HPFC INTEGER4 BUFPCK
+            CALL HPFC SND TO HOST
+         ENDIF
       ENDIF
 ! end of collect
 ! updating shared variable I
-      BUF INDEX = 0
-      RECEIVED NOT PERFORMED = .FALSE.
-      SIZE OF RECEIVED BUFFER = 0
-      CALL HPFC NCAST
-      CALL HPFC INTEGER4 BUFUPK
-      BUF INDEX = BUF INDEX+1
-      I = HPFC INTEGER4 BUFF(BUF INDEX)
+      IF (L.EQ.7.AND.U.EQ.12) THEN
+         BUF INDEX = 0
+         RECEIVED NOT PERFORMED = .FALSE.
+         SIZE OF RECEIVED BUFFER = 0
+         CALL HPFC NCAST
+         CALL HPFC INTEGER4 BUFUPK
+         BUF INDEX = BUF INDEX+1
+         I = HPFC INTEGER4 BUFF(BUF INDEX)
+      ENDIF
 ! end of update
       CALL HPFC NODE END
       END

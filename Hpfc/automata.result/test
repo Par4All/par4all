@@ -1,4 +1,4 @@
---- Hpfc Validation for automata
+--- Hpfc Validation for $VDIR/automata.f
 
 !
 ! File AUTOMATA_host.f
@@ -14,7 +14,7 @@
       PARAMETER (N = 70)
       INTEGER*4 M
       PARAMETER (M = 40)
-      INTEGER ALPHA1,LALPHA1,PSI1,T LID,J
+      INTEGER ALPHA1, LALPHA1, PSI1, T LID, I, J, I_LOCAL
       CHARACTER S(1:N)
       CALL HPFC INIT HOST
 
@@ -28,19 +28,21 @@
 
 ! compose and print out the result
 ! collecting distributed variable S
-         DO PSI1 = 1, 2
-            BUF INDEX = 0
-            RECEIVED NOT PERFORMED = .FALSE.
-            SIZE OF RECEIVED BUFFER = 0
-            T LID = PSI1
-            CALL HPFC RCV FROM NODE(T LID)
-            CALL HPFC STRING BUFUPK
-            DO ALPHA1 = MAX(1, -36+36*PSI1), MIN(70, -1+36*PSI1)
-               LALPHA1 = 37+ALPHA1-36*PSI1
-               BUF INDEX = BUF INDEX+1
-               S(ALPHA1) = HPFC STRING BUFF(BUF INDEX)
+         IF (J.LE.40.AND.1.LE.J.AND.I.EQ.71.AND.I_LOCAL.EQ.1) THEN
+            DO PSI1 = 1, 2
+               BUF INDEX = 0
+               RECEIVED NOT PERFORMED = .FALSE.
+               SIZE OF RECEIVED BUFFER = 0
+               T LID = PSI1
+               CALL HPFC RCV FROM NODE(T LID)
+               CALL HPFC STRING BUFUPK
+               DO ALPHA1 = MAX(1, -36+36*PSI1), MIN(70, -1+36*PSI1)
+                  LALPHA1 = 37+ALPHA1-36*PSI1
+                  BUF INDEX = BUF INDEX+1
+                  S(ALPHA1) = HPFC STRING BUFF(BUF INDEX)
+               ENDDO
             ENDDO
-         ENDDO
+         ENDIF
 ! end of collect
 
          PRINT *, S
@@ -122,9 +124,10 @@
       PARAMETER (N = 70)
       INTEGER*4 M
       PARAMETER (M = 40)
-      INTEGER ALPHA1,LALPHA1,PSI1,I_17,I_16,I_15,I_14,I_13,I_12,I_11,
-     &I_10,I_9,I_8,I_7,I_6,I_5,I_4,I_3,I_2,J,I_LOCAL
-      LOGICAL FIELD(0:37,1:3),L_0
+      INTEGER ALPHA1, LALPHA1, PSI1, I_17, I_16, I_15, I_14, I_13, 
+     &I_12, I_11, I_10, I_9, I_8, I_7, I_6, I_5, I_4, I_3, I_2, I, J
+     &, I_LOCAL
+      LOGICAL FIELD(0:37, 1:3), L_0
       CHARACTER S(1:36)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_15, I_16, I_17, 1, N, 1, 1)
@@ -202,16 +205,20 @@
             ENDIF
          ENDDO
 ! collecting distributed variable S
-         PSI1 = MY POS(1,1)
-         BUF INDEX = 0
-         SEND NOT INITIALIZED = .TRUE.
-         DO ALPHA1 = MAX(1, -36+36*PSI1), MIN(70, -1+36*PSI1)
-            LALPHA1 = 37+ALPHA1-36*PSI1
-            BUF INDEX = BUF INDEX+1
-            HPFC STRING BUFF(BUF INDEX) = S(LALPHA1)
-         ENDDO
-         CALL HPFC STRING BUFPCK
-         CALL HPFC SND TO HOST
+         IF (J.LE.40.AND.1.LE.J.AND.I.EQ.71.AND.I_LOCAL.EQ.1) THEN
+            PSI1 = MY POS(1,1)
+            IF (PSI1.LE.2.AND.1.LE.PSI1) THEN
+               BUF INDEX = 0
+               SEND NOT INITIALIZED = .TRUE.
+               DO ALPHA1 = MAX(1, -36+36*PSI1), MIN(70, -1+36*PSI1)
+                  LALPHA1 = 37+ALPHA1-36*PSI1
+                  BUF INDEX = BUF INDEX+1
+                  HPFC STRING BUFF(BUF INDEX) = S(LALPHA1)
+               ENDDO
+               CALL HPFC STRING BUFPCK
+               CALL HPFC SND TO HOST
+            ENDIF
+         ENDIF
 ! end of collect
 
       ENDDO
