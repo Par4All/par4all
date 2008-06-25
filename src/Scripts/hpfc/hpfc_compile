@@ -162,8 +162,8 @@ dir=${HPFC_RUNTIME:-${PIPS_ROOT}/Share}
 if [ "$FAKES" ] 
 then
     $debug "adding needed fake file"
-    for d in ${HPFC_RUNTIME} ${PIPS_ROOT}/Share ; do
-	for f in hpfc_stubs.direct hpfc_stubs.f ; do
+    for d in ${HPFC_RUNTIME} ${PIPS_ROOT}/share ; do
+	for f in hpfc_stubs.direct.f hpfc_stubs.f ; do
 	    [ -f $d/$f -a ! "$fake" ] && fake=$d/$f ;
 	done
     done
