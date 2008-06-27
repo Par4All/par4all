@@ -1056,11 +1056,13 @@ static void parse_arguments(int argc, char * argv[])
 	tpips_exec(optarg);
 	break;
       case 'v': 
-	fprintf(stdout, "tpips: (%s)\n"
-		"\tARCH=" STRINGIFY(SOFT_ARCH) "\n"
-		/* ??? revisions should updated at every link... */
-		"\tREVS %s\n" 
-		"\tDATE=" STRINGIFY(UTC_DATE) "\n", argv[0], soft_revisions);
+	fprintf(stdout, 
+		"tpips: (%s)\n"
+		"ARCH=" STRINGIFY(SOFT_ARCH) "\n"
+		"REVS=\n"
+		"%s" 
+		"DATE=" STRINGIFY(UTC_DATE) "\n", 
+		argv[0], soft_revisions);
 	exit(0);
 	break;
       case 'r': 

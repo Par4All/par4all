@@ -62,10 +62,11 @@ static void pips_parse_arguments(int argc, char * argv[])
 	switch (c) {
 	case 'v':
 	    fprintf(stdout, 
-		    "pips (%s)\n"
-		    "\tARCH=" STRINGIFY(SOFT_ARCH) "\n"
-		    "\tREVS %s\n"
-		    "\tDATE=" STRINGIFY(UTC_DATE) "\n", 
+		    "tpips: (%s)\n"
+		    "ARCH=" STRINGIFY(SOFT_ARCH) "\n"
+		    "REVS=\n"
+		    "%s" 
+		    "DATE=" STRINGIFY(UTC_DATE) "\n", 
 		    argv[0], soft_revisions);
 	    exit(0);
 	    break;

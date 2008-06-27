@@ -2,5 +2,7 @@
 
 /* could be shared somewhere? */
 char * soft_revisions = 
-  "newgen=" NEWGEN_REV ", linear=" LINEAR_REV
-  ", pips=" PIPS_REV ", nlpmake=" NLPMAKE_REV;
+  "  newgen:  " NEWGEN_REV "\n"
+  "  linear:  " LINEAR_REV "\n"
+  "  pips:    " PIPS_REV "\n"
+  "  nlpmake: " NLPMAKE_REV "\n";
