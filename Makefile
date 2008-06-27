@@ -2,6 +2,7 @@
 
 FIND	= find . -name '.svn' -type d -prune -o
 
+.PHONY: clean
 clean:
 	$(FIND) -name '*~' -type f -print0 \
 	     -o -name 'core' -type f -print0 \
@@ -17,6 +18,7 @@ clean:
 TARGET	= $(shell grep '^[a-zA-Z]' defaults)
 VOPT	= -v
 
+.PHONY: .check_validate
 .check_validate:
 	@if [ -d RESULTS ] ; then \
 	  echo -e \
@@ -26,8 +28,14 @@ VOPT	= -v
 	  exit 1; \
 	fi
 
+.PHONY: validate
 validate: .check_validate
 	PIPS_MORE=cat pips_validate $(VOPT) -V $(PWD) -O RESULTS $(TARGET)
 
+.PHONY: accept
 accept:
 	manual_accept $(TARGET)
+
+# convenient pseudo-target for tests
+%.val: %
+	test -d $< && $(MAKE) TARGET=$< validate
