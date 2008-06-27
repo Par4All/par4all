@@ -1,16 +1,17 @@
 #! /bin/sh
 # $Id$
 
-dir=$1
-
-if type svnversion > /dev/null
-then
-    if [ -d $dir/.svn ]
+for dir
+do
+    if type svnversion > /dev/null
     then
-	svnversion $dir
+	if [ -d $dir/.svn ]
+	then
+	    echo $(svn info $dir | sed -n -e '2s/.*: //p')@$(svnversion $dir)
+	else
+	    echo 'unknown@unknown'
+	fi
     else
-	echo 'unknown'
+	echo 'unknown@unknown'
     fi
-else
-    echo 'unknown'
-fi
+done
