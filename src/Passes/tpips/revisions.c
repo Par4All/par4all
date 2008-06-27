@@ -6,3 +6,5 @@ char * soft_revisions =
   "  linear:  " LINEAR_REV "\n"
   "  pips:    " PIPS_REV "\n"
   "  nlpmake: " NLPMAKE_REV "\n";
+
+char * soft_date = UTC_DATE;

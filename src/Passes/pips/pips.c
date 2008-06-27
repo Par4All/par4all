@@ -56,6 +56,7 @@ static void pips_parse_arguments(int argc, char * argv[])
     extern char *optarg;
     extern int optind;
     extern char * soft_revisions;
+    extern char * soft_date;
     source_files = gen_array_make(5);
 
     while ((c = getopt(argc, argv, "vf:m:s:p:b:1:0:")) != -1)
@@ -66,8 +67,8 @@ static void pips_parse_arguments(int argc, char * argv[])
 		    "ARCH=" STRINGIFY(SOFT_ARCH) "\n"
 		    "REVS=\n"
 		    "%s" 
-		    "DATE=" STRINGIFY(UTC_DATE) "\n", 
-		    argv[0], soft_revisions);
+		    "DATE=%s\n", 
+		    argv[0], soft_revisions, soft_date);
 	    exit(0);
 	    break;
 	case 'f':

@@ -43,6 +43,7 @@ static FILE * logfile;
 static FILE * current_file; /* current file being processed */
 
 extern char * soft_revisions;
+extern char * soft_date;
 extern int tgetnum();
 extern void tp_restart( FILE * ); /* tp_lex.c */
 
@@ -1061,8 +1062,8 @@ static void parse_arguments(int argc, char * argv[])
 		"ARCH=" STRINGIFY(SOFT_ARCH) "\n"
 		"REVS=\n"
 		"%s" 
-		"DATE=" STRINGIFY(UTC_DATE) "\n", 
-		argv[0], soft_revisions);
+		"DATE=%s\n", 
+		argv[0], soft_revisions, soft_date);
 	exit(0);
 	break;
       case 'r': 
