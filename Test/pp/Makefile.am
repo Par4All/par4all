@@ -6,7 +6,8 @@ OBJ_DIR = $(top_builddir)
 
 PP =  \
 	c6.in \
-	c7.in
+	c7.in \
+	salvatore.in
 
 #	c5.in \
 #	c4.in \

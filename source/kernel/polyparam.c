@@ -80,8 +80,8 @@ Polyhedron *PDomainIntersection(Polyhedron *Pol1,Polyhedron *Pol2,unsigned NbMax
 /* 
  * Given polyhderal domains 'Pol1' and 'Pol2', return the difference of the 
  * two domains with a modification that the resulting polyhedra in the new 
- * domain don't have a 1 unit space around cut and the degenrate results are 
- * discarded. 
+ * domain don't have a 1 unit space around cut and the degenerate results
+ * (of smaller dimension) are discarded. 
  */
 Polyhedron *PDomainDifference(Polyhedron *Pol1,Polyhedron *Pol2,unsigned NbMaxRays) {
   
@@ -581,7 +581,7 @@ static bit_vector_includes(unsigned int *bv, int len, unsigned int *part)
 /*----------------------------------------------------------------------*/
 /* scan_m_face                                                          */
 /*      pos : the next candidate constraint position                    */
-/*    nb-un : number of saturated constraints needed to finish a face   */
+/*    nb_un : number of saturated constraints needed to finish a face   */
 /*        D : the source polyhedron (context included )                 */
 /*       mf : bit-array marking rays which are saturated so far         */
 /* From Global area:                                                    */
@@ -1224,7 +1224,13 @@ Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int wo
   PiInv  = Matrix_Alloc(m+1,m+2);
   RaysDi = Matrix_Alloc(D1->NbRays,m+2);
   m_dim = m;
-  
+
+  /* if the smallest face is of smaller dimension than m_dim,
+   * then increase m_dim
+   */
+  if (m_dim < D1->NbBid)
+      m_dim = D1->NbBid;
+
 #ifdef DEBUGPP
   nbfaces=0;
 #endif
