@@ -4,8 +4,6 @@
 
 include $(ROOT)/makes/define_libraries.mk
 
-CPPFLAGS += -DUTC_DATE='$(UTC_DATE)'
-
 # issue about bad header files.
 ifdef INC_TARGET
 

@@ -11,6 +11,9 @@ VERSION	= $(MAKE.d)/version.sh
 	  echo '#define NLPMAKE_REV "$(shell $(VERSION) $(PIPS_ROOT)/makes)"'; \
 	} > revisions.h
 
+
+$(ARCH)/revisions.o: CPPFLAGS += -DUTC_DATE='$(UTC_DATE)'
+
 revisions.h: .revisions_h
 
 clean: version-clean
