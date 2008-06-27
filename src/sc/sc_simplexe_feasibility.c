@@ -489,7 +489,7 @@ typedef struct
     int numero; 
     int hash ;
     Value val ;
-    int succ ;
+    intptr_t succ ;
 } hashtable_t;
 
 /* For debugging: */
