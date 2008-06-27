@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <stdarg.h>
 
 #include "linear.h"
 
@@ -138,12 +139,16 @@ static void pips_user_log(const char * fmt, va_list args)
     FILE * log_file = get_log_file();
 
     if(log_file!=NULL) {
-	if (vfprintf(log_file, fmt, args) <= 0) {
+        /* it seems one cannot use args twice... so a copy is made here... */
+        va_list args_copy;
+	va_copy(args_copy, args);
+	if (vfprintf(log_file, fmt, args_copy) <= 0) {
 	    perror("pips_user_log");
 	    abort();
 	}
 	else
 	    fflush(log_file);
+	va_end(args_copy);
     }
 
     if(get_bool_property("USER_LOG_P")==FALSE)
