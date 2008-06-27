@@ -426,9 +426,9 @@ ZPolyhedron *ZDomainDifference(ZPolyhedron  *A, ZPolyhedron *B) {
 #endif
   
   if (A->Lat->NbRows != B->Lat->NbRows) {
-    fprintf(stderr, "In ZDomainDifference : The Input ZDomains");
-    fprintf(stderr, "Do not have the compatible dimensions\n");
-    fprintf(stderr, "ZDomainDiffernce not performed\n");
+    fprintf(stderr, "In ZDomainDifference : the input ZDomains ");
+    fprintf(stderr, "do not have compatible dimensions\n");
+    fprintf(stderr, "ZDomainDifference not performed\n");
     return NULL;
   }
   

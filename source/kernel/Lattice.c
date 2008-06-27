@@ -481,7 +481,7 @@ Lattice *LatticeIntersection(Lattice *X, Lattice *Y) {
   }
   
   if (Y->NbRows != X->NbRows) {
-    fprintf (stderr, "\nIn LatticeIntersection : The Input Lattices X and Y are of incompatible dimensions\n");
+    fprintf (stderr, "\nIn LatticeIntersection : the input lattices X and Y are of incompatible dimensions\n");
     return EmptyLattice(X->NbRows);
   }
   
@@ -667,7 +667,7 @@ LatticeUnion *Lattice2LatticeUnion(Lattice *X,Lattice *Y)
 
   Intersection = LatticeIntersection(X,Y);
   if (isEmptyLattice(Intersection) == True) {
-    fprintf(stderr,"\nIn Lattice2LatticeUnion : The Input Lattices X and Y does not have any common part\n");
+    fprintf(stderr,"\nIn Lattice2LatticeUnion : the input lattices X and Y do not have any common part\n");
     return NULL;
   }  
 
