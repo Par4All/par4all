@@ -103,6 +103,7 @@ summary=$odir/SUMMARY
 
 echo "validation for $@
 in directory ${vdir}/
+  $($PIPS_ROOT/makes/version.sh $vdir)
 for $arch architecture
 output in directory ${odir}/
 with pips=$pips
