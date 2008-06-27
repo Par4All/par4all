@@ -1,19 +1,4 @@
 * validation
 - use only relative filenames
-- should not rely on PIPS_ROOT/Validation nor $PIPS_VALIDDIR to exists
-
-* done for
-- Regions
-- Semantics
-- SC95
-- RegionPrivatization
-- Complexity
-- Syntax
-- Preprocessor
-- C_syntax
-- Control
-- Effects
-
-* Syntax
-- switch many .test to .tpips or .tpips2
-- do not have both .test and .tpips to save confusion
+  pb with expansion (create foo xxx/*.c)
+- must not rely on PIPS_ROOT/Validation nor $PIPS_VALIDDIR to exists
