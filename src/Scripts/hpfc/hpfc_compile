@@ -241,9 +241,10 @@ set +x
 [ "$DUMPFILES" ] &&
 {
   $verbose "dumping generated files"
-  cat $WORKSPACE.database/Src/*.[fh]
+  # sort needed so that the file order is deterministic
+  ls -d $WORKSPACE.database/Src/*.[fh] | sort | xargs cat
 }
-  
+
 [ "$DELETE" = : ] ||
 {
   $verbose "deleting $WORKSPACE workspace"
