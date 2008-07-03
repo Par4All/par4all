@@ -130,7 +130,31 @@ make_constant_entity(
 
 	if (bt == is_basic_int)
 	{
-	  ce = make_constant(is_constant_int, (void*) atol(name));
+	  /* The conversion depends on the size */
+	  if(size==4) {
+	    long l = atol(name);
+	    char buffer[12];
+
+	    sprintf(buffer, "%d", l);
+	    if(strcmp(name,buffer)==0)
+	      ce = make_constant(is_constant_int, (void*) atol(name));
+	    else
+	      ParserError("make_constant_entity",
+			  "Integer constant too large for internal representation\n");
+	  }
+	  else if(size==8) {
+	    /* Should not work on a 32 bit machines. Expects pointers to be 64 bits */
+	    long long ll = atoll(name);
+	    char buffer[24];
+
+	    sprintf(buffer, "%ld", ll);
+	    if(strcmp(name,buffer)==0)
+	      ce = make_constant(is_constant_int, (void*) atol(name));
+	    else
+	      ParserError("make_constant_entity",
+			  "Integer constant too large for internal representation\n");
+	    ce = make_constant(is_constant_int, (void*) atoll(name));
+	  }
 	}
 	else
 	{
