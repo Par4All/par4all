@@ -26,8 +26,12 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 display PRINTED_FILE[main]
 
-apply UNSPLIT[%PROGRAM]
+echo
+echo Unsplit array
+echo
 
+apply UNSPLIT[%PROGRAM]
+shell cat array.database/Src/array.c
 close
 
 delete array

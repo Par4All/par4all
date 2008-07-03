@@ -18,10 +18,14 @@ echo
 
 display PRINTED_FILE[main]
 
-apply UNSPLIT[%PROGRAM]
+echo
+echo Unsplit goto
+echo
 
+apply UNSPLIT[%PROGRAM]
+shell cat goto.database/Src/goto.c
 close
 
-delete goto
+#delete goto
 
 quit

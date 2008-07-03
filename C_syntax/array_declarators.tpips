@@ -12,10 +12,14 @@ activate C_PARSER
 
 #setenv PRETTYPRINT_DEBUG_LEVEL 7
 
-display PRINTED_FILE[%ALL]
+display PRINTED_FILE[array_declarators!]
+
+echo
+echo Unsplit array_declarators
+echo
 
 apply UNSPLIT[%PROGRAM]
-
+shell array_declarators.database/Src/array_declarators.c
 close
 
 delete array_declarators

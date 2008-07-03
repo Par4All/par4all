@@ -10,8 +10,13 @@ setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 activate C_SYMBOL_TABLE
 activate C_PARSER
 
-display SYMBOL_TABLE_FILE[%ALL]
-display PARSED_PRINTED_FILE[%ALL]
+#display SYMBOL_TABLE_FILE[foo]
+
+echo
+echo Printed file for foo
+echo 
+
+display PARSED_PRINTED_FILE[foo]
 
 close
 delete multideclslocalvar

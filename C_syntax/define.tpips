@@ -12,8 +12,12 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 display PRINTED_FILE[main]
 
-apply UNSPLIT[%PROGRAM]
+echo
+echo Unsplit define
+echo
 
+apply UNSPLIT[%PROGRAM]
+shell cat define.database/Src/define.c
 close
 
 delete define

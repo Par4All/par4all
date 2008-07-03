@@ -1,13 +1,50 @@
 delete files
-create files files/*.c
+
+# The expansion of * by tpips is not reliable because it happens with
+# respect to the execution directory and not with respect to the
+# location of the files (see Fabien Coelho)
+
+#create files files/*.c
+create files files/file1.c files/file2.c files/file3.c
 
 activate C_PARSER
 
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
-display PRINTED_FILE[%ALL]
+echo
+echo Printed files for file1.c
+echo
 
-#apply UNSPLIT[%PROGRAM]
+display PRINTED_FILE[file1!]
+display PRINTED_FILE[a]
+display PRINTED_FILE[b]
+
+echo
+echo Printed files for file2.c
+echo
+
+display PRINTED_FILE[file2!]
+display PRINTED_FILE[c]
+display PRINTED_FILE[d]
+
+echo
+echo Printed files for file3.c
+echo
+
+display PRINTED_FILE[e]
+display PRINTED_FILE[f]
+
+echo
+echo Unsplit files
+echo
+
+apply UNSPLIT[%PROGRAM]
+
+shell cat files.database/Src/file1.c
+shell cat files.database/Src/file2.c
+shell cat files.database/Src/file3.c
 
 close
+delete files
+quit

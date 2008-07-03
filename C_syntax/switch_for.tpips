@@ -27,6 +27,6 @@ display PRINTED_FILE[gl_enable]
 apply UNSPLIT[%PROGRAM]
 
 close
-delete switch_for
+#delete switch_for
 
 quit
