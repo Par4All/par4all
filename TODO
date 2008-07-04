@@ -2,4 +2,3 @@
 - use only relative filenames
   pb with expansion (create foo xxx/*.c)
 - must not rely on PIPS_ROOT/Validation nor $PIPS_VALIDDIR to exists
-- check svn commit messages
