@@ -131,29 +131,35 @@ make_constant_entity(
 	if (bt == is_basic_int)
 	{
 	  /* The conversion depends on the size */
+	  string sname = name;
+	  for(;*sname!='\000' &&*(sname+1)!='\000' && *sname=='0'; sname++)
+	    ;
 	  if(size==4) {
-	    long l = atol(name);
+	    long l = atol(sname);
 	    char buffer[12];
 
 	    sprintf(buffer, "%d", l);
-	    if(strcmp(name,buffer)==0)
-	      ce = make_constant(is_constant_int, (void*) atol(name));
-	    else
+	    if(strcmp(sname,buffer)==0)
+	      ce = make_constant(is_constant_int, (void*) atol(sname));
+	    else {
+	      pips_user_warning("Integer constant '%s' cannot be stored in %d bytes\n", name, size);
 	      ParserError("make_constant_entity",
 			  "Integer constant too large for internal representation\n");
+	    }
 	  }
 	  else if(size==8) {
 	    /* Should not work on a 32 bit machines. Expects pointers to be 64 bits */
-	    long long ll = atoll(name);
+	    long long ll = atoll(sname);
 	    char buffer[24];
 
 	    sprintf(buffer, "%ld", ll);
-	    if(strcmp(name,buffer)==0)
-	      ce = make_constant(is_constant_int, (void*) atol(name));
-	    else
+	    if(strcmp(sname,buffer)==0)
+	      ce = make_constant(is_constant_int, (void*) atoll(sname));
+	    else {
+	      pips_user_warning("Integer constant '%s' cannot be stored in %d bytes\n", name, size);
 	      ParserError("make_constant_entity",
 			  "Integer constant too large for internal representation\n");
-	    ce = make_constant(is_constant_int, (void*) atoll(name));
+	}
 	  }
 	}
 	else
