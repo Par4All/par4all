@@ -1,0 +1,6 @@
+delete leading0_01
+create leading0_01 leading0_01.f
+display PRINTED_FILE
+close
+delete leading0_01
+quit
