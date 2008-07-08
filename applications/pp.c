@@ -12,7 +12,7 @@ int main() {
   Param_Polyhedron *PA;
   Param_Domain *P;
   Param_Vertices *V;
-  int nbPV;
+  int nbPV, i, j;
   const char **param_name;
   
   a = Matrix_Read();
@@ -42,6 +42,21 @@ int main() {
   nbPV = PA->nbV;
   Domain_Free(A);
   Domain_Free(B);
+
+  if (PA->Rays->NbRows > 0) {
+    printf( "---------------------------------------\n" );
+    printf( "Overall rays :\n");
+    for (i = 0; i < PA->Rays->NbRows; i++) {
+      if (value_zero_p(PA->Rays->p[i][0]))
+        printf("Line:   [");
+      else
+        printf("Ray:    [");
+      for (j = 1; j < PA->Rays->NbColumns-1; j++) {
+        value_print(stdout,P_VALUE_FMT,PA->Rays->p[i][j]);
+      }
+      printf(" ]\n");
+    }
+  }
 
   /*****************************/
   /* Scan the validity domains */

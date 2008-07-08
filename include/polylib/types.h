@@ -142,6 +142,7 @@ typedef struct _Param_Polyhedron {
 	Param_Vertices *V;  /* Pointer to the list of parameteric vertices */
 	Param_Domain *D;    /* Pointer to the list of validity domains     */
 	Matrix *Constraints;/* Constraints referred to by V->Facets	   */
+	Matrix *Rays;        /* Lines/rays (non parametric)                 */
 } Param_Polyhedron;
 
 #define FORALL_PVertex_in_ParamPolyhedron(_V, _D, _P)   \

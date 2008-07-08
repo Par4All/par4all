@@ -7,7 +7,7 @@ extern "C" {
 
 extern void Compute_PDomains ( Param_Domain *PD, int nb_domains, int
                                working_space );
-extern Param_Polyhedron *GenParamPolyhedron (Polyhedron *Pol);
+extern Param_Polyhedron *GenParamPolyhedron(Polyhedron *Pol, Matrix *Rays);
 extern void Param_Domain_Free (Param_Domain *PD);
 extern void Param_Polyhedron_Free ( Param_Polyhedron *P );
 extern void Param_Vertices_Free ( Param_Vertices *PV );
