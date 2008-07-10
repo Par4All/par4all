@@ -130,11 +130,16 @@ make_constant_entity(
 
 	if (bt == is_basic_int)
 	{
-	  /* The conversion depends on the size */
+	  /* The conversion depends on the representation size */
+	  /* strtol() could be used to manage a larger variety of C
+	     initialization cases (RK) */
 	  string sname = name;
+
+	  /* Skip leading zeroes to check the conversion result with scanf */
 	  for(;*sname!='\000' &&*(sname+1)!='\000' && *sname=='0'; sname++)
 	    ;
-	  if(size==4) {
+
+	  if(size==4) { // 32 bit target machine
 	    long l = atol(sname);
 	    char buffer[12];
 
@@ -142,12 +147,13 @@ make_constant_entity(
 	    if(strcmp(sname,buffer)==0)
 	      ce = make_constant(is_constant_int, (void*) atol(sname));
 	    else {
+	      /* Some truncation occured */
 	      pips_user_warning("Integer constant '%s' cannot be stored in %d bytes\n", name, size);
 	      ParserError("make_constant_entity",
 			  "Integer constant too large for internal representation\n");
 	    }
 	  }
-	  else if(size==8) {
+	  else if(size==8) { // 64 bit target machine
 	    /* Should not work on a 32 bit machines. Expects pointers to be 64 bits */
 	    long long ll = atoll(sname);
 	    char buffer[24];
@@ -156,11 +162,14 @@ make_constant_entity(
 	    if(strcmp(sname,buffer)==0)
 	      ce = make_constant(is_constant_int, (void*) atoll(sname));
 	    else {
+	      /* Some truncation occured */
 	      pips_user_warning("Integer constant '%s' cannot be stored in %d bytes\n", name, size);
 	      ParserError("make_constant_entity",
 			  "Integer constant too large for internal representation\n");
-	}
+	    }
 	  }
+	  else
+	    pips_internal_error("Unexpected number of bytes for an integer variable\n");
 	}
 	else
 	{
