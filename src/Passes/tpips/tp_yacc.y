@@ -648,6 +648,8 @@ i_create: TK_CREATE TK_NAME /* workspace name */
 		} 
 		else
 		{
+		    if(!workspace_name_p($2))
+		       pips_user_error("workspace name %s contains invalid character(s)\n", $2);
 		    if (db_create_workspace($2))
 		    {
 			if (!create_workspace($3))
