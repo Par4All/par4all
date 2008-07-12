@@ -38,7 +38,7 @@
 %type <status> i_apply i_activate i_display i_get i_setenv i_getenv i_cd i_rm
 %type <status> i_info i_shell i_echo i_setprop i_quit i_exit i_help i_capply
 %type <status> i_checkpoint i_show i_unknown i_checkactive
-%type <name> rulename filename propname phasename resourcename
+%type <name> rulename filename propname phasename resourcename workspace_name
 %type <array> filename_list
 %type <rn> resource_id rule_id
 %type <array> owner list_of_owner_name
@@ -598,7 +598,7 @@ i_checkpoint: TK_CHECKPOINT TK_ENDOFLINE
 	}
 	;
 
-i_open:	TK_OPEN TK_NAME TK_ENDOFLINE
+i_open:	TK_OPEN workspace_name TK_ENDOFLINE
 	{
 	    string main_module_name;
 
@@ -631,7 +631,15 @@ i_open:	TK_OPEN TK_NAME TK_ENDOFLINE
 	}
 	;
 
-i_create: TK_CREATE TK_NAME /* workspace name */ 
+workspace_name: TK_NAME
+        {
+	  if(workspace_name_p($1))
+	    $$ = $1;
+	  else
+	    pips_user_error("workspace name %s contains invalid character(s)\n", $1);
+	}
+
+i_create: TK_CREATE workspace_name /* workspace name */ 
 		filename_list /* source files */ TK_ENDOFLINE
 	{
 	    string main_module_name;
@@ -648,8 +656,6 @@ i_create: TK_CREATE TK_NAME /* workspace name */
 		} 
 		else
 		{
-		    if(!workspace_name_p($2))
-		       pips_user_error("workspace name %s contains invalid character(s)\n", $2);
 		    if (db_create_workspace($2))
 		    {
 			if (!create_workspace($3))
@@ -692,7 +698,7 @@ i_close: TK_CLOSE /* assume current workspace */ TK_ENDOFLINE
 	}
 	;
 
-i_delete: TK_DELETE TK_NAME /* workspace name */ TK_ENDOFLINE
+i_delete: TK_DELETE workspace_name /* workspace name */ TK_ENDOFLINE
 	{
 	    pips_debug(7,"reduce rule i_delete\n");
 
