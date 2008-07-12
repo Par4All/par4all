@@ -4,7 +4,7 @@ create switch_for switch_for.c
 activate C_PARSER
 
 #setenv C_SYNTAX_DEBUG_LEVEL 7
-
+#setproperty  PRETTYPRINT_ALL_LABELS FALSE
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 

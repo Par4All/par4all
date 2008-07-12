@@ -8,7 +8,9 @@ activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE
 
 
+
 display PRINTED_FILE[%ALL]
+
 
 close
 

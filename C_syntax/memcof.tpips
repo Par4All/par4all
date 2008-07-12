@@ -7,6 +7,10 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 activate C_PARSER
 
+echo
+echo Printed file for 'memcof!' 
+echo
+
 display PRINTED_FILE[memcof!]
 
 echo

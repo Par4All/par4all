@@ -1,3 +1,11 @@
+
+Unsplit adi
+
+/*
+ * file for adi.c
+ */
+   extern void adi();
+   extern void tridag();
 void adi(double **a,double **b,double **c,double **d,double **e,double **f,double **g,double **u,int jmax,int k,double alpha,double beta,double eps)
 {
    int i;

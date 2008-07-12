@@ -10,6 +10,10 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 #setenv  PRETTYPRINT_DEBUG_LEVEL 7
 
+echo
+echo Printed file for "formal_function!"
+echo
+
 display PRINTED_FILE[formal_function!]
 
 echo

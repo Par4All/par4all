@@ -16,5 +16,5 @@ display SYMBOL_TABLE_FILE[main]
 display PARSED_PRINTED_FILE[foo]
 display PARSED_PRINTED_FILE[main]
 close
-delete allocation03
+#delete allocation03
 quit

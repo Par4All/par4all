@@ -1,0 +1,7 @@
+delete continue
+create continue continue.f
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+display PRINTED_FILE
+close
+quit

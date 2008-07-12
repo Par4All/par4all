@@ -1,4 +1,3 @@
-
 #define YES 1
 
 main()

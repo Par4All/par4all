@@ -1,4 +1,11 @@
    extern int verlet(int (*[])());
+
+Unsplit formal_function
+
+/*
+ * file for formal_function.c
+ */
+   extern int verlet(int (*[])());
 int verlet(int (*forces[])())
 {
 }

@@ -18,6 +18,7 @@ echo
 
 apply UNSPLIT[%PROGRAM]
 shell cat define.database/Src/define.c
+
 close
 
 delete define

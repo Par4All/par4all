@@ -24,6 +24,10 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 #activate PRINT_CODE_TRANSFORMERS
 
+echo
+echo Printed file for main
+echo
+
 display PRINTED_FILE[main]
 
 echo

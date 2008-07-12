@@ -1,3 +1,15 @@
+
+Printed file for array_declarators!
+
+   extern int n;
+   extern int m;
+   extern void fcompat(void );
+
+Unsplit array_declarators
+
+/*
+ * file for array_declarators.c
+ */
    extern int n;
    extern int m;
    extern void fcompat(void );
@@ -8,4 +20,3 @@ void fcompat(void )
    int c[n-1+1][n-1+1][6][m-1+1];
    int (*r)[n-1+1][n-1+1][n+1-1+1];
 }
-
