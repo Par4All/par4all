@@ -417,7 +417,7 @@ set_control_to_label(entity m, control c, hash_table h)
     if ((l = hash_get(h, (char *) c)) == HASH_UNDEFINED_VALUE) {
 	string label = entity_name( statement_to_label( st )) ;
 
-	l = empty_label_p( label ) ? new_label_name(m) : label ;
+	l = empty_global_label_p( label ) ? new_label_name(m) : label ;
 	debug(3, "set_control_to_label", "Associates label %s to stmt %s\n",
 	      l, statement_identification(st));
 	hash_put(h, (char *) c, strdup(l)) ;
@@ -663,7 +663,7 @@ text_trail(entity module, int margin, list trail, hash_table labels)
 	    }
 	    u = make_unformatted(NULL, statement_number(st), margin, pc) ;
 
-	    if( !empty_label_p( entity_name( statement_label( st )))) {
+	    if( !empty_global_label_p( entity_name( statement_label( st )))) {
 		/*
 		  string ln = control_to_label_name(c, labels);
 		  if(string_undefined_p(ln)) {

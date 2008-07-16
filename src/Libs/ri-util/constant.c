@@ -86,6 +86,26 @@ tag t;
 /* Lines between BEGIN_EOLE and END_EOLE tags are automatically included
    in the EOLE project (JZ - 11/98) */
 
+#define INTEGER_CONSTANT_NAME_CHARS \
+	"0123456789"
+
+bool integer_constant_name_p(string name)
+{
+    return strlen(name)==strspn(name, INTEGER_CONSTANT_NAME_CHARS);
+}
+intptr_t TK_CHARCON_to_intptr_t(string name)
+{
+  intptr_t r;
+  /* Should be able to decode any C character constant... */
+  if(strlen(name)==3 && name[0]=='\'' && name[2]=='\'')
+    r=name[1];
+  else {
+    pips_user_warning("character constant %s not recognized\n",name);
+    // pips_internal_error("not implemented yet\n");
+    r=0;//just temporory 
+  }
+  return r;
+}
 
 /* This function creates a constant. a constant is represented in our
 internal representation by a function. Its name is the name of the
@@ -111,71 +131,83 @@ Character constants are typed as int.
 					  size_t size,
 					  bool is_fortran)
 {
-    entity e;
+  entity e;
 
-   e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, name);
+  e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, name);
 
-    if (entity_type(e) == type_undefined) {
-	functional fe;
-	constant ce;
-	basic be;
+  if (entity_type(e) == type_undefined) {
+    functional fe;
+    constant ce;
+    basic be;
 	
-	if (bt == is_basic_string) {
-	    be = make_basic(bt, (make_value(is_value_constant, 
-					    (make_constant(is_constant_int, 
-					      (void*) strlen(name)-2)))));
-	}
-	else {
-	    be = make_basic(bt, (void*) size);
-	}
-
-	fe = make_functional(NIL, MakeTypeVariable(be, NIL));
-
-	if (bt == is_basic_int)	{ // int or char constants
-	  int basis = is_fortran? 10 : 0;
-	  string error_string = string_undefined;
-	  int64_t l = 0;
-
-	  /* Skip leading zeroes to check the conversion result with scanf */
-	  /* for(;*sname!='\000' &&*(sname+1)!='\000' && *sname=='0'; sname++) */
-	  /*  ; */
-
-	  if(size==4) { // 32 bit target machine
-	    l = (int64_t) strtol(name, &error_string, basis);
-	  }
-	  else if(size==8) {
-	    pips_assert("pointers have the right size", sizeof(void *)==8);
-	    l = (int64_t) strtol(name, &error_string, basis);
-	  }
-	  else
-	    pips_internal_error("Unexpected number of bytes for an integer variable\n");
-
-	  if(errno==EINVAL) {
-	      pips_user_warning("Integer constant '%s' cannot be converted in %d bytes (%s)\n",
-				name, size, error_string);
-	      ParserError("make_constant_entity",
-			  "Integer constant conversion error\n");
-	    }
-	  else if(errno==ERANGE) {
-	      pips_user_warning("Overflow, Integer constant '%s' cannot be stored in %d bytes\n",
-				name, size);
-	      ParserError("make_constant_entity",
-			  "Integer constant too large for internal representation\n");
-	  }
-
-	  ce = make_constant(is_constant_int, (void*) l);
-	}
-	else
-	{
-	  ce = make_constant(is_constant_call, e);
-	}
-
-	entity_type(e) = make_type(is_type_functional, fe);
-	entity_storage(e) = MakeStorageRom();
-	entity_initial(e) = make_value(is_value_constant, ce);
+    if (bt == is_basic_string) {
+      be = make_basic(bt, (make_value(is_value_constant, 
+				      (make_constant(is_constant_int, 
+						     (void*) strlen(name)-2)))));
+    }
+    else {
+      be = make_basic(bt, (void*) size);
     }
 
-    return(e);
+    fe = make_functional(NIL, MakeTypeVariable(be, NIL));
+
+    if (bt == is_basic_int)	{ // int or char constants
+      int basis = is_fortran? 10 : 0;
+      string error_string = string_undefined;
+      int64_t l = 0;
+      extern bool ParserError(string, string);
+      extern void CParserError(string);
+
+      /* Skip leading zeroes to check the conversion result with scanf */
+      /* for(;*sname!='\000' &&*(sname+1)!='\000' && *sname=='0'; sname++) */
+      /*  ; */
+
+      if(size==4) { // 32 bit target machine
+	l = (int64_t) strtol(name, &error_string, basis);
+      }
+      else if(size==8) {
+	pips_assert("pointers have the right size", sizeof(void *)==8);
+	l = (int64_t) strtol(name, &error_string, basis);
+      }
+      else if(size==1) {
+	// Character constant
+	intptr_t i = TK_CHARCON_to_intptr_t(name);
+	// fprintf(stderr,"make integer constant:name=%s\n",name);
+	ce = make_constant(is_constant_int, (void*) i);
+      }
+      else 
+	pips_internal_error("Unexpected number of bytes for an integer variable\n");
+
+      if(errno==EINVAL) {
+	pips_user_warning("Integer constant '%s' cannot be converted in %d bytes (%s)\n",
+			  name, size, error_string);
+	if(is_fortran) 
+	  ParserError("make_constant_entity",
+		      "Integer constant conversion error\n");
+	else
+	  CParserError("Integer constant conversion error\n");
+      }
+      else if(errno==ERANGE) {
+	pips_user_warning("Overflow, Integer constant '%s' cannot be stored in %d bytes\n",
+			  name, size);
+	if(is_fortran)
+	  ParserError("make_constant_entity",
+		      "Integer constant too large for internal representation\n");
+	else
+	  CParserError("Integer constant too large for internal representation\n");
+      }
+
+      ce = make_constant(is_constant_int, (void*) l); // Not OK on 32 bit machines
+    }
+    else {
+      ce = make_constant(is_constant_call, e);
+    }
+
+    entity_type(e) = make_type(is_type_functional, fe);
+    entity_storage(e) = MakeStorageRom();
+    entity_initial(e) = make_value(is_value_constant, ce);
+  }
+  return(e);
 }
 
 entity make_C_constant_entity(string name,

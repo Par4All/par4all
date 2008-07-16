@@ -717,16 +717,16 @@ expression:
 
 constant:
     TK_INTCON			
-                        {
-			  $$ = MakeConstant($1,is_basic_int);
+                        { // Do we know about the size? 2, 4 or 8 bytes?
+			  $$ = make_C_constant_entity($1, is_basic_int, 4);
 			}
 |   TK_FLOATCON	
                         {
-			  $$ = MakeConstant($1,is_basic_float); 
+			  $$ = MakeConstant($1, is_basic_float); 
 			}
 |   TK_CHARCON				
                         {
-			  $$ = MakeConstant($1,is_basic_int);
+			  $$ = make_C_constant_entity($1, is_basic_int, 1);
 			}
 |   string_constant	
                         {

@@ -147,7 +147,7 @@ statement st;
 {
     string label = entity_name(statement_label(st));
 
-    if(empty_label_p(label)) {
+    if(empty_global_label_p(label)) {
 	return(make_control(st, NIL, NIL));
     }
     else {
@@ -163,7 +163,7 @@ string name;
 {
     control c;
 
-    pips_assert("get_label_control", !empty_label_p(name)) ;
+    pips_assert("get_label_control", !empty_global_label_p(name)) ;
     c = (control)hash_get(Label_control, name);
     pips_assert("get_label_control", c != (control) HASH_UNDEFINED_VALUE);
     return(c);
@@ -180,7 +180,7 @@ statement st;
 {
     cons *sts ;
 
-    if( !empty_label_p(name) ) {
+    if( !empty_global_label_p(name) ) {
 	list new_sts;
 	sts = hash_get_default_empty_list(used_labels, name) ;
 	new_sts = CONS(STATEMENT, st, sts);
@@ -369,6 +369,10 @@ bool controlize(
 
         statement_number(nop) = statement_number(st);
         statement_comments(nop) = statement_comments(st);
+	// Well, let's try this for the time being. What is the scope?!?
+        statement_declarations(nop) = statement_declarations(st);
+        statement_decls_text(nop) = statement_decls_text(st);
+
 	succ = get_label_control(name);
 	/* Memory leak in CONS(CONTROL, pred, NIL). Also forgot to
            unlink the predecessor of the former successor of pred. RK */
@@ -1382,7 +1386,7 @@ statement st;
 cons *sts;
 control pred, succ;
 control c_res;
-hash_table used_labels;
+hash_table used_labels __attribute__((__unused__));
 {
     hash_table block_used_labels = hash_table_make(hash_string, 0);
     control c_block = control_undefined;
@@ -1411,10 +1415,18 @@ hash_table used_labels;
 
       c_block = make_control(make_empty_statement_with_declarations_and_comments(d, dt, ct),
 			     NIL, NIL);
+      /*pips_assert("declarations are preserved",
+		  gen_length(statement_declarations(st))
+		  ==gen_length(statement_declarations(control_statement(c_block))));*/
+    
     }
     else {
       /* What happens to the declarations and comments attached to st? */
       c_block = make_conditional_control(STATEMENT(CAR(sts)));
+      /*pips_assert("declarations are preserved",
+		  gen_length(statement_declarations(st))
+		  ==gen_length(statement_declarations(control_statement(c_block))));*/
+    
     }
     
     ctls = controlize_list_1(sts, pred, c_end, c_block, block_used_labels);
@@ -1427,6 +1439,9 @@ hash_table used_labels;
 	pips_debug(0, "Nodes from c_last %p\n", c_last);
 	display_linked_control_nodes(c_last);
     }
+    /*    pips_assert("declarations are preserved",
+		gen_length(statement_declarations(st))
+		==gen_length(statement_declarations(control_statement(c_block))));*/
     
     if(covers_labels_p(st,block_used_labels)) {
 	/* There is no GOTO to/from  outside the statement list:
@@ -1498,6 +1513,9 @@ hash_table used_labels;
 	}
 	/* Not a good idea from mine to add this free... RK
 	   free_statement(control_statement(c_res)); */
+	pips_assert("declarations are preserved",
+		    gen_length(statement_declarations(st))
+		    ==gen_length(statement_declarations(new_st)));
 	control_statement(c_res) = new_st;
 	link_2_control_nodes(pred, c_res);
 	link_2_control_nodes(c_res, succ);
@@ -1525,6 +1543,9 @@ hash_table used_labels;
 	patch_references(PREDS_OF_SUCCS, c_block, c_res);
 	patch_references(SUCCS_OF_PREDS, c_block, c_res);
 	controlized = TRUE;
+	/*	pips_assert("declarations are preserved",
+		    gen_length(statement_declarations(st))
+		    ==gen_length(statement_declarations(control_statement(c_res))));*/
     }
     union_used_labels( used_labels, block_used_labels);
     
@@ -1535,6 +1556,9 @@ hash_table used_labels;
 	check_control_coherency(pred);
 	check_control_coherency(succ);
 	check_control_coherency(c_res);
+	pips_assert("declarations are preserved",
+		    gen_length(statement_declarations(st))
+		    ==gen_length(statement_declarations(control_statement(c_res))));
     }
     
     return(controlized);
@@ -1652,7 +1676,7 @@ void init_label(name, st )
 string name;
 statement st;
 {
-    if(!empty_label_p(name)) {
+    if(!empty_global_label_p(name)) {
 	list used = (list) hash_get_default_empty_list(Label_statements, name);
 	list sts = CONS(STATEMENT, st, used);
 	/* Just append st to the list of statements pointing to

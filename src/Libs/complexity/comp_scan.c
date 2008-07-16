@@ -445,7 +445,7 @@ list effects_list;
     trace_on("loop %s label %s",entity_name(index),
 	                        entity_name(loop_label(loop_instr)));
 
-    if ( empty_label_p(entity_name(ll)) ) {
+    if ( empty_global_label_p(entity_name(ll)) ) {
 	/* if the statement were still reachable, we could try to use the
 	 * statement nunber...
 	 */

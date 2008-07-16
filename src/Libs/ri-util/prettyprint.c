@@ -804,7 +804,7 @@ words_assign_substring_op(call obj,
     list pc = NIL;
     expression e = expression_undefined;
     int prec = words_intrinsic_precedence(obj);
-
+   
     pips_assert("words_substring_op", gen_length(call_arguments(obj)) == 4);
 
     e = EXPRESSION(CAR(CDR(CDR(CDR(call_arguments(obj))))));
@@ -816,43 +816,108 @@ words_assign_substring_op(call obj,
     return(pc);
 }
 
+//function written by C.A. Mensi
 static list 
-words_nullary_op(call obj,
-		 int precedence,
-		 bool __attribute__ ((unused)) leftmost)
+words_nullary_op_c(call obj,
+		 int precedence __attribute__ ((unused)),
+		 bool leftmost __attribute__ ((unused)))
 {
-    list pc = NIL;
-    list args = call_arguments(obj);
-    entity func = call_function(obj);
-    string fname = entity_local_name(func);
+  list pc = NIL;
+  list args = call_arguments(obj);
+  entity func = call_function(obj);
+  string fname = entity_local_name(func);
+  int nargs = gen_length(args);
+  bool parentheses_p=TRUE;
+  /* STOP and PAUSE and RETURN in Fortran may have 0 or 1 argument.
+     STOP and PAUSE are prettyprinted in C using PIPS specific C functions. */
 
-    if(!is_fortran && same_string_p(fname,CONTINUE_FUNCTION_NAME))
-      fname = "";
-
-    if(same_string_p(fname,RETURN_FUNCTION_NAME))
-      pc = CHAIN_SWORD(pc, "return");
-    else 
-      pc = CHAIN_SWORD(pc, fname);
+  if(nargs==0){
     
-    /* STOP and PAUSE and RETURN in C may have 0 or 1 argument */
-    if(gen_length(args)==1) {
-      if(same_string_p(fname,STOP_FUNCTION_NAME)
-	 || same_string_p(fname,PAUSE_FUNCTION_NAME)
-	 || same_string_p(fname,RETURN_FUNCTION_NAME)) {
-	expression e = EXPRESSION(CAR(args));
-	pc = CHAIN_SWORD(pc, " ");
-	pc = gen_nconc(pc, words_subexpression(e, precedence, TRUE));
+    if(same_string_p(fname,STOP_FUNCTION_NAME))
+      pc = CHAIN_SWORD(pc, "exit(0)");
+    else if(same_string_p(fname,RETURN_FUNCTION_NAME))
+      pc = CHAIN_SWORD(pc, "return");
+    else if(same_string_p(fname,PAUSE_FUNCTION_NAME))
+      pc = CHAIN_SWORD(pc, "_f77_intrinsics_pause_(0)");
+    else if(same_string_p(fname,CONTINUE_FUNCTION_NAME))
+      pc = CHAIN_SWORD(pc, "");
+  }
+  else if(nargs==1){
+    expression e = EXPRESSION(CAR(args));
+    basic b=expression_basic(e);
+    if(same_string_p(fname,STOP_FUNCTION_NAME)){
+      if(basic_int_p(b)){
+	pc = CHAIN_SWORD(pc, "exit");
       }
-      else {
-	pips_error("words_nullary_op", "unexpected arguments");
+      else if(basic_string_p(b)){
+	pc = CHAIN_SWORD(pc, "_f77_intrinsics_stop_");
       }
     }
-    else if(gen_length(args)>1) {
-      pips_error("words_nullary_op", "unexpected arguments");
+    else if(same_string_p(fname,RETURN_FUNCTION_NAME)){
+	pc = CHAIN_SWORD(pc, "return");
+	parentheses_p=FALSE;
+	//pips_user_error("alternate returns are not supported in C\n");
     }
-
-    return(pc);
+    else if(same_string_p(fname,PAUSE_FUNCTION_NAME)){
+      pc = CHAIN_SWORD(pc, "_f77_intrinsics_pause_");
+    }
+    else {
+      pips_internal_error("unexpected arguments");
+    }
+    pc = CHAIN_SWORD(pc, parentheses_p?"(":" ");
+    pc = gen_nconc(pc, words_subexpression(e, precedence, TRUE));
+    pc = CHAIN_SWORD(pc, parentheses_p?")":"");
+  } 
+  else {
+    pips_internal_error("unexpected arguments");
+  }
+  return(pc);
 }
+
+// Function dedicated to Fortran.A. Mensi
+static list words_nullary_op_fortran(call obj,
+				     int precedence,
+				     bool __attribute__ ((unused)) leftmost)
+{
+  list pc = NIL;
+  list args = call_arguments(obj);
+  entity func = call_function(obj);
+  string fname = entity_local_name(func);
+
+  if(same_string_p(fname,RETURN_FUNCTION_NAME))
+    pc = CHAIN_SWORD(pc, strdup("return"));
+  else 
+    pc = CHAIN_SWORD(pc, fname);
+    
+  // STOP and PAUSE and RETURN in fortran may have 0 or 1 argument.A Mensi
+    
+  if(gen_length(args)==1) {
+    if(same_string_p(fname,STOP_FUNCTION_NAME)
+       || same_string_p(fname,PAUSE_FUNCTION_NAME)
+       || same_string_p(fname,RETURN_FUNCTION_NAME)) {
+      expression e = EXPRESSION(CAR(args));
+      pc = CHAIN_SWORD(pc, " ");
+      pc = gen_nconc(pc, words_subexpression(e, precedence, TRUE));
+    }
+    else {
+      pips_internal_error("unexpected arguments");
+    }
+  }
+  else if(gen_length(args)>1) {
+    pips_internal_error("unexpected arguments");
+  }
+
+  return(pc);
+}
+
+static list words_nullary_op(call obj,
+			     int precedence,
+			     bool __attribute__ ((unused)) leftmost)
+{
+ return is_fortran? words_nullary_op_fortran(obj, precedence, leftmost)
+   : words_nullary_op_c(obj, precedence, leftmost);
+}
+
 
 static list 
 words_io_control(list *iol,
@@ -960,103 +1025,103 @@ static list
 words_io_inst(call obj,
 	      int precedence, bool leftmost)
 {
-    list pc = NIL;
-    list pcio = call_arguments(obj);
-    list pio_write = pcio;
-    boolean good_fmt = FALSE;
-    bool good_unit = FALSE;
-    bool iolist_reached = FALSE;
-    bool complex_io_control_list = FALSE;
-    expression fmt_arg = expression_undefined;
-    expression unit_arg = expression_undefined;
-    string called = entity_local_name(call_function(obj));
+  list pc = NIL;
+  list pcio = call_arguments(obj);
+  list pio_write = pcio;
+  boolean good_fmt = FALSE;
+  bool good_unit = FALSE;
+  bool iolist_reached = FALSE;
+  bool complex_io_control_list = FALSE;
+  expression fmt_arg = expression_undefined;
+  expression unit_arg = expression_undefined;
+  string called = entity_local_name(call_function(obj));
     
-    /* AP: I try to convert WRITE to PRINT. Three conditions must be
-       fullfilled. The first, and obvious, one, is that the function has
-       to be WRITE. Secondly, "FMT" has to be equal to "*". Finally,
-       "UNIT" has to be equal either to "*" or "6".  In such case,
-       "WRITE(*,*)" is replaced by "PRINT *,". */
-    /* GO: Not anymore for UNIT=6 leave it ... */
-    while ((pio_write != NIL) && (!iolist_reached)) {
-	syntax s = expression_syntax(EXPRESSION(CAR(pio_write)));
-	call c;
-	expression arg = EXPRESSION(CAR(CDR(pio_write)));
+  /* AP: I try to convert WRITE to PRINT. Three conditions must be
+     fullfilled. The first, and obvious, one, is that the function has
+     to be WRITE. Secondly, "FMT" has to be equal to "*". Finally,
+     "UNIT" has to be equal either to "*" or "6".  In such case,
+     "WRITE(*,*)" is replaced by "PRINT *,". */
+  /* GO: Not anymore for UNIT=6 leave it ... */
+  while ((pio_write != NIL) && (!iolist_reached)) {
+    syntax s = expression_syntax(EXPRESSION(CAR(pio_write)));
+    call c;
+    expression arg = EXPRESSION(CAR(CDR(pio_write)));
 
-	if (! syntax_call_p(s)) {
-	    pips_error("words_io_inst", "call expected");
-	}
-
-	c = syntax_call(s);
-	if (strcmp(entity_local_name(call_function(c)), "FMT=") == 0) {
-	    /* Avoid to use words_expression(arg) because it set some
-               attachments and unit_words may not be used
-               later... RK. */
-	    entity f;
-	    /* The * format is coded as a call to "LIST_DIRECTED_FORMAT_NAME" function: */
-	    good_fmt = syntax_call_p(expression_syntax(arg))
-		&& value_intrinsic_p(entity_initial(f = 
-                   call_function(syntax_call(expression_syntax(arg)))))
-		    && (strcmp(entity_local_name(f),
-			       LIST_DIRECTED_FORMAT_NAME)==0);
-	    pio_write = CDR(CDR(pio_write));
-	    /* To display the format later: */
-	    fmt_arg = arg;
-	}
-	else if (strcmp(entity_local_name(call_function(c)), "UNIT=") == 0) {
-	    /* Avoid to use words_expression(arg) because it set some
-               attachments and unit_words may not be used
-               later... RK. */
-	    entity f;
-	    /* The * format is coded as a call to "LIST_DIRECTED_FORMAT_NAME" function: */
-	    good_unit = syntax_call_p(expression_syntax(arg))
-		&& value_intrinsic_p(entity_initial(f = 
-		    call_function(syntax_call(expression_syntax(arg)))))
-		    && (strcmp(entity_local_name(f),
-			       LIST_DIRECTED_FORMAT_NAME)==0);
-	    /* To display the unit later: */
-	    unit_arg = arg;
-	    pio_write = CDR(CDR(pio_write));
-	}
-	else if (strcmp(entity_local_name(call_function(c)), IO_LIST_STRING_NAME) == 0) {
-	    iolist_reached = TRUE;
-	    pio_write = CDR(pio_write);
-	}
-	else {
-	    complex_io_control_list = TRUE;
-	    pio_write = CDR(CDR(pio_write));
-	}
+    if (! syntax_call_p(s)) {
+      pips_error("words_io_inst", "call expected");
     }
 
-    if (good_fmt && good_unit && same_string_p(called, "WRITE"))
-    {
-	/* WRITE (*,*) -> PRINT * */
+    c = syntax_call(s);
+    if (strcmp(entity_local_name(call_function(c)), "FMT=") == 0) {
+      /* Avoid to use words_expression(arg) because it set some
+	 attachments and unit_words may not be used
+	 later... RK. */
+      entity f;
+      /* The * format is coded as a call to "LIST_DIRECTED_FORMAT_NAME" function: */
+      good_fmt = syntax_call_p(expression_syntax(arg))
+	&& value_intrinsic_p(entity_initial(f = 
+					    call_function(syntax_call(expression_syntax(arg)))))
+	&& (strcmp(entity_local_name(f),
+		   LIST_DIRECTED_FORMAT_NAME)==0);
+      pio_write = CDR(CDR(pio_write));
+      /* To display the format later: */
+      fmt_arg = arg;
+    }
+    else if (strcmp(entity_local_name(call_function(c)), "UNIT=") == 0) {
+      /* Avoid to use words_expression(arg) because it set some
+	 attachments and unit_words may not be used
+	 later... RK. */
+      entity f;
+      /* The * format is coded as a call to "LIST_DIRECTED_FORMAT_NAME" function: */
+      good_unit = syntax_call_p(expression_syntax(arg))
+	&& value_intrinsic_p(entity_initial(f = 
+					    call_function(syntax_call(expression_syntax(arg)))))
+	&& (strcmp(entity_local_name(f),
+		   LIST_DIRECTED_FORMAT_NAME)==0);
+      /* To display the unit later: */
+      unit_arg = arg;
+      pio_write = CDR(CDR(pio_write));
+    }
+    else if (strcmp(entity_local_name(call_function(c)), IO_LIST_STRING_NAME) == 0) {
+      iolist_reached = TRUE;
+      pio_write = CDR(pio_write);
+    }
+    else {
+      complex_io_control_list = TRUE;
+      pio_write = CDR(CDR(pio_write));
+    }
+  }
 
-	if (pio_write != NIL)	/* WRITE (*,*) pio -> PRINT *, pio */
+  if (good_fmt && good_unit && same_string_p(called, "WRITE"))
+    {
+      /* WRITE (*,*) -> PRINT * */
+
+      if (pio_write != NIL)	/* WRITE (*,*) pio -> PRINT *, pio */
 	{
-	    pc = CHAIN_SWORD(pc, "PRINT *, ");
+	  pc = CHAIN_SWORD(pc, "PRINT *, ");
 	}
-	else			/* WRITE (*,*)  -> PRINT *  */
+      else			/* WRITE (*,*)  -> PRINT *  */
 	{
-	    pc = CHAIN_SWORD(pc, "PRINT * ");
+	  pc = CHAIN_SWORD(pc, "PRINT * ");
 	}
        
-	pcio = pio_write;
+      pcio = pio_write;
     }
-    else if (good_fmt && good_unit && same_string_p(called, "READ"))
+  else if (good_fmt && good_unit && same_string_p(called, "READ"))
     {
-	/* READ (*,*) -> READ * */
-	
+      /* READ (*,*) -> READ * */
+      if(is_fortran) {
 	if (pio_write != NIL)	/* READ (*,*) pio -> READ *, pio */
-	{
+	  { 
 	    pc = CHAIN_SWORD(pc, "READ *, ");
-	}
+	  }
 	else			/* READ (*,*)  -> READ *  */
-	{
+	  {
 	    pc = CHAIN_SWORD(pc, "READ * ");
-	}
+	  }
 	pcio = pio_write;
-    }	
-    else if (!complex_io_control_list) {
+      }	
+      else if (!complex_io_control_list) {
 	list unit_words = words_expression(unit_arg);
 	pips_assert("A unit must be defined", !ENDP(unit_words));
 	pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
@@ -1064,15 +1129,15 @@ words_io_inst(call obj,
 	pc = gen_nconc(pc, unit_words);
 	
 	if (!expression_undefined_p(fmt_arg)) {
-	    /* There is a FORMAT: */
-	    pc = CHAIN_SWORD(pc, ", ");
-	    pc = gen_nconc(pc, words_expression(fmt_arg));
+	  /* There is a FORMAT: */
+	  pc = CHAIN_SWORD(pc, ", ");
+	  pc = gen_nconc(pc, words_expression(fmt_arg));
 	}
 
 	pc = CHAIN_SWORD(pc, ") ");
 	pcio = pio_write;
-    }
-    else {
+      }
+      else {
 	pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
 	pc = CHAIN_SWORD(pc, " (");
 	/* FI: missing argument; I use "precedence" because I've no clue;
@@ -1081,23 +1146,32 @@ words_io_inst(call obj,
 	pc = CHAIN_SWORD(pc, ") ");
 	/* 
 	   free_words(fmt_words);
-	   */
+	*/
+      }
+    } 
+  else {
+    //pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
+    pc = CHAIN_SWORD(pc, "Read_intrinsic (");
+    /* FI: missing argument; I use "precedence" because I've no clue;
+       see LZ */
+    pc = gen_nconc(pc, words_io_control(&pcio, precedence, leftmost));
+    pc = CHAIN_SWORD(pc, ") ");
+  }
+
+  /* because the "IOLIST=" keyword is embedded in the list
+     and because the first IOLIST= has already been skipped,
+     only odd elements are printed */
+  MAPL(pp, {
+    pc = gen_nconc(pc, words_expression(EXPRESSION(CAR(pp))));
+
+    if (CDR(pp) != NIL) {
+      POP(pp);
+      if(pp==NIL) 
+	pips_internal_error("missing element in IO list");
+      pc = CHAIN_SWORD(pc, ", ");
     }
-
-    /* because the "IOLIST=" keyword is embedded in the list
-       and because the first IOLIST= has already been skipped,
-       only odd elements are printed */
-    MAPL(pp, {
-	pc = gen_nconc(pc, words_expression(EXPRESSION(CAR(pp))));
-
-	if (CDR(pp) != NIL) {
-	    POP(pp);
-	    if(pp==NIL) 
-		pips_internal_error("missing element in IO list");
-	    pc = CHAIN_SWORD(pc, ", ");
-	}
-    }, pcio);
-    return(pc) ;
+  }, pcio);
+  return(pc) ;
 }
 
 static list 
@@ -1131,6 +1205,10 @@ words_prefix_unary_op(call obj,
 	else
 	 if (strcmp(fun,"+unary") == 0) 
 	    fun = "+";
+	 else if(!is_fortran){ 
+	   if(strcasecmp(fun, NOT_OPERATOR_NAME)==0)
+      fun=C_NOT_OPERATOR_NAME;
+	 }
     pc = CHAIN_SWORD(pc,strdup(fun));
     pc = gen_nconc(pc, words_subexpression(e, prec, FALSE));
 
@@ -1393,63 +1471,85 @@ words_infix_nary_op(call obj, int precedence, bool leftmost)
 static list 
 words_infix_binary_op(call obj, int precedence, bool leftmost)
 {
-    list pc = NIL;
-    list args = call_arguments(obj);
-    int prec = words_intrinsic_precedence(obj);
-    list we1 = words_subexpression(EXPRESSION(CAR(args)), prec, 
-				   prec>=MINIMAL_ARITHMETIC_PRECEDENCE? leftmost: TRUE);
-    list we2;
-    string fun = entity_local_name(call_function(obj));
+  list pc = NIL;
+  list args = call_arguments(obj);
+  int prec = words_intrinsic_precedence(obj);
+  list we1 = words_subexpression(EXPRESSION(CAR(args)), prec, 
+				 prec>=MINIMAL_ARITHMETIC_PRECEDENCE? leftmost: TRUE);
+  list we2;
+  string fun = entity_local_name(call_function(obj));
 
-    if ( strcmp(fun, "/") == 0 )
-	we2 = words_subexpression(EXPRESSION(CAR(CDR(args))), MAXIMAL_PRECEDENCE, FALSE);
-    else if ( strcmp(fun, "-") == 0 ) {
-	expression exp = EXPRESSION(CAR(CDR(args)));
-	if ( expression_call_p(exp) &&
-	     words_intrinsic_precedence(syntax_call(expression_syntax(exp))) >= 
-	     intrinsic_precedence("*") )
-	    /* precedence is greater than * or / */
-	    we2 = words_subexpression(exp, prec, FALSE);
-	else
-	    we2 = words_subexpression(exp, MAXIMAL_PRECEDENCE, FALSE);
+  if ( strcmp(fun, "/") == 0 )
+    we2 = words_subexpression(EXPRESSION(CAR(CDR(args))), MAXIMAL_PRECEDENCE, FALSE);
+  else if ( strcmp(fun, "-") == 0 ) {
+    expression exp = EXPRESSION(CAR(CDR(args)));
+    if ( expression_call_p(exp) &&
+	 words_intrinsic_precedence(syntax_call(expression_syntax(exp))) >= 
+	 intrinsic_precedence("*") )
+      /* precedence is greater than * or / */
+      we2 = words_subexpression(exp, prec, FALSE);
+    else
+      we2 = words_subexpression(exp, MAXIMAL_PRECEDENCE, FALSE);
+  }
+  else if ( strcmp(fun, "*") == 0 ) {
+    expression exp = EXPRESSION(CAR(CDR(args)));
+    if ( expression_call_p(exp) &&
+	 ENTITY_DIVIDE_P(call_function(syntax_call(expression_syntax(exp))))) {
+      basic bexp = basic_of_expression(exp);
+      if(basic_int_p(bexp)) {
+	we2 = words_subexpression(exp, MAXIMAL_PRECEDENCE, FALSE);
+      }
+      else
+	we2 = words_subexpression(exp, prec, FALSE);
+      free_basic(bexp);
     }
-    else if ( strcmp(fun, "*") == 0 ) {
-	expression exp = EXPRESSION(CAR(CDR(args)));
-	if ( expression_call_p(exp) &&
-	     ENTITY_DIVIDE_P(call_function(syntax_call(expression_syntax(exp))))) {
-	  basic bexp = basic_of_expression(exp);
-	  if(basic_int_p(bexp)) {
-	    we2 = words_subexpression(exp, MAXIMAL_PRECEDENCE, FALSE);
-	  }
-	  else
-	    we2 = words_subexpression(exp, prec, FALSE);
-	  free_basic(bexp);
-	}
-	else
-	  we2 = words_subexpression(exp, prec, FALSE);
-    }
-    else {
-	we2 = words_subexpression(EXPRESSION(CAR(CDR(args))), prec,
-				  prec<MINIMAL_ARITHMETIC_PRECEDENCE);
-    }
+    else
+      we2 = words_subexpression(exp, prec, FALSE);
+  }
+  else {
+    we2 = words_subexpression(EXPRESSION(CAR(CDR(args))), prec,
+			      prec<MINIMAL_ARITHMETIC_PRECEDENCE);
+  }
 
     
-    if ( strcmp(fun, "+C") == 0 )
-      fun = "+";
-    if ( strcmp(fun, "-C") == 0 )
-      fun = "-";
-    if ( strcmp(fun, "&bitand") == 0 )
-      fun = "&";
+  if ( strcmp(fun,PLUS_C_OPERATOR_NAME) == 0 )
+    fun = "+";
+  else  if ( strcmp(fun, MINUS_C_OPERATOR_NAME) == 0 )
+    fun = "-";
+  else  if ( strcmp(fun,BITWISE_AND_OPERATOR_NAME) == 0 )
+    fun = "&";
+  else if (!is_fortran){
+    if(strcasecmp(fun, GREATER_THAN_OPERATOR_NAME)==0)
+	
+      fun=C_GREATER_THAN_OPERATOR_NAME;
+    else if(strcasecmp(fun, LESS_THAN_OPERATOR_NAME)==0)
+      fun=C_LESS_THAN_OPERATOR_NAME;
+    else if(strcasecmp(fun,GREATER_OR_EQUAL_OPERATOR_NAME)==0)
+
+      fun=C_GREATER_OR_EQUAL_OPERATOR_NAME;
+    else if(strcasecmp(fun,LESS_OR_EQUAL_OPERATOR_NAME)==0)
+
+      fun=C_LESS_OR_EQUAL_OPERATOR_NAME;
+    else if(strcasecmp(fun, EQUAL_OPERATOR_NAME) ==0)
+      fun=C_EQUAL_OPERATOR_NAME;
+    else if(strcasecmp(fun,NON_EQUAL_OPERATOR_NAME)==0)
+      fun=C_NON_EQUAL_OPERATOR_NAME;
+    else if(strcasecmp(fun,AND_OPERATOR_NAME)==0)
+      fun=C_AND_OPERATOR_NAME;
+    else if(strcasecmp(fun, OR_OPERATOR_NAME)==0)
+      fun=C_OR_OPERATOR_NAME;
+   
+  }
+
+  if ( prec < precedence )
+    pc = CHAIN_SWORD(pc, "(");
+  pc = gen_nconc(pc, we1);
+  pc = CHAIN_SWORD(pc, strdup(fun));
+  pc = gen_nconc(pc, we2);
+  if( prec < precedence )
+    pc = CHAIN_SWORD(pc, ")");
     
-    if ( prec < precedence )
-      pc = CHAIN_SWORD(pc, "(");
-    pc = gen_nconc(pc, we1);
-    pc = CHAIN_SWORD(pc, strdup(fun));
-    pc = gen_nconc(pc, we2);
-    if ( prec < precedence )
-      pc = CHAIN_SWORD(pc, ")");
-    
-    return(pc);
+  return(pc);
 }
 
 /* Nga Nguyen : this case is added for comma expression in C, but I am not sure about its precedence
@@ -1554,11 +1654,12 @@ static struct intrinsic_handler {
     {"ENDFILE", words_io_inst, 0},
     {"IMPLIED-DO", words_implied_do, 0},
 
-    {RETURN_FUNCTION_NAME, words_nullary_op, 0},
-    {"PAUSE", words_nullary_op, 0},
+    {RETURN_FUNCTION_NAME, words_nullary_op,0},
+    {"PAUSE", words_nullary_op,0 },
     {"STOP", words_nullary_op, 0},
-    {"CONTINUE", words_nullary_op, 0},
+    {"CONTINUE", words_nullary_op,0},
     {"END", words_nullary_op, 0},
+ 
     {FORMAT_FUNCTION_NAME, words_prefix_unary_op, 0},
     {UNBOUNDED_DIMENSION_NAME, words_unbounded_dimension, 0},
     {LIST_DIRECTED_FORMAT_NAME, words_list_directed, 0},
@@ -1760,8 +1861,7 @@ words_subexpression(
     list pc;
     
     if ( expression_call_p(obj) )
-	pc = words_call(syntax_call(expression_syntax(obj)), precedence, 
-			leftmost, FALSE);
+	pc = words_call(syntax_call(expression_syntax(obj)), precedence, leftmost, FALSE);
     else 
 	pc = words_syntax(expression_syntax(obj));
     
@@ -1826,7 +1926,7 @@ text_block(
     }
 
 
-    if(!empty_local_label_name_p(label)) {
+    if(!empty_string_p(label)) {
 	pips_internal_error("Illegal label \"%s\". "
 			    "Blocks cannot carry a label\n",
 			    label);
@@ -2028,7 +2128,7 @@ text_loop_default(
     statement body = loop_body( obj ) ;
     entity the_label = loop_label(obj);
     string do_label = entity_local_name(the_label)+strlen(LABEL_PREFIX) ;
-    bool structured_do = empty_local_label_name_p(do_label);
+    bool structured_do = entity_empty_label_p(the_label);
     bool doall_loop_p = FALSE;
     bool hpf_prettyprint = pp_hpf_style_p();
     bool do_enddo_p = get_bool_property("PRETTYPRINT_DO_LABEL_AS_COMMENT");
@@ -2090,6 +2190,10 @@ text_loop_default(
 
     /* LOOP postlogue
      */
+
+
+
+
     if(!is_fortran) { /* i.e. is_C for the time being */
       if(!one_liner_p(body))
 	 ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
@@ -2118,7 +2222,7 @@ text_loop(
     statement body = loop_body( obj ) ;
     entity the_label = loop_label(obj);
     string do_label = entity_local_name(the_label)+strlen(LABEL_PREFIX) ;
-    bool structured_do = empty_local_label_name_p(do_label);
+    bool structured_do = entity_empty_label_p(the_label);
     bool do_enddo_p = get_bool_property("PRETTYPRINT_DO_LABEL_AS_COMMENT");
 
     /* small hack to show the initial label of the loop to name it...
@@ -2179,7 +2283,7 @@ text_whileloop(
     statement body = whileloop_body( obj ) ;
     entity the_label = whileloop_label(obj);
     string do_label = entity_local_name(the_label)+strlen(LABEL_PREFIX) ;
-    bool structured_do = empty_local_label_name_p(do_label);
+    bool structured_do = entity_empty_label_p(the_label);
     bool do_enddo_p = get_bool_property("PRETTYPRINT_DO_LABEL_AS_COMMENT");
 
     evaluation eval = whileloop_evaluation(obj);
@@ -2222,17 +2326,29 @@ text_whileloop(
 	      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDDO"));
 	    }
 	  }
-	else
+	else if(one_liner_p(body))
 	  {    
+	    pc = CHAIN_SWORD(NIL,"while (");
+	    pc = gen_nconc(pc, words_expression(whileloop_condition(obj)));
+	    pc = CHAIN_SWORD(pc,") ");
+	    u = make_unformatted(strdup(label), n, margin, pc) ;
+	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
+	    MERGE_TEXTS(r, text_statement_enclosed(module, margin+INDENTATION, body,!one_liner_p(body)));
+	   
+	    //if (structured_do) 
+	    //ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
+	  }
+	else
+	  {
 	    pc = CHAIN_SWORD(NIL,"while (");
 	    pc = gen_nconc(pc, words_expression(whileloop_condition(obj)));
 	    pc = CHAIN_SWORD(pc,") {");
 	    u = make_unformatted(strdup(label), n, margin, pc) ;
 	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
 	    MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, body));
-	   
 	    if (structured_do) 
-	      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
+	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
+	    
 	  }
       }
     else   
@@ -2305,7 +2421,8 @@ init_text_statement(
     return( r ) ;
 }
 
-static text 
+//static
+ text 
 text_logical_if(
     entity __attribute__ ((unused)) module,
     string label,
@@ -2313,26 +2430,42 @@ text_logical_if(
     test obj,
     int n)
 {
-    text r = make_text(NIL);
-    list pc = NIL;
-    statement tb = test_true(obj);
+  text r = make_text(NIL);
+  list pc = NIL;
+  statement tb = test_true(obj);
+
+  pc = CHAIN_SWORD(pc, strdup(is_fortran?"IF (":"if ("));
+  pc = gen_nconc(pc, words_expression(test_condition(obj)));
+  pc = CHAIN_SWORD(pc, ") ");
+  if(is_fortran) {
     instruction ti = statement_instruction(tb);
     call c = instruction_call(ti);
-
-    pc = CHAIN_SWORD(pc, strdup(is_fortran?"IF (":"if ("));
-    pc = gen_nconc(pc, words_expression(test_condition(obj)));
-    pc = CHAIN_SWORD(pc, ") ");
     pc = gen_nconc(pc, words_call(c, 0, TRUE, TRUE));
-    if (!is_fortran) 
-      pc = CHAIN_SWORD(pc, ";");
     ADD_SENTENCE_TO_TEXT(r, 
 			 make_sentence(is_sentence_unformatted, 
 				       make_unformatted(strdup(label), n, 
 							margin, pc)));
-    return(r);
+  }
+  else {
+    text t = text_statement(module, margin+INDENTATION, tb);
+    ADD_SENTENCE_TO_TEXT(r, 
+			 make_sentence(is_sentence_unformatted, 
+				       make_unformatted(strdup(label), n, 
+							margin, pc)));
+    text_sentences(r) = gen_nconc(text_sentences(r), text_sentences(t));
+    text_sentences(t) = NIL;
+    free_text(t);
+  }
+  ifdebug(8){
+    fprintf(stderr,"logical_if=================================\n");
+    print_text(stderr,r);
+    fprintf(stderr,"==============================\n");
+  }
+  return(r);
 }
 
-static text 
+//static 
+text 
 text_block_if(
     entity module,
     string label,
@@ -2351,8 +2484,9 @@ text_block_if(
     pc = gen_nconc(pc, words_expression(test_condition(obj)));
     if(is_fortran)
       pc = CHAIN_SWORD(pc, ") THEN");
-    else if(one_liner_true_statement)
+    else if(one_liner_true_statement){
       pc = CHAIN_SWORD(pc, ")");
+    }
     else
       pc = CHAIN_SWORD(pc, ") {");
 
@@ -2360,8 +2494,8 @@ text_block_if(
 			 make_sentence(is_sentence_unformatted, 
 				       make_unformatted(strdup(label), n, 
 							margin, pc)));
-    MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, 
-				  test_true(obj)));
+    MERGE_TEXTS(r, text_statement_enclosed(module, margin+INDENTATION, 
+				  test_true(obj), !one_liner_true_statement));
   
     test_false_obj = test_false(obj);
     if(statement_undefined_p(test_false_obj)){
@@ -2400,6 +2534,12 @@ text_block_if(
     else if((!else_branch_p && !one_liner_true_statement) || (else_branch_p && !one_liner_false_statement))
       ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,strdup("}")))
 
+    ifdebug(8){
+      fprintf(stderr,"text_block_if=================================\n");
+      print_text(stderr,r);
+      fprintf(stderr,"==============================\n");
+    }
+	
     return(r);
 }
 
@@ -2428,6 +2568,11 @@ text_io_block_if(
 							  margin, pc)));
       MERGE_TEXTS(r, text_statement(module, margin, 
 				    test_true(obj)));
+
+
+
+
+
       
       
       ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, 
@@ -2443,7 +2588,8 @@ text_io_block_if(
     return(r);
 }
 
-static text 
+//static
+ text 
 text_block_ifthen(
     entity module,
     string label,
@@ -2453,23 +2599,24 @@ text_block_ifthen(
 {
     text r = make_text(NIL);
     list pc = NIL;
+    statement tb=test_true(obj);
 
     pc = CHAIN_SWORD(pc, is_fortran?"IF (":"if (");
     pc = gen_nconc(pc, words_expression(test_condition(obj)));
-    pc = CHAIN_SWORD(pc, is_fortran?") THEN": ") {");
+    pc = CHAIN_SWORD(pc, is_fortran?") THEN": (one_liner_p(tb)?")":") {"));
 
     ADD_SENTENCE_TO_TEXT(r, 
 			 make_sentence(is_sentence_unformatted, 
 				       make_unformatted(strdup(label), n, 
 							margin, pc)));
-    MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, 
-				  test_true(obj)));
-    if (!is_fortran) 
+    MERGE_TEXTS(r, text_statement_enclosed(module, margin+INDENTATION, tb, !one_liner_p(tb)));
+    if (!is_fortran && !one_liner_p(tb)) 
       ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
     return(r);
 }
 
-static text 
+//static
+ text 
 text_block_else(
     entity module,
     string __attribute__ ((unused)) label,
@@ -2477,29 +2624,47 @@ text_block_else(
     statement stmt,
     int __attribute__ ((unused)) n)
 {    
-    text r = make_text(NIL);
+  text r = make_text(NIL);
 
-    if (!statement_with_empty_comment_p(stmt)
-	||
-	(!empty_statement_p(stmt)
-	 && !statement_continue_p(stmt))
-	||
-	(empty_statement_p(stmt)
-	 && (get_bool_property("PRETTYPRINT_EMPTY_BLOCKS")))
-	||
-	(statement_continue_p(stmt)
-	 && (get_bool_property("PRETTYPRINT_ALL_LABELS"))))
-      {
-	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,is_fortran?"ELSE":"else {"));
-	MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, stmt)); 
-	if (!is_fortran) 
-	  ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
+  if (!statement_with_empty_comment_p(stmt)
+      ||
+      (!empty_statement_p(stmt)
+       && !statement_continue_p(stmt))
+      ||
+      (empty_statement_p(stmt)
+       && (get_bool_property("PRETTYPRINT_EMPTY_BLOCKS")))
+      ||
+      (statement_continue_p(stmt)
+       && (get_bool_property("PRETTYPRINT_ALL_LABELS"))))
+    {
+      //code added by Amira Mensi
+      if (is_fortran) {
+	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin, "ELSE"));
+	MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, stmt));
       }
-    
-    return r;
+      else { //C assumed
+	if (one_liner_p(stmt)){
+	  ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"else"));
+	  MERGE_TEXTS(r, text_statement_enclosed(module, margin+INDENTATION, stmt, FALSE));
+	}
+	else {
+	  ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin, "else {"));
+	  MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, stmt)); 
+	  ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin, "}"));
+	}
+      }
+    }
+  /*original code
+    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,is_fortran?"ELSE":(one_liner_p(stmt)?"else":"else {")));
+    MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, stmt)); 
+    if (!is_fortran && !one_liner_p(stmt))
+    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));*/
+        	   
+  return r;
 }
 
-static text 
+//static
+ text 
 text_block_elseif(
     entity module,
     string label,
@@ -2507,50 +2672,55 @@ text_block_elseif(
     test obj,
     int n)
 {
-    text r = make_text(NIL);
-    list pc = NIL;
-    statement tb = test_true(obj);
-    statement fb = test_false(obj);
+  text r = make_text(NIL);
+  list pc = NIL;
+  statement tb = test_true(obj);
+  statement fb = test_false(obj);
 
-    /*
+  /*
     MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, 
-				  test_true(obj)));
-				  */
+    test_true(obj)));
+  */
 
-    if (!is_fortran)
-      {
-	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"else {"));
-	margin = margin + INDENTATION;
-      }
-    pc = CHAIN_SWORD(pc, is_fortran?"ELSEIF (":"if (");
-    pc = gen_nconc(pc, words_expression(test_condition(obj)));
-    pc = CHAIN_SWORD(pc, is_fortran?") THEN":") {");
-    ADD_SENTENCE_TO_TEXT(r, 
-			 make_sentence(is_sentence_unformatted, 
-				       make_unformatted(strdup(label), n, 
-							margin, pc)));
+  //if (!is_fortran) {
+  //	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"else{"));
+  //	margin = margin + INDENTATION;
+  //}
+  pc = CHAIN_SWORD(pc, strdup(is_fortran?"ELSEIF (":"else if ("));
+  pc = gen_nconc(pc, words_expression(test_condition(obj)));
+  pc = CHAIN_SWORD(pc, strdup(is_fortran?") THEN":(one_liner_p(tb)?")":") {")));
+  ADD_SENTENCE_TO_TEXT(r, 
+		       make_sentence(is_sentence_unformatted, 
+				     make_unformatted(strdup(label), n, 
+						      margin, pc)));
     
-    MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, tb));
+  MERGE_TEXTS(r, text_statement_enclosed(module, margin+INDENTATION, tb,!one_liner_p(tb)));
 
-    if (!is_fortran) 
-      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
+  if (!is_fortran && !one_liner_p(tb)) {
+    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin, strdup("}")));
+  }
 
-    if(statement_test_p(fb) 
-       && empty_comments_p(statement_comments(fb))
-       && entity_empty_label_p(statement_label(fb))) {
-	MERGE_TEXTS(r, text_block_elseif(module,
-					 label_local_name(statement_label(fb)),
-					 margin, 
-					 statement_test(fb), n));
-    }
-    else {
-	MERGE_TEXTS(r, text_block_else(module, label, margin, fb, n));
-    }
-
-    return(r);
+  if(statement_test_p(fb) 
+     && empty_comments_p(statement_comments(fb))
+     && entity_empty_label_p(statement_label(fb))) {
+    MERGE_TEXTS(r, text_block_elseif(module,
+				     label_local_name(statement_label(fb)),
+				     margin, 
+				     statement_test(fb), n));
+    
+  } else {
+    MERGE_TEXTS(r, text_block_else(module, label, margin, fb, n));
+  }
+  ifdebug(8){
+    fprintf(stderr,"elseif=================================\n");
+    print_text(stderr,r);
+    fprintf(stderr,"==============================\n");
+  }
+  return(r);
 }
 
-static text 
+//static
+ text 
 text_test(
     entity module,
     string label,
@@ -2562,7 +2732,7 @@ text_test(
     statement tb = test_true(obj);
     statement fb = test_false(obj);
 
-    /* 1st case: one statement in the true branch => logical IF */
+    /* 1st case: one statement in the true branch => Fortran logical IF */
     if(nop_statement_p(fb)
        && statement_call_p(tb)
        && entity_empty_label_p(statement_label(tb))
@@ -2573,7 +2743,7 @@ text_test(
 	    && get_bool_property("PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS"))) {
 	r = text_logical_if(module, label, margin, obj, n);
     }
-    /* 2nd case: one test in the false branch => ELSEIF block */
+    /* 2nd case: one test in the false branch => "ELSEIF" Fortran block or "else if" C construct */
     else if(statement_test_p(fb)
 	    && empty_comments_p(statement_comments(fb))
 	    && entity_empty_label_p(statement_label(fb))
@@ -2585,8 +2755,10 @@ text_test(
 		    (module,
 		     label_local_name(statement_label(fb)),
 		     margin, statement_test(fb), n));
-	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,strdup(is_fortran?"ENDIF":"}")));
-
+	
+	if(is_fortran)
+	  ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDIF"));
+	
 	/* r = text_block_if(module, label, margin, obj, n); */
     }
     else {   
@@ -2599,7 +2771,11 @@ text_test(
 	else 
 	  r = text_block_if(module, label, margin, obj, n);
     }
-    
+    ifdebug(8){
+    fprintf(stderr,"text_test=================================\n");
+    print_text(stderr,r);
+    fprintf(stderr,"==============================\n");
+  }
     return r;
 }
 
@@ -2654,7 +2830,7 @@ text_instruction(
       unformatted u;
       sentence s;
       if (instruction_continue_p(obj) &&
-	  empty_local_label_name_p(label) &&
+	  empty_string_p(label) &&
 	  !get_bool_property("PRETTYPRINT_ALL_LABELS")) {
 	pips_debug(5, "useless CONTINUE not printed\n");
 	r = make_text(NIL);
@@ -2664,7 +2840,7 @@ text_instruction(
 	  u = make_unformatted(strdup(label), n, margin, 
 			       words_call(instruction_call(obj), 
 					  0, TRUE, TRUE));
-	else
+	else // C
 	  u = make_unformatted(strdup(label), n, margin, 
 			     CHAIN_SWORD(words_call(instruction_call(obj), 
 						    0, TRUE, TRUE),
@@ -2702,13 +2878,115 @@ text_instruction(
   return(r);
 }
 
-/* Special handling for C comments with each line indented according to
-   the context.
+/* In case the input code is not C code, non-standard comments have to be detected */
+bool  C_comment_p(string c){
+  bool is_C_comment=TRUE;
+  char * ccp=c;
+  char cc=' ';
 
-   I do not see the interest if the user code is already indented... RK
-   OK, since the blanks outside the comments are removed by the parser.
-*/
-text C_comment_to_text(int margin, string comment)
+ init: 
+  cc=*ccp++;
+  if(cc==' '|| cc=='\t' || cc=='\n')
+   goto init;
+ else if( cc=='/')
+   goto slash;
+ else if(cc=='\000')
+   goto end;
+ else {
+   is_C_comment=FALSE;
+   goto end;
+ }
+
+ slash: 
+  cc=*ccp++;
+  if(cc=='*')
+   goto slash_star;
+ else if(cc=='/')
+   goto slash_slash;
+ else{
+   is_C_comment=FALSE;
+   goto end;
+ }
+
+ slash_star:
+   cc=*ccp++;
+ if(cc=='*')
+   goto slash_star_star;
+ else
+   goto slash_star;
+
+ slash_slash: 
+  cc=*ccp++;
+  if(cc=='\n'|| cc=='\0')
+   goto init;
+ else 
+   goto slash_slash;
+
+ slash_star_star: 
+  cc=*ccp++;
+  if(cc=='/')
+   goto init;
+ else
+   goto slash_star;
+
+ end : return is_C_comment;
+}
+
+/* In case comments are not formatted according to C rules, e.g. when
+   prettyprinting Fortran code as C code */
+text C_any_comment_to_text(int margin, string c)
+{
+  string lb = c; /* line beginning */
+  string le = c; /* line end */
+  string cp = c; /* current position, pointer in comments */
+  text ct = make_text(NIL);
+  bool is_C_comment = C_comment_p(c);
+    
+  /* Empty comments are different from "", and "", which should never
+     occur by the way, does not neet to be printed. */
+  if(strlen(c)>0) {
+    for(;*cp!='\0';cp++) {
+      if(*cp=='\n') {
+	//code added to manage prettprinting the C comments. A.Mensi
+	
+	if(cp!=c || TRUE){ 
+
+	  string cl=gen_strndup0(lb, le-lb);
+	  sentence s = sentence_undefined;
+	  if(is_C_comment)
+	    s = MAKE_ONE_WORD_SENTENCE(margin,cl);
+	  else {
+	    list pc = CHAIN_SWORD(NIL, cl); // cl is uselessly duplicated
+	    pc = CONS(STRING, MAKE_SWORD("//"), pc);
+	    s= make_sentence(is_sentence_unformatted, 
+			     make_unformatted((char *) NULL, 0, margin, pc));
+	  }
+	  ADD_SENTENCE_TO_TEXT(ct, s);
+	}
+       	lb = cp+1;
+	le = cp+1;
+      }
+      else
+	le++;
+    }
+    // Final \n has been removed by Ronan
+    if(lb<cp){
+      ADD_SENTENCE_TO_TEXT(ct,MAKE_ONE_WORD_SENTENCE(margin,gen_strndup0(lb,le-lb)));
+    } else{
+      ADD_SENTENCE_TO_TEXT(ct,MAKE_ONE_WORD_SENTENCE(margin,""));
+    }
+  }
+  else{// Final \n has been removed by Ronan
+    ADD_SENTENCE_TO_TEXT(ct,MAKE_ONE_WORD_SENTENCE(margin,""));
+  }
+
+  return ct;
+}
+
+// Ronan's improved version is bugged. It returns many lines for a
+// unique \n because le is not updated before looping. Has this code
+// been validated?
+text C_standard_comment_to_text(int margin, string comment)
 {
   string line;
   string le = comment; /* position of a line end */
@@ -2735,120 +3013,158 @@ text C_comment_to_text(int margin, string comment)
   return ct;
 }
 
-/* Handles all statements but tests that are nodes of an unstructured.
- * Those are handled by text_control.
- */
-text
-text_statement(
+/* Special handling for C comments  with each line indented according to
+   the context.
+
+   I do not see the interest if the user code is already indented... RK
+   OK, since the blanks outside the comments are removed by the parser.
+*/
+text C_comment_to_text(int margin, string comment)
+{
+  text ct = text_undefined;
+
+  if(C_comment_p(comment))
+    //ct = C_standard_comment_to_text(margin, comment);
+    ct = C_any_comment_to_text(margin, comment);
+  else
+    ct = C_any_comment_to_text(margin, comment);
+  return ct;
+}
+
+text text_statement_enclosed(
     entity module,
     int margin,
-    statement stmt)
+    statement stmt,
+    bool braces_p)
 {
-    instruction i = statement_instruction(stmt);
-    text r= make_text(NIL);
-    text temp;
-    string label =
-	entity_local_name(statement_label(stmt)) + strlen(LABEL_PREFIX);
-    string comments = statement_comments(stmt);
+  instruction i = statement_instruction(stmt);
+  text r= make_text(NIL);
+  text temp;
+  string label =
+    entity_local_name(statement_label(stmt)) + strlen(LABEL_PREFIX);
+  string comments = statement_comments(stmt);
     
-    pips_assert("Blocks have no comments", !instruction_block_p(i)||empty_comments_p(comments));
+  pips_assert("Blocks have no comments", !instruction_block_p(i)||empty_comments_p(comments));
 
-    /* 31/07/2003 Nga Nguyen : This code is added for C, because a statement can have its own declarations */
-    list l = statement_declarations(stmt);
+  /* 31/07/2003 Nga Nguyen : This code is added for C, because a statement can have its own declarations */
+  list l = statement_declarations(stmt);
 
-    if (!ENDP(l))
-      {
-	/* printf("Statement declarations : ");
-	print_entities(l); */
-	MERGE_TEXTS(r,c_text_entities(module,l,margin));
-      }
-    pips_debug(2, "Begin for statement %s\n", statement_identification(stmt));
-    pips_debug(9, "statement_comments: --%s--\n", 
-	       string_undefined_p(comments)? "<undef>": comments);
+  if (!ENDP(l))
+    {
+      /* printf("Statement declarations : ");
+	 print_entities(l); */
+      MERGE_TEXTS(r,c_text_entities(module,l,margin));
+    }
+  pips_debug(2, "Begin for statement %s with braces_p=%d\n", statement_identification(stmt),braces_p);
+  pips_debug(9, "statement_comments: --%s--\n", 
+	     string_undefined_p(comments)? "<undef>": comments);
  
 
-    if(statement_number(stmt)!=STATEMENT_NUMBER_UNDEFINED &&
-       statement_ordering(stmt)==STATEMENT_ORDERING_UNDEFINED) {
-	/* we are in trouble with some kind of dead (?) code... 
-	 but we might as well be dealing with some parsed_code */
-	pips_debug(1, "I unexpectedly bumped into dead code?\n");
-    }
+  if(statement_number(stmt)!=STATEMENT_NUMBER_UNDEFINED &&
+     statement_ordering(stmt)==STATEMENT_ORDERING_UNDEFINED) {
+    /* we are in trouble with some kind of dead (?) code... 
+       but we might as well be dealing with some parsed_code */
+    pips_debug(1, "I unexpectedly bumped into dead code?\n");
+  }
 
-    if (same_string_p(label, RETURN_LABEL_NAME)) 
+  if (same_string_p(label, RETURN_LABEL_NAME)) 
     {
-	pips_assert("Statement with return label must be a return statement",
-		    return_statement_p(stmt));
+      pips_assert("Statement with return label must be a return statement",
+		  return_statement_p(stmt));
 
-	/* do not add a redundant RETURN before an END, unless requested */
-	if(get_bool_property("PRETTYPRINT_FINAL_RETURN")
-	   || !last_statement_p(stmt)) 
+      /* do not add a redundant RETURN before an END, unless requested */
+      if(get_bool_property("PRETTYPRINT_FINAL_RETURN")
+	 || !last_statement_p(stmt)) 
 	{
-	    sentence s = MAKE_ONE_WORD_SENTENCE(margin, RETURN_FUNCTION_NAME);
-	    temp = make_text(CONS(SENTENCE, s ,NIL));
+	  sentence s = MAKE_ONE_WORD_SENTENCE(margin, RETURN_FUNCTION_NAME);
+	  temp = make_text(CONS(SENTENCE, s ,NIL));
 	}
-	else {
-	    temp = make_text(NIL);
-	}
-    }
-    else
-      {
-	temp = text_instruction(module, label, margin, i,
-				statement_number(stmt));
+      else {
+	temp = make_text(NIL);
       }
+    }
+  else
+    {
+      temp = text_instruction(module, label, margin, i,
+			      statement_number(stmt));
+    }
 
-    /* note about comments: they are duplicated here, but I'm pretty
-     * sure that the free is NEVER performed as it should. FC.
-     */
-    if(!ENDP(text_sentences(temp))) {
-      MERGE_TEXTS(r, init_text_statement(module, margin, stmt));
-      if (! string_undefined_p(comments)) {
-	if(is_fortran) {
-	  ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
-						strdup(comments)));
-	}
-        else {
-	  text ct = C_comment_to_text(margin, comments);
-	  MERGE_TEXTS(r, ct);
-	}
+  /* note about comments: they are duplicated here, but I'm pretty
+   * sure that the free is NEVER performed as it should. FC.
+   */
+  if(!ENDP(text_sentences(temp))) {
+    MERGE_TEXTS(r, init_text_statement(module, margin, stmt));
+    if (! string_undefined_p(comments)) {
+      if(is_fortran) {
+	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
+					      strdup(comments)));
       }
-      MERGE_TEXTS(r, temp);
+      else {
+	text ct = C_comment_to_text(margin, comments);
+	MERGE_TEXTS(r, ct);
+      }
     }
-    else {
-	/* Preserve comments */
-	if (! string_undefined_p(comments)) {
-	  if(is_fortran) {
-	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
-						  strdup(comments)));
-	  }
-	  else {
-	    text ct = C_comment_to_text(margin, comments);
-	    MERGE_TEXTS(r, ct);
-	  }
-	}
-	free_text(temp);
+    MERGE_TEXTS(r, temp);
+  }
+  else {
+    /* Preserve comments and empty C instruction */
+    if (! string_undefined_p(comments)) {
+      if(is_fortran) {
+	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
+					      strdup(comments)));
+      }
+      else {
+	text ct = C_comment_to_text(margin, comments);
+	MERGE_TEXTS(r, ct);
+      }
     }
-    attach_statement_information_to_text(r, stmt);
+    else if(!is_fortran && !braces_p) {
+      // Because C braces can be eliminated and hence semi-colon
+      // may be mandatory in a test branch or in a loop body.
+      // A. Mensi
+      sentence s = MAKE_ONE_WORD_SENTENCE(margin, strdup(";"));
+      ADD_SENTENCE_TO_TEXT(r, s);	  
+    }
+    free_text(temp);
+  }
+  attach_statement_information_to_text(r, stmt);
 
-    ifdebug(1) {
-	if (instruction_sequence_p(i)) {
-	    if(!(statement_with_empty_comment_p(stmt)
-		 && statement_number(stmt) == STATEMENT_NUMBER_UNDEFINED
-		 && unlabelled_statement_p(stmt))) {
-		user_log("Block statement %s\n"
-			 "Block number=%d, Block label=\"%s\", block comment=\"%s\"\n",
-			 statement_identification(stmt),
-			 statement_number(stmt), label_local_name(statement_label(stmt)),
-			 statement_comments(stmt));
-		pips_error("text_statement", "This block statement should be labelless, numberless"
+  ifdebug(1) {
+    if (instruction_sequence_p(i)) {
+      if(!(statement_with_empty_comment_p(stmt)
+	   && statement_number(stmt) == STATEMENT_NUMBER_UNDEFINED
+	   && unlabelled_statement_p(stmt))) {
+	user_log("Block statement %s\n"
+		 "Block number=%d, Block label=\"%s\", block comment=\"%s\"\n",
+		 statement_identification(stmt),
+		 statement_number(stmt), label_local_name(statement_label(stmt)),
+		 statement_comments(stmt));
+	pips_error("text_statement", "This block statement should be labelless, numberless"
 	
-			   " and commentless.\n");
-		}
-	}
+		   " and commentless.\n");
+      }
     }
+  }
+  ifdebug(8){
+    fprintf(stderr,"text_statement_enclosed=================================\n");
+    print_text(stderr,r);
+    fprintf(stderr,"==============================\n");
+  }
 
     pips_debug(2, "End for statement %s\n", statement_identification(stmt));
        
     return(r);
+}
+
+/* Handles all statements but tests that are nodes of an unstructured.
+ * Those are handled by text_control.
+ */
+text text_statement(
+    entity module,
+    int margin,
+    statement stmt)
+{
+  return text_statement_enclosed(module, margin, stmt, TRUE);
 }
 
 /* Keep track of the last statement to decide if a final return can be omitted
@@ -3006,6 +3322,12 @@ text_named_module(
 	  /* Print function header if the current module is not a compilation unit*/
 	  ADD_SENTENCE_TO_TEXT(r,attach_head_to_sentence(sentence_head(name), module)); 
 	  ADD_SENTENCE_TO_TEXT(r,MAKE_ONE_WORD_SENTENCE(0,"{"));
+	  /* get the declarations when they are not located in the module statement. A.Mensi */
+	  if(ENDP(statement_declarations(stat))) {
+	    list l = code_declarations(value_code(entity_initial(module)));
+	    
+	    MERGE_TEXTS(r,c_text_entities(module, l, INDENTATION));
+	  }
 	}
     }
   
@@ -3253,15 +3575,15 @@ static text text_forloop(entity module,
     pc = CHAIN_SWORD(pc,";");
     if (!expression_undefined_p(forloop_increment(obj)))
       pc = gen_nconc(pc, words_expression(forloop_increment(obj)));
-    pc = CHAIN_SWORD(pc,")");
+    pc = CHAIN_SWORD(pc,one_liner_p(body)?")":") {");
     u = make_unformatted(strdup(label), n, margin, pc) ;
     ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
 
     if(one_liner_p(body)) {
-      MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, body));
+      MERGE_TEXTS(r, text_statement_enclosed(module, margin+INDENTATION, body,!one_liner_p(body)));
     }
     else {
-      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"{"));
+      // ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"{"));
       MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, body));
       ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
     }

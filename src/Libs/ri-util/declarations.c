@@ -1266,8 +1266,8 @@ text_entity_declaration(
     pf4 = NIL, pf8 = NIL,
     pl = NIL, 
     pc8 = NIL, pc16 = NIL, ps = NIL, lparam = NIL;
-  list * ppi;
-  list * pph;
+  list * ppi=NULL;
+  list * pph=NULL;
   text r, t_chars = make_text(NIL), t_area = make_text(NIL); 
   string pp_var_dim = get_string_property("PRETTYPRINT_VARIABLE_DIMENSIONS");
   bool pp_in_type = FALSE, pp_in_common = FALSE, pp_cinc;
@@ -1387,7 +1387,7 @@ text_entity_declaration(
 	    pips_debug(7, "is an integer\n");
 	    if (variable_dimensions(type_variable(te)))
 	      {
-		string s;
+		string s = string_undefined;
 		switch (basic_int(b))
 		  {
 		  case 4: ppi = &pi4;
@@ -1410,7 +1410,7 @@ text_entity_declaration(
 	      }
 	    else
 	      {
-		string s;
+		string s = string_undefined;
 
 		switch (basic_int(b))
 		  {
@@ -1937,18 +1937,26 @@ list c_words_entity(type t, list name)
       pc = CHAIN_SWORD(pc,"...");
       return gen_nconc(pc,name);
     }  
-  pips_error("c_words_entity", "unexpected case\n");
+  pips_internal_error("unexpected case\n");
   return NIL;
 }
 
 text c_text_entities(entity module, list ldecl, int margin)
 {
   text r = make_text(NIL);
-  MAP(ENTITY,e,
-  {
-    text tmp = c_text_entity(module, e, margin);
-    MERGE_TEXTS(r,tmp);
-  },ldecl);
+  list l = ldecl;
+
+  for( ; !ENDP(l); POP(l)) {
+    entity e = ENTITY(CAR(l));
+    text tmp = text_undefined;
+    type t=entity_type(e);
+
+    if(!type_area_p(t) && ! type_statement_p(t) && !type_unknown_p(t) && !storage_formal_p(entity_storage(e))) {
+      tmp = c_text_entity(module, e, margin);
+      MERGE_TEXTS(r,tmp);
+    }
+  }
+
   
   return r; 
 }
@@ -2172,6 +2180,7 @@ void print_C_common_layout(FILE * fd, entity c, bool debug_p)
 
       equiv_members = arguments_difference(equiv_members, members);
       if(!ENDP(equiv_members)) {
+	extern int SafeSizeOfArray(entity a);
 	sort_list_of_entities(equiv_members);
 
 	(void) fprintf(fd, "\tVariables aliased to this common:\n");
@@ -2325,6 +2334,8 @@ void fprint_any_environment(FILE * fd, entity m, bool is_fortran)
 
     /* Return variable */
     if(!entity_undefined_p(rv)) {
+        extern int SafeSizeOfArray(entity a);
+
 	(void) fprintf(fd, "\nLayout for return variable:\n\n");
 	(void) fprintf(fd, "\tVariable %s,\tsize = %d\n", 
 			   entity_name(rv), SafeSizeOfArray(rv));
@@ -2336,6 +2347,7 @@ void fprint_any_environment(FILE * fd, entity m, bool is_fortran)
     }
 
     MAP(ENTITY, e, {
+      void print_common_layout(FILE * fd, entity c, bool debug_p);
       if(type_area_p(entity_type(e))) {
 	if(is_fortran)
 	  print_common_layout(fd, e, FALSE);

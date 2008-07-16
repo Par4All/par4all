@@ -312,7 +312,7 @@ entity_and_common_name(entity e)
 bool 
 entity_empty_label_p(entity e)
 {
-    return empty_label_p(entity_name(e));
+    return empty_label_p(entity_local_name(e));
 }
 
 bool 
@@ -429,7 +429,7 @@ entity_empty_label(void)
 
     empty = gen_find_tabulated(concatenate(TOP_LEVEL_MODULE_NAME,
 					   MODULE_SEP_STRING, 
-					   LABEL_PREFIX,
+					   EMPTY_LABEL_NAME,
 					   NULL), entity_domain);
     pips_assert("entity_empty_label", empty != entity_undefined );
 

@@ -43,7 +43,8 @@ string module_name, local_name;
 }
 
 bool 
-empty_local_label_name_p(s)
+//empty_local_label_name_p(s)
+empty_string_p(s)
 string s;
 {
     return(strcmp(s, "") == 0);
@@ -60,7 +61,20 @@ bool
 empty_label_p(s)
 string s;
 {
-    return(empty_local_label_name_p(local_name(s)+strlen(LABEL_PREFIX))) ;
+  // s must be a local label name
+  pips_assert("no separator", strchr(s, MODULE_SEP) == NULL);
+  // return(empty_local_label_name_p(local_name(s)+strlen(LABEL_PREFIX))) ;
+  return (strcmp(s, EMPTY_LABEL_NAME) == 0);
+}
+
+bool
+empty_global_label_p(gln)
+string gln;
+{
+  // gln must be a global label name
+  string lln = local_name(gln); 
+
+  return empty_label_p(lln);
 }
 
 bool 
