@@ -1,6 +1,5 @@
 main()
 {
    int i;
-   
 l12:   printf("\n");
 }

@@ -11,8 +11,7 @@ int main()
    float *wkm;
    float *vector();
    void free_vector();
-   for (k = 1;k<=m;k++)
-   {
+   for (k = 1;k<=m;k++) {
       float num = 0.0;
       float denom = 0.0;
       if (k>1) {
@@ -37,8 +36,7 @@ int main()
    float *wkm;
    float *vector();
    void free_vector();
-   for (k = 1;k<=m;k++)
-   {
+   for (k = 1;k<=m;k++) {
       float num = 0.0;
       float denom = 0.0;
       if (k>1) {

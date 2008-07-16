@@ -1,0 +1,25 @@
+delete one_liner_02
+create one_liner_02 one_liner_02.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+activate C_PARSER
+
+echo
+echo PARSED PRINTED FILE FOR MODULE one_liner_02
+echo
+
+display PARSED_PRINTED_FILE[one_liner_02]
+
+echo
+echo Compile parsed file one_liner_02
+echo
+
+apply UNSPLIT[%PROGRAM]
+# shell $(PIPS_CC) -c one_liner_03.database/Src/one_liner_03.c ?!?
+shell gcc -c one_liner_02.database/Src/one_liner_02.c
+close
+
+#delete one_liner_02
+
+quit

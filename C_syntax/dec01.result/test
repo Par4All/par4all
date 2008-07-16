@@ -4,8 +4,7 @@ PARSED PRINTED FILE
 void do_elem(char *dir)
 {
    int abc;
-   for (;;)
-   {
+   for (;;) {
       int j;
    }
    if (dir[0]=='.') {
@@ -20,8 +19,7 @@ PRINTED_FILE
 void do_elem(char *dir)
 {
    int abc;
-   for (;;)
-   {
+   for (;;) {
       int j;
    }
    if (dir[0]=='.') {

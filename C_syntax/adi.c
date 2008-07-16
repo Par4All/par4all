@@ -1,5 +1,9 @@
 /*#include <math.h>*/
 
+extern double sqrt(double);
+extern double fabs(double);
+
+
 #define JJ 50
 #define KK 6
 #define NRR 32  /* NRR=2 to the power (KK-1) */
@@ -54,8 +58,7 @@ int jmax,k;
 	for (j=2;j<=jmax-1;j++) {
 		for (l=2;l<=jmax-1;l++) {
 			anormg += fabs(g[j][l]);
-			psi[j][l] = -d[j][l]*u[j][l-1]
-				+(r[1]-e[j][l])*u[j][l]-f[j][l]*u[j][l+1];
+			psi[j][l] = -d[j][l]*u[j][l-1]+(r[1]-e[j][l])*u[j][l]-f[j][l]*u[j][l+1];
 		}
 	}
 	nits=MAXITS/nr;
@@ -72,8 +75,7 @@ int jmax,k;
 				}
 				tridag(aa,bb,cc,rr,uu,jmax-2);
 				for (j=2;j<=jmax-1;j++)
-					psi[j][l] = -psi[j][l]
-						+2.0*r[n]*uu[j-1];
+					psi[j][l] = -psi[j][l]+2.0*r[n]*uu[j-1];
 			}
 			for (j=2;j<=jmax-1;j++) {
 				for (l=2;l<=jmax-1;l++) {
@@ -92,10 +94,8 @@ int jmax,k;
 		anorm=0.0;
 		for (j=2;j<=jmax-1;j++)
 			for (l=2;l<=jmax-1;l++) {
-				resid=a[j][l]*u[j-1][l]
-					+(b[j][l]+e[j][l])*u[j][l];
-				resid += c[j][l]*u[j+1][l]+d[j][l]*u[j][l-1]
-					+f[j][l]*u[j][l+1]+g[j][l];
+				resid=a[j][l]*u[j-1][l]+(b[j][l]+e[j][l])*u[j][l];
+				resid += c[j][l]*u[j+1][l]+d[j][l]*u[j][l-1]+f[j][l]*u[j][l+1]+g[j][l];
 				anorm += fabs(resid);
 			}
 		if (anorm < (eps*anormg)) {

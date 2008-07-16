@@ -16,7 +16,6 @@ Controlizer output
 main()
 {
    int c = 5;
-
    if (!(c>0)) goto break_1;
    c -= 1;
 break_1:   ;

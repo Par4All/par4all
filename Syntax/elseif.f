@@ -19,7 +19,7 @@ C
                   if (kmodele.eq.0) then
                      j = 7
                   else
-                     stop
+                     stop 
                   endif
                endif
             else

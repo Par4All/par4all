@@ -5,14 +5,11 @@ void gl_enable()
 {
    int cap;
    int p;
-   if (cap==1) {
+   if (cap==1)
       goto switch_1_case_1;
-   }
 switch_1_case_1:   ;
    for (p = 0;p<6;p++)
-   {
       goto break_2;
-   }
 break_2:   ;
 }
 

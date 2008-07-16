@@ -1,62 +1,12 @@
-void memcof(float data[],int n,int m,float *pm,float cof[])
-{
-   int k;
-   int j;
-   int i;
-   float p = 0.0;
-   float *wk1;
-   float *wk2;
-   float *wkm;
-   float *vector();
-   void free_vector();
-   
-   wk1 = vector(1, n);
-   wk2 = vector(1, n);
-   wkm = vector(1, m);
-   for (j = 1;j<=n;j++)
-      p += (sqrarg = data[j],sqrarg*sqrarg);
-    *pm = p/n;
-   wk1[1] = data[1];
-   wk2[n-1] = data[n];
-   for (j = 2;j<=n-1;j++)
-   {
-      wk1[j] = data[j];
-      wk2[j-1] = data[j];
-   }
-   for (k = 1;k<=m;k++)
-   {
-      float num = 0.0;
-      float denom = 0.0;
-      for (j = 1;j<=n-k;j++)
-      {
-         num += wk1[j]*wk2[j];
-         denom += (sqrarg = wk1[j],sqrarg*sqrarg)+(sqrarg = wk2[j],sqrarg*sqrarg);
-      }
-      cof[k] = 2.0*num/denom;
-       *pm *= 1.0-(sqrarg = cof[k],sqrarg*sqrarg);
-      if (k!=1)
-         for (i = 1;i<=k-1;i++)
-            cof[i] = wkm[i]-cof[k]*wkm[k-i];
-      if (k==m) {
-         free_vector(wkm, 1, m);
-         free_vector(wk2, 1, n);
-         free_vector(wk1, 1, n);
-         return;
-      }
-      for (i = 1;i<=k;i++)
-         wkm[i] = cof[i];
-      for (j = 1;j<=n-k-1;j++)
-      {
-         wk1[j] -= wkm[k]*wk2[j];
-         wk2[j] = wk2[j+1]-wkm[k]*wk1[j+1];
-      }
-   }
-}
+
+Printed file for 'memcof!' 
+
    union PIPS_UNION_1 {
       unsigned char __c[8];
       double __d;
    };
-   static union PIPS_UNION_1 __huge_val = {{0, 0, 0, 0, 0, 0, 0xf0, 0x7f}};
+   typedef union PIPS_UNION_1 __huge_val_t;
+   static __huge_val_t __huge_val = {{0, 0, 0, 0, 0, 0, 0xf0, 0x7f}};
    extern double acos(double );
    extern double __acos(double );
    extern double asin(double );
@@ -77,12 +27,6 @@ void memcof(float data[],int n,int m,float *pm,float cof[])
    extern double __sinh(double );
    extern double tanh(double );
    extern double __tanh(double );
-   extern double acosh(double );
-   extern double __acosh(double );
-   extern double asinh(double );
-   extern double __asinh(double );
-   extern double atanh(double );
-   extern double __atanh(double );
    extern double exp(double );
    extern double __exp(double );
    extern double frexp(double ,int *);
@@ -95,20 +39,10 @@ void memcof(float data[],int n,int m,float *pm,float cof[])
    extern double __log10(double );
    extern double modf(double ,double *);
    extern double __modf(double ,double *);
-   extern double expm1(double );
-   extern double __expm1(double );
-   extern double log1p(double );
-   extern double __log1p(double );
-   extern double logb(double );
-   extern double __logb(double );
    extern double pow(double ,double );
    extern double __pow(double ,double );
    extern double sqrt(double );
    extern double __sqrt(double );
-   extern double hypot(double ,double );
-   extern double __hypot(double ,double );
-   extern double cbrt(double );
-   extern double __cbrt(double );
    extern double ceil(double );
    extern double __ceil(double );
    extern double fabs(double );
@@ -119,267 +53,117 @@ void memcof(float data[],int n,int m,float *pm,float cof[])
    extern double __fmod(double ,double );
    extern int __isinf(double );
    extern int __finite(double );
-   extern int isinf(double );
-   extern int finite(double );
-   extern double drem(double ,double );
-   extern double __drem(double ,double );
-   extern double significand(double );
-   extern double __significand(double );
-   extern double copysign(double ,double );
-   extern double __copysign(double ,double );
    extern int __isnan(double );
-   extern int isnan(double );
-   extern double j0(double );
-   extern double __j0(double );
-   extern double j1(double );
-   extern double __j1(double );
-   extern double jn(int ,double );
-   extern double __jn(int ,double );
-   extern double y0(double );
-   extern double __y0(double );
-   extern double y1(double );
-   extern double __y1(double );
-   extern double yn(int ,double );
-   extern double __yn(int ,double );
-   extern double erf(double );
-   extern double __erf(double );
-   extern double erfc(double );
-   extern double __erfc(double );
-   extern double lgamma(double );
-   extern double __lgamma(double );
-   extern double gamma(double );
-   extern double __gamma(double );
-   extern double lgamma_r(double ,int *);
-   extern double __lgamma_r(double ,int *);
-   extern double rint(double );
-   extern double __rint(double );
-   extern double nextafter(double ,double );
-   extern double __nextafter(double ,double );
-   extern double remainder(double ,double );
-   extern double __remainder(double ,double );
-   extern double scalbn(double ,int );
-   extern double __scalbn(double ,int );
-   extern int ilogb(double );
-   extern int __ilogb(double );
-   extern float acosf(float );
-   extern float __acosf(float );
-   extern float asinf(float );
-   extern float __asinf(float );
-   extern float atanf(float );
-   extern float __atanf(float );
-   extern float atan2f(float ,float );
-   extern float __atan2f(float ,float );
-   extern float cosf(float );
-   extern float __cosf(float );
-   extern float sinf(float );
-   extern float __sinf(float );
-   extern float tanf(float );
-   extern float __tanf(float );
-   extern float coshf(float );
-   extern float __coshf(float );
-   extern float sinhf(float );
-   extern float __sinhf(float );
-   extern float tanhf(float );
-   extern float __tanhf(float );
-   extern float acoshf(float );
-   extern float __acoshf(float );
-   extern float asinhf(float );
-   extern float __asinhf(float );
-   extern float atanhf(float );
-   extern float __atanhf(float );
-   extern float expf(float );
-   extern float __expf(float );
-   extern float frexpf(float ,int *);
-   extern float __frexpf(float ,int *);
-   extern float ldexpf(float ,int );
-   extern float __ldexpf(float ,int );
-   extern float logf(float );
-   extern float __logf(float );
-   extern float log10f(float );
-   extern float __log10f(float );
-   extern float modff(float ,float *);
-   extern float __modff(float ,float *);
-   extern float expm1f(float );
-   extern float __expm1f(float );
-   extern float log1pf(float );
-   extern float __log1pf(float );
-   extern float logbf(float );
-   extern float __logbf(float );
-   extern float powf(float ,float );
-   extern float __powf(float ,float );
-   extern float sqrtf(float );
-   extern float __sqrtf(float );
-   extern float hypotf(float ,float );
-   extern float __hypotf(float ,float );
-   extern float cbrtf(float );
-   extern float __cbrtf(float );
-   extern float ceilf(float );
-   extern float __ceilf(float );
-   extern float fabsf(float );
-   extern float __fabsf(float );
-   extern float floorf(float );
-   extern float __floorf(float );
-   extern float fmodf(float ,float );
-   extern float __fmodf(float ,float );
-   extern int __isinff(float );
-   extern int __finitef(float );
-   extern int isinff(float );
-   extern int finitef(float );
-   extern float dremf(float ,float );
-   extern float __dremf(float ,float );
-   extern float significandf(float );
-   extern float __significandf(float );
-   extern float copysignf(float ,float );
-   extern float __copysignf(float ,float );
-   extern int __isnanf(float );
-   extern int isnanf(float );
-   extern float j0f(float );
-   extern float __j0f(float );
-   extern float j1f(float );
-   extern float __j1f(float );
-   extern float jnf(int ,float );
-   extern float __jnf(int ,float );
-   extern float y0f(float );
-   extern float __y0f(float );
-   extern float y1f(float );
-   extern float __y1f(float );
-   extern float ynf(int ,float );
-   extern float __ynf(int ,float );
-   extern float erff(float );
-   extern float __erff(float );
-   extern float erfcf(float );
-   extern float __erfcf(float );
-   extern float lgammaf(float );
-   extern float __lgammaf(float );
-   extern float gammaf(float );
-   extern float __gammaf(float );
-   extern float lgammaf_r(float ,int *);
-   extern float __lgammaf_r(float ,int *);
-   extern float rintf(float );
-   extern float __rintf(float );
-   extern float nextafterf(float ,float );
-   extern float __nextafterf(float ,float );
-   extern float remainderf(float ,float );
-   extern float __remainderf(float ,float );
-   extern float scalbnf(float ,int );
-   extern float __scalbnf(float ,int );
-   extern int ilogbf(float );
-   extern int __ilogbf(float );
-   extern double acosl(double );
-   extern double __acosl(double );
-   extern double asinl(double );
-   extern double __asinl(double );
-   extern double atanl(double );
-   extern double __atanl(double );
-   extern double atan2l(double ,double );
-   extern double __atan2l(double ,double );
-   extern double cosl(double );
-   extern double __cosl(double );
-   extern double sinl(double );
-   extern double __sinl(double );
-   extern double tanl(double );
-   extern double __tanl(double );
-   extern double coshl(double );
-   extern double __coshl(double );
-   extern double sinhl(double );
-   extern double __sinhl(double );
-   extern double tanhl(double );
-   extern double __tanhl(double );
-   extern double acoshl(double );
-   extern double __acoshl(double );
-   extern double asinhl(double );
-   extern double __asinhl(double );
-   extern double atanhl(double );
-   extern double __atanhl(double );
-   extern double expl(double );
-   extern double __expl(double );
-   extern double frexpl(double ,int *);
-   extern double __frexpl(double ,int *);
-   extern double ldexpl(double ,int );
-   extern double __ldexpl(double ,int );
-   extern double logl(double );
-   extern double __logl(double );
-   extern double log10l(double );
-   extern double __log10l(double );
-   extern double modfl(double ,double *);
-   extern double __modfl(double ,double *);
-   extern double expm1l(double );
-   extern double __expm1l(double );
-   extern double log1pl(double );
-   extern double __log1pl(double );
-   extern double logbl(double );
-   extern double __logbl(double );
-   extern double powl(double ,double );
-   extern double __powl(double ,double );
-   extern double sqrtl(double );
-   extern double __sqrtl(double );
-   extern double hypotl(double ,double );
-   extern double __hypotl(double ,double );
-   extern double cbrtl(double );
-   extern double __cbrtl(double );
-   extern double ceill(double );
-   extern double __ceill(double );
-   extern double fabsl(double );
-   extern double __fabsl(double );
-   extern double floorl(double );
-   extern double __floorl(double );
-   extern double fmodl(double ,double );
-   extern double __fmodl(double ,double );
-   extern int __isinfl(double );
-   extern int __finitel(double );
-   extern int isinfl(double );
-   extern int finitel(double );
-   extern double dreml(double ,double );
-   extern double __dreml(double ,double );
-   extern double significandl(double );
-   extern double __significandl(double );
-   extern double copysignl(double ,double );
-   extern double __copysignl(double ,double );
-   extern int __isnanl(double );
-   extern int isnanl(double );
-   extern double j0l(double );
-   extern double __j0l(double );
-   extern double j1l(double );
-   extern double __j1l(double );
-   extern double jnl(int ,double );
-   extern double __jnl(int ,double );
-   extern double y0l(double );
-   extern double __y0l(double );
-   extern double y1l(double );
-   extern double __y1l(double );
-   extern double ynl(int ,double );
-   extern double __ynl(int ,double );
-   extern double erfl(double );
-   extern double __erfl(double );
-   extern double erfcl(double );
-   extern double __erfcl(double );
-   extern double lgammal(double );
-   extern double __lgammal(double );
-   extern double gammal(double );
-   extern double __gammal(double );
-   extern double lgammal_r(double ,int *);
-   extern double __lgammal_r(double ,int *);
-   extern double rintl(double );
-   extern double __rintl(double );
-   extern double nextafterl(double ,double );
-   extern double __nextafterl(double ,double );
-   extern double remainderl(double ,double );
-   extern double __remainderl(double ,double );
-   extern double scalbnl(double ,int );
-   extern double __scalbnl(double ,int );
-   extern int ilogbl(double );
-   extern int __ilogbl(double );
-   extern int signgam;
-   enum PIPS_ENUM_2 {_IEEE_, _SVID_, _XOPEN_, _POSIX_, _ISOC_};
-   typedef enum PIPS_ENUM_2 _LIB_VERSION_TYPE;
-   extern _LIB_VERSION_TYPE _LIB_VERSION;
-   struct exception {
-      int type;
-      char *name;
-      double arg1;
-      double arg2;
-      double retval;
-   };
-   extern int matherr(struct exception *);
    static float sqrarg;
    extern void memcof();
+
+Unsplit 
+
+/*
+ * file for memcof.c
+ */
+   union PIPS_UNION_1 {
+      unsigned char __c[8];
+      double __d;
+   };
+   typedef union PIPS_UNION_1 __huge_val_t;
+   static __huge_val_t __huge_val = {{0, 0, 0, 0, 0, 0, 0xf0, 0x7f}};
+   extern double acos(double );
+   extern double __acos(double );
+   extern double asin(double );
+   extern double __asin(double );
+   extern double atan(double );
+   extern double __atan(double );
+   extern double atan2(double ,double );
+   extern double __atan2(double ,double );
+   extern double cos(double );
+   extern double __cos(double );
+   extern double sin(double );
+   extern double __sin(double );
+   extern double tan(double );
+   extern double __tan(double );
+   extern double cosh(double );
+   extern double __cosh(double );
+   extern double sinh(double );
+   extern double __sinh(double );
+   extern double tanh(double );
+   extern double __tanh(double );
+   extern double exp(double );
+   extern double __exp(double );
+   extern double frexp(double ,int *);
+   extern double __frexp(double ,int *);
+   extern double ldexp(double ,int );
+   extern double __ldexp(double ,int );
+   extern double log(double );
+   extern double __log(double );
+   extern double log10(double );
+   extern double __log10(double );
+   extern double modf(double ,double *);
+   extern double __modf(double ,double *);
+   extern double pow(double ,double );
+   extern double __pow(double ,double );
+   extern double sqrt(double );
+   extern double __sqrt(double );
+   extern double ceil(double );
+   extern double __ceil(double );
+   extern double fabs(double );
+   extern double __fabs(double );
+   extern double floor(double );
+   extern double __floor(double );
+   extern double fmod(double ,double );
+   extern double __fmod(double ,double );
+   extern int __isinf(double );
+   extern int __finite(double );
+   extern int __isnan(double );
+   static float sqrarg;
+   extern void memcof();
+void memcof(float data[],int n,int m,float *pm,float cof[])
+{
+   int k;
+   int j;
+   int i;
+   float p = 0.0;
+   float *wk1;
+   float *wk2;
+   float *wkm;
+   float *vector();
+   void free_vector();
+   
+   wk1 = vector(1, n);
+   wk2 = vector(1, n);
+   wkm = vector(1, m);
+   for (j = 1;j<=n;j++)
+      p += (sqrarg = data[j],sqrarg*sqrarg);
+    *pm = p/n;
+   wk1[1] = data[1];
+   wk2[n-1] = data[n];
+   for (j = 2;j<=n-1;j++) {
+      wk1[j] = data[j];
+      wk2[j-1] = data[j];
+   }
+   for (k = 1;k<=m;k++) {
+      float num = 0.0;
+      float denom = 0.0;
+      for (j = 1;j<=n-k;j++) {
+         num += wk1[j]*wk2[j];
+         denom += (sqrarg = wk1[j],sqrarg*sqrarg)+(sqrarg = wk2[j],sqrarg*sqrarg);
+      }
+      cof[k] = 2.0*num/denom;
+       *pm *= 1.0-(sqrarg = cof[k],sqrarg*sqrarg);
+      if (k!=1)
+         for (i = 1;i<=k-1;i++)
+            cof[i] = wkm[i]-cof[k]*wkm[k-i];
+      if (k==m) {
+         free_vector(wkm, 1, m);
+         free_vector(wk2, 1, n);
+         free_vector(wk1, 1, n);
+         return;
+      }
+      for (i = 1;i<=k;i++)
+         wkm[i] = cof[i];
+      for (j = 1;j<=n-k-1;j++) {
+         wk1[j] -= wkm[k]*wk2[j];
+         wk2[j] = wk2[j+1]-wkm[k]*wk1[j+1];
+      }
+   }
+}

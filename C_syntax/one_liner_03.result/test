@@ -1,0 +1,20 @@
+
+PARSED PRINTED FILE FOR MODULE one_liner_03
+
+void one_liner_03()
+{
+   int x;
+   int y;
+   int z;
+   for (;;)
+      y++;
+   for (;;) {
+      y++;
+      z++;
+   }
+   for (;;)
+      ;
+}
+
+Compile parsed file one_liner_03
+

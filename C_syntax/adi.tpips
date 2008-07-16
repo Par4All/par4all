@@ -28,6 +28,8 @@ echo
 
 apply UNSPLIT[%PROGRAM]
 shell cat adi.database/Src/adi.c
+shell gcc -c adi.database/Src/adi.c
+shell rm -f adi.o
 
 close
 
