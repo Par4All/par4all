@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 #include "linear.h"
 
@@ -96,21 +97,23 @@ constant, the actual value is stored (as an integer) in constant_int.
 values of other constants have to be computed with the name, if
 necessary.
 
-name is the name of the constant 12, 123E10, '3I12', ...
-Initial and final quotes are included in the names of string constants.
+name is the name of the constant 12, 123E10, '3I12', 015 (C octal
+ constant), 0x1ae; (C hexadecimal), 890L (C long constant) ...
+ Initial and final quotes are included in the names of string
+ constants.
 
 basic is the basic type of the constant: int, float, ... 
+Character constants are typed as int.
 */
 
-entity 
-make_constant_entity(
-    string name,
-    tag bt,
-    size_t size)
+ entity make_C_or_Fortran_constant_entity(string name,
+					  tag bt,
+					  size_t size,
+					  bool is_fortran)
 {
     entity e;
 
-    e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, name);
+   e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, name);
 
     if (entity_type(e) == type_undefined) {
 	functional fe;
@@ -128,48 +131,39 @@ make_constant_entity(
 
 	fe = make_functional(NIL, MakeTypeVariable(be, NIL));
 
-	if (bt == is_basic_int)
-	{
-	  /* The conversion depends on the representation size */
-	  /* strtol() could be used to manage a larger variety of C
-	     initialization cases (RK) */
-	  string sname = name;
+	if (bt == is_basic_int)	{ // int or char constants
+	  int basis = is_fortran? 10 : 0;
+	  string error_string = string_undefined;
+	  int64_t l = 0;
 
 	  /* Skip leading zeroes to check the conversion result with scanf */
-	  for(;*sname!='\000' &&*(sname+1)!='\000' && *sname=='0'; sname++)
-	    ;
+	  /* for(;*sname!='\000' &&*(sname+1)!='\000' && *sname=='0'; sname++) */
+	  /*  ; */
 
 	  if(size==4) { // 32 bit target machine
-	    long l = atol(sname);
-	    char buffer[12];
-
-	    sprintf(buffer, "%d", l);
-	    if(strcmp(sname,buffer)==0)
-	      ce = make_constant(is_constant_int, (void*) atol(sname));
-	    else {
-	      /* Some truncation occured */
-	      pips_user_warning("Integer constant '%s' cannot be stored in %d bytes\n", name, size);
-	      ParserError("make_constant_entity",
-			  "Integer constant too large for internal representation\n");
-	    }
+	    l = (int64_t) strtol(name, &error_string, basis);
 	  }
-	  else if(size==8) { // 64 bit target machine
-	    /* Should not work on a 32 bit machines. Expects pointers to be 64 bits */
-	    long long ll = atoll(sname);
-	    char buffer[24];
-
-	    sprintf(buffer, "%ld", ll);
-	    if(strcmp(sname,buffer)==0)
-	      ce = make_constant(is_constant_int, (void*) atoll(sname));
-	    else {
-	      /* Some truncation occured */
-	      pips_user_warning("Integer constant '%s' cannot be stored in %d bytes\n", name, size);
-	      ParserError("make_constant_entity",
-			  "Integer constant too large for internal representation\n");
-	    }
+	  else if(size==8) {
+	    pips_assert("pointers have the right size", sizeof(void *)==8);
+	    l = (int64_t) strtol(name, &error_string, basis);
 	  }
 	  else
 	    pips_internal_error("Unexpected number of bytes for an integer variable\n");
+
+	  if(errno==EINVAL) {
+	      pips_user_warning("Integer constant '%s' cannot be converted in %d bytes (%s)\n",
+				name, size, error_string);
+	      ParserError("make_constant_entity",
+			  "Integer constant conversion error\n");
+	    }
+	  else if(errno==ERANGE) {
+	      pips_user_warning("Overflow, Integer constant '%s' cannot be stored in %d bytes\n",
+				name, size);
+	      ParserError("make_constant_entity",
+			  "Integer constant too large for internal representation\n");
+	  }
+
+	  ce = make_constant(is_constant_int, (void*) l);
 	}
 	else
 	{
@@ -182,6 +176,28 @@ make_constant_entity(
     }
 
     return(e);
+}
+
+entity make_C_constant_entity(string name,
+			      tag bt,
+			      size_t size)
+{
+  return make_C_or_Fortran_constant_entity(name, bt, size, FALSE);
+}
+
+entity make_Fortran_constant_entity(string name,
+				    tag bt,
+				    size_t size)
+{
+  return make_C_or_Fortran_constant_entity(name, bt, size, TRUE);
+}
+
+/* For historical reason, call the Fortran version */
+entity make_constant_entity(string name,
+			    tag bt,
+			    size_t size)
+{
+  return make_C_or_Fortran_constant_entity(name, bt, size, TRUE);
 }
 
 /* END_EOLE */
