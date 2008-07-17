@@ -1,4 +1,4 @@
-int g; 
+int g;
 
 void foo()
 {

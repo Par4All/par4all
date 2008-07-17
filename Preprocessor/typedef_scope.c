@@ -1,4 +1,3 @@
-
 typedef int node;
 
 main()

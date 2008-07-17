@@ -9,7 +9,6 @@ int main()
     char e:5;
     signed :6;
   } y;
-  
+
   return 0;
 }
-

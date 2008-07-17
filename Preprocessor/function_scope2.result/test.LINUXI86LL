@@ -3,3 +3,9 @@ foo()
 {
   i = 2;
 }
+# 1 "$VDIR/function_scope2.c"
+# 1 "<built-in>"
+# 1 "<command line>"
+# 1 "$VDIR/function_scope2.c"
+int i;
+extern foo();

@@ -1,4 +1,3 @@
-
 extern int foo(int i);
 main()
 {

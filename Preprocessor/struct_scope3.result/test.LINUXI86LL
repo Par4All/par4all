@@ -8,3 +8,8 @@ foo()
 {
   struct toto x;
 }
+# 1 "$VDIR/struct_scope3.c"
+# 1 "<built-in>"
+# 1 "<command line>"
+# 1 "$VDIR/struct_scope3.c"
+extern bstruct toto { int i; } foo();

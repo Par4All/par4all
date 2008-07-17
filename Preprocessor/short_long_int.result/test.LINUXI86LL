@@ -11,3 +11,8 @@ main()
   i1 = 1;
   i7 = 7;
 }
+# 1 "$VDIR/short_long_int.c"
+# 1 "<built-in>"
+# 1 "<command line>"
+# 1 "$VDIR/short_long_int.c"
+extern main();

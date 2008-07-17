@@ -1,17 +1,17 @@
 int main()
 {
-  struct 
+  struct
   {
     int a;
     int b;
-    struct 
+    struct
     {
       int m;
       float n;
     } c;
   } y;
-  
-  struct 
+
+  struct
   {
     float k;
     float l;

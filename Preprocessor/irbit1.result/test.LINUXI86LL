@@ -1,13 +1,18 @@
-# 6
+# 1
 int irbit1(iseed)
 unsigned long *iseed;
 {
- unsigned long newbit;
+        unsigned long newbit;
 
- newbit = (*iseed & 131072) >> 17
-  ^ (*iseed & 16) >> 4
-  ^ (*iseed & 2) >> 1
-  ^ (*iseed & 1);
- *iseed=(*iseed << 1) | newbit;
- return (int) newbit;
+        newbit = (*iseed & 131072) >> 17
+                ^ (*iseed & 16) >> 4
+                ^ (*iseed & 2) >> 1
+                ^ (*iseed & 1);
+        *iseed=(*iseed << 1) | newbit;
+        return (int) newbit;
 }
+# 1 "$VDIR/irbit1.c"
+# 1 "<built-in>"
+# 1 "<command line>"
+# 1 "$VDIR/irbit1.c"
+extern int irbit1();

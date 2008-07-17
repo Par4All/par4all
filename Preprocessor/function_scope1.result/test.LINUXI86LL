@@ -3,6 +3,14 @@ foo()
 {
   i = 2;
 }
+# 1 "$VDIR/function_scope1.c"
+# 1 "<built-in>"
+# 1 "<command line>"
+# 1 "$VDIR/function_scope1.c"
+int i;
+extern foo();
+
+extern main();
 # 7
 main()
 {

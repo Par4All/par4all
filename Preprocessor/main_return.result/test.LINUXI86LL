@@ -3,3 +3,8 @@ int main()
 {
   return 1;
 }
+# 1 "$VDIR/main_return.c"
+# 1 "<built-in>"
+# 1 "<command line>"
+# 1 "$VDIR/main_return.c"
+extern int main();

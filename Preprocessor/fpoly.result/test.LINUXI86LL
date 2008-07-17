@@ -3,8 +3,13 @@ void fpoly(x,p,np)
 float x,p[];
 int np;
 {
- int j;
+        int j;
 
- p[1]=1.0;
- for (j=2;j<=np;j++) p[j]=p[j-1]*x;
+        p[1]=1.0;
+        for (j=2;j<=np;j++) p[j]=p[j-1]*x;
 }
+# 1 "$VDIR/fpoly.c"
+# 1 "<built-in>"
+# 1 "<command line>"
+# 1 "$VDIR/fpoly.c"
+extern void fpoly();

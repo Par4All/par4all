@@ -25,3 +25,8 @@ main()
   int key2;
   int node;
 }
+# 1 "$VDIR/struct_member_name.c"
+# 1 "<built-in>"
+# 1 "<command line>"
+# 1 "$VDIR/struct_member_name.c"
+extern main();

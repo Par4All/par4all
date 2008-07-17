@@ -8,3 +8,8 @@ main()
       continue;
     }
 }
+# 1 "$VDIR/while_continue.c"
+# 1 "<built-in>"
+# 1 "<command line>"
+# 1 "$VDIR/while_continue.c"
+extern main();

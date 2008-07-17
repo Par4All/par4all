@@ -5,3 +5,10 @@ int csplit10(i, pj)
 {
   *pj = i;
 }
+# 1 "$VDIR/csplit10.c"
+# 1 "<built-in>"
+# 1 "<command line>"
+# 1 "$VDIR/csplit10.c"
+/* See what happens with old style declarations. */
+
+extern int csplit10();

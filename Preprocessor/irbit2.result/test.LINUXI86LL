@@ -1,12 +1,17 @@
-# 7
+# 1
 int irbit2(iseed)
 unsigned long *iseed;
 {
- if (*iseed & 131072) {
-  *iseed=((*iseed ^ 1 +2 +16) << 1) | 1;
-  return 1;
- } else {
-  *iseed <<= 1;
-  return 0;
- }
+        if (*iseed & 131072) {
+                *iseed=((*iseed ^ 1 +2 +16) << 1) | 1;
+                return 1;
+        } else {
+                *iseed <<= 1;
+                return 0;
+        }
 }
+# 1 "$VDIR/irbit2.c"
+# 1 "<built-in>"
+# 1 "<command line>"
+# 1 "$VDIR/irbit2.c"
+extern int irbit2();

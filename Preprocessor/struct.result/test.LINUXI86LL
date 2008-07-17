@@ -10,3 +10,8 @@ int main()
   struct x z;
   return 0;
 }
+# 1 "$VDIR/struct.c"
+# 1 "<built-in>"
+# 1 "<command line>"
+# 1 "$VDIR/struct.c"
+extern int main();

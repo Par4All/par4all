@@ -1,3 +1,10 @@
+# 1 "$VDIR/csplit15.c"
+# 1 "<built-in>"
+# 1 "<command line>"
+# 1 "$VDIR/csplit15.c"
+/* Make sure that the signature is parseable */
+
+extern int main();
 # 3
 int main(argc,argv)
 int argc;

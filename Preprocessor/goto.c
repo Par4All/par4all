@@ -1,9 +1,9 @@
 main()
 {
   int i = 0;
-  if (i>1) 
+  if (i>1)
     goto lab1;
-  else 
+  else
     goto lab2;
  lab1: i = i+1;
  lab2: i = i-1;

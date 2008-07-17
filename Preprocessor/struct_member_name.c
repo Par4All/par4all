@@ -1,6 +1,6 @@
 main()
 {
-  struct key 
+  struct key
   {
     int node;
   };
@@ -15,12 +15,12 @@ main()
     int node;
   };
 
-  struct node 
+  struct node
   {
     float node;
   };
 
   int key;
   int key2;
-  int node; 
+  int node;
 }

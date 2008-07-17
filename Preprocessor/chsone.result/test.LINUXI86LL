@@ -3,17 +3,22 @@ void chsone(bins,ebins,nbins,knstrn,df,chsq,prob)
 float bins[],ebins[],*df,*chsq,*prob;
 int nbins,knstrn;
 {
- int j;
- float temp;
- float gammq();
- void nrerror();
+        int j;
+        float temp;
+        float gammq();
+        void nrerror();
 
- *df=nbins-1-knstrn;
- *chsq=0.0;
- for (j=1;j<=nbins;j++) {
-  if (ebins[j] <= 0.0) nrerror("Bad expected number in CHSONE");
-  temp=bins[j]-ebins[j];
-  *chsq += temp*temp/ebins[j];
- }
- *prob=gammq(0.5*(*df),0.5*(*chsq));
+        *df=nbins-1-knstrn;
+        *chsq=0.0;
+        for (j=1;j<=nbins;j++) {
+                if (ebins[j] <= 0.0) nrerror("Bad expected number in CHSONE");
+                temp=bins[j]-ebins[j];
+                *chsq += temp*temp/ebins[j];
+        }
+        *prob=gammq(0.5*(*df),0.5*(*chsq));
 }
+# 1 "$VDIR/chsone.c"
+# 1 "<built-in>"
+# 1 "<command line>"
+# 1 "$VDIR/chsone.c"
+extern void chsone();

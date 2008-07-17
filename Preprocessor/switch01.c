@@ -10,4 +10,3 @@ int foo(int predicate)
   }
   return 333;
 }
-

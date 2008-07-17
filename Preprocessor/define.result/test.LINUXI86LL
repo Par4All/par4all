@@ -1,4 +1,9 @@
-# 4
+# 1 "$VDIR/define.c"
+# 1 "<built-in>"
+# 1 "<command line>"
+# 1 "$VDIR/define.c"
+extern main();
+# 1
 main()
 {
   int i = 1;

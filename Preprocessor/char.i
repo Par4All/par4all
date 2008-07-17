@@ -1,0 +1,9 @@
+main()
+{
+  char c1;
+  unsigned char c2;
+  signed char c3;
+  c1 = 'A';
+  c2 = 'B';
+  c3 = 'C';
+}

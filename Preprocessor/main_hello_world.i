@@ -1,0 +1,8 @@
+#include <stdio.h>
+
+
+main()
+{
+  int i = 0;
+  printf("Hello, world %d\n",i);
+}

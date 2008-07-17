@@ -5,7 +5,7 @@ int main()
     int a;
     int b;
   } y;
-  
+
   struct x z;
   return 0;
 }

@@ -19,11 +19,25 @@ main()
     {
       struct key
       {
- float node;
+        float node;
       };
     }
   printf("Test\n");
 }
+# 1 "$VDIR/struct_scope.c"
+# 1 "<built-in>"
+# 1 "<command line>"
+# 1 "$VDIR/struct_scope.c"
+struct key
+  {
+    int node;
+  };
+
+extern main();
+
+extern int foo();
+
+extern int toto();
 # 32
 int toto()
 {
@@ -32,7 +46,7 @@ int toto()
     {
       struct test
       {
- float a;
+        float a;
       };
     }
 }

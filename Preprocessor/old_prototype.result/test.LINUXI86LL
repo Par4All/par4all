@@ -5,3 +5,8 @@ void foo(a,b,c)
 {
 
 }
+# 1 "$VDIR/old_prototype.c"
+# 1 "<built-in>"
+# 1 "<command line>"
+# 1 "$VDIR/old_prototype.c"
+extern void foo();

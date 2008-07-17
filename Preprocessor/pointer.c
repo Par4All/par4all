@@ -11,7 +11,6 @@ int main()
   pp = (int **)malloc(200*sizeof(int));
   a[1] = &x;
   p = (int *)malloc(3*sizeof(int));
-  p1 = (int  (*)[13])malloc(13*sizeof(int));
-  return; 
+  p1 = (int (*)[13])malloc(13*sizeof(int));
+  return;
 }
-

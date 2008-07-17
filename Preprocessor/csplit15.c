@@ -3,11 +3,8 @@
 int main(argc,argv)
 int argc;
 char *argv[];
-{ 
+{
   int k;
 
   k = 1;
 }
-
-
- 

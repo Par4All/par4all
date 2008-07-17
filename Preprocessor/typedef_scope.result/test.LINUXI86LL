@@ -1,4 +1,4 @@
-# 18
+# 17
 foo()
 {
   typedef int node;
@@ -8,7 +8,7 @@ foo()
     int node;
   };
 }
-# 4
+# 3
 main()
 {
   typedef int node;
@@ -22,3 +22,12 @@ main()
   n = 5;
   printf("Test\n");
 }
+# 1 "$VDIR/typedef_scope.c"
+# 1 "<built-in>"
+# 1 "<command line>"
+# 1 "$VDIR/typedef_scope.c"
+typedef int node;
+
+extern main();
+node n=5;
+extern foo();
