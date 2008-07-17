@@ -1110,52 +1110,43 @@ words_io_inst(call obj,
   else if (good_fmt && good_unit && same_string_p(called, "READ"))
     {
       /* READ (*,*) -> READ * */
-      if(is_fortran) {
-	if (pio_write != NIL)	/* READ (*,*) pio -> READ *, pio */
-	  { 
-	    pc = CHAIN_SWORD(pc, "READ *, ");
-	  }
-	else			/* READ (*,*)  -> READ *  */
-	  {
-	    pc = CHAIN_SWORD(pc, "READ * ");
-	  }
-	pcio = pio_write;
-      }	
-      else if (!complex_io_control_list) {
-	list unit_words = words_expression(unit_arg);
-	pips_assert("A unit must be defined", !ENDP(unit_words));
-	pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
-	pc = CHAIN_SWORD(pc, " (");
-	pc = gen_nconc(pc, unit_words);
 	
-	if (!expression_undefined_p(fmt_arg)) {
-	  /* There is a FORMAT: */
-	  pc = CHAIN_SWORD(pc, ", ");
-	  pc = gen_nconc(pc, words_expression(fmt_arg));
+      if (pio_write != NIL)	/* READ (*,*) pio -> READ *, pio */
+	{
+	  pc = CHAIN_SWORD(pc, "READ *, ");
 	}
+      else			/* READ (*,*)  -> READ *  */
+	{
+	  pc = CHAIN_SWORD(pc, "READ * ");
+	}
+      pcio = pio_write;
+    }	
+  else if (!complex_io_control_list) {
+    list unit_words = words_expression(unit_arg);
+    pips_assert("A unit must be defined", !ENDP(unit_words));
+    pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
+    pc = CHAIN_SWORD(pc, " (");
+    pc = gen_nconc(pc, unit_words);
+	
+    if (!expression_undefined_p(fmt_arg)) {
+      /* There is a FORMAT: */
+      pc = CHAIN_SWORD(pc, ", ");
+      pc = gen_nconc(pc, words_expression(fmt_arg));
+    }
 
-	pc = CHAIN_SWORD(pc, ") ");
-	pcio = pio_write;
-      }
-      else {
-	pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
-	pc = CHAIN_SWORD(pc, " (");
-	/* FI: missing argument; I use "precedence" because I've no clue;
-	   see LZ */
-	pc = gen_nconc(pc, words_io_control(&pcio, precedence, leftmost));
-	pc = CHAIN_SWORD(pc, ") ");
-	/* 
-	   free_words(fmt_words);
-	*/
-      }
-    } 
+    pc = CHAIN_SWORD(pc, ") ");
+    pcio = pio_write;
+  }
   else {
-    //pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
-    pc = CHAIN_SWORD(pc, "Read_intrinsic (");
+    pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
+    pc = CHAIN_SWORD(pc, " (");
     /* FI: missing argument; I use "precedence" because I've no clue;
        see LZ */
     pc = gen_nconc(pc, words_io_control(&pcio, precedence, leftmost));
     pc = CHAIN_SWORD(pc, ") ");
+    /* 
+       free_words(fmt_words);
+    */
   }
 
   /* because the "IOLIST=" keyword is embedded in the list

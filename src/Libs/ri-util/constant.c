@@ -93,17 +93,44 @@ bool integer_constant_name_p(string name)
 {
     return strlen(name)==strspn(name, INTEGER_CONSTANT_NAME_CHARS);
 }
+
 intptr_t TK_CHARCON_to_intptr_t(string name)
 {
   intptr_t r;
+
   /* Should be able to decode any C character constant... */
   if(strlen(name)==3 && name[0]=='\'' && name[2]=='\'')
     r=name[1];
-  else {
+  else if(strlen(name)==4 && name[0]=='\'' && name[1]=='\\' && name[3]=='\'')
+    switch(name[2]) {
+    case '\t' :
+      r = 9; // not sure
+      break;
+    case '\n' :
+      r = 10;
+      break;
+    case '\r' :
+      r = 13;
+      break;
+    default:
+      r=name[2];
+    }
+  else if(strlen(name)==6 && name[0]=='\'' && name[1]=='\\' && name[5]=='\'') {
+    /* octal constant */
+    string error_string = string_undefined;
+    errno = 0;
+    r = strtol(&name[2], &error_string, 8);
+    if(errno!=0) {
+      pips_user_warning("character constant %s not recognized\n",name);
+      pips_internal_error("Illegal octal constant\n");
+    }
+  }
+  else { // Unrecognized format
     pips_user_warning("character constant %s not recognized\n",name);
     // pips_internal_error("not implemented yet\n");
     r=0;//just temporory 
   }
+
   return r;
 }
 
@@ -136,9 +163,9 @@ Character constants are typed as int.
   e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, name);
 
   if (entity_type(e) == type_undefined) {
-    functional fe;
-    constant ce;
-    basic be;
+    functional fe = functional_undefined;
+    constant ce = constant_undefined;
+    basic be = basic_undefined;
 	
     if (bt == is_basic_string) {
       be = make_basic(bt, (make_value(is_value_constant, 
@@ -151,34 +178,34 @@ Character constants are typed as int.
 
     fe = make_functional(NIL, MakeTypeVariable(be, NIL));
 
-    if (bt == is_basic_int)	{ // int or char constants
+    if (bt == is_basic_int && (size==4 || size==8)) { // int constant
       int basis = is_fortran? 10 : 0;
-      string error_string = string_undefined;
+      char * error_string = string_undefined;
       int64_t l = 0;
       extern bool ParserError(string, string);
       extern void CParserError(string);
-
-      /* Skip leading zeroes to check the conversion result with scanf */
-      /* for(;*sname!='\000' &&*(sname+1)!='\000' && *sname=='0'; sname++) */
-      /*  ; */
+      int error_number = 0;
 
       if(size==4) { // 32 bit target machine
+	errno = 0;
 	l = (int64_t) strtol(name, &error_string, basis);
+	error_number = errno;
+	errno = 0;
       }
       else if(size==8) {
 	pips_assert("pointers have the right size", sizeof(void *)==8);
+	errno = 0;
 	l = (int64_t) strtol(name, &error_string, basis);
-      }
-      else if(size==1) {
-	// Character constant
-	intptr_t i = TK_CHARCON_to_intptr_t(name);
-	// fprintf(stderr,"make integer constant:name=%s\n",name);
-	ce = make_constant(is_constant_int, (void*) i);
+	error_number = errno;
+	errno = 0;
       }
       else 
 	pips_internal_error("Unexpected number of bytes for an integer variable\n");
 
-      if(errno==EINVAL) {
+      pips_assert("Integer constants are internally stored on 4 or 8 bytes",
+		  size==4 || size==8);
+      /* Check conversion errors and make the constant */
+      if(error_number==EINVAL) {
 	pips_user_warning("Integer constant '%s' cannot be converted in %d bytes (%s)\n",
 			  name, size, error_string);
 	if(is_fortran) 
@@ -187,7 +214,7 @@ Character constants are typed as int.
 	else
 	  CParserError("Integer constant conversion error\n");
       }
-      else if(errno==ERANGE) {
+      else if(error_number==ERANGE) {
 	pips_user_warning("Overflow, Integer constant '%s' cannot be stored in %d bytes\n",
 			  name, size);
 	if(is_fortran)
@@ -196,8 +223,23 @@ Character constants are typed as int.
 	else
 	  CParserError("Integer constant too large for internal representation\n");
       }
+      else if(error_number!=0 && (l == LONG_MAX || l == LONG_MIN)) {
+	pips_internal_error("Conversion error for integer constant string\n");
+      }
+      else if(*error_string!='\0' && !same_string_p(error_string, "L")) {
+	pips_internal_error("Illegal characters found in integer constant string\n");
+      }
+      else if(name==error_string) {
+	pips_internal_error("No digit found in integer constant string\n");
+      }
 
       ce = make_constant(is_constant_int, (void*) l); // Not OK on 32 bit machines
+    }
+    else if(bt == is_basic_int && size==1) {
+      // Character constant
+      intptr_t i = TK_CHARCON_to_intptr_t(name);
+      // fprintf(stderr,"make integer constant:name=%s\n",name);
+      ce = make_constant(is_constant_int, (void*) i);
     }
     else {
       ce = make_constant(is_constant_call, e);
