@@ -70,13 +70,16 @@ statement (*codegen_fun)(statement, graph, set, int, bool);
       case is_instruction_loop: {
 	  stat = rice_loop(stat,l,codegen_fun);
 	  ifdebug(7){
-	      fprintf(stderr, "\nparalized loop :");
-	      if (statement_consistent_p((statement)stat))
+	      fprintf(stderr, "\nregenerated loop is %s:",
+		      execution_sequential_p(loop_execution(instruction_loop(statement_instruction(stat))))?
+		      "sequential" : "parallel");
+	      if (statement_consistent_p(stat))
 		  fprintf(stderr," gen consistent ");
 	  }
 	  break;
       }
       case is_instruction_whileloop:
+      case is_instruction_forloop:
       case is_instruction_goto: 
       case is_instruction_call: 
 	break;
@@ -253,9 +256,9 @@ do_it(
 
     ifdebug(7)
     {
-	fprintf(stderr, "\nparallelized code %s:",mod_name);
+	fprintf(stderr, "\nparallelized code for mudule %s:",mod_name);
 	if (statement_consistent_p((statement)mod_parallel_stat))
-	    fprintf(stderr," gen consistent ");
+	    fprintf(stderr," gen consistent\n");
     }
 
     debug_off();

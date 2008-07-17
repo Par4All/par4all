@@ -2142,7 +2142,7 @@ text_loop_default(
     if(is_fortran)
       pc = CHAIN_SWORD(NIL, (doall_loop_p) ? "DOALL " : "DO " );
     else
-      pc = CHAIN_SWORD(NIL, "for(" );
+      pc = CHAIN_SWORD(NIL, (doall_loop_p) ? "forall(" : "for(" );
     
     if(!structured_do && !doall_loop_p && !do_enddo_p) {
 	pc = CHAIN_SWORD(pc, concatenate(do_label, " ", NULL));
@@ -3040,7 +3040,7 @@ text text_statement_enclosed(
   /* 31/07/2003 Nga Nguyen : This code is added for C, because a statement can have its own declarations */
   list l = statement_declarations(stmt);
 
-  if (!ENDP(l))
+  if (!ENDP(l) && !is_fortran)
     {
       /* printf("Statement declarations : ");
 	 print_entities(l); */

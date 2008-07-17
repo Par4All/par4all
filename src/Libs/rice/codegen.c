@@ -512,7 +512,10 @@ statement body;
 				make_instruction(is_instruction_loop, new_loop),NIL,NULL);
     
     ifdebug(8) {
-	debug(8, "MakeLoopAs", "New loop\n");
+      pips_assert("Execution is either parallel or sequential",
+		  seq_or_par==is_execution_sequential || seq_or_par==is_execution_parallel);
+      debug(8, "MakeLoopAs", "New %s loop\n",
+	    seq_or_par==is_execution_sequential? "sequential" : "parallel");
       print_statement(new_loop_s);
     }
     
