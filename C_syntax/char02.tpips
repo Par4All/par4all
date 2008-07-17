@@ -6,6 +6,17 @@ activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
+echo
+echo Printed file for main
+echo
+
+display PRINTED_FILE[main]
+
+echo
+echo Preconditions for main
+echo
+
+activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[main]
 
 

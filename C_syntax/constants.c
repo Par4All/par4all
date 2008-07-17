@@ -1,6 +1,7 @@
 main() {
-  int i; 
+  int i, j, k, l; 
   i = 015; // octal constant
-  i = 0x1ae; // hexadecimal 
-  i = 890L; // long constant
+  j = 0x1ae; // hexadecimal 
+  k = 890L; // long constant
+  l = i + j + k;
 }
