@@ -1,0 +1,4 @@
+   extern int main();
+   int x;
+   extern void foo(int );
+
