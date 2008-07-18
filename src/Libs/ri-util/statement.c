@@ -1056,6 +1056,15 @@ void safe_print_statement(statement s)
     print_statement(s);
 }
 
+void print_parallel_statement(statement s)
+{
+  string cstyle = strdup(get_string_property(PRETTYPRINT_PARALLEL));
+  set_string_property(PRETTYPRINT_PARALLEL, "doall");
+  print_statement(s);
+  set_string_property(PRETTYPRINT_PARALLEL, cstyle);
+  free(cstyle);
+}
+
 
 /* Mapping from statement number to statement 
  *

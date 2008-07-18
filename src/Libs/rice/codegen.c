@@ -439,7 +439,7 @@ bool task_parallelize_p;
 	if (stata != statement_undefined) {
 	    ifdebug(9) {
 		debug(9, "CodeGenerate", "generated statement:\n") ;
-		print_statement(stata);
+		print_parallel_statement(stata);
 		
 	    }
 	    statb= MakeNestOfStatementList(l,nbl,&lst, loops, &block,&eblock,task_parallelize_p);
@@ -463,7 +463,7 @@ bool task_parallelize_p;
 	if (rst==statement_undefined)  
 	    debug(8, "CodeGenerate", "No code to generate\n") ;
 	else
-	  print_statement(rst);
+	  print_parallel_statement(rst);
 	
     }
     debug_off();
@@ -516,7 +516,7 @@ statement body;
 		  seq_or_par==is_execution_sequential || seq_or_par==is_execution_parallel);
       debug(8, "MakeLoopAs", "New %s loop\n",
 	    seq_or_par==is_execution_sequential? "sequential" : "parallel");
-      print_statement(new_loop_s);
+      print_parallel_statement(new_loop_s);
     }
     
     return(new_loop_s);

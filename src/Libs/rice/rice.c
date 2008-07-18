@@ -52,6 +52,7 @@ int l ;
 statement (*codegen_fun)(statement, graph, set, int, bool);
 {
     instruction istat = statement_instruction(stat);
+    statement new_stat = stat; // Most statements are modified by side effects
 
     switch (instruction_tag(istat)) {
       case is_instruction_block: {
@@ -68,13 +69,17 @@ statement (*codegen_fun)(statement, graph, set, int, bool);
 	  break;
       }
       case is_instruction_loop: {
-	  stat = rice_loop(stat,l,codegen_fun);
+	  new_stat = rice_loop(stat,l,codegen_fun);
 	  ifdebug(7){
-	      fprintf(stderr, "\nregenerated loop is %s:",
-		      execution_sequential_p(loop_execution(instruction_loop(statement_instruction(stat))))?
-		      "sequential" : "parallel");
-	      if (statement_consistent_p(stat))
-		  fprintf(stderr," gen consistent ");
+	      if(statement_loop_p(new_stat))
+	          pips_debug(7, "regenerated loop is %s:",
+			  execution_sequential_p(loop_execution(instruction_loop(statement_instruction(new_stat))))?
+			  "sequential" : "parallel");
+	      else
+	          pips_debug(7, "regenerated code:");
+	      if (statement_consistent_p(new_stat))
+		  fprintf(stderr, " consistent\n");
+	      print_parallel_statement(new_stat);
 	  }
 	  break;
       }
@@ -89,11 +94,10 @@ statement (*codegen_fun)(statement, graph, set, int, bool);
 	  break;
       }
       default:
-	fprintf(stderr, "[rice_statement] case default reached\n");
-	abort();
+	pips_internal_error("default case reached\n");
     }
 
-    return(stat);
+    return(new_stat);
 }
 
 statement 
@@ -146,7 +150,7 @@ rice_loop(statement stat,
 	
     ifdebug(7){
 	pips_debug(7, "consistency checking for CodeGenerate output: ");
-	if (statement_consistent_p((statement)nstat))
+	if (statement_consistent_p(nstat))
 	    fprintf(stderr," gen consistent\n");
     }
     pips_assert( "nstat is defined", nstat != statement_undefined ) ;
@@ -167,7 +171,7 @@ rice_loop(statement stat,
     fix_sequence_statement_attributes_if_sequence(nstat);
     ifdebug(1) {
 	fprintf(stderr, "final nest of loops:\n\n");
-	print_statement(nstat);
+	print_parallel_statement(nstat);
     }
 
     /* StatementToContext should be freed here. but it is not easy. */
@@ -194,6 +198,7 @@ do_it(
      * may be sequential if distribute_p is true
      */
     statement mod_parallel_stat = statement_undefined;
+    statement new_stmt = statement_undefined;
 
     set_current_module_statement( (statement)
 				  db_get_memory_resource(DBR_CODE, 
@@ -207,7 +212,7 @@ do_it(
 
     ifdebug(7)
     {
-	fprintf(stderr, "\nTesting NewGen consistency for initial code %s:\n",
+	pips_debug(7, "\nTesting NewGen consistency for initial code %s:\n",
 		mod_name);
 	if (statement_consistent_p((statement)mod_stat))
 	    fprintf(stderr," NewGen consistent statement\n");
@@ -248,7 +253,9 @@ do_it(
 
     rice_distribute_only = distribute_p ;
     enclosing = 0;
-    rice_statement(mod_parallel_stat,1,codegen_fun);   
+    // rice_statement works by side effects, most of the times, but
+    // not for loops
+    mod_parallel_stat = rice_statement(mod_parallel_stat,1,codegen_fun);
 
     /* Regenerate statement_ordering for the parallel code */
     reset_ordering_to_statement();
@@ -256,9 +263,10 @@ do_it(
 
     ifdebug(7)
     {
-	fprintf(stderr, "\nparallelized code for mudule %s:",mod_name);
-	if (statement_consistent_p((statement)mod_parallel_stat))
+	pips_debug(7, "\nparallelized code for module %s:",mod_name);
+	if (statement_consistent_p(mod_parallel_stat))
 	    fprintf(stderr," gen consistent\n");
+	print_parallel_statement(mod_parallel_stat);
     }
 
     debug_off();

@@ -2095,12 +2095,27 @@ text_hpf_directive(loop l, int m)
 #define OMP_DIRECTIVE 		OMP_SENTINEL " "
 #define OMP_CONTINUATION 	OMP_SENTINEL "x"
 #define OMP_PARALLELDO		"PARALLEL DO "
+#define OMP_C_SENTINEL 		"#pragma omp"
+#define OMP_C_DIRECTIVE 	OMP_C_SENTINEL " "
+#define OMP_C_CONTINUATION 	OMP_C_SENTINEL "x" 
+#define OMP_C_PARALLELDO	"parallel for "
 
 static text 
 text_omp_directive(loop l, int m)
 {
-    return text_directive(l, m, "\n" OMP_DIRECTIVE, OMP_CONTINUATION,
-			  OMP_PARALLELDO);
+  text t = text_undefined;
+
+  if(is_fortran)
+    t = text_directive(l, m, "\n" OMP_DIRECTIVE, OMP_CONTINUATION,
+		       OMP_PARALLELDO);
+  else { // assume C
+    // More should be done to take care of shared and private variables
+    t = text_directive(l, m, "\n" OMP_C_DIRECTIVE, OMP_CONTINUATION,
+		       OMP_C_PARALLELDO);
+
+  }
+
+  return t;
 }
 
 /* exported for fortran90.c */

@@ -37,6 +37,7 @@
  
 #define SEQUENTIAL_FORTRAN_EXT ".f"
 #define PARALLEL_FORTRAN_EXT ".parf"
+#define PARALLEL_C_EXT ".parc"
 #define PREDICAT_FORTRAN_EXT ".pref"
 #define PRETTYPRINT_FORTRAN_EXT ".ppf"
  
