@@ -1274,7 +1274,7 @@ text_entity_declaration(
   /* Declarations cannot be sorted out because Fortran standard impose at
   least an order on parameters. Fortunately here, PARAMETER are mostly
   integers, defined from other integer parameters... I assume that PIPS
-  would fail with an ENTRY areferencing an integer array dimensionned with
+  would fail with an ENTRY referencing an integer array dimensionned with
   a real parameter. But real parameters are not really well processed by
   PIPS...
 
