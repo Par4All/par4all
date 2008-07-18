@@ -5,7 +5,7 @@ void parallel01()
 {
    double x[10];
    int i;
-   
+
    for (i = 0;i<10;i++)
       x[i] = 0.;
 }
@@ -16,7 +16,7 @@ void parallel01()
 {
    double x[10];
    int i;
-   
+
    for(i = 0; i <= 9; i += 1)
       x[i] = 0.;
 }
@@ -33,7 +33,7 @@ void parallel01()
 
 //  P() {}
 
-   
+
    for(i = 0; i <= 9; i += 1)
 
 //  P(i) {0<=i, i<=9}
@@ -43,16 +43,11 @@ void parallel01()
 
 Parallelization
 
-
- ******** Whole Dependence Graph with Dependence Cones ******
-
-
-****************** End of Dependence Graph ******************
 void parallel01()
 {
    double x[10];
    int i;
-   
+
 
 #pragma omp    parallel for 
    for(i = 0; i <= 9; i += 1)

@@ -30,13 +30,15 @@ echo
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[parallel03]
 
-echo
-echo Dependence graph
-echo
+#echo
+#echo Dependence graph
+#echo
 
-activate PRINT_WHOLE_DEPENDENCE_GRAPH  
+# This dependence graph prettyprinter cannot be used in validation
+# because it uses hexadecimal adresses activate
+#activate PRINT_WHOLE_DEPENDENCE_GRAPH  
 
-display DG_FILE[parallel03]
+#display DG_FILE[parallel03]
 
 echo
 echo Parallelization

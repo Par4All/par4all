@@ -6,7 +6,7 @@ void parallel03()
    double x[10];
    double y[10];
    int i;
-   
+
    y[0] = 0.;
    for(i = 1; i <= 9; i += 1) {
       x[i] = (double )i;
@@ -27,7 +27,7 @@ void parallel03()
 
 //  P() {}
 
-   
+
    y[0] = 0.;
 
 //  P() {}
@@ -44,33 +44,6 @@ void parallel03()
    }
 }
 
-Dependence graph
-
-
- ******** Whole Dependence Graph with Dependence Cones ******
-
-	11 (0, 6) at 0x8397c60: ASSIGN 
- --> 11 (0, 6) at 0x8397c60: ASSIGN 
- with conflicts
-		from <y[i]-W-MUST> to <y[i-1]-R-MUST> at levels  1
-Generating system:
-1 Vertex 
-(1)
-End of generating system ****
-
-	10 (0, 5) at 0x8393460: ASSIGN 
- --> 11 (0, 6) at 0x8397c60: ASSIGN 
- with conflicts
-		from <x[i]-W-MUST> to <x[i]-R-MUST> at levels  2
-
-	8 (0, 2) at 0x8392670: ASSIGN 
- --> 11 (0, 6) at 0x8397c60: ASSIGN 
- with conflicts
-		from <y[0]-W-MUST> to <y[i-1]-R-MUST>
-		from <y[0]-W-MUST> to <y[i]-W-MUST>
-
-****************** End of Dependence Graph ******************
-
 Parallelization
 
 void parallel03()
@@ -78,7 +51,7 @@ void parallel03()
    double x[10];
    double y[10];
    int i;
-   
+
    y[0] = 0.;
 
 #pragma omp    parallel for 
@@ -95,7 +68,7 @@ void parallel03()
    double x[10];
    double y[10];
    int i;
-   
+
    y[0] = 0.;
 
 #pragma omp    parallel for 
