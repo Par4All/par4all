@@ -1,0 +1,17 @@
+      SUBROUTINE TEST8(L,N,M,A,B,C)
+      INTEGER L,N,M
+      REAL A(L,M), B(M,N), C(L,M)
+
+      DOALL I = 1, L                                                    0001
+         DOALL J = 1, N                                                 0002
+            C(I,J) = 0.0                                                0003
+         ENDDO
+      ENDDO
+      DOALL I = 1, L                                                    0001
+         DOALL J = 1, N                                                 0002
+            DO K = 1, M                                                 0004
+               C(I,J) = C(I,J)+A(I,K)*B(K,J)                            0005
+            ENDDO
+         ENDDO
+      ENDDO
+      END

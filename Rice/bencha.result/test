@@ -1,0 +1,737 @@
+C     Modifications
+C      - proper dimensions in common declarations of module BOUCLE
+C      - removal of entry CNTRL in subroutine BOUCLE
+C      - replacement of RETURN statements by END statements
+C      - small commons, with only one array of one element, are
+C     properly declared
+
+      PROGRAM BENCHA
+C
+c
+C-----EQUATION DE LA CHALEUR NON LINEAIRE 2 D
+C-----DIFFERENCES FINIES, NEWTON, GRADIENT CONJUGUE
+C
+C-----VERSION 1.0 UTILISEE POUR LES TESTS CRAY X-MP, CRAY 2 
+C-----21-28 AVRIL 1986
+C
+C-----COMPRESSIONS, RECHERCHES ET INTERPOLATIONS EN FORTRAN 
+C-----NON VECTORIEL 
+C
+C-----ADRESSAGE INDIRECT
+C
+      PARAMETER (NNLIG=11,NNCOL=31,NTOD=(NNLIG+1)*NNCOL)
+       COMMON/MONITOR/
+     .LKOM(6),
+     1IGENED,
+     1 NUPROT,NOMCAS(8),T2003,NINTO,INVTOT,ARRET,MODIF(10),JDATV,NVERS,
+     1 NUPRB13,NOMJOB,PGNOM,
+     1 DATESG,NOMSAG,NUPRB11,IDATE,ICYCLE,
+     1IGENEF,
+     2IDIMD,
+     2 NMIL,NTOT,NTOTM,NMF,NMAXNL,NFUS,NNTOT,NBNLOG,NBCOL,LIGDER,TRMG,
+     2 TRMG2,NBGR,NCORPS,NREA,NSECNE,NNPOL,NNPOLM,NFUSM,
+     2IDIMF
+      COMMON/MONITOR/
+     3LOGIQD,
+     3 REPRISE,YYYY,MOVE,ZZZZ,MYYYYYO,MXXXXX,MZZZZZ,IOPACI,IAXE,ISCHEMA,
+     3 ISYM,MINVER,ICOURB,SAGACE,IPRLCM,LOI4,LOI7,B13,
+     3 VIDEC,COMBLE,PREC,INTNEU,LISS,DECOUPL,SORTZON,NEUDISK,OPADISK, 
+     3 B10,DENEU,FUINE,PROTDIS,REPDIS,SANPROT,
+     3SORMU,FUS,FUSD,LREMAIL,POLUT,LPRES,LENER,LABAN,
+     3 B11,
+     3 IFB10,IFRO10,IFEN10,
+     3 SANSAG,
+     3 METMCC,VARMAIL,
+     3IANISO,
+     3 IFPART,
+     3 LLIBRE(5),LOGIQF
+      COMMON /MONITOR/
+     4IGESTD,
+     4 LARGE(20),NBMOT(20),IADLCM,LCMLON,LON402,
+     4L03,L04,L0402,L07,L0822,LETAT,LOPA,LSECT,LVARHE,LTOT,JOPAC,JETAT,
+     4JSECT,LXXXPHO,IFLU,ICOU,IFUIT,IYYYY1,INTEG,INTLI,ISORTI,
+     4LONFLU,LONCOU,LONFUIT,LONET,LSORTI,NEUDIS,LYYYY,
+     4LONMC1,LONMC2,JTIMES,LTIMES,JBILAN,LBILAN,JTDEC,JVRDEC,JVZDEC,
+     4 JRDEC,JZDEC,JZONES,JWS1DEC,JWS2DEC,JZMPDEC,
+     4 IGESTF
+      COMMON /MONITOR/
+     5LCOM1,LCOM2,LCOM3,LCOM4,LCOM5,LCOM6,LCOM7,LCOM8,LCOM9,LCOM10,
+     .LCREMAY,
+     5LCOMFIN
+      COMMON/DESCR/KN(NTOD)
+     .,LN(NTOD),
+     . MAT(NTOD),
+     . ND(NTOD),
+     . NH(NTOD),
+     . NG(NTOD),
+     . NB(NTOD),
+     . KLFB(NTOD),
+     . KLFG(NTOD),
+     . IVID(NTOD),
+     . DEN(NTOD),MNC,XT(20),XRO(40),XOPA(20,40),OPAK(NTOD), 
+     . DP(NTOD),NPFG,NFG(NTOD),NPFB,NFB(NTOD),
+     . V1(NTOD),V2(NTOD),V3(NTOD),V4(NTOD),V5(NTOD),V6(NTOD),V7(NTOD),
+     . VOLU(NTOD),VOLUN(NTOD),DVOLU(NTOD),
+     . NBLIG,NBKOL,NELIG(NTOD),NECOL(NTOD),IDLIG(NTOD),KOL(NTOD)
+      COMMON/LICOL/NLIG,NCOL
+      INTEGER DATESG
+      LOGICAL ARRET 
+       LOGICAL REPRISE,YYYY,MOVE,ZZZZ,SAGACE,LOI4,LOI7
+      LOGICAL B13,SORTZON,NEUDISK,OPADISK
+      LOGICAL B10,DENEU,FUINE,PROTDIS,REPDIS,SANPROT
+      LOGICAL IFB10,IFRO10,IFEN10
+      LOGICAL SANSAG
+      LOGICAL VIDEC,COMBLE,PREC,INTNEU,LISS,DECOUPL,IPRLCM
+      LOGICAL SORMU,FUS,FUSD,LREMAIL,POLUT,LPRES,LENER,LABAN
+      LOGICAL IANISO
+      LOGICAL B11,VARMAIL
+      LOGICAL IFPART
+      COMMON/SORTIES/
+     *TPHASE(5,5),KDBS(5),LDBS(5),KFBS(5),LFBS(5),ITYPB(5,5),IFBS(5,5),
+     *ICLIST(5),KFREQ(5,5),LFREQ(5,5),DTLIST(5,5),TLIST(5)
+     *,NBLOCS
+C  PROT
+     *,TFPROT(5),DTPROT(5),TPROT,TMPROT,ITPROT,NPALP,IPROT,DTPSTD
+C  BANDE 13
+     *,KDB13,LDB13,KFB13,LFB13,NBPT13,VLISB13,TRELB13,TFAZB13(5)
+     *,DTB13(5)
+     *,TBECAN,TMAC,MAXITER,
+     *ICNUS(5,5),
+C  SAGACE 
+     * NBSG,KDSG(5),LDSG(5),KFSG(5),LFSG(5),
+     * NTSG,PTSG(5),DTSG(5),NVSG,NMSG,
+     * DELTAZ,DELTAR,MIROIR,
+     *             DERSOR
+      LOGICAL MIROIR
+      COMMON/TIMES/ 
+     *             NITER,NITERH,NITERF,NITERN,
+     *TEMPS,TIMEH,TIMEF,TIMEN,DTIT,DTH,DTF,DTN,DTHN,DTFN,DTNN,DTHS,DTFS,
+     *DTNS,DTAH,DTAF,DTV,TARRET,DTITN,DTMIN,DTMAXF,DTMAXH
+     *,TDEBFU,TDPSG 
+     .,TDREM
+     *,DERTIME
+      COMMON/BILAN/ 
+     *             ETOTO,ECINO,EINTO,ERADO,QMRO,QMZO,
+     *             WEXT,QEXT,XIMPR,XIMPZ,XIMPA,
+     *             EFIS,EFUS,EFMC,EMAT, 
+     *             WQT1T,WQT2T,WQT3T,WQT,
+     *             ETOT,ECIN,EINT,ERAD,QMR,QMZ,
+     *             DWEXT,DQEXT,DXIMPR,DXIMPZ,DXIMPA,
+     *             DEFIS,DEFUS,WQT1,WQT2,WQT3,
+     *             TMA,XMA,VOL,
+     *WNMIL(50),WFMIL(50),
+     *             DERBIL
+      COMMON/C0201/R(NTOD)
+      COMMON/C0202/Z(NTOD)
+      COMMON/C0203/RO(NTOD)
+      COMMON/C0204/T(NTOD)
+      COMMON/C0205/ZMM(NTOD)
+      COMMON/C0206/DWA(NTOD)
+      COMMON/C0503/TR(NTOD)
+      COMMON/C0504/TZ(NTOD)
+      COMMON/C0505/TC(NTOD)
+      COMMON/C0506/ER(NTOD)
+      COMMON/C0507/FIRB(NTOD) 
+      COMMON/C0508/FIZB(NTOD) 
+      COMMON/C0509/FIRG(NTOD) 
+      COMMON/C0510/FIZG(NTOD) 
+      COMMON/C0512/ENM1(NTOD) 
+      COMMON/C0513/ESECN(NTOD)
+      COMMON/C0601/ERN(NTOD)
+      COMMON/C0602/FIRBN(NTOD)
+      COMMON/C0603/FIZBN(NTOD)
+      COMMON/C0604/FIRGN(NTOD)
+      COMMON/C0605/FIZGN(NTOD)
+      COMMON/C0608/RN(NTOD)
+      COMMON/C0609/ZN(NTOD)
+      COMMON/C0610/RON(NTOD)
+      COMMON/C0611/TN(NTOD)
+      COMMON/C0612/E(NTOD)
+      COMMON/C0613/EN(NTOD)
+      COMMON/C0614/PN(NTOD)
+      COMMON/C0615/P(NTOD)
+      COMMON/C0616/DELTAE(NTOD)
+      COMMON/C0801/COE1(NTOD) 
+      COMMON/C0802/COE2(NTOD) 
+      COMMON/C0803/COE3(NTOD) 
+      COMMON/C0804/COE4(NTOD) 
+      COMMON/C0805/CB(NTOD)
+      COMMON/C0806/CG(NTOD)
+      COMMON/C0807/CC(NTOD)
+      COMMON/C0808/CD(NTOD)
+      COMMON/C0809/CH(NTOD)
+      COMMON/C0810/CM(NTOD)
+      COMMON/C0811/XDT(NTOD)
+      COMMON/C0812/D1(NTOD)
+      COMMON/C0813/D2(NTOD)
+      COMMON/C0814/D3(NTOD)
+      COMMON/C0815/D4(NTOD)
+      COMMON/C0818/SNE(NTOD)
+      COMMON/CONTI/ 
+C  MONITEUR DU STEP3
+     *IZZZZZ,IXXXXX,IYYYYYO,NRET,IRET,TITER,NINTOT,INVM
+     *,IAPO,NOPROT,AMAXIT,ATPSMAX,ATBMAX,ADTMIN,ACLE1,ATLIM,IZZZZA
+     *,TIYYYY,TIXXX,TIZZZZ,TIACTU,TISOR 
+      LOGICAL AMAXIT,ATPSMAX,ATBMAX,ADTMIN,ACLE1,ATLIM,IZZZZA
+      LOGICAL IZZZZZ,IXXXXX,IYYYYYO,IAPO,NOPROT
+      COMMON/ZZZZ/ALK,OMK,APS,ALOM,P75,APH,CPH,ACPH,NINT
+     *          ,ISYMA,NKMIN,NLMIN,NKPREM,NLPREM
+      COMMON/MILIEU/
+     *             NOMMAT(50),METAT(50),MOPAC(50),MDSUP(50),
+     *             ROO(50),TOO(50),
+     *                  PO(50),
+     *             INDOPA(50),INDNEU(50),INDXXX(50),
+     *              NCOMP(5,50),TAUX(5,50),
+     *             NMPOL(50),NETMEL(5,2),NETPOL(5,2),IDGROU(2),ALFGR, 
+     *             FLUB(50),FLUG(50),FLUD(50),FLUH(50),
+     .NPARM (50),ICORPS (8,50),YNI (8,50),
+     .NPARMP(50),ICORPSP(8,50),YNIP(8,50),
+     *AMASSE(50),IREA(8,50),NCOMPP(5,5),TAUXP(5,5),
+     *NOFUS(50),IANI(50),
+     *ENO(50),
+     *MPOLOPA(5),XNACM(50),
+     * MILCOD(50),
+     *             DERMIL
+      COMMON/THERM/ 
+     *             NDEB,NFIN,KONV,NOCONV,TETA,JOB,EPS,TESTM,ITERQ
+      DIMENSION XTEMP(1)
+      EQUIVALENCE (XTEMP(1),FIZG(1))
+C
+      NPASMAX = 10                                                      0001
+      PRINT *, ' benchmark a npasmax= ', NPASMAX                        0002
+C      DO 1111 NPAS=1,npasmax
+C
+      NCOL = NNCOL                                                      0003
+      NLIG = NNLIG                                                      0004
+      NMAT1 = 1                                                         0005
+      NMAT2 = 6                                                         0006
+      NMAT3 = 11                                                        0007
+cbench      NOMMAT(1)=2HL1
+cbench      NOMMAT(2)=2HL2
+cbench      NOMMAT(3)=2HL3
+      NTOTM = NTOD                                                      0008
+      NTOT = NCOL*NLIG                                                  0009
+      YYYY = .FALSE.                                                    0010
+      MOVE = .FALSE.                                                    0011
+      ZZZZ = .TRUE.                                                     0012
+      T2003 = 0.                                                        0013
+      TEMPS = 0.                                                        0014
+      TIMEF = 0.                                                        0015
+      TIMEH = 0.                                                        0016
+      TIMEN = 0.                                                        0017
+      DTFS = 0.1E-9                                                     0018
+      DTHS = 0.1E-09                                                    0019
+      DTNS = 0.1E-09                                                    0020
+      DTF = DTFS                                                        0021
+      NINTO = 0                                                         0022
+      INVTOT = 0                                                        0023
+      NITER = 0                                                         0024
+      NITERF = 0                                                        0025
+      MAXITER = 300                                                     0026
+      TARRET = 100.E-9                                                  0027
+      MZZZZZ = 1                                                        0028
+      DTMIN = 0.01E-9                                                   0029
+      DTMAXF = 2.5E-9                                                   0030
+      TETA = 0.5                                                        0031
+      MINVER = 1                                                        0032
+      ISYM = 1                                                          0033
+      IMULTI = 0                                                        0034
+      IAXE = 1                                                          0035
+      P75 = 7.5                                                         0036
+      CPH = 3.E+10                                                      0037
+      APH = 7.56E-15                                                    0038
+      ACPH = 3./(4.*APH*CPH)                                            0039
+      MNC = NTOT                                                        0040
+      DO J = 1, NLIG                                                    0041
+         JCOL = (J-1)*NCOL                                              0042
+         DO II = 1, NCOL                                                0043
+            NN = JCOL+II                                                0044
+            KN(NN) = II                                                 0045
+            LN(NN) = J                                                  0046
+         ENDDO
+      ENDDO
+      DOALL N = 1, NTOT                                                 0048
+2        MAT(N) = 0                                                     0049
+      ENDDO
+      DO 3 N = 1, NTOT                                                  0050
+         IF (LN(N).LT.NLIG.AND.KN(N).LT.NCOL) MAT(N) = 3                0051
+         IF (LN(N).LT.NLIG.AND.KN(N).LT.NMAT3) MAT(N) = 2               0053
+         IF (LN(N).LT.NLIG.AND.KN(N).LT.NMAT2) MAT(N) = 1               0055
+3        CONTINUE                                                       0057
+      DO 4 N = 1, NTOT                                                  0058
+         ND(N) = N+1                                                    0059
+         IF (KN(N).EQ.NCOL.AND.LN(N).EQ.NLIG) ND(N) = 1                 0060
+         NG(N) = N-1                                                    0062
+         IF (KN(N).EQ.1) NG(N) = 1                                      0063
+         NB(N) = N-NCOL                                                 0065
+         IF (LN(N).EQ.1) NB(N) = 1                                      0066
+         NH(N) = N+NCOL                                                 0068
+         IF (LN(N).EQ.NLIG) NH(N) = N-NCOL*(NLIG-1)+1                   0069
+         IF (LN(N).EQ.NLIG.AND.KN(N).EQ.NCOL) NH(N) = 1                 0071
+4        CONTINUE                                                       0073
+      DOALL N = 1, NTOT                                                 0074
+         KLFB(N) = 0                                                    0075
+      ENDDO
+      DOALL N = 1, NTOT                                                 0074
+         KLFG(N) = 0                                                    0076
+      ENDDO
+      N1 = 0                                                            0078
+      N2 = 0                                                            0079
+      DO 6 N = 1, NTOT                                                  0080
+         IF (KN(N).EQ.1.OR.KN(N).EQ.NCOL.OR.LN(N).EQ.NLIG) THEN         0081
+            N1 = N1+1                                                   0082
+            KLFG(N1) = 1                                                0083
+            NFG(N1) = N                                                 0084
+         ENDIF
+         IF (LN(N).EQ.1.OR.LN(N).EQ.NLIG.OR.KN(N).EQ.NCOL) THEN         0085
+            N2 = N2+1                                                   0086
+            KLFB(N2) = 1                                                0087
+            NFB(N2) = N                                                 0088
+         ENDIF
+6        CONTINUE                                                       0089
+      NPFG = N1                                                         0090
+      NPFB = N2                                                         0091
+      DOALL N = 2, NTOT                                                 0092
+         IVID(N) = 15                                                   0093
+      ENDDO
+      DOALL N = 2, NCOL                                                 0095
+         IVID(N) = 12                                                   0096
+      ENDDO
+      DO 9 N = 1, NTOT                                                  0098
+         IF (KN(N).EQ.1) IVID(N) = 10                                   0099
+         IF (KN(N).EQ.NCOL) IVID(N) = 5                                 0101
+         IF (LN(N).EQ.NLIG) IVID(N) = 3                                 0103
+9        CONTINUE                                                       0105
+      IVID(1) = 8                                                       0106
+      IVID(NCOL) = 4                                                    0107
+      IVID(NTOT) = 1                                                    0108
+      IVID(NTOT-NCOL+1) = 2                                             0109
+C
+      DQEXT = 0.                                                        0110
+C
+      DOALL N = 1, NTOTM                                                0111
+         R(N) = 0.                                                      0112
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         Z(N) = 0.                                                      0113
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         RO(N) = 1.                                                     0114
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         ZMM(N) = 1.                                                    0115
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         VOLU(N) = 1.                                                   0116
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         T(N) = 100.                                                    0117
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         ER(N) = 0.                                                     0118
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         FIRB(N) = 0.                                                   0119
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         FIRG(N) = 0.                                                   0120
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         E(N) = 0.                                                      0121
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         P(N) = 0.                                                      0122
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         CB(N) = 0.                                                     0123
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         CG(N) = 0.                                                     0124
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         CC(N) = 0.                                                     0125
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         CD(N) = 0.                                                     0126
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         CH(N) = 0.                                                     0127
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         CM(N) = 0.                                                     0128
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         XDT(N) = 0.                                                    0129
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         D1(N) = 0.                                                     0130
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         D2(N) = 0.                                                     0131
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         D3(N) = 0.                                                     0132
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         D4(N) = 0.                                                     0133
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         COE1(N) = 1.                                                   0134
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         COE2(N) = 1.                                                   0135
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         COE3(N) = 1.                                                   0136
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         COE4(N) = 1.                                                   0137
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         XTEMP(N) = 1                                                   0138
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         DELTAE(N) = 0.                                                 0139
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         DWA(N) = 0.                                                    0140
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         ENM1(N) = 0.                                                   0141
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         ESECN(N) = 0.                                                  0142
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         V1(N) = 0.                                                     0143
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         V2(N) = 0.                                                     0144
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         V3(N) = 0.                                                     0145
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         V4(N) = 0.                                                     0146
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         V5(N) = 0.                                                     0147
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         V6(N) = 0.                                                     0148
+      ENDDO
+      DOALL N = 1, NTOTM                                                0111
+         V7(N) = 0.                                                     0149
+      ENDDO
+      DR = NLIG-1                                                       0151
+      DR = 10./DR                                                       0152
+      DZ1 = NMAT3-1                                                     0153
+      DZ1 = 10./DZ1                                                     0154
+      DZ2 = NCOL-NMAT3                                                  0155
+      DZ2 = 0.6/DZ2                                                     0156
+      DOALL N = 1, NTOT                                                 0157
+         R(N) = (LN(N)-1)*DR                                            0158
+      ENDDO
+      Z1 = 10.                                                          0160
+      DO 11 N = 1, NTOT                                                 0161
+         IF (KN(N).LE.NMAT3) THEN                                       0162
+            Z(N) = (KN(N)-1)*DZ1                                        0163
+         ELSE
+            Z(N) = Z1+(KN(N)-NMAT3)*DZ2                                 0164
+         ENDIF
+11       CONTINUE                                                       0165
+      RL = 0.7                                                          0166
+      RLO = 18.9                                                        0167
+      DO 12 N = 1, NTOT                                                 0168
+         IF (KN(N).LT.NMAT3) THEN                                       0169
+            RO(N) = RL                                                  0170
+         ELSE
+            RO(N) = RLO                                                 0171
+         ENDIF
+12       CONTINUE                                                       0172
+      DO 13 N = 1, NTOT                                                 0173
+         IF (KN(N).LT.NMAT2) THEN                                       0174
+            T(N) = 10.E+6                                               0175
+         ELSE
+            T(N) = 1.E+6                                                0176
+         ENDIF
+13       CONTINUE                                                       0177
+      DO 14 N = 1, NTOT                                                 0178
+         IF (MAT(N).NE.0) THEN                                          0179
+            R1 = R(N)                                                   0180
+            Z1 = Z(N)                                                   0181
+            R2 = R(NH(N))                                               0182
+            Z2 = Z(NH(N))                                               0183
+            R3 = R(NH(ND(N)))                                           0184
+            Z3 = Z(NH(ND(N)))                                           0185
+            R4 = R(ND(N))                                               0186
+            Z4 = Z(ND(N))                                               0187
+            RG1 = (R1+R2+R4)/3.                                         0188
+            RG2 = (R3+R2+R2)/3.                                         0189
+            S1 = (R2-R1)*(Z4-Z1)-(R4-R1)*(Z2-Z1)                        0190
+            S2 = (R4-R3)*(Z2-Z3)-(R2-R3)*(Z4-Z3)                        0191
+            VOL = (S1*RG1+S2*RG2)*3.14159265                            0192
+            ZMM(N) = VOL*RO(N)                                          0193
+            VOLU(N) = VOL                                               0194
+         ENDIF
+14       CONTINUE                                                       0195
+      TMAX = 20.1E+6                                                    0196
+      TMIN = 600000.                                                    0197
+      DTEMP = (TMAX-TMIN)/19                                            0198
+      XT(1) = TMIN                                                      0199
+      DO N = 2, 20                                                      0200
+         XT(N) = XT(N-1)+DTEMP                                          0201
+      ENDDO
+      ROMIN = 0.6                                                       0203
+      ROMAX = 0.79                                                      0204
+      DRO = (ROMAX-ROMIN)/19                                            0205
+      XRO(1) = ROMIN                                                    0206
+      DO N = 2, 20                                                      0207
+         XRO(N) = XRO(N-1)+DRO                                          0208
+      ENDDO
+      ROMIN = 18.8                                                      0210
+      ROMAX = 18.99                                                     0211
+      DRO = (ROMAX-ROMIN)/19                                            0212
+      XRO(21) = ROMIN                                                   0213
+      DO N = 22, 40                                                     0214
+         XRO(N) = XRO(N-1)+DRO                                          0215
+      ENDDO
+      DO I = 1, 20                                                      0217
+         M = 1                                                          0218
+         DOALL J = 1, 20                                                0219
+            XOPA(I,J) = OPAQ(M, XT(I), XRO(J))                          0220
+         ENDDO
+         M = 3                                                          0222
+         DOALL J = 21, 40                                               0223
+            XOPA(I,J) = OPAQ(M, XT(I), XRO(J))                          0224
+         ENDDO
+      ENDDO
+      DOALL N = 1, 20                                                   0227
+         XT(N) = ALOG(XT(N))                                            0228
+      ENDDO
+      DOALL N = 1, 20                                                   0230
+         XRO(N) = ALOG(XRO(N))                                          0231
+      ENDDO
+      DOALL N = 21, 40                                                  0233
+         XRO(N) = ALOG(XRO(N)+10000.)                                   0234
+      ENDDO
+      DOALL I = 1, 20                                                   0236
+         DOALL J = 1, 40                                                0237
+            XOPA(I,J) = ALOG(XOPA(I,J))                                 0238
+         ENDDO
+      ENDDO
+      DO 34 N = 1, NTOT                                                 0240
+         IF (MAT(N).EQ.3) THEN                                          0241
+            RO(N) = ALOG(RO(N)+10000.)                                  0242
+         ELSE
+            RO(N) = ALOG(RO(N))                                         0243
+         ENDIF
+34       CONTINUE                                                       0244
+      NBLIG = NLIG-1                                                    0245
+      NBKOL = NCOL-1                                                    0246
+      DOALL N = 1, NLIG                                                 0247
+         NELIG(N) = NBKOL                                               0248
+      ENDDO
+      IDLIG(1) = 1                                                      0250
+      DO N = 2, NLIG                                                    0251
+         IDLIG(N) = IDLIG(N-1)+NCOL                                     0252
+      ENDDO
+      DOALL N = 1, NBKOL                                                0254
+         NECOL(N) = NBLIG                                               0255
+      ENDDO
+      I = 1                                                             0257
+      DO N = 1, NBKOL                                                   0258
+         NPREM = N                                                      0259
+         DO II = 1, NECOL(N)                                            0260
+            KOL(I) = NPREM+(II-1)*NCOL                                  0261
+            I = I+1                                                     0262
+         ENDDO
+      ENDDO
+      ERADO = 0.                                                        0265
+      EINTO = 0.                                                        0266
+      ETOTO = 0.                                                        0267
+      EINT = 0.                                                         0268
+      ERAD = 0.                                                         0269
+      ECIN = 0.                                                         0270
+      DO 16 N = 1, NTOT                                                 0271
+         IF (MAT(N).NE.0) THEN                                          0272
+            EINTO = EINTO+ZMM(N)*E(N)                                   0273
+            ERADO = ERADO+ER(N)*VOLU(N)                                 0274
+         ENDIF
+16       CONTINUE                                                       0275
+      ETOTO = EINTO+ERADO                                               0276
+C 1111 CONTINUE
+C.....REWIND(9).......A NE PAS METTRE SI TAPE9=OUTPUT
+      STOP                                                              0277
+      END
+      FUNCTION  OPAQ(M,TT,RHO) 
+c
+c
+      PARAMETER (NNLIG=11,NNCOL=31,NTOD=(NNLIG+1)*NNCOL)
+       COMMON/MONITOR/
+     .LKOM(6),
+     1IGENED,
+     1 NUPROT,NOMCAS(8),T2003,NINTO,INVTOT,ARRET,MODIF(10),JDATV,NVERS,
+     1 NUPRB13,NOMJOB,PGNOM,
+     1 DATESG,NOMSAG,NUPRB11,IDATE,ICYCLE,
+     1IGENEF,
+     2IDIMD,
+     2 NMIL,NTOT,NTOTM,NMF,NMAXNL,NFUS,NNTOT,NBNLOG,NBCOL,LIGDER,TRMG,
+     2 TRMG2,NBGR,NCORPS,NREA,NSECNE,NNPOL,NNPOLM,NFUSM,
+     2IDIMF
+      COMMON/MONITOR/
+     3LOGIQD,
+     3 REPRISE,YYYY,MOVE,ZZZZ,MYYYYYO,MXXXXX,MZZZZZ,IOPACI,IAXE,ISCHEMA,
+     3 ISYM,MINVER,ICOURB,SAGACE,IPRLCM,LOI4,LOI7,B13,
+     3 VIDEC,COMBLE,PREC,INTNEU,LISS,DECOUPL,SORTZON,NEUDISK,OPADISK, 
+     3 B10,DENEU,FUINE,PROTDIS,REPDIS,SANPROT,
+     3SORMU,FUS,FUSD,LREMAIL,POLUT,LPRES,LENER,LABAN,
+     3 B11,
+     3 IFB10,IFRO10,IFEN10,
+     3 SANSAG,
+     3 METMCC,VARMAIL,
+     3IANISO,
+     3 IFPART,
+     3 LLIBRE(5),LOGIQF
+      COMMON /MONITOR/
+     4IGESTD,
+     4 LARGE(20),NBMOT(20),IADLCM,LCMLON,LON402,
+     4L03,L04,L0402,L07,L0822,LETAT,LOPA,LSECT,LVARHE,LTOT,JOPAC,JETAT,
+     4JSECT,LXXXPHO,IFLU,ICOU,IFUIT,IYYYY1,INTEG,INTLI,ISORTI,
+     4LONFLU,LONCOU,LONFUIT,LONET,LSORTI,NEUDIS,LYYYY,
+     4LONMC1,LONMC2,JTIMES,LTIMES,JBILAN,LBILAN,JTDEC,JVRDEC,JVZDEC,
+     4 JRDEC,JZDEC,JZONES,JWS1DEC,JWS2DEC,JZMPDEC,
+     4 IGESTF
+      COMMON /MONITOR/
+     5LCOM1,LCOM2,LCOM3,LCOM4,LCOM5,LCOM6,LCOM7,LCOM8,LCOM9,LCOM10,
+     .LCREMAY,
+     5LCOMFIN
+      COMMON/DESCR/KN(NTOD)
+     .,LN(NTOD),
+     . MAT(NTOD),
+     . ND(NTOD),
+     . NH(NTOD),
+     . NG(NTOD),
+     . NB(NTOD),
+     . KLFB(NTOD),
+     . KLFG(NTOD),
+     . IVID(NTOD),
+     . DEN(NTOD),MNC,XT(20),XRO(40),XOPA(20,40),OPAK(NTOD), 
+     . DP(NTOD),NPFG,NFG(NTOD),NPFB,NFB(NTOD),
+     . V1(NTOD),V2(NTOD),V3(NTOD),V4(NTOD),V5(NTOD),V6(NTOD),V7(NTOD),
+     . VOLU(NTOD),VOLUN(NTOD),DVOLU(NTOD),
+     . NBLIG,NBKOL,NELIG(NTOD),NECOL(NTOD),IDLIG(NTOD),KOL(NTOD)
+      COMMON/LICOL/NLIG,NCOL
+      INTEGER DATESG
+      LOGICAL ARRET 
+       LOGICAL REPRISE,YYYY,MOVE,ZZZZ,SAGACE,LOI4,LOI7
+      LOGICAL B13,SORTZON,NEUDISK,OPADISK
+      LOGICAL B10,DENEU,FUINE,PROTDIS,REPDIS,SANPROT
+      LOGICAL IFB10,IFRO10,IFEN10
+      LOGICAL SANSAG
+      LOGICAL VIDEC,COMBLE,PREC,INTNEU,LISS,DECOUPL,IPRLCM
+      LOGICAL SORMU,FUS,FUSD,LREMAIL,POLUT,LPRES,LENER,LABAN
+      LOGICAL IANISO
+      LOGICAL B11,VARMAIL
+      LOGICAL IFPART
+C      COMMON/OPA/NROP,IPRO,TDEG,DENS,XLT,NRA,ROA,TA,COMULT
+      COMMON/C0101/ISM    (   1)
+      COMMON/C0102/NENV   (   1)
+      COMMON/C0103/MVKLIM (   1)
+      COMMON/C0104/MEKIN  (   1)
+      COMMON/C0105/NMETO  (   1)
+      COMMON/C0201/R(NTOD)
+      COMMON/C0202/Z(NTOD)
+      COMMON/C0203/RO(NTOD)
+      COMMON/C0204/T(NTOD)
+      COMMON/C0205/ZMM(NTOD)
+      COMMON/C0206/DWA(NTOD)
+C
+      COMMON/C0301/XNI    (16,1)
+      COMMON/C0303/DNN    (8, 1)
+      COMMON/C0901/XNP(16,1)
+      COMMON/C1001/DNNFU(5,1) 
+      COMMON/C0401/FLUENER(   1)
+      COMMON/C0501/WCOUBN (   1)
+      COMMON/C0502/WCOUGN (   1)
+      COMMON/C0503/TR(NTOD)
+      COMMON/C0504/TZ(NTOD)
+      COMMON/C0505/TC(NTOD)
+      COMMON/C0506/ER(NTOD)
+      COMMON/C0507/FIRB(NTOD)
+      COMMON/C0508/FIZB(NTOD)
+      COMMON/C0509/FIRG(NTOD)
+      COMMON/C0510/FIZG(NTOD)
+      COMMON/C0511/TTTT   (   1)
+      COMMON/C0514/TSG    (   1)
+      COMMON/C0515/TSB    (   1)
+      COMMON/C0601/ERN(NTOD)
+      COMMON/C0602/FIRBN(NTOD)
+      COMMON/C0603/FIZBN(NTOD)
+      COMMON/C0604/FIRGN(NTOD)
+      COMMON/C0605/FIZGN(NTOD)
+      COMMON/C0606/VR     (   1)
+      COMMON/C0607/VZ     (   1)
+      COMMON/C0608/RN(NTOD)
+      COMMON/C0609/ZN(NTOD)
+      COMMON/C0610/RON(NTOD)
+      COMMON/C0611/TN(NTOD)
+      COMMON/C0612/E(NTOD)
+      COMMON/C0613/EN(NTOD)
+      COMMON/C0614/PN(NTOD)
+      COMMON/C0615/P(NTOD)
+      COMMON/C0616/DELTAE(NTOD)
+      COMMON/C0617/DWN    (   1)
+      COMMON/C0618/ZMI    (   1)
+      COMMON/C1701/WS1(1)
+      COMMON/C1702/WS2(1)
+      COMMON/C1703/ZMMP1(1)
+      COMMON/C1704/WS1N( 1)
+      COMMON/C1705/WS2N( 1)
+      COMMON/C0701/PRESVIT(   1)
+      COMMON/ZZZZ/ALK,OMK,APS,ALOM,P75,APH,CPH,ACPH,NINT
+     *          ,ISYMA,NKMIN,NLMIN,NKPREM,NLPREM
+      COMMON/TABCOR/
+     .IZ(99),XMASION(99),NOM(99),NDEBU(99)
+     .,DERCOR
+      COMMON/PARTI/XNE,XNIZI2 
+      COMMON/MILIEU/
+     *             NOMMAT(50),METAT(50),MOPAC(50),MDSUP(50),
+     *             ROO(50),TOO(50),
+     *                  PO(50),
+     *             INDOPA(50),INDNEU(50),INDXXX(50),
+     *              NCOMP(5,50),TAUX(5,50),
+     *             NMPOL(50),NETMEL(5,2),NETPOL(5,2),IDGROU(2),ALFGR, 
+     *             FLUB(50),FLUG(50),FLUD(50),FLUH(50),
+     .NPARM (50),ICORPS (8,50),YNI (8,50),
+     .NPARMP(50),ICORPSP(8,50),YNIP(8,50),
+     *AMASSE(50),IREA(8,50),NCOMPP(5,5),TAUXP(5,5),
+     *NOFUS(50),IANI(50),
+     *ENO(50),
+     *MPOLOPA(5),XNACM(50),
+     * MILCOD(50),
+     *             DERMIL
+C      COMMON/BELLOT/H,EX,C
+      COMMON/C0816/PMU    (   1)
+      COMMON/C0817/RMU    (   1)
+      COMMON/C0818/SNE(NTOD)
+      COMMON/C0819/SNT    (   1)
+      COMMON/C0820/ATS    (   1)
+      COMMON/C0821/ATE    (   1)
+      DATA MI/0/
+      IF (M.NE.3) THEN                                                  0001
+         TX = TT*8.620689E-8                                            0002
+         ALT = ALOG(TX)                                                 0003
+         ALR = ALOG(RHO)                                                0004
+         OPKF = 0.229+(0.05*EXP(-ALT*2.9)+6.E-4*EXP(-ALT*5.2))*EXP(     0005
+     &   ALR*0.8)                                                       0005
+         OPAQ = OPKF*RHO                                                0006
+      ELSE
+         C = 0.254E-20                                                  0007
+         H = -1.8                                                       0008
+         EX = 2.24                                                      0009
+         XLT = C*RHO**H*TT**EX*3.2808398E+3                             0010
+         OPAQ = 1./XLT                                                  0011
+      ENDIF
+100   CONTINUE                                                          0012
+      END

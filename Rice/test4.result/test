@@ -1,0 +1,10 @@
+      PROGRAM TEST4
+      REAL T(10),V(10)
+
+      DOALL I = 1, 10                                                   0001
+         T(I) = 0.0                                                     0002
+      ENDDO
+      DOALL I = 1, 10                                                   0001
+         V(I) = T(I)**2                                                 0003
+      ENDDO
+      END

@@ -1,0 +1,27 @@
+#!/bin/sh
+#
+# test pips on test8.f
+#
+#if Pips -f $PIPS_VALIDDIR/Rice/test8.f -w test8 -m test8 -s rfulldg -b PPF >&2
+#then 
+#	Delete test8>&2
+if Init -f $PIPS_VALIDDIR/Rice/test8.f test8>&2
+then
+	Select rfulldg>&2
+	if Display -m test8
+	then
+		Delete test8
+	else
+		echo Parallelization faileds
+		Delete test8
+		exit 2
+	fi
+else 
+    	echo Parallelization failed 
+	Delete test8
+	exit 1
+fi
+
+
+
+ 

@@ -1,0 +1,20 @@
+      SUBROUTINE TEST7(N,A,B)
+      INTEGER N
+      REAL A(N,N),B(N,N)
+
+      DO L = 1, N                                                       0001
+         DOALL J = L+1, N                                               0002
+            A(L,J) = A(L,J)/A(L,L)                                      0003
+         ENDDO
+         DOALL I = L+1, N                                               0005
+            DOALL K = L+1, N                                            0006
+               B(I,K) = A(I,L)*A(L,K)                                   0007
+            ENDDO
+         ENDDO
+         DOALL I = L+1, N                                               0005
+            DOALL K = L+1, N                                            0006
+               A(I,K) = A(I,K)-B(I,K)                                   0008
+            ENDDO
+         ENDDO
+      ENDDO
+      END

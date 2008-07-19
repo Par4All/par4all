@@ -1,0 +1,7 @@
+create silber02 ${PIPS_ROOT}/Validation/Rice/silber02.f
+module SILBER02
+activate COARSE_GRAIN_PARALLELIZATION
+display PARALLELPRINTED_FILE[SILBER02]
+close
+delete silber02
+quit
