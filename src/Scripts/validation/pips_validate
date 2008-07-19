@@ -145,6 +145,12 @@ function validate_file()
   # name='file'
   # upper='FILE'
   local full_name=${file%.[cfF]}
+  if [[ ! -d $full_name.result ]]
+  then
+    verb 1 "skipping $file: no matching result directory"
+    return
+  fi
+
   local name=${full_name/*\//}
   local upper=$(echo $name | tr '[a-z]' '[A-Z]')
 
