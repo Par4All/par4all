@@ -23,22 +23,31 @@ pips=$(type -p pips)
 function usage()
 {
   local status=$1 msg=$2
-  [[ $msg ]] && echo -e "message: $msg\n" >&2
-  echo -e \
-    "$script [options] directories or files...\n" \
-    "revision $rev\n" \
-    "options:\n" \
-    "  -h|--help: show some help\n" \
-    "  -v|--verbose: be verbose (repeat for more verbosity, over 2 is debug)\n"
-    "  -p|--pips pips: use this 'pips' executable, default $pips\n" \
-    "  -t|--tpips tpips: use this 'tpips' executable, default $tpips\n" \
-    "  -m|--mail email: send mails (not a good idea?)\n" \
-    "  -V|--valid dir: validation directory, default '$vdir'\n" \
-    "  -R|--run dir: running directory, default '.'\n" \
-    "  -O|--out|--output dir: output directory, default '.'\n" \
-    "arguments:\n" \
-    "  validation directories (e.g. Semantics Regions ...)\n" \
-    "  or files (e.g. Semantics/w14.f ...)\n"
+  if [[ $msg ]] 
+  then
+    echo -e "message: $msg\n" >&2
+  fi
+  if [[ $status == 0 || $status == 1 ]]
+  then
+    echo -e \
+      "$script [options] directories or files...\n" \
+	"revision $rev\n" \
+	"options:\n" \
+	"  -h|--help: show some help\n" \
+	"  -v|--verbose: be verbose (repeat for more, over 2 is debug)\n" \
+	"  -p|--pips pips: use this 'pips' executable\n" \
+	"     default '$pips'\n" \
+	"  -t|--tpips tpips: use this 'tpips' executable\n" \
+	"     default '$tpips'\n" \
+	"  -m|--mail email: send mails (not a good idea?)\n" \
+	"  -V|--valid dir: validation directory\n" \
+	"     default '$vdir'\n" \
+	"  -R|--run dir: running directory, default '.'\n" \
+	"  -O|--out|--output dir: output directory, default '.'\n" \
+	"arguments:\n" \
+	"  validation directories (e.g. Semantics Regions ...)\n" \
+	"  or files (e.g. Semantics/w14.f ...)\n"
+  fi
   exit ${status:-1}
 }
 
@@ -54,7 +63,7 @@ function verb()
 }
 
 # checks
-[[ $PIPS_ROOT ]] || usage 1 'PIPS_ROOT must be defined'
+[[ $PIPS_ROOT ]] || usage 2 'PIPS_ROOT must be defined'
 [[ -d $PIPS_ROOT ]] || usage 2 "no root directory: $PIPS_ROOT"
 
 # get options
