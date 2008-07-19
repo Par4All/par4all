@@ -1,0 +1,69 @@
+      PROGRAM JACOBI
+      INTEGER COUNT, MAXCYC, P, Q, I
+      REAL A(100, 100), X
+      REAL APP, APQ, AQQ, THETA, C, S, CSQ, SSQ, CS, AIP, AIQ
+      DO COUNT = 1, MAXCYC                                              0001
+         DO P = 1, N-1                                                  0002
+            DO Q = P+1, N                                               0003
+               APP = A(P,P)                                             0004
+               APQ = A(P,Q)                                             0005
+               A(P,Q) = 0.0                                             0015
+               AQQ = A(Q,Q)                                             0006
+               THETA = ATAN2(2.0*APQ, APP-AQQ)/2.0                      0007
+               C = COS(THETA)                                           0008
+               CSQ = C*C                                                0010
+               S = SIN(THETA)                                           0009
+               SSQ = S*S                                                0011
+               CS = C*S                                                 0012
+               A(P,P) = CSQ*APP+2.0*CS*APQ+SSQ*AQQ                      0013
+               A(Q,Q) = SSQ*APP-2.0*CS*APQ+CSQ*AQQ                      0014
+               DOALL I = 1, P-1                                         0017
+                  PRIVATE AIQ,AIP
+                  AIP = A(I,P)                                          0018
+                  AIQ = A(I,Q)                                          0019
+                  A(I,P) = C*AIP+S*AIQ                                  0020
+                  A(I,Q) = -S*AIP+C*AIQ                                 0022
+               ENDDO
+               DOALL I = P+1, Q-1                                       0025
+                  PRIVATE AIQ,AIP
+                  AIP = A(I,P)                                          0026
+                  AIQ = A(I,Q)                                          0027
+                  A(I,P) = C*AIP+S*AIQ                                  0028
+                  A(I,Q) = -S*AIP+C*AIQ                                 0030
+               ENDDO
+               DOALL I = Q+1, N                                         0033
+                  PRIVATE AIQ,AIP
+                  AIP = A(I,P)                                          0034
+                  AIQ = A(I,Q)                                          0035
+                  A(I,P) = C*AIP+S*AIQ                                  0036
+                  A(I,Q) = -S*AIP+C*AIQ                                 0038
+               ENDDO
+               DOALL I = Q+1, N                                         0033
+                  A(Q,I) = A(I,Q)                                       0039
+               ENDDO
+               DOALL I = Q+1, N                                         0033
+                  A(P,I) = A(I,P)                                       0037
+               ENDDO
+               DOALL I = P+1, Q-1                                       0025
+                  A(P,I) = A(I,P)                                       0029
+               ENDDO
+               DOALL I = 1, P-1                                         0017
+                  A(P,I) = A(I,P)                                       0021
+               ENDDO
+               A(Q,P) = 0.0                                             0016
+            ENDDO
+            DOALL Q = P+1, N                                            0003
+               PRIVATE I
+               DOALL I = P+1, Q-1                                       0025
+                  A(Q,I) = A(I,Q)                                       0031
+               ENDDO
+            ENDDO
+            DOALL Q = P+1, N                                            0003
+               PRIVATE I
+               DOALL I = 1, P-1                                         0017
+                  A(Q,I) = A(I,Q)                                       0023
+               ENDDO
+            ENDDO
+         ENDDO
+      ENDDO
+      END

@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+
+tpips=${tpips_version:-tpips}
+
+
+$tpips <<EOF
+delete maslov
+create maslov ${PIPS_VALIDDIR}/Ricedg/maslov.f
+module MASLOV
+activate RICE_FULL_DEPENDENCE_GRAPH
+display PARALLELPRINTED_FILE
+close
+delete maslov
+EOF
+#

@@ -1,0 +1,12 @@
+# test pips on jacobi-paf-conv.f
+#
+if Pips -f $PIPS_VALIDDIR/Ricedg/jacobi-paf-conv.f -w jacobi-paf-conv -m jacobi -s rfulldg -p priv -b PPF>&2
+then 
+	Display -l para77
+	Delete jacobi-paf-conv>&2
+else
+	echo Parallelization failed 
+	Delete jacobi-paf-conv>&2
+	exit 1
+fi
+

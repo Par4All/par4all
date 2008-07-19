@@ -1,0 +1,16 @@
+      PROGRAM TEST3
+      REAL T(10,10)
+
+      N = 10                                                            0001
+      DOALL I = 1, N                                                    0002
+         T(I,I) = 0                                                     0003
+      ENDDO
+      DO I = 1, N                                                       0002
+         DOALL K = 1, I-1                                               0004
+            T(I,K) = 1                                                  0005
+         ENDDO
+         DOALL K = 1, I-1                                               0004
+            T(K,I) = -1                                                 0006
+         ENDDO
+      ENDDO
+      END

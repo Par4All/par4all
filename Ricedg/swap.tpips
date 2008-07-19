@@ -1,0 +1,10 @@
+delete swap
+create swap swap.f
+
+apply IMPACT_CHECK[%ALL]
+display PRINTED_FILE[%ALL]
+
+close
+delete swap
+quit
+

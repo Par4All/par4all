@@ -1,0 +1,24 @@
+#
+# test pips on test7.f
+#
+if Init -f $PIPS_VALIDDIR/Ricedg/test7.f test7>&2
+then
+	Select -w test7 rfulldg>&2
+	if Display -m test7
+	then
+		Delete test7>&2
+	else
+		echo Parallelization failed
+		Delete test7>&2
+		exit 2
+	fi
+else
+	echo Initialization failed
+	Delete test7>&2	
+	exit 1
+fi
+
+
+
+
+ 

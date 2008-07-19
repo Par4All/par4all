@@ -1,0 +1,8 @@
+      PROGRAM TEST10
+      PARAMETER (N=50)
+      REAL A(100)
+      DOALL I = 1, N, 2                                                 0001
+         A(I) = A(2*I)                                                  0002
+      ENDDO
+      STOP                                                              0003
+      END

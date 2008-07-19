@@ -1,0 +1,10 @@
+delete impact
+create impact impactmaymust.f
+
+apply IMPACT_CHECK[%ALL]
+display PRINTED_FILE[%ALL]
+
+close
+delete impact
+quit
+

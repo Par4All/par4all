@@ -1,0 +1,10 @@
+delete contreexemple 
+create contreexemple contreexemple.f
+
+apply IMPACT_CHECK[%ALL]
+display PRINTED_FILE[%ALL]
+
+close
+delete contreexemple
+quit
+

@@ -1,0 +1,12 @@
+      PROGRAM NOIMPACT
+      INTEGER A, C, D
+      READ *, A, C, D                                                   0001
+      CALL NOIMPACTFOO(A, A, C, D)                                      0002
+      PRINT *, A, C, D                                                  0003
+      END
+      SUBROUTINE NOIMPACTFOO(A, B, C, D)
+      INTEGER A, B, C, D
+      C = A*2                                                           0001
+      D = C+2                                                           0002
+      B = D*3                                                           0003
+      END

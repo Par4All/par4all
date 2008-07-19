@@ -1,0 +1,12 @@
+C     example by Vadim Maslov, SIGPLAN PLDI 92
+      PROGRAM MASLOV
+      REAL C(0:99)
+
+      DOALL I = 0, 4                                                    0001
+         DOALL J = 0, 9                                                 0002
+            C(I+10*J) = C(I+10*J+5)                                     0003
+         ENDDO
+      ENDDO
+
+      END
+

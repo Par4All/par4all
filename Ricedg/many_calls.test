@@ -1,0 +1,43 @@
+#!/bin/sh
+#
+# Script to test call to two different DG one after the other
+# using many_calls.f
+#
+
+tpips=${tpips_version:-tpips}
+
+# Initialization:
+# rm -f many_calls.result/test
+# many_calls.test >many_calls.result/test
+
+$tpips <<EOF
+
+create mc ${PIPS_VALIDDIR}/Ricedg/many_calls.f
+activate PRINT_WHOLE_DEPENDENCE_GRAPH
+activate RICE_FAST_DEPENDENCE_GRAPH # Preconditions Ignored
+echo Whole dependence graph, preconditions and loop bounds ignored
+display DG_FILE
+activate RICE_FULL_DEPENDENCE_GRAPH # Loop Bounds Used
+echo
+echo Whole dependence graph, preconditions ignored, loop bounds used
+display DG_FILE
+activate RICE_SEMANTICS_DEPENDENCE_GRAPH # Preconditions Used
+echo
+echo Whole dependence graph, preconditions (and loop bounds) used
+display DG_FILE
+close
+open mc
+activate PRINT_EFFECTIVE_DEPENDENCE_GRAPH
+activate RICE_FAST_DEPENDENCE_GRAPH
+echo
+echo Effective dependence graph, preconditions (and loop bounds) used
+display DG_FILE
+activate RICE_FULL_DEPENDENCE_GRAPH
+activate PRINT_LOOP_CARRIED_DEPENDENCE_GRAPH
+echo
+echo Effective dependence graph, preconditions ignored, loop bounds used
+display DG_FILE
+close
+delete mc
+EOF
+#

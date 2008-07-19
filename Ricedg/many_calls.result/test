@@ -1,0 +1,160 @@
+Whole dependence graph, preconditions and loop bounds ignored
+
+
+ ************************ Dependence Graph ************************
+	05 --> 05 with conflicts
+		from <M(J,I)-R-MUST> to <M(I,J)-W-MUST> at levels  1
+Generating system:
+1 Vertex 
+(1,-1)
+1 Ray 
+(1,-1)
+End of generating system ****
+
+	05 --> 05 with conflicts
+		from <M(I,J)-W-MUST> to <M(J,I)-R-MUST> at levels  1
+Generating system:
+1 Vertex 
+(1,-1)
+1 Ray 
+(1,-1)
+End of generating system ****
+
+	05 --> 04 with conflicts
+		from <J-R-MUST> to <J-W-MUST> at levels  1
+
+	04 --> 04 with conflicts
+		from <J-W-MUST> to <J-W-MUST> at levels  1
+
+
+******************** End of Dependence Graph ********************
+
+Whole dependence graph, preconditions ignored, loop bounds used
+
+
+ ************************ Dependence Graph ************************
+	05 --> 04 with conflicts
+		from <J-R-MUST> to <J-W-MUST> at levels  1
+
+	04 --> 04 with conflicts
+		from <J-W-MUST> to <J-W-MUST> at levels  1
+
+
+******************** End of Dependence Graph ********************
+
+Whole dependence graph, preconditions (and loop bounds) used
+
+
+ ************************ Dependence Graph ************************
+	05 --> 04 with conflicts
+		from <J-R-MUST> to <J-W-MUST> at levels  1
+
+	04 --> 04 with conflicts
+		from <J-W-MUST> to <J-W-MUST> at levels  1
+
+
+******************** End of Dependence Graph ********************
+
+Effective dependence graph, preconditions (and loop bounds) used
+
+
+ ************************ Dependence graph ************************
+	05 --> 05 with conflicts
+		from <M(J,I)-R-MUST> to <M(I,J)-W-MUST> at levels  1
+	05 --> 05 with conflicts
+		from <M(I,J)-W-MUST> to <M(J,I)-R-MUST> at levels  1
+	04 --> 04 with conflicts
+		from <J-W-MUST> to <J-W-MUST> at levels  1
+
+******************** End of Dependence graph ********************
+
+Effective dependence graph, preconditions ignored, loop bounds used
+
+
+ ************************ Dependence graph ************************
+	04 --> 04 with conflicts
+		from <J-W-MUST> to <J-W-MUST> at levels  1
+
+
+******************** End of Dependence graph ********************
+
+Whole dependence graph, preconditions and loop bounds ignored
+
+ ******** Whole Dependence Graph with Dependence Cones ******
+
+	03 --> 03 with conflicts
+		from <M(J,I)-R-MUST> to <M(I,J)-W-MUST> at levels  1
+Generating system:
+1 Vertex 
+(1,-1)
+1 Ray 
+(1,-1)
+End of generating system ****
+
+	03 --> 03 with conflicts
+		from <M(I,J)-W-MUST> to <M(J,I)-R-MUST> at levels  1
+Generating system:
+1 Vertex 
+(1,-1)
+1 Ray 
+(1,-1)
+End of generating system ****
+
+	03 --> 02 with conflicts
+		from <J-R-MUST> to <J-W-MUST> at levels  1
+
+	02 --> 02 with conflicts
+		from <J-W-MUST> to <J-W-MUST> at levels  1
+
+
+****************** End of Dependence Graph ******************
+
+Whole dependence graph, preconditions ignored, loop bounds used
+
+ ******** Whole Dependence Graph with Dependence Cones ******
+
+	03 --> 02 with conflicts
+		from <J-R-MUST> to <J-W-MUST> at levels  1
+
+	02 --> 02 with conflicts
+		from <J-W-MUST> to <J-W-MUST> at levels  1
+
+
+****************** End of Dependence Graph ******************
+
+Whole dependence graph, preconditions (and loop bounds) used
+
+ ******** Whole Dependence Graph with Dependence Cones ******
+
+	03 --> 02 with conflicts
+		from <J-R-MUST> to <J-W-MUST> at levels  1
+
+	02 --> 02 with conflicts
+		from <J-W-MUST> to <J-W-MUST> at levels  1
+
+
+****************** End of Dependence Graph ******************
+
+Effective dependence graph, preconditions (and loop bounds) used
+
+ **************** Effective Dependence Graph ****************
+
+	03 --> 03 with conflicts
+		from <M(J,I)-R-MUST> to <M(I,J)-W-MUST> at levels  1
+	03 --> 03 with conflicts
+		from <M(I,J)-W-MUST> to <M(J,I)-R-MUST> at levels  1
+	02 --> 02 with conflicts
+		from <J-W-MUST> to <J-W-MUST> at levels  1
+
+****************** End of Dependence Graph ******************
+
+Effective dependence graph, preconditions ignored, loop bounds used
+
+ **** Loop Carried Dependence Graph with Dependence Cones ***
+
+	02 --> 02 with conflicts
+		from <J-W-MUST> to <J-W-MUST> at levels  1
+
+
+****************** End of Dependence Graph ******************
+

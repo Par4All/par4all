@@ -1,0 +1,15 @@
+c     Dr. Wolfe's wonderful Choleksy Decomposition program
+      SUBROUTINE CHOL(A,N)
+      REAL A(N,N)
+      DO K = 1, N                                                       0001
+         A(K,K) = SQRT(A(K,K))                                          0002
+         DOALL I = K+1, N                                               0003
+            A(I,K) = A(I,K)/A(K,K)                                      0004
+         ENDDO
+         DOALL I = K+1, N                                               0003
+            DOALL J = K+1, I                                            0005
+               A(I,J) = A(I,J)-A(I,K)*A(J,K)                            0006
+            ENDDO
+         ENDDO
+      ENDDO
+      END

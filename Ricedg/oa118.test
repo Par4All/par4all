@@ -1,0 +1,13 @@
+#!/bin/sh
+# test pips on oa118.f
+#
+if Pips -f $PIPS_VALIDDIR/Ricedg/oa118.f -w oa118 -m oa118 -s rfulldg -b PPF >&2
+then 
+	Display -l para77
+	Delete oa118>&2
+else 
+    	echo Parallelization failed 
+	Delete oa118>&2
+	exit 1
+fi
+ 

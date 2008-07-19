@@ -1,0 +1,12 @@
+delete display
+create display impactmaymust1.f
+module FOO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE
+activate PRINT_WHOLE_DEPENDENCE_GRAPH
+display DG_FILE
+close
+delete display
+quit

@@ -1,0 +1,12 @@
+#
+# test pips on test6.f
+#
+if Pips -f $PIPS_VALIDDIR/Ricedg/test6.f -w test6 -m test6 -s rfulldg -b PPF >&2
+then 
+	Display -l para77
+	Delete test6>&2
+else 
+    	echo Parallelization failed 
+	Delete test6>&2
+	exit 1
+fi

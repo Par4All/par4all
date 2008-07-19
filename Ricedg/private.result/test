@@ -1,0 +1,16 @@
+      PROGRAM PRIVATE
+c	privatisation malgre les DO implicites	
+c	dans les I/O
+        REAL A(10,10)
+        INTEGER I,J,K
+
+      DO J = 1, 32                                                      0001
+         PRIVATE K,I
+         DO I = 1, 10                                                   0002
+            A(I,J) = 0.                                                 0003
+         ENDDO
+         PRINT *, ((A(I,K), I = 1, 10), K = 1, I)                       0004
+      ENDDO
+      PRINT *, ((A(I,K), I = 1, 10), K = 1, J)                          0005
+      END
+

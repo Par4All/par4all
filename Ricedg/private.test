@@ -1,0 +1,18 @@
+#!/bin/sh
+#
+
+tpips=${tpips_version:-tpips}
+
+$tpips <<EOF
+set PRETTYPRINT_ALL_PRIVATE_VARIABLES TRUE
+create private ${PIPS_VALIDDIR}/Ricedg/private.f
+activate PRECONDITIONS_INTRA_FULL 
+activate TRANSFORMERS_INTRA_FULL 
+activate MUST_REGIONS 
+apply PRIVATIZE_MODULE
+activate REGION_CHAINS 
+display PARALLELPRINTED_FILE 
+close
+delete private
+EOF
+#
