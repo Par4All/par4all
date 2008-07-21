@@ -1,15 +1,9 @@
 delete rule4
 create rule4 rule4.c
 
+shell echo source code for module(s) `basename rule4.database/[a-z_]*[a-z_0-9]/*.c .c`
 shell cat -T rule4.database/[a-z_]*[a-z_0-9]/*.c
 
 close
-# delete rule4
-quit
-
-activate C_PARSER
-
-setproperty PRETTYPRINT_C_CODE TRUE
-
-display PRINTED_FILE[main]
+delete rule4
 quit
