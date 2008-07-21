@@ -1,4 +1,5 @@
---- considering indexes
+
+Print code with proper reductions
 
       PROGRAM INDEXES
       INTEGER I,J
@@ -20,6 +21,9 @@
          S(7) = I+J+S(7)                                                0008
       ENDDO
       END
+
+Print code with cumulated reductions
+
       PROGRAM INDEXES
       INTEGER I,J
       INTEGER S(10)
@@ -43,4 +47,3 @@
          S(7) = I+J+S(7)                                                0008
       ENDDO
       END
-

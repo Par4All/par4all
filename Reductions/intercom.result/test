@@ -1,6 +1,6 @@
---- considering intercom
 
-PROPER REDUCTIONS
+Print code with proper reductions
+
       SUBROUTINE INC
       COMMON /SUM/ S
 !  call sum[S],
@@ -38,7 +38,9 @@ PROPER REDUCTIONS
       COMMON /SUM/ S
       S = 0                                                             0001
       END
-CUMULATED REDUCTIONS
+
+Print code with cumulated reductions
+
 !  summary sum[S],
       SUBROUTINE INC
       COMMON /SUM/ S
@@ -81,4 +83,3 @@ CUMULATED REDUCTIONS
       COMMON /SUM/ S
       S = 0                                                             0001
       END
-

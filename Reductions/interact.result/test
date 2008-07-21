@@ -1,4 +1,5 @@
---- considering interact
+
+Print code with proper reductions
 
       REAL FUNCTION FSUMPROD(X, Y, Z)
 !  call sum[X],
@@ -36,6 +37,9 @@
 !  call prod[Y],
       Y = Y*Z                                                           0002
       END
+
+Print code with cumulated reductions
+
 !  summary sum[X],prod[Y],
       REAL FUNCTION FSUMPROD(X, Y, Z)
 !  call sum[X],
@@ -75,4 +79,3 @@
 !  call prod[Y],
       Y = Y*Z                                                           0002
       END
-

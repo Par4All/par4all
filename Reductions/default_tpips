@@ -1,0 +1,20 @@
+delete ${WSPACE}
+create ${WSPACE} ${FILE}
+
+echo
+echo Print code with proper reductions
+echo
+
+activate PRINT_CODE_PROPER_REDUCTIONS
+display PRINTED_FILE[%ALL]
+
+echo
+echo Print code with cumulated reductions
+echo
+
+activate PRINT_CODE_CUMULATED_REDUCTIONS
+display PRINTED_FILE[%ALL]
+
+close
+delete ${WSPACE}
+quit

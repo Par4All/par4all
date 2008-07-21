@@ -1,6 +1,6 @@
---- considering interpol
 
-PROPER REDUCTIONS
+Print code with proper reductions
+
       SUBROUTINE ADDTO(X, J)
 !  call sum[X],
       X = X+J                                                           0001
@@ -24,6 +24,9 @@ PROPER REDUCTIONS
          ENDDO
       ENDDO
       END
+
+Print code with cumulated reductions
+
 !  summary sum[X],
       SUBROUTINE ADDTO(X, J)
 !  call sum[X],
@@ -51,4 +54,3 @@ PROPER REDUCTIONS
          ENDDO
       ENDDO
       END
-

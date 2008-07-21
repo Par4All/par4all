@@ -1,4 +1,5 @@
---- considering int_propers
+
+Print code with proper reductions
 
       PROGRAM PROPERS
       INTEGER P,I,J,K,L
@@ -39,3 +40,43 @@
       S = K-S                                                           0021
       END
 
+Print code with cumulated reductions
+
+      PROGRAM PROPERS
+      INTEGER P,I,J,K,L
+      S = 0                                                             0001
+      P = 1                                                             0002
+      I = 2                                                             0003
+      J = 3                                                             0004
+      K = 4                                                             0005
+      L = 5                                                             0006
+!  call prod[P],
+!
+      P = P*2                                                           0007
+!  call prod[P],
+      P = 2*P                                                           0008
+!  call prod[P],
+      P = 2*L*K*P                                                       0009
+!  call sum[S],
+!
+      S = S+1                                                           0010
+!  call sum[S],
+      S = 1+S                                                           0011
+!  call sum[S],
+      S = I+S+J                                                         0012
+!  call sum[S],
+      S = S+I+J                                                         0013
+!  call sum[S],
+      S = I+J+S                                                         0014
+!  call sum[S],
+      S = S-I                                                           0015
+!  call sum[S],
+      S = S+3-J                                                         0016
+!  call sum[S],
+      S = L+K+S+J                                                       0017
+!
+      P = 3*I*P/J                                                       0018
+      P = 2*I/P                                                         0019
+      P = P/L                                                           0020
+      S = K-S                                                           0021
+      END

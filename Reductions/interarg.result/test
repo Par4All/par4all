@@ -1,6 +1,6 @@
---- considering interarg
 
-PROPER REDUCTIONS
+Print code with proper reductions
+
       SUBROUTINE ADDTO(X, J)
       INTEGER X, J
 !  call sum[X],
@@ -15,7 +15,9 @@ PROPER REDUCTIONS
       ENDDO
       PRINT *, S                                                        0004
       END
-CUMULATED REDUCTIONS
+
+Print code with cumulated reductions
+
 !  summary sum[X],
       SUBROUTINE ADDTO(X, J)
       INTEGER X, J
@@ -32,4 +34,3 @@ CUMULATED REDUCTIONS
       ENDDO
       PRINT *, S                                                        0004
       END
-

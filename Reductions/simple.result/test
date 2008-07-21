@@ -1,6 +1,6 @@
---- considering simple
 
-REDUCTION validation script      
+Print code with proper reductions
+
       PROGRAM REDUCTION
       INTEGER I, N
       PARAMETER (N=10)
@@ -36,6 +36,9 @@ REDUCTION validation script
       PRINT *, 'p is ', P                                               0016
 
       END
+
+Print code with cumulated reductions
+
       PROGRAM REDUCTION
       INTEGER I, N
       PARAMETER (N=10)
@@ -74,4 +77,3 @@ REDUCTION validation script
       PRINT *, 'p is ', P                                               0016
 
       END
-
