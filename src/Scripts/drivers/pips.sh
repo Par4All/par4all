@@ -1,9 +1,9 @@
-#! /bin/sh
+#! /bin/bash
 #
 # $Id$
 #
 # Find out actual *pips for the current $PIPS_ARCH...
-# It is always better to use the executable directly. 
+# It is always better to use the executable directly.
 #
 # This shell script is expected to be executer as pips/tpips or wpips.
 # This can be achieve by providing such links in the Share directory.
@@ -19,7 +19,7 @@ error()
   exit ${status}
 }
 
-[ "${PIPS_ROOT}" ] || 
+[ "${PIPS_ROOT}" ] ||
 {
     case $0 in
 	/*)
@@ -37,7 +37,7 @@ error()
 
 [ -d ${PIPS_ROOT} ] || error 2 "no such directory: $PIPS_ROOT"
 
-[ "${PIPS_ARCH}" ] || 
+[ "${PIPS_ARCH}" ] ||
 {
     arch=${PIPS_ROOT}/makes/arch.sh
     test -x $arch || error 3 "no $arch script to build PIPS_ARCH"
@@ -45,7 +45,7 @@ error()
     export PIPS_ARCH
 }
 
-# how to avoid a recursion of no actual binary is found:
+# Avoid a recursion if no actual binary is found:
 PATH=./${PIPS_ARCH}:${PIPS_ROOT}/bin/${PIPS_ARCH} \
     type ${what} > /dev/null || error 3 "no ${what} binary found!"
 
