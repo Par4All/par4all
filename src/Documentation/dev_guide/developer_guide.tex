@@ -1171,52 +1171,6 @@ injecting back the content into the \PipsOldWWW by editing the
 \texttt{src/Documentation/web} directory.
 
 
-\newpage
-\noindent
-{\huge MAY BE OBSOLETE DOWN FROM HERE\ldots}
-
-\section{Development (\texttt{PIPS\_DEVEDIR})}
-
-This directory contains the version of PIPS currently being developed.  It
-is a mirror of the organization under \verb+$PIPS_ROOT/src+. %%$
-Each library is developed and tested under this subtree, linking by
-default with the \emph{installed} libraries in \verb+$PIPS_ROOT/Lib+. %%$
-
-Thus new versions can be developed without interfering with other
-developments. Once a new version of a library (or pass, or script, or
-anything) is okay and validated, it is installed under the
-\verb+$PIPS_ROOT/Src+ subtree and becomes the reference for all other
-developers who may use its services. %%$
-
-When developing or debugging several related libraries at the same time,
-you can used the development version of these libraries by using unix
-links (\texttt{ln -s}) to one of the directory under the corresponding
-\verb|$PIPS_ARCH| subdirectory. When building %%$
-a new binary, the linker takes these local libraries first.
-
-\subsection{Experiments}
-
-At CRI, this directory is a large piece of disk space to be used
-temporarily to analyze large programs and to core dump large {\tt pips}
-processes; no permanent, non-deductible information should be stored
-there.
-
-
-\section{Linear library}
-\label{sec:linear}
-
-The linear library is also independent from PIPS. Its development was funded
-by the French organization CNRS.
-
-
-Its root directory is \verb+/projects/C3/Linear/+
-(\verb+$LINEAR_DIR+). This directory is further divided into
-similarily to Pips and Newgen.  Thus there are Production
-(\verb+$LINEAR_ROOT+) and Development directories.
-\verb+$LINEAR_ARCH+ (which defaults to \verb+$PIPS_ARCH+ and \verb|.|
-(dot)) can be used for building the library.
-
-
 \section{Library internal organization}
 \label{sec:library_internal_organization}
 
@@ -1658,6 +1612,53 @@ For global variables, initialization, access and reset routines must be
 provided. Do not forget that there may be several successive requests with
 \verb+wpips+ or \verb+tpips+, whereas tests performs with shell interfaces
 (for instance \verb+Build+) are much simpler.
+
+
+\newpage
+\noindent
+{\huge MAY BE OBSOLETE DOWN FROM HERE\ldots}
+
+\section{Development (\texttt{PIPS\_DEVEDIR})}
+
+This directory contains the version of PIPS currently being developed.  It
+is a mirror of the organization under \verb+$PIPS_ROOT/src+. %%$
+Each library is developed and tested under this subtree, linking by
+default with the \emph{installed} libraries in \verb+$PIPS_ROOT/Lib+. %%$
+
+Thus new versions can be developed without interfering with other
+developments. Once a new version of a library (or pass, or script, or
+anything) is okay and validated, it is installed under the
+\verb+$PIPS_ROOT/Src+ subtree and becomes the reference for all other
+developers who may use its services. %%$
+
+When developing or debugging several related libraries at the same time,
+you can used the development version of these libraries by using unix
+links (\texttt{ln -s}) to one of the directory under the corresponding
+\verb|$PIPS_ARCH| subdirectory. When building %%$
+a new binary, the linker takes these local libraries first.
+
+\subsection{Experiments}
+
+At CRI, this directory is a large piece of disk space to be used
+temporarily to analyze large programs and to core dump large {\tt pips}
+processes; no permanent, non-deductible information should be stored
+there.
+
+
+\section{Linear library}
+\label{sec:linear}
+
+The linear library is also independent from PIPS. Its development was funded
+by the French organization CNRS.
+
+
+Its root directory is \verb+/projects/C3/Linear/+
+(\verb+$LINEAR_DIR+). This directory is further divided into
+similarily to Pips and Newgen.  Thus there are Production
+(\verb+$LINEAR_ROOT+) and Development directories.
+\verb+$LINEAR_ARCH+ (which defaults to \verb+$PIPS_ARCH+ and \verb|.|
+(dot)) can be used for building the library.
+
 
 \section{Organization of a PIPS pass}
 \label{sec:pass_organization}
