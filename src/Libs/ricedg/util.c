@@ -110,9 +110,9 @@ prettyprint_dependence_graph(FILE * fd,
 	    if(!sru_format_p || statement_undefined_p(mod_stat)) {
 		/* factorize line numbers */
 		fprintf(fd, "\t%s -->", 
-			statement_identification(s1));
+			external_statement_identification(s1));
 		fprintf(fd, " %s with conflicts\n", 
-			statement_identification(s2));
+			external_statement_identification(s2));
 	    }
 
 	    for (pc = dg_arc_label_conflicts(dal); !ENDP(pc); pc = CDR(pc)) {

@@ -2939,7 +2939,7 @@ bool  C_comment_p(string c){
 }
 
 /* In case comments are not formatted according to C rules, e.g. when
-   prettyprinting Fortran code as C code */
+   prettyprinting Fortran code as C code, add // at beginning of lines   */
 text C_any_comment_to_text(int margin, string c)
 {
   string lb = c; /* line beginning */
@@ -2948,8 +2948,6 @@ text C_any_comment_to_text(int margin, string c)
   text ct = make_text(NIL);
   bool is_C_comment = C_comment_p(c);
     
-  /* Empty comments are different from "", and "", which should never
-     occur by the way, does not neet to be printed. */
   if(strlen(c)>0) {
     for(;*cp!='\0';cp++) {
       if(*cp=='\n') {
@@ -2957,15 +2955,18 @@ text C_any_comment_to_text(int margin, string c)
 	
 	if(cp!=c || TRUE){ 
 
-	  string cl=gen_strndup0(lb, le-lb);
+	  string cl = gen_strndup0(lb, le-lb);
 	  sentence s = sentence_undefined;
 	  if(is_C_comment)
-	    s = MAKE_ONE_WORD_SENTENCE(margin,cl);
-	  else {
+	    s = MAKE_ONE_WORD_SENTENCE(margin, cl);
+	  else if(strlen(cl)>0){
 	    list pc = CHAIN_SWORD(NIL, cl); // cl is uselessly duplicated
 	    pc = CONS(STRING, MAKE_SWORD("//"), pc);
 	    s= make_sentence(is_sentence_unformatted, 
 			     make_unformatted((char *) NULL, 0, margin, pc));
+	  }
+	  else {
+	    s = MAKE_ONE_WORD_SENTENCE(0, cl);
 	  }
 	  ADD_SENTENCE_TO_TEXT(ct, s);
 	}
@@ -2975,15 +2976,15 @@ text C_any_comment_to_text(int margin, string c)
       else
 	le++;
     }
-    // Final \n has been removed by Ronan
+    // Final \n has been removed in the parser presumably by Ronan
     if(lb<cp){
       ADD_SENTENCE_TO_TEXT(ct,MAKE_ONE_WORD_SENTENCE(margin,gen_strndup0(lb,le-lb)));
     } else{
-      ADD_SENTENCE_TO_TEXT(ct,MAKE_ONE_WORD_SENTENCE(margin,""));
+      ADD_SENTENCE_TO_TEXT(ct,MAKE_ONE_WORD_SENTENCE(0,""));
     }
   }
-  else{// Final \n has been removed by Ronan
-    ADD_SENTENCE_TO_TEXT(ct,MAKE_ONE_WORD_SENTENCE(margin,""));
+  else{// Final \n has been removed in the parser presumably by Ronan
+    ADD_SENTENCE_TO_TEXT(ct,MAKE_ONE_WORD_SENTENCE(0,""));
   }
 
   return ct;

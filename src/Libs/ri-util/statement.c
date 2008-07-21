@@ -1399,6 +1399,31 @@ instruction_identification(instruction i)
    information about the instruction. */
 
 string 
+external_statement_identification(statement s)
+{
+    static char buffer[50];
+    instruction i = statement_instruction(s);
+    string instrstring = instruction_identification(i);
+    int so = statement_ordering(s);
+    entity called = entity_undefined;
+
+    if(same_string_p(instrstring, "CALL")) {
+	called = call_function(instruction_call(i));
+    }
+
+    sprintf(buffer, "%td (%d, %d): %s %s\n",
+	    statement_number(s),
+	    ORDERING_NUMBER(so),
+	    ORDERING_STATEMENT(so),
+	    instrstring,
+	    entity_undefined_p(called)? "" : module_local_name(called));
+
+    return buffer;
+}
+
+/* Like external_statement_identification(), but with internal
+   information, the hexadecimal address of the statement */
+string 
 statement_identification(statement s)
 {
     static char buffer[50];
