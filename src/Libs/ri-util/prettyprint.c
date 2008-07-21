@@ -816,7 +816,7 @@ words_assign_substring_op(call obj,
     return(pc);
 }
 
-//function written by C.A. Mensi
+// Function written by C.A. Mensi to prettyprint C or Fortran code as C code
 static list 
 words_nullary_op_c(call obj,
 		 int precedence __attribute__ ((unused)),
@@ -828,11 +828,11 @@ words_nullary_op_c(call obj,
   string fname = entity_local_name(func);
   int nargs = gen_length(args);
   bool parentheses_p=TRUE;
+
   /* STOP and PAUSE and RETURN in Fortran may have 0 or 1 argument.
      STOP and PAUSE are prettyprinted in C using PIPS specific C functions. */
 
   if(nargs==0){
-    
     if(same_string_p(fname,STOP_FUNCTION_NAME))
       pc = CHAIN_SWORD(pc, "exit(0)");
     else if(same_string_p(fname,RETURN_FUNCTION_NAME))
@@ -847,6 +847,7 @@ words_nullary_op_c(call obj,
     basic b=expression_basic(e);
     if(same_string_p(fname,STOP_FUNCTION_NAME)){
       if(basic_int_p(b)){
+	// Missing: declaration of exit() if Fortran code handled
 	pc = CHAIN_SWORD(pc, "exit");
       }
       else if(basic_string_p(b)){
@@ -854,9 +855,9 @@ words_nullary_op_c(call obj,
       }
     }
     else if(same_string_p(fname,RETURN_FUNCTION_NAME)){
-	pc = CHAIN_SWORD(pc, "return");
-	parentheses_p=FALSE;
-	//pips_user_error("alternate returns are not supported in C\n");
+      pc = CHAIN_SWORD(pc, "return");
+      parentheses_p = FALSE;
+      //pips_user_error("alternate returns are not supported in C\n");
     }
     else if(same_string_p(fname,PAUSE_FUNCTION_NAME)){
       pc = CHAIN_SWORD(pc, "_f77_intrinsics_pause_");
@@ -874,7 +875,7 @@ words_nullary_op_c(call obj,
   return(pc);
 }
 
-// Function dedicated to Fortran.A. Mensi
+// function added for fortran  by A. Mensi
 static list words_nullary_op_fortran(call obj,
 				     int precedence,
 				     bool __attribute__ ((unused)) leftmost)
@@ -885,7 +886,7 @@ static list words_nullary_op_fortran(call obj,
   string fname = entity_local_name(func);
 
   if(same_string_p(fname,RETURN_FUNCTION_NAME))
-    pc = CHAIN_SWORD(pc, strdup("return"));
+    pc = CHAIN_SWORD(pc, "return");
   else 
     pc = CHAIN_SWORD(pc, fname);
     
@@ -914,8 +915,8 @@ static list words_nullary_op(call obj,
 			     int precedence,
 			     bool __attribute__ ((unused)) leftmost)
 {
- return is_fortran? words_nullary_op_fortran(obj, precedence, leftmost)
-   : words_nullary_op_c(obj, precedence, leftmost);
+  return is_fortran? words_nullary_op_fortran(obj, precedence, leftmost)
+    : words_nullary_op_c(obj, precedence, leftmost);
 }
 
 
@@ -1048,7 +1049,7 @@ words_io_inst(call obj,
     expression arg = EXPRESSION(CAR(CDR(pio_write)));
 
     if (! syntax_call_p(s)) {
-      pips_error("words_io_inst", "call expected");
+      pips_internal_error("call expected");
     }
 
     c = syntax_call(s);
@@ -1111,9 +1112,12 @@ words_io_inst(call obj,
     {
       /* READ (*,*) -> READ * */
 	
-      if (pio_write != NIL)	/* READ (*,*) pio -> READ *, pio */
-	{
-	  pc = CHAIN_SWORD(pc, "READ *, ");
+      if (pio_write != NIL )	/* READ (*,*) pio -> READ *, pio */
+	{ 
+	  if(!is_fortran)
+	    pc = CHAIN_SWORD(pc, "_f77_intrinsics_read_(");
+	  else
+	    pc = CHAIN_SWORD(pc, "READ *, ");
 	}
       else			/* READ (*,*)  -> READ *  */
 	{
@@ -1154,7 +1158,6 @@ words_io_inst(call obj,
      only odd elements are printed */
   MAPL(pp, {
     pc = gen_nconc(pc, words_expression(EXPRESSION(CAR(pp))));
-
     if (CDR(pp) != NIL) {
       POP(pp);
       if(pp==NIL) 
@@ -1162,6 +1165,10 @@ words_io_inst(call obj,
       pc = CHAIN_SWORD(pc, ", ");
     }
   }, pcio);
+
+  if(!is_fortran)
+    pc = CHAIN_SWORD(pc, ") ");
+	   
   return(pc) ;
 }
 
@@ -2427,8 +2434,7 @@ init_text_statement(
     return( r ) ;
 }
 
-//static
- text 
+static text 
 text_logical_if(
     entity __attribute__ ((unused)) module,
     string label,
@@ -2470,8 +2476,7 @@ text_logical_if(
   return(r);
 }
 
-//static 
-text 
+static text 
 text_block_if(
     entity module,
     string label,
@@ -2594,8 +2599,7 @@ text_io_block_if(
     return(r);
 }
 
-//static
- text 
+static text 
 text_block_ifthen(
     entity module,
     string label,
@@ -2621,8 +2625,7 @@ text_block_ifthen(
     return(r);
 }
 
-//static
- text 
+static text 
 text_block_else(
     entity module,
     string __attribute__ ((unused)) label,
@@ -2669,8 +2672,7 @@ text_block_else(
   return r;
 }
 
-//static
- text 
+static text 
 text_block_elseif(
     entity module,
     string label,
@@ -2683,15 +2685,6 @@ text_block_elseif(
   statement tb = test_true(obj);
   statement fb = test_false(obj);
 
-  /*
-    MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, 
-    test_true(obj)));
-  */
-
-  //if (!is_fortran) {
-  //	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"else{"));
-  //	margin = margin + INDENTATION;
-  //}
   pc = CHAIN_SWORD(pc, strdup(is_fortran?"ELSEIF (":"else if ("));
   pc = gen_nconc(pc, words_expression(test_condition(obj)));
   pc = CHAIN_SWORD(pc, strdup(is_fortran?") THEN":(one_liner_p(tb)?")":") {")));
@@ -2725,8 +2718,7 @@ text_block_elseif(
   return(r);
 }
 
-//static
- text 
+static text 
 text_test(
     entity module,
     string label,
@@ -2947,14 +2939,11 @@ text C_any_comment_to_text(int margin, string c)
   string cp = c; /* current position, pointer in comments */
   text ct = make_text(NIL);
   bool is_C_comment = C_comment_p(c);
-    
+
   if(strlen(c)>0) {
     for(;*cp!='\0';cp++) {
       if(*cp=='\n') {
-	//code added to manage prettprinting the C comments. A.Mensi
-	
-	if(cp!=c || TRUE){ 
-
+	if(cp!=c || TRUE){ // Do not skip \n
 	  string cl = gen_strndup0(lb, le-lb);
 	  sentence s = sentence_undefined;
 	  if(is_C_comment)
@@ -2983,7 +2972,7 @@ text C_any_comment_to_text(int margin, string c)
       ADD_SENTENCE_TO_TEXT(ct,MAKE_ONE_WORD_SENTENCE(0,""));
     }
   }
-  else{// Final \n has been removed in the parser presumably by Ronan
+  else{// Final \n has been removed by Ronan
     ADD_SENTENCE_TO_TEXT(ct,MAKE_ONE_WORD_SENTENCE(0,""));
   }
 

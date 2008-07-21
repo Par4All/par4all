@@ -134,28 +134,59 @@ extern void c_parse();
 
 void CParserError(char *msg)
 {
+  entity mod = get_current_module_entity();
+  string mod_name = entity_undefined_p(mod)? "entity_undefined":entity_module_name(mod);
+
   /* Reset the parser global variables ?*/
+  
+  pips_debug(4,"Reset current module entity %s\n", mod_name);
 
-  pips_debug(4,"Reset current module entity %s\n",get_current_module_name());
-  reset_current_module_entity();
+  /* The error may occur before the current module entity is defined */
+  error_reset_current_module_entity();
 
-  reset_entity_type_stack_table();
+  // Get rid of partly declared variables
+  if(mod!=entity_undefined) {
+    value v = entity_initial(mod);
+    code c = value_code(v);
+
+    code_declarations(c) = NIL;
+    code_decls_text(c) = string_undefined;
+    CleanLocalEntities(mod);
+  }
+
+  // Could not rebuild filename (A. Mensi)
+  // c_in = safe_fopen(file_name, "r");
+  // safe_fclose(c_in, file_name);
 
   /* Stacks are not allocated yet when dealing with external
      declarations. I assume that all stacks are declared
      simultaneously, hence a single test before freeing. */
-  if(!stack_undefined_p(SwitchGotoStack)) {
-    stack_free(&SwitchGotoStack);
-    stack_free(&SwitchControllerStack);
-    stack_free(&LoopStack);
-    stack_free(&BlockStack);  
-    /* Reset them to stack_undefined_p instead of STACK_NULL */
-    SwitchGotoStack = stack_undefined;
-    SwitchControllerStack = stack_undefined;
-    LoopStack = stack_undefined;
-    BlockStack = stack_undefined;
+  if(!entity_undefined_p(mod)) {
+    reset_entity_type_stack_table();
+    if(!stack_undefined_p(SwitchGotoStack)) {
+      stack_free(&SwitchGotoStack);
+      stack_free(&SwitchControllerStack);
+      stack_free(&LoopStack);
+      stack_free(&BlockStack);  
+      /* Reset them to stack_undefined_p instead of STACK_NULL */
+      SwitchGotoStack = stack_undefined;
+      SwitchControllerStack = stack_undefined;
+      LoopStack = stack_undefined;
+      BlockStack = stack_undefined;
+
+      stack_free(&ContextStack);
+      stack_free(&FunctionStack);
+      stack_free(&FormalStack);
+      stack_free(&OffsetStack);
+      stack_free(&StructNameStack);
+      ContextStack = stack_undefined;
+      FunctionStack = stack_undefined;
+      FormalStack = stack_undefined;
+      OffsetStack = stack_undefined;
+      StructNameStack = stack_undefined;
+    }
   }
-  
+
   reset_current_C_line_number();
   /* get rid of all collected comments */
   reset_C_comment(TRUE);
