@@ -1,0 +1,10 @@
+
+parsed printed file
+
+
+printed file
+
+void error02()
+{
+   extern void error02();
+}
