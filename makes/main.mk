@@ -253,7 +253,11 @@ name	= $(subst -,_, $(notdir $(CURDIR)))
 $(INC_TARGET).tmp:
 	$(COPY) $(TARGET)-local.h $(INC_TARGET);
 	{ \
+	  echo "/* Warning! Do not modify this file that is automatically generated! */"; \
+	  echo "/* Modify src/Libs/$(TARGET)/$(TARGET)-local.h instead, to add your own modifications. */"; \
+	  echo ""; \
 	  echo "/* header file built by $(PROTO) */"; \
+	  echo ""; \
 	  echo "#ifndef $(name)_header_included";\
 	  echo "#define $(name)_header_included";\
 	  cat $(TARGET)-local.h;\
