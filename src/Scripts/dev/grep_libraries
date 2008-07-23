@@ -1,6 +1,6 @@
 #! /bin/sh
 
-for lib in $PIPS_ROOT/Lib/$PIPS_ARCH/*.a ; do
+for lib in $PIPS_ROOT/lib/$PIPS_ARCH/*.a ; do
 	nm $lib | fgrep $1 | fgrep U > /dev/null
 	if [ $? = 0 ] ; then
 		echo undef in $lib ...

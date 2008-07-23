@@ -7,6 +7,7 @@
 
 \documentclass[a4paper]{article}
 \usepackage[latin9]{inputenc}
+\usepackage[T1]{fontenc}
 \usepackage[backref,pagebackref]{hyperref}
 \makeatletter
 % Test for a TeX4ht command:
@@ -18,6 +19,8 @@
 \usepackage{url}
 \usepackage{xspace,makeidx}
 \usepackage[hyper,procnames]{listings}
+
+\sloppy
 
 %% heu...
 \lstset{extendedchars=true, language=C, basicstyle=\footnotesize\ttfamily, numbers=left,
@@ -768,7 +771,7 @@ meaning such as building a global binary file from the sources.
 Useful targets defined:
 \begin{description}
 \item[build:] generate a running version with the documentation;
-\item[compile:] generate a running (hope so...) version. It is the default
+\item[compile \& recompile:] generate a running (hope so...) version. It is the default
   target to \texttt{make} if you don't precise one;
 \item[doc:] build the documentation (such as the one you are reading right
   now);
@@ -1174,41 +1177,46 @@ injecting back the content into the \PipsOldWWW by editing the
 \section{Library internal organization}
 \label{sec:library_internal_organization}
 
-The source files for the library {\tt L} are in the directory {\tt
-  Development/Libs/L}. 
+The source files for the library \texttt{\emph{L}} are in the directory
+\verb|$PIPS_ROOT/src/Libs/|\texttt{\emph{L}}. %$
 
-A Makefile must be created in this directory. It can be copied from an
+A \texttt{Makefile} must be created in this directory. It can be copied from an
 existing library since it ends with PIPS special include instructions used
 to simplify the make infrastructure, but it must be updated with the names
 of the local source and object files. Additionnal rules compatible with
-the {\tt make} syntax can also be added, but now the preferred method is
+the \texttt{make} syntax can also be added in this \texttt{Makefile},
+but now the preferred method is
 to put them in \texttt{local.mk} as explained later. For local
-\textsc{lex} and \textsc{yacc} files, use the \verb|$(PARSE)| and
-\verb|$(SCAN)| macros, and do not forget to change the 'yy' prefixes
+\textsc{lex} and \textsc{yacc} files, use the \verb|$(SCAN)| and
+\verb|$(PARSE)| macros, and do not forget to change the 'yy' prefixes
 through some sed script or better with the correct parser generator
 options to avoid name clashes when linking PIPS (which already includes
 several parsers and lexers).
 
-The {\tt Makefile} contains a default \texttt{recompile} entry to install
+The {\tt Makefile} calls the PIPS make infrastructure to define
+for example a default \texttt{recompile} entry to install
 the library in the production hierarchy, typically in
-\verb|$PIPS_ROOT/include| and \verb|$PIPS_ROOT/lib|
-  
-Great care must be taken when creating the library header file {\tt L.h}.
-This file includes the local header file {\tt L-local.h} (which contains
-macros, type definitions,\dots) written by the programmer and the external
-functions declared in the local source files, which are automatically
-extracted using {\tt cproto}.
+\verb|$PIPS_ROOT/include| and \verb|$PIPS_ROOT/lib|.
 
-{\tt L.h} must never be directly modified\footnote{A warning should be added
-  at the beginning.}. It is automatically generated when invoking {\tt make
-  header}\index{make!header}, or when {\tt L-local.h} has been modified, but
-not when the source files are modified. This avoids inopportune
-recompilations when tuning the library, but can lead to coherency problems.
+Great care must be taken when creating the library header file
+\texttt{\emph{L}.h}.  This file includes the local header file
+\texttt{\emph{L}-local.h} (which contains macros, type
+definitions\dots) written by the programmer and the external functions
+declared in the local source files, which are automatically extracted
+using {\tt cproto}.
 
-If a main program to test or use the library exists, then it necessarily
-is a pass (see Section~\ref{sec:pass_organization}), or a
-\lstinline|main()|. This rule is generally not respected, and this induces
-cycles in case of a global recompilation. (Is this up-to-date?)
+\texttt{\emph{L}.h} must never be directly modified as indicated by the
+warning at the beginning. It is automatically generated when invoking {\tt
+  make header}\index{make!header}, or when \texttt{\emph{L}-local.h} has
+been modified, but not when the source files are modified. This avoids
+inopportune recompilations when tuning the library, but can lead to
+coherency problems.
+
+If a main program to test or use the library exists, then it is
+necessarily a pass (see section~\ref{sec:pass_organization}), or a
+\lstinline|main()|. But the easiest way to test a library is to test
+through the PIPS infrastructure after declaring it
+as explained in section~\label{sec:direct-pipsmake}.
 
 
 \subsection{Libraries and data structures}
@@ -1216,43 +1224,50 @@ cycles in case of a global recompilation. (Is this up-to-date?)
 
 
 PIPS data structures are managed by NewGen. For each data structure
-declaration file in {\bf\tt Documentation/Newgen}, NewGen derives a header
-file, which is placed in \verb+$PIPS_ROOT/Include+. %% $
-For instance, the internal
-representation (i.e. the abstract syntax tree) is called
-\verb+ri+\index{ri}. It is described in the \LaTeX\ file  {\tt ri.tex} in
-{\tt \bf Documentation/Newgen}. It is then automatically transformed into a
-NewGen file {\tt ri.newgen}. And finally, NewGen produces an internal
-description file {\tt ri.spec} and a header file {\tt ri.h}, which must be
+declaration file in \verb+$PIPS_ROOT/src/Documentation/newgen+, NewGen
+derives a header file that defines the object interfaces, which is placed
+in \verb+$PIPS_ROOT/include+.
+
+For instance, the internal representation (i.e. the abstract syntax tree)
+is called \verb+ri+\index{ri}\footnote{For the French «
+  \emph{Représentation Interne} » or Internal Representation.}. It is
+described in the \LaTeX\ file {\tt ri.tex} in
+\verb+$PIPS_ROOT/src/Documentation/newgen+. It is then automatically
+transformed into a NewGen file {\tt ri.newgen}. And finally, NewGen
+produces an internal description file {\tt ri.spec}, a C file with the
+object method definitions and a header file {\tt ri.h}, which must be
 included in each C file using the internal representation.
 
 Thus, it is not possible to build a new library with the name {\tt ri},
 because the corresponding header file would be called {\tt ri.h}. The
-library in which higher order function concerning the {\tt ri} are placed,
-is then called {\tt ri-util}. It should be the case for all the other sets
+library in which higher order functions concerning the {\tt ri} are placed,
+is rather called {\tt ri-util}. It should be the case for all the other sets
 of data structures specified using NewGen. Such existing libraries are
 {\tt text-util} and {\tt paf-util}. However, mainly for historical
 reasons, there are numerous exceptions. Many functions are in fact in the
 library where they were first necessary. An example is the {\tt syntax}
-library (the parser).
+library (the parser). It should be refactored out some day.
 
 
 
 \subsection{Library dependencies}
 
-Library dependence cycles must be avoided. Links are not easy to manage when
-a module $a$ from library $A$ calls a module $b$ form library $B$ which
-itself calls a module $a'$ from library $A$. This situation also reflects a
-bad logical organization of libraries. Therefore, PIPS libraries must be
-organized as a DAG, i.e. they must have a partial order.
+Library dependence cycles must be avoided. Links are not easy to manage
+when a module $a$ from library $A$ calls a module $b$ form library $B$
+which itself calls a module $a'$ from library $A$. This situation also
+reflects a bad logical organization of libraries. Therefore, PIPS
+libraries must be organized as a DAG, i.e. they must have a partial
+order. With modern linkers, it is no longer an issue but we still have the
+issue at the \texttt{.h} level if we have cross-dependencies such as
+cross-recursion.
 
-
-Several utilities, such as \texttt{analyze\_libraries}, 
-\texttt{order\_libraries},
-can be used to determine the dependences between libraries, a total order
-compatible with the library partial order, and the possible cycles. The
-results are stored in \texttt{/tmp/libs.?} where the question mark stands for
-several values:
+Several utilities, such as \texttt{analyze\_libraries},
+\texttt{order\_libraries}, \verb|grep_libraries|,
+\verb|order_libraries_from_include| (see
+\verb|$PIPS_ROOT/src/Scripts/dev|), can be used to determine the
+dependences between libraries, a total order compatible with the library
+partial order, and the possible cycles. The results are stored in
+\texttt{/tmp/libs.?} where the question mark stands for several values:
 \begin{itemize}
   \item u: uses, modules used by each library.
   \item d: defs, modules defined by each library
@@ -1261,19 +1276,19 @@ several values:
   \item etc...
 \end{itemize}
 
-\subsection{Installation of a new phase (or library)}
 
+\subsection{Installation of a new phase (or library)}
 
 Some libraries implement functionalities which are accessible by the users
 via the \texttt{pipsmake} mechanism. For a good comprehension of the material
 contained in this subsection, the reader is referred to the corresponding
 documentation.
 
-A PIPS phase \emph{myphase} is implemented as a C function named 
-\texttt{myphase} with a single argument, which is the name of the 
-Fortran module to analyze. It returns a boolean value, which indicates 
-whether the computation has performed well. 
-It therefore resembles the following dummy function:
+A PIPS phase \emph{MYPHASE} is implemented as a C function named
+\texttt{myphase} with a single argument, which is the name of the module
+(a function or procedure) to analyze. It returns a boolean value, which
+indicates whether the computation has performed well.  It therefore
+resembles the following dummy function:
 \begin{lstlisting}
 bool myphase(char *module_name)
 {
@@ -1288,85 +1303,100 @@ This phase is usually located in a library named \texttt{myphase}, but this is
 not compulsory. It must set the global variables which are necessary for its
 execution using \texttt{properties}, and acquire the necessary resources by
 invoking \texttt{pipsdbm}. Directly invoking \texttt{pipsmake} is forbidden at
-this level. 
+this level.
+
+This section did not deal with the case where a new resource is
+introduced. This is the object of the section~\ref{sec:dealing-with-new}
+instead.
 
 Here are now the steps to install a new library named \texttt{mylib}.
 
-First, create a new directory \texttt{mylib} in \texttt{src/Libs} with the
-files \texttt{mylib.c} (where the code for the C \texttt{boolean
-  mylib(string name)}, which corresponds to the phase to add, generally
-is). Add the new directory name to the \texttt{local.mk}, so that the
-recursive make will consider it.
+\subsubsection{In the directory \texttt{src/Libs}}
+\label{sec:direct-textttsrcl-1}
+
+\begin{itemize}
+\item First, create a new directory \texttt{mylib} in \texttt{src/Libs};
+\item add the new directory name to the
+  \verb|$PIPS_ROOT/src/Libs/local.mk|, so that the recursive make will
+  consider it.
+\end{itemize}
 
 \subsubsection{In the directory \texttt{src/Libs/mylib}}
 \label{sec:direct-mylib}
-  
-  \begin{itemize}
-    
-  \item Create a \texttt{Makefile} (see examples in the other libraries). 
-    This file must list the sources of the library and the targets to
-    be build, then it must include the common makefile \texttt{main.mk}.
-    
-  \item Then run the commands \texttt{make} and {\tt make install}, to
-    install the library.  The file \texttt{mylib.h} is installed in the
-    \texttt{include} directory, %% $
-    and \texttt{libmylib.a} in the \texttt{lib/\$PIPS\_ARCH} directory. 
-    The library functions are now accessible by the other libraries and passes.
-    
-    Note that the \texttt{cproto} command is used to generate the library
-    header file \texttt{mylib.h}. To force this file to be build again, 
-    do a \texttt{make header}. 
-    
+
+\begin{itemize}
+\item Add some \texttt{.c} files (at least the one where the code is for
+  the C \texttt{boolean mylib(string name)} function, which corresponds to
+  the phase to add, generally is);
+\item create a \texttt{Makefile} (see examples in the other libraries).
+  This file must list the sources of the library and the targets to be
+  built, then it must include the common makefile
+  \verb|$(ROOT)/makes/main.mk|;
+\item Then run the commands \texttt{make}. The file \texttt{mylib.h} is
+  installed in the \verb+$PIPS_ROOT/include+ directory, and
+  \texttt{libmylib.a} in the \verb+$PIPS_ROOT/lib/$PIPS_ARCH+ directory.
+  The library functions are now accessible by the other libraries and
+  passes.
+
+  Note that the \texttt{cproto} command is used to generate the library
+  header file \texttt{mylib.h}. To force this file to be build again, do a
+  \texttt{make header}.
   \end{itemize}
-  
-\subsubsection{In directory \texttt{makes}}
+
+
+\subsubsection{In directory \texttt{\$PIPS\_ROOT/makes}}
 \label{sec:direct-makes}
-  
-  \begin{itemize}
-    
-  \item Update file \texttt{define\_libraries.mk}\index{define\_libraries.mk}. 
-    It contains the ordered list of PIPS libraries for linking.
-    The order in which the libraries are added is important:
-    the new library must be added after the libraries which use its
-    modules, but after the libraries whose modules it uses.
-    
-  \end{itemize}
-  
+
+\begin{itemize}
+\item Update file
+  \texttt{define\_libraries.mk}\index{define\_libraries.mk}.  It contains
+  the ordered list of PIPS libraries for linking.  The order in which the
+  libraries are added is important: the new library must be added after
+  the libraries which use its modules, but after the libraries whose
+  modules it uses.\marginpar{RK to FC: I'm not sure it is still true for
+    modern ld.}
+\end{itemize}
+
+
 \subsubsection{In directory \texttt{src/Scripts/env}}
 \label{sec:direct-env}
 
 If you need to introduce new environment variables or to modify old ones
 (not likely):
-  
-  \begin{itemize}
-    
-  \item possibly update \texttt{pipsrc.sh}\index{pipsrc.sh} file. 
-    It contains the shell environement variables for PIPS.
-    
-  \item run the \texttt{make} command to automatically build the files and
-    to install them in \verb|$PIPS_ROOT/share|.  Note that the
-    \texttt{pipsrc.*sh} files created by the setup command is not
-    affected, you must copy them again by hand since they were copied from
-    an older version at download time. So this change will only affects
-    future installations.
+\begin{itemize}
+\item possibly update \texttt{pipsrc.sh}\index{pipsrc.sh} file.  It
+  contains the shell environement variables for PIPS. Do not modify
+  \texttt{pipsrc.csh}\index{pipsrc.csh} since it is automatically
+  generated by the following item;
+\item run the \texttt{make} command to automatically build the files and
+  to install them in \verb|$PIPS_ROOT/share|.
+\end{itemize}
 
-  \end{itemize}
-  
+Note that the \texttt{pipsrc.*sh} files created at setup time by the setup
+command is not affected, you must copy them again by hand since they were
+copied from an older version at download time. So this change will only
+affects future installations. Another possibility to synchronize with the
+production version is to download a new version of the
+\verb|setup_pips.sh| script (or better make a link to
+\verb|MYPIPS/prod/pips/makes/setup_pips.sh| for example to have an always
+up-to-date version) and run again \verb|setup_pips.sh|. It won't erase the
+directories but will pull the new version of subversion and will
+reconstruct the \texttt{pipsrc.*sh} files.
+
+
 \subsubsection{In directory \texttt{src/Documentation/pipsmake}}
 \label{sec:direct-pipsmake}
-  
-  \begin{itemize}
-    
-  \item declare the new phase to \texttt{pipsmake} by adding the necessary
-    rules in the \texttt{pipsmake-rc.tex} file. Each rule describes the
-    dependances between the input and output resources of each phase. Just
-    have a look at the other rules to build your owns. You can also add
-    aliases to obtain nice menus in the \texttt{wpips} interface.
-    
-    For instance, for a phase \emph{myphase} which reads a resource \emph{res1}
-    andproduces a resource \emph{res2} for the current module, the rule and
-    its alias are:
 
+\begin{itemize}
+\item declare the new phase to \texttt{pipsmake} by adding the necessary
+  rules in the \texttt{pipsmake-rc.tex} file. Each rule describes the
+  dependences between the input and output resources of each phase. Just
+  have a look at the other rules to build your owns. You can also add
+  aliases to obtain nice menus in the \texttt{wpips} interface.
+
+  For instance, for a phase \emph{myphase} which reads a resource
+  \emph{res1} and produces a resource \emph{res2} for the current module,
+  the rule and its alias are:
 \begin{verbatim}
 alias myphase 'My Phase'
 
@@ -1374,52 +1404,61 @@ myphase > MODULE.res2
         < PROGRAM.entities
         < MODULE.res1
 \end{verbatim}
-    
-    Note that libraries generally use the program entities, that is to say
-    all the objects from the current Fortran program and which have a name.
-    This resource is named \texttt{PROGRAM.entities}.
-    
-  \item New \emph{properties} may be necessary for the new phase. 
-    They must be delared in the \texttt{properties-rc.tex} file.
-    
-  \item Run the command \texttt{make} to derive the various files
-    \texttt{pipsmake.rc}, \texttt{phases.h}, \texttt{resources.h},
-    \texttt{wpips.rc} and \texttt{builder-map.h} , and to copy them to
-    \verb|$PIPS_ROOT/doc|, \verb|$PIPS_ROOT/include| and
-    \verb|$PIPS_ROOT/etc|.
 
-  \end{itemize}
-  
+  Note that libraries generally use the program entities (for example if
+  you display some code in debug routines...), that is to say all the
+  objects from the current Fortran program and which have a name.  This
+  resource is named \texttt{PROGRAM.entities}.
+
+\item Run the command \texttt{make} to derive the various files
+  \texttt{pipsmake.rc}, \texttt{phases.h}, \texttt{resources.h},
+  \texttt{wpips.rc} and \texttt{builder-map.h} , and to copy them to
+  \verb|$PIPS_ROOT/doc|, \verb|$PIPS_ROOT/include| and
+  \verb|$PIPS_ROOT/etc|.
+\end{itemize}
+
+
+\subsubsection{In directory \texttt{src/Documentation/properties}}
+\label{sec:srcd}
+
+New \emph{properties} (that are global variables with a user interface in
+PIPS) may be necessary for the fine control of the new phase.  They must
+be declared in the \texttt{properties-rc.tex} file.
+
+Use \texttt{make} to push them into PIPS.
+
+
 \subsubsection{In directory \texttt{src/Libs/pipsmake}}
 \label{sec:direct-lib-pipsmake}
 
-Execute the command \texttt{make recompile} to recompile the pipsmake library.
-  
+Execute the command \texttt{make recompile} to recompile the
+\texttt{pipsmake} library.
+
+
 \subsubsection{In directory \texttt{src/Passes}}
 \label{sec:direct-passes}
 
 Execute the command \texttt{make recompile} to recompile and install
 updated versions of \texttt{pips}, \texttt{tpips} and \texttt{wpips}.
- 
+
 
 \subsubsection{The final touch}
 \label{sec:final-touch}
 
-It can also be necessary to update the shell scripts \texttt{Init}, 
-\texttt{Build}, \texttt{Select}, \texttt{Perform}, and \texttt{Display} in 
-directory \texttt{src/Scripts/drivers}.
-
-This section did not deal with the case where a new resource is
-introduced. This is the object of the next section.
+It can also be necessary to update the shell scripts \texttt{Init},
+\texttt{Build}, \texttt{Select}, \texttt{Perform}, and \texttt{Display} in
+directory \texttt{src/Scripts/drivers}.\marginpar{Are they still in use
+  since tpips? Should be automatically generated anyway... RK}
 
 
 \subsection{Dealing with a new resource}
+\label{sec:dealing-with-new}
 
 A new resource is declared by its use or its production by one of the rules
 in the file {\tt pipsmake-rc.tex} (see below). Here are now the steps to
 follow to deal with a new resource {\tt myres} once the phase {\tt myphase}
 from the library {\tt mylib} has been declared and installed as shown in the
-previous section, that is to say that the function 
+previous section, that is to say that the function
 \begin{verbatim}
 bool myphase(char *module_name)
 \end{verbatim}
@@ -1455,32 +1494,26 @@ myphase > MODULE.myres
 \subsubsection{In the directory \texttt{src/Libs/pipsdbm}}
 \label{sec:direct-pipsdbm}
 
-  The new resource (if any) must be declared to the resource manager
-  \texttt{pipsdbm}: 
-  
-  \begin{itemize}
-    
-  \item Update the file \texttt{methods.h} by adding a line for
-    the \texttt{DBR\_MYRES} resource. Macros are predefined 
-    for saving, loading, freeing and checking a resource if it is
-    a newgen domain, a string, aso. For instance a newgen resource
-    is simply declared as:
+The new resource (if any) must be declared to the resource manager
+\texttt{pipsdbm}:
+\begin{itemize}
+\item Update the file \texttt{methods.h} by adding a line for the
+  \texttt{DBR\_MYRES} resource. Macros are predefined for saving, loading,
+  freeing and checking a resource if it is a newgen domain, a string, and
+  so on. For instance a NewGen resource is simply declared as:
 \begin{verbatim}
 { DBR_MYRES, NEWGEN_METHODS },
 \end{verbatim}
-
-   For file resources, the pipsdbm data usually is a string representing
-   the file name within the pips database. All such resources are suffixed
-   with \texttt{\_FILE}. It is declared as~:
-
+  For file resources, the \texttt{pipsdbm} data usually is a string
+  representing the file name within the pips database. All such resources
+  are suffixed with \texttt{\_FILE}. It is declared as:
 \begin{verbatim}
 { DBR_MYRES_FILE, STRING_METHODS },
 \end{verbatim}
 
- \item Run the commands \texttt{make} to update \texttt{pipsdbm} and
-   install it.
-    
-  \end{itemize}
+\item Run the commands \texttt{make} to update \texttt{pipsdbm} and
+  install it.
+\end{itemize}
 
 
 \subsubsection{The final touch}
@@ -1498,115 +1531,72 @@ inconsistencies which only appear at run time (the database cannot be
 created for instance).
 
 
-
 \subsection{Modification or addition of a new NewGen data structure}
 
 NewGen data strutures for PIPS are defined in \LaTeX{} files which are in
-the directory \texttt{\$PIPS\_DEVEDIR/Documentation/newgen}. 
-These files include both the NewGen specifications, and the comments in
-\LaTeX{} format. 
-DDL\footnote{Newgen types are called \emph{domains\/} and are defined using a
-  high level specification language called DDL for \emph{Domain Definition
-    Language}.} files are automatically generated from the previous \LaTeX{}
-files. When declaring a new data structure, two cases may arise:
+the directory \verb+$PIPS_ROOT/src/Documentation/newgen+.  These files
+include both the NewGen specifications, and the comments in \LaTeX{}
+format.  DDL\footnote{Newgen types are called \emph{domains\/} and are
+  defined using a high level specification language called DDL for
+  \emph{Domain Definition Language}.} files are automatically generated
+from the previous \LaTeX{} files. When declaring a new data structure, two
+cases may arise:
 
 \begin{enumerate}
-  
-\item The new data structure is defined in a {\em new\/} file {\tt
-    mysd.ftex} or \texttt{mysd.tex}:
-  
-  This file has to be declared in the local {\tt Makefile} (in {\tt
-    \$PIPS\_DEVEDIR/Documentation/newgen}) for its further installation in the {\bf Production} hierarchy. It merely consists in adding its name {\tt
-    mysd.ftex} to the {\tt SOURCE\_FILES} list.
 
-If the data structure is to be managed by pipsdbm, \emph{i.e.} it
-is declared as a resource in pipsmake, then
+\item The new data structure is defined in a \emph{new} file
+  \texttt{mysd.tex}:
+
+  This file has to be declared in the local {\tt Makefile} (in
+  \verb+$PIPS_ROOT/src/Documentation/newgen+) for its further installation
+  in the PIPS hierarchy. It merely consists in adding its name
+  \texttt{mysd.tex} to the \texttt{F.tex} variable list.
+
+  If the data structure is to be managed by \texttt{pipsdbm}, \emph{i.e.}
+  it is declared as a resource in \texttt{pipsmake-rc.tex}, then
 \begin{verbatim}
-$PIPS_DEVEDIR/Lib/pipsdbm/methods.h
-\end{verbatim} %% $
-must be updated.
+$PIPS_ROOT/src/Lib/pipsdbm/methods.h
+\end{verbatim}
+  must be updated.
 
-It is not compulsory to immediately execute the command {\tt make install}
-in these directories. But it will be necessary before any global
-recompilation of PIPS (see below).
-  
-\item The new data structure is added to an already existing file {\tt 
-    mysd.ftex}: modifying this file is sufficient, and the above steps are
-    not necessary. 
+  It is not compulsory to immediately execute the command \texttt{make} in
+  these directories. But it will be necessary before any global
+  recompilation of PIPS (see below).
+
+\item The new data structure is added to an already existing file
+  \texttt{mysd.tex}: modifying this file is sufficient, and the above
+  steps are not necessary.
 \end{enumerate}
 
 Then, in both cases, the next steps have to be performed:
 \begin{itemize}
-  
-\item In the directory {\tt \$PIPS\_DEVEDIR/Documentation/newgen}, 
-  execute the command {\tt
-    make}.  This command builds the DDL files \texttt{mysd.newgen
-    mysd.spec mysd.h mysd.c} and some common files such as \texttt{specs.h}.
-  If everything is ok (check that the header and source code
-  for mysd look good), then do a \texttt{make install}.
- which copies the generated files to the \texttt{\$PIPS\_ROOT/Include} 
- directory;
+
+\item In the directory \verb+$PIPS_ROOT/src/Documentation/newgen+, %$
+  execute the command \texttt{make}.  This command builds the DDL files
+  \texttt{mysd.newgen}, \texttt{mysd.spec}, \texttt{mysd.h},
+  \texttt{mysd.c} and some common files such as \texttt{specs.h} and this
+  copies the generated files to the \verb+$PIPS_ROOT/include+ directory;
 
 \item NewGen globally handles all the data structures defined in the
   project. Hence any minor modification of one of them, or any addition,
   potentially leads to a modification of all the interfaces which are
-  generated. It is thus necessary to recompile everything in the {\bf \tt
-    Production} directory. Do not forget to first recompile {\tt
-    \$PIPS\_ROOT/Src/Lib/newgen} and, install {\tt
-    \$PIPS\_DEVEDIR/Lib/pipsdbm} if it has been modified in a previous
-  step. To recompile PIPS, see section~\ref{sec:building-pips}.
+  generated. It is thus necessary to recompile everything in the
+  production directory. It will also recompile
+  \verb+$PIPS_ROOT/src/Documentation/newgen+ and
+  \verb|$PIPS_ROOT/src/Lib/pipsdbm/methods.h| if they have been modified
+  in a previous step. To recompile PIPS, see
+  section~\ref{sec:building-pips}.
 \end{itemize}
-
-
-
-\subsection{Changing the dynamic allocation library}
-
-Errors which are the most difficult to find generally are dynamic allocation
-errors: The allocated space is accesssed after being freed ({\em
-  dangling pointer}), or a zone larger than the allocated zone is
-referenced (too long copy of a character string for instance).
-
-A first checking level is available with a set of SUN primitives ({\tt
-  man malloc.h}), by linking the program with
-\verb+/usr/lib/debug/malloc.o+. The choice of the dynamic allocation library
-can be made in \verb+pipsrc.ref+, or in the curretn environment, but without
-any guarantee for the link.
-
-A second level, a lot more efficient, but also much slower, is offerd by a
-public domain library, \verb+malloclib-pl11+. This library systematically
-overwrites freed zones with a special pattern, and checks that string
-operations are valid. It also records in which files allocations and
-desallocations are performed.
-
-To use it efficiently, all the source files which dynamically allocate or
-free memory must include \verb+malloc.h+ with double quotes (and not $< \;
->$ signs). This is achieved in most cases because NewGen includes
-\verb+malloc.h+. But some files, such as character strings manipulation
-files, do not include {\tt GenC.h}: {\tt \#include "malloc.h"} must be added
-to them.
-
-PIPS must then be entirely recompiled (see section~\ref{sec:building-pips}), as
-well as the libraries in {\tt \$PIPS\_EXTEDIR}, after renaming ({\tt mv})
-\verb+dbmalloc.h+ into \verb+malloc.h+ in {\tt \$PIPS\_EXTEDIR} and in the
-directories containing the sources of the external libraries (NewGen and
-Linear). Before linking, the environment variable \verb+PIPS_LIBS+ must
-have been modified, either in the current environment, or in
-\verb+pipsrc.ref+, to include the correct library.
-
-It is recommended to keep an version of PIPS linkeed with a reasonnably fast
-library to be able to create large databases for the tests. To avoid
-compiling and linking too many things each time, it is also recommended to
-modify the shell variables \verb+$PIPS_BINDIR+ and \verb+$PIPS_LIBDIR+ to
-keep both versions of PIPS.
 
 
 \subsection{Global variables, modifications}
 
 Global variables should be avoided, or at least carefully documented to
-avoid disturbing already existing programs. 
+avoid disturbing already existing programs. Properties (variables with a
+user interface) may be used instead.
 
 If new functionalities are required, it is better to keep the existing
-module as such, and to create a new one, with another name. 
+module as such, and to create a new one, with another name.
 
 For global variables, initialization, access and reset routines must be
 provided. Do not forget that there may be several successive requests with
@@ -1899,6 +1889,48 @@ tgrind -lf extr_doall.f
 
 All the source of PIPS can be pretty-printed with Doxygen and are
 browsable. For example, see \LINK{http://doxygen.pips.enstb.org}.
+
+\subsection{Changing the dynamic allocation library}
+
+Errors which are the most difficult to find generally are dynamic allocation
+errors: The allocated space is accesssed after being freed ({\em
+  dangling pointer}), or a zone larger than the allocated zone is
+referenced (too long copy of a character string for instance).
+
+A first checking level is available with a set of SUN primitives ({\tt
+  man malloc.h}), by linking the program with
+\verb+/usr/lib/debug/malloc.o+. The choice of the dynamic allocation library
+can be made in \verb+pipsrc.ref+, or in the curretn environment, but without
+any guarantee for the link.
+
+A second level, a lot more efficient, but also much slower, is offerd by a
+public domain library, \verb+malloclib-pl11+. This library systematically
+overwrites freed zones with a special pattern, and checks that string
+operations are valid. It also records in which files allocations and
+desallocations are performed.
+
+To use it efficiently, all the source files which dynamically allocate or
+free memory must include \verb+malloc.h+ with double quotes (and not $< \;
+>$ signs). This is achieved in most cases because NewGen includes
+\verb+malloc.h+. But some files, such as character strings manipulation
+files, do not include {\tt GenC.h}: {\tt \#include "malloc.h"} must be added
+to them.
+
+PIPS must then be entirely recompiled (see section~\ref{sec:building-pips}), as
+well as the libraries in {\tt \$PIPS\_EXTEDIR}, after renaming ({\tt mv})
+\verb+dbmalloc.h+ into \verb+malloc.h+ in {\tt \$PIPS\_EXTEDIR} and in the
+directories containing the sources of the external libraries (NewGen and
+Linear). Before linking, the environment variable \verb+PIPS_LIBS+ must
+have been modified, either in the current environment, or in
+\verb+pipsrc.ref+, to include the correct library.
+
+It is recommended to keep an version of PIPS linkeed with a reasonnably fast
+library to be able to create large databases for the tests. To avoid
+compiling and linking too many things each time, it is also recommended to
+modify the shell variables \verb+$PIPS_BINDIR+ and \verb+$PIPS_LIBDIR+ to
+keep both versions of PIPS.
+
+
 
 \newpage
 

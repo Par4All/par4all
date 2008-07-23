@@ -1,10 +1,11 @@
 #! /bin/sh
 
-# orders libraries used by Pips. Should be called after analyze_libraries.
-# -t top-down (default)
-# -b bottom-up order 
+USAGE="Usage: $0 [-t|b]\n
+ orders libraries used by Pips. Should be called after analyze_libraries.\n
+ -t top-down (default)\n
+ -b bottom-up order"
 
-USAGE="Usage: $0 [-t|b]"
+tmpdir=${PIPS_TEMPDIR:-/tmp}
 
 DEFAULT=TRUE
 
@@ -13,14 +14,14 @@ do
 	case $opt in
 	t)	DEFAULT=TRUE;;
 	b)	DEFAULT="";;
-	\?)	echo $USAGE >&2
+	*)	echo $USAGE >&2
 		exit 2;;
 	esac
 done
 
 if [ -n "$DEFAULT" ]
 then
-awk '$2 != $3 { print $2 , $3 }' $PIPS_TEMPDIR/libs.j | sort -u | tee $PIPS_TEMPDIR/libs.s | tsort > $PIPS_TEMPDIR/libs.o 2> $PIPS_TEMPDIR/libs.c
+awk '$2 != $3 { print $2 , $3 }' $tmpdir/libs.j | sort -u | tee $tmpdir/libs.s | tsort > $tmpdir/libs.o 2> $tmpdir/libs.c
 else
-awk '$2 != $3 { print $3 , $2 }' $PIPS_TEMPDIR/libs.j | sort -u | tee $PIPS_TEMPDIR/libs.s | tsort > $PIPS_TEMPDIR/libs.b 2> $PIPS_TEMPDIR/libs.c
+awk '$2 != $3 { print $3 , $2 }' $tmpdir/libs.j | sort -u | tee $tmpdir/libs.s | tsort > $tmpdir/libs.b 2> $tmpdir/libs.c
 fi
