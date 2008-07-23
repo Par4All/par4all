@@ -482,20 +482,39 @@ expression e ;
     return(FALSE);
 }
 
+// positive integer constant expression: call to a positive constant
+// or to a sum of positive integer constant expressions.  
+//
+// Likely to fail and need further extension if subtraction and
+// multiplication are used as probably allowed by C standard.
 bool integer_constant_expression_p(e)
 expression e;
 {
-    syntax s = expression_syntax(e);
+  syntax s = expression_syntax(e);
+  bool ice = FALSE;
 
-    if(syntax_call_p(s)) {
-	call c = syntax_call(s);
-	entity cst = call_function(c);
-	int i;
+  if(syntax_call_p(s)) {
+    call c = syntax_call(s);
+    entity cst = call_function(c);
+    list args = call_arguments(c);
+    int i;
 
-	return integer_constant_p(cst, &i);
+    if(integer_constant_p(cst, &i)) {
+      ice = TRUE;
     }
-    else
-	return FALSE;
+    else if(ENTITY_PLUS_P(cst)||ENTITY_PLUS_C_P(cst)) {
+      expression e1 = EXPRESSION(CAR(args));
+      expression e2 = EXPRESSION(CAR(CDR(args)));
+      ice = integer_constant_expression_p(e1) && integer_constant_expression_p(e2);
+    }
+  }
+  else if(syntax_reference_p(s)) {
+    // Can be an enum member
+    entity em = reference_variable(syntax_reference(s));
+
+    ice = entity_enum_member_p(em);
+  }
+  return ice;
 }
 
 bool signed_integer_constant_expression_p(e)

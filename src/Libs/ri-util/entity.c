@@ -226,6 +226,8 @@ entity_local_name(entity e)
 {
     string null_name = "null";
     pips_assert("entity is defined", !entity_undefined_p(e));
+    pips_assert("constant term or entity",
+		e==NULL || entity_domain_number(e)==entity_domain);
     return e==NULL ? null_name : local_name(entity_name(e));
 }
 
@@ -376,6 +378,24 @@ entity_subroutine_p(entity e)
 	   !entity_main_module_p(e) && 
 	   !entity_blockdata_p(e) && /* ??? */
 	   !entity_function_p(e);
+}
+
+bool entity_enum_p(entity e)
+{
+  return type_enum_p(entity_type(e));
+}
+
+bool entity_enum_member_p(entity e)
+{
+  string n = entity_module_name(e);
+
+  /* Is it a standard package or not? Check for forbidden characters
+     such as those used for PHI variables which have storage ROM just
+     like enum members */
+  //fprintf(stderr, "module name: \%s, forbidden characters: %d\n", n, streln(strspn(n, "-")));
+  if(strchr(n,'-')!=NULL)
+    return FALSE;
+  return type_variable_p(entity_type(e)) && storage_rom_p(entity_storage(e));
 }
 
 bool 

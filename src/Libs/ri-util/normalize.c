@@ -86,21 +86,35 @@ normalized NormalizeConstant(constant c)
 
 normalized NormalizeReference(reference r)
 {
-    normalized n=normalized_undefined;
-    entity e = reference_variable(r);
-    type t = entity_type(e);
+  normalized n = normalized_undefined;
+  entity e = reference_variable(r);
+  type t = entity_type(e);
 
-    if (! type_variable_p(t)) {
-	pips_error("NormalizeReference", "should be a variable !");
-    }
-    else {
-	n = (entity_integer_scalar_p(e)) ?
-	    make_normalized(is_normalized_linear, 
-			    vect_new((Variable) e, 1)) :
-		make_normalized(is_normalized_complex, UU);
+  pips_assert("constant term ore is an entity",
+	      entity_domain_number(e)==entity_domain);
+
+  if (!type_variable_p(t)) {
+    pips_error("NormalizeReference", "should be a variable !");
+  }
+  else {
+    Variable v = (Variable) e;
+    Value val = VALUE_ONE;
+
+    if(entity_enum_member_p(e)) {
+      value ev = entity_initial(e);
+      constant ecv = value_constant(ev);
+
+      v = TCST;
+      val = (Value)(constant_int(ecv));
     }
 
-    return(n);
+    n = (entity_integer_scalar_p(e)) ?
+      make_normalized(is_normalized_linear, 
+		      vect_new(v, val)) :
+      make_normalized(is_normalized_complex, UU);
+  }
+
+  return n;
 }
 
 normalized NormalizeIntrinsic(entity e, list la)
@@ -118,7 +132,7 @@ normalized NormalizeIntrinsic(entity e, list la)
 
 	vect_chg_sgn(normalized_linear(n));
     }
-    else if (ENTITY_MINUS_P(e) || ENTITY_PLUS_P(e)) {
+    else if (ENTITY_MINUS_P(e) || ENTITY_MINUS_C_P(e) || ENTITY_PLUS_P(e) || ENTITY_PLUS_C_P(e)) {
 	normalized ng, nd;
 
 	ng = NormalizeExpression(EXPRESSION(CAR(la)));
@@ -131,7 +145,7 @@ normalized NormalizeIntrinsic(entity e, list la)
 	    return(nd);
 	}
 
-	n = ENTITY_PLUS_P(e) ? 
+	n = (ENTITY_PLUS_P(e) || ENTITY_PLUS_C_P(e)) ? 
 	    make_normalized(is_normalized_linear, 
 			    vect_add(normalized_linear(ng), 
 					   normalized_linear(nd))) : 

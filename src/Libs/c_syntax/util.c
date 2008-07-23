@@ -409,122 +409,7 @@ expression MakeArrayExpression(expression exp, list lexp)
 
 /*******************  TYPES *******************/
 
-bool signed_type_p(type t)
-{
-  if (type_variable_p(t))
-    {
-      basic b = variable_basic(type_variable(t));
-      if (basic_int_p(b))
-	if (basic_int(b)/10 == DEFAULT_SIGNED_TYPE_SIZE)
-	  return TRUE;
-    }
-  return FALSE;
-}
-
-bool unsigned_type_p(type t)
-{
-  if (type_variable_p(t))
-    {
-      basic b = variable_basic(type_variable(t));
-      if (basic_int_p(b))
-	if (basic_int(b)/10 == DEFAULT_UNSIGNED_TYPE_SIZE)
-	  return TRUE;
-    }
-  return FALSE;
-}
-
-bool long_type_p(type t)
-{
-  if (type_variable_p(t))
-    {
-      basic b = variable_basic(type_variable(t));
-      if (basic_int_p(b))
-	if (basic_int(b) == DEFAULT_LONG_INTEGER_TYPE_SIZE)
-	  return TRUE;
-    }
-  return FALSE;
-}
-
-bool bit_type_p(type t)
-{
-  if (!type_undefined_p(t) && type_variable_p(t))
-    {
-      basic b = variable_basic(type_variable(t));
-      if (!basic_undefined_p(b) && basic_bit_p(b))
-	return TRUE;
-    }
-  return FALSE;
-}
-
-
-type make_standard_integer_type(type t, int size)
-{
-  if (t == type_undefined)
-    {
-      variable v = make_variable(make_basic_int(size),NIL,NIL);
-      return make_type_variable(v);
-    }
-  else
-    {
-      if (signed_type_p(t) || unsigned_type_p(t))
-	{
-	  basic b = variable_basic(type_variable(t));
-	  int i = basic_int(b);
-	  variable v = make_variable(make_basic_int(10*(i/10)+size),NIL,NIL);
-	  pips_debug(8,"Old basic size: %d, new size : %d\n",i,10*(i/10)+size);
-	  return make_type_variable(v);
-	}
-      else 
-	{
-	  if (bit_type_p(t))
-	    /* If it is int i:5, keep the bit basic type*/
-	    return t; 
-	  else
-	    user_warning("Parse error", "Standard integer types\n");
-	  return type_undefined;
-	}
-    }
-}
-
-type make_standard_long_integer_type(type t)
-{
-  if (t == type_undefined)
-    {
-      variable v = make_variable(make_basic_int(DEFAULT_LONG_INTEGER_TYPE_SIZE),NIL,NIL);
-      return make_type_variable(v); 
-    } 
-  else
-    {
-      if (signed_type_p(t) || unsigned_type_p(t) || long_type_p(t))
-	{
-	  basic b = variable_basic(type_variable(t));
-	  int i = basic_int(b);
-	  variable v; 
-	  if (i%10 == DEFAULT_INTEGER_TYPE_SIZE)
-	    {
-	      /* long */
-	      v = make_variable(make_basic_int(10*(i/10)+DEFAULT_LONG_INTEGER_TYPE_SIZE),NIL,NIL);
-	      pips_debug(8,"Old basic size: %d, new size : %d\n",i,10*(i/10)+DEFAULT_LONG_INTEGER_TYPE_SIZE);
-	    }
-	  else 
-	    {
-	      /* long long */
-	      v = make_variable(make_basic_int(10*(i/10)+DEFAULT_LONG_LONG_INTEGER_TYPE_SIZE),NIL,NIL);
-	      pips_debug(8,"Old basic size: %d, new size : %d\n",i,10*(i/10)+DEFAULT_LONG_LONG_INTEGER_TYPE_SIZE);
-	    }
-	  return make_type_variable(v);
-	}
-      else 
-	{
-	  if (bit_type_p(t))
-	    /* If it is long int i:5, keep the bit basic type*/
-	    return t; 
-	  else
-	    user_warning("Parse error", "Standard long integer types\n");
-	  return type_undefined;
-	}
-    }
-}
+// Moved to ri-util/type.c
 
 /******************* ENTITIES *******************/
 
@@ -1301,6 +1186,26 @@ void UpdateDerivedEntities(list ld, list le, stack ContextStack)
   },le);
 
 } 
+
+void InitializeEnumMemberValues(list lem)
+{
+  // enum member with implicit values are not yet fully instantiated
+  list cem = list_undefined;
+  int cv = 0;
+
+  for(cem = lem; !ENDP(cem); POP(cem)) {
+    entity em = ENTITY(CAR(cem));
+    value emv = entity_initial(em);
+
+    if(value_undefined_p(emv)) {
+      entity_initial(em) = make_value(is_value_constant, make_constant(is_constant_int, cv));
+    }
+    else {
+      cv = constant_int(value_constant(emv));
+    }
+    cv++;
+  }
+}
 
 entity MakeDerivedEntity(string name, list members, bool is_external, int i)
 {

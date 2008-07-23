@@ -1444,6 +1444,8 @@ type_spec:   /* ISO 6.7.2 */
                           /* Create the enum entity */
 			  entity ent = MakeDerivedEntity($2,$4,is_external,is_type_enum);
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
+
+			  InitializeEnumMemberValues($4);
 			  c_parser_context_type(context) = make_type_variable(v);  
 			  $$ = CONS(ENTITY,ent,NIL);
 			}                   
@@ -1453,6 +1455,8 @@ type_spec:   /* ISO 6.7.2 */
 			  string s = strdup(concatenate("PIPS_ENUM_",int_to_string(derived_counter++),NULL));
 			  entity ent = MakeDerivedEntity(s,$3,is_external,is_type_enum);
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
+
+			  InitializeEnumMemberValues($3);
 			  c_parser_context_type(context) = make_type_variable(v);  
 			  $$ = CONS(ENTITY,ent,NIL);
 			}
@@ -1622,6 +1626,7 @@ enumerator:
 			  variable v = make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL);
 			  entity_storage(ent) = make_storage_rom();
 			  entity_type(ent) = make_type_variable(v);
+			  // enum_list is not available yet. Values should be fixed later.
 			  /*  entity_initial(ent) = MakeEnumeratorInitialValue(enum_list,enum_counter);*/
 			  $$ = ent;
 			}

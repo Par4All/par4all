@@ -2034,13 +2034,29 @@ text c_text_entity(entity module, entity e, int margin)
       pc = CHAIN_SWORD(pc,"enum ");
       pc = CHAIN_SWORD(pc,name);
       pc = CHAIN_SWORD(pc," {");
-      MAP(ENTITY,ent,
-      { 
+      list cl = list_undefined;
+      int cv = 0;
+
+      for(cl = l; !ENDP(cl); POP(cl)) {
+	entity em = ENTITY(CAR(cl));
+	value emv = entity_initial(em);
+	constant emc = value_constant(emv);
+	int n = constant_int(emc);
+
 	if (!first) 
-	  pc = CHAIN_SWORD(pc,", ");
-	pc = CHAIN_SWORD(pc,entity_user_name(ent));
+	  pc = CHAIN_SWORD(pc, ", ");
+	pc = CHAIN_SWORD(pc, entity_user_name(em));
+	if(n!=cv) {
+	  extern string int_to_string(int); // misplaced util function
+	  string ns = int_to_string(n);
+	  pc = CHAIN_SWORD(pc, "=");
+	  pc = CHAIN_SWORD(pc, ns);
+	  free(ns);
+	  cv = n;
+	}
+	cv++;
 	first = FALSE;
-      },l);
+      };
       pc = CHAIN_SWORD(pc,"};");
       ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
 					    make_unformatted(NULL,0,margin,pc)));
