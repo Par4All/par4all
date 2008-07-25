@@ -252,7 +252,7 @@ static list build_real_resources(string oname, list lvr)
 		    (local_name_to_top_level_entity(on)) == TRUE)
 		{
 		    if (number_of_main)
-			pips_internal_error("More the one main\n");
+			pips_internal_error("More than one main\n");
 		    
 		    number_of_main++;
 		    pips_debug(8, "Main is %s\n", (string) on);
@@ -351,16 +351,19 @@ static list build_real_resources(string oname, list lvr)
 	  {
 	    string compilation_unit_name = compilation_unit_of_module(oname);
 
-	    if(!string_undefined_p(compilation_unit_name)) {
-	      add_res(vrn, compilation_unit_name);
-	      free(compilation_unit_name);
-	    }
-	    else {
+	    if(string_undefined_p(compilation_unit_name)) {
 	      /* Source code for module oname is not available */
-	      pips_user_error("No source code for module %s.\n"
-			      "Code synthesis not available for C.\n",
-			      oname);
+	      if(compilation_unit_p(oname)) {
+		pips_internal_error("Synthetic compilation units cannot be missing"
+				    " because they are synthesized"
+				    " with the corresponding file\n", oname);
+	      }
+	      pips_user_warning("No source code for module %s.\n", oname);
+	      compilation_unit_name = strdup(concatenate(oname, FILE_SEP_STRING, NULL));
 	    }
+
+	    add_res(vrn, compilation_unit_name);
+	    free(compilation_unit_name);
 	    break;
 	  }
 

@@ -493,55 +493,55 @@ expression:
 			}
 |   TK_PLUS expression
 		        {
-			  $$ = MakeUnaryCall(CreateIntrinsic("+unary"), $2);
+			  $$ = MakeUnaryCall(CreateIntrinsic(UNARY_PLUS_OPERATOR_NAME), $2);
 			}
 |   TK_MINUS expression
 		        {
-			  $$ = MakeUnaryCall(CreateIntrinsic("--"), $2);
+			  $$ = MakeUnaryCall(CreateIntrinsic(UNARY_MINUS_OPERATOR_NAME), $2);
 			}
 |   TK_STAR expression
 		        {
-			  $$ = MakeUnaryCall(CreateIntrinsic("*indirection"), $2);
+			  $$ = MakeUnaryCall(CreateIntrinsic(DEREFERENCING_OPERATOR_NAME), $2);
 			}
 |   TK_AND expression				%prec TK_ADDROF
 		        {
-			  $$ = MakeUnaryCall(CreateIntrinsic("&"), $2);
+			  $$ = MakeUnaryCall(CreateIntrinsic(ADDRESS_OF_OPERATOR_NAME), $2);
 			}
 |   TK_EXCLAM expression
 		        {
-			  $$ = MakeUnaryCall(CreateIntrinsic("!"), $2);
+			  $$ = MakeUnaryCall(CreateIntrinsic(C_NOT_OPERATOR_NAME), $2);
 			}
 |   TK_TILDE expression
 		        {
-			  $$ = MakeUnaryCall(CreateIntrinsic("~"), $2);
+			  $$ = MakeUnaryCall(CreateIntrinsic(BITWISE_NOT_OPERATOR_NAME), $2);
 			}
 |   TK_PLUS_PLUS expression                    %prec TK_CAST
 		        {
-			  $$ = MakeUnaryCall(CreateIntrinsic("++pre"), $2);
+			  $$ = MakeUnaryCall(CreateIntrinsic(PRE_INCREMENT_OPERATOR_NAME), $2);
 			}
 |   expression TK_PLUS_PLUS
 		        {
-			  $$ = MakeUnaryCall(CreateIntrinsic("post++"), $1);
+			  $$ = MakeUnaryCall(CreateIntrinsic(POST_INCREMENT_OPERATOR_NAME), $1);
 			}
 |   TK_MINUS_MINUS expression                  %prec TK_CAST
 		        {
-			  $$ = MakeUnaryCall(CreateIntrinsic("--pre"), $2);
+			  $$ = MakeUnaryCall(CreateIntrinsic(PRE_DECREMENT_OPERATOR_NAME), $2);
 			}
 |   expression TK_MINUS_MINUS
 		        {
-			  $$ = MakeUnaryCall(CreateIntrinsic("post--"), $1);
+			  $$ = MakeUnaryCall(CreateIntrinsic(POST_DECREMENT_OPERATOR_NAME), $1);
 			}
 |   expression TK_ARROW id_or_typename
 		        {	
 			  /* Find the struct/union type of the expression
 			     then the struct/union member entity and transform it to expression */
 			  expression exp = MemberIdentifierToExpression($1,$3); 
-			  $$ = MakeBinaryCall(CreateIntrinsic("->"),$1,exp);
+			  $$ = MakeBinaryCall(CreateIntrinsic(POINT_TO_OPERATOR_NAME),$1,exp);
 			}
 |   expression TK_DOT id_or_typename
 		        {
 			  expression exp = MemberIdentifierToExpression($1,$3);
-			  $$ = MakeBinaryCall(CreateIntrinsic("."),$1,exp);
+			  $$ = MakeBinaryCall(CreateIntrinsic(FIELD_OPERATOR_NAME),$1,exp);
 			}
 |   TK_LPAREN block TK_RPAREN
 		        {
@@ -566,134 +566,134 @@ expression:
 			}
 |   expression TK_QUEST opt_expression TK_COLON expression
 			{
-			  $$ = MakeTernaryCallExpr(CreateIntrinsic("?"), $1, $3, $5);
+			  $$ = MakeTernaryCallExpr(CreateIntrinsic(CONDITIONAL_OPERATOR_NAME), $1, $3, $5);
 			}
 |   expression TK_PLUS expression
 			{ 
-			  $$ = MakeBinaryCall(CreateIntrinsic("+C"), $1, $3); 
+			  $$ = MakeBinaryCall(CreateIntrinsic(PLUS_C_OPERATOR_NAME), $1, $3); 
 			}
 |   expression TK_MINUS expression
 			{ 
-			  $$ = MakeBinaryCall(CreateIntrinsic("-C"), $1, $3); 
+			  $$ = MakeBinaryCall(CreateIntrinsic(MINUS_C_OPERATOR_NAME), $1, $3); 
 			}
 |   expression TK_STAR expression
 			{ 
-			  $$ = MakeBinaryCall(CreateIntrinsic("*"), $1, $3); 
+			  $$ = MakeBinaryCall(CreateIntrinsic(MULTIPLY_OPERATOR_NAME), $1, $3); 
 			}
 |   expression TK_SLASH expression
 			{ 
-			  $$ = MakeBinaryCall(CreateIntrinsic("/"), $1, $3); 
+			  $$ = MakeBinaryCall(CreateIntrinsic(DIVIDE_OPERATOR_NAME), $1, $3); 
 			}
 |   expression TK_PERCENT expression
 			{ 
-			  $$ = MakeBinaryCall(CreateIntrinsic("%"), $1, $3); 
+			  $$ = MakeBinaryCall(CreateIntrinsic(C_MODULO_OPERATOR_NAME), $1, $3); 
 			}
 |   expression TK_AND_AND expression
 			{
-			  $$ = MakeBinaryCall(CreateIntrinsic("&&"), $1, $3); 
+			  $$ = MakeBinaryCall(CreateIntrinsic(C_AND_OPERATOR_NAME), $1, $3); 
 			}
 |   expression TK_PIPE_PIPE expression
 			{
-			  $$ = MakeBinaryCall(CreateIntrinsic("||"), $1, $3); 
+			  $$ = MakeBinaryCall(CreateIntrinsic(C_OR_OPERATOR_NAME), $1, $3); 
 			}
 |   expression TK_AND expression
 			{
-			  $$ = MakeBinaryCall(CreateIntrinsic("&bitand"), $1, $3); 
+			  $$ = MakeBinaryCall(CreateIntrinsic(BITWISE_AND_OPERATOR_NAME), $1, $3); 
 			}
 |   expression TK_PIPE expression
 			{
-			  $$ = MakeBinaryCall(CreateIntrinsic("|"), $1, $3); 
+			  $$ = MakeBinaryCall(CreateIntrinsic(BITWISE_OR_OPERATOR_NAME), $1, $3); 
 			}
 |   expression TK_CIRC expression
 			{
-			  $$ = MakeBinaryCall(CreateIntrinsic("^"), $1, $3); 
+			  $$ = MakeBinaryCall(CreateIntrinsic(BITWISE_XOR_OPERATOR_NAME), $1, $3); 
 			}
 |   expression TK_EQ_EQ expression
 			{
-			  $$ = MakeBinaryCall(CreateIntrinsic("=="), $1, $3); 
+			  $$ = MakeBinaryCall(CreateIntrinsic(C_EQUAL_OPERATOR_NAME), $1, $3); 
 			}
 |   expression TK_EXCLAM_EQ expression
 			{
-			  $$ = MakeBinaryCall(CreateIntrinsic("!="), $1, $3); 
+			  $$ = MakeBinaryCall(CreateIntrinsic(C_NON_EQUAL_OPERATOR_NAME), $1, $3); 
 			}
 |   expression TK_INF expression
 			{
-			  $$ = MakeBinaryCall(CreateIntrinsic("<"), $1, $3); 
+			  $$ = MakeBinaryCall(CreateIntrinsic(C_LESS_THAN_OPERATOR_NAME), $1, $3); 
 			}
 |   expression TK_SUP expression
 			{
-			  $$ = MakeBinaryCall(CreateIntrinsic(">"), $1, $3); 
+			  $$ = MakeBinaryCall(CreateIntrinsic(C_GREATER_THAN_OPERATOR_NAME), $1, $3); 
 			}
 |   expression TK_INF_EQ expression
 			{
-			  $$ = MakeBinaryCall(CreateIntrinsic("<="), $1, $3); 
+			  $$ = MakeBinaryCall(CreateIntrinsic(C_LESS_OR_EQUAL_OPERATOR_NAME), $1, $3); 
 			}
 |   expression TK_SUP_EQ expression
 			{
-			  $$ = MakeBinaryCall(CreateIntrinsic(">="), $1, $3); 
+			  $$ = MakeBinaryCall(CreateIntrinsic(C_GREATER_OR_EQUAL_OPERATOR_NAME), $1, $3); 
 			}
 |   expression TK_INF_INF expression
 			{
-			  $$ = MakeBinaryCall(CreateIntrinsic("<<"), $1, $3); 
+			  $$ = MakeBinaryCall(CreateIntrinsic(LEFT_SHIFT_OPERATOR_NAME), $1, $3); 
 			}
 |   expression TK_SUP_SUP expression
 			{
-			  $$ = MakeBinaryCall(CreateIntrinsic(">>"), $1, $3); 
+			  $$ = MakeBinaryCall(CreateIntrinsic(RIGHT_SHIFT_OPERATOR_NAME), $1, $3); 
 			}
 |   expression TK_EQ expression
 			{
 			  (void) simplify_C_expression($3);
-			  $$ = MakeBinaryCall(CreateIntrinsic("="), $1, $3); 
+			  $$ = MakeBinaryCall(CreateIntrinsic(ASSIGN_OPERATOR_NAME), $1, $3); 
 			}
 |   expression TK_PLUS_EQ expression
 			{
 			  (void) simplify_C_expression($3);
-			  $$ = MakeBinaryCall(CreateIntrinsic("+="), $1, $3); 
+			  $$ = MakeBinaryCall(CreateIntrinsic(PLUS_UPDATE_OPERATOR_NAME), $1, $3); 
 			}
 |   expression TK_MINUS_EQ expression
 			{
 			  (void) simplify_C_expression($3);
-			  $$ = MakeBinaryCall(CreateIntrinsic("-="), $1, $3); 
+			  $$ = MakeBinaryCall(CreateIntrinsic(MINUS_UPDATE_OPERATOR_NAME), $1, $3); 
 			}
 |   expression TK_STAR_EQ expression
 			{
 			  (void) simplify_C_expression($3);
-			  $$ = MakeBinaryCall(CreateIntrinsic("*="), $1, $3); 
+			  $$ = MakeBinaryCall(CreateIntrinsic(MULTIPLY_UPDATE_OPERATOR_NAME), $1, $3); 
 			}
 |   expression TK_SLASH_EQ expression
 			{
 			  (void) simplify_C_expression($3);
-			  $$ = MakeBinaryCall(CreateIntrinsic("/="), $1, $3); 
+			  $$ = MakeBinaryCall(CreateIntrinsic(DIVIDE_UPDATE_OPERATOR_NAME), $1, $3); 
 			}
 |   expression TK_PERCENT_EQ expression
 			{
 			  (void) simplify_C_expression($3);
-			  $$ = MakeBinaryCall(CreateIntrinsic("%="), $1, $3); 
+			  $$ = MakeBinaryCall(CreateIntrinsic(MODULO_UPDATE_OPERATOR_NAME), $1, $3); 
 			}
 |   expression TK_AND_EQ expression
 			{
 			  (void) simplify_C_expression($3);
-			  $$ = MakeBinaryCall(CreateIntrinsic("&="), $1, $3); 
+			  $$ = MakeBinaryCall(CreateIntrinsic(BITWISE_AND_UPDATE_OPERATOR_NAME), $1, $3); 
 			}
 |   expression TK_PIPE_EQ expression
 			{
 			  (void) simplify_C_expression($3);
-			  $$ = MakeBinaryCall(CreateIntrinsic("|="), $1, $3); 
+			  $$ = MakeBinaryCall(CreateIntrinsic(BITWISE_OR_UPDATE_OPERATOR_NAME), $1, $3); 
 			}
 |   expression TK_CIRC_EQ expression
 			{
 			  (void) simplify_C_expression($3);
-			  $$ = MakeBinaryCall(CreateIntrinsic("^="), $1, $3); 
+			  $$ = MakeBinaryCall(CreateIntrinsic(BITWISE_XOR_UPDATE_OPERATOR_NAME), $1, $3); 
 			}
 |   expression TK_INF_INF_EQ expression	
 			{
 			  (void) simplify_C_expression($3);
-			  $$ = MakeBinaryCall(CreateIntrinsic("<<="), $1, $3); 
+			  $$ = MakeBinaryCall(CreateIntrinsic(LEFT_SHIFT_UPDATE_OPERATOR_NAME), $1, $3); 
 			}
 |   expression TK_SUP_SUP_EQ expression
 			{
 			  (void) simplify_C_expression($3);
-			  $$ = MakeBinaryCall(CreateIntrinsic(">>="), $1, $3); 
+			  $$ = MakeBinaryCall(CreateIntrinsic(RIGHT_SHIFT_UPDATE_OPERATOR_NAME), $1, $3); 
 			}
 |   TK_LPAREN type_name TK_RPAREN expression
 		        {

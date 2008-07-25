@@ -153,6 +153,20 @@ char *s;
 		       s, SEQUENTIAL_FORTRAN_EXT, NULL));
 }
 
+bool string_fortran_filename_p(string s)
+{
+  int fnl = strlen(s);
+  int sl = strlen(SEQUENTIAL_FORTRAN_EXT);
+  bool is_fortran = FALSE;
+
+  if(fnl<=sl)
+    is_fortran = FALSE;
+  else
+    is_fortran = strcmp(SEQUENTIAL_FORTRAN_EXT, s+(fnl-sl))==0;
+
+  return is_fortran; 
+}
+
 string 
 module_fortranfilename(e)
 entity e;

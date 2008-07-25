@@ -36,6 +36,7 @@
 #define PARALLEL_CODE_EXT ".parcode"
  
 #define SEQUENTIAL_FORTRAN_EXT ".f"
+#define SEQUENTIAL_C_EXT ".c"
 #define PARALLEL_FORTRAN_EXT ".parf"
 #define PARALLEL_C_EXT ".parc"
 #define PREDICAT_FORTRAN_EXT ".pref"

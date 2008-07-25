@@ -128,12 +128,8 @@ entity get_current_compilation_unit_entity()
 
 void MakeCurrentCompilationUnitEntity(string name)
 {
-  entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,name);
-  /* Normally, the storage must be rom but in order to store the list of entities
-     declared with extern, we use the ram storage to put this list in ram_shared*/
-  entity_storage(e) = make_storage_ram(make_ram(entity_undefined,entity_undefined,0,NIL));
-  entity_type(e) = make_type_functional(make_functional(NIL,make_type_unknown()));
-  entity_initial(e) = make_value(is_value_code, make_code(NIL,strdup(""), make_sequence(NIL),NIL));
+  entity e = MakeCompilationUnitEntity(name);
+
   pips_debug(4,"Set current module entity for compilation unit %s\n",name);
   set_current_module_entity(e);
   //init_stack_storage_table();
@@ -182,7 +178,7 @@ expression MakeCommaExpression(list l)
     return expression_undefined;
   if (gen_length(l)==1)
     return EXPRESSION(CAR(l));
-  return make_call_expression(CreateIntrinsic(","),l);
+  return make_call_expression(CreateIntrinsic(COMMA_OPERATOR_NAME),l);
 }
 
 expression MakeBraceExpression(list l)
@@ -1198,7 +1194,8 @@ void InitializeEnumMemberValues(list lem)
     value emv = entity_initial(em);
 
     if(value_undefined_p(emv)) {
-      entity_initial(em) = make_value(is_value_constant, make_constant(is_constant_int, cv));
+      entity_initial(em) = make_value(is_value_constant,
+				      make_constant(is_constant_int, (void *) cv));
     }
     else {
       cv = constant_int(value_constant(emv));
@@ -1525,8 +1522,32 @@ static bool callnodeclfilter(call c)
   if(!(gen_in_list_p(e, entity_declarations(get_current_module_entity()))
        || gen_in_list_p(e, entity_declarations(get_current_compilation_unit_entity()))))
     {
-      declarationerror_p = TRUE;
-      user_log("\n\nNo declaration of function: %s in module: %s \n",
+      // Implicit declaration of an external function: returns an int
+      // Compute arguments type from call c
+      type ot = entity_type(e);
+      type rt = make_type(is_type_variable, 
+			  make_variable(make_basic(is_basic_int, (void *) DEFAULT_INTEGER_TYPE_SIZE),
+					NIL,
+					NIL));
+      list ptl = NIL;
+      list args = call_arguments(c);
+      list carg = list_undefined;
+      type ft = type_undefined;
+
+      for(carg=args; !ENDP(carg); POP (carg)) {
+	expression ce = EXPRESSION(CAR(carg));
+	type ct = expression_to_type(ce);
+	parameter cp = make_parameter(ct, make_mode(is_mode_value, UU));
+
+	ptl = gen_nconc(ptl, CONS(PARAMETER, cp, NIL));
+      }
+      ft = make_type(is_type_functional, make_functional(ptl, rt));
+
+      free_type(ot);
+      entity_type(e) = ft;
+
+      pips_user_warning("\n\nNo declaration of function %s in module %s\n"
+			"Implicit declaration added\n",
 	       entity_local_name(e), get_current_module_name());
     }
   }

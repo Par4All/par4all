@@ -860,6 +860,19 @@ basic_of_intrinsic(call c)
       /* leave it overloaded */
       ;
     }
+    else if(strcmp(entity_name(f),"TOP-LEVEL:&")==0) {
+      string s = entity_user_name(f);
+      bool b = ENTITY_ADDRESS_OF_P(f);
+      expression e = EXPRESSION(CAR(args));
+      basic eb = basic_of_expression(e);
+      // Forget multidimensional types
+      type et = make_type(is_type_variable,
+			  make_variable(eb, NIL, NIL));
+
+      fprintf(stderr, "b=%d, s=%s\n", b, s);
+      free_basic(rb);
+      rb = make_basic(is_basic_pointer, et);
+    }
     else {
       free_basic(rb);
       rb = basic_of_expression(EXPRESSION(CAR(args)));

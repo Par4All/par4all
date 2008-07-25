@@ -741,19 +741,29 @@ words_genuine_regular_call(call obj, bool is_a_subroutine)
 static list 
 words_assign_op(call obj,
 		int __attribute__ ((unused)) precedence,
-		bool __attribute__ ((unused)) leftmost) {
-    list pc = NIL, args = call_arguments(obj);
-    int prec = words_intrinsic_precedence(obj);
+		bool __attribute__ ((unused)) leftmost)
+{
+  list pc = NIL, args = call_arguments(obj);
+  int prec = words_intrinsic_precedence(obj);
+  string fun = entity_local_name(call_function(obj));
 
-    pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(args)), prec, TRUE));
-    /* FI->NN: I revert to the previous version to keep the SPACES
-       surrounding the assignment operator.Do not forget the strdup or
-       nothing can later be freed. */
-    pc = CHAIN_SWORD(pc," ");
-    pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj))); 
-    pc = CHAIN_SWORD(pc," ");
-    pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(args))), prec, TRUE));
-    return(pc);
+  pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(args)), prec, TRUE));
+
+  if (strcmp(fun,MODULO_UPDATE_OPERATOR_NAME) == 0)
+    fun = "%";
+  else if (strcmp(fun,BITWISE_AND_UPDATE_OPERATOR_NAME) == 0)
+    fun = "&=";
+  else if (strcmp(fun,BITWISE_XOR_UPDATE_OPERATOR_NAME) == 0)
+    fun = "^=";
+
+  /* FI->NN: I revert to the previous version to keep the SPACES
+     surrounding the assignment operator.Do not forget the strdup or
+     nothing can later be freed. */
+  pc = CHAIN_SWORD(pc," ");
+  pc = CHAIN_SWORD(pc, fun); 
+  pc = CHAIN_SWORD(pc," ");
+  pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(args))), prec, TRUE));
+  return(pc);
 }
 
 static list 
@@ -1185,32 +1195,37 @@ words_prefix_unary_op(call obj,
 		      int __attribute__ ((unused)) precedence,
 		      bool __attribute__ ((unused)) leftmost)
 {
-    list pc = NIL;
-    expression e = EXPRESSION(CAR(call_arguments(obj)));
-    int prec = words_intrinsic_precedence(obj);
-    string fun = entity_local_name(call_function(obj));
-    if (strcmp(fun,"++pre") == 0) 
-      fun = "++";
-    else 
-      if (strcmp(fun,"--pre") == 0) 
-	fun = "--";
-      else
-	if (strcmp(fun,"*indirection") == 0) 
-	  /* Since we put no spaces around an operator (to not change Fortran), the blank 
-	     before '*' is used to avoid the confusion in the case of divide operator, i.e 
-	     d1 = 1.0 / *det  in function inv_j, SPEC2000 quake benchmark. */
-	  fun = " *";
-	else
-	 if (strcmp(fun,"+unary") == 0) 
-	    fun = "+";
-	 else if(!is_fortran){ 
-	   if(strcasecmp(fun, NOT_OPERATOR_NAME)==0)
-      fun=C_NOT_OPERATOR_NAME;
-	 }
-    pc = CHAIN_SWORD(pc,strdup(fun));
-    pc = gen_nconc(pc, words_subexpression(e, prec, FALSE));
+  list pc = NIL;
+  expression e = EXPRESSION(CAR(call_arguments(obj)));
+  int prec = words_intrinsic_precedence(obj);
+  string fun = entity_local_name(call_function(obj));
+  if (strcmp(fun,PRE_INCREMENT_OPERATOR_NAME) == 0) 
+    fun = "++";
+  else if (strcmp(fun,PRE_DECREMENT_OPERATOR_NAME) == 0) 
+    fun = "--";
+  else if (strcmp(fun,ADDRESS_OF_OPERATOR_NAME) == 0) 
+    fun = "&";
+  else if (strcmp(fun,C_NOT_OPERATOR_NAME) == 0) 
+    fun = "!";
+  else if (strcmp(fun,BITWISE_NOT_OPERATOR_NAME) == 0) 
+    fun = "~";
+  else
+    if (strcmp(fun,"*indirection") == 0) 
+      /* Since we put no spaces around an operator (to not change Fortran), the blank 
+	 before '*' is used to avoid the confusion in the case of divide operator, i.e 
+	 d1 = 1.0 / *det  in function inv_j, SPEC2000 quake benchmark. */
+      fun = " *";
+    else
+      if (strcmp(fun,"+unary") == 0) 
+	fun = "+";
+      else if(!is_fortran){ 
+	if(strcasecmp(fun, NOT_OPERATOR_NAME)==0)
+	  fun=C_NOT_OPERATOR_NAME;
+      }
+  pc = CHAIN_SWORD(pc,strdup(fun));
+  pc = gen_nconc(pc, words_subexpression(e, prec, FALSE));
 
-    return(pc);
+  return(pc);
 }
 
 static list
@@ -1224,10 +1239,13 @@ words_postfix_unary_op(call obj,
     string fun = entity_local_name(call_function(obj));
 
     pc = gen_nconc(pc, words_subexpression(e, prec, FALSE));
-    if (strstr(fun,"post") != NULL)
-      pc = CHAIN_SWORD(pc,strstr(fun,"post")+4);
-    else 
-      pc = CHAIN_SWORD(pc,fun);
+
+    if (strcmp(fun,POST_INCREMENT_OPERATOR_NAME) == 0)
+      fun = "++";
+    else if (strcmp(fun,POST_DECREMENT_OPERATOR_NAME) == 0)
+     fun = "--";
+
+    pc = CHAIN_SWORD(pc,fun);
     
     return(pc);
 }
@@ -1477,7 +1495,7 @@ words_infix_binary_op(call obj, int precedence, bool leftmost)
   list we2;
   string fun = entity_local_name(call_function(obj));
 
-  if ( strcmp(fun, "/") == 0 )
+  if ( strcmp(fun, DIVIDE_OPERATOR_NAME) == 0 )
     we2 = words_subexpression(EXPRESSION(CAR(CDR(args))), MAXIMAL_PRECEDENCE, FALSE);
   else if ( strcmp(fun, "-") == 0 ) {
     expression exp = EXPRESSION(CAR(CDR(args)));
@@ -1489,7 +1507,7 @@ words_infix_binary_op(call obj, int precedence, bool leftmost)
     else
       we2 = words_subexpression(exp, MAXIMAL_PRECEDENCE, FALSE);
   }
-  else if ( strcmp(fun, "*") == 0 ) {
+  else if ( strcmp(fun, MULTIPLY_OPERATOR_NAME) == 0 ) {
     expression exp = EXPRESSION(CAR(CDR(args)));
     if ( expression_call_p(exp) &&
 	 ENTITY_DIVIDE_P(call_function(syntax_call(expression_syntax(exp))))) {
@@ -1516,6 +1534,12 @@ words_infix_binary_op(call obj, int precedence, bool leftmost)
     fun = "-";
   else  if ( strcmp(fun,BITWISE_AND_OPERATOR_NAME) == 0 )
     fun = "&";
+  else  if ( strcmp(fun,BITWISE_XOR_OPERATOR_NAME) == 0 )
+    fun = "^";
+  else  if ( strcmp(fun,C_AND_OPERATOR_NAME) == 0 )
+    fun = "&&";
+  else  if ( strcmp(fun,C_MODULO_OPERATOR_NAME) == 0 )
+    fun = "%";
   else if (!is_fortran){
     if(strcasecmp(fun, GREATER_THAN_OPERATOR_NAME)==0)
 	
@@ -1601,63 +1625,63 @@ static struct intrinsic_handler {
     list (*f)();
     int prec;
 } tab_intrinsic_handler[] = {
-    {"**", words_infix_binary_op, 30},
+    {POWER_OPERATOR_NAME, words_infix_binary_op, 30},
 
-    {"//", words_infix_binary_op, 30},
+    {CONCATENATION_FUNCTION_NAME, words_infix_binary_op, 30},
 
     /* The Fortran 77 standard does not allow x*-3 or x+-3, but this is dealt
     * with by argument leftmost, not by prorities.
     */
-    {"--", words_unary_minus, 25},
+    {UNARY_MINUS_OPERATOR_NAME, words_unary_minus, 25},
     /* {"--", words_unary_minus, 19}, */
 
-    {"*", words_infix_binary_op, 21},
-    {"/", words_infix_binary_op, 21},
+    {MULTIPLY_OPERATOR_NAME, words_infix_binary_op, 21},
+    {DIVIDE_OPERATOR_NAME, words_infix_binary_op, 21},
     
     {INVERSE_OPERATOR_NAME, words_inverse_op, 21}, 
     
-    {"+", words_infix_binary_op, 20},
-    {"-", words_infix_binary_op, 20},
+    {PLUS_OPERATOR_NAME, words_infix_binary_op, 20},
+    {MINUS_OPERATOR_NAME, words_infix_binary_op, 20},
 
     /* Non-arithemtic operators have priorities lesser than MINIMAL_ARITHMETIC_PRECEDENCE
      * leftmost is restaured to true for unary minus.
      */
 
-    {".LT.", words_infix_binary_op, 15},
-    {".GT.", words_infix_binary_op, 15},
-    {".LE.", words_infix_binary_op, 15},
-    {".GE.", words_infix_binary_op, 15},
-    {".EQ.", words_infix_binary_op, 15},
-    {".NE.", words_infix_binary_op, 15},
+    {LESS_THAN_OPERATOR_NAME, words_infix_binary_op, 15},
+    {GREATER_THAN_OPERATOR_NAME, words_infix_binary_op, 15},
+    {LESS_OR_EQUAL_OPERATOR_NAME, words_infix_binary_op, 15},
+    {GREATER_OR_EQUAL_OPERATOR_NAME, words_infix_binary_op, 15},
+    {EQUAL_OPERATOR_NAME, words_infix_binary_op, 15},
+    {NON_EQUAL_OPERATOR_NAME, words_infix_binary_op, 15},
 
-    {".NOT.", words_prefix_unary_op, 9},
+    {NOT_OPERATOR_NAME, words_prefix_unary_op, 9},
 
-    {".AND.", words_infix_binary_op, 8},
+    {AND_OPERATOR_NAME, words_infix_binary_op, 8},
 
-    {".OR.", words_infix_binary_op, 6},
+    {OR_OPERATOR_NAME, words_infix_binary_op, 6},
 
-    {".EQV.", words_infix_binary_op, 3},
-    {".NEQV.", words_infix_binary_op, 3},
+    {EQUIV_OPERATOR_NAME, words_infix_binary_op, 3},
+    {NON_EQUIV_OPERATOR_NAME, words_infix_binary_op, 3},
 
-    {"=", words_assign_op, 1},
+    {ASSIGN_OPERATOR_NAME, words_assign_op, 1},
 
-    {"WRITE", words_io_inst, 0},
-    {"READ", words_io_inst, 0},
-    {"PRINT", words_io_inst, 0},
-    {"OPEN", words_io_inst, 0},
-    {"CLOSE", words_io_inst, 0},
-    {"INQUIRE", words_io_inst, 0},
-    {"BACKSPACE", words_io_inst, 0},
-    {"REWIND", words_io_inst, 0},
-    {"ENDFILE", words_io_inst, 0},
-    {"IMPLIED-DO", words_implied_do, 0},
+    {WRITE_FUNCTION_NAME, words_io_inst, 0},
+    {READ_FUNCTION_NAME, words_io_inst, 0},
+    {PRINT_FUNCTION_NAME, words_io_inst, 0},
+    {OPEN_FUNCTION_NAME, words_io_inst, 0},
+    {CLOSE_FUNCTION_NAME, words_io_inst, 0},
+    {INQUIRE_FUNCTION_NAME, words_io_inst, 0},
+    {BACKSPACE_FUNCTION_NAME, words_io_inst, 0},
+    {REWIND_FUNCTION_NAME, words_io_inst, 0},
+    {ENDFILE_FUNCTION_NAME, words_io_inst, 0},
+    {IMPLIED_DO_FUNCTION_NAME, words_implied_do, 0},
 
     {RETURN_FUNCTION_NAME, words_nullary_op,0},
-    {"PAUSE", words_nullary_op,0 },
-    {"STOP", words_nullary_op, 0},
-    {"CONTINUE", words_nullary_op,0},
-    {"END", words_nullary_op, 0},
- 
+    {PAUSE_FUNCTION_NAME, words_nullary_op,0 },
+    {STOP_FUNCTION_NAME, words_nullary_op, 0},
+    {CONTINUE_FUNCTION_NAME, words_nullary_op,0},
+    {END_FUNCTION_NAME, words_nullary_op, 0},
+
     {FORMAT_FUNCTION_NAME, words_prefix_unary_op, 0},
     {UNBOUNDED_DIMENSION_NAME, words_unbounded_dimension, 0},
     {LIST_DIRECTED_FORMAT_NAME, words_list_directed, 0},
@@ -1686,62 +1710,60 @@ multiply-add operators ( JZ - sept 98) */
        "The C programming language" of Kernighan and Ritchie, and by 
        taking into account the precedence value of Fortran intrinsics. */
     
-    { ".", words_infix_binary_op, 30},
-    { "->", words_infix_binary_op, 30},
+    {FIELD_OPERATOR_NAME, words_infix_binary_op, 30},
+    {POINT_TO_OPERATOR_NAME, words_infix_binary_op, 30},
 
-    { "post++", words_postfix_unary_op, 25},
-    {"post--",  words_postfix_unary_op, 25},
-    {"++pre",  words_prefix_unary_op, 25},
-    {"--pre",  words_prefix_unary_op, 25},
-    {"&",  words_prefix_unary_op,25},
-    {"*indirection",  words_prefix_unary_op, 25},
-    {"+unary", words_prefix_unary_op, 25},
+    {POST_INCREMENT_OPERATOR_NAME, words_postfix_unary_op, 25},
+    {POST_DECREMENT_OPERATOR_NAME, words_postfix_unary_op, 25},
+    {PRE_INCREMENT_OPERATOR_NAME,  words_prefix_unary_op, 25},
+    {PRE_DECREMENT_OPERATOR_NAME,  words_prefix_unary_op, 25},
+    {ADDRESS_OF_OPERATOR_NAME,     words_prefix_unary_op,25},
+    {DEREFERENCING_OPERATOR_NAME,  words_prefix_unary_op, 25},
+
+    {UNARY_PLUS_OPERATOR_NAME, words_prefix_unary_op, 25},
     /*{"-unary", words_prefix_unary_op, 25},*/
-    {"~", words_prefix_unary_op, 25},
-    {"!", words_prefix_unary_op, 25},
+    {BITWISE_NOT_OPERATOR_NAME, words_prefix_unary_op, 25},
+    {C_NOT_OPERATOR_NAME, words_prefix_unary_op, 25},
     
-    {"%",  words_infix_binary_op, 21},
+    {C_MODULO_OPERATOR_NAME,  words_infix_binary_op, 21},
     
-    {"+C", words_infix_binary_op, 20},
-    {"-C", words_infix_binary_op, 20},
- 
-    {"<<", words_infix_binary_op, 19},
-    {">>", words_infix_binary_op, 19}, 
+    {PLUS_C_OPERATOR_NAME, words_infix_binary_op, 20},
+    {MINUS_C_OPERATOR_NAME, words_infix_binary_op, 20},
 
-    {"<", words_infix_binary_op, 15 },
-    {">", words_infix_binary_op, 15 },
-    {"<=", words_infix_binary_op, 15 },
-    {">=", words_infix_binary_op, 15 }, 
+    {LEFT_SHIFT_OPERATOR_NAME, words_infix_binary_op, 19},
+    {RIGHT_SHIFT_OPERATOR_NAME, words_infix_binary_op, 19}, 
 
-    {"==", words_infix_binary_op, 14 },
-    {"!=", words_infix_binary_op, 14 },  
+    {C_LESS_THAN_OPERATOR_NAME, words_infix_binary_op, 15 },
+    {C_GREATER_THAN_OPERATOR_NAME, words_infix_binary_op, 15},
+    {C_LESS_OR_EQUAL_OPERATOR_NAME, words_infix_binary_op, 15},
+    {C_GREATER_OR_EQUAL_OPERATOR_NAME, words_infix_binary_op, 15}, 
+
+    {C_EQUAL_OPERATOR_NAME, words_infix_binary_op, 14},
+    {C_NON_EQUAL_OPERATOR_NAME, words_infix_binary_op, 14},  
   
-    {"&bitand", words_infix_binary_op, 13}, 
+    {BITWISE_AND_OPERATOR_NAME, words_infix_binary_op, 13}, 
+    {BITWISE_XOR_OPERATOR_NAME, words_infix_binary_op, 12},
+    {BITWISE_OR_OPERATOR_NAME, words_infix_binary_op, 11},
 
-    {"^", words_infix_binary_op, 12},
+    {C_AND_OPERATOR_NAME, words_infix_binary_op, 8}, 
+    {C_OR_OPERATOR_NAME, words_infix_binary_op, 6},    
 
-    {"|", words_infix_binary_op, 11},
-
-    {"&&", words_infix_binary_op, 8}, 
-
-    {"||", words_infix_binary_op, 6},    
-
-    {"*=", words_assign_op, 1 },
-    {"/=", words_assign_op, 1 },
-    {"%=", words_assign_op, 1 },
-    {"+=", words_assign_op, 1 },
-    {"-=", words_assign_op, 1 },
-    {"<<=", words_assign_op, 1 },
-    {">>=", words_assign_op, 1 },
-    {"&=", words_assign_op, 1 },
-    {"^=", words_assign_op, 1 },
-    {"|=", words_assign_op, 1 },
+    {MULTIPLY_UPDATE_OPERATOR_NAME, words_assign_op, 1},
+    {DIVIDE_UPDATE_OPERATOR_NAME, words_assign_op, 1},
+    {MODULO_UPDATE_OPERATOR_NAME, words_assign_op, 1},
+    {PLUS_UPDATE_OPERATOR_NAME, words_assign_op, 1},
+    {MINUS_UPDATE_OPERATOR_NAME, words_assign_op, 1},
+    {LEFT_SHIFT_UPDATE_OPERATOR_NAME, words_assign_op, 1},
+    {RIGHT_SHIFT_UPDATE_OPERATOR_NAME, words_assign_op, 1},
+    {BITWISE_AND_UPDATE_OPERATOR_NAME, words_assign_op, 1},
+    {BITWISE_XOR_UPDATE_OPERATOR_NAME, words_assign_op, 1},
+    {BITWISE_OR_UPDATE_OPERATOR_NAME, words_assign_op, 1},
 
     /* which precedence ?*/
-    {"?", words_conditional_op, 0},
+    {CONDITIONAL_OPERATOR_NAME, words_conditional_op, 0},
 
-    {",", words_comma_op, 0},
- 
+    {COMMA_OPERATOR_NAME, words_comma_op, 0},
+
     {NULL, null, 0}
 };
 

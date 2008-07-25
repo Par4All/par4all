@@ -71,21 +71,22 @@
 #define IMPLIED_COMPLEX_NAME		"CMPLX_"
 #define IMPLIED_DCOMPLEX_NAME		"DCMPLX_"
 
+#define FIELD_OPERATOR_NAME             "."
+#define POINT_TO_OPERATOR_NAME          "->"
+#define DEREFERENCING_OPERATOR_NAME     "*indirection"
+
 #define ASSIGN_OPERATOR_NAME 		"="
 #define POST_INCREMENT_OPERATOR_NAME    "post++"
 #define POST_DECREMENT_OPERATOR_NAME    "post--"
-#define PRE_INCREMENT_OPERATOR_NAME     "post++"
-#define PRE_DECREMENT_OPERATOR_NAME     "post--"
+#define PRE_INCREMENT_OPERATOR_NAME     "++pre"
+#define PRE_DECREMENT_OPERATOR_NAME     "--pre"
 #define MULTIPLY_UPDATE_OPERATOR_NAME   "*=" 
 #define DIVIDE_UPDATE_OPERATOR_NAME   	"/=" 
-#define MODULO_UPDATE_OPERATOR_NAME   	"%=" 
 #define PLUS_UPDATE_OPERATOR_NAME   	"+=" 
 #define MINUS_UPDATE_OPERATOR_NAME   	"-=" 
 #define LEFT_SHIFT_UPDATE_OPERATOR_NAME "<<="
 #define RIGHT_SHIFT_UPDATE_OPERATOR_NAME   	">>="
-#define BITWISE_AND_UPDATE_OPERATOR_NAME   	"&=" 
-#define BITWISE_XOR_UPDATE_OPERATOR_NAME "^=" 
-#define BITWISE_OR_UPDATE_OPERATOR_NAME  "|=" 
+#define BITWISE_OR_UPDATE_OPERATOR_NAME  "|="
 
 #define COMMA_OPERATOR_NAME             ","
 
@@ -94,55 +95,141 @@
 #define MINUS_OPERATOR_NAME 		"-"
 #define MINUS_C_OPERATOR_NAME 		"-C" /* includes pointer arithmetic */
 #define UNARY_MINUS_OPERATOR_NAME 	"--"
+#define UNARY_PLUS_OPERATOR_NAME 	"+unary"
 #define MULTIPLY_OPERATOR_NAME 		"*"
 #define DIVIDE_OPERATOR_NAME 		"/"
 #define INVERSE_OPERATOR_NAME           "_INV_" /* internal stuff */
 #define POWER_OPERATOR_NAME 		"**"
 #define MODULO_OPERATOR_NAME 		"MOD"
-#define C_MODULO_OPERATOR_NAME 		"%"
+#define REAL_MODULO_OPERATOR_NAME 	"AMOD"
+#define DOUBLE_MODULO_OPERATOR_NAME 	"DMOD"
+#define SIGN_OPERATOR_NAME 	        "SIGN"
+#define ISIGN_OPERATOR_NAME 	        "ISIGN"
+#define DSIGN_OPERATOR_NAME 	        "DSIGN"
+#define DIM_OPERATOR_NAME 	        "DIM"
+#define IDIM_OPERATOR_NAME 	        "IDIM"
+#define DDIM_OPERATOR_NAME 	        "DDIM"
+#define DPROD_OPERATOR_NAME 	        "DPROD"
+#define CONJG_OPERATOR_NAME 	        "CONJG"
+#define DCONJG_OPERATOR_NAME 	        "DCONJG"
+#define SQRT_OPERATOR_NAME 	        "SQRT"
+#define DSQRT_OPERATOR_NAME 	        "DSQRT"
+#define CSQRT_OPERATOR_NAME 	        "CSQRT"
+#define CDSQRT_OPERATOR_NAME 	        "CDSQRT"
+#define EXP_OPERATOR_NAME 	        "EXP"
+#define DEXP_OPERATOR_NAME 	        "DEXP"
+#define CEXP_OPERATOR_NAME 	        "CEXP"
+#define CDEXP_OPERATOR_NAME 	        "CDEXP"
+#define LOG_OPERATOR_NAME 	        "LOG"
+#define ALOG_OPERATOR_NAME 	        "ALOG"
+#define DLOG_OPERATOR_NAME 	        "DLOG"
+#define CLOG_OPERATOR_NAME 	        "CLOG"
+#define CDLOG_OPERATOR_NAME 	        "CDLOG"
+#define LOG10_OPERATOR_NAME 	        "LOG10"
+#define ALOG10_OPERATOR_NAME 	        "ALOG10"
+#define DLOG10_OPERATOR_NAME 	        "DLOG10"
+#define SIN_OPERATOR_NAME 	        "SIN"
+#define DSIN_OPERATOR_NAME 	        "DSIN"
+#define CSIN_OPERATOR_NAME 	        "CSIN"
+#define CDSIN_OPERATOR_NAME 	        "CDSIN"
+#define COS_OPERATOR_NAME 	        "COS"
+#define DCOS_OPERATOR_NAME 	        "DCOS"
+#define CCOS_OPERATOR_NAME 	        "CCOS"
+#define CDCOS_OPERATOR_NAME 	        "CDCOS"
+#define TAN_OPERATOR_NAME 	        "TAN"
+#define DTAN_OPERATOR_NAME 	        "DTAN"
+#define ASIN_OPERATOR_NAME 	        "ASIN"
+#define DASIN_OPERATOR_NAME 	        "DASIN"
+#define ACOS_OPERATOR_NAME 	        "ACOS"
+#define DACOS_OPERATOR_NAME 	        "DACOS"
+#define ATAN_OPERATOR_NAME 	        "ATAN"
+#define DATAN_OPERATOR_NAME 	        "DATAN"
+#define ATAN2_OPERATOR_NAME 	        "ATAN2"
+#define DATAN2_OPERATOR_NAME 	        "DATAN2"
+#define SINH_OPERATOR_NAME 	        "SINH"
+#define DSINH_OPERATOR_NAME 	        "DSINH"
+#define COSH_OPERATOR_NAME 	        "COSH"
+#define DCOSH_OPERATOR_NAME 	        "DCOSH"
+#define TANH_OPERATOR_NAME 	        "TANH"
+#define DTANH_OPERATOR_NAME 	        "DTANH"
 #define LEFT_SHIFT_OPERATOR_NAME 	"<<"
 #define RIGHT_SHIFT_OPERATOR_NAME 	">>"
-#define BITWISE_AND_OPERATOR_NAME 	"&bitand"
+
+// Conflicts with reserved prefixes for BLOCKDATA (&), COMMON (~),
+// MAIN (%), FILESEP (!), MEMBER_SEP_STRING (^), ENUM (?) & al.
+// Use "-" to avoid conflict with user defined symbols
+#define ADDRESS_OF_OPERATOR_NAME         "__address-of__"       // &
+#define BITWISE_AND_OPERATOR_NAME 	 "__bit-and__"          // &
+#define BITWISE_NOT_OPERATOR_NAME 	 "__bit-not__"          // ~
+#define BITWISE_XOR_OPERATOR_NAME 	 "__C-xor__"            // ^
+#define C_AND_OPERATOR_NAME 		 "__C-and__"            // &&
+#define MODULO_UPDATE_OPERATOR_NAME   	 "__C-modulo-update__"  // %=
+#define BITWISE_AND_UPDATE_OPERATOR_NAME "__C-bit-and-update__" // &=
+#define BITWISE_XOR_UPDATE_OPERATOR_NAME "__C-bit-xor-update__" // ^=
+#define CONDITIONAL_OPERATOR_NAME        "__C-conditional__"    // ?
+#define C_NOT_OPERATOR_NAME 		 "__c-logical-not__"    // !
+#define C_MODULO_OPERATOR_NAME 		 "__c-modulo__"         // %
+
 #define BITWISE_OR_OPERATOR_NAME 	"|"
-#define BITWISE_XOR_OPERATOR_NAME 	"^"
-#define RIGHT_SHIFT_OPERATOR_NAME 	">>"
-#define RIGHT_SHIFT_OPERATOR_NAME 	">>"
-#define RIGHT_SHIFT_OPERATOR_NAME 	">>"
-#define RIGHT_SHIFT_OPERATOR_NAME 	">>"
 #define MIN_OPERATOR_NAME 		"MIN"
 #define MIN0_OPERATOR_NAME 		"MIN0"
+#define MIN1_OPERATOR_NAME 		"MIN1"
+#define AMIN0_OPERATOR_NAME 		"AMIN0"
 #define AMIN1_OPERATOR_NAME 		"AMIN1"
 #define DMIN1_OPERATOR_NAME 		"DMIN1"
 #define MAX_OPERATOR_NAME 		"MAX"
 #define MAX0_OPERATOR_NAME 		"MAX0"
+#define AMAX0_OPERATOR_NAME 		"AMAX0"
+#define MAX1_OPERATOR_NAME 		"MAX1"
 #define AMAX1_OPERATOR_NAME 		"AMAX1"
 #define DMAX1_OPERATOR_NAME 		"DMAX1"
 #define ABS_OPERATOR_NAME 		"ABS"
 #define IABS_OPERATOR_NAME 		"IABS"
 #define DABS_OPERATOR_NAME 		"DABS"
 #define CABS_OPERATOR_NAME 		"CABS"
+#define CDABS_OPERATOR_NAME 		"CDABS"
+
+#define LENGTH_OPERATOR_NAME 		"LEN"
+#define INDEX_OPERATOR_NAME 		"INDEX"
+#define LGE_OPERATOR_NAME 		"LGE"
+#define LGT_OPERATOR_NAME 		"LGT"
+#define LLE_OPERATOR_NAME 		"LLE"
+#define LLT_OPERATOR_NAME 		"LLT"
 
 /* generic conversion names.
  */
 #define INT_GENERIC_CONVERSION_NAME	"INT"
+#define IFIX_GENERIC_CONVERSION_NAME	"IFIX"
+#define IDINT_GENERIC_CONVERSION_NAME	"IDINT"
 #define REAL_GENERIC_CONVERSION_NAME	"REAL"
+#define FLOAT_GENERIC_CONVERSION_NAME	"FLOAT"
+#define DFLOAT_GENERIC_CONVERSION_NAME	"DFLOAT"
+#define SNGL_GENERIC_CONVERSION_NAME	"SNGL"
 #define DBLE_GENERIC_CONVERSION_NAME	"DBLE"
+#define DREAL_GENERIC_CONVERSION_NAME	"DREAL"
 #define CMPLX_GENERIC_CONVERSION_NAME	"CMPLX"
 #define DCMPLX_GENERIC_CONVERSION_NAME	"DCMPLX"
 
 #define INT_TO_CHAR_CONVERSION_NAME	"CHAR"
 #define CHAR_TO_INT_CONVERSION_NAME	"ICHAR"
 
+#define AINT_CONVERSION_NAME	        "AINT"
+#define DINT_CONVERSION_NAME	        "DINT"
+#define ANINT_CONVERSION_NAME	        "ANINT"
+#define DNINT_CONVERSION_NAME	        "DNINT"
+#define NINT_CONVERSION_NAME	        "NINT"
+#define IDNINT_CONVERSION_NAME	        "IDNINT"
+#define AIMAG_CONVERSION_NAME	        "AIMAG"
+#define DIMAG_CONVERSION_NAME	        "DIMAG"
+
 /* FI: intrinsics are defined at a third place after bootstrap and effects!
  *     I guess the name should be defined here and used in table(s) there
  */
 
 #define AND_OPERATOR_NAME 		".AND."
-#define C_AND_OPERATOR_NAME 		"&&"
 #define OR_OPERATOR_NAME 		".OR."
 #define C_OR_OPERATOR_NAME 		"||"
 #define NOT_OPERATOR_NAME 		".NOT."
-#define C_NOT_OPERATOR_NAME 		"!"
 #define NON_EQUAL_OPERATOR_NAME 	".NE."
 #define C_NON_EQUAL_OPERATOR_NAME 	"!="
 #define EQUIV_OPERATOR_NAME 		".EQV."
@@ -166,6 +253,7 @@
 #define RETURN_FUNCTION_NAME 		"RETURN"
 #define STOP_FUNCTION_NAME 		"STOP"
 #define PAUSE_FUNCTION_NAME 		"PAUSE"
+#define END_FUNCTION_NAME 		"END"
 
 #define BREAK_FUNCTION_NAME 		"break"
 #define CASE_FUNCTION_NAME 		"case"
@@ -173,12 +261,16 @@
 #define C_RETURN_FUNCTION_NAME 		"return"
 
 #define SUBSTRING_FUNCTION_NAME 	"_SUBSTR"
+#define CONCATENATION_FUNCTION_NAME 	"//"
 #define ASSIGN_SUBSTRING_FUNCTION_NAME 	"_ASSIGN_SUBSTR"
 
 #define WRITE_FUNCTION_NAME 		"WRITE"
+#define PRINT_FUNCTION_NAME 		"PRINT"
 #define REWIND_FUNCTION_NAME 		"REWIND"
 #define OPEN_FUNCTION_NAME 		"OPEN"
 #define CLOSE_FUNCTION_NAME 		"CLOSE"
+#define INQUIRE_FUNCTION_NAME 		"INQUIRE"
+#define BACKSPACE_FUNCTION_NAME 	"BACKSPACE"
 #define READ_FUNCTION_NAME 		"READ"
 #define BUFFERIN_FUNCTION_NAME 		"BUFFERIN"
 #define BUFFEROUT_FUNCTION_NAME 	"BUFFEROUT"
@@ -186,6 +278,100 @@
 #define FORMAT_FUNCTION_NAME 		"FORMAT"
 
 #define MOD_INTRINSIC_NAME 		"MOD"
+
+/* #include <ctype.h> */
+
+#define ISALNUM_OPERATOR_NAME 		"isalnum"
+#define ISALPHA_OPERATOR_NAME 		"isalpha"
+#define ISCNTRL_OPERATOR_NAME 		"iscntrl"
+#define ISDIGIT_OPERATOR_NAME 		"isdigit"
+#define ISGRAPH_OPERATOR_NAME 		"isgraph"
+#define ISLOWER_OPERATOR_NAME 		"islower"
+#define ISPRINT_OPERATOR_NAME 		"isprint"
+#define ISPUNCT_OPERATOR_NAME 		"ispunct"
+#define ISSPACE_OPERATOR_NAME 		"isspace"
+#define ISUPPER_OPERATOR_NAME 		"isupper"
+#define ISXDIGIT_OPERATOR_NAME 		"isxdigit"
+#define TOLOWER_OPERATOR_NAME 		"tolower"
+#define TOUPPER_OPERATOR_NAME 		"toupper"
+#define ISASCII_OPERATOR_NAME 		"isascii"
+#define TOASCII_OPERATOR_NAME 		"toascii"
+#define _TOLOWER_OPERATOR_NAME 		"_tolower"
+#define _TOUPPER_OPERATOR_NAME 		"_toupper"
+
+  /* #include <math.h>*/
+#define C_ACOS_OPERATOR_NAME "acos"
+#define C_ASIN_OPERATOR_NAME "asin"
+#define C_ATAN_OPERATOR_NAME "atan"
+#define C_ATAN2_OPERATOR_NAME "atan2"
+#define C_COS_OPERATOR_NAME "cos"
+#define C_SIN_OPERATOR_NAME "sin"
+#define C_TAN_OPERATOR_NAME "tan"
+#define C_COSH_OPERATOR_NAME "cosh"
+#define C_SINH_OPERATOR_NAME "sinh"
+#define C_TANH_OPERATOR_NAME "tanh"
+#define C_EXP_OPERATOR_NAME "exp"
+#define FREXP_OPERATOR_NAME "frexp"
+#define LDEXP_OPERATOR_NAME "ldexp"
+#define C_LOG_OPERATOR_NAME "log"
+#define C_LOG10_OPERATOR_NAME "log10"
+#define MODF_OPERATOR_NAME "modf"
+#define POW_OPERATOR_NAME "pow"
+#define C_SQRT_OPERATOR_NAME "sqrt"
+#define CEIL_OPERATOR_NAME "ceil"
+#define FABS_OPERATOR_NAME "fabs"
+#define FLOOR_OPERATOR_NAME "floor"
+#define FMOD_OPERATOR_NAME "fmod"
+#define ERF_OPERATOR_NAME "erf"
+#define ERFC_OPERATOR_NAME "erfc"
+#define GAMMA_OPERATOR_NAME "gamma"
+#define HYPOT_OPERATOR_NAME "hypot"
+#define ISNAN_OPERATOR_NAME "isnan"
+#define J0_OPERATOR_NAME "j0"
+#define J1_OPERATOR_NAME "j1"
+#define JN_OPERATOR_NAME "jn"
+#define LGAMMA_OPERATOR_NAME "lgamma"
+#define Y0_OPERATOR_NAME "y0"
+#define Y1_OPERATOR_NAME "y1"
+#define YN_OPERATOR_NAME "yn"
+#define C_ACOSH_OPERATOR_NAME "acosh"
+#define C_ASINH_OPERATOR_NAME "asinh"
+#define C_ATANH_OPERATOR_NAME "atanh"
+#define CBRT_OPERATOR_NAME "cbrt"
+#define LOGB_OPERATOR_NAME "logb"
+#define NEXTAFTER_OPERATOR_NAME "nextafter"
+#define REMAINDER_OPERATOR_NAME "remainder"
+#define SCALB_OPERATOR_NAME "scalb"
+#define EXPM1_OPERATOR_NAME "expm1"
+#define ILOGB_OPERATOR_NAME "ilogb"
+#define LOG1P_OPERATOR_NAME "log1p"
+#define RINT_OPERATOR_NAME "rint"
+#define MATHERR_OPERATOR_NAME "matherr"
+#define SIGNIFICAND_OPERATOR_NAME "significand"
+#define COPYSIGN_OPERATOR_NAME "copysign"
+#define SCALBN_OPERATOR_NAME "scalbn"
+#define MODFF_OPERATOR_NAME "modff"
+#define SIGFPE_OPERATOR_NAME "sigfpe"
+#define SINGLE_TO_DECIMAL_OPERATOR_NAME "single_to_decimal"
+#define DOUBLE_TO_DECIMAL_OPERATOR_NAME "double_to_decimal"
+#define EXTENDED_TO_DECIMAL_OPERATOR_NAME "extended_to_decimal"
+#define QUADRUPLE_TO_DECIMAL_OPERATOR_NAME "quadruple_to_decimal"
+#define DECIMAL_TO_SINGLE_OPERATOR_NAME "decimal_to_single"
+#define DECIMAL_TO_DOUBLE_OPERATOR_NAME "decimal_to_double"
+#define DECIMAL_TO_EXTENDED_OPERATOR_NAME "decimal_to_extended"
+#define DECIMAL_TO_QUADRUPLE_OPERATOR_NAME "decimal_to_quadruple"
+#define STRING_TO_DECIMAL_OPERATOR_NAME "string_to_decimal"
+#define FUNC_TO_DECIMAL_OPERATOR_NAME "func_to_decimal"
+#define FILE_TO_DECIMAL_OPERATOR_NAME "file_to_decimal"
+#define SECONVERT_OPERATOR_NAME "seconvert"
+#define SFCONVERT_OPERATOR_NAME "sfconvert"
+#define SGCONVERT_OPERATOR_NAME "sgconvert"
+#define ECONVERT_OPERATOR_NAME "econvert"
+#define FCONVERT_OPERATOR_NAME "fconvert"
+#define GCONVERT_OPERATOR_NAME "gconvert"
+#define QECONVERT_OPERATOR_NAME "qeconvert"
+#define QFCONVERT_OPERATOR_NAME "qfconvert"
+#define QGCONVERT_OPERATOR_NAME "qgconvert"
 
 /* These operators are used within the optimize transformation in
    order to manipulate operators such as n-ary add and multiply or
@@ -206,6 +392,8 @@
 #define DI_VAR_MODULE_NAME 		"DI-VAR"
 
 /* macros */
+/* memory leak: entity_user_name() allocates a new string which is
+   lost right away */
 #define entity_an_operator_p(e,name) \
   (strcmp(entity_user_name(e), name##_OPERATOR_NAME)==0)
 #define entity_a_function_p(e,name) \
@@ -235,6 +423,7 @@
 #define ENTITY_BITWISE_AND_UPDATE_P(e) entity_an_operator_p(e, BITWISE_AND_UPDATE)
 #define ENTITY_BITWISE_XOR_UPDATE_P(e) entity_an_operator_p(e, BITWISE_XOR_UPDATE)
 #define ENTITY_BITWISE_OR_UPDATE_P(e) entity_an_operator_p(e, BITWISE_OR_UPDATE)
+#define ENTITY_ADDRESS_OF_P(e) entity_an_operator_p(e, ADDRESS_OF)
 
 #define ENTITY_PLUS_P(e) entity_an_operator_p(e, PLUS)
 #define ENTITY_PLUS_C_P(e) entity_an_operator_p(e, PLUS_C)

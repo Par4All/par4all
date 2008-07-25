@@ -505,9 +505,9 @@ intrinsic_entity_p(entity e)
   return (!value_undefined_p(entity_initial(e)) && value_intrinsic_p(entity_initial(e)));
 }
 
-/* FI: I do not understand this function name (see next one!). It seems to mee
+/* FI: I do not understand this function name (see next one!). It seems to me
  * that any common or user function or user subroutine would
- * be return.
+ * be returned.
  * FI: assert condition made stronger (18 December 1998)
  */
 entity 
@@ -1018,8 +1018,15 @@ string entity_user_name(entity e)
     return strdup(strstr(global_name,LABEL_PREFIX) + 1);
   if (strstr(global_name,COMMON_PREFIX) != NULL)
     return strdup(strstr(global_name,COMMON_PREFIX) + 1);
-  if (strstr(global_name,BLOCKDATA_PREFIX) != NULL)
-    return strdup(strstr(global_name,BLOCKDATA_PREFIX) + 1);
+  if (strstr(global_name,BLOCKDATA_PREFIX) != NULL) {
+    /* Clash with the address-of C operator */
+    string s = strstr(global_name,BLOCKDATA_PREFIX);
+
+    if(strlen(s)>1)
+      return strdup(s + 1);
+    else
+      return strdup(s);
+  }
   if (strstr(global_name,MAIN_PREFIX) != NULL)
     return strdup(strstr(global_name,MAIN_PREFIX) + 1);
 
@@ -1066,6 +1073,21 @@ bool compilation_unit_p(string module_name)
 bool compilation_unit_entity_p(entity e)
 {
   return compilation_unit_p(entity_name(e));
+}
+
+entity MakeCompilationUnitEntity(string name)
+{
+  entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,name);
+
+  pips_assert("name is a compilation unit name", compilation_unit_p(name));
+
+  /* Normally, the storage must be rom but in order to store the list of entities
+     declared with extern, we use the ram storage to put this list in ram_shared*/
+  entity_storage(e) = make_storage_ram(make_ram(entity_undefined,entity_undefined,0,NIL));
+  entity_type(e) = make_type_functional(make_functional(NIL,make_type_unknown()));
+  entity_initial(e) = make_value(is_value_code, make_code(NIL,strdup(""), make_sequence(NIL),NIL));
+
+  return e;
 }
 
 bool extern_entity_p(entity module, entity e)

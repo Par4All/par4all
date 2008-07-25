@@ -493,7 +493,7 @@ statement loop_test(statement sl)
   loop l = statement_loop(sl);
   statement ts = statement_undefined;
   string cs = string_undefined;
-  call c = make_call(entity_intrinsic(".GT."),
+  call c = make_call(entity_intrinsic(GREATER_THAN_OPERATOR_NAME),
 		     CONS(EXPRESSION,
 			  make_entity_expression(loop_index(l), NIL),
 			  CONS(EXPRESSION,
@@ -508,7 +508,7 @@ statement loop_test(statement sl)
   string lab = string_undefined;
 
   if(entity_empty_label_p(loop_label(l)))
-    lab = "";
+    lab = ""; // FI: to be replaced by a symbolic constant
   else 
     lab = label_local_name(loop_label(l));
 
@@ -535,7 +535,7 @@ statement loop_inc(statement sl)
   loop l = statement_loop(sl);
   expression I = make_entity_expression(loop_index(l), NIL);
   expression II = make_entity_expression(loop_index(l), NIL);
-  call c = make_call(entity_intrinsic("+"), 
+  call c = make_call(entity_intrinsic(PLUS_OPERATOR_NAME), // Even for C code?
 		     CONS(EXPRESSION, 
 			  I, 
 			  CONS(EXPRESSION, 
@@ -629,7 +629,7 @@ statement whileloop_test(statement sl)
     whileloop l = instruction_whileloop(statement_instruction(sl));
     statement ts = statement_undefined;
     string cs = string_undefined;
-    call c = make_call(entity_intrinsic(get_bool_property("PRETTYPRINT_C_CODE")?"!":".NOT."),
+    call c = make_call(entity_intrinsic(get_bool_property("PRETTYPRINT_C_CODE")?C_NOT_OPERATOR_NAME:NOT_OPERATOR_NAME),
 		       CONS(EXPRESSION,
 			    copy_expression(whileloop_condition(l)),
 			    NIL));
@@ -762,7 +762,7 @@ statement forloop_header(statement sl)
 statement forloop_test(statement sl)
 {
   forloop l = instruction_forloop(statement_instruction(sl));
-  call c =  make_call(entity_intrinsic("!"),
+  call c =  make_call(entity_intrinsic(C_NOT_OPERATOR_NAME),
 		      CONS(EXPRESSION,
 			   copy_expression(forloop_condition(l)),
 			   NIL));
