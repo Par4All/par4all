@@ -1,0 +1,79 @@
+nodecls
+
+Declarations for module nodecls with type () -> void
+Variable list:
+
+Declared entity TOP-LEVEL:*STATIC*	with type area with size 0
+Declared entity nodecls:*DYNAMIC*	with type area with size 0
+Declared entity nodecls:*STACK*	with type area with size 0
+Declared entity nodecls:*STATIC*	with type area with size 0
+Declared entity nodeclsfunc!:*HEAP*	with type area with size 0
+Declared entity nodeclsfunc!:*STATIC*	with type area with size 0
+
+Layouts for areas (commons):
+
+Layout for common /TOP-LEVEL:*STATIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /nodecls:*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /nodecls:*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /nodecls:*STATIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /nodeclsfunc!:*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /nodeclsfunc!:*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module nodecls
+
+nodeclsfunc!
+
+Declarations for module nodeclsfunc! with type () -> unknow
+Variable list:
+
+Declared entity TOP-LEVEL:*STATIC*	with type area with size 0
+Declared entity TOP-LEVEL:nodecls	with type functional  () -> void
+Declared entity nodeclsfunc!:*DYNAMIC*	with type area with size 0
+Declared entity nodeclsfunc!:*HEAP*	with type area with size 0
+Declared entity nodeclsfunc!:*STACK*	with type area with size 0
+Declared entity nodeclsfunc!:*STATIC*	with type area with size 0
+
+Layouts for areas (commons):
+
+Layout for common /TOP-LEVEL:*STATIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /nodeclsfunc!:*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /nodeclsfunc!:*HEAP*/ of size 0:
+	* empty area *
+
+
+Layout for common /nodeclsfunc!:*STACK*/ of size 0:
+	* empty area *
+
+
+Layout for common /nodeclsfunc!:*STATIC*/ of size 0:
+	* empty area *
+
+End of declarations for module nodeclsfunc!
+
+void nodecls()
+{
+   foo();
+}
+   extern void nodecls();

@@ -1,0 +1,18 @@
+
+Parsed printed file for generate 02
+
+void generate02()
+{
+   int i = 0;
+   double x = 1.;
+   
+   // use an undeclared function without source code, which returns
+   // implictly an int
+   func(i, &x);
+}
+
+Parsed printed file for func
+
+int func(int f1,double f2)
+{
+}

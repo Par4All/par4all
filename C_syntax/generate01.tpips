@@ -1,0 +1,37 @@
+delete generate01
+create generate01 generate01.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+echo
+echo Parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[generate01]
+
+echo
+echo Printed file
+echo
+
+display PRINTED_FILE[%ALL]
+
+activate PRINT_CODE_PRECONDITIONS
+
+echo
+echo Printed file generate01 with intraprocedural preconditions
+echo
+
+display PRINTED_FILE[generate01]
+
+echo
+echo Printed file func with intraprocedural preconditions
+echo
+
+display PRINTED_FILE[func]
+
+close
+#delete generate01
+quit
