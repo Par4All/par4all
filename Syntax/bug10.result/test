@@ -44,7 +44,7 @@ Request: build resource CALLGRAPH_FILE for module COURC4.
   CONTROLIZER                    building   CODE(COURC4)
   INITIALIZER                    building   USER_FILE(BALAYE)
                                  building   INITIAL_FILE(BALAYE)
-user error in initializer: no source file for BALAYE (might be an ENTRY point)
+user error in generic_initializer: no source file for BALAYE (might be an ENTRY point)
 set PREPROCESSOR_MISSING_FILE_HANDLING to "query" or "generate"...
 user error in build_real_resources: unable to build callees for BALAYE
 Some source code probably is missing!

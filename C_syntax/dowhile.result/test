@@ -18,7 +18,6 @@ main()
 main()
 {
    int c = 5;
-   /* End of do while */
    do {
       --c;
       c++;

@@ -13,8 +13,14 @@ setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
 Selecting rule: C_SYMBOL_TABLE
 Selecting rule: C_PARSER
+echo
+
+echo Error duplicate variable declaration for a 
+Error duplicate variable declaration for a 
+echo
+
 Module multideclsinfile! already active.
-Request: build resource SYMBOL_TABLE_FILE for module multideclsinfile!.
+Request: build resource PARSED_PRINTED_FILE for module multideclsinfile!.
   BOOTSTRAP                      building   ENTITIES()
   COMPILATION_UNIT_PARSER        building   DECLARATIONS(multideclsinfile!)
 user warning in discard_C_comment: Comment "
@@ -23,32 +29,7 @@ user warning in discard_C_comment: Comment "
 
 //Multiple declarations of global variables check in one file
 " is lost at line 2, probably because comments cannot be attached to declarations.
-user warning in discard_C_comment: Comment "
-" is lost at line 3, probably because comments cannot be attached to declarations.
-user warning in discard_C_comment: Comment "
-" is lost at line 4, probably because comments cannot be attached to declarations.
-[hash_put] key redefined: 0x8cef70
-Multiple declarations of variable a in file
-user warning in CParserError: Recovery from C parser failure not (fully) implemented yet.
-C parser is likely to fail later if re-used.
-user error in CParserError: Illegal Inputuser warning in set_debug_stack_pointer: debug level stack is set to 2
-user warning in safe_do_something: Request aborted under pipsmake: build resource SYMBOL_TABLE_FILE for module multideclsinfile!.
-user error in display_a_resource: Cannot build view file SYMBOL_TABLE_FILE
-Module multideclsinfile! already active.
-Request: build resource PARSED_PRINTED_FILE for module multideclsinfile!.
-  COMPILATION_UNIT_PARSER        building   DECLARATIONS(multideclsinfile!)
-user warning in discard_C_comment: Comment "
-
-
-
-
-//Multiple declarations of global variables check in one file
-" is lost at line 2, probably because comments cannot be attached to declarations.
-user warning in discard_C_comment: Comment "
-" is lost at line 3, probably because comments cannot be attached to declarations.
-user warning in discard_C_comment: Comment "
-" is lost at line 4, probably because comments cannot be attached to declarations.
-[hash_put] key redefined: 0x8cef70
+[hash_put] key redefined: 0x8398680
 Multiple declarations of variable a in file
 user warning in CParserError: Recovery from C parser failure not (fully) implemented yet.
 C parser is likely to fail later if re-used.

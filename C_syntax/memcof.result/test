@@ -5,8 +5,7 @@ Printed file for 'memcof!'
       unsigned char __c[8];
       double __d;
    };
-   typedef union PIPS_UNION_1 __huge_val_t;
-   static __huge_val_t __huge_val = {{0, 0, 0, 0, 0, 0, 0xf0, 0x7f}};
+   static union PIPS_UNION_1 __huge_val = {{0, 0, 0, 0, 0, 0, 0xf0, 0x7f}};
    extern double acos(double );
    extern double __acos(double );
    extern double asin(double );
@@ -66,8 +65,7 @@ Unsplit
       unsigned char __c[8];
       double __d;
    };
-   typedef union PIPS_UNION_1 __huge_val_t;
-   static __huge_val_t __huge_val = {{0, 0, 0, 0, 0, 0, 0xf0, 0x7f}};
+   static union PIPS_UNION_1 __huge_val = {{0, 0, 0, 0, 0, 0, 0xf0, 0x7f}};
    extern double acos(double );
    extern double __acos(double );
    extern double asin(double );
@@ -128,7 +126,7 @@ void memcof(float data[],int n,int m,float *pm,float cof[])
    float *wkm;
    float *vector();
    void free_vector();
-   
+
    wk1 = vector(1, n);
    wk2 = vector(1, n);
    wkm = vector(1, m);

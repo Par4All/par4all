@@ -42,9 +42,9 @@ void adi(double **a,double **b,double **c,double **d,double **e,double **f,doubl
    void free_dvector();
    void nrerror();
    void tridag();
+
    if (jmax>50)
       nrerror("in ADI, increase JJ");
-   
    if (k>6-1)
       nrerror("in ADI, increase KK");
    psi = dmatrix(1, 50, 1, 50);
@@ -148,7 +148,7 @@ void tridag(double *a,double *b,double *c,double *r,double *u,int n)
    double *dvector();
    void nrerror();
    void free_dvector();
-   
+
    gam = dvector(1, n);
    if (b[1]==0.0)
       nrerror("error 1 in TRIDAG");

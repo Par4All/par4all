@@ -8,8 +8,3 @@ void gl_enable( )
 	break;
     }
 }
-
-
-
-
-

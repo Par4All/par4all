@@ -9,7 +9,8 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 activate C_PARSER
 
-display PRINTED_FILE[%ALL]
+display PARSED_PRINTED_FILE[main_hello_world!]
+display PARSED_PRINTED_FILE[main]
 
 close
 

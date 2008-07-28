@@ -1,13 +1,19 @@
 main()
 {
-   enum fleurs {rose=1, marguerite=0, jasmin};
-   enum legumes {carotte=51, haricot};
+   enum fleurs {rose=0x0001, marguerite=0, jasmin};
+   enum legumes {carotte=rose+50, haricot};
    enum fleurs ma1;
    enum fleurs ma2;
    enum fleurs ma3;
    enum legumes mon1;
    enum legumes mon2;
    int i;
+   int a1;
+   int a2;
+   int a3;
+   int on1;
+   int on2;
+   int j;
 
    ma1 = rose;
    ma2 = marguerite;
@@ -16,4 +22,84 @@ main()
    mon2 = haricot;
 
    i = ma1+ma2+ma3+mon1+mon2;
+
+   a1 = rose;
+   a2 = marguerite;
+   a3 = jasmin;
+   on1 = carotte;
+   on2 = haricot;
+
+   j = a1+a2+a3+on1+on2;
+}
+
+//  P() {}
+
+main()
+{
+   enum fleurs {rose=0x0001, marguerite=0, jasmin};
+   enum legumes {carotte=rose+50, haricot};
+   enum fleurs ma1;
+   enum fleurs ma2;
+   enum fleurs ma3;
+   enum legumes mon1;
+   enum legumes mon2;
+   int i;
+   int a1;
+   int a2;
+   int a3;
+   int on1;
+   int on2;
+   int j;
+
+//  P() {}
+
+
+   ma1 = rose;
+
+//  P() {}
+
+   ma2 = marguerite;
+
+//  P() {}
+
+   ma3 = jasmin;
+
+//  P() {}
+
+   mon1 = carotte;
+
+//  P() {}
+
+   mon2 = haricot;
+
+//  P() {}
+
+
+   i = ma1+ma2+ma3+mon1+mon2;
+
+//  P(i) {}
+
+
+   a1 = rose;
+
+//  P(a1,i) {a1==1}
+
+   a2 = marguerite;
+
+//  P(a1,a2,i) {a1==1, a2==0}
+
+   a3 = jasmin;
+
+//  P(a1,a2,a3,i) {a1==1, a2==0, a3==1}
+
+   on1 = carotte;
+
+//  P(a1,a2,a3,i,on1) {a1==1, a2==0, a3==1, on1==51}
+
+   on2 = haricot;
+
+//  P(a1,a2,a3,i,on1,on2) {a1==1, a2==0, a3==1, on1==51, on2==52}
+
+
+   j = a1+a2+a3+on1+on2;
 }

@@ -14,10 +14,14 @@ $tpips <<EOF
 
 create mc Ricedg/many_calls.f
 
+echo
+echo Five different views of the dependence graph
+echo
+
 activate PRINT_WHOLE_DEPENDENCE_GRAPH
 
 echo
-echo Whole dependence graph, preconditions and loop bounds ignored
+echo Whole dependence graph, preconditions and loop bounds ignored (1)
 echo
 
 activate RICE_FAST_DEPENDENCE_GRAPH # Preconditions Ignored
@@ -25,7 +29,7 @@ activate RICE_FAST_DEPENDENCE_GRAPH # Preconditions Ignored
 display DG_FILE
 
 echo
-echo Whole dependence graph, preconditions ignored, loop bounds used
+echo Whole dependence graph, preconditions ignored, loop bounds used (2)
 echo
 
 activate RICE_FULL_DEPENDENCE_GRAPH # Loop Bounds Used
@@ -33,7 +37,7 @@ activate RICE_FULL_DEPENDENCE_GRAPH # Loop Bounds Used
 display DG_FILE
 
 echo
-echo Whole dependence graph, preconditions (and loop bounds) used
+echo Whole dependence graph, preconditions (and loop bounds) used (3)
 echo
 
 activate RICE_SEMANTICS_DEPENDENCE_GRAPH # Preconditions Used
@@ -44,10 +48,14 @@ close
 
 open mc
 
+echo
+echo Effective dependence graph print-outs
+echo
+
 activate PRINT_EFFECTIVE_DEPENDENCE_GRAPH
 
 echo
-echo Effective dependence graph, preconditions (and loop bounds) used
+echo Effective dependence graph, preconditions (and loop bounds) used (1b)
 echo
 
 activate RICE_FAST_DEPENDENCE_GRAPH
@@ -55,7 +63,7 @@ activate RICE_FAST_DEPENDENCE_GRAPH
 display DG_FILE
 
 echo
-echo Effective dependence graph, preconditions ignored, loop bounds used
+echo Effective dependence graph, preconditions ignored, loop bounds used (2b)
 echo
 
 activate RICE_FULL_DEPENDENCE_GRAPH
