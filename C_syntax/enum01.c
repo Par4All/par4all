@@ -6,7 +6,7 @@ main()
   enum legumes{carotte=rose+50, haricot};
   enum fleurs ma1, ma2, ma3;
   enum legumes mon1, mon2;
-  int i;
+  int i, a1, a2, a3, on1, on2, j;
 
   ma1 = rose;
   ma2 = marguerite;
@@ -15,6 +15,14 @@ main()
   mon2 = haricot;
 
   i = ma1+ma2+ma3+mon1+mon2;
+
+  a1 = rose;
+  a2 = marguerite;
+  a3 = jasmin;
+  on1 = carotte;
+  on2 = haricot;
+
+  j = a1+a2+a3+on1+on2;
 
   // printf("rose=%d, margueritte=%d, jasmin=%d\n", ma1, ma2, ma3);
   //printf("carotte=%d, haricot=%d\n", mon1, mon2);
