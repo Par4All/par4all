@@ -100,14 +100,6 @@ normalized NormalizeReference(reference r)
     Variable v = (Variable) e;
     Value val = VALUE_ONE;
 
-    if(entity_enum_member_p(e)) {
-      value ev = entity_initial(e);
-      constant ecv = value_constant(ev);
-
-      v = TCST;
-      val = (Value)(constant_int(ecv));
-    }
-
     n = (entity_integer_scalar_p(e)) ?
       make_normalized(is_normalized_linear, 
 		      vect_new(v, val)) :

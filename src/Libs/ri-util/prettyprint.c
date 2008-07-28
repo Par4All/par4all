@@ -1209,18 +1209,16 @@ words_prefix_unary_op(call obj,
     fun = "!";
   else if (strcmp(fun,BITWISE_NOT_OPERATOR_NAME) == 0) 
     fun = "~";
-  else
-    if (strcmp(fun,"*indirection") == 0) 
+  else if (strcmp(fun,DEREFERENCING_OPERATOR_NAME) == 0) 
       /* Since we put no spaces around an operator (to not change Fortran), the blank 
 	 before '*' is used to avoid the confusion in the case of divide operator, i.e 
 	 d1 = 1.0 / *det  in function inv_j, SPEC2000 quake benchmark. */
-      fun = " *";
-    else
-      if (strcmp(fun,"+unary") == 0) 
-	fun = "+";
-      else if(!is_fortran){ 
+    fun = " *";
+  else if (strcmp(fun,UNARY_PLUS_OPERATOR_NAME) == 0) 
+    fun = "+";
+  else if(!is_fortran){ 
 	if(strcasecmp(fun, NOT_OPERATOR_NAME)==0)
-	  fun=C_NOT_OPERATOR_NAME;
+	  fun="!";
       }
   pc = CHAIN_SWORD(pc,strdup(fun));
   pc = gen_nconc(pc, words_subexpression(e, prec, FALSE));
@@ -1528,6 +1526,7 @@ words_infix_binary_op(call obj, int precedence, bool leftmost)
   }
 
     
+  /* handling of renamed operators */
   if ( strcmp(fun,PLUS_C_OPERATOR_NAME) == 0 )
     fun = "+";
   else  if ( strcmp(fun, MINUS_C_OPERATOR_NAME) == 0 )
@@ -1538,6 +1537,8 @@ words_infix_binary_op(call obj, int precedence, bool leftmost)
     fun = "^";
   else  if ( strcmp(fun,C_AND_OPERATOR_NAME) == 0 )
     fun = "&&";
+  else  if ( strcmp(fun,C_NON_EQUAL_OPERATOR_NAME) == 0 )
+    fun = "!=";
   else  if ( strcmp(fun,C_MODULO_OPERATOR_NAME) == 0 )
     fun = "%";
   else if (!is_fortran){
@@ -1555,9 +1556,9 @@ words_infix_binary_op(call obj, int precedence, bool leftmost)
     else if(strcasecmp(fun, EQUAL_OPERATOR_NAME) ==0)
       fun=C_EQUAL_OPERATOR_NAME;
     else if(strcasecmp(fun,NON_EQUAL_OPERATOR_NAME)==0)
-      fun=C_NON_EQUAL_OPERATOR_NAME;
+      fun= "!=";
     else if(strcasecmp(fun,AND_OPERATOR_NAME)==0)
-      fun=C_AND_OPERATOR_NAME;
+      fun="&&";
     else if(strcasecmp(fun, OR_OPERATOR_NAME)==0)
       fun=C_OR_OPERATOR_NAME;
    

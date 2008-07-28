@@ -103,6 +103,13 @@ extern stack FunctionStack; /* to know in which function the current formal argu
 extern stack FormalStack; /* to know if the entity is a formal parameter or not */
 extern stack OffsetStack; /* to know the offset of the formal argument */
 
+/* To keep track of compound statements IF, WHILE, SWITCH and FOR line numbers and comments */
+/* No solution yet for DO{}WHILE() */
+ extern int pop_current_C_line_number(); // Declared in clex.l not scanned by cproto
+ extern void push_current_C_line_number(); // Declared in clex.l not scanned by cproto
+ extern string pop_current_C_comment(); // Declared in clex.l not scanned by cproto
+ extern void push_current_C_comment(); // Declared in clex.l not scanned by cproto
+
 static c_parser_context context;
 
 
@@ -550,6 +557,8 @@ expression:
 |   paren_comma_expression
 		        {
 			  /* paren_comma_expression is a list of expressions*/ 
+			  (void) pop_current_C_comment();
+			  (void) pop_current_C_line_number();
 			  $$ = MakeCommaExpression($1);
 			}
 |   expression TK_LPAREN arguments TK_RPAREN
@@ -896,6 +905,8 @@ comma_expression_opt:
 paren_comma_expression:
     TK_LPAREN comma_expression TK_RPAREN
                         {
+			  push_current_C_comment();
+			  push_current_C_line_number();
 			  $$ = $2;
 			}
 |   TK_LPAREN error TK_RPAREN                         
@@ -978,14 +989,16 @@ statement:
                 	{
 			  $$ = test_to_statement(make_test(MakeCommaExpression($2), $3,
 							   make_empty_block_statement())); 
+			  pips_assert("statement is a test", statement_test_p($$));
                           statement_comments($$) = pop_current_C_comment();
-			  /* statement_number($$) = pop_current_C_line_number(); */
+			  statement_number($$) = pop_current_C_line_number();
 			}
 |   TK_IF paren_comma_expression statement TK_ELSE statement
 	                {
 			  $$ = test_to_statement(make_test(MakeCommaExpression($2),$3,$5));
+			  pips_assert("statement is a test", statement_test_p($$));
                           statement_comments($$) = pop_current_C_comment();
-			  /* statement_number($$) = pop_current_C_line_number(); */
+			  statement_number($$) = pop_current_C_line_number();
 			}
 |   TK_SWITCH 
                         {
@@ -999,7 +1012,11 @@ statement:
 			} 
     statement
                         {
+			  string sc = pop_current_C_comment();
+			  int sn = pop_current_C_line_number();
+
 			  $$ = MakeSwitchStatement($5);
+			  $$ = add_comment_and_line_number($$, sc, sn);
 			  stack_pop(SwitchGotoStack);
 			  stack_pop(SwitchControllerStack);
 			  stack_pop(LoopStack);
@@ -1011,8 +1028,11 @@ statement:
 			} 
     paren_comma_expression statement
 	        	{
+			  string sc = pop_current_C_comment();
+			  int sn = pop_current_C_line_number();
 			  pips_assert("While loop body consistent",statement_consistent_p($4));
 			  $$ = MakeWhileLoop($3,$4,TRUE);
+			  $$ = add_comment_and_line_number($$, sc, sn);
 			  stack_pop(LoopStack);
 			}
 |   TK_DO
@@ -1023,6 +1043,9 @@ statement:
     statement TK_WHILE paren_comma_expression TK_SEMICOLON
 	        	{
 			  $$ = MakeWhileLoop($5,$3,FALSE);
+			  /* The line number and comment are related to paren_comma_expression and not to TK_DO */
+			  (void) pop_current_C_line_number();
+			  (void) pop_current_C_comment();
 			  stack_pop(LoopStack);
 			}
 |   TK_FOR
@@ -1032,9 +1055,12 @@ statement:
 			} 
     TK_LPAREN for_clause opt_expression TK_SEMICOLON opt_expression TK_RPAREN statement
 	                {
+			  string sc = pop_current_C_comment();
+			  int sn = pop_current_C_line_number();
 			  pips_assert("For loop body consistent",statement_consistent_p($9));
 			  /*  The for clause may contain declarations*/
 			  $$ = MakeForloop($4,$5,$7,$9);
+			  $$ = add_comment_and_line_number($$, sc, sn);
 			  stack_pop(LoopStack);
 			}
 |   TK_IDENT TK_COLON statement
@@ -1103,7 +1129,11 @@ statement:
 ;
 
 for_clause: 
-    opt_expression TK_SEMICOLON   { }
+    opt_expression TK_SEMICOLON
+                        { 
+			  push_current_C_comment();
+			  push_current_C_line_number();
+			}
 |   declaration
                         {
 			  CParserError("For clause containing declaration not implemented\n");

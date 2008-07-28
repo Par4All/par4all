@@ -243,7 +243,7 @@ void discard_C_comment()
     if (character_occurences_in_string(C_current_comment, '\n')
 	== strlen(C_current_comment)) {
       /* The comments are only made of '\n', just silently discarding them */
-      pips_debug(3,"The \\n are lost, so the code presentation may be wrong...");
+      pips_debug(3,"The \\n are lost, so the code presentation may be wrong...\n");
     }
     else
       pips_user_warning("Comment \"%s\" is lost at line %d, "
@@ -667,8 +667,11 @@ L\"([^\"]|(\"\")|(\\\"))*\"	{
                                        yylval.string = strdup(yytext);
                                        /* Some of the pushes are unfortunately in cyacc.y */
                                        if(t==TK_IF || t==TK_SWITCH || t==TK_WHILE || t==TK_DO
-                                          || t==TK_FOR)
-                                         push_current_C_comment();
+                                          || t==TK_FOR) {
+                                         //push_current_C_comment();
+                                         //push_current_C_line_number();
+                                         ;
+                                    }
                                        /* Some comments are lost, especially in declarations */
                                        if(t==TK_ELSE || (t>=TK_CHAR && t <=TK_REGISTER))
                                          discard_C_comment();

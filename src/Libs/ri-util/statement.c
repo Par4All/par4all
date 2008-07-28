@@ -295,6 +295,13 @@ statement s;
 }
 
 bool 
+statement_forloop_p(s)
+statement s;
+{
+    return(instruction_forloop_p(statement_instruction(s)));
+}
+
+bool 
 unstructured_statement_p(statement s)
 {
     return(instruction_unstructured_p(statement_instruction(s)));
@@ -2322,6 +2329,37 @@ bool all_statements_defined_p(statement s)
   gen_context_recurse(s, (void *) &undefined_p ,statement_domain,
 		      undefined_statement_found_p, gen_null);
   return !undefined_p;
+}
+
+/* Since block cannot carry comments nor line numbers, they must be
+   moved to an internal continue statement.
+
+   A prettier version could be to make a new block containing the
+   continue and then the old block. Comments might be better located.
+ */
+statement add_comment_and_line_number(statement s, string sc, int sn)
+{
+  string osc = statement_comments(s);
+  statement ns = s;
+
+  if(osc!=NULL && !string_undefined_p(osc)) {
+    free(osc);
+  }
+
+  if(!statement_block_p(s)) {
+    statement_comments(s) = sc;
+    statement_number(s) = sn;
+  }
+  else if(!string_undefined_p(sc)) {
+    /* A continue statement must be inserted as first block statement*/
+    statement nops = make_continue_statement(entity_undefined);
+    list sss = sequence_statements(instruction_sequence(statement_instruction(s)));
+    statement_comments(nops) = sc;
+    statement_number(nops) = sn;
+    sequence_statements(instruction_sequence(statement_instruction(s))) =
+      CONS(STATEMENT, nops, sss);
+  }
+  return ns;
 }
 
 /* That's all folks */

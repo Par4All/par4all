@@ -214,7 +214,8 @@ statement MakeWhileLoop(list lexp, statement s, bool before)
   smt = make_statement(entity_empty_label(), 
 		       get_current_C_line_number(), 
 		       STATEMENT_ORDERING_UNDEFINED, 
-		       pop_current_C_comment(),
+		       //pop_current_C_comment(),
+		       string_undefined,
 		       make_instruction_whileloop(w),
 		       NIL, string_undefined);
 
@@ -253,7 +254,7 @@ statement MakeForloop(expression e1, expression e2, expression e3, statement s)
   smt = make_statement(entity_empty_label(), 
 		       get_current_C_line_number(), 
 		       STATEMENT_ORDERING_UNDEFINED, 
-		       pop_current_C_comment(),
+		       string_undefined,
 		       make_instruction_forloop(f),
 		       NIL, string_undefined);
 
@@ -321,7 +322,7 @@ statement MakeSwitchStatement(statement s)
   statement smt = FindStatementFromLabel(MakeCLabel(lab));
   statement seq = instruction_to_statement(make_instruction_sequence(stack_head(SwitchGotoStack)));
   /* For the time being, the switch comment is lost. It should already be included in the argument,s  */
-  pop_current_C_comment();
+  /* pop_current_C_comment(); */
 
   insert_statement(s,seq,TRUE);
 

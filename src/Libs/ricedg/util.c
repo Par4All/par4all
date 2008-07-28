@@ -108,11 +108,19 @@ prettyprint_dependence_graph(FILE * fd,
 	    dg_arc_label dal = (dg_arc_label) successor_arc_label(su);
 
 	    if(!sru_format_p || statement_undefined_p(mod_stat)) {
+	      /* Modification at revision 12484 because statement
+		 numbers were not initialized by C parser, with no
+		 validation of ricedg available at that time*/
 		/* factorize line numbers */
-		fprintf(fd, "\t%s -->", 
-			external_statement_identification(s1));
-		fprintf(fd, " %s with conflicts\n", 
-			external_statement_identification(s2));
+		//fprintf(fd, "\t%s -->", 
+			// external_statement_identification(s1)
+	        // Revision 10893: %02d and statement_number (Pham Dat)
+		fprintf(fd, "\t%02td -->", 
+			statement_number(s1));
+		//fprintf(fd, " %s with conflicts\n", 
+			// external_statement_identification(s2)
+		fprintf(fd, " %02td with conflicts\n", 
+			statement_number(s2));
 	    }
 
 	    for (pc = dg_arc_label_conflicts(dal); !ENDP(pc); pc = CDR(pc)) {

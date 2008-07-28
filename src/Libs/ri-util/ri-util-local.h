@@ -167,8 +167,9 @@
 #define BITWISE_AND_UPDATE_OPERATOR_NAME "__C-bit-and-update__" // &=
 #define BITWISE_XOR_UPDATE_OPERATOR_NAME "__C-bit-xor-update__" // ^=
 #define CONDITIONAL_OPERATOR_NAME        "__C-conditional__"    // ?
-#define C_NOT_OPERATOR_NAME 		 "__c-logical-not__"    // !
-#define C_MODULO_OPERATOR_NAME 		 "__c-modulo__"         // %
+#define C_NOT_OPERATOR_NAME 		 "__C-logical-not__"    // !
+#define C_NON_EQUAL_OPERATOR_NAME 	 "__C-non-equal__"      // !=
+#define C_MODULO_OPERATOR_NAME 		 "__C-modulo__"         // %
 
 #define BITWISE_OR_OPERATOR_NAME 	"|"
 #define MIN_OPERATOR_NAME 		"MIN"
@@ -231,7 +232,6 @@
 #define C_OR_OPERATOR_NAME 		"||"
 #define NOT_OPERATOR_NAME 		".NOT."
 #define NON_EQUAL_OPERATOR_NAME 	".NE."
-#define C_NON_EQUAL_OPERATOR_NAME 	"!="
 #define EQUIV_OPERATOR_NAME 		".EQV."
 #define NON_EQUIV_OPERATOR_NAME 	".NEQV."
 
