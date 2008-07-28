@@ -1624,8 +1624,11 @@ enumerator:
 
 			  entity ent = CreateEntityFromLocalNameAndPrefix($1,"",is_external);
 			  variable v = make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL);
+			  type rt = make_type(is_type_variable, v);
+			  functional f = make_functional(NIL, rt);
+
 			  entity_storage(ent) = make_storage_rom();
-			  entity_type(ent) = make_type_variable(v);
+			  entity_type(ent) = make_type_functional(f);
 			  // enum_list is not available yet. Values should be fixed later.
 			  /*  entity_initial(ent) = MakeEnumeratorInitialValue(enum_list,enum_counter);*/
 			  $$ = ent;
@@ -1633,15 +1636,22 @@ enumerator:
 |   TK_IDENT TK_EQ expression	
                         {
 			  /* Create an entity of is_basic_int, storage rom, initial_value = $3 */
+			  /* No, enum member must be functional
+			     entity, just like Fortran's parameters */
 			  int i; 
 			  entity ent = CreateEntityFromLocalNameAndPrefix($1,"",is_external);
-			  variable v = make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL);
+			  variable v = 
+			    make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL);
+			  type rt = make_type(is_type_variable, v);
+			  functional f = make_functional(NIL, rt);
+
 			  pips_assert("Enumerated value must be a constant integer", 
 				      signed_integer_constant_expression_p($3));
 			  i = signed_integer_constant_expression_value($3);
 			  entity_storage(ent) = make_storage_rom();
-			  entity_type(ent) = make_type_variable(v);
-			  entity_initial(ent) = make_value_constant(make_constant_int(i));
+			  entity_type(ent) = make_type_functional(f);
+			  entity_initial(ent) = 
+			    make_value_symbolic(make_symbolic($3, make_constant_int(i)));
 			  $$ = ent;
 			}
 ;

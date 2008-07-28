@@ -352,7 +352,16 @@ expression IdentifierToExpression(string s)
   switch (type_tag(entity_type(ent))) {
   case is_type_variable: 
   case is_type_functional:
-    return make_expression(make_syntax_reference(make_reference(ent,NIL)),normalized_undefined);
+    {
+      expression e = expression_undefined;
+      value iv = entity_initial(ent);
+      if(!value_undefined_p(iv) && value_symbolic_p(iv))
+	/* Generate a call to an enum member */
+	e = make_expression(make_syntax_call(make_call(ent, NIL)), normalized_undefined);
+      else
+	e = make_expression(make_syntax_reference(make_reference(ent,NIL)), normalized_undefined);
+      return e;
+    }
   default:
     {
       CParserError("Which kind of expression?\n");
@@ -1194,11 +1203,12 @@ void InitializeEnumMemberValues(list lem)
     value emv = entity_initial(em);
 
     if(value_undefined_p(emv)) {
-      entity_initial(em) = make_value(is_value_constant,
-				      make_constant(is_constant_int, (void *) cv));
+      entity_initial(em) = 
+	make_value_symbolic(make_symbolic(int_to_expression(cv),
+					  make_constant(is_constant_int, (void *) cv)));
     }
     else {
-      cv = constant_int(value_constant(emv));
+      cv = constant_int(symbolic_constant(value_symbolic(emv)));
     }
     cv++;
   }

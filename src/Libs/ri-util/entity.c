@@ -387,15 +387,10 @@ bool entity_enum_p(entity e)
 
 bool entity_enum_member_p(entity e)
 {
-  string n = entity_module_name(e);
+  value ev = entity_initial(e);
 
-  /* Is it a standard package or not? Check for forbidden characters
-     such as those used for PHI variables which have storage ROM just
-     like enum members */
-  //fprintf(stderr, "module name: \%s, forbidden characters: %d\n", n, streln(strspn(n, "-")));
-  if(strchr(n,'-')!=NULL)
-    return FALSE;
-  return type_variable_p(entity_type(e)) && storage_rom_p(entity_storage(e));
+  pips_assert("Value of e is defined", !value_undefined_p(e));
+  return value_symbolic_p(ev);
 }
 
 bool 

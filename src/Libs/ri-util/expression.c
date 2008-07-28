@@ -482,11 +482,17 @@ expression e ;
     return(FALSE);
 }
 
-// positive integer constant expression: call to a positive constant
-// or to a sum of positive integer constant expressions.  
-//
-// Likely to fail and need further extension if subtraction and
-// multiplication are used as probably allowed by C standard.
+/* positive integer constant expression: call to a positive constant
+   or to a sum of positive integer constant expressions (much too
+   restrictive, but enough for the source codes submitted to PIPS up
+   to now).
+
+   Likely to fail and need further extension if subtraction and
+   multiplication are used as probably allowed by C standard.
+
+   NormalizeExpression() could be used instead, as it is in fact to compute
+   the value of the expression.
+*/
 bool integer_constant_expression_p(e)
 expression e;
 {
@@ -502,18 +508,17 @@ expression e;
     if(integer_constant_p(cst, &i)) {
       ice = TRUE;
     }
+    else if(integer_symbolic_constant_p(cst, &i)) {
+      ice = TRUE;
+    }
     else if(ENTITY_PLUS_P(cst)||ENTITY_PLUS_C_P(cst)) {
       expression e1 = EXPRESSION(CAR(args));
       expression e2 = EXPRESSION(CAR(CDR(args)));
+
       ice = integer_constant_expression_p(e1) && integer_constant_expression_p(e2);
     }
   }
-  else if(syntax_reference_p(s)) {
-    // Can be an enum member
-    entity em = reference_variable(syntax_reference(s));
 
-    ice = entity_enum_member_p(em);
-  }
   return ice;
 }
 

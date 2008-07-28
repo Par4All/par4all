@@ -1949,7 +1949,7 @@ text c_text_entities(entity module, list ldecl, int margin)
   for( ; !ENDP(l); POP(l)) {
     entity e = ENTITY(CAR(l));
     text tmp = text_undefined;
-    type t=entity_type(e);
+    type t = entity_type(e);
 
     if(!type_area_p(t) && ! type_statement_p(t) && !type_unknown_p(t) && !storage_formal_p(entity_storage(e))) {
       tmp = c_text_entity(module, e, margin);
@@ -1957,7 +1957,6 @@ text c_text_entities(entity module, list ldecl, int margin)
     }
   }
 
-  
   return r; 
 }
 
@@ -2040,18 +2039,17 @@ text c_text_entity(entity module, entity e, int margin)
       for(cl = l; !ENDP(cl); POP(cl)) {
 	entity em = ENTITY(CAR(cl));
 	value emv = entity_initial(em);
-	constant emc = value_constant(emv);
+	symbolic ems = value_symbolic(emv);
+	expression eme = symbolic_expression(ems);
+	constant emc = symbolic_constant(value_symbolic(emv));
 	int n = constant_int(emc);
 
-	if (!first) 
+	if (!first)
 	  pc = CHAIN_SWORD(pc, ", ");
 	pc = CHAIN_SWORD(pc, entity_user_name(em));
 	if(n!=cv) {
-	  extern string int_to_string(int); // misplaced util function
-	  string ns = int_to_string(n);
 	  pc = CHAIN_SWORD(pc, "=");
-	  pc = CHAIN_SWORD(pc, ns);
-	  free(ns);
+	  pc = gen_nconc(pc, words_expression(eme));
 	  cv = n;
 	}
 	cv++;

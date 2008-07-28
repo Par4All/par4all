@@ -245,16 +245,19 @@ FILE%MODULE:BLOCK~name
 \end{itemize} 
 The name of a label is MODULE:@label because it has function scope. 
 
-In addition, to distinguish a structure, an union or an enumerator that has 
-the same name as other program variables, we have to add special constant 
-characters such as \verb/STRUCT_PREFIX, UNION_PREFIX, ENUM_PREFIX/ to 
-the name prefix. We also have to keep the name of the structure and the union 
-in the global name of its members in order to distinguish these members with 
-other program variables, and so a \verb/MEMBER_SEP_STRING/ is needed. 
-It is not necessary for the enum member, because the name of a variable must 
-be different to the name of an enumerator member. 
-A prefix for typedef \verb/TYPEDEF_PREFIX/ is necessary to distinguish a
-defined name and to regenerate code. 
+In addition, to distinguish a structure, an union or an enumerator
+that has the same name as other program variables, we have to add
+special constant characters such as
+\verb/STRUCT_PREFIX, UNION_PREFIX, ENUM_PREFIX/ to the name prefix. We
+also have to keep the name of the structure and the union in the
+global name of its members in order to distinguish these members with
+other program variables, and so a \verb/MEMBER_SEP_STRING/ is needed.
+It is not necessary for the enum member, because the name of a
+variable must be different to the name of an enumerator
+member\footnote{Enumerator members are represented as nullary
+  functions with symbolic values, like Fortran parameters.}.  A prefix
+for typedef \verb/TYPEDEF_PREFIX/ is necessary to distinguish a
+defined name and to regenerate code.
 \begin{verbatim}
 STRUCT_PREFIX #
 UNION_PREFIX *
