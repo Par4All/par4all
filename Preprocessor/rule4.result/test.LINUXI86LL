@@ -1,3 +1,39 @@
+
+source code for modules rule4! and f_ho_angle
+
+# 1 "$VDIR/rule4.c"
+# 1 "<built-in>"
+# 1 "<command line>"
+# 1 "$VDIR/rule4.c"
+/* Check that it exercises Rule 4 for function declaration... but the
+   problem in SPEC2000/ammp.c is not reproduced. */
+
+typedef struct{
+        double x,y,z;
+        double fx,fy,fz;
+        int serial;
+        double q,a,b,mass;
+        void *next;
+        char active;
+        char name[9];
+        double chi,jaa;
+        double vx,vy,vz,vw,dx,dy,dz;
+        double gx,gy,gz;
+        double VP,px,py,pz,dpx,dpy,dpz;
+        double qxx,qxy,qxz,qyy,qyz,qzz;
+        void *close[200 ];
+        void *excluded[32 ];
+        char exkind[32 ];
+        int dontuse;
+        } ATOM;
+
+typedef struct{
+        ATOM *atom1,*atom2,*atom3;
+        double target,k;
+        void *next;
+        } ANGLE;
+
+extern int f_ho_angle();
 # 29
 int f_ho_angle(lambda)
 double lambda;
