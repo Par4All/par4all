@@ -35,6 +35,7 @@
 
 #define FILE_SEP_STRING 		"!"
 #define BLOCK_SEP_STRING 		"`"
+#define BLOCK_SEP_CHAR 			'`'
 #define MEMBER_SEP_STRING 		"^"
 #define STRUCT_PREFIX 			"#"
 #define UNION_PREFIX 			"'"

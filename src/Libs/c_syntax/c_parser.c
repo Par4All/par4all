@@ -219,6 +219,7 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
       }
 
     ContextStack = stack_make(c_parser_context_domain,0,0);
+    InitScope();
     FunctionStack = stack_make(entity_domain,0,0);
     FormalStack = stack_make(basic_domain,0,0);
     OffsetStack = stack_make(basic_domain,0,0);
@@ -310,6 +311,7 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
     reset_current_C_line_number();
     reset_C_comment(compilation_unit_p(module_name));
     /*  reset_keyword_typedef_table();*/
+    pips_assert("ContextStack is empty", stack_empty_p(ContextStack));
     stack_free(&ContextStack);
     stack_free(&FunctionStack);
     stack_free(&FormalStack);

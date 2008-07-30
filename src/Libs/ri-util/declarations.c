@@ -1815,9 +1815,16 @@ bool typedef_type_p(type t)
    10 pointers, each pointer points to a function 
    with no parameter and the return type is int)  */
 
-list c_words_entity(type t, list name)
+list generic_c_words_entity(type t, list name, bool is_safe)
 {
   list pc = NIL;
+
+  if(type_undefined_p(t)) {
+    pc = CHAIN_SWORD(NIL, "type_undefined");
+    pc = gen_nconc(pc,name);
+    return pc;
+  }
+
   if (type_functional_p(t))
     {
       functional f = type_functional(t);
@@ -1825,7 +1832,7 @@ list c_words_entity(type t, list name)
       list lparams = functional_parameters(f);
       bool first = TRUE;  
 
-      pips_debug(7,"Function type with name = %s and length %zd\n", list_to_string(name), gen_length(name));
+      pips_debug(9,"Function type with name = \"%s\" and length %zd\n", list_to_string(name), gen_length(name));
  
       if ((gen_length(name) > 1) || ((gen_length(name) == 1) && (strcmp(STRING(CAR(name)),"*")==0)))
 	{
@@ -1845,29 +1852,29 @@ list c_words_entity(type t, list name)
       MAP(PARAMETER,p,
       {
 	type t1 = parameter_type(p);
-	pips_debug(3,"Parameter type %s\n ",words_to_string(words_type(t1)));
+	//pips_debug(3,"Parameter type %s\n ",type_undefined_p(t1)? "type_undefined" : words_to_string(words_type(t1)));
 	if (!first)
 	  pc = gen_nconc(pc,CHAIN_SWORD(NIL, LIST_SEPARATOR));
 	/* c_words_entity(t1,NIL) should be replaced by c_words_entity(t1,name_of_corresponding_parameter) */
-	pc = gen_nconc(pc,c_words_entity(t1,NIL));
-	pips_debug(3,"List of parameters %s\n ",list_to_string(pc));
+	pc = gen_nconc(pc,generic_c_words_entity(t1,NIL, is_safe));
+	pips_debug(9,"List of parameters \"%s\"\n ",list_to_string(pc));
 	first = FALSE;
       },lparams);
       
       pc = CHAIN_SWORD(pc,")");
-      return c_words_entity(t2,pc);
+      return generic_c_words_entity(t2,pc,is_safe);
     }
 
   if (pointer_type_p(t))
     {
       type t1 = basic_pointer(variable_basic(type_variable(t)));
-      pips_debug(7,"Pointer type with name = %s\n", list_to_string(name));
+      pips_debug(9,"Pointer type with name = %s\n", list_to_string(name));
 
       pc = CHAIN_SWORD(NIL,"*");
       if (variable_qualifiers(type_variable(t)) != NIL)
 	pc = gen_nconc(pc,words_qualifier(variable_qualifiers(type_variable(t))));
       pc = gen_nconc(pc,name);
-      return c_words_entity(t1,pc);
+      return generic_c_words_entity(t1,pc,is_safe);
     }
 
   /* Add type qualifiers if there are */
@@ -1876,7 +1883,7 @@ list c_words_entity(type t, list name)
 
   if (basic_type_p(t))
     {
-      pips_debug(7,"Basic type with name = %s\n", list_to_string(name));
+      pips_debug(9,"Basic type with name = \"%\"s\n", list_to_string(name));
  
       pc = gen_nconc(pc,words_type(t));
       pc = gen_nconc(pc,name);
@@ -1893,7 +1900,7 @@ list c_words_entity(type t, list name)
       list dims = variable_dimensions(type_variable(t));
       type t1 = copy_type(t);
       list tmp = NIL; 
-      pips_debug(7,"Array type with name = %s\n", list_to_string(name));
+      pips_debug(9,"Array type with name = %s\n", list_to_string(name));
 
       if ((gen_length(name) > 1) || ((gen_length(name) == 1) && (strcmp(STRING(CAR(name)),"*")==0)))
 	{
@@ -1910,14 +1917,14 @@ list c_words_entity(type t, list name)
 	}
       variable_dimensions(type_variable(t1)) = NIL;
       variable_qualifiers(type_variable(t1)) = NIL;
-      return gen_nconc(pc,c_words_entity(t1,gen_nconc(tmp,words_dimensions(dims))));
+      return gen_nconc(pc,generic_c_words_entity(t1,gen_nconc(tmp,words_dimensions(dims)),is_safe));
     }
  
   if (derived_type_p(t))
     {
       entity ent = basic_derived(variable_basic(type_variable(t)));
       type t1 = entity_type(ent);
-      pips_debug(7,"Derived type with name = %s\n", list_to_string(name));
+      pips_debug(9,"Derived type with name = %s\n", list_to_string(name));
       pc = gen_nconc(pc,words_type(t1));
       pc = CHAIN_SWORD(pc,entity_user_name(ent));
       pc = CHAIN_SWORD(pc," ");
@@ -1926,19 +1933,29 @@ list c_words_entity(type t, list name)
   if (typedef_type_p(t))
     {
       entity ent = basic_typedef(variable_basic(type_variable(t)));
-      pips_debug(7,"Typedef type with name = %s\n", list_to_string(name));
+      pips_debug(9,"Typedef type with name = %s\n", list_to_string(name));
       pc = CHAIN_SWORD(pc,entity_user_name(ent));
       pc = CHAIN_SWORD(pc," ");
       return gen_nconc(pc,name);
     }  
   if (type_varargs_p(t))
     {
-      pips_debug(7,"Varargs type ... with name = %s\n", list_to_string(name));
+      pips_debug(9,"Varargs type ... with name = %s\n", list_to_string(name));
       pc = CHAIN_SWORD(pc,"...");
       return gen_nconc(pc,name);
     }  
   pips_internal_error("unexpected case\n");
   return NIL;
+}
+
+list c_words_entity(type t, list name)
+{
+  return generic_c_words_entity(t, name, FALSE);
+}
+
+list safe_c_words_entity(type t, list name)
+{
+  return generic_c_words_entity(t, name, TRUE);
 }
 
 text c_text_entities(entity module, list ldecl, int margin)

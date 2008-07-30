@@ -465,7 +465,7 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
   entity ent = entity_undefined;
   string global_name = string_undefined; 
 
-  pips_debug(5,"Entity local name is %s with prefix %s\n",name,prefix);
+  pips_debug(5,"Entity local name is \"%s\" with prefix \"%s\"\n",name,prefix);
 
   /* Add block scope case here */
 
@@ -545,11 +545,22 @@ entity FindOrCreateCurrentEntity(string name,stack ContextStack,stack FormalStac
 {
   entity ent; 
   c_parser_context context = stack_head(ContextStack);
-  string scope = c_parser_context_scope(context);
+  string full_scope = c_parser_context_scope(context);
+  string scope = strrchr(full_scope, BLOCK_SEP_CHAR);
+  string block_scope = gen_strndup0(full_scope, 
+				    (scope==NULL)? strlen(full_scope) : (unsigned) (scope-full_scope+1));
+  type ct = c_parser_context_type(context);
   bool is_typedef = c_parser_context_typedef(context);
   bool is_static = c_parser_context_static(context);
   entity function = entity_undefined;
   bool is_formal;
+
+  if(scope!=NULL)
+    scope++;
+  else {
+    scope = full_scope;
+  }
+
   if (stack_undefined_p(FormalStack) || stack_empty_p(FormalStack))
     is_formal = FALSE;
   else
@@ -557,11 +568,17 @@ entity FindOrCreateCurrentEntity(string name,stack ContextStack,stack FormalStac
       is_formal= TRUE; 
       function = stack_head(FunctionStack);
     }
+
   ifdebug(5)
     {
-      pips_debug(5,"Entity local name %s\n",name);
-      if (scope != NULL)
-	pips_debug(5,"Current scope: %s\n",scope);
+      pips_debug(5,"Entity local name \"%s\"\n",name);
+      pips_debug(5,"Context %p\n",context);
+      if (full_scope != NULL) {
+	pips_debug(5,"Current scope: \"%s\"\n",full_scope);
+	pips_debug(5,"Local declaration scope: \"%s\"\n",scope);
+	pips_debug(5,"Block scope: \"%s\"\n",block_scope);
+      }
+      pips_debug(5,"type %p: %s\n", ct, list_to_string(safe_c_words_entity(ct, NIL)));
       pips_debug(5,"is_typedef: %d\n",is_typedef);
       pips_debug(5,"is_static: %d\n",is_static);
       pips_debug(5,"is_external: %d\n",is_external);
@@ -580,7 +597,7 @@ entity FindOrCreateCurrentEntity(string name,stack ContextStack,stack FormalStac
     }
   else
     {
-      if (scope != NULL)
+      if (strcmp(scope,"") != 0)
 	{
 	  ent = find_or_create_entity(strdup(concatenate(scope,name,NULL)));
 	  if (is_external && strstr(scope,TOP_LEVEL_MODULE_NAME) != NULL)
@@ -702,11 +719,12 @@ type UpdateFinalPointer(type pt, type t)
 void UpdatePointerEntity(entity e, type pt, list lq)
 {
   type t = entity_type(e);
-  pips_debug(3,"Update pointer entity %s\n",entity_name(e));
+  pips_debug(3,"Update pointer entity %s with type pt=\"%s\"\n",
+	     entity_name(e), list_to_string(c_words_entity(pt, NIL)));
   
   if (type_undefined_p(t))
     {
-      pips_debug(3,"Undefined type entity\n");
+      pips_debug(3,"Undefined entity type\n");
       entity_type(e) = pt;
       variable_qualifiers(type_variable(entity_type(e))) = gen_nconc(variable_qualifiers(type_variable(entity_type(e))),lq);
     }
@@ -737,6 +755,8 @@ void UpdatePointerEntity(entity e, type pt, list lq)
 	}
       }
     }
+  pips_debug(3,"Ends with type \"%s\" for entity %s\n",
+	     list_to_string(c_words_entity(entity_type(e), NIL)), entity_name(e));
 }
 
 void UpdateArrayEntity(entity e, list lq, list le)
@@ -769,23 +789,47 @@ void UpdateArrayEntity(entity e, list lq, list le)
 void UpdateFunctionEntity(entity e, list la)
 {
   type t = entity_type(e);
+
   pips_debug(3,"Update function entity %s\n",entity_name(e));
+
+  ifdebug(8) {
+    pips_debug(8, "with type list la: ");
+    if(ENDP(la)) {
+      (void) fprintf(stderr, "empty list");
+    }
+    MAP(PARAMETER, at, {
+      (void) fprintf(stderr, "%s, ", list_to_string(safe_c_words_entity(parameter_type(at), NIL)));
+    }, la);
+      (void) fprintf(stderr, "\n");
+  }
+
   if (type_undefined_p(t))
     entity_type(e) = make_type_functional(make_functional(la,type_undefined));
   else
     CParserError("This entity must have undefined type\n");
+
+  pips_debug(3,"Update function entity \"%s\" with type \"\%s\"\n",
+	     entity_name(e), list_to_string(safe_c_words_entity(entity_type(e), NIL)));
 }
 
 /* This function replaces the undefined field in t1 by t2. 
    If t1 is an array type and the basic of t1 is undefined, it is replaced by the basic of t2.
    If t1 is a pointer type, if the pointed type is undefined it is replaced by t2. 
    If t1 is a functional type, if the result type of t1 is undefined, it is replaced by t2.
-   The function is recursive */
+   The function is recursive.
+
+   FI: This function used to create sharing between t1 and t2, which
+   creates problems when t2 is later freed. t1 may be updated and
+   returned or a new type may be created. */
 
 type UpdateType(type t1, type t2)
 {
-  if (type_undefined_p(t1))
-    return t2;
+  if (type_undefined_p(t1)) {
+    if(!type_undefined_p(t2))
+      return copy_type(t2);
+    else
+      return t2;
+  }
   switch (type_tag(t1)) 
     {
     case is_type_variable: 
@@ -793,11 +837,12 @@ type UpdateType(type t1, type t2)
 	variable v = type_variable(t1);
 	if (basic_undefined_p(variable_basic(v)))
 	  {
+	    pips_assert("type t2 is defined", !type_undefined_p(t2));
 	    if (type_variable_p(t2))
-	      return make_type_variable(make_variable(variable_basic(type_variable(t2)),
+	      return make_type_variable(make_variable(copy_basic(variable_basic(type_variable(t2))),
 						      variable_dimensions(v),
 						      gen_nconc(variable_qualifiers(v),
-								variable_qualifiers(type_variable(t2)))));
+								gen_full_copy_list(variable_qualifiers(type_variable(t2))))));
 	    CParserError("t1 is a variable type but not t2\n");
 	  }
 	else 
@@ -819,9 +864,12 @@ type UpdateType(type t1, type t2)
 	functional f = type_functional(t1);
 	if (type_undefined_p(functional_result(f)))
 	  {
+	      type nt = type_undefined;
 	    if (type_undefined_p(t2))
-	      t2 = make_type_unknown();
-	    return make_type_functional(make_functional(functional_parameters(f),t2));
+	      nt = make_type_unknown();
+	    else
+	      nt = copy_type(t2);
+	    return make_type_functional(make_functional(functional_parameters(f),nt));
 	  }
 	return make_type_functional(make_functional(functional_parameters(f),UpdateType(functional_result(f),t2)));
       }
@@ -954,7 +1002,7 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
   type t1,t2;
   list lq = c_parser_context_qualifiers(context);
 
-  pips_debug(3,"Update entity %s\n",entity_name(e));
+  pips_debug(3,"Update entity begins for \"%s\" with context %p\n", entity_name(e), context);
 
   if (lq != NIL)
     {
@@ -969,6 +1017,7 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
   /************************* TYPE PART *******************************************/
  
   /* Use the type stack in entity_storage to create the final type for the entity*/
+  //pips_assert("context type tc is defined", !type_undefined_p(tc));
   t2 = UpdateType(t,tc);
 
   while (stack_size(s) > 1)
@@ -1050,6 +1099,9 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
   if(value_undefined_p(entity_initial(e))) {
     entity_initial(e) = make_value_unknown();
   }
+
+  pips_debug(3,"Update entity ends for \"%s\" with type \"%s\"\n",
+	     entity_name(e),list_to_string(safe_c_words_entity(entity_type(e), NIL)));
   
   pips_assert("Current entity is consistent",entity_consistent_p(e));
 }

@@ -54,6 +54,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #include "genC.h"
 #include "linear.h"
@@ -110,13 +111,136 @@ extern stack OffsetStack; /* to know the offset of the formal argument */
  extern string pop_current_C_comment(); // Declared in clex.l not scanned by cproto
  extern void push_current_C_comment(); // Declared in clex.l not scanned by cproto
 
-static c_parser_context context;
+ // FI: I assumed it was the current context; in fact the current
+ // context is rather the top of the ContextStack.I try to maintain as
+ // an invariant ycontext==stack_head(ContextStack)
+ // But this might not be a good idea as it interferes with cyacc.y use of ycontext
+static c_parser_context ycontext = c_parser_context_undefined;
 
+string empty_scope() { return strdup("");}
 
+bool empty_scope_p(string s) {return strcmp(s, "")==0;}
 
 c_parser_context CreateDefaultContext()
 {
-  return make_c_parser_context(NULL,type_undefined,storage_undefined,NIL,FALSE,FALSE);
+  return make_c_parser_context(empty_scope(),type_undefined,storage_undefined,NIL,FALSE,FALSE);
+}
+ 
+bool string_block_scope_p(string s)
+{
+  // A bock scope string is empty or made of numbers each terminated by BLOCK_SEP_STRING
+  char valid[12] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', BLOCK_SEP_CHAR, '\0'};
+  bool is_block_scope = FALSE;
+  string cs = s;
+  bool is_number = FALSE;
+
+  pips_debug(10, "Potential block scope string = \"%s\"\n", s);
+
+  pips_assert("The block scope contains only authorized characters",
+	      strspn(s, valid) == strlen(s));
+
+  for(cs=s; *cs!='\0'; cs++) {
+    if(is_number && isdigit(*cs))
+      ;
+    else if(is_number && *cs==BLOCK_SEP_CHAR)
+      is_number = FALSE;
+    else if(!is_number && isdigit(*cs))
+      is_number = TRUE;
+    else if(!is_number && *cs==BLOCK_SEP_CHAR) {
+      is_block_scope = FALSE;
+      break;
+    }
+  }
+  is_block_scope = !is_number;
+
+  pips_debug(10, "String = \"%s\" is %sa block scope string\n", s, is_block_scope?"":"not ");
+
+  return is_block_scope;
+}
+
+static int C_scope_identifier = -2;
+
+void InitScope()
+{
+  C_scope_identifier = -1;
+}
+
+void EnterScope()
+{
+  c_parser_context nc = CreateDefaultContext();
+  string cs = string_undefined;
+
+  pips_assert("C_scope_identifier has been initialized", C_scope_identifier>-2);
+
+  if(!stack_empty_p(ContextStack)) {
+    c_parser_context c = (c_parser_context) stack_head(ContextStack);
+    pips_assert("The current context is defined", !c_parser_context_undefined_p(c));
+    pips_assert("The current context scope is defined",
+		!string_undefined_p(c_parser_context_scope(c))
+		&& c_parser_context_scope(c)!=NULL);
+    pips_assert("The current context only contains scope information", 
+		//type_undefined_p(c_parser_context_type(c)) &&
+		storage_undefined_p(c_parser_context_storage(c))
+		&& ENDP(c_parser_context_qualifiers(c))
+		//&& !c_parser_context_typedef(c)
+		//&& !c_parser_context_static(c)
+		);
+    cs = c_parser_context_scope(c);
+    pips_assert("scope contains only block scope information", string_block_scope_p(cs));
+  }
+  else
+    cs = "";
+
+  // Add scope information if any
+  C_scope_identifier++;
+  if(C_scope_identifier>0) {
+    string ns = int_to_string(C_scope_identifier);
+    
+    c_parser_context_scope(nc) = strdup(concatenate(cs, ns, BLOCK_SEP_STRING, NULL));
+    free(ns);
+  }
+  else {
+    c_parser_context_scope(nc) = strdup(cs);
+  }
+
+  stack_push((char *) nc, ContextStack);
+  //ycontext = nc;
+  //pips_assert("ycontext is consistant with stack_head(ContextStack)",
+  //	      ycontext==stack_head(ContextStack));
+  pips_debug(8, "New block scope string: \"%s\" for context %p\n",
+	     c_parser_context_scope(nc), nc);
+}
+
+void ExitScope()
+{
+  c_parser_context c = (c_parser_context) stack_head(ContextStack);
+
+  pips_assert("The current context is defined", !c_parser_context_undefined_p(c));
+  pips_assert("The current contextscope is defined",
+	      !string_undefined_p(c_parser_context_scope(c))
+	      && c_parser_context_scope(c)!=NULL);
+  pips_assert("The current context only contains scope information", 
+	      //type_undefined_p(c_parser_context_type(c)) &&
+	      storage_undefined_p(c_parser_context_storage(c))
+	      && ENDP(c_parser_context_qualifiers(c))
+	      //&& !c_parser_context_typedef(c)
+	      //&& !c_parser_context_static(c)
+	      );
+  pips_debug(8, "Exiting context scope \"\%s\" in context %p\n",
+	     c_parser_context_scope(c), c);
+  free_c_parser_context(c);
+  (void) stack_pop(ContextStack);
+  if(!stack_empty_p(ContextStack)) {
+    c_parser_context oc = (c_parser_context) stack_head(ContextStack);
+    //pips_assert("ycontext is consistant with stack_head(ContextStack)",
+    //		ycontext==stack_head(ContextStack));
+    pips_debug(8, "Back to context scope \"\%s\" in context %p\n",
+	       c_parser_context_scope(oc), oc);
+  }
+  else {
+    // ycontext = c_parser_context_undefined;
+    pips_debug(8, "Back to undefined context scope\n");
+  }
 }
 
 %}
@@ -928,9 +1052,12 @@ bracket_comma_expression:
 
 /*** statements ***/
 block: /* ISO 6.8.2 */
-    TK_LBRACE local_labels block_attrs declaration_list statement_list TK_RBRACE   
+    TK_LBRACE
+                        { EnterScope();}
+    local_labels block_attrs declaration_list statement_list TK_RBRACE   
                         {
-			  $$ = MakeBlock($4,$5);
+			  $$ = MakeBlock($5,$6);
+			  ExitScope();
 			} 
 |   error location TK_RBRACE 
                         { CParserError("Parse error: error location TK_RBRACE \n"); } 
@@ -1222,7 +1349,30 @@ init_declarator:                             /* ISO 6.7 */
 ;
 
 decl_spec_list:
-{ context = CreateDefaultContext(); } my_decl_spec_list { $$ = $2;} 
+                       {
+			 if(stack_empty_p(ContextStack)) {
+                           ycontext = CreateDefaultContext();
+			 }
+			 else {
+			   /* Copy may be excessive as only the scope needs to be preserved...*/
+			   ycontext = copy_c_parser_context((c_parser_context)stack_head(ContextStack));
+			   /* How can these two problems occur since
+			      ycontext is only a copy of the
+			      ContextStack's head? Are we in the
+			      middle of a stack_push() /stack_pop()?
+			      The previous policy was to always
+			      allocate a new ycontext, regardless of
+			      the stack state */
+			   /* FI: a bit afraid of freeing the past type if any */
+			   c_parser_context_type(ycontext) = type_undefined;
+			   /* FI: sometimes, the scope is erased and lost */
+			   if(strcmp(c_parser_context_scope(ycontext), "TOP-LEVEL:")==0)
+			     c_parser_context_scope(ycontext) = empty_scope();
+			   /* Finally, to avoid problems!*/
+			   c_parser_context_scope(ycontext) = empty_scope();
+                         }
+                        } 
+    my_decl_spec_list { $$ = $2;} 
 ;
 
 my_decl_spec_list:                         /* ISO 6.7 */
@@ -1230,20 +1380,20 @@ my_decl_spec_list:                         /* ISO 6.7 */
     TK_TYPEDEF decl_spec_list_opt          
                         {
 			  /* Add TYPEDEF_PREFIX to entity name prefix and make it a rom storage */
-			  c_parser_context_typedef(context) = TRUE;
-			  c_parser_context_storage(context) = make_storage_rom();
+			  c_parser_context_typedef(ycontext) = TRUE;
+			  c_parser_context_storage(ycontext) = make_storage_rom();
 			  $$ = $2;
 			}    
 |   TK_EXTERN decl_spec_list_opt           
                         {
 			  /* This can be a variable or a function, whose storage is ram or return  */
-			  c_parser_context_scope(context) = strdup(concatenate(TOP_LEVEL_MODULE_NAME,
+			  c_parser_context_scope(ycontext) = strdup(concatenate(TOP_LEVEL_MODULE_NAME,
 									       MODULE_SEP_STRING,NULL)); 
 			  $$ = $2;
 			}    
 |   TK_STATIC decl_spec_list_opt    
                         {
-			  c_parser_context_static(context) = TRUE;
+			  c_parser_context_static(ycontext) = TRUE;
 			  $$ = $2;
 			}
 |   TK_AUTO decl_spec_list_opt           
@@ -1254,7 +1404,7 @@ my_decl_spec_list:                         /* ISO 6.7 */
 |   TK_REGISTER decl_spec_list_opt        
                         {
 			  /* Add to type variable qualifiers */
-			  c_parser_context_qualifiers(context) = gen_nconc(c_parser_context_qualifiers(context), 
+			  c_parser_context_qualifiers(ycontext) = gen_nconc(c_parser_context_qualifiers(ycontext), 
 									   CONS(QUALIFIER,make_qualifier_register(),NIL));
 			  $$ = $2;
 			}
@@ -1271,7 +1421,7 @@ my_decl_spec_list:                         /* ISO 6.7 */
 			}	 
 |   attribute decl_spec_list_opt        
                         { 
-			  c_parser_context_qualifiers(context) = CONS(QUALIFIER,$1,c_parser_context_qualifiers(context));
+			  c_parser_context_qualifiers(ycontext) = CONS(QUALIFIER,$1,c_parser_context_qualifiers(ycontext));
 			  $$ = $2;
 			}	
 /* specifier pattern variable (must be last in spec list) */
@@ -1286,7 +1436,7 @@ my_decl_spec_list:                         /* ISO 6.7 */
 decl_spec_list_opt: 
     /* empty */ 
                         {		  
-			  stack_push((char *) context,ContextStack);
+			  stack_push((char *) ycontext, ContextStack);
 			  $$ = NIL; 
 			} %prec TK_NAMED_TYPE
 |   my_decl_spec_list      { }
@@ -1299,7 +1449,7 @@ decl_spec_list_opt:
 decl_spec_list_opt_no_named: 
     /* empty */
                         {
-			  stack_push((char *) context,ContextStack);
+			  stack_push((char *) ycontext,ContextStack);
                           $$ = NIL; 
 			} %prec TK_IDENT
 |   my_decl_spec_list      { }
@@ -1309,45 +1459,45 @@ decl_spec_list_opt_no_named:
 type_spec:   /* ISO 6.7.2 */
     TK_VOID             
                         {
-			  c_parser_context_type(context) = make_type_void();
+			  c_parser_context_type(ycontext) = make_type_void();
 			  $$ = NIL;
                         } 
 |   TK_CHAR          
                         {
-			  c_parser_context_type(context) = make_standard_integer_type(c_parser_context_type(context),
+			  c_parser_context_type(ycontext) = make_standard_integer_type(c_parser_context_type(ycontext),
 										      DEFAULT_CHARACTER_TYPE_SIZE);
 			  $$ = NIL;
 			}
 |   TK_SHORT      
                         {
-			  c_parser_context_type(context) = make_standard_integer_type(c_parser_context_type(context),
+			  c_parser_context_type(ycontext) = make_standard_integer_type(c_parser_context_type(ycontext),
 										      DEFAULT_SHORT_INTEGER_TYPE_SIZE);
 			  $$ = NIL;
 			}    
 |   TK_INT  
                         {
-			  if (c_parser_context_type(context) == type_undefined)
+			  if (c_parser_context_type(ycontext) == type_undefined)
 			    {
 			      variable v = make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL);	
-			      c_parser_context_type(context) = make_type_variable(v);
+			      c_parser_context_type(ycontext) = make_type_variable(v);
 			    }
 			  $$ = NIL;
 			}  
 |   TK_LONG
                         {
-			  c_parser_context_type(context) = make_standard_long_integer_type(c_parser_context_type(context));
+			  c_parser_context_type(ycontext) = make_standard_long_integer_type(c_parser_context_type(ycontext));
 			  $$ = NIL;
 			}   
 |   TK_FLOAT           
                         {
 			  variable v = make_variable(make_basic_float(DEFAULT_REAL_TYPE_SIZE),NIL,NIL);
-			  c_parser_context_type(context) = make_type_variable(v);
+			  c_parser_context_type(ycontext) = make_type_variable(v);
 			  $$ = NIL;
 			}
 |   TK_DOUBLE           
                         {
 			  variable v = make_variable(make_basic_float(DEFAULT_DOUBLEPRECISION_TYPE_SIZE),NIL,NIL);
-			  c_parser_context_type(context) = make_type_variable(v);
+			  c_parser_context_type(ycontext) = make_type_variable(v);
 			  $$ = NIL;
 			}
 |   TK_SIGNED     
@@ -1355,14 +1505,14 @@ type_spec:   /* ISO 6.7.2 */
 			  /* see the RI document or ri-util.h for explanation */
 			  variable v = make_variable(make_basic_int(DEFAULT_SIGNED_TYPE_SIZE*10+
 								    DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL);
-			  c_parser_context_type(context) = make_type_variable(v);
+			  c_parser_context_type(ycontext) = make_type_variable(v);
 			  $$ = NIL;
 			}
 |   TK_UNSIGNED          
                         {
 			  variable v = make_variable(make_basic_int(DEFAULT_UNSIGNED_TYPE_SIZE*10+
 								    DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL);
-			  c_parser_context_type(context) = make_type_variable(v);
+			  c_parser_context_type(ycontext) = make_type_variable(v);
 			  $$ = NIL;
 			}
 |   TK_STRUCT id_or_typename                           
@@ -1376,7 +1526,7 @@ type_spec:   /* ISO 6.7.2 */
 			     because it is declared in other file  */
 			  if (type_undefined_p(entity_type(ent)))
 			    entity_type(ent) = make_type_struct(NIL); 
-			  c_parser_context_type(context) = make_type_variable(v);
+			  c_parser_context_type(ycontext) = make_type_variable(v);
 			  $$ = NIL;
 			}
 |   TK_STRUCT id_or_typename TK_LBRACE 
@@ -1393,7 +1543,7 @@ type_spec:   /* ISO 6.7.2 */
 			  /* Take from $5 the struct/union entities */
 			  list le = TakeDeriveEntities($5);
 			  $$ = gen_nconc(le,CONS(ENTITY,ent,NIL));
-			  c_parser_context_type(context) = make_type_variable(v); 
+			  c_parser_context_type(ycontext) = make_type_variable(v); 
 			  stack_pop(StructNameStack);
 			}
 |   TK_STRUCT TK_LBRACE
@@ -1411,7 +1561,7 @@ type_spec:   /* ISO 6.7.2 */
 			  /* Take from $4 the struct/union entities */
 			  list le = TakeDeriveEntities($4);
 			  $$ = gen_nconc(le,CONS(ENTITY,ent,NIL));
-			  c_parser_context_type(context) = make_type_variable(v);
+			  c_parser_context_type(ycontext) = make_type_variable(v);
 			  stack_pop(StructNameStack); 
 			}
 |   TK_UNION id_or_typename 
@@ -1422,7 +1572,7 @@ type_spec:   /* ISO 6.7.2 */
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
 			  if (type_undefined_p(entity_type(ent)))
 			    entity_type(ent) = make_type_union(NIL); 
-			  c_parser_context_type(context) = make_type_variable(v); 
+			  c_parser_context_type(ycontext) = make_type_variable(v); 
 			  $$ = NIL;
 			}
 |   TK_UNION id_or_typename TK_LBRACE 
@@ -1437,7 +1587,7 @@ type_spec:   /* ISO 6.7.2 */
 			  /* Take from $5 the struct/union entities */
 			  list le = TakeDeriveEntities($5);
 			  $$ = gen_nconc(le,CONS(ENTITY,ent,NIL));
-			  c_parser_context_type(context) = make_type_variable(v);
+			  c_parser_context_type(ycontext) = make_type_variable(v);
 			  stack_pop(StructNameStack);
 			}
 |   TK_UNION TK_LBRACE
@@ -1455,7 +1605,7 @@ type_spec:   /* ISO 6.7.2 */
 			  /* Take from $4 the struct/union entities */
 			  list le = TakeDeriveEntities($4);
 			  $$ = gen_nconc(le,CONS(ENTITY,ent,NIL));
-			  c_parser_context_type(context) = make_type_variable(v);
+			  c_parser_context_type(ycontext) = make_type_variable(v);
 			  stack_pop(StructNameStack);
 			}
 |   TK_ENUM id_or_typename   
@@ -1466,7 +1616,7 @@ type_spec:   /* ISO 6.7.2 */
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
 			  if (type_undefined_p(entity_type(ent)))
 			    entity_type(ent) = make_type_enum(NIL); 
-			  c_parser_context_type(context) = make_type_variable(v);
+			  c_parser_context_type(ycontext) = make_type_variable(v);
 			  $$ = NIL;  
 			}
 |   TK_ENUM id_or_typename TK_LBRACE enum_list maybecomma TK_RBRACE
@@ -1476,7 +1626,7 @@ type_spec:   /* ISO 6.7.2 */
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
 
 			  InitializeEnumMemberValues($4);
-			  c_parser_context_type(context) = make_type_variable(v);  
+			  c_parser_context_type(ycontext) = make_type_variable(v);  
 			  $$ = CONS(ENTITY,ent,NIL);
 			}                   
 |   TK_ENUM TK_LBRACE enum_list maybecomma TK_RBRACE
@@ -1487,7 +1637,7 @@ type_spec:   /* ISO 6.7.2 */
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
 
 			  InitializeEnumMemberValues($3);
-			  c_parser_context_type(context) = make_type_variable(v);  
+			  c_parser_context_type(ycontext) = make_type_variable(v);  
 			  $$ = CONS(ENTITY,ent,NIL);
 			}
 |   TK_NAMED_TYPE  
@@ -1496,11 +1646,11 @@ type_spec:   /* ISO 6.7.2 */
 			  ent = FindOrCreateEntityFromLocalNameAndPrefix($1,TYPEDEF_PREFIX,is_external);	
 			  
 			  /* Specify the type of the variable that follows this declaration specifier */
-			  if (c_parser_context_typedef(context))
+			  if (c_parser_context_typedef(ycontext))
 			    {
 			      /* typedef T1 T2 => the type of T2 will be that of T1*/
 			      pips_debug(8,"typedef T1 T2 where T1 =  %s\n",entity_name(ent));
-			      c_parser_context_type(context) = entity_type(ent);
+			      c_parser_context_type(ycontext) = entity_type(ent);
 			      $$ = CONS(ENTITY,ent,NIL);
 			    }
 			  else
@@ -1508,7 +1658,7 @@ type_spec:   /* ISO 6.7.2 */
 			      /* T1 var => the type of var is basic typedef */
 			      variable v = make_variable(make_basic_typedef(ent),NIL,NIL);
 			      pips_debug(8,"T1 var where T1 =  %s\n",entity_name(ent));
-			      c_parser_context_type(context) = make_type_variable(v);  
+			      c_parser_context_type(ycontext) = make_type_variable(v);  
 			      $$ = NIL;
 			    }
 			}
@@ -1528,7 +1678,7 @@ struct_decl_list: /* (* ISO 6.7.2. Except that we allow empty structs. We
     /* empty */         { $$ = NIL; }
 |   decl_spec_list TK_SEMICOLON struct_decl_list
                         {
-			  c_parser_context context = stack_head(ContextStack);
+			  c_parser_context ycontext = stack_head(ContextStack);
 			  /* Create the struct member entity with unique name, the name of the 
 			     struct/union is added to the member name prefix */
 			  string s = strdup(concatenate("PIPS_MEMBER_",int_to_string(derived_counter++),NULL));  
@@ -1539,7 +1689,7 @@ struct_decl_list: /* (* ISO 6.7.2. Except that we allow empty structs. We
 			  pips_debug(5,"Current derived name: %s\n",derived);
 			  pips_debug(5,"Member name: %s\n",entity_name(ent));
 			  entity_storage(ent) = make_storage_rom();
-			  entity_type(ent) = c_parser_context_type(context); 
+			  entity_type(ent) = c_parser_context_type(ycontext); 
 
 			  /* Temporally put the list of struct/union
 			     entities defined in $1 to initial value
@@ -1553,11 +1703,11 @@ struct_decl_list: /* (* ISO 6.7.2. Except that we allow empty structs. We
 			}             
 |   decl_spec_list
                         {
-			  c_parser_context context = stack_head(ContextStack);
+			  c_parser_context ycontext = stack_head(ContextStack);
 			  /* Add struct/union name and MEMBER_SEP_STRING to entity name */
 			  string derived = code_decls_text((code) stack_head(StructNameStack));		
-			  c_parser_context_scope(context) = CreateMemberScope(derived,is_external);
-			  c_parser_context_storage(context) = make_storage_rom();
+			  c_parser_context_scope(ycontext) = CreateMemberScope(derived,is_external);
+			  c_parser_context_storage(ycontext) = make_storage_rom();
 			}
     field_decl_list TK_SEMICOLON struct_decl_list
                         {
@@ -1570,14 +1720,14 @@ struct_decl_list: /* (* ISO 6.7.2. Except that we allow empty structs. We
 			  stack_pop(ContextStack);
 
 			  /* This code is not good ...
-			     I have problem with the global variable context and recursion: context is crushed 
+			     I have problem with the global variable ycontext and recursion: ycontext is crushed 
 			     when this decl_spec_list in struct_decl_list is entered, so the scope and storage 
 			     of the new context are given to the old context, before it is pushed in the stack.
 
 			     For the moment, I reset the changed values of the context, by hoping that in C, 
 			     before a STRUCT/UNION declaration, there is no extern, ... */
-			  c_parser_context_scope(context) = NULL;
-			  c_parser_context_storage(context) = storage_undefined;
+			  c_parser_context_scope(ycontext) = empty_scope();
+			  c_parser_context_storage(ycontext) = storage_undefined;
 			}
 |   error TK_SEMICOLON struct_decl_list
                         {
@@ -1611,10 +1761,10 @@ field_decl: /* (* ISO 6.7.2. Except that we allow unnamed fields. *) */
 			}  
 |   TK_COLON expression 
                         {
-			  c_parser_context context = stack_head(ContextStack);
+			  c_parser_context ycontext = stack_head(ContextStack);
 			  /* Unnamed bit-field : special and unique name */
 			  string s = strdup(concatenate("PIPS_MEMBER_",int_to_string(derived_counter++),NULL));  
-			  entity ent = CreateEntityFromLocalNameAndPrefix(s,c_parser_context_scope(context),is_external);
+			  entity ent = CreateEntityFromLocalNameAndPrefix(s,c_parser_context_scope(ycontext),is_external);
 			  variable v = make_variable(make_basic_bit(integer_constant_expression_value($2)),NIL,NIL);
 			  pips_assert("Width of bit-field must be a positive constant integer", 
 				      integer_constant_expression_p($2));
@@ -1799,7 +1949,7 @@ parameter_decl: /* (* ISO 6.7.5 *) */
     decl_spec_list declarator 
                         {
 			  UpdateEntity($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external);
-			  $$ = make_parameter(entity_type($2),make_mode(CurrentMode,UU));
+			  $$ = make_parameter(copy_type(entity_type($2)),make_mode(CurrentMode,UU));
 			  /* Set CurentMode where ???? */
 			  stack_pop(ContextStack);
 			}
@@ -1812,8 +1962,8 @@ parameter_decl: /* (* ISO 6.7.5 *) */
 			}
 |   decl_spec_list              
                         {
-			  c_parser_context context = stack_head(ContextStack);
-			  $$ = make_parameter(c_parser_context_type(context),make_mode(CurrentMode,UU));
+			  c_parser_context ycontext = stack_head(ContextStack);
+			  $$ = make_parameter(copy_type(c_parser_context_type(ycontext)),make_mode(CurrentMode,UU));
 			  /* function prototype*/
 			  stack_pop(ContextStack);
 			}
@@ -1922,8 +2072,8 @@ type_name: /* (* ISO 6.7.6 *) */
 			}
 |   decl_spec_list      
                         {
-			  c_parser_context context = stack_head(ContextStack);
-			  $$ = c_parser_context_type(context);
+			  c_parser_context ycontext = stack_head(ContextStack);
+			  $$ = c_parser_context_type(ycontext);
 			  stack_pop(ContextStack);
 			}
 ;

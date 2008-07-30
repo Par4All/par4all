@@ -647,7 +647,13 @@ type_to_string(type t)
     return(string_undefined); /* just to avoid a gcc warning */
 }
 
-
+string safe_type_to_string(type t)
+{
+  if(type_undefined_p(t))
+    return "undefined type";
+  else
+    return type_to_string(t);
+}
 
 /* BEGIN_EOLE */ /* - please do not remove this line */
 /* Lines between BEGIN_EOLE and END_EOLE tags are automatically included
