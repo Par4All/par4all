@@ -1,0 +1,11 @@
+Checking that typedef types are properly prettyprinted
+(because of a problem in main_hello_world.c)
+
+Printed file for "main"
+
+main()
+{
+   size_t i;
+
+   i = 0;
+}

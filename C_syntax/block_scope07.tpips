@@ -14,6 +14,7 @@ echo
 echo Parser output
 echo
 
+display PARSED_PRINTED_FILE[block_scope07!]
 display PARSED_PRINTED_FILE[main]
 
 quit

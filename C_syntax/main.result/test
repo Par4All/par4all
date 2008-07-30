@@ -1,3 +1,16 @@
+
+Parsed printed file for "main"
+
+main()
+{
+   int i;
+   goto l12;
+   i = 0;
+l12:   printf("\n");
+}
+
+Printed file for "main"
+
 main()
 {
    int i;

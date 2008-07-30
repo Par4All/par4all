@@ -1,0 +1,25 @@
+delete typedef03
+create typedef03 typedef03.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 5
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#setenv  PRETTYPRINT_DEBUG_LEVEL 9
+
+echo Checking that typedef types are properly prettyprinted
+echo (because of a problem in main_hello_world.c)
+
+echo
+echo Printed file for "main"
+echo
+
+display PRINTED_FILE[main]
+
+close
+delete typedef03
+
+quit

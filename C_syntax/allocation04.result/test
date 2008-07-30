@@ -1,3 +1,6 @@
+
+Symbol table for foo
+
 foo
 
 Declarations for module foo with typeINTEGER*4 -> INTEGER*4
@@ -42,6 +45,9 @@ Layout for common /foo:*STATIC*/ of size 4:
 	Variable foo:l	offset = 0	size = 4
 
 End of declarations for module foo
+
+
+Symbol table for main
 
 main
 
@@ -88,12 +94,18 @@ Layout for common /main:*STATIC*/ of size 4:
 
 End of declarations for module main
 
+
+Parsed printed file for foo
+
 int foo(int i)
 {
    int k;
    static int l;
    return k;
 }
+
+Parsed printed file for main
+
 int main()
 {
    int i;

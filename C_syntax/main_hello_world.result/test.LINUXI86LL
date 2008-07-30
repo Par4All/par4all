@@ -81,13 +81,13 @@
    typedef struct PIPS_STRUCT_7 _G_fpos64_t;
    enum PIPS_ENUM_8 {__GCONV_OK, __GCONV_NOCONV, __GCONV_NODB, __GCONV_NOMEM, __GCONV_EMPTY_INPUT, __GCONV_FULL_OUTPUT, __GCONV_ILLEGAL_INPUT, __GCONV_INCOMPLETE_INPUT, __GCONV_ILLEGAL_DESCRIPTOR, __GCONV_INTERNAL_ERROR};
    enum PIPS_ENUM_9 {__GCONV_IS_LAST=0x0001, __GCONV_IGNORE_ERRORS};
-   typedef static int (*__gconv_fct)(struct __gconv_step *,struct __gconv_step_data *,const unsigned char **,const unsigned char *,unsigned char **,size_t *,int ,int );
+   typedef static int (*__gconv_fct)(struct __gconv_step *,struct __gconv_step_data *,const unsigned char **,const unsigned char *,unsigned char **,unsigned int *,int ,int );
    typedef static wint_t (*__gconv_btowc_fct)(struct __gconv_step *,unsigned char );
    typedef static int (*__gconv_init_fct)(struct __gconv_step *);
    typedef static void (*__gconv_end_fct)(struct __gconv_step *);
-   typedef static int (*__gconv_trans_fct)(struct __gconv_step *,struct __gconv_step_data *,void *,const unsigned char *,const unsigned char **,const unsigned char *,unsigned char **,size_t *);
+   typedef static int (*__gconv_trans_fct)(struct __gconv_step *,struct __gconv_step_data *,void *,const unsigned char *,const unsigned char **,const unsigned char *,unsigned char **,unsigned int *);
    typedef static int (*__gconv_trans_context_fct)(void *,const unsigned char *,const unsigned char *,unsigned char *,unsigned char *);
-   typedef static int (*__gconv_trans_query_fct)(const char *,const char ***,size_t *);
+   typedef static int (*__gconv_trans_query_fct)(const char *,const char ***,unsigned int *);
    typedef static int (*__gconv_trans_init_fct)(void **,const char *);
    typedef static void (*__gconv_trans_end_fct)(void *);
    struct __gconv_trans_data {
@@ -183,9 +183,9 @@
    extern struct _IO_FILE_plus _IO_2_1_stdin_;
    extern struct _IO_FILE_plus _IO_2_1_stdout_;
    extern struct _IO_FILE_plus _IO_2_1_stderr_;
-   typedef static __ssize_t __io_read_fn(void *,char *,size_t );
-   typedef static __ssize_t __io_write_fn(void *,const char *,size_t );
-   typedef static int __io_seek_fn(void *,__off64_t *,int );
+   typedef static __ssize_t __io_read_fn(void *,char *,unsigned int );
+   typedef static __ssize_t __io_write_fn(void *,const char *,unsigned int );
+   typedef static int __io_seek_fn(void *,long long *,int );
    typedef static int __io_close_fn(void *);
    extern int __underflow(_IO_FILE *);
    extern int __uflow(_IO_FILE *);

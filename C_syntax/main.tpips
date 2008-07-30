@@ -17,6 +17,16 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 #activate PRINT_CODE_PRECONDITIONS 
 
+echo
+echo Parsed printed file for "main"
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo Printed file for "main"
+echo
+
 display PRINTED_FILE[main]
 
 close
