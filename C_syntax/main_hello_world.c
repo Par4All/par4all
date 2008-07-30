@@ -1759,14 +1759,6 @@ extern void _IO_free_backup_area (_IO_FILE *) ;
 
 
 typedef _G_fpos_t fpos_t;
-
-
-
-
-
-
-
-
 /* The possibilities for the third argument to `setvbuf'.  */
 
 
@@ -2281,17 +2273,6 @@ extern int ftrylockfile (FILE *__stream) ;
 extern void funlockfile (FILE *__stream) ;
 /* If we are compiling with optimizing read this file.  It contains
    several optimizing inline functions and macros.  */
-
-
-
-
-
-
-
-
-
-
-
 main()
 {
   int i = 0;
