@@ -3565,8 +3565,10 @@ Polyhedron *DomainConvex(Polyhedron *Pol,unsigned NbMaxConstrs) {
       return (Polyhedron*) 0;
     }
     
+    POL_ENSURE_VERTICES(Pol);
     NewPol = Polyhedron_Copy(Pol);
     for (p=Pol->next; p; p=p->next) {
+      POL_ENSURE_VERTICES(p);
       q = AddRays(p->Ray[0], p->NbRays, NewPol, NbMaxConstrs);
       Polyhedron_Free(NewPol);
       NewPol = q;
