@@ -135,7 +135,7 @@ extern void c_parse();
 void CParserError(char *msg)
 {
   entity mod = get_current_module_entity();
-  string mod_name = entity_undefined_p(mod)? "entity_undefined":entity_module_name(mod);
+  string mod_name = entity_undefined_p(mod)? "entity_undefined":entity_user_name(mod);
 
   /* Reset the parser global variables ?*/
   
@@ -237,7 +237,9 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
 
     /* Predefined type(s): __builtin_va_list */
     built_in_ent = find_or_create_entity(strdup(concatenate(compilation_unit_name,
-					    TYPEDEF_PREFIX,"__builtin_va_list",NULL)));
+							    MODULE_SEP_STRING,
+							    TYPEDEF_PREFIX,"__builtin_va_list",
+							    NULL)));
     if(storage_undefined_p(entity_storage(built_in_ent))) {
       entity_storage(built_in_ent) = make_storage_rom();
       /* Let's lie about the real type */

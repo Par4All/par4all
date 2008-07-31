@@ -109,15 +109,13 @@ EvalCall(call c)
 value 
 EvalConstant(constant c) 
 {
-  return make_value(is_value_constant, copy_constant(c));
-  /*
+  //return make_value(is_value_constant, copy_constant(c));
+
     return((constant_int_p(c)) ?
 	   make_value(is_value_constant, make_constant(is_constant_int,
 						   (void*) constant_int(c))) :
 	   make_value(is_value_constant, 
 		      make_constant(is_constant_litteral, NIL)));
-  */
-
 }
 
 /* this function tries to evaluate a call to an intrinsic function.
@@ -132,113 +130,206 @@ la is the list of arguments.
 value 
 EvalIntrinsic(entity e, list la)
 {
-    value v;
-    int token;
+  value v;
+  int token;
 
-    if ((token = IsUnaryOperator(e)) > 0)
-	    v = EvalUnaryOp(token, la);
-    else if ((token = IsBinaryOperator(e)) > 0)
-	    v = EvalBinaryOp(token, la);
-    else if ((token = IsNaryOperator(e)) > 0)
-	    v = EvalNaryOp(token, la);
-    else
-	    v = make_value(is_value_unknown, NIL);
+  if ((token = IsUnaryOperator(e)) > 0)
+    v = EvalUnaryOp(token, la);
+  else if ((token = IsBinaryOperator(e)) > 0)
+    v = EvalBinaryOp(token, la);
+  else if ((token = IsNaryOperator(e)) > 0)
+    v = EvalNaryOp(token, la);
+  else if (ENTITY_CONDITIONAL_P(e))
+    v = EvalConditionalOp(la);
+  else
+    v = make_value(is_value_unknown, NIL);
 
-    return(v);
+  return(v);
 }
+
+value EvalConditionalOp(list la)
+{
+  value vout, v1, v2, v3;
+  int arg1 = 0, arg2 = 0, arg3 = 0;
+  bool failed = FALSE;
+
+  pips_assert("Three arguments", gen_length(la)==3);
+
+  v1 = EvalExpression(EXPRESSION(CAR(la)));
+  if (value_constant_p(v1) && constant_int_p(value_constant(v1)))
+    arg1 = constant_int(value_constant(v1));
+  else
+    failed = TRUE;
+
+  v2 = EvalExpression(EXPRESSION(CAR(CDR(la))));
+  if (value_constant_p(v2) && constant_int_p(value_constant(v2)))
+    arg2 = constant_int(value_constant(v2));
+  else
+    failed = TRUE;
+
+  v3 = EvalExpression(EXPRESSION(CAR(CDR(CDR(la)))));
+  if (value_constant_p(v3) && constant_int_p(value_constant(v3)))
+    arg3 = constant_int(value_constant(v3));
+  else
+    failed = TRUE;
+
+  if(failed)
+    vout = make_value(is_value_unknown, NIL);
+  else
+    vout = make_value(is_value_constant,
+		      make_constant(is_constant_int, (void *) (arg1? arg2: arg3)));
+
+  free_value(v1);
+  free_value(v2);
+  free_value(v3);
+
+  return vout;
+}
+
 
 value 
 EvalUnaryOp(int t, list la)
 {
-	value vout, v;
-	int arg;
+  value vout, v;
+  int arg;
 
-	assert(la != NIL);
-	v = EvalExpression(EXPRESSION(CAR(la)));
-	if (value_constant_p(v) && constant_int_p(value_constant(v)))
-	    arg = constant_int(value_constant(v));
-	else
-		return(v);
+  assert(la != NIL);
+  v = EvalExpression(EXPRESSION(CAR(la)));
+  if (value_constant_p(v) && constant_int_p(value_constant(v)))
+    arg = constant_int(value_constant(v));
+  else
+    return(v);
 
-	if (t == MINUS) {
-	    constant_int(value_constant(v)) = -arg;
-	    vout = v;
-	}
-	else {
-	    free_value(v);
-	    vout = make_value(is_value_unknown, NIL);
-	}
+  if (t == MINUS) {
+    constant_int(value_constant(v)) = -arg;
+    vout = v;
+  }
+  else if (t == PLUS) {
+    constant_int(value_constant(v)) = arg;
+    vout = v;
+  }
+  else if (t == NOT) {
+    constant_int(value_constant(v)) = arg!=0;
+    vout = v;
+  }
+  else {
+    free_value(v);
+    vout = make_value(is_value_unknown, NIL);
+  }
 
-	return(vout);
+  return(vout);
 }
 
 value 
 EvalBinaryOp(int t, list la)
 {
-    value v;
-    int argl, argr;
+  value v;
+  int argl, argr;
 
-    pips_assert("non empty list", la != NIL);
+  pips_assert("non empty list", la != NIL);
 
-    v = EvalExpression(EXPRESSION(CAR(la)));
-    if (value_constant_p(v) && constant_int_p(value_constant(v))) {
-	argl = constant_int(value_constant(v));
-	free_value(v);
-    }
-    else
-	return(v);
-
-    la = CDR(la);
-
-    pips_assert("non empty list", la != NIL);
-    v = EvalExpression(EXPRESSION(CAR(la)));
-
-    if (value_constant_p(v) && constant_int_p(value_constant(v))) {
-	argr = constant_int(value_constant(v));
-    }
-    else
-	return(v);
-
-    switch (t) {
-      case MINUS:
-	constant_int(value_constant(v)) = argl-argr;
-	break;
-      case PLUS:
-	constant_int(value_constant(v)) = argl+argr;
-	break;
-      case STAR:
-	constant_int(value_constant(v)) = argl*argr;
-	break;
-      case SLASH:
-	if (argr != 0)
-	    constant_int(value_constant(v)) = argl/argr;
-	else {
-	    fprintf(stderr, "[EvalBinaryOp] zero divide\n");
-	    abort();
-	}	
-	break;
-      case MOD:
-	if (argr != 0)
-	    constant_int(value_constant(v)) = argl%argr;
-	else {
-	    fprintf(stderr, "[EvalBinaryOp] zero divide in modulo\n");
-	    abort();
-	}	
-	break;
-      case POWER:
-	if (argr >= 0)
-	    constant_int(value_constant(v)) = ipow(argl,argr);
-	else {
-	    free_value(v);
-	    v = make_value(is_value_unknown, NIL);
-	}
-	break;
-      default:
-	free_value(v);
-	v = make_value(is_value_unknown, NIL);
-    }
-
+  v = EvalExpression(EXPRESSION(CAR(la)));
+  if (value_constant_p(v) && constant_int_p(value_constant(v))) {
+    argl = constant_int(value_constant(v));
+    free_value(v);
+  }
+  else
     return(v);
+
+  la = CDR(la);
+
+  pips_assert("non empty list", la != NIL);
+  v = EvalExpression(EXPRESSION(CAR(la)));
+
+  if (value_constant_p(v) && constant_int_p(value_constant(v))) {
+    argr = constant_int(value_constant(v));
+  }
+  else
+    return(v);
+
+  switch (t) {
+  case MINUS:
+    constant_int(value_constant(v)) = argl-argr;
+    break;
+  case PLUS:
+    constant_int(value_constant(v)) = argl+argr;
+    break;
+  case STAR:
+    constant_int(value_constant(v)) = argl*argr;
+    break;
+  case SLASH:
+    if (argr != 0)
+      constant_int(value_constant(v)) = argl/argr;
+    else {
+      fprintf(stderr, "[EvalBinaryOp] zero divide\n");
+      abort();
+    }	
+    break;
+  case MOD:
+    if (argr != 0)
+      constant_int(value_constant(v)) = argl%argr;
+    else {
+      fprintf(stderr, "[EvalBinaryOp] zero divide in modulo\n");
+      abort();
+    }
+    break;
+  case POWER:
+    if (argr >= 0)
+      constant_int(value_constant(v)) = ipow(argl,argr);
+    else {
+      free_value(v);
+      v = make_value(is_value_unknown, NIL);
+    }
+    break;
+  case EQ:
+    constant_int(value_constant(v)) = argl==argr;
+    break;
+  case NE:
+    constant_int(value_constant(v)) = argl!=argr;
+    break;
+  case EQV:
+    constant_int(value_constant(v)) = argl==argr;
+    break;
+  case NEQV:
+       constant_int(value_constant(v)) = argl!=argr;
+   break;
+  case GT:
+       constant_int(value_constant(v)) = argl>argr;
+   break;
+  case LT:
+       constant_int(value_constant(v)) = argl<argr;
+   break;
+  case GE:
+       constant_int(value_constant(v)) = argl>=argr;
+   break;
+   /* OK for Fortran Logical? */
+  case OR:
+       constant_int(value_constant(v)) = (argl!=0)||(argr!=0);
+   break;
+  case AND:
+       constant_int(value_constant(v)) = (argl!=0)&&(argr!=0);
+   break;
+  case BITWISE_OR:
+       constant_int(value_constant(v)) = argl|argr;
+   break;
+  case BITWISE_AND:
+       constant_int(value_constant(v)) = argl&argr;
+   break;
+  case BITWISE_XOR:
+       constant_int(value_constant(v)) = argl^argr;
+   break;
+  case LEFT_SHIFT:
+       constant_int(value_constant(v)) = argl<<argr;
+   break;
+   case RIGHT_SHIFT:
+       constant_int(value_constant(v)) = argl>>argr;
+   break;
+ default:
+    free_value(v);
+    v = make_value(is_value_unknown, NIL);
+  }
+
+  return(v);
 }
 
 value 
@@ -283,15 +374,18 @@ EvalNaryOp(int t, list la)
     return(w);
 }
 
-/* FI: These string constants are defined in ri-util.h */
 int 
 IsUnaryOperator(entity e)
 {
 	int token;
+	string n = entity_local_name(e);
 
-	if (strcmp(entity_local_name(e), "--") == 0)
+	if (same_string_p(n, UNARY_MINUS_OPERATOR_NAME))
 		token = MINUS;
-	else if (strcmp(entity_local_name(e), ".NOT.") == 0)
+	else if (same_string_p(n, UNARY_PLUS_OPERATOR_NAME))
+		token = PLUS;
+	else if (same_string_p(n, NOT_OPERATOR_NAME)
+		 || same_string_p(n, C_NOT_OPERATOR_NAME))
 		token = NOT;
 	else
 		token = -1;
@@ -304,39 +398,62 @@ int
 IsBinaryOperator(entity e)
 {
 	int token;
+	string n = entity_local_name(e);
 
-	if      (strcmp(entity_local_name(e), "-") == 0)
+	if      (same_string_p(n, MINUS_OPERATOR_NAME)
+		 || same_string_p(n, MINUS_C_OPERATOR_NAME))
 		token = MINUS;
-	else if (strcmp(entity_local_name(e), "+") == 0)
+	else if (same_string_p(n, PLUS_OPERATOR_NAME)
+		 || same_string_p(n, PLUS_C_OPERATOR_NAME))
 		token = PLUS;
-	else if (strcmp(entity_local_name(e), "*") == 0)
+	else if (same_string_p(n, MULTIPLY_OPERATOR_NAME))
 		token = STAR;
-	else if (strcmp(entity_local_name(e), "/") == 0)
+	else if (same_string_p(n, DIVIDE_OPERATOR_NAME))
 		token = SLASH;
-	else if (strcmp(entity_local_name(e), "**") == 0)
+	else if (same_string_p(n, POWER_OPERATOR_NAME))
 		token = POWER;
-	else if (strcmp(entity_local_name(e), "MOD") == 0)
+	else if (same_string_p(n, MODULO_OPERATOR_NAME)
+		 || same_string_p(n, C_MODULO_OPERATOR_NAME))
 		token = MOD;
-	else if (strcmp(entity_local_name(e), ".EQ.") == 0)
+	else if (same_string_p(n, EQUAL_OPERATOR_NAME)
+		 || same_string_p(n, C_EQUAL_OPERATOR_NAME))
 		token = EQ;
-	else if (strcmp(entity_local_name(e), ".NE.") == 0)
+	else if (same_string_p(n, NON_EQUAL_OPERATOR_NAME)
+		 || same_string_p(n, C_NON_EQUAL_OPERATOR_NAME))
 		token = NE;
-	else if (strcmp(entity_local_name(e), ".EQV") == 0)
+	else if (same_string_p(n, MODULO_OPERATOR_NAME)
+		 || same_string_p(n, C_MODULO_OPERATOR_NAME))
 		token = EQV;
-	else if (strcmp(entity_local_name(e), ".NEQV") == 0)
+	else if (same_string_p(n, EQUIV_OPERATOR_NAME))
 		token = NEQV;
-	else if (strcmp(entity_local_name(e), ".GT.") == 0)
+	else if (same_string_p(n, GREATER_THAN_OPERATOR_NAME)
+		 || same_string_p(n, C_MODULO_OPERATOR_NAME))
 		token = GT;
-	else if (strcmp(entity_local_name(e), ".LT.") == 0)
+	else if (same_string_p(n, LESS_THAN_OPERATOR_NAME)
+		 || same_string_p(n, C_LESS_THAN_OPERATOR_NAME))
 		token = LT;
-	else if (strcmp(entity_local_name(e), ".GE.") == 0)
+	else if (same_string_p(n, GREATER_OR_EQUAL_OPERATOR_NAME)
+		 || same_string_p(n, C_GREATER_OR_EQUAL_OPERATOR_NAME))
 		token = GE;
-	else if (strcmp(entity_local_name(e), ".LE.") == 0)
+	else if (same_string_p(n, LESS_OR_EQUAL_OPERATOR_NAME)
+		 || same_string_p(n, C_LESS_OR_EQUAL_OPERATOR_NAME))
 		token = LE;
-	else if (strcmp(entity_local_name(e), ".OR.") == 0)
+	else if (same_string_p(n, OR_OPERATOR_NAME)
+		 || same_string_p(n, C_OR_OPERATOR_NAME))
 		token = OR;
-	else if (strcmp(entity_local_name(e), ".AND.") == 0)
+	else if (same_string_p(n, AND_OPERATOR_NAME)
+		 || same_string_p(n, C_AND_OPERATOR_NAME))
 		token = AND;
+	else if (same_string_p(n, BITWISE_AND_OPERATOR_NAME))
+		token = BITWISE_AND;
+	else if (same_string_p(n, BITWISE_OR_OPERATOR_NAME))
+		token = BITWISE_OR;
+	else if (same_string_p(n, BITWISE_XOR_OPERATOR_NAME))
+		token = BITWISE_XOR;
+	else if (same_string_p(n, LEFT_SHIFT_OPERATOR_NAME))
+		token = LEFT_SHIFT;
+	else if (same_string_p(n, RIGHT_SHIFT_OPERATOR_NAME))
+		token = RIGHT_SHIFT;
 	else if (same_string_p(entity_local_name(e), IMPLIED_COMPLEX_NAME) ||
 		 same_string_p(entity_local_name(e), IMPLIED_DCOMPLEX_NAME))
 	        token = CAST_OP;

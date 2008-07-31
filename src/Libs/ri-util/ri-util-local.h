@@ -425,6 +425,7 @@
 #define ENTITY_BITWISE_XOR_UPDATE_P(e) entity_an_operator_p(e, BITWISE_XOR_UPDATE)
 #define ENTITY_BITWISE_OR_UPDATE_P(e) entity_an_operator_p(e, BITWISE_OR_UPDATE)
 #define ENTITY_ADDRESS_OF_P(e) entity_an_operator_p(e, ADDRESS_OF)
+#define ENTITY_CONDITIONAL_P(e) entity_an_operator_p(e, CONDITIONAL)
 
 #define ENTITY_PLUS_P(e) entity_an_operator_p(e, PLUS)
 #define ENTITY_PLUS_C_P(e) entity_an_operator_p(e, PLUS_C)

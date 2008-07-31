@@ -622,8 +622,15 @@ local_name_to_top_level_entity(string n)
     /* Extension with C: the scope of a module can be its compilation unit if this is 
        a static module, not only TOP-LEVEL. */
 
-    if (static_module_name_p(n))
-      module = gen_find_tabulated(n,entity_domain);
+    if (static_module_name_p(n)) {
+      string cun = strdup(n);
+      string sep = strchr(cun, FILE_SEP);
+      string ln = strchr(n, FILE_SEP)+1;
+
+      *(sep+1) = '\0';
+      module = gen_find_tabulated(concatenate(cun, MODULE_SEP_STRING, ln, NULL),entity_domain);
+      free(cun);
+    }
     else 
       {
 	for(i=0; i<4 && entity_undefined_p(module); i++)
@@ -1041,6 +1048,11 @@ string entity_user_name(entity e)
   return NULL;
 }
 
+
+bool module_name_p(string name)
+{
+  return (!compilation_unit_p(name) && strstr(name, MODULE_SEP_STRING) == NULL);
+}
 
 
 bool static_module_name_p(string name)

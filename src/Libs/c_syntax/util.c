@@ -484,7 +484,7 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
 	  return ent;
 	}
     }
-  global_name = strdup(concatenate(compilation_unit_name,
+  global_name = strdup(concatenate(compilation_unit_name,MODULE_SEP_STRING,
 				   prefix,name,NULL));
   if ((ent = gen_find_tabulated(global_name,entity_domain)) != entity_undefined) 
     {
@@ -520,7 +520,7 @@ entity CreateEntityFromLocalNameAndPrefix(string name, string prefix, bool is_ex
   pips_debug(5,"Entity local name is %s with prefix %s\n",name,prefix);
   
   if (is_external)
-    ent = find_or_create_entity(strdup(concatenate(compilation_unit_name,
+    ent = find_or_create_entity(strdup(concatenate(compilation_unit_name,MODULE_SEP_STRING,
 					    prefix,name,NULL)));	
   else
     {
@@ -611,19 +611,32 @@ entity FindOrCreateCurrentEntity(string name,stack ContextStack,stack FormalStac
 	}
       else 
 	{
-	  if (is_formal)
+	  if (is_formal) {
 	    /* Formal parameter */
-	    ent = find_or_create_entity(strdup(concatenate(top_level_entity_p(function)?
-							   entity_user_name(function):entity_name(function),
-							   MODULE_SEP_STRING,name,NULL)));
+	    if(top_level_entity_p(function))
+	      ent = find_or_create_entity(strdup(concatenate(entity_user_name(function),
+							     MODULE_SEP_STRING,name,NULL)));
+	    else {
+	      // The function is local to a compilation unit
+	      // Was this the best possible design?
+	      string mn = entity_module_name(function);
+	      string ln = entity_local_name(function);
+	      ent = find_or_create_entity(strdup(concatenate(mn,ln,
+							     MODULE_SEP_STRING,name,NULL)));
+	    }
+	  }
 	  else 
 	    {
 	      /* scope = NULL, not extern/typedef/struct/union/enum  */
 	      if (is_external)
 		{
 		  /* This is a variable/function declared outside any module's body*/
-		  if (is_static) 
+		  if (is_static)
+		    /* Depending on the type, we should or not
+		       introduce a MODULE_SEP_STRING, but the type is
+		       still not fully known. Wait for UpdateFunctionEntity(). */
 		    ent = find_or_create_entity(strdup(concatenate(compilation_unit_name,
+								   MODULE_SEP_STRING,
 								   name,NULL)));
 		  else 
 		    ent = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,name);
@@ -786,11 +799,42 @@ void UpdateArrayEntity(entity e, list lq, list le)
     }
 }
 
-void UpdateFunctionEntity(entity e, list la)
+entity RenameFunctionEntity(entity oe)
 {
-  type t = entity_type(e);
+  entity ne = oe;
+  string s = entity_name(oe);
 
-  pips_debug(3,"Update function entity %s\n",entity_name(e));
+  /* The function name may be wrong because not enough information was
+     available when it was created by FindOrCreateCurrentEntity(). */
+  if(strchr(s, MODULE_SEP)!=NULL) {
+    string mn = entity_module_name(ne);
+    string ln = entity_local_name(ne);
+    value voe = entity_initial(oe);
+    stack s = get_from_entity_type_stack_table(oe);
+    stack ns = stack_copy(s);
+
+    ne = find_or_create_entity(strdup(concatenate(mn, ln, NULL)));
+    entity_type(ne) = copy_type(entity_type(oe));
+    entity_storage(ne) = copy_storage(entity_storage(oe));
+    /* FI I do not understand how formal parameters could be declared before */
+    if(value_undefined_p(voe) || value_unknown_p(voe))
+      entity_initial(ne) = make_value(is_value_code,
+				      make_code(NIL,strdup(""), make_sequence(NIL),NIL));
+    else
+      entity_initial(ne) = copy_value(entity_initial(oe));
+    put_to_entity_type_stack_table(ne, ns);
+   pips_debug(1, "entity %s renamed %s\n", entity_name(oe), entity_name(ne));
+  }
+  return ne;
+}
+
+void UpdateFunctionEntity(entity oe, list la)
+{
+  type t = entity_type(oe);
+  //string s = entity_name(oe);
+  //entity ne = oe;
+
+  pips_debug(3,"Update function entity %s\n",entity_name(oe));
 
   ifdebug(8) {
     pips_debug(8, "with type list la: ");
@@ -804,12 +848,12 @@ void UpdateFunctionEntity(entity e, list la)
   }
 
   if (type_undefined_p(t))
-    entity_type(e) = make_type_functional(make_functional(la,type_undefined));
+    entity_type(oe) = make_type_functional(make_functional(la,type_undefined));
   else
     CParserError("This entity must have undefined type\n");
 
   pips_debug(3,"Update function entity \"%s\" with type \"\%s\"\n",
-	     entity_name(e), list_to_string(safe_c_words_entity(entity_type(e), NIL)));
+	     entity_name(oe), list_to_string(safe_c_words_entity(entity_type(oe), NIL)));
 }
 
 /* This function replaces the undefined field in t1 by t2. 

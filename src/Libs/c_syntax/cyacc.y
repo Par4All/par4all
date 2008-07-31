@@ -514,12 +514,14 @@ global:
    scope it looks too much like a function call */
 |   TK_IDENT TK_LPAREN
                         { 
-			  entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,$1);
+			  entity oe = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,$1);
+			  entity e = oe; //RenameFunctionEntity(oe);
 			  pips_debug(2,"Create function %s with old-style function prototype\n",$1);
 			  if (storage_undefined_p(entity_storage(e))) 
 			    entity_storage(e) = make_storage_return(e);
 			  if (value_undefined_p(entity_initial(e)))
 			    entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL));
+			  //pips_assert("e is a module", module_name_p(entity_module_name(e)));
 			  stack_push((char *) e, FunctionStack);
 			  stack_push((char *) make_basic_logical(TRUE),FormalStack);
 			  stack_push((char *) make_basic_int(1),OffsetStack);
@@ -1818,20 +1820,29 @@ enumerator:
 			  /* Create an entity of is_basic_int, storage rom, initial_value = $3 */
 			  /* No, enum member must be functional
 			     entity, just like Fortran's parameters */
-			  int i; 
+			  //int i; 
+			  value vinit = value_undefined;
 			  entity ent = CreateEntityFromLocalNameAndPrefix($1,"",is_external);
 			  variable v = 
 			    make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL);
 			  type rt = make_type(is_type_variable, v);
 			  functional f = make_functional(NIL, rt);
 
-			  pips_assert("Enumerated value must be a constant integer", 
-				      signed_integer_constant_expression_p($3));
-			  i = signed_integer_constant_expression_value($3);
+			  //pips_assert("Enumerated value must be a constant integer", 
+			  //	      signed_integer_constant_expression_p($3));
+			  //i = signed_integer_constant_expression_value($3);
+			  vinit = EvalExpression($3);
 			  entity_storage(ent) = make_storage_rom();
 			  entity_type(ent) = make_type_functional(f);
-			  entity_initial(ent) = 
-			    make_value_symbolic(make_symbolic($3, make_constant_int(i)));
+
+                          if(value_constant_p(vinit) && constant_int_p(value_constant(vinit))) {
+			    entity_initial(ent) = 
+			      make_value_symbolic(make_symbolic($3, value_constant(vinit)));
+			  }
+                          else {
+			    pips_internal_error("Constant integer expression not evaluated");
+			  }
+                             
 			  $$ = ent;
 			}
 ;
@@ -1893,19 +1904,23 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			}
 |   direct_decl parameter_list_startscope 
                         {
-			  if (value_undefined_p(entity_initial($1)))
-			    entity_initial($1) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL), NIL));
-			  stack_push((char *) $1,FunctionStack);
+			  entity e = $1; //RenameFunctionEntity($1);
+			  if (value_undefined_p(entity_initial(e)))
+			    entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL), NIL));
+			  //pips_assert("e is a module", module_name_p(entity_module_name(e)));
+			  stack_push((char *) e, FunctionStack);
 			}
     rest_par_list TK_RPAREN
                         {
+			  entity e = (entity) stack_head(FunctionStack);
 			  stack_pop(FunctionStack);
 			  stack_pop(FormalStack);
 			  StackPop(OffsetStack);	
 			  /* Intrinsic functions in C such as printf, fprintf, ... are considered
 			     as entities with functional type ???
-			     if (!intrinsic_entity_p($1))*/
-			  UpdateFunctionEntity($1,$4);
+			     if (!intrinsic_entity_p(e))*/
+			  UpdateFunctionEntity(e,$4);
+			  $$ = e;
 			}
 ;
 
@@ -1984,23 +1999,27 @@ old_proto_decl:
 direct_old_proto_decl:
     direct_decl TK_LPAREN
                         { 
-			  if (value_undefined_p(entity_initial($1)))
+			  entity e = $1; //RenameFunctionEntity($1);
+			  if (value_undefined_p(entity_initial(e)))
 			    entity_initial($1) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL));
-			  stack_push((char *) $1, FunctionStack);
+			  //pips_assert("e is a module", module_name_p(entity_module_name(e)));
+			  stack_push((char *) e, FunctionStack);
 			  stack_push((char *) make_basic_logical(TRUE),FormalStack);
 			  stack_push((char *) make_basic_int(1),OffsetStack);
 			} 
     old_parameter_list_ne TK_RPAREN old_pardef_list
                         { 
+			  entity e = stack_head(FunctionStack);
 			  list paras = MakeParameterList($4,$6,FunctionStack);
 			  stack_pop(FunctionStack);
 			  stack_pop(FormalStack);
 			  StackPop(OffsetStack);
-			  UpdateFunctionEntity($1,paras);
+			  (void) UpdateFunctionEntity(e, paras);
+			  $$ = e;
 			}
 |   direct_decl TK_LPAREN TK_RPAREN
                         { 
-                          UpdateFunctionEntity($1,NIL);
+                          (void) UpdateFunctionEntity($1,NIL);
 			}
 ;
 
@@ -2128,16 +2147,20 @@ abs_direct_decl: /* (* ISO 6.7.6. We do not support optional declarator for
 /*(* The next shoudl be abs_direct_decl_opt but we get conflicts *)*/
 |   abs_direct_decl_opt parameter_list_startscope 
                         {
-			  if (value_undefined_p(entity_initial($1)))
-			    entity_initial($1) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL));
-			  stack_push((char *) $1,FunctionStack);
+			  entity e = $1; //RenameFunctionEntity($1);
+			  if (value_undefined_p(entity_initial(e)))
+			    entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL));
+			  //pips_assert("e is a module", module_name_p(entity_module_name($1)));
+			  stack_push((char *) e, FunctionStack);
 			}
     rest_par_list TK_RPAREN
                         {
+			  entity e = stack_head(FunctionStack);
 			  stack_pop(FunctionStack);
 			  stack_pop(FormalStack);
 			  StackPop(OffsetStack);	
-			  UpdateFunctionEntity($1,$4);
+			  (void) UpdateFunctionEntity(e,$4);
+			  $$ = e;
 			}  
 ;
 
@@ -2173,7 +2196,7 @@ function_def:  /* (* ISO 6.9.1 *) */
 			}	
 
 function_def_start:  /* (* ISO 6.9.1 *) */
-    decl_spec_list declarator   
+    decl_spec_list declarator 
                         { 
 			  UpdateEntity($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external);
 			  stack_pop(ContextStack);
@@ -2195,10 +2218,12 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 /* (* New-style function that does not have a return type *) */
 |   TK_IDENT parameter_list_startscope 
                         {
-			  entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,$1);
-			  pips_debug(2,"Create current module %s with no return type\n",$1);
+			  entity oe = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,$1);
+			  entity e = oe; //RenameFunctionEntity(oe);
+			  pips_debug(2,"Create current module %s with no return type\n",e);
 			  MakeCurrentModule(e);
 			  clear_C_comment();
+			  //pips_assert("e is a module", module_name_p(entity_module_name(e)));
 			  stack_push((char *) e, FunctionStack);
 			}
     rest_par_list TK_RPAREN 
@@ -2215,10 +2240,12 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 /* (* No return type and old-style parameter list *) */
 |   TK_IDENT TK_LPAREN old_parameter_list_ne
                         {
-			  entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,$1);
+			  entity oe = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,$1);
+			  entity e= oe; //RenameFunctionEntity(oe);
 			  pips_debug(2,"Create current module %s with no return type + old-style parameter list\n",$1);
 			  MakeCurrentModule(e);	
 			  clear_C_comment();
+			  //pips_assert("e is a module", module_name_p(entity_module_name(e)));
 			  stack_push((char *) e, FunctionStack);
 			  stack_push((char *) make_basic_logical(TRUE),FormalStack);
 			  stack_push((char *) make_basic_int(1),OffsetStack);

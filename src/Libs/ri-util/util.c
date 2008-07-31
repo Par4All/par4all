@@ -103,10 +103,11 @@ string s;
     string p_sep = NULL;
 
     /* We have problem with C, an entity name does not always need MODULE_SEP*/
+    /* FI: that is a problem for PIPS. Which entity name do not have a MODULE_SEP? */
 
     strncpy(local, s, MAXIMAL_MODULE_NAME_SIZE);
     local[MAXIMAL_MODULE_NAME_SIZE] = 0;
-    if (((p_sep = strchr(local, MODULE_SEP)) == NULL) && ((p_sep = strstr(local, FILE_SEP_STRING)) == NULL )) 
+    if (((p_sep = strchr(local, MODULE_SEP)) == NULL) /* && ((p_sep = strstr(local, FILE_SEP_STRING)) == NULL ) */ ) 
       pips_error("module_name", 
 		   "module name too long, or illegal: \"%s\"\n", s);
     else

@@ -501,7 +501,7 @@ static string new_ellipsis()
 %type <string> constant
 %type <void> string_constant
 %type <string> expression /* Required for bit fields, and maybe for enumerators. */
-%type <void> opt_expression
+%type <string> opt_expression /* required to initialize enumerator members via conditional expressions */
 %type <void> init_expression
 %type <string> comma_expression
 %type <string> paren_comma_expression
@@ -792,10 +792,15 @@ expression:
 			}
 |   expression TK_QUEST opt_expression TK_COLON expression
 			{
-			  free_partial_signature($1);
+			  //free_partial_signature($1);
 			  /* opt_expression does not return anything. */
-			  free_partial_signature($5);
-			  $$ = string_undefined;
+			  //free_partial_signature($5);
+			  //$$ = string_undefined;
+			  $$ = safe_build_signature($1,
+						    new_signature("?"),
+						    $3,
+						    new_signature(":"),
+						    $5, NULL);
 			}
 |   expression TK_PLUS expression
 			{ 
@@ -849,51 +854,59 @@ expression:
 			}
 |   expression TK_EQ_EQ expression
 			{
-			  free_partial_signature($1);
-			  free_partial_signature($3);
-			  $$ = string_undefined;
+			  //free_partial_signature($1);
+			  //free_partial_signature($3);
+			  //$$ = string_undefined;
+			  $$ = safe_build_signature($1, new_signature("=="), $3, NULL);
 			}
 |   expression TK_EXCLAM_EQ expression
 			{
-			  free_partial_signature($1);
-			  free_partial_signature($3);
-			  $$ = string_undefined;
+			  //free_partial_signature($1);
+			  //free_partial_signature($3);
+			  //$$ = string_undefined;
+			  $$ = safe_build_signature($1, new_signature("!="), $3, NULL);
 			}
 |   expression TK_INF expression
 			{
-			  free_partial_signature($1);
-			  free_partial_signature($3);
-			  $$ = string_undefined;
+			  //free_partial_signature($1);
+			  //free_partial_signature($3);
+			  //$$ = string_undefined;
+			  $$ = safe_build_signature($1, new_signature("<"), $3, NULL);
 			}
 |   expression TK_SUP expression
 			{
-			  free_partial_signature($1);
-			  free_partial_signature($3);
-			  $$ = string_undefined;
+			  //free_partial_signature($1);
+			  //free_partial_signature($3);
+			  //$$ = string_undefined;
+			  $$ = safe_build_signature($1, new_signature(">"), $3, NULL);
 			}
 |   expression TK_INF_EQ expression
 			{
-			  free_partial_signature($1);
-			  free_partial_signature($3);
-			  $$ = string_undefined;
+			  //free_partial_signature($1);
+			  //free_partial_signature($3);
+			  //$$ = string_undefined;
+			  $$ = safe_build_signature($1, new_signature("<="), $3, NULL);
 			}
 |   expression TK_SUP_EQ expression
 			{
-			  free_partial_signature($1);
-			  free_partial_signature($3);
-			  $$ = string_undefined;
+			  //free_partial_signature($1);
+			  //free_partial_signature($3);
+			  //$$ = string_undefined;
+			  $$ = safe_build_signature($1, new_signature(">="), $3, NULL);
 			}
 |   expression TK_INF_INF expression
 			{
-			  free_partial_signature($1);
-			  free_partial_signature($3);
-			  $$ = string_undefined;
+			  //free_partial_signature($1);
+			  //free_partial_signature($3);
+			  //$$ = string_undefined;
+			  $$ = safe_build_signature($1, new_signature("<<"), $3, NULL);
 			}
 |   expression TK_SUP_SUP expression
 			{
-			  free_partial_signature($1);
-			  free_partial_signature($3);
-			  $$ = string_undefined;
+			  //free_partial_signature($1);
+			  //free_partial_signature($3);
+			  //$$ = string_undefined;
+			  $$ = safe_build_signature($1, new_signature(">>"), $3, NULL);
 			}
 |   expression TK_EQ expression
 			{
@@ -1114,9 +1127,12 @@ arguments:
 
 opt_expression:
     /* empty */
-	        	{ }
+                        { $$=strdup(" ");}
 |   comma_expression
-	        	{ free_partial_signature($1); }
+                        { 
+                          //free_partial_signature($1);
+			  $$ = $1;
+			}
 ;
 
 comma_expression:
@@ -2313,4 +2329,3 @@ asmcloberlst_ne:
 ;
   
 %%
-

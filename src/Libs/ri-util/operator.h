@@ -2,7 +2,7 @@
  * $Id$
  *
  * FI: these values were taken from syntax/tokyacc.h but I do not 
- * think they matter.
+ * think they matter. Wouldn't an enum be better?
  *
  * MOD was an initial exception. So are MINIMUM and MAXIMUM
  */
@@ -28,4 +28,8 @@
 #define MINIMUM 85
 #define MAXIMUM 86
 #define CAST_OP 87
-
+#define BITWISE_AND 88
+#define BITWISE_OR 89
+#define BITWISE_XOR 90
+#define RIGHT_SHIFT 91
+#define LEFT_SHIFT 92
