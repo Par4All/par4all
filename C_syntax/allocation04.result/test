@@ -30,7 +30,7 @@ Layout for common /allocation04!:*HEAP*/ of size 0:
 
 
 Layout for common /allocation04!:*STATIC*/ of size 4:
-	Variable allocation04!m	offset = 0	size = 4
+	Variable allocation04!:m	offset = 0	size = 4
 
 
 Layout for common /foo:*DYNAMIC*/ of size 4:
@@ -76,7 +76,7 @@ Layout for common /allocation04!:*HEAP*/ of size 0:
 
 
 Layout for common /allocation04!:*STATIC*/ of size 4:
-	Variable allocation04!m	offset = 0	size = 4
+	Variable allocation04!:m	offset = 0	size = 4
 
 
 Layout for common /main:*DYNAMIC*/ of size 88:

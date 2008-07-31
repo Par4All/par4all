@@ -10,8 +10,8 @@ Declared entity externalloc01!:*DYNAMIC*	with type area with size 0
 Declared entity externalloc01!:*HEAP*	with type area with size 0
 Declared entity externalloc01!:*STACK*	with type area with size 0
 Declared entity externalloc01!:*STATIC*	with type area with size 0
-Declared entity externalloc01!b	with type variable INTEGER*4
-Declared entity externalloc01!foo	with type functional  () -> INTEGER*4
+Declared entity externalloc01!:b	with type variable INTEGER*4
+Declared entity externalloc01!:foo	with type functional  () -> INTEGER*4
 
 Layouts for areas (commons):
 

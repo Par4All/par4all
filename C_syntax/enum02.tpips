@@ -8,8 +8,6 @@ activate C_PARSER
 
 display PARSED_PRINTED_FILE[enum02!]
 
-quit
-
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[main]
 

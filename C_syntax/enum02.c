@@ -13,3 +13,24 @@ enum
   _ISpunct = ((10) < 8 ? ((1 << (10)) << 8) : ((1 << (10)) >> 8)),
   _ISalnum = ((11) < 8 ? ((1 << (11)) << 8) : ((1 << (11)) >> 8))
 };
+
+main()
+{
+  int i01, i02, i03, i04, i05, i06, i07, i08, i09, i10, i11, i12;
+  int t;
+
+  i01 = _ISupper;
+  i02 = _ISlower;
+  i03 = _ISalpha;
+  i04 = _ISdigit;
+  i05 = _ISxdigit;
+  i06 = _ISspace;
+  i07 = _ISprint;
+  i08 = _ISgraph;
+  i09 = _ISblank;
+  i10 = _IScntrl;
+  i11 = _ISpunct;
+  i12 = _ISalnum;
+
+  t = i01 + i02 + i03 + i04 + i05 + i06 + i07 + i08 + i09 + i10 + i11 + i12;
+}
