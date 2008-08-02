@@ -104,26 +104,27 @@ extern stack FunctionStack; /* to know in which function the current formal argu
 extern stack FormalStack; /* to know if the entity is a formal parameter or not */
 extern stack OffsetStack; /* to know the offset of the formal argument */
 
-/* To keep track of compound statements IF, WHILE, SWITCH and FOR line numbers and comments */
-/* No solution yet for DO{}WHILE() */
- extern int pop_current_C_line_number(); // Declared in clex.l not scanned by cproto
- extern void push_current_C_line_number(); // Declared in clex.l not scanned by cproto
- extern string pop_current_C_comment(); // Declared in clex.l not scanned by cproto
- extern void push_current_C_comment(); // Declared in clex.l not scanned by cproto
-
  // FI: I assumed it was the current context; in fact the current
- // context is rather the top of the ContextStack.I try to maintain as
- // an invariant ycontext==stack_head(ContextStack)
- // But this might not be a good idea as it interferes with cyacc.y use of ycontext
+ // context is rather the top of the ContextStack.I tried to maintain
+ // as an invariant ycontext==stack_head(ContextStack) But this is not
+ // be a good idea as it interferes with cyacc.y use of ycontext and
+ // ContextStack
 static c_parser_context ycontext = c_parser_context_undefined;
+
+/* Functions used to manage the block scoping in conjunction with
+   ContextStack and ycontext */
 
 string empty_scope() { return strdup("");}
 
 bool empty_scope_p(string s) {return strcmp(s, "")==0;}
-
-c_parser_context CreateDefaultContext()
+ 
+/* same kind of testing required for union as well */ 
+bool string_struct_scope_p(string s)
 {
-  return make_c_parser_context(empty_scope(),type_undefined,storage_undefined,NIL,FALSE,FALSE);
+  /* Full testing would require a module_name, a block_scope and a struct name */
+  /* Just lookup the struct identifier*/
+  string ss = strchr(s, MEMBER_SEP_CHAR);
+  return ss != NULL;
 }
  
 bool string_block_scope_p(string s)
@@ -136,26 +137,96 @@ bool string_block_scope_p(string s)
 
   pips_debug(10, "Potential block scope string = \"%s\"\n", s);
 
-  pips_assert("The block scope contains only authorized characters",
-	      strspn(s, valid) == strlen(s));
-
-  for(cs=s; *cs!='\0'; cs++) {
-    if(is_number && isdigit(*cs))
-      ;
-    else if(is_number && *cs==BLOCK_SEP_CHAR)
-      is_number = FALSE;
-    else if(!is_number && isdigit(*cs))
-      is_number = TRUE;
-    else if(!is_number && *cs==BLOCK_SEP_CHAR) {
-      is_block_scope = FALSE;
-      break;
+  if(strspn(s, valid) == strlen(s)) {
+    for(cs=s; *cs!='\0'; cs++) {
+      if(is_number && isdigit(*cs))
+	;
+      else if(is_number && *cs==BLOCK_SEP_CHAR)
+	is_number = FALSE;
+      else if(!is_number && isdigit(*cs))
+	is_number = TRUE;
+      else if(!is_number && *cs==BLOCK_SEP_CHAR) {
+	is_block_scope = FALSE;
+	break;
+      }
     }
+    is_block_scope = !is_number;
   }
-  is_block_scope = !is_number;
 
   pips_debug(10, "String = \"%s\" is %sa block scope string\n", s, is_block_scope?"":"not ");
 
   return is_block_scope;
+}
+
+/* The scope is moved up the scope tree and a NULL is return when
+   there are no more scope to explore. */
+string pop_block_scope(string old_scope)
+{
+  string new_scope = old_scope;
+  string last_scope = string_undefined;
+
+  pips_debug(8, "old_scope = \"%s\"\n", old_scope);
+  pips_assert("old_scope is a scope", string_block_scope_p(old_scope));
+
+  if(strlen(old_scope)>0) {
+    /* get rid of last block separator */
+    new_scope[strlen(new_scope)-1] = '\0';
+    last_scope = strrchr(new_scope, BLOCK_SEP_CHAR);
+
+    if(last_scope==NULL)
+      *new_scope = '\0';
+    else
+      *(last_scope+1) = '\0';
+  }
+  else
+    new_scope = NULL;
+
+  if(new_scope!=NULL) {
+    pips_debug(8, "new_scope = \"%s\"\n", new_scope);
+    pips_assert("new_scope is a scope", string_block_scope_p(new_scope));
+  }
+  else {
+    pips_debug(8, "new_scope = NULL\n");
+  }
+
+  return new_scope;
+}
+
+/* Allocate a new string containing only block scope information */
+string scope_to_block_scope(string full_scope)
+{
+  string l_scope = strrchr(full_scope, BLOCK_SEP_CHAR);
+  string f_scope = strchr(full_scope, MODULE_SEP);
+  string block_scope = string_undefined;
+
+  pips_debug(8, "full_scope = \"%s\"\n", full_scope);
+
+  if(f_scope==NULL)
+    f_scope = full_scope;
+  else
+    f_scope++;
+
+  if(l_scope==NULL)
+    block_scope = strdup("");
+  else
+    block_scope = gen_strndup0(f_scope, (unsigned) (l_scope-f_scope+1));
+
+  pips_debug(8, "f_scope = \"%s\", l_scope = \"%s\"\n", f_scope, l_scope);
+  pips_assert("block_scope is a scope", string_block_scope_p(block_scope));
+
+  return block_scope;
+}
+
+c_parser_context CreateDefaultContext()
+{
+  c_parser_context c = make_c_parser_context(empty_scope(),
+					     type_undefined,
+					     storage_undefined,
+					     NIL,
+					     FALSE,
+					     FALSE);
+  pips_debug(8, "New default context %p\n", c);
+  return c;
 }
 
 static int C_scope_identifier = -2;
@@ -193,7 +264,10 @@ void EnterScope()
 
   // Add scope information if any
   C_scope_identifier++;
-  if(C_scope_identifier>0) {
+  // A scope is needed right away to distinguish between formal
+  // parameters and local variable. See
+  // Validation/C_syntax/block_scope01.c, identifier x in function foo
+  if(C_scope_identifier>=0) {
     string ns = int_to_string(C_scope_identifier);
     
     c_parser_context_scope(nc) = strdup(concatenate(cs, ns, BLOCK_SEP_STRING, NULL));
@@ -209,6 +283,13 @@ void EnterScope()
   //	      ycontext==stack_head(ContextStack));
   pips_debug(8, "New block scope string: \"%s\" for context %p\n",
 	     c_parser_context_scope(nc), nc);
+}
+
+c_parser_context GetScope()
+{
+  c_parser_context c = (c_parser_context) stack_head(ContextStack);
+
+  return c;
 }
 
 void ExitScope()
@@ -241,6 +322,50 @@ void ExitScope()
     // ycontext = c_parser_context_undefined;
     pips_debug(8, "Back to undefined context scope\n");
   }
+}
+
+void PushContext(c_parser_context c)
+{
+  stack_push((char *) c, ContextStack);
+  pips_debug(8, "Context %p with scope \"%s\" is put in stack position %d\n",
+	     c, c_parser_context_scope(c), stack_size(ContextStack));
+}
+
+void PopContext()
+{
+  c_parser_context fc = (c_parser_context) stack_head(ContextStack);
+  c_parser_context c = c_parser_context_undefined;
+
+  pips_debug(8, "Context %p with scope \"%s\" is popped from stack position %d\n",
+	     fc, c_parser_context_scope(fc), stack_size(ContextStack));
+  c = (c_parser_context) stack_pop(ContextStack);
+  if(stack_empty_p(ContextStack)) {
+    pips_debug(8, "context stack is now empty\n");
+  }
+  else {
+    c_parser_context h = (c_parser_context) stack_head(ContextStack);
+    pips_debug(8, "Context %p with scope \"%s\" is top of stack at position %d\n",
+	       h, c_parser_context_scope(h), stack_size(ContextStack));
+  }
+}
+
+c_parser_context GetContext()
+{
+  c_parser_context c = (c_parser_context) stack_head(ContextStack);
+  pips_debug(8, "Context %p is obtained from stack position %d\n",
+	     c, stack_size(ContextStack));
+  return c;
+}
+
+c_parser_context GetContextCopy()
+{
+  c_parser_context c = (c_parser_context) stack_head(ContextStack);
+  c_parser_context cc = copy_c_parser_context(c);
+  pips_debug(8, "Context copy %p with scope \"%s\" is obtained from context %p with scope \"%s\" at stack position %d\n",
+	     cc, c_parser_context_scope(cc),
+	     c, c_parser_context_scope(c),
+	     stack_size(ContextStack));
+  return cc;
 }
 
 %}
@@ -420,12 +545,18 @@ file: globals
 						  " compilation unit %s\n",
 						  get_current_module_name());
 			    }
+			    ifdebug(8) {
+			      pips_debug(8, "Declaration list for compilation unit %s: ",
+					 get_current_module_name());
+			      print_entities(dl);
+			      pips_debug(8, "\n");
+			    }
 			    ModuleStatement = make_statement(entity_empty_label(), 
 							     STATEMENT_NUMBER_UNDEFINED, 
 							     STATEMENT_ORDERING_UNDEFINED, 
 							     string_undefined,
 							     make_instruction_block(NIL),
-							     dl,NULL);
+							     dl, NULL);
 			  }
 			}
 ;
@@ -1275,12 +1406,14 @@ declaration:                               /* ISO 6.7.*/
 			  pips_assert("Declaration list are not redundant", gen_once_p($2));
 			  pips_assert("Variable $1 has not been declared before", !gen_in_list_p($1, $2));
 			  UpdateEntities($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external);
-			  stack_pop(ContextStack);
+			  //stack_pop(ContextStack);
+			  PopContext();
 			  $$ = gen_nconc($1,$2);
 			}
 |   decl_spec_list TK_SEMICOLON	
                         {
-			  stack_pop(ContextStack);
+			  //stack_pop(ContextStack);
+			  PopContext();
 			  $$ = $1;
 			}
 ;
@@ -1354,10 +1487,13 @@ decl_spec_list:
                        {
 			 if(stack_empty_p(ContextStack)) {
                            ycontext = CreateDefaultContext();
+			   pips_debug(8, "new default context %p with scope \"%s\"\n", ycontext,
+				      c_parser_context_scope(ycontext));
 			 }
 			 else {
 			   /* Copy may be excessive as only the scope needs to be preserved...*/
-			   ycontext = copy_c_parser_context((c_parser_context)stack_head(ContextStack));
+			   //ycontext = copy_c_parser_context((c_parser_context)stack_head(ContextStack));
+			   ycontext = GetContextCopy();
 			   /* How can these two problems occur since
 			      ycontext is only a copy of the
 			      ContextStack's head? Are we in the
@@ -1368,10 +1504,24 @@ decl_spec_list:
 			   /* FI: a bit afraid of freeing the past type if any */
 			   c_parser_context_type(ycontext) = type_undefined;
 			   /* FI: sometimes, the scope is erased and lost */
-			   if(strcmp(c_parser_context_scope(ycontext), "TOP-LEVEL:")==0)
-			     c_parser_context_scope(ycontext) = empty_scope();
+			   //if(strcmp(c_parser_context_scope(ycontext), "TOP-LEVEL:")==0)
+			   //  c_parser_context_scope(ycontext) = empty_scope();
 			   /* Finally, to avoid problems!*/
-			   c_parser_context_scope(ycontext) = empty_scope();
+			   //c_parse
+			   //r_context_scope(ycontext) = empty_scope();
+
+			   /* Only block scope information is inherited */
+			   if(!string_block_scope_p(c_parser_context_scope(ycontext))
+			      && !string_struct_scope_p(c_parser_context_scope(ycontext))) {
+			     pips_debug(8, "Reset modified scope \"%s\"\n",
+					c_parser_context_scope(ycontext));
+			     c_parser_context_scope(ycontext) = empty_scope();
+			   }
+			   pips_debug(8, "new context %p with scope \"%s\" copied from context %p (stack size=%d)\n", 
+				      ycontext,
+				      c_parser_context_scope(ycontext),
+				      stack_head(ContextStack),
+				      stack_size(ContextStack));
                          }
                         } 
     my_decl_spec_list { $$ = $2;} 
@@ -1389,6 +1539,8 @@ my_decl_spec_list:                         /* ISO 6.7 */
 |   TK_EXTERN decl_spec_list_opt           
                         {
 			  /* This can be a variable or a function, whose storage is ram or return  */
+			  /* What is the scope in cyacc.y of this scope modification? */
+			  pips_debug(8, "Scope of context %p forced to TOP_LEVEL_MODULE_NAME", ycontext);
 			  c_parser_context_scope(ycontext) = strdup(concatenate(TOP_LEVEL_MODULE_NAME,
 									       MODULE_SEP_STRING,NULL)); 
 			  $$ = $2;
@@ -1438,7 +1590,8 @@ my_decl_spec_list:                         /* ISO 6.7 */
 decl_spec_list_opt: 
     /* empty */ 
                         {		  
-			  stack_push((char *) ycontext, ContextStack);
+			  //stack_push((char *) ycontext, ContextStack);
+			  PushContext(ycontext);
 			  $$ = NIL; 
 			} %prec TK_NAMED_TYPE
 |   my_decl_spec_list      { }
@@ -1451,7 +1604,8 @@ decl_spec_list_opt:
 decl_spec_list_opt_no_named: 
     /* empty */
                         {
-			  stack_push((char *) ycontext,ContextStack);
+			  //stack_push((char *) ycontext,ContextStack);
+			  PushContext(ycontext);
                           $$ = NIL; 
 			} %prec TK_IDENT
 |   my_decl_spec_list      { }
@@ -1680,7 +1834,8 @@ struct_decl_list: /* (* ISO 6.7.2. Except that we allow empty structs. We
     /* empty */         { $$ = NIL; }
 |   decl_spec_list TK_SEMICOLON struct_decl_list
                         {
-			  c_parser_context ycontext = stack_head(ContextStack);
+			  //c_parser_context ycontext = stack_head(ContextStack);
+			  c_parser_context ycontext = GetContext();
 			  /* Create the struct member entity with unique name, the name of the 
 			     struct/union is added to the member name prefix */
 			  string s = strdup(concatenate("PIPS_MEMBER_",int_to_string(derived_counter++),NULL));  
@@ -1701,11 +1856,13 @@ struct_decl_list: /* (* ISO 6.7.2. Except that we allow empty structs. We
 
 			  $$ = CONS(ENTITY,ent,$3); 
 			  
-			  stack_pop(ContextStack);
+			  //stack_pop(ContextStack);
+			  PopContext();
 			}             
 |   decl_spec_list
                         {
-			  c_parser_context ycontext = stack_head(ContextStack);
+			  //c_parser_context ycontext = stack_head(ContextStack);
+			  c_parser_context ycontext = GetContext();
 			  /* Add struct/union name and MEMBER_SEP_STRING to entity name */
 			  string derived = code_decls_text((code) stack_head(StructNameStack));		
 			  c_parser_context_scope(ycontext) = CreateMemberScope(derived,is_external);
@@ -1719,7 +1876,8 @@ struct_decl_list: /* (* ISO 6.7.2. Except that we allow empty structs. We
 
 			  /* Create the list of member entities */
 			  $$ = gen_nconc($3,$5);
-			  stack_pop(ContextStack);
+			  //stack_pop(ContextStack);
+			  PopContext();
 
 			  /* This code is not good ...
 			     I have problem with the global variable ycontext and recursion: ycontext is crushed 
@@ -1763,7 +1921,8 @@ field_decl: /* (* ISO 6.7.2. Except that we allow unnamed fields. *) */
 			}  
 |   TK_COLON expression 
                         {
-			  c_parser_context ycontext = stack_head(ContextStack);
+			  //c_parser_context ycontext = stack_head(ContextStack);
+			  c_parser_context ycontext = GetContext();
 			  /* Unnamed bit-field : special and unique name */
 			  string s = strdup(concatenate("PIPS_MEMBER_",int_to_string(derived_counter++),NULL));  
 			  entity ent = CreateEntityFromLocalNameAndPrefix(s,c_parser_context_scope(ycontext),is_external);
@@ -1966,21 +2125,24 @@ parameter_decl: /* (* ISO 6.7.5 *) */
 			  UpdateEntity($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external);
 			  $$ = make_parameter(copy_type(entity_type($2)),make_mode(CurrentMode,UU));
 			  /* Set CurentMode where ???? */
-			  stack_pop(ContextStack);
+			  //stack_pop(ContextStack);
+			  PopContext();
 			}
 |   decl_spec_list abstract_decl 
                         {
 			  UpdateAbstractEntity($2,ContextStack);
 			  $$ = make_parameter(copy_type(entity_type($2)),make_mode(CurrentMode,UU));
 			  free_entity($2);
-			  stack_pop(ContextStack);
+			  //stack_pop(ContextStack);
+			  PopContext();
 			}
 |   decl_spec_list              
                         {
 			  c_parser_context ycontext = stack_head(ContextStack);
 			  $$ = make_parameter(copy_type(c_parser_context_type(ycontext)),make_mode(CurrentMode,UU));
 			  /* function prototype*/
-			  stack_pop(ContextStack);
+			  //stack_pop(ContextStack);
+			  PopContext();
 			}
 |   TK_LPAREN parameter_decl TK_RPAREN    
                         { $$ = $2; } 
@@ -2047,7 +2209,8 @@ old_pardef_list:
 |   decl_spec_list old_pardef TK_SEMICOLON old_pardef_list  
                         {
 			  UpdateEntities($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external);
-			  stack_pop(ContextStack);	  
+			  //stack_pop(ContextStack);	  
+			  PopContext();
 			  /* Can we have struct/union definition in $1 ?*/
 			  /*$$ = gen_nconc($1,gen_nconc($2,$4));*/
 			  $$ = gen_nconc($2,$4);
@@ -2087,13 +2250,15 @@ type_name: /* (* ISO 6.7.6 *) */
 			  UpdateAbstractEntity($2,ContextStack);
 			  $$ = copy_type(entity_type($2));
 			  free_entity($2);
-			  stack_pop(ContextStack);
+			  //stack_pop(ContextStack);
+			  PopContext();
 			}
 |   decl_spec_list      
                         {
 			  c_parser_context ycontext = stack_head(ContextStack);
 			  $$ = c_parser_context_type(ycontext);
-			  stack_pop(ContextStack);
+			  //stack_pop(ContextStack);
+			  PopContext();
 			}
 ;
 
@@ -2199,7 +2364,8 @@ function_def_start:  /* (* ISO 6.9.1 *) */
     decl_spec_list declarator 
                         { 
 			  UpdateEntity($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external);
-			  stack_pop(ContextStack);
+			  //stack_pop(ContextStack);
+			  PopContext();
 			  pips_debug(2,"Create current module %s\n",entity_user_name($2));
 			  MakeCurrentModule($2); 
 			  clear_C_comment();
@@ -2209,7 +2375,8 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 |   decl_spec_list old_proto_decl 
                         { 
 			  UpdateEntity($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external);
-			  stack_pop(ContextStack);
+			  //stack_pop(ContextStack);
+			  PopContext();
 			  pips_debug(2,"Create current module %s with old-style prototype\n",entity_user_name($2));
 			  MakeCurrentModule($2); 
 			  clear_C_comment();
@@ -2220,7 +2387,8 @@ function_def_start:  /* (* ISO 6.9.1 *) */
                         {
 			  entity oe = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,$1);
 			  entity e = oe; //RenameFunctionEntity(oe);
-			  pips_debug(2,"Create current module %s with no return type\n",e);
+			  pips_debug(2,"Create current module \"%s\" with no return type\n",
+				     entity_name(e));
 			  MakeCurrentModule(e);
 			  clear_C_comment();
 			  //pips_assert("e is a module", module_name_p(entity_module_name(e)));

@@ -37,8 +37,11 @@
 #define BLOCK_SEP_STRING 		"`"
 #define BLOCK_SEP_CHAR 			'`'
 #define MEMBER_SEP_STRING 		"^"
+#define MEMBER_SEP_CHAR 		'^'
 #define STRUCT_PREFIX 			"#"
-#define UNION_PREFIX 			"'"
+#define STRUCT_PREFIX_CHAR		'#'
+#define UNION_PREFIX 			"'" // Conflict with C character constants
+#define UNION_PREFIX_CHAR		'\''
 #define ENUM_PREFIX 			"?"
 #define TYPEDEF_PREFIX 			"$"
 

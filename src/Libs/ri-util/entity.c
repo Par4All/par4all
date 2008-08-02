@@ -289,7 +289,8 @@ entity_minimal_name(entity e)
     string local_name = module_local_name(m);
     if (strcmp(module_local_name(m), entity_module_name(e)) == 0) {
       free(local_name);
-      return entity_local_name(e);
+      //return entity_local_name(e);
+      return entity_user_name(e);
     }
     else {
       free(local_name);
@@ -1006,8 +1007,16 @@ string entity_user_name(entity e)
 
   if (strstr(global_name,STRUCT_PREFIX) != NULL)
     return strdup(strstr(global_name,STRUCT_PREFIX) + 1);
-  if (strstr(global_name,UNION_PREFIX) != NULL)
-    return strdup(strstr(global_name,UNION_PREFIX) + 1);
+  if (strstr(global_name,UNION_PREFIX) != NULL) {
+    /* FI: currently the UNION_PREFIX, '\'', conflicts with C character constants */
+    int i = strchr(global_name, UNION_PREFIX_CHAR)!=strrchr(global_name, UNION_PREFIX_CHAR);
+    pips_debug(8, "i = %d\n", i);
+    if(i) {
+      return strdup(strstr(global_name,UNION_PREFIX));
+    }
+    else
+      return strdup(strstr(global_name,UNION_PREFIX) + 1);
+  }
   if (strstr(global_name,ENUM_PREFIX) != NULL)
     return strdup(strstr(global_name,ENUM_PREFIX) + 1);
   if (strstr(global_name,TYPEDEF_PREFIX) != NULL)
@@ -1032,9 +1041,9 @@ string entity_user_name(entity e)
   if (strstr(global_name,MAIN_PREFIX) != NULL)
     return strdup(strstr(global_name,MAIN_PREFIX) + 1);
 
-  /* Then block seperator */
+  /* Then block seperators */
   if (strstr(global_name,BLOCK_SEP_STRING) != NULL)
-    return strdup(strstr(global_name,BLOCK_SEP_STRING) + 1);
+    return strdup(strrchr(global_name,BLOCK_SEP_CHAR) + 1);
 
   /* Then module seperator */
   if (strstr(global_name,MODULE_SEP_STRING) != NULL)
@@ -1127,4 +1136,24 @@ bool extern_entity_p(entity module, entity e)
     return ((compilation_unit_entity_p(module) && gen_in_list_p(e,ram_shared(storage_ram(entity_storage(module)))))
 	  ||(!compilation_unit_entity_p(module) && (strstr(entity_name(e),TOP_LEVEL_MODULE_NAME) != NULL)));
   
+}
+
+string storage_to_string(storage s)
+{
+  string desc = string_undefined;
+
+  if(storage_undefined_p(s))
+    desc = "storage_undefined";
+  else if(storage_return_p(s))
+    desc = "return";
+  else if(storage_ram_p(s))
+    desc = "ram";
+  else if(storage_formal_p(s))
+    desc = "formal";
+  else if(storage_rom_p(s))
+    desc = "rom";
+  else
+    pips_internal_error("Unknown storage tag\n");
+
+  return desc;
 }

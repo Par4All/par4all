@@ -430,12 +430,17 @@ entity FindEntityFromLocalName(string name)
   entity ent;
   string prefixes[] = {"",STRUCT_PREFIX, UNION_PREFIX, ENUM_PREFIX, TYPEDEF_PREFIX,NULL};
   int i;
+  //extern c_parser_context GetScope(void);
+  //c_parser_context cpc = GetScope();
+  //string scope = scope_to_block_scope(c_parser_context_scope(cpc));
+
   for (i=0; prefixes[i]!=NULL; i++)
     {
       if ((ent = FindEntityFromLocalNameAndPrefix(name,prefixes[i])) != entity_undefined) 
 	return ent;
     }
-  pips_user_warning("Cannot find entity %s\n",name);
+
+  pips_user_warning("Cannot find entity %s\n", name);
 
   return entity_undefined;
 }
@@ -448,6 +453,33 @@ entity FindOrCreateEntityFromLocalNameAndPrefix(string name,string prefix, bool 
   return CreateEntityFromLocalNameAndPrefix(name,prefix,is_external);
 }
 
+entity FindOrCreateEntityFromLocalNameAndPrefixAndScope(string name,
+							string prefix,
+							string scope,
+							bool is_external)
+{
+  entity e = entity_undefined;
+  string ls = strdup(scope);
+
+  pips_assert("Should not be used", FALSE);
+  
+  pips_assert("scope is a block scope", string_block_scope_p(scope));
+
+  do {
+    string sname = strdup(concatenate(ls, name, NULL));
+    e = FindEntityFromLocalNameAndPrefix(sname,prefix);
+    free(sname);
+  }
+  while(e != entity_undefined && (ls = pop_block_scope(ls)));
+
+  if(entity_undefined_p(e)) {
+    /* The current scope will be automatically added */
+    e = CreateEntityFromLocalNameAndPrefix(name,prefix,is_external);
+  }
+  pips_debug(8, "Entity returned: \"%s\"\n", entity_name(e));
+  return e;
+}
+
 entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
 {
   /* Find an entity from its local name and prefix.
@@ -455,57 +487,61 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
  
      Possible name combinations and the looking order:
        
-	1. FILE!MODULE:BLOCK`PREFIXname or MODULE:BLOCK`PREFIXname
-        2. FILE!MODULE:PREFIXname or MODULE:PREFIXname
-        3. FILE!PREFIXname
-	4. TOP-LEVEL:PREFIXname
+     1. FILE!MODULE:BLOCK`PREFIXname or MODULE:BLOCK`PREFIXname
+     2. FILE!MODULE:PREFIXname or MODULE:PREFIXname
+     3. FILE!:PREFIXname (used to be FILE!PREFIXname)
+     4. TOP-LEVEL:PREFIXname
 			      
-     with 5 possible prefixes: blank, STRUCT_PREFIX, UNION_PREFIX, ENUM_PREFIX, TYPEDEF_PREFIX */
+     with 5 possible prefixes: blank, STRUCT_PREFIX, UNION_PREFIX, ENUM_PREFIX, TYPEDEF_PREFIX
+
+     "!" is FILE_SEP_STRING and ":" is MODULE_SEP_STRING and "`" is BLOCK_SEP_STRING
+ */
 
   entity ent = entity_undefined;
   string global_name = string_undefined; 
+  string scope = scope_to_block_scope(c_parser_context_scope(GetScope()));
+  string ls = strdup(scope);
 
-  pips_debug(5,"Entity local name is \"%s\" with prefix \"%s\"\n",name,prefix);
+  pips_debug(5,"Entity local name is \"%s\" with prefix \"%s\" and scope \"%s\"\n",
+	     name,prefix,scope);
+  pips_assert("Scope is a block scope", string_block_scope_p(scope));
 
-  /* Add block scope case here */
-
-  if (!entity_undefined_p(get_current_module_entity()))
-    {
+  if (!entity_undefined_p(get_current_module_entity())) {
+    /* Add block scope case here */
+    do {
       if (static_module_p(get_current_module_entity()))
 	global_name = strdup(concatenate(compilation_unit_name,
 					 get_current_module_name(),MODULE_SEP_STRING,
-					 prefix,name,NULL));
+					 ls,prefix,name,NULL));
       else
 	global_name = strdup(concatenate(get_current_module_name(),MODULE_SEP_STRING,
-					 prefix,name,NULL));
-      if ((ent = gen_find_tabulated(global_name,entity_domain)) != entity_undefined) 
-	{
-	  pips_debug(5,"Entity global name is %s\n",global_name);
-	  return ent;
-	}
-    }
-  global_name = strdup(concatenate(compilation_unit_name,MODULE_SEP_STRING,
-				   prefix,name,NULL));
-  if ((ent = gen_find_tabulated(global_name,entity_domain)) != entity_undefined) 
-    {
-      pips_debug(5,"Entity global name is %s\n",global_name);
-      return ent;
-    }
-   
-  global_name = strdup(concatenate(TOP_LEVEL_MODULE_NAME,MODULE_SEP_STRING,
-				   prefix,name,NULL));
-  if ((ent = gen_find_tabulated(global_name,entity_domain)) != entity_undefined) 
-    {
-      pips_debug(5,"Entity global name is %s\n",global_name);
-      return ent;
-    }
-  pips_user_warning("Cannot find entity %s with prefix \"%s\" at line %d\n",
-		    name, prefix, get_current_C_line_number());
-  /* It may be a parser error or a normal behavior when an entity is
-     used before it is defined as, for example, a struct in a typedef:
-     typedef struct foo foo; */
-  /* CParserError("Variable appears to be undefined\n"); */
-  return entity_undefined;
+					 ls,prefix,name,NULL));
+      ent = gen_find_tabulated(global_name,entity_domain);
+    } while(entity_undefined_p(ent) && (ls = pop_block_scope(ls))!=NULL);
+  }
+
+  if(entity_undefined_p(ent)) {
+    global_name = strdup(concatenate(compilation_unit_name,MODULE_SEP_STRING,
+				     prefix,name,NULL));
+    ent = gen_find_tabulated(global_name,entity_domain);
+  }
+ 
+  if(entity_undefined_p(ent)) {
+    global_name = strdup(concatenate(TOP_LEVEL_MODULE_NAME,MODULE_SEP_STRING,
+				     prefix,name,NULL));
+    ent = gen_find_tabulated(global_name,entity_domain);
+  }
+
+  if(entity_undefined_p(ent)) {
+    pips_user_warning("Cannot find entity %s with prefix \"%s\" at line %d\n",
+		      name, prefix, get_current_C_line_number());
+    /* It may be a parser error or a normal behavior when an entity is
+       used before it is defined as, for example, a struct in a typedef:
+       typedef struct foo foo; */
+    /* CParserError("Variable appears to be undefined\n"); */
+  }
+  pips_debug(5,"Entity global name is %s\n",global_name);
+  return ent;
 }
 
 entity CreateEntityFromLocalNameAndPrefix(string name, string prefix, bool is_external)
@@ -514,25 +550,31 @@ entity CreateEntityFromLocalNameAndPrefix(string name, string prefix, bool is_ex
      - if the entity is declared outside any function, their scope is the CurrentCompilationUnit
      - if the entity is declared inside a function, we have to know the CurrentBlock, 
      which is omitted for the moment 
-        - if the function is static, their scope is CurrentCompilationUnit#CurrentModule
-        - if the function is global, their scope is CurrentModule */
-  entity ent;
-  pips_debug(5,"Entity local name is %s with prefix %s\n",name,prefix);
-  
-  if (is_external)
+     - if the function is static, their scope is CurrentCompilationUnit#CurrentModule
+     - if the function is global, their scope is CurrentModule */
+  entity ent = entity_undefined;
+
+  if (is_external) {
+    pips_debug(5,"Entity local name is %s with prefix %s\n",name,prefix);
     ent = find_or_create_entity(strdup(concatenate(compilation_unit_name,MODULE_SEP_STRING,
-					    prefix,name,NULL)));	
-  else
-    {
-      /* Add block scope here */
-      if (static_module_p(get_current_module_entity()))
-	ent = find_or_create_entity(strdup(concatenate(compilation_unit_name,
-						get_current_module_name(),MODULE_SEP_STRING,
-						prefix,name,NULL)));	
-      else 
-	ent = find_or_create_entity(strdup(concatenate(get_current_module_name(),MODULE_SEP_STRING,
-						prefix,name,NULL)));	
-    }
+						   prefix,name,NULL)));
+  }
+  else {
+    string scope = scope_to_block_scope(c_parser_context_scope(GetScope()));
+
+    pips_debug(5,"Entity local name is %s with prefix %s and scope \"%s\"\n",
+	       name,prefix,scope);
+    pips_assert("scope is a block scope", string_block_scope_p(scope));
+
+    if (static_module_p(get_current_module_entity()))
+      ent = find_or_create_entity(strdup(concatenate(compilation_unit_name,
+						     get_current_module_name(),MODULE_SEP_STRING,
+						     scope,prefix,name,NULL)));	
+    else 
+      ent = find_or_create_entity(strdup(concatenate(get_current_module_name(),MODULE_SEP_STRING,
+						     scope,prefix,name,NULL)));
+    free(scope);
+  }
   pips_debug(5,"Entity global name is %s\n",entity_name(ent));
   return ent;
 }
@@ -543,12 +585,11 @@ entity CreateEntityFromLocalNameAndPrefix(string name, string prefix, bool is_ex
 entity FindOrCreateCurrentEntity(string name,stack ContextStack,stack FormalStack,
 				 stack FunctionStack, bool is_external)
 {
-  entity ent; 
-  c_parser_context context = stack_head(ContextStack);
+  entity ent;
+  c_parser_context context = GetScope();
   string full_scope = c_parser_context_scope(context);
   string scope = strrchr(full_scope, BLOCK_SEP_CHAR);
-  string block_scope = gen_strndup0(full_scope, 
-				    (scope==NULL)? strlen(full_scope) : (unsigned) (scope-full_scope+1));
+  string block_scope = scope_to_block_scope(full_scope);
   type ct = c_parser_context_type(context);
   bool is_typedef = c_parser_context_typedef(context);
   bool is_static = c_parser_context_static(context);
@@ -561,32 +602,37 @@ entity FindOrCreateCurrentEntity(string name,stack ContextStack,stack FormalStac
     scope = full_scope;
   }
 
+  if(!string_block_scope_p(block_scope)) {
+    pips_assert("block_scope is TOP-LEVEL:", same_string_p(block_scope, "TOP-LEVEL:"));
+    free(block_scope);
+    block_scope = empty_scope();
+  }
+
   if (stack_undefined_p(FormalStack) || stack_empty_p(FormalStack))
     is_formal = FALSE;
-  else
-    {
-      is_formal= TRUE; 
-      function = stack_head(FunctionStack);
-    }
+  else {
+    is_formal= TRUE; 
+    function = stack_head(FunctionStack);
+  }
 
-  ifdebug(5)
-    {
-      pips_debug(5,"Entity local name \"%s\"\n",name);
-      pips_debug(5,"Context %p\n",context);
-      if (full_scope != NULL) {
-	pips_debug(5,"Current scope: \"%s\"\n",full_scope);
-	pips_debug(5,"Local declaration scope: \"%s\"\n",scope);
-	pips_debug(5,"Block scope: \"%s\"\n",block_scope);
-      }
-      pips_debug(5,"type %p: %s\n", ct, list_to_string(safe_c_words_entity(ct, NIL)));
-      pips_debug(5,"is_typedef: %d\n",is_typedef);
-      pips_debug(5,"is_static: %d\n",is_static);
-      pips_debug(5,"is_external: %d\n",is_external);
-      pips_debug(5,"is_formal: %d\n",is_formal);
-      if (is_formal)
-	pips_debug(5,"of current function %s\n",entity_user_name(function));
-      /* function is only used for formal variables*/
+  ifdebug(5) {
+    pips_debug(5,"Entity local name \"%s\"\n",name);
+    pips_debug(5,"Context %p\n",context);
+    if (full_scope != NULL) {
+      pips_debug(5,"Current scope: \"%s\"\n",full_scope);
+      pips_debug(5,"Local declaration scope: \"%s\"\n",scope);
+      pips_debug(5,"Block scope: \"%s\"\n",block_scope);
+      pips_assert("block_scope is a block scope", string_block_scope_p(block_scope));
     }
+    pips_debug(5,"type %p: %s\n", ct, list_to_string(safe_c_words_entity(ct, NIL)));
+    pips_debug(5,"is_typedef: %d\n",is_typedef);
+    pips_debug(5,"is_static: %d\n",is_static);
+    pips_debug(5,"is_external: %d\n",is_external);
+    pips_debug(5,"is_formal: %d\n",is_formal);
+    if (is_formal)
+      pips_debug(5,"of current function %s\n",entity_user_name(function));
+    /* function is only used for formal variables*/
+  }
   
   if (is_typedef)
     {
@@ -599,8 +645,9 @@ entity FindOrCreateCurrentEntity(string name,stack ContextStack,stack FormalStac
     {
       if (strcmp(scope,"") != 0)
 	{
-	  ent = find_or_create_entity(strdup(concatenate(scope,name,NULL)));
-	  if (is_external && strstr(scope,TOP_LEVEL_MODULE_NAME) != NULL)
+	  /* Prefix for the current struct: use full_scope */
+	  ent = find_or_create_entity(strdup(concatenate(full_scope,name,NULL)));
+	  if (is_external /* && strstr(scope,TOP_LEVEL_MODULE_NAME) != NULL*/ )
 	    {
 	      /* This entity is declared in a compilation unit with keyword EXTERN.
 		 Add it to the storage of the compilation unit to help code generation*/
@@ -647,11 +694,16 @@ entity FindOrCreateCurrentEntity(string name,stack ContextStack,stack FormalStac
 		     Attention, the scope of a function declared in module is the module, not global.*/
 		  if (static_module_p(get_current_module_entity()))
 		    ent = find_or_create_entity(strdup(concatenate(compilation_unit_name,
-								   get_current_module_name(),MODULE_SEP_STRING,
-								   name,NULL)));      
+								   get_current_module_name(),
+								   MODULE_SEP_STRING,
+								   name,
+								   NULL)));      
 		  else
-		    ent = find_or_create_entity(strdup(concatenate(get_current_module_name(),MODULE_SEP_STRING,
-								   name,NULL)));
+		    ent = find_or_create_entity(strdup(concatenate(get_current_module_name(),
+								   MODULE_SEP_STRING,
+								   block_scope,
+								   name,
+								   NULL)));
 		}
 	    }
 	}
@@ -1107,7 +1159,9 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
 	    /* The entities for the type_variable is added to the current module and the declarations*/  
 	    entity function = get_current_module_entity();
 	    
-	    if(extern_entity_p(function, e))
+	    /* It is too early to use extern_entity_p() */
+	    //if(extern_entity_p(function, e))
+	    if(strstr(entity_name(e),TOP_LEVEL_MODULE_NAME) != NULL)
 	      AddToExterns(e,function);
 	    
 	    /* To avoid multiple declarations */
@@ -1144,8 +1198,10 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
     entity_initial(e) = make_value_unknown();
   }
 
-  pips_debug(3,"Update entity ends for \"%s\" with type \"%s\"\n",
-	     entity_name(e),list_to_string(safe_c_words_entity(entity_type(e), NIL)));
+  pips_debug(3,"Update entity ends for \"%s\" with type \"%s\" and storage \"%s\"\n",
+	     entity_name(e),
+	     list_to_string(safe_c_words_entity(entity_type(e), NIL)),
+	     storage_to_string(entity_storage(e)));
   
   pips_assert("Current entity is consistent",entity_consistent_p(e));
 }
@@ -1226,7 +1282,10 @@ void AddToDeclarations(entity e, entity mod)
 {
   if (!gen_in_list_p(e,code_declarations(value_code(entity_initial(mod)))))
     {
-      pips_debug(5,"Add entity %s to module %s\n",entity_user_name(e),entity_user_name(mod));
+      pips_debug(5,"Add entity \"%s\" (\"%s\") to module %s\n",
+		 entity_user_name(e),
+		 entity_local_name(e),
+		 entity_user_name(mod));
       code_declarations(value_code(entity_initial(mod)))
 	= gen_nconc(code_declarations(value_code(entity_initial(mod))),
 		    CONS(ENTITY,e,NIL));
@@ -1433,27 +1492,34 @@ string CreateMemberScope(string derived, bool is_external)
      - if the struct/union is declared outside any function, its scope is the CurrentCompilationUnit
      - if the struct/union is declared inside a function, we have to know the CurrentBlock, 
      which is omitted for the moment 
-        - if the function is static, its scope is CurrentCompilationUnit!CurrentModule
-        - if the function is global, its scope is CurrentModule
+     - if the function is static, its scope is CurrentCompilationUnit!CurrentModule
+     - if the function is global, its scope is CurrentModule
 
-  The name of the struct/union is then added to the field entity name, with 
-  the MEMBER_SEP_STRING */
+     The name of the struct/union is then added to the field entity name, with 
+     the MEMBER_SEP_STRING */
 
-  string s;
+  string s = string_undefined;
+
   pips_debug(3,"Struc/union name is %s\n",derived);
+
   if (is_external)
-    s = strdup(concatenate(compilation_unit_name,derived,MEMBER_SEP_STRING,NULL));	
-  else
-    {
-      if (static_module_p(get_current_module_entity()))
-	s = strdup(concatenate(compilation_unit_name,
-			get_current_module_name(),MODULE_SEP_STRING,
-			derived,MEMBER_SEP_STRING,NULL));	
-      else 
-	s = strdup(concatenate(get_current_module_name(),MODULE_SEP_STRING,
-			derived,MEMBER_SEP_STRING,NULL));
-    } 
+    s = strdup(concatenate(compilation_unit_name, MODULE_SEP_STRING, derived, MEMBER_SEP_STRING, NULL));	
+  else {
+    string scope = scope_to_block_scope(c_parser_context_scope(GetScope()));
+
+    pips_assert("scope is a block scope", string_block_scope_p(scope));
+
+    if (static_module_p(get_current_module_entity()))
+      s = strdup(concatenate(compilation_unit_name,
+			     get_current_module_name(), MODULE_SEP_STRING,
+			     scope, derived, MEMBER_SEP_STRING, NULL));	
+    else 
+      s = strdup(concatenate(get_current_module_name(), MODULE_SEP_STRING,
+			     scope, derived, MEMBER_SEP_STRING, NULL));
+  }
+
   pips_debug(3,"The struct/union member's scope is %s\n",s);
+
   return s;
 }
 

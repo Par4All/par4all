@@ -61,7 +61,7 @@ char * pips_user_value_name(entity e)
     }
     else {
 	(void) gen_check((gen_chunk *) e, entity_domain);
-	return entity_has_values_p(e)? entity_minimal_name(e) :
+	return entity_has_values_p(e)? entity_user_name(e) :
 	    external_value_name(e);
     }
 }
@@ -76,7 +76,7 @@ char * generic_value_name(entity e)
   else {
     (void) gen_check((gen_chunk *) e, entity_domain);
     if(local_temporary_value_entity_p(e)) {
-      n = entity_minimal_name(e);
+      n = entity_user_name(e);
     }
     /* else if (entity_has_values_p(e)){ */
     else if (!hash_value_to_name_undefined_p()
@@ -85,7 +85,7 @@ char * generic_value_name(entity e)
       n = pips_user_value_name(e);
     }
     else {
-      n = entity_minimal_name(e);
+      n = entity_user_name(e);
     }
   }
   return n;

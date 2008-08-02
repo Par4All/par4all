@@ -430,14 +430,14 @@ list C_loop_range(range obj, entity i)
     pc = CHAIN_SWORD(pc,"; ");
 
     /* Check the final bound */
-    pc = CHAIN_SWORD(pc, entity_local_name(i));
+    pc = CHAIN_SWORD(pc, entity_user_name(i));
     /* increasing or decreasing index? To be done later */
     pc = CHAIN_SWORD(pc," <= ");
     pc = gen_nconc(pc, words_subexpression(range_upper(obj), 0, TRUE));
     pc = CHAIN_SWORD(pc,"; ");
 
     /* Increment the loop index */
-    pc = CHAIN_SWORD(pc, entity_local_name(i));
+    pc = CHAIN_SWORD(pc, entity_user_name(i));
     pc = CHAIN_SWORD(pc," += ");
     pc = gen_nconc(pc, words_expression(range_increment(obj)));
     pc = CHAIN_SWORD(pc,")");
@@ -628,7 +628,7 @@ words_regular_call(call obj, bool is_a_subroutine)
     if (type_statement_p(t))
       return(CHAIN_SWORD(pc, entity_local_name(f)+strlen(LABEL_PREFIX)));
     if (value_constant_p(i)||value_symbolic_p(i))
-      return(CHAIN_SWORD(pc, entity_local_name(f)));
+      return(CHAIN_SWORD(pc, entity_user_name(f)));
   }
 
   if (type_void_p(functional_result(type_functional(t)))) 
@@ -2193,7 +2193,8 @@ text_loop_default(
     if(!structured_do && !doall_loop_p && !do_enddo_p) {
 	pc = CHAIN_SWORD(pc, concatenate(do_label, " ", NULL));
     }
-    pc = CHAIN_SWORD(pc, entity_local_name(loop_index(obj)));
+    //pc = CHAIN_SWORD(pc, entity_local_name(loop_index(obj)));
+    pc = CHAIN_SWORD(pc, entity_user_name(loop_index(obj)));
     pc = CHAIN_SWORD(pc, " = ");
 
     if(is_fortran) {
@@ -3053,7 +3054,7 @@ text C_comment_to_text(int margin, string comment)
 
 text text_statement_enclosed(
     entity module,
-    int margin,
+    int imargin,
     statement stmt,
     bool braces_p)
 {
@@ -3064,7 +3065,8 @@ text text_statement_enclosed(
     entity_local_name(statement_label(stmt)) + strlen(LABEL_PREFIX);
   string comments = statement_comments(stmt);
   bool braces_added = FALSE;
-    
+  int nmargin = imargin;
+
   pips_assert("Blocks have no comments", !instruction_block_p(i)||empty_comments_p(comments));
 
   /* 31/07/2003 Nga Nguyen : This code is added for C, because a
@@ -3075,9 +3077,10 @@ text text_statement_enclosed(
     if(!braces_p) {
       braces_added = TRUE;
       ADD_SENTENCE_TO_TEXT(r,
-			   MAKE_ONE_WORD_SENTENCE(margin,	"{"));
+			   MAKE_ONE_WORD_SENTENCE(imargin, "{"));
+      nmargin += INDENTATION;
     }
-    MERGE_TEXTS(r,c_text_entities(module,l,margin));
+    MERGE_TEXTS(r,c_text_entities(module,l,nmargin));
   }
   pips_debug(2, "Begin for statement %s with braces_p=%d\n", statement_identification(stmt),braces_p);
   pips_debug(9, "statement_comments: --%s--\n", 
@@ -3100,7 +3103,7 @@ text text_statement_enclosed(
       if(get_bool_property("PRETTYPRINT_FINAL_RETURN")
 	 || !last_statement_p(stmt)) 
 	{
-	  sentence s = MAKE_ONE_WORD_SENTENCE(margin, RETURN_FUNCTION_NAME);
+	  sentence s = MAKE_ONE_WORD_SENTENCE(nmargin, RETURN_FUNCTION_NAME);
 	  temp = make_text(CONS(SENTENCE, s ,NIL));
 	}
       else {
@@ -3109,7 +3112,7 @@ text text_statement_enclosed(
     }
   else
     {
-      temp = text_instruction(module, label, margin, i,
+      temp = text_instruction(module, label, nmargin, i,
 			      statement_number(stmt));
     }
 
@@ -3117,14 +3120,14 @@ text text_statement_enclosed(
    * sure that the free is NEVER performed as it should. FC.
    */
   if(!ENDP(text_sentences(temp))) {
-    MERGE_TEXTS(r, init_text_statement(module, margin, stmt));
+    MERGE_TEXTS(r, init_text_statement(module, nmargin, stmt));
     if (! string_undefined_p(comments)) {
       if(is_fortran) {
 	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
 					      strdup(comments)));
       }
       else {
-	text ct = C_comment_to_text(margin, comments);
+	text ct = C_comment_to_text(nmargin, comments);
 	MERGE_TEXTS(r, ct);
       }
     }
@@ -3138,7 +3141,7 @@ text text_statement_enclosed(
 					      strdup(comments)));
       }
       else {
-	text ct = C_comment_to_text(margin, comments);
+	text ct = C_comment_to_text(nmargin, comments);
 	MERGE_TEXTS(r, ct);
       }
     }
@@ -3146,15 +3149,14 @@ text text_statement_enclosed(
       // Because C braces can be eliminated and hence semi-colon
       // may be mandatory in a test branch or in a loop body.
       // A. Mensi
-      sentence s = MAKE_ONE_WORD_SENTENCE(margin, strdup(";"));
+      sentence s = MAKE_ONE_WORD_SENTENCE(nmargin, strdup(";"));
       ADD_SENTENCE_TO_TEXT(r, s);	  
     }
     free_text(temp);
   }
  
   if (braces_added) {
-    ADD_SENTENCE_TO_TEXT(r,
-			 MAKE_ONE_WORD_SENTENCE(margin,	"}"));
+    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(imargin, "}"));
   }
   attach_statement_information_to_text(r, stmt);
 
@@ -3363,7 +3365,10 @@ text_named_module(
   set_alternate_return_set();
   
   if (stat != statement_undefined) {
-    MERGE_TEXTS(r, text_statement(module, is_fortran?0:INDENTATION, stat));
+    MERGE_TEXTS(r,
+		text_statement(module,
+			       (is_fortran||compilation_unit_p(entity_name(name)))?0:INDENTATION,
+			       stat));
   }
     
   ral = generate_alternate_return_targets();

@@ -1902,7 +1902,8 @@ static int compare_region_entities(entity *pe1, entity *pe2)
 	return(null_2-null_1);
 
     /* if both entities are phi variables, or neither one */
-    if (phi_1 - phi_2 == 0) 
+    if (phi_1 - phi_2 == 0)
+      /* FI: This does not work well with C scope system */
 	return(strcmp(entity_name(*pe1), entity_name(*pe2)));
     
     /* if one and only one of the entities is a phi variable */ 
