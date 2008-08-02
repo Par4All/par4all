@@ -22,7 +22,7 @@ void generate01()
    // implictly an int
    func(i, x);
 }
-   extern void generate01();
+extern void generate01();
 
 Printed file generate01 with intraprocedural preconditions
 

@@ -1,5 +1,5 @@
-   static int i;
-   extern int foo();
+static int i;
+extern int foo();
 int foo()
 {
    i = 1;

@@ -1,8 +1,8 @@
 
 Parser output
 
-   static void foo(int );
-   extern void main();
+static void foo(int );
+extern void main();
 static void foo(int x)
 {
    printf("%d\n", x);
@@ -15,8 +15,8 @@ void main()
 
 Controlizer output
 
-   static void foo(int );
-   extern void main();
+static void foo(int );
+extern void main();
 static void foo(int x)
 {
    printf("%d\n", x);

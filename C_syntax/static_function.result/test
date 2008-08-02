@@ -1,8 +1,8 @@
 
 Module static_function!
 
-   static void foo(int );
-   extern void main();
+static void foo(int );
+extern void main();
 
 Module main
 

@@ -4,16 +4,38 @@ create block_scope01 block_scope01.c
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 
 activate C_PARSER
+activate C_SYMBOL_TABLE
 
 setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
+echo
+echo Symbol tables
+echo
 
+echo Possible bug in CCOmpilationUnitMemoryAllocation() for "block_scope01!"
+display SYMBOL_TABLE_FILE[block_scope01!]
+display SYMBOL_TABLE_FILE[main]
+display SYMBOL_TABLE_FILE[foo]
 
-display PRINTED_FILE[%ALL]
+echo
+echo Parsed printed files
+echo
 
+display PARSED_PRINTED_FILE[block_scope01!]
+display PARSED_PRINTED_FILE[main]
+display PARSED_PRINTED_FILE[foo]
+
+echo
+echo Printed files
+echo
+
+display PRINTED_FILE[block_scope01!]
+display PRINTED_FILE[main]
+display PRINTED_FILE[foo]
 
 close
 
-delete block_scope01
+#delete block_scope01
 
 

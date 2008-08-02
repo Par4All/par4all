@@ -1,0 +1,29 @@
+
+parsed printed file
+
+void block01()
+{
+   int i = 1;
+   {
+   int j = 2;
+   }
+   i++;
+   {
+   int k = 2;
+
+   k++;
+   }
+}
+
+printed file
+
+void block01()
+{
+   int i = 1;
+   i++;
+   {
+   int k = 2;
+
+   k++;
+   }
+}

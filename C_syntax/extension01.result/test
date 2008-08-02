@@ -1,0 +1,5 @@
+
+parsed printed file
+
+typedef unsigned long __dev_t;
+extern unsigned int foo();

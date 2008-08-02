@@ -2,11 +2,11 @@ bar()
 {
    int a;
 }
-   extern main();
-   enum hue {node, nide};
-   extern foo();
-   enum test {a, b};
-   extern bar();
+extern main();
+enum hue {node, nide};
+extern foo();
+enum test {a, b};
+extern bar();
 foo()
 {
    enum hue {node, nide};

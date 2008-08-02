@@ -7,7 +7,7 @@ Declared entity TOP-LEVEL:*STATIC*	with type area with size 0
 Declared entity foo:*DYNAMIC*	with type area with size 40
 Declared entity foo:*STACK*	with type area with size 0
 Declared entity foo:*STATIC*	with type area with size 0
-Declared entity foo:A	with type variable INTEGER*4
+Declared entity foo:0`A	with type variable INTEGER*4
 Declared entity sizeofArray04!:*HEAP*	with type area with size 0
 Declared entity sizeofArray04!:*STATIC*	with type area with size 0
 
@@ -18,7 +18,7 @@ Layout for common /TOP-LEVEL:*STATIC*/ of size 0:
 
 
 Layout for common /foo:*DYNAMIC*/ of size 40:
-	Variable foo:A	offset = 0	size = 40
+	Variable foo:0`A	offset = 0	size = 40
 
 
 Layout for common /foo:*STACK*/ of size 0:
@@ -76,7 +76,7 @@ End of declarations for module sizeofArray04!
 
 Parsed code
 
-   extern void foo();
+extern void foo();
 void foo()
 {
    int A[10];

@@ -7,8 +7,8 @@ Declared entity TOP-LEVEL:*STATIC*	with type area with size 0
 Declared entity foo:*DYNAMIC*	with type area with size 0
 Declared entity foo:*STACK*	with type area with size 0
 Declared entity foo:*STATIC*	with type area with size 0
-Declared entity foo:X	with type variable INTEGER*4
-Declared entity foo:Y	with type variable INTEGER*4
+Declared entity foo:0`X	with type variable INTEGER*4
+Declared entity foo:0`Y	with type variable INTEGER*4
 Declared entity foo:a	with type variable INTEGER*4
 Declared entity sizeofArray03!:*HEAP*	with type area with size 0
 Declared entity sizeofArray03!:*STATIC*	with type area with size 0
@@ -27,8 +27,8 @@ Layout for common /foo:*DYNAMIC*/ of size 0:
 
 
 Layout for common /foo:*STACK*/ of size 0:
-	Dynamic Variablefoo:X	offset = UNKNOWN, 	size = DYNAMIC
-	Dynamic Variablefoo:Y	offset = UNKNOWN, 	size = DYNAMIC
+	Dynamic Variablefoo:0`X	offset = UNKNOWN, 	size = DYNAMIC
+	Dynamic Variablefoo:0`Y	offset = UNKNOWN, 	size = DYNAMIC
 
 
 Layout for common /foo:*STATIC*/ of size 0:
@@ -82,7 +82,7 @@ End of declarations for module sizeofArray03!
 
 Parsed code
 
-   extern int foo(int );
+extern int foo(int );
 int foo(int a)
 {
    int X[a-1+1];

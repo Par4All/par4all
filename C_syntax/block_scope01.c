@@ -7,7 +7,8 @@ int main()
   return x;
 }
 
-int x;
+int x = 1;
+
 void foo(int x)
 {
   int x,y;

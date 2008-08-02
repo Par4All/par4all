@@ -9,7 +9,7 @@ main()
 {
    int i = 1;
    struct key {
-      float node;
+      int node;
    };
    if (i>1) {
       struct key {
@@ -18,12 +18,12 @@ main()
    }
    printf("Test\n");
 }
-   struct key {
-      int node;
-   };
-   extern main();
-   extern int foo();
-   extern int toto();
+struct key {
+   extern int node;
+};
+extern main();
+extern int foo();
+extern int toto();
 int toto()
 {
    int i = 1;

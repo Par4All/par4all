@@ -76,4 +76,4 @@ void nodecls()
 {
    foo();
 }
-   extern void nodecls();
+extern void nodecls();

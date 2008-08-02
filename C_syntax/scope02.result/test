@@ -1,8 +1,8 @@
 
 Printed file for scope02_c
 
-   static int i = 2;
-   extern void foo();
+static int i = 2;
+extern void foo();
 void foo()
 {
    printf("%d\n", i);
@@ -10,9 +10,9 @@ void foo()
 
 Printed file for scope02_a
 
-   extern int i;
-   void foo();
-   extern main();
+extern int i;
+void foo();
+extern main();
 main()
 {
    // printf("%d\n",i);
@@ -21,7 +21,7 @@ main()
 
 Printed file for scope02_b
 
-   int i = 1;
+int i = 1;
 main()
 {
    // printf("%d\n",i);
@@ -33,9 +33,9 @@ Unsplit the application
 /*
  * file for scope02_a.c
  */
-   extern int i;
-   void foo();
-   extern main();
+extern int i;
+void foo();
+extern main();
 main()
 {
    // printf("%d\n",i);
@@ -44,12 +44,12 @@ main()
 /*
  * file for scope02_b.c
  */
-   int i = 1;
+int i = 1;
 /*
  * file for scope02_c.c
  */
-   static int i = 2;
-   extern void foo();
+static int i = 2;
+extern void foo();
 void foo()
 {
    printf("%d\n", i);
