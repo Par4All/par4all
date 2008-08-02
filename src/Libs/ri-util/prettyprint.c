@@ -1930,6 +1930,7 @@ sentence_goto(
 /********************************************************************* TEXT */
 
 static text 
+
 text_block(
     entity module,
     string label,
@@ -1977,7 +1978,7 @@ text_block(
     for (; objs != NIL; objs = CDR(objs)) {
 	statement s = STATEMENT(CAR(objs));
 
-	text t = text_statement(module, margin, s);
+	text t = text_statement_enclosed(module, margin, s, FALSE);
 	text_sentences(r) = gen_nconc(text_sentences(r), text_sentences(t));
 	text_sentences(t) = NIL;
 	free_text(t);
@@ -3062,18 +3063,22 @@ text text_statement_enclosed(
   string label =
     entity_local_name(statement_label(stmt)) + strlen(LABEL_PREFIX);
   string comments = statement_comments(stmt);
+  bool braces_added = FALSE;
     
   pips_assert("Blocks have no comments", !instruction_block_p(i)||empty_comments_p(comments));
 
-  /* 31/07/2003 Nga Nguyen : This code is added for C, because a statement can have its own declarations */
+  /* 31/07/2003 Nga Nguyen : This code is added for C, because a
+     statement can have its own declarations */
   list l = statement_declarations(stmt);
 
-  if (!ENDP(l) && !is_fortran)
-    {
-      /* printf("Statement declarations : ");
-	 print_entities(l); */
-      MERGE_TEXTS(r,c_text_entities(module,l,margin));
+  if (!ENDP(l) && !is_fortran) {
+    if(!braces_p) {
+      braces_added = TRUE;
+      ADD_SENTENCE_TO_TEXT(r,
+			   MAKE_ONE_WORD_SENTENCE(margin,	"{"));
     }
+    MERGE_TEXTS(r,c_text_entities(module,l,margin));
+  }
   pips_debug(2, "Begin for statement %s with braces_p=%d\n", statement_identification(stmt),braces_p);
   pips_debug(9, "statement_comments: --%s--\n", 
 	     string_undefined_p(comments)? "<undef>": comments);
@@ -3137,7 +3142,7 @@ text text_statement_enclosed(
 	MERGE_TEXTS(r, ct);
       }
     }
-    else if(!is_fortran && !braces_p) {
+    else if(!is_fortran && !braces_p && !braces_added) {
       // Because C braces can be eliminated and hence semi-colon
       // may be mandatory in a test branch or in a loop body.
       // A. Mensi
@@ -3145,6 +3150,11 @@ text text_statement_enclosed(
       ADD_SENTENCE_TO_TEXT(r, s);	  
     }
     free_text(temp);
+  }
+ 
+  if (braces_added) {
+    ADD_SENTENCE_TO_TEXT(r,
+			 MAKE_ONE_WORD_SENTENCE(margin,	"}"));
   }
   attach_statement_information_to_text(r, stmt);
 
@@ -3170,9 +3180,9 @@ text text_statement_enclosed(
     fprintf(stderr,"==============================\n");
   }
 
-    pips_debug(2, "End for statement %s\n", statement_identification(stmt));
+  pips_debug(2, "End for statement %s\n", statement_identification(stmt));
        
-    return(r);
+  return(r);
 }
 
 /* Handles all statements but tests that are nodes of an unstructured.
