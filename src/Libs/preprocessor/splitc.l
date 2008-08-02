@@ -483,6 +483,12 @@ L\"([^\"]|(\"\")|(\\\"))*\"	{
 				pips_debug(5,"TK_ASM %s\n",yytext);
 				return(TK_ASM);
 			} 
+"__extension__"         {
+                                pips_user_warning("gcc keyword \"__extension__\" is ignored\n");
+                        }
+"__inline"            {
+                                pips_user_warning("gcc keyword \"__inline\" is ignored\n");
+                        }
 {ident}			{ 
                                 /* C keywords or identifiers */
 				int t = is_c_keyword_typedef(yytext);

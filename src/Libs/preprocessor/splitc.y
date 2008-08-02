@@ -713,55 +713,43 @@ expression:
 			}
 |   TK_STAR expression
 		        {
-			  free_partial_signature($2);
-			  $$ = string_undefined;
+			  $$ = safe_build_signature(new_signature("*"), $2, NULL);
 			}
 |   TK_AND expression				%prec TK_ADDROF
 		        {
-			  free_partial_signature($2);
-			  $$ = string_undefined;
+			  $$ = safe_build_signature(new_signature("&"), $2, NULL);
 			}
 |   TK_EXCLAM expression
 		        {
-			  free_partial_signature($2);
-			  $$ = string_undefined;
+			  $$ = safe_build_signature(new_signature("!"), $2, NULL);
 			}
 |   TK_TILDE expression
 		        {
-			  free_partial_signature($2);
-			  $$ = string_undefined;
+			  $$ = safe_build_signature(new_signature("~"), $2, NULL);
 			}
 |   TK_PLUS_PLUS expression                    %prec TK_CAST
 		        {
-			  free_partial_signature($2);
-			  $$ = string_undefined;
+			  $$ = safe_build_signature(new_signature("++"), $2, NULL);
 			}
 |   expression TK_PLUS_PLUS
 		        {
-			  free_partial_signature($1);
-			  $$ = string_undefined;
+			  $$ = safe_build_signature($1, new_signature("++"), NULL);
 			}
 |   TK_MINUS_MINUS expression                  %prec TK_CAST
 		        {
-			  free_partial_signature($2);
-			  $$ = string_undefined;
+			  $$ = safe_build_signature(new_signature("--"), $2, NULL);
 			}
 |   expression TK_MINUS_MINUS
 		        {
-			  free_partial_signature($1);
-			  $$ = string_undefined;
+			  $$ = safe_build_signature($1, new_signature("--"), NULL);
 			}
 |   expression TK_ARROW id_or_typename
 		        {	
-			  free_partial_signature($1);
-			  free_partial_signature($3);
-			  $$ = string_undefined;
+			  $$ = safe_build_signature($1, new_signature("->"), $3, NULL);
 			}
 |   expression TK_DOT id_or_typename
 		        {
-			  free_partial_signature($1);
-			  free_partial_signature($3);
-			  $$ = string_undefined;
+			  $$ = safe_build_signature($1, new_signature("."), $3, NULL);
 			}
 |   TK_LPAREN block TK_RPAREN
 		        {
@@ -824,33 +812,23 @@ expression:
 			}
 |   expression TK_AND_AND expression
 			{
-			  free_partial_signature($1);
-			  free_partial_signature($3);
-			  $$ = string_undefined;
+			  $$ = safe_build_signature($1, new_signature("&&"), $3, NULL);
 			}
 |   expression TK_PIPE_PIPE expression
 			{
-			  free_partial_signature($1);
-			  free_partial_signature($3);
-			  $$ = string_undefined;
+			  $$ = safe_build_signature($1, new_signature("||"), $3, NULL);
 			}
 |   expression TK_AND expression
 			{
-			  free_partial_signature($1);
-			  free_partial_signature($3);
-			  $$ = string_undefined;
+			  $$ = safe_build_signature($1, new_signature("&"), $3, NULL);
 			}
 |   expression TK_PIPE expression
 			{
-			  free_partial_signature($1);
-			  free_partial_signature($3);
-			  $$ = string_undefined;
+			  $$ = safe_build_signature($1, new_signature("|"), $3, NULL);
 			}
 |   expression TK_CIRC expression
 			{
-			  free_partial_signature($1);
-			  free_partial_signature($3);
-			  $$ = string_undefined;
+			  $$ = safe_build_signature($1, new_signature("^"), $3, NULL);
 			}
 |   expression TK_EQ_EQ expression
 			{
