@@ -812,21 +812,19 @@ bool hpfc_close(string name)
  */
 bool hpfc_install(string name)
 {
-    string dir, wks;
+  string dir, wks;
+  debug_on("HPFC_DEBUG_LEVEL");
+  pips_debug(1, "considering program %s\n", name);
 
-    debug_on("HPFC_DEBUG_LEVEL");
-    pips_debug(1, "considering program %s\n", name);
+  dir = db_get_current_workspace_directory();
+  wks = db_get_current_workspace_name();
 
-    dir = db_get_current_workspace_directory();
-    wks = db_get_current_workspace_name();
+  safe_system(concatenate("hpfc_install -iob ", dir, " -n ", wks, NULL));
 
-    safe_system(concatenate("PATH=${PATH}:${PIPS_ROOT}/Share "
-			    "hpfc_install -iob ", dir, " -n ", wks, NULL));
+  DB_PUT_FILE_RESOURCE(DBR_HPFC_INSTALLATION, name, NO_FILE);
 
-    DB_PUT_FILE_RESOURCE(DBR_HPFC_INSTALLATION, name, NO_FILE);
-
-    debug_off();
-    return TRUE;
+  debug_off();
+  return TRUE;
 }
 
 /* bool hpfc_make(string name)
