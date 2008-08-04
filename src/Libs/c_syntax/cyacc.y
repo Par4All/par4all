@@ -1589,7 +1589,7 @@ my_decl_spec_list:                         /* ISO 6.7 */
                                         /* ISO 6.7.4 */
 |   TK_INLINE decl_spec_list_opt
                         { 
-			  CParserError("INLINE not implemented\n"); 
+			  pips_user_warning("Keyword \"inline\" ignored\n"); 
 			  $$ = $2;
 			}	 
 |   attribute decl_spec_list_opt        

@@ -29,10 +29,14 @@ string global_name_to_user_name(string global_name)
   char lc = global_name[strlen(global_name)-1];
 
   /* First, take care of constrant strings and characters, wich may
-     contain any of the PIPS special characters and strings */
+     contain any of the PIPS special characters and strings.
+     And do not forget Fortran format */
 
   if(lc=='"' || lc=='\'') {
     user_name = strchr(global_name, lc);
+  }
+  else if(lc==')') {
+    user_name = strchr(global_name, '(');
   }
   else {
 
