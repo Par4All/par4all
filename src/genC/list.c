@@ -623,7 +623,7 @@ list gen_cons(void * item, list next)
  */
 list gen_typed_cons(intptr_t type, void * item, list next)
 {
-  if (Domains[type].domain->co.type==CONSTRUCTED_DT) {
+  if (type>0 && Domains[type].domain->co.type==CONSTRUCTED_DT) {
     message_assert("some item", item!=NULL && item!=gen_chunk_undefined);
     message_assert("check item type", ((gen_chunk*) item)->i==type);
   }

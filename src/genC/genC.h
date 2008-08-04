@@ -99,6 +99,7 @@ typedef union gen_chunk {
 #define INT_TYPE int
 #define FLOAT_TYPE float
 #define STRING_TYPE string
+
 #define CONSP_TYPE list
 #define LIST_TYPE list
 #define SETP_TYPE set
@@ -118,6 +119,21 @@ enum internal_type {
   float_domain = 4,
   string_domain = 5
 };
+
+/* utils for typed cons */
+#define BOOL_NEWGEN_DOMAIN (bool_domain)
+#define CHAR_NEWGEN_DOMAIN (char_domain)
+#define INT_NEWGEN_DOMAIN (int_domain)
+#define FLOAT_NEWGEN_DOMAIN (float_domain)
+#define STRING_NEWGEN_DOMAIN (string_domain)
+
+#define bool_NEWGEN_DOMAIN (bool_domain)
+#define char_NEWGEN_DOMAIN (char_domain)
+#define int_NEWGEN_DOMAIN (int_domain)
+#define float_NEWGEN_DOMAIN (float_domain)
+#define string_NEWGEN_DOMAIN (string_domain)
+
+#define LIST_NEWGEN_DOMAIN (-1) /* means unknown type... */
 
 #include "newgen_list.h"
 #include "newgen_stack.h"

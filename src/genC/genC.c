@@ -587,19 +587,19 @@ static void generate_arrow(
  */
 static void
 generate_safe_definition(
-    FILE * out, 
-    struct gen_binding * bp, 
+    FILE * out,
+    struct gen_binding * bp,
     string file)
 {
     string name = bp->name, Name = strup(name);
     int index = TYPE(bp);
 
     if (!IS_EXTERNAL(bp) && !IS_IMPORT(bp))
-	fprintf(out, 
+	fprintf(out,
 		"#define %s_domain (_gen_%s_start+%d)\n",
 		name, file, index);
 
-    fprintf(out, 
+    fprintf(out,
 	   "#if !defined(_newgen_%s_domain_defined_)\n"
 	   "#define _newgen_%s_domain_defined_\n",
 	    name, name);
@@ -610,16 +610,25 @@ generate_safe_definition(
 	 * number in different files with different include orders.
 	 * externals should really be global?
 	 */
-	fprintf(out, 
+	fprintf(out,
 		"#define newgen_%s(p) (p) /* old hack compatible */\n"
-		"#define %s_NEWGEN_EXTERNAL (_gen_%s_start+%d)\n",
+		"#define %s_NEWGEN_EXTERNAL (_gen_%s_start+%d)\n"
+		"#define %s_NEWGEN_DOMAIN (%s_NEWGEN_EXTERNAL)\n"
+		"#define %s_NEWGEN_DOMAIN (%s_NEWGEN_EXTERNAL)\n",
 		name,
-		Name, file, index);
+		Name, file, index,
+		Name, Name,
+		name, Name);
     else
-	fprintf(out, 
-		"typedef struct " STRUCT "%s_ * %s;\n", 
+      /* should not run if IS_IMPORT(bp)??? */
+	fprintf(out,
+		"#define %s_NEWGEN_DOMAIN (%s_domain)\n"
+		"#define %s_NEWGEN_DOMAIN (%s_domain)\n"
+		"typedef struct " STRUCT "%s_ * %s;\n",
+		Name, name,
+		name, name,
 		name, name);
-    
+
     fprintf(out, "#endif /* _newgen_%s_domain_defined_ */\n\n", name);
     free(Name);
 }
