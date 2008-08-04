@@ -71,3 +71,18 @@ test ttest ftest:
 endif # BIN_TARGET
 endif # OLD_TEST
 endif # LIB_TARGET
+
+ifdef VALIDATE_TARGET
+
+ifdef PIPS_VALIDDIR
+VALID.dir	= $(PIPS_VALIDDIR)
+else # no PIPS_VALIDDIR
+VALID.dir	= $(ROOT)/../../valid
+endif # PIPS_VALIDDIR
+
+validate: fast
+	cd $(VALID.dir) ; \
+	$(MAKE) clean ; \
+	$(MAKE) TARGET=$(VALIDATE_TARGET) validate ;
+
+endif # VALIDATE_TARGET
