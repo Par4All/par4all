@@ -232,7 +232,6 @@ extern void gen_context_multi_recurse GEN_PROTO((void *, void *,...));
 
 /* GEN_CHECK can be used to test run-time coherence of Newgen values.
  */
-
 #ifdef GEN_CHECK
 #undef GEN_CHECK
 #define GEN_CHECK(e,t) (gen_check((e),(t)),e)
@@ -241,6 +240,18 @@ extern void gen_context_multi_recurse GEN_PROTO((void *, void *,...));
 #define GEN_CHECK(e,t) (e)
 #define GEN_CHECK_ALLOC 0
 #endif
+
+/* this macro does about the same as gen_check, but inlined and safer */
+#define NEWGEN_CHECK_TYPE(dom,item)					\
+  {									\
+    intptr_t __type = dom;						\
+    void * __item = item;						\
+    if (__type>0 && Domains[__type].domain->co.type==CONSTRUCTED_DT) {	\
+      message_assert("some item", __item!=NULL);			\
+      message_assert("item is defined", __item!=gen_chunk_undefined);	\
+      message_assert("check type", ((gen_chunk*) __item)->i==__type);	\
+    }									\
+  }
 
 #include "newgen_map.h"
 #include "newgen_array.h"

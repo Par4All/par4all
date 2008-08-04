@@ -578,13 +578,10 @@ void gen_closure(iterate, initial)
 list /* of X */ (*iterate)(/* X, list of X */), initial;
 {
     list /* of X */ l_next, l_close = gen_copy_seq(initial);
-
     while (l_close)
     {
 	l_next = NIL;
-
 	MAPL(cc, l_next = iterate(CHUNK(CAR(cc)), l_next), l_close);
-
 	gen_free_list(l_close), l_close = l_next;
     }
 }
@@ -597,14 +594,15 @@ list gen_make_list(int domain, ...)
     va_start(args, domain);
 
     item = va_arg(args, gen_chunk*);
-    
     if (!item) return NIL;
-	
-    l = CONS(CHUNK, item, NIL), current = l;
 
-    while((item=va_arg(args, gen_chunk*)))
-	CDR(current) = CONS(CHUNK, item, NIL), POP(current);
-    
+    NEWGEN_CHECK_TYPE(domain, item);
+
+    l = CONS(CHUNK, item, NIL), current = l;
+    while((item=va_arg(args, gen_chunk*))) {
+      NEWGEN_CHECK_TYPE(domain, item);
+      CDR(current) = CONS(CHUNK, item, NIL), POP(current);
+    }
     return l;
     va_end(args);
 }
@@ -623,10 +621,7 @@ list gen_cons(void * item, list next)
  */
 list gen_typed_cons(intptr_t type, void * item, list next)
 {
-  if (type>0 && Domains[type].domain->co.type==CONSTRUCTED_DT) {
-    message_assert("some item", item!=NULL && item!=gen_chunk_undefined);
-    message_assert("check item type", ((gen_chunk*) item)->i==type);
-  }
+  NEWGEN_CHECK_TYPE(type, item);
   return gen_cons(item, next);
 }
 
