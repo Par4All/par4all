@@ -45,6 +45,7 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "alias_private.h"
 #include "ri-util.h"
 #include "database.h"
 #include "pipsdbm.h"
@@ -56,21 +57,21 @@
 #include "instrumentation.h"
 #include "transformations.h"
 
-/* As we create checks with stop error message who tell us there are 
- * bound violations for which array, on which dimension, which bound (lower or upper),
- * the following typedef array_dimension_bound_test permits us to create a sequence of tests 
- * for each statement more easier. 
+/* As we create checks with stop error message who tell us there are bound
+ * violations for which array, on which dimension, which bound (lower or upper),
+ * the following typedef array_dimension_bound_test permits us to create a
+ * sequence of tests for each statement more easier.
  *
  * The functions bottom_up_abc_call,
- * bottom_up_abc_reference, 
- * bottom_up_abc_expression return results of type 
+ * bottom_up_abc_reference,
+ * bottom_up_abc_expression return results of type
  * array_dimension_bound_test */
-typedef struct array_dimension_bound_test 
+typedef struct array_dimension_bound_test
 {
   list arr;
   list dim;
   list bou;
-  list exp; 
+  list exp;
 } array_dimension_bound_test;
 
 /* Data structure to support abc Implied DO*/
@@ -81,12 +82,12 @@ typedef struct Index_range
 } Index_range;
 
 /* context data structure for bottom_up_abc newgen recursion */
-typedef struct 
+typedef struct
 {
   persistant_statement_to_control map;
   stack uns;
-} 
-  bottom_up_abc_context_t, 
+}
+  bottom_up_abc_context_t,
 * bottom_up_abc_context_p;
 
 #define array_dimension_bound_test_undefined ((array_dimension_bound_test) {NIL,NIL,NIL,NIL} )
