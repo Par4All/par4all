@@ -32,6 +32,7 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "alias_private.h"
 #include "ri-util.h"
 #include "database.h"
 #include "pipsdbm.h"
