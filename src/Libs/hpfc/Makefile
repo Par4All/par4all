@@ -32,6 +32,8 @@ INC_TARGET =    $(TARGET).h
 
 LIB_TARGET =    lib$(TARGET).a
 
+VALIDATE_TARGET	= Hpfc
+
 # common stuff
 ifdef PIPS_ROOT
 ROOT    = $(PIPS_ROOT)
