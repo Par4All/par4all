@@ -11,7 +11,7 @@ unset tdir srcdir basedir reffiles toinstall tomake unsplit
 
 verb=':'
 debug=':'
-srcdir=${HPFC_RUNTIME:-$PIPS_ROOT/Runtime/hpfc}
+srcdir=${HPFC_RUNTIME:-$PIPS_ROOT/runtime/hpfc}
 MAKE=${HPFC_MAKE:-${PIPS_MAKE:-gmake}}
 M4=${HPFC_M4:-m4}
 
@@ -29,8 +29,11 @@ fi
 
 usage()
 {
+  code=$1 msg=$2
+  shift 2
+  [ "$msg" ] && echo "$msg" >&2
   cat <<-EOF
-	Usage: $RCSfile: hpfc_install,v $ [options]
+	Usage: hpfc_install [options]
 	   version $Revision$
 	   -h: help
 	   -i: install
@@ -75,6 +78,7 @@ $debug checking
 
 [ "$#" -eq 0 ] || usage
 [ "$basedir" ] || usage
+[ -d $srcdir ] || usage 1 "no runtime directory: $srcdir"
 
 name=`echo ${name:-\`basename $basedir .database\`} | tr 'A-Z' 'a-z'`
 
