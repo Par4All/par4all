@@ -212,7 +212,7 @@ static list addStatementToSequence(statement stat, list seq, list * start)
 {
    if(seq == NIL)
    {
-      seq = CONS(SATEMENT, stat, seq);
+      seq = CONS(STATEMENT, stat, seq);
       *start = seq;
    }
    else

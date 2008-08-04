@@ -24,6 +24,10 @@ int patterns_yyerror(char* s);
 int patterns_yywrap(void);
 int patterns_yylex();
 
+/* fake helpers */
+#define TOKEN_NEWGEN_DOMAIN (-1)
+#define ARGUMENT_NEWGEN_DOMAIN (-1)
+
 %}
 
 

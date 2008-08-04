@@ -41,6 +41,7 @@ typedef struct {
 } _reductionInfo_, * reductionInfo;
 #define REDUCTIONINFO(x) ((reductionInfo)((x).p))
 #define REDUCTIONINFO_TYPE reductionInfo
+#define REDUCTIONINFO_NEWGEN_DOMAIN (-1)
 #define reductionInfo_reduction(x) (x->_reductionInfo_reduction_)
 #define reductionInfo_count(x) (x->_reductionInfo_count_)
 #define reductionInfo_vector(x) (x->_reductionInfo_vector_)

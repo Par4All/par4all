@@ -366,7 +366,7 @@ void insert_pattern(char * s, list tokens, list args)
       m = next;
    }
 
-   matchTree_patterns(m) = CONS(PATTERN, p, matchTree_patterns(m));
+   matchTree_patterns(m) = CONS(PATTERNX, p, matchTree_patterns(m));
 }
 
 void patterns_yyparse();

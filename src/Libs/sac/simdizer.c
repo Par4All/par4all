@@ -280,7 +280,8 @@ static list simdize_simple_statements_pass1(list seq, float * simdCost)
    //argument info dependencies are local to each sequence -> RESET
    reset_argument_info();
 
-   sinfo = sinfo_begin = CONS(NULL, NULL, NIL);
+   // cons a NULL?
+   sinfo = sinfo_begin = CONS(STATEMENT_INFO, NULL, NIL);
 
    /* Traverse to list to group isomorphic statements */
    for( i = seq;
@@ -400,7 +401,7 @@ static list simdize_simple_statements_pass2(list seq, float * simdCost)
    //argument info dependencies are local to each sequence -> RESET
    reset_argument_info();
 
-   sinfo = sinfo_begin = CONS(NULL, NULL, NIL);
+   sinfo = sinfo_begin = CONS(STATEMENT_INFO, NULL, NIL);
 
    /* Traverse to list to group isomorphic statements */
    for( i = seq;

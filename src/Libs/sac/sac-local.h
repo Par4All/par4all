@@ -49,6 +49,8 @@ void init_dep_graph(graph dg);
 
 list expression_to_proper_effects(expression e);
 
+#define STATEMENT_INFO_NEWGEN_DOMAIN SIMDSTATEMENTINFO_NEWGEN_DOMAIN
+
 /* simd_loop_unroll.c */
 
 #define SIMD_COMMENT "SIMD_COMMENT_"
