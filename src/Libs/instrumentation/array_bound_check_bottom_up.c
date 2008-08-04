@@ -205,10 +205,10 @@ make_array_dimension_bound_test(entity e, int i, bool low, expression exp)
   array_dimension_bound_test retour =  array_dimension_bound_test_undefined;
   if (!expression_undefined_p(exp))
     {
-      retour.arr = gen_nconc( CONS(ENTITY,e,NIL),NIL);
-      retour.dim = gen_nconc(CONS(INT,i,NIL),NIL);
-      retour.bou = gen_nconc(CONS(BOOL,low,NIL),NIL);
-      retour.exp = gen_nconc( CONS(EXPRESSION,exp,NIL),NIL);
+      retour.arr = CONS(ENTITY,e,NIL);
+      retour.dim = CONS(INT,i,NIL);
+      retour.bou = CONS(BOOL,low,NIL);
+      retour.exp = CONS(EXPRESSION,exp,NIL);
     }
   return retour;
 }
