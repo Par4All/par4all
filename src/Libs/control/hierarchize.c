@@ -37,13 +37,15 @@ typedef interval_vertex_label arc_label;
    use the arc_label.
 
    Let us lay down this cpp and type lies for programmer's sake...
-   */
+*/
 #define vertex_predecessors vertex_successors
 #define predecessor_vertex successor_vertex
 #define make_predecessor make_successor
 #define free_predecessor free_successor
 #define PREDECESSOR SUCCESSOR
 #define PREDECESSOR_TYPE SUCCESSOR_TYPE
+#define PREDECESSOR_NEWGEN_DOMAIN (-1)
+#define SUCCESSOR_NEWGEN_DOMAIN (-1)
 typedef successor predecessor;
 
 
