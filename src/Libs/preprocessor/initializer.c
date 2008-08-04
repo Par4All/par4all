@@ -48,10 +48,10 @@ stub_var_decl(parameter p, int n, bool is_fortran)
     type t = parameter_type(p);
     pips_assert("is a variable", type_variable_p(t));
 
-    if(basic_overloaded_p(variable_basic(type_variable(t)))) 
+    if(basic_overloaded_p(variable_basic(type_variable(t))))
     {
 	string comment = strdup(concatenate(
-        "!     Unable to determine the type of parameter number ", name, "\n", 
+        "!     Unable to determine the type of parameter number ", name, "\n",
 	"!     ", basic_to_string(variable_basic(type_variable(t))),
 	" ", name, "\n", NULL));
 	free(name);
@@ -60,12 +60,10 @@ stub_var_decl(parameter p, int n, bool is_fortran)
     else
     {
 	result = make_sentence(is_sentence_unformatted,
-	  make_unformatted(string_undefined, 0, 0, 
-            CONS(STRING, 
+	  make_unformatted(string_undefined, 0, 0,
+	     gen_make_list(string_domain,
 		 strdup(basic_to_string(variable_basic(type_variable(t)))),
-		 CONS(STRING, strdup(" "),
-		      CONS(STRING, name, 
-			   CONS(STRIG, strdup(is_fortran? "" : ";"), NIL))))));
+		   strdup(" "), name, strdup(is_fortran? "" : ";"), NULL)));
     }
     return result;
 }
