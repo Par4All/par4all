@@ -1,86 +1,94 @@
 foo
 
-Declarations for module foo with type () -> void
+Declarations for module "foo" with type "() -> void"
+
 Variable list:
 
-Declared entity TOP-LEVEL:*STATIC*	with type area with size 4
-Declared entity allocation03!:*HEAP*	with type area with size 0
-Declared entity allocation03!:*STATIC*	with type area with size 0
-Declared entity foo:*DYNAMIC*	with type area with size 4
-Declared entity foo:*STACK*	with type area with size 0
-Declared entity foo:*STATIC*	with type area with size 4
-Declared entity foo:k	with type variable INTEGER*4
-Declared entity foo:l	with type variable INTEGER*4
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 4
+	Declared entity "allocation03!:*HEAP*" with type "area" with size 0
+	Declared entity "allocation03!:*STATIC*" with type "area" with size 0
+	Declared entity "foo:*DYNAMIC*" with type "area" with size 4
+	Declared entity "foo:*STACK*" with type "area" with size 0
+	Declared entity "foo:*STATIC*" with type "area" with size 4
+	Declared entity "foo:0`k" with type "variable" "int "
+	Declared entity "foo:0`l" with type "variable" "int "
 
-Layouts for areas (commons):
-
-Layout for common /TOP-LEVEL:*STATIC*/ of size 4:
-	Variable TOP-LEVEL:a	offset = 0	size = 4
+* empty extern declaration list *
 
 
-Layout for common /allocation03!:*HEAP*/ of size 0:
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 4:
+	Variable "TOP-LEVEL:a"	offset = 0	size = 4
+
+
+Layout for memory area "allocation03!:*HEAP*" of size 0:
 	* empty area *
 
 
-Layout for common /allocation03!:*STATIC*/ of size 0:
+Layout for memory area "allocation03!:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for common /foo:*DYNAMIC*/ of size 4:
-	Variable foo:k	offset = 0	size = 4
+Layout for memory area "foo:*DYNAMIC*" of size 4:
+	Variable "foo:0`k"	offset = 0	size = 4
 
 
-Layout for common /foo:*STACK*/ of size 0:
+Layout for memory area "foo:*STACK*" of size 0:
 	* empty area *
 
 
-Layout for common /foo:*STATIC*/ of size 4:
-	Variable foo:l	offset = 0	size = 4
+Layout for memory area "foo:*STATIC*" of size 4:
+	Variable "foo:0`l"	offset = 0	size = 4
 
 End of declarations for module foo
 
 main
 
-Declarations for module main with type () -> INTEGER*4
+Declarations for module "main" with type "() -> int "
+
 Variable list:
 
-Declared entity TOP-LEVEL:*STATIC*	with type area with size 4
-Declared entity allocation03!:*HEAP*	with type area with size 0
-Declared entity allocation03!:*STATIC*	with type area with size 0
-Declared entity main:*DYNAMIC*	with type area with size 88
-Declared entity main:*STACK*	with type area with size 0
-Declared entity main:*STATIC*	with type area with size 4
-Declared entity main:array	with type variable REAL*4
-Declared entity main:fooi	with type variable INTEGER*4
-Declared entity main:i	with type variable INTEGER*4
-Declared entity main:j	with type variable INTEGER*4
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 4
+	Declared entity "allocation03!:*HEAP*" with type "area" with size 0
+	Declared entity "allocation03!:*STATIC*" with type "area" with size 0
+	Declared entity "main:*DYNAMIC*" with type "area" with size 88
+	Declared entity "main:*STACK*" with type "area" with size 0
+	Declared entity "main:*STATIC*" with type "area" with size 4
+	Declared entity "main:0`array" with type "variable" "float "
+	Declared entity "main:0`fooi" with type "variable" "int "
+	Declared entity "main:0`i" with type "variable" "int "
+	Declared entity "main:0`j" with type "variable" "int "
 
-Layouts for areas (commons):
-
-Layout for common /TOP-LEVEL:*STATIC*/ of size 4:
-	Variable TOP-LEVEL:a	offset = 0	size = 4
+* empty extern declaration list *
 
 
-Layout for common /allocation03!:*HEAP*/ of size 0:
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 4:
+	Variable "TOP-LEVEL:a"	offset = 0	size = 4
+
+
+Layout for memory area "allocation03!:*HEAP*" of size 0:
 	* empty area *
 
 
-Layout for common /allocation03!:*STATIC*/ of size 0:
+Layout for memory area "allocation03!:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for common /main:*DYNAMIC*/ of size 88:
-	Variable main:i	offset = 0	size = 4
-	Variable main:fooi	offset = 4	size = 4
-	Variable main:array	offset = 8	size = 80
+Layout for memory area "main:*DYNAMIC*" of size 88:
+	Variable "main:0`i"	offset = 0	size = 4
+	Variable "main:0`fooi"	offset = 4	size = 4
+	Variable "main:0`array"	offset = 8	size = 80
 
 
-Layout for common /main:*STACK*/ of size 0:
+Layout for memory area "main:*STACK*" of size 0:
 	* empty area *
 
 
-Layout for common /main:*STATIC*/ of size 4:
-	Variable main:j	offset = 0	size = 4
+Layout for memory area "main:*STATIC*" of size 4:
+	Variable "main:0`j"	offset = 0	size = 4
 
 End of declarations for module main
 

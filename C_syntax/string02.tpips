@@ -1,0 +1,22 @@
+delete string02
+create string02 string02.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[string02]
+quit
+echo
+echo printed file
+echo
+
+display PRINTED_FILE[string02]
+
+close
+#delete string02
+quit

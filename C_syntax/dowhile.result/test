@@ -1,20 +1,3 @@
-# 1 "$VDIR/dowhile.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/dowhile.c"
-main()
-{
-  int c = 5; /* declaration comment that should be lost by parser */
-  /* Beginning of do while */
-  do
-    {
-      --c;
-      c++;
-      c -= 1;
-    } /* End of do while */
-  while (c>0);
-  /* End of function */
-}
 main()
 {
    int c = 5;

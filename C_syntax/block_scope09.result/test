@@ -3,38 +3,43 @@ Symbol table for block_scope09
 
 block_scope09!
 
-Declarations for module block_scope09! with type () -> unknow
+Declarations for module "block_scope09!" with type "() -> unknow"
+
 Variable list:
 
-Declared entity TOP-LEVEL:*STATIC*	with type area with size 0
-Declared entity TOP-LEVEL:block_scope09	with type functional INTEGER*4 -> INTEGER*4
-Declared entity TOP-LEVEL:x	with type variable INTEGER*4
-Declared entity TOP-LEVEL:y	with type variable INTEGER*4
-Declared entity block_scope09!:*DYNAMIC*	with type area with size 0
-Declared entity block_scope09!:*HEAP*	with type area with size 0
-Declared entity block_scope09!:*STACK*	with type area with size 0
-Declared entity block_scope09!:*STATIC*	with type area with size 0
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 8
+	Declared entity "TOP-LEVEL:block_scope09" with type "functional" "int  -> int "
+	Declared entity "TOP-LEVEL:x" with type "variable" "int "
+	Declared entity "TOP-LEVEL:y" with type "variable" "int "
+	Declared entity "block_scope09!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "block_scope09!:*HEAP*" with type "area" with size 0
+	Declared entity "block_scope09!:*STACK*" with type "area" with size 0
+	Declared entity "block_scope09!:*STATIC*" with type "area" with size 0
 
-Layouts for areas (commons):
+External variable list:
 
-Layout for common /TOP-LEVEL:*STATIC*/ of size 0:
-	External VariableTOP-LEVEL:x	offset = UNKNOWN,	size = 4
-	External VariableTOP-LEVEL:y	offset = UNKNOWN,	size = 4
+	Declared external entity "TOP-LEVEL:block_scope09"	with type "functional" "int  -> int "
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 8:
+	Variable "TOP-LEVEL:x"	offset = 0	size = 4
+	Variable "TOP-LEVEL:y"	offset = 4	size = 4
 
 
-Layout for common /block_scope09!:*DYNAMIC*/ of size 0:
+Layout for memory area "block_scope09!:*DYNAMIC*" of size 0:
 	* empty area *
 
 
-Layout for common /block_scope09!:*HEAP*/ of size 0:
+Layout for memory area "block_scope09!:*HEAP*" of size 0:
 	* empty area *
 
 
-Layout for common /block_scope09!:*STACK*/ of size 0:
+Layout for memory area "block_scope09!:*STACK*" of size 0:
 	* empty area *
 
 
-Layout for common /block_scope09!:*STATIC*/ of size 0:
+Layout for memory area "block_scope09!:*STATIC*" of size 0:
 	* empty area *
 
 End of declarations for module block_scope09!
@@ -42,47 +47,51 @@ End of declarations for module block_scope09!
 
 block_scope09
 
-Declarations for module block_scope09 with typeINTEGER*4 -> INTEGER*4
+Declarations for module "block_scope09" with type "int  -> int "
+
 Variable list:
 
-Declared entity TOP-LEVEL:*STATIC*	with type area with size 0
-Declared entity block_scope09!:*HEAP*	with type area with size 0
-Declared entity block_scope09!:*STATIC*	with type area with size 0
-Declared entity block_scope09:*DYNAMIC*	with type area with size 8
-Declared entity block_scope09:*STACK*	with type area with size 0
-Declared entity block_scope09:*STATIC*	with type area with size 0
-Declared entity block_scope09:0`1`x	with type variable INTEGER*4
-Declared entity block_scope09:0`k	with type variable INTEGER*4
-Declared entity block_scope09:x	with type variable INTEGER*4
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 8
+	Declared entity "block_scope09!:*HEAP*" with type "area" with size 0
+	Declared entity "block_scope09!:*STATIC*" with type "area" with size 0
+	Declared entity "block_scope09:*DYNAMIC*" with type "area" with size 8
+	Declared entity "block_scope09:*STACK*" with type "area" with size 0
+	Declared entity "block_scope09:*STATIC*" with type "area" with size 0
+	Declared entity "block_scope09:0`1`x" with type "variable" "int "
+	Declared entity "block_scope09:0`k" with type "variable" "int "
+	Declared entity "block_scope09:x" with type "variable" "int "
+
+* empty extern declaration list *
+
 
 Layouts for formal parameters:
 
 	Variable block_scope09:x	offset = 1
-Layouts for areas (commons):
+Layouts for memory areas:
 
-Layout for common /TOP-LEVEL:*STATIC*/ of size 0:
-	External VariableTOP-LEVEL:x	offset = UNKNOWN,	size = 4
-	External VariableTOP-LEVEL:y	offset = UNKNOWN,	size = 4
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 8:
+	Variable "TOP-LEVEL:x"	offset = 0	size = 4
+	Variable "TOP-LEVEL:y"	offset = 4	size = 4
 
 
-Layout for common /block_scope09!:*HEAP*/ of size 0:
+Layout for memory area "block_scope09!:*HEAP*" of size 0:
 	* empty area *
 
 
-Layout for common /block_scope09!:*STATIC*/ of size 0:
+Layout for memory area "block_scope09!:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for common /block_scope09:*DYNAMIC*/ of size 8:
-	Variable block_scope09:0`k	offset = 0	size = 4
-	Variable block_scope09:0`1`x	offset = 4	size = 4
+Layout for memory area "block_scope09:*DYNAMIC*" of size 8:
+	Variable "block_scope09:0`k"	offset = 0	size = 4
+	Variable "block_scope09:0`1`x"	offset = 4	size = 4
 
 
-Layout for common /block_scope09:*STACK*/ of size 0:
+Layout for memory area "block_scope09:*STACK*" of size 0:
 	* empty area *
 
 
-Layout for common /block_scope09:*STATIC*/ of size 0:
+Layout for memory area "block_scope09:*STATIC*" of size 0:
 	* empty area *
 
 End of declarations for module block_scope09

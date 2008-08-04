@@ -10,10 +10,3 @@ void foo()
 
 Printed file for scope01_a: should not work because of variable i
 
-int i = 1;
-extern main();
-main()
-{
-   printf("%d\n", i);
-   foo();
-}

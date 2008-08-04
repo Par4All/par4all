@@ -1,45 +1,50 @@
 main
 
-Declarations for module main with typeINTEGER*4 x INTEGER*1* -> INTEGER*4
+Declarations for module "main" with type "int  x char * -> int "
+
 Variable list:
 
-Declared entity TOP-LEVEL:*STATIC*	with type area with size 4
-Declared entity TOP-LEVEL:i	with type variable INTEGER*4
-Declared entity externalloc03!:*HEAP*	with type area with size 0
-Declared entity externalloc03!:*STATIC*	with type area with size 0
-Declared entity main:*DYNAMIC*	with type area with size 4
-Declared entity main:*STACK*	with type area with size 0
-Declared entity main:*STATIC*	with type area with size 0
-Declared entity main:argc	with type variable INTEGER*4
-Declared entity main:argv	with type variable INTEGER*1*
-Declared entity main:i	with type variable INTEGER*4
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 4
+	Declared entity "TOP-LEVEL:i" with type "variable" "int "
+	Declared entity "externalloc03!:*HEAP*" with type "area" with size 0
+	Declared entity "externalloc03!:*STATIC*" with type "area" with size 0
+	Declared entity "main:*DYNAMIC*" with type "area" with size 4
+	Declared entity "main:*STACK*" with type "area" with size 0
+	Declared entity "main:*STATIC*" with type "area" with size 0
+	Declared entity "main:0`i" with type "variable" "int "
+	Declared entity "main:argc" with type "variable" "int "
+	Declared entity "main:argv" with type "variable" "char *"
+
+External variable list:
+
+	Declared external entity "TOP-LEVEL:i"	with type "variable" int 
 
 Layouts for formal parameters:
 
 	Variable main:argc	offset = 1	Variable main:argv	offset = 2
-Layouts for areas (commons):
+Layouts for memory areas:
 
-Layout for common /TOP-LEVEL:*STATIC*/ of size 4:
-	Variable TOP-LEVEL:i	offset = 0	size = 4
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 4:
+	Variable "TOP-LEVEL:i"	offset = 0	size = 4
 
 
-Layout for common /externalloc03!:*HEAP*/ of size 0:
+Layout for memory area "externalloc03!:*HEAP*" of size 0:
 	* empty area *
 
 
-Layout for common /externalloc03!:*STATIC*/ of size 0:
+Layout for memory area "externalloc03!:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for common /main:*DYNAMIC*/ of size 4:
-	Variable main:i	offset = 0	size = 4
+Layout for memory area "main:*DYNAMIC*" of size 4:
+	Variable "main:0`i"	offset = 0	size = 4
 
 
-Layout for common /main:*STACK*/ of size 0:
+Layout for memory area "main:*STACK*" of size 0:
 	* empty area *
 
 
-Layout for common /main:*STATIC*/ of size 0:
+Layout for memory area "main:*STATIC*" of size 0:
 	* empty area *
 
 End of declarations for module main
@@ -47,7 +52,9 @@ End of declarations for module main
 int main(int argc,char *argv[])
 {
    int i = 2;
-   extern int i;
-   printf("%d\n", i);
+   {
+      extern int i;
+      printf("%d\n", i);
+   }
    return 0;
 }

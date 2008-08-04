@@ -1,14 +1,14 @@
-   extern void sc_to_matrices();
-   extern int a[10];
-   struct foo {
-      int mem;
-   };
-   extern struct foo x;
-   extern struct foo y;
-   extern int (*potentials[10])();
-   extern int (*forces[10])();
-   extern int nused;
-   extern int foo();
+extern void sc_to_matrices();
+extern int a[10];
+struct foo {
+   extern int mem;
+};
+extern struct foo x;
+extern struct foo y;
+extern int (*potentials[10])();
+extern int (*forces[10])();
+extern int nused;
+extern int foo();
 foo()
 {
    extern int i;

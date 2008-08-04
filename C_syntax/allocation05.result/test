@@ -1,39 +1,43 @@
 foo
 
-Declarations for module foo with type () -> INTEGER*4
+Declarations for module "foo" with type "() -> int "
+
 Variable list:
 
-Declared entity TOP-LEVEL:*STATIC*	with type area with size 4
-Declared entity allocation05!:*HEAP*	with type area with size 0
-Declared entity allocation05!:*STATIC*	with type area with size 0
-Declared entity foo:*DYNAMIC*	with type area with size 0
-Declared entity foo:*STACK*	with type area with size 0
-Declared entity foo:*STATIC*	with type area with size 0
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 4
+	Declared entity "allocation05!:*HEAP*" with type "area" with size 0
+	Declared entity "allocation05!:*STATIC*" with type "area" with size 0
+	Declared entity "foo:*DYNAMIC*" with type "area" with size 0
+	Declared entity "foo:*STACK*" with type "area" with size 0
+	Declared entity "foo:*STATIC*" with type "area" with size 0
 
-Layouts for areas (commons):
-
-Layout for common /TOP-LEVEL:*STATIC*/ of size 4:
-	Variable TOP-LEVEL:a	offset = 0	size = 4
-	External VariableTOP-LEVEL:b	offset = UNKNOWN,	size = 4
+* empty extern declaration list *
 
 
-Layout for common /allocation05!:*HEAP*/ of size 0:
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 4:
+	Variable "TOP-LEVEL:a"	offset = 0	size = 4
+	External Variable "TOP-LEVEL:b"	offset = UNKNOWN,	size = 4
+
+
+Layout for memory area "allocation05!:*HEAP*" of size 0:
 	* empty area *
 
 
-Layout for common /allocation05!:*STATIC*/ of size 0:
+Layout for memory area "allocation05!:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for common /foo:*DYNAMIC*/ of size 0:
+Layout for memory area "foo:*DYNAMIC*" of size 0:
 	* empty area *
 
 
-Layout for common /foo:*STACK*/ of size 0:
+Layout for memory area "foo:*STACK*" of size 0:
 	* empty area *
 
 
-Layout for common /foo:*STATIC*/ of size 0:
+Layout for memory area "foo:*STATIC*" of size 0:
 	* empty area *
 
 End of declarations for module foo

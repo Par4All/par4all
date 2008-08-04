@@ -1,43 +1,47 @@
 foo
 
-Declarations for module foo with type () -> void
+Declarations for module "foo" with type "() -> void"
+
 Variable list:
 
-Declared entity TOP-LEVEL:*STATIC*	with type area with size 0
-Declared entity allocation01!:*HEAP*	with type area with size 0
-Declared entity allocation01!:*STATIC*	with type area with size 0
-Declared entity foo:*DYNAMIC*	with type area with size 18
-Declared entity foo:*STACK*	with type area with size 0
-Declared entity foo:*STATIC*	with type area with size 0
-Declared entity foo:0`a	with type variable INTEGER*1
-Declared entity foo:0`i	with type variable INTEGER*4
-Declared entity foo:0`j	with type variable REAL*4
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "allocation01!:*HEAP*" with type "area" with size 0
+	Declared entity "allocation01!:*STATIC*" with type "area" with size 0
+	Declared entity "foo:*DYNAMIC*" with type "area" with size 18
+	Declared entity "foo:*STACK*" with type "area" with size 0
+	Declared entity "foo:*STATIC*" with type "area" with size 0
+	Declared entity "foo:0`a" with type "variable" "char "
+	Declared entity "foo:0`i" with type "variable" "int "
+	Declared entity "foo:0`j" with type "variable" "float "
 
-Layouts for areas (commons):
+* empty extern declaration list *
 
-Layout for common /TOP-LEVEL:*STATIC*/ of size 0:
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for common /allocation01!:*HEAP*/ of size 0:
+Layout for memory area "allocation01!:*HEAP*" of size 0:
 	* empty area *
 
 
-Layout for common /allocation01!:*STATIC*/ of size 0:
+Layout for memory area "allocation01!:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for common /foo:*DYNAMIC*/ of size 18:
-	Variable foo:0`i	offset = 0	size = 4
-	Variable foo:0`j	offset = 4	size = 4
-	Variable foo:0`a	offset = 8	size = 10
+Layout for memory area "foo:*DYNAMIC*" of size 18:
+	Variable "foo:0`i"	offset = 0	size = 4
+	Variable "foo:0`j"	offset = 4	size = 4
+	Variable "foo:0`a"	offset = 8	size = 10
 
 
-Layout for common /foo:*STACK*/ of size 0:
+Layout for memory area "foo:*STACK*" of size 0:
 	* empty area *
 
 
-Layout for common /foo:*STATIC*/ of size 0:
+Layout for memory area "foo:*STATIC*" of size 0:
 	* empty area *
 
 End of declarations for module foo

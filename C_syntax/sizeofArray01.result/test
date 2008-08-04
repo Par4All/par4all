@@ -1,81 +1,92 @@
 fcompat
 
-Declarations for module fcompat with type () -> void
+Declarations for module "fcompat" with type "() -> void"
+
 Variable list:
 
-Declared entity TOP-LEVEL:*STATIC*	with type area with size 0
-Declared entity fcompat:*DYNAMIC*	with type area with size 4
-Declared entity fcompat:*STACK*	with type area with size 0
-Declared entity fcompat:*STATIC*	with type area with size 0
-Declared entity fcompat:0`a	with type variable INTEGER*4
-Declared entity fcompat:0`c	with type variable INTEGER*4
-Declared entity fcompat:0`p	with type variable INTEGER*4*
-Declared entity sizeofArray01!:*HEAP*	with type area with size 0
-Declared entity sizeofArray01!:*STATIC*	with type area with size 0
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "fcompat:*DYNAMIC*" with type "area" with size 4
+	Declared entity "fcompat:*STACK*" with type "area" with size 0
+	Declared entity "fcompat:*STATIC*" with type "area" with size 0
+	Declared entity "fcompat:0`a" with type "variable" "int "
+	Declared entity "fcompat:0`c" with type "variable" "int "
+	Declared entity "fcompat:0`p" with type "variable" "int *"
+	Declared entity "sizeofArray01!:*HEAP*" with type "area" with size 0
+	Declared entity "sizeofArray01!:*STATIC*" with type "area" with size 0
 
-Layouts for areas (commons):
-
-Layout for common /TOP-LEVEL:*STATIC*/ of size 0:
-	External VariableTOP-LEVEL:n	offset = UNKNOWN,	size = 4
-	External VariableTOP-LEVEL:m	offset = UNKNOWN,	size = 4
+* empty extern declaration list *
 
 
-Layout for common /fcompat:*DYNAMIC*/ of size 4:
-	Variable fcompat:0`p	offset = 0	size = 4
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	External Variable "TOP-LEVEL:n"	offset = UNKNOWN,	size = 4
+	External Variable "TOP-LEVEL:m"	offset = UNKNOWN,	size = 4
 
 
-Layout for common /fcompat:*STACK*/ of size 0:
-	Dynamic Variablefcompat:0`a	offset = UNKNOWN, 	size = DYNAMIC
-	Dynamic Variablefcompat:0`c	offset = UNKNOWN, 	size = DYNAMIC
+Layout for memory area "fcompat:*DYNAMIC*" of size 4:
+	Variable "fcompat:0`p"	offset = 0	size = 4
 
 
-Layout for common /fcompat:*STATIC*/ of size 0:
+Layout for memory area "fcompat:*STACK*" of size 0:
+	Dynamic Variable "fcompat:0`a"	offset = UNKNOWN, 	size = DYNAMIC
+	Dynamic Variable "fcompat:0`c"	offset = UNKNOWN, 	size = DYNAMIC
+
+
+Layout for memory area "fcompat:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for common /sizeofArray01!:*HEAP*/ of size 0:
+Layout for memory area "sizeofArray01!:*HEAP*" of size 0:
 	* empty area *
 
 
-Layout for common /sizeofArray01!:*STATIC*/ of size 0:
+Layout for memory area "sizeofArray01!:*STATIC*" of size 0:
 	* empty area *
 
 End of declarations for module fcompat
 
 sizeofArray01!
 
-Declarations for module sizeofArray01! with type () -> unknow
+Declarations for module "sizeofArray01!" with type "() -> unknow"
+
 Variable list:
 
-Declared entity TOP-LEVEL:*STATIC*	with type area with size 0
-Declared entity TOP-LEVEL:fcompat	with type functional  () -> void
-Declared entity TOP-LEVEL:m	with type variable INTEGER*4
-Declared entity TOP-LEVEL:n	with type variable INTEGER*4
-Declared entity sizeofArray01!:*DYNAMIC*	with type area with size 0
-Declared entity sizeofArray01!:*HEAP*	with type area with size 0
-Declared entity sizeofArray01!:*STACK*	with type area with size 0
-Declared entity sizeofArray01!:*STATIC*	with type area with size 0
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:fcompat" with type "functional" "() -> void"
+	Declared entity "TOP-LEVEL:m" with type "variable" "int "
+	Declared entity "TOP-LEVEL:n" with type "variable" "int "
+	Declared entity "sizeofArray01!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "sizeofArray01!:*HEAP*" with type "area" with size 0
+	Declared entity "sizeofArray01!:*STACK*" with type "area" with size 0
+	Declared entity "sizeofArray01!:*STATIC*" with type "area" with size 0
 
-Layouts for areas (commons):
+External variable list:
 
-Layout for common /TOP-LEVEL:*STATIC*/ of size 0:
-	External VariableTOP-LEVEL:n	offset = UNKNOWN,	size = 4
-	External VariableTOP-LEVEL:m	offset = UNKNOWN,	size = 4
+	Declared external entity "TOP-LEVEL:n"	with type "variable" int 
+	Declared external entity "TOP-LEVEL:m"	with type "variable" int 
+	Declared external entity "TOP-LEVEL:fcompat"	with type "functional" "() -> void"
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	External Variable "TOP-LEVEL:n"	offset = UNKNOWN,	size = 4
+	External Variable "TOP-LEVEL:m"	offset = UNKNOWN,	size = 4
 
 
-Layout for common /sizeofArray01!:*DYNAMIC*/ of size 0:
+Layout for memory area "sizeofArray01!:*DYNAMIC*" of size 0:
 	* empty area *
 
 
-Layout for common /sizeofArray01!:*HEAP*/ of size 0:
+Layout for memory area "sizeofArray01!:*HEAP*" of size 0:
 	* empty area *
 
 
-Layout for common /sizeofArray01!:*STACK*/ of size 0:
+Layout for memory area "sizeofArray01!:*STACK*" of size 0:
 	* empty area *
 
 
-Layout for common /sizeofArray01!:*STATIC*/ of size 0:
+Layout for memory area "sizeofArray01!:*STATIC*" of size 0:
 	* empty area *
 
 End of declarations for module sizeofArray01!

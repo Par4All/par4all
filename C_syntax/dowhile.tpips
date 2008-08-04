@@ -7,7 +7,9 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 activate C_PARSER
 
-display USER_FILE[main]
+# USER_FILE seems to be a bit systsem dependent and hence improper to validation
+# This too bad because it was an good example of useful comments being discarded
+#display USER_FILE[main]
 
 display PRINTED_FILE[main]
 

@@ -1,74 +1,83 @@
 foo
 
-Declarations for module foo with type () -> void
+Declarations for module "foo" with type "() -> void"
+
 Variable list:
 
-Declared entity TOP-LEVEL:*STATIC*	with type area with size 0
-Declared entity foo:*DYNAMIC*	with type area with size 40
-Declared entity foo:*STACK*	with type area with size 0
-Declared entity foo:*STATIC*	with type area with size 0
-Declared entity foo:0`A	with type variable INTEGER*4
-Declared entity sizeofArray04!:*HEAP*	with type area with size 0
-Declared entity sizeofArray04!:*STATIC*	with type area with size 0
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "foo:*DYNAMIC*" with type "area" with size 40
+	Declared entity "foo:*STACK*" with type "area" with size 0
+	Declared entity "foo:*STATIC*" with type "area" with size 0
+	Declared entity "foo:0`A" with type "variable" "int "
+	Declared entity "sizeofArray04!:*HEAP*" with type "area" with size 0
+	Declared entity "sizeofArray04!:*STATIC*" with type "area" with size 0
 
-Layouts for areas (commons):
+* empty extern declaration list *
 
-Layout for common /TOP-LEVEL:*STATIC*/ of size 0:
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for common /foo:*DYNAMIC*/ of size 40:
-	Variable foo:0`A	offset = 0	size = 40
+Layout for memory area "foo:*DYNAMIC*" of size 40:
+	Variable "foo:0`A"	offset = 0	size = 40
 
 
-Layout for common /foo:*STACK*/ of size 0:
+Layout for memory area "foo:*STACK*" of size 0:
 	* empty area *
 
 
-Layout for common /foo:*STATIC*/ of size 0:
+Layout for memory area "foo:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for common /sizeofArray04!:*HEAP*/ of size 0:
+Layout for memory area "sizeofArray04!:*HEAP*" of size 0:
 	* empty area *
 
 
-Layout for common /sizeofArray04!:*STATIC*/ of size 0:
+Layout for memory area "sizeofArray04!:*STATIC*" of size 0:
 	* empty area *
 
 End of declarations for module foo
 
 sizeofArray04!
 
-Declarations for module sizeofArray04! with type () -> unknow
+Declarations for module "sizeofArray04!" with type "() -> unknow"
+
 Variable list:
 
-Declared entity TOP-LEVEL:*STATIC*	with type area with size 0
-Declared entity TOP-LEVEL:foo	with type functional  () -> void
-Declared entity sizeofArray04!:*DYNAMIC*	with type area with size 0
-Declared entity sizeofArray04!:*HEAP*	with type area with size 0
-Declared entity sizeofArray04!:*STACK*	with type area with size 0
-Declared entity sizeofArray04!:*STATIC*	with type area with size 0
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:foo" with type "functional" "() -> void"
+	Declared entity "sizeofArray04!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "sizeofArray04!:*HEAP*" with type "area" with size 0
+	Declared entity "sizeofArray04!:*STACK*" with type "area" with size 0
+	Declared entity "sizeofArray04!:*STATIC*" with type "area" with size 0
 
-Layouts for areas (commons):
+External variable list:
 
-Layout for common /TOP-LEVEL:*STATIC*/ of size 0:
+	Declared external entity "TOP-LEVEL:foo"	with type "functional" "() -> void"
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for common /sizeofArray04!:*DYNAMIC*/ of size 0:
+Layout for memory area "sizeofArray04!:*DYNAMIC*" of size 0:
 	* empty area *
 
 
-Layout for common /sizeofArray04!:*HEAP*/ of size 0:
+Layout for memory area "sizeofArray04!:*HEAP*" of size 0:
 	* empty area *
 
 
-Layout for common /sizeofArray04!:*STACK*/ of size 0:
+Layout for memory area "sizeofArray04!:*STACK*" of size 0:
 	* empty area *
 
 
-Layout for common /sizeofArray04!:*STATIC*/ of size 0:
+Layout for memory area "sizeofArray04!:*STATIC*" of size 0:
 	* empty area *
 
 End of declarations for module sizeofArray04!

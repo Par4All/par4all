@@ -1,75 +1,84 @@
 foo
 
-Declarations for module foo with type () -> void
+Declarations for module "foo" with type "() -> void"
+
 Variable list:
 
-Declared entity TOP-LEVEL:*STATIC*	with type area with size 4
-Declared entity foo:*DYNAMIC*	with type area with size 0
-Declared entity foo:*STACK*	with type area with size 0
-Declared entity foo:*STATIC*	with type area with size 0
-Declared entity foo:array2	with type variable INTEGER*4
-Declared entity sizeofArray05!:*HEAP*	with type area with size 0
-Declared entity sizeofArray05!:*STATIC*	with type area with size 0
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 4
+	Declared entity "foo:*DYNAMIC*" with type "area" with size 0
+	Declared entity "foo:*STACK*" with type "area" with size 0
+	Declared entity "foo:*STATIC*" with type "area" with size 0
+	Declared entity "foo:0`array2" with type "variable" "int "
+	Declared entity "sizeofArray05!:*HEAP*" with type "area" with size 0
+	Declared entity "sizeofArray05!:*STATIC*" with type "area" with size 0
 
-Layouts for areas (commons):
-
-Layout for common /TOP-LEVEL:*STATIC*/ of size 4:
-	Variable TOP-LEVEL:b	offset = 0	size = 4
+* empty extern declaration list *
 
 
-Layout for common /foo:*DYNAMIC*/ of size 0:
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 4:
+	Variable "TOP-LEVEL:b"	offset = 0	size = 4
+
+
+Layout for memory area "foo:*DYNAMIC*" of size 0:
 	* empty area *
 
 
-Layout for common /foo:*STACK*/ of size 0:
-	Dynamic Variablefoo:array2	offset = UNKNOWN, 	size = DYNAMIC
+Layout for memory area "foo:*STACK*" of size 0:
+	Dynamic Variable "foo:0`array2"	offset = UNKNOWN, 	size = DYNAMIC
 
 
-Layout for common /foo:*STATIC*/ of size 0:
+Layout for memory area "foo:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for common /sizeofArray05!:*HEAP*/ of size 0:
+Layout for memory area "sizeofArray05!:*HEAP*" of size 0:
 	* empty area *
 
 
-Layout for common /sizeofArray05!:*STATIC*/ of size 0:
+Layout for memory area "sizeofArray05!:*STATIC*" of size 0:
 	* empty area *
 
 End of declarations for module foo
 
 sizeofArray05!
 
-Declarations for module sizeofArray05! with type () -> unknow
+Declarations for module "sizeofArray05!" with type "() -> unknow"
+
 Variable list:
 
-Declared entity TOP-LEVEL:*STATIC*	with type area with size 4
-Declared entity TOP-LEVEL:b	with type variable INTEGER*4
-Declared entity TOP-LEVEL:foo	with type functional  () -> void
-Declared entity sizeofArray05!:*DYNAMIC*	with type area with size 0
-Declared entity sizeofArray05!:*HEAP*	with type area with size 0
-Declared entity sizeofArray05!:*STACK*	with type area with size 0
-Declared entity sizeofArray05!:*STATIC*	with type area with size 0
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 4
+	Declared entity "TOP-LEVEL:b" with type "variable" "int "
+	Declared entity "TOP-LEVEL:foo" with type "functional" "() -> void"
+	Declared entity "sizeofArray05!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "sizeofArray05!:*HEAP*" with type "area" with size 0
+	Declared entity "sizeofArray05!:*STACK*" with type "area" with size 0
+	Declared entity "sizeofArray05!:*STATIC*" with type "area" with size 0
 
-Layouts for areas (commons):
+External variable list:
 
-Layout for common /TOP-LEVEL:*STATIC*/ of size 4:
-	Variable TOP-LEVEL:b	offset = 0	size = 4
+	Declared external entity "TOP-LEVEL:foo"	with type "functional" "() -> void"
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 4:
+	Variable "TOP-LEVEL:b"	offset = 0	size = 4
 
 
-Layout for common /sizeofArray05!:*DYNAMIC*/ of size 0:
+Layout for memory area "sizeofArray05!:*DYNAMIC*" of size 0:
 	* empty area *
 
 
-Layout for common /sizeofArray05!:*HEAP*/ of size 0:
+Layout for memory area "sizeofArray05!:*HEAP*" of size 0:
 	* empty area *
 
 
-Layout for common /sizeofArray05!:*STACK*/ of size 0:
+Layout for memory area "sizeofArray05!:*STACK*" of size 0:
 	* empty area *
 
 
-Layout for common /sizeofArray05!:*STATIC*/ of size 0:
+Layout for memory area "sizeofArray05!:*STATIC*" of size 0:
 	* empty area *
 
 End of declarations for module sizeofArray05!
@@ -77,8 +86,8 @@ End of declarations for module sizeofArray05!
 
 Parsed code
 
-   int b = 20;
-   extern void foo();
+int b = 20;
+extern void foo();
 void foo()
 {
    int array2[b-1+1];
