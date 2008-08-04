@@ -5,6 +5,15 @@
 \usepackage{url}
 \newcommand{\PipsTpipsPDF}{\url{http://www.cri.ensmp.fr/pips/tpips-user-manual.htdoc/tpips-user-manual.pdf}\xspace}
 \newcommand{\PipsTpipsHTDOC}{\url{http://www.cri.ensmp.fr/pips/tpips-user-manual.htdoc}\xspace}
+\newcommand{\PipsPIPSmakePDF}{\url{http://www.cri.ensmp.fr/pips/pipsmake-rc.htdoc/pipsmake-rc.pdf}\xspace}
+\newcommand{\PipsPIPSmakeHTDOC}{\url{http://www.cri.ensmp.fr/pips/pipsmake-rc.htdoc}\xspace}
+\newcommand{\PipsPIPSpropertiesPDF}{\url{http://www.cri.ensmp.fr/pips/properties-rc.htdoc/properties-rc.pdf}\xspace}
+\newcommand{\PipsPIPSpropertiesHTDOC}{\url{http://www.cri.ensmp.fr/pips/properties-rc.htdoc}\xspace}
+
+
+% Number all sections in the text and the TOC:
+\setcounter{secnumdepth}{10}
+\setcounter{tocdepth}{10}
 
 
 \title{Tpips: command line interpreter}
@@ -22,6 +31,7 @@
 You can get a printable version of this document on\\
 \PipsTpipsPDF and a HTML version on \PipsTpipsHTDOC.
 
+\verb|$Id$|
 
 \tableofcontents
 
@@ -32,34 +42,37 @@ You can get a printable version of this document on\\
 PIPS project. All PIPS functionalities are available, with
 on-line help and automatic completion.
 
-{\tt tpips} is more efficient than the pips based scripts ( Init,
-Display,...) because the database is not open, read, written and closed
-for each command. {\tt tpips} is less user-friendly than wpips and epips,
-although it provides the unique opportunity to apply a transformation or
-display some information on several modules with one command, using
-pipsmake metavariables, 
-\verb+%CALLERS+ and  \verb+%CALLEES+,  
-or environment  user defined variables such
-as \verb+$MODULES+ %% $
-(see Example \ref{exm2}). The jpips future user
-interface will provide these pips/tpips functionalities too.
+{\tt tpips} is more efficient than the \texttt{pips} based scripts
+(\texttt{Init}, \texttt{Display},...) because the database is not open,
+read, written and closed for each command. {\tt tpips} is less
+user-friendly than \texttt{wpips} and \texttt{epips}\footnote{Note that
+  \texttt{wpips} and \texttt{epips} don't work anymore right now because a
+  deprecated GUI library, so \texttt{tpips} is definitively the way to
+  go...}, although it provides the unique opportunity to apply a
+transformation or display some information on several modules with one
+command, using pipsmake metavariables, \verb+%CALLERS+ and
+\verb+%CALLEES+,
+or environment user defined variables such as \verb+$MODULES+ %% $
+(see Example~\ref{exm2}). The \texttt{jpips} future user interface will
+provide these \texttt{pips}/\texttt{tpips} functionalities too.
 
 {\tt tpips} is recommended for large benchmarks and experiments, when
 analysis and optimization results do not require interactive working. {\tt
-  tpips} is used for the validation of each new pips version.
+  tpips} is used for the validation of each new PIPS version.
 
-{\tt tpips} can be used to automatically replay a manual wpips or {\tt
-  tpips} session by using \verb+logfile_to_tpips+. The
-\verb+logfile_to_tpips+ command derives a {\tt tpips} script
-from a logfile in a workspace (see Example~\ref{exm2}). A PIPS beginner
-should start with a window interface, wpips or epips, and not with {\tt
-  tpips}.
-
+{\tt tpips} can be used to automatically replay a manual \texttt{wpips} or
+{\tt tpips} session by using \verb+logfile_to_tpips+. The
+\verb+logfile_to_tpips+ command derives a {\tt tpips} script from a
+logfile in a workspace (see Example~\ref{exm2}). A PIPS beginner should
+start with a window interface, \texttt{wpips} or
+\texttt{epips}\footnote{If they work...}, and not with \texttt{tpips}. But
+the simple tools of section~\ref{sec:small-tools} can be useful for simple
+tasks.
 
 Access to Unix Shell and to PIPS properties is provided by {\tt tpips}.
 PIPS properties can be modified from {\tt tpips} , and only from {\tt
-  tpips} during a PIPS session (see Example\ref{exm3}). On the other hand,
-{\tt Wpips} reads at the
+  tpips} during a PIPS session (see Example~\ref{exm3}). On the other hand,
+{\tt wpips} reads at the
 beginning of the session the default properties and the new ones
 (re)defined in the {\tt properties.rc} file, but no change can be done
 afterwards.  Resetting properties during a session can be used to rebuild
@@ -75,63 +88,65 @@ backslashes.
 
 \section{Syntax}
 
-Different functions can be activated with the tpips commands. We decompose
-these functions in those related to the workspace, the analysis and
-transformation requests, the pips properties and options and the the environment. 
-Functions  and their arguments are presented in the next subsections. 
+Different functions can be activated with the \texttt{tpips} commands. We
+decompose these functions in those related to the \emph{workspace}, the
+\emph{analysis} and \emph{transformation} requests, the PIPS
+\emph{properties} and \emph{options} and the the environment.  Functions
+and their arguments are presented in the next subsections.
 
 
-\subsection{Workspace} 
+\subsection{Workspace}
+
 The commands for workspaces are: {\tt create} a new workspace (see
-pips command Init), {\tt open} an existing workspace, {\tt close} the
-current workspace, and {\tt delete} the current workspace or a
-specific one (see pips command Delete).
+\texttt{pips} command \texttt{Init}), {\tt open} an existing workspace,
+{\tt close} the current workspace, and {\tt delete} the current workspace
+or a specific one (see \texttt{pips} command \texttt{Delete}).
 
 These commands can be used several times during a session or
 within a {\tt tpips} script file.
 
 \begin{description}
-  
-\item [{\bf create} $<$workspace-name$>$ $<$file-name$>$] creates and
-  opens a new workspace from a source file - or set of source files
-  
-\item [ {\bf open} $<$workspace-name$>$] opens an existing workspace
- 
-\item [ {\bf close} $<$workspace-name$>$] closes an opened workspace
 
-  
-\item [ {\bf delete} $<$workspace-name$>$] deletes a closed workspace
-  
-\item [ {\bf quit}] quit {\tt tpips}
+\item[{\bf create} $<$workspace-name$>$ $<$file-name$>$] creates and
+  opens a new workspace from a source file --- or set of source files
+
+\item[{\bf open} $<$workspace-name$>$] opens an existing workspace
+
+\item[{\bf close} $<$workspace-name$>$] closes an opened workspace
+
+\item[{\bf delete} $<$workspace-name$>$] deletes a closed workspace
+
+\item[{\bf quit}] quits {\tt tpips}
 
 \end{description}
 
 
-\subsection{Requests} 
+\subsection{Requests}
 
 To apply a transformation or request a particular resource, use the
-following tpips commands. 
+following \texttt{tpips} commands.
+
+For a list of the available resources and their descriptions, have a look
+to \PipsPIPSmakeHTDOC or \PipsPIPSmakePDF.
+
 \begin{description}
 
-\item [ {\bf apply} $<$rule-descriptor$>$] applies a specified rule and
+\item[{\bf apply} $<$rule-descriptor$>$] applies a specified rule and
   produces the associated resources.
-        
-\item [{\bf capply} $<$rule-descriptor$>$] applies concurrently a specified
-  rule on the different OWNERs of the $<$rule-descriptor$>$ and produces the
-  associated resources (see Example \ref{exm4}).
-  
 
-\item [ {\bf display} $<$resource-descriptor$>$] makes a printable resource
+\item[{\bf capply} $<$rule-descriptor$>$] applies concurrently a specified
+  rule on the different \emph{OWNER}s of the $<$rule-descriptor$>$ and
+  produces the associated resources (see Example~\ref{exm4}).
+
+\item[{\bf display} $<$resource-descriptor$>$] makes a printable resource
   (if it does not exist) and prints it out. A printed resource is a ACSII
   file with the \verb+_FILE+ extension.
-  
 
-  
-\item [ {\bf make} $<$resource-descriptor$>$] makes a resource according to
+\item[{\bf make} $<$resource-descriptor$>$] makes a resource according to
   default rules
-  
 
 \end{description}
+
 
 \subsubsection*{Generic example:}
 
@@ -139,9 +154,9 @@ A resource, i.e. any piece of information computed by PIPS,
 can be required by command:
 
 {\bf
-\begin{verbatim}
+\begin{verbatim*}
 make <resource>
-\end{verbatim}
+\end{verbatim*}
 }
 
 or
@@ -152,17 +167,16 @@ make <resource[owner]>
 \end{verbatim*}
 }
 
-which uses interproceduraly and recursively default rules
-(see pips command Build). Or it is produced by a specific
-rule:
-{\bf
+which use interproceduraly and recursively default rules (see
+\texttt{pips} command \texttt{Build}). Or it is produced by a specific
+rule: {\bf
 \begin{verbatim}
 apply <rule>
 \end{verbatim}
 }
 
 which will require all its resource arguments by recursively
-calling make (see pips command Perform).
+calling make (see \texttt{pips} command \texttt{Perform}).
 
 The owner of a resource is the module it is attached to. By
 default, the owner is assumed to be the current module.
@@ -174,26 +188,30 @@ File resources can be displayed on screen:
 display <printable_resource> 
 \end{verbatim}
 }
-as with the pips Display script.
+as with the \texttt{pips} \texttt{Display} script.
 
-\subsection{PIPS properties and options} 
+
+\subsection{PIPS properties and options}
+
+For a list of the available properties and their descriptions, have a look
+to \PipsPIPSpropertiesHTDOC or \PipsPIPSpropertiesPDF.
 
 \begin{description}
-\item [ {\bf activate} $<$rule-name$>$] activates a rule. Several rules
+\item[{\bf activate} $<$rule-name$>$] activates a rule. Several rules
   can be used to produce a resource. At any time one of these rules is the
-  default rule
- 
-\item [ {\bf module} $<$module-name$>$] specifies the current module to
+  default rule.
+
+\item[{\bf module} $<$module-name$>$] specifies the current module to
   work on.
-  
-\item [ {\bf getproperty} $<$property-name$>$] prints the value of a Pips
-  property
-  
-\item [ {\bf setproperty} $<$property-name$>$ $<$value$>$] sets the value
-  of a property - after type check. Possible types are: boolean, int and
+
+\item[{\bf getproperty} $<$property-name$>$] prints the value of a PIPS
+  property.
+
+\item[{\bf setproperty} $<$property-name$>$ $<$value$>$] sets the value
+  of a property --- after type check. Possible types are: boolean, int and
   string.
 
-\item [{\bf checkpoint} $<$number$>$] checkpoints the current workspace
+\item[{\bf checkpoint} $<$number$>$] checkpoints the current workspace
   every $<$number$>$ pipsmake operations.
 
 \end{description}
@@ -217,87 +235,86 @@ activate <rule>
 \end{verbatim}
 }
 
-It is equivalent to the pips Select command.
+It is equivalent to the \texttt{pips} \texttt{Select} command.
 
 \subsection{Environment}
-The {\tt tpips} Unix-related commands are: cd, setenv, getenv, echo, and
-shell.
+
+The {\tt tpips} Unix-related commands are: \texttt{cd}, \texttt{setenv},
+\texttt{getenv}, \texttt{echo}, and \texttt{shell}.
 
 \begin{description}
-  
-\item [ {\bf shell} $<$sh-command$>$ $<$parameters$>$] Executes the line
-  as a shell command. With no arguments, run an inferior shell.
-  
-\item [ {\bf source} $<$filenames...$>$] reads {\tt tpips} commands from
-  files.
-  
-\item [ {\bf cd} $<$directory-name$>$] changes the default directory
-  
 
-\item [ {\bf echo} $<$string$>$] prints $<$string$>$
+\item[{\bf shell} $<$sh-command$>$ $<$parameters$>$] Executes the line
+  as a shell command. With no arguments, run an inferior shell;
 
-\item [ {\bf getenv} $<$variable-name$>$] prints the value of
-  $<$variable-name$>$ (equivalent to \verb+echo ${<variable-name>}+)
+\item[{\bf source} $<$filenames...$>$] reads {\tt tpips} commands from
+  files;
+
+\item[{\bf cd} $<$directory-name$>$] changes the default directory;
+
+\item[{\bf echo} $<$string$>$] prints $<$string$>$;
+
+\item[{\bf getenv} $<$variable-name$>$] prints the value of
+  $<$variable-name$>$ (equivalent to \verb+echo ${<variable-name>}+);
 %% $
-\item  [ {\bf setenv} $<$variable-name$>$ = $<$value$>$] sets $<$value$>$ to $<$variable-name$>$
+\item[{\bf setenv} $<$variable-name$>$ = $<$value$>$] sets $<$value$>$ to $<$variable-name$>$;
 
+\item[{\bf help} $<$command$>$] prints out general help or detailed help
+  about an item;
 
-\item [ {\bf help} $<$command$>$] prints out general help or detailed help
-  about an item
-
-\item [{\bf info} $<$name$>$]  print information about $<$name$>$. Here 
-        $<$name$>$ can be :  ``module'', ``modules'', ``workspace'' or 
-        ``directory'' words. 
+\item[{\bf info} $<$name$>$] print information about $<$name$>$. Here
+  $<$name$>$ can be the \texttt{module}, \texttt{modules},
+  \texttt{workspace} or \texttt{directory} words.
 
 \end{description}
-  
+
+
 \subsection{Parameters}
+
 The parameters of the different commands are :
 \begin{description}
 %%\quote
-\item [$<$file-name$>$] Unix path and file name. 
-  \par Shell syntax, such as \verb+*.f+, can be used when 
-  \verb+s+ option is specified or \verb+TPIPS_IS_A_SHELL+ variable is set.
-          
-\item [$<$workspace-name$>$] Unix file name - no path.
-  
-\item [$<$module-name$>$] Fortran function name in capital letters.
-  
-\item [$<$rule-name$>$] rule name (see Section \ref{rules})
-          
+\item [$<$file-name$>$] Unix path and file name.
+  \par Shell syntax, such as \verb+*.f+, can be used when \verb+s+ option
+  is specified or \verb+TPIPS_IS_A_SHELL+ variable is set;
+
+\item [$<$workspace-name$>$] Unix file name --- no path;
+
+\item [$<$module-name$>$] Fortran function name in capital letters or a C
+  function name;
+
+\item [$<$rule-name$>$] rule name (see Section \ref{rules});
+
 \item [$<$resource-descriptor$>$] It is a \verb+resource[OWNER]+
   expression: a pipsmake resource name to be computed for each module
-  associated to OWNER (see Sections \ref{res} and \ref{resf}).
-  
-\item [$<$rule-descriptor$>$] It is a \verb+rulename[OWNER]+ expression: a  pipsmake instantiated
-  rule  to be applied  on each  module associated to OWNER (see Section \ref{rules}).
+  associated to OWNER (see Sections \ref{res} and \ref{resf});
 
+\item [$<$rule-descriptor$>$] It is a \verb+rulename[OWNER]+ expression: a
+  pipsmake instantiated rule to be applied on each module associated to
+  OWNER (see Section \ref{rules});
 
-\end{description}
-
-The OWNER - used in the previous $<$rule-descriptor$>$ and
-$<$ resource-descriptor$>$ - can take these formats:
-
+\item [the OWNER] --- used in the previous $<$rule-descriptor$>$ and
+$<$resource-descriptor$>$ --- can take these formats:
 \begin{description}
 %%\quote
-\item [module-name] the target module name.
-\item [\%PROGRAM] the whole program (for global resource) . 
-\item [\%MAIN] the main module of the program. 
-\item [\%MODULE] the current  module.
+\item [module-name] the target module name;
+\item [\%PROGRAM] the whole program (for global resource);
+\item [\%MAIN] the main module of the program;
+\item [\%MODULE] the current module;
 \item [\$\{MODULES\}] the modules associated to the Shell variable
-  {\tt MODULES}. The different names are SPACE or/and TAB separated.
-\item [\%ALL] All worksapce modules 
-\item [\%CALLEES] All the callees of the current selected  module.
-\item [\%CALLERS]  All  the callers of the current selected  module.
-
+  {\tt MODULES}. The different names are SPACE or/and TAB separated;
+\item [\%ALL] All worksapce modules;
+\item [\%CALLEES] All the callees of the current selected module;
+\item [\%CALLERS] All the callers of the current selected module.
 \end{description}
 If no OWNER is specified, then the current  module is assumed. For
 generic owners, a  sign (\%) has been added to differentiate them
-from module names and environment variables.
+from existing module names and environment variables.
+
+\end{description}
 
 
-
-\section{Simple session} 
+\section{Simple session}
 
 A simple {\tt tpips} session is made of a few steps. First, a
 workspace must be created:
@@ -308,11 +325,11 @@ create work source1.f source2.f
 }
 
 and a subdirectory of the current directory, here
-work.database, is created to store and retrieve
+\texttt{work.database}, is created to store and retrieve
 code and information computed by PIPS about subroutines and
-functions found in source1.f or source2.f.
+functions found in \texttt{source1.f} or \texttt{source2.f}.
 
-Then, you have to select a module, let say FOO, by typing:
+Then, you have to select a module, let say \texttt{FOO}, by typing:
 {\bf
 \begin{verbatim}
 
@@ -325,7 +342,7 @@ file(s) which were passed to the create command, in
 which case it is automatically selected.
 
 To keep it simple the first time, you should then try to
-display the sequential code of routine FOO by typing:
+display the sequential code of routine \texttt{FOO} by typing:
 
 {\bf
 \begin{verbatim}
@@ -334,15 +351,15 @@ display PRINTED_FILE
 }
 
 Other resource names let you visualize the parallelized code
-(PARALLELPRINTED\_FILE), or the call graph (CALLGRAPH\_FILE)...
-Names for printable resources usually contain the string
-FILE. 
+(\texttt{PARALLELPRINTED\_FILE}), or the call graph
+(\texttt{CALLGRAPH\_FILE})...  Names for printable resources usually
+contain the string \texttt{FILE}.
 
 The standard command to leave {\tt tpips} is {\tt quit} but a control-D
 or end-of-file condition are valid too.
 
-Interactive analysis of module MATMUL from source code pgmsrc.f,
-in workspace pgm:
+Interactive analysis of module \texttt{MATMUL} from source code
+\texttt{pgmsrc.f}, in workspace \texttt{pgm}:
 
 {\bf
 \begin{verbatim}
@@ -360,12 +377,13 @@ tpips > quit
 %% $
 
 \section{Examples}
+
 \subsection{Call Graph}
 \label{exm1}
 
 To visualize the  call graph of the application, the following tpips
 session can be executed. The call graph of each application routine is
-displayed. 
+displayed.
 
 This example presents a use of:
 
@@ -374,8 +392,8 @@ This example presents a use of:
 \item shell path file name expression that will be expanded: \verb+*.f+,
 \item a $<$resource-descriptor$>$ : \verb+CALLGRAPH_FILE[%ALL]+
 \end{itemize}
-This tpips example is useful to test Pips parsing   on each  new
-benchmark. 
+This \texttt{tpips} example is useful to test PIPS parsing on each new
+benchmark.
 
 \begin{verbatim}
 setenv PIPS_SRCPATH SRC      # initiates the source file directory to SRC
@@ -394,14 +412,15 @@ quit
 
 \subsection{Dependences}
 \label{exm2}
-A programmer that would like to see the routines dependence graph to parallelize
-interprocedurally the application can executed the following tpips
-commands. 
 
-This example presents some Pips analyses and  use of 
+A programmer that would like to see the routines dependence graph to
+parallelize interprocedurally the application can executed the following
+\texttt{tpips} commands.
+
+This example presents some PIPS analyses and use of
 \begin{itemize}
-\item module selection: \verb+module TEST+,
-\item $<$rule-name$>$ : \verb+MUST_REGIONS+, \verb+REGION_CHAINS+ 
+\item module selection: \verb+module TEST+
+\item $<$rule-name$>$: \verb+MUST_REGIONS+, \verb+REGION_CHAINS+
 \item \verb+logfile_to_tpips+ command
 \end{itemize}
 
@@ -424,10 +443,11 @@ tpips> quit                         # quit tpips
 \end{verbatim}
 
 To store this simple session in a {\tt tpips} file, use the command:
-
-\verb+logfile_to_tpips  wfoo > foo.tpips+
-
-that generates the following {\tt tpips} commands  in File  \verb+foo.tpips+. 
+\begin{verbatim}
+logfile_to_tpips wfoo > foo.tpips
+\end{verbatim}
+that generates the following {\tt tpips} commands in the file
+\verb+foo.tpips+.
 
 \begin{verbatim}
 #
@@ -445,10 +465,10 @@ quit
 # EOF
 \end{verbatim}
 
-
-Note that  expression  \verb+%ALL+ has been expanded by all
+ote that  expression  \verb+%ALL+ has been expanded by all
 program routines, in that example there is only one \verb+TEST+
 routine in \verb+essai.f+.
+
 
 \subsection{Transformations}
 \label{exm3}
@@ -457,17 +477,17 @@ The following transformations are designed for application optimization.
 Specialization and code reduction eliminating useless instructions and
 declarations are performed.
 
-This example presents some pips transformations and use of 
+This example presents some PIPS transformations and use of
 \begin{itemize}
 \item program restructuration, cloning, dead code elimination, useless
-  declaration elimination, and code regeneration, 
-\item pips property: \verb+PREPROCESSOR_MISSING_FILE_HANDLING "generate"+ , 
+  declaration elimination, and code regeneration;
+\item pips property: \verb+PREPROCESSOR_MISSING_FILE_HANDLING "generate"+;
 \item transformation application : \verb+apply CLONE_ON_ARGUMENT[FUNCT]+.
-\item $<$rule-name$>$ : \verb+PRINT_CODE+,..
-\item $<$rule-descriptor$>$ : 
-  \verb+SUPPRESS_DEAD_CODE[${modules}]+,  \verb+UNSPLIT[%PROGRAM]+,..
+\item $<$rule-name$>$ : \verb+PRINT_CODE+...
+\item $<$rule-descriptor$>$:
+  \verb+SUPPRESS_DEAD_CODE[${modules}]+,  \verb+UNSPLIT[%PROGRAM]+...
 %% $
-\item $<$resource-descriptor$>$ :  \verb+PRINTED_FILE[FUNCT]+,  \verb+CALLGRAPH_FILE[%ALL]+,..
+\item $<$resource-descriptor$>$ :  \verb+PRINTED_FILE[FUNCT]+,  \verb+CALLGRAPH_FILE[%ALL]+...
 \end{itemize}
 \begin{verbatim}
 # Delete Workspace clone in case  it already exists
@@ -554,18 +574,18 @@ close
 
 \subsection{Analyses}
 \label{exm4}
-This example presents some classical pips analyzes: 
+
+This example presents some classical PIPS analyzes:
 
 \begin{itemize}
-\item computation of preconditions,
-\item transformers, 
-\item effects,
-\item regions, 
+\item computation of preconditions;
+\item transformers;
+\item effects;
+\item regions
 \end{itemize}
-and a {\it concurrent} transformation
-application.  
+and a {\it concurrent} transformation application.
 
-\verb+capply PARTIAL_EVAL[%ALL]+ 
+\verb+capply PARTIAL_EVAL[%ALL]+
 applies a partial evaluation on all routines concurrently without any
 verification process between two transformations. The partial evaluation
 of a routine does not modify other routine predicates, even if the code
@@ -641,9 +661,11 @@ close
 quit
 \end{verbatim}
 
+
 \subsection{Graphical  Graph View}
 \label{exm5}
-This example presents a call to a graphical call graph view. 
+
+This example presents a call to a graphical call graph view.
 
 \begin{verbatim}
 # resize the entities table. Useful for  large benchmarks. 
@@ -676,11 +698,13 @@ close
 quit
 \end{verbatim}
 
+
 \subsection{Parallelization}
 \label{exm6}
+
 This example presents some classical analyses and transformations designed
-to parallelize benchmarks, for instance the adm program of the Perfect
-club. 
+to parallelize benchmarks, for instance the \texttt{adm} program of the
+Perfect club.
 
 \begin{verbatim}
 #
@@ -714,16 +738,20 @@ close
 quit
 \end{verbatim}
 
-\section{Rules - Pips options}
+
+\section{Rules --- Pips options}
 \label{rules}
+
 Rules are used to compute resources. Several rules can be activated to
 compute a single resource. For instance a parallel version of a module may
 be computed from the interprocedural precondition
 (\verb+PRECONDITIONS_INTER_FULL+), interprocedural transformer
-(\verb+TRANSFORMERS_INTER_FULL+) and accurate
-dependencies (\verb+RICE_SEMANTICS_DEPENDENCE_GRAPH+). Rules are selected
-by \verb+activate+ or selected and applied by \verb+apply+ and \verb+capply+.
-More information on each particular rule is presented  in the pipsmake documentation.
+(\verb+TRANSFORMERS_INTER_FULL+) and accurate dependencies
+(\verb+RICE_SEMANTICS_DEPENDENCE_GRAPH+). Rules are selected by
+\verb+activate+ or selected and applied by \verb+apply+ and \verb+capply+.
+More rules and more information on each particular rule are presented in
+the pipsmake documentation, \PipsPIPSmakeHTDOC or \PipsPIPSmakePDF.
+
 \begin{verbatim*}
 #### ANALYSES ####
 
@@ -959,16 +987,18 @@ PRINT_SOURCE_REGIONS
 PRINT_SOURCE_TRANSFORMERS
 \end{verbatim*}
 
+
 \section{Resources}
 \label{res}
+
 The names of the current useful resources are given. These resources are
 computed by the \verb+make+ and \verb+display+ commands. These
 non-printable resources are encoded in internal data structures. The
 corresponding printable resources are listed in the following section.
-These resources are detailed in the pipsmake documentation.
+These resources and others are detailed the pipsmake documentation,
+\PipsPIPSmakeHTDOC or \PipsPIPSmakePDF.
 
 \begin{verbatim}
-
 CALLEES
 CALLERS
 CHAINS  
@@ -1045,12 +1075,15 @@ MUST_CONTINUATION
 MUST_SUMMARY_CONTINUATION
 \end{verbatim}
 
+
 \section{Printable resources}
 \label{resf}
+
 The printable resources usually contain the string FILE. They can be
-computed by invoking the \verb+display+ {\tt tpips} command. They are stored as
-human readable ASCII file in the workspace. The current resources which
-are printable follow, for more information see the pipsmake documentation.
+computed by invoking the \verb+display+ {\tt tpips} command. They are
+stored as human readable ASCII file in the workspace. The current
+resources which are printable follow, for more information see the
+pipsmake documentation, \PipsPIPSmakeHTDOC or \PipsPIPSmakePDF.  .
 
 \begin{verbatim}
 CALLGRAPH_FILE                   # call graph file
@@ -1066,38 +1099,59 @@ SOURCE_FILE                      # after the preprocessing phase
 USER_FILE                        # after regeneration of user files
 \end{verbatim}
 
+
 \section{Options}
-Usage: {\tt tpips} [-nscvh?jw] [-l logfile] [-r rcfile] [-e tpips-cmds] tpips-scripts
+
+Usage:\\
+\texttt{tpips} [\texttt{-nscvh?jw}] [\texttt{-l \emph{logfile}}]
+[\texttt{-r \emph{rcfile}}] [\texttt{-e \emph{tpips-cmds}}]
+\texttt{\emph{tpips-scripts}}
+
 \begin{description}
 
-\item [-n]  no execution mode. Just check the script syntax.
-\item [-s] behaves like a shell. {\tt tpips} commands simply extend a shell.
-\item [-c] behaves like a command, not a shell (it is the default option).
-\item [-v] displays version and architecture information.
-\item [-h or -?] provides some help.
-\item [-j] jpips special mode.
+\item [-n]  no execution mode. Just check the script syntax;
+\item [-s] behaves like a shell. {\tt tpips} commands simply extend a shell;
+\item [-c] behaves like a command, not a shell (it is the default option);
+\item [-v] displays version and architecture information;
+\item [-h or -?] provides some help;
+\item [-j] jpips special mode;
 \item [-w] starts with a wrapper (jpips special again)...
-\item [-l] $<$logfile$>$: log to $<$logfile$>$.
-\item [-r] $<$rcfile$>$: source the $<$rcfile$>$ file. 
-  (default \verb|$HOME/.tpipsrc|) %% $
+\item [-l] $<$logfile$>$: log to $<$logfile$>$;
+\item [-r] $<$rcfile$>$: source the $<$rcfile$>$ file (default
+  \verb|$HOME/.tpipsrc|); %% $
 \item [-e] tpips-cmds: executes the $<$tpips-cmds$>$ commands.
 \end{description}
 
 
 \section{Environment}
 
+Before using {\tt tpips}, you need to add a PIPS root directory to your
+path and to set some PIPS environment variables. In order to do that, you
+can source from the PIPS distribution the shell script \texttt{pipsrc.sh}
+for any sh compatible shell, e.g. ksh or bash, or \texttt{pipsrc.csh} for
+any csh compatible shell, e.g.  tcsh.
 
-Before using {\tt tpips}, you need to add a PIPS root directory to
-your path and to set some PIPS environment variables. In
-order to do that, you can execute the shell script
-Pips/pipsrc.sh for any sh compatible shell, e.g. ksh or
-bash, or Pips/pipsrc.csh for any csh compatible shell, e.g.
-tcsh.
+
+\section{Small tools}
+\label{sec:small-tools}
+
+\texttt{tpips} is the way to go with PIPS but it may be too complex to do
+some simple tasks used for some demonstrations or some well defined tasks.
+
+
+\subsection{\texttt{pips\_f2openmp}}
+\label{sec:pips_f2openmp}
+
+This tools parallelizes the Fortran files given in parameters and leave
+the OpenMP generated files in the locally created database.
+
+It is close to an automation of the example at section~\ref{exm6}.
+
 
 \end{document}
 
-%%% Local Variables: 
+%%% Local Variables:
 %%% mode: latex
 %%% TeX-master: t
 %%% ispell-local-dictionary: "american"
-%%% End: 
+%%% End:

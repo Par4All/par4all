@@ -1,0 +1,95 @@
+#! /bin/bash
+
+workspace=`basename $0$$`
+
+function display_usage_and_exit () {
+    cat <<EOF
+$0 [-h|--help] file.f ...
+  Create a workspace from Fortran given files and parallelize
+  them with OpenMP syntax.
+
+'$Id: print.c 12944 2008-07-18 12:44:57Z irigoin $'
+EOF
+    exit
+}
+
+function create_workspace () {
+    cat <<EOF
+echo Create the workspace from the files to parallelize
+create $workspace $*
+
+EOF
+}
+
+function select_most_precise_analysis () {
+    cat <<EOF
+echo Select the most precise analysis:
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate REGION_CHAINS
+echo Try to restructure the code for more precision:
+setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING=TRUE
+setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION=TRUE
+
+EOF
+}
+
+function privatize_scalar_variables () {
+    cat <<EOF
+echo Privatize scalar variables on all the modules of the program:
+apply PRIVATIZE_MODULE[%ALL]
+
+EOF
+}
+
+function openmp_parallelization () {
+    cat <<EOF
+echo Ask for some statistics about the job to be done:
+setproperty PARALLELIZATION_STATISTICS=TRUE
+echo Ask for the parallelization of all the modules of the program with OpenMP output:
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE[%ALL]
+
+EOF
+}
+
+function internalize_parallel_code () {
+    cat <<EOF
+echo Consider the generated parallel as the sequential code now:
+# Since INTERNALIZE_PARALLEL_CODE modify the sequentiel code,
+# applying it on the parallel code of another module that may depend
+# of the previous module can lead to reapplying the parallelization each time...
+# So use cappy insted of apply here:
+capply INTERNALIZE_PARALLEL_CODE[%ALL]
+
+EOF
+}
+
+function regenerate_source () {
+    cat <<EOF
+echo Regenerate the sources from the PIPS transformed code:
+apply UNSPLIT[%PROGRAM]
+#display PRINTED_FILE[%ALL]
+
+EOF
+}
+
+
+[ $# -eq 0 -o "$1" = "-h" -o "$1" = "--help" ] && display_usage_and_exit
+
+
+{
+    create_workspace $*
+    select_most_precise_analysis
+    privatize_scalar_variables
+    openmp_parallelization
+    internalize_parallel_code
+    # Force the code regeneration with OpenMP parallel syntax
+    # instead of sequential output:
+    echo 'setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "omp"'
+    regenerate_source
+} | tpips
+
+echo "The parallelized code is in $workspace.database/Src"

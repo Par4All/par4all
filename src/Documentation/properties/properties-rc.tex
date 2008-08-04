@@ -2115,7 +2115,8 @@ PRETTYPRINT_C_CODE FALSE
 \end{verbatim}
 
 However, this is not a good way to handle multi-target languages. To be
-replaced ... 
+replaced ...
+
 \subsubsection{Layout}
 \index{Analysis}
 \index{PRETTYPRINT\_LOOSE}
@@ -2164,12 +2165,33 @@ PRETTYPRINT_INDENTATION 3
 \index{Craft}
 \index{PRETTYPRINT\_PARALLEL}
 
+\paragraph{Parallel output style}
+\label{sec:parall-outp-style}
+
 How to print, from a syntactic point of view, a parallel do loop. Possible
-values are: \texttt{do doall f90 hpf cray craft cmf omp}. 
+values are: \texttt{do doall f90 hpf cray craft cmf omp}.
 
 \begin{verbatim}
 PRETTYPRINT_PARALLEL    "do"
 \end{verbatim}
+
+
+\paragraph{Default sequential output style}
+\label{sec:sequ-outp-style}
+
+How to print, from a syntactic point of view, a parallel do loop for a
+sequential code. Of course, by default, the sequential output is
+sequential by definition, so the default value is \verb/"do"/.
+
+But we may interested to change this behaviour to display after an
+application of \verb|INTERNALIZE_PARALLEL_CODE| the parallel code that is
+hidden in the sequential code. Possible values are: \texttt{do doall f90
+  hpf cray craft cmf omp}.
+
+\begin{verbatim}
+PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+\end{verbatim}
+
 
 \subsubsection{Display Analysis Results}
 \index{PRETTYPRINT\_EFFECTS}

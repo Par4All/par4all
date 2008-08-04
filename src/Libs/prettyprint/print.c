@@ -78,7 +78,10 @@ user_view_p()
     return is_user_view;
 }
 
-bool 
+
+/* Generic function to prettyprint some sequential or parallel code, or
+   even user view for the given module. */
+bool
 print_code_or_source(string mod_name)
 {
     bool success = FALSE;
@@ -86,22 +89,27 @@ print_code_or_source(string mod_name)
     entity module = local_name_to_top_level_entity(mod_name);
     statement mod_stat;
     string pp;
-  
+
     string resource_name = strdup
-	(get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? 
+	(get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ?
 	    DBR_GRAPH_PRINTED_FILE
 		: (is_user_view ? DBR_PARSED_PRINTED_FILE : DBR_PRINTED_FILE));
     string file_ext =
 	strdup(concatenate
 	       (is_user_view? PRETTYPRINT_FORTRAN_EXT : PREDICAT_FORTRAN_EXT,
-		get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? 
+		get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ?
 		GRAPH_FILE_EXT : "",
 		NULL));
 
     set_current_module_entity(module);
 
-    pp = strdup(get_string_property(PRETTYPRINT_PARALLEL));
-    set_string_property(PRETTYPRINT_PARALLEL, "do");
+    /* Since we want to prettyprint with a sequential syntax, save the
+       PRETTYPRINT_PARALLEL property that may select the parallel output
+       style before overriding it: */
+    pp = strdup(get_string_property("PRETTYPRINT_PARALLEL"));
+    /* Select the default prettyprint style for sequential prettyprint: */
+    set_string_property("PRETTYPRINT_PARALLEL",
+			get_string_property("PRETTYPRINT_SEQUENTIAL_STYLE"));
 
     mod_stat = (statement)
 	db_get_memory_resource(is_user_view?
@@ -119,7 +127,10 @@ print_code_or_source(string mod_name)
 
     debug_off();
 
-    set_string_property(PRETTYPRINT_PARALLEL, pp); free(pp);
+    /* Restore the previous PRETTYPRINT_PARALLEL property for the next
+       parallel code prettyprint: */
+    set_string_property("PRETTYPRINT_PARALLEL", pp);
+    free(pp);
 
     reset_current_module_entity();
     reset_current_module_statement();
@@ -127,10 +138,14 @@ print_code_or_source(string mod_name)
     free_text(r);
     free(resource_name);
     free(file_ext);
+
     return success;
 }
-    
-static bool 
+
+
+/* Build a textual resource for a parallel code using a string optional
+   parallel style (dialect such as "f90", "doall", "hpf", "omp" */
+static bool
 print_parallelized_code_common(
     string mod_name,
     string style)
@@ -142,12 +157,12 @@ print_parallelized_code_common(
     string pp = string_undefined;
 
     if (style) {
-	pp = strdup(get_string_property(PRETTYPRINT_PARALLEL));
-	set_string_property(PRETTYPRINT_PARALLEL, style);
+	pp = strdup(get_string_property("PRETTYPRINT_PARALLEL"));
+	set_string_property("PRETTYPRINT_PARALLEL", style);
     }
 
     begin_attachment_prettyprint();
-    
+
     init_prettyprint(empty_text);
 
     mod_stat = (statement)
@@ -165,10 +180,10 @@ print_parallelized_code_common(
     end_attachment_prettyprint();
 
     if (style) {
-	set_string_property(PRETTYPRINT_PARALLEL, pp); 
+	set_string_property("PRETTYPRINT_PARALLEL", pp);
 	free(pp);
     }
-    
+
     free_text(r);
     return success;
 }
