@@ -63,8 +63,8 @@ error_reset_current_module_entity()
 string
 get_current_module_name()
 {
-  /*  return module_local_name(current_module_entity);*/
-  return entity_user_name(current_module_entity);
+  return module_local_name(current_module_entity);
+  /* return entity_user_name(current_module_entity); */
 }
 
 

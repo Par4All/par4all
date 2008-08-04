@@ -38,8 +38,8 @@ void dump_common_layout(string_buffer result, entity c, bool debug_p, bool isfor
   list equiv_members = NIL;
 
   string_buffer_append(result, 
-		       strdup(concatenate(NL,"Layout for common /",
-					  entity_name(c),"/ of size ",
+		       strdup(concatenate(NL,"Layout for ",isfortran?"common /":"memory area \"",
+					  entity_name(c),isfortran?"/":"\""," of size ",
 					  itoa(area_size(type_area(entity_type(c)))),
 					  ":",NL,NULL)));
 
@@ -128,22 +128,22 @@ void dump_common_layout(string_buffer result, entity c, bool debug_p, bool isfor
       
 	if(ram_offset(storage_ram(entity_storage(m))) == DYNAMIC_RAM_OFFSET) {
 	  string_buffer_append(result,strdup(concatenate(
-							 "\tDynamic Variable",entity_name(m), 
-							 "\toffset = UNKNOWN, \tsize = DYNAMIC",
+							 "\tDynamic Variable \"",entity_name(m), 
+							 "\"\toffset = UNKNOWN, \tsize = DYNAMIC",
 							 NL,NULL)));
 	}
 	else if (ram_offset(storage_ram(entity_storage(m))) == UNDEFINED_RAM_OFFSET) {
 	    
 	  string_buffer_append(result,
 			       strdup(concatenate
-				      ("\tExternal Variable", entity_name(m),
-				       "\toffset = UNKNOWN,\tsize = ",itoa(s),NL,NULL)));
+				      ("\tExternal Variable \"", entity_name(m),
+				       "\"\toffset = UNKNOWN,\tsize = ",itoa(s),NL,NULL)));
 	}
 	else {
 	
 	  string_buffer_append(result,
 			       strdup(concatenate
-				      ("\tVariable ", entity_name(m),"\toffset = ",
+				      ("\tVariable \"", entity_name(m),"\"\toffset = ",
 				       itoa(ram_offset(storage_ram(entity_storage(m)))),NULL)));
 	  string_buffer_append(result,
 			       strdup(concatenate("\tsize = ",itoa(s),NL,NULL)));
@@ -194,68 +194,80 @@ void dump_common_layout(string_buffer result, entity c, bool debug_p, bool isfor
 void dump_functional(functional f, string_buffer result)
 {
   type tr = functional_result(f);
+  list cp = list_undefined;
 
-  MAPL(cp, {
+  for(cp=functional_parameters(f); !ENDP(cp); POP(cp)) {
     parameter p = PARAMETER(CAR(cp));
     type ta = parameter_type(p);
 
-    pips_assert("Argument type is variable or varags:variable or functional",
+    pips_assert("Argument type is variable or varags:variable or functional or void",
 		type_variable_p(ta)
 		|| (type_varargs_p(ta) && type_variable_p(type_varargs(ta)))
-		|| type_functional_p(ta));
+		|| type_functional_p(ta)
+		|| type_void_p(ta));
 
-    if(type_functional_p(ta)) {
+    if(type_variable_p(ta)) {
+      //string_buffer_append(result, strdup("("));
+      string_buffer_append(result, 
+			   strdup(concatenate(basic_to_string(variable_basic(type_variable(ta)))
+					    /*,NL*/,NULL)));
+      //string_buffer_append(result, strdup(")"));
+    }
+    else if(type_functional_p(ta)) {
       functional fa = type_functional(ta);
 
-      string_buffer_append(result, strdup(concatenate("(",NULL)));
+      string_buffer_append(result, strdup("("));
       dump_functional(fa, result);
-      string_buffer_append(result, strdup(concatenate(")",NULL)));
+      string_buffer_append(result, strdup(")"));
     }
-    else {
-      if(type_varargs_p(ta)) {
-	string_buffer_append(result, strdup(concatenate(type_to_string(ta),NULL)));
-	ta = type_varargs(ta);
-      }
-      string_buffer_append(result, strdup(concatenate( 
-			  basic_to_string(variable_basic(type_variable(ta))),NULL)));
+    else if(type_varargs_p(ta)) {
+      string_buffer_append(result, strdup(concatenate(type_to_string(ta),":",NULL)));
+      ta = type_varargs(ta);
+      string_buffer_append(result,
+			   strdup(basic_to_string(variable_basic(type_variable(ta)))));
+    }
+    else if(type_void_p(ta)) {
+      /* FI: we could do nothing or put "void". I choose to put "void"
+	 to give more information about the internal
+	 representation. */
+      string_buffer_append(result, strdup(type_to_string(ta)));
     }
     if(!ENDP(cp->cdr))
       string_buffer_append(result, strdup(concatenate(" x ",NULL)));
-  },
-       functional_parameters(f));
-
-  if(ENDP(functional_parameters(f))) {
-    string_buffer_append(result, strdup(concatenate(" ()",NULL)));
   }
+  if(ENDP(functional_parameters(f))) {
+    string_buffer_append(result, strdup(concatenate("()",NULL)));
+  }
+  
   string_buffer_append(result, strdup(concatenate(" -> ",NULL)));
 
   if(type_variable_p(tr))
     string_buffer_append(result, 
 			 strdup(concatenate(basic_to_string(variable_basic(type_variable(tr)))
-					    ,NL,NULL)));
+					    /*,NL*/,NULL)));
   else if(type_void_p(tr))
-    string_buffer_append(result, strdup(concatenate(type_to_string(tr),NL,NULL)));
+    string_buffer_append(result, strdup(concatenate(type_to_string(tr)/*,NL*/,NULL)));
   else if(type_unknown_p(tr)){
-
-    string_buffer_append(result, strdup(concatenate(type_to_string(tr),NL,NULL)));
+    string_buffer_append(result, strdup(concatenate(type_to_string(tr)/*,NL*/,NULL)));
   }
   else if(type_varargs_p(tr)) {
     string_buffer_append(result, strdup(concatenate(type_to_string(tr),":",
-		   basic_to_string(variable_basic(type_variable(type_varargs(tr)))),NULL)));
+						    basic_to_string(variable_basic(type_variable(type_varargs(tr)))),NULL)));
   }
   else
     /* An argument can be functional, but not (yet) a result. */
-    pips_error("fprint_functional", "Ill. type %d\n", type_tag(tr));
+    pips_internal_error("Ill. type %d\n", type_tag(tr));
 }
 
 string get_symbol_table(entity m, bool isfortran)
 {
   string_buffer result = string_buffer_make();
   string result2;
-
   list decls = gen_copy_seq(code_declarations(value_code(entity_initial(m))));
   int nth = 0;
   entity rv = entity_undefined;
+  list ce = list_undefined;
+
   pips_assert("get_symbol_table", entity_module_p(m));
 
   /* To simplify validation, at the expense of some information about
@@ -263,34 +275,38 @@ string get_symbol_table(entity m, bool isfortran)
   
   gen_sort_list(decls, compare_entities);
 
-  string_buffer_append(result, strdup(concatenate(NL,"Declarations for module ",
-						  module_local_name(m)," with type", NULL)));
+  string_buffer_append(result, strdup(concatenate(NL,"Declarations for module \"",
+						  module_local_name(m),"\" with type \"", NULL)));
 
   dump_functional(type_functional(entity_type(m)), result);
+  string_buffer_append(result, strdup("\""NL));
 
   /* List of implicitly and explicitly declared variables, 
      functions and areas */
   if(ENDP(decls))
-    string_buffer_append(result, strdup(concatenate("* empty declaration list *",NL,NL,NULL)));
+    string_buffer_append(result, strdup(concatenate("\n* empty declaration list *",NL,NL,NULL)));
   else
-    string_buffer_append(result, strdup(concatenate("Variable list:",NL,NL,NULL)));
+    string_buffer_append(result, strdup(concatenate("\nVariable list:",NL,NL,NULL)));
   
  
-  MAP(ENTITY, e, {
- 
+  for(ce=decls; !ENDP(ce); POP(ce)) {
+    entity e = ENTITY(CAR(ce));
     type t = entity_type(e);
-    string_buffer_append(result, strdup(concatenate("Declared entity ",
-						    entity_name(e),"\twith type ",
-						    type_to_string(t)," ",NULL)));
+
+    pips_debug(8, "Processing entity \"%s\"\n", entity_name(e));
+    string_buffer_append(result, strdup(concatenate("\tDeclared entity \"",
+						    entity_name(e),"\" with type \"",
+						    type_to_string(t),"\" ",NULL)));
     
     if(type_variable_p(t))
       string_buffer_append(result, 
 			   strdup(concatenate
-				  (basic_to_string(variable_basic(type_variable(t))), 
+				  ("\"", basic_to_string(variable_basic(type_variable(t))),"\"", 
 				   NL,NULL)));
-    
     else if(type_functional_p(t)) {
+      string_buffer_append(result, strdup("\""));
       dump_functional(type_functional(t),result);
+      string_buffer_append(result, strdup("\""NL));
     }
     else if(type_area_p(t)) {
       string_buffer_append(result,strdup(concatenate("with size ",
@@ -298,49 +314,88 @@ string get_symbol_table(entity m, bool isfortran)
     }
     else
       string_buffer_append(result, strdup(concatenate(NL,NULL)));
-  },
-      decls);
+  }
+ 
+  if(!isfortran) {
+    list edecls = gen_copy_seq(code_externs(value_code(entity_initial(m))));
+
+    //gen_sort_list(decls, compare_entities);
+
+    if(ENDP(edecls))
+      string_buffer_append(result, strdup(concatenate("\n* empty extern declaration list *",NL,NL,NULL)));
+    else
+      string_buffer_append(result, strdup(concatenate("\nExternal variable list:",NL,NL,NULL)));
+
+    for(ce=edecls; !ENDP(ce); POP(ce)) {
+      entity e = ENTITY(CAR(ce));
+      type t = entity_type(e);
+
+      pips_debug(8, "Processing external entity \"%s\"\n", entity_name(e));
+      pips_assert("e is an entity", entity_domain_number(e)==entity_domain);
+      string_buffer_append(result, strdup(concatenate("\tDeclared external entity \"",
+						      entity_name(e),"\"\twith type \"",
+						      type_to_string(t),"\" ",NULL)));
+    
+      if(type_variable_p(t))
+	string_buffer_append(result, 
+			     strdup(concatenate
+				    (basic_to_string(variable_basic(type_variable(t))), 
+				     NL,NULL)));
+    
+      else if(type_functional_p(t)) {
+	string_buffer_append(result, strdup("\""));
+	dump_functional(type_functional(t),result);
+	string_buffer_append(result, strdup("\""NL));
+      }
+      else if(type_area_p(t)) {
+	string_buffer_append(result,strdup(concatenate("with size ",
+						       itoa(area_size(type_area(t))),NL, NULL)));
+      }
+      else
+	string_buffer_append(result, strdup(concatenate(NL,NULL)));
+    }
+  }
 
   /* Formal parameters */
   nth = 0;
   MAP(ENTITY, v, {
-    storage vs = entity_storage(v);
+      storage vs = entity_storage(v);
 
-    pips_assert("All storages are defined", !storage_undefined_p(vs));
+      pips_assert("All storages are defined", !storage_undefined_p(vs));
 
-    if(storage_formal_p(vs)) {
-      nth++;
-      if(nth==1) {
-	string_buffer_append(result, strdup(concatenate(NL,"Layouts for formal parameters:"
-							,NL,NL,NULL)));
+      if(storage_formal_p(vs)) {
+	nth++;
+	if(nth==1) {
+	  string_buffer_append(result, strdup(concatenate(NL,"Layouts for formal parameters:"
+							  ,NL,NL,NULL)));
+	}
+	string_buffer_append(result,strdup(concatenate("\tVariable ",entity_name(v),
+						       "\toffset = ", itoa(formal_offset(storage_formal(vs))),NULL)));
       }
-      string_buffer_append(result,strdup(concatenate("\tVariable ",entity_name(v),
-						     "\toffset = ", itoa(formal_offset(storage_formal(vs))),NULL)));
-    }
-    else if(storage_return_p(vs)) {
-      pips_assert("No more than one return variable", entity_undefined_p(rv));
-      rv = v;
-    }
-  }, decls);
+      else if(storage_return_p(vs)) {
+	pips_assert("No more than one return variable", entity_undefined_p(rv));
+	rv = v;
+      }
+    }, decls);
 
   /* Return variable */
   if(!entity_undefined_p(rv)) {
     string_buffer_append(result, strdup(concatenate(NL,"Layout for return variable:",NL,NL,NULL)));
-    string_buffer_append(result, strdup(concatenate("\tVariable ",entity_name(rv),
-						    "\tsize = ", SafeSizeOfArray(rv),NULL)));
+    string_buffer_append(result, strdup(concatenate("\tVariable \"",entity_name(rv),
+						    "\"\tsize = ", SafeSizeOfArray(rv),NULL)));
   }
 
   /* Structure of each area/common */
   if(!ENDP(decls)) {
-    string_buffer_append(result, strdup(concatenate(NL,"Layouts for areas (commons):",NL,NULL)));
+    string_buffer_append(result, strdup(concatenate(NL,"Layouts for ",isfortran?"commons:":"memory areas:",NL,NULL)));
   }
 
   MAP(ENTITY, e, {
-    if(type_area_p(entity_type(e))) {
-      dump_common_layout(result, e, FALSE, isfortran);
-    }
-  }, 
-      decls);
+      if(type_area_p(entity_type(e))) {
+	dump_common_layout(result, e, FALSE, isfortran);
+      }
+    }, 
+    decls);
     
   string_buffer_append(result, strdup(concatenate("End of declarations for module ",
 						  module_local_name(m), NL,NL, NULL)));
@@ -382,6 +437,8 @@ void actual_symbol_table_dump(string module_name, bool isfortran)
 
 bool c_symbol_table(string module_name)
 {
+  is_fortran = FALSE; // The "is_fortran" parameter is not propagated
+  //all the way down to words_basic()
   actual_symbol_table_dump(module_name, FALSE);
   return TRUE;
 }

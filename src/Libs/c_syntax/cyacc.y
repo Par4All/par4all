@@ -285,11 +285,20 @@ void EnterScope()
 	     c_parser_context_scope(nc), nc);
 }
 
-c_parser_context GetScope()
+string GetScope()
 {
-  c_parser_context c = (c_parser_context) stack_head(ContextStack);
+  string s = "";
 
-  return c;
+  /* FI: I do not know if it wouldn't be better to initialize the
+     ContextStack with a default context before calling the C
+     parser */
+  if(!stack_empty_p(ContextStack)) {
+    c_parser_context c = (c_parser_context) stack_head(ContextStack);
+    
+    s = c_parser_context_scope(c);
+  }
+
+  return s;
 }
 
 void ExitScope()
@@ -351,9 +360,19 @@ void PopContext()
 
 c_parser_context GetContext()
 {
-  c_parser_context c = (c_parser_context) stack_head(ContextStack);
+    
+    c_parser_context c = c_parser_context_undefined;
+
+    if(!stack_empty_p(ContextStack))
+      c = (c_parser_context) stack_head(ContextStack);
+    else
+      // Should we return a default context?
+      // Not really compatible with a clean memory allocation policy
+      pips_internal_error("No current context");
+
   pips_debug(8, "Context %p is obtained from stack position %d\n",
 	     c, stack_size(ContextStack));
+
   return c;
 }
 
@@ -2106,8 +2125,15 @@ rest_par_list1:
 			}
     TK_ELLIPSIS 
                         {
-			  $$ = CONS(PARAMETER,make_parameter(make_type_varargs(type_undefined),
-							     make_mode(CurrentMode,UU)),NIL); 
+			  /*$$ = CONS(PARAMETER,make_parameter(make_type_varargs(type_undefined),
+			    make_mode(CurrentMode,UU)),NIL); */
+			  type at = make_type(is_type_variable,
+					      make_variable(make_basic(is_basic_overloaded, UU),
+							    NIL, NIL));
+			  $$ = CONS(PARAMETER,
+				    make_parameter(make_type_varargs(at),
+						   make_mode(CurrentMode,UU)),
+				    NIL); 
 			}
 |   TK_COMMA 
                         { 
@@ -2132,6 +2158,7 @@ parameter_decl: /* (* ISO 6.7.5 *) */
                         {
 			  UpdateAbstractEntity($2,ContextStack);
 			  $$ = make_parameter(copy_type(entity_type($2)),make_mode(CurrentMode,UU));
+			  RemoveFromExterns($2);
 			  free_entity($2);
 			  //stack_pop(ContextStack);
 			  PopContext();
@@ -2249,6 +2276,7 @@ type_name: /* (* ISO 6.7.6 *) */
                         {
 			  UpdateAbstractEntity($2,ContextStack);
 			  $$ = copy_type(entity_type($2));
+			  RemoveFromExterns($2);
 			  free_entity($2);
 			  //stack_pop(ContextStack);
 			  PopContext();

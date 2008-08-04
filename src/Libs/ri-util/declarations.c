@@ -285,7 +285,7 @@ list words_basic(basic obj)
       case is_basic_overloaded:
 	{
 	  /* should be a user error ? */
-	  pc = CHAIN_SWORD(pc,"OVERLOADED");
+	  pc = CHAIN_SWORD(pc,is_fortran?"OVERLOADED":"overloaded");
 	  break;
 	}
       case is_basic_complex:
@@ -1883,7 +1883,7 @@ list generic_c_words_entity(type t, list name, bool is_safe)
 
   if (basic_type_p(t))
     {
-      pips_debug(9,"Basic type with name = \"%\"s\n", list_to_string(name));
+      pips_debug(9,"Basic type with name = \"%s\"\n", list_to_string(name));
  
       pc = gen_nconc(pc,words_type(t));
       pc = gen_nconc(pc,name);
@@ -2145,7 +2145,7 @@ void print_C_common_layout(FILE * fd, entity c, bool debug_p)
   list members = get_common_members(c, mod, FALSE);
   list equiv_members = NIL;
 
-  (void) fprintf(fd, "\nLayout for common %s of size %td: \n",
+  (void) fprintf(fd, "\nLayout for memory area \"%s\" of size %td: \n",
 		 entity_name(c), area_size(type_area(entity_type(c))));
 
   if(ENDP(members)) {
@@ -2317,6 +2317,11 @@ void fprint_any_environment(FILE * fd, entity m, bool is_fortran)
     fprint_functional(fd, type_functional(entity_type(m)));
     (void) fprintf(fd, "\n\n");
 
+    /* In C, no return entity is created (yet). See MakeCurrentModule(). */
+    pips_assert("A module storage is ROM or return",
+		storage_rom_p(entity_storage(m))
+		|| storage_return_p(entity_storage(m)));
+
     /* List of implicitly and explicitly declared variables, 
        functions and areas */
 
@@ -2340,6 +2345,35 @@ void fprint_any_environment(FILE * fd, entity m, bool is_fortran)
 	    (void) fprintf(fd, "\n");
 	    },
 	decls);
+
+    if(!is_fortran) {
+      list edecls = gen_copy_seq(code_externs(value_code(entity_initial(m))));
+      /* List of external variables and functions and areas */
+
+      gen_sort_list(edecls, compare_entities);
+
+      (void) fprintf(fd, "%s\n", ENDP(edecls)? 
+		     "* empty external declaration list *\n\n": "External variable list:\n\n");
+
+      MAP(ENTITY, e, {
+	  type t = entity_type(e);
+
+	  fprintf(fd, "Declared entity %s\twith type %s ", entity_name(e), type_to_string(t));
+
+	  if(type_variable_p(t))
+	    fprintf(fd, "%s\n", basic_to_string(variable_basic(type_variable(t))));
+	  else if(type_functional_p(t)) {
+	    fprint_functional(fd, type_functional(t));
+	  }
+	  else if(type_area_p(t)) {
+	    (void) fprintf(fd, "with size %td\n", area_size(type_area(t)));
+	  }
+	  else
+	    (void) fprintf(fd, "\n");
+	},
+	edecls);
+      gen_free_list(edecls);
+    }
 
     /* Formal parameters */
     nth = 0;

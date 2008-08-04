@@ -493,6 +493,20 @@ entity global_new_value_to_global_old_value(entity v_new)
  *
  */
 
+/* the '#' character used in value naming conflicts with the reserved
+   character for struct naming*/
+string global_value_name_to_user_name(string gn)
+{
+  string un = strrchr(gn, BLOCK_SEP_CHAR);
+
+  if(un==NULL)
+    un = local_name(gn);
+  else
+    un++;
+
+  return un;
+}
+
 string external_value_name(entity e)
 {
   extern entity get_current_module_entity();
@@ -527,7 +541,8 @@ string external_value_name(entity e)
 
   if(strcmp(module_local_name(m), module_name(s)) == 0
      ||strcmp(TOP_LEVEL_MODULE_NAME, module_name(s)) == 0) {
-    s = local_name(s);
+    //s = local_name(s);
+    s = global_value_name_to_user_name(s);
   }
 
   return s;

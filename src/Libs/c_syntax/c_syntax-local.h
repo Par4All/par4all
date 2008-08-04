@@ -33,5 +33,6 @@ extern string scope_to_block_scope(string);
 /* The following functions are using parser variables*/
 extern void InitScope(void);
 extern void EnterScope(void);
-extern c_parser_context GetScope(void);
+extern string GetScope(void);
+extern c_parser_context GetContext(void);
 extern void ExitScope(void);

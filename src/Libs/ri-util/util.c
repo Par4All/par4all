@@ -22,6 +22,78 @@
 /* Lines between BEGIN_EOLE and END_EOLE tags are automatically included
    in the EOLE project (JZ - 11/98) */
 
+/* Does take care of block scopes */
+string global_name_to_user_name(string global_name)
+{
+  string user_name = string_undefined;
+  char lc = global_name[strlen(global_name)-1];
+
+  /* First, take care of constrant strings and characters, wich may
+     contain any of the PIPS special characters and strings */
+
+  if(lc=='"' || lc=='\'') {
+    user_name = strchr(global_name, lc);
+  }
+  else {
+
+    /* Then all possible prefixes first */
+
+    if (strstr(global_name,STRUCT_PREFIX) != NULL)
+      user_name = strstr(global_name,STRUCT_PREFIX) + 1;
+    else if (strstr(global_name,UNION_PREFIX) != NULL) {
+      user_name = strstr(global_name,UNION_PREFIX) + 1;
+    }
+    else if (strstr(global_name,ENUM_PREFIX) != NULL)
+      user_name = strstr(global_name,ENUM_PREFIX) + 1;
+    else if (strstr(global_name,TYPEDEF_PREFIX) != NULL)
+      user_name = strstr(global_name,TYPEDEF_PREFIX) + 1;
+
+    else if (strstr(global_name,MEMBER_SEP_STRING) != NULL)
+      user_name = strstr(global_name,MEMBER_SEP_STRING) + 1;
+
+    else if (strstr(global_name,LABEL_PREFIX) != NULL)
+      user_name = strstr(global_name,LABEL_PREFIX) + 1;
+    else if (strstr(global_name,COMMON_PREFIX) != NULL)
+      user_name = strstr(global_name,COMMON_PREFIX) + 1;
+    else if (strstr(global_name,BLOCKDATA_PREFIX) != NULL) {
+      /* Clash with the address-of C operator */
+      user_name = strstr(global_name,BLOCKDATA_PREFIX)+1;
+      //string s = strstr(global_name,BLOCKDATA_PREFIX);
+      //
+      //if(strlen(s)>1)
+      //	user_name = s + 1);
+      //else
+      //user_name = s;
+    }
+    else if (strstr(global_name,MAIN_PREFIX) != NULL) {
+      string s = strstr(global_name,MAIN_PREFIX) + 1;
+      pips_debug(8, "name = %s \n", s);
+      user_name = s;
+    }
+
+    /* Then block seperators */
+    else if (strstr(global_name,BLOCK_SEP_STRING) != NULL)
+      user_name = strrchr(global_name,BLOCK_SEP_CHAR) + 1;
+
+    /* Then module seperator */
+    else if (strstr(global_name,MODULE_SEP_STRING) != NULL)
+      user_name = strstr(global_name,MODULE_SEP_STRING) + 1;
+
+    /* Then file seperator */
+    else if (strstr(global_name,FILE_SEP_STRING) != NULL)
+      user_name = strstr(global_name,FILE_SEP_STRING) + 1;
+    else {
+      pips_internal_error("no seperator ?\n");
+      user_name = NULL;
+    }
+  }
+
+  pips_debug(9, "global name = \"%s\", user_name = \"%s\"\n",
+	     global_name, user_name);
+  return user_name;
+}
+
+/* Does not take care of block scopes and returns a pointer */
 string 
 local_name(s)
 string s;

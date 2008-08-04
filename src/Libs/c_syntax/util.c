@@ -448,6 +448,7 @@ entity FindEntityFromLocalName(string name)
 entity FindOrCreateEntityFromLocalNameAndPrefix(string name,string prefix, bool is_external)
 {
   entity e; 
+
   if ((e = FindEntityFromLocalNameAndPrefix(name,prefix)) != entity_undefined) 
     return e;
   return CreateEntityFromLocalNameAndPrefix(name,prefix,is_external);
@@ -499,7 +500,7 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
 
   entity ent = entity_undefined;
   string global_name = string_undefined; 
-  string scope = scope_to_block_scope(c_parser_context_scope(GetScope()));
+  string scope = scope_to_block_scope(GetScope());
   string ls = strdup(scope);
 
   pips_debug(5,"Entity local name is \"%s\" with prefix \"%s\" and scope \"%s\"\n",
@@ -533,7 +534,7 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
   }
 
   if(entity_undefined_p(ent)) {
-    pips_user_warning("Cannot find entity %s with prefix \"%s\" at line %d\n",
+    pips_user_warning("Cannot find entity with local name \"%s\" with prefix \"%s\" at line %d\n",
 		      name, prefix, get_current_C_line_number());
     /* It may be a parser error or a normal behavior when an entity is
        used before it is defined as, for example, a struct in a typedef:
@@ -560,7 +561,7 @@ entity CreateEntityFromLocalNameAndPrefix(string name, string prefix, bool is_ex
 						   prefix,name,NULL)));
   }
   else {
-    string scope = scope_to_block_scope(c_parser_context_scope(GetScope()));
+    string scope = scope_to_block_scope(GetScope());
 
     pips_debug(5,"Entity local name is %s with prefix %s and scope \"%s\"\n",
 	       name,prefix,scope);
@@ -579,14 +580,45 @@ entity CreateEntityFromLocalNameAndPrefix(string name, string prefix, bool is_ex
   return ent;
 }
 
+bool CheckExternList()
+{
+    entity f = get_current_module_entity();
+    if(entity_undefined_p(f))
+      pips_debug(5,"Current module is undefined\n");
+    else {
+      value fv = entity_initial(f);
+      pips_debug(5,"Current module is function \"%s\"\n", entity_name(f));
+      if(!value_undefined_p(fv)) {
+	code fc = value_code(fv);
+	if(!code_undefined_p(fc)) {
+	  list el = code_externs(fc);
+	  list le = gen_last(el);
+	  pips_debug(8, "Number of extern variables and functions: %d\n", gen_length(el));
+	  if(gen_length(el)>0) {
+	    pips_debug(8, "Last entity %s in cons %p with car=%p and cdr=%p\n",
+		       entity_name(ENTITY(CAR(le))),
+		       le,
+		       &(le->car),
+		       (void *) (le->cdr));
+	  }
+	  pips_assert("externs is an entity list", entity_list_p(el));
+	}
+      }
+    }
+    return TRUE;
+}
+
 /* This function finds or creates the current entity. Only entity full name is created, 
    other fields such as type, storage and initial value are undefined.  */
 
-entity FindOrCreateCurrentEntity(string name,stack ContextStack,stack FormalStack,
-				 stack FunctionStack, bool is_external)
+entity FindOrCreateCurrentEntity(string name,
+				 stack ContextStack __attribute__ ((__unused__)),
+				 stack FormalStack,
+				 stack FunctionStack, 
+				 bool is_external)
 {
   entity ent;
-  c_parser_context context = GetScope();
+  c_parser_context context = GetContext();
   string full_scope = c_parser_context_scope(context);
   string scope = strrchr(full_scope, BLOCK_SEP_CHAR);
   string block_scope = scope_to_block_scope(full_scope);
@@ -616,7 +648,20 @@ entity FindOrCreateCurrentEntity(string name,stack ContextStack,stack FormalStac
   }
 
   ifdebug(5) {
-    pips_debug(5,"Entity local name \"%s\"\n",name);
+    entity f = get_current_module_entity();
+    if(entity_undefined_p(f))
+      pips_debug(5,"Entity local name \"%s\"\n",name);
+    else {
+      value fv = entity_initial(f);
+      pips_debug(5,"Entity local name \"%s\" in function \"%s\"\n",name, entity_name(f));
+      if(!value_undefined_p(fv)) {
+	code fc = value_code(fv);
+	if(!code_undefined_p(fc)) {
+	  list el = code_externs(fc);
+	  pips_assert("externs is an entity list", entity_list_p(el));
+	}
+      }
+    }
     pips_debug(5,"Context %p\n",context);
     if (full_scope != NULL) {
       pips_debug(5,"Current scope: \"%s\"\n",full_scope);
@@ -652,8 +697,18 @@ entity FindOrCreateCurrentEntity(string name,stack ContextStack,stack FormalStac
 	      /* This entity is declared in a compilation unit with keyword EXTERN.
 		 Add it to the storage of the compilation unit to help code generation*/
 	      entity com_unit = get_current_compilation_unit_entity();
-	      ram_shared(storage_ram(entity_storage(com_unit))) = 
-		gen_nconc(ram_shared(storage_ram(entity_storage(com_unit))), CONS(ENTITY,ent,NIL));
+	      list el = code_externs(value_code(entity_initial(com_unit)));
+	      //ram_shared(storage_ram(entity_storage(com_unit))) = 
+	      //gen_nconc(ram_shared(storage_ram(entity_storage(com_unit))), CONS(ENTITY,ent,NIL));
+	      pips_debug(8, "Variable \"%s\" added to external declarations of \"%s\"\n",
+			 entity_name(ent), entity_name(com_unit));
+	      pips_assert("ent is an entity", entity_domain_number(ent)==entity_domain);
+	      pips_assert("com_unit is an entity", entity_domain_number(com_unit)==entity_domain);
+	      pips_assert("el is a pure entity list", entity_list_p(el));
+	      code_externs(value_code(entity_initial(com_unit))) = 
+		gen_nconc(code_externs(value_code(entity_initial(com_unit))), CONS(ENTITY,ent,NIL));
+	      el = code_externs(value_code(entity_initial(com_unit)));
+	      pips_assert("el is a pure entity list", entity_list_p(el));
 	    }
 	}
       else 
@@ -708,7 +763,7 @@ entity FindOrCreateCurrentEntity(string name,stack ContextStack,stack FormalStac
 	    }
 	}
     }
-  pips_debug(5,"Entity global name %s\n",entity_name(ent));
+  pips_debug(5,"Entity global name %s\n\n",entity_name(ent));
   return ent;
 }
 
@@ -750,15 +805,25 @@ dimension MakeDimension(list le)
       /* Take only the first expression of le, do not know why it can be a list ?*/
       expression e = EXPRESSION(CAR(le));
       int up;
+
       if (expression_integer_value(e,&up))
-	d = make_dimension(int_to_expression(0),int_to_expression(up-1));
+	/* use the integer value */
+	  d = make_dimension(int_to_expression(0),int_to_expression(up-1));
       else 
-	d = make_dimension(int_to_expression(0),MakeBinaryCall(CreateIntrinsic("-C"),e,
-							       int_to_expression(1)));
-      ifdebug(5) 
+	/* Build a new expression e' == e-1 */
+	d = make_dimension(int_to_expression(0),
+			   MakeBinaryCall(CreateIntrinsic(MINUS_C_OPERATOR_NAME),
+					  e,
+					  int_to_expression(1)));
+
+      ifdebug(9) 
 	{
-	  pips_debug(5,"Array dimension:\n");
+	  pips_debug(5,"Array dimension:");
 	  print_expression(e);
+	  pips_debug(8,"Array lower bound:");
+	  print_expression(dimension_lower(d));
+	  pips_debug(5,"Array dimension:");
+	  print_expression(dimension_upper(d));
 	}
     }
   return d;
@@ -786,7 +851,6 @@ void UpdatePointerEntity(entity e, type pt, list lq)
   type t = entity_type(e);
   pips_debug(3,"Update pointer entity %s with type pt=\"%s\"\n",
 	     entity_name(e), list_to_string(c_words_entity(pt, NIL)));
-  
   if (type_undefined_p(t))
     {
       pips_debug(3,"Undefined entity type\n");
@@ -981,38 +1045,21 @@ type UpdateType(type t1, type t2)
 
 void CCompilationUnitMemoryAllocation(entity module)
 {
-  /* Should be followed by preconditions */
-  //entity msae = FindOrCreateEntity(compilation_unit_name,  STATIC_AREA_LOCAL_NAME);
-  //area msa = type_area(entity_type(msae));
-  //entity gsae = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,  STATIC_AREA_LOCAL_NAME);
-  //area gsa = type_area(entity_type(gsae));
-  //entity fdae = FindOrCreateEntity(get_current_module_name(), DYNAMIC_AREA_LOCAL_NAME);
-  //area fda = type_area(entity_type(fdae));
-  //entity fsae = FindOrCreateEntity(get_current_module_name(), STATIC_AREA_LOCAL_NAME);
-  //area fsa = type_area(entity_type(fsae));
-  
-  /* Code for reallocation of memory problem due to reparsing of compilation unit
-     previouscompunit = get_current_compilation_unit_entity();
-     previoussizeofGlobalArea = area_size(gsa);
-  */
-  
-  nodecl_p(module,ModuleStatement);
   list ld = entity_declarations(module);
   entity var = entity_undefined;
-
-  //printf("\n\nArea Layout: %s\n\n", area_layout(fsa));
   
   pips_debug(8,"MEMORY ALLOCATION BEGINS\n");
-    
-  for(; !ENDP(ld); ld = CDR(ld))
-    {
+
+  /* Check that all variables used or defined are declared */
+  nodecl_p(module,ModuleStatement);
+
+  /* Allocate variables */
+  for(; !ENDP(ld); ld = CDR(ld)) {
       var = ENTITY(CAR(ld));
-      if(type_variable_p(entity_type(var)))
-	{
+      if(type_variable_p(entity_type(var))) 	{
 	  // Add some preconditions here
 	  storage s = entity_storage(var);
-	  if(storage_ram_p(s))
-	    {
+	  if(storage_ram_p(s)) 	    {
 	      ram r = storage_ram(s);
 	      entity a = ram_section(r);
 	      /* check the type of variable here to avoid conflict declarations */
@@ -1029,8 +1076,7 @@ void CCompilationUnitMemoryAllocation(entity module)
 		ram_offset(r) = area_size(type_area(entity_type(a)));
 		add_C_variable_to_area(a,var);
 	      }
-	      else
-		{
+	      else {
 		  /* Donot allocate the memory for external variables:
 		     Set the offset of ram -2 which signifies UNKNOWN offset
 		  */
@@ -1156,13 +1202,16 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
       else
 	{
 	  if(type_variable_p(entity_type(e))) {
-	    /* The entities for the type_variable is added to the current module and the declarations*/  
+	    /* The entities for the type_variable is added to the
+	       current module and the declarations*/  
 	    entity function = get_current_module_entity();
 	    
 	    /* It is too early to use extern_entity_p() */
 	    //if(extern_entity_p(function, e))
 	    if(strstr(entity_name(e),TOP_LEVEL_MODULE_NAME) != NULL)
-	      AddToExterns(e,function);
+	      if(!empty_scope_p(c_parser_context_scope(context)))
+		/* Keyword EXTERN has just been encountered */
+		AddToExterns(e,function);
 	    
 	    /* To avoid multiple declarations */
 	    if(!gen_in_list_p(e, code_externs(value_code(entity_initial(function)))) &&
@@ -1232,7 +1281,7 @@ void UpdateAbstractEntity(entity e, stack ContextStack)
   list lq = c_parser_context_qualifiers(context);
 
   pips_debug(3,"Update abstract entity %s\n",entity_name(e));
-  
+
   if (lq != NIL)
     {
       /* tc must have variable type, add lq to its qualifiers */
@@ -1267,15 +1316,33 @@ bool entity_in_list_p(entity e, list le)
   return FALSE;
 }
 
+void RemoveFromExterns(entity e)
+{
+  entity f = get_current_module_entity();
+  code fc = value_code(entity_initial(f));
+
+  gen_remove(&code_externs(fc), (void *) e);
+}
+
 void AddToExterns(entity e, entity mod)
 {
   // the entity e can be extern variable and extern functions
-  if(!gen_in_list_p(e, code_externs(value_code(entity_initial(mod)))))
+  list le = code_externs(value_code(entity_initial(mod)));
+
+  pips_assert("le is an entity list", entity_list_p(le));
+
+  if(!gen_in_list_p(e, le))
   {
-    pips_debug(5,"Add entity %s to extern declaration %s \n", entity_user_name(e), entity_user_name(mod));
+    pips_debug(5,"Add entity %s to extern declaration %s \n",
+	       entity_user_name(e), entity_user_name(mod));
+    pips_assert("e is an entity", entity_domain_number(e)==entity_domain);
+    pips_assert("mod is an entity", entity_domain_number(mod)==entity_domain);
     code_externs(value_code(entity_initial(mod)))
       = gen_nconc(code_externs(value_code(entity_initial(mod))),
 		  CONS(ENTITY,e,NIL));
+
+    le = code_externs(value_code(entity_initial(mod)));
+    pips_assert("le is an entity list", entity_list_p(le));
   }
 }
 void AddToDeclarations(entity e, entity mod)
@@ -1505,7 +1572,7 @@ string CreateMemberScope(string derived, bool is_external)
   if (is_external)
     s = strdup(concatenate(compilation_unit_name, MODULE_SEP_STRING, derived, MEMBER_SEP_STRING, NULL));	
   else {
-    string scope = scope_to_block_scope(c_parser_context_scope(GetScope()));
+    string scope = scope_to_block_scope(GetScope());
 
     pips_assert("scope is a block scope", string_block_scope_p(scope));
 

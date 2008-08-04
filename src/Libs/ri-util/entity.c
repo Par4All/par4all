@@ -216,6 +216,19 @@ bool label_string_defined_in_statement_p(string ls, statement s)
 /* Lines between BEGIN_EOLE and END_EOLE tags are automatically included
    in the EOLE project (JZ - 11/98) */
 
+string safe_entity_name(entity e)
+{
+  string sn = string_undefined;
+
+  if(entity_domain_number(e)!= entity_domain)
+    sn = "not an entity";
+  else if(entity_undefined_p(e))
+    sn = "undefined entity";
+  else
+    sn = entity_name(e);
+  return sn;
+}
+
 /* entity_local_name modified so that it does not core when used in
  * vect_fprint, since someone thought that it was pertinent to remove the
  * special care of constants there. So I added something here, to deal
@@ -390,7 +403,7 @@ bool entity_enum_member_p(entity e)
 {
   value ev = entity_initial(e);
 
-  pips_assert("Value of e is defined", !value_undefined_p(e));
+  pips_assert("Value of e is defined", !value_undefined_p(ev));
   return value_symbolic_p(ev);
 }
 
@@ -546,14 +559,25 @@ same_entity_p(entity e1, entity e2)
 int 
 compare_entities(entity *pe1, entity *pe2)
 {
-    int
-	null_1 = (*pe1==(entity)NULL),
-	null_2 = (*pe2==(entity)NULL);
+  int
+    null_1 = (*pe1==(entity)NULL),
+    null_2 = (*pe2==(entity)NULL);
     
-    if (null_1 || null_2) 
-	return(null_2-null_1);
-    else
-	return(strcmp(entity_name(*pe1), entity_name(*pe2)));
+  if (null_1 || null_2) 
+    return(null_2-null_1);
+  else {
+    /* FI: Which sorting do you want? */
+
+    //string s1 = entity_name_without_scope(*pe1);
+    //string s2 = entity_name_without_scope(*pe2);
+    //int c = strcmp(s1, s2);
+    //
+    //free(s1);
+    //free(s2);
+    //
+    //return c;
+    return(strcmp(entity_name(*pe1), entity_name(*pe2)));
+  }
 }
 
 /* sorted in place.
@@ -601,6 +625,25 @@ bool
 entity_basic_p(entity e, int basictag)
 {
     return (basic_tag(entity_basic(e)) == basictag);
+}
+
+/* Checks that el only contains entity*/
+bool entity_list_p(list el)
+{
+  bool pure = TRUE;
+
+  MAP(ENTITY, e, 
+      {
+	static entity le = entity_undefined;
+	pips_debug(8, "Entity e in list is \"%s\"\n", safe_entity_name(e));
+	if(entity_domain_number(e)!=entity_domain) {
+	  pips_debug(8, "Last entity le in list is \"%s\"\n", safe_entity_name(le));
+	  pure = FALSE;
+	  break;
+	}
+	le = e;
+      }, el);
+  return pure;
 }
 
 /* this function maps a local name, for instance P, to the corresponding
@@ -1001,60 +1044,29 @@ list /* of entity */ string_to_entity_list(string module, string names)
 */
 string entity_user_name(entity e)
 {
-  string global_name = entity_name(e);
+  string gn = entity_name(e);
+  string un = strdup(global_name_to_user_name(gn));
 
-  /* All possible prefixes first */
+  return un;
+}
 
-  if (strstr(global_name,STRUCT_PREFIX) != NULL)
-    return strdup(strstr(global_name,STRUCT_PREFIX) + 1);
-  if (strstr(global_name,UNION_PREFIX) != NULL) {
-    /* FI: currently the UNION_PREFIX, '\'', conflicts with C character constants */
-    int i = strchr(global_name, UNION_PREFIX_CHAR)!=strrchr(global_name, UNION_PREFIX_CHAR);
-    pips_debug(8, "i = %d\n", i);
-    if(i) {
-      return strdup(strstr(global_name,UNION_PREFIX));
-    }
-    else
-      return strdup(strstr(global_name,UNION_PREFIX) + 1);
-  }
-  if (strstr(global_name,ENUM_PREFIX) != NULL)
-    return strdup(strstr(global_name,ENUM_PREFIX) + 1);
-  if (strstr(global_name,TYPEDEF_PREFIX) != NULL)
-    return strdup(strstr(global_name,TYPEDEF_PREFIX) + 1);
+/* allocates a new string */
+string entity_name_without_scope(entity e)
+{
+  string en = entity_name(e);
+  string mn = entity_module_name(e);
+  string ns = strrchr(en, BLOCK_SEP_CHAR);
+  string enws = string_undefined;
 
-  if (strstr(global_name,MEMBER_SEP_STRING) != NULL)
-    return strdup(strstr(global_name,MEMBER_SEP_STRING) + 1);
+  if(ns==NULL)
+    enws = strdup(en);
+  else
+    enws = strdup(concatenate(mn, MODULE_SEP_STRING, ns+1, NULL));
 
-  if (strstr(global_name,LABEL_PREFIX) != NULL)
-    return strdup(strstr(global_name,LABEL_PREFIX) + 1);
-  if (strstr(global_name,COMMON_PREFIX) != NULL)
-    return strdup(strstr(global_name,COMMON_PREFIX) + 1);
-  if (strstr(global_name,BLOCKDATA_PREFIX) != NULL) {
-    /* Clash with the address-of C operator */
-    string s = strstr(global_name,BLOCKDATA_PREFIX);
+  pips_debug(8, "entity name = \"%s\", without scope: \"%s\"\n",
+	     en, enws);
 
-    if(strlen(s)>1)
-      return strdup(s + 1);
-    else
-      return strdup(s);
-  }
-  if (strstr(global_name,MAIN_PREFIX) != NULL)
-    return strdup(strstr(global_name,MAIN_PREFIX) + 1);
-
-  /* Then block seperators */
-  if (strstr(global_name,BLOCK_SEP_STRING) != NULL)
-    return strdup(strrchr(global_name,BLOCK_SEP_CHAR) + 1);
-
-  /* Then module seperator */
-  if (strstr(global_name,MODULE_SEP_STRING) != NULL)
-    return strdup(strstr(global_name,MODULE_SEP_STRING) + 1);
-
-  /* Then file seperator */
-  if (strstr(global_name,FILE_SEP_STRING) != NULL)
-    return strdup(strstr(global_name,FILE_SEP_STRING) + 1);
-
-  pips_error("entity_user_name", "no seperator ?\n");
-  return NULL;
+  return enws;
 }
 
 
@@ -1099,7 +1111,8 @@ entity MakeCompilationUnitEntity(string name)
 
   /* Normally, the storage must be rom but in order to store the list of entities
      declared with extern, we use the ram storage to put this list in ram_shared*/
-  entity_storage(e) = make_storage_ram(make_ram(entity_undefined,entity_undefined,0,NIL));
+  //entity_storage(e) = make_storage_ram(make_ram(entity_undefined,entity_undefined,0,NIL));
+  entity_storage(e) = make_storage(is_storage_rom, UU);
   entity_type(e) = make_type_functional(make_functional(NIL,make_type_unknown()));
   entity_initial(e) = make_value(is_value_code, make_code(NIL,strdup(""), make_sequence(NIL),NIL));
 
@@ -1133,7 +1146,10 @@ bool extern_entity_p(entity module, entity e)
   //else
     //return(static_module_name_p(e));
   */ 
-    return ((compilation_unit_entity_p(module) && gen_in_list_p(e,ram_shared(storage_ram(entity_storage(module)))))
+  /* return ((compilation_unit_entity_p(module) && gen_in_list_p(e,ram_shared(storage_ram(entity_storage(module)))))
+	  ||(!compilation_unit_entity_p(module) && (strstr(entity_name(e),TOP_LEVEL_MODULE_NAME) != NULL)));
+  */
+    return ((compilation_unit_entity_p(module) && gen_in_list_p(e,code_externs(value_code(entity_initial(module)))))
 	  ||(!compilation_unit_entity_p(module) && (strstr(entity_name(e),TOP_LEVEL_MODULE_NAME) != NULL)));
   
 }

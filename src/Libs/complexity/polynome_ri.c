@@ -78,7 +78,8 @@ Variable var;
 	pips_error("variable_local_name",
 		   "unexpected var == chunk_undefined.\n");
     else 
-	s = strdup(entity_local_name((entity) var));
+      // s = strdup(entity_local_name((entity) var));
+	s = strdup(entity_minimal_name((entity) var));
 
     return (s);
 }

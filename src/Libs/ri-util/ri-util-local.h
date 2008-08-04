@@ -38,7 +38,7 @@
 #define BLOCK_SEP_CHAR 			'`'
 #define MEMBER_SEP_STRING 		"^"
 #define MEMBER_SEP_CHAR 		'^'
-#define STRUCT_PREFIX 			"#"
+#define STRUCT_PREFIX 			"#" // Conflict with value naming in transformer
 #define STRUCT_PREFIX_CHAR		'#'
 #define UNION_PREFIX 			"'" // Conflict with C character constants
 #define UNION_PREFIX_CHAR		'\''

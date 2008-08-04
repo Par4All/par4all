@@ -355,7 +355,7 @@ contraintes_text_format(
     Pcontrainte cs, 		/* contraintes to be printed */
     string (*variable_name)(Variable),	/* hook for naming a variable */
     bool invert_put_first,      /* whether to invert put_first */
-    int (*put_first)(Pvecteur), /* whether to put first some constraints */
+    bool (*put_first)(Pvecteur), /* whether to put first some constraints */
     bool some_previous,         /* whether a separator is needed */
     bool is_inegalites,		/* egalites or inegalites */
     bool a_la_fortran		/* fortran look? */)

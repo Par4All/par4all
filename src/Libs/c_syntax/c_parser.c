@@ -146,6 +146,8 @@ void CParserError(char *msg)
 
   // Get rid of partly declared variables
   if(mod!=entity_undefined) {
+    /* Imported from syntax */
+    extern void CleanLocalEntities(entity);
     value v = entity_initial(mod);
     code c = value_code(v);
 
