@@ -48,7 +48,7 @@ usage()
 	   -s dir: where other sources are (default HPFC_INCLUDE then EXTEDIR)
 	   -f file: reference file (default none)
 	EOF
-  exit ${1:-1}
+  exit ${code:-1}
 }
 
 while getopts himvdqot:s:b:f:n: OPT
