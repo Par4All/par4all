@@ -37,7 +37,11 @@ typedef struct cons {
 #define CDR(pcons) ((pcons)->cdr)
 #define REFCAR(pc) (&(CAR(pc).p))
 
-#define CONS(type,x,l) gen_cons((void*) (x), (l)) /* could check type? */
+#ifdef NEWGEN_TYPED_CONS
+#define CONS(type,x,l) gen_typed_cons((type##_TYPE),(x),(l))
+#else
+#define CONS(type,x,l) gen_cons((void*) (x), (l))
+#endif /* NEWGEN_TYPED_CONS */
 
 #define MAPL(_map_list_cp,_code,_l) \
 	{cons* _map_list_cp = (_l) ; \
@@ -100,6 +104,7 @@ extern list gen_make_list GEN_PROTO((int, ...));
 extern list gen_copy_string_list GEN_PROTO((list));
 extern void gen_free_string_list GEN_PROTO((list));
 extern list gen_cons GEN_PROTO((void *, list));
+extern list gen_typed_cons GEN_PROTO((intptr_t, void *, list));
 extern void gen_list_and GEN_PROTO((list *, list));
 extern void gen_list_and_not GEN_PROTO((list *, list));
 extern void gen_list_patch(list, void *, void *);

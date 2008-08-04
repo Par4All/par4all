@@ -617,6 +617,19 @@ list gen_cons(void * item, list next)
   return ncons;
 }
 
+/* CONS a list with minimal type checking
+ * this cannot be done within the CONS macro because
+ * possible functions calls must not be replicated.
+ */
+list gen_typed_cons(intptr_t type, void * item, list next)
+{
+  if (Domains[type].domain->co.type==CONSTRUCTED_DT) {
+    message_assert("some item", item!=NULL && item!=gen_chunk_undefined);
+    message_assert("check item type", ((gen_chunk*) item)->i==type);
+  }
+  return gen_cons(item, next);
+}
+
 /* Compute A = A inter B: complexity in O(n2) */
 void
 gen_list_and(list * a,
