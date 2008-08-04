@@ -38,7 +38,7 @@ typedef struct cons {
 #define REFCAR(pc) (&(CAR(pc).p))
 
 #ifdef NEWGEN_TYPED_CONS
-#define CONS(type,x,l) gen_typed_cons((type##_NEWGEN_DOMAIN),(x),(l))
+#define CONS(type,x,l) gen_typed_cons((type##_NEWGEN_DOMAIN),(void*)(x),(l))
 #else
 #define CONS(type,x,l) gen_cons((void*) (x), (l))
 #endif /* NEWGEN_TYPED_CONS */
