@@ -5,13 +5,14 @@
 #define REGION EFFECT  /* for casts */
 #define REGION_ EFFECT_  /* for some left casts */
 #define REGION_TYPE EFFECT_TYPE
+#define REGION_NEWGEN_DOMAIN EFFECT_NEWGEN_DOMAIN
 
 #define region_undefined effect_undefined
 #define region_undefined_p(reg)  effect_undefined_p((reg))
 #define make_region(reference,action,approximation,system) \
     make_effect(make_cell(is_cell_preference, make_preference(reference)),\
     (action),(approximation), \
-    make_descriptor(is_descriptor_convex,system))  
+    make_descriptor(is_descriptor_convex,system))
 #define region_reference(reg) \
     preference_reference(cell_preference(effect_cell(reg)))
 #define region_action(reg) effect_action(reg)
@@ -28,9 +29,8 @@
     descriptor_convex_(effect_descriptor(reg))
 #define region_system(reg) \
     descriptor_convex(effect_descriptor(reg))
-    
- 
-/* useful region macros */ 
+
+/* useful region macros */
 
 #define region_read_p(reg) (action_tag(effect_action(reg))==is_action_read)
 #define region_write_p(reg) (action_tag(effect_action(reg))==is_action_write)
