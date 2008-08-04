@@ -246,7 +246,8 @@ extern void gen_context_multi_recurse GEN_PROTO((void *, void *,...));
   {									\
     intptr_t __type = dom;						\
     void * __item = item;						\
-    if (__type>0 && Domains[__type].domain->co.type==CONSTRUCTED_DT) {	\
+    if (__type>0 && Domains[__type].domain &&				\
+	Domains[__type].domain->co.type==CONSTRUCTED_DT) {		\
       message_assert("some item", __item!=NULL);			\
       message_assert("item is defined", __item!=gen_chunk_undefined);	\
       message_assert("check type", ((gen_chunk*) __item)->i==__type);	\
