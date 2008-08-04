@@ -30,23 +30,19 @@ f2a(float f)
     char buffer[32];
     sprintf(buffer, "%f", f);
     return strdup(buffer);
-}    
-
+}
 
 void
 add_one_unformated_printf_to_text(text r,
                                   string a_format, ...)
 {
+  /* beurk... */
    char buffer[200];
-   
    va_list some_arguments;
-
    va_start(some_arguments, a_format);
-   
    (void) vsprintf(buffer, a_format, some_arguments);
    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
                                          strdup(buffer)));
-
    va_end(some_arguments);
 }
 
