@@ -343,17 +343,14 @@ list *pblocks, *ploops;
 
 static list current_loop_list=NIL;
 
-static void set_current_loops_rewrite(l)
-loop l;
+static void set_current_loops_rewrite(loop l)
 {
-    current_loop_list =	CONS(ENTITY, l, current_loop_list);
+    current_loop_list =	CONS(LOOP, l, current_loop_list);
 }
 
-void set_current_loops(obj)
-statement obj;
+void set_current_loops(statement obj)
 {
     pips_assert("no current loop", current_loop_list==NIL);
-
     gen_recurse(obj, loop_domain, gen_true, set_current_loops_rewrite);
 }
 
@@ -366,7 +363,7 @@ void reset_current_loops()
 bool entity_loop_index_p(e)
 entity e;
 {
-    MAP(LOOP, l, if (e == loop_index(l)) return(TRUE), current_loop_list);
+    MAP(LOOP, l, if (e == loop_index(l)) return TRUE, current_loop_list);
     return FALSE;
 }
 
@@ -375,7 +372,6 @@ entity index;
 {
     MAP(LOOP, l, if (loop_index(l)==index) return(loop_range(l)),
 	current_loop_list);
-    
     return range_undefined;
 }
 
