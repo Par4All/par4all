@@ -1,0 +1,9 @@
+delete format03
+create format03 format03.f
+
+display PRINTED_FILE 
+close
+#delete format03
+quit
+EOF
+
