@@ -29,15 +29,13 @@ list l;
 range r;
 {
     if (ENDP(l)) /* first time */
-	return(CONS(CONSP, CONS(RANGE, r, NIL), NIL));
+	return CONS(LIST, CONS(RANGE, r, NIL), NIL);
 
     /* else */
     MAPL(cc,
      {
 	 list lr = CONSP(CAR(cc));
-
 	 assert(!ENDP(lr));
-
 	 lr = gen_nconc(lr, CONS(RANGE, r, NIL));
      },
 	 l);
@@ -51,23 +49,19 @@ list dup_list_of_ranges_list(l)
 list l;
 {
     list result = NIL;
-    
+
     MAPL(cc,
      {
 	 list lr = CONSP(CAR(cc));
 	 list lrp = NIL;
-
 	 MAP(RANGE, r, lrp = gen_nconc(lrp, CONS(RANGE, r, NIL)), lr);
-
 	 assert(gen_length(lrp)==gen_length(lr));
-
-	 result = gen_nconc(result, CONS(CONSP, lrp, NIL));
+	 result = gen_nconc(result, CONS(LIST, lrp, NIL));
      },
 	 l);
 
     assert(gen_length(l)==gen_length(result));
-
-    return(result);
+    return result;
 }
 
 /* ??? the complexity of this function could be improved greatly...
@@ -80,7 +74,6 @@ list l;
     MAPL(cv,
      {
 	 Pvecteur v = (Pvecteur) PVECTOR(CAR(cv));
-	 
 	 result = gen_nconc(result, CONS(PVECTOR, (VECTOR) vect_dup(v), NIL));
      },
 	 l);
@@ -96,8 +89,8 @@ int var, val;
 {
     list result = NIL;
 
-    if (ENDP(l)) 
-	return CONS(PVECTOR, (VECTOR) vect_new((Variable) var, 
+    if (ENDP(l))
+	return CONS(PVECTOR, (VECTOR) vect_new((Variable) var,
 					       int_to_value(val)), NIL);
 
     if ((var==0) || (val==0))

@@ -296,18 +296,18 @@ static void sequence_rewrite(sequence s)
 {
     if (n_loops==0 && n_levels==0) /* there was no doall inside */
 	return;
-    
+
     if (n_loops-n_levels!=1)
 	pips_internal_error("block within a block encountered\n");
-    
-    n_levels++, blocks = CONS(CONSP, sequence_statements(s), blocks);
+
+    n_levels++, blocks = CONS(LIST, sequence_statements(s), blocks);
 }
 
 static void loop_rewrite(loop l)
 {
     if (n_loops!=n_levels) /* a loop was found directly as a body */
-	n_levels++, blocks = CONS(CONSP, NIL, blocks);
-    
+	n_levels++, blocks = CONS(LIST, NIL, blocks);
+
     if (n_loops==0) inner_body=loop_body(l);
     loops = CONS(LOOP, l, loops);
     n_loops++;
@@ -327,10 +327,10 @@ list *pblocks, *ploops;
 		      sequence_domain, gen_true, sequence_rewrite,
 		      loop_domain, loop_filter, loop_rewrite,
 		      NULL);
-    
+
     pips_assert("loops found", n_loops!=0 && (n_loops-n_levels==1));
 
-    *pblocks=CONS(CONSP, NIL, blocks); /* nothing was done for the first ! */
+    *pblocks = CONS(LIST, NIL, blocks); /* nothing was done for the first ! */
     *ploops=loops;
 
     return(inner_body);

@@ -942,30 +942,27 @@ statement stat, *pstat;
     if (!align_check(the_computer_reference,
 		     the_computer_reference, &lvect, &lkind))
 	pips_error("Overlap_Analysis","no self alignment!\n");
-    
+
     if (computer_is_written)
-	lWa = CONS(CONSP, CONS(CONSP, lkind,
-			  CONS(CONSP, lvect, NIL)), NIL);
+      lWa = CONS(LIST, CONS(LIST, lkind, CONS(LIST, lvect, NIL)), NIL);
     else
-	lRa = CONS(CONSP, CONS(CONSP, lkind,
-			  CONS(CONSP, lvect, NIL)), NIL);
+      lRa = CONS(LIST, CONS(LIST, lkind, CONS(LIST, lvect, NIL)), NIL);
 
     pips_debug(9, "checking alignments\n");
 
     MAP(SYNTAX, s,
     {
 	reference r = syntax_reference(s);
-	
-	if (the_computer_reference==r) continue;
-	
+	if (the_computer_reference==r) 
+	  continue;
 	if (align_check(the_computer_reference, r, &lvect, &lkind))
 	{
 	    if (aligned_p(the_computer_reference, r, lvect, lkind))
 	    {
 		Wa = gen_nconc(Wa, CONS(SYNTAX, s, NIL));
-		lWa = gen_nconc(lWa, CONS(CONSP,
-					  CONS(CONSP, lkind, 
-					       CONS(CONSP, lvect, NIL)),
+		lWa = gen_nconc(lWa, CONS(LIST,
+					  CONS(LIST, lkind, 
+					       CONS(LIST, lvect, NIL)),
 					  NIL));
 	    }
 	    else /* ??? what about loop splitting */
@@ -1017,18 +1014,18 @@ statement stat, *pstat;
 	     if (aligned_p(the_computer_reference, r, lvect, lkind))
 	     {
 		 Ra = gen_nconc(Ra, CONS(SYNTAX, s, NIL));
-		 lRa = gen_nconc(lRa, CONS(CONSP,
-					   CONS(CONSP, lkind, 
-						CONS(CONSP, lvect, NIL)),
-					   NIL));    
+		 lRa = gen_nconc(lRa, CONS(LIST,
+					   CONS(LIST, lkind,
+						CONS(LIST, lvect, NIL)),
+					   NIL));
 	     }
 	     else
 	     if (message_manageable_p(array, lvect, lkind))
 	     {
 		 Ro = gen_nconc(Ro, CONS(SYNTAX, s, NIL));
-		 lRo = gen_nconc(lRo, CONS(CONSP,
-					   CONS(CONSP, lkind, 
-						CONS(CONSP, lvect, NIL)),
+		 lRo = gen_nconc(lRo, CONS(LIST,
+					   CONS(LIST, lkind, 
+						CONS(LIST, lvect, NIL)),
 					   NIL));
 	     }
 	     else
@@ -1084,7 +1081,7 @@ statement stat, *pstat;
 
     DEBUG_STAT(9, entity_name(node_module), newloopnest);
 
-    (*pstat) = 
+    (*pstat) =
 	make_block_statement
 	    (CONS(STATEMENT, messages_stat,
 	     CONS(STATEMENT,
@@ -1092,7 +1089,7 @@ statement stat, *pstat;
 				  the_computer_reference,
 		  CONSP(CAR(CONSP(CAR(computer_is_written? lWa: lRa)))),
 		  CONSP(CAR(CDR(CONSP(CAR(computer_is_written? lWa: lRa)))))),
-		  NIL)));    
+		  NIL)));
 
     DEBUG_STAT(8, entity_name(node_module), *pstat);
 

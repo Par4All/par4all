@@ -46,6 +46,7 @@ void fprint_entity_list(FILE *fp, list l);
 
 #define PVECTOR(v) CHUNK(v)
 #define VECTOR gen_chunk*
+#define PVECTOR_NEWGEN_DOMAIN (-1)
 
 /* ??? very beurk!
  */
