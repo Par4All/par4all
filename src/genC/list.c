@@ -606,6 +606,7 @@ list gen_make_list(int domain, ...)
 	CDR(current) = CONS(CHUNK, item, NIL), POP(current);
     
     return l;
+    va_end(args);
 }
 
 list gen_cons(void * item, list next)
@@ -615,7 +616,6 @@ list gen_cons(void * item, list next)
   ncons->cdr = next;
   return ncons;
 }
-
 
 /* Compute A = A inter B: complexity in O(n2) */
 void
