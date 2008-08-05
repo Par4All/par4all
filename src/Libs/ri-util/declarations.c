@@ -125,31 +125,44 @@ words_parameters(entity e)
 static list 
 words_dimension(dimension obj)
 {
-    list pc = NIL;
-    if (is_fortran)
-      {
-	pc = words_expression(dimension_lower(obj));
-	pc = CHAIN_SWORD(pc,":");
-	pc = gen_nconc(pc, words_expression(dimension_upper(obj)));
-      }
-    else
-      {
-	/* The lower bound of array in C is always equal to 0, 
-	   we only need to print (upper dimension + 1) */
-	if (unbounded_dimension_p(obj))
-	  pc = CHAIN_SWORD(pc,"");
-	else
-	  {
-	    expression eup = dimension_upper(obj);
-	    int up;
-	    if (expression_integer_value(eup, &up))
-	      pc = CHAIN_IWORD(pc,up+1);
-	    else
-	      /* to be refined here to make more beautiful expression, use normalize ? */
-	      pc = words_expression(MakeBinaryCall(CreateIntrinsic("+"),eup,int_to_expression(1)));
+  list pc = NIL;
+  if (is_fortran) {
+    pc = words_expression(dimension_lower(obj));
+    pc = CHAIN_SWORD(pc,":");
+    pc = gen_nconc(pc, words_expression(dimension_upper(obj)));
+  }
+  else {
+    /* The lower bound of array in C is always equal to 0, 
+       we only need to print (upper dimension + 1) */
+    if (unbounded_dimension_p(obj))
+      pc = CHAIN_SWORD(pc,"");
+    else {
+      expression eup = dimension_upper(obj);
+      int up;
+      if (FALSE && expression_integer_value(eup, &up))
+	/* FI: why do you want to change the source code? */
+	pc = CHAIN_IWORD(pc,up+1);
+      else {
+	if(expression_call_p(eup)) {
+	  call c = syntax_call(expression_syntax(eup));
+	  entity f = call_function(c);
+	  if(ENTITY_MINUS_P(f)||ENTITY_MINUS_C_P(f)){
+	    expression e1 = EXPRESSION(CAR(call_arguments(c)));
+	    expression e2 = EXPRESSION(CAR(CDR(call_arguments(c))));
+	    int i;
+
+	    if (expression_integer_value(e2, &i) && i==1)
+	      pc = words_expression(e1);
 	  }
+	}
+	if(pc==NIL)
+	  /* to be refined here to make more beautiful expression, use normalize ? */
+	  /* FI: why would we modify the user C source code?*/
+	  pc = words_expression(MakeBinaryCall(CreateIntrinsic("+"),eup,int_to_expression(1)));
       }
-    return(pc);
+    }
+  }
+  return(pc);
 }
 
 /* some compilers don't like dimensions that are declared twice.

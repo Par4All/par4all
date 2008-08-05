@@ -165,8 +165,9 @@ statement st;
     instruction i;
 
     return(entity_empty_label_p(statement_label(st)) &&
-	    instruction_block_p(i=statement_instruction(st)) &&
-	    ENDP(instruction_block(i)));
+	   instruction_block_p(i=statement_instruction(st)) &&
+	   ENDP(instruction_block(i)) &&
+	   ENDP(statement_declarations(st)));
 }
 
 bool 

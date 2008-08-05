@@ -1249,6 +1249,20 @@ bool bit_type_p(type t)
   return FALSE;
 }
 
+bool char_type_p(type t)
+{
+  bool is_char = FALSE;
+
+  if (!type_undefined_p(t) && type_variable_p(t)) {
+    basic b = variable_basic(type_variable(t));
+    if (!basic_undefined_p(b) && basic_int_p(b)) {
+      int i = basic_int(b);
+    is_char = (i==1); /* see words_basic() */
+    }
+  }
+  return is_char;
+}
+
 
 type make_standard_integer_type(type t, int size)
 {

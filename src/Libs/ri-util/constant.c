@@ -168,9 +168,10 @@ Character constants are typed as int.
     basic be = basic_undefined;
 	
     if (bt == is_basic_string) {
+      /* Drop the two qotes, but add space for '\0' */
       be = make_basic(bt, (make_value(is_value_constant, 
 				      (make_constant(is_constant_int, 
-						     (void*) strlen(name)-2)))));
+						     (void*) strlen(name)-2+1)))));
     }
     else {
       be = make_basic(bt, (void*) size);

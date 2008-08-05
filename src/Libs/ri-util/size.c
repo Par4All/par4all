@@ -31,19 +31,65 @@ computed (see CSafeSizeOfArray).
 bool
 SizeOfArray(entity e, int * s)
 {
-	variable a;
-	bool ok = TRUE;
-	int se = 0;
-	int ne = 0;
+  type et = entity_type(e);
+  variable a;
+  bool ok = TRUE;
+  int se = -1;
+  int ne = -1;
 
-	assert(type_variable_p(entity_type(e)));
-	a = type_variable(entity_type(e));
+  assert(type_variable_p(entity_type(e)));
+  a = type_variable(et);
 
-	se = SizeOfElements(variable_basic(a));
-	ok = NumberOfElements(variable_dimensions(a), &ne);
-	* s = ok? ne * se : se;
+  se = SizeOfElements(variable_basic(a));
+  ok = NumberOfElements(variable_dimensions(a), &ne);
 
-	return ok;
+  if(!ok) {
+    /* Let's try to use the initial value */
+    value ev = entity_initial(e);
+    //basic eb = variable_basic(a);
+
+    if(value_expression_p(ev)) {
+      expression eve = value_expression(ev);
+      //type evet = expression_to_type(eve);
+      basic eveb = basic_of_expression(eve);
+
+      /* Is it an array of characters initialized with a string expression? */
+      if(char_type_p(et) && basic_string_p(eveb)) {
+	ne = string_type_size(eveb);
+	ok = TRUE;
+      } 
+      else if(expression_call_p(eve)) {
+	call evec = syntax_call(expression_syntax(eve));
+	entity f = call_function(evec);
+	list args = call_arguments(evec);
+
+	/* Is it a call to the BRACE_INTRINSIC operator? */
+	if(ENTITY_BRACE_INTRINSIC_P(f)) {
+	  ne = gen_length(args);
+	  ok = TRUE;
+	}
+	/* Check for other dimensions */
+	if(ok && gen_length(variable_dimensions(a))>1) {
+	  bool sok = FALSE;
+	  int sne = -1;
+	  sok = NumberOfElements(CDR(variable_dimensions(a)), &sne);
+	  if(sok) {
+	    ne *= sne;
+	  }
+	  else {
+	    ok = FALSE;
+	  }
+	}
+      }
+    }
+    else if(value_constant_p(ev)) {
+      pips_internal_error("Not implemented yet\n");
+    }
+  }
+
+  * s = ok? ne * se : se;
+
+  return ok;
 }
 
 int
@@ -98,6 +144,13 @@ int entity_memory_size(entity dt)
 {
   /* dt is assumed to be a derived type: struct, union, and maybe enum */
   type t = entity_type(dt);
+  int s = type_memory_size(t);
+
+  return s;
+}
+
+int type_memory_size(type t)
+{
   int s = 0;
 
   switch(type_tag(t)) {
@@ -112,7 +165,7 @@ int entity_memory_size(entity dt)
   case is_type_variable:
     /* Seems to be the case for defined types; FI: why are they
        allocated in RAM while they only exist at compile time ? */
-    s = SizeOfElements(type_variable(t));
+    s = SizeOfElements(variable_basic(type_variable(t)));
     break;
   case is_type_struct:
     MAP(ENTITY, v, {s+=CSafeSizeOfArray(v);}, type_struct(t));

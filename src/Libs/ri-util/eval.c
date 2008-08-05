@@ -55,7 +55,7 @@ EvalSyntax(syntax s)
     v = make_value(is_value_unknown, NIL);
     break;
   case is_syntax_sizeofexpression:
-    v = make_value(is_value_unknown, NIL);
+    v = EvalSizeofexpression((syntax_sizeofexpression(s)));
     break;
   default:
     fprintf(stderr, "[EvalExpression] Unexpected default case %td\n",
@@ -104,6 +104,30 @@ EvalCall(call c)
     }
 
     return(vout);
+}
+
+value EvalSizeofexpression(sizeofexpression soe)
+{
+  type t = type_undefined;
+  value v = value_undefined;
+  int i;
+
+  if(sizeofexpression_expression_p(soe)) {
+    expression e = sizeofexpression_expression(soe);
+
+    t = expression_to_type(e);
+  }
+  else {
+    t = sizeofexpression_type(soe);
+  }
+
+  i = type_memory_size(t);
+  v = make_value(is_value_constant, make_constant(is_constant_int, i));
+
+  if(sizeofexpression_expression_p(soe))
+    free_type(t);
+
+  return v;
 }
 
 value 

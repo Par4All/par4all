@@ -763,7 +763,7 @@ entity FindOrCreateCurrentEntity(string name,
 	    }
 	}
     }
-  pips_debug(5,"Entity global name %s\n\n",entity_name(ent));
+  pips_debug(5,"Entity global name \"%s\"\n\n",entity_name(ent));
   return ent;
 }
 
@@ -806,8 +806,8 @@ dimension MakeDimension(list le)
       expression e = EXPRESSION(CAR(le));
       int up;
 
-      if (expression_integer_value(e,&up))
-	/* use the integer value */
+      if (FALSE && expression_integer_value(e,&up))
+	/* use the integer value */ /* If we do this, we cannot restitute the source code */
 	  d = make_dimension(int_to_expression(0),int_to_expression(up-1));
       else 
 	/* Build a new expression e' == e-1 */
@@ -897,7 +897,10 @@ void UpdateArrayEntity(entity e, list lq, list le)
   if (type_undefined_p(t))
     {
       pips_debug(3,"First array dimension\n");
-      entity_type(e) = make_type_variable(make_variable(basic_undefined,CONS(DIMENSION,MakeDimension(le),NIL),lq));
+      entity_type(e) =
+	make_type_variable(make_variable(basic_undefined,
+					 CONS(DIMENSION,MakeDimension(le),NIL),
+					 lq));
     }
   else 
     {
