@@ -6,6 +6,8 @@
 #define REGION_ EFFECT_  /* for some left casts */
 #define REGION_TYPE EFFECT_TYPE
 #define REGION_NEWGEN_DOMAIN EFFECT_NEWGEN_DOMAIN
+#define gen_REGION_cons gen_effect_cons
+#define gen_region_cons gen_effect_cons
 
 #define region_undefined effect_undefined
 #define region_undefined_p(reg)  effect_undefined_p((reg))
