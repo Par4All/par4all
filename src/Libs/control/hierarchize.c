@@ -46,6 +46,10 @@ typedef interval_vertex_label arc_label;
 #define PREDECESSOR_TYPE SUCCESSOR_TYPE
 #define PREDECESSOR_NEWGEN_DOMAIN (-1)
 #define SUCCESSOR_NEWGEN_DOMAIN (-1)
+#define gen_SUCCESSOR_cons gen_cons
+#define gen_PREDECESSOR_cons gen_cons
+#define gen_successor_cons gen_cons
+#define gen_predecessor_cons gen_cons
 typedef successor predecessor;
 
 
