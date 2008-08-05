@@ -11,7 +11,6 @@
 #include "genC.h"
 #include "newgen_include.h"
 
-#define INDENT "\t" /* indendation unit when generating the files */
 #define FIELD  "" /* was: "field_" */
 #define STRUCT "_newgen_struct_" /* structure names */
 
@@ -47,7 +46,7 @@ int gen_size(int domain)
   struct gen_binding * bp = Domains+domain;
   int overhead = GEN_HEADER + IS_TABULATED(bp);
 
-  switch (bp->domain->ba.type) 
+  switch (bp->domain->ba.type)
   {
   case BASIS_DT:
   case ARRAY_DT:
@@ -57,7 +56,7 @@ int gen_size(int domain)
   case CONSTRUCTED_DT:
     if (bp->domain->co.op == OR_OP)
       return overhead + 2;
-    else if (bp->domain->co.op == AND_OP) 
+    else if (bp->domain->co.op == AND_OP)
     {
       int size ;
       struct domainlist * dlp = bp->domain->co.components ;
@@ -134,7 +133,7 @@ static string newgen_type_name(union domain * dp)
 	default:
 	  break;
 	}
-    default: fatal("[newgen_type_name] unexpected domain type %d\n", 
+    default: fatal("[newgen_type_name] unexpected domain type %d\n",
 		   dp->ba.type);
     }
     return NULL;
@@ -145,7 +144,7 @@ static string newgen_type_name(union domain * dp)
 static string newgen_argument_type_name(union domain * dp)
 {
     switch (dp->ba.type) {
-    case BASIS_DT: 
+    case BASIS_DT:
       if (same_string_p(dp->ba.constructand->name, "int"))
 	/* Even if the NewGen name is int, the C name can be intptr_t: */
 	return int_type();
@@ -153,9 +152,9 @@ static string newgen_argument_type_name(union domain * dp)
     case LIST_DT: return "list";
     case SET_DT: return "set";
     case ARRAY_DT: return dp->ar.element->name;
-    default: fatal("[newgen_argument_type_name] unexpected domain type %d\n", 
+    default: fatal("[newgen_argument_type_name] unexpected domain type %d\n",
 		   dp->ba.type);
-    }    
+    }
     return NULL;
 }
 
@@ -230,11 +229,11 @@ static void generate_make(
     case LIST_DT:
     case SET_DT:
     case ARRAY_DT:
-	fprintf(header, "%s%s", 
+	fprintf(header, "%s%s",
 		newgen_argument_type_name(dom),
 		newgen_type_name_close(dom));
 	break;
-    default: 
+    default:
 	fatal("[generate_make] unexpected domain type tag %d\n", domain_type);
     }
 
@@ -243,7 +242,7 @@ static void generate_make(
     /* CODE
      */
     fprintf(code, "%s make_%s(", name, name);
-    
+
     switch (domain_type)
     {
     case CONSTRUCTED_DT:
@@ -266,7 +265,7 @@ static void generate_make(
     case LIST_DT:
     case SET_DT:
     case ARRAY_DT:
-	fprintf(code, "%s%s a", 
+	fprintf(code, "%s%s a",
 		newgen_argument_type_name(dom),
 		newgen_type_name_close(dom));
 	break;
@@ -274,11 +273,10 @@ static void generate_make(
 
     fprintf(code,
 	    ") {\n"
-	    INDENT "return (%s) "
+	    "  return (%s) "
 	    "gen_alloc(%d*sizeof(gen_chunk), GEN_CHECK_ALLOC, %s_domain",
 	    name, gen_size(domain), name);
-    
-    
+
     switch (domain_type)
     {
     case CONSTRUCTED_DT:
@@ -320,13 +318,13 @@ static void generate_make(
 	  {
 	    /* UNIT case */
 	    /* header */
-	    fprintf(header, "extern %s make_%s_%s(void);\n", 
+	    fprintf(header,
+		    "extern %s make_%s_%s(void);\n",
 		    name, name, field);
-	    
 	    /* code */
-	    fprintf(code, 
+	    fprintf(code,
 		    "%s make_%s_%s(void) {\n"
-		    INDENT "return make_%s(is_%s_%s, UU);\n"
+		    "  return make_%s(is_%s_%s, UU);\n"
 		    "}\n",
 		    name, name, field, name, name, field);
 	  }
@@ -335,11 +333,10 @@ static void generate_make(
 	    /* header */
 	    fprintf(header, "extern %s make_%s_%s(%s);\n",
 		    name, name, field, typen);
-	    
 	    /* code */
-	    fprintf(code, 
+	    fprintf(code,
 		    "%s make_%s_%s(%s _field_) {\n"
-		    INDENT "return make_%s(is_%s_%s, (void*) _field_);\n"
+		    "  return make_%s(is_%s_%s, (void*) _field_);\n"
 		    "}\n",
 		    name, name, field, typen,
 		    name, name, field);
@@ -352,7 +349,7 @@ static void generate_make(
 /* generate the struct for bp.
  */
 static void generate_struct_members(
-    FILE * out,  
+    FILE * out,
     struct gen_binding * bp,
     int domain_type,
     int operator)
@@ -363,38 +360,38 @@ static void generate_struct_members(
 
     /* generate the structure
      */
-    fprintf(out, 
+    fprintf(out,
 	    "struct " STRUCT "%s_ {\n"
-	    INDENT "%s _type_;\n", 
+	    "  %s _type_;\n",
 	     bp->name, int_type());
- 
+
     /* there is an additionnal field in tabulated domains.
      */
     if (IS_TABULATED(bp))
-	fprintf(out, 
-		INDENT "%s _%s_index__;\n", 
+	fprintf(out,
+		"  %s _%s_index__;\n",
 		int_type(), bp->name);
 
     if (domain_type==CONSTRUCTED_DT && operator==OR_OP) {
-	fprintf(out, 
-		INDENT "%s _%s_tag__;\n" 
-		INDENT "union {\n",
+	fprintf(out,
+		"  %s _%s_tag__;\n"
+		"  union {\n",
 		int_type(), bp->name);
-	offset = INDENT;
+	offset = "  ";
     }
 
     if ((domain_type==CONSTRUCTED_DT && operator==ARROW_OP) ||
-	domain_type==LIST_DT || 
+	domain_type==LIST_DT ||
 	domain_type==SET_DT)
-	fprintf(out, 
-		INDENT "%s _%s_holder_;\n", 
+	fprintf(out,
+		"  %s _%s_holder_;\n",
 		newgen_type_name(dom), bp->name);
 
     if (domain_type==CONSTRUCTED_DT && operator!=ARROW_OP)
     {
       /* generate struct fields */
       for (dlp=dom->co.components; dlp!=NULL; dlp=dlp->cdr)
-	fprintf(out, "%s" INDENT "%s%s _%s_%s_" FIELD "; /* %s:%s%s */\n",
+	fprintf(out, "%s  %s%s _%s_%s_" FIELD "; /* %s:%s%s */\n",
 		offset,
 		newgen_type_name(dlp->domain),
 		newgen_type_name_close(dlp->domain),
@@ -404,18 +401,18 @@ static void generate_struct_members(
 		newgen_kind_label(dlp->domain));
     }
 
-    if (domain_type==CONSTRUCTED_DT && operator==OR_OP) 
-	fprintf(out, INDENT "} _%s_union_;\n", bp->name);
-    
+    if (domain_type==CONSTRUCTED_DT && operator==OR_OP)
+	fprintf(out, "  } _%s_union_;\n", bp->name);
+
     fprintf(out, "};\n\n");
 }
 
 /* access to members are managed thru macros.
  * cannot be functions because assign would not be possible.
- * it would be better to avoid having field names that appear twice... 
+ * it would be better to avoid having field names that appear twice...
  */
 static void generate_access_members(
-    FILE * out, 
+    FILE * out,
     struct gen_binding * bp,
     int domain_type,
     int operator)
@@ -426,20 +423,20 @@ static void generate_access_members(
     string name=bp->name;
     int gen_current_tag = 0; /* tag numbers? */
 
-    fprintf(out, 
-	    "#define %s_domain_number(x) ((x)->_type_%s)\n", 
+    fprintf(out,
+	    "#define %s_domain_number(x) ((x)->_type_%s)\n",
 	    name, int_type_access_complement());
 
     if (domain_type==CONSTRUCTED_DT && operator==OR_OP) {
 	in_between = TRUE;
-	fprintf(out, 
-		"#define %s_tag(x) ((x)->_%s_tag__%s)\n", 
+	fprintf(out,
+		"#define %s_tag(x) ((x)->_%s_tag__%s)\n",
 		name, name, int_type_access_complement());
     }
     else in_between = FALSE;
-    
-    if (domain_type==CONSTRUCTED_DT && operator==ARROW_OP) 
-	fprintf(out, "#define %s_hash_table(x) ((x)->_%s_holder_)\n", 
+
+    if (domain_type==CONSTRUCTED_DT && operator==ARROW_OP)
+	fprintf(out, "#define %s_hash_table(x) ((x)->_%s_holder_)\n",
 		name, name);
 
     if (domain_type==LIST_DT || domain_type==SET_DT)
@@ -450,7 +447,7 @@ static void generate_access_members(
 	fprintf(out, "#define %s_%s(x) ((x)->_%s_%s_" FIELD "\n",
 		name, dom->ba.constructor,
 		name, dom->ba.constructor);
-    
+
     if (domain_type==CONSTRUCTED_DT && operator!=ARROW_OP)
     {
 	for (dlp=dom->co.components; dlp!=NULL; dlp=dlp->cdr)
@@ -460,7 +457,7 @@ static void generate_access_members(
 	    {
 	      string field = dlp->domain->ba.constructor;
 
-	      fprintf(out, 
+	      fprintf(out,
 		      "#define is_%s_%s (%d)\n"
 		      "#define %s_%s_p(x) (%s_tag(x)==is_%s_%s)\n",
 		      name, field, gen_current_tag++,
@@ -468,16 +465,16 @@ static void generate_access_members(
 	    }
 
 	    /* accesses... */
-	    fprintf(out, 
+	    fprintf(out,
 		    "#define %s_%s_(x) %s_%s(x) /* old hack compatible */\n"
 		    "#define %s_%s(x) ((x)->",
-		    name, dlp->domain->ba.constructor, 
-		    name, dlp->domain->ba.constructor, 
+		    name, dlp->domain->ba.constructor,
+		    name, dlp->domain->ba.constructor,
 		    name, dlp->domain->ba.constructor);
 	    if (in_between) fprintf(out, "_%s_union_.", name);
 	    fprintf(out, "_%s_%s_" FIELD, name, dlp->domain->ba.constructor);
 	    c = newgen_access_name(dlp->domain);
-	    if (c && !inline_directly(dlp->domain)) 
+	    if (c && !inline_directly(dlp->domain))
 		fprintf(out, ".%c", c);
 	    fprintf(out, ")\n");
 	}
@@ -487,7 +484,7 @@ static void generate_access_members(
 /* constructed types: + x (and ->...)
  */
 static void generate_constructed(
-    FILE * header, 
+    FILE * header,
     FILE * code,
     struct gen_binding * bp,
     int operator)
@@ -558,21 +555,21 @@ static void generate_arrow(
 	    vname, name, name, kname, /* delete */
 	    name, name, kname /* bound_p */);
 
-    fprintf(code, 
+    fprintf(code,
 	    "%s apply_%s(%s f, %s k) {\n"
-	    INDENT "return (%s) HASH_GET(%c, %c, %s_hash_table(f), k);\n"
+	    "  return (%s) HASH_GET(%c, %c, %s_hash_table(f), k);\n"
 	    "}\n"
 	    "void update_%s(%s f, %s k, %s v) {\n"
-	    INDENT "HASH_UPDATE(%c, %c, %s_hash_table(f), k, v);\n"
+	    "  HASH_UPDATE(%c, %c, %s_hash_table(f), k, v);\n"
 	    "}\n"
 	    "void extend_%s(%s f, %s k, %s v) {\n"
-	    INDENT "HASH_EXTEND(%c, %c, %s_hash_table(f), k, v);\n"
+	    "  HASH_EXTEND(%c, %c, %s_hash_table(f), k, v);\n"
 	    "}\n"
 	    "%s delete_%s(%s f, %s k) {\n"
-	    INDENT "return (%s) HASH_DELETE(%c, %c, %s_hash_table(f), k);\n"
+	    "  return (%s) HASH_DELETE(%c, %c, %s_hash_table(f), k);\n"
 	    "}\n"
 	    "bool bound_%s_p(%s f, %s k) {\n"
-	    INDENT "return HASH_BOUND_P(%c, %c, %s_hash_table(f), k);\n"
+	    "  return HASH_BOUND_P(%c, %c, %s_hash_table(f), k);\n"
 	    "}\n",
 	    vname, name, name, kname, vname, kc, vc, name, /* apply */
 	    name, name, kname, vname, kc, vc, name, /* update */
@@ -633,9 +630,9 @@ generate_safe_definition(
     free(Name);
 }
 
-/* generate the needed stuff for bp. 
+/* generate the needed stuff for bp.
  */
-static void 
+static void
 generate_domain(
     FILE * header,
     FILE * code,
@@ -643,13 +640,13 @@ generate_domain(
 {
     union domain * dp = bp->domain;
     string name = bp->name, Name = strup(bp->name);
-    
+
     if (!IS_EXTERNAL(bp))
     {
 	/* assumes a preceeding safe definition.
-	 * non specific (and/or...) stuff. 
+	 * non specific (and/or...) stuff.
 	 */
-	fprintf(header, 
+	fprintf(header,
 		"/* %s\n */\n"
 		"#define %s(x) ((%s)((x).p))\n"
 		"#define %s_(x) ((x).e)\n"
@@ -661,7 +658,9 @@ generate_domain(
 		"extern void free_%s(%s);\n"
 		"extern %s check_%s(%s);\n"
 		"extern bool %s_consistent_p(%s);\n"
-		"extern bool %s_defined_p(%s);\n",
+		"extern bool %s_defined_p(%s);\n"
+		"#define gen_%s_cons gen_%s_cons\n"
+		"extern list gen_%s_cons(%s, list);\n",
 		Name, /* comments */
 		Name, name, /* defines... */
 		Name,
@@ -670,54 +669,64 @@ generate_domain(
 		name, name,
 		name, name, name, /* copy */
 		name, name, /* free */
-		name, name, name, /* check */  
-		name, name,  /* consistent */
-		name, name  /* defined */ );
-	
+		name, name, name, /* check */
+		name, name, /* consistent */
+		name, name, /* defined */
+		Name, name, /* gen cons */
+		name, name);
+
 	fprintf(code,
 		"/* %s\n */\n"
 		"%s copy_%s(%s p) {\n"
-		INDENT "return (%s) gen_copy_tree((gen_chunk*)p);\n"
+		"  return (%s) gen_copy_tree((gen_chunk*)p);\n"
 		"}\n"
 		"void free_%s(%s p) {\n"
-		INDENT "gen_free((gen_chunk*)p);}\n"
+		"  gen_free((gen_chunk*)p);}\n"
 		"%s check_%s(%s p) {\n"
-		INDENT "return (%s) gen_check((gen_chunk*)p, %s_domain);\n"
+		"  return (%s) gen_check((gen_chunk*)p, %s_domain);\n"
 		"}\n"
 		"bool %s_consistent_p(%s p) {\n"
-		INDENT "check_%s(p); return gen_consistent_p((gen_chunk*)p);\n"
+		"  check_%s(p); return gen_consistent_p((gen_chunk*)p);\n"
 		"}\n"
 		"bool %s_defined_p(%s p) {\n"
-		INDENT "return gen_defined_p((gen_chunk*)p);\n"
+		"  return gen_defined_p((gen_chunk*)p);\n"
+		"}\n"
+		"list gen_%s_cons(%s p, list l) {\n"
+		"  return gen_typed_cons(%s_NEWGEN_DOMAIN, p, l);\n"
 		"}\n",
 		Name,
 		name, name, name, name, /* copy */
 		name, name, /* free */
 		name, name, name, name, name, /* check */
 		name, name, name, /* consistent */
-		name, name /* consistent */ );
+		name, name, /* consistent */
+		name, name, Name /* gen cons */);
 
 	if (IS_TABULATED(bp))
 	{
 	    /* tabulated */
-	    fprintf(header, 
+	    fprintf(header,
 		    "extern %s gen_find_%s(char *);\n"
 		    "extern void write_tabulated_%s(FILE *);\n"
-		    "extern void read_tabulated_%s(FILE *);\n", 
+		    "extern void read_tabulated_%s(FILE *);\n",
 		    name, name, /* find */
 		    name, /* write */
 		    name /* read */);
-	    fprintf(code, 
-		    "%s gen_find_%s(char * s)\n"
-		    "{ return (%s) gen_find_tabulated(s, %s_domain); }\n"
-		    "void write_tabulated_%s(FILE * f)\n"
-		    "{ (void) gen_write_tabulated(f, %s_domain); }\n"
-		    "void read_tabulated_%s(FILE * f)\n"
-		    "{ int domain = gen_read_tabulated(f, 0);\n"
+	    fprintf(code,
+		    "%s gen_find_%s(char * s) {\n"
+		    "  return (%s) gen_find_tabulated(s, %s_domain);\n"
+		    "}\n"
+		    "void write_tabulated_%s(FILE * f) {\n"
+		    "  (void) gen_write_tabulated(f, %s_domain);\n"
+		    "}\n"
+		    "void read_tabulated_%s(FILE * f) {\n"
+		    "  int domain = gen_read_tabulated(f, 0);\n"
 		    "  if (domain!=%s_domain) {\n"
 		    "    fprintf(stderr, " DomainNumberError ",\n"
 		    "            domain, %s_domain);\n"
-		    "    abort(); }}\n",
+		    "    abort();\n"
+		    "  }\n"
+		    "}\n",
 		    name, name, name, name, /* find */
 		    name, name, /* write */
 		    name, name, name, name /* read */);
@@ -725,34 +734,36 @@ generate_domain(
 	else
 	{
 	    /* NOT tabulated */
-	    fprintf(header, 
+	    fprintf(header,
 		    "extern void write_%s(FILE *, %s);\n"
 		    "extern %s read_%s(FILE *);\n",
 		    name, name, /* write */
 		    name, name /* read */);
-	    fprintf(code, 
-		    "void write_%s(FILE * f, %s p)\n"
-		    "{ gen_write(f,(gen_chunk*)p); }\n"
-		    "%s read_%s(FILE * f)\n"
-		    "{ return (%s) gen_read(f); }\n",
+	    fprintf(code,
+		    "void write_%s(FILE * f, %s p) {\n"
+		    "  gen_write(f, (gen_chunk *) p);\n"
+		    "}\n"
+		    "%s read_%s(FILE * f) {\n"
+		    "  return (%s) gen_read(f);\n"
+		    "}\n",
 		    name, name, /* write */
 		    name, name, name /* read */);
 	}
     }
-    
+
     switch (dp->ba.type) {
     case CONSTRUCTED_DT:
 	switch (dp->co.op) {
-	case AND_OP: 
+	case AND_OP:
 	    generate_constructed(header, code, bp, AND_OP);
 	    break;
 	case OR_OP:
 	    generate_constructed(header, code, bp, OR_OP);
 	    break;
-	case ARROW_OP: 
+	case ARROW_OP:
 	    generate_constructed(header, code, bp, ARROW_OP);
 	    generate_arrow(header, code, bp);
-	    break;	    
+	    break;
 	default:
 	    fatal("[generate_domain] unexpected constructed %d\n", dp->co.op);
 	}
@@ -811,7 +822,7 @@ void gencode(string file)
     int i;
     FILE * header, * code;
 
-    if (file==NULL) 
+    if (file==NULL)
       fatal("[gencode] no file name specified (%p)\n", no_warning);
 
     if (sizeof(void *)!=sizeof(gen_chunk))
@@ -829,10 +840,10 @@ void gencode(string file)
 	struct gen_binding * bp = &Domains[i];
 	if (bp->name && !IS_INLINABLE(bp) && !IS_TAB(bp))
 	    if (IS_EXTERNAL(bp))
-		fprintf(code, "typedef void * %s;\n", bp->name);	
+		fprintf(code, "typedef void * %s;\n", bp->name);
     }
 
-    fprintf(code, 
+    fprintf(code,
 	    "\n"
 	    "#include <stdio.h>\n"
 	    "#include <stdlib.h>\n"
@@ -849,7 +860,7 @@ void gencode(string file)
 	if (bp->name && !IS_INLINABLE(bp) && !IS_TAB(bp))
 	    generate_safe_definition(header, bp, file);
     }
-    
+
     /* then generate actual declarations.
      */
     for (i=0; i<MAX_DOMAIN; i++)
