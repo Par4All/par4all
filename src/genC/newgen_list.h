@@ -15,14 +15,15 @@
 */
 
 /* $Id$
- * These are the functions defined in the Newgen list library. 
+ *
+ * These are the functions defined in the Newgen list library.
  */
 
 #ifndef newgen_list_included
 #define newgen_list_included
 
-typedef struct cons { 
-  gen_chunk car; 
+typedef struct cons {
+  gen_chunk car;
   struct cons *cdr ;
 } cons, * list ;
 
@@ -38,21 +39,34 @@ typedef struct cons {
 #define REFCAR(pc) (&(CAR(pc).p))
 
 #ifdef NEWGEN_TYPED_CONS
-#define CONS(type,x,l) gen_typed_cons((type##_NEWGEN_DOMAIN),(void*)(x),(l))
+#define CONS(_t_,_i_,_l_) gen_##_t_##_cons((_i_),(_l_))
+#define gen_BOOL_cons gen_bool_cons
+#define gen_INT_cons gen_int_cons
+#define gen_LIST_cons gen_list_cons
+#define gen_STRING_cons gen_string_cons
 #else
 #define CONS(type,x,l) gen_cons((void*) (x), (l))
 #endif /* NEWGEN_TYPED_CONS */
 
-#define MAPL(_map_list_cp,_code,_l) \
-	{cons* _map_list_cp = (_l) ; \
-	for(;!ENDP(_map_list_cp);POP(_map_list_cp)) _code;}
+#define MAPL(_map_list_cp,_code,_l)					\
+  {									\
+    list _map_list_cp = (_l) ;						\
+    for(; !ENDP(_map_list_cp); POP(_map_list_cp))			\
+      _code;								\
+  }
 
 /* MAP(TYPE, var, code, list)
  */
-#define MAP(_map_CASTER, _map_item, _map_code, _map_list) \
-{ list _map_item##_list = (_map_list); _map_CASTER##_TYPE _map_item;\
-  for(; _map_item##_list; POP(_map_item##_list))\
-  { _map_item = _map_CASTER(CAR(_map_item##_list)); _map_code; }}
+#define MAP(_map_CASTER, _map_item, _map_code, _map_list)		\
+  {									\
+    list _map_item##_list = (_map_list);				\
+    _map_CASTER##_TYPE _map_item;					\
+    for(; _map_item##_list; POP(_map_item##_list))			\
+    {									\
+      _map_item = _map_CASTER(CAR(_map_item##_list));			\
+      _map_code;							\
+    }									\
+  }
 
 /* Fonctions de list.c 
  */
@@ -104,6 +118,10 @@ extern list gen_make_list GEN_PROTO((int, ...));
 extern list gen_copy_string_list GEN_PROTO((list));
 extern void gen_free_string_list GEN_PROTO((list));
 extern list gen_cons GEN_PROTO((void *, list));
+extern list gen_bool_cons GEN_PROTO((bool, list));
+extern list gen_int_cons GEN_PROTO((int, list));
+extern list gen_string_cons GEN_PROTO((string, list));
+extern list gen_list_cons GEN_PROTO((list, list));
 extern list gen_typed_cons GEN_PROTO((intptr_t, void *, list));
 extern void gen_list_and GEN_PROTO((list *, list));
 extern void gen_list_and_not GEN_PROTO((list *, list));
