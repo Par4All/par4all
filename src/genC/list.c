@@ -625,6 +625,27 @@ list gen_typed_cons(intptr_t type, void * item, list next)
   return gen_cons(item, next);
 }
 
+/* typed cons for "basic" types */
+list gen_bool_cons(bool b, list l)
+{
+  return gen_cons((void *) b, l);
+}
+
+list gen_int_cons(int i, list l)
+{
+  return gen_cons((void *) i, l);
+}
+
+list gen_string_cons(string s, list l)
+{
+  return gen_cons((void *) s, l);
+}
+
+list gen_list_cons(list i, list l)
+{
+  return gen_cons((void *) i, l);
+}
+
 /* Compute A = A inter B: complexity in O(n2) */
 void
 gen_list_and(list * a,
