@@ -78,7 +78,7 @@ $debug checking
 
 [ "$#" -eq 0 ] || usage
 [ "$basedir" ] || usage
-[ -d $srcdir ] || usage 1 "no runtime directory: $srcdir"
+[ -d $srcdir ] || echo "no runtime directory: $srcdir" >&2
 
 name=`echo ${name:-\`basename $basedir .database\`} | tr 'A-Z' 'a-z'`
 
