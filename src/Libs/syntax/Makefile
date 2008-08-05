@@ -27,6 +27,8 @@ LIB_CFILES	= $(INC_CFILES) $(DERIVED_CFILES)
 INC_TARGET =    $(TARGET).h
 LIB_TARGET =    lib$(TARGET).a
 
+VALIDATE_TARGET	= Syntax
+
 # common stuff
 ifdef PIPS_ROOT
 ROOT    = $(PIPS_ROOT)
