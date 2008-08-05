@@ -96,7 +96,7 @@ Parsed code
 extern void foo(int ,int );
 void foo(int m,int n)
 {
-   int A[m-1+1];
+   int A[m];
    int j;
-   int B[n-1+1];
+   int B[n];
 }

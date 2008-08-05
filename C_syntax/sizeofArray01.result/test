@@ -99,7 +99,7 @@ extern int m;
 extern void fcompat();
 void fcompat()
 {
-   int a[n-1+1];
-   int (*p)[n+1-1+1];
-   int c[m-1+1];
+   int a[n];
+   int (*p)[n+1];
+   int c[m];
 }

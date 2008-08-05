@@ -90,5 +90,5 @@ int b = 20;
 extern void foo();
 void foo()
 {
-   int array2[b-1+1];
+   int array2[b];
 }

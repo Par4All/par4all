@@ -94,7 +94,7 @@ Parsed code
 extern int foo(int );
 int foo(int a)
 {
-   int X[a-1+1];
-   int Y[a-1+1];
+   int X[a];
+   int Y[a];
    return 0;
 }

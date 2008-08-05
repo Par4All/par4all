@@ -170,8 +170,16 @@ void foo(int x)
    if (x>1) {
       int x;
    }
+   else
+    {
+      int x;
+   }
    if (y>1) {
       int x;
+   }
+   else
+    {
+      int y;
    }
 }
 
@@ -192,8 +200,16 @@ void foo(int x)
    if (x>1) {
       int x;
    }
+   else
+    {
+      int x;
+   }
    if (y>1) {
       int x;
+   }
+   else
+    {
+      int y;
    }
 }
 

@@ -177,7 +177,7 @@ struct _IO_FILE {
    extern void *__pad1;
    extern void *__pad2;
    extern int _mode;
-   extern char _unused2[15*sizeof(int )-2*sizeof(void *)-1+1];
+   extern char _unused2[15*sizeof(int )-2*sizeof(void *)];
 };
 typedef struct _IO_FILE _IO_FILE;
 extern struct _IO_FILE_plus _IO_2_1_stdin_;

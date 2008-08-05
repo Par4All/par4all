@@ -29,6 +29,9 @@ Variable list:
 	Declared entity "TOP-LEVEL:__overflow" with type "functional" "_IO_FILE * x int  -> int "
 	Declared entity "TOP-LEVEL:__uflow" with type "functional" "_IO_FILE * -> int "
 	Declared entity "TOP-LEVEL:__underflow" with type "functional" "_IO_FILE * -> int "
+	Declared entity "TOP-LEVEL:__woverflow" with type "functional" "_IO_FILE * x wint_t  -> wint_t "
+	Declared entity "TOP-LEVEL:__wuflow" with type "functional" "_IO_FILE * -> wint_t "
+	Declared entity "TOP-LEVEL:__wunderflow" with type "functional" "_IO_FILE * -> wint_t "
 	Declared entity "TOP-LEVEL:clearerr" with type "functional" "FILE * -> void"
 	Declared entity "TOP-LEVEL:fclose" with type "functional" "FILE * -> int "
 	Declared entity "TOP-LEVEL:feof" with type "functional" "FILE * -> int "
@@ -85,13 +88,48 @@ External variable list:
 	Declared external entity "main!:PIPS_STRUCT_2^__val"	with type "variable" __u_long 
 	Declared external entity "main!:PIPS_STRUCT_3^__val"	with type "variable" int 
 	Declared external entity "main!:PIPS_STRUCT_4^__count"	with type "variable" int 
-	Declared external entity "main!:PIPS_UNION_5^__wch"	with type "variable" unsigned int 
+	Declared external entity "main!:PIPS_UNION_5^__wch"	with type "variable" wint_t 
 	Declared external entity "main!:PIPS_UNION_5^__wchb"	with type "variable" char 
 	Declared external entity "main!:PIPS_STRUCT_4^__value"	with type "variable" union PIPS_UNION_5 
 	Declared external entity "main!:PIPS_STRUCT_6^__pos"	with type "variable" __off_t 
 	Declared external entity "main!:PIPS_STRUCT_6^__state"	with type "variable" __mbstate_t 
 	Declared external entity "main!:PIPS_STRUCT_7^__pos"	with type "variable" __off64_t 
 	Declared external entity "main!:PIPS_STRUCT_7^__state"	with type "variable" __mbstate_t 
+	Declared external entity "main!:__gconv_trans_data^__trans_fct"	with type "variable" __gconv_trans_fct 
+	Declared external entity "main!:__gconv_trans_data^__trans_context_fct"	with type "variable" __gconv_trans_context_fct 
+	Declared external entity "main!:__gconv_trans_data^__trans_end_fct"	with type "variable" __gconv_trans_end_fct 
+	Declared external entity "main!:__gconv_trans_data^__data"	with type "variable" void *
+	Declared external entity "main!:__gconv_trans_data^__next"	with type "variable" struct __gconv_trans_data *
+	Declared external entity "main!:__gconv_step^__shlib_handle"	with type "variable" struct __gconv_loaded_object *
+	Declared external entity "main!:__gconv_step^__modname"	with type "variable" char *
+	Declared external entity "main!:__gconv_step^__counter"	with type "variable" int 
+	Declared external entity "main!:__gconv_step^__from_name"	with type "variable" char *
+	Declared external entity "main!:__gconv_step^__to_name"	with type "variable" char *
+	Declared external entity "main!:__gconv_step^__fct"	with type "variable" __gconv_fct 
+	Declared external entity "main!:__gconv_step^__btowc_fct"	with type "variable" __gconv_btowc_fct 
+	Declared external entity "main!:__gconv_step^__init_fct"	with type "variable" __gconv_init_fct 
+	Declared external entity "main!:__gconv_step^__end_fct"	with type "variable" __gconv_end_fct 
+	Declared external entity "main!:__gconv_step^__min_needed_from"	with type "variable" int 
+	Declared external entity "main!:__gconv_step^__max_needed_from"	with type "variable" int 
+	Declared external entity "main!:__gconv_step^__min_needed_to"	with type "variable" int 
+	Declared external entity "main!:__gconv_step^__max_needed_to"	with type "variable" int 
+	Declared external entity "main!:__gconv_step^__stateful"	with type "variable" int 
+	Declared external entity "main!:__gconv_step^__data"	with type "variable" void *
+	Declared external entity "main!:__gconv_step_data^__outbuf"	with type "variable" unsigned char *
+	Declared external entity "main!:__gconv_step_data^__outbufend"	with type "variable" unsigned char *
+	Declared external entity "main!:__gconv_step_data^__flags"	with type "variable" int 
+	Declared external entity "main!:__gconv_step_data^__invocation_counter"	with type "variable" int 
+	Declared external entity "main!:__gconv_step_data^__internal_use"	with type "variable" int 
+	Declared external entity "main!:__gconv_step_data^__statep"	with type "variable" __mbstate_t *
+	Declared external entity "main!:__gconv_step_data^__state"	with type "variable" __mbstate_t 
+	Declared external entity "main!:__gconv_step_data^__trans"	with type "variable" struct __gconv_trans_data *
+	Declared external entity "main!:__gconv_info^__nsteps"	with type "variable" size_t 
+	Declared external entity "main!:__gconv_info^__steps"	with type "variable" struct __gconv_step *
+	Declared external entity "main!:__gconv_info^__data"	with type "variable" struct __gconv_step_data 
+	Declared external entity "main!:PIPS_UNION_10^__cd"	with type "variable" struct __gconv_info 
+	Declared external entity "main!:PIPS_STRUCT_11^__cd"	with type "variable" struct __gconv_info 
+	Declared external entity "main!:PIPS_STRUCT_11^__data"	with type "variable" struct __gconv_step_data 
+	Declared external entity "main!:PIPS_UNION_10^__combined"	with type "variable" struct PIPS_STRUCT_11 
 	Declared external entity "main!:_IO_marker^_next"	with type "variable" struct _IO_marker *
 	Declared external entity "main!:_IO_marker^_sbuf"	with type "variable" struct _IO_FILE *
 	Declared external entity "main!:_IO_marker^_pos"	with type "variable" int 
@@ -119,9 +157,6 @@ External variable list:
 	Declared external entity "main!:_IO_FILE^_offset"	with type "variable" __off64_t 
 	Declared external entity "main!:_IO_FILE^__pad1"	with type "variable" void *
 	Declared external entity "main!:_IO_FILE^__pad2"	with type "variable" void *
-	Declared external entity "main!:_IO_FILE^__pad3"	with type "variable" void *
-	Declared external entity "main!:_IO_FILE^__pad4"	with type "variable" void *
-	Declared external entity "main!:_IO_FILE^__pad5"	with type "variable" size_t 
 	Declared external entity "main!:_IO_FILE^_mode"	with type "variable" int 
 	Declared external entity "main!:_IO_FILE^_unused2"	with type "variable" char 
 	Declared external entity "TOP-LEVEL:_IO_2_1_stdin_"	with type "variable" struct _IO_FILE_plus 
@@ -130,6 +165,9 @@ External variable list:
 	Declared external entity "TOP-LEVEL:__underflow"	with type "functional" "_IO_FILE * -> int "
 	Declared external entity "TOP-LEVEL:__uflow"	with type "functional" "_IO_FILE * -> int "
 	Declared external entity "TOP-LEVEL:__overflow"	with type "functional" "_IO_FILE * x int  -> int "
+	Declared external entity "TOP-LEVEL:__wunderflow"	with type "functional" "_IO_FILE * -> wint_t "
+	Declared external entity "TOP-LEVEL:__wuflow"	with type "functional" "_IO_FILE * -> wint_t "
+	Declared external entity "TOP-LEVEL:__woverflow"	with type "functional" "_IO_FILE * x wint_t  -> wint_t "
 	Declared external entity "TOP-LEVEL:_IO_getc"	with type "functional" "_IO_FILE * -> int "
 	Declared external entity "TOP-LEVEL:_IO_putc"	with type "functional" "int  x _IO_FILE * -> int "
 	Declared external entity "TOP-LEVEL:_IO_feof"	with type "functional" "_IO_FILE * -> int "

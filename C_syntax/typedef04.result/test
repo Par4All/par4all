@@ -10,9 +10,9 @@ struct s {
 extern void typedef04(int ,struct s ,struct s *);
 void typedef04(int n,struct s d,struct s *pd)
 {
-   typedef int narray_t[n+2-1+1];
-   typedef int darray_t[d.dim-1+1];
-   typedef int parray_t[pd->dim-1+1];
+   typedef int narray_t[n+2];
+   typedef int darray_t[d.dim];
+   typedef int parray_t[pd->dim];
    narray_t a1;
    darray_t a2;
 }
