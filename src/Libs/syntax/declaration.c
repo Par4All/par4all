@@ -529,10 +529,11 @@ void DeclarePointer(entity ptr, entity pointed_array, list decl_dims)
      * computation. A heap area must be added.
      */
 
-    dims = CONS(EXPRESSION,
-		make_dimension(MakeIntegerConstantExpression("1"),
-			       MakeNullaryCall(CreateIntrinsic(UNBOUNDED_DIMENSION_NAME))),
-		NIL);
+    dims =
+      CONS(DIMENSION,
+	   make_dimension(MakeIntegerConstantExpression("1"),
+		  MakeNullaryCall(CreateIntrinsic(UNBOUNDED_DIMENSION_NAME))),
+	   NIL);
 
     /* dims = decl_dims; */
   }
