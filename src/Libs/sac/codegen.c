@@ -248,7 +248,7 @@ bool analyse_reference(reference r, referenceInfo i)
 	      else
 	         return FALSE;
 
-	      referenceInfo_lExp(i) = CONS(REFERENCE, expression_undefined, referenceInfo_lExp(i));
+	      referenceInfo_lExp(i) = CONS(EXPRESSION, expression_undefined, referenceInfo_lExp(i));
 	   }
 	   // r is for exemple A(EXP + 3)(it is supported)
 	   // or A(EXP1 + EXP2)(it's not supported)
@@ -271,7 +271,7 @@ bool analyse_reference(reference r, referenceInfo i)
 		 // "If r is A(EXP + 3), e should contain 3"
 	         case is_syntax_call:
 	         {
-                    referenceInfo_lExp(i) = CONS(REFERENCE, EXPRESSION(CAR(arg)), referenceInfo_lExp(i));
+                    referenceInfo_lExp(i) = CONS(EXPRESSION, EXPRESSION(CAR(arg)), referenceInfo_lExp(i));
 
 		    call cc = syntax_call(e);
 
@@ -291,7 +291,7 @@ bool analyse_reference(reference r, referenceInfo i)
 		 // "If r is A(EXP1 + EXP2), e should contain EXP2"
 	         case is_syntax_reference:
 	         {
-	            referenceInfo_lExp(i) = CONS(REFERENCE, exp, referenceInfo_lExp(i));
+	            referenceInfo_lExp(i) = CONS(EXPRESSION, exp, referenceInfo_lExp(i));
 	            referenceInfo_lOffset(i) = CONS(INT, 0, referenceInfo_lOffset(i));
 		    break;
 	         }
@@ -316,7 +316,7 @@ bool analyse_reference(reference r, referenceInfo i)
 	      {
 	         case is_syntax_call:
 	         {
-                    referenceInfo_lExp(i) = CONS(REFERENCE, EXPRESSION(CAR(arg)), referenceInfo_lExp(i));
+                    referenceInfo_lExp(i) = CONS(EXPRESSION, EXPRESSION(CAR(arg)), referenceInfo_lExp(i));
 
 		    call cc = syntax_call(e);
 
@@ -334,7 +334,7 @@ bool analyse_reference(reference r, referenceInfo i)
 
 	         case is_syntax_reference:
 	         {
-	            referenceInfo_lExp(i) = CONS(REFERENCE, exp, referenceInfo_lExp(i));
+	            referenceInfo_lExp(i) = CONS(EXPRESSION, exp, referenceInfo_lExp(i));
 	            referenceInfo_lOffset(i) = CONS(INT, 0, referenceInfo_lOffset(i));
 		    break;
 	         }
@@ -347,7 +347,7 @@ bool analyse_reference(reference r, referenceInfo i)
 	   // If nothing special has been detected
 	   else
 	   {
-	      referenceInfo_lExp(i) = CONS(REFERENCE, exp, referenceInfo_lExp(i));
+	      referenceInfo_lExp(i) = CONS(EXPRESSION, exp, referenceInfo_lExp(i));
 	      referenceInfo_lOffset(i) = CONS(INT, 0, referenceInfo_lOffset(i));
 	   }
 	   break;
@@ -355,7 +355,7 @@ bool analyse_reference(reference r, referenceInfo i)
 
 	// If nothing special has been detected
         case is_syntax_reference:
-	   referenceInfo_lExp(i) = CONS(REFERENCE, exp, referenceInfo_lExp(i));
+	   referenceInfo_lExp(i) = CONS(EXPRESSION, exp, referenceInfo_lExp(i));
 	   referenceInfo_lOffset(i) = CONS(INT, 0, referenceInfo_lOffset(i));
 	   break;
 	    

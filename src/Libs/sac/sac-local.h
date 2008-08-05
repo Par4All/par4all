@@ -50,6 +50,7 @@ void init_dep_graph(graph dg);
 list expression_to_proper_effects(expression e);
 
 #define STATEMENT_INFO_NEWGEN_DOMAIN SIMDSTATEMENTINFO_NEWGEN_DOMAIN
+#define gen_STATEMENT_INFO_cons gen_SIMDSTATEMENTINFO_cons
 
 /* simd_loop_unroll.c */
 

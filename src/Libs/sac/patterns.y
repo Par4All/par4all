@@ -27,6 +27,8 @@ int patterns_yylex();
 /* fake helpers */
 #define TOKEN_NEWGEN_DOMAIN (-1)
 #define ARGUMENT_NEWGEN_DOMAIN (-1)
+#define gen_TOKEN_cons(t,l) gen_cons(t,l)
+#define gen_ARGUMENT_cons(a,l) gen_cons(a,l)
 
 %}
 
@@ -157,7 +159,7 @@ pattern:
                                         }
 
 types_list:
-       type types_list                  { $$ = CONS(TYPE, $1, $2); }
+       type types_list                  { $$ = CONS(int, $1, $2); }
      |                                  { $$ = NIL; }
 
 type:
