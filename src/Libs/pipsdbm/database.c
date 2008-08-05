@@ -356,6 +356,8 @@ typedef struct
   string res_name;
 } t_tmp_result, * p_tmp_result;
 
+#define gen_DB_VOID_cons(i,l) gen_cons(i,l)
+
 static p_tmp_result make_tmp_result(int t, string on, string rn)
 {
   p_tmp_result res = (p_tmp_result) malloc(sizeof(t_tmp_result));
