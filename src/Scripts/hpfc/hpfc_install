@@ -90,17 +90,18 @@ name=`echo ${name:-\`basename $basedir .database\`} | tr 'A-Z' 'a-z'`
   mkdir $tdir
 }
 
-#
 $debug installating
 
 if [ "$toinstall" ]
 then
   $verb "installing in $tdir"
 
-  {
-    echo "NAME = $name" 
-    cat $srcdir/hpfc_Makefile_init 
-  } > $tdir/Makefile
+  src_makefile=$srcdir/hpfc_Makefile_init
+  if [ -f $src_makefile ]
+  then
+    echo "NAME = $name"
+    cat $src_makefile
+  fi > $tdir/Makefile
 
   cp $basedir/Src/* $tdir
 
@@ -108,17 +109,16 @@ then
   [ "$reffiles" ] && set `echo "$reffiles" | cut -d " " -f 2`
 
   $debug rebuilding initial source file
-  for f 
+  for f
   do
-     $debug "considering $f"
+    $debug "considering $f"
     egrep -s '(^[!cC\*][Ff][Cc][Dd]\$[ 	]*[Ff][Aa][Kk][Ee][ 	]*$|hpfc9)' \
-	$f || { $debug "adding $f" ; cat $f ; } 
+	$f || { $debug "adding $f" ; cat $f ; }
   done > $tdir/$name.f
 
   chmod ug+w $tdir/*
 fi
 
-#
 $debug making
 
 if [ "$tomake" ] 
