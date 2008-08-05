@@ -99,7 +99,7 @@ do
     x) verbose=':' ;;
     D) debug='deb' ;;
     d) DELETE='Delete' ;;
-    M) MAKE='gmake' ;;
+    M) MAKE='make' ;;
     q) STDOUT='/dev/null' ;;
     s) STDERR='/dev/null' ;;
     n) HPFFILES="$HPFC_DIR/Tests/hpftest$OPTARG.f" ;;
@@ -114,7 +114,7 @@ do
 	 full)
 	     DELETE='Delete' ;
 	     HPFC='-p HPFC_INSTALL' ;
-	     MAKE='gmake' ;;
+	     MAKE='make' ;;
 	 timing)
 	     TIMEPROP='-1 LOG_TIMINGS' ;;
 	 void|none) : ;;
