@@ -17,8 +17,8 @@ void generate01()
 {
    int i = 0;
    double x = 1.;
-
-   //// use an undeclared function without source code, which returns
+   
+   // use an undeclared function without source code, which returns
    // implictly an int
    func(i, x);
 }
@@ -36,8 +36,8 @@ void generate01()
 
 //  P() {}
 
-
-   //// use an undeclared function without source code, which returns
+   
+   // use an undeclared function without source code, which returns
    // implictly an int
    func(i, x);
 }
