@@ -1,0 +1,5 @@
+Chose a specific preprocessor for this case: cpp -C -P
+
+PARSED PRINTED FILE FOR MODULE comment04!
+
+void foo();

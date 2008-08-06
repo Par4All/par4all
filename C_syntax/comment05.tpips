@@ -1,0 +1,23 @@
+delete comment05
+create comment05 comment05.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+echo
+echo PARSED PRINTED FILE for module comment05!
+echo
+
+display PARSED_PRINTED_FILE[comment05!]
+
+echo
+echo End of PARSED PRINTED FILE for module comment05!
+echo
+
+close
+
+# delete comment05  
+
+quit
