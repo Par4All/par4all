@@ -1,5 +1,0 @@
-#!/bin/sh
-PIPS_CPP="cpp -C -P"
-echo Chose a specific preprocessor for this case: $PIPS_CPP
-export PIPS_CPP
-tpips comment04.tpips
