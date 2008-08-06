@@ -26,7 +26,7 @@
 #define MODULE_SEP 			':'
 
 #define MODULE_SEP_STRING 		":"
-#define LABEL_PREFIX 			"@"
+#define LABEL_PREFIX 			"@" // Often assumed to be one character long
 #define MAIN_PREFIX 			"%"
 #define COMMON_PREFIX 			"~"
 #define BLOCKDATA_PREFIX 		"&"
@@ -40,7 +40,7 @@
 #define MEMBER_SEP_CHAR 		'^'
 #define STRUCT_PREFIX 			"#" // Conflict with value naming in transformer
 #define STRUCT_PREFIX_CHAR		'#'
-#define UNION_PREFIX 			"'" // Conflict with C character constants
+#define UNION_PREFIX 			"'" /* Conflict with C character constants */
 #define UNION_PREFIX_CHAR		'\''
 #define ENUM_PREFIX 			"?"
 #define TYPEDEF_PREFIX 			"$"
@@ -53,7 +53,14 @@
 #define HEAP_AREA_LOCAL_NAME 		"*HEAP*"
 #define STACK_AREA_LOCAL_NAME 		"*STACK*"
 
-#define EMPTY_LABEL_NAME LABEL_PREFIX
+/* For enum and struct and union without names (see c_syntaxcyacc.y */
+#define DUMMY_ENUM_PREFIX               "_PIPS_ENUM_"
+#define DUMMY_STRUCT_PREFIX             "_PIPS_STRUCT_"
+#define DUMMY_UNION_PREFIX              "_PIPS_UNION_"
+#define DUMMY_ABSTRACT_PREFIX           "_PIPS_ABSTRACT_"
+#define DUMMY_MEMBER_PREFIX             "_PIPS_MEMBER_" /* For bit fields */
+
+#define EMPTY_LABEL_NAME                LABEL_PREFIX
 #define LIST_DIRECTED_FORMAT_NAME 	"LIST-DIRECTED"
 
 #define TOP_LEVEL_MODULE_NAME 		"TOP-LEVEL"

@@ -3538,8 +3538,10 @@ static list words_sizeofexpression(sizeofexpression obj)
 {
   list pc = NIL;
   pc = CHAIN_SWORD(pc,"sizeof(");
-  if (sizeofexpression_type_p(obj))
-    pc = gen_nconc(pc, words_type(sizeofexpression_type(obj)));
+  if (sizeofexpression_type_p(obj)) {
+    list pca = words_type(sizeofexpression_type(obj));
+    pc = gen_nconc(pc, pca);
+  }
   else
     pc = gen_nconc(pc, words_expression(sizeofexpression_expression(obj)));
   pc = CHAIN_SWORD(pc,")"); 

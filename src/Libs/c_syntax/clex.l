@@ -317,8 +317,9 @@ void init_C_comment()
 
 /* This should be used instead of the manual computation of
    C_line_number...
-   %option   yylineno
 */
+%option   yylineno
+
  /* To deal more cleanly with the comments:
     %x COMMENT
  */
@@ -702,7 +703,8 @@ L\"([^\"]|(\"\")|(\\\"))*\"	{
 
 void yyerror(char * msg)
 {
-    user_warning("yyerror", "C %s near \"%s\"\n", msg, yytext);
+    user_warning("yyerror", "C %s near \"%s\" at line %d\n", msg, yytext, yylineno);
+    CParserError("Parsing failed\n");
 }
 
 #ifndef yywrap

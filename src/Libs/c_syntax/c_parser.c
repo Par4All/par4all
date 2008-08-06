@@ -156,6 +156,8 @@ void CParserError(char *msg)
     CleanLocalEntities(mod);
   }
 
+  // Free CalledModules?
+
   // Could not rebuild filename (A. Mensi)
   // c_in = safe_fopen(file_name, "r");
   // safe_fclose(c_in, file_name);

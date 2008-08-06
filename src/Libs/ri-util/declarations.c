@@ -232,35 +232,35 @@ list words_basic(basic obj)
 	  else 
 	    {
 	      switch (basic_int(obj)) {
-		case 1: pc = CHAIN_SWORD(pc,"char "); 
+		case 1: pc = CHAIN_SWORD(pc,"char"); 
 		  break;
-		case 2: pc = CHAIN_SWORD(pc,"short "); 
+		case 2: pc = CHAIN_SWORD(pc,"short"); 
 		  break;
-		case 4: pc = CHAIN_SWORD(pc,"int "); 
+		case 4: pc = CHAIN_SWORD(pc,"int"); 
 		  break;
-		case 6: pc = CHAIN_SWORD(pc,"long "); 
+		case 6: pc = CHAIN_SWORD(pc,"long"); 
 		  break;
-		case 8: pc = CHAIN_SWORD(pc,"long long "); 
+		case 8: pc = CHAIN_SWORD(pc,"long long"); 
 		  break;
-		case 11: pc = CHAIN_SWORD(pc,"unsigned char ");
+		case 11: pc = CHAIN_SWORD(pc,"unsigned char");
 		  break;
-		case 12: pc = CHAIN_SWORD(pc,"unsigned short ");
+		case 12: pc = CHAIN_SWORD(pc,"unsigned short");
 		  break;
-		case 14: pc = CHAIN_SWORD(pc,"unsigned int ");
+		case 14: pc = CHAIN_SWORD(pc,"unsigned int");
 		  break;
-		case 16: pc = CHAIN_SWORD(pc,"unsigned long ");
+		case 16: pc = CHAIN_SWORD(pc,"unsigned long");
 		  break;
-		case 18: pc = CHAIN_SWORD(pc,"unsigned long long ");
+		case 18: pc = CHAIN_SWORD(pc,"unsigned long long");
 		  break;
-		case 21: pc = CHAIN_SWORD(pc,"signed char ");
+		case 21: pc = CHAIN_SWORD(pc,"signed char");
 		  break;
-		case 22: pc = CHAIN_SWORD(pc,"signed short ");
+		case 22: pc = CHAIN_SWORD(pc,"signed short");
 		  break;
-		case 24: pc = CHAIN_SWORD(pc,"signed int ");
+		case 24: pc = CHAIN_SWORD(pc,"signed int");
 		  break;
-		case 26: pc = CHAIN_SWORD(pc,"signed long ");
+		case 26: pc = CHAIN_SWORD(pc,"signed long");
 		  break;
-		case 28: pc = CHAIN_SWORD(pc,"signed long long ");
+		case 28: pc = CHAIN_SWORD(pc,"signed long long");
 		  break;
 		}
 	    }
@@ -276,9 +276,9 @@ list words_basic(basic obj)
 	  else 
 	    {
 	      switch (basic_float(obj)) {
-		case 4: pc = CHAIN_SWORD(pc,"float ");
+		case 4: pc = CHAIN_SWORD(pc,"float");
 		  break;
-		case 8: pc = CHAIN_SWORD(pc,"double ");
+		case 8: pc = CHAIN_SWORD(pc,"double");
 		  break;
 		}
 	    }
@@ -315,14 +315,14 @@ list words_basic(basic obj)
 	      pc = gen_nconc(pc, words_value(basic_string(obj)));
 	    }
 	  else 
-	    pc = CHAIN_SWORD(pc,"char ");
+	    pc = CHAIN_SWORD(pc,"char");
 	  break;
 	}
       case is_basic_bit:
 	{
 	  int i = basic_bit(obj);
 	  pips_debug(7,"Bit field basic: %d\n",i);
-	  pc = CHAIN_SWORD(pc,"int "); /* ignore if it is signed or unsigned */
+	  pc = CHAIN_SWORD(pc,"int"); /* ignore if it is signed or unsigned */
 	  break;
 	}
 	/* The following code maybe redundant, because of tests in c_words_entity*/
@@ -331,7 +331,7 @@ list words_basic(basic obj)
 	  type t = basic_pointer(obj);
 	  pips_debug(7,"Basic pointer\n");
 	  pc = gen_nconc(pc,words_type(t));
-	  pc = CHAIN_SWORD(pc,"*");
+	  pc = CHAIN_SWORD(pc," *");
 	  break;
 	}
       case is_basic_derived:
@@ -339,6 +339,7 @@ list words_basic(basic obj)
 	  entity ent = basic_derived(obj);
 	  type t = entity_type(ent);
 	  pc = gen_nconc(pc,words_type(t));
+	  pc = CHAIN_SWORD(pc," ");
 	  pc = CHAIN_SWORD(pc,entity_user_name(ent));
 	  pc = CHAIN_SWORD(pc," ");
 	  break;
@@ -347,7 +348,6 @@ list words_basic(basic obj)
 	{
 	  entity ent = basic_typedef(obj);
 	  pc = CHAIN_SWORD(pc,entity_user_name(ent));
-	  pc = CHAIN_SWORD(pc," ");
 	  break;
 	}  
       default:
@@ -425,7 +425,7 @@ sentence_head(entity e)
     case is_type_variable:
       {
 	pc = gen_nconc(pc, words_basic(variable_basic(type_variable(tr))));
-	pc = CHAIN_SWORD(pc,is_fortran? " FUNCTION ":"");
+	pc = CHAIN_SWORD(pc,is_fortran? " FUNCTION ":" ");
 	break;
       }
     case is_type_unknown:
@@ -1675,7 +1675,7 @@ list words_type(type obj)
       }
     case is_type_void:
       {
-	pc = CHAIN_SWORD(pc,"void ");
+	pc = CHAIN_SWORD(pc,"void");
 	break;
       }
     case is_type_unknown:
@@ -1684,23 +1684,28 @@ list words_type(type obj)
       }
     case is_type_struct:
       {
-	pc = CHAIN_SWORD(pc,"struct ");
+	pc = CHAIN_SWORD(pc,"struct");
 	break;
       }
     case is_type_union:
       {
-	pc = CHAIN_SWORD(pc,"union ");
+	pc = CHAIN_SWORD(pc,"union");
 	break;
       }
     case is_type_enum:
       {
-	pc = CHAIN_SWORD(pc,"enum ");
+	pc = CHAIN_SWORD(pc,"enum");
 	break;
       }
     case is_type_functional:
       {
-	type t = functional_result(type_functional(obj));
-	pc = words_type(t);
+	string_buffer result = string_buffer_make();
+	string rs = string_undefined;
+
+	dump_functional(type_functional(obj), result);
+	rs = string_buffer_to_string(result);
+	pc = gen_nconc(pc, CONS(STRING, rs, NIL));
+	string_buffer_free(&result, TRUE);
 	break;
       }
     case is_type_varargs:
@@ -1896,10 +1901,15 @@ list generic_c_words_entity(type t, list name, bool is_safe)
 
   if (basic_type_p(t))
     {
-      pips_debug(9,"Basic type with name = \"%s\"\n", list_to_string(name));
+      string sname = list_to_string(name);
+      pips_debug(9,"Basic type with name = \"%s\"\n", sname);
  
       pc = gen_nconc(pc,words_type(t));
-      pc = gen_nconc(pc,name);
+      pc = CHAIN_SWORD(pc," ");
+      if(!bit_type_p(t) || (strstr(sname,DUMMY_MEMBER_PREFIX)==NULL)) {
+	pc = gen_nconc(pc,name);
+	}
+      free(sname);
       if (bit_type_p(t))
 	{
 	  int i = basic_bit(variable_basic(type_variable(t)));
@@ -1937,9 +1947,19 @@ list generic_c_words_entity(type t, list name, bool is_safe)
     {
       entity ent = basic_derived(variable_basic(type_variable(t)));
       type t1 = entity_type(ent);
+      string n = entity_name(ent);
       pips_debug(9,"Derived type with name = %s\n", list_to_string(name));
-      pc = gen_nconc(pc,words_type(t1));
-      pc = CHAIN_SWORD(pc,entity_user_name(ent));
+      if((strstr(n,DUMMY_ENUM_PREFIX)==NULL)
+	 &&(strstr(n,DUMMY_STRUCT_PREFIX)==NULL)
+	 &&(strstr(n,DUMMY_UNION_PREFIX)==NULL)) {
+	pc = gen_nconc(pc,words_type(t1));
+	pc = CHAIN_SWORD(pc," ");
+	pc = CHAIN_SWORD(pc,entity_user_name(ent));
+      }
+      else {
+	//pc = CHAIN_SWORD(pc,"problem!");
+	pc = c_words_entity(t1, pc);
+      }
       pc = CHAIN_SWORD(pc," ");
       return gen_nconc(pc,name);
     }
@@ -1957,7 +1977,108 @@ list generic_c_words_entity(type t, list name, bool is_safe)
       pc = CHAIN_SWORD(pc,"...");
       return gen_nconc(pc,name);
     }  
-  pips_internal_error("unexpected case\n");
+  /* This section is derived from c_text_entity() */
+  /* it is used for structures, unions and enums which have no names
+     because they are part of a more global declaration such as
+     typedef s*/
+  /* FI: The union and the struct cases could be merged. */
+  if(type_struct_p(t))
+    {
+      list l = type_struct(t);
+      string sname = list_to_string(name);
+      list cl = list_undefined;
+
+      pips_debug(9,"Struct type ... with name = %s\n", sname);
+
+      pc = CHAIN_SWORD(pc,"struct ");
+      //if(strstr(sname,DUMMY_STRUCT_PREFIX)==NULL) {
+      //	pc = gen_nconc(pc,name);
+      //	pc = CHAIN_SWORD(pc," ");
+      //}
+      free(sname);
+      pc = CHAIN_SWORD(pc,"{");
+
+      for(cl = l; !ENDP(cl); POP(cl)) {
+	entity sm = ENTITY(CAR(cl));
+	type tsm = entity_type(sm);
+	pc = gen_nconc(pc,c_words_entity(tsm,CHAIN_SWORD(NIL,entity_user_name(sm))));
+	if(ENDP(CDR(cl)))
+	  pc = CHAIN_SWORD(pc,";");
+	else
+	  pc = CHAIN_SWORD(pc,"; ");
+     }
+      pc = CHAIN_SWORD(pc,"}");
+      return pc;
+    }
+  if(type_union_p(t))
+    {
+      list l = type_union(t);
+      string sname = list_to_string(name);
+      list cl = list_undefined;
+
+      pips_debug(9,"Union type ... with name = %s\n", sname);
+
+      pc = CHAIN_SWORD(pc,"union ");
+      //if(strstr(sname,DUMMY_UNION_PREFIX)==NULL) {
+      //	pc = gen_nconc(pc,name);
+      //	pc = CHAIN_SWORD(pc," ");
+      //}
+      free(sname);
+      pc = CHAIN_SWORD(pc,"{");
+
+      for(cl = l; !ENDP(cl); POP(cl)) {
+	entity eu = ENTITY(CAR(cl));
+	type tu = entity_type(eu);
+	pc = gen_nconc(pc,c_words_entity(tu,CHAIN_SWORD(NIL,entity_user_name(eu))));
+	if(ENDP(CDR(cl)))
+	  pc = CHAIN_SWORD(pc,";");
+	else
+	  pc = CHAIN_SWORD(pc,"; ");
+     }
+      pc = CHAIN_SWORD(pc,"}");
+      return pc;
+    }
+  if(type_enum_p(t))
+    {
+      list l = type_enum(t);
+      bool first = TRUE;
+      string sname = list_to_string(name);
+      list cl = list_undefined;
+      int cv = 0;
+
+      pips_debug(9,"Enum type ... with name = %s\n", sname);
+
+      pc = CHAIN_SWORD(pc,"enum ");
+      //if(strstr(sname,DUMMY_ENUM_PREFIX)==NULL) {
+      //	pc = gen_nconc(pc,name);
+      //	pc = CHAIN_SWORD(pc," ");
+      //}
+      free(sname);
+      pc = CHAIN_SWORD(pc,"{");
+
+      for(cl = l; !ENDP(cl); POP(cl)) {
+	entity em = ENTITY(CAR(cl));
+	value emv = entity_initial(em);
+	symbolic ems = value_symbolic(emv);
+	expression eme = symbolic_expression(ems);
+	constant emc = symbolic_constant(value_symbolic(emv));
+	int n = constant_int(emc);
+
+	if (!first)
+	  pc = CHAIN_SWORD(pc, ", ");
+	pc = CHAIN_SWORD(pc, entity_user_name(em));
+	if(n!=cv) {
+	  pc = CHAIN_SWORD(pc, "=");
+	  pc = gen_nconc(pc, words_expression(eme));
+	  cv = n;
+	}
+	cv++;
+	first = FALSE;
+      };
+      pc = CHAIN_SWORD(pc,"}");
+      return pc;
+    }
+   pips_internal_error("unexpected case\n");
   return NIL;
 }
 
@@ -1982,8 +2103,14 @@ text c_text_entities(entity module, list ldecl, int margin)
     type t = entity_type(e);
 
     if(!type_area_p(t) && ! type_statement_p(t) && !type_unknown_p(t) && !storage_formal_p(entity_storage(e))) {
-      tmp = c_text_entity(module, e, margin);
-      MERGE_TEXTS(r,tmp);
+      string n = entity_name(e);
+      /* Dummy enum must be printed anyway because their members are exposed directly. */
+      if(/*(strstr(n,DUMMY_ENUM_PREFIX)==NULL)&& */
+	 (strstr(n,DUMMY_STRUCT_PREFIX)==NULL)
+	 &&(strstr(n,DUMMY_UNION_PREFIX)==NULL)) {
+	tmp = c_text_entity(module, e, margin);
+	MERGE_TEXTS(r,tmp);
+      }
     }
   }
 
@@ -2027,7 +2154,7 @@ text c_text_entity(entity module, entity e, int margin)
   /* This part is for type specifiers, type qualifiers, function specifiers and declarator
      Three special cases for struct/union/enum definitions are treated here. 
      Variable (scalar, array), pointer, function, variables of type struct/union/enum and typedef 
-     are treadted by function c_words_entity */
+     are treated by function c_words_entity */
 
   switch (type_tag(t)) {
   case is_type_struct:
@@ -2035,8 +2162,11 @@ text c_text_entity(entity module, entity e, int margin)
       list l = type_struct(t);
       text fields = c_text_entities(module,l,margin+INDENTATION);
       pc = CHAIN_SWORD(pc,"struct ");
-      pc = CHAIN_SWORD(pc,name);
-      pc = CHAIN_SWORD(pc," {");
+      if(strstr(name,DUMMY_STRUCT_PREFIX)==NULL) {
+	pc = CHAIN_SWORD(pc,name);
+	pc = CHAIN_SWORD(pc," ");
+      }
+      pc = CHAIN_SWORD(pc,"{");
       ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
 					    make_unformatted(NULL,0,margin,pc)));
       MERGE_TEXTS(r,fields);
@@ -2048,8 +2178,11 @@ text c_text_entity(entity module, entity e, int margin)
       list l = type_union(t);
       text fields = c_text_entities(module,l,margin+INDENTATION);
       pc = CHAIN_SWORD(pc,"union ");
-      pc = CHAIN_SWORD(pc,name);
-      pc = CHAIN_SWORD(pc," {");
+      if(strstr(name,DUMMY_UNION_PREFIX)==NULL) {
+	pc = CHAIN_SWORD(pc,name);
+	pc = CHAIN_SWORD(pc," ");
+      }
+      pc = CHAIN_SWORD(pc,"{");
       ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
 					    make_unformatted(NULL,0,margin,pc)));
       MERGE_TEXTS(r,fields);
@@ -2061,8 +2194,11 @@ text c_text_entity(entity module, entity e, int margin)
       list l = type_enum(t);
       bool first = TRUE;
       pc = CHAIN_SWORD(pc,"enum ");
-      pc = CHAIN_SWORD(pc,name);
-      pc = CHAIN_SWORD(pc," {");
+      if(strstr(name,DUMMY_ENUM_PREFIX)==NULL) {
+	pc = CHAIN_SWORD(pc,name);
+	pc = CHAIN_SWORD(pc," ");
+      }
+      pc = CHAIN_SWORD(pc,"{");
       list cl = list_undefined;
       int cv = 0;
 

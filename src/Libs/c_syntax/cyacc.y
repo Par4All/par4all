@@ -1723,7 +1723,7 @@ type_spec:   /* ISO 6.7.2 */
 			}
 |   TK_STRUCT TK_LBRACE
                         {
-			  code c = make_code(NIL,strdup(concatenate("PIPS_STRUCT_",
+			  code c = make_code(NIL,strdup(concatenate(DUMMY_STRUCT_PREFIX,
 								    int_to_string(derived_counter++),NULL)),sequence_undefined, NIL);
 			  stack_push((char *) c, StructNameStack);
                         }
@@ -1767,8 +1767,12 @@ type_spec:   /* ISO 6.7.2 */
 			}
 |   TK_UNION TK_LBRACE
                         { 
-			  code c = make_code(NIL,strdup(concatenate("PIPS_UNION_",
-								    int_to_string(derived_counter++),NULL)),sequence_undefined, NIL);
+			  string n = int_to_string(derived_counter++);
+			  code c = make_code(NIL,
+					     strdup(concatenate(DUMMY_UNION_PREFIX,n,NULL)),
+					     sequence_undefined,
+					     NIL);
+			  free(n);
 			  stack_push((char *) c, StructNameStack);
                         }
     struct_decl_list TK_RBRACE
@@ -1807,7 +1811,9 @@ type_spec:   /* ISO 6.7.2 */
 |   TK_ENUM TK_LBRACE enum_list maybecomma TK_RBRACE
                         {
 			  /* Create the enum entity with unique name */
-			  string s = strdup(concatenate("PIPS_ENUM_",int_to_string(derived_counter++),NULL));
+			  string n = int_to_string(derived_counter++);
+			  string s = strdup(concatenate(DUMMY_ENUM_PREFIX,n,NULL));
+			  free(n);
 			  entity ent = MakeDerivedEntity(s,$3,is_external,is_type_enum);
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
 
@@ -1943,7 +1949,8 @@ field_decl: /* (* ISO 6.7.2. Except that we allow unnamed fields. *) */
 			  //c_parser_context ycontext = stack_head(ContextStack);
 			  c_parser_context ycontext = GetContext();
 			  /* Unnamed bit-field : special and unique name */
-			  string s = strdup(concatenate("PIPS_MEMBER_",int_to_string(derived_counter++),NULL));  
+			  string n = int_to_string(derived_counter++);
+			  string s = strdup(concatenate(DUMMY_MEMBER_PREFIX,n,NULL));  
 			  entity ent = CreateEntityFromLocalNameAndPrefix(s,c_parser_context_scope(ycontext),is_external);
 			  variable v = make_variable(make_basic_bit(integer_constant_expression_value($2)),NIL,NIL);
 			  pips_assert("Width of bit-field must be a positive constant integer", 
@@ -2299,10 +2306,15 @@ abstract_decl: /* (* ISO 6.7.6. *) */
 			  $$ = $2;		 
 			}
 |   pointer 
-                        { 
-			  $$ = FindOrCreateCurrentEntity(strdup(concatenate("PIPS_ABSTRACT_",
-									    int_to_string(abstract_counter++),NULL)),
-							 ContextStack,FormalStack,FunctionStack,is_external);
+                        {
+			  string n = int_to_string(abstract_counter++);
+			  $$ = FindOrCreateCurrentEntity(strdup(concatenate(DUMMY_ABSTRACT_PREFIX,
+									    n,NULL)),
+							 ContextStack,
+							 FormalStack,
+							 FunctionStack,
+							 is_external);
+			  free(n);
 			  UpdatePointerEntity($$,$1,NIL);
 			  /* Initialize the type stack and push the type of found/created entity to the stack. 
 			     It can be undefined if the entity hasnot been parsed, or a given type which is 
@@ -2360,10 +2372,14 @@ abs_direct_decl: /* (* ISO 6.7.6. We do not support optional declarator for
 abs_direct_decl_opt:
     abs_direct_decl    
                         { }
-|   /* empty */         {  
-			  $$ = FindOrCreateCurrentEntity(strdup(concatenate("PIPS_ABSTRACT_",
-									    int_to_string(abstract_counter++),NULL)),
-							 ContextStack,FormalStack,FunctionStack,is_external);
+|   /* empty */         {
+                          string n = int_to_string(abstract_counter++);
+			  $$ = FindOrCreateCurrentEntity(strdup(concatenate(DUMMY_ABSTRACT_PREFIX,
+									    n,NULL)),
+							 ContextStack,FormalStack,
+							 FunctionStack,
+							 is_external);
+			  free(n);
 			  stack s = stack_make(type_domain,0,0);
 			  //entity_storage($$) = (storage) s;
 			  stack_push((char *) entity_type($$),s);
