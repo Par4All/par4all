@@ -1,13 +1,13 @@
-enum PIPS_ENUM_1 {a=sizeof(int ), b};
-extern main();
+enum {a=sizeof(int), b};
+extern  main();
 
 Preconditions derived from enum
 
 
 //  P() {}
 
-enum PIPS_ENUM_1 {a=sizeof(int ), b};
-extern main();
+enum {a=sizeof(int), b};
+extern  main();
 
 
 //  P() {}

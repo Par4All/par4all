@@ -1,23 +1,23 @@
 main
 
-Declarations for module "main" with type "int  x char * -> int "
+Declarations for module "main" with type "int x char * -> int"
 
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 4
-	Declared entity "TOP-LEVEL:i" with type "variable" "int "
+	Declared entity "TOP-LEVEL:i" with type "variable" "int"
 	Declared entity "externalloc03!:*HEAP*" with type "area" with size 0
 	Declared entity "externalloc03!:*STATIC*" with type "area" with size 0
 	Declared entity "main:*DYNAMIC*" with type "area" with size 4
 	Declared entity "main:*STACK*" with type "area" with size 0
 	Declared entity "main:*STATIC*" with type "area" with size 0
-	Declared entity "main:0`i" with type "variable" "int "
-	Declared entity "main:argc" with type "variable" "int "
+	Declared entity "main:0`i" with type "variable" "int"
+	Declared entity "main:argc" with type "variable" "int"
 	Declared entity "main:argv" with type "variable" "char *"
 
 External variable list:
 
-	Declared external entity "TOP-LEVEL:i"	with type "variable" int 
+	Declared external entity "TOP-LEVEL:i"	with type "variable" int
 
 Layouts for formal parameters:
 

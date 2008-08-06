@@ -8,9 +8,9 @@ Declarations for module "block_scope09!" with type "() -> unknow"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 8
-	Declared entity "TOP-LEVEL:block_scope09" with type "functional" "int  -> int "
-	Declared entity "TOP-LEVEL:x" with type "variable" "int "
-	Declared entity "TOP-LEVEL:y" with type "variable" "int "
+	Declared entity "TOP-LEVEL:block_scope09" with type "functional" "int -> int"
+	Declared entity "TOP-LEVEL:x" with type "variable" "int"
+	Declared entity "TOP-LEVEL:y" with type "variable" "int"
 	Declared entity "block_scope09!:*DYNAMIC*" with type "area" with size 0
 	Declared entity "block_scope09!:*HEAP*" with type "area" with size 0
 	Declared entity "block_scope09!:*STACK*" with type "area" with size 0
@@ -18,7 +18,7 @@ Variable list:
 
 External variable list:
 
-	Declared external entity "TOP-LEVEL:block_scope09"	with type "functional" "int  -> int "
+	Declared external entity "TOP-LEVEL:block_scope09"	with type "functional" "int -> int"
 
 Layouts for memory areas:
 
@@ -47,7 +47,7 @@ End of declarations for module block_scope09!
 
 block_scope09
 
-Declarations for module "block_scope09" with type "int  -> int "
+Declarations for module "block_scope09" with type "int -> int"
 
 Variable list:
 
@@ -57,9 +57,9 @@ Variable list:
 	Declared entity "block_scope09:*DYNAMIC*" with type "area" with size 8
 	Declared entity "block_scope09:*STACK*" with type "area" with size 0
 	Declared entity "block_scope09:*STATIC*" with type "area" with size 0
-	Declared entity "block_scope09:0`1`x" with type "variable" "int "
-	Declared entity "block_scope09:0`k" with type "variable" "int "
-	Declared entity "block_scope09:x" with type "variable" "int "
+	Declared entity "block_scope09:0`1`x" with type "variable" "int"
+	Declared entity "block_scope09:0`k" with type "variable" "int"
+	Declared entity "block_scope09:x" with type "variable" "int"
 
 * empty extern declaration list *
 

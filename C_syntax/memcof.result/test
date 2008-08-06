@@ -1,11 +1,7 @@
 
 Printed file for 'memcof!' 
 
-union PIPS_UNION_1 {
-   extern unsigned char __c[8];
-   extern double __d;
-};
-static union PIPS_UNION_1 __huge_val = {{0, 0, 0, 0, 0, 0, 0xf0, 0x7f}};
+static union {unsigned char __c[8]; double __d;} __huge_val = {{0, 0, 0, 0, 0, 0, 0xf0, 0x7f}};
 extern double acos(double );
 extern double __acos(double );
 extern double asin(double );
@@ -61,11 +57,7 @@ Unsplit
 /*
  * file for memcof.c
  */
-union PIPS_UNION_1 {
-   extern unsigned char __c[8];
-   extern double __d;
-};
-static union PIPS_UNION_1 __huge_val = {{0, 0, 0, 0, 0, 0, 0xf0, 0x7f}};
+static union {unsigned char __c[8]; double __d;} __huge_val = {{0, 0, 0, 0, 0, 0, 0xf0, 0x7f}};
 extern double acos(double );
 extern double __acos(double );
 extern double asin(double );

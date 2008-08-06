@@ -1,0 +1,46 @@
+
+Symbol table for "decl08"
+
+decl08!
+
+Declarations for module "decl08!" with type "() -> unknow"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:decl08" with type "functional" "int x (char -> void) * -> void"
+	Declared entity "decl08!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "decl08!:*HEAP*" with type "area" with size 0
+	Declared entity "decl08!:*STACK*" with type "area" with size 0
+	Declared entity "decl08!:*STATIC*" with type "area" with size 0
+
+* empty extern declaration list *
+
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl08!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl08!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl08!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl08!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module decl08!
+
+
+Parsed printed file
+
+void decl08(int ,void (*)(char ));

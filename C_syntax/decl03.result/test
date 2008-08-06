@@ -8,7 +8,7 @@ Declarations for module "decl03!" with type "() -> unknow"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 12
-	Declared entity "TOP-LEVEL:a" with type "variable" "int "
+	Declared entity "TOP-LEVEL:a" with type "variable" "int"
 	Declared entity "decl03!:*DYNAMIC*" with type "area" with size 0
 	Declared entity "decl03!:*HEAP*" with type "area" with size 0
 	Declared entity "decl03!:*STACK*" with type "area" with size 0

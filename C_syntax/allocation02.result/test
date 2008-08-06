@@ -9,9 +9,9 @@ Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 8
 	Declared entity "TOP-LEVEL:foo" with type "functional" "() -> void"
-	Declared entity "TOP-LEVEL:global1" with type "variable" "int "
-	Declared entity "TOP-LEVEL:global2" with type "variable" "int "
-	Declared entity "TOP-LEVEL:main" with type "functional" "() -> int "
+	Declared entity "TOP-LEVEL:global1" with type "variable" "int"
+	Declared entity "TOP-LEVEL:global2" with type "variable" "int"
+	Declared entity "TOP-LEVEL:main" with type "functional" "() -> int"
 	Declared entity "allocation02!:*DYNAMIC*" with type "area" with size 0
 	Declared entity "allocation02!:*HEAP*" with type "area" with size 0
 	Declared entity "allocation02!:*STACK*" with type "area" with size 0
@@ -20,7 +20,7 @@ Variable list:
 External variable list:
 
 	Declared external entity "TOP-LEVEL:foo"	with type "functional" "() -> void"
-	Declared external entity "TOP-LEVEL:main"	with type "functional" "() -> int "
+	Declared external entity "TOP-LEVEL:main"	with type "functional" "() -> int"
 
 Layouts for memory areas:
 
@@ -58,7 +58,7 @@ Variable list:
 	Declared entity "foo:*DYNAMIC*" with type "area" with size 4
 	Declared entity "foo:*STACK*" with type "area" with size 0
 	Declared entity "foo:*STATIC*" with type "area" with size 0
-	Declared entity "foo:0`m" with type "variable" "int "
+	Declared entity "foo:0`m" with type "variable" "int"
 
 * empty extern declaration list *
 
@@ -93,7 +93,7 @@ End of declarations for module foo
 
 main
 
-Declarations for module "main" with type "() -> int "
+Declarations for module "main" with type "() -> int"
 
 Variable list:
 
@@ -103,7 +103,7 @@ Variable list:
 	Declared entity "main:*DYNAMIC*" with type "area" with size 4
 	Declared entity "main:*STACK*" with type "area" with size 0
 	Declared entity "main:*STATIC*" with type "area" with size 0
-	Declared entity "main:0`k" with type "variable" "int "
+	Declared entity "main:0`k" with type "variable" "int"
 
 * empty extern declaration list *
 

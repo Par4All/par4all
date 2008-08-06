@@ -10,9 +10,9 @@ Variable list:
 	Declared entity "foo:*DYNAMIC*" with type "area" with size 18
 	Declared entity "foo:*STACK*" with type "area" with size 0
 	Declared entity "foo:*STATIC*" with type "area" with size 0
-	Declared entity "foo:0`a" with type "variable" "char "
-	Declared entity "foo:0`i" with type "variable" "int "
-	Declared entity "foo:0`j" with type "variable" "float "
+	Declared entity "foo:0`a" with type "variable" "char"
+	Declared entity "foo:0`i" with type "variable" "int"
+	Declared entity "foo:0`j" with type "variable" "float"
 
 * empty extern declaration list *
 

@@ -8,7 +8,7 @@ Variable list:
 	Declared entity "foo:*DYNAMIC*" with type "area" with size 40
 	Declared entity "foo:*STACK*" with type "area" with size 0
 	Declared entity "foo:*STATIC*" with type "area" with size 0
-	Declared entity "foo:0`A" with type "variable" "int "
+	Declared entity "foo:0`A" with type "variable" "int"
 	Declared entity "sizeofArray04!:*HEAP*" with type "area" with size 0
 	Declared entity "sizeofArray04!:*STATIC*" with type "area" with size 0
 

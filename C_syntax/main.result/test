@@ -11,72 +11,72 @@ Variable list:
 	Declared entity "TOP-LEVEL:_IO_2_1_stderr_" with type "variable" "struct _IO_FILE_plus "
 	Declared entity "TOP-LEVEL:_IO_2_1_stdin_" with type "variable" "struct _IO_FILE_plus "
 	Declared entity "TOP-LEVEL:_IO_2_1_stdout_" with type "variable" "struct _IO_FILE_plus "
-	Declared entity "TOP-LEVEL:_IO_feof" with type "functional" "_IO_FILE * -> int "
-	Declared entity "TOP-LEVEL:_IO_ferror" with type "functional" "_IO_FILE * -> int "
+	Declared entity "TOP-LEVEL:_IO_feof" with type "functional" "_IO_FILE * -> int"
+	Declared entity "TOP-LEVEL:_IO_ferror" with type "functional" "_IO_FILE * -> int"
 	Declared entity "TOP-LEVEL:_IO_flockfile" with type "functional" "_IO_FILE * -> void"
 	Declared entity "TOP-LEVEL:_IO_free_backup_area" with type "functional" "_IO_FILE * -> void"
-	Declared entity "TOP-LEVEL:_IO_ftrylockfile" with type "functional" "_IO_FILE * -> int "
+	Declared entity "TOP-LEVEL:_IO_ftrylockfile" with type "functional" "_IO_FILE * -> int"
 	Declared entity "TOP-LEVEL:_IO_funlockfile" with type "functional" "_IO_FILE * -> void"
-	Declared entity "TOP-LEVEL:_IO_getc" with type "functional" "_IO_FILE * -> int "
-	Declared entity "TOP-LEVEL:_IO_padn" with type "functional" "_IO_FILE * x int  x __ssize_t  -> __ssize_t "
-	Declared entity "TOP-LEVEL:_IO_peekc_locked" with type "functional" "_IO_FILE * -> int "
-	Declared entity "TOP-LEVEL:_IO_putc" with type "functional" "int  x _IO_FILE * -> int "
-	Declared entity "TOP-LEVEL:_IO_seekoff" with type "functional" "_IO_FILE * x __off64_t  x int  x int  -> __off64_t "
-	Declared entity "TOP-LEVEL:_IO_seekpos" with type "functional" "_IO_FILE * x __off64_t  x int  -> __off64_t "
-	Declared entity "TOP-LEVEL:_IO_sgetn" with type "functional" "_IO_FILE * x void * x size_t  -> size_t "
-	Declared entity "TOP-LEVEL:_IO_vfprintf" with type "functional" "_IO_FILE * x char * x __gnuc_va_list  -> int "
-	Declared entity "TOP-LEVEL:_IO_vfscanf" with type "functional" "_IO_FILE * x char * x __gnuc_va_list  x int * -> int "
-	Declared entity "TOP-LEVEL:__overflow" with type "functional" "_IO_FILE * x int  -> int "
-	Declared entity "TOP-LEVEL:__uflow" with type "functional" "_IO_FILE * -> int "
-	Declared entity "TOP-LEVEL:__underflow" with type "functional" "_IO_FILE * -> int "
-	Declared entity "TOP-LEVEL:__woverflow" with type "functional" "_IO_FILE * x wint_t  -> wint_t "
-	Declared entity "TOP-LEVEL:__wuflow" with type "functional" "_IO_FILE * -> wint_t "
-	Declared entity "TOP-LEVEL:__wunderflow" with type "functional" "_IO_FILE * -> wint_t "
+	Declared entity "TOP-LEVEL:_IO_getc" with type "functional" "_IO_FILE * -> int"
+	Declared entity "TOP-LEVEL:_IO_padn" with type "functional" "_IO_FILE * x int x __ssize_t -> __ssize_t"
+	Declared entity "TOP-LEVEL:_IO_peekc_locked" with type "functional" "_IO_FILE * -> int"
+	Declared entity "TOP-LEVEL:_IO_putc" with type "functional" "int x _IO_FILE * -> int"
+	Declared entity "TOP-LEVEL:_IO_seekoff" with type "functional" "_IO_FILE * x __off64_t x int x int -> __off64_t"
+	Declared entity "TOP-LEVEL:_IO_seekpos" with type "functional" "_IO_FILE * x __off64_t x int -> __off64_t"
+	Declared entity "TOP-LEVEL:_IO_sgetn" with type "functional" "_IO_FILE * x void * x size_t -> size_t"
+	Declared entity "TOP-LEVEL:_IO_vfprintf" with type "functional" "_IO_FILE * x char * x __gnuc_va_list -> int"
+	Declared entity "TOP-LEVEL:_IO_vfscanf" with type "functional" "_IO_FILE * x char * x __gnuc_va_list x int * -> int"
+	Declared entity "TOP-LEVEL:__overflow" with type "functional" "_IO_FILE * x int -> int"
+	Declared entity "TOP-LEVEL:__uflow" with type "functional" "_IO_FILE * -> int"
+	Declared entity "TOP-LEVEL:__underflow" with type "functional" "_IO_FILE * -> int"
+	Declared entity "TOP-LEVEL:__woverflow" with type "functional" "_IO_FILE * x wint_t -> wint_t"
+	Declared entity "TOP-LEVEL:__wuflow" with type "functional" "_IO_FILE * -> wint_t"
+	Declared entity "TOP-LEVEL:__wunderflow" with type "functional" "_IO_FILE * -> wint_t"
 	Declared entity "TOP-LEVEL:clearerr" with type "functional" "FILE * -> void"
-	Declared entity "TOP-LEVEL:fclose" with type "functional" "FILE * -> int "
-	Declared entity "TOP-LEVEL:feof" with type "functional" "FILE * -> int "
-	Declared entity "TOP-LEVEL:ferror" with type "functional" "FILE * -> int "
-	Declared entity "TOP-LEVEL:fflush" with type "functional" "FILE * -> int "
-	Declared entity "TOP-LEVEL:fgetc" with type "functional" "FILE * -> int "
-	Declared entity "TOP-LEVEL:fgetpos" with type "functional" "FILE * x fpos_t * -> int "
-	Declared entity "TOP-LEVEL:fgets" with type "functional" "char * x int  x FILE * -> char *"
+	Declared entity "TOP-LEVEL:fclose" with type "functional" "FILE * -> int"
+	Declared entity "TOP-LEVEL:feof" with type "functional" "FILE * -> int"
+	Declared entity "TOP-LEVEL:ferror" with type "functional" "FILE * -> int"
+	Declared entity "TOP-LEVEL:fflush" with type "functional" "FILE * -> int"
+	Declared entity "TOP-LEVEL:fgetc" with type "functional" "FILE * -> int"
+	Declared entity "TOP-LEVEL:fgetpos" with type "functional" "FILE * x fpos_t * -> int"
+	Declared entity "TOP-LEVEL:fgets" with type "functional" "char * x int x FILE * -> char *"
 	Declared entity "TOP-LEVEL:fopen" with type "functional" "char * x char * -> FILE *"
-	Declared entity "TOP-LEVEL:fprintf" with type "functional" "FILE * x char * x varargs:overloaded -> int "
-	Declared entity "TOP-LEVEL:fputc" with type "functional" "int  x FILE * -> int "
-	Declared entity "TOP-LEVEL:fputs" with type "functional" "char * x FILE * -> int "
-	Declared entity "TOP-LEVEL:fread" with type "functional" "void * x size_t  x size_t  x FILE * -> size_t "
+	Declared entity "TOP-LEVEL:fprintf" with type "functional" "FILE * x char * x varargs:overloaded -> int"
+	Declared entity "TOP-LEVEL:fputc" with type "functional" "int x FILE * -> int"
+	Declared entity "TOP-LEVEL:fputs" with type "functional" "char * x FILE * -> int"
+	Declared entity "TOP-LEVEL:fread" with type "functional" "void * x size_t x size_t x FILE * -> size_t"
 	Declared entity "TOP-LEVEL:freopen" with type "functional" "char * x char * x FILE * -> FILE *"
-	Declared entity "TOP-LEVEL:fscanf" with type "functional" "FILE * x char * x varargs:overloaded -> int "
-	Declared entity "TOP-LEVEL:fseek" with type "functional" "FILE * x long  x int  -> int "
-	Declared entity "TOP-LEVEL:fsetpos" with type "functional" "FILE * x fpos_t * -> int "
-	Declared entity "TOP-LEVEL:ftell" with type "functional" "FILE * -> long "
-	Declared entity "TOP-LEVEL:fwrite" with type "functional" "void * x size_t  x size_t  x FILE * -> size_t "
-	Declared entity "TOP-LEVEL:getc" with type "functional" "FILE * -> int "
-	Declared entity "TOP-LEVEL:getchar" with type "functional" "void -> int "
+	Declared entity "TOP-LEVEL:fscanf" with type "functional" "FILE * x char * x varargs:overloaded -> int"
+	Declared entity "TOP-LEVEL:fseek" with type "functional" "FILE * x long x int -> int"
+	Declared entity "TOP-LEVEL:fsetpos" with type "functional" "FILE * x fpos_t * -> int"
+	Declared entity "TOP-LEVEL:ftell" with type "functional" "FILE * -> long"
+	Declared entity "TOP-LEVEL:fwrite" with type "functional" "void * x size_t x size_t x FILE * -> size_t"
+	Declared entity "TOP-LEVEL:getc" with type "functional" "FILE * -> int"
+	Declared entity "TOP-LEVEL:getchar" with type "functional" "void -> int"
 	Declared entity "TOP-LEVEL:gets" with type "functional" "char * -> char *"
 	Declared entity "TOP-LEVEL:main" with type "functional" "() -> unknow"
 	Declared entity "TOP-LEVEL:perror" with type "functional" "char * -> void"
-	Declared entity "TOP-LEVEL:printf" with type "functional" "char * x varargs:overloaded -> int "
-	Declared entity "TOP-LEVEL:putc" with type "functional" "int  x FILE * -> int "
-	Declared entity "TOP-LEVEL:putchar" with type "functional" "int  -> int "
-	Declared entity "TOP-LEVEL:puts" with type "functional" "char * -> int "
-	Declared entity "TOP-LEVEL:remove" with type "functional" "char * -> int "
-	Declared entity "TOP-LEVEL:rename" with type "functional" "char * x char * -> int "
+	Declared entity "TOP-LEVEL:printf" with type "functional" "char * x varargs:overloaded -> int"
+	Declared entity "TOP-LEVEL:putc" with type "functional" "int x FILE * -> int"
+	Declared entity "TOP-LEVEL:putchar" with type "functional" "int -> int"
+	Declared entity "TOP-LEVEL:puts" with type "functional" "char * -> int"
+	Declared entity "TOP-LEVEL:remove" with type "functional" "char * -> int"
+	Declared entity "TOP-LEVEL:rename" with type "functional" "char * x char * -> int"
 	Declared entity "TOP-LEVEL:rewind" with type "functional" "FILE * -> void"
-	Declared entity "TOP-LEVEL:scanf" with type "functional" "char * x varargs:overloaded -> int "
+	Declared entity "TOP-LEVEL:scanf" with type "functional" "char * x varargs:overloaded -> int"
 	Declared entity "TOP-LEVEL:setbuf" with type "functional" "FILE * x char * -> void"
-	Declared entity "TOP-LEVEL:setvbuf" with type "functional" "FILE * x char * x int  x size_t  -> int "
-	Declared entity "TOP-LEVEL:sprintf" with type "functional" "char * x char * x varargs:overloaded -> int "
-	Declared entity "TOP-LEVEL:sscanf" with type "functional" "char * x char * x varargs:overloaded -> int "
-	Declared entity "TOP-LEVEL:stderr" with type "variable" "struct _IO_FILE *"
-	Declared entity "TOP-LEVEL:stdin" with type "variable" "struct _IO_FILE *"
-	Declared entity "TOP-LEVEL:stdout" with type "variable" "struct _IO_FILE *"
+	Declared entity "TOP-LEVEL:setvbuf" with type "functional" "FILE * x char * x int x size_t -> int"
+	Declared entity "TOP-LEVEL:sprintf" with type "functional" "char * x char * x varargs:overloaded -> int"
+	Declared entity "TOP-LEVEL:sscanf" with type "functional" "char * x char * x varargs:overloaded -> int"
+	Declared entity "TOP-LEVEL:stderr" with type "variable" "struct _IO_FILE  *"
+	Declared entity "TOP-LEVEL:stdin" with type "variable" "struct _IO_FILE  *"
+	Declared entity "TOP-LEVEL:stdout" with type "variable" "struct _IO_FILE  *"
 	Declared entity "TOP-LEVEL:tmpfile" with type "functional" "void -> FILE *"
 	Declared entity "TOP-LEVEL:tmpnam" with type "functional" "char * -> char *"
-	Declared entity "TOP-LEVEL:ungetc" with type "functional" "int  x FILE * -> int "
-	Declared entity "TOP-LEVEL:vfprintf" with type "functional" "FILE * x char * x __gnuc_va_list  -> int "
-	Declared entity "TOP-LEVEL:vprintf" with type "functional" "char * x __gnuc_va_list  -> int "
-	Declared entity "TOP-LEVEL:vsprintf" with type "functional" "char * x char * x __gnuc_va_list  -> int "
+	Declared entity "TOP-LEVEL:ungetc" with type "functional" "int x FILE * -> int"
+	Declared entity "TOP-LEVEL:vfprintf" with type "functional" "FILE * x char * x __gnuc_va_list -> int"
+	Declared entity "TOP-LEVEL:vprintf" with type "functional" "char * x __gnuc_va_list -> int"
+	Declared entity "TOP-LEVEL:vsprintf" with type "functional" "char * x char * x __gnuc_va_list -> int"
 	Declared entity "main!:*DYNAMIC*" with type "area" with size 0
 	Declared entity "main!:*HEAP*" with type "area" with size 0
 	Declared entity "main!:*STACK*" with type "area" with size 0
@@ -84,56 +84,56 @@ Variable list:
 
 External variable list:
 
-	Declared external entity "main!:PIPS_STRUCT_1^__val"	with type "variable" long 
-	Declared external entity "main!:PIPS_STRUCT_2^__val"	with type "variable" __u_long 
-	Declared external entity "main!:PIPS_STRUCT_3^__val"	with type "variable" int 
-	Declared external entity "main!:PIPS_STRUCT_4^__count"	with type "variable" int 
-	Declared external entity "main!:PIPS_UNION_5^__wch"	with type "variable" wint_t 
-	Declared external entity "main!:PIPS_UNION_5^__wchb"	with type "variable" char 
-	Declared external entity "main!:PIPS_STRUCT_4^__value"	with type "variable" union PIPS_UNION_5 
-	Declared external entity "main!:PIPS_STRUCT_6^__pos"	with type "variable" __off_t 
-	Declared external entity "main!:PIPS_STRUCT_6^__state"	with type "variable" __mbstate_t 
-	Declared external entity "main!:PIPS_STRUCT_7^__pos"	with type "variable" __off64_t 
-	Declared external entity "main!:PIPS_STRUCT_7^__state"	with type "variable" __mbstate_t 
-	Declared external entity "main!:__gconv_trans_data^__trans_fct"	with type "variable" __gconv_trans_fct 
-	Declared external entity "main!:__gconv_trans_data^__trans_context_fct"	with type "variable" __gconv_trans_context_fct 
-	Declared external entity "main!:__gconv_trans_data^__trans_end_fct"	with type "variable" __gconv_trans_end_fct 
+	Declared external entity "main!:_PIPS_STRUCT_1^__val"	with type "variable" long
+	Declared external entity "main!:_PIPS_STRUCT_2^__val"	with type "variable" __u_long
+	Declared external entity "main!:_PIPS_STRUCT_3^__val"	with type "variable" int
+	Declared external entity "main!:_PIPS_STRUCT_4^__count"	with type "variable" int
+	Declared external entity "main!:_PIPS_UNION_5^__wch"	with type "variable" wint_t
+	Declared external entity "main!:_PIPS_UNION_5^__wchb"	with type "variable" char
+	Declared external entity "main!:_PIPS_STRUCT_4^__value"	with type "variable" union _PIPS_UNION_5 
+	Declared external entity "main!:_PIPS_STRUCT_6^__pos"	with type "variable" __off_t
+	Declared external entity "main!:_PIPS_STRUCT_6^__state"	with type "variable" __mbstate_t
+	Declared external entity "main!:_PIPS_STRUCT_7^__pos"	with type "variable" __off64_t
+	Declared external entity "main!:_PIPS_STRUCT_7^__state"	with type "variable" __mbstate_t
+	Declared external entity "main!:__gconv_trans_data^__trans_fct"	with type "variable" __gconv_trans_fct
+	Declared external entity "main!:__gconv_trans_data^__trans_context_fct"	with type "variable" __gconv_trans_context_fct
+	Declared external entity "main!:__gconv_trans_data^__trans_end_fct"	with type "variable" __gconv_trans_end_fct
 	Declared external entity "main!:__gconv_trans_data^__data"	with type "variable" void *
-	Declared external entity "main!:__gconv_trans_data^__next"	with type "variable" struct __gconv_trans_data *
-	Declared external entity "main!:__gconv_step^__shlib_handle"	with type "variable" struct __gconv_loaded_object *
+	Declared external entity "main!:__gconv_trans_data^__next"	with type "variable" struct __gconv_trans_data  *
+	Declared external entity "main!:__gconv_step^__shlib_handle"	with type "variable" struct __gconv_loaded_object  *
 	Declared external entity "main!:__gconv_step^__modname"	with type "variable" char *
-	Declared external entity "main!:__gconv_step^__counter"	with type "variable" int 
+	Declared external entity "main!:__gconv_step^__counter"	with type "variable" int
 	Declared external entity "main!:__gconv_step^__from_name"	with type "variable" char *
 	Declared external entity "main!:__gconv_step^__to_name"	with type "variable" char *
-	Declared external entity "main!:__gconv_step^__fct"	with type "variable" __gconv_fct 
-	Declared external entity "main!:__gconv_step^__btowc_fct"	with type "variable" __gconv_btowc_fct 
-	Declared external entity "main!:__gconv_step^__init_fct"	with type "variable" __gconv_init_fct 
-	Declared external entity "main!:__gconv_step^__end_fct"	with type "variable" __gconv_end_fct 
-	Declared external entity "main!:__gconv_step^__min_needed_from"	with type "variable" int 
-	Declared external entity "main!:__gconv_step^__max_needed_from"	with type "variable" int 
-	Declared external entity "main!:__gconv_step^__min_needed_to"	with type "variable" int 
-	Declared external entity "main!:__gconv_step^__max_needed_to"	with type "variable" int 
-	Declared external entity "main!:__gconv_step^__stateful"	with type "variable" int 
+	Declared external entity "main!:__gconv_step^__fct"	with type "variable" __gconv_fct
+	Declared external entity "main!:__gconv_step^__btowc_fct"	with type "variable" __gconv_btowc_fct
+	Declared external entity "main!:__gconv_step^__init_fct"	with type "variable" __gconv_init_fct
+	Declared external entity "main!:__gconv_step^__end_fct"	with type "variable" __gconv_end_fct
+	Declared external entity "main!:__gconv_step^__min_needed_from"	with type "variable" int
+	Declared external entity "main!:__gconv_step^__max_needed_from"	with type "variable" int
+	Declared external entity "main!:__gconv_step^__min_needed_to"	with type "variable" int
+	Declared external entity "main!:__gconv_step^__max_needed_to"	with type "variable" int
+	Declared external entity "main!:__gconv_step^__stateful"	with type "variable" int
 	Declared external entity "main!:__gconv_step^__data"	with type "variable" void *
 	Declared external entity "main!:__gconv_step_data^__outbuf"	with type "variable" unsigned char *
 	Declared external entity "main!:__gconv_step_data^__outbufend"	with type "variable" unsigned char *
-	Declared external entity "main!:__gconv_step_data^__flags"	with type "variable" int 
-	Declared external entity "main!:__gconv_step_data^__invocation_counter"	with type "variable" int 
-	Declared external entity "main!:__gconv_step_data^__internal_use"	with type "variable" int 
+	Declared external entity "main!:__gconv_step_data^__flags"	with type "variable" int
+	Declared external entity "main!:__gconv_step_data^__invocation_counter"	with type "variable" int
+	Declared external entity "main!:__gconv_step_data^__internal_use"	with type "variable" int
 	Declared external entity "main!:__gconv_step_data^__statep"	with type "variable" __mbstate_t *
-	Declared external entity "main!:__gconv_step_data^__state"	with type "variable" __mbstate_t 
-	Declared external entity "main!:__gconv_step_data^__trans"	with type "variable" struct __gconv_trans_data *
-	Declared external entity "main!:__gconv_info^__nsteps"	with type "variable" size_t 
-	Declared external entity "main!:__gconv_info^__steps"	with type "variable" struct __gconv_step *
+	Declared external entity "main!:__gconv_step_data^__state"	with type "variable" __mbstate_t
+	Declared external entity "main!:__gconv_step_data^__trans"	with type "variable" struct __gconv_trans_data  *
+	Declared external entity "main!:__gconv_info^__nsteps"	with type "variable" size_t
+	Declared external entity "main!:__gconv_info^__steps"	with type "variable" struct __gconv_step  *
 	Declared external entity "main!:__gconv_info^__data"	with type "variable" struct __gconv_step_data 
-	Declared external entity "main!:PIPS_UNION_10^__cd"	with type "variable" struct __gconv_info 
-	Declared external entity "main!:PIPS_STRUCT_11^__cd"	with type "variable" struct __gconv_info 
-	Declared external entity "main!:PIPS_STRUCT_11^__data"	with type "variable" struct __gconv_step_data 
-	Declared external entity "main!:PIPS_UNION_10^__combined"	with type "variable" struct PIPS_STRUCT_11 
-	Declared external entity "main!:_IO_marker^_next"	with type "variable" struct _IO_marker *
-	Declared external entity "main!:_IO_marker^_sbuf"	with type "variable" struct _IO_FILE *
-	Declared external entity "main!:_IO_marker^_pos"	with type "variable" int 
-	Declared external entity "main!:_IO_FILE^_flags"	with type "variable" int 
+	Declared external entity "main!:_PIPS_UNION_10^__cd"	with type "variable" struct __gconv_info 
+	Declared external entity "main!:_PIPS_STRUCT_11^__cd"	with type "variable" struct __gconv_info 
+	Declared external entity "main!:_PIPS_STRUCT_11^__data"	with type "variable" struct __gconv_step_data 
+	Declared external entity "main!:_PIPS_UNION_10^__combined"	with type "variable" struct _PIPS_STRUCT_11 
+	Declared external entity "main!:_IO_marker^_next"	with type "variable" struct _IO_marker  *
+	Declared external entity "main!:_IO_marker^_sbuf"	with type "variable" struct _IO_FILE  *
+	Declared external entity "main!:_IO_marker^_pos"	with type "variable" int
+	Declared external entity "main!:_IO_FILE^_flags"	with type "variable" int
 	Declared external entity "main!:_IO_FILE^_IO_read_ptr"	with type "variable" char *
 	Declared external entity "main!:_IO_FILE^_IO_read_end"	with type "variable" char *
 	Declared external entity "main!:_IO_FILE^_IO_read_base"	with type "variable" char *
@@ -145,87 +145,87 @@ External variable list:
 	Declared external entity "main!:_IO_FILE^_IO_save_base"	with type "variable" char *
 	Declared external entity "main!:_IO_FILE^_IO_backup_base"	with type "variable" char *
 	Declared external entity "main!:_IO_FILE^_IO_save_end"	with type "variable" char *
-	Declared external entity "main!:_IO_FILE^_markers"	with type "variable" struct _IO_marker *
-	Declared external entity "main!:_IO_FILE^_chain"	with type "variable" struct _IO_FILE *
-	Declared external entity "main!:_IO_FILE^_fileno"	with type "variable" int 
-	Declared external entity "main!:_IO_FILE^_flags2"	with type "variable" int 
-	Declared external entity "main!:_IO_FILE^_old_offset"	with type "variable" __off_t 
-	Declared external entity "main!:_IO_FILE^_cur_column"	with type "variable" unsigned short 
-	Declared external entity "main!:_IO_FILE^_vtable_offset"	with type "variable" signed char 
-	Declared external entity "main!:_IO_FILE^_shortbuf"	with type "variable" char 
+	Declared external entity "main!:_IO_FILE^_markers"	with type "variable" struct _IO_marker  *
+	Declared external entity "main!:_IO_FILE^_chain"	with type "variable" struct _IO_FILE  *
+	Declared external entity "main!:_IO_FILE^_fileno"	with type "variable" int
+	Declared external entity "main!:_IO_FILE^_flags2"	with type "variable" int
+	Declared external entity "main!:_IO_FILE^_old_offset"	with type "variable" __off_t
+	Declared external entity "main!:_IO_FILE^_cur_column"	with type "variable" unsigned short
+	Declared external entity "main!:_IO_FILE^_vtable_offset"	with type "variable" signed char
+	Declared external entity "main!:_IO_FILE^_shortbuf"	with type "variable" char
 	Declared external entity "main!:_IO_FILE^_lock"	with type "variable" _IO_lock_t *
-	Declared external entity "main!:_IO_FILE^_offset"	with type "variable" __off64_t 
+	Declared external entity "main!:_IO_FILE^_offset"	with type "variable" __off64_t
 	Declared external entity "main!:_IO_FILE^__pad1"	with type "variable" void *
 	Declared external entity "main!:_IO_FILE^__pad2"	with type "variable" void *
-	Declared external entity "main!:_IO_FILE^_mode"	with type "variable" int 
-	Declared external entity "main!:_IO_FILE^_unused2"	with type "variable" char 
+	Declared external entity "main!:_IO_FILE^_mode"	with type "variable" int
+	Declared external entity "main!:_IO_FILE^_unused2"	with type "variable" char
 	Declared external entity "TOP-LEVEL:_IO_2_1_stdin_"	with type "variable" struct _IO_FILE_plus 
 	Declared external entity "TOP-LEVEL:_IO_2_1_stdout_"	with type "variable" struct _IO_FILE_plus 
 	Declared external entity "TOP-LEVEL:_IO_2_1_stderr_"	with type "variable" struct _IO_FILE_plus 
-	Declared external entity "TOP-LEVEL:__underflow"	with type "functional" "_IO_FILE * -> int "
-	Declared external entity "TOP-LEVEL:__uflow"	with type "functional" "_IO_FILE * -> int "
-	Declared external entity "TOP-LEVEL:__overflow"	with type "functional" "_IO_FILE * x int  -> int "
-	Declared external entity "TOP-LEVEL:__wunderflow"	with type "functional" "_IO_FILE * -> wint_t "
-	Declared external entity "TOP-LEVEL:__wuflow"	with type "functional" "_IO_FILE * -> wint_t "
-	Declared external entity "TOP-LEVEL:__woverflow"	with type "functional" "_IO_FILE * x wint_t  -> wint_t "
-	Declared external entity "TOP-LEVEL:_IO_getc"	with type "functional" "_IO_FILE * -> int "
-	Declared external entity "TOP-LEVEL:_IO_putc"	with type "functional" "int  x _IO_FILE * -> int "
-	Declared external entity "TOP-LEVEL:_IO_feof"	with type "functional" "_IO_FILE * -> int "
-	Declared external entity "TOP-LEVEL:_IO_ferror"	with type "functional" "_IO_FILE * -> int "
-	Declared external entity "TOP-LEVEL:_IO_peekc_locked"	with type "functional" "_IO_FILE * -> int "
+	Declared external entity "TOP-LEVEL:__underflow"	with type "functional" "_IO_FILE * -> int"
+	Declared external entity "TOP-LEVEL:__uflow"	with type "functional" "_IO_FILE * -> int"
+	Declared external entity "TOP-LEVEL:__overflow"	with type "functional" "_IO_FILE * x int -> int"
+	Declared external entity "TOP-LEVEL:__wunderflow"	with type "functional" "_IO_FILE * -> wint_t"
+	Declared external entity "TOP-LEVEL:__wuflow"	with type "functional" "_IO_FILE * -> wint_t"
+	Declared external entity "TOP-LEVEL:__woverflow"	with type "functional" "_IO_FILE * x wint_t -> wint_t"
+	Declared external entity "TOP-LEVEL:_IO_getc"	with type "functional" "_IO_FILE * -> int"
+	Declared external entity "TOP-LEVEL:_IO_putc"	with type "functional" "int x _IO_FILE * -> int"
+	Declared external entity "TOP-LEVEL:_IO_feof"	with type "functional" "_IO_FILE * -> int"
+	Declared external entity "TOP-LEVEL:_IO_ferror"	with type "functional" "_IO_FILE * -> int"
+	Declared external entity "TOP-LEVEL:_IO_peekc_locked"	with type "functional" "_IO_FILE * -> int"
 	Declared external entity "TOP-LEVEL:_IO_flockfile"	with type "functional" "_IO_FILE * -> void"
 	Declared external entity "TOP-LEVEL:_IO_funlockfile"	with type "functional" "_IO_FILE * -> void"
-	Declared external entity "TOP-LEVEL:_IO_ftrylockfile"	with type "functional" "_IO_FILE * -> int "
-	Declared external entity "TOP-LEVEL:_IO_vfscanf"	with type "functional" "_IO_FILE * x char * x __gnuc_va_list  x int * -> int "
-	Declared external entity "TOP-LEVEL:_IO_vfprintf"	with type "functional" "_IO_FILE * x char * x __gnuc_va_list  -> int "
-	Declared external entity "TOP-LEVEL:_IO_padn"	with type "functional" "_IO_FILE * x int  x __ssize_t  -> __ssize_t "
-	Declared external entity "TOP-LEVEL:_IO_sgetn"	with type "functional" "_IO_FILE * x void * x size_t  -> size_t "
-	Declared external entity "TOP-LEVEL:_IO_seekoff"	with type "functional" "_IO_FILE * x __off64_t  x int  x int  -> __off64_t "
-	Declared external entity "TOP-LEVEL:_IO_seekpos"	with type "functional" "_IO_FILE * x __off64_t  x int  -> __off64_t "
+	Declared external entity "TOP-LEVEL:_IO_ftrylockfile"	with type "functional" "_IO_FILE * -> int"
+	Declared external entity "TOP-LEVEL:_IO_vfscanf"	with type "functional" "_IO_FILE * x char * x __gnuc_va_list x int * -> int"
+	Declared external entity "TOP-LEVEL:_IO_vfprintf"	with type "functional" "_IO_FILE * x char * x __gnuc_va_list -> int"
+	Declared external entity "TOP-LEVEL:_IO_padn"	with type "functional" "_IO_FILE * x int x __ssize_t -> __ssize_t"
+	Declared external entity "TOP-LEVEL:_IO_sgetn"	with type "functional" "_IO_FILE * x void * x size_t -> size_t"
+	Declared external entity "TOP-LEVEL:_IO_seekoff"	with type "functional" "_IO_FILE * x __off64_t x int x int -> __off64_t"
+	Declared external entity "TOP-LEVEL:_IO_seekpos"	with type "functional" "_IO_FILE * x __off64_t x int -> __off64_t"
 	Declared external entity "TOP-LEVEL:_IO_free_backup_area"	with type "functional" "_IO_FILE * -> void"
-	Declared external entity "TOP-LEVEL:stdin"	with type "variable" struct _IO_FILE *
-	Declared external entity "TOP-LEVEL:stdout"	with type "variable" struct _IO_FILE *
-	Declared external entity "TOP-LEVEL:stderr"	with type "variable" struct _IO_FILE *
-	Declared external entity "TOP-LEVEL:remove"	with type "functional" "char * -> int "
-	Declared external entity "TOP-LEVEL:rename"	with type "functional" "char * x char * -> int "
+	Declared external entity "TOP-LEVEL:stdin"	with type "variable" struct _IO_FILE  *
+	Declared external entity "TOP-LEVEL:stdout"	with type "variable" struct _IO_FILE  *
+	Declared external entity "TOP-LEVEL:stderr"	with type "variable" struct _IO_FILE  *
+	Declared external entity "TOP-LEVEL:remove"	with type "functional" "char * -> int"
+	Declared external entity "TOP-LEVEL:rename"	with type "functional" "char * x char * -> int"
 	Declared external entity "TOP-LEVEL:tmpfile"	with type "functional" "void -> FILE *"
 	Declared external entity "TOP-LEVEL:tmpnam"	with type "functional" "char * -> char *"
-	Declared external entity "TOP-LEVEL:fclose"	with type "functional" "FILE * -> int "
-	Declared external entity "TOP-LEVEL:fflush"	with type "functional" "FILE * -> int "
+	Declared external entity "TOP-LEVEL:fclose"	with type "functional" "FILE * -> int"
+	Declared external entity "TOP-LEVEL:fflush"	with type "functional" "FILE * -> int"
 	Declared external entity "TOP-LEVEL:fopen"	with type "functional" "char * x char * -> FILE *"
 	Declared external entity "TOP-LEVEL:freopen"	with type "functional" "char * x char * x FILE * -> FILE *"
 	Declared external entity "TOP-LEVEL:setbuf"	with type "functional" "FILE * x char * -> void"
-	Declared external entity "TOP-LEVEL:setvbuf"	with type "functional" "FILE * x char * x int  x size_t  -> int "
-	Declared external entity "TOP-LEVEL:fprintf"	with type "functional" "FILE * x char * x varargs:overloaded -> int "
-	Declared external entity "TOP-LEVEL:printf"	with type "functional" "char * x varargs:overloaded -> int "
-	Declared external entity "TOP-LEVEL:sprintf"	with type "functional" "char * x char * x varargs:overloaded -> int "
-	Declared external entity "TOP-LEVEL:vfprintf"	with type "functional" "FILE * x char * x __gnuc_va_list  -> int "
-	Declared external entity "TOP-LEVEL:vprintf"	with type "functional" "char * x __gnuc_va_list  -> int "
-	Declared external entity "TOP-LEVEL:vsprintf"	with type "functional" "char * x char * x __gnuc_va_list  -> int "
-	Declared external entity "TOP-LEVEL:fscanf"	with type "functional" "FILE * x char * x varargs:overloaded -> int "
-	Declared external entity "TOP-LEVEL:scanf"	with type "functional" "char * x varargs:overloaded -> int "
-	Declared external entity "TOP-LEVEL:sscanf"	with type "functional" "char * x char * x varargs:overloaded -> int "
-	Declared external entity "TOP-LEVEL:fgetc"	with type "functional" "FILE * -> int "
-	Declared external entity "TOP-LEVEL:getc"	with type "functional" "FILE * -> int "
-	Declared external entity "TOP-LEVEL:getchar"	with type "functional" "void -> int "
-	Declared external entity "TOP-LEVEL:fputc"	with type "functional" "int  x FILE * -> int "
-	Declared external entity "TOP-LEVEL:putc"	with type "functional" "int  x FILE * -> int "
-	Declared external entity "TOP-LEVEL:putchar"	with type "functional" "int  -> int "
-	Declared external entity "TOP-LEVEL:fgets"	with type "functional" "char * x int  x FILE * -> char *"
+	Declared external entity "TOP-LEVEL:setvbuf"	with type "functional" "FILE * x char * x int x size_t -> int"
+	Declared external entity "TOP-LEVEL:fprintf"	with type "functional" "FILE * x char * x varargs:overloaded -> int"
+	Declared external entity "TOP-LEVEL:printf"	with type "functional" "char * x varargs:overloaded -> int"
+	Declared external entity "TOP-LEVEL:sprintf"	with type "functional" "char * x char * x varargs:overloaded -> int"
+	Declared external entity "TOP-LEVEL:vfprintf"	with type "functional" "FILE * x char * x __gnuc_va_list -> int"
+	Declared external entity "TOP-LEVEL:vprintf"	with type "functional" "char * x __gnuc_va_list -> int"
+	Declared external entity "TOP-LEVEL:vsprintf"	with type "functional" "char * x char * x __gnuc_va_list -> int"
+	Declared external entity "TOP-LEVEL:fscanf"	with type "functional" "FILE * x char * x varargs:overloaded -> int"
+	Declared external entity "TOP-LEVEL:scanf"	with type "functional" "char * x varargs:overloaded -> int"
+	Declared external entity "TOP-LEVEL:sscanf"	with type "functional" "char * x char * x varargs:overloaded -> int"
+	Declared external entity "TOP-LEVEL:fgetc"	with type "functional" "FILE * -> int"
+	Declared external entity "TOP-LEVEL:getc"	with type "functional" "FILE * -> int"
+	Declared external entity "TOP-LEVEL:getchar"	with type "functional" "void -> int"
+	Declared external entity "TOP-LEVEL:fputc"	with type "functional" "int x FILE * -> int"
+	Declared external entity "TOP-LEVEL:putc"	with type "functional" "int x FILE * -> int"
+	Declared external entity "TOP-LEVEL:putchar"	with type "functional" "int -> int"
+	Declared external entity "TOP-LEVEL:fgets"	with type "functional" "char * x int x FILE * -> char *"
 	Declared external entity "TOP-LEVEL:gets"	with type "functional" "char * -> char *"
-	Declared external entity "TOP-LEVEL:fputs"	with type "functional" "char * x FILE * -> int "
-	Declared external entity "TOP-LEVEL:puts"	with type "functional" "char * -> int "
-	Declared external entity "TOP-LEVEL:ungetc"	with type "functional" "int  x FILE * -> int "
-	Declared external entity "TOP-LEVEL:fread"	with type "functional" "void * x size_t  x size_t  x FILE * -> size_t "
-	Declared external entity "TOP-LEVEL:fwrite"	with type "functional" "void * x size_t  x size_t  x FILE * -> size_t "
-	Declared external entity "TOP-LEVEL:fseek"	with type "functional" "FILE * x long  x int  -> int "
-	Declared external entity "TOP-LEVEL:ftell"	with type "functional" "FILE * -> long "
+	Declared external entity "TOP-LEVEL:fputs"	with type "functional" "char * x FILE * -> int"
+	Declared external entity "TOP-LEVEL:puts"	with type "functional" "char * -> int"
+	Declared external entity "TOP-LEVEL:ungetc"	with type "functional" "int x FILE * -> int"
+	Declared external entity "TOP-LEVEL:fread"	with type "functional" "void * x size_t x size_t x FILE * -> size_t"
+	Declared external entity "TOP-LEVEL:fwrite"	with type "functional" "void * x size_t x size_t x FILE * -> size_t"
+	Declared external entity "TOP-LEVEL:fseek"	with type "functional" "FILE * x long x int -> int"
+	Declared external entity "TOP-LEVEL:ftell"	with type "functional" "FILE * -> long"
 	Declared external entity "TOP-LEVEL:rewind"	with type "functional" "FILE * -> void"
-	Declared external entity "TOP-LEVEL:fgetpos"	with type "functional" "FILE * x fpos_t * -> int "
-	Declared external entity "TOP-LEVEL:fsetpos"	with type "functional" "FILE * x fpos_t * -> int "
+	Declared external entity "TOP-LEVEL:fgetpos"	with type "functional" "FILE * x fpos_t * -> int"
+	Declared external entity "TOP-LEVEL:fsetpos"	with type "functional" "FILE * x fpos_t * -> int"
 	Declared external entity "TOP-LEVEL:clearerr"	with type "functional" "FILE * -> void"
-	Declared external entity "TOP-LEVEL:feof"	with type "functional" "FILE * -> int "
-	Declared external entity "TOP-LEVEL:ferror"	with type "functional" "FILE * -> int "
+	Declared external entity "TOP-LEVEL:feof"	with type "functional" "FILE * -> int"
+	Declared external entity "TOP-LEVEL:ferror"	with type "functional" "FILE * -> int"
 	Declared external entity "TOP-LEVEL:perror"	with type "functional" "char * -> void"
 	Declared external entity "TOP-LEVEL:main"	with type "functional" "() -> unknow"
 

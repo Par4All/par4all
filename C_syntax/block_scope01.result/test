@@ -9,9 +9,9 @@ Declarations for module "block_scope01!" with type "() -> unknow"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 4
-	Declared entity "TOP-LEVEL:foo" with type "functional" "int  -> void"
-	Declared entity "TOP-LEVEL:main" with type "functional" "() -> int "
-	Declared entity "TOP-LEVEL:x" with type "variable" "int "
+	Declared entity "TOP-LEVEL:foo" with type "functional" "int -> void"
+	Declared entity "TOP-LEVEL:main" with type "functional" "() -> int"
+	Declared entity "TOP-LEVEL:x" with type "variable" "int"
 	Declared entity "block_scope01!:*DYNAMIC*" with type "area" with size 0
 	Declared entity "block_scope01!:*HEAP*" with type "area" with size 0
 	Declared entity "block_scope01!:*STACK*" with type "area" with size 0
@@ -19,8 +19,8 @@ Variable list:
 
 External variable list:
 
-	Declared external entity "TOP-LEVEL:main"	with type "functional" "() -> int "
-	Declared external entity "TOP-LEVEL:foo"	with type "functional" "int  -> void"
+	Declared external entity "TOP-LEVEL:main"	with type "functional" "() -> int"
+	Declared external entity "TOP-LEVEL:foo"	with type "functional" "int -> void"
 
 Layouts for memory areas:
 
@@ -47,7 +47,7 @@ End of declarations for module block_scope01!
 
 main
 
-Declarations for module "main" with type "() -> int "
+Declarations for module "main" with type "() -> int"
 
 Variable list:
 
@@ -57,8 +57,8 @@ Variable list:
 	Declared entity "main:*DYNAMIC*" with type "area" with size 8
 	Declared entity "main:*STACK*" with type "area" with size 0
 	Declared entity "main:*STATIC*" with type "area" with size 0
-	Declared entity "main:0`1`x" with type "variable" "int "
-	Declared entity "main:0`x" with type "variable" "int "
+	Declared entity "main:0`1`x" with type "variable" "int"
+	Declared entity "main:0`x" with type "variable" "int"
 
 * empty extern declaration list *
 
@@ -93,7 +93,7 @@ End of declarations for module main
 
 foo
 
-Declarations for module "foo" with type "int  -> void"
+Declarations for module "foo" with type "int -> void"
 
 Variable list:
 
@@ -103,13 +103,13 @@ Variable list:
 	Declared entity "foo:*DYNAMIC*" with type "area" with size 24
 	Declared entity "foo:*STACK*" with type "area" with size 0
 	Declared entity "foo:*STATIC*" with type "area" with size 0
-	Declared entity "foo:0`1`x" with type "variable" "int "
-	Declared entity "foo:0`2`x" with type "variable" "int "
-	Declared entity "foo:0`3`x" with type "variable" "int "
-	Declared entity "foo:0`4`y" with type "variable" "int "
-	Declared entity "foo:0`x" with type "variable" "int "
-	Declared entity "foo:0`y" with type "variable" "int "
-	Declared entity "foo:x" with type "variable" "int "
+	Declared entity "foo:0`1`x" with type "variable" "int"
+	Declared entity "foo:0`2`x" with type "variable" "int"
+	Declared entity "foo:0`3`x" with type "variable" "int"
+	Declared entity "foo:0`4`y" with type "variable" "int"
+	Declared entity "foo:0`x" with type "variable" "int"
+	Declared entity "foo:0`y" with type "variable" "int"
+	Declared entity "foo:x" with type "variable" "int"
 
 * empty extern declaration list *
 

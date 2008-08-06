@@ -1,6 +1,6 @@
 foo
 
-Declarations for module "foo" with type "int  -> int "
+Declarations for module "foo" with type "int -> int"
 
 Variable list:
 
@@ -8,9 +8,9 @@ Variable list:
 	Declared entity "foo:*DYNAMIC*" with type "area" with size 0
 	Declared entity "foo:*STACK*" with type "area" with size 0
 	Declared entity "foo:*STATIC*" with type "area" with size 0
-	Declared entity "foo:0`X" with type "variable" "int "
-	Declared entity "foo:0`Y" with type "variable" "int "
-	Declared entity "foo:a" with type "variable" "int "
+	Declared entity "foo:0`X" with type "variable" "int"
+	Declared entity "foo:0`Y" with type "variable" "int"
+	Declared entity "foo:a" with type "variable" "int"
 	Declared entity "sizeofArray03!:*HEAP*" with type "area" with size 0
 	Declared entity "sizeofArray03!:*STATIC*" with type "area" with size 0
 
@@ -55,7 +55,7 @@ Declarations for module "sizeofArray03!" with type "() -> unknow"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
-	Declared entity "TOP-LEVEL:foo" with type "functional" "int  -> int "
+	Declared entity "TOP-LEVEL:foo" with type "functional" "int -> int"
 	Declared entity "sizeofArray03!:*DYNAMIC*" with type "area" with size 0
 	Declared entity "sizeofArray03!:*HEAP*" with type "area" with size 0
 	Declared entity "sizeofArray03!:*STACK*" with type "area" with size 0
@@ -63,7 +63,7 @@ Variable list:
 
 External variable list:
 
-	Declared external entity "TOP-LEVEL:foo"	with type "functional" "int  -> int "
+	Declared external entity "TOP-LEVEL:foo"	with type "functional" "int -> int"
 
 Layouts for memory areas:
 

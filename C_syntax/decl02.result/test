@@ -8,15 +8,15 @@ Declarations for module "decl02!" with type "() -> unknow"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 34
-	Declared entity "TOP-LEVEL:MEM_checked_class" with type "variable" "char "
-	Declared entity "TOP-LEVEL:array" with type "variable" "int "
+	Declared entity "TOP-LEVEL:MEM_checked_class" with type "variable" "char"
+	Declared entity "TOP-LEVEL:array" with type "variable" "int"
 	Declared entity "decl02!:*DYNAMIC*" with type "area" with size 0
 	Declared entity "decl02!:*HEAP*" with type "area" with size 0
 	Declared entity "decl02!:*STACK*" with type "area" with size 0
 	Declared entity "decl02!:*STATIC*" with type "area" with size 0
 	Declared entity "decl02!:cmd" with type "variable" "char *"
 	Declared entity "decl02!:file" with type "variable" "char *"
-	Declared entity "decl02!:line" with type "variable" "STD_uint32 "
+	Declared entity "decl02!:line" with type "variable" "STD_uint32"
 
 * empty extern declaration list *
 

@@ -3,7 +3,7 @@ Symbol table for block_scope08
 
 block_scope08
 
-Declarations for module "block_scope08" with type "int  -> int "
+Declarations for module "block_scope08" with type "int -> int"
 
 Variable list:
 
@@ -13,8 +13,8 @@ Variable list:
 	Declared entity "block_scope08:*DYNAMIC*" with type "area" with size 4
 	Declared entity "block_scope08:*STACK*" with type "area" with size 0
 	Declared entity "block_scope08:*STATIC*" with type "area" with size 0
-	Declared entity "block_scope08:0`k" with type "variable" "int "
-	Declared entity "block_scope08:x" with type "variable" "int "
+	Declared entity "block_scope08:0`k" with type "variable" "int"
+	Declared entity "block_scope08:x" with type "variable" "int"
 
 * empty extern declaration list *
 

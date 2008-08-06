@@ -5,7 +5,7 @@ Declarations for module "foo" with type "() -> void"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
-	Declared entity "TOP-LEVEL:bar" with type "functional" "() -> int "
+	Declared entity "TOP-LEVEL:bar" with type "functional" "() -> int"
 	Declared entity "externalloc05!:*HEAP*" with type "area" with size 0
 	Declared entity "externalloc05!:*STATIC*" with type "area" with size 0
 	Declared entity "foo:*DYNAMIC*" with type "area" with size 0

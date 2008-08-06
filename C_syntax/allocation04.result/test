@@ -3,7 +3,7 @@ Symbol table for foo
 
 foo
 
-Declarations for module "foo" with type "int  -> int "
+Declarations for module "foo" with type "int -> int"
 
 Variable list:
 
@@ -13,9 +13,9 @@ Variable list:
 	Declared entity "foo:*DYNAMIC*" with type "area" with size 4
 	Declared entity "foo:*STACK*" with type "area" with size 0
 	Declared entity "foo:*STATIC*" with type "area" with size 4
-	Declared entity "foo:0`k" with type "variable" "int "
-	Declared entity "foo:0`l" with type "variable" "int "
-	Declared entity "foo:i" with type "variable" "int "
+	Declared entity "foo:0`k" with type "variable" "int"
+	Declared entity "foo:0`l" with type "variable" "int"
+	Declared entity "foo:i" with type "variable" "int"
 
 * empty extern declaration list *
 
@@ -55,7 +55,7 @@ Symbol table for main
 
 main
 
-Declarations for module "main" with type "() -> int "
+Declarations for module "main" with type "() -> int"
 
 Variable list:
 
@@ -65,10 +65,10 @@ Variable list:
 	Declared entity "main:*DYNAMIC*" with type "area" with size 88
 	Declared entity "main:*STACK*" with type "area" with size 0
 	Declared entity "main:*STATIC*" with type "area" with size 4
-	Declared entity "main:0`array" with type "variable" "float "
-	Declared entity "main:0`fooi" with type "variable" "int "
-	Declared entity "main:0`i" with type "variable" "int "
-	Declared entity "main:0`j" with type "variable" "int "
+	Declared entity "main:0`array" with type "variable" "float"
+	Declared entity "main:0`fooi" with type "variable" "int"
+	Declared entity "main:0`i" with type "variable" "int"
+	Declared entity "main:0`j" with type "variable" "int"
 
 * empty extern declaration list *
 

@@ -8,7 +8,7 @@ Declarations for module "fprintf01!" with type "() -> unknow"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
-	Declared entity "TOP-LEVEL:fprintf01" with type "functional" "char * x varargs:overloaded -> int "
+	Declared entity "TOP-LEVEL:fprintf01" with type "functional" "char * x varargs:overloaded -> int"
 	Declared entity "fprintf01!:*DYNAMIC*" with type "area" with size 0
 	Declared entity "fprintf01!:*HEAP*" with type "area" with size 0
 	Declared entity "fprintf01!:*STACK*" with type "area" with size 0
@@ -16,7 +16,7 @@ Variable list:
 
 External variable list:
 
-	Declared external entity "TOP-LEVEL:fprintf01"	with type "functional" "char * x varargs:overloaded -> int "
+	Declared external entity "TOP-LEVEL:fprintf01"	with type "functional" "char * x varargs:overloaded -> int"
 
 Layouts for memory areas:
 

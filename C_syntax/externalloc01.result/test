@@ -5,18 +5,18 @@ Declarations for module "externalloc01!" with type "() -> unknow"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 4
-	Declared entity "TOP-LEVEL:a" with type "variable" "int "
-	Declared entity "TOP-LEVEL:c" with type "variable" "int "
+	Declared entity "TOP-LEVEL:a" with type "variable" "int"
+	Declared entity "TOP-LEVEL:c" with type "variable" "int"
 	Declared entity "externalloc01!:*DYNAMIC*" with type "area" with size 0
 	Declared entity "externalloc01!:*HEAP*" with type "area" with size 0
 	Declared entity "externalloc01!:*STACK*" with type "area" with size 0
 	Declared entity "externalloc01!:*STATIC*" with type "area" with size 0
-	Declared entity "externalloc01!:b" with type "variable" "int "
-	Declared entity "externalloc01!:foo" with type "functional" "() -> int "
+	Declared entity "externalloc01!:b" with type "variable" "int"
+	Declared entity "externalloc01!:foo" with type "functional" "() -> int"
 
 External variable list:
 
-	Declared external entity "TOP-LEVEL:a"	with type "variable" int 
+	Declared external entity "TOP-LEVEL:a"	with type "variable" int
 
 Layouts for memory areas:
 

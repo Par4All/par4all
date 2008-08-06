@@ -1,6 +1,6 @@
 foo
 
-Declarations for module "foo" with type "int  x int  -> void"
+Declarations for module "foo" with type "int x int -> void"
 
 Variable list:
 
@@ -8,11 +8,11 @@ Variable list:
 	Declared entity "foo:*DYNAMIC*" with type "area" with size 4
 	Declared entity "foo:*STACK*" with type "area" with size 0
 	Declared entity "foo:*STATIC*" with type "area" with size 0
-	Declared entity "foo:0`A" with type "variable" "int "
-	Declared entity "foo:0`B" with type "variable" "int "
-	Declared entity "foo:0`j" with type "variable" "int "
-	Declared entity "foo:m" with type "variable" "int "
-	Declared entity "foo:n" with type "variable" "int "
+	Declared entity "foo:0`A" with type "variable" "int"
+	Declared entity "foo:0`B" with type "variable" "int"
+	Declared entity "foo:0`j" with type "variable" "int"
+	Declared entity "foo:m" with type "variable" "int"
+	Declared entity "foo:n" with type "variable" "int"
 	Declared entity "sizeofArray02!:*HEAP*" with type "area" with size 0
 	Declared entity "sizeofArray02!:*STATIC*" with type "area" with size 0
 
@@ -57,7 +57,7 @@ Declarations for module "sizeofArray02!" with type "() -> unknow"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
-	Declared entity "TOP-LEVEL:foo" with type "functional" "int  x int  -> void"
+	Declared entity "TOP-LEVEL:foo" with type "functional" "int x int -> void"
 	Declared entity "sizeofArray02!:*DYNAMIC*" with type "area" with size 0
 	Declared entity "sizeofArray02!:*HEAP*" with type "area" with size 0
 	Declared entity "sizeofArray02!:*STACK*" with type "area" with size 0
@@ -65,7 +65,7 @@ Variable list:
 
 External variable list:
 
-	Declared external entity "TOP-LEVEL:foo"	with type "functional" "int  x int  -> void"
+	Declared external entity "TOP-LEVEL:foo"	with type "functional" "int x int -> void"
 
 Layouts for memory areas:
 

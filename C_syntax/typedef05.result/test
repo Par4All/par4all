@@ -1,0 +1,13 @@
+int main()
+{
+   typedef char *STRING;
+   typedef int A[2][3];
+   typedef int PFI();
+   struct tree {
+      struct tree *left;
+      struct tree *right;
+   };
+   typedef struct tree TREE;
+   typedef struct tree *TREEPTR;
+   TREE t;
+}

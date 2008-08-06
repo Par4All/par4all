@@ -9,14 +9,8 @@ typedef signed short __int16_t;
 typedef unsigned short __uint16_t;
 typedef signed int __int32_t;
 typedef unsigned int __uint32_t;
-struct PIPS_STRUCT_1 {
-   extern long __val[2];
-};
-typedef struct PIPS_STRUCT_1 __quad_t;
-struct PIPS_STRUCT_2 {
-   extern __u_long __val[2];
-};
-typedef struct PIPS_STRUCT_2 __u_quad_t;
+typedef struct {long __val[2];} __quad_t;
+typedef struct {__u_long __val[2];} __u_quad_t;
 typedef unsigned long long __dev_t;
 typedef unsigned int __uid_t;
 typedef unsigned int __gid_t;
@@ -27,10 +21,7 @@ typedef unsigned int __nlink_t;
 typedef long __off_t;
 typedef long long __off64_t;
 typedef int __pid_t;
-struct PIPS_STRUCT_3 {
-   extern int __val[2];
-};
-typedef struct PIPS_STRUCT_3 __fsid_t;
+typedef struct {int __val[2];} __fsid_t;
 typedef long __clock_t;
 typedef unsigned long __rlim_t;
 typedef unsigned long long __rlim64_t;
@@ -60,27 +51,11 @@ typedef struct _IO_FILE FILE;
 typedef struct _IO_FILE __FILE;
 typedef long wchar_t;
 typedef unsigned int wint_t;
-union PIPS_UNION_5 {
-   extern wint_t __wch;
-   extern char __wchb[4];
-};
-struct PIPS_STRUCT_4 {
-   extern int __count;
-   extern union PIPS_UNION_5 __value;
-};
-typedef struct PIPS_STRUCT_4 __mbstate_t;
-struct PIPS_STRUCT_6 {
-   extern __off_t __pos;
-   extern __mbstate_t __state;
-};
-typedef struct PIPS_STRUCT_6 _G_fpos_t;
-struct PIPS_STRUCT_7 {
-   extern __off64_t __pos;
-   extern __mbstate_t __state;
-};
-typedef struct PIPS_STRUCT_7 _G_fpos64_t;
-enum PIPS_ENUM_8 {__GCONV_OK, __GCONV_NOCONV, __GCONV_NODB, __GCONV_NOMEM, __GCONV_EMPTY_INPUT, __GCONV_FULL_OUTPUT, __GCONV_ILLEGAL_INPUT, __GCONV_INCOMPLETE_INPUT, __GCONV_ILLEGAL_DESCRIPTOR, __GCONV_INTERNAL_ERROR};
-enum PIPS_ENUM_9 {__GCONV_IS_LAST=0x0001, __GCONV_IGNORE_ERRORS};
+typedef struct {int __count; union {wint_t __wch; char __wchb[4];} __value;} __mbstate_t;
+typedef struct {__off_t __pos; __mbstate_t __state;} _G_fpos_t;
+typedef struct {__off64_t __pos; __mbstate_t __state;} _G_fpos64_t;
+enum {__GCONV_OK, __GCONV_NOCONV, __GCONV_NODB, __GCONV_NOMEM, __GCONV_EMPTY_INPUT, __GCONV_FULL_OUTPUT, __GCONV_ILLEGAL_INPUT, __GCONV_INCOMPLETE_INPUT, __GCONV_ILLEGAL_DESCRIPTOR, __GCONV_INTERNAL_ERROR};
+enum {__GCONV_IS_LAST=0x0001, __GCONV_IGNORE_ERRORS};
 typedef static int (*__gconv_fct)(struct __gconv_step *,struct __gconv_step_data *,const unsigned char **,const unsigned char *,unsigned char **,unsigned int *,int ,int );
 typedef static wint_t (*__gconv_btowc_fct)(struct __gconv_step *,unsigned char );
 typedef static int (*__gconv_init_fct)(struct __gconv_step *);
@@ -130,15 +105,7 @@ struct __gconv_info {
    extern struct __gconv_step_data __data[1];
 };
 typedef struct __gconv_info *__gconv_t;
-struct PIPS_STRUCT_11 {
-   extern struct __gconv_info __cd;
-   extern struct __gconv_step_data __data;
-};
-union PIPS_UNION_10 {
-   extern struct __gconv_info __cd;
-   extern struct PIPS_STRUCT_11 __combined;
-};
-typedef union PIPS_UNION_10 _G_iconv_t;
+typedef union {struct __gconv_info __cd; struct {struct __gconv_info __cd; struct __gconv_step_data __data;} __combined;} _G_iconv_t;
 typedef int _G_int16_t;
 typedef int _G_int32_t;
 typedef unsigned int _G_uint16_t;
@@ -177,7 +144,7 @@ struct _IO_FILE {
    extern void *__pad1;
    extern void *__pad2;
    extern int _mode;
-   extern char _unused2[15*sizeof(int )-2*sizeof(void *)];
+   extern char _unused2[15*sizeof(int)-2*sizeof(void *)];
 };
 typedef struct _IO_FILE _IO_FILE;
 extern struct _IO_FILE_plus _IO_2_1_stdin_;
@@ -284,7 +251,7 @@ extern char *ctermid(char *);
 extern void flockfile(FILE *);
 extern int ftrylockfile(FILE *);
 extern void funlockfile(FILE *);
-extern main();
+extern  main();
 main()
 {
    int i = 0;

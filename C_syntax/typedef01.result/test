@@ -3,11 +3,7 @@ int main()
    typedef char *STRING;
    typedef int A[2][3];
    typedef int PFI();
-   struct PIPS_STRUCT_1 {
-      int left;
-      int right;
-   };
-   typedef struct PIPS_STRUCT_1 TREE;
-   typedef struct PIPS_STRUCT_1 *TREEPTR;
+   typedef struct {int left; int right;} TREE;
+   typedef struct {int left; int right;} *TREEPTR;
    TREE t;
 }

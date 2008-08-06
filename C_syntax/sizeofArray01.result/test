@@ -8,8 +8,8 @@ Variable list:
 	Declared entity "fcompat:*DYNAMIC*" with type "area" with size 4
 	Declared entity "fcompat:*STACK*" with type "area" with size 0
 	Declared entity "fcompat:*STATIC*" with type "area" with size 0
-	Declared entity "fcompat:0`a" with type "variable" "int "
-	Declared entity "fcompat:0`c" with type "variable" "int "
+	Declared entity "fcompat:0`a" with type "variable" "int"
+	Declared entity "fcompat:0`c" with type "variable" "int"
 	Declared entity "fcompat:0`p" with type "variable" "int *"
 	Declared entity "sizeofArray01!:*HEAP*" with type "area" with size 0
 	Declared entity "sizeofArray01!:*STATIC*" with type "area" with size 0
@@ -54,8 +54,8 @@ Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
 	Declared entity "TOP-LEVEL:fcompat" with type "functional" "() -> void"
-	Declared entity "TOP-LEVEL:m" with type "variable" "int "
-	Declared entity "TOP-LEVEL:n" with type "variable" "int "
+	Declared entity "TOP-LEVEL:m" with type "variable" "int"
+	Declared entity "TOP-LEVEL:n" with type "variable" "int"
 	Declared entity "sizeofArray01!:*DYNAMIC*" with type "area" with size 0
 	Declared entity "sizeofArray01!:*HEAP*" with type "area" with size 0
 	Declared entity "sizeofArray01!:*STACK*" with type "area" with size 0
@@ -63,8 +63,8 @@ Variable list:
 
 External variable list:
 
-	Declared external entity "TOP-LEVEL:n"	with type "variable" int 
-	Declared external entity "TOP-LEVEL:m"	with type "variable" int 
+	Declared external entity "TOP-LEVEL:n"	with type "variable" int
+	Declared external entity "TOP-LEVEL:m"	with type "variable" int
 	Declared external entity "TOP-LEVEL:fcompat"	with type "functional" "() -> void"
 
 Layouts for memory areas:

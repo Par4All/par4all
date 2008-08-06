@@ -1,0 +1,57 @@
+
+Symbol table for "decl07"
+
+decl07
+
+Declarations for module "decl07" with type "() -> void"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "decl07!:*HEAP*" with type "area" with size 0
+	Declared entity "decl07!:*STATIC*" with type "area" with size 0
+	Declared entity "decl07:*DYNAMIC*" with type "area" with size 8
+	Declared entity "decl07:*STACK*" with type "area" with size 0
+	Declared entity "decl07:*STATIC*" with type "area" with size 0
+	Declared entity "decl07:0`a" with type "variable" "int"
+	Declared entity "decl07:0`f" with type "variable" "(char -> void) *"
+
+* empty extern declaration list *
+
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl07!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl07!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl07:*DYNAMIC*" of size 8:
+	Variable "decl07:0`a"	offset = 0	size = 4
+	Variable "decl07:0`f"	offset = 4	size = 4
+
+
+Layout for memory area "decl07:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl07:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module decl07
+
+
+Parsed printed file
+
+void decl07()
+{
+   int a;
+   void (*f)(char );
+}

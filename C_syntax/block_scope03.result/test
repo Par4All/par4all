@@ -3,7 +3,7 @@ Symbol table for "main"
 
 main
 
-Declarations for module "main" with type "() -> int "
+Declarations for module "main" with type "() -> int"
 
 Variable list:
 
@@ -13,9 +13,9 @@ Variable list:
 	Declared entity "main:*DYNAMIC*" with type "area" with size 12
 	Declared entity "main:*STACK*" with type "area" with size 0
 	Declared entity "main:*STATIC*" with type "area" with size 0
-	Declared entity "main:0`1`x" with type "variable" "int "
-	Declared entity "main:0`x" with type "variable" "int "
-	Declared entity "main:0`z" with type "variable" "int "
+	Declared entity "main:0`1`x" with type "variable" "int"
+	Declared entity "main:0`x" with type "variable" "int"
+	Declared entity "main:0`z" with type "variable" "int"
 
 * empty extern declaration list *
 

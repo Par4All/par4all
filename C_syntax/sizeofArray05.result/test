@@ -8,7 +8,7 @@ Variable list:
 	Declared entity "foo:*DYNAMIC*" with type "area" with size 0
 	Declared entity "foo:*STACK*" with type "area" with size 0
 	Declared entity "foo:*STATIC*" with type "area" with size 0
-	Declared entity "foo:0`array2" with type "variable" "int "
+	Declared entity "foo:0`array2" with type "variable" "int"
 	Declared entity "sizeofArray05!:*HEAP*" with type "area" with size 0
 	Declared entity "sizeofArray05!:*STATIC*" with type "area" with size 0
 
@@ -49,7 +49,7 @@ Declarations for module "sizeofArray05!" with type "() -> unknow"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 4
-	Declared entity "TOP-LEVEL:b" with type "variable" "int "
+	Declared entity "TOP-LEVEL:b" with type "variable" "int"
 	Declared entity "TOP-LEVEL:foo" with type "functional" "() -> void"
 	Declared entity "sizeofArray05!:*DYNAMIC*" with type "area" with size 0
 	Declared entity "sizeofArray05!:*HEAP*" with type "area" with size 0
