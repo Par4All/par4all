@@ -40,17 +40,18 @@ typedef struct {
 } hash_entry;
 
 struct __hash_table {
-  hash_key_type type;               /* the type of keys... */
+  hash_key_type type;                  /* the type of keys... */
   size_t size;                         /* size of actual array */
   size_t n_entry;                      /* number of associations stored */
   uintptr_t (*rank)(void*, uintptr_t); /* how to compute rank for key */
-  int (*equals)(void*, void*);      /* how to compare keys */
-  hash_entry *array;                /* actual array */
+  int (*equals)(void*, void*);         /* how to compare keys */
+  hash_entry *array;                   /* actual array */
   size_t limit;                        /* max entries before reallocation */
 
   /* keep statistics on the life time of the hash table... FC 04/06/2003 */
-  uintptr_t n_put, n_get, n_del, n_upd;
-  uintptr_t n_put_iter, n_get_iter, n_del_iter, n_upd_iter;
+  size_t n_free_for_puts,
+    n_put, n_get, n_del, n_upd,
+    n_put_iter, n_get_iter, n_del_iter, n_upd_iter;
 };
 
 /* Constant to find the end of the prime numbers table 
@@ -194,6 +195,7 @@ hash_table hash_table_make(hash_key_type key_type, size_t size)
     htp->array = (hash_entry*) alloc(size*sizeof(hash_entry));
 
     /* initialize statistics */
+    htp->n_free_for_puts = 0;
     htp->n_put = 0;
     htp->n_get = 0;
     htp->n_del = 0;
@@ -281,25 +283,27 @@ void hash_put(hash_table htp, void * key, void * val)
 {
   uintptr_t rank;
   hash_entry * hep;
-    
+
   if (htp->n_entry+1 >= (htp->limit)) 
     hash_enlarge_table(htp);
-  
-  message_assert("illegal input key", key!=HASH_ENTRY_FREE &&
-		 key!=HASH_ENTRY_FREE_FOR_PUT);
+
+  message_assert("illegal input key",
+		 key!=HASH_ENTRY_FREE && key!=HASH_ENTRY_FREE_FOR_PUT);
   message_assert("illegal input value", val!=HASH_UNDEFINED_VALUE);
-  
+
   htp->n_put++;
   hep = hash_find_entry(htp, key, &rank, hash_put_op, &htp->n_put_iter);
-  
+
   if (hep->key != HASH_ENTRY_FREE && hep->key != HASH_ENTRY_FREE_FOR_PUT) {
     if (should_i_warn_on_redefinition && hep->val != val) {
-      (void) fprintf(stderr, "[hash_put] key redefined: %s\n", 
+      (void) fprintf(stderr, "[hash_put] key redefined: %s\n",
 		     hash_print_key(htp->type, key));
     }
     hep->val = val;
   }
   else {
+    if (hep->key == HASH_ENTRY_FREE_FOR_PUT)
+      htp->n_free_for_puts--;
     htp->n_entry += 1;
     hep->key = key;
     hep->val = val;
@@ -317,18 +321,19 @@ hash_delget(
     hash_entry * hep;
     void *val;
     uintptr_t rank;
-    
+
     message_assert("legal input key",
 		   key!=HASH_ENTRY_FREE && key!=HASH_ENTRY_FREE_FOR_PUT);
 
     htp->n_del++;
     hep = hash_find_entry(htp, key, &rank, hash_del_op, &htp->n_del_iter);
-    
+
     if (hep->key != HASH_ENTRY_FREE && hep->key != HASH_ENTRY_FREE_FOR_PUT) {
 	val = hep->val;
 	*pkey = hep->key;
 	htp->array[rank].key = HASH_ENTRY_FREE_FOR_PUT;
 	htp->n_entry -= 1;
+	htp->n_free_for_puts++;
 	return val;
     }
 
@@ -349,25 +354,24 @@ void * hash_del(hash_table htp, void * key)
 /* this function retrieves in the hash table pointed to by htp the
    couple whose key is equal to key. the HASH_UNDEFINED_VALUE pointer is
    returned if no such couple exists. otherwise the corresponding value
-   is returned. */ 
-
+   is returned. */
 void * hash_get(hash_table htp, void * key)
 {
   hash_entry * hep;
   uintptr_t n;
-  
-  message_assert("legal input key", key!=HASH_ENTRY_FREE &&
-		 key!=HASH_ENTRY_FREE_FOR_PUT);
-  
-  if (!htp->n_entry) 
+
+  message_assert("legal input key",
+		 key!=HASH_ENTRY_FREE && key!=HASH_ENTRY_FREE_FOR_PUT);
+
+  if (!htp->n_entry)
     return HASH_UNDEFINED_VALUE;
-  
+
   /* else may be there */
   htp->n_get++;
   hep = hash_find_entry(htp, key, &n, hash_get_op, &htp->n_get_iter);
-  
-  return(hep->key!=HASH_ENTRY_FREE && hep->key!=HASH_ENTRY_FREE_FOR_PUT ? 
-	 hep->val : HASH_UNDEFINED_VALUE);
+
+  return hep->key!=HASH_ENTRY_FREE &&
+	 hep->key!=HASH_ENTRY_FREE_FOR_PUT ? hep->val : HASH_UNDEFINED_VALUE;
 }
 
 /* TRUE if key has e value in htp.
@@ -383,14 +387,15 @@ void hash_update(hash_table htp, void * key, void * val)
 {
   hash_entry * hep;
   uintptr_t n;
-  
-  message_assert("illegal input key", key!=HASH_ENTRY_FREE &&
-		 key!=HASH_ENTRY_FREE_FOR_PUT);
+
+  message_assert("illegal input key",
+		 key!=HASH_ENTRY_FREE && key!=HASH_ENTRY_FREE_FOR_PUT);
+
   htp->n_upd++;
   hep = hash_find_entry(htp, key, &n, hash_get_op, &htp->n_upd_iter);
 
   message_assert("no previous entry", htp->equals(hep->key, key));
-  
+
   hep->val = val ;
 }
 
@@ -604,18 +609,16 @@ static int inc_prime_list[] = {
 #define HASH_INC_SIZE (31) /* 31... (yes, this one is prime;-) */
 
 
-/*  buggy function, the hash table stuff should be made again from scratch.
- *  - FC 02/02/1995
- *  - So go on! :-) RK 17/01/2008
+/* return where the key is [to be] stored, depending on the operation.
  */
-static hash_entry * 
-hash_find_entry(hash_table htp, 
-		void * key, 
-		uintptr_t *prank, 
+static hash_entry *
+hash_find_entry(hash_table htp,
+		void * key,
+		uintptr_t *prank,
 		hash_operation operation,
 		uintptr_t * stats)
 {
-  register uintptr_t
+  register size_t
     r_init = (*(htp->rank))(key, htp->size),
     r = r_init,
     /* history of r_inc value
@@ -627,16 +630,18 @@ hash_find_entry(hash_table htp,
      *    I'm not sure the result is any better than 1???
      *    It does seems to help significantly on some examples...
      */
-    r_inc  = inc_prime_list[ RANK(r_init, HASH_INC_SIZE) ] ;
+    r_inc  = inc_prime_list[ RANK(r_init, HASH_INC_SIZE) ],
+    r_first_free = r_init;
+  bool first_free_found = false;
   hash_entry he;
 
-  while (1) 
+  while (1)
   {
     /* FC 05/06/2003
      * if r_init is randomized (i.e. perfect hash function)
      * and r_inc does not kill everything (could it?)
      * if p is the filled proportion for the table, 0<=p<1
-     * we should have number_of_iterations 
+     * we should have number_of_iterations
      *        = \Sigma_{i=1}{\infinity} i*(1-p)p^{i-1}
      * this formula must simplify somehow... = 1/(1-p) ?
      * 0.20   => 1.25
@@ -647,43 +652,54 @@ hash_find_entry(hash_table htp,
      * 0.70   => 3.33
      */
     if (stats) (*stats)++;
-    
+
+    /* the r-th entry */
     he = htp->array[r];
-    
-    if (he.key == HASH_ENTRY_FREE)
-      break;
-    
-    /*  ??? it may happen that the previous mapping is kept
-     *  somewhere forward! So after a hash_del, the old value
-     *  would be visible again!
+
+    /* a possible never used place is found, stop seeking!
+     * and return first free found or current if none.
      */
-    if (he.key == HASH_ENTRY_FREE_FOR_PUT && operation == hash_put_op)
+    if (he.key == HASH_ENTRY_FREE) {
+      if (first_free_found)
+	r = r_first_free;
       break;
-    
+    }
+
+    /* this is a possible place for storing, but the key may be there anyway...
+     * so we keep on seeking, but keep the first found place.
+     */
+    if (he.key == HASH_ENTRY_FREE_FOR_PUT && operation == hash_put_op &&
+	!first_free_found) {
+      r_first_free = r;
+      first_free_found = true;
+    }
+
+    /* the key is found! */
     if (he.key != HASH_ENTRY_FREE_FOR_PUT &&
 	(*(htp->equals))(he.key, key))
       break;
-    
+
     /* GO: it is not anymore the next slot, we skip some of them depending
-     * on the reckonned increment 
+     * on the reckonned increment
      */
     r = (r + r_inc) % htp->size;
-    
-    /* FC: ??? this may happen in a hash_get after many put and del,
-     * if the table contains no FREE, but many FREE_FOR_PUT instead!
+
+    /* it may happen after many put and del, if the table contains no FREE,
+     * but only many FREE_FOR_PUT instead.
      */
     if(r == r_init) {
-      fprintf(stderr,"[hash_find_entry] cannot find entry\n") ;
-      abort() ;
+      assert(first_free_found);
+      r = r_first_free;
+      break;
     }
   }
-  
+
   *prank = r;
   return &(htp->array[r]);
 }
 
 /* now we define observers in order to
- * hide the hash_table type ... 
+ * hide the hash_table type...
  */
 int hash_table_entry_count(hash_table htp)
 {
