@@ -483,6 +483,10 @@ L\"([^\"]|(\"\")|(\\\"))*\"	{
 				pips_debug(5,"TK_ASM %s\n",yytext);
 				return(TK_ASM);
 			} 
+"__attribute__"                 {
+				pips_debug(5,"TK_ATTRIBUTE %s\n",yytext);
+				return(TK_ATTRIBUTE);
+			} 
 "__extension__"         {
                                 pips_user_warning("gcc keyword \"__extension__\" is ignored\n");
                         }

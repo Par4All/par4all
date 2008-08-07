@@ -136,7 +136,7 @@ static bool current_function_is_static_p = FALSE;
 
      pips_user_warning("Corrupted or non-supported C constructs.\n"
 		       "Compile your code first, set proper PIPS option.\n"
-		       "FI: I do not have time to look it up right now, sorry.");
+		       "FI: I do not have time to look it up right now, sorry.\n");
 
      pips_internal_error("Not implemented yet\n."
 			 " Should reset all static variables.\n");
