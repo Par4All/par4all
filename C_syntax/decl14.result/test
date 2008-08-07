@@ -1,0 +1,54 @@
+
+Symbol table for "decl14!"
+
+decl14!
+
+Declarations for module "decl14!" with type "() -> unknow"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:filter" with type "functional" "() -> int"
+	Declared entity "decl14!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "decl14!:*HEAP*" with type "area" with size 0
+	Declared entity "decl14!:*STACK*" with type "area" with size 0
+	Declared entity "decl14!:*STATIC*" with type "area" with size 0
+
+External variable list:
+
+	Declared external entity "TOP-LEVEL:filter"	with type "functional" "() -> int"
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl14!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl14!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl14!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl14!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module decl14!
+
+
+Symbol table for "decl14"
+
+
+Parsed printed file for "decl14!"
+
+extern int filter();
+extern int filter();
+
+Parsed rinted file for "decl14"
+

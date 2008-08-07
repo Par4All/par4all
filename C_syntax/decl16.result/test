@@ -1,0 +1,50 @@
+
+Symbol table for "decl16!"
+
+decl16!
+
+Declarations for module "decl16!" with type "() -> unknow"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:x" with type "variable" "f"
+	Declared entity "TOP-LEVEL:y" with type "variable" "g"
+	Declared entity "decl16!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "decl16!:*HEAP*" with type "area" with size 0
+	Declared entity "decl16!:*STACK*" with type "area" with size 0
+	Declared entity "decl16!:*STATIC*" with type "area" with size 0
+
+* empty extern declaration list *
+
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl16!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl16!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl16!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl16!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module decl16!
+
+
+Parsed printed file for "decl16!"
+
+typedef static int f(int );
+f x;
+typedef static int g(int );
+g y;

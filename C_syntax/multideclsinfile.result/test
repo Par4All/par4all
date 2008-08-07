@@ -29,11 +29,13 @@ user warning in discard_C_comment: Comment "
 
 //Multiple declarations of global variables check in one file
 " is lost at line 2, probably because comments cannot be attached to declarations.
-[hash_put] key redefined: 0x8398680
 Multiple declarations of variable a in file
-user warning in CParserError: Recovery from C parser failure not (fully) implemented yet.
+user warning in CParserError: 
+Recovery from C parser failure not (fully) implemented yet.
 C parser is likely to fail later if re-used.
-user error in CParserError: Illegal Inputuser warning in set_debug_stack_pointer: debug level stack is set to 2
+user error in CParserError: 
+Illegal Input at line -1 (1)
+user warning in set_debug_stack_pointer: debug level stack is set to 2
 user warning in safe_do_something: Request aborted under pipsmake: build resource PARSED_PRINTED_FILE for module multideclsinfile!.
 user error in display_a_resource: Cannot build view file PARSED_PRINTED_FILE
 Deletion of obsolete resources:

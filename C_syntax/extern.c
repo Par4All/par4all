@@ -10,6 +10,7 @@ extern int (*potentials[10])(),(*forces[10])(),nused;
 int foo()
 {
   extern int i;
+  /* Yes, a function may be declared inside itself... */
   extern foo();
   extern (*p)();
   extern (*f)();

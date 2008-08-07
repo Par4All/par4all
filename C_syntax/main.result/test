@@ -84,84 +84,84 @@ Variable list:
 
 External variable list:
 
-	Declared external entity "main!:_PIPS_STRUCT_1^__val"	with type "variable" long
-	Declared external entity "main!:_PIPS_STRUCT_2^__val"	with type "variable" __u_long
-	Declared external entity "main!:_PIPS_STRUCT_3^__val"	with type "variable" int
-	Declared external entity "main!:_PIPS_STRUCT_4^__count"	with type "variable" int
-	Declared external entity "main!:_PIPS_UNION_5^__wch"	with type "variable" wint_t
-	Declared external entity "main!:_PIPS_UNION_5^__wchb"	with type "variable" char
-	Declared external entity "main!:_PIPS_STRUCT_4^__value"	with type "variable" union _PIPS_UNION_5 
-	Declared external entity "main!:_PIPS_STRUCT_6^__pos"	with type "variable" __off_t
-	Declared external entity "main!:_PIPS_STRUCT_6^__state"	with type "variable" __mbstate_t
-	Declared external entity "main!:_PIPS_STRUCT_7^__pos"	with type "variable" __off64_t
-	Declared external entity "main!:_PIPS_STRUCT_7^__state"	with type "variable" __mbstate_t
-	Declared external entity "main!:__gconv_trans_data^__trans_fct"	with type "variable" __gconv_trans_fct
-	Declared external entity "main!:__gconv_trans_data^__trans_context_fct"	with type "variable" __gconv_trans_context_fct
-	Declared external entity "main!:__gconv_trans_data^__trans_end_fct"	with type "variable" __gconv_trans_end_fct
-	Declared external entity "main!:__gconv_trans_data^__data"	with type "variable" void *
-	Declared external entity "main!:__gconv_trans_data^__next"	with type "variable" struct __gconv_trans_data  *
-	Declared external entity "main!:__gconv_step^__shlib_handle"	with type "variable" struct __gconv_loaded_object  *
-	Declared external entity "main!:__gconv_step^__modname"	with type "variable" char *
-	Declared external entity "main!:__gconv_step^__counter"	with type "variable" int
-	Declared external entity "main!:__gconv_step^__from_name"	with type "variable" char *
-	Declared external entity "main!:__gconv_step^__to_name"	with type "variable" char *
-	Declared external entity "main!:__gconv_step^__fct"	with type "variable" __gconv_fct
-	Declared external entity "main!:__gconv_step^__btowc_fct"	with type "variable" __gconv_btowc_fct
-	Declared external entity "main!:__gconv_step^__init_fct"	with type "variable" __gconv_init_fct
-	Declared external entity "main!:__gconv_step^__end_fct"	with type "variable" __gconv_end_fct
-	Declared external entity "main!:__gconv_step^__min_needed_from"	with type "variable" int
-	Declared external entity "main!:__gconv_step^__max_needed_from"	with type "variable" int
-	Declared external entity "main!:__gconv_step^__min_needed_to"	with type "variable" int
-	Declared external entity "main!:__gconv_step^__max_needed_to"	with type "variable" int
-	Declared external entity "main!:__gconv_step^__stateful"	with type "variable" int
-	Declared external entity "main!:__gconv_step^__data"	with type "variable" void *
-	Declared external entity "main!:__gconv_step_data^__outbuf"	with type "variable" unsigned char *
-	Declared external entity "main!:__gconv_step_data^__outbufend"	with type "variable" unsigned char *
-	Declared external entity "main!:__gconv_step_data^__flags"	with type "variable" int
-	Declared external entity "main!:__gconv_step_data^__invocation_counter"	with type "variable" int
-	Declared external entity "main!:__gconv_step_data^__internal_use"	with type "variable" int
-	Declared external entity "main!:__gconv_step_data^__statep"	with type "variable" __mbstate_t *
-	Declared external entity "main!:__gconv_step_data^__state"	with type "variable" __mbstate_t
-	Declared external entity "main!:__gconv_step_data^__trans"	with type "variable" struct __gconv_trans_data  *
-	Declared external entity "main!:__gconv_info^__nsteps"	with type "variable" size_t
-	Declared external entity "main!:__gconv_info^__steps"	with type "variable" struct __gconv_step  *
-	Declared external entity "main!:__gconv_info^__data"	with type "variable" struct __gconv_step_data 
-	Declared external entity "main!:_PIPS_UNION_10^__cd"	with type "variable" struct __gconv_info 
-	Declared external entity "main!:_PIPS_STRUCT_11^__cd"	with type "variable" struct __gconv_info 
-	Declared external entity "main!:_PIPS_STRUCT_11^__data"	with type "variable" struct __gconv_step_data 
-	Declared external entity "main!:_PIPS_UNION_10^__combined"	with type "variable" struct _PIPS_STRUCT_11 
-	Declared external entity "main!:_IO_marker^_next"	with type "variable" struct _IO_marker  *
-	Declared external entity "main!:_IO_marker^_sbuf"	with type "variable" struct _IO_FILE  *
-	Declared external entity "main!:_IO_marker^_pos"	with type "variable" int
-	Declared external entity "main!:_IO_FILE^_flags"	with type "variable" int
-	Declared external entity "main!:_IO_FILE^_IO_read_ptr"	with type "variable" char *
-	Declared external entity "main!:_IO_FILE^_IO_read_end"	with type "variable" char *
-	Declared external entity "main!:_IO_FILE^_IO_read_base"	with type "variable" char *
-	Declared external entity "main!:_IO_FILE^_IO_write_base"	with type "variable" char *
-	Declared external entity "main!:_IO_FILE^_IO_write_ptr"	with type "variable" char *
-	Declared external entity "main!:_IO_FILE^_IO_write_end"	with type "variable" char *
-	Declared external entity "main!:_IO_FILE^_IO_buf_base"	with type "variable" char *
-	Declared external entity "main!:_IO_FILE^_IO_buf_end"	with type "variable" char *
-	Declared external entity "main!:_IO_FILE^_IO_save_base"	with type "variable" char *
-	Declared external entity "main!:_IO_FILE^_IO_backup_base"	with type "variable" char *
-	Declared external entity "main!:_IO_FILE^_IO_save_end"	with type "variable" char *
-	Declared external entity "main!:_IO_FILE^_markers"	with type "variable" struct _IO_marker  *
-	Declared external entity "main!:_IO_FILE^_chain"	with type "variable" struct _IO_FILE  *
-	Declared external entity "main!:_IO_FILE^_fileno"	with type "variable" int
-	Declared external entity "main!:_IO_FILE^_flags2"	with type "variable" int
-	Declared external entity "main!:_IO_FILE^_old_offset"	with type "variable" __off_t
-	Declared external entity "main!:_IO_FILE^_cur_column"	with type "variable" unsigned short
-	Declared external entity "main!:_IO_FILE^_vtable_offset"	with type "variable" signed char
-	Declared external entity "main!:_IO_FILE^_shortbuf"	with type "variable" char
-	Declared external entity "main!:_IO_FILE^_lock"	with type "variable" _IO_lock_t *
-	Declared external entity "main!:_IO_FILE^_offset"	with type "variable" __off64_t
-	Declared external entity "main!:_IO_FILE^__pad1"	with type "variable" void *
-	Declared external entity "main!:_IO_FILE^__pad2"	with type "variable" void *
-	Declared external entity "main!:_IO_FILE^_mode"	with type "variable" int
-	Declared external entity "main!:_IO_FILE^_unused2"	with type "variable" char
-	Declared external entity "TOP-LEVEL:_IO_2_1_stdin_"	with type "variable" struct _IO_FILE_plus 
-	Declared external entity "TOP-LEVEL:_IO_2_1_stdout_"	with type "variable" struct _IO_FILE_plus 
-	Declared external entity "TOP-LEVEL:_IO_2_1_stderr_"	with type "variable" struct _IO_FILE_plus 
+	Declared external entity "main!:_PIPS_STRUCT_1^__val"	with type "variable" "long"
+	Declared external entity "main!:_PIPS_STRUCT_2^__val"	with type "variable" "__u_long"
+	Declared external entity "main!:_PIPS_STRUCT_3^__val"	with type "variable" "int"
+	Declared external entity "main!:_PIPS_STRUCT_4^__count"	with type "variable" "int"
+	Declared external entity "main!:_PIPS_UNION_5^__wch"	with type "variable" "wint_t"
+	Declared external entity "main!:_PIPS_UNION_5^__wchb"	with type "variable" "char"
+	Declared external entity "main!:_PIPS_STRUCT_4^__value"	with type "variable" "union _PIPS_UNION_5 "
+	Declared external entity "main!:_PIPS_STRUCT_6^__pos"	with type "variable" "__off_t"
+	Declared external entity "main!:_PIPS_STRUCT_6^__state"	with type "variable" "__mbstate_t"
+	Declared external entity "main!:_PIPS_STRUCT_7^__pos"	with type "variable" "__off64_t"
+	Declared external entity "main!:_PIPS_STRUCT_7^__state"	with type "variable" "__mbstate_t"
+	Declared external entity "main!:__gconv_trans_data^__trans_fct"	with type "variable" "__gconv_trans_fct"
+	Declared external entity "main!:__gconv_trans_data^__trans_context_fct"	with type "variable" "__gconv_trans_context_fct"
+	Declared external entity "main!:__gconv_trans_data^__trans_end_fct"	with type "variable" "__gconv_trans_end_fct"
+	Declared external entity "main!:__gconv_trans_data^__data"	with type "variable" "void *"
+	Declared external entity "main!:__gconv_trans_data^__next"	with type "variable" "struct __gconv_trans_data  *"
+	Declared external entity "main!:__gconv_step^__shlib_handle"	with type "variable" "struct __gconv_loaded_object  *"
+	Declared external entity "main!:__gconv_step^__modname"	with type "variable" "char *"
+	Declared external entity "main!:__gconv_step^__counter"	with type "variable" "int"
+	Declared external entity "main!:__gconv_step^__from_name"	with type "variable" "char *"
+	Declared external entity "main!:__gconv_step^__to_name"	with type "variable" "char *"
+	Declared external entity "main!:__gconv_step^__fct"	with type "variable" "__gconv_fct"
+	Declared external entity "main!:__gconv_step^__btowc_fct"	with type "variable" "__gconv_btowc_fct"
+	Declared external entity "main!:__gconv_step^__init_fct"	with type "variable" "__gconv_init_fct"
+	Declared external entity "main!:__gconv_step^__end_fct"	with type "variable" "__gconv_end_fct"
+	Declared external entity "main!:__gconv_step^__min_needed_from"	with type "variable" "int"
+	Declared external entity "main!:__gconv_step^__max_needed_from"	with type "variable" "int"
+	Declared external entity "main!:__gconv_step^__min_needed_to"	with type "variable" "int"
+	Declared external entity "main!:__gconv_step^__max_needed_to"	with type "variable" "int"
+	Declared external entity "main!:__gconv_step^__stateful"	with type "variable" "int"
+	Declared external entity "main!:__gconv_step^__data"	with type "variable" "void *"
+	Declared external entity "main!:__gconv_step_data^__outbuf"	with type "variable" "unsigned char *"
+	Declared external entity "main!:__gconv_step_data^__outbufend"	with type "variable" "unsigned char *"
+	Declared external entity "main!:__gconv_step_data^__flags"	with type "variable" "int"
+	Declared external entity "main!:__gconv_step_data^__invocation_counter"	with type "variable" "int"
+	Declared external entity "main!:__gconv_step_data^__internal_use"	with type "variable" "int"
+	Declared external entity "main!:__gconv_step_data^__statep"	with type "variable" "__mbstate_t *"
+	Declared external entity "main!:__gconv_step_data^__state"	with type "variable" "__mbstate_t"
+	Declared external entity "main!:__gconv_step_data^__trans"	with type "variable" "struct __gconv_trans_data  *"
+	Declared external entity "main!:__gconv_info^__nsteps"	with type "variable" "size_t"
+	Declared external entity "main!:__gconv_info^__steps"	with type "variable" "struct __gconv_step  *"
+	Declared external entity "main!:__gconv_info^__data"	with type "variable" "struct __gconv_step_data "
+	Declared external entity "main!:_PIPS_UNION_10^__cd"	with type "variable" "struct __gconv_info "
+	Declared external entity "main!:_PIPS_STRUCT_11^__cd"	with type "variable" "struct __gconv_info "
+	Declared external entity "main!:_PIPS_STRUCT_11^__data"	with type "variable" "struct __gconv_step_data "
+	Declared external entity "main!:_PIPS_UNION_10^__combined"	with type "variable" "struct _PIPS_STRUCT_11 "
+	Declared external entity "main!:_IO_marker^_next"	with type "variable" "struct _IO_marker  *"
+	Declared external entity "main!:_IO_marker^_sbuf"	with type "variable" "struct _IO_FILE  *"
+	Declared external entity "main!:_IO_marker^_pos"	with type "variable" "int"
+	Declared external entity "main!:_IO_FILE^_flags"	with type "variable" "int"
+	Declared external entity "main!:_IO_FILE^_IO_read_ptr"	with type "variable" "char *"
+	Declared external entity "main!:_IO_FILE^_IO_read_end"	with type "variable" "char *"
+	Declared external entity "main!:_IO_FILE^_IO_read_base"	with type "variable" "char *"
+	Declared external entity "main!:_IO_FILE^_IO_write_base"	with type "variable" "char *"
+	Declared external entity "main!:_IO_FILE^_IO_write_ptr"	with type "variable" "char *"
+	Declared external entity "main!:_IO_FILE^_IO_write_end"	with type "variable" "char *"
+	Declared external entity "main!:_IO_FILE^_IO_buf_base"	with type "variable" "char *"
+	Declared external entity "main!:_IO_FILE^_IO_buf_end"	with type "variable" "char *"
+	Declared external entity "main!:_IO_FILE^_IO_save_base"	with type "variable" "char *"
+	Declared external entity "main!:_IO_FILE^_IO_backup_base"	with type "variable" "char *"
+	Declared external entity "main!:_IO_FILE^_IO_save_end"	with type "variable" "char *"
+	Declared external entity "main!:_IO_FILE^_markers"	with type "variable" "struct _IO_marker  *"
+	Declared external entity "main!:_IO_FILE^_chain"	with type "variable" "struct _IO_FILE  *"
+	Declared external entity "main!:_IO_FILE^_fileno"	with type "variable" "int"
+	Declared external entity "main!:_IO_FILE^_flags2"	with type "variable" "int"
+	Declared external entity "main!:_IO_FILE^_old_offset"	with type "variable" "__off_t"
+	Declared external entity "main!:_IO_FILE^_cur_column"	with type "variable" "unsigned short"
+	Declared external entity "main!:_IO_FILE^_vtable_offset"	with type "variable" "signed char"
+	Declared external entity "main!:_IO_FILE^_shortbuf"	with type "variable" "char"
+	Declared external entity "main!:_IO_FILE^_lock"	with type "variable" "_IO_lock_t *"
+	Declared external entity "main!:_IO_FILE^_offset"	with type "variable" "__off64_t"
+	Declared external entity "main!:_IO_FILE^__pad1"	with type "variable" "void *"
+	Declared external entity "main!:_IO_FILE^__pad2"	with type "variable" "void *"
+	Declared external entity "main!:_IO_FILE^_mode"	with type "variable" "int"
+	Declared external entity "main!:_IO_FILE^_unused2"	with type "variable" "char"
+	Declared external entity "TOP-LEVEL:_IO_2_1_stdin_"	with type "variable" "struct _IO_FILE_plus "
+	Declared external entity "TOP-LEVEL:_IO_2_1_stdout_"	with type "variable" "struct _IO_FILE_plus "
+	Declared external entity "TOP-LEVEL:_IO_2_1_stderr_"	with type "variable" "struct _IO_FILE_plus "
 	Declared external entity "TOP-LEVEL:__underflow"	with type "functional" "_IO_FILE * -> int"
 	Declared external entity "TOP-LEVEL:__uflow"	with type "functional" "_IO_FILE * -> int"
 	Declared external entity "TOP-LEVEL:__overflow"	with type "functional" "_IO_FILE * x int -> int"
@@ -183,9 +183,9 @@ External variable list:
 	Declared external entity "TOP-LEVEL:_IO_seekoff"	with type "functional" "_IO_FILE * x __off64_t x int x int -> __off64_t"
 	Declared external entity "TOP-LEVEL:_IO_seekpos"	with type "functional" "_IO_FILE * x __off64_t x int -> __off64_t"
 	Declared external entity "TOP-LEVEL:_IO_free_backup_area"	with type "functional" "_IO_FILE * -> void"
-	Declared external entity "TOP-LEVEL:stdin"	with type "variable" struct _IO_FILE  *
-	Declared external entity "TOP-LEVEL:stdout"	with type "variable" struct _IO_FILE  *
-	Declared external entity "TOP-LEVEL:stderr"	with type "variable" struct _IO_FILE  *
+	Declared external entity "TOP-LEVEL:stdin"	with type "variable" "struct _IO_FILE  *"
+	Declared external entity "TOP-LEVEL:stdout"	with type "variable" "struct _IO_FILE  *"
+	Declared external entity "TOP-LEVEL:stderr"	with type "variable" "struct _IO_FILE  *"
 	Declared external entity "TOP-LEVEL:remove"	with type "functional" "char * -> int"
 	Declared external entity "TOP-LEVEL:rename"	with type "functional" "char * x char * -> int"
 	Declared external entity "TOP-LEVEL:tmpfile"	with type "functional" "void -> FILE *"

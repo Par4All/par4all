@@ -1,3 +1,48 @@
 
 Symbol table for "decl05!"
 
+decl05!
+
+Declarations for module "decl05!" with type "() -> unknow"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:ERR_mgr_ctor" with type "functional" "char * x char * -> void"
+	Declared entity "TOP-LEVEL:ERR_mgr_dtor" with type "functional" "() -> void"
+	Declared entity "decl05!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "decl05!:*HEAP*" with type "area" with size 0
+	Declared entity "decl05!:*STACK*" with type "area" with size 0
+	Declared entity "decl05!:*STATIC*" with type "area" with size 0
+
+External variable list:
+
+	Declared external entity "decl05!:_err_error^function"	with type "variable" "char"
+	Declared external entity "decl05!:_err_manager^function"	with type "variable" "char"
+	Declared external entity "decl05!:_err_pile^pile"	with type "variable" "struct _err_error  *"
+	Declared external entity "decl05!:_err_manager^pile"	with type "variable" "struct _err_pile "
+	Declared external entity "decl05!:_err_manager^push"	with type "variable" "(struct _err_manager  * x char * -> void) *"
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl05!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl05!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl05!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl05!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module decl05!
+

@@ -17,7 +17,7 @@ Variable list:
 
 External variable list:
 
-	Declared external entity "TOP-LEVEL:i"	with type "variable" int
+	Declared external entity "TOP-LEVEL:i"	with type "variable" "int"
 
 Layouts for formal parameters:
 

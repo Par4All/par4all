@@ -16,9 +16,8 @@ Variable list:
 
 External variable list:
 
-	Declared external entity "decl06!:_err_manager^function"	with type "variable" char
-	Declared external entity "decl06!:_err_manager^push"	with type "variable" char * -> void *
-	Declared external entity "decl06!:_err_manager^functions"	with type "variable" char *
+	Declared external entity "decl06!:_err_manager^function"	with type "variable" "char"
+	Declared external entity "decl06!:_err_manager^push"	with type "variable" "(int -> void) *"
 
 Layouts for memory areas:
 
@@ -47,15 +46,15 @@ End of declarations for module decl06!
 Parsed printed file
 
 struct _err_manager {
-   extern char function[500];
-   extern void (*push)(const char *);
+   extern char function;
+   extern void (*push)(int );
 };
 void ERR_mgr_ctor(const char *,const char *);
 
 Printed file
 
 struct _err_manager {
-   extern char function[500];
-   extern void (*push)(const char *);
+   extern char function;
+   extern void (*push)(int );
 };
 void ERR_mgr_ctor(const char *,const char *);

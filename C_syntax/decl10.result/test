@@ -15,9 +15,9 @@ Variable list:
 
 External variable list:
 
-	Declared external entity "decl10!:_PIPS_STRUCT_1^a"	with type "variable" int
-	Declared external entity "decl10!:_PIPS_UNION_2^a"	with type "variable" int
-	Declared external entity "decl10!:_PIPS_UNION_2^b"	with type "variable" double
+	Declared external entity "decl10!:_PIPS_STRUCT_1^a"	with type "variable" "int"
+	Declared external entity "decl10!:_PIPS_UNION_2^a"	with type "variable" "int"
+	Declared external entity "decl10!:_PIPS_UNION_2^b"	with type "variable" "double"
 
 Layouts for memory areas:
 

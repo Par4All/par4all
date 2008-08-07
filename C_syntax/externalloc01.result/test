@@ -16,7 +16,7 @@ Variable list:
 
 External variable list:
 
-	Declared external entity "TOP-LEVEL:a"	with type "variable" int
+	Declared external entity "TOP-LEVEL:a"	with type "variable" "int"
 
 Layouts for memory areas:
 

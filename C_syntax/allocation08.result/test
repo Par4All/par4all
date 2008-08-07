@@ -1,0 +1,56 @@
+
+Symbol table for "allocation08"
+
+allocation08
+
+Declarations for module "allocation08" with type "() -> int"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "allocation08!:*HEAP*" with type "area" with size 0
+	Declared entity "allocation08!:*STATIC*" with type "area" with size 0
+	Declared entity "allocation08:*DYNAMIC*" with type "area" with size 210
+	Declared entity "allocation08:*STACK*" with type "area" with size 0
+	Declared entity "allocation08:*STATIC*" with type "area" with size 0
+	Declared entity "allocation08:0`x" with type "variable" "ac"
+
+* empty extern declaration list *
+
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "allocation08!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "allocation08!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "allocation08:*DYNAMIC*" of size 210:
+	Variable "allocation08:0`x"	offset = 0	size = 210
+
+
+Layout for memory area "allocation08:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "allocation08:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module allocation08
+
+
+Parsed printed file for "allocation08"
+
+typedef char ac[21];
+extern int allocation08();
+int allocation08()
+{
+   ac x[10];
+}

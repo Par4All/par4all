@@ -1,4 +1,4 @@
-Chose a specific preprocessor for this case: cpp -C -P
+This code is not compatible with "cpp -ansi"
 
 PARSED PRINTED FILE FOR MODULE comment04!
 

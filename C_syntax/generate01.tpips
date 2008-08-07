@@ -16,7 +16,8 @@ echo
 echo Printed file
 echo
 
-display PRINTED_FILE[%ALL]
+display PRINTED_FILE[generate01]
+#display PRINTED_FILE[%ALL]
 
 activate PRINT_CODE_PRECONDITIONS
 

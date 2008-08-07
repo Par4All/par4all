@@ -63,8 +63,8 @@ Variable list:
 
 External variable list:
 
-	Declared external entity "TOP-LEVEL:n"	with type "variable" int
-	Declared external entity "TOP-LEVEL:m"	with type "variable" int
+	Declared external entity "TOP-LEVEL:n"	with type "variable" "int"
+	Declared external entity "TOP-LEVEL:m"	with type "variable" "int"
 	Declared external entity "TOP-LEVEL:fcompat"	with type "functional" "() -> void"
 
 Layouts for memory areas:

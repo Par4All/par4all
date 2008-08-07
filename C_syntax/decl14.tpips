@@ -1,0 +1,43 @@
+delete decl14
+create decl14 decl14.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 1
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+# setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 5
+
+echo
+echo Symbol table for "decl14!"
+echo
+
+display SYMBOL_TABLE_FILE[decl14!]
+
+echo
+echo Symbol table for "decl14"
+echo
+
+display SYMBOL_TABLE_FILE[decl14]
+
+echo
+echo Parsed printed file for "decl14!"
+echo
+
+display PARSED_PRINTED_FILE[decl14!]
+
+echo
+echo Parsed rinted file for "decl14"
+echo
+
+display PARSED_PRINTED_FILE[decl14]
+
+
+close
+delete decl14
+
+quit

@@ -1,0 +1,72 @@
+user warning in tp_parse: decl11: No such workspace
+Registering file decl11.c
+Preprocessing file $VDIR/decl11.c
+Splitting file    ./decl11.database/Tmp/decl11.cpp_processed.c
+  Module         decl11!
+Workspace decl11 created and opened.
+Module decl11! selected
+Selecting rule: C_PARSER
+Selecting rule: C_SYMBOL_TABLE
+setproperty PRETTYPRINT_C_CODE TRUE
+user warning, property PRETTYPRINT_C_CODE redefined
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+user warning, property PRETTYPRINT_STATEMENT_NUMBER redefined
+echo
+
+echo Symbol table for "decl11"
+Symbol table for "decl11"
+echo
+
+Module decl11! already active.
+Request: build resource SYMBOL_TABLE_FILE for module decl11!.
+  BOOTSTRAP                      building   ENTITIES()
+  COMPILATION_UNIT_PARSER        building   DECLARATIONS(decl11!)
+user warning in discard_C_comment: Comment "
+
+
+
+/* This is OK with gcc, but not with -ansi nor -pedantic, even with std=c99 */
+" is lost at line 2, probably because comments cannot be attached to declarations.
+user warning in c_parse: Variable "decl11:a" is redefined at line 2 (6)
+user warning in CParserError: 
+Recovery from C parser failure not (fully) implemented yet.
+C parser is likely to fail later if re-used.
+user error in CParserError: 
+Variable redefinition not compatible with ISO standard. Try to compile with "gcc -ansi -c"
+ at line -1 (1)
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource SYMBOL_TABLE_FILE for module decl11!.
+user error in display_a_resource: Cannot build view file SYMBOL_TABLE_FILE
+echo
+
+echo Parsed printed file
+Parsed printed file
+echo
+
+Module decl11! already active.
+Request: build resource PARSED_PRINTED_FILE for module decl11!.
+  COMPILATION_UNIT_PARSER        building   DECLARATIONS(decl11!)
+user warning in discard_C_comment: Comment "
+
+
+
+/* This is OK with gcc, but not with -ansi nor -pedantic, even with std=c99 */
+" is lost at line 2, probably because comments cannot be attached to declarations.
+user warning in c_parse: Variable "decl11:a" is redefined at line 2 (6)
+user warning in CParserError: 
+Recovery from C parser failure not (fully) implemented yet.
+C parser is likely to fail later if re-used.
+user error in CParserError: 
+Variable redefinition not compatible with ISO standard. Try to compile with "gcc -ansi -c"
+ at line -1 (1)
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build resource PARSED_PRINTED_FILE for module decl11!.
+user error in display_a_resource: Cannot build view file PARSED_PRINTED_FILE
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module decl11!.
+Closing program.
+Closing workspace.
+Workspace decl11 closed.
+

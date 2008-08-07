@@ -46,3 +46,8 @@ Parsed printed file
 
 void decl09(int ,void (*)(char ,void (*)(char ,void (*)(char ))));
 void decl09b(int ,void (*)(char ,void (*)(char ,void (*)(char ))));
+
+Printed file
+
+void decl09(int ,void (*)(char ,void (*)(char ,void (*)(char ))));
+void decl09b(int ,void (*)(char ,void (*)(char ,void (*)(char ))));

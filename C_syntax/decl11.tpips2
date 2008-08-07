@@ -1,5 +1,5 @@
-delete decl09
-create decl09 decl09.c
+delete decl11
+create decl11 decl11.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 1
 
@@ -13,25 +13,25 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 #setenv PRETTYPRINT_DEBUG_LEVEL 5
 
 echo
-echo Symbol table for "decl09"
+echo Symbol table for "decl11"
 echo
 
-display SYMBOL_TABLE_FILE[decl09!]
+display SYMBOL_TABLE_FILE[decl11!]
 
 echo
 echo Parsed printed file
 echo
 
-display PARSED_PRINTED_FILE[decl09!]
-
+display PARSED_PRINTED_FILE[decl11!]
+quit
 echo
 echo Printed file
 echo
 
-display PRINTED_FILE[decl09!]
+display PRINTED_FILE[decl11!]
 
 
 close
-delete decl09
+delete decl11
 
 quit
