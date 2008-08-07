@@ -70,17 +70,12 @@ struct __hash_table {
 #define RANK(key, size) ((((uintptr_t)(key)) ^ 0xfab1c0e1U)%(size))
 #endif
 
-/* Set of the different operations 
- */
-typedef enum { hash_get_op , hash_put_op , hash_del_op } hash_operation;
-
 /* Private functions 
  */
 static void hash_enlarge_table(hash_table htp);
 static hash_entry * hash_find_entry(hash_table htp, 
 				    void * key, 
 				    uintptr_t *prank, 
-				    hash_operation operation,
 				    uintptr_t * stats);
 static string hash_print_key(hash_key_type, void*);
 
@@ -292,7 +287,7 @@ void hash_put(hash_table htp, void * key, void * val)
   message_assert("illegal input value", val!=HASH_UNDEFINED_VALUE);
 
   htp->n_put++;
-  hep = hash_find_entry(htp, key, &rank, hash_put_op, &htp->n_put_iter);
+  hep = hash_find_entry(htp, key, &rank, &htp->n_put_iter);
 
   if (hep->key != HASH_ENTRY_FREE && hep->key != HASH_ENTRY_FREE_FOR_PUT) {
     if (should_i_warn_on_redefinition && hep->val != val) {
@@ -314,8 +309,8 @@ void hash_put(hash_table htp, void * key, void * val)
  */ 
 void * 
 hash_delget(
-    hash_table htp, 
-    void * key, 
+    hash_table htp,
+    void * key,
     void ** pkey)
 {
     hash_entry * hep;
@@ -326,12 +321,13 @@ hash_delget(
 		   key!=HASH_ENTRY_FREE && key!=HASH_ENTRY_FREE_FOR_PUT);
 
     htp->n_del++;
-    hep = hash_find_entry(htp, key, &rank, hash_del_op, &htp->n_del_iter);
+    hep = hash_find_entry(htp, key, &rank, &htp->n_del_iter);
 
     if (hep->key != HASH_ENTRY_FREE && hep->key != HASH_ENTRY_FREE_FOR_PUT) {
 	val = hep->val;
 	*pkey = hep->key;
 	htp->array[rank].key = HASH_ENTRY_FREE_FOR_PUT;
+	htp->array[rank].val = NULL;
 	htp->n_entry -= 1;
 	htp->n_free_for_puts++;
 	return val;
@@ -368,7 +364,7 @@ void * hash_get(hash_table htp, void * key)
 
   /* else may be there */
   htp->n_get++;
-  hep = hash_find_entry(htp, key, &n, hash_get_op, &htp->n_get_iter);
+  hep = hash_find_entry(htp, key, &n, &htp->n_get_iter);
 
   return hep->key!=HASH_ENTRY_FREE &&
 	 hep->key!=HASH_ENTRY_FREE_FOR_PUT ? hep->val : HASH_UNDEFINED_VALUE;
@@ -392,7 +388,7 @@ void hash_update(hash_table htp, void * key, void * val)
 		 key!=HASH_ENTRY_FREE && key!=HASH_ENTRY_FREE_FOR_PUT);
 
   htp->n_upd++;
-  hep = hash_find_entry(htp, key, &n, hash_get_op, &htp->n_upd_iter);
+  hep = hash_find_entry(htp, key, &n, &htp->n_upd_iter);
 
   message_assert("no previous entry", htp->equals(hep->key, key));
 
@@ -482,34 +478,33 @@ hash_enlarge_table(hash_table htp)
   htp->size = get_next_hash_table_size(htp->size);
   htp->array = (hash_entry *) alloc(htp->size* sizeof(hash_entry));
   htp->limit = hash_size_limit(htp->size);
-  
+
   for (i = 0; i < htp->size ; i++)
     htp->array[i].key = HASH_ENTRY_FREE;
-  
-  for (i = 0; i < old_size; i++) 
+
+  for (i = 0; i < old_size; i++)
   {
     hash_entry he;
     he = old_array[i];
-    
+
     if (he.key != HASH_ENTRY_FREE && he.key != HASH_ENTRY_FREE_FOR_PUT) {
       hash_entry * nhep;
       uintptr_t rank;
-      
+
       htp->n_put++;
-      nhep = hash_find_entry(htp, he.key, &rank, 
-			     hash_put_op, &htp->n_put_iter);
-      
+      nhep = hash_find_entry(htp, he.key, &rank, &htp->n_put_iter);
+
       if (nhep->key != HASH_ENTRY_FREE) {
 	fprintf(stderr, "[hash_enlarge_table] fatal error\n");
 	abort();
-      }    
+      }
       htp->array[rank] = he;
     }
   }
   gen_free_area((void**)old_array, old_size*sizeof(hash_entry));
 }
 
-/* en s'inspirant vaguement de 
+/* en s'inspirant vaguement de
  *   Fast Hashing of Variable-Length Text Strings
  *   Peter K. Pearson
  *   CACM vol 33, nb 6, June 1990
@@ -526,11 +521,9 @@ static uintptr_t hash_string_rank(void * key, size_t size)
 {
   uintptr_t v = 0;
   char * s;
-  
   for (s = (char*) key; *s; s++)
     /* FC: */ v = ((v<<7) | (v>>25)) ^ *s;
     /* GO: v <<= 2, v += *s; */
-
   return v % size;
 }
 
@@ -615,7 +608,6 @@ static hash_entry *
 hash_find_entry(hash_table htp,
 		void * key,
 		uintptr_t *prank,
-		hash_operation operation,
 		uintptr_t * stats)
 {
   register size_t
@@ -668,8 +660,7 @@ hash_find_entry(hash_table htp,
     /* this is a possible place for storing, but the key may be there anyway...
      * so we keep on seeking, but keep the first found place.
      */
-    if (he.key == HASH_ENTRY_FREE_FOR_PUT && operation == hash_put_op &&
-	!first_free_found) {
+    if (he.key == HASH_ENTRY_FREE_FOR_PUT && !first_free_found) {
       r_first_free = r;
       first_free_found = true;
     }
@@ -684,11 +675,12 @@ hash_find_entry(hash_table htp,
      */
     r = (r + r_inc) % htp->size;
 
-    /* it may happen after many put and del, if the table contains no FREE,
+    /* argh! we have made a full round...
+     * it may happen after many put and del, if the table contains no FREE,
      * but only many FREE_FOR_PUT instead.
      */
     if(r == r_init) {
-      assert(first_free_found);
+      message_assert("one free place was seen", first_free_found);
       r = r_first_free;
       break;
     }
