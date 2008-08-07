@@ -32,16 +32,19 @@ bool
 SizeOfArray(entity e, int * s)
 {
   type et = entity_type(e);
-  variable a;
+  type uet = ultimate_type(et);
+  variable a, ua;
   bool ok = TRUE;
   int se = -1;
   int ne = -1;
 
-  assert(type_variable_p(entity_type(e)));
+  assert(type_variable_p(et) && type_variable_p(uet));
   a = type_variable(et);
+  ua = type_variable(uet);
 
-  se = SizeOfElements(variable_basic(a));
-  ok = NumberOfElements(variable_dimensions(a), &ne);
+  se = SizeOfElements(variable_basic(ua));
+
+  ok = NumberOfElements(variable_basic(a), variable_dimensions(a), &ne);
 
   if(!ok) {
     /* Let's try to use the initial value */
@@ -68,11 +71,12 @@ SizeOfArray(entity e, int * s)
 	  ne = gen_length(args);
 	  ok = TRUE;
 	}
-	/* Check for other dimensions */
+	/* Check for other dimensions which must be all declared: the
+	   first dimension only can be implicit */
 	if(ok && gen_length(variable_dimensions(a))>1) {
 	  bool sok = FALSE;
 	  int sne = -1;
-	  sok = NumberOfElements(CDR(variable_dimensions(a)), &sne);
+	  sok = NumberOfElements(variable_basic(a), CDR(variable_dimensions(a)), &sne);
 	  if(sok) {
 	    ne *= sne;
 	  }
@@ -252,11 +256,11 @@ int SizeOfElements(basic b)
 list of dimensions of the variable */
 
 int
-element_number(list ld)
+element_number(basic b, list ld)
 {
     int en = 0;
 
-    if(!NumberOfElements(ld, &en)) {
+    if(!NumberOfElements(b, ld, &en)) {
 	pips_error("element_number", "Probably varying size array\n");
     }
 
@@ -264,20 +268,33 @@ element_number(list ld)
 }
 
 bool
-NumberOfElements(list ld, int * n)
+NumberOfElements(basic b, list ld, int * n)
 {
-    list pc;
-    int ne = 1;
-    bool ok = TRUE;
+  list pc;
+  int ne = 1;
+  bool ok = TRUE;
+  int sne = 1;
 
+  /* do we have many elements at the lower typedef levels? */
+  if(basic_typedef_p(b)) {
+    entity e = basic_typedef(b);
+    // Lots of asserts skipped here
+    variable ev = type_variable(entity_type(e));
+
+    ok = NumberOfElements(variable_basic(ev), variable_dimensions(ev), &sne);
+  }
+
+  /* let's take care of the current level */
+  if(ok) {
     for (pc = ld; pc != NULL && ok; pc = CDR(pc)) {
-	int s;
-	ok = SizeOfDimension(DIMENSION(CAR(pc)), &s);
-	ne *= s;
+      int s;
+      ok = SizeOfDimension(DIMENSION(CAR(pc)), &s);
+      ne *= s;
     }
+  }
 
-    *n = ne;
-    return ok;
+  *n = ne*sne;
+  return ok;
 }
 
 Value 

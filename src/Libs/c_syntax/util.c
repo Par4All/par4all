@@ -140,7 +140,7 @@ void ResetCurrentCompilationUnitEntity(bool is_compilation_unit_parser)
 {
   if(is_compilation_unit_parser)
     CCompilationUnitMemoryAllocation(get_current_module_entity());
-  reset_entity_type_stack_table();
+  /* reset_entity_type_stack_table(); */
   if (get_bool_property("PARSER_DUMP_SYMBOL_TABLE"))
     fprint_C_environment(stderr, get_current_module_entity());
   pips_debug(4,"Reset current module entity for compilation unit %s\n",get_current_module_name());
@@ -688,7 +688,7 @@ entity FindOrCreateCurrentEntity(string name,
     }
   else
     {
-      if (strcmp(scope,"") != 0)
+      if (strcmp(scope,"") != 0 && !is_formal)
 	{
 	  /* Prefix for the current struct: use full_scope */
 	  ent = find_or_create_entity(strdup(concatenate(full_scope,name,NULL)));
@@ -714,17 +714,28 @@ entity FindOrCreateCurrentEntity(string name,
       else 
 	{
 	  if (is_formal) {
-	    /* Formal parameter */
-	    if(top_level_entity_p(function))
-	      ent = find_or_create_entity(strdup(concatenate(entity_user_name(function),
+	    /* Formal parameter for a function or for a pointer to a function? */
+	    type ft = (type)stack_head(get_from_entity_type_stack_table(function));
+
+	    if(!type_undefined_p(ft) && type_variable_p(ft)
+	       && basic_pointer_p(variable_basic(type_variable(ft)))) {
+	      string sn = int_to_string(ft); // To get a unique identifier for each function pointerdeclaration, dummy or not
+	      ent = find_or_create_entity(strdup(concatenate(DUMMY_PARAMETER_PREFIX,sn,
 							     MODULE_SEP_STRING,name,NULL)));
+	      free(sn);
+	    }
 	    else {
-	      // The function is local to a compilation unit
-	      // Was this the best possible design?
-	      string mn = entity_module_name(function);
-	      string ln = entity_local_name(function);
-	      ent = find_or_create_entity(strdup(concatenate(mn,ln,
-							     MODULE_SEP_STRING,name,NULL)));
+	      if(top_level_entity_p(function))
+		ent = find_or_create_entity(strdup(concatenate(entity_user_name(function),
+							       MODULE_SEP_STRING,name,NULL)));
+	      else {
+		// The function is local to a compilation unit
+		// Was this the best possible design?
+		string mn = entity_module_name(function);
+		string ln = entity_local_name(function);
+		ent = find_or_create_entity(strdup(concatenate(mn,ln,
+							       MODULE_SEP_STRING,name,NULL)));
+	      }
 	    }
 	  }
 	  else 
@@ -771,7 +782,8 @@ entity FindOrCreateCurrentEntity(string name,
 void UpdateParenEntity(entity e, list lq)
 {
   type t = entity_type(e);
-  pips_debug(3,"Update entity in parentheses %s\n",entity_name(e));
+  pips_debug(3,"Update entity in parentheses \"%s\" with type \"%s\"\n",
+	     entity_name(e), safe_type_to_string(entity_type(e)));
   if (lq != NIL)
     {
       if (type_undefined_p(t))
@@ -855,6 +867,23 @@ void UpdatePointerEntity(entity e, type pt, list lq)
     {
       pips_debug(3,"Undefined entity type\n");
       entity_type(e) = pt;
+      /*
+      if(type_undefined_p(pt)) {
+	type npt = make_type(is_type_variable,
+			     make_variable(make_basic(is_basic_pointer, type_undefined),
+					   NIL, NIL));
+	entity_type(e) = npt;
+      }
+      else if(type_variable_p(pt) && basic_pointer_p(variable_basic(type_variable(pt))))
+	entity_type(e) = pt;
+      else {
+	type npt = make_type(is_type_variable,
+			     make_variable(make_basic(is_basic_pointer, pt),
+					   NIL, NIL));
+	entity_type(e) = npt;
+      }
+      */
+
       variable_qualifiers(type_variable(entity_type(e))) = gen_nconc(variable_qualifiers(type_variable(entity_type(e))),lq);
     }
   else
@@ -968,8 +997,19 @@ void UpdateFunctionEntity(entity oe, list la)
 
   if (type_undefined_p(t))
     entity_type(oe) = make_type_functional(make_functional(la,type_undefined));
-  else
+  //  else if(type_variable_p(t) && basic_pointer_p(variable_basic(type_variable(t)))) {
+  //   basic b = variable_basic(type_variable(t));
+  //    type pt = basic_pointer(b);
+  //    if(type_undefined_p(pt))
+  //     basic_pointer(b) = make_type_functional(make_functional(la,type_undefined));
+  //else {
+  //    pips_internal_error("What should be done here?");
+  //  }
+  //}
+  else {
+    pips_internal_error("What should be done here?");
     CParserError("This entity must have undefined type\n");
+  }
 
   pips_debug(3,"Update function entity \"%s\" with type \"\%s\"\n",
 	     entity_name(oe), list_to_string(safe_c_words_entity(entity_type(oe), NIL)));
@@ -1058,39 +1098,49 @@ void CCompilationUnitMemoryAllocation(entity module)
 
   /* Allocate variables */
   for(; !ENDP(ld); ld = CDR(ld)) {
-      var = ENTITY(CAR(ld));
-      if(type_variable_p(entity_type(var))) 	{
-	  // Add some preconditions here
-	  storage s = entity_storage(var);
-	  if(storage_ram_p(s)) 	    {
-	      ram r = storage_ram(s);
-	      entity a = ram_section(r);
-	      /* check the type of variable here to avoid conflict declarations */
-	      if(!gen_in_list_p(var, code_externs(value_code(entity_initial(module))))) {
-		  if(ram_offset(r) != UNDEFINED_RAM_OFFSET 
-			    && ram_offset(r) != UNKNOWN_RAM_OFFSET 
-		     && ram_offset(r) != DYNAMIC_RAM_OFFSET ) {
-		    pips_user_warning
-		      ("Multiple declarations of variable %s in different files\n"
-		       ,entity_local_name(var));
-		    CParserError("Fix your source code!\n");
-		  }
+    var = ENTITY(CAR(ld));
+    if(type_variable_p(entity_type(var))) {
+      storage s = entity_storage(var);
+      type t = entity_type(var);
+      type ut = ultimate_type(t);
 
-		ram_offset(r) = area_size(type_area(entity_type(a)));
-		add_C_variable_to_area(a,var);
-	      }
-	      else {
-		  /* Donot allocate the memory for external variables:
-		     Set the offset of ram -2 which signifies UNKNOWN offset
-		  */
+      // Make sure that the ultimate type is variable */
+      if(!type_variable_p(ut) &&storage_ram_p(s)) {
+	/* We are in trouble */
+	pips_internal_error("Variable %s has not a variable type\n",
+			    entity_user_name(var));
+      }
 
-		  // Check type here to avoid conflict declarations
-		  if(ram_offset(r) == UNKNOWN_RAM_OFFSET)
-		    ram_offset(r) = UNDEFINED_RAM_OFFSET;
-		}
-	    }
+      // Add some preconditions here
+      if(storage_ram_p(s)) 	    {
+	ram r = storage_ram(s);
+	entity a = ram_section(r);
+	/* check the type of variable here to avoid conflict declarations */
+	if(!gen_in_list_p(var, code_externs(value_code(entity_initial(module))))) {
+	  if(ram_offset(r) != UNDEFINED_RAM_OFFSET 
+	     && ram_offset(r) != UNKNOWN_RAM_OFFSET 
+	     && ram_offset(r) != DYNAMIC_RAM_OFFSET ) {
+	    pips_user_warning
+	      ("Multiple declarations of variable %s in different files\n"
+	       ,entity_local_name(var));
+	    CParserError("Fix your source code!\n");
+	  }
+
+	  ram_offset(r) = area_size(type_area(entity_type(a)));
+	  add_C_variable_to_area(a,var);
 	}
+	else {
+	  /* Donot allocate the memory for external variables:
+	     Set the offset of ram -2 which signifies UNKNOWN offset
+	  */
+
+	  // Check type here to avoid conflict declarations
+	  if(ram_offset(r) == UNKNOWN_RAM_OFFSET)
+	    ram_offset(r) = UNDEFINED_RAM_OFFSET;
+	}
+      }
     }
+  }
 }
 
 /* This function is for MemoryAllocation for Module of C programs*/
@@ -1177,72 +1227,66 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
       
   /************************* STORAGE PART *******************************************/
 
-  /* this field is always pre-defined. It is temporarilly used to store a type. See cyacc.y rule direct-decl: */
+  /* this field is always pre-defined. It is temporarilly used to
+     store a type. See cyacc.y rule direct-decl: */
 
 
-  if (!storage_undefined_p(c_parser_context_storage(context)))
-    {
-      pips_debug(3,"Current storage context is %td\n",
-		 storage_tag(c_parser_context_storage(context)));
-      entity_storage(e) = c_parser_context_storage(context);
+  if (!storage_undefined_p(c_parser_context_storage(context))) {
+    pips_debug(3,"Current storage context is %td\n",
+	       storage_tag(c_parser_context_storage(context)));
+    entity_storage(e) = c_parser_context_storage(context);
+  }
+  else if (!stack_undefined_p(FormalStack) && (FormalStack != NULL)
+	   && !stack_empty_p(FormalStack)) {
+    entity function = stack_head(FunctionStack);
+    int offset = basic_int((basic) stack_head(OffsetStack));
+    pips_debug(3,"Create formal variable %s for function %s with offset %d\n",
+	       entity_name(e),entity_name(function),offset);
+    if(!value_intrinsic_p(entity_initial(function))) {
+      /* FI: Intrinsic do not have formal named parameters in PIPS
+	 RI, however such parameters can be named in intrinsic
+	 declarations. Problem with Validation/C_syntax/memcof.c */
+      AddToDeclarations(e,function);
     }
-  else 
-    {
-      if (!stack_undefined_p(FormalStack) && (FormalStack != NULL) && !stack_empty_p(FormalStack))
-	{
-	  entity function = stack_head(FunctionStack);
-	  int offset = basic_int((basic) stack_head(OffsetStack));
-	  pips_debug(3,"Create formal variable %s for function %s with offset %d\n",
-		     entity_name(e),entity_name(function),offset);
-	  if(!value_intrinsic_p(entity_initial(function))) {
-	    /* FI: Intrinsic do not have formal named parameters in PIPS
-	       RI, however such parameters can be named in intrinsic
-	       declarations. Problem with Validation/C_syntax/memcof.c */
-	    AddToDeclarations(e,function);
-	  }
-	  entity_storage(e) = make_storage_formal(make_formal(function,offset));
-	}
-      else
-	{
-	  if(type_variable_p(entity_type(e))) {
-	    /* The entities for the type_variable is added to the
-	       current module and the declarations*/  
-	    entity function = get_current_module_entity();
+    entity_storage(e) = make_storage_formal(make_formal(function,offset));
+  }
+  else if(type_variable_p(ultimate_type(entity_type(e)))) {
+    /* The entities for the type_variable is added to the
+       current module and the declarations*/  
+    entity function = get_current_module_entity();
 	    
-	    /* It is too early to use extern_entity_p() */
-	    //if(extern_entity_p(function, e))
-	    if(strstr(entity_name(e),TOP_LEVEL_MODULE_NAME) != NULL)
-	      if(!empty_scope_p(c_parser_context_scope(context)))
-		/* Keyword EXTERN has just been encountered */
-		AddToExterns(e,function);
+    /* It is too early to use extern_entity_p() */
+    //if(extern_entity_p(function, e))
+    if(strstr(entity_name(e),TOP_LEVEL_MODULE_NAME) != NULL)
+      if(!empty_scope_p(c_parser_context_scope(context)))
+	/* Keyword EXTERN has just been encountered */
+	AddToExterns(e,function);
 	    
-	    /* To avoid multiple declarations */
-	    if(!gen_in_list_p(e, code_externs(value_code(entity_initial(function)))) &&
-	       gen_in_list_p(e, code_declarations(value_code(entity_initial(function)))))
-	      {
-		user_log("Multiple declarations of variable %s in file\n",
-			 entity_local_name(e));
-		CParserError("Illegal Input");
+    /* To avoid multiple declarations */
+    if(!gen_in_list_p(e, code_externs(value_code(entity_initial(function)))) &&
+       gen_in_list_p(e, code_declarations(value_code(entity_initial(function)))))
+      {
+	user_log("Multiple declarations of variable %s in file\n",
+		 entity_local_name(e));
+	CParserError("Illegal Input");
 		
-	      }
+      }
 
-	    AddToDeclarations(e,function);
+    AddToDeclarations(e,function);
 
-	    // Check here if already stored the value
-	    if(storage_undefined_p(entity_storage(e)))
-	      entity_storage(e) = 
-		MakeStorageRam(e,is_external,c_parser_context_static(context));
-	  }
-	  else if (type_functional_p(entity_type(e))){
-	    /* The function should also added to the declarations */
-	    if(!entity_undefined_p(get_current_module_entity()))
-	      AddToDeclarations(e,get_current_module_entity());
-	    entity_storage(e) = MakeStorageRom();
-	  }
-	  else
-	    pips_assert("not implemented yet", FALSE);
-	}
-    }
+    // Check here if already stored the value
+    if(storage_undefined_p(entity_storage(e)))
+      entity_storage(e) = 
+	MakeStorageRam(e,is_external,c_parser_context_static(context));
+  }
+  else if (type_functional_p(ultimate_type(entity_type(e)))){
+    /* The function should also added to the declarations */
+    if(!entity_undefined_p(get_current_module_entity()))
+      AddToDeclarations(e,get_current_module_entity());
+    entity_storage(e) = MakeStorageRom();
+  }
+  else
+    pips_assert("not implemented yet", FALSE);
   
    
   /************************* INITIAL VALUE PART ****************************************/

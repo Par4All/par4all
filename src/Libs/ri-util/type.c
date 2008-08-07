@@ -1333,6 +1333,30 @@ type make_standard_long_integer_type(type t)
     }
 }
 
+/* What type should be used to perform memory allocation? */
+type ultimate_type(type t)
+{
+  type nt;
+
+  if(type_variable_p(t)) {
+    variable vt = type_variable(t);
+    basic bt = variable_basic(vt);
+
+    if(basic_typedef_p(bt)) {
+      entity e = basic_typedef(bt);
+      type st = entity_type(e);
+
+      nt = ultimate_type(st);
+    }
+    else
+      nt = t;
+  }
+  else
+    nt = t;
+
+  return nt;
+}
+
 /*
  *  that is all
  */

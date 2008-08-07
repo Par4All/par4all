@@ -61,9 +61,9 @@
 #include "ri.h"
 #include "ri-util.h"
 #include "misc.h"
-#include "transformations.h"
-#include "alias_private.h"
-#include "instrumentation.h"
+#include "transformations.h" // FI: should not be referenced
+#include "alias_private.h" // FI: should not be referenced
+#include "instrumentation.h" // FI: Wow! Just for int_to_string() which is also defined in prettyprint?
 
 #include "c_parser_private.h"
 
@@ -557,25 +557,30 @@ file: globals
 			  /* To handle special case: compilation unit module */
 			  list dl = $1;
 
-			  if (dl != NIL) {
-			    if(!compilation_unit_p(get_current_module_name())) {
-			      pips_assert("Each variable is declared once", gen_once_p(dl));
-			      pips_internal_error("Compilation unit rule used for non"
-						  " compilation unit %s\n",
-						  get_current_module_name());
+			  if (TRUE /* dl != NIL*/) { /* A C file with comments only is OK */
+			    if(!entity_undefined_p(get_current_module_entity())) {
+			      if(!compilation_unit_p(get_current_module_name())) {
+				pips_assert("Each variable is declared once", gen_once_p(dl));
+				pips_internal_error("Compilation unit rule used for non"
+						    " compilation unit %s\n",
+						    get_current_module_name());
+			      }
+			      ifdebug(8) {
+				pips_debug(8, "Declaration list for compilation unit %s: ",
+					   get_current_module_name());
+				print_entities(dl);
+				pips_debug(8, "\n");
+			      }
+			      ModuleStatement = make_statement(entity_empty_label(), 
+							       STATEMENT_NUMBER_UNDEFINED, 
+							       STATEMENT_ORDERING_UNDEFINED, 
+							       string_undefined,
+							       make_instruction_block(NIL),
+							       dl, NULL);
+			      if(ENDP(dl)) {
+				pips_user_warning("ISO C forbids an empty source file\n");
+			      }
 			    }
-			    ifdebug(8) {
-			      pips_debug(8, "Declaration list for compilation unit %s: ",
-					 get_current_module_name());
-			      print_entities(dl);
-			      pips_debug(8, "\n");
-			    }
-			    ModuleStatement = make_statement(entity_empty_label(), 
-							     STATEMENT_NUMBER_UNDEFINED, 
-							     STATEMENT_ORDERING_UNDEFINED, 
-							     string_undefined,
-							     make_instruction_block(NIL),
-							     dl, NULL);
 			  }
 			}
 ;
@@ -1428,6 +1433,8 @@ declaration:                               /* ISO 6.7.*/
 			  //stack_pop(ContextStack);
 			  PopContext();
 			  $$ = gen_nconc($1,$2);
+			  /* Remove their type stacks */
+			  remove_entity_type_stacks($$);
 			}
 |   decl_spec_list TK_SEMICOLON	
                         {
@@ -1522,6 +1529,9 @@ decl_spec_list:
 			      the stack state */
 			   /* FI: a bit afraid of freeing the past type if any */
 			   c_parser_context_type(ycontext) = type_undefined;
+			   /* A new context is entered: no longer typedef as in
+			    "typedef int f(int a)" when we hit "int a"*/
+			   c_parser_context_typedef(ycontext) = FALSE;
 			   /* FI: sometimes, the scope is erased and lost */
 			   //if(strcmp(c_parser_context_scope(ycontext), "TOP-LEVEL:")==0)
 			   //  c_parser_context_scope(ycontext) = empty_scope();
@@ -2050,19 +2060,35 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			  /* FI: A variable cannot be redeclared
 			     within the same scope, but this is not
 			     checked yet. */
-			  $$ = FindOrCreateCurrentEntity($1,ContextStack,FormalStack,FunctionStack,is_external);
+			  entity e = FindOrCreateCurrentEntity($1,ContextStack,FormalStack,FunctionStack,is_external);
 			  /* Initialize the type stack and push the type of found/created entity to the stack. 
 			     It can be undefined if the entity has not been parsed, or a given type which is 
 			     used later to check if the declarations are the same for one entity. 
 			     This stack is put temporarily in the storage of the entity, not a global variable 
-			     for each declarator to avoid being erased by recursion */
-			  stack s = stack_make(type_domain,0,0);
-			  
-			  stack_push((char *) entity_type($$),s);
-			  put_to_entity_type_stack_table($$,s);
+			     for each declarator to avoid being erased by recursion 
+			     (FI: this last sentence seems to be wrong) */
+			  stack s = get_from_entity_type_stack_table(e);
+			  if(stack_undefined_p(s)) {
+			    s = stack_make(type_domain,0,0);
+			    stack_push((char *) entity_type(e),s);
+			    put_to_entity_type_stack_table(e,s);
+			  }
+			  else {
+			    entity cm = get_current_module_entity();
+			    /* A function can be redeclared inside itself. see C_syntax/extern.c */
+			    if(cm!=e) {
+			      extern int yylineno; /* from lexer */
+			      pips_user_warning("Variable \"%s\" is redefined at line %d (%d)\n",
+						entity_name(e),
+						get_current_C_line_number(), yylineno);
+			      CParserError("Variable redefinition not compatible with ISO standard."
+					   " Try to compile with \"gcc -ansi -c\"\n");
+			    }
+			  }
 			 
-			  entity_type($$) = type_undefined;
+			  entity_type(e) = type_undefined;
 			  discard_C_comment();
+			  $$ = e;
 			}
 |   TK_LPAREN attributes declarator TK_RPAREN
                         {
@@ -2071,6 +2097,10 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			  $$ = $3;
 			  stack_push((char *) entity_type($$),
 			     get_from_entity_type_stack_table($$));
+			  // FI: if I rely on the stack, I won't know for a while what 
+			  // this entity is. And I'd like to make a difference between
+			  // a function and a pointer to a function before I declare
+			  // dummy arguments. But Nga's design has to be redone:-(.
 			  entity_type($$) = type_undefined;
 			}
 |   direct_decl TK_LBRACKET attributes comma_expression_opt TK_RBRACKET
@@ -2089,6 +2119,7 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			}
 |   direct_decl parameter_list_startscope 
                         {
+			  /* Well, here it can be a function or a pointer to a function */
 			  entity e = $1; //RenameFunctionEntity($1);
 			  if (value_undefined_p(entity_initial(e)))
 			    entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL), NIL));
@@ -2490,7 +2521,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 /*** GCC attributes ***/
 attributes:
     /* empty */				
-                        { $$ = NIL; }	
+                        { $$ = NIL; }
 |   attribute attributes
                         { $$ = CONS(QUALIFIER,$1,$2); }	
 ;

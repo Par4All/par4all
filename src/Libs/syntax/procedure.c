@@ -496,9 +496,9 @@ static int expression_reference_number(expression e)
     else {
       /* A whole array is initialized */
       int ne = -1;
+      variable vt = type_variable(entity_type(v));
  
-      if(!NumberOfElements(variable_dimensions(type_variable(entity_type(v))),
-			   &ne)) {
+      if(!NumberOfElements(variable_basic(vt), variable_dimensions(vt), &ne)) {
 	pips_user_warning("Varying size of array \"%s\"\n", entity_name(v));
 	ParserError("expression_reference_number", 
 		    "Fortran standard prohibit varying size array in DATA statements.\n");

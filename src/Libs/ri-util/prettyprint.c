@@ -2940,8 +2940,10 @@ bool  C_comment_p(string c){
 
  slash_slash: 
   cc=*ccp++;
-  if(cc=='\n'|| cc=='\0')
+  if(cc=='\n')
    goto init;
+  if(cc=='\0') // The comment may not end first with a '\n'
+     goto end;
  else 
    goto slash_slash;
 

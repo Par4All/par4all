@@ -52,12 +52,46 @@ void init_entity_type_storage_table()
 
 void put_to_entity_type_stack_table(entity key, stack value)
 {
+  if(stack_undefined_p(value))
+    pips_internal_error("The stack must be defined");
   hash_put(entity_to_type_stack_table,(char *) key,(void *) value);
 }
 
 stack get_from_entity_type_stack_table(entity key)
 {
-  return ((stack) hash_get(entity_to_type_stack_table, key));
+  void * p = hash_get(entity_to_type_stack_table, key);
+
+  if(p==HASH_UNDEFINED_VALUE)
+    return stack_undefined;
+  else
+    return ((stack) p);
+}
+
+void remove_entity_type_stacks(list el)
+{
+  list ce = list_undefined;
+
+  for(ce=el; !ENDP(ce); POP(ce)) {
+    entity e = ENTITY(CAR(ce));
+    //entity te = entity_undefined;
+    void * p = hash_get(entity_to_type_stack_table, (void *) e);
+    //void * p = hash_delget(entity_to_type_stack_table, (void *) e, (void **) &te);
+
+    pips_debug(8, "Remove type stack for \"%s\":", entity_name(e));
+    //pips_debug(8, "get=%p, delget=%p\n", p1, p);
+    if(p==HASH_UNDEFINED_VALUE) {
+      ifdebug(8) {fprintf(stderr, "no associated stack\n");
+      }
+    }
+    else {
+      stack es = (stack) p;
+
+      (void) hash_del(entity_to_type_stack_table, (void *) e);
+      if(!stack_undefined_p(es))
+	stack_free(&es);
+      ifdebug(8) fprintf(stderr, "done\n");
+    }
+  }
 }
 
 void reset_entity_type_stack_table()
@@ -136,6 +170,10 @@ void CParserError(char *msg)
 {
   entity mod = get_current_module_entity();
   string mod_name = entity_undefined_p(mod)? "entity_undefined":entity_user_name(mod);
+  extern void c_reset_lex(void);
+  extern int c_lineno;
+
+  c_reset_lex();
 
   /* Reset the parser global variables ?*/
   
@@ -195,9 +233,9 @@ void CParserError(char *msg)
   /* get rid of all collected comments */
   reset_C_comment(TRUE);
 
-  pips_user_warning("Recovery from C parser failure not (fully) implemented yet.\n"
+  pips_user_warning("\nRecovery from C parser failure not (fully) implemented yet.\n"
 		    "C parser is likely to fail later if re-used.\n");
-  pips_user_error(msg);
+  pips_user_error("\n%s at line %d (%d)\n", msg, get_current_C_line_number(), c_lineno);
   debug_off();
 }
 
@@ -314,6 +352,7 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
 
     free(file_name);
     file_name = NULL;
+    reset_entity_type_stack_table(); /* Used to be done in ResetCurrentCompilationUnitEntity() */
     reset_current_C_line_number();
     reset_C_comment(compilation_unit_p(module_name));
     /*  reset_keyword_typedef_table();*/
@@ -323,6 +362,7 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
     stack_free(&FormalStack);
     stack_free(&OffsetStack);
     stack_free(&StructNameStack);
+    ContextStack = FunctionStack = FormalStack = OffsetStack = StructNameStack = stack_undefined;
     debug_off();
     return TRUE;
 }

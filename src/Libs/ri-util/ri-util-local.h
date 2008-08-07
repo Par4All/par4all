@@ -60,6 +60,9 @@
 #define DUMMY_ABSTRACT_PREFIX           "_PIPS_ABSTRACT_"
 #define DUMMY_MEMBER_PREFIX             "_PIPS_MEMBER_" /* For bit fields */
 
+/* For dmmmy parameters in functions declarations */
+#define DUMMY_PARAMETER_PREFIX         "DUMMY-PARAMETER-"
+
 #define EMPTY_LABEL_NAME                LABEL_PREFIX
 #define LIST_DIRECTED_FORMAT_NAME 	"LIST-DIRECTED"
 

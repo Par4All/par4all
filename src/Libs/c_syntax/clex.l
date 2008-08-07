@@ -707,6 +707,20 @@ void yyerror(char * msg)
     CParserError("Parsing failed\n");
 }
 
+void yyreset_lex(void)
+{
+    yylineno = 1;
+#ifdef FLEX_SCANNER
+    yyrestart(yyin);
+#else
+    /* reset lex... Might be better to read the whole file?
+     */
+    syn_sptr = syn_sbuf;
+# define MMNEWLINE 10
+    syn_previous = MMNEWLINE;
+#endif
+}
+
 #ifndef yywrap
 int yywrap() { return 1;}
 #endif
