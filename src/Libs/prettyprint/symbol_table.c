@@ -351,12 +351,20 @@ string get_symbol_table(entity m, bool isfortran)
 						      entity_name(e),"\"\twith type \"",
 						      type_to_string(t),"\" ",NULL)));
     
-      if(type_variable_p(t))
-	string_buffer_append(result, 
-			     strdup(concatenate
-				    (basic_to_string(variable_basic(type_variable(t))), 
-				     NL,NULL)));
-    
+      if(type_variable_p(t)) {
+	variable v = type_variable(t);
+	basic b = variable_basic(v);
+	if(basic_pointer_p(b) && type_functional_p(basic_pointer(b))) {
+	  functional f = type_functional(basic_pointer(b));
+	  string_buffer_append(result, strdup("\"("));
+	  dump_functional(f,result);
+	  string_buffer_append(result, strdup(") *\""NL));
+	}
+	else {
+	  string_buffer_append(result, 
+			       strdup(concatenate("\"", basic_to_string(b), "\""NL,NULL)));
+	}
+      }
       else if(type_functional_p(t)) {
 	string_buffer_append(result, strdup("\""));
 	dump_functional(type_functional(t),result);
