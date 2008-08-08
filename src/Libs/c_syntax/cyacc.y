@@ -1429,7 +1429,7 @@ declaration:                               /* ISO 6.7.*/
                         {
 			  pips_assert("Declaration list are not redundant", gen_once_p($2));
 			  pips_assert("Variable $1 has not been declared before", !gen_in_list_p($1, $2));
-			  UpdateEntities($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external);
+			  UpdateEntities($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external,TRUE);
 			  //stack_pop(ContextStack);
 			  PopContext();
 			  $$ = gen_nconc($1,$2);
@@ -2079,7 +2079,7 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			    if(cm!=e) {
 			      extern int yylineno; /* from lexer */
 			      pips_user_warning("Variable \"%s\" is redefined at line %d (%d)\n",
-						entity_name(e),
+						entity_user_name(e) /* entity_name(e)*/,
 						get_current_C_line_number(), yylineno);
 			      CParserError("Variable redefinition not compatible with ISO standard."
 					   " Try to compile with \"gcc -ansi -c\"\n");
@@ -2186,7 +2186,7 @@ rest_par_list1:
 parameter_decl: /* (* ISO 6.7.5 *) */
     decl_spec_list declarator 
                         {
-			  UpdateEntity($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external);
+			  UpdateEntity($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external,FALSE);
 			  $$ = make_parameter(copy_type(entity_type($2)),make_mode(CurrentMode,UU));
 			  /* Set CurentMode where ???? */
 			  //stack_pop(ContextStack);
@@ -2265,7 +2265,7 @@ old_pardef_list:
     /* empty */         { $$ = NIL; }
 |   decl_spec_list old_pardef TK_SEMICOLON TK_ELLIPSIS
                         {
-			  UpdateEntities($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external);
+			  UpdateEntities($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external,FALSE);
 			  stack_pop(ContextStack);  
 			  /* Can we have struct/union definition in $1 ?*/
 			  /*$$ = gen_nconc($1,$2);*/
@@ -2273,7 +2273,7 @@ old_pardef_list:
 			}
 |   decl_spec_list old_pardef TK_SEMICOLON old_pardef_list  
                         {
-			  UpdateEntities($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external);
+			  UpdateEntities($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external,FALSE);
 			  //stack_pop(ContextStack);	  
 			  PopContext();
 			  /* Can we have struct/union definition in $1 ?*/
@@ -2438,7 +2438,7 @@ function_def:  /* (* ISO 6.9.1 *) */
 function_def_start:  /* (* ISO 6.9.1 *) */
     decl_spec_list declarator 
                         { 
-			  UpdateEntity($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external);
+			  UpdateEntity($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external, FALSE);
 			  //stack_pop(ContextStack);
 			  PopContext();
 			  pips_debug(2,"Create current module %s\n",entity_user_name($2));
@@ -2449,7 +2449,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 /* (* Old-style function prototype *) */
 |   decl_spec_list old_proto_decl 
                         { 
-			  UpdateEntity($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external);
+			  UpdateEntity($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external, FALSE);
 			  //stack_pop(ContextStack);
 			  PopContext();
 			  pips_debug(2,"Create current module %s with old-style prototype\n",entity_user_name($2));

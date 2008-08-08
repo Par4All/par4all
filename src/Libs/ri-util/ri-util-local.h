@@ -44,6 +44,7 @@
 #define UNION_PREFIX_CHAR		'\''
 #define ENUM_PREFIX 			"?"
 #define TYPEDEF_PREFIX 			"$"
+#define TYPEDEF_PREFIX_CHAR		'$'
 
 /*  constant names
  */

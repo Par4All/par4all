@@ -1103,6 +1103,41 @@ bool compilation_unit_entity_p(entity e)
   return compilation_unit_p(entity_name(e));
 }
 
+bool typedef_entity_p(entity e)
+{
+  /* Its name must contain the TYPEDEF_PREFIX just after the MODULE_SEP_STRING */
+  string en = entity_name(e);
+  string ms = strchr(en, MODULE_SEP);
+  bool is_typedef = FALSE;
+
+  if(ms!=NULL)
+    is_typedef = (*(ms+1)==TYPEDEF_PREFIX_CHAR);
+
+  return is_typedef;
+}
+
+/* is p a formal parameter? */
+bool formal_entity_p(entity p)
+{
+  storage es = entity_storage(p);
+  bool is_formal = storage_formal_p(es);
+
+  return is_formal;
+}
+
+/* is p a dummy parameter? */
+bool dummy_parameter_entity_p(entity p)
+{
+  string pn = entity_name(p);
+  string dummy = strstr(pn, DUMMY_PARAMETER_PREFIX);
+  bool is_dummy = (pn==dummy);
+
+  pips_debug(9, "pn=\"%s\", dummy=\"%s\"\n", pn, dummy);
+
+  return is_dummy;
+}
+
+
 entity MakeCompilationUnitEntity(string name)
 {
   entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,name);
