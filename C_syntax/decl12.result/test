@@ -27,7 +27,7 @@ user warning in discard_C_comment: Comment "
 
 /* Not OK with gcc */
 " is lost at line 2, probably because comments cannot be attached to declarations.
-user warning in c_parse: Variable "decl12:a" is redefined at line 2 (6)
+user warning in c_parse: Variable "a" is redefined at line 2 (6)
 user warning in CParserError: 
 Recovery from C parser failure not (fully) implemented yet.
 C parser is likely to fail later if re-used.
@@ -52,7 +52,7 @@ user warning in discard_C_comment: Comment "
 
 /* Not OK with gcc */
 " is lost at line 2, probably because comments cannot be attached to declarations.
-user warning in c_parse: Variable "decl12:a" is redefined at line 2 (6)
+user warning in c_parse: Variable "a" is redefined at line 2 (6)
 user warning in CParserError: 
 Recovery from C parser failure not (fully) implemented yet.
 C parser is likely to fail later if re-used.

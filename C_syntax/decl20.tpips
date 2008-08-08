@@ -1,5 +1,5 @@
-delete decl08
-create decl08 decl08.c
+delete decl20
+create decl20 decl20.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 1
 
@@ -8,30 +8,30 @@ activate C_SYMBOL_TABLE
 
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-# setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+#setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 
 #setenv PRETTYPRINT_DEBUG_LEVEL 5
 
 echo
-echo Symbol table for "decl08!"
+echo Symbol table for "decl20"
 echo
 
-display SYMBOL_TABLE_FILE[decl08!]
+display SYMBOL_TABLE_FILE[decl20]
 
 echo
 echo Parsed printed file
 echo
 
-display PARSED_PRINTED_FILE[decl08!]
-quit
+display PARSED_PRINTED_FILE[decl20]
+
 echo
 echo Printed file
 echo
 
-display PRINTED_FILE[decl08!]
+display PRINTED_FILE[decl20]
 
 
 close
-delete decl08
+delete decl20
 
 quit

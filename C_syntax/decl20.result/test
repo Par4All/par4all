@@ -1,0 +1,64 @@
+
+Symbol table for "decl20"
+
+decl20
+
+Declarations for module "decl20" with type "char * -> void"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "decl20!:*HEAP*" with type "area" with size 0
+	Declared entity "decl20!:*STATIC*" with type "area" with size 0
+	Declared entity "decl20:*DYNAMIC*" with type "area" with size 0
+	Declared entity "decl20:*STACK*" with type "area" with size 0
+	Declared entity "decl20:*STATIC*" with type "area" with size 0
+	Declared entity "decl20:dir" with type "variable" "char *"
+
+* empty extern declaration list *
+
+
+Layouts for formal parameters:
+
+	Variable decl20:dir	offset = 1
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl20!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl20!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl20:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl20:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl20:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module decl20
+
+
+Parsed printed file
+
+void decl20(char *dir)
+{
+   dir[0]=='.';
+}
+
+Printed file
+
+void decl20(char *dir)
+{
+   dir[0]=='.';
+}

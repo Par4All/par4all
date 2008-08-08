@@ -1,4 +1,4 @@
-//Checks the memory allocation offsets of non continous Array of dynamic size.
+//Checks the memory allocation offsets of non continous arrays of dynamic sizes.
 
 void foo(int m, int n)
 {
