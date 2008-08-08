@@ -18,24 +18,14 @@ clean:
 TARGET	= $(shell grep '^[a-zA-Z]' defaults)
 VOPT	= -v
 
-.PHONY: .check_validate
-.check_validate:
-	@if [ -d RESULTS ] ; then \
-	  echo -e \
-	    "\ncannot run validation with prior RESULTS still available." \
-	    "\nbefore trying to run the validation, do a cleanup with:\n" \
-	    "\n\t\tshell> make clean\n" ; \
-	  exit 1; \
-	fi
-
 .PHONY: validate
-validate: .check_validate
+validate: clean
 	PIPS_MORE=cat pips_validate $(VOPT) -V $(PWD) -O RESULTS $(TARGET)
 
 .PHONY: accept
 accept:
 	manual_accept $(TARGET)
 
-# convenient pseudo-target for tests
+# convenient pseudo-target for quick tests: make Hpfc.val
 %.val: %
 	test -d $< && $(MAKE) TARGET=$< validate
