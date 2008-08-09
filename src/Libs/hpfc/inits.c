@@ -105,7 +105,7 @@ int max_size_of_processors()
 	a = type_variable(entity_type(e));
 	
 	current_max = max(current_max,
-			  element_number(variable_dimensions(a)));
+			  element_number(variable_basic(a), variable_dimensions(a)));
     }, 
 	list_of_processors());
 

@@ -317,6 +317,7 @@ compile_one_reduction(
 	    (hpfc_reductions_operator(red), prolog, host, entity_basic(var)),
 	     CONS(EXPRESSION, entity_to_expression(var), 
 	     CONS(EXPRESSION, int_to_expression(element_number(
+		 variable_basic(type_variable(entity_type(var))),
 		 variable_dimensions(type_variable(entity_type(var))))),
 		  NIL))));
 }

@@ -323,7 +323,8 @@ processor_loop(
 		     (vect_make(VECTEUR_NUL,
 				hpfc_name_to_entity(MYLID), VALUE_ONE, 
 				TCST, int_to_value(- element_number
-      (variable_dimensions(type_variable(entity_type(psi))))))));
+      (variable_dimensions(type_variable(entity_type(psi))),
+       variable_dimensions(type_variable(entity_type(psi))))))));
 
     DEBUG_SYST(5, "P simpler", simpler);
     DEBUG_SYST(5, "P enumeration", enumeration);
