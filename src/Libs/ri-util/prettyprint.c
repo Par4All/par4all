@@ -854,8 +854,9 @@ words_nullary_op_c(call obj,
   }
   else if(nargs==1){
     expression e = EXPRESSION(CAR(args));
-    basic b=expression_basic(e);
+
     if(same_string_p(fname,STOP_FUNCTION_NAME)){
+      basic b=expression_basic(e);
       if(basic_int_p(b)){
 	// Missing: declaration of exit() if Fortran code handled
 	pc = CHAIN_SWORD(pc, "exit");

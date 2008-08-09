@@ -78,7 +78,7 @@ void remove_entity_type_stacks(list el)
     //void * p = hash_delget(entity_to_type_stack_table, (void *) e, (void **) &te);
 
     pips_debug(8, "Remove type stack for \"%s\":", entity_name(e));
-    fprintf(stderr, "Remove type stack for \"%s\":", entity_name(e));
+    //fprintf(stderr, "Remove type stack for \"%s\"\n", entity_name(e));
     //pips_debug(8, "get=%p, delget=%p\n", p1, p);
     if(p==HASH_UNDEFINED_VALUE) {
       ifdebug(8) {fprintf(stderr, "no associated stack\n");

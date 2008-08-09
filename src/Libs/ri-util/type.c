@@ -547,6 +547,21 @@ expression_basic(expression expr)
 	 */
       	return(entity_basic(call_function(syntax_call(the_syntax))));
 	break;
+    case is_syntax_cast:
+      {
+	cast c = syntax_cast(the_syntax);
+	type t = cast_type(c);
+	type ut = ultimate_type(t);
+	basic b = variable_basic(type_variable(ut));
+	pips_assert("Type is \"variable\"", type_variable_p(ut));
+      break;
+      }
+    case is_syntax_sizeofexpression:
+      {
+	/* How to void a memory leak? Where can we find a basic int? */
+	b = make_basic(is_basic_int, 4);
+      break;
+      }
     default:
 	pips_internal_error("unexpected syntax tag\n");
 	break;
