@@ -1,4 +1,4 @@
-# $Id: Makefile 12534 2006-08-17 17:40:34Z coelho $
+# $Id$
 #
 # pips shell simple tools
 #

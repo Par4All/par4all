@@ -8,7 +8,7 @@ $0 [-h|--help] file.f ...
   Create a workspace from Fortran given files and parallelize
   them with OpenMP syntax.
 
-'$Id: print.c 12944 2008-07-18 12:44:57Z irigoin $'
+'$Id$'
 EOF
     exit
 }
