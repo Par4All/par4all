@@ -2,8 +2,6 @@
 #
 # $Id$
 #
-# (c) Fabien COELHO July 1996-2007
-# 
 # what to do at night...
 #
 
@@ -27,7 +25,7 @@ target=~/PIPS
 
 setup='http://svn.cri.ensmp.fr/svn/nlpmake/trunk/makes/setup_pips.sh'
 
-while [ "$1" ] 
+while [ "$1" ]
 do
   opt=$1
   case $opt in
@@ -35,7 +33,7 @@ do
       -*) shift ;;
       *) break ;;
   esac
-  
+
   case $opt in
       -t|--target) target=$1 ; shift ;;
       -m|--mail) vopt="VOPT=-m $1" ; shift ;;
@@ -63,12 +61,13 @@ then
     # full download
     wget --no-verbose $setup
     # should be silent?
-    sh ./setup_pips.sh $target 
+    sh ./setup_pips.sh $target
 elif [[ $update ]]
 then
     test -d $target || err "no target directory: $target" 2
     pushd $target
     svn update prod valid
+    test $? -ne 0 && err "svn update failed" 5
     popd
 else
     echo '### no download, no update'
@@ -78,19 +77,19 @@ fi
 test -d $target || err "no target directory: $target" 3
 source $target/pipsrc.sh
 
-if [[ $compile && ! $download ]] 
+if [[ $compile && ! $download ]]
 then
     pushd $target
     # build? verbosity? clean+recompile?
     # skip documentation?
 
-    cd prod/newgen ; 
+    cd prod/newgen
     make clean recompile
 
-    cd ../linear ; 
+    cd ../linear
     make clean recompile
 
-    cd ../pips ; 
+    cd ../pips
     rm -rf bin/$PIPS_ARCH lib/$PIPS_ARCH
     make clean recompile
 
@@ -98,8 +97,8 @@ then
     then
 	echo "### recompilation succeeded"
     else
-	echo "### recompilation failed"
 	validate=
+	err "recompilation failed, no tpips" 6
     fi
     popd
 else
@@ -115,3 +114,5 @@ then
 else
     echo '### no validate'
 fi
+
+exit 0

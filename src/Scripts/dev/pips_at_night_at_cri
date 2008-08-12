@@ -14,8 +14,14 @@ test -f $target/pipsrc.sh && source $target/pipsrc.sh
 
 start=$(date)
 
-pips_at_night -t $target -m $email -u -c -v "$@" \
-    > out.$$ 2> err.$$
+pips_at_night -t $target -m $email -u -c -v "$@" > out.$$ 2> err.$$
+status=$?
+
+if [ $status -ne 0 ] ; then
+  result="failed ($status)"
+else
+  result='succeeded'
+fi
 
 mv out.$$ $target/out
 mv err.$$ $target/err
@@ -29,10 +35,11 @@ end=$(date)
   echo "email=$email"
   echo "start=$start"
   echo "end=$end"
+  echo "result=$result"
   echo
   echo "pips: $(svnversion $target/prod/pips)"
   echo "newgen: $(svnversion $target/prod/newgen)"
   echo "linear: $(svnversion $target/prod/linear)"
   echo "nlpmake: $(svnversion $target/prod/pips/makes)"
   echo "valid: $(svnversion $target/valid)"
-} | ${PIPS_MAIL:-Mail} -s '[pips] night job summary' $email
+} | ${PIPS_MAIL:-Mail} -s "[pips] night job $result" $email
