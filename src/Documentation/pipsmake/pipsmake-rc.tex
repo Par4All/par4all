@@ -2896,6 +2896,89 @@ simd_remove_reductions      > MODULE.code
         < MODULE.dg
 \end{verbatim}
 
+%%@UserManualDocumentation: deatomizer
+...
+%%!UserManualDocumentation
+
+\begin{verbatim}
+alias deatomizer 'Deatomizer'
+
+deatomizer                  > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.dg
+\end{verbatim}
+
+%%@UserManualDocumentation: if_conversion init
+This phase is the first phase of the if-conversion algorithm. The complete
+if conversion algorithm is performed by applying the three following
+phase: \verb|if_conversion_init|, \verb|if_conversion| and
+\verb|if_conversion_compact|.
+%%!UserManualDocumentation
+
+\begin{verbatim}
+alias if_conversion_init 'If-conversion init'
+
+if_conversion_init                  > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.dg
+        < MODULE.summary_complexity
+\end{verbatim}
+% +if_conversion_init > MODULE.code
+% +        > MODULE.calles
+% +        < PROGRAM.entities
+% +        < MODULE.code
+% +        < MODULE.complexities
+
+%%@UserManualDocumentation: if_conversion
+This phase is the second phase of the if-conversion algorithm. The
+complete if conversion algorithm is performed by applying the three
+following phase: \verb|if_conversion_init|, \verb|if_conversion| and
+\verb|if_conversion_compact|.
+%%!UserManualDocumentation
+
+\begin{verbatim}
+alias if_conversion 'If-conversion'
+
+if_conversion                  > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.dg
+\end{verbatim}
+% +if_conversion > MODULE.code
+% +        > MODULE.calles
+% +        < PROGRAM.entities
+% +        < MODULE.code
+% +        < MODULE.dg
+
+%%@UserManualDocumentation: if_conversion_compact
+This phase is the third phase of the \emph{if-conversion} algorithm. The
+complete if conversion algorithm is performed by applying the three
+following phase: \verb|if_conversion_init|, \verb|if_conversion| and
+\verb|if_conversion_compact|.
+%%!UserManualDocumentation
+
+\begin{verbatim}
+alias if_conversion_compact 'If-conversion compact'
+
+if_conversion_compact                  > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.dg
+\end{verbatim}
+% +if_conversion_compact > MODULE.code
+% +        > MODULE.calles
+% +        < PROGRAM.entities
+% +        < MODULE.code
+% +        < MODULE.dg
+% +        < MODULE.proper_effects
+
+
 %%@UserManualDocumentation: single_assignment
 This phase tries to minimize dependencies in the code by transforming
 it into single-assignment form.
@@ -2908,7 +2991,7 @@ single_assignment           > MODULE.code
         < PROGRAM.entities
         < MODULE.code
         < MODULE.dg
-\end{verbatim}
+\end{verbatim}%$
 
 %%@UserManualDocumentation: simdizer
 Function \verb+simdizer+ is an attempt at generating SIMD code for SIMD
@@ -2921,8 +3004,25 @@ of similar statements into vector operations.
 alias simdizer 'Generate SIMD code'
 
 simdizer                    > MODULE.code
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code MODULE.dg
+\end{verbatim}
+
+
+%%@UserManualDocumentation: simd_loop_const_elim
+This phase tries to optimize the SIMD code by removing from the loop body
+the SIMD statement that does not depends on the loop iteration.
+%%!UserManualDocumentation
+
+\begin{verbatim}
+alias simd_loop_const_elim 'SIMD loop constant elimination'
+
+simd_loop_const_elim                    > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.cumulated_effects
+        < MODULE.dg
 \end{verbatim}
 
 
@@ -2934,15 +3034,16 @@ Function \verb+coarse_grain_parallelization+ implements a loop parallelization
 algorithm based on array regions. It considers only one loop at a time, its
 body being abstracted by its invariant read and write regions. No loop
 distribution is performed, but any kind of loop body is acceptable
-whereas \textsc{Allen} \& \textsc{Kennedy} algorithm only copes with very simple loop bodies. 
+whereas \textsc{Allen} \& \textsc{Kennedy} algorithm only copes with very simple loop bodies.
 %%!UserManualDocumentation
 
 \begin{verbatim}
 coarse_grain_parallelization > MODULE.parallelized_code
-        < PROGRAM.entities 
-        < MODULE.code 
+        < PROGRAM.entities
+        < MODULE.code
         < MODULE.inv_regions
 \end{verbatim}
+
 
 \section{Code Distribution}
 \label{subsection-code-distribution}
@@ -3190,7 +3291,7 @@ done here.
 alias phrase_distributor 'PHRASE Distributor'
 
 phrase_distributor                       > MODULE.code
-                                         > MODULE.callees      
+                                         > MODULE.callees
         ! MODULE.phrase_distributor_init
         < PROGRAM.entities
         < MODULE.code
@@ -3223,7 +3324,45 @@ phrase_distributor_control_code          > MODULE.code
 \subsection{CoMap: code generation for accelerators with DMA}
 \label{sec:comap:-code}
 
-\marginpar{Ronan : include Mathieu Godet's work}
+\paragraph{Phrase Remove Dependences}
+\index{Phrase Remove Dependences}
+
+\begin{verbatim}
+alias phrase_remove_dependences 'Phrase Remove Dependences'
+
+phrase_remove_dependences                      > MODULE.code
+                                               > MODULE.callees
+        ! MODULE.phrase_distributor_init
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.in_regions
+        < MODULE.out_regions
+        < MODULE.dg
+\end{verbatim}
+
+
+\paragraph{Phrase comEngine Distributor}
+\index{Phrase comEngine Distributor}
+
+%%@UserManualDocumentation:  phrase_distributor
+This phase should be applied after the initialization (Phrase Distributor
+Initialisation or \verb|PHRASE_DISTRIBUTOR_INIT|). The job of comEngine
+distribution is done here.
+%%!UserManualDocumentation
+
+\begin{verbatim}
+alias phrase_comEngine_distributor 'PHRASE comEngine Distributor'
+
+phrase_comEngine_distributor                       > MODULE.code
+                                                   > MODULE.callees
+        ! MODULE.phrase_distributor_init
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.in_regions
+        < MODULE.out_regions
+        < MODULE.dg
+        < MODULE.summary_complexity
+\end{verbatim}
 
 
 \chapter{Program Transformations}
