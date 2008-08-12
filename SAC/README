@@ -1,0 +1,9 @@
+The benchmarks come from
+ridee.enstb.org:/export/bol/plinn/home/mgodet/benchmark
+or
+~keryell/projets/CoMap/CoMap-godet/benchmark
+
+from the MSc internship of Matthieu Godet.
+https://comap.enstb.org/publications/msc-of-matthieu-godet
+
+When it works, one should try to compile the output with compileC.sh

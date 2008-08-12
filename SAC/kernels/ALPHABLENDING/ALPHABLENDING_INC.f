@@ -1,0 +1,3 @@
+      INTEGER SIZE
+      PARAMETER(SIZE=50000)
+
