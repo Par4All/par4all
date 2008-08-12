@@ -887,9 +887,20 @@ See the \texttt{README} at the root of the \texttt{trunk} for details on
 how to run the validation. Basically, one must simply type \texttt{make}.
 
 See various examples around to add new validation files.  The preferred
-way is to provide a source file \texttt{MyTest.f}, a corresponding
-\texttt{MyTest.tpips} script, and store the standard output of the
-\texttt{.tpips} script into \texttt{MyTest.result/out}.
+way is to provide a source file \texttt{MyTest.f} or \texttt{MyTest.c}, a
+corresponding \texttt{MyTest.tpips} script, and store the standard output
+of the \texttt{.tpips} script into \texttt{MyTest.result/out}.
+
+The output \texttt{MyTest.result/out} is then compared against the
+reference \texttt{MyTest.result/test} to know if the validation is
+correct. So to install a new validation item, you need to create the
+reference \texttt{MyTest.result/test}. \texttt{pips\_validate -a} (see
+afterwards) can help to install a new validation reference file and
+directory.
+
+For more complex validations, a \texttt{.tpips} script without a direct
+corresponding source file but that may use many files from various
+location is also possible.
 
 \textbf{CAUTION:} use a relative and local path in the \texttt{.tpips}
 file to reference the source file.
@@ -925,15 +936,17 @@ Two validation scripts are available:
   These validation scripts \textbf{must not} rely on absolute path,
   otherwise moving the validation around is impossible.
   %%
-  If you really need to rely on the directory containing the scripts,
-  use the \texttt{\$\{VDIR:-.\}} environment variable with a default to
-  the current directory (well, I'm not that sure\ldots).
+  If you really need to rely on the directory containing the scripts, use
+  the \texttt{\$VDIR} environment variable that is initialized by the
+  validation infrastructure, or better \texttt{\$\{VDIR:-.\}} to default
+  to the current directory to test your scripts outside of the validation
+  infrastructure.
 
-  The scripts looks for  validation scripts in the following order:
+  The scripts looks for validation scripts in the following order:
   \begin{enumerate}
-  \item a corresponding. \texttt{.test} file, and executes it.
+  \item a corresponding \texttt{.test} file, and executes it.
 
-  \item a corresponding \texttt{.tpips} file which is executed as a
+  \item a \texttt{.tpips} file which is executed as a
     tpips script.
 
   \item a corresponding \texttt{.tpips2} file which is executed as a

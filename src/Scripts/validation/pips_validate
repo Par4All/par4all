@@ -7,6 +7,10 @@ rev='$Rev$'
 rev=${rev/*: /}
 rev=${rev/ */}
 
+# To be sure that extended globing is available:
+
+shopt -s extglob
+
 # DEFAULTS
 # where is the validation?
 vdir=${PIPS_VALIDDIR:-$PIPS_ROOT/../../valid}
@@ -19,11 +23,14 @@ arch=${PIPS_ARCH:-$($PIPS_ROOT/makes/arch.sh)}
 tpips=$(type -p tpips)
 pips=$(type -p pips)
 
+# By default, do not create a missing .result directory:
+auto_result_create=""
+
 # display help
 function usage()
 {
   local status=$1 msg=$2
-  if [[ $msg ]] 
+  if [[ $msg ]]
   then
     echo -e "message: $msg\n" >&2
   fi
@@ -45,6 +52,9 @@ function usage()
 	"  -R|--run dir: running directory, default '.'\n" \
 	"  -O|--out|--output dir: output directory, default '.'\n" \
 	"arguments:\n" \
+	"  -a|--auto-result-create: create a .result directory if it does\n" \
+	"     not exist yet. Useful to create a new validation test,\n" \
+	"     followed by a manual accept\n" \
 	"  validation directories (e.g. Semantics Regions ...)\n" \
 	"  or files (e.g. Semantics/w14.f ...)\n"
   fi
@@ -84,6 +94,7 @@ while [ "$1" ] ; do
       -R|--run) rdir=$1 ; shift ;;
       -O|--out|--output) odir=$1 ; shift ;;
       -m|--mail) mail="$mail $1" ; shift ;;
+      -a|--auto-result-create) auto_result_create=1 ;;
       --version) echo "$script revision $rev" ; exit 0 ;;
       *) usage 1 "unexpected option: $opt"
   esac
@@ -136,19 +147,28 @@ fi
 # appends errors to $summary
 function validate_file()
 {
-  # file='/some/path/to/directory/file.f'
+  # file='/some/path/to/directory/file.(f|c|F|tpips)'
   local file=$1
   [[ -f $file ]] || usage 12 "no such source file: $file"
   verb 4 "validating $file..."
 
-  # full_name='/some/path/to/directory/file'
+  # full_name='/some/path/to/directory/file' without the extension
   # name='file'
   # upper='FILE'
-  local full_name=${file%.[cfF]}
+  local full_name=${file%.@([cfF]|tpips)}
   if [[ ! -d $full_name.result ]]
   then
-    verb 1 "skipping $file: no matching result directory"
-    return
+    if [[ -n $auto_result_create ]]
+    then
+      mkdir $full_name.result
+      touch $full_name.result/test
+      echo "Directory $full_name.result created."
+      echo "Think to run a manual_accept to set the results of the validation"
+      echo "  of this file as the reference."
+    else
+      verb 1 "skipping $file: no matching result directory"
+      return
+    fi
   fi
 
   local name=${full_name/*\//}
@@ -271,7 +291,7 @@ for obj ; do
   failed=
   if [ -d $vdir/$obj ] ; then
     verb 1 "considering '$obj' directory"
-    for file in $vdir/$obj/*.[cfF] ; do
+    for file in $vdir/$obj/*.@([cfF]|tpips); do
       verb 3 " - considering '${file//$vdir\//}' file"
       validate_file $file || let errors++ failed=1
       let dones++
