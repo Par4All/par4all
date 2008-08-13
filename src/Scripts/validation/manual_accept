@@ -6,6 +6,7 @@
 
 svn=
 shopt -s nullglob
+shopt -s extglob
 
 # what is the current arch?
 arch=${PIPS_ARCH:-$($PIPS_ROOT/makes/arch.sh)}
@@ -20,12 +21,12 @@ function handle_out_file()
     # show differences
     if [ -f $file ] ; then
 	echo "CONSIDERING $ref and $outfile"
-	if [[ ! $PIPS_DIFF ]] ; then
+	if [[ ! $PIPS_GRAPHICAL_DIFF ]] ; then
             diff -b -u $ref $outfile | ${PIPS_MORE:-less}
 	else
 	    # Useless to use PIPS_MORE since for higher level graphical
 	    # tools for example
-	    ${PIPS_DIFF} $ref $outfile
+	    ${PIPS_GRAPHICAL_DIFF} $ref $outfile
 	fi
     else
 	echo "NEW OUTPUT $outfile"
@@ -61,7 +62,7 @@ for arg ; do
   if [[ -d $arg ]] ; then
       handle_directory $arg
   elif [[ -f $arg ]] ; then
-      outfile=${arg%.[Ffc]}.result/out
+      outfile=${arg%.@([Ffc]|tpips)}.result/out
       if [[ -f $outfile ]] ; then
 	  handle_out_file $outfile
       else

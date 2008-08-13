@@ -293,6 +293,13 @@ for obj ; do
     verb 1 "considering '$obj' directory"
     for file in $vdir/$obj/*.@([cfF]|tpips); do
       verb 3 " - considering '${file//$vdir\//}' file"
+      base=${file%.@([cfF]|tpips)}
+      ext=${file/*./}
+      if [[ $ext != tpips && -f $base.tpips ]] ; then
+	  # If there is a file and a .tpips associated, skip the
+	  # validation done for this file since it is done for the .tpips
+	  continue
+      fi
       validate_file $file || let errors++ failed=1
       let dones++
     done
