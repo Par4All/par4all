@@ -85,22 +85,21 @@ string statement_type_as_string (statement stat)
  */
 void debug_statement (string comments, statement stat, int debug_level)
 {
-  pips_debug(debug_level,"%s\n",comments);
   ifdebug(debug_level) {
+    pips_debug(debug_level,"%s\n",comments);
     print_statement(stat);
+    pips_debug(debug_level,"domain number         = %d\n", statement_domain_number(stat));
+    pips_debug(debug_level,"entity                = UNDEFINED\n");
+    pips_debug(debug_level,"statement number      = %d\n", statement_number(stat));
+    pips_debug(debug_level,"statement ordering    = %d\n", statement_ordering(stat));
+    if (statement_with_empty_comment_p(stat)) {
+      pips_debug(debug_level,"statement comments   = EMPTY\n");
+    }
+    else {
+      pips_debug(debug_level,"statement comments  = %s\n", statement_comments(stat));
+    }
+    pips_debug(debug_level,"statement instruction = %s\n", statement_type_as_string(stat));
   }
-  pips_debug(debug_level,"domain number         = %d\n", statement_domain_number(stat));
-  pips_debug(debug_level,"entity                = UNDEFINED\n");
-  pips_debug(debug_level,"statement number      = %d\n", statement_number(stat));
-  pips_debug(debug_level,"statement ordering    = %d\n", statement_ordering(stat));
-  if (statement_with_empty_comment_p(stat)) {
-    pips_debug(debug_level,"statement comments   = EMPTY\n");
-  }
-  else {
-    pips_debug(debug_level,"statement comments  = %s\n", statement_comments(stat));
-  }
-  pips_debug(debug_level,"statement instruction = %s\n", statement_type_as_string(stat));
-
 }
 
 /**
@@ -163,17 +162,18 @@ void debug_unstructured (unstructured an_unstructured,
       ordering = statement_ordering(s);
       /*if (ordering > 65535) ordering = ordering >> 16;*/
       sprintf (title, "CONTROL: %p\n", ordering);
-      pips_debug(debug_level, "%s\n",
-		 strdup(concatenate("\n", line,
-				    "* ", strdup(title),
-				    line, NULL)));
-      print_statement(s);
-      pips_debug(debug_level, "%s\n",
-		 strdup(concatenate("\n", line,
-				    "NEXT: ", next_nodes_as_string, "\n",
-				    "PREVIOUS: ", previous_nodes_as_string, "\n",
-				    line, NULL)));
-		 
+      ifdebug(debug_level) {
+	pips_debug(debug_level, "%s\n",
+		   strdup(concatenate("\n", line,
+				      "* ", strdup(title),
+				      line, NULL)));
+	print_statement(s);
+	pips_debug(debug_level, "%s\n",
+		   strdup(concatenate("\n", line,
+				      "NEXT: ", next_nodes_as_string, "\n",
+				      "PREVIOUS: ", previous_nodes_as_string, "\n",
+				      line, NULL)));
+      }
     }, unstructured_entry(an_unstructured), blocs);
   }
 }
@@ -559,8 +559,10 @@ void replace_in_sequence_statement_with (statement old_stat,
   stats_list = sequence_statements(instruction_sequence(statement_instruction(sequence_statement)));
 
   MAP (STATEMENT, s, {
-    pips_debug(7, "Iterate on statement:\n");
-    print_statement(s);    
+    ifdebug(7) {
+      pips_debug(7, "Iterate on statement:\n");
+      print_statement(s);
+    }
     if (s == old_stat) {
       pips_debug(7, "Replace this statement:\n");
       new_stats_list = CONS(STATEMENT,new_stat,new_stats_list);
@@ -575,7 +577,7 @@ void replace_in_sequence_statement_with (statement old_stat,
 
   /*gen_insert_after (new_stat, old_stat, stats_list);
     gen_remove (&stats_list, old_stat);*/
-  
+
   ifdebug(7) {
     pips_debug(7, "I've got this for the sequence\n");
     print_statement(sequence_statement);    

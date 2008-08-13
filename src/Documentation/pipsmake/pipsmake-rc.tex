@@ -1559,7 +1559,7 @@ values of scalar variables and their values after the execution of a
 statement, simple or compound (see~\cite{IJT92} and~\cite{Ir92}). In abstract
 interpretation terminology, a transformer is an abstract command
 linking the input abstract state of a statement and its output
-abstract state. 
+abstract state.
 
 By default, only integer scalar variables are analyzed, but properties
 can be set to handle boolean, string and floating point scalar
@@ -3232,7 +3232,7 @@ recompute everything from scratch. To be investigated later on.
 hpfc_install            > PROGRAM.hpfc_installation
     < PROGRAM.hpfc_commons
 
-hpfc_make               
+hpfc_make
 
 hpfc_run
 
@@ -3250,23 +3250,27 @@ hpfc_run
 \index{Code Distribution}
 \index{PHRASE}
 
-The PHRASE project is an attempt to automatically (or semi-automatically) 
-transform high-level language for partial evaluation in reconfigurable 
-logic (such as FPGAs or DataPaths).
+The PHRASE project is an attempt to automatically (or semi-automatically)
+transform high-level language programs into code with partial execution on
+some accelerators such as reconfigurable logic (such as FPGAs) or
+data-paths.
 
-This phases allow to split the code into portions of code delimited by 
-PHRASE-pragmas (written by the programmer) and a control file managing 
-them. Those portions of code are intented, after transformations, to 
-be executed in reconfigurable logic (in PHRASE projects, reconfigurable 
-logic is synthetized with smalltalk code).
+This phases allow to split the code into portions of code delimited by
+PHRASE-pragma (written by the programmer) and a control program managing
+them. Those portions of code are intended, after transformations, to be
+executed in reconfigurable logic. In the PHRASE project, the
+reconfigurable logic is synthesized with the Madeo tool that take
+SmallTalk code as input. This is why we have a SmallTalk pretty-printer
+(see section~\ref{subsection-prettyprinters-smalltalk}).
+
 
 \subsubsection{Phrase Distributor Initialisation}
 \index{Phrase Distributor Initialisation}
 
 %%@UserManualDocumentation:  phrase_distributor_init
-This phase is a preparation phase for (Phrase Distributor or
-PHRASE\_DISTRIBUTOR): the portions of code to externalize are identified
-and isolated here. Comments are modified by this phase.
+This phase is a preparation phase for the Phrase Distributor
+\verb|phrase_distributor|: the portions of code to externalize are
+identified and isolated here. Comments are modified by this phase.
 %%!UserManualDocumentation
 
 \begin{verbatim}
@@ -3277,14 +3281,18 @@ phrase_distributor_init                  > MODULE.code
         < MODULE.code
 \end{verbatim}
 
+This phase is automatically called by the following
+\verb|phrase_distributor|.
+
 
 \subsubsection{Phrase Distributor}
 \index{Phrase Distributor}
 
 %%@UserManualDocumentation:  phrase_distributor
-This phase should be applied after the initialization (Phrase Distributor
-Initialisation or PHRASE\_DISTRIBUTOR\_INIT). The job of distribution is
-done here.
+The job of distribution is done here. This phase should be applied after
+the initialization (Phrase Distributor Initialisation
+\verb|phrase_distributor_init|), so this one is automatically applied
+first.
 %%!UserManualDocumentation
 
 \begin{verbatim}
@@ -3299,6 +3307,7 @@ phrase_distributor                       > MODULE.code
         < MODULE.out_regions
         < MODULE.dg
 \end{verbatim}
+
 
 \subsubsection{Phrase Distributor Control Code}
 \index{Phrase Distributor Control Code}
@@ -3893,28 +3902,31 @@ restructure_control          > MODULE.code
         < MODULE.code
 \end{verbatim}
 
+
 \subsubsection{Spaghettify}
 \label{paragraph-spaghettify}
 
 %%@UserManualDocumentation: spaghettify
-The \texttt{spaghettifier} is used in the context of the PHRASE project while
-creating "Finite State Machine"-like code portions in order to synthesize
-them in reconfigurables units.
+\texttt{spaghettify} is used in the context of the PHRASE project while
+creating ``Finite State Machine''-like code portions in order to
+synthesize them in reconfigurable units.
 
-This phases transforms structured code portions (eg. loops) in
+This phases transform structured code portions (eg. loops) in
 unstructured statements.
 
-The \texttt{SPAGHETTIFIER} transforms the module in a unstructured code with hierarchical unstructured portion of code corresponding to old strutures.
+\texttt{spaghettify} transforms the module in a unstructured code with
+hierarchical unstructured portions of code corresponding to the old
+control flow structures.
 
 To add flexibility, the behavior of \texttt{spaghettifier} is
-controlled by the properties 
+controlled by the properties
 \begin{itemize}
 \item{DESTRUCTURE\_TESTS}
 \item{DESTRUCTURE\_LOOPS}
 \item{DESTRUCTURE\_WHILELOOPS}
 \item{DESTRUCTURE\_FORLOOPS}
 \end{itemize}
-to allow more or less destruction power !
+to allow more or less destruction power.
 
 %%!UserManualDocumentation
 %% Control Graph Restructuring
@@ -3933,16 +3945,16 @@ spaghettify          > MODULE.code
 
 %%@UserManualDocumentation: full_spaghettify
 The \texttt{spaghettifier} is used in context of PHRASE project while
-creating "Finite State Machine"-like code portions in order to synthetise
-them in reconfigurables units.
+creating``Finite State Machine''-like code portions in order to synthesize
+them in reconfigurable units.
 
-This phases transforms all the module in a unique
-unstructured statement. 
+This phases transforms all the module in a unique flat unstructured
+statement.
 
-Where as the \texttt{SPAGHETTIFIER} transforms the module in a unstructured
-code with hierarchical unstructured portion of code corresponding to
-old strutures, the \texttt{FULL\_SPAGHETTIFIER} transform the code in a SEQUENCE
-statement with a beginning statement, a UNIQUE and FLATTENIZED
+Whereas the \texttt{SPAGHETTIFIER} transforms the module in a unstructured
+code with hierarchical unstructured portions of code corresponding to the
+old structures, the \texttt{FULL\_SPAGHETTIFIER} transform the code in a
+sequence statement with a beginning statement, a unique and flattened
 unstructured (all the unstructured and sequences are flattened), and a
 final statement.
 
@@ -4014,8 +4026,8 @@ suppress_trivial_test          > MODULE.code
 
 Theses phases are used for PHRASE project.
 
-NB: The PHRASE project is an attempt to automatically (or semi-automatically) 
-transform high-level language for partial evaluation in reconfigurable 
+NB: The PHRASE project is an attempt to automatically (or semi-automatically)
+transform high-level language for partial evaluation in reconfigurable
 logic (such as FPGAs or DataPaths).
 
 This library provides phases allowing to build and modify "Finite State
@@ -4026,7 +4038,6 @@ reconfigurable units. This was implemented by Sylvain \textsc{Guérin}.
 \label{paragraph-fsm-generation}
 
 %%@UserManualDocumentation: fsm_generation
-
 This phase tries to generate finite state machine from arbitrary code by
 applying rules numeroting branches of the syntax tree and using it as
 state variable for the finite state machine.
@@ -4036,13 +4047,12 @@ WHILE-LOOP statement controlled by a state variable, whose different
 values are associated to the different statements.
 
 To add flexibility, the behavior of \texttt{FSM\_GENERATION} is
-controlled by the property 
+controlled by the property
 \begin{center}
 \verb|FSMIZE_WITH_GLOBAL_VARIABLE|
 \end{center}
 which controls the fact that the same global variable (global to the
 current module) must be used for each FSMized statements.
-
 %%!UserManualDocumentation
 
 \begin{verbatim}
@@ -4054,24 +4064,32 @@ fsm_generation        > MODULE.code
         < MODULE.code
 \end{verbatim}
 
+To generate a hierarchical finite state machine, apply first
+\texttt{spaghettify} (\S~\ref{paragraph-spaghettify}) and then
+\verb|fsm_generation|.
+
+To generate a flat finite state machine, apply first
+\verb|full_spaghettify| (\S~\ref{paragraph-full-spaghettify}) and then
+\verb|fsm_generation| or use the aggregate phase
+\verb|full_fsm_generation| (\S~\ref{paragraph-full-fsm-generation}).
+
+
 \subsubsection{Full FSM Generation}
 \label{paragraph-full-fsm-generation}
 
 %%@UserManualDocumentation: full_fsm_generation
-
-This phase tries to generate finite state machine from arbitrary code by
-applying rules numeroting branches of the syntax tree and using it as
-state variable for the finite state machine.
+This phase tries to generate a flat finite state machine from arbitrary
+code by applying rules numeroting branches of the syntax tree and using it
+as state variable for the finite state machine.
 
 This phase transform all the module in a FSM-like code, which is a
 WHILE-LOOP statement controlled by a state variable, whose different
 values are associated to the different statements.
 
-In fact, this phase is the succession of the 2 phases
-\texttt{FULL\_SPAGHETTIFY} (\S~ref{paragraph-full-spaghettify}) and
-\texttt{FSM\_GENERATION} (\S~\ref{paragraph-fsm-generation})
-
-
+In fact, this phase do nothing but rely on pipsmake to apply the
+succession of the 2 phases \texttt{FULL\_SPAGHETTIFY}
+(\S~ref{paragraph-full-spaghettify}) and \texttt{FSM\_GENERATION}
+(\S~\ref{paragraph-fsm-generation})
 %%!UserManualDocumentation
 
 \begin{verbatim}
@@ -4089,17 +4107,13 @@ full_fsm_generation   > MODULE.code
 \label{paragraph-fsm-split-state}
 
 %%@UserManualDocumentation: fsm_split_state
-
-This phase tries to generate finite state machine from arbitrary code by
-applying rules numeroting branches of the syntax tree and using it as
-state variable for the finite state machine.
+This phase is not yet implemented and do nothing right now...
 
 This phase transform a state of a FSM-like statement and split it into n
 new states where the portion of code to execute is smaller.
 
 NB: Phase \texttt{FULL\_SPAGHETTIFY} (\S~\ref{paragraph-full-spaghettify})
 must have been applied first !
-
 %%!UserManualDocumentation
 
 \begin{verbatim}
@@ -4114,17 +4128,13 @@ fsm_split_state    > MODULE.code
 \label{paragraph-fsm-merge-states}
 
 %%@UserManualDocumentation: fsm_merge_states
-
-This phase tries to generate finite state machine from arbitrary code by
-applying rules numeroting branches of the syntax tree and using it as
-state variable for the finite state machine.
+This phase is not yet implemented and do nothing right now...
 
 This phase transform 2 or more states of a FSM-like statement and merge
 them into a new state where the portion of code to execute is bigger.
 
 NB: Phase \texttt{FULL\_SPAGHETTIFY} (\S~\ref{paragraph-full-spaghettify})
 must have been applied first !
-
 %%!UserManualDocumentation
 
 \begin{verbatim}
@@ -6799,6 +6809,7 @@ print_c_code  > MODULE.c_printed_file
               < MODULE.crough
 \end{verbatim}
 
+
 \section{Prettyprinters Smalltalk}
 \label{subsection-prettyprinters-smalltalk}
 \index{Prettyprinters Smalltalk}
@@ -6812,7 +6823,10 @@ as \textsc{fpga}s or data-paths with \textsc{alu}).
 %%@UserManualDocumentation: print_code_smalltalk
 This pass is used in context of PHRASE project for synthetisation of
 reconfigurable logic for a portion of initial code. This function can
-be viewed as a SmallTalk pretty-printer of a subset of Fortran.
+be viewed as a SmallTalk pretty-printer of a subset of Fortran or C.
+
+It is used as input for the Madeo synthesis tools from UBO/AS that is
+written in SmallTalk and take circuit behaviour in SmallTalk.
 %%!UserManualDocumentation
 
 It is an interesting language fusion...
@@ -6824,6 +6838,7 @@ print_code_smalltalk        > MODULE.smalltalk_code_file
         < PROGRAM.entities
         < MODULE.code
 \end{verbatim}
+
 
 \section{Prettyprinter for CLAIRE}
 \label{subsection-prettyprinter-claire}

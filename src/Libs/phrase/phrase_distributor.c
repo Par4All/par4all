@@ -58,16 +58,16 @@ string get_function_name_by_searching_tag(statement stat,
   char* function_name = NULL;
   char*  next_line;
   instruction i = statement_instruction(stat);
-  
-  pips_debug(5, "BEGIN get_function_name_by_searching_tag [%s] on \n", tag);
+
   ifdebug(5) {
+    pips_debug(5, "BEGIN get_function_name_by_searching_tag [%s] on \n", tag);
     print_statement(stat);
   }
 
   if (instruction_tag(i) == is_instruction_sequence) {
     stat = STATEMENT(gen_nth(0,sequence_statements(instruction_sequence(i))));
   }
-  
+
   if (!statement_with_empty_comment_p(stat)) {
     searched_string = strdup(comment_portion);
     searched_string[strcspn(comment_portion, "%s")] = '\0';
@@ -94,24 +94,28 @@ string get_function_name_by_searching_tag(statement stat,
 /**
  * Remove begin tag for statement stat and function function_name
  */
-static void remove_begin_tag (statement stat, string function_name) 
+static void remove_begin_tag (statement stat, string function_name)
 {
   char* removed_tag = malloc(256);
   sprintf (removed_tag,EXTERNALIZED_CODE_PRAGMA_BEGIN,function_name);
-  pips_debug(2, "REMOVE %s from\n", removed_tag);
-  print_statement (stat);
+  ifdebug(2) {
+    pips_debug(2, "REMOVE %s from\n", removed_tag);
+    print_statement (stat);
+  }
   clean_statement_from_tags (removed_tag, stat);
 }
 
 /**
  * Remove end tag for statement stat and function function_name
  */
-static void remove_end_tag (statement stat, string function_name) 
+static void remove_end_tag (statement stat, string function_name)
 {
   char* removed_tag = malloc(256);
   sprintf (removed_tag,EXTERNALIZED_CODE_PRAGMA_END,function_name);
-  pips_debug(2, "REMOVE %s from\n", removed_tag);
-  print_statement (stat);
+  ifdebug(2) {
+    pips_debug(2, "REMOVE %s from\n", removed_tag);
+    print_statement (stat);
+  }
   clean_statement_from_tags (removed_tag, stat);
 }
 
@@ -285,10 +289,10 @@ static list identify_statements_to_distribute (statement module_stat)
   /* We identify again (after code restructuration) all the statement
    * containing a begin tag */
   statements_containing_begin_tag = NIL;
-  statements_containing_begin_tag 
+  statements_containing_begin_tag
     = get_statements_with_comments_containing(EXTERNALIZED_CODE_PRAGMA_BEGIN,
-					      module_stat); 
-  
+					      module_stat);
+
   /* We check that all those statements are contained in a sequence */
   MAP (STATEMENT, s, {
     ifdebug(5) {
@@ -296,7 +300,7 @@ static list identify_statements_to_distribute (statement module_stat)
       print_statement(s);
     }
     if (statement_is_contained_in_a_sequence_p (module_stat,s)) {
-      statements_contained_in_a_sequence 
+      statements_contained_in_a_sequence
 	= CONS (STATEMENT,
 		s,
 		statements_contained_in_a_sequence);
@@ -305,17 +309,18 @@ static list identify_statements_to_distribute (statement module_stat)
       pips_user_warning("Malformed externalized code portion identified. Ignored.\n");
     }
   }, statements_containing_begin_tag);
-  
+
   /* */
   MAP (STATEMENT, s, {
     statement sequence_statement;
     string function_name;
     string end_tag;
     list potential_end_statement = NIL;
-    sequence_statement = 
-      sequence_statement_containing (module_stat,s);
-    pips_debug(5, "Potential externalizable statement contained in a sequence \n");
-    print_statement(s);
+    sequence_statement = sequence_statement_containing (module_stat,s);
+    ifdebug(5) {
+      pips_debug(5, "Potential externalizable statement contained in a sequence \n");
+      print_statement(s);
+    }
     function_name = get_externalizable_function_name(s);
     if (function_name != NULL) {
       pips_debug(5, "Name: [%s] \n", function_name);
@@ -401,26 +406,30 @@ static void distribute_code (string function_name,
 				  make_instruction(is_instruction_call,
 						   make_call(new_module,call_params)),
 				  NIL,NULL);
-  
-  pips_debug(5, "BEFORE REPLACING\n");
-  pips_debug(5, "externalized_code=\n");
-  print_statement(externalized_code);
-  pips_debug(5, "call_statement=\n");
-  print_statement(call_statement);
-  pips_debug(5, "module_stat=\n");
-  print_statement(module_stat);
 
-  replace_in_sequence_statement_with (externalized_code,
-				      call_statement, 
-				      module_stat);
-  
-  pips_debug(5, "AFTER REPLACING\n");
-  pips_debug(5, "externalized_code=\n");
-  print_statement(externalized_code);
-  pips_debug(5, "call_statement=\n");
-  print_statement(call_statement);
-  pips_debug(5, "module_stat=\n");
-  print_statement(module_stat);
+  ifdebug(5) {
+    pips_debug(5, "BEFORE REPLACING\n");
+    pips_debug(5, "externalized_code=\n");
+    print_statement(externalized_code);
+    pips_debug(5, "call_statement=\n");
+    print_statement(call_statement);
+    pips_debug(5, "module_stat=\n");
+    print_statement(module_stat);
+  }
+
+  replace_in_sequence_statement_with(externalized_code,
+				     call_statement,
+				     module_stat);
+
+  ifdebug(5) {
+    pips_debug(5, "AFTER REPLACING\n");
+    pips_debug(5, "externalized_code=\n");
+    print_statement(externalized_code);
+    pips_debug(5, "call_statement=\n");
+    print_statement(call_statement);
+    pips_debug(5, "module_stat=\n");
+    print_statement(module_stat);
+  }
 
   pips_assert("Module structure is consistent after DISTRIBUTE_CODE", 
 	      gen_consistent_p((gen_chunk*)new_module));
