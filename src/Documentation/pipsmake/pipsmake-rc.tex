@@ -5834,6 +5834,7 @@ alias print_parallelized90_code 'Fortran 90'
 alias print_parallelizedcray_code 'Fortran Cray'
 \end{verbatim}
 
+
 \subsection{Fortran 77 Parallel View}
 
 %%@UserManualDocumentation: print_parallelized77_code
@@ -5850,21 +5851,32 @@ print_parallelized77_code       > MODULE.parallelprinted_file
 %%        < PROGRAM.entities
 %%        < MODULE.parallelized_code
 
+
 \subsection{HPF Directives Parallel View}
 
 %%@UserManualDocumentation: print_parallelizedHPF_code
-Output the code decorated with HPF or OMP directives.
+Output the code decorated with HPF directives.
 %%!UserManualDocumentation
 
 \begin{verbatim}
 print_parallelizedHPF_code     > MODULE.parallelprinted_file
         < PROGRAM.entities
         < MODULE.parallelized_code
+\end{verbatim}
 
+
+\subsection{OpenMP Directives Parallel View}
+
+%%@UserManualDocumentation: print_parallelizedOMP_code
+Output the code decorated with OpenMP (OMP) directives.
+%%!UserManualDocumentation
+
+\begin{verbatim}
 print_parallelizedOMP_code     > MODULE.parallelprinted_file
         < PROGRAM.entities
         < MODULE.parallelized_code
 \end{verbatim}
+
 
 \subsection{Fortran 90 Parallel View}
 
@@ -5877,6 +5889,7 @@ print_parallelized90_code       > MODULE.parallelprinted_file
         < PROGRAM.entities
         < MODULE.parallelized_code
 \end{verbatim}
+
 
 \subsection{Cray Fortran Parallel View}
 
@@ -5892,6 +5905,7 @@ print_parallelizedcray_code     > MODULE.parallelprinted_file
         < MODULE.parallelized_code
         < MODULE.cumulated_effects
 \end{verbatim}
+
 
 \section{Call Graph Files}
 \label{subsection-call-graph-files}
