@@ -1,0 +1,14 @@
+create ex2_FSM ex2.c
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo Transform all the control flow in one finite state machine:
+apply FULL_FSM_GENERATION[%ALL]
+display PRINTED_FILE[%ALL]
+
+echo For fun, prettyprint the C code as SmallTalk for the Madeo synthesis tool:
+display SMALLTALK_CODE_FILE[ex2]
+
+close
+delete ex2_FSM

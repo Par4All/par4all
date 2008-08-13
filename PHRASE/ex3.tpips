@@ -1,0 +1,15 @@
+create ex3 ex3.c
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+# Select the more precise regions to compute the communications:
+activate MUST_REGIONS
+
+echo Transform all the control flow in one finite state machine:
+apply PHRASE_DISTRIBUTOR[%ALL]
+apply PHRASE_DISTRIBUTOR_CONTROL_CODE[%ALL]
+display PRINTED_FILE[%ALL]
+
+close
+delete ex3

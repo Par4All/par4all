@@ -1,0 +1,176 @@
+Transform all the control flow in hierarchical finite state machines:
+int ex2(int argc,char *args)
+{
+   int U[101][101];
+   int V[101][101];
+   int i;
+   int j;
+   FSM2_STATE = 1;
+   while (FSM2_STATE!=0) 
+      if (FSM2_STATE==1) {
+         i = 0;
+         FSM2_STATE = 2;
+      }
+      else if (FSM2_STATE==2)
+         if (i<100) {
+            ;
+            FSM2_STATE = 3;
+         }
+         else
+          {
+            ;
+            FSM2_STATE = 10;
+         }
+      else if (FSM2_STATE==3) {
+         FSM196609_STATE = 4;
+         while (FSM196609_STATE!=0) 
+            if (FSM196609_STATE==4) {
+               j = 0;
+               FSM196609_STATE = 5;
+            }
+            else if (FSM196609_STATE==5)
+               if (j<100) {
+                  ;
+                  FSM196609_STATE = 6;
+               }
+               else
+                {
+                  ;
+                  FSM196609_STATE = 8;
+               }
+            else if (FSM196609_STATE==6) {
+               U[i+1][j] = V[i][j]+U[i][j];
+
+               V[i][j+1] = U[i+1][j];
+               FSM196609_STATE = 7;
+            }
+            else if (FSM196609_STATE==7) {
+               j++;
+               FSM196609_STATE = 5;
+            }
+            else if (FSM196609_STATE==8) {
+               ;
+               FSM196609_STATE = 0;
+            }
+         FSM2_STATE = 9;
+      }
+      else if (FSM2_STATE==9) {
+         i++;
+         FSM2_STATE = 2;
+      }
+      else if (FSM2_STATE==10) {
+         ;
+         FSM2_STATE = 0;
+      }
+   return 0;
+}
+extern int ex2(int ,char *);
+For fun, prettyprint the C code as SmallTalk for the Madeo synthesis tool:
+/* SMALLTALK pretty print for module ex2. */
+ex2 with:argc with:args 
+"Automatically generated with PIPS"
+
+"0`U,int , 2 dimensions"
+"0`V,int , 2 dimensions"
+"0`i,int "
+"0`j,int "
+"FSM2_STATE,int "
+"FSM196609_STATE,int "
+
+|0`U 0`V 0`i 0`j FSM2_STATE FSM196609_STATE |
+
+
+0`U := Array2D width: 101 height: 101.
+0`V := Array2D width: 101 height: 101.
+
+0`U.
+0`V.
+0`i.
+0`j.
+FSM2_STATE := 1.
+[FSM2_STATE != 0] whileTrue: [
+(FSM2_STATE == 1)
+ifTrue: [
+0`i := 0.
+FSM2_STATE := 2.
+]
+ifFalse: [
+(FSM2_STATE == 2)
+ifTrue: [
+(0`i < 100)
+ifTrue: [
+FSM2_STATE := 3.
+]
+ifFalse: [
+FSM2_STATE := 10.
+].
+]
+ifFalse: [
+(FSM2_STATE == 3)
+ifTrue: [
+FSM196609_STATE := 4.
+[FSM196609_STATE != 0] whileTrue: [
+(FSM196609_STATE == 4)
+ifTrue: [
+0`j := 0.
+FSM196609_STATE := 5.
+]
+ifFalse: [
+(FSM196609_STATE == 5)
+ifTrue: [
+(0`j < 100)
+ifTrue: [
+FSM196609_STATE := 6.
+]
+ifFalse: [
+FSM196609_STATE := 8.
+].
+]
+ifFalse: [
+(FSM196609_STATE == 6)
+ifTrue: [
+0`U at: (0`i + 1-0) at: 0`j-0 put: ((0`V at: 0`i-0 at: 0`j-0) + (0`U at: 0`i-0 at: 0`j-0)).
+0`V at: 0`i-0 at: (0`j + 1-0) put: (0`U at: (0`i + 1-0) at: 0`j-0).
+FSM196609_STATE := 7.
+]
+ifFalse: [
+(FSM196609_STATE == 7)
+ifTrue: [
+0`j ++.
+FSM196609_STATE := 5.
+]
+ifFalse: [
+(FSM196609_STATE == 8)
+ifTrue: [
+FSM196609_STATE := 0.
+]
+ifFalse: [
+].
+].
+].
+].
+].
+].
+FSM2_STATE := 9.
+]
+ifFalse: [
+(FSM2_STATE == 9)
+ifTrue: [
+0`i ++.
+FSM2_STATE := 2.
+]
+ifFalse: [
+(FSM2_STATE == 10)
+ifTrue: [
+FSM2_STATE := 0.
+]
+ifFalse: [
+].
+].
+].
+].
+].
+].
+^ result.
+
+

@@ -1,0 +1,14 @@
+delete ${WSPACE}
+create ${WSPACE} ${FILE}
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate PRINT_PARALLELIZEDOMP_CODE
+
+display PARALLELPRINTED_FILE[%ALL]
+
+close
+delete ${WSPACE}
+quit
