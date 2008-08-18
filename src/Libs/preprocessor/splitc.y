@@ -1740,7 +1740,7 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			   /* Too early to reset: one typedef can be used
                               to declare several named types... but I do
                               not know how to use it. */
-			   //csplit_is_typedef = FALSE;
+			   csplit_is_typedef = FALSE;
 			   $$ = $1;
 			 }
 			 else if(TRUE) { /* Keep identifiers in signatures */
