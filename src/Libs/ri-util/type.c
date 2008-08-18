@@ -552,14 +552,14 @@ expression_basic(expression expr)
 	cast c = syntax_cast(the_syntax);
 	type t = cast_type(c);
 	type ut = ultimate_type(t);
-	basic b = variable_basic(type_variable(ut));
+	b = variable_basic(type_variable(ut));
 	pips_assert("Type is \"variable\"", type_variable_p(ut));
       break;
       }
     case is_syntax_sizeofexpression:
       {
-	/* How to void a memory leak? Where can we find a basic int? */
-	b = make_basic(is_basic_int, 4);
+	/* How to void a memory leak? Where can we find a basic int? A static variable? */
+	b = make_basic(is_basic_int, (void *) 4);
       break;
       }
     default:
@@ -686,6 +686,114 @@ basic b;
 }
 
 
+/* basic basic_of_any_expression(expression exp, bool apply_p): Makes
+ * a basic of the same basic as the expression "exp" if "apply_p" is
+ * FALSE. If "apply_p" is true and if the expression returns a
+ * function, then return the resulting type of the function.
+ *
+ * WARNING: a new basic object is allocated
+ *
+ *  PREFER (???) expression_basic
+ *
+ */
+basic 
+basic_of_any_expression(expression exp, bool apply_p)
+{
+  syntax sy = expression_syntax(exp);
+  basic b = basic_undefined;
+
+  ifdebug(6){
+    pips_debug(6, "begins with apply_p=%s and expression ", bool_to_string(apply_p));
+    print_expression(exp);
+    pips_debug(6, "\n");
+  }
+
+  switch(syntax_tag(sy)) {
+  case is_syntax_reference:
+    {
+      entity v = reference_variable(syntax_reference(sy));
+      type exp_type = ultimate_type(entity_type(v));
+
+      if(apply_p) {
+	if(!type_functional_p(exp_type))
+	  pips_internal_error("Bad reference type tag %d \"%s\"\n",
+			      type_tag(exp_type));
+	else {
+	  type rt = functional_result(type_functional(exp_type));
+	  type urt = ultimate_type(rt);
+
+	  if(type_variable_p(urt))
+	    b = copy_basic(variable_basic(type_variable(urt)));
+	  else
+	    pips_internal_error("Unexpected type tag %s\n", type_to_string(urt));
+	}
+      }
+      else {
+	if(type_variable_p(exp_type))
+	  b = copy_basic(variable_basic(type_variable(exp_type)));
+	else if(type_functional_p(exp_type)) {
+	  /* A reference to a function returns a pointer to a function of the very same time */
+	  b = make_basic(is_basic_pointer, copy_type(exp_type));
+	}
+	else {
+	  pips_internal_error("Bad reference type tag %d \"%s\"\n",
+			      type_tag(exp_type), type_to_string(exp_type));
+	}
+      }
+      break;
+    }
+  case is_syntax_call: 
+    b = basic_of_call(syntax_call(sy), apply_p);
+    break;
+  case is_syntax_range: 
+    /* Well, let's assume range are well formed... */
+    b = basic_of_expression(range_lower(syntax_range(sy)));
+    break;
+  case is_syntax_cast: 
+    {
+      type t = cast_type(syntax_cast(sy));
+      if (type_tag(t) != is_type_variable)
+	pips_internal_error("Bad reference type tag %d\n",type_tag(t));
+      b = copy_basic(variable_basic(type_variable(t)));
+      break;
+    }
+  case is_syntax_sizeofexpression: 
+    {
+      sizeofexpression se = syntax_sizeofexpression(sy);
+      if (sizeofexpression_type_p(se))
+	{
+	  type t = sizeofexpression_type(se);
+	  if (type_tag(t) != is_type_variable)
+	    pips_internal_error("Bad reference type tag %d\n",type_tag(t));
+	  b = copy_basic(variable_basic(type_variable(t)));
+	}
+      else
+	{
+	  b = basic_of_expression(sizeofexpression_expression(se));
+	}
+      break;
+    }
+  case is_syntax_subscript: 
+    {
+      b = basic_of_expression(subscript_array(syntax_subscript(sy)));
+      break;
+    }
+  case is_syntax_application:
+    {
+      b = basic_of_any_expression(application_function(syntax_application(sy)), TRUE);
+      break;
+    }
+  default:
+    pips_internal_error("Bad syntax tag %d\n", syntax_tag(sy));
+    /* Never go there... */
+    b = make_basic(is_basic_overloaded, UUINT(4));
+  }
+
+  pips_debug(6, "returns with %s\n", basic_to_string(b));
+
+  return b;
+}
+
 /* basic basic_of_expression(expression exp): Makes a basic of the same
  * basic as the expression "exp". Indeed, "exp" will be assigned to
  * a temporary variable, which will have the same declaration as "exp".
@@ -701,71 +809,12 @@ basic b;
 basic 
 basic_of_expression(expression exp)
 {
-    syntax sy = expression_syntax(exp);
-    basic b = basic_undefined;
-
-    debug(6, "basic_of_expression", "\n");
-
-    switch(syntax_tag(sy)) {
-    case is_syntax_reference:
-    {
-	entity v = reference_variable(syntax_reference(sy));
-	type exp_type = entity_type(v);
-
-	if (type_tag(exp_type) != is_type_variable)
-	    pips_error("basic_of_expression", "Bad reference type tag %d\n",
-		       type_tag(exp_type));
-	b = copy_basic(variable_basic(type_variable(exp_type)));
-	break;
-    }
-    case is_syntax_call: 
-	b = basic_of_call(syntax_call(sy));
-	break;
-    case is_syntax_range: 
-	/* Well, let's assume range are well formed... */
-	b = basic_of_expression(range_lower(syntax_range(sy)));
-	break;
-    case is_syntax_cast: 
-      {
-	type t = cast_type(syntax_cast(sy));
-	if (type_tag(t) != is_type_variable)
-	  pips_error("basic_of_expression", "Bad reference type tag %d\n",type_tag(t));
-	b = copy_basic(variable_basic(type_variable(t)));
-	break;
-      }
-    case is_syntax_sizeofexpression: 
-      {
-	sizeofexpression se = syntax_sizeofexpression(sy);
-	if (sizeofexpression_type_p(se))
-	  {
-	    type t = sizeofexpression_type(se);
-	    if (type_tag(t) != is_type_variable)
-	      pips_error("basic_of_expression", "Bad reference type tag %d\n",type_tag(t));
-	    b = copy_basic(variable_basic(type_variable(t)));
-	  }
-	else
-	  {
-	    b = basic_of_expression(sizeofexpression_expression(se));
-	  }
-	break;
-      }
-    case is_syntax_subscript: 
-      {
-	b = basic_of_expression(subscript_array(syntax_subscript(sy)));
-	break;
-      }
-    default: pips_error("basic_of_expression", "Bad syntax tag");
-      /* Never go there... */
-      b = make_basic(is_basic_overloaded, UUINT(4));
-    }
-
-    debug(6, "basic_of_expression", "returns with %s\n", basic_to_string(b));
-
-    return b;
+  return basic_of_any_expression(exp, FALSE);
 }
 
 type expression_to_type(expression e)
 {
+  /* does not cover references to functions ...*/
   /* Could be more elaborated with array types for array expressions */
   type t = type_undefined;
   basic b = basic_of_expression(e);
@@ -782,7 +831,7 @@ type expression_to_type(expression e)
  * WARNING: a new basic is allocated
  */
 basic 
-basic_of_call(call c)
+basic_of_call(call c, bool apply_p)
 {
     entity e = call_function(c);
     tag t = value_tag(entity_initial(e));
@@ -794,7 +843,7 @@ basic_of_call(call c)
 	b = copy_basic(basic_of_external(c));
 	break;
     case is_value_intrinsic: 
-	b = basic_of_intrinsic(c);
+      b = basic_of_intrinsic(c, apply_p);
 	break;
     case is_value_symbolic: 
 	/* b = make_basic(is_basic_overloaded, UU); */
@@ -804,12 +853,12 @@ basic_of_call(call c)
 	b = copy_basic(basic_of_constant(c));
 	break;
     case is_value_unknown:
-	debug(1, "basic_of_call", "function %s has no initial value.\n"
+	pips_debug(1, "function %s has no initial value.\n"
 	      " Maybe it has not been parsed yet.\n",
 	      entity_name(e));
 	b = copy_basic(basic_of_external(c));
 	break;
-    default: pips_error("basic_of_call", "unknown tag %d\n", t);
+    default: pips_internal_error("unknown tag %d\n", t);
 	/* Never go there... */
     }
     return b;
@@ -830,7 +879,7 @@ basic_of_external(call c)
     basic b = basic_undefined;
     type call_type = entity_type(f);
 
-    debug(7, "basic_of_call", "External call to %s\n", entity_name(f));
+    pips_debug(7, "External call to %s\n", entity_name(f));
 
     if (type_tag(call_type) != is_type_functional)
 	pips_error("basic_of_external", "Bad call type tag");
@@ -839,10 +888,10 @@ basic_of_external(call c)
 
     if (!type_variable_p(return_type)) {
       if(type_void_p(return_type)) {
-	pips_user_error("A subroutine is used as a function\n");
+	pips_user_error("A subroutine or void returning function is used as an expression\n");
       }
       else {
-	pips_error("basic_of_external", "Bad return call type tag");
+	pips_internal_error("Bad return call type tag \"%s\"\n", type_to_string(return_type));
       }
     }
 
@@ -861,13 +910,13 @@ basic_of_external(call c)
  *
  * WARNING: returns a newly allocated basic object */
 basic 
-basic_of_intrinsic(call c)
+basic_of_intrinsic(call c, bool apply_p)
 {
   entity f = call_function(c);
   type rt = functional_result(type_functional(entity_type(f)));
   basic rb = copy_basic(variable_basic(type_variable(rt)));
-										       
-  pips_debug(7, "Intrinsic call to %s with result type %s\n",
+
+  pips_debug(7, "Intrinsic call to intrinsic \"%s\" with a priori result type \"%s\"\n",
 	     module_local_name(f),
 	     basic_to_string(rb));
 
@@ -881,18 +930,57 @@ basic_of_intrinsic(call c)
       /* leave it overloaded */
       ;
     }
-    else if(strcmp(entity_name(f),"TOP-LEVEL:&")==0) {
-      string s = entity_user_name(f);
-      bool b = ENTITY_ADDRESS_OF_P(f);
+    else if(ENTITY_ADDRESS_OF_P(f)) {
+      //string s = entity_user_name(f);
+      //bool b = ENTITY_ADDRESS_OF_P(f);
       expression e = EXPRESSION(CAR(args));
       basic eb = basic_of_expression(e);
       // Forget multidimensional types
       type et = make_type(is_type_variable,
 			  make_variable(eb, NIL, NIL));
 
-      fprintf(stderr, "b=%d, s=%s\n", b, s);
+      //fprintf(stderr, "b=%d, s=%s\n", b, s);
       free_basic(rb);
       rb = make_basic(is_basic_pointer, et);
+    }
+    else if(ENTITY_DEREFERENCING_P(f)) {
+      expression e = EXPRESSION(CAR(args));
+      free_basic(rb);
+      rb = basic_of_expression(e);
+      if(basic_pointer_p(rb)) {
+	type pt = ultimate_type(basic_pointer(rb));
+
+	free_basic(rb);
+	if(type_variable_p(pt) && !apply_p)
+	  rb = copy_basic(variable_basic(type_variable(pt)));
+	else if(type_functional_p(pt) && apply_p) {
+	  type rt = ultimate_type(functional_result(type_functional(pt)));
+
+	  if(type_variable_p(rt))
+	    rb = copy_basic(variable_basic(type_variable(rt)));
+	  else {
+	    /* Too bad for "void"... */
+	    pips_internal_error("result type of a functional type must be a variable type\n");
+	  }
+	}
+      }
+      else
+	pips_internal_error("Dereferencing of a non-pointer expression\n");
+    }
+    else if(ENTITY_POINT_TO_P(f)) {
+      //pips_internal_error("Point to case not implemented yet\n");
+      expression e1 = EXPRESSION(CAR(args));
+      expression e2 = EXPRESSION(CAR(CDR(args)));
+      free_basic(rb);
+      pips_assert("Two arguments for ENTITY_POINT_TO", gen_length(args)==2);
+      ifdebug(8) {
+	pips_debug(8, "Point to case, e1 = ");
+	print_expression(e1);
+	pips_debug(8, " and e2 = ");
+	print_expression(e1);
+	pips_debug(8, "\n");
+      }
+      rb = basic_of_expression(e2);
     }
     else {
       free_basic(rb);
@@ -909,6 +997,10 @@ basic_of_intrinsic(call c)
     }
 
   }
+
+  pips_debug(7, "Intrinsic call to intrinsic \"%s\" with a posteriori result type \"%s\"\n",
+	     module_local_name(f),
+	     basic_to_string(rb));
 
   return rb;
 }
@@ -961,9 +1053,53 @@ basic_union(expression exp1, expression exp2)
 }
 
 basic 
-basic_maximum(basic b1, basic b2)
+basic_maximum(basic fb1, basic fb2)
 {
   basic b = basic_undefined;
+  basic b1 = fb1;
+  basic b2 = fb2;
+
+  if(basic_typedef_p(fb1)) {
+    type t1 = ultimate_type(entity_type(basic_typedef(b1)));
+
+    if(type_variable_p(t1))
+      b1 = variable_basic(type_variable(t1));
+    else
+      pips_internal_error("Incompatible basic b1: not really a variable type\n");
+  }
+
+  if(basic_typedef_p(fb2)) {
+    type t2 = ultimate_type(entity_type(basic_typedef(b2)));
+
+    if(type_variable_p(t2))
+      b2 = variable_basic(type_variable(t2));
+    else
+      pips_internal_error("Incompatible basic b1: not really a variable type\n");
+  }
+
+  if(basic_derived_p(fb1)) {
+    entity e1 = basic_derived(fb1);
+
+    if(entity_enum_p(e1)) {
+      b1 = make_basic(is_basic_int, (void *) 4);
+      b = basic_maximum(b1, fb2);
+      free_basic(b1);
+    }
+    else
+      pips_internal_error("Unanalyzed derived basic b1\n");
+  }
+
+  if(basic_derived_p(fb2)) {
+    entity e2 = basic_derived(fb2);
+
+    if(entity_enum_p(e2)) {
+      b2 = make_basic(is_basic_int, (void *) 4);
+      b = basic_maximum(fb1, b2);
+      free_basic(b2);
+    }
+    else
+      pips_internal_error("Unanalyzed derived basic b2\n");
+  }
 
   /* FI: I do not believe this is correct for all intrinsics! */
 
@@ -1053,12 +1189,46 @@ basic_maximum(basic b1, basic b2)
       break;
       /* NN: More cases are added for C. To be refined  */
     case is_basic_bit:
-    case is_basic_pointer:
-    case is_basic_derived:
-    case is_basic_typedef:
-      b = make_basic(is_basic_overloaded, UU);
+      if(basic_bit_p(b2)) {
+	if(basic_bit(b1)>=basic_bit(b2))
+	  b = copy_basic(b1);
+	else
+	  b = copy_basic(b2);
+      }
+      else
+	/* bit is a lesser type */
+	b = copy_basic(b2);
       break;
-    default: pips_error("basic_union", "Ill. basic tag %d\n", basic_tag(b1));
+    case is_basic_pointer:
+      {
+	if(basic_int_p(b2) || basic_bit_p(b2))
+	  b = copy_basic(b1);
+	else if(basic_float_p(b2) || basic_logical_p(b2) || basic_complex_p(b2)) {
+	  /* Are they really comparable? */
+	  b = copy_basic(b1);
+	}
+	else if(basic_overloaded_p(b2))
+	  b = copy_basic(b1);
+	else if(basic_pointer_p(b2))
+	  /* How can we compare two pointer types? Equality? Comparison of the pointed types? */
+	  pips_internal_error("Comparison of two pointer types not implemented\n");
+	else if(basic_derived_p(b2))
+	  pips_internal_error("Comparison between pointer and struct/union not implemented\n");
+	else if(basic_typedef_p(b2))
+	  pips_internal_error("b2 cannot be a typedef basic\n");
+	else
+	  pips_internal_error("unknown tag %d for basic b2\n", basic_tag(b2));
+      break;
+       }
+     case is_basic_derived:
+      /* How do you compare a structure or a union to another type?
+	 The only case which seems to make sense is equality. */
+      pips_internal_error("Derived basic b1 it not comparable to another basic\n");
+      break;
+    case is_basic_typedef:
+      pips_internal_error("b1 cannot be a typedef basic\n");
+      break;
+    default: pips_internal_error("Ill. basic tag %d\n", basic_tag(b1));
     }
   }
 
@@ -1353,9 +1523,13 @@ type ultimate_type(type t)
 {
   type nt;
 
+  pips_debug(8, "Begins with type \"%s\"\n", type_to_string(t));
+
   if(type_variable_p(t)) {
     variable vt = type_variable(t);
     basic bt = variable_basic(vt);
+
+    pips_debug(8, "and basic \"%s\"\n", basic_to_string(bt));
 
     if(basic_typedef_p(bt)) {
       entity e = basic_typedef(bt);
@@ -1369,9 +1543,51 @@ type ultimate_type(type t)
   else
     nt = t;
 
-  return nt;
+  pips_debug(8, "Ends with type \"%s\"\n", type_to_string(nt));
+  ifdebug(8) {
+    if(type_variable_p(nt)) {
+      variable nvt = type_variable(nt);
+      basic nbt = variable_basic(nvt);
+
+      pips_debug(8, "and basic \"%s\"\n", basic_to_string(nbt));
+    }
+  }
+
+  pips_assert("nt is not a typedef",
+	      type_variable_p(nt)? !basic_typedef_p(variable_basic(type_variable(nt))) : TRUE);
+
+    return nt;
 }
 
+/* The function called can have a functional type, or a typedef type or a pointer type */
+type call_to_functional_type(call c)
+{
+  entity f = call_function(c);
+  type ft = entity_type(f);
+  type rt = type_undefined;
+
+  if(type_functional_p(ft))
+    rt = entity_type(f);
+  else if(type_variable_p(ft)) {
+    basic ftb = variable_basic(type_variable(ft));
+    if(basic_pointer_p(ftb)) {
+      rt = ultimate_type(basic_pointer(ftb));
+    }
+    else if(basic_typedef_p(ftb)) {
+      entity te = basic_typedef(ftb);
+      rt = ultimate_type(entity_type(te));
+    }
+    else {
+      pips_internal_error("Basic for called function unknown");
+    }
+  }
+  else
+    pips_internal_error("Type for called function unknown");
+
+  pips_assert("The typedef type is functional", type_functional_p(rt));
+
+  return rt;
+}
 /*
  *  that is all
  */

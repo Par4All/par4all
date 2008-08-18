@@ -1465,9 +1465,12 @@ decl_spec_list_opt:
 decl_spec_list_opt_no_named:     /* empty */
                         {
 			  $$ = new_empty();
-			} %prec TK_IDENT
+			}
+    %prec TK_IDENT
                         { 
 			  pips_debug(8, "empty TK_IDENT->decl_spec_list_opt_no_named\n");
+			  /* pips_debug(8, "TK_IDENT %s is discarded\n", $1); */
+			  /* free($1); */
 			  /* FI: I do not feel safe about this. */
 			  /* $$=strdup(splitc_text); */ /* FI: why not $1?*/
 			  /* $$ = strdup("IAmNotSure"); */
@@ -1543,8 +1546,12 @@ type_spec:   /* ISO 6.7.2 */
 			}
 |   TK_STRUCT id_or_typename TK_LBRACE /* { } */ struct_decl_list TK_RBRACE
                         {
-			  pips_debug(8, "TK_STRUCT id_or_typename TK_LBRACE struct_decl_list TK_RBRACE->type_spec\n");
-			  if(strcmp(csplit_current_function_name, $2)==0) {
+			  pips_debug(8, "TK_STRUCT id_or_typename TK_LBRACE struct_decl_list"
+				     " TK_RBRACE->type_spec\n");
+			  /* FI: I do not understand the reset. I copy
+			     the guard from previous rule */
+			  if(!string_undefined_p(csplit_current_function_name)
+			     && strcmp(csplit_current_function_name, $2)==0) {
 			    reset_csplit_current_function_name();
 			  }
 			  $$ = build_signature(new_signature("bstruct"), $2, new_lbrace(), $4,
@@ -1730,10 +1737,10 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			     hash_put(keyword_typedef_table,new_signature($1),(void *) TK_NAMED_TYPE);
 			   */
 			   keep_track_of_typedef(new_signature($1));
-			   /* To early to reset: one typedef can be used
+			   /* Too early to reset: one typedef can be used
                               to declare several named types... but I do
                               not know how to use it. */
-			   csplit_is_typedef = FALSE;
+			   //csplit_is_typedef = FALSE;
 			   $$ = $1;
 			 }
 			 else if(TRUE) { /* Keep identifiers in signatures */

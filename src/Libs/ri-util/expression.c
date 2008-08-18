@@ -2041,8 +2041,10 @@ bool simplify_C_expression(expression e)
       else {
 	/* Try to simplify the arguments, do not hope much from the result
            type because of overloading. */
-	entity f = call_function(c);
-	type rt = functional_result(type_functional(entity_type(f)));
+	type ft = call_to_functional_type(c);
+	type rt = ultimate_type(functional_result(type_functional(ft)));
+
+	//pips_assert("The function type is functional", type_functional_p(entity_type(f)));
 
 	MAP(EXPRESSION, se, {
 	  (void) simplify_C_expression(se);
@@ -2051,6 +2053,7 @@ bool simplify_C_expression(expression e)
 	if(type_variable_p(rt)) {
 	  basic rb = variable_basic(type_variable(rt));
 
+	  /* FI: I guess, typedef equivalent to those could also be declared substituable */
 	  can_be_substituted_p =
 	    basic_int_p(rb)
 	    || basic_float_p(rb) 

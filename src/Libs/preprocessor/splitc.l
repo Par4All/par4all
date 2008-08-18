@@ -255,7 +255,7 @@ L\'\\0[0-9]*\'           {
 				return(TK_CHARCON);
                         }
 
-\"([^\"]|(\"\")|(\\\"))*\"	{ 
+\"([^\"]|(\\\"))*\"	{ 
                                 pips_debug(5,"TK_STRINGCON regular or wide string: %s\n",yytext);
                                 /* the "world" in L"Hello, " "world" should be treated as 
                                    wide even though there's no L immediately preceding it */

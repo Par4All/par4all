@@ -129,6 +129,13 @@ void reset_current_C_line_number()
   free_line_number_stack();
 }
 
+void error_reset_current_C_line_number()
+{
+  C_line_number = UNDEFINED_C_LINE_NUMBER;
+
+  free_line_number_stack();
+}
+
 /* Comment management:
 
    - comments in declarations are lost (because there is no corresponding
@@ -280,6 +287,16 @@ void reset_C_comment(bool is_compilation_unit_p)
   free_comments_stack();
 }
 
+void error_reset_C_comment(bool is_compilation_unit_p __attribute__ ((__unused__)))
+{
+  if(!string_undefined_p(C_current_comment)) {
+    free(C_current_comment);
+    C_current_comment = string_undefined;
+  }
+  clear_C_comment();
+  free_comments_stack();
+}
+
 void clear_C_comment()
 {
   if(!string_undefined_p(C_current_comment)) {
@@ -295,8 +312,10 @@ void clear_C_comment()
     while(!comments_empty_p()) {
       string c = comments_pop();
       count++;
-      pips_debug(3, "Element %d: \"%s\"\n", count, c);
-      free(c);
+      pips_debug(3, "Element %d: \"%s\"\n", 
+		 count, string_undefined_p(c) ? "string undefined" : c);
+      if(!string_undefined_p(c))
+        free(c);
     }
   }
   pips_assert("The comment stack is empty\n", comments_empty_p());
@@ -428,7 +447,7 @@ L\'\\0[0-9]*\'          {
 				return(TK_CHARCON);
                         }
 
-\"([^\"]|(\"\")|(\\\"))*\"	{
+\"([^\"]|(\\\"))*\"	{
                                 pips_debug(9,"TK_STRINGCON regular or wide string: %s\n",yytext);
                                 /* the "world" in L"Hello, " "world" should be treated as
                                    wide even though there's no L immediately preceding it */

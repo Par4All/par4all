@@ -180,23 +180,51 @@ Character constants are typed as int.
     fe = make_functional(NIL, MakeTypeVariable(be, NIL));
 
     if (bt == is_basic_int && (size==4 || size==8)) { // int constant
+      //string unsignedintsuffix = "uU";
+      //string longintsuffix = "lL";
+      bool usuffix = (strchr(name, 'U') != NULL) || (strchr(name, 'u') != NULL);
+      bool lsuffix = (strchr(name, 'L') != NULL) || (strchr(name, 'l') != NULL);
       int basis = is_fortran? 10 : 0;
       char * error_string = string_undefined;
       int64_t l = 0;
       extern bool ParserError(string, string);
       extern void CParserError(string);
       int error_number = 0;
+      int (* conversion)(string, string *, int);
+
+      //pips_debug(8, "unsigned int suffix = %s, strspn = %d\n",
+      //	 unsignedintsuffix, usuffix);
+
+      /* See all hexadecimal constant as unsigned on 64 bits, elses
+	 0xffffffff generates an overflow, not a -1 (see C-syntax/constants03.c */
+      if(strstr(name,"0x")==name) {
+	usuffix = TRUE;
+	lsuffix = TRUE;
+      }
+
+      if(usuffix)
+	if(lsuffix)
+	  conversion = (int (*)(string, string *, int)) strtoull;
+	else
+	  conversion = (int (*)(string, string *, int)) strtoul;
+      else
+	if(lsuffix)
+	  conversion = (int (*)(string, string *, int)) strtoll;
+	else
+	  conversion = (int (*)(string, string *, int)) strtol;
 
       if(size==4) { // 32 bit target machine
 	errno = 0;
-	l = (int64_t) strtol(name, &error_string, basis);
+	l = (int64_t) conversion(name, &error_string, basis);
 	error_number = errno;
+	/* %ld, long; %zd, size_t; %td, ptrdiff_t */
+	pips_debug(8, "value = %lld, errno=%d\n", l, error_number);
 	errno = 0;
       }
       else if(size==8) {
 	pips_assert("pointers have the right size", sizeof(void *)==8);
 	errno = 0;
-	l = (int64_t) strtol(name, &error_string, basis);
+	l = (int64_t) conversion(name, &error_string, basis);
 	error_number = errno;
 	errno = 0;
       }
@@ -227,7 +255,7 @@ Character constants are typed as int.
       else if(error_number!=0 && (l == LONG_MAX || l == LONG_MIN)) {
 	pips_internal_error("Conversion error for integer constant string\n");
       }
-      else if(*error_string!='\0' && !same_string_p(error_string, "L")) {
+      else if(*error_string!='\0' && strspn(error_string, "LlUu")!=strlen(error_string)) {
 	pips_internal_error("Illegal characters found in integer constant string\n");
       }
       else if(name==error_string) {

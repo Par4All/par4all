@@ -140,6 +140,7 @@ void init_keyword_typedef_table()
   hash_put(keyword_typedef_table,"void", (char *) TK_VOID);
   hash_put(keyword_typedef_table,"volatile", (char *) TK_VOLATILE);
   hash_put(keyword_typedef_table,"while", (char *) TK_WHILE);
+  hash_put(keyword_typedef_table,"__builtin_va_arg", (char *) TK_BUILTIN_VA_ARG);
 
   /* GNU predefined type(s), expecting no conflict with user named type */
 
@@ -230,7 +231,7 @@ void CParserError(char *msg)
     }
   }
 
-  reset_current_C_line_number();
+  error_reset_current_C_line_number();
   /* get rid of all collected comments */
   reset_C_comment(TRUE);
 
@@ -247,6 +248,8 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
       strdup(concatenate(dir, "/", 
 		     db_get_file_resource(dbr_file,module_name,TRUE), NULL));
     entity built_in_ent = entity_undefined;
+    entity built_in_va_start = entity_undefined;
+    entity built_in_va_end = entity_undefined;
 
     free(dir);
 
@@ -290,6 +293,48 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
 					    make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),
 							  NIL, NIL));
       entity_initial(built_in_ent) = make_value_unknown();
+    }
+
+    /* Predefined functions(s): __builtin_va_end (va_arg() is parser directly) */
+    built_in_va_start = find_or_create_entity(strdup(concatenate(compilation_unit_name,
+								 MODULE_SEP_STRING,
+								 BUILTIN_VA_START,
+								 NULL)));
+    if(storage_undefined_p(entity_storage(built_in_va_start))) {
+      basic va_list_b = make_basic(is_basic_typedef, built_in_ent);
+      type va_list_t = make_type(is_type_variable, make_variable(va_list_b, NIL, NIL));
+      basic void_star_b = make_basic(is_basic_pointer, make_type_void());
+      type void_start_t = make_type(is_type_variable, make_variable(void_star_b, NIL, NIL));
+      entity_storage(built_in_va_start) = make_storage_rom();
+      /* Let's lie about the real type... */
+      entity_type(built_in_va_start) =
+	make_type(is_type_functional,
+		  make_functional(CONS(PARAMETER,
+				       make_parameter(va_list_t, make_mode(is_mode_value, UU)),
+				       CONS(PARAMETER,
+					    make_parameter(void_start_t,
+							   make_mode(is_mode_value, UU)),
+					    NIL)),
+				  make_type(is_type_void,UU)));
+      entity_initial(built_in_va_start) = make_value_intrinsic();
+    }
+
+    built_in_va_end = find_or_create_entity(strdup(concatenate(compilation_unit_name,
+							    MODULE_SEP_STRING,
+							    BUILTIN_VA_END,
+							    NULL)));
+    if(storage_undefined_p(entity_storage(built_in_va_end))) {
+      basic va_list_b = make_basic(is_basic_typedef, built_in_ent);
+      type va_list_t = make_type(is_type_variable, make_variable(va_list_b, NIL, NIL));
+      entity_storage(built_in_va_end) = make_storage_rom();
+      /* Let's lie about the real type */
+      entity_type(built_in_va_end) =
+	make_type(is_type_functional,
+		  make_functional(CONS(PARAMETER,
+				       make_parameter(va_list_t, make_mode(is_mode_value, UU)),
+				       NIL),
+				  make_type(is_type_void,UU)));
+      entity_initial(built_in_va_end) = make_value_intrinsic();
     }
 
     if (compilation_unit_p(module_name))

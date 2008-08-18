@@ -234,7 +234,7 @@ expression MemberDerivedIdentifierToExpression(type t,string m)
   if (type_variable_p(t))
     {
       basic b = variable_basic(type_variable(t));
-      pips_debug(6,"Basic tag is %td",basic_tag(b));
+      pips_debug(6,"Basic tag is %td\n",basic_tag(b));
       switch (basic_tag(b)) {
       case is_basic_pointer:
 	{
@@ -268,7 +268,7 @@ expression MemberIdentifierToExpression(expression e, string m)
   syntax s = expression_syntax(e);
   ifdebug(6)
     {
-      pips_debug(6,"Find the struct/union of %s from expression:\n",m);
+      pips_debug(6,"Find the struct/union of \"%s\" from expression:\n",m);
       print_expression(e);
     }
   switch (syntax_tag(s))
@@ -277,23 +277,67 @@ expression MemberIdentifierToExpression(expression e, string m)
       {
 	call c = syntax_call(s);
 	entity f = call_function(c);
-	pips_debug(6,"Call expression %s\n",entity_name(f));
-	if ((strcmp(entity_name(f),"TOP-LEVEL:->")==0) ||
-	    (strcmp(entity_name(f),"TOP-LEVEL:.")==0))
+	pips_debug(6,"Called operator is \"%s\"\n",entity_name(f));
+	if(ENTITY_PLUS_C_P(f))
 	  {
-	    expression exp = EXPRESSION(CAR(CDR(call_arguments(c))));
+	    expression e1 = EXPRESSION(CAR(call_arguments(c)));
+	    expression e2 = EXPRESSION(CAR(CDR(call_arguments(c))));
+	    expression exp = expression_undefined;
+	    basic b1 = basic_of_expression(e1);
+	    basic b2 = basic_of_expression(e2);
+
+	    if(basic_pointer_p(b1) && (basic_int_p(b2)||basic_bit_p(b2)))
+	      exp = e1;
+	    else if(basic_pointer_p(b2) && (basic_int_p(b1)||basic_bit_p(b1)))
+	      exp = e2;
+	    else
+	      CParserError("Pointer arithmetic error, incompatible types");
+	    free_basic(b1);
+	    free_basic(b2);
+
 	    return MemberIdentifierToExpression(exp,m);
 	  }
-	if (strcmp(entity_name(f),"TOP-LEVEL:*indirection")==0)
+	if(ENTITY_POST_INCREMENT_P(f) || ENTITY_POST_DECREMENT_P(f)
+	   || ENTITY_PRE_INCREMENT_P(f) || ENTITY_PRE_DECREMENT_P(f))
 	  {
 	    expression exp = EXPRESSION(CAR(call_arguments(c)));
 	    return MemberIdentifierToExpression(exp,m);
 	  }
-	/* More types of call must be added */
-	if (type_functional_p(entity_type(f)))
+	if(ENTITY_MINUS_C_P(f))
+	  {
+	    /* The first expression must be a pointer */
+	    expression exp = EXPRESSION(CAR(call_arguments(c)));
+	    return MemberIdentifierToExpression(exp,m);
+	  }
+	if(ENTITY_PLUS_P(f))
+	  {
+	    /* standard integer arithmetic: why bother? why take the CDR? */
+	    expression exp = EXPRESSION(CAR(CDR(call_arguments(c))));
+	    return MemberIdentifierToExpression(exp,m);
+	  }
+	if (ENTITY_FIELD_P(f) || ENTITY_POINT_TO_P(f))
+	  {
+	    expression exp = EXPRESSION(CAR(CDR(call_arguments(c))));
+	    return MemberIdentifierToExpression(exp,m);
+	  }
+	if (ENTITY_DEREFERENCING_P(f))
+	  {
+	    expression exp = EXPRESSION(CAR(call_arguments(c)));
+	    return MemberIdentifierToExpression(exp,m);
+	  }
+	/* FI: seems to simple. No need to rememer if you sarted with "." or "->"? */
+	if (ENTITY_ADDRESS_OF_P(f))
+	  {
+	    expression exp = EXPRESSION(CAR(call_arguments(c)));
+	    return MemberIdentifierToExpression(exp,m);
+	  }
+	/* More types of call must be taken into account: typedef and
+	   pointer to functions */
+	if (TRUE || type_functional_p(entity_type(f)))
 	  {
 	    /* User defined call */
-	    type t = functional_result(type_functional(entity_type(f)));
+	    type ft = call_to_functional_type(c);
+	    type t = functional_result(type_functional(ft));
 	    return MemberDerivedIdentifierToExpression(t,m);
 	  }
 	break;
@@ -303,7 +347,25 @@ expression MemberIdentifierToExpression(expression e, string m)
 	entity ent = reference_variable(syntax_reference(s));
 	type t = entity_type(ent);
 	pips_debug(6,"Reference expression\n");
-	return MemberDerivedIdentifierToExpression(t,m);
+
+	if(type_functional_p(t)) {
+	  /* A call must have occured somewhere... */
+	  type rt = ultimate_type(functional_result(type_functional(t)));
+	  return MemberDerivedIdentifierToExpression(rt,m);
+	}
+	else if(type_variable_p(t) && basic_pointer_p(variable_basic(type_variable(t)))) {
+	  type pt = ultimate_type(basic_pointer(variable_basic(type_variable(t))));
+
+	  if(type_functional_p(pt)) {
+	    /* An apply must have occured somewhere... */
+	    type rt = ultimate_type(functional_result(type_functional(pt)));
+	    return MemberDerivedIdentifierToExpression(rt,m);
+	  }
+	  else
+	    return MemberDerivedIdentifierToExpression(t,m);
+	}
+	else
+	  return MemberDerivedIdentifierToExpression(t,m);
       }
     case is_syntax_cast: 
       {
@@ -321,7 +383,12 @@ expression MemberIdentifierToExpression(expression e, string m)
 	pips_debug(6,"Subscripting array expression\n");
 	return MemberIdentifierToExpression(exp,m);
       }
-      
+    case is_syntax_application:
+      {
+	expression fe = application_function(syntax_application(s));
+	return MemberIdentifierToExpression(fe,m);
+	break;
+      }
     default: 
       {
 	pips_internal_error("unexpected syntax tag: %d\n", syntax_tag(s));
@@ -1461,13 +1528,19 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
 	    
     /* To avoid multiple declarations */
     if(!gen_in_list_p(e, code_externs(value_code(entity_initial(function)))) &&
-       gen_in_list_p(e, code_declarations(value_code(entity_initial(function)))))
-      {
+       gen_in_list_p(e, code_declarations(value_code(entity_initial(function))))) {
+      if(compilation_unit_entity_p(function)) {
+	/* Too late to check that the first declaration did not
+	   include an initialization */
+	pips_user_warning("Multiple declarations of variable %s in file\n",
+			   entity_local_name(e));
+      }
+      else {
 	user_log("Multiple declarations of variable %s in file\n",
 		 entity_local_name(e));
 	CParserError("Illegal Input");
-		
       }
+    }
 
     AddToDeclarations(e,function);
 
@@ -1716,7 +1789,21 @@ void InitializeEnumMemberValues(list lem)
 					  make_constant(is_constant_int, (void *) cv)));
     }
     else {
+      symbolic s = value_symbolic(emv);
+      constant c = symbolic_constant(s);
+
+      if(expression_undefined_p(symbolic_expression(s))) {
+	symbolic_expression(s) = int_to_expression(cv);
+	symbolic_constant(s) =  make_constant(is_constant_int, (void *) cv);
+      }
+      else if(constant_unknown_p(c)) {
+      /* The expression evaluation may have been delayed */
+	value nv = EvalExpression(symbolic_expression(s));
+	if(value_constant_p(nv) && constant_int_p(value_constant(nv)))
+	  symbolic_constant(s) = value_constant(nv);
+      }
       cv = constant_int(symbolic_constant(value_symbolic(emv)));
+      pips_assert("The symbolic field is consisten", symbolic_consistent_p(s));
     }
     cv++;
   }
@@ -2019,22 +2106,30 @@ static bool declarationerror_p;
 static bool referencenodeclfilter(reference r)
 {
   entity e = reference_variable(r);
+  entity m = get_current_module_entity();
+  entity cu = get_current_compilation_unit_entity();
 
-  if(variable_entity_p(e)){
-  if(!(gen_in_list_p(e, entity_declarations(get_current_module_entity()))
-       || gen_in_list_p(e, entity_declarations(get_current_compilation_unit_entity()))))
-    {
-      declarationerror_p = TRUE;
-      user_log("\n\nNo declaration of variable: %s in module: %s \n",
-	       entity_local_name(e),get_current_module_name());
-    }
+  if(variable_entity_p(e)) {
+    if(!(gen_in_list_p(e, entity_declarations(m))
+	 || gen_in_list_p(e, entity_declarations(cu))))
+      {
+	declarationerror_p = TRUE;
+	user_log("\n\nNo declaration of variable \"%s\" (\"%s\") in module \"%s\'\n",
+		 entity_local_name(e),entity_name(e),get_current_module_name());
+      }
   }
-  // There cannot a reference to variable of storage return
-  if(storage_return_p(entity_storage(e))){
-    declarationerror_p = TRUE;
-     user_log("\n\nNo declaration of variable: %s in module: %s \n",
-	      entity_local_name(e),get_current_module_name());
+  /* There can be a reference to variable of storage return when a
+     function pointer is assigned a function */
+  /* FI: this may be a bad decision choice to confuse a function and
+     its return value. It might be better to keep storage "rom"
+     systematically for functions and to restore this test. */
+  /*
+  //  if(storage_return_p(entity_storage(e))){
+  //  declarationerror_p = TRUE;
+  //  user_log("\n\nNo declaration of variable \"%s\" (\"%s\") in module \"%s\"\n",
+  //	     entity_user_name(e),entity_name(e),get_current_module_name());
   }
+  */
 
   return TRUE;
 }
@@ -2044,37 +2139,37 @@ static bool callnodeclfilter(call c)
 {
   entity e = call_function(c);
   if(value_code_p(entity_initial(e))) {
-  if(!(gen_in_list_p(e, entity_declarations(get_current_module_entity()))
-       || gen_in_list_p(e, entity_declarations(get_current_compilation_unit_entity()))))
-    {
-      // Implicit declaration of an external function: returns an int
-      // Compute arguments type from call c
-      type ot = entity_type(e);
-      type rt = make_type(is_type_variable, 
-			  make_variable(make_basic(is_basic_int, (void *) DEFAULT_INTEGER_TYPE_SIZE),
-					NIL,
-					NIL));
-      list ptl = NIL;
-      list args = call_arguments(c);
-      list carg = list_undefined;
-      type ft = type_undefined;
+    if(!(gen_in_list_p(e, entity_declarations(get_current_module_entity()))
+	 || gen_in_list_p(e, entity_declarations(get_current_compilation_unit_entity()))))
+      {
+	// Implicit declaration of an external function: returns an int
+	// Compute arguments type from call c
+	type ot = entity_type(e);
+	type rt = make_type(is_type_variable, 
+			    make_variable(make_basic(is_basic_int, (void *) DEFAULT_INTEGER_TYPE_SIZE),
+					  NIL,
+					  NIL));
+	list ptl = NIL;
+	list args = call_arguments(c);
+	list carg = list_undefined;
+	type ft = type_undefined;
 
-      for(carg=args; !ENDP(carg); POP (carg)) {
-	expression ce = EXPRESSION(CAR(carg));
-	type ct = expression_to_type(ce);
-	parameter cp = make_parameter(ct, make_mode(is_mode_value, UU));
+	for(carg=args; !ENDP(carg); POP (carg)) {
+	  expression ce = EXPRESSION(CAR(carg));
+	  type ct = expression_to_type(ce);
+	  parameter cp = make_parameter(ct, make_mode(is_mode_value, UU));
 
-	ptl = gen_nconc(ptl, CONS(PARAMETER, cp, NIL));
+	  ptl = gen_nconc(ptl, CONS(PARAMETER, cp, NIL));
+	}
+	ft = make_type(is_type_functional, make_functional(ptl, rt));
+
+	free_type(ot);
+	entity_type(e) = ft;
+
+	pips_user_warning("\n\nNo declaration of function %s in module %s\n"
+			  "Implicit declaration added\n",
+			  entity_user_name(e), get_current_module_name());
       }
-      ft = make_type(is_type_functional, make_functional(ptl, rt));
-
-      free_type(ot);
-      entity_type(e) = ft;
-
-      pips_user_warning("\n\nNo declaration of function %s in module %s\n"
-			"Implicit declaration added\n",
-	       entity_local_name(e), get_current_module_name());
-    }
   }
 
   return TRUE;

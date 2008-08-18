@@ -294,6 +294,10 @@
 
 #define MOD_INTRINSIC_NAME 		"MOD"
 
+/* vararg stuff */
+#define BUILTIN_VA_END                  "__builtin_va_end"
+#define BUILTIN_VA_START                "__builtin_va_start"
+
 /* #include <ctype.h> */
 
 #define ISALNUM_OPERATOR_NAME 		"isalnum"
@@ -540,6 +544,12 @@
 #define ENTITY_IMPLIED_CMPLX_P(e) ENTITY_NAME_P(e, IMPLIED_COMPLEX_NAME)
 #define ENTITY_IMPLIED_DCMPLX_P(e) ENTITY_NAME_P(e, IMPLIED_DCOMPLEX_NAME)
 
+/* C data structure and pointer management */
+#define ENTITY_FIELD_P(e) entity_an_operator_p(e, FIELD)
+#define ENTITY_POINT_TO_P(e) entity_an_operator_p(e, POINT_TO)
+#define ENTITY_DEREFERENCING_P(e) entity_an_operator_p(e, DEREFERENCING)
+/* Defined elsewhere: #define ENTITY_ADDRESS_OF_P(e) entity_an_operator_p(e, ADDRESS_OF) */
+
 #define ENTITY_FOUR_OPERATION_P(e) ( ENTITY_PLUS_P(e) || \
                                      ENTITY_MINUS_P(e) || \
 				     ENTITY_UNARY_MINUS_P(e) || \
@@ -569,7 +579,8 @@
  */
 #define LABEL_SIZE 5
 #define INDENTATION (get_int_property("PRETTYPRINT_INDENTATION"))
-#define MAXIMAL_MODULE_NAME_SIZE 36
+/* In C, the module name may include file names, the compilation unit name and the user name of the function. It goes well beyond the 36 of Fortan (check the standard)*/
+#define MAXIMAL_MODULE_NAME_SIZE 100
 
 /*   default values
  */

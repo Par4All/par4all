@@ -175,6 +175,8 @@ string
 module_name(s)
 string s;
 {
+  /* FI: shouldnt'we allocate dynamically "local" since its size is
+     smaller than the size of "s"? */
     static char local[MAXIMAL_MODULE_NAME_SIZE + 1];
     string p_sep = NULL;
 

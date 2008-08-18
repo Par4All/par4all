@@ -631,7 +631,7 @@ words_regular_call(call obj, bool is_a_subroutine)
       return(CHAIN_SWORD(pc, entity_user_name(f)));
   }
 
-  if (type_void_p(functional_result(type_functional(t)))) 
+  if (type_void_p(functional_result(type_functional(call_to_functional_type(obj)))))
     {
       if (is_a_subroutine) 
 	pc = CHAIN_SWORD(pc, is_fortran?"CALL ":"");
@@ -726,9 +726,9 @@ words_genuine_regular_call(call obj, bool is_a_subroutine)
   if (call_arguments(obj) != NIL) {
     /* The call is not used to code a constant: */
     entity f = call_function(obj);
-    type t = entity_type(f);
+    //type t = entity_type(f);
     /* The module name is the first one except if it is a procedure CALL. */
-    if (type_void_p(functional_result(type_functional(t))))
+    if (type_void_p(functional_result(type_functional(call_to_functional_type(obj)))))
       attach_regular_call_to_word(STRING(CAR(CDR(pc))), obj);
     else
       attach_regular_call_to_word(STRING(CAR(pc)), obj);
@@ -851,6 +851,8 @@ words_nullary_op_c(call obj,
       pc = CHAIN_SWORD(pc, "_f77_intrinsics_pause_(0)");
     else if(same_string_p(fname,CONTINUE_FUNCTION_NAME))
       pc = CHAIN_SWORD(pc, "");
+    else 
+      pips_internal_error("Unknown nullary operator");
   }
   else if(nargs==1){
     expression e = EXPRESSION(CAR(args));
@@ -873,13 +875,31 @@ words_nullary_op_c(call obj,
     else if(same_string_p(fname,PAUSE_FUNCTION_NAME)){
       pc = CHAIN_SWORD(pc, "_f77_intrinsics_pause_");
     }
+    else if(same_string_p(fname,BUILTIN_VA_END)){
+      pc = CHAIN_SWORD(pc, "va_end");
+    }
     else {
-      pips_internal_error("unexpected arguments");
+      pips_internal_error("unexpected one argument");
     }
     pc = CHAIN_SWORD(pc, parentheses_p?"(":" ");
     pc = gen_nconc(pc, words_subexpression(e, precedence, TRUE));
     pc = CHAIN_SWORD(pc, parentheses_p?")":"");
   } 
+  else if(nargs==2) {
+    expression e1 = EXPRESSION(CAR(args));
+    expression e2 = EXPRESSION(CAR(CDR(args)));
+
+    if(same_string_p(fname,BUILTIN_VA_START)){
+      pc = CHAIN_SWORD(pc, "va_start(");
+      pc = gen_nconc(pc, words_subexpression(e1, precedence, TRUE));
+      pc = CHAIN_SWORD(pc, ",");
+      pc = gen_nconc(pc, words_subexpression(e2, precedence, TRUE));
+      pc = CHAIN_SWORD(pc, ")");
+    }
+    else {
+      pips_internal_error("unexpected two arguments");
+    }
+  }
   else {
     pips_internal_error("unexpected arguments");
   }
@@ -1683,6 +1703,9 @@ static struct intrinsic_handler {
     {STOP_FUNCTION_NAME, words_nullary_op, 0},
     {CONTINUE_FUNCTION_NAME, words_nullary_op,0},
     {END_FUNCTION_NAME, words_nullary_op, 0},
+
+    {BUILTIN_VA_START, words_nullary_op, 0},
+    {BUILTIN_VA_END, words_nullary_op, 0},
 
     {FORMAT_FUNCTION_NAME, words_prefix_unary_op, 0},
     {UNBOUNDED_DIMENSION_NAME, words_unbounded_dimension, 0},

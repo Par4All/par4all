@@ -635,7 +635,7 @@ bool entity_list_p(list el)
   MAP(ENTITY, e, 
       {
 	static entity le = entity_undefined;
-	pips_debug(9, "Entity e in list is \"%s\"\n", safe_entity_name(e));
+	pips_debug(10, "Entity e in list is \"%s\"\n", safe_entity_name(e));
 	if(entity_domain_number(e)!=entity_domain) {
 	  pips_debug(8, "Last entity le in list is \"%s\"\n", safe_entity_name(le));
 	  pure = FALSE;

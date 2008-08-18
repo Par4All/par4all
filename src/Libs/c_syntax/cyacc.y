@@ -597,7 +597,7 @@ globals:
 			  if(!compilation_unit_p(get_current_module_name())) {
 			    pips_assert("Each variable is declared once", gen_once_p($3));
 			  }
-			  ifdebug(8) {
+			  ifdebug(9) {
 			    fprintf(stderr, "New variables $2 (%p) are declared\n", $2);
 			    print_entities($2);
 			    fprintf(stderr, "\n");
@@ -620,7 +620,7 @@ globals:
 			  /* It is assumed that compatibility is checked somewhere else... */
 			  $$ = gen_nconc($2, $3);
 
-			  ifdebug(8) {
+			  ifdebug(9) {
 			    fprintf(stderr, "*******Updated $$ declarations (%p) are: \n", $$);
 			    fprintf(stderr, "\n");
 			    if(ENDP($$))
@@ -932,8 +932,22 @@ expression:
 			}
 |   expression TK_EQ expression
 			{
-			  (void) simplify_C_expression($3);
-			  $$ = MakeBinaryCall(CreateIntrinsic(ASSIGN_OPERATOR_NAME), $1, $3); 
+			  expression lhs = $1;
+			  expression rhs = $3;
+			  /* Check the left hand side expression */
+			  if(expression_reference_p(lhs)) {
+			    reference r = expression_reference(lhs);
+			    entity v = reference_variable(r);
+			    type t = ultimate_type(entity_type(v));
+			    if(type_functional_p(t)) {
+			      pips_user_warning("Ill. left hand side reference to function \"%s\""
+                                                " or variable \"%s\" not declared\n",
+						entity_user_name(v), entity_user_name(v));
+			      CParserError("Ill. left hand side expression");
+			    }
+			  }
+			  (void) simplify_C_expression(rhs);
+			  $$ = MakeBinaryCall(CreateIntrinsic(ASSIGN_OPERATOR_NAME), lhs, rhs); 
 			}
 |   expression TK_PLUS_EQ expression
 			{
@@ -1377,13 +1391,25 @@ statement:
 |   TK_RETURN comma_expression TK_SEMICOLON
 	                {  
 			  /* $$ =  call_to_statement(make_call(CreateIntrinsic(RETURN_FUNCTION_NAME),$2)); */
+			  expression res = EXPRESSION(CAR($2));
+			  if(expression_reference_p(res)) {
+			    reference r = expression_reference(res);
+			    entity v = reference_variable(r);
+			    type t = ultimate_type(entity_type(v));
+			    if(type_functional_p(t)) {
+			      pips_user_warning("Ill. returned value: reference to function \"%s\""
+                                                " or variable \"%s\" not declared\n",
+						entity_user_name(v), entity_user_name(v));
+			      CParserError("Ill. return expression");
+			    }
+			  }
                           $$ = make_statement(entity_empty_label(), 
 			       get_current_C_line_number(), 
 			       STATEMENT_ORDERING_UNDEFINED, 
 			       get_current_C_comment(),
 			       make_instruction(is_instruction_call,
 						make_call(CreateIntrinsic(RETURN_FUNCTION_NAME), $2)),
-			       NIL, string_undefined);
+					      NIL, string_undefined);
 			  statement_consistent_p($$);
 			}
 |   TK_BREAK TK_SEMICOLON
@@ -2006,6 +2032,10 @@ enumerator:
 
 			  entity_storage(ent) = make_storage_rom();
 			  entity_type(ent) = make_type_functional(f);
+			  /* The information is not yet available, but
+			     I need to recognize this entity as
+			     symbolic for next rule */
+			  entity_initial(ent) = make_value_symbolic(make_symbolic(expression_undefined, make_constant_unknown()));
 			  // enum_list is not available yet. Values should be fixed later.
 			  /*  entity_initial(ent) = MakeEnumeratorInitialValue(enum_list,enum_counter);*/
 			  $$ = ent;
@@ -2035,7 +2065,26 @@ enumerator:
 			      make_value_symbolic(make_symbolic($3, value_constant(vinit)));
 			  }
                           else {
-			    pips_internal_error("Constant integer expression not evaluated");
+			    /* Error or reference to a previous member of the same enum (enum04.c) */
+			    /* FI: it might be easier to delay systematically the evaluation */
+			    bool is_ok = FALSE;
+			    if(expression_call_p($3)) {
+			      call c = syntax_call(expression_syntax($3));
+			      entity m = call_function(c);
+
+			      if(entity_symbolic_p(m)) {
+				is_ok = TRUE;
+			      }
+			    }
+			    if(is_ok)
+			      entity_initial(ent) = 
+				make_value_symbolic(make_symbolic($3, make_constant_unknown()));
+			    else {
+			      /* Let's try to delay evaluation anyway (enum05.c) */
+			      entity_initial(ent) = 
+				make_value_symbolic(make_symbolic($3, make_constant_unknown()));
+			      //pips_internal_error("Constant integer expression not evaluated\n");
+			    }
 			  }
                              
 			  $$ = ent;
@@ -2121,7 +2170,8 @@ direct_decl: /* (* ISO 6.7.5 *) */
                         {
 			  /* Well, here it can be a function or a pointer to a function */
 			  entity e = $1; //RenameFunctionEntity($1);
-			  if (value_undefined_p(entity_initial(e)))
+			  if (value_undefined_p(entity_initial(e))
+			      ||value_unknown_p(entity_initial(e)))
 			    entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL), NIL));
 			  //pips_assert("e is a module", module_name_p(entity_module_name(e)));
 			  stack_push((char *) e, FunctionStack);

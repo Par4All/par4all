@@ -584,7 +584,7 @@ string preprocessed_to_user_file(string preprocessed_user_file)
  */
 #define CPP_CPP			"cpp -C -ansi" /* alternative values: "gcc -E -C" */
 /* #define CPP_CPPFLAGS		" -P -D__PIPS__ -D__HPFC__ " */
-#define CPP_CPPFLAGS		" -D__PIPS__ -D__HPFC__ -U__GNUC__"
+#define CPP_CPPFLAGS		" -D__PIPS__ -D__HPFC__ -U__GNUC__ "
 #define FPP_CPP			"cpp -C" /* alternative values: "gcc -E -C" or "fpp" */
 #define FPP_CPPFLAGS		" -P -D__PIPS__ -D__HPFC__ "
 
@@ -627,6 +627,36 @@ static int colon_number(string s)
   return number;
 }
 
+int find_eol_coding(string name)
+{
+  FILE * f = safe_fopen(name, "r");
+  int state =0;
+  int eol_code = -1;
+  int c;
+
+  while((c=getc(f))!=EOF) {
+    if(c=='\n') {
+      if(state==1)
+	eol_code = 1; // DOS
+      else
+	eol_code = 0; // UNIX
+      break;
+    }
+    else if(c=='\r')
+      state = 1;
+    else {
+      if(state==1) {
+	eol_code = 2; // ISO22
+	break;
+      }
+    }
+  }
+
+  safe_fclose(f, name);
+
+  return eol_code;
+}
+
 static string process_thru_C_pp(string name)
 {
     string dir_name, new_name, simpler, cpp_options, cpp, cpp_err;
@@ -642,6 +672,8 @@ static string process_thru_C_pp(string name)
     string new_include_options = string_undefined;
     /* Pointer to the beginning of include_options, for debugging purposes: */
     string old_include_options = &include_options[0]; 
+    /* To manage file encoding */
+    int eol_code = -1;
 
     (void) strcpy(old_include_options, "-I. ");
     new_include_options = include_options+strlen(include_options);
@@ -681,6 +713,13 @@ static string process_thru_C_pp(string name)
 
     pips_debug(1, "PIPS_SRCPATH=\"%s\"\n", includes);
     pips_debug(1, "INCLUDE=\"%s\"\n", include_options);
+
+    eol_code = find_eol_coding(name);
+    eol_code = 0;
+
+    if(eol_code>0)
+      pips_user_error("EOL encoding for file \"%s\" is \"%s\" and not supported\n",
+		      name, eol_code==1? "dos" : "iso22");
 
     status = safe_system_no_abort
       (concatenate(cpp? cpp: CPP_CPP,

@@ -8,6 +8,7 @@ extern FILE * c_in; /* the file read in by the c_lexer */
 extern int get_current_C_line_number(void);
 extern void set_current_C_line_number(void);
 extern void reset_current_C_line_number(void);
+extern void error_reset_current_C_line_number(void);
 extern int pop_current_C_line_number();
 extern void push_current_C_line_number();
 
