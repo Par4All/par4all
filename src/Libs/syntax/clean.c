@@ -16,7 +16,8 @@ static char *current_function_local_name = NULL;
 static void set_current_function(function)
 entity function;
 {
-    pips_assert("set_current_function", top_level_entity_p(function));
+    pips_assert("set_current_function", top_level_entity_p(function)
+		|| compilation_unit_p(entity_module_name(function)));
     current_function = function;
     current_function_local_name = module_local_name(function);
 }
