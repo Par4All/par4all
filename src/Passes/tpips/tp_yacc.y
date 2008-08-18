@@ -661,6 +661,9 @@ i_create: TK_CREATE workspace_name /* workspace name */
 			if (!create_workspace($3))
 			{
 			    db_close_workspace(FALSE);
+			    /* If you need to preserve the workspace
+			       for debugging purposes, use property
+			       ABORT_ON_USER_ERROR */
 			    user_log("Deleting workspace...\n");
 			    delete_workspace($2);
 			    pips_user_error("Could not create workspace %s\n", 
