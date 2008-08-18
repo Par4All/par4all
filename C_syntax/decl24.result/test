@@ -1,0 +1,36 @@
+void * HDL_progress_end(HDL_progress_handler *prog)
+{
+   return 0;
+}
+void HDL_progress_start_monitor(HDL_progress_handler *progress)
+{
+   /* ERR_MGR_IF_DO( ! progress , emgr , ERR_TBD , return ); */
+
+   if (progress) {
+      progress->percent_start = 0;
+      progress->percent_stop = 100;
+      progress->percent_done = 0;
+      progress->progress = HDL_progress_progress;
+      progress->display = HDL_progress_display;
+      progress->display_data = 0;
+      progress->end_monitor = HDL_progress_end;
+   }
+}
+struct _hdl_progress_handler {
+   extern int percent_start;
+   extern int percent_stop;
+   extern int percent_done;
+   extern void (*progress)(struct _hdl_progress_handler *,const int ,const int );
+   extern void (*display)(struct _hdl_progress_handler *);
+   extern void *(*end_monitor)(struct _hdl_progress_handler *);
+   extern void *display_data;
+};
+typedef const struct _hdl_progress_handler HDL_progress_handler;
+extern void HDL_progress_display(HDL_progress_handler *);
+extern void HDL_progress_progress(HDL_progress_handler *,const int ,const int );
+extern void *HDL_progress_end(HDL_progress_handler *);
+extern void HDL_progress_display(HDL_progress_handler *);
+extern void HDL_progress_progress(HDL_progress_handler *,const int ,const int );
+extern void *HDL_progress_end(HDL_progress_handler *);
+extern void *HDL_progress_end(HDL_progress_handler *);
+extern void HDL_progress_start_monitor(HDL_progress_handler *);

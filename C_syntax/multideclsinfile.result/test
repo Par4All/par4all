@@ -27,17 +27,115 @@ user warning in discard_C_comment: Comment "
 
 
 
-//Multiple declarations of global variables check in one file
-" is lost at line 2, probably because comments cannot be attached to declarations.
-Multiple declarations of variable a in file
-user warning in CParserError: 
-Recovery from C parser failure not (fully) implemented yet.
-C parser is likely to fail later if re-used.
-user error in CParserError: 
-Illegal Input at line -1 (1)
-user warning in set_debug_stack_pointer: debug level stack is set to 2
-user warning in safe_do_something: Request aborted under pipsmake: build resource PARSED_PRINTED_FILE for module multideclsinfile!.
-user error in display_a_resource: Cannot build view file PARSED_PRINTED_FILE
+/* Multiple declarations of global variables check in one file */
+
+/* but this is OK with C... */
+
+" is lost at line 5, probably because comments cannot be attached to declarations.
+user warning in UpdateEntity: Multiple declarations of variable a in file
+
+Declarations for module multideclsinfile! with type  () ->  unknow
+
+
+Variable list:
+
+
+Declared entity TOP-LEVEL:*STATIC*	with type area with size 8
+Declared entity TOP-LEVEL:a	with type variable INTEGER*4
+Declared entity TOP-LEVEL:k	with type variable INTEGER*4
+Declared entity multideclsinfile!:*DYNAMIC*	with type area with size 0
+Declared entity multideclsinfile!:*HEAP*	with type area with size 0
+Declared entity multideclsinfile!:*STACK*	with type area with size 0
+Declared entity multideclsinfile!:*STATIC*	with type area with size 0
+* empty external declaration list *
+
+
+
+Layouts for areas (commons):
+
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 8: 
+	Variable TOP-LEVEL:a,	offset = 0,	size = 4
+	Variable TOP-LEVEL:k,	offset = 4,	size = 4
+
+
+Layout for memory area "multideclsinfile!:*DYNAMIC*" of size 0: 
+	* empty area *
+
+
+Layout for memory area "multideclsinfile!:*HEAP*" of size 0: 
+	* empty area *
+
+
+Layout for memory area "multideclsinfile!:*STACK*" of size 0: 
+	* empty area *
+
+
+Layout for memory area "multideclsinfile!:*STATIC*" of size 0: 
+	* empty area *
+
+End of declarations for module multideclsinfile!
+
+  C_PARSER                       building   PARSED_CODE(multideclsinfile!)
+                                 building   CALLEES(multideclsinfile!)
+user warning in discard_C_comment: Comment "
+
+
+
+/* Multiple declarations of global variables check in one file */
+
+/* but this is OK with C... */
+
+" is lost at line 5, probably because comments cannot be attached to declarations.
+user warning in UpdateEntity: Multiple declarations of variable a in file
+
+Declarations for module multideclsinfile! with type  () ->  unknow
+
+
+Variable list:
+
+
+Declared entity TOP-LEVEL:*STATIC*	with type area with size 8
+Declared entity TOP-LEVEL:a	with type variable INTEGER*4
+Declared entity TOP-LEVEL:k	with type variable INTEGER*4
+Declared entity multideclsinfile!:*DYNAMIC*	with type area with size 0
+Declared entity multideclsinfile!:*HEAP*	with type area with size 0
+Declared entity multideclsinfile!:*STACK*	with type area with size 0
+Declared entity multideclsinfile!:*STATIC*	with type area with size 0
+* empty external declaration list *
+
+
+
+Layouts for areas (commons):
+
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 8: 
+	Variable TOP-LEVEL:a,	offset = 0,	size = 4
+	Variable TOP-LEVEL:k,	offset = 4,	size = 4
+
+
+Layout for memory area "multideclsinfile!:*DYNAMIC*" of size 0: 
+	* empty area *
+
+
+Layout for memory area "multideclsinfile!:*HEAP*" of size 0: 
+	* empty area *
+
+
+Layout for memory area "multideclsinfile!:*STACK*" of size 0: 
+	* empty area *
+
+
+Layout for memory area "multideclsinfile!:*STATIC*" of size 0: 
+	* empty area *
+
+End of declarations for module multideclsinfile!
+
+  PRINT_SOURCE                   building   PARSED_PRINTED_FILE(multideclsinfile!)
+PARSED_PRINTED_FILE made for multideclsinfile!.
+int a;
+int k;
+int a;
 Deletion of obsolete resources:
 none destroyed.
 Closing all modules.

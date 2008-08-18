@@ -1,0 +1,21 @@
+
+parsed printed file
+
+void point_to04()
+{
+   struct s {
+      int foo;
+   };
+   typedef struct s a_t;
+   typedef struct s *p_t;
+   a_t a;
+   p_t p;
+   (p+2)->foo = 1;
+   (p+(int )2.)->foo = 1;
+   (2+p)->foo = 1;
+   (p-2)->foo = 1;
+   p++->foo = 1;
+   p--->foo = 1;
+   ++p->foo = 1;
+   --p->foo = 1;
+}

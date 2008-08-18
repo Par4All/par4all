@@ -1,0 +1,17 @@
+
+parsed printed file
+
+void point_to03()
+{
+   struct s {
+      int foo;
+   };
+   typedef struct s a_t;
+   typedef struct s *p_t;
+   a_t a;
+   p_t p;
+   (&a+2)->foo = 1;
+   (&a+(int )2.)->foo = 1;
+   (2+&a)->foo = 1;
+   (&a-2)->foo = 1;
+}

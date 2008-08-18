@@ -1,0 +1,15 @@
+
+parsed printed file
+
+void point_to02()
+{
+   struct s {
+      int foo;
+   };
+   struct s a;
+   struct s *p;
+   (&a+2)->foo = 1;
+   (&a+(int )2.)->foo = 1;
+   (2+&a)->foo = 1;
+   (&a-2)->foo = 1;
+}

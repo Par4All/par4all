@@ -1,0 +1,76 @@
+
+Parser output
+
+main()
+{
+   unsigned int i = 4294967295U;
+   unsigned int j;
+   int k;
+   int t;
+   int u;
+
+   j = i;
+   k = j;
+   t = i-j+k;
+   i = u;
+   j = u;
+   k = u;
+}
+
+Controlizer output
+
+main()
+{
+   unsigned int i = 4294967295U;
+   unsigned int j;
+   int k;
+   int t;
+   int u;
+
+   j = i;
+   k = j;
+   t = i-j+k;
+   i = u;
+   j = u;
+   k = u;
+}
+
+Preconditions
+
+
+//  P() {}
+
+main()
+{
+   unsigned int i = 4294967295U;
+   unsigned int j;
+   int k;
+   int t;
+   int u;
+
+//  P() {}
+
+
+   j = i;
+
+//  P(j) {i==j}
+
+   k = j;
+
+//  P(j,k) {i==j, i==k}
+
+   t = i-j+k;
+
+//  P(j,k,t) {i==j, i==k, i==t}
+
+   i = u;
+
+//  P(i,j,k,t) {i==u, j==t, k==t}
+
+   j = u;
+
+//  P(i,j,k,t) {i==j, i==u, k==t}
+
+   k = u;
+}
+

@@ -1,0 +1,14 @@
+
+Parsed printed file for "decl23!"
+
+extern void decl23a();
+extern void decl23();
+
+Parsed printed file for "decl23"
+
+void decl23()
+{
+   struct {void (*foo)();} s;
+   //s.foo = decl23a;
+   s.foo = decl23;
+}

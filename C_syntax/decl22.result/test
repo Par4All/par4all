@@ -1,0 +1,8 @@
+
+Parsed printed file for "decl22!"
+
+const char *MAK_not_byte = "L'image n'est pas du type BYTE";
+const char *MAK_not_byte = "L'image n'est pas du type BYTE";
+const char *MAK_not_byte = "L'image n'est pas du type BYTE";
+int v;
+int v;

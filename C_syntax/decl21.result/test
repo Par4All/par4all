@@ -1,3 +1,13 @@
 
 Parsed printed file for "decl21!"
 
+typedef static int f(int );
+extern int decl21(int );
+extern int decl21(int );
+
+Parsed printed file for "decl21"
+
+int decl21(int x)
+{
+   x++;
+}

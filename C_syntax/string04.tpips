@@ -1,0 +1,23 @@
+delete string04
+create string04 string04.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty ABORT_ON_USER_ERROR TRUE
+
+echo
+echo parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[string04]
+quit
+echo
+echo printed file
+echo
+
+display PRINTED_FILE[string04]
+
+close
+#delete string04
+quit

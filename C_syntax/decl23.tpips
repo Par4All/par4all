@@ -1,0 +1,30 @@
+delete decl23
+create decl23 decl23.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 1
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+#setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 5
+
+echo
+echo Parsed printed file for "decl23!"
+echo
+
+display PARSED_PRINTED_FILE[decl23!]
+
+echo
+echo Parsed printed file for "decl23"
+echo
+
+display PARSED_PRINTED_FILE[decl23]
+
+close
+delete decl23
+
+quit

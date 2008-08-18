@@ -1,0 +1,7 @@
+struct s {
+   extern int foo;
+};
+typedef struct s a_t;
+typedef struct s *p_t;
+a_t a;
+p_t p;
