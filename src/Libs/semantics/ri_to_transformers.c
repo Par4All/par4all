@@ -368,7 +368,7 @@ user_function_call_to_transformer(
   entity f = call_function(c);
   list pc = call_arguments(c);
   transformer t_caller = transformer_undefined;
-  basic rbt = basic_of_call(c);
+  basic rbt = basic_of_call(c, true);
   list ef = expression_to_proper_effects(expr);
 
   pips_debug(8, "begin\n");
