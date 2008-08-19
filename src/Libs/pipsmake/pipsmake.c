@@ -217,6 +217,11 @@ string compilation_unit_of_module(string module_name)
 /* Translate and expand a list of virtual resources into a potentially 
  * much longer list of real resources
  *
+ * this is intrinsically a bad idea: if a new module is created as
+ * a side effect of some processing, then the dependency on this new module
+ * will never appear and cannot be checked for a redo here (see comments
+ * of is_owner_all case).
+ *
  * In spite of the name, no resource is actually built.
  */
 static list build_real_resources(string oname, list lvr)
