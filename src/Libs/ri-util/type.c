@@ -825,13 +825,11 @@ type expression_to_type(expression e)
   return t;
 }
 
-/* basic basic_of_call(call c): returns the basic of the result given by the
- * call "c".
- *
+/* basic basic_of_call(call c):
+ * returns the basic of the result given by the call "c".
  * WARNING: a new basic is allocated
  */
-basic 
-basic_of_call(call c, bool apply_p)
+basic basic_of_call(call c, bool apply_p)
 {
     entity e = call_function(c);
     tag t = value_tag(entity_initial(e));
@@ -842,10 +840,10 @@ basic_of_call(call c, bool apply_p)
     case is_value_code:
 	b = copy_basic(basic_of_external(c));
 	break;
-    case is_value_intrinsic: 
+    case is_value_intrinsic:
       b = basic_of_intrinsic(c, apply_p);
 	break;
-    case is_value_symbolic: 
+    case is_value_symbolic:
 	/* b = make_basic(is_basic_overloaded, UU); */
 	b = copy_basic(basic_of_constant(c));
 	break;
@@ -902,15 +900,14 @@ basic_of_external(call c)
     return b;
 }
 
-/* basic basic_of_intrinsic(call c): returns the basic of the result given
- * by call to an intrinsic function. This basic must be computed with the
- * basic of the arguments of the intrinsic for overloaded operators.  It
- * should be able to accomodate more than two arguments as for generic min
- * and max operators.
+/* basic basic_of_intrinsic(call c, boolean apply_p):
+ * returns the basic of the result given by call to an intrinsic function.
+ * This basic must be computed with the basic of the arguments of the
+ * intrinsic for overloaded operators.  It should be able to accomodate more
+ * than two arguments as for generic min and max operators.
  *
  * WARNING: returns a newly allocated basic object */
-basic 
-basic_of_intrinsic(call c, bool apply_p)
+basic basic_of_intrinsic(call c, bool apply_p)
 {
   entity f = call_function(c);
   type rt = functional_result(type_functional(entity_type(f)));
