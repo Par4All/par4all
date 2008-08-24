@@ -360,8 +360,9 @@ typedef cln::cl_I Value;
 #define value_set_double(val,d)(mpz_set_d((val),(d)))
 #define value_clear(val)       (mpz_clear((val)))
 #define value_read(val,str)    (mpz_set_str((val),(str),10))
+typedef void (*value_print_gmp_free_t)(void *, size_t);
 #define value_print(Dst,fmt,val)  {char *str; \
-				void (*gmp_free) (void *, size_t); \
+				value_print_gmp_free_t gmp_free; \
 				str = mpz_get_str(0,10,(val)); \
 				fprintf((Dst),(fmt),str); \
 				mp_get_memory_functions(NULL, NULL, &gmp_free); \
