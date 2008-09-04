@@ -358,12 +358,12 @@ sh> svn co http://svn.cri.ensmp.fr/svn/pips/branches/calvin pips_dev
   in the \texttt{hpfc} library in pips:
 \begin{verbatim}
 sh> cd /home/temp/MYPIPS/prod/pips/src/Libs/hpfc
-sh> make USERNAME=calvin create-branch
+sh> make SVN_USERNAME=calvin create-branch
 # ... not really created before the commit
 sh> svn commit /home/temp/svn_branch.XXXXXX/
 \end{verbatim}
   It creates a new branch, not yet committed, in some temporary directory.
-  \texttt{USERNAME} is not necessary if the svn and unix account share the
+  \verb/SVN_USERNAME/ is not necessary if the svn and unix account share the
   same login name. This directory \textbf{must} then be committed.
 \item If necessary, update your development area to make the branch appear.
 \begin{verbatim}
