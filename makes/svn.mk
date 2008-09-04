@@ -4,7 +4,7 @@
 #
 
 SVN =		svn
-SVN_USERNAME =	
+SVN_USERNAME =
 SVN_FLAGS =
 
 IS_SVN_WC =	test -d .svn
@@ -15,8 +15,8 @@ IS_BRANCH =	$(BRANCH) test --quiet
 
 # fix command flags if username is provided
 ifdef SVN_USERNAME
-SVN_FLAGS	+= --username=$(SVN_USERNAME)
-BRANCH_FLAGS 	+= --username=$(SVN_USERNAME)
+SVN_FLAGS	+= --username $(SVN_USERNAME)
+BRANCH_FLAGS 	+= --username $(SVN_USERNAME)
 endif
 
 diff:
