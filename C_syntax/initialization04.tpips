@@ -1,0 +1,37 @@
+delete initialization04
+create initialization04 initialization04.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+echo
+echo Symbol table for "initialization04!"
+echo
+
+display SYMBOL_TABLE_FILE[initialization04!]
+
+echo
+echo Symbol table for "initialization04"
+echo
+
+display SYMBOL_TABLE_FILE[initialization04]
+
+echo
+echo Printed file for "initialization04!"
+echo
+
+display PRINTED_FILE[initialization04!]
+
+echo
+echo Printed file for "initialization04"
+echo
+
+display PRINTED_FILE[initialization04]
+
+close
+delete initialization04
+
+quit

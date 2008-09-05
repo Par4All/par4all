@@ -5,7 +5,7 @@ Printed file for "typedef04"
 
 typedef double mydouble;
 struct s {
-   extern int dim;
+   int dim;
 };
 extern void typedef04(int ,struct s ,struct s *);
 void typedef04(int n,struct s d,struct s *pd)

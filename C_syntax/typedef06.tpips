@@ -1,6 +1,6 @@
 delete typedef06
 
-ABORT_ON_USER_ERROR TRUE
+setproperty ABORT_ON_USER_ERROR TRUE
 
 create typedef06 typedef06.c
 

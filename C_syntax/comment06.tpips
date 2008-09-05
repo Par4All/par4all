@@ -1,0 +1,23 @@
+delete comment06
+create comment06 comment06.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty ABORT_ON_USER_ERROR TRUE
+
+echo
+echo parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[comment06]
+quit
+echo
+echo printed file
+echo
+
+display PRINTED_FILE[comment06]
+
+close
+#delete comment06
+quit

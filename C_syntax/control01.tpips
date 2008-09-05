@@ -1,0 +1,22 @@
+delete control01
+create control01 control01.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[control01]
+
+echo
+echo printed file
+echo
+
+display PRINTED_FILE[control01]
+
+close
+#delete control01
+quit

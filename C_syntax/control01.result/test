@@ -1,0 +1,62 @@
+
+parsed printed file
+
+int control01(int *in,int *val)
+{
+   int c;
+   int v;
+   for (;;) {
+      if (c = pnm_getc(in)==-1)
+         return -1;
+      if (c=='#')
+         for (;;) {
+            if (c = pnm_getc(in)==-1)
+               return -1;
+            if (c=='\n')
+               goto break_2;
+         }
+break_2:         ;
+      else if (c=='0'||c=='1') {
+         v = c-'0';
+         goto break_1;
+      }
+   }
+break_1:   ;
+   if (val)
+       *val = v;
+   return 0;
+}
+
+printed file
+
+int control01(int *in,int *val)
+{
+   int c;
+   int v;
+   ;
+l99996:   ;
+   if (!1) goto break_1;
+   if (c = pnm_getc(in)==-1) 
+      return -1;
+   if (c=='#') goto l99998;
+   if (c=='0'||c=='1') goto l99997;
+break_2:   ;
+   ;
+   goto l99996;
+l99997:   ;
+   v = c-'0';
+   goto break_1;
+l99998:   ;
+   ;
+l99995:   ;
+   if (!1) goto break_2;
+   if (c = pnm_getc(in)==-1) 
+      return -1;
+   if (c=='\n') goto break_2;
+   ;
+   goto l99995;
+break_1:   ;
+   if (val) 
+       *val = v;
+   return 0;
+}

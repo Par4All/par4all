@@ -19,9 +19,9 @@ main()
    printf("Test\n");
 }
 struct key {
-   extern int node;
+   int node;
 };
-extern main();
+extern  main();
 extern int foo();
 extern int toto();
 int toto()

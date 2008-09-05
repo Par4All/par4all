@@ -1,0 +1,8 @@
+
+Parsed printed file for "decl25!"
+
+struct s {
+   int a;
+   int b;
+};
+typedef struct s s_t;

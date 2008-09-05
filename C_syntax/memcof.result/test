@@ -1,7 +1,8 @@
 
 Printed file for 'memcof!' 
 
-static union {unsigned char __c[8]; double __d;} __huge_val = {{0, 0, 0, 0, 0, 0, 0xf0, 0x7f}};
+typedef union {unsigned char __c[8]; double __d;} __huge_val_t;
+static __huge_val_t __huge_val = {{0, 0, 0, 0, 0, 0, 0xf0, 0x7f}};
 extern double acos(double );
 extern double __acos(double );
 extern double asin(double );
@@ -57,7 +58,8 @@ Unsplit
 /*
  * file for memcof.c
  */
-static union {unsigned char __c[8]; double __d;} __huge_val = {{0, 0, 0, 0, 0, 0, 0xf0, 0x7f}};
+typedef union {unsigned char __c[8]; double __d;} __huge_val_t;
+static __huge_val_t __huge_val = {{0, 0, 0, 0, 0, 0, 0xf0, 0x7f}};
 extern double acos(double );
 extern double __acos(double );
 extern double asin(double );

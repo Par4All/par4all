@@ -15,13 +15,8 @@ Variable list:
 	Declared entity "decl05!:*STACK*" with type "area" with size 0
 	Declared entity "decl05!:*STATIC*" with type "area" with size 0
 
-External variable list:
+* empty extern declaration list *
 
-	Declared external entity "decl05!:_err_error^function"	with type "variable" "char"
-	Declared external entity "decl05!:_err_manager^function"	with type "variable" "char"
-	Declared external entity "decl05!:_err_pile^pile"	with type "variable" "struct _err_error  *"
-	Declared external entity "decl05!:_err_manager^pile"	with type "variable" "struct _err_pile "
-	Declared external entity "decl05!:_err_manager^push"	with type "variable" "(struct _err_manager  * x char * -> void) *"
 
 Layouts for memory areas:
 

@@ -44,7 +44,7 @@ End of declarations for module decl16!
 
 Parsed printed file for "decl16!"
 
-typedef static int f(int );
+typedef int f(int );
 f x;
-typedef static int g(int );
+typedef int g(int );
 g y;

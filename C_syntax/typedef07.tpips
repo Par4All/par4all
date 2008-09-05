@@ -1,0 +1,22 @@
+delete typedef07
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create typedef07 typedef07.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 5
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#setenv  PRETTYPRINT_DEBUG_LEVEL 9
+
+display PARSED_PRINTED_FILE[typedef07!]
+echo
+display PARSED_PRINTED_FILE[typedef07]
+close
+delete typedef07	
+
+quit

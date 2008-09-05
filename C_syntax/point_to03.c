@@ -4,8 +4,8 @@ void point_to03()
 {
   typedef struct s {
     int foo;
-  } a_t, *p_t;
-
+  } a_t /* , *p_t */;
+  typedef a_t * p_t;
   a_t a;
   p_t p;
 

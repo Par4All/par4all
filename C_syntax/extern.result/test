@@ -1,7 +1,7 @@
 extern void sc_to_matrices();
 extern int a[10];
 struct foo {
-   extern int mem;
+   int mem;
 };
 extern struct foo x;
 extern struct foo y;
@@ -12,8 +12,8 @@ extern int foo();
 foo()
 {
    extern int i;
-   extern foo();
-   extern (*p)();
-   extern (*f)();
+   extern  foo();
+   extern  (*p)();
+   extern  (*f)();
    extern int b[20];
 }

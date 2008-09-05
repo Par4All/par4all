@@ -13,12 +13,8 @@ Variable list:
 	Declared entity "decl15!:*STACK*" with type "area" with size 0
 	Declared entity "decl15!:*STATIC*" with type "area" with size 0
 
-External variable list:
+* empty extern declaration list *
 
-	Declared external entity "decl15!:_PIPS_STRUCT_1^__count"	with type "variable" "int"
-	Declared external entity "decl15!:_PIPS_UNION_2^__wch"	with type "variable" "wint_t"
-	Declared external entity "decl15!:_PIPS_UNION_2^__wchb"	with type "variable" "char"
-	Declared external entity "decl15!:_PIPS_STRUCT_1^__value"	with type "variable" "union _PIPS_UNION_2 "
 
 Layouts for memory areas:
 

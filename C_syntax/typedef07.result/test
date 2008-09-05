@@ -1,0 +1,9 @@
+typedef int f(int );
+typedef int (*g)(int );
+extern int typedef07(int );
+extern int typedef07(int );
+
+int typedef07(int cookie)
+{
+   return cookie;
+}

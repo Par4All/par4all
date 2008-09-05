@@ -2,7 +2,8 @@
 
 typedef struct s {
   int foo;
-} a_t, *p_t;
+} a_t /* , *p_t*/;
+typedef a_t * p_t;
 
 typedef p_t f_t();
 

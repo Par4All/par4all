@@ -1,5 +1,5 @@
 struct s {
-   extern int foo;
+   int foo;
 };
 typedef struct s a_t;
 typedef struct s *p_t;

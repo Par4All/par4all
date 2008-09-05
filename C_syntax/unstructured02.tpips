@@ -1,7 +1,7 @@
 delete unstructured02
 create unstructured02 unstructured02.c
 
-#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setenv C_SYNTAX_DEBUG_LEVEL 5
 
 activate C_PARSER
 
@@ -17,9 +17,17 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 #activate PRINT_CODE_PRECONDITIONS 
 
-display PRINTED_FILE[unstructured02]
+echo
+echo Parsed printed file
+echo
 
-apply UNSPLIT[%PROGRAM]
+display PARSED_PRINTED_FILE[unstructured02]
+
+echo
+echo Printed file
+echo
+
+display PRINTED_FILE[unstructured02]
 
 close
 

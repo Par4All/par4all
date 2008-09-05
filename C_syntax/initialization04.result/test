@@ -1,0 +1,128 @@
+
+Symbol table for "initialization04!"
+
+initialization04!
+
+Declarations for module "initialization04!" with type "() -> unknow"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 48
+	Declared entity "TOP-LEVEL:dec" with type "variable" "f_t"
+	Declared entity "TOP-LEVEL:inc" with type "variable" "f_t"
+	Declared entity "TOP-LEVEL:ini" with type "variable" "f_t"
+	Declared entity "TOP-LEVEL:initialization04" with type "functional" "() -> void"
+	Declared entity "TOP-LEVEL:tab" with type "variable" "si_t"
+	Declared entity "initialization04!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "initialization04!:*HEAP*" with type "area" with size 0
+	Declared entity "initialization04!:*STACK*" with type "area" with size 0
+	Declared entity "initialization04!:*STATIC*" with type "area" with size 0
+
+External variable list:
+
+	Declared external entity "TOP-LEVEL:initialization04"	with type "functional" "() -> void"
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 48:
+	Variable "TOP-LEVEL:tab"	offset = 0	size = 48
+
+
+Layout for memory area "initialization04!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "initialization04!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "initialization04!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "initialization04!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module initialization04!
+
+
+Symbol table for "initialization04"
+
+initialization04
+
+Declarations for module "initialization04" with type "() -> void"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 48
+	Declared entity "initialization04!:*HEAP*" with type "area" with size 0
+	Declared entity "initialization04!:*STATIC*" with type "area" with size 0
+	Declared entity "initialization04:*DYNAMIC*" with type "area" with size 32
+	Declared entity "initialization04:*STACK*" with type "area" with size 0
+	Declared entity "initialization04:*STATIC*" with type "area" with size 0
+	Declared entity "initialization04:0`tab2" with type "variable" "si_t"
+	Declared entity "initialization04:0`tab3" with type "variable" "si_t"
+
+* empty extern declaration list *
+
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 48:
+	Variable "TOP-LEVEL:tab"	offset = 0	size = 48
+
+
+Layout for memory area "initialization04!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "initialization04!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "initialization04:*DYNAMIC*" of size 32:
+	Variable "initialization04:0`tab2"	offset = 0	size = 16
+	Variable "initialization04:0`tab3"	offset = 16	size = 16
+
+
+Layout for memory area "initialization04:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "initialization04:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module initialization04
+
+
+Printed file for "initialization04!"
+
+struct s {
+   int foo;
+};
+typedef struct s a_t;
+typedef a_t *p_t;
+typedef p_t f_t();
+struct f {
+   f_t *init;
+   f_t *incr;
+   f_t *decr;
+};
+struct si {
+   int i;
+   struct f functions;
+};
+typedef struct si si_t;
+f_t ini;
+f_t inc;
+f_t dec;
+si_t tab[] = {{0, {ini, inc, dec}}, {1, {ini, inc, dec}}, {2, {ini, inc, dec}}};
+extern void initialization04();
+
+Printed file for "initialization04"
+
+void initialization04()
+{
+   si_t tab2[] = {0, {ini, inc, dec}};
+   si_t tab3[] = {{0, {ini, inc, dec}}};
+}
