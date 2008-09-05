@@ -628,7 +628,15 @@ words_regular_call(call obj, bool is_a_subroutine)
     if (type_statement_p(t))
       return(CHAIN_SWORD(pc, entity_local_name(f)+strlen(LABEL_PREFIX)));
     if (value_constant_p(i)||value_symbolic_p(i))
-      return(CHAIN_SWORD(pc, entity_user_name(f)));
+      if(is_fortran)
+	return(CHAIN_SWORD(pc, entity_user_name(f)));
+      else {
+	if(ENTITY_TRUE_P(f))
+	  return(CHAIN_SWORD(pc, "true"));
+	if(ENTITY_FALSE_P(f))
+	  return(CHAIN_SWORD(pc, "false"));
+	return(CHAIN_SWORD(pc, entity_user_name(f)));
+      }
   }
 
   if (type_void_p(functional_result(type_functional(call_to_functional_type(obj)))))
@@ -3632,8 +3640,12 @@ static text text_forloop(entity module,
     if (!expression_undefined_p(forloop_initialization(obj)))
       pc = gen_nconc(pc, words_expression(forloop_initialization(obj)));
     pc = CHAIN_SWORD(pc,";");
-    if (!expression_undefined_p(forloop_condition(obj)))
-      pc = gen_nconc(pc, words_expression(forloop_condition(obj)));
+    if (!expression_undefined_p(forloop_condition(obj))) {
+      /* To restitute for(;;) */
+      expression cond = forloop_condition(obj);
+      if(!expression_one_p(cond))
+	pc = gen_nconc(pc, words_expression(forloop_condition(obj)));
+    }
     pc = CHAIN_SWORD(pc,";");
     if (!expression_undefined_p(forloop_increment(obj)))
       pc = gen_nconc(pc, words_expression(forloop_increment(obj)));

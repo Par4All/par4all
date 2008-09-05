@@ -111,6 +111,9 @@ extern stack OffsetStack; /* to know the offset of the formal argument */
  // ContextStack
 static c_parser_context ycontext = c_parser_context_undefined;
 
+static string expression_comment = string_undefined;
+static int expression_line_number = STATEMENT_NUMBER_UNDEFINED;
+
 /* Functions used to manage the block scoping in conjunction with
    ContextStack and ycontext */
 
@@ -652,7 +655,7 @@ location:
 
 /*** Global Definition ***/
 global:
-    declaration         { }                 
+declaration         { discard_C_comment();}                 
 |   function_def        { $$ = NIL; }
 |   TK_ASM TK_LPAREN string_constant TK_RPAREN TK_SEMICOLON
                         { 
@@ -837,9 +840,13 @@ expression:
 			}
 |   paren_comma_expression
 		        {
-			  /* paren_comma_expression is a list of expressions*/ 
-			  (void) pop_current_C_comment();
-			  (void) pop_current_C_line_number();
+			  /* paren_comma_expression is a list of
+			     expressions, maybe reduced to one */ 
+			  if(!string_undefined_p(expression_comment)) {
+			    pips_user_warning("comment \"%s\" is lost\n", expression_comment);
+			  }
+			  expression_comment = pop_current_C_comment();
+			  expression_line_number = pop_current_C_line_number();
 			  $$ = MakeCommaExpression($1);
 			}
 |   expression TK_LPAREN arguments TK_RPAREN
@@ -1244,6 +1251,7 @@ declaration_list:
     /* empty */         { $$ = NIL; }
 |   declaration declaration_list
                         {
+			  //discard_C_comment();
 			  $$ = gen_nconc($1,$2);
 			}
 
@@ -1281,6 +1289,12 @@ statement:
 			    $$ = ExpressionToStatement(EXPRESSION(CAR($1)));
 			  else 
 			    $$ = call_to_statement(make_call(CreateIntrinsic(","),$1));
+			  if(!string_undefined_p(expression_comment)) {
+			    statement_comments($$) = expression_comment;
+			    statement_number($$) = expression_line_number;
+			    expression_comment = string_undefined;
+			    expression_line_number = STATEMENT_NUMBER_UNDEFINED;
+			  }
 			}
 |   block               { }
 |   TK_IF paren_comma_expression statement                    %prec TK_IF
@@ -1355,11 +1369,32 @@ statement:
 	                {
 			  string sc = pop_current_C_comment();
 			  int sn = pop_current_C_line_number();
+			  expression init = $4;
+			  expression cond = $5;
+			  expression inc = $7;
+
 			  pips_assert("For loop body consistent",statement_consistent_p($9));
+
+			  if(expression_undefined_p(init))
+			    init = make_call_expression(entity_intrinsic(CONTINUE_FUNCTION_NAME),
+							NIL);
+			  if(expression_undefined_p(cond)) {
+			    /* A bool C constant cannot be used
+			       because stdbool.h may not be
+			       included */
+			    /* cond = make_call_expression(MakeConstant(TRUE_OPERATOR_NAME, */
+			    /* is_basic_logical), */
+			    /* NIL); */
+			    cond = int_to_expression(1);
+			  }
+			  if(expression_undefined_p(inc))
+			    inc = make_call_expression(entity_intrinsic(CONTINUE_FUNCTION_NAME),
+							NIL);
 			  /*  The for clause may contain declarations*/
-			  $$ = MakeForloop($4,$5,$7,$9);
+			  $$ = MakeForloop(init, cond, inc,$9);
 			  $$ = add_comment_and_line_number($$, sc, sn);
 			  stack_pop(LoopStack);
+			  pips_assert("For loop consistent",statement_consistent_p($$));
 			}
 |   TK_IDENT TK_COLON statement
                         {
@@ -1446,6 +1481,7 @@ for_clause:
 			}
 |   declaration
                         {
+			  discard_C_comment();
 			  CParserError("For clause containing declaration not implemented\n");
 			}
 ;
@@ -2316,7 +2352,8 @@ old_pardef_list:
 |   decl_spec_list old_pardef TK_SEMICOLON TK_ELLIPSIS
                         {
 			  UpdateEntities($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external,FALSE);
-			  stack_pop(ContextStack);  
+			  //stack_pop(ContextStack);  
+			  PopContext();
 			  /* Can we have struct/union definition in $1 ?*/
 			  /*$$ = gen_nconc($1,$2);*/
 			  $$ = $2;

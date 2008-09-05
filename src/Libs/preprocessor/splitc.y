@@ -148,6 +148,37 @@ static bool current_function_is_static_p = FALSE;
 /* All the following global variables must be replaced by functions, once we have the preprocessor for C */
 
 static int csplit_is_typedef = FALSE; /* to know if this is a typedef name or not */
+static stack TypedefStack = stack_undefined;
+
+ static void PushTypedef()
+ {
+   pips_debug(8, "csplit_is_typedef = %s\n", bool_to_string(csplit_is_typedef));
+   stack_push((void *) csplit_is_typedef, TypedefStack);
+   csplit_is_typedef = FALSE;
+   pips_debug(8, "csplit_is_typedef = %s\n", bool_to_string(csplit_is_typedef));
+ }
+
+ static void PopTypedef()
+ {
+   csplit_is_typedef = (int) stack_pop(TypedefStack);
+   pips_debug(8, "csplit_is_typedef = %s\n", bool_to_string(csplit_is_typedef));
+ }
+
+ void MakeTypedefStack()
+ {
+   pips_assert("TypedefStack is undefined", stack_undefined_p(TypedefStack));
+   TypedefStack = stack_make(int_domain, 0, 0);
+}
+
+ void ResetTypedefStack()
+ {
+   if(stack_empty_p(TypedefStack)) {
+     stack_free(&TypedefStack);
+     TypedefStack = stack_undefined;
+   }
+   else
+     pips_internal_error("TypedefStack is not empty");
+ }
 
 /* If any of the strings is undefined, we are in trouble. If not,
    concatenate them with separator into a new string and free all input
@@ -1306,19 +1337,23 @@ declaration:                                /* ISO 6.7.*/
 			  pips_debug(5, "decl_spec_list=\"%s\", init_declarator_list=\"%s\"\n",
 				     $1, string_undefined_p($2) ? "UNDEFINED" : $2);
 			  csplit_is_function = 0; /* not function's declaration */
+			  //pips_assert("TypedefStack is empty", stack_empty_p(TypedefStack));
 			  csplit_is_typedef = FALSE;
 			  free_partial_signature($1);
 			  free_partial_signature($2);
 			  $$ = string_undefined;
+			  PopTypedef();
 			}
 |   decl_spec_list TK_SEMICOLON	
                         {
 			  pips_debug(5, "decl_spec_list TK_SEMICOLON -> declaration\n");
 			  pips_debug(5, "decl_spec_list=\"%s\"\n", $1);
 			  csplit_is_function = 0; /* not function's declaration */
+			  //pips_assert("TypedefStack is empty", stack_empty_p(TypedefStack));
 			  csplit_is_typedef = FALSE;
 			  free_partial_signature($1);
 			  $$ = string_undefined;
+			  PopTypedef();
 			}
 ;
 
@@ -1356,6 +1391,7 @@ decl_spec_list:                         /* ISO 6.7 */
                         {
 			  pips_debug(5, "TK_TYPEDEF decl_spec_list_opt->decl_spec_list\n");
 			  csplit_is_typedef = TRUE;
+			  pips_debug(8, "csplit_is_typedef=%s\n", bool_to_string(csplit_is_typedef));
 			  /* I would have liked not to build them when unnecessary. */
 			  /*
 			  free_partial_signature($2);
@@ -1454,8 +1490,8 @@ decl_spec_list:                         /* ISO 6.7 */
 /* (* In most cases if we see a NAMED_TYPE we must shift it. Thus we declare 
     * NAMED_TYPE to have right associativity  *) */
 decl_spec_list_opt: 
-    /* empty */         { $$=new_empty(); } %prec TK_NAMED_TYPE
-|   decl_spec_list      { $$=$1; }
+/* empty */         { $$=new_empty(); PushTypedef();} %prec TK_NAMED_TYPE
+|   decl_spec_list      { $$=$1;}
 ;
 
 /* (* We add this separate rule to handle the special case when an appearance 
@@ -1465,6 +1501,7 @@ decl_spec_list_opt:
 decl_spec_list_opt_no_named:     /* empty */
                         {
 			  $$ = new_empty();
+			  PushTypedef();
 			}
     %prec TK_IDENT
                         { 
@@ -1631,11 +1668,13 @@ struct_decl_list: /* (* ISO 6.7.2. Except that we allow empty structs. We
     /* empty */         { $$ = new_empty(); }
 |   decl_spec_list TK_SEMICOLON struct_decl_list
                         {
+			  PopTypedef();
 			  $$ = build_signature($1, new_semicolon(), $3, NULL);
 			}             
 |   decl_spec_list      /* { } */
     field_decl_list TK_SEMICOLON struct_decl_list
                         {
+			  PopTypedef();
 			  $$ = build_signature($1, $2, new_semicolon(), $4, NULL);
 			}
 |   error TK_SEMICOLON struct_decl_list
@@ -1740,7 +1779,7 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			   /* Too early to reset: one typedef can be used
                               to declare several named types... but I do
                               not know how to use it. */
-			   csplit_is_typedef = FALSE;
+			   //csplit_is_typedef = FALSE;
 			   $$ = $1;
 			 }
 			 else if(TRUE) { /* Keep identifiers in signatures */
@@ -1807,6 +1846,7 @@ rest_par_list1:
 parameter_decl: /* (* ISO 6.7.5 *) */
     decl_spec_list declarator 
                         {
+			  PopTypedef();
 			  $$ = build_signature($1, $2, NULL);
 			}
 |   decl_spec_list abstract_decl 
@@ -1829,13 +1869,16 @@ parameter_decl: /* (* ISO 6.7.5 *) */
 			  }
 			  else
 			    $$ = build_signature($1, $2, NULL);
+			  PopTypedef();
 			}
 |   decl_spec_list              
                         {
+			  PopTypedef();
 			  $$ = $1;
 			}
 |   TK_LPAREN parameter_decl TK_RPAREN    
                         { 
+			  //PopTypedef();
 			  $$ = build_signature(new_lparen(), $2, new_rparen(), NULL);
 			} 
 ;
@@ -1890,12 +1933,14 @@ old_pardef_list:
 			  $$ = build_signature($1, $2, new_comma(),
 					       new_ellipsis(), NULL);
 			  */
+			  PopTypedef();
 			}
 |   decl_spec_list old_pardef TK_SEMICOLON old_pardef_list  
                         {
 			  $$ = build_signature($1, $2, new_semicolon(),
 					       $4, NULL);
-			} 
+			  PopTypedef();
+			}
 ;
 
 old_pardef: 
@@ -1932,10 +1977,12 @@ pointer_opt:
 type_name: /* (* ISO 6.7.6 *) */
     decl_spec_list abstract_decl
                         {
+			  PopTypedef();
 			  $$ = build_signature($1, $2, NULL);
 			}
 |   decl_spec_list      
                         {
+			  PopTypedef();
 			  $$ = $1;
 			}
 ;
@@ -2009,6 +2056,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  pips_debug(1, "Signature for function \"%s\": \"%s\"\n\n",
 				     csplit_definite_function_name,
 				     csplit_definite_function_signature);
+			  PopTypedef();
 			}	
 /* (* Old-style function prototype *) */
 |   decl_spec_list old_proto_decl 
@@ -2034,7 +2082,8 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  pips_debug(1, "Signature for function \"%s\": \"%s\"\n\n",
 				     csplit_definite_function_name,
 				     csplit_definite_function_signature);
-			}	
+			  PopTypedef();
+			}
 /* (* New-style function that does not have a return type *) */
 |   TK_IDENT parameter_list_startscope rest_par_list TK_RPAREN 
                         { 

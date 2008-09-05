@@ -435,7 +435,7 @@ effect_compare(effect *peff1, effect *peff2)
     /* if same module name: sort on entity local name */
     if (eff1_pos == 0)
     {
-	eff1_pos = strcmp(entity_local_name(ent1), entity_local_name(ent2));	
+	eff1_pos = strcmp(entity_user_name(ent1), entity_user_name(ent2));	
     }
     /* else: current module comes first, others in lexicographic order */
     else

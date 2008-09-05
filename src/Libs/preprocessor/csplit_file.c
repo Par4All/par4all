@@ -201,8 +201,13 @@ void csplit_copy(string module_name, string signature, int first_line, int last_
 	     first_line, last_line, splitc_input_file_name,
 	     unambiguous_module_file_name);
 
-  pips_assert("First line is strictly positive and lesser than last_line",
-	      first_line>0 && first_line<last_line);
+  /* pips_assert("First line is strictly positive and lesser than last_line",
+     first_line>0 && first_line<last_line); */
+  if(!(first_line>0 && first_line<last_line)) {
+    pips_user_error("Definition of function %s starts at line %d and ends a t line %d\n"
+		    "PIPS assumes the function definition to start on a new line "
+		    "after the function signature\n", module_name, first_line, last_line);
+  }
   pips_assert("current_compilation_unit_name is defined",
 	      !string_undefined_p(current_compilation_unit_name));
 
@@ -327,6 +332,7 @@ string  csplit(
 
   module_list_file = out;
   csplit_open_compilation_unit(file_name);
+  MakeTypedefStack();
 
   CATCH(any_exception_error) {
     error_message = "parser error";
@@ -338,6 +344,7 @@ string  csplit(
   }
 
   csplit_close_compilation_unit(file_name);
+  ResetTypedefStack();
   safe_fclose(splitc_in, file_name);
   splitc_in = NULL;
   splitc_input_file_name = string_undefined;

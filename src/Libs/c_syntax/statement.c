@@ -319,13 +319,46 @@ statement MakeSwitchStatement(statement s)
      before s and return the inserted statement.  */
   int i = basic_int((basic) stack_head(LoopStack));
   string lab = strdup(concatenate("break_",int_to_string(i),NULL));
-  statement smt = FindStatementFromLabel(MakeCLabel(lab));
-  statement seq = instruction_to_statement(make_instruction_sequence(stack_head(SwitchGotoStack)));
+  statement smt = statement_undefined;
+  statement seq = statement_undefined;
+  sequence oseq = (sequence)stack_head(SwitchGotoStack);
+  list tl = sequence_statements(oseq);
+  list ct = list_undefined;
+  list ntl = NIL;
+  statement ds = statement_undefined;
+
+  ifdebug(8) {
+    pips_debug(8, "tl=%p\n", tl);
+  }
+
   /* For the time being, the switch comment is lost. It should already be included in the argument,s  */
   /* pop_current_C_comment(); */
 
+  /* Make sure the default case is the last one in the test sequence */
+  for(ct=tl;!ENDP(ct); POP(ct)) {
+    statement s = STATEMENT(CAR(ct));
+
+    if(instruction_goto_p(statement_instruction(s))) {
+      ds = s;
+    }
+    else {
+      ntl = gen_nconc(ntl, CONS(STATEMENT,s,NIL));
+    }
+  }
+  if(statement_undefined_p(ds)) {
+    /* no default case, jump out of the switch control structure */
+    ds = MakeBreakStatement(string_undefined /*strdup("")*/);
+  }
+  ntl = gen_nconc(ntl, CONS(STATEMENT,ds,NIL));
+  gen_free_list(tl);
+  sequence_statements(oseq)=NIL;
+  free_sequence(oseq);
+  seq = instruction_to_statement(make_instruction_sequence(make_sequence(ntl)));
+  //seq = instruction_to_statement(make_instruction_sequence(make_sequence(tl)));
+
   insert_statement(s,seq,TRUE);
 
+  smt = FindStatementFromLabel(MakeCLabel(lab));
   if (!statement_undefined_p(smt))
     {
       /* This switch has a break statement which has been transformed to goto 
@@ -376,6 +409,8 @@ statement MakeDefaultStatement()
   string lab = strdup(concatenate("switch_",int_to_string(i),"_default",NULL));
   statement s = MakeLabeledStatement(lab,make_continue_statement(entity_empty_label()));
   sequence CurrentSwitchGoto = stack_head(SwitchGotoStack);
+  /* If the default case is not last, it must be moved later in the
+     sequence_statements(CurrentSwitchGoto) */
   sequence_statements(CurrentSwitchGoto) = gen_nconc(sequence_statements(CurrentSwitchGoto),
 							       CONS(STATEMENT,MakeGotoStatement(lab),NULL));
   return s;

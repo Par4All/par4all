@@ -346,8 +346,13 @@ entity_label_p(entity e)
 bool 
 entity_module_p(entity e)
 {
+  if(typedef_entity_p(e))
+    /* Functional typedef also have value code ... */
+    return FALSE;
+  else {
     value v = entity_initial(e);
     return v!=value_undefined && value_code_p(v);
+  }
 }
 
 bool 
@@ -1114,6 +1119,19 @@ bool typedef_entity_p(entity e)
     is_typedef = (*(ms+1)==TYPEDEF_PREFIX_CHAR);
 
   return is_typedef;
+}
+
+bool member_entity_p(entity e)
+{
+  /* Its name must contain the MEMBER_PREFIX after the MODULE_SEP_STRING */
+  string en = entity_name(e);
+  string ms = strchr(en, MODULE_SEP);
+  bool is_member = FALSE;
+
+  if(ms!=NULL)
+    is_member = (strchr(ms, MEMBER_SEP_CHAR)!=NULL);
+
+  return is_member;
 }
 
 /* is p a formal parameter? */

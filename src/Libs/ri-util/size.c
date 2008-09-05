@@ -15,6 +15,32 @@
 
 extern value EvalExpression();
 
+int number_of_initial_values(list args)
+{
+  int niv = 0;
+  list carg = list_undefined;
+
+  for(carg=args; !ENDP(carg); POP(carg)) {
+    expression e = EXPRESSION(CAR(carg));
+
+    if(expression_call_p(e)) {
+      call c = syntax_call(expression_syntax(e));
+      entity f = call_function(c);
+      list sargs = call_arguments(c);
+
+      if(ENTITY_BRACE_INTRINSIC_P(f)) {
+	niv += number_of_initial_values(sargs);
+      }
+      else
+	niv++;
+    }
+    else
+      niv++;
+  }
+
+  return niv;
+}
+
 /* This function computes the total size of a variable, ie. the product of
 the number of elements and the size of each element, when it is a constant. 
 
@@ -54,13 +80,13 @@ SizeOfArray(entity e, int * s)
     if(value_expression_p(ev)) {
       expression eve = value_expression(ev);
       //type evet = expression_to_type(eve);
-      basic eveb = basic_of_expression(eve);
+      basic eveb = basic_of_expression(eve); /* FI: should eveb be freed? */
 
       /* Is it an array of characters initialized with a string expression? */
-      if(char_type_p(et) && basic_string_p(eveb)) {
+      if(char_type_p(et) && !basic_undefined_p(eveb) && basic_string_p(eveb)) {
 	ne = string_type_size(eveb);
 	ok = TRUE;
-      } 
+      }
       else if(expression_call_p(eve)) {
 	call evec = syntax_call(expression_syntax(eve));
 	entity f = call_function(evec);
@@ -68,11 +94,22 @@ SizeOfArray(entity e, int * s)
 
 	/* Is it a call to the BRACE_INTRINSIC operator? */
 	if(ENTITY_BRACE_INTRINSIC_P(f)) {
-	  ne = gen_length(args);
+	  /* This is too simple unfortunately */
+	  /* ne = gen_length(args); */
+	  int ni = number_of_initial_values(args);
+	  int nf = number_of_fields(et);
+	  ne = ni/nf;
+	  if(nf*ne!=ni) {
+	    /* Should be a call to CParserError()... */
+	    pips_user_error("Number of initialization values (%d) incompatible"
+			    " with number of type fields (%d)\n", ni, nf);
+	  }
 	  ok = TRUE;
 	}
 	/* Check for other dimensions which must be all declared: the
 	   first dimension only can be implicit */
+	/* Already taken care of by "ni" */
+	/*
 	if(ok && gen_length(variable_dimensions(a))>1) {
 	  bool sok = FALSE;
 	  int sne = -1;
@@ -84,6 +121,7 @@ SizeOfArray(entity e, int * s)
 	    ok = FALSE;
 	  }
 	}
+	*/
       }
     }
     else if(value_constant_p(ev)) {

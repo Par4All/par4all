@@ -1722,6 +1722,22 @@ expression exp;
     }
     return(FALSE);
 }
+bool 
+expression_one_p(expression exp)
+{
+  bool one_p = FALSE;
+
+  if(syntax_call_p(expression_syntax(exp))) {
+    call c = syntax_call(expression_syntax(exp));
+    value v = entity_initial(call_function(c));
+
+    if(value_constant_p(v)) {
+      constant c = value_constant(v);
+      one_p = constant_int_p(c) && (constant_int(c)==1);
+    }
+  }
+  return one_p;
+}
 
 
 /****************************************************** SAME EXPRESSION NAME */

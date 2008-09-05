@@ -762,9 +762,10 @@ statement forloop_header(statement sl)
 statement forloop_test(statement sl)
 {
   forloop l = instruction_forloop(statement_instruction(sl));
+  expression cond = forloop_condition(l);
   call c =  make_call(entity_intrinsic(C_NOT_OPERATOR_NAME),
 		      CONS(EXPRESSION,
-			   copy_expression(forloop_condition(l)),
+			   copy_expression(cond),
 			   NIL));
   test t = make_test(make_expression(make_syntax(is_syntax_call, c),
 				     normalized_undefined), 
@@ -778,6 +779,11 @@ statement forloop_test(statement sl)
 				STATEMENT_ORDERING_UNDEFINED,
 				cs,
 				make_instruction(is_instruction_test, t),NIL,NULL);
+
+  ifdebug(8) {
+    pips_debug(8, "Condition expression: ");
+    print_expression(cond);
+  }
   
   return ts;
 }
@@ -785,9 +791,15 @@ statement forloop_test(statement sl)
 statement forloop_inc(statement sl)
 {
   forloop l = instruction_forloop(statement_instruction(sl));
-  statement is = instruction_to_statement(make_instruction_expression(forloop_increment(l)));
+  expression inc = forloop_increment(l);
+  statement is = instruction_to_statement(make_instruction_expression(inc));
   statement_number(is) = statement_number(sl);
-  
+
+  ifdebug(8) {
+    pips_debug(8, "Increment expression: ");
+    print_expression(inc);
+  }
+
   return is;
 }
 
@@ -1153,7 +1165,7 @@ hash_table used_labels;
     controlized = FALSE;
     control_predecessors(succ) = ADD_PRED(c_res, succ);
   }
-  else 
+  else /* The foor loop cannot be preserved as a control structure*/
     {
       /* NN : I do not know how to deal with this, the following code does not always work 
 	   

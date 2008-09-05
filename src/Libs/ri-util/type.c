@@ -825,11 +825,13 @@ type expression_to_type(expression e)
   return t;
 }
 
-/* basic basic_of_call(call c):
- * returns the basic of the result given by the call "c".
+/* basic basic_of_call(call c): returns the basic of the result given by the
+ * call "c".
+ *
  * WARNING: a new basic is allocated
  */
-basic basic_of_call(call c, bool apply_p)
+basic 
+basic_of_call(call c, bool apply_p)
 {
     entity e = call_function(c);
     tag t = value_tag(entity_initial(e));
@@ -840,10 +842,10 @@ basic basic_of_call(call c, bool apply_p)
     case is_value_code:
 	b = copy_basic(basic_of_external(c));
 	break;
-    case is_value_intrinsic:
+    case is_value_intrinsic: 
       b = basic_of_intrinsic(c, apply_p);
 	break;
-    case is_value_symbolic:
+    case is_value_symbolic: 
 	/* b = make_basic(is_basic_overloaded, UU); */
 	b = copy_basic(basic_of_constant(c));
 	break;
@@ -900,14 +902,15 @@ basic_of_external(call c)
     return b;
 }
 
-/* basic basic_of_intrinsic(call c, boolean apply_p):
- * returns the basic of the result given by call to an intrinsic function.
- * This basic must be computed with the basic of the arguments of the
- * intrinsic for overloaded operators.  It should be able to accomodate more
- * than two arguments as for generic min and max operators.
+/* basic basic_of_intrinsic(call c): returns the basic of the result given
+ * by call to an intrinsic function. This basic must be computed with the
+ * basic of the arguments of the intrinsic for overloaded operators.  It
+ * should be able to accomodate more than two arguments as for generic min
+ * and max operators.
  *
  * WARNING: returns a newly allocated basic object */
-basic basic_of_intrinsic(call c, bool apply_p)
+basic 
+basic_of_intrinsic(call c, bool apply_p)
 {
   entity f = call_function(c);
   type rt = functional_result(type_functional(entity_type(f)));
@@ -978,6 +981,10 @@ basic basic_of_intrinsic(call c, bool apply_p)
 	pips_debug(8, "\n");
       }
       rb = basic_of_expression(e2);
+    }
+    else if(ENTITY_BRACE_INTRINSIC_P(f)) {
+      /* We should reconstruct a struct type or an array type... */
+      rb = make_basic_overloaded();
     }
     else {
       free_basic(rb);
@@ -1572,7 +1579,19 @@ type call_to_functional_type(call c)
     }
     else if(basic_typedef_p(ftb)) {
       entity te = basic_typedef(ftb);
-      rt = ultimate_type(entity_type(te));
+      type ut = ultimate_type(entity_type(te));
+
+      if(type_variable_p(ut)) {
+	basic utb = variable_basic(type_variable(ut));
+	if(basic_pointer_p(utb)) {
+	  rt = ultimate_type(basic_pointer(utb));
+	}
+	else
+	  /* assertion will fail anyway */
+	  free_type(ut);
+      }
+      else /* mustbe a functional type */
+	rt = ut;
     }
     else {
       pips_internal_error("Basic for called function unknown");
@@ -1584,6 +1603,37 @@ type call_to_functional_type(call c)
   pips_assert("The typedef type is functional", type_functional_p(rt));
 
   return rt;
+}
+
+int number_of_fields(type t)
+{
+  int n = 1;
+  type ut = ultimate_type(t);
+
+  if(type_variable_p(ut)) {
+    basic ub = variable_basic(type_variable(ut));
+
+    if(basic_derived_p(ub)) {
+      entity de = basic_derived(ub);
+      type dt = entity_type(de);
+      n = number_of_fields(dt);
+    }
+  }
+  else if(type_struct_p(t)) {
+    list el = type_struct(t);
+    list ce = list_undefined;
+
+    n = 0;
+    for(ce = el; !ENDP(ce); POP(ce)) {
+      entity fe = ENTITY(CAR(ce));
+      type ft = entity_type(fe);
+      n += number_of_fields(ft);
+    }
+  }
+  else
+    pips_internal_error("Illegal type argument\n");
+
+  return n;
 }
 /*
  *  that is all

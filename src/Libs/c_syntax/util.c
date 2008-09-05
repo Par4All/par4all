@@ -759,7 +759,11 @@ entity FindOrCreateCurrentEntity(string name,
 	{
 	  /* Prefix for the current struct: use full_scope */
 	  ent = find_or_create_entity(strdup(concatenate(full_scope,name,NULL)));
-	  if (is_external /* && strstr(scope,TOP_LEVEL_MODULE_NAME) != NULL*/ )
+	  if (is_external 
+	      && !member_entity_p(ent) /* Maybe it would have been
+					  better to push "external" in
+					  the context */
+	      /* && strstr(scope,TOP_LEVEL_MODULE_NAME) != NULL*/ )
 	    {
 	      /* This entity is declared in a compilation unit with keyword EXTERN.
 		 Add it to the storage of the compilation unit to help code generation*/
@@ -848,6 +852,7 @@ entity FindOrCreateCurrentEntity(string name,
 		    ent = find_or_create_entity(strdup(concatenate(compilation_unit_name,
 								   get_current_module_name(),
 								   MODULE_SEP_STRING,
+								   block_scope,
 								   name,
 								   NULL)));      
 		  else

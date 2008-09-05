@@ -50,13 +50,19 @@ static string continuation = string_undefined;
 int
 compare_effect_reference(effect * e1, effect * e2)
 {
-  entity v1, v2;
+  entity v1 = reference_variable(effect_reference(*e1));
+    entity v2 = reference_variable(effect_reference(*e2));
   int n1, n2;
-  v1 = reference_variable(effect_reference(*e1));
-  v2 = reference_variable(effect_reference(*e2));
+  string s1 = entity_name_without_scope(v1);
+  string s2 = entity_name_without_scope(v2);
+  int result;
+
   n1 = (v1==(entity)NULL),
   n2 = (v2==(entity)NULL);
-  return (n1 || n2)?  (n2-n1): strcmp(entity_name(v1), entity_name(v2));
+  result = (n1 || n2)?  (n2-n1): strcmp(s1,s2);
+  free(s1);
+  free(s2);
+  return result;
 }
 
 /* int compare_effect_reference_in_common(e1, e2):

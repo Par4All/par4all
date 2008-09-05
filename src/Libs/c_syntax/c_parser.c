@@ -145,6 +145,7 @@ void init_keyword_typedef_table()
   /* GNU predefined type(s), expecting no conflict with user named type */
 
   hash_put(keyword_typedef_table,"__builtin_va_list", (char *) TK_NAMED_TYPE);
+  hash_put(keyword_typedef_table,"_Bool", (char *) TK_NAMED_TYPE);
 
   /* typedef names are added lately */
 }
@@ -247,7 +248,8 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
     string file_name = 
       strdup(concatenate(dir, "/", 
 		     db_get_file_resource(dbr_file,module_name,TRUE), NULL));
-    entity built_in_ent = entity_undefined;
+    entity built_in_va_list = entity_undefined;
+    entity built_in_bool = entity_undefined;
     entity built_in_va_start = entity_undefined;
     entity built_in_va_end = entity_undefined;
 
@@ -282,17 +284,29 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
       is_fortran = FALSE;
 
     /* Predefined type(s): __builtin_va_list */
-    built_in_ent = find_or_create_entity(strdup(concatenate(compilation_unit_name,
+    built_in_va_list = find_or_create_entity(strdup(concatenate(compilation_unit_name,
 							    MODULE_SEP_STRING,
 							    TYPEDEF_PREFIX,"__builtin_va_list",
 							    NULL)));
-    if(storage_undefined_p(entity_storage(built_in_ent))) {
-      entity_storage(built_in_ent) = make_storage_rom();
+    if(storage_undefined_p(entity_storage(built_in_va_list))) {
+      entity_storage(built_in_va_list) = make_storage_rom();
       /* Let's lie about the real type */
-      entity_type(built_in_ent) = make_type(is_type_variable,
+      entity_type(built_in_va_list) = make_type(is_type_variable,
 					    make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),
 							  NIL, NIL));
-      entity_initial(built_in_ent) = make_value_unknown();
+      entity_initial(built_in_va_list) = make_value_unknown();
+    }
+    built_in_bool = find_or_create_entity(strdup(concatenate(compilation_unit_name,
+							    MODULE_SEP_STRING,
+							    TYPEDEF_PREFIX,"_Bool",
+							    NULL)));
+    if(storage_undefined_p(entity_storage(built_in_bool))) {
+      entity_storage(built_in_bool) = make_storage_rom();
+      entity_type(built_in_bool) =
+	make_type(is_type_variable,
+		  make_variable(make_basic_logical(DEFAULT_LOGICAL_TYPE_SIZE),
+				NIL, NIL));
+      entity_initial(built_in_bool) = make_value_unknown();
     }
 
     /* Predefined functions(s): __builtin_va_end (va_arg() is parser directly) */
@@ -301,7 +315,7 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
 								 BUILTIN_VA_START,
 								 NULL)));
     if(storage_undefined_p(entity_storage(built_in_va_start))) {
-      basic va_list_b = make_basic(is_basic_typedef, built_in_ent);
+      basic va_list_b = make_basic(is_basic_typedef, built_in_va_list);
       type va_list_t = make_type(is_type_variable, make_variable(va_list_b, NIL, NIL));
       basic void_star_b = make_basic(is_basic_pointer, make_type_void());
       type void_start_t = make_type(is_type_variable, make_variable(void_star_b, NIL, NIL));
@@ -324,7 +338,7 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
 							    BUILTIN_VA_END,
 							    NULL)));
     if(storage_undefined_p(entity_storage(built_in_va_end))) {
-      basic va_list_b = make_basic(is_basic_typedef, built_in_ent);
+      basic va_list_b = make_basic(is_basic_typedef, built_in_va_list);
       type va_list_t = make_type(is_type_variable, make_variable(va_list_b, NIL, NIL));
       entity_storage(built_in_va_end) = make_storage_rom();
       /* Let's lie about the real type */
