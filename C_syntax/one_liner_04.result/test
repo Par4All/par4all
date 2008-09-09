@@ -6,27 +6,26 @@ void one_liner_04()
    int x;
    int y;
    int z;
-   
+
    if (x>0)
       y++;
    else
       y++;
-   
+
    if (x>0) {
       y++;
       z++;
    }
-   else
-    {
+   else {
       y++;
       z++;
    }
-   
+
    if (x>0)
       ;
    //comment empty branch, misplaced by the parser
    
-   
+
    if (x>0)
       ;
    //simple comment, misplaced by the parser

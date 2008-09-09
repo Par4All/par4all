@@ -1,62 +1,81 @@
 bar!
 
-Declarations for module bar! with type () -> unknow
+Declarations for module "bar!" with type "() -> unknow"
+
 Variable list:
 
-Declared entity TOP-LEVEL:*STATIC*	with type area with size 0
-Declared entity TOP-LEVEL:i	with type variable INTEGER*4
-Declared entity bar!:*DYNAMIC*	with type area with size 0
-Declared entity bar!:*STACK*	with type area with size 0
-Declared entity bar!:*STATIC*	with type area with size 0
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:i" with type "variable" "int"
+	Declared entity "bar!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "bar!:*HEAP*" with type "area" with size 0
+	Declared entity "bar!:*STACK*" with type "area" with size 0
+	Declared entity "bar!:*STATIC*" with type "area" with size 0
 
-Layouts for areas (commons):
+External variable list:
 
-Layout for common /TOP-LEVEL:*STATIC*/ of size 0:
-	External VariableTOP-LEVEL:i	offset = UNKNOWN,	size = 4
+	Declared external entity "TOP-LEVEL:i"	with type "variable" "int"
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	External Variable "TOP-LEVEL:i"	offset = UNKNOWN,	size = 4
 
 
-Layout for common /bar!:*DYNAMIC*/ of size 0:
+Layout for memory area "bar!:*DYNAMIC*" of size 0:
 	* empty area *
 
 
-Layout for common /bar!:*STACK*/ of size 0:
+Layout for memory area "bar!:*HEAP*" of size 0:
 	* empty area *
 
 
-Layout for common /bar!:*STATIC*/ of size 0:
+Layout for memory area "bar!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "bar!:*STATIC*" of size 0:
 	* empty area *
 
 End of declarations for module bar!
 
 foo!
 
-Declarations for module foo! with type () -> unknow
+Declarations for module "foo!" with type "() -> unknow"
+
 Variable list:
 
-Declared entity TOP-LEVEL:*STATIC*	with type area with size 4
-Declared entity TOP-LEVEL:i	with type variable INTEGER*4
-Declared entity foo!:*DYNAMIC*	with type area with size 0
-Declared entity foo!:*STACK*	with type area with size 0
-Declared entity foo!:*STATIC*	with type area with size 0
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 4
+	Declared entity "TOP-LEVEL:i" with type "variable" "int"
+	Declared entity "foo!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "foo!:*HEAP*" with type "area" with size 0
+	Declared entity "foo!:*STACK*" with type "area" with size 0
+	Declared entity "foo!:*STATIC*" with type "area" with size 0
 
-Layouts for areas (commons):
-
-Layout for common /TOP-LEVEL:*STATIC*/ of size 4:
-	Variable TOP-LEVEL:i	offset = 0	size = 4
+* empty extern declaration list *
 
 
-Layout for common /foo!:*DYNAMIC*/ of size 0:
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 4:
+	Variable "TOP-LEVEL:i"	offset = 0	size = 4
+
+
+Layout for memory area "foo!:*DYNAMIC*" of size 0:
 	* empty area *
 
 
-Layout for common /foo!:*STACK*/ of size 0:
+Layout for memory area "foo!:*HEAP*" of size 0:
 	* empty area *
 
 
-Layout for common /foo!:*STATIC*/ of size 0:
+Layout for memory area "foo!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "foo!:*STATIC*" of size 0:
 	* empty area *
 
 End of declarations for module foo!
 
-   extern int i;
-   int i = 2;
+extern int i;
+int i = 2;

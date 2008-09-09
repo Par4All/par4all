@@ -23,8 +23,7 @@ int unstructured02()
             if (1>b)
                goto SKIP;
          }
-         else
-          {
+         else {
             if (1>a2)
                goto SKIP;
             if (1>b)
