@@ -1,0 +1,63 @@
+
+Symbole table
+
+complex02
+
+Declarations for module "complex02" with type "() -> void"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "complex02!:*HEAP*" with type "area" with size 0
+	Declared entity "complex02!:*STATIC*" with type "area" with size 0
+	Declared entity "complex02:*DYNAMIC*" with type "area" with size 48
+	Declared entity "complex02:*STACK*" with type "area" with size 0
+	Declared entity "complex02:*STATIC*" with type "area" with size 0
+	Declared entity "complex02:0`x1" with type "variable" "float _Complex"
+	Declared entity "complex02:0`x2" with type "variable" "float _Complex"
+	Declared entity "complex02:0`x3" with type "variable" "double _Complex"
+	Declared entity "complex02:0`x4" with type "variable" "double _Complex"
+
+* empty extern declaration list *
+
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "complex02!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "complex02!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "complex02:*DYNAMIC*" of size 48:
+	Variable "complex02:0`x1"	offset = 0	size = 8
+	Variable "complex02:0`x2"	offset = 8	size = 8
+	Variable "complex02:0`x3"	offset = 16	size = 16
+	Variable "complex02:0`x4"	offset = 32	size = 16
+
+
+Layout for memory area "complex02:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "complex02:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module complex02
+
+
+parsed printed file
+
+void complex02()
+{
+   float _Complex x1;
+   float _Complex x2;
+   double _Complex x3;
+   double _Complex x4;
+}

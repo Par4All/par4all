@@ -10,9 +10,13 @@ void gl_enable()
    int p;
    if (cap==1) {
    }
+   else {
+      goto break_2;
+   }
 switch_1_case_1:   ;
    p = 0;                                                               /*0009*/
    if (!(p<6)) {                                                               /*0009*/
    }
 break_2:   ;
+break_1:   ;
 }
