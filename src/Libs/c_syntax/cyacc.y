@@ -416,7 +416,7 @@ c_parser_context GetContextCopy()
 %token <string> TK_WSTRINGCON
 
 %token TK_EOF
-%token TK_CHAR TK_INT TK_DOUBLE TK_FLOAT TK_VOID 
+%token TK_CHAR TK_INT TK_DOUBLE TK_FLOAT TK_VOID TK_COMPLEX
 %token TK_ENUM TK_STRUCT TK_TYPEDEF TK_UNION
 %token TK_SIGNED TK_UNSIGNED TK_LONG TK_SHORT
 %token TK_VOLATILE TK_EXTERN TK_STATIC TK_CONST TK_RESTRICT TK_AUTO TK_REGISTER
@@ -1728,6 +1728,27 @@ type_spec:   /* ISO 6.7.2 */
 			      variable v = make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL);	
 			      c_parser_context_type(ycontext) = make_type_variable(v);
 			    }
+			  $$ = NIL;
+			}  
+|   TK_COMPLEX  
+                        {
+			  if (c_parser_context_type(ycontext) == type_undefined)
+			    {
+			      variable v = make_variable(make_basic_complex(DEFAULT_COMPLEX_TYPE_SIZE),NIL,NIL);	
+			      c_parser_context_type(ycontext) = make_type_variable(v);
+			    }
+			  else {
+			    /* Can be qualified by float, double and long double */
+			    type t = c_parser_context_type(ycontext);
+			    variable v = type_variable(t);
+			    basic b = variable_basic(v);
+
+			    pips_assert("prefix is for type variable",type_variable_p(t));
+			    if(basic_float_p(b)) {
+			      basic_tag(b) = is_basic_complex;
+			      basic_complex(b) = 2*basic_complex(b);
+			    }
+			  }
 			  $$ = NIL;
 			}  
 |   TK_LONG

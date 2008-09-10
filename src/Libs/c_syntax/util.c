@@ -1567,6 +1567,12 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
   /************************* INITIAL VALUE PART ****************************************/
   if(value_undefined_p(entity_initial(e))) {
     entity_initial(e) = make_value_unknown();
+    //type t = entity_type(e);
+    //type ut = ultimate_type(t);
+    //if(type_functional(ut) && !typedef_entity_p(e))
+    //  entity_initial(e) = make_value_code(make_code(NIL, strdup(""),make_sequence(NIL),NIL));
+    //else
+    //  entity_initial(e) = make_value_unknown();
   }
 
   /* Be careful if standard arguments are needed: replace the dummy parameters */

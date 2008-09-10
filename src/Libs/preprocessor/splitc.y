@@ -448,7 +448,7 @@ static string new_ellipsis()
 %token <string> TK_WSTRINGCON
 
 %token TK_EOF
-%token TK_CHAR TK_INT TK_DOUBLE TK_FLOAT TK_VOID 
+%token TK_CHAR TK_INT TK_DOUBLE TK_FLOAT TK_VOID TK_COMPLEX
 %token TK_ENUM TK_STRUCT TK_TYPEDEF TK_UNION
 %token TK_SIGNED TK_UNSIGNED TK_LONG TK_SHORT
 %token TK_VOLATILE TK_EXTERN TK_STATIC TK_CONST TK_RESTRICT TK_AUTO TK_REGISTER
@@ -1541,6 +1541,11 @@ type_spec:   /* ISO 6.7.2 */
 |   TK_INT  
                         {
 			  pips_debug(8, "TK_INT->type_spec\n");
+			  $$ = new_signature(splitc_text);
+			}  
+|   TK_COMPLEX
+                        {
+			  pips_debug(8, "TK_COMPLEX->type_spec\n");
 			  $$ = new_signature(splitc_text);
 			}  
 |   TK_LONG

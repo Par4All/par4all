@@ -303,8 +303,23 @@ list words_basic(basic obj)
 	}
       case is_basic_complex:
 	{
-	  pc = CHAIN_SWORD(pc,"COMPLEX*");
-	  pc = CHAIN_IWORD(pc,basic_complex(obj));
+	  if(is_fortran) {
+	    pc = CHAIN_SWORD(pc,"COMPLEX*");
+	    pc = CHAIN_IWORD(pc,basic_complex(obj));
+	  }
+	  else 
+	    {
+	      switch (basic_complex(obj)) {
+		case 8: pc = CHAIN_SWORD(pc,"float _Complex");
+		  break;
+		case 16: pc = CHAIN_SWORD(pc,"double _Complex");
+		  break;
+		case 32: pc = CHAIN_SWORD(pc,"long double _Complex");
+		  break;
+	      default:
+		pips_internal_error("Unexpected complex size");
+		}
+	    }
 	  break;
 	}
       case is_basic_string:

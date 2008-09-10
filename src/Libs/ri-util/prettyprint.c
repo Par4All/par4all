@@ -2589,9 +2589,12 @@ text_block_if(
 	  {
 	    if(!one_liner_true_statement)
 	      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
-	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"else"));
-	    if(!one_liner_false_statement)
-	      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin," {"));
+	    if(one_liner_false_statement) {
+	      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"else"));
+	    }
+	    else {
+	      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"else {"));
+	    }
 	  }
 	MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, 
 				      test_false_obj));

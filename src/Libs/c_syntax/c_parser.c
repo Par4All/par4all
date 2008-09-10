@@ -124,6 +124,7 @@ void init_keyword_typedef_table()
   hash_put(keyword_typedef_table,"if", (char *) TK_IF);
   hash_put(keyword_typedef_table,"inline", (char *) TK_INLINE);
   hash_put(keyword_typedef_table,"int", (char *) TK_INT);
+  hash_put(keyword_typedef_table,"_Complex", (char *) TK_COMPLEX);
   hash_put(keyword_typedef_table,"long", (char *) TK_LONG);
   hash_put(keyword_typedef_table,"register", (char *) TK_REGISTER);
   hash_put(keyword_typedef_table,"restrict", (char *) TK_RESTRICT);
@@ -250,6 +251,7 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
 		     db_get_file_resource(dbr_file,module_name,TRUE), NULL));
     entity built_in_va_list = entity_undefined;
     entity built_in_bool = entity_undefined;
+    entity built_in_complex = entity_undefined;
     entity built_in_va_start = entity_undefined;
     entity built_in_va_end = entity_undefined;
 
@@ -307,6 +309,18 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
 		  make_variable(make_basic_logical(DEFAULT_LOGICAL_TYPE_SIZE),
 				NIL, NIL));
       entity_initial(built_in_bool) = make_value_unknown();
+    }
+    built_in_complex = find_or_create_entity(strdup(concatenate(compilation_unit_name,
+								MODULE_SEP_STRING,
+								TYPEDEF_PREFIX,"_Complex",
+								NULL)));
+    if(storage_undefined_p(entity_storage(built_in_complex))) {
+      entity_storage(built_in_complex) = make_storage_rom();
+      entity_type(built_in_complex) =
+	make_type(is_type_variable,
+		  make_variable(make_basic_complex(DEFAULT_COMPLEX_TYPE_SIZE),
+				NIL, NIL));
+      entity_initial(built_in_complex) = make_value_unknown();
     }
 
     /* Predefined functions(s): __builtin_va_end (va_arg() is parser directly) */
