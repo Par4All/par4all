@@ -3269,7 +3269,9 @@ Polyhedron *DomainSimplify(Polyhedron *Pol1, Polyhedron *Pol2, unsigned NbMaxRay
   Dimension = Pol1->Dimension+2;     /* Homogenous Dimension + Status  */
   d = (Polyhedron *)0;
   for (p1=Pol1; p1; p1=p1->next) { 
-    
+
+    POL_ENSURE_VERTICES(p1);
+
     /* Filter is an array of integers, each bit in an element of Filter */
     /* array corresponds to a constraint. The bit is marked 1 if the    */
     /* corresponding constraint is non-redundant and is 0 if it is      */
@@ -3292,6 +3294,8 @@ Polyhedron *DomainSimplify(Polyhedron *Pol1, Polyhedron *Pol2, unsigned NbMaxRay
     /* Filter the constraints of p1 in context of polyhedra p2(s) */
     empty = 1;
     for (p2=Pol2; p2; p2=p2->next) {
+
+      POL_ENSURE_VERTICES(p2);
       
       /* Store the non-redundant constraints in array 'Filter'. With    */
       /* successive loops, the array 'Filter' holds the union of all    */
