@@ -66,6 +66,18 @@ static gen_array_t intern_upperbounds_array;
 static gen_array_t tasks_names;
 
 static string global_module_name;
+#define BL             " "
+#define TB1            "\t"
+
+static hash_table hash_task_to_effect = hash_table_undefined;
+static hash_table hash_entity_def_to_task = hash_table_undefined;
+static string global_module_name;
+static int global_margin =0;
+
+extern boolean is_fortran;
+
+static boolean motif_in_statement_p=FALSE;
+
 
 /**************************************************************** MISC UTILS */
 
@@ -1856,6 +1868,1426 @@ bool print_xml_code(string module_name)
     safe_fclose(out, filename);
     free(ppt);
   }
+
+  free(dir);
+  free(filename);
+
+  DB_PUT_FILE_RESOURCE(DBR_XML_PRINTED_FILE, module_name, xml);
+
+  reset_current_module_statement();
+  reset_current_module_entity();
+
+  return TRUE;
+}
+
+
+
+//================== PRETTYPRINT TERAOPT DTD ============================
+
+
+
+
+
+
+static string vect_to_string(Pvecteur pv) {
+  return  words_to_string(words_syntax(expression_syntax(make_vecteur_expression(pv))));
+}
+
+
+boolean vect_one_p(Pvecteur v) {
+  return  (!VECTEUR_NUL_P(v) && vect_size(v) == 1 && vect_coeff(TCST, v) ==1); 
+}
+
+boolean vect_zero_p(Pvecteur v) {
+  return  (VECTEUR_NUL_P(v) || 
+	   (!VECTEUR_NUL_P(v) && vect_size(v) == 1 && value_zero_p(vect_coeff(TCST, v)))); 
+  
+}
+
+static void type_and_size_for_array(entity var, char ** datatype, int *size)
+{
+  basic b = variable_basic(type_variable(entity_type(var)));
+  
+  switch (basic_tag(b)) 
+    {
+    case is_basic_int:
+      *datatype = "INTEGER ";
+      *size = basic_int(b);
+      break;
+    case is_basic_float:
+      *datatype = "REAL";
+      *size =basic_float(b);
+      break;
+    case is_basic_logical:
+      *datatype = "BOOLEAN";
+      *size = 1;
+      break;
+    case is_basic_complex: 
+      *datatype = "COMPLEX";
+      *size = basic_complex(b); 
+      break;
+    case is_basic_string: 
+      {
+	value v = basic_string(b);
+	*datatype = "CHARACTER";
+	if (value_constant_p(v) && constant_int_p(value_constant(v)))
+	  *size = constant_int(value_constant(v));
+	else if (value_symbolic_p(v)) {
+	  *size =9999;
+	}
+	break;
+      }
+    default:
+      *datatype = "UNKNOWN";
+      *size = 9999;
+    }
+}
+
+
+static void add_margin(int gm, string_buffer sb_result) {
+  int i; 
+  for (i=1;i<=gm;i++) 
+    string_buffer_append(sb_result,strdup(TB1));
+}
+
+static void string_buffer_append_word(string str, string_buffer sb_result)
+{
+  add_margin(global_margin,sb_result);
+  string_buffer_append(sb_result,
+		       strdup(concatenate(OPENANGLE, 
+					  str, 
+					  CLOSEANGLE, 
+					  NL, NULL)));
+}
+
+static void string_buffer_append_symbolic(string str, string_buffer sb_result){
+  add_margin(global_margin,sb_result);
+  string_buffer_append(sb_result,
+		       strdup(concatenate(OPENANGLE,"Symbolic",CLOSEANGLE, 
+					  str,
+					  OPENANGLE,"/Symbolic",CLOSEANGLE, 
+					  NL, NULL)));
+}
+
+static void string_buffer_append_numeric(string str, string_buffer sb_result){
+  add_margin(global_margin,sb_result);
+  string_buffer_append(sb_result,
+		       strdup(concatenate(OPENANGLE,"Numeric",CLOSEANGLE, 
+					  str,
+					  OPENANGLE,"/Numeric",CLOSEANGLE, 
+					  NL, NULL)));
+}
+
+static void
+find_loops_and_calls_in_box(statement stmp, nest_context_p nest)
+{
+  gen_context_multi_recurse(stmp,nest, loop_domain,push_loop,pop_loop,
+			    statement_domain, push_current_statement,pop_current_statement,
+			    test_domain, push_test, pop_test,
+			    call_domain,call_selection,store_call_context,
+			    NULL);
+}
+
+// A completer
+static void xml_Library(string_buffer sb_result)
+{
+  string_buffer_append_word("Library",sb_result);
+  string_buffer_append_word("/Library",sb_result);
+}
+// A completer
+static void xml_Returns(string_buffer sb_result)
+{
+  //string_buffer_append_word("Returns",sb_result);
+  //string_buffer_append_word("/Returns",sb_result);
+}
+// A completer
+static void xml_Timecosts(string_buffer sb_result)
+{
+  //string_buffer_append_word("Timecosts",sb_result);
+  // string_buffer_append_word("/Timecosts",sb_result);
+}
+
+// A completer
+static void  xml_AccessFunction(string_buffer sb_result)
+{
+  //string_buffer_append_word("AccessFunction",sb_result);
+  //string_buffer_append_word("/AccessFunction",sb_result);
+}
+// A completer
+static void xml_Regions(string_buffer sb_result)
+{
+  // string_buffer_append_word("Regions",sb_result);
+  // string_buffer_append_word("/Regions",sb_result);
+}
+// A completer
+static void xml_CodeSize(string_buffer sb_result)
+{
+  string_buffer_append_word("CodeSize",sb_result);
+  string_buffer_append_word("/CodeSize",sb_result);
+}
+
+
+
+static void  find_pattern(Psysteme ps, Pvecteur paving_indices, Pvecteur formal_parameters, int dim,  Pcontrainte *bound_inf, Pcontrainte *bound_sup, Pcontrainte *pattern_up_bound , Pcontrainte *iterator)
+{
+  Variable phi;
+  Value	v;
+  Pvecteur pi;
+  Pcontrainte c, next, cl, cu, cl_dup, cu_dup,pattern_dup, lind, lind_dup,
+    list_cl=NULL,
+    list_cu=NULL,
+    list_ind=NULL,
+    list_pattern=NULL,
+    pattern = CONTRAINTE_UNDEFINED;
+  int lower =1;
+  int upper =2;
+  int ind =3;
+  Pcontrainte bounds[3][3];
+  int nb_bounds =0;
+  int nb_lower = 0;
+  int nb_upper = 0;
+  int nb_indices=0;
+  int i,j;
+  Pbase vars_to_eliminate = BASE_NULLE;
+  Pvecteur vdiff = VECTEUR_NUL;
+   
+  for (i=1; i<=3;i++)
+    for (j=1; j<=3;j++)
+      bounds[i][j]=CONTRAINTE_UNDEFINED;
+  
+  phi = (Variable) make_phi_entity(dim); 
+ 
+  
+  /* Liste des  variables a eliminer autres de les phi et les indices de boucles englobants 
+     et les parametres formels de la fonction.
+     copie de la base + mise a zero des indices englobants 
+     + projection selon les elem de ce vecteur
+  */
+
+  vars_to_eliminate = vect_copy(ps->base); 
+  vect_erase_var(&vars_to_eliminate, phi);
+
+  for (pi = paving_indices; !VECTEUR_NUL_P(pi); pi = pi->succ)  
+    vect_erase_var(&vars_to_eliminate, var_of(pi));
+
+  for (pi = formal_parameters; !VECTEUR_NUL_P(pi); pi = pi->succ)  
+    vect_erase_var(&vars_to_eliminate, var_of(pi));
+
+  sc_projection_along_variables_ofl_ctrl(&ps,vars_to_eliminate , NO_OFL_CTRL);
+
+  // printf("Systeme a partir duquel on genere les contraintes  du motif:\n");
+  //sc_fprint(stdout,ps,entity_local_name);
+
+  for(c = sc_inegalites(ps), next=(c==NULL ? NULL : c->succ); 
+      c!=NULL; 
+      c=next, next=(c==NULL ? NULL : c->succ))
+    { 
+      Pvecteur indices_in_vecteur = VECTEUR_NUL;
+      vdiff = VECTEUR_NUL;
+      v = vect_coeff(phi, c->vecteur);
+      for (pi = paving_indices; !VECTEUR_NUL_P(pi); pi = pi->succ)
+	{  
+	  int coeff_index = vect_coeff(var_of(pi),c->vecteur);
+	  // CA prendre la valeur absolue de coeff_index
+	  if (coeff_index)
+	    vect_add_elem(&indices_in_vecteur,var_of(pi), coeff_index);
+	}
+      
+      /* on classe toutes les contraintes ayant plus de 2 indices de boucles 
+	 externes ensemble */
+      nb_indices=vect_size(indices_in_vecteur);
+      nb_indices = (nb_indices >2) ? 2 : nb_indices;
+      
+      if (value_pos_p(v)) {
+	c->succ = bounds[upper][nb_indices+1]; 
+	bounds[upper][nb_indices+1] = c;
+       	/* printf(" bornes inf avec indices de boucles englobants :\n");
+	   vect_print(bounds[upper][nb_indices+1]->vecteur, entity_local_name); */
+	nb_upper ++;
+      }
+      else if (value_neg_p(v)) {
+	c->succ = bounds[lower][nb_indices+1]; 
+	bounds[lower][nb_indices+1] = c;
+       	/* printf(" bornes inf avec indices de boucles englobants :\n");
+	   vect_print(bounds[lower][nb_indices+1]->vecteur, entity_local_name);*/
+	lind = contrainte_make(indices_in_vecteur); 
+	lind->succ = bounds[ind][nb_indices+1]; 
+	bounds[ind][nb_indices+1] = lind;
+	/* printf(" indices contenus dans la contrainte :\n");
+	   vect_print(bounds[ind][nb_indices+1]->vecteur, entity_local_name); */
+	nb_lower ++;
+      }
+    }
+  /* printf("Nb borne inf = %d, Nb borne sup = %d ;\n",nb_lower,nb_upper); */
+  
+
+  if  (!CONTRAINTE_UNDEFINED_P(bounds[lower][2])) {
+    /* case with 1 loop index in the loop bound constraints */ 
+    for(cl = bounds[lower][2], lind= bounds[ind][2]; cl !=NULL; cl=cl->succ,lind=lind->succ)  {
+      for(cu = bounds[upper][2]; cu !=NULL; cu =cu->succ) {
+	vdiff = vect_add(cu->vecteur,cl->vecteur);
+	vect_chg_sgn(vdiff);
+	vect_add_elem(&vdiff,TCST,1);
+	pattern = contrainte_make(vect_dup(vdiff));
+	for (pi = formal_parameters; !VECTEUR_NUL_P(pi); pi = pi->succ)  
+	  vect_erase_var(&vdiff, var_of(pi));
+	 
+	if (vect_dimension(vdiff)==0) {
+	  cl_dup = contrainte_dup(cl);
+	  cu_dup = contrainte_dup(cu);
+
+	  for (pi = lind->vecteur; !VECTEUR_NUL_P(pi); pi = pi->succ)  
+	    {
+	      vect_erase_var(&(cl_dup->vecteur), var_of(pi));
+	      vect_erase_var(&(cu_dup->vecteur), var_of(pi));
+	    }
+
+	  vect_erase_var(&(cl_dup->vecteur), phi);
+	  vect_erase_var(&(cu_dup->vecteur), phi);
+	  
+	  cl_dup->succ = list_cl, list_cl=cl_dup;
+
+	  vect_chg_sgn(cu_dup->vecteur);
+	  cu_dup->succ = list_cu, list_cu=cu_dup;
+
+	  lind_dup = contrainte_dup(lind);
+	  lind_dup->succ = list_ind, list_ind = lind_dup;
+	  pattern_dup = pattern;
+	  pattern_dup->succ = list_pattern, list_pattern = pattern_dup;
+	  nb_bounds ++;
+	}
+      }
+    }  
+    *bound_inf= list_cl;
+    *bound_sup = list_cu;
+    *pattern_up_bound = list_pattern;
+    *iterator = list_ind;
+  }
+  else if (!CONTRAINTE_UNDEFINED_P(bounds[lower][1]) 
+	   && !CONTRAINTE_UNDEFINED_P(bounds[upper][1])) {
+    /* case where loop bounds are numeric */
+    *bound_inf= bounds[lower][1];
+    vect_erase_var(&(bounds[lower][1]->vecteur), phi);
+    *bound_sup = bounds[upper][1];
+    vect_erase_var(&(bounds[upper][1]->vecteur), phi);
+    vect_chg_sgn(bounds[upper][1]->vecteur);
+
+    for (pi = bounds[ind][1]->vecteur; !VECTEUR_NUL_P(pi); pi = pi->succ)  
+      {
+	vect_erase_var(&(bounds[lower][1]->vecteur), var_of(pi));
+	vect_erase_var(&(bounds[upper][1]->vecteur), var_of(pi));
+      }
+    vdiff = vect_substract(bounds[upper][1]->vecteur,bounds[lower][1]->vecteur);
+   
+    vect_add_elem(&vdiff,TCST,1);
+    *pattern_up_bound = contrainte_make(vdiff);
+    *iterator =  bounds[ind][1];
+  } 
+  else {
+    /* Only bounds with several loop indices */ 
+    /* printf("PB - Only bounds with several loop indices\n"); */ 
+    *bound_inf= CONTRAINTE_UNDEFINED;
+    *bound_sup = CONTRAINTE_UNDEFINED;
+    *iterator = CONTRAINTE_UNDEFINED; 
+  } 
+}
+
+static void xml_Pattern_Paving(entity var, Pvecteur formal_parameters, list pattern_region, Pvecteur paving_indices, string_buffer sb_result)
+{ 
+
+  // int taskNumber =0;
+  list lr; 
+  string_buffer buffer_pattern = string_buffer_make();
+  string_buffer buffer_paving = string_buffer_make();
+  string string_paving = "";
+  string string_pattern =  "";
+
+  Pvecteur voffset, vpattern_up_bound;
+  // pour chacune des variables
+  // rechercher la region
+  // pour chaque dimension : generer en meme temps le pattern et le pavage
+  for ( lr = pattern_region; !ENDP(lr); lr = CDR(lr))
+    {
+      region reg = REGION(CAR(lr));
+      reference ref = region_reference(reg);  
+      entity vreg = reference_variable(ref);
+      if (array_reference_p(ref) && same_entity_p(vreg,var)) {
+	Psysteme ps_reg = sc_dup(region_system(reg));
+	Pvecteur iterat= VECTEUR_NUL;
+	Pcontrainte bound_inf = CONTRAINTE_UNDEFINED;
+	Pcontrainte bound_up = CONTRAINTE_UNDEFINED;
+	Pcontrainte pattern_up_bound = CONTRAINTE_UNDEFINED;
+	Pcontrainte iterator = CONTRAINTE_UNDEFINED;
+	int dim = gen_length(variable_dimensions(type_variable(entity_type(var))));
+	int i ;
+	int val =0;
+	int inc =0;
+
+	string_buffer_append_word("Pattern",buffer_pattern);
+	string_buffer_append_word("Pavage",buffer_paving);
+	
+	global_margin++;
+	for(i=1; i<=dim; i++)
+	  { 
+	    Psysteme ps = sc_dup(ps_reg); 
+	    sc_transform_eg_in_ineg(ps);
+
+	    find_pattern(ps, paving_indices, formal_parameters, i, &bound_inf, &bound_up, &pattern_up_bound, &iterator);
+
+	    if (!CONTRAINTE_UNDEFINED_P(bound_inf) &&   !VECTEUR_NUL_P(bound_inf->vecteur))
+	      voffset = bound_inf->vecteur;
+	    else
+	      voffset = vect_new(TCST,0);
+
+	    if (!CONTRAINTE_UNDEFINED_P(pattern_up_bound) &&   !VECTEUR_NUL_P(pattern_up_bound->vecteur))
+	      vpattern_up_bound = pattern_up_bound->vecteur;
+	    else  { // if we cannot deduce pattern length form region, array dim size is taken
+	      list ldim = variable_dimensions(type_variable(entity_type(vreg)));
+	      dimension vreg_dim = find_ith_dimension(ldim,i);
+	      normalized ndim = NORMALIZE_EXPRESSION(dimension_upper(vreg_dim));
+	      vpattern_up_bound = vect_dup((Pvecteur) normalized_linear(ndim));
+	    }
+	    
+	    /* PRINT PATTERN and PAVING */
+	    if ( vect_zero_p(voffset)  && vect_one_p(vpattern_up_bound))
+	      string_buffer_append_word("DimUnitPattern/",buffer_pattern);
+	    else {
+	      add_margin(global_margin,buffer_pattern);
+	      // A completer - choisir un indice pour le motif ?
+	      string_buffer_append(buffer_pattern,
+				   strdup(concatenate(OPENANGLE, 
+						      "DimPattern Index=",
+						      QUOTE,QUOTE,CLOSEANGLE,NL,NULL)));
+
+	      global_margin++;
+
+	      string_buffer_append_word("Offset",buffer_pattern);
+	      string_buffer_append_symbolic(vect_to_string(voffset),
+					    buffer_pattern);   
+	      if (vect_dimension(voffset)==0) 
+		string_buffer_append_numeric(vect_to_string(voffset),
+					     buffer_pattern);
+	      string_buffer_append_word("/Offset",buffer_pattern);
+
+	      string_buffer_append_word("Length",buffer_pattern);
+	      string_buffer_append_symbolic(vect_to_string(vpattern_up_bound),
+					    buffer_pattern);   
+	      if (vect_dimension(vpattern_up_bound)==0) 
+		string_buffer_append_numeric(vect_to_string(vpattern_up_bound),
+					     buffer_pattern); 
+	      string_buffer_append_word("/Length",buffer_pattern);
+
+	      string_buffer_append_word("Stride",buffer_pattern);
+	      val =1;
+	      string_buffer_append_symbolic(i2a(val),buffer_pattern);
+	      string_buffer_append_numeric(i2a(val),buffer_pattern);	 
+	      string_buffer_append_word("/Stride",buffer_pattern);
+	      global_margin--;
+	      string_buffer_append_word("/DimPattern",buffer_pattern);
+	    }
+	    if (!CONTRAINTE_UNDEFINED_P(iterator) &&!CONTRAINTE_NULLE_P(iterator)) {
+	      string_buffer_append_word("DimPavage",buffer_paving);
+	      
+	      for (iterat = paving_indices; !VECTEUR_NUL_P(iterat); iterat = iterat->succ)
+		{
+		  if ((inc = vect_coeff(var_of(iterat),iterator->vecteur)) !=0) {
+		    add_margin(global_margin,buffer_paving);
+		    string_buffer_append(buffer_paving,
+					 strdup(concatenate(OPENANGLE, 
+							    "RefLoopIndex Name=",
+							    QUOTE,entity_user_name(var_of(iterat)),QUOTE, BL, 
+							    "Inc=", QUOTE,
+							    i2a(inc),QUOTE,"/", CLOSEANGLE,NL,NULL)));
+		  }
+		}
+	      string_buffer_append_word("/DimPavage",buffer_paving);
+	    }
+	    else 
+	      string_buffer_append_word("DimPavage/",buffer_paving);	
+	    
+	  }
+	global_margin--;
+	string_buffer_append_word("/Pattern",buffer_pattern);
+	string_buffer_append_word("/Pavage",buffer_paving);
+	string_pattern = string_buffer_to_string(buffer_pattern);
+	string_paving = string_buffer_to_string(buffer_paving);
+	string_buffer_append(sb_result, string_pattern);
+	string_buffer_append(sb_result, string_paving);
+	xml_AccessFunction(sb_result);
+	
+      }
+    }  
+}
+static void xml_TaskParameters(entity module, list pattern_region, Pvecteur paving_indices, string_buffer sb_result)
+{
+ 
+  int ith;
+  int FormalParameterNumber = gen_length(module_formal_parameters(module));
+  Pvecteur formal_parameters = VECTEUR_NUL;
+
+  string_buffer_append_word("TaskParameters",sb_result);
+  global_margin++;
+  
+  for (ith=1;ith<=FormalParameterNumber;ith++) {
+ 
+    entity FormalArrayName = find_ith_formal_parameter(module,ith);
+    boolean effet_read = TRUE;
+    list lr;
+    boolean tp = FALSE;
+  
+    // Creation liste des parametres formels
+    vect_add_elem (&formal_parameters,(Variable) FormalArrayName,VALUE_ONE);
+
+    for ( lr = pattern_region; !ENDP(lr); lr = CDR(lr))
+      { 
+	region reg = REGION(CAR(lr));
+	reference ref = region_reference(reg);  
+	entity v = reference_variable(ref);
+	if (same_entity_p(v,FormalArrayName)) {
+	  effet_read = (region_read_p(reg))? TRUE: FALSE;
+	  add_margin(global_margin,sb_result);
+	  string_buffer_append(sb_result,
+			       strdup(concatenate(OPENANGLE, 
+						  "TaskParameter Name=",
+						  QUOTE,entity_user_name(FormalArrayName),QUOTE, BL, 
+						  "Type=", QUOTE,"DATA",QUOTE,BL,
+						  "AccessMode=", QUOTE, (effet_read)? "USE":"DEF",QUOTE,BL,
+						  "Kind=", QUOTE, "VARIABLE",QUOTE,
+						  CLOSEANGLE
+						  NL, NULL))); 
+	  tp = TRUE;
+	}
+      }
+     
+    global_margin++;
+    xml_Pattern_Paving(FormalArrayName, formal_parameters, 
+		       pattern_region,paving_indices, 
+		       sb_result);
+ 
+    global_margin--;
+    if (tp)
+      string_buffer_append_word("/TaskParameter",sb_result);
+  }
+  global_margin--;
+  string_buffer_append_word("/TaskParameters",sb_result);
+}
+
+
+
+static void xml_Bounds(expression elow, expression eup,string_buffer sb_result)
+{
+  int low,up;
+  string_buffer_append_word("LowerBound",sb_result);
+  global_margin++;
+  string_buffer_append_symbolic(words_to_string(words_syntax(expression_syntax(elow))),
+				sb_result);     
+  if (expression_integer_value(elow, &low))  
+    string_buffer_append_numeric(i2a(low),sb_result);
+  global_margin--;
+  string_buffer_append_word("/LowerBound",sb_result);
+    
+  /* Print XML Array UPPER BOUND */
+  string_buffer_append_word("UpperBound",sb_result);
+  global_margin++;
+  string_buffer_append_symbolic(words_to_string(words_syntax(expression_syntax(eup))),
+				sb_result);     
+  if (expression_integer_value(eup, &up))  
+    string_buffer_append_numeric(i2a(up),sb_result);
+  global_margin--;
+  string_buffer_append_word("/UpperBound",sb_result);
+     
+}
+static void xml_Bounds_and_Stride(expression elow, expression eup, expression stride, 
+				  string_buffer sb_result)
+{
+  int inc;
+ 
+  xml_Bounds(elow, eup,sb_result);
+  string_buffer_append_word("Stride",sb_result);
+  global_margin++;
+  string_buffer_append_symbolic(words_to_string(words_syntax(expression_syntax(stride))),
+				sb_result);     
+  if (expression_integer_value(stride, &inc))  
+    string_buffer_append_numeric(i2a(inc),sb_result);
+  global_margin--;
+  string_buffer_append_word("/Stride",sb_result);
+    
+}
+
+static void xml_Array(entity var,string_buffer sb_result)
+{
+  string datatype;
+  list ld, ldim = variable_dimensions(type_variable(entity_type(var)));
+  int i,j, size =0;
+  int nb_dim = gen_length(ldim);
+  char* layout_up[nb_dim];    
+  char *layout_low[nb_dim];
+  int no_dim=0;
+    
+  add_margin(global_margin,sb_result);
+  string_buffer_append(sb_result,
+		       strdup(concatenate(OPENANGLE, 
+					  "Array Name=",
+					  QUOTE,entity_user_name(var),QUOTE, BL, 
+					  "Type=", QUOTE,"DATA",QUOTE,BL,
+					  "Allocation=", QUOTE,
+					  (heap_area_p(var) || stack_area_p(var)) ? 
+					  "DYNAMIC": "STATIC",
+					  QUOTE,BL,
+					  "Kind=", QUOTE, "VARIABLE",QUOTE,
+					  CLOSEANGLE
+					  NL, NULL)));
+
+  /* Print XML Array DATA TYPE and DATA SIZE */
+  type_and_size_for_array(var, &datatype,&size); 
+  add_margin(global_margin,sb_result);
+  string_buffer_append(sb_result,
+		       strdup(concatenate(OPENANGLE,
+					  "DataType Type=",QUOTE,datatype,QUOTE, BL,
+					  "Size=",QUOTE, i2a(size), QUOTE, "/"
+					  CLOSEANGLE, 
+					  NL,NULL)));
+  /* Print XML Array DIMENSION */ 
+  
+  if(gen_length(ldim) >0) {
+    string_buffer_append_word("Dimensions",sb_result);
+   
+    for (ld = ldim ; !ENDP(ld); ld = CDR(ld)) {
+      expression elow = dimension_lower(DIMENSION(CAR(ld)));
+      expression eup = dimension_upper(DIMENSION(CAR(ld)));
+      global_margin++;
+      add_margin(global_margin,sb_result);
+      string_buffer_append(sb_result,
+			   strdup(concatenate(OPENANGLE, 
+					      "Dimension", 
+					      CLOSEANGLE, 
+					      NL, NULL)));
+      /* Print XML Array Bound */
+      global_margin++;
+      xml_Bounds(elow,eup,sb_result);
+      global_margin--;
+      add_margin(global_margin,sb_result);
+      string_buffer_append(sb_result,
+			   strdup(concatenate(OPENANGLE, 
+					      "/Dimension", 
+					      CLOSEANGLE, 
+					      NL, NULL)));
+      global_margin--;
+      layout_low[no_dim] = words_to_string(words_syntax(expression_syntax(elow)));
+      layout_up[no_dim] = words_to_string(words_syntax(expression_syntax(eup)));
+      no_dim++;
+    }
+  }   
+ 
+  string_buffer_append_word("/Dimensions",sb_result);
+
+  /* Print XML Array LAYOUT */
+  string_buffer_append_word("Layout",sb_result);
+  global_margin++;
+  for (i =0; i<= no_dim-1; i++) {
+    string_buffer_append_word("DimLayout",sb_result); 
+    global_margin++;
+    string_buffer_append_word("Symbolic",sb_result);
+    if (i==no_dim-1) {
+      add_margin(global_margin,sb_result);
+      string_buffer_append(sb_result,strdup(concatenate("1",NL,NULL)));
+    }
+    else { 
+      add_margin(global_margin,sb_result);
+      for (j=no_dim-1; j>=i+1; j--)
+	{ 
+	  if (strcmp(layout_low[j],"0")==0) 
+	    string_buffer_append(sb_result,
+				 strdup(concatenate("(",layout_up[j],"+1)",NULL))); 
+	  else
+	    string_buffer_append(sb_result,
+				 strdup(concatenate("(",layout_up[j],"-",
+						    layout_low[j],"+1)",NULL)));   
+	  if (j==i+1)
+	    string_buffer_append(sb_result,strdup(NL));
+	}
+    }
+    string_buffer_append_word("/Symbolic",sb_result);
+    global_margin--;
+    string_buffer_append_word("/DimLayout",sb_result); 
+  }
+  global_margin--;
+  string_buffer_append_word("/Layout",sb_result);
+  string_buffer_append_word("/Array",sb_result);
+}
+
+
+static void xml_LocalArrays(entity module, string_buffer sb_result)
+{
+ list ldecl;
+ int nb_dim=0;
+
+  ldecl = code_declarations(value_code(entity_initial(module)));
+  if(gen_length(ldecl) >0) {
+   
+    string_buffer_append_word("LocalArrays",sb_result);
+    
+    global_margin++;
+    
+    MAP(ENTITY,var, {
+      if (type_variable_p(entity_type(var)) 
+	  && ((nb_dim = variable_entity_dimension(var))>0)
+	  &&  !(storage_formal_p(entity_storage(var)))) {
+	xml_Array(var,sb_result);
+      }
+    },ldecl);
+
+    global_margin--;
+    string_buffer_append_word("/LocalArrays",sb_result);
+ 
+  }
+  else  
+    string_buffer_append_word("LocalArrays/",sb_result);
+}
+
+// A completer
+// Ne faire qu'une fonction avec la precedente
+static void xml_FormalArrays(entity module, string_buffer sb_result)
+{
+  list ldecl;
+  int nb_dim=0;
+
+  ldecl = code_declarations(value_code(entity_initial(module)));
+  if(gen_length(ldecl) >0) {
+   
+    string_buffer_append_word("FormalArrays",sb_result);
+    global_margin++;
+ 
+    MAP(ENTITY,var, {
+      if (type_variable_p(entity_type(var)) 
+	  && ((nb_dim = variable_entity_dimension(var))>0) 
+	  &&  storage_formal_p(entity_storage(var))) {
+	xml_Array(var,sb_result);
+      }
+    },ldecl);
+
+    global_margin--;
+    string_buffer_append_word("/FormalArrays",sb_result);
+  } 
+  else string_buffer_append_word("FormalArrays/",sb_result);
+}
+
+
+static void motif_in_statement(statement s)
+{
+  string comm = statement_comments(s);
+  if (!string_undefined_p(comm) && strstr(comm,"MOTIF")!=NULL)
+    motif_in_statement_p= TRUE;
+}
+
+
+static void xml_Loop(statement s, string_buffer sb_result)
+{
+  loop l = instruction_loop(statement_instruction(s));
+  expression el =range_lower(loop_range(l));
+  expression eu =range_upper(loop_range(l));
+  expression stride = range_increment(loop_range(l)); 
+  entity index =loop_index(l);
+  add_margin(global_margin,sb_result);
+  string_buffer_append(sb_result,
+		       strdup(concatenate(OPENANGLE,
+					  "Loop Index=",QUOTE,
+					  entity_user_name(index),QUOTE, BL,
+					  "ExecutionMode=",QUOTE,
+					  (execution_parallel_p(loop_execution(l)))? "PARALLEL":"SEQUENTIAL", 
+					  QUOTE, 
+					  CLOSEANGLE,NL,NULL)));
+  xml_Bounds_and_Stride(el,eu,stride,sb_result);
+  string_buffer_append_word("/Loop",sb_result);
+}
+
+// if comment MOTIF is on the loop, the pattern_region is the loop region 
+// if comment MOTIF is on a statement inside the sequence of the loop body
+// the cumulated region of the loop body is taken 
+// if comment MOTIF is outside the loop nest, the pattern_region is the call region
+static void xml_Loops(stack st,boolean call_external_loop_p, list *pattern_region, Pvecteur *paving_indices, Pvecteur *pattern_indices, boolean motif_in_te_p, string_buffer sb_result)
+{
+  boolean in_motif_p=FALSE;
+  boolean motif_on_loop_p=FALSE;
+  // Boucles externes a la TE
+  if (call_external_loop_p)
+    string_buffer_append_word("ExternalLoops",sb_result); 
+  else 
+    // Boucles externes au motif
+    string_buffer_append_word("Loops",sb_result); 
+
+  global_margin++;
+ 
+  STACK_MAP_X(s, statement,
+  {
+    loop l = instruction_loop(statement_instruction(s));
+    string comm = statement_comments(s);
+    entity index =loop_index(l);
+
+    if (!call_external_loop_p && !in_motif_p) {
+      // Test : Motif is in the loop body  or not 
+      motif_in_statement_p=FALSE;
+      gen_recurse(loop_body(l), statement_domain, gen_true,motif_in_statement); 
+      
+      // comment MOTIF  is on the Loop
+      motif_on_loop_p = !string_undefined_p(comm) && strstr(comm,"MOTIF")!=NULL;
+      if (motif_on_loop_p) {
+	  *pattern_region = regions_dup(load_statement_local_regions(s)); 
+	  vect_add_elem (pattern_indices,(Variable) index ,VALUE_ONE);
+	}
+      else if (motif_in_statement_p) {
+	  // cumulated regions on the sequence of the loop body instructions are needed
+	  *pattern_region = regions_dup(load_statement_local_regions(loop_body(l))); 
+	}
+      
+      in_motif_p = in_motif_p || motif_on_loop_p || 
+	           (motif_in_te_p && !motif_on_loop_p && !motif_in_statement_p);
+    }
+    if (!in_motif_p) {
+      vect_add_elem (paving_indices,(Variable) index ,VALUE_ONE);
+      xml_Loop(s, sb_result);
+    }
+  },
+	      st, 0);
+  
+  global_margin--;
+  if (call_external_loop_p)
+    string_buffer_append_word("/ExternalLoops",sb_result); 
+  else 
+    string_buffer_append_word("/Loops",sb_result); 
+  
+}
+
+static void  xml_Task(string callee_name, string_buffer sb_result)
+{
+  nest_context_t task_loopnest;
+  task_loopnest.loops_for_call = stack_make(statement_domain,0,0);
+  task_loopnest.loop_indices = stack_make(entity_domain,0,0);
+  task_loopnest.current_stat = stack_make(statement_domain,0,0);
+  task_loopnest.nested_loops=  gen_array_make(0);
+  task_loopnest.nested_loop_indices =  gen_array_make(0);
+  task_loopnest.nested_call=  gen_array_make(0); 
+  stack nested_loops;
+  list pattern_region =NIL; 
+  Pvecteur paving_indices = VECTEUR_NUL;
+  Pvecteur pattern_indices = VECTEUR_NUL;
+  boolean motif_in_te_p = FALSE;
+  entity callee = local_name_to_top_level_entity(callee_name);
+  //  string xml_callee = db_build_file_resource_name(DBR_XML_PRINTED_FILE, 
+  //						  callee_name, XMLPRETTY);
+  statement stat_callee=(statement) db_get_memory_resource(DBR_CODE, 
+							   callee_name, TRUE);
+  reset_rw_effects();
+  set_rw_effects
+    ((statement_effects)
+     db_get_memory_resource(DBR_REGIONS, callee_name, TRUE));
+
+  push_current_module_statement(stat_callee);
+ 
+  /* Get the READ and WRITE regions of the module */
+ 
+  global_margin++;
+  add_margin(global_margin,sb_result);
+  string_buffer_append(sb_result,
+		       strdup(concatenate(OPENANGLE, 
+					  "Task Name=",QUOTE, 
+					  callee_name,QUOTE,CLOSEANGLE, 
+					  NL, NULL)));
+  global_margin++;
+
+  find_loops_and_calls_in_box(stat_callee,&task_loopnest);
+
+  xml_Library(sb_result);
+  xml_Returns(sb_result);
+  xml_Timecosts(sb_result);
+  xml_LocalArrays(callee, sb_result);
+  xml_FormalArrays(callee,sb_result);
+  /* A completer 
+     On ne traite qu'une TE : un seul nid de boucles */
+  nested_loops = gen_array_item(task_loopnest.nested_loops,0); 
+
+  pattern_region = regions_dup(load_statement_local_regions(stat_callee));
+  gen_recurse(stat_callee, statement_domain, gen_true,motif_in_statement); 
+  motif_in_te_p = motif_in_statement_p;
+  xml_Loops(nested_loops,FALSE,&pattern_region,&paving_indices, &pattern_indices, motif_in_te_p, sb_result);
+
+  xml_TaskParameters(callee,pattern_region,paving_indices,sb_result);
+  xml_Regions(sb_result);
+  xml_CodeSize(sb_result);
+  
+  global_margin--;
+  string_buffer_append_word("/Task",sb_result);
+  global_margin--;
+   
+  pop_current_module_statement();
+  //  reset_current_module_entity();   
+  gen_array_free(task_loopnest.nested_loops);
+  gen_array_free(task_loopnest.nested_loop_indices);
+  gen_array_free(task_loopnest.nested_call);
+  stack_free(&(task_loopnest.loops_for_call));
+  stack_free(&(task_loopnest.loop_indices));
+  stack_free(&(task_loopnest.current_stat));
+
+}
+
+
+static void xml_ActualArrays(entity module, string_buffer sb_result)
+{ 
+  int nb_dim =0;
+  list ldecl;
+
+  ldecl = code_declarations(value_code(entity_initial(module)));
+
+  global_margin++;
+  string_buffer_append_word("ActualArrays",sb_result);
+  if(gen_length(ldecl) >0) {
+    global_margin++;
+ 
+    MAP(ENTITY,var, {
+      if (type_variable_p(entity_type(var)) 
+	  && (nb_dim = variable_entity_dimension(var))>0) {
+	xml_Array(var,sb_result);
+      }
+    },ldecl);
+    global_margin--;
+  }
+  string_buffer_append_word("/ActualArrays",sb_result); 
+  global_margin--;
+}
+
+static void  xml_LocalArrays_for_Box(string_buffer sb_result)
+{ 
+  string_buffer_append_word("LocalArrays/",sb_result); 
+  
+}
+static void  xml_FormalArrays_for_Box(string_buffer sb_result)
+{
+  string_buffer_append_word("FormalArrays/",sb_result); 
+}
+  
+
+void matrix_init(Pmatrix mat, int n, int m)
+{
+  int i,j;
+  for (i=1;i<=n;i++) {
+    for (j=1;j<=m;j++) {
+      MATRIX_ELEM(mat,i,j)=0;
+    }
+  }
+}
+
+static void xml_Matrix(Pmatrix mat, int n, int m, string_buffer sb_result)
+{
+  string srow, scolumn;
+  int i,j; 
+  // cas des nids de boucles vides
+  if (n==0 && m!=0) m=0;
+  if (m==0 && n!=0) n=0;
+  srow =strdup(itoa(n));
+  scolumn=strdup(itoa(m));
+
+  add_margin(global_margin,sb_result);
+  string_buffer_append(sb_result,
+		       strdup(concatenate(OPENANGLE, 
+					  "Matrix NbRows=", 
+					  QUOTE,srow,QUOTE,BL,
+					  "NbColumns=", QUOTE, scolumn,QUOTE,
+					  BL,CLOSEANGLE,NL, NULL)));
+  for (i=1;i<=n;i++) {
+    add_margin(global_margin,sb_result);
+    string_buffer_append(sb_result,
+			 strdup(concatenate(OPENANGLE, 
+					    "Row", CLOSEANGLE,BL, NULL)));
+    for (j=1;j<=m;j++) {
+      string_buffer_append(sb_result,
+			     strdup(concatenate(OPENANGLE,"c", CLOSEANGLE,
+						itoa(MATRIX_ELEM(mat,i,j)),
+						OPENANGLE, "/c", CLOSEANGLE,
+						BL, NULL)));
+    } 
+    string_buffer_append(sb_result,
+			 strdup(concatenate(OPENANGLE, 
+					    "/Row", CLOSEANGLE, NL, NULL)));
+  }
+  string_buffer_append_word("/Matrix",sb_result);
+}
+
+
+// A completer 
+// ne traite que les cas ou tout est correctement aligne
+// A traiter aussi le cas  ActualArrayDim = NIL
+// 
+static void xml_Connection(list  ActualArrayInd,int ActualArrayDim, int FormalArrayDim, string_buffer sb_result)
+{
+  Pmatrix mat; 
+  int i,j;
+  Pvecteur pv;
+  string_buffer_append_word("Connection",sb_result); 
+  mat = matrix_new(ActualArrayDim,FormalArrayDim);
+
+  if (is_fortran) {
+    for (i=1;i<=ActualArrayDim && i<= FormalArrayDim;i++)
+      MATRIX_ELEM(mat,i,i)=1;
+  }
+  else 
+    for (i=ActualArrayDim, j=FormalArrayDim;i>=1 && j>=1;i=i-1,j=j-1) 
+      MATRIX_ELEM(mat,i,j)=1;
+    
+  // Normalise les expressions lors du premier parcours
+  // Utile aussi a  xml_LoopOffset
+  MAP(EXPRESSION, e , { 
+    if (expression_normalized(e) == normalized_undefined)
+      expression_normalized(e)= NormalizeExpression(e); 
+      
+    pv = (Pvecteur)normalized_linear(expression_normalized(e));
+  },
+      ActualArrayInd);
+    
+  xml_Matrix(mat,ActualArrayDim,FormalArrayDim,sb_result);
+  string_buffer_append_word("/Connection",sb_result);
+}
+
+static void xml_LoopOffset(list  ActualArrayInd,int ActualArrayDim, Pvecteur loop_indices,string_buffer sb_result)
+{
+  Pmatrix mat; 
+  Pvecteur loop_indices2 = vect_reversal(loop_indices);
+  int nestloop_dim = vect_size(loop_indices2);
+  Pvecteur pv, pv2;
+  int i,j;
+
+  string_buffer_append_word("LoopOffset",sb_result); 
+  mat = matrix_new(ActualArrayDim,nestloop_dim);
+  i=1;
+  MAP(EXPRESSION, e , { 
+    pv = (Pvecteur)normalized_linear(expression_normalized(e));
+    for (pv2 = loop_indices2, j=1; !VECTEUR_NUL_P(pv2);pv2=pv2->succ,j++) 
+      MATRIX_ELEM(mat,i,j)=vect_coeff(pv2->var,pv);
+    i++;
+  },
+      ActualArrayInd);
+ 
+  xml_Matrix(mat,ActualArrayDim,nestloop_dim,sb_result);
+  string_buffer_append_word("/LoopOffset",sb_result);
+}
+
+// A completer
+// Ici, la constante vaut 0
+static void xml_ConstOffset(int ActualArrayDim, string_buffer sb_result)
+{ 
+  Pmatrix mat; 
+  string_buffer_append_word("ConstOffset",sb_result); 
+  mat = matrix_new(ActualArrayDim,1);
+  xml_Matrix(mat,ActualArrayDim,1,sb_result);
+  string_buffer_append_word("/ConstOffset",sb_result);
+}
+
+int find_rw_effect_for_entity(list leff, effect *eff, entity e)
+{
+  // return effet_rwb = 1 for Read, 2 for Write, 3 for Read+Write
+  int effet_rwb=0;
+  list lr = NIL;
+
+  for ( lr = leff; !ENDP(lr); lr = CDR(lr)) {
+    *eff= EFFECT(CAR(lr));
+    reference ref = effect_reference(*eff);  
+    entity v = reference_variable(ref);
+    if (same_entity_p(v,e)) {
+      if (action_read_p(effect_action(*eff))) effet_rwb ++ ;
+      if (action_write_p(effect_action(*eff))) effet_rwb +=2;
+    }
+  }
+  return (effet_rwb); 
+}
+
+
+static void  xml_Arguments(statement s, entity function, Pvecteur loop_indices, string_buffer sb_result )
+{
+  call c = instruction_call(statement_instruction(s));
+  list call_effect =load_proper_rw_effects_list(s);
+  entity FormalArrayName, ActualArrayName;
+  reference ActualRef;
+  effect ef = effect_undefined; 
+  int iexp,ith=0;
+  int rw_ef=0;
+
+  string_buffer_append_word("Arguments",sb_result);
+  global_margin++;
+  
+  MAP(EXPRESSION,exp,{  
+    ith ++; 
+    FormalArrayName = find_ith_formal_parameter(call_function(c),ith);
+    ActualRef = syntax_reference(expression_syntax(exp));
+    ActualArrayName = reference_variable(ActualRef);
+    rw_ef = find_rw_effect_for_entity(call_effect,&ef, ActualArrayName);
+
+    string_buffer_append_word("Argument",sb_result);
+    if (!array_argument_p(exp)) { /* Scalar Argument */
+      global_margin++;
+      add_margin(global_margin,sb_result);
+      string_buffer_append(sb_result,
+			   strdup(concatenate(OPENANGLE, 
+					      "ScalarArgument ActualName=", 
+					      QUOTE,
+					      entity_local_name(ActualArrayName),
+					      QUOTE,BL,
+					      "FormalName=", QUOTE,entity_local_name(FormalArrayName), QUOTE,BL,
+					      "AccessMode=",QUOTE,(rw_ef==2)? "DEF":"USE", QUOTE,CLOSEANGLE,
+					      NL, NULL)));         
+      if (expression_integer_value(exp, &iexp))  
+	string_buffer_append_numeric(i2a(iexp),sb_result);
+      string_buffer_append_word("/ScalarArgument",sb_result);    
+      global_margin--;
+    }
+    else { /* Array Argument */
+      int ActualArrayDim = variable_entity_dimension(ActualArrayName);
+      char *  SActualArrayDim = strdup(itoa(ActualArrayDim));
+      int FormalArrayDim = variable_entity_dimension(FormalArrayName);
+      list ActualArrayInd = reference_indices(ActualRef);
+      global_margin++;
+      add_margin(global_margin,sb_result);
+      string_buffer_append(sb_result,
+			   strdup(concatenate(OPENANGLE, 
+					      "ArrayArgument ActualName=", 
+					      QUOTE,
+					      entity_local_name(ActualArrayName),QUOTE,BL,
+					      "ActualDim=", QUOTE,SActualArrayDim,QUOTE,BL,
+					      "FormalName=", QUOTE,entity_local_name(FormalArrayName), QUOTE,BL,
+					      "FormalDim=", QUOTE,itoa(FormalArrayDim),QUOTE,BL,
+					      "AccessMode=",QUOTE,(rw_ef==1)? "USE":"DEF",QUOTE,CLOSEANGLE,
+					      NL, NULL)));
+      /* Save information to generate Task Graph */
+      hash_put(hash_task_to_effect,(char *)function, (char *) call_effect); 
+      if (rw_ef!=1)
+	hash_put(hash_entity_def_to_task, (char *)ActualArrayName,(char *)function); 
+      free(SActualArrayDim);
+      
+      xml_Connection(ActualArrayInd,ActualArrayDim,FormalArrayDim,sb_result);
+      xml_LoopOffset(ActualArrayInd,ActualArrayDim, loop_indices,sb_result);
+      xml_ConstOffset(ActualArrayDim,sb_result);
+      global_margin--;
+      string_buffer_append_word("/ArrayArgument",sb_result);    
+    }  
+    string_buffer_append_word("/Argument",sb_result);
+  },call_arguments(c)) ;
+  global_margin--;
+  string_buffer_append_word("/Arguments",sb_result);
+}
+
+
+// A completer
+static void   xml_Dependances()
+{
+  // Not implemented Yet
+}
+
+static void xml_Call( int taskNumber, nest_context_p nest, string_buffer sb_result)
+{
+  statement s = gen_array_item(nest->nested_call,taskNumber);
+  stack st = gen_array_item(nest->nested_loops,taskNumber); 
+  //  stack sindices = gen_array_item(nest->nested_loop_indices,taskNumber); 
+  call c = instruction_call(statement_instruction(s));
+  entity func= call_function(c);
+  list pattern_region=NIL;
+  Pvecteur paving_indices = VECTEUR_NUL;
+  Pvecteur pattern_indices = VECTEUR_NUL;
+ 
+  add_margin(global_margin,sb_result);
+  string_buffer_append(sb_result,
+		       strdup(concatenate(OPENANGLE, 
+					  "Call Name=", 
+					  QUOTE,
+					  entity_local_name(func), 
+					  QUOTE,
+					  CLOSEANGLE,NL, NULL)));
+  global_margin++;
+  xml_Loops(st,TRUE,&pattern_region,&paving_indices, &pattern_indices, FALSE, sb_result);
+  xml_Arguments(s,func,paving_indices, sb_result);
+  xml_Dependances();
+  global_margin--;
+  string_buffer_append_word("/Call",sb_result);
+}
+
+static void xml_BoxGraph(entity module,  string_buffer sb_result,string_buffer sb_ac)
+{
+  string_buffer appli_needs = string_buffer_make();
+  string string_needs = "";
+  string string_appli_needs = "";
+  list pc, effects_list;
+  int nb_call,nc;
+  
+  add_margin(global_margin,sb_result);
+  string_buffer_append(sb_result,
+		       strdup(concatenate(OPENANGLE, 
+					  "BoxGraph Name=", 
+					  QUOTE,"Box_",
+					  entity_user_name(module), 
+					  QUOTE,
+					  CLOSEANGLE,NL, NULL)));
+
+  nb_call = gen_length(entity_to_callees(module));
+  nc = 1;
+  MAP(ENTITY,callee,{
+    string n = entity_local_name(callee); 
+    string_buffer buffer_needs = string_buffer_make();
+    effects_list = hash_get(hash_task_to_effect,(char *) callee);
+
+    add_margin(global_margin,sb_result);
+    for (pc= effects_list;pc != NIL; pc = CDR(pc)){
+      effect e = EFFECT(CAR(pc));
+      reference r = effect_reference(e);
+      action ac = effect_action(e);
+      entity v =  reference_variable(r);
+      if (array_entity_p(v)){
+	if (action_read_p(ac)) {
+	  entity t =  hash_get(hash_entity_def_to_task,(char *) v);
+	  global_margin++;
+	  add_margin(global_margin,buffer_needs);
+	  string_buffer_append(buffer_needs,
+			       strdup(concatenate(OPENANGLE, 
+						  "Needs ArrayName=", 
+						  QUOTE,entity_local_name(v),QUOTE, BL,
+						  "DefinedBy=",
+						  QUOTE,
+						  (t!= HASH_UNDEFINED_VALUE) ? entity_local_name(t): "IN_VALUE",
+						  QUOTE,"/",
+						  CLOSEANGLE,NL,
+						  NULL))); 
+	  // Temporaire en attendant les effects IN de l'appli
+	  if (nc==1) {
+	    add_margin(global_margin,appli_needs);
+	    string_buffer_append(appli_needs,
+				 strdup(concatenate(OPENANGLE, 
+						    "Needs ArrayName=", 
+						    QUOTE,entity_local_name(v),QUOTE, BL,
+						    "DefinedBy=",
+						    QUOTE,(t!= HASH_UNDEFINED_VALUE) ? entity_local_name(t): "IN_VALUE",
+						    QUOTE,"/",
+						    CLOSEANGLE,NL,
+						    NULL))); 
+
+	  }
+	  global_margin--;
+	}
+	else {
+	  string_buffer_append(sb_result,
+			       strdup(concatenate(OPENANGLE, 
+						  "TaskRef Name=", 
+						  QUOTE,n,QUOTE, BL,
+						  "Computes=",
+						  QUOTE,entity_local_name(v),QUOTE,
+						  CLOSEANGLE,NL,
+						  NULL)));
+
+	  // Temporaire en attendant les effects OUT de l'appli
+	  if (nc==nb_call) {
+	    add_margin(global_margin,sb_ac);
+	    string_buffer_append(sb_ac,
+				 strdup(concatenate(OPENANGLE, 
+						    "TaskRef Name=", 
+						    QUOTE,"Box_", entity_user_name(module),QUOTE, BL,
+						    "Computes=",
+						    QUOTE,entity_local_name(v),QUOTE,
+						    CLOSEANGLE,NL,
+						    NULL)));
+	
+	    string_appli_needs =string_buffer_to_string(appli_needs);
+	    string_buffer_append(sb_ac,string_appli_needs);
+	    string_buffer_append_word("/TaskRef",sb_ac);	
+	  }
+	} 
+      }
+    }
+    string_needs =string_buffer_to_string(buffer_needs);
+    string_buffer_append(sb_result,string_needs);
+    string_buffer_append_word("/TaskRef",sb_result);	 
+    nc++;  
+  },
+      entity_to_callees(module));
+   
+  string_buffer_append_word("/BoxGraph",sb_result); 
+}
+
+
+
+static void xml_Boxes(entity module,statement stat,string_buffer sb_result,string_buffer sb_ac)
+{
+
+  string  module_name = entity_user_name(module);
+  nest_context_t nest;
+  int callnumber =0;
+
+  nest.loops_for_call = stack_make(statement_domain,0,0);
+  nest.loop_indices = stack_make(entity_domain,0,0);
+  nest.current_stat = stack_make(statement_domain,0,0);
+  nest.nested_loops=  gen_array_make(0);
+  nest.nested_loop_indices =  gen_array_make(0);
+  nest.nested_call=  gen_array_make(0);
+
+  global_margin++;
+  add_margin(global_margin,sb_result);
+  string_buffer_append(sb_result,
+		       strdup(concatenate(OPENANGLE, 
+					  "Box Name=", 
+					  QUOTE,"Box_",
+					  module_name, 
+					  QUOTE,
+					  CLOSEANGLE,NL, NULL)));
+  global_margin++;
+  xml_LocalArrays_for_Box(sb_result);
+  xml_FormalArrays_for_Box(sb_result);
+
+  /* Search of calls in Box */
+  find_loops_and_calls_in_box(stat,&nest);
+ 
+  for (callnumber = 0; callnumber<(int)gen_array_nitems(nest.nested_call); callnumber++)
+    xml_Call(callnumber, &nest,sb_result);
+  
+  xml_BoxGraph(module,sb_result,sb_ac);
+  global_margin--;
+  string_buffer_append_word("/Box",sb_result); 
+  
+  gen_array_free(nest.nested_loops);
+  gen_array_free(nest.nested_loop_indices);
+  gen_array_free(nest.nested_call);
+  stack_free(&(nest.loops_for_call));
+  stack_free(&(nest.loop_indices));
+  stack_free(&(nest.current_stat));
+
+
+}
+
+// A completer avec les effects IN et OUT de l'application
+static void xml_ApplicationGraph(string module_name, string_buffer sb_ac ,string_buffer sb_result)
+{
+  string string_sb_ac="";
+  add_margin(global_margin,sb_result);
+  string_buffer_append(sb_result,
+		       strdup(concatenate(OPENANGLE, 
+					  "ApplicationGraph Name=", 
+					  QUOTE,
+					  module_name, 
+					  QUOTE,
+					  CLOSEANGLE,NL, NULL)));
+  string_sb_ac =string_buffer_to_string(sb_ac);
+  string_buffer_append(sb_result,string_sb_ac);
+  string_buffer_append_word("/ApplicationGraph",sb_result); 
+  
+}
+
+
+static void xml_Application(string module_name, statement stat, string_buffer sb_result)
+{
+  entity module = local_name_to_top_level_entity(module_name);
+  callees callers = (callees)db_get_memory_resource(DBR_CALLEES,module_name, TRUE);
+  string_buffer sb_ac = string_buffer_make();
+ 
+  hash_task_to_effect = hash_table_make(hash_pointer,0);
+  hash_entity_def_to_task = hash_table_make(hash_pointer,0);
+  global_margin = 0; 
+  
+  string_buffer_append(sb_result,
+		       strdup(concatenate(OPENANGLE, 
+					  "!DOCTYPE Application SYSTEM ",
+					  QUOTE,
+					  "APPLI_TERAOPS_v2.dtd",
+					  QUOTE,
+					  CLOSEANGLE, 
+					  NL, NULL)));
+  string_buffer_append(sb_result,
+		       strdup(concatenate(OPENANGLE, 
+					  "Application Name=", 
+					  QUOTE,
+					  get_current_module_name(), 
+					  QUOTE, BL,
+					  "PassingMode=",
+					  QUOTE,
+					  (is_fortran) ? "BYREFERENCE":"BYVALUE",
+					  QUOTE,
+					  CLOSEANGLE, 
+					  NL, NULL)));
+  xml_ActualArrays(module,sb_result);
+  xml_Boxes(module,stat,sb_result,sb_ac);
+  string_buffer_append_word("Tasks",sb_result);
+  MAP(STRING, callee_name, {
+    xml_Task(callee_name,sb_result);
+  },
+      callees_callees(callers));
+  string_buffer_append_word("/Tasks",sb_result);
+  
+  xml_ApplicationGraph(module_name,sb_ac,sb_result);
+  
+  string_buffer_append(sb_result,
+		       strdup(concatenate(OPENANGLE, 
+					  "/Application", 
+					  CLOSEANGLE, 
+					  NL, NULL)));
+}
+
+/* Not implemented yet  - HYPOTHESIS = CODE IS VALID */
+/*static bool valid_specification_p(entity module, statement stat)
+{ 
+  return TRUE;
+}
+*/
+/******************************************************** PIPSMAKE INTERFACE */
+
+#define XMLPRETTY    ".xml"
+
+bool print_xml_application(string module_name)
+{
+  FILE * out;
+  entity module;
+  string string_sb_result, xml, dir, filename;
+  statement stat;
+  string_buffer sb_result=string_buffer_make();
+
+  module = local_name_to_top_level_entity(module_name);
+  xml = db_build_file_resource_name(DBR_XML_PRINTED_FILE, 
+				    module_name, XMLPRETTY);
+  dir = db_get_current_workspace_directory();
+  filename = strdup(concatenate(dir, "/", xml, NULL));
+  stat=(statement) db_get_memory_resource(DBR_CODE, 
+						    module_name, TRUE);
+
+  set_current_module_entity(module);
+  set_current_module_statement(stat);
+  if(statement_undefined_p(stat))
+    {
+      pips_internal_error("No statement for module %s\n", module_name);
+    }
+  set_proper_rw_effects((statement_effects)
+			db_get_memory_resource(DBR_PROPER_EFFECTS,
+					       module_name,TRUE));
+
+  init_cost_table();
+  /* Get the READ and WRITE regions of the module */
+  set_rw_effects((statement_effects) 
+		 db_get_memory_resource(DBR_REGIONS, module_name, TRUE)); 
+
+  set_complexity_map( (statement_mapping)
+		      db_get_memory_resource(DBR_COMPLEXITIES, module_name, TRUE));
+
+
+  debug_on("XMLPRETTYPRINTER_DEBUG_LEVEL"); 
+  // A implementer
+  // pips_debug(1, "Spec validation before xml prettyprinter for %s\n", 
+  //	     entity_name(module));
+  //if (valid_specification_p(module,stat)){ 
+  //pips_debug(1, "Not implemented yet - Hypothesis: Spec is  valid\n");
+  //pips_debug(1, "Begin Xml prettyprinter for %s\n", entity_name(module));
+
+  xml_Application(module_name, stat,sb_result);
+   
+  pips_debug(1, "End Xml prettyprinter for %s\n", module_name);
+  debug_off();  
+     
+  string_sb_result=string_buffer_to_string(sb_result); 
+  /* save to file */
+  out = safe_fopen(filename, "w");
+  fprintf(out,"<!-- XML prettyprint for module %s. --> \n%s", module_name,string_sb_result);
+  safe_fclose(out, filename);
+  string_buffer_free(&sb_result,TRUE);
+  //}
 
   free(dir);
   free(filename);

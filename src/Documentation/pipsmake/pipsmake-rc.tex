@@ -6935,6 +6935,26 @@ print_claire_code_with_explicit_motif       > MODULE.claire_printed_file
 \end{verbatim}
 
 
+%%@UserManualDocumentation: print_xml_application
+This pass was developped for the Ter@ops project to generate models
+of functions and application used for automatic mapping by SPEAR. 
+It generates XML code.
+%%@!UserManualDocumentation
+
+\begin{verbatim}
+alias print_xml_application 'Teraops Xml Pretty-Printer'
+
+print_xml_application      > MODULE.xml_printed_file
+    < PROGRAM.entities
+    < MODULE.code
+    < MODULE.proper_effects
+    < MODULE.cumulated_effects
+    < MODULE.summary_effects
+    < MODULE.complexities
+    < MODULE.regions       
+    < CALLEES.summary_effects
+\end{verbatim}
+
 \chapter{Feautrier Methods (a.k.a. Polyhedral Method)}
 \label{section-feautrier-methods}
 
