@@ -291,6 +291,7 @@ for obj ; do
   failed=
   if [ -d $vdir/$obj ] ; then
     verb 1 "considering '$obj' directory"
+    # this list may be empty: e.g. with the "pipspriv" repository
     for file in $vdir/$obj/*.@([cfF]|tpips); do
       verb 3 " - considering '${file//$vdir\//}' file"
       base=${file%.@([cfF]|tpips)}
