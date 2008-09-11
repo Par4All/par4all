@@ -18,6 +18,9 @@ clean:
 TARGET	= $(shell grep '^[a-zA-Z]' defaults)
 VOPT	= -v
 
+# validate-all: all subdirectories?
+# how to deal with private?
+
 .PHONY: validate
 validate: clean
 	PIPS_MORE=cat pips_validate $(VOPT) -V $(PWD) -O RESULTS $(TARGET)
