@@ -15,11 +15,8 @@ clean:
 	$(RM) -r RESULTS
 
 # subdirectories to consider
-TARGET	= $(shell grep '^[a-zA-Z]' defaults)
+TARGET	:= $(shell grep '^[a-zA-Z]' defaults)
 VOPT	= -v
-
-# validate-all: all subdirectories?
-# how to deal with private?
 
 .PHONY: validate
 validate: clean
@@ -29,6 +26,31 @@ validate: clean
 accept:
 	manual_accept $(TARGET)
 
-# convenient pseudo-target for quick tests: make Hpfc.val
-%.val: %
+# extract private (restricted access) validation
+.PHONY: private
+private:
+	if [ -d private ] ; then \
+	  if [ -d private/.svn ] ; then \
+	    svn up private/ ; \
+	  else \
+	    echo "ERROR: cannot update private" >&2 ; \
+	  fi ; \
+	else \
+	  svn co http://svnpriv.cri.ensmp.fr/svn/pipspriv/trunk private ; \
+	fi
+
+# validate one sub directory
+validate-%: %
 	test -d $< && $(MAKE) TARGET=$< validate
+
+# special handling of private
+PRIV	= $(wildcard private/*)
+PRIV.d	= $(shell for d in $(PRIV) ; do test -d $$d && echo $$d ; done)
+validate-private:
+	$(MAKE) TARGET="$(PRIV.d)" validate
+
+# validate all subdirectories
+ALL	= $(wildcard * private/*)
+ALL.d	= $(shell for d in $(ALL) ; do test -d $$d && echo $$d ; done)
+validate-all:
+	$(MAKE) TARGET="$(ALL.d)" validate
