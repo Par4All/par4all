@@ -2522,7 +2522,12 @@ static void xml_LocalArrays(entity module, string_buffer sb_result)
  list ldecl;
  int nb_dim=0;
 
-  ldecl = code_declarations(value_code(entity_initial(module)));
+ if (is_fortran)
+    ldecl = code_declarations(value_code(entity_initial(module)));
+  else {
+    statement s = get_current_module_statement();
+    ldecl = statement_declarations(s);
+  }
   if(gen_length(ldecl) >0) {
    
     string_buffer_append_word("LocalArrays",sb_result);
@@ -2552,7 +2557,12 @@ static void xml_FormalArrays(entity module, string_buffer sb_result)
   list ldecl;
   int nb_dim=0;
 
-  ldecl = code_declarations(value_code(entity_initial(module)));
+  if (is_fortran)
+    ldecl = code_declarations(value_code(entity_initial(module)));
+  else {
+    statement s = get_current_module_statement();
+    ldecl = statement_declarations(s);
+  }
   if(gen_length(ldecl) >0) {
    
     string_buffer_append_word("FormalArrays",sb_result);
@@ -2736,7 +2746,12 @@ static void xml_ActualArrays(entity module, string_buffer sb_result)
   int nb_dim =0;
   list ldecl;
 
-  ldecl = code_declarations(value_code(entity_initial(module)));
+   if (is_fortran)
+    ldecl = code_declarations(value_code(entity_initial(module)));
+  else {
+    statement s = get_current_module_statement();
+    ldecl = statement_declarations(s);
+  }
 
   global_margin++;
   string_buffer_append_word("ActualArrays",sb_result);
