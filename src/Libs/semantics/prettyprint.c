@@ -204,7 +204,7 @@ get_semantic_text(
   transformer summary = transformer_undefined;
   statement user_stat = statement_undefined;
 
-  set_current_module_entity( local_name_to_top_level_entity(module_name) );
+  set_current_module_entity(module_name_to_entity(module_name));
   mod = get_current_module_entity();
 
   set_current_module_statement

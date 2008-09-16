@@ -79,10 +79,6 @@
 #include "linear.h"
 #include "ri.h"
 
-#include "paf_ri.h"
-typedef dfg_arc_label arc_label;
-typedef dfg_vertex_label vertex_label;
-#include "graph.h"
 #include "database.h"
 #include "ri-util.h"
 #include "constants.h"
@@ -91,11 +87,10 @@ typedef dfg_vertex_label vertex_label;
 #include "text-util.h"
 #include "pipsdbm.h"
 #include "resources.h"
-#include "paf-util.h"
-#include "static_controlize.h"
 #include "transformations.h"
 
-#define MAX_OPERATOR_NAME "MAX"
+#define ADD_ELEMENT_TO_LIST( _list, _type, _element) \
+    (_list = gen_nconc( _list, CONS( _type, _element, NIL)))
 
 /*============================================================================*/
 /* void loop_normalize(string mod_name): Apply the loop normalization upon
@@ -121,7 +116,7 @@ char *mod_name;
   }
 
   /* Sets the current module to "mod_name". */
-  set_current_module_entity(local_name_to_top_level_entity(mod_name));
+  set_current_module_entity(module_name_to_entity(mod_name));
 
   mod_stat = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
  

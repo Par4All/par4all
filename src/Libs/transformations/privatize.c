@@ -345,7 +345,7 @@ bool privatize_module(char *mod_name)
     instruction mod_inst;
     graph mod_graph;
 
-    set_current_module_entity( local_name_to_top_level_entity(mod_name) );
+    set_current_module_entity(module_name_to_entity(mod_name) );
     module = get_current_module_entity();
 
     set_current_module_statement( (statement)

@@ -297,14 +297,14 @@ void set_methods_for_inout_effects(string module_name)
    * I'm not really sure it is actually useful for simple effects...
    */
   /*
-  set_current_module_entity(local_name_to_top_level_entity(module_name));
+  set_current_module_entity(module_name_to_entity(module_name));
   set_current_module_statement((statement)
 	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
 
   set_cumulated_rw_effects((statement_effects)
      db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
 
-  module_to_value_mappings( local_name_to_top_level_entity(module_name));
+  module_to_value_mappings(module_name_to_entity(module_name));
 
   reset_current_module_entity();
   reset_current_module_statement();

@@ -47,7 +47,7 @@ statement loop_strip_mine(statement loop_statement, int chunk_size, int chunk_nu
     statement b = loop_body(l);
     entity new_index = entity_undefined;
     char * module_name = db_get_current_module_name();
-    entity module = local_name_to_top_level_entity(module_name);
+    entity module = module_name_to_entity(module_name);
     
     debug(9, "loop_strip_mine", "begin: chunk_size = %d,chunk_number = %d\n",
 	  chunk_size, chunk_number);

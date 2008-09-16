@@ -22,7 +22,7 @@
 
 bool controlizer(string module_name)
 {
-  entity m = local_name_to_top_level_entity(module_name);
+  entity m = module_name_to_entity(module_name);
    
   statement module_stat, parsed_mod_stat;
     

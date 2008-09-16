@@ -158,7 +158,7 @@ summary_out_effects_engine(char *module_name)
     callees callers = (callees) db_get_memory_resource(DBR_CALLERS,
 						       module_name,
 						       TRUE);
-    entity callee = local_name_to_top_level_entity(module_name);
+    entity callee = module_name_to_entity(module_name);
 
     debug_on("OUT_EFFECTS_DEBUG_LEVEL");
 
@@ -178,7 +178,7 @@ summary_out_effects_engine(char *module_name)
     MAP(STRING, caller_name,
     {
 	list l_tmp;
-	entity caller = local_name_to_top_level_entity(caller_name);
+	entity caller = module_name_to_entity(caller_name);
 	l_tmp = out_effects_from_caller_to_callee(caller,callee);
     },
 	callees_callees(callers));
@@ -751,7 +751,7 @@ out_effects_engine(char *module_name)
 
     make_effects_private_current_context_stack();
    
-    set_current_module_entity( local_name_to_top_level_entity(module_name) );
+    set_current_module_entity(module_name_to_entity(module_name));
     module = get_current_module_entity();
 
     /* Get the code of the module. */

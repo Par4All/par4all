@@ -609,7 +609,7 @@ bool hpfc_filter(string name)
  */
 static bool hpfc_directives_handler(string name, bool dyn)
 {
-    entity module = local_name_to_top_level_entity(name);
+    entity module = module_name_to_entity(name);
 
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "considering module %s\n", name);
@@ -677,7 +677,7 @@ bool hpfc_dynamic_directives(string name)
  */
 bool hpfc_compile(string name)
 {
-    entity module = local_name_to_top_level_entity(name);
+    entity module = module_name_to_entity(name);
     bool do_compile;
 
     debug_on("HPFC_DEBUG_LEVEL");

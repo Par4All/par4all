@@ -243,7 +243,7 @@ get_text_regions_for_module(
 	db_get_memory_resource(resource_name, module_name, TRUE));
 
     /* the current entity may be used for minimal names... */
-    mod = local_name_to_top_level_entity(module_name);
+    mod = module_name_to_entity(module_name);
     set_current_module_entity(mod);
     t = text_array_regions(le, ifread, ifwrite);
     reset_current_module_entity();

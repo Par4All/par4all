@@ -321,7 +321,7 @@ text text_cray(entity module, int margin, statement stat)
 
 bool print_parallelizedcray_code(char *mod_name)
 {
-    entity module = local_name_to_top_level_entity(mod_name);
+    entity module = module_name_to_entity(mod_name);
     statement mod_stat = statement_undefined;
 
     /* push prettyprint style */

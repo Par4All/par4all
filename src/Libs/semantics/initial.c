@@ -53,7 +53,7 @@ get_main_entity(void)
 
     for (i=0; i<nmodules; i++)
     {
-	m = local_name_to_top_level_entity(gen_array_item(modules, i));
+	m = module_name_to_entity(gen_array_item(modules, i));
 	if (entity_main_module_p(m)) {
 	    gen_array_full_free(modules);
 	    return m;
@@ -63,7 +63,7 @@ get_main_entity(void)
     /* ??? some default if there is no main... */
     pips_user_warning("no main found, returning %s instead\n", 
 		      gen_array_item(modules,0));
-    m = local_name_to_top_level_entity(gen_array_item(modules, 0));
+    m = module_name_to_entity(gen_array_item(modules, 0));
     gen_array_full_free(modules);
     return m;
 }
@@ -75,7 +75,7 @@ get_main_entity(void)
 bool 
 initial_precondition(string name)
 {
-    entity module = local_name_to_top_level_entity(name);
+    entity module = module_name_to_entity(name);
     transformer prec;
 
     debug_on("SEMANTICS_DEBUG_LEVEL");
@@ -245,7 +245,7 @@ bool
 print_initial_precondition(string name)
 {
     bool ok;
-    entity module = local_name_to_top_level_entity(name);
+    entity module = module_name_to_entity(name);
     transformer t = (transformer) 
 	db_get_memory_resource(DBR_INITIAL_PRECONDITION, name, TRUE);
     

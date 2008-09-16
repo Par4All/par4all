@@ -30,7 +30,7 @@ static int number_of_processed_modules = 0;
 
 bool array_resizing_statistic(char *module_name)
 {
-  entity module_ent = local_name_to_top_level_entity(module_name);
+  entity module_ent = module_name_to_entity(module_name);
   list l_decl = code_declarations(entity_code(module_ent));
 
   number_of_processed_modules++;

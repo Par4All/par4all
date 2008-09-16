@@ -520,7 +520,7 @@ use_def_elimination(char * module_name)
 						TRUE)); 
 
    set_current_module_statement(module_statement);
-   set_current_module_entity(local_name_to_top_level_entity(module_name));
+   set_current_module_entity(module_name_to_entity(module_name));
 
    initialize_ordering_to_statement(module_statement);
 

@@ -1244,7 +1244,7 @@ bool print_crough(string module_name)
   statement stat;
 
   crough = db_build_file_resource_name(DBR_CROUGH, module_name, CROUGH);
-  module = local_name_to_top_level_entity(module_name);
+  module = module_name_to_entity(module_name);
   dir = db_get_current_workspace_directory();
   filename = strdup(concatenate(dir, "/", crough, NULL));
   stat = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);

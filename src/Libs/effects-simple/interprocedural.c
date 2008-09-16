@@ -301,7 +301,7 @@ global_effect_translation(
     if(!found)
     {
 	entity ent = ENTITY(CAR(l_com_ent));	
-	target_func = local_name_to_top_level_entity(
+	target_func = module_name_to_entity(
 	    module_name(entity_name(ent)));
 	ifdebug(5)
 	{

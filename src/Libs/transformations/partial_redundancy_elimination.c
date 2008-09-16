@@ -762,7 +762,7 @@ bool partial_redundancy_elimination(char *module_name)
      If a WHILE condition is simplified to FALSE, the WHILE is eliminated.*/
    
   statement module_statement;
-  set_current_module_entity(local_name_to_top_level_entity(module_name));
+  set_current_module_entity(module_name_to_entity(module_name));
   module_statement= (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
   set_current_module_statement(module_statement);
   

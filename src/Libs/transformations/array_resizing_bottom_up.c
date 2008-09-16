@@ -483,7 +483,7 @@ bool array_resizing_bottom_up(char* mod_name)
 
      file_name gives the file containing the current module in xxx.database/Src/ */
 
-  entity mod_ent = local_name_to_top_level_entity(mod_name);
+  entity mod_ent = module_name_to_entity(mod_name);
   list l_decl = code_declarations(entity_code(mod_ent)), l_regions = NIL; 
   statement stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
   transformer mod_pre;

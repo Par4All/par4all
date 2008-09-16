@@ -770,7 +770,7 @@ static list common_region_translation(entity callee, region reg,
     {
 	entity ent = ENTITY(CAR(l_com_ent));	
 	entity_target_func =
-	    local_name_to_top_level_entity(module_name(entity_name(ent)));
+	    module_name_to_entity(module_name(entity_name(ent)));
 	ifdebug(6)
 	{
 	    pips_debug(6, "common not declared in caller,\n"

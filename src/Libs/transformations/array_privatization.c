@@ -162,7 +162,7 @@ static bool privatizer(char *module_name)
 
     /* predicates defining summary regions from callees have to be 
        translated into variables local to module */
-    set_current_module_entity( local_name_to_top_level_entity(module_name) );
+    set_current_module_entity(module_name_to_entity(module_name));
     module = get_current_module_entity();
 
     set_cumulated_rw_effects((statement_effects)
@@ -777,7 +777,7 @@ declarations_privatizer(char *mod_name)
     set_current_module_statement( (statement)
 	db_get_memory_resource(DBR_CODE, mod_name, TRUE) );
     module_stat = get_current_module_statement();
-    set_current_module_entity( local_name_to_top_level_entity(mod_name) );
+    set_current_module_entity(module_name_to_entity(mod_name));
     module = get_current_module_entity();
     set_cumulated_rw_effects((statement_effects)
 	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, TRUE));

@@ -86,7 +86,7 @@ print_code_or_source(string mod_name)
 {
     bool success = FALSE;
     text r = make_text(NIL);
-    entity module = local_name_to_top_level_entity(mod_name);
+    entity module = module_name_to_entity(mod_name);
     statement mod_stat;
     string pp;
 
@@ -152,7 +152,7 @@ print_parallelized_code_common(
 {
     bool success = FALSE;
     text r = make_text(NIL);
-    entity module = local_name_to_top_level_entity(mod_name);
+    entity module = module_name_to_entity(mod_name);
     statement mod_stat;
     string pp = string_undefined;
 

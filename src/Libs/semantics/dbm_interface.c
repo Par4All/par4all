@@ -449,7 +449,7 @@ static transformer ordinary_summary_precondition(string module_name,
 
     MAP(STRING, caller_name, 
     {
-      entity caller = local_name_to_top_level_entity(caller_name);
+      entity caller = module_name_to_entity(caller_name);
       t = update_precondition_with_call_site_preconditions(t, caller, callee);
     }, callees_callees(callers));
 
@@ -496,7 +496,7 @@ bool summary_precondition(char * module_name)
 {
   /* transformer t = transformer_identity(); */
   transformer t = transformer_undefined;
-  entity callee = local_name_to_top_level_entity(module_name);
+  entity callee = module_name_to_entity(module_name);
 
   debug_on(SEMANTICS_DEBUG_LEVEL);
 
@@ -565,7 +565,7 @@ bool summary_total_postcondition(char * module_name)
   callees callers = (callees) db_get_memory_resource(DBR_CALLERS,
 						     module_name,
 						     TRUE);
-  entity callee = local_name_to_top_level_entity(module_name);
+  entity callee = module_name_to_entity(module_name);
   /* transformer t = transformer_identity(); */
   transformer t = transformer_undefined;
 
@@ -589,7 +589,7 @@ bool summary_total_postcondition(char * module_name)
 
   MAP(STRING, caller_name, 
   {
-    entity caller = local_name_to_top_level_entity(caller_name);
+    entity caller = module_name_to_entity(caller_name);
     t = update_precondition_with_call_site_preconditions(t, caller, callee);
   }, callees_callees(callers));
 
@@ -676,7 +676,7 @@ bool generic_module_name_to_transformers(char *module_name, bool in_context)
     debug_on(SEMANTICS_DEBUG_LEVEL);
     sc_variable_name_push((char* (*)(Variable)) readable_value_name);
 
-    set_current_module_entity(local_name_to_top_level_entity(module_name));
+    set_current_module_entity(module_name_to_entity(module_name));
     /* could be a gen_find_tabulated as well... */
     set_current_module_statement(
 	(statement) db_get_memory_resource(DBR_CODE, module_name, TRUE)); 
@@ -821,7 +821,7 @@ bool module_name_to_preconditions(char *module_name)
     debug_on(SEMANTICS_DEBUG_LEVEL);
     sc_variable_name_push((char* (*)(Variable)) readable_value_name);
 
-    set_current_module_entity( local_name_to_top_level_entity(module_name) );
+    set_current_module_entity(module_name_to_entity(module_name) );
     /* could be a gen_find_tabulated as well... */
     set_current_module_statement( 
 	(statement) db_get_memory_resource(DBR_CODE, module_name, TRUE)); 
@@ -926,7 +926,7 @@ bool module_name_to_total_preconditions(char *module_name)
   debug_on(SEMANTICS_DEBUG_LEVEL);
   sc_variable_name_push((char* (*)(Variable)) readable_value_name);
 
-  set_current_module_entity( local_name_to_top_level_entity(module_name) );
+  set_current_module_entity(module_name_to_entity(module_name) );
   set_current_module_statement( 
 			       (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE)); 
   if(get_current_module_statement() == (statement) database_undefined)

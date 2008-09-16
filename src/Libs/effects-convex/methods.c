@@ -148,7 +148,7 @@ init_convex_rw_regions(string module_name)
     /* for intermediate values */
     set_cumulated_rw_effects((statement_effects)
 	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
-    module_to_value_mappings( local_name_to_top_level_entity(module_name));
+    module_to_value_mappings(module_name_to_entity(module_name));
 
     init_convex_rw_prettyprint(module_name);
 }
@@ -181,7 +181,7 @@ init_convex_in_out_regions(string module_name)
     /* for intermediate values */
     set_cumulated_rw_effects((statement_effects)
 	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
-    module_to_value_mappings( local_name_to_top_level_entity(module_name));
+    module_to_value_mappings(module_name_to_entity(module_name));
 
     init_convex_inout_prettyprint(module_name);
 }
@@ -214,7 +214,7 @@ init_convex_summary_rw_regions(string module_name)
     /* for intermediate values */
     set_cumulated_rw_effects((statement_effects)
 	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
-    module_to_value_mappings( local_name_to_top_level_entity(module_name));
+    module_to_value_mappings(module_name_to_entity(module_name));
 
     init_convex_rw_prettyprint(module_name);
 }
@@ -237,7 +237,7 @@ init_convex_summary_in_out_regions(string module_name)
     /* for intermediate values */
     set_cumulated_rw_effects((statement_effects)
 	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
-    module_to_value_mappings( local_name_to_top_level_entity(module_name));
+    module_to_value_mappings(module_name_to_entity(module_name));
 
     init_convex_inout_prettyprint(module_name);
 }

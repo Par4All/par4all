@@ -232,7 +232,7 @@ void ReplaceReference(char *mod_name, reference ref, expression next_expr)
     debug(1,"ReplaceReference","ReplaceReference for %s\n", mod_name);
 
     /* Sets the current module to "mod_name". */
-    set_current_module_entity(local_name_to_top_level_entity(mod_name));
+    set_current_module_entity(module_name_to_entity(mod_name));
 
     /* FI: who calls ReplaceReference? Since there is a put DBR_CODE,
      * the get must be TRUE instead of FALSE

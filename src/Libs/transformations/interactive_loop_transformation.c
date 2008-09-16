@@ -34,7 +34,7 @@ bool
 interactive_loop_transformation(string module_name, statement (*loop_transformation)())
 {
     char lp_label[6];
-    entity module = local_name_to_top_level_entity(module_name);
+    entity module = module_name_to_entity(module_name);
     statement s;
     string resp;
     bool return_status = FALSE;

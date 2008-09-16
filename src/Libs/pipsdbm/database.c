@@ -28,16 +28,22 @@ extern bool compilation_unit_p(string); /* alas in c_syntax.h */
  * Upper case letters and underscore for Fortran, 
  * but also lower case letters and the FILE_SEP_STRING
  * "#" added for C compilation unit FC 12/08/2003
+ *
+ * FILE_SEP_STRING added for compilation units (FI)
+ * MODULE_SEP_STRING added for static C functions (FI)
  */
 #ifndef FILE_SEP_STRING /* in ri-util */
 #define FILE_SEP_STRING "!"
 #endif /* FILE_SEP_STRING */
+#ifndef MODULE_SEP_STRING /* in ri-util */
+#define MODULE_SEP_STRING ":"
+#endif /* MODULE_SEP_STRING */
 
 #define MODULE_NAME_CHARS \
   ( "ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
     "0123456789" \
     "abcdefghijklmnopqrstuvwxyz" \
-    FILE_SEP_STRING "_#-" )
+    FILE_SEP_STRING MODULE_SEP_STRING "_#-" )
 
 static bool simple_name_p(const string name)
 {

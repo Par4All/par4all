@@ -252,7 +252,7 @@ get_any_effects_text(
 
     /* current entity
      */
-    set_current_module_entity( local_name_to_top_level_entity(module_name));
+    set_current_module_entity(module_name_to_entity(module_name));
     module = get_current_module_entity();
 
     /* current statement

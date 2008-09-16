@@ -2,14 +2,13 @@
 
 TARGET	= transformations
 
-# old: loop_normalize.c
-
 LIB_CFILES =	replace.c \
 		loop_unroll.c \
 		prettyprintcray.c \
 		strip_mine.c \
 		interactive_loop_transformation.c \
 		loop_interchange.c \
+		loop_normalize.c \
 		interchange.c \
 		target.c \
 		nest_parallelization.c\

@@ -435,7 +435,7 @@ void actual_symbol_table_dump(string module_name, bool isfortran)
   FILE *out;
   string ppt;
 
-  entity module = local_name_to_top_level_entity(module_name);
+  entity module = module_name_to_entity(module_name);
 
   string symboltable = db_build_file_resource_name(DBR_SYMBOL_TABLE_FILE,
 						   module_name, NULL);

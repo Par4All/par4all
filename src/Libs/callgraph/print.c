@@ -36,7 +36,7 @@ string module_name;
 int decor_type;
 {
     bool success = FALSE;
-    entity mod = local_name_to_top_level_entity(module_name);
+    entity mod = module_name_to_entity(module_name);
 
     debug_on(CALLGRAPH_DEBUG_LEVEL);
     debug(1,"module_name_to_callgraphs","===%s===\n",module_name);

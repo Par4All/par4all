@@ -1095,7 +1095,7 @@ bool print_xml_code_with_explicit_motif(string module_name)
   xml = db_build_file_resource_name(DBR_XML_PRINTED_FILE, module_name, XMLPRETTY);
 
   global_module_name = module_name;
-  module = local_name_to_top_level_entity(module_name);
+  module = module_name_to_entity(module_name);
   dir = db_get_current_workspace_directory();
   filename = strdup(concatenate(dir, "/", xml, NULL));
   stat = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
@@ -1827,7 +1827,7 @@ bool print_xml_code(string module_name)
 {
   FILE * out;
   string ppt;
-  entity module = local_name_to_top_level_entity(module_name);
+  entity module = module_name_to_entity(module_name);
   string xml = db_build_file_resource_name(DBR_XML_PRINTED_FILE, 
 					      module_name, XMLPRETTY);
   string  dir = db_get_current_workspace_directory();
@@ -2682,7 +2682,7 @@ static void  xml_Task(string callee_name, string_buffer sb_result)
   Pvecteur paving_indices = VECTEUR_NUL;
   Pvecteur pattern_indices = VECTEUR_NUL;
   boolean motif_in_te_p = FALSE;
-  entity callee = local_name_to_top_level_entity(callee_name);
+  entity callee = module_name_to_entity(callee_name);
   //  string xml_callee = db_build_file_resource_name(DBR_XML_PRINTED_FILE, 
   //						  callee_name, XMLPRETTY);
   statement stat_callee=(statement) db_get_memory_resource(DBR_CODE, 
@@ -3192,7 +3192,7 @@ static void xml_ApplicationGraph(string module_name, string_buffer sb_ac ,string
 
 static void xml_Application(string module_name, statement stat, string_buffer sb_result)
 {
-  entity module = local_name_to_top_level_entity(module_name);
+  entity module = module_name_to_entity(module_name);
   callees callers = (callees)db_get_memory_resource(DBR_CALLEES,module_name, TRUE);
   string_buffer sb_ac = string_buffer_make();
  
@@ -3256,7 +3256,7 @@ bool print_xml_application(string module_name)
   statement stat;
   string_buffer sb_result=string_buffer_make();
 
-  module = local_name_to_top_level_entity(module_name);
+  module = module_name_to_entity(module_name);
   xml = db_build_file_resource_name(DBR_XML_PRINTED_FILE, 
 				    module_name, XMLPRETTY);
   dir = db_get_current_workspace_directory();

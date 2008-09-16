@@ -24,7 +24,7 @@ MakeRunTimeSupportSubroutine(
     string local_name,
     int number_of_arguments)
 {
-    entity res = local_name_to_top_level_entity(local_name);
+    entity res = module_name_to_entity(local_name);
     if (entity_undefined_p(res))
 	res = make_empty_subroutine(local_name);
     return res;

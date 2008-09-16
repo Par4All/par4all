@@ -118,7 +118,7 @@ bool module_is_called_by_main_program_p(entity mod)
       while (!ENDP(l_callers))
 	{
 	  string caller_name = STRING(CAR(l_callers));
-	  entity current_caller = local_name_to_top_level_entity(caller_name);
+	  entity current_caller = module_name_to_entity(caller_name);
 	  if (module_is_called_by_main_program_p(current_caller)) return TRUE;
 	  l_callers = CDR(l_callers);
 	}
@@ -1444,7 +1444,7 @@ static void top_down_adn_callers_arrays(list l_arrays,list l_callers)
       while (flag && !ENDP(l))
 	{
 	  string caller_name = STRING(CAR(l));
-	  current_caller = local_name_to_top_level_entity(caller_name);
+	  current_caller = module_name_to_entity(caller_name);
 	  if ( (opt%8 >= 4) && (! module_is_called_by_main_program_p(current_caller)))
 	    /* If the current caller is never called by the main program => 
 	       no need to follow this caller*/
@@ -1562,7 +1562,7 @@ static void top_down_adn_callers_arrays(list l_arrays,list l_callers)
 	  while (!ENDP(l))
 	    {
 	      string caller_name = STRING(CAR(l));
-	      current_caller = local_name_to_top_level_entity(caller_name);
+	      current_caller = module_name_to_entity(caller_name);
 	      if ((opt%8 >= 4)&& (! module_is_called_by_main_program_p(current_caller)))
 		/* If the current caller is never called by the main program => 
 		   no need to follow this caller*/
@@ -1651,7 +1651,7 @@ bool array_resizing_top_down(char *module_name)
   string declaration_file_name = strdup(concatenate(dir_name, "/", new_declarations, NULL));
   string instrument_file_name = strdup(concatenate(dir_name, "/TD_instrument.out", NULL));
   instrument_file = safe_fopen(instrument_file_name, "a");  
-  current_callee = local_name_to_top_level_entity(module_name);
+  current_callee = module_name_to_entity(module_name);
 
   number_of_processed_modules++;
   debug_on("ARRAY_RESIZING_TOP_DOWN_DEBUG_LEVEL");

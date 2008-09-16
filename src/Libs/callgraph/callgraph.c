@@ -46,21 +46,28 @@
 list 
 string_to_callees(string module_name)
 {
-    callees cl = (callees)db_get_memory_resource(DBR_CALLEES,module_name,TRUE);
-    return callees_callees(cl);
+  callees cl = callees_undefined;
+
+  if(static_module_name_p(module_name))
+    cl = (callees)db_get_memory_resource(DBR_CALLEES,module_name,TRUE);
+  else {
+    string ln = global_name_to_user_name(module_name);
+    cl = (callees)db_get_memory_resource(DBR_CALLEES,ln,TRUE);
+  }
+  return callees_callees(cl);
 }
 
 list 
 entity_to_callees(entity mod)
 {
     list callees_list=NIL;
-    string module_name = module_local_name(mod);
+    string module_name = entity_name(mod);
     list rl = NIL;
 
     callees_list = string_to_callees(module_name);
     
     MAP(STRING, e,
-	rl = CONS(ENTITY, local_name_to_top_level_entity(e), rl),
+	rl = CONS(ENTITY, module_name_to_entity(e), rl),
 	callees_list);
 
     return rl;
@@ -76,7 +83,7 @@ callgraph_module_name(
     FILE * fp,
     int decor_type)
 {
-    string module_name = module_local_name(module),
+    string module_name = module_resource_name(module),
 	dir = db_get_current_workspace_directory();    
     text r = make_text(NIL);
 
@@ -117,7 +124,7 @@ callgraph_module_name(
 
     MAP(ENTITY, e,
     {
-	string n = entity_local_name(e);
+	string n = module_resource_name(e);
 	string f = db_get_memory_resource(DBR_CALLGRAPH_FILE, n, TRUE);
 	string full = strdup(concatenate(dir, "/", f, NULL));
 
@@ -129,8 +136,8 @@ callgraph_module_name(
 
     free(dir);
 }
-    
-bool 
+
+bool
 module_to_callgraph(
     entity module,
     int decor_type)
@@ -138,7 +145,7 @@ module_to_callgraph(
     string name, dir, local, full;
     FILE * fp;
 
-    name = module_local_name(module);
+    name = module_resource_name(module);
     local = db_build_file_resource_name(DBR_CALLGRAPH_FILE, name, ".cg");
     dir = db_get_current_workspace_directory();
     full = strdup(concatenate(dir, "/", local, NULL));

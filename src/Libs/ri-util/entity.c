@@ -264,6 +264,19 @@ module_local_name(entity e)
 	+ strspn(name, COMMON_PREFIX);*/
 }
 
+string 
+module_resource_name(entity e)
+{
+  string rn = string_undefined;
+
+  if(top_level_entity_p(e))
+    rn = module_local_name(e);
+  else
+    rn = entity_name(e);
+
+  return rn;
+}
+
 /* END_EOLE */
 
 string 
@@ -689,6 +702,20 @@ local_name_to_top_level_entity(string n)
       }
     
     return module;
+}
+
+entity module_name_to_entity(string mn)
+{
+  /* Because of static C function, the entity returned is not always a
+     top-level entity. */
+  entity module = entity_undefined;
+
+  if(static_module_name_p(mn))
+    module = gen_find_tabulated(mn, entity_domain);
+  else
+    module = local_name_to_top_level_entity(mn);
+
+  return module;
 }
 
 entity 

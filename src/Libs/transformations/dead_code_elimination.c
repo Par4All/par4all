@@ -286,6 +286,7 @@ static bool loop_executed_once_p(statement s, loop l)
 
   /* m1 == m2
    */
+  /* Not necessarily true with side effects: DO i = inc(n), inc(n) */
   if (expression_equal_p(m1, m2))
     return TRUE;
 
@@ -345,10 +346,10 @@ static bool loop_executed_once_p(statement s, loop l)
     pv2 = normalized_linear(n_m2);
     pv3 = normalized_linear(n_m3);
     
-    /* pv = m1 - m2 */
+    /* pv = m1 - m2, i.e. m1 - m2 <= 0 */
     pv = vect_substract(pv1, pv2);
 
-    /* pv = m1 - m2 + m3 */
+    /* pvx = m1 - m2 + m3, i.e. m1 + m3 -m2 <=0 */
     pvx = vect_add(pv, pv3);
 
     if (m3_positif) {
@@ -961,7 +962,7 @@ suppress_dead_code(char * mod_name)
   mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
   set_current_module_statement(mod_stmt);
 
-  set_current_module_entity(local_name_to_top_level_entity(mod_name));
+  set_current_module_entity(module_name_to_entity(mod_name));
 
   /* FI: RK used a FALSE for db_get, i.e. an impur db_get...
    * I do not know why

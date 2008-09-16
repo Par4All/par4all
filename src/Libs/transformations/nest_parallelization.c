@@ -220,7 +220,7 @@ bool nest_parallelization(string module_name)
     statement mod_stat = statement_undefined;
     statement mod_parallel_stat = statement_undefined;
 
-    set_current_module_entity( local_name_to_top_level_entity(module_name) );
+    set_current_module_entity(module_name_to_entity(module_name));
     module = get_current_module_entity();
 
     pips_assert("loop_interchange", entity_module_p(module));

@@ -1088,7 +1088,7 @@ bool print_claire_code_with_explicit_motif(string module_name)
   claire = db_build_file_resource_name(DBR_CLAIRE_PRINTED_FILE, module_name, CLAIREPRETTY);
 
   global_module_name = module_name;
-  module = local_name_to_top_level_entity(module_name);
+  module = module_name_to_entity(module_name);
   dir = db_get_current_workspace_directory();
   filename = strdup(concatenate(dir, "/", claire, NULL));
   stat = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
@@ -1879,7 +1879,7 @@ bool print_claire_code(string module_name)
   FILE * out;
   string ppt;
  
-  entity module = local_name_to_top_level_entity(module_name);
+  entity module = module_name_to_entity(module_name);
   string claire = db_build_file_resource_name(DBR_CLAIRE_PRINTED_FILE, 
 					      module_name, CLAIREPRETTY);
   string  dir = db_get_current_workspace_directory();

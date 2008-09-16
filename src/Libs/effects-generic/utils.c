@@ -698,7 +698,7 @@ list extract_references_from_declarations(list decls)
 
 list  summary_effects_from_declaration(string module_name)
 {  
-  entity mod = local_name_to_top_level_entity(module_name);
+  entity mod = module_name_to_entity(module_name);
   list decls = code_declarations(value_code(entity_initial(mod)));
   list refs = extract_references_from_declarations(decls);
   return(make_effects_for_array_declarations(refs));

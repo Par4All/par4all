@@ -75,7 +75,7 @@ build_new_top_level_entity_name(string prefix)
     int version = 0;
 
     do { sprintf(name, "%s_%x", prefix, version++); }
-    while (local_name_to_top_level_entity(name)!=entity_undefined);
+    while (module_name_to_entity(name)!=entity_undefined);
 
     res = strdup(name); 
     free(name);
@@ -433,7 +433,7 @@ perform_clone(
     pips_debug(2, "cloning %s in %s on %d\n", 
 	       entity_local_name(module), caller_name, argn);
 
-    caller = local_name_to_top_level_entity(caller_name);
+    caller = module_name_to_entity(caller_name);
     stat = (statement) db_get_memory_resource(DBR_CODE, caller_name, TRUE);
 
     if (argn!=0)
@@ -492,7 +492,7 @@ set_currents(string name)
 
     init_clone();
 
-    module = local_name_to_top_level_entity(name);
+    module = module_name_to_entity(name);
     pips_assert("is a function", type_functional_p(entity_type(module)));
     set_current_module_entity(module);
     
@@ -679,8 +679,8 @@ clone_or_clone_substitute(
 	    checked_string_user_request("replacement for %s?", name,
 					"replacement function");
 
-	/* must be a top-level entity */
-	substitute = local_name_to_top_level_entity(substitute_s);
+	/* must be a top-level entity or a C static function */
+	substitute = module_name_to_entity(substitute_s);
 	if (entity_undefined_p(substitute) || 
 	    !type_functional_p(entity_type(substitute)))
 	{

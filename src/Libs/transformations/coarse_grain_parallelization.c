@@ -334,7 +334,7 @@ bool coarse_grain_parallelization(string module_name)
     entity module;
 
     /* Get the code of the module. */
-    set_current_module_entity( local_name_to_top_level_entity(module_name) );
+    set_current_module_entity(module_name_to_entity(module_name));
     module = get_current_module_entity();
     set_current_module_statement( (statement)
 	db_get_memory_resource(DBR_CODE, module_name, TRUE) );

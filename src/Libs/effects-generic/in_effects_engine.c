@@ -58,7 +58,7 @@ summary_in_effects_engine(char *module_name)
     list l_glob = NIL, l_loc = NIL; 
     statement module_stat;
 
-    set_current_module_entity(local_name_to_top_level_entity(module_name)); 
+    set_current_module_entity(module_name_to_entity(module_name)); 
     set_current_module_statement( (statement)
 	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
     module_stat = get_current_module_statement();
@@ -707,7 +707,7 @@ bool in_effects_engine(char * module_name)
 {
     statement module_stat;
     make_effects_private_current_context_stack();
-    set_current_module_entity(local_name_to_top_level_entity(module_name)); 
+    set_current_module_entity(module_name_to_entity(module_name)); 
 
     /* Get the code of the module. */
     set_current_module_statement( (statement)

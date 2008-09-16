@@ -100,7 +100,7 @@ static void debug_refs(gen_chunk *x)
 bool 
 wp65(string input_module_name)
 {
-    entity module = local_name_to_top_level_entity(input_module_name);
+    entity module = module_name_to_entity(input_module_name);
     /* Let's modify the old code instead of copy it but do not tell
        pipsdbm; else we would get a *copy* of the code, not consistent
        with the dependence graph */

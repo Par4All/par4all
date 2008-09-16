@@ -126,7 +126,7 @@ void loop_unroll(statement loop_statement, int rate)
     entity nub, ib, lu_ind;
     expression rhs_expr, expr;
     string module_name = db_get_current_module_name();
-    entity mod_ent = local_name_to_top_level_entity(module_name);
+    entity mod_ent = module_name_to_entity(module_name);
     entity label_entity;
     statement body, stmt;
     instruction block, inst;
@@ -673,7 +673,7 @@ unroll(char *mod_name)
 		  rate, lp_label, mod_name);
 
 	    /* Sets the current module to "mod_name". */
-	    /* current_module(local_name_to_top_level_entity(mod_name)); */
+	    /* current_module(module_name_to_entity(mod_name)); */
 
 	    /* DBR_CODE will be changed: argument "pure" should take FALSE 
 	       but this would be useless

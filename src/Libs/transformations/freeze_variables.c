@@ -187,7 +187,7 @@ boolean freeze_variables(char *mod_name)
   /* INITIALISATION */
   if (!statement_undefined_p(mod_stmt)) {
     set_current_module_statement(mod_stmt);
-    module =local_name_to_top_level_entity(mod_name);
+    module =module_name_to_entity(mod_name);
     set_current_module_entity(module);
     set_proper_rw_effects((statement_effects)
 			  db_get_memory_resource(DBR_PROPER_EFFECTS,
