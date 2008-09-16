@@ -1,14 +1,17 @@
 PIPS validation, i.e. non regression tests.
 
 
-Default validation or just for one directory:
+Default validation (list of directories in "defaults"):
 
 	sh> make validate
+
+or just for one directory or one file:
+
 	sh> make TARGET=Semantics validate
 	sh> make TARGET=Semantics/loopequiv.f validate
 
 
-To tell which tpips/pips should be used, you must give additional options 
+To tell which tpips/pips should be used, you must give additional options
 to "pips_validate" through the VOPT makefile macro:
 
 	sh> make VOPT='-v -t /path/to/tpips -p /path/to/pips' validate
