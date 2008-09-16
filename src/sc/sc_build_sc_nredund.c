@@ -37,10 +37,14 @@ Pcontrainte ineq;
   Pcontrainte ineg;
   boolean result = FALSE;  
  
-  if (CONTRAINTE_NULLE_P(ineq)) {return FALSE;}/*nothing to test*/
+  if (CONTRAINTE_NULLE_P(ineq)) {
+    /*nothing to test: 0==0 is intrinsically redundant */
+    return TRUE;
+  }
+
   ps = sc_copy(sc);
   ineg = contrainte_copy(ineq);
-    
+  contrainte_reverse(ineg);
   sc_add_inegalite(ps,ineg);
 
   base_rm(sc_base(ps));
