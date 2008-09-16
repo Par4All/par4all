@@ -1,0 +1,42 @@
+C
+C
+      PROGRAM UNROLL9
+C
+      PARAMETER (N=100)
+      REAL T(N)
+C
+      DO 10 I = 1, 4                                                    0001
+         IF (I.EQ.M) THEN                                               0002
+         ELSE
+            T(I+N) = -2*I                                               0004
+         ENDIF
+10       CONTINUE                                                       0005
+C
+      END
+C
+C
+      PROGRAM UNROLL9
+C
+      PARAMETER (N=100)
+      REAL T(N)
+C
+      IF (1.EQ.M) THEN                                                  0002
+      ELSE
+         T(1+N) = -2*1                                                  0004
+      ENDIF
+      IF (2.EQ.M) THEN                                                  0002
+      ELSE
+         T(2+N) = -2*2                                                  0004
+      ENDIF
+      IF (3.EQ.M) THEN                                                  0002
+      ELSE
+         T(3+N) = -2*3                                                  0004
+      ENDIF
+      IF (4.EQ.M) THEN                                                  0002
+      ELSE
+         T(4+N) = -2*4                                                  0004
+      ENDIF
+10    CONTINUE
+      I = 5
+C
+      END

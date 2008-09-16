@@ -1,0 +1,60 @@
+### initial code
+      PROGRAM DCE
+      LOGICAL L1, L2, L3, L4
+C     BEGIN BLOCK
+      READ *, L1, L2, L3, L4                                            0001
+C     BEGIN UNSTRUCTURED
+
+      IF (L1) GOTO 99998                                                0002
+      PRINT *, 1                                                        0005
+
+10    IF (L2) GOTO 99997                                                0007
+      PRINT *, 2                                                        0010
+
+20    IF (L3) GOTO 99996                                                0012
+      PRINT *, 3                                                        0015
+      GOTO 30
+99996 CONTINUE
+      IF (L4) THEN                                                      0013
+         GOTO 30
+      ELSE
+         GOTO 30
+      ENDIF
+99997 CONTINUE
+      IF (.TRUE.) THEN                                                  0008
+         GOTO 20
+      ELSE
+         GOTO 20
+      ENDIF
+99998 CONTINUE
+      IF (.FALSE.) THEN                                                 0003
+         GOTO 10
+      ELSE
+         GOTO 10
+      ENDIF
+30    CONTINUE                                                          0016
+C     END UNSTRUCTURED
+
+C     END BLOCK
+      END
+### suppress dead code
+      PROGRAM DCE
+      LOGICAL L1, L2, L3, L4
+C     BEGIN BLOCK
+      READ *, L1, L2, L3, L4                                            0001
+C     BEGIN UNSTRUCTURED
+
+      IF (L1) GOTO 10                                                   0002
+      PRINT *, 1                                                        0005
+
+10    IF (L2) GOTO 20                                                   0007
+      PRINT *, 2                                                        0010
+
+20    IF (L3) GOTO 30                                                   0012
+      PRINT *, 3                                                        0015
+30    CONTINUE                                                          0016
+C     END UNSTRUCTURED
+
+C     END BLOCK
+      END
+

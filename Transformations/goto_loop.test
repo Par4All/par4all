@@ -1,0 +1,66 @@
+#!/bin/sh
+
+tpips=${tpips_version:-tpips}
+
+$tpips <<EOF
+create goto_loop $PIPS_VALIDDIR/Transformations/goto_loop.f
+
+set PRETTYPRINT_FINAL_RETURN TRUE
+set PRETTYPRINT_ALL_LABELS TRUE
+
+activate PRINT_CODE_PRECONDITIONS
+#
+module DOUBLE
+display PRINTED_FILE
+apply SUPPRESS_DEAD_CODE 
+display PRINTED_FILE
+#
+module SIMPLE
+display PRINTED_FILE
+apply SUPPRESS_DEAD_CODE 
+display PRINTED_FILE
+#
+module TRIPLE
+display PRINTED_FILE
+apply SUPPRESS_DEAD_CODE 
+display PRINTED_FILE
+#
+module IF
+display PRINTED_FILE
+apply RESTRUCTURE_CONTROL
+display PRINTED_FILE
+apply SUPPRESS_DEAD_CODE 
+display PRINTED_FILE
+#
+module SUBROUTINETRIPLE
+display PRINTED_FILE
+apply SUPPRESS_DEAD_CODE
+display PRINTED_FILE
+apply RESTRUCTURE_CONTROL
+display PRINTED_FILE
+#
+module IFSIMPLE
+display PRINTED_FILE
+apply RESTRUCTURE_CONTROL
+display PRINTED_FILE
+apply SUPPRESS_DEAD_CODE 
+display PRINTED_FILE
+#
+module IFDERIENDUTOUT
+display PRINTED_FILE
+apply RESTRUCTURE_CONTROL
+display PRINTED_FILE
+apply SUPPRESS_DEAD_CODE 
+display PRINTED_FILE
+#
+module GOTODOUBLE
+display PRINTED_FILE
+apply SUPPRESS_DEAD_CODE 
+display PRINTED_FILE
+#
+close
+delete goto_loop
+quit
+EOF
+
+exit $?

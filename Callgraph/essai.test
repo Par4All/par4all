@@ -1,0 +1,8 @@
+#
+# essai.f test script
+#
+Init -df $PIPS_ROOT/Validation/Callgraph/essai.f essai >&2
+echo "--- Callgraph for ESSAI"
+Display -m essai -v cg
+Delete essai
+

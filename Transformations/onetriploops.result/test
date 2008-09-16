@@ -1,0 +1,192 @@
+
+Initial code
+
+      PROGRAM ONETRIPLOOPS
+
+      INTEGER I, N
+      READ *, N                                                         0001
+
+      DO I = 1, 1                                                       0002
+         PRINT *, 'i = ', I                                             0003
+      ENDDO
+
+      DO I = 2, 2                                                       0004
+         PRINT *, 'i = ', I                                             0005
+      ENDDO
+
+      DO I = -10, -10                                                   0006
+         PRINT *, 'i = ', I                                             0007
+      ENDDO
+
+      DO I = N, N                                                       0008
+         PRINT *, 'i = ', I                                             0009
+      ENDDO
+
+      DO I = 1, 1                                                       0010
+         PRINT *, 'i = ', I                                             0011
+      ENDDO
+
+      DO I = 1, 1, -1                                                   0012
+         PRINT *, 'i = ', I                                             0013
+      ENDDO
+
+      DO I = 2*N+3, 3+N*2                                               0014
+         PRINT *, 'i = ', I                                             0015
+      ENDDO
+
+      DO I = 100*COS(N), 100*COS(N)                                     0016
+         PRINT *, 'i = ', I                                             0017
+      ENDDO
+
+! loupe...
+      DO I = 100*COS(N), COS(N)*100                                     0018
+         PRINT *, 'i = ', I                                             0019
+      ENDDO
+
+      M = N                                                             0020
+
+      DO I = N, M                                                       0021
+         PRINT *, 'i = ', I                                             0022
+      ENDDO
+
+      M = N+2                                                           0023
+
+      DO I = N, M, 3                                                    0024
+         PRINT *, 'i = ', I                                             0025
+      ENDDO
+
+! pas simplifiable
+      DO I = N, M+1, 3                                                  0026
+         PRINT *, 'i = ', I                                             0027
+      ENDDO
+
+! pas simplifiable
+      DO I = N, M, 2                                                    0028
+         PRINT *, 'i = ', I                                             0029
+      ENDDO
+
+      DO I = M, N, -3                                                   0030
+         PRINT *, 'i = ', I                                             0031
+      ENDDO
+
+! pas simplifiable
+      DO I = M, N, -2                                                   0032
+         PRINT *, 'i = ', I                                             0033
+      ENDDO
+
+! pas simplifiable (signe de n...)
+      DO I = N, 2*N-1, N                                                0034
+         PRINT *, 'i = ', I                                             0035
+      ENDDO
+
+      IF (N.GT.0) THEN                                                  0036
+! pas simplifiable
+         DO I = N, 2*N+1, N                                             0037
+            PRINT *, 'i = ', I                                          0038
+         ENDDO
+         DO I = N, 2*N-1, N                                             0039
+            PRINT *, 'i = ', I                                          0040
+         ENDDO
+      ENDIF
+
+      IF (N.LT.0) THEN                                                  0041
+! pas simplifiable
+         DO I = N, 2*N-1, N                                             0042
+            PRINT *, 'i = ', I                                          0043
+         ENDDO
+         DO I = N, 2*N+1, N                                             0044
+            PRINT *, 'i = ', I                                          0045
+         ENDDO
+      ENDIF
+
+      END
+
+Code after one trip loop detection and simplification
+
+      PROGRAM ONETRIPLOOPS
+
+      INTEGER I, N
+      READ *, N                                                         0001
+
+      I = 1
+      PRINT *, 'i = ', I                                                0003
+
+      I = 2
+      PRINT *, 'i = ', I                                                0005
+
+      I = -10
+      PRINT *, 'i = ', I                                                0007
+
+      I = N
+      PRINT *, 'i = ', I                                                0009
+
+      I = 1
+      PRINT *, 'i = ', I                                                0011
+
+      I = 1
+      PRINT *, 'i = ', I                                                0013
+
+      I = 2*N+3
+      PRINT *, 'i = ', I                                                0015
+
+      I = 100*COS(N)
+      PRINT *, 'i = ', I                                                0017
+
+! loupe...
+      DO I = 100*COS(N), COS(N)*100                                     0018
+         PRINT *, 'i = ', I                                             0019
+      ENDDO
+
+      M = N                                                             0020
+
+      I = N
+      PRINT *, 'i = ', I                                                0022
+
+      M = N+2                                                           0023
+
+      I = N
+      PRINT *, 'i = ', I                                                0025
+
+! pas simplifiable
+      DO I = N, M+1, 3                                                  0026
+         PRINT *, 'i = ', I                                             0027
+      ENDDO
+
+! pas simplifiable
+      DO I = N, M, 2                                                    0028
+         PRINT *, 'i = ', I                                             0029
+      ENDDO
+
+      I = M
+      PRINT *, 'i = ', I                                                0031
+
+! pas simplifiable
+      DO I = M, N, -2                                                   0032
+         PRINT *, 'i = ', I                                             0033
+      ENDDO
+
+! pas simplifiable (signe de n...)
+      DO I = N, 2*N-1, N                                                0034
+         PRINT *, 'i = ', I                                             0035
+      ENDDO
+
+      IF (N.GT.0) THEN                                                  0036
+! pas simplifiable
+         DO I = N, 2*N+1, N                                             0037
+            PRINT *, 'i = ', I                                          0038
+         ENDDO
+         I = N
+         PRINT *, 'i = ', I                                             0040
+      ENDIF
+
+      IF (N.LT.0) THEN                                                  0041
+! pas simplifiable
+         DO I = N, 2*N-1, N                                             0042
+            PRINT *, 'i = ', I                                          0043
+         ENDDO
+         I = N
+         PRINT *, 'i = ', I                                             0045
+      ENDIF
+
+      END
+

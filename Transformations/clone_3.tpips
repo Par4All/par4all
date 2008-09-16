@@ -1,0 +1,9 @@
+delete c3
+create c3 clone_3.f
+apply CLONE_ON_ARGUMENT(CLONEE)
+1
+apply SUPPRESS_DEAD_CODE(CLONEE_0)
+display PRINTED_FILE($ALL)
+close
+delete c3
+quit

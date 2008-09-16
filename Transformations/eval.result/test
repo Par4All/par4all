@@ -1,0 +1,81 @@
+--- Partialy evaluated code for EVAL
+C     
+C     
+      PROGRAM EVAL
+C
+C     Programme de test pour l'evaluation partielle et le 
+C     remplacement de constantes.
+C
+      INTEGER L(10)
+C
+C
+      I = 0                                                             0001
+      J = 1                                                             0002
+      K = 5                                                             0003
+C
+C     do not replace array references, but array indices
+      L(2) = L(1)+L(1)                                                  0004
+C
+      DO I = 1, 5                                                       0005
+         P = P+I                                                        0006
+      ENDDO
+C
+      IF (2*N.GT.0) P = 0                                               0007
+C
+C     test de PLUS et MINUS
+      K = 2*(M+N)                                                       0009
+      K = 2*(M-N)                                                       0010
+      K = 2*(M-N)                                                       0011
+      K = 2*(N-M)                                                       0012
+      K = -2*(M+N)                                                      0013
+      K = -2*(M+N)                                                      0014
+C
+      K = M+2*N                                                         0015
+      K = M-2*N                                                         0016
+      K = M-2*N                                                         0017
+      K = -M-2*N                                                        0018
+      K = -(M+2*N)                                                      0019
+      K = 2*N-M                                                         0020
+C
+      K = 1+N                                                           0021
+      K = -N-1                                                          0022
+      K = -N-1                                                          0023
+      K = -N-1                                                          0024
+      K = N+1                                                           0025
+      K = N                                                             0026
+C
+C     test pour MULT
+      K = -6*M                                                          0027
+      K = N                                                             0028
+      K = 0                                                             0029
+      K = 3*N*M                                                         0030
+      K = 3*N*(M-1)+7                                                   0031
+      K = (N+1)*M                                                       0032
+C
+C     test pour DIV et MOD.
+C     {A=3/2} est equivalent a {A=1}, mais different de {A=3./2}
+      A = 1                                                             0033
+      A = 3./2                                                          0034
+      K = 1                                                             0035
+      K = 2                                                             0036
+      K = 2                                                             0037
+c     (-5)/2 = 5/(-2) = -2
+      K = -2                                                            0038
+      K = -2                                                            0039
+      K = (4*M+5)/2                                                     0040
+      K = 4*M+5                                                         0041
+      K = 2*M+3                                                         0042
+      K = 1                                                             0043
+      K = 1                                                             0044
+c     MOD(-3,2) = MOD(3,-2) = -1
+      K = -1                                                            0045
+      K = -1                                                            0046
+C
+C     do not replace written parameters of assign, fonctions 
+C     or subroutines!
+      I = 10                                                            0047
+      I = I                                                             0048
+      J = 0                                                             0049
+      CALL FX(10, J)                                                    0050
+C
+      END

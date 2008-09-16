@@ -1,0 +1,11 @@
+delete u
+setproperty PRETTYPRINT_ALL_DECLARATIONS=TRUE
+setproperty PRETTYPRINT_HEADER_COMMENTS=TRUE
+create u useless_decls.f
+echo !! before cleaning declarations
+display PRINTED_FILE
+apply CLEAN_DECLARATIONS
+echo !! after cleaning declarations
+display PRINTED_FILE
+close
+delete u

@@ -1,0 +1,34 @@
+delete consel
+create consel ${PIPS_ROOT}/Validation/Transformations/consel.f
+
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+
+setproperty PRETTYPRINT_BLOCKS TRUE
+
+setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+
+setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
+
+setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+
+setproperty PRETTYPRINT_ALL_LABELS TRUE
+
+setproperty PRETTYPRINT_INTERNAL_RETURN FALSE
+
+setproperty PRETTYPRINT_FINAL_RETURN TRUE
+
+setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+
+activate MUST_REGIONS
+module XDR_SEND
+activate PRINT_CODE_IN_REGIONS
+display PRINTED_FILE
+activate PRINT_CODE_OUT_REGIONS
+display PRINTED_FILE
+activate IN_OUT_REGIONS_CHAINS
+apply USE_DEF_ELIMINATION
+activate PRINT_CODE
+display PRINTED_FILE
+close
+delete consel
+quit

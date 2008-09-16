@@ -4,7 +4,7 @@
 void complex03()
 {
   _Complex x1 = 1 + 2I;
-  float _Complex x2;
+  float _Complex x2 = 1. + 2.I;
   double _Complex x3;
   long double _Complex x4;
 

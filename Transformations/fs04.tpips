@@ -1,0 +1,21 @@
+#
+# testing forward substitution
+#
+delete fs04
+create fs04 fs04.f
+echo !! Initial file
+display PRINTED_FILE
+apply FORWARD_SUBSTITUTE
+echo !! After forward substitution
+display PRINTED_FILE
+apply USE_DEF_ELIMINATION
+echo !! After use-def elimination
+display PRINTED_FILE
+echo !! After cleaning declarations
+setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+apply CLEAN_DECLARATIONS 
+#apply PARTIAL_EVAL
+display PRINTED_FILE
+close
+delete fs04
+quit

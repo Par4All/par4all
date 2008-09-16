@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+
+tpips=${tpips_version:-tpips}
+
+
+$tpips <<EOF
+delete mdg
+create mdg ${PIPS_VALIDDIR}/Callgraph/mdg.f
+module MDG
+activate PRINT_CALL_GRAPH_WITH_TRANSFORMERS
+display CALLGRAPH_FILE
+close
+delete mdg
+EOF
+#

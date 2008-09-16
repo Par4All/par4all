@@ -1,0 +1,28 @@
+delete otl
+create otl onetriploops.f
+# display PRINTED_FILE[onetriploops]
+# capply SUPPRESS_DEAD_CODE[onetriploops]
+# display PRINTED_FILE[onetriploops]
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[%ALL]
+
+# echo
+# echo Initial code with preconditions
+# echo
+# 
+# activate PRINT_CODE_PRECONDITIONS
+# display PRINTED_FILE[%ALL]
+# quit
+
+echo
+echo Code after one trip loop detection and simplification
+echo
+
+capply SUPPRESS_DEAD_CODE[%ALL]
+display PRINTED_FILE[%ALL]
+close
+delete otl

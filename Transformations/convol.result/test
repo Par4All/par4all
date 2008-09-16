@@ -1,0 +1,42 @@
+
+      SUBROUTINE CONVOL(NEW_IMAGE, IMAGE, ISI, ISJ, KERNEL, KSI, KSJ)
+c     The convolution kernel is not applied on the outer part
+c     of the image
+      REAL IMAGE(ISI,ISJ)
+      REAL NEW_IMAGE(ISI,ISJ)
+      REAL KERNEL(KSI,KSJ)
+
+
+      DO I = 1, 512                                                     0001
+         DO J = 1, 512                                                  0002
+            NEW_IMAGE(I,J) = IMAGE(I,J)                                 0003
+         ENDDO
+      ENDDO
+
+
+      DO 400 I = 2, 511                                                 0004
+         DO 300 J = 2, 511                                              0005
+            NEW_IMAGE(I,J) = 0.                                         0006
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I-1,J-1)*KERNEL(1,1   0009
+     &      )                                                           0009
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I-1,J)*KERNEL(1,2)    0009
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I-1,J+1)*KERNEL(1,3   0009
+     &      )                                                           0009
+            KJ = 4
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I,J-1)*KERNEL(2,1)    0009
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I,J)*KERNEL(2,2)      0009
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I,J+1)*KERNEL(2,3)    0009
+            KJ = 4
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+1,J-1)*KERNEL(3,1   0009
+     &      )                                                           0009
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+1,J)*KERNEL(3,2)    0009
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+1,J+1)*KERNEL(3,3   0009
+     &      )                                                           0009
+            KJ = 4
+200         CONTINUE
+            KI = 4
+            NEW_IMAGE(I,J) = NEW_IMAGE(I,J)/9                           0012
+300         CONTINUE                                                    0013
+400      CONTINUE                                                       0014
+
+      END

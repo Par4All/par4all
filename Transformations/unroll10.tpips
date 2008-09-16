@@ -1,0 +1,15 @@
+delete unroll10
+create unroll10 ${PIPS_ROOT}/Validation/Transformations/unroll10.f
+
+setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+
+apply UNROLL[UNROLL10]
+20
+8
+apply PARTIAL_EVAL
+apply SUPPRESS_DEAD_CODE
+apply USE_DEF_ELIMINATION
+display PRINTED_FILE[UNROLL10]
+close
+delete unroll10
+quit

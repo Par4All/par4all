@@ -1,0 +1,14 @@
+delete ratnuc
+create ratnuc ${PIPS_ROOT}/Validation/Transformations/ratnuc.f
+
+module RATNUC
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE
+
+apply ARRAY_PRIVATIZER
+activate COARSE_GRAIN_PARALLELIZATION
+display PARALLELPRINTED_FILE
+
+close
+delete ratnuc
+quit

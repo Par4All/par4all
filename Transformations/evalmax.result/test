@@ -1,0 +1,12 @@
+
+      SUBROUTINE PRINTMAX(I,J)
+
+      I = 1                                                             0001
+
+      J = 3                                                             0002
+
+      K = 2                                                             0003
+
+      PRINT *, 2                                                        0004
+
+      END

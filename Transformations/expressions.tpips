@@ -1,0 +1,10 @@
+delete expressions
+create expressions expressions.f
+module TEST1
+display PRINTED_FILE[TEST1]
+apply SUPPRESS_TRIVIAL_TEST[TEST1]
+display PRINTED_FILE[TEST1]
+close
+delete expressions
+quit
+

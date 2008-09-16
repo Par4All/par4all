@@ -1,0 +1,31 @@
+--- Cray code for PRINTPRIV
+      PROGRAM PRINTPRIV
+      REAL B(10,10), T
+c
+CMIC$ DO ALL PRIVATE(I,J) SHARED(B) 
+      DO I = 1, 10                                                      0001
+CDIR$ IVDEP 
+         DO J = 1, 10                                                   0002
+            B(I,J) = 0.                                                 0003
+         ENDDO
+      ENDDO
+CMIC$ DO ALL PRIVATE(I,K,T) SHARED(B) 
+      DO I = 1, 10                                                      0001
+         DO K = 1, 10                                                   0004
+            T = K                                                       0005
+            B(I,K) = T                                                  0006
+         ENDDO
+      ENDDO
+      END
+--- Cray code for FOO
+c
+      SUBROUTINE FOO
+      REAL B(10,10)
+CMIC$ DO ALL PRIVATE(I,K) SHARED(B) 
+      DO I = 1, 10                                                      0001
+CDIR$ IVDEP 
+         DO K = 1, 10                                                   0002
+            B(I,K) = 0.                                                 0003
+         ENDDO
+      ENDDO
+      END

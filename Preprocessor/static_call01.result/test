@@ -1,0 +1,22 @@
+int main()
+{
+   foo(3);
+}
+static void foo(int );
+extern int main();
+static void foo(int i)
+{
+   i++;
+}
+int main()
+{
+   foo(3);
+}
+static void foo(int );
+extern int main();
+static void foo(int i)
+{
+   i++;
+}
+ main
+     static_call01!:foo

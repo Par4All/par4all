@@ -1,0 +1,17 @@
+delete cgpara
+create cgpara ${PIPS_ROOT}/Validation/Transformations/cgpara.f
+activate COARSE_GRAIN_PARALLELIZATION # Coarse Grain Parallelization
+module TEST1
+display PARALLELPRINTED_FILE(TEST1)
+module TEST2
+display PARALLELPRINTED_FILE(TEST2)
+module TEST3
+display PARALLELPRINTED_FILE(TEST3)
+apply PRIVATIZE_MODULE(TEST3)
+display PARALLELPRINTED_FILE(TEST3)
+module TEST4
+display PARALLELPRINTED_FILE(TEST4)
+close
+delete cgpara
+
+

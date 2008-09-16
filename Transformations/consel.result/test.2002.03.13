@@ -1,0 +1,144 @@
+
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{PHI1==6, 1<=LEN}>
+C  <MSG(PHI1)-IN-MAY-{1<=PHI1, 1<=LEN}>
+
+      SUBROUTINE XDR_SEND(MSG, LEN)
+      INTEGER MSG(LEN)
+      INTEGER BUFFER_SIZE
+      PARAMETER (BUFFER_SIZE=1024)
+      INTEGER BUFFER(BUFFER_SIZE)
+
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{PHI1==6, 1<=LEN}>
+C  <MSG(PHI1)-IN-MAY-{1<=PHI1, 1<=LEN}>
+
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+
+      CALL RESET(BUFFER)                                                0001
+
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{PHI1==6, 1<=LEN}>
+C  <MSG(PHI1)-IN-MAY-{1<=PHI1, 1<=LEN}>
+
+C (0,3)
+
+      DO I = 1, LEN, BUFFER_SIZE                                        0002
+
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{PHI1==6, 1<=I, I<=LEN}>
+C  <MSG(PHI1)-IN-MAY-{I<=PHI1, 1<=I, I<=LEN}>
+
+C (0,4)
+C        BEGIN BLOCK
+C (0,5)
+         MLEN = MAX(I+BUFFER_SIZE-1, LEN)                               0003
+
+C  <MSG(PHI1)-IN-EXACT-{I<=PHI1, PHI1<=MLEN, 1<=I, I<=LEN,
+C    1023+I<=MLEN, LEN<=MLEN}>
+
+C (0,6)
+         DO J = I, MLEN                                                 0004
+
+C  <MSG(PHI1)-IN-EXACT-{PHI1==J, 1<=I, I<=J, I<=LEN, 1023+I<=MLEN,
+C    J<=MLEN, LEN<=MLEN}>
+
+C (0,7)
+            BUFFER(J-I+1) = MSG(J)                                      0005
+         ENDDO
+
+C  <BUFFER(PHI1)-IN-EXACT-{1<=PHI1, PHI1+I<=1+MLEN, J==MLEN+1, 1<=I,
+C    1024+I<=J, I<=LEN, 1+LEN<=J}>
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{PHI1==6, J==MLEN+1, 1<=I,
+C    1024+I<=J, I<=LEN, 1+LEN<=J}>
+
+C (0,8)
+         PRINT *, (BUFFER(K), K = 1, MLEN-I+1)                          0006
+C        END BLOCK
+      ENDDO
+C (0,9)
+
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE XDR_SEND(MSG, LEN)
+      INTEGER MSG(LEN)
+      INTEGER BUFFER_SIZE
+      PARAMETER (BUFFER_SIZE=1024)
+      INTEGER BUFFER(BUFFER_SIZE)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+
+      CALL RESET(BUFFER)                                                0001
+C (0,3)
+
+      DO I = 1, LEN, BUFFER_SIZE                                        0002
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, 2<=I, I<=LEN}>
+
+C (0,4)
+C        BEGIN BLOCK
+C (0,5)
+         MLEN = MAX(I+BUFFER_SIZE-1, LEN)                               0003
+
+C  <BUFFER(PHI1)-OUT-EXACT-{1<=PHI1, PHI1+I<=1+MLEN, 1<=I, I<=LEN,
+C    1023+I<=MLEN, LEN<=MLEN}>
+
+C (0,6)
+         DO J = I, MLEN                                                 0004
+
+C  <BUFFER(PHI1)-OUT-EXACT-{PHI1+I==J+1, 1<=PHI1, PHI1+I<=1+MLEN,
+C    1<=I, I<=LEN, 1023+I<=MLEN, LEN<=MLEN}>
+
+C (0,7)
+            BUFFER(J-I+1) = MSG(J)                                      0005
+         ENDDO
+
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, J==MLEN+1, 2<=I,
+C    1024+I<=J, I<=LEN, 1+LEN<=J}>
+
+C (0,8)
+         PRINT *, (BUFFER(K), K = 1, MLEN-I+1)                          0006
+C        END BLOCK
+      ENDDO
+C (0,9)
+
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE XDR_SEND(MSG, LEN)
+      INTEGER MSG(LEN)
+      INTEGER BUFFER_SIZE
+      PARAMETER (BUFFER_SIZE=1024)
+      INTEGER BUFFER(BUFFER_SIZE)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+C     BEGIN BLOCK
+C (0,3)
+
+      CONTINUE                                                          0001
+C     END BLOCK
+C (0,4)
+
+      DO I = 1, LEN, BUFFER_SIZE                                        0002
+C (0,5)
+C        BEGIN BLOCK
+C (0,6)
+         MLEN = MAX(I+BUFFER_SIZE-1, LEN)                               0003
+C (0,7)
+         DO J = I, MLEN                                                 0004
+C (0,8)
+            BUFFER(J-I+1) = MSG(J)                                      0005
+         ENDDO
+C (0,9)
+         PRINT *, (BUFFER(K), K = 1, MLEN-I+1)                          0006
+C        END BLOCK
+      ENDDO
+C (0,10)
+C     BEGIN BLOCK
+C (0,11)
+
+      CONTINUE                                                          0007
+C     END BLOCK
+C     END BLOCK
+      END

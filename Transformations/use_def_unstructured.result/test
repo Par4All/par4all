@@ -1,0 +1,120 @@
+
+C  P() {}
+
+      PROGRAM USE_DEF_UNSTRUCTURED
+
+C  P() {}
+
+C     BEGIN UNSTRUCTURED
+
+C  P() {}
+
+
+1     IF (I.EQ.0) GOTO 1                                                0001
+
+C  P() {}
+
+      A = 0                                                             0003
+
+C  P() {}
+
+      IF (I.EQ.2) GOTO 1                                                0004
+
+C  P() {}
+
+      B = 0                                                             0006
+
+C  P() {}
+
+      WRITE (*, B)                                                      0007
+      GOTO 1
+C     END UNSTRUCTURED
+      END
+
+C  P() {}
+
+      PROGRAM USE_DEF_UNSTRUCTURED
+
+C  P() {}
+
+C     BEGIN UNSTRUCTURED
+
+C  P() {}
+
+
+1     IF (I.EQ.0) GOTO 1                                                0001
+
+C  P() {}
+
+      IF (I.EQ.2) GOTO 1                                                0004
+
+C  P() {}
+
+      B = 0                                                             0006
+
+C  P() {}
+
+      WRITE (*, B)                                                      0007
+      GOTO 1
+C     END UNSTRUCTURED
+      END
+
+C  P() {}
+
+      PROGRAM USE_DEF_UNSTRUCTURED
+
+C  P() {}
+
+C     BEGIN UNSTRUCTURED
+
+C  P() {}
+
+
+1     IF (I.EQ.0) GOTO 1                                                0001
+
+C  P() {}
+
+      IF (I.EQ.2) GOTO 1                                                0004
+
+C  P() {}
+
+      B = 0                                                             0006
+
+C  P() {}
+
+      WRITE (*, B)                                                      0007
+      GOTO 1
+C     END UNSTRUCTURED
+      END
+
+C  P() {}
+
+      PROGRAM USE_DEF_UNSTRUCTURED
+
+C  P() {}
+
+C     BEGIN UNSTRUCTURED
+
+C  P() {}
+
+
+1     IF (I.EQ.0) GOTO 1                                                0001
+
+C  P() {}
+
+      IF (I.EQ.2) GOTO 1                                                0004
+
+C  P() {}
+
+      B = 0                                                             0006
+
+C  P() {}
+
+      WRITE (*, B)                                                      0007
+      GOTO 1
+C     END UNSTRUCTURED
+
+C  P() {0==-1}
+
+      RETURN
+      END

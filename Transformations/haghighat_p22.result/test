@@ -1,0 +1,84 @@
+
+C  P() {}
+
+      PROGRAM HAGHIGHAT
+      
+      INTEGER A, B, APB, AMB
+
+C  P() {}
+
+
+      READ *, A, B                                                      0001
+
+C  P(A,B) {}
+
+      APB = A+B                                                         0002
+
+C  P(A,APB,B) {A+B==APB}
+
+      AMB = A-B                                                         0003
+
+C  P(A,AMB,APB,B) {AMB+B==A, A+B==APB}
+
+      READ *, B                                                         0004
+
+C  P(A,AMB,APB,B) {AMB+APB==2A}
+
+      PRINT *, APB, (APB+AMB)/2                                         0005
+      END
+
+C  P() {}
+
+      PROGRAM HAGHIGHAT
+      
+      INTEGER A, B, APB, AMB
+
+C  P() {}
+
+
+      READ *, A, B                                                      0001
+
+C  P(A,B) {}
+
+      APB = A+B                                                         0002
+
+C  P(A,APB,B) {A+B==APB}
+
+      AMB = A-B                                                         0003
+
+C  P(A,AMB,APB,B) {AMB+B==A, A+B==APB}
+
+      READ *, B                                                         0004
+
+C  P(A,AMB,APB,B) {AMB+APB==2A}
+
+      PRINT *, APB, (APB+AMB)/2                                         0005
+      END
+
+C  P() {}
+
+      PROGRAM HAGHIGHAT
+      
+      INTEGER A, B, APB, AMB
+
+C  P() {}
+
+
+      READ *, A, B                                                      0001
+
+C  P(A,B) {}
+
+      APB = A+B                                                         0002
+
+C  P(A,APB,B) {A+B==APB}
+
+      AMB = A-B                                                         0003
+
+C  P(A,AMB,APB,B) {AMB+B==A, A+B==APB}
+
+      READ *, B                                                         0004
+
+C  P(A,AMB,APB,B) {AMB+APB==2A}
+
+      PRINT *, APB, (APB+AMB)/2                                         0005
+      END

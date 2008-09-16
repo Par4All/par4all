@@ -1,0 +1,61 @@
+C     several small regression tests for the coarse grain 
+C     parallelization phase of PIPS
+      SUBROUTINE TEST1(A,N)
+      INTEGER N,A(N),I
+
+      DOALL I = 1, N                                                    0001
+         A(I) = 0                                                       0002
+      ENDDO
+      END
+         
+      SUBROUTINE TEST2(A,N)
+      INTEGER N,A(N),I
+
+      DO I = 1, N                                                       0001
+         A(I) = A(I-1)                                                  0002
+      ENDDO
+      END
+         
+      SUBROUTINE TEST3(A,N)
+      INTEGER N,A(N,N),I,J
+
+      DO I = 1, N                                                       0001
+         DOALL J = 1, N                                                 0002
+            A(I,J) = A(I+1,J)                                           0003
+         ENDDO
+      ENDDO
+      END
+         
+      SUBROUTINE TEST3(A,N)
+      INTEGER N,A(N,N),I,J
+
+      DO I = 1, N                                                       0001
+         DOALL J = 1, N                                                 0002
+            A(I,J) = A(I+1,J)                                           0003
+         ENDDO
+      ENDDO
+      END
+         
+      SUBROUTINE TEST4(A,N,K)
+      INTEGER N,A(N),I,K
+
+      DOALL I = 1, N                                                    0001
+         IF (I.NE.K) A(I) = 0                                           0002
+      ENDDO
+
+      DOALL I = 1, N                                                    0004
+         IF (I.LE.K) GOTO 99998                                         0005
+
+         IF (I.GE.K) THEN                                               0007
+         ELSE
+            GOTO 10
+         ENDIF
+         A(I) = 2                                                       0008
+         GOTO 10
+99998    CONTINUE
+         A(I) = 1                                                       0006
+10       CONTINUE                                                       0009
+         A(I) = A(I)+K                                                  0009
+      ENDDO
+      END
+

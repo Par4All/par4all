@@ -1,0 +1,10 @@
+The summary preconditions are inconsistent with the statement
+preconditions because these are computed *intra* procedurally. This is a
+known bug/feature of PIPS.
+
+Variable A is an unexpected argument for some statement. This is due to
+an approximate fix-point for unstructured.
+
+The preconditions for the never called procedures is now correct,
+i.e. non satisfiable. However, they are not propagated because
+the interprocedural options are turned down.

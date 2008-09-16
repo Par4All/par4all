@@ -1,0 +1,28 @@
+delete c
+setproperty ABORT_ON_USER_ERROR TRUE
+create c clone_2.f
+echo # initial callgraph
+display CALLGRAPH_FILE[%MAIN]
+echo # initial codes
+display PRINTED_FILE[%ALL]
+echo # applying clone...
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+apply CLONE[CLONEE]
+C2
+0001
+apply CLONE_SUBSTITUTE[CLONEE]
+C2
+0003
+CLONEE_0
+echo # new callgraph
+display CALLGRAPH_FILE[%MAIN]
+echo # new codes.
+display PRINTED_FILE[%ALL]
+echo # applying dead code elimination...
+apply SUPPRESS_DEAD_CODE[%ALL]
+display PRINTED_FILE[%ALL]
+echo # done
+close
+delete c

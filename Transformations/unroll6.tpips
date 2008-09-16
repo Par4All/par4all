@@ -1,0 +1,10 @@
+delete unroll6
+create unroll6 ${PIPS_ROOT}/Validation/Transformations/unroll6.f
+module UNROLL6
+display PRINTED_FILE[UNROLL6]
+apply FULL_UNROLL_PRAGMA[UNROLL6]
+display PRINTED_FILE[UNROLL6]
+close
+delete unroll6
+quit
+# EOF
