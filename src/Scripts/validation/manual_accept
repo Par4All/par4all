@@ -8,6 +8,9 @@ svn=
 shopt -s nullglob
 shopt -s extglob
 
+# something done?
+something=
+
 # what is the current arch?
 arch=${PIPS_ARCH:-$($PIPS_ROOT/makes/arch.sh)}
 
@@ -21,6 +24,7 @@ function handle_out_file()
     # show differences
     if [ -f $file ] ; then
 	echo "CONSIDERING $ref and $outfile"
+	something=1
 	if [[ ! $PIPS_GRAPHICAL_DIFF ]] ; then
             diff -b -u $ref $outfile | ${PIPS_MORE:-less}
 	else
@@ -74,5 +78,6 @@ for arg ; do
 done
 
 [[ $svn ]] && echo "Consider running \"svn ci $@\" to commit changes"
+[[ $something ]] || echo "Nothing to accept"
 
 exit 0
