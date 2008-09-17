@@ -10,8 +10,7 @@
 ! remapping A[4]: A[4] -> A_1[1]
             PSI1 = MY POS(1,1)
             PSI2 = MY POS(2,1)
-            IF (MY LID.LE.4.AND.PSI1.LE.2.AND.PSI2.LE.2.AND.1.LE.PSI2
-     &      .AND.1.LE.PSI1) THEN
+            IF (MY LID.LE.4) THEN
                PSIp1 = PSI2
                PSIp2 = PSI1
                T LID = -2+2*PSIp1+PSIp2
@@ -43,8 +42,7 @@
 ! receive part
             PSIp1 = MY POS(1,1)
             PSIp2 = MY POS(2,1)
-            IF (MY LID.LE.4.AND.PSIp1.LE.2.AND.1.LE.PSIp1.AND.1.LE.
-     &      PSIp2.AND.PSIp2.LE.2) THEN
+            IF (MY LID.LE.4) THEN
                PSI1 = PSIp2
                PSI2 = PSIp1
                T LID = -2+2*PSI1+PSI2
@@ -96,8 +94,7 @@
 ! remapping B[3]: B[3] -> B_1[2]
             PSI1 = MY POS(1,1)
             PSI2 = MY POS(2,1)
-            IF (MY LID.LE.4.AND.1.LE.PSI1.AND.PSI1.LE.2.AND.PSI2.LE.2
-     &      .AND.1.LE.PSI2) THEN
+            IF (MY LID.LE.4) THEN
                DO PSIp1 = 1, 2
                   DO PSIp2 = 1, 2
                      T LID = -2+2*PSIp1+PSIp2
@@ -132,8 +129,7 @@
 ! receive part
             PSIp1 = MY POS(1,1)
             PSIp2 = MY POS(2,1)
-            IF (MY LID.LE.4.AND.1.LE.PSIp1.AND.PSIp1.LE.2.AND.1.LE.
-     &      PSIp2.AND.PSIp2.LE.2) THEN
+            IF (MY LID.LE.4) THEN
                DO PSI1 = 1, 2
                   DO PSI2 = 1, 2
                      T LID = -2+2*PSI1+PSI2

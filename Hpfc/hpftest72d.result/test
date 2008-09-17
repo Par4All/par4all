@@ -10,8 +10,7 @@
 ! remapping A[4]: A[4] -> A_1[1]
             PSI1 = MY POS(1,1)
             PSI2 = MY POS(2,1)
-            IF (MY LID.LE.4.AND.PSI1.LE.2.AND.PSI2.LE.2.AND.1.LE.PSI2
-     &      .AND.1.LE.PSI1) THEN
+            IF (MY LID.LE.4) THEN
                PSIp1 = PSI2
                PSIp2 = PSI1
                T LID = -2+2*PSIp1+PSIp2
@@ -43,8 +42,7 @@
 ! receive part
             PSIp1 = MY POS(1,1)
             PSIp2 = MY POS(2,1)
-            IF (MY LID.LE.4.AND.PSIp1.LE.2.AND.1.LE.PSIp1.AND.1.LE.
-     &      PSIp2.AND.PSIp2.LE.2) THEN
+            IF (MY LID.LE.4) THEN
                PSI1 = PSIp2
                PSI2 = PSIp1
                T LID = -2+2*PSI1+PSI2
@@ -97,8 +95,7 @@
 ! remapping B[3]: B[3] -> B_1[2]
             PSI1 = MY POS(1,1)
             PSI2 = MY POS(2,1)
-            IF (MY LID.LE.4.AND.1.LE.PSI1.AND.PSI1.LE.2.AND.PSI2.LE.2
-     &      .AND.1.LE.PSI2) THEN
+            IF (MY LID.LE.4) THEN
                DO PSIp1 = 1, 2
                   DO PSIp2 = 1, 2
                      T LID = -2+2*PSIp1+PSIp2
@@ -133,8 +130,7 @@
 ! receive part
             PSIp1 = MY POS(1,1)
             PSIp2 = MY POS(2,1)
-            IF (MY LID.LE.4.AND.1.LE.PSIp1.AND.PSIp1.LE.2.AND.1.LE.
-     &      PSIp2.AND.PSIp2.LE.2) THEN
+            IF (MY LID.LE.4) THEN
                DO PSI1 = 1, 2
                   DO PSI2 = 1, 2
                      T LID = -2+2*PSI1+PSI2
@@ -193,7 +189,7 @@
       INTEGER*4 N
       PARAMETER (N = 512)
       INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, PSI2, T LID, I
-     &, J, I_0, I_1, I_2, I_3, I_4, I_5
+     &, I_4, I_5
       REAL*4 A(1:N, 1:N), B(1:N, 1:N)
       CALL HPFC INIT HOST
 c
@@ -203,37 +199,33 @@ c
       CALL HPFC HTIMEON
       CALL HPFC HTIMEOFF('empty measure')
 ! collecting distributed variable B
-      IF (513.EQ.J.AND.513.EQ.I) THEN
-         PSI1 = 1
-         DO PSI2 = PSI1, 1
-            BUF INDEX = 0
-            RECEIVED NOT PERFORMED = .FALSE.
-            SIZE OF RECEIVED BUFFER = 0
-            T LID = -2+2*PSI1+PSI2
-            CALL HPFC RCV FROM NODE(T LID)
-            CALL HPFC REAL4 BUFUPK
-            DO ALPHA2 = MAX(-255+256*PSI2, -252+256*PSI1), MIN(13, 
-     &      256*PSI2)
-               ALPHA1 = -3+ALPHA2
-               LALPHA1 = 256+ALPHA1-256*PSI1
-               LALPHA2 = 256+ALPHA2-256*PSI2
-               BUF INDEX = BUF INDEX+1
-               B(ALPHA1,ALPHA2) = HPFC REAL4 BUFF(BUF INDEX)
-            ENDDO
+      PSI1 = 1
+      DO PSI2 = PSI1, 1
+         BUF INDEX = 0
+         RECEIVED NOT PERFORMED = .FALSE.
+         SIZE OF RECEIVED BUFFER = 0
+         T LID = -2+2*PSI1+PSI2
+         CALL HPFC RCV FROM NODE(T LID)
+         CALL HPFC REAL4 BUFUPK
+         DO ALPHA2 = MAX(-255+256*PSI2, -252+256*PSI1), MIN(13, 256*
+     &   PSI2)
+            ALPHA1 = -3+ALPHA2
+            LALPHA1 = 256+ALPHA1-256*PSI1
+            LALPHA2 = 256+ALPHA2-256*PSI2
+            BUF INDEX = BUF INDEX+1
+            B(ALPHA1,ALPHA2) = HPFC REAL4 BUFF(BUF INDEX)
          ENDDO
-      ENDIF
+      ENDDO
 ! end of collect
       I_4 = I+3
       PRINT *, (B(I,I_4), I = 1, 10)
 ! updating shared variable I
-      IF (J.EQ.513) THEN
-         BUF INDEX = 0
-         SEND NOT INITIALIZED = .TRUE.
-         BUF INDEX = BUF INDEX+1
-         HPFC INTEGER4 BUFF(BUF INDEX) = I
-         CALL HPFC INTEGER4 BUFPCK
-         CALL HPFC HCAST
-      ENDIF
+      BUF INDEX = 0
+      SEND NOT INITIALIZED = .TRUE.
+      BUF INDEX = BUF INDEX+1
+      HPFC INTEGER4 BUFF(BUF INDEX) = I
+      CALL HPFC INTEGER4 BUFPCK
+      CALL HPFC HCAST
 ! end of update
       CALL HPFC SYNCHRO
 c
@@ -245,42 +237,35 @@ c
       CALL HPFC HTIMEON
       CALL HPFC HTIMEOFF('transposition')
 ! collecting distributed variable A_1
-      IF (I_2.EQ.513.AND.I_1.EQ.513.AND.I_0.EQ.513.AND.I.EQ.513.AND.J
-     &.EQ.513.AND.I_3.EQ.513) THEN
-         DO PSI1 = 1, 2
-            DO PSI2 = 1, 2
-               BUF INDEX = 0
-               RECEIVED NOT PERFORMED = .FALSE.
-               SIZE OF RECEIVED BUFFER = 0
-               T LID = -2+2*PSI1+PSI2
-               CALL HPFC RCV FROM NODE(T LID)
-               CALL HPFC REAL4 BUFUPK
-               DO LALPHA1 = (7-PSI2)/2, (15-PSI2)/2
-                  DO LALPHA2 = MAX(1, -1+LALPHA1+HPFC DIVIDE(-PSI1+
-     &            PSI2, 2)), MIN(5, LALPHA1+HPFC DIVIDE(-3-PSI1+PSI2
-     &            , 2))
-                     ALPHA2 = -2+2*LALPHA2+PSI1
-                     ALPHA1 = -2+2*LALPHA1+PSI2
-                     BUF INDEX = BUF INDEX+1
-                     A(ALPHA1,ALPHA2) = HPFC REAL4 BUFF(BUF INDEX)
-                  ENDDO
+      DO PSI1 = 1, 2
+         DO PSI2 = 1, 2
+            BUF INDEX = 0
+            RECEIVED NOT PERFORMED = .FALSE.
+            SIZE OF RECEIVED BUFFER = 0
+            T LID = -2+2*PSI1+PSI2
+            CALL HPFC RCV FROM NODE(T LID)
+            CALL HPFC REAL4 BUFUPK
+            DO LALPHA1 = (7-PSI2)/2, (15-PSI2)/2
+               DO LALPHA2 = MAX(1, -1+LALPHA1+HPFC DIVIDE(-PSI1+PSI2
+     &         , 2)), MIN(5, LALPHA1+HPFC DIVIDE(-3-PSI1+PSI2, 2))
+                  ALPHA2 = -2+2*LALPHA2+PSI1
+                  ALPHA1 = -2+2*LALPHA1+PSI2
+                  BUF INDEX = BUF INDEX+1
+                  A(ALPHA1,ALPHA2) = HPFC REAL4 BUFF(BUF INDEX)
                ENDDO
             ENDDO
          ENDDO
-      ENDIF
+      ENDDO
 ! end of collect
       I_5 = I+3
       PRINT *, (A(I_5,I), I = 1, 10)
 ! updating shared variable I
-      IF (I_0.EQ.513.AND.I_1.EQ.513.AND.I_2.EQ.513.AND.I_3.EQ.513
-     &.AND.J.EQ.513) THEN
-         BUF INDEX = 0
-         SEND NOT INITIALIZED = .TRUE.
-         BUF INDEX = BUF INDEX+1
-         HPFC INTEGER4 BUFF(BUF INDEX) = I
-         CALL HPFC INTEGER4 BUFPCK
-         CALL HPFC HCAST
-      ENDIF
+      BUF INDEX = 0
+      SEND NOT INITIALIZED = .TRUE.
+      BUF INDEX = BUF INDEX+1
+      HPFC INTEGER4 BUFF(BUF INDEX) = I
+      CALL HPFC INTEGER4 BUFPCK
+      CALL HPFC HCAST
 ! end of update
       CALL HPFC HTIMEOFF('whole time')
       CALL HPFC HOST END
@@ -444,7 +429,7 @@ c
       PARAMETER (N = 512)
       INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, LALPHAp1, LALPHAp2, 
      &PSI1, PSI2, PSIp1, PSIp2, T LID, I_13, I_12, I_11, I_10, I_9, 
-     &I_8, I_7, I_6, I, J, I_0, I_1, I_2, I_3
+     &I_8, I_7, I_6, I, J
       REAL*4 A(1:256, 1:256), B(1:256, 1:256), B_1(1:256, 1:256), A_1
      &(1:256, 1:256)
       CALL HPFC INIT NODE
@@ -478,35 +463,31 @@ c
          ENDDO
       ENDDO
 ! collecting distributed variable B
-      IF (513.EQ.J.AND.513.EQ.I) THEN
-         PSI1 = MY POS(1,1)
-         PSI2 = MY POS(2,1)
-         IF (PSI2.LE.1.AND.PSI1.LE.PSI2.AND.1.LE.PSI1) THEN
-            BUF INDEX = 0
-            SEND NOT INITIALIZED = .TRUE.
-            DO ALPHA2 = MAX(-255+256*PSI2, -252+256*PSI1), MIN(13, 
-     &      256*PSI2)
-               ALPHA1 = -3+ALPHA2
-               LALPHA1 = 256+ALPHA1-256*PSI1
-               LALPHA2 = 256+ALPHA2-256*PSI2
-               BUF INDEX = BUF INDEX+1
-               HPFC REAL4 BUFF(BUF INDEX) = B(LALPHA1,LALPHA2)
-            ENDDO
-            CALL HPFC REAL4 BUFPCK
-            CALL HPFC SND TO HOST
-         ENDIF
+      PSI1 = MY POS(1,1)
+      PSI2 = MY POS(2,1)
+      IF (PSI2.LE.1.AND.PSI1.LE.PSI2) THEN
+         BUF INDEX = 0
+         SEND NOT INITIALIZED = .TRUE.
+         DO ALPHA2 = MAX(-255+256*PSI2, -252+256*PSI1), MIN(13, 256*
+     &   PSI2)
+            ALPHA1 = -3+ALPHA2
+            LALPHA1 = 256+ALPHA1-256*PSI1
+            LALPHA2 = 256+ALPHA2-256*PSI2
+            BUF INDEX = BUF INDEX+1
+            HPFC REAL4 BUFF(BUF INDEX) = B(LALPHA1,LALPHA2)
+         ENDDO
+         CALL HPFC REAL4 BUFPCK
+         CALL HPFC SND TO HOST
       ENDIF
 ! end of collect
 ! updating shared variable I
-      IF (J.EQ.513) THEN
-         BUF INDEX = 0
-         RECEIVED NOT PERFORMED = .FALSE.
-         SIZE OF RECEIVED BUFFER = 0
-         CALL HPFC NCAST
-         CALL HPFC INTEGER4 BUFUPK
-         BUF INDEX = BUF INDEX+1
-         I = HPFC INTEGER4 BUFF(BUF INDEX)
-      ENDIF
+      BUF INDEX = 0
+      RECEIVED NOT PERFORMED = .FALSE.
+      SIZE OF RECEIVED BUFFER = 0
+      CALL HPFC NCAST
+      CALL HPFC INTEGER4 BUFUPK
+      BUF INDEX = BUF INDEX+1
+      I = HPFC INTEGER4 BUFF(BUF INDEX)
 ! end of update
       CALL HPFC SYNCHRO
 ! begin remappings
@@ -542,39 +523,30 @@ c
       ENDDO
       CALL HPFC NTIMEOFF('transposition')
 ! collecting distributed variable A_1
-      IF (I_2.EQ.513.AND.I_1.EQ.513.AND.I_0.EQ.513.AND.I.EQ.513.AND.J
-     &.EQ.513.AND.I_3.EQ.513) THEN
-         PSI1 = MY POS(1,1)
-         PSI2 = MY POS(2,1)
-         IF (PSI2.LE.2.AND.1.LE.PSI2.AND.1.LE.PSI1.AND.PSI1.LE.2
-     &   ) THEN
-            BUF INDEX = 0
-            SEND NOT INITIALIZED = .TRUE.
-            DO LALPHA1 = (7-PSI2)/2, (15-PSI2)/2
-               DO LALPHA2 = MAX(1, -1+LALPHA1+HPFC DIVIDE(-PSI1+PSI2
-     &         , 2)), MIN(5, LALPHA1+HPFC DIVIDE(-3-PSI1+PSI2, 2))
-                  ALPHA2 = -2+2*LALPHA2+PSI1
-                  ALPHA1 = -2+2*LALPHA1+PSI2
-                  BUF INDEX = BUF INDEX+1
-                  HPFC REAL4 BUFF(BUF INDEX) = A_1(LALPHA1,LALPHA2)
-               ENDDO
-            ENDDO
-            CALL HPFC REAL4 BUFPCK
-            CALL HPFC SND TO HOST
-         ENDIF
-      ENDIF
+      PSI1 = MY POS(1,1)
+      PSI2 = MY POS(2,1)
+      BUF INDEX = 0
+      SEND NOT INITIALIZED = .TRUE.
+      DO LALPHA1 = (7-PSI2)/2, (15-PSI2)/2
+         DO LALPHA2 = MAX(1, -1+LALPHA1+HPFC DIVIDE(-PSI1+PSI2, 2)), 
+     &   MIN(5, LALPHA1+HPFC DIVIDE(-3-PSI1+PSI2, 2))
+            ALPHA2 = -2+2*LALPHA2+PSI1
+            ALPHA1 = -2+2*LALPHA1+PSI2
+            BUF INDEX = BUF INDEX+1
+            HPFC REAL4 BUFF(BUF INDEX) = A_1(LALPHA1,LALPHA2)
+         ENDDO
+      ENDDO
+      CALL HPFC REAL4 BUFPCK
+      CALL HPFC SND TO HOST
 ! end of collect
 ! updating shared variable I
-      IF (I_0.EQ.513.AND.I_1.EQ.513.AND.I_2.EQ.513.AND.I_3.EQ.513
-     &.AND.J.EQ.513) THEN
-         BUF INDEX = 0
-         RECEIVED NOT PERFORMED = .FALSE.
-         SIZE OF RECEIVED BUFFER = 0
-         CALL HPFC NCAST
-         CALL HPFC INTEGER4 BUFUPK
-         BUF INDEX = BUF INDEX+1
-         I = HPFC INTEGER4 BUFF(BUF INDEX)
-      ENDIF
+      BUF INDEX = 0
+      RECEIVED NOT PERFORMED = .FALSE.
+      SIZE OF RECEIVED BUFFER = 0
+      CALL HPFC NCAST
+      CALL HPFC INTEGER4 BUFUPK
+      BUF INDEX = BUF INDEX+1
+      I = HPFC INTEGER4 BUFF(BUF INDEX)
 ! end of update
       CALL HPFC NTIMEOFF('whole time')
       CALL HPFC NODE END
