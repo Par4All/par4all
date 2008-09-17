@@ -88,7 +88,7 @@ char *module_name;
 	db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE));
     set_cumulated_rw_effects((statement_effects)
 	db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
-    set_current_module_entity( local_name_to_top_level_entity(module_name) );
+    set_current_module_entity(module_name_to_entity(module_name));
     set_current_module_statement( (statement)
 	db_get_memory_resource(DBR_CODE, module_name, TRUE ) );
 

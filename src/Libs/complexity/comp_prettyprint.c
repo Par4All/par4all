@@ -140,7 +140,7 @@ char *module_name;
     set_current_module_statement( (statement)
 	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
     mod_stat = get_current_module_statement();
-    set_current_module_entity( local_name_to_top_level_entity(module_name) );
+    set_current_module_entity(module_name_to_entity(module_name) );
     mod = get_current_module_entity();
   
     if(is_user_view) {
@@ -208,7 +208,7 @@ char *module_name;
        be interesting to have its contextual complexity. The same is
        true for the icfg
        */
-    entity module = local_name_to_top_level_entity(module_name);
+    entity module = module_name_to_entity(module_name);
 
     return text_summary_complexity(module);
 }

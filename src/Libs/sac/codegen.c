@@ -197,7 +197,7 @@ static opcode get_optimal_opcode(opcodeClass kind, int argc, list* args)
 
 entity get_function_entity(string name)
 {
-   entity e = local_name_to_top_level_entity(name);
+   entity e = module_name_to_entity(name);
    if (entity_undefined_p(e))
       e = make_empty_subroutine(name);
    return e;

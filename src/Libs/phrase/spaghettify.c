@@ -150,7 +150,7 @@ bool spaghettify(string module_name)
 						      module_name, 
 						      TRUE);
 
-  module = local_name_to_top_level_entity(module_name);
+  module = module_name_to_entity(module_name);
   
   set_current_module_statement(stat);
   set_current_module_entity(local_name_to_top_level_entity(module_name));

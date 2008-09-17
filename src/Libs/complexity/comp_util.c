@@ -806,7 +806,7 @@ char *module_name;
  
     MAPL(pc, {
 	string callee_name = STRING(CAR(pc));
-	entity callee = local_name_to_top_level_entity(callee_name);
+	entity callee = module_name_to_entity(callee_name);
 	type t = entity_type(callee);
 
 	if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {

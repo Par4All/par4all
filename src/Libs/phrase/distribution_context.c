@@ -225,7 +225,7 @@ boolean compute_distribution_controlization_context (list l_calls,
     pips_debug(5, "Register statement calling externalized function %s: \n",
 	       function_name);
 
-    externalized_function = local_name_to_top_level_entity(function_name);
+    externalized_function = module_name_to_entity(function_name);
 
     /* Register new externalized function */
 

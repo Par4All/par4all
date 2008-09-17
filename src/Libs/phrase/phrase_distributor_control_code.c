@@ -808,7 +808,7 @@ static statement controlize_distribution (statement module_stat,
 								  function_name, 
 								  TRUE);
 	  
-	  called_module = local_name_to_top_level_entity(function_name);
+	  called_module = module_name_to_entity(function_name);
 	  
 	  /* SEND PARAMS calls */
 	  MAP (REGION, reg, {
@@ -820,7 +820,7 @@ static statement controlize_distribution (statement module_stat,
 
 	    list call_params = NIL;
 
-	    send_param_module  = local_name_to_top_level_entity(get_send_param_module_name(f, reg));
+	    send_param_module  = module_name_to_entity(get_send_param_module_name(f, reg));
 	    pips_debug(7, "Call to [%s]\n", entity_local_name(send_param_module));
 	    pips_debug(7, "Concerned entity is [%s]\n", entity_local_name(param));
 
@@ -922,7 +922,7 @@ static statement controlize_distribution (statement module_stat,
 
 	    list call_params = NIL;
 
-	    receive_param_module  = local_name_to_top_level_entity(get_receive_param_module_name(f, reg));
+	    receive_param_module  = module_name_to_entity(get_receive_param_module_name(f, reg));
 	    pips_debug(7, "Call to [%s]\n", entity_local_name(receive_param_module));
 	    pips_debug(7, "Concerned entity is [%s]\n", entity_local_name(param));
 
@@ -1044,10 +1044,10 @@ bool phrase_distributor_control_code(string module_name)
 						   module_name, 
 						   TRUE);
   
-  module = local_name_to_top_level_entity(module_name);
+  module = module_name_to_entity(module_name);
   
   set_current_module_statement(module_stat);
-  set_current_module_entity(local_name_to_top_level_entity(module_name));
+  set_current_module_entity(module_name_to_entity(module_name)); // FI: redundant
   
   set_cumulated_rw_effects((statement_effects)
 			   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));

@@ -845,10 +845,10 @@ bool phrase_distributor_init(string module_name)
 						      module_name, 
 						      TRUE);
   
-  module = local_name_to_top_level_entity(module_name);
+  module = module_name_to_entity(module_name);
   
   set_current_module_statement(stat);
-  set_current_module_entity(local_name_to_top_level_entity(module_name));
+  set_current_module_entity(module_name_to_entity(module_name)); //FI: redundant
   
   debug_on("PHRASE_DISTRIBUTOR_DEBUG_LEVEL");
 
@@ -901,10 +901,10 @@ bool phrase_distributor(string module_name)
 						   module_name, 
 						   TRUE);
   
-  module = local_name_to_top_level_entity(module_name);
+  module = module_name_to_entity(module_name);
   
   set_current_module_statement(module_stat);
-  set_current_module_entity(local_name_to_top_level_entity(module_name));
+  set_current_module_entity(module_name_to_entity(module_name)); // FI: redundant
   
   set_cumulated_rw_effects((statement_effects)
 			   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));

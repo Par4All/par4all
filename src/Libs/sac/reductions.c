@@ -614,7 +614,7 @@ bool simd_remove_reductions(char * mod_name)
       db_get_memory_resource(DBR_CODE, mod_name, TRUE);
 
    set_current_module_statement(mod_stmt);
-   set_current_module_entity(local_name_to_top_level_entity(mod_name));
+   set_current_module_entity(module_name_to_entity(mod_name));
    set_cumulated_reductions((pstatement_reductions)
 			    db_get_memory_resource(DBR_CUMULATED_REDUCTIONS,
 						   mod_name, TRUE));

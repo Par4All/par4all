@@ -328,7 +328,7 @@ bool single_assignment(char * mod_name)
    graph dg = (graph) db_get_memory_resource(DBR_DG, mod_name, TRUE);
 
    set_current_module_statement(mod_stmt);
-   set_current_module_entity(local_name_to_top_level_entity(mod_name));
+   set_current_module_entity(module_name_to_entity(mod_name));
 
    set_proper_rw_effects((statement_effects) 
       db_get_memory_resource(DBR_PROPER_EFFECTS, mod_name, TRUE));

@@ -252,7 +252,7 @@ entity clone_variable_with_new_name(entity a_variable,
   entity module;
   entity new_variable;
 
-  module = local_name_to_top_level_entity(module_name); 
+  module = module_name_to_entity(module_name); 
   /* Assert that module represent a value code */
   pips_assert("it is a code", value_code_p(entity_initial(module)));
 

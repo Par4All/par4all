@@ -256,7 +256,7 @@ void simd_loop_unroll(statement loop_statement, int rate)
     entity nub, ib, lu_ind;
     expression rhs_expr, expr;
     string module_name = db_get_current_module_name();
-    entity mod_ent = local_name_to_top_level_entity(module_name);
+    entity mod_ent = module_name_to_entity(module_name);
     entity label_entity;
     statement body, stmt;
     instruction block, inst;

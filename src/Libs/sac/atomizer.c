@@ -419,7 +419,7 @@ boolean simd_atomizer(char * mod_name)
       db_get_memory_resource(DBR_CODE, mod_name, TRUE);
 
    set_current_module_statement(mod_stmt);
-   set_current_module_entity(local_name_to_top_level_entity(mod_name));
+   set_current_module_entity(module_name_to_entity(mod_name));
 
    debug_on("SIMD_ATOMIZER_DEBUG_LEVEL");
    /* Now do the job */

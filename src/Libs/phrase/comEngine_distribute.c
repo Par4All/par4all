@@ -267,7 +267,7 @@ void create_HRE_module(string new_module_name,
 
   reset_current_module_entity();
 
-  set_current_module_entity(local_name_to_top_level_entity(module_name));
+  set_current_module_entity(module_name_to_entity(module_name));
 
   entity cloned = get_current_module_entity();
   string name = entity_local_name(cloned), new_name, comments;
@@ -295,7 +295,7 @@ void create_HRE_module(string new_module_name,
 
   reset_current_module_entity();
 
-  set_current_module_entity(local_name_to_top_level_entity(module_name));
+  set_current_module_entity(module_name_to_entity(module_name));
 
   t = text_named_module(new_fun, cloned, stat);
 
@@ -502,10 +502,10 @@ bool phrase_comEngine_distributor(string module_name)
 						   module_name, 
 						   TRUE);
   
-  module = local_name_to_top_level_entity(module_name);
+  module = module_name_to_entity(module_name);
   
   set_current_module_statement(module_stat);
-  set_current_module_entity(local_name_to_top_level_entity(module_name));
+  set_current_module_entity(module_name_to_entity(module_name)); // FI: a bit redundant since module is already available
   
   set_cumulated_rw_effects((statement_effects)
 			   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));

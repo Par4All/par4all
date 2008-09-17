@@ -63,7 +63,7 @@ entity create_state_variable (string module_name,
   string state_variable_name;
   char buffer[50];
 
-  module = local_name_to_top_level_entity(module_name); 
+  module = module_name_to_entity(module_name); 
 
   /* Assert that module represent a value code */
   pips_assert("it is a code", value_code_p(entity_initial(module)));

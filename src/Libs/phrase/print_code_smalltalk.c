@@ -1653,7 +1653,7 @@ bool print_code_smalltalk(string module_name)
 
   /* We first build the future resource file, with a .st */
   smalltalkcode = db_build_file_resource_name(DBR_SMALLTALK_CODE_FILE, module_name, STPRETTY);
-  module = local_name_to_top_level_entity(module_name);
+  module = module_name_to_entity(module_name);
   dir = db_get_current_workspace_directory();
   filename = strdup(concatenate(dir, "/", smalltalkcode, NULL));
   stat = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
