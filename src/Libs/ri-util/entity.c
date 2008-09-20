@@ -710,8 +710,12 @@ entity module_name_to_entity(string mn)
      top-level entity. */
   entity module = entity_undefined;
 
-  if(static_module_name_p(mn))
-    module = gen_find_tabulated(mn, entity_domain);
+  if(static_module_name_p(mn)) {
+    string cun = strdup(mn); /* compilation unit name */
+    *(strstr(cun, FILE_SEP_STRING)+1)='\0';
+    module = global_name_to_entity(cun, mn);
+    free(cun);
+  }
   else
     module = local_name_to_top_level_entity(mn);
 

@@ -507,6 +507,13 @@ entity FindEntityFromLocalName(string name)
 	return ent;
     }
 
+  if(entity_undefined_p(ent)) {
+    /* Is it a static function? It must have been parsed in the compilation unit */
+    string sname = strdup(concatenate(compilation_unit_name, name, NULL));
+    ent = global_name_to_entity(compilation_unit_name, sname);
+    return ent;
+  }
+
   pips_user_warning("Cannot find entity %s\n", name);
 
   return entity_undefined;
@@ -840,6 +847,7 @@ entity FindOrCreateCurrentEntity(string name,
 		       still not fully known. Wait for UpdateFunctionEntity(). */
 		    ent = find_or_create_entity(strdup(concatenate(compilation_unit_name,
 								   MODULE_SEP_STRING,
+								   compilation_unit_name,
 								   name,NULL)));
 		  else 
 		    ent = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,name);
@@ -2092,7 +2100,8 @@ void AddToCalledModules(entity e)
   if (!intrinsic_entity_p(e))
     {
       bool already_here = FALSE;
-      string n = top_level_entity_p(e)?entity_local_name(e):entity_name(e);
+      //string n = top_level_entity_p(e)?entity_local_name(e):entity_name(e);
+      string n = entity_local_name(e);
       MAP(STRING,s, 
       {
 	if (strcmp(n, s) == 0)

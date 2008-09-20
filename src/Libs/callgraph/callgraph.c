@@ -48,7 +48,7 @@ string_to_callees(string module_name)
 {
   callees cl = callees_undefined;
 
-  if(static_module_name_p(module_name))
+  if(FALSE && static_module_name_p(module_name))
     cl = (callees)db_get_memory_resource(DBR_CALLEES,module_name,TRUE);
   else {
     string ln = global_name_to_user_name(module_name);

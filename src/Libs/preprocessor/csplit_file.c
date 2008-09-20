@@ -191,7 +191,7 @@ void csplit_copy(string module_name, string signature, int first_line, int last_
   string unambiguous_module_file_name
     = strdup(concatenate(current_workspace_name, "/", module_name, ".c", NULL));
   string unambiguous_module_name = is_static_p?
-    strdup(concatenate(current_compilation_unit_name, MODULE_SEP_STRING, module_name, NULL)) :
+    strdup(concatenate(current_compilation_unit_name, /* MODULE_SEP_STRING,*/ module_name, NULL)) :
     module_name;
   /* string unambiguous_module_name = module_name; */
 
