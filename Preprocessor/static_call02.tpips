@@ -1,0 +1,23 @@
+delete static_call02
+
+setenv PIPS_CPP="cpp"
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create static_call02 static_call02/static_call02.c static_call02/bar.c static_call02/foo.c
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+display PARSED_PRINTED_FILE[%ALL]
+
+display PRINTED_FILE[%ALL]
+
+display SYMBOL_TABLE_FILE[%ALL]
+
+display CALLGRAPH_FILE[main]
+
+close
+#delete static_call02
+quit

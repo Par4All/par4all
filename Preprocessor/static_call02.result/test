@@ -1,0 +1,70 @@
+void bar(int i)
+{
+   extern void foo(int );
+   foo(i);
+
+   if (i) {
+      extern void foo(int );
+
+      foo(i);
+   }
+}
+extern void foo(int );
+void foo(int i)
+{
+
+   i++;
+   printf("This is the top-level version in bar.c\n");
+}
+static void foo(int );
+extern void bar(int );
+static void foo(int i)
+{
+   int foo;
+   void *p = (void *)&foo;
+
+   i++;
+
+   printf("This is the static version in foo.c\n");
+}
+int main()
+{
+   foo(3);
+   bar(3);
+}
+extern int main();
+int bar(int i)
+{
+   extern int foo(int );
+   foo(i);
+
+   if (i) {
+      extern int foo(int );
+
+      foo(i);
+   }
+}
+extern int foo(int );
+int foo(int i)
+{
+
+   i++;
+   printf("This is the top-level version in bar.c\n");
+}
+static void foo(int );
+extern int bar(int );
+static void foo(int i)
+{
+   int foo;
+   void *p = (void *)&foo;
+
+   i++;
+
+   printf("This is the static version in foo.c\n");
+}
+int main()
+{
+   foo(3);
+   bar(3);
+}
+extern int main();
