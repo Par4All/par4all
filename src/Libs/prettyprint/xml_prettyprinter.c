@@ -2352,7 +2352,10 @@ static void xml_TaskParameters(entity module, list pattern_region, Pvecteur pavi
 						  QUOTE,entity_user_name(FormalArrayName),QUOTE, BL, 
 						  "Type=", QUOTE,"DATA",QUOTE,BL,
 						  "AccessMode=", QUOTE, (effet_read)? "USE":"DEF",QUOTE,BL,
-						  "Kind=", QUOTE, "VARIABLE",QUOTE,
+						  "ArrayP=", QUOTE, (array_entity_p(v))?"TRUE":"FALSE",QUOTE, BL, 
+						  "Kind=", QUOTE, (entity_parameter_p(v))? "PARAMETER": "VARIABLE",QUOTE,
+						 
+
 						  CLOSEANGLE
 						  NL, NULL))); 
 	  tp = TRUE;
@@ -2434,7 +2437,7 @@ static void xml_Array(entity var,string_buffer sb_result)
 					  (heap_area_p(var) || stack_area_p(var)) ? 
 					  "DYNAMIC": "STATIC",
 					  QUOTE,BL,
-					  "Kind=", QUOTE, "VARIABLE",QUOTE,
+					  "Kind=", QUOTE,  (entity_parameter_p(var))? "PARAMETER": "VARIABLE",QUOTE,
 					  CLOSEANGLE
 					  NL, NULL)));
 
@@ -2590,6 +2593,15 @@ static void motif_in_statement(statement s)
     motif_in_statement_p= TRUE;
 }
 
+// A changer par une fonction qui detectera si la variable a ete definie 
+// dans un fichier de parametres ...
+static boolean entity_parameter_p(entity e)
+{
+  string s = entity_local_name(e);
+  boolean b=FALSE;
+  if (strstr(s,"PARAM")!=NULL) b = TRUE;
+    return (b);
+}
 
 static void xml_Loop(statement s, string_buffer sb_result)
 {
@@ -2683,6 +2695,7 @@ static void  xml_Task(string callee_name, string_buffer sb_result)
   Pvecteur pattern_indices = VECTEUR_NUL;
   boolean motif_in_te_p = FALSE;
   entity callee = module_name_to_entity(callee_name);
+  int i;
   //  string xml_callee = db_build_file_resource_name(DBR_XML_PRINTED_FILE, 
   //						  callee_name, XMLPRETTY);
   statement stat_callee=(statement) db_get_memory_resource(DBR_CODE, 
@@ -2714,7 +2727,7 @@ static void  xml_Task(string callee_name, string_buffer sb_result)
   xml_FormalArrays(callee,sb_result);
   /* A completer 
      On ne traite qu'une TE : un seul nid de boucles */
-  nested_loops = gen_array_item(task_loopnest.nested_loops,0); 
+ nested_loops = gen_array_item(task_loopnest.nested_loops,0); 
 
   pattern_region = regions_dup(load_statement_local_regions(stat_callee));
   gen_recurse(stat_callee, statement_domain, gen_true,motif_in_statement); 
@@ -2722,6 +2735,7 @@ static void  xml_Task(string callee_name, string_buffer sb_result)
   xml_Loops(nested_loops,FALSE,&pattern_region,&paving_indices, &pattern_indices, motif_in_te_p, sb_result);
 
   xml_TaskParameters(callee,pattern_region,paving_indices,sb_result);
+ 
   xml_Regions(sb_result);
   xml_CodeSize(sb_result);
   
@@ -2839,7 +2853,7 @@ static void xml_Connection(list  ActualArrayInd,int ActualArrayDim, int FormalAr
   Pvecteur pv;
   string_buffer_append_word("Connection",sb_result); 
   mat = matrix_new(ActualArrayDim,FormalArrayDim);
-
+  matrix_init(mat,ActualArrayDim,FormalArrayDim);
   if (is_fortran) {
     for (i=1;i<=ActualArrayDim && i<= FormalArrayDim;i++)
       MATRIX_ELEM(mat,i,i)=1;
@@ -2872,6 +2886,7 @@ static void xml_LoopOffset(list  ActualArrayInd,int ActualArrayDim, Pvecteur loo
 
   string_buffer_append_word("LoopOffset",sb_result); 
   mat = matrix_new(ActualArrayDim,nestloop_dim);
+  matrix_init(mat,ActualArrayDim,nestloop_dim);
   i=1;
   MAP(EXPRESSION, e , { 
     pv = (Pvecteur)normalized_linear(expression_normalized(e));
@@ -2892,6 +2907,7 @@ static void xml_ConstOffset(int ActualArrayDim, string_buffer sb_result)
   Pmatrix mat; 
   string_buffer_append_word("ConstOffset",sb_result); 
   mat = matrix_new(ActualArrayDim,1);
+  matrix_init(mat,ActualArrayDim,1);
   xml_Matrix(mat,ActualArrayDim,1,sb_result);
   string_buffer_append_word("/ConstOffset",sb_result);
 }
@@ -2924,6 +2940,9 @@ static void  xml_Arguments(statement s, entity function, Pvecteur loop_indices, 
   effect ef = effect_undefined; 
   int iexp,ith=0;
   int rw_ef=0;
+
+     printf("xml_Arguments statement: \n");
+      print_statement(s);
 
   string_buffer_append_word("Arguments",sb_result);
   global_margin++;
@@ -2968,7 +2987,7 @@ static void  xml_Arguments(statement s, entity function, Pvecteur loop_indices, 
 					      "ActualDim=", QUOTE,SActualArrayDim,QUOTE,BL,
 					      "FormalName=", QUOTE,entity_local_name(FormalArrayName), QUOTE,BL,
 					      "FormalDim=", QUOTE,itoa(FormalArrayDim),QUOTE,BL,
-					      "AccessMode=",QUOTE,(rw_ef==1)? "USE":"DEF",QUOTE,CLOSEANGLE,
+					      "AccessMode=",QUOTE,(rw_ef==2)? "DEF":"USE",QUOTE,CLOSEANGLE,
 					      NL, NULL)));
       /* Save information to generate Task Graph */
       hash_put(hash_task_to_effect,(char *)function, (char *) call_effect); 
@@ -3204,7 +3223,7 @@ static void xml_Application(string module_name, statement stat, string_buffer sb
 		       strdup(concatenate(OPENANGLE, 
 					  "!DOCTYPE Application SYSTEM ",
 					  QUOTE,
-					  "APPLI_TERAOPS_v2.dtd",
+					  "APPLI_TERAOPS_v3.dtd",
 					  QUOTE,
 					  CLOSEANGLE, 
 					  NL, NULL)));
@@ -3213,6 +3232,9 @@ static void xml_Application(string module_name, statement stat, string_buffer sb
 					  "Application Name=", 
 					  QUOTE,
 					  get_current_module_name(), 
+					  QUOTE, BL,
+					  "Language=",QUOTE,
+					  (is_fortran) ? "FORTRAN":"C",
 					  QUOTE, BL,
 					  "PassingMode=",
 					  QUOTE,
