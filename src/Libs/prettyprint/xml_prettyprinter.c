@@ -2028,7 +2028,7 @@ static void xml_CodeSize(string_buffer sb_result)
 
 // A changer par une fonction qui detectera si la variable a ete definie 
 // dans un fichier de parametres ...
-static boolean entity_parameter_p(entity e)
+static boolean entity_xml_parameter_p(entity e)
 {
   string s = entity_local_name(e);
   boolean b=FALSE;
@@ -2362,7 +2362,7 @@ static void xml_TaskParameters(entity module, list pattern_region, Pvecteur pavi
 						  "Type=", QUOTE,"DATA",QUOTE,BL,
 						  "AccessMode=", QUOTE, (effet_read)? "USE":"DEF",QUOTE,BL,
 						  "ArrayP=", QUOTE, (array_entity_p(v))?"TRUE":"FALSE",QUOTE, BL, 
-						  "Kind=", QUOTE, (entity_parameter_p(v))? "PARAMETER": "VARIABLE",QUOTE,
+						  "Kind=", QUOTE, (entity_xml_parameter_p(v))? "PARAMETER": "VARIABLE",QUOTE,
 						 
 
 						  CLOSEANGLE
@@ -2446,7 +2446,7 @@ static void xml_Array(entity var,string_buffer sb_result)
 					  (heap_area_p(var) || stack_area_p(var)) ? 
 					  "DYNAMIC": "STATIC",
 					  QUOTE,BL,
-					  "Kind=", QUOTE,  (entity_parameter_p(var))? "PARAMETER": "VARIABLE",QUOTE,
+					  "Kind=", QUOTE,  (entity_xml_parameter_p(var))? "PARAMETER": "VARIABLE",QUOTE,
 					  CLOSEANGLE
 					  NL, NULL)));
 
