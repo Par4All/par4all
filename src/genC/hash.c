@@ -127,9 +127,11 @@ static size_t prime_list[] = {
  */
 static size_t hash_size_limit(size_t current_size)
 {
-  /* 50.0% : ((size)>>1)
-   * 62.5% : (((size)>>1)+((size)>>3))
-   * 75.0% : (((size)>>1)+((size)>>2))
+  /* 25.0% : ((current_size)>>2)
+   * 50.0% : ((current_size)>>1)
+   * next values are TOO MUCH!
+   * 62.5% : (((current_size)>>1)+((current_size)>>3))
+   * 75.0% : (((current_size)>>1)+((current_size)>>2))
    */
   return current_size>>1;
 }
