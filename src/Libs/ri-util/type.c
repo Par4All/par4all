@@ -1088,6 +1088,7 @@ basic_maximum(basic fb1, basic fb2)
       b1 = make_basic(is_basic_int, (void *) 4);
       b = basic_maximum(b1, fb2);
       free_basic(b1);
+      return b;
     }
     else
       pips_internal_error("Unanalyzed derived basic b1\n");
@@ -1100,6 +1101,7 @@ basic_maximum(basic fb1, basic fb2)
       b2 = make_basic(is_basic_int, (void *) 4);
       b = basic_maximum(fb1, b2);
       free_basic(b2);
+      return b;
     }
     else
       pips_internal_error("Unanalyzed derived basic b2\n");
