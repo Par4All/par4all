@@ -13,7 +13,7 @@ Variable list:
 	Declared entity "decl02!:*DYNAMIC*" with type "area" with size 0
 	Declared entity "decl02!:*HEAP*" with type "area" with size 0
 	Declared entity "decl02!:*STACK*" with type "area" with size 0
-	Declared entity "decl02!:*STATIC*" with type "area" with size 0
+	Declared entity "decl02!:*STATIC*" with type "area" with size 12
 	Declared entity "decl02!:cmd" with type "variable" "char *"
 	Declared entity "decl02!:file" with type "variable" "char *"
 	Declared entity "decl02!:line" with type "variable" "STD_uint32"
@@ -40,8 +40,10 @@ Layout for memory area "decl02!:*STACK*" of size 0:
 	* empty area *
 
 
-Layout for memory area "decl02!:*STATIC*" of size 0:
-	* empty area *
+Layout for memory area "decl02!:*STATIC*" of size 12:
+	Variable "decl02!:cmd"	offset = 0	size = 4
+	Variable "decl02!:file"	offset = 4	size = 4
+	Variable "decl02!:line"	offset = 8	size = 4
 
 End of declarations for module decl02!
 

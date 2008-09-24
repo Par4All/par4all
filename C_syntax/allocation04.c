@@ -7,9 +7,9 @@ static int m;
 /*comment2*/
 int foo(int i)
 {
-	int k;
+	int k = a;
 	static int l;
-	return k;
+	return k + m;
 }
 int main()
 {	
@@ -17,6 +17,6 @@ int main()
 	int fooi;
 	float array[20];
 	static int j;
-	fooi=foo();
+	fooi=foo(i);
 	return 0;
 }

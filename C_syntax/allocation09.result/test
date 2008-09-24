@@ -1,0 +1,97 @@
+
+Symbol table for "allocation09"
+
+allocation09
+
+Declarations for module "allocation09" with type "() -> int"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "allocation09!:*HEAP*" with type "area" with size 0
+	Declared entity "allocation09!:*STATIC*" with type "area" with size 0
+	Declared entity "allocation09:*DYNAMIC*" with type "area" with size 57
+	Declared entity "allocation09:*STACK*" with type "area" with size 0
+	Declared entity "allocation09:*STATIC*" with type "area" with size 0
+	Declared entity "allocation09:0`a" with type "variable" "char"
+	Declared entity "allocation09:0`b" with type "variable" "short"
+	Declared entity "allocation09:0`c" with type "variable" "int"
+	Declared entity "allocation09:0`d" with type "variable" "long"
+	Declared entity "allocation09:0`e" with type "variable" "long long"
+	Declared entity "allocation09:0`sa" with type "variable" "signed char"
+	Declared entity "allocation09:0`sb" with type "variable" "signed short"
+	Declared entity "allocation09:0`sc" with type "variable" "signed int"
+	Declared entity "allocation09:0`sd" with type "variable" "signed long"
+	Declared entity "allocation09:0`se" with type "variable" "signed long long"
+	Declared entity "allocation09:0`ua" with type "variable" "unsigned char"
+	Declared entity "allocation09:0`ub" with type "variable" "unsigned short"
+	Declared entity "allocation09:0`uc" with type "variable" "unsigned int"
+	Declared entity "allocation09:0`ud" with type "variable" "unsigned long"
+	Declared entity "allocation09:0`ue" with type "variable" "unsigned long long"
+
+* empty extern declaration list *
+
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "allocation09!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "allocation09!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "allocation09:*DYNAMIC*" of size 57:
+	Variable "allocation09:0`a"	offset = 0	size = 1
+	Variable "allocation09:0`b"	offset = 1	size = 2
+	Variable "allocation09:0`c"	offset = 3	size = 4
+	Variable "allocation09:0`d"	offset = 7	size = 4
+	Variable "allocation09:0`e"	offset = 11	size = 8
+	Variable "allocation09:0`ua"	offset = 19	size = 1
+	Variable "allocation09:0`ub"	offset = 20	size = 2
+	Variable "allocation09:0`uc"	offset = 22	size = 4
+	Variable "allocation09:0`ud"	offset = 26	size = 4
+	Variable "allocation09:0`ue"	offset = 30	size = 8
+	Variable "allocation09:0`sa"	offset = 38	size = 1
+	Variable "allocation09:0`sb"	offset = 39	size = 2
+	Variable "allocation09:0`sc"	offset = 41	size = 4
+	Variable "allocation09:0`sd"	offset = 45	size = 4
+	Variable "allocation09:0`se"	offset = 49	size = 8
+
+
+Layout for memory area "allocation09:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "allocation09:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module allocation09
+
+
+Parsed printed file for "allocation09"
+
+extern int allocation09();
+int allocation09()
+{
+   char a;
+   short b;
+   int c;
+   long d;
+   long long e;
+   unsigned char ua;
+   unsigned short ub;
+   unsigned int uc;
+   unsigned long ud;
+   unsigned long long ue;
+   signed char sa;
+   signed short sb;
+   signed int sc;
+   signed long sd;
+   signed long long se;
+}

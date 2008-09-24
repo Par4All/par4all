@@ -12,7 +12,7 @@ Variable list:
 	Declared entity "block_scope10!:*HEAP*" with type "area" with size 0
 	Declared entity "block_scope10!:*STACK*" with type "area" with size 0
 	Declared entity "block_scope10!:*STATIC*" with type "area" with size 0
-	Declared entity "block_scope10!:block_scope10" with type "functional" "() -> int"
+	Declared entity "block_scope10!:block_scope10!block_scope10" with type "functional" "() -> int"
 
 * empty extern declaration list *
 
