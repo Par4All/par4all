@@ -38,15 +38,12 @@ typedef struct cons {
 #define CDR(pcons) ((pcons)->cdr)
 #define REFCAR(pc) (&(CAR(pc).p))
 
-#ifdef NEWGEN_TYPED_CONS
 #define CONS(_t_,_i_,_l_) gen_##_t_##_cons((_i_),(_l_))
 #define gen_BOOL_cons gen_bool_cons
 #define gen_INT_cons gen_int_cons
 #define gen_LIST_cons gen_list_cons
 #define gen_STRING_cons gen_string_cons
-#else
-#define CONS(type,x,l) gen_cons((void*) (x), (l))
-#endif /* NEWGEN_TYPED_CONS */
+/* #define CONS(type,x,l) gen_cons((void*) (x), (l)) */
 
 #define MAPL(_map_list_cp,_code,_l)					\
   {									\
