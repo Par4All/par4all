@@ -454,7 +454,7 @@ sentence_head(entity e)
       pips_internal_error("unexpected type for result\n");
     }
       
-    pc = CHAIN_SWORD(pc, module_local_name(e));
+    pc = CHAIN_SWORD(pc, entity_user_name(e));
     
     if (!ENDP(args)) {
       pc = CHAIN_SWORD(pc, "(");

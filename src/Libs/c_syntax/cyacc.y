@@ -1497,6 +1497,7 @@ declaration:                               /* ISO 6.7.*/
 			  $$ = gen_nconc($1,$2);
 			  /* Remove their type stacks */
 			  remove_entity_type_stacks($$);
+			  CleanUpEntities($$);
 			}
 |   decl_spec_list TK_SEMICOLON	
                         {

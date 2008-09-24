@@ -138,12 +138,17 @@ void MakeCurrentCompilationUnitEntity(string name)
 
 void ResetCurrentCompilationUnitEntity(bool is_compilation_unit_parser)
 {
+  /* Let's redo the memory allocation for variables whose name has changed:-(*/
   if(is_compilation_unit_parser)
     CCompilationUnitMemoryAllocation(get_current_module_entity());
+  else
+    CCompilationUnitMemoryReallocation(get_current_module_entity());
+
   /* reset_entity_type_stack_table(); */
   if (get_bool_property("PARSER_DUMP_SYMBOL_TABLE"))
     fprint_C_environment(stderr, get_current_module_entity());
-  pips_debug(4,"Reset current module entity for compilation unit %s\n",get_current_module_name());
+  pips_debug(4,"Reset current module entity for compilation unit \"%s\"\n",
+	     get_current_module_name());
   reset_current_module_entity();
 }
 
@@ -494,7 +499,7 @@ entity FindEntityFromLocalName(string name)
      
      How about multiple results ? The order of prefixes ?  */
 
-  entity ent;
+  entity ent = entity_undefined;
   string prefixes[] = {"",STRUCT_PREFIX, UNION_PREFIX, ENUM_PREFIX, TYPEDEF_PREFIX,NULL};
   int i;
   //extern c_parser_context GetScope(void);
@@ -842,6 +847,12 @@ entity FindOrCreateCurrentEntity(string name,
 		{
 		  /* This is a variable/function declared outside any module's body*/
 		  if (is_static)
+		  /* If it is a function, we'd like to increase its
+		     name. If it's a variable, we'd like not to
+		     increase its name with the compilation unit
+		     name. But we do not have much information here to
+		     make the decision. Let's assume it's a function
+		     and postpone to UpdateEntity() */
 		    /* Depending on the type, we should or not
 		       introduce a MODULE_SEP_STRING, but the type is
 		       still not fully known. Wait for UpdateFunctionEntity(). */
@@ -1185,7 +1196,7 @@ type UpdateType(type t1, type t2)
 
 /* This function allocates the memory to the Current Compilation Unit */
 
-void CCompilationUnitMemoryAllocation(entity module)
+void CCompilationUnitMemoryAllocations(entity module, boolean first_p)
 {
   list ld = entity_declarations(module);
   entity var = entity_undefined;
@@ -1219,17 +1230,20 @@ void CCompilationUnitMemoryAllocation(entity module)
 	  if(ram_offset(r) != UNDEFINED_RAM_OFFSET 
 	     && ram_offset(r) != UNKNOWN_RAM_OFFSET 
 	     && ram_offset(r) != DYNAMIC_RAM_OFFSET ) {
-	    pips_user_warning
-	      ("Multiple declarations of variable %s in different files\n"
-	       ,entity_local_name(var));
-	    CParserError("Fix your source code!\n");
+	    if(first_p) {
+	      pips_user_warning
+		("Multiple declarations of variable %s in different files\n"
+		 ,entity_local_name(var));
+	      CParserError("Fix your source code!\n");
+	    }
 	  }
-
-	  ram_offset(r) = area_size(type_area(entity_type(a)));
-	  add_C_variable_to_area(a,var);
+	  else {
+	    ram_offset(r) = area_size(type_area(entity_type(a)));
+	    add_C_variable_to_area(a,var);
+	  }
 	}
 	else {
-	  /* Donot allocate the memory for external variables:
+	  /* Do not allocate the memory for external variables:
 	     Set the offset of ram -2 which signifies UNKNOWN offset
 	  */
 
@@ -1240,6 +1254,16 @@ void CCompilationUnitMemoryAllocation(entity module)
       }
     }
   }
+}
+
+void CCompilationUnitMemoryAllocation(entity module)
+{
+  CCompilationUnitMemoryAllocations(module, TRUE);
+}
+
+void CCompilationUnitMemoryReallocation(entity module)
+{
+  CCompilationUnitMemoryAllocations(module, FALSE);
 }
 
 /* This function is for MemoryAllocation for Module of C programs*/
@@ -1641,6 +1665,88 @@ void UpdateEntities(list le, stack ContextStack, stack FormalStack, stack Functi
   {
     UpdateEntity(e,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external,is_declaration);
   },le);
+}
+
+entity CleanUpEntity(entity e)
+{
+  entity ne = e;
+  type et = entity_type(e);
+  string eln = entity_local_name(e);
+
+  if(static_module_name_p(eln) && !type_functional_p(et)) {
+    /* The variable name is wrong */
+    string neln = strstr(eln, FILE_SEP_STRING)+1;
+    string emn = entity_module_name(e);
+
+    ne = FindOrCreateEntity(emn, neln);
+
+    entity_type(ne) = copy_type(entity_type(e));
+    entity_storage(ne) = copy_storage(entity_storage(e));
+    entity_initial(ne) = copy_value(entity_initial(e));
+
+    pips_assert("entity has type variable", type_variable_p(et));
+    pips_debug(1, "Entity %s should have a functional type\n", entity_name(e));
+    pips_debug(1, "New Entity %s created\n", entity_name(ne));
+    /* Entity e should be removed... but it's pretty dangerous. */
+  }
+
+  return ne;
+}
+
+void CleanUpEntities(list le)
+{
+  list ce = list_undefined;
+  bool found = FALSE;
+
+  for(ce=le; !ENDP(ce); POP(ce)) {
+    entity e = ENTITY(CAR(ce));
+    entity ne = CleanUpEntity(e);
+    if(ne!=e) {
+      entity m = get_current_module_entity();
+      list d = code_declarations(value_code(entity_initial(m)));
+      list de = list_undefined;
+      storage s = entity_storage(e);
+
+      /* update entity in module declarations */
+      found = FALSE;
+      for(de=d; !ENDP(de); POP(de)) {
+	entity ed = ENTITY(CAR(de));
+	if(ed==e) {
+	  CAR(de).p = (gen_chunk *) ne;
+	  found = TRUE;
+	}
+      }
+      if(!found)
+	pips_internal_error("Entity to be replaced not declared\n");
+
+      /* Update storage area */
+      found = FALSE;
+      if(storage_ram_p(s)) {
+	ram r = storage_ram(s);
+	entity a = ram_section(r);
+	list ld = area_layout(type_area(entity_type(a)));
+	list lde = list_undefined;
+
+	for(lde=ld; !ENDP(lde); POP(lde)) {
+	  entity ed = ENTITY(CAR(lde));
+	  if(ed==e) {
+	    found = TRUE;
+	    CAR(lde).p = (gen_chunk *) ne;
+	  }
+	}
+	if(!found)
+	  pips_internal_error("Entity to be replaced not allocated in its ram area\n");
+      }
+      else {
+	pips_internal_error("Unexpected storage kind\n");
+      }
+
+      /* Update entity in current entity list */
+      CAR(ce).p = (gen_chunk *) ne;
+
+      free_entity(e);
+    }
+  }
 }
 
 

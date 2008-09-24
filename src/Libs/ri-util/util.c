@@ -27,6 +27,7 @@ string global_name_to_user_name(string global_name)
 {
   string user_name = string_undefined;
   char lc = global_name[strlen(global_name)-1];
+  string p;
 
   /* First, take care of constrant strings and characters, wich may
      contain any of the PIPS special characters and strings.
@@ -91,6 +92,11 @@ string global_name_to_user_name(string global_name)
       user_name = NULL;
     }
   }
+
+  /* Take care of the special case of static functions, leaving
+     compilation unit names untouched */
+  if ((p=strstr(user_name,FILE_SEP_STRING)) != NULL && *(p+1)!='\0')
+    user_name = p + 1;
 
   pips_debug(9, "global name = \"%s\", user_name = \"%s\"\n",
 	     global_name, user_name);

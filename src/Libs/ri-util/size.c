@@ -235,8 +235,12 @@ int SizeOfElements(basic b)
 
   switch (basic_tag(b)) {
   case is_basic_int:
+    {
     e = basic_int(b);
+    if(e==DEFAULT_LONG_INTEGER_TYPE_SIZE)
+      e = DEFAULT_INTEGER_TYPE_SIZE;
     break;
+    }
   case is_basic_float:
     e = basic_float(b);
     break;
