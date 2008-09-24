@@ -1,7 +1,7 @@
 /*
  * STACK MANAGEMENT
  *
- * Fabien COELHO, 05/12/94 
+ * Fabien COELHO, 05/12/94
  *
  * Could be integrated in Newgen as a building type (as lists, mappings).
  * there is no actual need of such a type on the functional point of view.
@@ -9,7 +9,7 @@
  * Stack print out and read in functions would be needed.
  * (direction problem).
  *
- * More thoughts needed. 
+ * More thoughts needed.
  *
  * $Id$
  */
@@ -28,26 +28,26 @@
  */
 typedef struct __stack_bucket
 {
-    size_t n_item;                 /* next available item in the bucket */
-    size_t max_items;              /* the max number of items of this bucket */
-    void **items;               /* the items (only pointers at the moment) */
-    struct __stack_bucket *succ;/* the next bucket */
-    /* we could keep the privious bucket? */
+  size_t n_item;                 /* next available item in the bucket */
+  size_t max_items;              /* the max number of items of this bucket */
+  void ** items;                 /* the items (only pointers at the moment) */
+  struct __stack_bucket *succ;/* the next bucket */
+  /* we could keep the previous bucket? */
 }
-   _stack_bucket, *_stack_ptr;
+  _stack_bucket, *_stack_ptr;
 
 /*  the stack head
  */
 typedef struct __stack_head
 {
-    size_t size;        /* current number of elements in stack */
-    size_t max_extent;  /* maximum extension of the stack */
-    _stack_ptr stack;/* buckets in use by the stack */
-    _stack_ptr avail;/* allocated buckets not in use anymore */
-    size_t bucket_size; /* reference bucket size for allocation */
-    size_t n_buckets;   /* number of allocated buckets */
-    int type;        /* as BASIC, LIST, EXTERNAL, CHUNK, domain? */
-    int policy;      /* may be used to indicate an allocation policy */
+  size_t size;        /* current number of elements in stack */
+  size_t max_extent;  /* maximum extension of the stack */
+  _stack_ptr stack;/* buckets in use by the stack */
+  _stack_ptr avail;/* allocated buckets not in use anymore */
+  size_t bucket_size; /* reference bucket size for allocation */
+  size_t n_buckets;   /* number of allocated buckets */
+  int type;        /* as BASIC, LIST, EXTERNAL, CHUNK, domain? */
+  int policy;      /* may be used to indicate an allocation policy */
 }
     _stack_head; /* and also *stack (in headers) */
 
@@ -61,23 +61,24 @@ typedef struct __stack_head
  */
 typedef struct __stack_iterator
 {
-    _stack_ptr bucket; /* current bucket */
-    int downward;      /* true if downward iterations */
-    size_t index;         /* current index in bucket */
-    _stack_ptr list;   /* all buckets */
+  _stack_ptr bucket; /* current bucket */
+  int downward;      /* true if downward iterations */
+  size_t index;      /* current index in bucket */
+  _stack_ptr list;   /* all buckets */
 }
     _stack_iterator; /* and also *stack_iterator (in headers) */
 
 static void update_iterator_upward(stack_iterator i)
 {
-    _stack_ptr x=i->list;
+  _stack_ptr x=i->list;
 
-    while(!STACK_PTR_NULL_P(x) && x->succ!=i->bucket) 
-	x=x->succ;
+  while(!STACK_PTR_NULL_P(x) && x->succ!=i->bucket)
+    x=x->succ;
 
-    i->bucket=x, i->index=0;
+  i->bucket=x, i->index=0;
 
-    if (x && i->bucket->n_item==0) i->bucket = STACK_PTR_NULL;
+  if (x && i->bucket->n_item==0)
+    i->bucket = STACK_PTR_NULL;
 }
 
 #define STACK_ITERATOR_END_P(i) STACK_PTR_NULL_P(i->bucket)
@@ -97,58 +98,56 @@ static void update_iterator_upward(stack_iterator i)
 
 stack_iterator stack_iterator_init(stack s, int down)
 {
-    stack_iterator i = (stack_iterator) malloc(sizeof(_stack_iterator));
+  stack_iterator i = (stack_iterator) malloc(sizeof(_stack_iterator));
 
-    STACK_CHECK(s);
+  STACK_CHECK(s);
 
-    if ((s->size)==0)
-		DEFINE_ITERATOR(i, STACK_PTR_NULL, -1, down, STACK_PTR_NULL)
+  if ((s->size)==0)
+    DEFINE_ITERATOR(i, STACK_PTR_NULL, -1, down, STACK_PTR_NULL)
+  else
+  {
+    if (down)
+    {
+      DEFINE_ITERATOR(i, s->stack, (s->stack->n_item)-1, down, s->stack);
+      UPDATE_ITERATOR_DOWNWARD(i);
+    }
     else
     {
-		if (down)
-		{
-			DEFINE_ITERATOR(i, s->stack, (s->stack->n_item)-1, down, 
-							s->stack);
-			UPDATE_ITERATOR_DOWNWARD(i);
-		}
-		else
-		{
-			DEFINE_ITERATOR(i, STACK_PTR_NULL, 0, down, s->stack);
-			update_iterator_upward(i); /* NOT the define! */
-		}
+      DEFINE_ITERATOR(i, STACK_PTR_NULL, 0, down, s->stack);
+      update_iterator_upward(i); /* NOT the define! */
     }
-    
-    return(i);
+  }
+  return i;
 }
 
 int stack_iterator_next_and_go(stack_iterator i, void ** pitem)
 {
-    if (STACK_ITERATOR_END_P(i))
-    {
-		*pitem = (void*) NULL;
-		return 0;
-    }
-    else
-    {
-		*pitem = (i->bucket->items)[i->index];
-		NEXT_ITERATION(i);
-		return 1;
-    }
+  if (STACK_ITERATOR_END_P(i))
+  {
+    *pitem = (void*) NULL;
+    return 0;
+  }
+  else
+  {
+    *pitem = (i->bucket->items)[i->index];
+    NEXT_ITERATION(i);
+    return 1;
+  }
 }
 
 int stack_iterator_end_p(stack_iterator i)
 {
-    return(STACK_ITERATOR_END_P(i));
+  return STACK_ITERATOR_END_P(i);
 }
 
 void stack_iterator_end(stack_iterator * pi)
 {
-    (*pi)->bucket = NEWGEN_FREED;
-    (*pi)->downward = 0;
-    (*pi)->index = 0;
-    (*pi)->list = NEWGEN_FREED;
-    free(*pi);
-    *pi=(stack_iterator) NULL;
+  (*pi)->bucket = NEWGEN_FREED;
+  (*pi)->downward = 0;
+  (*pi)->index = 0;
+  (*pi)->list = NEWGEN_FREED;
+  free(*pi);
+  *pi=(stack_iterator) NULL;
 }
 
 /*
@@ -160,16 +159,16 @@ void stack_iterator_end(stack_iterator * pi)
  */
 static _stack_ptr allocate_bucket(int size)
 {
-    _stack_ptr x = (_stack_ptr) malloc(sizeof(_stack_bucket));
-    message_assert("pointer was allocated", x);
-    
-    x->n_item = 0;
-    x->max_items = size;
-    x->items = (void **) malloc(sizeof(void *)*size);
-    message_assert("pointer was allocated", x->items);
-    x->succ = STACK_PTR_NULL;
+  _stack_ptr x = (_stack_ptr) malloc(sizeof(_stack_bucket));
+  message_assert("pointer was allocated", x);
 
-    return x;
+  x->n_item = 0;
+  x->max_items = size;
+  x->items = (void **) malloc(sizeof(void *)*size);
+  message_assert("pointer was allocated", x->items);
+  x->succ = STACK_PTR_NULL;
+
+  return x;
 }
 
 /* search for a new bucket, first in the available list,
@@ -177,41 +176,40 @@ static _stack_ptr allocate_bucket(int size)
  */
 static _stack_ptr find_or_allocate(stack s)
 {
-    if (!STACK_PTR_NULL_P(s->avail))
-    {
-		_stack_ptr x = s->avail;
-		
-		s->avail = (s->avail)->succ;
-		x->succ = STACK_PTR_NULL; /*  clean the bucket to be returned */
-		return x;
-    }
-    else
-    {
-		s->n_buckets++;
-		/* may depend from the policy? */
-		return allocate_bucket(s->bucket_size); 
-    }
+  if (!STACK_PTR_NULL_P(s->avail))
+  {
+    _stack_ptr x = s->avail;
+    s->avail = (s->avail)->succ;
+    x->succ = STACK_PTR_NULL; /*  clean the bucket to be returned */
+    return x;
+  }
+  else
+  {
+    s->n_buckets++;
+    /* may depend from the policy? */
+    return allocate_bucket(s->bucket_size);
+  }
 }
 
 /* ALLOCATEs a new stack of type
  */
 stack stack_make(int type, int bucket_size, int policy)
 {
-    stack s = (stack) malloc(sizeof(_stack_head));
-    message_assert("pointer was allocated", s);
+  stack s = (stack) malloc(sizeof(_stack_head));
+  message_assert("pointer was allocated", s);
 
-    if (bucket_size<10) bucket_size=STACK_DEFAULT_SIZE; /* not too small */
+  if (bucket_size<10) bucket_size=STACK_DEFAULT_SIZE; /* not too small */
 
-    s->size = 0;
-    s->type = type;
-    s->policy = policy; /* not used */
-    s->bucket_size = bucket_size;
-    s->max_extent = 0;
-    s->n_buckets = 0;
-    s->stack = allocate_bucket(bucket_size);
-    s->avail = STACK_PTR_NULL;
- 
-    return s;
+  s->size = 0;
+  s->type = type;
+  s->policy = policy; /* not used */
+  s->bucket_size = bucket_size;
+  s->max_extent = 0;
+  s->n_buckets = 0;
+  s->stack = allocate_bucket(bucket_size);
+  s->avail = STACK_PTR_NULL;
+
+  return s;
 }
 
 /* duplicate a stack with its contents.
@@ -233,20 +231,20 @@ static void free_bucket(_stack_ptr x)
 
 static void free_buckets(_stack_ptr x)
 {
-    _stack_ptr tmp;
-    while(!STACK_PTR_NULL_P(x))
-    {
-		tmp=x, x=x->succ, tmp->succ=STACK_PTR_NULL;
-		free_bucket(tmp);
-    }
+  _stack_ptr tmp;
+  while(!STACK_PTR_NULL_P(x))
+  {
+    tmp=x, x=x->succ, tmp->succ=STACK_PTR_NULL;
+    free_bucket(tmp);
+  }
 }
 
 void stack_free(stack * ps)
 {
-    free_buckets((*ps)->stack), (*ps)->stack=STACK_PTR_NULL;
-    free_buckets((*ps)->avail), (*ps)->avail=STACK_PTR_NULL;
-    gen_free_area((void**) *ps, sizeof(stack_head));
-    *ps = STACK_NULL;
+  free_buckets((*ps)->stack), (*ps)->stack=STACK_PTR_NULL;
+  free_buckets((*ps)->avail), (*ps)->avail=STACK_PTR_NULL;
+  gen_free_area((void**) *ps, sizeof(stack_head));
+  *ps = STACK_NULL;
 }
 
 /*    STACK MISCELLANEOUS
@@ -267,43 +265,43 @@ STACK_OBSERVER(consistent_p, 1) /* well, it is not implemented */
  */
 void stack_map(stack s, void (*f)())
 {
-    _stack_ptr x;
-    int i;
+  _stack_ptr x;
+  int i;
 
-    STACK_CHECK(s);
+  STACK_CHECK(s);
 
-    for(x=s->stack; x!=NULL; x=x->succ)
-	for(i=(x->n_item)-1; i>=0; i--)
-	    (*f)(x->items[i]);
+  for(x=s->stack; x!=NULL; x=x->succ)
+    for(i=(x->n_item)-1; i>=0; i--)
+      (*f)(x->items[i]);
 }
 
 static int number_of_buckets(_stack_ptr x)
 {
-    int n=0;
-    for(; !STACK_PTR_NULL_P(x); x=x->succ, n++);
-    return n;
+  int n=0;
+  for(; !STACK_PTR_NULL_P(x); x=x->succ, n++);
+  return n;
 }
 
 void stack_info(FILE * f, stack s)
 {
-    fprintf(f, "stack_info about stack %p\n", s);
+  fprintf(f, "stack_info about stack %p\n", s);
 
-    if (STACK_NULL_P(s))
-    {
-		fprintf(f, " - is null\n");
-		return;
-    }
-    /* else */
-    if (stack_undefined_p(s))
-    {
-		fprintf(f, " - is undefined\n");
-		return;
-    }
-    /* else */
-    fprintf(f, " - type %d, size %zd, max extent %zd\n", 
-	    s->type, s->size, s->max_extent);
-    fprintf(f, " - buckets: %d in use, %d available\n",
-	    number_of_buckets(s->stack), number_of_buckets(s->avail));
+  if (STACK_NULL_P(s))
+  {
+    fprintf(f, " - is null\n");
+    return;
+  }
+  /* else */
+  if (stack_undefined_p(s))
+  {
+    fprintf(f, " - is undefined\n");
+    return;
+  }
+  /* else */
+  fprintf(f, " - type %d, size %zd, max extent %zd\n",
+	  s->type, s->size, s->max_extent);
+  fprintf(f, " - buckets: %d in use, %d available\n",
+	  number_of_buckets(s->stack), number_of_buckets(s->avail));
 }
 
 /*     STACK USE
@@ -311,86 +309,84 @@ void stack_info(FILE * f, stack s)
 
 /* PUSHes the item on stack s
  *
- * a new bucket is allocated if necessary. 
- * the size it the same than the initial bucket size. 
+ * a new bucket is allocated if necessary.
+ * the size it the same than the initial bucket size.
  * Other policies may be considered.
  */
 void stack_push(void * item, stack s)
 {
-    _stack_ptr x = s->stack;
+  _stack_ptr x = s->stack;
 
-    assert(!STACK_PTR_NULL_P(x));
+  assert(!STACK_PTR_NULL_P(x));
 
-    if (x->n_item == x->max_items)
-    {
-		_stack_ptr saved = x;
-		x = find_or_allocate(s);
-		x->succ = saved;
-		s->stack = x;
-    }
+  if (x->n_item == x->max_items)
+  {
+    _stack_ptr saved = x;
+    x = find_or_allocate(s);
+    x->succ = saved;
+    s->stack = x;
+  }
 
-    /*   PUSH!
-     */
-    s->size++; 
-    if (s->size > s->max_extent) s->max_extent = s->size;
-    x->items[x->n_item++] = item;
+  /*   PUSH!
+   */
+  s->size++;
+  if (s->size > s->max_extent) s->max_extent = s->size;
+  x->items[x->n_item++] = item;
 }
 
 /* POPs one item from stack s
  *
- * the empty buckets are not freed here. 
+ * the empty buckets are not freed here.
  * stack_free does the job.
  */
 void *stack_pop(stack s)
 {
-    _stack_ptr x = s->stack;
+  _stack_ptr x = s->stack;
 
-    if (x->n_item==0)
-    {
-		_stack_ptr saved = x->succ;
-		
-		x->succ = s->avail, s->avail = x;
-		s->stack = saved, x = saved;
-    }
+  if (x->n_item==0)
+  {
+    _stack_ptr saved = x->succ;
+    x->succ = s->avail, s->avail = x;
+    s->stack = saved, x = saved;
+  }
 
-    assert(!STACK_PTR_NULL_P(x) && x->n_item>0);
+  assert(!STACK_PTR_NULL_P(x) && x->n_item>0);
 
-    /*   POP!
-     */
-    s->size--; 
-    return x->items[--x->n_item];
+  /*   POP!
+   */
+  s->size--;
+  return x->items[--x->n_item];
 }
 
 /* returns the item on top of stack s
  */
 void *stack_head(stack s)
 {
-    _stack_ptr x = s->stack;
+  _stack_ptr x = s->stack;
+  if (x->n_item==0) x = x->succ;
+  assert(!STACK_PTR_NULL_P(x) && x->n_item>0);
 
-    if (x->n_item==0) x = x->succ;
-    assert(!STACK_PTR_NULL_P(x) && x->n_item>0);
-
-    /*   HEAD
-     */
-    return x->items[(x->n_item)-1];
+  /*   HEAD
+   */
+  return x->items[(x->n_item)-1];
 }
 
 /* REPLACEs the item on top of stack s, and returns the old item
  */
 void *stack_replace(void * item, stack s)
 {
-    _stack_ptr x = s->stack;
-    void *old;
+  _stack_ptr x = s->stack;
+  void *old;
 
-    if (x->n_item==0) x = x->succ;
-    assert(!STACK_PTR_NULL_P(x) && x->n_item>0);
+  if (x->n_item==0) x = x->succ;
+  assert(!STACK_PTR_NULL_P(x) && x->n_item>0);
 
-    /*    REPLACE
-     */
-    old = x->items[(x->n_item)-1],
-    x->items[(x->n_item)-1] = item;
+  /*    REPLACE
+   */
+  old = x->items[(x->n_item)-1];
+  x->items[(x->n_item)-1] = item;
 
-    return old;
+  return old;
 }
 
 /*  that is all
