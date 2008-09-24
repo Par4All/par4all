@@ -1,5 +1,5 @@
 /*  STACK MANAGEMENT -- headers
- *  
+ *
  * $Id$
  *
  *  - a stack is declared with type stack (internals not visible from here!)
@@ -88,15 +88,19 @@ extern int stack_iterator_end_p _PROTO((stack_iterator)); /* not needed */
 
 /* applies _code on the items of _stack downward , with _item of _itemtype.
  */
-#define STACK_MAP_X(_item, _itemtype, _code, _stack, _downwards) \
-{\
-    stack_iterator _i = stack_iterator_init(_stack, _downwards);\
-    _itemtype _item;\
-    while(stack_iterator_next_and_go(_i, (void**)&_item)) _code;\
-    stack_iterator_end(&_i);\
-}
+#define STACK_MAP_X(_item, _itemtype, _code, _stack, _downwards)	\
+  {									\
+    stack_iterator _i = stack_iterator_init(_stack, _downwards);	\
+    void * _vs_item;							\
+    while (stack_iterator_next_and_go(_i, &_vs_item))			\
+    {									\
+      _itemtype _item = (_itemtype) _vs_item;				\
+      _code;								\
+    }									\
+    stack_iterator_end(&_i);						\
+  }
 
-#define STACK_MAP(_item, _itemtype, _code, _stack) \
+#define STACK_MAP(_item, _itemtype, _code, _stack)	\
   STACK_MAP_X(_item, _itemtype, _code, _stack, 1)
 
 #undef _PROTO
