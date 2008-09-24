@@ -82,19 +82,35 @@ static void update_iterator_upward(stack_iterator i)
 }
 
 #define STACK_ITERATOR_END_P(i) STACK_PTR_NULL_P(i->bucket)
-#define DEFINE_ITERATOR(i,blk,idx,dwn,lst) \
-    { i->bucket=(blk), i->index=(idx), i->list=lst, i->downward=dwn;}
-#define UPDATE_ITERATOR_DOWNWARD(i)\
-  if (i->index == (size_t) -1)	   \
- { i->bucket = i->bucket->succ,\
-   i->index = (i->bucket) ? (i->bucket->n_item)-1 : (size_t) -1; }
-#define UPDATE_ITERATOR_UPWARD(i)\
- if (i->index==i->bucket->n_item) update_iterator_upward(i);
-#define NEXT_ITERATION(i) \
-  if (i->downward)\
-  { i->index--; UPDATE_ITERATOR_DOWNWARD(i);}\
-  else\
-  { i->index++; UPDATE_ITERATOR_UPWARD(i); }
+
+#define DEFINE_ITERATOR(i,blk,idx,dwn,lst)				\
+  {									\
+    i->bucket=(blk);							\
+    i->index=(idx);							\
+    i->list=lst;							\
+    i->downward=dwn;							\
+  }
+
+#define UPDATE_ITERATOR_DOWNWARD(i)					\
+  if (i->index == (size_t) -1)						\
+    {									\
+      i->bucket = i->bucket->succ;					\
+      i->index = (i->bucket) ? (i->bucket->n_item)-1 : (size_t) -1;	\
+    }
+
+#define UPDATE_ITERATOR_UPWARD(i)				\
+  if (i->index==i->bucket->n_item)				\
+    update_iterator_upward(i);
+
+#define NEXT_ITERATION(i)			\
+  if (i->downward)				\
+  {						\
+    i->index--; UPDATE_ITERATOR_DOWNWARD(i);	\
+  }						\
+  else						\
+  {						\
+    i->index++; UPDATE_ITERATOR_UPWARD(i);	\
+  }
 
 stack_iterator stack_iterator_init(stack s, int down)
 {
