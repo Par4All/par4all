@@ -160,14 +160,15 @@ MakeCharacterParameter()
 		    make_constant(is_constant_int,
 				  UUINT(DEFAULT_CHARACTER_TYPE_SIZE)))),
 				      NIL),
-			make_mode(is_mode_reference, UU));
+			make_mode(is_mode_reference, UU),
+			strdup(""));
 }
 
 parameter 
 MakeAnyScalarParameter(tag t, intptr_t size)
 {
     return(make_parameter((MakeTypeArray(make_basic(t, UUINT(size)), NIL)),
-			  make_mode(is_mode_reference, UU)));
+			  make_mode(is_mode_reference, UU), strdup("")));
 }
 
 /* this function creates a default fortran operator result, i.e. a zero

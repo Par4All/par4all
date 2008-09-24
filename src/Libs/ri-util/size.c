@@ -237,6 +237,7 @@ int SizeOfElements(basic b)
   case is_basic_int:
     {
     e = basic_int(b);
+    e = e % 10;
     if(e==DEFAULT_LONG_INTEGER_TYPE_SIZE)
       e = DEFAULT_INTEGER_TYPE_SIZE;
     break;

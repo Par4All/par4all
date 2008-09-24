@@ -1015,7 +1015,8 @@ update_functional_type_with_actual_arguments(entity e, list l)
       }
 
       p = make_parameter(t,
-			 MakeModeReference());
+			 MakeModeReference(),
+			 strdup(""));
       functional_parameters(ft) = 
 	gen_nconc(functional_parameters(ft),
 		  CONS(PARAMETER, p, NIL));

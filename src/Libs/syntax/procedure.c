@@ -1156,7 +1156,7 @@ UpdateFunctionalType(
 	}
 
 	p = make_parameter((entity_type(fp)), 
-			   (MakeModeReference()));
+			   (MakeModeReference()), strdup(""));
 	functional_parameters(ft) = 
 		gen_nconc(functional_parameters(ft),
 			  CONS(PARAMETER, p, NIL));

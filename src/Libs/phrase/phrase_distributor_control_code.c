@@ -76,7 +76,8 @@ entity create_parameter_for_new_module (variable var,
     = CONS (ENTITY, new_variable, module_declarations);
   
   new_parameter = make_parameter (entity_type(new_variable),
-				  make_mode(is_mode_reference, UU));
+				  make_mode(is_mode_reference, UU),
+				  strdup(""));
   
   module_parameters = functional_parameters(type_functional(entity_type(module)));
   

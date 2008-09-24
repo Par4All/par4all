@@ -282,7 +282,8 @@ static statement make_get_rc_statement(expression rc_ref)
 				     make_parameter(make_type(is_type_variable,
 							      make_variable(make_basic(is_basic_int, (value) 4),
 									    NIL,NIL)),
-						    make_mode(is_mode_reference, UU)),
+						    make_mode(is_mode_reference, UU),
+						    strdup("")),
 				     NIL),
 				make_type(is_type_void, UU)));
     /*
@@ -377,7 +378,8 @@ static entity set_rc_function()
 				     make_parameter(make_type(is_type_variable,
 							      make_variable(make_basic(is_basic_int, (value) 4),
 									    NIL,NIL)),
-						    make_mode(is_mode_reference, UU)),
+						    make_mode(is_mode_reference, UU),
+						    strdup("")),
 				     NIL),
 				make_type(is_type_void, UU)));
     entity_storage(set_rc) = make_storage(is_storage_rom, UU);

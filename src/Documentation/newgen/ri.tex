@@ -483,13 +483,16 @@ nom '*D*' est utilisée pour les tableaux de taille non définie
 \index{Basic}\index{Integer}\index{Real}\index{Complex}
 \index{Character}\index{Overloaded}\index{Logical}
 
-\domain{Basic = int:int + float:int + logical:int + overloaded:unit + complex:int + string:value + bit:int + pointer:type + derived:entity + typedef:entity}
+\domain{Basic = int:int + float:int + logical:int + overloaded:unit + complex:int + string:value + bit:symbolic + pointer:type + derived:entity + typedef:entity}
 
-Type \texttt{basic} is used to store basic type information such has 
-\texttt{REAL} or \texttt{INTEGER}. Each member includes a precision information,
-namely the number of bytes required to store one scalar object of this
-type. The precision information is numerically known for all basic types
-but for \texttt{string}.
+Type \texttt{basic} is used to store basic type information such has
+\texttt{REAL} or \texttt{INTEGER}. Each member includes a precision
+information, which can be used to derive the number of bytes or bits
+required to store one scalar object of this type. The precision
+information is numerically known for most basic types but not for
+\texttt{overloaded}, \texttt{string}, \texttt{bit}, \texttt{derived},
+\texttt{pointer}. Not that for some C \texttt{int} types, the
+information \texttt{int:int} must be fixed.
 
 \begin{comment}
 Le domaine \verb/basic/ permet de représenter un type Fortran tel que
@@ -580,10 +583,12 @@ predicate to recognize intrinsics entities.
 \label{subsubsection-parameter}
 \index{Parameter}
 
-\domain{Parameter = type x mode}
+\domain{Parameter = type x mode x dummy:string}
 
-Objects of type \texttt{parameter} represents type and inout information
-for formal parameters.
+Objects of type \texttt{parameter} represents type and inout
+information for formal parameters. The dummy field is used to store a
+parameter name in C function declarations. By default, this name is
+the empty string, "".
 
 \begin{comment}
 Le domaine \verb/parameter/ représente le type et le mode de passage d'un
@@ -814,15 +819,16 @@ source fidèle.
 \label{subsubsection-constant}
 \index{Constant}\index{DATA}\index{PARAMETER}
 
-\domain{Constant = int + litteral:unit + call:entity + unknown:unit}
+\domain{Constant = int + float:int + logical:int + litteral:unit + call:entity + unknown:unit}
 {}
 
-Type \texttt{constant} is used to represent the numerical or non-numerical
-value of constant entities. Integer entities are directly flagged with
-their \texttt{int} value, otherwise if possible the constant is
+Type \texttt{constant} is used to represent the numerical or
+non-numerical value of constant entities. Integer entities are
+directly flagged with their \texttt{int} value, as well as floating
+point and logical entities, otherwise if possible the constant is
 represented as an \texttt{entity}, possibly itself if the constant is
-within the value of an entity, and finally if no entity can be thought of
-a \texttt{litteral} is chosen.
+within the value of an entity, and finally if no entity can be thought
+of a \texttt{litteral} is chosen.
 
 For instance, a constant entity such as 123.45 has "123.45" as entity name
 and its initial \verb/value/ is a \verb/constant/ of type \verb/litteral/

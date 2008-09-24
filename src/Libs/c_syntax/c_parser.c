@@ -338,10 +338,13 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
       entity_type(built_in_va_start) =
 	make_type(is_type_functional,
 		  make_functional(CONS(PARAMETER,
-				       make_parameter(va_list_t, make_mode(is_mode_value, UU)),
+				       make_parameter(va_list_t,
+						      make_mode(is_mode_value, UU),
+						      strdup("")),
 				       CONS(PARAMETER,
 					    make_parameter(void_start_t,
-							   make_mode(is_mode_value, UU)),
+							   make_mode(is_mode_value, UU),
+							   strdup("")),
 					    NIL)),
 				  make_type(is_type_void,UU)));
       entity_initial(built_in_va_start) = make_value_intrinsic();
@@ -359,7 +362,9 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
       entity_type(built_in_va_end) =
 	make_type(is_type_functional,
 		  make_functional(CONS(PARAMETER,
-				       make_parameter(va_list_t, make_mode(is_mode_value, UU)),
+				       make_parameter(va_list_t,
+						      make_mode(is_mode_value, UU),
+						      strdup("")),
 				       NIL),
 				  make_type(is_type_void,UU)));
       entity_initial(built_in_va_end) = make_value_intrinsic();

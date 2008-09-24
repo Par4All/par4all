@@ -2164,7 +2164,7 @@ list MakeParameterList(list l1, list l2, stack FunctionStack)
 	entity_type(ent) = make_type_variable(v);
 	entity_storage(ent) = make_storage_formal(make_formal(function,offset));
 	AddToDeclarations(ent,function);
-	p = make_parameter(entity_type(ent),make_mode_reference());
+	p = make_parameter(entity_type(ent),make_mode_reference(),strdup(""));
       }
     l = gen_nconc(l,CONS(PARAMETER,p,NIL));
     offset++;
@@ -2195,7 +2195,7 @@ parameter FindParameterEntity(string s, int offset, list l)
 	    formal f = storage_formal(st);
 	    formal_offset(f) = offset;
 	  }
-	return make_parameter(t,m);
+	return make_parameter(t,m,strdup(""));
       }
   },l);
   return parameter_undefined;
@@ -2283,7 +2283,7 @@ static bool callnodeclfilter(call c)
 	for(carg=args; !ENDP(carg); POP (carg)) {
 	  expression ce = EXPRESSION(CAR(carg));
 	  type ct = expression_to_type(ce);
-	  parameter cp = make_parameter(ct, make_mode(is_mode_value, UU));
+	  parameter cp = make_parameter(ct, make_mode(is_mode_value, UU), strdup(""));
 
 	  ptl = gen_nconc(ptl, CONS(PARAMETER, cp, NIL));
 	}

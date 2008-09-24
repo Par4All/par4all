@@ -2031,9 +2031,14 @@ field_decl: /* (* ISO 6.7.2. Except that we allow unnamed fields. *) */
 			}
 |   declarator TK_COLON expression   
                         {
-			  variable v = make_variable(make_basic_bit(integer_constant_expression_value($3)),NIL,NIL);
-			  pips_assert("Width of bit-field must be a positive constant integer", 
-				      integer_constant_expression_p($3));
+			  value nv = EvalExpression($3);
+			  constant c = value_constant_p(nv)?
+			    value_constant(nv) : make_constant_unknown();
+			  symbolic s = make_symbolic($3, c);
+			  variable v = make_variable(make_basic_bit(s),NIL,NIL);
+
+			  /*pips_assert("Width of bit-field must be a positive constant integer", 
+			    integer_constant_expression_p($3)); */
 			  /* Ignore for this moment if the bit is signed or unsigned */
 			  entity_type($1) = make_type_variable(v); 
 			  $$ = $1;
@@ -2046,9 +2051,13 @@ field_decl: /* (* ISO 6.7.2. Except that we allow unnamed fields. *) */
 			  string n = int_to_string(derived_counter++);
 			  string s = strdup(concatenate(DUMMY_MEMBER_PREFIX,n,NULL));  
 			  entity ent = CreateEntityFromLocalNameAndPrefix(s,c_parser_context_scope(ycontext),is_external);
-			  variable v = make_variable(make_basic_bit(integer_constant_expression_value($2)),NIL,NIL);
-			  pips_assert("Width of bit-field must be a positive constant integer", 
-				      integer_constant_expression_p($2));
+			  value nv = EvalExpression($2);
+			  constant c = value_constant_p(nv)?
+			    value_constant(nv) : make_constant_unknown();
+			  symbolic se = make_symbolic($2, c);
+			  variable v = make_variable(make_basic_bit(se),NIL,NIL);
+                          /* pips_assert("Width of bit-field must be a positive constant integer", 
+                             integer_constant_expression_p($2)); */
 			  entity_type(ent) = make_type_variable(v);
 			  $$ = ent;
 			}
@@ -2272,13 +2281,14 @@ rest_par_list1:
     TK_ELLIPSIS 
                         {
 			  /*$$ = CONS(PARAMETER,make_parameter(make_type_varargs(type_undefined),
-			    make_mode(CurrentMode,UU)),NIL); */
+			    make_mode(CurrentMode,UU), strdup("")),NIL); */
 			  type at = make_type(is_type_variable,
 					      make_variable(make_basic(is_basic_overloaded, UU),
 							    NIL, NIL));
 			  $$ = CONS(PARAMETER,
 				    make_parameter(make_type_varargs(at),
-						   make_mode(CurrentMode,UU)),
+						   make_mode(CurrentMode,UU),
+						   strdup("")),
 				    NIL); 
 			}
 |   TK_COMMA 
@@ -2295,7 +2305,9 @@ parameter_decl: /* (* ISO 6.7.5 *) */
     decl_spec_list declarator 
                         {
 			  UpdateEntity($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external,FALSE);
-			  $$ = make_parameter(copy_type(entity_type($2)),make_mode(CurrentMode,UU));
+			  $$ = make_parameter(copy_type(entity_type($2)),
+					      make_mode(CurrentMode,UU),
+					      strdup(""));
 			  /* Set CurentMode where ???? */
 			  //stack_pop(ContextStack);
 			  PopContext();
@@ -2303,7 +2315,9 @@ parameter_decl: /* (* ISO 6.7.5 *) */
 |   decl_spec_list abstract_decl 
                         {
 			  UpdateAbstractEntity($2,ContextStack);
-			  $$ = make_parameter(copy_type(entity_type($2)),make_mode(CurrentMode,UU));
+			  $$ = make_parameter(copy_type(entity_type($2)),
+					      make_mode(CurrentMode,UU),
+					      strdup(""));
 			  RemoveFromExterns($2);
 			  free_entity($2);
 			  //stack_pop(ContextStack);
@@ -2312,7 +2326,9 @@ parameter_decl: /* (* ISO 6.7.5 *) */
 |   decl_spec_list              
                         {
 			  c_parser_context ycontext = stack_head(ContextStack);
-			  $$ = make_parameter(copy_type(c_parser_context_type(ycontext)),make_mode(CurrentMode,UU));
+			  $$ = make_parameter(copy_type(c_parser_context_type(ycontext)),
+					      make_mode(CurrentMode,UU),
+					      strdup(""));
 			  /* function prototype*/
 			  //stack_pop(ContextStack);
 			  PopContext();

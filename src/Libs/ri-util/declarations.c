@@ -335,7 +335,8 @@ list words_basic(basic obj)
 	}
       case is_basic_bit:
 	{
-	  int i = basic_bit(obj);
+	  symbolic bs = basic_bit(obj);
+	  int i = constant_int(symbolic_constant(bs));
 	  pips_debug(7,"Bit field basic: %d\n",i);
 	  pc = CHAIN_SWORD(pc,"int"); /* ignore if it is signed or unsigned */
 	  break;
@@ -1927,9 +1928,11 @@ list generic_c_words_entity(type t, list name, bool is_safe)
       free(sname);
       if (bit_type_p(t))
 	{
-	  int i = basic_bit(variable_basic(type_variable(t)));
+	  symbolic s = basic_bit(variable_basic(type_variable(t)));
+	  expression ie = symbolic_expression(s);
+	  list iew = words_expression(ie);
 	  pc = CHAIN_SWORD(pc,":");
-	  pc = CHAIN_IWORD(pc,i);
+	  pc = gen_nconc(pc, iew);
 	}
       return pc;
     }

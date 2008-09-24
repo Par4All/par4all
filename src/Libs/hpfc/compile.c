@@ -165,7 +165,9 @@ add_one_bound_argument(
     lp = CONS(PARAMETER, 
 	      make_parameter(make_type(is_type_variable, 
 		   make_variable(MakeBasic(is_basic_int), NIL,NIL)),
-			     make_mode(is_mode_value, UU)), lp);
+			     make_mode(is_mode_value, UU),
+			     strdup("")),
+	      lp);
     return lp;
 }
 
