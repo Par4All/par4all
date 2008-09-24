@@ -31,24 +31,25 @@ subcmd=${3:-checkout}
 
 error()
 {
-    echo "$@" >&2
-    exit 1
+  echo "$@" >&2
+  exit 1
 }
 
-warning()
+warn()
 {
-    {
-    	echo
-    	for msg in "$@" ; do
-      	  echo $msg ;
-	done
-        echo "Type return to continue"
-    } >&2
-    read
+  {
+    echo
+    echo "WARNING"
+    for msg in "$@" ; do
+      echo $msg ;
+    done
+    echo "Type return to continue"
+  } >&2
+  read
 }
 
 test -d $destination  && \
-    warning "Warning : directory $destination already exists!" \
+    warn "Directory $destination already exists!" \
       " If you are not trying to finish a previous installation of PIPS" \
       " in $destination you should stop and choose another directory name."
 mkdir -p $destination || error "cannot mkdir $destination"
@@ -69,15 +70,12 @@ echo
 echo "### downloading pips"
 svn $subcmd $PIPS_SVN/bundles/trunks $prod || error "cannot checkout pips"
 
-valid=$destination/valid
+valid=$destination/validation
 echo "### downloading validation"
-if svn $subcmd $SVN_CRI/validation/trunk $valid
+if ! svn $subcmd $SVN_CRI/validation/trunk $valid
 then
-    # add the expected link...
-    ln -s $valid $prod/pips/Validation
-else
-    # just a warning...
-    warning "cannot checkout validation"
+  # just a warning...
+  warn "cannot checkout validation"
 fi
 
 # clean environment so as not to interfere with another installation
@@ -97,7 +95,7 @@ unset NEWGEN_ROOT LINEAR_ROOT PIPS_ROOT
 echo
 echo "### downloading $POLYLIB"
 cd /tmp
-test -f $POLYLIB.tar.gz && warning "some /tmp/$POLYLIB.tar.gz file already there. Continue?"
+test -f $POLYLIB.tar.gz && warn "some /tmp/$POLYLIB.tar.gz file already there. Continue?"
 wget -nd $POLYLIB_SITE/$POLYLIB.tar.gz || error "cannot wget polylib"
 
 echo
@@ -175,7 +173,7 @@ cd $prod/extern/lib/$PIPS_ARCH || error "cannot cd"
 rm -f libpolylib.a
 ln -s ../libpolylib*.a libpolylib.a || error "cannot create links"
 
-warning "cproto header generation results in many cpp warnings..."
+warn "cproto header generation results in many cpp warnings..."
 
 echo
 echo "### building newgen"
