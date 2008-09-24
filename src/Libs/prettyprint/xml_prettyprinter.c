@@ -22,7 +22,7 @@
 #include "complexity_ri.h"
 #include "complexity.h"
 #include "transformations.h"
-
+#include "callgraph.h"
 #define COMMA         ","
 #define EMPTY         ""
 #define NL            "\n"
@@ -78,7 +78,7 @@ extern boolean is_fortran;
 
 static boolean motif_in_statement_p=FALSE;
 
-
+extern dimension find_ith_dimension();
 /**************************************************************** MISC UTILS */
 
 #define current_module_is_a_function() \
@@ -2026,6 +2026,15 @@ static void xml_CodeSize(string_buffer sb_result)
   string_buffer_append_word("/CodeSize",sb_result);
 }
 
+// A changer par une fonction qui detectera si la variable a ete definie 
+// dans un fichier de parametres ...
+static boolean entity_parameter_p(entity e)
+{
+  string s = entity_local_name(e);
+  boolean b=FALSE;
+  if (strstr(s,"PARAM")!=NULL) b = TRUE;
+    return (b);
+}
 
 
 static void  find_pattern(Psysteme ps, Pvecteur paving_indices, Pvecteur formal_parameters, int dim,  Pcontrainte *bound_inf, Pcontrainte *bound_sup, Pcontrainte *pattern_up_bound , Pcontrainte *iterator)
@@ -2593,15 +2602,6 @@ static void motif_in_statement(statement s)
     motif_in_statement_p= TRUE;
 }
 
-// A changer par une fonction qui detectera si la variable a ete definie 
-// dans un fichier de parametres ...
-static boolean entity_parameter_p(entity e)
-{
-  string s = entity_local_name(e);
-  boolean b=FALSE;
-  if (strstr(s,"PARAM")!=NULL) b = TRUE;
-    return (b);
-}
 
 static void xml_Loop(statement s, string_buffer sb_result)
 {
@@ -2695,7 +2695,6 @@ static void  xml_Task(string callee_name, string_buffer sb_result)
   Pvecteur pattern_indices = VECTEUR_NUL;
   boolean motif_in_te_p = FALSE;
   entity callee = module_name_to_entity(callee_name);
-  int i;
   //  string xml_callee = db_build_file_resource_name(DBR_XML_PRINTED_FILE, 
   //						  callee_name, XMLPRETTY);
   statement stat_callee=(statement) db_get_memory_resource(DBR_CODE, 
@@ -2914,11 +2913,14 @@ static void xml_ConstOffset(int ActualArrayDim, string_buffer sb_result)
 
 int find_rw_effect_for_entity(list leff, effect *eff, entity e)
 {
-  // return effet_rwb = 1 for Read, 2 for Write, 3 for Read+Write
+  // return effet_rwb = 1 for Read, 2 for Write
   int effet_rwb=0;
   list lr = NIL;
 
-  for ( lr = leff; !ENDP(lr); lr = CDR(lr)) {
+  //  DEBUG
+  //  printf("liste des effects pour entity %s\n",entity_user_name(e));
+  //  print_effects(leff);
+  for ( lr = leff; !ENDP(lr) && (effet_rwb==0); lr = CDR(lr)) {
     *eff= EFFECT(CAR(lr));
     reference ref = effect_reference(*eff);  
     entity v = reference_variable(ref);
@@ -2941,8 +2943,8 @@ static void  xml_Arguments(statement s, entity function, Pvecteur loop_indices, 
   int iexp,ith=0;
   int rw_ef=0;
 
-     printf("xml_Arguments statement: \n");
-      print_statement(s);
+  //   printf("xml_Arguments statement: \n");
+  //   print_statement(s);
 
   string_buffer_append_word("Arguments",sb_result);
   global_margin++;
@@ -2991,7 +2993,7 @@ static void  xml_Arguments(statement s, entity function, Pvecteur loop_indices, 
 					      NL, NULL)));
       /* Save information to generate Task Graph */
       hash_put(hash_task_to_effect,(char *)function, (char *) call_effect); 
-      if (rw_ef!=1)
+      if (rw_ef==2)
 	hash_put(hash_entity_def_to_task, (char *)ActualArrayName,(char *)function); 
       free(SActualArrayDim);
       
@@ -3065,7 +3067,7 @@ static void xml_BoxGraph(entity module,  string_buffer sb_result,string_buffer s
     string_buffer buffer_needs = string_buffer_make();
     effects_list = hash_get(hash_task_to_effect,(char *) callee);
 
-    add_margin(global_margin,sb_result);
+    //  add_margin(global_margin,sb_result);
     for (pc= effects_list;pc != NIL; pc = CDR(pc)){
       effect e = EFFECT(CAR(pc));
       reference r = effect_reference(e);
@@ -3102,7 +3104,8 @@ static void xml_BoxGraph(entity module,  string_buffer sb_result,string_buffer s
 	  }
 	  global_margin--;
 	}
-	else {
+	else {  
+	  add_margin(global_margin,sb_result);
 	  string_buffer_append(sb_result,
 			       strdup(concatenate(OPENANGLE, 
 						  "TaskRef Name=", 
