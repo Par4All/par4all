@@ -19,4 +19,4 @@ static void foo(int i)
    i++;
 }
  main
-     static_call01!:foo
+     static_call01!foo

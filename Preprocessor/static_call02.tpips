@@ -10,11 +10,27 @@ activate C_SYMBOL_TABLE
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
+echo
+echo Parsed printed file for all
+echo
+
 display PARSED_PRINTED_FILE[%ALL]
+
+echo
+echo Printed file for all
+echo
 
 display PRINTED_FILE[%ALL]
 
+echo
+echo Symbole tables for all
+echo
+
 display SYMBOL_TABLE_FILE[%ALL]
+
+echo
+echo Call graph for "main"
+echo
 
 display CALLGRAPH_FILE[main]
 

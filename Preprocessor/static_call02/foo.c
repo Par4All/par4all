@@ -13,6 +13,7 @@ void bar(int i)
   foo(i);
 
   if(i) {
+    /* This declaration has no impact on gcc compiled code: the local foo is called */
     extern void foo(int i);
 
     foo(i);
