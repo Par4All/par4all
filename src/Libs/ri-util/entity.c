@@ -252,27 +252,32 @@ string entity_global_name(entity e)
     return entity_name(e);
 }
 
-string 
-module_local_name(entity e)
+/* Returns a copy of the module local user name */
+string module_local_name(entity e)
 {
-  
-  return entity_user_name(e);
-  /*  string name = local_name(entity_name(e));
-    return name 
-	+ strspn(name, MAIN_PREFIX)
-	+ strspn(name, BLOCKDATA_PREFIX)
-	+ strspn(name, COMMON_PREFIX);*/
+  /* No difference between modules and other entities, except for prefixes */
+  /* Allocates a new string */
+
+  // return entity_local_name(e);
+
+  //return entity_user_name(e);
+  string name = local_name(entity_name(e));
+
+  return strdup(name 
+    + strspn(name, MAIN_PREFIX)
+    + strspn(name, BLOCKDATA_PREFIX)
+    + strspn(name, COMMON_PREFIX));
 }
 
-string 
-module_resource_name(entity e)
+/* Returns a pointer towards the resource name. The resource name is
+   the module local name: it may include the  */
+string module_resource_name(entity e)
 {
-  string rn = string_undefined;
+  string rn = entity_local_name(e);
 
-  if(top_level_entity_p(e))
-    rn = module_local_name(e);
-  else
-    rn = entity_name(e);
+  rn += strspn(rn, MAIN_PREFIX)
+    + strspn(rn, BLOCKDATA_PREFIX)
+    + strspn(rn, COMMON_PREFIX);
 
   return rn;
 }

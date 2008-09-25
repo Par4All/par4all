@@ -51,7 +51,12 @@ string_to_callees(string module_name)
   if(FALSE && static_module_name_p(module_name))
     cl = (callees)db_get_memory_resource(DBR_CALLEES,module_name,TRUE);
   else {
-    string ln = global_name_to_user_name(module_name);
+    // Should be dealt with in ri-util
+    // string ln = global_name_to_user_name(module_name);
+    string ln = local_name(module_name);
+    ln += strspn(ln, MAIN_PREFIX)
+      + strspn(ln, BLOCKDATA_PREFIX)
+      + strspn(ln, COMMON_PREFIX);
     cl = (callees)db_get_memory_resource(DBR_CALLEES,ln,TRUE);
   }
   return callees_callees(cl);

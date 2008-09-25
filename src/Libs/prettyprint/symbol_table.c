@@ -271,7 +271,7 @@ string get_symbol_table(entity m, bool isfortran)
   string result2;
   list decls = gen_copy_seq(code_declarations(value_code(entity_initial(m))));
   int nth = 0;
-  entity rv = entity_undefined;
+  entity rv = entity_undefined; /* return variable */
   list ce = list_undefined;
 
   pips_assert("get_symbol_table", entity_module_p(m));

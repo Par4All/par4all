@@ -415,7 +415,8 @@ expression IdentifierToExpression(string s)
          The scope of this function is global */
       pips_debug(5,"Create unparsed global function: %s\n",s);
       ent = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,s);
-      entity_storage(ent) = make_storage_return(ent);
+      //entity_storage(ent) = make_storage_return(ent);
+      entity_storage(ent) = make_storage_rom();
       entity_type(ent) = make_type_functional(make_functional(NIL,make_type_unknown()));
       entity_initial(ent) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL));
       return make_expression(make_syntax_reference(make_reference(ent,NIL)),normalized_undefined);

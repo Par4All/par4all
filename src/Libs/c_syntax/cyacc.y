@@ -675,8 +675,10 @@ declaration         { discard_C_comment();}
 			  entity oe = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,$1);
 			  entity e = oe; //RenameFunctionEntity(oe);
 			  pips_debug(2,"Create function %s with old-style function prototype\n",$1);
-			  if (storage_undefined_p(entity_storage(e))) 
-			    entity_storage(e) = make_storage_return(e);
+			  if (storage_undefined_p(entity_storage(e))) {
+			    //entity_storage(e) = make_storage_return(e);
+			    entity_storage(e) = make_storage_rom();
+			  }
 			  if (value_undefined_p(entity_initial(e)))
 			    entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL));
 			  //pips_assert("e is a module", module_name_p(entity_module_name(e)));
@@ -711,8 +713,10 @@ declaration         { discard_C_comment();}
 			      functional f = make_functional(NIL,make_type_unknown());
 			      entity_type(e) = make_type_functional(f); 
 			    }
-			  if (storage_undefined_p(entity_storage(e))) 
-			    entity_storage(e) = make_storage_return(e);
+			  if (storage_undefined_p(entity_storage(e))) {
+			    // entity_storage(e) = make_storage_return(e);
+			    entity_storage(e) = make_storage_rom();
+			  }
 			  if (value_undefined_p(entity_initial(e)))
 			    entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL));	 
 			  pips_assert("Current function entity is consistent",entity_consistent_p(e));
