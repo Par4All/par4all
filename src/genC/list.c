@@ -646,6 +646,11 @@ list gen_list_cons(list i, list l)
   return gen_cons((void *) i, l);
 }
 
+list gen_CHUNK_cons(gen_chunk * c, list l)
+{
+  return gen_cons((void *) c, l);
+}
+
 /* Compute A = A inter B: complexity in O(n2) */
 void
 gen_list_and(list * a,

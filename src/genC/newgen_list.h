@@ -42,6 +42,7 @@ typedef struct cons {
 #define gen_BOOL_cons gen_bool_cons
 #define gen_INT_cons gen_int_cons
 #define gen_LIST_cons gen_list_cons
+#define gen_CONSP_cons gen_list_cons
 #define gen_STRING_cons gen_string_cons
 /* #define CONS(type,x,l) gen_cons((void*) (x), (l)) */
 
@@ -120,6 +121,7 @@ extern list gen_int_cons GEN_PROTO((int, list));
 extern list gen_string_cons GEN_PROTO((string, list));
 extern list gen_list_cons GEN_PROTO((list, list));
 extern list gen_typed_cons GEN_PROTO((intptr_t, void *, list));
+extern list gen_CHUNK_cons GEN_PROTO((gen_chunk *, list));
 extern void gen_list_and GEN_PROTO((list *, list));
 extern void gen_list_and_not GEN_PROTO((list *, list));
 extern void gen_list_patch(list, void *, void *);
