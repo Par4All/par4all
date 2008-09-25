@@ -91,12 +91,12 @@ string global_name_to_user_name(string global_name)
       pips_internal_error("no seperator ?\n");
       user_name = NULL;
     }
-  }
 
-  /* Take care of the special case of static functions, leaving
-     compilation unit names untouched */
-  if ((p=strstr(user_name,FILE_SEP_STRING)) != NULL && *(p+1)!='\0')
-    user_name = p + 1;
+    /* Take care of the special case of static functions, leaving
+       compilation unit names untouched */
+    if ((p=strstr(user_name,FILE_SEP_STRING)) != NULL && *(p+1)!='\0')
+      user_name = p + 1;
+  }
 
   pips_debug(9, "global name = \"%s\", user_name = \"%s\"\n",
 	     global_name, user_name);
