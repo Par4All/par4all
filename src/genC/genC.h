@@ -1,27 +1,26 @@
 /*
+  $Id$
 
-	-- NewGen Project
+  -- NewGen Project
 
-	The NewGen software has been designed by Remi Triolet and Pierre
-	Jouvelot (Ecole des Mines de Paris). This prototype implementation
-	has been written by Pierre Jouvelot.
+  The NewGen software has been designed by Remi Triolet and Pierre
+  Jouvelot (Ecole des Mines de Paris). This prototype implementation
+  has been written by Pierre Jouvelot.
 
-	This software is provided as is, and no guarantee whatsoever is
-	provided regarding its appropriate behavior. Any request or comment
-	should be sent to newgen@isatis.ensmp.fr.
+  This software is provided as is, and no guarantee whatsoever is
+  provided regarding its appropriate behavior. Any request or comment
+  should be sent to newgen@isatis.ensmp.fr.
 
-	(C) Copyright Ecole des Mines de Paris, 1989
-
+  (C) Copyright Ecole des Mines de Paris, 1989-2008
 */
-
-/* 
-   $Id$
- */
-
 
 #ifndef GENC_INCLUDED
 #define GENC_INCLUDED
 #define NEWGEN
+
+#ifdef CPROTO_ATTRIBUTE_FIX
+#define __attribute__(x) /* nope! */
+#endif /* old cproto attribute fix for Ronan */
 
 /*
  * This is the include file to be used for the generation of C code.
@@ -38,8 +37,8 @@
 #include "newgen_types.h"
 #include "newgen_set.h"
 
-/* The size of the management information inside each Newgen object (in
- *  gen_chunks) 
+/* The size of the management information inside each Newgen object
+ * (in gen_chunks)
  */
 
 #define GEN_HEADER (1)
@@ -74,7 +73,7 @@ typedef union gen_chunk {
 
 /* obsolete
  */
-#define chunk_undefined gen_chunk_undefined 
+#define chunk_undefined gen_chunk_undefined
 #define chunk_undefined_p(c) gen_chunk_undefined_p(c)
 
 #define UNIT(x) "You don't want to take the value of a unit type, do you?"
@@ -88,7 +87,7 @@ typedef union gen_chunk {
 #define CHUNK(x) ((x).p)
 #define HASH(x) ((x).h)
 #define CHUNKP(x) ((x).p)
-#define LIST(x) ((x).l) 
+#define LIST(x) ((x).l)
 #define SET(c) ((x).t)
 
 /* for the MAP macro to handle simple types correctly. FC.
@@ -139,17 +138,6 @@ enum internal_type {
 #include "newgen_stack.h"
 #include "newgen_string_buffer.h"
 #include "newgen_auto_string.h"
-
-/* never used I guess. FC 19/04/2000.
-#define TABULATED_MAP(_x,_code,_dom) \
-	{int _tabulated_map_i=0 ; \
-	 gen_chunk *_tabulated_map_t = Gen_tabulated_[Domains[_dom].index] ; \
-         gen_chunk *_x ; \
-	 for(;_tabulated_map_i<max_tabulated_elements();_tabulated_map_i++) {\
-		if( (_x=(_tabulated_map_t+_tabulated_map_i)->p) != \
-		     gen_chunk_undefined ) \
-			_code ;}}
-*/
 
 /* Function interface for user applications. */
 
