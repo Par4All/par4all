@@ -18,10 +18,6 @@
 #define GENC_INCLUDED
 #define NEWGEN
 
-#ifdef CPROTO_ATTRIBUTE_FIX
-#define __attribute__(x) /* nope! */
-#endif /* old cproto attribute fix for Ronan */
-
 /*
  * This is the include file to be used for the generation of C code.
  */
