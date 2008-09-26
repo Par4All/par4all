@@ -111,11 +111,6 @@ PATH	:= $(PATH):$(NEWGEN_ROOT)/bin:$(NEWGEN_ROOT)/bin/$(ARCH)
 UTC_DATE := "$(shell date -u)"
 CPPFLAGS += -DSOFT_ARCH='$(ARCH)' -I$(ROOT)/include
 
-# cproto 4.6 deals incorrectly with Ronan's added '__attribute__' declarations
-ifdef _NEED_CPROTO_ATTRIBUTE_FIX_
-PROTOFIX	= -DCPROTO_ATTRIBUTE_FIX
-endif
-
 # {C,CPP,LD,L,Y}OPT macros allow to *add* things from the command line
 # as gmake CPPOPT="-DFOO=bar" ... that will be added to the defaults
 # a typical interesting example is to put -pg in {C,LD}OPT
@@ -128,9 +123,7 @@ SCAN	= $(LEX) $(LFLAGS) $(LOPT) -t
 TYPECK	= $(LINT) $(LINTFLAGS) $(CPPFLAGS) $(LINT_LIBS)
 PARSE	= $(YACC) $(YFLAGS) $(YOPT)
 ARCHIVE = $(AR) $(ARFLAGS)
-# need to get through cpp...
-PROTOIZE= $(PROTO) $(PRFLAGS) \
-		-E "$(PREPROC) -DCPROTO_IS_PROTOTYPING $(PROTOFIX)"
+PROTOIZE= $(PROTO) $(PRFLAGS) -E "$(PREPROC) -DCPROTO_IS_PROTOTYPING"
 M4FLT	= $(M4) $(M4OPT) $(M4FLAGS)
 MAKEDEP	= $(CC) $(CMKDEP) $(CANSI) $(CFLAGS) $(COPT) $(CPPOPT) $(CPPFLAGS)
 NODIR	= --no-print-directory

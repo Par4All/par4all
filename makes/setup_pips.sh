@@ -66,6 +66,10 @@ do
   type $exe || error "no such executable, please install: $exe"
 done
 
+# check cproto version... 4.6 is still available on many distributions
+[[ $(cproto -V 2>&1) = 4.7* ]] || \
+  error "Pips compilation requires at least cproto 4.7c"
+
 echo
 echo "### downloading pips"
 svn $subcmd $PIPS_SVN/bundles/trunks $prod || error "cannot checkout pips"
@@ -106,10 +110,6 @@ type javac && echo '_HAS_JDK_ = 1' >> $config
 type latex && echo '_HAS_LATEX_ = 1' >> $config
 type htlatex && echo '_HAS_HTLATEX_ = 1' >> $config
 type emacs && echo '_HAS_EMACS_ = 1' >> $config
-# older cproto seems not to support __attribute__() added by RK?
-# may be generated on the fly??
-[[ $(cproto -V 2>&1) = 4.6* ]] && \
-  echo '_NEED_CPROTO_ATTRIBUTE_FIX_ = 1' >> $config
 
 # others? copy config to newgen and linear?
 ln -s $config $prod/newgen/makes/config.mk
