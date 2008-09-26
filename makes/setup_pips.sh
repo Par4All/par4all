@@ -101,10 +101,15 @@ wget -nd $POLYLIB_SITE/$POLYLIB.tar.gz || error "cannot wget polylib"
 echo
 echo "### testing special commands for config.mk"
 config=$prod/pips/makes/config.mk
-type javac && echo '_HAS_JDK_ = 1' >> $config
-type latex && echo '_HAS_LATEX_ = 1' >> $config
-type htlatex && echo '_HAS_HTLATEX_ = 1' >> $config
-type emacs && echo '_HAS_EMACS_ = 1' >> $config
+{
+  type javac && echo '_HAS_JDK_ = 1'
+  type latex && echo '_HAS_LATEX_ = 1'
+  type htlatex && echo '_HAS_HTLATEX_ = 1'
+  type emacs && echo '_HAS_EMACS_ = 1'
+  # older cproto seems not to support __attribute__() added by RK?
+  # may be generated on the fly??
+  [[ $(cproto -V 2>&1) = 4.6* ]] && echo '_NEED_CPROTO_ATTRIBUTE_FIX_ = 1'
+} >> $config
 # others? copy config to newgen and linear?
 
 # whether to build the documentation depends on latex and htlatex
