@@ -98,6 +98,7 @@ static bool inline_directly(union domain * dp)
   return FALSE;
 }
 
+/* bof... */
 static string int_type(void)
 {
   return same_size(intptr_t) ? "intptr_t": "gen_chunk";
@@ -217,7 +218,7 @@ static void generate_make(
 		newgen_type_name_close(dlp->domain));
       break;
     case OR_OP:
-      fprintf(header, "intptr_t domain, void * content");
+      fprintf(header, "intptr_t, void *");
       break;
     case ARROW_OP:
       fprintf(header, "void");
