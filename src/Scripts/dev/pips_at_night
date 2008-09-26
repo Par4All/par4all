@@ -7,10 +7,10 @@
 
 function err()
 {
-    local msg=$1 code=${2:-1}
-    echo -e "$0 ...\n"
-    echo $msg >&2
-    exit $code
+  local msg=$1 code=${2:-1}
+  echo -e "$0 ...\n"
+  echo $msg >&2
+  exit $code
 }
 
 # what to do
@@ -29,26 +29,26 @@ while [ "$1" ]
 do
   opt=$1
   case $opt in
-      --) shift ; break ;;
-      -*) shift ;;
-      *) break ;;
+    --) shift ; break ;;
+    -*) shift ;;
+    *) break ;;
   esac
 
   case $opt in
-      -t|--target) target=$1 ; shift ;;
-      -m|--mail) vopt="VOPT=-m $1" ; shift ;;
-      # what to do
-      -d|--download) download=1 ;;
-      -nd|--no-download) download= ;;
-      -u|--update) update=1 ;;
-      -nu|--no-update) update= ;;
-      -c|--compile) compile=1 ;;
-      -nc|--no-compile) compile= ;;
-      -v|--validate) validate=1 ;;
-      -nv|--no-validate) validate= ;;
-      # help
-      -h|--help) err 'display help message' 0 ;;
-      *) err "unexpected option '$opt'" 1 ;;
+    -t|--target) target=$1 ; shift ;;
+    -m|--mail) vopt="VOPT=-m $1" ; shift ;;
+    # what to do
+    -d|--download) download=1 ;;
+    -nd|--no-download) download= ;;
+    -u|--update) update=1 ;;
+    -nu|--no-update) update= ;;
+    -c|--compile) compile=1 ;;
+    -nc|--no-compile) compile= ;;
+    -v|--validate) validate=1 ;;
+    -nv|--no-validate) validate= ;;
+    # help
+    -h|--help) err 'display help message' 0 ;;
+    *) err "unexpected option '$opt'" 1 ;;
   esac
 done
 
@@ -57,18 +57,18 @@ test -d $target || download=1
 
 if [[ $download ]]
 then
-    test -d $target && err "will not overwrite target directory: $target" 4
-    # full download
-    wget --no-verbose $setup
-    # should be silent?
-    sh ./setup_pips.sh $target
+  test -d $target && err "will not overwrite target directory: $target" 4
+  # full download
+  wget --no-verbose $setup
+  # should be silent?
+  sh ./setup_pips.sh $target
 elif [[ $update ]]
 then
-    test -d $target || err "no target directory: $target" 2
-    pushd $target
-    svn update prod valid
-    test $? -ne 0 && err "svn update failed" 5
-    popd
+  test -d $target || err "no target directory: $target" 2
+  pushd $target
+  svn update prod validation
+  test $? -ne 0 && err "svn update failed" 5
+  popd
 else
     echo '### no download, no update'
 fi
@@ -79,40 +79,40 @@ source $target/pipsrc.sh
 
 if [[ $compile && ! $download ]]
 then
-    pushd $target
-    # build? verbosity? clean+recompile?
-    # skip documentation?
+  pushd $target
+  # build? verbosity? clean+recompile?
+  # skip documentation?
 
-    cd prod/newgen
-    make clean recompile
+  cd prod/newgen
+  make clean recompile
 
-    cd ../linear
-    make clean recompile
+  cd ../linear
+  make clean recompile
 
-    cd ../pips
-    rm -rf bin/$PIPS_ARCH lib/$PIPS_ARCH
-    make clean recompile
+  cd ../pips
+  rm -rf bin/$PIPS_ARCH lib/$PIPS_ARCH
+  make clean recompile
 
-    if [ -f bin/$PIPS_ARCH/tpips ]
-    then
-	echo "### recompilation succeeded"
-    else
-	validate=
-	err "recompilation failed, no tpips" 6
-    fi
-    popd
+  if [ -f bin/$PIPS_ARCH/tpips ]
+  then
+    echo "### recompilation succeeded"
+  else
+    validate=
+    err "recompilation failed, no tpips" 6
+  fi
+  popd
 else
-    echo '### no compile'
+  echo '### no compile'
 fi
 
 if [[ $validate ]]
 then
-    pushd $target/valid
-    make clean
-    make "$vopt" validate
-    popd
+  pushd $target/validation
+  make clean
+  make "$vopt" validate
+  popd
 else
-    echo '### no validate'
+  echo '### no validate'
 fi
 
 exit 0
