@@ -21,33 +21,45 @@ error()
 
 [ "${PIPS_ROOT}" ] ||
 {
-    case $0 in
-	/*)
-	    where=`dirname $0`
-	    ;;
-	*)
-	    name=`basename $0`
-	    where=`type -p $name`
-	    ;;
-    esac
+  # find the actual directory of the current script
+  # I have not found this information in any of bash variables.
+  case $0 in
+    /*)
+      # script launched with an absolute path: /abs/path/to/bin/tpips
+      where=`dirname $0`
+      ;;
+    */*)
+      # script launched with a relative path: rel/path/to/bin/tpips
+      where=$PWD/`dirname $0`
+      ;;
+    *)
+      # else script launched based on PATH: tpips
+      name=`basename $0`
+      where=`type -p $name`
+      ;;
+  esac
 
-    PIPS_ROOT=`dirname $where`
-    export PIPS_ROOT
+  # check that we get something...
+  [ "$where" ] || error 2 "no such directory: $where"
+
+  # derive pips root by stripping the last directory component of this script
+  PIPS_ROOT=`dirname $where`
+  export PIPS_ROOT
 }
 
 [ -d ${PIPS_ROOT} ] || error 2 "no such directory: $PIPS_ROOT"
 
 [ "${PIPS_ARCH}" ] ||
 {
-    arch=${PIPS_ROOT}/makes/arch.sh
-    test -x $arch || error 3 "no $arch script to build PIPS_ARCH"
-    PIPS_ARCH=`$arch`
-    export PIPS_ARCH
+  arch=${PIPS_ROOT}/makes/arch.sh
+  test -x $arch || error 3 "no $arch script to build PIPS_ARCH"
+  PIPS_ARCH=`$arch`
+  export PIPS_ARCH
 }
 
 # Avoid a recursion if no actual binary is found:
 PATH=./${PIPS_ARCH}:${PIPS_ROOT}/bin/${PIPS_ARCH} \
-    type ${what} > /dev/null || error 3 "no ${what} binary found!"
+  type ${what} > /dev/null || error 3 "no ${what} binary found!"
 
 # fix path according to pips architecture
 PATH=./${PIPS_ARCH}:${PIPS_ROOT}/bin/${PIPS_ARCH}:${PATH}
