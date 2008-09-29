@@ -3601,7 +3601,7 @@ typedef struct IntrinsicDescriptor
    to pointer, the typing functions are different. So in some cases, we have to 
    rename the operators */
 
-static IntrinsicDescriptor IntrinsicDescriptorTable[] = 
+static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] = 
 {
   {PLUS_OPERATOR_NAME, 2, default_intrinsic_type, typing_arithmetic_operator, 0},
   {MINUS_OPERATOR_NAME, 2, default_intrinsic_type, typing_arithmetic_operator, 0},
@@ -3652,8 +3652,7 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
 
   // Typing issue introduced by Ronan with size_t. Why aren't they all size_t or int?
   {SUBSTRING_FUNCTION_NAME, 3, substring_type, typing_substring, 0},
-  {ASSIGN_SUBSTRING_FUNCTION_NAME, 4, assign_substring_type, 
-   typing_assign_substring, 0},
+  {ASSIGN_SUBSTRING_FUNCTION_NAME, 4, assign_substring_type, typing_assign_substring, 0},
 
   /* Control statement */
   {CONTINUE_FUNCTION_NAME, 0, default_intrinsic_type, statement_without_argument, 0},
@@ -4306,7 +4305,7 @@ typing_function_t get_typing_function_for_intrinsic(string name)
   /* Initialize first time */
   if (!name_to_type_function) 
   {
-    IntrinsicDescriptor * pdt = IntrinsicDescriptorTable;
+    IntrinsicDescriptor * pdt = IntrinsicTypeDescriptorTable;
     
     name_to_type_function = hash_table_make(hash_string, 0);
     
@@ -4333,7 +4332,7 @@ switch_name_function get_switch_name_function_for_intrinsic(string name)
   /* Initialize first time */
   if (!name_to_switch_function) 
   {
-    IntrinsicDescriptor * pdt = IntrinsicDescriptorTable;
+    IntrinsicDescriptor * pdt = IntrinsicTypeDescriptorTable;
     
     name_to_switch_function = hash_table_make(hash_string, 0);
     
@@ -4356,7 +4355,7 @@ switch_name_function get_switch_name_function_for_intrinsic(string name)
    
    An intrinsic function has a rom storage, an unknown initial value and a
    functional type whose result and arguments have an overloaded basic
-   type. The number of arguments is given by the IntrinsicDescriptorTable
+   type. The number of arguments is given by the IntrinsicTypeDescriptorTable
    data structure. */
 
 void 
@@ -4382,7 +4381,7 @@ CreateIntrinsics()
 {
   IntrinsicDescriptor *pid;
   
-  for (pid = IntrinsicDescriptorTable; pid->name != NULL; pid++) {
+  for (pid = IntrinsicTypeDescriptorTable; pid->name != NULL; pid++) {
     MakeIntrinsic(pid->name, pid->nbargs, pid->intrinsic_type);
   }
 }
