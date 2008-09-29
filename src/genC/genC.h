@@ -225,17 +225,29 @@ extern void gen_context_multi_recurse GEN_PROTO((void *, void *,...));
 #define GEN_CHECK_ALLOC 0
 #endif
 
-/* this macro does about the same as gen_check, but inlined and safer */
-#define NEWGEN_CHECK_TYPE(dom,item)					\
+/* this macro does about the same as gen_check, but inlined and safer.
+ * the item *must* be some newgen allocated structure.
+ */
+#define NEWGEN_CHECK_TYPE(dom, item)					\
   {									\
-    intptr_t __type = dom;						\
+    intptr_t __type = dom, __itype;					\
     void * __item = item;						\
-    if (__type>0 && Domains[__type].domain &&				\
+    message_assert("valid required domaine number",			\
+		   __type>0 && __type<MAX_DOMAIN);			\
+    if (Domains[__type].domain &&					\
 	Domains[__type].domain->co.type==CONSTRUCTED_DT) {		\
       message_assert("some item", __item!=NULL);			\
       message_assert("item is defined", __item!=gen_chunk_undefined);	\
-      message_assert("check type", ((gen_chunk*) __item)->i==__type);	\
+      __itype = ((gen_chunk*) __item)->i;				\
+      if (__itype!=__type) {						\
+	message_assert("valid item domain number",			\
+		       __itype>0 && __itype<MAX_DOMAIN);		\
+	fprintf(stderr, "type error: expecting %s, got %s\n",		\
+		Domains[__type].name, Domains[__itype].name);		\
+	message_assert("check type", __itype==__type);			\
+      }									\
     }									\
+    /* else should I say something? Hmmm... */				\
   }
 
 #include "newgen_map.h"
