@@ -42,5 +42,5 @@ end=$(date)
   echo "newgen: $(svnversion $target/prod/newgen)"
   echo "linear: $(svnversion $target/prod/linear)"
   echo "nlpmake: $(svnversion $target/prod/pips/makes)"
-  echo "valid: $(svnversion $target/valid)"
+  echo "valid: $(svnversion $target/validation)"
 } | ${PIPS_MAIL:-Mail} -s "[pips] night job $result" $email
