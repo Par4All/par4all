@@ -112,13 +112,13 @@ static char unk[2]; /* one char lines are not implicit shells */
 <KEY>shell 		{ LITTERAL(TK_SHELL); }
 <KEY>!			{ LITTERAL(TK_SHELL); }
 
-<KEY,INITIAL>[ \t\r]+	/* skip blanks... */
+<KEY,INITIAL>[ \t]+	/* skip blanks... */
 
-<UNK>[^\n]*		{ yylval.name = strdup(concatenate(unk, yytext, NULL));
+<UNK>[^\r\n]*		{ yylval.name = strdup(concatenate(unk, yytext, NULL));
 			  KEYWORD(TK_UNKNOWN); }
 
-<LIT>[^\n]* 		{ yylval.name = strdup(yytext); RETURN(TK_LINE); }
-<INITIAL,KEY>#[^\n]*	{ BEGIN INITIAL;
+<LIT>[^\r\n]* 		{ yylval.name = strdup(yytext); RETURN(TK_LINE); }
+<INITIAL,KEY>#[^\r\n]*	{ BEGIN INITIAL;
 			  /* skip comments... (not for echo, shell set). */}
 <KEY>.			{ unk[0]=yytext[0]; unk[1]='\0'; BEGIN UNK; }
 
@@ -131,7 +131,7 @@ static char unk[2]; /* one char lines are not implicit shells */
 <INITIAL>\,		{ RETURN(TK_COMMA); }
 <INITIAL>= 		{ RETURN(TK_EQUAL); }
 
-<LIT,INITIAL>[\n;]	{ RESTART(TK_ENDOFLINE); }
+<LIT,INITIAL>(\n|\r|\r\n|;)	{ RESTART(TK_ENDOFLINE); }
 <LIT,INITIAL><<EOF>>	{ RESTART(TK_ENDOFLINE); }
 
 <STR>[^\"]*\"		{ /* " */ yylval.name = strdup(yytext);
