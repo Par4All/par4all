@@ -120,7 +120,7 @@ add_to_current_line(
     int lbuffer = strlen(buffer);
     boolean comment = FALSE;
     char stmp;
-    /* spacial case: appends a sole "," on end of line... */
+    /* special case: appends a sole "," on end of line... */
     if (same_string_p(append, ", ") && lbuffer+3==MAX_LINE_LENGTH) 
 	append = ",";
 

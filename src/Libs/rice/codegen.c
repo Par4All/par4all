@@ -369,105 +369,104 @@ set region;
 int l;
 bool task_parallelize_p;
 {
-    list lst =NIL;
-    cons *lsccs, *ps;
-    list loops=NIL;
+  list lst =NIL;
+  cons *lsccs, *ps;
+  list loops=NIL;
    
-    cons *block = NIL, *eblock = NIL;
-    statement stata = statement_undefined; 
-    statement statb = statement_undefined;
-    statement rst = statement_undefined;
-    int nbl =0;
+  cons *block = NIL, *eblock = NIL;
+  statement stata = statement_undefined; 
+  statement statb = statement_undefined;
+  statement rst = statement_undefined;
+  int nbl =0;
     
-   debug_on("RICE_DEBUG_LEVEL");
+  debug_on("RICE_DEBUG_LEVEL");
 
-    debug(9, "CodeGenerate", "Begin: starting at level %d ...\n", l); 
-    ifdebug(9)
-	print_statement_set(stderr, region);
+  pips_debug(9, "Begin: starting at level %d ...\n", l); 
+  ifdebug(9)
+    print_statement_set(stderr, region);
  
-    debug(9, "CodeGenerate", "finding and top-sorting sccs ...\n");
-    set_sccs_drivers(&AK_ignore_this_vertex, &AK_ignore_this_successor);
-    lsccs = FindAndTopSortSccs(g, region, l);
-    reset_sccs_drivers();
+  debug(9, "CodeGenerate", "finding and top-sorting sccs ...\n");
+  set_sccs_drivers(&AK_ignore_this_vertex, &AK_ignore_this_successor);
+  lsccs = FindAndTopSortSccs(g, region, l);
+  reset_sccs_drivers();
 
+  pips_debug(9, "generating code ...\n");
 
-    debug(9, "CodeGenerate", "generating code ...\n");
-    for (ps = lsccs; ps != NULL; ps = CDR(ps)) {
-	scc s = SCC(CAR(ps));
-	stata = statement_undefined;
-	if ( strongly_connected_p(s, l))  
-	    stata = ConnectedStatements(g, s, l, task_parallelize_p);
-	else {
-	    if (!get_bool_property("PARTIAL_DISTRIBUTION")) 
-		/* if s contains a single vertex and if this vertex is not 
-		   dependent upon itself, we generate a doall loop for it */
-		stata = IsolatedStatement(s, l, task_parallelize_p);
-	    else {
-		/* statements that are independent are gathered 
-		   into the same doall loop */
-		stata = IsolatedStatement(s, l, task_parallelize_p);
+  for (ps = lsccs; ps != NULL; ps = CDR(ps)) {
+    scc s = SCC(CAR(ps));
+    stata = statement_undefined;
+    if(strongly_connected_p(s, l))  
+      stata = ConnectedStatements(g, s, l, task_parallelize_p);
+    else {
+      if (!get_bool_property("PARTIAL_DISTRIBUTION")) 
+	/* if s contains a single vertex and if this vertex is not 
+	   dependent upon itself, we generate a doall loop for it */
+	stata = IsolatedStatement(s, l, task_parallelize_p);
+      else {
+	/* statements that are independent are gathered 
+	   into the same doall loop */
+	stata = IsolatedStatement(s, l, task_parallelize_p);
 		
-		/* set inner_region = scc_region(s);
-		if (contains_level_l_dependence(s,inner_region,l)) {
-		    stat = IsolatedStatement(s, l, task_parallelize_p);
-		    debug(9, "CodeGenerate", 
-			  "isolated comp.that contains dep. at Level %d\n",
-			  l);
-		}
-		else  { 
-		    vertex v = VERTEX(CAR(scc_vertices(s)));
-		    statement st = vertex_to_statement(v); 
-		    instruction sbody = statement_instruction(st);
-		    nbl = statement_imbrication_level(st);
-		    if (instruction_call_p(sbody) 
-			&& !instruction_continue_p(sbody))
-			if (nbl>=l-1)
-			    stat=IsolatedStatement(s, l, task_parallelize_p);
-			else { 
-			    loops = load_statement_enclosing_loops(st);
-			    lst = gen_nconc(lst, CONS(STATEMENT, st, NIL));
-			}
-		}
-		*/
-	    }
-	}
+	/* set inner_region = scc_region(s);
+	   if (contains_level_l_dependence(s,inner_region,l)) {
+	   stat = IsolatedStatement(s, l, task_parallelize_p);
+	   debug(9, "CodeGenerate", 
+	   "isolated comp.that contains dep. at Level %d\n",
+	   l);
+	   }
+	   else  { 
+	   vertex v = VERTEX(CAR(scc_vertices(s)));
+	   statement st = vertex_to_statement(v); 
+	   instruction sbody = statement_instruction(st);
+	   nbl = statement_imbrication_level(st);
+	   if (instruction_call_p(sbody) 
+	   && !instruction_continue_p(sbody))
+	   if (nbl>=l-1)
+	   stat=IsolatedStatement(s, l, task_parallelize_p);
+	   else { 
+	   loops = load_statement_enclosing_loops(st);
+	   lst = gen_nconc(lst, CONS(STATEMENT, st, NIL));
+	   }
+	   }
+	*/
+      }
+    }
 	 
-	/* In order to preserve the dependences, statements that have 
-	       been collected should be generated before the isolated statement 
-	    that has just been detected */
+    /* In order to preserve the dependences, statements that have 
+       been collected should be generated before the isolated statement 
+       that has just been detected */
 	
-	if (stata != statement_undefined) {
-	    ifdebug(9) {
-		debug(9, "CodeGenerate", "generated statement:\n") ;
-		print_parallel_statement(stata);
-		
-	    }
-	    statb= MakeNestOfStatementList(l,nbl,&lst, loops, &block,&eblock,task_parallelize_p);
-	    INSERT_AT_END(block, eblock, CONS(STATEMENT, stata, NIL));
-	}
+    if (stata != statement_undefined) {
+      ifdebug(9) {
+	pips_debug(9, "generated statement:\n") ;
+	print_parallel_statement(stata);
+      }
+      statb = MakeNestOfStatementList(l, nbl, &lst, loops, &block, &eblock, task_parallelize_p);
+      INSERT_AT_END(block, eblock, CONS(STATEMENT, stata, NIL));
     }
+  }
     
-    statb =MakeNestOfStatementList(l,nbl,&lst, loops,&block,&eblock,task_parallelize_p); 
+  statb = MakeNestOfStatementList(l,nbl,&lst, loops,&block,&eblock,task_parallelize_p); 
    
-    switch(gen_length(block)) {
-    case 0:
-	rst = statement_undefined ;
-	break;
-    default:
-	rst = make_block_statement(block);
-    }
+  switch(gen_length(block)) {
+  case 0:
+    rst = statement_undefined ;
+    break;
+  default:
+    rst = make_block_statement(block);
+  }
     
-    ifdebug(8) { 
-	debug(8, "CodeGenerate", "Result:\n") ;
+  ifdebug(8) { 
+    debug(8, "CodeGenerate", "Result:\n") ;
 	
-	if (rst==statement_undefined)  
-	    debug(8, "CodeGenerate", "No code to generate\n") ;
-	else
-	  print_parallel_statement(rst);
+    if (rst==statement_undefined)  
+      debug(8, "CodeGenerate", "No code to generate\n") ;
+    else
+      print_parallel_statement(rst);
 	
-    }
-    debug_off();
-    return(rst);
+  }
+  debug_off();
+  return(rst);
 }
 
 

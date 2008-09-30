@@ -2067,7 +2067,7 @@ loop_private_variables(loop obj)
     {
 	string private;
 	if (hpf_private) private = "NEW(";
-	else if (omp_private) private = "PRIVATE(";
+	else if (omp_private) private = is_fortran? "PRIVATE(" : "private(";
 	else private = "PRIVATE ";
 	l = CONS(STRING, MAKE_SWORD(private), l);
 	if (hpf_private || omp_private) CHAIN_SWORD(l, ")");
@@ -2089,8 +2089,10 @@ marged(
     int len = strlen(prefix), i;
     string result = (string) malloc(strlen(prefix)+margin+1);
     strcpy(result, prefix);
-    for (i=len; margin-->0;) 
+    if(is_fortran) {
+      for (i=len; margin-->0;) 
 	result[i++] = ' '; result[i]='\0';
+    }
     return result;
 }
 
@@ -2173,7 +2175,7 @@ text_omp_directive(loop l, int m)
 		       OMP_PARALLELDO);
   else { // assume C
     // More should be done to take care of shared and private variables
-    t = text_directive(l, m, "\n" OMP_C_DIRECTIVE, OMP_CONTINUATION,
+    t = text_directive(l, m, OMP_C_DIRECTIVE, OMP_C_CONTINUATION,
 		       OMP_C_PARALLELDO);
 
   }
