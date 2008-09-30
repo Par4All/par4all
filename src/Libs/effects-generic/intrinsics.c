@@ -5,7 +5,7 @@
  * File: intrinsics.c
  * ~~~~~~~~~~~~~~~~~~
  *
- * This File contains the generic functions necessary for the computation of 
+ * This File contains the generic functions necessary for the computation of
  * all types of proper effects and proper references of intrinsics.
  *
  */
@@ -308,7 +308,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {IMS_OPERATOR_NAME,          		     no_write_effects },
 
   /* Here are C intrinsics.*/
-  
+
   {FIELD_OPERATOR_NAME,                      no_write_effects},
   {POINT_TO_OPERATOR_NAME,                   no_write_effects},
   {POST_INCREMENT_OPERATOR_NAME,             unique_update_effects},
@@ -347,44 +347,45 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {BITWISE_AND_UPDATE_OPERATOR_NAME,         update_effects},
   {BITWISE_XOR_UPDATE_OPERATOR_NAME,         update_effects},
   {BITWISE_OR_UPDATE_OPERATOR_NAME,          update_effects},
-  {COMMA_OPERATOR_NAME,                      no_write_effects}, 
+  {COMMA_OPERATOR_NAME,                      no_write_effects},
+  {CONDITIONAL_OPERATOR_NAME,                no_write_effects},
 
   {BRACE_INTRINSIC,                          no_write_effects},
   {BREAK_FUNCTION_NAME,                      no_write_effects},
-  {CASE_FUNCTION_NAME,                       no_write_effects},  
+  {CASE_FUNCTION_NAME,                       no_write_effects},
   {DEFAULT_FUNCTION_NAME,                    no_write_effects},
   {C_RETURN_FUNCTION_NAME,                   no_write_effects},
 
-  /* These intrinsics are added with no_write_effects to work with C. 
+  /* These intrinsics are added with no_write_effects to work with C.
      The real effects must be studied !!! I do not have time for the moment */
-       
+
   {"__assert",                               no_write_effects},
 
   /* #include <ctype.h>*/
 
-  {ISALNUM_OPERATOR_NAME,                    no_write_effects}, 
-  {ISALPHA_OPERATOR_NAME,                    no_write_effects}, 
-  {ISCNTRL_OPERATOR_NAME,                    no_write_effects}, 
-  {ISDIGIT_OPERATOR_NAME,                    no_write_effects}, 
-  {ISGRAPH_OPERATOR_NAME,                    no_write_effects}, 
-  {ISLOWER_OPERATOR_NAME,                    no_write_effects}, 
-  {ISPRINT_OPERATOR_NAME,                    no_write_effects}, 
-  {ISPUNCT_OPERATOR_NAME,                    no_write_effects}, 
-  {ISSPACE_OPERATOR_NAME,                    no_write_effects}, 
-  {ISUPPER_OPERATOR_NAME,                    no_write_effects}, 
-  {ISXDIGIT_OPERATOR_NAME,                   no_write_effects}, 
-  {TOLOWER_OPERATOR_NAME,                    no_write_effects}, 
-  {TOUPPER_OPERATOR_NAME,                    no_write_effects}, 
-  {ISASCII_OPERATOR_NAME,                    no_write_effects}, 
-  {TOASCII_OPERATOR_NAME,                    no_write_effects}, 
-  {_TOLOWER_OPERATOR_NAME,                   no_write_effects}, 
-  {_TOUPPER_OPERATOR_NAME,                   no_write_effects}, 
-  
-  {"errno",                    		     no_write_effects}, 
+  {ISALNUM_OPERATOR_NAME,                    no_write_effects},
+  {ISALPHA_OPERATOR_NAME,                    no_write_effects},
+  {ISCNTRL_OPERATOR_NAME,                    no_write_effects},
+  {ISDIGIT_OPERATOR_NAME,                    no_write_effects},
+  {ISGRAPH_OPERATOR_NAME,                    no_write_effects},
+  {ISLOWER_OPERATOR_NAME,                    no_write_effects},
+  {ISPRINT_OPERATOR_NAME,                    no_write_effects},
+  {ISPUNCT_OPERATOR_NAME,                    no_write_effects},
+  {ISSPACE_OPERATOR_NAME,                    no_write_effects},
+  {ISUPPER_OPERATOR_NAME,                    no_write_effects},
+  {ISXDIGIT_OPERATOR_NAME,                   no_write_effects},
+  {TOLOWER_OPERATOR_NAME,                    no_write_effects},
+  {TOUPPER_OPERATOR_NAME,                    no_write_effects},
+  {ISASCII_OPERATOR_NAME,                    no_write_effects},
+  {TOASCII_OPERATOR_NAME,                    no_write_effects},
+  {_TOLOWER_OPERATOR_NAME,                   no_write_effects},
+  {_TOUPPER_OPERATOR_NAME,                   no_write_effects},
 
-  {"__flt_rounds",             		     no_write_effects}, 
+  {"errno",                    		     no_write_effects},
 
-  {"_sysconf",                 		     no_write_effects}, 
+  {"__flt_rounds",             		     no_write_effects},
+
+  {"_sysconf",                 		     no_write_effects},
   {"setlocale",                		     no_write_effects},
   {"localeconv",               		     no_write_effects},
   {"dcgettext",                		     no_write_effects},
@@ -392,69 +393,69 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {"gettext",                  		     no_write_effects},
   {"textdomain",               		     no_write_effects},
   {"bindtextdomain",           		     no_write_effects},
-  {"wdinit",                   		     no_write_effects}, 
-  {"wdchkind",                 		     no_write_effects}, 
-  {"wdbindf",                  		     no_write_effects}, 
-  {"wddelim",                  		     no_write_effects}, 
+  {"wdinit",                   		     no_write_effects},
+  {"wdchkind",                 		     no_write_effects},
+  {"wdbindf",                  		     no_write_effects},
+  {"wddelim",                  		     no_write_effects},
   {"mcfiller",                 		     no_write_effects},
   {"mcwrap",                   		     no_write_effects},
 
   /* #include <math.h>*/
 
-  {ACOS_OPERATOR_NAME,                	     no_write_effects},  
-  {ASIN_OPERATOR_NAME,                	     no_write_effects}, 
-  {ATAN_OPERATOR_NAME,                	     no_write_effects}, 
-  {ATAN2_OPERATOR_NAME,               	     no_write_effects},   
-  {COS_OPERATOR_NAME,                 	     no_write_effects}, 
-  {SIN_OPERATOR_NAME,                 	     no_write_effects}, 
-  {TAN_OPERATOR_NAME,                 	     no_write_effects}, 
-  {COSH_OPERATOR_NAME,                	     no_write_effects}, 
-  {SINH_OPERATOR_NAME,                	     no_write_effects}, 
-  {TANH_OPERATOR_NAME,                	     no_write_effects}, 
-  {EXP_OPERATOR_NAME,                 	     no_write_effects}, 
-  {FREXP_OPERATOR_NAME,               	     no_write_effects},  
-  {LDEXP_OPERATOR_NAME,               	     no_write_effects},  
-  {C_LOG_OPERATOR_NAME,               	     no_write_effects}, 
-  {C_LOG10_OPERATOR_NAME,             	     no_write_effects}, 
-  {MODF_OPERATOR_NAME,                	     no_write_effects},   
-  {POW_OPERATOR_NAME,                 	     no_write_effects},   
-  {C_SQRT_OPERATOR_NAME,              	     no_write_effects},  
-  {CEIL_OPERATOR_NAME,                	     no_write_effects},  
-  {FABS_OPERATOR_NAME,                	     no_write_effects},  
-  {FLOOR_OPERATOR_NAME,               	     no_write_effects},  
-  {FMOD_OPERATOR_NAME,                	     no_write_effects},  
-  {ERF_OPERATOR_NAME,                        no_write_effects}, 
-  {ERFC_OPERATOR_NAME,                       no_write_effects}, 
-  {GAMMA_OPERATOR_NAME,                      no_write_effects}, 
-  {HYPOT_OPERATOR_NAME,                      no_write_effects}, 
-  {ISNAN_OPERATOR_NAME,                      no_write_effects},  
-  {J0_OPERATOR_NAME,                         no_write_effects}, 
-  {J1_OPERATOR_NAME,                         no_write_effects}, 
-  {JN_OPERATOR_NAME,                         no_write_effects}, 
-  {LGAMMA_OPERATOR_NAME,                     no_write_effects}, 
-  {Y0_OPERATOR_NAME,                         no_write_effects}, 
-  {Y1_OPERATOR_NAME,                         no_write_effects}, 
-  {YN_OPERATOR_NAME,                         no_write_effects}, 
-  {C_ACOSH_OPERATOR_NAME ,                   no_write_effects}, 
-  {C_ASINH_OPERATOR_NAME,                    no_write_effects}, 
-  {C_ATANH_OPERATOR_NAME,                    no_write_effects}, 
-  {CBRT_OPERATOR_NAME,                       no_write_effects}, 
-  {LOGB_OPERATOR_NAME,                       no_write_effects}, 
-  {NEXTAFTER_OPERATOR_NAME,                  no_write_effects},   
-  {REMAINDER_OPERATOR_NAME,                  no_write_effects},   
-  {SCALB_OPERATOR_NAME,                      no_write_effects},   
-  {EXPM1_OPERATOR_NAME,                      no_write_effects}, 
-  {ILOGB_OPERATOR_NAME,                      no_write_effects}, 
-  {LOG1P_OPERATOR_NAME,                      no_write_effects}, 
-  {RINT_OPERATOR_NAME,                       no_write_effects}, 
-  {MATHERR_OPERATOR_NAME,                    no_write_effects},  
-  {SIGNIFICAND_OPERATOR_NAME,                no_write_effects}, 
-  {COPYSIGN_OPERATOR_NAME,                   no_write_effects},   
-  {SCALBN_OPERATOR_NAME,                     no_write_effects}, 
-  {MODFF_OPERATOR_NAME,                      no_write_effects},  
-  {SIGFPE_OPERATOR_NAME,                     no_write_effects},  
-  {SINGLE_TO_DECIMAL_OPERATOR_NAME,          no_write_effects}, 
-  {DOUBLE_TO_DECIMAL_OPERATOR_NAME,          no_write_effects}, 
+  {C_ACOS_OPERATOR_NAME,                	     no_write_effects},
+  {C_ASIN_OPERATOR_NAME,                	     no_write_effects},
+  {C_ATAN_OPERATOR_NAME,                	     no_write_effects},
+  {C_ATAN2_OPERATOR_NAME,               	     no_write_effects},
+  {C_COS_OPERATOR_NAME,                 	     no_write_effects},
+  {C_SIN_OPERATOR_NAME,                 	     no_write_effects},
+  {C_TAN_OPERATOR_NAME,                 	     no_write_effects},
+  {C_COSH_OPERATOR_NAME,                	     no_write_effects},
+  {C_SINH_OPERATOR_NAME,                	     no_write_effects},
+  {C_TANH_OPERATOR_NAME,                	     no_write_effects},
+  {C_EXP_OPERATOR_NAME,                 	     no_write_effects},
+  {FREXP_OPERATOR_NAME,               	     no_write_effects},
+  {LDEXP_OPERATOR_NAME,               	     no_write_effects},
+  {C_LOG_OPERATOR_NAME,               	     no_write_effects},
+  {C_LOG10_OPERATOR_NAME,             	     no_write_effects},
+  {MODF_OPERATOR_NAME,                	     no_write_effects},
+  {POW_OPERATOR_NAME,                 	     no_write_effects},
+  {C_SQRT_OPERATOR_NAME,              	     no_write_effects},
+  {CEIL_OPERATOR_NAME,                	     no_write_effects},
+  {FABS_OPERATOR_NAME,                	     no_write_effects},
+  {FLOOR_OPERATOR_NAME,               	     no_write_effects},
+  {FMOD_OPERATOR_NAME,                	     no_write_effects},
+  {ERF_OPERATOR_NAME,                        no_write_effects},
+  {ERFC_OPERATOR_NAME,                       no_write_effects},
+  {GAMMA_OPERATOR_NAME,                      no_write_effects},
+  {HYPOT_OPERATOR_NAME,                      no_write_effects},
+  {ISNAN_OPERATOR_NAME,                      no_write_effects},
+  {J0_OPERATOR_NAME,                         no_write_effects},
+  {J1_OPERATOR_NAME,                         no_write_effects},
+  {JN_OPERATOR_NAME,                         no_write_effects},
+  {LGAMMA_OPERATOR_NAME,                     no_write_effects},
+  {Y0_OPERATOR_NAME,                         no_write_effects},
+  {Y1_OPERATOR_NAME,                         no_write_effects},
+  {YN_OPERATOR_NAME,                         no_write_effects},
+  {C_ACOSH_OPERATOR_NAME ,                   no_write_effects},
+  {C_ASINH_OPERATOR_NAME,                    no_write_effects},
+  {C_ATANH_OPERATOR_NAME,                    no_write_effects},
+  {CBRT_OPERATOR_NAME,                       no_write_effects},
+  {LOGB_OPERATOR_NAME,                       no_write_effects},
+  {NEXTAFTER_OPERATOR_NAME,                  no_write_effects},
+  {REMAINDER_OPERATOR_NAME,                  no_write_effects},
+  {SCALB_OPERATOR_NAME,                      no_write_effects},
+  {EXPM1_OPERATOR_NAME,                      no_write_effects},
+  {ILOGB_OPERATOR_NAME,                      no_write_effects},
+  {LOG1P_OPERATOR_NAME,                      no_write_effects},
+  {RINT_OPERATOR_NAME,                       no_write_effects},
+  {MATHERR_OPERATOR_NAME,                    no_write_effects},
+  {SIGNIFICAND_OPERATOR_NAME,                no_write_effects},
+  {COPYSIGN_OPERATOR_NAME,                   no_write_effects},
+  {SCALBN_OPERATOR_NAME,                     no_write_effects},
+  {MODFF_OPERATOR_NAME,                      no_write_effects},
+  {SIGFPE_OPERATOR_NAME,                     no_write_effects},
+  {SINGLE_TO_DECIMAL_OPERATOR_NAME,          no_write_effects},
+  {DOUBLE_TO_DECIMAL_OPERATOR_NAME,          no_write_effects},
   {EXTENDED_TO_DECIMAL_OPERATOR_NAME,        no_write_effects},
   {QUADRUPLE_TO_DECIMAL_OPERATOR_NAME,       no_write_effects},
   {DECIMAL_TO_SINGLE_OPERATOR_NAME,          no_write_effects},
@@ -464,20 +465,20 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {STRING_TO_DECIMAL_OPERATOR_NAME,          no_write_effects},
   {FUNC_TO_DECIMAL_OPERATOR_NAME,            no_write_effects},
   {FILE_TO_DECIMAL_OPERATOR_NAME,            no_write_effects},
-  {SECONVERT_OPERATOR_NAME,                  no_write_effects},  
-  {SFCONVERT_OPERATOR_NAME,                  no_write_effects},  
-  {SGCONVERT_OPERATOR_NAME,                  no_write_effects},  
-  {ECONVERT_OPERATOR_NAME,                   no_write_effects},  
-  {FCONVERT_OPERATOR_NAME,                   no_write_effects},  
-  {GCONVERT_OPERATOR_NAME,                   no_write_effects},  
-  {QECONVERT_OPERATOR_NAME,                  no_write_effects},  
-  {QFCONVERT_OPERATOR_NAME,                  no_write_effects},  
-  {QGCONVERT_OPERATOR_NAME,                  no_write_effects},  
-  {"ecvt",                      	     no_write_effects},  
-  {"fcvt",                      	     no_write_effects},  
-  {"gcvt",                      	     no_write_effects},  
-  {"atof",                      	     no_write_effects},  
-  {"strtod",                    	     no_write_effects},  
+  {SECONVERT_OPERATOR_NAME,                  no_write_effects},
+  {SFCONVERT_OPERATOR_NAME,                  no_write_effects},
+  {SGCONVERT_OPERATOR_NAME,                  no_write_effects},
+  {ECONVERT_OPERATOR_NAME,                   no_write_effects},
+  {FCONVERT_OPERATOR_NAME,                   no_write_effects},
+  {GCONVERT_OPERATOR_NAME,                   no_write_effects},
+  {QECONVERT_OPERATOR_NAME,                  no_write_effects},
+  {QFCONVERT_OPERATOR_NAME,                  no_write_effects},
+  {QGCONVERT_OPERATOR_NAME,                  no_write_effects},
+  {"ecvt",                      	     no_write_effects},
+  {"fcvt",                      	     no_write_effects},
+  {"gcvt",                      	     no_write_effects},
+  {"atof",                      	     no_write_effects},
+  {"strtod",                    	     no_write_effects},
   {"rand",                      	     no_write_effects},
   /*#include <setjmp.h>*/
 
@@ -492,15 +493,15 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {"remove",                    	     no_write_effects},
   {"rename",                    	     no_write_effects},
   {"tmpfile",                   	     no_write_effects},
-  {"tmpnam",                    	     no_write_effects}, 
+  {"tmpnam",                    	     no_write_effects},
   {"fclose",                    	     no_write_effects},
   {"fflush",                    	     no_write_effects},
-  {"fopen",                     	     no_write_effects}, 
-  {"freopen",                   	     no_write_effects}, 
+  {"fopen",                     	     no_write_effects},
+  {"freopen",                   	     no_write_effects},
   {"setbuf",                    	     no_write_effects},
   {"setvbuf",                   	     no_write_effects},
   {"fprintf",                   	     no_write_effects /*io_effects*/},
-  {"fscanf",                    	     io_effects},
+  {"fscanf",                    	     no_write_effects /*io_effects*/},
   {"printf",                    	     no_write_effects /*io_effects*/},
   {"scanf",                     	     io_effects},
   {"sprintf",                   	     io_effects},
@@ -508,23 +509,23 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {"vfprintf",                  	     io_effects},
   {"vprintf",                   	     io_effects},
   {"vsprintf",                  	     io_effects},
-  {"fgetc",                     	     io_effects},
-  {"fgets",                     	     io_effects}, 
-  {"fputc",                     	     io_effects},
+  {"fgetc",                     	     no_write_effects /*io_effects*/},
+  {"fgets",                     	     io_effects},
+  {"fputc",                     	     no_write_effects /*io_effects*/},
   {"fputs",                     	     io_effects},
   {"getc",                      	     io_effects},
   {"putc",                      	     io_effects},
   {"getchar",                   	     io_effects},
   {"putchar",                   	     io_effects},
-  {"gets",                      	     io_effects}, 
+  {"gets",                      	     io_effects},
   {"puts",                      	     io_effects},
-  {"ungetc",                    	     io_effects},
-  {"fread",                     	     io_effects}, 
+  {"ungetc",                    	     no_write_effects /*io_effects*/},
+  {"fread",                     	     io_effects},
   {"fwrite",                    	     io_effects},
   {"fgetpos",                   	     no_write_effects},
   {"fseek",                     	     no_write_effects},
   {"fsetpos",                   	     no_write_effects},
-  {"ftell",                     	     no_write_effects}, 
+  {"ftell",                     	     no_write_effects},
   {"rewind",                    	     no_write_effects},
   {"clearerr",                  	     no_write_effects},
   {"feof",                      	     no_write_effects},
@@ -536,12 +537,12 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {"setlinebuf",                	     no_write_effects},
   {"snprintf",                  	     no_write_effects},
   {"vsnprintf",                 	     no_write_effects},
-  {"fdopen",                    	     no_write_effects}, 
-  {"ctermid",                   	     no_write_effects}, 
+  {"fdopen",                    	     no_write_effects},
+  {"ctermid",                   	     no_write_effects},
   {"fileno",                    	     no_write_effects},
-  {"popen",                     	     no_write_effects}, 
-  {"cuserid",                   	     no_write_effects}, 
-  {"tempnam",                   	     no_write_effects}, 
+  {"popen",                     	     no_write_effects},
+  {"cuserid",                   	     no_write_effects},
+  {"tempnam",                   	     no_write_effects},
   {"getopt",                    	     no_write_effects},
   {"getsubopt",                 	     no_write_effects},
   {"getw",                      	     no_write_effects},
@@ -549,7 +550,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {"pclose",                    	     no_write_effects},
   {"fseeko",                    	     no_write_effects},
   {"ftello",                    	     no_write_effects},
-  {"fopen64",                   	     no_write_effects}, 
+  {"fopen64",                   	     no_write_effects},
   {"freopen64",                 	     no_write_effects},
   {"tmpfile64",                 	     no_write_effects},
   {"fgetpos64",                 	     no_write_effects},
@@ -648,10 +649,10 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
 
 
 /* list generic_proper_effects_of_intrinsic(entity e, list args)
- * input    : a intrinsic function name, and the list or arguments. 
+ * input    : a intrinsic function name, and the list or arguments.
  * output   : the corresponding list of effects.
  * modifies : nothing.
- * comment  :	
+ * comment  :
  */
 list
 generic_proper_effects_of_intrinsic(entity e, list args)
@@ -679,7 +680,7 @@ generic_proper_effects_of_intrinsic(entity e, list args)
 
 
 
-static list 
+static list
 no_write_effects(entity e __attribute__ ((__unused__)),list args)
 {
     list lr;
@@ -690,7 +691,7 @@ no_write_effects(entity e __attribute__ ((__unused__)),list args)
     return(lr);
 }
 
-static list 
+static list
 affect_effects(entity e __attribute__ ((__unused__)),list args)
 {
     list le = NIL;
@@ -714,7 +715,7 @@ affect_effects(entity e __attribute__ ((__unused__)),list args)
     return(le);
 }
 
-static list 
+static list
 update_effects(entity e __attribute__ ((__unused__)),list args)
 {
     list le = NIL;
@@ -740,7 +741,7 @@ update_effects(entity e __attribute__ ((__unused__)),list args)
     return(le);
 }
 
-static list 
+static list
 unique_update_effects(entity e __attribute__ ((__unused__)),list args)
 {
     list le = NIL;
@@ -858,23 +859,23 @@ some_io_effects(entity e __attribute__ ((__unused__)), list args __attribute__ (
 
 static list read_io_effects(entity e, list args)
 {
-  /* READ is a special case , for example 
-     
-     N = 5
-     READ *,N, (T(I),I=1,N) 
+  /* READ is a special case , for example
 
-     There is write effect on N in the READ statement, so we have 
+     N = 5
+     READ *,N, (T(I),I=1,N)
+
+     There is write effect on N in the READ statement, so we have
      to project N from the proper region of the READ statement, then add
      the precondition after.
 
      The correct region in this case is :
-     
+
      <T(PHI1)-MAY-{1 <= PHI1, N==5} >*/
-     
 
-  /*  get standard io effects 
 
-      Attention : in this list of io_effects, there are already 
+  /*  get standard io effects
+
+      Attention : in this list of io_effects, there are already
       preconditions  so the too late application of reverse transformer
       still gives the false result !!!
 
@@ -892,7 +893,7 @@ static list read_io_effects(entity e, list args)
   if (!transformer_undefined_p(t)) /* hummm... */
   {
     /* reverse-apply transformer to le. */
-    le = (*effects_transformer_composition_op)(le, t); 
+    le = (*effects_transformer_composition_op)(le, t);
   }
 
   return le;
@@ -921,11 +922,11 @@ io_effects(entity e, list args)
 	    lep = effects_of_iolist(pc, p->ReadOrWrite);
 	}
 	else {
-	    lep = effects_of_ioelem(EXPRESSION(CAR(pc)), 
+	    lep = effects_of_ioelem(EXPRESSION(CAR(pc)),
 				    p->ReadOrWrite);
 	}
 
-	if (p->MayOrMust == is_approximation_may)        
+	if (p->MayOrMust == is_approximation_may)
 	    effects_to_may_effects(lep);
 
 	le = gen_nconc(le, lep);
@@ -936,7 +937,7 @@ io_effects(entity e, list args)
 	    (strcmp(p->IoElementName, "UNIT=") == 0))
 	{
 	    /* We simulate actions on files by read/write actions
-	       to a static integer array 
+	       to a static integer array
 	       GO:
 	       It is necessary to do a read and and write action to
 	       the array, because it updates the file-pointer so
@@ -966,17 +967,17 @@ io_effects(entity e, list args)
 	    ref = make_reference(private_io_entity, indices);
 	    le = gen_nconc(le, generic_proper_effects_of_reference(ref));
 	    le = gen_nconc(le, generic_proper_effects_of_lhs(ref));
-	}	
+	}
     }
 
     pips_debug(5, "end\n");
 
     return(le);
-}    
+}
 
 static list
 effects_of_ioelem(expression exp, tag act)
-{   
+{
     list lr;
 
     pips_debug(5, "begin\n");
@@ -990,11 +991,11 @@ effects_of_ioelem(expression exp, tag act)
 	lr = generic_proper_effects_of_lhs(syntax_reference(s));
     }
     else
-    {  
-	debug(6, "effects_of_io_elem", "is_action_read\n");  
+    {
+	debug(6, "effects_of_io_elem", "is_action_read\n");
 	lr = generic_proper_effects_of_expression(exp);
-    }   
- 
+    }
+
     pips_debug(5, "end\n");
     return(lr);
 }
@@ -1007,7 +1008,7 @@ effects_of_iolist(list exprs, tag act)
 
     pips_debug(5, "begin\n");
 
-    if (expression_implied_do_p(exp)) 
+    if (expression_implied_do_p(exp))
 	lep = effects_of_implied_do(exp, act);
     else
     {
@@ -1040,7 +1041,7 @@ effects_of_iolist(list exprs, tag act)
 	      }
 	    }
 	}
-	else {	
+	else {
 	    pips_debug(6, "is_action_read");
 	    lep = generic_proper_effects_of_expression(exp);
 	}
@@ -1075,11 +1076,11 @@ effects_of_implied_do(expression exp, tag act)
     args = call_arguments(syntax_call(expression_syntax(exp)));
     arg1 = EXPRESSION(CAR(args));       /* loop index */
     arg2 = EXPRESSION(CAR(CDR(args)));  /* range */
-    
-    pips_assert("effects_of_implied_do", 
+
+    pips_assert("effects_of_implied_do",
 		syntax_reference_p(expression_syntax(arg1)));
 
-    pips_assert("effects_of_implied_do", 
+    pips_assert("effects_of_implied_do",
 		syntax_range_p(expression_syntax(arg2)));
 
     index = reference_variable(syntax_reference(expression_syntax(arg1)));
@@ -1087,29 +1088,29 @@ effects_of_implied_do(expression exp, tag act)
 
     r = syntax_range(expression_syntax(arg2));
 
-    /* effects of implied do index 
-     * it is must_written but may read because the implied loop 
-     * might execute no iteration. 
+    /* effects of implied do index
+     * it is must_written but may read because the implied loop
+     * might execute no iteration.
      */
 
     le = generic_proper_effects_of_lhs(ref); /* the loop index is must-written */
     /* Read effects are masked by the first write to the implied-do loop variable */
-	
+
     /* effects of implied-loop bounds and increment */
     le = gen_nconc(le, generic_proper_effects_of_expression(arg2));
 
     /* Do we use context information */
     if (! transformer_undefined_p(context))
-    {    
+    {
 	transformer tmp_trans;
 	Psysteme context_sc;
 
     /* the preconditions of the current statement don't include those
      * induced by the implied_do, because they are local to the statement.
      * But we need them to properly calculate the regions.
-     * the solution is to add to the current context the preconditions 
+     * the solution is to add to the current context the preconditions
      * due to the current implied_do (think of nested implied_do).
-     * Beware: the implied-do index variable may already appear 
+     * Beware: the implied-do index variable may already appear
      * in the preconditions. So we have to eliminate it first.
      * the regions are calculated, and projected along the index.
      * BA, September 27, 1993.
@@ -1128,30 +1129,30 @@ effects_of_implied_do(expression exp, tag act)
 	}
 	/* tmp_trans simulates the transformer of the implied-do loop body */
 	tmp_trans = transformer_identity();
-	local_context = add_index_range_conditions(local_context, index, r, 
+	local_context = add_index_range_conditions(local_context, index, r,
 						   tmp_trans);
 	free_transformer(tmp_trans);
-	transformer_arguments(local_context) = 
-	    arguments_add_entity(transformer_arguments(local_context), 
-				 entity_to_new_value(index)); 
+	transformer_arguments(local_context) =
+	    arguments_add_entity(transformer_arguments(local_context),
+				 entity_to_new_value(index));
 
 
 	ifdebug(7) {
-	    pips_debug(7, "local context : \n%s\n", 
+	    pips_debug(7, "local context : \n%s\n",
 		       precondition_to_string(local_context));
-	}	
+	}
     }
     else
 	local_context = transformer_undefined;
 
     effects_private_current_context_push(local_context);
-    
-    MAP(EXPRESSION, expr, 
-    { 
+
+    MAP(EXPRESSION, expr,
+    {
       syntax s = expression_syntax(expr);
-      
+
       if (syntax_reference_p(s))
-	if (act == is_action_write) 
+	if (act == is_action_write)
 	  lep = generic_proper_effects_of_lhs(syntax_reference(s));
 	else
 	  lep = generic_proper_effects_of_expression(expr);
@@ -1164,7 +1165,7 @@ effects_of_implied_do(expression exp, tag act)
 	    lep = effects_of_implied_do(expr, act);
 	  else
 	    lep = generic_r_proper_effects_of_call(syntax_call(s));
-      
+
       /* indices are removed from effects because this is a loop */
       lr = NIL;
       MAP(EFFECT, eff,
@@ -1185,22 +1186,22 @@ effects_of_implied_do(expression exp, tag act)
       }, lep);
       gen_free_list(lep);
       lr = gen_nreverse(lr); /* preserve initial order??? */
-      le = gen_nconc(le, lr);	    
+      le = gen_nconc(le, lr);
     }, CDR(CDR(args)));
-    
-    
-    (*effects_union_over_range_op)(le, 
-				   index, 
+
+
+    (*effects_union_over_range_op)(le,
+				   index,
 				   r, descriptor_undefined);
-    
+
     ifdebug(6) {
       pips_debug(6, "effects:\n");
       (*effects_prettyprint_func)(le);
       fprintf(stderr, "\n");
     }
-    
+
     effects_private_current_context_pop();
     pips_debug(5, "end\n");
-    
+
     return le;
 }
