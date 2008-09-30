@@ -365,7 +365,7 @@ option because all interprocedural analysis results are going to be wrong.
 The user should retrieve the generated \verb/.f/ files in the workspace,
 under the Tmp directory, and add some assignments (def) and uses. The user
 modified synthetic files should then be saved and used to generate a new
-workspace. 
+workspace.
 
 Valid settings: \verb|error generate query|.
 
@@ -404,7 +404,7 @@ PARSER_WARN_FOR_COLUMNS_73_80   TRUE
 PIPS has been initially developed to parse correct Fortran compliant
 programs only. Real applications use lots of ANSI extensions... and they
 are not always correct! To make sure that PIPS output is correct, the
-input code should be checked against ANSI extensions using property 
+input code should be checked against ANSI extensions using property
 \begin{quote}
 CHECK\_FORTRAN\_SYNTAX\_BEFORE\_PIPS
 \end{quote}
@@ -1141,8 +1141,8 @@ The default value is false for reverse compatibility and for speed.
 \index{Interprocedural}
 \index{SEMANTICS\_INTERPROCEDURAL}
 
-To be refined later; basically, use callee\'s transformers instead of
-callee\'s effects when computing transformers bottom-up in the call graph;
+To be refined later; basically, use callee's transformers instead of
+callee's effects when computing transformers bottom-up in the call graph;
 when going top-down with preconditions, should we care about unique
 call site and/or perform meet operation on call site preconditions ?
 
@@ -1160,7 +1160,7 @@ This property is used internally and is not user selectable.
 \index{SEMANTICS\_RECOMPUTE\_FIX\_POINTS\_WITH\_PRECONDITIONS}
 
 CPU time and memory space are cheap enough to compute loop fix points for
-{\em transformers}. This property implies SEMANTICS\_FLOW\_SENSITIVE and is not
+{\em transformers}. This property implies \texttt{SEMANTICS\_FLOW\_SENSITIVE} and is not
 user-selectable. Its default value is {\em false}.
 
 \begin{verbatim}
@@ -1205,8 +1205,8 @@ and replaced by option {\em pattern} of the previous property.
 This property was defined to select one of Cousot-Halbwachs's heuristics
 and to compute fix points with inequalities and equalities for loops.
 These heuristics could be used to compute fix points for transformers
-and/or preconditions. This option implies SEMANTICS\_FIX\_POINT and
-SEMANTICS\_FLOW\_SENSITIVE.  It has not been implemented yet in
+and/or preconditions. This option implies \texttt{SEMANTICS\_FIX\_POINT} and
+\texttt{SEMANTICS\_FLOW\_SENSITIVE}.  It has not been implemented yet in
 PIPS\footnote{But some fix point functions are part of the C3 linear
   library.} because its accuracy has not yet been required, but is now
 badly named because there is no direct link between {\em inequality} and
@@ -1322,7 +1322,7 @@ display); this is the default value;
 statements and not for basic statements, since they should not cause
 accuracy problems;
 
-  \item 2 : prettyprint statistics for all statements
+  \item 2: prettyprint statistics for all statements
 
 \end{itemize}
 
@@ -2075,21 +2075,22 @@ SIMD_FORTRAN_MEM_ORGANISATION TRUE
 
 \subsection{PHRASE ComEngine}
 
-This property is set to TRUE if we want to synthesize only one 
+This property is set to TRUE if we want to synthesize only one
 process on the HRE.
-
 \begin{verbatim}
 COMENGINE_CONTROL_IN_HRE TRUE
 \end{verbatim}
 
-This property holds the fifo size of the ComEngine.
+\begin{verbatim}
+COMENGINE_BUFFER_HRE_INTERFACE TRUE
+\end{verbatim}
 
+This property holds the fifo size of the ComEngine.
 \begin{verbatim}
 COMENGINE_SIZE_OF_FIFO 128
 \end{verbatim}
 
 This property holds the number of fifos in the ComEngine.
-
 \begin{verbatim}
 COMENGINE_NUMBER_OF_FIFO 100
 \end{verbatim}

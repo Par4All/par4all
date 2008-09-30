@@ -1,9 +1,12 @@
 #! /bin/bash
 
+# Use $INSTALL_DIR if set or $PIPS_ROOT:
+SHR_d=${INSTALL_DIR:-$PIPS_ROOT}/share
+
 function display_usage_and_exit () {
     cat <<EOF
 $0 [-h|--help] file.f ...
-  Create a workspace from Fortran source files and parallelize
+  Create a workspace from C source files and parallelize
   them with OpenMP syntax.
 
 '$Id$'
@@ -15,6 +18,7 @@ source ${SHR_d}/simple_tools.bash
 
 {
     create_workspace $*
+    select_c_language
     select_most_precise_analysis
     privatize_scalar_variables
     openmp_parallelization
@@ -23,4 +27,4 @@ source ${SHR_d}/simple_tools.bash
     regenerate_source
 } | tpips
 
-display_end
+echo "The parallelized code is in $workspace.database/Src"

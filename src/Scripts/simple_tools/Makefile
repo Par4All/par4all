@@ -3,9 +3,10 @@
 # pips shell simple tools
 #
 
-SCRIPTS =	pips_f2openmp
+SCRIPTS =	pips_c2openmp pips_f2openmp
 
 INSTALL_EXE =	$(SCRIPTS)
+INSTALL_SHR = simple_tools.bash
 
 # common stuff
 ifdef PIPS_ROOT
