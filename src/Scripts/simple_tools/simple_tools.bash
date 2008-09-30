@@ -96,7 +96,7 @@ function select_omp_sequential_output () {
     cat <<EOF
 # Force the code regeneration with OpenMP parallel syntax
 # instead of sequential output:
-echo 'setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "omp"'
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "omp"
 
 EOF
 }
