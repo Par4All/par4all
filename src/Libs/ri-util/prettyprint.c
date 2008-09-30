@@ -2258,7 +2258,7 @@ text_loop_default(
 
     /* loop BODY
      */
-    MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, body));
+    MERGE_TEXTS(r, text_statement_enclosed(module, margin+INDENTATION, body, !one_liner_p(body)));
 
     /* LOOP postlogue
      */
@@ -2972,6 +2972,10 @@ bool  C_comment_p(string c){
    cc=*ccp++;
  if(cc=='*')
    goto slash_star_star;
+  else if(cc=='\0'){
+    is_C_comment=FALSE;
+    goto end;
+  }
  else
    goto slash_star;
 
@@ -2988,7 +2992,13 @@ bool  C_comment_p(string c){
   cc=*ccp++;
   if(cc=='/')
    goto init;
- else
+  else if(cc=='*')
+    goto slash_star_star;
+  else if(cc=='\0'){
+    is_C_comment=FALSE;
+    goto end;
+  }
+  else
    goto slash_star;
 
  end : return is_C_comment;
