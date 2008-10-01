@@ -289,8 +289,11 @@ list make_undefined_list()
 	list the_list = NIL;
 
 	debug(7, "make_undefined_list", "doing\n");
-	ADD_ELEMENT_TO_LIST( the_list, STATEMENT, statement_undefined);
-	ADD_ELEMENT_TO_LIST( the_list, STATEMENT, statement_undefined);
+	/* Newgen does not support list of undefined objects */
+	//ADD_ELEMENT_TO_LIST( the_list, STATEMENT, statement_undefined);
+	//ADD_ELEMENT_TO_LIST( the_list, STATEMENT, statement_undefined);
+	ADD_ELEMENT_TO_LIST( the_list, STATEMENT, make_continue_statement(entity_empty_label()));
+	ADD_ELEMENT_TO_LIST( the_list, STATEMENT, make_continue_statement(entity_empty_label()));
 	return( the_list );
 }
   
@@ -473,7 +476,7 @@ list exp_l;
 }
 
 /* bool undefined_statement_list_p( (list) l )			AL 04/93
- * Returns TRUE if l is made of 2 undefined_statement.
+ * Returns TRUE if l is made of 2 undefined or continue statement.
  */
 bool undefined_statement_list_p( l ) 
 list l;
@@ -489,6 +492,12 @@ list l;
 	second = STATEMENT(CAR(CDR( l )));
 	local_bool = ( first == statement_undefined ) 
 		     && ( second == statement_undefined );
+
+	/* Newgen does not support list of undefined objects */
+	if(!local_bool) {
+	  local_bool = continue_statement_p(first) && continue_statement_p(second);
+	}
+
 	return( local_bool );
 }
 

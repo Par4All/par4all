@@ -1889,8 +1889,11 @@ words_syntax(syntax obj)
     case is_syntax_application:
       pc = words_application(syntax_application(obj));
       break;
+    case is_syntax_va_arg:
+      pc = words_va_arg(syntax_va_arg(obj));
+      break;
     default: 
-      pips_internal_error("unexpected tag");
+      pips_internal_error("unexpected tag\n");
     }
     
     return(pc);
@@ -3593,6 +3596,20 @@ static list words_sizeofexpression(sizeofexpression obj)
   }
   else
     pc = gen_nconc(pc, words_expression(sizeofexpression_expression(obj)));
+  pc = CHAIN_SWORD(pc,")"); 
+  return pc;
+} 
+
+static list words_va_arg(list obj)
+{
+  list pc = NIL;
+  expression e1 = sizeofexpression_type(SIZEOFEXPRESSION(CAR(obj)));
+  type t2 = sizeofexpression_type(SIZEOFEXPRESSION(CAR(CDR(obj))));
+
+  pc = CHAIN_SWORD(pc,"va_arg(");
+  pc = gen_nconc(pc, words_expression(e1));
+  pc = CHAIN_SWORD(pc,", ");
+  pc = gen_nconc(pc, words_type(t2));
   pc = CHAIN_SWORD(pc,")"); 
   return pc;
 } 

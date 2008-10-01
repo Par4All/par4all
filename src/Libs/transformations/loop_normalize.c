@@ -134,7 +134,7 @@ char *mod_name;
   /* Compute the loops normalization of the module. */
 
   /* No longer assumption on a global unstructured around... */
-  ln_of_statement(mod_stat,
+  (void) ln_of_statement(mod_stat,
 		  Gforward_substitute_table, &Genclosing_loops,
 		  &Genclosing_tests, &Gscalar_written_forward,
 		  &Gcount_nlc);
@@ -176,7 +176,7 @@ int *Gcount_nlc;
   expression	nub2, nub3, index_exp, new_index_exp;
   expression      exp_max = expression_undefined;
   range           lr;
-  statement       before_stmt = statement_undefined;
+  statement       before_stmt = make_continue_statement(entity_empty_label());
   statement       end_stmt = statement_undefined;
   int             incre;
   list            stmt_list = NIL;
@@ -190,7 +190,7 @@ int *Gcount_nlc;
   /* If it is not a constant step, we just normalize the loop body */
   if(!normalizable_loop_p(l)) {
     ADD_ELEMENT_TO_LIST(*swfl, ENTITY, index);
-    ln_of_statement(loop_body( l ), fst, ell,
+    (void) ln_of_statement(loop_body( l ), fst, ell,
 		    etl, swfl, Gcount_nlc);
     return( make_undefined_list() );
   }
@@ -208,7 +208,7 @@ int *Gcount_nlc;
 					      expression_dup(rl)),
 				  expression_dup(ri)),
 		      expression_dup(ri));
-  nub2 = expression_dup(nub);
+  nub2 = copy_expression(nub);
 
   ADD_ELEMENT_TO_LIST( stmt_list, STATEMENT, before_stmt );
 

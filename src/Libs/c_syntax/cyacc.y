@@ -859,7 +859,18 @@ expression:
 			}
 |   TK_BUILTIN_VA_ARG TK_LPAREN expression TK_COMMA type_name TK_RPAREN
                         {
-			  CParserError("BUILTIN_VA_ARG not implemented\n");
+
+			  expression e = $3;
+			  type t = $5;
+			  sizeofexpression e1 = make_sizeofexpression_expression(e);
+			  sizeofexpression e2 = make_sizeofexpression_type(t);
+			  list l = CONS(SIZEOFEXPRESSION, e1,
+					CONS(SIZEOFEXPRESSION, e2, NIL));
+			  syntax s = make_syntax_va_arg(l);
+			  expression r = make_expression(s, make_normalized_complex());
+
+			  $$ = r;
+			  //CParserError("BUILTIN_VA_ARG not implemented\n");
 			}
 |   expression bracket_comma_expression
 			{

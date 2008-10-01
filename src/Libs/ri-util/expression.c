@@ -2097,6 +2097,7 @@ bool simplify_C_expression(expression e)
   case is_syntax_sizeofexpression:
   case is_syntax_subscript: 
   case is_syntax_application:
+  case is_syntax_va_arg:
       can_be_substituted_p = FALSE;
       break;
   default: pips_internal_error("Bad syntax tag");
