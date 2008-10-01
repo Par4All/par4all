@@ -38,20 +38,20 @@
 \newcommand{\PipsDevGuideHTDOC}{\LINK{http://www.cri.ensmp.fr/pips/developer_guide.htdoc}}
 \newcommand{\DoxygenSources}{\LINK{https://freia.enstb.org/pips/source}}
 
-\title{\bf {\Huge PIPS} \\
-  Development Environment \\
+\title{\bf {\Huge PIPS}\\
+  Development Environment\\
 }
 
 \author{
 \begin{tabular}{rl}
-  François & IRIGOIN \\
-  Pierre & JOUVELOT \\
-  Rémi & TRIOLET \\
-  Arnauld & LESERVOT \\
-  Alexis & PLATONOFF \\
-  Ronan & KERYELL \\
-  Béatrice & CREUSILLET \\
-  Fabien & COELHO \\
+  François & IRIGOIN\\
+  Pierre & JOUVELOT\\
+  Rémi & TRIOLET\\
+  Arnauld & LESERVOT\\
+  Alexis & PLATONOFF\\
+  Ronan & KERYELL\\
+  Béatrice & CREUSILLET\\
+  Fabien & COELHO\\
   Corinne & ANCOURT
 \end{tabular}
 }
@@ -357,17 +357,17 @@ sh> svn co http://svn.cri.ensmp.fr/svn/pips/branches/calvin pips_dev
   in the production version. Assuming that Calvin wants to develop
   in the \texttt{hpfc} library in pips:
 \begin{verbatim}
-sh> cd /home/temp/MYPIPS/prod/pips/src/Libs/hpfc
+sh> cd /home/.../MYPIPS/prod/pips/src/Libs/hpfc
 sh> make SVN_USERNAME=calvin create-branch
 # ... not really created before the commit
-sh> svn commit /home/temp/svn_branch.XXXXXX/
+sh> svn commit /tmp/svn_branch.XXXXXX/
 \end{verbatim}
   It creates a new branch, not yet committed, in some temporary directory.
   \verb/SVN_USERNAME/ is not necessary if the svn and unix account share the
   same login name. This directory \textbf{must} then be committed.
 \item If necessary, update your development area to make the branch appear.
 \begin{verbatim}
-sh> cd /home/temp/MYPIPS/pips_dev
+sh> cd /home/.../MYPIPS/pips_dev
 sh> svn update
 A    hpfc
 sh> cd hpfc
@@ -412,7 +412,7 @@ sh> svn diff --revision 12345:HEAD -x -w
 sh> make install-branch
 # ... create a temporary merged library
 # ... there may be conflicts to be dealt with
-sh> svn commit /tmp/svn_branch.XXXXXX/
+sh> cd /tmp/svn_branch.XXXXXX
 sh> svn commit .
 \end{verbatim}
 }
@@ -675,7 +675,7 @@ Configuration files, such as properties and pipsmake settings.
 Also some configuration files, automatically generated from
 the \LaTeX{} documentation in \texttt{src/Documentation}.
 Important files are \texttt{pipsmake.rc}, \texttt{properties.rc} and
-\texttt{wpips.rc}. 
+\texttt{wpips.rc}.
 
 \subsubsection{The \texttt{share} subdirectory}
 
