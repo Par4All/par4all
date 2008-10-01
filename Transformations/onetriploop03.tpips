@@ -20,24 +20,30 @@ echo
 echo Initial code
 echo
 
-display PRINTED_FILE[%ALL]
+display PRINTED_FILE[foo]
+display PRINTED_FILE[onetriploop03]
+display PRINTED_FILE[main]
 
 echo
 echo Initial code with preconditions
 echo
 
 activate PRINT_CODE_PRECONDITIONS
-display PRINTED_FILE[%ALL]
+display PRINTED_FILE[foo]
+display PRINTED_FILE[onetriploop03]
+display PRINTED_FILE[main]
 
 echo
 echo Code after one trip loop detection and simplification
 echo
 
 activate PRINT_CODE
-capply SUPPRESS_DEAD_CODE[%ALL]
-display PRINTED_FILE[%ALL]
+capply SUPPRESS_DEAD_CODE[onetriploop03]
+display PRINTED_FILE[foo]
+display PRINTED_FILE[onetriploop03]
+display PRINTED_FILE[main]
 
-apply UNSPLIT
+# apply UNSPLIT
 
 close
-delete onetriploop03
+# delete onetriploop03
