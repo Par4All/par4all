@@ -583,12 +583,13 @@ predicate to recognize intrinsics entities.
 \label{subsubsection-parameter}
 \index{Parameter}
 
-\domain{Parameter = type x mode x dummy:string}
+\domain{Parameter = type x mode x name:string}
 
 Objects of type \texttt{parameter} represents type and inout
-information for formal parameters. The dummy field is used to store a
-parameter name in C function declarations. By default, this name is
-the empty string, "".
+information for formal parameters. The name field is used to store a
+dummy parameter name in C function declarations, which may be
+different from the formal parameter name. By default, this name is the
+empty string, "".
 
 \begin{comment}
 Le domaine \verb/parameter/ représente le type et le mode de passage d'un
@@ -1621,7 +1622,7 @@ field set to \texttt{normalized\_undefined}.
 \label{subsection-syntax}
 \index{Syntax}
 
-\domain{Syntax = reference + range + call + cast + sizeofexpression + subscript + application}
+\domain{Syntax = reference + range + call + cast + sizeofexpression + subscript + application + va_arg:sizeofexpression*}
 {}
 
 Type \verb/syntax/ is used to represent expressions as they are
