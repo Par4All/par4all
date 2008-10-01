@@ -19,5 +19,4 @@ display PARSED_PRINTED_FILE[varargs02]
 close
 
 delete varargs02
-
-
+quit

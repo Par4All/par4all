@@ -18,5 +18,6 @@
 1        CONTINUE                                                       0009
       ENDDO
       I = 2*MAX((-1+N)/2, 0)+3
+      RETURN
       END
 
