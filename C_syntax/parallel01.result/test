@@ -48,8 +48,7 @@ void parallel01()
    double x[10];
    int i;
 
-
-#pragma omp    parallel for 
+#pragma omp parallel for 
    for(i = 0; i <= 9; i += 1)
       x[i] = 0.;
 }

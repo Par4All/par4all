@@ -1,3 +1,6 @@
+
+Parsed printed file for all
+
 void bar(int i)
 {
    extern void foo(int );
@@ -33,6 +36,9 @@ int main()
    bar(3);
 }
 extern int main();
+
+Printed file for all
+
 int bar(int i)
 {
    extern int foo(int );
@@ -68,6 +74,9 @@ int main()
    bar(3);
 }
 extern int main();
+
+Symbole tables for all
+
 bar
 
 Declarations for module "bar" with type "int -> int"
@@ -376,6 +385,9 @@ Layout for memory area "static_call02!:*STATIC*" of size 0:
 	* empty area *
 
 End of declarations for module static_call02!
+
+
+Call graph for "main"
 
  main
      foo
