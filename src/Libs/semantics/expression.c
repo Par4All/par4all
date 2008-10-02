@@ -1282,7 +1282,7 @@ integer_binary_operation_to_transformer(
   else if(ENTITY_MULTIPLY_P(op)) {
     tf = integer_multiply_to_transformer(e, e1, e2, pre, is_internal);
   }
-  else if(ENTITY_MODULO_P(op)) {
+  else if(ENTITY_MODULO_P(op) || ENTITY_C_MODULO_P(op)) {
     tf = modulo_to_transformer(e, e1, e2, pre, is_internal);
   }
   else if(ENTITY_DIVIDE_P(op)) {

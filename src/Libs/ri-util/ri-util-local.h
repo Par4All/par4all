@@ -452,6 +452,7 @@
 #define ENTITY_UNARY_MINUS_P(e) entity_an_operator_p(e, UNARY_MINUS)
 #define ENTITY_MULTIPLY_P(e) entity_an_operator_p(e, MULTIPLY)
 #define ENTITY_MODULO_P(e) entity_an_operator_p(e, MODULO)
+#define ENTITY_C_MODULO_P(e) entity_an_operator_p(e, C_MODULO)
 #define ENTITY_POWER_P(e) entity_an_operator_p(e, POWER)
 #define ENTITY_DIVIDE_P(e) entity_an_operator_p(e, DIVIDE)
 #define ENTITY_MIN_P(e) entity_an_operator_p(e, MIN)

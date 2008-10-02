@@ -329,6 +329,11 @@ static list words_subscript(subscript s);
 static list words_application(application a);
 static text text_forloop(entity module,string label,int margin,forloop obj,int n);
 
+/* This variable is used to disable the precedence system and hence to
+   prettyprint all parentheses, which let the prettyprint reflect the
+   AST. */
+static bool precedence_p = TRUE;
+
 /******************************************************************* STYLES */
 
 static bool 
@@ -627,7 +632,7 @@ words_regular_call(call obj, bool is_a_subroutine)
   if (call_arguments(obj) == NIL) {
     if (type_statement_p(t))
       return(CHAIN_SWORD(pc, entity_local_name(f)+strlen(LABEL_PREFIX)));
-    if (value_constant_p(i)||value_symbolic_p(i))
+    if (value_constant_p(i)||value_symbolic_p(i)) {
       if(is_fortran)
 	return(CHAIN_SWORD(pc, entity_user_name(f)));
       else {
@@ -637,6 +642,7 @@ words_regular_call(call obj, bool is_a_subroutine)
 	  return(CHAIN_SWORD(pc, "false"));
 	return(CHAIN_SWORD(pc, entity_user_name(f)));
       }
+    }
   }
 
   if (type_void_p(functional_result(type_functional(call_to_functional_type(obj)))))
@@ -733,7 +739,7 @@ words_genuine_regular_call(call obj, bool is_a_subroutine)
 
   if (call_arguments(obj) != NIL) {
     /* The call is not used to code a constant: */
-    entity f = call_function(obj);
+    //entity f = call_function(obj);
     //type t = entity_type(f);
     /* The module name is the first one except if it is a procedure CALL. */
     if (type_void_p(functional_result(type_functional(call_to_functional_type(obj)))))
@@ -748,7 +754,7 @@ words_genuine_regular_call(call obj, bool is_a_subroutine)
 
 static list 
 words_assign_op(call obj,
-		int __attribute__ ((unused)) precedence,
+		int precedence,
 		bool __attribute__ ((unused)) leftmost)
 {
   list pc = NIL, args = call_arguments(obj);
@@ -758,7 +764,7 @@ words_assign_op(call obj,
   pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(args)), prec, TRUE));
 
   if (strcmp(fun,MODULO_UPDATE_OPERATOR_NAME) == 0)
-    fun = "%";
+    fun = "%=";
   else if (strcmp(fun,BITWISE_AND_UPDATE_OPERATOR_NAME) == 0)
     fun = "&=";
   else if (strcmp(fun,BITWISE_XOR_UPDATE_OPERATOR_NAME) == 0)
@@ -771,6 +777,11 @@ words_assign_op(call obj,
   pc = CHAIN_SWORD(pc, fun); 
   pc = CHAIN_SWORD(pc," ");
   pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(args))), prec, TRUE));
+
+  if(prec < precedence ||  (!precedence_p && precedence>0)) {
+    pc = CONS(STRING, MAKE_SWORD("("), pc);
+    pc = CHAIN_SWORD(pc, ")");
+  }
   return(pc);
 }
 
@@ -1522,40 +1533,7 @@ words_infix_binary_op(call obj, int precedence, bool leftmost)
   list we2;
   string fun = entity_local_name(call_function(obj));
 
-  if ( strcmp(fun, DIVIDE_OPERATOR_NAME) == 0 )
-    we2 = words_subexpression(EXPRESSION(CAR(CDR(args))), MAXIMAL_PRECEDENCE, FALSE);
-  else if ( strcmp(fun, "-") == 0 ) {
-    expression exp = EXPRESSION(CAR(CDR(args)));
-    if ( expression_call_p(exp) &&
-	 words_intrinsic_precedence(syntax_call(expression_syntax(exp))) >= 
-	 intrinsic_precedence("*") )
-      /* precedence is greater than * or / */
-      we2 = words_subexpression(exp, prec, FALSE);
-    else
-      we2 = words_subexpression(exp, MAXIMAL_PRECEDENCE, FALSE);
-  }
-  else if ( strcmp(fun, MULTIPLY_OPERATOR_NAME) == 0 ) {
-    expression exp = EXPRESSION(CAR(CDR(args)));
-    if ( expression_call_p(exp) &&
-	 ENTITY_DIVIDE_P(call_function(syntax_call(expression_syntax(exp))))) {
-      basic bexp = basic_of_expression(exp);
-      if(basic_int_p(bexp)) {
-	we2 = words_subexpression(exp, MAXIMAL_PRECEDENCE, FALSE);
-      }
-      else
-	we2 = words_subexpression(exp, prec, FALSE);
-      free_basic(bexp);
-    }
-    else
-      we2 = words_subexpression(exp, prec, FALSE);
-  }
-  else {
-    we2 = words_subexpression(EXPRESSION(CAR(CDR(args))), prec,
-			      prec<MINIMAL_ARITHMETIC_PRECEDENCE);
-  }
-
-    
-  /* handling of renamed operators */
+  /* handling of internally renamed operators */
   if ( strcmp(fun,PLUS_C_OPERATOR_NAME) == 0 )
     fun = "+";
   else  if ( strcmp(fun, MINUS_C_OPERATOR_NAME) == 0 )
@@ -1572,15 +1550,12 @@ words_infix_binary_op(call obj, int precedence, bool leftmost)
     fun = "%";
   else if (!is_fortran){
     if(strcasecmp(fun, GREATER_THAN_OPERATOR_NAME)==0)
-	
       fun=C_GREATER_THAN_OPERATOR_NAME;
     else if(strcasecmp(fun, LESS_THAN_OPERATOR_NAME)==0)
       fun=C_LESS_THAN_OPERATOR_NAME;
     else if(strcasecmp(fun,GREATER_OR_EQUAL_OPERATOR_NAME)==0)
-
       fun=C_GREATER_OR_EQUAL_OPERATOR_NAME;
     else if(strcasecmp(fun,LESS_OR_EQUAL_OPERATOR_NAME)==0)
-
       fun=C_LESS_OR_EQUAL_OPERATOR_NAME;
     else if(strcasecmp(fun, EQUAL_OPERATOR_NAME) ==0)
       fun=C_EQUAL_OPERATOR_NAME;
@@ -1590,15 +1565,48 @@ words_infix_binary_op(call obj, int precedence, bool leftmost)
       fun="&&";
     else if(strcasecmp(fun, OR_OPERATOR_NAME)==0)
       fun=C_OR_OPERATOR_NAME;
-   
   }
 
-  if ( prec < precedence )
+  if(strcmp(fun, DIVIDE_OPERATOR_NAME) == 0)
+    we2 = words_subexpression(EXPRESSION(CAR(CDR(args))), MAXIMAL_PRECEDENCE, FALSE);
+  else if (strcmp(fun, MINUS_OPERATOR_NAME) == 0 ) {
+    expression exp = EXPRESSION(CAR(CDR(args)));
+    if(expression_call_p(exp) &&
+       words_intrinsic_precedence(syntax_call(expression_syntax(exp))) >= 
+       intrinsic_precedence(MULTIPLY_OPERATOR_NAME) )
+      /* precedence is greater than * or / */
+      we2 = words_subexpression(exp, prec, FALSE);
+    else
+      we2 = words_subexpression(exp, MAXIMAL_PRECEDENCE, FALSE);
+  }
+  else if(strcmp(fun, MULTIPLY_OPERATOR_NAME) == 0) {
+    expression exp = EXPRESSION(CAR(CDR(args)));
+    if(expression_call_p(exp) &&
+       ENTITY_DIVIDE_P(call_function(syntax_call(expression_syntax(exp))))) {
+      basic bexp = basic_of_expression(exp);
+
+      if(basic_int_p(bexp)) {
+	we2 = words_subexpression(exp, MAXIMAL_PRECEDENCE, FALSE);
+      }
+      else
+	we2 = words_subexpression(exp, prec, FALSE);
+      free_basic(bexp);
+    }
+    else
+      we2 = words_subexpression(exp, prec, FALSE);
+  }
+  else {
+    we2 = words_subexpression(EXPRESSION(CAR(CDR(args))), prec,
+			      prec<MINIMAL_ARITHMETIC_PRECEDENCE);
+  }
+
+  /* Use precedence to generate or not parentheses, unless parentheses are always required */
+  if(prec < precedence ||  !precedence_p)
     pc = CHAIN_SWORD(pc, "(");
   pc = gen_nconc(pc, we1);
   pc = CHAIN_SWORD(pc, strdup(fun));
   pc = gen_nconc(pc, we2);
-  if( prec < precedence )
+  if(prec < precedence || !precedence_p)
     pc = CHAIN_SWORD(pc, ")");
     
   return(pc);
@@ -1800,8 +1808,6 @@ multiply-add operators ( JZ - sept 98) */
     {NULL, null, 0}
 };
 
-static bool precedence_p = TRUE;
-
 static list 
 words_intrinsic_call(call obj, int precedence, bool leftmost)
 {
@@ -1840,6 +1846,20 @@ words_intrinsic_precedence(call obj)
     return intrinsic_precedence(n);
 }
 
+static list words_va_arg(list obj)
+{
+  list pc = NIL;
+  expression e1 = sizeofexpression_expression(SIZEOFEXPRESSION(CAR(obj)));
+  type t2 = sizeofexpression_type(SIZEOFEXPRESSION(CAR(CDR(obj))));
+
+  pc = CHAIN_SWORD(pc,"va_arg(");
+  pc = gen_nconc(pc, words_expression(e1));
+  pc = CHAIN_SWORD(pc,", ");
+  pc = gen_nconc(pc, words_type(t2));
+  pc = CHAIN_SWORD(pc,")"); 
+  return pc;
+} 
+
 /* exported for cmfortran.c
  */
 list 
@@ -1849,15 +1869,18 @@ words_call(
     bool leftmost,
     bool is_a_subroutine)
 {
-    list pc;
-    entity f = call_function(obj);
-    value i = entity_initial(f);
-    pc = (value_intrinsic_p(i)) ? 
-	(words_intrinsic_call(obj, 
-	(precedence_p||precedence<=1)? precedence : MAXIMAL_PRECEDENCE,
-			     leftmost))
-	: words_genuine_regular_call(obj, is_a_subroutine);
-    return pc;
+  list pc;
+  entity f = call_function(obj);
+  value i = entity_initial(f);
+
+  if(value_intrinsic_p(i)) {
+    int effective_precedence = (precedence_p||precedence<=1)? precedence : MAXIMAL_PRECEDENCE;
+
+    pc = words_intrinsic_call(obj, effective_precedence, leftmost);
+  }
+  else
+    pc = words_genuine_regular_call(obj, is_a_subroutine);
+  return pc;
 }
 
 /* exported for expression.c 
@@ -3596,20 +3619,6 @@ static list words_sizeofexpression(sizeofexpression obj)
   }
   else
     pc = gen_nconc(pc, words_expression(sizeofexpression_expression(obj)));
-  pc = CHAIN_SWORD(pc,")"); 
-  return pc;
-} 
-
-static list words_va_arg(list obj)
-{
-  list pc = NIL;
-  expression e1 = sizeofexpression_type(SIZEOFEXPRESSION(CAR(obj)));
-  type t2 = sizeofexpression_type(SIZEOFEXPRESSION(CAR(CDR(obj))));
-
-  pc = CHAIN_SWORD(pc,"va_arg(");
-  pc = gen_nconc(pc, words_expression(e1));
-  pc = CHAIN_SWORD(pc,", ");
-  pc = gen_nconc(pc, words_type(t2));
   pc = CHAIN_SWORD(pc,")"); 
   return pc;
 } 
