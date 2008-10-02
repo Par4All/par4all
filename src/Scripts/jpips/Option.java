@@ -7,7 +7,7 @@ package fr.ensmp.cri.jpips;
 import java.awt.*;
 import java.util.*;
 
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 import fr.ensmp.cri.jpips.Pawt.*;
 
