@@ -1763,6 +1763,8 @@ type_spec:   /* ISO 6.7.2 */
 			    if(basic_float_p(b)) {
 			      basic_tag(b) = is_basic_complex;
 			      basic_complex(b) = 2*basic_complex(b);
+			      if(basic_complex(b)==DEFAULT_COMPLEX_TYPE_SIZE)
+				basic_complex(b) += 1;
 			    }
 			  }
 			  $$ = NIL;

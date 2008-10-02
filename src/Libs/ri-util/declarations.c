@@ -310,7 +310,9 @@ list words_basic(basic obj)
 	  else 
 	    {
 	      switch (basic_complex(obj)) {
-		case 8: pc = CHAIN_SWORD(pc,"float _Complex");
+		case 8: pc = CHAIN_SWORD(pc,"_Complex");
+		  break;
+		case 9: pc = CHAIN_SWORD(pc,"float _Complex");
 		  break;
 		case 16: pc = CHAIN_SWORD(pc,"double _Complex");
 		  break;
