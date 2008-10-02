@@ -1,0 +1,12 @@
+
+Parsed printed file for "priority02"
+
+int priority02()
+{
+   int a;
+   int b;
+   int c;
+
+   a = (b*c);
+   return ((a = b)*c);
+}

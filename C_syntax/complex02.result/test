@@ -13,7 +13,7 @@ Variable list:
 	Declared entity "complex02:*DYNAMIC*" with type "area" with size 48
 	Declared entity "complex02:*STACK*" with type "area" with size 0
 	Declared entity "complex02:*STATIC*" with type "area" with size 0
-	Declared entity "complex02:0`x1" with type "variable" "float _Complex"
+	Declared entity "complex02:0`x1" with type "variable" "_Complex"
 	Declared entity "complex02:0`x2" with type "variable" "float _Complex"
 	Declared entity "complex02:0`x3" with type "variable" "double _Complex"
 	Declared entity "complex02:0`x4" with type "variable" "double _Complex"
@@ -56,7 +56,7 @@ parsed printed file
 
 void complex02()
 {
-   float _Complex x1;
+   _Complex x1;
    float _Complex x2;
    double _Complex x3;
    double _Complex x4;

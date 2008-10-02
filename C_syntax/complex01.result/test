@@ -3,5 +3,5 @@ parsed printed file
 
 void complex01()
 {
-   float _Complex x;
+   _Complex x;
 }

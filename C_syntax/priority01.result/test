@@ -1,0 +1,10 @@
+
+Parsed printed file for "priority01"
+
+int priority01()
+{
+   char a;
+   char b;
+   char c;
+   return (c = a+b)!='\n';
+}

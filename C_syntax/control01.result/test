@@ -6,11 +6,11 @@ int control01(int *in,int *val)
    int c;
    int v;
    for (;;) {
-      if (c = pnm_getc(in)==-1)
+      if ((c = pnm_getc(in))==-1)
          return -1;
       if (c=='#')
          for (;;) {
-            if (c = pnm_getc(in)==-1)
+            if ((c = pnm_getc(in))==-1)
                return -1;
             if (c=='\n')
                goto break_2;
@@ -36,7 +36,7 @@ int control01(int *in,int *val)
    ;
 l99996:   ;
    if (!1) goto break_1;
-   if (c = pnm_getc(in)==-1) 
+   if ((c = pnm_getc(in))==-1) 
       return -1;
    if (c=='#') goto l99998;
    if (c=='0'||c=='1') goto l99997;
@@ -50,7 +50,7 @@ l99998:   ;
    ;
 l99995:   ;
    if (!1) goto break_2;
-   if (c = pnm_getc(in)==-1) 
+   if ((c = pnm_getc(in))==-1) 
       return -1;
    if (c=='\n') goto break_2;
    ;
