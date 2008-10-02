@@ -250,6 +250,8 @@ int SizeOfElements(basic b)
     break;
   case is_basic_complex:
     e = basic_complex(b);
+    /* As for int, e encodes some fine typing information: remove it */
+    e = (e/8)*8;
     break;
   case is_basic_string: {
     constant c = constant_undefined;
