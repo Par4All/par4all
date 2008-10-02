@@ -106,80 +106,106 @@ rice_loop(statement stat,
 	  statement (*codegen_fun)(statement, graph, set, int, bool)
 	  )
 {
-    statement nstat;
-    instruction istat = statement_instruction(stat);
-    set region;
+  statement nstat;
+  instruction istat = statement_instruction(stat);
+  set region;
+  statement b = statement_undefined;
 
-    ifdebug(1) {
-	debug(1, "rice_loop", "original nest of loops:\n\n");
-	print_statement(stat);
-    }
+  ifdebug(1) {
+    debug(1, "rice_loop", "original nest of loops:\n\n");
+    print_statement(stat);
+  }
 
-    if ((region = distributable_loop(stat)) == set_undefined) {
-	int so = statement_ordering(stat);
-	user_warning("rice_loop", 
-		     "Cannot apply Allen & Kennedy's algorithm on "
-		     "loop %s with index %s at Statement %d (%d, %d)"
-		     " because it contains either tests or goto statements"
-		     " which prohibit loop distribution. You could activate the"
-		     " coarse_grain_parallelization rule.\n",
-		     label_local_name(loop_label(instruction_loop(istat))),
-		     entity_local_name(loop_index(instruction_loop(istat))),
-		     statement_number(stat),
-		     ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
+  if ((region = distributable_loop(stat)) == set_undefined) {
+    int so = statement_ordering(stat);
+    user_warning("rice_loop", 
+		 "Cannot apply Allen & Kennedy's algorithm on "
+		 "loop %s with index %s at Statement %d (%d, %d)"
+		 " because it contains either tests or goto statements"
+		 " which prohibit loop distribution. You could activate the"
+		 " coarse_grain_parallelization rule.\n",
+		 label_local_name(loop_label(instruction_loop(istat))),
+		 entity_local_name(loop_index(instruction_loop(istat))),
+		 statement_number(stat),
+		 ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
 
-	enclosing++ ;
-	loop_body(instruction_loop(istat)) = 
-	    rice_statement(loop_body(instruction_loop(istat)),l+1,codegen_fun);
-	enclosing-- ;
-	return(stat);
-    }
+    enclosing++ ;
+    loop_body(instruction_loop(istat)) = 
+      rice_statement(loop_body(instruction_loop(istat)),l+1,codegen_fun);
+    enclosing-- ;
+    return(stat);
+  }
 
-    ifdebug(2) {
-	debug(2, "rice_loop", "applied on region:\n");
-	print_statement_set(stderr, region);
-    }
+  ifdebug(2) {
+    debug(2, "rice_loop", "applied on region:\n");
+    print_statement_set(stderr, region);
+  }
 
-    set_enclosing_loops_map( loops_mapping_of_statement(stat) );
-    /* to deal with empty loop */
-    if (instruction_loop_p(istat) 
-	&& instruction_continue_p(statement_instruction(loop_body(instruction_loop(istat))))) 
-	    nstat = copy_statement(stat); 
-	else 
-	    nstat = codegen_fun(stat, dg, region, l, TRUE);
+  set_enclosing_loops_map( loops_mapping_of_statement(stat) );
+  /* to deal with empty loops */
+  if (instruction_loop_p(istat)
+      && continue_statement_p(b = perfectly_nested_loop_to_body(stat))) {
+    /* The code generation procedure avoid building nest around
+       continue statements. However, when there is only one continue,
+       Ronan Keryell would like to see parallel loop around it.
+
+       It seemed easier to modify temporarily the input statement
+       rather than finding out in the generation process when continue
+       must be ignored (most of the time) and when they must be
+       preserved.
+
+       Note that empty loops can be optimized by dead code elimination
+       (see SUPPRESS_DEAD_CODE) */
+    instruction i = statement_instruction(b);
+    call c = instruction_call(i);
+    entity cont = call_function(c);
+    statement nb = statement_undefined;
+
+    call_function(c) = global_name_to_entity(TOP_LEVEL_MODULE_NAME, STOP_FUNCTION_NAME);
+
+    //nstat = copy_statement(stat);
+
+    nstat = codegen_fun(stat, dg, region, l, TRUE);
+
+    nb = perfectly_nested_loop_to_body(nstat);
+    call_function(instruction_call(statement_instruction(b))) = cont;
+    call_function(c) = cont;
+  }
+  else 
+    nstat = codegen_fun(stat, dg, region, l, TRUE);
 	
-    ifdebug(7){
-	pips_debug(7, "consistency checking for CodeGenerate output: ");
-	if (statement_consistent_p(nstat))
-	    fprintf(stderr," gen consistent\n");
-    }
-    pips_assert( "nstat is defined", nstat != statement_undefined ) ;
-    /* FI: I'd rather not return a block when a unique loop statement has to
-     * be wrapped.
-     */
-    pips_assert("block or loop", 
-		instruction_block_p(statement_instruction(nstat)) ||
-		instruction_loop_p(statement_instruction(nstat))) ;
-    statement_label(nstat) = entity_empty_label();
-    statement_number(nstat) = 
-	(statement_block_p(nstat)? STATEMENT_NUMBER_UNDEFINED :
-	 statement_number(stat));
-    statement_ordering(nstat) = statement_ordering(stat);
-    statement_comments(nstat) = statement_comments(stat);
-    /* Do not forget to move forbidden information associated with
-       block: */
-    fix_sequence_statement_attributes_if_sequence(nstat);
-    ifdebug(1) {
-	fprintf(stderr, "final nest of loops:\n\n");
-	print_parallel_statement(nstat);
-    }
+  ifdebug(7){
+    pips_debug(7, "consistency checking for CodeGenerate output: ");
+    if (statement_consistent_p(nstat))
+      fprintf(stderr," gen consistent\n");
+  }
+  pips_assert( "nstat is defined", nstat != statement_undefined ) ;
+  /* FI: I'd rather not return a block when a unique loop statement has to
+   * be wrapped.
+   */
+  pips_assert("block or loop", 
+	      instruction_block_p(statement_instruction(nstat)) ||
+	      instruction_loop_p(statement_instruction(nstat))) ;
+  statement_label(nstat) = entity_empty_label();
+  statement_number(nstat) = 
+    (statement_block_p(nstat)? STATEMENT_NUMBER_UNDEFINED :
+     statement_number(stat));
+  statement_ordering(nstat) = statement_ordering(stat);
+  statement_comments(nstat) = statement_comments(stat);
+  /* Do not forget to move forbidden information associated with
+     block: */
+  fix_sequence_statement_attributes_if_sequence(nstat);
+  ifdebug(1) {
+    fprintf(stderr, "final nest of loops:\n\n");
+    print_parallel_statement(nstat);
+  }
 
-    /* StatementToContext should be freed here. but it is not easy. */
-    set_free(region);
+  /* StatementToContext should be freed here. but it is not easy. */
+  set_free(region);
 
-    clean_enclosing_loops();
+  clean_enclosing_loops();
 
-    return nstat;
+  return nstat;
 }
 
 /*
@@ -198,7 +224,6 @@ do_it(
      * may be sequential if distribute_p is true
      */
     statement mod_parallel_stat = statement_undefined;
-    statement new_stmt = statement_undefined;
 
     set_current_module_statement( (statement)
 				  db_get_memory_resource(DBR_CODE, 

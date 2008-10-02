@@ -378,7 +378,7 @@ bool task_parallelize_p;
   statement statb = statement_undefined;
   statement rst = statement_undefined;
   int nbl =0;
-    
+
   debug_on("RICE_DEBUG_LEVEL");
 
   pips_debug(9, "Begin: starting at level %d ...\n", l); 
@@ -399,8 +399,9 @@ bool task_parallelize_p;
       stata = ConnectedStatements(g, s, l, task_parallelize_p);
     else {
       if (!get_bool_property("PARTIAL_DISTRIBUTION")) 
-	/* if s contains a single vertex and if this vertex is not 
-	   dependent upon itself, we generate a doall loop for it */
+	/* if s contains a single vertex and if this vertex is not
+	   dependent upon itself, we generate a doall loop for it,
+	   unless it is a continue statement. */
 	stata = IsolatedStatement(s, l, task_parallelize_p);
       else {
 	/* statements that are independent are gathered 
@@ -568,10 +569,9 @@ list locals;
     return(result);
 }
 
-statement IsolatedStatement(s, l, task_parallelize_p)
-scc s;
-int l;
-bool task_parallelize_p;
+statement IsolatedStatement(scc s,
+			    int l,
+			    bool task_parallelize_p)
 {
     vertex v = VERTEX(CAR(scc_vertices(s)));
     statement st = vertex_to_statement(v), rst;
@@ -583,8 +583,7 @@ bool task_parallelize_p;
 
     /* continue statements are ignored. */
     if (!instruction_call_p(sbody) 
-	|| (strcmp(entity_local_name(call_function(instruction_call(sbody))), 
-	       "CONTINUE") == 0))
+	|| continue_statement_p(st))
 	return (statement_undefined);
 
     rst = MakeNestOfParallelLoops(l-1-enclosing,
@@ -596,7 +595,7 @@ bool task_parallelize_p;
 
 /* bb: ConnectedStatements() is called when s contains more than one
 vertex or one vertex dependent upon itself. Thus, vectorization can't
-occure */
+occur */
 statement ConnectedStatements(g, s, l, task_parallelize_p)
 graph g;
 scc s;
