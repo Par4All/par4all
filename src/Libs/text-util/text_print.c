@@ -247,7 +247,7 @@ print_sentence(FILE * fd,
     }
 }
 
-void 
+void
 print_text(FILE *fd, text t)
 {
     print_sentence_init();

@@ -1868,9 +1868,11 @@ list generic_c_words_entity(type t, list name, bool is_safe)
       list lparams = functional_parameters(f);
       bool first = TRUE;  
 
-      pips_debug(9,"Function type with name = \"%s\" and length %zd\n", list_to_string(name), gen_length(name));
+      pips_debug(9,"Function type with name = \"%s\" and length %zd\n",
+		 list_to_string(name), gen_length(name));
  
-      if ((gen_length(name) > 1) || ((gen_length(name) == 1) && (strcmp(STRING(CAR(name)),"*")==0)))
+      if ((gen_length(name) > 1)
+	  || ((gen_length(name) == 1) && (strcmp(STRING(CAR(name)),"*")==0)))
 	{
 	  /* Function name is an expression like *vfs[] in (*vfs[])() 
 	     (syntax = application), or an abstract function type, so parentheses must be added */

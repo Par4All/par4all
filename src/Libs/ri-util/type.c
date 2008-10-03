@@ -1638,6 +1638,204 @@ int number_of_fields(type t)
 
   return n;
 }
+
+/* Compute the list of entities implied in the definition of a
+   type. This list is empty for basic types such as int or char. But
+   it increases rapidly with typedef, struct, union and dimensions
+   which can use enum elements. 
+
+   The supporting entities are gathered in an updated list, sel,
+   supporting entity list. If entity a depends on entity b, b must
+   appear first in the list. Each entity should appear only once. */
+
+list functional_type_supporting_entities(list sel, functional f)
+{
+  ifdebug(8) {
+    pips_debug(8, "Begin: ");
+    print_entities(sel);
+    fprintf(stderr, "\n");
+  }
+
+  MAP(PARAMETER, p,
+      sel = type_supporting_entities(sel, parameter_type(p)),
+      functional_parameters(f));
+
+  sel = type_supporting_entities(sel, functional_result(f));
+
+  ifdebug(8) {
+    pips_debug(8, "End: ");
+    print_entities(sel);
+    fprintf(stderr, "\n");
+  }
+
+  return sel;
+}
+
+list expression_supporting_entities(list sel, expression e)
+{
+  syntax s = expression_syntax(e);
+
+  ifdebug(8) {
+    pips_debug(8, "Begin: ");
+    print_entities(sel);
+    fprintf(stderr, "\n");
+  }
+
+  if(syntax_call_p(s)) {
+    call c = syntax_call(s);
+    entity f = call_function(c);
+
+    if(symbolic_constant_entity_p(f)) {
+      /* f cannot be declared directly, we need its enum */
+      entity e_of_f = find_enum_of_member(f);
+     sel = gen_once(e_of_f, sel);
+    }
+
+    MAP(EXPRESSION, se, {
+      sel = expression_supporting_entities(sel, se);
+    }, call_arguments(c));
+  }
+  else {
+    /* do nothing */
+    ;
+  }
+
+  ifdebug(8) {
+    pips_debug(8, "End: ");
+    print_entities(sel);
+    fprintf(stderr, "\n");
+  }
+
+  return sel;
+}
+
+list symbolic_supporting_entities(list sel, symbolic s)
+{
+  expression e = symbolic_expression(s);
+  sel = expression_supporting_entities(sel, e);
+  return sel;
+}
+
+list basic_supporting_entities(list sel, basic b)
+{
+
+  ifdebug(8) {
+    pips_debug(8, "Begin: ");
+    print_entities(sel);
+    fprintf(stderr, "\n");
+  }
+
+  if(basic_int_p(b) ||
+     basic_float_p(b) ||
+     basic_logical_p(b) ||
+     basic_overloaded_p(b) ||
+     basic_complex_p(b) ||
+     basic_string_p(b))
+    ;
+  else if(basic_bit_p(b))
+    sel = symbolic_supporting_entities(sel, basic_bit(b));
+  else if(basic_pointer_p(b))
+    sel = type_supporting_entities(sel, basic_pointer(b));
+  else if(basic_derived_p(b)) {
+    sel = gen_once((void*) basic_derived(b), sel);
+    sel = type_supporting_entities(sel, entity_type(basic_derived(b)));
+  }
+  else if(basic_typedef_p(b)) {
+    entity se = basic_typedef(b);
+    sel = gen_once((void *) se, sel);
+    sel = type_supporting_entities(sel, entity_type(se));
+  }
+  else
+    pips_internal_error("Unrecognized basic tag %d\n", basic_tag(b));
+ 
+  ifdebug(8) {
+    pips_debug(8, "End: ");
+    print_entities(sel);
+    fprintf(stderr, "\n");
+  }
+
+  return sel;
+}
+
+list variable_type_supporting_entities(list sel, variable v)
+{
+  basic b = variable_basic(v);
+  list dims = variable_dimensions(v);
+
+  ifdebug(8) {
+    pips_debug(8, "Begin: ");
+    print_entities(sel);
+    fprintf(stderr, "\n");
+  }
+
+  MAP(DIMENSION, d, {
+    expression l = dimension_lower(d);
+    expression u = dimension_upper(d);
+    sel = expression_supporting_entities(sel, l);
+    sel = expression_supporting_entities(sel, u);
+  }, dims);
+
+  sel = basic_supporting_entities(sel, b);
+
+  ifdebug(8) {
+    pips_debug(8, "End: ");
+    print_entities(sel);
+    fprintf(stderr, "\n");
+  }
+
+  return sel;
+}
+
+list type_supporting_entities(list sel, type t)
+{
+
+  ifdebug(8) {
+    pips_debug(8, "Begin: ");
+    print_entities(sel);
+    fprintf(stderr, "\n");
+  }
+
+  if(type_functional_p(t))
+    sel = functional_type_supporting_entities(sel, type_functional(t));
+  else if(type_variable_p(t))
+    sel = variable_type_supporting_entities(sel, type_variable(t));
+  else if(type_varargs_p(t))
+    pips_user_warning("varargs case not implemented yet\n"); /* do nothing? */
+  else if(type_void_p(t))
+    ;
+  else if(type_struct_p(t)) {
+    list sse = type_struct(t);
+
+    MAP(ENTITY, se, {
+      sel = type_supporting_entities(sel, entity_type(se));
+    }, sse);
+  }
+  else if(type_union_p(t)) {
+    list use = type_union(t);
+
+    MAP(ENTITY, se, {
+      sel = type_supporting_entities(sel, entity_type(se));
+    }, use);
+  }
+  else if(type_enum_p(t)) {
+    list ese = type_enum(t);
+
+    MAP(ENTITY, se, {
+      sel = type_supporting_entities(sel, entity_type(se));
+    }, ese);
+  }
+  else
+    pips_internal_error("Unexpected type with tag %d\n", type_tag(t));
+
+  ifdebug(8) {
+    pips_debug(8, "End: ");
+    print_entities(sel);
+    fprintf(stderr, "\n");
+  }
+
+  return sel;
+}
+
 /*
  *  that is all
  */

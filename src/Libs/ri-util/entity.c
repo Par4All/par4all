@@ -1262,3 +1262,32 @@ string storage_to_string(storage s)
 
   return desc;
 }
+
+/* Find the enclosing module of an entity. If an entity is a module, return e.
+ If the entity is a top-level entity, return e.*/
+/* FI: I'm surprised this function does not exist already */
+entity entity_to_module_entity(entity e)
+{
+  entity m = entity_undefined;
+
+  if(top_level_entity_p(e)) 
+    m = e;
+  else if(entity_module_p(e)) 
+    m = e;
+  else {
+    string mn = entity_module_name(e);
+
+    if(static_module_name_p(mn)) {
+      m = gen_find_tabulated(concatenate(mn, MODULE_SEP_STRING, mn, NULL),entity_domain);
+    }
+    else {
+      m = gen_find_tabulated(concatenate(TOP_LEVEL_MODULE_NAME,
+					 MODULE_SEP_STRING, mn, NULL),
+			     entity_domain);
+    }
+  }
+
+  pips_assert("entity m is defined", !entity_undefined_p(m));
+
+  return m;
+}

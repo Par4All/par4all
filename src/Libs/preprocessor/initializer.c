@@ -152,6 +152,57 @@ stub_text(entity module, bool is_fortran)
     return make_text(ls);
 }
 
+/* generates the text of a compilation unit for a missing C module.
+ */
+static text 
+compilation_unit_text(entity cu, entity module)
+{
+    sentence warning = sentence_undefined;
+    type t = entity_type(module);
+    text md = text_undefined;
+    list sel = NIL; // supporting entity list
+    text cut = make_text(NIL);
+    
+    is_fortran = FALSE; // Not clean...
+
+    pips_assert("We must be in a C prettyprinter environement", !is_fortran);
+
+    if (type_undefined_p(t))
+	pips_user_error("undefined type for %s\n", entity_name(module));
+
+    if (!type_functional_p(t))
+	pips_user_error("non functional type for %s\n", entity_name(module));
+
+    warning = make_sentence(is_sentence_formatted, strdup(C_FILE_WARNING));
+    md = c_text_entity(cu, module, 0);
+    sel = functional_type_supporting_entities(sel, type_functional(t));
+
+    ifdebug(8) {
+      pips_debug(8, "List of supporting entities: ");
+      print_entities(sel);
+      fprintf(stderr, "\n");
+    }
+
+    pips_assert("Each entity appears only once", gen_once_p(sel));
+
+    MAP(ENTITY, se, {
+      text se_text = c_text_entity(module, se, 0);
+
+      ifdebug(8) {
+	pips_debug(8, "Add declaration of entity \"\%s\"\n", entity_name(se));
+	print_text(stderr, se_text);
+      }
+
+      MERGE_TEXTS(cut, se_text);
+    }, sel);
+
+    MERGE_TEXTS(cut, md);
+
+    gen_free_list(sel);
+
+    return cut;
+}
+
 /* generates a source file for some module, if none available.
  */
 static bool 
@@ -245,7 +296,7 @@ missing_file_initializer(string module_name, bool is_fortran)
     /* builds the compilation unit stub: it can be empty or include
        module_name declaration as an extern function.
      */
-    stub = c_text_entity(cu, m, 0);
+    stub = compilation_unit_text(cu, m);
 
     /* put it in the source file and link the initial file.
      */
@@ -323,9 +374,72 @@ bool fortran_initializer(string module_name)
 
 bool initializer(string module_name)
 {
-  return generic_initializer(module_name, TRUE);
+  bool res = FALSE;
+
+  debug_on("INITIALIZER_DEBUG_LEVEL");
+  res = generic_initializer(module_name, TRUE);
+  debug_off();
+
+  return res;
 }
 bool c_initializer(string module_name)
 {
-  return generic_initializer(module_name, FALSE);
+  bool res = FALSE;
+
+  debug_on("INITIALIZER_DEBUG_LEVEL");
+  res = generic_initializer(module_name, FALSE);
+  debug_off();
+
+  return res;
+}
+
+/* FI: I tried to put it in ri-util/entity.c, but it did not work
+   because the database is used. */
+entity find_enum_of_member(entity m)
+{
+  entity mod = entity_to_module_entity(m);
+  statement mod_stat = (statement) db_get_memory_resource(DBR_PARSED_CODE,
+							  entity_local_name(mod), TRUE);
+  /* Not good in general, but should work for compilation units... */
+  list dl = code_declarations(value_code(entity_initial(mod)));
+  /* No, it does not... */
+  list sdl = statement_declarations(mod_stat);
+  list fdl = gen_nconc(gen_copy_seq(dl), gen_copy_seq(sdl));
+
+  entity ee = entity_undefined;
+
+  ifdebug(8) {
+    pips_debug(8, "Declarations for enclosing module \"\%s\": \"", entity_name(mod));
+    print_entities(dl);
+    print_entities(sdl);
+    fprintf(stderr, "\"\n");
+  }
+
+  MAP(ENTITY, e, {
+    if(entity_enum_p(e)) {
+      list ml = type_enum(entity_type(e));
+
+      pips_debug(8, "Checking enum \"\%s\"\n", entity_name(e));
+
+      if(gen_in_list_p((void *) m, ml)) {
+	ee = e;
+	break;
+      }
+      ifdebug(8) {
+	if(entity_undefined_p(ee)) {
+	  pips_debug(8, "Member \"\%s\" not found in enum \"\%s\"\n",
+		     entity_name(m), entity_name(e));
+	}
+	else {
+	  pips_debug(8, "Member \"\%s\" found in enum \"\%s\"\n",
+		     entity_name(m), entity_name(e));
+	}
+      }
+    }
+  }, fdl);
+
+  pips_assert("enum entity is found", !entity_undefined_p(ee));
+  gen_free_list(fdl);
+		       
+  return ee;
 }
