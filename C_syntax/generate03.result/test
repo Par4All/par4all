@@ -1,0 +1,23 @@
+
+Parsed printed file for generate 03
+
+void generate03()
+{
+   foo i;
+   double x = 1.;
+   foo y;
+   
+   // use an undeclared function without source code, which returns
+   // implictly an inta typedef type
+   y = func(i, &x);
+}
+
+Parsed printed file for func
+
+int func(_Complex f1,double *f2)
+{
+}
+
+Printed synthesized file "func!"
+
+int func(_Complex ,double *);
