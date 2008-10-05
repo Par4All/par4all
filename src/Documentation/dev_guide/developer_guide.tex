@@ -781,7 +781,7 @@ Useful targets defined:
 \item[tags:] build the TAGS index files of identifiers found in the
   subdirectories (see~\ref{subsec:tags} for more precision and other
   specific targets);
-\item[unbuild:] clean up things;
+\item[unbuild:] clean up things: generated directories are removed;
 \item[htdoc:] generate an HTML version of the documentation
 \item[full-build:] like \texttt{build} but with \texttt{htdoc} too.
 \end{description}
@@ -795,40 +795,20 @@ some passes or documentation parts, such as:
 \begin{description}
 \item[\texttt{local-clean}:] remove eventually some stuff in the current
   directory;
-\item[\texttt{lib}:] just recompiles the local source files to create the
-  local library into the local \verb|$PIPS_ARCH|%$
-  without installing into the production directory. It is useful to test
-  the compilation of a local library without cluttering the production
-  version. See also the \texttt{ttest} target.
 \item[\texttt{depend}:] \texttt{make depend}\index{make!depend} must be
   used regularly to keep file dependencies up-to-date. The local header
   file corresponding to the current pass or library must have been
   created\marginpar{Is this line obsolete?} before, otherwise \texttt{make
     depend} selects the header file from \verb+$PIPS_ROOT/include+, and
   the local header will never be created;%% $
-\item[\texttt{ttest}:] {\tt make ttest}\index{make!ttest} generate a local
-  version of \texttt{tpips} into the local \verb|$PIPS_ARCH| directory by
-  compiling the local files and linking them against the other libraries
-  already installed in \verb|$PIPS_ROOT|. This allows to verify that the
-  local library or pass links properly with PIPS, linear and NewGen, and
-  to test and validate the modifications. If you want to test several
-  libraries at once, without cluttering the production version, it is more
-  subtle. Once you have chosen the directory of one library seen as the
-  master one, you need to make accessible the other libraries from the
-  local \verb|$PIPS_ARCH|, for example with a symbolic links that can be
-  created in the master library directory like:
-\begin{verbatim}
-ln -s ../semantics/$PIPS_ARCH/libsemantics.a $PIPS_ARCH
-\end{verbatim}
-\item[\texttt{test}:] same as \texttt{ttest} but build a \texttt{pips}
-  instead of \texttt{tpips};
-\item[\texttt{wtest}:] same as \texttt{ttest} but build a \texttt{wpips}
-  instead of \texttt{tpips};
-\item[\texttt{phase6}:] builds the documentation;\marginpar{these rules
-    should have user-friendly names?}
-\item[\texttt{phase7}:] builds the documentation for web publication;
+\item[\texttt{fast}:] {\tt make fast}\index{make!fast} recompile
+  the local library and relink the executables.
+\item[\texttt{full}:] {\tt make full}\index{make!full} rebuild PIPS
+  fully from the root, so that all rependencies are checked.
+\item[\texttt{compile}:] also builds the documentation;
+\item[\texttt{full-compile}:] also builds the documentation for web publication;
 \end{description}
-\marginpar{There are other rules to describe...}
+\marginpar{There are other rules to describe\ldots}
 
 THIS PARAGRAPH IS OBSOLETE.\marginpar{I cannot see how to compile without
   installing to the PROD directory...}
