@@ -23,6 +23,7 @@
 #include "complexity.h"
 #include "transformations.h"
 #include "callgraph.h"
+
 #define COMMA         ","
 #define EMPTY         ""
 #define NL            "\n"
@@ -69,7 +70,6 @@ static string global_module_name;
 #define BL             " "
 #define TB1            "\t"
 
-static hash_table hash_task_to_effect = hash_table_undefined;
 static hash_table hash_entity_def_to_task = hash_table_undefined;
 static string global_module_name;
 static int global_margin =0;
@@ -2076,15 +2076,22 @@ static void  find_pattern(Psysteme ps, Pvecteur paving_indices, Pvecteur formal_
   vars_to_eliminate = vect_copy(ps->base); 
   vect_erase_var(&vars_to_eliminate, phi);
 
+  //printf("paving_indices:\n");
+  //vect_fprint(stdout,paving_indices,entity_local_name);
+
   for (pi = paving_indices; !VECTEUR_NUL_P(pi); pi = pi->succ)  
     vect_erase_var(&vars_to_eliminate, var_of(pi));
+  //printf("formal_parameters:\n");
+  // vect_fprint(stdout,formal_parameters,entity_local_name);
 
   for (pi = formal_parameters; !VECTEUR_NUL_P(pi); pi = pi->succ)  
     vect_erase_var(&vars_to_eliminate, var_of(pi));
+  //printf("vars_to_eliminate:\n");
+  //vect_fprint(stdout,vars_to_eliminate,entity_local_name);
 
   sc_projection_along_variables_ofl_ctrl(&ps,vars_to_eliminate , NO_OFL_CTRL);
 
-  // printf("Systeme a partir duquel on genere les contraintes  du motif:\n");
+  //printf("Systeme a partir duquel on genere les contraintes  du motif:\n");
   //sc_fprint(stdout,ps,entity_local_name);
 
   for(c = sc_inegalites(ps), next=(c==NULL ? NULL : c->succ); 
@@ -2194,7 +2201,7 @@ static void  find_pattern(Psysteme ps, Pvecteur paving_indices, Pvecteur formal_
   } 
   else {
     /* Only bounds with several loop indices */ 
-    /* printf("PB - Only bounds with several loop indices\n"); */ 
+    /* printf("PB - Only bounds with several loop indices\n"); */
     *bound_inf= CONTRAINTE_UNDEFINED;
     *bound_sup = CONTRAINTE_UNDEFINED;
     *iterator = CONTRAINTE_UNDEFINED; 
@@ -2240,7 +2247,8 @@ static void xml_Pattern_Paving(entity var, Pvecteur formal_parameters, list patt
 	  { 
 	    Psysteme ps = sc_dup(ps_reg); 
 	    sc_transform_eg_in_ineg(ps);
-
+	    //printf("find pattern for entity %s [dim=%d]\n",entity_local_name(var),i);
+	    //sc_fprint(stdout,ps,entity_local_name);
 	    find_pattern(ps, paving_indices, formal_parameters, i, &bound_inf, &bound_up, &pattern_up_bound, &iterator);
 
 	    if (!CONTRAINTE_UNDEFINED_P(bound_inf) &&   !VECTEUR_NUL_P(bound_inf->vecteur))
@@ -2337,16 +2345,20 @@ static void xml_TaskParameters(entity module, list pattern_region, Pvecteur pavi
   string_buffer_append_word("TaskParameters",sb_result);
   global_margin++;
   
+ // Creation liste des parametres formels
+    for (ith=1;ith<=FormalParameterNumber;ith++) {
+      entity FormalArrayName = find_ith_formal_parameter(module,ith);
+      vect_add_elem (&formal_parameters,(Variable) FormalArrayName,VALUE_ONE);
+    }
+
+
   for (ith=1;ith<=FormalParameterNumber;ith++) {
- 
+
     entity FormalArrayName = find_ith_formal_parameter(module,ith);
     boolean effet_read = TRUE;
     list lr;
     boolean tp = FALSE;
   
-    // Creation liste des parametres formels
-    vect_add_elem (&formal_parameters,(Variable) FormalArrayName,VALUE_ONE);
-
     for ( lr = pattern_region; !ENDP(lr); lr = CDR(lr))
       { 
 	region reg = REGION(CAR(lr));
@@ -2359,10 +2371,10 @@ static void xml_TaskParameters(entity module, list pattern_region, Pvecteur pavi
 			       strdup(concatenate(OPENANGLE, 
 						  "TaskParameter Name=",
 						  QUOTE,entity_user_name(FormalArrayName),QUOTE, BL, 
-						  "Type=", QUOTE,"DATA",QUOTE,BL,
+						  "Type=", QUOTE,(entity_xml_parameter_p(v))? "CONTROL":"DATA",QUOTE,BL,
 						  "AccessMode=", QUOTE, (effet_read)? "USE":"DEF",QUOTE,BL,
 						  "ArrayP=", QUOTE, (array_entity_p(v))?"TRUE":"FALSE",QUOTE, BL, 
-						  "Kind=", QUOTE, (entity_xml_parameter_p(v))? "PARAMETER": "VARIABLE",QUOTE,
+						  "Kind=", QUOTE,  "VARIABLE",QUOTE,
 						 
 
 						  CLOSEANGLE
@@ -2441,12 +2453,12 @@ static void xml_Array(entity var,string_buffer sb_result)
 		       strdup(concatenate(OPENANGLE, 
 					  "Array Name=",
 					  QUOTE,entity_user_name(var),QUOTE, BL, 
-					  "Type=", QUOTE,"DATA",QUOTE,BL,
+					  "Type=", QUOTE,(entity_xml_parameter_p(var))? "CONTROL":"DATA",QUOTE,BL,
 					  "Allocation=", QUOTE,
 					  (heap_area_p(var) || stack_area_p(var)) ? 
 					  "DYNAMIC": "STATIC",
 					  QUOTE,BL,
-					  "Kind=", QUOTE,  (entity_xml_parameter_p(var))? "PARAMETER": "VARIABLE",QUOTE,
+					  "Kind=", QUOTE,   "VARIABLE",QUOTE,
 					  CLOSEANGLE
 					  NL, NULL)));
 
@@ -2639,7 +2651,7 @@ static void xml_Loops(stack st,boolean call_external_loop_p, list *pattern_regio
     string_buffer_append_word("Loops",sb_result); 
 
   global_margin++;
- 
+  if (st != STACK_NULL) {
   STACK_MAP_X(s, statement,
   {
     loop l = instruction_loop(statement_instruction(s));
@@ -2662,7 +2674,7 @@ static void xml_Loops(stack st,boolean call_external_loop_p, list *pattern_regio
 	  *pattern_region = regions_dup(load_statement_local_regions(loop_body(l))); 
 	}
       
-      in_motif_p = in_motif_p || motif_on_loop_p || 
+      in_motif_p = !motif_in_te_p || in_motif_p || motif_on_loop_p || 
 	           (motif_in_te_p && !motif_on_loop_p && !motif_in_statement_p);
     }
     if (!in_motif_p) {
@@ -2671,7 +2683,7 @@ static void xml_Loops(stack st,boolean call_external_loop_p, list *pattern_regio
     }
   },
 	      st, 0);
-  
+  }
   global_margin--;
   if (call_external_loop_p)
     string_buffer_append_word("/ExternalLoops",sb_result); 
@@ -2992,7 +3004,6 @@ static void  xml_Arguments(statement s, entity function, Pvecteur loop_indices, 
 					      "AccessMode=",QUOTE,(rw_ef==2)? "DEF":"USE",QUOTE,CLOSEANGLE,
 					      NL, NULL)));
       /* Save information to generate Task Graph */
-      hash_put(hash_task_to_effect,(char *)function, (char *) call_effect); 
       if (rw_ef==2)
 	hash_put(hash_entity_def_to_task, (char *)ActualArrayName,(char *)function); 
       free(SActualArrayDim);
@@ -3043,14 +3054,15 @@ static void xml_Call( int taskNumber, nest_context_p nest, string_buffer sb_resu
   string_buffer_append_word("/Call",sb_result);
 }
 
-static void xml_BoxGraph(entity module,  string_buffer sb_result,string_buffer sb_ac)
+static void xml_BoxGraph(entity module, nest_context_p nest, string_buffer sb_result,string_buffer sb_ac)
 {
   string_buffer appli_needs = string_buffer_make();
   string string_needs = "";
   string string_appli_needs = "";
   list pc, effects_list;
-  int nb_call,nc;
-  
+  int nb_call,nc,callnumber;
+ 
+
   add_margin(global_margin,sb_result);
   string_buffer_append(sb_result,
 		       strdup(concatenate(OPENANGLE, 
@@ -3060,14 +3072,22 @@ static void xml_BoxGraph(entity module,  string_buffer sb_result,string_buffer s
 					  QUOTE,
 					  CLOSEANGLE,NL, NULL)));
 
-  nb_call = gen_length(entity_to_callees(module));
+  nb_call = (int)gen_array_nitems(nest->nested_call);
   nc = 1;
-  MAP(ENTITY,callee,{
-    string n = entity_local_name(callee); 
-    string_buffer buffer_needs = string_buffer_make();
-    effects_list = hash_get(hash_task_to_effect,(char *) callee);
 
-    //  add_margin(global_margin,sb_result);
+  for (callnumber = 0; callnumber<nb_call; callnumber++) {
+    statement s = gen_array_item(nest->nested_call,callnumber); 
+    call c = instruction_call(statement_instruction(s));
+    list effects_list =load_proper_rw_effects_list(s);
+    string n = entity_local_name(call_function(c)); 
+    string_buffer buffer_needs = string_buffer_make();
+
+    add_margin(global_margin,sb_result);
+    string_buffer_append(sb_result,
+			       strdup(concatenate(OPENANGLE, 
+						  "TaskRef Name=", 
+						  QUOTE,n,QUOTE, CLOSEANGLE,NL,
+						    NULL)));
     for (pc= effects_list;pc != NIL; pc = CDR(pc)){
       effect e = EFFECT(CAR(pc));
       reference r = effect_reference(e);
@@ -3104,14 +3124,12 @@ static void xml_BoxGraph(entity module,  string_buffer sb_result,string_buffer s
 	  }
 	  global_margin--;
 	}
-	else {  
+	else {   
+	  global_margin++;
 	  add_margin(global_margin,sb_result);
 	  string_buffer_append(sb_result,
-			       strdup(concatenate(OPENANGLE, 
-						  "TaskRef Name=", 
-						  QUOTE,n,QUOTE, BL,
-						  "Computes=",
-						  QUOTE,entity_local_name(v),QUOTE,
+			       strdup(concatenate(OPENANGLE,"Computes ArrayName=",
+						  QUOTE,entity_local_name(v),QUOTE,"/",
 						  CLOSEANGLE,NL,
 						  NULL)));
 
@@ -3120,17 +3138,16 @@ static void xml_BoxGraph(entity module,  string_buffer sb_result,string_buffer s
 	    add_margin(global_margin,sb_ac);
 	    string_buffer_append(sb_ac,
 				 strdup(concatenate(OPENANGLE, 
-						    "TaskRef Name=", 
-						    QUOTE,"Box_", entity_user_name(module),QUOTE, BL,
-						    "Computes=",
-						    QUOTE,entity_local_name(v),QUOTE,
+						    "Computes ArrayName=",
+						    QUOTE,entity_local_name(v),QUOTE,"/",
 						    CLOSEANGLE,NL,
 						    NULL)));
 	
 	    string_appli_needs =string_buffer_to_string(appli_needs);
 	    string_buffer_append(sb_ac,string_appli_needs);
-	    string_buffer_append_word("/TaskRef",sb_ac);	
+	  	
 	  }
+	   global_margin--;
 	} 
       }
     }
@@ -3138,8 +3155,8 @@ static void xml_BoxGraph(entity module,  string_buffer sb_result,string_buffer s
     string_buffer_append(sb_result,string_needs);
     string_buffer_append_word("/TaskRef",sb_result);	 
     nc++;  
-  },
-      entity_to_callees(module));
+
+  }
    
   string_buffer_append_word("/BoxGraph",sb_result); 
 }
@@ -3179,7 +3196,7 @@ static void xml_Boxes(entity module,statement stat,string_buffer sb_result,strin
   for (callnumber = 0; callnumber<(int)gen_array_nitems(nest.nested_call); callnumber++)
     xml_Call(callnumber, &nest,sb_result);
   
-  xml_BoxGraph(module,sb_result,sb_ac);
+  xml_BoxGraph(module,&nest,sb_result,sb_ac);
   global_margin--;
   string_buffer_append_word("/Box",sb_result); 
   
@@ -3218,7 +3235,6 @@ static void xml_Application(string module_name, statement stat, string_buffer sb
   callees callers = (callees)db_get_memory_resource(DBR_CALLEES,module_name, TRUE);
   string_buffer sb_ac = string_buffer_make();
  
-  hash_task_to_effect = hash_table_make(hash_pointer,0);
   hash_entity_def_to_task = hash_table_make(hash_pointer,0);
   global_margin = 0; 
   
@@ -3226,7 +3242,7 @@ static void xml_Application(string module_name, statement stat, string_buffer sb
 		       strdup(concatenate(OPENANGLE, 
 					  "!DOCTYPE Application SYSTEM ",
 					  QUOTE,
-					  "APPLI_TERAOPS_v3.dtd",
+					  "APPLI_TERAOPS_v4.dtd",
 					  QUOTE,
 					  CLOSEANGLE, 
 					  NL, NULL)));
@@ -3246,7 +3262,21 @@ static void xml_Application(string module_name, statement stat, string_buffer sb
 					  CLOSEANGLE, 
 					  NL, NULL)));
   xml_ActualArrays(module,sb_result);
-  xml_Boxes(module,stat,sb_result,sb_ac);
+  global_margin +=2;
+  add_margin(global_margin,sb_ac);
+  string_buffer_append(sb_ac,
+		       strdup(concatenate(OPENANGLE, 
+					  "TaskRef Name=", 
+					  QUOTE,"Box_", entity_user_name(module),
+					  QUOTE,CLOSEANGLE,NL,
+					  NULL)));  
+  global_margin -=2;
+
+  xml_Boxes(module,stat,sb_result,sb_ac);  
+  global_margin ++; 
+  string_buffer_append_word("/TaskRef",sb_ac); 
+  global_margin --; 
+ 
   string_buffer_append_word("Tasks",sb_result);
   MAP(STRING, callee_name, {
     xml_Task(callee_name,sb_result);
