@@ -1,8 +1,8 @@
-delete generate04
+delete generate06
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create generate04 generate04.c
+create generate06 generate06.c
 
 activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE
@@ -10,10 +10,10 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
 
 echo
-echo Parsed printed file for generate 04
+echo Parsed printed file for generate 06
 echo
 
-display PARSED_PRINTED_FILE[generate04]
+display PARSED_PRINTED_FILE[generate06]
 
 echo
 echo Parsed printed file for func
@@ -32,7 +32,7 @@ echo
 echo Compile the generated code
 echo
 
-shell cat generate04.database/func\!/func\!.c generate04.database/func/func.c >foo.c
+shell cat generate06.database/func\!/func\!.c generate06.database/func/func.c >foo.c
 shell cat foo.c
 shell gcc -c foo.c
 shell rm foo.c
@@ -48,10 +48,10 @@ display PRINTED_FILE[%ALL]
 activate PRINT_CODE_PRECONDITIONS
 
 echo
-echo Printed file generate04 with intraprocedural preconditions
+echo Printed file generate06 with intraprocedural preconditions
 echo
 
-display PRINTED_FILE[generate04]
+display PRINTED_FILE[generate06]
 
 echo
 echo Printed file func with intraprocedural preconditions
@@ -60,5 +60,5 @@ echo
 display PRINTED_FILE[func]
 
 close
-#delete generate04
+#delete generate06
 quit

@@ -1,4 +1,7 @@
 delete generate03
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create generate03 generate03.c
 
 activate C_PARSER
@@ -24,6 +27,15 @@ echo
 
 activate PRINT_CODE
 display PRINTED_FILE[func!]
+
+echo
+echo Compile the generated code
+echo
+
+shell cat generate03.database/func\!/func\!.c generate03.database/func/func.c >foo.c
+shell cat foo.c
+shell gcc -c foo.c
+shell rm foo.c
 
 quit
 echo

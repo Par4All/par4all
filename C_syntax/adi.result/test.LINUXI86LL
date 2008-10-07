@@ -36,12 +36,12 @@ void adi(double **a,double **b,double **c,double **d,double **e,double **f,doubl
    double *r;
    double *alph;
    double *bet;
-   double **dmatrix();
-   double *dvector();
-   void free_dmatrix();
-   void free_dvector();
-   void nrerror();
-   void tridag();
+   double **dmatrix(int ,int ,int ,int );
+   double *dvector(int ,int );
+   void free_dmatrix(double **,int ,int ,int ,int );
+   void free_dvector(double *,int ,int );
+   void nrerror(char );
+   void tridag(double *,double *,double *,double *,double *,int );
 
    if (jmax>50)
       nrerror("in ADI, increase JJ");
@@ -145,9 +145,9 @@ void tridag(double *a,double *b,double *c,double *r,double *u,int n)
    int j;
    double bet;
    double *gam;
-   double *dvector();
-   void nrerror();
-   void free_dvector();
+   double *dvector(int ,int );
+   void nrerror(char );
+   void free_dvector(double *,int ,int );
 
    gam = dvector(1, n);
    if (b[1]==0.0)

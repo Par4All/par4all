@@ -5,6 +5,7 @@ Declarations for module "nodecls" with type "() -> void"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:foo" with type "functional" "() -> int"
 	Declared entity "nodecls:*DYNAMIC*" with type "area" with size 0
 	Declared entity "nodecls:*STACK*" with type "area" with size 0
 	Declared entity "nodecls:*STATIC*" with type "area" with size 0
@@ -83,6 +84,7 @@ End of declarations for module nodeclsfunc!
 
 void nodecls()
 {
+   extern int foo();
    foo();
 }
 extern void nodecls();

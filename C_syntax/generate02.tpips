@@ -1,4 +1,7 @@
 delete generate02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create generate02 generate02.c
 
 activate C_PARSER
@@ -17,6 +20,16 @@ echo Parsed printed file for func
 echo
 
 display PARSED_PRINTED_FILE[func]
+
+echo
+echo Compile the generated code
+echo
+
+shell cat generate02.database/func\!/func\!.c generate02.database/func/func.c >foo.c
+shell cat foo.c
+shell gcc -c foo.c
+shell rm foo.c
+
 quit
 echo
 echo Printed file
