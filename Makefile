@@ -29,14 +29,15 @@ accept:
 # extract private (restricted access) validation
 .PHONY: private
 private:
-	if [ -d private ] ; then \
+	if [ -d private/. ] ; then \
 	  if [ -d private/.svn ] ; then \
 	    svn up private/ ; \
 	  else \
 	    echo "ERROR: cannot update private" >&2 ; \
 	  fi ; \
 	else \
-	  svn co http://svnpriv.cri.ensmp.fr/svn/pipspriv/trunk private ; \
+	  echo "checkout the private validation, and link it as 'private'"; \
+	  echo "CAUTION: it MUST NOT be distributed..." ; \
 	fi
 
 # validate one sub directory
