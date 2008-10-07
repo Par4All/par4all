@@ -36,7 +36,10 @@ private:
 	    echo "ERROR: cannot update private" >&2 ; \
 	  fi ; \
 	else \
-	  echo "checkout the private validation, and link it as 'private'"; \
+	  echo "checkout the private validation somewhere:"; \
+	  echo "> svn co http://svnpriv.cri.ensmp.fr/svn/pipspriv/trunk ???"; \
+	  echo "and link it here as 'private':"; \
+	  echo "> ln -s ??? private"; \
 	  echo "CAUTION: it MUST NOT be distributed..." ; \
 	fi
 
