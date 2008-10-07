@@ -129,6 +129,14 @@ stub_text(entity module, bool is_fortran)
     type t = entity_type(module);
     int n=1;
     list /* of sentence */ ls = NIL;
+    text st = text_undefined;
+
+    ifdebug(8) {
+      if(!is_fortran) {
+	text txt = c_text_entity(entity_undefined, module, 0);
+	print_text(stderr, txt);
+      }
+    }
 
     if (type_undefined_p(t))
 	pips_user_error("undefined type for %s\n", entity_name(module));
@@ -136,7 +144,8 @@ stub_text(entity module, bool is_fortran)
     if (!type_functional_p(t))
 	pips_user_error("non functional type for %s\n", entity_name(module));
 
-    warning = make_sentence(is_sentence_formatted, strdup(is_fortran? FILE_WARNING:C_FILE_WARNING));
+    warning = make_sentence(is_sentence_formatted,
+			    strdup(is_fortran? FILE_WARNING:C_FILE_WARNING));
     head = stub_head(module, is_fortran);
     
     MAP(PARAMETER, p, 
@@ -149,7 +158,15 @@ stub_text(entity module, bool is_fortran)
     
     ls = CONS(SENTENCE, warning, CONS(SENTENCE, head, gen_nreverse(ls)));
 
-    return make_text(ls);
+    st = make_text(ls);
+
+    ifdebug(8) {
+      if(!is_fortran) {
+	print_text(stderr, st);
+      }
+    }
+
+    return st;
 }
 
 /* generates the text of a compilation unit for a missing C module.
@@ -161,7 +178,10 @@ compilation_unit_text(entity cu, entity module)
     type t = entity_type(module);
     text md = text_undefined;
     list sel = NIL; // supporting entity list
+    list nsel = NIL; // supporting entity list
+    list cse = list_undefined;
     text cut = make_text(NIL);
+    //entity e = entity_undefined;
     
     is_fortran = FALSE; // Not clean...
 
@@ -178,27 +198,55 @@ compilation_unit_text(entity cu, entity module)
     sel = functional_type_supporting_entities(sel, type_functional(t));
 
     ifdebug(8) {
-      pips_debug(8, "List of supporting entities: ");
+      pips_debug(8, "Redundant list of supporting entities: ");
       print_entities(sel);
       fprintf(stderr, "\n");
     }
 
-    pips_assert("Each entity appears only once", gen_once_p(sel));
+    /* Eliminate multiple occurences. The first one must be preserved
+       to preserve the dependencies. Might be more efficient to CONS
+       and then to reverse nsel, or even better to update sel. I keep
+       the most intuitive version. */
+    for(cse = sel; !ENDP(cse); POP(cse)) {
+      entity e = ENTITY(CAR(cse));
+      if(!gen_in_list_p(e,nsel))
+	nsel = gen_nconc(nsel, CONS(ENTITY,e, NIL));
+    }
+    gen_free_list(sel);
+    sel = list_undefined;
+
+    ifdebug(8) {
+      pips_debug(8, "List of supporting entities: ");
+      print_entities(nsel);
+      fprintf(stderr, "\n");
+    }
+
+    pips_assert("Each entity appears only once", gen_once_p(nsel));
 
     MAP(ENTITY, se, {
-      text se_text = c_text_entity(module, se, 0);
+      string n = entity_user_name(se);
 
-      ifdebug(8) {
-	pips_debug(8, "Add declaration of entity \"\%s\"\n", entity_name(se));
-	print_text(stderr, se_text);
+      /* Do not declare dummy structures, unions and enumerations,
+	 which must be part of another declaration, either a typedef
+	 or a name structure, union or enumeration. */
+      if((strstr(n,DUMMY_ENUM_PREFIX)==NULL) &&
+	 (strstr(n,DUMMY_STRUCT_PREFIX)==NULL) &&
+	 (strstr(n,DUMMY_UNION_PREFIX)==NULL)) {
+	text se_text = c_text_entity(module, se, 0);
+
+	ifdebug(8) {
+	  pips_debug(8, "Add declaration of entity \"\%s\"\n", entity_name(se));
+	  print_text(stderr, se_text);
+	}
+
+	MERGE_TEXTS(cut, se_text);
       }
-
-      MERGE_TEXTS(cut, se_text);
-    }, sel);
+      free(n);
+    }, nsel);
 
     MERGE_TEXTS(cut, md);
 
-    gen_free_list(sel);
+    gen_free_list(nsel);
 
     return cut;
 }

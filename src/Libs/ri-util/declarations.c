@@ -355,11 +355,21 @@ list words_basic(basic obj)
       case is_basic_derived:
 	{
 	  entity ent = basic_derived(obj);
+	  string name = entity_user_name(ent);
 	  type t = entity_type(ent);
-	  pc = gen_nconc(pc,words_type(t));
-	  pc = CHAIN_SWORD(pc," ");
-	  pc = CHAIN_SWORD(pc,entity_user_name(ent));
-	  pc = CHAIN_SWORD(pc," ");
+
+	  if(strstr(name,DUMMY_STRUCT_PREFIX)==NULL
+	     && strstr(name,DUMMY_UNION_PREFIX)==NULL
+	     && strstr(name,DUMMY_ENUM_PREFIX)==NULL) {
+	    pc = gen_nconc(pc,words_type(t));
+	    pc = CHAIN_SWORD(pc," ");
+	    pc = CHAIN_SWORD(pc,entity_user_name(ent));
+	    pc = CHAIN_SWORD(pc," ");
+	  }
+	  else {
+	    pc = gen_nconc(pc, c_words_entity(t, NIL));
+	  }
+	  free(name);
 	  break;
 	}
       case is_basic_typedef:

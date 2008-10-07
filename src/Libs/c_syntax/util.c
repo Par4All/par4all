@@ -207,8 +207,11 @@ expression MakeFunctionExpression(expression e, list le)
     case is_syntax_reference:
       {
 	entity ent = reference_variable(syntax_reference(s));
+	bool ok = TRUE;
+
 	AddToCalledModules(ent);
 	pips_debug(6,"Normal function call\n");
+	ok = check_C_function_type(ent, le);
 	exp = make_call_expression(ent,le);
 	break;
       }
@@ -341,7 +344,7 @@ expression MemberIdentifierToExpression(expression e, string m)
 	if (TRUE || type_functional_p(entity_type(f)))
 	  {
 	    /* User defined call */
-	    type ft = call_to_functional_type(c);
+	    type ft = call_to_functional_type(c, TRUE);
 	    type t = functional_result(type_functional(ft));
 	    return MemberDerivedIdentifierToExpression(t,m);
 	  }
@@ -614,8 +617,8 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
   }
 
   if(entity_undefined_p(ent)) {
-    pips_user_warning("Cannot find entity with local name \"%s\" with prefix \"%s\" at line %d\n",
-		      name, prefix, get_current_C_line_number());
+    pips_debug(8, "Cannot find entity with local name \"%s\" with prefix \"%s\" at line %d\n",
+	       name, prefix, get_current_C_line_number());
     /* It may be a parser error or a normal behavior when an entity is
        used before it is defined as, for example, a struct in a typedef:
        typedef struct foo foo; */
@@ -2272,6 +2275,7 @@ static bool callnodeclfilter(call c)
 	// Implicit declaration of an external function: returns an int
 	// Compute arguments type from call c
 	type ot = entity_type(e);
+	// Too bad we assume the old type is no good
 	type rt = make_type(is_type_variable, 
 			    make_variable(make_basic(is_basic_int, (void *) DEFAULT_INTEGER_TYPE_SIZE),
 					  NIL,
@@ -2283,7 +2287,7 @@ static bool callnodeclfilter(call c)
 
 	for(carg=args; !ENDP(carg); POP (carg)) {
 	  expression ce = EXPRESSION(CAR(carg));
-	  type ct = expression_to_type(ce);
+	  type ct = expression_to_user_type(ce);
 	  parameter cp = make_parameter(ct, make_mode(is_mode_value, UU), strdup(""));
 
 	  ptl = gen_nconc(ptl, CONS(PARAMETER, cp, NIL));
@@ -2293,6 +2297,8 @@ static bool callnodeclfilter(call c)
 	free_type(ot);
 	entity_type(e) = ft;
 
+	entity_declarations(get_current_module_entity()) = 
+	  gen_nconc(entity_declarations(get_current_module_entity()), CONS(ENTITY, e, NIL));
 	pips_user_warning("\n\nNo declaration of function %s in module %s\n"
 			  "Implicit declaration added\n",
 			  entity_user_name(e), get_current_module_name());

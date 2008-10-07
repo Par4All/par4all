@@ -686,7 +686,7 @@ basic b;
   return list_to_string(words_basic(b));
 }
 
-
+
 /* basic basic_of_any_expression(expression exp, bool apply_p): Makes
  * a basic of the same basic as the expression "exp" if "apply_p" is
  * FALSE. If "apply_p" is true and if the expression returns a
@@ -698,7 +698,7 @@ basic b;
  *
  */
 basic 
-basic_of_any_expression(expression exp, bool apply_p)
+some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p)
 {
   syntax sy = expression_syntax(exp);
   basic b = basic_undefined;
@@ -713,7 +713,7 @@ basic_of_any_expression(expression exp, bool apply_p)
   case is_syntax_reference:
     {
       entity v = reference_variable(syntax_reference(sy));
-      type exp_type = ultimate_type(entity_type(v));
+      type exp_type = ultimate_p? ultimate_type(entity_type(v)) : copy_type(entity_type(v));
 
       if(apply_p) {
 	if(!type_functional_p(exp_type))
@@ -721,7 +721,7 @@ basic_of_any_expression(expression exp, bool apply_p)
 			      type_tag(exp_type));
 	else {
 	  type rt = functional_result(type_functional(exp_type));
-	  type urt = ultimate_type(rt);
+	  type urt = ultimate_p? ultimate_type(rt):copy_type(rt);
 
 	  if(type_variable_p(urt))
 	    b = copy_basic(variable_basic(type_variable(urt)));
@@ -744,7 +744,7 @@ basic_of_any_expression(expression exp, bool apply_p)
       break;
     }
   case is_syntax_call: 
-    b = basic_of_call(syntax_call(sy), apply_p);
+    b = basic_of_call(syntax_call(sy), apply_p, ultimate_p);
     break;
   case is_syntax_range: 
     /* Well, let's assume range are well formed... */
@@ -795,6 +795,12 @@ basic_of_any_expression(expression exp, bool apply_p)
   return b;
 }
 
+basic 
+basic_of_any_expression(expression exp, bool apply_p)
+{
+  return some_basic_of_any_expression(exp, apply_p, TRUE);
+}
+
 /* basic basic_of_expression(expression exp): Makes a basic of the same
  * basic as the expression "exp". Indeed, "exp" will be assigned to
  * a temporary variable, which will have the same declaration as "exp".
@@ -813,6 +819,7 @@ basic_of_expression(expression exp)
   return basic_of_any_expression(exp, FALSE);
 }
 
+/* Replace typedef'ed types by combinations of basic types */
 type expression_to_type(expression e)
 {
   /* does not cover references to functions ...*/
@@ -826,13 +833,27 @@ type expression_to_type(expression e)
   return t;
 }
 
+/* Preserve typedef'ed types when possible */
+type expression_to_user_type(expression e)
+{
+  /* does not cover references to functions ...*/
+  /* Could be more elaborated with array types for array expressions */
+  type t = type_undefined;
+  basic b = some_basic_of_any_expression(e, FALSE, FALSE);
+  variable v = make_variable(b, NIL, NIL);
+
+  t = make_type(is_type_variable, v);
+
+  return t;
+}
+
 /* basic basic_of_call(call c): returns the basic of the result given by the
  * call "c".
  *
  * WARNING: a new basic is allocated
  */
 basic 
-basic_of_call(call c, bool apply_p)
+basic_of_call(call c, bool apply_p, bool ultimate_p)
 {
     entity e = call_function(c);
     tag t = value_tag(entity_initial(e));
@@ -844,7 +865,7 @@ basic_of_call(call c, bool apply_p)
 	b = copy_basic(basic_of_external(c));
 	break;
     case is_value_intrinsic: 
-      b = basic_of_intrinsic(c, apply_p);
+      b = basic_of_intrinsic(c, apply_p, ultimate_p);
 	break;
     case is_value_symbolic: 
 	/* b = make_basic(is_basic_overloaded, UU); */
@@ -898,7 +919,7 @@ basic_of_external(call c)
 
     b = (variable_basic(type_variable(return_type)));
 
-    debug(7, "basic_of_call", "Returned type is %s\n", basic_to_string(b));
+    pips_debug(7, "Returned type is %s\n", basic_to_string(b));
 
     return b;
 }
@@ -911,7 +932,7 @@ basic_of_external(call c)
  *
  * WARNING: returns a newly allocated basic object */
 basic 
-basic_of_intrinsic(call c, bool apply_p)
+basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
 {
   entity f = call_function(c);
   type rt = functional_result(type_functional(entity_type(f)));
@@ -935,7 +956,7 @@ basic_of_intrinsic(call c, bool apply_p)
       //string s = entity_user_name(f);
       //bool b = ENTITY_ADDRESS_OF_P(f);
       expression e = EXPRESSION(CAR(args));
-      basic eb = basic_of_expression(e);
+      basic eb = some_basic_of_any_expression(e, FALSE, ultimate_p);
       // Forget multidimensional types
       type et = make_type(is_type_variable,
 			  make_variable(eb, NIL, NIL));
@@ -1035,7 +1056,7 @@ basic_of_constant(call c)
     return(variable_basic(type_variable(return_type)));
 }
 
-
+
 /* basic basic_union(expression exp1 exp2): returns the basic of the
  * expression which has the most global basic. Then, between "int" and
  * "float", the most global is "float".
@@ -1265,7 +1286,7 @@ basic_maximum(basic fb1, basic fb2)
 }
 
 /* END_EOLE */
-
+
 bool 
 overloaded_type_p(type t)
 {
@@ -1567,7 +1588,7 @@ type ultimate_type(type t)
 }
 
 /* The function called can have a functional type, or a typedef type or a pointer type */
-type call_to_functional_type(call c)
+type call_to_functional_type(call c, bool ultimate_p)
 {
   entity f = call_function(c);
   type ft = entity_type(f);
@@ -1578,7 +1599,8 @@ type call_to_functional_type(call c)
   else if(type_variable_p(ft)) {
     basic ftb = variable_basic(type_variable(ft));
     if(basic_pointer_p(ftb)) {
-      rt = ultimate_type(basic_pointer(ftb));
+      type pt = basic_pointer(ftb);
+      rt = ultimate_p? ultimate_type(pt) : copy_type(pt);
     }
     else if(basic_typedef_p(ftb)) {
       entity te = basic_typedef(ftb);
@@ -1587,7 +1609,8 @@ type call_to_functional_type(call c)
       if(type_variable_p(ut)) {
 	basic utb = variable_basic(type_variable(ut));
 	if(basic_pointer_p(utb)) {
-	  rt = ultimate_type(basic_pointer(utb));
+	  type pt = basic_pointer(utb);
+	  rt = ultimate_p? ultimate_type(pt): copy_type(pt);
 	}
 	else
 	  /* assertion will fail anyway */
@@ -1641,12 +1664,14 @@ int number_of_fields(type t)
 
 /* Compute the list of entities implied in the definition of a
    type. This list is empty for basic types such as int or char. But
-   it increases rapidly with typedef, struct, union and dimensions
-   which can use enum elements. 
+   it increases rapidly with typedef, struct, union, bit and dimensions
+   which can use enum elements in sizing expressions. 
 
    The supporting entities are gathered in an updated list, sel,
    supporting entity list. If entity a depends on entity b, b must
-   appear first in the list. Each entity should appear only once. */
+   appear first in the list. Each entity should appear only once but
+   first we keep all occurences to make sure the partial order
+   between.entities is respected. */
 
 list functional_type_supporting_entities(list sel, functional f)
 {
@@ -1671,7 +1696,40 @@ list functional_type_supporting_entities(list sel, functional f)
   return sel;
 }
 
-list expression_supporting_entities(list sel, expression e)
+list enum_supporting_entities(list sel, entity e)
+{
+  type t = entity_type(e);
+  list ml = type_enum(t);
+  list cm = list_undefined;
+
+  pips_assert("type is of enum kind", type_enum_p(t));
+
+  ifdebug(8) {
+    pips_debug(8, "Begin: ");
+    print_entities(sel);
+    fprintf(stderr, "\n");
+  }
+
+  for(cm = ml; !ENDP(cm); POP(cm)) {
+    entity m = ENTITY(CAR(cm));
+    value v = entity_initial(m);
+    symbolic s = value_symbolic(v);
+
+    pips_assert("m is an enum member", value_symbolic_p(v));
+
+    sel = constant_expression_supporting_entities(sel, symbolic_expression(s));
+  }
+
+  ifdebug(8) {
+    pips_debug(8, "End: ");
+    print_entities(sel);
+    fprintf(stderr, "\n");
+  }
+
+  return sel;
+}
+
+list constant_expression_supporting_entities(list sel, expression e)
 {
   syntax s = expression_syntax(e);
 
@@ -1687,12 +1745,14 @@ list expression_supporting_entities(list sel, expression e)
 
     if(symbolic_constant_entity_p(f)) {
       /* f cannot be declared directly, we need its enum */
+      extern entity find_enum_of_member(entity);
       entity e_of_f = find_enum_of_member(f);
-     sel = gen_once(e_of_f, sel);
+      sel = CONS(ENTITY, e_of_f, sel);
+      sel = enum_supporting_entities(sel, e_of_f);
     }
 
     MAP(EXPRESSION, se, {
-      sel = expression_supporting_entities(sel, se);
+      sel = constant_expression_supporting_entities(sel, se);
     }, call_arguments(c));
   }
   else {
@@ -1712,7 +1772,7 @@ list expression_supporting_entities(list sel, expression e)
 list symbolic_supporting_entities(list sel, symbolic s)
 {
   expression e = symbolic_expression(s);
-  sel = expression_supporting_entities(sel, e);
+  sel = constant_expression_supporting_entities(sel, e);
   return sel;
 }
 
@@ -1737,12 +1797,12 @@ list basic_supporting_entities(list sel, basic b)
   else if(basic_pointer_p(b))
     sel = type_supporting_entities(sel, basic_pointer(b));
   else if(basic_derived_p(b)) {
-    sel = gen_once((void*) basic_derived(b), sel);
+    sel = CONS(ENTITY, basic_derived(b), sel);
     sel = type_supporting_entities(sel, entity_type(basic_derived(b)));
   }
   else if(basic_typedef_p(b)) {
     entity se = basic_typedef(b);
-    sel = gen_once((void *) se, sel);
+    sel = CONS(ENTITY, se, sel);
     sel = type_supporting_entities(sel, entity_type(se));
   }
   else
@@ -1771,8 +1831,8 @@ list variable_type_supporting_entities(list sel, variable v)
   MAP(DIMENSION, d, {
     expression l = dimension_lower(d);
     expression u = dimension_upper(d);
-    sel = expression_supporting_entities(sel, l);
-    sel = expression_supporting_entities(sel, u);
+    sel = constant_expression_supporting_entities(sel, l);
+    sel = constant_expression_supporting_entities(sel, u);
   }, dims);
 
   sel = basic_supporting_entities(sel, b);
@@ -1835,7 +1895,64 @@ list type_supporting_entities(list sel, type t)
 
   return sel;
 }
+
+/* Check that an effective parameter list is compatible with a
+   function type. Or improve the function type when it is not precise
+   as with "extern int f()". This is (a bit/partially) redundant with
+   undeclared function detection since undeclared functions are
+   declared "extern int f()". */
+bool check_C_function_type(entity f, list args)
+{
+  bool ok = TRUE;
+  type t = entity_type(f);
+  list parms = functional_parameters(type_functional(t));
 
+  pips_assert("f is a function", type_functional_p(t));
+
+  if(ENDP(parms)) {
+    if(ENDP(args))
+      ;
+    else {
+      /* Use parms to improve the type of f, probably declared f()
+	 with no type information. */
+      /* Should be very similar to call_to_functional_type(). */
+      list pl = NIL;
+      MAP(EXPRESSION, e, {
+	type et = expression_to_user_type(e);
+	parameter p = make_parameter(et, make_mode(is_mode_value, UU), strdup(""));
+	pl = gen_nconc(pl, CONS(PARAMETER, p, NIL));
+      },
+	  args);
+      functional_parameters(type_functional(t)) = pl;
+
+      if(type_unknown_p(functional_result(type_functional(t)))) {
+	basic b = make_basic_int(DEFAULT_INTEGER_TYPE_SIZE);
+	functional_result(type_functional(t)) = make_type_variable(make_variable(b, NIL, NIL));
+      }
+
+      pips_user_warning("Type updated for function \"%s\"\n", entity_user_name(f));
+      ifdebug(8) {
+	text txt = c_text_entity(get_current_module_entity(), f, 0);
+	print_text(stderr, txt);
+      }
+    }
+  }
+  else if(gen_length(args)!=gen_length(parms)) {
+    if(gen_length(args)==0 && gen_length(parms)==1) {
+      parameter p = PARAMETER(CAR(parms));
+      type pt = parameter_type(p);
+      ok = type_void_p(pt);
+    }
+    else
+      ok = FALSE;
+  }
+  else {
+    /* Check type compatibility: find function in flint? */
+    ;
+  }
+
+  return ok;
+}
 /*
  *  that is all
  */

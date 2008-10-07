@@ -645,7 +645,7 @@ words_regular_call(call obj, bool is_a_subroutine)
     }
   }
 
-  if (type_void_p(functional_result(type_functional(call_to_functional_type(obj)))))
+  if (type_void_p(functional_result(type_functional(call_to_functional_type(obj, FALSE)))))
     {
       if (is_a_subroutine) 
 	pc = CHAIN_SWORD(pc, is_fortran?"CALL ":"");
@@ -742,7 +742,7 @@ words_genuine_regular_call(call obj, bool is_a_subroutine)
     //entity f = call_function(obj);
     //type t = entity_type(f);
     /* The module name is the first one except if it is a procedure CALL. */
-    if (type_void_p(functional_result(type_functional(call_to_functional_type(obj)))))
+    if (type_void_p(functional_result(type_functional(call_to_functional_type(obj,FALSE)))))
       attach_regular_call_to_word(STRING(CAR(CDR(pc))), obj);
     else
       attach_regular_call_to_word(STRING(CAR(pc)), obj);

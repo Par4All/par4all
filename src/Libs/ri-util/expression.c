@@ -2036,7 +2036,7 @@ bool simplify_C_expression(expression e)
 	can_be_substituted_p =
 	  basic_int_p(rb)
 	  || basic_float_p(rb) 
-	  || basic_complex_p(rb); /* Should not occur in C */
+	  || basic_complex_p(rb); /* Should not occur in C, before C99 */
       }
       else if(gen_length(call_arguments(c))==2) {
 	/* Check "+C" and "-C" */
@@ -2057,7 +2057,7 @@ bool simplify_C_expression(expression e)
       else {
 	/* Try to simplify the arguments, do not hope much from the result
            type because of overloading. */
-	type ft = call_to_functional_type(c);
+	type ft = call_to_functional_type(c, TRUE);
 	type rt = ultimate_type(functional_result(type_functional(ft)));
 
 	//pips_assert("The function type is functional", type_functional_p(entity_type(f)));
