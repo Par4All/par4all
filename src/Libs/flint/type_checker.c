@@ -141,7 +141,7 @@ type_this_call(expression exp, type_context_p context)
   /* Constants */
   else if (entity_constant_p(function_called))
   {
-    b = basic_of_call(c, true);
+    b = basic_of_call(c, true, true);
   }
   
   /* User-defined functions */
