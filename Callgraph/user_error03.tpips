@@ -1,5 +1,5 @@
 delete user_error03
-create user_error03 ${PIPS_ROOT}/Validation/Callgraph/user_error03.f
+create user_error03 user_error03.f
 activate PRINT_CALL_GRAPH_WITH_CUMULATED_EFFECTS
 display CALLGRAPH_FILE
 activate PRINT_CODE_CUMULATED_EFFECTS

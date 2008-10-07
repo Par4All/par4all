@@ -1,5 +1,5 @@
 delete decor01
-create decor01 ${PIPS_ROOT}/Validation/Callgraph/decor01.f
+create decor01 decor01.f
 
 echo
 echo Basic call graph

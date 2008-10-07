@@ -1,0 +1,8 @@
+delete essai
+create essai essai.f
+module ESSAI
+activate PRINT_CALL_GRAPH
+display CALLGRAPH_FILE[ESSAI]
+close
+delete essai
+quit
