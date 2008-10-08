@@ -1,3 +1,4 @@
+extern void simp2();
 # 1
 void simp2(a,n,l2,nl2,ip,kp,q1)
 int n,l2[],nl2,*ip,kp;
@@ -31,8 +32,3 @@ float **a,*q1;
                 }
         }
 }
-# 1 "$VDIR/simp2.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/simp2.c"
-extern void simp2();

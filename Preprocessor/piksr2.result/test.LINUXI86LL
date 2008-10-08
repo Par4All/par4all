@@ -1,3 +1,4 @@
+extern void piksr2();
 # 1
 void piksr2(n,arr,brr)
 int n;
@@ -19,8 +20,3 @@ float arr[],brr[];
                 brr[i+1]=b;
         }
 }
-# 1 "$VDIR/piksr2.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/piksr2.c"
-extern void piksr2();

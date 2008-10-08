@@ -1,3 +1,4 @@
+extern void mrqcof();
 # 1
 void mrqcof(x,y,sig,ndata,a,ma,lista,mfit,alpha,beta,chisq,funcs)
 float x[],y[],sig[],a[],**alpha,beta[],*chisq;
@@ -30,8 +31,3 @@ void (*funcs)(); /* ANSI: void (*funcs)(float,float *,float *,float *,int); */
                 for (k=1;k<=j-1;k++) alpha[k][j]=alpha[j][k];
         free_vector(dyda,1,ma);
 }
-# 1 "$VDIR/mrqcof.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/mrqcof.c"
-extern void mrqcof();

@@ -1,3 +1,4 @@
+extern void mmid();
 # 1
 void mmid(y,dydx,nvar,xs,htot,nstep,yout,derivs)
 float y[],dydx[],xs,htot,yout[];
@@ -32,8 +33,3 @@ int nvar,nstep;
         free_vector(yn,1,nvar);
         free_vector(ym,1,nvar);
 }
-# 1 "$VDIR/mmid.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/mmid.c"
-extern void mmid();

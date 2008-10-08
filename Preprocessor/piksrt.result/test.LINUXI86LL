@@ -1,3 +1,4 @@
+extern void piksrt();
 # 1
 void piksrt(n,arr)
 int n;
@@ -16,8 +17,3 @@ float arr[];
                 arr[i+1]=a;
         }
 }
-# 1 "$VDIR/piksrt.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/piksrt.c"
-extern void piksrt();

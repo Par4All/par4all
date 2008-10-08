@@ -1,24 +1,3 @@
-# 1270
-float probks(alam)
-float alam;
-{
-        int j;
-        float a2,fac=2.0,sum=0.0,term,termbf=0.0;
-
-        a2 = -2.0*alam*alam;
-        for (j=1;j<=100;j++) {
-                term=fac*exp(a2*j*j);
-                sum += term;
-                if (fabs(term) <= 0.001*termbf || fabs(term) < 1.0e-8*sum) return sum;
-                fac = -fac;
-                termbf=fabs(term);
-        }
-        return 0.0;
-}
-# 1 "$VDIR/probks.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/probks.c"
 /* Declarations for math functions.
    Copyright (C) 1991-1993,1995-1999,2001,2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1282,3 +1261,20 @@ extern int matherr (struct exception *__exc);
 /* Get machine-dependent inline versions (if there are any).  */
 # 1270 "$VDIR/probks.c"
 extern float probks();
+# 1270
+float probks(alam)
+float alam;
+{
+        int j;
+        float a2,fac=2.0,sum=0.0,term,termbf=0.0;
+
+        a2 = -2.0*alam*alam;
+        for (j=1;j<=100;j++) {
+                term=fac*exp(a2*j*j);
+                sum += term;
+                if (fabs(term) <= 0.001*termbf || fabs(term) < 1.0e-8*sum) return sum;
+                fac = -fac;
+                termbf=fabs(term);
+        }
+        return 0.0;
+}

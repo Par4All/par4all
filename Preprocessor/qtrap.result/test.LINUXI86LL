@@ -1,24 +1,3 @@
-# 1270
-float qtrap(func,a,b)
-float a,b;
-float (*func)();
-{
-        int j;
-        float s,olds,trapzd();
-        void nrerror();
-
-        olds = -1.0e30;
-        for (j=1;j<=20;j++) {
-                s=trapzd(func,a,b,j);
-                if (fabs(s-olds) < 1.0e-5*fabs(olds)) return s;
-                olds=s;
-        }
-        nrerror("Too many steps in routine QTRAP");
-}
-# 1 "$VDIR/qtrap.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/qtrap.c"
 /* Declarations for math functions.
    Copyright (C) 1991-1993,1995-1999,2001,2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1282,3 +1261,20 @@ extern int matherr (struct exception *__exc);
 /* Get machine-dependent inline versions (if there are any).  */
 # 1270 "$VDIR/qtrap.c"
 extern float qtrap();
+# 1270
+float qtrap(func,a,b)
+float a,b;
+float (*func)();
+{
+        int j;
+        float s,olds,trapzd();
+        void nrerror();
+
+        olds = -1.0e30;
+        for (j=1;j<=20;j++) {
+                s=trapzd(func,a,b,j);
+                if (fabs(s-olds) < 1.0e-5*fabs(olds)) return s;
+                olds=s;
+        }
+        nrerror("Too many steps in routine QTRAP");
+}

@@ -1,3 +1,4 @@
+extern void eclazz();
 # 1
 void eclazz(nf,n,equiv)
 int n,nf[];
@@ -15,8 +16,3 @@ int (*equiv)();
         }
         for (jj=1;jj<=n;jj++) nf[jj]=nf[nf[jj]];
 }
-# 1 "$VDIR/eclazz.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/eclazz.c"
-extern void eclazz();

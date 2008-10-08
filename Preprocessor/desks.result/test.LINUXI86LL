@@ -79,10 +79,6 @@ great k;
         for(j=32;j>=1;j--)
                 *iout = (*iout <<= 1) | (bit[ipp[j]] & itmp ? 1 : 0);
 }
-# 1 "$VDIR/desks.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/desks.c"
 extern unsigned long bit[]; /* defined in DES */
 
 typedef struct IMMENSE {unsigned long l,r;} immense;

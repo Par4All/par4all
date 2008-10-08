@@ -5,7 +5,8 @@ create ${WSPACE} ${FILE}
 # static functions, do not forget the COMPILATION_UNIT_PREFIX, but no
 # static functions in validation files using default_tpips?
 
-display C_SOURCE_FILE[%ALL]
+# display C_SOURCE_FILE[%ALL]
+shell cat ${WSPACE}.database/[^T]*/*.c|sed -e '/^# 1[^0-9][^0-9]*/d'
 
 close
 delete ${WSPACE}

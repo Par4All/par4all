@@ -1,3 +1,4 @@
+extern void predic();
 # 1
 void predic(data,ndata,d,npoles,future,nfut)
 float data[],d[],future[];
@@ -18,8 +19,3 @@ int ndata,npoles,nfut;
         }
         free_vector(reg,1,npoles);
 }
-# 1 "$VDIR/predic.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/predic.c"
-extern void predic();

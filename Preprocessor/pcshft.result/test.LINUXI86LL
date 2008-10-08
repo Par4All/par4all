@@ -1,3 +1,4 @@
+extern void pcshft();
 # 1
 void pcshft(a,b,d,n)
 float a,b,d[];
@@ -17,8 +18,3 @@ int n;
                 for (k=n-2;k>=j;k--)
                         d[k] -= cnst*d[k+1];
 }
-# 1 "$VDIR/pcshft.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/pcshft.c"
-extern void pcshft();

@@ -1,3 +1,4 @@
+extern void mprove();
 # 1
 void mprove(a,alud,n,indx,b,x)
 float **a,**alud,b[],x[];
@@ -18,8 +19,3 @@ int n,indx[];
         for (i=1;i<=n;i++) x[i] -= r[i];
         free_vector(r,1,n);
 }
-# 1 "$VDIR/mprove.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/mprove.c"
-extern void mprove();

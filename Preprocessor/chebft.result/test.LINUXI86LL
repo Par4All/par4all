@@ -1,33 +1,3 @@
-# 1269
-void chebft(a,b,c,n,func)
-float a,b,c[];
-float (*func)(); /* ANSI: float (*func)(float); */
-int n;
-{
-        int k,j;
-        float fac,bpa,bma,*f,*vector();
-        void free_vector();
-
-        f=vector(0,n-1);
-        bma=0.5*(b-a);
-        bpa=0.5*(b+a);
-        for (k=0;k<n;k++) {
-                float y=cos(3.141592653589793*(k+0.5)/n);
-                f[k]=(*func)(y*bma+bpa);
-        }
-        fac=2.0/n;
-        for (j=0;j<n;j++) {
-                double sum=0.0;
-                for (k=0;k<n;k++)
-                        sum += f[k]*cos(3.141592653589793*j*(k+0.5)/n);
-                c[j]=fac*sum;
-        }
-        free_vector(f,0,n-1);
-}
-# 1 "$VDIR/chebft.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/chebft.c"
 /* Declarations for math functions.
    Copyright (C) 1991-1993,1995-1999,2001,2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1297,3 +1267,29 @@ extern int matherr (struct exception *__exc);
 
 
 extern void chebft();
+# 1269
+void chebft(a,b,c,n,func)
+float a,b,c[];
+float (*func)(); /* ANSI: float (*func)(float); */
+int n;
+{
+        int k,j;
+        float fac,bpa,bma,*f,*vector();
+        void free_vector();
+
+        f=vector(0,n-1);
+        bma=0.5*(b-a);
+        bpa=0.5*(b+a);
+        for (k=0;k<n;k++) {
+                float y=cos(3.141592653589793*(k+0.5)/n);
+                f[k]=(*func)(y*bma+bpa);
+        }
+        fac=2.0/n;
+        for (j=0;j<n;j++) {
+                double sum=0.0;
+                for (k=0;k<n;k++)
+                        sum += f[k]*cos(3.141592653589793*j*(k+0.5)/n);
+                c[j]=fac*sum;
+        }
+        free_vector(f,0,n-1);
+}

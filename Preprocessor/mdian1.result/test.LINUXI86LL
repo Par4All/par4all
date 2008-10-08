@@ -1,3 +1,4 @@
+extern void mdian1();
 # 1
 void mdian1(x,n,xmed)
 float x[],*xmed;
@@ -10,8 +11,3 @@ int n;
         n2p=(n2=n/2)+1;
         *xmed=(n % 2 ? x[n2p] : 0.5*(x[n2]+x[n2p]));
 }
-# 1 "$VDIR/mdian1.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/mdian1.c"
-extern void mdian1();

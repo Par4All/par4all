@@ -1,34 +1,3 @@
-# 1267
-void eulsum(sum,term,jterm,wksp)
-float *sum,term,wksp[];
-int jterm;
-{
-        int j;
-        static int nterm;
-        float tmp,dum;
-
-        if (jterm == 1) {
-                nterm=1;
-                *sum=0.5*(wksp[1]=term);
-        } else {
-                tmp=wksp[1];
-                wksp[1]=term;
-                for (j=1;j<=nterm-1;j++) {
-                        dum=wksp[j+1];
-                        wksp[j+1]=0.5*(wksp[j]+tmp);
-                        tmp=dum;
-                }
-                wksp[nterm+1]=0.5*(wksp[nterm]+tmp);
-                if (fabs(wksp[nterm+1]) <= fabs(wksp[nterm]))
-                        *sum += (0.5*wksp[++nterm]);
-                else
-                        *sum += wksp[nterm+1];
-        }
-}
-# 1 "$VDIR/eulsum.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/eulsum.c"
 /* Declarations for math functions.
    Copyright (C) 1991-1993,1995-1999,2001,2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1296,3 +1265,30 @@ extern int matherr (struct exception *__exc);
 
 
 extern void eulsum();
+# 1267
+void eulsum(sum,term,jterm,wksp)
+float *sum,term,wksp[];
+int jterm;
+{
+        int j;
+        static int nterm;
+        float tmp,dum;
+
+        if (jterm == 1) {
+                nterm=1;
+                *sum=0.5*(wksp[1]=term);
+        } else {
+                tmp=wksp[1];
+                wksp[1]=term;
+                for (j=1;j<=nterm-1;j++) {
+                        dum=wksp[j+1];
+                        wksp[j+1]=0.5*(wksp[j]+tmp);
+                        tmp=dum;
+                }
+                wksp[nterm+1]=0.5*(wksp[nterm]+tmp);
+                if (fabs(wksp[nterm+1]) <= fabs(wksp[nterm]))
+                        *sum += (0.5*wksp[++nterm]);
+                else
+                        *sum += wksp[nterm+1];
+        }
+}

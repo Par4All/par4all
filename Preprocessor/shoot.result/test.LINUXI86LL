@@ -1,3 +1,4 @@
+extern void shoot();
 # 1
 void shoot(nvar,v,delv,n2,x1,x2,eps,h1,hmin,f,dv)
 int nvar,n2;
@@ -34,8 +35,3 @@ float v[],delv[],x1,x2,eps,h1,hmin,f[],dv[];
         free_ivector(indx,1,nvar);
         free_vector(y,1,nvar);
 }
-# 1 "$VDIR/shoot.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/shoot.c"
-extern void shoot();

@@ -3,8 +3,4 @@ main()
 {
   restrict int i;
 }
-# 1 "$VDIR/restrict.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/restrict.c"
 extern main();

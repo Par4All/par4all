@@ -3,10 +3,6 @@ main()
 {
   i = 1;
 }
-# 1 "$VDIR/variable_scope3.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/variable_scope3.c"
 extern int i;
 /*static int i = 0;*/
 int i;

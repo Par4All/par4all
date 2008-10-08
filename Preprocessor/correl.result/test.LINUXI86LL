@@ -1,3 +1,4 @@
+extern void correl();
 # 1
 void correl(data1,data2,n,ans)
 float data1[],data2[],ans[];
@@ -18,8 +19,3 @@ int n;
         realft(ans,no2,-1);
         free_vector(fft,1,2*n);
 }
-# 1 "$VDIR/correl.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/correl.c"
-extern void correl();

@@ -1,3 +1,4 @@
+extern void vander();
 # 1
 void vander(x,w,q,n)
 float x[],w[],q[];
@@ -35,8 +36,3 @@ int n;
         }
         free_vector(c,1,n);
 }
-# 1 "$VDIR/vander.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/vander.c"
-extern void vander();

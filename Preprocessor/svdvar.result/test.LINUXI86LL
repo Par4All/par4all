@@ -1,3 +1,4 @@
+extern void svdvar();
 # 1
 void svdvar(v,ma,w,cvm)
 float **v,w[],**cvm;
@@ -20,8 +21,3 @@ int ma;
         }
         free_vector(wti,1,ma);
 }
-# 1 "$VDIR/svdvar.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/svdvar.c"
-extern void svdvar();

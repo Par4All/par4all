@@ -1,3 +1,7 @@
+int ncom=0; /* defining declarations */
+float *pcom=0,*xicom=0,(*nrfunc)();
+
+extern void linmin();
 # 4
 void linmin(p,xi,n,fret,func)
 float p[],xi[],*fret,(*func)();
@@ -28,11 +32,3 @@ int n;
         free_vector(xicom,1,n);
         free_vector(pcom,1,n);
 }
-# 1 "$VDIR/linmin.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/linmin.c"
-int ncom=0; /* defining declarations */
-float *pcom=0,*xicom=0,(*nrfunc)();
-
-extern void linmin();

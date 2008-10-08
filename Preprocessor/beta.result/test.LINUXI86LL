@@ -1,15 +1,3 @@
-# 1267
-float beta(z,w)
-float z,w;
-{
-        float gammln();
-
-        return exp(gammln(z)+gammln(w)-gammln(z+w));
-}
-# 1 "$VDIR/beta.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/beta.c"
 /* Declarations for math functions.
    Copyright (C) 1991-1993,1995-1999,2001,2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1277,3 +1265,11 @@ extern int matherr (struct exception *__exc);
 
 
 extern float beta();
+# 1267
+float beta(z,w)
+float z,w;
+{
+        float gammln();
+
+        return exp(gammln(z)+gammln(w)-gammln(z+w));
+}

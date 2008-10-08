@@ -1,3 +1,4 @@
+extern void tridag();
 # 1
 void tridag(a,b,c,r,u,n)
 float a[],b[],c[],r[],u[];
@@ -20,8 +21,3 @@ int n;
                 u[j] -= gam[j+1]*u[j+1];
         free_vector(gam,1,n);
 }
-# 1 "$VDIR/tridag.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/tridag.c"
-extern void tridag();

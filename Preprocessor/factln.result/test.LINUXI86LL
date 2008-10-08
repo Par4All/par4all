@@ -1,3 +1,4 @@
+extern float factln();
 # 1
 float factln(n)
 int n;
@@ -11,8 +12,3 @@ int n;
         if (n <= 100) return a[n] ? a[n] : (a[n]=gammln(n+1.0));
         else return gammln(n+1.0);
 }
-# 1 "$VDIR/factln.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/factln.c"
-extern float factln();

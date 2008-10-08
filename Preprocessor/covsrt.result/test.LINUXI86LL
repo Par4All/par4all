@@ -1,3 +1,4 @@
+extern void covsrt();
 # 1
 void covsrt(covar,ma,lista,mfit)
 float **covar;
@@ -25,8 +26,3 @@ int ma,lista[],mfit;
         for (j=2;j<=ma;j++)
                 for (i=1;i<=j-1;i++) covar[i][j]=covar[j][i];
 }
-# 1 "$VDIR/covsrt.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/covsrt.c"
-extern void covsrt();

@@ -1,26 +1,3 @@
-# 1270
-float qsimp(func,a,b)
-float a,b;
-float (*func)();
-{
-        int j;
-        float s,st,ost,os,trapzd();
-        void nrerror();
-
-        ost = os = -1.0e30;
-        for (j=1;j<=20;j++) {
-                st=trapzd(func,a,b,j);
-                s=(4.0*st-ost)/3.0;
-                if (fabs(s-os) < 1.0e-6*fabs(os)) return s;
-                os=s;
-                ost=st;
-        }
-        nrerror("Too many steps in routine QSIMP");
-}
-# 1 "$VDIR/qsimp.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/qsimp.c"
 /* Declarations for math functions.
    Copyright (C) 1991-1993,1995-1999,2001,2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1284,3 +1261,22 @@ extern int matherr (struct exception *__exc);
 /* Get machine-dependent inline versions (if there are any).  */
 # 1270 "$VDIR/qsimp.c"
 extern float qsimp();
+# 1270
+float qsimp(func,a,b)
+float a,b;
+float (*func)();
+{
+        int j;
+        float s,st,ost,os,trapzd();
+        void nrerror();
+
+        ost = os = -1.0e30;
+        for (j=1;j<=20;j++) {
+                st=trapzd(func,a,b,j);
+                s=(4.0*st-ost)/3.0;
+                if (fabs(s-os) < 1.0e-6*fabs(os)) return s;
+                os=s;
+                ost=st;
+        }
+        nrerror("Too many steps in routine QSIMP");
+}

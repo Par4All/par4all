@@ -1,3 +1,4 @@
+extern void splin2();
 # 1
 void splin2(x1a,x2a,ya,y2a,m,n,x1,x2,y)
 float x1a[],x2a[],**ya,**y2a,x1,x2,*y;
@@ -16,8 +17,3 @@ int m,n;
         free_vector(yytmp,1,n);
         free_vector(ytmp,1,n);
 }
-# 1 "$VDIR/splin2.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/splin2.c"
-extern void splin2();

@@ -1,29 +1,3 @@
-# 1263
-float qromb(func,a,b)
-float a,b;
-float (*func)();
-{
-        float ss,dss,trapzd();
-        float s[20 +1 +1],h[20 +1 +1];
-        int j;
-        void polint(),nrerror();
-
-        h[1]=1.0;
-        for (j=1;j<=20;j++) {
-                s[j]=trapzd(func,a,b,j);
-                if (j >= 5) {
-                        polint(&h[j-5],&s[j-5],5,0.0,&ss,&dss);
-                        if (fabs(dss) < 1.0e-6*fabs(ss)) return ss;
-                }
-                s[j+1]=s[j];
-                h[j+1]=0.25*h[j];
-        }
-        nrerror("Too many steps in routine QROMB");
-}
-# 1 "$VDIR/qromb.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/qromb.c"
 /* Declarations for math functions.
    Copyright (C) 1991-1993,1995-1999,2001,2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1287,3 +1261,25 @@ extern int matherr (struct exception *__exc);
 /* Get machine-dependent inline versions (if there are any).  */
 
 extern float qromb();
+# 1263
+float qromb(func,a,b)
+float a,b;
+float (*func)();
+{
+        float ss,dss,trapzd();
+        float s[20 +1 +1],h[20 +1 +1];
+        int j;
+        void polint(),nrerror();
+
+        h[1]=1.0;
+        for (j=1;j<=20;j++) {
+                s[j]=trapzd(func,a,b,j);
+                if (j >= 5) {
+                        polint(&h[j-5],&s[j-5],5,0.0,&ss,&dss);
+                        if (fabs(dss) < 1.0e-6*fabs(ss)) return ss;
+                }
+                s[j+1]=s[j];
+                h[j+1]=0.25*h[j];
+        }
+        nrerror("Too many steps in routine QROMB");
+}

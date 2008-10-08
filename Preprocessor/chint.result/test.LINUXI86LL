@@ -1,3 +1,4 @@
+extern void chint();
 # 1
 void chint(a,b,c,cint,n)
 float a,b,c[],cint[];
@@ -16,8 +17,3 @@ int n;
         sum += fac*cint[n-1];
         cint[0]=2.0*sum;
 }
-# 1 "$VDIR/chint.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/chint.c"
-extern void chint();

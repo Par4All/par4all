@@ -1,56 +1,3 @@
-# 1263
-void amoeba(p,y,ndim,ftol,funk,nfunk)
-float **p,y[],ftol,(*funk)();
-int ndim,*nfunk;
-{
-        int i,j,ilo,ihi,inhi,mpts=ndim+1;
-        float ytry,ysave,sum,rtol,amotry(),*psum,*vector();
-        void nrerror(),free_vector();
-
-        psum=vector(1,ndim);
-        *nfunk=0;
-        for (j=1;j<=ndim;j++) { for (i=1,sum=0.0;i<=mpts;i++) sum += p[i][j]; psum[j]=sum;}
-        for (;;) {
-                ilo=1;
-                ihi = y[1]>y[2] ? (inhi=2,1) : (inhi=1,2);
-                for (i=1;i<=mpts;i++) {
-                        if (y[i] < y[ilo]) ilo=i;
-                        if (y[i] > y[ihi]) {
-                                inhi=ihi;
-                                ihi=i;
-                        } else if (y[i] > y[inhi])
-                                if (i != ihi) inhi=i;
-                }
-                rtol=2.0*fabs(y[ihi]-y[ilo])/(fabs(y[ihi])+fabs(y[ilo]));
-                if (rtol < ftol) break;
-                if (*nfunk >= 5000) nrerror("Too many iterations in AMOEBA");
-                ytry=amotry(p,y,psum,ndim,funk,ihi,nfunk,-1.0);
-                if (ytry <= y[ilo])
-                        ytry=amotry(p,y,psum,ndim,funk,ihi,nfunk,2.0);
-                else if (ytry >= y[inhi]) {
-                        ysave=y[ihi];
-                        ytry=amotry(p,y,psum,ndim,funk,ihi,nfunk,0.5);
-                        if (ytry >= ysave) {
-                                for (i=1;i<=mpts;i++) {
-                                        if (i != ilo) {
-                                                for (j=1;j<=ndim;j++) {
-                                                        psum[j]=0.5*(p[i][j]+p[ilo][j]);
-                                                        p[i][j]=psum[j];
-                                                }
-                                                y[i]=(*funk)(psum);
-                                        }
-                                }
-                                *nfunk += ndim;
-                                for (j=1;j<=ndim;j++) { for (i=1,sum=0.0;i<=mpts;i++) sum += p[i][j]; psum[j]=sum;}
-                        }
-                }
-        }
-        free_vector(psum,1,ndim);
-}
-# 1 "$VDIR/amoeba.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/amoeba.c"
 /* Declarations for math functions.
    Copyright (C) 1991-1993,1995-1999,2001,2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1316,6 +1263,55 @@ extern int matherr (struct exception *__exc);
 extern void amoeba();
 
 extern float amotry();
+# 1263
+void amoeba(p,y,ndim,ftol,funk,nfunk)
+float **p,y[],ftol,(*funk)();
+int ndim,*nfunk;
+{
+        int i,j,ilo,ihi,inhi,mpts=ndim+1;
+        float ytry,ysave,sum,rtol,amotry(),*psum,*vector();
+        void nrerror(),free_vector();
+
+        psum=vector(1,ndim);
+        *nfunk=0;
+        for (j=1;j<=ndim;j++) { for (i=1,sum=0.0;i<=mpts;i++) sum += p[i][j]; psum[j]=sum;}
+        for (;;) {
+                ilo=1;
+                ihi = y[1]>y[2] ? (inhi=2,1) : (inhi=1,2);
+                for (i=1;i<=mpts;i++) {
+                        if (y[i] < y[ilo]) ilo=i;
+                        if (y[i] > y[ihi]) {
+                                inhi=ihi;
+                                ihi=i;
+                        } else if (y[i] > y[inhi])
+                                if (i != ihi) inhi=i;
+                }
+                rtol=2.0*fabs(y[ihi]-y[ilo])/(fabs(y[ihi])+fabs(y[ilo]));
+                if (rtol < ftol) break;
+                if (*nfunk >= 5000) nrerror("Too many iterations in AMOEBA");
+                ytry=amotry(p,y,psum,ndim,funk,ihi,nfunk,-1.0);
+                if (ytry <= y[ilo])
+                        ytry=amotry(p,y,psum,ndim,funk,ihi,nfunk,2.0);
+                else if (ytry >= y[inhi]) {
+                        ysave=y[ihi];
+                        ytry=amotry(p,y,psum,ndim,funk,ihi,nfunk,0.5);
+                        if (ytry >= ysave) {
+                                for (i=1;i<=mpts;i++) {
+                                        if (i != ilo) {
+                                                for (j=1;j<=ndim;j++) {
+                                                        psum[j]=0.5*(p[i][j]+p[ilo][j]);
+                                                        p[i][j]=psum[j];
+                                                }
+                                                y[i]=(*funk)(psum);
+                                        }
+                                }
+                                *nfunk += ndim;
+                                for (j=1;j<=ndim;j++) { for (i=1,sum=0.0;i<=mpts;i++) sum += p[i][j]; psum[j]=sum;}
+                        }
+                }
+        }
+        free_vector(psum,1,ndim);
+}
 # 1312
 float amotry(p,y,psum,ndim,funk,ihi,nfunk,fac)
 float **p,*y,*psum,(*funk)(),fac;

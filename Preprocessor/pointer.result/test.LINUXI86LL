@@ -15,8 +15,4 @@ int main()
   p1 = (int (*)[13])malloc(13*sizeof(int));
   return;
 }
-# 1 "$VDIR/pointer.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/pointer.c"
 extern int main();

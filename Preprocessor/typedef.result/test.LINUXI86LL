@@ -7,8 +7,4 @@ main()
   MYINT m;
   n = 1;
 }
-# 1 "$VDIR/typedef.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/typedef.c"
 extern main();

@@ -1,3 +1,4 @@
+extern void chsone();
 # 1
 void chsone(bins,ebins,nbins,knstrn,df,chsq,prob)
 float bins[],ebins[],*df,*chsq,*prob;
@@ -17,8 +18,3 @@ int nbins,knstrn;
         }
         *prob=gammq(0.5*(*df),0.5*(*chsq));
 }
-# 1 "$VDIR/chsone.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/chsone.c"
-extern void chsone();

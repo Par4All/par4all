@@ -1,3 +1,4 @@
+extern void bcuint();
 # 1
 void bcuint(y,y1,y2,y12,x1l,x1u,x2l,x2u,x1,x2,ansy,ansy1,ansy2)
 float y[],y1[],y2[],y12[],x1l,x1u,x2l,x2u,x1,x2,*ansy,*ansy1,*ansy2;
@@ -23,8 +24,3 @@ float y[],y1[],y2[],y12[],x1l,x1u,x2l,x2u,x1,x2,*ansy,*ansy1,*ansy2;
         *ansy2 /= d2;
         free_matrix(c,1,4,1,4);
 }
-# 1 "$VDIR/bcuint.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/bcuint.c"
-extern void bcuint();

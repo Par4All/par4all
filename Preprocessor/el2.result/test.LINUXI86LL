@@ -1,55 +1,3 @@
-# 1263
-float el2(x,qqc,aa,bb)
-float x,qqc,aa,bb;
-{
-        float a,b,c,d,e,f,g,em,eye,p,qc,y,z;
-        int l;
-        void nrerror();
-
-        if (x == 0.0) return 0.0;
-        else if (qqc) {
-                qc=qqc;
-                a=aa;
-                b=bb;
-                d=1.0+(c=x*x);
-                p=sqrt((1.0+c*qc*qc)/d);
-                d=x/d;
-                c=d/(p+p);
-                z=(eye=a)-b;
-                a=0.5*(b+a);
-                y=fabs(1.0/x);
-                f=0.0;
-                l=0;
-                em=1.0;
-                qc=fabs(qc);
-                for (;;) {
-                        b += (eye*qc);
-                        g=(e=em*qc)/p;
-                        d += (f*g);
-                        f=c;
-                        eye=a;
-                        p += g;
-                        c=0.5*(d/p+c);
-                        g=em;
-                        em += qc;
-                        a=0.5*(b/em+a);
-                        y -= (e/y);
-                        if (y == 0.0) y=sqrt(e)*1.0e-9;
-                        if (fabs(g-qc) <= 0.0003*g) break;
-                        qc=sqrt(e)*2.0;
-                        l *= 2;
-                        if (y<0.0) l++;
-                }
-                if (y<0.0) l++;
-                e=(atan(em/y)+3.14159265*l)*a/em;
-                if (x < 0.0) e = -e;
-                return e+c*z;
-        } else nrerror("Bad qqc in routine EL2");
-}
-# 1 "$VDIR/el2.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/el2.c"
 /* Declarations for math functions.
    Copyright (C) 1991-1993,1995-1999,2001,2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1313,3 +1261,51 @@ extern int matherr (struct exception *__exc);
 /* Get machine-dependent inline versions (if there are any).  */
 
 extern float el2();
+# 1263
+float el2(x,qqc,aa,bb)
+float x,qqc,aa,bb;
+{
+        float a,b,c,d,e,f,g,em,eye,p,qc,y,z;
+        int l;
+        void nrerror();
+
+        if (x == 0.0) return 0.0;
+        else if (qqc) {
+                qc=qqc;
+                a=aa;
+                b=bb;
+                d=1.0+(c=x*x);
+                p=sqrt((1.0+c*qc*qc)/d);
+                d=x/d;
+                c=d/(p+p);
+                z=(eye=a)-b;
+                a=0.5*(b+a);
+                y=fabs(1.0/x);
+                f=0.0;
+                l=0;
+                em=1.0;
+                qc=fabs(qc);
+                for (;;) {
+                        b += (eye*qc);
+                        g=(e=em*qc)/p;
+                        d += (f*g);
+                        f=c;
+                        eye=a;
+                        p += g;
+                        c=0.5*(d/p+c);
+                        g=em;
+                        em += qc;
+                        a=0.5*(b/em+a);
+                        y -= (e/y);
+                        if (y == 0.0) y=sqrt(e)*1.0e-9;
+                        if (fabs(g-qc) <= 0.0003*g) break;
+                        qc=sqrt(e)*2.0;
+                        l *= 2;
+                        if (y<0.0) l++;
+                }
+                if (y<0.0) l++;
+                e=(atan(em/y)+3.14159265*l)*a/em;
+                if (x < 0.0) e = -e;
+                return e+c*z;
+        } else nrerror("Bad qqc in routine EL2");
+}

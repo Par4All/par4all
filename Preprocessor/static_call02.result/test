@@ -32,6 +32,8 @@ static void foo(int i)
 }
 int main()
 {
+   extern int foo(int );
+   extern int bar(int );
    foo(3);
    bar(3);
 }
@@ -70,6 +72,8 @@ static void foo(int i)
 }
 int main()
 {
+   extern int foo(int );
+   extern int bar(int );
    foo(3);
    bar(3);
 }
@@ -310,6 +314,8 @@ Declarations for module "main" with type "() -> int"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:bar" with type "functional" "int -> int"
+	Declared entity "TOP-LEVEL:foo" with type "functional" "int -> int"
 	Declared entity "main:*DYNAMIC*" with type "area" with size 0
 	Declared entity "main:*STACK*" with type "area" with size 0
 	Declared entity "main:*STATIC*" with type "area" with size 0

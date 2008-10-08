@@ -1,3 +1,4 @@
+extern float midpnt();
 # 1
 float midpnt(func,a,b,n)
 float a,b;
@@ -29,8 +30,3 @@ float (*func)(); /* ANSI: float (*func)(float); */
                 return s;
         }
 }
-# 1 "$VDIR/midpnt.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/midpnt.c"
-extern float midpnt();

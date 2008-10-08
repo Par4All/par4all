@@ -20,8 +20,4 @@ int main()
 
   return 0;
 }
-# 1 "$VDIR/struct_noname.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/struct_noname.c"
 extern int main();

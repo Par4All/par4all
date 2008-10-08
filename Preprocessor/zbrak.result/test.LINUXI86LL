@@ -1,3 +1,4 @@
+extern void zbrak();
 # 1
 void zbrak(fx,x1,x2,n,xb1,xb2,nb)
 float x1,x2,xb1[],xb2[];
@@ -21,8 +22,3 @@ int n,*nb;
                 if (nbb == (*nb)) return;
         }
 }
-# 1 "$VDIR/zbrak.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/zbrak.c"
-extern void zbrak();

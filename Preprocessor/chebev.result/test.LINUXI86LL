@@ -1,3 +1,4 @@
+extern float chebev();
 # 1
 float chebev(a,b,c,m,x)
 float a,b,c[],x;
@@ -16,8 +17,3 @@ int m;
         }
         return y*d-dd+0.5*c[0];
 }
-# 1 "$VDIR/chebev.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/chebev.c"
-extern float chebev();

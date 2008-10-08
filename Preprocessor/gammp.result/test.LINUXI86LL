@@ -1,3 +1,4 @@
+extern float gammp();
 # 1
 float gammp(a,x)
 float a,x;
@@ -14,8 +15,3 @@ float a,x;
                 return 1.0-gammcf;
         }
 }
-# 1 "$VDIR/gammp.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/gammp.c"
-extern float gammp();

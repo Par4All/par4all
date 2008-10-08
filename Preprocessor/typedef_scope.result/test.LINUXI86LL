@@ -22,10 +22,6 @@ main()
   n = 5;
   printf("Test\n");
 }
-# 1 "$VDIR/typedef_scope.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/typedef_scope.c"
 typedef int node;
 
 extern main();

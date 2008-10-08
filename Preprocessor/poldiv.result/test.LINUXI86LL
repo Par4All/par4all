@@ -1,3 +1,4 @@
+extern void poldiv();
 # 1
 void poldiv(u,n,v,nv,q,r)
 float u[],v[],q[],r[];
@@ -16,8 +17,3 @@ int n,nv;
         }
         r[nv]=0.0;
 }
-# 1 "$VDIR/poldiv.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/poldiv.c"
-extern void poldiv();

@@ -1,3 +1,4 @@
+extern float ran1();
 # 1
 float ran1(idum)
 int *idum;
@@ -32,8 +33,3 @@ int *idum;
         r[j]=(ix1+ix2*(1.0/134456))*(1.0/259200);
         return temp;
 }
-# 1 "$VDIR/ran1.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/ran1.c"
-extern float ran1();

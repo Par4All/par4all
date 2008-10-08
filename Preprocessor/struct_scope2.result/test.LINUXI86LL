@@ -3,8 +3,4 @@ bar ()
 {
   extern struct s x;
 }
-# 1 "$VDIR/struct_scope2.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/struct_scope2.c"
 extern bar();

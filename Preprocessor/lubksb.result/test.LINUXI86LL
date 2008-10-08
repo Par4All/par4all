@@ -1,3 +1,4 @@
+extern void lubksb();
 # 1
 void lubksb(a,n,indx,b)
 float **a,b[];
@@ -21,8 +22,3 @@ int n,*indx;
                 b[i]=sum/a[i][i];
         }
 }
-# 1 "$VDIR/lubksb.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/lubksb.c"
-extern void lubksb();

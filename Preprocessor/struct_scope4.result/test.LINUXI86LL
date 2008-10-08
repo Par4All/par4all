@@ -8,8 +8,4 @@ main()
 {
   struct toto y;
 }
-# 1 "$VDIR/struct_scope4.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/struct_scope4.c"
 extern bstruct toto { float f; } main();

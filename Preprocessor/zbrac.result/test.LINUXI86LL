@@ -1,28 +1,3 @@
-# 1270
-int zbrac(func,x1,x2)
-float *x1,*x2;
-float (*func)(); /* ANSI: float (*func)(float); */
-{
-        int j;
-        float f1,f2;
-        void nrerror();
-
-        if (*x1 == *x2) nrerror("Bad initial range in ZBRAC");
-        f1=(*func)(*x1);
-        f2=(*func)(*x2);
-        for (j=1;j<=50;j++) {
-                if (f1*f2 < 0.0) return 1;
-                if (fabs(f1) < fabs(f2))
-                        f1=(*func)(*x1 += 1.6*(*x1-*x2));
-                else
-                        f2=(*func)(*x2 += 1.6*(*x2-*x1));
-        }
-        return 0;
-}
-# 1 "$VDIR/zbrac.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/zbrac.c"
 /* Declarations for math functions.
    Copyright (C) 1991-1993,1995-1999,2001,2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1286,3 +1261,24 @@ extern int matherr (struct exception *__exc);
 /* Get machine-dependent inline versions (if there are any).  */
 # 1270 "$VDIR/zbrac.c"
 extern int zbrac();
+# 1270
+int zbrac(func,x1,x2)
+float *x1,*x2;
+float (*func)(); /* ANSI: float (*func)(float); */
+{
+        int j;
+        float f1,f2;
+        void nrerror();
+
+        if (*x1 == *x2) nrerror("Bad initial range in ZBRAC");
+        f1=(*func)(*x1);
+        f2=(*func)(*x2);
+        for (j=1;j<=50;j++) {
+                if (f1*f2 < 0.0) return 1;
+                if (fabs(f1) < fabs(f2))
+                        f1=(*func)(*x1 += 1.6*(*x1-*x2));
+                else
+                        f2=(*func)(*x2 += 1.6*(*x2-*x1));
+        }
+        return 0;
+}

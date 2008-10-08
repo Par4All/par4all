@@ -2,10 +2,6 @@
 extern foo()
 {
 }
-# 1 "$VDIR/function_scope3.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/function_scope3.c"
 static foo();
 
 extern foo();

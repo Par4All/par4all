@@ -1,7 +1,3 @@
-# 1 "$VDIR/char.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/char.c"
 extern main();
 # 1
 main()

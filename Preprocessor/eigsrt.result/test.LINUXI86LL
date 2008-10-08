@@ -1,3 +1,4 @@
+extern void eigsrt();
 # 1
 void eigsrt(d,v,n)
 float d[],**v;
@@ -21,8 +22,3 @@ int n;
                 }
         }
 }
-# 1 "$VDIR/eigsrt.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/eigsrt.c"
-extern void eigsrt();

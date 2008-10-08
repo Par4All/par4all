@@ -1,3 +1,7 @@
+static float sqrarg;
+
+
+extern void lfit();
 # 4
 void lfit(x,y,sig,ndata,a,ma,lista,mfit,covar,chisq,funcs)
 int ndata,ma,lista[],mfit;
@@ -55,11 +59,3 @@ void (*funcs)(); /* ANSI: void (*funcs)(float,float *,int); */
         free_vector(afunc,1,ma);
         free_matrix(beta,1,ma,1,1);
 }
-# 1 "$VDIR/lfit.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/lfit.c"
-static float sqrarg;
-
-
-extern void lfit();

@@ -1,3 +1,6 @@
+extern float **d,*x; /* defined in BSSTEP */
+
+extern void pzextr();
 # 3
 void pzextr(iest,xest,yest,yz,dy,nv,nuse)
 int iest,nv,nuse;
@@ -33,10 +36,3 @@ float xest,yest[],yz[],dy[];
         }
         free_vector(c,1,nv);
 }
-# 1 "$VDIR/pzextr.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/pzextr.c"
-extern float **d,*x; /* defined in BSSTEP */
-
-extern void pzextr();

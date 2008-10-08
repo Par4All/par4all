@@ -1,3 +1,7 @@
+extern int mm,n,mpt; /* defined in SFROID */
+extern float h,c2,anorm,x[];
+
+extern void difeq();
 # 4
 void difeq(k,k1,k2,jsf,is1,isf,indexv,ne,s,y)
 int k,k1,k2,jsf,is1,isf,indexv[],ne;
@@ -55,11 +59,3 @@ float **s,**y;
                 s[3][jsf]=y[3][k]-y[3][k-1];
         }
 }
-# 1 "$VDIR/difeq.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/difeq.c"
-extern int mm,n,mpt; /* defined in SFROID */
-extern float h,c2,anorm,x[];
-
-extern void difeq();

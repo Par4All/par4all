@@ -51,8 +51,4 @@ int foo(int predicate )
     }
   return (333);
 }
-# 1 "$VDIR/switch01_goto.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/switch01_goto.c"
 extern int foo(int predicate);

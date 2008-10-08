@@ -1,30 +1,3 @@
-# 1270
-void shell(n,arr)
-float arr[];
-int n;
-{
-        int nn,m,j,i,lognb2;
-        float t;
-
-        lognb2=(log((double) n)*1.442695022 +1.0e-5);
-        m=n;
-        for (nn=1;nn<=lognb2;nn++) {
-                m >>= 1;
-                for (j=m+1;j<=n;j++) {
-                        i=j-m;
-                        t=arr[j];
-                        while (i >= 1 && arr[i] > t) {
-                                arr[i+m]=arr[i];
-                                i -= m;
-                        }
-                        arr[i+m]=t;
-                }
-        }
-}
-# 1 "$VDIR/shell.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/shell.c"
 /* Declarations for math functions.
    Copyright (C) 1991-1993,1995-1999,2001,2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1288,3 +1261,26 @@ extern int matherr (struct exception *__exc);
 /* Get machine-dependent inline versions (if there are any).  */
 # 1270 "$VDIR/shell.c"
 extern void shell();
+# 1270
+void shell(n,arr)
+float arr[];
+int n;
+{
+        int nn,m,j,i,lognb2;
+        float t;
+
+        lognb2=(log((double) n)*1.442695022 +1.0e-5);
+        m=n;
+        for (nn=1;nn<=lognb2;nn++) {
+                m >>= 1;
+                for (j=m+1;j<=n;j++) {
+                        i=j-m;
+                        t=arr[j];
+                        while (i >= 1 && arr[i] > t) {
+                                arr[i+m]=arr[i];
+                                i -= m;
+                        }
+                        arr[i+m]=t;
+                }
+        }
+}

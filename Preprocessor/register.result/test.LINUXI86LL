@@ -3,8 +3,4 @@ main()
 {
   register int i;
 }
-# 1 "$VDIR/register.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/register.c"
 extern main();

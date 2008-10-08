@@ -1,3 +1,4 @@
+extern void ddpoly();
 # 1
 void ddpoly(c,nc,x,pd,nd)
 int nc,nd;
@@ -19,8 +20,3 @@ float c[],x,pd[];
                 pd[i] *= cnst;
         }
 }
-# 1 "$VDIR/ddpoly.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/ddpoly.c"
-extern void ddpoly();

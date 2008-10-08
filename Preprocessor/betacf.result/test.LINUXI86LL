@@ -1,39 +1,3 @@
-# 1270
-float betacf(a,b,x)
-float a,b,x;
-{
-        float qap,qam,qab,em,tem,d;
-        float bz,bm=1.0,bp,bpp;
-        float az=1.0,am=1.0,ap,app,aold;
-        int m;
-        void nrerror();
-
-        qab=a+b;
-        qap=a+1.0;
-        qam=a-1.0;
-        bz=1.0-qab*x/qap;
-        for (m=1;m<=100;m++) {
-                em=(float) m;
-                tem=em+em;
-                d=em*(b-em)*x/((qam+tem)*(a+tem));
-                ap=az+d*am;
-                bp=bz+d*bm;
-                d = -(a+em)*(qab+em)*x/((qap+tem)*(a+tem));
-                app=ap+d*az;
-                bpp=bp+d*bz;
-                aold=az;
-                am=ap/bpp;
-                bm=bp/bpp;
-                az=app/bpp;
-                bz=1.0;
-                if (fabs(az-aold) < (3.0e-7*fabs(az))) return az;
-        }
-        nrerror("a or b too big, or ITMAX too small in BETACF");
-}
-# 1 "$VDIR/betacf.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/betacf.c"
 /* Declarations for math functions.
    Copyright (C) 1991-1993,1995-1999,2001,2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1297,3 +1261,35 @@ extern int matherr (struct exception *__exc);
 /* Get machine-dependent inline versions (if there are any).  */
 # 1270 "$VDIR/betacf.c"
 extern float betacf();
+# 1270
+float betacf(a,b,x)
+float a,b,x;
+{
+        float qap,qam,qab,em,tem,d;
+        float bz,bm=1.0,bp,bpp;
+        float az=1.0,am=1.0,ap,app,aold;
+        int m;
+        void nrerror();
+
+        qab=a+b;
+        qap=a+1.0;
+        qam=a-1.0;
+        bz=1.0-qab*x/qap;
+        for (m=1;m<=100;m++) {
+                em=(float) m;
+                tem=em+em;
+                d=em*(b-em)*x/((qam+tem)*(a+tem));
+                ap=az+d*am;
+                bp=bz+d*bm;
+                d = -(a+em)*(qab+em)*x/((qap+tem)*(a+tem));
+                app=ap+d*az;
+                bpp=bp+d*bz;
+                aold=az;
+                am=ap/bpp;
+                bm=bp/bpp;
+                az=app/bpp;
+                bz=1.0;
+                if (fabs(az-aold) < (3.0e-7*fabs(az))) return az;
+        }
+        nrerror("a or b too big, or ITMAX too small in BETACF");
+}

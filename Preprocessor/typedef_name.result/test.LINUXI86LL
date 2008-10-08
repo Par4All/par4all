@@ -8,8 +8,4 @@ main()
     int node;
   };
 }
-# 1 "$VDIR/typedef_name.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/typedef_name.c"
 extern main();

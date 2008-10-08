@@ -1,3 +1,7 @@
+/* See what happens with multiple parameter declarations on one line and
+   unordered declarations. This is OK with "gcc -c -ansi". */
+
+extern int csplit11();
 # 4
 int csplit11(i, pj, k, pl)
      int i, k;
@@ -7,11 +11,3 @@ int csplit11(i, pj, k, pl)
   *pj = i;
   *pl = k;
 }
-# 1 "$VDIR/csplit11.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/csplit11.c"
-/* See what happens with multiple parameter declarations on one line and
-   unordered declarations. This is OK with "gcc -c -ansi". */
-
-extern int csplit11();

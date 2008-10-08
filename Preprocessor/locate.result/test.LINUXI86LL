@@ -1,3 +1,4 @@
+extern void locate();
 # 1
 void locate(xx,n,x,j)
 float xx[],x;
@@ -17,8 +18,3 @@ int n,*j;
         }
         *j=jl;
 }
-# 1 "$VDIR/locate.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/locate.c"
-extern void locate();

@@ -1,3 +1,4 @@
+extern void bksub();
 # 1
 void bksub(ne,nb,jf,k1,k2,c)
 int ne,nb,jf,k1,k2;
@@ -23,8 +24,3 @@ float ***c;
                 for (i=1;i<=nbf;i++) c[i+nb][1][k]=c[i][jf][kp];
         }
 }
-# 1 "$VDIR/bksub.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/bksub.c"
-extern void bksub();

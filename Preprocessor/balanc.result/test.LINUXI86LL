@@ -1,49 +1,3 @@
-# 1269
-void balanc(a,n)
-float **a;
-int n;
-{
-        int last,j,i;
-        float s,r,g,f,c,sqrdx;
-
-        sqrdx=2.0*2.0;
-        last=0;
-        while (last == 0) {
-                last=1;
-                for (i=1;i<=n;i++) {
-                        r=c=0.0;
-                        for (j=1;j<=n;j++)
-                                if (j != i) {
-                                        c += fabs(a[j][i]);
-                                        r += fabs(a[i][j]);
-                                }
-                        if (c && r) {
-                                g=r/2.0;
-                                f=1.0;
-                                s=c+r;
-                                while (c<g) {
-                                        f *= 2.0;
-                                        c *= sqrdx;
-                                }
-                                g=r*2.0;
-                                while (c>g) {
-                                        f /= 2.0;
-                                        c /= sqrdx;
-                                }
-                                if ((c+r)/f < 0.95*s) {
-                                        last=0;
-                                        g=1.0/f;
-                                        for (j=1;j<=n;j++) a[i][j] *= g;
-                                        for (j=1;j<=n;j++) a[j][i] *= f;
-                                }
-                        }
-                }
-        }
-}
-# 1 "$VDIR/balanc.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/balanc.c"
 /* Declarations for math functions.
    Copyright (C) 1991-1993,1995-1999,2001,2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1313,3 +1267,45 @@ extern int matherr (struct exception *__exc);
 
 
 extern void balanc();
+# 1269
+void balanc(a,n)
+float **a;
+int n;
+{
+        int last,j,i;
+        float s,r,g,f,c,sqrdx;
+
+        sqrdx=2.0*2.0;
+        last=0;
+        while (last == 0) {
+                last=1;
+                for (i=1;i<=n;i++) {
+                        r=c=0.0;
+                        for (j=1;j<=n;j++)
+                                if (j != i) {
+                                        c += fabs(a[j][i]);
+                                        r += fabs(a[i][j]);
+                                }
+                        if (c && r) {
+                                g=r/2.0;
+                                f=1.0;
+                                s=c+r;
+                                while (c<g) {
+                                        f *= 2.0;
+                                        c *= sqrdx;
+                                }
+                                g=r*2.0;
+                                while (c>g) {
+                                        f /= 2.0;
+                                        c /= sqrdx;
+                                }
+                                if ((c+r)/f < 0.95*s) {
+                                        last=0;
+                                        g=1.0/f;
+                                        for (j=1;j<=n;j++) a[i][j] *= g;
+                                        for (j=1;j<=n;j++) a[j][i] *= f;
+                                }
+                        }
+                }
+        }
+}

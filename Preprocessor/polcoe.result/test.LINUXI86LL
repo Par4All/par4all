@@ -1,3 +1,4 @@
+extern void polcoe();
 # 1
 void polcoe(x,y,n,cof)
 float x[],y[],cof[];
@@ -28,8 +29,3 @@ int n;
         }
         free_vector(s,0,n);
 }
-# 1 "$VDIR/polcoe.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/polcoe.c"
-extern void polcoe();

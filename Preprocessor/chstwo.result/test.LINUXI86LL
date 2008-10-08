@@ -1,3 +1,4 @@
+extern void chstwo();
 # 1
 void chstwo(bins1,bins2,nbins,knstrn,df,chsq,prob)
 float bins1[],bins2[],*df,*chsq,*prob;
@@ -18,8 +19,3 @@ int nbins,knstrn;
                 }
         *prob=gammq(0.5*(*df),0.5*(*chsq));
 }
-# 1 "$VDIR/chstwo.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/chstwo.c"
-extern void chstwo();

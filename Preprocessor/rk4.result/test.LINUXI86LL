@@ -1,3 +1,4 @@
+extern void rk4();
 # 1
 void rk4(y,dydx,n,x,h,yout,derivs)
 float y[],dydx[],x,h,yout[];
@@ -29,8 +30,3 @@ int n;
         free_vector(dyt,1,n);
         free_vector(dym,1,n);
 }
-# 1 "$VDIR/rk4.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/rk4.c"
-extern void rk4();

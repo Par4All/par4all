@@ -16,7 +16,14 @@ echo
 display PARSED_PRINTED_FILE[generate08]
 
 echo
-echo Symbol table for generate 08
+echo Symbol table for "generate 08!"
+echo
+
+activate C_SYMBOL_TABLE
+display SYMBOL_TABLE_FILE[generate08!]
+
+echo
+echo Symbol table for "generate08"
 echo
 
 activate C_SYMBOL_TABLE

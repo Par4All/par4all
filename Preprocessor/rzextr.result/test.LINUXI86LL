@@ -1,3 +1,6 @@
+extern float **d,*x; /* defined in BSSTEP */
+
+extern void rzextr();
 # 3
 void rzextr(iest,xest,yest,yz,dy,nv,nuse)
 int iest,nv,nuse;
@@ -43,10 +46,3 @@ float xest,yest[],yz[],dy[];
         }
         free_vector(fx,1,nuse);
 }
-# 1 "$VDIR/rzextr.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/rzextr.c"
-extern float **d,*x; /* defined in BSSTEP */
-
-extern void rzextr();

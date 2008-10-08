@@ -1,3 +1,4 @@
+extern float ran3();
 # 1
 float ran3(idum)
 int *idum;
@@ -37,8 +38,3 @@ int *idum;
         ma[inext]=mj;
         return mj*(1.0/1000000000);
 }
-# 1 "$VDIR/ran3.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/ran3.c"
-extern float ran3();

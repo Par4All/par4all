@@ -1,37 +1,3 @@
-# 1270
-void gser(gamser,a,x,gln)
-float a,x,*gamser,*gln;
-{
-        int n;
-        float sum,del,ap;
-        float gammln();
-        void nrerror();
-
-        *gln=gammln(a);
-        if (x <= 0.0) {
-                if (x < 0.0) nrerror("x less than 0 in routine GSER");
-                *gamser=0.0;
-                return;
-        } else {
-                ap=a;
-                del=sum=1.0/a;
-                for (n=1;n<=100;n++) {
-                        ap += 1.0;
-                        del *= x/ap;
-                        sum += del;
-                        if (fabs(del) < fabs(sum)*3.0e-7) {
-                                *gamser=sum*exp(-x+a*log(x)-(*gln));
-                                return;
-                        }
-                }
-                nrerror("a too large, ITMAX too small in routine GSER");
-                return;
-        }
-}
-# 1 "$VDIR/gser.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/gser.c"
 /* Declarations for math functions.
    Copyright (C) 1991-1993,1995-1999,2001,2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1295,3 +1261,33 @@ extern int matherr (struct exception *__exc);
 /* Get machine-dependent inline versions (if there are any).  */
 # 1270 "$VDIR/gser.c"
 extern void gser();
+# 1270
+void gser(gamser,a,x,gln)
+float a,x,*gamser,*gln;
+{
+        int n;
+        float sum,del,ap;
+        float gammln();
+        void nrerror();
+
+        *gln=gammln(a);
+        if (x <= 0.0) {
+                if (x < 0.0) nrerror("x less than 0 in routine GSER");
+                *gamser=0.0;
+                return;
+        } else {
+                ap=a;
+                del=sum=1.0/a;
+                for (n=1;n<=100;n++) {
+                        ap += 1.0;
+                        del *= x/ap;
+                        sum += del;
+                        if (fabs(del) < fabs(sum)*3.0e-7) {
+                                *gamser=sum*exp(-x+a*log(x)-(*gln));
+                                return;
+                        }
+                }
+                nrerror("a too large, ITMAX too small in routine GSER");
+                return;
+        }
+}

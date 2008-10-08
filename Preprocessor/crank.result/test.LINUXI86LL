@@ -1,3 +1,4 @@
+extern void crank();
 # 1
 void crank(n,w,s)
 float w[],*s;
@@ -23,8 +24,3 @@ int n;
         }
         if (j == n) w[n]=n;
 }
-# 1 "$VDIR/crank.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/crank.c"
-extern void crank();

@@ -1,3 +1,8 @@
+extern int ncom; /* defined in DLINMIN */
+extern float *pcom,*xicom,(*nrfunc)();
+extern void (*nrdfun)();
+
+extern float df1dim();
 # 5
 float df1dim(x)
 float x;
@@ -16,12 +21,3 @@ float x;
         free_vector(xt,1,ncom);
         return df1;
 }
-# 1 "$VDIR/df1dim.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/df1dim.c"
-extern int ncom; /* defined in DLINMIN */
-extern float *pcom,*xicom,(*nrfunc)();
-extern void (*nrdfun)();
-
-extern float df1dim();

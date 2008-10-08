@@ -1,26 +1,3 @@
-# 1267
-float gammln(xx)
-float xx;
-{
-        double x,tmp,ser;
-        static double cof[6]={76.18009173,-86.50532033,24.01409822,
-                -1.231739516,0.120858003e-2,-0.536382e-5};
-        int j;
-
-        x=xx-1.0;
-        tmp=x+5.5;
-        tmp -= (x+0.5)*log(tmp);
-        ser=1.0;
-        for (j=0;j<=5;j++) {
-                x += 1.0;
-                ser += cof[j]/x;
-        }
-        return -tmp+log(2.50662827465*ser);
-}
-# 1 "$VDIR/gammln.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/gammln.c"
 /* Declarations for math functions.
    Copyright (C) 1991-1993,1995-1999,2001,2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1288,3 +1265,22 @@ extern int matherr (struct exception *__exc);
 
 
 extern float gammln();
+# 1267
+float gammln(xx)
+float xx;
+{
+        double x,tmp,ser;
+        static double cof[6]={76.18009173,-86.50532033,24.01409822,
+                -1.231739516,0.120858003e-2,-0.536382e-5};
+        int j;
+
+        x=xx-1.0;
+        tmp=x+5.5;
+        tmp -= (x+0.5)*log(tmp);
+        ser=1.0;
+        for (j=0;j<=5;j++) {
+                x += 1.0;
+                ser += cof[j]/x;
+        }
+        return -tmp+log(2.50662827465*ser);
+}

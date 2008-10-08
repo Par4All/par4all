@@ -7,8 +7,4 @@ main()
       c -= 1;
     }
 }
-# 1 "$VDIR/while.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/while.c"
 extern main();

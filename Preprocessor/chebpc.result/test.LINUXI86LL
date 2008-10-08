@@ -1,3 +1,4 @@
+extern void chebpc();
 # 1
 void chebpc(c,d,n)
 float c[],d[];
@@ -25,8 +26,3 @@ int n;
         d[0] = -dd[0]+0.5*c[0];
         free_vector(dd,0,n-1);
 }
-# 1 "$VDIR/chebpc.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/chebpc.c"
-extern void chebpc();

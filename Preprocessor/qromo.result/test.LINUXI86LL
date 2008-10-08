@@ -1,29 +1,3 @@
-# 1263
-float qromo(func,a,b,choose)
-float a,b;
-float (*func)();
-float (*choose)(); /* ANSI: float choose(float(*)(float),float,float,int); */
-{
-        int j;
-        float ss,dss,h[14 +1 +1],s[14 +1 +1];
-        void polint(),nrerror();
-
-        h[1]=1.0;
-        for (j=1;j<=14;j++) {
-                s[j]=(*choose)(func,a,b,j);
-                if (j >= 5) {
-                        polint(&h[j-5],&s[j-5],5,0.0,&ss,&dss);
-                        if (fabs(dss) < 1.0e-6*fabs(ss)) return ss;
-                }
-                s[j+1]=s[j];
-                h[j+1]=h[j]/9.0;
-        }
-        nrerror("Too many steps in routing QROMO");
-}
-# 1 "$VDIR/qromo.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/qromo.c"
 /* Declarations for math functions.
    Copyright (C) 1991-1993,1995-1999,2001,2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1287,3 +1261,25 @@ extern int matherr (struct exception *__exc);
 /* Get machine-dependent inline versions (if there are any).  */
 
 extern float qromo();
+# 1263
+float qromo(func,a,b,choose)
+float a,b;
+float (*func)();
+float (*choose)(); /* ANSI: float choose(float(*)(float),float,float,int); */
+{
+        int j;
+        float ss,dss,h[14 +1 +1],s[14 +1 +1];
+        void polint(),nrerror();
+
+        h[1]=1.0;
+        for (j=1;j<=14;j++) {
+                s[j]=(*choose)(func,a,b,j);
+                if (j >= 5) {
+                        polint(&h[j-5],&s[j-5],5,0.0,&ss,&dss);
+                        if (fabs(dss) < 1.0e-6*fabs(ss)) return ss;
+                }
+                s[j+1]=s[j];
+                h[j+1]=h[j]/9.0;
+        }
+        nrerror("Too many steps in routing QROMO");
+}

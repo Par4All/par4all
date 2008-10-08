@@ -1,3 +1,4 @@
+extern void sort3();
 # 1
 void sort3(n,ra,rb,rc)
 int n;
@@ -19,8 +20,3 @@ float ra[],rb[],rc[];
         free_vector(wksp,1,n);
         free_ivector(iwksp,1,n);
 }
-# 1 "$VDIR/sort3.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/sort3.c"
-extern void sort3();

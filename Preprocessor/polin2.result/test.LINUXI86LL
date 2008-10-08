@@ -1,3 +1,4 @@
+extern void polin2();
 # 1
 void polin2(x1a,x2a,ya,m,n,x1,x2,y,dy)
 float x1a[],x2a[],**ya,x1,x2,*y,*dy;
@@ -14,8 +15,3 @@ int m,n;
         polint(x1a,ymtmp,m,x1,y,dy);
         free_vector(ymtmp,1,m);
 }
-# 1 "$VDIR/polin2.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/polin2.c"
-extern void polin2();

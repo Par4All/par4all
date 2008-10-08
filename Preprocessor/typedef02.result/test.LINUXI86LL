@@ -19,8 +19,4 @@ main()
   typedef tata titi;
   n = 1;
 }
-# 1 "$VDIR/typedef02.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/typedef02.c"
 extern main();

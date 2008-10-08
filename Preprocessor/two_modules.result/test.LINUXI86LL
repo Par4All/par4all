@@ -16,10 +16,6 @@ main()
   MYINT m;
   n = 1;
 }
-# 1 "$VDIR/two_modules.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/two_modules.c"
 int g;
 
 extern void foo();

@@ -1,30 +1,3 @@
-# 1271
-void ksone(data,n,func,d,prob)
-float data[],*d,*prob;
-float (*func)(); /* ANSI: float (*func)(float); */
-int n;
-{
-        int j;
-        float fo=0.0,fn,ff,en,dt;
-        void sort();
-        float probks();
-
-        sort(n,data);
-        en=n;
-        *d=0.0;
-        for (j=1;j<=n;j++) {
-                fn=j/en;
-                ff=(*func)(data[j]);
-                dt = (maxarg1=(fabs(fo-ff)),maxarg2=(fabs(fn-ff)),(maxarg1) > (maxarg2) ? (maxarg1) : (maxarg2));
-                if (dt > *d) *d=dt;
-                fo=fn;
-        }
-        *prob=probks(sqrt(en)*(*d));
-}
-# 1 "$VDIR/ksone.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/ksone.c"
 /* Declarations for math functions.
    Copyright (C) 1991-1993,1995-1999,2001,2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1296,3 +1269,26 @@ static float maxarg1,maxarg2;
 
 
 extern void ksone();
+# 1271
+void ksone(data,n,func,d,prob)
+float data[],*d,*prob;
+float (*func)(); /* ANSI: float (*func)(float); */
+int n;
+{
+        int j;
+        float fo=0.0,fn,ff,en,dt;
+        void sort();
+        float probks();
+
+        sort(n,data);
+        en=n;
+        *d=0.0;
+        for (j=1;j<=n;j++) {
+                fn=j/en;
+                ff=(*func)(data[j]);
+                dt = (maxarg1=(fabs(fo-ff)),maxarg2=(fabs(fn-ff)),(maxarg1) > (maxarg2) ? (maxarg1) : (maxarg2));
+                if (dt > *d) *d=dt;
+                fo=fn;
+        }
+        *prob=probks(sqrt(en)*(*d));
+}

@@ -1,39 +1,3 @@
-# 1269
-float midsql(funk,aa,bb,n)
-float aa,bb;
-int n;
-float (*funk)(); /* ANSI: float (*funk)(float); */
-{
-        float x,tnm,sum,del,ddel,b,a;
-        static float s;
-        static int it;
-        int j;
-
-        b=sqrt(bb-aa);
-        a=0.0;
-        if (n == 1) {
-                it=1;
-                return (s=(b-a)*(2.0*(0.5*(a+b))*(*funk)(aa+(0.5*(a+b))*(0.5*(a+b)))));
-        } else {
-                tnm=it;
-                del=(b-a)/(3.0*tnm);
-                ddel=del+del;
-                x=a+0.5*del;
-                sum=0.0;
-                for (j=1;j<=it;j++) {
-                        sum += (2.0*(x)*(*funk)(aa+(x)*(x)));
-                        x += ddel;
-                        sum += (2.0*(x)*(*funk)(aa+(x)*(x)));
-                        x += del;
-                }
-                it *= 3;
-                return (s=(s+(b-a)*sum/tnm)/3.0);
-        }
-}
-# 1 "$VDIR/midsql.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/midsql.c"
 /* Declarations for math functions.
    Copyright (C) 1991-1993,1995-1999,2001,2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1303,3 +1267,35 @@ extern int matherr (struct exception *__exc);
 
 
 extern float midsql();
+# 1269
+float midsql(funk,aa,bb,n)
+float aa,bb;
+int n;
+float (*funk)(); /* ANSI: float (*funk)(float); */
+{
+        float x,tnm,sum,del,ddel,b,a;
+        static float s;
+        static int it;
+        int j;
+
+        b=sqrt(bb-aa);
+        a=0.0;
+        if (n == 1) {
+                it=1;
+                return (s=(b-a)*(2.0*(0.5*(a+b))*(*funk)(aa+(0.5*(a+b))*(0.5*(a+b)))));
+        } else {
+                tnm=it;
+                del=(b-a)/(3.0*tnm);
+                ddel=del+del;
+                x=a+0.5*del;
+                sum=0.0;
+                for (j=1;j<=it;j++) {
+                        sum += (2.0*(x)*(*funk)(aa+(x)*(x)));
+                        x += ddel;
+                        sum += (2.0*(x)*(*funk)(aa+(x)*(x)));
+                        x += del;
+                }
+                it *= 3;
+                return (s=(s+(b-a)*sum/tnm)/3.0);
+        }
+}

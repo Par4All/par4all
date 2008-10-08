@@ -1,3 +1,4 @@
+extern float trapzd();
 # 1
 float trapzd(func,a,b,n)
 float a,b;
@@ -22,8 +23,3 @@ int n;
                 return s;
         }
 }
-# 1 "$VDIR/trapzd.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/trapzd.c"
-extern float trapzd();

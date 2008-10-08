@@ -1,3 +1,4 @@
+extern void toeplz();
 # 1
 void toeplz(r,x,y,n)
 float r[],x[],y[];
@@ -55,8 +56,3 @@ int n;
         }
         nrerror("TOEPLZ - should not arrive here!");
 }
-# 1 "$VDIR/toeplz.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/toeplz.c"
-extern void toeplz();

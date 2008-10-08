@@ -14,8 +14,4 @@ main()
   i2 = 2;
   i8 = 8;
 }
-# 1 "$VDIR/unsigned.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/unsigned.c"
 extern main();

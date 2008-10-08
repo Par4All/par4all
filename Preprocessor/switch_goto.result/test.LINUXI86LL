@@ -12,8 +12,4 @@ main()
  labdefault: ;
  switch_exit:;
 }
-# 1 "$VDIR/switch_goto.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/switch_goto.c"
 extern main();

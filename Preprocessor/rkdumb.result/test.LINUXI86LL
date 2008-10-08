@@ -1,3 +1,6 @@
+float **y=0,*xx=0; /* defining declaration */
+
+extern void rkdumb();
 # 3
 void rkdumb(vstart,nvar,x1,x2,nstep,derivs)
 int nvar,nstep;
@@ -34,10 +37,3 @@ void (*derivs)(); /* ANSI: void (*derivs)(float,float *,float *); */
         free_vector(vout,1,nvar);
         free_vector(v,1,nvar);
 }
-# 1 "$VDIR/rkdumb.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/rkdumb.c"
-float **y=0,*xx=0; /* defining declaration */
-
-extern void rkdumb();

@@ -1,28 +1,3 @@
-# 1267
-void simp1(a,mm,ll,nll,iabf,kp,bmax)
-float **a,*bmax;
-int mm,ll[],nll,iabf,*kp;
-{
-        int k;
-        float test;
-
-        *kp=ll[1];
-        *bmax=a[mm+1][*kp+1];
-        for (k=2;k<=nll;k++) {
-                if (iabf == 0)
-                        test=a[mm+1][ll[k]+1]-(*bmax);
-                else
-                        test=fabs(a[mm+1][ll[k]+1])-fabs(*bmax);
-                if (test > 0.0) {
-                        *bmax=a[mm+1][ll[k]+1];
-                        *kp=ll[k];
-                }
-        }
-}
-# 1 "$VDIR/simp1.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/simp1.c"
 /* Declarations for math functions.
    Copyright (C) 1991-1993,1995-1999,2001,2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1290,3 +1265,24 @@ extern int matherr (struct exception *__exc);
 
 
 extern void simp1();
+# 1267
+void simp1(a,mm,ll,nll,iabf,kp,bmax)
+float **a,*bmax;
+int mm,ll[],nll,iabf,*kp;
+{
+        int k;
+        float test;
+
+        *kp=ll[1];
+        *bmax=a[mm+1][*kp+1];
+        for (k=2;k<=nll;k++) {
+                if (iabf == 0)
+                        test=a[mm+1][ll[k]+1]-(*bmax);
+                else
+                        test=fabs(a[mm+1][ll[k]+1])-fabs(*bmax);
+                if (test > 0.0) {
+                        *bmax=a[mm+1][ll[k]+1];
+                        *kp=ll[k];
+                }
+        }
+}

@@ -24,10 +24,6 @@ main()
     }
   printf("Test\n");
 }
-# 1 "$VDIR/struct_scope.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/struct_scope.c"
 struct key
   {
     int node;

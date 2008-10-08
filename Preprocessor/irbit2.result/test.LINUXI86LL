@@ -1,3 +1,4 @@
+extern int irbit2();
 # 1
 int irbit2(iseed)
 unsigned long *iseed;
@@ -10,8 +11,3 @@ unsigned long *iseed;
                 return 0;
         }
 }
-# 1 "$VDIR/irbit2.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/irbit2.c"
-extern int irbit2();

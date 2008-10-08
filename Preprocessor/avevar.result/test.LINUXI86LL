@@ -1,3 +1,4 @@
+extern void avevar();
 # 1
 void avevar(data,n,ave,svar)
 float data[],*ave,*svar;
@@ -15,8 +16,3 @@ int n;
         }
         *svar /= (n-1);
 }
-# 1 "$VDIR/avevar.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/avevar.c"
-extern void avevar();

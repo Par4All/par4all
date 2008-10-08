@@ -9,8 +9,4 @@ main()
 
   union x y;
 }
-# 1 "$VDIR/union.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/union.c"
 extern main();

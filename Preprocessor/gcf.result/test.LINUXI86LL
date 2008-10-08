@@ -1,39 +1,3 @@
-# 1270
-void gcf(gammcf,a,x,gln)
-float a,x,*gammcf,*gln;
-{
-        int n;
-        float gold=0.0,g,fac=1.0,b1=1.0;
-        float b0=0.0,anf,ana,an,a1,a0=1.0;
-        float gammln();
-        void nrerror();
-
-        *gln=gammln(a);
-        a1=x;
-        for (n=1;n<=100;n++) {
-                an=(float) n;
-                ana=an-a;
-                a0=(a1+a0*ana)*fac;
-                b0=(b1+b0*ana)*fac;
-                anf=an*fac;
-                a1=x*a0+anf*a1;
-                b1=x*b0+anf*b1;
-                if (a1) {
-                        fac=1.0/a1;
-                        g=b1*fac;
-                        if (fabs((g-gold)/g) < 3.0e-7) {
-                                *gammcf=exp(-x+a*log(x)-(*gln))*g;
-                                return;
-                        }
-                        gold=g;
-                }
-        }
-        nrerror("a too large, ITMAX too small in routine GCF");
-}
-# 1 "$VDIR/gcf.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/gcf.c"
 /* Declarations for math functions.
    Copyright (C) 1991-1993,1995-1999,2001,2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1297,3 +1261,35 @@ extern int matherr (struct exception *__exc);
 /* Get machine-dependent inline versions (if there are any).  */
 # 1270 "$VDIR/gcf.c"
 extern void gcf();
+# 1270
+void gcf(gammcf,a,x,gln)
+float a,x,*gammcf,*gln;
+{
+        int n;
+        float gold=0.0,g,fac=1.0,b1=1.0;
+        float b0=0.0,anf,ana,an,a1,a0=1.0;
+        float gammln();
+        void nrerror();
+
+        *gln=gammln(a);
+        a1=x;
+        for (n=1;n<=100;n++) {
+                an=(float) n;
+                ana=an-a;
+                a0=(a1+a0*ana)*fac;
+                b0=(b1+b0*ana)*fac;
+                anf=an*fac;
+                a1=x*a0+anf*a1;
+                b1=x*b0+anf*b1;
+                if (a1) {
+                        fac=1.0/a1;
+                        g=b1*fac;
+                        if (fabs((g-gold)/g) < 3.0e-7) {
+                                *gammcf=exp(-x+a*log(x)-(*gln))*g;
+                                return;
+                        }
+                        gold=g;
+                }
+        }
+        nrerror("a too large, ITMAX too small in routine GCF");
+}

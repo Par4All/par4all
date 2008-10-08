@@ -1,3 +1,4 @@
+extern void simplx();
 # 1
 void simplx(a,m,n,m1,m2,m3,icase,izrov,iposv)
 int m,n,m1,m2,m3,*icase,izrov[],iposv[];
@@ -101,8 +102,3 @@ one: simp3(a,m+1,n,ip,kp);
                 iposv[ip]=is;
         }
 }
-# 1 "$VDIR/simplx.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/simplx.c"
-extern void simplx();

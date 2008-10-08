@@ -1,3 +1,4 @@
+extern float qgaus();
 # 1
 float qgaus(func,a,b)
 float a,b;
@@ -19,8 +20,3 @@ float (*func)(); /* ANSI: float (*func)(float); */
         }
         return s *= xr;
 }
-# 1 "$VDIR/qgaus.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/qgaus.c"
-extern float qgaus();

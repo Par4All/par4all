@@ -1,3 +1,4 @@
+extern void twofft();
 # 1
 void twofft(data1,data2,fft1,fft2,n)
 float data1[],data2[],fft1[],fft2[];
@@ -30,8 +31,3 @@ int n;
                 fft2[nn3-j]=rem;
         }
 }
-# 1 "$VDIR/twofft.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/twofft.c"
-extern void twofft();

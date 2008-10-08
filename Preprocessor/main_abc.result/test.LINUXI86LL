@@ -4,8 +4,4 @@ main()
   int a,b,c;
   a = b + c;
 }
-# 1 "$VDIR/main_abc.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/main_abc.c"
 extern main();

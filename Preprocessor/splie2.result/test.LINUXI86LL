@@ -1,3 +1,4 @@
+extern void splie2();
 # 1
 void splie2(x1a,x2a,ya,m,n,y2a)
 float x1a[],x2a[],**ya,**y2a;
@@ -9,8 +10,3 @@ int m,n;
         for (j=1;j<=m;j++)
                 spline(x2a,ya[j],n,1.0e30,1.0e30,y2a[j]);
 }
-# 1 "$VDIR/splie2.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/splie2.c"
-extern void splie2();

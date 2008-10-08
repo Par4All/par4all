@@ -1,7 +1,3 @@
-# 1 "$VDIR/extern.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/extern.c"
 extern int foo(int i);
 extern main();
 # 2

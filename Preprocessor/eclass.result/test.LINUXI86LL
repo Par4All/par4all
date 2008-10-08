@@ -1,3 +1,4 @@
+extern void eclass();
 # 1
 void eclass(nf,n,lista,listb,m)
 int nf[],lista[],listb[],n,m;
@@ -15,8 +16,3 @@ int nf[],lista[],listb[],n,m;
         for (j=1;j<=n;j++)
                 while (nf[j] != nf[nf[j]]) nf[j]=nf[nf[j]];
 }
-# 1 "$VDIR/eclass.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/eclass.c"
-extern void eclass();

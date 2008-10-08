@@ -1,3 +1,4 @@
+extern float bessy();
 # 1
 float bessy(n,x)
 int n;
@@ -19,8 +20,3 @@ float x;
         }
         return by;
 }
-# 1 "$VDIR/bessy.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/bessy.c"
-extern float bessy();

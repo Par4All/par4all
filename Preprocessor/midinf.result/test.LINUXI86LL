@@ -1,3 +1,4 @@
+extern float midinf();
 # 1
 float midinf(funk,aa,bb,n)
 float aa,bb;
@@ -30,8 +31,3 @@ float (*funk)(); /* ANSI: float (*funk)(float); */
                 return (s=(s+(b-a)*sum/tnm)/3.0);
         }
 }
-# 1 "$VDIR/midinf.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/midinf.c"
-extern float midinf();

@@ -1,42 +1,3 @@
-# 1263
-float golden(ax,bx,cx,f,tol,xmin)
-float ax,bx,cx,tol,*xmin;
-float (*f)(); /* ANSI: float (*f)(float); */
-{
-        float f0,f1,f2,f3,x0,x1,x2,x3;
-
-        x0=ax;
-        x3=cx;
-        if (fabs(cx-bx) > fabs(bx-ax)) {
-                x1=bx;
-                x2=bx+(1.0-0.61803399)*(cx-bx);
-        } else {
-                x2=bx;
-                x1=bx-(1.0-0.61803399)*(bx-ax);
-        }
-        f1=(*f)(x1);
-        f2=(*f)(x2);
-        while (fabs(x3-x0) > tol*(fabs(x1)+fabs(x2))) {
-                if (f2 < f1) {
-                        (x0)=(x1);(x1)=(x2);(x2)=(0.61803399*x1+(1.0-0.61803399)*x3);
-                        (f0)=(f1);(f1)=(f2);(f2)=((*f)(x2));
-                } else {
-                        (x3)=(x2);(x2)=(x1);(x1)=(0.61803399*x2+(1.0-0.61803399)*x0);
-                        (f3)=(f2);(f2)=(f1);(f1)=((*f)(x1));
-                }
-        }
-        if (f1 < f2) {
-                *xmin=x1;
-                return f1;
-        } else {
-                *xmin=x2;
-                return f2;
-        }
-}
-# 1 "$VDIR/golden.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/golden.c"
 /* Declarations for math functions.
    Copyright (C) 1991-1993,1995-1999,2001,2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1300,3 +1261,38 @@ extern int matherr (struct exception *__exc);
 /* Get machine-dependent inline versions (if there are any).  */
 
 extern float golden();
+# 1263
+float golden(ax,bx,cx,f,tol,xmin)
+float ax,bx,cx,tol,*xmin;
+float (*f)(); /* ANSI: float (*f)(float); */
+{
+        float f0,f1,f2,f3,x0,x1,x2,x3;
+
+        x0=ax;
+        x3=cx;
+        if (fabs(cx-bx) > fabs(bx-ax)) {
+                x1=bx;
+                x2=bx+(1.0-0.61803399)*(cx-bx);
+        } else {
+                x2=bx;
+                x1=bx-(1.0-0.61803399)*(bx-ax);
+        }
+        f1=(*f)(x1);
+        f2=(*f)(x2);
+        while (fabs(x3-x0) > tol*(fabs(x1)+fabs(x2))) {
+                if (f2 < f1) {
+                        (x0)=(x1);(x1)=(x2);(x2)=(0.61803399*x1+(1.0-0.61803399)*x3);
+                        (f0)=(f1);(f1)=(f2);(f2)=((*f)(x2));
+                } else {
+                        (x3)=(x2);(x2)=(x1);(x1)=(0.61803399*x2+(1.0-0.61803399)*x0);
+                        (f3)=(f2);(f2)=(f1);(f1)=((*f)(x1));
+                }
+        }
+        if (f1 < f2) {
+                *xmin=x1;
+                return f1;
+        } else {
+                *xmin=x2;
+                return f2;
+        }
+}

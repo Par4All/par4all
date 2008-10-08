@@ -1,3 +1,7 @@
+static float sqrarg;
+
+
+extern void convlv();
 # 4
 void convlv(data,n,respns,m,isign,ans)
 float data[],respns[],ans[];
@@ -29,11 +33,3 @@ int n,m,isign;
         realft(ans,no2,-1);
         free_vector(fft,1,2*n);
 }
-# 1 "$VDIR/convlv.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/convlv.c"
-static float sqrarg;
-
-
-extern void convlv();

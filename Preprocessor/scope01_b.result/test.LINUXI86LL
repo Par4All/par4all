@@ -3,9 +3,5 @@ void foo()
 {
   printf("%d\n",i);
 }
-# 1 "$VDIR/scope01_b.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/scope01_b.c"
 int i = 1;
 extern void foo();

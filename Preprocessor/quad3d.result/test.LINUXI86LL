@@ -24,19 +24,6 @@ float z;
 {
         return (*nrfunc)(xsav,ysav,z);
 }
-# 4
-float quad3d(func,x1,x2)
-float x1,x2,(*func)();
-{
-        float qgaus(),f1();
-
-        nrfunc=func;
-        return qgaus(f1,x1,x2);
-}
-# 1 "$VDIR/quad3d.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/quad3d.c"
 static float xsav,ysav;
 static float (*nrfunc)(); /* ANSI: static float (*nrfunc)(float,float,float); */
 
@@ -47,3 +34,12 @@ extern float f1();
 extern float f2();
 
 extern float f3();
+# 4
+float quad3d(func,x1,x2)
+float x1,x2,(*func)();
+{
+        float qgaus(),f1();
+
+        nrfunc=func;
+        return qgaus(f1,x1,x2);
+}

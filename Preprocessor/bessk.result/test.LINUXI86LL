@@ -1,3 +1,4 @@
+extern float bessk();
 # 1
 float bessk(n,x)
 int n;
@@ -19,8 +20,3 @@ float x;
         }
         return bk;
 }
-# 1 "$VDIR/bessk.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/bessk.c"
-extern float bessk();

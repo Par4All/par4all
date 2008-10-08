@@ -1,3 +1,4 @@
+extern void simp3();
 # 1
 void simp3(a,i1,k1,ip,kp)
 int i1,k1,ip,kp;
@@ -18,8 +19,3 @@ float **a;
                 if (kk-1 != kp) a[ip+1][kk] *= -piv;
         a[ip+1][kp+1]=piv;
 }
-# 1 "$VDIR/simp3.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/simp3.c"
-extern void simp3();

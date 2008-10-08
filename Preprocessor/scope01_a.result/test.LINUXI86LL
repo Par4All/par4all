@@ -4,9 +4,5 @@ main()
   printf("%d\n",i);
   foo();
 }
-# 1 "$VDIR/scope01_a.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/scope01_a.c"
 int i = 1;
 extern main();

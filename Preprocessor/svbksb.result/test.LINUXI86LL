@@ -1,3 +1,4 @@
+extern void svbksb();
 # 1
 void svbksb(u,w,v,m,n,b,x)
 float **u,w[],**v,b[],x[];
@@ -23,8 +24,3 @@ int m,n;
         }
         free_vector(tmp,1,n);
 }
-# 1 "$VDIR/svbksb.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/svbksb.c"
-extern void svbksb();

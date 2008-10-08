@@ -1,3 +1,4 @@
+extern void rank();
 # 1
 void rank(n,indx,irank)
 int indx[],irank[],n;
@@ -6,8 +7,3 @@ int indx[],irank[],n;
 
         for (j=1;j<=n;j++) irank[indx[j]]=j;
 }
-# 1 "$VDIR/rank.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/rank.c"
-extern void rank();

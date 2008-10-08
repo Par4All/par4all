@@ -1,3 +1,4 @@
+extern float erfc();
 # 1
 float erfc(x)
 float x;
@@ -6,8 +7,3 @@ float x;
 
         return x < 0.0 ? 1.0+gammp(0.5,x*x) : gammq(0.5,x*x);
 }
-# 1 "$VDIR/erfc.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/erfc.c"
-extern float erfc();

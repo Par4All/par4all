@@ -1,3 +1,4 @@
+extern void sort();
 # 1
 void sort(n,ra)
 int n;
@@ -32,8 +33,3 @@ float ra[];
                 ra[i]=rra;
         }
 }
-# 1 "$VDIR/sort.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/sort.c"
-extern void sort();

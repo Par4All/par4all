@@ -1,3 +1,4 @@
+extern void splint();
 # 1
 void splint(xa,ya,y2a,n,x,y)
 float xa[],ya[],y2a[],x,*y;
@@ -20,8 +21,3 @@ int n;
         b=(x-xa[klo])/h;
         *y=a*ya[klo]+b*ya[khi]+((a*a*a-a)*y2a[klo]+(b*b*b-b)*y2a[khi])*(h*h)/6.0;
 }
-# 1 "$VDIR/splint.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/splint.c"
-extern void splint();

@@ -1,3 +1,4 @@
+extern void chder();
 # 1
 void chder(a,b,c,cder,n)
 float a,b,c[],cder[];
@@ -14,8 +15,3 @@ int n;
         for (j=0;j<n;j++)
                 cder[j] *= con;
 }
-# 1 "$VDIR/chder.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/chder.c"
-extern void chder();

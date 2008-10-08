@@ -13,8 +13,4 @@ main()
     default:
     }
 }
-# 1 "$VDIR/switch.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/switch.c"
 extern main();

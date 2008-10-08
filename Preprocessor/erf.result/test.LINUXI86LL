@@ -1,3 +1,4 @@
+extern float erf();
 # 1
 float erf(x)
 float x;
@@ -6,8 +7,3 @@ float x;
 
         return x < 0.0 ? -gammp(0.5,x*x) : gammp(0.5,x*x);
 }
-# 1 "$VDIR/erf.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/erf.c"
-extern float erf();

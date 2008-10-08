@@ -1,3 +1,4 @@
+extern void mrqmin();
 # 1
 void mrqmin(x,y,sig,ndata,a,ma,lista,mfit,covar,alpha,chisq,funcs,alamda)
 float x[],y[],sig[],a[],**covar,**alpha,*chisq,*alamda;
@@ -62,8 +63,3 @@ void (*funcs)();
         }
         return;
 }
-# 1 "$VDIR/mrqmin.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/mrqmin.c"
-extern void mrqmin();

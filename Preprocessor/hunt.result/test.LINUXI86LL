@@ -1,3 +1,4 @@
+extern void hunt();
 # 1
 void hunt(xx,n,x,jlo)
 int n,*jlo;
@@ -49,8 +50,3 @@ float xx[],x;
                         jhi=jm;
         }
 }
-# 1 "$VDIR/hunt.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/hunt.c"
-extern void hunt();

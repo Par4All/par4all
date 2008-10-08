@@ -1,74 +1,3 @@
-# 3244
-void anneal(x,y,iorder,ncity)
-float x[],y[];
-int iorder[],ncity;
-{
-        int ans,nover,nlimit,i1,i2,idum;
-        unsigned long int iseed;
-        int i,j,k,nsucc,nn,idec;
-        static int n[7];
-        float path,de,t;
-        float ran3();
-        int irbit1(),metrop();
-        void reverse(),trnspt();
-        float revcst(),trncst();
-
-        nover=100*ncity;
-        nlimit=10*ncity;
-        path=0.0;
-        t=0.5;
-        for (i=1;i<ncity;i++) {
-                i1=iorder[i];
-                i2=iorder[i+1];
-                path += sqrt(((x[i2])-(x[i1]))*((x[i2])-(x[i1]))+((y[i2])-(y[i1]))*((y[i2])-(y[i1])));
-        }
-        i1=iorder[ncity];
-        i2=iorder[1];
-        path += sqrt(((x[i2])-(x[i1]))*((x[i2])-(x[i1]))+((y[i2])-(y[i1]))*((y[i2])-(y[i1])));
-        idum = -1;
-        iseed=111;
-        for (j=1;j<=100;j++) {
-                nsucc=0;
-                for (k=1;k<=nover;k++) {
-                        do {
-                                n[1]=1+(int) (ncity*ran3(&idum));
-                                n[2]=1+(int) ((ncity-1)*ran3(&idum));
-                                if (n[2] >= n[1]) ++n[2];
-                                nn=1+((n[1]-n[2]+ncity-1) % ncity);
-                        } while (nn<3);
-                        idec=irbit1(&iseed);
-                        if (idec == 0) {
-                                n[3]=n[2]+(int) (abs(nn-2)*ran3(&idum))+1;
-                                n[3]=1+((n[3]-1) % ncity);
-                                de=trncst(x,y,iorder,ncity,n);
-                                ans=metrop(de,t);
-                                if (ans) {
-                                        ++nsucc;
-                                        path += de;
-                                        trnspt(iorder,ncity,n);
-                                }
-                        } else {
-                                de=revcst(x,y,iorder,ncity,n);
-                                ans=metrop(de,t);
-                                if (ans) {
-                                        ++nsucc;
-                                        path += de;
-                                        reverse(iorder,ncity,n);
-                                }
-                        }
-                        if (nsucc >= nlimit) break;
-                }
-                printf("\n %s %10.6f %s %12.6f \n","T =",t,
-                        "	 Path Length =",path);
-                printf("Successful Moves: %6d\n",nsucc);
-                t *= 0.9;
-                if (nsucc == 0) return;
-        }
-}
-# 1 "$VDIR/anneal.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/anneal.c"
 /* Define ISO C stdio on top of C++ iostreams.
    Copyright (C) 1991,1994-2002,2003 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -3300,6 +3229,73 @@ extern float trncst();
 extern void trnspt();
 
 extern int metrop();
+# 3244
+void anneal(x,y,iorder,ncity)
+float x[],y[];
+int iorder[],ncity;
+{
+        int ans,nover,nlimit,i1,i2,idum;
+        unsigned long int iseed;
+        int i,j,k,nsucc,nn,idec;
+        static int n[7];
+        float path,de,t;
+        float ran3();
+        int irbit1(),metrop();
+        void reverse(),trnspt();
+        float revcst(),trncst();
+
+        nover=100*ncity;
+        nlimit=10*ncity;
+        path=0.0;
+        t=0.5;
+        for (i=1;i<ncity;i++) {
+                i1=iorder[i];
+                i2=iorder[i+1];
+                path += sqrt(((x[i2])-(x[i1]))*((x[i2])-(x[i1]))+((y[i2])-(y[i1]))*((y[i2])-(y[i1])));
+        }
+        i1=iorder[ncity];
+        i2=iorder[1];
+        path += sqrt(((x[i2])-(x[i1]))*((x[i2])-(x[i1]))+((y[i2])-(y[i1]))*((y[i2])-(y[i1])));
+        idum = -1;
+        iseed=111;
+        for (j=1;j<=100;j++) {
+                nsucc=0;
+                for (k=1;k<=nover;k++) {
+                        do {
+                                n[1]=1+(int) (ncity*ran3(&idum));
+                                n[2]=1+(int) ((ncity-1)*ran3(&idum));
+                                if (n[2] >= n[1]) ++n[2];
+                                nn=1+((n[1]-n[2]+ncity-1) % ncity);
+                        } while (nn<3);
+                        idec=irbit1(&iseed);
+                        if (idec == 0) {
+                                n[3]=n[2]+(int) (abs(nn-2)*ran3(&idum))+1;
+                                n[3]=1+((n[3]-1) % ncity);
+                                de=trncst(x,y,iorder,ncity,n);
+                                ans=metrop(de,t);
+                                if (ans) {
+                                        ++nsucc;
+                                        path += de;
+                                        trnspt(iorder,ncity,n);
+                                }
+                        } else {
+                                de=revcst(x,y,iorder,ncity,n);
+                                ans=metrop(de,t);
+                                if (ans) {
+                                        ++nsucc;
+                                        path += de;
+                                        reverse(iorder,ncity,n);
+                                }
+                        }
+                        if (nsucc >= nlimit) break;
+                }
+                printf("\n %s %10.6f %s %12.6f \n","T =",t,
+                        "	 Path Length =",path);
+                printf("Successful Moves: %6d\n",nsucc);
+                t *= 0.9;
+                if (nsucc == 0) return;
+        }
+}
 # 3403
 int metrop(de,t)
 float de,t;

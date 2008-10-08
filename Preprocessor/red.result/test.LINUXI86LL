@@ -1,3 +1,4 @@
+extern void red();
 # 1
 void red(iz1,iz2,jz1,jz2,jm1,jm2,jmf,ic1,jc1,jcf,kc,c,s)
 float ***c,**s;
@@ -18,8 +19,3 @@ int iz1,iz2,jz1,jz2,jm1,jm2,jmf,ic1,jc1,jcf,kc;
                 ic += 1;
         }
 }
-# 1 "$VDIR/red.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/red.c"
-extern void red();
