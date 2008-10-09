@@ -24,6 +24,10 @@ TIME=
 unset MODULE WORKSPACE DUMPFILES NOINSTALL STDOUT STDERR \
 	REDIRECT FILES HPFFILES
 
+# fix sort order to byte order (upper case then lower case)
+LC_ALL=C
+export LC_ALL
+
 rm -f $TMP.*
 
 #
