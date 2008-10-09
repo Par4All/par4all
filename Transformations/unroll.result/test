@@ -1,4 +1,6 @@
---- Code unrolled twice for UNROLL
+
+Code unrolled twice for "UNROLL"
+
 C
 C
       PROGRAM UNROLL
@@ -18,7 +20,9 @@ C
       I = 1+MAX0(LU_NUB0, 0)*1
 C
       END
---- Code after partial evaluation for UNROLL
+
+Code after partial evaluation for "UNROLL"
+
 C
 C
       PROGRAM UNROLL

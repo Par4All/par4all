@@ -1,5 +1,5 @@
 delete consel
-create consel ${PIPS_ROOT}/Validation/Transformations/consel.f
+create consel consel.f
 
 setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 

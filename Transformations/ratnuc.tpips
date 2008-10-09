@@ -1,5 +1,5 @@
 delete ratnuc
-create ratnuc ${PIPS_ROOT}/Validation/Transformations/ratnuc.f
+create ratnuc ratnuc.f
 
 module RATNUC
 activate PRINT_CODE_REGIONS

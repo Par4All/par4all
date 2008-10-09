@@ -1,0 +1,47 @@
+#!/bin/sh
+#
+# printpriv.f test script
+#
+# echo "GENERATE_NESTED_PARALLEL_LOOPS FALSE" > properties.rc
+# if Pips -s rice_cray -f printpriv.f -w printpriv -m printpriv -p priv >&2
+# then
+# 	echo "--- Cray code for PRINTPRIV"
+# 	if Display cray
+# 	then
+# 		echo "--- Cray code for FOO"
+# 		Display -m foo cray
+# 		exit_status=$?
+# 	else
+# 		exit_status=2
+# 	fi
+# else
+# 	exit_status=1
+# fi
+# Delete printpriv
+# exit $exit_status
+
+delete printpriv
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create printpriv printpriv.f
+
+apply PRIVATIZE_MODULE[PRINTPRIV]
+
+activate PRINT_PARALLELIZEDCRAY_CODE
+
+echo
+echo Cray code for "PRINTPRIV"
+echo
+
+display PARALLELPRINTED_FILE[PRINTPRIV]
+
+echo
+echo Cray code for "FOO"
+echo
+
+display PARALLELPRINTED_FILE[FOO]
+
+close
+delete printpriv
+quit

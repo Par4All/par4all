@@ -4,7 +4,7 @@ tpips=${tpips_version:-tpips}
 
 $tpips <<EOF
 delete use_def_elimination
-create use_def_elimination $PIPS_VALIDDIR/Transformations/use_def_elimination.f
+create use_def_elimination use_def_elimination.f
 
 set PRETTYPRINT_FINAL_RETURN TRUE
 set PRETTYPRINT_INTERNAL_RETURN TRUE

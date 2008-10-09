@@ -1,7 +1,7 @@
 # Pb de coherence de la table
 # ordering_to_statement
 delete seq
-create seq ${PIPS_ROOT}/Validation/Transformations/use_def_elim_seq.f
+create seq use_def_elim_seq.f
 module USE_DEF_ELIM_SEQ
 apply USE_DEF_ELIMINATION
 display PRINTED_FILE

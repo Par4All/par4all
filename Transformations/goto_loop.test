@@ -3,7 +3,7 @@
 tpips=${tpips_version:-tpips}
 
 $tpips <<EOF
-create goto_loop $PIPS_VALIDDIR/Transformations/goto_loop.f
+create goto_loop goto_loop.f
 
 set PRETTYPRINT_FINAL_RETURN TRUE
 set PRETTYPRINT_ALL_LABELS TRUE

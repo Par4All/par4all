@@ -2,7 +2,7 @@
 # and by repetitive partial evaluation
 
 delete convol-unroll
-create convol-unroll ${PIPS_ROOT}/Validation/Transformations/convol-unroll.f
+create convol-unroll convol-unroll.f
 
 module convol
 apply UNROLL

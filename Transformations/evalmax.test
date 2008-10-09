@@ -10,7 +10,7 @@ $tpips <<EOF
 # MAX0 and MIN0 should be accepted in PARAMETER constant expressions
 
 delete evalmax
-create evalmax $PIPS_VALIDDIR/Transformations/evalmax.f
+create evalmax evalmax.f
 module printmax
 apply PARTIAL_EVAL
 display PRINTED_FILE

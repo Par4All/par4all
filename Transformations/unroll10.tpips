@@ -1,5 +1,5 @@
 delete unroll10
-create unroll10 ${PIPS_ROOT}/Validation/Transformations/unroll10.f
+create unroll10 unroll10.f
 
 setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
 

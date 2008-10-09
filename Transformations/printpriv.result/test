@@ -1,4 +1,6 @@
---- Cray code for PRINTPRIV
+
+Cray code for "PRINTPRIV"
+
       PROGRAM PRINTPRIV
       REAL B(10,10), T
 c
@@ -11,13 +13,16 @@ CDIR$ IVDEP
       ENDDO
 CMIC$ DO ALL PRIVATE(I,K,T) SHARED(B) 
       DO I = 1, 10                                                      0001
+CMIC$ DO ALL PRIVATE(K,T) SHARED(I,B) 
          DO K = 1, 10                                                   0004
             T = K                                                       0005
             B(I,K) = T                                                  0006
          ENDDO
       ENDDO
       END
---- Cray code for FOO
+
+Cray code for "FOO"
+
 c
       SUBROUTINE FOO
       REAL B(10,10)

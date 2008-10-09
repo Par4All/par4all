@@ -1,7 +1,0 @@
-#
-# eval.f test script
-#
-Pips -f $PIPS_ROOT/Validation/Transformations/eval.f -w eval -m eval -p partial_eval -b PF >&2
-echo "--- Partialy evaluated code for EVAL"
-Display -l code
-Delete eval

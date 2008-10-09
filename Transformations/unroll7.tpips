@@ -1,5 +1,5 @@
 delete unroll7
-create unroll7 ${PIPS_ROOT}/Validation/Transformations/unroll7.f
+create unroll7 unroll7.f
 module UNROLL7
 display PRINTED_FILE[UNROLL7]
 apply FULL_UNROLL_PRAGMA[UNROLL7]

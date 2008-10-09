@@ -4,7 +4,7 @@ tpips=${tpips_version:-tpips}
 
 $tpips <<EOF
 delete use_def_unstructured
-create use_def_unstructured $PIPS_VALIDDIR/Transformations/use_def_unstructured.f
+create use_def_unstructured use_def_unstructured.f
 
 set PRETTYPRINT_FINAL_RETURN TRUE
 set PRETTYPRINT_INTERNAL_RETURN TRUE

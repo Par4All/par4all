@@ -4,7 +4,7 @@ tpips=${tpips_version:-tpips}
 
 $tpips <<EOF
 delete final_return
-create final_return $PIPS_VALIDDIR/Transformations/final_return.f
+create final_return final_return.f
 
 set PRETTYPRINT_FINAL_RETURN TRUE
 set PRETTYPRINT_INTERNAL_RETURN TRUE

@@ -1,5 +1,5 @@
 delete unroll9
-create unroll9 ${PIPS_ROOT}/Validation/Transformations/unroll9.f
+create unroll9 unroll9.f
 
 apply RESTRUCTURE_CONTROL
 display PRINTED_FILE

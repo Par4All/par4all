@@ -4,7 +4,7 @@ tpips=${tpips_version:-tpips}
 
 $tpips <<EOF
 delete unstr6
-create unstr6 $PIPS_VALIDDIR/Transformations/unstr6.f
+create unstr6 unstr6.f
 
 set PRETTYPRINT_FINAL_RETURN TRUE
 set PRETTYPRINT_ALL_LABELS TRUE

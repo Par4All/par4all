@@ -1,0 +1,47 @@
+#!/bin/sh
+
+# unroll.f test script
+#
+# if Pips -f unroll.f -w unroll -m unroll -p unroll -b PF >&2 <<EndOfInput
+# 10
+# 2
+# EndOfInput
+# then
+# 	echo "--- Code unrolled twice for UNROLL"
+# 	Display -l code
+# 	if Pips -w unroll -m unroll -p partial_eval -b PF >&2
+# 	then
+# 		echo "--- Code after partial evaluation for UNROLL"
+# 		Display -l code
+# 		exit_status=$?
+# 	else
+# 		exit_status=2
+# 	fi
+# else
+# 	exit_status=1
+# fi
+# Delete unroll
+# exit $exit_status
+
+delete unroll
+create unroll unroll.f
+
+apply UNROLL[UNROLL]
+10
+2
+echo
+echo Code unrolled twice for "UNROLL"
+echo
+
+display PRINTED_FILE[UNROLL]
+
+echo
+echo Code after partial evaluation for "UNROLL"
+echo
+
+apply PARTIAL_EVAL[UNROLL]
+display PRINTED_FILE[UNROLL]
+
+close
+delete unroll
+quit
