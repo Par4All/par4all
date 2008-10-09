@@ -3,7 +3,7 @@ delete source02
 # In case of preprocessing, UNPSLIT does not regenerate user files but
 # preprocessed user files
 
-create source02 source02.src/*.F
+create source02 source02.src/module01.F source02.src/module02.F
 
 display PRINTED_FILE[%ALL]
 

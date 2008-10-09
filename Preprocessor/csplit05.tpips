@@ -6,7 +6,11 @@ delete csplit05
 
 # setproperty CHECK_FORTRAN_SYNTAX_BEFORE_PIPS TRUE
 
-create csplit05 csplit05.src/*.c
+# tpips does not exapnd filenames anymore
+# create csplit05 csplit05.src/*.c
+create csplit05 csplit05.src/foo1.c csplit05.src/foo2.c
+
+echo csplit must fail because of duplicate function name "foo"
 
 activate C_PARSER
 

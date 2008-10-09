@@ -1,0 +1,11 @@
+
+csplit must not fail because the scopes of the two C foo functions are different
+
+void foo()
+{
+}
+extern void foo();
+static void foo();
+static void foo()
+{
+}

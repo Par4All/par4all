@@ -6,7 +6,11 @@ delete csplit06
 
 # setproperty CHECK_FORTRAN_SYNTAX_BEFORE_PIPS TRUE
 
-create csplit06 csplit06.src/*.c
+create csplit06 csplit06.src/foo1.c csplit06.src/foo2.c
+
+echo
+echo csplit must not fail because the scopes of the two C foo functions are different
+echo
 
 activate C_PARSER
 

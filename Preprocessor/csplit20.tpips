@@ -5,6 +5,14 @@ create csplit20 csplit20.c
 
 # quit
 
+echo
+echo No output because the input file does not exist
+echo
+
+# The database is deleted when the creation fails. It is not possible
+#  to access the warnging file
+# shell cat csplit20.database/Warnings
+
 activate C_PARSER
 
 display PRINTED_FILE[main]
