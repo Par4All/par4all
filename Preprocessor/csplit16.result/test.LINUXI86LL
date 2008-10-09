@@ -1,16 +1,12 @@
+/* See what happens with specific parsing for compilation units */
+
+extern int csplit16(int i, int *pj, int k, int **pl);
 # 3
 int csplit16(int i, int * pj, int k, int * * pl)
 {
   *pj = i;
   **pl = k;
 }
-# 1 "$VDIR/csplit16.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/csplit16.c"
-/* See what happens with specific parsing for compilation units */
-
-extern int csplit16(int i, int *pj, int k, int **pl);
 int csplit16(int i,int *pj,int k,int **pl)
 {
     *pj = i;

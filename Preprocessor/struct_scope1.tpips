@@ -1,6 +1,14 @@
 delete struct_scope1
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv SHELL /bin/bash
+
 create struct_scope1 struct_scope1.c
-display C_SOURCE_FILE[%ALL]
+# display C_SOURCE_FILE[%ALL]
+
+# Get rid of preprocessed files
+shell rm -f struct_scope1.database/Tmp/*.c
+shell cat struct_scope1.database/*/*.c|sed -e '/^# 1[^0-9][^0-9]*/d'
 
 
 close

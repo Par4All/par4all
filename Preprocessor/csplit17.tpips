@@ -1,15 +1,26 @@
 delete csplit17
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv SHELL /bin/bash
+
 create csplit17 csplit17.c
 
 # check signatures with parameter names are parsed (about csplit16.c)
-display C_SOURCE_FILE[%ALL]
+# display C_SOURCE_FILE[%ALL]
+
+# Get rid of preprocessed files
+shell rm -f csplit17.database/Tmp/*.c
+shell cat csplit17.database/*/*.c|sed -e '/^# 1[^0-9][^0-9]*/d'
 
 # quit
 
 # This has nothing to do with the preprocessing
 
 close
-open csplit17
+delete csplit17
+# Cannot be reopened because of the above rm -f
+#open csplit17
+create csplit17 csplit17.c
 
 activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE

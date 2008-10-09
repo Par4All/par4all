@@ -7,4 +7,6 @@ static void foo(int x)
 void main()
 {
   int j;
+
+  foo(j);
 }

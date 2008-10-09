@@ -3,11 +3,16 @@ create static_function static_function.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 5
 activate C_PARSER
+activate C_SYMBOL_TABLE
 
 #setenv PRETTYPRINT_DEBUG_LEVEL 3
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
+# display SYMBOL_TABLE_FILE[static_function!foo]
+display SYMBOL_TABLE_FILE[static_function!]
+display PARSED_PRINTED_FILE[main]
+#quit
 # display PRINTED_FILE[%ALL]
 
 echo
@@ -27,9 +32,15 @@ echo Module foo
 echo
 
 display PRINTED_FILE[static_function!foo]
+display SYMBOL_TABLE_FILE[static_function!foo]
 
+echo
+echo Call graph for "main"
+echo
+
+display CALLGRAPH_FILE[main]
 
 close
-delete static_function
+#rdelete static_function
 
 quit

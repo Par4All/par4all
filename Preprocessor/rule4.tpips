@@ -1,12 +1,16 @@
 delete rule4
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv SHELL /bin/bash
+
 create rule4 rule4.c
 
 echo
 echo source code for modules rule4! and f_ho_angle
 echo
 
-shell cat -T rule4.database/rule4!/*.c
-shell cat -T rule4.database/f_ho_angle/*.c
+shell cat -T rule4.database/rule4!/*.c|sed -e '/^# 1[^0-9][^0-9]*/d'
+shell cat -T rule4.database/f_ho_angle/*.c|sed -e '/^# 1[^0-9][^0-9]*/d'
 
 close
 # delete rule4

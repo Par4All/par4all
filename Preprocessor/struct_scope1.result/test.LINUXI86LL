@@ -7,8 +7,4 @@ foo ()
 {
   struct s x;
 }
-# 1 "$VDIR/struct_scope1.c"
-# 1 "<built-in>"
-# 1 "<command line>"
-# 1 "$VDIR/struct_scope1.c"
 extern bstruct s { int i; } foo();

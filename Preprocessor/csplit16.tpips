@@ -1,13 +1,23 @@
 delete csplit16
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv SHELL /bin/bash
+
 create csplit16 csplit16.c
 
 # check that the compilation unit can be parser specially
-display C_SOURCE_FILE[%ALL]
+# display C_SOURCE_FILE[%ALL]
+
+# Get rid of preprocessed files
+shell rm -f csplit16.database/Tmp/*.c
+shell cat csplit16.database/*/*.c|sed -e '/^# 1[^0-9][^0-9]*/d'
 
 # This has nothing to do with the preprocessing
 
 close
-open csplit16
+delete csplit16
+#open csplit16
+create csplit16 csplit16.c
 
 activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE
