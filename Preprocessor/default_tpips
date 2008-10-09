@@ -1,4 +1,8 @@
 delete ${WSPACE}
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv SHELL /bin/bash
+
 create ${WSPACE} ${FILE}
 
 # Display result of csplit, except for the compilation unit(s) Because of
@@ -6,7 +10,10 @@ create ${WSPACE} ${FILE}
 # static functions in validation files using default_tpips?
 
 # display C_SOURCE_FILE[%ALL]
-shell cat ${WSPACE}.database/[^T]*/*.c|sed -e '/^# 1[^0-9][^0-9]*/d'
+
+# Get rid of preprocessed files
+shell rm -f ${WSPACE}.database/Tmp/*.c
+shell cat ${WSPACE}.database/*/*.c|sed -e '/^# 1[^0-9][^0-9]*/d'
 
 close
 delete ${WSPACE}
