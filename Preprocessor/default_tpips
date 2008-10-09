@@ -5,14 +5,20 @@ setenv SHELL /bin/bash
 
 create ${WSPACE} ${FILE}
 
-# Display result of csplit, except for the compilation unit(s) Because of
-# static functions, do not forget the COMPILATION_UNIT_PREFIX, but no
-# static functions in validation files using default_tpips?
+# Display result of csplit, including for the compilation unit(s).
 
+# No static functions in validation files using default_tpips?
+
+# The semantics of %ALL has cnaged twice, including or not the
+# compilation unit.  Besides, these files include preprocessor
+# dependent information, which make it unsuitable for validation
 # display C_SOURCE_FILE[%ALL]
 
 # Get rid of preprocessed files
 shell rm -f ${WSPACE}.database/Tmp/*.c
+
+# Display all C files, including compilation units, but get rid of pragams,
+# except the line number pragma to avoid dependencies on gcc and/or preprocessor version
 shell cat ${WSPACE}.database/*/*.c|sed -e '/^# 1[^0-9][^0-9]*/d'
 
 close
