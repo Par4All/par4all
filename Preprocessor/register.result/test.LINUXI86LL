@@ -1,6 +1,0 @@
-# 1
-main()
-{
-  register int i;
-}
-extern main();

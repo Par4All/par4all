@@ -1,6 +1,4 @@
-
-Module main
-
+# 1
 int main()
 {
   struct x
@@ -8,7 +6,8 @@ int main()
     int a;
     int b;
   } y;
-  
+
   struct x z;
   return 0;
 }
+extern int main();

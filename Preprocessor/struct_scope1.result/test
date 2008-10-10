@@ -1,11 +1,10 @@
-
-Module foo
-
-struct s 
+# 1
+struct s
 {
   int i;
 }
 foo ()
 {
-  struct s x; 
+  struct s x;
 }
+extern bstruct s { int i; } foo();

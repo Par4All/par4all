@@ -1,7 +1,6 @@
-
-Module main
-
+# 1
 main()
 {
   volatile int i;
 }
+extern main();

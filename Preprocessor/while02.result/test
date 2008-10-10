@@ -1,6 +1,4 @@
-
-Module main
-
+# 1
 main()
 {
   int c = 5; /* initialization not treated yet*/
@@ -10,3 +8,4 @@ main()
       break;
     }
 }
+extern main();

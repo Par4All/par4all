@@ -1,6 +1,5 @@
-
-Module main
-
+extern main();
+# 1
 main()
 {
   char c1;

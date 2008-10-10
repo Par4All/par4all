@@ -1,6 +1,4 @@
-
-Module main
-
+# 1
 main()
 {
   int i1;
@@ -13,3 +11,4 @@ main()
   i1 = 1;
   i7 = 7;
 }
+extern main();

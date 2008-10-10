@@ -1,11 +1,9 @@
-
-Module main
-
+# 1
 main()
 {
   typedef int myint;
   myint n;
-  typedef myint MYINT; 
+  typedef myint MYINT;
   MYINT m;
   struct s {
     int i;
@@ -21,3 +19,4 @@ main()
   typedef tata titi;
   n = 1;
 }
+extern main();

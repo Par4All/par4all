@@ -1,6 +1,4 @@
-
-Module main
-
+# 1
 main()
 {
   int i = 1;
@@ -14,3 +12,4 @@ main()
  labdefault: ;
  switch_exit:;
 }
+extern main();

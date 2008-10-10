@@ -1,6 +1,4 @@
-
-Module main
-
+# 1
 main()
 {
   union x
@@ -11,3 +9,4 @@ main()
 
   union x y;
 }
+extern main();

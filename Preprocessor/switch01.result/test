@@ -1,6 +1,4 @@
-
-Module foo
-
+# 1
 int foo(int predicate)
 {
   int x = 0;
@@ -13,3 +11,4 @@ int foo(int predicate)
   }
   return 333;
 }
+extern int foo(int predicate);

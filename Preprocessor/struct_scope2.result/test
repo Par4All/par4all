@@ -1,7 +1,6 @@
-
-Module bar
-
+# 1
 bar ()
 {
-  extern struct s x; 
+  extern struct s x;
 }
+extern bar();

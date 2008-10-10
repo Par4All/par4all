@@ -1,6 +1,0 @@
-# 1
-bar ()
-{
-  extern struct s x;
-}
-extern bar();

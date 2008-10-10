@@ -1,6 +1,6 @@
-
-Module foo
-
+static int i;
+extern int foo();
+# 2
 int foo()
 {
   i = 1;

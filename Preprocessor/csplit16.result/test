@@ -1,12 +1,7 @@
-
-/* Module csplit16! */
-
 /* See what happens with specific parsing for compilation units */
 
 extern int csplit16(int i, int *pj, int k, int **pl);
-
-/* Module csplit16 */
-
+# 3
 int csplit16(int i, int * pj, int k, int * * pl)
 {
   *pj = i;

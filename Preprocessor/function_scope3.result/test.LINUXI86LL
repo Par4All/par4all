@@ -1,7 +1,0 @@
-# 3
-extern foo()
-{
-}
-static foo();
-
-extern foo();

@@ -1,6 +1,5 @@
-
-Module main
-
+extern main();
+# 1
 main()
 {
   auto int i;

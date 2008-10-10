@@ -1,7 +1,0 @@
-# 2
-main()
-{
-  i = 1;
-}
-int i;
-extern main();

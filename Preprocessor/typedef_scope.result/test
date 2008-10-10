@@ -1,22 +1,18 @@
-
-Module foo
-
+# 17
 foo()
 {
   typedef int node;
-  //int node; 
+  //int node;
   struct node
   {
     int node;
   };
 }
-
-Module main
-
+# 3
 main()
 {
   typedef int node;
-  //int node; 
+  //int node;
   struct node
   {
     int node;
@@ -26,3 +22,8 @@ main()
   n = 5;
   printf("Test\n");
 }
+typedef int node;
+
+extern main();
+node n=5;
+extern foo();

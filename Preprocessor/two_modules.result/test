@@ -1,6 +1,4 @@
-
-Module foo
-
+# 3
 void foo()
 {
   int c = 5;
@@ -9,9 +7,7 @@ void foo()
       c -= 1;
     }
 }
-
-Module main
-
+# 12
 main()
 {
   typedef int myint;
@@ -20,3 +16,8 @@ main()
   MYINT m;
   n = 1;
 }
+int g;
+
+extern void foo();
+
+extern main();

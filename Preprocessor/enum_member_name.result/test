@@ -1,6 +1,5 @@
-
-Module main
-
+extern main();
+# 1
 main()
 {
   enum hue {node,nide};

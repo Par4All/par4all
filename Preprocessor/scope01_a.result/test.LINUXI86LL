@@ -1,8 +1,0 @@
-# 2
-main()
-{
-  printf("%d\n",i);
-  foo();
-}
-int i = 1;
-extern main();

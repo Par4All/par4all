@@ -1,12 +1,11 @@
-
-Module main
-
+# 1
 main()
 {
   typedef int node;
-  //int node; 
+  //int node;
   struct node
   {
     int node;
   };
 }
+extern main();

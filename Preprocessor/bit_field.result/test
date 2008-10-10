@@ -1,6 +1,5 @@
-
-Module main
-
+extern int main();
+# 1
 int main()
 {
   struct x
@@ -12,6 +11,6 @@ int main()
     char e:5;
     signed :6;
   } y;
-  
+
   return 0;
 }

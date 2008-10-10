@@ -1,6 +1,0 @@
-extern main();
-# 1
-main()
-{
-  const volatile int i;
-}

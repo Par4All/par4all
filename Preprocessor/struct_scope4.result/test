@@ -1,6 +1,4 @@
-
-Module main
-
+# 1
 struct toto
 {
   float f;
@@ -10,3 +8,4 @@ main()
 {
   struct toto y;
 }
+extern bstruct toto { float f; } main();

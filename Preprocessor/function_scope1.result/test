@@ -1,13 +1,13 @@
-
-Module foo
-
+# 2
 foo()
 {
   i = 2;
 }
+int i;
+extern foo();
 
-Module main
-
+extern main();
+# 7
 main()
 {
 }
