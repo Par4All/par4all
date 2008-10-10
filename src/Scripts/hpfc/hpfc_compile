@@ -24,10 +24,6 @@ TIME=
 unset MODULE WORKSPACE DUMPFILES NOINSTALL STDOUT STDERR \
 	REDIRECT FILES HPFFILES
 
-# fix sort order to byte order (upper case then lower case)
-LC_ALL=C
-export LC_ALL
-
 rm -f $TMP.*
 
 #
@@ -111,33 +107,39 @@ do
     w) WORKSPACE="$OPTARG" ;;
     k) case $OPTARG in
 	 demo)
-	     STDERR='/dev/null' ;
-	     PIPSPROP='-1 HPFC_NO_WARNING -1 NO_USER_WARNING' ;
-	     verbose='verb' ;
-	     HPFC='-p HPFC_INSTALL' ;;
+	     STDERR='/dev/null'
+	     PIPSPROP='-1 HPFC_NO_WARNING -1 NO_USER_WARNING'
+	     verbose='verb'
+	     HPFC='-p HPFC_INSTALL'
+	     ;;
 	 full)
-	     DELETE='Delete' ;
-	     HPFC='-p HPFC_INSTALL' ;
-	     MAKE='make' ;;
+	     DELETE='Delete'
+	     HPFC='-p HPFC_INSTALL'
+	     MAKE='make'
+	     ;;
 	 timing)
-	     TIMEPROP='-1 LOG_TIMINGS' ;;
+	     TIMEPROP='-1 LOG_TIMINGS'
+	     ;;
 	 void|none) : ;;
-	 validate) 
-	     DUMPFILES=':' ;
-	     NOINSTALL=':' ;
-	     REDIRECT=':' ;
-	     verbose=':' ;
-	     DELETE='Delete' ;;
-	 debug)
+	 validate)
+	     DUMPFILES=':'
+	     NOINSTALL=':'
+	     REDIRECT=':'
+	     verbose=':'
+	     DELETE='Delete'
+	     ;;
+      	 debug)
 	     VERBOSEARG='-v'
 	     DEBUGARG='-d'
-	     PIPSPROP='-0 HPFC_NO_WARNING -0 NO_USER_WARNING -1 LOG_TIMINGS' ;
-	     verbose='verb' ;
-	     debug='deb' ;
-	     DELETE=':'	;
-	     REDIRECT=':' ;;
+	     PIPSPROP='-0 HPFC_NO_WARNING -0 NO_USER_WARNING -1 LOG_TIMINGS'
+	     verbose='verb'
+	     debug='deb'
+	     DELETE=':'
+	     REDIRECT=':'
+	     ;;
 	 *)  echo "no $OPTARG keyword" ;
-	     usage 3 ;;
+	     usage 3
+	     ;;
        esac ;;
     h|*) usage 1 ;;
   esac
