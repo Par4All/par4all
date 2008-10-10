@@ -23,8 +23,12 @@ arch=${PIPS_ARCH:-$($PIPS_ROOT/makes/arch.sh)}
 tpips=$(type -p tpips)
 pips=$(type -p pips)
 
-# By default, do not create a missing .result directory:
+# by default, do not create a missing .result directory:
 auto_result_create=""
+
+# fix collation (sort) order to default ASCII for all validations
+unset LANG LC_ALL LC_COLLATE
+export LC_ALL=C
 
 # display help
 function usage()
