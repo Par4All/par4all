@@ -1,4 +1,4 @@
-create silber01 ${PIPS_ROOT}/Validation/Rice/silber01.f
+create silber01 silber01.f
 module SILBER01
 activate COARSE_GRAIN_PARALLELIZATION
 display PARALLELPRINTED_FILE[SILBER01]
