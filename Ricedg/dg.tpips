@@ -1,5 +1,5 @@
 delete dg
-create dg ${PIPS_ROOT}/Validation/Ricedg/impactunstructured.f
+create dg impactunstructured.f
 
 activate PRINT_WHOLE_DEPENDENCE_GRAPH
 setproperty PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT TRUE
