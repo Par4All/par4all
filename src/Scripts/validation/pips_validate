@@ -288,6 +288,9 @@ dones=0
 errors=0
 elist=''
 
+# this is not good.
+# what means to be validated is when *.result directories are available
+# and then we should look for available tpips/test/sources to do so?
 for obj ; do
   failed=
   if [ -d $vdir/$obj ] ; then
