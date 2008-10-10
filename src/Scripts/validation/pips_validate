@@ -167,7 +167,8 @@ function validate_file()
       echo "  of this file as the reference."
     else
       verb 1 "skipping $file: no matching result directory"
-      return
+      echo "skipped: $file" >> $summary
+      return 0
     fi
   fi
 
