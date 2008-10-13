@@ -347,7 +347,7 @@ list union_list(list l1, list l2) {
 
   for(cl=l2; !ENDP(cl); POP(cl)) {
     gen_chunk * gcp = CHUNK(CAR(cl));
-	if(gen_in_list_p(gcp , l1))
+	if(!gen_in_list_p(gcp , l1))
 	  l1 = gen_nconc(l1, gen_cons(gcp, NIL));
   }
 
