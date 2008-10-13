@@ -1,4 +1,7 @@
 delete ${WSPACE}
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create ${WSPACE} ${FILE}
 
 display PARALLELPRINTED_FILE[%ALL]

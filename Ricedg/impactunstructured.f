@@ -3,7 +3,7 @@
       INTEGER A, B, C(5)
       A = 0
       B = 1
-      CALL FOO(A,B)
+      CALL FOO(A, B)
       CALL FOO(A, A)
 C      CALL FOO(T,A)
 C      CALL FOO(A,T)
