@@ -331,12 +331,27 @@ static void insert_impact_description_as_comment(statement s1, statement s2, boo
   return;
 }
 
+/*
 list union_list(list l1, list l2) {
     MAP(STATEMENT, s, {
         if (!gen_in_list_p(s, l1))
 	  ADD_ELEMENT_TO_LIST(l1, STATEMENT, s);
     }, l2);
     return l1;
+}
+*/
+
+/* Union is not typed... */
+list union_list(list l1, list l2) {
+  list cl = list_undefined;
+
+  for(cl=l2; !ENDP(cl); POP(cl)) {
+    gen_chunk * gcp = CHUNK(CAR(cl));
+	if(gen_in_list_p(gcp , l1))
+	  l1 = gen_nconc(l1, gen_cons(gcp, NIL));
+  }
+
+  return l1;
 }
 
 static effect get_effect_read_of_statement_on_variable(statement s, entity var)

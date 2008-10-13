@@ -340,9 +340,13 @@ Obviously, type \texttt{type} is used to represent the type of an
 entity. This type is defined as union to cover the needs of different
 kinds of entities. Member \texttt{statement} is used for statement
 labels\index{Label}, since a label points towards a statement. Member
-\texttt{area} is used for commons\index{Common}. Two additional areas are
-defined as implicit common, the static and the dynamic areas associated
-to a module. Their specific names are defined in \texttt{ri-util.h}.
+\texttt{area} is used for commons\index{Common}. Additional areas are
+defined as implicit common: the static and the dynamic areas
+associated to a module, as well as the stack and heap areas. Their
+specific names are defined in \texttt{ri-util.h}. The static dynamic
+areas contain variables of static sizes. The stack and heap areas
+contain variables of sizes known at run-time and variables dynamically
+allocated (e.g. malloc).
 
 Member \texttt{variable} is used for all variables and symbolic constants. It
 also is used for formal parameters and for results of functions. Member
@@ -358,7 +362,7 @@ d'instruction.  Le sous-domaine \verb/area/ est utilisé pour les
 commons et pour les deux zones statique et dynamique associée à chaque
 module.  Le sous-domaine \verb/variable/ est utilisé pour toutes les
 variables, y compris les paramètres formels et le résultat d'une
-fonction.  Le sous-domaine \verb/functional/ est utilisé pour les
+fonction Fortran.  Le sous-domaine \verb/functional/ est utilisé pour les
 fonctions, pour les subroutines et pour le programme principal.  Le
 sous-domaine \verb/void/ est utilisé pour le résultat d'une subroutine
 ou d'un programme principal.
@@ -370,20 +374,20 @@ ou d'un programme principal.
 
 \domain{Area = size:int x layout:entity*}
 
-Type \texttt{area} is used to represent storage sections for variables such
-as commons or static or dynamic area. Areas are \emph{global} objects in
-the current implementation. The package name used in the corresponding
-entity name must be \verb/TOP-LEVEL/, but this is not explictly
-enforced. Dynamic commons defined by the Fortran standard are not
-implemented, as is the case with most Fortran~77 compiler. Dynamic
-commons cannot be statically identified because a dynamic binding is
-used.
+Type \texttt{area} is used to represent storage sections for variables
+such as commons or static or dynamic areas. Areas for Fortran commons
+are \emph{global} objects in the current implementation. The package
+name used in the corresponding entity name must be \verb/TOP-LEVEL/ in
+Fortran, but this is not explictly enforced. Dynamic commons defined
+by the Fortran standard are not implemented, as is the case with most
+Fortran~77 compiler. Dynamic commons cannot be statically identified
+because a dynamic binding is used.
 
 \begin{comment}
 Le domaine \texttt{area} est utilisé pour représenter les aires de
 stockage des variables telles que les commons et les aires statiques ou
-dynamiques. Ces aires sont des objets globaux et leur package de
-rattachement est donc \verb/TOP-LEVEL/.
+dynamiques. Les commons Fortran sont des objets globaux et leur package de
+rattachement est donc \verb/TOP-LEVEL/. Les autres aires sont locales 
 \end{comment}
 
 Field \texttt{size} is the amount of memory space expressed in bytes, or
