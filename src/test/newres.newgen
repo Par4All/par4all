@@ -20,13 +20,12 @@ reservation = 	persistant conducteur:personne x date x
 --
 personne = nom:string x logins:login{} ;
 
--- Pour la Se'cu
+-- Pour la Sécu
 
 identification = personne -> int ;
 
 -- La date contient la periode de reservation, pour essayer de combiner
--- plus d'une reservation par jour.
+-- plus une reservation par jour.
 
 tabulated date = ident:string x jour:int x mois:int x annee:int x periode;
 periode = { MATIN , APRESMIDI , JOURNEE };
-
