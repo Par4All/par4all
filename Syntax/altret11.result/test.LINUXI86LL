@@ -31,8 +31,8 @@ Source cannot be parsed with current properties
 user warning in set_debug_stack_pointer: debug level stack is set to 2
 user warning in safe_do_something: Request aborted under pipsmake: build phase/rule UNSPLIT for module ALTRET11.
 shell ${PIPS_F77:-f77} -c altret11.database/Src/altret11.f
-g77: altret11.database/Src/altret11.f: No such file or directory
-g77: no input files
+f77: altret11.database/Src/altret11.f: No such file or directory
+f77: no input files
 user warning in tp_system: shell returned status (1.0)
 user error in tp_system: shell error (256) in tpips script
 Deletion of obsolete resources:

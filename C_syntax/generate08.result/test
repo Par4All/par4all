@@ -8,7 +8,50 @@ void generate08()
    (void )func(&t);
 }
 
-Symbol table for generate 08
+Symbol table for "generate 08!"
+
+generate08!
+
+Declarations for module "generate08!" with type "() -> unknow"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:generate08" with type "functional" "() -> void"
+	Declared entity "generate08!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "generate08!:*HEAP*" with type "area" with size 0
+	Declared entity "generate08!:*STACK*" with type "area" with size 0
+	Declared entity "generate08!:*STATIC*" with type "area" with size 0
+
+External variable list:
+
+	Declared external entity "TOP-LEVEL:generate08"	with type "functional" "() -> void"
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "generate08!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "generate08!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "generate08!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "generate08!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module generate08!
+
+
+Symbol table for "generate08"
 
 generate08
 

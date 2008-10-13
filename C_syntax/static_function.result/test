@@ -1,3 +1,50 @@
+static_function!
+
+Declarations for module "static_function!" with type "() -> unknow"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:main" with type "functional" "() -> void"
+	Declared entity "static_function!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "static_function!:*HEAP*" with type "area" with size 0
+	Declared entity "static_function!:*STACK*" with type "area" with size 0
+	Declared entity "static_function!:*STATIC*" with type "area" with size 0
+	Declared entity "static_function!:static_function!foo" with type "functional" "int -> void"
+
+External variable list:
+
+	Declared external entity "TOP-LEVEL:main"	with type "functional" "() -> void"
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "static_function!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "static_function!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "static_function!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "static_function!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module static_function!
+
+void main()
+{
+   int j;
+
+   foo(j);
+}
 
 Module static_function!
 
@@ -9,6 +56,8 @@ Module main
 void main()
 {
    int j;
+
+   foo(j);
 }
 
 Module foo
@@ -18,3 +67,56 @@ static void foo(int x)
    float i;
    i = 5;
 }
+static_function!foo
+
+Declarations for module "static_function!foo" with type "int -> void"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "static_function!:*HEAP*" with type "area" with size 0
+	Declared entity "static_function!:*STATIC*" with type "area" with size 0
+	Declared entity "static_function!foo:*DYNAMIC*" with type "area" with size 4
+	Declared entity "static_function!foo:*STACK*" with type "area" with size 0
+	Declared entity "static_function!foo:*STATIC*" with type "area" with size 0
+	Declared entity "static_function!foo:0`i" with type "variable" "float"
+	Declared entity "static_function!foo:x" with type "variable" "int"
+
+* empty extern declaration list *
+
+
+Layouts for formal parameters:
+
+	Variable static_function!static_function!foo:x	offset = 1
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "static_function!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "static_function!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "static_function!foo:*DYNAMIC*" of size 4:
+	Variable "static_function!static_function!foo:0`i"	offset = 0	size = 4
+
+
+Layout for memory area "static_function!foo:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "static_function!foo:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module static_function!foo
+
+
+Call graph for "main"
+
+ main
+     static_function!foo
