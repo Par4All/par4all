@@ -95,7 +95,7 @@ reservation lire_reservation()
 
     r = make_reservation( personne_undefined, d, l, 0, NULL, date_undefined );
     reservation_conducteur( r ) = p ;
-    PERSONNE(reservation_passager(r)[0]) = reservation_conducteur(r);
+    reservation_passager(r)[0] = reservation_conducteur(r);
 
     /*	reservation_conducteur(r) = 
 	PERSONNE(reservation_passager(r)[0]) = reservation_conducteur(r);
@@ -112,7 +112,7 @@ reservation lire_reservation()
 
     for (i = 1; i <= reservation_nbpassager(r); i++) {
 	fprintf(stderr, "Nom du passager %d ? ", i);
-	PERSONNE(reservation_passager(r)[i]) = (personne) lire_passager();
+	reservation_passager(r)[i] = lire_passager();
     }
     fprintf(stderr, "Cette reservation est-elle definitive (o/n) ? ");
     reservation_a_confirmer(r) = (ld_char(stdin) == 'o') ? d : d ;
@@ -252,13 +252,13 @@ login l ;
 {
     return( l ) ;
 }
-	
+
 void
 print_date( d )
 date d ;
 {
     fprintf( stderr, "date %s, offset %d\n", date_ident( d ) ,
-	     ((chunk *)d+1)->i ) ;
+	     ((gen_chunk *)d+1)->i ) ;
 }
 
 int main(void)
@@ -329,13 +329,13 @@ int main(void)
 	fprintf(stderr, "%s (%d) a reserve la voiture le %d/%d/%d\n pour %s,",
 		personne_nom(reservation_conducteur(r)),
 		j,
-		date_jour(reservation_date(r)),	
-		date_mois(reservation_date(r)),	
+		date_jour(reservation_date(r)),
+		date_mois(reservation_date(r)),
 		date_annee(reservation_date(r)),
-		personne_nom( PERSONNE(reservation_passager(r)[1]) )) ;
-	SET_MAP( log, {fprintf(stderr, "%c\n", 
+		personne_nom(reservation_passager(r)[1])) ;
+	SET_MAP( log, {fprintf(stderr, "%c\n",
 			       ((struct mylogin *)log)->user_id ) ;},
-		 personne_logins(PERSONNE(reservation_passager(r)[1]))) ;
+		 personne_logins(reservation_passager(r)[1])) ;
     }
     fprintf( stderr, "End report\n" ) ;
     fd = ouvrir("sortie", "w");
@@ -383,23 +383,28 @@ int main(void)
 	r = RESERVATION(CAR(l)) ;
 	fprintf(stderr, "%s a reserve la voiture le %d/%d/%d\n pour %s,",
 		personne_nom(reservation_conducteur(r)),
-		date_jour(reservation_date(r)),	
-		date_mois(reservation_date(r)),	
+		date_jour(reservation_date(r)),
+		date_mois(reservation_date(r)),
 		date_annee(reservation_date(r)),
-		personne_nom( PERSONNE(reservation_passager(r)[1]) )) ;
-	SET_MAP( log, {fprintf(stderr, "%c\n", 
+		personne_nom(reservation_passager(r)[1]));
+	SET_MAP( log, {fprintf(stderr, "%c\n",
 			       ((struct mylogin *)log)->user_id ) ;},
-		 personne_logins(PERSONNE(reservation_passager(r)[1]))) ;
+		 personne_logins(reservation_passager(r)[1])) ;
     }
     fd = ouvrir( "sortie2", "w" ) ;
     gen_write_tabulated( fd, date_domain ) ;
-    
-    TABULATED_MAP(d,{fprintf( stderr, "%s\n", date_ident( d ));},
-		  date_domain ) ;
-    
+
+#warning "TABULATED_MAP is not implemented anymore..."
+    /*
+    TABULATED_MAP( d, {
+	fprintf( stderr, "%s\n", date_ident( d ));
+      },
+      date_domain);
+    */
+
     gen_debug = GEN_DBG_CHECK ;
 /*    gen_debug = GEN_DBG_TRAV ;*/
-    fprintf(stderr, "%d reservations\n", 
+    fprintf(stderr, "%d reservations\n",
 	    gen_length(indisponibilite_reservation(i)));
 /*    gen_debug = GEN_DBG_TRAV ; */
     ii = copy_indisponibilite( i ) ;
@@ -409,12 +414,12 @@ int main(void)
     gen_write( fd, ii ) ;
     fprintf( stderr, "End writing\n" ) ;
     fprintf( stderr, "Check sharing\n" ) ;
-    gen_debug = GEN_DBG_TRAV ; 
+    gen_debug = GEN_DBG_TRAV ;
     l = indisponibilite_reservation( i ) ;
-    l = CONS( RESERVATION, RESERVATION(CAR( l )), 
+    l = CONS( RESERVATION, RESERVATION(CAR( l )),
 	      CONS( RESERVATION, RESERVATION(CAR( l )), NIL)) ;
     gen_write( stderr, make_indisponibilite( l, secu )) ;
-    RESERVATION(CAR( l )) = reservation_undefined ;
+    RESERVATION_(CAR(l)) = reservation_undefined ;
     fprintf(stderr, "i Defined = %d\n", 
 	    gen_defined_p( make_indisponibilite( l, secu ))) ;
     gen_free( make_indisponibilite( l, secu )) ;
