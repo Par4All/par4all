@@ -1,5 +1,8 @@
 delete ocean_fi_2
-create ocean_fi_2 ocean_fi_2.f
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create ocean_fi_2 ocean_fi.f
 
 setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 setproperty SEMANTICS_FILTERED_PRECONDITIONS TRUE
@@ -15,5 +18,5 @@ activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE
 
 close
-# delete ocean_fi_2
+delete ocean_fi_2
 quit

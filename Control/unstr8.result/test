@@ -1,3 +1,6 @@
+
+Printed file
+
       PROGRAM UNSTR
       INTEGER I,J,K
       READ *, J, K                                                      0001
@@ -54,6 +57,9 @@ c     Some irreductible graphs
       I = 3                                                             0004
       GOTO 100
       END
+
+Printed file after RESTUCTURE_CONTROL
+
       PROGRAM UNSTR
       INTEGER I,J,K
       READ *, J, K                                                      0001

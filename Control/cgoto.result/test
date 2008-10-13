@@ -1,3 +1,6 @@
+
+Printed file
+
       PROGRAM CGOTO
 
       IF (I.EQ.1) GOTO 100                                              0001
@@ -14,6 +17,9 @@
 400   CONTINUE                                                          0009
       J = 5                                                             0010
       END
+
+Printed file after RESTUCTURE_CONTROL
+
       PROGRAM CGOTO
 
       IF (I.EQ.1) GOTO 100                                              0001

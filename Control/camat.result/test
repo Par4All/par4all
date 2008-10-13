@@ -1,3 +1,6 @@
+
+Printed file
+
 C -----------------------------------------------------------
 C	PREPARATION DES DONNEES POUR L'ACTIF OU LE REACTIF
 C -----------------------------------------------------------
@@ -368,6 +371,9 @@ C     +       ' MAX: ' ,I5)
 C 1003 FORMAT(3X,'NOMBRE D''ELEMENTS DANS LE JACOBIEN: ',I5,' MAX: ',I5)
 C 1004 FORMAT (1X,'* FIN DE CAMAT ',A4,20X,'KER=',I6)
       END
+
+Printed file after RESTUCTURE_CONTROL
+
 C -----------------------------------------------------------
 C	PREPARATION DES DONNEES POUR L'ACTIF OU LE REACTIF
 C -----------------------------------------------------------

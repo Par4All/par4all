@@ -1,9 +1,0 @@
-delete foo
-# create foo Tests/unstructured.f
-create foo unstruc18.f
-
-setenv SEMANTICS_DEBUG_LEVEL "8"
-activate TRANSFORMERS_INTER_FULL
-activate PRINT_CODE_TRANSFORMERS
-display PRINTED_FILE[UNSTRUC18]
-quit

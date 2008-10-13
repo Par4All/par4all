@@ -1,9 +1,15 @@
+
+Printed file
+
       PROGRAM CAMAT 
       KER = 0                                                           0001
 
 
 1     CONTINUE
       END
+
+Printed file after RESTUCTURE_CONTROL
+
       PROGRAM CAMAT 
       KER = 0                                                           0001
 

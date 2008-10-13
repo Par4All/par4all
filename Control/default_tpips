@@ -1,7 +1,19 @@
 delete ${WSPACE}
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create ${WSPACE} ${FILE}
 
+echo
+echo Printed file
+echo
+
 display PRINTED_FILE
+
+echo
+echo Printed file after RESTUCTURE_CONTROL
+echo
+
 apply RESTRUCTURE_CONTROL
 display PRINTED_FILE
 

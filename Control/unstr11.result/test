@@ -1,3 +1,6 @@
+
+Printed file
+
       PROGRAM EMPTY
       INTEGER A, B
 
@@ -8,6 +11,9 @@ c     commentaire sur un goto :
       PRINT *, J                                                        0004
 
       END
+
+Printed file after RESTUCTURE_CONTROL
+
       PROGRAM EMPTY
       INTEGER A, B
 

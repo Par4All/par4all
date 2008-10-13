@@ -1,3 +1,6 @@
+
+Printed file
+
       PROGRAM UNSTR
 
 c     test of entry and exit node extraction by Ronan's restructurer
@@ -11,6 +14,9 @@ c     plus unstructured decomposition
       PRINT *, J                                                        0006
 
       END
+
+Printed file after RESTUCTURE_CONTROL
+
       PROGRAM UNSTR
 
 c     test of entry and exit node extraction by Ronan's restructurer

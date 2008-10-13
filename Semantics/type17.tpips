@@ -1,24 +1,39 @@
 delete type17
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create type17 type17.f
 
 setproperty SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES TRUE
 setproperty SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES TRUE
 setproperty SEMANTICS_ANALYZE_SCALAR_STRING_VARIABLES TRUE
 
+echo
+echo Transformers for "TYPE17"
+echo
+
 activate PRINT_CODE_TRANSFORMERS
-display PRINTED_FILE[%ALL]
+display PRINTED_FILE[TYPE17]
+
+echo
+echo Preconditions for "TYPE17"
+echo
 
 activate PRINT_CODE_PRECONDITIONS
-display PRINTED_FILE[%ALL]
+display PRINTED_FILE[TYPE17]
 
 # delete type17
+
+echo
+echo After dead code elimination for "TYPE17"
+echo
 
 activate PRINT_CODE
-# apply PARTIAL_EVAL[%ALL]
+# apply PARTIAL_EVAL[TYPE17]
 apply SUPPRESS_DEAD_CODE[TYPE17]
 
-display PRINTED_FILE[%ALL]
+display PRINTED_FILE[TYPE17]
 
 close
-# delete type17
 delete type17
+quit

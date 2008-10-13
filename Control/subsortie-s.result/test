@@ -1,7 +1,13 @@
+
+Printed file
+
       SUBROUTINE SUBSORTIE()
       IF (A.EQ.B) THEN                                                  0001
       ENDIF
       END
+
+Printed file after RESTUCTURE_CONTROL
+
       SUBROUTINE SUBSORTIE()
       IF (A.EQ.B) THEN                                                  0001
       ENDIF

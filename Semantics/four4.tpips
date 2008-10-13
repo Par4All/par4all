@@ -1,4 +1,7 @@
 delete four4
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create four4 four4.f
 
 #setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
@@ -17,9 +20,19 @@ module FOUR4
 
 # setenv SEMANTICS_DEBUG_LEVEL 8
 
+echo
+echo Transformers for "FOUR4"
+echo
+
+SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT FALSE
+
 activate TRANSFORMERS_INTER_FULL
 activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE[FOUR4]
+
+echo
+echo Preconditions for "FOUR4"
+echo
 
 activate INTERPROCEDURAL_SUMMARY_PRECONDITION
 activate PRECONDITIONS_INTER_FULL
@@ -29,4 +42,4 @@ display PRINTED_FILE[FOUR4]
 close
 delete four4
 quit
-# EOF
+

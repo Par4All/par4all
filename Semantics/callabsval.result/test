@@ -1,4 +1,29 @@
 
+Transformers for "ABSVAL"
+
+
+C  T(NABS) {0<=N+NABS, N<=NABS}
+
+      SUBROUTINE ABSVAL(N, NABS)
+
+C  T(NABS) {0<=N+NABS, N<=NABS}
+
+      IF (N.LT.0) THEN                                                  0001
+
+C  T(NABS) {N+NABS==0}
+
+         NABS = -N                                                      0002
+      ELSE
+
+C  T(NABS) {N==NABS}
+
+         NABS = N                                                       0003
+      ENDIF
+      END
+
+Preconditions for "ABSVAL"
+
+
 C  P() {}
 
       PROGRAM CALLABSVAL

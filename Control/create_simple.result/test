@@ -1,3 +1,6 @@
+
+Printed file
+
       SUBROUTINE CREATE
 
 
@@ -7,6 +10,9 @@
 9999  I = 4                                                             0004
 8888  CONTINUE
       END
+
+Printed file after RESTUCTURE_CONTROL
+
       SUBROUTINE CREATE
 
 

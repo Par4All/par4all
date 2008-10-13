@@ -3,14 +3,16 @@
 # Script to test call to two different DG one after the other
 # using many_calls.f
 #
-
-tpips=${tpips_version:-tpips}
-
+# 
+# tpips=${tpips_version:-tpips}
+# 
 # Initialization:
 # rm -f many_calls.result/test
 # many_calls.test >many_calls.result/test
+# 
+# $tpips <<EOF
 
-$tpips <<EOF
+delete mc
 
 create mc Ricedg/many_calls.f
 
@@ -72,5 +74,4 @@ activate PRINT_LOOP_CARRIED_DEPENDENCE_GRAPH
 display DG_FILE
 close
 delete mc
-EOF
-#
+

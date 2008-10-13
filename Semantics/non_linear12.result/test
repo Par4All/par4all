@@ -1,4 +1,7 @@
 
+Transformers for "ABSVAL"
+
+
 C  T(IS,M,NQ) {0<=IS+1, IS<=1, 5<=M, M<=6, 1<=NQ, NQ<=64}
 
       SUBROUTINE NON_LINEAR12 (IS, M, U, X, Y, NQ)
@@ -95,6 +98,113 @@ C (0,14)
       ENDIF
 
 C  T() {0<=IS+1, IS<=1, 5<=M, M<=6, 0<=MX, MX<=63, 1<=NQ, NQ<=64}
+
+C (0,15)
+
+      PRINT *, MX                                                       0014
+C     END BLOCK
+      END
+
+Preconditions for "ABSVAL"
+
+
+C  P() {}
+
+      SUBROUTINE NON_LINEAR12 (IS, M, U, X, Y, NQ)
+
+      IMPLICIT REAL*8 (A-H, O-Z)
+      PARAMETER (PI = 3.141592653589793238D0)
+      COMMON /COUNT/ KTTRANS(256)
+      DIMENSION U(1), X(1), Y(1)
+
+C  P() {}
+
+C (0,1)
+C     BEGIN BLOCK
+
+C  P() {}
+
+C (0,2)
+
+      IF (X.GT.0) THEN                                                  0001
+
+C  P() {}
+
+C (0,3)
+         IS = -1                                                        0002
+      ELSE
+
+C  P() {}
+
+C (0,4)
+         IS = 1                                                         0003
+      ENDIF
+
+C  P(IS) {0<=IS+1, IS<=1}
+
+C (0,5)
+
+      IF (X.GT.0) THEN                                                  0004
+
+C  P(IS) {0<=IS+1, IS<=1}
+
+C (0,6)
+         M = 5                                                          0005
+      ELSE
+
+C  P(IS) {0<=IS+1, IS<=1}
+
+C (0,7)
+         M = 6                                                          0006
+      ENDIF
+
+C  P(IS,M) {0<=IS+1, IS<=1, 5<=M, M<=6}
+
+C (0,8)
+
+      IF (X.GT.0) THEN                                                  0007
+
+C  P(IS,M) {0<=IS+1, IS<=1, 5<=M, M<=6}
+
+C (0,9)
+         NQ = 1                                                         0008
+      ELSE
+
+C  P(IS,M) {0<=IS+1, IS<=1, 5<=M, M<=6}
+
+C (0,10)
+         NQ = 64                                                        0009
+      ENDIF
+
+C  P(IS,M,NQ) {0<=IS+1, IS<=1, 5<=M, M<=6, 1<=NQ, NQ<=64}
+
+C (0,11)
+
+      MX = MOD(K, 64)                                                   0010
+
+C  P(IS,M,MX,NQ) {0<=IS+1, IS<=1, 5<=M, M<=6, 0<=MX, MX<=63, 1<=NQ,
+C    NQ<=64}
+
+C (0,12)
+
+      IF (IS.NE.1.AND.IS.NE.-1.OR.M.LT.1.OR.M.GT.MX) THEN               0011
+
+C  P(IS,M,MX,NQ) {0<=IS+1, IS<=1, MX<=59IS+M+58, 59IS+MX<=M+58,
+C    MX<=58IS+63, 58IS+MX<=63, 5<=M, M<=6, 0<=MX, 1<=NQ, NQ<=64}
+
+C (0,13)
+         PRINT *, IS, M, MX                                             0012
+      ELSE
+
+C  P(IS,M,MX,NQ) {0<=IS+1, IS<=1, 5<=M, M<=6, M<=MX, 0<=MX, MX<=63,
+C    1<=NQ, NQ<=64}
+
+C (0,14)
+         PRINT *, IS, M, MX                                             0013
+      ENDIF
+
+C  P(IS,M,MX,NQ) {0<=IS+1, IS<=1, 5<=M, M<=6, 0<=MX, MX<=63, 1<=NQ,
+C    NQ<=64}
 
 C (0,15)
 

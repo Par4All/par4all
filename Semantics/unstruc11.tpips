@@ -1,4 +1,7 @@
 delete unstruc11
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create unstruc11 unstruc11.f
 
 module UNSTRUC11
@@ -48,5 +51,7 @@ shell echo
 activate PRECONDITIONS_INTER_FULL
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[UNSTRUC11]
+
 close
 delete unstruc11
+quit

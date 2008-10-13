@@ -1,3 +1,6 @@
+
+Printed file
+
       PROGRAM UNSTR
       INTEGER A, B
 
@@ -14,6 +17,9 @@ c     if:
          GOTO 10
       ENDIF
       END
+
+Printed file after RESTUCTURE_CONTROL
+
       PROGRAM UNSTR
       INTEGER A, B
 

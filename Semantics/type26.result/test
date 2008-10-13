@@ -1,4 +1,7 @@
 
+Transformers for "TYPE26"
+
+
 C  T() {}
 
       PROGRAM TYPE26
@@ -26,6 +29,9 @@ C  T() {}
       CALL INIPRINT(S, X, I)                                            0004
 
       END
+
+Preconditions for "TYPE26" and "INIPRINT"
+
 
 C  P() {}
 
@@ -70,3 +76,14 @@ C  P() {"Hello World!"==FS, 2.0==FX, FI==1}
 
       END
 
+Partial evaluation for "INIPRINT": only integer scalar variables are substituted
+
+
+      SUBROUTINE INIPRINT(FS, FX, FI)
+
+      CHARACTER*(*) FS
+      INTEGER FI
+
+      PRINT *, FS, FX, 1                                                0001
+
+      END

@@ -1,0 +1,14 @@
+delete grandg02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create grandg02 grandg.f
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+module GRANDG
+display GRAPH_PRINTED_FILE[GRANDG]
+
+close
+quit
+# EOF

@@ -140,14 +140,14 @@ c=========================================================
 C*        filsys=fichtest(itest)(1:lonfich)//'.sys'
 C*        filsys=fichtest(itest)(1:lonfich)
          OPEN (UNIT=56,FILE=FILSYS)                                     0021
-         DO IGRAIN = 1, NGRAIN                                          0022
+         DO 910 IGRAIN = 1, NGRAIN                                      0022
             ISYS = 12*(IGRAIN-1)                                        0023
             WRITE (56, *) 'grain ', IGRAIN                              0024
             WRITE (56, '(6(2x,f9.5))') (GVCUM(ID), ID = ISYS+1, ISYS+   0025
      &      6)                                                          0025
             WRITE (56, '(6(2x,f9.5))') (GVCUM(ID), ID = ISYS+7, ISYS+   0026
      &      12)                                                         0026
-         ENDDO
+910         CONTINUE                                                    0027
          CLOSE (56)                                                     0028
       ENDIF
       END
