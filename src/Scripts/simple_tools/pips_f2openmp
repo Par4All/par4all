@@ -1,5 +1,8 @@
 #! /bin/bash
 
+# Use $INSTALL_DIR if set or $PIPS_ROOT:
+SHR_d=${INSTALL_DIR:-$PIPS_ROOT}/share
+
 function display_usage_and_exit () {
     cat <<EOF
 $0 [-h|--help] file.f ...
