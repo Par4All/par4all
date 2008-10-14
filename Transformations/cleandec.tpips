@@ -1,12 +1,17 @@
+# FI: I do not understand what is cleaned up
+
 delete cleandec
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create cleandec cleandec.f
 
 apply CLEAN_DECLARATIONS[BAR]
 apply CLEAN_DECLARATIONS[CLEANDEC]
 apply UNSPLIT[BAR]
 apply UNSPLIT[CLEANDEC]
-display PRINTED_FILE[BAR]
 display PRINTED_FILE[CLEANDEC]
+display PRINTED_FILE[BAR]
 close
 delete cleandec
 quit

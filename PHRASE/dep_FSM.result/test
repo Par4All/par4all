@@ -13,8 +13,7 @@ int dep(int a[100],int b[100],int c[100],int d[100])
             ;
             FSM3_STATE = 2;
          }
-         else
-          {
+         else {
             ;
             FSM3_STATE = 3;
          }

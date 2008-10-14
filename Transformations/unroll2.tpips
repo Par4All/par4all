@@ -56,7 +56,14 @@ echo
 echo Code after dead code elimination for "UNROLL2"
 echo
 
-apply SUPRESS_DEAD_CODE[UNROLL2]
+apply SUPPRESS_DEAD_CODE[UNROLL2]
+display PRINTED_FILE[UNROLL2]
+
+echo
+echo Code after use-def elimination for "UNROLL2"
+echo
+
+apply USE_DEF_ELIMINATION[UNROLL2]
 display PRINTED_FILE[UNROLL2]
 
 close

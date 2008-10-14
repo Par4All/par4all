@@ -1,7 +1,13 @@
+delete rma
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create rma rma.c
 activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 
 # Since the for loops are not dealt yet:
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
@@ -9,9 +15,9 @@ setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 activate MUST_REGIONS
 
 echo Transform all the control flow in one finite state machine:
-apply PHRASE_DISTRIBUTOR[%ALL]
-apply PHRASE_DISTRIBUTOR_CONTROL_CODE[%ALL]
-display PRINTED_FILE[%ALL]
+apply PHRASE_DISTRIBUTOR[rma]
+apply PHRASE_DISTRIBUTOR_CONTROL_CODE[rma]
+display PRINTED_FILE[rma]
 
 close
 delete rma

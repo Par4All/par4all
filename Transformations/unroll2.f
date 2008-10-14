@@ -9,4 +9,5 @@ C
          T(I+N) = -2*I
  10   CONTINUE
 C
+      PRINT *, T
       END

@@ -1,4 +1,5 @@
 Transform all the control flow in hierarchical finite state machines:
+extern int ex3(int ,char *);
 int ex3(int argc,char *args)
 {
    int x[100];
@@ -19,8 +20,7 @@ int ex3(int argc,char *args)
             ;
             FSM2_STATE = 3;
          }
-         else
-          {
+         else {
             ;
             FSM2_STATE = 5;
          }
@@ -40,7 +40,6 @@ int ex3(int argc,char *args)
 
    return 0;
 }
-extern int ex3(int ,char *);
 For fun, prettyprint the C code as SmallTalk for the Madeo synthesis tool:
 /* SMALLTALK pretty print for module ex3. */
 ex3 with:argc with:args 

@@ -1,3 +1,7 @@
+delete dep_FSM
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create dep_FSM dep.c
 activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE

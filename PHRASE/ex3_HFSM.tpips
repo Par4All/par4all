@@ -1,12 +1,19 @@
+delete ex3_HFSM
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create ex3_HFSM ex3.c
 activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
 echo Transform all the control flow in hierarchical finite state machines:
-apply SPAGHETTIFY[%ALL]
-apply FSM_GENERATION[%ALL]
-display PRINTED_FILE[%ALL]
+apply SPAGHETTIFY[ex3]
+apply FSM_GENERATION[ex3]
+display PRINTED_FILE[ex3!]
+display PRINTED_FILE[ex3]
 
 echo For fun, prettyprint the C code as SmallTalk for the Madeo synthesis tool:
 display SMALLTALK_CODE_FILE[ex3]

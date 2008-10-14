@@ -1,4 +1,6 @@
---- Code unrolled twice for UNROLL2
+
+Code unrolled twice for "UNROLL2"
+
 C
 C
       PROGRAM UNROLL2
@@ -17,8 +19,11 @@ C
 99997    CONTINUE
       I = 1+MAX0(LU_NUB0, 0)*1
 C
+      PRINT *, T                                                        0004
       END
---- Code after partial evaluation for UNROLL2
+
+Code after partial evaluation for "UNROLL2"
+
 C
 C
       PROGRAM UNROLL2
@@ -37,8 +42,11 @@ C
 99997    CONTINUE
       I = 101
 C
+      PRINT *, T                                                        0004
       END
---- Code after dead code elimination for UNROLL2
+
+Code after dead code elimination for "UNROLL2"
+
 C
 C
       PROGRAM UNROLL2
@@ -56,4 +64,23 @@ C
 99997    CONTINUE
       I = 101
 C
+      PRINT *, T                                                        0004
+      END
+
+Code after use-def elimination for "UNROLL2"
+
+C
+C
+      PROGRAM UNROLL2
+C
+      PARAMETER (N=100)
+      REAL T(N)
+C
+99998 CONTINUE
+      DO 99997 LU_IND0 = 0, 99, 2
+         T(LU_IND0+101) = -2*LU_IND0-2                                  0002
+         T(LU_IND0+102) = -2*LU_IND0-4                                  0002
+99997    CONTINUE
+C
+      PRINT *, T                                                        0004
       END

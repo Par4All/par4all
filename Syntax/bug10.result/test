@@ -46,6 +46,7 @@ Request: build resource CALLGRAPH_FILE for module COURC4.
                                  building   INITIAL_FILE(BALAYE)
 user error in generic_initializer: no source file for BALAYE (might be an ENTRY point)
 set PREPROCESSOR_MISSING_FILE_HANDLING to "query" or "generate"...
+user warning in set_debug_stack_pointer: debug level stack is set to 2
 user error in build_real_resources: unable to build callees for BALAYE
 Some source code probably is missing!
 user warning in safe_do_something: Request aborted in pipsmake: build resource CALLGRAPH_FILE for module COURC4.

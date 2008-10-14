@@ -14,8 +14,7 @@ int ex2(int argc,char *args)
             ;
             FSM3_STATE = 2;
          }
-         else
-          {
+         else {
             ;
             FSM3_STATE = 6;
          }
@@ -28,8 +27,7 @@ int ex2(int argc,char *args)
             ;
             FSM3_STATE = 4;
          }
-         else
-          {
+         else {
             ;
             FSM3_STATE = 5;
          }
