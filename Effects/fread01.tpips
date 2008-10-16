@@ -1,0 +1,24 @@
+delete fread01
+setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create fread01 fread01.c
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+display PRINTED_FILE
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]
+quit
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+
+close
+delete fread01
+quit
