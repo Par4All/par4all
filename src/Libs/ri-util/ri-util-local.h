@@ -291,6 +291,64 @@
 #define BUFFEROUT_FUNCTION_NAME 	"BUFFEROUT"
 #define ENDFILE_FUNCTION_NAME 		"ENDFILE"
 #define FORMAT_FUNCTION_NAME 		"FORMAT"
+/*io functions: C library and system io.Amira Mensi*/
+/*#include<stdio.h> */
+#define PRINTF_FUNCTION_NAME            "printf"
+#define FPRINTF_FUNCTION_NAME           "fprintf"
+#define SCANF_FUNCTION_NAME             "scanf"
+#define FSCANF_FUNCTION_NAME            "fscanf"
+#define PUTS_FUNCTION_NAME              "puts"
+#define GETS_FUNCTION_NAME              "gets"
+#define FPUTS_FUNCTION_NAME             "fputs"
+#define FGETS_FUNCTION_NAME             "fgets"
+#define FPUTC_FUNCTION_NAME             "fputc"
+#define FGETC_FUNCTION_NAME             "fgetc"
+#define FOPEN_FUNCTION_NAME             "fopen"
+#define FCLOSE_FUNCTION_NAME            "fclose"
+#define SNPRINTF_FUNCTION_NAME          "snprintf"
+#define SSCANF_FUNCTION_NAME            "sscanf"
+#define VFPRINTF_FUNCTION_NAME          "vfprintf"
+#define VFSCANF_FUNCTION_NAME           "vfscanf"
+#define VPRINTF_FUNCTION_NAME           "vprintf"
+#define VSCANF_FUNCTION_NAME            "vscanf"
+#define VSNPRINTF_FUNCTION_NAME         "vsnprintf"
+#define VSPRINTF_FUNCTION_NAME          "vsprintf"
+#define SPRINTF_FUNCTION_NAME           "sprintf"
+#define VSSCANF_FUNCTION_NAME           "vsscanf"
+#define FPUTC_FUNCTION_NAME             "fputc"
+#define GETC_FUNCTION_NAME              "getc"
+#define GETCHAR_FUNCTION_NAME           "getchar"
+#define PUTC_FUNCTION_NAME              "putc"
+#define PUTCHAR_FUNCTION_NAME           "putchar"
+#define UNGETC_FUNCTION_NAME            "ungetc"
+#define FREAD_FUNCTION_NAME             "fread"
+#define FWRITE_FUNCTION_NAME            "fwrite"
+#define FGETPOS_FUNCTION_NAME           "fgetpos"
+#define FSEEK_FUNCTION_NAME             "fseek"
+#define FSETPOS_FUNCTION_NAME           "fsetpos"
+#define FTELL_FUNCTION_NAME             "ftell"
+#define C_REWIND_FUNCTION_NAME          "rewind"
+#define CLEARERR_FUNCTION_NAME          "clearer"
+#define FEOF_FUNCTION_NAME              "feof"
+#define FERROR_FUNCTION_NAME            "ferror"
+#define PERROR_FUNCTION_NAME            "perror"
+#define WRITE_SYSTEM_FUNCTION_NAME      "write"
+#define READ_SYSTEM_FUNCTION_NAME       "read"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #define MOD_INTRINSIC_NAME 		"MOD"
 
@@ -532,6 +590,49 @@
 #define ENTITY_IMPLIEDDO_P(e) ENTITY_NAME_P(e, IMPLIED_DO_NAME)
 #define ENTITY_IO_LIST_P(e) ENTITY_NAME_P(e, IO_LIST_STRING_NAME)
 #define ENTITY_FORMAT_P(e) ENTITY_NAME_P(e, "FORMAT")
+#define ENTITY_PRINTF_P(e) ENTITY_NAME_P(e, "printf")
+#define ENTITY_FPRINTF_P(e) ENTITY_NAME_P(e, "fprintf")
+#define ENTITY_SCANF_P(e) ENTITY_NAME_P(e, "scanf")
+#define ENTITY_FSCANF_P(e) ENTITY_NAME_P(e, "fscanf")
+#define ENTITY_PUTS_P(e) ENTITY_NAME_P(e, "puts")
+#define ENTITY_GETS_P(e) ENTITY_NAME_P(e, "gets")
+#define ENTITY_FGETC_P(e) ENTITY_NAME_P(e, "fgetc")
+#define ENTITY_FPUTS_P(e) ENTITY_NAME_P(e, "fputs")
+#define ENTITY_FGETS_P(e) ENTITY_NAME_P(e, "fgets")
+#define ENTITY_FPUTC_P(e) ENTITY_NAME_P(e, "fputc")
+#define ENTITY_FGETS_P(e) ENTITY_NAME_P(e, "fgets")
+#define ENTITY_FOPEN_P(e) ENTITY_NAME_P(e, "fopen")
+#define ENTITY_FCLOSE_P(e) ENTITY_NAME_P(e, "fclose")
+/* C and system IO.Amira Mensi*/
+#define ENTITY_SNPRINTF_P(e) ENTITY_NAME_P(e,"snprintf")
+#define ENTITY_SSCANF_P(e)   ENTITY_NAME_P(e,"sscanf")
+#define ENTITY_VFPRINTF_P(e) ENTITY_NAME_P(e, "vfprintf")
+#define ENTITY_VFSCANF_P(e)  ENTITY_NAME_P(e, "vfscanf")
+#define ENTITY_VPRINTF_P(e)  ENTITY_NAME_P(e, "vprintf")
+#define ENTITY_VSCANF_P(e)   ENTITY_NAME_P(e,"vscanf")
+#define ENTITY_VSNPRINTF_P(e) ENTITY_NAME_P(e,"vsnprintf")
+#define ENTITY_VSPRINTF_P(e) ENTITY_NAME_P(e, "vsprintf")
+#define ENTITY_SPRINTF_P(e) ENTITY_NAME_P(e, "sprintf")
+#define ENTITY_VSSCANF_P(e)  ENTITY_NAME_P(e, "vsscanf")
+#define ENTITY_FPUTC_P(e)  ENTITY_NAME_P(e, "fputc")
+#define ENTITY_GETC_P(e)   ENTITY_NAME_P(e, "getc")
+#define ENTITY_GETCHAR_P(e)  ENTITY_NAME_P(e, "getchar")
+#define ENTITY_PUTC_P(e)    ENTITY_NAME_P(e, "putc")
+#define ENTITY_PUTCHAR_P(e) ENTITY_NAME_P(e, "putchar")
+#define ENTITY_UNGETC_P(e)  ENTITY_NAME_P(e,"ungetc")
+#define ENTITY_FREAD_P(e)   ENTITY_NAME_P(e, "fread")
+#define ENTITY_FWRITE_P(e)  ENTITY_NAME_P(e, "fwrite")
+#define ENTITY_FGETPOS_P(e) ENTITY_NAME_P(e,"fgetpos")
+#define ENTITY_FSEEK_P(e)   ENTITY_NAME_P(e, "fseek")
+#define ENTITY_FSETPOS_P(e) ENTITY_NAME_P(e, "fsetpos")
+#define ENTITY_FTELL_P(e)  ENTITY_NAME_P(e,"ftell")
+#define ENTITY_C_REWIND_P(e)  ENTITY_NAME_P(e,"rewind")
+#define ENTITY_CLEARERR_P(e)  ENTITY_NAME_P(e,"clearer")
+#define ENTITY_FEOF_P(e)  ENTITY_NAME_P(e,"feof")
+#define ENTITY_FERROR_P(e)  ENTITY_NAME_P(e, "ferror")
+#define ENTITY_PERROR_P(e)  ENTITY_NAME_P(e,"perror")
+#define ENTITY_WRITE_SYSTEM_P(e) ENTITY_NAME_P(e,"write")
+#define ENTITY_READ_SYSTEM_P(e)   ENTITY_NAME_P(e,"read") 
 
 /* DATA management
  */
@@ -847,6 +948,10 @@ the variable is unsigned, signed or not */
 #define STDERR_LUN (0)
 #define STDIN_LUN (5)
 #define STDOUT_LUN (6)
+/*Symbolic constants for the file descriptors beloning to the standard streams*/
+#define STDIN_FILENO (0)
+#define STDOUT_FILENO (1)
+#define STDERR_FILENO (2)
 
 /* Empty comments (i.e. default comments) */
 
