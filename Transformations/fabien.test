@@ -8,6 +8,8 @@ tpips=${tpips_version:-tpips}
 
 $tpips <<EOF
 
+set ABORT_ON_USER_ERROR TRUE
+
 # Check evaluation of constant expressions for parameters (eval.c),
 # linearization of expressions with constant subexpressions (normalize.c)
 # and partial evaluation of expressions with intrinsics

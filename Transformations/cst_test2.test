@@ -7,7 +7,7 @@ $tpips <<EOF
 setproperty PRETTYPRINT_BLOCK_IF_ONLY=TRUE
 
 delete cst_test2
-create cst_test2 $PIPS_ROOT/Validation/Transformations/cst_test2.f
+create cst_test2 cst_test2.f
 
 echo
 echo Preconditions computed for user code

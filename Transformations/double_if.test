@@ -3,7 +3,7 @@
 tpips=${tpips_version:-tpips}
 
 $tpips <<EOF
-create double_if $PIPS_VALIDDIR/Transformations/double_if.f
+create double_if double_if.f
 set DEAD_CODE_DISPLAY_STATISTICS TRUE
 
 echo
