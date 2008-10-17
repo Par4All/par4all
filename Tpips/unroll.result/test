@@ -1,0 +1,33 @@
+C
+C
+      PROGRAM UNROLL
+C
+      PARAMETER (N=100)
+      REAL T(N)
+C
+      DO 10 I = 1, 100                                                  0001
+         T(I) = -2*I                                                    0002
+10       CONTINUE                                                       0003
+C
+      END
+C
+C
+      PROGRAM UNROLL
+C
+      PARAMETER (N=100)
+      REAL T(N)
+C
+      LU_NUB0 = 100
+      LU_IB0 = 0
+      DO 99998 LU_IND0 = 0, LU_IB0-1
+         T(LU_IND0*1+1) = -2*(LU_IND0*1+1)                              0002
+99998    CONTINUE
+      DO 99997 LU_IND0 = LU_IB0, LU_NUB0-1, 4
+         T((LU_IND0+0)*1+1) = -2*((LU_IND0+0)*1+1)                      0002
+         T((LU_IND0+1)*1+1) = -2*((LU_IND0+1)*1+1)                      0002
+         T((LU_IND0+2)*1+1) = -2*((LU_IND0+2)*1+1)                      0002
+         T((LU_IND0+3)*1+1) = -2*((LU_IND0+3)*1+1)                      0002
+99997    CONTINUE
+      I = 1+MAX0(LU_NUB0, 0)*1
+C
+      END

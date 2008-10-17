@@ -1,0 +1,6 @@
+echo ${PIPS_SRCPATH}
+create s srcpath2.f
+echo ${PIPS_SRCPATH}
+close
+echo ${PIPS_SRCPATH}
+delete s

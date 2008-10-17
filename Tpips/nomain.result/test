@@ -1,0 +1,4 @@
+! next line added by fsplit() in pips
+      PROGRAM MAIN000
+      PRINT *, 'coucou'                                                 0001
+      END

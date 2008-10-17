@@ -1,0 +1,13 @@
+! testing properties errors and persistance with tpips!
+! initial values
+COMPLEXITY_PRINT_STATISTICS 0
+COMPUTE_ALL_DEPENDENCES FALSE
+! new values
+COMPLEXITY_PRINT_STATISTICS 1
+COMPUTE_ALL_DEPENDENCES TRUE
+! if this message appear, we get through many user errors;-)
+ABORT_ON_USER_ERROR FALSE
+! saved values
+COMPLEXITY_PRINT_STATISTICS 1
+COMPUTE_ALL_DEPENDENCES TRUE
+! done

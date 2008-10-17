@@ -1,0 +1,14 @@
+echo trying file nimportequoi.f
+create n1 ${PIPS_ROOT}/Validation/Tpips/nimportequoi.f
+echo trying another file
+create n2 ${PIPS_ROOT}/Validation/Tpips/test.f
+display PRINTED_FILE
+close
+echo trying file nimportequoi.f again
+create n1 ${PIPS_ROOT}/Validation/Tpips/nimportequoi.f
+echo the other database should still be there
+open n2
+display PRINTED_FILE
+close
+delete n2
+delete n1

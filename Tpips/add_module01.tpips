@@ -1,0 +1,12 @@
+delete add_module01
+create add_module01 add_module01.f
+
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "query"
+setproperty TRANSFORMERS_INTER_FULL	TRUE
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[%ALL]
+add_module01.src/added_module.f
+close
+delete add_module01
+quit

@@ -1,0 +1,12 @@
+delete u
+create u unroll.f
+module UNROLL
+display PRINTED_FILE
+apply UNROLL
+10
+4
+display PRINTED_FILE
+close
+delete u
+quit
+

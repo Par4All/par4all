@@ -1,0 +1,19 @@
+delete add_module02
+create add_module02 add_module02.f
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "query"
+
+echo
+echo Print a new module
+echo
+
+display PRINTED_FILE[ADDED_MODULES]
+add_module02.src/added_modules.f
+
+echo
+echo Print all known modules known to pipsmake: there should be three
+echo
+
+display PRINTED_FILE[%ALL]
+close
+delete add_module02
+quit

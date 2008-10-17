@@ -1,0 +1,14 @@
+
+C  T() {}
+
+C     Check that a new module can be added to a workspace
+C     when it is discovered in a call
+
+      PROGRAM ADD_MODULE01
+
+C  T() {}
+
+
+      CALL ADDED_MODULE                                                 0001
+
+      END

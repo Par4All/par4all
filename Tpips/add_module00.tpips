@@ -1,0 +1,8 @@
+delete add_module00
+create add_module00 add_module00.f
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "query"
+display PRINTED_FILE[ADDED_MODULE]
+add_module00.src/added_module.f
+close
+delete add_module00
+quit

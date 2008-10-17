@@ -1,0 +1,92 @@
+#!/bin/sh
+
+
+tpips=${tpips_version:-tpips}
+PIPS_VALIDDIR=${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}
+
+# echo tpips="$tpips"
+
+echo "testing tpips -n option"
+
+$tpips -n <<EOF
+
+# Try to get errors on user_errors ...
+# so we MUST go on !
+
+set ABORT_ON_USER_ERROR FALSE
+
+# First playing with open/close/delete ...
+
+delete tpips_noexe
+delete tpips_noexe
+create tpips_noexe $PIPS_VALIDDIR/Tpips/tpips_noexe.f
+delete tpips_noexe
+close
+delete tpips_noexe
+create tpips_noexe $PIPS_VALIDDIR/Tpips/tpips_noexe.f
+create tpips_noexe $PIPS_VALIDDIR/Tpips/tpips_noexe.f
+module STF
+close
+close
+module STF
+open tpips_noexe
+open tpips_noexe
+
+#now some activate stuff ...
+
+module STF
+activate MAY_REGIONS # MAY regions
+activate MUST_REGIONS # MUST regions
+activate PRINT_CALL_GRAPH # Calls
+activate PRINT_CALL_GRAPH_WITH_OUT_REGIONS # Calls & Out regions
+activate RICE_FAST_DEPENDENCE_GRAPH # Preconditions Ignored
+activate RICE_SEMANTICS_DEPENDENCE_GRAPH # Preconditions Used
+activate PRINT_EFFECTIVE_DEPENDENCE_GRAPH # Default
+activate PRINT_WHOLE_DEPENDENCE_GRAPH # All arcs
+activate PRINT_ICFG # Calls 
+activate PRINT_ICFG_WITH_CONTROL_OUT_REGIONS # Calls & Control & Out regions
+activate PRINT_PARALLELIZED77_CODE # Fortran 77
+activate PRINT_PARALLELIZEDCRAFT_CODE # CRAFT Fortran
+activate RICE_ALL_DEPENDENCE # All Dependences
+activate NEST_PARALLELIZATION # Loop Nest Parallelization
+activate PRECONDITIONS_INTRA # Intra-Procedural Analysis
+activate PRECONDITIONS_INTER_FULL # Full Inter-Procedural Analysis
+activate PRINT_CODE # Statements Only
+activate PRINT_CODE_STATIC_CONTROL # Statements & Static Controls
+activate PRINT_CODE_PRECONDITIONS # Statements & Static Controls
+activate PRINT_CODE_AS_A_GRAPH # Graph with Statements Only
+activate PRINT_CODE_AS_A_GRAPH_CUMULATED_EFFECTS # Graph with Statements & Cumulated Effects
+activate TRANSFORMERS_INTRA_FAST # Quick Intra-Procedural Computation
+activate TRANSFORMERS_INTER_FULL # Full Inter-Procedural Computation
+activate ATOMIC_CHAINS # Standard
+activate REGION_CHAINS # Regions
+activate PRINT_SOURCE # Basic
+activate PRINT_SOURCE_CUMULATED_EFFECTS # With Cumulated Effects
+
+# then display a few dummy things ...
+
+display CALLGRAPH_FILE(STF)
+display ICFG_FILE(STF)
+display FLINTED(STF)
+#display ADFG_FILE(STF)
+#display DG_FILE(STF)
+#display PLC_FILE(STF)
+#display BDT_FILE(STF)
+#display ADFG_FILE(STF)
+apply SUPPRESS_DEAD_CODE(STF)
+#display ADFG_FILE(STF)
+display PRINTED_FILE(STF)
+display PRINTED_FILE(STF)
+apply SUPPRESS_DEAD_CODE(STF)
+display PRINTED_FILE(STF)
+apply PARTIAL_EVAL(STF)
+display PRINTED_FILE(STF)
+#apply PRIVATIZE_MODULE(STF)
+
+#no close !!
+EOF
+
+echo "done"
+
+# Delete tpips_noexe
+#that is all ...

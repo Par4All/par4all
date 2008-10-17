@@ -1,0 +1,15 @@
+echo
+echo The message should be: workspace protected_workspace: Permission denied
+echo
+
+create protected_workspace ${PIPS_ROOT}/Validation/Tpips/protected_workspace.f
+display PRINTED_FILE
+close
+shell chmod u-rwx protected_workspace.database
+open protected_workspace
+display PRINTED_FILE[FOO]
+shell chmod u+rwx protected_workspace.database
+# Fabien would like a close before the delete... but it should be useless
+# since the open whould have failed
+delete protected_workspace
+quit
