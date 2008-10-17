@@ -13,7 +13,7 @@ shopt -s extglob
 
 # DEFAULTS
 # where is the validation?
-vdir=${PIPS_VALIDDIR:-$PIPS_ROOT/../../valid}
+vdir=${PIPS_VALIDDIR:-$PIPS_ROOT/../../validation}
 
 # default running directory
 rdir=.
