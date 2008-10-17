@@ -1,0 +1,36 @@
+!!
+!! file for scalar_alias.f
+!!
+      PROGRAM ALIAS
+C (0,1)
+      INCLUDE 'alias_flags.h'
+C     BEGIN BLOCK
+C (0,2)
+      I = 1
+C (0,3)
+      ALIAS_FLAG(1) = .TRUE.
+      CALL FOO(I, I)
+C (0,4)
+      PRINT *, I
+C (0,5)
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE FOO(J,K)
+C (0,1)
+      INCLUDE 'alias_flags.h'
+      IF (ALIAS_FLAG(1)) STOP "Alias violation in module FOO: write on J
+     &, aliased with K by call path (ALIAS:(0,3)) "
+      IF (ALIAS_FLAG(1)) STOP "Alias violation in module FOO: write on K
+     &, aliased with J by call path (ALIAS:(0,3)) "
+C     BEGIN BLOCK
+C (0,2)
+      J = J+K
+C (0,3)
+      K = J*K
+C (0,4)
+      PRINT *, J, K
+C (0,5)
+      RETURN
+C     END BLOCK
+      END

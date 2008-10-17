@@ -1,0 +1,29 @@
+!!
+!! file for scalar_alias.f
+!!
+      PROGRAM ALIAS
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      I = 1
+C (0,3)
+      CALL FOO(I, I)
+C (0,4)
+      PRINT *, I
+C (0,5)
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE FOO(J,K)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      J = J+K
+C (0,3)
+      K = J*K
+C (0,4)
+      PRINT *, J, K
+C (0,5)
+      RETURN
+C     END BLOCK
+      END

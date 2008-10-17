@@ -1,0 +1,89 @@
+!!
+!! file for alias09.f
+!!
+      PROGRAM ALIAS
+      REAL A(10,10), B(500)
+      REAL X(100,100)
+      EQUIVALENCE (A(1,1),B(1))
+      EQUIVALENCE (M,N)
+      COMMON W
+C (0,1)
+      INCLUDE 'alias_flags.h'
+C     BEGIN BLOCK
+C (0,2)
+      ALIAS_FLAG(1) = .TRUE.
+      ALIAS_FLAG(5) = .TRUE.
+      CALL FOO1(M, N)
+C (0,3)
+      ALIAS_FLAG(2) = .TRUE.
+      CALL FOO1(W, K)
+C (0,4)
+      CALL FOO1(K, L)
+C (0,5)
+      ALIAS_FLAG(3) = .TRUE.
+      CALL FOO2(A(1,1), B(1))
+C (0,6)
+      DO I = 1, 10
+C (0,7)
+         DO J = 1, 10
+C (0,8)
+            CALL FOO2(X(I,J), X(2*I,2*J))
+         ENDDO
+      ENDDO
+C (0,9)
+      RETURN
+C     END BLOCK
+      END
+
+      SUBROUTINE FOO1(V1,V2)
+      COMMON W
+C (0,1)
+      INCLUDE 'alias_flags.h'
+      IF (ALIAS_FLAG(1)) STOP "Alias violation in module FOO1: write on 
+     &V1, aliased with V2 by call path (ALIAS:(0,2)) "
+      IF (ALIAS_FLAG(2)) STOP "Alias violation in module FOO1: write on 
+     &V1, aliased with W by call path (ALIAS:(0,3)) "
+C     BEGIN BLOCK
+C (0,2)
+      V1 = 1
+C (0,3)
+      ALIAS_FLAG(4) = .TRUE.
+      CALL FOO3(V1, X, V2)
+C (0,4)
+      RETURN
+C     END BLOCK
+      END
+      
+      SUBROUTINE FOO2(XV1,XV2)
+      REAL XV1(100), XV2(100)
+C (0,1)
+      INCLUDE 'alias_flags.h'
+C     BEGIN BLOCK
+C (0,2)
+      DO I = 1, 10
+C (0,3)
+      IF (I-1.GE.0.AND.I-100.LE.0.AND.ALIAS_FLAG(3)) STOP "Alias violati
+     &on in module FOO2: write on XV1, aliased with XV2 by call path (AL
+     &IAS:(0,5)) "
+      CALL DYNAMIC_ALIAS_CHECK("Alias violation in module FOO2: write on
+     & XV1, aliased with XV2", XV1, (I-1)*4, XV2, (100-1)*4)
+         XV1(I) = XV2(I)
+      ENDDO
+C (0,4)
+      RETURN
+C     END BLOCK
+      END
+      
+      SUBROUTINE FOO3(F1,F2,F3)
+C (0,1)
+      INCLUDE 'alias_flags.h'
+      IF (ALIAS_FLAG(5).AND.ALIAS_FLAG(4)) STOP "Alias violation in modu
+     &le FOO3: write on F1, aliased with F3 by call path (FOO1:(0,3)) (A
+     &LIAS:(0,2)) "
+C     BEGIN BLOCK
+C (0,2)
+      F1 = 30
+C (0,3)
+      RETURN
+C     END BLOCK
+      END

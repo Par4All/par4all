@@ -1,0 +1,60 @@
+!!
+!! file for alias03.f
+!!
+C     example with EQUIVALENCE
+
+      PROGRAM ALIAS
+      INTEGER A(2,3), B(3),C(5),SUB
+      EQUIVALENCE (SUB,A(1,2),B(2),C(3))
+      EQUIVALENCE (A(1,2),B(2),C(3))
+      EQUIVALENCE (M,N)
+      EQUIVALENCE (M,K)
+      COMMON W
+C (0,1)
+      INCLUDE 'alias_flags.h'
+C     BEGIN BLOCK
+C (0,2)
+      ALIAS_FLAG(1) = .TRUE.
+      CALL FOO(M, N)
+C (0,3)
+      M = 5
+C (0,4)
+      A(1,N) = A(2,N)+A(1,N)
+C (0,5)
+      B(2) = 3
+C (0,6)
+      READ *, A
+C (0,7)
+      ALIAS_FLAG(2) = .TRUE.
+      CALL FOO(W, SUB)
+C (0,8)
+      ALIAS_FLAG(3) = .TRUE.
+      CALL FOO(A(1,2), B(2))
+C (0,9)
+      RETURN
+C     END BLOCK
+      END
+
+      SUBROUTINE FOO(NV1,NV2)
+      COMMON W
+C (0,1)
+      INCLUDE 'alias_flags.h'
+      IF (ALIAS_FLAG(1)) STOP "Alias violation in module FOO: write on N
+     &V1, aliased with NV2 by call path (ALIAS:(0,2)) "
+      IF (ALIAS_FLAG(1)) STOP "Alias violation in module FOO: write on N
+     &V2, aliased with NV1 by call path (ALIAS:(0,2)) "
+      IF (ALIAS_FLAG(2)) STOP "Alias violation in module FOO: write on N
+     &V1, aliased with W by call path (ALIAS:(0,7)) "
+      IF (ALIAS_FLAG(3)) STOP "Alias violation in module FOO: write on N
+     &V1, aliased with NV2 by call path (ALIAS:(0,8)) "
+      IF (ALIAS_FLAG(3)) STOP "Alias violation in module FOO: write on N
+     &V2, aliased with NV1 by call path (ALIAS:(0,8)) "
+C     BEGIN BLOCK
+C (0,2)
+      NV1 = 1
+C (0,3)
+      NV2 = 2
+C (0,4)
+      RETURN
+C     END BLOCK
+      END

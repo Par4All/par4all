@@ -1,0 +1,54 @@
+!!
+!! file for alias06.f
+!!
+      PROGRAM MAIN  
+      REAL A(10000)  
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      M = 50
+C (0,3)
+      DO I = 1, M
+C (0,4)
+         CALL SUB1(A(I), M)
+      ENDDO
+C (0,5)
+      RETURN
+C     END BLOCK
+      END
+
+      SUBROUTINE SUB1(X,N)  
+      REAL X(N,N)  
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      L = 20
+C (0,3)
+      DO I = 1, L
+C (0,4)
+         DO J = 1, L
+C (0,5)
+            CALL SUB2(X(I,J), X(2*I,2*J), L)
+         ENDDO
+      ENDDO
+C (0,6)
+      RETURN
+C     END BLOCK
+      END
+
+      SUBROUTINE SUB2(V1,V2,L)  
+      REAL V1(L),V2(L)  
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      DO I = 1, L
+C (0,3)
+      CALL DYNAMIC_ALIAS_CHECK(
+     &"Alias violation in module SUB2: write on V1, aliased with V2"
+     &, V1, (I-1)*4, V2, (L-1)*4)
+         V1(I) = I
+      ENDDO
+C (0,4)
+      RETURN
+C     END BLOCK
+      END

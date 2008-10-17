@@ -1,0 +1,56 @@
+!!
+!! file for alias07.f
+!!
+C     The two arrays are not overlapped
+
+      PROGRAM ALIAS
+      REAL A(10000)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      M = 50
+C (0,3)
+      CALL FOO(A, M)
+C (0,4)
+      RETURN
+C     END BLOCK
+      END
+
+      SUBROUTINE FOO(X,N)
+      REAL X(100,100)
+C (0,1)
+      INCLUDE 'alias_flags.h'
+C     BEGIN BLOCK
+C (0,2)
+      L = 20
+C (0,3)
+      DO I = 1, L
+C (0,4)
+         DO J = 1, L
+C (0,5)
+      ALIAS_FLAG(1) = .TRUE.
+            CALL TOTO(X(I,J), X(2*I,2*J), I, J, L)
+         ENDDO
+      ENDDO
+C (0,6)
+      RETURN
+C     END BLOCK
+      END
+      
+      SUBROUTINE TOTO(V1,V2,II,JJ,L)
+      REAL V1(L),V2(L)  
+C (0,1)
+      INCLUDE 'alias_flags.h'
+C     BEGIN BLOCK
+C (0,2)
+      DO I = 1, L
+C (0,3)
+      IF (-100*JJ-II-1+I.GE.0.AND.-L-100*JJ-II+I.LE.0.AND.ALIAS_FLAG(
+     &1)) STOP "Alias violation in module TOTO: write on V1, aliased wit
+     &h V2 by call path (FOO:(0,5)) "
+         V1(I) = I
+      ENDDO
+C (0,4)
+      RETURN
+C     END BLOCK
+      END

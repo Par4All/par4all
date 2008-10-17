@@ -1,0 +1,89 @@
+!!
+!! file for alias10.f
+!!
+      PROGRAM ALIAS
+      PARAMETER (N=10)
+      INTEGER N, M
+      REAL*4 A(N), C
+      COMMON /ESSAI/ C(100)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      PRINT *, 'detection des alias dynamiques'
+C (0,3)
+
+      PRINT *, 'pas ok'
+C (0,4)
+      CALL SUB(A, A, N, 4*N, 4*N, 4)
+C (0,5)
+
+      PRINT *, 'ok'
+C (0,6)
+! comment connait-on la taille? regions? ou declaration...
+      M = 5
+C (0,7)
+      CALL SUB(A(1), A(M+1), M, 4*M, 4*M, 4)
+C (0,8)
+
+      PRINT *, 'pas ok'
+C (0,9)
+      M = 3
+C (0,10)
+      CALL SUB(A(1), A(M), M, 4*M, 4*M, 4)
+C (0,11)
+
+      PRINT *, 'pas ok'
+C (0,12)
+      CALL SUB(C(1), C(11), 10, 4*10, 4*10, 4)
+C (0,13)
+
+      PRINT *, 'ok'
+C (0,14)
+      CALL SUB(C(11), C(21), 10, 4*10, 4*10, 4)
+C (0,15)
+
+      PRINT *, 'fin'
+C (0,16)
+      RETURN
+C     END BLOCK
+      END
+
+      SUBROUTINE SUB(A, B, M, SA, SB, SM)
+      COMMON /ESSAI/ C(100)
+      REAL*4 C
+      INTEGER M, I
+      REAL*4 A(M), B(M)
+      INTEGER SA, SB, SM
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+
+! W-MUST a(1:m) b(1:m) c(1:m)
+! R a b c m
+c      call checkalias('ab\0', a, min(sa,4*m), b, min(sb,4*m))
+c      call checkalias('ac\0', a, min(sa,4*m), c, min(4*100,4*m))
+c      call checkalias('am\0', a, min(sa,4*m), m, min(sm,4))
+c      call checkalias('bc\0', b, min(sb,4*m), c, min(4*100,4*m))
+c      call checkalias('bm\0', b, min(sb,4*m), m, min(sm,4))
+c      call checkalias('cm\0', c, min(4*100,4*m), m, min(sm,4))
+
+      DO I = 1, M
+C (0,3)
+         A(I) = I
+      ENDDO
+C (0,4)
+
+      DO I = 1, M
+C (0,5)
+         B(I) = A(I)+3
+      ENDDO
+C (0,6)
+
+      DO I = 1, M
+C (0,7)
+         C(I) = C(I)+B(I)
+      ENDDO
+C (0,8)
+      RETURN
+C     END BLOCK
+      END
