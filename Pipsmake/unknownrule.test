@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# test ! -d unknownrule.database || Delete unknownrule
+
+{
+  Init -d -f $PIPS_ROOT/Validation/Pipsmake/unknownrule.f unknownrule
+  Display -v -m unknownrule code
+  Perform -v -m unknownrule FOO
+  Build -v -m unknownrule BAR
+  Delete unknownrule
+} 2>&1 | \
+	sed '/file *\//d;
+	     s,^[-/a-zA-Z0-9\.]*/pips , *some* pips ,;
+	     s,[-/a-zA-Z0-9\.]*/unknownrule.f , *some* unknownrule.f ,'
+
+exit 0

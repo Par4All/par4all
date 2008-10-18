@@ -1,0 +1,10 @@
+delete m
+create m main.f
+echo "%MAIN before parsing"
+display PRINTED_FILE[%MAIN]
+echo "%ALL"
+display PRINTED_FILE[%ALL]
+echo "%MAIN after parsing"
+display PRINTED_FILE[%MAIN]
+close
+delete m

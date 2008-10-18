@@ -1,0 +1,77 @@
+ *some* pips -f  *some* unknownrule.f unknownrule
+  Module         UNKNOWNRULE
+Workspace unknownrule created and opened.
+Module UNKNOWNRULE selected
+Module UNKNOWNRULE selected
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module UNKNOWNRULE.
+Closing program.
+Closing workspace.
+Workspace unknownrule closed.
+
+Workspace unknownrule (default)
+ *some* pips -m UNKNOWNRULE -s PRINT_CODE -b PRINTED_FILE unknownrule
+Workspace unknownrule opened.
+Module UNKNOWNRULE selected
+Module UNKNOWNRULE selected
+Selecting rule: PRINT_CODE
+user warning in activate: Rule `PRINT_CODE' already active
+Request: build resource PRINTED_FILE for module UNKNOWNRULE.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(UNKNOWNRULE)
+  PARSER                         building   PARSED_CODE(UNKNOWNRULE)
+                                 building   CALLEES(UNKNOWNRULE)
+  CONTROLIZER                    building   CODE(UNKNOWNRULE)
+  PRINT_CODE                     building   PRINTED_FILE(UNKNOWNRULE)
+PRINTED_FILE made for UNKNOWNRULE.
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module UNKNOWNRULE.
+Closing program.
+Closing workspace.
+Workspace unknownrule closed.
+
+Display of file unknownrule.database/UNKNOWNRULE/UNKNOWNRULE.pref
+      PROGRAM UNKNOWNRULE
+
+C     See what happens when Perform is called with an unexistant
+C     rule name.
+
+      I = 1                                                             0001
+
+      END
+Workspace unknownrule (default)
+ *some* pips -m UNKNOWNRULE -p FOO unknownrule
+Workspace unknownrule opened.
+Module UNKNOWNRULE selected
+Module UNKNOWNRULE selected
+user warning in safe_do_something: Unknown phase/rule "FOO"
+Cannot perform FOO for UNKNOWNRULE.
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module UNKNOWNRULE.
+Closing program.
+Closing workspace.
+Workspace unknownrule closed.
+
+Exit code for pips: 1; exiting Pips
+Workspace unknownrule (default)
+ *some* pips -m UNKNOWNRULE -b BAR unknownrule
+Workspace unknownrule opened.
+Module UNKNOWNRULE selected
+Module UNKNOWNRULE selected
+user warning in safe_do_something: Unknown resource "BAR"
+Cannot build BAR for UNKNOWNRULE.
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module UNKNOWNRULE.
+Closing program.
+Closing workspace.
+Workspace unknownrule closed.
+
+Exit code for pips: 1; exiting Pips

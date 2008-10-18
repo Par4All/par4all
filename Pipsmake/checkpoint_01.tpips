@@ -1,0 +1,41 @@
+
+echo \# testing checkpoint
+echo \# first run, create
+
+delete cp
+create cp checkpoint_01.f
+checkpoint
+make PRINTED_FILE[%ALL]
+close cp
+
+echo \# second run, display
+
+open cp
+display PRINTED_FILE[%ALL]
+checkpoint
+close cp
+
+echo \# third run, preconditions
+
+open cp
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[%ALL]
+activate PRINT_CODE
+checkpoint
+close cp
+
+echo \# fourth run, partial eval
+
+open cp
+capply PARTIAL_EVAL[%ALL]
+checkpoint
+close
+
+echo \# last run, display, close and delete.
+
+open cp
+display PRINTED_FILE[%ALL]
+close
+delete cp
+
+echo \# done

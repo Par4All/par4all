@@ -1,0 +1,56 @@
+#! /bin/sh
+#
+# $Id: checkpoint_02.test,v 1.2 1997/12/05 19:43:40 coelho Exp $
+#
+# testing PIPSMAKE_CHECKPOINTS...
+#
+
+tpips=${tpips_version:-tpips}
+	
+PIPS_SRCPATH=.
+export PIPS_SRCPATH
+setproperty ABORT_ON_USER_ERROR TRUE
+
+echo \# testing automatic checkpoint
+
+${tpips} <<EOF
+delete cp
+setproperty ABORT_ON_USER_ERROR TRUE
+# checkpoint every 3 rules...
+setproperty PIPSMAKE_CHECKPOINTS 3
+# hey, this is realy number 01 which is reused here!
+create cp checkpoint_01.f
+make PRINTED_FILE[%ALL]
+exit
+EOF
+
+echo \# second run, preconditions...
+# exit
+
+${tpips} <<EOF
+open cp
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[%ALL]
+activate PRINT_CODE
+exit
+EOF
+
+echo \# partial eval
+
+${tpips} <<EOF
+open cp
+capply PARTIAL_EVAL[%ALL]
+make PRINTED_FILE[%ALL]
+exit
+EOF
+
+echo \# the display
+
+${tpips} <<EOF
+open cp
+display PRINTED_FILE[%ALL]
+close
+delete cp
+EOF
+
+echo \# done

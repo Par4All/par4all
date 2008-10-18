@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# There is no source file for module missing
+
+tpips=${tpips_version:-tpips}
+
+Delete missing
+
+# Initialization:
+# rm -f missing.result/test
+# tpips >missing.result/test <<EOF
+
+( $tpips 2>&1 | sed '/file *\//d' ) <<EOF
+create missing $PIPS_VALIDDIR/Pipsmake/missing.f
+module callmissing
+display CALLGRAPH_FILE
+display PRINTED_FILE
+close
+delete missing
+quit
+EOF
+

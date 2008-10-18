@@ -1,0 +1,25 @@
+#
+# $Id: capply_01.tpips,v 1.2 2003/06/06 08:48:07 coelho Exp irigoin $
+#
+# test concurrent apply
+#
+setproperty ABORT_ON_USER_ERROR TRUE
+
+delete ca
+create ca capply_01.f
+
+echo # before partial evaluation
+display PRINTED_FILE[%ALL]
+
+echo # concurrent apply partial evaluation
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+capply PARTIAL_EVAL[%ALL]
+#apply PARTIAL_EVAL[%ALL]
+
+echo # after partial evaluation
+display PRINTED_FILE[%ALL]
+
+close
+delete ca

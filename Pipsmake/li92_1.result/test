@@ -1,0 +1,199 @@
+echo
+
+echo Direct computation of precondition for li921
+Direct computation of precondition for li921
+echo
+
+Registering file li92_1.f
+  Module         LI921
+Workspace li92_1 created and opened.
+Module LI921 selected
+Module LI921 already active.
+Selecting rule: PRINT_CODE_PRECONDITIONS
+Module LI921 already active.
+Request: build resource PRINTED_FILE for module LI921.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(LI921)
+  PARSER                         building   PARSED_CODE(LI921)
+                                 building   CALLEES(LI921)
+  CONTROLIZER                    building   CODE(LI921)
+  PROPER_EFFECTS                 building   PROPER_EFFECTS(LI921)
+  CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(LI921)
+  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(LI921)
+  TRANSFORMERS_INTRA_FAST        building   TRANSFORMERS(LI921)
+  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(LI921)
+  INTRAPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(LI921)
+  PRECONDITIONS_INTRA            building   PRECONDITIONS(LI921)
+  PRINT_CODE_PRECONDITIONS       building   PRINTED_FILE(LI921)
+PRINTED_FILE made for LI921.
+
+C  P() {}
+
+C CODE FROM THE PAPER "ARRAY PRIVATIZATION FOR PARALLEL
+C EXECUTION OF LOOPS" FROM Z. LI, ICS'92.
+
+      SUBROUTINE LI921(A,N)
+      INTEGER N, A(N), M
+
+C  P() {}
+
+
+      A(1) = 0                                                          0001
+
+C  P() {}
+
+      DO I = 1, N                                                       0002
+
+C  P(I,J,K,M) {1<=I, I<=N}
+
+         DO J = 1, N                                                    0003
+
+C  P(I,J,K,M) {1<=I, I<=N, 1<=J, J<=N}
+
+            DO K = 2, N                                                 0004
+
+C  P(I,J,K,M) {1<=I, I<=N, 1<=J, J<=N, 2<=K, K<=N}
+
+               A(K) = 0                                                 0005
+
+C  P(I,J,K,M) {1<=I, I<=N, 1<=J, J<=N, 2<=K, K<=N}
+
+               M = A(K-1)                                               0006
+            ENDDO
+         ENDDO
+      ENDDO
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module LI921.
+Closing program.
+Closing workspace.
+Workspace li92_1 closed.
+
+echo
+
+echo Computation of precondition for li921 after touching the source code
+Computation of precondition for li921 after touching the source code
+echo
+
+shell sleep 2
+shell touch li92_1.database/li921.f
+Workspace li92_1 opened.
+Module LI921 selected
+Module LI921 already active.
+Selecting rule: PRINT_CODE_PRECONDITIONS
+user warning in activate: Rule `PRINT_CODE_PRECONDITIONS' already active
+Module LI921 already active.
+Request: build resource PRINTED_FILE for module LI921.
+PRINTED_FILE made for LI921.
+
+C  P() {}
+
+C CODE FROM THE PAPER "ARRAY PRIVATIZATION FOR PARALLEL
+C EXECUTION OF LOOPS" FROM Z. LI, ICS'92.
+
+      SUBROUTINE LI921(A,N)
+      INTEGER N, A(N), M
+
+C  P() {}
+
+
+      A(1) = 0                                                          0001
+
+C  P() {}
+
+      DO I = 1, N                                                       0002
+
+C  P(I,J,K,M) {1<=I, I<=N}
+
+         DO J = 1, N                                                    0003
+
+C  P(I,J,K,M) {1<=I, I<=N, 1<=J, J<=N}
+
+            DO K = 2, N                                                 0004
+
+C  P(I,J,K,M) {1<=I, I<=N, 1<=J, J<=N, 2<=K, K<=N}
+
+               A(K) = 0                                                 0005
+
+C  P(I,J,K,M) {1<=I, I<=N, 1<=J, J<=N, 2<=K, K<=N}
+
+               M = A(K-1)                                               0006
+            ENDDO
+         ENDDO
+      ENDDO
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module LI921.
+Closing program.
+Closing workspace.
+Workspace li92_1 closed.
+
+echo
+
+echo Computation of precondition for li921 after touching its summary effects
+Computation of precondition for li921 after touching its summary effects
+echo
+
+shell sleep 2
+shell touch li92_1.database/LI921.SUMMARY_EFFECTS
+Workspace li92_1 opened.
+Module LI921 selected
+Module LI921 already active.
+Selecting rule: PRINT_CODE_PRECONDITIONS
+user warning in activate: Rule `PRINT_CODE_PRECONDITIONS' already active
+Module LI921 already active.
+Request: build resource PRINTED_FILE for module LI921.
+PRINTED_FILE made for LI921.
+
+C  P() {}
+
+C CODE FROM THE PAPER "ARRAY PRIVATIZATION FOR PARALLEL
+C EXECUTION OF LOOPS" FROM Z. LI, ICS'92.
+
+      SUBROUTINE LI921(A,N)
+      INTEGER N, A(N), M
+
+C  P() {}
+
+
+      A(1) = 0                                                          0001
+
+C  P() {}
+
+      DO I = 1, N                                                       0002
+
+C  P(I,J,K,M) {1<=I, I<=N}
+
+         DO J = 1, N                                                    0003
+
+C  P(I,J,K,M) {1<=I, I<=N, 1<=J, J<=N}
+
+            DO K = 2, N                                                 0004
+
+C  P(I,J,K,M) {1<=I, I<=N, 1<=J, J<=N, 2<=K, K<=N}
+
+               A(K) = 0                                                 0005
+
+C  P(I,J,K,M) {1<=I, I<=N, 1<=J, J<=N, 2<=K, K<=N}
+
+               M = A(K-1)                                               0006
+            ENDDO
+         ENDDO
+      ENDDO
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module LI921.
+Closing program.
+Closing workspace.
+Workspace li92_1 closed.
+
+Workspace li92_1 deleted.

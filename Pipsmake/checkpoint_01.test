@@ -1,0 +1,62 @@
+#! /bin/sh
+#
+# $Id: checkpoint_01.test,v 1.2 2003/06/16 14:21:55 coelho Exp $
+#
+# testing checkpoint...
+#
+
+tpips=${tpips_version:-tpips}
+	
+PIPS_SRCPATH=$PIPS_ROOT/Validation/Pipsmake
+export PIPS_SRCPATH
+
+echo \# testing checkpoint
+echo \# first run, create
+
+${tpips} <<EOF
+delete cp
+create cp checkpoint_01.f
+checkpoint
+make PRINTED_FILE[%ALL]
+exit
+EOF
+
+echo \# second run, display
+
+${tpips} <<EOF
+open cp
+display PRINTED_FILE[%ALL]
+checkpoint
+exit
+EOF
+
+echo \# third run, preconditions
+
+${tpips} <<EOF
+open cp
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[%ALL]
+activate PRINT_CODE
+checkpoint
+exit
+EOF
+
+echo \# fourth run, partial eval
+
+${tpips} <<EOF
+open cp
+capply PARTIAL_EVAL[%ALL]
+checkpoint
+exit
+EOF
+
+echo \# last run, display, close and delete.
+
+${tpips} <<EOF
+open cp
+display PRINTED_FILE[%ALL]
+close
+delete cp
+EOF
+
+echo \# done

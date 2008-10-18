@@ -1,0 +1,42 @@
+# before partial evaluation
+
+      SUBROUTINE BLA(I, J)
+      INTEGER I, J, K
+      K = 5                                                             0001
+      PRINT *, I, J, K+3                                                0002
+      END
+      PROGRAM CAPPLY
+      INTEGER I
+      I = 2                                                             0001
+      PRINT *, I                                                        0002
+      CALL FOO(I)                                                       0003
+      END
+
+      SUBROUTINE FOO(I)
+      INTEGER I, J
+      J = 3                                                             0001
+      PRINT *, I, J                                                     0002
+      CALL BLA(I, J)                                                    0003
+      END
+# concurrent apply partial evaluation
+# after partial evaluation
+
+      SUBROUTINE BLA(I, J)
+      INTEGER I, J, K
+      K = 5                                                             0001
+      PRINT *, 2, 3, 8                                                  0002
+      END
+      PROGRAM CAPPLY
+      INTEGER I
+      I = 2                                                             0001
+      PRINT *, 2                                                        0002
+      CALL FOO(2)                                                       0003
+      END
+
+      SUBROUTINE FOO(I)
+      INTEGER I, J
+      J = 3                                                             0001
+      PRINT *, 2, 3                                                     0002
+      CALL BLA(2, 3)                                                    0003
+      END
+

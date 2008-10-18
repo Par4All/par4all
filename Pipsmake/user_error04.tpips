@@ -1,0 +1,9 @@
+delete user_error04
+create user_error04 user_error04.f
+capply PRIVATIZE_MODULE[%ALL]
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE
+display PRINTED_FILE[B]
+close
+delete user_error04
+quit

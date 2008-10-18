@@ -1,0 +1,42 @@
+!!
+!! file for unsplit02.f
+!!
+C     Check the impact of the Fortran preprocessor on unsplit
+! 1
+      PROGRAM ONE
+      INTEGER I, THREE
+      EXTERNAL THREE
+      PRINT *, 'one'                                                    0001
+      CALL TWO                                                          0002
+      I = TREE()                                                        0003
+      CALL FOUR                                                         0004
+      CALL SEVEN                                                        0005
+      END
+! 2
+      SUBROUTINE TWO
+      PRINT *, 'two'                                                    0001
+      END
+! 3
+      INTEGER FUNCTION THREE
+      PRINT *, 'three'                                                  0001
+      THREE = 3                                                         0002
+      END
+! 4
+      SUBROUTINE FOUR
+      PRINT *, 'four'                                                   0001
+      CALL FIVE                                                         0002
+      END
+! 5
+      SUBROUTINE FIVE
+      PRINT *, 'five'                                                   0001
+      END
+! 6
+      SUBROUTINE SIX
+      PRINT *, 'six'                                                    0001
+      END
+! 7
+      SUBROUTINE SEVEN
+      CALL SIX                                                          0001
+      PRINT *, 'seven'                                                  0002
+      END
+
