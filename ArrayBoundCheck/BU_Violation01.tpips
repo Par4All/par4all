@@ -1,0 +1,32 @@
+delete BU_Violation01
+create BU_Violation01 BU_Violation01.f
+
+apply ARRAY_BOUND_CHECK_BOTTOM_UP[%ALL]
+display PRINTED_FILE[%ALL]
+
+apply PARTIAL_REDUNDANCY_ELIMINATION[%ALL]
+display PRINTED_FILE[%ALL]
+
+close BU_Violation01
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,27 @@
+      PROGRAM TEST
+
+      REAL T(4)
+
+      DO I = 1, 5                                                       0001
+         IF (I.LT.1.OR.I.GT.4) STOP 
+     &   "Bound violation:array TEST:T, 1st dimension"
+         T(I) = 0.                                                      0002
+      ENDDO
+
+      PRINT *, T(2)                                                     0003
+
+      END
+      PROGRAM TEST
+
+      REAL T(4)
+
+      DO I = 1, 5                                                       0001
+         IF (I.GT.4) STOP 
+     &   "Bound violation:array TEST:T, 1st dimension"
+         T(I) = 0.                                                      0002
+      ENDDO
+
+      PRINT *, T(2)                                                     0003
+
+      END
+

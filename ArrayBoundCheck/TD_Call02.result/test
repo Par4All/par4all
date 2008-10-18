@@ -1,0 +1,1466 @@
+c
+c     Call with many array references
+c
+c
+c
+      SUBROUTINE JACU
+c
+c***compute the upper triangular part of the jacobian matrix
+c
+c Author: Sisira Weeratunga
+c         NASA Ames Research Center
+c         (10/25/90)
+c
+c #include 'applu.incl'  
+
+      IMPLICIT REAL*8 (A-H,O-Z)
+c
+      PARAMETER ( C1 = 1.40D+00, C2 = 0.40D+00,
+     $            C3 = 1.00D-01, C4 = 1.00D+00,
+     $            C5 = 1.40D+00 )
+c
+c***grid
+c
+      COMMON/CGCON/ NX, NY, NZ,
+     $              II1, II2, JI1, JI2, KI1, KI2, ITWJ,
+     $              DXI, DETA, DZETA,
+     $              TX1, TX2, TX3,
+     $              TY1, TY2, TY3,
+     $              TZ1, TZ2, TZ3
+c
+c***dissipation
+c
+      COMMON/DISP/ DX1,DX2,DX3,DX4,DX5,
+     $             DY1,DY2,DY3,DY4,DY5,
+     $             DZ1,DZ2,DZ3,DZ4,DZ5,
+     $             DSSP
+c
+c***field variables and residuals
+c
+      COMMON/CVAR/ U(5,33,33,33),
+     $             RSD(5,33,33,33),
+     $             FRCT(5,33,33,33)
+c
+c***output control parameters
+c
+      COMMON/CPRCON/ IPR, IOUT, INORM
+c
+c***newton-raphson iteration control parameters
+c
+      COMMON/CTSCON/ ITMAX, INVERT,
+     $               DT, OMEGA, TOLRSD(5),
+     $               RSDNM(5), ERRNM(5), FRC, TTOTAL
+c
+      COMMON/CJAC/ A(5,5,33,33,33),
+     $             B(5,5,33,33,33),
+     $             C(5,5,33,33,33),
+     $             D(5,5,33,33,33)
+c
+c***coefficients of the exact solution
+c
+      COMMON/CEXACT/ CE(5,13)
+c
+
+
+
+c
+      R43 = 4.0D+00/3.0D+00                                             0001
+      C1345 = C1*C3*C4*C5                                               0002
+      C34 = C3*C4                                                       0003
+c      
+      DO K = 2, NZ-1                                                    0004
+c
+         DO J = 2, NY-1                                                 0005
+c
+            DO I = 2, NX-1                                              0006
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, READIN
+     &G,  array JACU:U, upper bound, 4th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 3rd dimension"
+               IF (33.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, READIN
+     &G,  array JACU:U, upper bound, 2nd dimension"
+c               
+c***form the first block sub-diagonal
+c
+               TMP1 = 1.0D+00/U(1,I+1,J,K)                              0007
+               TMP2 = TMP1*TMP1                                         0008
+               TMP3 = TMP1*TMP2                                         0009
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 3rd dimension"
+c
+               A(1,1,I,J,K) = -DT*TX1*DX1                               0010
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:A, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 3rd dimension"
+               A(1,2,I,J,K) = DT*TX2                                    0011
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 3rd dimension"
+               A(1,3,I,J,K) = 0.0D+00                                   0012
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:A, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 3rd dimension"
+               A(1,4,I,J,K) = 0.0D+00                                   0013
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 3rd dimension"
+               A(1,5,I,J,K) = 0.0D+00                                   0014
+               IF (1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ.AND.2.LE.I.AND.
+     &         1+I.LE.NX.AND.34.LE.K) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 4th dimension"
+               IF (1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K.AND.2.LE.I.AND.
+     &         1+I.LE.NX.AND.34.LE.J) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 3rd dimension"
+               IF (1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ.AND.2.LE.K.AND.
+     &         1+I.LE.NX.AND.33.LE.I) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 2nd dimension"
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:A, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 3rd dimension"
+c
+               A(2,1,I,J,K) = DT*TX2*((-(U(2,I+1,J,K)*TMP1)**2)+C2*     0015
+     &         0.50D+00*(U(2,I+1,J,K)*U(2,I+1,J,K)+U(3,I+1,J,K)*U(3,I   0015
+     &         +1,J,K)+U(4,I+1,J,K)*U(4,I+1,J,K))*TMP2)-DT*TX1*(-R43)   0015
+     &         *C34*TMP2*U(2,I+1,J,K)                                   0015
+               IF (33.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, READIN
+     &G,  array JACU:U, upper bound, 2nd dimension"
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 3rd dimension"
+               A(2,2,I,J,K) = DT*TX2*(2.0D+00-C2)*U(2,I+1,J,K)*TMP1-    0016
+     &         DT*TX1*R43*C34*TMP1-DT*TX1*DX2                           0016
+               IF (33.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, READIN
+     &G,  array JACU:U, upper bound, 2nd dimension"
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:A, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 3rd dimension"
+               A(2,3,I,J,K) = DT*TX2*(-C2)*U(3,I+1,J,K)*TMP1            0017
+               IF (33.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, READIN
+     &G,  array JACU:U, upper bound, 2nd dimension"
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 3rd dimension"
+               A(2,4,I,J,K) = DT*TX2*(-C2)*U(4,I+1,J,K)*TMP1            0018
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:A, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 3rd dimension"
+               A(2,5,I,J,K) = DT*TX2*C2                                 0019
+               IF (1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ.AND.2.LE.J.AND.
+     &         1+J.LE.NY.AND.34.LE.K) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 4th dimension"
+               IF (1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+K.LE.NZ.AND.
+     &         1+J.LE.NY.AND.34.LE.J) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 3rd dimension"
+               IF (1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ.AND.2.LE.J.AND.
+     &         1+J.LE.NY.AND.33.LE.I) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 2nd dimension"
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 3rd dimension"
+c
+               A(3,1,I,J,K) = DT*TX2*(-(U(2,I+1,J,K)*U(3,I+1,J,K)))*    0020
+     &         TMP2-DT*TX1*(-C34)*TMP2*U(3,I+1,J,K)                     0020
+               IF (33.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, READIN
+     &G,  array JACU:U, upper bound, 2nd dimension"
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:A, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 3rd dimension"
+               A(3,2,I,J,K) = DT*TX2*U(3,I+1,J,K)*TMP1                  0021
+               IF (33.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, READIN
+     &G,  array JACU:U, upper bound, 2nd dimension"
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 3rd dimension"
+               A(3,3,I,J,K) = DT*TX2*U(2,I+1,J,K)*TMP1-DT*TX1*C34*      0022
+     &         TMP1-DT*TX1*DX3                                          0022
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:A, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 3rd dimension"
+               A(3,4,I,J,K) = 0.0D+00                                   0023
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 3rd dimension"
+               A(3,5,I,J,K) = 0.0D+00                                   0024
+               IF (33.LT.K) STOP "Bound violation:, READING,  array JACU
+     &:U, upper bound, 4th dimension"
+               IF (33.LT.J) STOP "Bound violation:, READING,  array JACU
+     &:U, upper bound, 3rd dimension"
+               IF (33.LT.I+1) STOP "Bound violation:, READING,  array JA
+     &CU:U, upper bound, 2nd dimension"
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:A, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 3rd dimension"
+c
+               A(4,1,I,J,K) = DT*TX2*(-(U(2,I+1,J,K)*U(4,I+1,J,K)))*    0025
+     &         TMP2-DT*TX1*(-C34)*TMP2*U(4,I+1,J,K)                     0025
+               IF (33.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, READIN
+     &G,  array JACU:U, upper bound, 2nd dimension"
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 3rd dimension"
+               A(4,2,I,J,K) = DT*TX2*U(4,I+1,J,K)*TMP1                  0026
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:A, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 3rd dimension"
+               A(4,3,I,J,K) = 0.0D+00                                   0027
+               IF (33.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, READIN
+     &G,  array JACU:U, upper bound, 2nd dimension"
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 3rd dimension"
+               A(4,4,I,J,K) = DT*TX2*U(2,I+1,J,K)*TMP1-DT*TX1*C34*      0028
+     &         TMP1-DT*TX1*DX4                                          0028
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:A, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 3rd dimension"
+               A(4,5,I,J,K) = 0.0D+00                                   0029
+               IF (1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ.AND.2.LE.J.AND.
+     &         1+J.LE.NY.AND.34.LE.K) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 4th dimension"
+               IF (1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+K.LE.NZ.AND.
+     &         1+J.LE.NY.AND.34.LE.J) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 3rd dimension"
+               IF (1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ.AND.2.LE.J.AND.
+     &         1+J.LE.NY.AND.33.LE.I) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 2nd dimension"
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 3rd dimension"
+c
+               A(5,1,I,J,K) = DT*TX2*(C2*(U(2,I+1,J,K)*U(2,I+1,J,K)+U   0030
+     &         (3,I+1,J,K)*U(3,I+1,J,K)+U(4,I+1,J,K)*U(4,I+1,J,K))*     0030
+     &         TMP2-C1*U(5,I+1,J,K)*TMP1)*U(2,I+1,J,K)*TMP1-DT*TX1*(-   0030
+     &         (R43*C34-C1345))*TMP3*U(2,I+1,J,K)**2                    0030
+               IF (33.LT.K) STOP "Bound violation:, READING,  array JACU
+     &:U, upper bound, 4th dimension"
+               IF (33.LT.J) STOP "Bound violation:, READING,  array JACU
+     &:U, upper bound, 3rd dimension"
+               IF (33.LT.I+1) STOP "Bound violation:, READING,  array JA
+     &CU:U, upper bound, 2nd dimension"
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:A, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 3rd dimension"
+
+C     $              - (     c34 - c1345 ) * tmp3 * ( u(3,i+1,j,k)**2 )
+
+C     $              - (     c34 - c1345 ) * tmp3 * ( u(4,i+1,j,k)**2 )
+C     $              - c1345 * tmp2 * u(5,i+1,j,k) )
+               A(5,2,I,J,K) = DT*TX2*(C1*U(5,I+1,J,K)*TMP1-0.50D+00*    0031
+     &         C2*(3.0D+00*U(2,I+1,J,K)*U(2,I+1,J,K)+U(3,I+1,J,K)*U(3   0031
+     &         ,I+1,J,K)+U(4,I+1,J,K)*U(4,I+1,J,K))*TMP2)-DT*TX1*(R43   0031
+     &         *C34-C1345)*TMP2*U(2,I+1,J,K)                            0031
+               IF (1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ.AND.2.LE.J.AND.
+     &         1+J.LE.NY.AND.34.LE.K) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 4th dimension"
+               IF (1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+K.LE.NZ.AND.
+     &         1+J.LE.NY.AND.34.LE.J) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 3rd dimension"
+               IF (1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ.AND.2.LE.J.AND.
+     &         1+J.LE.NY.AND.33.LE.I) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 2nd dimension"
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 3rd dimension"
+               A(5,3,I,J,K) = DT*TX2*(-C2)*U(3,I+1,J,K)*U(2,I+1,J,K)*   0032
+     &         TMP2-DT*TX1*(C34-C1345)*TMP2*U(3,I+1,J,K)                0032
+               IF (33.LT.K) STOP "Bound violation:, READING,  array JACU
+     &:U, upper bound, 4th dimension"
+               IF (33.LT.J) STOP "Bound violation:, READING,  array JACU
+     &:U, upper bound, 3rd dimension"
+               IF (33.LT.I+1) STOP "Bound violation:, READING,  array JA
+     &CU:U, upper bound, 2nd dimension"
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:A, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 3rd dimension"
+               A(5,4,I,J,K) = DT*TX2*(-C2)*U(4,I+1,J,K)*U(2,I+1,J,K)*   0033
+     &         TMP2-DT*TX1*(C34-C1345)*TMP2*U(4,I+1,J,K)                0033
+               IF (33.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, READIN
+     &G,  array JACU:U, upper bound, 2nd dimension"
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:A, upper bound, 3rd dimension"
+               A(5,5,I,J,K) = DT*TX2*C1*U(2,I+1,J,K)*TMP1-DT*TX1*       0034
+     &         C1345*TMP1-DT*TX1*DX5                                    0034
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, READIN
+     &G,  array JACU:U, upper bound, 4th dimension"
+               IF (33.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 3rd dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, READIN
+     &G,  array JACU:U, upper bound, 2nd dimension"
+c
+c***form the second block sub-diagonal
+c
+               TMP1 = 1.0D+00/U(1,I,J+1,K)                              0035
+               TMP2 = TMP1*TMP1                                         0036
+               TMP3 = TMP1*TMP2                                         0037
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 3rd dimension"
+c
+               B(1,1,I,J,K) = -DT*TY1*DY1                               0038
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:B, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 3rd dimension"
+               B(1,2,I,J,K) = 0.0D+00                                   0039
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 3rd dimension"
+               B(1,3,I,J,K) = DT*TY2                                    0040
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:B, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 3rd dimension"
+               B(1,4,I,J,K) = 0.0D+00                                   0041
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 3rd dimension"
+               B(1,5,I,J,K) = 0.0D+00                                   0042
+               IF (1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ.AND.2.LE.I.AND.
+     &         1+I.LE.NX.AND.34.LE.K) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 4th dimension"
+               IF (1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K.AND.2.LE.I.AND.
+     &         1+I.LE.NX.AND.33.LE.J) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 3rd dimension"
+               IF (1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ.AND.2.LE.K.AND.
+     &         1+I.LE.NX.AND.34.LE.I) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 2nd dimension"
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:B, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 3rd dimension"
+c
+               B(2,1,I,J,K) = DT*TY2*(-(U(2,I,J+1,K)*U(3,I,J+1,K)))*    0043
+     &         TMP2-DT*TY1*(-C34)*TMP2*U(2,I,J+1,K)                     0043
+               IF (33.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, READIN
+     &G,  array JACU:U, upper bound, 3rd dimension"
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 3rd dimension"
+               B(2,2,I,J,K) = DT*TY2*U(3,I,J+1,K)*TMP1-DT*TY1*C34*      0044
+     &         TMP1-DT*TY1*DY2                                          0044
+               IF (33.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 3rd dimension"
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:B, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 3rd dimension"
+               B(2,3,I,J,K) = DT*TY2*U(2,I,J+1,K)*TMP1                  0045
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 3rd dimension"
+               B(2,4,I,J,K) = 0.0D+00                                   0046
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:B, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 3rd dimension"
+               B(2,5,I,J,K) = 0.0D+00                                   0047
+               IF (1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ.AND.2.LE.J.AND.
+     &         1+J.LE.NY.AND.34.LE.K) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 4th dimension"
+               IF (1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+K.LE.NZ.AND.
+     &         1+J.LE.NY.AND.33.LE.J) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 3rd dimension"
+               IF (1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ.AND.2.LE.J.AND.
+     &         1+J.LE.NY.AND.34.LE.I) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 2nd dimension"
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 3rd dimension"
+c
+               B(3,1,I,J,K) = DT*TY2*((-(U(3,I,J+1,K)*TMP1)**2)+        0048
+     &         0.50D+00*C2*(U(2,I,J+1,K)*U(2,I,J+1,K)+U(3,I,J+1,K)*U(   0048
+     &         3,I,J+1,K)+U(4,I,J+1,K)*U(4,I,J+1,K))*TMP2)-DT*TY1*(-    0048
+     &         R43)*C34*TMP2*U(3,I,J+1,K)                               0048
+               IF (33.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 3rd dimension"
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:B, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 3rd dimension"
+               B(3,2,I,J,K) = DT*TY2*(-C2)*U(2,I,J+1,K)*TMP1            0049
+               IF (33.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, READIN
+     &G,  array JACU:U, upper bound, 3rd dimension"
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 3rd dimension"
+               B(3,3,I,J,K) = DT*TY2*(2.0D+00-C2)*U(3,I,J+1,K)*TMP1-    0050
+     &         DT*TY1*R43*C34*TMP1-DT*TY1*DY3                           0050
+               IF (33.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 3rd dimension"
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:B, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 3rd dimension"
+               B(3,4,I,J,K) = DT*TY2*(-C2)*U(4,I,J+1,K)*TMP1            0051
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 3rd dimension"
+               B(3,5,I,J,K) = DT*TY2*C2                                 0052
+               IF (1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ.AND.2.LE.I.AND.
+     &         1+I.LE.NX.AND.34.LE.K) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 4th dimension"
+               IF (1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K.AND.2.LE.I.AND.
+     &         1+I.LE.NX.AND.33.LE.J) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 3rd dimension"
+               IF (1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ.AND.2.LE.K.AND.
+     &         1+I.LE.NX.AND.34.LE.I) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 2nd dimension"
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:B, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 3rd dimension"
+c
+               B(4,1,I,J,K) = DT*TY2*(-(U(3,I,J+1,K)*U(4,I,J+1,K)))*    0053
+     &         TMP2-DT*TY1*(-C34)*TMP2*U(4,I,J+1,K)                     0053
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 3rd dimension"
+               B(4,2,I,J,K) = 0.0D+00                                   0054
+               IF (33.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 3rd dimension"
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:B, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 3rd dimension"
+               B(4,3,I,J,K) = DT*TY2*U(4,I,J+1,K)*TMP1                  0055
+               IF (33.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, READIN
+     &G,  array JACU:U, upper bound, 3rd dimension"
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 3rd dimension"
+               B(4,4,I,J,K) = DT*TY2*U(3,I,J+1,K)*TMP1-DT*TY1*C34*      0056
+     &         TMP1-DT*TY1*DY4                                          0056
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:B, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 3rd dimension"
+               B(4,5,I,J,K) = 0.0D+00                                   0057
+               IF (1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ.AND.2.LE.J.AND.
+     &         1+J.LE.NY.AND.34.LE.K) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 4th dimension"
+               IF (1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+K.LE.NZ.AND.
+     &         1+J.LE.NY.AND.33.LE.J) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 3rd dimension"
+               IF (1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ.AND.2.LE.J.AND.
+     &         1+J.LE.NY.AND.34.LE.I) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 2nd dimension"
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 3rd dimension"
+c
+               B(5,1,I,J,K) = DT*TY2*(C2*(U(2,I,J+1,K)*U(2,I,J+1,K)+U   0058
+     &         (3,I,J+1,K)*U(3,I,J+1,K)+U(4,I,J+1,K)*U(4,I,J+1,K))*     0058
+     &         TMP2-C1*U(5,I,J+1,K)*TMP1)*U(3,I,J+1,K)*TMP1-DT*TY1*(-   0058
+     &         (C34-C1345))*TMP3*U(2,I,J+1,K)**2                        0058
+               IF (1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ.AND.2.LE.I.AND.
+     &         1+I.LE.NX.AND.34.LE.K) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 4th dimension"
+               IF (1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K.AND.2.LE.I.AND.
+     &         1+I.LE.NX.AND.33.LE.J) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 3rd dimension"
+               IF (1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ.AND.2.LE.K.AND.
+     &         1+I.LE.NX.AND.34.LE.I) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 2nd dimension"
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:B, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 3rd dimension"
+
+C     $              - ( r43*c34 - c1345 )*tmp3*(u(3,i,j+1,k)**2)
+
+
+C     $              - (     c34 - c1345 )*tmp3*(u(4,i,j+1,k)**2)
+C     $              - c1345*tmp2*u(5,i,j+1,k) )
+               B(5,2,I,J,K) = DT*TY2*(-C2)*U(2,I,J+1,K)*U(3,I,J+1,K)*   0059
+     &         TMP2-DT*TY1*(C34-C1345)*TMP2*U(2,I,J+1,K)                0059
+               IF (33.LT.K) STOP "Bound violation:, READING,  array JACU
+     &:U, upper bound, 4th dimension"
+               IF (33.LT.J+1) STOP "Bound violation:, READING,  array JA
+     &CU:U, upper bound, 3rd dimension"
+               IF (33.LT.I) STOP "Bound violation:, READING,  array JACU
+     &:U, upper bound, 2nd dimension"
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 3rd dimension"
+               B(5,3,I,J,K) = DT*TY2*(C1*U(5,I,J+1,K)*TMP1-0.50D+00*    0060
+     &         C2*(U(2,I,J+1,K)*U(2,I,J+1,K)+3.0D+00*U(3,I,J+1,K)*U(3   0060
+     &         ,I,J+1,K)+U(4,I,J+1,K)*U(4,I,J+1,K))*TMP2)-DT*TY1*(R43   0060
+     &         *C34-C1345)*TMP2*U(3,I,J+1,K)                            0060
+               IF (1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ.AND.2.LE.I.AND.
+     &         1+I.LE.NX.AND.34.LE.K) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 4th dimension"
+               IF (1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K.AND.2.LE.I.AND.
+     &         1+I.LE.NX.AND.33.LE.J) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 3rd dimension"
+               IF (1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ.AND.2.LE.K.AND.
+     &         1+I.LE.NX.AND.34.LE.I) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 2nd dimension"
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:B, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 3rd dimension"
+               B(5,4,I,J,K) = DT*TY2*(-C2)*U(3,I,J+1,K)*U(4,I,J+1,K)*   0061
+     &         TMP2-DT*TY1*(C34-C1345)*TMP2*U(4,I,J+1,K)                0061
+               IF (33.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, READIN
+     &G,  array JACU:U, upper bound, 3rd dimension"
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:B, upper bound, 3rd dimension"
+               B(5,5,I,J,K) = DT*TY2*C1*U(3,I,J+1,K)*TMP1-DT*TY1*       0062
+     &         C1345*TMP1-DT*TY1*DY5                                    0062
+               IF (33.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, READIN
+     &G,  array JACU:U, upper bound, 4th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 3rd dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, READIN
+     &G,  array JACU:U, upper bound, 2nd dimension"
+c
+c***form the third block sub-diagonal
+c
+               TMP1 = 1.0D+00/U(1,I,J,K+1)                              0063
+               TMP2 = TMP1*TMP1                                         0064
+               TMP3 = TMP1*TMP2                                         0065
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 3rd dimension"
+c
+               C(1,1,I,J,K) = -DT*TZ1*DZ1                               0066
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:C, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 3rd dimension"
+               C(1,2,I,J,K) = 0.0D+00                                   0067
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 3rd dimension"
+               C(1,3,I,J,K) = 0.0D+00                                   0068
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:C, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 3rd dimension"
+               C(1,4,I,J,K) = DT*TZ2                                    0069
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 3rd dimension"
+               C(1,5,I,J,K) = 0.0D+00                                   0070
+               IF (33.LT.K+1) STOP "Bound violation:, READING,  array JA
+     &CU:U, upper bound, 4th dimension"
+               IF (33.LT.J) STOP "Bound violation:, READING,  array JACU
+     &:U, upper bound, 3rd dimension"
+               IF (33.LT.I) STOP "Bound violation:, READING,  array JACU
+     &:U, upper bound, 2nd dimension"
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:C, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 3rd dimension"
+c
+               C(2,1,I,J,K) = DT*TZ2*(-(U(2,I,J,K+1)*U(4,I,J,K+1)))*    0071
+     &         TMP2-DT*TZ1*(-C34)*TMP2*U(2,I,J,K+1)                     0071
+               IF (33.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, READIN
+     &G,  array JACU:U, upper bound, 4th dimension"
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 3rd dimension"
+               C(2,2,I,J,K) = DT*TZ2*U(4,I,J,K+1)*TMP1-DT*TZ1*C34*      0072
+     &         TMP1-DT*TZ1*DZ2                                          0072
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:C, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 3rd dimension"
+               C(2,3,I,J,K) = 0.0D+00                                   0073
+               IF (33.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, READIN
+     &G,  array JACU:U, upper bound, 4th dimension"
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 3rd dimension"
+               C(2,4,I,J,K) = DT*TZ2*U(2,I,J,K+1)*TMP1                  0074
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:C, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 3rd dimension"
+               C(2,5,I,J,K) = 0.0D+00                                   0075
+               IF (1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ.AND.2.LE.J.AND.
+     &         1+J.LE.NY.AND.33.LE.K) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 4th dimension"
+               IF (1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+K.LE.NZ.AND.
+     &         1+J.LE.NY.AND.34.LE.J) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 3rd dimension"
+               IF (1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ.AND.2.LE.J.AND.
+     &         1+J.LE.NY.AND.34.LE.I) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 2nd dimension"
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 3rd dimension"
+c
+               C(3,1,I,J,K) = DT*TZ2*(-(U(3,I,J,K+1)*U(4,I,J,K+1)))*    0076
+     &         TMP2-DT*TZ1*(-C34)*TMP2*U(3,I,J,K+1)                     0076
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:C, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 3rd dimension"
+               C(3,2,I,J,K) = 0.0D+00                                   0077
+               IF (33.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, READIN
+     &G,  array JACU:U, upper bound, 4th dimension"
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 3rd dimension"
+               C(3,3,I,J,K) = DT*TZ2*U(4,I,J,K+1)*TMP1-DT*TZ1*C34*      0078
+     &         TMP1-DT*TZ1*DZ3                                          0078
+               IF (33.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, READIN
+     &G,  array JACU:U, upper bound, 4th dimension"
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:C, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 3rd dimension"
+               C(3,4,I,J,K) = DT*TZ2*U(3,I,J,K+1)*TMP1                  0079
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 3rd dimension"
+               C(3,5,I,J,K) = 0.0D+00                                   0080
+               IF (33.LT.K+1) STOP "Bound violation:, READING,  array JA
+     &CU:U, upper bound, 4th dimension"
+               IF (33.LT.J) STOP "Bound violation:, READING,  array JACU
+     &:U, upper bound, 3rd dimension"
+               IF (33.LT.I) STOP "Bound violation:, READING,  array JACU
+     &:U, upper bound, 2nd dimension"
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:C, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 3rd dimension"
+c
+               C(4,1,I,J,K) = DT*TZ2*((-(U(4,I,J,K+1)*TMP1)**2)+        0081
+     &         0.50D+00*C2*(U(2,I,J,K+1)*U(2,I,J,K+1)+U(3,I,J,K+1)*U(   0081
+     &         3,I,J,K+1)+U(4,I,J,K+1)*U(4,I,J,K+1))*TMP2)-DT*TZ1*(-    0081
+     &         R43)*C34*TMP2*U(4,I,J,K+1)                               0081
+               IF (33.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, READIN
+     &G,  array JACU:U, upper bound, 4th dimension"
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 3rd dimension"
+               C(4,2,I,J,K) = DT*TZ2*(-C2)*U(2,I,J,K+1)*TMP1            0082
+               IF (33.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, READIN
+     &G,  array JACU:U, upper bound, 4th dimension"
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:C, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 3rd dimension"
+               C(4,3,I,J,K) = DT*TZ2*(-C2)*U(3,I,J,K+1)*TMP1            0083
+               IF (33.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, READIN
+     &G,  array JACU:U, upper bound, 4th dimension"
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 3rd dimension"
+               C(4,4,I,J,K) = DT*TZ2*(2.0D+00-C2)*U(4,I,J,K+1)*TMP1-    0084
+     &         DT*TZ1*R43*C34*TMP1-DT*TZ1*DZ4                           0084
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:C, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 3rd dimension"
+               C(4,5,I,J,K) = DT*TZ2*C2                                 0085
+               IF (1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ.AND.2.LE.J.AND.
+     &         1+J.LE.NY.AND.33.LE.K) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 4th dimension"
+               IF (1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+K.LE.NZ.AND.
+     &         1+J.LE.NY.AND.34.LE.J) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 3rd dimension"
+               IF (1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ.AND.2.LE.J.AND.
+     &         1+J.LE.NY.AND.34.LE.I) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 2nd dimension"
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 3rd dimension"
+c
+               C(5,1,I,J,K) = DT*TZ2*(C2*(U(2,I,J,K+1)*U(2,I,J,K+1)+U   0086
+     &         (3,I,J,K+1)*U(3,I,J,K+1)+U(4,I,J,K+1)*U(4,I,J,K+1))*     0086
+     &         TMP2-C1*U(5,I,J,K+1)*TMP1)*U(4,I,J,K+1)*TMP1-DT*TZ1*(-   0086
+     &         (C34-C1345))*TMP3*U(2,I,J,K+1)**2                        0086
+               IF (33.LT.K+1) STOP "Bound violation:, READING,  array JA
+     &CU:U, upper bound, 4th dimension"
+               IF (33.LT.J) STOP "Bound violation:, READING,  array JACU
+     &:U, upper bound, 3rd dimension"
+               IF (33.LT.I) STOP "Bound violation:, READING,  array JACU
+     &:U, upper bound, 2nd dimension"
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:C, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 3rd dimension"
+
+C     $           - ( c34 - c1345 ) * tmp3 * (u(3,i,j,k+1)**2)
+
+C     $           - ( r43*c34 - c1345 )* tmp3 * (u(4,i,j,k+1)**2)
+C     $          - c1345 * tmp2 * u(5,i,j,k+1) )
+               C(5,2,I,J,K) = DT*TZ2*(-C2)*U(2,I,J,K+1)*U(4,I,J,K+1)*   0087
+     &         TMP2-DT*TZ1*(C34-C1345)*TMP2*U(2,I,J,K+1)                0087
+               IF (1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ.AND.2.LE.J.AND.
+     &         1+J.LE.NY.AND.33.LE.K) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 4th dimension"
+               IF (1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+K.LE.NZ.AND.
+     &         1+J.LE.NY.AND.34.LE.J) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 3rd dimension"
+               IF (1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ.AND.2.LE.J.AND.
+     &         1+J.LE.NY.AND.34.LE.I) STOP "Bound violation:, READING,  
+     &array JACU:U, upper bound, 2nd dimension"
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 3rd dimension"
+               C(5,3,I,J,K) = DT*TZ2*(-C2)*U(3,I,J,K+1)*U(4,I,J,K+1)*   0088
+     &         TMP2-DT*TZ1*(C34-C1345)*TMP2*U(3,I,J,K+1)                0088
+               IF (33.LT.K+1) STOP "Bound violation:, READING,  array JA
+     &CU:U, upper bound, 4th dimension"
+               IF (33.LT.J) STOP "Bound violation:, READING,  array JACU
+     &:U, upper bound, 3rd dimension"
+               IF (33.LT.I) STOP "Bound violation:, READING,  array JACU
+     &:U, upper bound, 2nd dimension"
+               IF (34.LE.K.AND.1+I.LE.NX.AND.2.LE.I.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+I.LE.NX.AND.2.LE.I.AND.2.LE.K.AND.1+
+     &         K.LE.NZ.AND.1+J.LE.NY) STOP "Bound violation:, WRITING,  
+     &array JACU:C, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+I.LE.NX.AND.2.LE.K.AND.1+K.LE.NZ
+     &         .AND.2.LE.J.AND.1+J.LE.NY) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 3rd dimension"
+               C(5,4,I,J,K) = DT*TZ2*(C1*U(5,I,J,K+1)*TMP1-0.50D+00*    0089
+     &         C2*(U(2,I,J,K+1)*U(2,I,J,K+1)+U(3,I,J,K+1)*U(3,I,J,K+1   0089
+     &         )+3.0D+00*U(4,I,J,K+1)*U(4,I,J,K+1))*TMP2)-DT*TZ1*(R43   0089
+     &         *C34-C1345)*TMP2*U(4,I,J,K+1)                            0089
+               IF (33.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, READIN
+     &G,  array JACU:U, upper bound, 4th dimension"
+               IF (34.LE.K.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 5th dimension"
+               IF (34.LE.J.AND.1+J.LE.NY.AND.1+K.LE.NZ.AND.2.LE.K
+     &         .AND.2.LE.I.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 4th dimension"
+               IF (34.LE.I.AND.1+J.LE.NY.AND.2.LE.J.AND.1+K.LE.NZ
+     &         .AND.2.LE.K.AND.1+I.LE.NX) STOP "Bound violation:, WRITIN
+     &G,  array JACU:C, upper bound, 3rd dimension"
+               C(5,5,I,J,K) = DT*TZ2*C1*U(4,I,J,K+1)*TMP1-DT*TZ1*       0090
+     &         C1345*TMP1-DT*TZ1*DZ5                                    0090
+c
+            ENDDO
+c
+         ENDDO
+c
+      ENDDO
+c
+      END
+c
+c     Call with many array references
+c
+c
+c
+      SUBROUTINE JACU
+c
+c***compute the upper triangular part of the jacobian matrix
+c
+c Author: Sisira Weeratunga
+c         NASA Ames Research Center
+c         (10/25/90)
+c
+c #include 'applu.incl'  
+
+      IMPLICIT REAL*8 (A-H,O-Z)
+c
+      PARAMETER ( C1 = 1.40D+00, C2 = 0.40D+00,
+     $            C3 = 1.00D-01, C4 = 1.00D+00,
+     $            C5 = 1.40D+00 )
+c
+c***grid
+c
+      COMMON/CGCON/ NX, NY, NZ,
+     $              II1, II2, JI1, JI2, KI1, KI2, ITWJ,
+     $              DXI, DETA, DZETA,
+     $              TX1, TX2, TX3,
+     $              TY1, TY2, TY3,
+     $              TZ1, TZ2, TZ3
+c
+c***dissipation
+c
+      COMMON/DISP/ DX1,DX2,DX3,DX4,DX5,
+     $             DY1,DY2,DY3,DY4,DY5,
+     $             DZ1,DZ2,DZ3,DZ4,DZ5,
+     $             DSSP
+c
+c***field variables and residuals
+c
+      COMMON/CVAR/ U(5,33,33,33),
+     $             RSD(5,33,33,33),
+     $             FRCT(5,33,33,33)
+c
+c***output control parameters
+c
+      COMMON/CPRCON/ IPR, IOUT, INORM
+c
+c***newton-raphson iteration control parameters
+c
+      COMMON/CTSCON/ ITMAX, INVERT,
+     $               DT, OMEGA, TOLRSD(5),
+     $               RSDNM(5), ERRNM(5), FRC, TTOTAL
+c
+      COMMON/CJAC/ A(5,5,33,33,33),
+     $             B(5,5,33,33,33),
+     $             C(5,5,33,33,33),
+     $             D(5,5,33,33,33)
+c
+c***coefficients of the exact solution
+c
+      COMMON/CEXACT/ CE(5,13)
+c
+
+
+
+c
+      R43 = 4.0D+00/3.0D+00                                             0001
+      C1345 = C1*C3*C4*C5                                               0002
+      C34 = C3*C4                                                       0003
+c      
+      DO K = 2, NZ-1                                                    0004
+c
+         DO J = 2, NY-1                                                 0005
+c
+            DO I = 2, NX-1                                              0006
+               IF (34.LE.K) STOP "Bound violation:, READING,  array JACU
+     &:U, upper bound, 4th dimension"
+               IF (34.LE.J) STOP "Bound violation:, READING,  array JACU
+     &:U, upper bound, 3rd dimension"
+               IF (33.LE.I) STOP "Bound violation:, READING,  array JACU
+     &:U, upper bound, 2nd dimension"
+c               
+c***form the first block sub-diagonal
+c
+               TMP1 = 1.0D+00/U(1,I+1,J,K)                              0007
+               TMP2 = TMP1*TMP1                                         0008
+               TMP3 = TMP1*TMP2                                         0009
+c
+               A(1,1,I,J,K) = -DT*TX1*DX1                               0010
+               A(1,2,I,J,K) = DT*TX2                                    0011
+               A(1,3,I,J,K) = 0.0D+00                                   0012
+               A(1,4,I,J,K) = 0.0D+00                                   0013
+               A(1,5,I,J,K) = 0.0D+00                                   0014
+c
+               A(2,1,I,J,K) = DT*TX2*((-(U(2,I+1,J,K)*TMP1)**2)+C2*     0015
+     &         0.50D+00*(U(2,I+1,J,K)*U(2,I+1,J,K)+U(3,I+1,J,K)*U(3,I   0015
+     &         +1,J,K)+U(4,I+1,J,K)*U(4,I+1,J,K))*TMP2)-DT*TX1*(-R43)   0015
+     &         *C34*TMP2*U(2,I+1,J,K)                                   0015
+               A(2,2,I,J,K) = DT*TX2*(2.0D+00-C2)*U(2,I+1,J,K)*TMP1-    0016
+     &         DT*TX1*R43*C34*TMP1-DT*TX1*DX2                           0016
+               A(2,3,I,J,K) = DT*TX2*(-C2)*U(3,I+1,J,K)*TMP1            0017
+               A(2,4,I,J,K) = DT*TX2*(-C2)*U(4,I+1,J,K)*TMP1            0018
+               A(2,5,I,J,K) = DT*TX2*C2                                 0019
+c
+               A(3,1,I,J,K) = DT*TX2*(-(U(2,I+1,J,K)*U(3,I+1,J,K)))*    0020
+     &         TMP2-DT*TX1*(-C34)*TMP2*U(3,I+1,J,K)                     0020
+               A(3,2,I,J,K) = DT*TX2*U(3,I+1,J,K)*TMP1                  0021
+               A(3,3,I,J,K) = DT*TX2*U(2,I+1,J,K)*TMP1-DT*TX1*C34*      0022
+     &         TMP1-DT*TX1*DX3                                          0022
+               A(3,4,I,J,K) = 0.0D+00                                   0023
+               A(3,5,I,J,K) = 0.0D+00                                   0024
+c
+               A(4,1,I,J,K) = DT*TX2*(-(U(2,I+1,J,K)*U(4,I+1,J,K)))*    0025
+     &         TMP2-DT*TX1*(-C34)*TMP2*U(4,I+1,J,K)                     0025
+               A(4,2,I,J,K) = DT*TX2*U(4,I+1,J,K)*TMP1                  0026
+               A(4,3,I,J,K) = 0.0D+00                                   0027
+               A(4,4,I,J,K) = DT*TX2*U(2,I+1,J,K)*TMP1-DT*TX1*C34*      0028
+     &         TMP1-DT*TX1*DX4                                          0028
+               A(4,5,I,J,K) = 0.0D+00                                   0029
+c
+               A(5,1,I,J,K) = DT*TX2*(C2*(U(2,I+1,J,K)*U(2,I+1,J,K)+U   0030
+     &         (3,I+1,J,K)*U(3,I+1,J,K)+U(4,I+1,J,K)*U(4,I+1,J,K))*     0030
+     &         TMP2-C1*U(5,I+1,J,K)*TMP1)*U(2,I+1,J,K)*TMP1-DT*TX1*(-   0030
+     &         (R43*C34-C1345))*TMP3*U(2,I+1,J,K)**2                    0030
+
+C     $              - (     c34 - c1345 ) * tmp3 * ( u(3,i+1,j,k)**2 )
+
+C     $              - (     c34 - c1345 ) * tmp3 * ( u(4,i+1,j,k)**2 )
+C     $              - c1345 * tmp2 * u(5,i+1,j,k) )
+               A(5,2,I,J,K) = DT*TX2*(C1*U(5,I+1,J,K)*TMP1-0.50D+00*    0031
+     &         C2*(3.0D+00*U(2,I+1,J,K)*U(2,I+1,J,K)+U(3,I+1,J,K)*U(3   0031
+     &         ,I+1,J,K)+U(4,I+1,J,K)*U(4,I+1,J,K))*TMP2)-DT*TX1*(R43   0031
+     &         *C34-C1345)*TMP2*U(2,I+1,J,K)                            0031
+               A(5,3,I,J,K) = DT*TX2*(-C2)*U(3,I+1,J,K)*U(2,I+1,J,K)*   0032
+     &         TMP2-DT*TX1*(C34-C1345)*TMP2*U(3,I+1,J,K)                0032
+               A(5,4,I,J,K) = DT*TX2*(-C2)*U(4,I+1,J,K)*U(2,I+1,J,K)*   0033
+     &         TMP2-DT*TX1*(C34-C1345)*TMP2*U(4,I+1,J,K)                0033
+               A(5,5,I,J,K) = DT*TX2*C1*U(2,I+1,J,K)*TMP1-DT*TX1*       0034
+     &         C1345*TMP1-DT*TX1*DX5                                    0034
+               IF (33.LE.J) STOP "Bound violation:, READING,  array JACU
+     &:U, upper bound, 3rd dimension"
+c
+c***form the second block sub-diagonal
+c
+               TMP1 = 1.0D+00/U(1,I,J+1,K)                              0035
+               TMP2 = TMP1*TMP1                                         0036
+               TMP3 = TMP1*TMP2                                         0037
+c
+               B(1,1,I,J,K) = -DT*TY1*DY1                               0038
+               B(1,2,I,J,K) = 0.0D+00                                   0039
+               B(1,3,I,J,K) = DT*TY2                                    0040
+               B(1,4,I,J,K) = 0.0D+00                                   0041
+               B(1,5,I,J,K) = 0.0D+00                                   0042
+c
+               B(2,1,I,J,K) = DT*TY2*(-(U(2,I,J+1,K)*U(3,I,J+1,K)))*    0043
+     &         TMP2-DT*TY1*(-C34)*TMP2*U(2,I,J+1,K)                     0043
+               B(2,2,I,J,K) = DT*TY2*U(3,I,J+1,K)*TMP1-DT*TY1*C34*      0044
+     &         TMP1-DT*TY1*DY2                                          0044
+               B(2,3,I,J,K) = DT*TY2*U(2,I,J+1,K)*TMP1                  0045
+               B(2,4,I,J,K) = 0.0D+00                                   0046
+               B(2,5,I,J,K) = 0.0D+00                                   0047
+c
+               B(3,1,I,J,K) = DT*TY2*((-(U(3,I,J+1,K)*TMP1)**2)+        0048
+     &         0.50D+00*C2*(U(2,I,J+1,K)*U(2,I,J+1,K)+U(3,I,J+1,K)*U(   0048
+     &         3,I,J+1,K)+U(4,I,J+1,K)*U(4,I,J+1,K))*TMP2)-DT*TY1*(-    0048
+     &         R43)*C34*TMP2*U(3,I,J+1,K)                               0048
+               B(3,2,I,J,K) = DT*TY2*(-C2)*U(2,I,J+1,K)*TMP1            0049
+               B(3,3,I,J,K) = DT*TY2*(2.0D+00-C2)*U(3,I,J+1,K)*TMP1-    0050
+     &         DT*TY1*R43*C34*TMP1-DT*TY1*DY3                           0050
+               B(3,4,I,J,K) = DT*TY2*(-C2)*U(4,I,J+1,K)*TMP1            0051
+               B(3,5,I,J,K) = DT*TY2*C2                                 0052
+c
+               B(4,1,I,J,K) = DT*TY2*(-(U(3,I,J+1,K)*U(4,I,J+1,K)))*    0053
+     &         TMP2-DT*TY1*(-C34)*TMP2*U(4,I,J+1,K)                     0053
+               B(4,2,I,J,K) = 0.0D+00                                   0054
+               B(4,3,I,J,K) = DT*TY2*U(4,I,J+1,K)*TMP1                  0055
+               B(4,4,I,J,K) = DT*TY2*U(3,I,J+1,K)*TMP1-DT*TY1*C34*      0056
+     &         TMP1-DT*TY1*DY4                                          0056
+               B(4,5,I,J,K) = 0.0D+00                                   0057
+c
+               B(5,1,I,J,K) = DT*TY2*(C2*(U(2,I,J+1,K)*U(2,I,J+1,K)+U   0058
+     &         (3,I,J+1,K)*U(3,I,J+1,K)+U(4,I,J+1,K)*U(4,I,J+1,K))*     0058
+     &         TMP2-C1*U(5,I,J+1,K)*TMP1)*U(3,I,J+1,K)*TMP1-DT*TY1*(-   0058
+     &         (C34-C1345))*TMP3*U(2,I,J+1,K)**2                        0058
+
+C     $              - ( r43*c34 - c1345 )*tmp3*(u(3,i,j+1,k)**2)
+
+
+C     $              - (     c34 - c1345 )*tmp3*(u(4,i,j+1,k)**2)
+C     $              - c1345*tmp2*u(5,i,j+1,k) )
+               B(5,2,I,J,K) = DT*TY2*(-C2)*U(2,I,J+1,K)*U(3,I,J+1,K)*   0059
+     &         TMP2-DT*TY1*(C34-C1345)*TMP2*U(2,I,J+1,K)                0059
+               B(5,3,I,J,K) = DT*TY2*(C1*U(5,I,J+1,K)*TMP1-0.50D+00*    0060
+     &         C2*(U(2,I,J+1,K)*U(2,I,J+1,K)+3.0D+00*U(3,I,J+1,K)*U(3   0060
+     &         ,I,J+1,K)+U(4,I,J+1,K)*U(4,I,J+1,K))*TMP2)-DT*TY1*(R43   0060
+     &         *C34-C1345)*TMP2*U(3,I,J+1,K)                            0060
+               B(5,4,I,J,K) = DT*TY2*(-C2)*U(3,I,J+1,K)*U(4,I,J+1,K)*   0061
+     &         TMP2-DT*TY1*(C34-C1345)*TMP2*U(4,I,J+1,K)                0061
+               B(5,5,I,J,K) = DT*TY2*C1*U(3,I,J+1,K)*TMP1-DT*TY1*       0062
+     &         C1345*TMP1-DT*TY1*DY5                                    0062
+               IF (33.LE.K) STOP "Bound violation:, READING,  array JACU
+     &:U, upper bound, 4th dimension"
+c
+c***form the third block sub-diagonal
+c
+               TMP1 = 1.0D+00/U(1,I,J,K+1)                              0063
+               TMP2 = TMP1*TMP1                                         0064
+               TMP3 = TMP1*TMP2                                         0065
+c
+               C(1,1,I,J,K) = -DT*TZ1*DZ1                               0066
+               C(1,2,I,J,K) = 0.0D+00                                   0067
+               C(1,3,I,J,K) = 0.0D+00                                   0068
+               C(1,4,I,J,K) = DT*TZ2                                    0069
+               C(1,5,I,J,K) = 0.0D+00                                   0070
+c
+               C(2,1,I,J,K) = DT*TZ2*(-(U(2,I,J,K+1)*U(4,I,J,K+1)))*    0071
+     &         TMP2-DT*TZ1*(-C34)*TMP2*U(2,I,J,K+1)                     0071
+               C(2,2,I,J,K) = DT*TZ2*U(4,I,J,K+1)*TMP1-DT*TZ1*C34*      0072
+     &         TMP1-DT*TZ1*DZ2                                          0072
+               C(2,3,I,J,K) = 0.0D+00                                   0073
+               C(2,4,I,J,K) = DT*TZ2*U(2,I,J,K+1)*TMP1                  0074
+               C(2,5,I,J,K) = 0.0D+00                                   0075
+c
+               C(3,1,I,J,K) = DT*TZ2*(-(U(3,I,J,K+1)*U(4,I,J,K+1)))*    0076
+     &         TMP2-DT*TZ1*(-C34)*TMP2*U(3,I,J,K+1)                     0076
+               C(3,2,I,J,K) = 0.0D+00                                   0077
+               C(3,3,I,J,K) = DT*TZ2*U(4,I,J,K+1)*TMP1-DT*TZ1*C34*      0078
+     &         TMP1-DT*TZ1*DZ3                                          0078
+               C(3,4,I,J,K) = DT*TZ2*U(3,I,J,K+1)*TMP1                  0079
+               C(3,5,I,J,K) = 0.0D+00                                   0080
+c
+               C(4,1,I,J,K) = DT*TZ2*((-(U(4,I,J,K+1)*TMP1)**2)+        0081
+     &         0.50D+00*C2*(U(2,I,J,K+1)*U(2,I,J,K+1)+U(3,I,J,K+1)*U(   0081
+     &         3,I,J,K+1)+U(4,I,J,K+1)*U(4,I,J,K+1))*TMP2)-DT*TZ1*(-    0081
+     &         R43)*C34*TMP2*U(4,I,J,K+1)                               0081
+               C(4,2,I,J,K) = DT*TZ2*(-C2)*U(2,I,J,K+1)*TMP1            0082
+               C(4,3,I,J,K) = DT*TZ2*(-C2)*U(3,I,J,K+1)*TMP1            0083
+               C(4,4,I,J,K) = DT*TZ2*(2.0D+00-C2)*U(4,I,J,K+1)*TMP1-    0084
+     &         DT*TZ1*R43*C34*TMP1-DT*TZ1*DZ4                           0084
+               C(4,5,I,J,K) = DT*TZ2*C2                                 0085
+c
+               C(5,1,I,J,K) = DT*TZ2*(C2*(U(2,I,J,K+1)*U(2,I,J,K+1)+U   0086
+     &         (3,I,J,K+1)*U(3,I,J,K+1)+U(4,I,J,K+1)*U(4,I,J,K+1))*     0086
+     &         TMP2-C1*U(5,I,J,K+1)*TMP1)*U(4,I,J,K+1)*TMP1-DT*TZ1*(-   0086
+     &         (C34-C1345))*TMP3*U(2,I,J,K+1)**2                        0086
+
+C     $           - ( c34 - c1345 ) * tmp3 * (u(3,i,j,k+1)**2)
+
+C     $           - ( r43*c34 - c1345 )* tmp3 * (u(4,i,j,k+1)**2)
+C     $          - c1345 * tmp2 * u(5,i,j,k+1) )
+               C(5,2,I,J,K) = DT*TZ2*(-C2)*U(2,I,J,K+1)*U(4,I,J,K+1)*   0087
+     &         TMP2-DT*TZ1*(C34-C1345)*TMP2*U(2,I,J,K+1)                0087
+               C(5,3,I,J,K) = DT*TZ2*(-C2)*U(3,I,J,K+1)*U(4,I,J,K+1)*   0088
+     &         TMP2-DT*TZ1*(C34-C1345)*TMP2*U(3,I,J,K+1)                0088
+               C(5,4,I,J,K) = DT*TZ2*(C1*U(5,I,J,K+1)*TMP1-0.50D+00*    0089
+     &         C2*(U(2,I,J,K+1)*U(2,I,J,K+1)+U(3,I,J,K+1)*U(3,I,J,K+1   0089
+     &         )+3.0D+00*U(4,I,J,K+1)*U(4,I,J,K+1))*TMP2)-DT*TZ1*(R43   0089
+     &         *C34-C1345)*TMP2*U(4,I,J,K+1)                            0089
+               C(5,5,I,J,K) = DT*TZ2*C1*U(4,I,J,K+1)*TMP1-DT*TZ1*       0090
+     &         C1345*TMP1-DT*TZ1*DZ5                                    0090
+c
+            ENDDO
+c
+         ENDDO
+c
+      ENDDO
+c
+      END
+

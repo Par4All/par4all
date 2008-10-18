@@ -1,0 +1,39 @@
+* Example with array reference in the condition of test
+      PROGRAM TEST
+      PARAMETER (N=10)
+      INTEGER T(N),X
+
+      PRINT *, 'THIS IS A TEST'                                         0001
+
+      IF (T(5).LE.10) THEN                                              0002
+         IF (11.LE.X) STOP "Bound violation:, WRITING,  array TEST:T, up
+     &per bound, 1st dimension"
+         IF (X.LE.0) STOP "Bound violation:, WRITING,  array TEST:T, low
+     &er bound, 1st dimension"
+         T(X) = 10                                                      0003
+      ELSE
+         T(5) = 10                                                      0004
+      ENDIF
+
+      PRINT *, T                                                        0005
+      END
+* Example with array reference in the condition of test
+      PROGRAM TEST
+      PARAMETER (N=10)
+      INTEGER T(N),X
+
+      PRINT *, 'THIS IS A TEST'                                         0001
+
+      IF (T(5).LE.10) THEN                                              0002
+         IF (11.LE.X) STOP "Bound violation:, WRITING,  array TEST:T, up
+     &per bound, 1st dimension"
+         IF (X.LE.0) STOP "Bound violation:, WRITING,  array TEST:T, low
+     &er bound, 1st dimension"
+         T(X) = 10                                                      0003
+      ELSE
+         T(5) = 10                                                      0004
+      ENDIF
+
+      PRINT *, T                                                        0005
+      END
+

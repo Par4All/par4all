@@ -1,0 +1,29 @@
+* Example with write effect on variable 
+* of the bound of array's declaration
+
+      SUBROUTINE EFFECT(A, N)
+      
+      REAL A(N)
+
+      N = 2*N                                                           0001
+      DO I = 1, N                                                       0002
+         IF (I.LT.1.OR.I.GT.N) STOP 
+     &   "Bound violation:array EFFECT:A, 1st dimension"
+         A(I) = 0.                                                      0003
+      ENDDO
+
+      END
+* Example with write effect on variable 
+* of the bound of array's declaration
+
+      SUBROUTINE EFFECT(A, N)
+      
+      REAL A(N)
+
+      N = 2*N                                                           0001
+      DO I = 1, N                                                       0002
+         A(I) = 0.                                                      0003
+      ENDDO
+
+      END
+

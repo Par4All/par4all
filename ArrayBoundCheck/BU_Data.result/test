@@ -1,0 +1,29 @@
+* Example with the DATA declaration
+* Array bound checking in PIPS do not add test to this declaration
+
+      PROGRAM TEST
+      REAL X(50)
+      DATA (X(I),I=-5,10)/3*0.0/
+
+      N = 20                                                            0001
+
+      DO 100 I = 1, N                                                   0002
+         IF (I.LT.1.OR.I.GT.50) STOP 
+     &   "Bound violation:array TEST:X, 1st dimension"
+         X(I) = 0.                                                      0003
+100      CONTINUE                                                       0004
+      END
+* Example with the DATA declaration
+* Array bound checking in PIPS do not add test to this declaration
+
+      PROGRAM TEST
+      REAL X(50)
+      DATA (X(I),I=-5,10)/3*0.0/
+
+      N = 20                                                            0001
+
+      DO 100 I = 1, N                                                   0002
+         X(I) = 0.                                                      0003
+100      CONTINUE                                                       0004
+      END
+

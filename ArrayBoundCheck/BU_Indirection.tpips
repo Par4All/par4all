@@ -1,0 +1,32 @@
+delete BU_Indirection
+create BU_Indirection BU_Indirection.f
+
+apply ARRAY_BOUND_CHECK_BOTTOM_UP[%ALL]
+display PRINTED_FILE[%ALL]
+
+apply PARTIAL_REDUNDANCY_ELIMINATION[%ALL]
+display PRINTED_FILE[%ALL]
+
+close BU_Indirection
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

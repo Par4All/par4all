@@ -19,7 +19,7 @@ source  ${VDIR:-.}/sourced.tpips \
 	${VDIR:-.}/sourced3.tpips
 echo ! already open
 open source
-source  ${VDIR:-.}$(PIPS_VALIDDIR)/Transformations/sourced.tpips
+source  ${VDIR:-.}/sourced.tpips
 # echo # delete all
 # setproperty PIPSDBM_RESOURCES_TO_DELETE="all"
 # source sourced.tpips

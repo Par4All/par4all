@@ -1,0 +1,40 @@
+* Example with simple unstructured
+
+      PROGRAM TEST
+      INTEGER X(50)    
+      I = 1                                                             0001
+99998 CONTINUE
+
+
+C     DO loop 100 with exit had to be desugared
+      IF (I.GT.10) GOTO 200                                             0001
+      X(I) = 0                                                          0002
+      IF (I.GT.5) GOTO 200                                              0003
+100   CONTINUE                                                          0005
+      I = I+1                                                           0001
+      GOTO 99998
+
+200   CONTINUE                                                          0006
+      PRINT *, 'THIS IS A TEST'                                         0006
+      END
+* Example with simple unstructured
+
+      PROGRAM TEST
+      INTEGER X(50)    
+      I = 1                                                             0001
+
+
+C     DO loop 100 with exit had to be desugared
+      IF (I.GT.10) THEN                                                 0001
+      ENDIF
+99997 CONTINUE
+      X(I) = 0                                                          0002
+      IF (I.GT.5) GOTO 200                                              0003
+100   CONTINUE                                                          0005
+      I = I+1                                                           0001
+      GOTO 99997
+
+200   CONTINUE                                                          0006
+      PRINT *, 'THIS IS A TEST'                                         0006
+      END
+
