@@ -1,0 +1,22 @@
+delete c
+setenv src ${VDIR:.}/Flint
+echo compile and execute initial file
+! f77 ${src}/constants.F
+! ./a.out > out.1
+! rm ./a.out
+create c constants.F
+apply TYPE_CHECKER[%ALL]
+display PRINTED_FILE
+apply UNSPLIT
+close
+echo compile and execute result file
+! f77 c.database/Src/constants.cpp_processed.f
+! ./a.out > out.2
+! rm ./a.out
+echo differences...
+! diff out.1 out.2
+echo result
+! cat out.1
+! rm out.1 out.2
+delete c
+quit

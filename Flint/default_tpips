@@ -1,0 +1,27 @@
+#!/bin/sh
+#
+# if Pips -f $PIPS_VALIDDIR/Flint/tested_file.f -m tested_file -p flinter -w tested_file >/dev/null
+# then
+# 	cat tested_file.database/TESTED_FILE/TESTED_FILE.flinted
+# 	exit_status=0
+# else
+# 	exit_status=1
+# fi
+# Delete tested_file 2>/dev/null
+# exit $exit_status
+
+delete ${WSPACE}
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create ${WSPACE} ${FILE}
+
+echo
+echo Flinted file
+echo
+
+display FLINTED_FILE
+
+close
+delete ${WSPACE}
+quit

@@ -1,0 +1,9 @@
+setproperty TYPE_CHECKER_DOUBLE_COMPLEX_EXTENSION TRUE 
+setproperty TYPE_CHECKER_EXPLICIT_COMPLEX_CONSTANTS TRUE
+
+delete t
+create t simplification.f
+apply TYPE_CHECKER[%ALL]
+display PRINTED_FILE
+close
+delete t

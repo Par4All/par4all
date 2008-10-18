@@ -1,0 +1,12 @@
+delete l
+create l loop00.f
+echo ### initial file
+display PRINTED_FILE[%ALL]
+apply TYPE_CHECKER[%ALL]
+echo ### type checked file
+display PRINTED_FILE[%ALL]
+close
+
+delete l
+quit
+

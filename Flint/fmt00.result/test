@@ -1,0 +1,28 @@
+### initial
+      PROGRAM FMT
+
+10    FORMAT(1X,'SALUT')                                                0001
+20    FORMAT(1X,'HELLO'/)                                               0002
+30    FORMAT(1X,'INT=',I2)                                              0003
+      WRITE (*, 10)                                                     0004
+      WRITE (*, 20)                                                     0005
+      WRITE (*, 30) 12                                                  0006
+
+1100  FORMAT(1X,'DEBUT DU PROGRAMME'//)                                 0007
+      WRITE (1, 1100)                                                   0008
+
+      END
+### type checked
+      PROGRAM FMT
+
+10    FORMAT(1X,'SALUT')                                                0001
+20    FORMAT(1X,'HELLO'/)                                               0002
+30    FORMAT(1X,'INT=',I2)                                              0003
+      WRITE (*, 10)                                                     0004
+      WRITE (*, 20)                                                     0005
+      WRITE (*, 30) 12                                                  0006
+
+1100  FORMAT(1X,'DEBUT DU PROGRAMME'//)                                 0007
+      WRITE (1, 1100)                                                   0008
+
+      END

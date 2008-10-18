@@ -1,0 +1,69 @@
+
+
+Non-initialized variables:
+--------------------------
+In statement number 14 (0.15):
+	"__IO_EFFECTS:LUNS" used but not initialized.
+In statement number 16 (0.17):
+	"PHI" used but not initialized.
+	"RESUL:XP" used but not initialized.
+	"RESUL:YP" used but not initialized.
+	"RESUL:ZP" used but not initialized.
+In statement number 17 (0.18):
+	"CALMAT:P" used but not initialized.
+In statement number 18 (0.19):
+	"R" used but not initialized.
+	"Q" used but not initialized.
+	"T" used but not initialized.
+	"BEL" used but not initialized.
+	"ROMAT:BID" used but not initialized.
+	"ROMAT:PH" used but not initialized.
+	"ROMAT:Q2" used but not initialized.
+	"ROMAT:ROL" used but not initialized.
+	"ROMAT:RN" used but not initialized.
+	"ROMAT:RES" used but not initialized.
+	"ROMAT:BID" used but not initialized.
+	"ROMAT:BID" used but not initialized.
+	"ROMAT:BID" used but not initialized.
+	"CALMAT:PXX" used but not initialized.
+	"ROMAT:BID" used but not initialized.
+	"CALMAT:PYY" used but not initialized.
+	"ROMAT:BID" used but not initialized.
+	"CALMAT:PZZ" used but not initialized.
+	"ROMAT:BID" used but not initialized.
+	"CALMAT:PXY" used but not initialized.
+	"ROMAT:BID" used but not initialized.
+	"CALMAT:PXZ" used but not initialized.
+	"ROMAT:BID" used but not initialized.
+	"CALMAT:PYZ" used but not initialized.
+	"ROMAT:BID" used but not initialized.
+	"ROMAT:BID" used but not initialized.
+	"CALMAT:P" used but not initialized.
+In statement number 23 (0.24):
+	"PHI" used but not initialized.
+	"RESUL:ZP" used but not initialized.
+	"RESUL:YP" used but not initialized.
+In statement number 25 (0.27):
+	"R" used but not initialized.
+	"BEL" used but not initialized.
+	"B" used but not initialized.
+	"A" used but not initialized.
+	"BELK" used but not initialized.
+	"ROMAT:ROL" used but not initialized.
+	"ROMAT:Q2" used but not initialized.
+	"ROMAT:RN" used but not initialized.
+	"ROMAT:SECM2" used but not initialized.
+In statement number 26 (0.28):
+	"Q" used but not initialized.
+	"T" used but not initialized.
+	"B" used but not initialized.
+	"A" used but not initialized.
+In statement number 27 (0.29):
+	"PHI" used but not initialized.
+	"RESUL:ZP" used but not initialized.
+	"RESUL:YP" used but not initialized.
+	"NITER" used but not initialized.
+
+flint message from check common, in module TMINES
+overlap of incompatible variables (TMINES:IDEC, MAILLA:XDEC) in common MACH
+number of messages from flint for TMINES : 54

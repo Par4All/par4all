@@ -1,0 +1,13 @@
+delete o
+create o onde24.f
+echo ### initial
+display PRINTED_FILE[%ALL]
+apply TYPE_CHECKER[%ALL]
+echo ### type checked
+display PRINTED_FILE[%ALL]
+# apply UNSPLIT
+close
+! cat o.database/Warnings
+
+delete o
+quit

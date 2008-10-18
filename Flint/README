@@ -1,0 +1,4 @@
+Test cases args1.f and mode1.f are non longer used because the errors are
+now caught by the effects computation, before flinter can emit a diagnostic.
+
+args1 moved back in for TYPE_CHECKER

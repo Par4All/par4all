@@ -1,0 +1,244 @@
+
+
+Non-initialized variables:
+--------------------------
+In statement number 16 (0.17):
+	"__IO_EFFECTS:LUNS" used but not initialized.
+In statement number 36 (0.38):
+	"N" used but not initialized.
+In statement number 37 (0.39):
+	"N" used but not initialized.
+In statement number 40 (0.43):
+	"I" used but not initialized.
+In statement number 45 (0.49):
+	"N" used but not initialized.
+In statement number 46 (0.50):
+	"N" used but not initialized.
+In statement number 49 (0.54):
+	"I" used but not initialized.
+In statement number 55 (0.60):
+	"ZF" used but not initialized.
+	"YF" used but not initialized.
+	"XF" used but not initialized.
+	"FNX" used but not initialized.
+	"FXY" used but not initialized.
+	"FNY" used but not initialized.
+	"FXX" used but not initialized.
+	"FNZ" used but not initialized.
+	"FXZ" used but not initialized.
+In statement number 63 (0.69):
+	"N" used but not initialized.
+In statement number 67 (0.74):
+	"I" used but not initialized.
+	"XF" used but not initialized.
+	"YF" used but not initialized.
+	"ZF" used but not initialized.
+	"XO" used but not initialized.
+	"YO" used but not initialized.
+	"ZO" used but not initialized.
+	"FNX" used but not initialized.
+	"FNY" used but not initialized.
+	"FNZ" used but not initialized.
+In statement number 69 (0.77):
+	"XF" used but not initialized.
+	"I" used but not initialized.
+	"K" used but not initialized.
+	"YF" used but not initialized.
+	"ZF" used but not initialized.
+In statement number 76 (0.85):
+	"I" used but not initialized.
+	"FNY" used but not initialized.
+	"FNZ" used but not initialized.
+In statement number 82 (0.92):
+	"N" used but not initialized.
+In statement number 83 (0.93):
+	"N" used but not initialized.
+In statement number 84 (0.94):
+	"N" used but not initialized.
+In statement number 85 (0.95):
+	"N" used but not initialized.
+In statement number 86 (0.96):
+	"N" used but not initialized.
+In statement number 87 (0.97):
+	"N" used but not initialized.
+In statement number 88 (0.98):
+	"N" used but not initialized.
+In statement number 89 (0.99):
+	"N" used but not initialized.
+In statement number 90 (0.100):
+	"N" used but not initialized.
+In statement number 91 (0.101):
+	"N" used but not initialized.
+In statement number 92 (0.102):
+	"N" used but not initialized.
+In statement number 93 (0.103):
+	"N" used but not initialized.
+In statement number 94 (0.104):
+	"N" used but not initialized.
+In statement number 95 (0.105):
+	"N" used but not initialized.
+In statement number 96 (0.106):
+	"N" used but not initialized.
+In statement number 97 (0.107):
+	"N" used but not initialized.
+In statement number 98 (0.108):
+	"N" used but not initialized.
+In statement number 101 (0.111):
+	"O" used but not initialized.
+	"AA" used but not initialized.
+	"XO" used but not initialized.
+	"ZO" used but not initialized.
+	"YO" used but not initialized.
+	"ZF" used but not initialized.
+	"YF" used but not initialized.
+	"XF" used but not initialized.
+	"FNZ" used but not initialized.
+	"FNY" used but not initialized.
+	"FNX" used but not initialized.
+	"FEZ" used but not initialized.
+	"FEY" used but not initialized.
+	"FEX" used but not initialized.
+	"FXZ" used but not initialized.
+	"FXY" used but not initialized.
+	"FXX" used but not initialized.
+In statement number 106 (0.117):
+	"I" used but not initialized.
+In statement number 107 (0.118):
+	"I" used but not initialized.
+In statement number 111 (0.123):
+	"I" used but not initialized.
+In statement number 114 (0.126):
+	"O" used but not initialized.
+In statement number 119 (0.132):
+	"I" used but not initialized.
+In statement number 120 (0.133):
+	"I" used but not initialized.
+In statement number 121 (0.134):
+	"I" used but not initialized.
+In statement number 124 (0.138):
+	"J" used but not initialized.
+	"ZO" used but not initialized.
+	"YO" used but not initialized.
+In statement number 126 (0.140):
+	"O" used but not initialized.
+In statement number 129 (0.143):
+	"J" used but not initialized.
+In statement number 131 (0.146):
+	"I" used but not initialized.
+In statement number 132 (0.147):
+	"I" used but not initialized.
+In statement number 133 (0.148):
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 138 (0.155):
+	"J" used but not initialized.
+	"JJ" used but not initialized.
+In statement number 142 (0.160):
+	"J" used but not initialized.
+In statement number 145 (0.163):
+	"J" used but not initialized.
+In statement number 148 (0.167):
+	"J" used but not initialized.
+In statement number 150 (0.169):
+	"ZO" used but not initialized.
+	"YO" used but not initialized.
+In statement number 152 (0.171):
+	"I" used but not initialized.
+In statement number 154 (0.173):
+	"O" used but not initialized.
+In statement number 159 (0.179):
+	"I" used but not initialized.
+In statement number 160 (0.180):
+	"I" used but not initialized.
+In statement number 161 (0.181):
+	"I" used but not initialized.
+In statement number 162 (0.182):
+	"I" used but not initialized.
+In statement number 165 (0.186):
+	"N" used but not initialized.
+In statement number 166 (0.187):
+	"N" used but not initialized.
+In statement number 167 (0.188):
+	"N" used but not initialized.
+In statement number 169 (0.190):
+	"FNY" used but not initialized.
+	"FNZ" used but not initialized.
+	"ZO" used but not initialized.
+	"YO" used but not initialized.
+	"XO" used but not initialized.
+In statement number 175 (0.197):
+	"I" used but not initialized.
+In statement number 176 (0.198):
+	"I" used but not initialized.
+In statement number 177 (0.199):
+	"I" used but not initialized.
+In statement number 178 (0.200):
+	"I" used but not initialized.
+In statement number 179 (0.201):
+	"I" used but not initialized.
+In statement number 185 (0.208):
+	"I" used but not initialized.
+In statement number 186 (0.209):
+	"I" used but not initialized.
+	"FNZ" used but not initialized.
+In statement number 189 (0.212):
+	"IDT" used but not initialized.
+In statement number 195 (0.219):
+	"I" used but not initialized.
+In statement number 196 (0.220):
+	"I" used but not initialized.
+In statement number 197 (0.221):
+	"I" used but not initialized.
+In statement number 198 (0.222):
+	"I" used but not initialized.
+In statement number 199 (0.223):
+	"I" used but not initialized.
+In statement number 200 (0.224):
+	"I" used but not initialized.
+	"XO" used but not initialized.
+	"YO" used but not initialized.
+	"ZO" used but not initialized.
+In statement number 214 (0.239):
+	"J" used but not initialized.
+In statement number 219 (0.245):
+	"I" used but not initialized.
+	"J" used but not initialized.
+In statement number 220 (0.246):
+	"J" used but not initialized.
+In statement number 221 (0.247):
+	"J" used but not initialized.
+In statement number 222 (0.248):
+	"FNZ" used but not initialized.
+In statement number 223 (0.249):
+	"FNX" used but not initialized.
+In statement number 226 (0.252):
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 229 (0.256):
+	"I" used but not initialized.
+	"J" used but not initialized.
+In statement number 230 (0.257):
+	"J" used but not initialized.
+In statement number 231 (0.258):
+	"J" used but not initialized.
+In statement number 232 (0.259):
+	"FNZ" used but not initialized.
+In statement number 233 (0.260):
+	"FNX" used but not initialized.
+In statement number 236 (0.263):
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 238 (0.265):
+	"J" used but not initialized.
+In statement number 239 (0.266):
+	"J" used but not initialized.
+In statement number 241 (0.268):
+	"J" used but not initialized.
+
+flint message from check reference: WARNING, in module OA118, in statement (0.69), number 63
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module OA118, in statement (0.69), number 63
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module OA118, in statement (0.69), number 63
+the 1th index may not be a mere integer
+number of messages from flint for OA118 : 147

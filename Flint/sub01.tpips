@@ -1,0 +1,7 @@
+delete s
+create s sub01.f
+apply TYPE_CHECKER[%ALL]
+display PRINTED_FILE[%ALL]
+close
+delete s
+quit

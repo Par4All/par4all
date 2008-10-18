@@ -1,0 +1,6 @@
+
+Flinted file
+
+flint message from check_call, in module WTYPE8, in statement (0.2), number 1
+incompatible basic type, 2th arg in call to TOP-LEVEL:FOO, float>int
+number of messages from flint for WTYPE8 : 1

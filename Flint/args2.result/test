@@ -1,0 +1,6 @@
+
+Flinted file
+
+flint message from check call, in module ARGS2, in statement (0.2), number 1
+too many arguments (2) in call to TOP-LEVEL:FOO (1)
+number of messages from flint for ARGS2 : 1

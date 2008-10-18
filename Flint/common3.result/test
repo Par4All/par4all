@@ -1,0 +1,6 @@
+
+Flinted file
+
+flint message from check common, in module COMMON3
+overlap of incompatible variables (COMMON3:X, FOO:I) in common BAR
+number of messages from flint for COMMON3 : 1
