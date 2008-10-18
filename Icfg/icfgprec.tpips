@@ -1,0 +1,18 @@
+delete ic
+create ic icfgprec.f
+
+echo
+echo ICFG with transformers
+echo
+
+activate PRINT_ICFG_WITH_TRANSFORMERS
+display ICFG_FILE
+
+echo
+echo ICFG with preconditions
+echo
+
+activate PRINT_ICFG_WITH_PRECONDITIONS
+display ICFG_FILE
+close
+delete ic

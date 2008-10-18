@@ -1,0 +1,8 @@
+delete easy
+create easy easy.f
+display ICFG_FILE
+activate PRINT_ICFG_WITH_CONTROL
+display ICFG_FILE
+close
+delete easy
+quit

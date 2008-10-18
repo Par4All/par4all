@@ -1,0 +1,16 @@
+
+Basic ICFG file
+
+GO
+    S1
+    S2
+    S1
+
+ICFG file with loops
+
+GO
+    S1
+    S2
+    do A
+        S1
+    enddo

@@ -1,0 +1,17 @@
+
+ICFG with transformers
+
+ICFGPREC
+
+C  T(J) {J==J#init+1}
+
+    INC
+
+ICFG with preconditions
+
+ICFGPREC
+
+C  P() {J==2}
+
+    INC
+
