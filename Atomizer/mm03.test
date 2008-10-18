@@ -1,0 +1,25 @@
+#!/bin/sh
+#
+# mm03.f test script
+#
+# Loop normalization and atomization of module MM03
+#
+
+tpips=${tpips_version:-tpips}
+
+$tpips <<EOF
+delete wmm03
+set ABORT_ON_USER_ERROR TRUE
+create wmm03 $PIPS_VALIDDIR/Atomizer/mm03.f
+module MM03
+apply LOOP_NORMALIZE
+echo Code after loop normalize
+display PRINTED_FILE
+apply ATOMIZER
+echo Code after atomizer
+display PRINTED_FILE
+close
+delete wmm03
+EOF
+
+exit $?
