@@ -1,0 +1,29 @@
+      program q
+      parameter (mn=10)
+      dimension a(mn)
+      im = mn
+      nmax = 6
+      do 100 i = 1, nmax
+         call sub(im,a)
+ 100  continue
+      do 101 i = 1,im
+         print *,a(i)
+ 101  continue
+      end
+c
+      subroutine sub(imm,b)
+      dimension b(imm)
+      mk = imm - 6
+      mm = mk*2
+      do 200 i = 1, mm
+         ii = i + 2
+         do 201 j = ii, 8
+            b(j) = b(j) + 2.
+ 201     continue
+         jj = 8 - i
+         do 202 j = 1, jj
+            b(j) = b(j) + 2.
+ 202        continue
+ 200  continue
+      return
+      end

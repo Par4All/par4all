@@ -1,0 +1,13 @@
+#!/bin/sh
+#
+# Script to test pips on the Cholesky program
+#
+Pips -f $PIPS_VALIDDIR/DemoStd/choles.f -w choles -m choles -p prcp >&2
+exit_code=$?
+echo "--- Preconditions"
+Display -l prec
+Pips -m choles -s rfulldg -p priv -b PPF >&2
+echo "--- Parallel Version"
+Display -l 
+Delete choles >&2
+exit $exit_code

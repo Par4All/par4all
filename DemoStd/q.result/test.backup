@@ -1,0 +1,56 @@
+--- Complexity for module SUB
+C                                           -20*IMM^2 + 396*IMM - 1649 (SUMMARY)
+C
+      SUBROUTINE SUB(IMM,B)
+      DIMENSION B(IMM)
+C                                                                    3 (STMT) 
+      MK = IMM-6                                                        0001
+C                                                                    3 (STMT) 
+      MM = MK*2                                                         0002
+C                                           -20*IMM^2 + 396*IMM - 1655 (DO)   
+      DO I = 1, MM                                                      0004
+C                                                                    3 (STMT) 
+         II = I+2                                                       0005
+C                                                            -5*I + 36 (DO)   
+         DO J = II, 8                                                   0007
+C                                                                    5 (STMT) 
+            B(J) = B(J)+2.                                              0008
+C                                                                    0 (STMT) 
+         ENDDO
+C                                                                    3 (STMT) 
+         JJ = 8-I                                                       0010
+C                                                            -5*I + 41 (DO)   
+         DO J = 1, JJ                                                   0012
+C                                                                    5 (STMT) 
+            B(J) = B(J)+2.                                              0013
+C                                                                    0 (STMT) 
+         ENDDO
+C                                                                    0 (STMT) 
+      ENDDO
+C                                                                    0 (STMT) 
+C                                                                    0 (STMT) 
+C                                                                    0 (STMT) 
+      END
+--- Complexity for module Q
+C                                                                 1890 (SUMMARY)
+      PROGRAM Q
+      PARAMETER (MN=10)
+      DIMENSION A(MN)
+C                                                                    1 (STMT) 
+      IM = MN                                                           0001
+C                                                                    1 (STMT) 
+      NMAX = 6                                                          0002
+C                                                                 1867 (DO)   
+      DO I = 1, NMAX                                                    0004
+C                                                                  311 (STMT) 
+         CALL SUB(IM, A)                                                0005
+C                                                                    0 (STMT) 
+      ENDDO
+C                                                                   21 (DO)   
+      DO I = 1, IM                                                      0008
+C                                                                    2 (STMT) 
+         WRITE (UNIT=6,FMT=*) A(I)                                      0009
+C                                                                    0 (STMT) 
+      ENDDO
+C                                                                    0 (STMT) 
+      END

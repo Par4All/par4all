@@ -1,0 +1,51 @@
+choles.f
+
+----------------------------------------------
+Cas de parallelisation avec analyse semantique
+----------------------------------------------
+On montre qu'il faut utiliser les predicats (nommes preconditions) pour
+paralleliser la boucle DO sur J. En effet, les elements de A qui sont
+lus sont distincts de ceux qui sont ecrits.
+
+a. Utilisation des predicats.
+Pour montrer quels predicats sont calcules, il faut construire la
+ressource PRINTED_FILE (Sequential View) avec la regle
+PRINT_CODE_PRECONDITIONS (Statements & Preconditions). Donc selectionner
+d'abord cette regle dans Props, puis demander `Sequential View' dans
+Edit/View.
+
+b. Privatisation.
+Selection de Transform > Privatize
+Rem: On ne peut visualiser les effets de cette privatisation, car le
+pretty-printer supprime toute privatisation si le code n'est pas
+parallele. 
+
+c. Parallelisation
+Pour obtenir une version parallele, il faut utiliser les preconditions
+pour construire le graphe de dependance. Donc selectionner:
+Props > Dependence Graph > Preconditions Used. Ensuite, demender la
+parallelisation. 
+
+
+En version batch:
+#
+# cholesky
+#
+choles () {
+program Cholesky
+Init -f choles.f chol
+Display -m choles prec
+
+Pips -s rfulldg -p priv -b PPF
+Display -l 
+#This is parallel version
+
+Pips -s rdg -b PPF
+Display -l 
+#This is sequential version
+
+Select rfulldg
+Display
+
+Delete chol
+}

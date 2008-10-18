@@ -1,0 +1,86 @@
+--- Preconditions
+
+C  P() {}
+
+C
+C     CHOLESKI METHOD - VERSION 1
+C
+C     PRIVATIZATION
+C     DEPENDENCE COMPUTATION WITH AND WITHOUT EXECUTION CONTEXT
+C
+      SUBROUTINE CHOLES(A, P, N)
+      REAL X, A(N,N), P(N)
+
+C  P() {}
+
+C
+      DO I = 1, N                                                       0001
+
+C  P(I,J,K,KK) {1<=I, I<=N}
+
+         X = A(I,I)                                                     0002
+
+C  P(I,J,K,KK) {1<=I, I<=N}
+
+         DO K = 1, I-1                                                  0003
+
+C  P(I,J,K,KK) {1<=I, K+1<=I, I<=N, 1<=K}
+
+            X = X-A(I,K)*A(I,K)                                         0004
+         ENDDO
+
+C  P(I,J,K,KK) {I==K, 1<=I, I<=N}
+
+         P(I) = 1.0/SQRT(X)                                             0005
+
+C  P(I,J,K,KK) {I==K, 1<=I, I<=N}
+
+         DO J = I+1, N                                                  0006
+
+C  P(I,J,K,KK) {I==K, 1<=I, I+1<=J, I<=N, J<=N}
+
+            X = A(I,J)                                                  0007
+
+C  P(I,J,K,KK) {I==K, 1<=I, I+1<=J, I<=N, J<=N}
+
+            DO KK = 1, I-1                                              0008
+
+C  P(I,J,K,KK) {I==K, 1<=I, I+1<=J, KK+1<=I, I<=N, J<=N, 1<=KK}
+
+               X = X-A(I,J)*A(I,KK)                                     0009
+            ENDDO
+
+C  P(I,J,K,KK) {I==K, I==KK, 1<=I, I+1<=J, J<=N}
+
+            A(J,I) = X*P(I)                                             0010
+         ENDDO
+      ENDDO
+C
+      END
+--- Parallel Version
+C
+C     CHOLESKI METHOD - VERSION 1
+C
+C     PRIVATIZATION
+C     DEPENDENCE COMPUTATION WITH AND WITHOUT EXECUTION CONTEXT
+C
+      SUBROUTINE CHOLES(A, P, N)
+      REAL X, A(N,N), P(N)
+C
+      DO I = 1, N                                                       0001
+         X = A(I,I)                                                     0002
+         DO K = 1, I-1                                                  0003
+            X = X-A(I,K)*A(I,K)                                         0004
+         ENDDO
+         P(I) = 1.0/SQRT(X)                                             0005
+         DOALL J = I+1, N                                               0006
+            PRIVATE X,KK
+            X = A(I,J)                                                  0007
+            DO KK = 1, I-1                                              0008
+               X = X-A(I,J)*A(I,KK)                                     0009
+            ENDDO
+            A(J,I) = X*P(I)                                             0010
+         ENDDO
+      ENDDO
+C
+      END
