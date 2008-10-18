@@ -1,0 +1,42 @@
+
+Initial code
+
+      PROGRAM TILING02
+
+C     Check tiling: use integer loop bounds, not mutiple of the tile size
+
+      REAL X(0:15, 0:10)
+
+      DO 100 I = 0, 15                                                  0001
+         DO 200 J = 0, 10                                               0002
+            X(I,J) = FLOAT(I+J)                                         0003
+200         CONTINUE                                                    0004
+100      CONTINUE                                                       0005
+
+      PRINT *, X                                                        0006
+
+      END
+
+After axis parallel tiling (5, 5)
+
+      PROGRAM TILING02
+
+C     Check tiling: use integer loop bounds, not mutiple of the tile size
+
+      REAL X(0:15, 0:10)
+
+      DO I_t = 0, 3                                                     0001
+         DO J_t = 0, 2
+
+            DO I = 5*I_t, MIN(15, 4+5*I_t)                              0001
+               DO J = 5*J_t, MIN(4+5*J_t, 10)                           0002
+                  X(I,J) = FLOAT(I+J)                                   0003
+200               CONTINUE                                              0004
+               ENDDO
+            ENDDO
+         ENDDO
+      ENDDO
+
+      PRINT *, X                                                        0006
+
+      END

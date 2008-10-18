@@ -1,0 +1,108 @@
+user warning in tp_parse: hyper02: No such workspace
+Registering file hyper02.f
+  Module         HYPER02
+Workspace hyper02 created and opened.
+Module HYPER02 selected
+Module HYPER02 already active.
+echo
+
+echo Initial code
+Initial code
+echo
+
+Module HYPER02 already active.
+Request: build resource PRINTED_FILE for module HYPER02.
+  BOOTSTRAP                      building   ENTITIES()
+  FILTER_FILE                    building   SOURCE_FILE(HYPER02)
+  PARSER                         building   PARSED_CODE(HYPER02)
+                                 building   CALLEES(HYPER02)
+  CONTROLIZER                    building   CODE(HYPER02)
+  PRINT_CODE                     building   PRINTED_FILE(HYPER02)
+PRINTED_FILE made for HYPER02.
+      SUBROUTINE HYPER02(X, N, M)
+
+C     Same code as loopfi01.f, used to check management of user errors
+
+      REAL X(N, M)
+
+      DO 100 I = 1, N                                                   0001
+         DO 200 J = 1, M                                                0002
+            X(I,J) = FLOAT(I+J)                                         0003
+200         CONTINUE                                                    0004
+100      CONTINUE                                                       0005
+
+      PRINT *, X                                                        0006
+
+      END
+echo
+
+echo Unknown loop label
+Unknown loop label
+echo
+
+Request: build phase/rule LOOP_HYPERPLANE for module HYPER02.
+  LOOP_HYPERPLANE                updating   CODE(HYPER02)
+user error in interactive_loop_transformation: loop label `300' does not exist
+user warning in safe_do_something: Request aborted under pipsmake: build phase/rule LOOP_HYPERPLANE for module HYPER02.
+echo
+
+echo Too many vector components
+Too many vector components
+echo
+
+Request: build phase/rule LOOP_HYPERPLANE for module HYPER02.
+  LOOP_HYPERPLANE                updating   CODE(HYPER02)
+Too many coordinates. Hyperplane loop transformation has been cancelled.
+user error in hyperplane: A proper hyperplane direction was not provided
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build phase/rule LOOP_HYPERPLANE for module HYPER02.
+echo
+
+echo Too few vector components
+Too few vector components
+echo
+
+Request: build phase/rule LOOP_HYPERPLANE for module HYPER02.
+  LOOP_HYPERPLANE                updating   CODE(HYPER02)
+Not enough coordinates. Hyperplane loop transformation has been cancelled.
+user error in hyperplane: A proper hyperplane direction was not provided
+user warning in set_debug_stack_pointer: debug level stack is set to 2
+user warning in safe_do_something: Request aborted under pipsmake: build phase/rule LOOP_HYPERPLANE for module HYPER02.
+echo
+
+echo Vector component with wrong type
+Vector component with wrong type
+echo
+
+Request: build phase/rule LOOP_HYPERPLANE for module HYPER02.
+  LOOP_HYPERPLANE                updating   CODE(HYPER02)
+LOOP_HYPERPLANE made for HYPER02.
+Module HYPER02 already active.
+Request: build resource PRINTED_FILE for module HYPER02.
+  PRINT_CODE                     building   PRINTED_FILE(HYPER02)
+PRINTED_FILE made for HYPER02.
+      SUBROUTINE HYPER02(X, N, M)
+
+C     Same code as loopfi01.f, used to check management of user errors
+
+      REAL X(N, M)
+
+      DO Ip = 1, N                                                      0001
+         DO Jp = 1, M                                                   0002
+            X(Ip,Jp) = FLOAT(Ip+Jp)                                     0003
+200         CONTINUE                                                    0004
+         ENDDO
+      ENDDO
+
+      PRINT *, X                                                        0006
+
+      END
+Deletion of obsolete resources:
+none destroyed.
+Closing all modules.
+  Closing module HYPER02.
+Closing program.
+Closing workspace.
+Workspace hyper02 closed.
+
+Workspace hyper02 deleted.
