@@ -1,0 +1,13 @@
+! avant
+      PROGRAM COMMENTS
+! 1
+! 2
+! 3
+      INTEGER I
+      REAL*4 R
+      
+      READ *, I, R                                                      0001
+! apres read
+      PRINT *, I, R                                                     0002
+! apres print
+      END

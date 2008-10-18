@@ -1,0 +1,23 @@
+      PROGRAM EXTRMAIN
+      INTEGER I1,I2,IMAX,I1P1,I1P2,I2M1,I2M2,IBF,J1,J2,JMAX,J1P1,J1P2
+     &,J2M1,J2M2,JA,JB,JAM1,JBP1,K1,K2,KMAX,K1P1,K1P2,K2M1,K2M2,L,
+     &NXYZ,N4,NI,NC
+      REAL*4 T(1:52,1:21,1:60)
+      COMMON /CNI/ L
+      COMMON /CK/ K1,K2,KMAX,K1P1,K1P2,K2M1,K2M2
+      COMMON /CJ/ J1,J2,JMAX,J1P1,J1P2,J2M1,J2M2,JA,JB,JAM1,JBP1
+      COMMON /CI/ I1,I2,IMAX,I1P1,I1P2,I2M1,I2M2,IBF
+      COMMON /CT/ T
+      
+      READ (NXYZ) I1, I2, J1, JA, K1, K2                                0001
+      REWIND (NXYZ)                                                     0002
+C     
+      IF (J1.GE.1.AND.K1.GE.1) THEN                                     0003
+         N4 = 4                                                         0004
+         J1 = J1+1                                                      0005
+         J2 = 2*JA+1                                                    0006
+         JA = JA+1                                                      0007
+         K1 = K1+1                                                      0008
+         CALL EXTR(NI, NC)                                              0009
+      ENDIF
+      END

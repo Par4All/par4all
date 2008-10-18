@@ -1,0 +1,13 @@
+delete ${WSPACE}
+create ${WSPACE} ${FILE}
+
+# Set the EPips mode behaviour:
+set PRETTYPRINT_ADD_EMACS_PROPERTIES TRUE
+set PRETTYPRINT_ALL_DECLARATIONS TRUE
+set PRETTYPRINT_HEADER_COMMENTS TRUE
+
+display PRINTED_FILE
+
+close
+delete ${WSPACE}
+quit
