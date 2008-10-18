@@ -1,0 +1,32 @@
+*DECK NPRIO
+      FUNCTION NPRIO(I,J,K,L,NSHELL)
+C
+C     CALCULATE A "PRIORITY", A NUMBER WHICH IS UNIQUE FOR ANY GIVEN
+C     I J K L.  NPRIO IS USED BY VARIOUS ROUTINES IN THE PROCESS
+C     OF DECIDING WHICH OF SEVERAL SYMMETRICALLY RELATED POSSIBILITES
+C     TO CHOOSE.
+C
+      I1 = I
+      J1 = J
+      K1 = K
+      L1 = L
+      IF(I1 .GE. J1) GOTO 10
+      IJKL = I1
+      I1   = J1
+      J1   = IJKL
+   10 IF(K1 .GE. L1) GOTO 20
+      IJKL = K1
+      K1   = L1
+      L1   = IJKL
+   20 IF(I1-K1) 25,35,40
+   25 IJKL = I1
+      I1   = K1
+      K1   = IJKL
+      IJKL = J1
+      J1   = L1
+      L1   = IJKL
+      GOTO 40
+   35 IF(J1 .LT. L1) GOTO 25
+   40 NPRIO = I1*(NSHELL+1)**3 + J1*(NSHELL+1)**2 + K1*(NSHELL+1) + L1
+      RETURN
+      END

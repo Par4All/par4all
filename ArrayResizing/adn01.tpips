@@ -1,0 +1,23 @@
+delete adn01
+create adn01 adn01.f
+
+
+make NEW_DECLARATIONS[%ALL]
+#apply ARRAY_RESIZING_TOP_DOWN[%ALL]
+
+setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
+setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+setproperty PRETTYPRINT_DO_LABEL_AS_COMMENT TRUE
+setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+setproperty PRETTYPRINT_FINAL_RETURN TRUE
+
+display PRINTED_FILE[%ALL]
+apply UNSPLIT
+
+shell /users/cri/nguyen/Experiment/Script/array_resizing_instrument.pl < adn01.database/TD_instrument.out
+
+shell cat adn01.database/Src/adn01.f
+quit

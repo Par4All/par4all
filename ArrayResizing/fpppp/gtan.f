@@ -1,0 +1,9 @@
+      FUNCTION GTAN (ARG)
+C
+C     TANGENT
+C
+      REAL*8 GTAN,DTAN,ARG
+C
+      GTAN = DTAN (ARG)
+      RETURN
+      END

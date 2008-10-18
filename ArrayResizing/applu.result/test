@@ -1,0 +1,5093 @@
+!!
+!! file for applu.f
+!!
+      PROGRAM APPLU
+c
+c***driver for the performance evaluation of the solver for
+c   five coupled parabolic/elliptic partial differential equations.
+c
+c Author: Sisira Weeratunga
+c         NASA Ames Research Center
+c         (10/25/90)
+c
+c Changes: Jeff Reilly, 9/25/94
+c	   All write statements have output device changed from
+c	   output devide "iout" to "6" (stdout). 
+
+
+c #include 'applu.incl'  
+
+      IMPLICIT REAL*8 (A-H,O-Z)
+c
+      PARAMETER ( C1 = 1.40D+00, C2 = 0.40D+00,
+     $            C3 = 1.00D-01, C4 = 1.00D+00,
+     $            C5 = 1.40D+00 )
+c
+c***grid
+c
+      COMMON/CGCON/ NX, NY, NZ,
+     $              II1, II2, JI1, JI2, KI1, KI2, ITWJ,
+     $              DXI, DETA, DZETA,
+     $              TX1, TX2, TX3,
+     $              TY1, TY2, TY3,
+     $              TZ1, TZ2, TZ3
+c
+c***dissipation
+c
+      COMMON/DISP/ DX1,DX2,DX3,DX4,DX5,
+     $             DY1,DY2,DY3,DY4,DY5,
+     $             DZ1,DZ2,DZ3,DZ4,DZ5,
+     $             DSSP
+c
+c***field variables and residuals
+c
+      COMMON/CVAR/ U(5,33,33,33),
+     $             RSD(5,33,33,33),
+     $             FRCT(5,33,33,33)
+c
+c***output control parameters
+c
+      COMMON/CPRCON/ IPR, IOUT, INORM
+c
+c***newton-raphson iteration control parameters
+c
+      COMMON/CTSCON/ ITMAX, INVERT,
+     $               DT, OMEGA, TOLRSD(5),
+     $               RSDNM(5), ERRNM(5), FRC, TTOTAL
+c
+      COMMON/CJAC/ A(5,5,33,33,33),
+     $             B(5,5,33,33,33),
+     $             C(5,5,33,33,33),
+     $             D(5,5,33,33,33)
+c
+c***coefficients of the exact solution
+c
+      COMMON/CEXACT/ CE(5,13)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+2001  FORMAT(5X,'PROBLEM SIZE IS TOO SMALL - ',/5X,'SET EACH OF NX, NY A
+     x 
+     &ND NZ AT LEAST EQUAL TO 5')
+C (0,3)
+2002  FORMAT(5X,'PROBLEM SIZE IS TOO LARGE - ',/5X,'NX, NY AND NZ SHOULD
+     x 
+     & BE LESS THAN OR EQUAL TO ',/5X,'ISIZ1, ISIZ2 AND ISIZ3 RESPECTIVE
+     x 
+     &LY')
+C (0,4)
+c
+
+
+
+      WRITE (6, *) 'Version: %Z%'
+C (0,5)
+
+c
+c***open file for input data
+c      open (unit=5,file= 'applu.inp33',status='old',
+c
+c      open (unit=5,file='applu.in',status='old',
+c     *      access='sequential',form='formatted')
+c      rewind 5
+c
+c***read the unit number for output data
+c
+      READ (5, *) 
+C (0,6)
+      READ (5, *) 
+C (0,7)
+      READ (5, *) IOUT
+C (0,8)
+c
+c***flag that controls printing of the progress of iterations
+c
+      READ (5, *) 
+C (0,9)
+      READ (5, *) 
+C (0,10)
+      READ (5, *) IPR, INORM
+C (0,11)
+c
+c***set the maximum number of pseudo-time steps to be taken
+c
+      READ (5, *) 
+C (0,12)
+      READ (5, *) 
+C (0,13)
+      READ (5, *) ITMAX
+C (0,14)
+c
+c***set the magnitude of the time step
+c
+      READ (5, *) 
+C (0,15)
+      READ (5, *) 
+C (0,16)
+      READ (5, *) DT
+C (0,17)
+c
+c***set the method of inverting the jacobian martix
+c   (invert = 1 : use Block approximate factorization method,
+c    invert = 2 : use Diagonalized approximate factorization method,
+c    invert = 3 : use SSOR methd)
+c
+      READ (5, *) 
+C (0,18)
+      READ (5, *) 
+C (0,19)
+      READ (5, *) INVERT
+C (0,20)
+c
+c***set the value of over-relaxation factor for SSOR iterations
+c
+      READ (5, *) 
+C (0,21)
+      READ (5, *) 
+C (0,22)
+      READ (5, *) OMEGA
+C (0,23)
+c
+c***set the steady-state residual tolerance levels
+c
+      READ (5, *) 
+C (0,24)
+      READ (5, *) 
+C (0,25)
+      READ (5, *) TOLRSD(1), TOLRSD(2), TOLRSD(3), TOLRSD(4), TOLRSD(
+     &5)
+C (0,26)
+c
+c***read problem specification parameters
+c
+c
+c***specify the number of grid points in xi, eta and zeta directions
+c
+      READ (5, *) 
+C (0,27)
+      READ (5, *) 
+C (0,28)
+      READ (5, *) NX, NY, NZ
+C (0,29)
+c
+c***open the file for output data
+c
+c      if ( iout .eq. 7 ) then
+c
+c         open ( unit = 7, file = 'output.data', status = 'unknown',
+c     $         access = 'sequential', form = 'formatted' )
+c         rewind 7
+c
+c      end if
+c
+      IF (NX.LT.5.OR.NY.LT.5.OR.NZ.LT.5) THEN
+C (0,30)
+C        BEGIN BLOCK
+C (0,31)
+c
+         WRITE (6, 2001) 
+C (0,32)
+         STOP
+c
+C        END BLOCK
+      ELSE
+C (0,34)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,35)
+c
+      IF (NX.GT.33.OR.NY.GT.33.OR.NZ.GT.33) THEN
+C (0,36)
+C        BEGIN BLOCK
+C (0,37)
+c
+         WRITE (6, 2002) 
+c
+C        END BLOCK
+      ELSE
+C (0,39)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,40)
+c
+      DXI = 1.0D+00/(NX-1)
+C (0,41)
+      DETA = 1.0D+00/(NY-1)
+C (0,42)
+      DZETA = 1.0D+00/(NZ-1)
+C (0,43)
+c
+      TX1 = 1.0D+00/(DXI*DXI)
+C (0,44)
+      TX2 = 1.0D+00/(2.0D+00*DXI)
+C (0,45)
+      TX3 = 1.0D+00/DXI
+C (0,46)
+c
+      TY1 = 1.0D+00/(DETA*DETA)
+C (0,47)
+      TY2 = 1.0D+00/(2.0D+00*DETA)
+C (0,48)
+      TY3 = 1.0D+00/DETA
+C (0,49)
+c
+      TZ1 = 1.0D+00/(DZETA*DZETA)
+C (0,50)
+      TZ2 = 1.0D+00/(2.0D+00*DZETA)
+C (0,51)
+      TZ3 = 1.0D+00/DZETA
+C (0,52)
+c
+      II1 = 2
+C (0,53)
+      II2 = NX-1
+C (0,54)
+      JI1 = 2
+C (0,55)
+      JI2 = NY-2
+C (0,56)
+      KI1 = 3
+C (0,57)
+      KI2 = NZ-1
+C (0,58)
+      ITWJ = 0
+C (0,59)
+c
+c***diffusion coefficients
+c
+      DX1 = 0.75D+00
+C (0,60)
+      DX2 = DX1
+C (0,61)
+      DX3 = DX1
+C (0,62)
+      DX4 = DX1
+C (0,63)
+      DX5 = DX1
+C (0,64)
+c
+      DY1 = 0.75D+00
+C (0,65)
+      DY2 = DY1
+C (0,66)
+      DY3 = DY1
+C (0,67)
+      DY4 = DY1
+C (0,68)
+      DY5 = DY1
+C (0,69)
+c
+      DZ1 = 1.00D+00
+C (0,70)
+      DZ2 = DZ1
+C (0,71)
+      DZ3 = DZ1
+C (0,72)
+      DZ4 = DZ1
+C (0,73)
+      DZ5 = DZ1
+C (0,74)
+c
+c***fourth difference dissipation 
+c
+      DSSP = MAX(DX1, DY1, DZ1)/4.0D+00
+C (0,75)
+c
+c***coefficients of the exact solution to the first pde
+c
+      CE(1,1) = 2.0D+00
+C (0,76)
+      CE(1,2) = 0.0D+00
+C (0,77)
+      CE(1,3) = 0.0D+00
+C (0,78)
+      CE(1,4) = 4.0D+00
+C (0,79)
+      CE(1,5) = 5.0D+00
+C (0,80)
+      CE(1,6) = 3.0D+00
+C (0,81)
+      CE(1,7) = 5.0D-01
+C (0,82)
+      CE(1,8) = 2.0D-02
+C (0,83)
+      CE(1,9) = 1.0D-02
+C (0,84)
+      CE(1,10) = 3.0D-02
+C (0,85)
+      CE(1,11) = 5.0D-01
+C (0,86)
+      CE(1,12) = 4.0D-01
+C (0,87)
+      CE(1,13) = 3.0D-01
+C (0,88)
+c
+c***coefficients of the exact solution to the second pde
+c
+      CE(2,1) = 1.0D+00
+C (0,89)
+      CE(2,2) = 0.0D+00
+C (0,90)
+      CE(2,3) = 0.0D+00
+C (0,91)
+      CE(2,4) = 0.0D+00
+C (0,92)
+      CE(2,5) = 1.0D+00
+C (0,93)
+      CE(2,6) = 2.0D+00
+C (0,94)
+      CE(2,7) = 3.0D+00
+C (0,95)
+      CE(2,8) = 1.0D-02
+C (0,96)
+      CE(2,9) = 3.0D-02
+C (0,97)
+      CE(2,10) = 2.0D-02
+C (0,98)
+      CE(2,11) = 4.0D-01
+C (0,99)
+      CE(2,12) = 3.0D-01
+C (0,100)
+      CE(2,13) = 5.0D-01
+C (0,101)
+c
+c***coefficients of the exact solution to the third pde
+c
+      CE(3,1) = 2.0D+00
+C (0,102)
+      CE(3,2) = 2.0D+00
+C (0,103)
+      CE(3,3) = 0.0D+00
+C (0,104)
+      CE(3,4) = 0.0D+00
+C (0,105)
+      CE(3,5) = 0.0D+00
+C (0,106)
+      CE(3,6) = 2.0D+00
+C (0,107)
+      CE(3,7) = 3.0D+00
+C (0,108)
+      CE(3,8) = 4.0D-02
+C (0,109)
+      CE(3,9) = 3.0D-02
+C (0,110)
+      CE(3,10) = 5.0D-02
+C (0,111)
+      CE(3,11) = 3.0D-01
+C (0,112)
+      CE(3,12) = 5.0D-01
+C (0,113)
+      CE(3,13) = 4.0D-01
+C (0,114)
+c
+c***coefficients of the exact solution to the fourth pde
+c
+      CE(4,1) = 2.0D+00
+C (0,115)
+      CE(4,2) = 2.0D+00
+C (0,116)
+      CE(4,3) = 0.0D+00
+C (0,117)
+      CE(4,4) = 0.0D+00
+C (0,118)
+      CE(4,5) = 0.0D+00
+C (0,119)
+      CE(4,6) = 2.0D+00
+C (0,120)
+      CE(4,7) = 3.0D+00
+C (0,121)
+      CE(4,8) = 3.0D-02
+C (0,122)
+      CE(4,9) = 5.0D-02
+C (0,123)
+      CE(4,10) = 4.0D-02
+C (0,124)
+      CE(4,11) = 2.0D-01
+C (0,125)
+      CE(4,12) = 1.0D-01
+C (0,126)
+      CE(4,13) = 3.0D-01
+C (0,127)
+c
+c***coefficients of the exact solution to the fifth pde
+c
+      CE(5,1) = 5.0D+00
+C (0,128)
+      CE(5,2) = 4.0D+00
+C (0,129)
+      CE(5,3) = 3.0D+00
+C (0,130)
+      CE(5,4) = 2.0D+00
+C (0,131)
+      CE(5,5) = 1.0D-01
+C (0,132)
+      CE(5,6) = 4.0D-01
+C (0,133)
+      CE(5,7) = 3.0D-01
+C (0,134)
+      CE(5,8) = 5.0D-02
+C (0,135)
+      CE(5,9) = 4.0D-02
+C (0,136)
+      CE(5,10) = 3.0D-02
+C (0,137)
+      CE(5,11) = 1.0D-01
+C (0,138)
+      CE(5,12) = 3.0D-01
+C (0,139)
+      CE(5,13) = 2.0D-01
+C (0,140)
+c
+c***set the boundary values for dependent variables
+c
+      CALL SETBV
+C (0,141)
+c
+c***set the initial values for dependent variables
+c
+      CALL SETIV
+C (0,142)
+c
+c***compute the forcing term based on prescribed exact solution
+c
+      CALL ERHS
+C (0,143)
+c
+c***perform the SSOR iterations
+c
+      CALL SSOR
+C (0,144)
+c
+c***compute the solution error
+c
+      CALL ERROR
+C (0,145)
+c
+c***compute the surface integral
+c
+      CALL PINTGR
+C (0,146)
+c
+c***verification test
+c
+      CALL VERIFY(RSDNM, ERRNM, FRC)
+C (0,147)
+c
+c***print the CPU time
+c
+c
+      STOP
+C (0,148)
+      RETURN
+C     END BLOCK
+      END
+c
+c
+c
+c
+c
+      SUBROUTINE SETBV
+c
+c***set the boundary values of dependent variables
+c
+c Author: Sisira Weeratunga
+c         NASA Ames Research Center
+c         (10/25/90)
+c
+c #include 'applu.incl'  
+
+      IMPLICIT REAL*8 (A-H,O-Z)
+c
+      PARAMETER ( C1 = 1.40D+00, C2 = 0.40D+00,
+     $            C3 = 1.00D-01, C4 = 1.00D+00,
+     $            C5 = 1.40D+00 )
+c
+c***grid
+c
+      COMMON/CGCON/ NX, NY, NZ,
+     $              II1, II2, JI1, JI2, KI1, KI2, ITWJ,
+     $              DXI, DETA, DZETA,
+     $              TX1, TX2, TX3,
+     $              TY1, TY2, TY3,
+     $              TZ1, TZ2, TZ3
+c
+c***dissipation
+c
+      COMMON/DISP/ DX1,DX2,DX3,DX4,DX5,
+     $             DY1,DY2,DY3,DY4,DY5,
+     $             DZ1,DZ2,DZ3,DZ4,DZ5,
+     $             DSSP
+c
+c***field variables and residuals
+c
+      COMMON/CVAR/ U(5,33,33,33),
+     $             RSD(5,33,33,33),
+     $             FRCT(5,33,33,33)
+c
+c***output control parameters
+c
+      COMMON/CPRCON/ IPR, IOUT, INORM
+c
+c***newton-raphson iteration control parameters
+c
+      COMMON/CTSCON/ ITMAX, INVERT,
+     $               DT, OMEGA, TOLRSD(5),
+     $               RSDNM(5), ERRNM(5), FRC, TTOTAL
+c
+      COMMON/CJAC/ A(5,5,33,33,33),
+     $             B(5,5,33,33,33),
+     $             C(5,5,33,33,33),
+     $             D(5,5,33,33,33)
+c
+c***coefficients of the exact solution
+c
+      COMMON/CEXACT/ CE(5,13)
+C (0,1)
+      INTEGER*8 I_PIPS_EXACT_U000IJK
+      COMMON /PIPS_EXACT_U000IJK/ I_PIPS_EXACT_U000IJK
+C     BEGIN BLOCK
+C (0,2)
+c
+
+
+
+c
+c***set the dependent variable values along the top and bottom faces
+c
+      DO J = 1, NY
+C (0,3)
+         DO I = 1, NX
+C (0,4)
+C           BEGIN BLOCK
+C (0,5)
+      I_PIPS_EXACT_U000IJK = 5*33*33*33-((I-1)*5+(J-1)*5*33)
+c
+            CALL EXACT(I, J, 1, U(1,I,J,1))
+C (0,6)
+      I_PIPS_EXACT_U000IJK = 5*33*33*33-((I-1)*5+(J-1)*5*33+(NZ-1)*5*
+     &33*33)
+            CALL EXACT(I, J, NZ, U(1,I,J,NZ))
+c
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,8)
+c
+c***set the dependent variable values along north and south faces
+c
+      DO K = 1, NZ
+C (0,9)
+         DO I = 1, NX
+C (0,10)
+C           BEGIN BLOCK
+C (0,11)
+      I_PIPS_EXACT_U000IJK = 5*33*33*33-((I-1)*5+(K-1)*5*33*33)
+c
+            CALL EXACT(I, 1, K, U(1,I,1,K))
+C (0,12)
+      I_PIPS_EXACT_U000IJK = 5*33*33*33-((I-1)*5+(NY-1)*5*33+(K-1)*5*
+     &33*33)
+            CALL EXACT(I, NY, K, U(1,I,NY,K))
+c
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,14)
+c
+c***set the dependent variable values along east and west faces
+c
+      DO K = 1, NZ
+C (0,15)
+         DO J = 1, NY
+C (0,16)
+C           BEGIN BLOCK
+C (0,17)
+      I_PIPS_EXACT_U000IJK = 5*33*33*33-((J-1)*5*33+(K-1)*5*33*33)
+c
+            CALL EXACT(1, J, K, U(1,1,J,K))
+C (0,18)
+      I_PIPS_EXACT_U000IJK = 5*33*33*33-((NX-1)*5+(J-1)*5*33+(K-1)*5*
+     &33*33)
+            CALL EXACT(NX, J, K, U(1,NX,J,K))
+c
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,20)
+c
+      RETURN
+C     END BLOCK
+      END
+c
+c
+c
+c
+c
+      SUBROUTINE SETIV
+c
+c***set the initial values of independent variables based on tri-linear
+c   interpolation of boundary values in the computational space.
+c
+c Author: Sisira Weeratunga
+c         NASA Ames Research Center
+c         (10/25/90)
+c
+c #include 'applu.incl'  
+
+      IMPLICIT REAL*8 (A-H,O-Z)
+c
+      PARAMETER ( C1 = 1.40D+00, C2 = 0.40D+00,
+     $            C3 = 1.00D-01, C4 = 1.00D+00,
+     $            C5 = 1.40D+00 )
+c
+c***grid
+c
+      COMMON/CGCON/ NX, NY, NZ,
+     $              II1, II2, JI1, JI2, KI1, KI2, ITWJ,
+     $              DXI, DETA, DZETA,
+     $              TX1, TX2, TX3,
+     $              TY1, TY2, TY3,
+     $              TZ1, TZ2, TZ3
+c
+c***dissipation
+c
+      COMMON/DISP/ DX1,DX2,DX3,DX4,DX5,
+     $             DY1,DY2,DY3,DY4,DY5,
+     $             DZ1,DZ2,DZ3,DZ4,DZ5,
+     $             DSSP
+c
+c***field variables and residuals
+c
+      COMMON/CVAR/ U(5,33,33,33),
+     $             RSD(5,33,33,33),
+     $             FRCT(5,33,33,33)
+c
+c***output control parameters
+c
+      COMMON/CPRCON/ IPR, IOUT, INORM
+c
+c***newton-raphson iteration control parameters
+c
+      COMMON/CTSCON/ ITMAX, INVERT,
+     $               DT, OMEGA, TOLRSD(5),
+     $               RSDNM(5), ERRNM(5), FRC, TTOTAL
+c
+      COMMON/CJAC/ A(5,5,33,33,33),
+     $             B(5,5,33,33,33),
+     $             C(5,5,33,33,33),
+     $             D(5,5,33,33,33)
+c
+c***coefficients of the exact solution
+c
+      COMMON/CEXACT/ CE(5,13)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+c
+
+
+
+c
+      DO K = 2, NZ-1
+C (0,3)
+C        BEGIN BLOCK
+C (0,4)
+         ZETA = DFLOAT(K-1)/(NZ-1)
+C (0,5)
+         DO J = 2, NY-1
+C (0,6)
+C           BEGIN BLOCK
+C (0,7)
+            ETA = DFLOAT(J-1)/(NY-1)
+C (0,8)
+            DO I = 2, NX-1
+C (0,9)
+C              BEGIN BLOCK
+C (0,10)
+               XI = DFLOAT(I-1)/(NX-1)
+C (0,11)
+               DO M = 1, 5
+C (0,12)
+C                 BEGIN BLOCK
+C (0,13)
+c
+                  PXI = (1.0D+00-XI)*U(M,1,J,K)+XI*U(M,NX,J,K)
+C (0,14)
+                  PETA = (1.0D+00-ETA)*U(M,I,1,K)+ETA*U(M,I,NY,K)
+C (0,15)
+                  PZETA = (1.0D+00-ZETA)*U(M,I,J,1)+ZETA*U(M,I,J,NZ)
+C (0,16)
+c
+                  U(M,I,J,K) = PXI+PETA+PZETA-PXI*PETA-PETA*PZETA-
+     &            PZETA*PXI+PXI*PETA*PZETA
+c
+C                 END BLOCK
+               ENDDO
+C              END BLOCK
+            ENDDO
+C           END BLOCK
+         ENDDO
+C        END BLOCK
+      ENDDO
+C (0,18)
+c
+      RETURN
+C     END BLOCK
+      END
+c
+c
+c
+c
+c
+      SUBROUTINE BLTS ( LDMX, LDMY, LDMZ,
+     $                  NX, NY, NZ,
+     $                  OMEGA,
+     $                  V,
+     $                  LDZ, LDY, LDX, D )
+c
+c***compute the regular-sparse, block lower triangular solution:
+c
+c                     v <-- ( L-inv ) * v
+c
+c Author: Sisira Weeratunga
+c         NASA Ames Research Center
+c         (10/25/90)
+c
+      IMPLICIT REAL*8 ( A-H, O-Z )
+c
+      REAL*8 LDX, LDY, LDZ, D
+c
+      DIMENSION V( 5, LDMX, LDMY,33),
+     $          LDZ( 5, 5, LDMX, LDMY,33),
+     $          LDY( 5, 5, LDMX, LDMY,33),
+     $          LDX( 5, 5, LDMX, LDMY,33),
+     $          D( 5, 5, LDMX, LDMY,33)
+c
+      DIMENSION TMAT(5,5)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+c
+      DO K = 2, NZ-1
+C (0,3)
+C        BEGIN BLOCK
+C (0,4)
+c
+         DO J = 2, NY-1
+C (0,5)
+C           BEGIN BLOCK
+C (0,6)
+c
+            DO I = 2, NX-1
+C (0,7)
+C              BEGIN BLOCK
+C (0,8)
+c
+               DO M = 1, 5
+C (0,9)
+C                 BEGIN BLOCK
+C (0,10)
+c
+                  DO L = 1, 5
+C (0,11)
+C                    BEGIN BLOCK
+C (0,12)
+c
+                     V(M,I,J,K) = V(M,I,J,K)-OMEGA*(LDZ(M,L,I,J,K)*V(
+     &               L,I,J,K-1)+LDY(M,L,I,J,K)*V(L,I,J-1,K)+LDX(M,L,I
+     &               ,J,K)*V(L,I-1,J,K))
+c
+C                    END BLOCK
+                  ENDDO
+c
+C                 END BLOCK
+               ENDDO
+C (0,15)
+c
+c***diagonal block inversion
+c
+c***forward elimination
+c
+               DO M = 1, 5
+C (0,16)
+                  DO L = 1, 5
+C (0,17)
+                     TMAT(M,L) = D(M,L,I,J,K)
+                  ENDDO
+               ENDDO
+C (0,18)
+c
+               DO IP = 1, 4
+C (0,19)
+C                 BEGIN BLOCK
+C (0,20)
+c
+                  TMP1 = 1.0D+00/TMAT(IP,IP)
+C (0,21)
+c
+                  DO M = IP+1, 5
+C (0,22)
+C                    BEGIN BLOCK
+C (0,23)
+c
+                     TMP = TMP1*TMAT(M,IP)
+C (0,24)
+c     
+                     DO L = IP+1, 5
+C (0,25)
+C                       BEGIN BLOCK
+C (0,26)
+c
+                        TMAT(M,L) = TMAT(M,L)-TMP*TMAT(IP,L)
+c     
+C                       END BLOCK
+                     ENDDO
+C (0,28)
+c
+                     V(M,I,J,K) = V(M,I,J,K)-V(IP,I,J,K)*TMP
+c     
+C                    END BLOCK
+                  ENDDO
+c
+C                 END BLOCK
+               ENDDO
+C (0,31)
+c
+c***back substitution
+c
+               DO M = 5, 1, -1
+C (0,32)
+C                 BEGIN BLOCK
+C (0,33)
+c
+                  DO L = M+1, 5
+C (0,34)
+C                    BEGIN BLOCK
+C (0,35)
+c
+                     V(M,I,J,K) = V(M,I,J,K)-TMAT(M,L)*V(L,I,J,K)
+c
+C                    END BLOCK
+                  ENDDO
+C (0,37)
+c
+                  V(M,I,J,K) = V(M,I,J,K)/TMAT(M,M)
+c
+C                 END BLOCK
+               ENDDO
+c
+C              END BLOCK
+            ENDDO
+c
+C           END BLOCK
+         ENDDO
+c     
+C        END BLOCK
+      ENDDO
+C (0,42)
+c
+      RETURN
+C     END BLOCK
+      END
+c
+c
+c
+c
+c
+      SUBROUTINE BUTS ( LDMX, LDMY, LDMZ,
+     $                  NX, NY, NZ,
+     $                  OMEGA,
+     $                  V,
+     $                  D, UDX, UDY, UDZ )
+c
+c***compute the regular-sparse, block upper triangular solution:
+c
+c                     v <-- ( U-inv ) * v
+c
+c Author: Sisira Weeratunga
+c         NASA Ames Research Center
+c         (10/25/90)
+c
+      IMPLICIT REAL*8 ( A-H, O-Z )
+c
+      REAL*8 UDX, UDY, UDZ, D
+c
+      DIMENSION V( 5, LDMX, LDMY,33),
+     $          D( 5, 5, LDMX, LDMY,33),
+     $          UDX( 5, 5, LDMX, LDMY,33),
+     $          UDY( 5, 5, LDMX, LDMY,33),
+     $          UDZ( 5, 5, LDMX, LDMY,33)
+c
+      DIMENSION TMAT(5,5), TV(5)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+c
+      DO K = NZ-1, 2, -1
+C (0,3)
+C        BEGIN BLOCK
+C (0,4)
+c
+         DO J = NY-1, 2, -1
+C (0,5)
+C           BEGIN BLOCK
+C (0,6)
+c
+            DO I = NX-1, 2, -1
+C (0,7)
+C              BEGIN BLOCK
+C (0,8)
+c
+               DO M = 1, 5
+C (0,9)
+C                 BEGIN BLOCK
+C (0,10)
+c
+                  TV(M) = 0.0D+00
+C (0,11)
+c
+                  DO L = 1, 5
+C (0,12)
+C                    BEGIN BLOCK
+C (0,13)
+c
+                     TV(M) = TV(M)+OMEGA*(UDZ(M,L,I,J,K)*V(L,I,J,K+1)
+     &               +UDY(M,L,I,J,K)*V(L,I,J+1,K)+UDX(M,L,I,J,K)*V(L,
+     &               I+1,J,K))
+c
+C                    END BLOCK
+                  ENDDO
+c
+C                 END BLOCK
+               ENDDO
+C (0,16)
+c     
+c***diagonal block inversion
+c
+               DO M = 1, 5
+C (0,17)
+                  DO L = 1, 5
+C (0,18)
+                     TMAT(M,L) = D(M,L,I,J,K)
+                  ENDDO
+               ENDDO
+C (0,19)
+c
+               DO IP = 1, 4
+C (0,20)
+C                 BEGIN BLOCK
+C (0,21)
+c
+                  TMP1 = 1.0D+00/TMAT(IP,IP)
+C (0,22)
+c
+                  DO M = IP+1, 5
+C (0,23)
+C                    BEGIN BLOCK
+C (0,24)
+c
+                     TMP = TMP1*TMAT(M,IP)
+C (0,25)
+c     
+                     DO L = IP+1, 5
+C (0,26)
+C                       BEGIN BLOCK
+C (0,27)
+c
+                        TMAT(M,L) = TMAT(M,L)-TMP*TMAT(IP,L)
+c     
+C                       END BLOCK
+                     ENDDO
+C (0,29)
+c
+                     TV(M) = TV(M)-TV(IP)*TMP
+c     
+C                    END BLOCK
+                  ENDDO
+c
+C                 END BLOCK
+               ENDDO
+C (0,32)
+c
+c***back substitution
+c
+               DO M = 5, 1, -1
+C (0,33)
+C                 BEGIN BLOCK
+C (0,34)
+c
+                  DO L = M+1, 5
+C (0,35)
+C                    BEGIN BLOCK
+C (0,36)
+c
+                     TV(M) = TV(M)-TMAT(M,L)*TV(L)
+c
+C                    END BLOCK
+                  ENDDO
+C (0,38)
+c
+                  TV(M) = TV(M)/TMAT(M,M)
+c
+C                 END BLOCK
+               ENDDO
+C (0,40)
+c
+               DO M = 1, 5
+C (0,41)
+C                 BEGIN BLOCK
+C (0,42)
+c
+                  V(M,I,J,K) = V(M,I,J,K)-TV(M)
+c
+C                 END BLOCK
+               ENDDO
+c
+C              END BLOCK
+            ENDDO
+c
+C           END BLOCK
+         ENDDO
+c     
+C        END BLOCK
+      ENDDO
+C (0,47)
+c
+      RETURN
+C     END BLOCK
+      END
+c
+c
+c
+c
+c
+      SUBROUTINE ERHS
+c
+c***compute the right hand side based on exact solution
+c
+c Author: Sisira Weeratunga
+c         NASA Ames Research Center
+c         (10/25/90)
+c
+c #include 'applu.incl'  
+
+      IMPLICIT REAL*8 (A-H,O-Z)
+c
+      PARAMETER ( C1 = 1.40D+00, C2 = 0.40D+00,
+     $            C3 = 1.00D-01, C4 = 1.00D+00,
+     $            C5 = 1.40D+00 )
+c
+c***grid
+c
+      COMMON/CGCON/ NX, NY, NZ,
+     $              II1, II2, JI1, JI2, KI1, KI2, ITWJ,
+     $              DXI, DETA, DZETA,
+     $              TX1, TX2, TX3,
+     $              TY1, TY2, TY3,
+     $              TZ1, TZ2, TZ3
+c
+c***dissipation
+c
+      COMMON/DISP/ DX1,DX2,DX3,DX4,DX5,
+     $             DY1,DY2,DY3,DY4,DY5,
+     $             DZ1,DZ2,DZ3,DZ4,DZ5,
+     $             DSSP
+c
+c***field variables and residuals
+c
+      COMMON/CVAR/ U(5,33,33,33),
+     $             RSD(5,33,33,33),
+     $             FRCT(5,33,33,33)
+c
+c***output control parameters
+c
+      COMMON/CPRCON/ IPR, IOUT, INORM
+c
+c***newton-raphson iteration control parameters
+c
+      COMMON/CTSCON/ ITMAX, INVERT,
+     $               DT, OMEGA, TOLRSD(5),
+     $               RSDNM(5), ERRNM(5), FRC, TTOTAL
+c
+      COMMON/CJAC/ A(5,5,33,33,33),
+     $             B(5,5,33,33,33),
+     $             C(5,5,33,33,33),
+     $             D(5,5,33,33,33)
+c
+c***coefficients of the exact solution
+c
+      COMMON/CEXACT/ CE(5,13)
+c
+
+
+
+c
+      DIMENSION FLUX(5,33), UE(5,33)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+c
+      DSSPM = DSSP
+C (0,3)
+c
+      DO K = 1, NZ
+C (0,4)
+         DO J = 1, NY
+C (0,5)
+            DO I = 1, NX
+C (0,6)
+               DO M = 1, 5
+C (0,7)
+                  FRCT(M,I,J,K) = 0.0D+00
+               ENDDO
+            ENDDO
+         ENDDO
+      ENDDO
+C (0,8)
+c
+c***xi-direction flux differences
+c
+      DO K = 2, NZ-1
+C (0,9)
+C        BEGIN BLOCK
+C (0,10)
+c
+         ZETA = DFLOAT(K-1)/(NZ-1)
+C (0,11)
+c
+         DO J = 2, NY-1
+C (0,12)
+C           BEGIN BLOCK
+C (0,13)
+c
+            ETA = DFLOAT(J-1)/(NY-1)
+C (0,14)
+c
+            DO I = 1, NX
+C (0,15)
+C              BEGIN BLOCK
+C (0,16)
+c
+               XI = DFLOAT(I-1)/(NX-1)
+C (0,17)
+c
+               DO M = 1, 5
+C (0,18)
+C                 BEGIN BLOCK
+C (0,19)
+c
+                  UE(M,I) = CE(M,1)+CE(M,2)*XI+CE(M,3)*ETA+CE(M,4)*
+     &            ZETA+CE(M,5)*XI*XI+CE(M,6)*ETA*ETA+CE(M,7)*ZETA*
+     &            ZETA+CE(M,8)*XI*XI*XI+CE(M,9)*ETA*ETA*ETA+CE(M,10)*
+     &            ZETA*ZETA*ZETA+CE(M,11)*XI*XI*XI*XI+CE(M,12)*ETA*
+     &            ETA*ETA*ETA+CE(M,13)*ZETA*ZETA*ZETA*ZETA
+c
+C                 END BLOCK
+               ENDDO
+C (0,21)
+c
+               FLUX(1,I) = UE(2,I)
+C (0,22)
+c
+               U21 = UE(2,I)/UE(1,I)
+C (0,23)
+c
+               Q = 0.50D+00*(UE(2,I)*UE(2,I)+UE(3,I)*UE(3,I)+UE(4,I)*
+     &         UE(4,I))/UE(1,I)
+C (0,24)
+c
+               FLUX(2,I) = UE(2,I)*U21+C2*(UE(5,I)-Q)
+C (0,25)
+c
+               FLUX(3,I) = UE(3,I)*U21
+C (0,26)
+c
+               FLUX(4,I) = UE(4,I)*U21
+C (0,27)
+c
+               FLUX(5,I) = (C1*UE(5,I)-C2*Q)*U21
+c    
+C              END BLOCK
+            ENDDO
+C (0,29)
+c
+            DO I = 2, NX-1
+C (0,30)
+C              BEGIN BLOCK
+C (0,31)
+c
+               DO M = 1, 5
+C (0,32)
+C                 BEGIN BLOCK
+C (0,33)
+c
+                  FRCT(M,I,J,K) = FRCT(M,I,J,K)-TX2*(FLUX(M,I+1)-FLUX
+     &            (M,I-1))
+c
+C                 END BLOCK
+               ENDDO
+c
+C              END BLOCK
+            ENDDO
+C (0,36)
+c
+            DO I = 2, NX
+C (0,37)
+C              BEGIN BLOCK
+C (0,38)
+c
+               TMP = 1.0D+00/UE(1,I)
+C (0,39)
+c
+               U21I = TMP*UE(2,I)
+C (0,40)
+               U31I = TMP*UE(3,I)
+C (0,41)
+               U41I = TMP*UE(4,I)
+C (0,42)
+               U51I = TMP*UE(5,I)
+C (0,43)
+c
+               TMP = 1.0D+00/UE(1,I-1)
+C (0,44)
+c
+               U21IM1 = TMP*UE(2,I-1)
+C (0,45)
+               U31IM1 = TMP*UE(3,I-1)
+C (0,46)
+               U41IM1 = TMP*UE(4,I-1)
+C (0,47)
+               U51IM1 = TMP*UE(5,I-1)
+C (0,48)
+c
+               FLUX(2,I) = 4.0D+00/3.0D+00*TX3*(U21I-U21IM1)
+C (0,49)
+               FLUX(3,I) = TX3*(U31I-U31IM1)
+C (0,50)
+               FLUX(4,I) = TX3*(U41I-U41IM1)
+C (0,51)
+               FLUX(5,I) = 0.50D+00*(1.0D+00-C1*C5)*TX3*(U21I**2+U31I
+     &         **2+U41I**2-(U21IM1**2+U31IM1**2+U41IM1**2))+1.0D+00/
+     &         6.0D+00*TX3*(U21I**2-U21IM1**2)+C1*C5*TX3*(U51I-U51IM1
+     &         )
+c
+C              END BLOCK
+            ENDDO
+C (0,53)
+c
+            DO I = 2, NX-1
+C (0,54)
+C              BEGIN BLOCK
+C (0,55)
+c
+               FRCT(1,I,J,K) = FRCT(1,I,J,K)+DX1*TX1*(UE(1,I-1)-
+     &         2.0D+00*UE(1,I)+UE(1,I+1))
+C (0,56)
+c
+               FRCT(2,I,J,K) = FRCT(2,I,J,K)+TX3*C3*C4*(FLUX(2,I+1)-
+     &         FLUX(2,I))+DX2*TX1*(UE(2,I-1)-2.0D+00*UE(2,I)+UE(2,I+1
+     &         ))
+C (0,57)
+c
+               FRCT(3,I,J,K) = FRCT(3,I,J,K)+TX3*C3*C4*(FLUX(3,I+1)-
+     &         FLUX(3,I))+DX3*TX1*(UE(3,I-1)-2.0D+00*UE(3,I)+UE(3,I+1
+     &         ))
+C (0,58)
+c
+               FRCT(4,I,J,K) = FRCT(4,I,J,K)+TX3*C3*C4*(FLUX(4,I+1)-
+     &         FLUX(4,I))+DX4*TX1*(UE(4,I-1)-2.0D+00*UE(4,I)+UE(4,I+1
+     &         ))
+C (0,59)
+c
+               FRCT(5,I,J,K) = FRCT(5,I,J,K)+TX3*C3*C4*(FLUX(5,I+1)-
+     &         FLUX(5,I))+DX5*TX1*(UE(5,I-1)-2.0D+00*UE(5,I)+UE(5,I+1
+     &         ))
+c
+C              END BLOCK
+            ENDDO
+C (0,61)
+c
+c***Fourth-order dissipation
+c
+            DO M = 1, 5
+C (0,62)
+C              BEGIN BLOCK
+C (0,63)
+c
+               FRCT(M,2,J,K) = FRCT(M,2,J,K)-DSSPM*(5.0D+00*UE(M,2)-
+     &         4.0D+00*UE(M,3)+UE(M,4))
+C (0,64)
+c
+               FRCT(M,3,J,K) = FRCT(M,3,J,K)-DSSPM*((-4.0D+00)*UE(M,2
+     &         )+6.0D+00*UE(M,3)-4.0D+00*UE(M,4)+UE(M,5))
+c
+C              END BLOCK
+            ENDDO
+C (0,66)
+c
+            DO I = 4, NX-3
+C (0,67)
+C              BEGIN BLOCK
+C (0,68)
+c
+               DO M = 1, 5
+C (0,69)
+C                 BEGIN BLOCK
+C (0,70)
+c
+                  FRCT(M,I,J,K) = FRCT(M,I,J,K)-DSSPM*(UE(M,I-2)-
+     &            4.0D+00*UE(M,I-1)+6.0D+00*UE(M,I)-4.0D+00*UE(M,I+1)
+     &            +UE(M,I+2))
+c
+C                 END BLOCK
+               ENDDO
+c
+C              END BLOCK
+            ENDDO
+C (0,73)
+c
+            DO M = 1, 5
+C (0,74)
+C              BEGIN BLOCK
+C (0,75)
+c
+               FRCT(M,NX-2,J,K) = FRCT(M,NX-2,J,K)-DSSPM*(UE(M,NX-4)-
+     &         4.0D+00*UE(M,NX-3)+6.0D+00*UE(M,NX-2)-4.0D+00*UE(M,NX-
+     &         1))
+C (0,76)
+c
+               FRCT(M,NX-1,J,K) = FRCT(M,NX-1,J,K)-DSSPM*(UE(M,NX-3)-
+     &         4.0D+00*UE(M,NX-2)+5.0D+00*UE(M,NX-1))
+c
+C              END BLOCK
+            ENDDO
+c
+C           END BLOCK
+         ENDDO
+c
+C        END BLOCK
+      ENDDO
+C (0,80)
+c
+c***eta-direction flux differences
+c
+      DO K = 2, NZ-1
+C (0,81)
+C        BEGIN BLOCK
+C (0,82)
+c
+         ZETA = DFLOAT(K-1)/(NZ-1)
+C (0,83)
+c
+         DO I = 2, NX-1
+C (0,84)
+C           BEGIN BLOCK
+C (0,85)
+c
+            XI = DFLOAT(I-1)/(NX-1)
+C (0,86)
+c 
+            DO J = 1, NY
+C (0,87)
+C              BEGIN BLOCK
+C (0,88)
+c
+               ETA = DFLOAT(J-1)/(NY-1)
+C (0,89)
+c
+               DO M = 1, 5
+C (0,90)
+C                 BEGIN BLOCK
+C (0,91)
+c
+                  UE(M,J) = CE(M,1)+CE(M,2)*XI+CE(M,3)*ETA+CE(M,4)*
+     &            ZETA+CE(M,5)*XI*XI+CE(M,6)*ETA*ETA+CE(M,7)*ZETA*
+     &            ZETA+CE(M,8)*XI*XI*XI+CE(M,9)*ETA*ETA*ETA+CE(M,10)*
+     &            ZETA*ZETA*ZETA+CE(M,11)*XI*XI*XI*XI+CE(M,12)*ETA*
+     &            ETA*ETA*ETA+CE(M,13)*ZETA*ZETA*ZETA*ZETA
+c
+C                 END BLOCK
+               ENDDO
+C (0,93)
+c
+               FLUX(1,J) = UE(3,J)
+C (0,94)
+c
+               U31 = UE(3,J)/UE(1,J)
+C (0,95)
+c
+               Q = 0.50D+00*(UE(2,J)*UE(2,J)+UE(3,J)*UE(3,J)+UE(4,J)*
+     &         UE(4,J))/UE(1,J)
+C (0,96)
+c
+               FLUX(2,J) = UE(2,J)*U31
+C (0,97)
+c
+               FLUX(3,J) = UE(3,J)*U31+C2*(UE(5,J)-Q)
+C (0,98)
+c
+               FLUX(4,J) = UE(4,J)*U31
+C (0,99)
+c
+               FLUX(5,J) = (C1*UE(5,J)-C2*Q)*U31
+c    
+C              END BLOCK
+            ENDDO
+C (0,101)
+c
+            DO J = 2, NY-1
+C (0,102)
+C              BEGIN BLOCK
+C (0,103)
+c
+               DO M = 1, 5
+C (0,104)
+C                 BEGIN BLOCK
+C (0,105)
+c
+                  FRCT(M,I,J,K) = FRCT(M,I,J,K)-TY2*(FLUX(M,J+1)-FLUX
+     &            (M,J-1))
+c
+C                 END BLOCK
+               ENDDO
+c
+C              END BLOCK
+            ENDDO
+C (0,108)
+c
+            DO J = 2, NY
+C (0,109)
+C              BEGIN BLOCK
+C (0,110)
+c
+               TMP = 1.0D+00/UE(1,J)
+C (0,111)
+c
+               U21J = TMP*UE(2,J)
+C (0,112)
+               U31J = TMP*UE(3,J)
+C (0,113)
+               U41J = TMP*UE(4,J)
+C (0,114)
+               U51J = TMP*UE(5,J)
+C (0,115)
+c
+               TMP = 1.0D+00/UE(1,J-1)
+C (0,116)
+c
+               U21JM1 = TMP*UE(2,J-1)
+C (0,117)
+               U31JM1 = TMP*UE(3,J-1)
+C (0,118)
+               U41JM1 = TMP*UE(4,J-1)
+C (0,119)
+               U51JM1 = TMP*UE(5,J-1)
+C (0,120)
+c
+               FLUX(2,J) = TY3*(U21J-U21JM1)
+C (0,121)
+               FLUX(3,J) = 4.0D+00/3.0D+00*TY3*(U31J-U31JM1)
+C (0,122)
+               FLUX(4,J) = TY3*(U41J-U41JM1)
+C (0,123)
+               FLUX(5,J) = 0.50D+00*(1.0D+00-C1*C5)*TY3*(U21J**2+U31J
+     &         **2+U41J**2-(U21JM1**2+U31JM1**2+U41JM1**2))+1.0D+00/
+     &         6.0D+00*TY3*(U31J**2-U31JM1**2)+C1*C5*TY3*(U51J-U51JM1
+     &         )
+c
+C              END BLOCK
+            ENDDO
+C (0,125)
+c
+            DO J = 2, NY-1
+C (0,126)
+C              BEGIN BLOCK
+C (0,127)
+c
+               FRCT(1,I,J,K) = FRCT(1,I,J,K)+DY1*TY1*(UE(1,J-1)-
+     &         2.0D+00*UE(1,J)+UE(1,J+1))
+C (0,128)
+c
+               FRCT(2,I,J,K) = FRCT(2,I,J,K)+TY3*C3*C4*(FLUX(2,J+1)-
+     &         FLUX(2,J))+DY2*TY1*(UE(2,J-1)-2.0D+00*UE(2,J)+UE(2,J+1
+     &         ))
+C (0,129)
+c
+               FRCT(3,I,J,K) = FRCT(3,I,J,K)+TY3*C3*C4*(FLUX(3,J+1)-
+     &         FLUX(3,J))+DY3*TY1*(UE(3,J-1)-2.0D+00*UE(3,J)+UE(3,J+1
+     &         ))
+C (0,130)
+c
+               FRCT(4,I,J,K) = FRCT(4,I,J,K)+TY3*C3*C4*(FLUX(4,J+1)-
+     &         FLUX(4,J))+DY4*TY1*(UE(4,J-1)-2.0D+00*UE(4,J)+UE(4,J+1
+     &         ))
+C (0,131)
+c
+               FRCT(5,I,J,K) = FRCT(5,I,J,K)+TY3*C3*C4*(FLUX(5,J+1)-
+     &         FLUX(5,J))+DY5*TY1*(UE(5,J-1)-2.0D+00*UE(5,J)+UE(5,J+1
+     &         ))
+c
+C              END BLOCK
+            ENDDO
+C (0,133)
+c
+c***fourth-order dissipation
+c
+            DO M = 1, 5
+C (0,134)
+C              BEGIN BLOCK
+C (0,135)
+c
+               FRCT(M,I,2,K) = FRCT(M,I,2,K)-DSSPM*(5.0D+00*UE(M,2)-
+     &         4.0D+00*UE(M,3)+UE(M,4))
+C (0,136)
+c
+               FRCT(M,I,3,K) = FRCT(M,I,3,K)-DSSPM*((-4.0D+00)*UE(M,2
+     &         )+6.0D+00*UE(M,3)-4.0D+00*UE(M,4)+UE(M,5))
+c
+C              END BLOCK
+            ENDDO
+C (0,138)
+c
+            DO J = 4, NY-3
+C (0,139)
+C              BEGIN BLOCK
+C (0,140)
+c
+               DO M = 1, 5
+C (0,141)
+C                 BEGIN BLOCK
+C (0,142)
+c
+                  FRCT(M,I,J,K) = FRCT(M,I,J,K)-DSSPM*(UE(M,J-2)-
+     &            4.0D+00*UE(M,J-1)+6.0D+00*UE(M,J)-4.0D+00*UE(M,J+1)
+     &            +UE(M,J+2))
+c
+C                 END BLOCK
+               ENDDO
+c
+C              END BLOCK
+            ENDDO
+C (0,145)
+c
+            DO M = 1, 5
+C (0,146)
+C              BEGIN BLOCK
+C (0,147)
+c
+               FRCT(M,I,NY-2,K) = FRCT(M,I,NY-2,K)-DSSPM*(UE(M,NY-4)-
+     &         4.0D+00*UE(M,NY-3)+6.0D+00*UE(M,NY-2)-4.0D+00*UE(M,NY-
+     &         1))
+C (0,148)
+c
+               FRCT(M,I,NY-1,K) = FRCT(M,I,NY-1,K)-DSSPM*(UE(M,NY-3)-
+     &         4.0D+00*UE(M,NY-2)+5.0D+00*UE(M,NY-1))
+c
+C              END BLOCK
+            ENDDO
+c
+C           END BLOCK
+         ENDDO
+c
+C        END BLOCK
+      ENDDO
+C (0,152)
+c
+c***zeta-direction flux differences
+c
+      DO J = 2, NY-1
+C (0,153)
+C        BEGIN BLOCK
+C (0,154)
+c
+         ETA = DFLOAT(J-1)/(NY-1)
+C (0,155)
+c
+         DO I = 2, NX-1
+C (0,156)
+C           BEGIN BLOCK
+C (0,157)
+c
+            XI = DFLOAT(I-1)/(NX-1)
+C (0,158)
+c
+            DO K = 1, NZ
+C (0,159)
+C              BEGIN BLOCK
+C (0,160)
+c
+               ZETA = DFLOAT(K-1)/(NZ-1)
+C (0,161)
+c
+               DO M = 1, 5
+C (0,162)
+C                 BEGIN BLOCK
+C (0,163)
+c
+                  UE(M,K) = CE(M,1)+CE(M,2)*XI+CE(M,3)*ETA+CE(M,4)*
+     &            ZETA+CE(M,5)*XI*XI+CE(M,6)*ETA*ETA+CE(M,7)*ZETA*
+     &            ZETA+CE(M,8)*XI*XI*XI+CE(M,9)*ETA*ETA*ETA+CE(M,10)*
+     &            ZETA*ZETA*ZETA+CE(M,11)*XI*XI*XI*XI+CE(M,12)*ETA*
+     &            ETA*ETA*ETA+CE(M,13)*ZETA*ZETA*ZETA*ZETA
+c
+C                 END BLOCK
+               ENDDO
+C (0,165)
+c
+               FLUX(1,K) = UE(4,K)
+C (0,166)
+c
+               U41 = UE(4,K)/UE(1,K)
+C (0,167)
+c
+               Q = 0.50D+00*(UE(2,K)*UE(2,K)+UE(3,K)*UE(3,K)+UE(4,K)*
+     &         UE(4,K))/UE(1,K)
+C (0,168)
+c
+               FLUX(2,K) = UE(2,K)*U41
+C (0,169)
+c
+               FLUX(3,K) = UE(3,K)*U41
+C (0,170)
+c
+               FLUX(4,K) = UE(4,K)*U41+C2*(UE(5,K)-Q)
+C (0,171)
+c
+               FLUX(5,K) = (C1*UE(5,K)-C2*Q)*U41
+c    
+C              END BLOCK
+            ENDDO
+C (0,173)
+c
+            DO K = 2, NZ-1
+C (0,174)
+C              BEGIN BLOCK
+C (0,175)
+c
+               DO M = 1, 5
+C (0,176)
+C                 BEGIN BLOCK
+C (0,177)
+c
+                  FRCT(M,I,J,K) = FRCT(M,I,J,K)-TZ2*(FLUX(M,K+1)-FLUX
+     &            (M,K-1))
+c
+C                 END BLOCK
+               ENDDO
+c
+C              END BLOCK
+            ENDDO
+C (0,180)
+c
+            DO K = 2, NZ
+C (0,181)
+C              BEGIN BLOCK
+C (0,182)
+c
+               TMP = 1.0D+00/UE(1,K)
+C (0,183)
+c
+               U21K = TMP*UE(2,K)
+C (0,184)
+               U31K = TMP*UE(3,K)
+C (0,185)
+               U41K = TMP*UE(4,K)
+C (0,186)
+               U51K = TMP*UE(5,K)
+C (0,187)
+c
+               TMP = 1.0D+00/UE(1,K-1)
+C (0,188)
+c
+               U21KM1 = TMP*UE(2,K-1)
+C (0,189)
+               U31KM1 = TMP*UE(3,K-1)
+C (0,190)
+               U41KM1 = TMP*UE(4,K-1)
+C (0,191)
+               U51KM1 = TMP*UE(5,K-1)
+C (0,192)
+c
+               FLUX(2,K) = TZ3*(U21K-U21KM1)
+C (0,193)
+               FLUX(3,K) = TZ3*(U31K-U31KM1)
+C (0,194)
+               FLUX(4,K) = 4.0D+00/3.0D+00*TZ3*(U41K-U41KM1)
+C (0,195)
+               FLUX(5,K) = 0.50D+00*(1.0D+00-C1*C5)*TZ3*(U21K**2+U31K
+     &         **2+U41K**2-(U21KM1**2+U31KM1**2+U41KM1**2))+1.0D+00/
+     &         6.0D+00*TZ3*(U41K**2-U41KM1**2)+C1*C5*TZ3*(U51K-U51KM1
+     &         )
+c
+C              END BLOCK
+            ENDDO
+C (0,197)
+c
+            DO K = 2, NZ-1
+C (0,198)
+C              BEGIN BLOCK
+C (0,199)
+c
+               FRCT(1,I,J,K) = FRCT(1,I,J,K)+DZ1*TZ1*(UE(1,K+1)-
+     &         2.0D+00*UE(1,K)+UE(1,K-1))
+C (0,200)
+c
+               FRCT(2,I,J,K) = FRCT(2,I,J,K)+TZ3*C3*C4*(FLUX(2,K+1)-
+     &         FLUX(2,K))+DZ2*TZ1*(UE(2,K+1)-2.0D+00*UE(2,K)+UE(2,K-1
+     &         ))
+C (0,201)
+c
+               FRCT(3,I,J,K) = FRCT(3,I,J,K)+TZ3*C3*C4*(FLUX(3,K+1)-
+     &         FLUX(3,K))+DZ3*TZ1*(UE(3,K+1)-2.0D+00*UE(3,K)+UE(3,K-1
+     &         ))
+C (0,202)
+c
+               FRCT(4,I,J,K) = FRCT(4,I,J,K)+TZ3*C3*C4*(FLUX(4,K+1)-
+     &         FLUX(4,K))+DZ4*TZ1*(UE(4,K+1)-2.0D+00*UE(4,K)+UE(4,K-1
+     &         ))
+C (0,203)
+c
+               FRCT(5,I,J,K) = FRCT(5,I,J,K)+TZ3*C3*C4*(FLUX(5,K+1)-
+     &         FLUX(5,K))+DZ5*TZ1*(UE(5,K+1)-2.0D+00*UE(5,K)+UE(5,K-1
+     &         ))
+c
+C              END BLOCK
+            ENDDO
+C (0,205)
+c
+c***fourth-order dissipation
+c
+            DO M = 1, 5
+C (0,206)
+C              BEGIN BLOCK
+C (0,207)
+c
+               FRCT(M,I,J,2) = FRCT(M,I,J,2)-DSSPM*(5.0D+00*UE(M,2)-
+     &         4.0D+00*UE(M,3)+UE(M,4))
+C (0,208)
+c
+               FRCT(M,I,J,3) = FRCT(M,I,J,3)-DSSPM*((-4.0D+00)*UE(M,2
+     &         )+6.0D+00*UE(M,3)-4.0D+00*UE(M,4)+UE(M,5))
+c
+C              END BLOCK
+            ENDDO
+C (0,210)
+c
+            DO K = 4, NZ-3
+C (0,211)
+C              BEGIN BLOCK
+C (0,212)
+c
+               DO M = 1, 5
+C (0,213)
+C                 BEGIN BLOCK
+C (0,214)
+c
+                  FRCT(M,I,J,K) = FRCT(M,I,J,K)-DSSPM*(UE(M,K-2)-
+     &            4.0D+00*UE(M,K-1)+6.0D+00*UE(M,K)-4.0D+00*UE(M,K+1)
+     &            +UE(M,K+2))
+c
+C                 END BLOCK
+               ENDDO
+c
+C              END BLOCK
+            ENDDO
+C (0,217)
+c
+            DO M = 1, 5
+C (0,218)
+C              BEGIN BLOCK
+C (0,219)
+c
+               FRCT(M,I,J,NZ-2) = FRCT(M,I,J,NZ-2)-DSSPM*(UE(M,NZ-4)-
+     &         4.0D+00*UE(M,NZ-3)+6.0D+00*UE(M,NZ-2)-4.0D+00*UE(M,NZ-
+     &         1))
+C (0,220)
+c
+               FRCT(M,I,J,NZ-1) = FRCT(M,I,J,NZ-1)-DSSPM*(UE(M,NZ-3)-
+     &         4.0D+00*UE(M,NZ-2)+5.0D+00*UE(M,NZ-1))
+c
+C              END BLOCK
+            ENDDO
+c
+C           END BLOCK
+         ENDDO
+c
+C        END BLOCK
+      ENDDO
+C (0,224)
+      RETURN
+C     END BLOCK
+      END
+c
+c
+c
+c
+c
+      SUBROUTINE EXACT ( I, J, K, U000IJK )
+c
+c***compute the exact solution at (i,j,k)
+c
+c Author: Sisira Weeratunga 
+c         NASA Ames Research Center
+c         (10/25/90)
+c
+c #include 'applu.incl'  
+
+      IMPLICIT REAL*8 (A-H,O-Z)
+c
+      PARAMETER ( C1 = 1.40D+00, C2 = 0.40D+00,
+     $            C3 = 1.00D-01, C4 = 1.00D+00,
+     $            C5 = 1.40D+00 )
+c
+c***grid
+c
+      COMMON/CGCON/ NX, NY, NZ,
+     $              II1, II2, JI1, JI2, KI1, KI2, ITWJ,
+     $              DXI, DETA, DZETA,
+     $              TX1, TX2, TX3,
+     $              TY1, TY2, TY3,
+     $              TZ1, TZ2, TZ3
+c
+c***dissipation
+c
+      COMMON/DISP/ DX1,DX2,DX3,DX4,DX5,
+     $             DY1,DY2,DY3,DY4,DY5,
+     $             DZ1,DZ2,DZ3,DZ4,DZ5,
+     $             DSSP
+c
+c***field variables and residuals
+c
+      COMMON/CVAR/ U(5,33,33,33),
+     $             RSD(5,33,33,33),
+     $             FRCT(5,33,33,33)
+c
+c***output control parameters
+c
+      COMMON/CPRCON/ IPR, IOUT, INORM
+c
+c***newton-raphson iteration control parameters
+c
+      COMMON/CTSCON/ ITMAX, INVERT,
+     $               DT, OMEGA, TOLRSD(5),
+     $               RSDNM(5), ERRNM(5), FRC, TTOTAL
+c
+      COMMON/CJAC/ A(5,5,33,33,33),
+     $             B(5,5,33,33,33),
+     $             C(5,5,33,33,33),
+     $             D(5,5,33,33,33)
+c
+c***coefficients of the exact solution
+c
+      COMMON/CEXACT/ CE(5,13)
+c
+
+
+
+c
+      DIMENSION U000IJK(I_PIPS_EXACT_U000IJK)
+C (0,1)
+      INTEGER*8 I_PIPS_EXACT_U000IJK
+      COMMON /PIPS_EXACT_U000IJK/ I_PIPS_EXACT_U000IJK
+C     BEGIN BLOCK
+C (0,2)
+c
+      XI = DFLOAT(I-1)/(NX-1)
+C (0,3)
+      ETA = DFLOAT(J-1)/(NY-1)
+C (0,4)
+      ZETA = DFLOAT(K-1)/(NZ-1)
+C (0,5)
+c
+      DO M = 1, 5
+C (0,6)
+C        BEGIN BLOCK
+C (0,7)
+c
+         U000IJK(M) = CE(M,1)+CE(M,2)*XI+CE(M,3)*ETA+CE(M,4)*ZETA+CE(
+     &   M,5)*XI*XI+CE(M,6)*ETA*ETA+CE(M,7)*ZETA*ZETA+CE(M,8)*XI*XI*
+     &   XI+CE(M,9)*ETA*ETA*ETA+CE(M,10)*ZETA*ZETA*ZETA+CE(M,11)*XI*
+     &   XI*XI*XI+CE(M,12)*ETA*ETA*ETA*ETA+CE(M,13)*ZETA*ZETA*ZETA*
+     &   ZETA
+c
+C        END BLOCK
+      ENDDO
+C (0,9)
+c
+      RETURN
+C     END BLOCK
+      END
+c
+c
+c
+c
+c
+      SUBROUTINE ERROR
+c
+c***compute the solution error
+c
+c Author: Sisira Weeratunga 
+c         NASA Ames Research Center
+c         (10/25/90)
+c
+c #include 'applu.incl'  
+
+      IMPLICIT REAL*8 (A-H,O-Z)
+c
+      PARAMETER ( C1 = 1.40D+00, C2 = 0.40D+00,
+     $            C3 = 1.00D-01, C4 = 1.00D+00,
+     $            C5 = 1.40D+00 )
+c
+c***grid
+c
+      COMMON/CGCON/ NX, NY, NZ,
+     $              II1, II2, JI1, JI2, KI1, KI2, ITWJ,
+     $              DXI, DETA, DZETA,
+     $              TX1, TX2, TX3,
+     $              TY1, TY2, TY3,
+     $              TZ1, TZ2, TZ3
+c
+c***dissipation
+c
+      COMMON/DISP/ DX1,DX2,DX3,DX4,DX5,
+     $             DY1,DY2,DY3,DY4,DY5,
+     $             DZ1,DZ2,DZ3,DZ4,DZ5,
+     $             DSSP
+c
+c***field variables and residuals
+c
+      COMMON/CVAR/ U(5,33,33,33),
+     $             RSD(5,33,33,33),
+     $             FRCT(5,33,33,33)
+c
+c***output control parameters
+c
+      COMMON/CPRCON/ IPR, IOUT, INORM
+c
+c***newton-raphson iteration control parameters
+c
+      COMMON/CTSCON/ ITMAX, INVERT,
+     $               DT, OMEGA, TOLRSD(5),
+     $               RSDNM(5), ERRNM(5), FRC, TTOTAL
+c
+      COMMON/CJAC/ A(5,5,33,33,33),
+     $             B(5,5,33,33,33),
+     $             C(5,5,33,33,33),
+     $             D(5,5,33,33,33)
+c
+c***coefficients of the exact solution
+c
+      COMMON/CEXACT/ CE(5,13)
+c
+
+
+
+c
+      DIMENSION IMAX(5), JMAX(5), KMAX(5),
+     $          U000IJK(5), ERRMAX(5)
+C (0,1)
+      INTEGER*8 I_PIPS_EXACT_U000IJK
+      COMMON /PIPS_EXACT_U000IJK/ I_PIPS_EXACT_U000IJK
+C     BEGIN BLOCK
+C (0,2)
+c
+1001  FORMAT(/5X,'max. error in soln. to first pde  =',1PE12.4/,5X,'and 
+     x 
+     &its location                  = (',I4','I4,','I4,' )'/,/5X,'max. e
+     x 
+     &rror in soln. to second pde =',1PE12.4/,5X,'and its location      
+     x 
+     &            = (',I4','I4,','I4,' )'/,/5X,'max. error in soln. to t
+     x 
+     &hird pde  =',1PE12.4/,5X,'and its location                  = (',I
+     x 
+     &4','I4,','I4,' )'/,/5X,'max. error in soln. to fourth pde =',1PE12
+     x 
+     &.4/,5X,'and its location                  = (',I4','I4,','I4,' )'/
+     x 
+     &,/5X,'max. error in soln. to fifth pde  =',1PE12.4/,5X,'and its lo
+     x 
+     &cation                  = (',I4','I4,','I4,' )')
+C (0,3)
+c
+1002  FORMAT(1X/1X,'RMS-norm of error in soln. to ','first pde  = ',1PE1
+     x 
+     &2.5/,1X,'RMS-norm of error in soln. to ','second pde = ',1PE12.5/,
+     x 
+     &1X,'RMS-norm of error in soln. to ','third pde  = ',1PE12.5/,1X,'R
+     x 
+     &MS-norm of error in soln. to ','fourth pde = ',1PE12.5/,1X,'RMS-no
+     x 
+     &rm of error in soln. to ','fifth pde  = ',1PE12.5)
+C (0,4)
+c
+      LNORM = 2
+C (0,5)
+c
+      IF (LNORM.EQ.1) THEN
+C (0,6)
+C        BEGIN BLOCK
+C (0,7)
+c
+         DO M = 1, 5
+C (0,8)
+            ERRMAX(M) = -1.0D+20
+         ENDDO
+C (0,9)
+c
+         DO K = 2, NZ-1
+C (0,10)
+            DO J = 2, NY-1
+C (0,11)
+               DO I = 2, NX-1
+C (0,12)
+C                 BEGIN BLOCK
+C (0,13)
+      I_PIPS_EXACT_U000IJK = 5
+c
+                  CALL EXACT(I, J, K, U000IJK)
+C (0,14)
+c
+                  DO M = 1, 5
+C (0,15)
+C                    BEGIN BLOCK
+C (0,16)
+c
+                     TMP = ABS(U000IJK(M)-U(M,I,J,K))
+C (0,17)
+c
+                     IF (TMP.GT.ERRMAX(M)) THEN
+C (0,18)
+C                       BEGIN BLOCK
+C (0,19)
+c
+                        ERRMAX(M) = TMP
+C (0,20)
+                        IMAX(M) = I
+C (0,21)
+                        JMAX(M) = J
+C (0,22)
+                        KMAX(M) = K
+c
+C                       END BLOCK
+                     ELSE
+C (0,24)
+C                       BEGIN BLOCK
+C                       END BLOCK
+                     ENDIF
+c
+C                    END BLOCK
+                  ENDDO
+c
+C                 END BLOCK
+               ENDDO
+            ENDDO
+         ENDDO
+C (0,27)
+c
+         WRITE (6, 1001) (ERRMAX(M),IMAX(M),JMAX(M),KMAX(M), M = 1, 5
+     &   )
+c
+C        END BLOCK
+      ELSE
+C (0,29)
+         IF (LNORM.EQ.2) THEN
+C (0,30)
+C           BEGIN BLOCK
+C (0,31)
+c
+            DO M = 1, 5
+C (0,32)
+               ERRNM(M) = 0.0D+00
+            ENDDO
+C (0,33)
+c
+            DO K = 2, NZ-1
+C (0,34)
+               DO J = 2, NY-1
+C (0,35)
+                  DO I = 2, NX-1
+C (0,36)
+C                    BEGIN BLOCK
+C (0,37)
+      I_PIPS_EXACT_U000IJK = 5
+c
+                     CALL EXACT(I, J, K, U000IJK)
+C (0,38)
+c
+                     DO M = 1, 5
+C (0,39)
+C                       BEGIN BLOCK
+C (0,40)
+c
+                        TMP = U000IJK(M)-U(M,I,J,K)
+C (0,41)
+c
+                        ERRNM(M) = ERRNM(M)+TMP**2
+c
+C                       END BLOCK
+                     ENDDO
+c
+C                    END BLOCK
+                  ENDDO
+               ENDDO
+            ENDDO
+C (0,44)
+c
+            DO M = 1, 5
+C (0,45)
+               ERRNM(M) = SQRT(ERRNM(M)/((NX-2)*(NY-2)*(NZ-2)))
+            ENDDO
+C (0,46)
+c
+            WRITE (6, 1002) (ERRNM(M), M = 1, 5)
+c
+C           END BLOCK
+         ELSE
+C (0,48)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+      ENDIF
+C (0,49)
+c
+      RETURN
+C     END BLOCK
+      END
+c
+c
+c
+c
+c
+      SUBROUTINE JACLD
+c
+c***compute the lower triangular part of the jacobian matrix
+c
+c Author: Sisira Weeratunga
+c         NASA Ames Research Center
+c         (10/25/90)
+c
+c #include 'applu.incl'  
+
+      IMPLICIT REAL*8 (A-H,O-Z)
+c
+      PARAMETER ( C1 = 1.40D+00, C2 = 0.40D+00,
+     $            C3 = 1.00D-01, C4 = 1.00D+00,
+     $            C5 = 1.40D+00 )
+c
+c***grid
+c
+      COMMON/CGCON/ NX, NY, NZ,
+     $              II1, II2, JI1, JI2, KI1, KI2, ITWJ,
+     $              DXI, DETA, DZETA,
+     $              TX1, TX2, TX3,
+     $              TY1, TY2, TY3,
+     $              TZ1, TZ2, TZ3
+c
+c***dissipation
+c
+      COMMON/DISP/ DX1,DX2,DX3,DX4,DX5,
+     $             DY1,DY2,DY3,DY4,DY5,
+     $             DZ1,DZ2,DZ3,DZ4,DZ5,
+     $             DSSP
+c
+c***field variables and residuals
+c
+      COMMON/CVAR/ U(5,33,33,33),
+     $             RSD(5,33,33,33),
+     $             FRCT(5,33,33,33)
+c
+c***output control parameters
+c
+      COMMON/CPRCON/ IPR, IOUT, INORM
+c
+c***newton-raphson iteration control parameters
+c
+      COMMON/CTSCON/ ITMAX, INVERT,
+     $               DT, OMEGA, TOLRSD(5),
+     $               RSDNM(5), ERRNM(5), FRC, TTOTAL
+c
+      COMMON/CJAC/ A(5,5,33,33,33),
+     $             B(5,5,33,33,33),
+     $             C(5,5,33,33,33),
+     $             D(5,5,33,33,33)
+c
+c***coefficients of the exact solution
+c
+      COMMON/CEXACT/ CE(5,13)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+c
+
+
+
+c
+      R43 = 4.0D+00/3.0D+00
+C (0,3)
+      C1345 = C1*C3*C4*C5
+C (0,4)
+      C34 = C3*C4
+C (0,5)
+c      
+      DO K = 2, NZ-1
+C (0,6)
+C        BEGIN BLOCK
+C (0,7)
+c
+         DO J = 2, NY-1
+C (0,8)
+C           BEGIN BLOCK
+C (0,9)
+c
+            DO I = 2, NX-1
+C (0,10)
+C              BEGIN BLOCK
+C (0,11)
+c
+c***form the block daigonal
+c
+               TMP1 = 1.0D+00/U(1,I,J,K)
+C (0,12)
+               TMP2 = TMP1*TMP1
+C (0,13)
+               TMP3 = TMP1*TMP2
+C (0,14)
+c
+               D(1,1,I,J,K) = 1.0D+00+DT*2.0D+00*(TX1*DX1+TY1*DY1+TZ1
+     &         *DZ1)
+C (0,15)
+               D(1,2,I,J,K) = 0.0D+00
+C (0,16)
+               D(1,3,I,J,K) = 0.0D+00
+C (0,17)
+               D(1,4,I,J,K) = 0.0D+00
+C (0,18)
+               D(1,5,I,J,K) = 0.0D+00
+C (0,19)
+c
+               D(2,1,I,J,K) = DT*2.0D+00*(TX1*(-R43)*C34*TMP2*U(2,I,J
+     &         ,K)+TY1*(-C34)*TMP2*U(2,I,J,K)+TZ1*(-C34)*TMP2*U(2,I,J
+     &         ,K))
+C (0,20)
+               D(2,2,I,J,K) = 1.0D+00+DT*2.0D+00*(TX1*R43*C34*TMP1+
+     &         TY1*C34*TMP1+TZ1*C34*TMP1)+DT*2.0D+00*(TX1*DX2+TY1*DY2
+     &         +TZ1*DZ2)
+C (0,21)
+               D(2,3,I,J,K) = 0.0D+00
+C (0,22)
+               D(2,4,I,J,K) = 0.0D+00
+C (0,23)
+               D(2,5,I,J,K) = 0.0D+00
+C (0,24)
+c
+               D(3,1,I,J,K) = DT*2.0D+00*(TX1*(-C34)*TMP2*U(3,I,J,K)+
+     &         TY1*(-R43)*C34*TMP2*U(3,I,J,K)+TZ1*(-C34)*TMP2*U(3,I,J
+     &         ,K))
+C (0,25)
+               D(3,2,I,J,K) = 0.0D+00
+C (0,26)
+               D(3,3,I,J,K) = 1.0D+00+DT*2.0D+00*(TX1*C34*TMP1+TY1*
+     &         R43*C34*TMP1+TZ1*C34*TMP1)+DT*2.0D+00*(TX1*DX3+TY1*DY3
+     &         +TZ1*DZ3)
+C (0,27)
+               D(3,4,I,J,K) = 0.0D+00
+C (0,28)
+               D(3,5,I,J,K) = 0.0D+00
+C (0,29)
+c
+               D(4,1,I,J,K) = DT*2.0D+00*(TX1*(-C34)*TMP2*U(4,I,J,K)+
+     &         TY1*(-C34)*TMP2*U(4,I,J,K)+TZ1*(-R43)*C34*TMP2*U(4,I,J
+     &         ,K))
+C (0,30)
+               D(4,2,I,J,K) = 0.0D+00
+C (0,31)
+               D(4,3,I,J,K) = 0.0D+00
+C (0,32)
+               D(4,4,I,J,K) = 1.0D+00+DT*2.0D+00*(TX1*C34*TMP1+TY1*
+     &         C34*TMP1+TZ1*R43*C34*TMP1)+DT*2.0D+00*(TX1*DX4+TY1*DY4
+     &         +TZ1*DZ4)
+C (0,33)
+               D(4,5,I,J,K) = 0.0D+00
+C (0,34)
+c
+               D(5,1,I,J,K) = DT*2.0D+00*(TX1*((-(R43*C34-C1345))*
+     &         TMP3*U(2,I,J,K)**2-(C34-C1345)*TMP3*U(3,I,J,K)**2-(C34
+     &         -C1345)*TMP3*U(4,I,J,K)**2-C1345*TMP2*U(5,I,J,K))+TY1*
+     &         ((-(C34-C1345))*TMP3*U(2,I,J,K)**2-(R43*C34-C1345)*
+     &         TMP3*U(3,I,J,K)**2-(C34-C1345)*TMP3*U(4,I,J,K)**2-
+     &         C1345*TMP2*U(5,I,J,K))+TZ1*((-(C34-C1345))*TMP3*U(2,I,
+     &         J,K)**2-(C34-C1345)*TMP3*U(3,I,J,K)**2-(R43*C34-C1345)
+     &         *TMP3*U(4,I,J,K)**2-C1345*TMP2*U(5,I,J,K)))
+C (0,35)
+               D(5,2,I,J,K) = DT*2.0D+00*(TX1*(R43*C34-C1345)*TMP2*U(
+     &         2,I,J,K)+TY1*(C34-C1345)*TMP2*U(2,I,J,K)+TZ1*(C34-
+     &         C1345)*TMP2*U(2,I,J,K))
+C (0,36)
+               D(5,3,I,J,K) = DT*2.0D+00*(TX1*(C34-C1345)*TMP2*U(3,I,
+     &         J,K)+TY1*(R43*C34-C1345)*TMP2*U(3,I,J,K)+TZ1*(C34-
+     &         C1345)*TMP2*U(3,I,J,K))
+C (0,37)
+               D(5,4,I,J,K) = DT*2.0D+00*(TX1*(C34-C1345)*TMP2*U(4,I,
+     &         J,K)+TY1*(C34-C1345)*TMP2*U(4,I,J,K)+TZ1*(R43*C34-
+     &         C1345)*TMP2*U(4,I,J,K))
+C (0,38)
+               D(5,5,I,J,K) = 1.0D+00+DT*2.0D+00*(TX1*C1345*TMP1+TY1*
+     &         C1345*TMP1+TZ1*C1345*TMP1)+DT*2.0D+00*(TX1*DX5+TY1*DY5
+     &         +TZ1*DZ5)
+C (0,39)
+c
+c***form the first block sub-diagonal
+c
+               TMP1 = 1.0D+00/U(1,I,J,K-1)
+C (0,40)
+               TMP2 = TMP1*TMP1
+C (0,41)
+               TMP3 = TMP1*TMP2
+C (0,42)
+c
+               A(1,1,I,J,K) = -DT*TZ1*DZ1
+C (0,43)
+               A(1,2,I,J,K) = 0.0D+00
+C (0,44)
+               A(1,3,I,J,K) = 0.0D+00
+C (0,45)
+               A(1,4,I,J,K) = -DT*TZ2
+C (0,46)
+               A(1,5,I,J,K) = 0.0D+00
+C (0,47)
+c
+               A(2,1,I,J,K) = -DT*TZ2*(-(U(2,I,J,K-1)*U(4,I,J,K-1)))*
+     &         TMP2-DT*TZ1*(-C34)*TMP2*U(2,I,J,K-1)
+C (0,48)
+               A(2,2,I,J,K) = -DT*TZ2*U(4,I,J,K-1)*TMP1-DT*TZ1*C34*
+     &         TMP1-DT*TZ1*DZ2
+C (0,49)
+               A(2,3,I,J,K) = 0.0D+00
+C (0,50)
+               A(2,4,I,J,K) = -DT*TZ2*U(2,I,J,K-1)*TMP1
+C (0,51)
+               A(2,5,I,J,K) = 0.0D+00
+C (0,52)
+c
+               A(3,1,I,J,K) = -DT*TZ2*(-(U(3,I,J,K-1)*U(4,I,J,K-1)))*
+     &         TMP2-DT*TZ1*(-C34)*TMP2*U(3,I,J,K-1)
+C (0,53)
+               A(3,2,I,J,K) = 0.0D+00
+C (0,54)
+               A(3,3,I,J,K) = -DT*TZ2*U(4,I,J,K-1)*TMP1-DT*TZ1*C34*
+     &         TMP1-DT*TZ1*DZ3
+C (0,55)
+               A(3,4,I,J,K) = -DT*TZ2*U(3,I,J,K-1)*TMP1
+C (0,56)
+               A(3,5,I,J,K) = 0.0D+00
+C (0,57)
+c
+               A(4,1,I,J,K) = -DT*TZ2*((-(U(4,I,J,K-1)*TMP1)**2)+
+     &         0.50D+00*C2*(U(2,I,J,K-1)*U(2,I,J,K-1)+U(3,I,J,K-1)*U(
+     &         3,I,J,K-1)+U(4,I,J,K-1)*U(4,I,J,K-1))*TMP2)-DT*TZ1*(-
+     &         R43)*C34*TMP2*U(4,I,J,K-1)
+C (0,58)
+               A(4,2,I,J,K) = -DT*TZ2*(-C2)*U(2,I,J,K-1)*TMP1
+C (0,59)
+               A(4,3,I,J,K) = -DT*TZ2*(-C2)*U(3,I,J,K-1)*TMP1
+C (0,60)
+               A(4,4,I,J,K) = -DT*TZ2*(2.0D+00-C2)*U(4,I,J,K-1)*TMP1-
+     &         DT*TZ1*R43*C34*TMP1-DT*TZ1*DZ4
+C (0,61)
+               A(4,5,I,J,K) = -DT*TZ2*C2
+C (0,62)
+c
+               A(5,1,I,J,K) = -DT*TZ2*(C2*(U(2,I,J,K-1)*U(2,I,J,K-1)+
+     &         U(3,I,J,K-1)*U(3,I,J,K-1)+U(4,I,J,K-1)*U(4,I,J,K-1))*
+     &         TMP2-C1*U(5,I,J,K-1)*TMP1)*U(4,I,J,K-1)*TMP1-DT*TZ1*((
+     &         -(C34-C1345))*TMP3*U(2,I,J,K-1)**2-(C34-C1345)*TMP3*U(
+     &         3,I,J,K-1)**2-(R43*C34-C1345)*TMP3*U(4,I,J,K-1)**2-
+     &         C1345*TMP2*U(5,I,J,K-1))
+C (0,63)
+               A(5,2,I,J,K) = -DT*TZ2*(-C2)*U(2,I,J,K-1)*U(4,I,J,K-1)
+     &         *TMP2-DT*TZ1*(C34-C1345)*TMP2*U(2,I,J,K-1)
+C (0,64)
+               A(5,3,I,J,K) = -DT*TZ2*(-C2)*U(3,I,J,K-1)*U(4,I,J,K-1)
+     &         *TMP2-DT*TZ1*(C34-C1345)*TMP2*U(3,I,J,K-1)
+C (0,65)
+               A(5,4,I,J,K) = -DT*TZ2*(C1*U(5,I,J,K-1)*TMP1-0.50D+00*
+     &         C2*(U(2,I,J,K-1)*U(2,I,J,K-1)+U(3,I,J,K-1)*U(3,I,J,K-1
+     &         )+3.0D+00*U(4,I,J,K-1)*U(4,I,J,K-1))*TMP2)-DT*TZ1*(R43
+     &         *C34-C1345)*TMP2*U(4,I,J,K-1)
+C (0,66)
+               A(5,5,I,J,K) = -DT*TZ2*C1*U(4,I,J,K-1)*TMP1-DT*TZ1*
+     &         C1345*TMP1-DT*TZ1*DZ5
+C (0,67)
+c
+c***form the second block sub-diagonal
+c
+               TMP1 = 1.0D+00/U(1,I,J-1,K)
+C (0,68)
+               TMP2 = TMP1*TMP1
+C (0,69)
+               TMP3 = TMP1*TMP2
+C (0,70)
+c
+               B(1,1,I,J,K) = -DT*TY1*DY1
+C (0,71)
+               B(1,2,I,J,K) = 0.0D+00
+C (0,72)
+               B(1,3,I,J,K) = -DT*TY2
+C (0,73)
+               B(1,4,I,J,K) = 0.0D+00
+C (0,74)
+               B(1,5,I,J,K) = 0.0D+00
+C (0,75)
+c
+               B(2,1,I,J,K) = -DT*TY2*(-(U(2,I,J-1,K)*U(3,I,J-1,K)))*
+     &         TMP2-DT*TY1*(-C34)*TMP2*U(2,I,J-1,K)
+C (0,76)
+               B(2,2,I,J,K) = -DT*TY2*U(3,I,J-1,K)*TMP1-DT*TY1*C34*
+     &         TMP1-DT*TY1*DY2
+C (0,77)
+               B(2,3,I,J,K) = -DT*TY2*U(2,I,J-1,K)*TMP1
+C (0,78)
+               B(2,4,I,J,K) = 0.0D+00
+C (0,79)
+               B(2,5,I,J,K) = 0.0D+00
+C (0,80)
+c
+               B(3,1,I,J,K) = -DT*TY2*((-(U(3,I,J-1,K)*TMP1)**2)+
+     &         0.50D+00*C2*(U(2,I,J-1,K)*U(2,I,J-1,K)+U(3,I,J-1,K)*U(
+     &         3,I,J-1,K)+U(4,I,J-1,K)*U(4,I,J-1,K))*TMP2)-DT*TY1*(-
+     &         R43)*C34*TMP2*U(3,I,J-1,K)
+C (0,81)
+               B(3,2,I,J,K) = -DT*TY2*(-C2)*U(2,I,J-1,K)*TMP1
+C (0,82)
+               B(3,3,I,J,K) = -DT*TY2*(2.0D+00-C2)*U(3,I,J-1,K)*TMP1-
+     &         DT*TY1*R43*C34*TMP1-DT*TY1*DY3
+C (0,83)
+               B(3,4,I,J,K) = -DT*TY2*(-C2)*U(4,I,J-1,K)*TMP1
+C (0,84)
+               B(3,5,I,J,K) = -DT*TY2*C2
+C (0,85)
+c
+               B(4,1,I,J,K) = -DT*TY2*(-(U(3,I,J-1,K)*U(4,I,J-1,K)))*
+     &         TMP2-DT*TY1*(-C34)*TMP2*U(4,I,J-1,K)
+C (0,86)
+               B(4,2,I,J,K) = 0.0D+00
+C (0,87)
+               B(4,3,I,J,K) = -DT*TY2*U(4,I,J-1,K)*TMP1
+C (0,88)
+               B(4,4,I,J,K) = -DT*TY2*U(3,I,J-1,K)*TMP1-DT*TY1*C34*
+     &         TMP1-DT*TY1*DY4
+C (0,89)
+               B(4,5,I,J,K) = 0.0D+00
+C (0,90)
+c
+               B(5,1,I,J,K) = -DT*TY2*(C2*(U(2,I,J-1,K)*U(2,I,J-1,K)+
+     &         U(3,I,J-1,K)*U(3,I,J-1,K)+U(4,I,J-1,K)*U(4,I,J-1,K))*
+     &         TMP2-C1*U(5,I,J-1,K)*TMP1)*U(3,I,J-1,K)*TMP1-DT*TY1*((
+     &         -(C34-C1345))*TMP3*U(2,I,J-1,K)**2-(R43*C34-C1345)*
+     &         TMP3*U(3,I,J-1,K)**2-(C34-C1345)*TMP3*U(4,I,J-1,K)**2-
+     &         C1345*TMP2*U(5,I,J-1,K))
+C (0,91)
+               B(5,2,I,J,K) = -DT*TY2*(-C2)*U(2,I,J-1,K)*U(3,I,J-1,K)
+     &         *TMP2-DT*TY1*(C34-C1345)*TMP2*U(2,I,J-1,K)
+C (0,92)
+               B(5,3,I,J,K) = -DT*TY2*(C1*U(5,I,J-1,K)*TMP1-0.50D+00*
+     &         C2*(U(2,I,J-1,K)*U(2,I,J-1,K)+3.0D+00*U(3,I,J-1,K)*U(3
+     &         ,I,J-1,K)+U(4,I,J-1,K)*U(4,I,J-1,K))*TMP2)-DT*TY1*(R43
+     &         *C34-C1345)*TMP2*U(3,I,J-1,K)
+C (0,93)
+               B(5,4,I,J,K) = -DT*TY2*(-C2)*U(3,I,J-1,K)*U(4,I,J-1,K)
+     &         *TMP2-DT*TY1*(C34-C1345)*TMP2*U(4,I,J-1,K)
+C (0,94)
+               B(5,5,I,J,K) = -DT*TY2*C1*U(3,I,J-1,K)*TMP1-DT*TY1*
+     &         C1345*TMP1-DT*TY1*DY5
+C (0,95)
+c               
+c***form the third block sub-diagonal
+c
+               TMP1 = 1.0D+00/U(1,I-1,J,K)
+C (0,96)
+               TMP2 = TMP1*TMP1
+C (0,97)
+               TMP3 = TMP1*TMP2
+C (0,98)
+c
+               C(1,1,I,J,K) = -DT*TX1*DX1
+C (0,99)
+               C(1,2,I,J,K) = -DT*TX2
+C (0,100)
+               C(1,3,I,J,K) = 0.0D+00
+C (0,101)
+               C(1,4,I,J,K) = 0.0D+00
+C (0,102)
+               C(1,5,I,J,K) = 0.0D+00
+C (0,103)
+c
+               C(2,1,I,J,K) = -DT*TX2*((-(U(2,I-1,J,K)*TMP1)**2)+C2*
+     &         0.50D+00*(U(2,I-1,J,K)*U(2,I-1,J,K)+U(3,I-1,J,K)*U(3,I
+     &         -1,J,K)+U(4,I-1,J,K)*U(4,I-1,J,K))*TMP2)-DT*TX1*(-R43)
+     &         *C34*TMP2*U(2,I-1,J,K)
+C (0,104)
+               C(2,2,I,J,K) = -DT*TX2*(2.0D+00-C2)*U(2,I-1,J,K)*TMP1-
+     &         DT*TX1*R43*C34*TMP1-DT*TX1*DX2
+C (0,105)
+               C(2,3,I,J,K) = -DT*TX2*(-C2)*U(3,I-1,J,K)*TMP1
+C (0,106)
+               C(2,4,I,J,K) = -DT*TX2*(-C2)*U(4,I-1,J,K)*TMP1
+C (0,107)
+               C(2,5,I,J,K) = -DT*TX2*C2
+C (0,108)
+c
+               C(3,1,I,J,K) = -DT*TX2*(-(U(2,I-1,J,K)*U(3,I-1,J,K)))*
+     &         TMP2-DT*TX1*(-C34)*TMP2*U(3,I-1,J,K)
+C (0,109)
+               C(3,2,I,J,K) = -DT*TX2*U(3,I-1,J,K)*TMP1
+C (0,110)
+               C(3,3,I,J,K) = -DT*TX2*U(2,I-1,J,K)*TMP1-DT*TX1*C34*
+     &         TMP1-DT*TX1*DX3
+C (0,111)
+               C(3,4,I,J,K) = 0.0D+00
+C (0,112)
+               C(3,5,I,J,K) = 0.0D+00
+C (0,113)
+c
+               C(4,1,I,J,K) = -DT*TX2*(-(U(2,I-1,J,K)*U(4,I-1,J,K)))*
+     &         TMP2-DT*TX1*(-C34)*TMP2*U(4,I-1,J,K)
+C (0,114)
+               C(4,2,I,J,K) = -DT*TX2*U(4,I-1,J,K)*TMP1
+C (0,115)
+               C(4,3,I,J,K) = 0.0D+00
+C (0,116)
+               C(4,4,I,J,K) = -DT*TX2*U(2,I-1,J,K)*TMP1-DT*TX1*C34*
+     &         TMP1-DT*TX1*DX4
+C (0,117)
+               C(4,5,I,J,K) = 0.0D+00
+C (0,118)
+c
+               C(5,1,I,J,K) = -DT*TX2*(C2*(U(2,I-1,J,K)*U(2,I-1,J,K)+
+     &         U(3,I-1,J,K)*U(3,I-1,J,K)+U(4,I-1,J,K)*U(4,I-1,J,K))*
+     &         TMP2-C1*U(5,I-1,J,K)*TMP1)*U(2,I-1,J,K)*TMP1-DT*TX1*((
+     &         -(R43*C34-C1345))*TMP3*U(2,I-1,J,K)**2-(C34-C1345)*
+     &         TMP3*U(3,I-1,J,K)**2-(C34-C1345)*TMP3*U(4,I-1,J,K)**2-
+     &         C1345*TMP2*U(5,I-1,J,K))
+C (0,119)
+               C(5,2,I,J,K) = -DT*TX2*(C1*U(5,I-1,J,K)*TMP1-0.50D+00*
+     &         C2*(3.0D+00*U(2,I-1,J,K)*U(2,I-1,J,K)+U(3,I-1,J,K)*U(3
+     &         ,I-1,J,K)+U(4,I-1,J,K)*U(4,I-1,J,K))*TMP2)-DT*TX1*(R43
+     &         *C34-C1345)*TMP2*U(2,I-1,J,K)
+C (0,120)
+               C(5,3,I,J,K) = -DT*TX2*(-C2)*U(3,I-1,J,K)*U(2,I-1,J,K)
+     &         *TMP2-DT*TX1*(C34-C1345)*TMP2*U(3,I-1,J,K)
+C (0,121)
+               C(5,4,I,J,K) = -DT*TX2*(-C2)*U(4,I-1,J,K)*U(2,I-1,J,K)
+     &         *TMP2-DT*TX1*(C34-C1345)*TMP2*U(4,I-1,J,K)
+C (0,122)
+               C(5,5,I,J,K) = -DT*TX2*C1*U(2,I-1,J,K)*TMP1-DT*TX1*
+     &         C1345*TMP1-DT*TX1*DX5
+c
+C              END BLOCK
+            ENDDO
+c
+C           END BLOCK
+         ENDDO
+c
+C        END BLOCK
+      ENDDO
+C (0,126)
+c
+      RETURN
+C     END BLOCK
+      END
+c
+c
+c
+c
+c
+      SUBROUTINE JACU
+c
+c***compute the upper triangular part of the jacobian matrix
+c
+c Author: Sisira Weeratunga
+c         NASA Ames Research Center
+c         (10/25/90)
+c
+c #include 'applu.incl'  
+
+      IMPLICIT REAL*8 (A-H,O-Z)
+c
+      PARAMETER ( C1 = 1.40D+00, C2 = 0.40D+00,
+     $            C3 = 1.00D-01, C4 = 1.00D+00,
+     $            C5 = 1.40D+00 )
+c
+c***grid
+c
+      COMMON/CGCON/ NX, NY, NZ,
+     $              II1, II2, JI1, JI2, KI1, KI2, ITWJ,
+     $              DXI, DETA, DZETA,
+     $              TX1, TX2, TX3,
+     $              TY1, TY2, TY3,
+     $              TZ1, TZ2, TZ3
+c
+c***dissipation
+c
+      COMMON/DISP/ DX1,DX2,DX3,DX4,DX5,
+     $             DY1,DY2,DY3,DY4,DY5,
+     $             DZ1,DZ2,DZ3,DZ4,DZ5,
+     $             DSSP
+c
+c***field variables and residuals
+c
+      COMMON/CVAR/ U(5,33,33,33),
+     $             RSD(5,33,33,33),
+     $             FRCT(5,33,33,33)
+c
+c***output control parameters
+c
+      COMMON/CPRCON/ IPR, IOUT, INORM
+c
+c***newton-raphson iteration control parameters
+c
+      COMMON/CTSCON/ ITMAX, INVERT,
+     $               DT, OMEGA, TOLRSD(5),
+     $               RSDNM(5), ERRNM(5), FRC, TTOTAL
+c
+      COMMON/CJAC/ A(5,5,33,33,33),
+     $             B(5,5,33,33,33),
+     $             C(5,5,33,33,33),
+     $             D(5,5,33,33,33)
+c
+c***coefficients of the exact solution
+c
+      COMMON/CEXACT/ CE(5,13)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+c
+
+
+
+c
+      R43 = 4.0D+00/3.0D+00
+C (0,3)
+      C1345 = C1*C3*C4*C5
+C (0,4)
+      C34 = C3*C4
+C (0,5)
+c      
+      DO K = 2, NZ-1
+C (0,6)
+C        BEGIN BLOCK
+C (0,7)
+c
+         DO J = 2, NY-1
+C (0,8)
+C           BEGIN BLOCK
+C (0,9)
+c
+            DO I = 2, NX-1
+C (0,10)
+C              BEGIN BLOCK
+C (0,11)
+c               
+c***form the first block sub-diagonal
+c
+               TMP1 = 1.0D+00/U(1,I+1,J,K)
+C (0,12)
+               TMP2 = TMP1*TMP1
+C (0,13)
+               TMP3 = TMP1*TMP2
+C (0,14)
+c
+               A(1,1,I,J,K) = -DT*TX1*DX1
+C (0,15)
+               A(1,2,I,J,K) = DT*TX2
+C (0,16)
+               A(1,3,I,J,K) = 0.0D+00
+C (0,17)
+               A(1,4,I,J,K) = 0.0D+00
+C (0,18)
+               A(1,5,I,J,K) = 0.0D+00
+C (0,19)
+c
+               A(2,1,I,J,K) = DT*TX2*((-(U(2,I+1,J,K)*TMP1)**2)+C2*
+     &         0.50D+00*(U(2,I+1,J,K)*U(2,I+1,J,K)+U(3,I+1,J,K)*U(3,I
+     &         +1,J,K)+U(4,I+1,J,K)*U(4,I+1,J,K))*TMP2)-DT*TX1*(-R43)
+     &         *C34*TMP2*U(2,I+1,J,K)
+C (0,20)
+               A(2,2,I,J,K) = DT*TX2*(2.0D+00-C2)*U(2,I+1,J,K)*TMP1-
+     &         DT*TX1*R43*C34*TMP1-DT*TX1*DX2
+C (0,21)
+               A(2,3,I,J,K) = DT*TX2*(-C2)*U(3,I+1,J,K)*TMP1
+C (0,22)
+               A(2,4,I,J,K) = DT*TX2*(-C2)*U(4,I+1,J,K)*TMP1
+C (0,23)
+               A(2,5,I,J,K) = DT*TX2*C2
+C (0,24)
+c
+               A(3,1,I,J,K) = DT*TX2*(-(U(2,I+1,J,K)*U(3,I+1,J,K)))*
+     &         TMP2-DT*TX1*(-C34)*TMP2*U(3,I+1,J,K)
+C (0,25)
+               A(3,2,I,J,K) = DT*TX2*U(3,I+1,J,K)*TMP1
+C (0,26)
+               A(3,3,I,J,K) = DT*TX2*U(2,I+1,J,K)*TMP1-DT*TX1*C34*
+     &         TMP1-DT*TX1*DX3
+C (0,27)
+               A(3,4,I,J,K) = 0.0D+00
+C (0,28)
+               A(3,5,I,J,K) = 0.0D+00
+C (0,29)
+c
+               A(4,1,I,J,K) = DT*TX2*(-(U(2,I+1,J,K)*U(4,I+1,J,K)))*
+     &         TMP2-DT*TX1*(-C34)*TMP2*U(4,I+1,J,K)
+C (0,30)
+               A(4,2,I,J,K) = DT*TX2*U(4,I+1,J,K)*TMP1
+C (0,31)
+               A(4,3,I,J,K) = 0.0D+00
+C (0,32)
+               A(4,4,I,J,K) = DT*TX2*U(2,I+1,J,K)*TMP1-DT*TX1*C34*
+     &         TMP1-DT*TX1*DX4
+C (0,33)
+               A(4,5,I,J,K) = 0.0D+00
+C (0,34)
+c
+               A(5,1,I,J,K) = DT*TX2*(C2*(U(2,I+1,J,K)*U(2,I+1,J,K)+U
+     &         (3,I+1,J,K)*U(3,I+1,J,K)+U(4,I+1,J,K)*U(4,I+1,J,K))*
+     &         TMP2-C1*U(5,I+1,J,K)*TMP1)*U(2,I+1,J,K)*TMP1-DT*TX1*((
+     &         -(R43*C34-C1345))*TMP3*U(2,I+1,J,K)**2-(C34-C1345)*
+     &         TMP3*U(3,I+1,J,K)**2-(C34-C1345)*TMP3*U(4,I+1,J,K)**2-
+     &         C1345*TMP2*U(5,I+1,J,K))
+C (0,35)
+               A(5,2,I,J,K) = DT*TX2*(C1*U(5,I+1,J,K)*TMP1-0.50D+00*
+     &         C2*(3.0D+00*U(2,I+1,J,K)*U(2,I+1,J,K)+U(3,I+1,J,K)*U(3
+     &         ,I+1,J,K)+U(4,I+1,J,K)*U(4,I+1,J,K))*TMP2)-DT*TX1*(R43
+     &         *C34-C1345)*TMP2*U(2,I+1,J,K)
+C (0,36)
+               A(5,3,I,J,K) = DT*TX2*(-C2)*U(3,I+1,J,K)*U(2,I+1,J,K)*
+     &         TMP2-DT*TX1*(C34-C1345)*TMP2*U(3,I+1,J,K)
+C (0,37)
+               A(5,4,I,J,K) = DT*TX2*(-C2)*U(4,I+1,J,K)*U(2,I+1,J,K)*
+     &         TMP2-DT*TX1*(C34-C1345)*TMP2*U(4,I+1,J,K)
+C (0,38)
+               A(5,5,I,J,K) = DT*TX2*C1*U(2,I+1,J,K)*TMP1-DT*TX1*
+     &         C1345*TMP1-DT*TX1*DX5
+C (0,39)
+c
+c***form the second block sub-diagonal
+c
+               TMP1 = 1.0D+00/U(1,I,J+1,K)
+C (0,40)
+               TMP2 = TMP1*TMP1
+C (0,41)
+               TMP3 = TMP1*TMP2
+C (0,42)
+c
+               B(1,1,I,J,K) = -DT*TY1*DY1
+C (0,43)
+               B(1,2,I,J,K) = 0.0D+00
+C (0,44)
+               B(1,3,I,J,K) = DT*TY2
+C (0,45)
+               B(1,4,I,J,K) = 0.0D+00
+C (0,46)
+               B(1,5,I,J,K) = 0.0D+00
+C (0,47)
+c
+               B(2,1,I,J,K) = DT*TY2*(-(U(2,I,J+1,K)*U(3,I,J+1,K)))*
+     &         TMP2-DT*TY1*(-C34)*TMP2*U(2,I,J+1,K)
+C (0,48)
+               B(2,2,I,J,K) = DT*TY2*U(3,I,J+1,K)*TMP1-DT*TY1*C34*
+     &         TMP1-DT*TY1*DY2
+C (0,49)
+               B(2,3,I,J,K) = DT*TY2*U(2,I,J+1,K)*TMP1
+C (0,50)
+               B(2,4,I,J,K) = 0.0D+00
+C (0,51)
+               B(2,5,I,J,K) = 0.0D+00
+C (0,52)
+c
+               B(3,1,I,J,K) = DT*TY2*((-(U(3,I,J+1,K)*TMP1)**2)+
+     &         0.50D+00*C2*(U(2,I,J+1,K)*U(2,I,J+1,K)+U(3,I,J+1,K)*U(
+     &         3,I,J+1,K)+U(4,I,J+1,K)*U(4,I,J+1,K))*TMP2)-DT*TY1*(-
+     &         R43)*C34*TMP2*U(3,I,J+1,K)
+C (0,53)
+               B(3,2,I,J,K) = DT*TY2*(-C2)*U(2,I,J+1,K)*TMP1
+C (0,54)
+               B(3,3,I,J,K) = DT*TY2*(2.0D+00-C2)*U(3,I,J+1,K)*TMP1-
+     &         DT*TY1*R43*C34*TMP1-DT*TY1*DY3
+C (0,55)
+               B(3,4,I,J,K) = DT*TY2*(-C2)*U(4,I,J+1,K)*TMP1
+C (0,56)
+               B(3,5,I,J,K) = DT*TY2*C2
+C (0,57)
+c
+               B(4,1,I,J,K) = DT*TY2*(-(U(3,I,J+1,K)*U(4,I,J+1,K)))*
+     &         TMP2-DT*TY1*(-C34)*TMP2*U(4,I,J+1,K)
+C (0,58)
+               B(4,2,I,J,K) = 0.0D+00
+C (0,59)
+               B(4,3,I,J,K) = DT*TY2*U(4,I,J+1,K)*TMP1
+C (0,60)
+               B(4,4,I,J,K) = DT*TY2*U(3,I,J+1,K)*TMP1-DT*TY1*C34*
+     &         TMP1-DT*TY1*DY4
+C (0,61)
+               B(4,5,I,J,K) = 0.0D+00
+C (0,62)
+c
+               B(5,1,I,J,K) = DT*TY2*(C2*(U(2,I,J+1,K)*U(2,I,J+1,K)+U
+     &         (3,I,J+1,K)*U(3,I,J+1,K)+U(4,I,J+1,K)*U(4,I,J+1,K))*
+     &         TMP2-C1*U(5,I,J+1,K)*TMP1)*U(3,I,J+1,K)*TMP1-DT*TY1*((
+     &         -(C34-C1345))*TMP3*U(2,I,J+1,K)**2-(R43*C34-C1345)*
+     &         TMP3*U(3,I,J+1,K)**2-(C34-C1345)*TMP3*U(4,I,J+1,K)**2-
+     &         C1345*TMP2*U(5,I,J+1,K))
+C (0,63)
+               B(5,2,I,J,K) = DT*TY2*(-C2)*U(2,I,J+1,K)*U(3,I,J+1,K)*
+     &         TMP2-DT*TY1*(C34-C1345)*TMP2*U(2,I,J+1,K)
+C (0,64)
+               B(5,3,I,J,K) = DT*TY2*(C1*U(5,I,J+1,K)*TMP1-0.50D+00*
+     &         C2*(U(2,I,J+1,K)*U(2,I,J+1,K)+3.0D+00*U(3,I,J+1,K)*U(3
+     &         ,I,J+1,K)+U(4,I,J+1,K)*U(4,I,J+1,K))*TMP2)-DT*TY1*(R43
+     &         *C34-C1345)*TMP2*U(3,I,J+1,K)
+C (0,65)
+               B(5,4,I,J,K) = DT*TY2*(-C2)*U(3,I,J+1,K)*U(4,I,J+1,K)*
+     &         TMP2-DT*TY1*(C34-C1345)*TMP2*U(4,I,J+1,K)
+C (0,66)
+               B(5,5,I,J,K) = DT*TY2*C1*U(3,I,J+1,K)*TMP1-DT*TY1*
+     &         C1345*TMP1-DT*TY1*DY5
+C (0,67)
+c
+c***form the third block sub-diagonal
+c
+               TMP1 = 1.0D+00/U(1,I,J,K+1)
+C (0,68)
+               TMP2 = TMP1*TMP1
+C (0,69)
+               TMP3 = TMP1*TMP2
+C (0,70)
+c
+               C(1,1,I,J,K) = -DT*TZ1*DZ1
+C (0,71)
+               C(1,2,I,J,K) = 0.0D+00
+C (0,72)
+               C(1,3,I,J,K) = 0.0D+00
+C (0,73)
+               C(1,4,I,J,K) = DT*TZ2
+C (0,74)
+               C(1,5,I,J,K) = 0.0D+00
+C (0,75)
+c
+               C(2,1,I,J,K) = DT*TZ2*(-(U(2,I,J,K+1)*U(4,I,J,K+1)))*
+     &         TMP2-DT*TZ1*(-C34)*TMP2*U(2,I,J,K+1)
+C (0,76)
+               C(2,2,I,J,K) = DT*TZ2*U(4,I,J,K+1)*TMP1-DT*TZ1*C34*
+     &         TMP1-DT*TZ1*DZ2
+C (0,77)
+               C(2,3,I,J,K) = 0.0D+00
+C (0,78)
+               C(2,4,I,J,K) = DT*TZ2*U(2,I,J,K+1)*TMP1
+C (0,79)
+               C(2,5,I,J,K) = 0.0D+00
+C (0,80)
+c
+               C(3,1,I,J,K) = DT*TZ2*(-(U(3,I,J,K+1)*U(4,I,J,K+1)))*
+     &         TMP2-DT*TZ1*(-C34)*TMP2*U(3,I,J,K+1)
+C (0,81)
+               C(3,2,I,J,K) = 0.0D+00
+C (0,82)
+               C(3,3,I,J,K) = DT*TZ2*U(4,I,J,K+1)*TMP1-DT*TZ1*C34*
+     &         TMP1-DT*TZ1*DZ3
+C (0,83)
+               C(3,4,I,J,K) = DT*TZ2*U(3,I,J,K+1)*TMP1
+C (0,84)
+               C(3,5,I,J,K) = 0.0D+00
+C (0,85)
+c
+               C(4,1,I,J,K) = DT*TZ2*((-(U(4,I,J,K+1)*TMP1)**2)+
+     &         0.50D+00*C2*(U(2,I,J,K+1)*U(2,I,J,K+1)+U(3,I,J,K+1)*U(
+     &         3,I,J,K+1)+U(4,I,J,K+1)*U(4,I,J,K+1))*TMP2)-DT*TZ1*(-
+     &         R43)*C34*TMP2*U(4,I,J,K+1)
+C (0,86)
+               C(4,2,I,J,K) = DT*TZ2*(-C2)*U(2,I,J,K+1)*TMP1
+C (0,87)
+               C(4,3,I,J,K) = DT*TZ2*(-C2)*U(3,I,J,K+1)*TMP1
+C (0,88)
+               C(4,4,I,J,K) = DT*TZ2*(2.0D+00-C2)*U(4,I,J,K+1)*TMP1-
+     &         DT*TZ1*R43*C34*TMP1-DT*TZ1*DZ4
+C (0,89)
+               C(4,5,I,J,K) = DT*TZ2*C2
+C (0,90)
+c
+               C(5,1,I,J,K) = DT*TZ2*(C2*(U(2,I,J,K+1)*U(2,I,J,K+1)+U
+     &         (3,I,J,K+1)*U(3,I,J,K+1)+U(4,I,J,K+1)*U(4,I,J,K+1))*
+     &         TMP2-C1*U(5,I,J,K+1)*TMP1)*U(4,I,J,K+1)*TMP1-DT*TZ1*((
+     &         -(C34-C1345))*TMP3*U(2,I,J,K+1)**2-(C34-C1345)*TMP3*U(
+     &         3,I,J,K+1)**2-(R43*C34-C1345)*TMP3*U(4,I,J,K+1)**2-
+     &         C1345*TMP2*U(5,I,J,K+1))
+C (0,91)
+               C(5,2,I,J,K) = DT*TZ2*(-C2)*U(2,I,J,K+1)*U(4,I,J,K+1)*
+     &         TMP2-DT*TZ1*(C34-C1345)*TMP2*U(2,I,J,K+1)
+C (0,92)
+               C(5,3,I,J,K) = DT*TZ2*(-C2)*U(3,I,J,K+1)*U(4,I,J,K+1)*
+     &         TMP2-DT*TZ1*(C34-C1345)*TMP2*U(3,I,J,K+1)
+C (0,93)
+               C(5,4,I,J,K) = DT*TZ2*(C1*U(5,I,J,K+1)*TMP1-0.50D+00*
+     &         C2*(U(2,I,J,K+1)*U(2,I,J,K+1)+U(3,I,J,K+1)*U(3,I,J,K+1
+     &         )+3.0D+00*U(4,I,J,K+1)*U(4,I,J,K+1))*TMP2)-DT*TZ1*(R43
+     &         *C34-C1345)*TMP2*U(4,I,J,K+1)
+C (0,94)
+               C(5,5,I,J,K) = DT*TZ2*C1*U(4,I,J,K+1)*TMP1-DT*TZ1*
+     &         C1345*TMP1-DT*TZ1*DZ5
+c
+C              END BLOCK
+            ENDDO
+c
+C           END BLOCK
+         ENDDO
+c
+C        END BLOCK
+      ENDDO
+C (0,98)
+c
+      RETURN
+C     END BLOCK
+      END
+c
+c
+c
+c
+c
+      SUBROUTINE PINTGR
+c
+c***compute the surface integral
+c
+c Author: Sisira Weeratunga
+c         NASA Ames Research Center
+c         (10/25/90)
+c
+c #include 'applu.incl'  
+
+      IMPLICIT REAL*8 (A-H,O-Z)
+c
+      PARAMETER ( C1 = 1.40D+00, C2 = 0.40D+00,
+     $            C3 = 1.00D-01, C4 = 1.00D+00,
+     $            C5 = 1.40D+00 )
+c
+c***grid
+c
+      COMMON/CGCON/ NX, NY, NZ,
+     $              II1, II2, JI1, JI2, KI1, KI2, ITWJ,
+     $              DXI, DETA, DZETA,
+     $              TX1, TX2, TX3,
+     $              TY1, TY2, TY3,
+     $              TZ1, TZ2, TZ3
+c
+c***dissipation
+c
+      COMMON/DISP/ DX1,DX2,DX3,DX4,DX5,
+     $             DY1,DY2,DY3,DY4,DY5,
+     $             DZ1,DZ2,DZ3,DZ4,DZ5,
+     $             DSSP
+c
+c***field variables and residuals
+c
+      COMMON/CVAR/ U(5,33,33,33),
+     $             RSD(5,33,33,33),
+     $             FRCT(5,33,33,33)
+c
+c***output control parameters
+c
+      COMMON/CPRCON/ IPR, IOUT, INORM
+c
+c***newton-raphson iteration control parameters
+c
+      COMMON/CTSCON/ ITMAX, INVERT,
+     $               DT, OMEGA, TOLRSD(5),
+     $               RSDNM(5), ERRNM(5), FRC, TTOTAL
+c
+      COMMON/CJAC/ A(5,5,33,33,33),
+     $             B(5,5,33,33,33),
+     $             C(5,5,33,33,33),
+     $             D(5,5,33,33,33)
+c
+c***coefficients of the exact solution
+c
+      COMMON/CEXACT/ CE(5,13)
+c
+
+
+
+c
+      DIMENSION PHI1(33,33), PHI2(33,33)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+c
+1001  FORMAT(//5X,'surface integral = ',1PE12.5//)
+C (0,3)
+c
+      DO J = JI1, JI2
+C (0,4)
+C        BEGIN BLOCK
+C (0,5)
+c     
+         DO I = II1, II2
+C (0,6)
+C           BEGIN BLOCK
+C (0,7)
+c
+            PHI1(I,J) = C2*(U(5,I,J,KI1)-0.50D+00*(U(2,I,J,KI1)**2+U(
+     &      3,I,J,KI1)**2+U(4,I,J,KI1)**2)/U(1,I,J,KI1))
+C (0,8)
+c     
+            PHI2(I,J) = C2*(U(5,I,J,KI2)-0.50D+00*(U(2,I,J,KI2)**2+U(
+     &      3,I,J,KI2)**2+U(4,I,J,KI2)**2)/U(1,I,J,KI2))
+c
+C           END BLOCK
+         ENDDO
+c
+C        END BLOCK
+      ENDDO
+C (0,11)
+c
+      FRC1 = 0.0D+00
+C (0,12)
+c
+      DO J = JI1, JI2-1
+C (0,13)
+C        BEGIN BLOCK
+C (0,14)
+c
+         DO I = II1, II2-1
+C (0,15)
+C           BEGIN BLOCK
+C (0,16)
+c
+            FRC1 = FRC1+PHI1(I,J)+PHI1(I+1,J)+PHI1(I,J+1)+PHI1(I+1,J+
+     &      1)+PHI2(I,J)+PHI2(I+1,J)+PHI2(I,J+1)+PHI2(I+1,J+1)
+c
+C           END BLOCK
+         ENDDO
+c
+C        END BLOCK
+      ENDDO
+C (0,19)
+c
+      FRC1 = DXI*DETA*FRC1
+C (0,20)
+c
+      DO K = KI1, KI2
+C (0,21)
+C        BEGIN BLOCK
+C (0,22)
+c     
+         DO I = II1, II2
+C (0,23)
+C           BEGIN BLOCK
+C (0,24)
+c
+            PHI1(I,K) = C2*(U(5,I,JI1,K)-0.50D+00*(U(2,I,JI1,K)**2+U(
+     &      3,I,JI1,K)**2+U(4,I,JI1,K)**2)/U(1,I,JI1,K))
+C (0,25)
+c     
+            PHI2(I,K) = C2*(U(5,I,JI2,K)-0.50D+00*(U(2,I,JI2,K)**2+U(
+     &      3,I,JI2,K)**2+U(4,I,JI2,K)**2)/U(1,I,JI2,K))
+c
+C           END BLOCK
+         ENDDO
+c
+C        END BLOCK
+      ENDDO
+C (0,28)
+c
+      FRC2 = 0.0D+00
+C (0,29)
+c
+      DO K = KI1, KI2-1
+C (0,30)
+C        BEGIN BLOCK
+C (0,31)
+c
+         DO I = II1, II2-1
+C (0,32)
+C           BEGIN BLOCK
+C (0,33)
+c
+            FRC2 = FRC2+PHI1(I,K)+PHI1(I+1,K)+PHI1(I,K+1)+PHI1(I+1,K+
+     &      1)+PHI2(I,K)+PHI2(I+1,K)+PHI2(I,K+1)+PHI2(I+1,K+1)
+c
+C           END BLOCK
+         ENDDO
+c
+C        END BLOCK
+      ENDDO
+C (0,36)
+c
+      FRC2 = DXI*DZETA*FRC2
+C (0,37)
+c
+      DO K = KI1, KI2
+C (0,38)
+C        BEGIN BLOCK
+C (0,39)
+c     
+         DO J = JI1, JI2
+C (0,40)
+C           BEGIN BLOCK
+C (0,41)
+c
+            PHI1(J,K) = C2*(U(5,II1,J,K)-0.50D+00*(U(2,II1,J,K)**2+U(
+     &      3,II1,J,K)**2+U(4,II1,J,K)**2)/U(1,II1,J,K))
+C (0,42)
+c     
+            PHI2(J,K) = C2*(U(5,II2,J,K)-0.50D+00*(U(2,II2,J,K)**2+U(
+     &      3,II2,J,K)**2+U(4,II2,J,K)**2)/U(1,II2,J,K))
+c
+C           END BLOCK
+         ENDDO
+c
+C        END BLOCK
+      ENDDO
+C (0,45)
+c
+      FRC3 = 0.0D+00
+C (0,46)
+c
+      DO K = KI1, KI2-1
+C (0,47)
+C        BEGIN BLOCK
+C (0,48)
+c
+         DO J = JI1, JI2-1
+C (0,49)
+C           BEGIN BLOCK
+C (0,50)
+c
+            FRC3 = FRC3+PHI1(J,K)+PHI1(J+1,K)+PHI1(J,K+1)+PHI1(J+1,K+
+     &      1)+PHI2(J,K)+PHI2(J+1,K)+PHI2(J,K+1)+PHI2(J+1,K+1)
+c
+C           END BLOCK
+         ENDDO
+c
+C        END BLOCK
+      ENDDO
+C (0,53)
+c
+      FRC3 = DETA*DZETA*FRC3
+C (0,54)
+c
+      FRC = 0.25D+00*(FRC1+FRC2+FRC3)
+C (0,55)
+c
+      WRITE (6, 1001) FRC
+c
+C (0,57)
+c
+      RETURN
+C     END BLOCK
+      END
+c
+c
+c
+c
+c
+      SUBROUTINE RHS
+c
+c***compute the right hand sides
+c
+c Author: Sisira Weeratunga
+c         NASA Ames Research Center
+c         (10/25/90)
+c
+c #include 'applu.incl'  
+
+      IMPLICIT REAL*8 (A-H,O-Z)
+c
+      PARAMETER ( C1 = 1.40D+00, C2 = 0.40D+00,
+     $            C3 = 1.00D-01, C4 = 1.00D+00,
+     $            C5 = 1.40D+00 )
+c
+c***grid
+c
+      COMMON/CGCON/ NX, NY, NZ,
+     $              II1, II2, JI1, JI2, KI1, KI2, ITWJ,
+     $              DXI, DETA, DZETA,
+     $              TX1, TX2, TX3,
+     $              TY1, TY2, TY3,
+     $              TZ1, TZ2, TZ3
+c
+c***dissipation
+c
+      COMMON/DISP/ DX1,DX2,DX3,DX4,DX5,
+     $             DY1,DY2,DY3,DY4,DY5,
+     $             DZ1,DZ2,DZ3,DZ4,DZ5,
+     $             DSSP
+c
+c***field variables and residuals
+c
+      COMMON/CVAR/ U(5,33,33,33),
+     $             RSD(5,33,33,33),
+     $             FRCT(5,33,33,33)
+c
+c***output control parameters
+c
+      COMMON/CPRCON/ IPR, IOUT, INORM
+c
+c***newton-raphson iteration control parameters
+c
+      COMMON/CTSCON/ ITMAX, INVERT,
+     $               DT, OMEGA, TOLRSD(5),
+     $               RSDNM(5), ERRNM(5), FRC, TTOTAL
+c
+      COMMON/CJAC/ A(5,5,33,33,33),
+     $             B(5,5,33,33,33),
+     $             C(5,5,33,33,33),
+     $             D(5,5,33,33,33)
+c
+c***coefficients of the exact solution
+c
+      COMMON/CEXACT/ CE(5,13)
+c
+
+
+
+c
+      DIMENSION FLUX(5,33)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+c
+      DO K = 1, NZ
+C (0,3)
+         DO J = 1, NY
+C (0,4)
+            DO I = 1, NX
+C (0,5)
+               DO M = 1, 5
+C (0,6)
+                  RSD(M,I,J,K) = -FRCT(M,I,J,K)
+               ENDDO
+            ENDDO
+         ENDDO
+      ENDDO
+C (0,7)
+c
+c***xi-direction flux differences
+c
+      DO K = 2, NZ-1
+C (0,8)
+C        BEGIN BLOCK
+C (0,9)
+c
+         DO J = 2, NY-1
+C (0,10)
+C           BEGIN BLOCK
+C (0,11)
+c 
+            DO I = 1, NX
+C (0,12)
+C              BEGIN BLOCK
+C (0,13)
+c
+               FLUX(1,I) = U(2,I,J,K)
+C (0,14)
+c
+               U21 = U(2,I,J,K)/U(1,I,J,K)
+C (0,15)
+c
+               Q = 0.50D+00*(U(2,I,J,K)*U(2,I,J,K)+U(3,I,J,K)*U(3,I,J
+     &         ,K)+U(4,I,J,K)*U(4,I,J,K))/U(1,I,J,K)
+C (0,16)
+c
+               FLUX(2,I) = U(2,I,J,K)*U21+C2*(U(5,I,J,K)-Q)
+C (0,17)
+c
+               FLUX(3,I) = U(3,I,J,K)*U21
+C (0,18)
+c
+               FLUX(4,I) = U(4,I,J,K)*U21
+C (0,19)
+c
+               FLUX(5,I) = (C1*U(5,I,J,K)-C2*Q)*U21
+c    
+C              END BLOCK
+            ENDDO
+C (0,21)
+c
+            DO I = 2, NX-1
+C (0,22)
+C              BEGIN BLOCK
+C (0,23)
+c
+               DO M = 1, 5
+C (0,24)
+C                 BEGIN BLOCK
+C (0,25)
+c
+                  RSD(M,I,J,K) = RSD(M,I,J,K)-TX2*(FLUX(M,I+1)-FLUX(M
+     &            ,I-1))
+c
+C                 END BLOCK
+               ENDDO
+c
+C              END BLOCK
+            ENDDO
+C (0,28)
+c
+            DO I = 2, NX
+C (0,29)
+C              BEGIN BLOCK
+C (0,30)
+c
+               TMP = 1.0D+00/U(1,I,J,K)
+C (0,31)
+c
+               U21I = TMP*U(2,I,J,K)
+C (0,32)
+               U31I = TMP*U(3,I,J,K)
+C (0,33)
+               U41I = TMP*U(4,I,J,K)
+C (0,34)
+               U51I = TMP*U(5,I,J,K)
+C (0,35)
+c
+               TMP = 1.0D+00/U(1,I-1,J,K)
+C (0,36)
+c
+               U21IM1 = TMP*U(2,I-1,J,K)
+C (0,37)
+               U31IM1 = TMP*U(3,I-1,J,K)
+C (0,38)
+               U41IM1 = TMP*U(4,I-1,J,K)
+C (0,39)
+               U51IM1 = TMP*U(5,I-1,J,K)
+C (0,40)
+c
+               FLUX(2,I) = 4.0D+00/3.0D+00*TX3*(U21I-U21IM1)
+C (0,41)
+               FLUX(3,I) = TX3*(U31I-U31IM1)
+C (0,42)
+               FLUX(4,I) = TX3*(U41I-U41IM1)
+C (0,43)
+               FLUX(5,I) = 0.50D+00*(1.0D+00-C1*C5)*TX3*(U21I**2+U31I
+     &         **2+U41I**2-(U21IM1**2+U31IM1**2+U41IM1**2))+1.0D+00/
+     &         6.0D+00*TX3*(U21I**2-U21IM1**2)+C1*C5*TX3*(U51I-U51IM1
+     &         )
+c
+C              END BLOCK
+            ENDDO
+C (0,45)
+c
+            DO I = 2, NX-1
+C (0,46)
+C              BEGIN BLOCK
+C (0,47)
+c
+               RSD(1,I,J,K) = RSD(1,I,J,K)+DX1*TX1*(U(1,I-1,J,K)-
+     &         2.0D+00*U(1,I,J,K)+U(1,I+1,J,K))
+C (0,48)
+c
+               RSD(2,I,J,K) = RSD(2,I,J,K)+TX3*C3*C4*(FLUX(2,I+1)-
+     &         FLUX(2,I))+DX2*TX1*(U(2,I-1,J,K)-2.0D+00*U(2,I,J,K)+U(
+     &         2,I+1,J,K))
+C (0,49)
+c
+               RSD(3,I,J,K) = RSD(3,I,J,K)+TX3*C3*C4*(FLUX(3,I+1)-
+     &         FLUX(3,I))+DX3*TX1*(U(3,I-1,J,K)-2.0D+00*U(3,I,J,K)+U(
+     &         3,I+1,J,K))
+C (0,50)
+c
+               RSD(4,I,J,K) = RSD(4,I,J,K)+TX3*C3*C4*(FLUX(4,I+1)-
+     &         FLUX(4,I))+DX4*TX1*(U(4,I-1,J,K)-2.0D+00*U(4,I,J,K)+U(
+     &         4,I+1,J,K))
+C (0,51)
+c
+               RSD(5,I,J,K) = RSD(5,I,J,K)+TX3*C3*C4*(FLUX(5,I+1)-
+     &         FLUX(5,I))+DX5*TX1*(U(5,I-1,J,K)-2.0D+00*U(5,I,J,K)+U(
+     &         5,I+1,J,K))
+c
+C              END BLOCK
+            ENDDO
+C (0,53)
+c
+c***Fourth-order dissipation
+c
+            DO M = 1, 5
+C (0,54)
+C              BEGIN BLOCK
+C (0,55)
+c
+               RSD(M,2,J,K) = RSD(M,2,J,K)-DSSP*(5.0D+00*U(M,2,J,K)-
+     &         4.0D+00*U(M,3,J,K)+U(M,4,J,K))
+C (0,56)
+c
+               RSD(M,3,J,K) = RSD(M,3,J,K)-DSSP*((-4.0D+00)*U(M,2,J,K
+     &         )+6.0D+00*U(M,3,J,K)-4.0D+00*U(M,4,J,K)+U(M,5,J,K))
+c
+C              END BLOCK
+            ENDDO
+C (0,58)
+c
+            DO I = 4, NX-3
+C (0,59)
+C              BEGIN BLOCK
+C (0,60)
+c
+               DO M = 1, 5
+C (0,61)
+C                 BEGIN BLOCK
+C (0,62)
+c
+                  RSD(M,I,J,K) = RSD(M,I,J,K)-DSSP*(U(M,I-2,J,K)-
+     &            4.0D+00*U(M,I-1,J,K)+6.0D+00*U(M,I,J,K)-4.0D+00*U(M
+     &            ,I+1,J,K)+U(M,I+2,J,K))
+c
+C                 END BLOCK
+               ENDDO
+c
+C              END BLOCK
+            ENDDO
+C (0,65)
+c
+            DO M = 1, 5
+C (0,66)
+C              BEGIN BLOCK
+C (0,67)
+c
+               RSD(M,NX-2,J,K) = RSD(M,NX-2,J,K)-DSSP*(U(M,NX-4,J,K)-
+     &         4.0D+00*U(M,NX-3,J,K)+6.0D+00*U(M,NX-2,J,K)-4.0D+00*U(
+     &         M,NX-1,J,K))
+C (0,68)
+c
+               RSD(M,NX-1,J,K) = RSD(M,NX-1,J,K)-DSSP*(U(M,NX-3,J,K)-
+     &         4.0D+00*U(M,NX-2,J,K)+5.0D+00*U(M,NX-1,J,K))
+c
+C              END BLOCK
+            ENDDO
+c
+C           END BLOCK
+         ENDDO
+c
+C        END BLOCK
+      ENDDO
+C (0,72)
+c
+c***eta-direction flux differences
+c
+      DO K = 2, NZ-1
+C (0,73)
+C        BEGIN BLOCK
+C (0,74)
+c
+         DO I = 2, NX-1
+C (0,75)
+C           BEGIN BLOCK
+C (0,76)
+c 
+            DO J = 1, NY
+C (0,77)
+C              BEGIN BLOCK
+C (0,78)
+c
+               FLUX(1,J) = U(3,I,J,K)
+C (0,79)
+c
+               U31 = U(3,I,J,K)/U(1,I,J,K)
+C (0,80)
+c
+               Q = 0.50D+00*(U(2,I,J,K)*U(2,I,J,K)+U(3,I,J,K)*U(3,I,J
+     &         ,K)+U(4,I,J,K)*U(4,I,J,K))/U(1,I,J,K)
+C (0,81)
+c
+               FLUX(2,J) = U(2,I,J,K)*U31
+C (0,82)
+c
+               FLUX(3,J) = U(3,I,J,K)*U31+C2*(U(5,I,J,K)-Q)
+C (0,83)
+c
+               FLUX(4,J) = U(4,I,J,K)*U31
+C (0,84)
+c
+               FLUX(5,J) = (C1*U(5,I,J,K)-C2*Q)*U31
+c    
+C              END BLOCK
+            ENDDO
+C (0,86)
+c
+            DO J = 2, NY-1
+C (0,87)
+C              BEGIN BLOCK
+C (0,88)
+c
+               DO M = 1, 5
+C (0,89)
+C                 BEGIN BLOCK
+C (0,90)
+c
+                  RSD(M,I,J,K) = RSD(M,I,J,K)-TY2*(FLUX(M,J+1)-FLUX(M
+     &            ,J-1))
+c
+C                 END BLOCK
+               ENDDO
+c
+C              END BLOCK
+            ENDDO
+C (0,93)
+c
+            DO J = 2, NY
+C (0,94)
+C              BEGIN BLOCK
+C (0,95)
+c
+               TMP = 1.0D+00/U(1,I,J,K)
+C (0,96)
+c
+               U21J = TMP*U(2,I,J,K)
+C (0,97)
+               U31J = TMP*U(3,I,J,K)
+C (0,98)
+               U41J = TMP*U(4,I,J,K)
+C (0,99)
+               U51J = TMP*U(5,I,J,K)
+C (0,100)
+c
+               TMP = 1.0D+00/U(1,I,J-1,K)
+C (0,101)
+c
+               U21JM1 = TMP*U(2,I,J-1,K)
+C (0,102)
+               U31JM1 = TMP*U(3,I,J-1,K)
+C (0,103)
+               U41JM1 = TMP*U(4,I,J-1,K)
+C (0,104)
+               U51JM1 = TMP*U(5,I,J-1,K)
+C (0,105)
+c
+               FLUX(2,J) = TY3*(U21J-U21JM1)
+C (0,106)
+               FLUX(3,J) = 4.0D+00/3.0D+00*TY3*(U31J-U31JM1)
+C (0,107)
+               FLUX(4,J) = TY3*(U41J-U41JM1)
+C (0,108)
+               FLUX(5,J) = 0.50D+00*(1.0D+00-C1*C5)*TY3*(U21J**2+U31J
+     &         **2+U41J**2-(U21JM1**2+U31JM1**2+U41JM1**2))+1.0D+00/
+     &         6.0D+00*TY3*(U31J**2-U31JM1**2)+C1*C5*TY3*(U51J-U51JM1
+     &         )
+c
+C              END BLOCK
+            ENDDO
+C (0,110)
+c
+            DO J = 2, NY-1
+C (0,111)
+C              BEGIN BLOCK
+C (0,112)
+c
+               RSD(1,I,J,K) = RSD(1,I,J,K)+DY1*TY1*(U(1,I,J-1,K)-
+     &         2.0D+00*U(1,I,J,K)+U(1,I,J+1,K))
+C (0,113)
+c
+               RSD(2,I,J,K) = RSD(2,I,J,K)+TY3*C3*C4*(FLUX(2,J+1)-
+     &         FLUX(2,J))+DY2*TY1*(U(2,I,J-1,K)-2.0D+00*U(2,I,J,K)+U(
+     &         2,I,J+1,K))
+C (0,114)
+c
+               RSD(3,I,J,K) = RSD(3,I,J,K)+TY3*C3*C4*(FLUX(3,J+1)-
+     &         FLUX(3,J))+DY3*TY1*(U(3,I,J-1,K)-2.0D+00*U(3,I,J,K)+U(
+     &         3,I,J+1,K))
+C (0,115)
+c
+               RSD(4,I,J,K) = RSD(4,I,J,K)+TY3*C3*C4*(FLUX(4,J+1)-
+     &         FLUX(4,J))+DY4*TY1*(U(4,I,J-1,K)-2.0D+00*U(4,I,J,K)+U(
+     &         4,I,J+1,K))
+C (0,116)
+c
+               RSD(5,I,J,K) = RSD(5,I,J,K)+TY3*C3*C4*(FLUX(5,J+1)-
+     &         FLUX(5,J))+DY5*TY1*(U(5,I,J-1,K)-2.0D+00*U(5,I,J,K)+U(
+     &         5,I,J+1,K))
+c
+C              END BLOCK
+            ENDDO
+C (0,118)
+c
+c***fourth-order dissipation
+c
+            DO M = 1, 5
+C (0,119)
+C              BEGIN BLOCK
+C (0,120)
+c
+               RSD(M,I,2,K) = RSD(M,I,2,K)-DSSP*(5.0D+00*U(M,I,2,K)-
+     &         4.0D+00*U(M,I,3,K)+U(M,I,4,K))
+C (0,121)
+c
+               RSD(M,I,3,K) = RSD(M,I,3,K)-DSSP*((-4.0D+00)*U(M,I,2,K
+     &         )+6.0D+00*U(M,I,3,K)-4.0D+00*U(M,I,4,K)+U(M,I,5,K))
+c
+C              END BLOCK
+            ENDDO
+C (0,123)
+c
+            DO J = 4, NY-3
+C (0,124)
+C              BEGIN BLOCK
+C (0,125)
+c
+               DO M = 1, 5
+C (0,126)
+C                 BEGIN BLOCK
+C (0,127)
+c
+                  RSD(M,I,J,K) = RSD(M,I,J,K)-DSSP*(U(M,I,J-2,K)-
+     &            4.0D+00*U(M,I,J-1,K)+6.0D+00*U(M,I,J,K)-4.0D+00*U(M
+     &            ,I,J+1,K)+U(M,I,J+2,K))
+c
+C                 END BLOCK
+               ENDDO
+c
+C              END BLOCK
+            ENDDO
+C (0,130)
+c
+            DO M = 1, 5
+C (0,131)
+C              BEGIN BLOCK
+C (0,132)
+c
+               RSD(M,I,NY-2,K) = RSD(M,I,NY-2,K)-DSSP*(U(M,I,NY-4,K)-
+     &         4.0D+00*U(M,I,NY-3,K)+6.0D+00*U(M,I,NY-2,K)-4.0D+00*U(
+     &         M,I,NY-1,K))
+C (0,133)
+c
+               RSD(M,I,NY-1,K) = RSD(M,I,NY-1,K)-DSSP*(U(M,I,NY-3,K)-
+     &         4.0D+00*U(M,I,NY-2,K)+5.0D+00*U(M,I,NY-1,K))
+c
+C              END BLOCK
+            ENDDO
+c
+C           END BLOCK
+         ENDDO
+c
+C        END BLOCK
+      ENDDO
+C (0,137)
+c
+c***zeta-direction flux differences
+c
+      DO J = 2, NY-1
+C (0,138)
+C        BEGIN BLOCK
+C (0,139)
+c
+         DO I = 2, NX-1
+C (0,140)
+C           BEGIN BLOCK
+C (0,141)
+c
+            DO K = 1, NZ
+C (0,142)
+C              BEGIN BLOCK
+C (0,143)
+c
+               FLUX(1,K) = U(4,I,J,K)
+C (0,144)
+c
+               U41 = U(4,I,J,K)/U(1,I,J,K)
+C (0,145)
+c
+               Q = 0.50D+00*(U(2,I,J,K)*U(2,I,J,K)+U(3,I,J,K)*U(3,I,J
+     &         ,K)+U(4,I,J,K)*U(4,I,J,K))/U(1,I,J,K)
+C (0,146)
+c
+               FLUX(2,K) = U(2,I,J,K)*U41
+C (0,147)
+c
+               FLUX(3,K) = U(3,I,J,K)*U41
+C (0,148)
+c
+               FLUX(4,K) = U(4,I,J,K)*U41+C2*(U(5,I,J,K)-Q)
+C (0,149)
+c
+               FLUX(5,K) = (C1*U(5,I,J,K)-C2*Q)*U41
+c    
+C              END BLOCK
+            ENDDO
+C (0,151)
+c
+            DO K = 2, NZ-1
+C (0,152)
+C              BEGIN BLOCK
+C (0,153)
+c
+               DO M = 1, 5
+C (0,154)
+C                 BEGIN BLOCK
+C (0,155)
+c
+                  RSD(M,I,J,K) = RSD(M,I,J,K)-TZ2*(FLUX(M,K+1)-FLUX(M
+     &            ,K-1))
+c
+C                 END BLOCK
+               ENDDO
+c
+C              END BLOCK
+            ENDDO
+C (0,158)
+c
+            DO K = 2, NZ
+C (0,159)
+C              BEGIN BLOCK
+C (0,160)
+c
+               TMP = 1.0D+00/U(1,I,J,K)
+C (0,161)
+c
+               U21K = TMP*U(2,I,J,K)
+C (0,162)
+               U31K = TMP*U(3,I,J,K)
+C (0,163)
+               U41K = TMP*U(4,I,J,K)
+C (0,164)
+               U51K = TMP*U(5,I,J,K)
+C (0,165)
+c
+               TMP = 1.0D+00/U(1,I,J,K-1)
+C (0,166)
+c
+               U21KM1 = TMP*U(2,I,J,K-1)
+C (0,167)
+               U31KM1 = TMP*U(3,I,J,K-1)
+C (0,168)
+               U41KM1 = TMP*U(4,I,J,K-1)
+C (0,169)
+               U51KM1 = TMP*U(5,I,J,K-1)
+C (0,170)
+c
+               FLUX(2,K) = TZ3*(U21K-U21KM1)
+C (0,171)
+               FLUX(3,K) = TZ3*(U31K-U31KM1)
+C (0,172)
+               FLUX(4,K) = 4.0D+00/3.0D+00*TZ3*(U41K-U41KM1)
+C (0,173)
+               FLUX(5,K) = 0.50D+00*(1.0D+00-C1*C5)*TZ3*(U21K**2+U31K
+     &         **2+U41K**2-(U21KM1**2+U31KM1**2+U41KM1**2))+1.0D+00/
+     &         6.0D+00*TZ3*(U41K**2-U41KM1**2)+C1*C5*TZ3*(U51K-U51KM1
+     &         )
+c
+C              END BLOCK
+            ENDDO
+C (0,175)
+c
+            DO K = 2, NZ-1
+C (0,176)
+C              BEGIN BLOCK
+C (0,177)
+c
+               RSD(1,I,J,K) = RSD(1,I,J,K)+DZ1*TZ1*(U(1,I,J,K-1)-
+     &         2.0D+00*U(1,I,J,K)+U(1,I,J,K+1))
+C (0,178)
+c
+               RSD(2,I,J,K) = RSD(2,I,J,K)+TZ3*C3*C4*(FLUX(2,K+1)-
+     &         FLUX(2,K))+DZ2*TZ1*(U(2,I,J,K-1)-2.0D+00*U(2,I,J,K)+U(
+     &         2,I,J,K+1))
+C (0,179)
+c
+               RSD(3,I,J,K) = RSD(3,I,J,K)+TZ3*C3*C4*(FLUX(3,K+1)-
+     &         FLUX(3,K))+DZ3*TZ1*(U(3,I,J,K-1)-2.0D+00*U(3,I,J,K)+U(
+     &         3,I,J,K+1))
+C (0,180)
+c
+               RSD(4,I,J,K) = RSD(4,I,J,K)+TZ3*C3*C4*(FLUX(4,K+1)-
+     &         FLUX(4,K))+DZ4*TZ1*(U(4,I,J,K-1)-2.0D+00*U(4,I,J,K)+U(
+     &         4,I,J,K+1))
+C (0,181)
+c
+               RSD(5,I,J,K) = RSD(5,I,J,K)+TZ3*C3*C4*(FLUX(5,K+1)-
+     &         FLUX(5,K))+DZ5*TZ1*(U(5,I,J,K-1)-2.0D+00*U(5,I,J,K)+U(
+     &         5,I,J,K+1))
+c
+C              END BLOCK
+            ENDDO
+C (0,183)
+c
+c***fourth-order dissipation
+c
+            DO M = 1, 5
+C (0,184)
+C              BEGIN BLOCK
+C (0,185)
+c
+               RSD(M,I,J,2) = RSD(M,I,J,2)-DSSP*(5.0D+00*U(M,I,J,2)-
+     &         4.0D+00*U(M,I,J,3)+U(M,I,J,4))
+C (0,186)
+c
+               RSD(M,I,J,3) = RSD(M,I,J,3)-DSSP*((-4.0D+00)*U(M,I,J,2
+     &         )+6.0D+00*U(M,I,J,3)-4.0D+00*U(M,I,J,4)+U(M,I,J,5))
+c
+C              END BLOCK
+            ENDDO
+C (0,188)
+c
+            DO K = 4, NZ-3
+C (0,189)
+C              BEGIN BLOCK
+C (0,190)
+c
+               DO M = 1, 5
+C (0,191)
+C                 BEGIN BLOCK
+C (0,192)
+c
+                  RSD(M,I,J,K) = RSD(M,I,J,K)-DSSP*(U(M,I,J,K-2)-
+     &            4.0D+00*U(M,I,J,K-1)+6.0D+00*U(M,I,J,K)-4.0D+00*U(M
+     &            ,I,J,K+1)+U(M,I,J,K+2))
+c
+C                 END BLOCK
+               ENDDO
+c
+C              END BLOCK
+            ENDDO
+C (0,195)
+c
+            DO M = 1, 5
+C (0,196)
+C              BEGIN BLOCK
+C (0,197)
+c
+               RSD(M,I,J,NZ-2) = RSD(M,I,J,NZ-2)-DSSP*(U(M,I,J,NZ-4)-
+     &         4.0D+00*U(M,I,J,NZ-3)+6.0D+00*U(M,I,J,NZ-2)-4.0D+00*U(
+     &         M,I,J,NZ-1))
+C (0,198)
+c
+               RSD(M,I,J,NZ-1) = RSD(M,I,J,NZ-1)-DSSP*(U(M,I,J,NZ-3)-
+     &         4.0D+00*U(M,I,J,NZ-2)+5.0D+00*U(M,I,J,NZ-1))
+c
+C              END BLOCK
+            ENDDO
+c
+C           END BLOCK
+         ENDDO
+c
+C        END BLOCK
+      ENDDO
+C (0,202)
+c
+      RETURN
+C     END BLOCK
+      END
+c
+c
+c
+c
+c
+      SUBROUTINE SSOR
+c
+c***to perform pseudo-time stepping SSOR iterations
+c   for five nonlinear pde's.
+c
+c Author: Sisira Weeratunga
+c         NASA Ames Research Center
+c         (10/25/90)
+c
+c #include 'applu.incl'  
+
+      IMPLICIT REAL*8 (A-H,O-Z)
+c
+      PARAMETER ( C1 = 1.40D+00, C2 = 0.40D+00,
+     $            C3 = 1.00D-01, C4 = 1.00D+00,
+     $            C5 = 1.40D+00 )
+c
+c***grid
+c
+      COMMON/CGCON/ NX, NY, NZ,
+     $              II1, II2, JI1, JI2, KI1, KI2, ITWJ,
+     $              DXI, DETA, DZETA,
+     $              TX1, TX2, TX3,
+     $              TY1, TY2, TY3,
+     $              TZ1, TZ2, TZ3
+c
+c***dissipation
+c
+      COMMON/DISP/ DX1,DX2,DX3,DX4,DX5,
+     $             DY1,DY2,DY3,DY4,DY5,
+     $             DZ1,DZ2,DZ3,DZ4,DZ5,
+     $             DSSP
+c
+c***field variables and residuals
+c
+      COMMON/CVAR/ U(5,33,33,33),
+     $             RSD(5,33,33,33),
+     $             FRCT(5,33,33,33)
+c
+c***output control parameters
+c
+      COMMON/CPRCON/ IPR, IOUT, INORM
+c
+c***newton-raphson iteration control parameters
+c
+      COMMON/CTSCON/ ITMAX, INVERT,
+     $               DT, OMEGA, TOLRSD(5),
+     $               RSDNM(5), ERRNM(5), FRC, TTOTAL
+c
+      COMMON/CJAC/ A(5,5,33,33,33),
+     $             B(5,5,33,33,33),
+     $             C(5,5,33,33,33),
+     $             D(5,5,33,33,33)
+c
+c***coefficients of the exact solution
+c
+      COMMON/CEXACT/ CE(5,13)
+c
+
+
+
+c
+      DIMENSION IDMAX(5), JDMAX(5), KDMAX(5),
+     $          IMAX(5), JMAX(5), KMAX(5),
+     $          DELUNM(5)
+      PARAMETER ( ONE = 1.0D+00 )
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+c     
+1001  FORMAT(1X/5X,'pseudo-time SSOR iteration no.=',I4/)
+C (0,3)
+c
+1002  FORMAT(1X/1X,'max-norm of SSOR-iteration correction ','for first p
+     x 
+     &de  = ',1PE12.5/,55X,'(',I4,',',I4,',',I4,')'/,1X,'max-norm of SSO
+     x 
+     &R-iteration correction ','for second pde = ',1PE12.5/,55X,'(',I4,'
+     x 
+     &,',I4,',',I4,')'/,1X,'max-norm of SSOR-iteration correction ','for
+     x 
+     & third pde  = ',1PE12.5/,55X,'(',I4,',',I4,',',I4,')'/,1X,'max-nor
+     x 
+     &m of SSOR-iteration correction ','for fourth pde = ',1PE12.5/,55X,
+     x 
+     &'(',I4,',',I4,',',I4,')'/,1X,'max-norm of SSOR-iteration correctio
+     x 
+     &n ','for fifth pde  = ',1PE12.5/,55X,'(',I4,',',I4,',',I4,')')
+C (0,4)
+c
+1003  FORMAT(1X/1X,'max-norm of steady-state residual for ','first pde  
+     x 
+     &= ',1PE12.5/,51X,'(',I4,',',I4,',',I4,')'/,1X,'max-norm of steady-
+     x 
+     &state residual for ','second pde = ',1PE12.5/,51X,'(',I4,',',I4,',
+     x 
+     &',I4,')'/,1X,'max-norm of steady-state residual for ','third pde  
+     x 
+     &= ',1PE12.5/,51X,'(',I4,',',I4,',',I4,')'/,1X,'max-norm of steady-
+     x 
+     &state residual for ','fourth pde = ',1PE12.5/,51X,'(',I4,',',I4,',
+     x 
+     &',I4,')'/,1X,'max-norm of steady-state residual for ','fifth pde  
+     x 
+     &= ',1PE12.5/,51X,'(',I4,',',I4,',',I4,')')
+C (0,5)
+c
+1004  FORMAT(1X/1X,'convergence was achieved after ',I4,' pseudo-time st
+     x 
+     &eps')
+C (0,6)
+c
+1006  FORMAT(1X/1X,'RMS-norm of SSOR-iteration correction ','for first p
+     x 
+     &de  = ',1PE12.5/,1X,'RMS-norm of SSOR-iteration correction ','for 
+     x 
+     &second pde = ',1PE12.5/,1X,'RMS-norm of SSOR-iteration correction 
+     x 
+     &','for third pde  = ',1PE12.5/,1X,'RMS-norm of SSOR-iteration corr
+     x 
+     &ection ','for fourth pde = ',1PE12.5/,1X,'RMS-norm of SSOR-iterati
+     x 
+     &on correction ','for fifth pde  = ',1PE12.5)
+C (0,7)
+c
+1007  FORMAT(1X/1X,'RMS-norm of steady-state residual for ','first pde  
+     x 
+     &= ',1PE12.5/,1X,'RMS-norm of steady-state residual for ','second p
+     x 
+     &de = ',1PE12.5/,1X,'RMS-norm of steady-state residual for ','third
+     x 
+     & pde  = ',1PE12.5/,1X,'RMS-norm of steady-state residual for ','fo
+     x 
+     &urth pde = ',1PE12.5/,1X,'RMS-norm of steady-state residual for ',
+     x 
+     &'fifth pde  = ',1PE12.5)
+C (0,8)
+c
+      LNORM = 2
+C (0,9)
+c
+c***begin pseudo-time stepping iterations
+c
+      TMP = 1.0D+00/(OMEGA*(2.0D+00-OMEGA))
+C (0,10)
+c
+c***compute the steady-state residuals
+c
+      CALL RHS
+C (0,11)
+c
+c***compute the max-norms of newton iteration residuals
+c
+      IF (LNORM.EQ.1) THEN
+C (0,12)
+C        BEGIN BLOCK
+C (0,13)
+c
+         CALL MAXNORM(33, 33, 33, NX, NY, NZ, IMAX, JMAX, KMAX, RSD, 
+     &   RSDNM)
+C (0,14)
+c
+         IF (IPR.EQ.1) THEN
+C (0,15)
+C           BEGIN BLOCK
+C (0,16)
+c
+            WRITE (6, *) '          Initial residual norms'
+C (0,17)
+            WRITE (6, *) 
+C (0,18)
+            WRITE (6, 1003) (RSDNM(M),IMAX(M),JMAX(M),KMAX(M), M = 1
+     &      , 5)
+c
+C           END BLOCK
+         ELSE
+C (0,20)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+c
+C        END BLOCK
+      ELSE
+C (0,22)
+         IF (LNORM.EQ.2) THEN
+C (0,23)
+C           BEGIN BLOCK
+C (0,24)
+c
+            CALL L2NORM(33, 33, 33, NX, NY, NZ, RSD, RSDNM)
+C (0,25)
+c
+            IF (IPR.EQ.1) THEN
+C (0,26)
+C              BEGIN BLOCK
+C (0,27)
+c
+               WRITE (6, *) '          Initial residual norms'
+C (0,28)
+               WRITE (6, *) 
+C (0,29)
+               WRITE (6, 1007) (RSDNM(M), M = 1, 5)
+c     
+C              END BLOCK
+            ELSE
+C (0,31)
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+c     
+C           END BLOCK
+         ELSE
+C (0,33)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+      ENDIF
+C (0,34)
+      ISTEP = 1
+C (0,35)
+C     BEGIN UNSTRUCTURED
+99997 CONTINUE
+C (1,1)
+c     
+C     DO loop  with exit had to be desugared
+      IF (ISTEP.GT.ITMAX) RETURN
+C (6,1)
+C     BEGIN BLOCK
+C (6,2)
+c
+      IF (MOD(ISTEP, INORM).EQ.0.AND.IPR.EQ.1) THEN
+C (6,3)
+C        BEGIN BLOCK
+C (6,4)
+c
+         WRITE (6, 1001) ISTEP
+c
+C        END BLOCK
+      ELSE
+C (6,6)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (6,7)
+c
+c***perform SSOR iteration
+c
+      DO K = 2, NZ-1
+C (6,8)
+         DO J = 2, NY-1
+C (6,9)
+            DO I = 2, NX-1
+C (6,10)
+               DO M = 1, 5
+C (6,11)
+C                 BEGIN BLOCK
+C (6,12)
+c
+                  RSD(M,I,J,K) = DT*RSD(M,I,J,K)
+c     
+C                 END BLOCK
+               ENDDO
+            ENDDO
+         ENDDO
+      ENDDO
+C (6,14)
+c
+c***form the lower triangular part of the jacobian matrix
+c
+      CALL JACLD
+C (6,15)
+c
+c***perform the lower triangular solution
+c
+      CALL BLTS(33, 33, 33, NX, NY, NZ, OMEGA, RSD, A, B, C, D)
+C (6,16)
+c
+c***form the strictly upper triangular part of the jacobian matrix
+c
+      CALL JACU
+C (6,17)
+c
+c***perform the upper triangular solution
+c
+      CALL BUTS(33, 33, 33, NX, NY, NZ, OMEGA, RSD, D, A, B, C)
+C (6,18)
+c
+c***update the variables
+c
+      DO K = 2, NZ-1
+C (6,19)
+         DO J = 2, NY-1
+C (6,20)
+            DO I = 2, NX-1
+C (6,21)
+               DO M = 1, 5
+C (6,22)
+C                 BEGIN BLOCK
+C (6,23)
+c
+                  U(M,I,J,K) = U(M,I,J,K)+TMP*RSD(M,I,J,K)
+c
+C                 END BLOCK
+               ENDDO
+            ENDDO
+         ENDDO
+      ENDDO
+C (6,25)
+c
+c***compute the max-norms of newton iteration corrections
+c
+      IF (MOD(ISTEP, INORM).EQ.0) THEN
+C (6,26)
+C        BEGIN BLOCK
+C (6,27)
+c
+         IF (LNORM.EQ.1) THEN
+C (6,28)
+C           BEGIN BLOCK
+C (6,29)
+c     
+            CALL MAXNORM(33, 33, 33, NX, NY, NZ, IDMAX, JDMAX, KDMAX
+     &      , RSD, DELUNM)
+C (6,30)
+c
+            IF (IPR.EQ.1) THEN
+C (6,31)
+C              BEGIN BLOCK
+C (6,32)
+c
+               WRITE (6, 1002) (DELUNM(M),IDMAX(M),JDMAX(M),KDMAX(M)
+     &         , M = 1, 5)
+c
+C              END BLOCK
+            ELSE
+C (6,34)
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+c
+C           END BLOCK
+         ELSE
+C (6,36)
+            IF (LNORM.EQ.2) THEN
+C (6,37)
+C              BEGIN BLOCK
+C (6,38)
+c
+               CALL L2NORM(33, 33, 33, NX, NY, NZ, RSD, DELUNM)
+C (6,39)
+c
+               IF (IPR.EQ.1) THEN
+C (6,40)
+C                 BEGIN BLOCK
+C (6,41)
+c
+                  WRITE (6, 1006) (DELUNM(M), M = 1, 5)
+c
+C                 END BLOCK
+               ELSE
+C (6,43)
+C                 BEGIN BLOCK
+C                 END BLOCK
+               ENDIF
+c
+C              END BLOCK
+            ELSE
+C (6,45)
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+         ENDIF
+c
+C        END BLOCK
+      ELSE
+C (6,47)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (6,48)
+c
+c***compute the steady-state residuals
+c
+      CALL RHS
+C (6,49)
+c
+c***compute the max-norms of newton iteration residuals
+c
+      IF (MOD(ISTEP, INORM).EQ.0.OR.ISTEP.EQ.ITMAX) THEN
+C (6,50)
+C        BEGIN BLOCK
+C (6,51)
+c
+         IF (LNORM.EQ.1) THEN
+C (6,52)
+C           BEGIN BLOCK
+C (6,53)
+c
+            CALL MAXNORM(33, 33, 33, NX, NY, NZ, IMAX, JMAX, KMAX, 
+     &      RSD, RSDNM)
+C (6,54)
+c
+            IF (IPR.EQ.1) THEN
+C (6,55)
+C              BEGIN BLOCK
+C (6,56)
+c
+               WRITE (6, 1003) (RSDNM(M),IMAX(M),JMAX(M),KMAX(M), M
+     &          = 1, 5)
+c
+C              END BLOCK
+            ELSE
+C (6,58)
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+c
+C           END BLOCK
+         ELSE
+C (6,60)
+            IF (LNORM.EQ.2) THEN
+C (6,61)
+C              BEGIN BLOCK
+C (6,62)
+c
+               CALL L2NORM(33, 33, 33, NX, NY, NZ, RSD, RSDNM)
+C (6,63)
+c
+               IF (IPR.EQ.1) THEN
+C (6,64)
+C                 BEGIN BLOCK
+C (6,65)
+c
+                  WRITE (6, 1007) (RSDNM(M), M = 1, 5)
+c
+C                 END BLOCK
+               ELSE
+C (6,67)
+C                 BEGIN BLOCK
+C                 END BLOCK
+               ENDIF
+c
+C              END BLOCK
+            ELSE
+C (6,69)
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+         ENDIF
+c
+C        END BLOCK
+      ELSE
+C (6,71)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C     END BLOCK
+C (4,1)
+c
+c***check the newton-iteration residuals against the tolerance levels
+c
+      IF (RSDNM(1).LT.TOLRSD(1).AND.RSDNM(2).LT.TOLRSD(2).AND.RSDNM(3
+     &).LT.TOLRSD(3).AND.RSDNM(4).LT.TOLRSD(4).AND.RSDNM(5).LT.TOLRSD
+     &(5)) GOTO 99998
+C (5,1)
+c
+      ISTEP = ISTEP+1
+      GOTO 99997
+99998 CONTINUE
+C (3,1)
+c
+      WRITE (6, 1004) ISTEP
+C (2,1)
+c     
+c
+      RETURN
+C     END UNSTRUCTURED
+C     END BLOCK
+      END
+c
+c
+c
+c
+c
+      SUBROUTINE MAXNORM ( LDX, LDY, LDZ,
+     $                     NX, NY, NZ,
+     $                     IMAX, JMAX, KMAX, V, VNM )
+c
+c***compute the max-norm of vector v.
+c
+c Author: Sisira Weeratunga
+c         NASA Ames Research Center
+c         (10/25/90)
+c
+      IMPLICIT REAL*8 (A-H,O-Z)
+      DIMENSION V(5,LDX,LDY,33),
+     $          VNM(5), IMAX(5), JMAX(5), KMAX(5)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+c
+      DO M = 1, 5
+C (0,3)
+C        BEGIN BLOCK
+C (0,4)
+c
+         VNM(M) = -1.0D+10
+c
+C        END BLOCK
+      ENDDO
+C (0,6)
+c
+      DO K = 1, NZ
+C (0,7)
+C        BEGIN BLOCK
+C (0,8)
+         DO J = 1, NY
+C (0,9)
+C           BEGIN BLOCK
+C (0,10)
+            DO I = 1, NX
+C (0,11)
+C              BEGIN BLOCK
+C (0,12)
+c
+               DO M = 1, 5
+C (0,13)
+C                 BEGIN BLOCK
+C (0,14)
+c
+                  T1 = ABS(V(M,I,J,K))
+C (0,15)
+c
+                  IF (VNM(M).LT.T1) THEN
+C (0,16)
+C                    BEGIN BLOCK
+C (0,17)
+                     VNM(M) = T1
+C (0,18)
+                     IMAX(M) = I
+C (0,19)
+                     JMAX(M) = J
+C (0,20)
+                     KMAX(M) = K
+C                    END BLOCK
+                  ELSE
+C (0,21)
+C                    BEGIN BLOCK
+C                    END BLOCK
+                  ENDIF
+c
+C                 END BLOCK
+               ENDDO
+c
+C              END BLOCK
+            ENDDO
+c
+C           END BLOCK
+         ENDDO
+c
+C        END BLOCK
+      ENDDO
+C (0,26)
+c
+      RETURN
+C     END BLOCK
+      END
+c
+c
+c
+c
+c
+      SUBROUTINE L2NORM ( LDX, LDY, LDZ,
+     $                    NX, NY, NZ,
+     $                    V, SUM )
+c
+c***to compute the l2-norm of vector v.
+c
+c Author: Sisira Weeratunga
+c         NASA Ames Research Center
+c         (10/25/90)
+c
+      IMPLICIT REAL*8 (A-H,O-Z)
+      DIMENSION V( 5, LDX, LDY,33),
+     $          SUM(5)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+c
+      DO M = 1, 5
+C (0,3)
+C        BEGIN BLOCK
+C (0,4)
+c
+         SUM(M) = 0.0D+00
+c
+C        END BLOCK
+      ENDDO
+C (0,6)
+c
+      DO K = 2, NZ-1
+C (0,7)
+         DO J = 2, NY-1
+C (0,8)
+            DO I = 2, NX-1
+C (0,9)
+C              BEGIN BLOCK
+C (0,10)
+c
+               DO M = 1, 5
+C (0,11)
+                  SUM(M) = SUM(M)+V(M,I,J,K)*V(M,I,J,K)
+               ENDDO
+c
+C              END BLOCK
+            ENDDO
+         ENDDO
+      ENDDO
+C (0,13)
+c
+      DO M = 1, 5
+C (0,14)
+C        BEGIN BLOCK
+C (0,15)
+c
+         SUM(M) = SQRT(SUM(M)/((NX-2)*(NY-2)*(NZ-2)))
+c
+C        END BLOCK
+      ENDDO
+C (0,17)
+c
+      RETURN
+C     END BLOCK
+      END
+c
+c
+c
+c
+c
+      SUBROUTINE VERIFY ( XCR, XCE, XCI )
+c
+c***verification routine
+c
+c Author: Sisira Weeratunga 
+c         NASA Ames Research Center
+c         (10/25/90)
+c
+c #include 'applu.incl'  
+
+      IMPLICIT REAL*8 (A-H,O-Z)
+c
+      PARAMETER ( C1 = 1.40D+00, C2 = 0.40D+00,
+     $            C3 = 1.00D-01, C4 = 1.00D+00,
+     $            C5 = 1.40D+00 )
+c
+c***grid
+c
+      COMMON/CGCON/ NX, NY, NZ,
+     $              II1, II2, JI1, JI2, KI1, KI2, ITWJ,
+     $              DXI, DETA, DZETA,
+     $              TX1, TX2, TX3,
+     $              TY1, TY2, TY3,
+     $              TZ1, TZ2, TZ3
+c
+c***dissipation
+c
+      COMMON/DISP/ DX1,DX2,DX3,DX4,DX5,
+     $             DY1,DY2,DY3,DY4,DY5,
+     $             DZ1,DZ2,DZ3,DZ4,DZ5,
+     $             DSSP
+c
+c***field variables and residuals
+c
+      COMMON/CVAR/ U(5,33,33,33),
+     $             RSD(5,33,33,33),
+     $             FRCT(5,33,33,33)
+c
+c***output control parameters
+c
+      COMMON/CPRCON/ IPR, IOUT, INORM
+c
+c***newton-raphson iteration control parameters
+c
+      COMMON/CTSCON/ ITMAX, INVERT,
+     $               DT, OMEGA, TOLRSD(5),
+     $               RSDNM(5), ERRNM(5), FRC, TTOTAL
+c
+      COMMON/CJAC/ A(5,5,33,33,33),
+     $             B(5,5,33,33,33),
+     $             C(5,5,33,33,33),
+     $             D(5,5,33,33,33)
+c
+c***coefficients of the exact solution
+c
+      COMMON/CEXACT/ CE(5,13)
+c
+
+
+
+c
+      DIMENSION XCR(5), XCE(5),
+     $          XRR(5), XRE(5)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+1001  FORMAT(/5X,'VERIFICATION TEST FOR RESIDUALS FAILED')
+C (0,3)
+1002  FORMAT(/5X,'VERIFICATION TEST FOR RESIDUALS ','IS SUCCESSFUL')
+C (0,4)
+1003  FORMAT(/5X,'VERIFICATION TEST FOR SOLUTION ','ERRORS FAILED')
+C (0,5)
+1005  FORMAT(/5X,'VERIFICATION TEST FOR SURFACE INTEGRAL FAILED')
+C (0,6)
+1006  FORMAT(/5X,'VERIFICATION TEST FOR SURFACE INTEGRAL ','IS SUCCESSFU
+     x 
+     &L')
+C (0,7)
+1007  FORMAT(//10X,'CAUTION',//5X,'REFERENCE VALUES CURRENTLY IN THIS VE
+     x 
+     &RIFICATION ','ROUTINE ',/5X,'ARE VALID ONLY FOR RUNS WITH THE FOLL
+     x 
+     &OWING PARAMETER ','VALUES:',//5X,'NX = 12;  NY = 12;  NZ = 12 ',//
+     x 
+     &5X,'ITMAX = 50',//5X,'DT = 5.0d-01',//5X,'OMEGA = 1.2',//5X,'CHANG
+     x 
+     &E IN ANY OF THE ABOVE VALUES RENDER THE REFERENCE ','VALUES ',/5X,
+     x 
+     &'INVALID AND CAUSES A FAILURE OF THE VERIFICATION TEST.')
+C (0,8)
+1004  FORMAT
+     &(/5X,'VERIFICATION TEST FOR SOLUTION ERRORS ','IS SUCCESSFUL')
+C (0,9)
+1008  FORMAT(//10X,'CAUTION',//5X,'REFERENCE VALUES CURRENTLY IN THIS VE
+     x 
+     &RIFICATION ','ROUTINE ',/5X,'ARE VALID ONLY FOR RUNS WITH THE FOLL
+     x 
+     &OWING PARAMETER ','VALUES:',//5X,'NX = 64;  NY = 64;  NZ = 64 ',//
+     x 
+     &5X,'ITMAX = 250',//5X,'DT = 2.0d+00',//5X,'OMEGA = 1.2',//5X,'CHAN
+     x 
+     &GE IN ANY OF THE ABOVE VALUES RENDER THE REFERENCE ','VALUES ',/5X
+     x 
+     &,'INVALID AND CAUSES A FAILURE OF THE VERIFICATION TEST.')
+C (0,10)
+1009  FORMAT(//10X,'CAUTION',//5X,'REFERENCE VALUES CURRENTLY IN THIS VE
+     x 
+     &RIFICATION ','ROUTINE ',/5X,'ARE VALID ONLY FOR RUNS WITH THE FOLL
+     x 
+     &OWING PARAMETER ','VALUES:',//5X,'NX = 102;  NY = 102;  NZ = 102 '
+     x 
+     &,//5X,'ITMAX = 250',//5X,'DT = 2.0d+00',//5X,'OMEGA = 1.2',//5X,'C
+     x 
+     &HANGE IN ANY OF THE ABOVE VALUES RENDER THE REFERENCE ','VALUES ',
+     x 
+     &/5X,'INVALID AND CAUSES A FAILURE OF THE VERIFICATION TEST.')
+C (0,11)
+1010  FORMAT(//1X,'FOR THE PROBLEM PARAMETERS IN USE ','NO REFERENCE VAL
+     x 
+     &UES ARE PROVIDED'/1X,'IN THE CURRENT VERIFICATION ROUTINE - ','NO 
+     x 
+     &VERIFIACTION TEST WAS PERFORMED')
+C (0,12)
+c
+      IF (NX.EQ.12.AND.NY.EQ.12.AND.NZ.EQ.12) THEN
+C (0,13)
+C        BEGIN BLOCK
+C (0,14)
+c
+c***tolerance level
+c
+         EPSILON = 1.0D-08
+C (0,15)
+c
+c***Reference values of RMS-norms of residual, for the (12X12X12) grid,
+c   after 50 time steps, with  DT = 5.0d-01
+c
+         XRR(1) = 1.6196343210976702D-02
+C (0,16)
+         XRR(2) = 2.1976745164821318D-03
+C (0,17)
+         XRR(3) = 1.5179927653399185D-03
+C (0,18)
+         XRR(4) = 1.5029584435994323D-03
+C (0,19)
+         XRR(5) = 3.4264073155896461D-02
+C (0,20)
+c
+c***Reference values of RMS-norms of solution error, for the (12X12X12) grid,
+c   after 50 time steps, with  DT = 5.0d-01
+c
+         XRE(1) = 6.4223319957960924D-04
+C (0,21)
+         XRE(2) = 8.4144342047347926D-05
+C (0,22)
+         XRE(3) = 5.8588269616485186D-05
+C (0,23)
+         XRE(4) = 5.8474222595157350D-05
+C (0,24)
+         XRE(5) = 1.3103347914111294D-03
+C (0,25)
+c
+c***Reference value of surface integral, for the (12X12X12) grid,
+c   after 50 time steps, with DT = 5.0d-01
+c
+         XRI = 7.8418928865937083D+00
+C (0,26)
+         M = 1
+C (0,27)
+C        BEGIN UNSTRUCTURED
+99994    CONTINUE
+C (1,1)
+c
+c***verification test for residuals
+c
+C     DO loop  with exit had to be desugared
+         IF (M.GT.5) GOTO 99996
+C (14,1)
+c     
+         TMP = ABS((XCR(M)-XRR(M))/XRR(M))
+C (12,1)
+c     
+         IF (TMP.GT.EPSILON) GOTO 99995
+C (13,1)
+c     
+         M = M+1
+         GOTO 99994
+99995    CONTINUE
+C (11,1)
+C        BEGIN BLOCK
+C (11,2)
+c     
+         WRITE (6, 1001) 
+c     
+C        END BLOCK
+C (3,1)
+C        BEGIN BLOCK
+C (3,2)
+c     
+c***verification test for solution error
+c
+100      CONTINUE
+C (3,3)
+         M = 1
+C        END BLOCK
+99991    CONTINUE
+C (4,1)
+c     
+C     DO loop  with exit had to be desugared
+         IF (M.GT.5) GOTO 99993
+C (10,1)
+c
+         TMP = ABS((XCE(M)-XRE(M))/XRE(M))
+C (8,1)
+c     
+         IF (TMP.GT.EPSILON) GOTO 99992
+C (9,1)
+c     
+         M = M+1
+         GOTO 99991
+99992    CONTINUE
+C (7,1)
+C        BEGIN BLOCK
+C (7,2)
+c     
+         WRITE (6, 1003) 
+c     
+C        END BLOCK
+         GOTO 200
+99993    CONTINUE
+C (5,1)
+c     
+         WRITE (6, 1004) 
+         GOTO 200
+99996    CONTINUE
+C (2,1)
+c     
+         WRITE (6, 1002) 
+         GOTO 100
+C (6,1)
+c
+c***verification test for surface integral
+c
+200      CONTINUE
+C        END UNSTRUCTURED
+C (0,28)
+c
+         TMP = ABS((XCI-XRI)/XRI)
+C (0,29)
+c     
+         IF (TMP.GT.EPSILON) THEN
+C (0,30)
+C           BEGIN BLOCK
+C (0,31)
+c     
+            WRITE (6, 1005) 
+c     
+C           END BLOCK
+         ELSE
+C (0,33)
+C           BEGIN BLOCK
+C (0,34)
+c     
+            WRITE (6, 1006) 
+c     
+C           END BLOCK
+         ENDIF
+C (0,36)
+c     
+         WRITE (6, 1007) 
+c
+C        END BLOCK
+      ELSE
+C (0,38)
+         IF (NX.EQ.64.AND.NY.EQ.64.AND.NZ.EQ.64) THEN
+C (0,39)
+C           BEGIN BLOCK
+C (0,40)
+c
+c***tolerance level
+c
+            EPSILON = 1.0D-08
+C (0,41)
+c
+c***Reference values of RMS-norms of residual, for the (64X64X64) grid,
+c   after 250 time steps, with  DT = 2.0d+00
+c
+            XRR(1) = 7.7902107606689367D+02
+C (0,42)
+            XRR(2) = 6.3402765259692870D+01
+C (0,43)
+            XRR(3) = 1.9499249727292479D+02
+C (0,44)
+            XRR(4) = 1.7845301160418537D+02
+C (0,45)
+            XRR(5) = 1.8384760349464247D+03
+C (0,46)
+c     
+c***Reference values of RMS-norms of solution error, for the (64X64X64) grid,
+c   after 250 time steps, with  DT = 2.0d+00
+c
+            XRE(1) = 2.9964085685471943D+01
+C (0,47)
+            XRE(2) = 2.8194576365003349D+00
+C (0,48)
+            XRE(3) = 7.3473412698774742D+00
+C (0,49)
+            XRE(4) = 6.7139225687777051D+00
+C (0,50)
+            XRE(5) = 7.0715315688392578D+01
+C (0,51)
+c
+c***Reference value of surface integral, for the (64X64X64) grid,
+c   after 250 time steps, with DT = 2.0d+00
+c
+            XRI = 2.6030925604886277D+01
+C (0,52)
+            M = 1
+C (0,53)
+C           BEGIN UNSTRUCTURED
+99988       CONTINUE
+C (15,1)
+c
+c***verification test for residuals
+c
+C     DO loop  with exit had to be desugared
+            IF (M.GT.5) GOTO 99990
+C (28,1)
+c     
+            TMP = ABS((XCR(M)-XRR(M))/XRR(M))
+C (26,1)
+c     
+            IF (TMP.GT.EPSILON) GOTO 99989
+C (27,1)
+c     
+            M = M+1
+            GOTO 99988
+99989       CONTINUE
+C (25,1)
+c     
+            WRITE (6, 1001) 
+C (17,1)
+C           BEGIN BLOCK
+C (17,2)
+c     
+c***verification test for solution error
+c
+400         CONTINUE
+C (17,3)
+            M = 1
+C           END BLOCK
+99985       CONTINUE
+C (18,1)
+c     
+C     DO loop  with exit had to be desugared
+            IF (M.GT.5) GOTO 99987
+C (24,1)
+c
+            TMP = ABS((XCE(M)-XRE(M))/XRE(M))
+C (22,1)
+c     
+            IF (TMP.GT.EPSILON) GOTO 99986
+C (23,1)
+c     
+            M = M+1
+            GOTO 99985
+99986       CONTINUE
+C (21,1)
+c     
+            WRITE (6, 1003) 
+            GOTO 500
+99987       CONTINUE
+C (19,1)
+c     
+            WRITE (6, 1004) 
+            GOTO 500
+99990       CONTINUE
+C (16,1)
+c     
+            WRITE (6, 1002) 
+            GOTO 400
+C (20,1)
+c
+c***verification test for surface integral
+c
+500         CONTINUE
+C           END UNSTRUCTURED
+C (0,54)
+c
+            TMP = ABS((XCI-XRI)/XRI)
+C (0,55)
+c     
+            IF (TMP.GT.EPSILON) THEN
+C (0,56)
+C              BEGIN BLOCK
+C (0,57)
+c     
+               WRITE (6, 1005) 
+c     
+C              END BLOCK
+            ELSE
+C (0,59)
+C              BEGIN BLOCK
+C (0,60)
+c     
+               WRITE (6, 1006) 
+c     
+C              END BLOCK
+            ENDIF
+C (0,62)
+c     
+            WRITE (6, 1008) 
+c
+C           END BLOCK
+         ELSE
+C (0,64)
+            IF (NX.EQ.102.AND.NY.EQ.102.AND.NZ.EQ.102) THEN
+C (0,65)
+C              BEGIN BLOCK
+C (0,66)
+c
+c***tolerance level
+c
+               EPSILON = 1.0D-08
+C (0,67)
+c
+c***Reference values of RMS-norms of residual, for the (102X102X102) grid,
+c   after 250 time steps, with  DT = 2.0d+00
+c
+               XRR(1) = 3.5532672969982736D+03
+C (0,68)
+               XRR(2) = 2.6214750795310692D+02
+C (0,69)
+               XRR(3) = 8.8333721850952190D+02
+C (0,70)
+               XRR(4) = 7.7812774739425265D+02
+C (0,71)
+               XRR(5) = 7.3087969592545314D+03
+C (0,72)
+c     
+c***Reference values of RMS-norms of solution error, for the (102X102X102) 
+c   grid, after 250 time steps, with  DT = 2.0d+00
+c
+               XRE(1) = 1.1401176380212709D+02
+C (0,73)
+               XRE(2) = 8.1098963655421574D+00
+C (0,74)
+               XRE(3) = 2.8480597317698308D+01
+C (0,75)
+               XRE(4) = 2.5905394567832939D+01
+C (0,76)
+               XRE(5) = 2.6054907504857413D+02
+C (0,77)
+c
+c***Reference value of surface integral, for the (102X102X102) grid,
+c   after 250 time steps, with DT = 2.0d+00
+c
+               XRI = 4.7887162703308227D+01
+C (0,78)
+               M = 1
+C (0,79)
+C              BEGIN UNSTRUCTURED
+99982          CONTINUE
+C (29,1)
+c
+c***verification test for residuals
+c
+C     DO loop  with exit had to be desugared
+               IF (M.GT.5) GOTO 99984
+C (42,1)
+c     
+               TMP = ABS((XCR(M)-XRR(M))/XRR(M))
+C (40,1)
+c     
+               IF (TMP.GT.EPSILON) GOTO 99983
+C (41,1)
+c     
+               M = M+1
+               GOTO 99982
+99983          CONTINUE
+C (39,1)
+c     
+               WRITE (6, 1001) 
+C (31,1)
+C              BEGIN BLOCK
+C (31,2)
+c     
+c***verification test for solution error
+c
+600            CONTINUE
+C (31,3)
+               M = 1
+C              END BLOCK
+99979          CONTINUE
+C (32,1)
+c     
+C     DO loop  with exit had to be desugared
+               IF (M.GT.5) GOTO 99981
+C (38,1)
+c
+               TMP = ABS((XCE(M)-XRE(M))/XRE(M))
+C (36,1)
+c     
+               IF (TMP.GT.EPSILON) GOTO 99980
+C (37,1)
+c     
+               M = M+1
+               GOTO 99979
+99980          CONTINUE
+C (35,1)
+c     
+               WRITE (6, 1003) 
+               GOTO 700
+99981          CONTINUE
+C (33,1)
+c     
+               WRITE (6, 1004) 
+               GOTO 700
+99984          CONTINUE
+C (30,1)
+c     
+               WRITE (6, 1002) 
+               GOTO 600
+C (34,1)
+c
+c***verification test for surface integral
+c
+700            CONTINUE
+C              END UNSTRUCTURED
+C (0,80)
+c
+               TMP = ABS((XCI-XRI)/XRI)
+C (0,81)
+c     
+               IF (TMP.GT.EPSILON) THEN
+C (0,82)
+C                 BEGIN BLOCK
+C (0,83)
+c     
+                  WRITE (6, 1005) 
+c     
+C                 END BLOCK
+               ELSE
+C (0,85)
+C                 BEGIN BLOCK
+C (0,86)
+c     
+                  WRITE (6, 1006) 
+c     
+C                 END BLOCK
+               ENDIF
+C (0,88)
+c     
+               WRITE (6, 1009) 
+c
+C              END BLOCK
+            ELSE
+C (0,90)
+C              BEGIN BLOCK
+C (0,91)
+c
+               WRITE (6, 1010) 
+c
+C              END BLOCK
+            ENDIF
+         ENDIF
+      ENDIF
+C (0,93)
+c
+      RETURN
+C     END BLOCK
+      END

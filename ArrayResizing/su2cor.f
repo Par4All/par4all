@@ -1,0 +1,2271 @@
+      PROGRAM SU2COR
+****************************************************************
+*
+* Quantum Physics Program: Computation of masses of elementary
+* particles in the framework of the Quark-Gluon theory,
+* using a monte carlo method
+*
+* SPEC Benchmark Program 103.su2cor, adopted from the program "su2cor"
+* (SNI-internal name: ASW01) written by B. Bunk, University of
+* Wuppertal, Germany, 1987
+* Previous SPEC version (in suite CFP92): 089.su2cor
+*
+* Contact: Dr. Wilfried Stehling, Siemens Nixdorf, D 552
+*          81730 Muenchen, Germany
+*
+* Modifications for the SPEC version:
+*
+* - Internal timing statements removed or commented out
+* - Detailed output supressed
+*
+* Modifications March 1991 by
+*   Aenne Scharbert,
+*   Marcus Schwankl,
+*   Reinhold Weicker,
+*   Andrea Wittmann,
+*       Siemens Nixdorf Information Systems, STM OS 323,
+*       Otto-Hahn-Ring 6, W-8000 Muenchen 83, Germany
+*
+* Modifications Nov. 1993 by
+*   Wilfried Stehling, Siemens Nixdorf Informationssysteme AG,
+*   D 552, 81730 Muenchen, Germany
+* Increased problem size for longer execution time:
+* Grid size MAXVEC was 4**3*8, is now 8**3*8.
+* File su2cor.data.f and input values have been modified accordingly.
+*
+* Modifications Sept. 1994 by
+*   Reinhold Weicker, Siemens Nixdorf
+* Decreased number of iterations
+* Removed subroutines that are not necessary for SPEC version
+*
+* Modifications Nov. 1994 by
+*   Reinhold Weicker, Siemens Nixdorf
+* Increased number of iterations
+* Set grid size to 8**3*8+7
+*
+****************************************************************
+C     PROGRAM SU2COR
+C***************************************************************
+C****    B. BUNK, UMIVERSITAET WUPPERTAL 1987
+C****    BERECHNUNG VON GLUEBALL-MASSEN IM RAHMEN DER
+C****    SU2 EICHTHEORIE.
+C****    MONTE CARLO RECHNUNG, ERZEUGUNG DER KONFIGURATIONEN
+C****    MIT DER WAERMEBAD-METHODE.
+C****    GITTERGROESSE: 8**3*16 , SPEICHERBEDARF 5 MBYTES
+C****    ANZAHL DER ERZEUGTEN KONFIGURATIONEN : 20
+C****    DIE ANZAHL WIRD IN DER EINGABEDATEI UEBER DIE UNIT 5
+C****    EINGELESEN. ES IST DIE DRITTE ZAHL DES LETZTEN RECORDS.
+C***************************************************************
+*
+*   English translation of (original) comment:
+*
+*       Computation of glueball masses in the framework of the
+*       SU2 calibration theory.
+*       Monte Carlo computation, generation of the configuration
+*       with the "warm bath" method.
+*       Grid size: 8**3*16, Memory size needed: 5 MByte
+*       Number of configurations generated: 20
+*       The number is read from the input file via unit 5;
+*       it is the third number of the last record
+*
+****************************************************************
+
+      PARAMETER(MAXVEC=8**3*8+7)
+      PARAMETER(MAXATT=5)
+      PARAMETER(ERROR=1.E-8)
+      PARAMETER(ERROR4=1.E-7,NDMAX4=8)
+      PARAMETER(ERROR2=1.E-7,NDMAX2=10)
+
+      REAL*8 U,ACPT,ENERGY,CD0,CD1,CD2,CD3,RD,SD,BCOEFF,BETINV
+
+      REAL*8 W11SUM(20,3),W11INT(20,3)
+      REAL*8 W22SUM(20,3),W22INT(20,3)
+
+      COMMON/PAR1/NDIM,LSIZE(4),LVEC,NDSP
+      COMMON/PAR2/NPTS,NLINKS,NPLAQS,NPLPP,NVOL
+      COMMON/PAR3/BETA,GAMMA,ITER,IFREQ,MFREQ
+      COMMON/GEOM1/NEWLAT(2**4,-4:4)
+      COMMON/GEOM2/ICODE(2**4,-4:4)
+      COMMON/GEOM3/INDPBC(MAXVEC,2*4)
+      COMMON/SW/ACPT,ENERGY
+      COMMON/BESS1/CD0(0:200,2:20),CD1(0:200,2:20)
+      COMMON/BESS2/CD2(0:200,2:20),CD3(0:200,2:20)
+      COMMON/BESS3/RD(20),SD(20)
+      COMMON/BESS4/BCOEFF
+      COMMON/INTBLK/BETINV,NERR4,NERR2
+      COMMON/CONF/U(MAXVEC,0:3,2**4,4)
+      EXTERNAL TRINIT
+
+      WRITE (6,*) 'SPEC benchmark 103.su2cor'
+
+      WRITE (6,*) ' '
+C
+C     GET START INSTRUCTION
+C
+*     For historical reasons, we keep the variable ISTART.
+*     In the original version, it used to be either -1
+*     or the channel number of the channel from which input
+*     values are read.
+
+      ISTART = -1
+
+C     GET BASIC PARAMETERS
+
+      READ(5,*)NDIM,(LSIZE(N),N=1,NDIM)
+
+      IF(NDIM.NE.4 .OR. NDIM.GT.4)STOP
+
+      WRITE(6,1000)
+1000  FORMAT(1X,75('+')/' PROGRAM SU2V1COR'
+     X   ,' -- MODIFIED HEAT BATH ALGORITHM'
+     X   /'    -- VECTORIZED PROGRAM IN STANDARD FORTRAN'
+     X   /'    -- GLUEBALL CORRELATIONS FOR 1X1 AND 2X2 LOOP OPERATORS'
+     X   /'    -- INTEGRAL EXPRESSIONS FOR LOOP OPERATORS USED') 
+      WRITE(6,1005)NDIM,(LSIZE(N),N=1,NDIM) 
+1005  FORMAT(//' DIMENSION =',I3
+     X        /' SIZE      =',4I3)
+C
+C     COMPUTE BASIC QUANTITIES
+C
+      CALL GEOM
+C
+      WRITE(6,1015)LVEC,MAXATT,200,ERROR,NDMAX4,ERROR4,NDMAX2,ERROR2
+1015  FORMAT(//' VECTOR LENGTH: ',I8
+     X        /' IN SWEEP:  MAXATT =',I4
+     X        /' IN BESTAB: NSTEPS =',I4,'      ERROR  =',E11.3
+     X        /' IN INT4:   NDMAX4 =',I4,'      ERROR4 =',E11.3
+     X        /' IN INT2:   NDMAX2 =',I4,'      ERROR2 =',E11.3)
+      IF(LVEC.GT.MAXVEC) THEN
+	WRITE (6,*) 'LVEC=',LVEC
+	STOP
+	ENDIF
+      IF(MOD(LVEC,2).NE.0) THEN
+	WRITE (6,*) 'LVEC,mod 2=',LVEC
+	STOP
+	ENDIF
+      IF(LSIZE(NDIM).GT.20) THEN
+	WRITE (6,*) 'LSIZE(NDIM)=',LSIZE(NDIM)
+	STOP
+	ENDIF
+      IF(20.LT.NDMAX4 .OR. 20.LT.NDMAX2) THEN
+	WRITE (6,*) 'NDMAX.LT.NDMAX4 .OR. NDMAX.LT.NDMAX2'
+	STOP
+	ENDIF
+
+C     INITIALIZE THE CONFIGURATION
+
+      CALL INIT(ISTART)
+      OPEN (11,FILE='SU2COR.MODEL',STATUS='OLD')
+C     DO 90 I4=1,4
+C     DO 90 I3=1,16
+C     DO 90 I2=0,3
+C     DO 90 I1=1,LVEC
+      READ(11,111) ((((U(I1,I2,I3,I4),I1=1,LVEC),I2=0,3),I3=1,16),
+     1I4=1,4)
+  90  CONTINUE
+ 111  FORMAT(D16.10)
+
+
+C     GET RUN PARAMETERS
+
+200   CONTINUE
+      READ(5,*,END=999)BETA,NTHERM,NMEAS,NPRINT,MFREQ,NSAVE,ISAVE
+      IF(BETA.LE.0.)GOTO 999
+      GAMMA=0.
+      WRITE(6,1017)BETA
+1017  FORMAT(//1X,75('-')/' BETA  =',F8.4)
+C
+      CALL BESTAB(BETA,NDIM)
+C
+      IF(NTHERM.GE.0)THEN
+      WRITE(6,1018)NTHERM
+1018  FORMAT(/' CLEAR COUNTERS'
+     X      //' THERMALISATION:',I6,' ITERATIONS')
+      ITER=0
+      IFREQ=0
+      NERR2=0
+      NERR4=0
+      CALL CLEAR2(2*NDIM+9+8*(LSIZE(NDIM)/2+1),10)
+      CALL CLEAR4(8,2+LSIZE(NDIM)/2)
+      ELSE
+      WRITE(6,1019)ITER
+1019  FORMAT(/' STATISTICS CONTINUED'
+     X      //' OLD ITERATIONS:',I6)
+      ENDIF
+      WRITE(6,1020)NMEAS,MFREQ
+1020  FORMAT( ' MEASUREMENT   :',I6,' ITERATIONS'
+     X   //' FREQUENCY OF CORRELATION MEASUREMENTS:',I5,' ITERATION(S)')
+C
+      IF(ISAVE.GT.0)THEN
+      WRITE(6,1030)NSAVE,ISAVE
+1030  FORMAT(/' SAVE FREQUENCY:',I6,' ITERATIONS, UNIT =',I3)
+      ELSE
+      WRITE(6,'(/'' CONFIGURATION NOT SAVED'')')
+      ENDIF
+C
+C     THERMALISATION
+C
+      IF(NTHERM.GT.0)THEN
+      IPR=0
+      ISA=0
+      WRITE(6,1040)(I,I=1,NDIM)
+1040  FORMAT(/29X,'E',15X,'FUNDAMENTAL POLYAKOV LINE AVERAGES'
+     X     /'   ITER   ACPT      CURRENT     AVERAGE',4(7X,I2,1X))
+      DO 50 ITER=1,NTHERM
+      CALL SWEEP
+C+++++      CALL POLYA
+      IPR=IPR+1
+      IF(IPR.EQ.NPRINT .OR. ITER.EQ.NTHERM)THEN
+      WRITE(6,1050)ITER,ACPT,ENERGY,AVER2(1),(AVER2(I),I=2,2*NDIM,2)
+1050  FORMAT(I7,F8.4,2F12.6,2X,5F10.6)
+      IPR=0
+      ENDIF
+      ISA=ISA+1
+      IF(ISA.GE.NSAVE .AND. ISAVE.GT.0)THEN
+C     CALL SAVE(ISAVE)
+      ISA=0
+      ENDIF
+50    CONTINUE
+      ITER=0
+      IFREQ=0
+      NERR2=0
+      NERR4=0
+      CALL CLEAR2(2*NDIM+9+8*(LSIZE(NDIM)/2+1),10)
+      CALL CLEAR4(8,2+LSIZE(NDIM)/2)
+C     IF(ISAVE.GT.0) CALL SAVE(ISAVE)
+      ENDIF
+C
+C     MEASUREMENT
+C
+      IPR=0
+      ISA=0
+      WRITE(6,1040)(I,I=1,NDIM)
+      DO 60 IT=1,NMEAS
+      ITER=ITER+1
+      CALL SWEEP
+C+++++      CALL POLYA
+      IPR=IPR+1
+      IF(IPR.EQ.NPRINT .OR. IT.EQ.NMEAS)THEN
+      WRITE(6,1050)ITER,ACPT,ENERGY,AVER2(1),(AVER2(I),I=2,2*NDIM,2)
+      IPR=0
+      ENDIF
+      IFREQ=IFREQ+1
+      IF(IFREQ.GE.MFREQ)THEN
+      CALL CORR
+      IFREQ=0
+      ENDIF
+      ISA=ISA+1
+      IF((ISA.GE.NSAVE .OR. IT.EQ.NMEAS) .AND. ISAVE.GT.0)THEN
+C     CALL SAVE(ISAVE)
+      ISA=0
+      CALL LOOPS(W11SUM,W11INT,W22SUM,W22INT)
+      SUG = 0.
+      DO 70 IPL = 1, 3
+      SU = 0.
+      DO 71 ITIT = 1, LSIZE(NDIM)
+          SU = SU + W11SUM(ITIT,IPL)
+   71 CONTINUE
+      SU = SU / REAL(LSIZE(NDIM))
+      SUG = SUG + SU
+   70 CONTINUE
+      SUG = SUG/3
+      ENDIF
+60    CONTINUE
+C
+C     RESULTS AND ERROR ANALYSIS
+C
+      IF(ITER.GT.0) CALL EVAL
+C
+      GOTO 200
+C PROGRAM NEEDS THE LABEL
+999   CONTINUE 
+      STOP
+      END
+C*************************EVAL*****************************
+C
+C     PRINT RESULTS AND ERROR ANALYSIS
+C
+      SUBROUTINE EVAL
+*     ***************
+C
+      PARAMETER(MAXVEC=8**3*8+7)
+C
+      COMMON/PAR1/NDIM,LSIZE(4),LVEC,NDSP
+      COMMON/PAR2/NPTS,NLINKS,NPLAQS,NPLPP,NVOL
+C
+      REAL*8 ED,PF,PA
+      REAL*8 S110,S112,S110I,S112I,S220,S222,S220I,S222I
+      REAL*8 C110,C112,C110I,C112I,C220,C222,C220I,C222I
+      REAL*8 COVAR4
+C
+      CALL STAT2(1,ED,SIGE,RE,0)
+C
+*      WRITE(6,1080)
+*1080  FORMAT(/' POLYAKOV LINE AVERAGES:'
+*     X   /'  I',12X,'FUNDAMENTAL       CORR.FAC.'
+*     X   ,'            ADJOINT         CORR.FAC.')
+      DO 70 I=1,NDIM
+      CALL STAT2(2*I,PF,SIGPF,RPF,0)
+      CALL STAT2(2*I+1,PA,SIGPA,RPA,0)
+70    CONTINUE
+C
+*     X      /11X,'W11(0+)',25X,'W22(0+)'
+*     X      ,25X,'W11(2+)',25X,'W22(2+)')
+      CALL STAT2(10,S110,ES110,RS110,0)
+      CALL STAT2(11,S112,ES112,RS112,0)
+      CALL STAT2(12,S110I,ES110I,RS110I,0)
+      CALL STAT2(13,S112I,ES112I,RS112I,0)
+      CALL STAT2(14,S220,ES220,RS220,0)
+      CALL STAT2(15,S222,ES222,RS222,0)
+      CALL STAT2(16,S220I,ES220I,RS220I,0)
+      CALL STAT2(17,S222I,ES222I,RS222I,0)
+      MAXDST=LSIZE(NDIM)/2
+      NDIST=MAXDST+1
+      DO 80 IDIST=0,MAXDST
+      IND=IDIST+1
+      IND1=IND+1
+C
+      CALL STAT2(17+IND,C110,EC110,RC110,0)
+      C110=(C110-S110**2) /NVOL
+      EC110=COVAR4(1,IND1,IND1)
+     X      + 4.*S110*( S110*COVAR4(1,1,1) - COVAR4(1,1,IND1) )
+      EC110=SQRT(MAX(0.,EC110))*RC110 /NVOL
+C
+      CALL STAT2(17+NDIST+IND,C112,EC112,RC112,0)
+      C112=C112 /NVOL
+      EC112=EC112 /NVOL
+C
+      CALL STAT2(17+4*NDIST+IND,C220,EC220,RC220,0)
+      C220=(C220-S220**2) /NVOL
+      EC220=COVAR4(5,IND1,IND1)
+     X      + 4.*S220*( S220*COVAR4(5,1,1) - COVAR4(5,1,IND1) )
+      EC220=SQRT(MAX(0.,EC220))*RC220 /NVOL
+C
+      CALL STAT2(17+5*NDIST+IND,C222,EC222,RC222,0)
+      C222=C222 /NVOL
+      EC222=EC222 /NVOL
+C
+      CALL STAT2(17+2*NDIST+IND,C110I,EC110I,RC110I,0)
+      C110I=(C110I-S110I**2) /NVOL
+      EC110I=COVAR4(3,IND1,IND1)
+     X       + 4.*S110I*( S110I*COVAR4(3,1,1) - COVAR4(3,1,IND1) )
+      EC110I=SQRT(MAX(0.,EC110I))*RC110I /NVOL
+C
+      CALL STAT2(17+3*NDIST+IND,C112I,EC112I,RC112I,0)
+      C112I=C112I /NVOL
+      EC112I=EC112I /NVOL
+C
+      CALL STAT2(17+6*NDIST+IND,C220I,EC220I,RC220I,0)
+      C220I=(C220I-S220I**2) /NVOL
+      EC220I=COVAR4(7,IND1,IND1)
+     X       + 4.*S220I*( S220I*COVAR4(7,1,1) - COVAR4(7,1,IND1) )
+      EC220I=SQRT(MAX(0.,EC220I))*RC220I /NVOL
+C
+      CALL STAT2(17+7*NDIST+IND,C222I,EC222I,RC222I,0)
+      C222I=C222I /NVOL
+      EC222I=EC222I /NVOL
+C
+80    CONTINUE
+C
+      END
+C*************************SWEEP**************************
+C
+C     ONE VECTORISED SWEEP USING A MODIFIED HEAT BATH ALGORITHM
+C
+      SUBROUTINE SWEEP
+*     ****************
+C
+      PARAMETER(MAXVEC=8**3*8+7)
+      PARAMETER(MAXATT=5)
+C
+      REAL*8 U,ACPT,ENERGY
+      REAL*8 BETINV,PI,ZERO,ONE,TWO,EPS
+      REAL*8 B,W1,W2,BNORM,BINV,WT,W0,C1,C2,R1,R2
+      PARAMETER(PI=3.141592654D0,ZERO=0.D0,ONE=1.D0,TWO=2.D0,EPS=1.E-20)
+C
+      REAL*8 EDOUB
+      COMMON/PAR1/NDIM,LSIZE(4),LVEC,NDSP
+      COMMON/PAR2/NPTS,NLINKS,NPLAQS,NPLPP,NVOL
+      COMMON/PAR3/BETA,GAMMA,ITER,IFREQ,MFREQ
+      COMMON/SW/ACPT,ENERGY
+      COMMON/CONF/U(MAXVEC,0:3,2**4,4)
+C
+      DIMENSION B(MAXVEC,0:3),W1(MAXVEC,0:3),W2(MAXVEC,0:3)
+      DIMENSION BNORM(MAXVEC),BINV(MAXVEC),WT(MAXVEC),W0(MAXVEC)
+      DIMENSION C1(MAXVEC),C2(MAXVEC),R1(MAXVEC),R2(MAXVEC)
+C+++++EQUIVALENCE (BNORM(1),W2(1,0)),(BINV(1),W2(1,1))
+C+++++EQUIVALENCE (WT(1),W2(1,2)),(W0(1),W2(1,3))
+      LOGICAL LACPT(MAXVEC)
+C
+      EDOUB=0.D0
+      ENERGY=ZERO
+      IACPT=0
+      BETINV=1.D0/BETA
+C
+C     LOOP OVER SUB-LATTICES  ILAT  AND LINK DIRECTIONS  I1
+C
+      DO 200 ILAT=1,2**NDIM
+      DO 200 I1=1,NDIM
+C
+C     ACCUMULATE THE INTERACTING PLAQUETTES IN  B(...)
+C
+      DO 210 I=1,LVEC
+      B(I,0)=ZERO
+      B(I,1)=ZERO
+      B(I,2)=ZERO
+      B(I,3)=ZERO
+      LACPT(I)=.FALSE.
+210   CONTINUE
+C
+      DO 220 I2=1,NDIM
+      IF(I1.EQ.I2)GOTO 220
+      CALL INTACT(ILAT,I1, I2,W1)
+      CALL INTACT(ILAT,I1,-I2,W2)
+      DO 230 I=1,LVEC
+      B(I,0)=B(I,0)+W1(I,0)+W2(I,0)
+      B(I,1)=B(I,1)+W1(I,1)+W2(I,1)
+      B(I,2)=B(I,2)+W1(I,2)+W2(I,2)
+      B(I,3)=B(I,3)+W1(I,3)+W2(I,3)
+230   CONTINUE
+220   CONTINUE
+C
+C     HEAT BATH STEP
+C
+      DO 300 I=1,LVEC
+      BNORM(I)=SQRT( B(I,0)**2 + B(I,1)**2 + B(I,2)**2 + B(I,3)**2 )
+      BINV(I)=ONE/BNORM(I)
+      C1(I)=BETINV*BINV(I)
+300   CONTINUE
+C
+      DO 310 IATT=1,MAXATT
+      CALL TRNGV(R1,LVEC,ONE)
+      CALL TRNGV(R2,LVEC,ONE)
+      DO 311 I=1,LVEC
+      WT(I)=ONE + C1(I)*LOG(EPS+R1(I))
+      IF( R2(I)**2 .LE. (ONE-WT(I)**2) )THEN
+      W0(I)=WT(I)
+      LACPT(I)=.TRUE.
+      ENDIF
+311   CONTINUE
+310   CONTINUE
+C
+      CALL TRNGV(R1,LVEC,TWO)
+      CALL TRNGV(R2,LVEC,PI)
+C
+      DO 320 I=1,LVEC
+      IF(LACPT(I))THEN
+C
+      IACPT=IACPT+1
+      EDOUB=EDOUB + BNORM(I)*W0(I)
+      W1(I,0)=BINV(I) * W0(I)
+C
+      BINV(I)=BINV(I) * SQRT(ONE-W0(I)**2)
+      R1(I)=R1(I) - ONE
+      W1(I,3)=BINV(I) * R1(I)
+C
+      C1(I)=TAN(R2(I))
+      C2(I)=C1(I)**2
+      BINV(I)=BINV(I) * SQRT(ONE-R1(I)**2) / (ONE+C2(I))
+      W1(I,1)=BINV(I) * (ONE-C2(I))
+      W1(I,2)=BINV(I) * TWO*C1(I)
+C
+      ELSE
+C
+      W1(I,0)= U(I,0,ILAT,I1)
+      W1(I,1)=-U(I,1,ILAT,I1)
+      W1(I,2)=-U(I,2,ILAT,I1)
+      W1(I,3)=-U(I,3,ILAT,I1)
+C
+      ENDIF
+320   CONTINUE
+C
+C     COMPUTE AND STORE THE NEW LINK VARIABLES
+C
+      CALL MATMAT(W1,B,W2,LVEC,MAXVEC)
+C
+      DO 400 I=1,LVEC
+      IF(LACPT(I))THEN
+      U(I,0,ILAT,I1)=W2(I,0)
+      U(I,1,ILAT,I1)=W2(I,1)
+      U(I,2,ILAT,I1)=W2(I,2)
+      U(I,3,ILAT,I1)=W2(I,3)
+      ELSE
+      EDOUB=EDOUB + W2(I,0)
+      ENDIF
+400   CONTINUE
+C
+200   CONTINUE
+C
+C     END OF LOOP OVER SUB-LATTICES AND LINK DIRECTIONS
+C
+      ENERGY=EDOUB/(4*NPLAQS)
+      CALL ACCUM2(1,DBLE(ENERGY))
+      ACPT=FLOAT(IACPT)/NLINKS
+      END
+C*************************GEOM****************************
+C
+C     COMPUTE GEOMETRY VECTORS
+C
+      SUBROUTINE GEOM
+*     ***************
+C
+      PARAMETER(MAXVEC=8**3*8+7)
+C
+      COMMON/PAR1/NDIM,LSIZE(4),LVEC,NDSP
+      COMMON/PAR2/NPTS,NLINKS,NPLAQS,NPLPP,NVOL
+      COMMON/GEOM1/NEWLAT(2**4,-4:4)
+      COMMON/GEOM2/ICODE(2**4,-4:4)
+      COMMON/GEOM3/INDPBC(MAXVEC,2*4)
+C
+      DIMENSION LHALF(4),IBASE(4),JUMP(4)
+      DIMENSION IX(4),IUP(4),IDN(4),ISTEP(4)
+      LOGICAL LZ(4)
+C
+C     COMPUTE SOME BASIC PARAMETERS
+C
+      NDSP=NDIM-1
+C
+      NPTS=1
+      LVEC=1
+      DO 10 I=1,NDIM
+      IF(MOD(LSIZE(I),2) .NE. 0) STOP
+      NVOL=NPTS
+      NPTS=NPTS*LSIZE(I)
+      LHALF(I)=LSIZE(I)/2
+      LVEC=LVEC*LHALF(I)
+10    CONTINUE
+C
+      NLINKS=NPTS*NDIM
+      NPLPP=(NDIM*(NDIM-1))/2
+      NPLAQS=NPTS*NPLPP
+C
+C     COMPUTE THE VECTORS  NEWLAT(..)  AND  ICODE(..)
+C
+C        NEWLAT(ILAT,I1)  DETERMINES THE INDEX OF THE SUB-LATTICE
+C              REACHED FROM  ILAT  IN DIRECTION  I1
+C        ICODE(ILAT,I1)  CONTAINS THE INDEX OF THE PERMUTATION VECTOR
+C              INDPBC  NEEDED ON SUB-LATTICE  ILAT  FOR A STEP  I1
+C              ICODE=0 IF NO PERMUTATION IS NEEDED
+C        I1 = +/-1,...,+/-NDIM
+C
+      DO 20 I=1,NDIM
+      ISTEP(I)=2**(I-1)
+      LZ(I)=.FALSE.
+20    CONTINUE
+C
+      ILAT=0
+100   CONTINUE
+      ILAT=ILAT+1
+C
+      NEWLAT(ILAT,0)=-1
+      ICODE(ILAT,0)=-1
+C
+      DO 110 I1=1,NDIM
+C
+      NEWLAT(ILAT, I1)=ILAT+ISTEP(I1)
+      NEWLAT(ILAT,-I1)=ILAT+ISTEP(I1)
+C
+      IF(LZ(I1))THEN
+      ICODE(ILAT, I1)=I1
+      ICODE(ILAT,-I1)=0
+      ELSE
+      ICODE(ILAT, I1)=0
+      ICODE(ILAT,-I1)=NDIM+I1
+      ENDIF
+C
+110   CONTINUE
+C
+      DO 190 I=1,NDIM
+      LZ(I)=.NOT.LZ(I)
+      ISTEP(I)=-ISTEP(I)
+      IF(LZ(I))GOTO 100
+190   CONTINUE
+C
+C     COMPUTE THE INDEX VECTORS  INDPBC(...)  FOR PERMUTATIONS OF
+C              VECTORS SUBJECT TO PERIODIC BOUNDARY CONDITIONS
+C         INDPBC(IPT,IND)  CONTAINS THE LOCATION, WITHIN ITS VECTOR,
+C              OF THE NEIGHBOUR OF THE (BLOCKED) POINT  IPT .
+C              THE SHIFT  +/-I1  IS CODED IN  IND  AS DEFINED
+C              DURING THE CONSTRUCTION OF THE ARRAY  ICODE(...) .
+C
+      IBASE(1)=1
+      DO 210 I=2,NDIM
+      IBASE(I)=IBASE(I-1)*LHALF(I-1)
+      JUMP(I-1)=IBASE(I)-IBASE(I-1)
+210   CONTINUE
+      JUMP(NDIM)=IBASE(NDIM)*(LHALF(NDIM)-1)
+C
+      DO 220 I=1,NDIM
+      IUP(I)=IBASE(I)
+      IDN(I)=JUMP(I)
+      IX(I)=1
+220   CONTINUE
+      IPT=0
+C
+300   CONTINUE
+      IPT=IPT+1
+C
+      DO 310 I1=1,NDIM
+      INDPBC(IPT,I1)=IPT+IUP(I1)
+      INDPBC(IPT,NDIM+I1)=IPT+IDN(I1)
+310   CONTINUE
+C
+      DO 390 I=1,NDIM
+      IX(I)=IX(I)+1
+      IDN(I)=-IBASE(I)
+      IF(IX(I).LT.LHALF(I))GOTO 300
+      IF(IX(I).EQ.LHALF(I))THEN
+      IUP(I)=-JUMP(I)
+      GOTO 300
+      ENDIF
+      IX(I)=1
+      IUP(I)=IBASE(I)
+      IDN(I)=JUMP(I)
+390   CONTINUE
+C
+      END
+C****************MATRIX MULTIPLICATIONS*********************
+C
+C     VECTORIZED MULTIPLICATION OF SU(2) MATRICES
+C
+C          LVEC: VECTOR LENGTH
+C          LDIM: FIRST DIMENSIONAL PARAMETER OF U,V,W
+C                    IN THE CALLING PROGRAM
+C
+      SUBROUTINE MATMAT(U,V,W,LVEC,LDIM)
+*     *****************
+C
+      REAL*8 U,V,W
+C
+      DIMENSION U(LDIM,0:3),V(LDIM,0:3),W(LDIM,0:3)
+C
+C     W = U * V
+C
+      DO 10 I=1,LVEC
+      W(I,0)=U(I,0)*V(I,0)-U(I,1)*V(I,1)-U(I,2)*V(I,2)-U(I,3)*V(I,3)
+      W(I,1)=U(I,0)*V(I,1)+U(I,1)*V(I,0)+U(I,2)*V(I,3)-U(I,3)*V(I,2)
+      W(I,2)=U(I,0)*V(I,2)-U(I,1)*V(I,3)+U(I,2)*V(I,0)+U(I,3)*V(I,1)
+      W(I,3)=U(I,0)*V(I,3)+U(I,1)*V(I,2)-U(I,2)*V(I,1)+U(I,3)*V(I,0)
+10    CONTINUE
+      RETURN
+C
+      ENTRY ADDMM(U,V,W,LVEC,LDIM)
+C
+C     W = W + U * V
+C
+      DO 20 I=1,LVEC
+      W(I,0)=W(I,0)
+     X       +U(I,0)*V(I,0)-U(I,1)*V(I,1)-U(I,2)*V(I,2)-U(I,3)*V(I,3)
+      W(I,1)=W(I,1)
+     X       +U(I,0)*V(I,1)+U(I,1)*V(I,0)+U(I,2)*V(I,3)-U(I,3)*V(I,2)
+      W(I,2)=W(I,2)
+     X       +U(I,0)*V(I,2)-U(I,1)*V(I,3)+U(I,2)*V(I,0)+U(I,3)*V(I,1)
+      W(I,3)=W(I,3)
+     X       +U(I,0)*V(I,3)+U(I,1)*V(I,2)-U(I,2)*V(I,1)+U(I,3)*V(I,0)
+20    CONTINUE
+      RETURN
+C
+      ENTRY ADJMAT(U,V,W,LVEC,LDIM)
+C
+C     W = ADJ(U) * V
+C
+      DO 30 I=1,LVEC
+      W(I,0)=U(I,0)*V(I,0)+U(I,1)*V(I,1)+U(I,2)*V(I,2)+U(I,3)*V(I,3)
+      W(I,1)=U(I,0)*V(I,1)-U(I,1)*V(I,0)-U(I,2)*V(I,3)+U(I,3)*V(I,2)
+      W(I,2)=U(I,0)*V(I,2)+U(I,1)*V(I,3)-U(I,2)*V(I,0)-U(I,3)*V(I,1)
+      W(I,3)=U(I,0)*V(I,3)-U(I,1)*V(I,2)+U(I,2)*V(I,1)-U(I,3)*V(I,0)
+30    CONTINUE
+      RETURN
+C
+      ENTRY ADDAM(U,V,W,LVEC,LDIM)
+C
+C     W = W + ADJ(U) * V
+C
+      DO 40 I=1,LVEC
+      W(I,0)=W(I,0)
+     X       +U(I,0)*V(I,0)+U(I,1)*V(I,1)+U(I,2)*V(I,2)+U(I,3)*V(I,3)
+      W(I,1)=W(I,1)
+     X       +U(I,0)*V(I,1)-U(I,1)*V(I,0)-U(I,2)*V(I,3)+U(I,3)*V(I,2)
+      W(I,2)=W(I,2)
+     X       +U(I,0)*V(I,2)+U(I,1)*V(I,3)-U(I,2)*V(I,0)-U(I,3)*V(I,1)
+      W(I,3)=W(I,3)
+     X       +U(I,0)*V(I,3)-U(I,1)*V(I,2)+U(I,2)*V(I,1)-U(I,3)*V(I,0)
+40    CONTINUE
+      RETURN
+C
+      ENTRY MATADJ(U,V,W,LVEC,LDIM)
+C
+C     W = U * ADJ(V)
+C
+      DO 50 I=1,LVEC
+      W(I,0)=+U(I,0)*V(I,0)+U(I,1)*V(I,1)+U(I,2)*V(I,2)+U(I,3)*V(I,3)
+      W(I,1)=-U(I,0)*V(I,1)+U(I,1)*V(I,0)-U(I,2)*V(I,3)+U(I,3)*V(I,2)
+      W(I,2)=-U(I,0)*V(I,2)+U(I,1)*V(I,3)+U(I,2)*V(I,0)-U(I,3)*V(I,1)
+      W(I,3)=-U(I,0)*V(I,3)-U(I,1)*V(I,2)+U(I,2)*V(I,1)+U(I,3)*V(I,0)
+50    CONTINUE
+      RETURN
+C
+      ENTRY ADDMA(U,V,W,LVEC,LDIM)
+C
+C     W = W + U * ADJ(V)
+C
+      DO 60 I=1,LVEC
+      W(I,0)=W(I,0)
+     X       +U(I,0)*V(I,0)+U(I,1)*V(I,1)+U(I,2)*V(I,2)+U(I,3)*V(I,3)
+      W(I,1)=W(I,1)
+     X       -U(I,0)*V(I,1)+U(I,1)*V(I,0)-U(I,2)*V(I,3)+U(I,3)*V(I,2)
+      W(I,2)=W(I,2)
+     X       -U(I,0)*V(I,2)+U(I,1)*V(I,3)+U(I,2)*V(I,0)-U(I,3)*V(I,1)
+      W(I,3)=W(I,3)
+     X       -U(I,0)*V(I,3)-U(I,1)*V(I,2)+U(I,2)*V(I,1)+U(I,3)*V(I,0)
+60    CONTINUE
+      RETURN
+C
+      ENTRY ADJADJ(U,V,W,LVEC,LDIM)
+C
+C     W = ADJ(U) * ADJ(V)
+C
+      DO 70 I=1,LVEC
+      W(I,0)=+U(I,0)*V(I,0)-U(I,1)*V(I,1)-U(I,2)*V(I,2)-U(I,3)*V(I,3)
+      W(I,1)=-U(I,0)*V(I,1)-U(I,1)*V(I,0)+U(I,2)*V(I,3)-U(I,3)*V(I,2)
+      W(I,2)=-U(I,0)*V(I,2)-U(I,1)*V(I,3)-U(I,2)*V(I,0)+U(I,3)*V(I,1)
+      W(I,3)=-U(I,0)*V(I,3)+U(I,1)*V(I,2)-U(I,2)*V(I,1)-U(I,3)*V(I,0)
+70    CONTINUE
+      RETURN
+C
+      ENTRY ADDAA(U,V,W,LVEC,LDIM)
+C
+C     W = W + ADJ(U) * ADJ(V)
+C
+      DO 80 I=1,LVEC
+      W(I,0)=W(I,0)
+     X       +U(I,0)*V(I,0)-U(I,1)*V(I,1)-U(I,2)*V(I,2)-U(I,3)*V(I,3)
+      W(I,1)=W(I,1)
+     X       -U(I,0)*V(I,1)-U(I,1)*V(I,0)+U(I,2)*V(I,3)-U(I,3)*V(I,2)
+      W(I,2)=W(I,2)
+     X       -U(I,0)*V(I,2)-U(I,1)*V(I,3)-U(I,2)*V(I,0)+U(I,3)*V(I,1)
+      W(I,3)=W(I,3)
+     X       -U(I,0)*V(I,3)+U(I,1)*V(I,2)-U(I,2)*V(I,1)-U(I,3)*V(I,0)
+80    CONTINUE
+      END
+C*************************PERM**************************************
+C
+C     PERMUTE A VECTOR OF SU(2) MATRICES  U(..,..)  ACCORDING TO THE
+C        INDEX VECTOR  INDPBC(..,IC)   AND RETURN THE RESULT IN
+C        V(..,..)
+C
+C        LVEC: VECTOR LENGTH
+C        LDIM: FIRST DIMENSIONAL PARAMETER OF U,V,W
+C                 IN THE CALLING PROGRAM
+C
+      SUBROUTINE PERM(U,IC,V,LVEC)
+*     ***************
+C
+      PARAMETER(MAXVEC=8**3*8+7)
+C
+      REAL*8 U,V
+C
+      COMMON/GEOM3/INDPBC(MAXVEC,2*4)
+C
+      DIMENSION U(MAXVEC,0:3),V(MAXVEC,0:3)
+C
+      DO 10 I=2,LVEC,2
+      V(I-1,0)=U(INDPBC(I-1,IC),0)
+      V(I-1,1)=U(INDPBC(I-1,IC),1)
+      V(I-1,2)=U(INDPBC(I-1,IC),2)
+      V(I-1,3)=U(INDPBC(I-1,IC),3)
+      V(I,0)=U(INDPBC(I,IC),0)
+      V(I,1)=U(INDPBC(I,IC),1)
+      V(I,2)=U(INDPBC(I,IC),2)
+      V(I,3)=U(INDPBC(I,IC),3)
+10    CONTINUE
+      END
+C*************************INTACT************************************
+C
+C     COMPUTE THE (VECTORISED) PRODUCT OF THREE INTERACTING NEIGHBOURS
+C          OF A LINK  (ILAT2,I1)  AROUND THE PLAQUETTE  (I1,I2)
+C       I1=1,..,NDIM
+C       I2=+/-1,..,+/-NDIM
+C
+      SUBROUTINE INTACT(ILAT2,I1,I2,PROD)
+*     *****************
+C
+      PARAMETER(MAXVEC=8**3*8+7)
+C
+      REAL*8 U
+      REAL*8 PROD,W1,W2
+C
+      COMMON/PAR1/NDIM,LSIZE(4),LVEC,NDSP
+      COMMON/PAR2/NPTS,NLINKS,NPLAQS,NPLPP,NVOL
+      COMMON/PAR3/BETA,GAMMA,ITER,IFREQ,MFREQ
+      COMMON/GEOM1/NEWLAT(2**4,-4:4)
+      COMMON/GEOM2/ICODE(2**4,-4:4)
+      COMMON/CONF/U(MAXVEC,0:3,2**4,4)
+C
+      DIMENSION PROD(MAXVEC,0:3),W1(MAXVEC,0:3),W2(MAXVEC,0:3)
+C
+C     THE SUB-LATTICE POINTS ARE LABELLED AS FOLLOWS:
+C
+C               I1
+C                .
+C                .    4   5   6
+C                .    1   2   3
+C                . . . . . . . . . . ABS(I2)
+C
+C     ILAT2  REFERS TO POINT '2'
+C     '2-5' IS THE CENTRAL LINK  (ILAT2,I1)
+C
+C     THE PRODUCT  '2-3-6-5'  (FOR POSITIVE  I2)
+C              OR  '2-1-4-5'  (FOR NEGATIVE  I2)
+C        IS RETURNED IN  PROD(...)
+C
+      IF(I2.GT.0)THEN
+C
+C     CASE  I1 POSITIVE , I2 POSITIVE
+C
+      ILAT3=NEWLAT(ILAT2,I2)
+      ILAT5=NEWLAT(ILAT2,I1)
+      IC23=ICODE(ILAT2,I2)
+      IC25=ICODE(ILAT2,I1)
+C
+      IF(IC23.EQ.0)THEN
+      CALL MATMAT(U(1,0,ILAT3,I1),U(1,0,ILAT2,I2),W1,
+     X                        LVEC,MAXVEC)
+      ELSE
+      CALL PERM(U(1,0,ILAT3,I1),IC23,W2,LVEC)
+      CALL MATMAT(W2,U(1,0,ILAT2,I2),W1,LVEC,MAXVEC)
+      ENDIF
+C
+      IF(IC25.EQ.0)THEN
+      CALL ADJMAT(U(1,0,ILAT5,I2),W1,PROD,LVEC,MAXVEC)
+      ELSE
+      CALL PERM(U(1,0,ILAT5,I2),IC25,W2,LVEC)
+      CALL ADJMAT(W2,W1,PROD,LVEC,MAXVEC)
+      ENDIF
+C
+      ELSE
+C
+C     CASE  I1 POSITIVE , I2 NEGATIVE
+C
+      ILAT1=NEWLAT(ILAT2,I2)
+      ILAT4=NEWLAT(ILAT1,I1)
+      IC21=ICODE(ILAT2,I2)
+      IC14=ICODE(ILAT1,I1)
+C
+      CALL MATADJ(U(1,0,ILAT1,I1),U(1,0,ILAT1,-I2),W1,
+     X                    LVEC,MAXVEC)
+      IF(IC14.EQ.0)THEN
+      IF(IC21.EQ.0)THEN
+      CALL MATMAT(U(1,0,ILAT4,-I2),W1,PROD,LVEC,MAXVEC)
+      ELSE
+      CALL MATMAT(U(1,0,ILAT4,-I2),W1,W2,LVEC,MAXVEC)
+      CALL PERM(W2,IC21,PROD,LVEC)
+      ENDIF
+      ELSE
+      IF(IC21.EQ.0)THEN
+      CALL PERM(U(1,0,ILAT4,-I2),IC14,W2,LVEC)
+      CALL MATMAT(W2,W1,PROD,LVEC,MAXVEC)
+      ELSE
+      CALL PERM(U(1,0,ILAT4,-I2),IC14,PROD,LVEC)
+      CALL MATMAT(PROD,W1,W2,LVEC,MAXVEC)
+      CALL PERM(W2,IC21,PROD,LVEC)
+      ENDIF
+      ENDIF
+C
+      ENDIF
+C
+      END
+C*************************BESTABNN*****************************
+C
+      SUBROUTINE BESTAB(BETA,NDIM)
+*     *****************
+C
+      PARAMETER(ERROR=1.E-8)
+C
+      REAL*8 CD0,CD1,CD2,CD3,RD,SD,BCOEFF
+C
+      COMMON/BESS1/CD0(0:200,2:20),CD1(0:200,2:20)
+      COMMON/BESS2/CD2(0:200,2:20),CD3(0:200,2:20)
+      COMMON/BESS3/RD(20),SD(20)
+      COMMON/BESS4/BCOEFF
+C
+      DIMENSION CD(-1:200+2,2:20)
+C
+      BCOEFF=FLOAT(200)/(2*(NDIM-1))**2
+C
+      STEP=((NDIM-1)*BETA)**2 /200
+      BHALF=.5D0*BETA
+C
+C     LOOP OVER POINTS
+C
+      DO 100 IBSQ=-1,200+2
+      U=IBSQ*STEP
+C
+C     COMPUTE THE NUMERATOR AND DENOMINATOR SUMS FOR  CD(BETA,B)
+C
+      DENOM=1.D0
+      CD(IBSQ,2)=.5D0
+      DO 10 ND=3,20
+      CD(IBSQ,ND)=CD(IBSQ,ND-1) /ND
+10    CONTINUE
+      S=1.
+      K=0
+C
+20    CONTINUE
+      K=K+1
+      S=S*U/(K*(K+1))
+      DENOM=DENOM+S
+      S1=S
+      DO 30 ND=2,20
+      S1=S1/(K+ND)
+      CD(IBSQ,ND)=CD(IBSQ,ND)+S1
+30    CONTINUE
+      IF(ABS(S).GT.DENOM*ERROR)GOTO 20
+C
+C     COMPUTE  CD(BETA,B)
+C
+      F=1./DENOM
+      DO 40 ND=2,20
+      F=F*BHALF
+      CD(IBSQ,ND)=F*CD(IBSQ,ND)
+40    CONTINUE
+C
+100   CONTINUE
+C
+C     COMPUTE THE COEFFICIENTS OF THE INTERPOLATING POLYNOMIALS
+C
+      DO 200 IBSQ=0,200
+      DO 200 ND=2,20
+      CD0(IBSQ,ND)=CD(IBSQ,ND)
+      CD1(IBSQ,ND)=-CD(IBSQ-1,ND)/3.D0 - .5D0*CD(IBSQ,ND)
+     X                    + CD(IBSQ+1,ND) - CD(IBSQ+2,ND)/6.D0
+      CD2(IBSQ,ND)=.5D0*( CD(IBSQ-1,ND) + CD(IBSQ+1,ND) ) - CD(IBSQ,ND)
+      CD3(IBSQ,ND)=( CD(IBSQ+2,ND) - CD(IBSQ-1,ND) )/6.D0
+     X                   + .5D0*( CD(IBSQ,ND) - CD(IBSQ+1,ND) )
+200   CONTINUE
+C
+C     COMPUTE THE SUMS FOR  RD(BETA)
+C
+      RD(1)=1.D0
+      DO 50 ND=2,20
+      RD(ND)=RD(ND-1)/ND
+50    CONTINUE
+      U=BHALF**2
+      S=1.
+      K=0
+C
+60    CONTINUE
+      K=K+1
+      S=S*U/K**2
+      S1=S
+      DO 70 ND=1,20
+      S1=S1/(K+ND)
+      RD(ND)=RD(ND)+S1
+70    CONTINUE
+      IF(S.GT.RD(1)*ERROR)GOTO 60
+C
+C     COMPUTE  RD(BETA)  AND  SD(BETA)
+C
+      F=1./RD(1)
+      RD(1)=1.
+      DO 80 ND=2,20
+      D=ND
+      F=F*BHALF
+      RD(ND)=D*F*RD(ND)
+      SD(ND)=D/(D-1.D0)*RD(ND-1) - (D+1.D0)/BETA*RD(ND)
+80    CONTINUE
+      SD(1)=.5D0*RD(2)
+      END
+C*************************BESPOL****************************
+C
+C     COMPUTE THE INTERPOLATING POLYNOMIAL FOR TABULATED
+C          RATIOS OF BESSEL FUNCTIONS
+C
+      SUBROUTINE BESPOL(ND,IND,DIFF,POL,LVEC)
+*     *****************
+C
+      PARAMETER(ERROR=1.E-8)
+C
+      REAL*8 CD0,CD1,CD2,CD3
+      REAL*8 DIFF,POL
+C
+      COMMON/BESS1/CD0(0:200,2:20),CD1(0:200,2:20)
+      COMMON/BESS2/CD2(0:200,2:20),CD3(0:200,2:20)
+C
+      DIMENSION IND(LVEC),DIFF(LVEC),POL(LVEC)
+C
+      DO 10 I=2,LVEC,2
+      POL(I-1)=
+     X     ( CD0(IND(I-1),ND)+DIFF(I-1)*( CD1(IND(I-1),ND)+DIFF(I-1)*
+     X     ( CD2(IND(I-1),ND)+DIFF(I-1)*  CD3(IND(I-1),ND) )))
+      POL(I)=( CD0(IND(I),ND)+DIFF(I)*( CD1(IND(I),ND)+DIFF(I)*
+     X       ( CD2(IND(I),ND)+DIFF(I)*  CD3(IND(I),ND) )))
+10    CONTINUE
+      END
+C*************************INT4V*****************************
+C
+C     COMPUTE THE 4-LINK INTEGRAL EXPRESSIONS FOR THE
+C          PLAQUETTE AVERAGE (VECTORISED VERSION)
+C
+      SUBROUTINE INT4V(B1,B2,B3,B4,PLINT)
+*     ****************
+C
+      PARAMETER(MAXVEC=8**3*8+7)
+      PARAMETER(ERROR=1.E-8)
+      PARAMETER(ERROR4=1.E-7,NDMAX4=8)
+C
+      REAL*8 BCOEFF,BETINV,RD,SD
+      REAL*8 B1,B2,B3,B4,PLINT,W1,W2,TRACE,BSQ,D1,D2,D3,D4
+      REAL*8 SUM1,SUM2,CHIDM1,CHID,BES1,BES2,BES3,BES4,F6
+      REAL*8 B1SQ,B2SQ,B3SQ,B4SQ,CHIOLD,F5,ERR4,ZERO,ONE,TWO
+      PARAMETER(ERR4=ERROR4,ZERO=0.D0,ONE=1.D0,TWO=2.D0)
+C
+      COMMON/PAR1/NDIM,LSIZE(4),LVEC,NDSP
+      COMMON/INTBLK/BETINV,NERR4,NERR2
+      COMMON/BESS3/RD(20),SD(20)
+      COMMON/BESS4/BCOEFF
+C
+      DIMENSION B1(MAXVEC,0:3),B2(MAXVEC,0:3)
+      DIMENSION B3(MAXVEC,0:3),B4(MAXVEC,0:3),PLINT(MAXVEC)
+C
+      DIMENSION W1(MAXVEC,0:3),W2(MAXVEC,0:3),TRACE(MAXVEC),BSQ(MAXVEC)
+      DIMENSION D1(MAXVEC),D2(MAXVEC),D3(MAXVEC),D4(MAXVEC)
+      DIMENSION I1(MAXVEC),I2(MAXVEC),I3(MAXVEC),I4(MAXVEC)
+      DIMENSION SUM1(MAXVEC),SUM2(MAXVEC),CHIDM1(MAXVEC),CHID(MAXVEC)
+      DIMENSION BES1(MAXVEC),BES2(MAXVEC),BES3(MAXVEC),BES4(MAXVEC)
+      DIMENSION F6(MAXVEC)
+C
+C+++++EQUIVALENCE (BES1,W1(1,0)),(BES2,W1(1,1))
+C+++++EQUIVALENCE (BES3,W1(1,2)),(BES4,W1(1,3))
+C+++++EQUIVALENCE (D1,W2(1,0)),(D2,W2(1,1))
+C+++++EQUIVALENCE (D3,W2(1,2)),(D4,W2(1,3))
+C
+C     PRODUCT B2*B1
+C
+      CALL MATMAT(B2,B1,W1,LVEC,MAXVEC)
+C
+C     PRODUCT B3*B4
+C
+      CALL MATMAT(B3,B4,W2,LVEC,MAXVEC)
+C
+      DO 50 I=1,LVEC
+C
+      TRACE(I)=TWO*( W1(I,0)*W2(I,0) + W1(I,1)*W2(I,1)
+     X             + W1(I,2)*W2(I,2) + W1(I,3)*W2(I,3) )
+C
+      B1SQ=B1(I,0)**2 + B1(I,1)**2 + B1(I,2)**2 + B1(I,3)**2
+      B2SQ=B2(I,0)**2 + B2(I,1)**2 + B2(I,2)**2 + B2(I,3)**2
+      B3SQ=B3(I,0)**2 + B3(I,1)**2 + B3(I,2)**2 + B3(I,3)**2
+      B4SQ=B4(I,0)**2 + B4(I,1)**2 + B4(I,2)**2 + B4(I,3)**2
+C
+      BSQ(I)=B1SQ*B2SQ*B3SQ*B4SQ
+C
+      D1(I)=BCOEFF*B1SQ
+      I1(I)=D1(I)
+      D1(I)=D1(I)-I1(I)
+C
+      D2(I)=BCOEFF*B2SQ
+      I2(I)=D2(I)
+      D2(I)=D2(I)-I2(I)
+C
+      D3(I)=BCOEFF*B3SQ
+      I3(I)=D3(I)
+      D3(I)=D3(I)-I3(I)
+C
+      D4(I)=BCOEFF*B4SQ
+      I4(I)=D4(I)
+      D4(I)=D4(I)-I4(I)
+C
+C     INITIALISE THE SUMS AND RECURSION RELATIONS FOR D=1
+C
+      SUM1(I)=SD(1)
+      SUM2(I)=ONE
+C
+      CHIDM1(I)=ZERO
+      CHID(I)=ONE
+C
+50    CONTINUE
+C
+C     LOOP OVER D=2,3,4,...,NDMAX4
+C
+      DO 100 ND=2,NDMAX4
+C
+      CALL BESPOL(ND,I1,D1,BES1,LVEC)
+      CALL BESPOL(ND,I2,D2,BES2,LVEC)
+      CALL BESPOL(ND,I3,D3,BES3,LVEC)
+      CALL BESPOL(ND,I4,D4,BES4,LVEC)
+C
+      DO 150 I=1,LVEC
+C
+C     RECURSION RELATION FOR  CHI
+C
+      CHIOLD=CHIDM1(I)
+      CHIDM1(I)=CHID(I)
+      CHID(I)=TRACE(I)*CHID(I) - BSQ(I)*CHIOLD
+C
+C     SUMMATION
+C
+      F5=CHID(I)*BES1(I)*BES2(I)*BES3(I)*BES4(I)
+      F6(I)=RD(ND)*F5
+      SUM1(I)=SUM1(I) + SD(ND)*F5
+      SUM2(I)=SUM2(I) + F6(I)
+150   CONTINUE
+C
+100   CONTINUE
+C
+C     END OF LOOP OVER D
+C
+      DO 200 I=1,LVEC
+      PLINT(I)=SUM1(I)/SUM2(I)
+      IF(ABS(F6(I)) .GT. SUM2(I)*ERR4) NERR4=NERR4+1
+200   CONTINUE
+      END
+C*************************INT2V*****************************
+C
+C     COMPUTE THE 2-LINK INTEGRAL EXPRESSION FOR THE CORNER
+C          (VECTORISED VERSION)
+C
+      SUBROUTINE INT2V(B1,B2,W,AV)
+*     ****************
+C
+      PARAMETER(MAXVEC=8**3*8+7)
+      PARAMETER(ERROR=1.E-8)
+      PARAMETER(ERROR2=1.E-7,NDMAX2=10)
+C
+      REAL*8 BCOEFF,BETINV,RD,SD
+      REAL*8 B1,B2,W,AV,TRACE,BSQ,D1,D2,SUM1,SUM2,PHID,CHID
+      REAL*8 C1,C2,F4,DENOM
+      REAL*8 B1SQ,B2SQ,D,PHIOLD,F2,F3,ERR2,ZERO,ONE
+      PARAMETER(ERR2=ERROR2,ZERO=0.D0,ONE=1.D0)
+C
+      COMMON/PAR1/NDIM,LSIZE(4),LVEC,NDSP
+      COMMON/INTBLK/BETINV,NERR4,NERR2
+      COMMON/BESS3/RD(20),SD(20)
+      COMMON/BESS4/BCOEFF
+C
+      DIMENSION B1(MAXVEC,0:3),B2(MAXVEC,0:3)
+      DIMENSION W(MAXVEC,0:3),AV(MAXVEC,0:3)
+C
+      DIMENSION TRACE(MAXVEC),BSQ(MAXVEC)
+      DIMENSION I1(MAXVEC),I2(MAXVEC),D1(MAXVEC),D2(MAXVEC)
+      DIMENSION SUM1(MAXVEC),SUM2(MAXVEC),PHID(MAXVEC),CHID(MAXVEC)
+      DIMENSION C1(MAXVEC),C2(MAXVEC)
+      DIMENSION F4(MAXVEC),DENOM(MAXVEC)
+C
+C     PRODUCT B2*B1
+C
+      CALL MATMAT(B2,B1,AV,LVEC,MAXVEC)
+C
+      DO 50 I=1,LVEC
+C
+      TRACE(I)= AV(I,0)*W(I,0) + AV(I,1)*W(I,1)
+     X        + AV(I,2)*W(I,2) + AV(I,3)*W(I,3)
+C
+      B1SQ=B1(I,0)**2 + B1(I,1)**2 + B1(I,2)**2 + B1(I,3)**2
+      B2SQ=B2(I,0)**2 + B2(I,1)**2 + B2(I,2)**2 + B2(I,3)**2
+C
+      BSQ(I)=B1SQ*B2SQ
+C
+      D1(I)=BCOEFF*B1SQ
+      I1(I)=D1(I)
+      D1(I)=D1(I)-I1(I)
+C
+      D2(I)=BCOEFF*B2SQ
+      I2(I)=D2(I)
+      D2(I)=D2(I)-I2(I)
+C
+C     INITIALISE THE SUMS AND RECURSION RELATIONS FOR D=1
+C
+      SUM1(I)=SD(1)
+      SUM2(I)=ZERO
+      DENOM(I)=ONE
+C
+      CHID(I)=ONE
+      PHID(I)=ZERO
+C
+50    CONTINUE
+C
+C     LOOP OVER D=2,3,4,...,NDMAX2
+C
+      DO 100 ND=2,NDMAX2
+      D=ND
+C
+      CALL BESPOL(ND,I1,D1,C1,LVEC)
+      CALL BESPOL(ND,I2,D2,C2,LVEC)
+C
+      DO 150 I=1,LVEC
+C
+C     RECURSION RELATION FOR  CHI  AND  PHI
+C
+      PHIOLD=PHID(I)
+      PHID(I)=D*CHID(I) + TRACE(I)*PHID(I)
+      CHID(I)=(TRACE(I)*PHID(I) - BSQ(I)*PHIOLD) /(D-ONE)
+C
+C     SUMMATION
+C
+      F2=C1(I)*C2(I)
+      F3=CHID(I)*F2
+      F4(I)=RD(ND)*F3
+      SUM1(I)=SUM1(I) + SD(ND)*F3
+      SUM2(I)=SUM2(I) + RD(ND)*PHID(I)*F2
+      DENOM(I)=DENOM(I) + F4(I)
+C
+150   CONTINUE
+C
+100   CONTINUE
+C
+C     END OF LOOP OVER D
+C
+C     COMPUTE THE CORNER AVERAGE
+C
+      DO 200 I=1,LVEC
+C
+      C2(I)=BETINV*SUM2(I)/DENOM(I)
+      C1(I)=SUM1(I)/DENOM(I) - TRACE(I)*C2(I)
+C
+      AV(I,0)=C1(I)*W(I,0) + C2(I)*AV(I,0)
+      AV(I,1)=C1(I)*W(I,1) + C2(I)*AV(I,1)
+      AV(I,2)=C1(I)*W(I,2) + C2(I)*AV(I,2)
+      AV(I,3)=C1(I)*W(I,3) + C2(I)*AV(I,3)
+C
+      IF(ABS(F4(I)) .GT. DENOM(I)*ERR2) NERR2=NERR2+1
+C
+200   CONTINUE
+      END
+C*************************CORR***************************
+C
+C     ACCUMULATE THE GLUEBALL CORRELATIONS
+C       (SUBROUTINE SPECIALISED TO 4 DIMENSIONS)
+C
+      SUBROUTINE CORR
+*     ***************
+C
+      PARAMETER(MAXVEC=8**3*8+7)
+C
+      COMMON/PAR1/NDIM,LSIZE(4),LVEC,NDSP
+      COMMON/PAR2/NPTS,NLINKS,NPLAQS,NPLPP,NVOL
+C
+      REAL*8 S110,S112,S110I,S112I
+      REAL*8 S220,S222,S220I,S222I
+      REAL*8 W11SUM(20,3),W11INT(20,3)
+      REAL*8 W22SUM(20,3),W22INT(20,3)
+      REAL*8 OP110(20),OP112(20),OP110I(20),OP112I(20)
+      REAL*8 OP220(20),OP222(20),OP220I(20),OP222I(20)
+      REAL*8 PR110(0:20/2),PR112(0:20/2)
+      REAL*8 PR110I(0:20/2),PR112I(0:20/2)
+      REAL*8 PR220(0:20/2),PR222(0:20/2)
+      REAL*8 PR220I(0:20/2),PR222I(0:20/2)
+      REAL*8 VECT(2+20/2,8)
+C
+      NT=LSIZE(NDIM)
+      MAXDST=NT/2
+      NDIST=MAXDST+1
+C
+      S110=0.D0
+      S112=0.D0
+      S110I=0.D0
+      S112I=0.D0
+C
+      S220=0.D0
+      S222=0.D0
+      S220I=0.D0
+      S222I=0.D0
+C
+      CALL LOOPS(W11SUM,W11INT,W22SUM,W22INT)
+C
+      DO 10 IT=1,NT
+C
+      OP110(IT)=W11SUM(IT,3)+W11SUM(IT,2)+W11SUM(IT,1)
+      OP112(IT)=W11SUM(IT,3)+W11SUM(IT,2)-2*W11SUM(IT,1)
+      OP110I(IT)=W11INT(IT,3)+W11INT(IT,2)+W11INT(IT,1)
+      OP112I(IT)=W11INT(IT,3)+W11INT(IT,2)-2*W11INT(IT,1)
+C
+      OP220(IT)=W22SUM(IT,3)+W22SUM(IT,2)+W22SUM(IT,1)
+      OP222(IT)=W22SUM(IT,3)+W22SUM(IT,2)-2*W22SUM(IT,1)
+      OP220I(IT)=W22INT(IT,3)+W22INT(IT,2)+W22INT(IT,1)
+      OP222I(IT)=W22INT(IT,3)+W22INT(IT,2)-2*W22INT(IT,1)
+C
+      S110=S110 + OP110(IT)
+      S112=S112 + OP112(IT)
+      S110I=S110I + OP110I(IT)
+      S112I=S112I + OP112I(IT)
+C
+      S220=S220 + OP220(IT)
+      S222=S222 + OP222(IT)
+      S220I=S220I + OP220I(IT)
+      S222I=S222I + OP222I(IT)
+10    CONTINUE
+C
+      CALL ACCUM2(10,S110/NT)
+      CALL ACCUM2(11,S112/NT)
+      CALL ACCUM2(12,S110I/NT)
+      CALL ACCUM2(13,S112I/NT)
+C
+      CALL ACCUM2(14,S220/NT)
+      CALL ACCUM2(15,S222/NT)
+      CALL ACCUM2(16,S220I/NT)
+      CALL ACCUM2(17,S222I/NT)
+C
+      VECT(1,1)=S110/NT
+      VECT(1,2)=S112/NT
+      VECT(1,3)=S110I/NT
+      VECT(1,4)=S112I/NT
+      VECT(1,5)=S220/NT
+      VECT(1,6)=S222/NT
+      VECT(1,7)=S220I/NT
+      VECT(1,8)=S222I/NT
+C
+      DO 20 IDIST=0,MAXDST
+      PR110(IDIST)=0.D0
+      PR112(IDIST)=0.D0
+      PR110I(IDIST)=0.D0
+      PR112I(IDIST)=0.D0
+C
+      PR220(IDIST)=0.D0
+      PR222(IDIST)=0.D0
+      PR220I(IDIST)=0.D0
+      PR222I(IDIST)=0.D0
+20    CONTINUE
+C
+      DO 30 IT1=1,NT
+      DO 30 IT2=IT1,NT
+      IDIST=MIN(IT2-IT1,NT+IT1-IT2)
+      PR110(IDIST)=PR110(IDIST) + OP110(IT1)*OP110(IT2)
+      PR112(IDIST)=PR112(IDIST) + OP112(IT1)*OP112(IT2)
+      PR110I(IDIST)=PR110I(IDIST) + OP110I(IT1)*OP110I(IT2)
+      PR112I(IDIST)=PR112I(IDIST) + OP112I(IT1)*OP112I(IT2)
+C
+      PR220(IDIST)=PR220(IDIST) + OP220(IT1)*OP220(IT2)
+      PR222(IDIST)=PR222(IDIST) + OP222(IT1)*OP222(IT2)
+      PR220I(IDIST)=PR220I(IDIST) + OP220I(IT1)*OP220I(IT2)
+      PR222I(IDIST)=PR222I(IDIST) + OP222I(IT1)*OP222I(IT2)
+30    CONTINUE
+C
+      DO 40 IDIST=0,MAXDST
+      IND=IDIST+1
+      IND1=IND+1
+      FACT=1.D0/NT
+      IF(2*IDIST.EQ.NT) FACT=2.D0/NT
+C
+      CALL ACCUM2(17+IND,PR110(IDIST)*FACT)
+      CALL ACCUM2(17+NDIST+IND,PR112(IDIST)*FACT)
+      CALL ACCUM2(17+2*NDIST+IND,PR110I(IDIST)*FACT)
+      CALL ACCUM2(17+3*NDIST+IND,PR112I(IDIST)*FACT)
+C
+      CALL ACCUM2(17+4*NDIST+IND,PR220(IDIST)*FACT)
+      CALL ACCUM2(17+5*NDIST+IND,PR222(IDIST)*FACT)
+      CALL ACCUM2(17+6*NDIST+IND,PR220I(IDIST)*FACT)
+      CALL ACCUM2(17+7*NDIST+IND,PR222I(IDIST)*FACT)
+C
+      VECT(IND1,1)=PR110(IDIST)*FACT
+      VECT(IND1,2)=PR112(IDIST)*FACT
+      VECT(IND1,3)=PR110I(IDIST)*FACT
+      VECT(IND1,4)=PR112I(IDIST)*FACT
+      VECT(IND1,5)=PR220(IDIST)*FACT
+      VECT(IND1,6)=PR222(IDIST)*FACT
+      VECT(IND1,7)=PR220I(IDIST)*FACT
+      VECT(IND1,8)=PR222I(IDIST)*FACT
+40    CONTINUE
+C
+      DO 50 IBL=1,8
+      CALL ACCUM4(IBL,VECT(1,IBL))
+50    CONTINUE
+      END
+C*************************LOOPS**************************
+C
+C     MEASUREMENT OF SUMS OF LOOPS (VECTORISED)
+C          W11SUM(IT,IPLANE) : NAIVE PLAQUETTE EXPRESSION
+C          W11INT(IT,IPLANE) : 4-LINK INTEGRAL
+C          W22SUM(IT,IPLANE) : NAIVE 2X2 LOOP
+C          W22INT(IT,IPLANE) : 2X2 LOOP INTEGRAL (4 CORNERS)
+C        IT: TIME SLICE
+C        IPLANE=1,2,...  FOR SPATIAL PLANES (1,2),(1,3),...
+C
+      SUBROUTINE LOOPS(W11SUM,W11INT,W22SUM,W22INT)
+*     ****************
+C
+      PARAMETER(MAXVEC=8**3*8+7)
+      PARAMETER(NST=(4-1)*(4-2),MAXSL=2**(4-1))
+C
+      REAL*8 U,BETINV
+      REAL*8 R,S,W1,W2,WP,WR,WL,W,WLOOP1,WLOOP2
+C
+      COMMON/PAR1/NDIM,LSIZE(4),LVEC,NDSP
+      COMMON/PAR2/NPTS,NLINKS,NPLAQS,NPLPP,NVOL
+      COMMON/PAR3/BETA,GAMMA,ITER,IFREQ,MFREQ
+      COMMON/GEOM1/NEWLAT(2**4,-4:4)
+      COMMON/GEOM2/ICODE(2**4,-4:4)
+      COMMON/INTBLK/BETINV,NERR4,NERR2
+      COMMON/CONF/U(MAXVEC,0:3,2**4,4)
+C
+      DIMENSION R(MAXVEC,0:3,MAXSL,NST),S(MAXVEC,0:3,MAXSL,NST)
+      DIMENSION W1(MAXVEC,0:3),W2(MAXVEC,0:3),WP(MAXVEC,0:3)
+      DIMENSION WR(MAXVEC,0:3),WL(MAXVEC,0:3),W(MAXVEC,0:3)
+      DIMENSION WLOOP1(MAXVEC),WLOOP2(MAXVEC)
+C
+      DIMENSION MPL(4,4),MPLANE(4,4)
+C
+      REAL*8 W11SUM(20,*),W11INT(20,*)
+      REAL*8 W22SUM(20,*),W22INT(20,*)
+C
+      NT=LSIZE(NDIM)
+      NSPLPP=(NDSP*(NDSP-1))/2
+      LSPVEC=NVOL/2**NDSP
+C
+      BETINV=1.D0/BETA
+C
+      IPLANE=0
+      DO 10 I1=1,NDSP-1
+      DO 10 I2=I1+1,NDSP
+      IPLANE=IPLANE+1
+      MPLANE(I1,I2)=IPLANE
+      MPLANE(I2,I1)=IPLANE
+10    CONTINUE
+C
+      I1I2=0
+      DO 20 I1=1,NDSP
+      DO 20 I2=1,NDSP
+      IF(I1.EQ.I2)GOTO 20
+      I1I2=I1I2+1
+      MPL(I1,I2)=I1I2
+20    CONTINUE
+C
+      DO 40 IPLANE=1,NSPLPP
+      DO 40 IT=1,NT
+      W11SUM(IT,IPLANE)=0.D0
+      W11INT(IT,IPLANE)=0.D0
+      W22SUM(IT,IPLANE)=0.D0
+      W22INT(IT,IPLANE)=0.D0
+40    CONTINUE
+C
+C     LOOP OVER SUB-LATTICES WITH ODD AND EVEN TIME-SLICES
+C
+      DO 900 IFIRST=1,2
+C
+      IADD=0
+      IF(IFIRST.EQ.2)IADD=2**NDSP
+C.....................................................
+C     COMPUTE THE SPACE-LIKE PRODUCTS R AND S
+C
+C     LOOP OVER SPATIAL PLAQUETTES (ILAT2,I1,I2)
+C
+      DO 100 ILAT2=1,2**NDSP
+      DO 100 I1=1,NDSP-1
+      DO 100 I2=I1+1,NDSP
+C
+C               I1
+C                .
+C                .       5   6
+C                .       2   3
+C                . . . . . . . . . . I2
+C
+C     ILAT2  REFERS TO POINT '2'
+C
+      I1I2=MPL(I1,I2)
+      I2I1=MPL(I2,I1)
+C
+      ILAT3=NEWLAT(ILAT2,I2)
+      ILAT5=NEWLAT(ILAT2,I1)
+C
+      IU2=ILAT2+IADD
+      IU3=ILAT3+IADD
+      IU5=ILAT5+IADD
+C
+      IC23=ICODE(ILAT2,I2)
+      IC25=ICODE(ILAT2,I1)
+      IC32=ICODE(ILAT3,-I2)
+      IC52=ICODE(ILAT5,-I1)
+C
+C     PRODUCT '2-3-6' IN W1
+C
+      IF(IC23.EQ.0)THEN
+      CALL MATMAT(U(1,0,IU3,I1),U(1,0,IU2,I2),W1,LVEC,MAXVEC)
+      ELSE
+      CALL PERM(U(1,0,IU3,I1),IC23,WP,LVEC)
+      CALL MATMAT(WP,U(1,0,IU2,I2),W1,LVEC,MAXVEC)
+      ENDIF
+C
+C     PRODUCT '2-3-6-5' IN R
+C
+      IF(IC25.EQ.0)THEN
+      CALL ADJMAT(U(1,0,IU5,I2),W1,R(1,0,ILAT2,I1I2),LVEC,MAXVEC)
+      ELSE
+      CALL PERM(U(1,0,IU5,I2),IC25,WP,LVEC)
+      CALL ADJMAT(WP,W1,R(1,0,ILAT2,I1I2),LVEC,MAXVEC)
+      ENDIF
+C
+C     PRODUCT '5-2-3-6' IN S
+C
+      IF(IC52.EQ.0)THEN
+      CALL MATADJ(W1,U(1,0,IU2,I1),S(1,0,ILAT5,I2I1),LVEC,MAXVEC)
+      ELSE
+      CALL MATADJ(W1,U(1,0,IU2,I1),WP,LVEC,MAXVEC)
+      CALL PERM(WP,IC52,S(1,0,ILAT5,I2I1),LVEC)
+      ENDIF
+C
+C     PRODUCT '2-5-6' IN W2
+C
+      IF(IC25.EQ.0)THEN
+      CALL MATMAT(U(1,0,IU5,I2),U(1,0,IU2,I1),W2,LVEC,MAXVEC)
+      ELSE
+      CALL PERM(U(1,0,IU5,I2),IC25,WP,LVEC)
+      CALL MATMAT(WP,U(1,0,IU2,I1),W2,LVEC,MAXVEC)
+      ENDIF
+C
+C     PRODUCT '2-5-6-3' IN R
+C
+      IF(IC23.EQ.0)THEN
+      CALL ADJMAT(U(1,0,IU3,I1),W2,R(1,0,ILAT2,I2I1),LVEC,MAXVEC)
+      ELSE
+      CALL PERM(U(1,0,IU3,I1),IC23,WP,LVEC)
+      CALL ADJMAT(WP,W2,R(1,0,ILAT2,I2I1),LVEC,MAXVEC)
+      ENDIF
+C
+C     PRODUCT '3-2-5-6' IN S
+C
+      IF(IC32.EQ.0)THEN
+      CALL MATADJ(W2,U(1,0,IU2,I2),S(1,0,ILAT3,I1I2),LVEC,MAXVEC)
+      ELSE
+      CALL MATADJ(W2,U(1,0,IU2,I2),WP,LVEC,MAXVEC)
+      CALL PERM(WP,IC32,S(1,0,ILAT3,I1I2),LVEC)
+      ENDIF
+C
+C     COMPUTE AND ACCUMULATE THE SPATIAL PLAQUETTES
+C
+      DO 110 I=1,LVEC
+      WLOOP1(I)= W1(I,0)*W2(I,0) + W1(I,1)*W2(I,1)
+     X         + W1(I,2)*W2(I,2) + W1(I,3)*W2(I,3)
+110   CONTINUE
+C
+      IPLANE=MPLANE(I1,I2)
+      N=0
+      DO 120 IT=IFIRST,NT,2
+      DO 130 I=1,LSPVEC
+      W11SUM(IT,IPLANE)=W11SUM(IT,IPLANE) + DBLE(WLOOP1(N+I))
+130   CONTINUE
+      N=N+LSPVEC
+120   CONTINUE
+C
+100   CONTINUE
+C
+C     END OF LOOP OVER SPATIAL PLAQUETTES
+C.....................................................
+C     COMPUTE THE SPACE-LIKE 2X2 LOOPS
+C
+C     LOOP OVER SPATIAL PLANES (ILAT2,I1,I2)
+C
+      DO 200 ILAT2=1,2**NDSP
+      DO 200 I1=1,NDSP-1
+      DO 200 I2=I1+1,NDSP
+C
+C               I1
+C                .    7   8   9
+C                .    4   5   6
+C                .    1   2   3
+C                . . . . . . . . . . I2
+C
+C     ILAT2  REFERS TO POINT '2'
+C
+      I1I2=MPL(I1,I2)
+C
+      ILAT5=NEWLAT(ILAT2,I1)
+      IC25=ICODE(ILAT2,I1)
+C
+C     PRODUCT '5-4-1-2-3-6-5' IN W1
+C
+      CALL MATADJ(R(1,0,ILAT2,I1I2),S(1,0,ILAT2,I1I2),W1,LVEC,MAXVEC)
+C
+C     PRODUCT '5-4-7-8-9-6-5' IN W2
+C
+      IF(IC25.EQ.0)THEN
+      CALL ADJMAT(R(1,0,ILAT5,I1I2),S(1,0,ILAT5,I1I2),W2,LVEC,MAXVEC)
+      ELSE
+      CALL ADJMAT(R(1,0,ILAT5,I1I2),S(1,0,ILAT5,I1I2),WP,LVEC,MAXVEC)
+      CALL PERM(WP,IC25,W2,LVEC)
+      ENDIF
+C
+C     COMPUTE AND ACCUMULATE THE SPATIAL 2X2 LOOPS
+C
+      DO 210 I=1,LVEC
+      WLOOP2(I)= W1(I,0)*W2(I,0) + W1(I,1)*W2(I,1)
+     X         + W1(I,2)*W2(I,2) + W1(I,3)*W2(I,3)
+210   CONTINUE
+C
+      IPLANE=MPLANE(I1,I2)
+      N=0
+      DO 220 IT=IFIRST,NT,2
+      DO 230 I=1,LSPVEC
+      W22SUM(IT,IPLANE)=W22SUM(IT,IPLANE) + DBLE(WLOOP2(N+I))
+230   CONTINUE
+      N=N+LSPVEC
+220   CONTINUE
+C
+200   CONTINUE
+C
+C     END OF LOOP OVER SPATIAL PLANES
+C..........................................................
+C     COMPUTE THE TIME-LIKE PRODUCTS
+C       AND REPLACE  R  AND  S  BY THE COMPLEMENTARY
+C       BACKGROUND EXPRESSIONS  (SUM - R)  AND  (SUM - S)
+C
+C     LOOP OVER SPATIAL LINKS (ILAT,I1)
+C
+      DO 300 ILAT=1,2**NDSP
+      DO 300 I1=1,NDSP
+C
+      CALL INTACT(ILAT+IADD,I1, NDIM,W1)
+      CALL INTACT(ILAT+IADD,I1,-NDIM,W2)
+      DO 310 I=1,LVEC
+      W1(I,0)=W1(I,0) + W2(I,0)
+      W1(I,1)=W1(I,1) + W2(I,1)
+      W1(I,2)=W1(I,2) + W2(I,2)
+      W1(I,3)=W1(I,3) + W2(I,3)
+310   CONTINUE
+C
+      DO 320 I2=1,NDSP
+      IF(I1.EQ.I2)GOTO 320
+      I1I2=MPL(I1,I2)
+      DO 321 I=1,LVEC
+      W1(I,0)=W1(I,0) + R(I,0,ILAT,I1I2) + S(I,0,ILAT,I1I2)
+      W1(I,1)=W1(I,1) + R(I,1,ILAT,I1I2) + S(I,1,ILAT,I1I2)
+      W1(I,2)=W1(I,2) + R(I,2,ILAT,I1I2) + S(I,2,ILAT,I1I2)
+      W1(I,3)=W1(I,3) + R(I,3,ILAT,I1I2) + S(I,3,ILAT,I1I2)
+321   CONTINUE
+320   CONTINUE
+C
+      DO 330 I2=1,NDSP
+      IF(I1.EQ.I2)GOTO 330
+      I1I2=MPL(I1,I2)
+      DO 331 I=1,LVEC
+      R(I,0,ILAT,I1I2)=W1(I,0) - R(I,0,ILAT,I1I2)
+      R(I,1,ILAT,I1I2)=W1(I,1) - R(I,1,ILAT,I1I2)
+      R(I,2,ILAT,I1I2)=W1(I,2) - R(I,2,ILAT,I1I2)
+      R(I,3,ILAT,I1I2)=W1(I,3) - R(I,3,ILAT,I1I2)
+      S(I,0,ILAT,I1I2)=W1(I,0) - S(I,0,ILAT,I1I2)
+      S(I,1,ILAT,I1I2)=W1(I,1) - S(I,1,ILAT,I1I2)
+      S(I,2,ILAT,I1I2)=W1(I,2) - S(I,2,ILAT,I1I2)
+      S(I,3,ILAT,I1I2)=W1(I,3) - S(I,3,ILAT,I1I2)
+331   CONTINUE
+330   CONTINUE
+C
+300   CONTINUE
+C
+C     END OF LOOP OVER SPATIAL LINKS
+C..........................................................
+C     COMPUTE THE SPACE-LIKE 1X1 AND 2X2 INTEGRALS
+C
+C     LOOP OVER SPATIAL PLANES (ILAT1,I1,I2)
+C
+      DO 400 ILAT1=1,2**NDSP
+      DO 400 I1=1,NDSP-1
+      DO 400 I2=I1+1,NDSP
+C
+C               I1
+C                .    7   8   9
+C                .    4   5   6
+C                .    1   2   3
+C                . . . . . . . . . . I2
+C
+C     ILAT1  REFERS TO POINT '1'
+C
+      I1I2=MPL(I1,I2)
+      I2I1=MPL(I2,I1)
+C
+      ILAT2=NEWLAT(ILAT1,I2)
+      ILAT3=NEWLAT(ILAT2,I2)
+      ILAT4=NEWLAT(ILAT1,I1)
+      ILAT5=NEWLAT(ILAT2,I1)
+      ILAT6=NEWLAT(ILAT3,I1)
+      ILAT7=NEWLAT(ILAT4,I1)
+      ILAT8=NEWLAT(ILAT5,I1)
+C
+      IU2=ILAT2+IADD
+      IU4=ILAT4+IADD
+      IU5=ILAT5+IADD
+C
+      IC12=ICODE(ILAT1,I2)
+      IC14=ICODE(ILAT1,I1)
+      IC23=ICODE(ILAT2,I2)
+      IC25=ICODE(ILAT2,I1)
+      IC45=ICODE(ILAT4,I2)
+      IC47=ICODE(ILAT4,I1)
+      IC56=ICODE(ILAT5,I2)
+      IC58=ICODE(ILAT5,I1)
+C
+C     COMPUTE THE PLAQUETTE INTEGRAL FOR   4  5
+C                                          1  2
+C
+      IF(IC12.EQ.0)THEN
+      IF(IC14.EQ.0)THEN
+      CALL INT4V(R(1,0,ILAT1,I2I1),S(1,0,ILAT2,I1I2),
+     X           S(1,0,ILAT4,I2I1),R(1,0,ILAT1,I1I2),WLOOP1)
+      ELSE
+      CALL PERM(S(1,0,ILAT4,I2I1),IC14,WP,LVEC)
+      CALL INT4V(R(1,0,ILAT1,I2I1),S(1,0,ILAT2,I1I2),
+     X           WP               ,R(1,0,ILAT1,I1I2),WLOOP1)
+      ENDIF
+      ELSE
+      CALL PERM(S(1,0,ILAT2,I1I2),IC12,W1,LVEC)
+      IF(IC14.EQ.0)THEN
+      CALL INT4V(R(1,0,ILAT1,I2I1),W1,
+     X           S(1,0,ILAT4,I2I1),R(1,0,ILAT1,I1I2),WLOOP1)
+      ELSE
+      CALL PERM(S(1,0,ILAT4,I2I1),IC14,WP,LVEC)
+      CALL INT4V(R(1,0,ILAT1,I2I1),W1,
+     X           WP               ,R(1,0,ILAT1,I1I2),WLOOP1)
+      ENDIF
+      ENDIF
+C
+C     COMPUTE THE 2X2 LOOP INTEGRALS
+C
+C     CORNER '2-3-6' IN  W1  (REFERENCE POINT '2')
+C
+      IF(IC25.EQ.0)THEN
+      CALL MATMAT(U(1,0,IU5,I2),U(1,0,IU2,I1),W,LVEC,MAXVEC)
+      ELSE
+      CALL PERM(U(1,0,IU5,I2),IC25,WP,LVEC)
+      CALL MATMAT(WP,U(1,0,IU2,I1),W,LVEC,MAXVEC)
+      ENDIF
+C
+      IF(IC23.EQ.0)THEN
+      CALL INT2V(R(1,0,ILAT2,I2I1),S(1,0,ILAT3,I1I2),W,W1)
+      ELSE
+      CALL PERM(S(1,0,ILAT3,I1I2),IC23,WP,LVEC)
+      CALL INT2V(R(1,0,ILAT2,I2I1),WP,W,W1)
+      ENDIF
+C
+C     CORNER '6-9-8' IN  W2  (REFERENCE POINT '5')
+C
+      CALL MATADJ(U(1,0,IU5,I1),U(1,0,IU5,I2),W,LVEC,MAXVEC)
+C
+      DO 450 I=1,LVEC
+      WR(I,0)= S(I,0,ILAT8,I2I1)
+      WR(I,1)=-S(I,1,ILAT8,I2I1)
+      WR(I,2)=-S(I,2,ILAT8,I2I1)
+      WR(I,3)=-S(I,3,ILAT8,I2I1)
+450   CONTINUE
+      IF(IC58.EQ.0)THEN
+      IF(IC56.EQ.0)THEN
+      CALL INT2V(S(1,0,ILAT6,I1I2),WR,W,W2)
+      ELSE
+      CALL PERM(S(1,0,ILAT6,I1I2),IC56,WP,LVEC)
+      CALL INT2V(WP,WR,W,W2)
+      ENDIF
+      ELSE
+      CALL PERM(WR,IC58,WL,LVEC)
+      IF(IC56.EQ.0)THEN
+      CALL INT2V(S(1,0,ILAT6,I1I2),WL,W,W2)
+      ELSE
+      CALL PERM(S(1,0,ILAT6,I1I2),IC56,WP,LVEC)
+      CALL INT2V(WP,WL,W,W2)
+      ENDIF
+      ENDIF
+C
+C     PRODUCT '2-3-6-9-8' IN  WR  (REFERENCE POINT '2')
+C
+      IF(IC25.EQ.0)THEN
+      CALL MATMAT(W2,W1,WR,LVEC,MAXVEC)
+      ELSE
+      CALL PERM(W2,IC25,WP,LVEC)
+      CALL MATMAT(WP,W1,WR,LVEC,MAXVEC)
+      ENDIF
+C
+C     CORNER '2-1-4' IN  W1  (REFERENCE POINT '1')
+C
+      IF(IC12.EQ.0)THEN
+      IF(IC14.EQ.0)THEN
+      CALL ADJMAT(U(1,0,IU4,I2),U(1,0,IU2,I1),W,LVEC,MAXVEC)
+      ELSE
+      CALL PERM(U(1,0,IU4,I2),IC14,WP,LVEC)
+      CALL ADJMAT(WP,U(1,0,IU2,I1),W,LVEC,MAXVEC)
+      ENDIF
+      ELSE
+      CALL PERM(U(1,0,IU2,I1),IC12,W2,LVEC)
+      IF(IC14.EQ.0)THEN
+      CALL ADJMAT(U(1,0,IU4,I2),W2,W,LVEC,MAXVEC)
+      ELSE
+      CALL PERM(U(1,0,IU4,I2),IC14,WP,LVEC)
+      CALL ADJMAT(WP,W2,W,LVEC,MAXVEC)
+      ENDIF
+      ENDIF
+C
+      DO 460 I=1,LVEC
+      WL(I,0)= R(I,0,ILAT1,I2I1)
+      WL(I,1)=-R(I,1,ILAT1,I2I1)
+      WL(I,2)=-R(I,2,ILAT1,I2I1)
+      WL(I,3)=-R(I,3,ILAT1,I2I1)
+460   CONTINUE
+      CALL INT2V(WL,R(1,0,ILAT1,I1I2),W,W1)
+C
+C     CORNER '4-7-8' IN  W2  (REFERENCE POINT '4')
+C
+      IF(IC45.EQ.0)THEN
+      CALL MATMAT(U(1,0,IU5,I1),U(1,0,IU4,I2),W,LVEC,MAXVEC)
+      ELSE
+      CALL PERM(U(1,0,IU5,I1),IC45,WP,LVEC)
+      CALL MATMAT(WP,U(1,0,IU4,I2),W,LVEC,MAXVEC)
+      ENDIF
+C
+      IF(IC47.EQ.0)THEN
+      CALL INT2V(R(1,0,ILAT4,I1I2),S(1,0,ILAT7,I2I1),W,W2)
+      ELSE
+      CALL PERM(S(1,0,ILAT7,I2I1),IC47,WP,LVEC)
+      CALL INT2V(R(1,0,ILAT4,I1I2),WP,W,W2)
+      ENDIF
+C
+C     PRODUCT '2-1-4-7-8' IN  WL  (REFERENCE POINT '1')
+C
+      IF(IC14.EQ.0)THEN
+      CALL MATMAT(W2,W1,WL,LVEC,MAXVEC)
+      ELSE
+      CALL PERM(W2,IC14,WP,LVEC)
+      CALL MATMAT(WP,W1,WL,LVEC,MAXVEC)
+      ENDIF
+C
+C     COMPUTE THE TRACE (REFERENCE POINT '1')
+C
+      IF(IC12.EQ.0)THEN
+      DO 470 I=1,LVEC
+      WLOOP2(I)= WR(I,0)*WL(I,0) + WR(I,1)*WL(I,1)
+     X         + WR(I,2)*WL(I,2) + WR(I,3)*WL(I,3)
+470   CONTINUE
+      ELSE
+      CALL PERM(WR,IC12,WP,LVEC)
+      DO 480 I=1,LVEC
+      WLOOP2(I)= WP(I,0)*WL(I,0) + WP(I,1)*WL(I,1)
+     X         + WP(I,2)*WL(I,2) + WP(I,3)*WL(I,3)
+480   CONTINUE
+      ENDIF
+C
+C     ACCUMULATE THE 1X1 AND 2X2 LOOP INTEGRALS
+C
+      IPLANE=MPLANE(I1,I2)
+      N=0
+      DO 490 IT=IFIRST,NT,2
+      DO 495 I=1,LSPVEC
+      W11INT(IT,IPLANE)=W11INT(IT,IPLANE) + DBLE(WLOOP1(N+I))
+      W22INT(IT,IPLANE)=W22INT(IT,IPLANE) + DBLE(WLOOP2(N+I))
+495   CONTINUE
+      N=N+LSPVEC
+490   CONTINUE
+C
+400   CONTINUE
+C
+C     END OF LOOP OVER SPATIAL PLANES
+C...........................................................
+C
+900   CONTINUE
+C
+C     END OF LOOP OVER ODD/EVEN SUB-LATTICES
+C
+      END
+C*************************STAT2NN***************************
+C                                               B.BUNK 1985
+C     RELAXATION ANALYSIS
+C
+C     FOR INTERNAL COUNTERS IN REAL*8
+C        REMOVE  C+++++
+C
+C     CLEAR COUNTERS
+C
+      SUBROUTINE CLEAR2(NVAR1,NCORR1)
+*     *****************
+      PARAMETER(MAXVEC=8**3*8+7)
+      PARAMETER(MAXVAR=25+4*20,MAXCOR=10)
+* new common order against missalignments          a.w.
+      COMMON/ST2/NVAR,NCORR,SAV(MAXVAR),F(MAXVAR,MAXCOR)
+      COMMON/ST2/SUM(MAXVAR,0:MAXCOR),H(MAXVAR,MAXCOR),NDAT(MAXVAR)
+      REAL*8 SAV,F,SUM,H
+      SAVE/ST2/
+      IF(NVAR1.GT.MAXVAR)THEN
+      WRITE(*,'('' ERROR IN STAT2: NVAR ='',I5)')NVAR1
+      STOP
+      ENDIF
+      IF(NCORR1.GT.MAXCOR)THEN
+      WRITE(*,'('' ERROR IN STAT2: NCORR ='',I5)')NCORR1
+      STOP
+      ENDIF
+      NVAR=NVAR1
+      NCORR=NCORR1
+      DO 10 IVAR=1,NVAR
+      NDAT(IVAR)=0
+      SAV(IVAR)=0.D0
+      SUM(IVAR,0)=0.D0
+      DO 10 ICORR=1,NCORR
+      F(IVAR,ICORR)=0.D0
+      SUM(IVAR,ICORR)=0.D0
+10    CONTINUE
+      END
+C
+C     ACCUMULATE DATA
+C
+      SUBROUTINE ACCUM2(IVAR,DFN)
+*     *****************
+      PARAMETER(MAXVEC=8**3*8+7)
+      PARAMETER(MAXVAR=25+4*20,MAXCOR=10)
+* new common order against missalignments          a.w.
+      COMMON/ST2/NVAR,NCORR,SAV(MAXVAR),F(MAXVAR,MAXCOR)
+      COMMON/ST2/SUM(MAXVAR,0:MAXCOR),H(MAXVAR,MAXCOR),NDAT(MAXVAR)
+      REAL*8 SAV,F,SUM,H,DFN
+      SAVE/ST2/
+      IF(IVAR.LT.1 .OR. IVAR.GT.NVAR)RETURN
+      NDAT(IVAR)=NDAT(IVAR)+1
+C+++++      DFN=FN
+      SAV(IVAR)=SAV(IVAR)+DFN
+      SUM(IVAR,0)=SUM(IVAR,0)+DFN*DFN
+      DO 10 ICORR=1,NCORR
+10    SUM(IVAR,ICORR)=SUM(IVAR,ICORR)+DFN*F(IVAR,ICORR)
+      DO 20 ICORR=NCORR,2,-1
+20    F(IVAR,ICORR)=F(IVAR,ICORR-1)
+      F(IVAR,1)=DFN
+      IF(NDAT(IVAR).LE.NCORR) H(IVAR,NDAT(IVAR))=DFN
+      END
+C
+C     COMPUTE AVERAGES
+C
+      FUNCTION AVER2(IVAR)
+      PARAMETER(MAXVEC=8**3*8+7)
+      PARAMETER(MAXVAR=25+4*20,MAXCOR=10)
+* new common order against missalignments          a.w.
+      COMMON/ST2/NVAR,NCORR,SAV(MAXVAR),F(MAXVAR,MAXCOR)
+      COMMON/ST2/SUM(MAXVAR,0:MAXCOR),H(MAXVAR,MAXCOR),NDAT(MAXVAR)
+      REAL*8 SAV,F,SUM,H
+      SAVE/ST2/
+      AVER2=0.D0
+      ND=NDAT(IVAR)
+      IF(IVAR.LT.1 .OR. IVAR.GT.NVAR .OR. ND.LT.1)RETURN
+      AVER2=SAV(IVAR)/ND
+      END
+C
+C     STATISTICAL ANALYSIS, INCLUDING RELAXATION EFFECTS
+C
+      SUBROUTINE STAT2(IVAR,AV,SIG,RATIO,IUNIT)
+*     ****************
+      PARAMETER(MAXVEC=8**3*8+7)
+      PARAMETER(MAXVAR=25+4*20,MAXCOR=10)
+* new common order against missalignments          a.w.
+      COMMON/ST2/NVAR,NCORR,SAV(MAXVAR),F(MAXVAR,MAXCOR)
+      COMMON/ST2/SUM(MAXVAR,0:MAXCOR),H(MAXVAR,MAXCOR),NDAT(MAXVAR)
+      REAL*8 SAV,F,SUM,H,AV,S1,S2
+      SAVE/ST2/
+      DIMENSION GAM(0:MAXCOR),R(MAXCOR),T(MAXCOR)
+      AV=0.D0
+      SIG=0.D0
+      RATIO=0.D0
+      IF(IVAR.LT.1 .OR. IVAR.GT.NVAR)RETURN
+      ND=NDAT(IVAR)
+      NMAX=MIN(ND-1,NCORR)
+      IF(IUNIT.GT.0)THEN
+      WRITE(IUNIT,1000) ND,NMAX
+1000  FORMAT(' RELAXATION ANALYSIS WITH NDAT =',I5,'   ,NCORR =',I5)
+      WRITE(IUNIT,'('' INTERNAL REAL*8'')')
+      ENDIF
+      IF(ND.LT.1)RETURN
+      AV=SAV(IVAR)/ND
+      IF(IUNIT.GT.0) WRITE(IUNIT,'('' AVERAGE ='',F12.6)') AV
+      GAM(0)=SUM(IVAR,0)/ND-AV*AV
+      SIG0=SQRT(MAX( GAM(0)/ND ,0.))
+      IF(NMAX.LT.1)GOTO 90
+C
+      N1=MAX(NMAX/5,1)
+      N2=NMAX/2
+      SIG=0.D0
+      IFLAG=NMAX+1
+      U=GAM(0)
+      S1=0.D0
+      S2=0.D0
+C
+      DO 10 N=1,NMAX
+      S1=S1+H(IVAR,N)
+      S2=S2+F(IVAR,N)
+      GAM(N)=( SUM(IVAR,N)+(S1+S2-(ND+N)*AV)*AV )/(ND-N)
+C
+      R(N)=0.D0
+      IF(U.NE.0.) R(N)=GAM(N)/U
+      U=GAM(N)
+C
+      T(N)=0.D0
+      IF(IFLAG.LT.N)GOTO 10
+      IF(R(N).GT.0.D0 .AND. R(N).LT.1.D0)THEN
+      T(N)=-1.D0/LOG(R(N))
+      SIG=SIG + GAM(N)*(ND-N)
+      ELSE
+      IFLAG=N
+      ENDIF
+10    CONTINUE
+C
+      IF(N2.GT.N1 .AND. IFLAG.GT.N2)THEN
+      TAU=(GAM(N1)/GAM(N2))**(1.D0/(N2-N1))
+      SIG=GAM(0) + 2.D0*GAM(N2)/(TAU-1.D0)
+      DO 20 N=1,N2
+      SIG=SIG + 2.D0*GAM(N)
+20    CONTINUE
+      TAU=1.D0/LOG(TAU)
+      ELSE
+      SIG=GAM(0) + 2.D0/ND*SIG
+      TAU=0.D0
+      ENDIF
+      SIG=SQRT(MAX( SIG/ND ,0.))
+      RATIO=0.D0
+      IF(SIG0.GT.0.D0) RATIO=SIG/SIG0
+C
+      IF(IUNIT.LE.0)RETURN
+C
+      WRITE(IUNIT,1010) SIG,(GAM(N),N=0,NMAX)
+1010  FORMAT(' SIGMA   =',F12.6/' GAMMA(0)=',F12.6/' GAMMA(N)='/
+     X   (10F12.6))
+      WRITE(IUNIT,1020) (R(N),N=1,NMAX)
+1020  FORMAT(' GAMMA(N)/GAMMA(N-1) ='/(10F12.6))
+      WRITE(IUNIT,1030)(T(N),N=1,NMAX)
+1030  FORMAT(' RELAXATION TIME T(N) ='/(10F12.4))
+      WRITE(IUNIT,1035)N1,N2,TAU
+1035  FORMAT(' RELAX. TIME T(',I2,',',I2,') =',F10.4)
+      WRITE(IUNIT,1040) RATIO
+1040  FORMAT(' SIGMA/SIGMA(UNCORR.) =',F10.4)
+90    CONTINUE
+      IF(IUNIT.GT.0) WRITE(IUNIT,1050) SIG0
+1050  FORMAT(' SIGMA(UNCORRELATED)  =',F12.6)
+      END
+
+C********************STAT4*********************************
+C                                               B.BUNK 1986
+C     STATISTICAL ANALYSIS FOR  NBL  BLOCKS
+C        OF  NVAR  CORRELATED VARIABLES EACH
+C
+C     FOR INTERNAL COUNTERS IN REAL*8:
+C        REMOVE C+++++
+C
+C     CLEAR COUNTERS
+C
+      SUBROUTINE CLEAR4(NBL1,NVAR1)
+*     *****************
+      PARAMETER(MAXVEC=8**3*8+7)
+      PARAMETER(MAXBL=8,MAXVAR=2+20/2)
+      COMMON/ST4/NBL,NVAR,NDAT(MAXBL)
+      COMMON/ST4/SAV(MAXBL,MAXVAR),SUM(MAXBL,MAXVAR,MAXVAR)
+      SAVE/ST4/
+      REAL*8 SAV,SUM
+      IF(NBL1.GT.MAXBL)THEN
+      WRITE(*,'('' ERROR IN STAT4: NBL ='',I5)')NBL1
+      STOP
+      ENDIF
+      IF(NVAR1.GT.MAXVAR)THEN
+      WRITE(*,'('' ERROR IN STAT4: NVAR ='',I5)')NVAR1
+      STOP
+      ENDIF
+      NBL=NBL1
+      NVAR=NVAR1
+      DO 10 IBL=1,NBL
+      NDAT(IBL)=0
+      DO 10 I=1,NVAR
+      SAV(IBL,I)=0.D0
+      DO 10 J=1,NVAR
+10    SUM(IBL,I,J)=0.D0
+      END
+C
+C     ACCUMULATE DATA
+C
+      SUBROUTINE ACCUM4(IBL,F)
+*     *****************
+      PARAMETER(MAXVEC=8**3*8+7)
+      PARAMETER(MAXBL=8,MAXVAR=2+20/2)
+      COMMON/ST4/NBL,NVAR,NDAT(MAXBL)
+      COMMON/ST4/SAV(MAXBL,MAXVAR),SUM(MAXBL,MAXVAR,MAXVAR)
+      SAVE/ST4/
+      REAL*8 SAV,SUM,DF
+      REAL*8 F(*)
+C+++++      DIMENSION F(*)
+      IF(IBL.LT.1 .OR. IBL.GT.NBL)RETURN
+      NDAT(IBL)=NDAT(IBL)+1
+      DO 10 I=1,NVAR
+      DF=F(I)
+      SAV(IBL,I)=SAV(IBL,I)+DF
+      DO 10 J=I,NVAR
+10    SUM(IBL,I,J)=SUM(IBL,I,J)+DF*F(J)
+      END
+C
+C     COMPUTE AVERAGES
+C
+      REAL*8 FUNCTION AVER4(IBL,IVAR)
+      PARAMETER(MAXVEC=8**3*8+7)
+      PARAMETER(MAXBL=8,MAXVAR=2+20/2)
+      COMMON/ST4/NBL,NVAR,NDAT(MAXBL)
+      COMMON/ST4/SAV(MAXBL,MAXVAR),SUM(MAXBL,MAXVAR,MAXVAR)
+      SAVE/ST4/
+      REAL*8 SAV,SUM
+      AVER4=0.D0
+      IF(IBL.LT.1 .OR. IBL.GT.NBL .OR. IVAR.LT.1 .OR. IVAR.GT.NVAR
+     X                            .OR. NDAT(IBL).LT.1)RETURN
+      AVER4=SAV(IBL,IVAR)/NDAT(IBL)
+      END
+C
+C     COMPUTE ERRORS
+C
+      REAL*8 FUNCTION SIGMA4(IBL,IVAR)
+      PARAMETER(MAXVEC=8**3*8+7)
+      PARAMETER(MAXBL=8,MAXVAR=2+20/2)
+      COMMON/ST4/NBL,NVAR,NDAT(MAXBL)
+      COMMON/ST4/SAV(MAXBL,MAXVAR),SUM(MAXBL,MAXVAR,MAXVAR)
+      SAVE/ST4/
+      REAL*8 SAV,SUM,ZERO
+      PARAMETER(ZERO=0.D0)
+      SIGMA4=0.D0
+      IF(IBL.LT.1 .OR. IBL.GT.NBL .OR. IVAR.LT.1 .OR. IVAR.GT.NVAR
+     X                            .OR. NDAT(IBL).LT.1)RETURN
+      SIGMA4=SQRT(MAX(SUM(IBL,IVAR,IVAR)-SAV(IBL,IVAR)**2/NDAT(IBL)
+     X               ,ZERO))/NDAT(IBL)
+      END
+C
+C     COMPUTE COVARIANCE MATRIX
+C
+      REAL*8 FUNCTION COVAR4(IBL,I,J)
+      PARAMETER(MAXVEC=8**3*8+7)
+      PARAMETER(MAXBL=8,MAXVAR=2+20/2)
+      COMMON/ST4/NBL,NVAR,NDAT(MAXBL)
+      COMMON/ST4/SAV(MAXBL,MAXVAR),SUM(MAXBL,MAXVAR,MAXVAR)
+      SAVE/ST4/
+      REAL*8 SAV,SUM
+      COVAR4=0.D0
+      IMIN=MIN(I,J)
+      IMAX=MAX(I,J)
+      ND=NDAT(IBL)
+      IF(IBL.LT.1 .OR. IBL.GT.NBL .OR. IMIN.LT.1 .OR. IMAX.GT.NVAR
+     X                            .OR. ND.LT.1)RETURN
+      COVAR4=((SUM(IBL,IMIN,IMAX)-SAV(IBL,I)*SAV(IBL,J)/ND)/ND)/ND
+      END
+
+C****************************TRNGV*************************************
+C
+C     TRNGV PROVIDES A VECTOR OF RANDOM NUMBERS
+C       WITH UNIFORM DISTRIBUTION IN  (0.,RMAX)
+C
+      SUBROUTINE TRNGV(RANVEC,LVEC,RMAX)
+*     ****************
+C
+      PARAMETER(MAXVEC=8**3*8+7)
+      REAL*8 RANVEC,RMAX,R1,RNORM
+      PARAMETER(R1=2.D0**(-31))
+C
+      COMMON/TRNBLK/IREG(0:249+MAXVEC)
+      SAVE/TRNBLK/
+C
+      DIMENSION RANVEC(LVEC)
+      DIMENSION ISEED(0:249)
+C
+      N103=LVEC/103
+      LEFT=LVEC - 103*N103
+C
+C SOME LINES ARE NEW
+      IFIRST=0
+      IMAX=2147483647
+      DO 100 N=1,N103
+      DO 10 I=IFIRST,IFIRST+102
+C     IREG(I+250)=IEOR(IREG(I+147),IREG(I))
+      IREG(I+250)=IREG(I+147)-IREG(I)
+      IF (IREG(I+250).LE.0) IREG(I+250)=IREG(I+250)+IMAX
+10    CONTINUE
+      IFIRST=IFIRST+103
+100   CONTINUE
+C
+C SOME LINES ARE NEW
+      DO 20 I=IFIRST,IFIRST+LEFT-1
+C     IREG(I+250)=IEOR(IREG(I+147),IREG(I))
+      IREG(I+250)=IREG(I+147)-IREG(I)
+      IF (IREG(I+250).LE.0) IREG(I+250)=IREG(I+250)+IMAX
+20    CONTINUE
+C
+      RNORM=R1*RMAX
+      DO 30 I=1,LVEC
+      RANVEC(I)=RNORM*IREG(I+249)
+30    CONTINUE
+C
+      DO 40 I=0,249
+      IREG(I)=IREG(I+LVEC)
+40    CONTINUE
+C
+      RETURN
+C
+C
+      ENTRY TRNGET(ISEED)
+C
+      DO 50 I=0,249
+      ISEED(I)=IREG(I)
+50    CONTINUE
+      RETURN
+C
+      ENTRY TRNSET(ISEED)
+C
+      DO 60 I=0,249
+      IREG(I)=ISEED(I)
+60    CONTINUE
+      END
+C
+      SUBROUTINE INIT(ISTART)
+*     ***************
+C
+      PARAMETER(MAXVEC=8**3*8+7)
+C
+      REAL*8 U,BETINV
+      REAL*8 ZERO,ONE,TWO
+      PARAMETER(ZERO=0.,ONE=1.,TWO=2.)
+C
+      COMMON/PAR1/NDIM,LSIZE(4),LVEC,NDSP
+      COMMON/PAR2/NPTS,NLINKS,NPLAQS,NPLPP,NVOL
+      COMMON/PAR3/BETA,GAMMA,ITER,IFREQ,MFREQ
+      COMMON/INTBLK/BETINV,NERR4,NERR2
+      COMMON/CONF/U(MAXVEC,0:3,2**4,4)
+C
+      ITER=0
+      IFREQ=0
+      NERR2=0
+      NERR4=0
+      CALL CLEAR2(2*NDIM+9+8*(LSIZE(NDIM)/2+1),10)
+      CALL CLEAR4(8,2+LSIZE(NDIM)/2)
+      WRITE(6,'(//'' RANDOM START'')')
+      DO 30 I1=1,NDIM
+      DO 30 ILAT=1,2**NDIM
+      DO 30 I30=1,4
+      CALL TRNGV1(LVEC)
+      GOTO 30
+30    CONTINUE
+C
+      END
+C
+      SUBROUTINE TRNGV1(LVEC)
+*     ****************
+C
+      PARAMETER(MAXVEC=8**3*8+7)
+      REAL*8 R1
+      PARAMETER(R1=2.D0**(-31))
+C
+      COMMON/TRNBLK/IREG(0:249+MAXVEC)
+      SAVE/TRNBLK/
+C
+      N103=LVEC/103
+      LEFT=LVEC - 103*N103
+C
+C SOME LINES ARE NEW
+      IFIRST=0
+      IMAX=2147483647
+      DO 100 N=1,N103
+      DO 10 I=IFIRST,IFIRST+102
+C     IREG(I+250)=IEOR(IREG(I+147),IREG(I))
+      IREG(I+250)=IREG(I+147)-IREG(I)
+      IF (IREG(I+250).LE.0) IREG(I+250)=IREG(I+250)+IMAX
+10    CONTINUE
+      IFIRST=IFIRST+103
+100   CONTINUE
+C
+C SOME LINES ARE NEW
+      DO 20 I=IFIRST,IFIRST+LEFT-1
+C     IREG(I+250)=IEOR(IREG(I+147),IREG(I))
+      IREG(I+250)=IREG(I+147)-IREG(I)
+      IF (IREG(I+250).LE.0) IREG(I+250)=IREG(I+250)+IMAX
+20    CONTINUE
+C
+      DO 40 I=0,249
+      IREG(I)=IREG(I+LVEC)
+40    CONTINUE
+C
+      RETURN
+      END

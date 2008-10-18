@@ -1,0 +1,322 @@
+      PROGRAM APPLU
+
+      COMMON/CGCON/ NX, NY, NZ
+      COMMON/CVAR/ U(5,33,33,33)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      READ (5, *) NX, NY, NZ
+C (0,3)
+
+      IF (NX.LT.5.OR.NY.LT.5.OR.NZ.LT.5) THEN
+C (0,4)
+C        BEGIN BLOCK
+C (0,5)
+c
+         WRITE (6, 2001) 
+C (0,6)
+2001     FORMAT(5X,'PROBLEM SIZE IS TOO SMALL - ',/5X,'SET EACH OF NX, N
+     &Y AND NZ AT LEAST EQUAL TO 5')
+C (0,7)
+         STOP
+C        END BLOCK
+      ELSE
+C (0,8)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,9)
+      IF (NX.GT.33.OR.NY.GT.33.OR.NZ.GT.33) THEN
+C (0,10)
+C        BEGIN BLOCK
+C (0,11)
+
+         WRITE (6, 2002) 
+C (0,12)
+2002     FORMAT(5X,'PROBLEM SIZE IS TOO LARGE - ',/5X,'NX, NY AND NZ SHO
+     &ULD BE LESS THAN OR EQUAL TO ',/5X,'ISIZ1, ISIZ2 AND ISIZ3 RESPECT
+     &IVELY')
+C (0,13)
+         STOP
+C        END BLOCK
+      ELSE
+C (0,14)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,15)
+c
+      CALL SETBV
+C (0,16)
+      CALL ERROR
+C (0,17)
+      STOP
+C (0,18)
+      RETURN
+C     END BLOCK
+      END
+c
+      SUBROUTINE ERROR
+      COMMON/CGCON/ NX, NY, NZ
+      COMMON/CVAR/ U(5,33,33,33)
+      DIMENSION U000IJK(5)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      DO K = 2, NZ-1
+C (0,3)
+         DO J = 2, NY-1
+C (0,4)
+            DO I = 2, NX-1
+C (0,5)
+C              BEGIN BLOCK
+C (0,6)
+c     
+               CALL EXACT(I, J, K, U000IJK)
+
+C              END BLOCK
+            ENDDO
+         ENDDO
+      ENDDO
+C (0,8)
+      RETURN
+C     END BLOCK
+      END
+
+      SUBROUTINE EXACT ( I, J, K, U000IJK )
+      COMMON/CGCON/ NX, NY, NZ
+      DIMENSION U000IJK(*)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+
+      DO M = 1, 5
+C (0,3)
+         U000IJK(M) = M
+      ENDDO
+C (0,4)
+      RETURN
+C     END BLOCK
+      END
+
+      SUBROUTINE SETBV
+      COMMON/CGCON/ NX, NY, NZ
+      COMMON/CVAR/ U(5,33,33,33)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+
+      DO J = 1, NY
+C (0,3)
+         DO I = 1, NX
+C (0,4)
+C           BEGIN BLOCK
+C (0,5)
+            CALL EXACT(I, J, 1, U(1,I,J,1))
+C (0,6)
+            CALL EXACT(I, J, NZ, U(1,I,J,NZ))
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,7)
+      DO K = 1, NZ
+C (0,8)
+         DO I = 1, NX
+C (0,9)
+C           BEGIN BLOCK
+C (0,10)
+            CALL EXACT(I, 1, K, U(1,I,1,K))
+C (0,11)
+            CALL EXACT(I, NY, K, U(1,I,NY,K))
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,12)
+      DO K = 1, NZ
+C (0,13)
+         DO J = 1, NY
+C (0,14)
+C           BEGIN BLOCK
+C (0,15)
+            CALL EXACT(1, J, K, U(1,1,J,K))
+C (0,16)
+            CALL EXACT(NX, J, K, U(1,NX,J,K))
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,17)
+      RETURN
+C     END BLOCK
+      END
+!!
+!! file for simple_applu.f
+!!
+      PROGRAM APPLU
+
+      COMMON/CGCON/ NX, NY, NZ
+      COMMON/CVAR/ U(5,33,33,33)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      READ (5, *) NX, NY, NZ
+C (0,3)
+
+      IF (NX.LT.5.OR.NY.LT.5.OR.NZ.LT.5) THEN
+C (0,4)
+C        BEGIN BLOCK
+C (0,5)
+c
+         WRITE (6, 2001) 
+C (0,6)
+2001     FORMAT(5X,'PROBLEM SIZE IS TOO SMALL - ',/5X,'SET EACH OF NX, N
+     x 
+     &Y AND NZ AT LEAST EQUAL TO 5')
+C (0,7)
+         STOP
+C        END BLOCK
+      ELSE
+C (0,8)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,9)
+      IF (NX.GT.33.OR.NY.GT.33.OR.NZ.GT.33) THEN
+C (0,10)
+C        BEGIN BLOCK
+C (0,11)
+
+         WRITE (6, 2002) 
+C (0,12)
+2002     FORMAT(5X,'PROBLEM SIZE IS TOO LARGE - ',/5X,'NX, NY AND NZ SHO
+     x 
+     &ULD BE LESS THAN OR EQUAL TO ',/5X,'ISIZ1, ISIZ2 AND ISIZ3 RESPECT
+     x 
+     &IVELY')
+C (0,13)
+         STOP
+C        END BLOCK
+      ELSE
+C (0,14)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,15)
+c
+      CALL SETBV
+C (0,16)
+      CALL ERROR
+C (0,17)
+      STOP
+C (0,18)
+      RETURN
+C     END BLOCK
+      END
+
+      SUBROUTINE SETBV
+      COMMON/CGCON/ NX, NY, NZ
+      COMMON/CVAR/ U(5,33,33,33)
+C (0,1)
+      INTEGER*8 I_PIPS_EXACT_U000IJK
+      COMMON /PIPS_EXACT_U000IJK/ I_PIPS_EXACT_U000IJK
+C     BEGIN BLOCK
+C (0,2)
+
+      DO J = 1, NY
+C (0,3)
+         DO I = 1, NX
+C (0,4)
+C           BEGIN BLOCK
+C (0,5)
+      I_PIPS_EXACT_U000IJK = 5*33*33*33-((I-1)*5+(J-1)*5*33)
+            CALL EXACT(I, J, 1, U(1,I,J,1))
+C (0,6)
+      I_PIPS_EXACT_U000IJK = 5*33*33*33-((I-1)*5+(J-1)*5*33+(NZ-1)*5*
+     &33*33)
+            CALL EXACT(I, J, NZ, U(1,I,J,NZ))
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,7)
+      DO K = 1, NZ
+C (0,8)
+         DO I = 1, NX
+C (0,9)
+C           BEGIN BLOCK
+C (0,10)
+      I_PIPS_EXACT_U000IJK = 5*33*33*33-((I-1)*5+(K-1)*5*33*33)
+            CALL EXACT(I, 1, K, U(1,I,1,K))
+C (0,11)
+      I_PIPS_EXACT_U000IJK = 5*33*33*33-((I-1)*5+(NY-1)*5*33+(K-1)*5*
+     &33*33)
+            CALL EXACT(I, NY, K, U(1,I,NY,K))
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,12)
+      DO K = 1, NZ
+C (0,13)
+         DO J = 1, NY
+C (0,14)
+C           BEGIN BLOCK
+C (0,15)
+      I_PIPS_EXACT_U000IJK = 5*33*33*33-((J-1)*5*33+(K-1)*5*33*33)
+            CALL EXACT(1, J, K, U(1,1,J,K))
+C (0,16)
+      I_PIPS_EXACT_U000IJK = 5*33*33*33-((NX-1)*5+(J-1)*5*33+(K-1)*5*
+     &33*33)
+            CALL EXACT(NX, J, K, U(1,NX,J,K))
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,17)
+      RETURN
+C     END BLOCK
+      END
+
+      SUBROUTINE EXACT ( I, J, K, U000IJK )
+      COMMON/CGCON/ NX, NY, NZ
+      DIMENSION U000IJK(I_PIPS_EXACT_U000IJK)
+C (0,1)
+      INTEGER*8 I_PIPS_EXACT_U000IJK
+      COMMON /PIPS_EXACT_U000IJK/ I_PIPS_EXACT_U000IJK
+C     BEGIN BLOCK
+C (0,2)
+
+      DO M = 1, 5
+C (0,3)
+         U000IJK(M) = M
+      ENDDO
+C (0,4)
+      RETURN
+C     END BLOCK
+      END
+c
+      SUBROUTINE ERROR
+      COMMON/CGCON/ NX, NY, NZ
+      COMMON/CVAR/ U(5,33,33,33)
+      DIMENSION U000IJK(5)
+C (0,1)
+      INTEGER*8 I_PIPS_EXACT_U000IJK
+      COMMON /PIPS_EXACT_U000IJK/ I_PIPS_EXACT_U000IJK
+C     BEGIN BLOCK
+C (0,2)
+      DO K = 2, NZ-1
+C (0,3)
+         DO J = 2, NY-1
+C (0,4)
+            DO I = 2, NX-1
+C (0,5)
+C              BEGIN BLOCK
+C (0,6)
+      I_PIPS_EXACT_U000IJK = 5
+c     
+               CALL EXACT(I, J, K, U000IJK)
+
+C              END BLOCK
+            ENDDO
+         ENDDO
+      ENDDO
+C (0,8)
+      RETURN
+C     END BLOCK
+      END

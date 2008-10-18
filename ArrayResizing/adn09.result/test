@@ -1,0 +1,141 @@
+      PROGRAM INTER_REGION
+      REAL WORK(100)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+
+      CALL RUN2(WORK)
+C (0,3)
+
+      CALL RUN3(WORK)
+C (0,4)
+      CALL RUN1(WORK)
+C (0,5)
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE RUN(C)
+      COMMON /FOO/ N
+      REAL C(1)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+!     INITIALLY: DO 10
+      DO I = 1, N
+C (0,3)
+C        BEGIN BLOCK
+C (0,4)
+         C(I) = 0.
+C (0,5)
+10       CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,6)
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE RUN1(C)
+      COMMON /FOO/ N
+      REAL C(1)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      CALL RUN(C)
+C (0,3)
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE RUN2(C)
+      COMMON /FOO/ N
+      REAL C(1)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      CALL RUN(C)
+C (0,3)
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE RUN3(C)
+      COMMON /FOO/ N
+      REAL C(1)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      CALL RUN(C)
+C (0,3)
+      RETURN
+C     END BLOCK
+      END
+!!
+!! file for adn09.f
+!!
+      PROGRAM INTER_REGION
+      REAL WORK(100)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+
+      CALL RUN2(WORK)
+C (0,3)
+
+      CALL RUN3(WORK)
+C (0,4)
+      CALL RUN1(WORK)
+C (0,5)
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE RUN1(C)
+      COMMON /FOO/ N
+      REAL C(100)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      CALL RUN(C)
+C (0,3)
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE RUN2(C)
+      COMMON /FOO/ N
+      REAL C(100)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      CALL RUN(C)
+C (0,3)
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE RUN3(C)
+      COMMON /FOO/ N
+      REAL C(100)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      CALL RUN(C)
+C (0,3)
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE RUN(C)
+      COMMON /FOO/ N
+      REAL C(100)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+!     INITIALLY: DO 10
+      DO I = 1, N
+C (0,3)
+C        BEGIN BLOCK
+C (0,4)
+         C(I) = 0.
+C (0,5)
+10       CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,6)
+      RETURN
+C     END BLOCK
+      END

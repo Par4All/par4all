@@ -1,0 +1,4717 @@
+!!
+!! file for turb3d.f
+!!
+C******************************************************************************C 
+C                                                                              C
+C +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++C
+C                                                                              C
+C CODE NAME : TURB3D                                                           C
+C                                                                              C
+C PURPOSE   :                                                                  C
+C            This program can be used for simulating isotropic,                C
+C            homogeneous turbulence in a cube with periodic                    C
+C            boundary conditions in x,y,z coordinate directions.               C
+C            It solves the Navier-Stokes equations using a pseudo-             C
+C            spectral method. Leapfrog-Crank-Nicolson scheme is                C
+C            used for time stepping.                                           C
+C                                                                              C
+C AUTHOR    :                                                                  C
+C            TURB3D was written by Dr. Raj Panda                               C
+C                                                                              C
+C HISTORY   :                                                                  C
+C            The original version was written for IBM 3090 systems in 1989     C
+C            and utilized the FFT routines from IBM's ESSL. It was modified by C	
+C            David Schneider and Hui Gao at CSRD to run with David Bailey's    C 
+C            FFT routines. This version is the CSRD version with minor changes.C
+C                                                                              C 
+C            At CSRD, TURB3D was run on different platforms including,         C
+C            IBM RS/6000, Sun-4, Alliant FX/80 & FX/2800 and Cray Y-MP.        C 
+C                                                                              C
+C SIZE      :                                                                  C
+C            All benchmarking should be done at size 64*64*64                  C
+C                                                                              C
+C PARALLEL  :                                                                  C
+C            The parallel content in the code is close to 100%.                C 
+C +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++C
+C                                                                              C
+C                                                                              C 
+C******************************************************************************C 
+
+C                                                                       
+C
+C     SUBROUTINE CALLS: PBRINT, TURB3D, PARAM, TGVEL, 
+C                        WCAL, DCOPY, ENR, ZFFT, XYFFT, UXW, LIN, 
+C                        LINAVG, MIXAVG, VERIFY.
+C
+C
+
+
+      PROGRAM MAIN
+      COMMON /PAR1/ ISTART,NSTEPS,NAVG,ISAV,NSAV,NOUT,IRND,ITG,ITEST 
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+C SPEC, JWR: Line copied from line 75 to be sure ITEST is defined
+C
+      CALL TURB3D
+C (0,3)
+      IF (ITEST.EQ.1) THEN
+C (0,4)
+         CALL VERIFYTR
+      ELSE
+C (0,5)
+         CALL VERIFY
+      ENDIF
+C (0,6)
+      STOP
+C (0,7)
+      RETURN
+C     END BLOCK
+      END
+C
+C                                                                       
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C                                                                       
+      SUBROUTINE TURB3D() 
+C***                                                                    
+      IMPLICIT REAL*8(A-H,O-Z)                                          
+     x 
+      PARAMETER   (IX= 64,IY= 64,IZ= 64 ,M1=6)
+
+      PARAMETER   (IXPP=IX+2,IXHP=IX/2+1,ITOT=IXPP*IY*IZ,               
+     x 
+     +          IXY=IXHP*IY,IXZ=IXHP*IZ,IYZ=IY*IZ)                      
+     x 
+      COMMON/ALL/ U(IXPP,IY,IZ),V(IXPP,IY,IZ),W(IXPP,IY,IZ),            
+     x 
+     +            OX(IXPP,IY,IZ),OY(IXPP,IY,IZ),OZ(IXPP,IY,IZ)          
+     x 
+      COMMON/SHR/ U0(IXPP,IY,IZ),V0(IXPP,IY,IZ),W0(IXPP,IY,IZ),         
+     x 
+     +            U1(IXPP,IY,IZ),V1(IXPP,IY,IZ),W1(IXPP,IY,IZ)          
+     x 
+C
+      COMMON/WAV/ XW(129),YW(129),ZW(129),XSQ(129),YSQ(129),ZSQ(129)    
+     x 
+      COMMON/TRUNC/XWT(129),YWT(129),ZWT(129)                           
+     x 
+      COMMON /BOX/ PI,PI2,BOXX,BOXY,BOXZ,FX,FY,FZ                       
+     x 
+      COMMON /PAR1/ ISTART,NSTEPS,NAVG,ISAV,NSAV,NOUT,IRND,ITG,ITEST    
+     x       
+      COMMON /PAR2/ REY,XNU,DT                                          
+     x 
+      COMMON /COUNT/ KTTRANS(256)
+      COMMON /DIM/ ISIZE(9)                                             
+     x 
+C                                                                       
+      DIMENSION EU1(12),EV1(12),EW1(12),EOX1(12),EOY1(12),EOZ1(12)
+      COMMON /ENG/ EU1, EV1, EW1, EOX1, EOY1, EOZ1
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+C
+2000  FORMAT(' ::SIMULATION OF ISOTROPIC, DECAYING TURBULENCE::')
+C (0,3)
+2010  FORMAT(' ::::::::::::::::::::::::::::::::::::::::::::::::')
+C (0,4)
+3000  FORMAT(//,'      NX      NY      NZ',/,3I8)
+C (0,5)
+4000  FORMAT(' ISTEP=',I4,2X,'TIME=',F8.4/)
+C (0,6)
+4100  FORMAT(' EU,EV,EW    =',3E20.12)
+C (0,7)
+4200  FORMAT(' EOX,EOY,EOZ =',3E20.12)
+C (0,8)
+5555  FORMAT(//' TOTAL NUMBER OF TRANSPOSES PERFORMED = ',I10)
+C (0,9)
+C
+C                                                                       
+C      OPEN(5, FILE='TURB3D.INPUT')                                    
+C      OPEN(6, FILE='TURB3D.OUTPUT')                                   
+C
+      WRITE (6, 2010) 
+C (0,10)
+      WRITE (6, 2000) 
+C (0,11)
+      WRITE (6, 2010) 
+C (0,12)
+C
+      NX = IX
+C (0,13)
+      NY = IY
+C (0,14)
+      NZ = IZ
+C (0,15)
+      NXPP = IXPP
+C (0,16)
+      NXHP = IXHP
+C (0,17)
+      NTOT = ITOT
+C (0,18)
+      NXY = IXY
+C (0,19)
+      NXZ = IXZ
+C (0,20)
+      NYZ = IYZ
+C (0,21)
+C
+      ISIZE(1) = NX
+C (0,22)
+      ISIZE(2) = NY
+C (0,23)
+      ISIZE(3) = NZ
+C (0,24)
+      ISIZE(4) = NXPP
+C (0,25)
+      ISIZE(5) = NXHP
+C (0,26)
+      ISIZE(6) = NTOT
+C (0,27)
+      ISIZE(7) = NXY
+C (0,28)
+      ISIZE(8) = NXZ
+C (0,29)
+      ISIZE(9) = NYZ
+C (0,30)
+C
+!     INITIALLY: DO 555
+      DO I = 1, 256
+C (0,31)
+C        BEGIN BLOCK
+C (0,32)
+         KTTRANS(I) = 0
+C (0,33)
+555      CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,34)
+C
+      WRITE (6, 3000) (ISIZE(I), I = 1, 3)
+C (0,35)
+      ISTEP0 = 0
+C (0,36)
+      CALL PARAM
+C (0,37)
+      DT2 = DT
+C (0,38)
+      IF (ISTART.EQ.1) THEN
+C (0,39)
+         DT2 = 2.D0*DT
+      ELSE
+C (0,40)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,41)
+      IF (ISTART.EQ.0) THEN
+C (0,42)
+C        BEGIN BLOCK
+C (0,43)
+         JSTEP = 1
+C (0,44)
+         ISTEP = 0
+C (0,45)
+         NLAST = ISTEP+NSTEPS
+C (0,46)
+         TIME = 0.0D0
+C (0,47)
+         IF (IRND.EQ.1) THEN
+C (0,48)
+            STOP '*** RANDOM VELOCITY FIELD NOT ALLOWED ***'
+         ELSE
+C (0,49)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C (0,50)
+         IF (ITG.EQ.1) THEN
+C (0,51)
+C           BEGIN BLOCK
+C (0,52)
+            CALL TGVEL(U, V, W)
+C (0,53)
+            CALL WCAL(U, V, W, OX, OY, OZ)
+C           END BLOCK
+         ELSE
+C (0,54)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C        END BLOCK
+      ELSE
+C (0,55)
+C        BEGIN BLOCK
+C (0,56)
+         NLAST = ISTEP0+NSTEPS
+C (0,57)
+         JSTEP = 1
+C (0,58)
+         ISTEP = ISTEP0
+C (0,59)
+C
+C      FOR RESTART USER MUST INPUT U,V,W HERE                     
+C                                                                 
+         CALL WCAL(U, V, W, OX, OY, OZ)
+C        END BLOCK
+      ENDIF
+C (0,60)
+C
+      CALL DCOPY(NTOT, U, 1, U0, 1)
+C (0,61)
+      CALL DCOPY(NTOT, V, 1, V0, 1)
+C (0,62)
+      CALL DCOPY(NTOT, W, 1, W0, 1)
+C (0,63)
+C     BEGIN UNSTRUCTURED
+C (1,1)
+C     BEGIN BLOCK
+C (1,2)
+C
+C     ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: 
+C     ::::::::::BEGIN TIME INTEGRATION LOOP::::::::::::::::::::::::::::
+C     ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: 
+C
+1001  CONTINUE
+C (1,3)
+C                                                                       
+C                                                                       
+      DTV = XNU
+C (1,4)
+      DTT = 0.5D0*DT2
+C (1,5)
+C     ***************************************************************** 
+      IF (MOD(ISTEP, NOUT).EQ.0.OR.ISTEP.EQ.0) THEN
+C (1,6)
+C        BEGIN BLOCK
+C (1,7)
+         MSTEP = INT(ISTEP/NOUT)
+C (1,8)
+         IF (ITG.EQ.1) THEN
+C (1,9)
+C           BEGIN BLOCK
+C (1,10)
+            CALL ENR(U, U, 0.5D0, EU)
+C (1,11)
+            CALL ENR(V, V, 0.5D0, EV)
+C (1,12)
+            CALL ENR(W, W, 0.5D0, EW)
+C (1,13)
+            CALL ENR(OX, OX, 0.5D0, EOX)
+C (1,14)
+            CALL ENR(OY, OY, 0.5D0, EOY)
+C (1,15)
+            CALL ENR(OZ, OZ, 0.5D0, EOZ)
+C (1,16)
+            EU1(MSTEP+1) = EU
+C (1,17)
+            EV1(MSTEP+1) = EV
+C (1,18)
+            EW1(MSTEP+1) = EW
+C (1,19)
+            EOX1(MSTEP+1) = EOX
+C (1,20)
+            EOY1(MSTEP+1) = EOY
+C (1,21)
+            EOZ1(MSTEP+1) = EOZ
+C           END BLOCK
+         ELSE
+C (1,22)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C        END BLOCK
+      ELSE
+C (1,23)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (1,24)
+C
+C     ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: 
+C     :::::: FOURIER-TO-PHYSICAL SPACE FFT :::::::::::::::::::::::::::: 
+C     ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: 
+C
+C
+!     INITIALLY: DO 101
+      DO J = 1, NY
+C (1,25)
+C        BEGIN BLOCK
+C (1,26)
+         CALL ZFFT(J, 1, 1, 1)
+C (1,27)
+         CALL ZFFT(J, 1, 2, 1)
+C (1,28)
+         CALL ZFFT(J, 1, 3, 1)
+C (1,29)
+         CALL ZFFT(J, 1, 4, 1)
+C (1,30)
+         CALL ZFFT(J, 1, 5, 1)
+C (1,31)
+         CALL ZFFT(J, 1, 6, 1)
+C (1,32)
+101      CONTINUE
+C        END BLOCK
+      ENDDO
+C (1,33)
+C
+C
+!     INITIALLY: DO 201
+      DO K = 1, NZ
+C (1,34)
+C        BEGIN BLOCK
+C (1,35)
+         CALL XYFFT(K, 1, 1, 1)
+C (1,36)
+         CALL XYFFT(K, 1, 2, 1)
+C (1,37)
+         CALL XYFFT(K, 1, 3, 1)
+C (1,38)
+         CALL XYFFT(K, 1, 4, 1)
+C (1,39)
+         CALL XYFFT(K, 1, 5, 1)
+C (1,40)
+         CALL XYFFT(K, 1, 6, 1)
+C (1,41)
+201      CONTINUE
+C        END BLOCK
+      ENDDO
+C (1,42)
+C
+C
+C
+C     ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+C     ::::::: NONLINEAR TERM IN PHYSICAL SPACE :::::::::::::::::::::::::
+C     ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+C
+C
+      CALL UXW(U, V, W, OX, OY, OZ)
+C (1,43)
+C
+C     ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+C     ::::::: PHYSICAL-TO-FOURIER SPACE FFT ::::::::::::::::::::::::::::
+C     ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+C
+C
+!     INITIALLY: DO 301
+      DO K = 1, NZ
+C (1,44)
+C        BEGIN BLOCK
+C (1,45)
+         CALL XYFFT(K, 1, 1, -1)
+C (1,46)
+         CALL XYFFT(K, 1, 2, -1)
+C (1,47)
+         CALL XYFFT(K, 1, 3, -1)
+C (1,48)
+         CALL XYFFT(K, 1, 4, -1)
+C (1,49)
+         CALL XYFFT(K, 1, 5, -1)
+C (1,50)
+         CALL XYFFT(K, 1, 6, -1)
+C (1,51)
+301      CONTINUE
+C        END BLOCK
+      ENDDO
+C (1,52)
+C
+C
+!     INITIALLY: DO 401
+      DO J = 1, NY
+C (1,53)
+C        BEGIN BLOCK
+C (1,54)
+         CALL ZFFT(J, 1, 1, -1)
+C (1,55)
+         CALL ZFFT(J, 1, 2, -1)
+C (1,56)
+         CALL ZFFT(J, 1, 3, -1)
+C (1,57)
+         CALL ZFFT(J, 1, 4, -1)
+C (1,58)
+         CALL ZFFT(J, 1, 5, -1)
+C (1,59)
+         CALL ZFFT(J, 1, 6, -1)
+C (1,60)
+401      CONTINUE
+C        END BLOCK
+      ENDDO
+C (1,61)
+C
+C
+C
+      IF (MOD(ISTEP, 2).EQ.0) THEN
+C (1,62)
+C        BEGIN BLOCK
+C (1,63)
+         CALL DCOPY(NTOT, U, 1, U1, 1)
+C (1,64)
+         CALL DCOPY(NTOT, V, 1, V1, 1)
+C (1,65)
+         CALL DCOPY(NTOT, W, 1, W1, 1)
+C (1,66)
+         CALL DCOPY(NTOT, U0, 1, U, 1)
+C (1,67)
+         CALL DCOPY(NTOT, V0, 1, V, 1)
+C (1,68)
+         CALL DCOPY(NTOT, W0, 1, W, 1)
+C        END BLOCK
+      ELSE
+C (1,69)
+C        BEGIN BLOCK
+C (1,70)
+         CALL DCOPY(NTOT, U, 1, U0, 1)
+C (1,71)
+         CALL DCOPY(NTOT, V, 1, V0, 1)
+C (1,72)
+         CALL DCOPY(NTOT, W, 1, W0, 1)
+C (1,73)
+         CALL DCOPY(NTOT, U1, 1, U, 1)
+C (1,74)
+         CALL DCOPY(NTOT, V1, 1, V, 1)
+C (1,75)
+         CALL DCOPY(NTOT, W1, 1, W, 1)
+C        END BLOCK
+      ENDIF
+C     END BLOCK
+C (2,1)
+C
+C
+C     ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: 
+C     :::::::::::::: TIME-STEPPING :::::::::::::::::::::::::::::::::::: 
+C     ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: 
+C                                                                       
+C     STABILIZE LEAPFROG TIME-STEPPING SCHEME                           
+C                                                                       
+C
+      IF (JSTEP.EQ.NAVG) GOTO 99993
+C (4,1)
+C     BEGIN BLOCK
+C (4,2)
+C
+C
+      CALL LIN(U, V, W, OX, OY, OZ, DT2, DTV, DTT)
+C (4,3)
+C
+C
+C
+      IF (MOD(ISTEP, NOUT).EQ.0.OR.ISTEP.EQ.0) THEN
+C (4,4)
+         IF (ITG.EQ.1) THEN
+C (4,5)
+C           BEGIN BLOCK
+C (4,6)
+            WRITE (6, 4000) ISTEP, TIME
+C (4,7)
+            WRITE (6, 4100) EU, EV, EW
+C (4,8)
+            WRITE (6, 4200) EOX, EOY, EOZ
+C           END BLOCK
+         ELSE
+C (4,9)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+      ELSE
+C (4,10)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (4,11)
+      TIME = TIME+DT
+C (4,12)
+      DT2 = 2.D0*DT
+C (4,13)
+      ISTEP = ISTEP+1
+C (4,14)
+      JSTEP = JSTEP+1
+C (4,15)
+      IF (MOD(ISTEP, NAVG).EQ.0) THEN
+C (4,16)
+         JSTEP = 1
+      ELSE
+C (4,17)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C     END BLOCK
+C (5,1)
+C
+C
+C     ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::  
+C     :::::::: END OF TIME-STEPPING ::::::::::::::::::::::::::::::::::  
+C     ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::  
+C
+C
+      IF (ISTEP.LT.NLAST) THEN
+         GOTO 1001
+      ELSE
+         GOTO 1111
+      ENDIF
+99993 CONTINUE
+C (3,1)
+C     BEGIN BLOCK
+C (3,2)
+C
+C
+      CALL LINAVG(U, V, W, OX, OY, OZ, DT2, DTV, DTT)
+C (3,3)
+      IF (MOD(ISTEP, 2).EQ.0) THEN
+C (3,4)
+C        BEGIN BLOCK
+C (3,5)
+         CALL DCOPY(NTOT, U1, 1, U, 1)
+C (3,6)
+         CALL DCOPY(NTOT, V1, 1, V, 1)
+C (3,7)
+         CALL DCOPY(NTOT, W1, 1, W, 1)
+C        END BLOCK
+      ELSE
+C (3,8)
+C        BEGIN BLOCK
+C (3,9)
+         CALL DCOPY(NTOT, U0, 1, U, 1)
+C (3,10)
+         CALL DCOPY(NTOT, V0, 1, V, 1)
+C (3,11)
+         CALL DCOPY(NTOT, W0, 1, W, 1)
+C        END BLOCK
+      ENDIF
+C (3,12)
+      CALL MIXAVG(U, V, W, OX, OY, OZ)
+C (3,13)
+C
+C
+C
+      JSTEP = JSTEP+1
+C (3,14)
+      DT2 = 2.D0*DT
+C
+C
+C     END BLOCK
+      GOTO 1001
+C (6,1)
+1111  CONTINUE
+C     END UNSTRUCTURED
+C (0,64)
+      ISUM = 0
+C (0,65)
+!     INITIALLY: DO 556
+      DO I = 1, 256
+C (0,66)
+C        BEGIN BLOCK
+C (0,67)
+         ISUM = ISUM+KTTRANS(I)
+C (0,68)
+556      CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,69)
+      WRITE (6, 5555) ISUM
+C (0,70)
+C                                                                       
+      RETURN
+C     END BLOCK
+      END
+C                                                                       
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C                                                                       
+      SUBROUTINE  PARAM                                                 
+     x 
+C                                                                       
+C     SET UP A PERIODIC BOX OF VOLUME FX, FY,FZ                        
+C     TO READ INPUT FILE                                                
+C                                                                       
+C     SET UP A PERIODIC BOX OF VOLUME BOXX, BOXY,BOXZ.
+C     COMPUTE FX = 2*PI/BOXX,
+C             FY = 2*PI/BOXY,
+C             FZ = 2*PI/BOXZ.
+C     READ INPUT FILE AND CALL WAVNUM ROUTINE TO SET UP 
+C     WAVE NUMBERS.                                               
+C
+C     SUBROUTINE CALL: WAVNUM.
+C  
+C                                                                       
+      IMPLICIT REAL*8(A-H,O-Z)                                          
+     x 
+C                                                                       
+C     REY      = REYNOLDS NO.                                           
+C     XNU       = VISCOSITY                                             
+C     BOXX                                                              
+C     BOXY     = DIMENSIONS OF BOX                                      
+C     BOXX                                                              
+C     DT       = TIME STEP                                              
+C     NSTEPS   = MAXIMUM NUMBER OF TIME STEPS                           
+C     NAVG     = LEAPFROG AVERAGING INTERVAL                            
+C     NOUT     = POST PROCESSING SAVE INTERVAL(DATA SAVED IN FOUR SPACE)
+      COMMON/WAV/ XW(129),YW(129),ZW(129),XSQ(129),YSQ(129),ZSQ(129)    
+     x 
+      COMMON /PAR1/ ISTART,NSTEPS,NAVG,ISAV,NSAV,NOUT,IRND,ITG,ITEST    
+     x       
+      COMMON /PAR2/ REY,XNU,DT                                          
+     x 
+      COMMON/ENCON/ C1,C2                                               
+     x 
+      COMMON /ALIAS/ IALIAS                                             
+     x 
+      COMMON /BOX/ PI,PI2,BOXX,BOXY,BOXZ,FX,FY,FZ                       
+     x 
+      CHARACTER*80 JNK                                                  
+     x 
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+100   FORMAT(A80)
+C (0,3)
+5000  FORMAT(/,' E(K) = ',F6.4,'*K**4*EXP(-',F6.4,'*K**2)')
+C (0,4)
+2000  FORMAT(/,'    ISTART    ','   NSTEPS    NAVG      NOUT      IALIAS
+     x 
+     &     ITEST',/,6I10)
+C (0,5)
+3000  FORMAT(/,'    REY       XNU       DT   ',/,3F10.5/)
+C (0,6)
+C                                                                       
+      PI = 2.0D0*ASIN(1.0D0)
+C (0,7)
+      PI2 = 2.0D0*PI
+C (0,8)
+      BOXX = PI2
+C (0,9)
+      BOXY = PI2
+C (0,10)
+      BOXZ = PI2
+C (0,11)
+      FX = PI2/BOXX
+C (0,12)
+      FY = PI2/BOXY
+C (0,13)
+      FZ = PI2/BOXZ
+C (0,14)
+C                                                                       
+      READ (5, 100) JNK
+C (0,15)
+      READ (5, *) ISTART, NSTEPS, NAVG, NOUT, IALIAS, ITEST
+C (0,16)
+      READ (5, 100) JNK
+C (0,17)
+      READ (5, *) XNU, DT
+C (0,18)
+      READ (5, 100) JNK
+C (0,19)
+      READ (5, *) IRND, ITG
+C (0,20)
+      READ (5, 100) JNK
+C (0,21)
+      READ (5, *) C1, C2
+C (0,22)
+      REY = 1.D0/XNU
+C (0,23)
+      WRITE (6, 2000) ISTART, NSTEPS, NAVG, NOUT, IALIAS, ITEST
+C (0,24)
+      WRITE (6, 3000) REY, XNU, DT
+C (0,25)
+      IF (IRND.EQ.1) THEN
+C (0,26)
+C        BEGIN BLOCK
+C (0,27)
+         WRITE (6, *) 
+     &   'ENERGY SPECTRUM E(K) OF THE RANDOM INITIAL VELOCITY'
+C (0,28)
+         WRITE (6, 5000) C1, C2
+C        END BLOCK
+      ELSE
+C (0,29)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,30)
+      IF (ITG.EQ.1) THEN
+C (0,31)
+         WRITE (6, *) 'INITIAL VELOCITY IS A TAYLOR-GREEN VORTEX'
+      ELSE
+C (0,32)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,33)
+      CALL WAVNUM
+C (0,34)
+      RETURN
+C     END BLOCK
+      END
+C                                                                       
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C                                                                       
+      SUBROUTINE  WAVNUM                                                
+     x 
+C                                                                       
+C                                                                       
+C     TO SET UP WAVE NUMBERS XW,YW,ZW;  
+C     SQUARE OF WAVE NUMBERS XSQ,YSQ,ZSQ;
+C     AND TRUNC NUMBERS XWT,YWT,ZWT. 
+C                                                                       
+      IMPLICIT REAL*8(A-H,O-Z)                                          
+     x 
+      COMMON/WAV/ XW(129),YW(129),ZW(129),XSQ(129),YSQ(129),ZSQ(129)    
+     x 
+      COMMON/TRUNC/XWT(129),YWT(129),ZWT(129)                           
+     x 
+      COMMON /DIM/ NX,NY,NZ,NXPP,NXHP,NTOT,NXY,NXZ,NYZ                  
+     x 
+      COMMON /BOX/ PI,PI2,BOXX,BOXY,BOXZ,FX,FY,FZ                       
+     x 
+      COMMON /ALIAS/ IALIAS                                             
+     x 
+      REAL*8 LIMX,LIMY,LIMZ                                             
+     x 
+      DATA   TINY/1.D-20/                                               
+     x 
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      NXH = NX/2
+C (0,3)
+!     INITIALLY: DO 1
+      DO I = 1, NXH
+C (0,4)
+C        BEGIN BLOCK
+C (0,5)
+         XW(I) = FX*FLOAT(I-1)+TINY
+C (0,6)
+         XSQ(I) = XW(I)*XW(I)+TINY
+C (0,7)
+1        CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,8)
+      XW(NXHP) = TINY
+C (0,9)
+      XSQ(NXHP) = TINY
+C (0,10)
+      NYH = NY/2
+C (0,11)
+!     INITIALLY: DO 2
+      DO J = 2, NYH
+C (0,12)
+C        BEGIN BLOCK
+C (0,13)
+         YW(J) = FY*FLOAT(J-1)+TINY
+C (0,14)
+         YW(NY+2-J) = -YW(J)
+C (0,15)
+         YSQ(J) = YW(J)*YW(J)
+C (0,16)
+         YSQ(NY+2-J) = YSQ(J)
+C (0,17)
+2        CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,18)
+      YW(NYH+1) = TINY
+C (0,19)
+      YW(1) = TINY
+C (0,20)
+      YSQ(1) = TINY
+C (0,21)
+      YSQ(NYH+1) = TINY
+C (0,22)
+      NZH = NZ/2
+C (0,23)
+!     INITIALLY: DO 3
+      DO J = 2, NZH
+C (0,24)
+C        BEGIN BLOCK
+C (0,25)
+         ZW(J) = FZ*FLOAT(J-1)+TINY
+C (0,26)
+         ZW(NZ+2-J) = -ZW(J)
+C (0,27)
+         ZSQ(J) = ZW(J)*ZW(J)
+C (0,28)
+         ZSQ(NZ+2-J) = ZSQ(J)
+C (0,29)
+3        CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,30)
+      ZW(NZH+1) = TINY
+C (0,31)
+      ZSQ(NZH+1) = TINY
+C (0,32)
+      ZW(1) = TINY
+C (0,33)
+      ZSQ(1) = TINY
+C (0,34)
+!     INITIALLY: DO 4
+      DO I = 1, NXHP
+C (0,35)
+4        XWT(I) = 1.0D0
+      ENDDO
+C (0,36)
+!     INITIALLY: DO 5
+      DO J = 1, NY
+C (0,37)
+5        YWT(J) = 1.0D0
+      ENDDO
+C (0,38)
+!     INITIALLY: DO 6
+      DO K = 1, NZ
+C (0,39)
+6        ZWT(K) = 1.0D0
+      ENDDO
+C (0,40)
+      LIMX = 2.D0*FLOAT(NXHP)/3.D0
+C (0,41)
+      LIMY = 2.D0*FLOAT(NY/2+1)/3.D0
+C (0,42)
+      LIMZ = 2.D0*FLOAT(NZ/2+1)/3.D0
+C (0,43)
+      IF (IALIAS.EQ.1) THEN
+C (0,44)
+C        BEGIN BLOCK
+C (0,45)
+!     INITIALLY: DO 41
+         DO I = 1, NXHP
+C (0,46)
+C           BEGIN BLOCK
+C (0,47)
+            IF (ABS(XW(I)).GT.LIMX) THEN
+C (0,48)
+               XWT(I) = 0.D0
+            ELSE
+C (0,49)
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+C (0,50)
+41          CONTINUE
+C           END BLOCK
+         ENDDO
+C (0,51)
+!     INITIALLY: DO 51
+         DO J = 1, NY
+C (0,52)
+C           BEGIN BLOCK
+C (0,53)
+            IF (ABS(YW(J)).GT.LIMY) THEN
+C (0,54)
+               YWT(J) = 0.D0
+            ELSE
+C (0,55)
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+C (0,56)
+51          CONTINUE
+C           END BLOCK
+         ENDDO
+C (0,57)
+!     INITIALLY: DO 61
+         DO K = 1, NZ
+C (0,58)
+C           BEGIN BLOCK
+C (0,59)
+            IF (ABS(ZW(K)).GT.LIMZ) THEN
+C (0,60)
+               ZWT(K) = 0.D0
+            ELSE
+C (0,61)
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+C (0,62)
+61          CONTINUE
+C           END BLOCK
+         ENDDO
+C        END BLOCK
+      ELSE
+C (0,63)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,64)
+      RETURN
+C     END BLOCK
+      END
+C                                                                       
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C                                                                       
+C  INITIAL CONDITION FOR A TAYLOR-GREEN VORTEX                           
+C                                                                       
+      SUBROUTINE  TGVEL (U,V,W)                                         
+     x 
+C
+C     TO SET UP INITIAL CONDITIONS FOR A TAYLOR-GREEN VORTEX                  
+C     U(I,Y,Z) = COS X SIN Y COS Z                                      
+C     V(X,Y,Z) = - SIN X COS Y COS Z                                    
+C     W(X,Y,Z) = 0
+C                                                                       
+C     ON RETURN
+C
+C     U, V, W 
+C        ARE THE THREE DIMENSIONAL ARRAYS. SPECIFIED AS: 
+C        COMPLEX*16 U(NXHP,NY,NZ),V(NXHP,NY,NZ),W(NXHP,NY,NZ) 
+C
+      IMPLICIT REAL*8(A-H,O-Z)                                          
+     x 
+      COMMON /DIM/ NX,NY,NZ,NXPP,NXHP,NTOT,NXY,NXZ,NYZ                  
+     x 
+      COMPLEX*16  U(NXHP,NY,2162688/(NXHP*NY*16)),V(NXHP,NY,2162688/(NXH
+     x P*NY*16)),W(NXHP,NY,2162688/(NXHP*NY*16)),IUNIT          
+      COMMON /PAR1/ ISTART,NSTEPS,NAVG,ISAV,NSAV,NOUT,IRND,ITG,ITEST    
+     x       
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+C     VELOCITY FIELD IS SET UP IN FOURIER SPACE                         
+C     U(X,Y,Z) = COS X SIN Y COS Z                                      
+C     V(X,Y,Z) = - SIN X COS Y COS Z                                    
+C     W(X,Y,Z) = 0                                                      
+      IUNIT = CMPLX(0.0D0, 1.0D0)
+C (0,3)
+!     INITIALLY: DO 1
+      DO I = 1, NXHP
+C (0,4)
+C        BEGIN BLOCK
+C (0,5)
+!     INITIALLY: DO 2
+         DO J = 1, NY
+C (0,6)
+C           BEGIN BLOCK
+C (0,7)
+!     INITIALLY: DO 3
+            DO K = 1, NZ
+C (0,8)
+C              BEGIN BLOCK
+C (0,9)
+               U(I,J,K) = CMPLX(0.0D0, 0.0D0)
+C (0,10)
+               V(I,J,K) = CMPLX(0.0D0, 0.0D0)
+C (0,11)
+               W(I,J,K) = CMPLX(0.0D0, 0.0D0)
+C (0,12)
+3              CONTINUE
+C              END BLOCK
+            ENDDO
+C (0,13)
+2           CONTINUE
+C           END BLOCK
+         ENDDO
+C (0,14)
+1        CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,15)
+      SCALAR = 0.125D0
+C (0,16)
+      U(2,2,2) = -SCALAR*IUNIT
+C (0,17)
+      U(2,NY,2) = SCALAR*IUNIT
+C (0,18)
+      U(2,2,NZ) = -SCALAR*IUNIT
+C (0,19)
+      U(2,NY,NZ) = SCALAR*IUNIT
+C (0,20)
+      V(2,2,2) = SCALAR*IUNIT
+C (0,21)
+      V(2,NY,2) = SCALAR*IUNIT
+C (0,22)
+      V(2,2,NZ) = SCALAR*IUNIT
+C (0,23)
+      V(2,NY,NZ) = SCALAR*IUNIT
+C (0,24)
+      RETURN
+C     END BLOCK
+      END
+C                                                                       
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C                                                                       
+      SUBROUTINE  WCAL (U,V,W,OX,OY,OZ)                                 
+     x 
+C                                                                       
+C
+C     COMPUTE THE VORTICITY VECTOR W = (OX,OY,OZ)
+C                                    = (XW,YW,ZW) X (U,V,W)   
+C
+C     ON ENTRY
+C
+C     U, V, W
+C        ARE THE THREE DIMENSIONAL ARRAYS SPECIFIED AS:
+C        COMPLEX*16 U(NXHP,NY,NZ),V(NXHP,NY,NZ),W(NXHP,NY,NZ)
+C
+C     ON RETURN
+C
+C     OX, OY, OZ
+C        ARE THE THREE DIMENSIONAL ARRAYS SPECIFIED AS:
+C        COMPLEX*16 OX(NXHP,NY,OZ),OY(NXHP,NY,OZ),OZ(NXHP,NY,OZ)
+C
+      IMPLICIT REAL*8(A-H,O-Z)                                          
+     x 
+      COMMON /DIM/ NX,NY,NZ,NXPP,NXHP,NTOT,NXY,NXZ,NYZ                  
+     x 
+      COMMON/WAV/ XW(129),YW(129),ZW(129),XSQ(129),YSQ(129),ZSQ(129)    
+     x 
+      COMPLEX*16 U(NXHP,NY,2162688/(NXHP*NY*16)),V(NXHP,NY,2162688/(NXHP
+     x *NY*16)),W(NXHP,NY,2162688/(NXHP*NY*16)),                
+     +     OX(NXHP,NY,2162688/(NXHP*NY*16)),OY(NXHP,NY,2162688/(NXHP*NY*
+     x 16)),OZ(NXHP,NY,2162688/(NXHP*NY*16)),IUNIT              
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      IUNIT = CMPLX(0.D0, 1.D0)
+C (0,3)
+!     INITIALLY: DO 1
+      DO J = 1, NY
+C (0,4)
+C        BEGIN BLOCK
+C (0,5)
+         Q = YW(J)
+C (0,6)
+!     INITIALLY: DO 2
+         DO I = 1, NXHP
+C (0,7)
+C           BEGIN BLOCK
+C (0,8)
+            P = XW(I)
+C (0,9)
+!     INITIALLY: DO 3
+            DO K = 1, NZ
+C (0,10)
+C              BEGIN BLOCK
+C (0,11)
+               OX(I,J,K) = IUNIT*(Q*W(I,J,K)-ZW(K)*V(I,J,K))
+C (0,12)
+               OY(I,J,K) = IUNIT*(ZW(K)*U(I,J,K)-P*W(I,J,K))
+C (0,13)
+               OZ(I,J,K) = IUNIT*(P*V(I,J,K)-Q*U(I,J,K))
+C (0,14)
+3              CONTINUE
+C              END BLOCK
+            ENDDO
+C (0,15)
+2           CONTINUE
+C           END BLOCK
+         ENDDO
+C (0,16)
+1        CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,17)
+      RETURN
+C     END BLOCK
+      END
+C                                                                       
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C                                                                       
+      SUBROUTINE DCOPY(N,X,IX,Y,IY)                                     
+     x 
+C                                                                       
+C     COPY A VECTOR X OF LENGTH N, TO ANOTHER VECTOR Y OF LENGTH N:     
+C     Y <- X                                                            
+C                                                                       
+C
+C     ON ENTRY
+C
+C     N
+C        INTEGER ,IS THE NUMBER OF ELEMENTS IN VECTORS X AND Y. N >= 0.
+C
+C     X
+C        REAL*8 X(*), IS THE VECTOR OF LENGTH N. 
+C        X IS A ONE-DIMENSIONAL ARRAY OF (AT LEAST LENGTH) 1+(N-1)|INCX.
+C
+C     INCX
+C        INTEGER, IS THE STRIDE FOR VECTOR X.
+C
+C     INCY
+C        INTEGER, IS THE STRIDE FOR VECTOR Y.
+C
+C     ON RETURN
+C
+C     Y
+C        REAL*8 Y(*), IS THE VECTOR OF LENGTH N. 
+C        Y IS A ONE-DIMENSIONAL ARRAY OF (AT LEAST LENGTH) 1+(N-1)|INCY.
+C
+C     X IS A ONE-DIMENSIONAL ARRAY OF (AT LEAST LENGTH) 1+(N-1)|INCX|   
+C     Y IS A ONE-DIMENSIONAL ARRAY OF (AT LEAST LENGTH) 1+(N-1)|INCY|   
+C                                                                       
+      INTEGER N,IX,IY                                                   
+     x 
+      REAL*8  X(270336), Y(270336)                                      
+     x           
+C                                                                       
+      INTEGER I                                                         
+     x 
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+C                                                                       
+      IF (IX.EQ.1.AND.IY.EQ.1) THEN
+C (0,3)
+!     INITIALLY: DO 10
+         DO I = 1, N
+C (0,4)
+C           BEGIN BLOCK
+C (0,5)
+            Y(I) = X(I)
+C (0,6)
+10          CONTINUE
+C           END BLOCK
+         ENDDO
+      ELSE
+C (0,7)
+!     INITIALLY: DO 20
+         DO I = 0, N-1
+C (0,8)
+C           BEGIN BLOCK
+C (0,9)
+            Y(I*IY+1) = X(I*IX+1)
+C (0,10)
+20          CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDIF
+C (0,11)
+C                                                                       
+      RETURN
+C     END BLOCK
+      END
+C                                                                       
+C                                                                       
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C                                                                       
+      SUBROUTINE  ENR(A,B,COEF,S)                                       
+     x 
+C                                                                       
+C     COMPUTES VECTOR MULTIPLY $2*COEF*A*B$                             
+C
+C     ON ENTRY
+C   
+C     A, B
+C        ARE FOUR DIMENSIONAL ARRAYS.
+C        REAL*8 A(2,NXHP,NY,NZ),B(2,NXHP,NY,NZ)
+C
+C     COEF
+C        IS A CONSTANT.
+C        REAL*8 COEF.
+C
+C     ON RETURN
+C
+C     S
+C        COMPUTES VECTOR MULTIPLY.
+C        REAL*8 S.
+      IMPLICIT REAL*8(A-H,O-Z)                                          
+     x 
+      COMMON /DIM/ NX,NY,NZ,NXPP,NXHP,NTOT,NXY,NXZ,NYZ                  
+     x 
+      REAL*8        A(2,NXHP,NY,270336/(2*NXHP*NY)),B(2,NXHP,NY,270336/(
+     x 2*NXHP*NY))                       
+      REAL*8 S0
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      S = 0.D0
+C (0,3)
+      S0 = 0
+C (0,4)
+!     INITIALLY: DO 1
+      DO IA = 1, 2
+C (0,5)
+C        BEGIN BLOCK
+C (0,6)
+!     INITIALLY: DO 2
+         DO J = 1, NY
+C (0,7)
+C           BEGIN BLOCK
+C (0,8)
+!     INITIALLY: DO 3
+            DO I = 1, NXHP-1
+C (0,9)
+C              BEGIN BLOCK
+C (0,10)
+               IF (I.EQ.1) THEN
+C (0,11)
+                  F1 = 1.D0
+               ELSE
+C (0,12)
+                  F1 = 2.D0
+               ENDIF
+C (0,13)
+!     INITIALLY: DO 4
+               DO K = 1, NZ
+C (0,14)
+C                 BEGIN BLOCK
+C (0,15)
+                  S0 = S0+F1*COEF*A(IA,I,J,K)*B(IA,I,J,K)
+C (0,16)
+4                 CONTINUE
+C                 END BLOCK
+               ENDDO
+C (0,17)
+3              CONTINUE
+C              END BLOCK
+            ENDDO
+C (0,18)
+2           CONTINUE
+C           END BLOCK
+         ENDDO
+C (0,19)
+1        CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,20)
+      S = S+S0
+C (0,21)
+      RETURN
+C     END BLOCK
+      END
+C                                                                       
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C                                                                       
+      SUBROUTINE  ZFFT(JN,NTSK,IND,IS)                                  
+     x 
+C
+C     PERFORMS 3-D FOURIER TRANSFORMS OF COMPLEX (CFT) 
+C     DATA IN Z DIRECTION.
+C
+C     SUBROUTINE CALL: DCFT
+C
+C     ON ENTRY
+C
+C     JN
+C        INTEGER, IS AN INDEX OF START POINT IN THE ARRAY.
+C
+C     IND
+C        INTEGER, IS AN INDEX TO POINT OUT WHICH ARRAY SHOULD 
+C        APPLY DCFT ROUTINE.
+C
+C     IS 
+C        INTEGER, CONTROLS THE DIRECTION OF THE TRANSFORM. 
+C        IS EITHER = 1 OR -1.
+C        IF IS = 1, TRANSFORMING FREQUENCY TO TIME.
+C        IF IS = -1, TRANSFORMING TIME TO FREQUENCY.
+C
+      IMPLICIT    REAL*8(A-H,O-Z)                                       
+     x 
+      PARAMETER   (IX= 64,IY= 64,IZ= 64 ,M1=6)
+
+      PARAMETER   (IXPP=IX+2,IXHP=IX/2+1,ITOT=IXPP*IY*IZ,               
+     x 
+     +          IXY=IXHP*IY,IXZ=IXHP*IZ,IYZ=IY*IZ)                      
+     x 
+      COMMON/ALL/ U(IXPP,IY,IZ),V(IXPP,IY,IZ),W(IXPP,IY,IZ),            
+     x 
+     +            OX(IXPP,IY,IZ),OY(IXPP,IY,IZ),OZ(IXPP,IY,IZ)          
+     x 
+      COMMON/SHR/ U0(IXPP,IY,IZ),V0(IXPP,IY,IZ),W0(IXPP,IY,IZ),         
+     x 
+     +            U1(IXPP,IY,IZ),V1(IXPP,IY,IZ),W1(IXPP,IY,IZ)          
+     x 
+      COMMON /DIM/ NX,NY,NZ,NXPP,NXHP,NTOT,NXY,NXZ,NYZ                  
+     x 
+      REAL*8      AUX1(4*IX),AUX2(2*IX)                               
+C (0,1)
+      INTEGER*8 I_PIPS_DCFT_X
+      COMMON /PIPS_DCFT_X/ I_PIPS_DCFT_X
+      INTEGER*8 I_PIPS_DCFT_Y
+      COMMON /PIPS_DCFT_Y/ I_PIPS_DCFT_Y
+C     BEGIN BLOCK
+C (0,2)
+      IF (IS.EQ.-1) THEN
+C (0,3)
+C        BEGIN BLOCK
+C (0,4)
+         IF (IND.EQ.1) THEN
+C (0,5)
+C           BEGIN BLOCK
+C (0,6)
+            SZ = 1.D0/FLOAT(NZ)
+C (0,7)
+      I_PIPS_DCFT_X = IXPP*IY*IZ-(JN-1)*IXPP
+      I_PIPS_DCFT_Y = IXPP*IY*IZ-(JN-1)*IXPP
+            CALL DCFT(M1, U(1,JN,1), NXY, 1, U(1,JN,1), NXY, 1, NZ, 
+     &      NXHP, 1, SZ, AUX1, AUX2, JN)
+C           END BLOCK
+         ELSE
+C (0,8)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C (0,9)
+         IF (IND.EQ.2) THEN
+C (0,10)
+C           BEGIN BLOCK
+C (0,11)
+            SZ = 1.D0/FLOAT(NZ)
+C (0,12)
+      I_PIPS_DCFT_X = IXPP*IY*IZ-(JN-1)*IXPP
+      I_PIPS_DCFT_Y = IXPP*IY*IZ-(JN-1)*IXPP
+            CALL DCFT(M1, V(1,JN,1), NXY, 1, V(1,JN,1), NXY, 1, NZ, 
+     &      NXHP, 1, SZ, AUX1, AUX2, JN)
+C           END BLOCK
+         ELSE
+C (0,13)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C (0,14)
+         IF (IND.EQ.3) THEN
+C (0,15)
+C           BEGIN BLOCK
+C (0,16)
+            SZ = 1.D0/FLOAT(NZ)
+C (0,17)
+      I_PIPS_DCFT_X = IXPP*IY*IZ-(JN-1)*IXPP
+      I_PIPS_DCFT_Y = IXPP*IY*IZ-(JN-1)*IXPP
+            CALL DCFT(M1, W(1,JN,1), NXY, 1, W(1,JN,1), NXY, 1, NZ, 
+     &      NXHP, 1, SZ, AUX1, AUX2, JN)
+C           END BLOCK
+         ELSE
+C (0,18)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C (0,19)
+         IF (IND.EQ.4) THEN
+C (0,20)
+C           BEGIN BLOCK
+C (0,21)
+            SZ = 1.D0/FLOAT(NZ)
+C (0,22)
+      I_PIPS_DCFT_X = IXPP*IY*IZ-(JN-1)*IXPP
+      I_PIPS_DCFT_Y = IXPP*IY*IZ-(JN-1)*IXPP
+            CALL DCFT(M1, OX(1,JN,1), NXY, 1, OX(1,JN,1), NXY, 1, NZ
+     &      , NXHP, 1, SZ, AUX1, AUX2, JN)
+C           END BLOCK
+         ELSE
+C (0,23)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C (0,24)
+         IF (IND.EQ.5) THEN
+C (0,25)
+C           BEGIN BLOCK
+C (0,26)
+            SZ = 1.D0/FLOAT(NZ)
+C (0,27)
+      I_PIPS_DCFT_X = IXPP*IY*IZ-(JN-1)*IXPP
+      I_PIPS_DCFT_Y = IXPP*IY*IZ-(JN-1)*IXPP
+            CALL DCFT(M1, OY(1,JN,1), NXY, 1, OY(1,JN,1), NXY, 1, NZ
+     &      , NXHP, 1, SZ, AUX1, AUX2, JN)
+C           END BLOCK
+         ELSE
+C (0,28)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C (0,29)
+         IF (IND.EQ.6) THEN
+C (0,30)
+C           BEGIN BLOCK
+C (0,31)
+            SZ = 1.D0/FLOAT(NZ)
+C (0,32)
+      I_PIPS_DCFT_X = IXPP*IY*IZ-(JN-1)*IXPP
+      I_PIPS_DCFT_Y = IXPP*IY*IZ-(JN-1)*IXPP
+            CALL DCFT(M1, OZ(1,JN,1), NXY, 1, OZ(1,JN,1), NXY, 1, NZ
+     &      , NXHP, 1, SZ, AUX1, AUX2, JN)
+C           END BLOCK
+         ELSE
+C (0,33)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C        END BLOCK
+      ELSE
+C (0,34)
+C        BEGIN BLOCK
+C (0,35)
+         IF (IND.EQ.1) THEN
+C (0,36)
+      I_PIPS_DCFT_X = IXPP*IY*IZ-(JN-1)*IXPP
+      I_PIPS_DCFT_Y = IXPP*IY*IZ-(JN-1)*IXPP
+            CALL DCFT(M1, U(1,JN,1), NXY, 1, U(1,JN,1), NXY, 1, NZ, 
+     &      NXHP, -1, 1.0D0, AUX1, AUX2, JN)
+         ELSE
+C (0,37)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C (0,38)
+         IF (IND.EQ.2) THEN
+C (0,39)
+      I_PIPS_DCFT_X = IXPP*IY*IZ-(JN-1)*IXPP
+      I_PIPS_DCFT_Y = IXPP*IY*IZ-(JN-1)*IXPP
+            CALL DCFT(M1, V(1,JN,1), NXY, 1, V(1,JN,1), NXY, 1, NZ, 
+     &      NXHP, -1, 1.0D0, AUX1, AUX2, JN)
+         ELSE
+C (0,40)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C (0,41)
+         IF (IND.EQ.3) THEN
+C (0,42)
+      I_PIPS_DCFT_X = IXPP*IY*IZ-(JN-1)*IXPP
+      I_PIPS_DCFT_Y = IXPP*IY*IZ-(JN-1)*IXPP
+            CALL DCFT(M1, W(1,JN,1), NXY, 1, W(1,JN,1), NXY, 1, NZ, 
+     &      NXHP, -1, 1.0D0, AUX1, AUX2, JN)
+         ELSE
+C (0,43)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C (0,44)
+         IF (IND.EQ.4) THEN
+C (0,45)
+      I_PIPS_DCFT_X = IXPP*IY*IZ-(JN-1)*IXPP
+      I_PIPS_DCFT_Y = IXPP*IY*IZ-(JN-1)*IXPP
+            CALL DCFT(M1, OX(1,JN,1), NXY, 1, OX(1,JN,1), NXY, 1, NZ
+     &      , NXHP, -1, 1.0D0, AUX1, AUX2, JN)
+         ELSE
+C (0,46)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C (0,47)
+         IF (IND.EQ.5) THEN
+C (0,48)
+      I_PIPS_DCFT_X = IXPP*IY*IZ-(JN-1)*IXPP
+      I_PIPS_DCFT_Y = IXPP*IY*IZ-(JN-1)*IXPP
+            CALL DCFT(M1, OY(1,JN,1), NXY, 1, OY(1,JN,1), NXY, 1, NZ
+     &      , NXHP, -1, 1.0D0, AUX1, AUX2, JN)
+         ELSE
+C (0,49)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C (0,50)
+         IF (IND.EQ.6) THEN
+C (0,51)
+      I_PIPS_DCFT_X = IXPP*IY*IZ-(JN-1)*IXPP
+      I_PIPS_DCFT_Y = IXPP*IY*IZ-(JN-1)*IXPP
+            CALL DCFT(M1, OZ(1,JN,1), NXY, 1, OZ(1,JN,1), NXY, 1, NZ
+     &      , NXHP, -1, 1.0D0, AUX1, AUX2, JN)
+         ELSE
+C (0,52)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C        END BLOCK
+      ENDIF
+C (0,53)
+      RETURN
+C     END BLOCK
+      END
+C                                                                       
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C                                                                       
+      SUBROUTINE DCFT( M1, X, INC1X, INC2X, Y, INC1Y, INC2Y, N, M,
+     &   ISIGN, SCALE, RA, AUX,NQ)
+C
+C  THIS PERFORMS A SET OF M COMPLEX DISCRETE N-POINT FOURIER TRANSFORMS
+C  OF COMPLEX DATA. HERE N=2^M1.
+C
+C     SUBROUTINE CALL: CFFT
+C
+C     ON ENTRY
+C 
+C     M1, N
+C        INTEGER IRUN, N1. N1 IS THE LENGTH OF EACH SEQUENCE TO 
+C        BE TRANSFORMED. WHERE N1 = 2^IRUN. 2 < IRUN < 8.
+C     X
+C        REAL*8 X(*), CONSISTING OF M SEQUENCES OF LENGTH N.
+C
+C     INC1X, INC1Y
+C        INTEGER, ARE THE STRIDE BETWEEN THE ELEMENTS WITHIN 
+C        EACH SEQUENCE IN ARRAY X AND Y.
+C
+C     INC2X, INC2Y
+C        INTEGER, ARE THE STRIDE BETWEEN THE FIRST ELEMENTS 
+C        OF SEQUENCE IN ARRAY X AND Y.
+C     M 
+C        INTEGER. M > 0, IS THE NUMBER OF SEQUENCE TO BE TRAMSFORMED.
+C
+C     ISIGN
+C        INTEGER, CONTROLS THE DIRECTION OF THE TRANSFORM. 
+C        ISIGN  EITHER = 1 OR -1.
+C        IF IS = -1, TRANSFORMING FREQUENCY TO TIME.
+C        IF IS = 1, TRANSFORMING TIME TO FREQUENCY.
+C      
+C     SCALE
+C        REAL*8, IS THE SCALING CONSTANT SCALE. SCALE<>0.0
+C
+C     RA, AUX
+C        REAL*8 RA(4*N), AUX(2*N), ARE THE SCRATCH ARRAY.
+C
+C     ON RETURN
+C
+C     Y
+C        REAL*8 Y(*), CONTAINS THE RESULTS OF THE M DISCRETE 
+C        FOURIER TRANSFORMS, EACH OF LENGTH N.
+C
+      IMPLICIT REAL*8(A-H,O-Z)
+      REAL*8 X(I_PIPS_DCFT_X),Y(I_PIPS_DCFT_Y),RA(4*N),AUX(2*N)
+C (0,1)
+      INTEGER*8 I_PIPS_DCFT_X
+      COMMON /PIPS_DCFT_X/ I_PIPS_DCFT_X
+      INTEGER*8 I_PIPS_DCFT_Y
+      COMMON /PIPS_DCFT_Y/ I_PIPS_DCFT_Y
+      INTEGER*8 I_PIPS_CFFT_U
+      COMMON /PIPS_CFFT_U/ I_PIPS_CFFT_U
+      INTEGER*8 I_PIPS_CFFT_X
+      COMMON /PIPS_CFFT_X/ I_PIPS_CFFT_X
+      INTEGER*8 I_PIPS_CFFT_Y
+      COMMON /PIPS_CFFT_Y/ I_PIPS_CFFT_Y
+C     BEGIN BLOCK
+C (0,2)
+      I_PIPS_CFFT_U = 2*N
+      I_PIPS_CFFT_X = 4*N
+      I_PIPS_CFFT_Y = 4*N-(2*N+1-1)
+      CALL CFFT(0, M1, AUX, RA, RA(2*N+1), NQ)
+C (0,3)
+!     INITIALLY: DO 10
+      DO I = 1, M
+C (0,4)
+C        BEGIN BLOCK
+C (0,5)
+         IBR = (I-1)*INC2X*2+1
+C (0,6)
+         IBC = (I-1)*INC2X*2+2
+C (0,7)
+!     INITIALLY: DO 20
+         DO II = 1, N
+C (0,8)
+C           BEGIN BLOCK
+C (0,9)
+            INDR = IBR+(II-1)*2*INC1X
+C (0,10)
+            INDC = IBC+(II-1)*2*INC1X
+C (0,11)
+            RA(II) = X(INDR)
+C (0,12)
+            RA(II+N) = X(INDC)
+C (0,13)
+20          CONTINUE
+C           END BLOCK
+         ENDDO
+C (0,14)
+      I_PIPS_CFFT_U = 2*N
+      I_PIPS_CFFT_X = 4*N
+      I_PIPS_CFFT_Y = 4*N-(2*N+1-1)
+         CALL CFFT(ISIGN, M1, AUX, RA, RA(2*N+1), NQ)
+C (0,15)
+!     INITIALLY: DO 30
+         DO II = 1, N
+C (0,16)
+C           BEGIN BLOCK
+C (0,17)
+            INDR = IBR+(II-1)*2*INC1X
+C (0,18)
+            INDC = IBC+(II-1)*2*INC1X
+C (0,19)
+            Y(INDR) = SCALE*RA(II)
+C (0,20)
+            Y(INDC) = SCALE*RA(II+N)
+C (0,21)
+30          CONTINUE
+C           END BLOCK
+         ENDDO
+C (0,22)
+10       CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,23)
+      RETURN
+C     END BLOCK
+      END
+C
+C                                                                       
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C                                                                       
+      SUBROUTINE CFFT (IS, M, U, X, Y, NQ)
+C
+C   Computes the 2^M-point complex-to-complex FFT of X using an algorithm due
+C   to Swarztrauber, coupled with some fast methods for performing power-of-
+C   two matrix transpositions (see article by DHB in Intl. J. of Supercomputer
+C   Applications, Spring 1988, p. 82 - 87). This is the radix 2 version.
+C   X is both the input and the output array, while Y is a scratch array.
+C   Both X and Y must be dimensioned with 2 * N real cells, where N = 2^M.
+C   The data in X are assumed to have real and imaginary parts separated
+C   by N cells.  Before calling CFFTZ to perform an FFT, the array U must be
+C   initialized by calling CFFTZ with IS set to 0 and M set to MX, where MX is
+C   the maximum value of M for any subsequent call.  U must be dimensioned
+C   with at least 2 * NX real cells, where NX = 2^MX.
+C
+C   David H. Bailey     October 26, 1990
+C
+      IMPLICIT REAL*8 (A-H, O-Z)
+      PARAMETER (PI = 3.141592653589793238D0)
+      COMMON /COUNT/ KTTRANS(256)
+      DIMENSION U(I_PIPS_CFFT_U), X(I_PIPS_CFFT_X), Y(I_PIPS_CFFT_Y)
+C (0,1)
+      INTEGER*8 I_PIPS_CFFT_U
+      COMMON /PIPS_CFFT_U/ I_PIPS_CFFT_U
+      INTEGER*8 I_PIPS_CFFT_X
+      COMMON /PIPS_CFFT_X/ I_PIPS_CFFT_X
+      INTEGER*8 I_PIPS_CFFT_Y
+      COMMON /PIPS_CFFT_Y/ I_PIPS_CFFT_Y
+      INTEGER*8 I_PIPS_FFTZ1_X
+      COMMON /PIPS_FFTZ1_X/ I_PIPS_FFTZ1_X
+      INTEGER*8 I_PIPS_FFTZ1_Y
+      COMMON /PIPS_FFTZ1_Y/ I_PIPS_FFTZ1_Y
+      INTEGER*8 I_PIPS_TRANS_X
+      COMMON /PIPS_TRANS_X/ I_PIPS_TRANS_X
+      INTEGER*8 I_PIPS_TRANS_Y
+      COMMON /PIPS_TRANS_Y/ I_PIPS_TRANS_Y
+C     BEGIN BLOCK
+C (0,2)
+C       WRITE (6, 1)  IS, M, MX
+1     FORMAT('CFFTZ: EITHER U HAS NOT BEEN INITIALIZED, OR ELSE'/'ONE OF
+     x 
+     & THE INPUT PARAMETERS IS INVALID',3I5)
+C (0,3)
+C     BEGIN UNSTRUCTURED
+C (1,1)
+C
+      IF (IS.EQ.0) GOTO 99998
+C (18,1)
+C     BEGIN BLOCK
+C (18,2)
+C
+C   Check if input parameters are invalid.
+C
+      K = U(1)
+C (18,3)
+      MX = MOD(K, 64)
+C (18,4)
+      IF (IS.NE.1.AND.IS.NE.-1.OR.M.LT.1.OR.M.GT.MX) THEN
+C       STOP
+      ELSE
+C (18,6)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (18,7)
+C>>
+C   A normal call to CFFTZ starts here.  M1 is the number of the first variant
+C   radix-2 Stockham iterations to be performed.  The second variant is faster
+C   on most computers after the first few iterations, since in the second
+C   variant it is not necessary to access roots of unity in the inner DO loop.
+C   Thus it is most efficient to limit M1 to some value.  For many vector
+C   computers, the optimum limit of M1 is 6.  For scalar systems, M1 should
+C   probably be limited to 2.
+C
+      N = 2**M
+C (18,8)
+C      M1 = MIN (M / 2, 6)
+      M1 = MIN(M/2, 2)
+C (18,9)
+      M2 = M-M1
+C (18,10)
+      N2 = 2**M1
+C (18,11)
+      N1 = 2**M2
+C (18,12)
+      L = 1
+C     END BLOCK
+99996 CONTINUE
+C (15,1)
+C
+C   Perform one variant of the Stockham FFT.
+C
+C     DO loop 120 with exit had to be desugared
+      IF (L.GT.M1) GOTO 99997
+C (17,1)
+      I_PIPS_FFTZ1_X = I_PIPS_CFFT_X
+      I_PIPS_FFTZ1_Y = I_PIPS_CFFT_Y
+      CALL FFTZ1(IS, L, M, U, X, Y)
+C (13,1)
+      IF (L.EQ.M1) GOTO 140
+C (14,1)
+C     BEGIN BLOCK
+C (14,2)
+      I_PIPS_FFTZ1_X = I_PIPS_CFFT_Y
+      I_PIPS_FFTZ1_Y = I_PIPS_CFFT_X
+      CALL FFTZ1(IS, L+1, M, U, Y, X)
+C (14,3)
+120   CONTINUE
+C (14,4)
+      L = L+2
+C     END BLOCK
+      GOTO 99996
+C (12,1)
+C     BEGIN BLOCK
+C (12,2)
+      I_PIPS_TRANS_X = I_PIPS_CFFT_Y
+      I_PIPS_TRANS_Y = I_PIPS_CFFT_X
+C
+C   Perform a transposition of Y treated as a N2 x N1 x 2 matrix.
+C
+140   CALL TRANS(N1, N2, Y, X)
+C (12,3)
+      KTTRANS(NQ) = KTTRANS(NQ)+1
+C (12,4)
+      L = M1+1
+C     END BLOCK
+99995 CONTINUE
+C (10,1)
+C
+C   Perform second variant of the Stockham FFT from X to Y and Y to X.
+C
+C     DO loop 150 with exit had to be desugared
+      IF (L.GT.M) GOTO 180
+C (11,1)
+      CALL FFTZ2(IS, L, M, U, X, Y)
+C (8,1)
+      IF (L.EQ.M) GOTO 160
+C (9,1)
+C     BEGIN BLOCK
+C (9,2)
+      CALL FFTZ2(IS, L+1, M, U, Y, X)
+C (9,3)
+150   CONTINUE
+C (9,4)
+      L = L+2
+C     END BLOCK
+      GOTO 99995
+C (7,1)
+C     BEGIN BLOCK
+C (7,2)
+C
+C
+C   Copy Y to X.
+C
+160   CONTINUE
+C (7,3)
+!     INITIALLY: DO 170
+      DO I = 1, 2*N
+C (7,4)
+C        BEGIN BLOCK
+C (7,5)
+         X(I) = Y(I)
+C (7,6)
+170      CONTINUE
+C        END BLOCK
+      ENDDO
+C     END BLOCK
+      GOTO 180
+99997 CONTINUE
+C (16,1)
+C     BEGIN BLOCK
+C (16,2)
+      I_PIPS_TRANS_X = I_PIPS_CFFT_X
+      I_PIPS_TRANS_Y = I_PIPS_CFFT_Y
+C
+C   Perform a transposition of X treated as a N2 x N1 x 2 matrix.
+C
+      CALL TRANS(N1, N2, X, Y)
+C (16,3)
+      KTTRANS(NQ) = KTTRANS(NQ)+1
+C (16,4)
+      L = M1+1
+C     END BLOCK
+99994 CONTINUE
+C (6,1)
+C
+C   Perform second variant of the Stockham FFT from Y to X and X to Y.
+C
+C     DO loop 130 with exit had to be desugared
+      IF (L.GT.M) GOTO 160
+C (19,1)
+      CALL FFTZ2(IS, L, M, U, Y, X)
+C (4,1)
+      IF (L.EQ.M) GOTO 180
+C (5,1)
+C     BEGIN BLOCK
+C (5,2)
+      CALL FFTZ2(IS, L+1, M, U, X, Y)
+C (5,3)
+130   CONTINUE
+C (5,4)
+      L = L+2
+C     END BLOCK
+      GOTO 99994
+99998 CONTINUE
+C (2,1)
+C     BEGIN BLOCK
+C (2,2)
+C
+C   Initialize the U array with sines and cosines in a manner that permits
+C   stride one access at each FFT iteration.
+C
+      N = 2**M
+C (2,3)
+      NU = N
+C (2,4)
+      U(1) = 64*N+M
+C (2,5)
+      KU = 2
+C (2,6)
+      KN = KU+NU
+C (2,7)
+      LN = 1
+C (2,8)
+C
+!     INITIALLY: DO 110
+      DO J = 1, M
+C (2,9)
+C        BEGIN BLOCK
+C (2,10)
+         T = PI/LN
+C (2,11)
+C
+C   This loop is vectorizable.
+C
+!     INITIALLY: DO 100
+         DO I = 0, LN-1
+C (2,12)
+C           BEGIN BLOCK
+C (2,13)
+            TI = I*T
+C (2,14)
+            U(I+KU) = COS(TI)
+C (2,15)
+            U(I+KN) = SIN(TI)
+C (2,16)
+100         CONTINUE
+C           END BLOCK
+         ENDDO
+C (2,17)
+C
+         KU = KU+LN
+C (2,18)
+         KN = KU+NU
+C (2,19)
+         LN = 2*LN
+C (2,20)
+110      CONTINUE
+C        END BLOCK
+      ENDDO
+C
+C     END BLOCK
+C (3,1)
+C
+C
+180   CONTINUE
+C     END UNSTRUCTURED
+C (0,4)
+      RETURN
+C     END BLOCK
+      END
+C
+C                                                                       
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C                                                                       
+      SUBROUTINE FFTZ1 (IS, L, M, U, X, Y)
+C
+C
+C   PERFORMS THE L-TH ITERATION OF THE FIRST VARIANT OF THE  
+C   STOCKHAM FFT.
+C
+C 
+C     ON ENTRY
+C
+C     IS 
+C        INTEGER, CONTROLS THE DIRECTION OF THE TRANSFORM. 
+C        IS EITHER = 1 OR -1.
+C        IF IS = -1, TRANSFORMING FREQUENCY TO TIME.
+C        IF IS = 1, TRANSFORMING TIME TO FREQUENCY.
+C     L 
+C        INTEGER, L-TH ITERATION OF THE FIRST VARIANT OF THE  
+C        STOCKHAM FFT.
+C     X
+C        REAL*8 X(2*N). X HAS REAL AND IMAGINARY PARTS SEPARATED 
+C        BY N CELLS.
+C     U
+C        REAL*8 U(2*N) IS THE SCRATCH ARRAY.
+C     M 
+C        INTEGER.  N = 2^M.
+C
+C     ON RETURN
+C
+C     Y
+C        REAL*8 Y(2*N).
+C
+      IMPLICIT REAL*8 (A-H, O-Z)
+      DIMENSION U(I_PIPS_CFFT_U), X(I_PIPS_FFTZ1_X), Y(I_PIPS_FFTZ1_Y)
+C (0,1)
+      INTEGER*8 I_PIPS_CFFT_U
+      COMMON /PIPS_CFFT_U/ I_PIPS_CFFT_U
+      INTEGER*8 I_PIPS_CFFT_Y
+      COMMON /PIPS_CFFT_Y/ I_PIPS_CFFT_Y
+      INTEGER*8 I_PIPS_CFFT_X
+      COMMON /PIPS_CFFT_X/ I_PIPS_CFFT_X
+      INTEGER*8 I_PIPS_FFTZ1_X
+      COMMON /PIPS_FFTZ1_X/ I_PIPS_FFTZ1_X
+      INTEGER*8 I_PIPS_FFTZ1_Y
+      COMMON /PIPS_FFTZ1_Y/ I_PIPS_FFTZ1_Y
+C     BEGIN BLOCK
+C (0,2)
+C
+C   Set initial parameters.
+C
+      N = 2**M
+C (0,3)
+      K = U(1)
+C (0,4)
+      NU = K/64
+C (0,5)
+      N1 = N/2
+C (0,6)
+      LK = 2**(L-1)
+C (0,7)
+      LI = 2**(M-L)
+C (0,8)
+      LJ = 2*LI
+C (0,9)
+      KU = LI+1
+C (0,10)
+      KN = KU+NU
+C (0,11)
+C
+!     INITIALLY: DO 100
+      DO K = 0, LK-1
+C (0,12)
+C        BEGIN BLOCK
+C (0,13)
+         I11 = K*LJ+1
+C (0,14)
+         I12 = I11+LI
+C (0,15)
+         I21 = K*LI+1
+C (0,16)
+         I22 = I21+N1
+C (0,17)
+C
+C   This loop is vectorizable.
+C
+!     INITIALLY: DO 100
+         DO I = 0, LI-1
+C (0,18)
+C           BEGIN BLOCK
+C (0,19)
+            U1 = U(KU+I)
+C (0,20)
+            U2 = IS*U(KN+I)
+C (0,21)
+            X11 = X(I11+I)
+C (0,22)
+            X12 = X(I11+I+N)
+C (0,23)
+            X21 = X(I12+I)
+C (0,24)
+            X22 = X(I12+I+N)
+C (0,25)
+            T1 = X11-X21
+C (0,26)
+            T2 = X12-X22
+C (0,27)
+            Y(I21+I) = X11+X21
+C (0,28)
+            Y(I21+I+N) = X12+X22
+C (0,29)
+            Y(I22+I) = U1*T1-U2*T2
+C (0,30)
+            Y(I22+I+N) = U1*T2+U2*T1
+C (0,31)
+100         CONTINUE
+C           END BLOCK
+         ENDDO
+C        END BLOCK
+      ENDDO
+C (0,32)
+C
+      RETURN
+C     END BLOCK
+      END
+C
+C                                                                       
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C                                                                       
+      SUBROUTINE TRANS (N1, N2, X, Y)
+C
+C   Performs a transpose of the vector X, returning the result in Y.  X is
+C   treated as a N1 x N2 complex matrix, and Y is treated as a N2 x N1 complex
+C   matrix.  The complex data is assumed stored with real and imaginary parts
+C   separated by N1 x N2 locations.  If this routine is to be used for an
+C   application involving only real data, then the second line of all inner DO
+C   loops may be deleted.
+C
+C   David H. Bailey      April 28, 1987
+C
+      IMPLICIT REAL*8 (A-H, O-Z)
+      DIMENSION X(I_PIPS_TRANS_X), Y(I_PIPS_TRANS_Y)
+C (0,1)
+      INTEGER*8 I_PIPS_CFFT_X
+      COMMON /PIPS_CFFT_X/ I_PIPS_CFFT_X
+      INTEGER*8 I_PIPS_CFFT_Y
+      COMMON /PIPS_CFFT_Y/ I_PIPS_CFFT_Y
+      INTEGER*8 I_PIPS_TRANS_X
+      COMMON /PIPS_TRANS_X/ I_PIPS_TRANS_X
+      INTEGER*8 I_PIPS_TRANS_Y
+      COMMON /PIPS_TRANS_Y/ I_PIPS_TRANS_Y
+C     BEGIN BLOCK
+C (0,2)
+C
+      N = N1*N2
+C (0,3)
+C     BEGIN UNSTRUCTURED
+C (1,1)
+C>>
+C   Perform one of three techniques, depending on N.  The best strategy varies
+C   with the computer system.  The following strategy is best for many vector
+C   systems.  The outer IF block should be commented out for scalar computers.
+C
+C      IF (N1 .LT. 32 .OR. N2 .LT. 32) THEN
+      IF (N1.GE.N2) GOTO 100
+C (4,1)
+C     BEGIN BLOCK
+C (4,2)
+C
+C   Scheme 2:  Perform a simple transpose with the loops reversed.  This is
+C   usually the best on vector computers if N1 is odd, or if both N1 and N2 are
+C   small, and N2 is larger than N1.
+C
+!     INITIALLY: DO 130
+120   DO I = 0, N1-1
+C (4,3)
+C
+C   This loop is vectorizable.
+C
+!     INITIALLY: DO 130
+         DO J = 0, N2-1
+C (4,4)
+C           BEGIN BLOCK
+C (4,5)
+            Y(J+I*N2+1) = X(J*N1+I+1)
+C (4,6)
+            Y(J+I*N2+1+N) = X(J*N1+I+1+N)
+C (4,7)
+130         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C
+C     END BLOCK
+      GOTO 180
+C (2,1)
+C     BEGIN BLOCK
+C (2,2)
+C      ELSE
+C        GOTO 140
+C      ENDIF
+C
+C   Scheme 1:  Perform a simple transpose in the usual way.  This is usually
+C   the best on vector computers if N2 is odd, or if both N1 and N2 are small,
+C   and N1 is larger than N2.
+C
+!     INITIALLY: DO 110
+100   DO J = 0, N2-1
+C (2,3)
+C
+C   This loop is vectorizable.
+C
+!     INITIALLY: DO 110
+         DO I = 0, N1-1
+C (2,4)
+C           BEGIN BLOCK
+C (2,5)
+            Y(I*N2+J+1) = X(I+J*N1+1)
+C (2,6)
+            Y(I*N2+J+1+N) = X(I+J*N1+1+N)
+C (2,7)
+110         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C
+C     END BLOCK
+C (3,1)
+C
+180   CONTINUE
+C     END UNSTRUCTURED
+C (0,4)
+      RETURN
+C     END BLOCK
+      END
+C
+C                                                                       
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C                                                                       
+      SUBROUTINE FFTZ2 (IS, L, M, U, X, Y)
+C
+C   PERFORMS THE L-TH ITERATION OF THE SECOND VARIANT OF THE  
+C   STOCKHAM FFT.
+C
+C 
+C     ON ENTRY
+C
+C     IS 
+C        INTEGER, CONTROLS THE DIRECTION OF THE TRANSFORM. 
+C        IS EITHER = 1 OR -1.
+C        IF IS = -1, TRANSFORMING FREQUENCY TO TIME.
+C        IF IS = 1, TRANSFORMING TIME TO FREQUENCY.
+C     L 
+C        INTEGER, L-TH ITERATION OF THE SECOND VARIANT OF THE  
+C        STOCKHAM FFT.
+C     X
+C        REAL*8 X(2*N). X HAS REAL AND IMAGINARY PARTS SEPARATED 
+C        BY N CELLS.
+C     U
+C        REAL*8 U(2*N) IS THE SCRATCH ARRAY.
+C     M 
+C        INTEGER.  N = 2^M.
+C
+C     ON RETURN
+C
+C     Y
+C        REAL*8 Y(2*N).
+C
+      IMPLICIT REAL*8 (A-H, O-Z)
+      DIMENSION U(I_PIPS_CFFT_U), X(I_PIPS_CFFT_X), Y(I_PIPS_CFFT_Y)
+C (0,1)
+      INTEGER*8 I_PIPS_CFFT_U
+      COMMON /PIPS_CFFT_U/ I_PIPS_CFFT_U
+      INTEGER*8 I_PIPS_CFFT_Y
+      COMMON /PIPS_CFFT_Y/ I_PIPS_CFFT_Y
+      INTEGER*8 I_PIPS_CFFT_X
+      COMMON /PIPS_CFFT_X/ I_PIPS_CFFT_X
+C     BEGIN BLOCK
+C (0,2)
+C
+C   Set initial parameters.
+C
+      N = 2**M
+C (0,3)
+      K = U(1)
+C (0,4)
+      NU = K/64
+C (0,5)
+      N1 = N/2
+C (0,6)
+      LK = 2**(L-1)
+C (0,7)
+      LI = 2**(M-L)
+C (0,8)
+      LJ = 2*LK
+C (0,9)
+      KU = LI+1
+C (0,10)
+C
+!     INITIALLY: DO 100
+      DO I = 0, LI-1
+C (0,11)
+C        BEGIN BLOCK
+C (0,12)
+         I11 = I*LK+1
+C (0,13)
+         I12 = I11+N1
+C (0,14)
+         I21 = I*LJ+1
+C (0,15)
+         I22 = I21+LK
+C (0,16)
+         U1 = U(KU+I)
+C (0,17)
+         U2 = IS*U(KU+I+NU)
+C (0,18)
+C
+C   This loop is vectorizable.
+C
+!     INITIALLY: DO 100
+         DO K = 0, LK-1
+C (0,19)
+C           BEGIN BLOCK
+C (0,20)
+            X11 = X(I11+K)
+C (0,21)
+            X12 = X(I11+K+N)
+C (0,22)
+            X21 = X(I12+K)
+C (0,23)
+            X22 = X(I12+K+N)
+C (0,24)
+            T1 = X11-X21
+C (0,25)
+            T2 = X12-X22
+C (0,26)
+            Y(I21+K) = X11+X21
+C (0,27)
+            Y(I21+K+N) = X12+X22
+C (0,28)
+            Y(I22+K) = U1*T1-U2*T2
+C (0,29)
+            Y(I22+K+N) = U1*T2+U2*T1
+C (0,30)
+100         CONTINUE
+C           END BLOCK
+         ENDDO
+C        END BLOCK
+      ENDDO
+C (0,31)
+C
+      RETURN
+C     END BLOCK
+      END
+C
+C                                                                       
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C                                                                       
+      SUBROUTINE  XYFFT(KN,NTSK,IND,IS)                                 
+     x 
+C
+C     PERFORMS 3-D FOURIER TRANSFORMS OF COMPLEX (CFT) 
+C     DATA IN X, Y DIRECTION.
+C
+C     SUBROUTINE CALLS: DCFT, DCRFT, and DRCFT.
+C
+C     ON ENTRY
+C
+C     KN
+C        INTEGER, IS AN INDEX OF START POINT IN THE ARRAY.
+C
+C     IND
+C        INTEGER, IS AN INDEX TO POINT OUT WHICH ARRAY SHOULD 
+C        APPLY DCFT ROUTINE.
+C
+C     IS
+C        INTEGER, CONTROLS THE DIRECTION OF THE TRANSFORM. 
+C        IS EITHER = 1 OR -1.
+C        IF IS = 1, TRANSFORMING FREQUENCY TO TIME.
+C        IF IS = -1, TRANSFORMING TIME TO FREQUENCY.
+C
+      IMPLICIT    REAL*8(A-H,O-Z)                                       
+     x 
+      PARAMETER   (IX= 64,IY= 64,IZ= 64 ,M1=6)
+
+      PARAMETER   (IXPP=IX+2,IXHP=IX/2+1,ITOT=IXPP*IY*IZ,               
+     x 
+     +          IXY=IXHP*IY,IXZ=IXHP*IZ,IYZ=IY*IZ)                      
+     x 
+      COMMON/ALL/ U(IXPP,IY,IZ),V(IXPP,IY,IZ),W(IXPP,IY,IZ),            
+     x 
+     +            OX(IXPP,IY,IZ),OY(IXPP,IY,IZ),OZ(IXPP,IY,IZ)          
+     x 
+      COMMON/SHR/ U0(IXPP,IY,IZ),V0(IXPP,IY,IZ),W0(IXPP,IY,IZ),         
+     x 
+     +            U1(IXPP,IY,IZ),V1(IXPP,IY,IZ),W1(IXPP,IY,IZ)          
+     x 
+      COMMON /DIM/ NX,NY,NZ,NXPP,NXHP,NTOT,NXY,NXZ,NYZ                  
+     x 
+      REAL*8      AUX1(4*IX),AUX2(2*IX)                               
+C (0,1)
+      INTEGER*8 I_PIPS_DCFT_X
+      COMMON /PIPS_DCFT_X/ I_PIPS_DCFT_X
+      INTEGER*8 I_PIPS_DCFT_Y
+      COMMON /PIPS_DCFT_Y/ I_PIPS_DCFT_Y
+C     BEGIN BLOCK
+C (0,2)
+      IF (IS.EQ.-1) THEN
+C (0,3)
+C        BEGIN BLOCK
+C (0,4)
+         IF (IND.EQ.1) THEN
+C (0,5)
+C           BEGIN BLOCK
+C (0,6)
+            SX = 1.D0/FLOAT(NX)
+C (0,7)
+            CALL DRCFT(M1, U(1,1,KN), NXPP, U(1,1,KN), NXHP, NX, NY, 
+     &      1, SX, AUX1, AUX2, KN)
+C (0,8)
+            SY = 1.D0/FLOAT(NY)
+C (0,9)
+      I_PIPS_DCFT_X = IXPP*IY*IZ-(KN-1)*IXPP*IY
+      I_PIPS_DCFT_Y = IXPP*IY*IZ-(KN-1)*IXPP*IY
+            CALL DCFT(M1, U(1,1,KN), NXHP, 1, U(1,1,KN), NXHP, 1, NY
+     &      , NXHP, 1, SY, AUX1, AUX2, KN)
+C           END BLOCK
+         ELSE
+C (0,10)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C (0,11)
+         IF (IND.EQ.2) THEN
+C (0,12)
+C           BEGIN BLOCK
+C (0,13)
+            SX = 1.D0/FLOAT(NX)
+C (0,14)
+            CALL DRCFT(M1, V(1,1,KN), NXPP, V(1,1,KN), NXHP, NX, NY, 
+     &      1, SX, AUX1, AUX2, KN)
+C (0,15)
+            SY = 1.D0/FLOAT(NY)
+C (0,16)
+      I_PIPS_DCFT_X = IXPP*IY*IZ-(KN-1)*IXPP*IY
+      I_PIPS_DCFT_Y = IXPP*IY*IZ-(KN-1)*IXPP*IY
+            CALL DCFT(M1, V(1,1,KN), NXHP, 1, V(1,1,KN), NXHP, 1, NY
+     &      , NXHP, 1, SY, AUX1, AUX2, KN)
+C           END BLOCK
+         ELSE
+C (0,17)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C (0,18)
+         IF (IND.EQ.3) THEN
+C (0,19)
+C           BEGIN BLOCK
+C (0,20)
+            SX = 1.D0/FLOAT(NX)
+C (0,21)
+            CALL DRCFT(M1, W(1,1,KN), NXPP, W(1,1,KN), NXHP, NX, NY, 
+     &      1, SX, AUX1, AUX2, KN)
+C (0,22)
+            SY = 1.D0/FLOAT(NY)
+C (0,23)
+      I_PIPS_DCFT_X = IXPP*IY*IZ-(KN-1)*IXPP*IY
+      I_PIPS_DCFT_Y = IXPP*IY*IZ-(KN-1)*IXPP*IY
+            CALL DCFT(M1, W(1,1,KN), NXHP, 1, W(1,1,KN), NXHP, 1, NY
+     &      , NXHP, 1, SY, AUX1, AUX2, KN)
+C           END BLOCK
+         ELSE
+C (0,24)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C (0,25)
+         IF (IND.EQ.4) THEN
+C (0,26)
+C           BEGIN BLOCK
+C (0,27)
+            SX = 1.D0/FLOAT(NX)
+C (0,28)
+            CALL DRCFT(M1, OX(1,1,KN), NXPP, OX(1,1,KN), NXHP, NX, NY
+     &      , 1, SX, AUX1, AUX2, KN)
+C (0,29)
+            SY = 1.D0/FLOAT(NY)
+C (0,30)
+      I_PIPS_DCFT_X = IXPP*IY*IZ-(KN-1)*IXPP*IY
+      I_PIPS_DCFT_Y = IXPP*IY*IZ-(KN-1)*IXPP*IY
+            CALL DCFT(M1, OX(1,1,KN), NXHP, 1, OX(1,1,KN), NXHP, 1, 
+     &      NY, NXHP, 1, SY, AUX1, AUX2, KN)
+C           END BLOCK
+         ELSE
+C (0,31)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C (0,32)
+         IF (IND.EQ.5) THEN
+C (0,33)
+C           BEGIN BLOCK
+C (0,34)
+            SX = 1.D0/FLOAT(NX)
+C (0,35)
+            CALL DRCFT(M1, OY(1,1,KN), NXPP, OY(1,1,KN), NXHP, NX, NY
+     &      , 1, SX, AUX1, AUX2, KN)
+C (0,36)
+            SY = 1.D0/FLOAT(NY)
+C (0,37)
+      I_PIPS_DCFT_X = IXPP*IY*IZ-(KN-1)*IXPP*IY
+      I_PIPS_DCFT_Y = IXPP*IY*IZ-(KN-1)*IXPP*IY
+            CALL DCFT(M1, OY(1,1,KN), NXHP, 1, OY(1,1,KN), NXHP, 1, 
+     &      NY, NXHP, 1, SY, AUX1, AUX2, KN)
+C           END BLOCK
+         ELSE
+C (0,38)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C (0,39)
+         IF (IND.EQ.6) THEN
+C (0,40)
+C           BEGIN BLOCK
+C (0,41)
+            SX = 1.D0/FLOAT(NX)
+C (0,42)
+            CALL DRCFT(M1, OZ(1,1,KN), NXPP, OZ(1,1,KN), NXHP, NX, NY
+     &      , 1, SX, AUX1, AUX2, KN)
+C (0,43)
+            SY = 1.D0/FLOAT(NY)
+C (0,44)
+      I_PIPS_DCFT_X = IXPP*IY*IZ-(KN-1)*IXPP*IY
+      I_PIPS_DCFT_Y = IXPP*IY*IZ-(KN-1)*IXPP*IY
+            CALL DCFT(M1, OZ(1,1,KN), NXHP, 1, OZ(1,1,KN), NXHP, 1, 
+     &      NY, NXHP, 1, SY, AUX1, AUX2, KN)
+C           END BLOCK
+         ELSE
+C (0,45)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C        END BLOCK
+      ELSE
+C (0,46)
+C        BEGIN BLOCK
+C (0,47)
+         IF (IND.EQ.1) THEN
+C (0,48)
+C           BEGIN BLOCK
+C (0,49)
+      I_PIPS_DCFT_X = IXPP*IY*IZ-(KN-1)*IXPP*IY
+      I_PIPS_DCFT_Y = IXPP*IY*IZ-(KN-1)*IXPP*IY
+            CALL DCFT(M1, U(1,1,KN), NXHP, 1, U(1,1,KN), NXHP, 1, NY
+     &      , NXHP, -1, 1.D0, AUX1, AUX2, KN)
+C (0,50)
+            CALL DCRFT(M1, U(1,1,KN), NXHP, U(1,1,KN), NXPP, NX, NY, 
+     &      -1, 1.D0, AUX1, AUX2, KN)
+C           END BLOCK
+         ELSE
+C (0,51)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C (0,52)
+         IF (IND.EQ.2) THEN
+C (0,53)
+C           BEGIN BLOCK
+C (0,54)
+      I_PIPS_DCFT_X = IXPP*IY*IZ-(KN-1)*IXPP*IY
+      I_PIPS_DCFT_Y = IXPP*IY*IZ-(KN-1)*IXPP*IY
+            CALL DCFT(M1, V(1,1,KN), NXHP, 1, V(1,1,KN), NXHP, 1, NY
+     &      , NXHP, -1, 1.D0, AUX1, AUX2, KN)
+C (0,55)
+            CALL DCRFT(M1, V(1,1,KN), NXHP, V(1,1,KN), NXPP, NX, NY, 
+     &      -1, 1.D0, AUX1, AUX2, KN)
+C           END BLOCK
+         ELSE
+C (0,56)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C (0,57)
+         IF (IND.EQ.3) THEN
+C (0,58)
+C           BEGIN BLOCK
+C (0,59)
+      I_PIPS_DCFT_X = IXPP*IY*IZ-(KN-1)*IXPP*IY
+      I_PIPS_DCFT_Y = IXPP*IY*IZ-(KN-1)*IXPP*IY
+            CALL DCFT(M1, W(1,1,KN), NXHP, 1, W(1,1,KN), NXHP, 1, NY
+     &      , NXHP, -1, 1.D0, AUX1, AUX2, KN)
+C (0,60)
+            CALL DCRFT(M1, W(1,1,KN), NXHP, W(1,1,KN), NXPP, NX, NY, 
+     &      -1, 1.D0, AUX1, AUX2, KN)
+C           END BLOCK
+         ELSE
+C (0,61)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C (0,62)
+         IF (IND.EQ.4) THEN
+C (0,63)
+C           BEGIN BLOCK
+C (0,64)
+      I_PIPS_DCFT_X = IXPP*IY*IZ-(KN-1)*IXPP*IY
+      I_PIPS_DCFT_Y = IXPP*IY*IZ-(KN-1)*IXPP*IY
+            CALL DCFT(M1, OX(1,1,KN), NXHP, 1, OX(1,1,KN), NXHP, 1, 
+     &      NY, NXHP, -1, 1.D0, AUX1, AUX2, KN)
+C (0,65)
+            CALL DCRFT(M1, OX(1,1,KN), NXHP, OX(1,1,KN), NXPP, NX, NY
+     &      , -1, 1.D0, AUX1, AUX2, KN)
+C           END BLOCK
+         ELSE
+C (0,66)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C (0,67)
+         IF (IND.EQ.5) THEN
+C (0,68)
+C           BEGIN BLOCK
+C (0,69)
+      I_PIPS_DCFT_X = IXPP*IY*IZ-(KN-1)*IXPP*IY
+      I_PIPS_DCFT_Y = IXPP*IY*IZ-(KN-1)*IXPP*IY
+            CALL DCFT(M1, OY(1,1,KN), NXHP, 1, OY(1,1,KN), NXHP, 1, 
+     &      NY, NXHP, -1, 1.D0, AUX1, AUX2, KN)
+C (0,70)
+            CALL DCRFT(M1, OY(1,1,KN), NXHP, OY(1,1,KN), NXPP, NX, NY
+     &      , -1, 1.D0, AUX1, AUX2, KN)
+C           END BLOCK
+         ELSE
+C (0,71)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C (0,72)
+         IF (IND.EQ.6) THEN
+C (0,73)
+C           BEGIN BLOCK
+C (0,74)
+      I_PIPS_DCFT_X = IXPP*IY*IZ-(KN-1)*IXPP*IY
+      I_PIPS_DCFT_Y = IXPP*IY*IZ-(KN-1)*IXPP*IY
+            CALL DCFT(M1, OZ(1,1,KN), NXHP, 1, OZ(1,1,KN), NXHP, 1, 
+     &      NY, NXHP, -1, 1.D0, AUX1, AUX2, KN)
+C (0,75)
+            CALL DCRFT(M1, OZ(1,1,KN), NXHP, OZ(1,1,KN), NXPP, NX, NY
+     &      , -1, 1.D0, AUX1, AUX2, KN)
+C           END BLOCK
+         ELSE
+C (0,76)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C        END BLOCK
+      ENDIF
+C (0,77)
+      RETURN
+C     END BLOCK
+      END
+C                                                                       
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C                                                                       
+      SUBROUTINE DRCFT( IRUN, X, INC2X, Y, INC2Y, N1, M1, ISIGN,        
+     x 
+     +   SCALE, DUMMY1,DUMMY2,NQ)                                   
+C 
+C     PERFORMS THE COMPLEX TO REAL PASS AS PART OF CFT ROUTINE.
+C
+C     SUBROUTINE CALL: DCFT.
+C
+C     ON ENTRY
+C 
+C     IRUN, N1
+C        INTEGER IRUN, N1. WHERE N1 = 2^IRUN. 2 < IRUN < 8.
+C     X
+C        REAL*8 X(INC2X,*), IS THE TWO DIMENSION ARRAY.
+C     Y
+C        REAL*8 Y(2,INC2Y,*), IS THE THREE DIMENSION ARRAY.
+C
+C     INC2X, INC2Y
+C        INTEGER, ARE THE STRIDE BETWEEN THE ELEMENTS WITHIN EACH 
+C        SEQUENCE IN ARRAY X AND Y.
+C     M1 
+C        INTEGER. M1 > 0. IS THE NUMBER OF SEQUENCE TO BE TRAMSFORMED.
+C
+C     ISIGN
+C        INTEGER, CONTROLS THE DIRECTION OF THE TRANSFORM. 
+C        ISIGN  EITHER = 1 OR -1.
+C        IF IS = -1, TRANSFORMING FREQUENCY TO TIME.
+C        IF IS = 1, TRANSFORMING TIME TO FREQUENCY.
+C      
+C     SCALE
+C        REAL*8, IS THE SCALING CONSTANT SCALE. SCALE<>0.0
+C
+C     DUMMY1, DUMMY2
+C        REAL*8 DUMMY1(*), DUMMY2(*), ARE THE SCRATCH ARRAY.
+C
+      REAL*8 X(INC2X,(-4224*NQ+274560)/INC2X),Y(2,INC2Y,(-4224*NQ+274560
+     x )/(2*INC2Y)),DUMMY1(256),DUMMY2(128)                
+      REAL*8 PI,SCALE, PJ,PR,FR,FI,GR,GI,TR,TI                          
+     x  
+      REAL*8 PIHALF,ALPHA                                               
+     x 
+      PARAMETER ( PI=3.141592653589793D0 )                              
+     x 
+C (0,1)
+      INTEGER*8 I_PIPS_DCFT_X
+      COMMON /PIPS_DCFT_X/ I_PIPS_DCFT_X
+      INTEGER*8 I_PIPS_DCFT_Y
+      COMMON /PIPS_DCFT_Y/ I_PIPS_DCFT_Y
+C     BEGIN BLOCK
+C (0,2)
+      NHALF = N1/2
+C (0,3)
+      I_PIPS_DCFT_X = INC2X*(-4224*NQ+274560)/INC2X
+      I_PIPS_DCFT_Y = 2*INC2Y*(-4224*NQ+274560)/(2*INC2Y)
+      CALL DCFT(IRUN-1, X, 1, INC2X/2, Y, 1, INC2Y, N1/2, M1, ISIGN, 
+     &SCALE, DUMMY1, DUMMY2, NQ)
+C (0,4)
+      J2 = NHALF+1
+C (0,5)
+!     INITIALLY: DO 1
+      DO I = 1, M1
+C (0,6)
+C        BEGIN BLOCK
+C (0,7)
+         Y(1,J2,I) = Y(1,1,I)-Y(2,1,I)
+C (0,8)
+         Y(1,1,I) = Y(1,1,I)+Y(2,1,I)
+C (0,9)
+         Y(2,1,I) = 0.D0
+C (0,10)
+         Y(2,J2,I) = 0.D0
+C (0,11)
+1        CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,12)
+      PIHALF = PI/NHALF
+C (0,13)
+!     INITIALLY: DO 2
+      DO J = 1, NHALF/2
+C (0,14)
+C        BEGIN BLOCK
+C (0,15)
+         ALPHA = J*PIHALF
+C (0,16)
+         PJ = -ISIGN*SIN(ALPHA)
+C (0,17)
+         PR = -COS(ALPHA)
+C (0,18)
+         J1 = J+1
+C (0,19)
+         J2 = NHALF-J+1
+C (0,20)
+!     INITIALLY: DO 3
+         DO I = 1, M1
+C (0,21)
+C           BEGIN BLOCK
+C (0,22)
+            FR = Y(1,J1,I)+Y(1,J2,I)
+C (0,23)
+            FI = Y(2,J1,I)-Y(2,J2,I)
+C (0,24)
+            TR = Y(1,J1,I)-Y(1,J2,I)
+C (0,25)
+            TI = Y(2,J1,I)+Y(2,J2,I)
+C (0,26)
+            GR = PJ*TR-PR*TI
+C (0,27)
+            GI = PJ*TI+PR*TR
+C (0,28)
+            Y(1,J1,I) = (FR+GR)*.5D0
+C (0,29)
+            Y(2,J1,I) = (FI+GI)*.5D0
+C (0,30)
+            Y(1,J2,I) = (FR-GR)*.5D0
+C (0,31)
+            Y(2,J2,I) = -(FI-GI)*.5D0
+C (0,32)
+3           CONTINUE
+C           END BLOCK
+         ENDDO
+C (0,33)
+2        CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,34)
+      RETURN
+C     END BLOCK
+      END
+C                                                                       
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C                                                                       
+      SUBROUTINE DCRFT(IRUN,X,INC2X,Y,INC2Y,N1,M1,ISIGN,SCALE,DUMMY1,   
+     x 
+     + DUMMY2,NQ)                                                  
+C 
+C     PERFORMS THE REAL TO COMPLEX PASS AS PART OF CFT ROUTINE.
+C
+C     SUBROUTINE CALL: DCFT.
+C
+C     ON ENTRY
+C 
+C     IRUN, N1
+C        INTEGER IRUN, N1. WHERE N1 = 2^IRUN. 2 < IRUN < 8.
+C     X
+C        REAL*8 X(INC2X,*), IS THE TWO DIMENSION ARRAY.
+C     Y
+C        REAL*8 Y(2,INC2Y,*), IS THE THREE DIMENSION ARRAY.
+C
+C     INC2X, INC2Y
+C        INTEGER, ARE THE STRIDE BETWEEN THE ELEMENTS WITHIN EACH 
+C        SEQUENCE IN ARRAY X AND Y.
+C     M1 
+C        INTEGER. M1 > 0. IS THE NUMBER OF SEQUENCE TO BE TRAMSFORMED.
+C
+C     ISIGN
+C        INTEGER, CONTROLS THE DIRECTION OF THE TRANSFORM. 
+C        ISIGN  EITHER = 1 OR -1.
+C        IF IS = -1, TRANSFORMING FREQUENCY TO TIME.
+C        IF IS = 1, TRANSFORMING TIME TO FREQUENCY.
+C      
+C     SCALE
+C        REAL*8, IS THE SCALING CONSTANT SCALE. SCALE <> 0.0
+C
+C     DUMMY1, DUMMY2
+C        REAL*8 DUMMY1(*), DUMMY2(*), ARE THE SCRATCH ARRAY.
+C
+      REAL*8 Y(INC2Y,(-4224*NQ+274560)/INC2Y), X(2,INC2X,(-4224*NQ+27456
+     x 0)/(2*INC2X)),FR,FI,GR,GI,TR,TI,PR,PJ,PI        
+      REAL*8 DUMMY1(256), DUMMY2(128)                                   
+     x     
+      REAL*8 SCALE, PIHALF, ALPHA                                       
+     x 
+      PARAMETER ( PI=3.141592653589793D0)                               
+     x 
+C (0,1)
+      INTEGER*8 I_PIPS_DCFT_X
+      COMMON /PIPS_DCFT_X/ I_PIPS_DCFT_X
+      INTEGER*8 I_PIPS_DCFT_Y
+      COMMON /PIPS_DCFT_Y/ I_PIPS_DCFT_Y
+C     BEGIN BLOCK
+C (0,2)
+      NHALF = N1/2
+C (0,3)
+      J2 = NHALF+1
+C (0,4)
+!     INITIALLY: DO 3
+      DO I = 1, M1
+C (0,5)
+C        BEGIN BLOCK
+C (0,6)
+         X(2,1,I) = X(1,1,I)-X(1,J2,I)
+C (0,7)
+         X(1,1,I) = X(1,1,I)+X(1,J2,I)
+C (0,8)
+3        CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,9)
+      PIHALF = PI/NHALF
+C (0,10)
+!     INITIALLY: DO 4
+      DO J = 1, NHALF/2
+C (0,11)
+C        BEGIN BLOCK
+C (0,12)
+         ALPHA = J*PIHALF
+C (0,13)
+         PJ = ISIGN*SIN(ALPHA)
+C (0,14)
+         PR = COS(ALPHA)
+C (0,15)
+         J1 = J+1
+C (0,16)
+         J2 = NHALF-J+1
+C (0,17)
+!     INITIALLY: DO 5
+         DO I = 1, M1
+C (0,18)
+C           BEGIN BLOCK
+C (0,19)
+            FR = X(1,J1,I)+X(1,J2,I)
+C (0,20)
+            FI = X(2,J1,I)-X(2,J2,I)
+C (0,21)
+            TR = X(1,J1,I)-X(1,J2,I)
+C (0,22)
+            TI = X(2,J1,I)+X(2,J2,I)
+C (0,23)
+            GR = PJ*TR-PR*TI
+C (0,24)
+            GI = PJ*TI+PR*TR
+C (0,25)
+            X(1,J1,I) = FR+GR
+C (0,26)
+            X(2,J1,I) = FI+GI
+C (0,27)
+            X(1,J2,I) = FR-GR
+C (0,28)
+            X(2,J2,I) = -(FI-GI)
+C (0,29)
+5           CONTINUE
+C           END BLOCK
+         ENDDO
+C (0,30)
+4        CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,31)
+      I_PIPS_DCFT_X = 2*INC2X*(-4224*NQ+274560)/(2*INC2X)
+      I_PIPS_DCFT_Y = INC2Y*(-4224*NQ+274560)/INC2Y
+      CALL DCFT(IRUN-1, X, 1, INC2X, Y, 1, INC2Y/2, N1/2, M1, ISIGN, 
+     &SCALE, DUMMY1, DUMMY2, NQ)
+C (0,32)
+      RETURN
+C     END BLOCK
+      END
+C                                                                       
+C                                                                       
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C                                                                       
+      SUBROUTINE UXW(A,B,C,D,E,F)                                       
+     x 
+C                                                                       
+C                                                                       
+C     COMPUTE THE NONLINEAR TERM (D, E, F) = (A, B, C) X (D, E, F)
+C
+C     ON ENTRY
+C  
+C     A, B, C
+C        ARE THE THREE DIMENSIONAL ARRAYS SPECIFIED AS:
+C        COMPLEX*16 A(NXHP,NY,NZ),B(NXHP,NY,NZ),C(NXHP,NY,NZ)
+C
+C     D, E, F     
+C        ARE THE THREE DIMENSIONAL ARRAYS SPECIFIED AS:
+C        COMPLEX*16 D(NXHP,NY,NZ),E(NXHP,NY,NZ),F(NXHP,NY,NZ)
+C
+C     ON RETURN
+C 
+C     D, E, F     
+C        ARE THE THREE DIMENSIONAL ARRAYS SPECIFIED AS:
+C        COMPLEX*16 D(NXHP,NY,NZ),E(NXHP,NY,NZ),F(NXHP,NY,NZ)
+C                                                                       
+      IMPLICIT REAL*8(A-H,O-Z)                                          
+     x 
+      COMMON /DIM/ NX,NY,NZ,NXPP,NXHP,NTOT,NXY,NXZ,NYZ                  
+     x 
+      DIMENSION  A(NXPP,NY,270336/(NXPP*NY)),B(NXPP,NY,270336/(NXPP*NY))
+     x ,C(NXPP,NY,270336/(NXPP*NY)),                
+     +           D(NXPP,NY,270336/(NXPP*NY)),E(NXPP,NY,270336/(NXPP*NY))
+     x ,F(NXPP,NY,270336/(NXPP*NY))                 
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+!     INITIALLY: DO 1
+      DO K = 1, NZ
+C (0,3)
+C        BEGIN BLOCK
+C (0,4)
+!     INITIALLY: DO 2
+         DO J = 1, NY
+C (0,5)
+C           BEGIN BLOCK
+C (0,6)
+!     INITIALLY: DO 3
+            DO I = 1, NXPP
+C (0,7)
+C              BEGIN BLOCK
+C (0,8)
+               TA = A(I,J,K)
+C (0,9)
+               TB = B(I,J,K)
+C (0,10)
+               TC = C(I,J,K)
+C (0,11)
+               TEMP1 = TB*F(I,J,K)-TC*E(I,J,K)
+C (0,12)
+               TEMP2 = TC*D(I,J,K)-TA*F(I,J,K)
+C (0,13)
+               TEMP3 = TA*E(I,J,K)-TB*D(I,J,K)
+C (0,14)
+               D(I,J,K) = TEMP1
+C (0,15)
+               E(I,J,K) = TEMP2
+C (0,16)
+               F(I,J,K) = TEMP3
+C (0,17)
+3              CONTINUE
+C              END BLOCK
+            ENDDO
+C (0,18)
+2           CONTINUE
+C           END BLOCK
+         ENDDO
+C (0,19)
+1        CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,20)
+      RETURN
+C     END BLOCK
+      END
+C                                                                       
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC 
+C                                                                       
+      SUBROUTINE  LINAVG(AM,BM,CM,D,E,F,DT2,DTV,DTT)                    
+     x 
+
+C     LEAPFROG AVERAGING IS DONE PERIODICALLY TO PREVENT THE 
+C     DECOUPLING OF TIME STEPS DURING LONG-TIME INTEGRATION.
+C
+C     ON ENTRY
+C 
+C     AM, BM, CM
+C        ARE THE THREE DIMENSIONAL ARRAYS SPECIFIED AS:
+C        COMPLEX*16 AM(NXHP,NY,NZ),BM(NXHP,NY,NZ),CM(NXHP,NY,NZ)
+C
+C     D, E, F
+C        ARE THE THREE DIMENSIONAL ARRAYS SPECIFIED AS:
+C        COMPLEX*16 D(NXHP,NY,NZ),E(NXHP,NY,NZ),F(NXHP,NY,NZ)
+C
+C     DTT, DT2
+C        ARE DELTA TIME, DOUBLE DELTA TIME.
+C        REAL*8 DTT, DT2.
+C
+C     DTV
+C        IS THE VISCOSITY COEFFICIENT.
+C        REAL*8 DTV.
+C
+C     ON RETURN
+C
+C     D, E, F
+C        ARE THE THREE DIMENSIONAL ARRAYS SPECIFIED AS:
+C        COMPLEX*16 D(NXHP,NY,NZ),E(NXHP,NY,NZ),F(NXHP,NY,NZ)
+C
+      IMPLICIT REAL*8(A-H,O-Z)                                          
+     x 
+      COMMON /DIM/ NX,NY,NZ,NXPP,NXHP,NTOT,NXY,NXZ,NYZ                  
+     x 
+      COMMON/WAV/ XW(129),YW(129),ZW(129),XSQ(129),YSQ(129),ZSQ(129)    
+     x 
+      COMMON/TRUNC/XWT(129),YWT(129),ZWT(129)                           
+     x 
+      COMPLEX*16  AM(NXHP,NY,2162688/(NXHP*NY*16)),BM(NXHP,NY,2162688/(N
+     x XHP*NY*16)),CM(NXHP,NY,2162688/(NXHP*NY*16)),            
+     +            D(NXHP,NY,2162688/(NXHP*NY*16)),E(NXHP,NY,2162688/(NXH
+     x P*NY*16)),F(NXHP,NY,2162688/(NXHP*NY*16))                
+      COMPLEX*16 P                                                      
+     x 
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+!     INITIALLY: DO 1
+      DO K = 1, NZ
+C (0,3)
+C        BEGIN BLOCK
+C (0,4)
+         R = ZW(K)
+C (0,5)
+         RT = ZWT(K)
+C (0,6)
+         ZWSQ = ZSQ(K)
+C (0,7)
+!     INITIALLY: DO 1
+         DO J = 1, NY
+C (0,8)
+C           BEGIN BLOCK
+C (0,9)
+            Q = YW(J)
+C (0,10)
+            QT = YWT(J)
+C (0,11)
+            YWSQ = YSQ(J)+ZWSQ
+C (0,12)
+!     INITIALLY: DO 2
+            DO I = 1, NXHP
+C (0,13)
+C              BEGIN BLOCK
+C (0,14)
+               FACT3 = XSQ(I)+YWSQ
+C (0,15)
+               FACT1 = DTV*DTT*FACT3
+C (0,16)
+               FACT2 = RT*QT*XWT(I)/(1.D0+FACT1)
+C (0,17)
+               D(I,J,K) = AM(I,J,K)-FACT1*AM(I,J,K)+DT2*D(I,J,K)
+C (0,18)
+               E(I,J,K) = BM(I,J,K)-FACT1*BM(I,J,K)+DT2*E(I,J,K)
+C (0,19)
+               F(I,J,K) = CM(I,J,K)-FACT1*CM(I,J,K)+DT2*F(I,J,K)
+C (0,20)
+               P = (F(I,J,K)*R+Q*E(I,J,K)+XW(I)*D(I,J,K))/FACT3
+C (0,21)
+               D(I,J,K) = AM(I,J,K)+(D(I,J,K)-XW(I)*P)*FACT2
+C (0,22)
+               E(I,J,K) = BM(I,J,K)+(E(I,J,K)-Q*P)*FACT2
+C (0,23)
+               F(I,J,K) = CM(I,J,K)+(F(I,J,K)-R*P)*FACT2
+C (0,24)
+2              CONTINUE
+C              END BLOCK
+            ENDDO
+C (0,25)
+1           CONTINUE
+C           END BLOCK
+         ENDDO
+C        END BLOCK
+      ENDDO
+C (0,26)
+      RETURN
+C     END BLOCK
+      END
+C                                                                       
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C                                                                       
+      SUBROUTINE  MIXAVG(A,B,C,D,E,F)                                   
+     x 
+C
+C     PART OF LEAPFROG AVERAGING IS DONE PERIODICALLY TO PREVENT THE 
+C     DECOUPLING OF TIME STEPS DURING LONG-TIME INTEGRATION.
+C
+C     ON ENTRY
+C 
+C     A, B, C
+C        ARE THE THREE DIMENSIONAL ARRAYS SPECIFIED AS:
+C        COMPLEX*16 A(NXHP,NY,NZ),B(NXHP,NY,NZ),C(NXHP,NY,NZ)
+C
+C     D, E, F
+C        ARE THE THREE DIMENSIONAL ARRAYS SPECIFIED AS:
+C        COMPLEX*16 D(NXHP,NY,NZ),E(NXHP,NY,NZ),F(NXHP,NY,NZ)
+C
+C     ON RETURN
+C 
+C     A, B, C
+C        ARE THE THREE DIMENSIONAL ARRAYS SPECIFIED AS:
+C        COMPLEX*16 A(NXHP,NY,NZ),B(NXHP,NY,NZ),C(NXHP,NY,NZ)
+C
+C     D, E, F
+C        ARE THE THREE DIMENSIONAL ARRAYS SPECIFIED AS:
+C        COMPLEX*16 D(NXHP,NY,NZ),E(NXHP,NY,NZ),F(NXHP,NY,NZ)
+C
+      IMPLICIT REAL*8(A-H,O-Z)                                          
+     x 
+      COMMON /DIM/ NX,NY,NZ,NXPP,NXHP,NTOT,NXY,NXZ,NYZ                  
+     x 
+      COMMON/WAV/ XW(129),YW(129),ZW(129),XSQ(129),YSQ(129),ZSQ(129)    
+     x 
+      COMPLEX*16  A(NXHP,NY,2162688/(NXHP*NY*16)),B(NXHP,NY,2162688/(NXH
+     x P*NY*16)),C(NXHP,NY,2162688/(NXHP*NY*16)),               
+     +            D(NXHP,NY,2162688/(NXHP*NY*16)),E(NXHP,NY,2162688/(NXH
+     x P*NY*16)),F(NXHP,NY,2162688/(NXHP*NY*16))                
+      COMPLEX*16  IUNIT                                                 
+     x 
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      IUNIT = CMPLX(0.D0, 1.D0)
+C (0,3)
+!     INITIALLY: DO 1
+      DO K = 1, NZ
+C (0,4)
+C        BEGIN BLOCK
+C (0,5)
+         RW = ZW(K)
+C (0,6)
+!     INITIALLY: DO 1
+         DO J = 1, NY
+C (0,7)
+C           BEGIN BLOCK
+C (0,8)
+            QW = YW(J)
+C (0,9)
+!     INITIALLY: DO 2
+            DO I = 1, NXHP
+C (0,10)
+C              BEGIN BLOCK
+C (0,11)
+               A(I,J,K) = 0.25D0*(D(I,J,K)+2.D0*A(I,J,K))
+C (0,12)
+               B(I,J,K) = 0.25D0*(E(I,J,K)+2.D0*B(I,J,K))
+C (0,13)
+               C(I,J,K) = 0.25D0*(F(I,J,K)+2.D0*C(I,J,K))
+C (0,14)
+               D(I,J,K) = (QW*C(I,J,K)-RW*B(I,J,K))*IUNIT
+C (0,15)
+               E(I,J,K) = (RW*A(I,J,K)-XW(I)*C(I,J,K))*IUNIT
+C (0,16)
+               F(I,J,K) = (XW(I)*B(I,J,K)-QW*A(I,J,K))*IUNIT
+C (0,17)
+2              CONTINUE
+C              END BLOCK
+            ENDDO
+C (0,18)
+1           CONTINUE
+C           END BLOCK
+         ENDDO
+C        END BLOCK
+      ENDDO
+C (0,19)
+      RETURN
+C     END BLOCK
+      END
+C
+C                                                                       
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C                                                                       
+      SUBROUTINE  LIN(AM,BM,CM,D,E,F,DT2,DTV,DTT)                       
+     x 
+C                                                                       
+C     ONE TIME STEP OF THE LEAP-FROG SCHEME                             
+C
+C     ON ENTRY
+C 
+C     AM, BM, CM
+C        COMPLEX*16 AM(NXHP,NY,NZ),BM(NXHP,NY,NZ),CM(NXHP,NY,NZ) 
+C
+C     D, E, F
+C        COMPLEX*16 D(NXHP,NY,NZ),E(NXHP,NY,NZ),F(NXHP,NY,NZ) 
+C
+C     DTT, DT2
+C        REAL*8, ARE DELTA TIME, AND DOUBLE DELTA TIME.
+C
+C     DTV
+C        REAL*8, IS A VISCOSITY COEFFICIENT.
+C
+C
+C     ON RETURN
+C
+C     AM, BM, CM
+C        ARE THE THREE DIMENSIONAL ARRAYS SPECIFIED AS ABOVE. 
+C
+C     D, E, F
+C        ARE THE THREE DIMENSIONAL ARRAYS SPECIFIED AS ABOVE. 
+C
+      IMPLICIT REAL*8(A-H,O-Z)                                          
+     x 
+      COMMON /DIM/ NX,NY,NZ,NXPP,NXHP,NTOT,NXY,NXZ,NYZ                  
+     x 
+      COMMON/WAV/ XW(129),YW(129),ZW(129),XSQ(129),YSQ(129),ZSQ(129)    
+     x 
+      COMMON/TRUNC/XWT(129),YWT(129),ZWT(129)                           
+     x 
+      COMPLEX*16  AM(NXHP,NY,2162688/(NXHP*NY*16)),BM(NXHP,NY,2162688/(N
+     x XHP*NY*16)),CM(NXHP,NY,2162688/(NXHP*NY*16)),            
+     +            D(NXHP,NY,2162688/(NXHP*NY*16)),E(NXHP,NY,2162688/(NXH
+     x P*NY*16)),F(NXHP,NY,2162688/(NXHP*NY*16))                
+      COMPLEX*16  P,IUNIT                                               
+     x 
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      IUNIT = CMPLX(0.D0, 1.D0)
+C (0,3)
+!     INITIALLY: DO 1
+      DO K = 1, NZ
+C (0,4)
+C        BEGIN BLOCK
+C (0,5)
+         RW = ZW(K)
+C (0,6)
+         RT = ZWT(K)
+C (0,7)
+         ZWSQ = ZSQ(K)
+C (0,8)
+!     INITIALLY: DO 2
+         DO J = 1, NY
+C (0,9)
+C           BEGIN BLOCK
+C (0,10)
+            QW = YW(J)
+C (0,11)
+            QT = YWT(J)
+C (0,12)
+            YWSQ = YSQ(J)+ZWSQ
+C (0,13)
+!     INITIALLY: DO 3
+            DO I = 1, NXHP
+C (0,14)
+C              BEGIN BLOCK
+C (0,15)
+               FACT3 = XSQ(I)+YWSQ
+C (0,16)
+               FACT1 = DTV*DTT*FACT3
+C (0,17)
+               FACT2 = RT*QT*XWT(I)/(1.D0+FACT1)
+C (0,18)
+               D(I,J,K) = (1.D0-FACT1)*AM(I,J,K)+DT2*D(I,J,K)
+C (0,19)
+               E(I,J,K) = (1.D0-FACT1)*BM(I,J,K)+DT2*E(I,J,K)
+C (0,20)
+               F(I,J,K) = (1.D0-FACT1)*CM(I,J,K)+DT2*F(I,J,K)
+C (0,21)
+               P = (F(I,J,K)*RW+E(I,J,K)*QW+D(I,J,K)*XW(I))/FACT3
+C (0,22)
+               AM(I,J,K) = (D(I,J,K)-XW(I)*P)*FACT2
+C (0,23)
+               BM(I,J,K) = (E(I,J,K)-QW*P)*FACT2
+C (0,24)
+               CM(I,J,K) = (F(I,J,K)-RW*P)*FACT2
+C (0,25)
+               D(I,J,K) = (QW*CM(I,J,K)-RW*BM(I,J,K))*IUNIT
+C (0,26)
+               E(I,J,K) = (RW*AM(I,J,K)-XW(I)*CM(I,J,K))*IUNIT
+C (0,27)
+               F(I,J,K) = (XW(I)*BM(I,J,K)-QW*AM(I,J,K))*IUNIT
+C (0,28)
+3              CONTINUE
+C              END BLOCK
+            ENDDO
+C (0,29)
+2           CONTINUE
+C           END BLOCK
+         ENDDO
+C (0,30)
+1        CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,31)
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE VERIFYTR()
+C                                                                       
+C
+C     VERIFY THE CORRECTNESS OF COMPUTATION.
+C
+C     ON ENTRY
+C
+C     EU1, EV1, EW1, EOX1, EOY1, EOZ1
+C        ARE THE ARRAYS OF ENERGY.
+C        REAL*8 EU1(12),EV1(12),EW1(12),EOX1(12),EOY1(12),EOZ1(12).
+C
+      IMPLICIT REAL*8(E-F)
+C
+
+      DIMENSION EU1(12),EV1(12),EW1(12),EOX1(12),EOY1(12),EOZ1(12)
+      COMMON /ENG/ EU1, EV1, EW1, EOX1, EOY1, EOZ1
+C
+      COMMON /PAR1/ ISTART,NSTEPS,NAVG,ISAV,NSAV,NOUT,IRND,ITG,ITEST
+      COMMON /DIM/ NX,NY,NZ,NXPP,NXHP,NTOT,NXY,NXZ,NYZ
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+1     FORMAT(1X,'TURB3D BENCHMARK TEST VERIFICATION & TIMING'/)
+C (0,3)
+2     FORMAT(1X,'VALIDATION PARAMETERS:'/)
+C (0,4)
+3     FORMAT(1X,3E20.12)
+C (0,5)
+4     FORMAT(//1X,'RESULTS FOR THIS RUN ARE:  VALID')
+C (0,6)
+5     FORMAT(//1X,'RESULTS FOR THIS RUN ARE:  INVALID')
+C (0,7)
+C                                                                       
+4000  FORMAT(A,4X,I3,6X,2(1X,E12.4,' +/- ',E10.4))
+C (0,8)
+C
+      OPEN (UNIT=10,FILE='TURB3D.TEST.VERIFY') 
+C (0,9)
+C.... THE VERIFICATION ROUTINE                                      
+      WRITE (10, 1) 
+C (0,10)
+      WRITE (10, 2) 
+C (0,11)
+!     INITIALLY: DO 20
+      DO I = 1, 11
+C (0,12)
+C        BEGIN BLOCK
+C (0,13)
+         WRITE (10, 3) EU1(I), EV1(I), EW1(I)
+C (0,14)
+         WRITE (10, 3) EOX1(I), EOY1(I), EOZ1(I)
+C (0,15)
+20       CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,16)
+C                                                                       
+      IVALID = 0
+C (0,17)
+C
+      IF (ABS(EU1(1)-0.625000000000E-01)/0.625000000000E-01.GE.1E-2
+     &) THEN
+C (0,18)
+         IVALID = 1
+      ELSE
+C (0,19)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,20)
+      IF (ABS(EV1(1)-0.625000000000E-01)/0.625000000000E-01.GE.1E-2
+     &) THEN
+C (0,21)
+         IVALID = 1
+      ELSE
+C (0,22)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,23)
+      IF (ABS(EW1(1)).GE.1E-2) THEN
+C (0,24)
+         IVALID = 1
+      ELSE
+C (0,25)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,26)
+      IF (ABS(EOX1(1)-0.625000000000E-01)/0.625000000000E-01.GE.1E-2
+     &) THEN
+C (0,27)
+         IVALID = 1
+      ELSE
+C (0,28)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,29)
+      IF (ABS(EOY1(1)-0.625000000000E-01)/0.625000000000E-01.GE.1E-2
+     &) THEN
+C (0,30)
+         IVALID = 1
+      ELSE
+C (0,31)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,32)
+      IF (ABS(EOZ1(1)-0.250000000000E+00)/0.250000000000E+00.GE.1E-2
+     &) THEN
+C (0,33)
+         IVALID = 1
+      ELSE
+C (0,34)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,35)
+C
+      IF (ABS(EU1(2)-0.624925082612E-01)/0.624925082612E-01.GE.1E-2
+     &) THEN
+C (0,36)
+         IVALID = 1
+      ELSE
+C (0,37)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,38)
+      IF (ABS(EV1(2)-0.624925082612E-01)/0.624925082612E-01.GE.1E-2
+     &) THEN
+C (0,39)
+         IVALID = 1
+      ELSE
+C (0,40)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,41)
+      IF (ABS(EW1(2)-0.156225003000E-07)/0.156225003000E-07.GE.1E-2
+     &) THEN
+C (0,42)
+         IVALID = 1
+      ELSE
+C (0,43)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,44)
+      IF (ABS(EOX1(2)-0.624926254300E-01)/0.624926254300E-01.GE.1E-2
+     &) THEN
+C (0,45)
+         IVALID = 1
+      ELSE
+C (0,46)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,47)
+      IF (ABS(EOY1(2)-0.624926254300E-01)/0.624926254300E-01.GE.1E-2
+     &) THEN
+C (0,48)
+         IVALID = 1
+      ELSE
+C (0,49)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,50)
+      IF (ABS(EOZ1(2)-0.249970001800E+00)/0.249970001800E+00.GE.1E-2
+     &) THEN
+C (0,51)
+         IVALID = 1
+      ELSE
+C (0,52)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,53)
+C
+      IF (ABS(EU1(3)-0.624849705524E-01)/0.624849705524E-01.GE.1E-2
+     &) THEN
+C (0,54)
+         IVALID = 1
+      ELSE
+C (0,55)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,56)
+      IF (ABS(EV1(3)-0.624849705524E-01)/0.624849705524E-01.GE.1E-2
+     &) THEN
+C (0,57)
+         IVALID = 1
+      ELSE
+C (0,58)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,59)
+      IF (ABS(EW1(3)-0.624651006823E-07)/0.624651006823E-07.GE.1E-2
+     &) THEN
+C (0,60)
+         IVALID = 1
+      ELSE
+C (0,61)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,62)
+      IF (ABS(EOX1(3)-0.624854390410E-01)/0.624854390410E-01.GE.1E-2
+     &) THEN
+C (0,63)
+         IVALID = 1
+      ELSE
+C (0,64)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,65)
+      IF (ABS(EOY1(3)-0.624854390410E-01)/0.624854390410E-01.GE.1E-2
+     &) THEN
+C (0,66)
+         IVALID = 1
+      ELSE
+C (0,67)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,68)
+      IF (ABS(EOZ1(3)-0.249939757280E+00)/0.249939757280E+00.GE.1E-2
+     &) THEN
+C (0,69)
+         IVALID = 1
+      ELSE
+C (0,70)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,71)
+C
+      IF (ABS(EU1(4)-0.624774493857E-01)/0.624774493857E-01.GE.1E-2
+     &) THEN
+C (0,72)
+         IVALID = 1
+      ELSE
+C (0,73)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,74)
+      IF (ABS(EV1(4)-0.624774493857E-01)/0.624774493857E-01.GE.1E-2
+     &) THEN
+C (0,75)
+         IVALID = 1
+      ELSE
+C (0,76)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,77)
+      IF (ABS(EW1(4)-0.140512172452E-06)/0.140512172452E-06.GE.1E-2
+     &) THEN
+C (0,78)
+         IVALID = 1
+      ELSE
+C (0,79)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,80)
+      IF (ABS(EOX1(4)-0.624785032284E-01)/0.624785032284E-01.GE.1E-2
+     &) THEN
+C (0,81)
+         IVALID = 1
+      ELSE
+C (0,82)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,83)
+      IF (ABS(EOY1(4)-0.624785032284E-01)/0.624785032284E-01.GE.1E-2
+     &) THEN
+C (0,84)
+         IVALID = 1
+      ELSE
+C (0,85)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,86)
+      IF (ABS(EOZ1(4)-0.249909516521E+00)/0.249909516521E+00.GE.1E-2
+     &) THEN
+C (0,87)
+         IVALID = 1
+      ELSE
+C (0,88)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,89)
+C
+      IF (ABS(EU1(5)-0.624698822596E-01)/0.624698822596E-01.GE.1E-2
+     &) THEN
+C (0,90)
+         IVALID = 1
+      ELSE
+C (0,91)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,92)
+      IF (ABS(EV1(5)-0.624698822596E-01)/0.624698822596E-01.GE.1E-2
+     &) THEN
+C (0,93)
+         IVALID = 1
+      ELSE
+C (0,94)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,95)
+      IF (ABS(EW1(5)-0.249719639172E-06)/0.249719639172E-06.GE.1E-2
+     &) THEN
+C (0,96)
+         IVALID = 1
+      ELSE
+C (0,97)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,98)
+      IF (ABS(EOX1(5)-0.624717551627E-01)/0.624717551627E-01.GE.1E-2
+     &) THEN
+C (0,99)
+         IVALID = 1
+      ELSE
+C (0,100)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,101)
+      IF (ABS(EOY1(5)-0.624717551627E-01)/0.624717551627E-01.GE.1E-2
+     &) THEN
+C (0,102)
+         IVALID = 1
+      ELSE
+C (0,103)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,104)
+      IF (ABS(EOZ1(5)-0.249879029611E+00)/0.249879029611E+00.GE.1E-2
+     &) THEN
+C (0,105)
+         IVALID = 1
+      ELSE
+C (0,106)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,107)
+C
+      IF (ABS(EU1(6)-0.624623316921E-01)/0.624623316921E-01.GE.1E-2
+     &) THEN
+C (0,108)
+         IVALID = 1
+      ELSE
+C (0,109)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,110)
+      IF (ABS(EV1(6)-0.624623316921E-01)/0.624623316921E-01.GE.1E-2
+     &) THEN
+C (0,111)
+         IVALID = 1
+      ELSE
+C (0,112)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,113)
+      IF (ABS(EW1(6)-0.390084991743E-06)/0.390084991743E-06.GE.1E-2
+     &) THEN
+C (0,114)
+         IVALID = 1
+      ELSE
+C (0,115)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,116)
+      IF (ABS(EOX1(6)-0.624652573427E-01)/0.624652573427E-01.GE.1E-2
+     &) THEN
+C (0,117)
+         IVALID = 1
+      ELSE
+C (0,118)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,119)
+      IF (ABS(EOY1(6)-0.624652573427E-01)/0.624652573427E-01.GE.1E-2
+     &) THEN
+C (0,120)
+         IVALID = 1
+      ELSE
+C (0,121)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,122)
+      IF (ABS(EOZ1(6)-0.249848546626E+00)/0.249848546626E+00.GE.1E-2
+     &) THEN
+C (0,123)
+         IVALID = 1
+      ELSE
+C (0,124)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,125)
+C
+      IF (ABS(EU1(7)-0.624547351769E-01)/0.624547351769E-01.GE.1E-2
+     &) THEN
+C (0,126)
+         IVALID = 1
+      ELSE
+C (0,127)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,128)
+      IF (ABS(EV1(7)-0.624547351769E-01)/0.624547351769E-01.GE.1E-2
+     &) THEN
+C (0,129)
+         IVALID = 1
+      ELSE
+C (0,130)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,131)
+      IF (ABS(EW1(7)-0.561551328264E-06)/0.561551328264E-06.GE.1E-2
+     &) THEN
+C (0,132)
+         IVALID = 1
+      ELSE
+C (0,133)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,134)
+      IF (ABS(EOX1(7)-0.624589468415E-01)/0.624589468415E-01.GE.1E-2
+     &) THEN
+C (0,135)
+         IVALID = 1
+      ELSE
+C (0,136)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,137)
+      IF (ABS(EOY1(7)-0.624589468415E-01)/0.624589468415E-01.GE.1E-2
+     &) THEN
+C (0,138)
+         IVALID = 1
+      ELSE
+C (0,139)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,140)
+      IF (ABS(EOZ1(7)-0.249817817667E+00)/0.249693943767E+00.GE.1E-2
+     &) THEN
+C (0,141)
+         IVALID = 1
+      ELSE
+C (0,142)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,143)
+C
+      IF (ABS(EU1(8)-0.624471552364E-01)/0.624471552364E-01.GE.1E-2
+     &) THEN
+C (0,144)
+         IVALID = 1
+      ELSE
+C (0,145)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,146)
+      IF (ABS(EV1(8)-0.624471552364E-01)/0.624471552364E-01.GE.1E-2
+     &) THEN
+C (0,147)
+         IVALID = 1
+      ELSE
+C (0,148)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,149)
+      IF (ABS(EW1(8)-0.764127911828E-06)/0.764127911828E-06.GE.1E-2
+     &) THEN
+C (0,150)
+         IVALID = 1
+      ELSE
+C (0,151)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,152)
+      IF (ABS(EOX1(8)-0.624528862483E-01)/0.624528862483E-01.GE.1E-2
+     &) THEN
+C (0,153)
+         IVALID = 1
+      ELSE
+C (0,154)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,155)
+      IF (ABS(EOY1(8)-0.624528862483E-01)/0.624528862483E-01.GE.1E-2
+     &) THEN
+C (0,156)
+         IVALID = 1
+      ELSE
+C (0,157)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,158)
+      IF (ABS(EOZ1(8)-0.249787092799E+00)/0.249787092799E+00.GE.1E-2
+     &) THEN
+C (0,159)
+         IVALID = 1
+      ELSE
+C (0,160)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,161)
+C
+      IF (ABS(EU1(9)-0.624395293607E-01)/0.624395293607E-01.GE.1E-2
+     &) THEN
+C (0,162)
+         IVALID = 1
+      ELSE
+C (0,163)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,164)
+      IF (ABS(EV1(9)-0.624395293607E-01)/0.624395293607E-01.GE.1E-2
+     &) THEN
+C (0,165)
+         IVALID = 1
+      ELSE
+C (0,166)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,167)
+      IF (ABS(EW1(9)-0.997746362297E-06)/0.997746362297E-06.GE.1E-2
+     &) THEN
+C (0,168)
+         IVALID = 1
+      ELSE
+C (0,169)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,170)
+      IF (ABS(EOX1(9)-0.624470125518E-01)/0.624470125518E-01.GE.1E-2
+     &) THEN
+C (0,171)
+         IVALID = 1
+      ELSE
+C (0,172)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,173)
+      IF (ABS(EOY1(9)-0.624470125518E-01)/0.624470125518E-01.GE.1E-2
+     &) THEN
+C (0,174)
+         IVALID = 1
+      ELSE
+C (0,175)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,176)
+      IF (ABS(EOZ1(9)-0.249756122144E+00)/0.249756122144E+00.GE.1E-2
+     &) THEN
+C (0,177)
+         IVALID = 1
+      ELSE
+C (0,178)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,179)
+C
+      IF (ABS(EU1(10)-0.624319045872E-01)/0.624319045872E-01.GE.1E-2
+     &) THEN
+C (0,180)
+         IVALID = 1
+      ELSE
+C (0,181)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,182)
+      IF (ABS(EV1(10)-0.624319045872E-01)/0.624319045872E-01.GE.1E-2
+     &) THEN
+C (0,183)
+         IVALID = 1
+      ELSE
+C (0,184)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,185)
+      IF (ABS(EW1(10)-0.126239922912E-05)/0.126239922912E-05.GE.1E-2
+     &) THEN
+C (0,186)
+         IVALID = 1
+      ELSE
+C (0,187)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,188)
+      IF (ABS(EOX1(10)-0.624413727308E-01)/0.624413727308E-01.GE.1E-2
+     &) THEN
+C (0,189)
+         IVALID = 1
+      ELSE
+C (0,190)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,191)
+      IF (ABS(EOY1(10)-0.624413727308E-01)/0.624413727308E-01.GE.1E-2
+     &) THEN
+C (0,192)
+         IVALID = 1
+      ELSE
+C (0,193)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,194)
+      IF (ABS(EOZ1(10)-0.249725093861E+00)/0.249725093861E+00.GE.1E-2
+     &) THEN
+C (0,195)
+         IVALID = 1
+      ELSE
+C (0,196)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,197)
+C
+      IF (ABS(EU1(11)-0.624242648740E-01)/0.624242648740E-01.GE.1E-2
+     &) THEN
+C (0,198)
+         IVALID = 1
+      ELSE
+C (0,199)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,200)
+      IF (ABS(EV1(11)-0.624242648740E-01)/0.624242648740E-01.GE.1E-2
+     &) THEN
+C (0,201)
+         IVALID = 1
+      ELSE
+C (0,202)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,203)
+      IF (ABS(EW1(11)-0.155808881559E-05)/0.155808881559E-05.GE.1E-2
+     &) THEN
+C (0,204)
+         IVALID = 1
+      ELSE
+C (0,205)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,206)
+      IF (ABS(EOX1(11)-0.624359507677E-01)/0.624359507677E-01.GE.1E-2
+     &) THEN
+C (0,207)
+         IVALID = 1
+      ELSE
+C (0,208)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,209)
+      IF (ABS(EOY1(11)-0.624359507677E-01)/0.624359507677E-01.GE.1E-2
+     &) THEN
+C (0,210)
+         IVALID = 1
+      ELSE
+C (0,211)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,212)
+      IF (ABS(EOZ1(11)-0.249693943792E+00)/0.249693943792E+00.GE.1E-2
+     &) THEN
+C (0,213)
+         IVALID = 1
+      ELSE
+C (0,214)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,215)
+C
+      IF (IVALID.EQ.0) THEN
+C (0,216)
+         WRITE (10, 4) 
+      ELSE
+C (0,217)
+         WRITE (10, 5) 
+      ENDIF
+C                                                                       
+C
+
+C                                                                       
+C (0,219)
+C                                                                       
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE VERIFY()
+C                                                                       
+C
+C     VERIFY THE CORRECTNESS OF COMPUTATION.
+C
+C     ON ENTRY
+C
+C     EU1, EV1, EW1, EOX1, EOY1, EOZ1
+C        ARE THE ARRAYS OF ENERGY.
+C        REAL*8 EU1(12),EV1(12),EW1(12),EOX1(12),EOY1(12),EOZ1(12).
+C
+      IMPLICIT REAL*8(E-F)
+C
+
+      DIMENSION EU1(12),EV1(12),EW1(12),EOX1(12),EOY1(12),EOZ1(12)
+      COMMON /ENG/ EU1, EV1, EW1, EOX1, EOY1, EOZ1
+C
+      COMMON /PAR1/ ISTART,NSTEPS,NAVG,ISAV,NSAV,NOUT,IRND,ITG,ITEST
+      COMMON /DIM/ NX,NY,NZ,NXPP,NXHP,NTOT,NXY,NXZ,NYZ
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+1     FORMAT(1X,'TURB3D BENCHMARK VERIFICATION & TIMING'/)
+C (0,3)
+2     FORMAT(1X,'VALIDATION PARAMETERS:'/)
+C (0,4)
+3     FORMAT(1X,3E20.12)
+C (0,5)
+4     FORMAT(//1X,'RESULTS FOR THIS RUN ARE:  VALID')
+C (0,6)
+5     FORMAT(//1X,'RESULTS FOR THIS RUN ARE:  INVALID')
+C (0,7)
+C                                                                       
+4000  FORMAT(A,4X,I3,6X,2(1X,E12.4,' +/- ',E10.4))
+C (0,8)
+C
+      OPEN (UNIT=10,FILE='TURB3D.VERIFY') 
+C (0,9)
+C.... THE VERIFICATION ROUTINE                                      
+      WRITE (10, 1) 
+C (0,10)
+      WRITE (10, 2) 
+C (0,11)
+!     INITIALLY: DO 20
+      DO I = 1, 11
+C (0,12)
+C        BEGIN BLOCK
+C (0,13)
+         WRITE (10, 3) EU1(I), EV1(I), EW1(I)
+C (0,14)
+         WRITE (10, 3) EOX1(I), EOY1(I), EOZ1(I)
+C (0,15)
+20       CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,16)
+C                                                                       
+      IVALID = 0
+C (0,17)
+C
+      IF (ABS(EU1(1)-0.625000000000E-01)/0.625000000000E-01.GE.1E-2
+     &) THEN
+C (0,18)
+         IVALID = 1
+      ELSE
+C (0,19)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,20)
+      IF (ABS(EV1(1)-0.625000000000E-01)/0.625000000000E-01.GE.1E-2
+     &) THEN
+C (0,21)
+         IVALID = 1
+      ELSE
+C (0,22)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,23)
+      IF (ABS(EW1(1)).GE.1E-2) THEN
+C (0,24)
+         IVALID = 1
+      ELSE
+C (0,25)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,26)
+      IF (ABS(EOX1(1)-0.625000000000E-01)/0.625000000000E-01.GE.1E-2
+     &) THEN
+C (0,27)
+         IVALID = 1
+      ELSE
+C (0,28)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,29)
+      IF (ABS(EOY1(1)-0.625000000000E-01)/0.625000000000E-01.GE.1E-2
+     &) THEN
+C (0,30)
+         IVALID = 1
+      ELSE
+C (0,31)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,32)
+      IF (ABS(EOZ1(1)-0.250000000000E+00)/0.250000000000E+00.GE.1E-2
+     &) THEN
+C (0,33)
+         IVALID = 1
+      ELSE
+C (0,34)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,35)
+C
+      IF (ABS(EU1(2)-0.624242648740E-01)/0.624242648740E-01.GE.1E-2
+     &) THEN
+C (0,36)
+         IVALID = 1
+      ELSE
+C (0,37)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,38)
+      IF (ABS(EV1(2)-0.624242648740E-01)/0.624242648740E-01.GE.1E-2
+     &) THEN
+C (0,39)
+         IVALID = 1
+      ELSE
+C (0,40)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,41)
+      IF (ABS(EW1(2)-0.155808881559E-05)/0.155808881559E-05.GE.1E-2
+     &) THEN
+C (0,42)
+         IVALID = 1
+      ELSE
+C (0,43)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,44)
+      IF (ABS(EOX1(2)-0.624359507677E-01)/0.624359507677E-01.GE.1E-2
+     &) THEN
+C (0,45)
+         IVALID = 1
+      ELSE
+C (0,46)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,47)
+      IF (ABS(EOY1(2)-0.624359507677E-01)/0.624359507677E-01.GE.1E-2
+     &) THEN
+C (0,48)
+         IVALID = 1
+      ELSE
+C (0,49)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,50)
+      IF (ABS(EOZ1(2)-0.249693943792E+00)/0.249693943792E+00.GE.1E-2
+     &) THEN
+C (0,51)
+         IVALID = 1
+      ELSE
+C (0,52)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,53)
+C
+      IF (ABS(EU1(3)-0.623470643533E-01)/0.623470643533E-01.GE.1E-2
+     &) THEN
+C (0,54)
+         IVALID = 1
+      ELSE
+C (0,55)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,56)
+      IF (ABS(EV1(3)-0.623470643533E-01)/0.623470643533E-01.GE.1E-2
+     &) THEN
+C (0,57)
+         IVALID = 1
+      ELSE
+C (0,58)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,59)
+      IF (ABS(EW1(3)-0.621437580180E-05)/0.621437580180E-05.GE.1E-2
+     &) THEN
+C (0,60)
+         IVALID = 1
+      ELSE
+C (0,61)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,62)
+      IF (ABS(EOX1(3)-0.623936757947E-01)/0.623936757947E-01.GE.1E-2
+     &) THEN
+C (0,63)
+         IVALID = 1
+      ELSE
+C (0,64)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,65)
+      IF (ABS(EOY1(3)-0.623936757947E-01)/0.623936757947E-01.GE.1E-2
+     &) THEN
+C (0,66)
+         IVALID = 1
+      ELSE
+C (0,67)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,68)
+      IF (ABS(EOZ1(3)-0.249375836204E+00)/0.249375836204E+00.GE.1E-2
+     &) THEN
+C (0,69)
+         IVALID = 1
+      ELSE
+C (0,70)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,71)
+C
+      IF (ABS(EU1(4)-0.622684059836E-01)/0.622684059836E-01.GE.1E-2
+     &) THEN
+C (0,72)
+         IVALID = 1
+      ELSE
+C (0,73)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,74)
+      IF (ABS(EV1(4)-0.622684059836E-01)/0.622684059836E-01.GE.1E-2
+     &) THEN
+C (0,75)
+         IVALID = 1
+      ELSE
+C (0,76)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,77)
+      IF (ABS(EW1(4)-0.139411938815E-04)/0.139411938815E-04.GE.1E-2
+     &) THEN
+C (0,78)
+         IVALID = 1
+      ELSE
+C (0,79)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,80)
+      IF (ABS(EOX1(4)-0.623729831887E-01)/0.623729831887E-01.GE.1E-2
+     &) THEN
+C (0,81)
+         IVALID = 1
+      ELSE
+C (0,82)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,83)
+      IF (ABS(EOY1(4)-0.623729831887E-01)/0.623729831887E-01.GE.1E-2
+     &) THEN
+C (0,84)
+         IVALID = 1
+      ELSE
+C (0,85)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,86)
+      IF (ABS(EOZ1(4)-0.249045779559E+00)/0.249045779559E+00.GE.1E-2
+     &) THEN
+C (0,87)
+         IVALID = 1
+      ELSE
+C (0,88)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,89)
+C
+      IF (ABS(EU1(5)-0.621882978354E-01)/0.621882978354E-01.GE.1E-2
+     &) THEN
+C (0,90)
+         IVALID = 1
+      ELSE
+C (0,91)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,92)
+      IF (ABS(EV1(5)-0.621882978354E-01)/0.621882978354E-01.GE.1E-2
+     &) THEN
+C (0,93)
+         IVALID = 1
+      ELSE
+C (0,94)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,95)
+      IF (ABS(EW1(5)-0.247099560140E-04)/0.247099560140E-04.GE.1E-2
+     &) THEN
+C (0,96)
+         IVALID = 1
+      ELSE
+C (0,97)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,98)
+      IF (ABS(EOX1(5)-0.623736799074E-01)/0.623736799074E-01.GE.1E-2
+     &) THEN
+C (0,99)
+         IVALID = 1
+      ELSE
+C (0,100)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,101)
+      IF (ABS(EOY1(5)-0.623736799074E-01)/0.623736799074E-01.GE.1E-2
+     &) THEN
+C (0,102)
+         IVALID = 1
+      ELSE
+C (0,103)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,104)
+      IF (ABS(EOZ1(5)-0.248703891007E+00)/0.248703891007E+00.GE.1E-2
+     &) THEN
+C (0,105)
+         IVALID = 1
+      ELSE
+C (0,106)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,107)
+C
+      IF (ABS(EU1(6)-0.621067484882E-01)/0.621067484882E-01.GE.1E-2
+     &) THEN
+C (0,108)
+         IVALID = 1
+      ELSE
+C (0,109)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,110)
+      IF (ABS(EV1(6)-0.621067484882E-01)/0.621067484882E-01.GE.1E-2
+     &) THEN
+C (0,111)
+         IVALID = 1
+      ELSE
+C (0,112)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,113)
+      IF (ABS(EW1(6)-0.384911706662E-04)/0.384911706662E-04.GE.1E-2
+     &) THEN
+C (0,114)
+         IVALID = 1
+      ELSE
+C (0,115)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,116)
+      IF (ABS(EOX1(6)-0.623955717372E-01)/0.623955717372E-01.GE.1E-2
+     &) THEN
+C (0,117)
+         IVALID = 1
+      ELSE
+C (0,118)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,119)
+      IF (ABS(EOY1(6)-0.623955717372E-01)/0.623955717372E-01.GE.1E-2
+     &) THEN
+C (0,120)
+         IVALID = 1
+      ELSE
+C (0,121)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,122)
+      IF (ABS(EOZ1(6)-0.248350302140E+00)/0.248350302140E+00.GE.1E-2
+     &) THEN
+C (0,123)
+         IVALID = 1
+      ELSE
+C (0,124)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,125)
+C
+      IF (ABS(EU1(7)-0.620237670172E-01)/0.620237670172E-01.GE.1E-2
+     &) THEN
+C (0,126)
+         IVALID = 1
+      ELSE
+C (0,127)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,128)
+      IF (ABS(EV1(7)-0.620237670172E-01)/0.620237670172E-01.GE.1E-2
+     &) THEN
+C (0,129)
+         IVALID = 1
+      ELSE
+C (0,130)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,131)
+      IF (ABS(EW1(7)-0.552544589510E-04)/0.552544589510E-04.GE.1E-2
+     &) THEN
+C (0,132)
+         IVALID = 1
+      ELSE
+C (0,133)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,134)
+      IF (ABS(EOX1(7)-0.624384632917E-01)/0.624384632917E-01.GE.1E-2
+     &) THEN
+C (0,135)
+         IVALID = 1
+      ELSE
+C (0,136)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,137)
+      IF (ABS(EOY1(7)-0.624384632917E-01)/0.624384632917E-01.GE.1E-2
+     &) THEN
+C (0,138)
+         IVALID = 1
+      ELSE
+C (0,139)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,140)
+      IF (ABS(EOZ1(7)-0.247985158598E+00)/0.247985158598E+00.GE.1E-2
+     &) THEN
+C (0,141)
+         IVALID = 1
+      ELSE
+C (0,142)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,143)
+C
+      IF (ABS(EU1(8)-0.619393629806E-01)/0.619393629806E-01.GE.1E-2
+     &) THEN
+C (0,144)
+         IVALID = 1
+      ELSE
+C (0,145)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,146)
+      IF (ABS(EV1(8)-0.619393629806E-01)/0.619393629806E-01.GE.1E-2
+     &) THEN
+C (0,147)
+         IVALID = 1
+      ELSE
+C (0,148)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,149)
+      IF (ABS(EW1(8)-0.749685727905E-04)/0.749685727905E-04.GE.1E-2
+     &) THEN
+C (0,150)
+         IVALID = 1
+      ELSE
+C (0,151)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,152)
+      IF (ABS(EOX1(8)-0.625021580253E-01)/0.625021580253E-01.GE.1E-2
+     &) THEN
+C (0,153)
+         IVALID = 1
+      ELSE
+C (0,154)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,155)
+      IF (ABS(EOY1(8)-0.625021580253E-01)/0.625021580253E-01.GE.1E-2
+     &) THEN
+C (0,156)
+         IVALID = 1
+      ELSE
+C (0,157)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,158)
+      IF (ABS(EOZ1(8)-0.247608619650E+00)/0.247608619650E+00.GE.1E-2
+     &) THEN
+C (0,159)
+         IVALID = 1
+      ELSE
+C (0,160)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,161)
+C
+      IF (ABS(EU1(9)-0.618535464078E-01)/0.618535464078E-01.GE.1E-2
+     &) THEN
+C (0,162)
+         IVALID = 1
+      ELSE
+C (0,163)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,164)
+      IF (ABS(EV1(9)-0.618535464078E-01)/0.618535464078E-01.GE.1E-2
+     &) THEN
+C (0,165)
+         IVALID = 1
+      ELSE
+C (0,166)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,167)
+      IF (ABS(EW1(9)-0.976014138093E-04)/0.976014138093E-04.GE.1E-2
+     &) THEN
+C (0,168)
+         IVALID = 1
+      ELSE
+C (0,169)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,170)
+      IF (ABS(EOX1(9)-0.625864582582E-01)/0.625864582582E-01.GE.1E-2
+     &) THEN
+C (0,171)
+         IVALID = 1
+      ELSE
+C (0,172)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,173)
+      IF (ABS(EOY1(9)-0.625864582582E-01)/0.625864582582E-01.GE.1E-2
+     &) THEN
+C (0,174)
+         IVALID = 1
+      ELSE
+C (0,175)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,176)
+      IF (ABS(EOZ1(9)-0.247220857761E+00)/0.247220857761E+00.GE.1E-2
+     &) THEN
+C (0,177)
+         IVALID = 1
+      ELSE
+C (0,178)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,179)
+C
+      IF (ABS(EU1(10)-0.617663277872E-01)/0.617663277872E-01.GE.1E-2
+     &) THEN
+C (0,180)
+         IVALID = 1
+      ELSE
+C (0,181)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,182)
+      IF (ABS(EV1(10)-0.617663277872E-01)/0.617663277872E-01.GE.1E-2
+     &) THEN
+C (0,183)
+         IVALID = 1
+      ELSE
+C (0,184)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,185)
+      IF (ABS(EW1(10)-0.123120052813E-03)/0.123120052813E-03.GE.1E-2
+     &) THEN
+C (0,186)
+         IVALID = 1
+      ELSE
+C (0,187)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,188)
+      IF (ABS(EOX1(10)-0.626911652110E-01)/0.626911652110E-01.GE.1E-2
+     &) THEN
+C (0,189)
+         IVALID = 1
+      ELSE
+C (0,190)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,191)
+      IF (ABS(EOY1(10)-0.626911652110E-01)/0.626911652110E-01.GE.1E-2
+     &) THEN
+C (0,192)
+         IVALID = 1
+      ELSE
+C (0,193)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,194)
+      IF (ABS(EOZ1(10)-0.246822058147E+00)/0.246822058147E+00.GE.1E-2
+     &) THEN
+C (0,195)
+         IVALID = 1
+      ELSE
+C (0,196)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,197)
+C
+      IF (ABS(EU1(11)-0.616777180541E-01)/0.616777180541E-01.GE.1E-2
+     &) THEN
+C (0,198)
+         IVALID = 1
+      ELSE
+C (0,199)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,200)
+      IF (ABS(EV1(11)-0.616777180541E-01)/0.616777180541E-01.GE.1E-2
+     &) THEN
+C (0,201)
+         IVALID = 1
+      ELSE
+C (0,202)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,203)
+      IF (ABS(EW1(11)-0.151490749774E-03)/0.151490749774E-03.GE.1E-2
+     &) THEN
+C (0,204)
+         IVALID = 1
+      ELSE
+C (0,205)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,206)
+      IF (ABS(EOX1(11)-0.628160790475E-01)/0.628160790475E-01.GE.1E-2
+     &) THEN
+C (0,207)
+         IVALID = 1
+      ELSE
+C (0,208)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,209)
+      IF (ABS(EOY1(11)-0.628160790475E-01)/0.628160790475E-01.GE.1E-2
+     &) THEN
+C (0,210)
+         IVALID = 1
+      ELSE
+C (0,211)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,212)
+      IF (ABS(EOZ1(11)-0.246412418305E+00)/0.246412418305E+00.GE.1E-2
+     &) THEN
+C (0,213)
+         IVALID = 1
+      ELSE
+C (0,214)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,215)
+C
+      IF (IVALID.EQ.0) THEN
+C (0,216)
+         WRITE (10, 4) 
+      ELSE
+C (0,217)
+         WRITE (10, 5) 
+      ENDIF
+C                                                                       
+C                                                                       
+C (0,219)
+C                                                                       
+      RETURN
+C     END BLOCK
+      END

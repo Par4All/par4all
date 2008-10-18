@@ -1,0 +1,6536 @@
+!!
+!! file for hydro2d.f
+!!
+      PROGRAM HYD2D
+*
+*
+****************************************************************
+*
+* Astrophysical program for the computation of galactical jets,
+* using hydrodynamical Navier Stokes equations
+*
+* SPEC Benchmark Program 104.hydro2d, adopted from the program
+* "hydro2d" (SNI-internal name: ASW02) written by Dr. Koesl,
+* Max-Planck-Institut fuer Astrophysik, Garching, Germany
+*
+* This version of the benchmark evolved from the benchmark
+* 090.hydro2d. The parameters MP and NP have been enlarged,
+* for a larger problem size and longer execution time.
+*
+* Contact: Dr. Wilfried Stehling,
+*          Siemens Nixdorf, D 552
+*          81730 Muenchen, Germany
+*
+* Modifications for the SPEC version:
+*
+* - Internal timing statements removed
+* - Output modified. Detailed output is now on unit 10.
+* - All floating point data changed to double precision
+*     (Declaration IMPLICIT DOUBLE PRECISION (A-H, O-Z))
+*     Accordingly, replaced all calls to AMIN1, AMAX1
+*     by calls to DMIN1, DMAX1
+* - Association of Fortran unit number (10) and file HYDRO.DET
+*     via an OPEN statement
+* - Assigning variables via input file instead of DATA statements.
+*     New subroutine (INPDTA) created. Subroutine call inserted in
+*     main program.
+* - Rearanged variables COMMON areas to avoid alignment problems
+* - Changed fp parameter (constant) values in subroutines CUT, VPR,
+*   VPS to 1.0D-7, to eliminate numerical differences for runs on
+*   different machines
+*
+* Modifications March, July, Aug., Oct. 1991 by
+*   Aenne Scharbert,
+*   Marcus Schwankl,
+*   Reinhold Weicker,
+*   Andrea Wittmann,
+*       Siemens Nixdorf, STM OS 323
+*
+* Modifications Sept./Oct.Nov. 1994 by
+*   Reinhold Weicker
+*   Siemens Nixdorf, MR PD 214
+*   33094 Paderborn
+*   Germany
+* 
+* - Increased grid size (N = 40)
+* - Expressed padding of COMMON blocks in terms of MP, NP
+*
+****************************************************************
+*
+*          PROGRAMM ZUR BERECHNUNG GALAKTISCHER JETS
+*          HERKUNFT: MAX-PLANCK-INSTITUT FUER ASTROPHYSIK
+*                    GARCHING
+*                    HERR DR. KOESSL
+*
+* PARAMETER MP, NP WERDEN IN ALLEN UNTERPROGRAMMEN GESETZT
+* SIE MUESSEN DIE WERTE ANNEHMEN:
+*
+*      MP = 10 * N + 2  , NP = 4 * N
+*
+* SPEICHERBEDARF:
+*
+*      UNGEFAEHR 134 * MP * NP BYTES
+*
+* PARAMETERAENDERUNG DURCH CHANGE ALL COMMAND
+*
+*      C 'MP   =      102' 'MP   =      XXX' ALL
+*      C 'NP   =       40' 'NP   =      XXX' ALL
+*
+* ANZAHL DER ZEITSCHRITTE WIRD IM BLOCK DATA PROGRAMM DURCH DEN
+* WERT VON ISTEP FESTGELEGT.
+*
+* AUSDRUCK VON INFORMATION WIRD AUF UNIT 11 GELENKT.
+* DETAILLIERTE MODELLDATEN WERDEN ALLE IPRIN ZEITSCHRITTE AUSGEGEBEN.
+* DER WERT VON IPRIN WIRD IM BLOCK DATA PROGRAMM FESTGELEGT.
+*
+***************************************************************
+*
+*   English translation of comment:
+*
+*   The parameters MP, NP are set in all subroutines
+*   They must have the values
+*      MP = 10 * N + 2  , NP = 4 * N
+*   Approximate memory requirements:
+*      134 * MP * NP BYTES
+*   The number of time steps is controlled in the block data
+*   module (hydro2d.data.f) by the value of ISTEP.
+*
+*   Detailed data are generated every IPRIN time steps; the value
+*   of IRPN is taken from the block data module.
+*
+***********************************************************************
+*
+*     MAIN PROGRAM:
+*
+*     1.)  DEFINTION OF COMMON BLOCKS
+*     2.)  READ AND TEST BASIC DATA
+*          (PARAMETERS READ FROM INPUT DATA SET ARE SIGNED WITH #)
+*     3.)  READ LAST MODEL OR CONSTRUCT NEW MODEL
+*     4.)  SOLVE HYDRODYNAMIC EQUATIONS
+*     5.)  CHECK AND SAVE DATA  (CHANNEL NUMBER USED: 19)
+*     6.)  CHECK REMAINING CPU TIME
+*
+***********************************************************************
+*
+*     DESCRIPTION OF PARAMETERS:
+*
+*     - MP(MX#) ...   NUMBER OF GRIDPOINTS IN Z-DIRECTION
+*     - NP(NX#) ...   NUMBER OF GRIDPOINTS IN R-DIRECTION
+*
+*     REMARK:   MX,NX ARE USED TO CHECK THE DIMENSIONS MP,NP
+*               OF THE ARRAYS THAT ARE FIXED IN PARAMETER
+*               STATEMENTS IN EVERY ROUTINE
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+*
+*     i.e. N = 40 (see comment above)
+*
+*
+***********************************************************************
+*
+*     DESCRIPTION OF COMMONS:
+*
+*     - PRMT      ...   BASIC PARAMETERS
+*     - DISK      ...   CONTROL BLOCK FOR LOOP AND I/O
+*     - BOND      ...   CONTROL BLOCK FOR TREATMENT OF BOUNDARIES
+*     - ADVC      ...   CONTROL BLOCK FOR LIMITED ADVECTION
+*     - CUTP      ...   CONTROL BLOCK FOR PRESSURE UNDERSHOOT
+*     - CONT      ...   CONTROL VARIABLES
+*     - GRID      ...   POSITION OF GRIDPOINTS
+*     - VAR1      ...   VARIABLES AT OLD TIMESTEP
+*     - VAR2      ...   VARIABLES AT NEW TIMESTEP & STAGGERED GRID (1)
+*     - VARH      ...   PRESSURE, VELOCITY & FLUXES
+*     - VARS      ...   CORIOLIS FORCES
+*     - SCRA      ...   SCRATCH MEMORY & VARIBLES AT STAGG. GRID (2)
+*
+*     ATTENTION:   COMMON VARH USED AS SCRATCH IN ROUTINE STAGF1
+*
+*     REMARK:      THE MAXIMUM MEMORY SPACE NEEDED FOR COMMON BLOCKS
+*                  /GRID/ /VAR1/ /VAR2/ /VARH/ /VARS/ /SCRA/
+*                  IS ALLOCATED ONLY VIA ONE DIMENSIONAL DUMMY ARRAYS
+*
+***********************************************************************
+*
+*     DESCRIPTION OF VARIABLES IN COMMON /PRMT/
+*
+*     - IS      ...   NUMBER OF TIMESTEP
+*     - TS      ...   TOTAL TIME
+*
+*     - DT      ...   TIME STEP
+*
+*     - GAM     ...   GAMMA  =   CP / CV
+*     - CFL#    ...   PORTION OF TIMESTEP USED (COURANT-FACTOR)
+*     - VCT#    ...   MAGNITUDE OF ARTIFICIAL DIFFUSION COEFFICENT
+*
+*     - TZ      ...   MINIMAL GRID SPACING IN Z-DIRECTION
+*     - TR      ...   MINIMAL GRID SPACING IN R-DIRECTION
+*     - FTZ     ...   POSITION OF LOWER Z-BOUNDARY
+*     - FTR     ...   POSITION OF LOWER R-BOUNDARY
+*     - BSZ     ...   Z- BIAS OF EXPONENTIAL PART OF GRID
+*     - BSR     ...   R- BIAS OF EXPONENTIAL PART OF GRID
+*     - QTZ     ...   Z- FRACTION OF GRID WHICH IS EQUIDISTANT
+*     - QTR     ...   R- FRACTION OF GRID WHICH IS EQUIDISTANT
+*
+*     DESCRIPTION OF VARIABLES IN COMMON /DISK/
+*
+*     - ISTEP#  ...   NUMBER OF TIMESTEPS TO BE COMPUTE
+*     - ICNT    ...   NUMBER OF TIMESTEPS ACTUALLY COMPUTED
+*     - ISTOR#  ...   EACH "ISTOR" TIMESTEPS A MODEL IS STORED
+*     - IPRIN#  ...   EACH "IPRIN" TIMESTEPS DATA IS PRINTED
+*     - MPROW#  ...   NUMBER OF Z-ROWS TO BE PRINTED
+*     - NPROW#  ...   NUMBER OF R-ROWS TO BE PRINTED
+*                     SKIP-DISTANCE = M(N)P / M(N)PROW
+*
+*     DESCRIPTION OF VARIABLES IN COMMON /BOND/
+*
+*     - ZL#     ...   TYPE OF LOWER Z-BOUNDARY  ( O=OPEN , C=CLOSED )
+*     - ZU#     ...   TYPE OF UPPER Z-BOUNDARY
+*     - RL#     ...   TYPE OF LOWER R-BOUNDARY
+*     - RU#     ...   TYPE OF UPPER R-BOUNDARY
+*
+*     DESCRIPTION OF VARIABLES IN COMMON /ADVC/
+*
+*     - MQ      ...   UPPER INDEX FOR Z-ADVECTION
+*     - NQ      ...   UPPER INDEX FOR R-ADVECTION
+*                     (XQ1= PRED(XQ), XQ2= PRED(PRED(XQ))
+*     - MQFLG   ...   LIMIT Z-ADVECTION IF MQFLG=1
+*     - NQFLQ   ...   LIMIT R-ADVECTION IF NQFLG=1
+*     - ROBMQ   ...   TARGET FOR SEARCH IN Z-DIRECTION
+*     - ROBNQ   ...   TARGET FOR SEARCH IN R-DIRECTION
+*
+*     DESCRIPTION OF VARIABLES IN COMMON /CUTP/
+*
+*     - NEGFL#  ...   PRINT POSITION OF NEGATIV PRESSURE IF NEGFL=1
+*     - NEGCN#  ...   MAXIMUM NUMBER OF CELLS WITH NEGATIVE PRESSURE
+*                     (THE PROGRAM STOPS IF NEGPR > NEGCN BECOMES TRUE)
+*     - NEGPR   ...   NUMBER OF CELLS WITH NEGATIVE PRESSURE
+*     - NEGPO   ...   POSITIONS OF NEGATIVE PRESSURE (DIM=1000)
+*     - CUTPR   ...   "FLOOR" OF PRESSURE
+*                     (IF PR < PRCUT THEN PR IS SET EQUAL PRCUT)
+*
+*     DESCRIPTION OF VARIABLES IN COMMON /CONT/
+*
+*     - ROMIN   ...   MINIMUM OF DENSITY     (POSITION AT MINRO)
+*     - ENMIN   ...   MINIMUM OF ENERGY      (POSITION AT MINEN)
+*     - GZMIN   ...   MINIMUM OF Z-MOMENTUM  (POSITION AT MINGZ)
+*     - GRMIN   ...   MINIMUM OF R-MOMENTUM  (POSITION AT MINGR)
+*
+*     - ROMAX   ...   MAXIMUM OF DENSITY     (POSITION AT MAXRO)
+*     - ENMAX   ...   MAXIMUM OF ENERGY      (POSITION AT MAXEN)
+*     - GZMAX   ...   MAXIMUM OF Z-MOMENTUM  (POSITION AT MAXGZ)
+*     - GRMAX   ...   MAXIMUM OF R-MOMENTUM  (POSITION AT MAXGR)
+*
+*     - TOTMA   ...   TOTAL MASS
+*     - TOTEN   ...   TOTAL ENERGY
+*     - TOTGZ   ...   TOTAL Z-MOMENTUM
+*
+*     DESCRIPTION OF VARIABLES IN COMMON /GRID/
+*
+*     - Z       ...   POSITION OF Z-MESH-POINTS
+*     - ZB      ...   POSITION OF Z-CELL-BOUNDARIES
+*     - DZ      ...   DISTANCE BETWEEN Z-CELL-BOUNDARIES
+*     - DBZ     ...   DISTANCE BETWEEN Z-MESH-POINTS
+*     - FZ      ...   INTERPOLATION WEIGHTS FOR Z-DIRECTION
+*
+*     - R       ...   POSITION OF R-MESH-POINTS
+*     - RB      ...   POSITION OF R-CELL-BOUNDARIES
+*     - DR      ...   DISTANCE BETWEEN R-CELL-BOUNDARIES
+*     - DBR     ...   DISTANCE BETWEEN R-MESH-POINTS
+*     - FR      ...   INTERPOLATION WEIGHTS FOR R-DIRECTION
+*
+*     DESCRIPTION OF VARIABLES IN COMMON /VAR1/
+*
+*     - RO      ...   DENSITY
+*     - EN      ...   TOTAL ENERGY
+*     - GZ      ...   Z-MOMENTUM
+*     - GR      ...   R-MOMENTUM
+*     - GP      ...   PHI-MOMENTUM
+*     - BZ      ...   Z-FIELD
+*     - BR      ...   R-FIELD
+*     - BP      ...   PHI-FIELD
+*
+*     FOR DESCRIPTION OF THE VARIABLES IN THE REMAINING
+*     COMMON BLOCKS SEE THE COMMENTS IN THE SUBROUTINES
+*
+***********************************************************************
+*
+*
+      CHARACTER       ZL,ZU, RL,RU
+*
+      COMMON /PRMT/   TS, DT, GAM, CFL,VCT,
+     &                TZ,TR, FTZ,FTR, BSZ,BSR, QTZ,QTR, IS
+      COMMON /DISK/   ISTEP, ICNT,
+     &                ISTOR, IPRIN, MPROW, NPROW
+      COMMON /BOND/   ZL,ZU, RL,RU
+      COMMON /ADVC/   ROBMQ, ROBNQ,
+     &                MQ,MQ1,MQ2, NQ,NQ1,NQ2,
+     &                MQFLG, NQFLG
+      COMMON /CUTP/   PRCUT, NEGFL, NEGCN, NEGPR, NEGPO(1000)
+      COMMON /CONT/   ENMAX, ROMAX, ENMIN, ROMIN,
+     &                GRMAX, GZMAX, GRMIN, GZMIN,
+     &                TOTMA, TOTEN, TOTGZ,
+     &                MINRO, MINEN, MAXRO, MAXEN,
+     &                MINGZ, MINGR, MAXGZ, MAXGR
+      COMMON /GRID/   H0(  5 * (MP+1)  +
+     &                     5 * (NP+1)           )
+      COMMON /VAR1/   H1(  4 *  MP    *  NP     )
+      COMMON /VAR2/   H2(  4 * (MP+1) * (NP+1)  )
+      COMMON /VARH/   H3(  4 * (MP+1) * (NP+1)  )
+      COMMON /VARS/   H4(  1 *  MP    *  NP     )
+      COMMON /SCRA/   H5(  4 * (MP+1) * (NP+1)  )
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+*
+      OPEN (UNIT=10,FILE='HYDRO.DET') 
+C (0,3)
+*
+*       File for detail output, not included in the comparison
+*       of results for SPEC purposes
+*
+*      read values from file
+      CALL INPDTA
+C (0,4)
+*
+*      Print the values only for last model computed
+      IPRIN = ISTEP
+C (0,5)
+*      If, for diagnostic purposes, more values are to be printed,
+*      this should be changed accordingly (e.g., IPRIN = 80 causes
+*      the values to be printed every 80th time step).
+*
+*
+***********************************************************************
+*        PREPARE THE COMPUTATION
+***********************************************************************
+*
+*
+      CALL PREPAR
+C (0,6)
+*
+*
+***********************************************************************
+*        COMPUTE INITAL MODEL OR READ LAST MODEL FROM DISC
+***********************************************************************
+*
+*
+*
+      CALL INIVAL
+C (0,7)
+*
+*
+***********************************************************************
+*        ADVANCE SOLUTION BY 'ISTEP' TIMESTEPS
+***********************************************************************
+*
+*
+!     INITIALLY: DO 100
+      DO ICNT = 1, ISTEP
+C (0,8)
+C        BEGIN BLOCK
+C (0,9)
+*
+*----------------------------------------------------------------------
+*        COMPUTE NEW TIMESTEP AND SOLVE EQUATIONS
+*----------------------------------------------------------------------
+*
+         CALL TISTEP
+C (0,10)
+         CALL ADVNCE
+C (0,11)
+*
+*----------------------------------------------------------------------
+*        COMPUTE CONTROL VARIABLES AND SAVE DATA
+*----------------------------------------------------------------------
+*
+         CALL CHECK
+C (0,12)
+         CALL OUTPUT
+C (0,13)
+*
+*----------------------------------------------------------------------
+*        END OF LOOP
+*----------------------------------------------------------------------
+*
+100      CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,14)
+*
+*----------------------------------------------------------------------
+*        EXIT IF THE LOOP IS NOT FINISHED
+*        BUT THE CPU TIME IS ALREADY CONSUMED
+*----------------------------------------------------------------------
+*
+*  200 CONTINUE
+*
+*
+***********************************************************************
+*        TERMINATE THE COMPUTATION
+***********************************************************************
+*
+*
+      CALL TERM
+C (0,15)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE PREPAR
+*
+*
+***********************************************************************
+*
+*     THIS SUBROUTINE PREPARES THE COMPUTATION
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+*
+      CHARACTER       ZL,ZU, RL,RU
+*
+      COMMON /PRMT/   TS, DT, GAM, CFL,VCT,
+     &                TZ,TR, FTZ,FTR, BSZ,BSR, QTZ,QTR, IS
+      COMMON /DISK/   ISTEP, ICNT,
+     &                ISTOR, IPRIN, MPROW, NPROW
+      COMMON /BOND/   ZL,ZU, RL,RU
+      COMMON /ADVC/   ROBMQ, ROBNQ,
+     &                MQ,MQ1,MQ2, NQ,NQ1,NQ2,
+     &                MQFLG, NQFLG
+      COMMON /CUTP/   PRCUT, NEGFL, NEGCN, NEGPR, NEGPO(1000)
+*
+*
+***********************************************************************
+*        DEFINE DIMENSION CONTROL VARAIABLES
+***********************************************************************
+*
+*
+      PARAMETER  ( MX      =         MP )
+      PARAMETER  ( NX      =         NP )
+*
+*
+***********************************************************************
+*       DEFINE STATEMENT FUNCTION FOR BOUNDARY PARAMTER TEST
+***********************************************************************
+*
+*
+      CHARACTER  CH
+      LOGICAL    NORCO
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+50    FORMAT('1'//////6X,'REQUESTED DIMENSION'/6X,'MX   =  ',I15/6X,'NX 
+     x 
+     &  =  ',I15///6X,'NOT EQUAL'/6X,'DEFINED DIMENSION'/6X,'MP   =  ',I
+     x 
+     &15/6X,'NP   =  ',I15//////6X,'STOP IN ROUTINE:   PREPAR')
+C (0,3)
+60    FORMAT('1'//////6X,'DEFINED DIMENSION'/6X,'TOO SMALL (LESS THAN 3)
+     x 
+     &'/6X,'MP   =  ',I15/6X,'NP   =  ',I15//////6X,'STOP IN ROUTINE:   
+     x 
+     &PREPAR')
+C (0,4)
+70    FORMAT('1'//////6X,'ILLEGAL BOUNDARY PARAMETER SPECIFCATION'/6X,'O
+     x 
+     &NLY ''C'' AND ''O'' ARE ACCEPTED'/6X,'Z-DIR. (LOWER)  = ',A/6X,'Z-
+     x 
+     &DIR. (UPPER)  = ',A/6X,'R-DIR. (LOWER)  = ',A/6X,'R-DIR. (UPPER)  
+     x 
+     &= ',A//////6X,'STOP IN ROUTINE:   PREPAR')
+C (0,5)
+C$PIPS STATEMENT FUNCTION NORCO SUBSTITUTED
+*
+*
+***********************************************************************
+*        TEST LENGTH OF MEMORY
+***********************************************************************
+*
+*
+      IF (MX.NE.MP.OR.NX.NE.NP) THEN
+C (0,6)
+C        BEGIN BLOCK
+C (0,7)
+         WRITE (10, 50) MX, NX, MP, NP
+C (0,8)
+         STOP
+C        END BLOCK
+      ELSE
+C (0,9)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,10)
+*
+*
+      IF (MP.LT.3.OR.NP.LT.3) THEN
+C (0,11)
+C        BEGIN BLOCK
+C (0,12)
+         WRITE (10, 60) MP, NP
+C (0,13)
+         STOP
+C        END BLOCK
+      ELSE
+C (0,14)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,15)
+*
+*
+***********************************************************************
+*        CHECK BOUNDARY PARAMETERS
+***********************************************************************
+*
+*
+      IF (.NOT.(ZL.EQ.'C'.OR.ZL.EQ.'O').OR..NOT.(ZU.EQ.'C'.OR.ZU.EQ.
+     &'O').OR..NOT.(RL.EQ.'C'.OR.RL.EQ.'O').OR..NOT.(RU.EQ.'C'.OR.RU
+     &.EQ.'O')) THEN
+C (0,16)
+C        BEGIN BLOCK
+C (0,17)
+         WRITE (10, 70) ZL, ZU, RL, RU
+C (0,18)
+         STOP
+C        END BLOCK
+      ELSE
+C (0,19)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,20)
+*
+*
+***********************************************************************
+*        CHECK SOME I/O AND THE Z-ADVECTION PARAMETERS
+***********************************************************************
+*
+*
+      IF (MPROW.LT.1) THEN
+C (0,21)
+         MPROW = 1
+      ELSE
+C (0,22)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,23)
+      IF (MPROW.GT.MP) THEN
+C (0,24)
+         MPROW = MP
+      ELSE
+C (0,25)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,26)
+      IF (NPROW.LT.1) THEN
+C (0,27)
+         NPROW = 1
+      ELSE
+C (0,28)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,29)
+      IF (NPROW.GT.NP) THEN
+C (0,30)
+         NPROW = NP
+      ELSE
+C (0,31)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,32)
+*
+      IF (NEGFL.LT.0) THEN
+C (0,33)
+         NEGFL = 0
+      ELSE
+C (0,34)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,35)
+      IF (NEGFL.GT.1) THEN
+C (0,36)
+         NEGFL = 1
+      ELSE
+C (0,37)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,38)
+      IF (NEGCN.LT.0) THEN
+C (0,39)
+         NEGCN = 0
+      ELSE
+C (0,40)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,41)
+      IF (NEGCN.GT.1000) THEN
+C (0,42)
+         NEGCN = 1000
+      ELSE
+C (0,43)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,44)
+*
+      IF (MQFLG.LT.0) THEN
+C (0,45)
+         MQFLG = 0
+      ELSE
+C (0,46)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,47)
+      IF (MQFLG.GT.1) THEN
+C (0,48)
+         MQFLG = 1
+      ELSE
+C (0,49)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,50)
+      IF (NQFLG.LT.0) THEN
+C (0,51)
+         NQFLG = 0
+      ELSE
+C (0,52)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,53)
+      IF (NQFLG.GT.1) THEN
+C (0,54)
+         NQFLG = 1
+      ELSE
+C (0,55)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,56)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE INIVAL
+*
+*
+***********************************************************************
+*
+*     IN THIS SUBROUTINE THE PROGRAM IS STARTED
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+*
+      COMMON /DISK/   ISTEP, ICNT,
+     &                ISTOR, IPRIN, MPROW, NPROW
+      COMMON /PRMT/   TS, DT, GAM, CFL,VCT,
+     &                TZ,TR, FTZ,FTR, BSZ,BSR, QTZ,QTR, IS
+      COMMON /ADVC/   ROBMQ, ROBNQ,
+     &                MQ,MQ1,MQ2, NQ,NQ1,NQ2,
+     &                MQFLG, NQFLG
+      COMMON /VAR1/   RO(MP,NP), EN(MP,NP),
+     &                GZ(MP,NP), GR(MP,NP)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+*
+*
+***********************************************************************
+*     SET TIME TO ZERO AND COMPUTE INITIAL MODEL AND GRID
+***********************************************************************
+*
+*
+      IS = 0
+C (0,3)
+      TS = 0.0D0
+C (0,4)
+      DT = 0.0D0
+C (0,5)
+*
+*
+      CALL INIMOD
+C (0,6)
+      CALL GRIDCO
+C (0,7)
+*
+*
+***********************************************************************
+*     PRESET BOUNDARIES AND DETERMINE TARGETS FOR LIMITED ADVECTION
+***********************************************************************
+*
+*
+      ROBMQ = RO(MP,1)
+C (0,8)
+      ROBNQ = RO(1,NP)
+C (0,9)
+
+*
+*
+      CALL ADLEN('H')
+C (0,10)
+*
+***********************************************************************
+*     COMPUTE CONTROL VARIABLES, PRESSURE AND VELOCITY,
+*     PRINT BASIC PARAMETERS OF INITIAL MODEL
+*     AND WRITE INITIAL MODEL ON DISC
+***********************************************************************
+*
+*
+      CALL CHECK
+C (0,11)
+C     CALL OUTPUT
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE INIMOD
+*
+*
+***********************************************************************
+*
+*     IN THIS SUBROUTINE THE INITIAL MODEL IS COMPUTED
+*
+***********************************************************************
+*
+*     VALUES SET OR COMPUTED:
+*        -  GAM
+*        -  RO,EN, GZ,GR
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,   NP   =       160 )
+      PARAMETER  ( M1   =   MP - 1 ,   N1   =   NP - 1 )
+*
+*
+*
+      PARAMETER  ( XLZ =       30.0D0 )
+      PARAMETER  ( XLR =        8.0D0 )
+*
+C     PARAMETER  ( XCZ =       30.0D0 )
+      PARAMETER  ( XCZ =       15.0D0 )
+      PARAMETER  ( XSZ =       30.0D0 )
+*
+      PARAMETER  ( RO0 =        1.0D0 )
+      PARAMETER  ( PR0 =        0.6D0 )
+*
+      PARAMETER  ( XLJET =      1.0D0 )
+      PARAMETER  ( ROJET =      0.1D0 )
+      PARAMETER  ( PRJET =      0.6D0 )
+      PARAMETER  (  VJET =    18.97D0 )
+
+      COMMON /PRMT/   TS, DT, GAM, CFL,VCT,
+     &                TZ,TR, FTZ,FTR, BSZ,BSR, QTZ,QTR, IS
+      COMMON /GRID/   Z(MP), ZB(0:MP), DZ(MP), DBZ(0:MP), FZ(M1),
+     &                R(NP), RB(0:NP), DR(NP), DBR(0:NP), FR(N1),
+     &                DUM(8)
+* Dum is a dummy             a.w.
+      COMMON /VAR1/   RO(MP,NP), EN(MP,NP),
+     &                GZ(MP,NP), GR(MP,NP)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+1000  FORMAT(E20.14)
+C (0,3)
+1099  FORMAT(' NO FURTHER MODEL DATA AVAILABLE, STOP')
+C (0,4)
+*
+*
+***********************************************************************
+*     OPEN MODEL INPUT
+***********************************************************************
+      OPEN (UNIT=11,FILE='HYDRO2D.MODEL',STATUS='OLD') 
+C (0,5)
+***********************************************************************
+*     SET BASIC PARAMETERS
+***********************************************************************
+*
+*
+      GAM = DBLE(5.0D0)/DBLE(3.0D0)
+C (0,6)
+*
+      TZ = XLZ/(MP-2)
+C (0,7)
+      TR = XLR/NP
+C (0,8)
+      FTZ = DBLE(-2.0D0)*TZ
+C (0,9)
+      FTR = 0.0D0
+C (0,10)
+      BSZ = 1.0D0
+C (0,11)
+      BSR = 1.0D0
+C (0,12)
+      QTZ = 1.0D0
+C (0,13)
+      QTR = 1.0D0
+C (0,14)
+*
+*
+***********************************************************************
+*     SET VARIABLES
+***********************************************************************
+*
+*
+      CON = GAM-1.0D0
+C (0,15)
+      EN0 = PR0/CON
+C (0,16)
+*
+      MPCON = NINT(MP*XCZ/XLZ)
+C (0,17)
+      MPSTR = NINT(MP*XSZ/XLZ)
+C (0,18)
+      J = 1
+C (0,19)
+C     BEGIN UNSTRUCTURED
+99995 CONTINUE
+C (1,1)
+*
+C     DO loop 5 with exit had to be desugared
+      IF (J.GT.NP) GOTO 99998
+C (10,1)
+      I = 1
+99996 CONTINUE
+C (7,1)
+C     DO loop 5 with exit had to be desugared
+      IF (I.GT.MP) GOTO 99997
+C (9,1)
+      READ (UNIT=11,FMT=1000,END=99) RO(I,J)
+C (6,1)
+C     BEGIN BLOCK
+C (6,2)
+5     CONTINUE
+C (6,3)
+      I = I+1
+C     END BLOCK
+      GOTO 99996
+C (4,1)
+C     BEGIN BLOCK
+C (4,2)
+99    WRITE (6, 1099) 
+C (4,3)
+      STOP
+C     END BLOCK
+99997 CONTINUE
+C (8,1)
+      J = J+1
+      GOTO 99995
+99998 CONTINUE
+C (2,1)
+C     BEGIN BLOCK
+C (2,2)
+!     INITIALLY: DO 10
+      DO J = 1, NP
+C (2,3)
+!     INITIALLY: DO 10
+         DO I = 1, MPCON
+C (2,4)
+C           BEGIN BLOCK
+C (2,5)
+C        RO(I,J) =  RO0
+            EN(I,J) = EN0
+C (2,6)
+            GZ(I,J) = 0.0D0
+C (2,7)
+            GR(I,J) = 0.0D0
+C (2,8)
+10          CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (2,9)
+*
+!     INITIALLY: DO 12
+      DO J = 1, NP
+C (2,10)
+!     INITIALLY: DO 12
+         DO I = MPCON+1, MP
+C (2,11)
+C           BEGIN BLOCK
+C (2,12)
+*        RO(I,J) =  RO0  *  10 ** ( REAL(MPCON-I) / REAL(MPSTR) )
+C        RO(I,J) =  RO0  *  10 ** ( DBLE(MPCON-I) / DBLE(MPSTR) )
+            EN(I,J) = EN0
+C (2,13)
+            GZ(I,J) = 0.0D0
+C (2,14)
+            GR(I,J) = 0.0D0
+C (2,15)
+12          CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (2,16)
+*
+*
+      ENJET = PRJET/CON+0.5D0*ROJET*VJET**2
+C (2,17)
+      GZJET = ROJET*VJET
+C (2,18)
+*
+      NPJET = NINT(NP*XLJET/XLR)
+C (2,19)
+*
+!     INITIALLY: DO 20
+      DO J = 1, NPJET
+C (2,20)
+!     INITIALLY: DO 20
+         DO I = 1, 2
+C (2,21)
+C           BEGIN BLOCK
+C (2,22)
+C        RO(I,J) =  ROJET
+            EN(I,J) = ENJET
+C (2,23)
+            GZ(I,J) = GZJET
+C (2,24)
+20          CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+*
+*
+***********************************************************************
+*
+*
+C     END BLOCK
+C (3,1)
+      RETURN
+C     END UNSTRUCTURED
+C     END BLOCK
+      END
+      SUBROUTINE BBH
+*
+*
+***********************************************************************
+*
+*     IN THIS SUBROUTINE THE "BOTTOM"-BOUNDARY-VALUES
+*     FOR THE HALF TIME-STEP ARE COMPUTED
+*
+***********************************************************************
+*
+*     VALUES COMPUTED:
+*        -  RO,EN           ( VALUES AT STAGGERED GRID (1)    )
+*        -  GZ,GR
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,   NP   =       160 )
+*
+*
+      PARAMETER  ( XLZ =       30.0D0 )
+      PARAMETER  ( XLR =        8.0D0 )
+      PARAMETER  ( XLJET =      1.0D0 )
+      PARAMETER  ( ROJET =      0.1D0 )
+      PARAMETER  ( PRJET =      0.6D0 )
+      PARAMETER  (  VJET =    18.97D0 )
+*
+      COMMON /PRMT/   TS, DT, GAM, CFL,VCT,
+     &                TZ,TR, FTZ,FTR, BSZ,BSR, QTZ,QTR, IS
+      COMMON /ADVC/   ROBMQ, ROBNQ,
+     &                MQ,MQ1,MQ2, NQ,NQ1,NQ2,
+     &                MQFLG, NQFLG
+      COMMON /VAR1/   RO(MP,NP), EN(MP,NP),
+     &                GZ(MP,NP), GR(MP,NP)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+*
+*
+***********************************************************************
+*     COMPUTE LOWER Z-BOUNDARY
+***********************************************************************
+*
+*
+      CON = GAM-1.0D0
+C (0,3)
+      ENJET = PRJET/CON+0.5D0*ROJET*VJET**2
+C (0,4)
+      GZJET = ROJET*VJET
+C (0,5)
+*
+      NPJET = NINT(NP*XLJET/XLR)
+C (0,6)
+*
+!     INITIALLY: DO 100
+      DO J = 1, NPJET
+C (0,7)
+!     INITIALLY: DO 100
+         DO I = 1, 2
+C (0,8)
+C           BEGIN BLOCK
+C (0,9)
+*
+            RO(I,J) = ROJET
+C (0,10)
+            EN(I,J) = ENJET
+C (0,11)
+            GZ(I,J) = GZJET
+C (0,12)
+            GR(I,J) = 0.0D0
+C (0,13)
+*
+100         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,14)
+*
+!     INITIALLY: DO 200
+      DO J = NPJET+1, NQ
+C (0,15)
+C        BEGIN BLOCK
+C (0,16)
+*
+         RO(1,J) = RO(3,J)
+C (0,17)
+         EN(1,J) = EN(3,J)
+C (0,18)
+         GZ(1,J) = -GZ(3,J)
+C (0,19)
+         GR(1,J) = GR(3,J)
+C (0,20)
+*
+         RO(2,J) = RO(3,J)
+C (0,21)
+         EN(2,J) = EN(3,J)
+C (0,22)
+         GZ(2,J) = -GZ(3,J)
+C (0,23)
+         GR(2,J) = GR(3,J)
+C (0,24)
+*
+200      CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,25)
+*
+*
+***********************************************************************
+*     COMPUTE LOWER R-BOUNDARY
+***********************************************************************
+*
+*
+!     INITIALLY: DO 300
+      DO I = 1, MQ
+C (0,26)
+C        BEGIN BLOCK
+C (0,27)
+*
+         RO(I,1) = RO(I,2)
+C (0,28)
+         EN(I,1) = EN(I,2)
+C (0,29)
+         GZ(I,1) = GZ(I,2)
+C (0,30)
+         GR(I,1) = GR(I,2)/DBLE(3.0D0)
+C (0,31)
+*
+300      CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,32)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE BBF
+*
+*
+***********************************************************************
+*
+*     IN THIS SUBROUTINE THE "BOTTOM"-BOUNDARY-VALUES
+*     FOR THE FULL TIME-STEP ARE COMPUTED
+*
+***********************************************************************
+*
+*     VALUES COMPUTED:
+*        -  RON,ENN           ( VALUES AT STAGGERED GRID (2)    )
+*        -  GZN,GRN
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,   NP   =       160 )
+*
+*
+      PARAMETER  ( XLZ =       30.0D0 )
+      PARAMETER  ( XLR =        8.0D0 )
+      PARAMETER  ( XLJET =      1.0D0 )
+      PARAMETER  ( ROJET =      0.1D0 )
+      PARAMETER  ( PRJET =      0.6D0 )
+      PARAMETER  (  VJET =    18.97D0 )
+*
+      COMMON /PRMT/   TS, DT, GAM, CFL,VCT,
+     &                TZ,TR, FTZ,FTR, BSZ,BSR, QTZ,QTR, IS
+      COMMON /ADVC/   ROBMQ, ROBNQ,
+     &                MQ,MQ1,MQ2, NQ,NQ1,NQ2,
+     &                MQFLG, NQFLG
+* DU2 is a dummy              a.w.
+      COMMON /VAR2/   RON(MP,NP), ENN(MP,NP),
+     &                GZN(MP,NP), GRN(MP,NP),
+     &                DU2(4*MP + 4*NP + 4)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+*
+*
+***********************************************************************
+*     COMPUTE LOWER Z-BOUNDARY
+***********************************************************************
+*
+*
+      CON = GAM-DBLE(1.0D0)
+C (0,3)
+      ENJET = PRJET/CON+DBLE(0.5D0)*ROJET*VJET**2
+C (0,4)
+      GZJET = ROJET*VJET
+C (0,5)
+*
+      NPJET = NINT(NP*XLJET/XLR)
+C (0,6)
+*
+!     INITIALLY: DO 100
+      DO J = 1, NPJET
+C (0,7)
+!     INITIALLY: DO 100
+         DO I = 1, 2
+C (0,8)
+C           BEGIN BLOCK
+C (0,9)
+*
+            RON(I,J) = ROJET
+C (0,10)
+            ENN(I,J) = ENJET
+C (0,11)
+            GZN(I,J) = GZJET
+C (0,12)
+            GRN(I,J) = 0.0D0
+C (0,13)
+*
+100         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,14)
+*
+!     INITIALLY: DO 200
+      DO J = NPJET+1, NQ
+C (0,15)
+C        BEGIN BLOCK
+C (0,16)
+*
+         RON(1,J) = RON(3,J)
+C (0,17)
+         ENN(1,J) = ENN(3,J)
+C (0,18)
+         GZN(1,J) = -GZN(3,J)
+C (0,19)
+         GRN(1,J) = GRN(3,J)
+C (0,20)
+*
+         RON(2,J) = RON(3,J)
+C (0,21)
+         ENN(2,J) = ENN(3,J)
+C (0,22)
+         GZN(2,J) = -GZN(3,J)
+C (0,23)
+         GRN(2,J) = GRN(3,J)
+C (0,24)
+*
+200      CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,25)
+*
+*
+***********************************************************************
+*     COMPUTE LOWER R-BOUNDARY
+***********************************************************************
+*
+*
+!     INITIALLY: DO 300
+      DO I = 1, MQ
+C (0,26)
+C        BEGIN BLOCK
+C (0,27)
+*
+         RON(I,1) = RON(I,2)
+C (0,28)
+         ENN(I,1) = ENN(I,2)
+C (0,29)
+         GZN(I,1) = GZN(I,2)
+C (0,30)
+         GRN(I,1) = GRN(I,2)/DBLE(3.0D0)
+C (0,31)
+*
+300      CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,32)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE GRIDCO
+*
+*
+***********************************************************************
+*
+*     IN THIS SUBROUTINE THE GRID IS CONSTRUCTED
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        -  TX      ( MINIMAL GRID SPACING                  )
+*        -  FTX     ( POSITION OF LOWER BOUNDARY            )
+*        -  BSX     ( BIAS OF EXPONENTIAL PART OF GRID      )
+*        -  QTX     ( FRACTION OF GRID WHICH IS EQUIDISTANT )
+*     VALUES COMPUTED:
+*        -  X       ( POSITION OF MESH-POINTS               )
+*        -  XB      ( POSITION OF CELL-BOUNDARIES           )
+*        -  DX      ( DISTANCE BETWEEN CELL-BOUNDARIES      )
+*        -  DBX     ( DISTANCE BETWEEN MESH-POINTS          )
+*        -  FX      ( INTERPOLATION WEIGHTS                 )
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+      PARAMETER  ( M1   =   MP - 1 ,   N1   =   NP - 1 )
+*
+      COMMON /PRMT/   TS, DT, GAM, CFL,VCT,
+     &                TZ,TR, FTZ,FTR, BSZ,BSR, QTZ,QTR, IS
+      COMMON /GRID/   Z(MP), ZB(0:MP), DZ(MP), DBZ(0:MP), FZ(M1),
+     &                R(NP), RB(0:NP), DR(NP), DBR(0:NP), FR(N1),
+     &                DUM(8)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+* Dum is a dummy             a.w.
+*
+*
+***********************************************************************
+*     COMPUTE AND CHECK VALUES OF GRID-PARAMETERS
+***********************************************************************
+*
+*
+      MH = INT(QTZ*MP)
+C (0,3)
+      NH = INT(QTR*NP)
+C (0,4)
+*
+      IF (MH.LT.1) THEN
+C (0,5)
+         MH = 1
+      ELSE
+C (0,6)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,7)
+      IF (NH.LT.1) THEN
+C (0,8)
+         NH = 1
+      ELSE
+C (0,9)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,10)
+      IF (MH.GT.MP) THEN
+C (0,11)
+         MH = MP
+      ELSE
+C (0,12)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,13)
+      IF (NH.GT.NP) THEN
+C (0,14)
+         NH = NP
+      ELSE
+C (0,15)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,16)
+      IF (BSZ.LE.0.0) THEN
+C (0,17)
+         BSZ = 1.0D0
+      ELSE
+C (0,18)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,19)
+      IF (BSR.LE.0.0) THEN
+C (0,20)
+         BSR = 1.0D0
+      ELSE
+C (0,21)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,22)
+*
+*
+***********************************************************************
+*     COMPUTE Z-GRID
+***********************************************************************
+*
+*
+!     INITIALLY: DO 100
+      DO I = 1, MH
+C (0,23)
+C        BEGIN BLOCK
+C (0,24)
+         Z(I) = TZ*(I-DBLE(0.5D0))+FTZ
+C (0,25)
+100      CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,26)
+      WIDO = DBLE(0.5D0)*TZ
+C (0,27)
+!     INITIALLY: DO 105
+      DO I = MH+1, MP
+C (0,28)
+C        BEGIN BLOCK
+C (0,29)
+         WIDN = DBLE(0.5D0)*TZ*BSZ**(I-MH)
+C (0,30)
+         Z(I) = Z(I-1)+WIDO+WIDN
+C (0,31)
+         WIDO = WIDN
+C (0,32)
+105      CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,33)
+*
+      ZB(0) = FTZ
+C (0,34)
+!     INITIALLY: DO 110
+      DO I = 1, MP
+C (0,35)
+C        BEGIN BLOCK
+C (0,36)
+         ZB(I) = Z(I)+Z(I)-ZB(I-1)
+C (0,37)
+110      CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,38)
+*
+!     INITIALLY: DO 120
+      DO I = 1, MP
+C (0,39)
+C        BEGIN BLOCK
+C (0,40)
+         DZ(I) = ZB(I)-ZB(I-1)
+C (0,41)
+120      CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,42)
+*
+!     INITIALLY: DO 130
+      DO I = 1, M1
+C (0,43)
+C        BEGIN BLOCK
+C (0,44)
+         DBZ(I) = Z(I+1)-Z(I)
+C (0,45)
+         FZ(I) = (ZB(I)-Z(I))/(Z(I+1)-Z(I))
+C (0,46)
+130      CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,47)
+      DBZ(0) = DBZ(1)
+C (0,48)
+      DBZ(MP) = DBZ(M1)
+C (0,49)
+*
+*
+***********************************************************************
+*     COMPUTE R-GRID
+***********************************************************************
+*
+*
+!     INITIALLY: DO 200
+      DO J = 1, NH
+C (0,50)
+C        BEGIN BLOCK
+C (0,51)
+         R(J) = TR*(J-DBLE(0.5D0))+FTR
+C (0,52)
+200      CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,53)
+      WIDO = DBLE(0.5D0)*TR
+C (0,54)
+!     INITIALLY: DO 205
+      DO J = NH+1, NP
+C (0,55)
+C        BEGIN BLOCK
+C (0,56)
+         WIDN = DBLE(0.5D0)*TR*BSR**(J-NH)
+C (0,57)
+         R(J) = R(J-1)+WIDO+WIDN
+C (0,58)
+         WIDO = WIDN
+C (0,59)
+205      CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,60)
+*
+      RB(0) = FTR
+C (0,61)
+!     INITIALLY: DO 210
+      DO J = 1, NP
+C (0,62)
+C        BEGIN BLOCK
+C (0,63)
+         RB(J) = R(J)+R(J)-RB(J-1)
+C (0,64)
+210      CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,65)
+*
+!     INITIALLY: DO 220
+      DO J = 1, NP
+C (0,66)
+C        BEGIN BLOCK
+C (0,67)
+         DR(J) = RB(J)-RB(J-1)
+C (0,68)
+220      CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,69)
+*
+!     INITIALLY: DO 230
+      DO J = 1, N1
+C (0,70)
+C        BEGIN BLOCK
+C (0,71)
+         DBR(J) = R(J+1)-R(J)
+C (0,72)
+         FR(J) = (RB(J)-R(J))/(R(J+1)-R(J))
+C (0,73)
+230      CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,74)
+      DBR(0) = DBR(1)
+C (0,75)
+      DBR(NP) = DBR(N1)
+C (0,76)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE TISTEP
+*
+***********************************************************************
+*
+*     IN THIS SUBROUTINE THE TIMESTEP IS COMPUTED
+*     (CFL-CONDITION & DIFFUSION TIME SCALE & PRESSURE GRADIENT)
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        - GAM, CFL,VCT, IS,TS, DZ,DR
+*        - RO,PR, VZ,VR
+*     VALUES USED AS TEMPORARY STORAGE:
+*        - DPZ,DPR   ( PRESSURE DIFFERENCES     )
+*        - DVZ,DVR   ( VELOCITY DIFFERENCES     )
+*        - TST       ( TIME STEPS FOR EACH CELL )
+*     VALUES COMPUTED:
+*        - DT, IS,TS
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+      PARAMETER  ( MN   =   MP * NP )
+      PARAMETER  ( M1   =   MP - 1 ,   N1   =   NP - 1 )
+*
+      COMMON /PRMT/   TS, DT, GAM, CFL,VCT,
+     &                TZ,TR, FTZ,FTR, BSZ,BSR, QTZ,QTR, IS
+      COMMON /ADVC/   ROBMQ, ROBNQ,
+     &                MQ,MQ1,MQ2, NQ,NQ1,NQ2,
+     &                MQFLG, NQFLG
+      COMMON /GRID/   Z(MP), ZB(0:MP), DZ(MP), DBZ(0:MP), FZ(M1),
+     &                R(NP), RB(0:NP), DR(NP), DBR(0:NP), FR(N1),
+     &                DUM(8)
+* Dum is a dummy             a.w.
+      COMMON /VAR1/   RO (MP,NP), EN (MP,NP),
+     &                GZ (MP,NP), GR (MP,NP)
+* DU3 is a dummy             a.w.
+      COMMON /VARH/   VZ (MP,NP), VR (MP,NP),
+     &                PR (MP,NP), TST(MN),
+     &                DU3(4*MP + 4*NP + 4)
+* DU4 is a dummy               a.w.
+      COMMON /SCRA/   DPZ(MP,NP), DPR(MP,NP),
+     &                DVZ(MP,NP), DVR(MP,NP),
+     &                DU4(4*MP + 4*NP + 4)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+*
+*
+***********************************************************************
+*     COMPUTE DIFFERENCES OF PRESSURE
+***********************************************************************
+*
+*
+!     INITIALLY: DO 200
+      DO J = 1, NQ
+C (0,3)
+!     INITIALLY: DO 200
+         DO I = 2, MQ1
+C (0,4)
+C           BEGIN BLOCK
+C (0,5)
+            DPZ(I,J) = DBLE(0.5D0)*ABS(PR(I+1,J)-PR(I-1,J))/RO(I,J)
+C (0,6)
+200         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,7)
+*
+!     INITIALLY: DO 202
+      DO J = 1, NQ
+C (0,8)
+C        BEGIN BLOCK
+C (0,9)
+         DPZ(1,J) = ABS(PR(2,J)-PR(1,J))/RO(1,J)
+C (0,10)
+         DPZ(MQ,J) = ABS(PR(MQ,J)-PR(MQ1,J))/RO(MQ,J)
+C (0,11)
+202      CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,12)
+*
+*
+!     INITIALLY: DO 210
+      DO J = 2, NQ1
+C (0,13)
+!     INITIALLY: DO 210
+         DO I = 1, MQ
+C (0,14)
+C           BEGIN BLOCK
+C (0,15)
+            DPR(I,J) = DBLE(0.5D0)*ABS(PR(I,J+1)-PR(I,J-1))/RO(I,J)
+C (0,16)
+210         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,17)
+*
+!     INITIALLY: DO 212
+      DO I = 1, MQ
+C (0,18)
+C        BEGIN BLOCK
+C (0,19)
+         DPR(I,1) = ABS(PR(I,2)-PR(I,1))/RO(I,1)
+C (0,20)
+         DPR(I,NQ) = ABS(PR(I,NQ)-PR(I,NQ1))/RO(I,NQ)
+C (0,21)
+212      CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,22)
+*
+*
+***********************************************************************
+*     COMPUTE DIFFERENCES OF VELOCITY
+***********************************************************************
+*
+*
+      VC2 = DBLE(2.0D0)*VCT
+C (0,23)
+*
+*
+!     INITIALLY: DO 300
+      DO J = 1, NQ
+C (0,24)
+!     INITIALLY: DO 300
+         DO I = 2, MQ1
+C (0,25)
+C           BEGIN BLOCK
+C (0,26)
+            DVZ(I,J) = VCT*ABS(VZ(I+1,J)-VZ(I-1,J))
+C (0,27)
+300         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,28)
+*
+!     INITIALLY: DO 302
+      DO J = 1, NQ
+C (0,29)
+C        BEGIN BLOCK
+C (0,30)
+         DVZ(1,J) = VC2*ABS(VZ(2,J)-VZ(1,J))
+C (0,31)
+         DVZ(MQ,J) = VC2*ABS(VZ(MQ,J)-VZ(MQ1,J))
+C (0,32)
+302      CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,33)
+*
+*
+!     INITIALLY: DO 310
+      DO J = 2, NQ1
+C (0,34)
+!     INITIALLY: DO 310
+         DO I = 1, MQ
+C (0,35)
+C           BEGIN BLOCK
+C (0,36)
+            DVR(I,J) = VCT*ABS(VR(I,J+1)-VR(I,J-1))
+C (0,37)
+310         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,38)
+*
+!     INITIALLY: DO 312
+      DO I = 1, MQ
+C (0,39)
+C        BEGIN BLOCK
+C (0,40)
+         DVR(I,1) = VC2*ABS(VR(I,2)-VR(I,1))
+C (0,41)
+         DVR(I,NQ) = VC2*ABS(VR(I,NQ)-VR(I,NQ1))
+C (0,42)
+312      CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,43)
+*
+*
+***********************************************************************
+*     COMPUTE TIMESTEP FOR EACH CELL
+***********************************************************************
+*
+*
+      K = 0
+C (0,44)
+*
+!     INITIALLY: DO 400
+      DO J = 1, NQ
+C (0,45)
+!     INITIALLY: DO 400
+         DO I = 1, MQ
+C (0,46)
+C           BEGIN BLOCK
+C (0,47)
+*
+            VSD = SQRT(GAM*PR(I,J)/RO(I,J))
+C (0,48)
+*
+            VZ1 = VSD+ABS(VZ(I,J))+DVZ(I,J)
+C (0,49)
+            VZ2 = VZ1**2
+C (0,50)
+            VR1 = VSD+ABS(VR(I,J))+DVR(I,J)
+C (0,51)
+            VR2 = VR1**2
+C (0,52)
+*
+            XPZ = DBLE(0.25D0)*DPZ(I,J)/VZ2
+C (0,53)
+            XPR = DBLE(0.25D0)*DPR(I,J)/VR2
+C (0,54)
+*
+            IF (XPZ.LT.1.0D-3) THEN
+C (0,55)
+               DPZ(I,J) = 1.0D0
+            ELSE
+C (0,56)
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+C (0,57)
+            IF (XPR.LT.1.0D-3) THEN
+C (0,58)
+               DPR(I,J) = 1.0D0
+            ELSE
+C (0,59)
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+C (0,60)
+*
+            TCZ = DBLE(0.5D0)*DZ(I)/DPZ(I,J)*(SQRT(VZ2+DBLE(4.0D0)*
+     &      DPZ(I,J))-VZ1)
+C (0,61)
+            TCR = DBLE(0.5D0)*DR(J)/DPR(I,J)*(SQRT(VR2+DBLE(4.0D0)*
+     &      DPR(I,J))-VR1)
+C (0,62)
+*
+            IF (XPZ.LT.1.0D-3) THEN
+C (0,63)
+               TCZ = DZ(I)/VZ1*(DBLE(1.0D0)-XPZ)
+            ELSE
+C (0,64)
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+C (0,65)
+            IF (XPR.LT.1.0D-3) THEN
+C (0,66)
+               TCR = DR(J)/VR1*(DBLE(1.0D0)-XPR)
+            ELSE
+C (0,67)
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+C (0,68)
+*
+            K = K+1
+C (0,69)
+            TST(K) = DMIN1(TCZ, TCR)
+C (0,70)
+*
+400         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,71)
+*
+*
+***********************************************************************
+*     COMPUTE NEW TIMESTEP
+*     ADVANCE TIME AND STEP-COUNTER
+***********************************************************************
+*
+*
+      MI = ISMIN(MQ*NQ, TST, 1)
+C (0,72)
+      TC = CFL*TST(MI)
+C (0,73)
+      DT = DBLE(2.0D0)*DT
+C (0,74)
+      IF (TC.LT.DT) THEN
+C (0,75)
+         DT = TC
+      ELSE
+C (0,76)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,77)
+*
+      IF (IS.EQ.0) THEN
+C (0,78)
+         DT = DBLE(0.01D0)*TC
+      ELSE
+C (0,79)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,80)
+*
+      IS = IS+1
+C (0,81)
+      TS = TS+DT
+C (0,82)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE ADVNCE
+*
+*
+***********************************************************************
+*
+*     IN THIS SUBROUTINE THE SOLUTION IS ADVANCED BY ONE TIME-STEP
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        -  DT
+*        -  RO, EN             ( "OLD" - VALUES AT TIMESTEP N      )
+*        -  GZ, GR
+*     VALUES USED AS TEMPORARY STORAGE:
+*        -  RON,ENN            ( "NEW" - VALUES AT HALF TIMESTEP
+*        -  GZN,GRN              T-VALUES AT FULL & HALF TIMESTEP  )
+*     VALUES COMPUTED:
+*        -  RO, EN             ( "NEW" - VALUES AT FULL TIMESTEP   )
+*        -  GZ, GR
+*
+*     REMARKS:  THE CALLING SEQUENCE OF THE SUBROUTINES
+*                         M U S T   N O T
+*               BE CHANGED IN ORDER TO AVOID CATASTROPHIC
+*               MEMORY CONFLICTS IN COMMON /VAR2/ & /VARS/
+*     /VAR2/ :  1.)  UNDEFINED ON ENTRY
+*               2.)  OLD VALUES ON STAGGERED GRID (2) AFTER STAGH1
+*               3.)  HALF TRANSPORTED VALUES AFTER TRANS2 (1ST CALL)
+*               4.)  HALF VALUES AFTER HALF TIMESTEP
+*               5.)  HALF VALUES ON STAGGERED GRID (2) AFTER STAGF1
+*               6.)  NEW TRANSPORTED VALUES AFTER TRANS2 (2ND CALL)
+*               7.)  UNDEFINED ON EXIT
+*     /VARS/ :  1.)  UNDEFINED ON ENTRY
+*               2.)  OLD CORIOLIS FORCES AFTER CORIH
+*               3.)  HALF CORIOLIS FORCES AFTER CORIF
+*               4.)  UNDEFINED ON EXIT
+*     ORDER  :  CALL STAGF1 AFTER  STAGF2
+*               CALL TRANS1 BEFORE TRANS2
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+*
+      COMMON /PRMT/   TS, DT, GAM, CFL,VCT,
+     &                TZ,TR, FTZ,FTR, BSZ,BSR, QTZ,QTR, IS
+      COMMON /VAR1/   RO (MP,NP), EN (MP,NP),
+     &                GZ (MP,NP), GR (MP,NP)
+* DU2 is a dummy              a.w.
+      COMMON /VAR2/   RON(MP,NP), ENN(MP,NP),
+     &                GZN(MP,NP), GRN(MP,NP),
+     &                DU2(4*MP + 4*NP + 4)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+*
+*
+***********************************************************************
+*     COMPUTE HALF TIMESTEP
+***********************************************************************
+*
+*
+*----------------------------------------------------------------------
+*     COMPUTE TIMESTEP AND REGION OF ADVECTION
+*----------------------------------------------------------------------
+*
+      DT = DBLE(0.5D0)*DT
+C (0,3)
+      CALL ADLEN('H')
+C (0,4)
+*
+*----------------------------------------------------------------------
+*     COMPUTE VALUES OF VARAIABLES AT CELL BOUNDARIES
+*----------------------------------------------------------------------
+*
+      CALL BBH
+C (0,5)
+      CALL CORIH
+C (0,6)
+      CALL STAGH2
+C (0,7)
+      CALL STAGH1
+C (0,8)
+*
+*----------------------------------------------------------------------
+*     COMPUTE TRANSPORT
+*----------------------------------------------------------------------
+*
+      CALL TRANS1
+C (0,9)
+      CALL TRANS2
+C (0,10)
+*
+*----------------------------------------------------------------------
+*     COMPUTE FLUX-CORRECTION
+*----------------------------------------------------------------------
+*
+      CALL FCT(RON, RON, RO)
+C (0,11)
+      CALL FCT(ENN, ENN, EN)
+C (0,12)
+      CALL FCT(GZN, GZN, GZ)
+C (0,13)
+      CALL FCT(GRN, GRN, GR)
+C (0,14)
+*
+*
+***********************************************************************
+*     COMPUTE FULL TIMESTEP
+***********************************************************************
+*
+*
+*----------------------------------------------------------------------
+*     COMPUTE TIMESTEP AND REGION OF ADVECTION
+*----------------------------------------------------------------------
+*
+      DT = DBLE(2.0D0)*DT
+C (0,15)
+      CALL ADLEN('F')
+C (0,16)
+*
+*----------------------------------------------------------------------
+*     COMPUTE VALUES OF VARAIABLES AT CELL BOUNDARIES
+*----------------------------------------------------------------------
+*
+      CALL BBF
+C (0,17)
+      CALL CORIF
+C (0,18)
+      CALL STAGF2
+C (0,19)
+      CALL STAGF1
+C (0,20)
+*
+*----------------------------------------------------------------------
+*     COMPUTE TRANSPORT
+*----------------------------------------------------------------------
+*
+      CALL TRANS1
+C (0,21)
+      CALL TRANS2
+C (0,22)
+*
+*----------------------------------------------------------------------
+*     COMPUTE FLUX-CORRECTION
+*----------------------------------------------------------------------
+*
+      CALL FCT(RO, RON, RO)
+C (0,23)
+      CALL FCT(EN, ENN, EN)
+C (0,24)
+      CALL FCT(GZ, GZN, GZ)
+C (0,25)
+      CALL FCT(GR, GRN, GR)
+C (0,26)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE ADLEN (STEP)
+*
+*
+***********************************************************************
+*
+*     IN THIS SUBROUTINE THE UPPER BOUNDARY
+*     (MAXIMUM INDEX) FOR THE Z- AND R-ADVECTION ARE COMPUTED
+*     IF MQFLG=1 THE Z-ADVECTION IS SKIPPED IN THE RIGHT PART
+*     AND IF NQFLG=1 THE R-ADVECTION IS SKIPPED IN THE
+*     UPPER PART OF THE GRID TO SAVE COMPUTATION TIME
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        -  MQFLG, NQFLG
+*        -  ROBMQ, ROBNQ
+*        -  RO
+*     VALUES COMPUTED:
+*        -  MQ,MQ1,MQ2
+*        -  NQ,NQ1,NQ2
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+      PARAMETER  ( M1   =   MP - 1 ,   N1   =   NP - 1 )
+      PARAMETER  ( M2   =   MP - 2 ,   N2   =   NP - 2 )
+      PARAMETER  ( MN   =   MP * NP )
+*
+      CHARACTER  STEP
+*
+      COMMON /ADVC/   ROBMQ, ROBNQ,
+     &                MQ,MQ1,MQ2, NQ,NQ1,NQ2,
+     &                MQFLG, NQFLG
+      COMMON /VAR1/   RO(MP,NP), EN(MP,NP),
+     &                GZ(MP,NP), GR(MP,NP)
+* DU4 is a dummy               a.w.
+      COMMON /SCRA/   H1(MP), H2(NP),
+     &                DU4(4*MP*NP + 3*MP + 3*NP + 4)
+C (0,1)
+C     BEGIN UNSTRUCTURED
+C (1,1)
+*
+***********************************************************************
+*     DETERMINE IF CALLED FOR HALF OF FULL TIMESTEP
+***********************************************************************
+*
+*
+      IF (STEP.NE.'H') GOTO 100
+C (4,1)
+C     BEGIN BLOCK
+C (4,2)
+*
+*
+***********************************************************************
+*     HALF TIMESTEP
+***********************************************************************
+*
+*
+*----------------------------------------------------------------------
+*     LIMIT Z-ADVECTION
+*----------------------------------------------------------------------
+*
+      IF (MQFLG.EQ.1) THEN
+C (4,3)
+C        BEGIN BLOCK
+C (4,4)
+!     INITIALLY: DO 10
+         DO I = 1, MP
+C (4,5)
+C           BEGIN BLOCK
+C (4,6)
+            H1(I) = RO(MP-I+1,1)
+C (4,7)
+10          CONTINUE
+C           END BLOCK
+         ENDDO
+C (4,8)
+         MQ = ISFNE(MP, H1, 1, ROBMQ)
+C (4,9)
+         MQ = MIN0(MP, MP-MQ+11)
+C (4,10)
+         MQ1 = MQ-1
+C (4,11)
+         MQ2 = MQ-2
+C        END BLOCK
+      ELSE
+C (4,12)
+C        BEGIN BLOCK
+C (4,13)
+         MQ = MP
+C (4,14)
+         MQ1 = M1
+C (4,15)
+         MQ2 = M2
+C        END BLOCK
+      ENDIF
+C (4,16)
+*
+*----------------------------------------------------------------------
+*     LIMIT R-ADVECTION
+*----------------------------------------------------------------------
+*
+      IF (NQFLG.EQ.1) THEN
+C (4,17)
+C        BEGIN BLOCK
+C (4,18)
+!     INITIALLY: DO 20
+         DO J = 1, NP
+C (4,19)
+C           BEGIN BLOCK
+C (4,20)
+            H2(J) = RO(1,NP-J+1)
+C (4,21)
+20          CONTINUE
+C           END BLOCK
+         ENDDO
+C (4,22)
+         NQ = ISFNE(NP, H2, 1, ROBNQ)
+C (4,23)
+         NQ = MIN0(NP, NP-NQ+11)
+C (4,24)
+         NQ1 = NQ-1
+C (4,25)
+         NQ2 = NQ-2
+C        END BLOCK
+      ELSE
+C (4,26)
+C        BEGIN BLOCK
+C (4,27)
+         NQ = NP
+C (4,28)
+         NQ1 = N1
+C (4,29)
+         NQ2 = N2
+C        END BLOCK
+      ENDIF
+
+
+*
+*----------------------------------------------------------------------
+*     RETURN TO ROUTINE ADVNCE
+*----------------------------------------------------------------------
+*
+C     END BLOCK
+      RETURN
+C (2,1)
+C     BEGIN BLOCK
+C (2,2)
+*
+*
+***********************************************************************
+*     FULL TIMESTEP
+***********************************************************************
+*
+*
+100   CONTINUE
+C (2,3)
+*
+*----------------------------------------------------------------------
+*     DIMINISH ADVECTION LENGTHES BY ONE
+*----------------------------------------------------------------------
+*
+      IF (MQFLG.EQ.1.AND.MQ.LT.MP) THEN
+C (2,4)
+C        BEGIN BLOCK
+C (2,5)
+         MQ = MQ-1
+C (2,6)
+         MQ1 = MQ1-1
+C (2,7)
+         MQ2 = MQ2-1
+C        END BLOCK
+      ELSE
+C (2,8)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (2,9)
+*
+      IF (NQFLG.EQ.1.AND.NQ.LT.NP) THEN
+C (2,10)
+C        BEGIN BLOCK
+C (2,11)
+         NQ = NQ-1
+C (2,12)
+         NQ1 = NQ1-1
+C (2,13)
+         NQ2 = NQ2-1
+C        END BLOCK
+      ELSE
+C (2,14)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+*
+*----------------------------------------------------------------------
+*     RETURN TO ROUTINE ADVNCE
+*----------------------------------------------------------------------
+*
+C     END BLOCK
+C (3,1)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END UNSTRUCTURED
+      END
+      SUBROUTINE CORIH
+*
+*
+***********************************************************************
+*
+*     IN THIS SUBROUTINE THE CORIOLIS FORCES ARE COMPUTED
+*     FROM THE "OLD" VALUES FOR THE HALF TIME STEP
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        -  RO,EN             ( VALUES BEFORE TRANSPORT         )
+*        -  GZ,GR
+*     VALUES COMPUTED:
+*        -  CHGR              ( CORIOLIS FORCES                 )
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+      PARAMETER  ( M1   =   MP - 1 ,   N1   =   NP - 1 )
+*
+      COMMON /PRMT/   TS, DT, GAM, CFL,VCT,
+     &                TZ,TR, FTZ,FTR, BSZ,BSR, QTZ,QTR, IS
+      COMMON /ADVC/   ROBMQ, ROBNQ,
+     &                MQ,MQ1,MQ2, NQ,NQ1,NQ2,
+     &                MQFLG, NQFLG
+      COMMON /CUTP/   PRCUT, NEGFL, NEGCN, NEGPR, NEGPO(1000)
+      COMMON /GRID/   Z(MP), ZB(0:MP), DZ(MP), DBZ(0:MP), FZ(M1),
+     &                R(NP), RB(0:NP), DR(NP), DBR(0:NP), FR(N1),
+     &                DUM(8)
+* Dum is a dummy             a.w.
+      COMMON /VAR1/   RO(MP,NP), EN(MP,NP),
+     &                GZ(MP,NP), GR(MP,NP)
+      COMMON /VARS/   CHGR(MP,NP)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+*
+*
+***********************************************************************
+*
+*
+      CON = GAM-DBLE(1.0D0)
+C (0,3)
+*
+*
+!     INITIALLY: DO 100
+      DO J = 1, NQ
+C (0,4)
+!     INITIALLY: DO 100
+         DO I = 1, MQ
+C (0,5)
+C           BEGIN BLOCK
+C (0,6)
+*
+            PR = CON*(EN(I,J)-DBLE(0.5D0)*(GZ(I,J)**2+GR(I,J)**2)/RO(
+     &      I,J))
+C (0,7)
+*
+            IF (PR.LT.PRCUT) THEN
+C (0,8)
+               PR = PRCUT
+            ELSE
+C (0,9)
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+C (0,10)
+*
+            CHGR(I,J) = -PR/R(J)
+C (0,11)
+*
+100         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,12)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE STAGH1
+*
+*
+***********************************************************************
+*
+*     IN THIS SUBROUTINE THE VALUES ON THE STAGGERED GRID (1)
+*     ARE COMPUTED FROM THE "OLD" VALUES FOR THE HALF TIME STEP
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        -  RO ,EN            ( VALUES BEFORE TRANSPORT         )
+*        -  GZ ,GR
+*     VALUES COMPUTED:
+*        -  RO1,EN1           ( VALUES AT STAGGERED GRID (1)    )
+*        -  GZ1,GR1
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+*
+      COMMON /VAR1/   RO(MP,NP), EN(MP,NP),
+     &                GZ(MP,NP), GR(MP,NP)
+* DU2 is a dummy              a.w.
+      COMMON /VAR2/   RO1(0:MP,NP), EN1(0:MP,NP),
+     &                GZ1(0:MP,NP), GR1(0:MP,NP),
+     &                DU2(4*MP + 4)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+*
+*
+***********************************************************************
+*     COMPUTE VALUES ON STAGGERED GRID (1)
+***********************************************************************
+*
+*
+      CALL S1(RO1, RO)
+C (0,3)
+      CALL S1(EN1, EN)
+C (0,4)
+      CALL S1(GZ1, GZ)
+C (0,5)
+      CALL S1(GR1, GR)
+C (0,6)
+*
+*
+***********************************************************************
+*     COMPUTE BOUNDARY-VALUES ON STAGGERED GRID (1)
+***********************************************************************
+*
+*
+      CALL B1(RO1, RO, 'RO')
+C (0,7)
+      CALL B1(EN1, EN, 'EN')
+C (0,8)
+      CALL B1(GZ1, GZ, 'GZ')
+C (0,9)
+      CALL B1(GR1, GR, 'GR')
+C (0,10)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE STAGH2
+*
+*
+***********************************************************************
+*
+*     IN THIS SUBROUTINE THE VALUES ON THE STAGGERED GRID (2)
+*     ARE COMPUTED FROM THE "OLD" VALUES FOR THE HALF TIME STEP
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        -  RO ,EN            ( VALUES BEFORE TRANSPORT         )
+*        -  GZ ,GR
+*     VALUES COMPUTED:
+*        -  RO2,EN2           ( VALUES AT STAGGERED GRID (2)    )
+*        -  GZ2,GR2
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+*
+      COMMON /VAR1/   RO(MP,NP), EN(MP,NP),
+     &                GZ(MP,NP), GR(MP,NP)
+* DU4 is a dummy               a.w.
+      COMMON /SCRA/   RO2(MP,0:NP), EN2(MP,0:NP),
+     &                GZ2(MP,0:NP), GR2(MP,0:NP),
+     &                DU4(4*NP + 4)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+*
+*
+***********************************************************************
+*     COMPUTE VALUES ON STAGGERED GRID (2)
+***********************************************************************
+*
+*
+      CALL S2(RO2, RO)
+C (0,3)
+      CALL S2(EN2, EN)
+C (0,4)
+      CALL S2(GZ2, GZ)
+C (0,5)
+      CALL S2(GR2, GR)
+C (0,6)
+*
+*
+***********************************************************************
+*     COMPUTE BOUNDARY-VALUES ON STAGGERED GRID (2)
+*     LOWER BOUNDARY:   Z-AXIS
+***********************************************************************
+*
+*
+      CALL B2(RO2, RO, 'RO')
+C (0,7)
+      CALL B2(EN2, EN, 'EN')
+C (0,8)
+      CALL B2(GZ2, GZ, 'GZ')
+C (0,9)
+      CALL B2(GR2, GR, 'GR')
+C (0,10)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE CORIF
+*
+*
+***********************************************************************
+*
+*     IN THIS SUBROUTINE THE CORIOLIS FORCES ARE COMPUTED
+*     FROM THE "NEW" VALUES FOR THE FULL TIME STEP
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        -  RON,ENN           ( VALUES AFTER HALF TIME STEP     )
+*        -  GZN,GRN
+*     VALUES COMPUTED:
+*        -  CHGR              ( CORIOLIS FORCES                 )
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+      PARAMETER  ( M1   =   MP - 1 ,   N1   =   NP - 1 )
+*
+      COMMON /PRMT/   TS, DT, GAM, CFL,VCT,
+     &                TZ,TR, FTZ,FTR, BSZ,BSR, QTZ,QTR, IS
+      COMMON /ADVC/   ROBMQ, ROBNQ,
+     &                MQ,MQ1,MQ2, NQ,NQ1,NQ2,
+     &                MQFLG, NQFLG
+      COMMON /CUTP/   PRCUT, NEGFL, NEGCN, NEGPR, NEGPO(1000)
+      COMMON /GRID/   Z(MP), ZB(0:MP), DZ(MP), DBZ(0:MP), FZ(M1),
+     &                R(NP), RB(0:NP), DR(NP), DBR(0:NP), FR(N1),
+     &                DUM(8)
+* Dum is a dummy             a.w.
+* DU2 is a dummy              a.w.
+      COMMON /VAR2/   RON(MP,NP), ENN(MP,NP),
+     &                GZN(MP,NP), GRN(MP,NP),
+     &                DU2(4*MP + 4*NP + 4)
+      COMMON /VARS/   CHGR(MP,NP)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+*
+*
+***********************************************************************
+*
+*
+      CON = GAM-DBLE(1.0D0)
+C (0,3)
+*
+*
+!     INITIALLY: DO 100
+      DO J = 1, NQ
+C (0,4)
+!     INITIALLY: DO 100
+         DO I = 1, MQ
+C (0,5)
+C           BEGIN BLOCK
+C (0,6)
+*
+            PRN = CON*(ENN(I,J)-DBLE(0.5D0)*(GZN(I,J)**2+GRN(I,J)**2)
+     &      /RON(I,J))
+C (0,7)
+*
+            IF (PRN.LT.PRCUT) THEN
+C (0,8)
+               PRN = PRCUT
+            ELSE
+C (0,9)
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+C (0,10)
+*
+            CHGR(I,J) = -PRN/R(J)
+C (0,11)
+*
+100         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,12)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE STAGF1
+*
+*
+***********************************************************************
+*
+*     IN THIS SUBROUTINE THE VALUES ON THE STAGGERED GRID (1)
+*     ARE COMPUTED FROM THE "NEW" VALUES FOR THE FULL TIME STEP
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        -  RON,ENN           ( VALUES AFTER HALF TIME STEP
+*        -  GZN,GRN             -> OVERWITTEN BY THE COMPUTED VALUES )
+*     VALUES USED AS TEMPORARY STORAGE:
+*        -  HH                ( TEMPORARY STORAGE                    )
+*     VALUES COMPUTED:
+*        -  RO1,EN1           ( VALUES AT STAGGERED GRID (1)         )
+*        -  GZ1,GR1
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+*
+      COMMON /ADVC/   ROBMQ, ROBNQ,
+     &                MQ,MQ1,MQ2, NQ,NQ1,NQ2,
+     &                MQFLG, NQFLG
+* DU3 is a dummy             a.w.
+      COMMON /VARH/   HH(0:MP,NP),
+     &                DU3(3*MP*NP + 4*MP + 3*NP + 4)
+*
+***********************************************************************
+*     SHARE COMMON /VAR2/ BETWEEN "NEW" AND "STAGGERED" VALUES
+*     ATTENTION:   THE ARRAYS FOR "NEW" VALUES ARE SHORTER
+*                  THAN THE ARRAYS FOR THE "STAGGERED" VALUES
+*                  THUS NO MEMORY CONFLICT CAN OCCUR
+*                  IF A "NEW" VALUE ISN'T USED AFTER AVERAGING
+*                  AND IF THE SEQUENCE OF THE OPERATIONS ISN'T CHANGED
+*                  BECAUSE THE "STAGGERED" VALUES ARE WRITTEN INTO
+*                  COMMON /CONT/ "BOTTOM UP"
+*                  TO PREVENT LOSS OF INFORMATION AN INTERMEDIATE
+*                  ARRAY HH IS USED TO ASSEMBLE THE "STAGGERED" VALUES
+***********************************************************************
+*
+*
+      COMMON /VAR2/   H( 4 * (MP+1) * (NP+1) )
+*
+      DIMENSION       RO1(0:MP,NP), EN1(0:MP,NP),
+     &                GZ1(0:MP,NP), GR1(0:MP,NP)
+      DIMENSION       RON(MP,NP), ENN(MP,NP),
+     &                GZN(MP,NP), GRN(MP,NP)
+*
+      EQUIVALENCE  (  H(             1 )  ,  RO1(0,1)  )    ,
+     &             (  H(   (MP+1)*NP+1 )  ,  EN1(0,1)  )    ,
+     &             (  H( 2*(MP+1)*NP+1 )  ,  GZ1(0,1)  )    ,
+     &             (  H( 3*(MP+1)*NP+1 )  ,  GR1(0,1)  )
+      EQUIVALENCE  (  H(             1 )  ,  RON(1,1)  )    ,
+     &             (  H(    MP*   NP+1 )  ,  ENN(1,1)  )    ,
+     &             (  H( 2* MP*   NP+1 )  ,  GZN(1,1)  )    ,
+     &             (  H( 3* MP*   NP+1 )  ,  GRN(1,1)  )
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+*
+*
+***********************************************************************
+*     COMPUTE INTERPOLATED VALUES OF R-MOMENTUM
+***********************************************************************
+*
+*
+      CALL S1(HH, GRN)
+C (0,3)
+      CALL B1(HH, GRN, 'GR')
+C (0,4)
+*
+!     INITIALLY: DO 400
+      DO J = 1, NQ
+C (0,5)
+!     INITIALLY: DO 400
+         DO I = 0, MQ
+C (0,6)
+C           BEGIN BLOCK
+C (0,7)
+            GR1(I,J) = HH(I,J)
+C (0,8)
+400         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,9)
+*
+*
+***********************************************************************
+*     COMPUTE INTERPOLATED VALUES OF Z-MOMENTUM
+***********************************************************************
+*
+*
+      CALL S1(HH, GZN)
+C (0,10)
+      CALL B1(HH, GZN, 'GZ')
+C (0,11)
+*
+!     INITIALLY: DO 300
+      DO J = 1, NQ
+C (0,12)
+!     INITIALLY: DO 300
+         DO I = 0, MQ
+C (0,13)
+C           BEGIN BLOCK
+C (0,14)
+            GZ1(I,J) = HH(I,J)
+C (0,15)
+300         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,16)
+*
+*
+***********************************************************************
+*     COMPUTE INTERPOLATED VALUES OF ENERGY
+***********************************************************************
+*
+*
+      CALL S1(HH, ENN)
+C (0,17)
+      CALL B1(HH, ENN, 'EN')
+C (0,18)
+*
+!     INITIALLY: DO 200
+      DO J = 1, NQ
+C (0,19)
+!     INITIALLY: DO 200
+         DO I = 0, MQ
+C (0,20)
+C           BEGIN BLOCK
+C (0,21)
+            EN1(I,J) = HH(I,J)
+C (0,22)
+200         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,23)
+*
+*
+***********************************************************************
+*     COMPUTE INTERPOLATED VALUES OF DENSITY
+***********************************************************************
+*
+*
+      CALL S1(HH, RON)
+C (0,24)
+      CALL B1(HH, RON, 'RO')
+C (0,25)
+*
+!     INITIALLY: DO 100
+      DO J = 1, NQ
+C (0,26)
+!     INITIALLY: DO 100
+         DO I = 0, MQ
+C (0,27)
+C           BEGIN BLOCK
+C (0,28)
+            RO1(I,J) = HH(I,J)
+C (0,29)
+100         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,30)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE STAGF2
+*
+*
+***********************************************************************
+*
+*     IN THIS SUBROUTINE THE VALUES ON THE STAGGERED GRID (2)
+*     ARE COMPUTED FROM THE "NEW" VALUES FOR THE FULL TIME STEP
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        -  RON,ENN           ( VALUES AFTER HALF TIME STEP     )
+*        -  GZN,GRN
+*     VALUES COMPUTED:
+*        -  RO2,EN2           ( VALUES AT STAGGERED GRID (2)    )
+*        -  GZ2,GR2
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+*
+* DU2 is a dummy              a.w.
+      COMMON /VAR2/   RON(MP,NP), ENN(MP,NP),
+     &                GZN(MP,NP), GRN(MP,NP),
+     &                DU2(4*MP + 4*NP + 4)
+* DU4 is a dummy               a.w.
+      COMMON /SCRA/   RO2(MP,0:NP), EN2(MP,0:NP),
+     &                GZ2(MP,0:NP), GR2(MP,0:NP),
+     &                DU4(4*NP + 4)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+*
+*
+***********************************************************************
+*     COMPUTE VALUES ON STAGGERED GRID (2)
+***********************************************************************
+*
+*
+      CALL S2(RO2, RON)
+C (0,3)
+      CALL S2(EN2, ENN)
+C (0,4)
+      CALL S2(GZ2, GZN)
+C (0,5)
+      CALL S2(GR2, GRN)
+C (0,6)
+*
+*
+***********************************************************************
+*     COMPUTE BOUNDARY-VALUES ON STAGGERED GRID (2)
+*     LOWER BOUNDARY:   Z-AXIS
+***********************************************************************
+*
+*
+      CALL B2(RO2, RON, 'RO')
+C (0,7)
+      CALL B2(EN2, ENN, 'EN')
+C (0,8)
+      CALL B2(GZ2, GZN, 'GZ')
+C (0,9)
+      CALL B2(GR2, GRN, 'GR')
+C (0,10)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE S1 ( U1 , U )
+*
+*
+***********************************************************************
+*
+*     IN THIS SUBROUTINE THE VALUES
+*     ON THE STAGGERED GRID (1) ARE COMPUTED
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        -  U      ( VALUES AT CENTER OF CELL          )
+*        -  FZ     ( INTERPOLATION WEIGHTS             )
+*     VALUES COMPUTED:
+*        -  U1     ( INTERPOLATED VALUES ON GRID (1)   )
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+      PARAMETER  ( M1   =   MP - 1 ,   N1   =   NP - 1 )
+*
+      DIMENSION  U1(0:MP,NP), U(MP,NP)
+*
+      COMMON /ADVC/   ROBMQ, ROBNQ,
+     &                MQ,MQ1,MQ2, NQ,NQ1,NQ2,
+     &                MQFLG, NQFLG
+      COMMON /GRID/   Z(MP), ZB(0:MP), DZ(MP), DBZ(0:MP), FZ(M1),
+     &                R(NP), RB(0:NP), DR(NP), DBR(0:NP), FR(N1),
+     &                DUM(8)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+* Dum is a dummy             a.w.
+*
+*
+***********************************************************************
+*
+*
+      MH = MIN0(MQ, M1)
+C (0,3)
+*
+!     INITIALLY: DO 100
+      DO J = 1, NQ
+C (0,4)
+!     INITIALLY: DO 100
+         DO I = 1, MH
+C (0,5)
+C           BEGIN BLOCK
+C (0,6)
+            U1(I,J) = FZ(I)*(U(I+1,J)-U(I,J))+U(I,J)
+C (0,7)
+100         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,8)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE S2 ( U2 , U )
+*
+*
+***********************************************************************
+*
+*     IN THIS SUBROUTINE THE VALUES
+*     ON THE STAGGERED GRID (2) ARE COMPUTED
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        -  U      ( VALUES AT CENTER OF CELL          )
+*        -  FR     ( INTERPOLATION WEIGHTS             )
+*     VALUES COMPUTED:
+*        -  U2     ( INTERPOLATED VALUES ON GRID (2)   )
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+      PARAMETER  ( M1   =   MP - 1 ,   N1   =   NP - 1 )
+*
+      DIMENSION  U2(MP,0:NP), U(MP,NP)
+*
+      COMMON /ADVC/   ROBMQ, ROBNQ,
+     &                MQ,MQ1,MQ2, NQ,NQ1,NQ2,
+     &                MQFLG, NQFLG
+      COMMON /GRID/   Z(MP), ZB(0:MP), DZ(MP), DBZ(0:MP), FZ(M1),
+     &                R(NP), RB(0:NP), DR(NP), DBR(0:NP), FR(N1),
+     &                DUM(8)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+* Dum is a dummy             a.w.
+*
+*
+***********************************************************************
+*
+*
+      NH = MIN0(NQ, N1)
+C (0,3)
+*
+!     INITIALLY: DO 100
+      DO J = 1, NH
+C (0,4)
+!     INITIALLY: DO 100
+         DO I = 1, MQ
+C (0,5)
+C           BEGIN BLOCK
+C (0,6)
+            U2(I,J) = FR(J)*(U(I,J+1)-U(I,J))+U(I,J)
+C (0,7)
+100         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,8)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE B1 ( U1 , U , VAR )
+*
+*
+***********************************************************************
+*
+*     IN THIS SUBROUTINE THE BOUNDARY VALUES
+*     ON THE STAGGERED GRID (1) ARE COMPUTED
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        -  ZL,ZU  ( TYPE OF BOUNDARIES            )
+*        -  U      ( VALUES AT CENTER OF CELL      )
+*     VALUES USED AS TEMPORARY STORAGE:
+*        -  TYPX   ( TYPE OF BOUNDARY:
+*                    C  ...  ZERO VALUE
+*                    O  ...  ZERO DERIVATIVE       )
+*                    L=LOWER & U=UPPER BOUNDARY    )
+*     VALUES COMPUTED:
+*        -  U1     ( BOUNDARY VALUES ON GRID (1)   )
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+      PARAMETER  ( M1   =   MP - 1 ,   N1   =   NP - 1 )
+*
+      CHARACTER       ZL,ZU, RL,RU
+      COMMON /BOND/   ZL,ZU, RL,RU
+*
+*
+      CHARACTER*2  VAR
+      CHARACTER    TYPL, TYPU
+      DIMENSION    U1(0:MP,NP), U(MP,NP)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+*
+*
+***********************************************************************
+*     DETERMINE TYPE OF BOUNDARY
+***********************************************************************
+*
+*
+      IF (VAR.EQ.'RO'.OR.VAR.EQ.'EN'.OR.VAR.EQ.'GR'.OR.VAR.EQ.'GP'
+     &.OR.VAR.EQ.'BZ') THEN
+C (0,3)
+C        BEGIN BLOCK
+C (0,4)
+         TYPL = 'O'
+C (0,5)
+         TYPU = 'O'
+C        END BLOCK
+      ELSE
+C (0,6)
+C        BEGIN BLOCK
+C (0,7)
+         TYPL = ZL
+C (0,8)
+         TYPU = ZU
+C        END BLOCK
+      ENDIF
+C (0,9)
+*
+*
+***********************************************************************
+*     LOWER BOUNDARY
+***********************************************************************
+*
+*
+      IF (TYPL.EQ.'C') THEN
+C (0,10)
+C        BEGIN BLOCK
+C (0,11)
+*
+!     INITIALLY: DO 100
+         DO J = 1, NP
+C (0,12)
+C           BEGIN BLOCK
+C (0,13)
+            U1(0,J) = DBLE(0.0D0)
+C (0,14)
+100         CONTINUE
+C           END BLOCK
+         ENDDO
+*
+C        END BLOCK
+      ELSE
+C (0,16)
+C        BEGIN BLOCK
+C (0,17)
+*
+!     INITIALLY: DO 200
+         DO J = 1, NP
+C (0,18)
+C           BEGIN BLOCK
+C (0,19)
+            U1(0,J) = U(1,J)
+C (0,20)
+200         CONTINUE
+C           END BLOCK
+         ENDDO
+*
+C        END BLOCK
+      ENDIF
+C (0,22)
+*
+*
+***********************************************************************
+*     UPPER BOUNDARY
+***********************************************************************
+*
+*
+      IF (TYPU.EQ.'C') THEN
+C (0,23)
+C        BEGIN BLOCK
+C (0,24)
+*
+!     INITIALLY: DO 120
+         DO J = 1, NP
+C (0,25)
+C           BEGIN BLOCK
+C (0,26)
+            U1(MP,J) = DBLE(0.0D0)
+C (0,27)
+120         CONTINUE
+C           END BLOCK
+         ENDDO
+*
+C        END BLOCK
+      ELSE
+C (0,29)
+C        BEGIN BLOCK
+C (0,30)
+*
+!     INITIALLY: DO 220
+         DO J = 1, NP
+C (0,31)
+C           BEGIN BLOCK
+C (0,32)
+            U1(MP,J) = U(MP,J)
+C (0,33)
+220         CONTINUE
+C           END BLOCK
+         ENDDO
+*
+C        END BLOCK
+      ENDIF
+C (0,35)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE B2 ( U2 , U , VAR )
+*
+*
+***********************************************************************
+*
+*     IN THIS SUBROUTINE THE BOUNDARY VALUES
+*     ON THE STAGGERED GRID (2) ARE COMPUTED
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        -  RL,RU  ( TYPE OF BOUNDARIES            )
+*        -  U      ( VALUES AT CENTER OF CELL      )
+*     VALUES USED AS TEMPORARY STORAGE:
+*        -  TYPX   ( TYPE OF BOUNDARY:
+*                    C  ...  ZERO VALUE
+*                    O  ...  ZERO DERIVATIVE       )
+*                    L=LOWER & U=UPPER BOUNDARY    )
+*     VALUES COMPUTED:
+*        -  U2     ( BOUNDARY VALUES ON GRID (2)   )
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+      PARAMETER  ( M1   =   MP - 1 ,   N1   =   NP - 1 )
+*
+      CHARACTER       ZL,ZU, RL,RU
+      COMMON /BOND/   ZL,ZU, RL,RU
+*
+*
+      CHARACTER*2  VAR
+      CHARACTER    TYPL, TYPU
+      DIMENSION    U2(MP,0:NP), U(MP,NP)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+*
+*
+***********************************************************************
+*     DETERMINE TYPE OF BOUNDARY
+***********************************************************************
+*
+*
+      IF (VAR.EQ.'RO'.OR.VAR.EQ.'EN'.OR.VAR.EQ.'GZ'.OR.VAR.EQ.'BZ'
+     &) THEN
+C (0,3)
+C        BEGIN BLOCK
+C (0,4)
+         TYPL = 'O'
+C (0,5)
+         TYPU = 'O'
+C        END BLOCK
+      ELSE
+C (0,6)
+C        BEGIN BLOCK
+C (0,7)
+         TYPL = RL
+C (0,8)
+         TYPU = RU
+C        END BLOCK
+      ENDIF
+C (0,9)
+*
+*
+***********************************************************************
+*     LOWER BOUNDARY
+***********************************************************************
+*
+*
+      IF (TYPL.EQ.'C') THEN
+C (0,10)
+C        BEGIN BLOCK
+C (0,11)
+*
+!     INITIALLY: DO 100
+         DO I = 1, MP
+C (0,12)
+C           BEGIN BLOCK
+C (0,13)
+            U2(I,0) = DBLE(0.0D0)
+C (0,14)
+100         CONTINUE
+C           END BLOCK
+         ENDDO
+*
+C        END BLOCK
+      ELSE
+C (0,16)
+C        BEGIN BLOCK
+C (0,17)
+*
+!     INITIALLY: DO 200
+         DO I = 1, MP
+C (0,18)
+C           BEGIN BLOCK
+C (0,19)
+            U2(I,0) = U(I,1)
+C (0,20)
+200         CONTINUE
+C           END BLOCK
+         ENDDO
+*
+C        END BLOCK
+      ENDIF
+C (0,22)
+*
+*
+***********************************************************************
+*     UPPER BOUNDARY
+***********************************************************************
+*
+*
+      IF (TYPU.EQ.'C') THEN
+C (0,23)
+C        BEGIN BLOCK
+C (0,24)
+*
+!     INITIALLY: DO 120
+         DO I = 1, MP
+C (0,25)
+C           BEGIN BLOCK
+C (0,26)
+            U2(I,NP) = 0.0D0
+C (0,27)
+120         CONTINUE
+C           END BLOCK
+         ENDDO
+*
+C        END BLOCK
+      ELSE
+C (0,29)
+C        BEGIN BLOCK
+C (0,30)
+*
+!     INITIALLY: DO 220
+         DO I = 1, MP
+C (0,31)
+C           BEGIN BLOCK
+C (0,32)
+            U2(I,NP) = U(I,NP)
+C (0,33)
+220         CONTINUE
+C           END BLOCK
+         ENDDO
+*
+C        END BLOCK
+      ENDIF
+C (0,35)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE TRANS1
+*
+*
+***********************************************************************
+*
+*     IN THIS SUBROUTINE THE TRANSPORT IN Z-DIRECTION IS COMPUTED
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        -  GAM, MQ,NQ
+*        -  RO ,EN            ( VALUES BEFORE TRANSPORT               )
+*        -  GZ ,GR
+*        -  RO1,EN1           ( VALUES AT STAGGERED GRID (1)
+*        -  GZ1,GR1             -> OVERWRITTEN BY THE COMPUTED VALUES )
+*     VALUES USED AS TEMPORARY STORAGE:
+*        -  VR1               ( VELOCITIES AT STAGGERED GRID (1)      )
+*        -  PR1               ( PRESSURE   AT STAGGERED GRID (1)      )
+*        -  FL1               ( FLUXES     AT STAGGERED GRID (1)      )
+*     VALUES COMPUTED:
+*        -  RON,ENN           ( VALUES AFTER Z-TRANSPORT              )
+*        -  GZN,GRN
+*        -  VZ1               ( Z-VELOCITY AT STAGGERED GRID (1)      )
+*
+*     REMARK:  Z-VELOCITY MUST NOT BE CHANGED (INPUT FOR FCT ROUTINES )
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+*
+      COMMON /PRMT/   TS, DT, GAM, CFL,VCT,
+     &                TZ,TR, FTZ,FTR, BSZ,BSR, QTZ,QTR, IS
+      COMMON /ADVC/   ROBMQ, ROBNQ,
+     &                MQ,MQ1,MQ2, NQ,NQ1,NQ2,
+     &                MQFLG, NQFLG
+      COMMON /CUTP/   PRCUT, NEGFL, NEGCN, NEGPR, NEGPO(1000)
+      COMMON /VAR1/   RO(MP,NP), EN(MP,NP),
+     &                GZ(MP,NP), GR(MP,NP)
+* DU3 is a dummy             a.w.
+      COMMON /VARH/   VZ1(0:MP,NP), VR1(0:MP,NP),
+     &                PR1(0:MP,NP), FL1(0:MP,NP),
+     &                DU3(4*MP + 4)
+*
+*
+***********************************************************************
+*     SHARE COMMON /VAR2/ BETWEEN "NEW" AND "STAGGERED" VALUES
+*     ATTENTION:   THE ARRAYS FOR "STAGGERED" VALUES ARE LONGER
+*                  THAN THE ARRAYS FOR THE "NEW" VALUES
+*                  THUS NO MEMORY CONFLICT CAN OCCUR
+*                  IF A "STAGGERED" VALUE ISN'T USED AFTER TRANSPORT
+*                  AND IF THE SEQUENCE OF THE OPERATIONS ISN'T CHANGED
+*                  BECAUSE THE "NEW" VALUES ARE WRITTEN INTO
+*                  COMMON /CONT/ "TOP DOWN"
+***********************************************************************
+*
+*
+      COMMON /VAR2/   H( 4 * (MP+1) * (NP+1) )
+*
+      DIMENSION       RO1(0:MP,NP), EN1(0:MP,NP),
+     &                GZ1(0:MP,NP), GR1(0:MP,NP)
+      DIMENSION       RON(MP,NP), ENN(MP,NP),
+     &                GZN(MP,NP), GRN(MP,NP)
+*
+      EQUIVALENCE  (  H(             1 )  ,  RO1(0,1)  )    ,
+     &             (  H(   (MP+1)*NP+1 )  ,  EN1(0,1)  )    ,
+     &             (  H( 2*(MP+1)*NP+1 )  ,  GZ1(0,1)  )    ,
+     &             (  H( 3*(MP+1)*NP+1 )  ,  GR1(0,1)  )
+      EQUIVALENCE  (  H(             1 )  ,  RON(1,1)  )    ,
+     &             (  H(    MP*   NP+1 )  ,  ENN(1,1)  )    ,
+     &             (  H( 2* MP*   NP+1 )  ,  GZN(1,1)  )    ,
+     &             (  H( 3* MP*   NP+1 )  ,  GRN(1,1)  )
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+*
+*
+***********************************************************************
+*     COMPUTE PRESSURE AND VELOCITIES ON STAGGERED GRID (1)
+*     THESE QUANTITIES ARE USED SEVERAL TIMES!
+***********************************************************************
+*
+*
+      CON = GAM-DBLE(1.0D0)
+C (0,3)
+*
+!     INITIALLY: DO 010
+      DO J = 1, NQ
+C (0,4)
+!     INITIALLY: DO 010
+         DO I = 0, MQ
+C (0,5)
+C           BEGIN BLOCK
+C (0,6)
+*
+            VZ1(I,J) = GZ1(I,J)/RO1(I,J)
+C (0,7)
+            VR1(I,J) = GR1(I,J)/RO1(I,J)
+C (0,8)
+            PR1(I,J) = CON*(EN1(I,J)-0.5D0*(GZ1(I,J)**2+GR1(I,J)**2)/
+     &      RO1(I,J))
+C (0,9)
+*
+            IF (PR1(I,J).LT.PRCUT) THEN
+C (0,10)
+               PR1(I,J) = PRCUT
+            ELSE
+C (0,11)
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+C (0,12)
+*
+010         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,13)
+*
+*
+***********************************************************************
+*     COMPUTE MASS-TRANSPORT
+***********************************************************************
+*
+*
+!     INITIALLY: DO 100
+      DO J = 1, NQ
+C (0,14)
+!     INITIALLY: DO 100
+         DO I = 0, MQ
+C (0,15)
+C           BEGIN BLOCK
+C (0,16)
+            FL1(I,J) = RO1(I,J)*VZ1(I,J)
+C (0,17)
+100         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,18)
+*
+      CALL T1(RON, RO, FL1)
+C (0,19)
+*
+*
+***********************************************************************
+*     COMPUTE ENERGY-TRANSPORT
+***********************************************************************
+*
+*
+!     INITIALLY: DO 200
+      DO J = 1, NQ
+C (0,20)
+!     INITIALLY: DO 200
+         DO I = 0, MQ
+C (0,21)
+C           BEGIN BLOCK
+C (0,22)
+            FL1(I,J) = (EN1(I,J)+PR1(I,J))*VZ1(I,J)
+C (0,23)
+200         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,24)
+*
+      CALL T1(ENN, EN, FL1)
+C (0,25)
+*
+*
+***********************************************************************
+*     COMPUTE MOMENTUM-TRANSPORT
+***********************************************************************
+*
+*
+*----------------------------------------------------------------------
+*     1.) Z-MOMENTUM
+*----------------------------------------------------------------------
+*
+!     INITIALLY: DO 300
+      DO J = 1, NQ
+C (0,26)
+!     INITIALLY: DO 300
+         DO I = 0, MQ
+C (0,27)
+C           BEGIN BLOCK
+C (0,28)
+            FL1(I,J) = GZ1(I,J)*VZ1(I,J)+PR1(I,J)
+C (0,29)
+300         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,30)
+*
+      CALL T1(GZN, GZ, FL1)
+C (0,31)
+*
+*----------------------------------------------------------------------
+*     2.) R-MOMENTUM
+*----------------------------------------------------------------------
+*
+!     INITIALLY: DO 400
+      DO J = 1, NQ
+C (0,32)
+!     INITIALLY: DO 400
+         DO I = 0, MQ
+C (0,33)
+C           BEGIN BLOCK
+C (0,34)
+            FL1(I,J) = GR1(I,J)*VZ1(I,J)
+C (0,35)
+400         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,36)
+*
+      CALL T1(GRN, GR, FL1)
+C (0,37)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE TRANS2
+*
+*
+***********************************************************************
+*
+*     IN THIS SUBROUTINE THE TRANSPORT IN R-DIRECTION IS COMPUTED
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        -  GAM, MQ,NQ
+*        -  RON,ENN           ( VALUES AFTER Z-TRANSPORT        )
+*        -  GZN,GRN
+*        -  RO2,EN2           ( VALUES AT STAGGERED GRID (2)    )
+*        -  GZ2,GR2
+*        -  CHGR              ( CORIOLIS FORCES                 )
+*     VALUES USED AS TEMPORARY STORAGE:
+*        -  PR2               ( PRESSURE AT STAGGERED GRID (2)  )
+*        -  FL2               ( FLUXES   AT STAGGERED GRID (2)  )
+*     VALUES COMPUTED:
+*        -  RON,ENN           ( VALUES AFTER R-TRANSPORT        )
+*        -  GZN,GRN
+*        -  VR2               ( VELOCITY AT STAGGERED GRID (2)  )
+*     DEFINED BUT NOT USED:
+*        -  VZ1               ( VELOCITY AT STAGGERED GRID (1)  )
+*
+*     REMARKS: Z-VELOCITY MUST NOT BE CHANGED (INPUT FOR FCT ROUTINES )
+*              R-VELOCITY MUST NOT BE CHANGED (INPUT FOR FCT ROUTINES )
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+*
+      COMMON /PRMT/   TS, DT, GAM, CFL,VCT,
+     &                TZ,TR, FTZ,FTR, BSZ,BSR, QTZ,QTR, IS
+      COMMON /ADVC/   ROBMQ, ROBNQ,
+     &                MQ,MQ1,MQ2, NQ,NQ1,NQ2,
+     &                MQFLG, NQFLG
+      COMMON /CUTP/   PRCUT, NEGFL, NEGCN, NEGPR, NEGPO(1000)
+* DU2 is a dummy              a.w.
+      COMMON /VAR2/   RON(MP,NP), ENN(MP,NP),
+     &                GZN(MP,NP), GRN(MP,NP),
+     &                DU2(4*MP + 4*NP + 4)
+* DU4 is a dummy               a.w.
+      COMMON /SCRA/   RO2(MP,0:NP), EN2(MP,0:NP),
+     &                GZ2(MP,0:NP), GR2(MP,0:NP),
+     &                DU4(4*NP + 4)
+* DU3 is a dummy             a.w.
+      COMMON /VARH/   VZ1(0:MP,NP), VR2(MP,0:NP),
+     &                PR2(MP,0:NP), FL2(MP,0:NP),
+     &                DU3(1*MP + 3*NP + 4)
+      COMMON /VARS/   CHGR(MP,NP)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+*
+*
+***********************************************************************
+*     COMPUTE PRESSURE AND R-VELOCITY ON STAGGERED GRID (2)
+*     THESE QUANTITIES ARE USED SEVERAL TIMES!
+***********************************************************************
+*
+*
+      CON = GAM-1.0D0
+C (0,3)
+*
+!     INITIALLY: DO 010
+      DO J = 0, NQ
+C (0,4)
+!     INITIALLY: DO 010
+         DO I = 1, MQ
+C (0,5)
+C           BEGIN BLOCK
+C (0,6)
+*
+            VR2(I,J) = GR2(I,J)/RO2(I,J)
+C (0,7)
+            PR2(I,J) = CON*(EN2(I,J)-0.5D0*(GZ2(I,J)**2+GR2(I,J)**2)/
+     &      RO2(I,J))
+C (0,8)
+*
+            IF (PR2(I,J).LT.PRCUT) THEN
+C (0,9)
+               PR2(I,J) = PRCUT
+            ELSE
+C (0,10)
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+C (0,11)
+*
+010         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,12)
+*
+*
+***********************************************************************
+*     COMPUTE MASS-TRANSPORT
+***********************************************************************
+*
+*
+!     INITIALLY: DO 100
+      DO J = 0, NQ
+C (0,13)
+!     INITIALLY: DO 100
+         DO I = 1, MQ
+C (0,14)
+C           BEGIN BLOCK
+C (0,15)
+            FL2(I,J) = RO2(I,J)*VR2(I,J)
+C (0,16)
+100         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,17)
+*
+      CALL T2(RON, FL2)
+C (0,18)
+*
+*
+***********************************************************************
+*     COMPUTE ENERGY-TRANSPORT
+***********************************************************************
+*
+*
+!     INITIALLY: DO 200
+      DO J = 0, NQ
+C (0,19)
+!     INITIALLY: DO 200
+         DO I = 1, MQ
+C (0,20)
+C           BEGIN BLOCK
+C (0,21)
+            FL2(I,J) = (EN2(I,J)+PR2(I,J))*VR2(I,J)
+C (0,22)
+200         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,23)
+*
+      CALL T2(ENN, FL2)
+C (0,24)
+*
+*
+***********************************************************************
+*     COMPUTE MOMENTUM-TRANSPORT
+***********************************************************************
+*
+*
+*----------------------------------------------------------------------
+*     1.) Z-MOMENTUM
+*----------------------------------------------------------------------
+*
+!     INITIALLY: DO 300
+      DO J = 0, NQ
+C (0,25)
+!     INITIALLY: DO 300
+         DO I = 1, MQ
+C (0,26)
+C           BEGIN BLOCK
+C (0,27)
+            FL2(I,J) = GZ2(I,J)*VR2(I,J)
+C (0,28)
+300         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,29)
+*
+      CALL T2(GZN, FL2)
+C (0,30)
+*
+*----------------------------------------------------------------------
+*     2.) R-MOMENTUM   (CORIOLIS FORCES!)
+*----------------------------------------------------------------------
+*
+!     INITIALLY: DO 400
+      DO J = 0, NQ
+C (0,31)
+!     INITIALLY: DO 400
+         DO I = 1, MQ
+C (0,32)
+C           BEGIN BLOCK
+C (0,33)
+            FL2(I,J) = GR2(I,J)*VR2(I,J)+PR2(I,J)
+C (0,34)
+400         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,35)
+*
+      CALL T2(GRN, FL2)
+C (0,36)
+*
+!     INITIALLY: DO 410
+      DO J = 1, NQ
+C (0,37)
+!     INITIALLY: DO 410
+         DO I = 1, MQ
+C (0,38)
+C           BEGIN BLOCK
+C (0,39)
+            GRN(I,J) = GRN(I,J)-DT*CHGR(I,J)
+C (0,40)
+410         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,41)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE T1 ( UN , U , FL )
+*
+*
+***********************************************************************
+*
+*     IN THIS SUBROUTINE THE TRANSPORT IN Z-DIRECTION IS COMPUTED
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        -  DT     ( TIMESTEP                 )
+*        -  DZ     ( GRIDSPACING              )
+*        -  U      ( VALUES BEFORE TRANSPORT  )
+*        -  FL     ( FLUX                     )
+*     VALUES COMPUTED:
+*        -  UN     ( VALUES AFTER Z-TRANSPORT )
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+      PARAMETER  ( M1   =   MP - 1 ,   N1   =   NP - 1 )
+*
+      DIMENSION  UN(MP,NP), U(MP,NP), FL(0:MP,NP)
+*
+      COMMON /PRMT/   TS, DT, GAM, CFL,VCT,
+     &                TZ,TR, FTZ,FTR, BSZ,BSR, QTZ,QTR, IS
+      COMMON /ADVC/   ROBMQ, ROBNQ,
+     &                MQ,MQ1,MQ2, NQ,NQ1,NQ2,
+     &                MQFLG, NQFLG
+      COMMON /GRID/   Z(MP), ZB(0:MP), DZ(MP), DBZ(0:MP), FZ(M1),
+     &                R(NP), RB(0:NP), DR(NP), DBR(0:NP), FR(N1),
+     &                DUM(8)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+* Dum is a dummy             a.w.
+*
+*
+***********************************************************************
+*
+*
+!     INITIALLY: DO 10
+      DO J = 1, NQ
+C (0,3)
+!     INITIALLY: DO 10
+         DO I = 1, MQ
+C (0,4)
+C           BEGIN BLOCK
+C (0,5)
+            UN(I,J) = U(I,J)-DT/DZ(I)*(FL(I,J)-FL(I-1,J))
+C (0,6)
+10          CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,7)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE T2 ( UN , FL )
+*
+*
+***********************************************************************
+*
+*     IN THIS SUBROUTINE THE TRANSPORT IN R-DIRECTION IS COMPUTED
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        -  DT     ( TIMESTEP                   )
+*        -  DR     ( GRIDSPACING                )
+*        -  R      ( POSITION OF GRIDPOINT      )
+*        -  RB     ( POSITION OF CELL-BOUNDARY  )
+*        -  UN     ( VALUES AFTER Z-TRANSPORT   )
+*        -  FL     ( FLUX                       )
+*     VALUES COMPUTED:
+*        -  UN     ( VALUES AFTER R-TRANSPORT   )
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+      PARAMETER  ( M1   =   MP - 1 ,   N1   =   NP - 1 )
+*
+      DIMENSION  UN(MP,NP), FL(MP,0:NP)
+*
+      COMMON /PRMT/   TS, DT, GAM, CFL,VCT,
+     &                TZ,TR, FTZ,FTR, BSZ,BSR, QTZ,QTR, IS
+      COMMON /ADVC/   ROBMQ, ROBNQ,
+     &                MQ,MQ1,MQ2, NQ,NQ1,NQ2,
+     &                MQFLG, NQFLG
+      COMMON /GRID/   Z(MP), ZB(0:MP), DZ(MP), DBZ(0:MP), FZ(M1),
+     &                R(NP), RB(0:NP), DR(NP), DBR(0:NP), FR(N1),
+     &                DUM(8)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+* Dum is a dummy             a.w.
+*
+*
+***********************************************************************
+*
+*
+!     INITIALLY: DO 10
+      DO J = 1, NQ
+C (0,3)
+!     INITIALLY: DO 10
+         DO I = 1, MQ
+C (0,4)
+C           BEGIN BLOCK
+C (0,5)
+            UN(I,J) = UN(I,J)-DT/(R(J)*DR(J))*(RB(J)*FL(I,J)-RB(J-1)*
+     &      FL(I,J-1))
+C (0,6)
+10          CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,7)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE ARTDIF
+*
+*
+***********************************************************************
+*
+*     IN THIS SUBROUTINE THE ARTIFICIAL
+*     DIFFUSION COEFFICENT IS COMPUTED
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        -  VCT
+*        -  DT, DZ,DR
+*        -  VZ1,VR2       ( VELOCITY AT STAGGERED GRIDS     )
+*     VALUES COMPUTED:
+*        -  VC1,VC2       ( AVERAGED DIFFUSION COEFFICENTS  )
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+      PARAMETER  ( M1   =   MP - 1 ,   N1   =   NP - 1 )
+*
+      COMMON /PRMT/   TS, DT, GAM, CFL,VCT,
+     &                TZ,TR, FTZ,FTR, BSZ,BSR, QTZ,QTR, IS
+      COMMON /ADVC/   ROBMQ, ROBNQ,
+     &                MQ,MQ1,MQ2, NQ,NQ1,NQ2,
+     &                MQFLG, NQFLG
+      COMMON /GRID/   Z(MP), ZB(0:MP), DZ(MP), DBZ(0:MP), FZ(M1),
+     &                R(NP), RB(0:NP), DR(NP), DBR(0:NP), FR(N1),
+     &                DUM(8)
+* Dum is a dummy             a.w.
+* DU3 is a dummy             a.w.
+      COMMON /VARH/   VZ1(0:MP,NP), VR2(MP,0:NP),
+     &                VC1(0:MP,NP), VC2(MP,0:NP),
+     &                DU3(2*MP +2*NP + 4)
+C$$$NEW BY O.HAAN, 6.4.87
+      DIMENSION DRIN(NP),DZIN(MP)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+C$$$NEW
+C$$$ MOVE VCT*DT/DZ(I) AND VCT*DT/DR(J) OUT OF LOOPS
+C$$$
+*
+*
+***********************************************************************
+*     COMPUTE Z-COMPONENT
+***********************************************************************
+*
+*
+C$$$
+!     INITIALLY: DO 20
+      DO I = 1, MQ1
+C (0,3)
+C        BEGIN BLOCK
+C (0,4)
+         DZIN(I) = VCT*DT/DZ(I)
+C (0,5)
+20       CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,6)
+!     INITIALLY: DO 40
+      DO J = 1, NQ1
+C (0,7)
+C        BEGIN BLOCK
+C (0,8)
+         DRIN(J) = VCT*DT/DR(J)
+C (0,9)
+40       CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,10)
+C$$$
+!     INITIALLY: DO 100
+      DO J = 1, NQ
+C (0,11)
+!     INITIALLY: DO 100
+         DO I = 1, MQ1
+C (0,12)
+C           BEGIN BLOCK
+C (0,13)
+            VC1(I,J) = DZIN(I)*(ABS(VZ1(I+1,J)-VZ1(I-1,J))+0.5D0*ABS(
+     &      VR2(I+1,J)+VR2(I+1,J-1)-VR2(I,J)-VR2(I,J-1)))
+C (0,14)
+100         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,15)
+*
+*
+***********************************************************************
+*     COMPUTE R-COMPONENT
+***********************************************************************
+*
+*
+!     INITIALLY: DO 200
+      DO J = 1, NQ1
+C (0,16)
+!     INITIALLY: DO 200
+         DO I = 1, MQ
+C (0,17)
+C           BEGIN BLOCK
+C (0,18)
+            VC2(I,J) = DRIN(J)*(ABS(VR2(I,J+1)-VR2(I,J-1))+0.5D0*ABS(
+     &      VZ1(I,J+1)+VZ1(I-1,J+1)-VZ1(I,J)-VZ1(I-1,J)))
+C (0,19)
+200         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,20)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE FCT ( UNEW, UTRA, UOLD )
+*
+*
+***********************************************************************
+*
+*     IN THIS SUBROUTINE THE FLUX-CORRECTION-PROCESS IS COMPUTED
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        -  DT
+*        -  DZ,DR, FZ,FR, R,RB, DBZ,DBR
+*        -  UOLD          ( OLD- VALUES OF VARIABLE         )
+*        -  UTRA          ( TRANSPORTED VALUES OF VARIABLE  )
+*        -  VZ1,VR2       ( VELOCITY AT STAGGERED GRIDS     )
+*        -  VC            ( DIFFUSION COEFFICENTS           )
+*     VALUES USED AS TEMPORARY STORAGE:
+*        -  DK,AK, VK     ( DIFFUSION COEFFICENTS           )
+*        -  AZ1,AR2       ( RAW AND CORRECTED
+*                           ANTIDIFFUSION FLUXES            )
+*        -  DZ1,DR2       ( DIFFUSION FLUXES                )
+*        -  UTRA          ( TD- VALUES OF VARIABLES         )
+*     VALUES COMPUTED:
+*        -  UNEW          ( VALUES OF VARIABLE AT NEW STEP  )
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+      PARAMETER  ( M1   =   MP - 1 ,   N1   =   NP - 1 )
+*
+      DIMENSION  UNEW(MP,NP), UTRA(MP,NP), UOLD(MP,NP)
+*
+      COMMON /PRMT/   TS, DT, GAM, CFL,VCT,
+     &                TZ,TR, FTZ,FTR, BSZ,BSR, QTZ,QTR, IS
+      COMMON /ADVC/   ROBMQ, ROBNQ,
+     &                MQ,MQ1,MQ2, NQ,NQ1,NQ2,
+     &                MQFLG, NQFLG
+      COMMON /GRID/   Z(MP), ZB(0:MP), DZ(MP), DBZ(0:MP), FZ(M1),
+     &                R(NP), RB(0:NP), DR(NP), DBR(0:NP), FR(N1),
+     &                DUM(8)
+* Dum is a dummy             a.w.
+* DU3 is a dummy             a.w.
+      COMMON /VARH/   VZ1(0:MP,NP), VR2(MP,0:NP),
+     &                VC1(0:MP,NP), VC2(MP,0:NP),
+     &                DU3(2*MP +2*NP + 4)
+* DU4 is a dummy               a.w.
+      COMMON /SCRA/   AZ1(0:MP,NP), AR2(MP,0:NP),
+     &                DZ1(0:MP,NP), DR2(MP,0:NP),
+     &                DU4(2*MP +2*NP + 4)
+C$$$NEW BY O.HAAN, 6.4.87
+      DIMENSION DRIN(NP),DZIN(MP)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+C$$$NEW
+C$$$ MOVE 1/DZ(I) AND 1/(DR(J)*R(J)) OUT OF LOOPS
+C$$$
+*
+*
+***********************************************************************
+*     COMPUTE DIFFUSION COEFFICENTS AS STATEMENT FUNCTIONS
+***********************************************************************
+*
+*
+*----------------------------------------------------------------------
+*     DEFINE DIFFUSION COEFFICENTS AS STATEMENT FUNCTIONS
+*----------------------------------------------------------------------
+*
+C$PIPS STATEMENT FUNCTION DC SUBSTITUTED
+C$PIPS STATEMENT FUNCTION AC SUBSTITUTED
+*
+*----------------------------------------------------------------------
+*     COMPUTE ARTIFICIAL DIFFUSION COEFFICENTS
+*----------------------------------------------------------------------
+*
+      CALL ARTDIF
+C (0,3)
+*
+*
+***********************************************************************
+*     COMPUTE DIFFUSION AND RAW ANTIDIFFUSION FLUXES
+***********************************************************************
+*
+*
+*----------------------------------------------------------------------
+*     COMPUTE FLUXES IN Z-DIRECTION
+*----------------------------------------------------------------------
+*
+!     INITIALLY: DO 100
+      DO J = 1, NQ
+C (0,4)
+!     INITIALLY: DO 100
+         DO I = 1, MQ1
+C (0,5)
+C           BEGIN BLOCK
+C (0,6)
+*
+            EK = DT/DZ(I)
+C (0,7)
+            DK = DBLE(0.125D0)
+C (0,8)
+            AK = DBLE(0.125D0)
+C (0,9)
+*
+            DZ1(I,J) = (DK+VC1(I,J))*(UOLD(I+1,J)-UOLD(I,J))
+C (0,10)
+            AZ1(I,J) = AK*(UTRA(I+1,J)-UTRA(I,J))
+C (0,11)
+*
+100         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,12)
+*
+*----------------------------------------------------------------------
+*     COMPUTE FLUXES IN R-DIRECTION
+*----------------------------------------------------------------------
+*
+!     INITIALLY: DO 110
+      DO J = 1, NQ1
+C (0,13)
+!     INITIALLY: DO 110
+         DO I = 1, MQ
+C (0,14)
+C           BEGIN BLOCK
+C (0,15)
+*
+            EK = DT/DR(J)
+C (0,16)
+            DK = DBLE(0.125D0)
+C (0,17)
+            AK = DBLE(0.125D0)
+C (0,18)
+*
+            DR2(I,J) = (DK+VC2(I,J))*(UOLD(I,J+1)-UOLD(I,J))
+C (0,19)
+            AR2(I,J) = AK*(UTRA(I,J+1)-UTRA(I,J))
+C (0,20)
+*
+110         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,21)
+*
+*----------------------------------------------------------------------
+*     SET FLUXES ACROSS BOUNDARY TO ZERO
+*----------------------------------------------------------------------
+*
+!     INITIALLY: DO 120
+      DO J = 1, NQ
+C (0,22)
+C        BEGIN BLOCK
+C (0,23)
+         DZ1(0,J) = 0.0D0
+C (0,24)
+         DZ1(MQ,J) = 0.0D0
+C (0,25)
+         AZ1(0,J) = 0.0D0
+C (0,26)
+         AZ1(MQ,J) = 0.0D0
+C (0,27)
+120      CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,28)
+*
+!     INITIALLY: DO 130
+      DO I = 1, MQ
+C (0,29)
+C        BEGIN BLOCK
+C (0,30)
+         DR2(I,0) = 0.0D0
+C (0,31)
+         DR2(I,NQ) = 0.0D0
+C (0,32)
+         AR2(I,0) = 0.0D0
+C (0,33)
+         AR2(I,NQ) = 0.0D0
+C (0,34)
+130      CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,35)
+*
+*
+***********************************************************************
+*     COMPUTE DIFFUSION
+***********************************************************************
+*
+*
+C$$$
+!     INITIALLY: DO 20
+      DO I = 1, MQ
+C (0,36)
+C        BEGIN BLOCK
+C (0,37)
+         DZIN(I) = 1.0D0/DZ(I)
+C (0,38)
+20       CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,39)
+!     INITIALLY: DO 40
+      DO J = 1, NQ
+C (0,40)
+C        BEGIN BLOCK
+C (0,41)
+         DRIN(J) = 1.0D0/(DR(J)*R(J))
+C (0,42)
+40       CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,43)
+C$$$
+!     INITIALLY: DO 200
+      DO J = 1, NQ
+C (0,44)
+!     INITIALLY: DO 200
+         DO I = 1, MQ
+C (0,45)
+C           BEGIN BLOCK
+C (0,46)
+            UTRA(I,J) = UTRA(I,J)+(DBZ(I)*DZ1(I,J)-DBZ(I-1)*DZ1(I-1,J
+     &      ))*DZIN(I)+(DBR(J)*RB(J)*DR2(I,J)-DBR(J-1)*RB(J-1)*DR2(I,
+     &      J-1))*DRIN(J)
+C (0,47)
+200         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,48)
+*
+*
+***********************************************************************
+*     LIMIT ANTIDIFFUSION FLUXES
+***********************************************************************
+*
+*
+      CALL FILTER(UTRA, UOLD)
+C (0,49)
+*
+*
+***********************************************************************
+*     COMPUTE ANTIDIFFUSION
+***********************************************************************
+*
+*
+!     INITIALLY: DO 400
+      DO J = 1, NQ
+C (0,50)
+!     INITIALLY: DO 400
+         DO I = 1, MQ
+C (0,51)
+C           BEGIN BLOCK
+C (0,52)
+            UNEW(I,J) = UTRA(I,J)-(DBZ(I)*AZ1(I,J)-DBZ(I-1)*AZ1(I-1,J
+     &      ))*DZIN(I)-(DBR(J)*RB(J)*AR2(I,J)-DBR(J-1)*RB(J-1)*AR2(I,
+     &      J-1))*DRIN(J)
+C (0,53)
+400         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,54)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE FILTER ( UTDF , UOLD )
+*
+*
+***********************************************************************
+*
+*     IN THIS SUBROUTINE THE ANTI-DIFFUSION FLUXES ARE LIMITED
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        -  AZ1,AR2       ( RAW ANTI-DIFFUSION FLUXES       )
+*        -  UOLD,UTDF     ( OLD/TD- VALUES OF VARIABLE      )
+*     VALUES USED AS TEMPORARY STORAGE:
+*        -  TZ1,TR2       ( DIFFERENCES OF TD-VALUES        )
+*        -  XMAX,XMIN     ( MAX/MIN OF OLD & TD-VALUES      )
+*        -  VMAX,VMIN     ( MAX/MIN VALUE USED IN FILTER    )
+*        -  PP,PM         ( SUM OF FLUXES INTO/OUT OF CELL  )
+*        -  QP,QM         ( MAX/MIN DIFFERENCES OF VALUES   )
+*        -  RP,RM         ( FILTER- FUNCTION                )
+*     VALUES COMPUTED:
+*        -  AZ1,AR2       ( CORRECTED ANTI-DIFFUSION FLUXES )
+*     DEFINED BUT NOT USED:
+*        -  VZ1,VR2       ( VELOCITIES AT STAGGERED GRIDS   )
+*
+*     REMARKS: Z-VELOCITY MUST NOT BE CHANGED (INPUT FOR FCT ROUTINES )
+*              R-VELOCITY MUST NOT BE CHANGED (INPUT FOR FCT ROUTINES )
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+*
+      DIMENSION  UOLD(MP,NP), UTDF(MP,NP)
+*
+      COMMON /ADVC/   ROBMQ, ROBNQ,
+     &                MQ,MQ1,MQ2, NQ,NQ1,NQ2,
+     &                MQFLG, NQFLG
+* DU4 is a dummy               a.w.
+      COMMON /SCRA/   AZ1(0:MP,NP), AR2(MP,0:NP),
+     &                XMAX (MP,NP), XMIN (MP,NP),
+     &                DU4(3*MP + 3*NP + 4)
+* DU3 is a dummy             a.w.
+      COMMON /VARH/   VZ1(0:MP,NP), VR2(MP,0:NP),
+     &                VMAX (MP,NP), VMIN (MP,NP),
+     &                DU3(3*MP + 3*NP + 4)
+*
+*
+***********************************************************************
+*     SHARE PART OF COMMON /SCRA/ BETWEEN SCRATCH-VECTORS
+*     REMARK:   NO MEMORY CONFLICT POSSIBLE
+***********************************************************************
+*
+*
+      DIMENSION  TZ1(MP,NP), TR2(MP,NP)
+      DIMENSION  RP (MP,NP), RM (MP,NP)
+*
+      EQUIVALENCE  (  XMAX , RP , TZ1 , TR2 )
+      EQUIVALENCE  (  XMIN , RM )
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+*
+*
+***********************************************************************
+*     COMPUTE DIFFERENCES OF TD-VALUES AND
+*     ELIMINATE FLUXES IN THE WRONG DIRECTION
+***********************************************************************
+*
+*
+*----------------------------------------------------------------------
+*     1.) Z-DIRECTION
+*----------------------------------------------------------------------
+*
+!     INITIALLY: DO 100
+      DO J = 1, NQ
+C (0,3)
+!     INITIALLY: DO 100
+         DO I = 1, MQ1
+C (0,4)
+C           BEGIN BLOCK
+C (0,5)
+            TZ1(I,J) = UTDF(I+1,J)-UTDF(I,J)
+C (0,6)
+100         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,7)
+*
+!     INITIALLY: DO 110
+      DO J = 1, NQ
+C (0,8)
+!     INITIALLY: DO 110
+         DO I = 2, MQ2
+C (0,9)
+C           BEGIN BLOCK
+C (0,10)
+            IF (AZ1(I,J)*TZ1(I-1,J).LT.0.0D0.OR.AZ1(I,J)*TZ1(I,J).LT.
+     &      0.0D0.OR.AZ1(I,J)*TZ1(I+1,J).LT.0.0D0) THEN
+C (0,11)
+               AZ1(I,J) = 0.0D0
+            ELSE
+C (0,12)
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+C (0,13)
+110         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,14)
+*
+!     INITIALLY: DO 112
+      DO J = 1, NQ
+C (0,15)
+C        BEGIN BLOCK
+C (0,16)
+         IF (AZ1(1,J)*TZ1(1,J).LT.0.0D0.OR.AZ1(1,J)*TZ1(2,J).LT.0.0D0
+     &   ) THEN
+C (0,17)
+            AZ1(1,J) = 0.0D0
+         ELSE
+C (0,18)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C (0,19)
+         IF (AZ1(MQ1,J)*TZ1(MQ1,J).LT.0.0D0.OR.AZ1(MQ1,J)*TZ1(MQ2,J)
+     &   .LT.0.0D0) THEN
+C (0,20)
+            AZ1(MQ1,J) = 0.0D0
+         ELSE
+C (0,21)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C (0,22)
+112      CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,23)
+*
+*----------------------------------------------------------------------
+*     2.) R-DIRECTION
+*----------------------------------------------------------------------
+*
+!     INITIALLY: DO 150
+      DO J = 1, NQ1
+C (0,24)
+!     INITIALLY: DO 150
+         DO I = 1, MQ
+C (0,25)
+C           BEGIN BLOCK
+C (0,26)
+            TR2(I,J) = UTDF(I,J+1)-UTDF(I,J)
+C (0,27)
+150         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,28)
+*
+!     INITIALLY: DO 160
+      DO J = 2, NQ2
+C (0,29)
+!     INITIALLY: DO 160
+         DO I = 1, MQ
+C (0,30)
+C           BEGIN BLOCK
+C (0,31)
+            IF (AR2(I,J)*TR2(I,J-1).LT.0.0D0.OR.AR2(I,J)*TR2(I,J).LT.
+     &      0.0D0.OR.AR2(I,J)*TR2(I,J+1).LT.0.0D0) THEN
+C (0,32)
+               AR2(I,J) = 0.0D0
+            ELSE
+C (0,33)
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+C (0,34)
+160         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,35)
+*
+!     INITIALLY: DO 162
+      DO I = 1, MQ
+C (0,36)
+C        BEGIN BLOCK
+C (0,37)
+         IF (AR2(I,1)*TR2(I,1).LT.0.0D0.OR.AR2(I,1)*TR2(I,2).LT.0.0D0
+     &   ) THEN
+C (0,38)
+            AR2(I,1) = 0.0D0
+         ELSE
+C (0,39)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C (0,40)
+         IF (AR2(I,NQ1)*TR2(I,NQ1).LT.0.0D0.OR.AR2(I,NQ1)*TR2(I,NQ2)
+     &   .LT.0.0D0) THEN
+C (0,41)
+            AR2(I,NQ1) = 0.0D0
+         ELSE
+C (0,42)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C (0,43)
+162      CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,44)
+*
+*
+***********************************************************************
+*     COMPUTE MAXIMUM VALUE OF VARIABLE TO USE IN FILTER
+***********************************************************************
+*
+*
+*----------------------------------------------------------------------
+*     1.) COMPUTE MAX/MIN OF OLD AND TD VALUE
+*----------------------------------------------------------------------
+*
+!     INITIALLY: DO 200
+      DO J = 1, NQ
+C (0,45)
+!     INITIALLY: DO 200
+         DO I = 1, MQ
+C (0,46)
+C           BEGIN BLOCK
+C (0,47)
+            XMAX(I,J) = DMAX1(UOLD(I,J), UTDF(I,J))
+C (0,48)
+            XMIN(I,J) = DMIN1(UOLD(I,J), UTDF(I,J))
+C (0,49)
+200         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,50)
+*
+*----------------------------------------------------------------------
+*     2.) COMPUTE MAX/MIN VALUE OF VARIABLE FOR FILTER
+*         A.) Z-SWEEP & BOUNDARY
+*----------------------------------------------------------------------
+*
+!     INITIALLY: DO 220
+      DO J = 1, NQ
+C (0,51)
+!     INITIALLY: DO 220
+         DO I = 2, MQ1
+C (0,52)
+C           BEGIN BLOCK
+C (0,53)
+            VMAX(I,J) = DMAX1(XMAX(I,J), XMAX(I+1,J), XMAX(I-1,J))
+C (0,54)
+            VMIN(I,J) = DMIN1(XMIN(I,J), XMIN(I+1,J), XMIN(I-1,J))
+C (0,55)
+220         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,56)
+*
+!     INITIALLY: DO 222
+      DO J = 1, NQ
+C (0,57)
+C        BEGIN BLOCK
+C (0,58)
+         VMAX(1,J) = DMAX1(XMAX(1,J), XMAX(2,J))
+C (0,59)
+         VMAX(MQ,J) = DMAX1(XMAX(MQ1,J), XMAX(MQ,J))
+C (0,60)
+         VMIN(1,J) = DMIN1(XMIN(1,J), XMIN(2,J))
+C (0,61)
+         VMIN(MQ,J) = DMIN1(XMIN(MQ1,J), XMIN(MQ,J))
+C (0,62)
+222      CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,63)
+*
+*----------------------------------------------------------------------
+*     2.) COMPUTE MAX/MIN VALUE OF VARIABLE FOR FILTER
+*         B.) R-SWEEP & BOUNDARY
+*----------------------------------------------------------------------
+*
+!     INITIALLY: DO 240
+      DO J = 2, NQ1
+C (0,64)
+!     INITIALLY: DO 240
+         DO I = 1, MQ
+C (0,65)
+C           BEGIN BLOCK
+C (0,66)
+            VMAX(I,J) = DMAX1(VMAX(I,J), XMAX(I,J+1), XMAX(I,J-1))
+C (0,67)
+            VMIN(I,J) = DMIN1(VMIN(I,J), XMIN(I,J+1), XMIN(I,J-1))
+C (0,68)
+240         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,69)
+*
+!     INITIALLY: DO 242
+      DO I = 1, MQ
+C (0,70)
+C        BEGIN BLOCK
+C (0,71)
+         VMAX(I,1) = DMAX1(VMAX(I,1), XMAX(I,1), XMAX(I,2))
+C (0,72)
+         VMAX(I,NQ) = DMAX1(VMAX(I,NQ), XMAX(I,NQ1), XMAX(I,NQ))
+C (0,73)
+         VMIN(I,1) = DMIN1(VMIN(I,1), XMIN(I,1), XMIN(I,2))
+C (0,74)
+         VMIN(I,NQ) = DMIN1(VMIN(I,NQ), XMIN(I,NQ1), XMIN(I,NQ))
+C (0,75)
+242      CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,76)
+*
+*
+***********************************************************************
+*     COMPUTE POSITIVE AND NEGITVE FILTER FUNCTION
+***********************************************************************
+*
+*
+!     INITIALLY: DO 300
+      DO J = 1, NQ
+C (0,77)
+!     INITIALLY: DO 300
+         DO I = 1, MQ
+C (0,78)
+C           BEGIN BLOCK
+C (0,79)
+            PP = DMAX1(DBLE(0.0D0), AZ1(I-1,J))+DMAX1(DBLE(0.0D0), 
+     &      AR2(I,J-1))-DMIN1(DBLE(0.0D0), AZ1(I,J))-DMIN1(DBLE(0.0D0
+     &      ), AR2(I,J))
+C (0,80)
+            PM = DMAX1(DBLE(0.0D0), AZ1(I,J))+DMAX1(DBLE(0.0D0), AR2(
+     &      I,J))-DMIN1(DBLE(0.0D0), AZ1(I-1,J))-DMIN1(DBLE(0.0D0), 
+     &      AR2(I,J-1))
+C (0,81)
+            QP = VMAX(I,J)-UTDF(I,J)
+C (0,82)
+            QM = UTDF(I,J)-VMIN(I,J)
+C (0,83)
+            XP = PP
+C (0,84)
+            XM = PM
+C (0,85)
+            IF (XP.EQ.0.0D0) THEN
+C (0,86)
+               PP = 1.0D0
+            ELSE
+C (0,87)
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+C (0,88)
+            IF (XM.EQ.0.0D0) THEN
+C (0,89)
+               PM = 1.0D0
+            ELSE
+C (0,90)
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+C (0,91)
+            RP(I,J) = DMIN1(DBLE(1.0D0), QP/PP)
+C (0,92)
+            RM(I,J) = DMIN1(DBLE(1.0D0), QM/PM)
+C (0,93)
+            IF (XP.EQ.0.0D0) THEN
+C (0,94)
+               RP(I,J) = 0.0D0
+            ELSE
+C (0,95)
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+C (0,96)
+            IF (XM.EQ.0.0D0) THEN
+C (0,97)
+               RM(I,J) = 0.0D0
+            ELSE
+C (0,98)
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+C (0,99)
+300         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,100)
+*
+*
+***********************************************************************
+*     LIMIT FLUXES
+***********************************************************************
+*
+*
+*----------------------------------------------------------------------
+*     1.) Z-DIRECTION
+*----------------------------------------------------------------------
+*
+!     INITIALLY: DO 400
+      DO J = 1, NQ
+C (0,101)
+!     INITIALLY: DO 400
+         DO I = 1, MQ1
+C (0,102)
+C           BEGIN BLOCK
+C (0,103)
+            C = DMIN1(RP(I+1,J), RM(I,J))
+C (0,104)
+            IF (AZ1(I,J).LT.0.0D0) THEN
+C (0,105)
+               C = DMIN1(RP(I,J), RM(I+1,J))
+            ELSE
+C (0,106)
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+C (0,107)
+            AZ1(I,J) = C*AZ1(I,J)
+C (0,108)
+400         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,109)
+*
+*----------------------------------------------------------------------
+*     2.) R-DIRECTION
+*----------------------------------------------------------------------
+*
+!     INITIALLY: DO 420
+      DO J = 1, NQ1
+C (0,110)
+!     INITIALLY: DO 420
+         DO I = 1, MQ
+C (0,111)
+C           BEGIN BLOCK
+C (0,112)
+            C = DMIN1(RP(I,J+1), RM(I,J))
+C (0,113)
+            IF (AR2(I,J).LT.0.0D0) THEN
+C (0,114)
+               C = DMIN1(RP(I,J), RM(I,J+1))
+            ELSE
+C (0,115)
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+C (0,116)
+            AR2(I,J) = C*AR2(I,J)
+C (0,117)
+420         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,118)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE CHECK
+*
+*
+***********************************************************************
+*
+*     IN THIS SUBROUTINE SOME IMPORTANT CHECKS ARE PERFORMED
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+      COMMON /PRMT/   TS, DT, GAM, CFL,VCT,
+     &                TZ,TR, FTZ,FTR, BSZ,BSR, QTZ,QTR, IS
+      COMMON /DISK/   ISTEP, ICNT,
+     &                ISTOR, IPRIN, MPROW, NPROW
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+*
+*
+***********************************************************************
+*     COMPUTE MAXIMUM, MINIMUM AND FLOOR VALUES OF VARIABLES
+*     COMPUTE PRESSURE, VELOCITY AND FLOOR OF PRESSURE
+***********************************************************************
+*
+*
+      CALL CUT
+C (0,3)
+      CALL VPR
+C (0,4)
+C     BEGIN UNSTRUCTURED
+C (1,1)
+*
+*
+***********************************************************************
+*     CHECK TIMESTEP AND RETURN IF NOTHING IS PRINTED OR STORED
+***********************************************************************
+*
+*
+      IF (.NOT.(MOD(IS, ISTOR).EQ.0.OR.MOD(IS, IPRIN).EQ.0)) RETURN
+C (3,1)
+C     BEGIN BLOCK
+C (3,2)
+*
+*
+***********************************************************************
+*     COMPUTE PRESSURE, VELOCITY AND FLOOR OF PRESSURE,
+*     AND CHECK THE CONSERVATITION PROPERITES OF THE EQUATIONS
+***********************************************************************
+*
+*
+      CALL VPS
+C (3,3)
+      CALL CON
+*
+*
+***********************************************************************
+*
+*
+C     END BLOCK
+C (2,1)
+      RETURN
+C     END UNSTRUCTURED
+C     END BLOCK
+      END
+      SUBROUTINE CUT
+*
+*
+***********************************************************************
+*
+*     IN THIS SUBROUTINE THE EXTREMAL VALUES OF THE VARIABLES
+*     ARE COMPUTED AND VERY SMALL VALUES ARE CUT OFF
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        -  RO,EN, GZ,GR
+*     VALUES COMPUTED:
+*        -  RO,EN, GZ,GR
+*        -  ROMIN,ENMIN         ( AND POSITION )
+*        -  GZMIN,GRMIN         ( AND POSITION )
+*        -  ROMAX,ENMAX         ( AND POSITION )
+*        -  GZMAX,GRMAX         ( AND POSITION )
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+      PARAMETER  ( MN   =   MP * NP )
+*
+*     Original values for the next 4 constants: 1.0D-14
+*     Changed 10/18/91, Reinhold Weicker
+      PARAMETER  ( ROFLOR  =    1.0D-7 )
+      PARAMETER  ( ENFLOR  =    1.0D-7 )
+      PARAMETER  ( GZFLOR  =    1.0D-7 )
+      PARAMETER  ( GRFLOR  =    1.0D-7 )
+*
+*
+      COMMON /ADVC/   ROBMQ, ROBNQ,
+     &                MQ,MQ1,MQ2, NQ,NQ1,NQ2,
+     &                MQFLG, NQFLG
+      COMMON /CONT/   ENMAX, ROMAX, ENMIN, ROMIN,
+     &                GRMAX, GZMAX, GRMIN, GZMIN,
+     &                TOTMA, TOTEN, TOTGZ,
+     &                MINRO, MINEN, MAXRO, MAXEN,
+     &                MINGZ, MINGR, MAXGZ, MAXGR
+      COMMON /VAR1/   RO(MP,NP), EN(MP,NP),
+     &                GZ(MP,NP), GR(MP,NP)
+* DU4 is a dummy               a.w.
+      COMMON /SCRA/   ROH(MN), ENH(MN),
+     &                GZH(MN), GRH(MN),
+     &                DU4(4*MP + 4*NP +4)
+*
+*****************************************************************
+*   Declaration of variables.
+*   This is done additionally to the IMPLICIT declaration,
+*   because one of the compilers reported strange
+*   error messages.
+*   We have no idea, what difference an explicit declaration makes,
+*   but it seems to work.
+*                                   m.s. 07/22/91
+*****************************************************************
+* integer
+       INTEGER*4 MQ, MQ1, MQ2, NQ, NQ1, NQ2, MQFLG, NQFLG,
+     &           MINRO, MINEN, MAXRO, MAXEN,
+     &           MINGZ, MINGR, MAXGZ, MAXGR
+*
+* double precision
+       DOUBLE PRECISION ROBMQ, ROBNQ, ENMAX, ROMAX, ENMIN, ROMIN,
+     &                  GRMAX, GZMAX, GRMIN, GZMIN,
+     &                  TOTMA, TOTEN, TOTGZ, RO, EN, GZ, GR,
+     &                  ROH, ENH, GZH, GRH
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+****************************************************************
+*
+***********************************************************************
+*     PACK VARAIABLES INTO SCRATCH FOR SEARCH
+***********************************************************************
+*
+*
+      MNQ = MQ*NQ
+C (0,3)
+*
+      K = 0
+C (0,4)
+!     INITIALLY: DO 100
+      DO J = 1, NQ
+C (0,5)
+!     INITIALLY: DO 100
+         DO I = 1, MQ
+C (0,6)
+C           BEGIN BLOCK
+C (0,7)
+            K = K+1
+C (0,8)
+            ROH(K) = RO(I,J)
+C (0,9)
+            ENH(K) = EN(I,J)
+C (0,10)
+            GZH(K) = GZ(I,J)
+C (0,11)
+            GRH(K) = GR(I,J)
+C (0,12)
+100         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,13)
+*
+*
+***********************************************************************
+*     COMPUTE MINIMUM VALUES OF VARIABLES
+***********************************************************************
+*
+*
+      MINRO = ISMIN(MNQ, ROH, 1)
+C (0,14)
+      MINEN = ISMIN(MNQ, ENH, 1)
+C (0,15)
+      MINGZ = ISMIN(MNQ, GZH, 1)
+C (0,16)
+      MINGR = ISMIN(MNQ, GRH, 1)
+C (0,17)
+*
+      ROMIN = ROH(MINRO)
+C (0,18)
+      ENMIN = ENH(MINEN)
+C (0,19)
+      GZMIN = GZH(MINGZ)
+C (0,20)
+      GRMIN = GRH(MINGR)
+C (0,21)
+*
+*
+***********************************************************************
+*     COMPUTE MAXIMUM VALUES OF VARIABLES
+***********************************************************************
+*
+*
+      MAXRO = I0MAX(MNQ, ROH, 1)
+C (0,22)
+      MAXEN = I0MAX(MNQ, ENH, 1)
+C (0,23)
+      MAXGZ = I0MAX(MNQ, GZH, 1)
+C (0,24)
+      MAXGR = I0MAX(MNQ, GRH, 1)
+C (0,25)
+*
+      ROMAX = ROH(MAXRO)
+C (0,26)
+      ENMAX = ENH(MAXEN)
+C (0,27)
+      GZMAX = GZH(MAXGZ)
+C (0,28)
+      GRMAX = GRH(MAXGR)
+C (0,29)
+*
+*
+***********************************************************************
+*     CUT OFF VERY SMALL VALUES
+***********************************************************************
+*
+*
+      ROCUT = ROFLOR*ROMAX
+C (0,30)
+      ENCUT = ENFLOR*ENMAX
+C (0,31)
+      GZCUT = GZFLOR*DMAX1(DABS(GZMIN), DABS(GZMAX))
+C (0,32)
+      GRCUT = GRFLOR*DMAX1(DABS(GRMIN), DABS(GRMAX))
+C (0,33)
+*
+      GTCUT = DMAX1(GZCUT, GRCUT)
+C (0,34)
+*
+*
+!     INITIALLY: DO 200
+      DO J = 1, NQ
+C (0,35)
+!     INITIALLY: DO 200
+         DO I = 1, MQ
+C (0,36)
+C           BEGIN BLOCK
+C (0,37)
+            IF (RO(I,J).LT.ROCUT) THEN
+C (0,38)
+               RO(I,J) = ROCUT
+            ELSE
+C (0,39)
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+C (0,40)
+            IF (EN(I,J).LT.ENCUT) THEN
+C (0,41)
+               EN(I,J) = ENCUT
+            ELSE
+C (0,42)
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+C (0,43)
+            IF (ABS(GZ(I,J)).LT.GTCUT) THEN
+C (0,44)
+               GZ(I,J) = 0.0D0
+            ELSE
+C (0,45)
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+C (0,46)
+            IF (ABS(GR(I,J)).LT.GTCUT) THEN
+C (0,47)
+               GR(I,J) = 0.0D0
+            ELSE
+C (0,48)
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+C (0,49)
+200         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,50)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE VPR
+*
+*
+***********************************************************************
+*
+*     IN THIS SUBROUTINE THE VELOCITIES, THE PRESSURE
+*     AND THE FLOOR OF THE PRESSURE IS COMPUTED
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        -  GAM
+*        -  RO,EN, GZ,GR
+*     VALUES USED AS TEMPORARY STORAGE:
+*        -  ID,PH
+*     VALUES COMPUTED:
+*        -  PR, VZ,VR
+*        -  NEGPR,NEGPO,PRCUT
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+      PARAMETER  ( MN   =   MP * NP )
+*
+*     Original value for the next constant: 1.0D-14
+*     Changed 10/18/91, Reinhold Weicker
+      PARAMETER  ( PRFLOR  =    1.0D-7 )
+*
+      COMMON /PRMT/   TS, DT, GAM, CFL,VCT,
+     &                TZ,TR, FTZ,FTR, BSZ,BSR, QTZ,QTR, IS
+      COMMON /ADVC/   ROBMQ, ROBNQ,
+     &                MQ,MQ1,MQ2, NQ,NQ1,NQ2,
+     &                MQFLG, NQFLG
+      COMMON /CUTP/   PRCUT, NEGFL, NEGCN, NEGPR, NEGPO(1000)
+      COMMON /VAR1/   RO(MP,NP), EN(MP,NP),
+     &                GZ(MP,NP), GR(MP,NP)
+* DU3 is a dummy             a.w.
+      COMMON /VARH/   VZ(MP,NP), VR(MP,NP),
+     &                PR(MP,NP),
+     &                DU3(1*MP*NP + 4*MP + 4*NP + 4)
+* DU4 is a dummy               a.w.
+      COMMON /SCRA/   ID(MN), PH(MN),
+     &                DU4(2*MP*NP + MP*NP/2 + 4*MP + 4*NP + 4)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+* MP*NP/2 because integer array ID takes only half the space
+* of an array of REAL*8 data
+*
+***********************************************************************
+*     COMPUTE VELOCITIES AND THERMAL PRESSURE
+***********************************************************************
+*
+*
+      CON = GAM-DBLE(1.0D0)
+C (0,3)
+*
+!     INITIALLY: DO 100
+      DO J = 1, NQ
+C (0,4)
+!     INITIALLY: DO 100
+         DO I = 1, MQ
+C (0,5)
+C           BEGIN BLOCK
+C (0,6)
+*
+            VZ(I,J) = GZ(I,J)/RO(I,J)
+C (0,7)
+            VR(I,J) = GR(I,J)/RO(I,J)
+C (0,8)
+*
+            PR(I,J) = CON*(EN(I,J)-0.5D0*(GZ(I,J)**2+GR(I,J)**2)/RO(I
+     &      ,J))
+C (0,9)
+*
+100         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,10)
+*
+*
+***********************************************************************
+*     COUNT NEGATIVE VALUES OF THERMAL PRESSURE
+*     AND STORE POSITION OF NEGATIVE VALUES
+***********************************************************************
+*
+*
+      K = 0
+C (0,11)
+!     INITIALLY: DO 200
+      DO J = 1, NQ
+C (0,12)
+!     INITIALLY: DO 200
+         DO I = 1, MQ
+C (0,13)
+C           BEGIN BLOCK
+C (0,14)
+            K = K+1
+C (0,15)
+            PH(K) = PR(I,J)
+C (0,16)
+200         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,17)
+*
+      CALL WNFLE(MQ*NQ, PH, 1, DBLE(0.0D0), ID, NEGPR)
+C (0,18)
+*
+      IF (NEGPR.GE.1.AND.NEGPR.LE.NEGCN) THEN
+C (0,19)
+!     INITIALLY: DO 300
+         DO I = 1, NEGPR
+C (0,20)
+C           BEGIN BLOCK
+C (0,21)
+            NEGPO(I) = ID(I)
+C (0,22)
+300         CONTINUE
+C           END BLOCK
+         ENDDO
+      ELSE
+C (0,23)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,24)
+*
+*
+***********************************************************************
+*     COMPUTE FLOOR OF THERMAL PRESSURE,
+*     AND CUT OFF SMALL OR NEGATIVE VALUES
+***********************************************************************
+*
+*
+      MAXPR = I0MAX(MQ*NQ, PH, 1)
+C (0,25)
+      PRCUT = PRFLOR*PH(MAXPR)
+C (0,26)
+*
+!     INITIALLY: DO 400
+      DO J = 1, NQ
+C (0,27)
+!     INITIALLY: DO 400
+         DO I = 1, MQ
+C (0,28)
+C           BEGIN BLOCK
+C (0,29)
+            IF (PR(I,J).LT.PRCUT) THEN
+C (0,30)
+               PR(I,J) = PRCUT
+            ELSE
+C (0,31)
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+C (0,32)
+400         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,33)
+
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE VPS
+*
+*
+***********************************************************************
+*
+*     IN THIS SUBROUTINE THE VELOCITIES, THE PRESSURE
+*     AND THE FLOOR OF THE PRESSURE IS COMPUTED
+*     FOR ALL GRIDPOINTS FOR THE OUTPUT ROUTINE
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        -  GAM
+*        -  RO,EN, GZ,GR
+*     VALUES USED AS TEMPORARY STORAGE:
+*        -  ID
+*     VALUES COMPUTED:
+*        -  PR, VZ,VR
+*        -  NEGPR,NEGPO,PRCUT
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+      PARAMETER  ( MN   =   MP * NP )
+*
+*     Original value for the next constant: 1.0D-14
+*     Changed 10/18/91, Reinhold Weicker
+      PARAMETER  ( PRFLOR  =    1.0D-7 )
+*
+      COMMON /PRMT/   TS, DT, GAM, CFL,VCT,
+     &                TZ,TR, FTZ,FTR, BSZ,BSR, QTZ,QTR, IS
+      COMMON /CUTP/   PRCUT, NEGFL, NEGCN, NEGPR, NEGPO(1000)
+      COMMON /VAR1/   RO(MP,NP), EN(MP,NP),
+     &                GZ(MP,NP), GR(MP,NP)
+* DU3 is a dummy             a.w.
+      COMMON /VARH/   VZ(MP,NP), VR(MP,NP),
+     &                PR(MP,NP),
+     &                DU3(1*MP*NP + 4*MP + 4*NP + 4)
+* DU4 is a dummy               a.w.
+      COMMON /SCRA/   ID(MN),
+     &                DU4(3*MP*NP + MP*NP/2 + 4*MP + 4*NP + 4)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+* MP*NP/2 because integer array ID takes only half the space
+* of an array of REAL*8 data
+*
+***********************************************************************
+*     COMPUTE VELOCITIES AND THERMAL PRESSURE
+***********************************************************************
+*
+*
+      CON = GAM-1.0D0
+C (0,3)
+*
+!     INITIALLY: DO 100
+      DO J = 1, NP
+C (0,4)
+!     INITIALLY: DO 100
+         DO I = 1, MP
+C (0,5)
+C           BEGIN BLOCK
+C (0,6)
+*
+            VZ(I,J) = GZ(I,J)/RO(I,J)
+C (0,7)
+            VR(I,J) = GR(I,J)/RO(I,J)
+C (0,8)
+*
+            PR(I,J) = CON*(EN(I,J)-0.5D0*(GZ(I,J)**2+GR(I,J)**2)/RO(I
+     &      ,J))
+C (0,9)
+*
+100         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,10)
+*
+*
+***********************************************************************
+*     COUNT NEGATIVE VALUES OF THERMAL PRESSURE
+*     AND STORE POSITION OF NEGATIVE VALUES
+***********************************************************************
+*
+*
+      CALL WNFLE(MN, PR, 1, DBLE(0.0D0), ID, NEGPR)
+C (0,11)
+*
+      IF (NEGPR.GE.1.AND.NEGPR.LE.NEGCN) THEN
+C (0,12)
+!     INITIALLY: DO 200
+         DO I = 1, NEGPR
+C (0,13)
+C           BEGIN BLOCK
+C (0,14)
+            NEGPO(I) = ID(I)
+C (0,15)
+200         CONTINUE
+C           END BLOCK
+         ENDDO
+      ELSE
+C (0,16)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,17)
+*
+*
+***********************************************************************
+*     COMPUTE FLOOR OF THERMAL PRESSURE,
+*     AND CUT OFF SMALL OR NEGATIVE VALUES
+***********************************************************************
+*
+*
+      MAXPR = I0MAX(MN, PR, 1)
+C (0,18)
+      M01 = MOD(MAXPR-1, MP)+1
+C (0,19)
+      N01 = (MAXPR-1)/MP+1
+C (0,20)
+CSTE  PRCUT =  PRFLOR * PR(MAXPR,1)
+      PRCUT = PRFLOR*PR(M01,N01)
+C (0,21)
+*
+!     INITIALLY: DO 300
+      DO J = 1, NP
+C (0,22)
+!     INITIALLY: DO 300
+         DO I = 1, MP
+C (0,23)
+C           BEGIN BLOCK
+C (0,24)
+            IF (PR(I,J).LT.PRCUT) THEN
+C (0,25)
+               PR(I,J) = PRCUT
+            ELSE
+C (0,26)
+C              BEGIN BLOCK
+C              END BLOCK
+            ENDIF
+C (0,27)
+300         CONTINUE
+C           END BLOCK
+         ENDDO
+      ENDDO
+C (0,28)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE CON
+*
+*
+***********************************************************************
+*
+*     IN THIS SUBROUTINE THE CONTROL VARIABLES ARE COMPUTED
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        -  DZ,R,DR
+*        -  RO,EN, GZ,GR
+*     VALUES USED AS TEMPORARY STORAGE:
+*        -  DF
+*     VALUES COMPUTED:
+*        -  TOTMA,TOTEN,TOTGZ
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+      PARAMETER  ( M1   =   MP - 1 ,   N1   =   NP - 1 )
+      PARAMETER  ( MN   =   MP * NP )
+*
+      COMMON /CONT/   ENMAX, ROMAX, ENMIN, ROMIN,
+     &                GRMAX, GZMAX, GRMIN, GZMIN,
+     &                TOTMA, TOTEN, TOTGZ,
+     &                MINRO, MINEN, MAXRO, MAXEN,
+     &                MINGZ, MINGR, MAXGZ, MAXGR
+      COMMON /GRID/   Z(MP), ZB(0:MP), DZ(MP), DBZ(0:MP), FZ(M1),
+     &                R(NP), RB(0:NP), DR(NP), DBR(0:NP), FR(N1),
+     &                DUM(8)
+* Dum is a dummy             a.w.
+      COMMON /VAR1/   RO(MP,NP), EN(MP,NP),
+     &                GZ(MP,NP), GR(MP,NP)
+* DU4 is a dummy               a.w.
+      COMMON /SCRA/   DF(MP,NP),
+     &                DU4(3*MP*NP + 4*MP + 4*NP + 4)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+*
+***********************************************************************
+*     COMPUTE TOTAL MASS, ENERGY AND Z-MOMENTUM
+***********************************************************************
+*
+*
+!     INITIALLY: DO 100
+      DO J = 1, NP
+C (0,3)
+C        BEGIN BLOCK
+C (0,4)
+         RDR = R(J)*DR(J)
+C (0,5)
+!     INITIALLY: DO 120
+         DO I = 1, MP
+C (0,6)
+C           BEGIN BLOCK
+C (0,7)
+            DF(I,J) = RDR*DZ(I)
+C (0,8)
+120         CONTINUE
+C           END BLOCK
+         ENDDO
+C (0,9)
+100      CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,10)
+*
+      TOTMA = SDOT(MN, DF, 1, RO, 1)
+C (0,11)
+      TOTEN = SDOT(MN, DF, 1, EN, 1)
+C (0,12)
+      TOTGZ = SDOT(MN, DF, 1, GZ, 1)
+C (0,13)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE OUTPUT
+*
+*
+***********************************************************************
+*
+*     IN THIS SUBROUTINE A MODEL IS WRITEN ON DISC
+*     AND / OR ASSORTED DATA IS PRINTED
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+      PARAMETER  ( M1   =   MP - 1 ,   N1   =   NP - 1 )
+*
+      COMMON /PRMT/   TS, DT, GAM, CFL,VCT,
+     &                TZ,TR, FTZ,FTR, BSZ,BSR, QTZ,QTR, IS
+      COMMON /DISK/   ISTEP, ICNT,
+     &                ISTOR, IPRIN, MPROW, NPROW
+      COMMON /ADVC/   ROBMQ, ROBNQ,
+     &                MQ,MQ1,MQ2, NQ,NQ1,NQ2,
+     &                MQFLG, NQFLG
+      COMMON /CUTP/   PRCUT, NEGFL, NEGCN, NEGPR, NEGPO(1000)
+      COMMON /CONT/   ENMAX, ROMAX, ENMIN, ROMIN,
+     &                GRMAX, GZMAX, GRMIN, GZMIN,
+     &                TOTMA, TOTEN, TOTGZ,
+     &                MINRO, MINEN, MAXRO, MAXEN,
+     &                MINGZ, MINGR, MAXGZ, MAXGR
+      COMMON /GRID/   Z(MP), ZB(0:MP), DZ(MP), DBZ(0:MP), FZ(M1),
+     &                R(NP), RB(0:NP), DR(NP), DBR(0:NP), FR(N1),
+     &                DUM(8)
+* Dum is a dummy             a.w.
+      COMMON /VAR1/   RO(MP,NP), EN(MP,NP),
+     &                GZ(MP,NP), GR(MP,NP)
+* DU3 is a dummy             a.w.
+      COMMON /VARH/   VZ(MP,NP), VR(MP,NP),
+     &                PR(MP,NP),
+     &                DU3(1*MP*NP + 4*MP + 4*NP + 4)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+
+500   FORMAT('1'/////6X,'TOO MANY CELLS WITH NEGATIVE PRESSURE:'/6X,'AT 
+     x 
+     &TIMESTEP NUMBER: ',I6/6X,'NEGPR  =  ',I6/6X,'NEGCN  =  ',I6/6X,'ST
+     x 
+     &OP IN ROUTINE:    OUTPUT')
+C (0,3)
+510   FORMAT(4X,'TIMESTEP: ',I6,4X,I4,'  CELLS WITH P<0')
+C (0,4)
+520   FORMAT(4X,' '/4X,'TIMESTEP: ',I6,4X,I4,'  CELLS WITH P<0',6X,I2,4X
+     x 
+     &,'I=',I4,4X,'J=',I4)
+C (0,5)
+530   FORMAT(50X,I2,4X,'I=',I4,4X,'J=',I4)
+C (0,6)
+*
+210   FORMAT(////6X,'CONTROL VARIABLES OF MODEL NO.:',I13////6X,'TOTAL T
+     x 
+     &IME:            TS = ',1PE16.9/6X,'LAST TIMESTEP:         DT = ',E
+     x 
+     &16.9////6X,'GRIDSPACING:           TZ = ',E16.9/6X,'              
+     x 
+     &         TR = ',E16.9/6X,'                      BSZ = ',E16.9/6X,'
+     x 
+     &                      BSR = ',E16.9/6X,'                      QTZ 
+     x 
+     &= ',E16.9/6X,'                      QTR = ',E16.9////6X,'GAMMA:   
+     x 
+     &             GAM = ',E16.9////6X,'COURANT FACTOR:       CFL = ',E1
+     x 
+     &6.9/6X,'VISCOSITY FACTOR:     VCT = ',E16.9////6X,'ADVECTION LENGT
+     x 
+     &H:      MQ = ',I16/6X,'                       NQ = ',I16////6X,'TO
+     x 
+     &TAL MASS:         TOTMA = ',E16.9/6X,'TOTAL ENERGY:       TOTEN = 
+     x 
+     &',E16.9/6X,'TOTAL Z-MOMENTUM:   TOTGZ = ',E16.9)
+C (0,7)
+* I had to change the FORMAT            a.w.
+*  230 FORMAT (////6X,'DENSITY MIN:   ',5X,'ROMIN = ',1PE16.9
+*     &          ,12X,'POSITION:     I = ',I4,'     J = ',I4
+*     &           /6X,'ENERGY MIN:    ',5X,'ENMIN = ',E16.9
+*     &          ,12X,'POSITION:     I = ',I4,'     J = ',I4
+*     &           /6X,'Z-MOMENTUM MIN:',5X,'GZMIN = ',E16.9
+*     &          ,12X,'POSITION:     I = ',I4,'     J = ',I4
+*     &           /6X,'R-MOMENTUM MIN:',5X,'GRMIN = ',E16.9
+*     &          ,12X,'POSITION:     I = ',I4,'     J = ',I4 )
+*  240 FORMAT (////6X,'DENSITY MAX:   ',5X,'ROMAX = ',1PE16.9
+*     &          ,12X,'POSITION:     I = ',I4,'     J = ',I4
+*     &           /6X,'ENERGY MAX:    ',5X,'ENMAX = ',E16.9
+*     &          ,12X,'POSITION:     I = ',I4,'     J = ',I4
+*     &           /6X,'Z-MOMENTUM MAX:',5X,'GZMAX = ',E16.9
+*     &          ,12X,'POSITION:     I = ',I4,'     J = ',I4
+*     &           /6X,'R-MOMENTUM MAX:',5X,'GRMAX = ',E16.9
+*     &          ,12X,'POSITION:     I = ',I4,'     J = ',I4 )
+230   FORMAT(////6X,'DENSITY MIN:   ',5X,'ROMIN = ',1PE16.9/6X,'ENERGY M
+     x 
+     &IN:    ',5X,'ENMIN = ',E16.9/6X,'Z-MOMENTUM MIN:',5X,'GZMIN = ',E1
+     x 
+     &6.9/6X,'R-MOMENTUM MIN:',5X,'GRMIN = ',E16.9)
+C (0,8)
+240   FORMAT(////6X,'DENSITY MAX:   ',5X,'ROMAX = ',1PE16.9/6X,'ENERGY M
+     x 
+     &AX:    ',5X,'ENMAX = ',E16.9/6X,'Z-MOMENTUM MAX:',5X,'GZMAX = ',E1
+     x 
+     &6.9/6X,'R-MOMENTUM MAX:',5X,'GRMAX = ',E16.9)
+C (0,9)
+*
+300   FORMAT('1'//1X,'VALUES OF VARIABLES AT ','RO-DISTANCE     J  = ',I
+     x 
+     &10/38X,'R(J) = ',1PE10.3E2////1X,'Z-IN',4X,'Z-DIST',9X,'DENSITY',7
+     x 
+     &X,'PRESSURE',5X,'Z-VELOCITY',4X,'R-VELOCITY')
+C (0,10)
+350   FORMAT(1X,I4,2X,1PE10.2E2,2X,4(2X,E12.5))
+C (0,11)
+*
+*
+***********************************************************************
+*     PRINT INFORMATION ABOUT NEGATIVE PRESSURE
+***********************************************************************
+*
+*
+      IF (MOD(IS-1, IPRIN).EQ.0) THEN
+C (0,12)
+         IFLAG = 0
+      ELSE
+C (0,13)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,14)
+*
+      IF (NEGPR.GT.0) THEN
+C (0,15)
+C        BEGIN BLOCK
+C (0,16)
+*
+         IFLAG = 1
+C (0,17)
+*
+         IF (NEGPR.GT.NEGCN) THEN
+C (0,18)
+C           BEGIN BLOCK
+C (0,19)
+            WRITE (10, 500) IS, NEGPR, NEGCN
+C (0,20)
+            STOP
+C           END BLOCK
+         ELSE
+C (0,21)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C (0,22)
+*
+         IF (NEGFL.EQ.0) THEN
+C (0,23)
+            WRITE (10, 510) IS, NEGPR
+         ELSE
+C (0,24)
+C           BEGIN BLOCK
+C (0,25)
+            IF (MOD(IS, IPRIN).EQ.0) THEN
+C (0,26)
+               MH = MP
+            ELSE
+C (0,27)
+               MH = MQ
+            ENDIF
+C (0,28)
+!     INITIALLY: DO 50
+            DO I = 1, NEGPR
+C (0,29)
+C              BEGIN BLOCK
+C (0,30)
+               JNEG = (NEGPO(I)-1)/MH+1
+C (0,31)
+               INEG = NEGPO(I)-MH*(JNEG-1)
+C (0,32)
+               IF (I.EQ.1) THEN
+C (0,33)
+                  WRITE (10, 520) IS, NEGPR, I, INEG, JNEG
+               ELSE
+C (0,34)
+                  WRITE (10, 530) I, INEG, JNEG
+               ENDIF
+C (0,35)
+50             CONTINUE
+C              END BLOCK
+            ENDDO
+C           END BLOCK
+         ENDIF
+*
+C        END BLOCK
+      ELSE
+C (0,37)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,38)
+C     BEGIN UNSTRUCTURED
+C (1,1)
+*
+*
+***********************************************************************
+*     CHECK TIMESTEP AND STORE MODEL ON DISK
+***********************************************************************
+*
+*
+      IF (MOD(IS, ISTOR).NE.0) THEN
+      ENDIF
+C (2,1)
+*
+*
+*
+*
+***********************************************************************
+*     CHECK TIMESTEP,
+*     COMPUTE POSITION OF CONTROL VARIABLES
+*     AND PRINT CONTROL VARIABLES
+***********************************************************************
+*
+*
+100   IF (MOD(IS, IPRIN).NE.0) RETURN
+C (4,1)
+C     BEGIN BLOCK
+C (4,2)
+*
+*
+      JMIRO = (MINRO-1)/MQ+1
+C (4,3)
+      JMIEN = (MINEN-1)/MQ+1
+C (4,4)
+      JMIGZ = (MINGZ-1)/MQ+1
+C (4,5)
+      JMIGR = (MINGR-1)/MQ+1
+C (4,6)
+*
+      JMARO = (MAXRO-1)/MQ+1
+C (4,7)
+      JMAEN = (MAXEN-1)/MQ+1
+C (4,8)
+      JMAGZ = (MAXGZ-1)/MQ+1
+C (4,9)
+      JMAGR = (MAXGR-1)/MQ+1
+C (4,10)
+*
+*
+      IMIRO = MINRO-MQ*(JMIRO-1)
+C (4,11)
+      IMIEN = MINEN-MQ*(JMIEN-1)
+C (4,12)
+      IMIGZ = MINGZ-MQ*(JMIGZ-1)
+C (4,13)
+      IMIGR = MINGR-MQ*(JMIGR-1)
+C (4,14)
+*
+      IMARO = MAXRO-MQ*(JMARO-1)
+C (4,15)
+      IMAEN = MAXEN-MQ*(JMAEN-1)
+C (4,16)
+      IMAGZ = MAXGZ-MQ*(JMAGZ-1)
+C (4,17)
+      IMAGR = MAXGR-MQ*(JMAGR-1)
+C (4,18)
+*
+*
+*     IF ( IFLAG .EQ. 1 )    PRINT '(1H1)'
+*   PRINT changed to WRITE - R.W., 4/30/91
+      IF (IFLAG.EQ.1) THEN
+C (4,19)
+         WRITE (10, '(1H1)') 
+      ELSE
+C (4,20)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (4,21)
+*
+      WRITE (*, 210) IS, TS, DT, TZ, TR, BSZ, BSR, QTZ, QTR, GAM, CFL
+     &, VCT, MQ, NQ, TOTMA, TOTEN, TOTGZ
+C (4,22)
+* old version:
+*      PRINT 230,  ROMIN, IMIRO, JMIRO,
+*     &            ENMIN, IMIEN, JMIEN,
+*     &            GZMIN, IMIGZ, JMIGZ,
+*     &            GRMIN, IMIGR, JMIGR
+* new version:
+      WRITE (*, 230) ROMIN, ENMIN, GZMIN, GRMIN
+C (4,23)
+* old version:
+*      PRINT 240,  ROMAX, IMARO, JMARO,
+*     &            ENMAX, IMAEN, JMAEN,
+*     &            GZMAX, IMAGZ, JMAGZ,
+*     &            GRMAX, IMAGR, JMAGR
+* new version:
+      WRITE (*, 240) ROMAX, ENMAX, GZMAX, GRMAX
+C (4,24)
+*
+*
+***********************************************************************
+*     PRINT ASSORTED DATA
+***********************************************************************
+*
+*
+!     INITIALLY: DO 10
+      DO J = 1, NP, NP/NPROW
+C (4,25)
+C        BEGIN BLOCK
+C (4,26)
+*
+         WRITE (10, 300) J, R(J)
+C (4,27)
+*
+!     INITIALLY: DO 20
+         DO I = 1, MP, MP/MPROW
+C (4,28)
+C           BEGIN BLOCK
+C (4,29)
+            WRITE (10, 350) I, Z(I), RO(I,J), PR(I,J), VZ(I,J), VR(I,
+     &      J)
+C (4,30)
+20          CONTINUE
+C           END BLOCK
+         ENDDO
+C (4,31)
+*
+10       CONTINUE
+C        END BLOCK
+      ENDDO
+*
+*
+***********************************************************************
+*
+*
+C     END BLOCK
+C (3,1)
+      RETURN
+C     END UNSTRUCTURED
+C     END BLOCK
+      END
+      SUBROUTINE TERM
+*
+*
+***********************************************************************
+*
+*     THIS SUBROUTINE TERMINATES THE COMPUTATION
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+*
+      COMMON /PRMT/   TS, DT, GAM, CFL,VCT,
+     &                TZ,TR, FTZ,FTR, BSZ,BSR, QTZ,QTR, IS
+      COMMON /ADVC/   ROBMQ, ROBNQ,
+     &                MQ,MQ1,MQ2, NQ,NQ1,NQ2,
+     &                MQFLG, NQFLG
+      COMMON /DISK/   ISTEP, ICNT,
+     &                ISTOR, IPRIN, MPROW, NPROW
+      COMMON /VAR1/   RO(MP,NP), EN(MP,NP),
+     &                GZ(MP,NP), GR(MP,NP)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+*
+10    FORMAT(' 1',/////6X,'NORMAL PROGRAM STOP')
+C (0,3)
+20    FORMAT(' 1',/////6X,'EMERGENCY HALT')
+C (0,4)
+*
+100   FORMAT(/6X,'AT TIMESTEP NO.     :  ',I10/6X,'TOTAL TIME IS       :
+     x 
+     &  ',1PE10.3E2/6X,'CURRENT TIMESTEP IS :  ',1PE10.3E2///6X,I6,' TIM
+     x 
+     &ESTEPS HAVE BEEN COMPUTED'/6X,I6,' TIMESTEPS HAVE BEEN STORED'/6X,
+     x 
+     &I6,' TIMESTEPS HAVE BEEN PRINTED'/6X,I6,' TIMESTEPS HAVE BEEN CANC
+     x 
+     &ELED'/////6X,'STOP IN ROUTINE:   TERM')
+C (0,5)
+*
+*
+***********************************************************************
+*        WRITE LAST MODEL TO DISK IF THIS HASN'T ALREADY BEEN DONE
+***********************************************************************
+*
+*
+*
+*
+***********************************************************************
+*        PRINT SOME INFORMATION ABOUT THE COMPUTATION
+***********************************************************************
+*
+*
+      IF (ICNT.GT.ISTEP) THEN
+C (0,6)
+C        BEGIN BLOCK
+C (0,7)
+         ICNT = ISTEP
+C (0,8)
+         WRITE (*, 10) 
+C        END BLOCK
+      ELSE
+C (0,9)
+         WRITE (*, 20) 
+      ENDIF
+C (0,10)
+*
+      WRITE (*, 100) IS, TS, DT, ICNT, ICNT/ISTOR+1, ICNT/IPRIN+1, 
+     &ISTEP-ICNT
+C (0,11)
+*
+*
+***********************************************************************
+*
+*
+      STOP
+C (0,12)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      DOUBLE PRECISION FUNCTION SDOT ( N, SX,INCX, SY,INCY )
+*
+*
+***********************************************************************
+*
+*     THIS FUNCTION COMPUTES THE SCALAR PRODUCT OF TWO VECTORS
+*
+*     STATUS:  TESTED
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        -  N           ( DIMENSION OF ARRAYS )
+*        -  SX(Y)       ( VECTORS             )
+*        -  INCX(Y)     ( SKIP DISTANCES      )
+*     VALUES COMPUTED:
+*        -  SDOT
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+      DIMENSION  SX(64320), SY(64320)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+*
+*
+***********************************************************************
+*
+*
+      INX = 1
+C (0,3)
+      INY = 1
+C (0,4)
+      IF (INCX.LT.0) THEN
+C (0,5)
+         INX = -INCX*(N-1)+1
+      ELSE
+C (0,6)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,7)
+      IF (INCY.LT.0) THEN
+C (0,8)
+         INY = -INCY*(N-1)+1
+      ELSE
+C (0,9)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,10)
+*
+      DOT = 0.0D0
+C (0,11)
+*
+!     INITIALLY: DO 10
+      DO I = 0, N-1
+C (0,12)
+C        BEGIN BLOCK
+C (0,13)
+         DOT = DOT+SX(INCX*I+INX)*SY(INCY*I+INY)
+C (0,14)
+10       CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,15)
+*
+      SDOT = DOT
+C (0,16)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      FUNCTION ISMIN ( N, SX,INCX )
+*
+*
+***********************************************************************
+*
+*     THIS FUNCTION COMPUTES THE INDEX OF
+*     THE MINIMUM ELEMENT OF A VECTOR
+*
+*     STATUS:  TESTED
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        -  N           ( DIMENSION OF ARRAY )
+*        -  SX          ( VECTOR             )
+*        -  INCX        ( SKIP DISTANCE      )
+*     VALUES COMPUTED:
+*        -  ISMIN
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+      DIMENSION  SX(64320)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+*
+*
+***********************************************************************
+*
+*
+      INX = 1
+C (0,3)
+      IF (INCX.LT.0) THEN
+C (0,4)
+         INX = -INCX*(N-1)+1
+      ELSE
+C (0,5)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,6)
+*
+      IMIN = INX
+C (0,7)
+      SMIN = SX(INX)
+C (0,8)
+*
+!     INITIALLY: DO 10
+      DO I = 2, N
+C (0,9)
+C        BEGIN BLOCK
+C (0,10)
+         INX = INX+INCX
+C (0,11)
+         IF (SX(INX).LT.SMIN) THEN
+C (0,12)
+C           BEGIN BLOCK
+C (0,13)
+            IMIN = INX
+C (0,14)
+            SMIN = SX(INX)
+C           END BLOCK
+         ELSE
+C (0,15)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C (0,16)
+10       CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,17)
+*
+      ISMIN = IMIN
+C (0,18)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      FUNCTION I0MAX ( N, SX,INCX )
+*
+*
+***********************************************************************
+*
+*     THIS FUNCTION COMPUTES THE INDEX OF
+*     THE MAXIMUM ELEMENT OF A VECTOR
+*
+*     STATUS:  TESTED
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        -  N           ( DIMENSION OF ARRAY )
+*        -  SX          ( VECTOR             )
+*        -  INCX        ( SKIP DISTANCE      )
+*     VALUES COMPUTED:
+*        -  I0MAX
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+      DIMENSION  SX(64320)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+*
+*
+***********************************************************************
+*
+*
+      INX = 1
+C (0,3)
+      IF (INCX.LT.0) THEN
+C (0,4)
+         INX = -INCX*(N-1)+1
+      ELSE
+C (0,5)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,6)
+*
+      IMAX = INX
+C (0,7)
+      SMAX = SX(INX)
+C (0,8)
+*
+!     INITIALLY: DO 10
+      DO I = 2, N
+C (0,9)
+C        BEGIN BLOCK
+C (0,10)
+         INX = INX+INCX
+C (0,11)
+         IF (SX(INX).GT.SMAX) THEN
+C (0,12)
+C           BEGIN BLOCK
+C (0,13)
+            IMAX = INX
+C (0,14)
+            SMAX = SX(INX)
+C           END BLOCK
+         ELSE
+C (0,15)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C (0,16)
+10       CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,17)
+*
+      I0MAX = IMAX
+C (0,18)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      FUNCTION ISAMAX ( N, SX,INCX )
+*
+*
+***********************************************************************
+*
+*     THIS FUNCTION COMPUTES THE INDEX OF
+*     THE ABSOLUTE MAXIMUM ELEMENT OF A VECTOR
+*
+*     STATUS:  TESTED
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        -  N           ( DIMENSION OF ARRAY )
+*        -  SX          ( VECTOR             )
+*        -  INCX        ( SKIP DISTANCE      )
+*     VALUES COMPUTED:
+*        -  ISAMAX
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+      DIMENSION  SX(I_PIPS_ISAMAX_SX)
+C (0,1)
+      INTEGER*8 I_PIPS_ISAMAX_SX
+      COMMON /PIPS_ISAMAX_SX/ I_PIPS_ISAMAX_SX
+C     BEGIN BLOCK
+C (0,2)
+*
+*
+***********************************************************************
+*
+*
+      INX = 1
+C (0,3)
+      IF (INCX.LT.0) THEN
+C (0,4)
+         INX = -INCX*(N-1)+1
+      ELSE
+C (0,5)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,6)
+*
+      IMAX = INX
+C (0,7)
+      SMAX = ABS(SX(INX))
+C (0,8)
+*
+!     INITIALLY: DO 10
+      DO I = 2, N
+C (0,9)
+C        BEGIN BLOCK
+C (0,10)
+         INX = INX+INCX
+C (0,11)
+         ASX = ABS(SX(INX))
+C (0,12)
+         IF (ASX.GT.SMAX) THEN
+C (0,13)
+C           BEGIN BLOCK
+C (0,14)
+            IMAX = INX
+C (0,15)
+            SMAX = ASX
+C           END BLOCK
+         ELSE
+C (0,16)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C (0,17)
+10       CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,18)
+*
+      ISAMAX = IMAX
+C (0,19)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE WNFLE ( N, ARRAY,INC, TARGET, INDEX,NVAL )
+*
+*
+***********************************************************************
+*
+*     THIS ROUTINE COMPUTES ALL LOCATIONS
+*     THAT ARE LESS THAN OR EQUAL TO THE TARGET
+*
+*     STATUS:  TESTED
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        -  N           ( DIMENSION OF ARRAY      )
+*        -  ARRAY       ( ARRAY TO BE SEARCHED    )
+*        -  INC         ( SKIP DISTANCE           )
+*        -  TARGET      ( TARGET TO BE FOUND      )
+*     VALUES COMPUTED:
+*        -  INDEX       ( ARRAY OF FOUND INDICES  )
+*        -  NVAL        ( NUMBER OF FOUND INDICES )
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+      DIMENSION  ARRAY(64320), INDEX(64320)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+*
+*
+***********************************************************************
+*
+*
+      INA = 1
+C (0,3)
+      IF (INC.LT.0) THEN
+C (0,4)
+         INA = -INC*(N-1)+1
+      ELSE
+C (0,5)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,6)
+*
+      NVAL = 0
+C (0,7)
+*
+!     INITIALLY: DO 10
+      DO I = 1, N
+C (0,8)
+C        BEGIN BLOCK
+C (0,9)
+         IF (ARRAY(INA).LE.TARGET) THEN
+C (0,10)
+C           BEGIN BLOCK
+C (0,11)
+            NVAL = NVAL+1
+C (0,12)
+            INDEX(NVAL) = I
+C           END BLOCK
+         ELSE
+C (0,13)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C (0,14)
+         INA = INA+INC
+C (0,15)
+10       CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,16)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE WNFGT ( N, ARRAY,INC, TARGET, INDEX,NVAL )
+*
+*
+***********************************************************************
+*
+*     THIS ROUTINE COMPUTES ALL LOCATIONS
+*     THAT ARE GREATER THAN THE TARGET
+*
+*     STATUS:  TESTED
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        -  N           ( DIMENSION OF ARRAY      )
+*        -  ARRAY       ( ARRAY TO BE SEARCHED    )
+*        -  INC         ( SKIP DISTANCE           )
+*        -  TARGET      ( TARGET TO BE FOUND      )
+*     VALUES COMPUTED:
+*        -  INDEX       ( ARRAY OF FOUND INDICES  )
+*        -  NVAL        ( NUMBER OF FOUND INDICES )
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+      DIMENSION  ARRAY(I_PIPS_WNFGT_ARRAY), INDEX(I_PIPS_WNFGT_INDEX)
+C (0,1)
+      INTEGER*8 I_PIPS_WNFGT_ARRAY
+      COMMON /PIPS_WNFGT_ARRAY/ I_PIPS_WNFGT_ARRAY
+      INTEGER*8 I_PIPS_WNFGT_INDEX
+      COMMON /PIPS_WNFGT_INDEX/ I_PIPS_WNFGT_INDEX
+C     BEGIN BLOCK
+C (0,2)
+*
+*
+***********************************************************************
+*
+*
+      INA = 1
+C (0,3)
+      IF (INC.LT.0) THEN
+C (0,4)
+         INA = -INC*(N-1)+1
+      ELSE
+C (0,5)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,6)
+*
+      NVAL = 0
+C (0,7)
+*
+!     INITIALLY: DO 10
+      DO I = 1, N
+C (0,8)
+C        BEGIN BLOCK
+C (0,9)
+         IF (ARRAY(INA).GT.TARGET) THEN
+C (0,10)
+C           BEGIN BLOCK
+C (0,11)
+            NVAL = NVAL+1
+C (0,12)
+            INDEX(NVAL) = I
+C           END BLOCK
+         ELSE
+C (0,13)
+C           BEGIN BLOCK
+C           END BLOCK
+         ENDIF
+C (0,14)
+         INA = INA+INC
+C (0,15)
+10       CONTINUE
+C        END BLOCK
+      ENDDO
+C (0,16)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+      FUNCTION ISFNE ( N, ARRAY,INC, TARGET )
+*
+*
+***********************************************************************
+*
+*     THIS FUNCTION COMPUTES THE INDEX OF THE FIRST
+*     LOCATION THAT IS EQUAL TO THE TARGET
+*
+*     STATUS:  TESTED
+*
+***********************************************************************
+*
+*     VALUES REQUIRED:
+*        -  N           ( DIMENSION OF ARRAY    )
+*        -  ARRAY       ( ARRAY TO BE SEARCHED  )
+*        -  INC         ( SKIP DISTANCE         )
+*        -  TARGET      ( TARGET TO BE FOUND    )
+*     VALUES COMPUTED:
+*        -  ISFEQ
+*
+***********************************************************************
+*
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+      DIMENSION  ARRAY(N)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+*
+*
+***********************************************************************
+*
+*
+      INA = 1
+C (0,3)
+      IF (INC.LT.0) THEN
+C (0,4)
+         INA = -INC*(N-1)+1
+      ELSE
+C (0,5)
+C        BEGIN BLOCK
+C        END BLOCK
+      ENDIF
+C (0,6)
+      I = 1
+C (0,7)
+C     BEGIN UNSTRUCTURED
+99994 CONTINUE
+C (1,1)
+*
+C     DO loop 10 with exit had to be desugared
+      IF (I.GT.N) GOTO 20
+C (3,1)
+*
+      IF (ABS(ARRAY(INA)-TARGET).GT.1D-4) GOTO 20
+C (4,1)
+C     BEGIN BLOCK
+C (4,2)
+*
+* Original statement, leading to different results on different
+* machines, due to small numerical differences
+* Testing for equality should not be done for floating point numbers
+*        IF ( ARRAY(INA) .NE. TARGET )  GOTO 20
+*
+      INA = INA+INC
+C (4,3)
+10    CONTINUE
+C (4,4)
+      I = I+1
+C     END BLOCK
+      GOTO 99994
+C (2,1)
+*
+20    CONTINUE
+C     END UNSTRUCTURED
+C (0,8)
+*
+      ISFNE = I
+C (0,9)
+*
+*
+***********************************************************************
+*
+*
+      RETURN
+C     END BLOCK
+      END
+!!
+!! file for inpdta.f
+!!
+      SUBROUTINE INPDTA
+      IMPLICIT REAL*8 (A-H, O-Z)
+*
+*     INPUT UNIT = STDIN
+      INTEGER*4 CNTUNT
+      PARAMETER ( CNTUNT  =  5 )
+*
+*
+***********************************************************************
+*        READ BASIC DATA INTO COMMONS
+*        /DISK/ , /CUTP/ , /PRMT/ , /ADVC/ , /BOND/
+***********************************************************************
+*
+*
+* DECLARATION OF DUMMY CHARACTER STRING
+      CHARACTER*80 CDUM
+*
+      CHARACTER       ZL,ZU, RL,RU
+*
+      COMMON /PRMT/   TS, DT, GAM, CFL,VCT,
+     &                TZ,TR, FTZ,FTR, BSZ,BSR, QTZ,QTR, IS
+      COMMON /DISK/   ISTEP, ICNT,
+     &                ISTOR, IPRIN, MPROW, NPROW
+      COMMON /BOND/   ZL,ZU, RL,RU
+      COMMON /ADVC/   ROBMQ, ROBNQ,
+     &                MQ,MQ1,MQ2, NQ,NQ1,NQ2,
+     &                MQFLG, NQFLG
+      COMMON /CUTP/   PRCUT, NEGFL, NEGCN, NEGPR, NEGPO(1000)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+*
+*
+* INPUT OF CONTROL PARAMETERS AND PRINT THEM FOR COMPARISON
+1000  FORMAT(A80)
+C (0,3)
+      READ (CNTUNT, 1000) CDUM
+C (0,4)
+      READ (CNTUNT, *) ISTEP
+C (0,5)
+      PRINT *, ' ISTEP      =         ', ISTEP
+C (0,6)
+*
+      READ (CNTUNT, 1000) CDUM
+C (0,7)
+      READ (CNTUNT, *) ISTOR, MPROW, NPROW
+C (0,8)
+      PRINT *, ' ISTOR      =         ', ISTOR
+C (0,9)
+      PRINT *, ' MPROW      =         ', MPROW
+C (0,10)
+      PRINT *, ' NPROW      =         ', NPROW
+C (0,11)
+*
+      READ (CNTUNT, 1000) CDUM
+C (0,12)
+      READ (CNTUNT, *) NEGFL, NEGCN
+C (0,13)
+      PRINT *, ' NEGFL      =         ', NEGFL
+C (0,14)
+      PRINT *, ' NEGCN      =         ', NEGCN
+C (0,15)
+*
+      READ (CNTUNT, 1000) CDUM
+C (0,16)
+      READ (CNTUNT, *) CFL, VCT
+C (0,17)
+      PRINT *, ' CFL        =         ', CFL
+C (0,18)
+      PRINT *, ' VCT        =         ', VCT
+C (0,19)
+*
+      READ (CNTUNT, 1000) CDUM
+C (0,20)
+      READ (CNTUNT, *) MQFLG, NQFLG
+C (0,21)
+      PRINT *, ' MQFLG     =         ', MQFLG
+C (0,22)
+      PRINT *, ' NQFLG     =         ', NQFLG
+C (0,23)
+*
+      READ (CNTUNT, 1000) CDUM
+C (0,24)
+      READ (CNTUNT, *) ZL, ZU, RL, RU
+C (0,25)
+      PRINT *, ' ZL         =         ', ZL
+C (0,26)
+      PRINT *, ' ZU         =         ', ZU
+C (0,27)
+      PRINT *, ' RL         =         ', RL
+C (0,28)
+      PRINT *, ' RU         =         ', RU
+C (0,29)
+*
+      RETURN
+C     END BLOCK
+      END

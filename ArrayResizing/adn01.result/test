@@ -1,0 +1,61 @@
+      PROGRAM ADN01
+      PARAMETER (N=10,M=20)
+      REAL A(N,M)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      I = 5
+C (0,3)
+      CALL FOO(A, N, M)
+C (0,4)
+      J = 9
+C (0,5)
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE FOO(X,Y,Z)
+      INTEGER Y,Z
+      REAL X(Y,*)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      DO I = 1, 10
+C (0,3)
+         X(I,I) = 1.
+      ENDDO
+C (0,4)
+      RETURN
+C     END BLOCK
+      END
+!!
+!! file for adn01.f
+!!
+      PROGRAM ADN01
+      PARAMETER (N=10,M=20)
+      REAL A(N,M)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      I = 5
+C (0,3)
+      CALL FOO(A, N, M)
+C (0,4)
+      J = 9
+C (0,5)
+      RETURN
+C     END BLOCK
+      END
+      SUBROUTINE FOO(X,Y,Z)
+      INTEGER Y,Z
+      REAL X(Y,20)
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      DO I = 1, 10
+C (0,3)
+         X(I,I) = 1.
+      ENDDO
+C (0,4)
+      RETURN
+C     END BLOCK
+      END

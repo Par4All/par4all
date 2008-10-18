@@ -1,0 +1,9 @@
+      FUNCTION GACOS (ARG)
+C
+C     ARC COSINE
+C
+      REAL*8 GACOS,DACOS,ARG
+C
+      GACOS = DACOS (ARG)
+      RETURN
+      END
