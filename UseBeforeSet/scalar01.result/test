@@ -1,0 +1,19 @@
+      PROGRAM SCALAR01
+      REAL X
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+      PRINT *, X
+C (0,3)
+      RETURN
+C     END BLOCK
+      END
+!!
+!! file for scalar01.f
+!!
+      PROGRAM SCALAR01
+      REAL X
+      STOP "Variable X is used before set"
+      PRINT *, X
+      RETURN
+      END
