@@ -1,0 +1,66 @@
+      SUBROUTINE WP65(PROC_ID)
+      INTEGER*4 idiv
+      EXTERNAL idiv
+      INTEGER PROC_ID,BANK_ID,L,O,I_0,L_I,J_0,L_J,L_I_1,L_I_2
+      REAL*4 L_T_0_0(0:24,0:24)
+
+C     WP65 DISTRIBUTED CODE FOR MATINI
+
+C     To scan the tile set for WP65
+      DO 99989 I_0 = PROC_ID, 3, 4
+         DO 99990 J_0 = 0, 3
+C           To scan each iteration of the current tile
+            DO 99991 L_I = 0, 24
+               DO 99992 L_J = 0, 24
+                  L_T_0_0(L_I,L_J) = 0.
+200               CONTINUE
+99992             CONTINUE
+99991          CONTINUE
+            DOALL BANK_ID = 0, 3
+               DO 99994 L_J = 0, 24
+                  DO 99995 L = MAX(idiv(I_0+100*J_0, 16), idiv(3-
+     &            BANK_ID+25*J_0+L_J, 4)), MIN(idiv(96+I_0+100*J_0, 
+     &            16), idiv(99-BANK_ID, 4), idiv(-BANK_ID+25*J_0+L_J
+     &            , 4))
+                     L_I_1 = 0
+                     L_I_2 = 24
+                     IF (L_I_1.LE.L_I_2) THEN
+                        CALL WP65_SEND_4(BANK_ID, L_T_0_0(L_I_1,L_J)
+     &                  , L_I_2-L_I_1+1)
+                     ENDIF
+99995                CONTINUE
+99994             CONTINUE
+99993          CONTINUE
+            ENDDO
+99990       CONTINUE
+99989    CONTINUE
+      END
+      SUBROUTINE BANK(BANK_ID)
+      INTEGER*4 idiv
+      EXTERNAL idiv
+      INTEGER PROC_ID,BANK_ID,L,O,I_0,L_I,J_0,L_J
+      REAL*4 ES_T(0:99,0:25)
+
+C     BANK DISTRIBUTED CODE FOR MATINI
+
+C     To scan the tile set for BANK
+      DO 99987 I_0 = 0, 3
+         PROC_ID = MOD(I_0, 4)
+         DO 99988 J_0 = 0, 3
+            DO 99996 L_J = MAX(0, BANK_ID-25*J_0), 24
+               DO 99997 L = MAX(0, idiv(3-BANK_ID+25*J_0, 4)), idiv(
+     &         24-BANK_ID+25*J_0, 4)
+                  DO 99998 O = MAX(0, -100*BANK_ID+25*I_0+2500*J_0-
+     &            400*L+100*L_J), MIN(99, 24-100*BANK_ID+25*I_0+2500*
+     &            J_0-400*L+100*L_J)
+                     IF (idiv(175+100*BANK_ID-25*I_0+400*L+O, 100)
+     &               .LE.idiv(100+100*BANK_ID-25*I_0+400*L+O, 100)
+     &               ) THEN
+                        CALL BANK_RECEIVE_4(PROC_ID, ES_T(O,L), 1)
+                     ENDIF
+99998                CONTINUE
+99997             CONTINUE
+99996          CONTINUE
+99988       CONTINUE
+99987    CONTINUE
+      END

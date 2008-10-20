@@ -1,0 +1,29 @@
+delete ${WSPACE}
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setenv SHELL /bin/bash
+
+# tpips does not expanse the second argument of a setenv
+# setenv MODULE `basename $FILE .f`
+# echo $MODULE
+# setenv MODULE '*'
+
+create ${WSPACE} ${FILE}
+
+activate RICE_FULL_DEPENDENCE_GRAPH
+
+shell cp ${VDIR}/${MODULE}.rc model.rc
+
+# WP65_COMPUTE_MODULE
+
+apply WP65
+
+shell cat \
+  ${WSPACE}.database/${MODULE}/${MODULE}.wp65 \
+  ${WSPACE}.database/${MODULE}/${MODULE}.bank
+
+close
+rm model.rc
+# delete ${WSPACE}
+quit
