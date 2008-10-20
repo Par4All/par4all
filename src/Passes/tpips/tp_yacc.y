@@ -17,6 +17,7 @@
 
 %token TK_OWNER_NAME
 %token TK_OWNER_ALL
+%token TK_OWNER_ALLFUNC
 %token TK_OWNER_PROGRAM
 %token TK_OWNER_MAIN
 %token TK_OWNER_MODULE
@@ -929,6 +930,18 @@ owner:	TK_OPENPAREN TK_OWNER_ALL TK_CLOSEPAREN
 				    "create or open one!\n");
 		else 
 		    $$ = db_get_module_list();
+	    }
+	}
+        | TK_OPENPAREN TK_OWNER_ALLFUNC TK_CLOSEPAREN
+	{
+	    pips_debug(7,"reduce rule owner (ALL)\n");
+	    if (tpips_execution_mode) 
+	    {
+		if (!db_get_current_workspace_name())
+		    pips_user_error("No current workspace! "
+				    "create or open one!\n");
+		else 
+		    $$ = db_get_function_list();
 	    }
 	}
 	| TK_OPENPAREN TK_OWNER_PROGRAM TK_CLOSEPAREN
