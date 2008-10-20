@@ -1786,7 +1786,7 @@ cstr_args_check(statement s)
 
     cal = instruction_call(i);
     func_name = entity_name(call_function(cal));
-    printf("FONCTION: %s\n", func_name);
+    pips_debug(1, "FONCTION: %s\n", func_name);
 
     /* Convert the arguments list into an array */
     args = call_arguments(cal);
@@ -1848,7 +1848,9 @@ cstr_args_check(statement s)
     free(argstab);
 
     if (expr == expression_undefined) {
-        put_a_comment_on_a_statement(s, strdup("/*CHECK WAS NOT CREATED*/"));
+        /* The target languague is unknown: C or Fortran, NL at the
+	   end or not? It will be up to the prettyprinter (FI). */
+        put_a_comment_on_a_statement(s, strdup("CHECK WAS NOT CREATED"));
         return statement_undefined;
     }
 
