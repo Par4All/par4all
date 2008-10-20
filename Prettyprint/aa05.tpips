@@ -1,0 +1,15 @@
+delete aa05
+create aa05 ${PIPS_ROOT}/Validation/Prettyprint/aa05.f
+
+# Interprocedural parallelism canot be expressed in Fortran 90
+# activate REGION_CHAINS
+
+activate PRINT_PARALLELIZED90_CODE
+
+display PARALLELPRINTED_FILE
+close
+shell cp aa05.database/AA05/AA05.parf foo.f
+shell f90 foo.f
+shell rm foo.f a.out
+delete aa05
+quit

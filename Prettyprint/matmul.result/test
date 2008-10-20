@@ -1,0 +1,59 @@
+c square matrix multiplication
+      PROGRAM MATMUL
+      INTEGER N
+      PARAMETER (N=10)
+      REAL*8 A(N,N), B(N,N), C(N,N), X
+      INTEGER I, J, K
+
+!HPF$ INDEPENDENT, NEW(I)
+      DO J = 1, N                                                       0001
+
+!HPF$    INDEPENDENT
+         DO I = 1, N                                                    0002
+            A(I,J) = REAL(I-N/2)/REAL(J)                                0003
+         ENDDO
+      ENDDO
+
+!HPF$ INDEPENDENT, NEW(I)
+      DO J = 1, N                                                       0001
+
+!HPF$    INDEPENDENT
+         DO I = 1, N                                                    0002
+            B(I,J) = REAL(J-3)/REAL(I)                                  0004
+         ENDDO
+      ENDDO
+
+!HPF$ INDEPENDENT, NEW(I)
+      DO J = 1, N                                                       0005
+
+!HPF$    INDEPENDENT
+         DO I = 1, N                                                    0006
+            C(I,J) = 0.                                                 0007
+         ENDDO
+      ENDDO
+
+!HPF$ INDEPENDENT, NEW(I)
+      DO J = 1, N                                                       0005
+
+!HPF$    INDEPENDENT, NEW(K)
+         DO I = 1, N                                                    0006
+            DO K = 1, N                                                 0008
+               C(I,J) = C(I,J)+A(I,K)*B(K,J)                            0009
+            ENDDO
+         ENDDO
+      ENDDO
+
+!HPF$ INDEPENDENT, NEW(I)
+      DO J = 1, N                                                       0010
+
+!HPF$    INDEPENDENT, NEW(X,K)
+         DO I = 1, N                                                    0011
+            X = 0.                                                      0012
+            DO K = 1, N                                                 0013
+               X = X+A(I,K)*B(K,J)                                      0014
+            ENDDO
+            C(I,J) = X                                                  0015
+         ENDDO
+      ENDDO
+      PRINT *, ((C(I,J), I = 1, N), J = 1, N)                           0016
+      END

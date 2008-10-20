@@ -1,0 +1,50 @@
+!!
+!! pips: include file for common FOO
+!!
+      INTEGER I1(1:N)
+      COMMON /FOO/ I1
+!!
+!! pips: sorry,  cannot include common FOO2
+!!
+!!
+!! pips: sorry,  cannot include common FOO3
+!!
+!!
+!! file for decl7.f
+!!
+      PROGRAM DECL7
+      INTEGER*4 N
+      PARAMETER (N = 5)
+      INTEGER*4 M
+      PARAMETER (M = 1)
+      REAL*4 P
+      PARAMETER (P = 2)
+      REAL*4 Q
+      PARAMETER (Q = 10)
+      include 'FOO.h'
+      INTEGER J(1:M), K(1:P)
+      COMMON /FOO2/ J, K
+      INTEGER L(1:Q)
+      COMMON /FOO3/ L
+
+      PRINT *, I1(1), J(1), L(2)                                        0001
+      CALL BLA                                                          0002
+      END
+      SUBROUTINE BLA
+      INTEGER*4 N
+      PARAMETER (N = 5)
+      INTEGER*4 M
+      PARAMETER (M = 2)
+      REAL*4 P
+      PARAMETER (P = 1)
+      REAL*4 QX
+      PARAMETER (QX = 10)
+      include 'FOO.h'
+      INTEGER J(1:M), K(1:P)
+      COMMON /FOO2/ J, K
+      INTEGER L(1:QX)
+      COMMON /FOO3/ L
+
+      PRINT *, I1(1), K(1), L(2)                                        0001
+      END
+

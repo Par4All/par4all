@@ -1,0 +1,10 @@
+delete d
+create d decl5.f
+setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+echo # initial version
+display PRINTED_FILE(DECL5)
+apply CLEAN_DECLARATIONS(DECL5)
+echo # after cleaning declarations...
+display PRINTED_FILE(DECL5)
+close
+quit

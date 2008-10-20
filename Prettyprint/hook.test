@@ -1,0 +1,35 @@
+#!/bin/sh
+
+tpips=${tpips_version:-tpips}
+
+# Initialization:
+# rm -f hook.result/test
+# tpips >hook.result/test <<EOF
+
+$tpips <<EOF
+delete hook
+create hook $PIPS_VALIDDIR/Prettyprint/hook.f
+
+module HOOK
+activate PRINT_CODE_PRECONDITIONS
+
+echo
+echo Default options: no decoration for end
+echo --------------------------------------
+
+display PRINTED_FILE
+
+echo
+echo Decoration for end
+echo ------------------
+
+set PRETTYPRINT_FINAL_RETURN TRUE
+shell sleep 1
+shell touch hook.database/HOOK/HOOK.f
+
+display PRINTED_FILE
+
+close
+delete hook
+quit
+EOF

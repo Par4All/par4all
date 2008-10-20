@@ -1,0 +1,70 @@
+# initial codes
+      SUBROUTINE BLA
+      INTEGER A, B, C
+      INTEGER T(1:3)
+      COMMON A, B, C
+      EQUIVALENCE (T, A)
+      PRINT *, T(3)                                                     0001
+      END
+      PROGRAM DECLS1
+      INTEGER A, B, C
+      INTEGER T(1:3)
+      COMMON A, B, C
+      EQUIVALENCE (T, A)
+      PRINT *, A                                                        0001
+      CALL FOO                                                          0002
+      CALL BLA                                                          0003
+      END
+      SUBROUTINE FOO
+      INTEGER A, B, C
+      INTEGER T(1:3)
+      COMMON A, B, C
+      EQUIVALENCE (T, A)
+      DATA A, B, C /1, 2, 3/
+      PRINT *, B                                                        0001
+      END
+# partial evaluation...
+# cleaning declarations...
+# new codes
+      SUBROUTINE BLA
+      include 'blank.h'
+      PRINT *, T(3)                                                     0001
+      END
+      PROGRAM DECLS1
+      include 'blank.h'
+      PRINT *, A                                                        0001
+      CALL FOO                                                          0002
+      CALL BLA                                                          0003
+      END
+      SUBROUTINE FOO
+      include 'blank.h'
+      DATA A, B, C /1, 2, 3/
+      PRINT *, 2                                                        0001
+      END
+# unsplitting files...
+!!
+!! pips: include file for common blank
+!!
+      INTEGER A, B, C
+      INTEGER T(1:3)
+      COMMON A, B, C
+      EQUIVALENCE (T, A)
+!!
+!! file for decls_1.f
+!!
+      PROGRAM DECLS1
+      include 'blank.h'
+      PRINT *, A                                                        0001
+      CALL FOO                                                          0002
+      CALL BLA                                                          0003
+      END
+      SUBROUTINE FOO
+      include 'blank.h'
+      DATA A, B, C /1, 2, 3/
+      PRINT *, 2                                                        0001
+      END
+      SUBROUTINE BLA
+      include 'blank.h'
+      PRINT *, T(3)                                                     0001
+      END
+

@@ -1,0 +1,159 @@
+      INTEGER FUNCTION FUN1(I)
+      INTEGER I
+      FUN1 = 3                                                          0001
+      END
+      PROGRAM MAIN
+      INTEGER I, FUN1
+      EXTERNAL FUN1
+      I = 1                                                             0001
+      IF (I.EQ.1) THEN                                                  0002
+         I = 2                                                          0003
+      ELSE
+         I = 3                                                          0004
+      ENDIF
+      CALL SUB(I, 10)                                                   0005
+      CALL SUB2(10, 20)                                                 0006
+      CALL SUB3                                                         0007
+      I = FUN1(2)                                                       0008
+      END
+      SUBROUTINE SUB(J, K)
+      INTEGER I
+      PARAMETER (N=10)
+      REAL*8 A(0:N)
+      DO I = 0, K                                                       0001
+         A(I) = 0                                                       0002
+      ENDDO
+      CALL SUB4(A)                                                      0003
+      END
+      SUBROUTINE SUB2(N, M)
+      REAL*4 B(0:10,0:20)
+      INTEGER I,J
+      DO I = 0, M                                                       0001
+         DO J = 0, N                                                    0002
+            B(J,I) = I+J                                                0003
+         ENDDO
+      ENDDO
+      END
+      SUBROUTINE SUB3
+      PARAMETER (N=2, M=3)
+      INTEGER I, FUN1
+      EXTERNAL FUN1
+      I = N+M                                                           0001
+      DO WHILE (I.GT.0)                                                 0002
+         I = I-1                                                        0003
+         I = I-FUN1(0)                                                  0004
+      ENDDO
+      END
+      SUBROUTINE SUB4(A)
+      PARAMETER (N=10)
+      INTEGER I
+      REAL*8 A(0:N)
+      REAL*8 B(0:N)
+      DO I = 0, N                                                       0001
+         B(I) = A(I)                                                    0002
+      ENDDO
+      DO I = 1, N-1                                                     0003
+         A(I) = 0.25*(B(I-1)+2*B(I)+B(I+1))                             0004
+      ENDDO
+      END
+/* C pretty print for module FUN1. */
+int 
+  fun1 (int i)
+{
+  int result;
+
+  result = 3;
+  return result;
+}
+/* C pretty print for module MAIN. */
+int 
+  main (int argc, char *argv[])
+{
+  int i;
+
+  i = 1;
+  if (i == 1)
+    {
+      i = 2;
+    }
+  else
+    {
+      i = 3;
+    }
+  sub (i, 10);
+  sub2 (10, 20);
+  sub3 ();
+  i = fun1 (2);
+  return 0;
+}
+/* C pretty print for module SUB. */
+#define n 10
+
+void 
+  sub (int j, int k)
+{
+  int i;
+  double a[11];
+
+  for (i = 0; i <= k; i++)
+    {
+      a[i] = 0;
+    }
+  sub4 (a);
+  return;
+}
+/* C pretty print for module SUB2. */
+void 
+  sub2 (int n, int m)
+{
+  float b[21][11];
+  int i;
+  int j;
+
+  for (i = 0; i <= m; i++)
+    {
+      for (j = 0; j <= n; j++)
+	{
+	  b[i][j] = (i + j);
+	}
+    }
+  return;
+}
+/* C pretty print for module SUB3. */
+#define n 2
+
+#define m 3
+
+void 
+  sub3 (void)
+{
+  int i;
+
+  i = (n + m);
+  while (i > 0)
+    {
+      i = (i - 1);
+      i = (i - fun1 (0));
+    }
+  return;
+}
+/* C pretty print for module SUB4. */
+#define n 10
+
+void 
+  sub4 (double a[11])
+{
+  int i;
+  double b[11];
+
+  for (i = 0; i <= n; i++)
+    {
+      b[i] = a[i];
+    }
+  for (i = 1; i <= n - 1; i++)
+    {
+      a[i] = (0.25 * ((b[i - 1] + (2 * b[i])) + b[i + 1]));
+    }
+  return;
+}
+

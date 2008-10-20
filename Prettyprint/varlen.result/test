@@ -1,0 +1,6 @@
+      PROGRAM VARLEN
+      INTEGER*4 N
+      PARAMETER (N = 144)
+      CHARACTER*(N) X
+      END
+

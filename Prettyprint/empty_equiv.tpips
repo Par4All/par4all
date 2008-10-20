@@ -1,0 +1,13 @@
+#
+# test prettyprint of equivalence after code cleaning
+# 
+delete ee
+create ee empty_equiv.f
+setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+echo # before cleaning code
+display PRINTED_FILE
+apply CLEAN_DECLARATIONS
+echo # after cleaning code
+display PRINTED_FILE
+close
+delete ee
