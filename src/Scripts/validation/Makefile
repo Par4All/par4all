@@ -3,7 +3,9 @@
 SCRIPTS = \
 	pips_validate \
 	manual_accept \
-	pips_emacs_diff
+	pips_emacs_diff \
+	array_resizing_instrument.pl \
+	ubs_checking_instrument.pl
 
 INSTALL_UTL =	$(SCRIPTS)
 
