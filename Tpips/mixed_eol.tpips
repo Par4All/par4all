@@ -1,11 +1,11 @@
-delete main_2
+delete mixed_eol
 
 # setenv PIPS_CPP="cpp" (pour eviter l'option -ansi)  
 
 # Arret a la premiere erreur:
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create main_2 main_2.c
+create mixed_eol mixed_eol.c
 echo ensuite
 # options necessaires pour pouvoir travailler sur du code C
 

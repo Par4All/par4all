@@ -17,7 +17,7 @@ echo
 # we should generate a user_error in db_update_file_time_of_resource() if we cannot 'stat'
 # a file
 
-create protected_workspace2 ${PIPS_ROOT}/Validation/Tpips/protected_workspace2.f
+create protected_workspace2 ${VDIR}/protected_workspace2.f
 shell chmod u-rwx protected_workspace2.database
 display PRINTED_FILE
 shell chmod u+rwx protected_workspace2.database

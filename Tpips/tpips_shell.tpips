@@ -4,7 +4,7 @@
 # Check tpips as a shell. FC.
 #
 
-setpropertyABORT_ON_USER_ERROR TRUE
+setproperty ABORT_ON_USER_ERROR TRUE
 
 # turn it on.
 setproperty TPIPS_IS_A_SHELL TRUE
@@ -16,7 +16,7 @@ setproperty TPIPS_IS_A_SHELL TRUE
 echo ## phase 1
 
 delete tps
-create tps tpips_shell_src/*.f
+create tps tpips_shell.src/*.f
 
 # $ALL does not trigger the shell substitution... {} must be used.
 display PRINTED_FILE($ALL)
@@ -38,7 +38,7 @@ delete tps
 echo ## phase 2
 
 # the link creates a simpler path where tpips is running.
-ln -s tpips_shell_src src_tmp
+ln -s tpips_shell.src src_tmp
 
 # now filters out foo.f
 create tps `echo src_tmp/*.f | \

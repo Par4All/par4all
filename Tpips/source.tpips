@@ -9,17 +9,17 @@ create source source.f
 close
 # sourcing
 echo ! one 
-source  ${VDIR:-.}/sourced.tpips
+source  ${VDIR:-.}/sourced.include/sourced.tpips
 echo ! two
-source  ${VDIR:-.}/sourced.tpips \
-	${VDIR:-.}/sourced2.tpips
+source  ${VDIR:-.}/sourced.include/sourced.tpips \
+	${VDIR:-.}/sourced.include/sourced2.tpips
 echo ! three
-source  ${VDIR:-.}/sourced.tpips \
-	${VDIR:-.}/sourced2.tpips \
-	${VDIR:-.}/sourced3.tpips
+source  ${VDIR:-.}/sourced.include/sourced.tpips \
+	${VDIR:-.}/sourced.include/sourced2.tpips \
+	${VDIR:-.}/sourced.include/sourced3.tpips
 echo ! already open
 open source
-source  ${VDIR:-.}/sourced.tpips
+source  ${VDIR:-.}/sourced.include/sourced.tpips
 # echo # delete all
 # setproperty PIPSDBM_RESOURCES_TO_DELETE="all"
 # source sourced.tpips

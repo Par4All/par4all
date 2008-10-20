@@ -20,7 +20,7 @@ Source code for FOO, although FOO does not exist yet in the workspace
 !
       SUBROUTINE FOO(F1, F2)
       INTEGER*4 F1
-      CHARACTER*5 F2
+      CHARACTER*6 F2
       END
 
 No source code for BOOM, which does not exist,
@@ -47,7 +47,7 @@ Source code for FOO
 !
       SUBROUTINE FOO(F1, F2)
       INTEGER*4 F1
-      CHARACTER*5 F2
+      CHARACTER*6 F2
       END
 
 Source code for the main program
