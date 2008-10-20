@@ -1,0 +1,9 @@
+delete ecg
+create ecg ecg.f
+activate PRINT_CODE_PROPER_REFERENCES
+display PRINTED_FILE($ALL)
+activate PRINT_CODE_CUMULATED_REFERENCES
+display PRINTED_FILE($ALL)
+close
+delete ecg
+quit
