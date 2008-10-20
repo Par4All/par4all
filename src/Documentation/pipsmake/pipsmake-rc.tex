@@ -371,12 +371,18 @@ New user source files should be automatically and completely re-built when the p
 is no longer under \PIPS{} control, i.e. when the
 workspace is closed. An executable application can easily be regenerated
 after code transformations using the \TPIPS{} interface and requesting the
-{\tt PRINTED\_FILE} resources for all modules:
+{\tt PRINTED\_FILE} resources for all modules, including compilation units in C:
 \begin{quote}
 {\tt display PRINTED\_FILE[\%ALL]}
 \end{quote}
-But this is what is done by explicitly requesting the code regeneration as
-described in \S~\ref{sec:regen-user-source}.
+Note that compilation units can be left out with:
+\begin{quote}
+{\tt display PRINTED\_FILE[\%ALLFUNC]}
+\end{quote}
+In both cases with C source code, the order of modules may be
+unsuitable for direct recompilation and compilation units anyway
+should be included, But this is what is done by explicitly requesting
+the code regeneration as described in \S~\ref{sec:regen-user-source}.
 
 Note that \PIPS{} expects proper ANSI Fortran 77 code. Its parser was not
 designed to locate syntax errors. It is highly recommended to check source
@@ -788,7 +794,7 @@ C preprocessor used,on its option and on the system environment
 (/usr/include,...).} using for instance
 \texttt{gcc -E}\footnote{It can be redefined using
 \texttt{CPP\_PIPS\_ENV} and \texttt{CPP\ PIPS\_OPTIONS\_ENV} environment
-variables} and broken into a new compilation unit which contains only
+variables} and broken into a new \index{compilation unit} which contains only
 variable and function and type definitions and one C file for each C
 function defined in the initial C file.
 
@@ -6112,7 +6118,7 @@ print_call_graph_with_out_regions        > MODULE.callgraph_file
         < MODULE.cumulated_effects
 \end{verbatim}
 
-\section{uDrawGraph Interprocedural Control Flow Graph Files (DVICFG)}
+\section{DrawGraph Interprocedural Control Flow Graph Files (DVICFG)}
 
 %%@UserManualDocumentation: dvicfg_file
 This is the file ICFG with format of graph \PuDrawGraph (formerly

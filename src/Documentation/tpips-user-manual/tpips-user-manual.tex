@@ -303,7 +303,11 @@ $<$resource-descriptor$>$ --- can take these formats:
 \item [\%MODULE] the current module;
 \item [\$\{MODULES\}] the modules associated to the Shell variable
   {\tt MODULES}. The different names are SPACE or/and TAB separated;
-\item [\%ALL] All worksapce modules;
+\item [\%ALL] All workspace modules, including C compilation
+units\footnote{A PIPS compilation unit is associated to each C user
+source file. it contains all the initial declarations, but the
+function definitions.};
+\item [\%ALLFUNC] All workspace functions, excluding C compilation units;
 \item [\%CALLEES] All the callees of the current selected module;
 \item [\%CALLERS] All the callers of the current selected module.
 \end{description}
