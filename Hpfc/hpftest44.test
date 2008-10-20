@@ -1,0 +1,26 @@
+#! /bin/sh
+#
+# HPFC default test
+#
+# (c) Fabien COELHO, 07/03/94
+# 
+# $Id: default_test,v 1.19 1997/05/28 08:14:16 coelho Exp $
+#
+
+dir=${PIPS_ROOT}/Validation/`basename \`dirname $0\``
+PIPS="${pips_version:-pips}"
+
+echo "pips is ${PIPS}" >&2
+echo "--- Hpfc Validation for hpftest44"
+echo
+
+file=${dir}/hpftest44.f
+test -f ${dir}/hpftest44.F && file=${dir}/hpftest44.F
+
+#
+# uses the validate command of the hpfc driver.
+
+hpfc validate -p ${PIPS} ${file} ${dir}/include/stub.f
+
+# that is all
+# 
