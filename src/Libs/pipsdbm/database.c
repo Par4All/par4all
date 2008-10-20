@@ -967,7 +967,7 @@ gen_array_t db_get_module_list_initial_order(void)
  * test files. Another possibility would be to regenerate include
  * statements...
  */
-gen_array_t db_get_module_list(void)
+gen_array_t db_get_module_or_function_list(bool module_p)
 {
     gen_array_t a = gen_array_make(0);
     DB_OK;
@@ -977,7 +977,7 @@ gen_array_t db_get_module_list(void)
 	string on = db_symbol_name(os);
 	pips_assert("some symbol name", on);
 	pips_debug(9, "considering %s -> %p\n", on, or);
-	if (!same_string_p(on, "") /* && !compilation_unit_p(on) */)
+	if (!same_string_p(on, "") && (module_p || !compilation_unit_p(on)))
 	    gen_array_dupappend(a, on);
     },
 	get_pips_database());
@@ -986,4 +986,12 @@ gen_array_t db_get_module_list(void)
     return a;
 }
 
+gen_array_t db_get_module_list(void)
+{
+  return db_get_module_or_function_list(TRUE);
+}
 
+gen_array_t db_get_function_list(void)
+{
+  return db_get_module_or_function_list(FALSE);
+}
