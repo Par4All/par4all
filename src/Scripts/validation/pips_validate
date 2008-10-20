@@ -17,6 +17,7 @@ vdir=${PIPS_VALIDDIR:-$PIPS_ROOT/../../validation}
 
 # default running directory
 rdir=.
+recurse=
 
 # get default architecture and tpips/pips
 arch=${PIPS_ARCH:-$($PIPS_ROOT/makes/arch.sh)}
@@ -51,9 +52,10 @@ function usage()
 	"  -t|--tpips tpips: use this 'tpips' executable\n" \
 	"     default '$tpips'\n" \
 	"  -m|--mail email: send mails (not a good idea?)\n" \
-	"  -V|--valid dir: validation directory\n" \
+	"  -V|--valid dir: validation destination directory\n" \
 	"     default '$vdir'\n" \
 	"  -R|--run dir: running directory, default '.'\n" \
+        "  -r|--recurse: look for subdirectories...\n" \
 	"  -O|--out|--output dir: output directory, default '.'\n" \
 	"arguments:\n" \
 	"  -a|--auto-result-create: create a .result directory if it does\n" \
@@ -99,6 +101,7 @@ while [ "$1" ] ; do
       -O|--out|--output) odir=$1 ; shift ;;
       -m|--mail) mail="$mail $1" ; shift ;;
       -a|--auto-result-create) auto_result_create=1 ;;
+      -r|--recurse) recurse=1 ;;
       --version) echo "$script revision $rev" ; exit 0 ;;
       *) usage 1 "unexpected option: $opt"
   esac
@@ -119,7 +122,7 @@ mkdir $odir || usage 6 "error on mkdir $odir"
 [[ -f properties.rc ]] && usage 17 "cannot run with local 'properties.rc'"
 [[ -f pipsmake.rc ]] && usage 18 "cannot run with local 'pipsmake.rc'"
 
-# go !
+# go into running directory
 [[ $rdir != '.' ]] && pushd $rdir
 
 # start summary
@@ -292,10 +295,17 @@ dones=0
 errors=0
 elist=''
 
+#
+if [[ $recurse ]] ;
+then
+  find "$@" -type d -print | egrep -v '(\.svn|OLD|\.result|\.src|\.include)'
+else
+  echo "$@"
+fi |
 # this is not good.
 # what means to be validated is when *.result directories are available
 # and then we should look for available tpips/test/sources to do so?
-for obj ; do
+while read obj ; do
   failed=
   if [ -d $vdir/$obj ] ; then
     verb 1 "considering '$obj' directory"
