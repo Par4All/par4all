@@ -1,0 +1,14 @@
+
+C  <B(PHI1,PHI2,PHI3)-W-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=10,
+C    1<=PHI3, PHI2+10PHI3<=60}>
+
+
+      SUBROUTINE FOO(B, N)
+      INTEGER N, B(N,10,10),I,J,K
+
+C  <B(PHI1,PHI2,PHI3)-W-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=10,
+C    1<=PHI3, PHI2+10PHI3<=60}>
+
+      CALL BLA(B(1,1,1), N)                                             0001
+      END
+

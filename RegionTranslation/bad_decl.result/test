@@ -1,0 +1,11 @@
+      PROGRAM BAD_DECL
+      INTEGER A(10,10)
+
+C  <A(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=10, 1<=PHI2,
+C    PHI1+10PHI2<=60}>
+
+
+      CALL BAD(A)                                                       0001
+
+      END
+

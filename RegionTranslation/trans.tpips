@@ -1,0 +1,7 @@
+delete t
+create t trans.f
+activate MUST_REGIONS
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[FOO]
+close
+delete t

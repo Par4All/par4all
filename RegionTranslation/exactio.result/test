@@ -1,0 +1,58 @@
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
+
+!
+! test translation of regions with global exact IO effects.
+!
+      PROGRAM IO
+      REAL A(10)
+
+C  <A(PHI1)-R-EXACT-{}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
+
+      PRINT *, A                                                        0001
+
+C  <A(PHI1)-R-EXACT-{1<=PHI1, PHI1<=5}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
+
+      CALL PRINTA(A)                                                    0002
+
+C  <A(PHI1)-R-EXACT-{1<=PHI1, PHI1<=1}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
+
+      CALL PRINTB(A)                                                    0003
+      END
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
+C  <X(PHI1)-R-EXACT-{}>
+
+
+      SUBROUTINE PRINTA(X)
+      REAL X(5)
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
+C  <X(PHI1)-R-EXACT-{}>
+
+      PRINT *, X                                                        0001
+      END
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
+C  <X(PHI1)-R-EXACT-{}>
+
+      
+      SUBROUTINE PRINTB(X)
+      REAL X(1)
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
+C  <X(PHI1)-R-EXACT-{}>
+
+      PRINT *, X                                                        0001
+      END

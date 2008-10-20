@@ -1,0 +1,16 @@
+#! /bin/sh
+ 
+tpips=${tpips_version:-tpips}
+ 
+$tpips <<%
+
+delete bad_decl
+create bad_decl ${PIPS_ROOT}/Validation/RegionTranslation/bad_decl.f
+module BAD_DECL
+activate MUST_REGIONS
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE
+close
+delete bad_decl
+#
+%

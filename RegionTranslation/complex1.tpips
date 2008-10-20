@@ -1,0 +1,13 @@
+
+delete complex1
+create complex1 complex1.f
+module TCOMP
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+activate MUST_REGIONS
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE
+activate PRINT_CODE_OUT_REGIONS
+display PRINTED_FILE($ALL)
+close
+delete complex1

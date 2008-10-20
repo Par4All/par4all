@@ -1,0 +1,17 @@
+delete i
+
+create i exactio.f
+
+activate MUST_REGIONS
+
+#make REGIONS[PRINTA]
+#setenv REGION_TRANSLATION_DEBUG_LEVEL=3
+#make REGIONS[IO]
+#setenv REGION_TRANSLATION_DEBUG_LEVEL=0
+
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[%ALL]
+
+close
+delete i
+quit
