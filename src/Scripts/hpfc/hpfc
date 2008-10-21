@@ -1,7 +1,7 @@
 #! /bin/sh
-# 
+#
 # $Id$
-# 
+#
 # HPFC scripts very front-end.
 # just an easy way not to have to remember the name of some scripts.
 #
@@ -17,9 +17,9 @@ script=`basename $0`
 usage()
 {
   cat >&2 <<-END
-	
+
 	$script is the HPF Compiler driver in front of pips.
-	
+
 	usage: $script [-hvdqt] [-o name] [-D cpp-macros]
 	       function [options] [arguments]
 	  OPTIONS:
@@ -32,16 +32,16 @@ usage()
 	    -o name: name for the generated file (forwarded to compiler)
 	    -D macro: additionnal cpp macros
 	    -E var=val: additional environment variables
-	
+
 	  typical example: "hpfc -D NPES=4 -D SIZE=1000 -o adi adi2d.F"
 	  to generate an "adi.hpfc" directory with everything in it...
-	
+
 	  also some function among (3 significant characters):
 	  COMPILATION:
 	    i|interactive: (thanks to GNU readline library) (\,cd)
 	    c|compile: compile
 	    m|make: compile and link
-	    r|run: run 
+	    r|run: run
 	    f|full: compile + make (shorthand for demos)
 	    d|delete: delete hpfc directory
 	    q|quit: does nothing
@@ -54,7 +54,7 @@ usage()
 	    p|pvm: pvm control
 	    h|help: gives this help (but nothing more:-)
 	    validate: used by the validation...
-	
+
 	END
   exit ${1:-1}
 }
@@ -84,7 +84,7 @@ do
     q) HPFC_MODE=demo ;;
     d) HPFC_MODE=debug ;;
     t) TIMING=timing ;;
-    T) COPT="-T $COPT" ;; 
+    T) COPT="-T $COPT" ;;
     o) COPT="-w $OPTARG $COPT";;
     h) usage 0 ;;
     D) PIPS_CPP_FLAGS="$PIPS_CPP_FLAGS -D$OPTARG" ;;
@@ -98,7 +98,7 @@ shift `expr $OPTIND - 1`
 # DEFAULT if no arguments: interactive. That makes sense.
 
 # fix path to find hpfc_compile
-arch=${PIPS_ARCH:-`arch.sh`}
+arch=${PIPS_ARCH:-`$PIPS_ROOT/makes/arch.sh`}
 bindir=`dirname $0`
 PATH=$PATH:./$arch:$bindir/$arch:$PIPS_ROOT/bin/$arch
 
@@ -112,7 +112,7 @@ PATH=$PATH:./$arch:$bindir/$arch:$PIPS_ROOT/bin/$arch
 # just a shorthand for MY personnal use. FC.
 
 key=$1
-if [ -f "$key" ] 
+if [ -f "$key" ]
 then
   HPFC_MODE=void
   key=compile
