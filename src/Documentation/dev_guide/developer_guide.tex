@@ -404,6 +404,9 @@ sh> svn diff --revision 12345:HEAD -x -w
 }
   \end{enumerate}
 
+\item If you want to merge into your branch the on-going development from
+  the trunk, see \S~\ref{sec:other-approaches} to do a \texttt{pull}.
+
 \item When you are done with your developments, they are committed into
   your branch, you want to install them back to the pips main line.
   You must have write access to the \texttt{trunk} in order to do the commit.
@@ -431,9 +434,12 @@ sh> svn commit .
 
 
 \subsubsection{Other approaches}
+\label{sec:other-approaches}
 
-You may decide that the above procedure is not for you.
-Well, I would not advise it.
+You may also decide that the previous procedure is not for you. Well, it
+may not be advisable to begin with, but it can be useful to work on many
+libraries in PIPS at the same time and to have an atomic view or even
+having different versions of your own in your branch, for example.
 
 Here are other possible approaches for developping in PIPS,
 that you may use provided that you do not break the development
@@ -443,8 +449,8 @@ not to break the non-regression tests.
 It is possible to use the \texttt{svn\_branch.sh} script directly to
 create a branch for any part of pips, including the full
 software. \verb|svn_branch.sh| has been developed because \textsc{svn}
-cannot yet deal natively with branching but it is planned to change with
-version 1.5.
+cannot yet deal natively with branching but it is planned to change when
+all the PIPS developers will use SVN version 1.5 or more.
 
 It is possible to use \texttt{svn} directly to create and manage your
 branches with copies. The \texttt{svn\_branch.sh} adds convenient
@@ -454,8 +460,19 @@ joined back (pushed) to it, and so on. These informations are stored in
 \texttt{svnbranch:...} properties. So if you want to play around with
 home-made branching, think about them too...
 
-For example, if you want to merge directly and atomically in your own
-working copy of the trunk your own copy of several branch pieces such as
+Here is an excerpt of the available \verb|svn_branch.sh| that can be
+described more precisely with \verb|svn_branch.sh --help|
+\begin{description}
+\item[\texttt{create}] a new branch of something somewhere;
+\item[\texttt{pull}] into your branch the modifications that have been
+  done in the trunk since your last \texttt{pull} or branch creation;
+\item[\texttt{push}] merge back your branch into the trunk since the last
+  merge you've done.
+\end{description}
+
+If you want to directly hack the SVN repository, for example, if you want
+to merge directly and atomically into your own working copy of the trunk
+your own copy of several branch pieces such as
 \texttt{pips/trunk/src/Libs/expressions} that is from the trunk at
 revision 12475 and so on, you can do something like:
 \begin{verbatim}
@@ -468,12 +485,43 @@ svn merge -r 12356:HEAD ../../../../branches/godet/phrase
 cd cd .../svn/pips/trunk
 svn commit
 \end{verbatim}
+But it should be used only for emergency case (for example if the branch
+were developed outside the PIPS branch infrastructure).
 
 It is finally possible to edit directly your production working copy, and
 just commit from there when you're happy with your changes.  This may be
 advisable for small easy to test global changes, such as adding a new
 library in PIPS. This is not advisable for long development, as it is
 often useful to have an history of such developments.
+
+
+\subsubsection{Developing in a branch? Validate before merging!}
+\label{sec:devel-branch-valid}
+
+Do not forget that if you or someone else merge your branch into the
+trunk, things must be validated against the global PIPS validation to
+avoid havoc for the other PIPS developers.
+
+Here is a typical behaviour you should follow:
+\begin{enumerate}
+\item update your production copy of PIPS (the \texttt{trunk}) with
+  \texttt{svn up}, recompile the production version and apply the
+  validation against it;
+\item merge into you branch the last developments from the trunk with a
+  \texttt{svn\_branch.sh pull}, recompile (so it will modify the
+  executables and libraries in the production version) and validate;
+\item if it is worse than point 1, improve the code in your branch and go
+  to step 1 again;
+\item if you are happy with the validation, merge your beautiful work into
+  the PIPS Holly trunk with \texttt{svn\_branch.sh push} so that all the
+  PIPS community can congratulate you.
+\end{enumerate}
+
+For more information about the validation process, have a look to
+\S~\ref{sec:validation}. Since your validation mileage may vary according
+to your target architecture because of bugs or limitations (little or big
+Endian, native 32-bit or 64 bit architecture...) you should try to
+validate on various architectures.
 
 
 \subsubsection{Understanding the Makefile infrastructure inside the SVN
@@ -899,7 +947,7 @@ Two validation scripts are available:
 \item[pips\_validate]: \index{Validate} Non-regression tests;
 
   The arguments are names of subdirectories in
-  \texttt{\$PIPS\_ROOT/../../valid} or source files within these
+  \texttt{\$PIPS\_ROOT/../../validation} or source files within these
   directories.  See \texttt{pips\_validate -h} for help and a list of
   options.
 
@@ -973,6 +1021,9 @@ Two validation scripts are available:
   environment variable to \verb|pips_emacs_diff| to use graphical Ediff
   mode sounds like a good idea.
 \end{description}
+
+If you work on a branch, you should also have a look to
+\S~\ref{sec:devel-branch-valid}.
 
 %%\begin{itemize}
 %%\item \verb+bug-to-validate+: \index{bug-to-validate}When a bug is
