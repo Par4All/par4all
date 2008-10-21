@@ -1,4 +1,4 @@
---- Hpfc Validation for hpftest12
+--- Hpfc Validation for $VDIR/hpftest12.f
 
 !
 ! File HPFTEST12_host.f
@@ -67,8 +67,8 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST12_parameters.h"
-      INTEGER I_1,I_0,I,J,K
-      REAL*4 A(1:25,1:100,1:100)
+      INTEGER I_1, I_0, I, J, K
+      REAL*4 A(1:25, 1:100, 1:100)
       CALL HPFC INIT NODE
       DO I = 1, 100
          DO J = 1, 100

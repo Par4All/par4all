@@ -1,4 +1,4 @@
---- Hpfc Validation for hpftest60
+--- Hpfc Validation for $VDIR/hpftest60.f
 
 !
 ! File HPFTEST60_host.f
@@ -14,9 +14,9 @@
       PARAMETER (N = 10)
       INTEGER*4 N
       PARAMETER (N = 10)
-      INTEGER ALPHA1,ALPHA2,ALPHA3,LALPHA1,LALPHA2,LALPHA3,PSI1,PSI2,
-     &T LID,I
-      INTEGER A(1:N,1:N,1:N)
+      INTEGER ALPHA1, ALPHA2, ALPHA3, LALPHA1, LALPHA2, LALPHA3, PSI1
+     &, PSI2, T LID, I
+      INTEGER A(1:N, 1:N, 1:N)
       CALL HPFC INIT HOST
       PRINT *, 'hpftest60 running'
 ! collecting distributed variable A
@@ -28,7 +28,7 @@
          T LID = -2+2*PSI1+PSI2
          CALL HPFC RCV FROM NODE(T LID)
          CALL HPFC INTEGER4 BUFUPK
-         DO ALPHA3 = -4+5*PSI2, 5*PSI1
+         DO ALPHA3 = MAX(-4+5*PSI2, -4+5*PSI1), MIN(5*PSI2, 5*PSI1)
             ALPHA2 = ALPHA3
             ALPHA1 = ALPHA3
             LALPHA1 = ALPHA1
@@ -113,9 +113,9 @@
       PARAMETER (N = 10)
       INTEGER*4 N
       PARAMETER (N = 10)
-      INTEGER ALPHA1,ALPHA2,ALPHA3,LALPHA1,LALPHA2,LALPHA3,PSI1,PSI2,
-     &I_7,I_6,I_5,I_4,I_3,I_2,I_1,I_0,I,J,K
-      INTEGER A(1:N,1:5,1:5)
+      INTEGER ALPHA1, ALPHA2, ALPHA3, LALPHA1, LALPHA2, LALPHA3, PSI1
+     &, PSI2, I_7, I_6, I_5, I_4, I_3, I_2, I_1, I_0, I, J, K
+      INTEGER A(1:N, 1:5, 1:5)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_5, I_6, I_7, 1, N, 1, 1)
       CALL HPFC LOOP BOUNDS(I_1, I_2, I_3, 1, N, 1, 2)
@@ -136,7 +136,7 @@
       IF (PSI2.LE.PSI1.AND.PSI1.LE.PSI2) THEN
          BUF INDEX = 0
          SEND NOT INITIALIZED = .TRUE.
-         DO ALPHA3 = -4+5*PSI2, 5*PSI1
+         DO ALPHA3 = MAX(-4+5*PSI2, -4+5*PSI1), MIN(5*PSI2, 5*PSI1)
             ALPHA2 = ALPHA3
             ALPHA1 = ALPHA3
             LALPHA1 = ALPHA1

@@ -1,4 +1,4 @@
---- Hpfc Validation for hpftest10
+--- Hpfc Validation for $VDIR/hpftest10.f
 
 !
 ! File HPFTEST10_host.f
@@ -10,7 +10,7 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST10_parameters.h"
-      INTEGER I_12,I_10,I_8,I_4,I_2,J,K,I_0,I_1
+      INTEGER I_12, I_10, I_8, I_4, I_2, J, K, I_0, I_1
       LOGICAL L_0
       CALL HPFC INIT HOST
       J = 2
@@ -74,8 +74,8 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST10_parameters.h"
-      INTEGER I_14,I_13,I_12,I_11,I_10,I_9,I_8,I_7,I_6,I_5,I_4,I_3,
-     &I_2,J,K,I_0,I_1
+      INTEGER I_14, I_13, I_12, I_11, I_10, I_9, I_8, I_7, I_6, I_5, 
+     &I_4, I_3, I_2, J, K, I_0, I_1
       INTEGER G(1:5)
       LOGICAL L_0
       CALL HPFC INIT NODE

@@ -1,4 +1,4 @@
---- Hpfc Validation for hpftest49
+--- Hpfc Validation for $VDIR/hpftest49.f
 
 !
 ! File HPFTEST49_host.f
@@ -12,7 +12,7 @@
       include "HPFTEST49_parameters.h"
       INTEGER*4 SIZE
       PARAMETER (SIZE = 500)
-      INTEGER ALPHA1,LALPHA1,PSI1,T LID,I,N
+      INTEGER ALPHA1, LALPHA1, PSI1, T LID, I, N
       INTEGER A(1:SIZE)
       CALL HPFC INIT HOST
       PRINT *, 'hpftest 49 running...'
@@ -34,7 +34,7 @@
             T LID = PSI1
             CALL HPFC RCV FROM NODE(T LID)
             CALL HPFC INTEGER4 BUFUPK
-            DO ALPHA1 = MAX(1, -130+128*PSI1), MIN(500, -3+128*PSI1, 
+            DO ALPHA1 = MAX(1, -130+128*PSI1), MIN(-3+128*PSI1, 500, 
      &      N)
                LALPHA1 = 131+ALPHA1-128*PSI1
                BUF INDEX = BUF INDEX+1
@@ -98,7 +98,7 @@
       include "HPFTEST49_parameters.h"
       INTEGER*4 SIZE
       PARAMETER (SIZE = 500)
-      INTEGER ALPHA1,LALPHA1,PSI1,I_4,I_3,I_2,I_1,I_0,I,N
+      INTEGER ALPHA1, LALPHA1, PSI1, I_4, I_3, I_2, I_1, I_0, I, N
       INTEGER A(1:128)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_2, I_3, I_4, 2, SIZE, 1, 1)
@@ -127,7 +127,7 @@
          IF (128*PSI1.LE.130+N) THEN
             BUF INDEX = 0
             SEND NOT INITIALIZED = .TRUE.
-            DO ALPHA1 = MAX(1, -130+128*PSI1), MIN(500, -3+128*PSI1, 
+            DO ALPHA1 = MAX(1, -130+128*PSI1), MIN(-3+128*PSI1, 500, 
      &      N)
                LALPHA1 = 131+ALPHA1-128*PSI1
                BUF INDEX = BUF INDEX+1

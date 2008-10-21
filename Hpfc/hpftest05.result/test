@@ -1,4 +1,4 @@
---- Hpfc Validation for hpftest05
+--- Hpfc Validation for $VDIR/hpftest05.f
 
 !
 ! File HPFTEST05_host.f
@@ -56,7 +56,7 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST05_parameters.h"
-      INTEGER I_3,I_2,I_1,I_0,J,I
+      INTEGER I_3, I_2, I_1, I_0, J, I
       REAL*4 A(1:5)
       CALL HPFC INIT NODE
       J = 1

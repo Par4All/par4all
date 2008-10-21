@@ -1,4 +1,4 @@
---- Hpfc Validation for hpftest22
+--- Hpfc Validation for $VDIR/hpftest22.f
 
 !
 ! File HPFTEST22_host.f
@@ -10,8 +10,8 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST22_parameters.h"
-      INTEGER ALPHA1,LALPHA1,PSI1,T LID,I,I_0,I_1,I_2
-      INTEGER K(1:10),J(1:10)
+      INTEGER ALPHA1, LALPHA1, PSI1, T LID, I, I_0, I_1, I_2
+      INTEGER K(1:10), J(1:10)
       LOGICAL L_0
       CALL HPFC INIT HOST
       PRINT *, 'hpftest22 running'
@@ -65,7 +65,7 @@
          T LID = PSI1
          CALL HPFC RCV FROM NODE(T LID)
          CALL HPFC INTEGER4 BUFUPK
-         DO ALPHA1 = -1+2*PSI1, MIN(7, 2*PSI1)
+         DO ALPHA1 = MAX(3, -1+2*PSI1), MIN(7, 2*PSI1)
             LALPHA1 = 2+ALPHA1-2*PSI1
             BUF INDEX = BUF INDEX+1
             K(ALPHA1) = HPFC INTEGER4 BUFF(BUF INDEX)
@@ -87,8 +87,8 @@
          ENDDO
       ENDDO
 ! end of collect
-      I_2 = K(7)
       I_1 = K(3)
+      I_2 = K(7)
       L_0 = J(I_1).LT.J(I_2)
       IF (L_0) PRINT *, 'quite interesting a property...'
       PRINT *, 'hpftest22 end'
@@ -153,8 +153,8 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST22_parameters.h"
-      INTEGER ALPHA1,LALPHA1,PSI1,I_6,I_5,I_4,I_3,I
-      INTEGER J(1:2),K(1:2)
+      INTEGER ALPHA1, LALPHA1, PSI1, I_6, I_5, I_4, I_3, I
+      INTEGER J(1:2), K(1:2)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_4, I_5, I_6, 1, 10, 1, 1)
       I = I_6
@@ -201,7 +201,7 @@
       IF (PSI1.LE.4.AND.2.LE.PSI1) THEN
          BUF INDEX = 0
          SEND NOT INITIALIZED = .TRUE.
-         DO ALPHA1 = -1+2*PSI1, MIN(7, 2*PSI1)
+         DO ALPHA1 = MAX(3, -1+2*PSI1), MIN(7, 2*PSI1)
             LALPHA1 = 2+ALPHA1-2*PSI1
             BUF INDEX = BUF INDEX+1
             HPFC INTEGER4 BUFF(BUF INDEX) = K(LALPHA1)

@@ -1,4 +1,4 @@
---- Hpfc Validation for hpftest43
+--- Hpfc Validation for $VDIR/hpftest43.f
 
 !
 ! File HPFTEST43_host.f
@@ -10,8 +10,8 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST43_parameters.h"
-      INTEGER ALPHA1,LALPHA1,PSI1,T LID,I
-      REAL*4 A(1:20),H
+      INTEGER ALPHA1, LALPHA1, PSI1, T LID, I
+      REAL*4 A(1:20), H
       CALL HPFC INIT HOST
       PRINT *, 'enter h'
       READ *, H
@@ -110,8 +110,9 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST43_parameters.h"
-      INTEGER ALPHA1,LALPHA1,PSI1,I_9,I_8,I_7,I_6,I_5,I_4,I_3,I_2,I
-      REAL*4 A(1:6),B(1:7),H
+      INTEGER ALPHA1, LALPHA1, PSI1, I_9, I_8, I_7, I_6, I_5, I_4, 
+     &I_3, I_2, I
+      REAL*4 A(1:6), B(1:7), H
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_7, I_8, I_9, 3, 18, 2, 1)
       CALL HPFC LOOP BOUNDS(I_3, I_4, I_5, 1, 20, 1, 1)

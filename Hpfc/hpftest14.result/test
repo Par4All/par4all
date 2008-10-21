@@ -1,4 +1,4 @@
---- Hpfc Validation for hpftest14
+--- Hpfc Validation for $VDIR/hpftest14.f
 
 !
 ! File HPFTEST14_host.f
@@ -62,14 +62,14 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST14_parameters.h"
-      INTEGER I_2,I,J,I_0,I_1
-      REAL*4 F_0,A(1:25,1:100)
+      INTEGER I_2, I, J, I_0, I_1
+      REAL*4 F_0, A(1:25, 1:100)
       CALL HPFC INIT NODE
       I = 0
       DO I = 2, 101
          DO J = 0, 99
-            I_0 = I-1
             I_1 = J+1
+            I_0 = I-1
             CALL HPFC CMPCOMPUTER(1, I_0, I_1, 0, 0, 0, 0, 0)
             IF (HPFC COMPUTERP()) THEN
                F_0 = I+J

@@ -1,4 +1,4 @@
---- Hpfc Validation for hpftest41
+--- Hpfc Validation for $VDIR/hpftest41.f
 
 !
 ! File HPFTEST41_host.f
@@ -10,8 +10,8 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST41_parameters.h"
-      INTEGER ALPHA1,ALPHA2,LALPHA1,LALPHA2,PSI1,PSI2,T LID,I
-      REAL*4 TC(1:500,1:500)
+      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, PSI2, T LID, I
+      REAL*4 TC(1:500, 1:500)
       CALL HPFC INIT HOST
       PRINT *, 'hpftest41 running'
       PRINT *, 'thermo'
@@ -34,8 +34,8 @@ c print results
       T LID = -2+2*PSI1+PSI2
       CALL HPFC RCV FROM NODE(T LID)
       CALL HPFC REAL4 BUFUPK
-      DO ALPHA2 = 2, 10
-         DO ALPHA1 = 2, 10
+      DO ALPHA2 = MAX(2, -249+250*PSI2), MIN(10, 250*PSI2)
+         DO ALPHA1 = MAX(2, -249+250*PSI1), MIN(10, 250*PSI1)
             LALPHA1 = 250+ALPHA1-250*PSI1
             LALPHA2 = 250+ALPHA2-250*PSI2
             BUF INDEX = BUF INDEX+1
@@ -161,11 +161,12 @@ c print results
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST41_parameters.h"
-      INTEGER ALPHA1,ALPHA2,LALPHA1,LALPHA2,PSI1,PSI2,I_35,I_34,I_33,
-     &I_32,I_31,I_30,I_29,I_28,I_27,I_26,I_25,I_24,I_23,I_22,I_21,
-     &I_20,I_19,I_18,I_17,I_16,I_15,I_14,I_13,I_12,I_11,I_10,I_9,I_8,
-     &I_7,I_6,I_5,I_4,I,K
-      REAL*4 TC(0:251,0:251),TS(1:250,1:250),NORTH(1:250)
+      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, PSI2, I_35, 
+     &I_34, I_33, I_32, I_31, I_30, I_29, I_28, I_27, I_26, I_25, 
+     &I_24, I_23, I_22, I_21, I_20, I_19, I_18, I_17, I_16, I_15, 
+     &I_14, I_13, I_12, I_11, I_10, I_9, I_8, I_7, I_6, I_5, I_4, I, 
+     &K
+      REAL*4 TC(0:251, 0:251), TS(1:250, 1:250), NORTH(1:250)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_33, I_34, I_35, 2, 499, 3, 1)
       CALL HPFC LOOP BOUNDS(I_29, I_30, I_31, 2, 499, 3, 2)
@@ -277,8 +278,8 @@ c computation and copy back (dataparallel semantic)
       IF (PSI2.LE.1.AND.PSI1.LE.1) THEN
          BUF INDEX = 0
          SEND NOT INITIALIZED = .TRUE.
-         DO ALPHA2 = 2, 10
-            DO ALPHA1 = 2, 10
+         DO ALPHA2 = MAX(2, -249+250*PSI2), MIN(10, 250*PSI2)
+            DO ALPHA1 = MAX(2, -249+250*PSI1), MIN(10, 250*PSI1)
                LALPHA1 = 250+ALPHA1-250*PSI1
                LALPHA2 = 250+ALPHA2-250*PSI2
                BUF INDEX = BUF INDEX+1

@@ -1,4 +1,4 @@
---- Hpfc Validation for hpftest06
+--- Hpfc Validation for $VDIR/hpftest06.f
 
 !
 ! File HPFTEST06_host.f
@@ -10,7 +10,7 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST06_parameters.h"
-      INTEGER I_8,J
+      INTEGER I_8, J
       LOGICAL L_0
       CALL HPFC INIT HOST
       J = 2
@@ -63,7 +63,8 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST06_parameters.h"
-      INTEGER I_10,I_9,I_8,I_7,I_6,I_5,I_4,I_3,I_2,J,I,I_0,I_1
+      INTEGER I_10, I_9, I_8, I_7, I_6, I_5, I_4, I_3, I_2, J, I, I_0
+     &, I_1
       INTEGER G(1:5)
       LOGICAL L_0
       CALL HPFC INIT NODE
@@ -74,24 +75,24 @@
          G(I_2) = 1
       ENDIF
       DO I = J, 10
-         I_0 = I_3
-         I_1 = I-1
-         CALL HPFC CMPCOMPUTER(1, I_0, 0, 0, 0, 0, 0, 0)
+         I_1 = I_3
+         I_0 = I-1
+         CALL HPFC CMPCOMPUTER(1, I_1, 0, 0, 0, 0, 0, 0)
          IF (HPFC COMPUTERP()) THEN
-            CALL HPFC CMPOWNERS(1, I_1, 0, 0, 0, 0, 0, 0)
+            CALL HPFC CMPOWNERS(1, I_0, 0, 0, 0, 0, 0, 0)
             IF (HPFC OWNERP()) THEN
-               I_4 = MOD(I_1-1, 5)+1
+               I_4 = MOD(I_0-1, 5)+1
                I_3 = G(I_4)
             ELSE
                CALL HPFC RCVFR S(HPFC INTEGER4, I_3)
             ENDIF
             I_6 = I
-            I_7 = MOD(I_0-1, 5)+1
+            I_7 = MOD(I_1-1, 5)+1
             G(I_7) = I_6
          ELSE
-            CALL HPFC CMPOWNERS(1, I_1, 0, 0, 0, 0, 0, 0)
+            CALL HPFC CMPOWNERS(1, I_0, 0, 0, 0, 0, 0, 0)
             IF (HPFC SENDERP()) THEN
-               I_5 = MOD(I_1-1, 5)+1
+               I_5 = MOD(I_0-1, 5)+1
                CALL HPFC SNDTO C(HPFC INTEGER4, G(I_5))
             ENDIF
          ENDIF

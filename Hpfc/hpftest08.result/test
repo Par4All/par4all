@@ -1,4 +1,4 @@
---- Hpfc Validation for hpftest08
+--- Hpfc Validation for $VDIR/hpftest08.f
 
 !
 ! File HPFTEST08_host.f
@@ -10,7 +10,7 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST08_parameters.h"
-      INTEGER I_0,J
+      INTEGER I_0, J
       CALL HPFC INIT HOST
       J = 1
       CALL HPFC CMPOWNERS(1, 1, 0, 0, 0, 0, 0, 0)
@@ -59,7 +59,7 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST08_parameters.h"
-      INTEGER I_1,I_0,J
+      INTEGER I_1, I_0, J
       INTEGER G(1:5)
       CALL HPFC INIT NODE
       J = 1

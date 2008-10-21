@@ -1,4 +1,4 @@
---- Hpfc Validation for hpftest07
+--- Hpfc Validation for $VDIR/hpftest07.f
 
 !
 ! File HPFTEST07_host.f
@@ -10,19 +10,19 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST07_parameters.h"
-      INTEGER I_19,I_17,I_15,I_13,I_11,J,I_2,I_3,I_4
+      INTEGER I_19, I_17, I_15, I_13, I_11, J, I_2, I_3, I_4
       LOGICAL L_0
       CALL HPFC INIT HOST
       J = 2
       CALL HPFC CMPOWNERS(1, 1, 0, 0, 0, 0, 0, 0)
       CALL HPFC RCVFR HNBCAST S(HPFC INTEGER4, I_11)
-      I_3 = I_11+1
-      CALL HPFC CMPOWNERS(1, I_3, 0, 0, 0, 0, 0, 0)
+      I_2 = I_11+1
+      CALL HPFC CMPOWNERS(1, I_2, 0, 0, 0, 0, 0, 0)
       CALL HPFC RCVFR HNBCAST S(HPFC INTEGER4, I_13)
-      I_2 = I_13-1
+      I_3 = I_13-1
       CALL HPFC CMPOWNERS(1, 1, 0, 0, 0, 0, 0, 0)
       CALL HPFC RCVFR HNBCAST S(HPFC INTEGER4, I_15)
-      CALL HPFC CMPOWNERS(1, I_2, 0, 0, 0, 0, 0, 0)
+      CALL HPFC CMPOWNERS(1, I_3, 0, 0, 0, 0, 0, 0)
       CALL HPFC RCVFR HNBCAST S(HPFC INTEGER4, I_17)
       L_0 = I_17.EQ.I_15
       IF (L_0) THEN
@@ -74,8 +74,9 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST07_parameters.h"
-      INTEGER I_21,I_20,I_19,I_18,I_17,I_16,I_15,I_14,I_13,I_12,I_11,
-     &I_10,I_9,I_8,I_7,I_6,I_5,J,I,I_0,I_1,I_2,I_3,I_4
+      INTEGER I_21, I_20, I_19, I_18, I_17, I_16, I_15, I_14, I_13, 
+     &I_12, I_11, I_10, I_9, I_8, I_7, I_6, I_5, J, I, I_0, I_1, I_2
+     &, I_3, I_4
       INTEGER G(1:5)
       LOGICAL L_0
       CALL HPFC INIT NODE
@@ -86,24 +87,24 @@
          G(I_5) = 1
       ENDIF
       DO I = J, 10
-         I_0 = I_6
-         I_1 = I-1
-         CALL HPFC CMPCOMPUTER(1, I_0, 0, 0, 0, 0, 0, 0)
+         I_1 = I_6
+         I_0 = I-1
+         CALL HPFC CMPCOMPUTER(1, I_1, 0, 0, 0, 0, 0, 0)
          IF (HPFC COMPUTERP()) THEN
-            CALL HPFC CMPOWNERS(1, I_1, 0, 0, 0, 0, 0, 0)
+            CALL HPFC CMPOWNERS(1, I_0, 0, 0, 0, 0, 0, 0)
             IF (HPFC OWNERP()) THEN
-               I_7 = MOD(I_1-1, 5)+1
+               I_7 = MOD(I_0-1, 5)+1
                I_6 = G(I_7)
             ELSE
                CALL HPFC RCVFR S(HPFC INTEGER4, I_6)
             ENDIF
             I_9 = I
-            I_10 = MOD(I_0-1, 5)+1
+            I_10 = MOD(I_1-1, 5)+1
             G(I_10) = I_9
          ELSE
-            CALL HPFC CMPOWNERS(1, I_1, 0, 0, 0, 0, 0, 0)
+            CALL HPFC CMPOWNERS(1, I_0, 0, 0, 0, 0, 0, 0)
             IF (HPFC SENDERP()) THEN
-               I_8 = MOD(I_1-1, 5)+1
+               I_8 = MOD(I_0-1, 5)+1
                CALL HPFC SNDTO C(HPFC INTEGER4, G(I_8))
             ENDIF
          ENDIF
@@ -116,16 +117,16 @@
       ELSE
          CALL HPFC RCVFR HNBCAST S(HPFC INTEGER4, I_11)
       ENDIF
-      I_3 = I_11+1
-      CALL HPFC CMPOWNERS(1, I_3, 0, 0, 0, 0, 0, 0)
+      I_2 = I_11+1
+      CALL HPFC CMPOWNERS(1, I_2, 0, 0, 0, 0, 0, 0)
       IF (HPFC OWNERP()) THEN
-         I_14 = MOD(I_3-1, 5)+1
+         I_14 = MOD(I_2-1, 5)+1
          I_13 = G(I_14)
          CALL HPFC NSNDTO HA(HPFC INTEGER4, I_13)
       ELSE
          CALL HPFC RCVFR HNBCAST S(HPFC INTEGER4, I_13)
       ENDIF
-      I_2 = I_13-1
+      I_3 = I_13-1
       CALL HPFC CMPOWNERS(1, 1, 0, 0, 0, 0, 0, 0)
       IF (HPFC OWNERP()) THEN
          I_16 = MOD(1-1, 5)+1
@@ -134,9 +135,9 @@
       ELSE
          CALL HPFC RCVFR HNBCAST S(HPFC INTEGER4, I_15)
       ENDIF
-      CALL HPFC CMPOWNERS(1, I_2, 0, 0, 0, 0, 0, 0)
+      CALL HPFC CMPOWNERS(1, I_3, 0, 0, 0, 0, 0, 0)
       IF (HPFC OWNERP()) THEN
-         I_18 = MOD(I_2-1, 5)+1
+         I_18 = MOD(I_3-1, 5)+1
          I_17 = G(I_18)
          CALL HPFC NSNDTO HA(HPFC INTEGER4, I_17)
       ELSE

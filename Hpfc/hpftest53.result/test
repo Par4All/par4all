@@ -1,4 +1,4 @@
---- Hpfc Validation for hpftest53
+--- Hpfc Validation for $VDIR/hpftest53.f
 
 !
 ! File HPFTEST53_host.f
@@ -14,8 +14,9 @@
       PARAMETER (NP = 800)
       INTEGER*4 NP
       PARAMETER (NP = 800)
-      INTEGER ALPHA1,ALPHA2,LALPHA1,LALPHA2,PSI1,PSI2,T LID,I,J
-      REAL*8 V(1:NP,1:NP)
+      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, PSI2, T LID, I
+     &, J
+      REAL*8 V(1:NP, 1:NP)
       CALL HPFC INIT HOST
       DO I = 1, NP
          DO J = 1, NP
@@ -112,8 +113,8 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST53_parameters.h"
-      INTEGER ALPHA1,ALPHA2,LALPHA1,LALPHA2,PSI1,PSI2,I,J
-      REAL*8 V(1:200,1:200)
+      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, PSI2, I, J
+      REAL*8 V(1:200, 1:200)
       CALL HPFC INIT NODE
 ! updating shared variable I
       BUF INDEX = 0

@@ -1,4 +1,4 @@
---- Hpfc Validation for hpftest29
+--- Hpfc Validation for $VDIR/hpftest29.f
 
 !
 ! File HPFTEST29_host.f
@@ -10,8 +10,8 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST29_parameters.h"
-      INTEGER ALPHA1,LALPHA1,PSI1,T LID,I
-      REAL*4 B(1:10),D
+      INTEGER ALPHA1, LALPHA1, PSI1, T LID, I
+      REAL*4 B(1:10), D
       CALL HPFC INIT HOST
       PRINT *, 'hpftest29 running'
       PRINT *, 'enter real d'
@@ -112,8 +112,9 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST29_parameters.h"
-      INTEGER ALPHA1,LALPHA1,PSI1,I_7,I_6,I_5,I_4,I_3,I_2,I_1,I_0,I
-      REAL*4 A(1:5),B(1:5),D
+      INTEGER ALPHA1, LALPHA1, PSI1, I_7, I_6, I_5, I_4, I_3, I_2, 
+     &I_1, I_0, I
+      REAL*4 A(1:5), B(1:5), D
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_5, I_6, I_7, 1, 10, 1, 1)
       CALL HPFC LOOP BOUNDS(I_1, I_2, I_3, 1, 10, 2, 1)

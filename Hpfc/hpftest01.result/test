@@ -1,4 +1,4 @@
---- Hpfc Validation for hpftest01
+--- Hpfc Validation for $VDIR/hpftest01.f
 
 !
 ! File HPFTEST01_host.f
@@ -56,7 +56,7 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST01_parameters.h"
-      INTEGER I_3,I_2,I_1,I_0,I
+      INTEGER I_3, I_2, I_1, I_0, I
       REAL*4 A(1:5)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_1, I_2, I_3, 1, 10, 1, 1)

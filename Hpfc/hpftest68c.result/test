@@ -1,4 +1,4 @@
---- Hpfc Validation for hpftest68c
+--- Hpfc Validation for $VDIR/hpftest68c.f
 
 !
 ! File TEST68_A_2_3_node.h
@@ -19,7 +19,7 @@
                   BUF INDEX = 0
                   SEND NOT INITIALIZED = .TRUE.
                   DO LALPHA2 = 1, 15
-                     DO LALPHA1 = 1, MIN(15, 35-15*PSIp1)
+                     DO LALPHA1 = 1, MIN(35-15*PSIp1, 15)
                         LALPHAp2 = LALPHA2
                         LALPHAp1 = LALPHA1
                         BUF INDEX = BUF INDEX+1
@@ -52,7 +52,7 @@
                   RECEIVED NOT PERFORMED = .TRUE.
                   SIZE OF RECEIVED BUFFER = 0
                   DO LALPHA2 = 1, 15
-                     DO LALPHA1 = 1, MIN(15, 35-15*PSIp1)
+                     DO LALPHA1 = 1, MIN(35-15*PSIp1, 15)
                         LALPHAp2 = LALPHA2
                         LALPHAp1 = LALPHA1
                         IF (BUF INDEX.EQ.SIZE OF RECEIVED BUFFER
@@ -68,7 +68,7 @@
                ELSE
 ! - copying
                   DO LALPHA2 = 1, 15
-                     DO LALPHA1 = 1, MIN(15, 35-15*PSIp1)
+                     DO LALPHA1 = 1, MIN(35-15*PSIp1, 15)
                         LALPHAp2 = LALPHA2
                         LALPHAp1 = LALPHA1
                         A(LALPHAp1,LALPHAp2) = A_1(LALPHA1,LALPHA2)
@@ -103,7 +103,7 @@
                   BUF INDEX = 0
                   SEND NOT INITIALIZED = .TRUE.
                   DO LALPHA2 = 1, 15
-                     DO LALPHA1 = 1, MIN(15, 35-15*PSIp2)
+                     DO LALPHA1 = 1, MIN(35-15*PSIp2, 15)
                         LALPHAp2 = LALPHA2
                         LALPHAp1 = LALPHA1
                         BUF INDEX = BUF INDEX+1
@@ -136,7 +136,7 @@
                   RECEIVED NOT PERFORMED = .TRUE.
                   SIZE OF RECEIVED BUFFER = 0
                   DO LALPHA2 = 1, 15
-                     DO LALPHA1 = 1, MIN(15, 35-15*PSIp2)
+                     DO LALPHA1 = 1, MIN(35-15*PSIp2, 15)
                         LALPHAp2 = LALPHA2
                         LALPHAp1 = LALPHA1
                         IF (BUF INDEX.EQ.SIZE OF RECEIVED BUFFER
@@ -152,7 +152,7 @@
                ELSE
 ! - copying
                   DO LALPHA2 = 1, 15
-                     DO LALPHA1 = 1, MIN(15, 35-15*PSIp2)
+                     DO LALPHA1 = 1, MIN(35-15*PSIp2, 15)
                         LALPHAp2 = LALPHA2
                         LALPHAp1 = LALPHA1
                         A_1(LALPHAp1,LALPHAp2) = A(LALPHA1,LALPHA2)
@@ -184,8 +184,9 @@
       PARAMETER (N = 20)
       INTEGER*4 N
       PARAMETER (N = 20)
-      INTEGER ALPHA1,ALPHA2,LALPHA1,LALPHA2,PSI1,PSI2,T LID,I
-      REAL*4 A(1:N,1:M)
+      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, PSI2, T LID, I
+     &, I_4
+      REAL*4 A(1:N, 1:M)
       CALL HPFC INIT HOST
       PRINT *, 'DYNAMIC TEST (68) RUNNING'
 ! collecting distributed variable A
@@ -244,7 +245,8 @@
          ENDDO
       ENDDO
 ! end of collect
-      PRINT *, (A(I+1,I), I = 1, N-1)
+      I_4 = I+1
+      PRINT *, (A(I_4,I), I = 1, N-1)
 ! updating shared variable I
       BUF INDEX = 0
       SEND NOT INITIALIZED = .TRUE.
@@ -392,12 +394,13 @@
       PARAMETER (N = 20)
       INTEGER*4 M
       PARAMETER (M = 30)
-      INTEGER ALPHA1,ALPHA2,LALPHA1,LALPHA2,LALPHAp1,LALPHAp2,PSI1,
-     &PSI2,PSIp1,PSIp2,T LID,I_11,I_10,I_9,I_8,I_7,I_6,I_5,I_4,I,J
-      REAL*4 A(1:15,1:15),A_1(1:15,1:15)
+      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, LALPHAp1, LALPHAp2, 
+     &PSI1, PSI2, PSIp1, PSIp2, T LID, I_12, I_11, I_10, I_9, I_8, 
+     &I_7, I_6, I_5, I, J
+      REAL*4 A(1:15, 1:15), A_1(1:15, 1:15)
       CALL HPFC INIT NODE
-      CALL HPFC LOOP BOUNDS(I_9, I_10, I_11, 1, N, 3, 1)
-      CALL HPFC LOOP BOUNDS(I_5, I_6, I_7, 1, N, 3, 2)
+      CALL HPFC LOOP BOUNDS(I_10, I_11, I_12, 1, N, 3, 1)
+      CALL HPFC LOOP BOUNDS(I_6, I_7, I_8, 1, N, 3, 2)
 ! all livenesss for A
       LIVE MAPPING(3) = .FALSE.
       LIVE MAPPING(2) = .FALSE.
@@ -405,19 +408,19 @@
 ! direct remapping for A
       LIVE MAPPING(3) = .TRUE.
       MSTATUS(3) = 3
-      J = I_7
-      DO I_4 = I_5, I_6
+      J = I_8
+      DO I_5 = I_6, I_7
          J = J+1
-         I = I_11
-         DO I_8 = I_9, I_10
+         I = I_12
+         DO I_9 = I_10, I_11
             I = I+1
-            A(I_8,I_4) = REAL(I+J)/REAL(J-I+M+1)
+            A(I_9,I_5) = REAL(I+J)/REAL(J-I+M+1)
          ENDDO
       ENDDO
 ! collecting distributed variable A
       PSI1 = MY POS(1,1)
       PSI2 = MY POS(2,1)
-      IF (PSI1.LE.1.AND.2.LE.PSI2) THEN
+      IF (2.LE.PSI2.AND.PSI1.LE.1) THEN
          BUF INDEX = 0
          SEND NOT INITIALIZED = .TRUE.
          ALPHA2 = 20
@@ -503,7 +506,7 @@
 ! collecting distributed variable A
       PSI1 = MY POS(1,1)
       PSI2 = MY POS(2,1)
-      IF (PSI1.LE.1.AND.2.LE.PSI2) THEN
+      IF (2.LE.PSI2.AND.PSI1.LE.1) THEN
          BUF INDEX = 0
          SEND NOT INITIALIZED = .TRUE.
          ALPHA2 = 20

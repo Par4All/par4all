@@ -1,4 +1,4 @@
---- Hpfc Validation for hpftest35
+--- Hpfc Validation for $VDIR/hpftest35.f
 
 !
 ! File HPFTEST35_host.f
@@ -10,8 +10,8 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST35_parameters.h"
-      INTEGER ALPHA1,ALPHA2,LALPHA1,LALPHA2,PSI1,PSI2,T LID,I
-      REAL*4 TC(1:250,1:250)
+      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, PSI2, T LID, I
+      REAL*4 TC(1:250, 1:250)
       CALL HPFC INIT HOST
       PRINT *, 'hpftest35 running'
       PRINT *, 'thermo'
@@ -164,11 +164,12 @@ c print results
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST35_parameters.h"
-      INTEGER ALPHA1,ALPHA2,LALPHA1,LALPHA2,PSI1,PSI2,I_35,I_34,I_33,
-     &I_32,I_31,I_30,I_29,I_28,I_27,I_26,I_25,I_24,I_23,I_22,I_21,
-     &I_20,I_19,I_18,I_17,I_16,I_15,I_14,I_13,I_12,I_11,I_10,I_9,I_8,
-     &I_7,I_6,I_5,I_4,I,K
-      REAL*4 TC(0:126,0:126),TS(1:125,1:125),NORTH(1:125)
+      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, PSI2, I_35, 
+     &I_34, I_33, I_32, I_31, I_30, I_29, I_28, I_27, I_26, I_25, 
+     &I_24, I_23, I_22, I_21, I_20, I_19, I_18, I_17, I_16, I_15, 
+     &I_14, I_13, I_12, I_11, I_10, I_9, I_8, I_7, I_6, I_5, I_4, I, 
+     &K
+      REAL*4 TC(0:126, 0:126), TS(1:125, 1:125), NORTH(1:125)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_33, I_34, I_35, 2, 249, 3, 2)
       CALL HPFC LOOP BOUNDS(I_29, I_30, I_31, 2, 249, 3, 1)

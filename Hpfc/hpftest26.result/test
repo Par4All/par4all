@@ -1,4 +1,4 @@
---- Hpfc Validation for hpftest26
+--- Hpfc Validation for $VDIR/hpftest26.f
 
 !
 ! File HPFTEST26_host.f
@@ -10,7 +10,7 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST26_parameters.h"
-      INTEGER ALPHA1,LALPHA1,PSI1,T LID,I
+      INTEGER ALPHA1, LALPHA1, PSI1, T LID, I
       INTEGER J(1:10)
       CALL HPFC INIT HOST
       PRINT *, 'hpftest26 running'
@@ -97,8 +97,8 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST26_parameters.h"
-      INTEGER ALPHA1,LALPHA1,PSI1,I_4,I_3,I_2,I_1,I,I_0
-      INTEGER J(1:2),K(1:3)
+      INTEGER ALPHA1, LALPHA1, PSI1, I_4, I_3, I_2, I_1, I, I_0
+      INTEGER J(1:2), K(1:3)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_2, I_3, I_4, 1, 10, 2, 1)
       DO I = 1, 3

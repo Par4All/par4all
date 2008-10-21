@@ -1,4 +1,4 @@
---- Hpfc Validation for hpftest34
+--- Hpfc Validation for $VDIR/hpftest34.f
 
 !
 ! File HPFTEST34_host.f
@@ -10,23 +10,26 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST34_parameters.h"
-      INTEGER ALPHA1,ALPHA2,LALPHA1,LALPHA2,PSI1,PSI2,T LID,I
-      REAL*4 B(1:10,1:10)
+      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, PSI2, T LID, I
+      REAL*4 B(1:10, 1:10)
       CALL HPFC INIT HOST
       PRINT *, 'hpftest34 running'
 ! collecting distributed variable B
       DO PSI1 = 1, 2
-         DO PSI2 = 1, 2
+         DO PSI2 = MAX(-1+PSI1, HPFC DIVIDE(9-3*PSI1, 4)), MIN(5+
+     &   HPFC DIVIDE(-4*PSI1, 3), 1+PSI1)
             BUF INDEX = 0
             RECEIVED NOT PERFORMED = .FALSE.
             SIZE OF RECEIVED BUFFER = 0
             T LID = -2+2*PSI1+PSI2
             CALL HPFC RCV FROM NODE(T LID)
             CALL HPFC REAL4 BUFUPK
-            DO ALPHA2 = -4+5*PSI2, 5*PSI2
-               DO ALPHA1 = MAX(-3+ALPHA2, HPFC DIVIDE(28-4*ALPHA2, 3)
-     &         , -4+5*PSI1), MIN(HPFC DIVIDE(51-3*ALPHA2, 4), 4+
-     &         ALPHA2, 5*PSI1)
+            DO ALPHA2 = MAX(2, -4+5*PSI2, HPFC DIVIDE(29-15*PSI1, 4)
+     &      , -8+5*PSI1), MIN(9, 5*PSI2, 3+5*PSI1, HPFC DIVIDE(67-20*
+     &      PSI1, 3))
+               DO ALPHA1 = MAX(-4+5*PSI1, HPFC DIVIDE(28-4*ALPHA2, 3)
+     &         , -3+ALPHA2), MIN(4+ALPHA2, HPFC DIVIDE(51-3*ALPHA2, 4
+     &         ), 5*PSI1)
                   LALPHA1 = 5+ALPHA1-5*PSI1
                   LALPHA2 = 5+ALPHA2-5*PSI2
                   BUF INDEX = BUF INDEX+1
@@ -134,9 +137,10 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST34_parameters.h"
-      INTEGER ALPHA1,ALPHA2,LALPHA1,LALPHA2,PSI1,PSI2,I_20,I_19,I_18,
-     &I_17,I_16,I_15,I_14,I_13,I_12,I_11,I_10,I_9,I_8,I_7,I_6,I_5,I,J
-      REAL*4 A(0:5,0:6),B(1:5,1:5)
+      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, PSI2, I_20, 
+     &I_19, I_18, I_17, I_16, I_15, I_14, I_13, I_12, I_11, I_10, I_9
+     &, I_8, I_7, I_6, I_5, I, J
+      REAL*4 A(0:5, 0:6), B(1:5, 1:5)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_18, I_19, I_20, 2, 9, 1, 2)
       CALL HPFC LOOP BOUNDS(I_14, I_15, I_16, 2, 9, 1, 1)
@@ -232,9 +236,10 @@
       PSI2 = MY POS(2,1)
       BUF INDEX = 0
       SEND NOT INITIALIZED = .TRUE.
-      DO ALPHA2 = -4+5*PSI2, 5*PSI2
-         DO ALPHA1 = MAX(-3+ALPHA2, HPFC DIVIDE(28-4*ALPHA2, 3), -4+5
-     &   *PSI1), MIN(HPFC DIVIDE(51-3*ALPHA2, 4), 4+ALPHA2, 5*PSI1)
+      DO ALPHA2 = MAX(2, -4+5*PSI2, HPFC DIVIDE(29-15*PSI1, 4), -8+5*
+     &PSI1), MIN(9, 5*PSI2, 3+5*PSI1, HPFC DIVIDE(67-20*PSI1, 3))
+         DO ALPHA1 = MAX(-4+5*PSI1, HPFC DIVIDE(28-4*ALPHA2, 3), -3+
+     &   ALPHA2), MIN(4+ALPHA2, HPFC DIVIDE(51-3*ALPHA2, 4), 5*PSI1)
             LALPHA1 = 5+ALPHA1-5*PSI1
             LALPHA2 = 5+ALPHA2-5*PSI2
             BUF INDEX = BUF INDEX+1

@@ -1,4 +1,4 @@
---- Hpfc Validation for hpftest44
+--- Hpfc Validation for $VDIR/hpftest44.f
 
 !
 ! File HPFTEST44_host.f
@@ -14,8 +14,8 @@
       PARAMETER (N = 20)
       INTEGER*4 N
       PARAMETER (N = 20)
-      INTEGER ALPHA1,LALPHA1,PSI1,T LID,I
-      REAL*4 A(1:N),H
+      INTEGER ALPHA1, LALPHA1, PSI1, T LID, I
+      REAL*4 A(1:N), H
       CALL HPFC INIT HOST
       PRINT *, 'enter h'
       READ *, H
@@ -116,8 +116,9 @@
       include "HPFTEST44_parameters.h"
       INTEGER*4 N
       PARAMETER (N = 20)
-      INTEGER ALPHA1,LALPHA1,PSI1,I_9,I_8,I_7,I_6,I_5,I_4,I_3,I_2,I
-      REAL*4 A(1:6),B(1:7),H
+      INTEGER ALPHA1, LALPHA1, PSI1, I_9, I_8, I_7, I_6, I_5, I_4, 
+     &I_3, I_2, I
+      REAL*4 A(1:6), B(1:7), H
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_7, I_8, I_9, 3, N-2, 2, 1)
       CALL HPFC LOOP BOUNDS(I_3, I_4, I_5, 1, N, 1, 1)

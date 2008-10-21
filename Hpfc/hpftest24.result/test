@@ -1,4 +1,4 @@
---- Hpfc Validation for hpftest24
+--- Hpfc Validation for $VDIR/hpftest24.f
 
 !
 ! File HPFTEST24_host.f
@@ -10,7 +10,7 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST24_parameters.h"
-      INTEGER ALPHA1,LALPHA1,PSI1,T LID,I
+      INTEGER ALPHA1, LALPHA1, PSI1, T LID, I
       INTEGER J(1:10)
       CALL HPFC INIT HOST
       PRINT *, 'hpftest24 running'
@@ -84,8 +84,8 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST24_parameters.h"
-      INTEGER ALPHA1,LALPHA1,PSI1,I_12,I_11,I_10,I_9,I_8,I_7,I_6,I_5,
-     &I_4,I_3,I_2,I_1,I_0,I,K,D
+      INTEGER ALPHA1, LALPHA1, PSI1, I_12, I_11, I_10, I_9, I_8, I_7
+     &, I_6, I_5, I_4, I_3, I_2, I_1, I_0, I, K, D
       INTEGER J(1:4)
       CALL HPFC INIT NODE
       DO I = 1, 10

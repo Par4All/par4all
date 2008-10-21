@@ -1,4 +1,4 @@
---- Hpfc Validation for movebounds
+--- Hpfc Validation for $VDIR/movebounds.f
 
 !
 ! File MOVEBOUNDS_host.f
@@ -70,8 +70,8 @@
       include "MOVEBOUNDS_parameters.h"
       INTEGER*4 N
       PARAMETER (N = 100)
-      INTEGER I_7,I_6,I_5,I_4,I_3,I_2,I_1,I_0,I,J,K
-      REAL*4 A(1:50,1:50)
+      INTEGER I_7, I_6, I_5, I_4, I_3, I_2, I_1, I_0, I, J, K
+      REAL*4 A(1:50, 1:50)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_5, I_6, I_7, N-10, N, 1, 1)
 

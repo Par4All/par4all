@@ -1,4 +1,4 @@
---- Hpfc Validation for hpftest37
+--- Hpfc Validation for $VDIR/hpftest37.f
 
 !
 ! File HPFTEST37_host.f
@@ -10,8 +10,8 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST37_parameters.h"
-      INTEGER ALPHA1,ALPHA2,LALPHA1,LALPHA2,PSI1,T LID,I
-      REAL*4 TC(1:250,1:250)
+      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, T LID, I
+      REAL*4 TC(1:250, 1:250)
       CALL HPFC INIT HOST
       PRINT *, 'hpftest37 running'
       PRINT *, 'thermo'
@@ -153,9 +153,10 @@ c print results
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST37_parameters.h"
-      INTEGER ALPHA1,ALPHA2,LALPHA1,LALPHA2,PSI1,I_15,I_14,I_13,I_12,
-     &I_11,I_10,I_9,I_8,I_7,I_6,I_5,I_4,I,J,K,I_2,I_3
-      REAL*4 TC(0:64,1:250),TS(1:63,1:250),NORTH(1:250)
+      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, I_15, I_14, 
+     &I_13, I_12, I_11, I_10, I_9, I_8, I_7, I_6, I_5, I_4, I, J, K, 
+     &I_2, I_3
+      REAL*4 TC(0:64, 1:250), TS(1:63, 1:250), NORTH(1:250)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_13, I_14, I_15, 2, 249, 3, 1)
       CALL HPFC LOOP BOUNDS(I_9, I_10, I_11, 2, 249, 2, 1)
@@ -214,8 +215,8 @@ c computation and copy back (dataparallel semantic)
          ENDIF
          DO I_8 = I_9, I_10
             DO J = 2, 249
-               I_3 = J+1
                I_2 = J-1
+               I_3 = J+1
                TS(I_8,J) = 0.25*(TC(I_8-1,J)+TC(I_8+1,J)+TC(I_8,I_2)+
      &         TC(I_8,I_3))
             ENDDO

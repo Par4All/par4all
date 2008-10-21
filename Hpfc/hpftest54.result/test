@@ -1,4 +1,4 @@
---- Hpfc Validation for hpftest54
+--- Hpfc Validation for $VDIR/hpftest54.f
 
 !
 ! File HPFTEST54_host.f
@@ -16,9 +16,9 @@
       PARAMETER (N = 500)
       INTEGER*4 TIMES
       PARAMETER (TIMES = 100)
-      INTEGER ALPHA1,ALPHA2,ALPHA3,LALPHA1,LALPHA2,LALPHA3,PSI1,PSI2,
-     &T LID,OLD,NEW,T1,T2,T3,T4,T5,I,K
-      REAL*8 TEMP(1:N,1:N,1:2),X
+      INTEGER ALPHA1, ALPHA2, ALPHA3, LALPHA1, LALPHA2, LALPHA3, PSI1
+     &, PSI2, T LID, OLD, NEW, T1, T2, T3, T4, T5, I, K
+      REAL*8 TEMP(1:N, 1:N, 1:2), X
       CALL HPFC INIT HOST
       PRINT *, 'HPFTEST54 RUNNING, THERMO'
 c
@@ -50,7 +50,7 @@ c
       PRINT *, 'MAX is ', X
 10    FORMAT(F8.2,F8.2,F8.2,F8.2,F8.2)
 ! collecting distributed variable TEMP
-      IF (1.LE.NEW.AND.NEW.LE.2) THEN
+      IF (1.LE.OLD.AND.OLD.LE.2) THEN
          PSI1 = 1
          PSI2 = 1
          BUF INDEX = 0
@@ -59,9 +59,9 @@ c
          T LID = -2+2*PSI1+PSI2
          CALL HPFC RCV FROM NODE(T LID)
          CALL HPFC REAL8 BUFUPK
-         DO ALPHA2 = 12, 60
-            DO ALPHA1 = 2, 10
-               ALPHA3 = 3-NEW
+         DO ALPHA2 = MAX(12, -249+250*PSI2), MIN(60, 250*PSI2)
+            DO ALPHA1 = MAX(2, -249+250*PSI1), MIN(10, 250*PSI1)
+               ALPHA3 = OLD
                LALPHA1 = 250+ALPHA1-250*PSI1
                LALPHA2 = 250+ALPHA2-250*PSI2
                LALPHA3 = ALPHA3
@@ -177,11 +177,12 @@ c
       PARAMETER (N = 500)
       INTEGER*4 TIMES
       PARAMETER (TIMES = 100)
-      INTEGER ALPHA1,ALPHA2,ALPHA3,LALPHA1,LALPHA2,LALPHA3,PSI1,PSI2,
-     &I_31,I_30,I_29,I_28,I_27,I_26,I_25,I_24,I_23,I_22,I_21,I_20,
-     &I_19,I_18,I_17,I_16,I_15,I_14,I_13,I_12,I_11,I_10,I_9,I_8,I_7,
-     &I_6,I_5,I_4,OLD,NEW,T1,T2,T3,T4,T5,I,K
-      REAL*8 TEMP(0:251,0:251,1:2),NORTH(1:250),X
+      INTEGER ALPHA1, ALPHA2, ALPHA3, LALPHA1, LALPHA2, LALPHA3, PSI1
+     &, PSI2, I_31, I_30, I_29, I_28, I_27, I_26, I_25, I_24, I_23, 
+     &I_22, I_21, I_20, I_19, I_18, I_17, I_16, I_15, I_14, I_13, 
+     &I_12, I_11, I_10, I_9, I_8, I_7, I_6, I_5, I_4, OLD, NEW, T1, 
+     &T2, T3, T4, T5, I, K
+      REAL*8 TEMP(0:251, 0:251, 1:2), NORTH(1:250), X
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_29, I_30, I_31, 1, N, 1, 2)
       CALL HPFC LOOP BOUNDS(I_25, I_26, I_27, 2, N-1, 2, 1)
@@ -306,15 +307,15 @@ c
      &HPFTEST54 NORTH UP1, 1, N)
       T4 = TIME()
 ! collecting distributed variable TEMP
-      IF (1.LE.NEW.AND.NEW.LE.2) THEN
+      IF (1.LE.OLD.AND.OLD.LE.2) THEN
          PSI1 = MY POS(1,1)
          PSI2 = MY POS(2,1)
          IF (PSI2.LE.1.AND.PSI1.LE.1) THEN
             BUF INDEX = 0
             SEND NOT INITIALIZED = .TRUE.
-            DO ALPHA2 = 12, 60
-               DO ALPHA1 = 2, 10
-                  ALPHA3 = 3-NEW
+            DO ALPHA2 = MAX(12, -249+250*PSI2), MIN(60, 250*PSI2)
+               DO ALPHA1 = MAX(2, -249+250*PSI1), MIN(10, 250*PSI1)
+                  ALPHA3 = OLD
                   LALPHA1 = 250+ALPHA1-250*PSI1
                   LALPHA2 = 250+ALPHA2-250*PSI2
                   LALPHA3 = ALPHA3

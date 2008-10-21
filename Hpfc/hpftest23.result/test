@@ -1,4 +1,4 @@
---- Hpfc Validation for hpftest23
+--- Hpfc Validation for $VDIR/hpftest23.f
 
 !
 ! File HPFTEST23_host.f
@@ -10,8 +10,8 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST23_parameters.h"
-      INTEGER ALPHA1,LALPHA1,PSI1,T LID,I,I_0,I_1,I_2
-      INTEGER K(1:10),J(1:10)
+      INTEGER ALPHA1, LALPHA1, PSI1, T LID, I, I_0, I_1, I_2
+      INTEGER K(1:10), J(1:10)
       LOGICAL L_0
       CALL HPFC INIT HOST
       PRINT *, 'hpftest23 running'
@@ -87,8 +87,8 @@
          ENDDO
       ENDDO
 ! end of collect
-      I_2 = K(7)
       I_1 = K(3)
+      I_2 = K(7)
       L_0 = J(I_1).LT.J(I_2)
       IF (L_0) PRINT *, 'quite interesting a property...'
       PRINT *, 'hpftest23 end'
@@ -155,8 +155,8 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST23_parameters.h"
-      INTEGER ALPHA1,LALPHA1,PSI1,I_7,I_6,I_5,I_4,I_3,I
-      INTEGER J(1:4),K(1:4)
+      INTEGER ALPHA1, LALPHA1, PSI1, I_7, I_6, I_5, I_4, I_3, I
+      INTEGER J(1:4), K(1:4)
       CALL HPFC INIT NODE
       DO I = 1, 10
          CALL HPFC CMPCOMPUTER(2, I, 0, 0, 0, 0, 0, 0)

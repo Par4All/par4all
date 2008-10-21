@@ -1,4 +1,4 @@
---- Hpfc Validation for hpftest02
+--- Hpfc Validation for $VDIR/hpftest02.f
 
 !
 ! File HPFTEST02_host.f
@@ -144,7 +144,7 @@ Commencement du code
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST02_parameters.h"
-      INTEGER I_0,I
+      INTEGER I_0, I
       REAL*4 A1(1:5)
       CALL HPFC INIT NODE
 C     

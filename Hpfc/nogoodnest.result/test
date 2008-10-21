@@ -1,4 +1,4 @@
---- Hpfc Validation for nogoodnest
+--- Hpfc Validation for $VDIR/nogoodnest.f
 
 !
 ! File NOGOODNEST_host.f
@@ -97,10 +97,11 @@
       PARAMETER (N = 100)
       INTEGER*4 N
       PARAMETER (N = 100)
-      INTEGER I_29,I_28,I_27,I_26,I_25,I_24,I_23,I_22,I_21,I_20,I_19,
-     &I_18,I_17,I_16,I_15,I_14,I_13,I_12,I_11,I_10,I_9,I_8,I_7,I_6,J,
-     &I_LOCAL,I_0,I_1,I_2,I_3,I_4,I_5
-      REAL*4 F_3,F_2,F_1,F_0,U(1:50,1:N),UH(1:50,1:N)
+      INTEGER I_29, I_28, I_27, I_26, I_25, I_24, I_23, I_22, I_21, 
+     &I_20, I_19, I_18, I_17, I_16, I_15, I_14, I_13, I_12, I_11, 
+     &I_10, I_9, I_8, I_7, I_6, J, I_LOCAL, I_0, I_1, I_2, I_3, I_4, 
+     &I_5
+      REAL*4 F_3, F_2, F_1, F_0, U(1:50, 1:N), UH(1:50, 1:N)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_24, I_25, I_26, 2, N-1, 1, 1)
       CALL HPFC LOOP BOUNDS(I_17, I_18, I_19, 2, N-1, 1, 1)
@@ -126,8 +127,8 @@
             ENDIF
          ENDIF
          DO I_9 = I_10, I_11
-            I_1 = J-1
             I_0 = J+1
+            I_1 = J-1
             UH(I_9,J) = U(I_9,J)+U(I_9,I_0)+U(I_9,I_1)
          ENDDO
          CALL HPFC CMPCOMPUTER(1, N, J, 0, 0, 0, 0, 0)
@@ -156,8 +157,8 @@
             UH(1,J) = U(1,J)
          ENDIF
          DO I_16 = I_17, I_18
-            I_3 = J-1
             I_2 = J+1
+            I_3 = J-1
             UH(I_16,J) = U(I_16,J)+U(I_16,I_2)+U(I_16,I_3)
          ENDDO
          IF (MY POS(1,1).EQ.2) THEN
@@ -186,8 +187,8 @@
             ENDIF
          ENDIF
          DO I_23 = I_24, I_25
-            I_5 = J-1
             I_4 = J+1
+            I_5 = J-1
             UH(I_23,J) = U(I_23,J)+U(I_23,I_4)+U(I_23,I_5)
          ENDDO
          CALL HPFC CMPCOMPUTER(1, N, J, 0, 0, 0, 0, 0)

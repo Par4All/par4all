@@ -1,4 +1,4 @@
---- Hpfc Validation for hpftest67
+--- Hpfc Validation for $VDIR/hpftest67.f
 
 !
 ! File HPFTEST67_host.f
@@ -14,8 +14,8 @@
       PARAMETER (N = 25)
       INTEGER*4 N
       PARAMETER (N = 25)
-      INTEGER ALPHA1,ALPHA2,LALPHA1,LALPHA2,PSI1,T LID,I,J
-      INTEGER A(1:N,1:N)
+      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, T LID, I, J
+      INTEGER A(1:N, 1:N)
       CALL HPFC INIT HOST
       PRINT *, 'HPFTEST67 IS RUNNING'
 ! collecting distributed variable A
@@ -106,9 +106,9 @@
       PARAMETER (N = 25)
       INTEGER*4 N
       PARAMETER (N = 25)
-      INTEGER ALPHA1,ALPHA2,LALPHA1,LALPHA2,PSI1,I_10,I_9,I_8,I_7,I_6
-     &,I_5,I_4,I_3,I,J,I_1
-      INTEGER A(1:9,1:N)
+      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, I_10, I_9, I_8
+     &, I_7, I_6, I_5, I_4, I_3, I, J, I_1
+      INTEGER A(1:9, 1:N)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_8, I_9, I_10, 4, N-2, 1, 1)
       CALL HPFC LOOP BOUNDS(I_4, I_5, I_6, 1, N, 1, 1)

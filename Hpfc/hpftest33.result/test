@@ -1,4 +1,4 @@
---- Hpfc Validation for hpftest33
+--- Hpfc Validation for $VDIR/hpftest33.f
 
 !
 ! File HPFTEST33_host.f
@@ -10,8 +10,8 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST33_parameters.h"
-      INTEGER ALPHA1,ALPHA2,LALPHA1,LALPHA2,PSI1,PSI2,T LID,I
-      REAL*4 B(1:10,1:10)
+      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, PSI2, T LID, I
+      REAL*4 B(1:10, 1:10)
       CALL HPFC INIT HOST
       PRINT *, 'hpftest33 running'
 ! collecting distributed variable B
@@ -129,9 +129,10 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST33_parameters.h"
-      INTEGER ALPHA1,ALPHA2,LALPHA1,LALPHA2,PSI1,PSI2,I_19,I_18,I_17,
-     &I_16,I_15,I_14,I_13,I_12,I_11,I_10,I_9,I_8,I_7,I_6,I_5,I_4,I,J
-      REAL*4 A(0:6,0:6),B(1:5,1:5)
+      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, PSI2, I_19, 
+     &I_18, I_17, I_16, I_15, I_14, I_13, I_12, I_11, I_10, I_9, I_8
+     &, I_7, I_6, I_5, I_4, I, J
+      REAL*4 A(0:6, 0:6), B(1:5, 1:5)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_17, I_18, I_19, 2, 9, 1, 2)
       CALL HPFC LOOP BOUNDS(I_13, I_14, I_15, 2, 9, 1, 1)

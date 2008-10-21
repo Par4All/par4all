@@ -1,4 +1,4 @@
---- Hpfc Validation for hpftest65
+--- Hpfc Validation for $VDIR/hpftest65.f
 
 !
 ! File HPFTEST65_host.f
@@ -14,8 +14,9 @@
       PARAMETER (N = 100)
       INTEGER*4 N
       PARAMETER (N = 100)
-      INTEGER ALPHA1,ALPHA2,LALPHA1,LALPHA2,PSI1,PSI2,T LID,I,J
-      REAL*4 B(1:N,1:N),A(1:N)
+      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, PSI2, T LID, I
+     &, J
+      REAL*4 B(1:N, 1:N), A(1:N)
       CALL HPFC INIT HOST
       PRINT *, 'hpftest65 running'
       DO I = 1, N
@@ -117,9 +118,9 @@
       PARAMETER (N = 100)
       INTEGER*4 N
       PARAMETER (N = 100)
-      INTEGER ALPHA1,ALPHA2,LALPHA1,LALPHA2,PSI1,PSI2,I_7,I_6,I_5,I_4
-     &,I_3,I_2,I_1,I_0,I,J
-      REAL*4 A(1:N),B(1:50,1:50),TMP
+      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, PSI2, I_7, I_6
+     &, I_5, I_4, I_3, I_2, I_1, I_0, I, J
+      REAL*4 A(1:N), B(1:50, 1:50), TMP
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_5, I_6, I_7, 1, N, 1, 1)
       CALL HPFC LOOP BOUNDS(I_1, I_2, I_3, 1, N, 1, 2)
