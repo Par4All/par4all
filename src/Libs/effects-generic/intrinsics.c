@@ -56,6 +56,9 @@ static list effects_of_iolist(list exprs, tag act);
 static list effects_of_implied_do(expression exp, tag act);
 static list generic_io_effects(entity e,list args);
 static list unix_io_effects(entity e,list args);
+static list any_rgs_effects(entity e,list args, bool init_p);
+static list rgs_effects(entity e,list args);
+static list rgsi_effects(entity e,list args);
 
 /* the following data structure indicates wether an io element generates
 a read effects or a write effect. the kind of effect depends on the
@@ -525,12 +528,22 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {QECONVERT_OPERATOR_NAME,                no_write_effects},
   {QFCONVERT_OPERATOR_NAME,                no_write_effects},
   {QGCONVERT_OPERATOR_NAME,                no_write_effects},
-  {"ecvt",                    		   no_write_effects},
-  {"fcvt",                    		   no_write_effects},
-  {"gcvt",                    		   no_write_effects},
-  {"atof",                    		   no_write_effects},
-  {"strtod",                  		   no_write_effects},
-  {"rand",                    		   no_write_effects},
+  {ECVT_FUNCTION_NAME,                    		   no_write_effects},
+  {FCVT_FUNCTION_NAME,                    		   no_write_effects},
+  {GCVT_FUNCTION_NAME,                    		   no_write_effects},
+  {ATOF_FUNCTION_NAME,                    		   no_write_effects},
+  {STRTOD_FUNCTION_NAME,                  		   no_write_effects},
+  {RANDOM_FUNCTION_NAME,       		   rgs_effects},
+  {SRANDOM_FUNCTION_NAME,    		   rgsi_effects},
+  {RAND_FUNCTION_NAME,                     rgs_effects },
+  {SRAND_FUNCTION_NAME,                    rgs_effects },
+  {DRAND48_FUNCTION_NAME,                  rgs_effects  },
+  {ERAND48_FUNCTION_NAME,                  rgs_effects  },
+  {JRAND48_FUNCTION_NAME,                  rgs_effects  },
+  {LRAND48_FUNCTION_NAME,                  rgs_effects  },
+  {MRAND48_FUNCTION_NAME,                  rgs_effects  },
+  {NRAND48_FUNCTION_NAME,                  rgs_effects  },
+  {SRAND48_FUNCTION_NAME,                  rgs_effects   },
   /*#include <setjmp.h>*/
 
   {"setjmp",                  		   no_write_effects},
@@ -580,58 +593,56 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {FERROR_FUNCTION_NAME,                   generic_io_effects},
   {PERROR_FUNCTION_NAME,                   generic_io_effects},
 
-  {"remove",                    	   no_write_effects},
-  {"rename",                    	   no_write_effects},
-  {"tmpfile",                   	   no_write_effects},
-  {"tmpnam",                    	   no_write_effects},
-  {"fflush",                    	   no_write_effects},
-  {"freopen",                   	   no_write_effects},
-  {"setbuf",                    	   no_write_effects},
-  {"setvbuf",                   	   no_write_effects},
+  {REMOVE_FUNCTION_NAME,                    	   no_write_effects},
+  {RENAME_FUNCTION_NAME,                    	   no_write_effects},
+  {TMPFILE_FUNCTION_NAME,                   	   no_write_effects},
+  {TMPNAM_FUNCTION_NAME,                    	   no_write_effects},
+  {FFLUSH_FUNCTION_NAME,                    	   no_write_effects},
+  {FREOPEN_FUNCTION_NAME,                   	   no_write_effects},
+  {SETBUF_FUNCTION_NAME,                    	   no_write_effects},
+  {SETVBUF_FUNCTION_NAME ,                   	   no_write_effects},
 
-  {"__filbuf",                  	   no_write_effects},
-  {"__flsbuf",                  	   no_write_effects},
-  {"setbuffer",                 	   no_write_effects},
-  {"setlinebuf",                	   no_write_effects},
-  {"snprintf",                  	   no_write_effects},
-  {"vsnprintf",                 	   no_write_effects},
-  {"fdopen",                    	   no_write_effects},
-  {"ctermid",                   	   no_write_effects},
-  {"fileno",                    	   no_write_effects},
-  {"popen",                     	   no_write_effects},
-  {"cuserid",                   	   no_write_effects},
-  {"tempnam",                   	   no_write_effects},
-  {"getopt",                    	   no_write_effects},
-  {"getsubopt",                 	   no_write_effects},
-  {"getw",                      	   no_write_effects},
-  {"putw",                      	   no_write_effects},
-  {"pclose",                    	   no_write_effects},
-  {"fseeko",                    	   no_write_effects},
-  {"ftello",                    	   no_write_effects},
-  {"fopen64",                   	   no_write_effects},
-  {"freopen64",                 	   no_write_effects},
-  {"tmpfile64",                 	   no_write_effects},
-  {"fgetpos64",                 	   no_write_effects},
-  {"fsetpos64",                 	   no_write_effects},
-  {"fseeko64",                  	   no_write_effects},
-  {"ftello64",                  	   no_write_effects},
+  {__FILBUF_FUNCTION_NAME,                  	   no_write_effects},
+  {__FILSBUF_FUNCTION_NAME,                  	   no_write_effects},
+  {SETBUFFER_FUNCTION_NAME,                 	   no_write_effects},
+  {SETLINEBUF_FUNCTION_NAME,                	   no_write_effects},
+  {FDOPEN_FUNCTION_NAME,                    	   no_write_effects},
+  {CTERMID_FUNCTION_NAME,                   	   no_write_effects},
+  {FILENO_FUNCTION_NAME,                    	   no_write_effects},
+  {POPEN_FUNCTION_NAME,                     	   no_write_effects},
+  {CUSERID_FUNCTION_NAME,                   	   no_write_effects},
+  {TEMPNAM_FUNCTION_NAME,                   	   no_write_effects},
+  {GETOPT_FUNCTION_NAME,                    	   no_write_effects},
+  {GETSUBOPT_FUNCTION_NAME,                 	   no_write_effects},
+  {GETW_FUNCTION_NAME,                      	   no_write_effects},
+  {PUTW_FUNCTION_NAME,                      	   no_write_effects},
+  {PCLOSE_FUNCTION_NAME,                    	   no_write_effects},
+  {FSEEKO_FUNCTION_NAME,                    	   no_write_effects},
+  {FTELLO_FUNCTION_NAME,                    	   no_write_effects},
+  {FOPEN64_FUNCTION_NAME,                   	   no_write_effects},
+  {FREOPEN64_FUNCTION_NAME,                 	   no_write_effects},
+  {TMPFILE64_FUNCTION_NAME,                 	   no_write_effects},
+  {FGETPOS64_FUNCTION_NAME,                 	   no_write_effects},
+  {FSETPOS64_FUNCTION_NAME,                 	   no_write_effects},
+  {FSEEKO64_FUNCTION_NAME,                  	   no_write_effects},
+  {FTELLO64_FUNCTION_NAME,                  	   no_write_effects},
   // read and write system's functions.Amira Mensi
   {WRITE_SYSTEM_FUNCTION_NAME,             generic_io_effects},
   {READ_SYSTEM_FUNCTION_NAME,              generic_io_effects},
   //{"read", generic_io_effects},
 
   /*#include <stdlib.h>*/
-  {"abort",                 	    	   no_write_effects},
-  {"abs",                 	    	   no_write_effects},
-  {"atexit",                 	    	   no_write_effects},
-  {"atof",                 	    	   no_write_effects},
-  {"atoi",                 	    	   no_write_effects},
-  {"atol",                 	    	   no_write_effects},
-  {"bsearch",                 	    	   no_write_effects},
-  {"calloc",                 	    	   no_write_effects},
-  {"div",                 	    	   no_write_effects},
-  {"exit",                 	    	   no_write_effects},
-  {"free",                 	    	   no_write_effects},
+  {ABORT_FUNCTION_NAME,                 	    	   no_write_effects},
+  {ABS_FUNCTION_NAME,                 	    	   no_write_effects},
+  {ATEXIT_FUNCTION_NAME,                 	    	   no_write_effects},
+  {ATOF_FUNCTION_NAME,                 	    	   no_write_effects},
+  {ATOI_FUNCTION_NAME,                 	    	   no_write_effects},
+  {ATOL_FUNCTION_NAME,                 	    	   no_write_effects},
+  {BSEARCH_FUNCTION_NAME,                 	    	   no_write_effects},
+  {CALLOC_FUNCTION_NAME,                 	    	   no_write_effects},
+  {DIV_FUNCTION_NAME,                 	    	   no_write_effects},
+  {EXIT_FUNCTION_NAME,                 	    	   no_write_effects},
+  {FREE_FUNCTION_NAME,                 	    	   no_write_effects},
   /*  {char *getenv(const char *, 0, 0},
       {long int labs(long, 0, 0},
       {ldiv_t ldiv(long, long, 0, 0},*/
@@ -981,7 +992,7 @@ static list read_io_effects(entity e, list args)
   return le;
 }
 
-static  list io_effects(entity e, list args)
+static list io_effects(entity e, list args)
 {
     list le = NIL, pc, lep;
 
@@ -1139,10 +1150,8 @@ unix_io_effects(entity e, list args)
   return(le);
 }
 
-/* c_io_effects to handle the effects of functions of the "stdio."h library. Amira Mensi*/
-static
-list
-c_io_effects(entity e, list args)
+/* c_io_effects to handle the effects of functions of the "stdio.h" library. Amira Mensi*/
+static list c_io_effects(entity e, list args)
 {
   list le = NIL, lep;
   entity private_io_entity;
@@ -1254,6 +1263,62 @@ c_io_effects(entity e, list args)
   return(le);
 }
 
+static list rgsi_effects(entity e, list args)
+{
+  return( any_rgs_effects( e, args, TRUE));
+}
+
+static list rgs_effects(entity e, list args)
+{
+  return( any_rgs_effects( e, args, FALSE));
+}
+
+/* gen_seed_effects to handle the effects of random functions. Amira Mensi*/
+static list any_rgs_effects(entity e, list args, bool init_p)
+{
+  list le = NIL, lep;
+  entity private_io_entity;
+  reference ref;
+  list indices = NIL;
+  IoElementDescriptor *p;
+  int lenght=0;
+  int i=0;
+
+  pips_debug(5, "begin\n");
+
+  p = SearchCIoElement(entity_local_name(e));
+  if(init_p == TRUE){
+ 
+  MAP(EXPRESSION,exp,{
+    lep = effects_of_ioelem(exp,
+			    p->IoElementName[i]);
+    i=i+1;
+
+    if (p->MayOrMust == is_approximation_may)
+      effects_to_may_effects(lep);
+
+    le = gen_nconc(le, lep);
+    print_effects(le);
+    //ifdebug(8) print_effects(lep);
+  }, args);
+	
+  }	
+  private_io_entity = global_name_to_entity
+    (RAND_EFFECTS_PACKAGE_NAME,
+     RAND_GEN_EFFECTS_NAME);
+
+  pips_assert("gen_seed_effects", private_io_entity != entity_undefined);
+
+  ref = make_reference(private_io_entity, indices);
+  ifdebug(8) print_reference(ref);
+  le = gen_nconc(le, generic_proper_effects_of_reference(ref));
+  le = gen_nconc(le, generic_proper_effects_of_lhs(ref));
+
+
+  pips_debug(5, "end\n");
+
+  return(le);
+}
 
 static list
 effects_of_ioelem(expression exp, tag act)
