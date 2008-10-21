@@ -295,17 +295,20 @@ dones=0
 errors=0
 elist=''
 
-#
+# what do we have to do?
 if [[ $recurse ]] ;
 then
-  find "$@" -type d -print | egrep -v '(\.svn|OLD|\.result|\.src|\.include)'
+  what=$(find "$@" -type d -print |
+         egrep -v '(\.svn|OLD|\.result|\.src|\.include)')
 else
-  echo "$@"
-fi |
+  what="$@"
+fi
+
 # this is not good.
 # what means to be validated is when *.result directories are available
 # and then we should look for available tpips/test/sources to do so?
-while read obj ; do
+for obj in $what
+do
   failed=
   if [ -d $vdir/$obj ] ; then
     verb 1 "considering '$obj' directory"
