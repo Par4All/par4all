@@ -184,6 +184,9 @@ according to the standard : ISO/IEC 9899.Amira Mensi */
   {WRITE_SYSTEM_FUNCTION_NAME,  "rrr",     is_action_read, is_approximation_must},
   {READ_SYSTEM_FUNCTION_NAME,   "rrr",     is_action_read, is_approximation_must},
 
+  {BUFFERIN_FUNCTION_NAME,      "xrwr",    is_action_read, is_approximation_must},
+  {BUFFEROUT_FUNCTION_NAME,     "xrrr",    is_action_read, is_approximation_must},
+
   {0,                            0,        0,              0}
 };
 
@@ -337,8 +340,8 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {CLOSE_FUNCTION_NAME,                    io_effects},
   {INQUIRE_FUNCTION_NAME,                  io_effects},
   {READ_FUNCTION_NAME,                     read_io_effects},
-  {BUFFERIN_FUNCTION_NAME,                 io_effects},
-  {BUFFEROUT_FUNCTION_NAME,                io_effects},
+  {BUFFERIN_FUNCTION_NAME,                 c_io_effects},
+  {BUFFEROUT_FUNCTION_NAME,                c_io_effects},
   {ENDFILE_FUNCTION_NAME,                  io_effects},
   {IMPLIED_DO_NAME,                        effects_of_implied_do},
 
@@ -978,9 +981,7 @@ static list read_io_effects(entity e, list args)
   return le;
 }
 
-static
- list
-io_effects(entity e, list args)
+static  list io_effects(entity e, list args)
 {
     list le = NIL, pc, lep;
 
@@ -991,7 +992,7 @@ io_effects(entity e, list args)
 	entity ci;
         syntax s = expression_syntax(EXPRESSION(CAR(pc)));
 
-        pips_assert("io_effects", syntax_call_p(s));
+        pips_assert("syntax is a call", syntax_call_p(s));
 
 	ci = call_function(syntax_call(s));
 	p = SearchIoElement(entity_local_name(e), entity_local_name(ci));
@@ -1042,7 +1043,7 @@ io_effects(entity e, list args)
 		(IO_EFFECTS_PACKAGE_NAME,
 		 IO_EFFECTS_ARRAY_NAME);
 
-	    pips_assert("io_effects", private_io_entity != entity_undefined);
+	    pips_assert("private_io_entity is defined", private_io_entity != entity_undefined);
 
 	    ref = make_reference(private_io_entity, indices);
 	    le = gen_nconc(le, generic_proper_effects_of_reference(ref));
@@ -1150,6 +1151,7 @@ c_io_effects(entity e, list args)
   IoElementDescriptor *p;
   int lenght=0;
   int i=0;
+  bool file_p = TRUE; /* it really is an IO, not a string operation */
 
   expression unit = expression_undefined;
   bool implicit_io_stream_p = TRUE;
@@ -1176,61 +1178,76 @@ c_io_effects(entity e, list args)
 
     ifdebug(8) print_effects(lep);
   }, args);
-	
-	
+
   /* We simulate actions on files by read/write actions
      to a static integer array
      GO:
      It is necessary to do a read and and write action to
      the array, because it updates the file-pointer so
      it reads it and then writes it ...*/
-	
 
-  ifdebug(8) print_expression(unit);
-
-  if(implicit_io_stream_p){
+  if(ENTITY_PRINTF_P(e) || ENTITY_GETS_P(e) || ENTITY_PUTS_P(e)|| ENTITY_VPRINTF_P(e))
     // The output is written into stdout
-    if(ENTITY_PRINTF_P(e) || ENTITY_GETS_P(e) || ENTITY_PUTS_P(e)|| ENTITY_VPRINTF_P(e))
-      unit = int_to_expression(STDOUT_FILENO);
+    unit = int_to_expression(STDOUT_FILENO);
+  else if (ENTITY_SCANF_P(e) || ENTITY_GETS_P(e) || ENTITY_VSCANF_P(e) || ENTITY_GETCHAR_P(e))
     //The input is obtained from stdin
-    else if (ENTITY_SCANF_P(e) || ENTITY_GETS_P(e) || ENTITY_VSCANF_P(e) || ENTITY_GETCHAR_P(e))
-      unit = int_to_expression(STDIN_FILENO);
-    else if (ENTITY_PERROR_P(e))
-      unit = int_to_expression(STDERR_FILENO);
-    // The output is written into an array OR The input is obtained from a string(the first argument is a char*)
-    else if (ENTITY_SNPRINTF_P(e) || ENTITY_SSCANF_P(e) || ENTITY_VFPRINTF_P(e) || ENTITY_VSNPRINTF_P(e)||ENTITY_VSPRINTF_P(e)||ENTITY_VSSCANF_P(e))
-      unit = int_to_expression(3);
+    unit = int_to_expression(STDIN_FILENO);
+  else if (ENTITY_PERROR_P(e))
+    unit = int_to_expression(STDERR_FILENO);
+  else if (ENTITY_SSCANF_P(e)
+	   || ENTITY_VSNPRINTF_P(e)||ENTITY_VSPRINTF_P(e)||ENTITY_VSSCANF_P(e)) {
+    // The input is a string(the first argument is a char*)
+    file_p = FALSE;;
+  }
+  else if (ENTITY_SPRINTF_P(e) || ENTITY_SNPRINTF_P(e)
+	   || ENTITY_VSPRINTF_P(e) || ENTITY_VSNPRINTF_P(e)) {
+    // The output is a string(the first argument is a char*)
+    file_p = FALSE;;
+  }
+  else if (ENTITY_FPUTC_P(e) || ENTITY_FPUTS_P(e) || ENTITY_PUTC_P(e) || ENTITY_UNGETC_P(e))
     // the second argument is a file descriptor
-    else if (ENTITY_FPUTC_P(e) || ENTITY_FPUTS_P(e) || ENTITY_PUTC_P(e) || ENTITY_UNGETC_P(e))
-      unit = int_to_expression(3);
+    ;
+  else if (ENTITY_FGETS_P(e))
     //the third argument is a file descriptor
-    else if (ENTITY_FGETS_P(e))
-      unit = int_to_expression(3);
+    ;
+  else if (ENTITY_FREAD_P(e) || ENTITY_FWRITE_P(e))
     //the fourth argument is a file descriptor
-    else if (ENTITY_FREAD_P(e) || ENTITY_FWRITE_P(e))
-      unit = int_to_expression(3);
-    // all the following functions have in common the first argument is a file descriptor except the fopen function which has the path's file as first argument.
-    else if(ENTITY_FPRINTF_P(e) || ENTITY_FSCANF_P(e) || ENTITY_VFSCANF_P(e) || ENTITY_FGETC_P(e) ||ENTITY_GETC_P(e) || ENTITY_FGETPOS_P(e) || ENTITY_FSEEK_P(e) || ENTITY_FSETPOS_P(e) || ENTITY_FTELL_P(e)||ENTITY_FSETPOS_P(e) || ENTITY_FTELL_P(e)
-	    || ENTITY_C_REWIND_P(e) || ENTITY_CLEARERR_P(e) || ENTITY_FEOF_P(e) || ENTITY_FERROR_P(e) || ENTITY_FCLOSE_P(e) || ENTITY_FOPEN_P(e))
-      // the descriptor file will be calculated later.Amira Mensi
-      unit = int_to_expression(3);
-
-  }else
+    ;
+  else if(ENTITY_FPRINTF_P(e) || ENTITY_VFPRINTF_P(e) || ENTITY_FSCANF_P(e) || ENTITY_VFSCANF_P(e)
+	  || ENTITY_FGETC_P(e) ||ENTITY_GETC_P(e) || ENTITY_FGETPOS_P(e)
+	  || ENTITY_FSEEK_P(e) || ENTITY_FSETPOS_P(e) || ENTITY_FTELL_P(e)
+	  || ENTITY_FSETPOS_P(e) || ENTITY_FTELL_P(e) || ENTITY_C_REWIND_P(e)
+	  || ENTITY_CLEARERR_P(e) || ENTITY_FEOF_P(e) || ENTITY_FERROR_P(e)
+	  || ENTITY_FCLOSE_P(e))
+    // all the following functions have in common the first argument is a file descriptor.
+    ;
+  else if(ENTITY_FOPEN_P(e))
+    // the fopen function has the path's file as first argument.
+    ;
+  else if(ENTITY_BUFFERIN_P(e) || ENTITY_BUFFEROUT_P(e))
+    // the first argument is an integer specifying the logical unit
+    // The expression should be evaluated and used if an integer is returned
+    ;
+  else
     pips_internal_error("Which C io command? \%s\n", entity_name(e));
 
-  indices = CONS(EXPRESSION, unit, NIL);
+  if(file_p) {
+    if(expression_undefined_p(unit))
+      indices = NIL;
+    else
+      indices = CONS(EXPRESSION, unit, NIL);
 
-  private_io_entity = global_name_to_entity
-    (IO_EFFECTS_PACKAGE_NAME,
-     IO_EFFECTS_ARRAY_NAME);
+    private_io_entity = global_name_to_entity
+      (IO_EFFECTS_PACKAGE_NAME,
+       IO_EFFECTS_ARRAY_NAME);
 
-  pips_assert("c_io_effects", private_io_entity != entity_undefined);
+    pips_assert("c_io_effects", private_io_entity != entity_undefined);
 
-  ref = make_reference(private_io_entity, indices);
-  ifdebug(8) print_reference(ref);
-  le = gen_nconc(le, generic_proper_effects_of_reference(ref));
-  le = gen_nconc(le, generic_proper_effects_of_lhs(ref));
-
+    ref = make_reference(private_io_entity, indices);
+    ifdebug(8) print_reference(ref);
+    le = gen_nconc(le, generic_proper_effects_of_reference(ref));
+    le = gen_nconc(le, generic_proper_effects_of_lhs(ref));
+  }
 
   pips_debug(5, "end\n");
 
