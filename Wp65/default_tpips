@@ -4,10 +4,8 @@ setproperty ABORT_ON_USER_ERROR TRUE
 
 setenv SHELL /bin/bash
 
-# tpips does not expanse the second argument of a setenv
-# setenv MODULE `basename $FILE .f`
-# echo $MODULE
-# setenv MODULE '*'
+
+setenv MODULE=`basename $FILE .f`
 
 create ${WSPACE} ${FILE}
 
