@@ -86,7 +86,8 @@ print_code_or_source(string mod_name)
 {
     bool success = FALSE;
     text r = make_text(NIL);
-    entity module = module_name_to_entity(mod_name);
+    entity module;
+    if( (module = module_name_to_entity(mod_name)) == entity_undefined ) return false;
     statement mod_stat;
     string pp;
 
