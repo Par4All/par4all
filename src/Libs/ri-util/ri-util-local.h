@@ -291,8 +291,11 @@
 #define BUFFEROUT_FUNCTION_NAME 	"BUFFEROUT"
 #define ENDFILE_FUNCTION_NAME 		"ENDFILE"
 #define FORMAT_FUNCTION_NAME 		"FORMAT"
+
 /*io functions: C library and system io.Amira Mensi*/
+
 /*#include<stdio.h> */
+
 #define PRINTF_FUNCTION_NAME            "printf"
 #define FPRINTF_FUNCTION_NAME           "fprintf"
 #define SCANF_FUNCTION_NAME             "scanf"
@@ -334,21 +337,136 @@
 #define PERROR_FUNCTION_NAME            "perror"
 #define WRITE_SYSTEM_FUNCTION_NAME      "write"
 #define READ_SYSTEM_FUNCTION_NAME       "read"
+#define REMOVE_FUNCTION_NAME            "remove"
+#define RENAME_FUNCTION_NAME            "rename"
+#define TMPFILE_FUNCTION_NAME           "tmpfile"
+#define TMPNAM_FUNCTION_NAME            "tmpnam"
+#define FFLUSH_FUNCTION_NAME            "fflush"
+#define FREOPEN_FUNCTION_NAME           "freopen"
+#define SETBUF_FUNCTION_NAME            "setbuf"
+#define SETVBUF_FUNCTION_NAME           "setvbuf"
+#define __FILBUF_FUNCTION_NAME          "__filbuf"
+#define __FILSBUF_FUNCTION_NAME         "__flsbuf"
+#define SETBUFFER_FUNCTION_NAME         "setbuffer"
+#define SETLINEBUF_FUNCTION_NAME        "setlinebuf"
+#define FDOPEN_FUNCTION_NAME            "fdopen"
+#define CTERMID_FUNCTION_NAME           "ctermid"
+#define FILENO_FUNCTION_NAME            "fileno"
+#define POPEN_FUNCTION_NAME             "popen"
+#define CUSERID_FUNCTION_NAME           "cuserid"
+#define TEMPNAM_FUNCTION_NAME           "tempnam"
+#define GETW_FUNCTION_NAME              "getw" 
+#define PUTW_FUNCTION_NAME              "putw"
+#define PCLOSE_FUNCTION_NAME            "pclose"
+#define FSEEKO_FUNCTION_NAME            "fseeko"
+#define FTELLO_FUNCTION_NAME            "ftello"
+#define FOPEN64_FUNCTION_NAME           "fopen64"
+#define FREOPEN64_FUNCTION_NAME         "freopen64"
+#define TMPFILE64_FUNCTION_NAME         "tmpfile64"
+#define FGETPOS64_FUNCTION_NAME         "fgetpos64"
+#define FSETPOS64_FUNCTION_NAME         "fsetpos64"
+#define FSEEKO64_FUNCTION_NAME          "fseeko64"
+#define FTELLO64_FUNCTION_NAME          "ftello64"
+#define ABORT_FUNCTION_NAME             "abort"
+#define ABS_FUNCTION_NAME               "abs"
+#define ATEXIT_FUNCTION_NAME            "atexit"
+#define ATOF_FUNCTION_NAME              "atof"
+#define ATOI_FUNCTION_NAME              "atoi"
+#define ATOL_FUNCTION_NAME              "atol"
+#define BSEARCH_FUNCTION_NAME           "bsearch"
+#define CALLOC_FUNCTION_NAME            "calloc"
+#define DIV_FUNCTION_NAME               "div"
+#define EXIT_FUNCTION_NAME              "exit"
+#define FREE_FUNCTION_NAME              "free"
+#define GETENV_FUNCTION_NAME            "getenv"
+#define LABS_FUNCTION_NAME              "labs"
+#define LDIV_FUNCTION_NAME              "ldiv"
+#define MALLOC_FUNCTION_NAME            "malloc"
+#define MBLEN_FUNCTION_NAME             "mblen"
+#define MBSTOWCS_FUNCTION_NAME          "mbstowcs"
+#define MBTOWC_FUNCTION_NAME            "mbtowc"
+#define QSORT_FUNCTION_NAME             "qsort"
+#define REALLOC_FUNCTION_NAME           "realloc"
+#define STRTOD_FUNCTION_NAME            "strtod"
+#define STRTOL_FUNCTION_NAME            "strtol"
+#define STRTOUL_FUNCTION_NAME           "strtoul"
+#define SYSTEM_FUNCTION_NAME            "system"
+#define WCTOMB_FUNCTION_NAME            "wctomb"
+#define WCSTOMBS_FUNCTION_NAME          "wcstombs"
+#define EXITHANDLE_FUNCTION_NAME        "exithandle"
+#define DRAND48_FUNCTION_NAME           "drand48"
+#define ERAND48_FUNCTION_NAME           "erand48"
+#define JRAND48_FUNCTION_NAME           "jrand48"
+#define LCONG48_FUNCTION_NAME           "lcong48"
+#define LRAND48_FUNCTION_NAME           "lrand48"
+#define MRAND48_FUNCTION_NAME           "mrand48"
+#define NRAND48_FUNCTION_NAME           "nrand48"
+#define SEED48_FUNCTION_NAME            "seed48"
+#define SRAND48_FUNCTION_NAME           "srand48"
+#define PUTENV_FUNCTION_NAME            "putenv"
+#define SETKEY_FUNCTION_NAME            "setkey"
+#define SWAB_FUNCTION_NAME              "swab"
+#define MKSTEMP_FUNCTION_NAME           "mkstemp"
+#define MKSTEMP64_FUNCTION_NAME         "mkstemp64"
+#define A614_FUNCTION_NAME              "a64l"
+#define ECVT_FUNCTION_NAME              "ecvt"
+#define FCVT_FUNCTION_NAME              "fcvt"
+#define GCVT_FUNCTION_NAME              "gcvt"
+#define GETSUBOPT_FUNCTION_NAME         "getsubopt"
+#define GRANTPT_FUNCTION_NAME           "grantpt"
+#define INITSTATE_FUNCTION_NAME         "initstate"
+#define C_164A_FUNCTION_NAME              "l64a"
+#define MKTEMP_FUNCTION_NAME            "mktemp"
+#define PTSNAME_FUNCTION_NAME           "ptsname"
+#define REALPATH_FUNCTION_NAME          "realpath"
+#define SETSTATE_FUNCTION_NAME          "setstate"
+#define TTYSLOT_FUNCTION_NAME           "ttyslot"
+#define UNLOCKPT_FUNCTION_NAME          "unlockpt"
+#define VALLOC_FUNCTION_NAME            "valloc"
+#define DUP2_FUNCTION_NAME              "dup2"
+#define QECVT_FUNCTION_NAME             "qecvt"
+#define QFCVT_FUNCTION_NAME             "qfcvt"
+#define QGCVT_FUNCTION_NAME             "qgcvt"
+#define GETCWD_FUNCTION_NAME            "getcwd"
+#define GETEXECNAME_FUNCTION_NAME       "getexecname"
+#define GETLOGIN_FUNCTION_NAME          "getlogin"
+#define GETOPT_FUNCTION_NAME            "getopt"
+#define GETPASS_FUNCTION_NAME           "getpass"
+#define GETPASSPHRASE_FUNCTION_NAME     "getpassphrase"
+#define GETPW_FUNCTION_NAME             "getpw"
+#define ISATTY_FUNCTION_NAME            "isatty"
+#define MEMALIGN_FUNCTION_NAME          "memalign"
+#define TTYNAME_FUNCTION_NAME           "ttyname"
+#define ATOLL_FUNCTION_NAME             "atoll"
+#define LLABS_FUNCTION_NAME             "llabs"
+#define LLDIV_FUNCTION_NAME             "lldiv"
+#define LLTOSTR_FUNCTION_NAME           "lltostr"
+#define STROLL_FUNCTION_NAME            "strtoll"
+#define STROULL_FUNCTION_NAME           "strtoull"
+#define ULLOSTR_FUNCTION_NAME           "ulltostr"
 
+/* include <string.h> */
 
+#define STRCMP_FUNCTION_NAME            "strcmp"
+#define STRCPY_FUNCTION_NAME            "strcpy"
+#define STRCAT_FUNCTION_NAME            "strcat"
+#define STRLEN_FUNCTION_NAME            "strlen"
+#define FOPEN_FUNCTION_NAME             "fopen"
 
+/* #include <fcntl.h>*/                 
 
+#define FCNTL_FUNCTION_NAME             "fcntl"
+#define CREAT_FUNCTION_NAME             "creat"
+#define DIRECTIO_FUNCTION_NAME          "directio"
+#define OPEN64_FUNCTION_NAME            "open64"
+#define CREAT64_FUNCTION_NAME           "creat64"
 
+/* random functions of <stdlib.h> */
 
-
-
-
-
-
-
-
-
-
+#define RAND_FUNCTION_NAME              "rand"
+#define SRAND_FUNCTION_NAME             "srand"
+#define RANDOM_FUNCTION_NAME            "random"
+#define SRANDOM_FUNCTION_NAME           "srandom"
 
 #define MOD_INTRINSIC_NAME 		"MOD"
 
@@ -376,7 +494,8 @@
 #define _TOLOWER_OPERATOR_NAME 		"_tolower"
 #define _TOUPPER_OPERATOR_NAME 		"_toupper"
 
-  /* #include <math.h>*/
+ /* #include <math.h>*/
+
 #define C_ACOS_OPERATOR_NAME "acos"
 #define C_ASIN_OPERATOR_NAME "asin"
 #define C_ATAN_OPERATOR_NAME "atan"
@@ -469,12 +588,12 @@
 #define DI_VAR_MODULE_NAME 		"DI-VAR"
 
 /* macros */
-/* memory leak: entity_user_name() allocates a new string which is
-   lost right away */
+
+/* FI: entity_local_name() might be usfficient for the comparison */
 #define entity_an_operator_p(e,name) \
-  (strcmp(entity_user_name(e), name##_OPERATOR_NAME)==0)
+  (strcmp(global_name_to_user_name(entity_name(e)), name##_OPERATOR_NAME)==0)
 #define entity_a_function_p(e,name) \
-  (strcmp(entity_user_name(e), name##_FUNCTION_NAME)==0)
+  (strcmp(global_name_to_user_name(entity_name(e)), name##_FUNCTION_NAME)==0)
 
 #define ENTITY_CONVERSION_P(e,name) \
   (strcmp(entity_local_name(e), name##_GENERIC_CONVERSION_NAME)==0)
@@ -528,7 +647,6 @@
 #define ENTITY_CABS_P(e) entity_an_operator_p(e, CABS)
 
 #define ENTITY_AND_P(e) (entity_an_operator_p(e, AND) || entity_an_operator_p(e, C_AND))
-
 #define ENTITY_OR_P(e) (entity_an_operator_p(e, OR) || entity_an_operator_p(e, C_OR))
 #define ENTITY_NOT_P(e) (entity_an_operator_p(e, NOT) || entity_an_operator_p(e, C_NOT))
 #define ENTITY_NON_EQUAL_P(e) (entity_an_operator_p(e, NON_EQUAL) || entity_an_operator_p(e, C_NON_EQUAL))
@@ -634,19 +752,148 @@
 #define ENTITY_WRITE_SYSTEM_P(e) ENTITY_NAME_P(e,"write")
 #define ENTITY_READ_SYSTEM_P(e)   ENTITY_NAME_P(e,"read") 
 
-/* DATA management
- */
+#define ENTITY_REMOVE_SYSTEM_P(e)   ENTITY_NAME_P(e,"remove") 
+#define ENTITY_RENAME_SYSTEM_P(e)   ENTITY_NAME_P(e,"rename") 
+#define ENTITY_TMPFILE_SYSTEM_P(e)   ENTITY_NAME_P(e,"tmpfile") 
+#define ENTITY_TMPNAM_SYSTEM_P(e)   ENTITY_NAME_P(e,"tmpnam") 
+#define ENTITY_FFLUSH_SYSTEM_P(e)   ENTITY_NAME_P(e,"fflush") 
+#define ENTITY_FREOPEN_SYSTEM_P(e)   ENTITY_NAME_P(e,"freopen") 
+#define ENTITY_SETBUF_SYSTEM_P(e)   ENTITY_NAME_P(e,"setbuf") 
+#define ENTITY_SETVBUF_SYSTEM_P(e)   ENTITY_NAME_P(e,"setvbuf") 
+#define ENTITY__FILBUF_SYSTEM_P(e)   ENTITY_NAME_P(e,"__filbuf") 
+#define ENTITY__FILSBUF_SYSTEM_P(e)   ENTITY_NAME_P(e,"__flsbuf") 
+#define ENTITY_SETBUFFER_SYSTEM_P(e)   ENTITY_NAME_P(e,"setbuffer") 
+#define ENTITY_SETLINEBUF_SYSTEM_P(e)   ENTITY_NAME_P(e,"setlinebuf") 
+#define ENTITY_FDOPEN_SYSTEM_P(e)   ENTITY_NAME_P(e,"fdopen")
+#define ENTITY_CTERMID_SYSTEM_P(e)   ENTITY_NAME_P(e,"ctermid")
+#define ENTITY_FILENO_SYSTEM_P(e)   ENTITY_NAME_P(e,"fileno")
+#define ENTITY_POPEN_SYSTEM_P(e)   ENTITY_NAME_P(e,"popen")
+#define ENTITY_CUSERID_SYSTEM_P(e)   ENTITY_NAME_P(e,"cuserid")
+#define ENTITY_TEMPNAM_SYSTEM_P(e)   ENTITY_NAME_P(e,"tempnam")
+#define ENTITY_GETW_SYSTEM_P(e)   ENTITY_NAME_P(e,"getw")
+#define ENTITY_PUTW_SYSTEM_P(e)   ENTITY_NAME_P(e,"putw")
+#define ENTITY_PCLOSE_SYSTEM_P(e)   ENTITY_NAME_P(e,"pclose")
+#define ENTITY_FSEEKO_SYSTEM_P(e)   ENTITY_NAME_P(e,"fseeko")
+#define ENTITY_FTELLO_SYSTEM_P(e)   ENTITY_NAME_P(e,"ftello")
+#define ENTITY_FOPEN64_SYSTEM_P(e)   ENTITY_NAME_P(e,"fopen64")
+#define ENTITY_FREOPEN64_SYSTEM_P(e)   ENTITY_NAME_P(e,"freopen64")
+#define ENTITY_TMPFILE64_SYSTEM_P(e)   ENTITY_NAME_P(e,"tmpfile64")
+#define ENTITY_FGETPOS64_SYSTEM_P(e)   ENTITY_NAME_P(e,"fgetpos64")
+#define ENTITY_FSETPOS64_SYSTEM_P(e)   ENTITY_NAME_P(e,"fsetpos64")
+#define ENTITY_FSEEKO64_SYSTEM_P(e)   ENTITY_NAME_P(e,"fseeko64")
+#define ENTITY_FTELLO64_SYSTEM_P(e)   ENTITY_NAME_P(e,"ftello64")
+#define ENTITY_ABORT_SYSTEM_P(e)   ENTITY_NAME_P(e,"abort")
+#define ENTITY_ABS_SYSTEM_P(e)     ENTITY_NAME_P(e,"abs")
+#define ENTITY_ATEXIT_SYSTEM_P(e)   ENTITY_NAME_P(e,"atexit")
+#define ENTITY_ATOF_SYSTEM_P(e)   ENTITY_NAME_P(e,"atof")
+#define ENTITY_ATOI_SYSTEM_P(e)   ENTITY_NAME_P(e,"atoi")
+#define ENTITY_BSEARCH_SYSTEM_P(e)   ENTITY_NAME_P(e,"bsearch")
+#define ENTITY_CALLOC_SYSTEM_P(e)   ENTITY_NAME_P(e, "calloc")
+#define ENTITY_DIV_SYSTEM_P(e)    ENTITY_NAME_P(e,"div")
+#define ENTITY_EXIT_SYSTEM_P(e)   ENTITY_NAME_P(e,"exit")
+#define ENTITY_FREE_SYSTEM_P(e)   ENTITY_NAME_P(e,"free")
+#define ENTITY_GETENV_SYSTEM_P(e)   ENTITY_NAME_P(e,"getenv")
+#define ENTITY_LABS_SYSTEM_P(e)   ENTITY_NAME_P(e,"labs")
+#define ENTITY_LDIV_SYSTEM_P(e)   ENTITY_NAME_P(e,"ldiv")
+#define ENTITY_MALLOC_SYSTEM_P(e)   ENTITY_NAME_P(e,"malloc")
+#define ENTITY_MBLEN_SYSTEM_P(e)   ENTITY_NAME_P(e,"mblen")
+#define ENTITY_MBSTOWCS_SYSTEM_P(e)   ENTITY_NAME_P(e,"mbstowcs")
+#define ENTITY_MBTOWC_SYSTEM_P(e)   ENTITY_NAME_P(e,"mbtowc")
+#define ENTITY_QSORT_SYSTEM_P(e)   ENTITY_NAME_P(e,"qsort")
+#define ENTITY_REALLOC_SYSTEM_P(e)   ENTITY_NAME_P(e,"realloc")
+#define ENTITY_STRTOD_SYSTEM_P(e)   ENTITY_NAME_P(e,"strtod")
+#define ENTITY_STRTOL_SYSTEM_P(e)   ENTITY_NAME_P(e,"strtol")
+#define ENTITY_STRTOUL_SYSTEM_P(e)   ENTITY_NAME_P(e,"strtoul")
+#define ENTITY_SYSTEM_SYSTEM_P(e)    ENTITY_NAME_P(e,"system")
+#define ENTITY_WCTOMB_SYSTEM_P(e)     ENTITY_NAME_P(e,"wctomb")
+#define ENTITY_WCSTOMBS_SYSTEM_P(e)    ENTITY_NAME_P(e,"wcstombs")
+#define ENTITY_EXITHANDLESYSTEM_P(e)   ENTITY_NAME_P(e,"exithandle")
+#define ENTITY_DRAND48_SYSTEM_P(e)     ENTITY_NAME_P(e,"drand48")
+#define ENTITY_ERAND48_SYSTEM_P(e)     ENTITY_NAME_P(e,"erand48")
+#define ENTITY_JRAND48_SYSTEM_P(e)    ENTITY_NAME_P(e,"jrand48")
+#define ENTITY_LCONG48_SYSTEM_P(e)     ENTITY_NAME_P(e,"lcong48")
+#define ENTITY_LRAND48_SYSTEM_P(e)     ENTITY_NAME_P(e,"lrand48")
+#define ENTITY_MRAND48_SYSTEM_P(e)    ENTITY_NAME_P(e,"mrand48")
+#define ENTITY_NRAND48_SYSTEM_P(e)      ENTITY_NAME_P(e,"nrand48")
+#define ENTITY_SEED48_SYSTEM_P(e)       ENTITY_NAME_P(e,"seed48")
+#define ENTITY_SRAND48_SYSTEM_P(e)    ENTITY_NAME_P(e,"srand48")
+#define ENTITY_PUTENV_SYSTEM_P(e)     ENTITY_NAME_P(e,"putenv")
+#define ENTITY_SETKEY_SYSTEM_P(e)     ENTITY_NAME_P(e,"setkey")
+#define ENTITY_SWAB_SYSTEM_P(e)       ENTITY_NAME_P(e,"swab")
+#define ENTITY_MKSTEMP_SYSTEM_P(e)   ENTITY_NAME_P(e,"mkstemp")
+#define ENTITY_MKSTEMP64_SYSTEM_P(e) ENTITY_NAME_P(e, "mkstemp64")
+#define ENTITY_A614_SYSTEM_P(e)     ENTITY_NAME_P(e,"a64l")
+#define ENTITY_ECVT_SYSTEM_P(e)      ENTITY_NAME_P(e,"ecvt")
+#define ENTITY_FCVT_SYSTEM_P(e)      ENTITY_NAME_P(e,"fcvt")
+#define ENTITY_GCVT_SYSTEM_P(e)       ENTITY_NAME_P(e,"gcvt")
+#define ENTITY_GETSUBOPT_SYSTEM_P(e)  ENTITY_NAME_P(e,"getsubopt")
+#define ENTITY_GRANTPT_SYSTEM_P(e)    ENTITY_NAME_P(e,"grantpt")
+#define ENTITY_INITSTATE_SYSTEM_P(e)  ENTITY_NAME_P(e,"initstate")
+#define ENTITY_C_164A_SYSTEM_P(e)       ENTITY_NAME_P(e,"l64a")
+#define ENTITY_MKTEMP_SYSTEM_P(e)    ENTITY_NAME_P(e,"mktemp")
+#define ENTITY_PTSNAME_SYSTEM_P(e)   ENTITY_NAME_P(e,"ptsname")
+#define ENTITY_REALPATH_SYSTEM_P(e)   ENTITY_NAME_P(e, "realpath")
+#define ENTITY_SETSTATE_SYSTEM_P(e)   ENTITY_NAME_P(e, "setstate")
+#define ENTITY_TTYSLOT_SYSTEM_P(e)   ENTITY_NAME_P(e,"ttyslot")
+#define ENTITY_UNLOCKPT_SYSTEM_P(e)   ENTITY_NAME_P(e,"unlockpt")
+#define ENTITY_VALLOC_SYSTEM_P(e)   ENTITY_NAME_P(e,"valloc")
+#define ENTITY_DUP2_SYSTEM_P(e)   ENTITY_NAME_P(e,"dup2")
+#define ENTITY_QECVT_SYSTEM_P(e)   ENTITY_NAME_P(e,"qecvt")
+#define ENTITY_QFCVT_SYSTEM_P(e)   ENTITY_NAME_P(e, "qfcvt")
+#define ENTITY_QGCVT_SYSTEM_P(e)   ENTITY_NAME_P(e,"qgcvt")
+#define ENTITY_GETCWD_SYSTEM_P(e)   ENTITY_NAME_P(e,"getcwd")
+#define ENTITY_ENTITY_GETEXECNAME_SYSTEM_P(e)   ENTITY_NAME_P(e, "getexecname")
+#define ENTITY_GETLOGIN_SYSTEM_P(e)   ENTITY_NAME_P(e,"getlogin")
+#define ENTITY_GETOPT_SYSTEM_P(e)   ENTITY_NAME_P(e,"getopt")
+#define ENTITY_GETPASS_SYSTEM_P(e)   ENTITY_NAME_P(e,"getpass")
+#define ENTITY_GETPASSPHRASE_SYSTEM_P(e)   ENTITY_NAME_P(e,"getpassphrase")
+#define ENTITY_GETPW_SYSTEM_P(e)   ENTITY_NAME_P(e, "getpw")
+#define ENTITY_ISATTY_SYSTEM_P(e)   ENTITY_NAME_P(e, "isatty")
+#define ENTITY_MEMALIGN_SYSTEM_P(e)   ENTITY_NAME_P(e,"memalign")
+#define ENTITY_TTYNAME_SYSTEM_P(e)   ENTITY_NAME_P(e,"ttyname")
+#define ENTITY_ATOLL_SYSTEM_P(e)   ENTITY_NAME_P(e,"atoll")
+#define ENTITY_LLABS_SYSTEM_P(e)   ENTITY_NAME_P(e,"llabs")
+#define ENTITY_LLDIV_SYSTEM_P(e)   ENTITY_NAME_P(e,"lldiv")
+#define ENTITY_LLTOSTR_SYSTEM_P(e)   ENTITY_NAME_P(e,"lltostr")
+#define ENTITY_STROLL_SYSTEM_P(e)   ENTITY_NAME_P(e,"strtoll")
+#define ENTITY_STROULL_SYSTEM_P(e)   ENTITY_NAME_P(e,"strtoull")
+#define ENTITY_ULLOSTR_SYSTEM_P(e)   ENTITY_NAME_P(e,"ulltostr")
+
+/* include <string.h> */
+
+#define ENTITY_STRCMP_SYSTEM_P(e)   ENTITY_NAME_P(e,"strcmp")
+#define ENTITY_STRCPY_SYSTEM_P(e)   ENTITY_NAME_P(e,"strcpy")
+#define ENTITY_STRCAT_SYSTEM_P(e)   ENTITY_NAME_P(e,"strcat")
+#define ENTITY_STRLEN_SYSTEM_P(e)   ENTITY_NAME_P(e,"strlen")
+#define ENTITY_FOPEN_SYSTEM_P(e)   ENTITY_NAME_P(e,"fopen")
+
+/* #include <fcntl.h>*/                 
+
+#define ENTITY_FCNTL_SYSTEM_P(e)   ENTITY_NAME_P(e,"fcntl")
+#define ENTITY_OPEN_SYSTEM_P(e)   ENTITY_NAME_P(e,"open")
+#define ENTITY_CREAT_SYSTEM_P(e)   ENTITY_NAME_P(e,"creat")
+#define ENTITY_DIRECTIO_SYSTEM_P(e)   ENTITY_NAME_P(e,"directio")
+#define ENTITY_OPEN64_SYSTEM_P(e)   ENTITY_NAME_P(e,"open64")
+#define ENTITY_CREAT64_SYSTEM_P(e)   ENTITY_NAME_P(e,"creat64")
+/* random functions of stdlib.h */
+#define ENTITY_RANDOM_P(e)  ENTITY_NAME_P(e,"random")
+#define ENTITY_SRANDOM_P(e)  ENTITY_NAME_P(e,"srandom")
+
+/* DATA management */
+
 #define ENTITY_STATIC_INITIALIZATION_P(e) ENTITY_NAME_P(e, STATIC_INITIALIZATION_FUNCTION_NAME)
 #define ENTITY_REPEAT_VALUE_P(e) ENTITY_NAME_P(e, REPEAT_VALUE_FUNCTION_NAME)
 #define ENTITY_DATA_LIST_P(e) ENTITY_NAME_P(e, DATA_LIST_FUNCTION_NAME)
 
 /* C initialization expression */
+
 #define ENTITY_BRACE_INTRINSIC_P(e) ENTITY_NAME_P(e, BRACE_INTRINSIC)
 
 #define ENTITY_IMPLIED_CMPLX_P(e) ENTITY_NAME_P(e, IMPLIED_COMPLEX_NAME)
 #define ENTITY_IMPLIED_DCMPLX_P(e) ENTITY_NAME_P(e, IMPLIED_DCOMPLEX_NAME)
 
 /* C data structure and pointer management */
+
 #define ENTITY_FIELD_P(e) entity_an_operator_p(e, FIELD)
 #define ENTITY_POINT_TO_P(e) entity_an_operator_p(e, POINT_TO)
 #define ENTITY_DEREFERENCING_P(e) entity_an_operator_p(e, DEREFERENCING)
@@ -660,8 +907,8 @@
 
 #define IO_CALL_P(call) io_intrinsic_p(call_function(call))
 
-/* classification of basics
- */
+/* classification of basics */
+
 #define basic_numeric_simple_p(b) (basic_int_p(b) || basic_float_p(b))
 #define basic_numeric_p(b) (basic_numeric_simple_p(b) || basic_complex_p(b))
 #define basic_compatible_simple_p(b1, b2) (\
@@ -677,15 +924,15 @@
                 (basic_overloaded_p(b1) && basic_overloaded_p(b2)) ||\
                 (basic_undefined_p(b1) && basic_undefined_p(b2)))
 
-/*  constant sizes
- */
+/*  constant sizes */
+
 #define LABEL_SIZE 5
 #define INDENTATION (get_int_property("PRETTYPRINT_INDENTATION"))
 /* In C, the module name may include file names, the compilation unit name and the user name of the function. It goes well beyond the 36 of Fortan (check the standard)*/
 #define MAXIMAL_MODULE_NAME_SIZE 100
 
-/*   default values
- */
+/*   default values */
+
 #define STATEMENT_NUMBER_UNDEFINED (-1)
 #define UNKNOWN_RAM_OFFSET (-1)
 // It is for extern variables whose ram offset is not known
@@ -707,8 +954,8 @@
          (expression_normalized(e) = NormalizeExpression(e)) : \
          (expression_normalized(e)))
 
-/*   MISC: newgen shorthands
- */
+/*   MISC: newgen shorthands */
+
 #define entity_declarations(e) (code_declarations(entity_code(e)))
 
 #define effect_system(e) \
@@ -740,8 +987,8 @@
 #define entity_constant_p(e) (type_functional_p(entity_type(e)) && \
   storage_rom_p(entity_storage(e)) && value_constant_p(entity_initial(e)))
 
-/* building instruction and statements...
- */
+/* building instruction and statements... */
+
 #define instruction_to_statement(i) \
    make_statement(entity_empty_label(),\
 		  STATEMENT_NUMBER_UNDEFINED, STATEMENT_ORDERING_UNDEFINED,\
@@ -757,8 +1004,8 @@
 
 
 /***************************************************** BOOLEAN EXPRESSIONS */
-/* Building quickly boolean expressions, FC.
- */
+
+/* Building quickly boolean expressions, FC. */
 
 #define unary_intrinsic_expression(name, e)\
  call_to_expression(make_call(entity_intrinsic(name),CONS(EXPRESSION,e,NIL)))
@@ -788,6 +1035,7 @@
 
 
 /******************************************************** CONTROL GRAPH... */
+
 /* For the control graph modifiers: */
 
 /* To specify the way that remove_a_control_from_a_list_and_relink
@@ -804,6 +1052,7 @@ remove_a_control_from_a_list_and_relink_direction;
 
 
 /********************************************************* DUMMY VARIABLES */
+
 #define PRIME_LETTER_FOR_VARIABLES	"p"
 
 /* define to build the _dummy and _prime of a variable.
@@ -815,6 +1064,7 @@ entity get_ith_##lname##_prime(int i)\
     {return(get_ith_dummy(MODULE, NAME PRIME_LETTER_FOR_VARIABLES, i));}
 
 /* Constants for some ex-atomizer variable generation */
+
 #define TMP_ENT 1
 #define AUX_ENT 2
 #define DOUBLE_PRECISION_SIZE 8
@@ -901,7 +1151,7 @@ entity get_ith_##lname##_prime(int i)\
 #define DEFAULT_UNSIGNED_TYPE_SIZE (1)
 #define DEFAULT_SIGNED_TYPE_SIZE (2)
 
-/* The standard integer types are represented as follow
+/* The standard C integer types are represented as follow
 char                   = 1
 short_int              = 2
 int                    = 4
@@ -931,11 +1181,14 @@ the variable is unsigned, signed or not */
 
 #define DEFAULT_POINTER_TYPE_SIZE (4)
 
-
 /* Implicit variables to handle IO effetcs */
 
 /* package name for io routines */
 #define IO_EFFECTS_PACKAGE_NAME "__IO_EFFECTS"
+/* package name for random routines */
+#define RAND_EFFECTS_PACKAGE_NAME "_RANDOM_EFFECTS"
+/* variable name for random unit */
+#define RAND_GEN_EFFECTS_NAME "GEN_SEED"
 /* array of Logical UNits; it is more or less handled as the current file pointer */
 #define IO_EFFECTS_ARRAY_NAME "LUNS"
 /* array of end of file codes */
