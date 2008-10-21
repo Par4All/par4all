@@ -1,6 +1,7 @@
 
 Flinted file
 
+FOO has been flinted : everything is ok.
 flint message from check_call, in module WTYPE1, in statement (0.2), number 1
 incompatible basic type, 1th arg in call to TOP-LEVEL:FOO, float>int
 number of messages from flint for WTYPE1 : 1

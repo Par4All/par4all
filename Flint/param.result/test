@@ -49,7 +49,7 @@
       LOGICAL*4 L3
       PARAMETER (L3 = 1)
       LOGICAL*4 L4
-      PARAMETER (L4 = 1.AND..TRUE.)
+      PARAMETER (L4 = 1.NE.0.AND..TRUE.)
       LOGICAL*4 LI
       PARAMETER (LI = 1)
       LOGICAL*4 LR
@@ -120,7 +120,7 @@
       LOGICAL*4 L3
       PARAMETER (L3 = 1)
       LOGICAL*4 L4
-      PARAMETER (L4 = 1.AND..TRUE.)
+      PARAMETER (L4 = 1.NE.0.AND..TRUE.)
       LOGICAL*4 LI
       PARAMETER (LI = 1)
       LOGICAL*4 LR
@@ -144,16 +144,7 @@
 !ERROR: LOGICAL*4 parameter 'LR' definition from incompatible type REAL*4
 !ERROR: LOGICAL*4 parameter 'LD' definition from incompatible type REAL*8
 !ERROR: LOGICAL*4 parameter 'L3' definition from incompatible type INTEGER*4
-!ERROR: #1 argument of '.AND.' must be LOGICAL,  but not INTEGER*4
       PRINT *, IL, DL, RL, LI, LR, LD, L3, L4                           0008
       PRINT *, IL, DL, RL, LI, LR, LD, L3, L4                           0009
       END
 run resulting code
-   12    12.0000    12.000000000000
-   12  12  12  12  13
-     12.0000    12.0000    12.0000    12.0000    13.0000    13.0000
-     12.000000000000    12.000000000000    12.000000000000    12.000000000000
-     13.000000000000    13.000000000000
-   T  F  T
-   1    1.0000000000000    1.00000  T  T  T  T  T
-   1    1.0000000000000    1.00000  T  T  T  T  T

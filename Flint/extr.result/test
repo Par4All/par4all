@@ -1,4 +1,33 @@
 
+Flinted file
+
+
+
+Non-initialized variables:
+--------------------------
+In statement number 1 (0.2):
+	"T" used but not initialized.
+	"L" used but not initialized.
+	"KP" used but not initialized.
+	"JP" used but not initialized.
+	"T" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"T" used but not initialized.
+	"T" used but not initialized.
+	"T" used but not initialized.
+	"T" used but not initialized.
+
+flint message from check reference: WARNING, in module D, in statement (0.2), number 1
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module D, in statement (0.2), number 1
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module D, in statement (0.2), number 1
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module D, in statement (0.2), number 1
+the 3th index may not be a mere integer
+number of messages from flint for D : 15
+
 
 Non-initialized variables:
 --------------------------
@@ -16,23 +45,23 @@ In statement number 12 (0.15):
 In statement number 13 (0.16):
 	"J" used but not initialized.
 In statement number 14 (0.17):
-	"J" used but not initialized.
 	"NC" used but not initialized.
+	"J" used but not initialized.
 In statement number 15 (0.18):
-	"J" used but not initialized.
 	"NC" used but not initialized.
+	"J" used but not initialized.
 In statement number 16 (0.19):
-	"J" used but not initialized.
 	"NC" used but not initialized.
+	"J" used but not initialized.
 In statement number 17 (0.20):
-	"J" used but not initialized.
 	"NC" used but not initialized.
+	"J" used but not initialized.
 In statement number 18 (0.21):
-	"J" used but not initialized.
 	"NC" used but not initialized.
+	"J" used but not initialized.
 In statement number 19 (0.22):
-	"J" used but not initialized.
 	"NC" used but not initialized.
+	"J" used but not initialized.
 
 flint message from check_call: WARNING, in module EXTR, in statement (0.14), number 11
 may be incompatible basic type, 4th arg in call to TOP-LEVEL:D

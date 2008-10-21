@@ -1,4 +1,2813 @@
 
+Flinted file
+
+
+
+Non-initialized variables:
+--------------------------
+In statement number 4 (0.5):
+	"KM" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+In statement number 6 (0.8):
+	"L" used but not initialized.
+In statement number 7 (0.9):
+	"L" used but not initialized.
+In statement number 8 (1.1):
+	"NMAX" used but not initialized.
+In statement number 32 (5.7):
+	"L" used but not initialized.
+In statement number 33 (5.8):
+	"L" used but not initialized.
+In statement number 34 (5.9):
+	"IM" used but not initialized.
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+	"B" used but not initialized.
+In statement number 37 (5.12):
+	"L" used but not initialized.
+In statement number 40 (5.15):
+	"L" used but not initialized.
+In statement number 25 (4.1):
+	"RESNL" used but not initialized.
+In statement number 24 (9.1):
+	"EPS" used but not initialized.
+In statement number 12 (10.6):
+	"L" used but not initialized.
+In statement number 13 (10.7):
+	"L" used but not initialized.
+In statement number 14 (10.8):
+	"IM" used but not initialized.
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+	"A" used but not initialized.
+In statement number 15 (10.9):
+	"IM" used but not initialized.
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+	"A" used but not initialized.
+In statement number 18 (10.12):
+	"L" used but not initialized.
+
+number of messages from flint for CALCG : 27
+
+
+Non-initialized variables:
+--------------------------
+In statement number 1 (0.2):
+	"IM" used but not initialized.
+In statement number 2 (0.3):
+	"JM" used but not initialized.
+In statement number 3 (0.4):
+	"KM" used but not initialized.
+In statement number 4 (0.5):
+	"KM" used but not initialized.
+In statement number 5 (0.6):
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 6 (0.7):
+	"IM" used but not initialized.
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 7 (0.8):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"IM" used but not initialized.
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 12 (0.14):
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"LB" used but not initialized.
+In statement number 15 (0.19):
+	"I" used but not initialized.
+	"CX" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 16 (0.20):
+	"I" used but not initialized.
+	"CY" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 17 (0.21):
+	"I" used but not initialized.
+	"CZ" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 18 (0.22):
+	"I" used but not initialized.
+	"CX" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 19 (0.23):
+	"I" used but not initialized.
+	"CY" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 20 (0.24):
+	"I" used but not initialized.
+	"CZ" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 21 (0.25):
+	"I" used but not initialized.
+	"CX" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 22 (0.26):
+	"I" used but not initialized.
+	"CY" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 23 (0.27):
+	"I" used but not initialized.
+	"CZ" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 24 (0.28):
+	"I" used but not initialized.
+	"CX" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 25 (0.29):
+	"I" used but not initialized.
+	"CY" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 26 (0.30):
+	"I" used but not initialized.
+	"CZ" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 27 (0.31):
+	"I" used but not initialized.
+	"CX" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 28 (0.32):
+	"I" used but not initialized.
+	"CY" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 29 (0.33):
+	"I" used but not initialized.
+	"CZ" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 30 (0.34):
+	"I" used but not initialized.
+	"CX" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 31 (0.35):
+	"I" used but not initialized.
+	"CY" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 32 (0.36):
+	"I" used but not initialized.
+	"CZ" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 33 (0.37):
+	"I" used but not initialized.
+	"CX" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 34 (0.38):
+	"I" used but not initialized.
+	"CY" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 35 (0.39):
+	"I" used but not initialized.
+	"CZ" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 36 (0.40):
+	"I" used but not initialized.
+	"CX" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 37 (0.41):
+	"I" used but not initialized.
+	"CY" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 38 (0.42):
+	"I" used but not initialized.
+	"CZ" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 42 (0.47):
+	"I" used but not initialized.
+	"W" used but not initialized.
+	"L" used but not initialized.
+In statement number 46 (0.52):
+	"I" used but not initialized.
+	"LJ" used but not initialized.
+	"LK" used but not initialized.
+In statement number 49 (0.56):
+	"I" used but not initialized.
+	"LJ" used but not initialized.
+	"LK" used but not initialized.
+	"P" used but not initialized.
+	"L" used but not initialized.
+	"LL" used but not initialized.
+In statement number 53 (0.61):
+	"I" used but not initialized.
+	"LL" used but not initialized.
+In statement number 55 (0.64):
+	"I" used but not initialized.
+In statement number 56 (0.65):
+	"I" used but not initialized.
+	"LL" used but not initialized.
+In statement number 59 (0.68):
+	"I" used but not initialized.
+	"LJ" used but not initialized.
+	"LL" used but not initialized.
+In statement number 61 (0.71):
+	"LL" used but not initialized.
+	"KK" used but not initialized.
+In statement number 63 (0.73):
+	"I" used but not initialized.
+	"LL" used but not initialized.
+In statement number 65 (0.75):
+	"I" used but not initialized.
+	"LL" used but not initialized.
+In statement number 68 (0.78):
+	"I" used but not initialized.
+	"LJ" used but not initialized.
+	"LL" used but not initialized.
+In statement number 72 (0.83):
+	"I" used but not initialized.
+In statement number 73 (0.84):
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 74 (0.85):
+	"I" used but not initialized.
+In statement number 75 (0.86):
+	"I" used but not initialized.
+In statement number 76 (0.87):
+	"I" used but not initialized.
+In statement number 77 (0.88):
+	"I" used but not initialized.
+In statement number 78 (0.89):
+	"I" used but not initialized.
+In statement number 79 (0.90):
+	"I" used but not initialized.
+In statement number 82 (0.93):
+	"IL" used but not initialized.
+In statement number 83 (0.95):
+	"IL" used but not initialized.
+In statement number 84 (0.96):
+	"IL" used but not initialized.
+In statement number 85 (0.98):
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"PYZ" used but not initialized.
+	"L" used but not initialized.
+	"JL" used but not initialized.
+	"IL" used but not initialized.
+	"PXZ" used but not initialized.
+	"PXY" used but not initialized.
+	"PZZ" used but not initialized.
+	"PYY" used but not initialized.
+	"PXX" used but not initialized.
+In statement number 86 (0.99):
+	"IL" used but not initialized.
+In statement number 90 (0.103):
+	"L" used but not initialized.
+	"I" used but not initialized.
+In statement number 94 (0.108):
+	"IL" used but not initialized.
+In statement number 96 (0.110):
+	"IL" used but not initialized.
+	"I" used but not initialized.
+	"J" used but not initialized.
+In statement number 100 (0.115):
+	"IL" used but not initialized.
+	"I" used but not initialized.
+	"JL" used but not initialized.
+	"J" used but not initialized.
+In statement number 102 (0.117):
+	"JL" used but not initialized.
+	"I" used but not initialized.
+	"IL" used but not initialized.
+	"J" used but not initialized.
+In statement number 105 (0.120):
+	"I" used but not initialized.
+	"J" used but not initialized.
+In statement number 107 (0.123):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 108 (0.124):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 109 (0.125):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 110 (0.126):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 111 (0.127):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 112 (0.128):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 113 (0.129):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 114 (0.130):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 119 (0.136):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"LB" used but not initialized.
+In statement number 122 (0.139):
+	"JM" used but not initialized.
+In statement number 123 (0.140):
+	"KM" used but not initialized.
+	"JM" used but not initialized.
+In statement number 124 (0.142):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"KM" used but not initialized.
+	"JM" used but not initialized.
+In statement number 125 (0.143):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+	"JM" used but not initialized.
+
+flint message from check reference: WARNING, in module CALMAT, in statement (0.22), number 18
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.23), number 19
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.24), number 20
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.25), number 21
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.25), number 21
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.26), number 22
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.26), number 22
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.27), number 23
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.27), number 23
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.28), number 24
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.29), number 25
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.30), number 26
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.31), number 27
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.32), number 28
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.33), number 29
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.34), number 30
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.34), number 30
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.35), number 31
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.35), number 31
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.36), number 32
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.36), number 32
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.37), number 33
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.37), number 33
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.37), number 33
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.38), number 34
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.38), number 34
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.38), number 34
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.39), number 35
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.39), number 35
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.39), number 35
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.40), number 36
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.40), number 36
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.41), number 37
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.41), number 37
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.42), number 38
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.42), number 38
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.123), number 107
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.123), number 107
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.124), number 108
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.124), number 108
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.124), number 108
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.124), number 108
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.125), number 109
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.125), number 109
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.125), number 109
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.125), number 109
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.126), number 110
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.126), number 110
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.126), number 110
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.126), number 110
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.126), number 110
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.126), number 110
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.128), number 112
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.128), number 112
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.129), number 113
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.129), number 113
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.130), number 114
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.130), number 114
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.130), number 114
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module CALMAT, in statement (0.130), number 114
+the 3th index may not be a mere integer
+number of messages from flint for CALMAT : 283
+
+
+Non-initialized variables:
+--------------------------
+In statement number 1 (0.2):
+	"JM" used but not initialized.
+In statement number 2 (0.3):
+	"KM" used but not initialized.
+In statement number 3 (0.4):
+	"KM" used but not initialized.
+In statement number 4 (0.6):
+	"K" used but not initialized.
+	"KM" used but not initialized.
+In statement number 5 (0.7):
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 6 (0.9):
+	"I" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 7 (0.10):
+	"IM" used but not initialized.
+	"I" used but not initialized.
+	"KM" used but not initialized.
+In statement number 8 (0.11):
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 9 (0.13):
+	"J" used but not initialized.
+	"B" used but not initialized.
+	"K" used but not initialized.
+	"I" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 10 (0.14):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"B" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 11 (0.15):
+	"JM" used but not initialized.
+	"B" used but not initialized.
+	"K" used but not initialized.
+	"I" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 12 (0.16):
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 13 (0.18):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 14 (0.19):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"B" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 15 (0.20):
+	"J" used but not initialized.
+	"B" used but not initialized.
+	"K" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 16 (0.21):
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"B" used but not initialized.
+	"K" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 17 (0.22):
+	"J" used but not initialized.
+	"B" used but not initialized.
+	"K" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 18 (0.23):
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 19 (0.25):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"B" used but not initialized.
+	"I" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 20 (0.26):
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"B" used but not initialized.
+	"K" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 21 (0.27):
+	"J" used but not initialized.
+	"B" used but not initialized.
+	"K" used but not initialized.
+	"I" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 22 (0.28):
+	"J" used but not initialized.
+	"B" used but not initialized.
+	"K" used but not initialized.
+	"I" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 23 (0.29):
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 24 (0.31):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"B" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 25 (0.32):
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"B" used but not initialized.
+	"K" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 26 (0.33):
+	"J" used but not initialized.
+	"B" used but not initialized.
+	"K" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 27 (0.34):
+	"J" used but not initialized.
+	"B" used but not initialized.
+	"K" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 28 (0.35):
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 29 (0.36):
+	"KM" used but not initialized.
+
+flint message from check reference: WARNING, in module DES, in statement (0.14), number 10
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module DES, in statement (0.14), number 10
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module DES, in statement (0.25), number 19
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module DES, in statement (0.25), number 19
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module DES, in statement (0.26), number 20
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module DES, in statement (0.26), number 20
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module DES, in statement (0.27), number 21
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module DES, in statement (0.27), number 21
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module DES, in statement (0.28), number 22
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module DES, in statement (0.28), number 22
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module DES, in statement (0.31), number 24
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module DES, in statement (0.31), number 24
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module DES, in statement (0.32), number 25
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module DES, in statement (0.32), number 25
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module DES, in statement (0.33), number 26
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module DES, in statement (0.33), number 26
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module DES, in statement (0.34), number 27
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module DES, in statement (0.34), number 27
+the 1th index may not be a mere integer
+number of messages from flint for DES : 148
+
+
+Non-initialized variables:
+--------------------------
+In statement number 1 (0.2):
+	"IM" used but not initialized.
+In statement number 6 (0.7):
+	"I" used but not initialized.
+In statement number 8 (0.9):
+	"IM" used but not initialized.
+In statement number 12 (0.15):
+	"I" used but not initialized.
+In statement number 13 (0.16):
+	"I" used but not initialized.
+	"IM" used but not initialized.
+In statement number 14 (0.17):
+	"IM" used but not initialized.
+In statement number 15 (0.19):
+	"I" used but not initialized.
+	"IM" used but not initialized.
+In statement number 16 (0.20):
+	"IM" used but not initialized.
+In statement number 17 (0.21):
+	"IM" used but not initialized.
+In statement number 18 (0.22):
+	"IM" used but not initialized.
+In statement number 19 (0.24):
+	"IM" used but not initialized.
+In statement number 20 (0.25):
+	"IM" used but not initialized.
+In statement number 21 (0.27):
+	"IM" used but not initialized.
+In statement number 22 (0.28):
+	"IM" used but not initialized.
+In statement number 23 (0.30):
+	"IM" used but not initialized.
+In statement number 24 (0.31):
+	"IM" used but not initialized.
+In statement number 25 (0.33):
+	"IM" used but not initialized.
+In statement number 26 (0.34):
+	"IM" used but not initialized.
+In statement number 27 (0.36):
+	"I" used but not initialized.
+	"IM" used but not initialized.
+In statement number 28 (0.37):
+	"I" used but not initialized.
+	"IM" used but not initialized.
+In statement number 29 (0.38):
+	"I" used but not initialized.
+	"IM" used but not initialized.
+In statement number 30 (0.39):
+	"IM" used but not initialized.
+In statement number 31 (0.40):
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+In statement number 32 (0.41):
+	"KM" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+In statement number 33 (0.42):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"KM" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+In statement number 34 (0.43):
+	"IM" used but not initialized.
+In statement number 35 (0.44):
+	"KM" used but not initialized.
+	"IM" used but not initialized.
+In statement number 36 (0.45):
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+	"IM" used but not initialized.
+In statement number 37 (0.47):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+	"IM" used but not initialized.
+In statement number 38 (0.48):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"KM" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+In statement number 39 (0.49):
+	"JM" used but not initialized.
+In statement number 40 (0.50):
+	"KM" used but not initialized.
+	"JM" used but not initialized.
+In statement number 41 (0.51):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"KM" used but not initialized.
+	"JM" used but not initialized.
+In statement number 42 (0.52):
+	"IM" used but not initialized.
+In statement number 43 (0.54):
+	"I" used but not initialized.
+	"IM" used but not initialized.
+In statement number 44 (0.55):
+	"XMACH" used but not initialized.
+	"IM" used but not initialized.
+In statement number 45 (0.56):
+	"IM" used but not initialized.
+In statement number 46 (0.57):
+	"IM" used but not initialized.
+In statement number 47 (0.58):
+	"IM" used but not initialized.
+In statement number 48 (0.59):
+	"XMACH" used but not initialized.
+	"IM" used but not initialized.
+In statement number 49 (0.60):
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+In statement number 50 (0.61):
+	"KM" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+In statement number 51 (0.62):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"KM" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+In statement number 52 (0.63):
+	"IM" used but not initialized.
+
+flint message from check common, in module MAILLA
+overlap of incompatible variables (MAILLA:XDEC, CALMAT:IDEC) in common MACH
+flint message from check reference: WARNING, in module MAILLA, in statement (0.7), number 6
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module MAILLA, in statement (0.7), number 6
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module MAILLA, in statement (0.7), number 6
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module MAILLA, in statement (0.10), number 9
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module MAILLA, in statement (0.16), number 13
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module MAILLA, in statement (0.54), number 43
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module MAILLA, in statement (0.54), number 43
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module MAILLA, in statement (0.62), number 51
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module MAILLA, in statement (0.62), number 51
+the 1th index may not be a mere integer
+number of messages from flint for MAILLA : 95
+
+
+Non-initialized variables:
+--------------------------
+In statement number 32 (0.33):
+	"I" used but not initialized.
+In statement number 35 (0.37):
+	"I" used but not initialized.
+In statement number 37 (0.39):
+	"I" used but not initialized.
+In statement number 39 (0.41):
+	"I" used but not initialized.
+In statement number 41 (0.43):
+	"I" used but not initialized.
+In statement number 42 (0.44):
+	"I" used but not initialized.
+In statement number 43 (0.45):
+	"I" used but not initialized.
+In statement number 44 (0.46):
+	"I" used but not initialized.
+In statement number 45 (0.47):
+	"I" used but not initialized.
+In statement number 46 (0.48):
+	"I" used but not initialized.
+In statement number 47 (0.49):
+	"I" used but not initialized.
+In statement number 48 (0.50):
+	"I" used but not initialized.
+In statement number 49 (0.51):
+	"I" used but not initialized.
+In statement number 50 (0.52):
+	"I" used but not initialized.
+In statement number 51 (0.53):
+	"I" used but not initialized.
+In statement number 52 (0.54):
+	"I" used but not initialized.
+In statement number 53 (0.55):
+	"I" used but not initialized.
+In statement number 54 (0.56):
+	"I" used but not initialized.
+In statement number 55 (0.57):
+	"I" used but not initialized.
+In statement number 56 (0.58):
+	"I" used but not initialized.
+In statement number 57 (0.59):
+	"I" used but not initialized.
+In statement number 58 (0.60):
+	"I" used but not initialized.
+In statement number 59 (0.61):
+	"I" used but not initialized.
+In statement number 60 (0.62):
+	"I" used but not initialized.
+In statement number 61 (0.63):
+	"I" used but not initialized.
+In statement number 62 (0.64):
+	"I" used but not initialized.
+In statement number 63 (0.65):
+	"I" used but not initialized.
+In statement number 64 (0.66):
+	"I" used but not initialized.
+In statement number 69 (0.72):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 70 (0.73):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 71 (0.74):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 72 (0.75):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 73 (0.76):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 74 (0.77):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+
+number of messages from flint for POLTRI : 46
+
+
+Non-initialized variables:
+--------------------------
+In statement number 1 (0.2):
+	"JM" used but not initialized.
+In statement number 3 (0.4):
+	"KM" used but not initialized.
+In statement number 4 (0.5):
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 5 (0.6):
+	"IM" used but not initialized.
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 6 (0.7):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"L" used but not initialized.
+	"A" used but not initialized.
+	"IM" used but not initialized.
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 7 (0.8):
+	"KM" used but not initialized.
+In statement number 8 (0.10):
+	"KM" used but not initialized.
+	"K" used but not initialized.
+In statement number 9 (0.11):
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 10 (0.13):
+	"I" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 11 (0.14):
+	"I" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 12 (0.15):
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 13 (0.17):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 14 (0.18):
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 15 (0.20):
+	"I" used but not initialized.
+	"J" used but not initialized.
+	"K" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 16 (0.21):
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 17 (0.22):
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 18 (0.24):
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 19 (0.25):
+	"J" used but not initialized.
+	"K" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 20 (0.26):
+	"J" used but not initialized.
+	"K" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 21 (0.27):
+	"J" used but not initialized.
+	"K" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 22 (0.28):
+	"J" used but not initialized.
+	"K" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 23 (0.29):
+	"J" used but not initialized.
+	"K" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 24 (0.30):
+	"J" used but not initialized.
+	"K" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 25 (0.31):
+	"J" used but not initialized.
+	"K" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 26 (0.32):
+	"J" used but not initialized.
+	"K" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 27 (0.33):
+	"J" used but not initialized.
+	"K" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 28 (0.34):
+	"J" used but not initialized.
+	"K" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 29 (0.35):
+	"J" used but not initialized.
+	"K" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 30 (0.36):
+	"J" used but not initialized.
+	"K" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 31 (0.37):
+	"J" used but not initialized.
+	"K" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 32 (0.38):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 33 (1.1):
+	"JM" used but not initialized.
+	"J" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number -1 (1.2):
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number -1 (1.3):
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 44 (2.1):
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 35 (3.2):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 36 (3.3):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 37 (3.4):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 38 (3.5):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 39 (3.6):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 40 (3.7):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 41 (3.8):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 42 (3.9):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 43 (3.10):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 45 (0.40):
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 46 (0.42):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 47 (0.43):
+	"J" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 48 (0.44):
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 49 (0.45):
+	"J" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 50 (0.46):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 51 (0.47):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 52 (0.48):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 53 (0.49):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 54 (0.50):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 55 (0.51):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 56 (0.52):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 57 (0.53):
+	"J" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 58 (0.54):
+	"J" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 59 (0.55):
+	"J" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 60 (0.56):
+	"J" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 61 (0.57):
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 62 (0.58):
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 63 (0.59):
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 64 (0.60):
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 65 (0.61):
+	"J" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 66 (0.62):
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 67 (0.63):
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 68 (0.65):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 69 (0.66):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 70 (0.67):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 71 (0.68):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 72 (0.69):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 73 (0.70):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 74 (0.71):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 75 (0.72):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 76 (0.73):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 77 (0.74):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 78 (0.75):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 79 (0.76):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 80 (0.77):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 81 (0.78):
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 82 (0.79):
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 83 (0.81):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 84 (0.82):
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 85 (0.83):
+	"J" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 86 (0.84):
+	"J" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 87 (0.85):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 88 (0.86):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 89 (0.87):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 90 (0.88):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 91 (0.89):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 92 (0.90):
+	"J" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 93 (0.91):
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 94 (0.92):
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 95 (0.93):
+	"J" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 96 (0.94):
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 97 (0.95):
+	"J" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 98 (0.96):
+	"J" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 99 (0.97):
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 100 (0.98):
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 101 (0.100):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 102 (0.101):
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 103 (0.102):
+	"J" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 104 (0.103):
+	"J" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 105 (0.104):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 106 (0.105):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 107 (0.106):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 108 (0.107):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 109 (0.108):
+	"J" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 110 (0.109):
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 111 (0.110):
+	"J" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 112 (0.111):
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 113 (0.112):
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 114 (0.113):
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 115 (0.114):
+	"KM" used but not initialized.
+
+flint message from check reference: WARNING, in module PREPCG, in statement (3.2), number 35
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (3.2), number 35
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (3.3), number 36
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (3.3), number 36
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (3.4), number 37
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (3.4), number 37
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (3.5), number 38
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (3.5), number 38
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (3.6), number 39
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (3.6), number 39
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (3.7), number 40
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (3.7), number 40
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (3.8), number 41
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (3.8), number 41
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (3.9), number 42
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (3.9), number 42
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (3.10), number 43
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (3.10), number 43
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.81), number 83
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.81), number 83
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.82), number 84
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.82), number 84
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.83), number 85
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.83), number 85
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.84), number 86
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.84), number 86
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.85), number 87
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.85), number 87
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.86), number 88
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.86), number 88
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.87), number 89
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.87), number 89
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.88), number 90
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.88), number 90
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.89), number 91
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.89), number 91
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.90), number 92
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.90), number 92
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.91), number 93
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.91), number 93
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.92), number 94
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.92), number 94
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.93), number 95
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.93), number 95
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.94), number 96
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.94), number 96
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.95), number 97
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.95), number 97
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.96), number 98
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.96), number 98
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.100), number 101
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.100), number 101
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.101), number 102
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.101), number 102
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.102), number 103
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.102), number 103
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.103), number 104
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.103), number 104
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.104), number 105
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.104), number 105
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.105), number 106
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.105), number 106
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.106), number 107
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.106), number 107
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.107), number 108
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.107), number 108
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.108), number 109
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.108), number 109
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.109), number 110
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.109), number 110
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.110), number 111
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.110), number 111
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.111), number 112
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module PREPCG, in statement (0.111), number 112
+the 3th index may not be a mere integer
+number of messages from flint for PREPCG : 592
+
+
+Non-initialized variables:
+--------------------------
+In statement number 1 (0.2):
+	"IM" used but not initialized.
+In statement number 2 (0.3):
+	"KM" used but not initialized.
+In statement number 3 (0.5):
+	"KM" used but not initialized.
+	"K" used but not initialized.
+In statement number 4 (0.6):
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 5 (0.8):
+	"J" used but not initialized.
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 6 (0.9):
+	"JM" used but not initialized.
+	"J" used but not initialized.
+	"KM" used but not initialized.
+In statement number 7 (0.10):
+	"IM" used but not initialized.
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 8 (0.12):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"Q" used but not initialized.
+	"B" used but not initialized.
+	"Q" used but not initialized.
+	"B" used but not initialized.
+	"Q" used but not initialized.
+	"B" used but not initialized.
+	"Q" used but not initialized.
+	"B" used but not initialized.
+	"Q" used but not initialized.
+	"B" used but not initialized.
+	"IM" used but not initialized.
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 9 (0.13):
+	"K" used but not initialized.
+	"I" used but not initialized.
+	"Q" used but not initialized.
+	"J" used but not initialized.
+	"B" used but not initialized.
+	"IM" used but not initialized.
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 10 (0.14):
+	"I" used but not initialized.
+	"Q" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"B" used but not initialized.
+	"IM" used but not initialized.
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 11 (0.15):
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"Q" used but not initialized.
+	"K" used but not initialized.
+	"B" used but not initialized.
+	"IM" used but not initialized.
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 12 (0.16):
+	"I" used but not initialized.
+	"Q" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"B" used but not initialized.
+	"IM" used but not initialized.
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 13 (0.17):
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 14 (0.19):
+	"K" used but not initialized.
+	"I" used but not initialized.
+	"Q" used but not initialized.
+	"J" used but not initialized.
+	"B" used but not initialized.
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 15 (0.20):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"Q" used but not initialized.
+	"B" used but not initialized.
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 16 (0.21):
+	"K" used but not initialized.
+	"I" used but not initialized.
+	"Q" used but not initialized.
+	"J" used but not initialized.
+	"B" used but not initialized.
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 17 (0.22):
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"Q" used but not initialized.
+	"K" used but not initialized.
+	"B" used but not initialized.
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 18 (0.23):
+	"I" used but not initialized.
+	"Q" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"B" used but not initialized.
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 19 (0.24):
+	"I" used but not initialized.
+	"Q" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"B" used but not initialized.
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 20 (0.25):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"Q" used but not initialized.
+	"B" used but not initialized.
+	"Q" used but not initialized.
+	"B" used but not initialized.
+	"Q" used but not initialized.
+	"B" used but not initialized.
+	"Q" used but not initialized.
+	"B" used but not initialized.
+	"Q" used but not initialized.
+	"B" used but not initialized.
+	"Q" used but not initialized.
+	"B" used but not initialized.
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 21 (0.26):
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 22 (0.27):
+	"IM" used but not initialized.
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 23 (0.29):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"Q" used but not initialized.
+	"B" used but not initialized.
+	"Q" used but not initialized.
+	"B" used but not initialized.
+	"Q" used but not initialized.
+	"B" used but not initialized.
+	"IM" used but not initialized.
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 24 (0.30):
+	"I" used but not initialized.
+	"Q" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"B" used but not initialized.
+	"IM" used but not initialized.
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 25 (0.31):
+	"I" used but not initialized.
+	"Q" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"B" used but not initialized.
+	"IM" used but not initialized.
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 26 (0.32):
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"Q" used but not initialized.
+	"K" used but not initialized.
+	"B" used but not initialized.
+	"IM" used but not initialized.
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 27 (0.33):
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 28 (0.34):
+	"KM" used but not initialized.
+
+flint message from check reference: WARNING, in module PROD, in statement (0.19), number 14
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module PROD, in statement (0.19), number 14
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module PROD, in statement (0.20), number 15
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module PROD, in statement (0.20), number 15
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module PROD, in statement (0.21), number 16
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module PROD, in statement (0.21), number 16
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module PROD, in statement (0.22), number 17
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module PROD, in statement (0.22), number 17
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module PROD, in statement (0.23), number 18
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module PROD, in statement (0.23), number 18
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module PROD, in statement (0.24), number 19
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module PROD, in statement (0.24), number 19
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module PROD, in statement (0.25), number 20
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module PROD, in statement (0.25), number 20
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module PROD, in statement (0.25), number 20
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module PROD, in statement (0.25), number 20
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module PROD, in statement (0.25), number 20
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module PROD, in statement (0.25), number 20
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module PROD, in statement (0.29), number 23
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module PROD, in statement (0.29), number 23
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module PROD, in statement (0.29), number 23
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module PROD, in statement (0.30), number 24
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module PROD, in statement (0.30), number 24
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module PROD, in statement (0.31), number 25
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module PROD, in statement (0.31), number 25
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module PROD, in statement (0.32), number 26
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module PROD, in statement (0.32), number 26
+the 1th index may not be a mere integer
+number of messages from flint for PROD : 195
+
+
+Non-initialized variables:
+--------------------------
+In statement number 1 (0.2):
+	"KM" used but not initialized.
+In statement number 2 (0.3):
+	"JM" used but not initialized.
+In statement number 3 (0.4):
+	"KM" used but not initialized.
+In statement number 4 (0.6):
+	"K" used but not initialized.
+	"KM" used but not initialized.
+In statement number 5 (0.7):
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 6 (0.9):
+	"I" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 7 (0.10):
+	"I" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 8 (0.11):
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 9 (0.13):
+	"J" used but not initialized.
+	"B" used but not initialized.
+	"K" used but not initialized.
+	"I" used but not initialized.
+	"B" used but not initialized.
+	"B" used but not initialized.
+	"B" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 10 (0.14):
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 11 (0.15):
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 12 (0.17):
+	"J" used but not initialized.
+	"B" used but not initialized.
+	"K" used but not initialized.
+	"I" used but not initialized.
+	"B" used but not initialized.
+	"B" used but not initialized.
+	"B" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 13 (0.18):
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 14 (0.19):
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 15 (0.21):
+	"J" used but not initialized.
+	"B" used but not initialized.
+	"K" used but not initialized.
+	"I" used but not initialized.
+	"B" used but not initialized.
+	"B" used but not initialized.
+	"B" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 16 (0.22):
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 17 (0.23):
+	"K" used but not initialized.
+	"JM" used but not initialized.
+	"I" used but not initialized.
+	"B" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 18 (0.24):
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 19 (0.26):
+	"J" used but not initialized.
+	"K" used but not initialized.
+	"I" used but not initialized.
+	"B" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 20 (0.27):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"B" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 21 (0.28):
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 22 (0.29):
+	"KM" used but not initialized.
+
+flint message from check reference: WARNING, in module REP, in statement (0.17), number 12
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module REP, in statement (0.17), number 12
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module REP, in statement (0.17), number 12
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module REP, in statement (0.17), number 12
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module REP, in statement (0.21), number 15
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module REP, in statement (0.21), number 15
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module REP, in statement (0.21), number 15
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module REP, in statement (0.21), number 15
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module REP, in statement (0.26), number 19
+the 2th index may not be a mere integer
+number of messages from flint for REP : 90
+
+
+Non-initialized variables:
+--------------------------
+In statement number 1 (0.2):
+	"IM" used but not initialized.
+In statement number 2 (0.3):
+	"JM" used but not initialized.
+In statement number 3 (0.4):
+	"XMACH" used but not initialized.
+In statement number 6 (0.7):
+	"__IO_EFFECTS:LUNS" used but not initialized.
+	"NITER" used but not initialized.
+	"NUMTOT" used but not initialized.
+In statement number 10 (0.12):
+	"XP" used but not initialized.
+	"I" used but not initialized.
+	"XP" used but not initialized.
+In statement number 11 (0.13):
+	"PHI" used but not initialized.
+	"I" used but not initialized.
+	"PHI" used but not initialized.
+In statement number 12 (0.14):
+	"PHI" used but not initialized.
+	"JM" used but not initialized.
+	"I" used but not initialized.
+	"PHI" used but not initialized.
+In statement number 13 (0.15):
+	"PHI" used but not initialized.
+	"KM" used but not initialized.
+	"JM" used but not initialized.
+	"I" used but not initialized.
+	"PHI" used but not initialized.
+In statement number 14 (0.16):
+	"PHI" used but not initialized.
+	"KM" used but not initialized.
+	"I" used but not initialized.
+	"PHI" used but not initialized.
+In statement number 15 (0.17):
+	"YP" used but not initialized.
+	"I" used but not initialized.
+	"YP" used but not initialized.
+In statement number 16 (0.18):
+	"ZP" used but not initialized.
+	"I" used but not initialized.
+	"ZP" used but not initialized.
+In statement number 22 (0.25):
+	"L" used but not initialized.
+In statement number 24 (0.27):
+	"L" used but not initialized.
+	"XMACH" used but not initialized.
+In statement number 25 (0.28):
+	"XP" used but not initialized.
+	"I" used but not initialized.
+	"XP" used but not initialized.
+In statement number 26 (0.29):
+	"YP" used but not initialized.
+	"I" used but not initialized.
+	"YP" used but not initialized.
+In statement number 27 (0.30):
+	"ZP" used but not initialized.
+	"I" used but not initialized.
+	"ZP" used but not initialized.
+
+flint message from check common, in module RESUL
+overlap of incompatible variables (RESUL:IDEC, MAILLA:XDEC) in common MACH
+flint message from check reference: WARNING, in module RESUL, in statement (0.12), number 10
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module RESUL, in statement (0.13), number 11
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module RESUL, in statement (0.14), number 12
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module RESUL, in statement (0.15), number 13
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module RESUL, in statement (0.16), number 14
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module RESUL, in statement (0.17), number 15
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module RESUL, in statement (0.18), number 16
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module RESUL, in statement (0.28), number 25
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module RESUL, in statement (0.29), number 26
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module RESUL, in statement (0.30), number 27
+the 1th index may not be a mere integer
+number of messages from flint for RESUL : 54
+
+
+Non-initialized variables:
+--------------------------
+In statement number 1 (0.2):
+	"IM" used but not initialized.
+In statement number 2 (0.3):
+	"JM" used but not initialized.
+In statement number 3 (0.4):
+	"KM" used but not initialized.
+In statement number 4 (0.5):
+	"XMACH" used but not initialized.
+In statement number 7 (0.8):
+	"XMIN" used but not initialized.
+In statement number 8 (0.9):
+	"XMAX" used but not initialized.
+In statement number 12 (0.13):
+	"XNEWT" used but not initialized.
+In statement number 14 (0.15):
+	"IM" used but not initialized.
+In statement number 15 (0.16):
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+In statement number 16 (0.17):
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"IM" used but not initialized.
+In statement number 18 (0.20):
+	"I" used but not initialized.
+In statement number 19 (0.21):
+	"I" used but not initialized.
+In statement number 20 (0.22):
+	"I" used but not initialized.
+In statement number 22 (0.24):
+	"KM" used but not initialized.
+In statement number 23 (0.25):
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 24 (0.27):
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 25 (0.28):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 26 (0.29):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"IM" used but not initialized.
+	"SECM2" used but not initialized.
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+In statement number 28 (0.31):
+	"JM" used but not initialized.
+In statement number 29 (0.32):
+	"KM" used but not initialized.
+	"JM" used but not initialized.
+In statement number 30 (0.34):
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+	"JM" used but not initialized.
+In statement number 31 (0.35):
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+	"JM" used but not initialized.
+In statement number 32 (0.36):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"L" used but not initialized.
+	"IM" used but not initialized.
+	"KM" used but not initialized.
+	"JM" used but not initialized.
+In statement number 33 (0.37):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"KM" used but not initialized.
+	"JM" used but not initialized.
+In statement number 38 (0.44):
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"LB" used but not initialized.
+	"BELK" used but not initialized.
+	"K" used but not initialized.
+In statement number 42 (0.50):
+	"I" used but not initialized.
+	"PHI" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 43 (0.51):
+	"I" used but not initialized.
+	"PHI" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 44 (0.52):
+	"I" used but not initialized.
+	"PHI" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 45 (0.53):
+	"I" used but not initialized.
+	"PHI" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 46 (0.54):
+	"I" used but not initialized.
+	"PHI" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 47 (0.55):
+	"I" used but not initialized.
+	"PHI" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 48 (0.56):
+	"I" used but not initialized.
+	"PHI" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 49 (0.57):
+	"I" used but not initialized.
+	"PHI" used but not initialized.
+	"K" used but not initialized.
+	"J" used but not initialized.
+In statement number 50 (0.58):
+	"I" used but not initialized.
+In statement number 53 (0.61):
+	"L" used but not initialized.
+	"I" used but not initialized.
+In statement number 57 (0.66):
+	"IL" used but not initialized.
+In statement number 59 (0.68):
+	"IL" used but not initialized.
+	"I" used but not initialized.
+	"J" used but not initialized.
+In statement number 63 (0.73):
+	"IL" used but not initialized.
+	"I" used but not initialized.
+	"JL" used but not initialized.
+	"J" used but not initialized.
+In statement number 65 (0.75):
+	"JL" used but not initialized.
+	"I" used but not initialized.
+	"IL" used but not initialized.
+	"J" used but not initialized.
+In statement number 68 (0.78):
+	"I" used but not initialized.
+	"J" used but not initialized.
+In statement number 69 (0.79):
+	"IDEC" used but not initialized.
+In statement number 71 (0.82):
+	"I" used but not initialized.
+In statement number 72 (0.83):
+	"I" used but not initialized.
+In statement number 73 (0.84):
+	"I" used but not initialized.
+In statement number 76 (0.88):
+	"I" used but not initialized.
+	"L" used but not initialized.
+In statement number 78 (0.91):
+	"I" used but not initialized.
+	"J" used but not initialized.
+In statement number 79 (0.92):
+	"I" used but not initialized.
+In statement number 81 (0.94):
+	"I" used but not initialized.
+	"J" used but not initialized.
+In statement number 83 (0.96):
+	"I" used but not initialized.
+In statement number 85 (0.98):
+	"I" used but not initialized.
+In statement number 88 (0.101):
+	"IL" used but not initialized.
+In statement number 89 (0.103):
+	"IL" used but not initialized.
+In statement number 90 (0.104):
+	"IL" used but not initialized.
+In statement number 91 (0.105):
+	"J" used but not initialized.
+	"I" used but not initialized.
+	"JL" used but not initialized.
+	"IL" used but not initialized.
+In statement number 95 (0.110):
+	"I" used but not initialized.
+In statement number 96 (0.111):
+	"I" used but not initialized.
+In statement number 112 (2.2):
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 109 (4.2):
+	"I" used but not initialized.
+	"J" used but not initialized.
+In statement number 111 (4.4):
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 115 (0.114):
+	"I" used but not initialized.
+In statement number 117 (0.117):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 118 (0.118):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 119 (0.119):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 120 (0.120):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 121 (0.121):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 122 (0.122):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 123 (0.123):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 126 (0.127):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 127 (0.128):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 128 (0.129):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 129 (0.130):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 130 (0.131):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 131 (0.132):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 132 (0.133):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 135 (0.137):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 136 (0.138):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 137 (0.139):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 138 (0.140):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 139 (0.141):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 140 (0.142):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 141 (0.143):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 142 (0.144):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 145 (0.148):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 146 (0.149):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 147 (0.150):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 148 (0.151):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 149 (0.152):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 150 (0.153):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 151 (0.154):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 152 (0.155):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 153 (0.156):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 154 (0.157):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 155 (0.158):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 156 (0.159):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 157 (0.160):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 158 (0.161):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 161 (0.165):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 162 (0.166):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 163 (0.167):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 164 (0.168):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 165 (0.169):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 166 (0.170):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 167 (0.171):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 168 (0.172):
+	"K" used but not initialized.
+	"J" used but not initialized.
+	"I" used but not initialized.
+In statement number 171 (0.175):
+	"IM" used but not initialized.
+	"JM" used but not initialized.
+	"KM" used but not initialized.
+	"A" used but not initialized.
+	"__IO_EFFECTS:LUNS" used but not initialized.
+
+flint message from check common, in module ROMAT
+overlap of incompatible variables (ROMAT:IDEC, MAILLA:XDEC) in common MACH
+flint message from check reference: WARNING, in module ROMAT, in statement (0.51), number 43
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.52), number 44
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.52), number 44
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.53), number 45
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.54), number 46
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.55), number 47
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.55), number 47
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.56), number 48
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.56), number 48
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.56), number 48
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.57), number 49
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.57), number 49
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (2.2), number 112
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (2.2), number 112
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (4.2), number 109
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (4.2), number 109
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (4.2), number 109
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (4.2), number 109
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (4.4), number 111
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (4.4), number 111
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.127), number 126
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.127), number 126
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.128), number 127
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.128), number 127
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.129), number 128
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.129), number 128
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.130), number 129
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.130), number 129
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.131), number 130
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.131), number 130
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.132), number 131
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.132), number 131
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.133), number 132
+the 4th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.133), number 132
+the 4th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.137), number 135
+the 4th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.137), number 135
+the 4th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.138), number 136
+the 4th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.138), number 136
+the 4th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.139), number 137
+the 4th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.139), number 137
+the 4th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.140), number 138
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.140), number 138
+the 4th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.140), number 138
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.140), number 138
+the 4th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.141), number 139
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.141), number 139
+the 4th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.141), number 139
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.141), number 139
+the 4th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.142), number 140
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.142), number 140
+the 4th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.142), number 140
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.142), number 140
+the 4th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.144), number 142
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.144), number 142
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.148), number 145
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.148), number 145
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.149), number 146
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.149), number 146
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.150), number 147
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.150), number 147
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.150), number 147
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.150), number 147
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.151), number 148
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.151), number 148
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.151), number 148
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.151), number 148
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.152), number 149
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.152), number 149
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.152), number 149
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.152), number 149
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.153), number 150
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.153), number 150
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.154), number 151
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.154), number 151
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.155), number 152
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.155), number 152
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.156), number 153
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.156), number 153
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.156), number 153
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.156), number 153
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.157), number 154
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.157), number 154
+the 4th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.157), number 154
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.157), number 154
+the 4th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.158), number 155
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.158), number 155
+the 4th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.158), number 155
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.158), number 155
+the 4th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.159), number 156
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.159), number 156
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.159), number 156
+the 4th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.159), number 156
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.159), number 156
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.159), number 156
+the 4th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.160), number 157
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.160), number 157
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.161), number 158
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.161), number 158
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.161), number 158
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.161), number 158
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.165), number 161
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.165), number 161
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.166), number 162
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.166), number 162
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.166), number 162
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.166), number 162
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.167), number 163
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.167), number 163
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.167), number 163
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.167), number 163
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.168), number 164
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.168), number 164
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.168), number 164
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.168), number 164
+the 1th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.168), number 164
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.168), number 164
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.170), number 166
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.170), number 166
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.171), number 167
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.171), number 167
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.172), number 168
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.172), number 168
+the 3th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.172), number 168
+the 2th index may not be a mere integer
+flint message from check reference: WARNING, in module ROMAT, in statement (0.172), number 168
+the 3th index may not be a mere integer
+number of messages from flint for ROMAT : 398
+
 
 Non-initialized variables:
 --------------------------
@@ -6,9 +2815,9 @@ In statement number 14 (0.15):
 	"__IO_EFFECTS:LUNS" used but not initialized.
 In statement number 16 (0.17):
 	"PHI" used but not initialized.
-	"RESUL:XP" used but not initialized.
-	"RESUL:YP" used but not initialized.
-	"RESUL:ZP" used but not initialized.
+	"MAILLA:YP" used but not initialized.
+	"MAILLA:ZP" used but not initialized.
+	"MAILLA:XP" used but not initialized.
 In statement number 17 (0.18):
 	"CALMAT:P" used but not initialized.
 In statement number 18 (0.19):
@@ -16,43 +2825,35 @@ In statement number 18 (0.19):
 	"Q" used but not initialized.
 	"T" used but not initialized.
 	"BEL" used but not initialized.
-	"ROMAT:BID" used but not initialized.
-	"ROMAT:PH" used but not initialized.
-	"ROMAT:Q2" used but not initialized.
-	"ROMAT:ROL" used but not initialized.
-	"ROMAT:RN" used but not initialized.
-	"ROMAT:RES" used but not initialized.
-	"ROMAT:BID" used but not initialized.
-	"ROMAT:BID" used but not initialized.
-	"ROMAT:BID" used but not initialized.
-	"CALMAT:PXX" used but not initialized.
-	"ROMAT:BID" used but not initialized.
-	"CALMAT:PYY" used but not initialized.
-	"ROMAT:BID" used but not initialized.
-	"CALMAT:PZZ" used but not initialized.
-	"ROMAT:BID" used but not initialized.
-	"CALMAT:PXY" used but not initialized.
-	"ROMAT:BID" used but not initialized.
-	"CALMAT:PXZ" used but not initialized.
-	"ROMAT:BID" used but not initialized.
+	"CALMAT:RES" used but not initialized.
+	"CALMAT:X" used but not initialized.
+	"CALMAT:A" used but not initialized.
 	"CALMAT:PYZ" used but not initialized.
-	"ROMAT:BID" used but not initialized.
-	"ROMAT:BID" used but not initialized.
-	"CALMAT:P" used but not initialized.
+	"CALMAT:S23" used but not initialized.
+	"CALMAT:PXZ" used but not initialized.
+	"CALMAT:S13" used but not initialized.
+	"CALMAT:PXY" used but not initialized.
+	"CALMAT:S12" used but not initialized.
+	"CALMAT:PZZ" used but not initialized.
+	"CALMAT:S33" used but not initialized.
+	"CALMAT:PYY" used but not initialized.
+	"CALMAT:S22" used but not initialized.
+	"CALMAT:PXX" used but not initialized.
+	"CALMAT:S11" used but not initialized.
+	"CALMAT:SURF" used but not initialized.
+	"CALMAT:TEMP" used but not initialized.
+	"CALMAT:W" used but not initialized.
 In statement number 23 (0.24):
 	"PHI" used but not initialized.
-	"RESUL:ZP" used but not initialized.
-	"RESUL:YP" used but not initialized.
+	"MAILLA:YP" used but not initialized.
+	"MAILLA:ZP" used but not initialized.
 In statement number 25 (0.27):
 	"R" used but not initialized.
 	"BEL" used but not initialized.
 	"B" used but not initialized.
 	"A" used but not initialized.
 	"BELK" used but not initialized.
-	"ROMAT:ROL" used but not initialized.
-	"ROMAT:Q2" used but not initialized.
-	"ROMAT:RN" used but not initialized.
-	"ROMAT:SECM2" used but not initialized.
+	"CALMAT:SECM2" used but not initialized.
 In statement number 26 (0.28):
 	"Q" used but not initialized.
 	"T" used but not initialized.
@@ -60,10 +2861,10 @@ In statement number 26 (0.28):
 	"A" used but not initialized.
 In statement number 27 (0.29):
 	"PHI" used but not initialized.
-	"RESUL:ZP" used but not initialized.
-	"RESUL:YP" used but not initialized.
 	"NITER" used but not initialized.
+	"MAILLA:YP" used but not initialized.
+	"MAILLA:ZP" used but not initialized.
 
 flint message from check common, in module TMINES
 overlap of incompatible variables (TMINES:IDEC, MAILLA:XDEC) in common MACH
-number of messages from flint for TMINES : 54
+number of messages from flint for TMINES : 46

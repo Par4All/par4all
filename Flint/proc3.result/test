@@ -1,6 +1,5 @@
 
 Flinted file
 
-flint message from check procedure, in module PROC3, in statement (0.2), number 1
-warning, function used as a procedure : TOP-LEVEL:JOKE
-number of messages from flint for PROC3 : 1
+JOKE has been flinted : everything is ok.
+PROC3 has been flinted : everything is ok.

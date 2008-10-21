@@ -20,7 +20,7 @@ echo
 echo Flinted file
 echo
 
-display FLINTED_FILE
+display FLINTED_FILE[%ALL]
 
 close
 delete ${WSPACE}
