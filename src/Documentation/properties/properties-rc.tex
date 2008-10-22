@@ -2127,6 +2127,7 @@ replaced ...
 \index{PRETTYPRINT\_LOOSE}
 \index{PRETTYPRINT\_STATEMENT\_NUMBER}
 \index{PRETTYPRINT\_INDENTATION}
+\index{PRETTYPRINT\_LISTS\_WITH\_SPACES}
 \index{Statement number}
 
 When prettyprinting semantic information (preconditions, transformers and
@@ -2160,6 +2161,14 @@ default value is 3.
 PRETTYPRINT_INDENTATION 3
 \end{verbatim}
 
+Some people prefer to use a space after a comma to separate items in
+lists such as declaration lists or parameter lists in order to improve
+readability. Other people would rather pack more information per
+line. The default option is chosen for readability.
+
+\begin{verbatim}
+PRETTYPRINT_LISTS_WITH_SPACES TRUE
+\end{verbatim}
 
 \subsubsection{Target Language Selection}
 \index{HPF}
