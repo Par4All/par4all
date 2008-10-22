@@ -1,12 +1,12 @@
       SUBROUTINE BLA1
       INTEGER I
-      COMMON /_ENTRY_BLAX/ I
+      COMMON /ENTRY_BLAX/ I
 99996 CONTINUE                                                          0001
       I = I+1                                                           0002
       END
       SUBROUTINE BLA2
       INTEGER I
-      COMMON /_ENTRY_BLAX/ I
+      COMMON /ENTRY_BLAX/ I
 99997 CONTINUE                                                          0001
       I = I+1                                                           0002
 99996 CONTINUE                                                          0003
@@ -14,7 +14,7 @@
       END
       SUBROUTINE BLA3
       INTEGER I
-      COMMON /_ENTRY_BLAX/ I
+      COMMON /ENTRY_BLAX/ I
 99998 CONTINUE                                                          0001
       I = I+1                                                           0002
 99997 CONTINUE                                                          0003
@@ -24,7 +24,7 @@
       END
       SUBROUTINE BLAX
       INTEGER I
-      COMMON /_ENTRY_BLAX/ I
+      COMMON /ENTRY_BLAX/ I
 ! warning: this initialization should appear only once...
       DATA I /0/
 ! data => save i

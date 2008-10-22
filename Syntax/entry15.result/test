@@ -3,7 +3,7 @@ Module ENTRY15
 
       SUBROUTINE ENTRY15(N)
       INTEGER N, M, K
-      COMMON /_ENTRY_ENTRY15/ M
+      COMMON /ENTRY_ENTRY15/ M
 
       PRINT *, N                                                        0001
 
@@ -14,7 +14,7 @@ Entry INCREMENT
 
       SUBROUTINE INCREMENT(N)
       INTEGER N, M, K
-      COMMON /_ENTRY_ENTRY15/ M
+      COMMON /ENTRY_ENTRY15/ M
 
 99998 CONTINUE                                                          0001
 

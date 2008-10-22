@@ -835,7 +835,7 @@ c +++
 15          CONTINUE                                                    0214
          PMINJ = TFMASS(NUMVEL)/TNPARC                                  0215
       ENDIF
-      WRITE (12, 880) (I,VELINJ(I), I = 1, NUMVEL)                      0216
+      WRITE (12, 880) (I, VELINJ(I), I = 1, NUMVEL)                     0216
 c +++
 c +++ compute 3 unit vectors (a, n, & o) for each nozzle, for use
 c +++ in setting velocities in subroutine inject, where a is

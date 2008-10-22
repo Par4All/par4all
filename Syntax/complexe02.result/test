@@ -7,6 +7,6 @@ c     This is a complex constant
 c     This is diagnosed as an invalid implicit DO
 c     print *, (5, 6, 7)
 
-      PRINT *, (5,6, I = 1, 2)                                          0002
+      PRINT *, (5, 6, I = 1, 2)                                         0002
 
       END

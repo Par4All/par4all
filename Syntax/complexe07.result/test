@@ -3,14 +3,14 @@
 
       PRINT *, (A(I), I = 1, 10)                                        0001
 
-      PRINT *, (A(I),B(I), I = 1, 10)                                   0002
+      PRINT *, (A(I), B(I), I = 1, 10)                                  0002
 
-      PRINT *, (A(I),B(I),C(I), I = 1, 10)                              0003
+      PRINT *, (A(I), B(I), C(I), I = 1, 10)                            0003
 
-      PRINT *, (A(I),B(I),C(I),D(I), I = 1, 10)                         0004
+      PRINT *, (A(I), B(I), C(I), D(I), I = 1, 10)                      0004
 
-      PRINT *, (A(I),B(I),C(I),D(I),E(I), I = 1, 10)                    0005
+      PRINT *, (A(I), B(I), C(I), D(I), E(I), I = 1, 10)                0005
 
-      PRINT *, (A(I),B(I),C(I),D(I),E(I),I, I = 1, 10)                  0006
+      PRINT *, (A(I), B(I), C(I), D(I), E(I), I, I = 1, 10)             0006
 
       END

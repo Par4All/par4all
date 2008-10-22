@@ -73,7 +73,7 @@ PRINTED_FILE made for ENTRY18.
       SUBROUTINE ENTRY18(N)
       INTEGER N, K, L
       INTEGER M(1:10)
-      COMMON /_ENTRY_ENTRY18/ L, M, K
+      COMMON /ENTRY_ENTRY18/ L, M, K
 
 C     Goal: check that multiple entries each have a proper entry common
 C     for multiple static variables (and a unique DATA, see also entry16.f)
@@ -109,7 +109,7 @@ Declared entity INCREMENT1:K	with type variable INTEGER*4
 Declared entity INCREMENT1:L	with type variable INTEGER*4
 Declared entity INCREMENT1:M	with type variable INTEGER*4
 Declared entity INCREMENT1:N	with type variable INTEGER*4
-Declared entity TOP-LEVEL:~_ENTRY_ENTRY18	with type area with size 48
+Declared entity TOP-LEVEL:~ENTRY_ENTRY18	with type area with size 48
 
 Layouts for formal parameters:
 
@@ -134,7 +134,7 @@ Layout for common /*STATIC*/ of size 0:
 	* empty area *
 
 
-Layout for common /_ENTRY_ENTRY18/ of size 48:
+Layout for common /ENTRY_ENTRY18/ of size 48:
 	Variable INCREMENT1:L,	offset = 0,	size = 4
 	Variable INCREMENT1:M,	offset = 4,	size = 40
 	Variable INCREMENT1:K,	offset = 44,	size = 4
@@ -147,7 +147,7 @@ PRINTED_FILE made for INCREMENT1.
       SUBROUTINE INCREMENT1(N)
       INTEGER N, K, L
       INTEGER M(1:10)
-      COMMON /_ENTRY_ENTRY18/ L, M, K
+      COMMON /ENTRY_ENTRY18/ L, M, K
 
 99998 CONTINUE                                                          0001
 
@@ -191,7 +191,7 @@ Declared entity INCREMENT2:K	with type variable INTEGER*4
 Declared entity INCREMENT2:L	with type variable INTEGER*4
 Declared entity INCREMENT2:M	with type variable INTEGER*4
 Declared entity INCREMENT2:N	with type variable INTEGER*4
-Declared entity TOP-LEVEL:~_ENTRY_ENTRY18	with type area with size 48
+Declared entity TOP-LEVEL:~ENTRY_ENTRY18	with type area with size 48
 
 Layouts for formal parameters:
 
@@ -216,7 +216,7 @@ Layout for common /*STATIC*/ of size 0:
 	* empty area *
 
 
-Layout for common /_ENTRY_ENTRY18/ of size 48:
+Layout for common /ENTRY_ENTRY18/ of size 48:
 	Variable INCREMENT2:L,	offset = 0,	size = 4
 	Variable INCREMENT2:M,	offset = 4,	size = 40
 	Variable INCREMENT2:K,	offset = 44,	size = 4
@@ -229,7 +229,7 @@ PRINTED_FILE made for INCREMENT2.
       SUBROUTINE INCREMENT2(N)
       INTEGER N, K, L
       INTEGER M(1:10)
-      COMMON /_ENTRY_ENTRY18/ L, M, K
+      COMMON /ENTRY_ENTRY18/ L, M, K
 
 99997 CONTINUE                                                          0001
 
@@ -269,7 +269,7 @@ Declared entity INCREMENT3:K	with type variable INTEGER*4
 Declared entity INCREMENT3:L	with type variable INTEGER*4
 Declared entity INCREMENT3:M	with type variable INTEGER*4
 Declared entity INCREMENT3:N	with type variable INTEGER*4
-Declared entity TOP-LEVEL:~_ENTRY_ENTRY18	with type area with size 48
+Declared entity TOP-LEVEL:~ENTRY_ENTRY18	with type area with size 48
 
 Layouts for formal parameters:
 
@@ -294,7 +294,7 @@ Layout for common /*STATIC*/ of size 0:
 	* empty area *
 
 
-Layout for common /_ENTRY_ENTRY18/ of size 48:
+Layout for common /ENTRY_ENTRY18/ of size 48:
 	Variable INCREMENT3:L,	offset = 0,	size = 4
 	Variable INCREMENT3:M,	offset = 4,	size = 40
 	Variable INCREMENT3:K,	offset = 44,	size = 4
@@ -307,7 +307,7 @@ PRINTED_FILE made for INCREMENT3.
       SUBROUTINE INCREMENT3(N)
       INTEGER N, K, L
       INTEGER M(1:10)
-      COMMON /_ENTRY_ENTRY18/ L, M, K
+      COMMON /ENTRY_ENTRY18/ L, M, K
 
 99996 CONTINUE                                                          0001
 
@@ -343,7 +343,7 @@ Declared entity INCREMENT4:K	with type variable INTEGER*4
 Declared entity INCREMENT4:L	with type variable INTEGER*4
 Declared entity INCREMENT4:M	with type variable INTEGER*4
 Declared entity INCREMENT4:N	with type variable INTEGER*4
-Declared entity TOP-LEVEL:~_ENTRY_ENTRY18	with type area with size 48
+Declared entity TOP-LEVEL:~ENTRY_ENTRY18	with type area with size 48
 
 Layouts for formal parameters:
 
@@ -368,7 +368,7 @@ Layout for common /*STATIC*/ of size 0:
 	* empty area *
 
 
-Layout for common /_ENTRY_ENTRY18/ of size 48:
+Layout for common /ENTRY_ENTRY18/ of size 48:
 	Variable INCREMENT4:L,	offset = 0,	size = 4
 	Variable INCREMENT4:M,	offset = 4,	size = 40
 	Variable INCREMENT4:K,	offset = 44,	size = 4
@@ -381,7 +381,7 @@ PRINTED_FILE made for INCREMENT4.
       SUBROUTINE INCREMENT4(N)
       INTEGER N, K, L
       INTEGER M(1:10)
-      COMMON /_ENTRY_ENTRY18/ L, M, K
+      COMMON /ENTRY_ENTRY18/ L, M, K
 
 99995 CONTINUE                                                          0001
 

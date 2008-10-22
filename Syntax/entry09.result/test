@@ -4,7 +4,7 @@ Module ENTRY01
       SUBROUTINE ENTRY09(X, N)
       INTEGER N, L
       COMPLEX*8 X(1:N)
-      COMMON /_ENTRY_ENTRY09/ L
+      COMMON /ENTRY_ENTRY09/ L
 
       DATA L /10/
 
@@ -18,7 +18,7 @@ Entry INCREMENT
       SUBROUTINE INCREMENT(Y, M)
       INTEGER M, L
       CHARACTER Y(1:M)
-      COMMON /_ENTRY_ENTRY09/ L
+      COMMON /ENTRY_ENTRY09/ L
 
 99998 CONTINUE                                                          0001
 
