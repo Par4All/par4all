@@ -1,4 +1,7 @@
 delete altret09
+
+setproperty ABORT_ON_USER_ERROR FALSE
+
 create altret09 altret09.src/altret09.f \
 	altret09.src/foo.f
 
@@ -13,6 +16,14 @@ setproperty PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS TRUE
 #shell cat ${VDIR:-.}/altret09.src/altret09.f
 
 # this is a bad idead - FC
+
+# This does not work anymore because of Fabien's changes which led to
+# the disparition of PIPS_VALIDDIR - FI
+
+# What is the semantic of VDIR? The directory where the validation
+# takes place or the directory where the .tpips was fond? If the latter
+# is true, create should set $VDIR.
+
 shell ${PIPS_F77:-f77} \
 	${VDIR:-.}/altret09.src/altret09.f \
 	${VDIR:-.}/altret09.src/foo.f
