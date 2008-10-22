@@ -95,10 +95,10 @@
 #define POST_DECREMENT_OPERATOR_NAME    "post--"
 #define PRE_INCREMENT_OPERATOR_NAME     "++pre"
 #define PRE_DECREMENT_OPERATOR_NAME     "--pre"
-#define MULTIPLY_UPDATE_OPERATOR_NAME   "*=" 
-#define DIVIDE_UPDATE_OPERATOR_NAME     "/=" 
-#define PLUS_UPDATE_OPERATOR_NAME       "+=" 
-#define MINUS_UPDATE_OPERATOR_NAME      "-=" 
+#define MULTIPLY_UPDATE_OPERATOR_NAME   "*="
+#define DIVIDE_UPDATE_OPERATOR_NAME     "/="
+#define PLUS_UPDATE_OPERATOR_NAME       "+="
+#define MINUS_UPDATE_OPERATOR_NAME      "-="
 #define LEFT_SHIFT_UPDATE_OPERATOR_NAME "<<="
 #define RIGHT_SHIFT_UPDATE_OPERATOR_NAME        ">>="
 #define BITWISE_OR_UPDATE_OPERATOR_NAME  "|="
@@ -365,7 +365,7 @@
 #define POPEN_FUNCTION_NAME             "popen"
 #define CUSERID_FUNCTION_NAME           "cuserid"
 #define TEMPNAM_FUNCTION_NAME           "tempnam"
-#define GETW_FUNCTION_NAME              "getw" 
+#define GETW_FUNCTION_NAME              "getw"
 #define PUTW_FUNCTION_NAME              "putw"
 #define PCLOSE_FUNCTION_NAME            "pclose"
 #define FSEEKO_FUNCTION_NAME            "fseeko"
@@ -466,7 +466,7 @@
 #define STRLEN_FUNCTION_NAME            "strlen"
 //#define FOPEN_FUNCTION_NAME           "fopen"
 
-/* #include <fcntl.h>*/                 
+/* #include <fcntl.h>*/
 
 #define FCNTL_FUNCTION_NAME             "fcntl"
 #define CREAT_FUNCTION_NAME             "creat"
@@ -666,8 +666,8 @@
 #define ENTITY_EQUIV_P(e) entity_an_operator_p(e, EQUIV)
 #define ENTITY_NON_EQUIV_P(e) entity_an_operator_p(e, NON_EQUIV)
 
-/* Attention : 
-   This definition is different with the Fortran Standard where the logical 
+/* Attention :
+   This definition is different with the Fortran Standard where the logical
    operators are the following only: AND, OR, NOT, EQUIV, NEQUIV (NN-Mars 2000)*/
 
 #define ENTITY_LOGICAL_OPERATOR_P(e) ( ENTITY_RELATIONAL_OPERATOR_P(e) || \
@@ -767,9 +767,9 @@
 
 /*io functions: C library and system io.Amira Mensi*/
 
-#define ENTITY_C_OPEN_SYSTEM_P(e)        ENTITY_NAME_P(e, C_OPEN_FUNCTION_NAME) 
-#define ENTITY_C_CLOSE_SYSTEM_P(e)       ENTITY_NAME_P(e, C_CLOSE_FUNCTION_NAME) 
-#define ENTITY_C_READ_SYSTEM_P(e)        ENTITY_NAME_P(e, C_READ_FUNCTION_NAME) 
+#define ENTITY_C_OPEN_SYSTEM_P(e)        ENTITY_NAME_P(e, C_OPEN_FUNCTION_NAME)
+#define ENTITY_C_CLOSE_SYSTEM_P(e)       ENTITY_NAME_P(e, C_CLOSE_FUNCTION_NAME)
+#define ENTITY_C_READ_SYSTEM_P(e)        ENTITY_NAME_P(e, C_READ_FUNCTION_NAME)
 #define ENTITY_C_WRITE_SYSTEM_P(e)       ENTITY_NAME_P(e, C_WRITE_FUNCTION_NAME)
 /* fcntl() */
 #define ENTITY_FSYNC_SYSTEM_P(e)         ENTITY_NAME_P(e, FSYNC_FUNCTION_NAME)
@@ -778,18 +778,18 @@
 #define ENTITY_SELECT_SYSTEM_P(e)        ENTITY_NAME_P(e, SELECT_FUNCTION_NAME)
 #define ENTITY_PSELECT_SYSTEM_P(e)       ENTITY_NAME_P(e, PSELECT_FUNCTION_NAME)
 
-#define ENTITY_REMOVE_SYSTEM_P(e)        ENTITY_NAME_P(e, "remove") 
-#define ENTITY_RENAME_SYSTEM_P(e)        ENTITY_NAME_P(e, "rename") 
-#define ENTITY_TMPFILE_SYSTEM_P(e)       ENTITY_NAME_P(e, "tmpfile") 
-#define ENTITY_TMPNAM_SYSTEM_P(e)        ENTITY_NAME_P(e, "tmpnam") 
-#define ENTITY_FFLUSH_SYSTEM_P(e)        ENTITY_NAME_P(e, "fflush") 
-#define ENTITY_FREOPEN_SYSTEM_P(e)       ENTITY_NAME_P(e, "freopen") 
-#define ENTITY_SETBUF_SYSTEM_P(e)        ENTITY_NAME_P(e, "setbuf") 
-#define ENTITY_SETVBUF_SYSTEM_P(e)       ENTITY_NAME_P(e, "setvbuf") 
-#define ENTITY__FILBUF_SYSTEM_P(e)       ENTITY_NAME_P(e, "__filbuf") 
-#define ENTITY__FILSBUF_SYSTEM_P(e)      ENTITY_NAME_P(e, "__flsbuf") 
-#define ENTITY_SETBUFFER_SYSTEM_P(e)     ENTITY_NAME_P(e, "setbuffer") 
-#define ENTITY_SETLINEBUF_SYSTEM_P(e)    ENTITY_NAME_P(e, "setlinebuf") 
+#define ENTITY_REMOVE_SYSTEM_P(e)        ENTITY_NAME_P(e, "remove")
+#define ENTITY_RENAME_SYSTEM_P(e)        ENTITY_NAME_P(e, "rename")
+#define ENTITY_TMPFILE_SYSTEM_P(e)       ENTITY_NAME_P(e, "tmpfile")
+#define ENTITY_TMPNAM_SYSTEM_P(e)        ENTITY_NAME_P(e, "tmpnam")
+#define ENTITY_FFLUSH_SYSTEM_P(e)        ENTITY_NAME_P(e, "fflush")
+#define ENTITY_FREOPEN_SYSTEM_P(e)       ENTITY_NAME_P(e, "freopen")
+#define ENTITY_SETBUF_SYSTEM_P(e)        ENTITY_NAME_P(e, "setbuf")
+#define ENTITY_SETVBUF_SYSTEM_P(e)       ENTITY_NAME_P(e, "setvbuf")
+#define ENTITY__FILBUF_SYSTEM_P(e)       ENTITY_NAME_P(e, "__filbuf")
+#define ENTITY__FILSBUF_SYSTEM_P(e)      ENTITY_NAME_P(e, "__flsbuf")
+#define ENTITY_SETBUFFER_SYSTEM_P(e)     ENTITY_NAME_P(e, "setbuffer")
+#define ENTITY_SETLINEBUF_SYSTEM_P(e)    ENTITY_NAME_P(e, "setlinebuf")
 #define ENTITY_FDOPEN_SYSTEM_P(e)        ENTITY_NAME_P(e, "fdopen")
 #define ENTITY_CTERMID_SYSTEM_P(e)       ENTITY_NAME_P(e, "ctermid")
 #define ENTITY_FILENO_SYSTEM_P(e)        ENTITY_NAME_P(e, "fileno")
@@ -897,7 +897,7 @@
 /* FI: Why is it declared "system"? Why is it in the middle of string functions? */
 #define ENTITY_FOPEN_SYSTEM_P(e)         ENTITY_NAME_P(e, "fopen")
 
-/* #include <fcntl.h>*/                 
+/* #include <fcntl.h>*/
 
 #define ENTITY_FCNTL_SYSTEM_P(e)         ENTITY_NAME_P(e,"fcntl")
 #define ENTITY_OPEN_SYSTEM_P(e)          ENTITY_NAME_P(e,"open")
@@ -1005,12 +1005,12 @@
 #define make_simple_effect(reference,action,approximation)\
     make_effect(make_cell(is_cell_preference, make_preference(reference)),\
     (action),(approximation), \
-    make_descriptor(is_descriptor_none,UU))  
+    make_descriptor(is_descriptor_none,UU))
 
 #define make_convex_effect(reference,action,approximation,system)\
     make_effect(make_cell(is_cell_preference, make_preference(reference)),\
     (action),(approximation), \
-    make_descriptor(is_descriptor_convex,system))  
+    make_descriptor(is_descriptor_convex,system))
 
 
 #define statement_block_p(stat) \
@@ -1045,7 +1045,7 @@
 #define binary_intrinsic_expression(name, e1, e2)\
  call_to_expression(make_call(entity_intrinsic(name),\
  CONS(EXPRESSION, e1, CONS(EXPRESSION, e2, NIL))))
-  
+
 #define not_expression(e) \
     unary_intrinsic_expression(NOT_OPERATOR_NAME, e)
 #define or_expression(e1, e2) \
@@ -1072,7 +1072,7 @@
 
 /* To specify the way that remove_a_control_from_a_list_and_relink
    acts: */
-enum remove_a_control_from_a_list_and_relink_direction 
+enum remove_a_control_from_a_list_and_relink_direction
 {
    /* Put some strange number to avoid random clash as much as
       possible... */
@@ -1107,9 +1107,9 @@ entity get_ith_##lname##_prime(int i)\
 /* moved here because needed by syntax:-(
  */
 /* Directive names encoding: HPF_PREFIX + one character.
- * This encoding is achieved thru a sed script that transforms directives 
- * into calls that can be parsed by the PIPS F77 parser. It's a hack but 
- * it greatly reduced the number of lines for directive analysis, and 
+ * This encoding is achieved thru a sed script that transforms directives
+ * into calls that can be parsed by the PIPS F77 parser. It's a hack but
+ * it greatly reduced the number of lines for directive analysis, and
  * it allowed quite simply to figure out where the executable directives
  * are in the code.
  * However the syntax allowed in mapping directives is restricted to F77.
@@ -1140,7 +1140,7 @@ entity get_ith_##lname##_prime(int i)\
 #define DYNAMIC_SUFFIX          "Y"
 
 /* suffixes for my own (FCD:-) directives.
- * these directives are used to instrument the code. 
+ * these directives are used to instrument the code.
  * must be used carefully. may be ignore with some properties.
  */
 #define TELL_SUFFIX             "0"
@@ -1202,7 +1202,7 @@ signed_int             = 24
 signed_long_int        = 26
 signed_long_long_int   = 28
 
-mod(i,10) refers to the basic size and div(i,10) refers that 
+mod(i,10) refers to the basic size and div(i,10) refers that
 the variable is unsigned, signed or not */
 
 #define DEFAULT_REAL_TYPE_SIZE (4)
@@ -1269,16 +1269,16 @@ the variable is unsigned, signed or not */
 */
 
 #define CONTROL_MAP( ctl, code, c, list ) \
-    GENERIC_CONTROL_MAP( control_map_get_blocs, ctl, code, c, list ) 
+    GENERIC_CONTROL_MAP( control_map_get_blocs, ctl, code, c, list )
 
 #define BACKWARD_CONTROL_MAP( ctl, code, c, list ) \
-    GENERIC_CONTROL_MAP( backward_control_map_get_blocs, ctl, code, c, list ) 
+    GENERIC_CONTROL_MAP( backward_control_map_get_blocs, ctl, code, c, list )
 
 #define FORWARD_CONTROL_MAP( ctl, code, c, list ) \
-    GENERIC_CONTROL_MAP( forward_control_map_get_blocs, ctl, code, c, list ) 
+    GENERIC_CONTROL_MAP( forward_control_map_get_blocs, ctl, code, c, list )
 
 #define WIDE_FORWARD_CONTROL_MAP( ctl, code, c, list ) \
-    GENERIC_CONTROL_MAP( wide_forward_control_map_get_blocs, ctl, code, c, list ) 
+    GENERIC_CONTROL_MAP( wide_forward_control_map_get_blocs, ctl, code, c, list )
 
 #define GENERIC_CONTROL_MAP( get_controls, ctl, code, c, list ) \
 { \

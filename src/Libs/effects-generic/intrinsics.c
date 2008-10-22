@@ -193,12 +193,12 @@ defined according to the standard ISO/IEC 9899. Amira Mensi */
   {C_CLOSE_FUNCTION_NAME,       "r",       is_action_read, is_approximation_must},
   {C_WRITE_FUNCTION_NAME,       "rrr",     is_action_read, is_approximation_must},
   {C_READ_FUNCTION_NAME,        "rwr",     is_action_read, is_approximation_must},
-  {FCNTL_FUNCTION_NAME,        	"rrr",     is_action_read, is_approximation_must},
-  {FSYNC_FUNCTION_NAME,        	"r",       is_action_read, is_approximation_must},
-  {FDATASYNC_FUNCTION_NAME,    	"r",       is_action_read, is_approximation_must},
-  {IOCTL_FUNCTION_NAME,        	"rr*",     is_action_read, is_approximation_must},
-  {SELECT_FUNCTION_NAME,       	"rrrrr",   is_action_read, is_approximation_must},
-  {PSELECT_FUNCTION_NAME,      	"rrrrrr",  is_action_read, is_approximation_must},
+  {FCNTL_FUNCTION_NAME,         "rrr",     is_action_read, is_approximation_must},
+  {FSYNC_FUNCTION_NAME,         "r",       is_action_read, is_approximation_must},
+  {FDATASYNC_FUNCTION_NAME,     "r",       is_action_read, is_approximation_must},
+  {IOCTL_FUNCTION_NAME,         "rr*",     is_action_read, is_approximation_must},
+  {SELECT_FUNCTION_NAME,        "rrrrr",   is_action_read, is_approximation_must},
+  {PSELECT_FUNCTION_NAME,       "rrrrrr",  is_action_read, is_approximation_must},
 
   /* Fortran extensions for asynchronous IO's */
 
@@ -649,8 +649,17 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
 
   /* C IO system functions in man -S 2 */
 
+  {C_OPEN_FUNCTION_NAME,                           unix_io_effects},
+  {CREAT_FUNCTION_NAME,                            unix_io_effects},
+  {C_CLOSE_FUNCTION_NAME,                          unix_io_effects},
   {C_WRITE_FUNCTION_NAME,                          unix_io_effects},
-  {C_READ_FUNCTION_NAME,                      	   unix_io_effects},
+  {C_READ_FUNCTION_NAME,                           unix_io_effects},
+  {FCNTL_FUNCTION_NAME,                            unix_io_effects},
+  {FSYNC_FUNCTION_NAME,                            unix_io_effects},
+  {FDATASYNC_FUNCTION_NAME,                        unix_io_effects},
+  {IOCTL_FUNCTION_NAME,                            unix_io_effects},
+  {SELECT_FUNCTION_NAME,                           unix_io_effects},
+  {PSELECT_FUNCTION_NAME,                          unix_io_effects},
 
   /*#include <stdlib.h>*/
 
@@ -750,7 +759,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
  * input    : a intrinsic function name, and the list or arguments.
  * output   : the corresponding list of effects.
  * modifies : nothing.
- * comment  :   
+ * comment  :
  */
 list
 generic_proper_effects_of_intrinsic(entity e, list args)
@@ -1084,7 +1093,7 @@ static list io_effects(entity e, list args)
             ref = make_reference(private_io_entity, indices);
             le = gen_nconc(le, generic_proper_effects_of_reference(ref));
             le = gen_nconc(le, generic_proper_effects_of_lhs(ref));
-        }       
+        }
     }
 
     pips_debug(5, "end\n");
@@ -1158,12 +1167,12 @@ static list generic_io_effects(entity e, list args, bool system_p)
     else if (ENTITY_PERROR_P(e))
       unit = int_to_expression(STDERR_FILENO);
     else if (ENTITY_SSCANF_P(e)
-	     || ENTITY_VSNPRINTF_P(e)||ENTITY_VSPRINTF_P(e)||ENTITY_VSSCANF_P(e)) {
+             || ENTITY_VSNPRINTF_P(e)||ENTITY_VSPRINTF_P(e)||ENTITY_VSSCANF_P(e)) {
       // The input is a string(the first argument is a char*)
       file_p = FALSE;;
     }
     else if (ENTITY_SPRINTF_P(e) || ENTITY_SNPRINTF_P(e)
-	     || ENTITY_VSPRINTF_P(e) || ENTITY_VSNPRINTF_P(e)) {
+             || ENTITY_VSPRINTF_P(e) || ENTITY_VSNPRINTF_P(e)) {
       // The output is a string(the first argument is a char*)
       file_p = FALSE;;
     }
@@ -1177,11 +1186,11 @@ static list generic_io_effects(entity e, list args, bool system_p)
       //the fourth argument is a file descriptor
       ;
     else if(ENTITY_FPRINTF_P(e) || ENTITY_VFPRINTF_P(e) || ENTITY_FSCANF_P(e) || ENTITY_VFSCANF_P(e)
-	    || ENTITY_FGETC_P(e) ||ENTITY_GETC_P(e) || ENTITY_FGETPOS_P(e)
-	    || ENTITY_FSEEK_P(e) || ENTITY_FSETPOS_P(e) || ENTITY_FTELL_P(e)
-	    || ENTITY_FSETPOS_P(e) || ENTITY_FTELL_P(e) || ENTITY_C_REWIND_P(e)
-	    || ENTITY_CLEARERR_P(e) || ENTITY_FEOF_P(e) || ENTITY_FERROR_P(e)
-	    || ENTITY_FCLOSE_P(e))
+            || ENTITY_FGETC_P(e) ||ENTITY_GETC_P(e) || ENTITY_FGETPOS_P(e)
+            || ENTITY_FSEEK_P(e) || ENTITY_FSETPOS_P(e) || ENTITY_FTELL_P(e)
+            || ENTITY_FSETPOS_P(e) || ENTITY_FTELL_P(e) || ENTITY_C_REWIND_P(e)
+            || ENTITY_CLEARERR_P(e) || ENTITY_FEOF_P(e) || ENTITY_FERROR_P(e)
+            || ENTITY_FCLOSE_P(e))
       // all the following functions have in common the first argument is a file descriptor.
       ;
     else if(ENTITY_FOPEN_P(e))
@@ -1202,7 +1211,7 @@ static list generic_io_effects(entity e, list args, bool system_p)
        || ENTITY_IOCTL_SYSTEM_P(e) || ENTITY_FDATASYNC_SYSTEM_P(e)
        ) {
       /* The first argument must be an integer expression, which may
-	 be statically evaluable. */
+         be statically evaluable. */
       ;
     }
     else if(ENTITY_C_OPEN_SYSTEM_P(e) || ENTITY_CREAT_SYSTEM_P(e)) {
@@ -1341,7 +1350,7 @@ static list effects_of_ioelem(expression exp, tag act)
         else{
           pips_internal_error("write effect on non reference expression\n");
         }
-        
+
         lr = generic_proper_effects_of_expression(exp);
         lr = gen_nconc(lr, lw);
       }
@@ -1392,7 +1401,7 @@ effects_of_iolist(list exprs, tag act)
               }
             }
         }
-        else {  
+        else {
             pips_debug(6, "is_action_read");
             lep = generic_proper_effects_of_expression(exp);
         }
@@ -1446,7 +1455,7 @@ effects_of_implied_do(expression exp, tag act)
 
     le = generic_proper_effects_of_lhs(ref); /* the loop index is must-written */
     /* Read effects are masked by the first write to the implied-do loop variable */
-        
+
     /* effects of implied-loop bounds and increment */
     le = gen_nconc(le, generic_proper_effects_of_expression(arg2));
 
@@ -1491,7 +1500,7 @@ effects_of_implied_do(expression exp, tag act)
         ifdebug(7) {
             pips_debug(7, "local context : \n%s\n",
                        precondition_to_string(local_context));
-        }       
+        }
     }
     else
         local_context = transformer_undefined;
@@ -1537,7 +1546,7 @@ effects_of_implied_do(expression exp, tag act)
       }, lep);
       gen_free_list(lep);
       lr = gen_nreverse(lr); /* preserve initial order??? */
-      le = gen_nconc(le, lr);   
+      le = gen_nconc(le, lr);
     }, CDR(CDR(args)));
 
 
