@@ -3689,7 +3689,7 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   
   {CONCATENATION_FUNCTION_NAME, 2, character_to_character_type, typing_concat_operator, 0},
 
-  /* IO statement */
+  /* FORTRAN IO statement */
   {WRITE_FUNCTION_NAME, (INT_MAX), default_intrinsic_type, check_read_write, 0},
   {REWIND_FUNCTION_NAME, (INT_MAX), default_intrinsic_type, check_rewind, 0},
   {BACKSPACE_FUNCTION_NAME, (INT_MAX), default_intrinsic_type, check_backspace, 0},
@@ -4230,7 +4230,7 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {PCLOSE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {FSEEKO_FUNCTION_NAME, 3, overloaded_to_integer_type, 0, 0},
   {FTELLO_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {FOPEN_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0}, 
+  {FOPEN64_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0}, 
   {FREOPEN64_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
   {TMPFILE64_FUNCTION_NAME, 1,default_intrinsic_type, 0, 0},
   {FGETPOS64_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
@@ -4260,13 +4260,13 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {MBSTOWCS_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
   {MBTOWC_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
   {QSORT_FUNCTION_NAME, 4, default_intrinsic_type, 0, 0},
-  {RANDOM_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+  {RAND_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {REALLOC_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-  {SRANDOM_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+  {SRAND_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {STRTOD_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
   {STRTOL_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
   {STRTOUL_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
-  {STRTOUL_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+  {SYSTEM_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {WCTOMB_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
   {WCSTOMBS_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
   {EXITHANDLE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
@@ -4341,7 +4341,7 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   
 
   {FCNTL_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
-  {OPEN_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
+  {C_OPEN_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
   {CREAT_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
   {DIRECTIO_FUNCTION_NAME, 2, integer_to_integer_type, 0, 0},
   {OPEN64_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},

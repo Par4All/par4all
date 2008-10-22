@@ -54,7 +54,7 @@ static list read_io_effects(entity e, list args);
 static list effects_of_ioelem(expression exp, tag act);
 static list effects_of_iolist(list exprs, tag act);
 static list effects_of_implied_do(expression exp, tag act);
-static list generic_io_effects(entity e,list args);
+static list generic_io_effects(entity e,list args, bool system_p);
 static list unix_io_effects(entity e,list args);
 static list any_rgs_effects(entity e,list args, bool init_p);
 static list rgs_effects(entity e,list args);
@@ -138,35 +138,36 @@ static IoElementDescriptor IoElementDescriptorTable[] = {
   {"WRITE",     "IOLIST=",      is_action_read,  is_approximation_must},
 
   /* C IO intrinsics */
+
   /* The field IoElementName is used to describe the function's
 pattern: r to say that there's a read effect on the argument, w to say
 that there's a write effect and x to say that there's a read and write
 effect on the argument. The "*" is used to say that the last effect is
-repeted for the last arguments (varargs).  the function's pattern is defined
-according to the standard : ISO/IEC 9899.Amira Mensi */
+repeted for the last arguments (varargs).  the function's pattern is
+defined according to the standard ISO/IEC 9899. Amira Mensi */
 
-  {PRINTF_FUNCTION_NAME,       	"rr*",     is_action_read, is_approximation_must},
-  {FPRINTF_FUNCTION_NAME,      	"xrr*",    is_action_read, is_approximation_must},
-  {SCANF_FUNCTION_NAME,        	"rw*",     is_action_read, is_approximation_must},
-  {FSCANF_FUNCTION_NAME,       	"xrw*",    is_action_read, is_approximation_must},
+  {PRINTF_FUNCTION_NAME,        "rr*",     is_action_read, is_approximation_must},
+  {FPRINTF_FUNCTION_NAME,       "xrr*",    is_action_read, is_approximation_must},
+  {SCANF_FUNCTION_NAME,         "rw*",     is_action_read, is_approximation_must},
+  {FSCANF_FUNCTION_NAME,        "xrw*",    is_action_read, is_approximation_must},
   {PUTS_FUNCTION_NAME,          "r",       is_action_read, is_approximation_must},
-  {GETS_FUNCTION_NAME,         	"w",       is_action_read, is_approximation_must},
-  {FPUTS_FUNCTION_NAME,        	"rw*",     is_action_read, is_approximation_must},
-  {FGETS_FUNCTION_NAME,        	"wrx",     is_action_read, is_approximation_must},
-  {FPUTC_FUNCTION_NAME,        	"rx",      is_action_read, is_approximation_must},
-  {FOPEN_FUNCTION_NAME,        	"rr",      is_action_read, is_approximation_must},
-  {FCLOSE_FUNCTION_NAME,       	"x",       is_action_read, is_approximation_must},
-  {SNPRINTF_FUNCTION_NAME,     	"xrrr",    is_action_read, is_approximation_must},
-  {SPRINTF_FUNCTION_NAME,      	"wr*",     is_action_read, is_approximation_must},
-  {SSCANF_FUNCTION_NAME,       	"rrw*",    is_action_read, is_approximation_must},
-  {VFPRINTF_FUNCTION_NAME,     	"rr",      is_action_read, is_approximation_must},
-  {VFSCANF_FUNCTION_NAME,      	"xrw",     is_action_read, is_approximation_must},
-  {VPRINTF_FUNCTION_NAME,      	"rr",      is_action_read, is_approximation_must},
-  {VSNPRINTF_FUNCTION_NAME,    	"wrrr",    is_action_read, is_approximation_must},
-  {VSPRINTF_FUNCTION_NAME,     	"wrr",     is_action_read, is_approximation_must},
-  {VSSCANF_FUNCTION_NAME,      	"rrw",     is_action_read, is_approximation_must},
-  {VSCANF_FUNCTION_NAME,       	"rr",      is_action_read, is_approximation_must},
-  {FPUTC_FUNCTION_NAME,        	"rx",      is_action_read, is_approximation_must},
+  {GETS_FUNCTION_NAME,          "w",       is_action_read, is_approximation_must},
+  {FPUTS_FUNCTION_NAME,         "rw*",     is_action_read, is_approximation_must},
+  {FGETS_FUNCTION_NAME,         "wrx",     is_action_read, is_approximation_must},
+  {FPUTC_FUNCTION_NAME,         "rx",      is_action_read, is_approximation_must},
+  {FOPEN_FUNCTION_NAME,         "rr",      is_action_read, is_approximation_must},
+  {FCLOSE_FUNCTION_NAME,        "x",       is_action_read, is_approximation_must},
+  {SNPRINTF_FUNCTION_NAME,      "xrrr",    is_action_read, is_approximation_must},
+  {SPRINTF_FUNCTION_NAME,       "wr*",     is_action_read, is_approximation_must},
+  {SSCANF_FUNCTION_NAME,        "rrw*",    is_action_read, is_approximation_must},
+  {VFPRINTF_FUNCTION_NAME,      "rr",      is_action_read, is_approximation_must},
+  {VFSCANF_FUNCTION_NAME,       "xrw",     is_action_read, is_approximation_must},
+  {VPRINTF_FUNCTION_NAME,       "rr",      is_action_read, is_approximation_must},
+  {VSNPRINTF_FUNCTION_NAME,     "wrrr",    is_action_read, is_approximation_must},
+  {VSPRINTF_FUNCTION_NAME,      "wrr",     is_action_read, is_approximation_must},
+  {VSSCANF_FUNCTION_NAME,       "rrw",     is_action_read, is_approximation_must},
+  {VSCANF_FUNCTION_NAME,        "rr",      is_action_read, is_approximation_must},
+  {FPUTC_FUNCTION_NAME,         "rx",      is_action_read, is_approximation_must},
   {GETC_FUNCTION_NAME,          "x",       is_action_read, is_approximation_must},
   {FGETC_FUNCTION_NAME,         "x",       is_action_read, is_approximation_must},
   {GETCHAR_FUNCTION_NAME,       "r",       is_action_read, is_approximation_must},
@@ -184,8 +185,22 @@ according to the standard : ISO/IEC 9899.Amira Mensi */
   {FEOF_FUNCTION_NAME,          "r",       is_action_read, is_approximation_must},
   {FERROR_FUNCTION_NAME,        "x",       is_action_read, is_approximation_must},
   {PERROR_FUNCTION_NAME,        "r",       is_action_read, is_approximation_must},
-  {WRITE_SYSTEM_FUNCTION_NAME,  "rrr",     is_action_read, is_approximation_must},
-  {READ_SYSTEM_FUNCTION_NAME,   "rrr",     is_action_read, is_approximation_must},
+
+  /* UNIX IO system calls */
+
+  {C_OPEN_FUNCTION_NAME,        "rrr",     is_action_read, is_approximation_must},
+  {CREAT_FUNCTION_NAME,         "rr",      is_action_read, is_approximation_must},
+  {C_CLOSE_FUNCTION_NAME,       "r",       is_action_read, is_approximation_must},
+  {C_WRITE_FUNCTION_NAME,       "rrr",     is_action_read, is_approximation_must},
+  {C_READ_FUNCTION_NAME,        "rwr",     is_action_read, is_approximation_must},
+  {FCNTL_FUNCTION_NAME,        	"rrr",     is_action_read, is_approximation_must},
+  {FSYNC_FUNCTION_NAME,        	"r",       is_action_read, is_approximation_must},
+  {FDATASYNC_FUNCTION_NAME,    	"r",       is_action_read, is_approximation_must},
+  {IOCTL_FUNCTION_NAME,        	"rr*",     is_action_read, is_approximation_must},
+  {SELECT_FUNCTION_NAME,       	"rrrrr",   is_action_read, is_approximation_must},
+  {PSELECT_FUNCTION_NAME,      	"rrrrrr",  is_action_read, is_approximation_must},
+
+  /* Fortran extensions for asynchronous IO's */
 
   {BUFFERIN_FUNCTION_NAME,      "xrwr",    is_action_read, is_approximation_must},
   {BUFFEROUT_FUNCTION_NAME,     "xrrr",    is_action_read, is_approximation_must},
@@ -336,6 +351,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
 
   {ASSIGN_OPERATOR_NAME,                   affect_effects},
 
+  /* Fortran IO related intrinsic */
   {WRITE_FUNCTION_NAME,                    io_effects},
   {REWIND_FUNCTION_NAME,                   io_effects},
   {BACKSPACE_FUNCTION_NAME,                io_effects},
@@ -354,12 +370,12 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   /* These operators are used within the OPTIMIZE transformation in
      order to manipulate operators such as n-ary add and multiply or
      multiply-add operators ( JZ - sept 98) */
-  {EOLE_SUM_OPERATOR_NAME,     		   no_write_effects },
-  {EOLE_PROD_OPERATOR_NAME,    		   no_write_effects },
-  {EOLE_FMA_OPERATOR_NAME,     		   no_write_effects },
+  {EOLE_SUM_OPERATOR_NAME,                 no_write_effects },
+  {EOLE_PROD_OPERATOR_NAME,                no_write_effects },
+  {EOLE_FMA_OPERATOR_NAME,                 no_write_effects },
 
-  {IMA_OPERATOR_NAME,          		   no_write_effects },
-  {IMS_OPERATOR_NAME,          		   no_write_effects },
+  {IMA_OPERATOR_NAME,                      no_write_effects },
+  {IMS_OPERATOR_NAME,                      no_write_effects },
 
   /* Here are C intrinsics.*/
 
@@ -439,20 +455,20 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
 
   {"__flt_rounds",                         no_write_effects},
 
-  {"_sysconf",                    	   no_write_effects},
-  {"setlocale",                   	   no_write_effects},
-  {"localeconv",                  	   no_write_effects},
-  {"dcgettext",                   	   no_write_effects},
-  {"dgettext",                    	   no_write_effects},
-  {"gettext",                     	   no_write_effects},
-  {"textdomain",                  	   no_write_effects},
-  {"bindtextdomain",              	   no_write_effects},
-  {"wdinit",                      	   no_write_effects},
-  {"wdchkind",                    	   no_write_effects},
-  {"wdbindf",                     	   no_write_effects},
-  {"wddelim",                     	   no_write_effects},
-  {"mcfiller",                    	   no_write_effects},
-  {"mcwrap",                      	   no_write_effects},
+  {"_sysconf",                             no_write_effects},
+  {"setlocale",                            no_write_effects},
+  {"localeconv",                           no_write_effects},
+  {"dcgettext",                            no_write_effects},
+  {"dgettext",                             no_write_effects},
+  {"gettext",                              no_write_effects},
+  {"textdomain",                           no_write_effects},
+  {"bindtextdomain",                       no_write_effects},
+  {"wdinit",                               no_write_effects},
+  {"wdchkind",                             no_write_effects},
+  {"wdbindf",                              no_write_effects},
+  {"wddelim",                              no_write_effects},
+  {"mcfiller",                             no_write_effects},
+  {"mcwrap",                               no_write_effects},
 
   /* #include <math.h>*/
 
@@ -528,125 +544,134 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {QECONVERT_OPERATOR_NAME,                no_write_effects},
   {QFCONVERT_OPERATOR_NAME,                no_write_effects},
   {QGCONVERT_OPERATOR_NAME,                no_write_effects},
-  {ECVT_FUNCTION_NAME,                    		   no_write_effects},
-  {FCVT_FUNCTION_NAME,                    		   no_write_effects},
-  {GCVT_FUNCTION_NAME,                    		   no_write_effects},
-  {ATOF_FUNCTION_NAME,                    		   no_write_effects},
-  {STRTOD_FUNCTION_NAME,                  		   no_write_effects},
-  {RANDOM_FUNCTION_NAME,       		   rgs_effects},
-  {SRANDOM_FUNCTION_NAME,    		   rgsi_effects},
-  {RAND_FUNCTION_NAME,                     rgs_effects },
-  {SRAND_FUNCTION_NAME,                    rgs_effects },
-  {DRAND48_FUNCTION_NAME,                  rgs_effects  },
-  {ERAND48_FUNCTION_NAME,                  rgs_effects  },
-  {JRAND48_FUNCTION_NAME,                  rgs_effects  },
-  {LRAND48_FUNCTION_NAME,                  rgs_effects  },
-  {MRAND48_FUNCTION_NAME,                  rgs_effects  },
-  {NRAND48_FUNCTION_NAME,                  rgs_effects  },
-  {SRAND48_FUNCTION_NAME,                  rgs_effects   },
+  {ECVT_FUNCTION_NAME,                     no_write_effects},
+  {FCVT_FUNCTION_NAME,                     no_write_effects},
+  {GCVT_FUNCTION_NAME,                     no_write_effects},
+  {ATOF_FUNCTION_NAME,                     no_write_effects},
+  {STRTOD_FUNCTION_NAME,                   no_write_effects},
+  /* Random number generators in stdlib.h */
+  {RANDOM_FUNCTION_NAME,                   rgs_effects},
+  {SRANDOM_FUNCTION_NAME,                  rgsi_effects},
+  {RAND_FUNCTION_NAME,                     rgs_effects},
+  {SRAND_FUNCTION_NAME,                    rgsi_effects},
+  {DRAND48_FUNCTION_NAME,                  rgs_effects},
+  {ERAND48_FUNCTION_NAME,                  rgs_effects},
+  {JRAND48_FUNCTION_NAME,                  rgs_effects},
+  {LRAND48_FUNCTION_NAME,                  rgs_effects},
+  {MRAND48_FUNCTION_NAME,                  rgs_effects},
+  {NRAND48_FUNCTION_NAME,                  rgs_effects},
+  {SRAND48_FUNCTION_NAME,                  rgsi_effects},
+  {SEED48_FUNCTION_NAME,                   rgsi_effects},
+  {LCONG48_FUNCTION_NAME,                  rgsi_effects},
+
   /*#include <setjmp.h>*/
 
-  {"setjmp",                  		   no_write_effects},
-  {"__setjmp",                		   no_write_effects},
-  {"longjmp",                 		   no_write_effects},
-  {"__longjmp",               		   no_write_effects},
-  {"sigsetjmp",               		   no_write_effects},
-  {"siglongjmp",              		   no_write_effects},
+  {"setjmp",                               no_write_effects},
+  {"__setjmp",                             no_write_effects},
+  {"longjmp",                              no_write_effects},
+  {"__longjmp",                            no_write_effects},
+  {"sigsetjmp",                            no_write_effects},
+  {"siglongjmp",                           no_write_effects},
 
   /*#include <stdio.h>*/
   // IO functions
-  {FCLOSE_FUNCTION_NAME,                   generic_io_effects},
-  {FOPEN_FUNCTION_NAME,                    generic_io_effects},
-  {FPRINTF_FUNCTION_NAME,                  generic_io_effects},
-  {FSCANF_FUNCTION_NAME,                   generic_io_effects},
-  {PRINTF_FUNCTION_NAME,                   generic_io_effects},
-  {SCANF_FUNCTION_NAME,                    generic_io_effects},
-  {SPRINTF_FUNCTION_NAME,                  generic_io_effects},
-  {SSCANF_FUNCTION_NAME,                   generic_io_effects},
-  {VFPRINTF_FUNCTION_NAME,                 generic_io_effects},
-  {VPRINTF_FUNCTION_NAME,                  generic_io_effects},
-  {VFSCANF_FUNCTION_NAME,                  generic_io_effects},
-  {VSPRINTF_FUNCTION_NAME,                 generic_io_effects},
-  {VSNPRINTF_FUNCTION_NAME,                generic_io_effects},
-  {SNPRINTF_FUNCTION_NAME,                 generic_io_effects},
-  {VSCANF_FUNCTION_NAME,                   generic_io_effects},
-  {FGETC_FUNCTION_NAME,                    generic_io_effects},
-  {FGETS_FUNCTION_NAME,                    generic_io_effects},
-  {FPUTC_FUNCTION_NAME,                    generic_io_effects},
-  {FPUTS_FUNCTION_NAME,                    generic_io_effects},
-  {GETC_FUNCTION_NAME,                     generic_io_effects},
-  {PUTC_FUNCTION_NAME,                     generic_io_effects},
-  {GETCHAR_FUNCTION_NAME,                  generic_io_effects},
-  {PUTCHAR_FUNCTION_NAME,                  generic_io_effects},
-  {GETS_FUNCTION_NAME,                     generic_io_effects},
-  {PUTS_FUNCTION_NAME,                     generic_io_effects},
-  {UNGETC_FUNCTION_NAME,                   generic_io_effects},
-  {FREAD_FUNCTION_NAME,                    generic_io_effects},
-  {FWRITE_FUNCTION_NAME,                   generic_io_effects},
-  {FGETPOS_FUNCTION_NAME,                  generic_io_effects},
-  {FSEEK_FUNCTION_NAME,                    generic_io_effects},
-  {FSETPOS_FUNCTION_NAME,                  generic_io_effects},
-  {FTELL_FUNCTION_NAME,                    generic_io_effects},
-  {C_REWIND_FUNCTION_NAME,                 generic_io_effects},
-  {CLEARERR_FUNCTION_NAME,                 generic_io_effects},
-  {FEOF_FUNCTION_NAME,                     generic_io_effects},
-  {FERROR_FUNCTION_NAME,                   generic_io_effects},
-  {PERROR_FUNCTION_NAME,                   generic_io_effects},
+  {FCLOSE_FUNCTION_NAME,                   c_io_effects},
+  {FOPEN_FUNCTION_NAME,                    c_io_effects},
+  {FPRINTF_FUNCTION_NAME,                  c_io_effects},
+  {FSCANF_FUNCTION_NAME,                   c_io_effects},
+  {PRINTF_FUNCTION_NAME,                   c_io_effects},
+  {SCANF_FUNCTION_NAME,                    c_io_effects},
+  {SPRINTF_FUNCTION_NAME,                  c_io_effects},
+  {SSCANF_FUNCTION_NAME,                   c_io_effects},
+  {VFPRINTF_FUNCTION_NAME,                 c_io_effects},
+  {VPRINTF_FUNCTION_NAME,                  c_io_effects},
+  {VFSCANF_FUNCTION_NAME,                  c_io_effects},
+  {VSPRINTF_FUNCTION_NAME,                 c_io_effects},
+  {VSNPRINTF_FUNCTION_NAME,                c_io_effects},
+  {SNPRINTF_FUNCTION_NAME,                 c_io_effects},
+  {VSCANF_FUNCTION_NAME,                   c_io_effects},
+  {FGETC_FUNCTION_NAME,                    c_io_effects},
+  {FGETS_FUNCTION_NAME,                    c_io_effects},
+  {FPUTC_FUNCTION_NAME,                    c_io_effects},
+  {FPUTS_FUNCTION_NAME,                    c_io_effects},
+  {GETC_FUNCTION_NAME,                     c_io_effects},
+  {PUTC_FUNCTION_NAME,                     c_io_effects},
+  {GETCHAR_FUNCTION_NAME,                  c_io_effects},
+  {PUTCHAR_FUNCTION_NAME,                  c_io_effects},
+  {GETS_FUNCTION_NAME,                     c_io_effects},
+  {PUTS_FUNCTION_NAME,                     c_io_effects},
+  {UNGETC_FUNCTION_NAME,                   c_io_effects},
+  {FREAD_FUNCTION_NAME,                    c_io_effects},
+  {FWRITE_FUNCTION_NAME,                   c_io_effects},
+  {FGETPOS_FUNCTION_NAME,                  c_io_effects},
+  {FSEEK_FUNCTION_NAME,                    c_io_effects},
+  {FSETPOS_FUNCTION_NAME,                  c_io_effects},
+  {FTELL_FUNCTION_NAME,                    c_io_effects},
+  {C_REWIND_FUNCTION_NAME,                 c_io_effects},
+  {CLEARERR_FUNCTION_NAME,                 c_io_effects},
+  {FEOF_FUNCTION_NAME,                     c_io_effects},
+  {FERROR_FUNCTION_NAME,                   c_io_effects},
+  {PERROR_FUNCTION_NAME,                   c_io_effects},
 
-  {REMOVE_FUNCTION_NAME,                    	   no_write_effects},
-  {RENAME_FUNCTION_NAME,                    	   no_write_effects},
-  {TMPFILE_FUNCTION_NAME,                   	   no_write_effects},
-  {TMPNAM_FUNCTION_NAME,                    	   no_write_effects},
-  {FFLUSH_FUNCTION_NAME,                    	   no_write_effects},
-  {FREOPEN_FUNCTION_NAME,                   	   no_write_effects},
-  {SETBUF_FUNCTION_NAME,                    	   no_write_effects},
-  {SETVBUF_FUNCTION_NAME ,                   	   no_write_effects},
+  {REMOVE_FUNCTION_NAME,                           no_write_effects},
+  {RENAME_FUNCTION_NAME,                           no_write_effects},
+  {TMPFILE_FUNCTION_NAME,                          no_write_effects},
+  {TMPNAM_FUNCTION_NAME,                           no_write_effects},
+  {FFLUSH_FUNCTION_NAME,                           no_write_effects},
+  {FREOPEN_FUNCTION_NAME,                          no_write_effects},
+  {SETBUF_FUNCTION_NAME,                           no_write_effects},
+  {SETVBUF_FUNCTION_NAME ,                         no_write_effects},
 
-  {__FILBUF_FUNCTION_NAME,                  	   no_write_effects},
-  {__FILSBUF_FUNCTION_NAME,                  	   no_write_effects},
-  {SETBUFFER_FUNCTION_NAME,                 	   no_write_effects},
-  {SETLINEBUF_FUNCTION_NAME,                	   no_write_effects},
-  {FDOPEN_FUNCTION_NAME,                    	   no_write_effects},
-  {CTERMID_FUNCTION_NAME,                   	   no_write_effects},
-  {FILENO_FUNCTION_NAME,                    	   no_write_effects},
-  {POPEN_FUNCTION_NAME,                     	   no_write_effects},
-  {CUSERID_FUNCTION_NAME,                   	   no_write_effects},
-  {TEMPNAM_FUNCTION_NAME,                   	   no_write_effects},
-  {GETOPT_FUNCTION_NAME,                    	   no_write_effects},
-  {GETSUBOPT_FUNCTION_NAME,                 	   no_write_effects},
-  {GETW_FUNCTION_NAME,                      	   no_write_effects},
-  {PUTW_FUNCTION_NAME,                      	   no_write_effects},
-  {PCLOSE_FUNCTION_NAME,                    	   no_write_effects},
-  {FSEEKO_FUNCTION_NAME,                    	   no_write_effects},
-  {FTELLO_FUNCTION_NAME,                    	   no_write_effects},
-  {FOPEN64_FUNCTION_NAME,                   	   no_write_effects},
-  {FREOPEN64_FUNCTION_NAME,                 	   no_write_effects},
-  {TMPFILE64_FUNCTION_NAME,                 	   no_write_effects},
-  {FGETPOS64_FUNCTION_NAME,                 	   no_write_effects},
-  {FSETPOS64_FUNCTION_NAME,                 	   no_write_effects},
-  {FSEEKO64_FUNCTION_NAME,                  	   no_write_effects},
-  {FTELLO64_FUNCTION_NAME,                  	   no_write_effects},
-  // read and write system's functions.Amira Mensi
-  {WRITE_SYSTEM_FUNCTION_NAME,             generic_io_effects},
-  {READ_SYSTEM_FUNCTION_NAME,              generic_io_effects},
-  //{"read", generic_io_effects},
+  {__FILBUF_FUNCTION_NAME,                         no_write_effects},
+  {__FILSBUF_FUNCTION_NAME,                        no_write_effects},
+  {SETBUFFER_FUNCTION_NAME,                        no_write_effects},
+  {SETLINEBUF_FUNCTION_NAME,                       no_write_effects},
+  {FDOPEN_FUNCTION_NAME,                           no_write_effects},
+  {CTERMID_FUNCTION_NAME,                          no_write_effects},
+  {FILENO_FUNCTION_NAME,                           no_write_effects},
+  {POPEN_FUNCTION_NAME,                            no_write_effects},
+  {CUSERID_FUNCTION_NAME,                          no_write_effects},
+  {TEMPNAM_FUNCTION_NAME,                          no_write_effects},
+  {GETOPT_FUNCTION_NAME,                           no_write_effects},
+  {GETSUBOPT_FUNCTION_NAME,                        no_write_effects},
+  {GETW_FUNCTION_NAME,                             no_write_effects},
+  {PUTW_FUNCTION_NAME,                             no_write_effects},
+  {PCLOSE_FUNCTION_NAME,                           no_write_effects},
+  {FSEEKO_FUNCTION_NAME,                           no_write_effects},
+  {FTELLO_FUNCTION_NAME,                           no_write_effects},
+  {FOPEN64_FUNCTION_NAME,                          no_write_effects},
+  {FREOPEN64_FUNCTION_NAME,                        no_write_effects},
+  {TMPFILE64_FUNCTION_NAME,                        no_write_effects},
+  {FGETPOS64_FUNCTION_NAME,                        no_write_effects},
+  {FSETPOS64_FUNCTION_NAME,                        no_write_effects},
+  {FSEEKO64_FUNCTION_NAME,                         no_write_effects},
+  {FTELLO64_FUNCTION_NAME,                         no_write_effects},
+
+  /* C IO system functions in man -S 2 */
+
+  {C_WRITE_FUNCTION_NAME,                          unix_io_effects},
+  {C_READ_FUNCTION_NAME,                      	   unix_io_effects},
 
   /*#include <stdlib.h>*/
-  {ABORT_FUNCTION_NAME,                 	    	   no_write_effects},
-  {ABS_FUNCTION_NAME,                 	    	   no_write_effects},
-  {ATEXIT_FUNCTION_NAME,                 	    	   no_write_effects},
-  {ATOF_FUNCTION_NAME,                 	    	   no_write_effects},
-  {ATOI_FUNCTION_NAME,                 	    	   no_write_effects},
-  {ATOL_FUNCTION_NAME,                 	    	   no_write_effects},
-  {BSEARCH_FUNCTION_NAME,                 	    	   no_write_effects},
-  {CALLOC_FUNCTION_NAME,                 	    	   no_write_effects},
-  {DIV_FUNCTION_NAME,                 	    	   no_write_effects},
-  {EXIT_FUNCTION_NAME,                 	    	   no_write_effects},
-  {FREE_FUNCTION_NAME,                 	    	   no_write_effects},
+
+  {ABORT_FUNCTION_NAME,                            no_write_effects},
+  {ABS_FUNCTION_NAME,                              no_write_effects},
+  {ATEXIT_FUNCTION_NAME,                           no_write_effects},
+  {ATOF_FUNCTION_NAME,                             no_write_effects},
+  {ATOI_FUNCTION_NAME,                             no_write_effects},
+  {ATOL_FUNCTION_NAME,                             no_write_effects},
+  {BSEARCH_FUNCTION_NAME,                          no_write_effects},
+  {CALLOC_FUNCTION_NAME,                           no_write_effects},
+  {DIV_FUNCTION_NAME,                              no_write_effects},
+  {EXIT_FUNCTION_NAME,                             no_write_effects},
+  {FREE_FUNCTION_NAME,                             no_write_effects},
+
   /*  {char *getenv(const char *, 0, 0},
       {long int labs(long, 0, 0},
       {ldiv_t ldiv(long, long, 0, 0},*/
+
   {"malloc", no_write_effects},
+
   /* {int mblen(const char *, size_t, 0, 0},
      {size_t mbstowcs(wchar_t *, const char *, size_t, 0, 0},
      {int mbtowc(wchar_t *, const char *, size_t, 0, 0},
@@ -674,8 +699,8 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
      {int putenv(char *, 0, 0},
      {void setkey(const char *, 0, 0},
      {void swab(const char *, char *, ssize_t, 0, 0},
-     {int	mkstemp(char *, 0, 0},
-     {int	mkstemp64(char *, 0, 0},
+     {int       mkstemp(char *, 0, 0},
+     {int       mkstemp64(char *, 0, 0},
      {long a64l(const char *, 0, 0},
      {char *ecvt(double, int, int *, int *, 0, 0},
      {char *fcvt(double, int, int *, int *, 0, 0},
@@ -725,7 +750,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
  * input    : a intrinsic function name, and the list or arguments.
  * output   : the corresponding list of effects.
  * modifies : nothing.
- * comment  :	
+ * comment  :   
  */
 list
 generic_proper_effects_of_intrinsic(entity e, list args)
@@ -738,10 +763,10 @@ generic_proper_effects_of_intrinsic(entity e, list args)
 
     while (pid->name != NULL) {
         if (strcmp(pid->name, s) == 0) {
-	        lr = (*(pid->effects_function))(e, args);
-		pips_debug(3, "end\n");
+                lr = (*(pid->effects_function))(e, args);
+                pips_debug(3, "end\n");
                 return(lr);
-	    }
+            }
 
         pid += 1;
     }
@@ -892,7 +917,7 @@ SearchIoElement(char *s, char *i)
    IoElementDescriptor *p = IoElementDescriptorTable;
 
       while (p->StmtName != NULL) {
-	if (strcmp(p->StmtName, s) == 0 && strcmp(p->IoElementName, i) == 0)
+        if (strcmp(p->StmtName, s) == 0 && strcmp(p->IoElementName, i) == 0)
                 return(p);
         p += 1;
     }
@@ -910,7 +935,7 @@ SearchCIoElement(char *s)
    IoElementDescriptor *p = IoElementDescriptorTable;
 
       while (p->StmtName != NULL) {
-	if (strcmp(p->StmtName, s) == 0)
+        if (strcmp(p->StmtName, s) == 0)
                 return(p);
         p += 1;
     }
@@ -934,8 +959,8 @@ some_io_effects(entity e __attribute__ ((__unused__)), list args __attribute__ (
     list indices = NIL;
 
     indices = CONS(EXPRESSION,
-		   int_to_expression(STDERR_LUN),
-		   NIL);
+                   int_to_expression(STDERR_LUN),
+                   NIL);
 
     private_io_entity = global_name_to_entity
       (IO_EFFECTS_PACKAGE_NAME,
@@ -999,67 +1024,67 @@ static list io_effects(entity e, list args)
     pips_debug(5, "begin\n");
 
     for (pc = args; pc != NIL; pc = CDR(pc)) {
-	IoElementDescriptor *p;
-	entity ci;
+        IoElementDescriptor *p;
+        entity ci;
         syntax s = expression_syntax(EXPRESSION(CAR(pc)));
 
         pips_assert("syntax is a call", syntax_call_p(s));
 
-	ci = call_function(syntax_call(s));
-	p = SearchIoElement(entity_local_name(e), entity_local_name(ci));
+        ci = call_function(syntax_call(s));
+        p = SearchIoElement(entity_local_name(e), entity_local_name(ci));
 
-	pc = CDR(pc);
+        pc = CDR(pc);
 
-	if (strcmp(p->IoElementName, "IOLIST=") == 0) {
-	    lep = effects_of_iolist(pc, p->ReadOrWrite);
-	}
-	else {
-	    lep = effects_of_ioelem(EXPRESSION(CAR(pc)),
-				    p->ReadOrWrite);
-	}
+        if (strcmp(p->IoElementName, "IOLIST=") == 0) {
+            lep = effects_of_iolist(pc, p->ReadOrWrite);
+        }
+        else {
+            lep = effects_of_ioelem(EXPRESSION(CAR(pc)),
+                                    p->ReadOrWrite);
+        }
 
-	if (p->MayOrMust == is_approximation_may)
-	    effects_to_may_effects(lep);
+        if (p->MayOrMust == is_approximation_may)
+            effects_to_may_effects(lep);
 
-	le = gen_nconc(le, lep);
+        le = gen_nconc(le, lep);
 
-	/* effects effects on logical units - taken from effects/io.c */
-	if ((get_bool_property ("PRETTYPRINT_IO_EFFECTS")) &&
-	    (pc != NIL) &&
-	    (strcmp(p->IoElementName, "UNIT=") == 0))
-	{
-	    /* We simulate actions on files by read/write actions
-	       to a static integer array
-	       GO:
-	       It is necessary to do a read and and write action to
-	       the array, because it updates the file-pointer so
-	       it reads it and then writes it ...*/
-	    entity private_io_entity;
-	    reference ref;
-	    list indices = NIL;
-	    expression unit = EXPRESSION(CAR(pc));
+        /* effects effects on logical units - taken from effects/io.c */
+        if ((get_bool_property ("PRETTYPRINT_IO_EFFECTS")) &&
+            (pc != NIL) &&
+            (strcmp(p->IoElementName, "UNIT=") == 0))
+        {
+            /* We simulate actions on files by read/write actions
+               to a static integer array
+               GO:
+               It is necessary to do a read and and write action to
+               the array, because it updates the file-pointer so
+               it reads it and then writes it ...*/
+            entity private_io_entity;
+            reference ref;
+            list indices = NIL;
+            expression unit = EXPRESSION(CAR(pc));
 
-	    if(expression_list_directed_p(unit)) {
-		if(same_string_p(entity_local_name(e), READ_FUNCTION_NAME))
-		    unit = int_to_expression(STDIN_LUN);
-		else if(same_string_p(entity_local_name(e), WRITE_FUNCTION_NAME))
-		    unit = int_to_expression(STDOUT_LUN);
-		else
-		    pips_error("io_effects", "Which logical unit?\n");
-	    }
+            if(expression_list_directed_p(unit)) {
+                if(same_string_p(entity_local_name(e), READ_FUNCTION_NAME))
+                    unit = int_to_expression(STDIN_LUN);
+                else if(same_string_p(entity_local_name(e), WRITE_FUNCTION_NAME))
+                    unit = int_to_expression(STDOUT_LUN);
+                else
+                    pips_error("io_effects", "Which logical unit?\n");
+            }
 
-	    indices = gen_nconc(indices, CONS(EXPRESSION, unit, NIL));
+            indices = gen_nconc(indices, CONS(EXPRESSION, unit, NIL));
 
-	    private_io_entity = global_name_to_entity
-		(IO_EFFECTS_PACKAGE_NAME,
-		 IO_EFFECTS_ARRAY_NAME);
+            private_io_entity = global_name_to_entity
+                (IO_EFFECTS_PACKAGE_NAME,
+                 IO_EFFECTS_ARRAY_NAME);
 
-	    pips_assert("private_io_entity is defined", private_io_entity != entity_undefined);
+            pips_assert("private_io_entity is defined", private_io_entity != entity_undefined);
 
-	    ref = make_reference(private_io_entity, indices);
-	    le = gen_nconc(le, generic_proper_effects_of_reference(ref));
-	    le = gen_nconc(le, generic_proper_effects_of_lhs(ref));
-	}	
+            ref = make_reference(private_io_entity, indices);
+            le = gen_nconc(le, generic_proper_effects_of_reference(ref));
+            le = gen_nconc(le, generic_proper_effects_of_lhs(ref));
+        }       
     }
 
     pips_debug(5, "end\n");
@@ -1067,92 +1092,15 @@ static list io_effects(entity e, list args)
     return(le);
 }
 
-/*generic_io_effects to distinguish between the system's function and the C IO function. Amira Mensi*/
-static
-list
-generic_io_effects(entity e, list args)
+/*generic_io_effects to encompass the system functions and the C libray IO functions. Amira Mensi*/
+
+static list generic_io_effects(entity e, list args, bool system_p)
 {
-  if(ENTITY_WRITE_SYSTEM_P(e)||ENTITY_READ_SYSTEM_P(e))
-	   return (  unix_io_effects( e,  args));
-	     else
-	   return ( c_io_effects( e,  args));
-
-}
-
-/* unix_io_effects to manage the read and write system's functions */
-static
-list
-unix_io_effects(entity e, list args)
-{
-  list le = NIL, lep;
-  entity private_io_entity;
-  reference ref;
-  list indices = NIL;
-  IoElementDescriptor *p;
-  int i=0;
-
-  expression exp __attribute__ ((__unused__))=EXPRESSION(CAR(args));
-  expression unit = expression_undefined;
-  bool implicit_io_stream_p = TRUE;
-
-
-  pips_debug(5, "begin\n");
-  p = SearchCIoElement(entity_local_name(e));
-  MAP(EXPRESSION,exp,{	
-    lep = effects_of_ioelem(exp,
-			    p->IoElementName[i]);
-    i=i+1;
-    if (p->MayOrMust == is_approximation_may)
-      effects_to_may_effects(lep);
-
-    le = gen_nconc(le, lep);
-    ifdebug(8) print_effects(lep);
-  },
-      implicit_io_stream_p? CDR(args) : CDR(CDR(args)));
-
-
-	
-  /* We simulate actions on files by read/write actions
-     to a static integer array
-     GO:
-     It is necessary to do a read and and write action to
-     the array, because it updates the file-pointer so
-     it reads it and then writes it ...*/
-	
-
-  ifdebug(8) print_expression(unit);
-
-  if(implicit_io_stream_p){
-    if(ENTITY_WRITE_SYSTEM_P(e))
-      unit = int_to_expression( INT(CAR(args)));
-    else if (ENTITY_READ_SYSTEM_P(e))
-      unit = int_to_expression(INT(CAR(args)));
-  }
-  else
-    pips_internal_error("Which io command? \%s\n", entity_name(e));
-
-  indices = CONS(EXPRESSION, unit, NIL);
-
-  private_io_entity = global_name_to_entity
-    (IO_EFFECTS_PACKAGE_NAME,
-     IO_EFFECTS_ARRAY_NAME);
-
-  pips_assert("unix_io_effects", private_io_entity != entity_undefined);
-
-  ref = make_reference(private_io_entity, indices);
-  ifdebug(8) print_reference(ref);
-  le = gen_nconc(le, generic_proper_effects_of_reference(ref));
-  le = gen_nconc(le, generic_proper_effects_of_lhs(ref));
-
-
-  pips_debug(5, "end\n");
-
-  return(le);
-}
-
-/* c_io_effects to handle the effects of functions of the "stdio.h" library. Amira Mensi*/
-static list c_io_effects(entity e, list args)
-{
+  /*
+    return (  unix_io_effects( e,  args));
+    else
+    return ( c_io_effects( e,  args));
+  */
   list le = NIL, lep;
   entity private_io_entity;
   reference ref;
@@ -1163,7 +1111,6 @@ static list c_io_effects(entity e, list args)
   bool file_p = TRUE; /* it really is an IO, not a string operation */
 
   expression unit = expression_undefined;
-  bool implicit_io_stream_p = TRUE;
 
   pips_debug(5, "begin\n");
 
@@ -1171,13 +1118,14 @@ static list c_io_effects(entity e, list args)
   lenght=strlen(p->IoElementName);
 
   MAP(EXPRESSION,exp,{
-    //if we have * as last argument, we repeat the effect of the penultimate argument for the rest of the arguments
+    //if we have * as last argument, we repeat the effect of the
+    //penultimate argument for the rest of the arguments
+
     if(p->IoElementName[lenght-1]=='*' && i==lenght-1)
-      lep = effects_of_ioelem(exp,
-			      p->IoElementName[lenght-2]);
+      lep = effects_of_ioelem(exp, p->IoElementName[lenght-2]);
     else
-      lep = effects_of_ioelem(exp,
-			      p->IoElementName[i]);
+      lep = effects_of_ioelem(exp, p->IoElementName[i]);
+
     i=i+1;
 
     if (p->MayOrMust == is_approximation_may)
@@ -1185,60 +1133,89 @@ static list c_io_effects(entity e, list args)
 
     le = gen_nconc(le, lep);
 
-    ifdebug(8) print_effects(lep);
+    ifdebug(8) {
+      extern void print_effects(list);
+
+      print_effects(lep);
+    }
   }, args);
 
   /* We simulate actions on files by read/write actions
-     to a static integer array
+     to a special static integer array.
      GO:
      It is necessary to do a read and and write action to
      the array, because it updates the file-pointer so
      it reads it and then writes it ...*/
 
-  if(ENTITY_PRINTF_P(e) || ENTITY_GETS_P(e) || ENTITY_PUTS_P(e)|| ENTITY_VPRINTF_P(e))
-    // The output is written into stdout
-    unit = int_to_expression(STDOUT_FILENO);
-  else if (ENTITY_SCANF_P(e) || ENTITY_GETS_P(e) || ENTITY_VSCANF_P(e) || ENTITY_GETCHAR_P(e))
-    //The input is obtained from stdin
-    unit = int_to_expression(STDIN_FILENO);
-  else if (ENTITY_PERROR_P(e))
-    unit = int_to_expression(STDERR_FILENO);
-  else if (ENTITY_SSCANF_P(e)
-	   || ENTITY_VSNPRINTF_P(e)||ENTITY_VSPRINTF_P(e)||ENTITY_VSSCANF_P(e)) {
-    // The input is a string(the first argument is a char*)
-    file_p = FALSE;;
+  if(!system_p) {
+    /* FILE * file descriptors are used */
+    if(ENTITY_PRINTF_P(e) || ENTITY_GETS_P(e) || ENTITY_PUTS_P(e)|| ENTITY_VPRINTF_P(e))
+      // The output is written into stdout
+      unit = int_to_expression(STDOUT_FILENO);
+    else if (ENTITY_SCANF_P(e) || ENTITY_GETS_P(e) || ENTITY_VSCANF_P(e) || ENTITY_GETCHAR_P(e))
+      //The input is obtained from stdin
+      unit = int_to_expression(STDIN_FILENO);
+    else if (ENTITY_PERROR_P(e))
+      unit = int_to_expression(STDERR_FILENO);
+    else if (ENTITY_SSCANF_P(e)
+	     || ENTITY_VSNPRINTF_P(e)||ENTITY_VSPRINTF_P(e)||ENTITY_VSSCANF_P(e)) {
+      // The input is a string(the first argument is a char*)
+      file_p = FALSE;;
+    }
+    else if (ENTITY_SPRINTF_P(e) || ENTITY_SNPRINTF_P(e)
+	     || ENTITY_VSPRINTF_P(e) || ENTITY_VSNPRINTF_P(e)) {
+      // The output is a string(the first argument is a char*)
+      file_p = FALSE;;
+    }
+    else if (ENTITY_FPUTC_P(e) || ENTITY_FPUTS_P(e) || ENTITY_PUTC_P(e) || ENTITY_UNGETC_P(e))
+      // the second argument is a file descriptor
+      ;
+    else if (ENTITY_FGETS_P(e))
+      //the third argument is a file descriptor
+      ;
+    else if (ENTITY_FREAD_P(e) || ENTITY_FWRITE_P(e))
+      //the fourth argument is a file descriptor
+      ;
+    else if(ENTITY_FPRINTF_P(e) || ENTITY_VFPRINTF_P(e) || ENTITY_FSCANF_P(e) || ENTITY_VFSCANF_P(e)
+	    || ENTITY_FGETC_P(e) ||ENTITY_GETC_P(e) || ENTITY_FGETPOS_P(e)
+	    || ENTITY_FSEEK_P(e) || ENTITY_FSETPOS_P(e) || ENTITY_FTELL_P(e)
+	    || ENTITY_FSETPOS_P(e) || ENTITY_FTELL_P(e) || ENTITY_C_REWIND_P(e)
+	    || ENTITY_CLEARERR_P(e) || ENTITY_FEOF_P(e) || ENTITY_FERROR_P(e)
+	    || ENTITY_FCLOSE_P(e))
+      // all the following functions have in common the first argument is a file descriptor.
+      ;
+    else if(ENTITY_FOPEN_P(e))
+      // the fopen function has the path's file as first argument.
+      ;
+    else if(ENTITY_BUFFERIN_P(e) || ENTITY_BUFFEROUT_P(e))
+      // the first argument is an integer specifying the logical unit
+      // The expression should be evaluated and used if an integer is returned
+      ;
+    else
+      pips_internal_error("Which C library io command? \%s\n", entity_name(e));
   }
-  else if (ENTITY_SPRINTF_P(e) || ENTITY_SNPRINTF_P(e)
-	   || ENTITY_VSPRINTF_P(e) || ENTITY_VSNPRINTF_P(e)) {
-    // The output is a string(the first argument is a char*)
-    file_p = FALSE;;
+  else {
+    /* Integer file descriptors are used */
+    if(ENTITY_C_WRITE_SYSTEM_P(e) || ENTITY_C_READ_SYSTEM_P(e)
+       || ENTITY_C_CLOSE_SYSTEM_P(e) || ENTITY_FCNTL_SYSTEM_P(e)
+       || ENTITY_FSYNC_SYSTEM_P(e) || ENTITY_FDATASYNC_SYSTEM_P(e)
+       || ENTITY_IOCTL_SYSTEM_P(e) || ENTITY_FDATASYNC_SYSTEM_P(e)
+       ) {
+      /* The first argument must be an integer expression, which may
+	 be statically evaluable. */
+      ;
+    }
+    else if(ENTITY_C_OPEN_SYSTEM_P(e) || ENTITY_CREAT_SYSTEM_P(e)) {
+      /* No information about the fd returned */
+      ;
+    }
+    else if(ENTITY_SELECT_SYSTEM_P(e) || ENTITY_PSELECT_SYSTEM_P(e)) {
+      /* Several file descriptors are read */
+      ;
+    }
+    else
+      pips_internal_error("Which Unix io command? \"\%s\"\n", entity_name(e));
   }
-  else if (ENTITY_FPUTC_P(e) || ENTITY_FPUTS_P(e) || ENTITY_PUTC_P(e) || ENTITY_UNGETC_P(e))
-    // the second argument is a file descriptor
-    ;
-  else if (ENTITY_FGETS_P(e))
-    //the third argument is a file descriptor
-    ;
-  else if (ENTITY_FREAD_P(e) || ENTITY_FWRITE_P(e))
-    //the fourth argument is a file descriptor
-    ;
-  else if(ENTITY_FPRINTF_P(e) || ENTITY_VFPRINTF_P(e) || ENTITY_FSCANF_P(e) || ENTITY_VFSCANF_P(e)
-	  || ENTITY_FGETC_P(e) ||ENTITY_GETC_P(e) || ENTITY_FGETPOS_P(e)
-	  || ENTITY_FSEEK_P(e) || ENTITY_FSETPOS_P(e) || ENTITY_FTELL_P(e)
-	  || ENTITY_FSETPOS_P(e) || ENTITY_FTELL_P(e) || ENTITY_C_REWIND_P(e)
-	  || ENTITY_CLEARERR_P(e) || ENTITY_FEOF_P(e) || ENTITY_FERROR_P(e)
-	  || ENTITY_FCLOSE_P(e))
-    // all the following functions have in common the first argument is a file descriptor.
-    ;
-  else if(ENTITY_FOPEN_P(e))
-    // the fopen function has the path's file as first argument.
-    ;
-  else if(ENTITY_BUFFERIN_P(e) || ENTITY_BUFFEROUT_P(e))
-    // the first argument is an integer specifying the logical unit
-    // The expression should be evaluated and used if an integer is returned
-    ;
-  else
-    pips_internal_error("Which C io command? \%s\n", entity_name(e));
 
   if(file_p) {
     if(expression_undefined_p(unit))
@@ -1250,7 +1227,7 @@ static list c_io_effects(entity e, list args)
       (IO_EFFECTS_PACKAGE_NAME,
        IO_EFFECTS_ARRAY_NAME);
 
-    pips_assert("c_io_effects", private_io_entity != entity_undefined);
+    pips_assert("private_io_entity is defined", private_io_entity != entity_undefined);
 
     ref = make_reference(private_io_entity, indices);
     ifdebug(8) print_reference(ref);
@@ -1263,65 +1240,70 @@ static list c_io_effects(entity e, list args)
   return(le);
 }
 
-static list rgsi_effects(entity e, list args)
+/* unix_io_effects to manage the IO system's functions */
+static list unix_io_effects(entity e, list args)
 {
-  return( any_rgs_effects( e, args, TRUE));
+  return generic_io_effects(e, args, TRUE);
 }
 
-static list rgs_effects(entity e, list args)
+/* c_io_effects to handle the effects of functions of the "stdio.h" library. Amira Mensi*/
+static list c_io_effects(entity e, list args)
 {
-  return( any_rgs_effects( e, args, FALSE));
+  return generic_io_effects(e, args, FALSE);
 }
 
-/* gen_seed_effects to handle the effects of random functions. Amira Mensi*/
-static list any_rgs_effects(entity e, list args, bool init_p)
+/* To handle the effects of random functions. Amira Mensi*/
+static list any_rgs_effects(entity e __attribute__ ((__unused__)), list args, bool init_p)
 {
-  list le = NIL, lep;
-  entity private_io_entity;
+  list le = NIL;
+  list lep = NIL;
+  entity private_rgs_entity = entity_undefined;
   reference ref;
   list indices = NIL;
-  IoElementDescriptor *p;
-  int lenght=0;
-  int i=0;
 
   pips_debug(5, "begin\n");
 
-  p = SearchCIoElement(entity_local_name(e));
-  if(init_p == TRUE){
- 
   MAP(EXPRESSION,exp,{
-    lep = effects_of_ioelem(exp,
-			    p->IoElementName[i]);
-    i=i+1;
-
-    if (p->MayOrMust == is_approximation_may)
-      effects_to_may_effects(lep);
-
+    lep = generic_proper_effects_of_expression(exp);
     le = gen_nconc(le, lep);
-    print_effects(le);
+    //ifdebug(8) print_effects(le);
     //ifdebug(8) print_effects(lep);
   }, args);
-	
-  }	
-  private_io_entity = global_name_to_entity
+
+  private_rgs_entity = global_name_to_entity
     (RAND_EFFECTS_PACKAGE_NAME,
      RAND_GEN_EFFECTS_NAME);
 
-  pips_assert("gen_seed_effects", private_io_entity != entity_undefined);
+  pips_assert("gen_seed_effects", private_rgs_entity != entity_undefined);
 
-  ref = make_reference(private_io_entity, indices);
+  ref = make_reference(private_rgs_entity, indices);
+
   ifdebug(8) print_reference(ref);
-  le = gen_nconc(le, generic_proper_effects_of_reference(ref));
-  le = gen_nconc(le, generic_proper_effects_of_lhs(ref));
 
+  le = gen_nconc(le, generic_proper_effects_of_reference(ref));
+
+  if(init_p == TRUE){
+    le = gen_nconc(le, generic_proper_effects_of_lhs(ref));
+  }
 
   pips_debug(5, "end\n");
 
   return(le);
 }
 
-static list
-effects_of_ioelem(expression exp, tag act)
+/* The seed is written */
+static list rgsi_effects(entity e, list args)
+{
+  return any_rgs_effects( e, args, TRUE);
+}
+
+/* The seed is read */
+static list rgs_effects(entity e, list args)
+{
+  return any_rgs_effects( e, args, FALSE);
+}
+
+static list effects_of_ioelem(expression exp, tag act)
 {
     list lr = list_undefined;
     syntax s = expression_syntax(exp);
@@ -1336,32 +1318,32 @@ effects_of_ioelem(expression exp, tag act)
     if (act == is_action_write)
     {
 
-	pips_debug(6, "is_action_write\n");
-	pips_assert("effects_of_ioelem", syntax_reference_p(s));
+        pips_debug(6, "is_action_write\n");
+        pips_assert("effects_of_ioelem", syntax_reference_p(s));
 
-	lr = generic_proper_effects_of_lhs(syntax_reference(s));
+        lr = generic_proper_effects_of_lhs(syntax_reference(s));
     }
     else if(act == is_action_read)
     {
-	debug(6, "effects_of_io_elem", "is_action_read\n");
-	lr = generic_proper_effects_of_expression(exp);
+        debug(6, "effects_of_io_elem", "is_action_read\n");
+        lr = generic_proper_effects_of_expression(exp);
     }
     else if(act == 'x')
       {
-	list lw = NIL;
+        list lw = NIL;
 
-	debug(6, "effects_of_io_elem", "is_action_read and is_action_write\n");
+        debug(6, "effects_of_io_elem", "is_action_read and is_action_write\n");
 
-	if(syntax_reference_p(s)) {
-	  reference r= syntax_reference(s);
-	  lw = generic_proper_effects_of_lhs(r);
-	}
-	else{
-	  pips_internal_error("write effect on non reference expression\n");
-	}
-	
-	lr = generic_proper_effects_of_expression(exp);
-	lr = gen_nconc(lr, lw);
+        if(syntax_reference_p(s)) {
+          reference r= syntax_reference(s);
+          lw = generic_proper_effects_of_lhs(r);
+        }
+        else{
+          pips_internal_error("write effect on non reference expression\n");
+        }
+        
+        lr = generic_proper_effects_of_expression(exp);
+        lr = gen_nconc(lr, lw);
       }
 
     pips_debug(5, "end\n");
@@ -1378,42 +1360,42 @@ effects_of_iolist(list exprs, tag act)
     pips_debug(5, "begin\n");
 
     if (expression_implied_do_p(exp))
-	lep = effects_of_implied_do(exp, act);
+        lep = effects_of_implied_do(exp, act);
     else
     {
-	if (act == is_action_write)
-	{
-	    syntax s = expression_syntax(exp);
+        if (act == is_action_write)
+        {
+            syntax s = expression_syntax(exp);
 
-	    pips_debug(6, "is_action_write");
-	    /* pips_assert("effects_of_iolist", syntax_reference_p(s)); */
-	    if(syntax_reference_p(s))
-	      lep = generic_proper_effects_of_lhs(syntax_reference(s));
-	    else
-	    {
-	      /* write action on a substring */
-	      if(syntax_call_p(s) &&
-		 strcmp(entity_local_name(call_function(syntax_call(s))),
-			SUBSTRING_FUNCTION_NAME) == 0 )
-	      {
-		expression e = EXPRESSION(CAR(call_arguments(syntax_call(s))));
-		expression l = EXPRESSION(CAR(CDR(call_arguments(syntax_call(s)))));
-		expression u = EXPRESSION(CAR(CDR(CDR(call_arguments(syntax_call(s))))));
+            pips_debug(6, "is_action_write");
+            /* pips_assert("effects_of_iolist", syntax_reference_p(s)); */
+            if(syntax_reference_p(s))
+              lep = generic_proper_effects_of_lhs(syntax_reference(s));
+            else
+            {
+              /* write action on a substring */
+              if(syntax_call_p(s) &&
+                 strcmp(entity_local_name(call_function(syntax_call(s))),
+                        SUBSTRING_FUNCTION_NAME) == 0 )
+              {
+                expression e = EXPRESSION(CAR(call_arguments(syntax_call(s))));
+                expression l = EXPRESSION(CAR(CDR(call_arguments(syntax_call(s)))));
+                expression u = EXPRESSION(CAR(CDR(CDR(call_arguments(syntax_call(s))))));
 
-		lep = generic_proper_effects_of_lhs
-		    (syntax_reference(expression_syntax(e)));
-		lep = gen_nconc(lep, generic_proper_effects_of_expression(l));
-		lep = gen_nconc(lep, generic_proper_effects_of_expression(u));
-	      }
-	      else {
-		pips_internal_error("Impossible memory write effect!");
-	      }
-	    }
-	}
-	else {	
-	    pips_debug(6, "is_action_read");
-	    lep = generic_proper_effects_of_expression(exp);
-	}
+                lep = generic_proper_effects_of_lhs
+                    (syntax_reference(expression_syntax(e)));
+                lep = gen_nconc(lep, generic_proper_effects_of_expression(l));
+                lep = gen_nconc(lep, generic_proper_effects_of_expression(u));
+              }
+              else {
+                pips_internal_error("Impossible memory write effect!");
+              }
+            }
+        }
+        else {  
+            pips_debug(6, "is_action_read");
+            lep = generic_proper_effects_of_expression(exp);
+        }
     }
 
     pips_debug(5, "end\n");
@@ -1447,10 +1429,10 @@ effects_of_implied_do(expression exp, tag act)
     arg2 = EXPRESSION(CAR(CDR(args)));  /* range */
 
     pips_assert("effects_of_implied_do",
-		syntax_reference_p(expression_syntax(arg1)));
+                syntax_reference_p(expression_syntax(arg1)));
 
     pips_assert("effects_of_implied_do",
-		syntax_range_p(expression_syntax(arg2)));
+                syntax_range_p(expression_syntax(arg2)));
 
     index = reference_variable(syntax_reference(expression_syntax(arg1)));
     ref = make_reference(index, NIL);
@@ -1464,15 +1446,15 @@ effects_of_implied_do(expression exp, tag act)
 
     le = generic_proper_effects_of_lhs(ref); /* the loop index is must-written */
     /* Read effects are masked by the first write to the implied-do loop variable */
-	
+        
     /* effects of implied-loop bounds and increment */
     le = gen_nconc(le, generic_proper_effects_of_expression(arg2));
 
     /* Do we use context information */
     if (! transformer_undefined_p(context))
     {
-	transformer tmp_trans;
-	Psysteme context_sc;
+        transformer tmp_trans;
+        Psysteme context_sc;
 
     /* the preconditions of the current statement don't include those
      * induced by the implied_do, because they are local to the statement.
@@ -1485,34 +1467,34 @@ effects_of_implied_do(expression exp, tag act)
      * BA, September 27, 1993.
      */
 
-	local_context = transformer_dup(context);
-	/* we first eliminate the implied-do index variable */
-	context_sc = predicate_system(transformer_relation(local_context));
-	if(base_contains_variable_p(context_sc->base, (Variable) index))
-	{
-	    sc_and_base_projection_along_variable_ofl_ctrl(&context_sc,
-							   (Variable) index,
-							   NO_OFL_CTRL);
-	    predicate_system_(transformer_relation(local_context)) =
-		newgen_Psysteme(context_sc);
-	}
-	/* tmp_trans simulates the transformer of the implied-do loop body */
-	tmp_trans = transformer_identity();
-	local_context = add_index_range_conditions(local_context, index, r,
-						   tmp_trans);
-	free_transformer(tmp_trans);
-	transformer_arguments(local_context) =
-	    arguments_add_entity(transformer_arguments(local_context),
-				 entity_to_new_value(index));
+        local_context = transformer_dup(context);
+        /* we first eliminate the implied-do index variable */
+        context_sc = predicate_system(transformer_relation(local_context));
+        if(base_contains_variable_p(context_sc->base, (Variable) index))
+        {
+            sc_and_base_projection_along_variable_ofl_ctrl(&context_sc,
+                                                           (Variable) index,
+                                                           NO_OFL_CTRL);
+            predicate_system_(transformer_relation(local_context)) =
+                newgen_Psysteme(context_sc);
+        }
+        /* tmp_trans simulates the transformer of the implied-do loop body */
+        tmp_trans = transformer_identity();
+        local_context = add_index_range_conditions(local_context, index, r,
+                                                   tmp_trans);
+        free_transformer(tmp_trans);
+        transformer_arguments(local_context) =
+            arguments_add_entity(transformer_arguments(local_context),
+                                 entity_to_new_value(index));
 
 
-	ifdebug(7) {
-	    pips_debug(7, "local context : \n%s\n",
-		       precondition_to_string(local_context));
-	}	
+        ifdebug(7) {
+            pips_debug(7, "local context : \n%s\n",
+                       precondition_to_string(local_context));
+        }       
     }
     else
-	local_context = transformer_undefined;
+        local_context = transformer_undefined;
 
     effects_private_current_context_push(local_context);
 
@@ -1521,47 +1503,47 @@ effects_of_implied_do(expression exp, tag act)
       syntax s = expression_syntax(expr);
 
       if (syntax_reference_p(s))
-	if (act == is_action_write)
-	  lep = generic_proper_effects_of_lhs(syntax_reference(s));
-	else
-	  lep = generic_proper_effects_of_expression(expr);
+        if (act == is_action_write)
+          lep = generic_proper_effects_of_lhs(syntax_reference(s));
+        else
+          lep = generic_proper_effects_of_expression(expr);
       else
-	if (syntax_range_p(s))
-	  lep = generic_proper_effects_of_range(syntax_range(s));
-	else
-	  /* syntax_call_p(s) is true here */
-	  if (expression_implied_do_p(expr))
-	    lep = effects_of_implied_do(expr, act);
-	  else
-	    lep = generic_r_proper_effects_of_call(syntax_call(s));
+        if (syntax_range_p(s))
+          lep = generic_proper_effects_of_range(syntax_range(s));
+        else
+          /* syntax_call_p(s) is true here */
+          if (expression_implied_do_p(expr))
+            lep = effects_of_implied_do(expr, act);
+          else
+            lep = generic_r_proper_effects_of_call(syntax_call(s));
 
       /* indices are removed from effects because this is a loop */
       lr = NIL;
       MAP(EFFECT, eff,
       {
-	if (effect_entity(eff) != index)
-	  lr =  CONS(EFFECT, eff, lr);
-	else if(act==is_action_write /* This is a read */
-		&& action_write_p(effect_action(eff))) {
-	  pips_user_error("Index %s in implied DO is read. "
-			  "Standard violation, see Section 12.8.2.3\n",
-			  entity_local_name(index));
-	}
-	else
-	{
-	  debug(5, "effects_of_implied_do", "index removed");
-	  free_effect(eff);
-	}
+        if (effect_entity(eff) != index)
+          lr =  CONS(EFFECT, eff, lr);
+        else if(act==is_action_write /* This is a read */
+                && action_write_p(effect_action(eff))) {
+          pips_user_error("Index %s in implied DO is read. "
+                          "Standard violation, see Section 12.8.2.3\n",
+                          entity_local_name(index));
+        }
+        else
+        {
+          debug(5, "effects_of_implied_do", "index removed");
+          free_effect(eff);
+        }
       }, lep);
       gen_free_list(lep);
       lr = gen_nreverse(lr); /* preserve initial order??? */
-      le = gen_nconc(le, lr);	
+      le = gen_nconc(le, lr);   
     }, CDR(CDR(args)));
 
 
     (*effects_union_over_range_op)(le,
-				   index,
-				   r, descriptor_undefined);
+                                   index,
+                                   r, descriptor_undefined);
 
     ifdebug(6) {
       pips_debug(6, "effects:\n");
