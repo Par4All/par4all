@@ -1570,7 +1570,8 @@ MakeEntryCommon(
     entity m,
     entity a)
 {
-    string c_name = strdup(concatenate(COMMON_PREFIX, "_ENTRY_", 
+  /* FI: the prefix used to be "_ENTRY_" but this seems to be refused by f77 3.3.5 */
+    string c_name = strdup(concatenate(COMMON_PREFIX, "ENTRY_", 
 				       module_local_name(m), NULL));
     entity c = local_name_to_top_level_entity(c_name);
     area aa = type_area(entity_type(a));
