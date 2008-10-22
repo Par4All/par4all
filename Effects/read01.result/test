@@ -4,6 +4,7 @@ int main()
    size_t nbytes;
    ssize_t bytes_read;
    int fd;
+
    nbytes = sizeof(buf);
    bytes_read = read(fd, buf, nbytes);
 }
@@ -17,10 +18,11 @@ int main()
    int fd;
 //               <may be read    >: buf[*]
 //               <must be written>: nbytes
+
    nbytes = sizeof(buf);
-//               <may be read    >: __IO_EFFECTS:LUNS[*] buf[*]
-//               <may be written >: __IO_EFFECTS:LUNS[*]
-//               <must be read   >: nbytes
+//               <may be read    >: __IO_EFFECTS:LUNS[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] buf[*]
+//               <must be read   >: fd nbytes
 //               <must be written>: bytes_read
    bytes_read = read(fd, buf, nbytes);
 }
