@@ -17,5 +17,5 @@ FWD_DIRS	= \
 	continuation reductions regions effects-convex alias-classes \
 	callgraph icfg ricedg \
 	chains rice hyperplane transformations expressions \
-	statistics instrumentation hpfc atomizer sac phrase wp65 \
+	statistics instrumentation hpfc atomizer safescale sac phrase wp65 \
 	preprocessor pipsmake
