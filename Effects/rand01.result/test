@@ -1,0 +1,31 @@
+int main()
+{
+   int entier;
+   int graine;
+   double virgule;
+   graine = 50;
+   srandom(graine);
+   /* Initialisation du générateur */
+   virgule = (double )rand()/(2147483647+1);
+   entier = 1+rand();
+}
+//               <must be read   >: _RANDOM_EFFECTS:GEN_SEED
+//               <must be written>: _RANDOM_EFFECTS:GEN_SEED
+int main()
+{
+   int entier;
+   int graine;
+   double virgule;
+//               <must be written>: graine
+   graine = 50;
+//               <must be read   >: _RANDOM_EFFECTS:GEN_SEED graine
+//               <must be written>: _RANDOM_EFFECTS:GEN_SEED
+   srandom(graine);
+//               <must be read   >: _RANDOM_EFFECTS:GEN_SEED
+//               <must be written>: virgule
+   /* Initialisation du générateur */
+   virgule = (double )rand()/(2147483647+1);
+//               <must be read   >: _RANDOM_EFFECTS:GEN_SEED
+//               <must be written>: entier
+   entier = 1+rand();
+}
