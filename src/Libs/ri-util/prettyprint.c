@@ -770,13 +770,26 @@ words_assign_op(call obj,
   else if (strcmp(fun,BITWISE_XOR_UPDATE_OPERATOR_NAME) == 0)
     fun = "^=";
 
-  /* FI->NN: I revert to the previous version to keep the SPACES
-     surrounding the assignment operator.Do not forget the strdup or
-     nothing can later be freed. */
+  /* FI: space_p could be used here to cotnrol spacing around assignment */
   pc = CHAIN_SWORD(pc," ");
   pc = CHAIN_SWORD(pc, fun); 
   pc = CHAIN_SWORD(pc," ");
-  pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(args))), prec, TRUE));
+  if(is_fortran) {
+    expression e = EXPRESSION(CAR(CDR(args)));
+    if(expression_call_p(e)) {
+      /* = is not a Fortran operator. No need for parentheses ever,
+	 even with the parenthesis option */
+      /*
+      call c = syntax_call(expression_syntax(e));
+      pc = gen_nconc(pc, words_call(c, 0, TRUE, TRUE));
+      */
+      pc = gen_nconc(pc, words_syntax(expression_syntax(e)));
+    }
+    else
+      pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(args))), prec, TRUE));
+  }
+  else
+    pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(args))), prec, TRUE));
 
   if(prec < precedence ||  (!precedence_p && precedence>0)) {
     pc = CONS(STRING, MAKE_SWORD("("), pc);
@@ -1016,11 +1029,11 @@ words_implied_do(call obj,
 		 bool __attribute__ ((unused)) leftmost)
 {
     list pc = NIL;
-
     list pcc;
     expression index;
     syntax s;
     range r;
+    bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
 
     pcc = call_arguments(obj);
     index = EXPRESSION(CAR(pcc));
@@ -1036,9 +1049,9 @@ words_implied_do(call obj,
     MAPL(pcp, {
 	pc = gen_nconc(pc, words_expression(EXPRESSION(CAR(pcp))));
 	if (CDR(pcp) != NIL)
-	    pc = CHAIN_SWORD(pc, ",");
+	    pc = CHAIN_SWORD(pc, space_p? ", " : ",");
     }, CDR(pcc));
-    pc = CHAIN_SWORD(pc, ", ");
+    pc = CHAIN_SWORD(pc, space_p? ", " : ",");
 
     pc = gen_nconc(pc, words_expression(index));
     pc = CHAIN_SWORD(pc, " = ");
@@ -1086,6 +1099,7 @@ words_io_inst(call obj,
   expression fmt_arg = expression_undefined;
   expression unit_arg = expression_undefined;
   string called = entity_local_name(call_function(obj));
+  bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
     
   /* AP: I try to convert WRITE to PRINT. Three conditions must be
      fullfilled. The first, and obvious, one, is that the function has
@@ -1184,7 +1198,7 @@ words_io_inst(call obj,
 	
     if (!expression_undefined_p(fmt_arg)) {
       /* There is a FORMAT: */
-      pc = CHAIN_SWORD(pc, ", ");
+      pc = CHAIN_SWORD(pc, space_p? ", " : ",");
       pc = gen_nconc(pc, words_expression(fmt_arg));
     }
 
@@ -1212,7 +1226,7 @@ words_io_inst(call obj,
       POP(pp);
       if(pp==NIL) 
 	pips_internal_error("missing element in IO list");
-      pc = CHAIN_SWORD(pc, ", ");
+      pc = CHAIN_SWORD(pc, space_p? ", " : ",");
     }
   }, pcio);
 
@@ -1851,10 +1865,11 @@ static list words_va_arg(list obj)
   list pc = NIL;
   expression e1 = sizeofexpression_expression(SIZEOFEXPRESSION(CAR(obj)));
   type t2 = sizeofexpression_type(SIZEOFEXPRESSION(CAR(CDR(obj))));
+  bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
 
   pc = CHAIN_SWORD(pc,"va_arg(");
   pc = gen_nconc(pc, words_expression(e1));
-  pc = CHAIN_SWORD(pc,", ");
+  pc = CHAIN_SWORD(pc, space_p? ", " : ",");
   pc = gen_nconc(pc, words_type(t2));
   pc = CHAIN_SWORD(pc,")"); 
   return pc;
@@ -2137,6 +2152,7 @@ text_directive(
     char buffer[100]; /* ??? */
     list /* of string */ l = NIL;
     bool is_hpf = pp_hpf_style_p(), is_omp = pp_omp_style_p();
+    bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
 
     /* start buffer */
     buffer[0] = '\0';
@@ -2147,7 +2163,7 @@ text_directive(
 	add_to_current_line(buffer, parallel, cont, t);
 	l = loop_private_variables(obj);
 	if (l && is_hpf) 
-	    add_to_current_line(buffer, ", ", cont, t);
+	    add_to_current_line(buffer, space_p? ", " : ",", cont, t);
     }
     else if (get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES"))
     {
@@ -3602,9 +3618,11 @@ static list words_cast(cast obj)
   list pc = NIL;
   type t = cast_type(obj);
   expression exp = cast_expression(obj);
+  bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
+
   pc = CHAIN_SWORD(pc,"(");
   pc = gen_nconc(pc, c_words_entity(t,NIL));
-  pc = CHAIN_SWORD(pc,")");
+  pc = CHAIN_SWORD(pc, space_p? ") " : ")");
   pc = gen_nconc(pc, words_expression(exp));
   return pc;
 } 

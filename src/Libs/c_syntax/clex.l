@@ -252,10 +252,16 @@ void discard_C_comment()
       /* The comments are only made of '\n', just silently discarding them */
       pips_debug(3,"The \\n are lost, so the code presentation may be wrong...\n");
     }
-    else
+    else {
+      /*
       pips_user_warning("Comment \"%s\" is lost at line %d, "
 			"probably because comments cannot be attached to declarations.\n",
 			C_current_comment, C_line_number);
+      */
+      pips_debug(8, "Comment \"%s\" is lost at line %d, "
+		 "probably because comments cannot be attached to declarations.\n",
+		 C_current_comment, C_line_number);
+    }
     free(C_current_comment);
     C_current_comment = string_undefined;
   }

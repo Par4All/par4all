@@ -847,8 +847,9 @@ type expression_to_user_type(expression e)
   return t;
 }
 
-/* basic basic_of_call(call c): returns the basic of the result given by the
- * call "c".
+/* basic basic_of_call(call c): returns the basic of the result given
+ * by the call "c". If ultimate_p is true, replaced typdef'ed types by
+ * their definitions recursively. If not, preserve typedef'ed types.
  *
  * WARNING: a new basic is allocated
  */
@@ -924,11 +925,13 @@ basic_of_external(call c)
     return b;
 }
 
-/* basic basic_of_intrinsic(call c): returns the basic of the result given
- * by call to an intrinsic function. This basic must be computed with the
- * basic of the arguments of the intrinsic for overloaded operators.  It
- * should be able to accomodate more than two arguments as for generic min
- * and max operators.
+/* basic basic_of_intrinsic(call c): returns the basic of the result
+ * given by call to an intrinsic function. This basic must be computed
+ * with the basic of the arguments of the intrinsic for overloaded
+ * operators.  It should be able to accomodate more than two arguments
+ * as for generic min and max operators. ultimate_p controls the
+ * behavior when typedef'ed types are encountered: should they be
+ * replaced by their definitions or not?
  *
  * WARNING: returns a newly allocated basic object */
 basic 

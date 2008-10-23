@@ -594,7 +594,7 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
     /* Add block scope case here */
     do {
       if (static_module_p(get_current_module_entity()))
-	global_name = strdup(concatenate(compilation_unit_name,
+	global_name = strdup(concatenate(/*compilation_unit_name,*/
 					 get_current_module_name(),MODULE_SEP_STRING,
 					 ls,prefix,name,NULL));
       else
@@ -872,8 +872,8 @@ entity FindOrCreateCurrentEntity(string name,
 		  /* This is a variable/function declared inside a module's body: add block scope here 
 		     Attention, the scope of a function declared in module is the module, not global.*/
 		  if (static_module_p(get_current_module_entity()))
-		    ent = find_or_create_entity(strdup(concatenate(compilation_unit_name,
-								   get_current_module_name(),
+		    /* The module name is unambiguous because it is used by pipdbm */
+		    ent = find_or_create_entity(strdup(concatenate(get_current_module_name(),
 								   MODULE_SEP_STRING,
 								   block_scope,
 								   name,

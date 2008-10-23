@@ -67,7 +67,7 @@ words_value(value obj)
     return(pc);
 }
 
-#define LIST_SEPARATOR (is_fortran? ", " : ",")
+/* #define LIST_SEPARATOR (is_fortran? ", " : ",") */
 
 static list 
 words_parameters(entity e)
@@ -76,6 +76,7 @@ words_parameters(entity e)
   type te = entity_type(e);
   functional fe;
   int nparams, i;
+  bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
 
   pips_assert("is functionnal", type_functional_p(te));
 
@@ -85,7 +86,7 @@ words_parameters(entity e)
   for (i = 1; i <= nparams; i++) {
     entity param = find_ith_parameter(e, i);
     if (pc != NIL) {
-      pc = CHAIN_SWORD(pc, LIST_SEPARATOR);
+      pc = CHAIN_SWORD(pc, space_p? ", " : ",");
     }
 
     /* If prettyprint alternate returns... Property to be added. */
@@ -178,6 +179,7 @@ words_declaration(
     bool prettyprint_common_variable_dimensions_p)
 {
     list pl = NIL;
+    bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
 
     pl = CHAIN_SWORD(pl, entity_user_name(e));
 
@@ -196,7 +198,7 @@ words_declaration(
 		    MAPL(pd, 
 		    {
 		      pl = gen_nconc(pl, words_dimension(DIMENSION(CAR(pd))));
-		      if (CDR(pd) != NIL) pl = CHAIN_SWORD(pl, LIST_SEPARATOR);
+		      if (CDR(pd) != NIL) pl = CHAIN_SWORD(pl, space_p? ", " : ",");
 		    }, dims);
 		    pl = CHAIN_SWORD(pl, ")");
 		  }
@@ -292,7 +294,7 @@ list words_basic(basic obj)
 	       pc = CHAIN_IWORD(pc,basic_logical(obj));
 	     }
 	   else 
-	     pc = CHAIN_SWORD(pc,"int ");
+	     pc = CHAIN_SWORD(pc,"int"); /* FI: Use stdbool.h instead? */
 	   break;
 	}
       case is_basic_overloaded:
@@ -363,8 +365,8 @@ list words_basic(basic obj)
 	     && strstr(name,DUMMY_ENUM_PREFIX)==NULL) {
 	    pc = gen_nconc(pc,words_type(t));
 	    pc = CHAIN_SWORD(pc," ");
-	    pc = CHAIN_SWORD(pc,entity_user_name(ent));
-	    pc = CHAIN_SWORD(pc," ");
+	    pc = CHAIN_SWORD(pc,name);
+	    pc = CHAIN_SWORD(pc," "); /* FI: This space may not be always useful */
 	  }
 	  else {
 	    pc = gen_nconc(pc, c_words_entity(t, NIL));
@@ -498,6 +500,7 @@ sentence_area(entity e, entity module, bool pp_dimensions)
     string area_name = module_local_name(e);
     type te = entity_type(e);
     list pc = NIL, entities = NIL;
+    bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
 
     /* FI: POINTER declarations should be generated for the heap area */
     if (dynamic_area_p(e) || heap_area_p(e) || stack_area_p(e)) /* shouldn't get in? */
@@ -537,7 +540,7 @@ sentence_area(entity e, entity module, bool pp_dimensions)
 	    
 	    MAP(ENTITY, ee, 
 	     {
-		 if (comma) pc = CHAIN_SWORD(pc, LIST_SEPARATOR);
+		 if (comma) pc = CHAIN_SWORD(pc, space_p? ", " : ",");
 		 else comma = TRUE;
 		 pc = gen_nconc(pc, 
 			words_declaration(ee, !is_save && pp_dimensions));
@@ -832,6 +835,7 @@ text_equivalence_class(
     int offset1, offset2;
     Value size1, size2, offset_end1;
     boolean first;
+    bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
 
     if (gen_length(l_equiv)<=1) return t_equiv;
 
@@ -890,11 +894,11 @@ text_equivalence_class(
 	    pips_debug(EQUIV_DEBUG, "easiest case: offsets are the same\n");
 
 	    if (first) lw = CHAIN_SWORD(lw, "EQUIVALENCE"), first = FALSE;
-	    else lw = CHAIN_SWORD(lw, LIST_SEPARATOR);
+	    else lw = CHAIN_SWORD(lw, space_p? ", " : ",");
 
 	    lw = CHAIN_SWORD(lw, " (");
 	    lw = CHAIN_SWORD(lw, entity_local_name(ent1));
-	    lw = CHAIN_SWORD(lw, LIST_SEPARATOR);
+	    lw = CHAIN_SWORD(lw, space_p? ", " : ",");
 	    lw = CHAIN_SWORD(lw, entity_local_name(ent2));
 	    lw = CHAIN_SWORD(lw, ")");		
 	    POP(l2);
@@ -945,7 +949,7 @@ text_equivalence_class(
 			   offset, dim_max,size_elt_1);
 		
 		if (first) lw = CHAIN_SWORD(lw, "EQUIVALENCE"), first = FALSE;
-		else lw = CHAIN_SWORD(lw, LIST_SEPARATOR);
+		else lw = CHAIN_SWORD(lw, space_p? ", " : ",");
 
 		lw = CHAIN_SWORD(lw, " (");
 		lw = CHAIN_SWORD(lw, entity_local_name(ent1));
@@ -982,7 +986,7 @@ text_equivalence_class(
 		    sprintf(buffer+strlen(buffer), "%d", new_decl);		 
 		    lw = CHAIN_SWORD(lw,strdup(buffer));			
 		    if (current_dim < dim_max)
-			lw = CHAIN_SWORD(lw, LIST_SEPARATOR);
+			lw = CHAIN_SWORD(lw, space_p? ", " : ",");
 		    
 		    POP(l_tmp);
 		    current_dim++;
@@ -990,7 +994,7 @@ text_equivalence_class(
 		} /* while */
 		
 		lw = CHAIN_SWORD(lw, ")");	
-		lw = CHAIN_SWORD(lw, LIST_SEPARATOR);
+		lw = CHAIN_SWORD(lw, space_p? ", " : ",");
 		lw = CHAIN_SWORD(lw, entity_local_name(ent2));
 		lw = CHAIN_SWORD(lw, ")");	
 		POP(l2);
@@ -1157,6 +1161,7 @@ static sentence sentence_data_statement(statement is)
   list rl = list_undefined; /* Reference List */
   expression rle = expression_undefined; /* reference list expression, i.e. call to DATA LIST */
   entity rlf = entity_undefined; /* DATA LIST entity function */
+  bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
   
   pips_assert("An initialization instruction is a call", instruction_call_p(ii));
   ife = call_function(ic);
@@ -1177,7 +1182,7 @@ static sentence sentence_data_statement(statement is)
     list ivwl = list_undefined;
 
     if(rl!=call_arguments(syntax_call(expression_syntax(rle)))) {
-      wl = CHAIN_SWORD(wl, strdup(", "));
+      wl = CHAIN_SWORD(wl, strdup(space_p? ", " : ","));
     }
 
     ive = EXPRESSION(CAR(rl));
@@ -1223,7 +1228,7 @@ static sentence sentence_data_statement(statement is)
       wl = gen_nconc(wl, iwl);
     }
     if(!ENDP(CDR(al))) {
-      wl = gen_nconc(wl, CONS(STRING, strdup(", "), NIL));
+      wl = gen_nconc(wl, CONS(STRING, strdup(space_p? ", " : ","), NIL));
     }
   }
 
@@ -1312,6 +1317,7 @@ text_entity_declaration(
   text r, t_chars = make_text(NIL), t_area = make_text(NIL); 
   string pp_var_dim = get_string_property("PRETTYPRINT_VARIABLE_DIMENSIONS");
   bool pp_in_type = FALSE, pp_in_common = FALSE, pp_cinc;
+  bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
   /* Declarations cannot be sorted out because Fortran standard impose at
   least an order on parameters. Fortunately here, PARAMETER are mostly
   integers, defined from other integer parameters... I assume that PIPS
@@ -1446,7 +1452,7 @@ text_entity_declaration(
 		
 		  default: pips_internal_error("Unexpected integer size");
 		  }
-		*ppi = CHAIN_SWORD(*ppi, *ppi==NIL ? s : ", ");
+		*ppi = CHAIN_SWORD(*ppi, *ppi==NIL ? s : space_p? ", " : ",");
 		*ppi = gen_nconc(*ppi, words_declaration(e, pp_dim)); 
 	      }
 	    else
@@ -1469,7 +1475,7 @@ text_entity_declaration(
 		    break;
 		  default: pips_internal_error("Unexpected integer size");
 		  }
-		*pph = CHAIN_SWORD(*pph, *pph==NIL ? s : LIST_SEPARATOR);
+		*pph = CHAIN_SWORD(*pph, *pph==NIL ? s : (space_p? ", " : ","));
 		*pph = gen_nconc(*pph, words_declaration(e, pp_dim)); 
 	      }
 	    break;
@@ -1478,12 +1484,12 @@ text_entity_declaration(
 	    switch (basic_float(b))
 	      {
 	      case 4:
-		pf4 = CHAIN_SWORD(pf4, pf4==NIL ? "REAL*4 " : LIST_SEPARATOR);
+		pf4 = CHAIN_SWORD(pf4, pf4==NIL ? "REAL*4 " : (space_p? ", " : ","));
 		pf4 = gen_nconc(pf4, words_declaration(e, pp_dim));
 		break;
 	      case 8:
 	      default:
-		pf8 = CHAIN_SWORD(pf8, pf8==NIL ? "REAL*8 " : LIST_SEPARATOR);
+		pf8 = CHAIN_SWORD(pf8, pf8==NIL ? "REAL*8 " : (space_p? ", " : ","));
 		pf8 = gen_nconc(pf8, words_declaration(e, pp_dim));
 		break;
 	      }
@@ -1493,19 +1499,19 @@ text_entity_declaration(
 	    switch (basic_complex(b))
 	      {
 	      case 8:
-		pc8 = CHAIN_SWORD(pc8, pc8==NIL ? "COMPLEX*8 " : LIST_SEPARATOR);
+		pc8 = CHAIN_SWORD(pc8, pc8==NIL ? "COMPLEX*8 " : (space_p? ", " : ","));
 		pc8 = gen_nconc(pc8, words_declaration(e, pp_dim));
 		break;
 	      case 16:
 	      default:
-		pc16 = CHAIN_SWORD(pc16, pc16==NIL ? "COMPLEX*16 " : LIST_SEPARATOR);
+		pc16 = CHAIN_SWORD(pc16, pc16==NIL ? "COMPLEX*16 " : (space_p? ", " : ","));
 		pc16 = gen_nconc(pc16, words_declaration(e, pp_dim));
 		break;
 	      }
 	    break;
 	  case is_basic_logical:
 	    pips_debug(7, "is a logical\n");
-	    pl = CHAIN_SWORD(pl, pl==NIL ? "LOGICAL " : LIST_SEPARATOR);
+	    pl = CHAIN_SWORD(pl, pl==NIL ? "LOGICAL " : (space_p? ", " : ","));
 	    pl = gen_nconc(pl, words_declaration(e, pp_dim));
 	    break;
 	  case is_basic_overloaded:
@@ -1523,7 +1529,7 @@ text_entity_declaration(
 		    
 		  if (i==1)
 		    {
-		      ps = CHAIN_SWORD(ps, ps==NIL ? "CHARACTER " : LIST_SEPARATOR);
+		      ps = CHAIN_SWORD(ps, ps==NIL ? "CHARACTER " : (space_p? ", " : ","));
 		      ps = gen_nconc(ps, words_declaration(e, pp_dim));
 		    }
 		  else
@@ -1764,11 +1770,13 @@ static list words_brace_expression(expression exp)
   list pc = NIL;
   list args = call_arguments(syntax_call(expression_syntax(exp)));
   bool first = TRUE;
+  bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
+
   pc = CHAIN_SWORD(pc,"{");
   MAP(EXPRESSION,e,
   {
     if (!first) 
-      pc = CHAIN_SWORD(pc,", ");
+      pc = CHAIN_SWORD(pc, space_p? ", " : ",");
     if (brace_expression_p(e))
       pc = gen_nconc(pc,words_brace_expression(e));
     else
@@ -1782,13 +1790,15 @@ static list words_brace_expression(expression exp)
 static list words_dimensions(list dims)
 {
   list pc = NIL;
+  bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
+
   if (is_fortran)
     {
       pc = CHAIN_SWORD(pc, "(");		    
       MAPL(pd, 
       {
 	pc = gen_nconc(pc, words_dimension(DIMENSION(CAR(pd))));
-	if (CDR(pd) != NIL) pc = CHAIN_SWORD(pc, ", ");
+	if (CDR(pd) != NIL) pc = CHAIN_SWORD(pc, space_p? ", " : ",");
       }, dims);
       pc = CHAIN_SWORD(pc, ")");
     }
@@ -1864,6 +1874,7 @@ bool typedef_type_p(type t)
 list generic_c_words_entity(type t, list name, bool is_safe)
 {
   list pc = NIL;
+  bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
 
   if(type_undefined_p(t)) {
     pc = CHAIN_SWORD(NIL, "type_undefined");
@@ -1902,9 +1913,9 @@ list generic_c_words_entity(type t, list name, bool is_safe)
 	type t1 = parameter_type(p);
 	//pips_debug(3,"Parameter type %s\n ",type_undefined_p(t1)? "type_undefined" : words_to_string(words_type(t1)));
 	if (!first)
-	  pc = gen_nconc(pc,CHAIN_SWORD(NIL, LIST_SEPARATOR));
+	  pc = gen_nconc(pc,CHAIN_SWORD(NIL, space_p? ", " : ","));
 	/* c_words_entity(t1,NIL) should be replaced by c_words_entity(t1,name_of_corresponding_parameter) */
-	pc = gen_nconc(pc,generic_c_words_entity(t1,NIL, is_safe));
+	pc = gen_nconc(pc,generic_c_words_entity(t1, NIL, is_safe));
 	pips_debug(9,"List of parameters \"%s\"\n ",list_to_string(pc));
 	first = FALSE;
       },lparams);
@@ -1929,19 +1940,18 @@ list generic_c_words_entity(type t, list name, bool is_safe)
   if (type_variable_p(t) && variable_qualifiers(type_variable(t)) != NIL)
     pc = words_qualifier(variable_qualifiers(type_variable(t)));
 
-  if (basic_type_p(t))
-    {
+  if (basic_type_p(t)) {
       string sname = list_to_string(name);
       pips_debug(9,"Basic type with name = \"%s\"\n", sname);
  
       pc = gen_nconc(pc,words_type(t));
-      pc = CHAIN_SWORD(pc," ");
+      if(strlen(sname)!=0)
+	pc = CHAIN_SWORD(pc," ");
       if(!bit_type_p(t) || (strstr(sname,DUMMY_MEMBER_PREFIX)==NULL)) {
 	pc = gen_nconc(pc,name);
 	}
       free(sname);
-      if (bit_type_p(t))
-	{
+      if (bit_type_p(t)) {
 	  symbolic s = basic_bit(variable_basic(type_variable(t)));
 	  expression ie = symbolic_expression(s);
 	  list iew = words_expression(ie);
@@ -1950,8 +1960,7 @@ list generic_c_words_entity(type t, list name, bool is_safe)
 	}
       return pc;
     }
-  if (array_type_p(t))
-    {
+  if (array_type_p(t)){
       list dims = variable_dimensions(type_variable(t));
       type t1 = copy_type(t);
       list tmp = NIL; 
@@ -2097,7 +2106,7 @@ list generic_c_words_entity(type t, list name, bool is_safe)
 	int n = constant_int(emc);
 
 	if (!first)
-	  pc = CHAIN_SWORD(pc, ", ");
+	  pc = CHAIN_SWORD(pc, space_p? ", " : ",");
 	pc = CHAIN_SWORD(pc, entity_user_name(em));
 	if(n!=cv) {
 	  pc = CHAIN_SWORD(pc, "=");
@@ -2157,6 +2166,7 @@ text c_text_entity(entity module, entity e, int margin)
   storage s = entity_storage(e);
   value val = entity_initial(e);
   list pc = NIL;
+  bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
  
   pips_debug(5,"Print declaration for entity %s in module %s\n",
 	     entity_name(e),
@@ -2177,9 +2187,13 @@ text c_text_entity(entity module, entity e, int margin)
   if (strstr(entity_name(e),TYPEDEF_PREFIX) != NULL)
     pc = CHAIN_SWORD(pc,"typedef ");
  
-  /* The global variables stored in static area and in ram but they are not static so a condition is needed which checks if it not a global variable*/
+  /* The global variables stored in static area and in ram but they
+     are not static so a condition is needed, which checks if it is not a
+     global variable*/
   // entity m = get_current_module_entity();
-  if ((storage_ram_p(s) && static_area_p(ram_section(storage_ram(s))) && !strstr(entity_name(e),TOP_LEVEL_MODULE_NAME)) 
+  if ((storage_ram_p(s)
+       && static_area_p(ram_section(storage_ram(s)))
+       && !strstr(entity_name(e),TOP_LEVEL_MODULE_NAME)) 
       || (entity_module_p(e) && static_module_p(e)))
     pc = CHAIN_SWORD(pc,"static ");
 
@@ -2243,7 +2257,7 @@ text c_text_entity(entity module, entity e, int margin)
 	int n = constant_int(emc);
 
 	if (!first)
-	  pc = CHAIN_SWORD(pc, ", ");
+	  pc = CHAIN_SWORD(pc, space_p? ", " : ",");
 	pc = CHAIN_SWORD(pc, entity_user_name(em));
 	if(n!=cv) {
 	  pc = CHAIN_SWORD(pc, "=");

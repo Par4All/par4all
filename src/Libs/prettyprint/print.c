@@ -87,10 +87,8 @@ print_code_or_source(string mod_name)
     bool success = FALSE;
     text r = make_text(NIL);
     entity module;
-    if( (module = module_name_to_entity(mod_name)) == entity_undefined ) return false;
     statement mod_stat;
     string pp;
-
     string resource_name = strdup
 	(get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ?
 	    DBR_GRAPH_PRINTED_FILE
@@ -101,6 +99,14 @@ print_code_or_source(string mod_name)
 		get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ?
 		GRAPH_FILE_EXT : "",
 		NULL));
+
+    /* FI: This test could be moved up in pipsmake? */
+    if(entity_undefined_p(module = module_name_to_entity(mod_name))) {
+      /* FI: Should be a pips_internal_error() as pipsmake is here to
+	 avoid this very problem... */
+      pips_user_error("Module \"\%s\"\n not found", mod_name);
+      return false;
+    }
 
     set_current_module_entity(module);
 

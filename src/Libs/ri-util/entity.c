@@ -258,9 +258,6 @@ string module_local_name(entity e)
   /* No difference between modules and other entities, except for prefixes */
   /* Allocates a new string */
 
-  // return entity_local_name(e);
-
-  //return entity_user_name(e);
   string name = local_name(entity_name(e));
 
   return strdup(name 
@@ -310,23 +307,29 @@ entity e;
 }
 */
 
+/* In interprocedural context, returns the shortest non-ambiguous name
+   for a variable. If it is local to the current module, use the user
+   name. If not return entity_name(), which is not fully satisfying
+   for C variables because it includes scope information.
+
+   Note also that this function assumes the existence of a current module.
+*/
 string 
 entity_minimal_name(entity e)
 {
-    entity m = get_current_module_entity();
+  entity m = get_current_module_entity();
+  string local_name = module_local_name(m);
 
-    pips_assert("some current entity", !entity_undefined_p(m));
+  pips_assert("some current entity", !entity_undefined_p(m));
 
-    string local_name = module_local_name(m);
-    if (strcmp(module_local_name(m), entity_module_name(e)) == 0) {
-      free(local_name);
-      //return entity_local_name(e);
-      return entity_user_name(e);
-    }
-    else {
-      free(local_name);
-      return entity_name(e);
-    }
+  if (strcmp(module_local_name(m), entity_module_name(e)) == 0) {
+    free(local_name);
+    return global_name_to_user_name(entity_name(e));
+  }
+  else {
+    free(local_name);
+    return entity_name(e);
+  }
 }
 
 
