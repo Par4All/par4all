@@ -16,7 +16,7 @@ void point_to04()
    /* Floating point values are not allowed in pointer arithmetic */
    /* (p+2.)->foo = 1; */
 
-   (p+(int)2.)->foo = 1;
+   (p+(int) 2.)->foo = 1;
    (2+p)->foo = 1;
    (p-2)->foo = 1;
    

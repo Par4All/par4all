@@ -1,5 +1,5 @@
 main()
 {
    int z;
-   int x = (myint *)z;
+   int x = (myint *) z;
 }
