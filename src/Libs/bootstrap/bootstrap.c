@@ -219,17 +219,7 @@ static void CreateRandomSeed()
   /* GO: entity for io logical units: It is an unsigned int*/
   make_entity(AddPackageToName(RAND_EFFECTS_PACKAGE_NAME,
                                RAND_GEN_EFFECTS_NAME),
-          MakeTypeArray(make_basic_int(14),
-                        CONS(DIMENSION,
-                             make_dimension
-                             (MakeIntegerConstantExpression("0"),
-                                /*
-                                  MakeNullaryCall
-                                  (CreateIntrinsic(UNBOUNDED_DIMENSION_NAME))
-                                */
-                              MakeIntegerConstantExpression("2000")
-                              ),
-                             NIL)),
+	      make_scalar_integer_type(DEFAULT_INTEGER_TYPE_SIZE),
               /* make_storage(is_storage_ram,
                  make_ram(entity_undefined, DynamicArea, 0, NIL))
               */
