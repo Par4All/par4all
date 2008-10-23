@@ -1,4 +1,4 @@
-void h(int n,int *const volatile p,int *const *volatile q,int *const r)
+void h(int n, int *const volatile p, int *const *volatile q, int *const r)
 {
    volatile int *const ptr;
    const int ar[10][20];

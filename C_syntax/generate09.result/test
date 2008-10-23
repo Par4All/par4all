@@ -4,7 +4,7 @@ Parsed printed file for generate 09
 void generate09()
 {
    sem_t t;
-   (void )func(&t);
+   (void)func(&t);
 }
 
 Parsed printed file for func

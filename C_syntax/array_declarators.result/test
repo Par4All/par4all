@@ -3,7 +3,7 @@ Printed file for array_declarators!
 
 extern int n;
 extern int m;
-extern void fcompat(void );
+extern void fcompat(void);
 
 Unsplit array_declarators
 
@@ -12,7 +12,7 @@ Unsplit array_declarators
  */
 extern int n;
 extern int m;
-extern void fcompat(void );
+extern void fcompat(void);
 void fcompat(void)
 {
    int a[n][6][m];

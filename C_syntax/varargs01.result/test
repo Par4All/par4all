@@ -1,7 +1,7 @@
 
 Parser output
 
-int varargs01(FILE *stream,const char *fmt,...)
+int varargs01(FILE *stream, const char *fmt, ...)
 {
    va_list pa;
    int r;

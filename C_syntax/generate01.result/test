@@ -46,6 +46,6 @@ Printed file func with intraprocedural preconditions
 
 //  P() {}
 
-int func(int f1,double f2)
+int func(int f1, double f2)
 {
 }

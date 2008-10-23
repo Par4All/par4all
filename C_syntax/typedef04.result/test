@@ -7,8 +7,8 @@ typedef double mydouble;
 struct s {
    int dim;
 };
-extern void typedef04(int ,struct s ,struct s *);
-void typedef04(int n,struct s d,struct s *pd)
+extern void typedef04(int, struct s , struct s *);
+void typedef04(int n, struct s d, struct s *pd)
 {
    typedef int narray_t[n+2];
    typedef int darray_t[d.dim];

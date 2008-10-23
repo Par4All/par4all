@@ -21,12 +21,6 @@ Module decl11! already active.
 Request: build resource SYMBOL_TABLE_FILE for module decl11!.
   BOOTSTRAP                      building   ENTITIES()
   COMPILATION_UNIT_PARSER        building   DECLARATIONS(decl11!)
-user warning in discard_C_comment: Comment "
-
-
-
-/* This is OK with gcc, but not with -ansi nor -pedantic, even with std=c99 */
-" is lost at line 2, probably because comments cannot be attached to declarations.
 user warning in c_parse: Variable "a" is redefined at line 2 (6)
 user warning in CParserError: 
 Recovery from C parser failure not (fully) implemented yet.
@@ -46,12 +40,6 @@ echo
 Module decl11! already active.
 Request: build resource PARSED_PRINTED_FILE for module decl11!.
   COMPILATION_UNIT_PARSER        building   DECLARATIONS(decl11!)
-user warning in discard_C_comment: Comment "
-
-
-
-/* This is OK with gcc, but not with -ansi nor -pedantic, even with std=c99 */
-" is lost at line 2, probably because comments cannot be attached to declarations.
 user warning in c_parse: Variable "a" is redefined at line 2 (6)
 user warning in CParserError: 
 Recovery from C parser failure not (fully) implemented yet.

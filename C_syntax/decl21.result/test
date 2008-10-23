@@ -1,9 +1,9 @@
 
 Parsed printed file for "decl21!"
 
-typedef int f(int );
-extern int decl21(int );
-extern int decl21(int );
+typedef int f(int);
+extern int decl21(int);
+extern int decl21(int);
 
 Parsed printed file for "decl21"
 

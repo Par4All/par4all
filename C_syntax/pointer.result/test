@@ -10,8 +10,8 @@ int main()
    int (*a2[10][30])[20];
    int (*q)[10][20];
    int (*(*app[10])[20])[30];
-   int (*apf[20])(int ,int );
-   int (*pf)(int );
+   int (*apf[20])(int, int);
+   int (*pf)(int);
    x = 5;
    p = &x;
    pp1 = (int (**)[10][20])malloc(200*sizeof(int));

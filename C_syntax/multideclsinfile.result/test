@@ -23,15 +23,6 @@ Module multideclsinfile! already active.
 Request: build resource PARSED_PRINTED_FILE for module multideclsinfile!.
   BOOTSTRAP                      building   ENTITIES()
   COMPILATION_UNIT_PARSER        building   DECLARATIONS(multideclsinfile!)
-user warning in discard_C_comment: Comment "
-
-
-
-/* Multiple declarations of global variables check in one file */
-
-/* but this is OK with C... */
-
-" is lost at line 5, probably because comments cannot be attached to declarations.
 user warning in UpdateEntity: Multiple declarations of variable a in file
 
 Declarations for module multideclsinfile! with type  () ->  unknow
@@ -78,15 +69,6 @@ End of declarations for module multideclsinfile!
 
   C_PARSER                       building   PARSED_CODE(multideclsinfile!)
                                  building   CALLEES(multideclsinfile!)
-user warning in discard_C_comment: Comment "
-
-
-
-/* Multiple declarations of global variables check in one file */
-
-/* but this is OK with C... */
-
-" is lost at line 5, probably because comments cannot be attached to declarations.
 user warning in UpdateEntity: Multiple declarations of variable a in file
 
 Declarations for module multideclsinfile! with type  () ->  unknow

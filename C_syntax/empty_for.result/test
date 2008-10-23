@@ -4,7 +4,7 @@ Prettyprint the source as C, of course
 Do not display original number lines as comment:
 If possible, transform simple for-loops into do-loop a  la Fortran, simpler to analyze:
 Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
-int main(int argc,char *argv[])
+int main(int argc, char *argv[])
 {
    int i;
    int j;

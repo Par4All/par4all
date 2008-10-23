@@ -94,8 +94,8 @@ End of declarations for module decl17
 
 Parsed printed file for "decl17!" and "decl17"
 
-extern void decl17(int );
-extern void decl17(int );
+extern void decl17(int);
+extern void decl17(int);
 
 void decl17(int iarg)
 {

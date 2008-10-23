@@ -49,7 +49,7 @@ Layout for memory area "main:*STATIC*" of size 0:
 
 End of declarations for module main
 
-int main(int argc,char *argv[])
+int main(int argc, char *argv[])
 {
    int i = 2;
    {

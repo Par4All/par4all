@@ -1,8 +1,8 @@
-int f(void );
+int f(void);
 int *fip();
 int (*pfi)();
-int (*apfi[3])(int *,int *);
+int (*apfi[3])(int *, int *);
 int (*fpfi())();
-int (*fpfi1(int (*)(long ),int ))(int );
-int (*fpfi2(int (*)(long ),int ,...))(int ,...);
+int (*fpfi1(int (*)(long), int))(int);
+int (*fpfi2(int (*)(long), int, ...))(int, ...);
 
