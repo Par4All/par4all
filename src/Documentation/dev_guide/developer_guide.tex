@@ -498,7 +498,7 @@ often useful to have an history of such developments.
 \subsubsection{Developing in a branch? Validate before merging!}
 \label{sec:devel-branch-valid}
 
-Do not forget that if you or someone else merge your branch into the
+Do not forget that if you or someone else merges your branch into the
 trunk, things must be validated against the global PIPS validation to
 avoid havoc for the other PIPS developers.
 
@@ -507,7 +507,8 @@ Here is a typical behaviour you should follow:
 \item update your production copy of PIPS (the \texttt{trunk}) with
   \texttt{svn up}, recompile the production version and apply the
   validation against it;
-\item merge into you branch the last developments from the trunk with a
+\item commit your branch if not already done;
+\item merge into your branch the last developments from the trunk with a
   \texttt{svn\_branch.sh pull}, recompile (so it will modify the
   executables and libraries in the production version) and validate;
 \item if it is worse than point 1, improve the code in your branch and go
