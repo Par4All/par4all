@@ -73,7 +73,10 @@
 }
 
 You can get a printable version of this document on\\
-\PipsDevGuidePDF and a HTML version on \PipsDevGuideHTDOC.
+\PipsDevGuidePDF and a HTML version on \PipsDevGuideHTDOC. Warning if you
+use the HTML version and do some copy/paste" it has been noticed that some
+characters are changes, such as the \verb|'| that should be a simple plain
+quote but is changed in something else...
 
 The legacy WWW site is at \PipsOldWWW and a new one is at \PipsNewWWW.
 
@@ -363,8 +366,10 @@ sh> make SVN_USERNAME=calvin create-branch
 sh> svn commit /tmp/svn_branch.XXXXXX/
 \end{verbatim}
   It creates a new branch, not yet committed, in some temporary directory.
-  \verb/SVN_USERNAME/ is not necessary if the svn and unix account share the
-  same login name. This directory \textbf{must} then be committed.
+  \verb/SVN_USERNAME/ is not necessary if the svn and unix account share
+  the same login name. In this case the name in the \verb/USER/
+  environment variable is used instead. This directory \textbf{must} then
+  be committed.
 \item If necessary, update your development area to make the branch appear.
 \begin{verbatim}
 sh> cd /home/.../MYPIPS/pips_dev
