@@ -476,13 +476,15 @@ entity global_new_value_to_global_old_value(entity v_new)
 
   /* There is no real test for global new values */
 
-  pips_assert("global_new_value_to_global_old_value",
+  pips_assert("new value must be a real variable entity, denoting the new value",
 	      strcmp(entity_module_name(v_new), SEMANTICS_MODULE_NAME) != 0);
 
   v_old = (entity) gen_find_tabulated(concatenate(entity_name(v_new),
 						  OLD_VALUE_SUFFIX,
 						  NULL),
 				      entity_domain);
+  if(v_old==NULL) v_old = entity_undefined;
+
   return v_old;
 }
 

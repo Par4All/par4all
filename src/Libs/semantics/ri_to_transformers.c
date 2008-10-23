@@ -425,8 +425,11 @@ user_function_call_to_transformer(
 
     /* Get rid of the temporary representing the function's value */
     orv = global_new_value_to_global_old_value(rv);
-    t_caller = transformer_filter(t_caller,
-				  CONS(ENTITY, rv, CONS(ENTITY, orv, NIL)));
+    if(entity_undefined_p(orv))
+      t_caller = transformer_filter(t_caller, CONS(ENTITY, rv, NIL));
+    else
+      t_caller = transformer_filter(t_caller,
+				    CONS(ENTITY, rv, CONS(ENTITY, orv, NIL)));
 
 
     ifdebug(8) {
