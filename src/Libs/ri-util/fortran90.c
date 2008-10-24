@@ -350,7 +350,12 @@ int n ;
 	statement_ordering(new_s) = statement_ordering(loop_body(obj));
 	statement_comments(new_s) = statement_comments(loop_body(obj));
 	t = text_statement(module, margin, new_s);
-	free_statement(new_s);
+	/* FI: Although new_s has been converted to text, it cannot
+	   always be freed. I do not know which part of new_s is
+	   reused in the result of text_statement() or somewhere
+	   else... Found with valgrind and validation case
+	   Prettyprint/aa01.tpips */
+	//free_statement(new_s);
     }
     else {
 	/* No legal vector form has been found */
