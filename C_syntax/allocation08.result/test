@@ -10,10 +10,11 @@ Variable list:
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
 	Declared entity "allocation08!:*HEAP*" with type "area" with size 0
 	Declared entity "allocation08!:*STATIC*" with type "area" with size 0
-	Declared entity "allocation08:*DYNAMIC*" with type "area" with size 210
+	Declared entity "allocation08:*DYNAMIC*" with type "area" with size 290
 	Declared entity "allocation08:*STACK*" with type "area" with size 0
 	Declared entity "allocation08:*STATIC*" with type "area" with size 0
 	Declared entity "allocation08:0`x" with type "variable" "ac"
+	Declared entity "allocation08:0`y" with type "variable" "int"
 
 * empty extern declaration list *
 
@@ -32,8 +33,9 @@ Layout for memory area "allocation08!:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for memory area "allocation08:*DYNAMIC*" of size 210:
+Layout for memory area "allocation08:*DYNAMIC*" of size 290:
 	Variable "allocation08:0`x"	offset = 0	size = 210
+	Variable "allocation08:0`y"	offset = 210	size = 80
 
 
 Layout for memory area "allocation08:*STACK*" of size 0:
@@ -53,4 +55,5 @@ extern int allocation08();
 int allocation08()
 {
    ac x[10];
+   int y[20];
 }

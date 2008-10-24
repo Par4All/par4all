@@ -5,7 +5,7 @@ void generate08()
 {
    sem_t t;
    //extern int fun(sem_t *);
-   (void)func(&t);
+   (void) func(&t);
 }
 
 Symbol table for "generate 08!"

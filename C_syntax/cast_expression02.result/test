@@ -8,5 +8,5 @@ Parsed printed file for "cast_expression02"
 int cast_expression02()
 {
    double y = 5.2;
-   return (int)y;
+   return (int) y;
 }

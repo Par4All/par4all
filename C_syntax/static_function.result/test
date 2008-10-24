@@ -48,7 +48,7 @@ void main()
 
 Module static_function!
 
-static void foo(int );
+static void foo(int);
 extern void main();
 
 Module main
@@ -87,7 +87,7 @@ Variable list:
 
 Layouts for formal parameters:
 
-	Variable static_function!static_function!foo:x	offset = 1
+	Variable static_function!foo:x	offset = 1
 Layouts for memory areas:
 
 Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
@@ -103,7 +103,7 @@ Layout for memory area "static_function!:*STATIC*" of size 0:
 
 
 Layout for memory area "static_function!foo:*DYNAMIC*" of size 4:
-	Variable "static_function!static_function!foo:0`i"	offset = 0	size = 4
+	Variable "static_function!foo:0`i"	offset = 0	size = 4
 
 
 Layout for memory area "static_function!foo:*STACK*" of size 0:
