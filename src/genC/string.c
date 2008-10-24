@@ -3,20 +3,20 @@
   moved from pips by FC, 16/09/1998.
 
   $Id$
-  
+
 */
 
 /*
-  
+
   CONCATENATE concatenates a variable list of strings in a static string
   (which is returned).
-  
+
   STRNDUP copie les N premiers caracteres de la chaine S dans une zone
   allouee dynamiquement, puis retourne un pointeur sur cette zone. si la
   longueur de S est superieure ou egale a N, aucun caratere null n'est
   ajoute au resultat. sinon, la chaine resultat est padde avec des
   caracteres null.
-  
+
 
   STRNDUP0 copie les N premiers caracteres de la chaine S dans une zone
   allouee dynamiquement, puis retourne un pointeur sur cette zone.
@@ -194,7 +194,7 @@ string strupper(string s1, string s2)
     }
 
     *s1 = '\0';
-	
+
     return r;
 }
 
@@ -209,7 +209,7 @@ string strlower(string s1, string s2)
     }
 
     *s1 = '\0';
-	
+
     return r;
 }
 
@@ -237,4 +237,25 @@ string nth_suffix(int i)
 	break;
     }
     return suffix;
+}
+
+
+/* Find if a string s end with a suffix.
+
+   If yes, return a pointer to the suffix in s, if not, return NULL. */
+string find_suffix(string s, string suffix) {
+  size_t l = strlen(s);
+  size_t l_suffix = strlen(suffix);
+
+  if (l < l_suffix)
+    /* No way if the suffix is longer than the string! */
+    return NULL;
+
+  string suffix_position = s + l - l_suffix;
+  if (memcmp(suffix_position, suffix, l_suffix) == 0)
+    /* Get it! */
+    return suffix_position;
+
+  /* Not found: */
+  return NULL;
 }
