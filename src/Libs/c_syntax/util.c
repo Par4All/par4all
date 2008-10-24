@@ -1388,9 +1388,10 @@ void UseFormalArguments(entity f)
 
     /* Is it a local function or global function? */
     if(top_level_entity_p(f))
-      mn = strdup(entity_user_name(f));
+      mn = entity_user_name(f);
     else
-      mn = strdup(concatenate(entity_module_name(f),entity_local_name(f), NULL));
+      /* mn = strdup(concatenate(entity_module_name(f),entity_local_name(f), NULL)); */
+      mn = strdup(entity_local_name(f));
 
     /* Remore the dummy formals from f's declaration list (and from the
        symbol table?) and replace them by equivalent regular formal parameters */

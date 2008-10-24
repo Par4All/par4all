@@ -470,7 +470,7 @@ sentence_head(entity e)
     }
       
     pc = CHAIN_SWORD(pc, entity_user_name(e));
-    
+
     if (!ENDP(args)) {
       pc = CHAIN_SWORD(pc, "(");
       pc = gen_nconc(pc, args);
@@ -1748,8 +1748,9 @@ list words_type(type obj)
 	break;
       }
     default:
-      pips_error("words_type", "unexpected tag\n");
+      pips_internal_error("unexpected tag\n");
     }
+  pips_debug(8, "End: \"\%s\"\n", list_to_string(pc));
   return pc;
 }
 
@@ -1981,6 +1982,9 @@ list generic_c_words_entity(type t, list name, bool is_safe)
 	}
       variable_dimensions(type_variable(t1)) = NIL;
       variable_qualifiers(type_variable(t1)) = NIL;
+      pips_debug(8, "Before concatenation, pc=\"\%s\"\n", list_to_string(pc));
+      if(pc!=NIL)
+	pc = CHAIN_SWORD(pc, " ");
       return gen_nconc(pc,generic_c_words_entity(t1,gen_nconc(tmp,words_dimensions(dims)),is_safe));
     }
  
@@ -2007,9 +2011,10 @@ list generic_c_words_entity(type t, list name, bool is_safe)
   if (typedef_type_p(t))
     {
       entity ent = basic_typedef(variable_basic(type_variable(t)));
-      pips_debug(9,"Typedef type with name = %s\n", list_to_string(name));
+      pips_debug(9,"Typedef type with name = \"\%s\"\n", list_to_string(name));
       pc = CHAIN_SWORD(pc,entity_user_name(ent));
-      pc = CHAIN_SWORD(pc," ");
+      if(name!=NIL)
+	pc = CHAIN_SWORD(pc," ");
       return gen_nconc(pc,name);
     }  
   if (type_varargs_p(t))
@@ -2119,13 +2124,20 @@ list generic_c_words_entity(type t, list name, bool is_safe)
       pc = CHAIN_SWORD(pc,"}");
       return pc;
     }
-   pips_internal_error("unexpected case\n");
+  pips_internal_error("unexpected case\n");
   return NIL;
 }
 
 list c_words_entity(type t, list name)
 {
-  return generic_c_words_entity(t, name, FALSE);
+  list pc = generic_c_words_entity(t, name, FALSE);
+
+  ifdebug(8) {
+    string s = list_to_string(pc);
+    pips_debug(8, "End with \"\%s\"\n", s);
+  }
+
+  return pc;
 }
 
 list safe_c_words_entity(type t, list name)

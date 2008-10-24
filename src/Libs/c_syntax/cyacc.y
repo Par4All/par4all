@@ -1056,7 +1056,8 @@ constant:
 			}
 |   string_constant	
                         {
-			  $$ = MakeConstant($1,is_basic_string);
+			  /* The size will be fixed later, hence 0 here. */
+			  $$ = make_C_constant_entity($1, is_basic_string, 0);
                         }
 /*add a nul to strings.  We do this here (rather than in the lexer) to make
   concatenation easy below.*/

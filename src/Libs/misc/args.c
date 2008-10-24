@@ -53,8 +53,11 @@ list_to_string(list l)
   MAP(STRING,s, {
       if (result == NULL)
 	result = strdup((const char *)s);
-      else 
-	result = strdup(concatenate(result,s,NULL)); 
+      else {
+	string new_result = strdup(concatenate(result,s,NULL));
+	free(result);
+	result = new_result;
+      }
     }, l);
   return result;
 }
