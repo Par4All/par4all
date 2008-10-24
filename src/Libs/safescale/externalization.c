@@ -642,13 +642,25 @@ static entity create_module_with_statement(statement stat, string new_module_nam
     print_statement(stat);
   }
   
-  DB_PUT_MEMORY_RESOURCE(DBR_CODE, new_module_name, stat);
+  //DB_PUT_MEMORY_RESOURCE(DBR_CODE, new_module_name, stat);
+
+  // Generate an empty code for global variables in the compile unit:
+  text_code = make_text(gen_sentence_cons(make_sentence_formatted(strdup("")),
+					  NIL));
+  // Create an empty compile unit for the current module:
+  string cu_name = strdup(concatenate(new_module_name, "!", NULL));
+  make_text_resource_and_free(cu_name, DBR_USER_FILE, ".cpp_processed.c", text_code);
+  //make_text_resource(cu_name, DBR_C_SOURCE_FILE, ".c", text_code);
+  free(cu_name);
+
+  // Prettyprint the code of the module to regenerate the files:
   init_prettyprint(empty_text);
   text_code = text_module(new_module, stat);
   // Create a pseudo-initial file to be coherent with PIPS infrastructure
   make_text_resource(new_module_name, DBR_INITIAL_FILE, ".c_initial", text_code);
-  make_text_resource(new_module_name, DBR_USER_FILE, ".c", text_code);
-  make_text_resource_and_free(new_module_name, DBR_SOURCE_FILE, ".c", text_code);
+  // Name this ressource according to the definition of compilation_unit_of_module():
+  make_text_resource(new_module_name, DBR_USER_FILE, ".cpp_processed.c", text_code);
+  make_text_resource_and_free(new_module_name, DBR_C_SOURCE_FILE, ".c", text_code);
   close_prettyprint();
   //free_statement(stat);
 
@@ -786,7 +798,7 @@ static void distribute(statement module_stat, entity module)
   hash_table ht_out_regions;
 
   pips_debug(5, "[BEGIN] distribute\n");
-  pips_debug(5, "Number of analyzed statements to distribute: %d\n", gen_length(l_stats));
+  pips_debug(5, "Number of analyzed statements to distribute: %td\n", gen_length(l_stats));
 
   compute_distribution_context(l_stats,	module_stat, module, &ht_stats, &ht_params, &ht_private, &ht_in_regions, &ht_out_regions);
 

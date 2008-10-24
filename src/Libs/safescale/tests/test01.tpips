@@ -1,6 +1,7 @@
 delete test01
 create test01 test01.c
 
+setproperty ABORT_ON_USER_ERROR TRUE
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
@@ -37,8 +38,8 @@ display PRINTED_FILE[main]
 #display PRINTED_FILE[main]
 
 apply SAFESCALE_DISTRIBUTOR
-#display PRINTED_FILE[for]
-#display PRINTED_FILE[main]
+display PRINTED_FILE[for]
+display PRINTED_FILE[main]
 
 close
 
