@@ -785,27 +785,24 @@ hpfc_parser                     > MODULE.parsed_code
 
 \subsection{Declaration of the C parsers}
 
-A C file is a compilation unit with macros, include statements, local
-and global variable definitions, type definitions, and with some or no
+A C file is a compilation unit with macros, include statements, local and
+global variable definitions, type definitions, and with some or no
 function definitions. When the PIPS workspace is created by PIPS
-preprocessor, each C file is preprocessed\footnote{Macros are
-interpreted and include files are expanded. The result depends on the
-C preprocessor used,on its option and on the system environment
-(/usr/include,...).} using for instance
-\texttt{gcc -E}\footnote{It can be redefined using
-\texttt{CPP\_PIPS\_ENV} and \texttt{CPP\ PIPS\_OPTIONS\_ENV} environment
-variables} and broken into a new \index{compilation unit} which contains only
-variable and function and type definitions and one C file for each C
-function defined in the initial C file.
+preprocessor, each C file is preprocessed\footnote{Macros are interpreted
+  and include files are expanded. The result depends on the C preprocessor
+  used,on its option and on the system environment
+  (\texttt{/usr/include},...).} using for instance \texttt{gcc
+  -E}\footnote{It can be redefined using \texttt{CPP\_PIPS\_ENV} and
+  \texttt{CPP\ PIPS\_OPTIONS\_ENV} environment variables} and broken into
+a new \index{compilation unit} which contains only global variable
+declaration, function declaration and type definitions, and one C file for
+each C function defined in the initial C file.
 
-The compilation unit does not contain any function definitions after
-the\marginpar{RK: gnih? to be deleted (FI)} workspace creation.
-
-The new compilation units must be parsed before the new files
-containing each one function definition can be parsed. The new
-compilation units are named like the initial file name with a bang
-extension. For instance, file \texttt{foo.c} will lead to a new
-\texttt{foo!.c} compilation unit. This new compilation unit may be empty.
+The new compilation units must be parsed before the new files containing
+each one function definition can be parsed. The new compilation units are
+named like the initial file name with a bang extension. For instance, file
+\verb|foo.cpp_processed.c| will lead to a new \verb|foo!.cpp_processed.c|
+compilation unit. This new compilation unit may be empty.
 
 \begin{verbatim}
 compilation_unit_parser         > COMPILATION_UNIT.declarations
@@ -3335,6 +3332,50 @@ phrase_distributor_control_code          > MODULE.code
         < MODULE.dg
 \end{verbatim}
 
+
+\subsection{Safescale}
+\label{subsubsection_safescale_module_analysis}
+\index{Safescale}
+\index{Kaapi}
+
+The Safescale project is an attempt to automatically (or semi-automatically) 
+transform sequential code written in C language for the Kaapi runtime. 
+
+\subsubsection{Distribution init}
+\index{Distribution init}
+
+%%@UserManualDocumentation:  saferscale_distributor_init
+This phase is intended for the analysis of a module given with the aim of finding
+blocks of code delimited by specific pragmas from it.
+%%!UserManualDocumentation
+
+\begin{verbatim}
+alias safescale_distributor_init 'Safescale distributor init'
+
+safescale_distributor_init                  > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{verbatim}
+
+\subsubsection{Statement externalization}
+\index{Statement externalization}
+
+%%@UserManualDocumentation:  safescale_distributor
+This phase is intended for the externalization of a block of code.
+%%!UserManualDocumentation
+
+\begin{verbatim}
+alias safescale_distributor 'Safescale distributor'
+
+safescale_distributor                  > MODULE.code
+                                       > MODULE.callees              
+        ! MODULE.safescale_distributor_init
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.regions
+        < MODULE.in_regions
+        < MODULE.out_regions
+\end{verbatim}
 
 \subsection{CoMap: code generation for accelerators with DMA}
 \label{sec:comap:-code}
