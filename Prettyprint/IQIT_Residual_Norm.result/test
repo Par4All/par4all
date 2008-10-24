@@ -1,7 +1,7 @@
 
 PARSED PRINTED FILES
 
-int AddShift_i(Block_t *BlockToProcess_at,Block_t *ProcessedBlock_at)
+int AddShift_i(Block_t *BlockToProcess_at, Block_t *ProcessedBlock_at)
 {
    int i = 0;
    int j = 0;
@@ -11,7 +11,7 @@ int AddShift_i(Block_t *BlockToProcess_at,Block_t *ProcessedBlock_at)
          ((ProcessedBlock_at->p)[i])[j] = ((BlockToProcess_at->p)[i])[j]+2*2*2*2*2>>6;
    return 1;
 }
-int BlockProcessing_i(int BlockId_i,int BlockInitialValue_i,Block_t *ResultingBlock_at)
+int BlockProcessing_i(int BlockId_i, int BlockInitialValue_i, Block_t *ResultingBlock_at)
 {
 
    printf("\n====== BEGIN Block no %d =========\n", BlockId_i);
@@ -61,20 +61,20 @@ int BlockProcessing_i(int BlockId_i,int BlockInitialValue_i,Block_t *ResultingBl
 
    printf("====== END Block no %d =========\n\n", BlockId_i);
 }
-int DisplayBlockHexa_i(char *BlockName_ac,Block_t *BlockToDisplay_at)
+int DisplayBlockHexa_i(char *BlockName_ac, Block_t *BlockToDisplay_at)
 {
    int i = 0;
    int j = 0;
    printf("---- %s ----\n", BlockName_ac);
    for (i = 0;i<4;i++) {
       for (j = 0;j<4;j++)
-         printf("0x%08X ", (int )((BlockToDisplay_at->p)[i])[j]);
+         printf("0x%08X ", (int) ((BlockToDisplay_at->p)[i])[j]);
       printf("\n");
    }
    printf("------------\n");
    return 1;
 }
-int DisplayBlock_i(char *BlockName_ac,Block_t *BlockToDisplay_at)
+int DisplayBlock_i(char *BlockName_ac, Block_t *BlockToDisplay_at)
 {
    int i = 0;
    int j = 0;
@@ -87,7 +87,7 @@ int DisplayBlock_i(char *BlockName_ac,Block_t *BlockToDisplay_at)
    printf("------------\n");
    return 1;
 }
-int FillBlockWithIncValue_i(short PixelValue_s,Block_t *BlockToFill_at)
+int FillBlockWithIncValue_i(short PixelValue_s, Block_t *BlockToFill_at)
 {
    int i = 0;
    int j = 0;
@@ -102,7 +102,7 @@ int FillBlockWithIncValue_i(short PixelValue_s,Block_t *BlockToFill_at)
 
    return 1;
 }
-int FillBlockWithOneValue_i(short PixelValue_s,Block_t *BlockToFill_at)
+int FillBlockWithOneValue_i(short PixelValue_s, Block_t *BlockToFill_at)
 {
    int i = 0;
    int j = 0;
@@ -116,7 +116,7 @@ int FillBlockWithOneValue_i(short PixelValue_s,Block_t *BlockToFill_at)
 
    return 1;
 }
-int HorizontalTransform_1_i(Block_t *BlockToTransform_at,Block_t *TransformedBlock_at)
+int HorizontalTransform_1_i(Block_t *BlockToTransform_at, Block_t *TransformedBlock_at)
 {
    int i = 0;
 
@@ -129,7 +129,7 @@ int HorizontalTransform_1_i(Block_t *BlockToTransform_at,Block_t *TransformedBlo
 
    return 1;
 }
-int HorizontalTransform_2_i(Block_t *BlockToTransform_at,Block_t *TransformedBlock_at)
+int HorizontalTransform_2_i(Block_t *BlockToTransform_at, Block_t *TransformedBlock_at)
 {
    int i = 0;
 
@@ -142,7 +142,7 @@ int HorizontalTransform_2_i(Block_t *BlockToTransform_at,Block_t *TransformedBlo
 
    return 1;
 }
-int LevelScaleMatrixDetermination_i(int Scale,Block_t *ComputedLevelScaleMatrix)
+int LevelScaleMatrixDetermination_i(int Scale, Block_t *ComputedLevelScaleMatrix)
 {
 
    ((ComputedLevelScaleMatrix->p)[0])[0] = LevelScaleBaseMatrix_auc[Scale][0];
@@ -164,7 +164,7 @@ int LevelScaleMatrixDetermination_i(int Scale,Block_t *ComputedLevelScaleMatrix)
 
    return 1;
 }
-int Scaling_i(Block_t *Scale_at,Block_t *BlockToScale_at,Block_t *ReScaledBlock_at)
+int Scaling_i(Block_t *Scale_at, Block_t *BlockToScale_at, Block_t *ReScaledBlock_at)
 {
    int i = 0;
    int j = 0;
@@ -180,7 +180,7 @@ int Scaling_i(Block_t *Scale_at,Block_t *BlockToScale_at,Block_t *ReScaledBlock_
             ((ReScaledBlock_at->p)[i])[j] = ((ReScaledBlock_at->p)[i])[j]*2;
    return 1;
 }
-int VerticalTransform_1_i(Block_t *BlockToTransform_at,Block_t *TransformedBlock_at)
+int VerticalTransform_1_i(Block_t *BlockToTransform_at, Block_t *TransformedBlock_at)
 {
    int j = 0;
 
@@ -193,7 +193,7 @@ int VerticalTransform_1_i(Block_t *BlockToTransform_at,Block_t *TransformedBlock
 
    return 1;
 }
-int VerticalTransform_2_i(Block_t *BlockToTransform_at,Block_t *TransformedBlock_at)
+int VerticalTransform_2_i(Block_t *BlockToTransform_at, Block_t *TransformedBlock_at)
 {
    int j = 0;
 
@@ -206,18 +206,18 @@ int VerticalTransform_2_i(Block_t *BlockToTransform_at,Block_t *TransformedBlock
 
    return 1;
 }
-int main(int argc,char *argv[])
+int main(int argc, char *argv[])
 {
    int i = 0;
    int j = 0;
    int k = 0;
    int l = 0;
-   Block_t *BlockToDisplay_at = (void *)0;
+   Block_t *BlockToDisplay_at = (void *) 0;
 
    printf("\n\nTEST OF IQ-IT RESIDUAL 4x4 Block NORM IMPLEMENTATION %s - %s \n\n", "11:17:40", "Oct 20 2008");
 
    qP_i = 28;
-   qP_div_6_i = (int )qP_i/6;
+   qP_div_6_i = (int) qP_i/6;
    qP_mod_6_i = qP_i-qP_div_6_i*6;
    LeftShift_i = qP_div_6_i;
 
@@ -266,14 +266,14 @@ int main(int argc,char *argv[])
          for (k = 0;k<4;k++)
             for (l = 0;l<4;l++) {
                BlockToDisplay_at = &MB_t[k][l];
-               printf("%x:%x:%04x: %04x\n", i, j, k*4+l, (short )((BlockToDisplay_at->p)[i])[j]);
+               printf("%x:%x:%04x: %04x\n", i, j, k*4+l, (short) ((BlockToDisplay_at->p)[i])[j]);
             }
    printf("\n\nEND  %s - %s \n\n", "11:17:40", "Oct 20 2008");
 }
 
 PRINTED FILES
 
-int AddShift_i(Block_t *BlockToProcess_at,Block_t *ProcessedBlock_at)
+int AddShift_i(Block_t *BlockToProcess_at, Block_t *ProcessedBlock_at)
 {
    int i = 0;
    int j = 0;
@@ -283,7 +283,7 @@ int AddShift_i(Block_t *BlockToProcess_at,Block_t *ProcessedBlock_at)
          ((ProcessedBlock_at->p)[i])[j] = ((BlockToProcess_at->p)[i])[j]+2*2*2*2*2>>6;
    return 1;
 }
-int BlockProcessing_i(int BlockId_i,int BlockInitialValue_i,Block_t *ResultingBlock_at)
+int BlockProcessing_i(int BlockId_i, int BlockInitialValue_i, Block_t *ResultingBlock_at)
 {
 
    printf("\n====== BEGIN Block no %d =========\n", BlockId_i);
@@ -333,20 +333,20 @@ int BlockProcessing_i(int BlockId_i,int BlockInitialValue_i,Block_t *ResultingBl
 
    printf("====== END Block no %d =========\n\n", BlockId_i);
 }
-int DisplayBlockHexa_i(char *BlockName_ac,Block_t *BlockToDisplay_at)
+int DisplayBlockHexa_i(char *BlockName_ac, Block_t *BlockToDisplay_at)
 {
    int i = 0;
    int j = 0;
    printf("---- %s ----\n", BlockName_ac);
    for (i = 0;i<4;i++) {
       for (j = 0;j<4;j++)
-         printf("0x%08X ", (int )((BlockToDisplay_at->p)[i])[j]);
+         printf("0x%08X ", (int) ((BlockToDisplay_at->p)[i])[j]);
       printf("\n");
    }
    printf("------------\n");
    return 1;
 }
-int DisplayBlock_i(char *BlockName_ac,Block_t *BlockToDisplay_at)
+int DisplayBlock_i(char *BlockName_ac, Block_t *BlockToDisplay_at)
 {
    int i = 0;
    int j = 0;
@@ -359,7 +359,7 @@ int DisplayBlock_i(char *BlockName_ac,Block_t *BlockToDisplay_at)
    printf("------------\n");
    return 1;
 }
-int FillBlockWithIncValue_i(short PixelValue_s,Block_t *BlockToFill_at)
+int FillBlockWithIncValue_i(short PixelValue_s, Block_t *BlockToFill_at)
 {
    int i = 0;
    int j = 0;
@@ -374,7 +374,7 @@ int FillBlockWithIncValue_i(short PixelValue_s,Block_t *BlockToFill_at)
 
    return 1;
 }
-int FillBlockWithOneValue_i(short PixelValue_s,Block_t *BlockToFill_at)
+int FillBlockWithOneValue_i(short PixelValue_s, Block_t *BlockToFill_at)
 {
    int i = 0;
    int j = 0;
@@ -388,7 +388,7 @@ int FillBlockWithOneValue_i(short PixelValue_s,Block_t *BlockToFill_at)
 
    return 1;
 }
-int HorizontalTransform_1_i(Block_t *BlockToTransform_at,Block_t *TransformedBlock_at)
+int HorizontalTransform_1_i(Block_t *BlockToTransform_at, Block_t *TransformedBlock_at)
 {
    int i = 0;
 
@@ -401,7 +401,7 @@ int HorizontalTransform_1_i(Block_t *BlockToTransform_at,Block_t *TransformedBlo
 
    return 1;
 }
-int HorizontalTransform_2_i(Block_t *BlockToTransform_at,Block_t *TransformedBlock_at)
+int HorizontalTransform_2_i(Block_t *BlockToTransform_at, Block_t *TransformedBlock_at)
 {
    int i = 0;
 
@@ -414,7 +414,7 @@ int HorizontalTransform_2_i(Block_t *BlockToTransform_at,Block_t *TransformedBlo
 
    return 1;
 }
-int LevelScaleMatrixDetermination_i(int Scale,Block_t *ComputedLevelScaleMatrix)
+int LevelScaleMatrixDetermination_i(int Scale, Block_t *ComputedLevelScaleMatrix)
 {
 
    ((ComputedLevelScaleMatrix->p)[0])[0] = LevelScaleBaseMatrix_auc[Scale][0];
@@ -436,7 +436,7 @@ int LevelScaleMatrixDetermination_i(int Scale,Block_t *ComputedLevelScaleMatrix)
 
    return 1;
 }
-int Scaling_i(Block_t *Scale_at,Block_t *BlockToScale_at,Block_t *ReScaledBlock_at)
+int Scaling_i(Block_t *Scale_at, Block_t *BlockToScale_at, Block_t *ReScaledBlock_at)
 {
    int i = 0;
    int j = 0;
@@ -452,7 +452,7 @@ int Scaling_i(Block_t *Scale_at,Block_t *BlockToScale_at,Block_t *ReScaledBlock_
             ((ReScaledBlock_at->p)[i])[j] = ((ReScaledBlock_at->p)[i])[j]*2;
    return 1;
 }
-int VerticalTransform_1_i(Block_t *BlockToTransform_at,Block_t *TransformedBlock_at)
+int VerticalTransform_1_i(Block_t *BlockToTransform_at, Block_t *TransformedBlock_at)
 {
    int j = 0;
 
@@ -465,7 +465,7 @@ int VerticalTransform_1_i(Block_t *BlockToTransform_at,Block_t *TransformedBlock
 
    return 1;
 }
-int VerticalTransform_2_i(Block_t *BlockToTransform_at,Block_t *TransformedBlock_at)
+int VerticalTransform_2_i(Block_t *BlockToTransform_at, Block_t *TransformedBlock_at)
 {
    int j = 0;
 
@@ -478,18 +478,18 @@ int VerticalTransform_2_i(Block_t *BlockToTransform_at,Block_t *TransformedBlock
 
    return 1;
 }
-int main(int argc,char *argv[])
+int main(int argc, char *argv[])
 {
    int i = 0;
    int j = 0;
    int k = 0;
    int l = 0;
-   Block_t *BlockToDisplay_at = (void *)0;
+   Block_t *BlockToDisplay_at = (void *) 0;
 
    printf("\n\nTEST OF IQ-IT RESIDUAL 4x4 Block NORM IMPLEMENTATION %s - %s \n\n", "11:17:40", "Oct 20 2008");
 
    qP_i = 28;
-   qP_div_6_i = (int )qP_i/6;
+   qP_div_6_i = (int) qP_i/6;
    qP_mod_6_i = qP_i-qP_div_6_i*6;
    LeftShift_i = qP_div_6_i;
 
@@ -538,7 +538,7 @@ int main(int argc,char *argv[])
          for (k = 0;k<4;k++)
             for (l = 0;l<4;l++) {
                BlockToDisplay_at = &MB_t[k][l];
-               printf("%x:%x:%04x: %04x\n", i, j, k*4+l, (short )((BlockToDisplay_at->p)[i])[j]);
+               printf("%x:%x:%04x: %04x\n", i, j, k*4+l, (short) ((BlockToDisplay_at->p)[i])[j]);
             }
    printf("\n\nEND  %s - %s \n\n", "11:17:40", "Oct 20 2008");
 }

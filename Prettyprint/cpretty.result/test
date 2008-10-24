@@ -57,8 +57,8 @@
       ENDDO
       END
 /* C pretty print for module FUN1. */
-int 
-  fun1 (int i)
+int
+fun1 (int i)
 {
   int result;
 
@@ -66,8 +66,8 @@ int
   return result;
 }
 /* C pretty print for module MAIN. */
-int 
-  main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   int i;
 
@@ -89,8 +89,8 @@ int
 /* C pretty print for module SUB. */
 #define n 10
 
-void 
-  sub (int j, int k)
+void
+sub (int j, int k)
 {
   int i;
   double a[11];
@@ -103,8 +103,8 @@ void
   return;
 }
 /* C pretty print for module SUB2. */
-void 
-  sub2 (int n, int m)
+void
+sub2 (int n, int m)
 {
   float b[21][11];
   int i;
@@ -124,8 +124,8 @@ void
 
 #define m 3
 
-void 
-  sub3 (void)
+void
+sub3 (void)
 {
   int i;
 
@@ -140,8 +140,8 @@ void
 /* C pretty print for module SUB4. */
 #define n 10
 
-void 
-  sub4 (double a[11])
+void
+sub4 (double a[11])
 {
   int i;
   double b[11];
