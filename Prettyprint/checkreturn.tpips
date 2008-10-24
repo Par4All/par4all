@@ -1,5 +1,5 @@
 # delete checkreturn
-create checkreturn ${PIPS_ROOT}/Validation/Prettyprint/checkreturn.f
+create checkreturn checkreturn.f
 
 module CHECKRETURN
 

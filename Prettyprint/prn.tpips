@@ -2,7 +2,7 @@
 # the last colmun is reached by a continuation...
 #
 delete prn
-create prn ${PIPS_ROOT}/Validation/Prettyprint/prn.f
+create prn prn.f
 display PRINTED_FILE(prn)
 close
 delete prn

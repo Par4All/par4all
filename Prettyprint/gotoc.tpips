@@ -2,7 +2,7 @@
 #
 
 delete gotoc
-create gotoc ${PIPS_ROOT}/Validation/Prettyprint/gotoc.f
+create gotoc gotoc.f
 module GOTOC
 
 echo

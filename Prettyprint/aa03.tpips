@@ -1,5 +1,5 @@
 delete aa03
-create aa03 ${PIPS_ROOT}/Validation/Prettyprint/aa03.f
+create aa03 aa03.f
 
 # Interprocedural parallelism canot be expressed in Fortran 90
 # activate REGION_CHAINS

@@ -1,5 +1,5 @@
 delete continuation01
-create continuation01 ${PIPS_ROOT}/Validation/Prettyprint/continuation01.f
+create continuation01 continuation01.f
 display PRINTED_FILE[%ALL]
 close
 delete continuation01

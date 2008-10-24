@@ -1,5 +1,5 @@
 delete equiv
-create equiv ${PIPS_ROOT}/Validation/Prettyprint/equiv.f
+create equiv equiv.f
 
 set PRETTYPRINT_ALL_DECLARATIONS TRUE
 
