@@ -1263,10 +1263,12 @@ the variable is unsigned, signed or not */
 #define STDERR_LUN (0)
 #define STDIN_LUN (5)
 #define STDOUT_LUN (6)
-/*Symbolic constants for the file descriptors beloning to the standard streams*/
+/*Symbolic constants for the file descriptors belonging to the standard streams: unistd.h */
+#ifndef _UNISTD_H
 #define STDIN_FILENO (0)
 #define STDOUT_FILENO (1)
 #define STDERR_FILENO (2)
+#endif
 
 /* Empty comments (i.e. default comments) */
 
