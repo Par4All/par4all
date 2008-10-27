@@ -3,6 +3,6 @@ main()
    int i;
    int n;
    int nr;
-   int k = (++i,0);
+   int k = (++i, 0);
    i = (nr?1:n+1);
 }

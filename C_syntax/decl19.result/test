@@ -95,10 +95,10 @@ End of declarations for module decl19
 
 Parsed printed file for "decl19!" and "decl19"
 
-typedef int f(int );
-typedef int (*g)(int );
-extern int decl19(int );
-extern int decl19(int );
+typedef int f(int);
+typedef int (*g)(int);
+extern int decl19(int);
+extern int decl19(int);
 
 int decl19(int cookie)
 {
@@ -110,9 +110,9 @@ int decl19(int cookie)
    if (cookie<10)
       return x(cookie+1);
    else if (cookie<20)
-      return ( *x)(cookie+1);
+      return (*x)(cookie+1);
    else if (cookie<30) {
       /* Fun for my student :-) */
-      ( * * * * * * * * * * * * * * * * *x)(cookie+1);
+      (*****************x)(cookie+1);
    }
 }

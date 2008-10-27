@@ -1,4 +1,7 @@
 delete nodeclsfunc
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create nodeclsfunc nodeclsfunc.c
 
 
@@ -12,5 +15,5 @@ display SYMBOL_TABLE_FILE[%ALL]
 display PARSED_PRINTED_FILE[%ALL]
 
 close
-delete nodecls
+delete nodeclsfunc
 quit

@@ -6,7 +6,7 @@ main()
    int i;
    int j;
    int a[5];
-   for ((i = 1,j = 2);i<5;(i++,j += 2))
+   for ((i = 1, j = 2);i<5;(i++, j += 2))
       a[i] = i;
 }
 
@@ -17,10 +17,10 @@ main()
    int i;
    int j;
    int a[5];
-   (i = 1,j = 2);
+   (i = 1, j = 2);
    while (i<5) {
       a[i] = i;
-      (i++,j += 2);
+      (i++, j += 2);
    }
 }
 
@@ -32,7 +32,7 @@ main()
    int j;
    int a[5];
 //               <must be written>: i j
-   (i = 1,j = 2);
+   (i = 1, j = 2);
 //               <must be read   >: i
    while (i<5) {
 //               <must be read   >: i
@@ -40,7 +40,7 @@ main()
       a[i] = i;
 //               <must be read   >: i j
 //               <must be written>: i j
-      (i++,j += 2);
+      (i++, j += 2);
    }
 }
 
@@ -57,7 +57,7 @@ main()
 
 //  T(i,j) {}
 
-   (i = 1,j = 2);
+   (i = 1, j = 2);
 
 //  T(i,j) {}
 
@@ -69,6 +69,6 @@ main()
 
 //  T(i,j) {}
 
-      (i++,j += 2);
+      (i++, j += 2);
    }
 }

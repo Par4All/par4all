@@ -3,28 +3,28 @@ Parsed printed file for all
 
 void bar(int i)
 {
-   extern void foo(int );
+   extern void foo(int);
    foo(i);
 
    if (i) {
-      extern void foo(int );
+      extern void foo(int);
 
       foo(i);
    }
 }
-extern void foo(int );
+extern void foo(int);
 void foo(int i)
 {
 
    i++;
    printf("This is the top-level version in bar.c\n");
 }
-static void foo(int );
-extern void bar(int );
+static void foo(int);
+extern void bar(int);
 static void foo(int i)
 {
    int foo;
-   void *p = (void *)&foo;
+   void *p = (void *) &foo;
 
    i++;
 
@@ -32,8 +32,8 @@ static void foo(int i)
 }
 int main()
 {
-   extern int foo(int );
-   extern int bar(int );
+   extern void foo(int);
+   extern void bar(int);
    foo(3);
    bar(3);
 }
@@ -41,30 +41,30 @@ extern int main();
 
 Printed file for all
 
-int bar(int i)
+void bar(int i)
 {
-   extern int foo(int );
+   extern void foo(int);
    foo(i);
 
    if (i) {
-      extern int foo(int );
+      extern void foo(int);
 
       foo(i);
    }
 }
-extern int foo(int );
-int foo(int i)
+extern void foo(int);
+void foo(int i)
 {
 
    i++;
    printf("This is the top-level version in bar.c\n");
 }
-static void foo(int );
-extern int bar(int );
+static void foo(int);
+extern void bar(int);
 static void foo(int i)
 {
    int foo;
-   void *p = (void *)&foo;
+   void *p = (void *) &foo;
 
    i++;
 
@@ -72,8 +72,8 @@ static void foo(int i)
 }
 int main()
 {
-   extern int foo(int );
-   extern int bar(int );
+   extern void foo(int);
+   extern void bar(int);
    foo(3);
    bar(3);
 }
@@ -83,12 +83,12 @@ Symbole tables for all
 
 bar
 
-Declarations for module "bar" with type "int -> int"
+Declarations for module "bar" with type "int -> void"
 
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
-	Declared entity "TOP-LEVEL:foo" with type "functional" "int -> int"
+	Declared entity "TOP-LEVEL:foo" with type "functional" "int -> void"
 	Declared entity "bar:*DYNAMIC*" with type "area" with size 0
 	Declared entity "bar:*STACK*" with type "area" with size 0
 	Declared entity "bar:*STATIC*" with type "area" with size 0
@@ -136,7 +136,7 @@ Declarations for module "bar!" with type "() -> unknow"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
-	Declared entity "TOP-LEVEL:foo" with type "functional" "int -> int"
+	Declared entity "TOP-LEVEL:foo" with type "functional" "int -> void"
 	Declared entity "bar!:*DYNAMIC*" with type "area" with size 0
 	Declared entity "bar!:*HEAP*" with type "area" with size 0
 	Declared entity "bar!:*STACK*" with type "area" with size 0
@@ -144,7 +144,7 @@ Variable list:
 
 External variable list:
 
-	Declared external entity "TOP-LEVEL:foo"	with type "functional" "int -> int"
+	Declared external entity "TOP-LEVEL:foo"	with type "functional" "int -> void"
 
 Layouts for memory areas:
 
@@ -171,7 +171,7 @@ End of declarations for module bar!
 
 foo
 
-Declarations for module "foo" with type "int -> int"
+Declarations for module "foo" with type "int -> void"
 
 Variable list:
 
@@ -223,7 +223,7 @@ Declarations for module "foo!" with type "() -> unknow"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
-	Declared entity "TOP-LEVEL:bar" with type "functional" "int -> int"
+	Declared entity "TOP-LEVEL:bar" with type "functional" "int -> void"
 	Declared entity "foo!:*DYNAMIC*" with type "area" with size 0
 	Declared entity "foo!:*HEAP*" with type "area" with size 0
 	Declared entity "foo!:*STACK*" with type "area" with size 0
@@ -232,7 +232,7 @@ Variable list:
 
 External variable list:
 
-	Declared external entity "TOP-LEVEL:bar"	with type "functional" "int -> int"
+	Declared external entity "TOP-LEVEL:bar"	with type "functional" "int -> void"
 
 Layouts for memory areas:
 
@@ -266,19 +266,19 @@ Variable list:
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
 	Declared entity "foo!:*HEAP*" with type "area" with size 0
 	Declared entity "foo!:*STATIC*" with type "area" with size 0
-	Declared entity "foo!foo!foo:i" with type "variable" "int"
 	Declared entity "foo!foo:*DYNAMIC*" with type "area" with size 8
 	Declared entity "foo!foo:*STACK*" with type "area" with size 0
 	Declared entity "foo!foo:*STATIC*" with type "area" with size 0
 	Declared entity "foo!foo:0`foo" with type "variable" "int"
 	Declared entity "foo!foo:0`p" with type "variable" "void *"
+	Declared entity "foo!foo:i" with type "variable" "int"
 
 * empty extern declaration list *
 
 
 Layouts for formal parameters:
 
-	Variable foo!foo!foo:i	offset = 1
+	Variable foo!foo:i	offset = 1
 Layouts for memory areas:
 
 Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
@@ -314,8 +314,8 @@ Declarations for module "main" with type "() -> int"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
-	Declared entity "TOP-LEVEL:bar" with type "functional" "int -> int"
-	Declared entity "TOP-LEVEL:foo" with type "functional" "int -> int"
+	Declared entity "TOP-LEVEL:bar" with type "functional" "int -> void"
+	Declared entity "TOP-LEVEL:foo" with type "functional" "int -> void"
 	Declared entity "main:*DYNAMIC*" with type "area" with size 0
 	Declared entity "main:*STACK*" with type "area" with size 0
 	Declared entity "main:*STATIC*" with type "area" with size 0

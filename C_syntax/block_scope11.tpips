@@ -1,0 +1,59 @@
+# The local function hides the global function, no matter what "extern" means
+
+delete block_scope11
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+# create block_scope11 block_scope11.src/main.c block_scope11.src/global.c
+create block_scope11 block_scope11.src/main.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+# setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+echo
+echo Symbol table for "main"
+echo
+
+display SYMBOL_TABLE_FILE[main]
+quit
+display SYMBOL_TABLE_FILE[main!]
+echo
+display SYMBOL_TABLE_FILE[main!foo]
+echo
+
+
+echo
+echo Parser output
+echo
+
+display PARSED_PRINTED_FILE[block_scope11!]
+echo
+display PARSED_PRINTED_FILE[block_scope11!block_scope11]
+# quit
+
+echo
+echo Parser output
+echo
+
+display PARSED_PRINTED_FILE[block_scope11!]
+echo
+display PARSED_PRINTED_FILE[block_scope11!block_scope11]
+
+echo
+echo Controlizer output
+echo
+
+display PRINTED_FILE[block_scope11!block_scope11]
+
+close
+
+delete block_scope11
+
+
