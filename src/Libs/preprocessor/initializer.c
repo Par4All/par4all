@@ -256,108 +256,127 @@ compilation_unit_text(entity cu, entity module)
 static bool 
 missing_file_initializer(string module_name, bool is_fortran)
 {
-    boolean success_p = TRUE;
-    entity m = local_name_to_top_level_entity(module_name);
-    string file_name, dir_name, src_name, full_name, init_name, finit_name; 
-    /* relative to the current directory */
-    FILE * f;
-    text stub;
-    string res = is_fortran? DBR_INITIAL_FILE : DBR_C_SOURCE_FILE;
-    /* For C only: compilation unit cu and compilation unit name cun */
-    string cun = string_undefined;
-    entity cu = entity_undefined;
+  boolean success_p = TRUE;
+  entity m = local_name_to_top_level_entity(module_name);
+  string file_name, dir_name, src_name, full_name, init_name, finit_name; 
+  /* relative to the current directory */
+  FILE * f;
+  text stub;
+  string res = is_fortran? DBR_INITIAL_FILE : DBR_C_SOURCE_FILE;
+  /* For C only: compilation unit cu and compilation unit name cun */
+  string cun = string_undefined;
+  entity cu = entity_undefined;
  
-    pips_user_warning("no source file for %s: synthetic code is generated\n",
-		      module_name);
+  pips_user_warning("no source file for %s: synthetic code is generated\n",
+		    module_name);
 
-    if(entity_undefined_p(m))
+  if(entity_undefined_p(m))
     {
       pips_user_error(
-	"No entity defined for module %s although it might"
-	" have been encountered at a call site\n", module_name);
+		      "No entity defined for module %s although it might"
+		      " have been encountered at a call site\n", module_name);
       return FALSE;
     }
 
-    // Build the coresponding compilation unit for C code
-    if(!is_fortran) {
-      // Function defined in pipsmake
-      extern string compilation_unit_of_module(string);
-      cun = compilation_unit_of_module(module_name);
+  // Build the coresponding compilation unit for C code
+  if(!is_fortran) {
+    // Function defined in pipsmake
+    extern string compilation_unit_of_module(string);
+    cun = compilation_unit_of_module(module_name);
 
-      if(string_undefined_p(cun)) {
-	cun = strdup(concatenate(module_name, FILE_SEP_STRING, NULL));
-	cu = MakeCompilationUnitEntity(cun);
-      }
+    if(string_undefined_p(cun)) {
+      cun = strdup(concatenate(module_name, FILE_SEP_STRING, NULL));
+      cu = MakeCompilationUnitEntity(cun);
     }
+  }
     
-    /* pips' current directory is just above the workspace
-     */
-    file_name = strdup(concatenate(module_name, is_fortran? ".f" : ".cpp_processed.c", NULL));
+  /* pips' current directory is just above the workspace
+   */
+  file_name = strdup(concatenate(module_name, is_fortran? ".f" : ".cpp_processed.c", NULL));
+  if(is_fortran)
+    /* Module name normalization */
     file_name = strlower(file_name, file_name);
-    dir_name = db_get_current_workspace_directory();
-    src_name = strdup(concatenate(WORKSPACE_TMP_SPACE, "/", file_name, NULL));
-    full_name = strdup(concatenate(dir_name, "/", src_name, NULL));
-    init_name = 
-      db_build_file_resource_name(res, module_name, is_fortran? ".f_initial" : ".c");
-    finit_name = strdup(concatenate(dir_name, "/", init_name, NULL));
+  dir_name = db_get_current_workspace_directory();
+  src_name = strdup(concatenate(WORKSPACE_TMP_SPACE, "/", file_name, NULL));
+  full_name = strdup(concatenate(dir_name, "/", src_name, NULL));
+  init_name = 
+    db_build_file_resource_name(res, module_name, is_fortran? ".f_initial" : ".c");
+  finit_name = strdup(concatenate(dir_name, "/", init_name, NULL));
 
-    /* builds the stub.
-     */
-    stub = stub_text(m, is_fortran);
+  /* builds the stub.
+   */
+  stub = stub_text(m, is_fortran);
 
-    /* put it in the source file and link the initial file.
-     */
-    db_make_subdirectory(WORKSPACE_TMP_SPACE);
-    f = safe_fopen(full_name, "w");
-    print_text(f, stub);
-    safe_fclose(f, full_name);
-    /* A PIPS database may be partly incoherent after a core dump but
-       still usable (Cathare 2, FI)*/
-    if(file_exists_p(finit_name))
-      safe_unlink(finit_name);
-    safe_link(finit_name, full_name);
+  /* put it in the source file and link the initial file.
+   */
+  db_make_subdirectory(WORKSPACE_TMP_SPACE);
+  f = safe_fopen(full_name, "w");
+  print_text(f, stub);
+  safe_fclose(f, full_name);
+  /* A PIPS database may be partly incoherent after a core dump but
+     still usable (Cathare 2, FI)*/
+  if(file_exists_p(finit_name))
+    safe_unlink(finit_name);
+  safe_link(finit_name, full_name);
 
-    /* Add the new file as a file resource...
-     * should only put a new user file, I guess?
-     */
-    user_log("Registering synthesized file %s\n", file_name);
-    DB_PUT_FILE_RESOURCE(res, module_name, init_name);
-    DB_PUT_FILE_RESOURCE(DBR_USER_FILE, module_name, src_name);
 
-    if(!is_fortran) { // is C assumed
-      /* Add the compilation unit files */
-      pips_assert("The compilation unit name is defined", !string_undefined_p(cun));
-      user_log("Registering synthesized compilation unit %s\n", file_name);
+  if(!is_fortran) { // is C assumed
+    /* Add the compilation unit files */
+    string cu_file_name = string_undefined;
+    string cu_init_name = string_undefined;
+    string cu_finit_name = string_undefined;
 
-      /*
-	file_name = strdup(concatenate(module_name, is_fortran? ".f" : ".cpp_processed.c", NULL));
-	file_name = strlower(file_name, file_name);
-	dir_name = db_get_current_workspace_directory();
-	src_name = strdup(concatenate(WORKSPACE_TMP_SPACE, "/", file_name, NULL));
-	full_name = strdup(concatenate(dir_name, "/", src_name, NULL));
-      */
+    pips_assert("The compilation unit name is defined", !string_undefined_p(cun));
 
-    init_name = 
+    user_log("Registering synthesized compilation unit %s\n", cun);
+
+    cu_file_name = strdup(concatenate(cun, is_fortran? ".f" : ".cpp_processed.c", NULL));
+    /* No name normalization for C module names */
+    /* cu_file_name = strlower(cu_file_name, cu_file_name); */
+    cu_init_name = 
       db_build_file_resource_name(res, cun, is_fortran? ".f_initial" : ".c");
-    finit_name = strdup(concatenate(dir_name, "/", init_name, NULL));
+    cu_finit_name = strdup(concatenate(dir_name, "/", cu_init_name, NULL));
 
     /* builds the compilation unit stub: it can be empty or include
        module_name declaration as an extern function.
-     */
+    */
     stub = compilation_unit_text(cu, m);
 
-    /* put it in the source file and link the initial file.
-     */
+    /* put it in the source file and link the initial file. */
     db_make_subdirectory(WORKSPACE_TMP_SPACE);
-    f = safe_fopen(finit_name, "w");
+    f = safe_fopen(cu_finit_name, "w");
     print_text(f, stub);
-    safe_fclose(f, finit_name);
-      DB_PUT_FILE_RESOURCE(res, cun, init_name);
-      DB_PUT_FILE_RESOURCE(DBR_USER_FILE, cun, strdup(src_name));
+    safe_fclose(f, cu_finit_name);
+
+    DB_PUT_NEW_FILE_RESOURCE(res, cun, cu_init_name);
+    DB_PUT_NEW_FILE_RESOURCE(DBR_USER_FILE, cun, strdup(src_name));
+
+    ifdebug(8) {
+      pips_debug(8, "File \"\%s\" is registered as resource \"\%s\" for module \"\%s\"\n",
+		 cu_init_name, res, cun);
+      pips_debug(8, "File \"\%s\" is registered as resource \"\%s\" for module \"\%s\"\n",
+		 src_name, DBR_USER_FILE, cun);
+      pips_assert("new C_SOURCE_FILE resource exists", db_resource_p(res, cun));
+      pips_assert("new DBR_USER_FILE resource exists", db_resource_p(DBR_USER_FILE, cun));
+    }
+    free(cu_file_name), free(cu_finit_name);
   }
 
-    free(file_name), free(dir_name), free(full_name), free(finit_name);
-    return success_p;
+  /* Add the new module file as a file resource... */
+  user_log("Registering synthesized file %s\n", file_name);
+  /* FI: Why not DB_PUT_NEW_FILE_xxx? */
+  DB_PUT_NEW_FILE_RESOURCE(res, module_name, init_name);
+  DB_PUT_NEW_FILE_RESOURCE(DBR_USER_FILE, module_name, src_name);
+
+  ifdebug(8) {
+    pips_debug(8, "File \"\%s\" is registered as resource \"\%s\" for module \"\%s\"\n",
+	       init_name, res, module_name);
+    pips_debug(8, "File \"\%s\" is registered as resource \"\%s\" for module \"\%s\"\n",
+	       src_name, DBR_USER_FILE, module_name);
+  }
+
+  free(file_name), free(dir_name), free(full_name), free(finit_name);
+  return success_p;
 }
 
 extern bool process_user_file(string); /* ??? in top-level */
