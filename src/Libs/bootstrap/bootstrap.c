@@ -4133,6 +4133,16 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {QECONVERT_OPERATOR_NAME, 5, default_intrinsic_type, 0, 0},
   {QFCONVERT_OPERATOR_NAME, 5, default_intrinsic_type, 0, 0},
   {QGCONVERT_OPERATOR_NAME, 4, default_intrinsic_type, 0, 0},
+
+  /* netdb.h */
+  {__H_ERRNO_LOCATION_OPERATOR_NAME, 0, default_intrinsic_type, 0, 0},
+
+  /* bits/errno.h */
+  {__ERRNO_LOCATION_OPERATOR_NAME, 0, default_intrinsic_type, 0, 0},
+
+  /* signal.h */
+  {SIGNAL_OPERATOR_NAME, 2, default_intrinsic_type, 0, 0},
+
   /* same name in stdlib
      {"ecvt", 4, default_intrinsic_type, 0, 0},
      {"fcvt", 4, default_intrinsic_type, 0, 0},
@@ -4179,7 +4189,9 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {FPUTC_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
   {FPUTS_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
   {GETC_FUNCTION_NAME, 1, overloaded_to_integer_type, 0, 0},
+  {_IO_GETC_FUNCTION_NAME, 1, overloaded_to_integer_type, 0, 0},
   {PUTC_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
+  {_IO_PUTC_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
   {GETCHAR_FUNCTION_NAME, 1, void_to_integer_type, 0, 0},
   {PUTCHAR_FUNCTION_NAME, 1, integer_to_integer_type, 0, 0},
   {GETS_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
@@ -4237,6 +4249,9 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {IOCTL_FUNCTION_NAME,     (INT_MAX), overloaded_to_integer_type, 0, 0},
   {SELECT_FUNCTION_NAME,    5,         overloaded_to_integer_type, 0, 0},
   {PSELECT_FUNCTION_NAME,   6,         overloaded_to_integer_type, 0, 0},
+  {STAT_FUNCTION_NAME,      2,         overloaded_to_integer_type, 0, 0},
+  {FSTAT_FUNCTION_NAME,     2,         overloaded_to_integer_type, 0, 0},
+  {LSTAT_FUNCTION_NAME,     2,         overloaded_to_integer_type, 0, 0},
 
   /*#include <stdlib.h>*/
 
@@ -4251,6 +4266,7 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {DIV_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
   {EXIT_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {FREE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+
   {GETENV_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {LABS_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {LDIV_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
@@ -4328,6 +4344,8 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {STRCPY_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
   {STRCAT_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
   {STRLEN_FUNCTION_NAME,1,default_intrinsic_type, 0, 0},
+  {STRERROR_FUNCTION_NAME,1,integer_to_overloaded_type, 0, 0},
+  {STRERROR_R_FUNCTION_NAME,3,default_intrinsic_type, 0, 0},
 
   /*#include <tgmath.h>*/
   /*#include <time.h>*/

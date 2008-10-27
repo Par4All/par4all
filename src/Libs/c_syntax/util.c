@@ -208,9 +208,37 @@ expression MakeFunctionExpression(expression e, list le)
       {
 	entity ent = reference_variable(syntax_reference(s));
 	bool ok = TRUE;
+	entity cf = get_current_module_entity();
 
-	AddToCalledModules(ent);
-	pips_debug(6,"Normal function call\n");
+	if(!intrinsic_entity_p(ent)) {
+	  entity cu = get_current_compilation_unit_entity();
+	  list cudl = code_declarations(value_code(entity_initial(cu)));
+	  type ut = ultimate_type(entity_type(ent));
+
+	  if(type_functional_p(ut))
+	    AddToCalledModules(ent);
+	  else {
+	    /* Must be a pointer to a function */
+	    string eun = entity_user_name(ent);
+	    pips_user_warning("Call to an unknown function via function pointer \"\%s\"\n",
+			      eun);
+	    free(eun);
+	  }
+
+	  if(!gen_in_list_p(ent, cudl)) {
+	    /* Undeclared functions return int by default */
+	    type ft = entity_type(ent);
+	    functional f = type_functional(ft);
+
+	    pips_assert("function's type is ultimately functional or pointer to functional",
+			call_compatible_type_p(ft));
+	    f = type_functional(ft);
+	    if(type_functional_p(ft) && type_unknown_p(functional_result(f)))
+	      functional_result(f) = MakeIntegerResult();
+	    AddToDeclarations(ent, cf);
+	  }
+	}
+	pips_debug(6,"Normal function or intrinsics call\n");
 	ok = check_C_function_type(ent, le);
 	exp = make_call_expression(ent,le);
 	break;
@@ -409,9 +437,12 @@ expression MemberIdentifierToExpression(expression e, string m)
 expression IdentifierToExpression(string s)
 {
   entity ent = FindEntityFromLocalName(s);
-  pips_debug(5,"Identifier is: %s\n",s);
-  if (entity_undefined_p(ent))
-    {
+  expression exp = expression_undefined;
+
+  pips_debug(5,"Identifier is \"%s\" and entity_name is \"\%s\"\n",
+	     s, safe_entity_name(ent));
+
+  if (entity_undefined_p(ent)) {
       /* Could this be non declared variables ?*/
       /* This identifier has not been passed by the parser. 
          It is probably a function call => try this case now and complete others later.
@@ -422,28 +453,43 @@ expression IdentifierToExpression(string s)
       entity_storage(ent) = make_storage_rom();
       entity_type(ent) = make_type_functional(make_functional(NIL,make_type_unknown()));
       entity_initial(ent) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL));
-      return make_expression(make_syntax_reference(make_reference(ent,NIL)),normalized_undefined);
+      /* This may be a call or a reference in case a functional pointer is initialized */
+      exp = make_expression(make_syntax_reference(make_reference(ent,NIL)),normalized_undefined);
       /*return MakeNullaryCall(ent);*/
     }
-  switch (type_tag(entity_type(ent))) {
-  case is_type_variable: 
-  case is_type_functional:
-    {
-      expression e = expression_undefined;
-      value iv = entity_initial(ent);
-      if(!value_undefined_p(iv) && value_symbolic_p(iv))
-	/* Generate a call to an enum member */
-	e = make_expression(make_syntax_call(make_call(ent, NIL)), normalized_undefined);
-      else
-	e = make_expression(make_syntax_reference(make_reference(ent,NIL)), normalized_undefined);
-      return e;
-    }
-  default:
-    {
-      CParserError("Which kind of expression?\n");
-      return expression_undefined;
+  else if(type_undefined_p(entity_type(ent))) {
+    /* FI: This may happen when a variable is used to initialize another
+       variable within the same declaration statement: see
+       decl29.c. This might not be a general fix as the type could be
+       functional: to be checked. But setting up type earlier would require a huge
+       change in the parser rules. Unless FindOrCreateCurrentEntity()
+       could do a better job? But the information added is later
+       destroyed by the parser. */
+    exp = make_expression(make_syntax_reference(make_reference(ent,NIL)),
+			  normalized_undefined);
+  }
+  else { 
+    switch (type_tag(entity_type(ent))) {
+    case is_type_variable: 
+    case is_type_functional:
+      {
+	value iv = entity_initial(ent);
+
+	if(!value_undefined_p(iv) && value_symbolic_p(iv))
+	  /* Generate a call to an enum member */
+	  exp = make_expression(make_syntax_call(make_call(ent, NIL)), normalized_undefined);
+	else
+	  exp = make_expression(make_syntax_reference(make_reference(ent,NIL)),
+				normalized_undefined);
+	break;
+      }
+    default:
+      {
+	CParserError("Which kind of expression?\n");
+      }
     }
   }
+  return exp;
 }
 
 expression MakeArrayExpression(expression exp, list lexp)
@@ -884,6 +930,11 @@ entity FindOrCreateCurrentEntity(string name,
 								   block_scope,
 								   name,
 								   NULL)));
+		  /* FI: why is ct not exploited? Because the
+		     information is later destroyed. I guess it is
+		     related to the type_stack stored in the entity_
+		     initial field. */
+		  /* entity_type(ent) = copy_type(ct); */
 		}
 	    }
 	}
@@ -1090,6 +1141,8 @@ entity RenameFunctionEntity(entity oe)
   return ne;
 }
 
+/* The parser has found out that an entity is a function and partially
+   sets its type */
 void UpdateFunctionEntity(entity oe, list la)
 {
   type t = entity_type(oe);

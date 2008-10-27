@@ -220,10 +220,10 @@ string safe_entity_name(entity e)
 {
   string sn = string_undefined;
 
-  if(entity_domain_number(e)!= entity_domain)
+  if(entity_undefined_p(e))
+    sn = "undefined object, entity assumed";
+  else if(entity_domain_number(e)!= entity_domain)
     sn = "not an entity";
-  else if(entity_undefined_p(e))
-    sn = "undefined entity";
   else
     sn = entity_name(e);
   return sn;
@@ -1113,7 +1113,24 @@ string entity_name_without_scope(entity e)
   return enws;
 }
 
+/* allocates a new string */
+string local_name_to_scope(string ln)
+{
+  string ns = strrchr(ln, BLOCK_SEP_CHAR);
+  string s = string_undefined;
 
+  if(ns==NULL)
+    s = empty_scope();
+  else
+    s = strndup(ln, ns-ln+1);
+
+  pips_debug(8, "local name = \"%s\",  scope: \"%s\"\n",
+	     ln, s);
+
+  return s;
+}
+
+
 bool module_name_p(string name)
 {
   return (!compilation_unit_p(name) && strstr(name, MODULE_SEP_STRING) == NULL);

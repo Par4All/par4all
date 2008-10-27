@@ -169,9 +169,11 @@ defined according to the standard ISO/IEC 9899. Amira Mensi */
   {VSCANF_FUNCTION_NAME,        "rr",      is_action_read, is_approximation_must},
   {FPUTC_FUNCTION_NAME,         "rx",      is_action_read, is_approximation_must},
   {GETC_FUNCTION_NAME,          "x",       is_action_read, is_approximation_must},
+  {_IO_GETC_FUNCTION_NAME,      "x",       is_action_read, is_approximation_must},
   {FGETC_FUNCTION_NAME,         "x",       is_action_read, is_approximation_must},
   {GETCHAR_FUNCTION_NAME,       "r",       is_action_read, is_approximation_must},
   {PUTC_FUNCTION_NAME,          "rx",      is_action_read, is_approximation_must},
+  {_IO_PUTC_FUNCTION_NAME,      "rx",      is_action_read, is_approximation_must},
   {PUTCHAR_FUNCTION_NAME,       "r",       is_action_read, is_approximation_must},
   {UNGETC_FUNCTION_NAME,        "rx",      is_action_read, is_approximation_must},
   {FREAD_FUNCTION_NAME,         "wrrx",    is_action_read, is_approximation_must},
@@ -199,6 +201,7 @@ defined according to the standard ISO/IEC 9899. Amira Mensi */
   {IOCTL_FUNCTION_NAME,         "rr*",     is_action_read, is_approximation_must},
   {SELECT_FUNCTION_NAME,        "rrrrr",   is_action_read, is_approximation_must},
   {PSELECT_FUNCTION_NAME,       "rrrrrr",  is_action_read, is_approximation_must},
+  {FSTAT_FUNCTION_NAME,         "rw",      is_action_read, is_approximation_must},
 
   /* Fortran extensions for asynchronous IO's */
 
@@ -544,6 +547,16 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {QECONVERT_OPERATOR_NAME,                no_write_effects},
   {QFCONVERT_OPERATOR_NAME,                no_write_effects},
   {QGCONVERT_OPERATOR_NAME,                no_write_effects},
+
+  /* netdb.h */
+  {__H_ERRNO_LOCATION_OPERATOR_NAME,       no_write_effects},
+
+  /* bits/errno.h */
+  {__ERRNO_LOCATION_OPERATOR_NAME,         no_write_effects},
+
+  /* signal.h */
+  {SIGNAL_OPERATOR_NAME,                   no_write_effects},
+
   {ECVT_FUNCTION_NAME,                     no_write_effects},
   {FCVT_FUNCTION_NAME,                     no_write_effects},
   {GCVT_FUNCTION_NAME,                     no_write_effects},
@@ -595,7 +608,9 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {FPUTC_FUNCTION_NAME,                    c_io_effects},
   {FPUTS_FUNCTION_NAME,                    c_io_effects},
   {GETC_FUNCTION_NAME,                     c_io_effects},
+  {_IO_GETC_FUNCTION_NAME,                 c_io_effects},
   {PUTC_FUNCTION_NAME,                     c_io_effects},
+  {_IO_PUTC_FUNCTION_NAME,                 c_io_effects},
   {GETCHAR_FUNCTION_NAME,                  c_io_effects},
   {PUTCHAR_FUNCTION_NAME,                  c_io_effects},
   {GETS_FUNCTION_NAME,                     c_io_effects},
@@ -647,7 +662,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {FSEEKO64_FUNCTION_NAME,                         no_write_effects},
   {FTELLO64_FUNCTION_NAME,                         no_write_effects},
 
-  /* C IO system functions in man -S 2 */
+  /* C IO system functions in man -S 2 unistd.h */
 
   {C_OPEN_FUNCTION_NAME,                           unix_io_effects},
   {CREAT_FUNCTION_NAME,                            unix_io_effects},
@@ -660,6 +675,9 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {IOCTL_FUNCTION_NAME,                            unix_io_effects},
   {SELECT_FUNCTION_NAME,                           unix_io_effects},
   {PSELECT_FUNCTION_NAME,                          unix_io_effects},
+  {STAT_FUNCTION_NAME,                             no_write_effects}, /* sys/stat.h */
+  {FSTAT_FUNCTION_NAME,                            unix_io_effects},
+  {LSTAT_FUNCTION_NAME,                            no_write_effects},
 
   /*#include <stdlib.h>*/
 
@@ -680,6 +698,15 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
       {ldiv_t ldiv(long, long, 0, 0},*/
 
   {"malloc", no_write_effects},
+
+  /*#include <string.h>*/
+
+  {STRCMP_FUNCTION_NAME,                           no_write_effects},
+  {STRCPY_FUNCTION_NAME,                           no_write_effects},
+  {STRCAT_FUNCTION_NAME,                           no_write_effects},
+  {STRLEN_FUNCTION_NAME,                           no_write_effects},
+  {STRERROR_FUNCTION_NAME,                         no_write_effects},
+  {STRERROR_R_FUNCTION_NAME,                       no_write_effects},
 
   /* {int mblen(const char *, size_t, 0, 0},
      {size_t mbstowcs(wchar_t *, const char *, size_t, 0, 0},
@@ -1176,7 +1203,7 @@ static list generic_io_effects(entity e, list args, bool system_p)
       // The output is a string(the first argument is a char*)
       file_p = FALSE;;
     }
-    else if (ENTITY_FPUTC_P(e) || ENTITY_FPUTS_P(e) || ENTITY_PUTC_P(e) || ENTITY_UNGETC_P(e))
+    else if (ENTITY_FPUTC_P(e) || ENTITY_FPUTS_P(e) || ENTITY_PUTC_P(e)  || ENTITY__IO_PUTC_P(e) || ENTITY_UNGETC_P(e))
       // the second argument is a file descriptor
       ;
     else if (ENTITY_FGETS_P(e))
@@ -1185,10 +1212,10 @@ static list generic_io_effects(entity e, list args, bool system_p)
     else if (ENTITY_FREAD_P(e) || ENTITY_FWRITE_P(e))
       //the fourth argument is a file descriptor
       ;
-    else if(ENTITY_FPRINTF_P(e) || ENTITY_VFPRINTF_P(e) || ENTITY_FSCANF_P(e) || ENTITY_VFSCANF_P(e)
-            || ENTITY_FGETC_P(e) ||ENTITY_GETC_P(e) || ENTITY_FGETPOS_P(e)
-            || ENTITY_FSEEK_P(e) || ENTITY_FSETPOS_P(e) || ENTITY_FTELL_P(e)
-            || ENTITY_FSETPOS_P(e) || ENTITY_FTELL_P(e) || ENTITY_C_REWIND_P(e)
+    else if(ENTITY_FPRINTF_P(e)     || ENTITY_VFPRINTF_P(e) || ENTITY_FSCANF_P(e) || ENTITY_VFSCANF_P(e)
+            || ENTITY_FGETC_P(e)    || ENTITY_GETC_P(e)  || ENTITY__IO_GETC_P(e) || ENTITY_FGETPOS_P(e)
+            || ENTITY_FSEEK_P(e)    || ENTITY_FSETPOS_P(e) || ENTITY_FTELL_P(e)
+            || ENTITY_FSETPOS_P(e)  || ENTITY_FTELL_P(e) || ENTITY_C_REWIND_P(e)
             || ENTITY_CLEARERR_P(e) || ENTITY_FEOF_P(e) || ENTITY_FERROR_P(e)
             || ENTITY_FCLOSE_P(e))
       // all the following functions have in common the first argument is a file descriptor.

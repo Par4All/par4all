@@ -294,6 +294,8 @@
 
 /*io functions: C library and system io.Amira Mensi*/
 
+/* unistd.h */
+
 #define C_OPEN_FUNCTION_NAME            "open"
 #define C_CLOSE_FUNCTION_NAME           "close"
 #define C_READ_FUNCTION_NAME            "read"
@@ -304,6 +306,9 @@
 #define IOCTL_FUNCTION_NAME             "ioctl"   // sys/ioctl.h
 #define SELECT_FUNCTION_NAME            "select"  // sys/select.h
 #define PSELECT_FUNCTION_NAME           "pselect" // sys/select.h
+#define STAT_FUNCTION_NAME              "stat"    // sys/stat.h
+#define FSTAT_FUNCTION_NAME             "fstat"   // sys/stat.h
+#define LSTAT_FUNCTION_NAME             "lstat"   // sys/stat.h
 
 /*#include<stdio.h> */
 
@@ -330,8 +335,10 @@
 #define SPRINTF_FUNCTION_NAME           "sprintf"
 #define VSSCANF_FUNCTION_NAME           "vsscanf"
 #define GETC_FUNCTION_NAME              "getc"
+#define _IO_GETC_FUNCTION_NAME          "_IO_getc" /* libio.h */
 #define GETCHAR_FUNCTION_NAME           "getchar"
 #define PUTC_FUNCTION_NAME              "putc"
+#define _IO_PUTC_FUNCTION_NAME          "_IO_putc" /* libio.h */
 #define PUTCHAR_FUNCTION_NAME           "putchar"
 #define UNGETC_FUNCTION_NAME            "ungetc"
 #define FREAD_FUNCTION_NAME             "fread"
@@ -465,6 +472,8 @@
 #define STRCAT_FUNCTION_NAME            "strcat"
 #define STRLEN_FUNCTION_NAME            "strlen"
 //#define FOPEN_FUNCTION_NAME           "fopen"
+#define STRERROR_FUNCTION_NAME          "strerror"
+#define STRERROR_R_FUNCTION_NAME        "strerror_r"
 
 /* #include <fcntl.h>*/
 
@@ -582,6 +591,15 @@
 #define QFCONVERT_OPERATOR_NAME "qfconvert"
 #define QGCONVERT_OPERATOR_NAME "qgconvert"
 
+/* netdb.h */
+#define __H_ERRNO_LOCATION_OPERATOR_NAME "__h_erno_location"
+
+/* bits/errno.h */
+#define __ERRNO_LOCATION_OPERATOR_NAME "__errno_location"
+
+/* signal.h */
+#define SIGNAL_OPERATOR_NAME "signal"
+
 /* These operators are used within the optimize transformation in
    order to manipulate operators such as n-ary add and multiply or
    multiply-add operators ( JZ - sept 98)
@@ -595,6 +613,8 @@
  */
 #define IMA_OPERATOR_NAME                               "IMA-OP"
 #define IMS_OPERATOR_NAME                               "IMS-OP"
+
+/*****************************************************************************************/
 
 /* moved from ricedg-local.h */
 #define LOOP_COUNTER_MODULE_NAME        "LOOP-COUNTER"
@@ -749,8 +769,10 @@
 #define ENTITY_SPRINTF_P(e)              ENTITY_NAME_P(e, "sprintf")
 #define ENTITY_VSSCANF_P(e)              ENTITY_NAME_P(e, "vsscanf")
 #define ENTITY_GETC_P(e)                 ENTITY_NAME_P(e, "getc")
+#define ENTITY__IO_GETC_P(e)             ENTITY_NAME_P(e, "_IO_getc")
 #define ENTITY_GETCHAR_P(e)              ENTITY_NAME_P(e, "getchar")
 #define ENTITY_PUTC_P(e)                 ENTITY_NAME_P(e, "putc")
+#define ENTITY__IO_PUTC_P(e)             ENTITY_NAME_P(e, "_IO_putc")
 #define ENTITY_PUTCHAR_P(e)              ENTITY_NAME_P(e, "putchar")
 #define ENTITY_UNGETC_P(e)               ENTITY_NAME_P(e, "ungetc")
 #define ENTITY_FREAD_P(e)                ENTITY_NAME_P(e, "fread")
@@ -777,6 +799,9 @@
 #define ENTITY_IOCTL_SYSTEM_P(e)         ENTITY_NAME_P(e, IOCTL_FUNCTION_NAME)
 #define ENTITY_SELECT_SYSTEM_P(e)        ENTITY_NAME_P(e, SELECT_FUNCTION_NAME)
 #define ENTITY_PSELECT_SYSTEM_P(e)       ENTITY_NAME_P(e, PSELECT_FUNCTION_NAME)
+#define ENTITY_STAT_SYSTEM_P(e)          ENTITY_NAME_P(e, STAT_FUNCTION_NAME)
+#define ENTITY_FSTAT_SYSTEM_P(e)         ENTITY_NAME_P(e, FSTAT_FUNCTION_NAME)
+#define ENTITY_LSTAT_SYSTEM_P(e)         ENTITY_NAME_P(e, LSTAT_FUNCTION_NAME)
 
 #define ENTITY_REMOVE_SYSTEM_P(e)        ENTITY_NAME_P(e, "remove")
 #define ENTITY_RENAME_SYSTEM_P(e)        ENTITY_NAME_P(e, "rename")
@@ -893,6 +918,8 @@
 #define ENTITY_STRCPY_SYSTEM_P(e)        ENTITY_NAME_P(e, "strcpy")
 #define ENTITY_STRCAT_SYSTEM_P(e)        ENTITY_NAME_P(e, "strcat")
 #define ENTITY_STRLEN_SYSTEM_P(e)        ENTITY_NAME_P(e, "strlen")
+#define ENTITY_STRERROR_SYSTEM_P(e)      ENTITY_NAME_P(e, "strerror")
+#define ENTITY_STRERROR_R_SYSTEM_P(e)    ENTITY_NAME_P(e, "strerror_r")
 
 /* FI: Why is it declared "system"? Why is it in the middle of string functions? */
 #define ENTITY_FOPEN_SYSTEM_P(e)         ENTITY_NAME_P(e, "fopen")
@@ -910,6 +937,9 @@
 
 #define ENTITY_RANDOM_P(e)               ENTITY_NAME_P(e,"random")
 #define ENTITY_SRANDOM_P(e)              ENTITY_NAME_P(e,"srandom")
+
+/* signal.h */
+#define ENTITY_SIGNAL_P(e)               ENTITY_NAME_P(e,"signal")
 
 /* Fortran DATA management */
 

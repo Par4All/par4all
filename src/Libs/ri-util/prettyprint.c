@@ -628,11 +628,12 @@ words_regular_call(call obj, bool is_a_subroutine)
   entity f = call_function(obj);
   value i = entity_initial(f);
   type t = entity_type(f);
+  bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
 
-  if (call_arguments(obj) == NIL) {
-    if (type_statement_p(t))
+  if(call_arguments(obj) == NIL) {
+    if(type_statement_p(t))
       return(CHAIN_SWORD(pc, entity_local_name(f)+strlen(LABEL_PREFIX)));
-    if (value_constant_p(i)||value_symbolic_p(i)) {
+    if(value_constant_p(i)||value_symbolic_p(i)) {
       if(is_fortran)
 	return(CHAIN_SWORD(pc, entity_user_name(f)));
       else {
@@ -645,18 +646,17 @@ words_regular_call(call obj, bool is_a_subroutine)
     }
   }
 
-  if (type_void_p(functional_result(type_functional(call_to_functional_type(obj, FALSE)))))
-    {
-      if (is_a_subroutine) 
-	pc = CHAIN_SWORD(pc, is_fortran?"CALL ":"");
-      else
-	if (is_fortran) /* to avoid this warning for C*/
-	  pips_user_warning("subroutine '%s' used as a function.\n",
-			    entity_name(f));
+  if(type_void_p(functional_result(type_functional(call_compatible_type(entity_type(call_function(obj))))))) {
+    if(is_a_subroutine) 
+      pc = CHAIN_SWORD(pc, is_fortran?"CALL ":"");
+    else
+      if(is_fortran) /* to avoid this warning for C*/
+	pips_user_warning("subroutine '%s' used as a function.\n",
+			  entity_name(f));
       
-    }
-  else if (is_a_subroutine) {
-    if (is_fortran) /* to avoid this warning for C*/
+  }
+  else if(is_a_subroutine) {
+    if(is_fortran) /* to avoid this warning for C*/
       pips_user_warning("function '%s' used as a subroutine.\n",
 			entity_name(f));
     pc = CHAIN_SWORD(pc, is_fortran?"CALL ":"");
@@ -664,14 +664,14 @@ words_regular_call(call obj, bool is_a_subroutine)
 
   /* the implied complex operator is hidden... [D]CMPLX_(x,y) -> (x,y)
    */
-  if (!ENTITY_IMPLIED_CMPLX_P(f) && !ENTITY_IMPLIED_DCMPLX_P(f))
+  if(!ENTITY_IMPLIED_CMPLX_P(f) && !ENTITY_IMPLIED_DCMPLX_P(f))
     pc = CHAIN_SWORD(pc, entity_user_name(f));
 
   /* The corresponding formal parameter cannot be checked by
      formal_label_replacement_p() because the called modules may not have
      been parsed yet. */
 
-  if( !ENDP( call_arguments(obj))) {
+  if(!ENDP(call_arguments(obj))) {
     list pa = list_undefined;
     pc = CHAIN_SWORD(pc, "(");
 
@@ -717,7 +717,7 @@ words_regular_call(call obj, bool is_a_subroutine)
       else
 	pc = gen_nconc(pc, words_expression(EXPRESSION(CAR(pa))));
       if (CDR(pa) != NIL)
-	pc = CHAIN_SWORD(pc, ", ");
+	pc = CHAIN_SWORD(pc, space_p? ", ": ",");
     }
 
     pc = CHAIN_SWORD(pc, ")");
@@ -742,7 +742,7 @@ words_genuine_regular_call(call obj, bool is_a_subroutine)
     //entity f = call_function(obj);
     //type t = entity_type(f);
     /* The module name is the first one except if it is a procedure CALL. */
-    if (type_void_p(functional_result(type_functional(call_to_functional_type(obj,FALSE)))))
+    if (type_void_p(functional_result(type_functional(call_compatible_type(entity_type(call_function(obj)))))))
       attach_regular_call_to_word(STRING(CAR(CDR(pc))), obj);
     else
       attach_regular_call_to_word(STRING(CAR(pc)), obj);
@@ -1266,8 +1266,10 @@ words_prefix_unary_op(call obj,
   else if (strcmp(fun,DEREFERENCING_OPERATOR_NAME) == 0) 
       /* Since we put no spaces around an operator (to not change Fortran), the blank 
 	 before '*' is used to avoid the confusion in the case of divide operator, i.e 
-	 d1 = 1.0 / *det  in function inv_j, SPEC2000 quake benchmark. */
-    fun = " *";
+	 d1 = 1.0 / *det  in function inv_j, SPEC2000 quake benchmark.
+
+	 But we do not want this in a lhs and espcially with a double dereferencing. */
+    fun = "*";
   else if (strcmp(fun,UNARY_PLUS_OPERATOR_NAME) == 0) 
     fun = "+";
   else if(!is_fortran){ 
@@ -1581,8 +1583,11 @@ words_infix_binary_op(call obj, int precedence, bool leftmost)
       fun=C_OR_OPERATOR_NAME;
   }
 
-  if(strcmp(fun, DIVIDE_OPERATOR_NAME) == 0)
+  if(strcmp(fun, DIVIDE_OPERATOR_NAME) == 0) {
+    /* Do we want to add a space in case we2 starts with a dereferencing operator "*"? 
+     Nga suggests to look at the quake benchmark of SPEC2000. */
     we2 = words_subexpression(EXPRESSION(CAR(CDR(args))), MAXIMAL_PRECEDENCE, FALSE);
+  }
   else if (strcmp(fun, MINUS_OPERATOR_NAME) == 0 ) {
     expression exp = EXPRESSION(CAR(CDR(args)));
     if(expression_call_p(exp) &&
@@ -1635,11 +1640,13 @@ static list words_comma_op(call obj,
 {
   list pc = NIL, args = call_arguments(obj);
   int prec = words_intrinsic_precedence(obj);
+  bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
+
   pc = CHAIN_SWORD(pc,"(");
   pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(args)), prec, TRUE));
   while (!ENDP(CDR(args)))
   {
-    pc = CHAIN_SWORD(pc,",");
+    pc = CHAIN_SWORD(pc,space_p?", " : ",");
     pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(args))), prec, TRUE));
     args = CDR(args);
   }

@@ -101,6 +101,48 @@ extern stack StructNameStack; /* to remember the name of a struct/union and add 
 extern stack ContextStack;
 
 extern stack FunctionStack; /* to know in which function the current formal arguments are declared */
+static void PushFunction(entity f)
+{
+  string s = local_name_to_scope(f);
+  entity nf = f;
+
+  if(!empty_scope_p(s)) {
+    /* Scoping is not used in function naming, static or not */
+    string nn = entity_name_without_scope(entity_name(f));
+
+    nf = find_or_create_entity(nn);
+
+    pips_debug(8, "entity \"\%s\" is replaced by entity \"\%s\"\n",
+	       entity_name(f), entity_name(nf));
+
+    /* FI: I'm not sure that copy_xxx() takes xxx_undefined as valid
+       argument, and I could not find the information in Newgen source
+       code. */
+    if(!type_undefined_p(entity_type(f)))
+      entity_type(nf) = copy_type(entity_type(f));
+    if(!value_undefined_p(entity_initial(f)))
+      entity_initial(nf) = copy_value(entity_initial(f));
+    if(!storage_undefined_p(entity_storage(f)))
+      entity_storage(nf) = copy_storage(entity_storage(f));
+
+    /* let's assume that the entity has not been recorded anywhere yet. */
+    free_entity(f);
+  }
+
+  stack_push((char *) nf, FunctionStack);
+}
+
+static void PopFunction()
+{
+  stack_pop(FunctionStack);
+ }
+
+entity GetFunction()
+{
+  entity f = stack_head(FunctionStack);
+  return f;
+}
+
 extern stack FormalStack; /* to know if the entity is a formal parameter or not */
 extern stack OffsetStack; /* to know the offset of the formal argument */
 
@@ -682,14 +724,14 @@ declaration         { discard_C_comment();}
 			  if (value_undefined_p(entity_initial(e)))
 			    entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL));
 			  //pips_assert("e is a module", module_name_p(entity_module_name(e)));
-			  stack_push((char *) e, FunctionStack);
+			  PushFunction(e);
 			  stack_push((char *) make_basic_logical(TRUE),FormalStack);
 			  stack_push((char *) make_basic_int(1),OffsetStack);
 			  discard_C_comment();
 			} 
     old_parameter_list_ne TK_RPAREN old_pardef_list TK_SEMICOLON
                         { 
-			  entity e = stack_head(FunctionStack);
+			  entity e = GetFunction();
 			  if (type_undefined_p(entity_type(e)))
 			    {
 			      list paras = MakeParameterList($4,$6,FunctionStack);
@@ -697,7 +739,7 @@ declaration         { discard_C_comment();}
 			      entity_type(e) = make_type_functional(f);
 			    }
 			  pips_assert("Current function entity is consistent",entity_consistent_p(e));
-			  stack_pop(FunctionStack);
+			  PopFunction();
 			  stack_pop(FormalStack);
 			  StackPop(OffsetStack);	
 			  $$ = NIL;	
@@ -2259,12 +2301,12 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			      ||value_unknown_p(entity_initial(e)))
 			    entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL), NIL));
 			  //pips_assert("e is a module", module_name_p(entity_module_name(e)));
-			  stack_push((char *) e, FunctionStack);
+			  PushFunction(e);
 			}
     rest_par_list TK_RPAREN
                         {
-			  entity e = (entity) stack_head(FunctionStack);
-			  stack_pop(FunctionStack);
+			  entity e = GetFunction();
+			  PopFunction();
 			  stack_pop(FormalStack);
 			  StackPop(OffsetStack);	
 			  /* Intrinsic functions in C such as printf, fprintf, ... are considered
@@ -2372,15 +2414,15 @@ direct_old_proto_decl:
 			  if (value_undefined_p(entity_initial(e)))
 			    entity_initial($1) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL));
 			  //pips_assert("e is a module", module_name_p(entity_module_name(e)));
-			  stack_push((char *) e, FunctionStack);
+			  PushFunction(e);
 			  stack_push((char *) make_basic_logical(TRUE),FormalStack);
 			  stack_push((char *) make_basic_int(1),OffsetStack);
 			} 
     old_parameter_list_ne TK_RPAREN old_pardef_list
                         { 
-			  entity e = stack_head(FunctionStack);
+			  entity e = GetFunction();
 			  list paras = MakeParameterList($4,$6,FunctionStack);
-			  stack_pop(FunctionStack);
+			  PopFunction();
 			  stack_pop(FormalStack);
 			  StackPop(OffsetStack);
 			  (void) UpdateFunctionEntity(e, paras);
@@ -2530,12 +2572,12 @@ abs_direct_decl: /* (* ISO 6.7.6. We do not support optional declarator for
 			  if (value_undefined_p(entity_initial(e)))
 			    entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL));
 			  //pips_assert("e is a module", module_name_p(entity_module_name($1)));
-			  stack_push((char *) e, FunctionStack);
+			  PushFunction(e);
 			}
     rest_par_list TK_RPAREN
                         {
-			  entity e = stack_head(FunctionStack);
-			  stack_pop(FunctionStack);
+			  entity e = GetFunction();
+			  PopFunction();
 			  stack_pop(FormalStack);
 			  StackPop(OffsetStack);	
 			  (void) UpdateFunctionEntity(e,$4);
@@ -2610,16 +2652,16 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  MakeCurrentModule(e);
 			  clear_C_comment();
 			  //pips_assert("e is a module", module_name_p(entity_module_name(e)));
-			  stack_push((char *) e, FunctionStack);
+			  PushFunction(e);
 			}
     rest_par_list TK_RPAREN 
                         { 
 			  /* Functional type is unknown or int (by default) or void ?*/
 			  functional f = make_functional($4,make_type_unknown());
-			  entity e = stack_head(FunctionStack);
+			  entity e = GetFunction();
 			  entity_type(e) = make_type_functional(f);
 			  pips_assert("Current module entity is consistent\n",entity_consistent_p(e));
-			  stack_pop(FunctionStack);
+			  PopFunction();
 			  stack_pop(FormalStack);
 			  StackPop(OffsetStack);	
 			}	
@@ -2632,7 +2674,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  MakeCurrentModule(e);	
 			  clear_C_comment();
 			  //pips_assert("e is a module", module_name_p(entity_module_name(e)));
-			  stack_push((char *) e, FunctionStack);
+			  PushFunction(e);
 			  stack_push((char *) make_basic_logical(TRUE),FormalStack);
 			  stack_push((char *) make_basic_int(1),OffsetStack);
 			}
@@ -2640,10 +2682,10 @@ function_def_start:  /* (* ISO 6.9.1 *) */
                         { 
 			  list paras = MakeParameterList($3,$6,FunctionStack);
 			  functional f = make_functional(paras,make_type_unknown());
-			  entity e = stack_head(FunctionStack);
+			  entity e = GetFunction();
 			  entity_type(e) = make_type_functional(f);
 			  pips_assert("Current module entity is consistent\n",entity_consistent_p(e));
-			  stack_pop(FunctionStack);
+			  PopFunction();
 			  stack_pop(FormalStack);
 			  StackPop(OffsetStack);	
 			}	

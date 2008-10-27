@@ -306,6 +306,7 @@ entity make_constant_entity(string name,
 /* END_EOLE */
 
 
+/* Make a Fortran constant */
 entity 
 MakeConstant(name, bt)
 string name;

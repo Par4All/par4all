@@ -770,13 +770,13 @@ some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p)
 	}
       else
 	{
-	  b = basic_of_expression(sizeofexpression_expression(se));
+	  b = some_basic_of_any_expression(sizeofexpression_expression(se), apply_p, ultimate_p);
 	}
       break;
     }
   case is_syntax_subscript: 
     {
-      b = basic_of_expression(subscript_array(syntax_subscript(sy)));
+      b = some_basic_of_any_expression(subscript_array(syntax_subscript(sy)), apply_p, ultimate_p);
       break;
     }
   case is_syntax_application:
@@ -973,9 +973,15 @@ basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
       free_basic(rb);
       rb = basic_of_expression(e);
       if(basic_pointer_p(rb)) {
-	type pt = ultimate_type(basic_pointer(rb));
+	type pt = type_undefined;
+
+	if(ultimate_p)
+	  pt = ultimate_type(basic_pointer(rb));
+	else
+	  pt = copy_type(basic_pointer(rb));
 
 	free_basic(rb);
+	pips_assert("The pointed type is consistent", type_consistent_p(pt));
 	if(type_variable_p(pt) && !apply_p)
 	  rb = copy_basic(variable_basic(type_variable(pt)));
 	else if(type_functional_p(pt) && apply_p) {
@@ -1548,8 +1554,23 @@ type make_standard_long_integer_type(type t)
 	}
     }
 }
+
+/* FI: there are different notions of "ultimate" types in C.
 
-/* What type should be used to perform memory allocation? */
+We may need to reduce a type to basic concrete types, removing all
+typedefs wherever they are.
+
+We may also need to know if the type is compatible with a function
+call: we need to chase down the pointers as well as the typedefs. See
+call_compatible_type_p().
+
+Finally, we may need to know how much memory should be allocated to
+hold an object of this type. This is what was needed first, hence the
+semantics of the function below.
+ */
+
+/* What type should be used to perform memory allocation? No
+   allocation of a new type. */
 type ultimate_type(type t)
 {
   type nt;
@@ -1587,10 +1608,70 @@ type ultimate_type(type t)
   pips_assert("nt is not a typedef",
 	      type_variable_p(nt)? !basic_typedef_p(variable_basic(type_variable(nt))) : TRUE);
 
-    return nt;
+  return nt;
 }
 
-/* The function called can have a functional type, or a typedef type or a pointer type */
+/* Is an object of type t compatible with a call? */
+bool call_compatible_type_p(type t)
+{
+  bool compatible_p = TRUE;
+
+  if(!type_functional_p(t)) {
+    if(type_variable_p(t)) {
+      basic b = variable_basic(type_variable(t));
+
+      if(basic_pointer_p(b))
+	compatible_p = call_compatible_type_p(basic_pointer(b));
+      else if(basic_typedef_p(b)) {
+	entity te = basic_typedef(b);
+
+	compatible_p = call_compatible_type_p(entity_type(te));
+      }
+      else
+	compatible_p = FALSE;
+    }
+    else
+      compatible_p = FALSE;
+  }
+  return compatible_p;
+}
+
+/* returns the type necessary to generate or check a call to an object
+   of type t. Does not allocate a new type. Previous function could be
+   implemented with this one. */
+type call_compatible_type(type t)
+{
+  type compatible = t;
+
+  pips_assert("t is a consistent type", type_consistent_p(t));
+
+  if(!type_functional_p(t)) {
+    if(type_variable_p(t)) {
+      basic b = variable_basic(type_variable(t));
+
+      if(basic_pointer_p(b))
+	compatible = call_compatible_type(basic_pointer(b));
+      else if(basic_typedef_p(b)) {
+	entity te = basic_typedef(b);
+
+	compatible = call_compatible_type(entity_type(te));
+      }
+      else
+	compatible = FALSE;
+    }
+    else
+      compatible = FALSE;
+  }
+  pips_assert("compatible is a functional type", type_functional_p(compatible));
+  pips_assert("compatible is a consistent type", type_consistent_p(compatible));
+  return compatible;
+}
+
+/* The function called can have a functional type, or a typedef type
+   or a pointer type to a functional type. FI: I'm not sure this is
+   correctly implemented. I do not know if a new type is always
+   allocated. I do not understand the semantics if ultimate is turned
+   off.  */
 type call_to_functional_type(call c, bool ultimate_p)
 {
   entity f = call_function(c);
@@ -1619,7 +1700,7 @@ type call_to_functional_type(call c, bool ultimate_p)
 	  /* assertion will fail anyway */
 	  free_type(ut);
       }
-      else /* mustbe a functional type */
+      else /* must be a functional type */
 	rt = ut;
     }
     else {
@@ -1908,35 +1989,47 @@ bool check_C_function_type(entity f, list args)
 {
   bool ok = TRUE;
   type t = entity_type(f);
-  list parms = functional_parameters(type_functional(t));
+  type ct = call_compatible_type(t);
+  list parms = functional_parameters(type_functional(ct));
+  extern void print_text(FILE *, text); /* FI: well, for debugging only... */
 
-  pips_assert("f is a function", type_functional_p(t));
+  pips_assert("f can be used to generate a call", call_compatible_type_p(t));
 
   if(ENDP(parms)) {
     if(ENDP(args))
       ;
     else {
-      /* Use parms to improve the type of f, probably declared f()
-	 with no type information. */
-      /* Should be very similar to call_to_functional_type(). */
-      list pl = NIL;
-      MAP(EXPRESSION, e, {
-	type et = expression_to_user_type(e);
-	parameter p = make_parameter(et, make_mode(is_mode_value, UU), strdup(""));
-	pl = gen_nconc(pl, CONS(PARAMETER, p, NIL));
-      },
+      if(type_functional_p(t)) {
+	/* Use parms to improve the type of f, probably declared f()
+	   with no type information. */
+	/* Should be very similar to call_to_functional_type(). */
+	list pl = NIL;
+	MAP(EXPRESSION, e, {
+	    type et = expression_to_user_type(e);
+	    parameter p = make_parameter(et, make_mode(is_mode_value, UU), strdup(""));
+	    pl = gen_nconc(pl, CONS(PARAMETER, p, NIL));
+	  },
 	  args);
-      functional_parameters(type_functional(t)) = pl;
+	functional_parameters(type_functional(t)) = pl;
 
-      if(type_unknown_p(functional_result(type_functional(t)))) {
-	basic b = make_basic_int(DEFAULT_INTEGER_TYPE_SIZE);
-	functional_result(type_functional(t)) = make_type_variable(make_variable(b, NIL, NIL));
+	if(type_unknown_p(functional_result(type_functional(t)))) {
+	  basic b = make_basic_int(DEFAULT_INTEGER_TYPE_SIZE);
+	  functional_result(type_functional(t)) = make_type_variable(make_variable(b, NIL, NIL));
+	}
+
+	pips_user_warning("Type updated for function \"%s\"\n", entity_user_name(f));
+	ifdebug(8) {
+	  text txt = c_text_entity(get_current_module_entity(), f, 0);
+	  print_text(stderr, txt);
+	}
       }
-
-      pips_user_warning("Type updated for function \"%s\"\n", entity_user_name(f));
-      ifdebug(8) {
-	text txt = c_text_entity(get_current_module_entity(), f, 0);
-	print_text(stderr, txt);
+      else {
+	/* Must be a typedef or a pointer to a function. No need to refine the type*/
+	ifdebug(8) {
+	  text txt = c_text_entity(get_current_module_entity(), f, 0);
+	  pips_debug(8, "Type not updated for function \"%s\"\n", entity_user_name(f));
+	  print_text(stderr, txt);
+	}
       }
     }
   }
@@ -1950,7 +2043,10 @@ bool check_C_function_type(entity f, list args)
       ok = FALSE;
   }
   else {
-    /* Check type compatibility: find function in flint? */
+    /* Check type compatibility: find function in flint?
+       type_equal_p() requires lots of extensions to handle C
+       types. And you would probably need type conversion to concrete
+       type.*/
     ;
   }
 
