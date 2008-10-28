@@ -1,0 +1,24 @@
+
+Parsed printed file for "struct03"
+
+int struct03()
+{
+   struct three {
+      int first;
+      int second;
+   };
+   struct four {
+      struct three un;
+      struct three deux;
+   };
+   struct four x[10];
+   int i = 0;
+
+   for (i = 0;i<10;i++) {
+      x[i].un.first = 1;
+      x[i].deux.second = 0;
+   }
+}
+
+Cumulated effetcs for "struct03"
+

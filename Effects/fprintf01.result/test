@@ -26,7 +26,7 @@ int main()
    pFile = fopen("myfile.txt", "w");
 //               <may be read    >: __IO_EFFECTS:LUNS[*] n name[*] 
 //                                  pFile
-//               <may be written >: __IO_EFFECTS:LUNS[*] name[*] pFile
+//               <may be written >: __IO_EFFECTS:LUNS[*] name[*]
 //               <must be written>: n
    for(n = 0; n <= 2; n += 1) {
 //               <may be read    >: __IO_EFFECTS:LUNS[*]
@@ -38,12 +38,10 @@ int main()
 //               <may be read    >: __IO_EFFECTS:LUNS[*] name[*]
 //               <may be written >: __IO_EFFECTS:LUNS[*]
 //               <must be read   >: n pFile
-//               <must be written>: pFile
       fprintf(pFile, "Name %d %s\n", n, name);
    }
 //               <may be read    >: __IO_EFFECTS:LUNS[*]
 //               <may be written >: __IO_EFFECTS:LUNS[*]
 //               <must be read   >: pFile
-//               <must be written>: pFile
    fclose(pFile);
 }

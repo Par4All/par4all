@@ -1,0 +1,14 @@
+
+Cumulated effetcs for "struct01"
+
+int struct01()
+{
+   struct one {
+      int first;
+      int second;
+   };
+   struct one x;
+//               <must be written>: x
+
+   x.first = 1;
+}

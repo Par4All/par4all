@@ -23,7 +23,7 @@ int main()
 //               <may be read    >: __IO_EFFECTS:LUNS[*]
 //               <may be written >: __IO_EFFECTS:LUNS[*] buf[*]
 //               <must be read   >: fp
-//               <must be written>: fp n
+//               <must be written>: n
    n = fread(buf, 8, 50, fp);
 //               <may be read    >: __IO_EFFECTS:LUNS[*]
 //               <may be written >: __IO_EFFECTS:LUNS[*]
@@ -35,6 +35,5 @@ int main()
 //               <may be read    >: __IO_EFFECTS:LUNS[*]
 //               <may be written >: __IO_EFFECTS:LUNS[*]
 //               <must be read   >: fp
-//               <must be written>: fp
    fclose(fp);
 }
