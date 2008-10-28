@@ -9,6 +9,6 @@ int csplit16(int i, int * pj, int k, int * * pl)
 }
 int csplit16(int i, int *pj, int k, int **pl)
 {
-    *pj = i;
-    * *pl = k;
+   *pj = i;
+   **pl = k;
 }

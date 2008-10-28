@@ -7,9 +7,9 @@
 
 tpips=${tpips_version:-tpips}
 	
-PIPS_SRCPATH=.
-export PIPS_SRCPATH
-setproperty ABORT_ON_USER_ERROR TRUE
+#PIPS_SRCPATH=.
+#export PIPS_SRCPATH
+#setproperty ABORT_ON_USER_ERROR TRUE
 
 echo \# testing automatic checkpoint
 

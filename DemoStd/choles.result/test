@@ -1,4 +1,6 @@
---- Preconditions
+
+Preconditions for "CHOLES"
+
 
 C  P() {}
 
@@ -57,7 +59,9 @@ C  P(I,J,K,KK) {I==K, I==KK, 1<=I, I+1<=J, J<=N}
       ENDDO
 C
       END
---- Parallel Version
+
+Parallelization for "CHOLES"
+
 C
 C     CHOLESKI METHOD - VERSION 1
 C

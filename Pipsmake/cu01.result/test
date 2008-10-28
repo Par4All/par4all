@@ -16,8 +16,8 @@ int cu01(int i, int * pj, int k, int * pl)
 
 Module cu01 prettyprinted
 
-int cu01(int i,int *pj,int k,int *pl)
+int cu01(int i, int *pj, int k, int *pl)
 {
-    *pj = i;
-    *pl = k;
+   *pj = i;
+   *pl = k;
 }
