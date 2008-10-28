@@ -420,6 +420,21 @@ entity_subroutine_p(entity e)
 	   !entity_function_p(e);
 }
 
+/* e is the field of a structure */
+bool entity_field_p(entity e)
+{
+  string eln = entity_local_name(e);
+  bool field_p = FALSE;
+
+  if(*eln!='\'' && *eln!='"') {
+    string pos = strrchr(eln, MEMBER_SEP_CHAR);
+
+    field_p = pos!=NULL;
+  }
+
+  return field_p;
+}
+
 bool entity_enum_p(entity e)
 {
   return type_enum_p(entity_type(e));

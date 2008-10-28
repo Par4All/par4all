@@ -1017,6 +1017,10 @@ basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
       /* We should reconstruct a struct type or an array type... */
       rb = make_basic_overloaded();
     }
+    else if(ENTITY_ASSIGN_P(f)) {
+      /* returns the type of the left hand side */
+      rb = basic_of_expression(EXPRESSION(CAR(args)));
+    }
     else {
       free_basic(rb);
       rb = basic_of_expression(EXPRESSION(CAR(args)));
@@ -1246,9 +1250,25 @@ basic_maximum(basic fb1, basic fb2)
 	}
 	else if(basic_overloaded_p(b2))
 	  b = copy_basic(b1);
-	else if(basic_pointer_p(b2))
+	else if(basic_pointer_p(b2)) {
 	  /* How can we compare two pointer types? Equality? Comparison of the pointed types? */
-	  pips_internal_error("Comparison of two pointer types not implemented\n");
+	  /* pips_internal_error("Comparison of two pointer types not implemented\n"); */
+	  type t1 = basic_pointer(b1);
+	  type t2 = basic_pointer(b2);
+
+	  if(type_variable_p(t1) && type_variable_p(t2)) {
+	    basic nb1 = variable_basic(type_variable(t1));
+	    basic nb2 = variable_basic(type_variable(t2));
+
+	    /* FI: not convvincing. As in other palces, assuming this
+	       is meaning ful, it would be better to use a basic
+	       comparator, basic_greater_p(), which could return 1, -1
+	       or 0 or ??? and deal with non comparable type. */
+	    b = basic_maximum(nb1, nb2);
+	  }
+	  else
+	    pips_internal_error("Comparison of two pointer types not meaningful\n");
+	}
 	else if(basic_derived_p(b2))
 	  pips_internal_error("Comparison between pointer and struct/union not implemented\n");
 	else if(basic_typedef_p(b2))

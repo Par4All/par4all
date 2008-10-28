@@ -161,6 +161,39 @@ generic_proper_effects_of_lhs(reference ref)
     return(le);
 }
 
+list 
+generic_proper_effects_of_any_lhs(expression lhs)
+{
+  list le = NIL;
+  syntax s = expression_syntax(lhs);
+
+  if (syntax_reference_p(s)) {
+    le = generic_proper_effects_of_lhs(syntax_reference(s));
+  }
+  else if(syntax_call_p(s)) {
+    call c = syntax_call(s);
+    entity op = call_function(c);
+    list nargs = call_arguments(c);
+
+    if(ENTITY_FIELD_P(op)) {
+      expression e1 = EXPRESSION(CAR(nargs));
+      syntax s1 = expression_syntax(e1);
+      expression e2 = EXPRESSION(CAR(CDR(nargs)));
+
+      pips_assert("The field operator has two arguments", gen_length(nargs)==2);
+      pips_assert("The structure is defined by a reference to it", syntax_reference_p(s1));
+
+     le = gen_nconc(le, generic_proper_effects_of_lhs(syntax_reference(s1)));
+     pips_assert("Guess: only one effect?", gen_length(le));
+     le = gen_nconc(le, generic_proper_effects_of_expression(e2));
+    }
+  }
+  else
+    pips_internal_error("lhs is not a reference and is not handled yet\n");
+
+  return le;
+}
+
 /* list generic_proper_effects_of_reference(reference ref)
  * input    : a reference that is read.
  * output   : the corresponding list of effects.
@@ -170,8 +203,12 @@ generic_proper_effects_of_lhs(reference ref)
 list 
 generic_proper_effects_of_reference(reference ref)
 {
+  list le = NIL;
+  entity v = reference_variable(ref);
+
+  /* structure fields are referenced, not called, altough they are constant... */
+  if(!entity_field_p(v)) {
     list inds = reference_indices(ref);
-    list le = NIL;
     transformer context;
 
     /* CA: lazy, because in the in region backward translation of formal
@@ -179,7 +216,7 @@ generic_proper_effects_of_reference(reference ref)
      * this stuff may be called without proper context.
      */
     if (effects_private_current_context_empty_p())
-	context = transformer_undefined;
+      context = transformer_undefined;
     else
       {
 	context = effects_private_current_context_head();
@@ -189,21 +226,21 @@ generic_proper_effects_of_reference(reference ref)
     pips_debug(3, "begin\n");
     
     if (! (*empty_context_test)(context))
-    {	
+      {	
 	le = CONS(EFFECT, 
 		  (*reference_to_effect_func)(ref,
 					      make_action(is_action_read, UU)),
 		  NIL);
 
 	if (! ENDP(inds)) 
-	    le = gen_nconc(le, generic_proper_effects_of_expressions(inds));
+	  le = gen_nconc(le, generic_proper_effects_of_expressions(inds));
 
 
 	(*effects_precondition_composition_op)(le, context);
-    }
-
-    pips_debug(3, "end\n");
-    return(le);
+      }
+  }
+  pips_debug(3, "end\n");
+  return(le);
 }
 
 

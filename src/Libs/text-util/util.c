@@ -173,7 +173,9 @@ add_to_current_line(
     /* Append the new line */
     lbuffer = strlen(buffer);
     stmp = continuation[0];
-    comment = stmp == 'c'|| stmp == 'C'	|| stmp == '!'|| stmp == '*';
+    comment = (stmp == 'c'|| stmp == 'C'	|| stmp == '!'|| stmp == '*'
+      || (continuation[0] == '/' && continuation[1] == '/')
+      || (continuation[0] == '/' && continuation[1] == '*'));
     
     if (strlen(buffer) + lappend + 2 > MAX_LINE_LENGTH) {
 	/* this shouldn't happen. 

@@ -1947,6 +1947,21 @@ transformer transformer_add_any_relation_information(
       pips_internal_error("illegal overloaded type for operator %s\n",
 		 entity_name(op));
       break;
+    case is_basic_bit:
+      pips_user_warning("bit type not analyzed for operator %s\n",
+			entity_name(op));
+      break;
+    case is_basic_pointer:
+      pips_user_warning("pointer type not analyzed for operator %s\n",
+			entity_name(op));
+      break;
+    case is_basic_derived:
+      /* Nothing to be done wit hsturct and union */
+      break;
+    case is_basic_typedef:
+      pips_internal_error("typedef should ne converted to concrete types for operator %s\n",
+			entity_name(op));
+      break;
     default:
       pips_internal_error("unknown basic b=%d\n", basic_tag(b1));
     }

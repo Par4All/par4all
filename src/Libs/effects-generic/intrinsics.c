@@ -52,6 +52,7 @@ static list io_effects(entity e, list args);
 static list c_io_effects(entity e, list args);
 static list read_io_effects(entity e, list args);
 static list effects_of_ioelem(expression exp, tag act);
+static list effects_of_C_ioelem(expression exp, tag act);
 static list effects_of_iolist(list exprs, tag act);
 static list effects_of_implied_do(expression exp, tag act);
 static list generic_io_effects(entity e,list args, bool system_p);
@@ -812,8 +813,6 @@ generic_proper_effects_of_intrinsic(entity e, list args)
     return(NIL);
 }
 
-
-
 static list
 no_write_effects(entity e __attribute__ ((__unused__)),list args)
 {
@@ -825,76 +824,83 @@ no_write_effects(entity e __attribute__ ((__unused__)),list args)
     return(lr);
 }
 
-static list
-affect_effects(entity e __attribute__ ((__unused__)),list args)
+
+/* Three different cases are handled:
+ * the standard assignement: x = y;
+ * the assignement with update, x+=y, which implies first a read of the lhs
+ * the update, x++, which has no rhs
+ */
+static list any_affect_effects(entity e __attribute__ ((__unused__)),
+			       list args,
+			       bool update_p,
+			       bool unique_p)
 {
-    list le = NIL;
+  list le = NIL;
+  expression lhs = EXPRESSION(CAR(args));
+  syntax s = expression_syntax(lhs);
 
-    expression lhs = EXPRESSION(CAR(args));
-    syntax s = expression_syntax(lhs);
+  pips_debug(5, "begin\n");
 
+  if (syntax_reference_p(s)) {
+    if(update_p)
+      le = generic_proper_effects_of_expression(lhs);
+    le = gen_nconc(le, generic_proper_effects_of_lhs(syntax_reference(s)));
+  }
+  else if(syntax_call_p(s)) {
+    call c = syntax_call(s);
+    entity op = call_function(c);
+    list nargs = call_arguments(c);
+
+    if(ENTITY_FIELD_P(op)) {
+      expression e1 = EXPRESSION(CAR(nargs));
+      syntax s1 = expression_syntax(e1);
+      expression e2 = EXPRESSION(CAR(CDR(nargs)));
+
+      pips_assert("The field operator has two arguments", gen_length(nargs)==2);
+      ifdebug(8) {
+	pips_debug(8, "First expression: ");
+	print_expression(e1);
+	pips_debug(8, "\nSecond expression: ");
+	print_expression(e2);
+	pips_debug(8, "\n");
+      }
+      pips_assert("The structure is defined by a reference to it", syntax_reference_p(s1));
+
+     if(update_p)
+      le = generic_proper_effects_of_expression(e1);
+     le = gen_nconc(le, generic_proper_effects_of_lhs(syntax_reference(s1)));
+     le = gen_nconc(le, generic_proper_effects_of_expression(e2));
+    }
+  }
+  else
+    pips_internal_error("lhs is not a reference and is not handled yet\n");
+
+
+  if(!unique_p) {
     expression rhs = EXPRESSION(CAR(CDR(args)));
-
-    pips_debug(5, "begin\n");
-
-    if (! syntax_reference_p(s))
-            pips_error("affect_effects", "not a reference\n");
-
-    le = generic_proper_effects_of_lhs(syntax_reference(s));
-
     le = gen_nconc(le, generic_proper_effects_of_expression(rhs));
+  }
 
-    pips_debug(5, "end\n");
+  pips_debug(5, "end\n");
 
-    return(le);
+  return le;
+}
+
+static list affect_effects(entity e __attribute__ ((__unused__)),list args)
+{
+  return any_affect_effects(e, args, FALSE, FALSE);
 }
 
 static list
 update_effects(entity e __attribute__ ((__unused__)),list args)
 {
-    list le = NIL;
-
-    expression lhs = EXPRESSION(CAR(args));
-    syntax s = expression_syntax(lhs);
-
-    expression rhs = EXPRESSION(CAR(CDR(args)));
-
-    pips_debug(5, "begin\n");
-
-    if (! syntax_reference_p(s))
-            pips_error("affect_effects", "not a reference\n");
-
-    le = generic_proper_effects_of_lhs(syntax_reference(s));
-
-    le = gen_nconc(le, generic_proper_effects_of_expression(lhs));
-
-    le = gen_nconc(le, generic_proper_effects_of_expression(rhs));
-
-    pips_debug(5, "end\n");
-
-    return(le);
+  return any_affect_effects(e, args, TRUE, FALSE);
 }
 
 static list
 unique_update_effects(entity e __attribute__ ((__unused__)),list args)
 {
-    list le = NIL;
-
-    expression lhs = EXPRESSION(CAR(args));
-    syntax s = expression_syntax(lhs);
-
-    pips_debug(5, "begin\n");
-
-    if (! syntax_reference_p(s))
-            pips_error("affect_effects", "not a reference\n");
-
-    le = generic_proper_effects_of_lhs(syntax_reference(s));
-
-    le = gen_nconc(le, generic_proper_effects_of_expression(lhs));
-
-    pips_debug(5, "end\n");
-
-    return(le);
+  return any_affect_effects(e, args, TRUE, TRUE);
 }
 
 static list
@@ -1158,9 +1164,9 @@ static list generic_io_effects(entity e, list args, bool system_p)
     //penultimate argument for the rest of the arguments
 
     if(p->IoElementName[lenght-1]=='*' && i==lenght-1)
-      lep = effects_of_ioelem(exp, p->IoElementName[lenght-2]);
+      lep = effects_of_C_ioelem(exp, p->IoElementName[lenght-2]);
     else
-      lep = effects_of_ioelem(exp, p->IoElementName[i]);
+      lep = effects_of_C_ioelem(exp, p->IoElementName[i]);
 
     i=i+1;
 
@@ -1339,52 +1345,91 @@ static list rgs_effects(entity e, list args)
   return any_rgs_effects( e, args, FALSE);
 }
 
+static list effects_of_any_ioelem(expression exp, tag act, bool is_fortran)
+{
+  list le = NIL;
+  //syntax s = expression_syntax(exp);
+
+  pips_debug(5, "begin with act=%c\n", act);
+
+  if (act == 'w' || act == 'x' || act == is_action_write) {
+    pips_debug(6, "is_action_write or read-write\n");
+ 
+    if(is_fortran)
+      le = generic_proper_effects_of_any_lhs(exp);
+    else { /* C language */
+      /* FI: short term simplification... We need pointers for side effects... */
+      syntax s = expression_syntax(exp);
+
+      if(syntax_reference_p(s)) {
+	/* This is not possible as parameters are passed by value,
+	   except if an address is passed, for instance an array or a
+	   pointer */
+	reference r = syntax_reference(s);
+	entity v = reference_variable(r);
+	type t = entity_type(v);
+	type ut = ultimate_type(t); /* FI: is ultimate_type() enough? */
+
+	if(type_variable_p(ut)) {
+	  variable vt = type_variable(ut);
+
+	  if(!ENDP(variable_dimensions(vt))) {
+	    /* Fine, this is an array */
+	    le = generic_proper_effects_of_any_lhs(exp);
+	  }
+	  else if(basic_pointer_p(variable_basic(vt))) {
+	    /* This is going to be called for the FILE descriptors */
+	    /* pips_internal_error("Effects thru pointers not implemented yet"); */
+	    pips_user_warning("Effects thru pointers not implemented yet");
+	  }
+	  else
+	    pips_user_error("IO element update for \"\%s\": an address should be passed",
+			    entity_user_name(v));
+	}
+	else {
+	  pips_user_error("IO element update for \"\%s\": incompatible type",
+			  entity_user_name(v));
+	}
+      }
+      else if(syntax_call_p(s)) {
+	call c = syntax_call(s);
+	entity op = call_function(c);
+	list nargs = call_arguments(c);
+
+	if(ENTITY_DEREFERENCING_P(op)) {
+	    pips_internal_error("Effects thru dereferenced pointers not implemented yet");
+	}
+	if(ENTITY_ADDRESS_OF_P(op)) {
+	  expression e = EXPRESSION(CAR(nargs));
+
+	  pips_assert("one argument", gen_length(nargs)==1);
+	  le = generic_proper_effects_of_any_lhs(e);
+	}
+	else {
+	  pips_internal_error("Operator \"\%s\" not handled\n", entity_name(op));
+	}
+      }
+    }
+  }
+
+  if(act ==  'r' || act == 'x' || act == is_action_read) {
+    pips_debug(6, "is_action_read or read-write\n");
+    le = gen_nconc(le, generic_proper_effects_of_expression(exp));
+  }
+
+  pips_debug(5, "end\n");
+
+  return le;
+}
+
 static list effects_of_ioelem(expression exp, tag act)
 {
-    list lr = list_undefined;
-    syntax s = expression_syntax(exp);
+  return effects_of_any_ioelem(exp, act, TRUE);
+}
 
-    if(act=='r')
-      act=is_action_read;
-    else if(act == 'w')
-      act=is_action_write;
-
-    pips_debug(5, "begin\n");
-
-    if (act == is_action_write)
-    {
-
-        pips_debug(6, "is_action_write\n");
-        pips_assert("effects_of_ioelem", syntax_reference_p(s));
-
-        lr = generic_proper_effects_of_lhs(syntax_reference(s));
-    }
-    else if(act == is_action_read)
-    {
-        debug(6, "effects_of_io_elem", "is_action_read\n");
-        lr = generic_proper_effects_of_expression(exp);
-    }
-    else if(act == 'x')
-      {
-        list lw = NIL;
-
-        debug(6, "effects_of_io_elem", "is_action_read and is_action_write\n");
-
-        if(syntax_reference_p(s)) {
-          reference r= syntax_reference(s);
-          lw = generic_proper_effects_of_lhs(r);
-        }
-        else{
-          pips_internal_error("write effect on non reference expression\n");
-        }
-
-        lr = generic_proper_effects_of_expression(exp);
-        lr = gen_nconc(lr, lw);
-      }
-
-    pips_debug(5, "end\n");
-
-    return(lr);
+static list effects_of_C_ioelem(expression exp, tag act)
+{
+  return effects_of_any_ioelem(exp, act, FALSE);
 }
 
 static list
