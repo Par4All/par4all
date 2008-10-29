@@ -187,6 +187,20 @@ generic_proper_effects_of_any_lhs(expression lhs)
      pips_assert("Guess: only one effect?", gen_length(le));
      le = gen_nconc(le, generic_proper_effects_of_expression(e2));
     }
+    else if(ENTITY_POINT_TO_P(op)) {
+    }
+    else if(ENTITY_PLUS_C_P(op)) {
+    }
+    else if(ENTITY_MINUS_C_P(op)) {
+    }
+  }
+  else if(syntax_cast_p(s)) {
+  }
+  else if(syntax_sizeofexpression_p(s)) {
+  }
+  else if(syntax_subscript_p(s)) {
+  }
+  else if(syntax_application_p(s)) {
   }
   else
     pips_internal_error("lhs is not a reference and is not handled yet\n");

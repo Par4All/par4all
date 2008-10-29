@@ -1592,6 +1592,63 @@ regeneration ? Some semantics can be added into the generated label names.
 PIPS analyses are preserved, but the prettyprinter of unstructured
 must be improved to pattern-match \verb/continue/ and \verb/break/.
 
+\chapter{Memory Effects}
+\label{chapter:memory-effects}
+
+\section{Pointers}
+
+Pointers are a key part of C since parameters are passed by value and
+since recursive data structures require pointers. In the Fotran
+implementation, the memory effects are represented by the
+\verb/effect/ data structure and its fields, and by lists of such data
+structures:
+
+\begin{verbatim}
+effects = effects:effect* ;
+effects_classes = classes:effects* ;
+effect = cell x action x approximation x descriptor ;
+cell = reference + preference ;
+action = read:unit + write:unit ;
+approximation = may:unit + must:unit + exact:unit ;
+descriptor = convexunion:Psysteme* + convex:Psysteme + none:unit ;
+reference = variable:entity x indices:expression* ;
+preference = persistant reference ;
+\end{verbatim}
+
+The effect of a statement like \verb/*p=1;/ can only be expressed in
+this framework as a reference to a large memory entity, an area or a
+set of areas, as no information is locally available about \verb/p/.
+
+Effects are abstractions of effective memory effects. For instance
+\verb/d[i]/ can be captured as \verb/d[i]/ because the data structure
+\verb/reference/ let us do so, as \verb/d[*]/ to obtain a constant
+effect independent of the current store, or as an array region, with
+cosntant reference \verb/d[phi]/ and store sensitive descriptor
+\verb/{phi=i}.
+
+We need a new abstraction to deal with indirect effects in such a way
+that constant pointers can be detected and taken advantage of. For
+instance, a C function incrementing an integer, \verb/void inc(*int p)/,
+should be analyzed in such a way that the call site effect of
+\verb/inc(&i)/ can be derived exactly.
+
+We need to know that \verb/inc/ performs an indirect write through
+\verb/p/.  This is not a great new abstraction for pointers. It is the
+minimum needed in a first phase.
+
+How can we add this new information in the current PIPS data
+structure? Many solutions are possible:
+\begin{enumerate}
+\item add nothing in the data structures and keep the information at
+the source code level: have different variables for direct and
+indirect effects;
+\item define a new level of effects, like
+\verb/g_effect = direct:effect + indirect:effect/ or, at the list
+level, \verb/g_effects = direct:effects + indirect:effects/
+\end{enumerate}
+
+\section{Data structures}
+
 \chapter*{Conclusion}
 
 There is no perfect solution, especially before full implementations
