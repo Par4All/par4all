@@ -4,7 +4,15 @@
 #  - shouldn't it also process newgen and linear files ?
 
 delete pips
-create pips ${PIPS_ROOT}/src/Libs/*/*.c
+
+setenv FOO "${PIPS_ROOT}/src/Libs/*/*.c"
+# shell echo ${PIPS_ROOT}
+# shell echo ${FOO}
+
+setenv PIPS_CPP_FLAGS " -I. -I${PIPS_ROOT}/include "
+
+# create pips ${PIPS_ROOT}/src/Libs/*/*.c
+create pips ${FOO}
 
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 activate C_PARSER
