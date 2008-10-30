@@ -389,6 +389,7 @@ sh> cd hpfc
   \item[branch-avail] list of commits on the trunk that where not pulled
     into the branch.
   \end{description}
+  For other targets about compilation, see \S~\ref{sec:local-targets}.
 
   It may be desirable to look for the differences between the branch
   and trunk with additional options, for instance to ignore space changes.
@@ -1654,6 +1655,34 @@ provided. Do not forget that there may be several successive requests with
 \verb+wpips+ or \verb+tpips+, whereas tests performs with shell interfaces
 (for instance \verb+Build+) are much simpler.
 
+
+\subsection{Adding a new language input}
+\label{sec:new_language}
+
+
+\begin{itemize}
+\item Define the language (subset) to be used by PIPS;
+\item gather a use-case file basis to be used as a validation of the work;
+\item define what transformations and analysis phases will be used and
+  adapted to the new language for your need;
+\item integrate an existing parser (should be simple);
+\item create a preprocessor system that split a source file into as many
+  files there are modules (functions, subroutines...) in the source
+  file. This may use a skeleton parser for the language to detect and
+  split module definitions from the source file;
+\item adapt the parser to generate the PIPS internal representation
+  (should be more complex);
+\item extend the internal representation if is cannot cope with the new
+  features and concepts of the language. It may need some deep thoughts if
+  the language is quite different of those previously dealt by PIPS;
+\item modify all the needed analysis and transformations to cope with the
+  new features added in the internal representation to deal with the new
+  language on the selected validation programs..
+\end{itemize}
+
+That means that the work depends on the objectives and the complexity of
+the new language. If the Pascal language is added it should be easy, if an
+object-oriented is added, it should be hard\ldots
 
 \newpage
 \noindent

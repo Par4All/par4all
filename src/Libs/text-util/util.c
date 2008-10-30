@@ -21,7 +21,7 @@ i2a(int i)
     char buffer[32];
     sprintf(buffer, "%d", i);
     return strdup(buffer);
-}    
+}
 
 
 char *
