@@ -1623,7 +1623,7 @@ Effects are abstractions of effective memory effects. For instance
 \verb/d[i]/ can be captured as \verb/d[i]/ because the data structure
 \verb/reference/ let us do so, as \verb/d[*]/ to obtain a constant
 effect independent of the current store, or as an array region, with
-cosntant reference \verb/d[phi]/ and store sensitive descriptor
+constant reference \verb/d[phi]/ and store sensitive descriptor
 \verb/{phi=i}/.
 
 We need a new abstraction to deal with indirect effects in such a way
@@ -1636,8 +1636,20 @@ We need to know that \verb/inc/ performs an indirect write through
 \verb/p/.  This is not a great new abstraction for pointers. It is the
 minimum needed in a first phase.
 
-How can we add this new information in the current PIPS data
-structure? Many solutions are possible:
+We need to encode \verb/p->in/, which is equivalent to \verb/(*p).in/.
+
+We need to encode \verb/(*p)[i][j][k]/ which is an array acces to a
+formal array parameter.
+
+We do not know if we need to keep track of pointer arrays, as in
+\verb/*(p[3])/: our region framework can handle it effortlessly, but
+what can we do with information about pointer arrays? If our lattice
+is too simple, we won't be able to make a difference between
+\verb/*(p[3])/ and\verb/(*p)[3]/.
+
+What is the new information we want to add? How can we add this new
+information in the current PIPS data structure? Many solutions are
+possible:
 \begin{enumerate}
 \item add nothing in the data structures and keep the information at
 the source code level: have different variables for direct and
