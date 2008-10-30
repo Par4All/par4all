@@ -38,8 +38,9 @@ display PRINTED_FILE[main]
 #display PRINTED_FILE[main]
 
 apply SAFESCALE_DISTRIBUTOR
-display PRINTED_FILE[for]
 display PRINTED_FILE[main]
+display PRINTED_FILE[traou!]
+display PRINTED_FILE[traou]
 
 close
 

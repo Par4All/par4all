@@ -1,3 +1,10 @@
+/* 	$Id$	 */
+
+#ifndef lint
+static char vcid[] = "$Id$";
+#endif /* lint */
+
+
 #include "safescale.h"
 
 
@@ -449,7 +456,7 @@ static string get_externalized_function_param_name(entity variable, int param_nb
 {
   char buffer[256];
 
-  sprintf(buffer, EXTERNALIZED_FUNCTION_PARAM_NAME, entity_local_name(variable), param_nb);
+  sprintf(buffer, EXTERNALIZED_FUNCTION_PARAM_NAME, entity_user_name(variable), param_nb);
 
   return strdup(buffer);
 }
@@ -462,7 +469,7 @@ static string get_externalized_function_private_param_name(entity variable)
 {
   char buffer[256];
 
-  sprintf(buffer, EXTERNALIZED_FUNCTION_PRIVATE_PARAM_NAME, entity_local_name(variable));
+  sprintf(buffer, EXTERNALIZED_FUNCTION_PRIVATE_PARAM_NAME, entity_user_name(variable));
 
   return strdup(buffer);
 }
@@ -626,7 +633,7 @@ static entity create_module_with_statement(statement stat, string new_module_nam
                         add_private_variable_to_module(ref, new_module, stat, new_module_name);
                       }, references_for_regions(l_priv));
   
-  /* Deal with parameters variables */ 
+  /* Deal with parameter variables */ 
   param_nb = gen_length(l_params);
 
   MAP(REFERENCE, ref, {
@@ -642,43 +649,8 @@ static entity create_module_with_statement(statement stat, string new_module_nam
     print_statement(stat);
   }
   
-  //DB_PUT_MEMORY_RESOURCE(DBR_CODE, new_module_name, stat);
-
-  // Generate an empty code for global variables in the compile unit:
-  text_code = make_text(gen_sentence_cons(make_sentence_formatted(strdup("")),
-					  NIL));
-  // Create an empty compile unit for the current module:
-  string cu_name = strdup(concatenate(new_module_name, "!", NULL));
-  make_text_resource_and_free(cu_name, DBR_USER_FILE, ".cpp_processed.c", text_code);
-  //make_text_resource(cu_name, DBR_C_SOURCE_FILE, ".c", text_code);
-  free(cu_name);
-
-  // Prettyprint the code of the module to regenerate the files:
-  init_prettyprint(empty_text);
-  text_code = text_module(new_module, stat);
-  // Create a pseudo-initial file to be coherent with PIPS infrastructure
-  make_text_resource(new_module_name, DBR_INITIAL_FILE, ".c_initial", text_code);
-  // Name this ressource according to the definition of compilation_unit_of_module():
-  make_text_resource(new_module_name, DBR_USER_FILE, ".cpp_processed.c", text_code);
-  make_text_resource_and_free(new_module_name, DBR_C_SOURCE_FILE, ".c", text_code);
-  close_prettyprint();
-  //free_statement(stat);
-
-  pips_debug(5, "Current directory: %s\n", db_get_current_workspace_directory());
-
-  //source_file = db_build_file_resource_name(DBR_SOURCE_FILE, new_module_name, ".c");
-
-  //pips_debug(5, "Source file : [%s]\n", source_file);
-
-  // Give the new module a user file.
-  //DB_PUT_NEW_FILE_RESOURCE(DBR_USER_FILE, new_module_name, source_file);
-
-  //DB_PUT_MEMORY_RESOURCE(DBR_USER_FILE, new_module_name, 
-  //		 strdup(db_get_memory_resource(DBR_INITIAL_FILE, new_module_name, TRUE)));
-  //init_prettyprint(empty_text);
-  //make_text_resource(new_module_name, DBR_INITIAL_FILE, ".c_initial", text_code);
-  //close_prettyprint();
-
+  add_new_module(new_module_name, new_module, stat, is_fortran);
+  
   pips_debug(5, "[END] create_module_with_statement\n");
 
   return new_module;
