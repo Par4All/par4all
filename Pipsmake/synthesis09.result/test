@@ -53,7 +53,7 @@ Request: build resource CALLGRAPH_FILE for module SYNTHESIS09.
   INITIALIZER                    building   USER_FILE(HIDENH)
                                  building   INITIAL_FILE(HIDENH)
 user warning in missing_file_initializer: no source file for HIDENH: synthetic code is generated
-Registering synthesized file hidenh.f
+Registering synthesized file HIDENH.f
   FILTER_FILE                    building   SOURCE_FILE(HIDENH)
   PARSER                         building   PARSED_CODE(HIDENH)
                                  building   CALLEES(HIDENH)

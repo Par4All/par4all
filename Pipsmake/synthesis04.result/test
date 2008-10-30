@@ -56,7 +56,7 @@ Request: build resource CALLGRAPH_FILE for module SYNTHESIS04.
   INITIALIZER                    building   USER_FILE(FOO)
                                  building   INITIAL_FILE(FOO)
 user warning in missing_file_initializer: no source file for FOO: synthetic code is generated
-Registering synthesized file foo.f
+Registering synthesized file FOO.f
   FILTER_FILE                    building   SOURCE_FILE(FOO)
   PARSER                         building   PARSED_CODE(FOO)
                                  building   CALLEES(FOO)
