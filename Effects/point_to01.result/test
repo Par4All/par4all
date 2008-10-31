@@ -1,0 +1,28 @@
+
+Parsed printed file for "point_to01"
+
+void point_to01()
+{
+   double x = 1.;
+   double *p = &x;
+   double *q = 0;
+
+   q = p;
+   *p = 2.;
+}
+
+Cumulated effetcs for "point_to01"
+
+void point_to01()
+{
+   double x = 1.;
+   double *p = &x;
+   double *q = 0;
+//               <must be read   >: p
+//               <must be written>: q
+
+   q = p;
+//               <must be read   >: p
+//               <must be written>: p
+   *p = 2.;
+}

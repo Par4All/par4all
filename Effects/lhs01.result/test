@@ -1,0 +1,54 @@
+
+Parsed printed file for "lhs01"
+
+void lhs01()
+{
+   int i = 2;
+   int j;
+   int k;
+   (i>2?i = 3:j = 3);
+
+   if (i>2)
+      i = 3;
+   else
+      j = 3;
+   (i>2?j = 4:j = 3);
+
+   if (i>2)
+      j = 4;
+   else
+      j = 3;
+}
+
+Cumulated effetcs for "lhs01"
+
+void lhs01()
+{
+   int i = 2;
+   int j;
+   int k;
+//               <must be read   >: i
+//               <must be written>: i j
+   (i>2?i = 3:j = 3);
+//               <may be written >: i j
+//               <must be read   >: i
+
+   if (i>2)
+//               <must be written>: i
+      i = 3;
+   else
+//               <must be written>: j
+      j = 3;
+//               <must be read   >: i
+//               <must be written>: j
+   (i>2?j = 4:j = 3);
+//               <must be read   >: i
+//               <must be written>: j
+
+   if (i>2)
+//               <must be written>: j
+      j = 4;
+   else
+//               <must be written>: j
+      j = 3;
+}

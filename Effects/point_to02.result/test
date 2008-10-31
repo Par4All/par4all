@@ -1,0 +1,43 @@
+
+Parsed printed file for "point_to02"
+
+void point_to02()
+{
+   double x = 1.;
+   double *p = &x;
+   double **q = &p;
+   int i = 1;
+   
+
+   **q = 2.;
+   **(q+(i = 2)) = 3.;
+   x = **q;
+   q++;
+   *q++;
+}
+
+Cumulated effetcs for "point_to02"
+
+void point_to02()
+{
+   double x = 1.;
+   double *p = &x;
+   double **q = &p;
+   int i = 1;
+//               <must be read   >: q
+   
+
+   **q = 2.;
+//               <must be read   >: q
+//               <must be written>: i
+   **(q+(i = 2)) = 3.;
+//               <must be read   >: q
+//               <must be written>: x
+   x = **q;
+//               <must be read   >: q
+//               <must be written>: q
+   q++;
+//               <must be read   >: q
+//               <must be written>: q
+   *q++;
+}

@@ -1,0 +1,21 @@
+
+Parsed printed file for "assign01"
+
+void assign01()
+{
+   int i;
+   int j;
+
+   i = j = 1;
+}
+
+Cumulated effetcs for "assign01"
+
+void assign01()
+{
+   int i;
+   int j;
+//               <must be written>: i j
+
+   i = j = 1;
+}

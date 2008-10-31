@@ -19,6 +19,13 @@ echo
 display PARSED_PRINTED_FILE[struct02]
 
 echo
+echo Proper effetcs for "struct02"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[struct02]
+
+echo
 echo Cumulated effetcs for "struct02"
 echo
 
