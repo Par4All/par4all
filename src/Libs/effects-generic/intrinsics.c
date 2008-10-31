@@ -846,35 +846,11 @@ static list any_affect_effects(entity e __attribute__ ((__unused__)),
       le = generic_proper_effects_of_expression(lhs);
     le = gen_nconc(le, generic_proper_effects_of_lhs(syntax_reference(s)));
   }
-  else if(syntax_call_p(s)) {
-    call c = syntax_call(s);
-    entity op = call_function(c);
-    list nargs = call_arguments(c);
-
-    if(ENTITY_FIELD_P(op)) {
-      expression e1 = EXPRESSION(CAR(nargs));
-      syntax s1 = expression_syntax(e1);
-      expression e2 = EXPRESSION(CAR(CDR(nargs)));
-
-      pips_assert("The field operator has two arguments", gen_length(nargs)==2);
-      ifdebug(8) {
-	pips_debug(8, "First expression: ");
-	print_expression(e1);
-	pips_debug(8, "\nSecond expression: ");
-	print_expression(e2);
-	pips_debug(8, "\n");
-      }
-      pips_assert("The structure is defined by a reference to it", syntax_reference_p(s1));
-
-     if(update_p)
-      le = generic_proper_effects_of_expression(e1);
-     le = gen_nconc(le, generic_proper_effects_of_lhs(syntax_reference(s1)));
-     le = gen_nconc(le, generic_proper_effects_of_expression(e2));
-    }
+  else {
+    if(update_p)
+      le = generic_proper_effects_of_expression(lhs);
+    le = gen_nconc(le, generic_proper_effects_of_any_lhs(lhs));
   }
-  else
-    pips_internal_error("lhs is not a reference and is not handled yet\n");
-
 
   if(!unique_p) {
     expression rhs = EXPRESSION(CAR(CDR(args)));

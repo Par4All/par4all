@@ -392,7 +392,7 @@ translate_array_effect(entity called_func, list real_args, reference real_ref,
     tag formal_tac = action_tag(effect_action(formal_effect));
     tag formal_tap = approximation_tag(effect_approximation(formal_effect));
 
-    entity formal_var = reference_variable(effect_reference(formal_effect));
+    entity formal_var = reference_variable(effect_any_reference(formal_effect));
     int formal_ndims = NumberOfDimension(formal_var);
 
     entity real_var = reference_variable(real_ref);
@@ -550,7 +550,7 @@ static effect
 translate_effect(entity called_func, list real_args, reference real_ref,
 		 effect formal_effect)
 {
-    entity formal_var = reference_variable(effect_reference(formal_effect));
+    entity formal_var = reference_variable(effect_any_reference(formal_effect));
     entity real_var = reference_variable(real_ref);
 
     tag formal_tac = action_tag(effect_action(formal_effect));
@@ -640,6 +640,7 @@ summary_effect_to_proper_effect(
 
 	pips_assert("expression is a reference or read effect", 
 		    effect_read_p(e) || expression_reference_p(nth));
+	/* FI: a preference is forced here */
 	effect_reference(res) = expression_reference(nth);
 
 	return CONS(EFFECT, res, NIL);

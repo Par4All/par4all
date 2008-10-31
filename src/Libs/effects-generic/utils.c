@@ -456,7 +456,7 @@ cons * fx;
 {
     MAPL(ceffect,
      {entity e = 
-	  reference_variable(effect_reference(EFFECT(CAR(ceffect))));
+	  reference_variable(effect_any_reference(EFFECT(CAR(ceffect))));
      if(!integer_scalar_entity_p(e)) return FALSE;},
 	 fx);
     return TRUE;
@@ -471,7 +471,7 @@ cons * fx;
 {
     MAPL(ceffect,
      {entity e = 
-	  reference_variable(effect_reference(EFFECT(CAR(ceffect))));
+	  reference_variable(effect_any_reference(EFFECT(CAR(ceffect))));
 	  if(integer_scalar_entity_p(e)) return TRUE;},
 	 fx);
     return FALSE;
@@ -488,7 +488,7 @@ entity e;
     MAP(EFFECT, ef, 
     {
 	action a = effect_action(ef);
-	entity e_used = reference_variable(effect_reference(ef));
+	entity e_used = reference_variable(effect_any_reference(ef));
 	
 	/* Note: to test aliasing == should be replaced below by
 	 * entity_conflict_p()
@@ -513,7 +513,7 @@ entity e;
     MAPL(cef, 
      {
 	 effect ef = EFFECT(CAR(cef));
-	 entity e_used = reference_variable(effect_reference(ef));
+	 entity e_used = reference_variable(effect_any_reference(ef));
 	 /* Used to be a simple pointer equality test */
 	 if(entity_conflict_p(e, e_used)) {
 	     read_or_write = TRUE;
@@ -532,7 +532,7 @@ entity e;
     MAPL(cef, 
      {
 	 effect ef = EFFECT(CAR(cef));
-	 entity e_used = reference_variable(effect_reference(ef));
+	 entity e_used = reference_variable(effect_any_reference(ef));
 	 if(entity_conflict_p(e, e_used)) {
 	     conflict_e = e_used;
 	     break;
@@ -550,7 +550,7 @@ entity e;
     MAPL(cef, 
      {
 	 effect ef = EFFECT(CAR(cef));
-	 entity e_used = reference_variable(effect_reference(ef));
+	 entity e_used = reference_variable(effect_any_reference(ef));
 	 if(entity_conflict_p(e, e_used)) {
 	     lconflict_e = gen_nconc(lconflict_e, 
 				     CONS(ENTITY, e_used, NIL));
@@ -586,7 +586,7 @@ statement_io_effect_p(statement s)
 
    MAP(EFFECT, an_effect,
        {
-          reference a_reference = effect_reference(an_effect);
+          reference a_reference = effect_any_reference(an_effect);
           entity a_touched_variable =
              reference_variable(a_reference);
 
@@ -613,7 +613,7 @@ statement_has_a_formal_argument_write_effect_p(statement s)
 
    MAP(EFFECT, an_effect,
        {
-          entity a_variable = reference_variable(effect_reference(an_effect));
+          entity a_variable = reference_variable(effect_any_reference(an_effect));
           
           if (action_write_p(effect_action(an_effect))
               && (variable_return_p(a_variable)

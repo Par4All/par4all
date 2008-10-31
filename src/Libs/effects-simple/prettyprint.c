@@ -50,8 +50,8 @@ static string continuation = string_undefined;
 int
 compare_effect_reference(effect * e1, effect * e2)
 {
-  entity v1 = reference_variable(effect_reference(*e1));
-    entity v2 = reference_variable(effect_reference(*e2));
+  entity v1 = reference_variable(effect_any_reference(*e1));
+    entity v2 = reference_variable(effect_any_reference(*e2));
   int n1, n2;
   string s1 = entity_name_without_scope(v1);
   string s2 = entity_name_without_scope(v2);
@@ -77,8 +77,8 @@ compare_effect_reference_in_common(effect * e1, effect * e2)
   entity v1, v2;
   int n1, n2 ,result;
   string name1, name2;
-  v1 = reference_variable(effect_reference(*e1));
-  v2 = reference_variable(effect_reference(*e2));
+  v1 = reference_variable(effect_any_reference(*e1));
+  v2 = reference_variable(effect_any_reference(*e2));
   n1 = (v1==(entity)NULL),
   n2 = (v2==(entity)NULL);
   name1= strdup((entity_in_common_p(v1)) ? 
@@ -195,7 +195,7 @@ simple_effects_to_text(
     for(ce = sefs_list; !ENDP(ce); POP(ce)) 
     {
 	effect eff = EFFECT(CAR(ce));
-	reference ref = effect_reference(eff);
+	reference ref = effect_any_reference(eff);
 	action ac = effect_action(eff);
 	approximation ap = effect_approximation(eff);
 	list /* of string */ ls = effect_words_reference(ref);
@@ -251,7 +251,7 @@ text simple_inout_effects_to_text(list l)
 string
 effect_to_string(effect eff)
 {
-    list /* of string */ ls = effect_words_reference(effect_reference(eff));
+    list /* of string */ ls = effect_words_reference(effect_any_reference(eff));
     string result = words_to_string(ls);
     gen_free_string_list(ls);
     return result;
@@ -263,7 +263,7 @@ words_effect(obj)
 effect obj;
 {
     list pc = NIL;
-    reference r = effect_reference(obj);
+    reference r = effect_any_reference(obj);
     action ac = effect_action(obj);
     approximation ap = effect_approximation(obj);
 

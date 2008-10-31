@@ -435,6 +435,60 @@ bool entity_field_p(entity e)
   return field_p;
 }
 
+/* f is a field of a structure: what is its structure?
+ *
+ * To get the structure name, we have to drop the field part of f's
+ * name and to insert a struct prefix before the struct name. Maybe,
+ * it would have been better to keep the struct prefix in the field
+ * name.
+ */
+int entity_field_to_entity_struct(entity f)
+{
+  entity s = entity_undefined;
+  string sn = strdup(entity_name(f)); /* structure name */
+  string pos = strrchr(sn, MEMBER_SEP_CHAR);
+  string usn = string_undefined;
+  int usnl = 0;
+
+  pips_assert("The entity is a field", pos!=NULL);
+
+  *pos = '\0'; /* get rid of the field name */
+  usn = strdup(global_name_to_user_name(sn));
+  usnl = strlen(usn);
+  *(pos-usnl) = STRUCT_PREFIX_CHAR;
+  /* can be done in place because the field name is at least on
+     character long and because we also gain the field marker */
+  (void) strncpy(pos-usnl+1, usn, usnl+1);
+  free(usn);
+
+  pips_debug(8, "struct entity name is \"\%s\"\n", sn);
+  s = gen_find_tabulated(sn, entity_domain);
+
+  pips_assert("entity s is defined", !entity_undefined_p(s));
+
+  return s;
+}
+
+/* f is a field of a structure: what is its rank? */
+int entity_field_rank(entity f)
+{
+  int rank = -1;
+  entity s = entity_field_to_entity_struct(f);
+  type st = entity_type(s);
+  list fl = type_struct(st);
+
+  pips_assert("st is a struct type", type_struct_p(st));
+
+  /* FI: positions are counted from 1 on; do we want to subtract 1? */
+  rank = gen_position((void *) f, fl);
+
+  if(rank==0) {
+    pips_internal_error("Field \"\%s\" is not part of its structure \"\%s\"\n",
+			entity_name(f), entity_name(s));
+  }
+  return rank;
+}
+
 bool entity_enum_p(entity e)
 {
   return type_enum_p(entity_type(e));

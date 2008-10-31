@@ -74,7 +74,7 @@ bool summary_rw_effects_engine(string module_name)
     
     l_loc2 = gen_append(l_loc,l_dec);
     
-    // MAP(EFFECT, e, fprintf(stderr, "=%s=", entity_name(reference_variable(effect_reference(e)))) ,l_loc2);
+    // MAP(EFFECT, e, fprintf(stderr, "=%s=", entity_name(reference_variable(effect_any_reference(e)))) ,l_loc2);
     l_glob = (*effects_local_to_global_translation_op)(l_loc2);
     
 

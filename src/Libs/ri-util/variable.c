@@ -298,7 +298,7 @@ entity e;
 {
   type t = entity_type(e);
 
-  pips_assert("entity_scalar_p", type_variable_p(t));
+  pips_assert("e is a variable", type_variable_p(t));
 
   return(ENDP(variable_dimensions(type_variable(t))));
 }

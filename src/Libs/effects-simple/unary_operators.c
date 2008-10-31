@@ -57,70 +57,88 @@ reference_to_simple_effect(reference ref, action ac)
 /* SIMPLE EFFECTS                                                                */
 /*********************************************************************************/
 
+/* A persistant reference is forced. */
 effect
 simple_effect_dup(effect eff)
 {
-    effect new_eff;
-    new_eff = copy_effect(eff);
+  effect new_eff = effect_undefined;
+
+  new_eff = copy_effect(eff);
+
+  if(cell_preference_p(effect_cell(new_eff)))
     effect_reference(new_eff) = reference_dup(effect_reference(new_eff));
-    return(new_eff);
+  else
+    cell_reference(effect_cell(new_eff)) = reference_dup(effect_reference(new_eff));
+
+  return(new_eff);
 }
 
+/* use free_effect() instead? persistent reference assumed */
 void
 simple_effect_free(effect eff)
 {
+  if(cell_preference_p(effect_cell(eff))) {
     free_reference(effect_reference(eff));
     effect_reference(eff) = reference_undefined;
-    free_effect(eff);
+  }
+  else {
+    free_reference(effect_any_reference(eff));
+    cell_reference(effect_cell(eff)) = reference_undefined;
+  }
+  free_effect(eff);
 }
 
-effect
-reference_to_reference_effect(reference ref, action ac)
-{
-    cell cell_ref = make_cell(is_cell_preference, make_preference(ref));
-    approximation ap = make_approximation(is_approximation_must, UU);
-    effect eff;
+/* In fact, reference to persistant reference, preference */
+ effect
+ reference_to_reference_effect(reference ref, action ac)
+ {
+   cell cell_ref = make_cell(is_cell_preference, make_preference(ref));
+   approximation ap = make_approximation(is_approximation_must, UU);
+   effect eff;
     
-    eff = make_effect(cell_ref, ac, ap, make_descriptor(is_descriptor_none,UU));  
-    return(eff);
-}
+   eff = make_effect(cell_ref, ac, ap, make_descriptor(is_descriptor_none,UU));  
+   return(eff);
+ }
 
 
 list 
 simple_effects_union_over_range(list l_eff, entity i, range r, descriptor d)
 {
-    if (!get_bool_property("ONE_TRIP_DO"))
+  if (!get_bool_property("ONE_TRIP_DO"))
     {
-	effects_to_may_effects(l_eff);
+      effects_to_may_effects(l_eff);
     }
-    return l_eff;
+  return l_eff;
 }
 
 
 list 
 effect_to_may_sdfi_list(effect eff)
 {
-    if (!ENDP(reference_indices(effect_reference(eff))))
-    {
-	effect_reference(eff) = make_reference(effect_entity(eff), NIL);
-    }
-    effect_approximation_tag(eff) = is_approximation_may;
-    return(CONS(EFFECT,eff,NIL));
+  if (!ENDP(reference_indices(effect_any_reference(eff)))) {
+    /* FI: a persistant reference is forced here */
+    pips_assert("reference is a persistant reference", cell_preference_p(effect_cell(eff)));
+    effect_reference(eff) = make_reference(effect_entity(eff), NIL);
+  }
+  effect_approximation_tag(eff) = is_approximation_may;
+  return(CONS(EFFECT,eff,NIL));
 }
 
 list 
 effect_to_sdfi_list(effect eff)
 {
-    if (!ENDP(reference_indices(effect_reference(eff))))
+  if (!ENDP(reference_indices(effect_any_reference(eff))))
     {
-	effect_reference(eff) = make_reference(effect_entity(eff), NIL);
-	effect_approximation_tag(eff) = is_approximation_may;
+      /* FI: persistant reference assumed */
+      pips_assert("reference is a persistant reference", cell_preference_p(effect_cell(eff)));
+      effect_reference(eff) = make_reference(effect_entity(eff), NIL);
+      effect_approximation_tag(eff) = is_approximation_may;
     }
-    return(CONS(EFFECT,eff,NIL));
+  return(CONS(EFFECT,eff,NIL));
 }
 
 void
 simple_effects_descriptor_normalize(list l_eff)
 {
-    return;
+  return;
 }

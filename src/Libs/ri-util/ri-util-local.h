@@ -1024,8 +1024,15 @@
         (descriptor_convex_p(effect_descriptor(e))? \
          descriptor_convex(effect_descriptor(e)) : SC_UNDEFINED)
 
+/* FI: it would be useful to assert cell_preference_p(effect_cell(e)),
+   but I do not know how to do it in such a way that it works both for
+   left hand sides and right hand sides using commas */
 #define effect_reference(e) \
          preference_reference(cell_preference(effect_cell(e)))
+
+/* FI: cannot be used as a left hand side */
+#define effect_any_reference(e) \
+         (cell_preference_p(effect_cell(e))? preference_reference(cell_preference(effect_cell(e))) : cell_reference(effect_cell(e)))
 
 #define entity_variable_p(e) (type_variable_p(entity_type(e)))
 
