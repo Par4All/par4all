@@ -319,8 +319,12 @@ hash_delget(
     void *val;
     uintptr_t rank;
 
-    message_assert("legal input key",
-		   key!=HASH_ENTRY_FREE && key!=HASH_ENTRY_FREE_FOR_PUT);
+    /* FI: the stack is destroyed by assert; I need to split the
+       statement to put a breakpoint just before the stack
+       disappears. */
+    if(!(key!=HASH_ENTRY_FREE && key!=HASH_ENTRY_FREE_FOR_PUT))
+      message_assert("legal input key",
+		     key!=HASH_ENTRY_FREE && key!=HASH_ENTRY_FREE_FOR_PUT);
 
     htp->n_del++;
     hep = hash_find_entry(htp, key, &rank, &htp->n_del_iter);
@@ -358,8 +362,12 @@ void * hash_get(hash_table htp, void * key)
   hash_entry * hep;
   uintptr_t n;
 
-  message_assert("legal input key",
-		 key!=HASH_ENTRY_FREE && key!=HASH_ENTRY_FREE_FOR_PUT);
+  /* FI: the stack is destroyed by assert; I need to split the
+     statement to put a breakpoint just before the stack
+     disappears. */
+  if(!(key!=HASH_ENTRY_FREE && key!=HASH_ENTRY_FREE_FOR_PUT))
+    message_assert("legal input key",
+		   key!=HASH_ENTRY_FREE && key!=HASH_ENTRY_FREE_FOR_PUT);
 
   if (!htp->n_entry)
     return HASH_UNDEFINED_VALUE;
@@ -369,7 +377,7 @@ void * hash_get(hash_table htp, void * key)
   hep = hash_find_entry(htp, key, &n, &htp->n_get_iter);
 
   return hep->key!=HASH_ENTRY_FREE &&
-	 hep->key!=HASH_ENTRY_FREE_FOR_PUT ? hep->val : HASH_UNDEFINED_VALUE;
+    hep->key!=HASH_ENTRY_FREE_FOR_PUT ? hep->val : HASH_UNDEFINED_VALUE;
 }
 
 /* TRUE if key has e value in htp.
