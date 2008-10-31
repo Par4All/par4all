@@ -34,14 +34,14 @@
 
 list
 ReferenceUnion(list l1, list l2,
-	       boolean (*union_combinable_p)(effect, effect))
+	       boolean (*union_combinable_p)(effect, effect) __attribute__ ((unused)))
 {
     return gen_nconc(l1,l2);
 }
 
 list
 ReferenceTestUnion(list l1, list l2,
-		   boolean (*union_combinable_p)(effect, effect))
+		   boolean (*union_combinable_p)(effect, effect) __attribute__ ((unused)))
 {
     list l_res;
 
@@ -168,7 +168,8 @@ effect_sup_difference(/* const */ effect eff1, /* const */ effect eff2)
 }
 
 static list
-effect_inf_difference(effect eff1, effect eff2)
+effect_inf_difference(effect eff1 __attribute__ ((unused)),
+		      effect eff2 __attribute__ ((unused)))
 {
     list l_res = NIL;
     return(l_res);
@@ -236,8 +237,16 @@ proper_to_summary_simple_effect(effect eff)
     if (!effect_scalar_p(eff))
     {
 	entity e = effect_entity(eff);
-	free_reference(effect_reference(eff));
-	effect_reference(eff) = make_reference(e, NIL);
+	cell c = effect_cell(eff);
+
+	free_reference(effect_any_reference(eff));
+	if(cell_preference_p(c)) {
+	  preference p = cell_preference(c);
+	  preference_reference(p) = make_reference(e, NIL);
+	}
+	else {
+	  cell_reference(c) = make_reference(e, NIL);
+	}
 	effect_approximation_tag(eff) = is_approximation_may;
     }
     return(eff);

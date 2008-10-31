@@ -534,8 +534,8 @@ graph dg;
 		effect e_source = conflict_source(conf2);
 		effect e_sink = conflict_sink(conf2);
 
-		reference r11 = effect_reference(e_source);
-		reference r21 = effect_reference(e_sink);
+		reference r11 = effect_any_reference(e_source);
+		reference r21 = effect_any_reference(e_sink);
 
 		ifdebug(8) {
 		    (void) fprintf(stderr,"Test with reference 1 %p: ", r1);

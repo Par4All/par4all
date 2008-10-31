@@ -197,14 +197,15 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
   /* scan the list of effects... the list is modified in place */
   while(!ENDP(cur))
   {
-    effect current = EFFECT(CAR(cur));
+    effect lcurrent = EFFECT(CAR(cur));
+    effect current = effect_undefined;
     string n;
     tag a;
     bool may_combine, do_combine = FALSE;
     list do_combine_item = NIL;
     list next = CDR(cur); /* now, as 'cur' may be removed... */
 
-    current = (*proper_to_summary_effect_func)(current);
+    current = (*proper_to_summary_effect_func)(lcurrent);
     n = entity_name(effect_entity(current));
     a = effect_action_tag(current);
 

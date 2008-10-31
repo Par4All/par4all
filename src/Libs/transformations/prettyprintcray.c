@@ -72,7 +72,7 @@ list real_loop_locals(loop lp, effects cfx)
 	effect 
 	    eff = EFFECT(CAR(ce));
 	entity 
-	    ent = reference_variable(effect_reference(eff));
+	    ent = reference_variable(effect_any_reference(eff));
 
 	if (!entity_in_list(ent, rll)
 	    && entity_in_list(ent,loop_locals(lp)) ) 
@@ -183,7 +183,7 @@ text text_microtasked_loop(entity module, int margin, statement lp_stt)
 	entity ent = ENTITY(CAR(el));
 
 	/* What about arrays? nothing special?? */
-	/* if (!ENDP(reference_indices(effect_reference(eff)))) */
+	/* if (!ENDP(reference_indices(effect_any_reference(eff)))) */
 
 	if (np>0)
 	    wordl = CHAIN_SWORD(wordl, ",");
@@ -222,14 +222,14 @@ text text_microtasked_loop(entity module, int margin, statement lp_stt)
     MAPL(ce, 
      { 
 	effect eff = EFFECT(CAR(ce));
-	entity ent = reference_variable(effect_reference(eff));
+	entity ent = reference_variable(effect_any_reference(eff));
 
 /*	if(ENDP(ce)) user_log("ce is NIL !!\n");
 	if(ENDP(CDR(ce))) user_log("CDR(ce) is NIL\n");
 	else user_log("CDR(ce) is *not* NIL\n");
  */
 	/* What about arrays? nothing special?? */
-	/* if (!ENDP(reference_indices(effect_reference(eff)))) */
+	/* if (!ENDP(reference_indices(effect_any_reference(eff)))) */
 
 	/*
 	 * ent_l added, in order to use the newly computed << good >> effects, 

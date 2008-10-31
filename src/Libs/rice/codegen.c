@@ -99,13 +99,13 @@ int l;
 {
     extern int enclosing;
     effect e1 = conflict_source(c);
-    reference r1 = effect_reference(e1) ;
+    reference r1 = effect_any_reference(e1) ;
     entity var1 = reference_variable(r1);
     statement s1 = vertex_to_statement(v1);
     list loops1 = load_statement_enclosing_loops(s1);
 
     effect e2 = conflict_sink(c);
-    reference r2 = effect_reference( e2 ) ;
+    reference r2 = effect_any_reference( e2 ) ;
     entity var2 = reference_variable(r2);
     statement s2 = vertex_to_statement(v2);
     list loops2 = load_statement_enclosing_loops(s2);

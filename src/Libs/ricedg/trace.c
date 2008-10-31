@@ -95,7 +95,7 @@ list make_filtered_dg_or_dvdg(statement mod_stat, graph mod_graph)
 	    
 	    MAP(CONFLICT, c, {
 	        if (!statement_undefined_p(mod_stat)) {
-		    entity conflict_var = reference_variable(effect_reference(conflict_source(c)));
+		    entity conflict_var = reference_variable(effect_any_reference(conflict_source(c)));
 		    if (gen_in_list_p(conflict_var, vars_ent_list) || vars_ent_list == NIL) {
 		        string succ_label = (string)malloc(sizeof(string)*30);
 			int l1 = dl + apply_persistant_statement_to_int(s_to_l, s1);
@@ -105,8 +105,8 @@ list make_filtered_dg_or_dvdg(statement mod_stat, graph mod_graph)
 			vertex vertex_child = NULL;
 			char statement_action_parent = action_read_p(effect_action(conflict_source(c))) ? 'R' : 'W';
 			char statement_action_child = action_read_p(effect_action(conflict_sink(c))) ? 'R' : 'W';
-			string variable_name_parent = words_to_string(effect_words_reference(effect_reference(conflict_source(c))));
-			string variable_name_child = words_to_string(effect_words_reference(effect_reference(conflict_sink(c))));
+			string variable_name_parent = words_to_string(effect_words_reference(effect_any_reference(conflict_source(c))));
+			string variable_name_child = words_to_string(effect_words_reference(effect_any_reference(conflict_sink(c))));
 			string node_name_parent = (string)malloc(sizeof(string)*strlen(variable_name_parent) + 30);
 			string node_name_child = (string)malloc(sizeof(string)*strlen(variable_name_child) + 30);
 

@@ -35,7 +35,7 @@ boolean  rw_effect_on_variable_p(list efs, entity var, boolean b)
 			    
   for( le =efs ; !ENDP(le ) && !readeff ; POP(le) ) {
     effect e= EFFECT(CAR(le));
-    reference r = effect_reference(e);
+    reference r = effect_any_reference(e);
     entity v = reference_variable(r); 
     if ((v==var) &&  
 	((b && action_read_p(effect_action(e))) || 
@@ -109,7 +109,7 @@ static void freeze_variables_in_statement(statement s, entity_lists * el)
       read_eff_on_var_already_seen=FALSE;
       if (this_entity_in_args) {
 	MAP(EFFECT, eff, {
-	  reference r = effect_reference(eff);
+	  reference r = effect_any_reference(eff);
 	  entity v = reference_variable(r);  
 	  if (v == ent) {
 	    if (action_write_p(effect_action(eff))) {

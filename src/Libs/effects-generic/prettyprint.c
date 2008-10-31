@@ -146,7 +146,10 @@ load_resources(string module_name)
 static list
 load_list(statement_effects m, statement s)
 {
-    return effects_effects(apply_statement_effects(m, s));
+  effects e = apply_statement_effects(m, s);
+  list el = effects_effects(e);
+  pips_assert("Retrieved effects are consistent", effects_consistent_p(e));
+  return el;
 }
 
 /********************************************************************* TEXT */

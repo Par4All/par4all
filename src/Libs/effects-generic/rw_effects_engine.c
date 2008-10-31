@@ -321,7 +321,8 @@ static void rw_effects_of_call(call c)
 
     if (!(*empty_context_test)(context))
     {
-	le = effects_dup(load_proper_rw_effects_list(current_stat));
+      list sel = load_proper_rw_effects_list(current_stat);
+	le = effects_dup(sel);
 	ifdebug(2){
 	    pips_debug(2, "proper effects before summarization: \n");
 	    (*effects_prettyprint_func)(le);

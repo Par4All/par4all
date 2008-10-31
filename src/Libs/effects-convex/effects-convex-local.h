@@ -17,13 +17,18 @@
     make_descriptor(is_descriptor_convex,system))
 #define region_reference(reg) \
     preference_reference(cell_preference(effect_cell(reg)))
+#define region_any_reference(reg) \
+    cell_preference_p(effect_cell(reg))? preference_reference(cell_preference(effect_cell(reg))):cell_reference(effect_cell(reg))
 #define region_action(reg) effect_action(reg)
 #define region_approximation(reg) effect_approximation(reg)
 #define region_context(reg) effect_context(reg)
+#define region_cell(reg) effect_cell(reg)
 #define copy_region(reg) region_dup((reg))
-#define free_region(reg) region_free((reg))
+/* FI: much too dangerous! */
+/* #define free_region(reg) region_free((reg)) */
+#define free_region(reg) free_effect((reg))
 
-#define region_entity(reg) reference_variable(region_reference(reg))
+#define region_entity(reg) reference_variable(region_any_reference(reg))
 #define region_action_tag(reg) action_tag(effect_action(reg))
 #define region_approximation_tag(reg) \
     approximation_tag(effect_approximation(reg))

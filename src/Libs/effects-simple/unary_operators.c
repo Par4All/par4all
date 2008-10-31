@@ -57,7 +57,7 @@ reference_to_simple_effect(reference ref, action ac)
 /* SIMPLE EFFECTS                                                                */
 /*********************************************************************************/
 
-/* A persistant reference is forced. */
+/* A persistant reference wss forced. */
 effect
 simple_effect_dup(effect eff)
 {
@@ -66,9 +66,13 @@ simple_effect_dup(effect eff)
   new_eff = copy_effect(eff);
 
   if(cell_preference_p(effect_cell(new_eff)))
+    /* FI: memory leak? we allocate something and put it behind a persistent pointer */
     effect_reference(new_eff) = reference_dup(effect_reference(new_eff));
   else
-    cell_reference(effect_cell(new_eff)) = reference_dup(effect_reference(new_eff));
+    /* FI: nothing to be done */
+    ;
+
+  ifdebug(8) pips_assert("the new effect is consistent", effect_consistent_p(new_eff));
 
   return(new_eff);
 }

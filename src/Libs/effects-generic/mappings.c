@@ -10,6 +10,7 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+#include "misc.h"
 
 /* REFERENCES */
 GENERIC_GLOBAL_FUNCTION(proper_references, statement_effects)
@@ -29,72 +30,96 @@ GENERIC_GLOBAL_FUNCTION(expr_prw_effects, persistant_expression_to_effects)
 list 
 load_proper_rw_effects_list(statement s)
 {
-    return(effects_effects(load_proper_rw_effects(s)));
+  effects e = load_proper_rw_effects(s);
+  ifdebug(8) pips_assert("proper rw effects loaded are consistent", effects_consistent_p(e));
+  return(effects_effects(e));
 }
 
 void store_proper_rw_effects_list(statement s, list l_eff)
 {
-    store_proper_rw_effects(s, make_effects(l_eff));
+  effects e = make_effects(l_eff);
+  ifdebug(8) pips_assert("proper rw effects to store are consistent", effects_consistent_p(e));
+  store_proper_rw_effects(s, e);
 }
 
 void update_proper_rw_effects_list(statement s, list l_eff)
 {
-    update_proper_rw_effects(s, make_effects(l_eff));
+  effects e = make_effects(l_eff);
+  ifdebug(8) pips_assert("proper rw effects to update are consistent", effects_consistent_p(e));
+  update_proper_rw_effects(s, e);
 }
 
 
 list 
 load_rw_effects_list(statement s)
 {
-    return(effects_effects(load_rw_effects(s)));
+  effects e = load_rw_effects(s);
+  ifdebug(8) pips_assert("rw effects loaded are consistent", effects_consistent_p(e));
+  return(effects_effects(e));
 }
 
 void
 store_rw_effects_list(statement s, list l_eff)
 {
-    store_rw_effects(s, make_effects(l_eff));
+  effects e = make_effects(l_eff);
+  ifdebug(8) pips_assert("rw effects to store are consistent", effects_consistent_p(e));
+  store_rw_effects(s, e);
 }
 
 void
 update_rw_effects_list(statement s, list l_eff)
 {
-    update_rw_effects(s, make_effects(l_eff));
+  effects e = make_effects(l_eff);
+  ifdebug(8) pips_assert("rw effects to update are consistent", effects_consistent_p(e));
+  update_rw_effects(s, e);
 }
 
 list 
 load_invariant_rw_effects_list(statement s)
 {
-    return(effects_effects(load_invariant_rw_effects(s)));
+  effects e = load_invariant_rw_effects(s);
+  ifdebug(8) pips_assert("invariant rw effects loaded are consistent", effects_consistent_p(e));
+  return(effects_effects(e));
 }
 
 void
 store_invariant_rw_effects_list(statement s, list l_eff)
 {
-    store_invariant_rw_effects(s, make_effects(l_eff));
+  effects e = make_effects(l_eff);
+  ifdebug(8) pips_assert("invariant rw effects to store are consistent", effects_consistent_p(e));
+  store_invariant_rw_effects(s, make_effects(l_eff));
 }
 
 void
 update_invariant_rw_effects_list(statement s, list l_eff)
 {
-    update_invariant_rw_effects(s, make_effects(l_eff));
+  effects e = make_effects(l_eff);
+  ifdebug(8) pips_assert("invariant rw effects to update are consistent", effects_consistent_p(e));
+  update_invariant_rw_effects(s, e);
 }
 
 list 
 load_cumulated_rw_effects_list(statement s)
 {
-    return(effects_effects(load_cumulated_rw_effects(s)));
+  effects e = load_cumulated_rw_effects(s);
+  ifdebug(8) pips_assert("cumulated rw effects loaded are consistent", effects_consistent_p(e));
+  return(effects_effects(e));
 }
 
 void
 store_cumulated_rw_effects_list(statement s, list l_eff)
 {
-    store_cumulated_rw_effects(s, make_effects(l_eff));
+  effects e = make_effects(l_eff);
+  ifdebug(8) pips_assert("cumulated rw effects to store are consistent", effects_consistent_p(e));
+  store_cumulated_rw_effects(s, e);
 }
 
 void
 update_cumulated_rw_effects_list(statement s, list l_eff)
 {
-    update_cumulated_rw_effects(s, make_effects(l_eff));
+  effects e = make_effects(l_eff);
+  ifdebug(8) pips_assert("cumulated rw effects to update are consistent", effects_consistent_p(e));
+  update_cumulated_rw_effects(s, e);
 }
 
 

@@ -208,7 +208,7 @@ static bool expression_implied_do_index_p(expression exp,entity e)
 
       MAP(EFFECT, eff, 
 	  {
-	    if (reference_variable(effect_reference(eff)) == e &&
+	    if (reference_variable(effect_any_reference(eff)) == e &&
 		action_read_p(effect_action(eff))) 
 	      {
 			

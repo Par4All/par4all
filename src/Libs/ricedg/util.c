@@ -127,7 +127,7 @@ prettyprint_dependence_graph(FILE * fd,
 		conflict c = CONFLICT(CAR(pc));
 		     
 		/* if (!entity_scalar_p(reference_variable
-		   (effect_reference(conflict_source(c))))) {
+		   (effect_any_reference(conflict_source(c))))) {
 		   */
 		if(sru_format_p && !statement_undefined_p(mod_stat)) {
 		    int l1 = dl + apply_persistant_statement_to_int(s_to_l, s1);
@@ -142,9 +142,9 @@ prettyprint_dependence_graph(FILE * fd,
 			    action_read_p(effect_action(conflict_source(c)))? 'R' : 'W',
 			    action_read_p(effect_action(conflict_sink(c)))? 'R' : 'W');
 		    fprintf(fd, "<");
-		    print_words(fd, effect_words_reference(effect_reference(conflict_source(c))));
+		    print_words(fd, effect_words_reference(effect_any_reference(conflict_source(c))));
 		    fprintf(fd, "> - <");
-		    print_words(fd, effect_words_reference(effect_reference(conflict_sink(c))));
+		    print_words(fd, effect_words_reference(effect_any_reference(conflict_sink(c))));
 		    fprintf(fd, ">");
 		    
 		    /* Additional information for EDF prettyprint. 
@@ -301,7 +301,7 @@ prettyprint_dependence_graph_view(FILE * fd,
 		    if (llsred == NIL) continue;
 		    else {
 			/*if (!	entity_scalar_p(reference_variable
-			  (effect_reference(conflict_source(c))))) { */
+			  (effect_any_reference(conflict_source(c))))) { */
 
 			fprintf(fd, "\t%02td --> %02td with conflicts\n", 
 				statement_number(s1), statement_number(s2));

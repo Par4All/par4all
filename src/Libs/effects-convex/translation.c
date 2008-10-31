@@ -457,7 +457,7 @@ static bool some_phi_variable(Pcontrainte c)
  */
 void append_declaration_sc_if_exact_without_constraints(region r)
 {
-  entity v = reference_variable(region_reference(r));
+  entity v = reference_variable(region_any_reference(r));
   Psysteme s = region_system(r);
 
   if (entity_scalar_p(v) || region_may_p(r)) return;
@@ -644,9 +644,14 @@ region region_translation(region reg_1, entity func_1, reference rf_1,
 	}
       
 	region_entity(reg_2) = entity_undefined;
-	free_reference(region_reference(reg_2));
-	region_reference(reg_2) = make_regions_psi_reference(array_2);
-	
+	free_reference(region_any_reference(reg_2));
+	if(cell_preference_p(region_cell(reg_2))) {
+	  preference p_2 = cell_preference(region_cell(reg_2));
+	  preference_reference(p_2) = make_regions_psi_reference(array_2);
+	}
+	else
+	  cell_reference(region_cell(reg_2)) = make_regions_psi_reference(array_2);
+
 	if (statistics_p)
 	{
 	    exact_input_p = region_exact_p(reg_2);
@@ -2073,7 +2078,7 @@ static void region_translation_of_predicate(region reg, entity to_func)
 {
     pips_debug(8, "region before translation: \n%s\n", region_to_string(reg));
 
-    if (!entity_scalar_p(reference_variable(region_reference(reg)))) 
+    if (!entity_scalar_p(reference_variable(region_any_reference(reg)))) 
     {
 	/* we add the system representing the association between 
 	 * actual and formal parameters to the region */

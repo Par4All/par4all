@@ -159,9 +159,12 @@ region region_dup(region reg)
 
     new_reg = copy_effect(reg);
 
-    /* work around persistency of effect reference 
-     */
-    region_reference(new_reg) = reference_dup(region_reference(reg));
+    if(cell_preference_p(region_cell(new_reg))) {
+      /* work around persistency of effect reference */
+      preference p = cell_preference(region_cell(new_reg));
+      preference_reference(p) = reference_dup(region_reference(reg));
+    }
+    
     debug_region_consistency(new_reg);
     return new_reg;
 }
@@ -195,7 +198,7 @@ void regions_free(list l_reg)
 {
     MAP(EFFECT, reg,
     {
-	free_region(reg);
+	region_free(reg);
     }, l_reg);
     gen_free_list(l_reg);
 }
@@ -207,11 +210,19 @@ void regions_free(list l_reg)
  */
 void region_free(region reg)
 {
-    /* work around persistency of effect reference */
     debug_region_consistency(reg);
-    free_reference(region_reference(reg));
-    region_reference(reg) = reference_undefined;
-    free_effect(reg);
+
+    if(cell_preference_p(region_cell(reg))) {
+      /* work around persistency of effect reference */
+      preference p = cell_preference(region_cell(reg));
+      free_reference(region_any_reference(reg));
+      /* FI: Should be useless with the persistant attribute */
+      preference_reference(p) = reference_undefined;
+      free_effect(reg);
+    }
+    else {
+      free_region(reg);
+    }
 }
 
 
@@ -832,7 +843,8 @@ effect reg;
  * modifies : nothing
  * comment  : for compatibility	
  */
-list regions_to_nil_list(region reg1, region reg2)
+list regions_to_nil_list(region reg1 __attribute__ ((unused)),
+			 region reg2 __attribute__ ((unused)))
 {
     return(NIL);
 }
@@ -843,7 +855,7 @@ list regions_to_nil_list(region reg1, region reg2)
  * modifies : nothing
  * comment  : for compatibility	
  */
-list region_to_nil_list(region reg)
+list region_to_nil_list(region reg __attribute__ ((unused)))
 {
     return(NIL);
 }
@@ -1564,7 +1576,7 @@ boolean psi_region_p(region reg)
 		       (syntax_reference
 			(expression_syntax
 			 (EXPRESSION
-			  (CAR(reference_indices(region_reference(reg))))))))) 
+			  (CAR(reference_indices(region_any_reference(reg))))))))) 
 	return TRUE;
     else 
 	return FALSE;    
@@ -2210,7 +2222,7 @@ empty_convex_context_p(transformer context)
     return sc_empty_p(sc_context);
 }
 
-string region_to_string(effect reg)
+string region_to_string(effect reg __attribute__ ((unused)))
 {
     return strdup("[region_to_string] not more implemented\n");
 }

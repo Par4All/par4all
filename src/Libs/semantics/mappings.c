@@ -304,7 +304,7 @@ static void allocate_module_value_mappings(entity m)
        module_intra_effects */
     MAP(EFFECT, ef,
     {
-	entity e = reference_variable(effect_reference(ef));
+	entity e = reference_variable(effect_any_reference(ef));
 	action a = effect_action(ef);
 	if(integer_scalar_entity_p(e))
 	    new_value_number++;
@@ -391,7 +391,7 @@ void module_to_value_mappings(entity m)
        and generate proper entries into hash tables */
     MAPL(cef,
      {entity e = 
-	  reference_variable(effect_reference(EFFECT(CAR(cef))));
+	  reference_variable(effect_any_reference(EFFECT(CAR(cef))));
 	  action a = effect_action(EFFECT(CAR(cef)));
 	  if(analyzable_scalar_entity_p(e) && action_write_p(a)) 
 	      add_interprocedural_value_entities(e);
@@ -402,7 +402,7 @@ void module_to_value_mappings(entity m)
        and generate proper entries into hash tables */
     MAPL(cef,
      {entity e = 
-	  reference_variable(effect_reference(EFFECT(CAR(cef))));
+	  reference_variable(effect_any_reference(EFFECT(CAR(cef))));
 	  action a = effect_action(EFFECT(CAR(cef)));
 	  if(analyzable_scalar_entity_p(e) && action_read_p(a)) 
 	      add_interprocedural_new_value_entity(e);
@@ -420,7 +420,7 @@ void module_to_value_mappings(entity m)
        and generate proper entries into hash tables */
     MAP(EFFECT, ef,
     {
-	entity e = reference_variable(effect_reference(ef));
+	entity e = reference_variable(effect_any_reference(ef));
 	action a = effect_action(ef);
 	if(analyzable_scalar_entity_p(e) && action_write_p(a)) {
 	    if(storage_return_p(entity_storage(e))) {
@@ -441,7 +441,7 @@ void module_to_value_mappings(entity m)
        in parameters and uninitialized variables have to be dealt with */
     MAP(EFFECT, ef,
      {
-	 entity e = reference_variable(effect_reference(ef));
+	 entity e = reference_variable(effect_any_reference(ef));
 	 if(analyzable_scalar_entity_p(e) && !entity_has_values_p(e)) {
 	      /* FI: although it may only be read within this procedure,
 	       * e might be written in another one thru a COMMON;

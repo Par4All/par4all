@@ -158,7 +158,7 @@ invariant_vertex_to_invariant_entities(vertex v,
 
     MAP(EFFECT, ef, {
 	if (effect_write_p(ef)) {
-	    entity e = reference_variable(effect_reference(ef));
+	    entity e = reference_variable(effect_any_reference(ef));
 
 	    if (!set_belong_p(rs, (char *) v)) {
 		rs = set_add_element(rs, rs, (char *) e);
@@ -589,7 +589,7 @@ statement_depend_of_indices_p(statement st,
 
     MAP(ENTITY, index, {
 	MAP(EFFECT, ef, {
-	    entity e = reference_variable(effect_reference(ef));
+	    entity e = reference_variable(effect_any_reference(ef));
 	    if (e == index) {
 
 		ifdebug(6) {
@@ -651,7 +651,7 @@ vertex_partially_invariant_p(vertex v,
     statement st = vertex_to_statement(v);
 
     MAP(EFFECT, ef, {
-	reference ref = effect_reference(ef);
+	reference ref = effect_any_reference(ef);
 
 	/* Looking for write effects only */
 	if (effect_write_p(ef)) {

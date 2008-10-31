@@ -217,8 +217,8 @@ bool find_covering_reference_path(set arcs_processed_set,
 	MAP(CONFLICT, c, {
 	  effect e_tmp_src = conflict_source(c);
 	  effect e_tmp_dest = conflict_sink(c);
-	  entity ent_tmp_src = reference_variable(effect_reference(e_tmp_src));
-	  entity ent_tmp_dest = reference_variable(effect_reference(e_tmp_dest));
+	  entity ent_tmp_src = reference_variable(effect_any_reference(e_tmp_src));
+	  entity ent_tmp_dest = reference_variable(effect_any_reference(e_tmp_dest));
 	  action act_tmp_src = effect_action(e_tmp_src);
 	  action act_tmp_dest = effect_action(e_tmp_dest);
 	  set arcs_processed_tmp_set = set_make(set_pointer);
@@ -357,7 +357,7 @@ list union_list(list l1, list l2) {
 static effect get_effect_read_of_statement_on_variable(statement s, entity var)
 {
   MAP(EFFECT, eff, {
-    entity e = reference_variable(effect_reference(eff));
+    entity e = reference_variable(effect_any_reference(eff));
     if (entity_conflict_p(e, var) && action_read_p(effect_action(eff)))
       return eff;
   }, statement_to_effects(s));
@@ -367,7 +367,7 @@ static effect get_effect_read_of_statement_on_variable(statement s, entity var)
 static effect get_effect_write_of_statement_on_variable(statement s, entity var)
 {
   MAP(EFFECT, eff, {
-    entity e = reference_variable(effect_reference(eff));
+    entity e = reference_variable(effect_any_reference(eff));
     if (entity_conflict_p(e, var) && action_write_p(effect_action(eff)))
       return eff;
   }, statement_to_effects(s));
@@ -678,7 +678,7 @@ static void check_for_effected_statement(statement s, list le)
   list stat_writes2_old = gen_copy_seq(stat_writes2);
   
   MAP(EFFECT, eff, {
-    entity ent_dest = reference_variable(effect_reference(eff));
+    entity ent_dest = reference_variable(effect_any_reference(eff));
     action act_dest = effect_action(eff);
     bool impact_must_p = FALSE; /* default value of dependence : MAY */
     effect eff_tmp;
@@ -1078,7 +1078,7 @@ static bool variable_is_written_by_statement_flt(statement s)
 	MAP(EFFECT, eff, {
 	    action a = effect_action(eff);
 	    if (action_write_p(a)) {
-	        reference r = effect_reference(eff);
+	        reference r = effect_any_reference(eff);
 		entity e = reference_variable(r);
 		if (same_entity_p(e,current_entity)) {
 		    ifdebug(3) {

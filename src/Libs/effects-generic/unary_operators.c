@@ -175,12 +175,33 @@ list
 effects_dup(list l_eff)
 {
     list l_new = NIL;
-    MAP(EFFECT, eff,
-	/* build last to first */
-	l_new = CONS(EFFECT, (*effect_dup_func)(eff), l_new),
-	l_eff);
+    list ec = list_undefined;
+
+    ifdebug(8) {
+      effects e = make_effects(l_eff);
+      pips_assert("input effects are consistent", effects_consistent_p(e));
+      effects_effects(e) = NIL;
+      free_effects(e);
+    }
+
+    for(ec = l_eff; !ENDP(ec); POP(ec)) {
+      effect eff = EFFECT(CAR(ec));
+
+      /* build last to first */
+      l_new = CONS(EFFECT, (*effect_dup_func)(eff), l_new);
+    }
+
     /* and the order is reversed */
-    return gen_nreverse(l_new);
+    l_new =  gen_nreverse(l_new);
+
+    ifdebug(8) {
+      effects e = make_effects(l_new);
+      pips_assert("input effects are consistent", effects_consistent_p(e));
+      effects_effects(e) = NIL;
+      free_effects(e);
+    }
+
+    return l_new;
 }
 
 void

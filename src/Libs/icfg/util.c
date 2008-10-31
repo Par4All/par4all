@@ -281,7 +281,7 @@ list /* of effect */ effects_filter(list l_effs, list l_ents)
     list l_flt = NIL;
     MAP(EFFECT, eff, {
         action ac = effect_action(eff);
-	reference ref = effect_reference(eff);
+	reference ref = effect_any_reference(eff);
 	entity ent = reference_variable(ref);
 	MAP(ENTITY, e_flt, {
 	    if (entity_conflict_p(e_flt, ent)) {

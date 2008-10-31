@@ -53,7 +53,7 @@ transformer effects_to_transformer(list e) /* list of effects */
 
   MAP(EFFECT, ef, 
   {
-    reference r = effect_reference(ef);
+    reference r = effect_any_reference(ef);
     action a = effect_action(ef);
     entity v = reference_variable(r);
     
@@ -85,7 +85,7 @@ transformer filter_transformer(transformer t, list e)
 
   MAP(EFFECT, ef, 
   {
-    reference r = effect_reference(ef);
+    reference r = effect_any_reference(ef);
     /* action a = effect_action(ef); */
     entity v = reference_variable(r);
     
@@ -172,7 +172,7 @@ effects_to_arguments(list fx) /* list of effects */
 
   MAP(EFFECT, ef, 
   {
-    reference r = effect_reference(ef);
+    reference r = effect_any_reference(ef);
     action a = effect_action(ef);
     entity e = reference_variable(r);
 	

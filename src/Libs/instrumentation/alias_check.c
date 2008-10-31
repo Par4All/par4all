@@ -539,7 +539,7 @@ static bool variable_is_written_by_statement_flt(statement s)
 	    action a = effect_action(eff);
 	    if (action_write_p(a))
 	      {
-		reference r = effect_reference(eff);
+		reference r = effect_any_reference(eff);
 		entity e = reference_variable(r);
 		if (same_entity_p(e,current_entity))
 		  {
@@ -625,7 +625,7 @@ static bool dynamic_alias_check_flt(statement s, alias_context_p context)
     action a = effect_action(eff);
     if (action_write_p(a))
       {
-	reference r = effect_reference(eff);
+	reference r = effect_any_reference(eff);
 	entity e = reference_variable(r);
 	if (same_entity_p(e,context->first_entity))
 	  {
@@ -676,7 +676,7 @@ static bool alias_check_scalar_variable_in_module_flt(statement s,
     action a = effect_action(eff);
     if (action_write_p(a))
       {
-	reference r = effect_reference(eff);
+	reference r = effect_any_reference(eff);
 	entity e = reference_variable(r);
 	if (same_entity_p(e,context->first_entity))
 	  {
@@ -719,7 +719,7 @@ static bool alias_check_array_and_scalar_variable_in_module_flt(statement s,
     action a = effect_action(eff);
     if (action_write_p(a))
       {
-	reference r = effect_reference(eff);
+	reference r = effect_any_reference(eff);
 	entity e = reference_variable(r);
 	if (same_entity_p(e,context->first_entity))
 	  {
@@ -795,7 +795,7 @@ static bool alias_check_array_variable_in_module_flt(statement s,alias_context_p
     action a = effect_action(eff);
     if (action_write_p(a))
       {
-	reference r = effect_reference(eff);
+	reference r = effect_any_reference(eff);
 	entity e = reference_variable(r);
 	if (same_entity_p(e,context->first_entity))
 	  {
@@ -1211,7 +1211,7 @@ static bool alias_check_scalar_variable_in_caller_flt(statement s,alias_context_
     action a = effect_action(eff);
     if (action_write_p(a))
       {
-	reference r = effect_reference(eff);
+	reference r = effect_any_reference(eff);
 	entity e = reference_variable(r);
 	if (same_entity_p(e,context->first_entity))
 	  {
@@ -1253,7 +1253,7 @@ static bool alias_check_array_and_scalar_variable_in_caller_flt(statement s,alia
     action a = effect_action(eff);
     if (action_write_p(a))
       {
-	reference r = effect_reference(eff);
+	reference r = effect_any_reference(eff);
 	entity e = reference_variable(r);
 	if (same_entity_p(e,context->first_entity))
 	  {
@@ -1352,7 +1352,7 @@ static bool alias_check_array_variable_in_caller_flt(statement s,alias_context_p
     action a = effect_action(eff);
     if (action_write_p(a))
       {
-	reference r = effect_reference(eff);
+	reference r = effect_any_reference(eff);
 	entity e = reference_variable(r);
 	if (same_entity_p(e,context->first_entity))
 	  {

@@ -371,7 +371,7 @@ list effects_to_entity_list(list lef)
 {
   list le = NIL;
   MAP(EFFECT, e, 
-      le = CONS(ENTITY, reference_variable(effect_reference(e)), le),
+      le = CONS(ENTITY, reference_variable(effect_any_reference(e)), le),
       lef);
   return gen_nreverse(le);
 }
@@ -453,7 +453,7 @@ static void add_reference_information(transformer pre, statement s, bool renamin
   list efs = load_proper_rw_effects_list(s);
 
   MAP(EFFECT, e, {
-    reference r = effect_reference(e);
+    reference r = effect_any_reference(e);
     list li = reference_indices(r);
 
     if(!ENDP(li)){

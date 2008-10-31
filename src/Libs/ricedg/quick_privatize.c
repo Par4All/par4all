@@ -82,11 +82,11 @@ list conflicts;
     MAP(CONFLICT, c,
     {
 	effect f1 = conflict_source(c);
-	reference r1 = effect_reference(f1);
+	reference r1 = effect_any_reference(f1);
 	entity e1 = reference_variable(r1);
 
 	effect f2 = conflict_sink(c);
-	reference r2 = effect_reference(f2);
+	reference r2 = effect_any_reference(f2);
 	entity e2 = reference_variable(r2);
 
 	debug(2, "quick_privatize_statement_pair", 
@@ -132,7 +132,7 @@ list conflicts;
 
 		MAP(EFFECT, e, 
 		{
-		    if (reference_variable(effect_reference(e)) == ind2 &&
+		    if (reference_variable(effect_any_reference(e)) == ind2 &&
 			action_read_p(effect_action(e))) 
 		    {
 			

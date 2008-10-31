@@ -703,11 +703,15 @@ void region_non_exact_projection_along_parameters(region reg, list l_param)
 	/* if there is an overflow error, reg becomes a whole array may region */
 	CATCH(overflow_error)
 	{
-	    region reg_tmp = reference_whole_region(region_reference(reg),
+	    region reg_tmp = reference_whole_region(region_any_reference(reg),
 						    region_action_tag(reg));
+	    cell c_tmp = region_cell(reg_tmp);
 
 	    region_system_(reg) = region_system_(reg_tmp);
-	    region_reference(reg_tmp) = reference_undefined;
+	    if(cell_preference_p(c_tmp))
+	      preference_reference(cell_preference(c_tmp)) = reference_undefined;
+	    else
+	      cell_reference(c_tmp) = reference_undefined;
 	    region_system_(reg_tmp) = newgen_Psysteme(SC_UNDEFINED);
 	    free_effect(reg_tmp);
 	    sc_rm(ps);
@@ -755,11 +759,15 @@ void region_exact_projection_along_parameters(region reg, list l_param)
 	
 	/* if there is an overflow error, reg becomes a whole array may region */
 	CATCH(overflow_error) {
-	    region reg_tmp = reference_whole_region(region_reference(reg),
+	    region reg_tmp = reference_whole_region(region_any_reference(reg),
 						    region_action_tag(reg));
+	    cell c_tmp = region_cell(reg_tmp);
 
 	    region_system_(reg) = region_system_(reg_tmp);
-	    region_reference(reg_tmp) = reference_undefined;
+	    if(cell_preference_p(c_tmp))
+	      preference_reference(cell_preference(c_tmp)) = reference_undefined;
+	    else
+	      cell_reference(c_tmp) = reference_undefined;
 	    region_system_(reg_tmp) = newgen_Psysteme(SC_UNDEFINED);
 	    free_effect(reg_tmp);
 	    sc_rm(ps);
@@ -864,11 +872,15 @@ void region_non_exact_projection_along_variables(region reg, list l_var)
 	/* if there is an overflow error, reg becomes a whole array may region */
 	CATCH(overflow_error) 
 	{
-	    region reg_tmp = reference_whole_region(region_reference(reg),
+	    region reg_tmp = reference_whole_region(region_any_reference(reg),
 						    region_action_tag(reg));
+	    cell c_tmp = region_cell(reg_tmp);
 
 	    region_system_(reg) = region_system_(reg_tmp);
-	    region_reference(reg_tmp) = reference_undefined;
+	    if(cell_preference_p(c_tmp))
+	      preference_reference(cell_preference(c_tmp)) = reference_undefined;
+	    else
+	      cell_reference(c_tmp) = reference_undefined;
 	    region_system_(reg_tmp) = newgen_Psysteme(SC_UNDEFINED);
 	    free_effect(reg_tmp);
 	    sc_rm(ps);
@@ -913,11 +925,15 @@ list l_var;
 	/* if there is an overflow error, reg becomes a whole array may region */
 	CATCH(overflow_error)
 	{
-	    region reg_tmp = reference_whole_region(region_reference(reg),
+	    region reg_tmp = reference_whole_region(region_any_reference(reg),
 						    region_action_tag(reg));
+	    cell c_tmp = region_cell(reg_tmp);
 
 	    region_system_(reg) = region_system_(reg_tmp);
-	    region_reference(reg_tmp) = reference_undefined;
+	    if(cell_preference_p(c_tmp))
+	      preference_reference(cell_preference(c_tmp)) = reference_undefined;
+	    else
+	      cell_reference(c_tmp) = reference_undefined;
 	    region_system_(reg_tmp) = newgen_Psysteme(SC_UNDEFINED);
 	    free_effect(reg_tmp);
 	    sc_rm(ps);
@@ -979,11 +995,15 @@ void region_exact_projection_along_variable(region reg, entity var)
 	    CATCH(overflow_error)
 	    {
 		region reg_tmp = 
-		    reference_whole_region(region_reference(reg),
+		    reference_whole_region(region_any_reference(reg),
 					   region_action_tag(reg));
-		
+		cell c_tmp = region_cell(reg_tmp);
+
 		region_system_(reg) = region_system_(reg_tmp);
-		region_reference(reg_tmp) = reference_undefined;
+		if(cell_preference_p(c_tmp))
+		  preference_reference(cell_preference(c_tmp)) = reference_undefined;
+		else
+		  cell_reference(c_tmp) = reference_undefined;
 		region_system_(reg_tmp) = newgen_Psysteme(SC_UNDEFINED);
 		free_effect(reg_tmp);
 		sc_rm(sc);

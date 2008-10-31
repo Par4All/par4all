@@ -648,7 +648,7 @@ rice_update_dependence_graph(
 			  && (action_write_p(effect_action(e2)))) &&
 			!((s1==s2) && (action_read_p(effect_action(e1)))
 			  && (action_read_p(effect_action(e2)))) )
-             /* && (reference_indices(effect_reference(e1))) != NIL) */
+             /* && (reference_indices(effect_any_reference(e1))) != NIL) */
 		    {
 			debug (4, "rice_update_dependence_graph", 
 			       "looking for the opposite dependence");  
@@ -854,11 +854,11 @@ TestCoupleOfEffects(
 {
     list n1 = load_statement_enclosing_loops(s1);
     Psysteme sc1 = SC_UNDEFINED;
-    reference r1 = effect_reference( e1 ) ;
+    reference r1 = effect_any_reference( e1 ) ;
 
     list n2 = load_statement_enclosing_loops(s2);
     Psysteme sc2 = SC_UNDEFINED;
-    reference r2 = effect_reference(e2) ;
+    reference r2 = effect_any_reference(e2) ;
     
 
     switch (dg_type)
