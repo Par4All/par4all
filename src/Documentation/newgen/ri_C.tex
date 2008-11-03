@@ -1615,9 +1615,10 @@ reference = variable:entity x indices:expression* ;
 preference = persistant reference ;
 \end{verbatim}
 
-The effect of a statement like \verb/*p=1;/ can only be expressed in
-this framework as a reference to a large memory entity, an area or a
-set of areas, as no information is locally available about \verb/p/.
+In this framework, the effect of a statement like \verb/*p=1;/ can
+ only be expressed in this framework as a reference to a large memory
+ entity, an area or a set of areas, as no information is locally
+ available about \verb/p/.
 
 Effects are abstractions of effective memory effects. For instance
 \verb/d[i]/ can be captured as \verb/d[i]/ because the data structure
@@ -1636,30 +1637,318 @@ We need to know that \verb/inc/ performs an indirect write through
 \verb/p/.  This is not a great new abstraction for pointers. It is the
 minimum needed in a first phase.
 
-We need to encode \verb/p->in/, which is equivalent to \verb/(*p).in/.
+We need to encode \verb/p->in/, which is equivalent to
+ \verb/(*p).in/. Assuming that \verb/in/ is the third field of the
+ pointed structure, this could be rewritten \verb/(*p)[3]/.
 
-We need to encode \verb/(*p)[i][j][k]/ which is an array acces to a
-formal array parameter.
+We also need to encode \verb/(*p)[i][j][k]/ which is an array access to
+ a formal array parameter. Pointer \verb/p/ may be a pointer to a
+ dynamicically typed variable such as \verb/double x[n][m]/, where
+ \verb/n/ and \verb/m/ are formal parameters too.
 
 We do not know if we need to keep track of pointer arrays, as in
-\verb/*(p[3])/: our region framework can handle it effortlessly, but
-what can we do with information about pointer arrays? If our lattice
-is too simple, we won't be able to make a difference between
-\verb/*(p[3])/ and\verb/(*p)[3]/.
+ \verb/*(p[3])/: our region framework can handle it effortlessly, but
+ what can we do with information about pointer arrays? If our lattice
+ is too simple, we won't be able to make a difference between
+ \verb/*(p[3])/ and\verb/(*p)[3]/. However, since we transform
+ accesses to structure fields into indexing (Section
+ \ref{section:data-structures}), we might be interested in the post
+ index form to keep or to retrieve information about data structures
+ containing pointers ot functions.
 
 What is the new information we want to add? How can we add this new
 information in the current PIPS data structure? Many solutions are
 possible:
 \begin{enumerate}
-\item add nothing in the data structures and keep the information at
-the source code level: have different variables for direct and
-indirect effects;
-\item define a new level of effects, like
-\verb/g_effect = direct:effect + indirect:effect/ or, at the list
-level, \verb/g_effects = direct:effects + indirect:effects/
+
+\item \label{variable-level}add nothing in the data structures and
+ keep the information at the source code level: have different
+ variables for direct and indirect effects;
+
+\item \label{new-level}define a new level of effects, like
+\verb/g_effect = direct:effect + indirect:effect + .../ or, at the list
+level, \verb/g_effects = direct:effects + indirect:effects + .../
+
+\item \label{new-action}add new kinds of actions such as
+ \verb/indirect_read/ or \verb/indirect_write/;
+
+\item re-use the \verb/descriptor/ field; this does seem to make less
+ sense than the previous solution;
+
+\item \label{new-effect-field} add a new effect field, \verb/addressing/,
+ in \verb/effect/
+
+\item \label{new-effect}define a brand new pointer effect data structure, extending
+ solution~\ref{new-level};
+
+\item ...
+
 \end{enumerate}
 
+How do we chose given the current implementation and our goals?
+
+Separating indirect effects and direct effects at the variable level
+ would require a huge reworking of the current code since functions
+ should return a structure containing several lists instead of a
+ single list. This would prevent us from giving a meaning to the
+ effect order in an order list: it is useful to know that a write
+ occurs before a read.
+
+This holds whether lists are separated at the variable level (solution
+ \ref{variable-level}) or at the data structure level (solution
+ \ref{new-level}).
+
+Adding new actions, Solution~\ref{new-action}, does not respect the
+ field semantics and its link with Bernstein's conditions. The number of
+ new actions can be great if we take into account indirect pre- and
+ post-indexation. However, we may not need pre- and post-
+ indexation. And it might make debugging easier with unknown action
+ detection. Unfortunately, with only two actions, people do not use
+ switch and default when there are only two actions. They assume that
+ if it is not the first one, it has to be the second one.
+
+Adding a new field to effect, for instance \verb/addressing/ or
+ \verb/addressing_mode/, Solution~\ref{new-effect-field}, is nicely
+ orthogonal, let us structure it as we want, and avoid a combination
+ of attribute with the read and write actions. It requires source code
+ modifications for \verb/make_effect/. And the bugs due to a lack of
+ access checking will not be syntactically detectable.
+
+However indirect accesses would have to be reduced to standard
+ accesses before the dependence test can be used and after the
+ semantics analysis has managed to propagate pointer values and
+ equality. The region analysis does not expect any indirect
+ effects. The easiest way out might be to add a new phase using
+ general effects and reducing them all to standard effects, exploiting
+ semantics information. This would require a renaming of effects at
+ the pipsmake and database level to avoid confusion and to force the
+ conversion of resources.
+
+The last solution, Solution~\ref{new-effect}, would require a proper
+ survey of most published pointer analyses. It would be nice if the
+ old effect data structure could be mapped onto it to minimize source
+ code modifications via macros. This could also be done later and
+ independently, using simple pointer information gathered with the
+ effect data structure as a starting point for more advanced analyses.
+
+In the short term, the best solution is to add a new field
+ \verb/addressing_mode/ (or \verb/addressing/ to avoid underscore in
+ field names?) with three values for pre- and post-indexation:
+
+\begin{verbatim}
+effect = cell x action x approximation x descriptor x addressing;
+addressing = index:unit + pre:unit + post:unit
+\end{verbatim}
+
+All accesses are indexed by default in PIPS internal representation,
+ so \verb/post/ and \verb/pre/ are equivalent for scalar accesses.
+
+Mode \verb/index/ could be called \verb/direct_indexing/ to be more
+ homogeneous, but indexing always occurs. So \verb/index/ could be
+ called \verb/direct/.
+
+The mode \verb/preindexing/ does not seem to be very useful in the
+ short term.
+
 \section{Data structures}
+\label{section:data-structures}
+
+PIPS was designed primarily for arrays and this shows in the reference
+ data structure, which only support the indexed access mode. Hence, we
+ need to map the offset accesses found with data structure references
+ such as \verb/c.in/ onto indexed accesses.
+
+Several possibilities come to mind for data structures if the current
+ effect data structure is to be preserved:
+\begin{enumerate}
+
+\item to mimic the address computation at the byte level, assuming any
+ field access can be interpreted as an array access of some byte
+ elements; this does not account for bit fields, but those are not frequently used;
+
+\item to rename fields by their ranks and to access them by indexing;
+ this is not correct for a compiler, but the access information is
+ preserved, which is enough for an analyzer; array fields are a
+ natural dimension, inserted at the right place among index
+ dimensions;
+
+\item to build new variable names located at the field address,
+ i.e. in equivalence with the whole data structure but not with its
+ other fields; for instance \verb/a.b.c/ would be represented by one
+ variable of name \verb/a-b-c/ with no name conflict if dash is used
+ inside the new name; array fields are would be taken care of as with
+ a regular array; for instance \verb/a.b[i].c/ would be represented by
+ \verb/a-b-c[i]/;
+
+\item to build new variable names based on the offset values and to
+ define some kind array type reflecting the real increments: an
+ element size is associated to each dimension, so that the impact of
+ any index is exactly reproduced; this might be a cross of the first
+ two solutions; the offset based name may be equivalent to using the
+ global offset as a unique last dimension instead of using one
+ dimension per field and array traversal.
+
+\end{enumerate}
+
+We have to analyze the impact of the choice with respect to effect
+ computation, but also with region and semantics analyses, as well as
+ dependence testing.
+
+Regions are similar to effects and are not impacted. The semantics
+ analyses is not compatible with the first option, for instance
+ because the value of an integer will not be analyzed since four
+ different bytes are involved. The second option requires the
+ semantics analysis to be extended to deal with fixed array elements
+ such as \verb/x[1][2]/, which has been a long pending extension. The
+ third option requires the semantics analysis to be extended to deal
+ with equivalenced variables: currently, the analyses are restricted
+ to non aliased variables.
+
+The dependence test should be able to deal with all three options
+ because it deals with regions, i.e. set of array elements, and with
+ equivalenced variables, i.e. an aliasing test is performed before the
+ array dependence test.
+
+The third option requires improvements in memory allocation and in
+ aliasing management. Data structures for aliasing exist because of
+ Fortran, but they are not currently used for C. The scalar analysis
+ of semantics can be used right away to analyze structure fields.
+
+The effect prettyprinter is easier with option 2, unless the naming
+ scheme is exaclty C scheme, i.e. \verb/a.x/ is equivalenced with a
+ variable of name \verb/a.x/. Hopefully, a dot in a variable name is
+ not going to create implementation nightmares. But field names may
+ conflict: they should include the structure name and \verb/a.x/ would
+ become something like \verb/a.a-x/.
+
+All three schemes are minimum. They are sufficient to represent any
+ constant address with indexing equivalent to a field access
+ expression. And any field expression is represented in only one way.
+
+\section{Unions}
+\label{section:unions}
+
+Union are more difficult to track. They create an equivalence between
+ two structures located at the same address. This reminds us of
+ Fortran equivalences, extended to data structures.
+
+For instance, \verb/union {int i; double x;} u;/ could be interpreted
+ as three variables called verb/u/, /u-i/ and /u-x/ located at the very same
+ address.
+
+Parallelism could be safely detected for arrays of unions and for unions of
+ arrays using existing PIPS technology.
+
+It is not yet clear how this could be extended when unions are part of
+ more complex data structures. Can we still use a naming scheme
+ (option 3 for data structures) and move all index information at the
+ end of the reference? It this still a way to denote precisely the
+ address accessed such that all analyses are based on a correct
+ representation of locations?
+
+If we use a naming scheme (option 3 above), we should be able to
+ compute addresses and ranges for combination of union and struct and
+ to build aliasing information due to unions. To be refined.
+
+Indexing may be more difficult to deal with as its impact on address
+ computation must be precisely reproduced when dealing with
+ equivalenced variables.
+
+If we use the basic byte based representation (Solution 1), union can
+ be handled like structures and lead to automatic parallelization. But
+ difference sets of indices will lead to array linearization.
+
+So we have to find the best trade-off between naming, indexing and
+ linearization for dependence testing when unions are used.
+
+\section{Point to Operator}
+
+The point to operator is syntactic sugar. The expression \verb/a->x/
+ can be replaced by \verb/(*a).x/.
+
+\section{Address Expressions}
+
+Address expressions are very general as base and offset can be
+ provided by function calls and offset by any integer arithmetic
+ expressions. Pointers differences are allowed to compute offsets,
+ making it difficult to identify a base pointer and an
+ offset. Consider for instance \verb/*(p+q-r)/: is it \verb/p/ or
+ \verb/q/ the offset?
+
+If we could distinguish a base pointer \verb/p/ and one offset, the address
+ expression could be rewritten \verb/*(p[offset])/.
+
+But the basis may be returned by a function, as in \verb/f()->x/.
+
+Multiple indirections, as in \verb/a->x->y/, \verb/M[M[a]+x]+y/ make
+ the notions of base and offset ludicrous.
+
+So we need a way to express fuzzy address, for instance using a
+ special address value {\em anywhere} equivalent to the whole memory
+ \verb/M/.
+
+\section{Indirect Effect Normalization}
+
+When pointers value are known, indirect accesses can be converted
+ precisely into direct accesses as in \verb/*(&i)=1/.
+
+Fuzzy pointer values, i.e. sets of pointer values, must be introduced
+ to cover other cases, using if possible PIPS support for aliasing,
+ a.k.a. equivalence in Fortran. The lattice for pointer values may be
+ built with areas, finite sets of areas or special new areas such as
+ the area containing all areas. PIPS uses four areas for each module:
+ the static area for objects of constant addresses, the dynamic area
+ for objects of constant sizes\footnote{They are given constant
+ addresses in this area, but they are only constant with respect to
+ the frame pointer.}, the stack area for objects of unknown size and
+ the heap area for dynamic memory allocation. Currently aliasing is
+ only statically handled in the static and dynamic areas, using
+ constant addresses.
+
+The potentiel levels are:
+\begin{enumerate}
+
+\item at least three as for any constant propagation lattice, with
+ {\em anywhere} used as soon as the constant value is unknown;
+
+\item but it could be slightly increased by taking into account the
+ scope of a function and the scope of its compilation unit.
+
+\item or it could include all subsets of the area set since the latest
+ is bounded by the number of functions and compilation units.
+
+\item or...
+
+\end{enumerate}
+
+Note that \verb/free/ does not let us infer that two pointers are
+ different because both of them were malloced. Hence the different
+ heap areas\footnote{A separate heap area is used for each function.}
+ are in fact a unique heap.
+
+What aliasing assumptions should we make about formal parameters and
+ global variables? Do we assume constant value for formal pointers and
+ hence no aliasing between them and between local pointers?
+
+How do we implement the lattice? By multiplying the effects in the
+ effect list, with one effect per area possibly accessed? By adding
+ new super areas including several subareas and using equivalence
+ information? By limiting the number of levels in the lattice?
+
+\section{Putting together pointers, structures, unions and C address computations...}
+
+The general case has not been discussed yet as we are driven by the
+ Ter@ops project and its requirements:
+\begin{enumerate}
+\item key information such as array dimensions and loop bounds are
+ parts of structures;
+\item array dimensions and hence typing are dynamic; formal arrays are
+ likely to be accessed via pointers as in \verb/(*p)[i]j]/;
+\item ...
+\end{enumerate}
+
+This does not require mixes of structures, unions and pointers to be
+ dealt with...
 
 \chapter*{Conclusion}
 
