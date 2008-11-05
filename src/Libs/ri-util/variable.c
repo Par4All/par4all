@@ -291,42 +291,79 @@ char *module_name;
   return(e);
 }
 
+
+/* The concrete type of e is a scalar type. The programmer cannot index this variable. 
 
-bool 
-entity_scalar_p(e)
+   Note: variable e may appear indexed somewhere in the PIPS internal
+   representation if this is linked to some semantics.
+*/
+bool entity_scalar_p(e)
 entity e;
 {
-  type t = entity_type(e);
+  type t = ultimate_type(entity_type(e));
 
   pips_assert("e is a variable", type_variable_p(t));
 
   return(ENDP(variable_dimensions(type_variable(t))));
 }
 
-
 /* for variables (like I), not constants (like 1)!
  * use integer_constant_p() for constants
+ *
+ * The integer type may be signed or unsigned.
  */
 bool 
 entity_integer_scalar_p(e)
 entity e;
 {
   return(entity_scalar_p(e) &&
-	 basic_int_p(variable_basic(type_variable(entity_type(e)))));
+	 basic_int_p(variable_basic(type_variable(ultimate_type(entity_type(e))))));
 }
-
 
 /* integer_scalar_entity_p() is obsolete; use entity_integer_scalar_p() */
 bool 
 integer_scalar_entity_p(e)
 entity e;
 {
+  type ct = ultimate_type(entity_type(e));
   return type_variable_p(entity_type(e)) && 
-    basic_int_p(variable_basic(type_variable(entity_type(e)))) &&
-    variable_dimensions(type_variable(entity_type(e))) == NIL;
+    basic_int_p(variable_basic(type_variable(ct))) &&
+    variable_dimensions(type_variable(ct)) == NIL;
 }
 
+/* Any reference r such that reference_variable(r)==e accesses all
+   bytes (or bits) allocated to variable e. In other words, any write
+   of e is a kill.
 
+   The Newgen type of e must be "variable". */
+bool entity_atomic_reference_p(entity e)
+{
+  type ct = ultimate_type(entity_type(e));
+  variable vt = type_variable(ct);
+  bool atomic_p = FALSE;
+
+  pips_assert("entity e is a variable", type_variable_p(ct));
+
+  if(ENDP(variable_dimensions(vt))) {
+    /* The property is not true for overloaded, string, derived
+       (typedef is impossible here) */
+    basic bt = variable_basic(vt);
+    atomic_p = basic_int_p(bt) || basic_float_p(bt) || basic_logical_p(bt)
+      || basic_complex_p(bt) || basic_bit_p(bt) || basic_pointer_p(bt);
+  }
+
+  return atomic_p;
+}
+
+  /* Another semantics would be: is this reference r to e a kill for
+     e? In general, this cannot be answered at the entity level only
+     (see previous function) and the reference itself must be passed
+     as an argument.
+
+     FI: I'm not sure of the best location for this function in
+     ri-util (no file reference.c).
+ */
+
 dimension 
 entity_ith_dimension(e, i)
 entity e;
