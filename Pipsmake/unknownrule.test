@@ -3,7 +3,7 @@
 # test ! -d unknownrule.database || Delete unknownrule
 
 {
-  Init -d -f $PIPS_ROOT/Validation/Pipsmake/unknownrule.f unknownrule
+  Init -d -f ${VDIR:.}/unknownrule.f unknownrule
   Display -v -m unknownrule code
   Perform -v -m unknownrule FOO
   Build -v -m unknownrule BAR

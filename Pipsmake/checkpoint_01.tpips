@@ -1,21 +1,25 @@
+# Converted from a Shell file which used different processes
 
-echo \# testing checkpoint
-echo \# first run, create
+shell echo # testing checkpoint
+shell echo # first run, create
 
 delete cp
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create cp checkpoint_01.f
 checkpoint
 make PRINTED_FILE[%ALL]
 close cp
 
-echo \# second run, display
+shell echo # second run, display
 
 open cp
 display PRINTED_FILE[%ALL]
 checkpoint
 close cp
 
-echo \# third run, preconditions
+shell echo \# third run, preconditions
 
 open cp
 activate PRINT_CODE_PRECONDITIONS
@@ -24,18 +28,19 @@ activate PRINT_CODE
 checkpoint
 close cp
 
-echo \# fourth run, partial eval
+shell echo \# fourth run, partial eval
 
 open cp
 capply PARTIAL_EVAL[%ALL]
 checkpoint
 close
 
-echo \# last run, display, close and delete.
+shell echo \# last run, display, close and delete.
 
 open cp
 display PRINTED_FILE[%ALL]
 close
 delete cp
 
-echo \# done
+shell echo \# done
+quit

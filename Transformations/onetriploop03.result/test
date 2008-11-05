@@ -1,7 +1,7 @@
 
 Initial code
 
-void foo(char *f,int a)
+void foo(char *f, int a)
 {
 }
 void onetriploop03(int n)
@@ -25,7 +25,7 @@ Initial code with preconditions
 
 //  P() {}
 
-void foo(char *f,int a)
+void foo(char *f, int a)
 {
 }
 
@@ -67,7 +67,7 @@ int main()
 
 Code after one trip loop detection and simplification
 
-void foo(char *f,int a)
+void foo(char *f, int a)
 {
 }
 void onetriploop03(int n)

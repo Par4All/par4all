@@ -1,4 +1,7 @@
 delete while05
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create while05 ${PIPS_ROOT}/Validation/Icfg/while05.f
 
 activate PRINT_ICFG_WITH_LOOPS

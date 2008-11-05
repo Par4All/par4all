@@ -47,7 +47,7 @@ echo
 echo Printed files with regions
 echo
 
-# activate MUST_REGIONS
+activate MUST_REGIONS
 activate PRINT_CODE_REGIONS
 display PRINTED_FILE[struct02]
 

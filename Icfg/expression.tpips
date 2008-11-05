@@ -1,4 +1,7 @@
 delete expression
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create expression ${PIPS_ROOT}/Validation/Icfg/expression.f
 
 echo
