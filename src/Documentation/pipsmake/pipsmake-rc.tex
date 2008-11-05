@@ -73,6 +73,8 @@
 %%  \usepackage{url}}
 \usepackage{url}
 \usepackage{makeidx}
+\usepackage{listings}
+\lstset{extendedchars=true, language=C}
 
 %% Cannot work with verbatim: \begin{verbatim} absorbs \end{example}
 %% \newenvironment{example}{\begin{verbatim}}{\end{verbatim}}
@@ -379,10 +381,10 @@ Note that compilation units can be left out with:
 \begin{quote}
 {\tt display PRINTED\_FILE[\%ALLFUNC]}
 \end{quote}
-In both cases with C source code, the order of modules may be
-unsuitable for direct recompilation and compilation units anyway
-should be included, But this is what is done by explicitly requesting
-the code regeneration as described in \S~\ref{sec:regen-user-source}.
+In both cases with C source code, the order of modules may be unsuitable
+for direct recompilation and compilation units should be included anyway,
+but this is what is done by explicitly requesting the code regeneration as
+described in \S~\ref{sec:regen-user-source}.
 
 Note that \PIPS{} expects proper ANSI Fortran 77 code. Its parser was not
 designed to locate syntax errors. It is highly recommended to check source
@@ -785,24 +787,76 @@ hpfc_parser                     > MODULE.parsed_code
 
 \subsection{Declaration of the C parsers}
 
-A C file is a compilation unit with macros, include statements, local and
-global variable definitions, type definitions, and with some or no
-function definitions. When the PIPS workspace is created by PIPS
-preprocessor, each C file is preprocessed\footnote{Macros are interpreted
-  and include files are expanded. The result depends on the C preprocessor
-  used,on its option and on the system environment
-  (\texttt{/usr/include},...).} using for instance \texttt{gcc
-  -E}\footnote{It can be redefined using \texttt{CPP\_PIPS\_ENV} and
-  \texttt{CPP\ PIPS\_OPTIONS\_ENV} environment variables} and broken into
-a new \index{compilation unit} which contains only global variable
-declaration, function declaration and type definitions, and one C file for
-each C function defined in the initial C file.
+A C file is seen in PIPS as a compilation unit, that contains all the
+objects declarations that are global to this file, and as many as module
+(function or procedure) definitions defined in this file.
 
-The new compilation units must be parsed before the new files containing
-each one function definition can be parsed. The new compilation units are
-named like the initial file name with a bang extension. For instance, file
-\verb|foo.cpp_processed.c| will lead to a new \verb|foo!.cpp_processed.c|
-compilation unit. This new compilation unit may be empty.
+Thus the compilation unit contains the file-global macros, the include
+statements, the local and global variable definitions, the type
+definitions, and the function declarations if any found in the C file.
+
+When the PIPS workspace is created by PIPS preprocessor, each C file is
+preprocessed\footnote{Macros are interpreted and include files are
+  expanded. The result depends on the C preprocessor used,on its option
+  and on the system environment (\texttt{/usr/include},...).} using for
+instance \texttt{gcc -E}\footnote{It can be redefined using
+  \texttt{CPP\_PIPS\_ENV} and \texttt{CPP\ PIPS\_OPTIONS\_ENV} environment
+  variables} and broken into a new \index{compilation unit} which contains
+only the file-global variable declarations, the function declarations and
+the type definitions, and one C file for each C function defined in the
+initial C file.
+
+The new compilation units must be parsed before the new files, containing
+each one exactly one function definition, can be parsed. The new
+compilation units are named like the initial file names but with a bang
+extension.
+
+For example, considering a C file \verb|foo.c| with 2 function
+definitions:
+\begin{lstlisting}
+enum { N = 2008 };
+typedef float data_t;
+data_t matrix[N][N];
+extern int errno;
+
+int calc(data_t a[N][N]) {
+  [...]
+}
+
+int main(int argc, char *argv[]) {
+  [..]
+}
+\end{lstlisting}
+After preprocessing, it leads to a file \verb|foo.cpp_processed.c| that is
+then split into a new \verb|foo!.cpp_processed.c| compilation unit
+containing
+\begin{lstlisting}
+enum { N = 2008 };
+typedef float data_t;
+data_t matrix[N][N];
+extern int errno;
+
+int calc(data_t a[N][N]);}
+
+int main(int argc, char *argv[]);
+\end{lstlisting}
+and 2 module files containing the definitions of the 2 functions, a
+\verb|calc.c|
+\begin{lstlisting}
+int calc(data_t a[N][N]) {
+  [...]
+}
+\end{lstlisting}
+and a \verb|main.c|
+\begin{lstlisting}
+int main(int argc, char *argv[]) {
+  [..]
+}
+\end{lstlisting}
+
+Note that it is possible to have an empty compilation unit and no module
+file if the original file does not contain sensible C informations (such
+as an empty file containing only blank characters and so on).
 
 \begin{verbatim}
 compilation_unit_parser         > COMPILATION_UNIT.declarations
@@ -811,10 +865,9 @@ compilation_unit_parser         > COMPILATION_UNIT.declarations
 
 The resource \verb/COMPILATION_UNIT.declarations/ produced by
 \verb/compilation_unit_parser/ is a special resource used to force the
-parsing of the new compilation unit before the parsing of its
-associated functions. It is in fact a hash table containing C keywords
-and typedef names in each compilation unit.\marginpar{RK: mais de quoi ça
-cause ? (FI: to be deleted?)}
+parsing of the new compilation unit before the parsing of its associated
+functions. It is in fact a hash table containing the file-global C
+keywords and typedef names defined in each compilation unit.
 
 \begin{verbatim}
 c_parser                        > MODULE.parsed_code
