@@ -13,8 +13,9 @@
 #define region_undefined_p(reg)  effect_undefined_p((reg))
 #define make_region(reference,action,approximation,system) \
     make_effect(make_cell(is_cell_preference, make_preference(reference)),\
-    (action),(approximation), \
-    make_descriptor(is_descriptor_convex,system))
+		(action), make_addressing_index(), (approximation),	\
+		make_descriptor(is_descriptor_convex,system))
+/* To be avoided. Use region_any_reference() instead */
 #define region_reference(reg) \
     preference_reference(cell_preference(effect_cell(reg)))
 #define region_any_reference(reg) \
@@ -23,10 +24,11 @@
 #define region_approximation(reg) effect_approximation(reg)
 #define region_context(reg) effect_context(reg)
 #define region_cell(reg) effect_cell(reg)
+/* Work around the persistant attribute in effect_cell() */
 #define copy_region(reg) region_dup((reg))
 /* FI: much too dangerous! */
 /* #define free_region(reg) region_free((reg)) */
-#define free_region(reg) free_effect((reg))
+/* #define free_region(reg) free_effect((reg)) */
 
 #define region_entity(reg) reference_variable(region_any_reference(reg))
 #define region_action_tag(reg) action_tag(effect_action(reg))

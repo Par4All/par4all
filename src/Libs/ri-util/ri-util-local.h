@@ -53,6 +53,8 @@
 #define STATIC_AREA_LOCAL_NAME          "*STATIC*"
 #define HEAP_AREA_LOCAL_NAME            "*HEAP*"
 #define STACK_AREA_LOCAL_NAME           "*STACK*"
+/* The set of all memory areas */
+#define ALL_MEMORY_ENTITY_NAME          "TOP-LEVEL:*MEMORY*"
 
 /* For enum and struct and union without names (see c_syntaxcyacc.y */
 #define DUMMY_ENUM_PREFIX               "_PIPS_ENUM_"
@@ -1041,13 +1043,13 @@
 
 #define make_simple_effect(reference,action,approximation)\
     make_effect(make_cell(is_cell_preference, make_preference(reference)),\
-    (action),(approximation), \
-    make_descriptor(is_descriptor_none,UU))
+		(action), make_addressing_index(), (approximation),	\
+		make_descriptor(is_descriptor_none,UU))
 
 #define make_convex_effect(reference,action,approximation,system)\
     make_effect(make_cell(is_cell_preference, make_preference(reference)),\
-    (action),(approximation), \
-    make_descriptor(is_descriptor_convex,system))
+		(action), make_addressing_index(),(approximation),				\
+		make_descriptor(is_descriptor_convex,system))
 
 
 #define statement_block_p(stat) \

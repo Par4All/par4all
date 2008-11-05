@@ -46,10 +46,13 @@ reference_to_simple_effect(reference ref, action ac)
    old uses of make_simple_effects. Or persistancy is not properly handled? 
    - bc.
 */
+  /* FI: this should be revisited now that I have cleaned up a lot of
+     the effects library to handled the two kinds of cells. */
   /* cell cell_ref = make_cell(is_cell_reference, copy_reference(ref)); */
-  cell cell_ref = make_cell(is_cell_preference, make_preference(ref));
-  approximation ap = make_approximation(is_approximation_must, UU);
-  effect eff = make_effect(cell_ref, ac, ap, make_descriptor_none());  
+  cell cell_ref = make_cell_preference(make_preference(ref));
+  addressing ad = make_addressing_index();
+  approximation ap = make_approximation_must();
+  effect eff = make_effect(cell_ref, ac, ad, ap, make_descriptor_none());  
   return eff;
 }
 
@@ -65,12 +68,10 @@ simple_effect_dup(effect eff)
 
   new_eff = copy_effect(eff);
 
-  if(cell_preference_p(effect_cell(new_eff)))
+  if(cell_preference_p(effect_cell(new_eff))) {
     /* FI: memory leak? we allocate something and put it behind a persistent pointer */
     effect_reference(new_eff) = reference_dup(effect_reference(new_eff));
-  else
-    /* FI: nothing to be done */
-    ;
+  }
 
   ifdebug(8) pips_assert("the new effect is consistent", effect_consistent_p(new_eff));
 
@@ -97,16 +98,20 @@ simple_effect_free(effect eff)
  reference_to_reference_effect(reference ref, action ac)
  {
    cell cell_ref = make_cell(is_cell_preference, make_preference(ref));
+   addressing ad = make_addressing_index();
    approximation ap = make_approximation(is_approximation_must, UU);
    effect eff;
     
-   eff = make_effect(cell_ref, ac, ap, make_descriptor(is_descriptor_none,UU));  
+   eff = make_effect(cell_ref, ac, ad, ap, make_descriptor(is_descriptor_none,UU));  
    return(eff);
  }
 
 
 list 
-simple_effects_union_over_range(list l_eff, entity i, range r, descriptor d)
+simple_effects_union_over_range(list l_eff,
+				entity i __attribute__ ((unused)),
+				range r __attribute__ ((unused)),
+				descriptor d __attribute__ ((unused)))
 {
   if (!get_bool_property("ONE_TRIP_DO"))
     {
@@ -142,7 +147,7 @@ effect_to_sdfi_list(effect eff)
 }
 
 void
-simple_effects_descriptor_normalize(list l_eff)
+simple_effects_descriptor_normalize(list l_eff __attribute__ ((unused)))
 {
   return;
 }

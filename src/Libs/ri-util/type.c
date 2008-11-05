@@ -2072,6 +2072,83 @@ bool check_C_function_type(entity f, list args)
 
   return ok;
 }
+
+/* Number of steps to access the lowest leave of type t.  Number of
+ dimensions for an array. One for a struct or an union field, plus its
+ dimension. */
+int type_depth(type t)
+{
+  int d = 0;
+
+  if(type_variable_p(t)) {
+    variable v = type_variable(t);
+
+    d = gen_length(variable_dimensions(v))+basic_depth(variable_basic(v));
+  }
+  else if(type_void_p(t))
+    d = 0;
+  else if(type_varargs_p(t))
+    d = 0;
+  else if(type_struct_p(t)) {
+    list fl = type_struct(t);
+    d = 0;
+    MAP(ENTITY, e, {
+	int i = type_depth(entity_type(e));
+	d = d>i?d:i;
+      }, fl);
+    d++;
+  }
+  else if(type_union_p(t)) {
+    list fl = type_union(t);
+    d = 0;
+    MAP(ENTITY, e, {
+	int i = type_depth(entity_type(e));
+	d = d>i?d:i;
+      }, fl);
+    d++;
+  }
+  else if(type_enum_p(t))
+    d = 0;
+
+  return d;
+}
+
+int basic_depth(basic b)
+{
+  int d = 0;
+
+  switch(basic_tag(b)) {
+  case is_basic_int:
+  case is_basic_float:
+  case is_basic_logical:
+  case is_basic_overloaded:
+  case is_basic_complex:
+  case is_basic_string:
+  case is_basic_bit:
+  case is_basic_pointer:
+    break;
+  case is_basic_derived:
+    {
+      entity e = basic_derived(b);
+      type t = entity_type(e);
+      d = type_depth(t);
+      break;
+    }
+  case is_basic_typedef:
+    {
+      entity e = basic_typedef(b);
+      type t = entity_type(e);
+
+      d = type_depth(t);
+      break;
+    }
+  default:
+    pips_internal_error("Unexpected basic tag %d\n", basic_tag(b));
+  }
+
+  return d;
+}
+
 /*
  *  that is all
  */

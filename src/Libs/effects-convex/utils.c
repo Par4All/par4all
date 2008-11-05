@@ -159,13 +159,21 @@ region region_dup(region reg)
 
     new_reg = copy_effect(reg);
 
+    pips_assert("The copied region has the same persistent property as sthe input region",
+		cell_tag(effect_cell(new_reg))==cell_tag(effect_cell(new_reg)));
+
+    /* Duplicate the reference in spite of the persistant attribute */
     if(cell_preference_p(region_cell(new_reg))) {
       /* work around persistency of effect reference */
       preference p = cell_preference(region_cell(new_reg));
-      preference_reference(p) = reference_dup(region_reference(reg));
+      preference_reference(p) = reference_dup(region_any_reference(reg));
     }
     
     debug_region_consistency(new_reg);
+    /* FI: I do not understand the type check error in the comparison
+       below. Is one of the pointers forced to int by operator !=?*/
+    pips_assert("No sharing of references",
+		region_any_reference(reg)!=region_any_reference(new_reg));
     return new_reg;
 }
 
@@ -207,6 +215,8 @@ void regions_free(list l_reg)
  * input    : a region
  * output   : nothing !
  * modifies : frees region
+ * Unless function free_effect(), this function overrides the persistant attribute
+ * which may exist at the cell level. Macro free_region() does not exist anymore.
  */
 void region_free(region reg)
 {
@@ -221,7 +231,7 @@ void region_free(region reg)
       free_effect(reg);
     }
     else {
-      free_region(reg);
+      free_effect(reg);
     }
 }
 
@@ -932,21 +942,24 @@ list l_reg;
  */
 reference make_regions_reference(entity ent)
 {
-    list regions_ref_inds = NIL, ent_list_dim = NIL;
-    int dim;
-    type ent_ty = entity_type(ent);
+  list regions_ref_inds = NIL, ent_list_dim = NIL;
+  int dim;
+  type ent_ty = entity_type(ent);
+  int d = -1;
+
+  if (type_variable_p(ent_ty))
+    /* ent_list_dim = variable_dimensions(type_variable(ent_ty)); */
+    d = type_depth(ent_ty);
     
-    if (type_variable_p(ent_ty))
-	ent_list_dim = variable_dimensions(type_variable(ent_ty));
-    
-    if (! entity_scalar_p(ent))
-	for (dim = 1; ent_list_dim != NIL; ent_list_dim = CDR(ent_list_dim), dim++)
-	    regions_ref_inds = gen_nconc(regions_ref_inds,
-					 CONS(EXPRESSION,
-					      make_phi_expression(dim),
-					      NIL));
-    
-    return(make_reference(ent, regions_ref_inds));
+  for (dim = 1; dim <= d; dim++)
+    regions_ref_inds = gen_nconc(regions_ref_inds,
+				 CONS(EXPRESSION,
+				      make_phi_expression(dim),
+				      NIL));
+
+  /* FI: if I want to add extra-dimensions to reflect structure fields... */
+
+  return make_reference(ent, regions_ref_inds);
 }
 
 
@@ -961,21 +974,23 @@ reference make_regions_reference(entity ent)
 static Psysteme make_whole_array_predicate(entity e)
 {
     Psysteme ps = sc_new();
-    
-    /* No phi if the entity is a scalar */
-    if (! entity_scalar_p(e))
+    type t = entity_type(e);
+    int d = type_depth(t);
+
+    /* No phi if the entity has no depth (includes scalar entity which have depth 0 */
+    if (d>0)
     {
 	int dim;
-	int dim_max = NumberOfDimension(e);
 
 	/* add phi variables in the base */
-	for (dim = 1; dim<=dim_max; dim ++)
+	for (dim = 1; dim<=d; dim ++)
 	{
 	    entity phi = make_phi_entity(dim);
 	    sc_base_add_variable(ps, (Variable) phi);
 	}
 	
 	/* add array bounds if asked for */
+	/* FI: To be improved for arrays embedded within structures. */
 	if (array_bounds_p())	
 	    ps = sc_safe_append(ps, 
 				sc_safe_normalize(entity_declaration_sc(e)));
@@ -992,67 +1007,71 @@ static Psysteme make_whole_array_predicate(entity e)
  */
 effect make_reference_region(reference ref, tag tac)
 {
-    entity e = reference_variable(ref);
-    effect reg;
-    boolean linear_p = TRUE;
-    Psysteme sc;
+  entity e = reference_variable(ref);
+  type t = entity_type(e);
+  int d = type_depth(t);
+  effect reg;
+  boolean linear_p = TRUE;
+  Psysteme sc;
 
-    /* first make the predicate according to ref */
+  /* first make the predicate according to ref */
 
-    ifdebug(3)
+  ifdebug(3)
     {
-	pips_debug(3, "variable : \n%s\n", 
-		   words_to_string(words_reference(ref)));
+      pips_debug(3, "Reference : \"%s\"", 
+		 words_to_string(words_reference(ref)));
+      fprintf(stderr, "\n");
     }
     
-    sc = make_whole_array_predicate(e);
+  sc = make_whole_array_predicate(e);
     
-    /* No predicate if the entity is a scalar. */
-    if (! entity_scalar_p(e))
+  /* No predicate if the entity is a scalar. */
+  if (d>0)
     {
-	int idim;
-	list ind = reference_indices(ref);
-       
-	/* Nga Nguyen 04 June 2002 . Bug for regions, see Validation/Regions/incr3.f
-	   If the whole array is accessed (ind = NIL), for example 
-	   DIMENSION DECOUP(2)
-	   WRITE *,DECOUP
-	   all array elements must be added in the region
+      int idim;
+      list ind = reference_indices(ref);
 
-	   They can be added later by function 
-	   append_declaration_sc_if_exact_without_constraints 
-	   but if the current region is used, it is not consistent => core dumped*/
+      pips_assert("The number of indices is less or equal to the type depth",
+		  (int) gen_length(ind) <= d);
 
-	if (ENDP(ind))
-	  sc = entity_declaration_sc(e);
-	else
-	  {
-	    for (idim = 1; ind != NIL; idim++, ind = CDR(ind))
-	      {
-		/* For equalities. */
-		expression exp_ind = EXPRESSION(CAR(ind));
-		boolean dim_linear_p;
+      /* Nga Nguyen 04 June 2002 . Bug for regions, see Validation/Regions/incr3.f
+	 If the whole array is accessed (ind = NIL), for example 
+	 DIMENSION DECOUP(2)
+	 WRITE *,DECOUP
+	 all array elements must be added in the region
+
+	 They can be added later by function 
+	 append_declaration_sc_if_exact_without_constraints 
+	 but if the current region is used, it is not consistent => core dumped*/
+
+      if (ENDP(ind))
+	sc = entity_declaration_sc(e); /* FI see what happens with structures */
+      else {
+	for (idim = 1; ind != NIL; idim++, ind = CDR(ind)) {
+	  /* For equalities. */
+	  expression exp_ind = EXPRESSION(CAR(ind));
+	  boolean dim_linear_p;
 		
-		ifdebug(3) {
-		  pips_debug(3, "addition of equality :\nPHI%d - %s = 0\n",
-			     idim, words_to_string(words_expression(exp_ind)));
-		}
-		
-		dim_linear_p = 
-		  sc_add_phi_equation(sc, exp_ind, idim, IS_EG, PHI_FIRST);
-		pips_debug(3, "%slinear equation.\n", dim_linear_p? "": "non-");
-		linear_p = linear_p && dim_linear_p;	    
-	      } /* for */
+	  ifdebug(3) {
+	    pips_debug(3, "addition of equality :\nPHI%d - %s = 0\n",
+		       idim, words_to_string(words_expression(exp_ind)));
 	  }
+		
+	  dim_linear_p = 
+	    sc_add_phi_equation(sc, exp_ind, idim, IS_EG, PHI_FIRST);
+	  pips_debug(3, "%slinear equation.\n", dim_linear_p? "": "non-");
+	  linear_p = linear_p && dim_linear_p;	    
+	} /* for */
+      }
     } /* if */
     
-    reg = make_region(reference_dup(make_regions_reference(e)),
-		      make_action(tac, UU),
-		      make_approximation
-		      (linear_p? is_approximation_must : is_approximation_may,
-		       UU),
-		      sc);
-    return(reg);
+  reg = make_region(reference_dup(make_regions_reference(e)),
+		    make_action(tac, UU),
+		    make_approximation
+		    (linear_p? is_approximation_must : is_approximation_may,
+		     UU),
+		    sc);
+  return(reg);
 }    
 
 /* reference make_regions_psi_reference(entity ent)
@@ -1734,7 +1753,7 @@ region_constraints_sort(
     c = constraints_sort_with_compare
       //	(c, BASE_NULLE, equality_p? 
       (c, sorted_base, equality_p? 
-	 compare_region_equalities: compare_region_inequalities);
+       ((int (*)()) compare_region_equalities): ((int (*)()) compare_region_inequalities));
     reset_bases_for_compare();
     return(c);           
 }

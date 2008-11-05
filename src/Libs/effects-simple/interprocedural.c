@@ -33,7 +33,7 @@ simple_effects_backward_translation(
     entity func, 
     list real_args,
     list l_eff, 
-    transformer context)
+    transformer context __attribute__ ((unused)))
 {
     return summary_to_proper_effects(func, real_args, l_eff);
 }
@@ -249,7 +249,7 @@ offset_of_reference(reference ref, int n)
 static list /* of effect */ 
 global_effect_translation(
     effect ef, 
-    entity source_func,
+    entity source_func __attribute__ ((unused)),
     entity target_func)
 {
     list l_com_ent, l_tmp, l_new_eff = NIL;
@@ -671,16 +671,17 @@ summary_to_proper_effects(
     list /* of effect */ func_sdfi)
 {
     list pc, le = NIL, l_formals;
-    int ipc, n_formals;
+    int ipc;
+    int n_formals;
 
     pips_debug(3, "effects on formals on call to %s\n", entity_name(func));
 
     /* check the number of parameters */
     l_formals = module_formal_parameters(func);
-    n_formals = gen_length(l_formals);
+    n_formals = (int) gen_length(l_formals);
    
 
-    if (gen_length(args) < n_formals)
+    if ((int) gen_length(args) < n_formals)
     {
 	/* this is really a user error.
 	 * if you move this as a user warning, the pips would drop
@@ -695,7 +696,7 @@ summary_to_proper_effects(
 			  "insufficient number of actual arguments.\n",
 			  module_local_name(func));
     }
-    else if (gen_length(args) > n_formals)
+    else if ((int) gen_length(args) > n_formals)
     {
 	/* This can be survived... */        
       fprintf(stderr,"%d formal arguments for module%s:\n",
@@ -832,6 +833,7 @@ summary_to_proper_effects(
 #define make_translated_effect(entity,action,approximation)\
     make_effect(make_cell(is_cell_reference, make_reference((entity), NIL)),\
 		make_action(action, UU),\
+		make_addressing_index(),\
 		make_approximation(approximation, UU),\
 		make_descriptor(is_descriptor_none,UU))
 
@@ -934,7 +936,7 @@ simple_effects_forward_translation(
     entity callee, 
     list /* of expression */ real_args,
     list /* of effect */ l_eff, 
-    transformer context)
+    transformer context __attribute__ ((unused)))
 {
     list /* of effect */ lr, lc;
 

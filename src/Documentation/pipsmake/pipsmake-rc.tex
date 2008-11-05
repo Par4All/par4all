@@ -550,10 +550,12 @@ filter_file                     > MODULE.source_file
 \end{verbatim}
 
 
-In C, the initializer can generate directly a \verb|c_source_file|.
+In C, the initializer can generate directly a \verb|c_source_file| and
+its compilation unit.
 
 \begin{verbatim}
 c_initializer                     > MODULE.c_source_file
+                                  > COMPILATION_UNIT.c_source_file
 \end{verbatim}
 
 \section{Regeneration of user source files}

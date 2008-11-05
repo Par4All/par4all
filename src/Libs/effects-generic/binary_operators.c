@@ -46,11 +46,11 @@ list_of_effects_generic_binary_op(
     list (*r2_unary_op)(effect))
 {
     list l_res = NIL;
+    list cr1 = list_undefined;
 
     debug_on("EFFECTS_OPERATORS_DEBUG_LEVEL");
 
-    ifdebug(1)
-    {
+    ifdebug(1) {
       pips_debug(1, "Initial effects : \n");
       fprintf(stderr,"\t l1 :\n");
       (*effects_prettyprint_func)(l1);
@@ -60,22 +60,20 @@ list_of_effects_generic_binary_op(
     
     /* we first deal with the effects of l1 : those that are combinable with 
      * the effects of l2, and the others, which we call the remnants of l1 */
-    MAP(EFFECT, r1,
-    {
+    for(cr1 = l1; !ENDP(cr1); POP(cr1)) {
+      effect r1 = EFFECT(CAR(cr1));
       list lr2 = l2;
       list prec_lr2 = NIL;
       bool combinable = FALSE;
       
       pips_debug(8, "r1: %s\n", entity_name(effect_variable(r1)));
       
-      while(!combinable && !ENDP(lr2))
-      {
+      while(!combinable && !ENDP(lr2)) {
 	effect r2 = EFFECT(CAR(lr2));
 	
 	pips_debug(8, "r2: %s\n", entity_name(effect_variable(r2)));
 	
-	if ( (*r1_r2_combinable_p)(r1,r2) )
-	{
+	if ( (*r1_r2_combinable_p)(r1,r2) ) {
 	  combinable = TRUE;
 	  l_res = gen_nconc((*r1_r2_binary_op)(r1,r2), l_res);
 	  
@@ -90,31 +88,26 @@ list_of_effects_generic_binary_op(
 	  free_effect(r1); r1=effect_undefined; 
 	  free_effect(r2); r2=effect_undefined;
 	}
-	else
-	{
+	else {
 	  prec_lr2 = lr2;
 	  lr2 = CDR(lr2);
 	}
       }
       
-      ifdebug(9)
-	{
+      ifdebug(9) {
 	  pips_debug(9, "intermediate effects 1:\n");
 	  (*effects_prettyprint_func)(l_res);
 	}
       
-      if(!combinable)
-      {
+      if(!combinable) {
 	/* r1 belongs to the remnants of l1 : it is combinable 
 	 * with no effects of l2 */
 	if ( (*r1_r2_combinable_p)(r1,effect_undefined) ) 
 	  l_res = gen_nconc((*r1_unary_op)(r1), l_res);
       }
-    },
-	l1);
+    }
     
-    ifdebug(9)
-      {
+    ifdebug(9) {
 	pips_debug(9, "intermediate effects 2:\n");
 	(*effects_prettyprint_func)(l_res);
       }
@@ -219,16 +212,19 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
     if (may_combine)
     {
       /* did we see it? */
+      /* effect with indirect addressing cannot be combined, unless equal */
       switch (a) {
       case is_action_write:
-	if (hash_defined_p(all_write_effects, n))
+	if (hash_defined_p(all_write_effects, n)
+	    && addressing_index_p(effect_addressing(current)))
 	{
 	  do_combine = TRUE;
 	  do_combine_item = hash_get(all_write_effects, n); 
 	}
 	break;
       case is_action_read:
-	if (hash_defined_p(all_read_effects, n))
+	if (hash_defined_p(all_read_effects, n)
+	    && addressing_index_p(effect_addressing(current)))
 	{
 	  do_combine = TRUE;
 	  do_combine_item = hash_get(all_read_effects, n);
@@ -317,15 +313,22 @@ bool combinable_effects_p(effect eff1, effect eff2)
 
 bool effects_same_action_p(effect eff1, effect eff2)
 {
-    bool same_var, same_act;
+  bool same_p = TRUE;
 
     if (effect_undefined_p(eff1) || effect_undefined_p(eff2))
-	return(TRUE);
+	same_p = TRUE;
+    else {
+      bool same_var, same_act, direct_p;
+      addressing ad1 = effect_addressing(eff1);
+      addressing ad2 = effect_addressing(eff2);
 
-    same_var = (effect_entity(eff1) == effect_entity(eff2));
-    same_act = (effect_action_tag(eff1) == effect_action_tag(eff2));
+      same_var = (effect_entity(eff1) == effect_entity(eff2));
+      same_act = (effect_action_tag(eff1) == effect_action_tag(eff2));
+      direct_p = (addressing_index_p(ad1) && addressing_index_p(ad2));
 
-    return(same_var && same_act);
+      same_p = same_var && same_act &&direct_p;
+    }
+    return same_p;
 }
 
 bool effects_same_variable_p(effect eff1, effect eff2)

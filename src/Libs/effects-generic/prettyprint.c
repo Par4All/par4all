@@ -357,47 +357,48 @@ print_source_or_code_effects_engine(
  */
 list /* of string */ effect_words_reference(reference obj)
 {
-    list pc = NIL;
-    string begin_attachment;
-    entity e = reference_variable(obj);
+  list pc = NIL;
+  string begin_attachment;
+  entity e = reference_variable(obj);
    
-    if (get_bool_property("PRETTYPRINT_WITH_COMMON_NAMES")  
-	&& entity_in_common_p(e)) {
-	pc = CHAIN_SWORD(pc, (string) entity_and_common_name(e));
-    } else 
-	pc = CHAIN_SWORD(pc, entity_minimal_name(e));
-    begin_attachment = STRING(CAR(pc));
+  if (get_bool_property("PRETTYPRINT_WITH_COMMON_NAMES")  
+      && entity_in_common_p(e)) {
+    pc = CHAIN_SWORD(pc, (string) entity_and_common_name(e));
+  } else 
+    pc = CHAIN_SWORD(pc, entity_minimal_name(e));
+  begin_attachment = STRING(CAR(pc));
 
-    if (reference_indices(obj) != NIL) {
-      string beg = is_fortran? "(" : "[";
-      string mid = is_fortran? "," : "][";
-      string end = is_fortran? ")" : "]";
+  if (reference_indices(obj) != NIL) {
+    string beg = is_fortran? "(" : "[";
+    string mid = is_fortran? "," : "][";
+    string end = is_fortran? ")" : "]";
 
-	pc = CHAIN_SWORD(pc,beg);
-	MAPL(pi, {
-	    pc = gen_nconc(pc, words_expression(EXPRESSION(CAR(pi))));
-	    if (CDR(pi) != NIL)
-		pc = CHAIN_SWORD(pc,mid);
-	}, reference_indices(obj));
-	pc = CHAIN_SWORD(pc,end);
+    pc = CHAIN_SWORD(pc,beg);
+    MAPL(pi, {
+	pc = gen_nconc(pc, words_expression(EXPRESSION(CAR(pi))));
+	if (CDR(pi) != NIL)
+	  pc = CHAIN_SWORD(pc,mid);
+      }, reference_indices(obj));
+    pc = CHAIN_SWORD(pc,end);
+  }
+  else {
+    string beg = is_fortran? "(*" : "[*";
+    string mid = is_fortran? ",*" : "][*";
+    string end = is_fortran? ")" : "]";
+    int d;
+    /* if( (d=variable_entity_dimension(reference_variable(obj))) != 0) { */
+    if( (d=type_depth(entity_type(reference_variable(obj)))) != 0) {
+      int i;
+      pc = CHAIN_SWORD(pc,beg);
+      for(i = 1; i < d; i++)
+	pc = CHAIN_SWORD(pc,mid);
+      pc = CHAIN_SWORD(pc,end);
     }
-    else {
-      string beg = is_fortran? "(*" : "[*";
-      string mid = is_fortran? ",*" : "][*";
-      string end = is_fortran? ")" : "]";
-	int d;
-	if( (d=variable_entity_dimension(reference_variable(obj))) != 0) {
-	    int i;
-	    pc = CHAIN_SWORD(pc,beg);
-	    for(i = 1; i < d; i++)
-		pc = CHAIN_SWORD(pc,mid);
-	    pc = CHAIN_SWORD(pc,end);
-	}
-    }
-    attach_reference_to_word_list(begin_attachment, STRING(CAR(gen_last(pc))),
-				  obj);
+  }
+  attach_reference_to_word_list(begin_attachment, STRING(CAR(gen_last(pc))),
+				obj);
 
-    return(pc);
+  return(pc);
 }
 
 

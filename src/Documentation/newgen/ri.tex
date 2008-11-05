@@ -1588,25 +1588,10 @@ ones. Field \verb/normalized/ indirectly contains a secondary
 representation of affine integer expressions stored as
 \verb/Pvecteur/\index{Pvecteur} (see Section~\ref{subsection-pvecteur}).
 
-\begin{comment}
-Le domaine \verb/expression/ permet de stocker les expressions.  Le
-sous-domaine \texttt{syntax} contient la description de l'expression telle
-qu'elle apparaît dans le texte source du programme. Le sous-domaine
-\texttt{normalized} contient une forme compilée des expressions
-linéaires, sous forme de \verb/Pvecteur/\index{Pvecteur}.
-\end{comment}
-
 If field \texttt{normalized} is set to value 
 \texttt{normalized\_undefined}, this implies that the PIPS function used to
 detect affine expressions and sub-expressions has not been called. This
 {\bf does not} imply that the expression is not affine.
-
-\begin{comment}
-Si le sous-domaine \texttt{normalized} contient la valeur 
-\texttt{normalized\_undefined}, cela signifie que la fonction de linéarisation
-n'a pas été appelée pour cette expression; cela {\bf ne} signifie
-{\bf pas} que l'expression n'est pas linéaire.
-\end{comment}
 
 The \verb/normalized/ field is redundant with the \verb/syntax/
 field. There is no consistency check available. When new expressions are
@@ -1640,27 +1625,14 @@ element\footnote{Scalar variables are represented as 0-dimensional
 definitions\footnote{This explains why type \texttt{range} is defined
   in the \emph{Instruction} section.} and array declarations.
 
-New kinds of syntax are added to handle C language. They are {\it cast},
- {\it sizeof}, {\it subscripting array} and
-{\it function application} expressions. The subscripting array expression
-is an extension of the reference expression, which includes other
-more complicated array objects such as pointer, function, 
-structure or union member... The same extension is made to call
-expression, named function application, because the called function is
-not necessarily an entity but can be any expression that denotes a function.   
-
-\begin{comment}
-Le domaine \verb/syntax/ permet de représenter les expressions telles
-qu'elles apparaissent dans le texte source du programme. Un
-\verb/syntax/ est soit une \verb/reference/ à un élément de tableau
-(on rappelle que les scalaires sont des tableaux à 0 dimension) , soit
-un \verb/call/ à une fonction (les opérateurs sont représentés par
-des fonctions pré-définies, y compris l'assignation; c'est pourquoi le
-domaine \texttt{call} est défini dans la section \emph{Instructions}), soit
-un \verb/range/, dans le cas des expressions bornes de boucles (le domaine
-\texttt{range} est présenté au niveau des boucles, aussi dans la section
-\emph{Instructions}).
-\end{comment}
+New kinds of \verb/syntax/ are added to handle the C language. They
+are {\it cast}, {\it sizeof}, {\it subscripting array} and {\it
+  function application} expressions. The subscripting array expression
+is an extension of the reference expression, which includes other more
+complicated array objects such as pointer, function, structure or
+union member... The same extension is made to call expression, named
+function application, because the called function is not necessarily
+an entity but can be any expression that denotes the address of a function.
 
 \subsubsection{Reference}
 \label{subsubsection-reference}
@@ -1795,7 +1767,8 @@ of the statement effects on memory.
 Each program variable is a unique set of memory locations. Effects can
 be expressed as effects on these sets. They are called \emph{atomic}
 effects, because a whole data structure is seen as read or written as
-soon as one element is read or written.
+soon as one element is read or written. Note that indirect effects due
+to pointer uses are related to unknown memory locations.
 
 The memory location representation can be refined for arrays. Certain
 sets of array locations are handled, for instance intervals like
@@ -1837,11 +1810,15 @@ increment expressions as in \verb/DO I = I, 10*I, I/ must be preserved.
 \label{subsection-effects}
 \index{Effects}
 
-The \texttt{effects} domain is a list of individual effects. Each effect
-can only be a read or a write and is related to only one variable. Lots
-of individual effects are linked to each statements, especially compound
-statements like \texttt{blocks}, \texttt{tests}, \texttt{loops} and 
-\texttt{unstructured}. 
+The \texttt{effects} domain is a list of individual effects. Each
+effect can only be a read or a write and is related to only one
+entity, most of the time a variable entity\footnote{In Fortran, the
+  entity is always a variable entity.}, but possibly an area entity or
+even an entity representing a set of areas\footnote{Areas and set of
+  areas are used to express imprecise memory effects due to pointer
+  dereferencing.}. Lots of individual effects are linked to each
+statements, especially compound statements like \texttt{blocks},
+\texttt{tests}, \texttt{loops} and \texttt{unstructured}.
 
 Control effects, such as \verb/STOP/ or exception, are not
 computed. PIPS only deals with memory effects. Fortran exceptions like
@@ -1881,48 +1858,44 @@ are lists of effects, i.e. lists of lists of regions.
 \label{subsection-effect}
 \index{Effect}\index{Region}
 
-\domain{Effect = cell x action x approximation x descriptor}
+\domain{Effect = cell x action x addressing x approximation x descriptor}
 {}
 \domain{Descriptor = convexunion:Psysteme* + convex:Psysteme + none:unit}
 {}
 
 Type \verb/effect/ is used to represent a read or write access to a
-variable, i.e. to abstract a reference in a statement. Statement effects
-are used to build use-def chains, dependence
+variable or through a pointer, i.e. to abstract a reference in a
+statement. Statement effects are used to compute array regions,
+transformers and preconditions, to build use-def chains, dependence
 %% http://www.cri.ensmp.fr/pips/pipsmake-rc.html} 
-graphs, Summary Data Flow Information (SDFI), known as summary
-effects at the module level, and as cumulated effects at the statement
-level, and array regions. Proper effects, cumulated effects, summary
-effects and array regions are all of type \verb/effect/. Proper effects,
-cumulated effects and summary effects are called simple effects and they
-do not use the last field, \verb/descriptor/.
+graphs, Summary Data Flow Information (SDFI), known as summary effects
+at the module level, and as cumulated effects at the statement level,
+and array regions. Proper effects, cumulated effects, summary effects
+and array regions are all of type \verb/effect/ but they are
+distinguished by pipsmake as difference resources. Proper effects,
+cumulated effects and summary effects are called simple effects and
+they do not store information in the last field, \verb/descriptor/.
 
-\begin{comment}
-Le domaine \verb/effect/ est utilisé pour représenter les effets d'un
-statement sur les variables du module. Les effets des instructions sont
-le point de départ du calcul use-def chains, des
-%%{http://www.cri.ensmp.fr/pips/pipsmake-rc.html} 
-dépendances, des Summary Data Flow Information (known as summary
-effects at the module level, and as cumulated effects at the statement
-level), et des régions.
-\end{comment}
+Field \verb/cell/ specifies which memory locations are accessed. In
+Fortran, variables, scalar or array, are accessed directly. In C, it
+may be a pointer specifying an indirect adressing. A \verb/cell/ is
+either a \verb/reference/ or a persistant\footnote{Persitant is a
+  Newgen attribute carried by a typ or by a field. It means that
+  recursive Newgen procedures must stop there. This impacts especially
+  the free and copy functions.} \verb/preference/. Attribute
+\verb/persistant/ is used because reference objects point to may be
+part of program statements. At least for simple effects such as
+effects associated to \verb/x[i]/: if effect references are copied, a
+reference to \verb/i/ is copied twice, once to specify that \verb/i/
+is read and the second one to specify that \verb/x[i]/ is read or
+written.
 
-Field \verb/reference/ specifies which variables, scalar or array, is
-accessed. Attribute \verb/persistant/ is used because reference objects
-pointed to may be part of program statements. At least for simple
-effects. This attribute is not welcome for more advanced effects, such
-as regions, which use pseudo-references based on \verb/PHI/ variables. Memory
-allocation is difficult to manage when the persistant attribute is
-declared at the type level and not at the object level.
-
-\begin{comment}
-Le sous-domaine \texttt{reference} indique sur quelle variable, scalaire ou
-tableau, a lieu un effet. L'attribut \texttt{persistant} lui est donné
-parce que les références concernées font directement partie des
-statements du programme, au moins quand il s'agit d'effets simples. Cet
-attribut est naturellement gênant pour les régions qui utilisent des
-références synthétiques basées sur les pseudo-variables $PHI$.
-\end{comment}
+This persistant attribute is not welcome for more advanced effects,
+such as regions, which use pseudo-references based on \verb/PHI/
+variables. Memory allocation is even more difficult to manage when the
+persistant attribute is declared at the type level and not at the
+object level. This explains why the field \verb/reference/ was moved
+down and accessed now trhu the field \verb/cell/.
 
 Field \verb/action/ specifies if the memory access is a read or a write,
 for read/write effects, and if the memory value is read from the statement
@@ -1931,21 +1904,20 @@ the statement is later read for a \verb/out/ effect or region. So,
 \verb/read/ and \verb/in/ effects and regions have action \verb/read/ while
 \verb/write/ and \verb/out/ effects and regions have action \verb/write/.
 
-Field \verb/approximation/ is used to know if the reference for
-simple effects, or the set of array elements defined by the
-\verb/descriptor/ for array regions, is or not accessed for sure. For
-instance, a conditional is going to generate may effects, and a
-sequence, must effects\footnote{Needless to say, reality is much more
-  complex. This oversimplified statement only is written to support some
-  intuition about may and must and exact information.}.
+Field \verb/addressing/ specifies the addressing mode. The addressing
+can be direct and indexed, as in \verb/x[i]/, indirect and
+post-indexed, as in \verb/(*p)[i]/, indirect and pre-indexed, as sin
+\verb/*(p[i])/. For Fortran code, indirect addressing modes are not
+used.
 
-\begin{comment}
-Le sous-domaine \texttt{action} précise si la
-référence est lue ou écrite, et le sous-domaine \texttt{approximation}
-permet de savoir si la référence (pour les effets) ou l'ensemble des
-éléments de tableaux défini par le contexte (pour les régions) est lu ou
-écrit à coup sûr ou non. 
-\end{comment}
+Field \verb/approximation/ is used to specify if all the memory addresses
+of the reference for simple effects, or of the set of array elements
+defined by the \verb/descriptor/ for array regions, are or not
+accessed for sure. For instance, a conditional is going to generate
+may effects, and a sequence, must effects\footnote{Needless to say,
+  reality is much more complex. This oversimplified statement only is
+  written to support some intuition about may and must and exact
+  information.}.
 
 Simple effects and regions may reference a global variable which is in
 the scope of the callee but not in the scope of the caller or a static
@@ -1967,24 +1939,6 @@ and assuming that scopes are known, which is not true because some
 modules may be analyzed before some other ones are parsed (see pipsmake
 in \cite{Trio90}\cite{Baro91}).
 
-\begin{comment}
-Lors de la traduction interprocédurale des effets ou des régions portant
-sur une variable globale non déclarée dans le module appelant ou sur une
-variable statique apparaissant dans un \texttt{SAVE}, il est important de
-récupérer une référence qui sera la même pour tous les sites d'appels.
-Pour cela on choisit un module de référence (dans lequel le common ou le
-save est déclaré), dont le nom préfixera le nom de la variable. Le choix
-de ce module n'est pas trivial. À l'heure actuelle, il s'agit du nom du
-module de la première variable apparaissant dans la liste des variables du
-common:
-\begin{quote}
- \texttt{ram\_section(storage\_ram(entity\_storage(<my\_common>)))}
-\end{quote}
-Selon l'ordre dans lequel les modules sont analysés, le nom de module
-trouvé sera différent. Il faudrait en réalité prendre le premier nom
-de module dans l'ordre lexicographique des modules appelés (callees).
-\end{comment}
-
 Field \verb/reference/ can be used to specify that an effect is limited
 to a sub-array since a \verb/range/ can be used as subscript expression
 of a reference. This facility is used when the cumulated effects of a
@@ -1993,28 +1947,14 @@ scope. For regions, field \verb/reference/ defines the accessed variable
 as well as pseudo-variables, known as \verb/PHI/ variables. There is one
 \verb/PHI/ variable per array dimension.
 
-\begin{comment}
-Le sous-domaine \texttt{reference} permet de préciser qu'un effet n'a lieu que
-sur un sous-tableau en utilisant un \texttt{range} comme expression d'indice.
-Ceci est utilisé lors de la traduction des effets cumulés d'un procédure
-en les effets propres d'un call site. Pour les régions, ce sous-domaine
-précise l'entité concernée ainsi que la liste des variables $\phi$ qui
-décrivent ses dimensions.
-\end{comment}
-
 Field \verb/context/ only is used for effects known as \emph{array
 regions}. They were defined by Rémi Triolet in~\cite{Trio84} and
 extended by Béatrice Creusillet in~\cite{Creu96}.
 
-\begin{comment}
-Le sous-domaine \texttt{context} n'est utilisé que pour représenter les
-effets des instructions par des régions (telles que définies par Rémi
-Triolet).
-\end{comment}
-
 There should not be much strict aliasing between effects in an effect
-list, but this is (was?) not checked and enforced. Some efforts are made
-whe ntranslating the summary effects of a callee into the caller's frame.
+list, but this is (was?) not checked and enforced. Some efforts are
+made when translating the summary effects of a callee into the
+caller's frame to avoid this problem.
 
 \subsection{Nature of an Effect}
 \label{subsection-action}
@@ -2028,11 +1968,19 @@ conditions \cite{Bern66} and in other program transformation conditions:
 read and write. \verb/IN/ regions are represented by \verb/read/ effects
 and \verb/OUT/ regions by \verb/write/ effects.
 
-\begin{comment}
-Deux types d'effets sont utilisés dans les conditions de Bernstein
-et dans les conditions propres à chaque transformation de programme:
-la lecture d'une variable et son écriture.
-\end{comment}
+\subsection{Addressing Modes of an Effect}
+\label{subsection-access}
+\index{Access}
+
+\domain{Addressing = index:unit + pre:unit + post:unit}
+{}
+
+Three addressing modes are used. The default addressing mode is the index
+mode. Scalars are accessed like arrays of 0 dimension. The index mode
+is the only mode used for Fortran programs. The indirect pre-indexing
+mode is used to represent references such as \verb/*(p[i])/. The
+indirect popst-indexing mode is used to represent references such as
+\verb/(*p)[i]/.
 
 \subsection{Approximation of an Effect}
 \label{subsection-approximation}

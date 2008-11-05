@@ -10,7 +10,8 @@
 #define effect_approximation_tag(eff) \
 	approximation_tag(effect_approximation(eff))
 
-#define effect_scalar_p(eff) entity_scalar_p(effect_entity(eff))
+/* #define effect_scalar_p(eff) entity_scalar_p(effect_entity(eff)) */
+#define effect_scalar_p(eff) (type_depth(entity_type(effect_entity(eff)))==0)
 #define effect_read_p(eff) (action_tag(effect_action(eff))==is_action_read)
 #define effect_write_p(eff) (action_tag(effect_action(eff))==is_action_write)
 #define effect_may_p(eff) \

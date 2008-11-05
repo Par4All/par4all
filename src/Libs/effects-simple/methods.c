@@ -53,8 +53,13 @@ set_methods_for_proper_references()
 
     reference_to_effect_func = reference_to_reference_effect;
 
-    effects_union_op = effects_undefined_binary_operator;
-    effects_test_union_op = effects_undefined_binary_operator;
+    /* FI: no longer good with conditional expressions? Should we use
+       EffectsMustUnion or ReferenceMustUnion? Does not seem to have
+       an impact... */
+    //effects_union_op = effects_undefined_binary_operator;
+    //effects_test_union_op = effects_undefined_binary_operator;
+    effects_union_op = EffectsMustUnion;
+    effects_test_union_op = EffectsMayUnion;
     effects_intersection_op = effects_undefined_binary_operator;
     effects_sup_difference_op = effects_undefined_binary_operator;
     effects_inf_difference_op = effects_undefined_binary_operator;
@@ -173,8 +178,13 @@ set_methods_for_proper_simple_effects()
     reference_to_effect_func = reference_to_simple_effect;
 
     effect_union_op = effect_must_union;
-    effects_union_op = effects_undefined_binary_operator;
-    effects_test_union_op = effects_undefined_binary_operator;
+
+    /* FIL Changed because of C conditional operator. */
+    // effects_union_op = effects_undefined_binary_operator;
+    //effects_test_union_op = effects_undefined_binary_operator;
+    effects_union_op = EffectsMustUnion;
+    effects_test_union_op = EffectsMayUnion;
+
     effects_intersection_op = effects_undefined_binary_operator;
     effects_sup_difference_op = effects_undefined_binary_operator;
     effects_inf_difference_op = effects_undefined_binary_operator;
@@ -289,7 +299,7 @@ set_methods_for_simple_effects()
     set_methods_for_rw_effects_prettyprint(string_undefined);
 }
 
-void set_methods_for_inout_effects(string module_name)
+void set_methods_for_inout_effects(string module_name __attribute__ ((unused)))
 {
   set_methods_for_simple_effects();
 
@@ -319,19 +329,19 @@ void reset_methods_for_inout_effects()
   */
 }
 
-void set_methods_for_rw_effects_prettyprint(string module_name)
+void set_methods_for_rw_effects_prettyprint(string module_name __attribute__ ((unused)))
 {
     effects_prettyprint_func = print_effects;
     effects_to_text_func = simple_rw_effects_to_text;
 }
 
-void set_methods_for_inout_effects_prettyprint(string module_name)
+void set_methods_for_inout_effects_prettyprint(string module_name __attribute__ ((unused)))
 {
     effects_prettyprint_func = print_effects;
     effects_to_text_func = simple_inout_effects_to_text;
 }
 
-void reset_methods_for_effects_prettyprint(string module_name)
+void reset_methods_for_effects_prettyprint(string module_name __attribute__ ((unused)))
 {
     effects_prettyprint_func = (generic_prettyprint_function) abort;
     effects_to_text_func = (generic_text_function) abort;

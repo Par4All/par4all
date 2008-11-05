@@ -42,6 +42,7 @@
 /********************************************************* LOCAL FUNCTIONS */
 
 static list no_write_effects(entity e,list args);
+static list address_of_effects(entity e,list args);
 static list affect_effects(entity e,list args);
 static list update_effects(entity e,list args);
 static list unique_update_effects(entity e,list args);
@@ -389,7 +390,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {POST_DECREMENT_OPERATOR_NAME,           unique_update_effects},
   {PRE_INCREMENT_OPERATOR_NAME,            unique_update_effects},
   {PRE_DECREMENT_OPERATOR_NAME,            unique_update_effects},
-  {ADDRESS_OF_OPERATOR_NAME,               no_write_effects},
+  {ADDRESS_OF_OPERATOR_NAME,               address_of_effects},
   {DEREFERENCING_OPERATOR_NAME,            no_write_effects},
   {UNARY_PLUS_OPERATOR_NAME,               no_write_effects},
   // {"-unary",                            no_write_effects},UNARY_MINUS_OPERATOR already exist (FORTRAN)
@@ -821,6 +822,24 @@ no_write_effects(entity e __attribute__ ((__unused__)),list args)
     debug(5, "no_write_effects", "begin\n");
     lr = generic_proper_effects_of_expressions(args);
     debug(5, "no_write_effects", "end\n");
+    return(lr);
+}
+
+static list
+address_of_effects(entity f __attribute__ ((__unused__)),list args)
+{
+    list lr;
+    expression e = EXPRESSION(CAR(args));
+    syntax s = expression_syntax(e);
+    reference r = syntax_reference(s);
+    list i = reference_indices(r);
+
+    pips_debug(5, "begin\n");
+    pips_assert("address of has only one argument", gen_length(args)==1);
+    pips_assert("address of has only one argument and it is a reference",
+		syntax_reference_p(s));
+    lr = generic_proper_effects_of_expressions(i);
+    pips_debug(5, "end\n");
     return(lr);
 }
 

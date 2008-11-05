@@ -898,7 +898,7 @@ region_intersection(region reg1, region reg2)
  * modifies : nothing.
  * comment  : We assume that both regions concern the same entity.
  */
-list region_entities_intersection(region reg1, region reg2)
+list region_entities_intersection(region reg1, region reg2 __attribute__ ((unused)))
 {
     return(CONS(EFFECT, region_dup(reg1), NIL));
 }
@@ -1197,7 +1197,8 @@ static Psysteme disjunction_to_region_sc(Pdisjunct disjonction, boolean *p_exact
  * comment  : app is the tag if the disjunction is exact;
  */
 static list disjunction_to_list_of_regions(Pdisjunct disjonction, region reg,
-					  tag app, boolean super_or_sub) 
+					   tag app,
+					   boolean super_or_sub __attribute__ ((unused))) 
 {
     Psysteme ps;
     region reg_ps;
@@ -1302,91 +1303,107 @@ static list list_of_regions_generic_binary_op(
     list (*r1_unary_op)(effect),
     list (*r2_unary_op)(effect))
 {
-    list l_res = NIL;
+  list l_res = NIL;
+  list cr1 = list_undefined;
 
-    debug_on("REGIONS_OPERATORS_DEBUG_LEVEL");
+  debug_on("REGIONS_OPERATORS_DEBUG_LEVEL");
 
-    debug_regions_consistency(l1);
-    debug_regions_consistency(l2);
-
-    ifdebug(1)
-    {
-	pips_debug(1, "Initial regions : \n");
-	fprintf(stderr,"\t l1 :\n");
-	print_regions(l1);
-	fprintf(stderr,"\t l2 :\n");
-	print_regions(l2);
+  debug_regions_consistency(l1);
+  ifdebug(1) {
+    if(effects_reference_sharing_p(l1, FALSE)) {
+      pips_internal_error("A list of regions share some references");
     }
+  }
+  debug_regions_consistency(l2);
+
+  ifdebug(1) {
+    pips_debug(1, "Initial regions : \n");
+    fprintf(stderr,"\t l1 :\n");
+    print_regions(l1);
+    ifdebug(8) {
+      fprintf(stderr, "Dump of initial region l1 : \n");
+      dump_effects(l1);
+    }
+    fprintf(stderr,"\t l2 :\n");
+    print_regions(l2);
+    ifdebug(8) {
+      fprintf(stderr, "Dump of initial region l2 : \n");
+      dump_effects(l2);
+    }
+  }
     
-    /* we first deal with the regions of l1 : those that are combinable with 
-     * the regions of l2, and the others, which we call the remnants of l1 */
-    MAP(EFFECT, r1,
-     {
-	 list lr2 = l2;
-	 list prec_lr2;
-	 boolean combinable = FALSE;
-	 
-	 prec_lr2 = NIL;
-	 while(!combinable && !ENDP(lr2))
-	 {
-	     effect r2 = EFFECT(CAR(lr2));
+  /* we first deal with the regions of l1 : those that are combinable with 
+   * the regions of l2, and the others, which we call the remnants of l1 */
+  for(cr1=l1; !ENDP(cr1); POP(cr1)) {
+    effect r1 = EFFECT(CAR(cr1));
+    list lr2 = l2;
+    list prec_lr2;
+    boolean combinable = FALSE;
+
+    ifdebug(8) {
+      fprintf(stderr, "Dump r1 when entering the loop body\n");
+      dump_effect(r1);
+    }
+
+    prec_lr2 = NIL;
+    while(!combinable && !ENDP(lr2)) {
+      effect r2 = EFFECT(CAR(lr2));
 	     
-	     if ( (*r1_r2_combinable_p)(r1,r2) )
-	     {
-		 combinable = TRUE;
-		 l_res = gen_nconc(l_res, (*r1_r2_binary_op)(r1,r2));
-		 /* gen_remove(&l2, EFFECT(CAR(lr2))); */
-		 if (prec_lr2 != NIL)
-		     CDR(prec_lr2) = CDR(lr2);		     
-		 else
-		     l2 = CDR(lr2);
+      if ( (*r1_r2_combinable_p)(r1,r2) ) {
+	combinable = TRUE;
+	l_res = gen_nconc(l_res, (*r1_r2_binary_op)(r1,r2));
+	/* gen_remove(&l2, EFFECT(CAR(lr2))); */
+	if (prec_lr2 != NIL)
+	  CDR(prec_lr2) = CDR(lr2);		     
+	else
+	  l2 = CDR(lr2);
 
-		 free(lr2);
-		 lr2 = NIL;
-		 /* */
-		 region_free(r1); 
-		 region_free(r2);
-	     }
-	     else
-	     {
-		 prec_lr2 = lr2;
-		 lr2 = CDR(lr2);
-	     }
-	 }
-	 if(!combinable)
-	 {
-	     /* r1 belongs to the remnants of l1 : it is combinable 
-              * with no regions of l2 */
-	     if ( (*r1_r2_combinable_p)(r1,effect_undefined) ) 
-		 l_res = gen_nconc(l_res, (*r1_unary_op)(r1));
-	 }
-     },
-	l1);
-    
+	free(lr2);
+	lr2 = NIL;
+	region_free(r2);
+	/* This assumes no sharing between effects in lr1 at the reference level */
+	ifdebug(8) {
+	  fprintf(stderr, "Dump r1 just before the free:\n");
+	  dump_effect(r1);
+	}
+	region_free(r1);
+      }
+      else {
+	prec_lr2 = lr2;
+	lr2 = CDR(lr2);
+      }
+    }
+    if(!combinable) {
+      /* r1 belongs to the remnants of l1 : it is combinable 
+       * with no regions of l2 */
+      if ( (*r1_r2_combinable_p)(r1,effect_undefined) ) 
+	l_res = gen_nconc(l_res, (*r1_unary_op)(r1));
+    }
+  }
 
-    /* we must then deal with the remnants of l2 */
-    MAP(EFFECT, r2,
-    {  
+  /* we must then deal with the remnants of l2 */
+  MAP(EFFECT, r2,
+      {  
 	if ( (*r1_r2_combinable_p)(effect_undefined,r2) ) 
-	    l_res = gen_nconc(l_res, (*r2_unary_op)(r2));
-    },
-	l2);
+	  l_res = gen_nconc(l_res, (*r2_unary_op)(r2));
+      },
+      l2);
 
-    debug_regions_consistency(l_res);
+  debug_regions_consistency(l_res);
         
-    ifdebug(1)
+  ifdebug(1)
     {
-	pips_debug(1, "final regions : \n");
-	print_regions(l_res);
+      pips_debug(1, "final regions : \n");
+      print_regions(l_res);
     }
 
-    /* no memory leaks: l1 and l2 won't be used anymore */
-    gen_free_list(l1);
-    gen_free_list(l2);
+  /* no memory leaks: l1 and l2 won't be used anymore */
+  gen_free_list(l1);
+  gen_free_list(l2);
     
-    debug_off();
+  debug_off();
     
-    return l_res;
+  return l_res;
 }
 
 /*************************************** PROPER REGIONS TO SUMMARY REGIONS */

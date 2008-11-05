@@ -157,10 +157,21 @@ simple_effects_to_text(
     string ifread, 
     string ifwrite)
 {
-    text sefs_text = make_text(NIL), rt, wt, Rt, Wt;
+  /* FI: with twelve categories instead of four, it might be better to
+     use an array of categories... */
+    text sefs_text = make_text(NIL),
+      rt, wt, Rt, Wt,
+      rtpre, wtpre, Rtpre, Wtpre,
+      rtpost, wtpost, Rtpost, Wtpost;
     char r[MAX_LINE_LENGTH], w[MAX_LINE_LENGTH], 
 	R[MAX_LINE_LENGTH],  W[MAX_LINE_LENGTH];
     bool rb = FALSE, wb = FALSE, Rb = FALSE, Wb = FALSE;
+    char rpre[MAX_LINE_LENGTH], wpre[MAX_LINE_LENGTH], 
+	Rpre[MAX_LINE_LENGTH],  Wpre[MAX_LINE_LENGTH];
+    bool rbpre = FALSE, wbpre = FALSE, Rbpre = FALSE, Wbpre = FALSE;
+    char rpost[MAX_LINE_LENGTH], wpost[MAX_LINE_LENGTH], 
+	Rpost[MAX_LINE_LENGTH],  Wpost[MAX_LINE_LENGTH];
+    bool rbpost = FALSE, wbpost = FALSE, Rbpost = FALSE, Wbpost = FALSE;
     list ce;
     
     if (sefs_list == (list) HASH_UNDEFINED_VALUE ||
@@ -178,12 +189,30 @@ simple_effects_to_text(
     w[0] = '\0'; strcat(w, concatenate(PIPS_COMMENT_SENTINEL, may_be, ifwrite, may_end, NULL));
     W[0] = '\0'; strcat(W, concatenate(PIPS_COMMENT_SENTINEL, must_be, ifwrite, must_end, NULL));
 
+    rpre[0] = '\0'; strcat(rpre, concatenate(PIPS_COMMENT_SENTINEL, may_be, ifread, " - pre", may_end, NULL));
+    Rpre[0] = '\0'; strcat(Rpre, concatenate(PIPS_COMMENT_SENTINEL, must_be, ifread, " - pre", must_end, NULL));
+    wpre[0] = '\0'; strcat(wpre, concatenate(PIPS_COMMENT_SENTINEL, may_be, ifwrite, " - pre", may_end, NULL));
+    Wpre[0] = '\0'; strcat(Wpre, concatenate(PIPS_COMMENT_SENTINEL, must_be, ifwrite, " - pre", must_end, NULL));
+
+    rpost[0] = '\0'; strcat(rpost, concatenate(PIPS_COMMENT_SENTINEL, may_be, ifread, " - post", may_end, NULL));
+    Rpost[0] = '\0'; strcat(Rpost, concatenate(PIPS_COMMENT_SENTINEL, must_be, ifread, " - post", must_end, NULL));
+    wpost[0] = '\0'; strcat(wpost, concatenate(PIPS_COMMENT_SENTINEL, may_be, ifwrite, " - post", may_end, NULL));
+    Wpost[0] = '\0'; strcat(Wpost, concatenate(PIPS_COMMENT_SENTINEL, must_be, ifwrite, " - post", must_end, NULL));
+
     /* These four "texts" are used to build all the text of prettyprint
        for a given type of effect. Each sentence contains one line. */
-    rt = make_text(NIL);
-    wt = make_text(NIL);
-    Rt = make_text(NIL);
-    Wt = make_text(NIL);
+    rt = make_text(NIL); /* Read May Direct */
+    wt = make_text(NIL); /* Write May Direct */
+    Rt = make_text(NIL); /* Read Must Direct */
+    Wt = make_text(NIL); /* Write Must Direct */
+    rtpre = make_text(NIL); /* Read May Pre-indexed */
+    wtpre = make_text(NIL); /* Write May Pre-indexed */
+    Rtpre = make_text(NIL); /* Read Must Pre-indexed */
+    Wtpre = make_text(NIL); /* Write Must Pre-indexed */
+    rtpost = make_text(NIL); /* Read May Post-indexed */
+    wtpost = make_text(NIL); /* Write May Post-indexed */
+    Rtpost = make_text(NIL); /* Read Must Post-indexed */
+    Wtpost = make_text(NIL); /* Write Must Post-indexed */
 
     /* We sort the list of effects in lexicographic order */
      if (get_bool_property("PRETTYPRINT_WITH_COMMON_NAMES")) 
@@ -197,6 +226,7 @@ simple_effects_to_text(
 	effect eff = EFFECT(CAR(ce));
 	reference ref = effect_any_reference(eff);
 	action ac = effect_action(eff);
+	addressing ad = effect_addressing(eff);
 	approximation ap = effect_approximation(eff);
 	list /* of string */ ls = effect_words_reference(ref);
 	string t;
@@ -213,6 +243,7 @@ simple_effects_to_text(
 	   of prettyprint. First, we select the type of effect : R-MAY, W-MAY,
 	   R-MUST, W-MUST. Then, if this addition results in a line too long,
            we save the current line, and begin a new one. */
+	if(addressing_index_p(ad)) {
 	if (action_read_p(ac) && approximation_may_p(ap))
 	    update_an_effect_type(rt, r, t), rb = TRUE;
 	else if (!action_read_p(ac) && approximation_may_p(ap))
@@ -223,6 +254,33 @@ simple_effects_to_text(
 	    update_an_effect_type(Wt, W, t), Wb = TRUE;
 	else
 	    pips_internal_error("unrecognized effect");
+	}
+	else if(addressing_pre_p(ad)) {
+	if (action_read_p(ac) && approximation_may_p(ap))
+	    update_an_effect_type(rtpre, r, t), rbpre = TRUE;
+	else if (!action_read_p(ac) && approximation_may_p(ap))
+	    update_an_effect_type(wtpre, w, t), wbpre = TRUE;
+	else if (action_read_p(ac) && !approximation_may_p(ap))
+	    update_an_effect_type(Rtpre, R, t), Rbpre = TRUE;
+	else if (!action_read_p(ac) && !approximation_may_p(ap))
+	    update_an_effect_type(Wtpre, W, t), Wbpre = TRUE;
+	else
+	    pips_internal_error("unrecognized effect");
+	}
+	else if(addressing_post_p(ad)) {
+	if (action_read_p(ac) && approximation_may_p(ap))
+	    update_an_effect_type(rtpost, r, t), rbpost = TRUE;
+	else if (!action_read_p(ac) && approximation_may_p(ap))
+	    update_an_effect_type(wtpost, w, t), wbpost = TRUE;
+	else if (action_read_p(ac) && !approximation_may_p(ap))
+	    update_an_effect_type(Rtpost, R, t), Rbpost = TRUE;
+	else if (!action_read_p(ac) && !approximation_may_p(ap))
+	    update_an_effect_type(Wtpost, W, t), Wbpost = TRUE;
+	else
+	    pips_internal_error("unrecognized effect\n");
+	}
+	else
+	    pips_internal_error("unrecognized addressing mode\n");
 
 	free(t);
     }
@@ -231,11 +289,31 @@ simple_effects_to_text(
     close_current_line(w, wt, CONTINUATION);
     close_current_line(R, Rt, CONTINUATION);
     close_current_line(W, Wt, CONTINUATION);
+    
+    close_current_line(rpre, rtpre, CONTINUATION);
+    close_current_line(wpre, wtpre, CONTINUATION);
+    close_current_line(Rpre, Rtpre, CONTINUATION);
+    close_current_line(Wpre, Wtpre, CONTINUATION);
+    
+    close_current_line(rpost, rtpost, CONTINUATION);
+    close_current_line(wpost, wtpost, CONTINUATION);
+    close_current_line(Rpost, Rtpost, CONTINUATION);
+    close_current_line(Wpost, Wtpost, CONTINUATION);
 
     if (rb) { MERGE_TEXTS(sefs_text, rt); } else free_text(rt);
     if (wb) { MERGE_TEXTS(sefs_text, wt); } else free_text(wt);
     if (Rb) { MERGE_TEXTS(sefs_text, Rt); } else free_text(Rt);
     if (Wb) { MERGE_TEXTS(sefs_text, Wt); } else free_text(Wt);
+
+    if (rbpre) { MERGE_TEXTS(sefs_text, rtpre); } else free_text(rtpre);
+    if (wbpre) { MERGE_TEXTS(sefs_text, wtpre); } else free_text(wtpre);
+    if (Rbpre) { MERGE_TEXTS(sefs_text, Rtpre); } else free_text(Rtpre);
+    if (Wbpre) { MERGE_TEXTS(sefs_text, Wtpre); } else free_text(Wtpre);
+
+    if (rbpost) { MERGE_TEXTS(sefs_text, rtpost); } else free_text(rtpost);
+    if (wbpost) { MERGE_TEXTS(sefs_text, wtpost); } else free_text(wtpost);
+    if (Rbpost) { MERGE_TEXTS(sefs_text, Rtpost); } else free_text(Rtpost);
+    if (Wbpost) { MERGE_TEXTS(sefs_text, Wtpost); } else free_text(Wtpost);
 
     return sefs_text;
 }
@@ -265,11 +343,14 @@ effect obj;
     list pc = NIL;
     reference r = effect_any_reference(obj);
     action ac = effect_action(obj);
+    addressing ad = effect_addressing(obj);
     approximation ap = effect_approximation(obj);
 
     pc = CHAIN_SWORD(pc,"<");
     pc = gen_nconc(pc, effect_words_reference(r));
     pc = CHAIN_SWORD(pc, action_read_p(ac) ? "-R" : "-W" );  
+    if(!addressing_index_p(ad))
+      pc = CHAIN_SWORD(pc, addressing_pre_p(ad)? "-PRE" : "-POST");
     pc = CHAIN_SWORD(pc, approximation_may_p(ap) ? "-MAY>" : "-MUST>" );
     return (pc);
 }
@@ -288,4 +369,12 @@ print_effects( list pc)
     }
     else 
 	fprintf(stderr, "\t<NONE>\n");
+}
+
+void print_effect(effect e)
+{
+  effect_consistent_p(e);
+  fprintf(stderr, "\t");
+  print_words(stderr, words_effect(e));
+  fprintf(stderr, "\n");
 }

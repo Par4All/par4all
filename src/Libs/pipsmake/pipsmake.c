@@ -792,7 +792,7 @@ bool rmake(string rname, string oname)
 			  up_to_date_resources, res);
 	}
 	else {
-	  pips_internal_error("resource %s(%s) just built not found!\n",
+	  pips_internal_error("resource %s[%s] just built not found!\n",
 			      rrrn, rron);
 	}
       }, 

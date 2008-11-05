@@ -144,7 +144,7 @@ generic_proper_effects_of_lhs(reference ref)
     pips_debug(3, "begin\n");
 
     if (! (*empty_context_test)(context))
-    {	
+    {
 	le = CONS(EFFECT, 
 		  (*reference_to_effect_func)(ref,
 					      make_action(is_action_write, UU)),
@@ -161,6 +161,305 @@ generic_proper_effects_of_lhs(reference ref)
     return(le);
 }
 
+static list generic_proper_effects_of_a_subscripted_lhs(reference ra, list inds, effect * pe)
+{
+  /* Simple pattern: I assume something like p[3] or
+     p[3][4][5]... where p is a pointer and not an array. */
+
+  list le = NIL;
+  effect me = effect_undefined; /* main effect */
+  /* generate a direct write on the variable although it is not an array */
+  entity p = reference_variable(ra);
+  list ie = NIL;
+  reference mr = reference_undefined;
+
+  le = generic_proper_effects_of_lhs(ra);
+
+  /* add the subscript effects */
+  MAP(EXPRESSION, ind, {
+      ie = gen_nconc(ie, generic_proper_effects_of_expression(ind));
+    }, inds);
+  le = gen_nconc(le, ie);
+
+  /* add the subscript to the effect or to the region in a generic way... */
+  mr = make_reference(p, gen_full_copy_list(inds));
+  me = make_effect(make_cell_reference(mr),
+		   make_action_write(),
+		   make_addressing_index(),
+		   make_approximation_must(),
+		   make_descriptor_none()); /* NOT GENERIC */
+  pips_user_warning("Subscript add not fully implemented yet\n");
+  *pe = me;
+
+  ifdebug(8) {
+    extern void print_effect(effect);
+    pips_debug(8, "End with main effect: ");
+    print_effect(me);
+  }
+
+  return le;
+}
+
+static list generic_proper_effects_of_a_point_to_lhs(reference r1, expression e2, effect * pe)
+{
+  /* The pattern is r1->e2, which is equivalent to (*e1).e2 and mapped
+     onto (*e1[inds1])[rank(e2)]. This is too complex as you would
+     need pre and post-indexing. We take post-indexing in account
+     only: We deal only with the pattern e1==p where p is not
+     subscripted */
+  list le = NIL;
+  list ind1 = reference_indices(r1);
+  entity p = reference_variable(r1);
+
+  if(ENDP(ind1)) {
+    /* No indices for */
+    /* An indirect write effect can be generated */
+    /* If there were indices, the semantics will be p[i]->a, (*p[i])[a]  */
+    reference mr = reference_undefined;
+    effect me = effect_undefined;
+    syntax s2 = expression_syntax(e2);
+    entity f = reference_variable(syntax_reference(s2));
+    int rank = -1;
+
+    pips_assert("e2 is a reference", syntax_reference_p(s2));
+
+    /* There are no subscript effects for r1 */
+    /* There are not effect for e2 */
+
+    /* set the main write effect to indirect post-index */
+    rank =  entity_field_rank(f);
+    mr = make_reference(p,CONS(EXPRESSION, int_to_expression(rank), NIL)); /* NOT GENERIC */
+    me = make_effect(make_cell_reference(mr),
+		     make_action_write(),
+		     make_addressing_post(),
+		     make_approximation_must(),
+		     make_descriptor_none()); /* NOT GENERIC */
+    *pe = me;
+  }
+  else {
+    *pe = effect_undefined;
+  }
+
+  return le;
+}
+
+/* This function is not used */
+static list generic_proper_effects_of_a_dereferencing_lhs(expression e1)
+{
+  /* Pattern: *e */
+  list le = NIL;
+  syntax s1 = expression_syntax(e1);
+
+  if(syntax_reference_p(s1)) {
+    /* An indirect write effect can be generated */
+    /* If there are indices, the semantics will be *(p[i]) and not (*p)[i] */
+    reference r1 = syntax_reference(s1);
+    list lr = generic_proper_effects_of_lhs(r1);
+
+    /* set the main write effect to indirect: assume *(p[i++]) or *p++ */
+    le = lr;
+    le = gen_nconc(le, generic_proper_effects_of_expression(e1));
+  }
+  else {
+    /* let's give up with complex address computations: generate a write effect to anywhere */
+    pips_user_warning("A write effect to anywhere should be generated\n");
+    ;
+    /* And add other effects.. */
+    le = gen_nconc(le, generic_proper_effects_of_expression(e1));
+  }
+
+  return le;
+}
+
+/* Return a pointer to a new effect for s.e2 */
+static list generic_proper_effects_of_a_field_lhs(reference r, expression e2, effect * pe)
+{
+  /* Simple basic pattern handled: s.f */
+  /* Reference to a field */
+  syntax s2 = expression_syntax(e2);
+  entity f = entity_undefined; /* field */
+  int rank = -1; /* rank of the field */
+  effect me = effect_undefined; /* main effect */
+  reference mr = reference_undefined;
+  list le = NIL;
+  list indices = reference_indices(r);
+
+  pips_assert("The expression is a reference to a structure field",
+	      syntax_reference_p(s2));
+
+  f = reference_variable(syntax_reference(s2));
+  rank = entity_field_rank(f);
+
+  /* make a copy of the reference so as not to touch the source
+     code via a persistant reference, preference */
+  mr = copy_reference(r);
+  reference_consistent_p(mr);
+  reference_indices(mr) = gen_nconc(reference_indices(mr),
+				    CONS(EXPRESSION, int_to_expression(rank), NIL));
+  me = make_effect(make_cell_reference(mr),
+		   make_action_write(),
+		   make_addressing_index(),
+		   make_approximation_must(),
+		   make_descriptor_none()); /* This is not generic */
+  effect_consistent_p(me);
+
+  ifdebug(8) {
+    extern void print_effect(effect);
+    pips_debug(8, "Effects for a structure field \"\%s\" of rank %d: ",
+	       entity_user_name(f), rank);
+    print_effect(me);
+    pips_debug(8, "\n");
+  }
+
+  /* Take care of effects in the reference indices */
+  MAP(EXPRESSION, exp, {
+      le = gen_nconc(le, generic_proper_effects_of_expression(exp));
+    }, indices);
+
+  *pe = me;
+  return le;
+}
+
+/* Go down along the first argument till you find a reference or a
+   dereferencing and build the effect e by side effects as well as the
+   auxiliary effect list on the way back up*/
+list generic_proper_effects_of_call_in_lhs(entity op, list args, effect * pe)
+{
+  list le = NIL;
+
+  if(ENTITY_FIELD_P(op)) {
+    expression e1 = EXPRESSION(CAR(args));
+    syntax s1 = expression_syntax(e1);
+    expression e2 = EXPRESSION(CAR(CDR(args)));
+
+    if(syntax_reference_p(s1)) {
+      reference r1 = syntax_reference(s1);
+      le = generic_proper_effects_of_a_field_lhs(r1, e2, pe);
+    }
+    else if(syntax_call_p(s1)) {
+      call c1 = syntax_call(s1);
+      entity op1 = call_function(c1);
+      list args1 = call_arguments(c1);
+
+      /* We must go down recursively first */
+      le = generic_proper_effects_of_call_in_lhs(op1, args1, pe);
+
+      if(!effect_undefined_p(*pe)) {
+	/* update pe */
+	syntax s2 = expression_syntax(e2);
+	reference r2 = syntax_reference(s2);
+	entity f = reference_variable(r2);
+	int rank = entity_field_rank(f);
+	reference mr = effect_any_reference(*pe);
+
+	pips_assert("e2 is a reference", syntax_reference_p(s2));
+
+	/* THIS IS NOT GENERIC */
+	reference_indices(mr) = gen_nconc(reference_indices(mr),
+					  CONS(EXPRESSION, int_to_expression(rank), NIL));
+      }
+    }
+  }
+  else if(ENTITY_POINT_TO_P(op)) {
+    /* Any kind of complex expressions may appear here. But since the
+       field in e2 implies a postindexing, e1 has to be simple because
+       we cannot support both pre- and post-indexing */
+    expression e1 = EXPRESSION(CAR(args));
+    syntax s1 = expression_syntax(e1);
+    expression e2 = EXPRESSION(CAR(CDR(args)));
+
+    if(syntax_reference_p(s1)) {
+      reference r1 = syntax_reference(s1);
+      le = generic_proper_effects_of_a_point_to_lhs(r1, e2, pe);
+    }
+    else {
+      le = generic_proper_effects_of_expression(e1);
+      *pe = effect_undefined;
+    }
+  }
+  else if(ENTITY_DEREFERENCING_P(op)) {
+    /* Any kind of complex expressions may appear here */
+    expression e1 = EXPRESSION(CAR(args));
+    syntax s1 = expression_syntax(e1);
+
+    if(syntax_call_p(s1)) {
+      call c1 = syntax_call(s1);
+      entity op = call_function(c1);
+      list nargs = call_arguments(c1);
+
+      le = generic_proper_effects_of_call_in_lhs(op, nargs, pe);
+      //le = generic_proper_effects_of_expression(e1);
+      /* we have to modify pe if it is defined? No we do not know how
+	 to deal with expressions except *(p->in[i].b etc...) */
+      //*pe = effect_undefined;
+    }
+    else if(syntax_reference_p(s1)) {
+      reference mr = copy_reference(syntax_reference(s1));
+      effect me = make_effect(make_cell_reference(mr),
+			      make_action_write(),
+			      make_addressing_pre(),
+			      make_approximation_must(),
+			      make_descriptor_none());
+      list ind1 = reference_indices(syntax_reference(s1));
+      *pe = me;
+      
+      /* Take care of effects in the reference indices */
+      MAP(EXPRESSION, exp, {
+	  le = gen_nconc(le, generic_proper_effects_of_expression(exp));
+	}, ind1);
+      /* take care fo the pointer itself: it must be read */
+      le = gen_nconc(le, generic_proper_effects_of_reference(syntax_reference(s1)));
+    }
+    else {
+      pips_internal_error("Something wrong in RI or missing");
+    }
+
+    /* If pe is defined and of kind index/direct addressing mode, then we have a pre-indexation */
+    if(!effect_undefined_p(*pe)) {
+      addressing a = effect_addressing(*pe);
+
+      if(addressing_index(a)) {
+	effect_addressing(*pe) = make_addressing_pre();
+	free_addressing(a);
+      }
+    }
+    else {
+      free_effect(*pe);
+      *pe = effect_undefined;
+    }
+  }
+  else {
+    /* This may happen within a dereferencing argument to compute an address */
+    /* No hope (yet) to identify a main effect as in *(p+q-r) or *(b?p:q) */
+    *pe = effect_undefined;
+
+    if(ENTITY_CONDITIONAL_P(op)) {
+      expression cond = EXPRESSION(CAR(args));
+      expression et = EXPRESSION(CAR(CDR(args)));
+      expression ef = EXPRESSION(CAR(CDR(CDR(args))));
+
+      list lc = proper_effects_of_expression(cond);
+      list lt = proper_effects_of_expression(et);
+      list lf = proper_effects_of_expression(ef);
+
+      le = (*effects_test_union_op)(lt, lf, effects_same_action_p);
+      le = (*effects_union_op)(le, lc, effects_same_action_p);
+    }
+    else {
+      MAP(EXPRESSION, exp, {
+	  le = gen_nconc(le, proper_effects_of_expression(exp));
+	}, args);
+    }
+  }
+
+  ifdebug(8) {
+    pips_debug(8, "End with le=\n");
+    (*effects_prettyprint_func)(le);
+  }
+
+  return le;
+}
+
 list generic_proper_effects_of_any_lhs(expression lhs)
 {
   list le = NIL;
@@ -173,93 +472,27 @@ list generic_proper_effects_of_any_lhs(expression lhs)
     call c = syntax_call(s);
     entity op = call_function(c);
     list nargs = call_arguments(c);
+    /* simple effect */
+    effect e = make_effect(cell_undefined, action_undefined, addressing_undefined,
+			   approximation_undefined, descriptor_undefined);
+    effect ge = effect_undefined; /* generic effect */
 
-    if(ENTITY_FIELD_P(op)) {
-      /* Expression returning the address of a structure. */
-      expression e1 = EXPRESSION(CAR(nargs));
-      syntax s1 = expression_syntax(e1);
-      /* Reference to a field */
-      expression e2 = EXPRESSION(CAR(CDR(nargs)));
-      syntax s2 = expression_syntax(e2);
-      entity f = entity_undefined; /* field */
-      int r = -1; /* rank of the field */
-      effect me = effect_undefined; /* main effect, assumed to be first in le */
-      reference mr = reference_undefined;
-
-      pips_assert("The field operator has two arguments", gen_length(nargs)==2);
-      pips_assert("The second operator is a reference to a structure field",
-		  syntax_reference_p(s2));
-
-      le = gen_nconc(le, generic_proper_effects_of_any_lhs(e1));
-
-      /* This is useless as the second argument is a constant */
-      le = gen_nconc(le, generic_proper_effects_of_expression(e2));
-
-      pips_assert("the second argument of the field operator is a reference",
-		  syntax_reference_p(s2));
-      f = reference_variable(syntax_reference(s2));
-      r = entity_field_rank(f);
-      pips_assert("e1's effects contain at least one element", gen_length(le)>=1);
-      me = EFFECT(CAR(le));
-      /* make a copy of the reference so as not to touch the source
-	 code via a persistant reference, preference */
-      mr = copy_reference(effect_reference(me));
-      reference_consistent_p(mr);
-      reference_indices(mr) = gen_nconc(reference_indices(mr),
-					CONS(EXPRESSION, int_to_expression(r), NIL));
-      effect_cell(me) = make_cell_reference(mr);
-      effect_consistent_p(me);
-
-      ifdebug(8) {
-	pips_debug(8, "Effects for a structure field \"\%s\" of rank %d: ",
-		   entity_user_name(f), r);
-	print_effects(le);
-	pips_debug(8, "\n");
-      }
-    }
-    else if(ENTITY_POINT_TO_P(op)) {
-      /* Any kind of complex expressions may appear here */
-      expression e1 = EXPRESSION(CAR(nargs));
-      syntax s1 = expression_syntax(e1);
-
-      pips_assert("The point to operator has one argument", gen_length(nargs)==1);
-
-      if(syntax_reference_p(s1)) {
-	/* An indirect write effect can be generated */
-	/* If there are indices, the semantics will be p[i]->a  */
-	reference r1 = syntax_reference(s1);
-	list lr = generic_proper_effects_of_lhs(r1);
-
-	/* set the main write effect to indirect: assume *(p[i++]) or *p++ */
-	le = lr;
-      }
-    }
-    else if(ENTITY_DEREFERENCING_P(op)) {
-      /* Any kind of complex expressions may appear here */
-      expression e1 = EXPRESSION(CAR(nargs));
-      syntax s1 = expression_syntax(e1);
-
-      pips_assert("The dereferencing operator has one argument", gen_length(nargs)==1);
-
-      if(syntax_reference_p(s1)) {
-	/* An indirect write effect can be generated */
-	/* If there are indices, the semantics will be *(p[i]) and not (*p)[i] */
-	reference r1 = syntax_reference(s1);
-	list lr = generic_proper_effects_of_lhs(r1);
-
-	/* set the main write effect to indirect: assume *(p[i++]) or *p++ */
-	le = lr;
-	le = gen_nconc(le, generic_proper_effects_of_expression(e1));
-      }
-      else {
-	/* let's give up with complex address computations: generate a write effect to anywhere */
-	;
-	/* And add other effects.. */
-	le = gen_nconc(le, generic_proper_effects_of_expression(e1));
-      }
+    le = generic_proper_effects_of_call_in_lhs(op, nargs, &e);
+    if(!effect_undefined_p(e)) {
+      reference r = effect_any_reference(e);
+      /* Generate a proper decriptor in a generic way */
+      ge = (*reference_to_effect_func)(r, make_action_write());
+      effect_addressing(ge) = copy_addressing(effect_addressing(e));
+      effect_approximation(ge) = copy_approximation(effect_approximation(e));
     }
     else {
-      pips_user_error("use of function call as lhs is not allowed\n");
+      /* add an anywhere effect */
+      ge = anywhere_effect(make_action_write());
+    }
+    le = CONS(EFFECT, ge, le);
+    ifdebug(8) {
+      pips_debug(8, "Effect for a call:\n");
+      (*effects_prettyprint_func)(le);
     }
   }
   else if(syntax_cast_p(s)) {
@@ -269,27 +502,26 @@ list generic_proper_effects_of_any_lhs(expression lhs)
     pips_user_error("sizeof cannot be a lhs\n");
   }
   else if(syntax_subscript_p(s)) {
-    /* I assume something like p[3] or p[3][4][5]... where p is a pointer and not an array */
     subscript sub = syntax_subscript(s);
     expression a = subscript_array(sub); /* address expression */
-    syntax sa = expression_syntax(a);
     list inds = subscript_indices(sub);
+    syntax sa = expression_syntax(a);
 
     if(syntax_reference_p(sa)) {
-      /* generate an indirect write on the variable */
       reference ra = syntax_reference(sa);
-      entity p = reference_variable(ra);
-      list ie = NIL;
+      effect e = make_effect(cell_undefined, action_undefined, addressing_undefined,
+			     approximation_undefined, descriptor_undefined);
 
-      /* generate an indirect write on p */
-      le = generic_proper_effects_of_lhs(ra);
-      /* The reference to update should be the first in the effect list le */
-
-      /* add the subscript effects */
-      MAP(EXPRESSION, ind, {
-	ie = gen_nconc(ie, generic_proper_effects_of_expression(ind));
-      }, inds);
-      le = gen_nconc(le, ie);
+      le = generic_proper_effects_of_a_subscripted_lhs(ra, inds, &e);
+      pips_user_warning("If defined, effect e should be added to le");
+      if(!effect_undefined_p(e)) {
+	le = gen_nconc(CONS(EFFECT, e, NIL), le);
+      }
+    }
+    else {
+      /* */
+      effect e = anywhere_effect(make_action_write());
+      le = gen_nconc(CONS(EFFECT, e, NIL), le);
     }
   }
   else if(syntax_application_p(s)) {
@@ -299,6 +531,12 @@ list generic_proper_effects_of_any_lhs(expression lhs)
   else
     pips_internal_error("lhs is not a reference and is not handled yet: syntax tag=%d\n",
 			syntax_tag(s));
+
+  ifdebug(8) {
+    pips_debug(8, "End with le=\n");
+    (*effects_prettyprint_func)(le);
+    fprintf(stderr, "\n");
+  }
 
   return le;
 }
