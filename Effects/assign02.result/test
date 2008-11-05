@@ -20,10 +20,10 @@ void assign02()
 {
    s_t s;
    int j;
-//               <must be written>: s[*]
+//               <may be written >: s[*]
 
    s = make_s(1, 2.);
-//               <must be written>: s[1]
+//               <may be written >: s[*]
    s.entier = 4;
 //               <must be written>: j
    /* invalid lvalue in assignment */

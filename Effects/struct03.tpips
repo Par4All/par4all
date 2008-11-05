@@ -40,6 +40,19 @@ echo
 activate PRINT_CODE_REGIONS
 display PRINTED_FILE[struct03]
 
+# Should be useless
+# apply PRIVATIZE_MODULE
+
+echo
+echo Printed files after parallelization
+echo
+
+# Should be useless
+# activate COARSE_GRAIN_PARALLELIZATION
+
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE[struct03]
+
 close
 delete struct03
 quit

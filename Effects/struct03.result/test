@@ -35,14 +35,14 @@ int struct03()
    struct four x[10];
    int i = 0;
 //               <may be read    >: i
-//               <may be written >: x[*]
+//               <may be written >: x[*][*][*]
 //               <must be written>: i
 
    for(i = 0; i <= 9; i += 1) {
-//               <may be written >: x[*]
+//               <may be written >: x[*][*][*]
 //               <must be read   >: i
       x[i].un.first = 1;
-//               <may be written >: x[*]
+//               <may be written >: x[*][*][*]
 //               <must be read   >: i
       x[i].deux.second = 0;
    }
@@ -63,17 +63,35 @@ int struct03()
    struct four x[10];
    int i = 0;
 
-//  <x[PHI1][2][2]-W-MAY-{0<=PHI1, PHI1<=9}>
+//  <x[PHI1][PHI2][PHI3]-W-MAY-{PHI2==PHI3, 0<=PHI1, PHI1<=9, 1<=PHI2,
+//    PHI2<=2}>
 
 
    for(i = 0; i <= 9; i += 1) {
 
-//  <x[PHI1][1][1]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
+//  <x[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, PHI2==1, PHI3==1, 0<=i,
+//    i<=9}>
 
       x[i].un.first = 1;
 
-//  <x[PHI1][2][2]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
+//  <x[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, PHI2==2, PHI3==2, 0<=i,
+//    i<=9}>
 
       x[i].deux.second = 0;
    }
+}
+
+Printed files after parallelization
+
+int struct03()
+{
+   struct four x[10];
+   int i = 0;
+
+#pragma omp parallel for 
+   for(i = 0; i <= 9; i += 1)
+      x[i].un.first = 1;
+#pragma omp parallel for 
+   for(i = 0; i <= 9; i += 1)
+      x[i].deux.second = 0;
 }

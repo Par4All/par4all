@@ -11,5 +11,9 @@ int struct02()
       x[i].first = 1;
       x[i].second = 0;
     }
+    else {
+      x[i].first = 0;
+      x[i].second = 1;
+    }
   }
 }

@@ -1,9 +1,9 @@
-delete struct02
+delete array02
 
 setenv PIPS_CPP="cpp -C"
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create struct02 struct02.c
+create array02 array02.c
 
 activate C_PARSER
 
@@ -13,24 +13,24 @@ setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 
 echo
-echo Parsed printed file for "struct02"
+echo Parsed printed file for "array02"
 echo
 
-display PARSED_PRINTED_FILE[struct02]
+display PARSED_PRINTED_FILE[array02]
 
 echo
-echo Proper effetcs for "struct02"
+echo Proper effetcs for "array02"
 echo
 
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[struct02]
+display PRINTED_FILE[array02]
 
 echo
-echo Cumulated effetcs for "struct02"
+echo Cumulated effetcs for "array02"
 echo
 
 activate PRINT_CODE_CUMULATED_EFFECTS
-display PRINTED_FILE[struct02]
+display PRINTED_FILE[array02]
 
 # quit
 
@@ -44,14 +44,14 @@ setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 
 activate PRINT_CODE_TRANSFORMERS
-display PRINTED_FILE[struct02]
+display PRINTED_FILE[array02]
 
 echo
 echo Preconditions for "main"
 echo
 
 activate PRINT_CODE_PRECONDITIONS
-display PRINTED_FILE[struct02]
+display PRINTED_FILE[array02]
 # quit
 echo
 echo Printed files with regions
@@ -59,7 +59,7 @@ echo
 
 activate MUST_REGIONS
 activate PRINT_CODE_REGIONS
-display PRINTED_FILE[struct02]
+display PRINTED_FILE[array02]
 
 # Should be useless
 # apply PRIVATIZE_MODULE
@@ -71,8 +71,8 @@ echo
 activate COARSE_GRAIN_PARALLELIZATION
 
 activate PRINT_PARALLELIZEDOMP_CODE
-display PARALLELPRINTED_FILE[struct02]
+display PARALLELPRINTED_FILE[array02]
 
 close
-# delete struct02
+delete array02
 quit
