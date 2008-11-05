@@ -264,6 +264,7 @@ static void rw_effects_of_loop(loop l)
 
     /* effects on locals are unconditionnaly masked */
     l_body = effects_dup_without_variables(l_body, loop_locals(l));
+    l_body = effects_dup_without_variables(l_body, statement_declarations(b));
     
     /* COMPUTATION OF INVARIANT RW EFFECTS */
         
@@ -346,34 +347,56 @@ static void rw_effects_of_call(call c)
 
 static void rw_effects_of_test(test t)
 {
-    statement current_stat = effects_private_current_stmt_head();
-    list le, lt, lf, lc, lr;
+  statement current_stat = effects_private_current_stmt_head();
+  list le, lt, lf, lc, lr;
+  statement true_s = test_true(t);
+  statement false_s = test_false(t);
+  extern reference_to_convex_region();
 
-    pips_debug(2, "begin\n");
+  pips_debug(2, "begin\n");
 
-      /* effects of the true branch */
+  /* FI: when regions are computed the test condition should be
+     evaluated wrt the current precondition to see if it evaluates
+     to true or false. This would preserve must effects. 
+
+     dead_test_filter() could be used, but it returns an enum
+     defined in transformations-local.h */
+
+  if(reference_to_effect_func == reference_to_convex_region
+     && !statement_strongly_feasible_p(true_s)) {
+    /* the true branch is dead */
+    le = effects_dup(load_rw_effects_list(false_s));
+  }
+  else if(reference_to_effect_func == reference_to_convex_region
+	  && !statement_strongly_feasible_p(false_s)) {
+    /* the false branch is dead */
+    le = effects_dup(load_rw_effects_list(true_s));
+  }
+  else {
+    /* effects of the true branch */
     lt = effects_dup(load_rw_effects_list(test_true(t)));
-      /* effects of the false branch */
+    /* effects of the false branch */
     lf = effects_dup(load_rw_effects_list(test_false(t)));
-      /* effects of the combination of both */
+    /* effects of the combination of both */
     le = (*effects_test_union_op)(lt, lf, effects_same_action_p);
+  }
 
-      /* proper_effects of the condition */
-    lc = effects_dup(load_proper_rw_effects_list(current_stat));
-    if (contract_p)
-	lc = proper_to_summary_effects(lc);
-      /* effect of the test */
-    lr = (*effects_union_op)(le, lc, effects_same_action_p);
+  /* proper_effects of the condition */
+  lc = effects_dup(load_proper_rw_effects_list(current_stat));
+  if (contract_p)
+    lc = proper_to_summary_effects(lc);
+  /* effect of the test */
+  lr = (*effects_union_op)(le, lc, effects_same_action_p);
 
-    (*effects_descriptor_normalize_func)(lr);
+  (*effects_descriptor_normalize_func)(lr);
 
-    ifdebug(2){
-	pips_debug(2, "R/W effects: \n");
-	(*effects_prettyprint_func)(lr);
-    }
+  ifdebug(2){
+    pips_debug(2, "R/W effects: \n");
+    (*effects_prettyprint_func)(lr);
+  }
     
-    store_rw_effects_list(current_stat, lr);
-    pips_debug(2, "end\n");
+  store_rw_effects_list(current_stat, lr);
+  pips_debug(2, "end\n");
 }
 
 static list r_rw_effects_of_sequence(list l_inst)

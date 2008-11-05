@@ -494,8 +494,8 @@ transformer_add_call_condition_information_updown(
     newpre = transformer_add_condition_information_updown
       (pre, c1, context, !veracity, upwards);
   }
-  else if((ENTITY_TRUE_P(op) && !veracity) ||
-	  (ENTITY_FALSE_P(op) && veracity)) {
+  else if(((ENTITY_TRUE_P(op) || ENTITY_ONE_P(op)) && !veracity) ||
+	  ((ENTITY_FALSE_P(op) || ENTITY_ZERO_P(op)) && veracity)) {
     free_transformer(pre);
     newpre = transformer_empty();
   }
@@ -1412,10 +1412,10 @@ static transformer logical_constant_to_transformer(entity v,
   Pvecteur eq = vect_new((Variable) v, VALUE_ONE);
   Pcontrainte c;
 
-  if(ENTITY_TRUE_P(f)) {
+  if(ENTITY_TRUE_P(f) || ENTITY_ONE_P(f)) {
     vect_add_elem(&eq, TCST , VALUE_MONE);
   }
-  else if(ENTITY_FALSE_P(f)) {
+  else if(ENTITY_FALSE_P(f) || ENTITY_ZERO_P(f)) {
     ;
   }
   else {

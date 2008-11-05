@@ -480,8 +480,12 @@ list generic_proper_effects_of_any_lhs(expression lhs)
     le = generic_proper_effects_of_call_in_lhs(op, nargs, &e);
     if(!effect_undefined_p(e)) {
       reference r = effect_any_reference(e);
-      /* Generate a proper decriptor in a generic way */
+      transformer context = effects_private_current_context_head();
+
+     /* Generate a proper decriptor in a generic way */
       ge = (*reference_to_effect_func)(r, make_action_write());
+      /* FI: memory leak of a CONS */
+      (*effects_precondition_composition_op)(CONS(EFFECT, ge, NIL), context);
       effect_addressing(ge) = copy_addressing(effect_addressing(e));
       effect_approximation(ge) = copy_approximation(effect_approximation(e));
     }

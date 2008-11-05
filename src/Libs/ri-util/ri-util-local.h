@@ -254,6 +254,8 @@
 
 #define TRUE_OPERATOR_NAME              ".TRUE."
 #define FALSE_OPERATOR_NAME             ".FALSE."
+#define ONE_OPERATOR_NAME               "1"
+#define ZERO_OPERATOR_NAME              "0"
 
 #define GREATER_OR_EQUAL_OPERATOR_NAME  ".GE."
 #define C_GREATER_OR_EQUAL_OPERATOR_NAME        ">="
@@ -624,11 +626,11 @@
 
 /* macros */
 
-/* FI: entity_local_name() might be usfficient for the comparison */
+/* FI: entity_local_name() should be sufficient for these comparisons */
 #define entity_an_operator_p(e,name) \
-  (strcmp(global_name_to_user_name(entity_name(e)), name##_OPERATOR_NAME)==0)
+  (same_string_p(global_name_to_user_name(entity_name(e)), name##_OPERATOR_NAME))
 #define entity_a_function_p(e,name) \
-  (strcmp(global_name_to_user_name(entity_name(e)), name##_FUNCTION_NAME)==0)
+  (same_string_p(global_name_to_user_name(entity_name(e)), name##_FUNCTION_NAME))
 
 #define ENTITY_CONVERSION_P(e,name) \
   (strcmp(entity_local_name(e), name##_GENERIC_CONVERSION_NAME)==0)
@@ -702,6 +704,8 @@
 
 #define ENTITY_TRUE_P(e) entity_an_operator_p(e, TRUE)
 #define ENTITY_FALSE_P(e) entity_an_operator_p(e, FALSE)
+#define ENTITY_ONE_P(e) entity_an_operator_p(e, ONE)
+#define ENTITY_ZERO_P(e) entity_an_operator_p(e, ZERO)
 
 #define ENTITY_GREATER_OR_EQUAL_P(e) (entity_an_operator_p(e, GREATER_OR_EQUAL) || entity_an_operator_p(e, C_GREATER_OR_EQUAL))
 #define ENTITY_GREATER_THAN_P(e)  (entity_an_operator_p(e, GREATER_THAN) || entity_an_operator_p(e, C_GREATER_THAN))
