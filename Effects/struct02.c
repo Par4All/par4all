@@ -7,7 +7,9 @@ int struct02()
   int i = 0;
 
   for(i=0;i<10;i++) {
-    x[i].first = 1;
-    x[i].second = 0;
+    if(1) {
+      x[i].first = 1;
+      x[i].second = 0;
+    }
   }
 }

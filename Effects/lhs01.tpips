@@ -19,7 +19,14 @@ echo
 display PARSED_PRINTED_FILE[lhs01]
 
 echo
-echo Cumulated effetcs for "lhs01"
+echo Proper effects for "lhs01"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[lhs01]
+
+echo
+echo Cumulated effects for "lhs01"
 echo
 
 activate PRINT_CODE_CUMULATED_EFFECTS

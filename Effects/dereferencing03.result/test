@@ -1,0 +1,49 @@
+
+Parsed printed file for "dereferencing03"
+
+void dereferencing03()
+{
+   struct one {
+      int first;
+      int second;
+   };
+   struct one x;
+   struct one *p;
+
+   p = &x;
+   p->first = 1;
+}
+
+Proper effetcs for "dereferencing03"
+
+void dereferencing03()
+{
+   struct one {
+      int first;
+      int second;
+   };
+   struct one x;
+   struct one *p;
+//               <must be written>: p
+
+   p = &x;
+//               <must be written - post>:
+   p->first = 1;
+}
+
+Cumulated effetcs for "dereferencing03"
+
+void dereferencing03()
+{
+   struct one {
+      int first;
+      int second;
+   };
+   struct one x;
+   struct one *p;
+//               <must be written>: p
+
+   p = &x;
+//               <must be written - post>:
+   p->first = 1;
+}

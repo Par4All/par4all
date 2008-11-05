@@ -1,0 +1,44 @@
+
+Parsed printed file for "dereferencing01"
+
+void dereferencing01()
+{
+   double x = 1.;
+   double *p = &x;
+   double *q = 0;
+
+   q = p;
+   *p = 2.;
+}
+
+Proper effetcs for "dereferencing01"
+
+void dereferencing01()
+{
+   double x = 1.;
+   double *p = &x;
+   double *q = 0;
+//               <must be read   >: p
+//               <must be written>: q
+
+   q = p;
+//               <must be read   >: p
+//               <must be written - pre>:
+   *p = 2.;
+}
+
+Cumulated effetcs for "dereferencing01"
+
+void dereferencing01()
+{
+   double x = 1.;
+   double *p = &x;
+   double *q = 0;
+//               <must be read   >: p
+//               <must be written>: q
+
+   q = p;
+//               <must be read   >: p
+//               <must be written - pre>:
+   *p = 2.;
+}

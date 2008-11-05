@@ -34,6 +34,10 @@ display PRINTED_FILE[struct02]
 
 # quit
 
+echo
+echo Transformers for "main"
+echo
+
 activate TRANSFORMERS_INTER_FULL
 activate PRECONDITIONS_INTER_FULL
 activate PRINT_CODE_TRANSFORMERS

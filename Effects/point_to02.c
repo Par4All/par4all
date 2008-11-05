@@ -1,14 +1,10 @@
 void point_to02()
 {
-  double x = 1.;
-  double * p = &x;
-  double ** q = &p;
-  int i = 1;
+  struct s {
+    int a;
+    int b[10];
+  } c, *p;
 
-
-  **q = 2.;
-  **(q+(i=2)) = 3.;
-  x = **q;
-  q++;
-  *q++;
+  p->a = 1;
+  p->b[2] = 3;
 }

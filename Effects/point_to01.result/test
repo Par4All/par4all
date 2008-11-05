@@ -3,26 +3,42 @@ Parsed printed file for "point_to01"
 
 void point_to01()
 {
-   double x = 1.;
-   double *p = &x;
-   double *q = 0;
+   struct s {
+      int a;
+      int b;
+   };
+   struct s c;
+   struct s *p;
 
-   q = p;
-   *p = 2.;
+   p->a = 1;
+}
+
+Proper effetcs for "point_to01"
+
+void point_to01()
+{
+   struct s {
+      int a;
+      int b;
+   };
+   struct s c;
+   struct s *p;
+//               <must be written - post>:
+
+   p->a = 1;
 }
 
 Cumulated effetcs for "point_to01"
 
 void point_to01()
 {
-   double x = 1.;
-   double *p = &x;
-   double *q = 0;
-//               <must be read   >: p
-//               <must be written>: q
+   struct s {
+      int a;
+      int b;
+   };
+   struct s c;
+   struct s *p;
+//               <must be written - post>:
 
-   q = p;
-//               <must be read   >: p
-//               <must be written>: p
-   *p = 2.;
+   p->a = 1;
 }
