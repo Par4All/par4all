@@ -8,8 +8,30 @@ void assign02()
 
    s = make_s(1, 2.);
    s.entier = 4;
+   
    /* invalid lvalue in assignment */
    /* make_s(1, 2.).entier = 4; */
+   
+   /* But this is OK in rhs */
+   j = make_s(1, 2.).entier;
+}
+
+Proper effetcs for "assign02"
+
+void assign02()
+{
+   s_t s;
+   int j;
+//               <may be written >: s[*]
+
+   s = make_s(1, 2.);
+//               <may be written >: s[*]
+   s.entier = 4;
+//               <must be written>: j
+   
+   /* invalid lvalue in assignment */
+   /* make_s(1, 2.).entier = 4; */
+   
    /* But this is OK in rhs */
    j = make_s(1, 2.).entier;
 }
@@ -26,8 +48,10 @@ void assign02()
 //               <may be written >: s[*]
    s.entier = 4;
 //               <must be written>: j
+   
    /* invalid lvalue in assignment */
    /* make_s(1, 2.).entier = 4; */
+   
    /* But this is OK in rhs */
    j = make_s(1, 2.).entier;
 }

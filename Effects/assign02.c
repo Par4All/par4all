@@ -17,8 +17,10 @@ void assign02()
 
   s = make_s(1, 2.);
   s.entier = 4;
+
   /* invalid lvalue in assignment */
   /* make_s(1, 2.).entier = 4; */
+
   /* But this is OK in rhs */
   j = make_s(1, 2.).entier;
 }

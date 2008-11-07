@@ -57,8 +57,8 @@ void lhs01()
    //i>2?i=3:j=3;
    /* This is OK*/
    i = j = 2;
+//               <may be written >: i j
 //               <must be read   >: i
-//               <must be written>: i j
    (i>2?i = 3:j = 3);
 //               <must be written>: i j
 
@@ -108,8 +108,8 @@ void lhs01()
    //i>2?i=3:j=3;
    /* This is OK*/
    i = j = 2;
+//               <may be written >: i j
 //               <must be read   >: i
-//               <must be written>: i j
    (i>2?i = 3:j = 3);
 //               <must be written>: i j
 

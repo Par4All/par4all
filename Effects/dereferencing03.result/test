@@ -27,7 +27,8 @@ void dereferencing03()
 //               <must be written>: p
 
    p = &x;
-//               <must be written - post>:
+//               <must be read   >: p
+//               <must be written - post>: (*p)[1]
    p->first = 1;
 }
 
@@ -44,6 +45,7 @@ void dereferencing03()
 //               <must be written>: p
 
    p = &x;
-//               <must be written - post>:
+//               <must be read   >: p
+//               <must be written - post>: (*p)[1]
    p->first = 1;
 }

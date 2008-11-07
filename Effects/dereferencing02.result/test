@@ -24,8 +24,8 @@ void dereferencing02()
    double *p = &x;
    double **q = &p;
    int i = 1;
+//               <may be written >: TOP-LEVEL:*MEMORY*
 //               <must be read   >: q
-//               <must be written - pre>:
    
 
    **q = 2.;

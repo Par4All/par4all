@@ -3,47 +3,25 @@ Parsed printed file for "point_to03"
 
 void point_to03()
 {
-   struct one {
-      int first;
-      int second;
-   };
-   struct one x;
-   struct one *p;
+   typedef double a_t[10][20];
+   a_t a;
+   a_t *p;
 
-   p = &x;
-   p->first = 1;
+   p = &a;
+   ((*p)[2])[3] = 1.5;
 }
 
 Proper effetcs for "point_to03"
 
 void point_to03()
 {
-   struct one {
-      int first;
-      int second;
-   };
-   struct one x;
-   struct one *p;
+   typedef double a_t[10][20];
+   a_t a;
+   a_t *p;
 //               <must be written>: p
 
-   p = &x;
-//               <must be written - post>:
-   p->first = 1;
-}
-
-Cumulated effetcs for "point_to03"
-
-void point_to03()
-{
-   struct one {
-      int first;
-      int second;
-   };
-   struct one x;
-   struct one *p;
-//               <must be written>: p
-
-   p = &x;
-//               <must be written - post>:
-   p->first = 1;
+   p = &a;
+//               <must be read   >: p
+//               <must be written - post>: (*p)[2][3]
+   ((*p)[2])[3] = 1.5;
 }

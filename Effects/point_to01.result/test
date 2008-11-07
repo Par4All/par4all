@@ -6,11 +6,21 @@ void point_to01()
    struct s {
       int a;
       int b;
+      int c;
+      int d;
    };
    struct s c;
    struct s *p;
 
-   p->a = 1;
+   p = &c;
+
+   if (1) {
+      p->a = 1;
+      p->b = 2;
+      p->c = 3;
+      p->d = p->a;
+      p->d = p->a = 4;
+   }
 }
 
 Proper effetcs for "point_to01"
@@ -20,12 +30,32 @@ void point_to01()
    struct s {
       int a;
       int b;
+      int c;
+      int d;
    };
    struct s c;
    struct s *p;
-//               <must be written - post>:
+//               <must be written>: p
 
-   p->a = 1;
+   p = &c;
+
+   if (1) {
+//               <must be read   >: p
+//               <must be written - post>: (*p)[1]
+      p->a = 1;
+//               <must be read   >: p
+//               <must be written - post>: (*p)[2]
+      p->b = 2;
+//               <must be read   >: p
+//               <must be written - post>: (*p)[3]
+      p->c = 3;
+//               <must be read   >: p
+//               <must be written - post>: (*p)[4]
+      p->d = p->a;
+//               <must be read   >: p
+//               <must be written - post>: (*p)[4] (*p)[1]
+      p->d = p->a = 4;
+   }
 }
 
 Cumulated effetcs for "point_to01"
@@ -35,10 +65,33 @@ void point_to01()
    struct s {
       int a;
       int b;
+      int c;
+      int d;
    };
    struct s c;
    struct s *p;
-//               <must be written - post>:
+//               <must be written>: p
 
-   p->a = 1;
+   p = &c;
+//               <may be read    >: p
+//               <may be written - post >: (*p) (*p) (*p) (*p) (*p)
+//                                  (*p)
+
+   if (1) {
+//               <must be read   >: p
+//               <must be written - post>: (*p)[1]
+      p->a = 1;
+//               <must be read   >: p
+//               <must be written - post>: (*p)[2]
+      p->b = 2;
+//               <must be read   >: p
+//               <must be written - post>: (*p)[3]
+      p->c = 3;
+//               <must be read   >: p
+//               <must be written - post>: (*p)[4]
+      p->d = p->a;
+//               <must be read   >: p
+//               <must be written - post>: (*p)[4] (*p)[1]
+      p->d = p->a = 4;
+   }
 }

@@ -21,7 +21,8 @@ void lhs02()
 //               <must be read   >: i
 
    *(i>2?&i:&j) = 3;
-//               <must be read   >: i j
+//               <may be read    >: j
+//               <must be read   >: i
 //               <must be written>: j
 
    j = (i>2?i+1:j+2);
@@ -37,7 +38,8 @@ void lhs02()
 //               <must be read   >: i
 
    *(i>2?&i:&j) = 3;
-//               <must be read   >: i j
+//               <may be read    >: j
+//               <must be read   >: i
 //               <must be written>: j
 
    j = (i>2?i+1:j+2);

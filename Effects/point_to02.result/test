@@ -24,9 +24,11 @@ void point_to02()
    };
    struct s c;
    struct s *p;
-//               <must be written - post>:
+//               <must be read   >: p
+//               <must be written - post>: (*p)[1]
 
    p->a = 1;
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <must be read   >: p
+//               <must be written - post>: (*p)[2][2]
    (p->b)[2] = 3;
 }
