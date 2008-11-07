@@ -1,9 +1,9 @@
-/* 
+/*
    $Id$
 
    Try to prettyprint the RI in C.
    Very basic at the time.
-   Functionnal. 
+   Functionnal.
    All arguments are assumed newly allocated.
    It might be really slow, but it should be safe.
    I should use some kind of string accumulator (array/list...)
@@ -50,7 +50,7 @@
 #define COMMENT	      "//" SPACE
 
 /* forward declaration. */
-static string c_expression(expression);
+static string c_expression(expression,bool);
 
 /**************************************************************** MISC UTILS */
 
@@ -119,7 +119,7 @@ static string c_entity_local_name(entity var)
         if (strstr(name,UNION_PREFIX) != NULL)
             name = strstr(name,UNION_PREFIX) + 1;
         if (strstr(name,ENUM_PREFIX) != NULL)
-            name = strstr(name,ENUM_PREFIX) + 1;      
+            name = strstr(name,ENUM_PREFIX) + 1;
         if (strstr(name,TYPEDEF_PREFIX) != NULL)
             name = strstr(name,TYPEDEF_PREFIX) + 1;
         if (strstr(name,MEMBER_SEP_STRING) != NULL)
@@ -137,7 +137,7 @@ static string c_entity_local_name(entity var)
 
 /************************************************************** DECLARATIONS */
 
-/* 
+/*
    integer a(n,m) -> int a[m][n];
    parameter (n=4) -> #define n 4
    */
@@ -190,15 +190,15 @@ static string c_basic_string(basic b)
                 pips_debug(2,"Basic int\n");
                 switch (basic_int(b))
                 {
-                    case 1: result = "char" SPACE; 
+                    case 1: result = "char" SPACE;
                             break;
-                    case 2: result = "short" SPACE; 
+                    case 2: result = "short" SPACE;
                             break;
-                    case 4: result = "int" SPACE; 
+                    case 4: result = "int" SPACE;
                             break;
-                    case 6: result = "long" SPACE; 
+                    case 6: result = "long" SPACE;
                             break;
-                    case 8: result = "long long" SPACE; 
+                    case 8: result = "long long" SPACE;
                             break;
                     case 11: result = "unsigned char" SPACE;
                              break;
@@ -267,12 +267,12 @@ static string c_basic_string(basic b)
                 result = c_entity_local_name(ent);
                 allocated=true;
                 break;
-            }  
+            }
     }
     return allocated ? result : strdup(result);
 }
 
-    static string 
+    static string
 int_to_string(int i)
 {
     char buffer[50];
@@ -283,7 +283,7 @@ int_to_string(int i)
 static string c_dim_string(list ldim)
 {
     string result = "";
-    if (ldim != NIL ) 
+    if (ldim != NIL )
     {
         MAP(DIMENSION, dim,
         {
@@ -294,8 +294,8 @@ static string c_dim_string(list ldim)
             string slow;
             string sup;
 
-            /* In fact, the lower bound of array in C is always equal to 0, 
-               we only need to print (upper dimension + 1) 
+            /* In fact, the lower bound of array in C is always equal to 0,
+               we only need to print (upper dimension + 1)
                but in order to handle Fortran code, we check all other possibilities
                and print (upper - lower + 1). Problem : the order of dimensions is reversed !!!! */
 
@@ -312,19 +312,19 @@ static string c_dim_string(list ldim)
                                                 eup,int_to_expression(1)))),
                                     CLOSEBRACKET,result,NULL));
                 }
-                else 
+                else
                 {
                     if (expression_integer_value(eup, &up))
                         result = strdup(concatenate(OPENBRACKET,int_to_string(up-low+1),CLOSEBRACKET,result,NULL));
                     else
                     {
                         sup = words_to_string(words_expression(eup));
-                        result = strdup(concatenate(OPENBRACKET,sup,"-",int_to_string(low-1),CLOSEBRACKET,result,NULL)); 
+                        result = strdup(concatenate(OPENBRACKET,sup,"-",int_to_string(low-1),CLOSEBRACKET,result,NULL));
                         free(sup);
                     }
                 }
             }
-            else 
+            else
             {
                 slow = words_to_string(words_expression(elow));
                 sup = words_to_string(words_expression(eup));
@@ -346,19 +346,19 @@ static string c_qualifier_string(list l)
         switch (qualifier_tag(q)) {
             case is_qualifier_register:
                 result = concatenate(result,"register ",NULL);
-                break; 
+                break;
             case is_qualifier_const:
                 result = concatenate(result,"const ",NULL);
                 break;
             case is_qualifier_restrict:
                 result = concatenate(result,"restrict ",NULL);
-                break;  
+                break;
             case is_qualifier_volatile:
                 result = concatenate(result,"volatile ",NULL);
-                break; 
+                break;
         }
     },l);
-    return strdup(result); 
+    return strdup(result);
 }
 
 static bool brace_expression_p(expression e)
@@ -410,7 +410,7 @@ static string this_entity_cdeclaration(entity var)
     }
 
     switch (storage_tag(s)) {
-        case is_storage_rom: 
+        case is_storage_rom:
             {
                 value va = entity_initial(var);
                 if (!value_undefined_p(va))
@@ -437,7 +437,7 @@ static string this_entity_cdeclaration(entity var)
                 }
                 break;
             }
-        case is_storage_ram: 
+        case is_storage_ram:
             {
                 /*     ram r = storage_ram(s);
                        entity sec = ram_section(r);
@@ -445,14 +445,14 @@ static string this_entity_cdeclaration(entity var)
                        result = "static ";*/
                 break;
             }
-        default: 
+        default:
             break;
     }
 
     switch (type_tag(t)) {
         case is_type_variable:
             {
-                variable v = type_variable(t);  
+                variable v = type_variable(t);
                 string st, sd, svar, sq;
                 value val = entity_initial(var);
                 st = c_basic_string(variable_basic(v));
@@ -470,7 +470,7 @@ static string this_entity_cdeclaration(entity var)
                         expression exp = value_expression(val);
                         if (brace_expression_p(exp))
                             result = strdup(concatenate(result,"=",c_brace_expression_string(exp),NULL));
-                        else 
+                        else
                             result = strdup(concatenate(result,"=",words_to_string(words_expression(exp)),NULL));
                     }
                 }
@@ -480,8 +480,8 @@ static string this_entity_cdeclaration(entity var)
                     pips_debug(2,"Basic bit %d",i);
                     result = strdup(concatenate(result,":",int_to_string(i),NULL));
                 }
-                free(st); 
-                //free(sd); 
+                free(st);
+                //free(sd);
                 break;
             }
         case is_type_struct:
@@ -493,7 +493,7 @@ static string this_entity_cdeclaration(entity var)
                 free(tmp);
                 MAP(ENTITY,ent,
                 {
-                    string s = this_entity_cdeclaration(ent);	    
+                    string s = this_entity_cdeclaration(ent);	
                     result = strdup(concatenate(result, s, SEMICOLON, NULL));
                     free(s);
                 },l);
@@ -509,7 +509,7 @@ static string this_entity_cdeclaration(entity var)
                 free(tmp);
                 MAP(ENTITY,ent,
                 {
-                    string s = this_entity_cdeclaration(ent);	    
+                    string s = this_entity_cdeclaration(ent);	
                     result = strdup(concatenate(result, s, SEMICOLON, NULL));
                     free(s);
                 },l);
@@ -525,7 +525,7 @@ static string this_entity_cdeclaration(entity var)
                 result = strdup(concatenate("enum ", tmp, " {",NULL));
                 free(tmp);
                 MAP(ENTITY,ent,
-                { 
+                {
                     tmp = c_entity_local_name(ent);
                     result = strdup(concatenate(result,first?"":",",tmp,NULL));
                     free(tmp);
@@ -544,7 +544,7 @@ static string this_entity_cdeclaration(entity var)
 static bool parameter_p(entity e)
 {
     /* Constant variables */
-    return storage_rom_p(entity_storage(e)) && 
+    return storage_rom_p(entity_storage(e)) &&
         value_symbolic_p(entity_initial(e)) &&
         type_functional_p(entity_type(e));
 }
@@ -559,7 +559,7 @@ static bool variable_p(entity e)
 static bool argument_p(entity e)
 {
     /* Formal variables */
-    return type_variable_p(entity_type(e)) && 
+    return type_variable_p(entity_type(e)) &&
         storage_formal_p(entity_storage(e));
 }
 
@@ -581,7 +581,7 @@ static string c_declarations(
     {
         string tmp = NULL;
         tmp = c_entity_local_name(var);
-        debug(2, "\n Prettyprinter declaration for variable :",tmp);   
+        debug(2, "\n Prettyprinter declaration for variable :",tmp);
         free(tmp);
         if (consider_this_entity(var))
         {
@@ -600,7 +600,7 @@ static string c_declarations(
 /********************************************************************** HEAD */
 
 /* returns the head of the function/subroutine/program.
-   declarations look ANSI C. 
+   declarations look ANSI C.
    */
 #define MAIN_DECLARATION	"int main(int argc, char *argv[])" NL
 
@@ -628,7 +628,7 @@ static string c_head(entity module)
         else
         {
             variable v;
-            pips_assert("type of result is a variable", 
+            pips_assert("type of result is a variable",
                     type_variable_p(functional_result(f)));
             v = type_variable(functional_result(f));
             head = c_basic_string(variable_basic(v));
@@ -650,7 +650,7 @@ static string c_head(entity module)
                     OPENPAREN, args, CLOSEPAREN, NL, NULL));
 
         free(svar);
-        free(head); 
+        free(head);
         free(args);
     }
 
@@ -684,14 +684,14 @@ static string ppt_binary(string in_c, list le)
 
     e1 = EXPRESSION(CAR(le));
     p1 = expression_needs_parenthesis_p(e1);
-    s1 = c_expression(e1);
+    s1 = c_expression(e1,false);
 
     e2 = EXPRESSION(CAR(CDR(le)));
     p2 = expression_needs_parenthesis_p(e2);
-    s2 = c_expression(e2);
+    s2 = c_expression(e2,false);
 
     result = strdup(concatenate(p1? OPENPAREN: EMPTY, s1, p1? CLOSEPAREN: EMPTY,
-                SPACE, in_c, SPACE, 
+                SPACE, in_c, SPACE,
                 p2? OPENPAREN: EMPTY, s2, p2? CLOSEPAREN: EMPTY,
                 NULL));
 
@@ -705,7 +705,7 @@ static string ppt_unary(string in_c, list le)
 {
     string e, result;
     pips_assert("one arg to unary call", gen_length(le)==1);
-    e = c_expression(EXPRESSION(CAR(le)));
+    e = c_expression(EXPRESSION(CAR(le)),false);
     result = strdup(concatenate(in_c, SPACE, e, NULL));
     free(e);
     return result;
@@ -715,7 +715,7 @@ static string ppt_unary_post(string in_c, list le)
 {
     string e, result;
     pips_assert("one arg to unary call", gen_length(le)==1);
-    e = c_expression(EXPRESSION(CAR(le)));
+    e = c_expression(EXPRESSION(CAR(le)),false);
     result = strdup(concatenate(e, SPACE, in_c, NULL));
     free(e);
     return result;
@@ -726,10 +726,10 @@ static string ppt_call(string in_c, list le)
 {
     string scall, old;
     if (le == NIL)
-    { 
+    {
         scall = strdup(concatenate(in_c, "()", NULL));
     }
-    else 
+    else
     {
         bool first = TRUE;
         scall = strdup(concatenate(in_c, OPENPAREN, NULL));
@@ -737,7 +737,7 @@ static string ppt_call(string in_c, list le)
         /* Attention: not like this for io statements*/
         MAP(EXPRESSION, e,
         {
-            string arg = c_expression(e);
+            string arg = c_expression(e,false);
             old = scall;
             scall = strdup(concatenate(old, first? "": ", ", arg, NULL));
             //free(arg);
@@ -752,7 +752,7 @@ static string ppt_call(string in_c, list le)
     return scall;
 }
 
-static struct s_ppt intrinsic_to_c[] = 
+static struct s_ppt intrinsic_to_c[] =
 {
     { "+", "+", ppt_binary  },
     { "-", "-", ppt_binary },
@@ -769,6 +769,7 @@ static struct s_ppt intrinsic_to_c[] =
     { ".LE.", "<=", ppt_binary },
     { ".GE.", ">=", ppt_binary },
     { ".EQ.", "==", ppt_binary },
+    { ".EQV.", "==", ppt_binary },
     { ".NE.", "!=", ppt_binary },
     { ".", ".", ppt_binary },
     { "->", "->", ppt_binary},
@@ -781,23 +782,23 @@ static struct s_ppt intrinsic_to_c[] =
     {"+unary", "+", ppt_unary },
     {"-unary", "-", ppt_unary },
     {"~", "~", ppt_unary },
-    {"!", "!", ppt_unary },  
-    {"%", "%" , ppt_binary },  
+    {"!", "!", ppt_unary },
+    {"%", "%" , ppt_binary },
     {"+C", "+" , ppt_binary },
-    {"-C", "-", ppt_binary }, 
+    {"-C", "-", ppt_binary },
     {"<<", "<<", ppt_binary },
-    {">>", ">>", ppt_binary }, 
+    {">>", ">>", ppt_binary },
     {"<", "<" , ppt_binary },
     {">", ">" , ppt_binary },
     {"<=", "<=", ppt_binary },
-    {">=", ">=", ppt_binary }, 
+    {">=", ">=", ppt_binary },
     {"==", "==", ppt_binary },
-    {"!=", "!=", ppt_binary },  
-    {"&bitand", "&", ppt_binary}, 
+    {"!=", "!=", ppt_binary },
+    {"&bitand", "&", ppt_binary},
     {"^", "^", ppt_binary },
     {"|", "|", ppt_binary },
-    {"&&", "&&", ppt_binary }, 
-    {"||", "||", ppt_binary },  
+    {"&&", "&&", ppt_binary },
+    {"||", "||", ppt_binary },
     {"*=", "*=", ppt_binary },
     {"/=", "/=", ppt_binary },
     {"%=", "%=", ppt_binary },
@@ -842,7 +843,7 @@ static bool expression_needs_parenthesis_p(expression e)
 #define RET	"return"
 #define CONT "continue"
 
-static string c_call(call c)
+static string c_call(call c,bool breakable)
 {
     entity called = call_function(c);
     struct s_ppt * ppt = get_ppt(called);
@@ -862,7 +863,7 @@ static string c_call(call c)
     }
     else if (same_string_p(local_name, "CONTINUE") )
     {
-        result = strdup(CONT);
+        result = breakable?strdup(CONT):strdup("");
     }
     else if (call_constant_p(c))
     {
@@ -883,9 +884,9 @@ static string c_call(call c)
 static string c_reference(reference r)
 {
     string result = strdup(EMPTY), old, svar;
-    MAP(EXPRESSION, e, 
+    MAP(EXPRESSION, e,
     {
-        string s = c_expression(e);
+        string s = c_expression(e,false);
 
         old = result;
         result = strdup(concatenate(OPENBRACKET, s, CLOSEBRACKET,old, NULL));
@@ -901,14 +902,14 @@ static string c_reference(reference r)
     return result;
 }
 
-static string c_expression(expression e)
+static string c_expression(expression e,bool breakable)
 {
     string result = NULL;
     syntax s = expression_syntax(e);
     switch (syntax_tag(s))
     {
         case is_syntax_call:
-            result = c_call(syntax_call(s));
+            result = c_call(syntax_call(s),breakable);
             break;
         case is_syntax_range:
             result = strdup("range not implemented");
@@ -923,9 +924,9 @@ static string c_expression(expression e)
     return result;
 }
 
-static string c_statement(statement s);
+static string c_statement(statement s, bool breakable);
 
-static string c_unstructured(unstructured u)
+static string c_unstructured(unstructured u,bool breakable)
 {
     string result = "";
     /* build an arbitrary reverse trail of control nodes */
@@ -938,7 +939,7 @@ static string c_unstructured(unstructured u)
         dump_trail(trail);
     }
     /* Copy from text_trail ...*/
-    for(cc=trail; !ENDP(cc); POP(cc)) 
+    for(cc=trail; !ENDP(cc); POP(cc))
     {
         control c = CONTROL(CAR(cc));
         string l = string_undefined;
@@ -949,24 +950,24 @@ static string c_unstructured(unstructured u)
             printf("Processing statement:\n");
             print_statement(st);
         }
-        switch(nsucc) 
+        switch(nsucc)
         {
             case 0:
-                {	  
+                {	
                     printf("nsucc = 0 \n");
-                    result = strdup(concatenate(result,c_statement(st),NULL));
+                    result = strdup(concatenate(result,c_statement(st,false),NULL));
                     break;
                 }
-            case 1: 
+            case 1:
                 {
                     control succ = CONTROL(CAR(control_successors(c)));
                     printf("nsucc = 1 \n");
                     if(check_io_statement_p(control_statement(succ)) &&
-                            !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS")) 
+                            !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS"))
                     {
                         succ = CONTROL(CAR(CDR(control_successors(succ))));
                         if(check_io_statement_p(control_statement(succ)) &&
-                                !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS")) 
+                                !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS"))
                         {
 
                             succ = CONTROL(CAR(CDR(control_successors(succ))));
@@ -975,13 +976,13 @@ static string c_unstructured(unstructured u)
                                 !check_io_statement_p(control_statement(succ)));
                     }
 
-                    result = strdup(concatenate(result,c_statement(st),NULL));
+                    result = strdup(concatenate(result,c_statement(st,false),NULL));
                     if(statement_does_return(st))
                     {
                         if(!ENDP(CDR(cc)))
                         {
                             control tsucc = CONTROL(CAR(CDR(cc)));
-                            if(tsucc==succ) 
+                            if(tsucc==succ)
                             {
                                 break;
                             }
@@ -994,7 +995,7 @@ static string c_unstructured(unstructured u)
                     }
                     break;
                 }
-            case 2: 
+            case 2:
                 {
                     control succ1 = CONTROL(CAR(control_successors(c)));
                     control succ2 = CONTROL(CAR(CDR(control_successors(c))));
@@ -1005,7 +1006,7 @@ static string c_unstructured(unstructured u)
                     printf("nsucc = 2 \n");
                     pips_assert("must be a test", instruction_test_p(i));
 
-                    result = strdup(concatenate(result,"if (",c_expression(test_condition(t)), ") {", NL, NULL));
+                    result = strdup(concatenate(result,"if (",c_expression(test_condition(t),breakable), ") {", NL, NULL));
                     printf("Result = %s\n",result);
 
                     /* Is there a textual successor? */
@@ -1020,7 +1021,7 @@ static string c_unstructured(unstructured u)
                                 printf("This may happen after restructuring\n");
                                 ;
                             }
-                            else 
+                            else
                             {
                                 /* succ2 must be reached by GOTO */
                                 printf("succ2 must be reached by GOTO\n");
@@ -1030,7 +1031,7 @@ static string c_unstructured(unstructured u)
                                 printf("str = %s\n",str);
                             }
                         }
-                        else 
+                        else
                         {
                             if(tsucc==succ2)
                             {
@@ -1048,7 +1049,7 @@ static string c_unstructured(unstructured u)
                                 pips_assert("Must be labelled", l!= string_undefined);
                                 str = strdup(concatenate("goto ", l, SEMICOLON, "}", NL,"else {",NL,NULL));
                                 l = label_local_name(statement_label(control_statement(succ2)));
-                                pips_assert("Must be labelled", l!= string_undefined);	      
+                                pips_assert("Must be labelled", l!= string_undefined);	
                                 str = strdup(concatenate(str,"goto ", l, SEMICOLON, NULL));
                                 printf("str = %s\n",str);
                             }
@@ -1085,25 +1086,25 @@ static string c_unstructured(unstructured u)
             default:
                 pips_internal_error("Too many successors for a control node\n");
         }
-    }   
+    }
 
     gen_free_list(trail);
     return result;
 }
 
-static string c_test(test t)
+static string c_test(test t,bool breakable)
 {
     string result;
     bool no_false;
     string cond, strue, sfalse;
-    cond = c_expression(test_condition(t));
-    strue = c_statement(test_true(t));
+    cond = c_expression(test_condition(t),breakable);
+    strue = c_statement(test_true(t),breakable);
     no_false = empty_statement_p(test_false(t));
 
-    sfalse = no_false? NULL: c_statement(test_false(t));
+    sfalse = no_false? NULL: c_statement(test_false(t),false);
 
-    result = strdup(concatenate("if (", cond, ") {" NL, 
-                strue, 
+    result = strdup(concatenate("if (", cond, ") {" NL,
+                strue,
                 no_false? "}" NL: "} else {" NL,
                 sfalse, "}" NL, NULL));
     free(cond);
@@ -1112,13 +1113,13 @@ static string c_test(test t)
     return result;
 }
 
-static string c_sequence(sequence seq)
+static string c_sequence(sequence seq, bool breakable)
 {
     string result = strdup(EMPTY);
     MAP(STATEMENT, s,
     {
         string oldresult = result;
-        string current = c_statement(s);
+        string current = c_statement(s,breakable);
         result = strdup(concatenate(oldresult, current, NULL));
         free(current);
         free(oldresult);
@@ -1131,18 +1132,27 @@ static string c_loop(loop l)
     /* partial implementation...
        However, there is not this kind of loop in C */
     string result;
-    string body = c_statement(loop_body(l));
+    string body = c_statement(loop_body(l),true);
     string index = c_entity_local_name(loop_index(l));
     range r = loop_range(l);
-    string low = c_expression(range_lower(r));
-    string up = c_expression(range_upper(r));
-    /* what about step*/
+    string low = c_expression(range_lower(r),true);
+    string up = c_expression(range_upper(r),true);
+    string theincr = c_expression(range_increment(r),true);
+    string incr = 0;
+    if( strcmp(theincr,"1")==0 )
+      incr = strdup("++");
+    else
+      incr = strdup(concatenate( "+=", theincr , NULL ));
+    free(theincr);
+   /* what about step*/
     result = strdup(concatenate("for (", index, "=", low, "; ",
                 index, "<=", up, "; ",
-                index, "++)", SPACE, OPENBRACE, NL, 
+                index,  incr, ")", SPACE, OPENBRACE, NL,
                 body, CLOSEBRACE, NL, NULL));
     free(body);
     free(index);
+    free(incr);
+    // TODO: There are some allocation bugs in c_expression()
     //free(low);
     //free(up);
     return result;
@@ -1153,15 +1163,15 @@ static string c_whileloop(whileloop w)
 {
     /* partial implementation... */
     string result;
-    string body = c_statement(whileloop_body(w));
-    string cond = c_expression(whileloop_condition(w));
+    string body = c_statement(whileloop_body(w),true);
+    string cond = c_expression(whileloop_condition(w),true);
     evaluation eval = whileloop_evaluation(w);
     /*do while and while do loops */
     if (evaluation_before_p(eval))
-        result = strdup(concatenate("while (", cond, ") {" NL, 
+        result = strdup(concatenate("while (", cond, ") {" NL,
                     body, "}" NL, NULL));
-    else   
-        result = strdup(concatenate("do " NL, "{" NL, 
+    else
+        result = strdup(concatenate("do " NL, "{" NL,
                     body, "}" NL,"while (", cond, ");" NL, NULL));
     free(cond);
     free(body);
@@ -1172,11 +1182,11 @@ static string c_forloop(forloop f)
 {
     /* partial implementation... */
     string result;
-    string body = c_statement(forloop_body(f));
-    string init = c_expression(forloop_initialization(f));
-    string cond = c_expression(forloop_condition(f));
-    string inc = c_expression(forloop_increment(f));
-    result = strdup(concatenate("for (", init, ";",cond,";",inc,") {" NL, 
+    string body = c_statement(forloop_body(f),true);
+    string init = c_expression(forloop_initialization(f),true);
+    string cond = c_expression(forloop_condition(f),true);
+    string inc = c_expression(forloop_increment(f),true);
+    result = strdup(concatenate("for (", init, ";",cond,";",inc,") {" NL,
                 body, "}" NL, NULL));
 
     free(inc);
@@ -1187,7 +1197,7 @@ static string c_forloop(forloop f)
 }
 /**************************************************************** STATEMENTS */
 
-static string c_statement(statement s)
+static string c_statement(statement s, bool breakable)
 {
     string result;
     instruction i = statement_instruction(s);
@@ -1199,13 +1209,13 @@ static string c_statement(statement s)
         case is_instruction_test:
             {
                 test t = instruction_test(i);
-                result = c_test(t);
+                result = c_test(t,breakable);
                 break;
             }
         case is_instruction_sequence:
             {
                 sequence seq = instruction_sequence(i);
-                result = c_sequence(seq);
+                result = c_sequence(seq,breakable);
                 break;
             }
         case is_instruction_loop:
@@ -1228,14 +1238,14 @@ static string c_statement(statement s)
             }
         case is_instruction_call:
             {
-                string scall = c_call(instruction_call(i));
+                string scall = c_call(instruction_call(i),breakable);
                 result = strdup(concatenate(scall, SEMICOLON, NULL));
                 break;
             }
         case is_instruction_unstructured:
             {
                 unstructured u = instruction_unstructured(i);
-                result = c_unstructured(u);
+                result = c_unstructured(u,breakable);
                 break;
             }
         case is_instruction_goto:
@@ -1254,12 +1264,12 @@ static string c_statement(statement s)
 
     if (!ENDP(l))
     {
-        string decl = ""; 
+        string decl = "";
         MAP(ENTITY, var,
         {
             string svar;
             string tmp = c_entity_local_name(var);
-            debug(2, "\n In block declaration for variable :", tmp);   
+            debug(2, "\n In block declaration for variable :", tmp);
             free(tmp);
             svar = this_entity_cdeclaration(var);
             decl = strdup(concatenate(decl, svar, SEMICOLON, NULL));
@@ -1276,7 +1286,7 @@ static string c_code_string(entity module, statement stat)
     string before_head, head, decls, body, result;
 
     /* What about declarations that are external a module scope ?
-       Consider a source file as a module entity, put all declarations in it 
+       Consider a source file as a module entity, put all declarations in it
        (external static + TOP-LEVEL) */
 
     /* before_head only generates the constant declarations, such as #define*/
@@ -1292,9 +1302,9 @@ static string c_code_string(entity module, statement stat)
     head        = c_head(module);
     /* What about declarations associated to statements */
     decls       = c_declarations(module, variable_p, SEMICOLON, TRUE);
-    body        = c_statement(stat);
+    body        = c_statement(stat, false);
 
-    result = concatenate(before_head, head, OPENBRACE, NL, 
+    result = concatenate(before_head, head, OPENBRACE, NL,
             decls, NL, body, CLOSEBRACE, NL, NULL);
 
     free(before_head);
@@ -1331,7 +1341,7 @@ bool print_crough(string module_name)
     pips_debug(1, "Begin C prettyprrinter for %s\n", entity_name(module));
     ppt = c_code_string(module, stat);
     pips_debug(1, "end\n");
-    debug_off();  
+    debug_off();
 
     /* save to file */
     out = safe_fopen(filename, "w");
@@ -1360,8 +1370,8 @@ bool print_c_code(string module_name)
     cpretty = db_build_file_resource_name(DBR_C_PRINTED_FILE, module_name, CPRETTY);
     dir = db_get_current_workspace_directory();
 
-    cmd = strdup(concatenate(INDENT, " ", 
-                dir, "/", crough, " -o ", 
+    cmd = strdup(concatenate(INDENT, " ",
+                dir, "/", crough, " -o ",
                 dir, "/", cpretty, NULL));
 
     safe_system(cmd);
