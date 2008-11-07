@@ -96,9 +96,14 @@ compare_effect_reference_in_common(effect * e1, effect * e2)
 
 /* Try to factorize code from Alexis Platonoff :
 
-   Append an_effect_string to an_effect_text an position the
-   exist_flag at TRUE. The procedure is intended to be called for the
-   4 different types of effects. RK
+   Append an_effect_string to an_effect_text and position the
+   exist_flag at TRUE.
+
+   The procedure is intended to be called for the 4 different types of
+   effects. RK
+
+   Now, for 12 types of effects, but I do not see the exist_flag
+   positionning (FI)
 */
 static void
 update_an_effect_type(
@@ -228,7 +233,7 @@ simple_effects_to_text(
 	action ac = effect_action(eff);
 	addressing ad = effect_addressing(eff);
 	approximation ap = effect_approximation(eff);
-	list /* of string */ ls = effect_words_reference(ref);
+	list /* of string */ ls = effect_words_reference_with_addressing(ref, addressing_tag(ad));
 	string t;
 
 	/* We build the string containing the effect's reference */
@@ -253,31 +258,31 @@ simple_effects_to_text(
 	else if (!action_read_p(ac) && !approximation_may_p(ap))
 	    update_an_effect_type(Wt, W, t), Wb = TRUE;
 	else
-	    pips_internal_error("unrecognized effect");
+	    pips_internal_error("unrecognized effect action\n");
 	}
 	else if(addressing_pre_p(ad)) {
 	if (action_read_p(ac) && approximation_may_p(ap))
-	    update_an_effect_type(rtpre, r, t), rbpre = TRUE;
+	    update_an_effect_type(rtpre, rpre, t), rbpre = TRUE;
 	else if (!action_read_p(ac) && approximation_may_p(ap))
-	    update_an_effect_type(wtpre, w, t), wbpre = TRUE;
+	    update_an_effect_type(wtpre, wpre, t), wbpre = TRUE;
 	else if (action_read_p(ac) && !approximation_may_p(ap))
-	    update_an_effect_type(Rtpre, R, t), Rbpre = TRUE;
+	    update_an_effect_type(Rtpre, Rpre, t), Rbpre = TRUE;
 	else if (!action_read_p(ac) && !approximation_may_p(ap))
-	    update_an_effect_type(Wtpre, W, t), Wbpre = TRUE;
+	    update_an_effect_type(Wtpre, Wpre, t), Wbpre = TRUE;
 	else
-	    pips_internal_error("unrecognized effect");
+	    pips_internal_error("unrecognized effect action\n");
 	}
 	else if(addressing_post_p(ad)) {
 	if (action_read_p(ac) && approximation_may_p(ap))
-	    update_an_effect_type(rtpost, r, t), rbpost = TRUE;
+	    update_an_effect_type(rtpost, rpost, t), rbpost = TRUE;
 	else if (!action_read_p(ac) && approximation_may_p(ap))
-	    update_an_effect_type(wtpost, w, t), wbpost = TRUE;
+	    update_an_effect_type(wtpost, wpost, t), wbpost = TRUE;
 	else if (action_read_p(ac) && !approximation_may_p(ap))
-	    update_an_effect_type(Rtpost, R, t), Rbpost = TRUE;
+	    update_an_effect_type(Rtpost, Rpost, t), Rbpost = TRUE;
 	else if (!action_read_p(ac) && !approximation_may_p(ap))
-	    update_an_effect_type(Wtpost, W, t), Wbpost = TRUE;
+	    update_an_effect_type(Wtpost, Wpost, t), Wbpost = TRUE;
 	else
-	    pips_internal_error("unrecognized effect\n");
+	    pips_internal_error("unrecognized effect action\n");
 	}
 	else
 	    pips_internal_error("unrecognized addressing mode\n");
@@ -314,6 +319,11 @@ simple_effects_to_text(
     if (wbpost) { MERGE_TEXTS(sefs_text, wtpost); } else free_text(wtpost);
     if (Rbpost) { MERGE_TEXTS(sefs_text, Rtpost); } else free_text(Rtpost);
     if (Wbpost) { MERGE_TEXTS(sefs_text, Wtpost); } else free_text(Wtpost);
+
+    ifdebug(8) {
+      pips_debug(8, "End with:\n");
+      print_text(stderr, sefs_text);
+    }
 
     return sefs_text;
 }

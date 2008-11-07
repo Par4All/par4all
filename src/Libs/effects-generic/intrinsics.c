@@ -42,6 +42,7 @@
 /********************************************************* LOCAL FUNCTIONS */
 
 static list no_write_effects(entity e,list args);
+static list conditional_effects(entity e,list args);
 static list address_of_effects(entity e,list args);
 static list affect_effects(entity e,list args);
 static list update_effects(entity e,list args);
@@ -423,7 +424,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {BITWISE_XOR_UPDATE_OPERATOR_NAME,       update_effects},
   {BITWISE_OR_UPDATE_OPERATOR_NAME,        update_effects},
   {COMMA_OPERATOR_NAME,                    no_write_effects},
-  {CONDITIONAL_OPERATOR_NAME,              no_write_effects},
+  {CONDITIONAL_OPERATOR_NAME,              conditional_effects},
 
   {BRACE_INTRINSIC,                        no_write_effects},
   {BREAK_FUNCTION_NAME,                    no_write_effects},
@@ -823,6 +824,27 @@ no_write_effects(entity e __attribute__ ((__unused__)),list args)
     lr = generic_proper_effects_of_expressions(args);
     debug(5, "no_write_effects", "end\n");
     return(lr);
+}
+
+static list
+conditional_effects(entity e __attribute__ ((__unused__)),list args)
+{
+  list le;
+
+  pips_debug(5, "begin\n");
+  expression cond = EXPRESSION(CAR(args));
+  expression et = EXPRESSION(CAR(CDR(args)));
+  expression ef = EXPRESSION(CAR(CDR(CDR(args))));
+
+  list lc = generic_proper_effects_of_expression(cond);
+  list lt = generic_proper_effects_of_expression(et);
+  list lf = generic_proper_effects_of_expression(ef);
+
+  le = (*effects_test_union_op)(lt, lf, effects_same_action_p);
+  le = (*effects_union_op)(le, lc, effects_same_action_p);
+
+  pips_debug(5, "end\n");
+  return le;
 }
 
 static list

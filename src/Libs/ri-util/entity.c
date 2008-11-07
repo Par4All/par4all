@@ -322,7 +322,7 @@ entity_minimal_name(entity e)
 
   pips_assert("some current entity", !entity_undefined_p(m));
 
-  if (strcmp(module_local_name(m), entity_module_name(e)) == 0) {
+  if (strcmp(local_name, entity_module_name(e)) == 0) {
     free(local_name);
     return global_name_to_user_name(entity_name(e));
   }

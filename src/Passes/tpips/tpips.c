@@ -1186,7 +1186,7 @@ int tpips_main(int argc, char * argv[])
     set_exception_callbacks(push_pips_context, pop_pips_context);
 
     {
-	string pid = (char*) malloc(sizeof(char)*20);
+	char pid[20];
 	sprintf(pid, "PID=%d", (int) getpid());
 	pips_assert("not too long", strlen(pid)<20);
 	putenv(pid);
