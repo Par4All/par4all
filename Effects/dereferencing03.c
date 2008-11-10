@@ -1,12 +1,8 @@
-/* Not much dereferencing here... */
-
 void dereferencing03()
 {
-  struct one {
-    int first;
-    int second;
-  } x, *p;
+  double * p;
+  int i;
 
-  p = &x;
-  p->first = 1;
+  *(p+1) = 0.;
+  *(p+i) = 0.;
 }

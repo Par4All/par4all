@@ -81,6 +81,14 @@ int struct03()
    }
 }
 
+Dependence graph for "struct07"
+
+
+ **************** Effective Dependence Graph ****************
+
+
+****************** End of Dependence Graph ******************
+
 Printed files after parallelization
 
 int struct03()

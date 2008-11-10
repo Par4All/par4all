@@ -50,6 +50,7 @@ void point_to01()
 //               <must be written - post>: (*p)[3]
       p->c = 3;
 //               <must be read   >: p
+//               <must be read    - post>: (*p)[1]
 //               <must be written - post>: (*p)[4]
       p->d = p->a;
 //               <must be read   >: p
@@ -74,6 +75,7 @@ void point_to01()
 
    p = &c;
 //               <may be read    >: p
+//               <may be read    - post >: (*p)
 //               <may be written - post >: (*p) (*p) (*p) (*p) (*p)
 //                                  (*p)
 
@@ -88,6 +90,7 @@ void point_to01()
 //               <must be written - post>: (*p)[3]
       p->c = 3;
 //               <must be read   >: p
+//               <must be read    - post>: (*p)[1]
 //               <must be written - post>: (*p)[4]
       p->d = p->a;
 //               <must be read   >: p
