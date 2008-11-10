@@ -42,6 +42,7 @@
 /********************************************************* LOCAL FUNCTIONS */
 
 static list no_write_effects(entity e,list args);
+static list address_expression_effects(entity e,list args);
 static list conditional_effects(entity e,list args);
 static list address_of_effects(entity e,list args);
 static list affect_effects(entity e,list args);
@@ -385,14 +386,14 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
 
   /* Here are C intrinsics.*/
 
-  {FIELD_OPERATOR_NAME,                    no_write_effects},
-  {POINT_TO_OPERATOR_NAME,                 no_write_effects},
+  {FIELD_OPERATOR_NAME,                    address_expression_effects},
+  {POINT_TO_OPERATOR_NAME,                 address_expression_effects},
   {POST_INCREMENT_OPERATOR_NAME,           unique_update_effects},
   {POST_DECREMENT_OPERATOR_NAME,           unique_update_effects},
   {PRE_INCREMENT_OPERATOR_NAME,            unique_update_effects},
   {PRE_DECREMENT_OPERATOR_NAME,            unique_update_effects},
   {ADDRESS_OF_OPERATOR_NAME,               address_of_effects},
-  {DEREFERENCING_OPERATOR_NAME,            no_write_effects},
+  {DEREFERENCING_OPERATOR_NAME,            address_expression_effects},
   {UNARY_PLUS_OPERATOR_NAME,               no_write_effects},
   // {"-unary",                            no_write_effects},UNARY_MINUS_OPERATOR already exist (FORTRAN)
   {BITWISE_NOT_OPERATOR_NAME,              no_write_effects},
@@ -824,6 +825,22 @@ no_write_effects(entity e __attribute__ ((__unused__)),list args)
     lr = generic_proper_effects_of_expressions(args);
     debug(5, "no_write_effects", "end\n");
     return(lr);
+}
+
+static list
+address_expression_effects(entity op, list args)
+{
+    list le = list_undefined;
+    expression ne = make_call_expression(op, args);
+    call nc = syntax_call(expression_syntax(ne));
+
+    pips_debug(5, "begin\n");
+    le = generic_proper_effects_of_address_expression(ne, FALSE);
+    call_function(nc) = entity_undefined; // useless because of persistance
+    call_arguments(nc) = NIL;
+    free_expression(ne);
+    pips_debug(5, "end\n");
+    return le;
 }
 
 static list

@@ -1047,19 +1047,19 @@ static void impact_check_two_scalar_variables_in_path(entity e1, entity e2, expr
 
 static void impact_check_in_path(entity e1, entity e2, expression off1, expression off2, list path)
 {
-    if (entity_scalar_p(e1) && entity_scalar_p(e2))
+    if (entity_atomic_reference_p(e1) && entity_atomic_reference_p(e2))
         impact_check_two_scalar_variables_in_path(e1, e2, off1, off2, path);
-    if (entity_scalar_p(e1) && !entity_scalar_p(e2))
+    if (entity_atomic_reference_p(e1) && !entity_atomic_reference_p(e2))
       {
         fprintf(stderr, "alias entre variable scalaire e1 et variable tableau e2\n");
 	impact_check_two_scalar_variables_in_path(e1, e2, off1, off2, path);
       }
-    if (!entity_scalar_p(e1) && entity_scalar_p(e2))
+    if (!entity_atomic_reference_p(e1) && entity_atomic_reference_p(e2))
       {
         fprintf(stderr, "alias entre variable tableau e1 et variable scalaire e2\n");
 	impact_check_two_scalar_variables_in_path(e1, e2, off1, off2, path);
       }
-    if (!entity_scalar_p(e1) && !entity_scalar_p(e2))
+    if (!entity_atomic_reference_p(e1) && !entity_atomic_reference_p(e2))
       {
 	fprintf(stderr, "alias entre 2 variables tableau\n");
 	impact_check_two_scalar_variables_in_path(e1, e2, off1, off2, path);

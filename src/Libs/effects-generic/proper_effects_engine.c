@@ -477,7 +477,7 @@ static list generic_proper_effects_of_call_in_lhs(entity op, list args, effect *
 /* Go down along the first argument till you find a reference or a
    dereferencing and build the effect e by side effects as well as the
    auxiliary effect list on the way back up*/
-list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect * pmre)
+list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect * pmre, int lhs_p)
 {
   list le = NIL;
   syntax s = expression_syntax(exp);
@@ -492,7 +492,7 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
     reference mr = copy_reference(syntax_reference(s));
     /* Keep addressing open to further indexation if possible */
     effect me = make_effect(make_cell_reference(mr),
-			    make_action_write(),
+			    lhs_p?make_action_write():make_action_read(),
 			    make_addressing_index(),
 			    make_approximation_must(),
 			    make_descriptor_none());
@@ -510,9 +510,7 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
     /* We know it must be read because we are dealing with a complex
        lhs, except when we have a field operator only... So, this read effect mre
        will have to be taken care of later. */
-    MAP(EXPRESSION, ind, {
-      le = gen_nconc(le, generic_proper_effects_of_expression(ind));
-    }, reference_indices(syntax_reference(s)));
+    le = generic_proper_effects_of_expressions(reference_indices(syntax_reference(s)));
     finished_p = TRUE;
   }
   else if(syntax_call_p(s)) {
@@ -535,14 +533,49 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
     else if(ENTITY_PLUS_C_P(op)) {
       /* This might be tractable if arg1 is a reference to a
 	 pointer. For instance, *(p+q-r) can be converted to p[q-r] */
+      expression e1 = EXPRESSION(CAR(args));
+      syntax s1 = expression_syntax(e1);
+      expression e2 = EXPRESSION(CAR(CDR(args)));
       pips_user_warning("Not implemented yet");
-      le = generic_proper_effects_of_expression(exp);
-      *pmwe = effect_undefined;
-      finished_p = TRUE;
+
+      if(syntax_reference_p(s1)) {
+	reference r1 = syntax_reference(s1);
+	entity v1 = reference_variable(r1);
+	type t1 = ultimate_type(entity_type(v1));
+	if(type_variable_p(t1)) {
+	  variable vt1 = type_variable(t1);
+	  basic b1 = variable_basic(vt1);
+	  if(basic_pointer_p(b1)) {
+	    effect me = make_effect(make_cell_reference(make_reference(v1, CONS(EXPRESSION,e2,NIL))),
+				    lhs_p?make_action_write():make_action_read(),
+				    make_addressing_index(),
+				    make_approximation_must(),
+				    make_descriptor_none());
+	    /* Read effect to generate for point_to and for dereferencing */
+	    effect mre = make_effect(make_cell_reference(make_reference(v1,NIL)),
+				     make_action_read(),
+				     make_addressing_index(),
+				     make_approximation_must(),
+				     make_descriptor_none());
+
+	    *pmwe = me;
+	    *pmre = mre;
+	    le = generic_proper_effects_of_expression(e2);
+	    finished_p = TRUE;
+ 	  }
+	}
+      }
+      if(!finished_p) {
+	le = generic_proper_effects_of_expression(exp);
+	*pmwe = effect_undefined;
+	finished_p = TRUE;
+      }
     }
+    /* Other functions to process: p++, ++p, p--, --p */
     else {
-      /* failure */
-      pips_user_warning("PIPS does not know how to handle precisely this lhs: \"%s\"\n",
+      /* failure: a user function is called to return a structure or an address */
+      pips_user_warning("PIPS does not know how to handle precisely this %s: \"%s\"\n",
+			lhs_p? "lhs":"rhs",
 			words_to_string(words_expression(exp)));
       /* FI: This comes too late. down in the recursion. The effect of
 	 the other sub-expressions won't be computed because we've set
@@ -559,7 +592,7 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
   if(!finished_p) {
 
     /* go down */
-    le = generic_proper_effects_of_complex_lhs(s_exp, pmwe, pmre);
+    le = generic_proper_effects_of_complex_lhs(s_exp, pmwe, pmre, lhs_p);
 
     ifdebug(8) {
       if(effect_undefined_p(*pmwe)) {
@@ -834,11 +867,20 @@ static list generic_proper_effects_of_subscript_in_lhs(subscript sub, effect * p
 
 list generic_proper_effects_of_any_lhs(expression lhs)
 {
+  return generic_proper_effects_of_address_expression(lhs, TRUE);
+}
+
+/* FI: lhs should be subtituted by ae */
+list generic_proper_effects_of_address_expression(expression lhs, int write_p)
+{
   list le = NIL;
   syntax s = expression_syntax(lhs);
 
   if (syntax_reference_p(s)) {
-    le = generic_proper_effects_of_lhs(syntax_reference(s));
+    if(write_p)
+      le = generic_proper_effects_of_lhs(syntax_reference(s));
+    else
+      pips_internal_error("Case not taken into account");
   }
   else if(syntax_call_p(s) || syntax_subscript_p(s)) {
     effect e = effect_undefined; /* main write effect */
@@ -846,7 +888,7 @@ list generic_proper_effects_of_any_lhs(expression lhs)
     effect ge = effect_undefined; /* generic effect */
 
     /* Look for a main write effect of the lhs */
-    le = generic_proper_effects_of_complex_lhs(lhs, &e, &re);
+    le = generic_proper_effects_of_complex_lhs(lhs, &e, &re, write_p);
 
     if(!effect_undefined_p(re)) {
       /* Copies of re were used to deal with complex addressing. The
@@ -859,7 +901,7 @@ list generic_proper_effects_of_any_lhs(expression lhs)
       transformer context = effects_private_current_context_head();
 
      /* Generate a proper decriptor in a generic way */
-      ge = (*reference_to_effect_func)(r, make_action_write());
+      ge = (*reference_to_effect_func)(r, write_p?make_action_write():make_action_read());
       /* FI: memory leak of a CONS */
       (*effects_precondition_composition_op)(CONS(EFFECT, ge, NIL), context);
       effect_addressing(ge) = copy_addressing(effect_addressing(e));
@@ -1024,8 +1066,13 @@ generic_proper_effects_of_syntax(syntax s)
 	  break;
 	}
       case is_syntax_subscript:
-	le = generic_proper_effects_of_subscript(syntax_subscript(s));
+	{
+	  expression exp = make_expression(s, normalized_undefined);
+	  le = generic_proper_effects_of_address_expression(exp, FALSE);
+	  expression_syntax(exp) = syntax_undefined;
+	  free_expression(exp);
 	break;
+	}
       case is_syntax_application:
 	le = generic_proper_effects_of_application(syntax_application(s));
 	break;

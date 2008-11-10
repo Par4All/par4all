@@ -177,6 +177,9 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
   list cur, pred = NIL;
   /* entity name -> consp in effect list. */
   hash_table all_read_effects, all_write_effects;
+  /* FI: at this level, it's pretty dangerous to combine effects with no constant addresses */
+  //hash_table all_read_pre_effects, all_write_pre_effects;
+  //hash_table all_read_post_effects, all_write_post_effects;
   
   ifdebug(6) {
     pips_debug(6, "proper effects: \n");
@@ -185,6 +188,10 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
   
   all_read_effects = hash_table_make(hash_string, 10);
   all_write_effects = hash_table_make(hash_string, 10);
+  //all_read_pre_effects = hash_table_make(hash_string, 10);
+  //all_write_pre_effects = hash_table_make(hash_string, 10);
+  //all_read_post_effects = hash_table_make(hash_string, 10);
+  //all_write_post_effects = hash_table_make(hash_string, 10);
 
   cur = l_effects;
   /* scan the list of effects... the list is modified in place */
@@ -194,6 +201,7 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
     effect current = effect_undefined;
     string n;
     tag a;
+    addressing ad;
     bool may_combine, do_combine = FALSE;
     list do_combine_item = NIL;
     list next = CDR(cur); /* now, as 'cur' may be removed... */
@@ -201,13 +209,17 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
     current = (*proper_to_summary_effect_func)(lcurrent);
     n = entity_name(effect_entity(current));
     a = effect_action_tag(current);
+    ad = effect_addressing(current);
 
     /* may/do we have to combine ? */
     /* ??? FC this should be no big deal... anyway :
      * in the previous implementation, 'current' was not yet
      * passed thru proper_to_summary_effect_func when tested...
+     *
+     * Indirect addressing prevents combining
      */
-    may_combine = !scalars_only_p || effect_scalar_p(current);
+    may_combine = (!scalars_only_p || effect_scalar_p(current))
+      && addressing_index_p(ad);
 
     if (may_combine)
     {

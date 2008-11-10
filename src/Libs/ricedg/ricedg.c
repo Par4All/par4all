@@ -919,12 +919,20 @@ TestCoupleOfEffects(
 
 list 
 TestCoupleOfReferences(
-    list n1, Psysteme sc1, statement s1, effect ef1, reference r1,
-    list n2, Psysteme sc2, statement s2, effect ef2, reference r2,
-    list llv,
-    Ptsg * gs,
-    list * levelsop, 
-    Ptsg * gsop)
+		       list n1,
+		       Psysteme sc1 __attribute__ ((unused)),
+		       statement s1,
+		       effect ef1,
+		       reference r1,
+		       list n2,
+		       Psysteme sc2 __attribute__ ((unused)),
+		       statement s2,
+		       effect ef2,
+		       reference r2,
+		       list llv __attribute__ ((unused)),
+		       Ptsg * gs __attribute__ ((unused)),
+		       list * levelsop __attribute__ ((unused)), 
+		       Ptsg * gsop __attribute__ ((unused)))
 {
     intptr_t i, cl, dims, ty;
     list levels = NIL, levels1 = NIL;
@@ -952,8 +960,10 @@ TestCoupleOfReferences(
 		     entity_local_name(e1), entity_local_name(e2));
 	
     }
-	
-    if (e1 == e2 && !entity_scalar_p(e1) && !entity_scalar_p(e2)) 
+
+    /* if (e1 == e2 && !entity_scalar_p(e1) && !entity_scalar_p(e2)) */
+    /* FI: Why these two tests under the condition e1==e2? */
+    if (e1 == e2 && !entity_atomic_reference_p(e1) && !entity_atomic_reference_p(e2)) 
     {
 	if (get_bool_property("RICEDG_STATISTICS_ALL_ARRAYS")) 
 	{
@@ -2174,11 +2184,7 @@ Pvecteur *p_DiIncNonCons;
  */
 
 static list 
-TestDiVariables(ps, cl, s1, ef1, s2, ef2)
-Psysteme ps;
-int cl;
-statement s1, s2;
-effect ef1, ef2;
+TestDiVariables(Psysteme ps, int cl, statement s1, effect ef1 __attribute__ ((unused)), statement s2, effect ef2 __attribute__ ((unused)))
 {
     list levels = NIL;
     intptr_t l;
@@ -2444,9 +2450,6 @@ Psysteme dep_sc;
 
 
 
-
-
-    
 static list 
 loop_variant_list(stat)
 statement stat;
@@ -2472,6 +2475,12 @@ statement stat;
 	if (gen_find_eq(v,lv) == entity_undefined) 
 	    lv = CONS(ENTITY, v, lv);
     }, locals);
+    locals = statement_declarations(loop_body(l));
+    MAP(ENTITY, v,
+    {
+	if (gen_find_eq(v,lv) == entity_undefined) 
+	    lv = CONS(ENTITY, v, lv);
+    }, locals);
     
     return(lv);
 }
@@ -2480,11 +2489,8 @@ statement stat;
  * ( Di=(0,0,...0) and s1 = s2).
  */ 
 static boolean 
-TestDiCnst(ps, cl, s1, ef1, s2, ef2)  
-Psysteme ps;
-int cl;
-statement s1, s2;
-effect ef1,ef2;
+TestDiCnst(Psysteme ps, int cl, statement s1, effect ef1 __attribute__ ((unused)),
+	   statement s2, effect ef2 __attribute__ ((unused)))  
 {
   int l;
 
