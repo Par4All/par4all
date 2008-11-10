@@ -6,7 +6,8 @@ INC_CFILES = \
 	initializer.c \
 	source_file.c \
 	split_file.c \
-	csplit_file.c
+	csplit_file.c \
+	module.c
 
 DERIVED_HEADERS = splitc.h
 DERIVED_CFILES = splitcyaccer.c splitclexer.c

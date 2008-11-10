@@ -696,13 +696,29 @@ list extract_references_from_declarations(list decls)
   return(lref.lr);
 }   
 
-list  summary_effects_from_declaration(string module_name)
-{  
-  entity mod = module_name_to_entity(module_name);
-  list decls = code_declarations(value_code(entity_initial(mod)));
-  list refs = extract_references_from_declarations(decls);
-  return(make_effects_for_array_declarations(refs));
-  
+list summary_effects_from_declaration(string module_name)
+{
+  list sel = NIL;
+  //entity mod = module_name_to_entity(module_name);
+  //list decls = code_declarations(value_code(entity_initial(mod)));
+  extern list current_module_declarations(void);
+  list decls = current_module_declarations();
+  list refs = list_undefined;
+
+  refs = extract_references_from_declarations(decls);
+
+  ifdebug(8) {
+    pips_debug(8, "References from declarations:\n");
+    MAP(REFERENCE, r, {
+      pips_debug(8, "Reference for variable \"%s\"\n",
+		 entity_name(reference_variable(r)));
+      print_reference(r);
+    }, refs);
+  }
+
+  sel = make_effects_for_array_declarations(refs);
+
+  return sel;
 }
 
 void dump_cell(cell c)

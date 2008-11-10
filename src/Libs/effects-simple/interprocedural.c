@@ -53,71 +53,70 @@ simple_effects_backward_translation(
 list 
 effects_dynamic_elim(list l_eff)
 {
-    list l_res = NIL;
+  list l_res = NIL;
+  list c_eff = list_undefined;
 
-    MAP(EFFECT, eff, 
-     {
-        entity eff_ent = effect_entity(eff);
-        storage eff_s = entity_storage(eff_ent);
-        boolean ignore_this_effect = FALSE;
+  for(c_eff = l_eff; !ENDP(c_eff); POP(c_eff)) {
+    effect eff = EFFECT(CAR(c_eff));
 
-	ifdebug(4)
-	{
-	    pips_debug(4, "current effect: \n%s\n", effect_to_string(eff));
-	}
+    entity eff_ent = effect_entity(eff);
+    storage eff_s = entity_storage(eff_ent);
+    boolean ignore_this_effect = FALSE;
 
-	/* If the reference is a common variable (ie. with storage ram but
-	 * not dynamic) or a formal parameter, the effect is not ignored.
-	 */
-        switch (storage_tag(eff_s))
-	{
-	case is_storage_return:
-	    pips_debug(5, "return var ignored (%s)\n", entity_name(eff_ent));
+    ifdebug(4) {
+      pips_debug(4, "current effect \n%s for entity \"\%s\":\n",
+		 effect_to_string(eff), entity_name(eff_ent));
+    }
+
+    /* If the reference is a common variable (ie. with storage ram but
+     * not dynamic) or a formal parameter, the effect is not ignored.
+     */
+    switch (storage_tag(eff_s)) {
+    case is_storage_return:
+      pips_debug(5, "return var ignored (%s)\n", entity_name(eff_ent));
+      ignore_this_effect = TRUE;
+      break;
+    case is_storage_ram:
+      {
+	ram r = storage_ram(eff_s);
+	/* FI: heap areas effects should be preserved... */
+	if (dynamic_area_p(ram_section(r)) || heap_area_p(ram_section(r))
+	    || stack_area_p(ram_section(r)))
+	  {
+	    pips_debug(5, "dynamic or pointed var ignored (%s)\n", 
+		       entity_name(eff_ent));
 	    ignore_this_effect = TRUE;
-	    break;
-	case is_storage_ram:
-	{
-	    ram r = storage_ram(eff_s);
-	    if (dynamic_area_p(ram_section(r)) || heap_area_p(ram_section(r))
-		|| stack_area_p(ram_section(r)))
-	    {
-		pips_debug(5, "dynamic or pointed var ignored (%s)\n", 
-			   entity_name(eff_ent));
-		ignore_this_effect = TRUE;
-	    }
-	    break;
-	}
-	case is_storage_formal:
-	    break;
-	case is_storage_rom:
-	  ignore_this_effect = TRUE;
-	  break;
-	  /*  pips_internal_error("bad tag for %s (rom)\n", 
-	      entity_name(eff_ent));*/
-	default:
-	    pips_internal_error("case default reached\n");
-        }
+	  }
+	break;
+      }
+    case is_storage_formal:
+      break;
+    case is_storage_rom:
+      ignore_this_effect = TRUE;
+      break;
+      /*  pips_internal_error("bad tag for %s (rom)\n", 
+	  entity_name(eff_ent));*/
+    default:
+      pips_internal_error("case default reached\n");
+    }
 	
-        if (! ignore_this_effect)  /* Eliminate dynamic variables. */
-	{
-	    effect eff_res = make_sdfi_effect(eff);
-	    ifdebug(4)
-	    {
-		pips_debug(4, "effect kept : \n\t %s\n", 
-			   effect_to_string(eff_res));
-	    }
-            l_res = CONS(EFFECT, eff_res, l_res);
-        }
-	else 
-	    ifdebug(4)
-	    {
-		pips_debug(4, "effect removed : \n\t %s\n", 
-			   effect_to_string(eff));
-	    }
-    },
-	l_eff);
+    if (! ignore_this_effect)  /* Eliminate dynamic variables. */ {
+      effect eff_res = make_sdfi_effect(eff);
+      ifdebug(4) {
+	pips_debug(4, "effect preserved for variable \"\%s\": \n\t %s\n", 
+		   entity_name(effect_variable(eff_res)),
+		   words_to_string(words_effect(eff_res)));
+      }
+      l_res = CONS(EFFECT, eff_res, l_res);
+    }
+    else ifdebug(4) {
+      pips_debug(4, "effect removed for variable \"\%s\": \n\t %s\n", 
+		 entity_name(effect_variable(eff)),
+		 words_to_string(words_effect(eff)));
+    }
+  }
 
-    return(l_res);
+  return(l_res);
 }
 
 

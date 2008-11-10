@@ -40,6 +40,13 @@ entity previouscompunit;
 
 */
 
+/* To keep track of the current dummy parameter naming. */
+static int current_dummy_parameter_number;
+static void set_current_dummy_parameter_number(int n)
+{current_dummy_parameter_number=n;}
+int get_current_dummy_parameter_number(void)
+{return current_dummy_parameter_number;}
+
 /******************* TOP LEVEL ENTITY  **********************/
 
 entity get_top_level_entity()
@@ -650,12 +657,27 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
     } while(entity_undefined_p(ent) && (ls = pop_block_scope(ls))!=NULL);
   }
 
+  /* Is it a formal parameter not yet converted in the function frame? */
+  if(entity_undefined_p(ent)) {
+    extern string int_to_string(int);
+    string sn = int_to_string(get_current_dummy_parameter_number());
+    string formal_name = string_undefined;
+
+    formal_name = strdup(concatenate(DUMMY_PARAMETER_PREFIX,sn,MODULE_SEP_STRING,
+				     prefix,name,NULL));
+    ent = gen_find_tabulated(formal_name,entity_domain);
+    free(sn);
+    free(formal_name);
+  }
+
+  /* Is it a static variable declared in the compilation unit? */
   if(entity_undefined_p(ent)) {
     global_name = strdup(concatenate(compilation_unit_name,MODULE_SEP_STRING,
 				     prefix,name,NULL));
     ent = gen_find_tabulated(global_name,entity_domain);
   }
  
+  /* Is it a global variable declared in the compilation unit? */
   if(entity_undefined_p(ent)) {
     global_name = strdup(concatenate(TOP_LEVEL_MODULE_NAME,MODULE_SEP_STRING,
 				     prefix,name,NULL));
@@ -862,6 +884,7 @@ entity FindOrCreateCurrentEntity(string name,
 	    else if(!type_undefined_p(ft) && type_variable_p(ft)
 		&& basic_pointer_p(variable_basic(type_variable(ft)))) {
 	      string sn = int_to_string((int)ft); // To get a unique identifier for each function pointerdeclaration, dummy or not
+	      set_current_dummy_parameter_number((int) ft);
 	      ent = find_or_create_entity(strdup(concatenate(DUMMY_PARAMETER_PREFIX,sn,
 							     MODULE_SEP_STRING,name,NULL)));
 	      free(sn);
@@ -872,6 +895,7 @@ entity FindOrCreateCurrentEntity(string name,
 	      // may not be sufficient as a function can be declared
 	      // any number of times with any parameter names)
 	      string sn = int_to_string((int) function); 
+	      set_current_dummy_parameter_number((int) function);
 	      ent = find_or_create_entity(strdup(concatenate(DUMMY_PARAMETER_PREFIX,sn,
 							     MODULE_SEP_STRING,name,NULL)));
 	      free(sn);
@@ -1363,7 +1387,7 @@ void CModuleMemoryAllocation(entity module)
 	}
     }
 }
-
+
 /* If f has regular formal parameters, destroy them. */
 void UseDummyArguments(entity f)
 {
@@ -1478,6 +1502,27 @@ void UseFormalArguments(entity f)
   }
 }
 
+/* To chase formals in type declarations */
+static dummy_formal_list;
+
+static void cancel_dummy_reference(reference r)
+{
+  entity v = reference_variable(r);
+
+  pips_debug(8, "Reference to \"\%s\" found\n", entity_name(v));
+
+  if(gen_in_list_p((void*) v, dummy_formal_list)) {
+    reference_variable(r) = entity_undefined;
+  pips_debug(8, "Reference to \"\%s\" removed\n", entity_name(v));
+  }
+}
+
+static void clean_up_dummy_parameter_type(type t, list fpl)
+{
+  dummy_formal_list = fpl;
+  gen_multi_recurse(t, reference_domain, gen_true, cancel_dummy_reference, NULL);
+}
+
 /* If f has dummy formal parameters, replace them by standard formal parameters */
 void RemoveDummyArguments(entity f)
 {
@@ -1511,16 +1556,19 @@ void RemoveDummyArguments(entity f)
     /* FI: just in case? */
     remove_entity_type_stacks(formals);
 
-    /* Remore the dummy formals from f's declaration list (and from the
-       symbol table?) and replace them by equivalent regular formal parameters */
+    /* Remore the dummy formals from f's declaration list (and from
+       the symbol table?) and cancel all pointers in their
+       declarations towards themselves as in "void foo(n,a[n])" */
     for(cd = formals; !ENDP(cd); POP(cd)) {
       entity p = ENTITY(CAR(cd));
+      type pt = entity_type(p);
       storage ps = entity_storage(p);
       formal pfs = storage_formal(ps);
 
-      pips_debug(8, "Formal dummy parameter \"%s\" is removed ",
+      pips_debug(8, "Formal dummy parameter \"%s\" is removed\n",
 		 entity_name(p));
 
+      clean_up_dummy_parameter_type(pt, formals);
       gen_remove(&code_declarations(fc), (void *) p);
 
       /* FI: The storage might point to another dummy argument
@@ -1532,7 +1580,7 @@ void RemoveDummyArguments(entity f)
     gen_free_list(formals);
   }
 }
-
+
 void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack FunctionStack,
 		  stack OffsetStack, bool is_external, bool is_declaration)
 {

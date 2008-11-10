@@ -71,6 +71,10 @@ bool summary_rw_effects_engine(string module_name)
     }
 
     l_dec = summary_effects_from_declaration(module_name);
+    ifdebug(8) {
+      pips_debug(8, "Summary effects from declarations:\n");
+	(*effects_prettyprint_func)(l_dec);
+    }
     
     l_loc2 = gen_append(l_loc,l_dec);
     
