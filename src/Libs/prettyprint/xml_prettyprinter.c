@@ -55,6 +55,10 @@
 
 #define XML_RL      NL,TAB,TAB
 
+#define code_is_a_box 0
+#define code_is_a_te 1
+#define code_is_a_main 2
+
 /* array containing extern loop indices names */
 static gen_array_t extern_indices_array;
 /* array containing intern loop indices (name : "M_") */
@@ -75,7 +79,7 @@ static string global_module_name;
 static int global_margin =0;
 
 extern boolean is_fortran;
-
+static boolean box_in_statement_p=FALSE;
 static boolean motif_in_statement_p=FALSE;
 
 extern dimension find_ith_dimension();
@@ -2026,6 +2030,40 @@ static void xml_CodeSize(string_buffer sb_result)
   string_buffer_append_word("/CodeSize",sb_result);
 }
 
+void insert_xml_callees(string module_name) {
+  FILE * out;
+  string dir = db_get_current_workspace_directory();
+  string sm = db_build_file_resource_name(DBR_XML_PRINTED_FILE, 
+					  module_name, XMLPRETTY);
+  string xml_module_name = strdup(concatenate(dir, "/", sm, NULL));
+  callees callers = (callees)db_get_memory_resource(DBR_CALLEES,module_name, TRUE);
+  out = safe_fopen(xml_module_name, "a");
+
+  MAP(STRING, callee_name, {
+    string sc=(string) db_get_memory_resource(DBR_XML_PRINTED_FILE, 
+					      callee_name, TRUE);  
+    string xml_callee_name = strdup(concatenate(dir, "/", sc, NULL));
+     safe_append(out, xml_callee_name,0, TRUE);
+    free(xml_callee_name);
+  },
+      callees_callees(callers)); 
+  safe_fclose(out, xml_module_name);
+  free(xml_module_name);
+}
+
+void insert_xml_string(string module_name, string s) {
+  FILE * out;
+  string dir = db_get_current_workspace_directory();
+  string sm = db_build_file_resource_name(DBR_XML_PRINTED_FILE, 
+					  module_name, XMLPRETTY);
+  string xml_module_name = strdup(concatenate(dir, "/", sm, NULL));
+  out = safe_fopen(xml_module_name, "a");
+  fprintf(out,"%s",s);
+  safe_fclose(out, xml_module_name);
+  free(xml_module_name);
+}
+
+
 // A changer par une fonction qui detectera si la variable a ete definie 
 // dans un fichier de parametres ...
 static boolean entity_xml_parameter_p(entity e)
@@ -2335,65 +2373,66 @@ static void xml_Pattern_Paving(entity var, Pvecteur formal_parameters, list patt
       }
     }  
 }
-static void xml_TaskParameters(entity module, list pattern_region, Pvecteur paving_indices, string_buffer sb_result)
+static void xml_TaskParameters(boolean assign_function, int code_tag, entity module, list pattern_region, Pvecteur paving_indices, string_buffer sb_result)
 {
  
   int ith;
   int FormalParameterNumber = gen_length(module_formal_parameters(module));
   Pvecteur formal_parameters = VECTEUR_NUL;
-
-  string_buffer_append_word("TaskParameters",sb_result);
+  boolean effet_read = TRUE;
+  list lr;
+  boolean tp = FALSE;
+  
+  if (assign_function)
+    string_buffer_append_word("AssignParameters",sb_result);
+  else
+    string_buffer_append_word("TaskParameters",sb_result);
   global_margin++;
   
- // Creation liste des parametres formels
-    for (ith=1;ith<=FormalParameterNumber;ith++) {
-      entity FormalArrayName = find_ith_formal_parameter(module,ith);
-      vect_add_elem (&formal_parameters,(Variable) FormalArrayName,VALUE_ONE);
-    }
-
-
+  // Creation liste des parametres formels
   for (ith=1;ith<=FormalParameterNumber;ith++) {
-
     entity FormalArrayName = find_ith_formal_parameter(module,ith);
-    boolean effet_read = TRUE;
-    list lr;
-    boolean tp = FALSE;
+    vect_add_elem (&formal_parameters,(Variable) FormalArrayName,VALUE_ONE);
+  }
   
-    for ( lr = pattern_region; !ENDP(lr); lr = CDR(lr))
-      { 
-	region reg = REGION(CAR(lr));
-	reference ref = region_reference(reg);  
-	entity v = reference_variable(ref);
-	if (same_entity_p(v,FormalArrayName)) {
-	  effet_read = (region_read_p(reg))? TRUE: FALSE;
-	  add_margin(global_margin,sb_result);
-	  string_buffer_append(sb_result,
-			       strdup(concatenate(OPENANGLE, 
-						  "TaskParameter Name=",
-						  QUOTE,entity_user_name(FormalArrayName),QUOTE, BL, 
-						  "Type=", QUOTE,(entity_xml_parameter_p(v))? "CONTROL":"DATA",QUOTE,BL,
-						  "AccessMode=", QUOTE, (effet_read)? "USE":"DEF",QUOTE,BL,
-						  "ArrayP=", QUOTE, (array_entity_p(v))?"TRUE":"FALSE",QUOTE, BL, 
-						  "Kind=", QUOTE,  "VARIABLE",QUOTE,
+  for ( lr = pattern_region; !ENDP(lr); lr = CDR(lr))
+    { 
+      region reg = REGION(CAR(lr));
+      reference ref = region_reference(reg);  
+      entity v = reference_variable(ref);
+      tp = FALSE;
+      if ((code_tag == code_is_a_main || vect_coeff(v,formal_parameters) != 0) && vect_coeff(v,paving_indices) == 0) {
+	effet_read = (region_read_p(reg))? TRUE: FALSE;
+	add_margin(global_margin,sb_result);
+	string_buffer_append(sb_result,
+			     strdup(concatenate(OPENANGLE, 
+						(assign_function)?"AssignParameter":"TaskParameter"," Name=",
+						QUOTE,entity_user_name(v),QUOTE, BL, 
+						"Type=", QUOTE,(entity_xml_parameter_p(v))? "CONTROL":"DATA",QUOTE,BL,
+						"AccessMode=", QUOTE, (effet_read)? "USE":"DEF",QUOTE,BL,
+						"ArrayP=", QUOTE, (array_entity_p(v))?"TRUE":"FALSE",QUOTE, BL, 
+						"Kind=", QUOTE,  "VARIABLE",QUOTE,
 						 
 
-						  CLOSEANGLE
-						  NL, NULL))); 
-	  tp = TRUE;
-	}
+						CLOSEANGLE
+						NL, NULL))); 
+	global_margin++;
+	xml_Pattern_Paving(v, formal_parameters, 
+			   pattern_region,paving_indices, 
+			   sb_result);
+	
+	global_margin--;
+	if (assign_function)
+	  string_buffer_append_word("/AssignParameter",sb_result);
+	else
+	  string_buffer_append_word("/TaskParameter",sb_result);
       }
-     
-    global_margin++;
-    xml_Pattern_Paving(FormalArrayName, formal_parameters, 
-		       pattern_region,paving_indices, 
-		       sb_result);
- 
-    global_margin--;
-    if (tp)
-      string_buffer_append_word("/TaskParameter",sb_result);
-  }
+    }
   global_margin--;
-  string_buffer_append_word("/TaskParameters",sb_result);
+  if (assign_function)
+    string_buffer_append_word("/AssignParameters",sb_result);
+  else
+    string_buffer_append_word("/TaskParameters",sb_result);
 }
 
 
@@ -2613,6 +2652,12 @@ static void motif_in_statement(statement s)
   if (!string_undefined_p(comm) && strstr(comm,"MOTIF")!=NULL)
     motif_in_statement_p= TRUE;
 }
+static void box_in_statement(statement s)
+{
+  string comm = statement_comments(s);
+  if (!string_undefined_p(comm) && strstr(comm,"BOX")!=NULL)
+    box_in_statement_p= TRUE;
+}
 
 
 static void xml_Loop(statement s, string_buffer sb_result)
@@ -2641,13 +2686,13 @@ static void xml_Loop(statement s, string_buffer sb_result)
 // if comment MOTIF is outside the loop nest, the pattern_region is the call region
 static void xml_Loops(stack st,boolean call_external_loop_p, list *pattern_region, Pvecteur *paving_indices, Pvecteur *pattern_indices, boolean motif_in_te_p, string_buffer sb_result)
 {
-  boolean in_motif_p=FALSE;
+  boolean in_motif_p=!call_external_loop_p && !motif_in_te_p;
   boolean motif_on_loop_p=FALSE;
   // Boucles externes a la TE
   if (call_external_loop_p)
     string_buffer_append_word("ExternalLoops",sb_result); 
   else 
-    // Boucles externes au motif
+    // Boucles externes au motif dans la TE
     string_buffer_append_word("Loops",sb_result); 
 
   global_margin++;
@@ -2658,7 +2703,7 @@ static void xml_Loops(stack st,boolean call_external_loop_p, list *pattern_regio
     string comm = statement_comments(s);
     entity index =loop_index(l);
 
-    if (!call_external_loop_p && !in_motif_p) {
+     if (!in_motif_p) {
       // Test : Motif is in the loop body  or not 
       motif_in_statement_p=FALSE;
       gen_recurse(loop_body(l), statement_domain, gen_true,motif_in_statement); 
@@ -2674,8 +2719,11 @@ static void xml_Loops(stack st,boolean call_external_loop_p, list *pattern_regio
 	  *pattern_region = regions_dup(load_statement_local_regions(loop_body(l))); 
 	}
       
-      in_motif_p = !motif_in_te_p || in_motif_p || motif_on_loop_p || 
-	           (motif_in_te_p && !motif_on_loop_p && !motif_in_statement_p);
+      in_motif_p =   (!call_external_loop_p && !motif_in_te_p) //Par default on englobe si TE
+	 || in_motif_p        // on etait deja dans le motif
+	|| motif_on_loop_p  // on vient de trouver un Motif sur la boucle
+	|| (motif_in_te_p && !motif_on_loop_p && !motif_in_statement_p); 
+      // motif externe au nid de boucles (cas des motif au milieu d'une sequence) 
     }
     if (!in_motif_p) {
       vect_add_elem (paving_indices,(Variable) index ,VALUE_ONE);
@@ -2692,7 +2740,7 @@ static void xml_Loops(stack st,boolean call_external_loop_p, list *pattern_regio
   
 }
 
-static void  xml_Task(string callee_name, string_buffer sb_result)
+static void  xml_Task(string module_name, int code_tag,string_buffer sb_result)
 {
   nest_context_t task_loopnest;
   task_loopnest.loops_for_call = stack_make(statement_domain,0,0);
@@ -2706,56 +2754,52 @@ static void  xml_Task(string callee_name, string_buffer sb_result)
   Pvecteur paving_indices = VECTEUR_NUL;
   Pvecteur pattern_indices = VECTEUR_NUL;
   boolean motif_in_te_p = FALSE;
-  entity callee = module_name_to_entity(callee_name);
-  //  string xml_callee = db_build_file_resource_name(DBR_XML_PRINTED_FILE, 
-  //						  callee_name, XMLPRETTY);
-  statement stat_callee=(statement) db_get_memory_resource(DBR_CODE, 
-							   callee_name, TRUE);
+  entity module = module_name_to_entity(module_name);
+
+  string string_sb_result;
+  statement stat_module=(statement) db_get_memory_resource(DBR_CODE, 
+							   module_name, TRUE);
   reset_rw_effects();
   set_rw_effects
     ((statement_effects)
-     db_get_memory_resource(DBR_REGIONS, callee_name, TRUE));
+     db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
 
-  push_current_module_statement(stat_callee);
- 
-  /* Get the READ and WRITE regions of the module */
- 
+  push_current_module_statement(stat_module);
   global_margin++;
   add_margin(global_margin,sb_result);
   string_buffer_append(sb_result,
 		       strdup(concatenate(OPENANGLE, 
 					  "Task Name=",QUOTE, 
-					  callee_name,QUOTE,CLOSEANGLE, 
+					  module_name,QUOTE,CLOSEANGLE, 
 					  NL, NULL)));
   global_margin++;
 
-  find_loops_and_calls_in_box(stat_callee,&task_loopnest);
+  find_loops_and_calls_in_box(stat_module,&task_loopnest);
 
   xml_Library(sb_result);
   xml_Returns(sb_result);
   xml_Timecosts(sb_result);
-  xml_LocalArrays(callee, sb_result);
-  xml_FormalArrays(callee,sb_result);
-  /* A completer 
-     On ne traite qu'une TE : un seul nid de boucles */
- nested_loops = gen_array_item(task_loopnest.nested_loops,0); 
+  xml_LocalArrays(module, sb_result);
+  xml_FormalArrays(module,sb_result);
+  /*  On ne traite qu'une TE : un seul nid de boucles */
+  nested_loops = gen_array_item(task_loopnest.nested_loops,0); 
 
-  pattern_region = regions_dup(load_statement_local_regions(stat_callee));
-  gen_recurse(stat_callee, statement_domain, gen_true,motif_in_statement); 
+  pattern_region = regions_dup(load_statement_local_regions(stat_module));
+  gen_recurse(stat_module, statement_domain, gen_true,motif_in_statement); 
   motif_in_te_p = motif_in_statement_p;
   xml_Loops(nested_loops,FALSE,&pattern_region,&paving_indices, &pattern_indices, motif_in_te_p, sb_result);
 
-  xml_TaskParameters(callee,pattern_region,paving_indices,sb_result);
- 
+  xml_TaskParameters(FALSE,code_tag, module,pattern_region,paving_indices,sb_result);
+
   xml_Regions(sb_result);
   xml_CodeSize(sb_result);
-  
   global_margin--;
   string_buffer_append_word("/Task",sb_result);
   global_margin--;
-   
+  
+   string_sb_result=string_buffer_to_string(sb_result); 
+  insert_xml_string(module_name,string_sb_result);
   pop_current_module_statement();
-  //  reset_current_module_entity();   
   gen_array_free(task_loopnest.nested_loops);
   gen_array_free(task_loopnest.nested_loop_indices);
   gen_array_free(task_loopnest.nested_call);
@@ -2929,9 +2973,6 @@ int find_rw_effect_for_entity(list leff, effect *eff, entity e)
   int effet_rwb=0;
   list lr = NIL;
 
-  //  DEBUG
-  //  printf("liste des effects pour entity %s\n",entity_user_name(e));
-  //  print_effects(leff);
   for ( lr = leff; !ENDP(lr) && (effet_rwb==0); lr = CDR(lr)) {
     *eff= EFFECT(CAR(lr));
     reference ref = effect_reference(*eff);  
@@ -2945,15 +2986,18 @@ int find_rw_effect_for_entity(list leff, effect *eff, entity e)
 }
 
 
+
 static void  xml_Arguments(statement s, entity function, Pvecteur loop_indices, string_buffer sb_result )
 {
   call c = instruction_call(statement_instruction(s));
   list call_effect =load_proper_rw_effects_list(s);
   entity FormalArrayName, ActualArrayName;
   reference ActualRef;
+  syntax sr;
   effect ef = effect_undefined; 
   int iexp,ith=0;
   int rw_ef=0;
+  string aan ="";
 
   //   printf("xml_Arguments statement: \n");
   //   print_statement(s);
@@ -2964,10 +3008,19 @@ static void  xml_Arguments(statement s, entity function, Pvecteur loop_indices, 
   MAP(EXPRESSION,exp,{  
     ith ++; 
     FormalArrayName = find_ith_formal_parameter(call_function(c),ith);
-    ActualRef = syntax_reference(expression_syntax(exp));
-    ActualArrayName = reference_variable(ActualRef);
-    rw_ef = find_rw_effect_for_entity(call_effect,&ef, ActualArrayName);
+    sr = expression_syntax(exp);
+    if (syntax_reference_p(sr)) {
+      ActualRef = syntax_reference(sr);
+      ActualArrayName = reference_variable(ActualRef);
+      aan = entity_local_name(ActualArrayName);
+      rw_ef = find_rw_effect_for_entity(call_effect,&ef, ActualArrayName);
+    }
+    else {
+      // Actual Parameter could be  an expression
+      aan = words_to_string(words_syntax(sr));
+      rw_ef = 1;
 
+    }
     string_buffer_append_word("Argument",sb_result);
     if (!array_argument_p(exp)) { /* Scalar Argument */
       global_margin++;
@@ -2976,7 +3029,7 @@ static void  xml_Arguments(statement s, entity function, Pvecteur loop_indices, 
 			   strdup(concatenate(OPENANGLE, 
 					      "ScalarArgument ActualName=", 
 					      QUOTE,
-					      entity_local_name(ActualArrayName),
+					      aan,
 					      QUOTE,BL,
 					      "FormalName=", QUOTE,entity_local_name(FormalArrayName), QUOTE,BL,
 					      "AccessMode=",QUOTE,(rw_ef==2)? "DEF":"USE", QUOTE,CLOSEANGLE,
@@ -3027,7 +3080,7 @@ static void   xml_Dependances()
   // Not implemented Yet
 }
 
-static void xml_Call( int taskNumber, nest_context_p nest, string_buffer sb_result)
+static void xml_Call(entity module,  int code_tag,int taskNumber, nest_context_p nest, string_buffer sb_result)
 {
   statement s = gen_array_item(nest->nested_call,taskNumber);
   stack st = gen_array_item(nest->nested_loops,taskNumber); 
@@ -3037,21 +3090,44 @@ static void xml_Call( int taskNumber, nest_context_p nest, string_buffer sb_resu
   list pattern_region=NIL;
   Pvecteur paving_indices = VECTEUR_NUL;
   Pvecteur pattern_indices = VECTEUR_NUL;
+  boolean motif_in_te_p=FALSE;
  
-  add_margin(global_margin,sb_result);
+ add_margin(global_margin,sb_result);
   string_buffer_append(sb_result,
 		       strdup(concatenate(OPENANGLE, 
 					  "Call Name=", 
 					  QUOTE,
-					  entity_local_name(func), 
+					  ENTITY_ASSIGN_P(func) ? "LocalAssignment" : entity_local_name(func), 
 					  QUOTE,
-					  CLOSEANGLE,NL, NULL)));
-  global_margin++;
-  xml_Loops(st,TRUE,&pattern_region,&paving_indices, &pattern_indices, FALSE, sb_result);
-  xml_Arguments(s,func,paving_indices, sb_result);
+ 					  CLOSEANGLE,NL, NULL)));
+ global_margin++;
+ 
+ pattern_region = regions_dup(load_statement_local_regions(s));
+
+  xml_Loops(st,TRUE,&pattern_region,&paving_indices, &pattern_indices,motif_in_te_p, sb_result);
+
+  if (ENTITY_ASSIGN_P(func)) { 
+    xml_TaskParameters(TRUE,code_tag, module,pattern_region,paving_indices,sb_result);
+  }
+  else
+    xml_Arguments(s,func,paving_indices, sb_result);
   xml_Dependances();
   global_margin--;
   string_buffer_append_word("/Call",sb_result);
+}
+
+boolean array_in_effect_list(list effects_list)
+{
+  list pc;
+ for (pc= effects_list;pc != NIL; pc = CDR(pc)){
+      effect e = EFFECT(CAR(pc));
+      reference r = effect_reference(e);
+      entity v =  reference_variable(r);
+      if (array_entity_p(v)){
+	return(TRUE);
+      }
+ }
+ return(FALSE);
 }
 
 static void xml_BoxGraph(entity module, nest_context_p nest, string_buffer sb_result,string_buffer sb_ac)
@@ -3059,117 +3135,121 @@ static void xml_BoxGraph(entity module, nest_context_p nest, string_buffer sb_re
   string_buffer appli_needs = string_buffer_make();
   string string_needs = "";
   string string_appli_needs = "";
-  list pc, effects_list;
+  list pc;
   int nb_call,nc,callnumber;
  
-
   add_margin(global_margin,sb_result);
   string_buffer_append(sb_result,
 		       strdup(concatenate(OPENANGLE, 
 					  "BoxGraph Name=", 
-					  QUOTE,"Box_",
-					  entity_user_name(module), 
+					  QUOTE,entity_user_name(module), 
 					  QUOTE,
 					  CLOSEANGLE,NL, NULL)));
 
   nb_call = (int)gen_array_nitems(nest->nested_call);
   nc = 1;
-
+  global_margin++;
   for (callnumber = 0; callnumber<nb_call; callnumber++) {
     statement s = gen_array_item(nest->nested_call,callnumber); 
     call c = instruction_call(statement_instruction(s));
     list effects_list =load_proper_rw_effects_list(s);
-    string n = entity_local_name(call_function(c)); 
+    entity func= call_function(c);
     string_buffer buffer_needs = string_buffer_make();
+    boolean assign_func = ENTITY_ASSIGN_P(func);
+    string n= assign_func ? "LocalAssignment" : entity_local_name(func);
 
-    add_margin(global_margin,sb_result);
-    string_buffer_append(sb_result,
-			       strdup(concatenate(OPENANGLE, 
-						  "TaskRef Name=", 
-						  QUOTE,n,QUOTE, CLOSEANGLE,NL,
-						    NULL)));
-    for (pc= effects_list;pc != NIL; pc = CDR(pc)){
-      effect e = EFFECT(CAR(pc));
-      reference r = effect_reference(e);
-      action ac = effect_action(e);
-      entity v =  reference_variable(r);
-      if (array_entity_p(v)){
-	if (action_read_p(ac)) {
-	  entity t =  hash_get(hash_entity_def_to_task,(char *) v);
-	  global_margin++;
-	  add_margin(global_margin,buffer_needs);
-	  string_buffer_append(buffer_needs,
-			       strdup(concatenate(OPENANGLE, 
-						  "Needs ArrayName=", 
-						  QUOTE,entity_local_name(v),QUOTE, BL,
-						  "DefinedBy=",
-						  QUOTE,
-						  (t!= HASH_UNDEFINED_VALUE) ? entity_local_name(t): "IN_VALUE",
-						  QUOTE,"/",
-						  CLOSEANGLE,NL,
-						  NULL))); 
-	  // Temporaire en attendant les effects IN de l'appli
-	  if (nc==1) {
-	    add_margin(global_margin,appli_needs);
-	    string_buffer_append(appli_needs,
+    if (!assign_func || array_in_effect_list(effects_list)) {
+
+      add_margin(global_margin,sb_result);
+      string_buffer_append(sb_result,
+			   strdup(concatenate(OPENANGLE, 
+					      "TaskRef Name=", 
+					      QUOTE,n,QUOTE, CLOSEANGLE,NL,
+					      NULL)));
+      for (pc= effects_list;pc != NIL; pc = CDR(pc)){
+	effect e = EFFECT(CAR(pc));
+	reference r = effect_reference(e);
+	action ac = effect_action(e);
+	entity v =  reference_variable(r);
+	if (array_entity_p(v)){
+	  if (action_read_p(ac)) {
+	    entity t =  hash_get(hash_entity_def_to_task,(char *) v);
+	    global_margin++;
+	    add_margin(global_margin,buffer_needs);
+	    string_buffer_append(buffer_needs,
 				 strdup(concatenate(OPENANGLE, 
 						    "Needs ArrayName=", 
 						    QUOTE,entity_local_name(v),QUOTE, BL,
 						    "DefinedBy=",
-						    QUOTE,(t!= HASH_UNDEFINED_VALUE) ? entity_local_name(t): "IN_VALUE",
+						    QUOTE,
+						    (t!= HASH_UNDEFINED_VALUE) ? entity_local_name(t): "IN_VALUE",
 						    QUOTE,"/",
 						    CLOSEANGLE,NL,
 						    NULL))); 
+	    // Temporaire en attendant les effects IN de l'appli
+	    if (nc==1) {
+	      add_margin(global_margin,appli_needs);
+	      string_buffer_append(appli_needs,
+				   strdup(concatenate(OPENANGLE, 
+						      "Needs ArrayName=", 
+						      QUOTE,entity_local_name(v),QUOTE, BL,
+						      "DefinedBy=",
+						      QUOTE,(t!= HASH_UNDEFINED_VALUE) ? entity_local_name(t): "IN_VALUE",
+						      QUOTE,"/",
+						      CLOSEANGLE,NL,
+						      NULL))); 
 
+	    }
+	    global_margin--;
 	  }
-	  global_margin--;
-	}
-	else {   
-	  global_margin++;
-	  add_margin(global_margin,sb_result);
-	  string_buffer_append(sb_result,
-			       strdup(concatenate(OPENANGLE,"Computes ArrayName=",
-						  QUOTE,entity_local_name(v),QUOTE,"/",
-						  CLOSEANGLE,NL,
-						  NULL)));
-
-	  // Temporaire en attendant les effects OUT de l'appli
-	  if (nc==nb_call) {
-	    add_margin(global_margin,sb_ac);
-	    string_buffer_append(sb_ac,
-				 strdup(concatenate(OPENANGLE, 
-						    "Computes ArrayName=",
+	  else {   
+	    global_margin++;
+	    add_margin(global_margin,sb_result);
+	    string_buffer_append(sb_result,
+				 strdup(concatenate(OPENANGLE,"Computes ArrayName=",
 						    QUOTE,entity_local_name(v),QUOTE,"/",
 						    CLOSEANGLE,NL,
 						    NULL)));
-	
-	    string_appli_needs =string_buffer_to_string(appli_needs);
-	    string_buffer_append(sb_ac,string_appli_needs);
-	  	
-	  }
-	   global_margin--;
-	} 
-      }
-    }
-    string_needs =string_buffer_to_string(buffer_needs);
-    string_buffer_append(sb_result,string_needs);
-    string_buffer_append_word("/TaskRef",sb_result);	 
-    nc++;  
 
+	    // Temporaire en attendant les effects OUT de l'appli
+	    if (nc==nb_call) {
+	      add_margin(global_margin,sb_ac);
+	      string_buffer_append(sb_ac,
+				   strdup(concatenate(OPENANGLE, 
+						      "Computes ArrayName=",
+						      QUOTE,entity_local_name(v),QUOTE,"/",
+						      CLOSEANGLE,NL,
+						      NULL)));
+	
+	      string_appli_needs =string_buffer_to_string(appli_needs);
+	      string_buffer_append(sb_ac,string_appli_needs);
+	  	
+	    }
+	    global_margin--;
+	  } 
+	}
+      }
+      string_needs =string_buffer_to_string(buffer_needs);
+      string_buffer_append(sb_result,string_needs);
+      string_buffer_append_word("/TaskRef",sb_result);	 
+      nc++;  
+
+    }
   }
-   
+    global_margin--;
   string_buffer_append_word("/BoxGraph",sb_result); 
 }
 
 
 
-static void xml_Boxes(entity module,statement stat,string_buffer sb_result,string_buffer sb_ac)
+static void xml_Boxes(string module_name, int code_tag,string_buffer sb_result,string_buffer sb_ac)
 {
-
-  string  module_name = entity_user_name(module);
+  entity module = module_name_to_entity(module_name);
+  
   nest_context_t nest;
   int callnumber =0;
-
+  statement stat = get_current_module_statement();
+  string string_sb_result;
   nest.loops_for_call = stack_make(statement_domain,0,0);
   nest.loop_indices = stack_make(entity_domain,0,0);
   nest.current_stat = stack_make(statement_domain,0,0);
@@ -3182,8 +3262,7 @@ static void xml_Boxes(entity module,statement stat,string_buffer sb_result,strin
   string_buffer_append(sb_result,
 		       strdup(concatenate(OPENANGLE, 
 					  "Box Name=", 
-					  QUOTE,"Box_",
-					  module_name, 
+					  QUOTE,module_name, 
 					  QUOTE,
 					  CLOSEANGLE,NL, NULL)));
   global_margin++;
@@ -3194,12 +3273,21 @@ static void xml_Boxes(entity module,statement stat,string_buffer sb_result,strin
   find_loops_and_calls_in_box(stat,&nest);
  
   for (callnumber = 0; callnumber<(int)gen_array_nitems(nest.nested_call); callnumber++)
-    xml_Call(callnumber, &nest,sb_result);
+    xml_Call(module, code_tag, callnumber, &nest,sb_result);
+  
+
   
   xml_BoxGraph(module,&nest,sb_result,sb_ac);
   global_margin--;
   string_buffer_append_word("/Box",sb_result); 
-  
+   string_sb_result=string_buffer_to_string(sb_result); 
+
+  insert_xml_string(module_name,string_sb_result);
+
+  string_buffer_append_word("Tasks",sb_result);
+  insert_xml_callees(module_name);
+  string_buffer_append_word("/Tasks",sb_result);
+   global_margin--;
   gen_array_free(nest.nested_loops);
   gen_array_free(nest.nested_loop_indices);
   gen_array_free(nest.nested_call);
@@ -3211,11 +3299,12 @@ static void xml_Boxes(entity module,statement stat,string_buffer sb_result,strin
 }
 
 // A completer avec les effects IN et OUT de l'application
-static void xml_ApplicationGraph(string module_name, string_buffer sb_ac ,string_buffer sb_result)
+static void xml_ApplicationGraph(string module_name, string_buffer sb_ac )
 {
+  string_buffer sb_pref_ac = string_buffer_make();
   string string_sb_ac="";
-  add_margin(global_margin,sb_result);
-  string_buffer_append(sb_result,
+  add_margin(global_margin,sb_pref_ac);
+  string_buffer_append(sb_pref_ac,
 		       strdup(concatenate(OPENANGLE, 
 					  "ApplicationGraph Name=", 
 					  QUOTE,
@@ -3223,22 +3312,22 @@ static void xml_ApplicationGraph(string module_name, string_buffer sb_ac ,string
 					  QUOTE,
 					  CLOSEANGLE,NL, NULL)));
   string_sb_ac =string_buffer_to_string(sb_ac);
-  string_buffer_append(sb_result,string_sb_ac);
-  string_buffer_append_word("/ApplicationGraph",sb_result); 
+  string_buffer_append(sb_pref_ac,string_sb_ac);
+  string_buffer_append_word("/ApplicationGraph",sb_pref_ac); 
+  sb_ac=sb_pref_ac;
+  
   
 }
 
 
-static void xml_Application(string module_name, statement stat, string_buffer sb_result)
+static void xml_Application(string module_name, int code_tag,string_buffer sb_result)
 {
   entity module = module_name_to_entity(module_name);
-  callees callers = (callees)db_get_memory_resource(DBR_CALLEES,module_name, TRUE);
   string_buffer sb_ac = string_buffer_make();
- 
-  hash_entity_def_to_task = hash_table_make(hash_pointer,0);
+  string sr;
   global_margin = 0; 
   
-  string_buffer_append(sb_result,
+   string_buffer_append(sb_result,
 		       strdup(concatenate(OPENANGLE, 
 					  "!DOCTYPE Application SYSTEM ",
 					  QUOTE,
@@ -3261,47 +3350,75 @@ static void xml_Application(string module_name, statement stat, string_buffer sb
 					  QUOTE,
 					  CLOSEANGLE, 
 					  NL, NULL)));
-  xml_ActualArrays(module,sb_result);
-  global_margin +=2;
+ xml_ActualArrays(module,sb_result);
+ global_margin ++;
+  add_margin(global_margin,sb_ac);
+  string_buffer_append(sb_ac,
+		       strdup(concatenate(OPENANGLE, 
+					  "ApplicationGraph Name=", 
+					  QUOTE,
+					  module_name, 
+					  QUOTE,
+					  CLOSEANGLE,NL, NULL)));
+  global_margin ++;
   add_margin(global_margin,sb_ac);
   string_buffer_append(sb_ac,
 		       strdup(concatenate(OPENANGLE, 
 					  "TaskRef Name=", 
-					  QUOTE,"Box_", entity_user_name(module),
+					  QUOTE,entity_user_name(module),
 					  QUOTE,CLOSEANGLE,NL,
 					  NULL)));  
   global_margin -=2;
+  xml_Boxes(module_name,code_tag,sb_result,sb_ac);  
+  global_margin +=2;
+  string_buffer_append_word("/TaskRef",sb_ac);  
+ global_margin --;
+ string_buffer_append_word("/ApplicationGraph",sb_ac); 
+ global_margin --;
 
-  xml_Boxes(module,stat,sb_result,sb_ac);  
-  global_margin ++; 
-  string_buffer_append_word("/TaskRef",sb_ac); 
-  global_margin --; 
+
  
-  string_buffer_append_word("Tasks",sb_result);
-  MAP(STRING, callee_name, {
-    xml_Task(callee_name,sb_result);
-  },
-      callees_callees(callers));
-  string_buffer_append_word("/Tasks",sb_result);
-  
-  xml_ApplicationGraph(module_name,sb_ac,sb_result);
-  
-  string_buffer_append(sb_result,
+   add_margin(global_margin,sb_ac);
+  string_buffer_append(sb_ac,
 		       strdup(concatenate(OPENANGLE, 
 					  "/Application", 
 					  CLOSEANGLE, 
 					  NL, NULL)));
+  sr=string_buffer_to_string(sb_ac); 
+
+  insert_xml_string(module_name,sr);  
 }
 
-/* Not implemented yet  - HYPOTHESIS = CODE IS VALID */
-/*static bool valid_specification_p(entity module, statement stat)
-{ 
-  return TRUE;
-}
-*/
 /******************************************************** PIPSMAKE INTERFACE */
 
 #define XMLPRETTY    ".xml"
+
+int find_code_status(string module_name)
+{
+
+  statement stat=(statement) db_get_memory_resource(DBR_CODE, 
+						    module_name, TRUE); 
+  boolean wmotif = FALSE;
+  boolean wbox = FALSE;
+
+  motif_in_statement_p=FALSE;
+  gen_recurse(stat, statement_domain, gen_true,motif_in_statement);  
+  wmotif = motif_in_statement_p;
+  gen_recurse(stat, statement_domain, gen_true,box_in_statement);  
+  wbox = box_in_statement_p;
+  
+  if (strstr(module_name,"MAIN")!=NULL || strstr(module_name,"main")!=NULL)
+     return(code_is_a_main); 
+     else {
+       if (wmotif && !wbox)
+	 return (code_is_a_te);
+       else return(code_is_a_box);
+     }
+     
+
+}
+
+
 
 bool print_xml_application(string module_name)
 {
@@ -3310,7 +3427,9 @@ bool print_xml_application(string module_name)
   string string_sb_result, xml, dir, filename;
   statement stat;
   string_buffer sb_result=string_buffer_make();
-
+ string_buffer sb_ac = string_buffer_make();  
+ hash_entity_def_to_task = hash_table_make(hash_pointer,0);
+ int code_tag;
   module = module_name_to_entity(module_name);
   xml = db_build_file_resource_name(DBR_XML_PRINTED_FILE, 
 				    module_name, XMLPRETTY);
@@ -3338,27 +3457,37 @@ bool print_xml_application(string module_name)
 		      db_get_memory_resource(DBR_COMPLEXITIES, module_name, TRUE));
 
 
-  debug_on("XMLPRETTYPRINTER_DEBUG_LEVEL"); 
-  // A implementer
-  // pips_debug(1, "Spec validation before xml prettyprinter for %s\n", 
-  //	     entity_name(module));
-  //if (valid_specification_p(module,stat)){ 
-  //pips_debug(1, "Not implemented yet - Hypothesis: Spec is  valid\n");
-  //pips_debug(1, "Begin Xml prettyprinter for %s\n", entity_name(module));
+  debug_on("XMLPRETTYPRINTER_DEBUG_LEVEL");   
+  out = safe_fopen(filename, "w");
+  fprintf(out,"<!-- XML prettyprint for module %s. --> \n",module_name);
+  safe_fclose(out, filename);
 
-  xml_Application(module_name, stat,sb_result);
-   
+   code_tag = find_code_status(module_name);
+  switch (code_tag) 
+    {
+    case code_is_a_box: {
+      xml_Boxes(module_name,code_tag,sb_result,sb_ac);
+   break;
+    }
+    case code_is_a_te:{ 
+      xml_Task(module_name,code_tag,sb_result);
+      break;
+    }
+    case code_is_a_main:{
+
+      xml_Application(module_name, code_tag,sb_result);  
+
+
+      break;
+    }
+   default:
+      pips_internal_error("unexpected kind of code for xml_prettyprinter\n");
+    }
+
   pips_debug(1, "End Xml prettyprinter for %s\n", module_name);
   debug_off();  
-     
-  string_sb_result=string_buffer_to_string(sb_result); 
-  /* save to file */
-  out = safe_fopen(filename, "w");
-  fprintf(out,"<!-- XML prettyprint for module %s. --> \n%s", module_name,string_sb_result);
-  safe_fclose(out, filename);
-  string_buffer_free(&sb_result,TRUE);
-  //}
-
+   string_buffer_free(&sb_result,TRUE);
+  hash_table_free(hash_entity_def_to_task);
   free(dir);
   free(filename);
 
@@ -3366,6 +3495,8 @@ bool print_xml_application(string module_name)
 
   reset_current_module_statement();
   reset_current_module_entity();
-
+  reset_complexity_map();
+  reset_rw_effects();
+  reset_proper_rw_effects();
   return TRUE;
 }
