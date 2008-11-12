@@ -1,0 +1,34 @@
+
+Parsed printed file for "dereferencing04"
+
+void dereferencing04()
+{
+   double *p;
+   double *q;
+   double *r;
+   *(p+q-r) = 0.;
+}
+
+Proper effetcs for "dereferencing04"
+
+void dereferencing04()
+{
+   double *p;
+   double *q;
+   double *r;
+//               <must be read   >: p q r
+//               <must be written - pre>: p[q-r]
+   *(p+q-r) = 0.;
+}
+
+Cumulated effetcs for "dereferencing04"
+
+void dereferencing04()
+{
+   double *p;
+   double *q;
+   double *r;
+//               <must be read   >: p q r
+//               <must be written - pre>: p[q-r]
+   *(p+q-r) = 0.;
+}
