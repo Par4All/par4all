@@ -2252,7 +2252,8 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			  else {
 			    entity cm = get_current_module_entity();
 			    /* A function can be redeclared inside itself. see C_syntax/extern.c */
-			    if(cm!=e) {
+			    /* Dummy parameters can also be redeclared */
+			    if(cm!=e && !dummy_parameter_entity_p(e)) {
 			      extern int yylineno; /* from lexer */
 			      pips_user_warning("Variable \"%s\" is redefined at line %d (%d)\n",
 						entity_user_name(e) /* entity_name(e)*/,
@@ -2341,14 +2342,14 @@ rest_par_list1:
     TK_ELLIPSIS 
                         {
 			  /*$$ = CONS(PARAMETER,make_parameter(make_type_varargs(type_undefined),
-			    make_mode(CurrentMode,UU), strdup("")),NIL); */
+			    make_mode(CurrentMode,UU), make_dummy_unknown()),NIL); */
 			  type at = make_type(is_type_variable,
 					      make_variable(make_basic(is_basic_overloaded, UU),
 							    NIL, NIL));
 			  $$ = CONS(PARAMETER,
 				    make_parameter(make_type_varargs(at),
 						   make_mode(CurrentMode,UU),
-						   strdup("")),
+						   make_dummy_unknown()),
 				    NIL); 
 			}
 |   TK_COMMA 
@@ -2367,7 +2368,8 @@ parameter_decl: /* (* ISO 6.7.5 *) */
 			  UpdateEntity($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external,FALSE);
 			  $$ = make_parameter(copy_type(entity_type($2)),
 					      make_mode(CurrentMode,UU),
-					      strdup(""));
+					      make_dummy_identifier($2)); //FI: or should it
+			  // be entity_undefined? Are we parsing a compilation unit or a function?
 			  /* Set CurentMode where ???? */
 			  //stack_pop(ContextStack);
 			  PopContext();
@@ -2377,7 +2379,7 @@ parameter_decl: /* (* ISO 6.7.5 *) */
 			  UpdateAbstractEntity($2,ContextStack);
 			  $$ = make_parameter(copy_type(entity_type($2)),
 					      make_mode(CurrentMode,UU),
-					      strdup(""));
+					      make_dummy_unknown()); //FI: to be checked
 			  RemoveFromExterns($2);
 			  free_entity($2);
 			  //stack_pop(ContextStack);
@@ -2388,7 +2390,7 @@ parameter_decl: /* (* ISO 6.7.5 *) */
 			  c_parser_context ycontext = stack_head(ContextStack);
 			  $$ = make_parameter(copy_type(c_parser_context_type(ycontext)),
 					      make_mode(CurrentMode,UU),
-					      strdup(""));
+					      make_dummy_unknown());
 			  /* function prototype*/
 			  //stack_pop(ContextStack);
 			  PopContext();

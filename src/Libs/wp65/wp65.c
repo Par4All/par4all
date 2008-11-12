@@ -221,7 +221,7 @@ statement * pemulator;
     functional_parameters(type_functional(entity_type(compute_module)))
 	= CONS(PARAMETER, make_parameter(MakeTypeVariable(make_basic(is_basic_int,4), NIL),
 					 make_mode(is_mode_reference, UU),
-					 strdup("")),
+					 make_dummy_unknown()),
 	       NIL);
 
     memory_module_name = strdup(BANK_NAME);
@@ -232,7 +232,7 @@ statement * pemulator;
 	       make_parameter(MakeTypeVariable(make_basic(is_basic_int,
 							  4), NIL),
 			      make_mode(is_mode_reference, UU),
-			      strdup("")),
+			      make_dummy_unknown()),
 	       NIL);
     computational = make_block_statement(NIL);
     emulator = make_block_statement(NIL);

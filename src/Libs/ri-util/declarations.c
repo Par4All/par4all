@@ -99,12 +99,18 @@ words_parameters(entity e)
 	  {
 	    parameter p = PARAMETER(gen_nth(i-1,functional_parameters(fe)));
 	    type t = parameter_type(p);
+	    //string pn = parameter_name(p);
 	    /* param can be undefined for C language: void foo(void)
 	       We do not have an entity corresponding to the 1st argument */
 	    if (is_fortran)
 	      pips_user_warning("%dth parameter out of %d parameters not found for function %s\n",
 				i, nparams, entity_name(e));
 	    pc = gen_nconc(pc,words_type(t));
+	    /* Should be correct, but seems useless */
+	    //if(!same_string_p(pn, "")) {
+	    //  pc = gen_nconc(pc, strdup(" "));
+	    //  pc = gen_nconc(pc, strdup(pn));
+	    //}
 	  }
 	else 
 	  {
@@ -1888,6 +1894,7 @@ list generic_c_words_entity(type t, list name, bool is_safe)
       functional f = type_functional(t);
       type t2 = functional_result(f);
       list lparams = functional_parameters(f);
+      list cparam = list_undefined;
       bool first = TRUE;  
 
       pips_debug(9,"Function type with name = \"%s\" and length %zd\n",
@@ -1909,17 +1916,23 @@ list generic_c_words_entity(type t, list name, bool is_safe)
 	  pc = CHAIN_SWORD(name,"(");
 	}
       
-      MAP(PARAMETER,p,
-      {
+      for(cparam = lparams; !ENDP(cparam); POP(cparam)) {
+	parameter p = PARAMETER(CAR(cparam));
 	type t1 = parameter_type(p);
+	string pn = dummy_unknown_p(parameter_dummy(p))?
+	  string_undefined : strdup(entity_local_name(dummy_identifier(parameter_dummy(p))));
+
 	//pips_debug(3,"Parameter type %s\n ",type_undefined_p(t1)? "type_undefined" : words_to_string(words_type(t1)));
 	if (!first)
 	  pc = gen_nconc(pc,CHAIN_SWORD(NIL, space_p? ", " : ","));
 	/* c_words_entity(t1,NIL) should be replaced by c_words_entity(t1,name_of_corresponding_parameter) */
-	pc = gen_nconc(pc,generic_c_words_entity(t1, NIL, is_safe));
+	pc = gen_nconc(pc,
+		       generic_c_words_entity(t1, 
+					      string_undefined_p(pn)? NIL : CONS(STRING, strdup(pn), NIL),
+					      is_safe));
 	pips_debug(9,"List of parameters \"%s\"\n ",list_to_string(pc));
 	first = FALSE;
-      },lparams);
+      }
       
       pc = CHAIN_SWORD(pc,")");
       return generic_c_words_entity(t2,pc,is_safe);

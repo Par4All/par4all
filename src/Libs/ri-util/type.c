@@ -161,14 +161,16 @@ MakeCharacterParameter()
 				  UUINT(DEFAULT_CHARACTER_TYPE_SIZE)))),
 				      NIL),
 			make_mode(is_mode_reference, UU),
-			strdup(""));
+			make_dummy_unknown());
 }
 
+/* For Fortran */
 parameter 
 MakeAnyScalarParameter(tag t, intptr_t size)
 {
-    return(make_parameter((MakeTypeArray(make_basic(t, UUINT(size)), NIL)),
-			  make_mode(is_mode_reference, UU), strdup("")));
+  return make_parameter(MakeTypeArray(make_basic(t, UUINT(size)), NIL),
+			make_mode_reference(),
+			make_dummy_unknown());
 }
 
 /* this function creates a default fortran operator result, i.e. a zero
@@ -2026,7 +2028,7 @@ bool check_C_function_type(entity f, list args)
 	list pl = NIL;
 	MAP(EXPRESSION, e, {
 	    type et = expression_to_user_type(e);
-	    parameter p = make_parameter(et, make_mode(is_mode_value, UU), strdup(""));
+	    parameter p = make_parameter(et, make_mode_value(), make_dummy_unknown());
 	    pl = gen_nconc(pl, CONS(PARAMETER, p, NIL));
 	  },
 	  args);

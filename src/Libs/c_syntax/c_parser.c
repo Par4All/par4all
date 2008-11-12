@@ -340,11 +340,11 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
 		  make_functional(CONS(PARAMETER,
 				       make_parameter(va_list_t,
 						      make_mode(is_mode_value, UU),
-						      strdup("")),
+						      make_dummy_unknown()),
 				       CONS(PARAMETER,
 					    make_parameter(void_start_t,
 							   make_mode(is_mode_value, UU),
-							   strdup("")),
+							   make_dummy_unknown()),
 					    NIL)),
 				  make_type(is_type_void,UU)));
       entity_initial(built_in_va_start) = make_value_intrinsic();
@@ -364,7 +364,7 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
 		  make_functional(CONS(PARAMETER,
 				       make_parameter(va_list_t,
 						      make_mode(is_mode_value, UU),
-						      strdup("")),
+						      make_dummy_unknown()),
 				       NIL),
 				  make_type(is_type_void,UU)));
       entity_initial(built_in_va_end) = make_value_intrinsic();

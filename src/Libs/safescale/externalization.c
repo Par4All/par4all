@@ -561,7 +561,7 @@ static void add_parameter_variable_to_module(reference ref, entity module, state
   module_declarations = code_declarations(value_code(entity_initial(module)));  
   code_declarations(value_code(entity_initial(module))) = CONS(ENTITY, new_variable, module_declarations);
   
-  new_parameter = make_parameter(entity_type(new_variable), make_mode(is_mode_reference, UU), strdup("")); 
+  new_parameter = make_parameter(entity_type(new_variable), make_mode(is_mode_reference, UU), make_dummy_unknown()); //FI: could be make_dummy_identifier(new_variable)
   module_parameters = functional_parameters(type_functional(entity_type(module)));
   functional_parameters(type_functional(entity_type(module))) = CONS(PARAMETER, new_parameter, module_parameters);
 }

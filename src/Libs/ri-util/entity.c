@@ -1086,7 +1086,7 @@ check_common_inclusion(entity common)
 entity 
 find_ith_formal_parameter(
     entity the_fnct,
-    int    rank)
+    int rank)
 {
     list ldecl = code_declarations(value_code(entity_initial(the_fnct)));
     entity current = entity_undefined;
@@ -1099,7 +1099,7 @@ find_ith_formal_parameter(
 	    return current;
     }
 
-    pips_internal_error("cannot find the %d dummy argument of %s",
+    pips_internal_error("cannot find the %d dummy argument of %s\n",
 			rank, entity_name(the_fnct));
 
     return entity_undefined;

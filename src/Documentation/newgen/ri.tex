@@ -587,18 +587,23 @@ predicate to recognize intrinsics entities.
 \label{subsubsection-parameter}
 \index{Parameter}
 
-\domain{Parameter = type x mode x name:string}
+\domain{Parameter = type x mode x dummy}
 
 Objects of type \texttt{parameter} represents type and inout
-information for formal parameters. The name field is used to store a
-dummy parameter name in C function declarations, which may be
-different from the formal parameter name. By default, this name is the
-empty string, "".
+information for formal parameters. The \verb/dummy/ field is used to
+store a dummy\footnote{Also known as {\em formal} parameter, opposed
+  to AN {\em effective} parameter.} parameter entity in C (and Fortran)
+function declarations, which may be different from the formal
+parameter name. It is required by declaration such as:
 
-\begin{comment}
-Le domaine \verb/parameter/ représente le type et le mode de passage d'un
-paramètre formel de module. 
-\end{comment}
+\begin{verbatim}
+typedef int foo(int a, double x[a*a]);
+\end{verbatim}
+
+When no information about a dummy parameter is available, as in
+\verb/void foo(int)/, an unknown dummy is used.
+
+\domain{Dummy = unknown:unit + identifier:entity}
 
 \index{Mode}
 \domain{Mode = value:unit + reference:unit}

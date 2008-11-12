@@ -661,13 +661,11 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
   if(entity_undefined_p(ent)) {
     extern string int_to_string(int);
     string sn = int_to_string(get_current_dummy_parameter_number());
-    string formal_name = string_undefined;
 
-    formal_name = strdup(concatenate(DUMMY_PARAMETER_PREFIX,sn,MODULE_SEP_STRING,
+    global_name = strdup(concatenate(DUMMY_PARAMETER_PREFIX,sn,MODULE_SEP_STRING,
 				     prefix,name,NULL));
-    ent = gen_find_tabulated(formal_name,entity_domain);
+    ent = gen_find_tabulated(global_name,entity_domain);
     free(sn);
-    free(formal_name);
   }
 
   /* Is it a static variable declared in the compilation unit? */
@@ -691,8 +689,9 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
        used before it is defined as, for example, a struct in a typedef:
        typedef struct foo foo; */
     /* CParserError("Variable appears to be undefined\n"); */
-  }
-  pips_debug(5,"Entity global name is %s\n",global_name);
+  } else
+    pips_debug(5,"Entity global name is %s\n",global_name);
+  //free(global_name);
   return ent;
 }
 
@@ -1447,6 +1446,8 @@ void UseFormalArguments(entity f)
     list cd = list_undefined;
     list formals = NIL;
     string mn = string_undefined;
+    extern list extract_references_from_declarations(list);
+    list refs =  extract_references_from_declarations(dl);
 
     pips_assert("the value is code", value_code_p(fv));
 
@@ -1459,9 +1460,6 @@ void UseFormalArguments(entity f)
 	pips_assert("v is a dummy parameter", dummy_parameter_entity_p(v));
       }
     }
-
-    /* FI: just in case? */
-    remove_entity_type_stacks(formals);
 
     /* Is it a local function or global function? */
     if(top_level_entity_p(f))
@@ -1479,31 +1477,51 @@ void UseFormalArguments(entity f)
       storage ps = entity_storage(p);
       formal pfs = storage_formal(ps);
 
-      new_p = find_or_create_entity(strdup(concatenate(mn,MODULE_SEP_STRING, pn, NULL)));
-      free(pn);
-      entity_storage(new_p) = copy_storage(entity_storage(p));
-      entity_type(new_p) = copy_type(entity_type(p));
-      entity_initial(new_p) = copy_value(entity_initial(p));
-      pips_debug(8, "Formal dummy parameter \"%s\" is replaced "
-		 "by standard formal parameter \"%s\"\n", entity_name(p), entity_name(new_p));
+      if(!stack_undefined_p(get_from_entity_type_stack_table(p))) {
+	new_p = find_or_create_entity(strdup(concatenate(mn,MODULE_SEP_STRING, pn, NULL)));
+	free(pn);
+	entity_storage(new_p) = copy_storage(entity_storage(p));
+	entity_type(new_p) = copy_type(entity_type(p));
+	entity_initial(new_p) = copy_value(entity_initial(p));
+	pips_debug(8, "Formal dummy parameter \"%s\" is replaced "
+		   "by standard formal parameter \"%s\"\n",
+		   entity_name(p), entity_name(new_p));
 
-      /* A substitution could be performed instead...*/
-      gen_remove(&code_declarations(fc), (void *) p);
-      code_declarations(fc) = gen_nconc(code_declarations(fc), CONS(ENTITY, new_p,NIL));
+	/* Substitute p by new_p in the declaration references for cases
+	   such as "foo(n, double a[n])" */
+	/* This only works if the refs list points to the actual
+	   references and not to copies. */
+	MAP(REFERENCE, r, {
+	    entity e = reference_variable(r);
+	    if(e==p) {
+	      reference_variable(r) = new_p;
+	      pips_debug(8, "reference to \"%s\" changed in reference to \"\%s\"\n",
+			 entity_name(p), entity_name(new_p));
+	    }
+	  }, refs);
 
-      /* FI: The storage might point to another dummy argument
-	 (although it should not) */
-      formal_function(pfs) = entity_undefined;
-      /* Let's hope there are no other pointers towards dummy formal parameters */
-      free_entity(p);
+	/* A substitution could be performed instead...*/
+	gen_remove(&code_declarations(fc), (void *) p);
+	code_declarations(fc) = gen_nconc(code_declarations(fc), CONS(ENTITY, new_p,NIL));
+
+	/* FI: The storage might point to another dummy argument
+	   (although it should not) */
+	formal_function(pfs) = entity_undefined;
+	/* Let's hope there are no other pointers towards dummy formal parameters */
+	// free_entity(p); // FI: we may use them in the type data structuress
+      }
     }
+
+    /* FI: just in case? */
+    remove_entity_type_stacks(formals);
+
     free(mn);
     gen_free_list(formals);
   }
 }
 
 /* To chase formals in type declarations */
-static dummy_formal_list;
+static list dummy_formal_list;
 
 static void cancel_dummy_reference(reference r)
 {
@@ -1519,12 +1537,13 @@ static void cancel_dummy_reference(reference r)
 
 static void clean_up_dummy_parameter_type(type t, list fpl)
 {
+  pips_internal_error("This function should not be called\n");
   dummy_formal_list = fpl;
   gen_multi_recurse(t, reference_domain, gen_true, cancel_dummy_reference, NULL);
 }
 
 /* If f has dummy formal parameters, replace them by standard formal parameters */
-void RemoveDummyArguments(entity f)
+void RemoveDummyArguments(entity f, bool remove_p)
 {
   value fv = entity_initial(f);
 
@@ -1537,6 +1556,12 @@ void RemoveDummyArguments(entity f)
     list dl = code_declarations(fc);
     list cd = list_undefined;
     list formals = NIL;
+    type ft = entity_type(f);
+    list fp = functional_parameters(type_functional(ft));
+    list cformals = list_undefined;
+    list cfp = list_undefined;
+    int nformals=-1;
+    int nfp = gen_length(fp);
 
     pips_assert("the value is code", value_code_p(fv));
 
@@ -1552,30 +1577,69 @@ void RemoveDummyArguments(entity f)
 	  formals = gen_nconc(formals, CONS(ENTITY, v, NIL));
       }
     }
+    nformals = gen_length(formals);
 
-    /* FI: just in case? */
-    remove_entity_type_stacks(formals);
+    /* Copy their names, if any, in the "name" field of the "parameter" data structure */
 
-    /* Remore the dummy formals from f's declaration list (and from
-       the symbol table?) and cancel all pointers in their
-       declarations towards themselves as in "void foo(n,a[n])" */
-    for(cd = formals; !ENDP(cd); POP(cd)) {
-      entity p = ENTITY(CAR(cd));
-      type pt = entity_type(p);
-      storage ps = entity_storage(p);
-      formal pfs = storage_formal(ps);
+    if(nformals==nfp) {
+      /* This special case could be ignored and handled like the next one. */
+      for(cformals=formals, cfp = fp; !ENDP(cfp); POP(cformals), POP(cfp)) {
+	parameter p = PARAMETER(CAR(cfp));
+	entity ep = ENTITY(CAR(cformals));
+	//string pn = strdup(entity_user_name(ep));
 
-      pips_debug(8, "Formal dummy parameter \"%s\" is removed\n",
-		 entity_name(p));
+	pips_assert("The parameter name is unknown",
+		    dummy_unknown_p(parameter_dummy(p)));
 
-      clean_up_dummy_parameter_type(pt, formals);
-      gen_remove(&code_declarations(fc), (void *) p);
+	/* FI: we do not have to change this field in the function declaration */
+	//parameter_dummy(p) = make_dummy_identifier(ep);
+      }
+    }
+    else if(nformals>0) {
+      int i = -1;
+      for(cfp=fp, i= 1;!ENDP(cfp); POP(cfp), i++) {
+	entity ep = find_ith_parameter(f,i);
+	if(!entity_undefined_p(ep)) {
+	  parameter p = PARAMETER(CAR(cfp));
+	  //string pn = strdup(entity_user_name(ep));
 
-      /* FI: The storage might point to another dummy argument
-	 (although it should not) */
-      formal_function(pfs) = entity_undefined;
-      /* Let's hope there are no other pointers towards dummy formal parameters */
-      free_entity(p);
+	  pips_assert("The parameter name is empty",
+		      dummy_unknown_p(parameter_dummy(p)));
+
+	  //parameter_dummy(p) = ep;
+	}
+      }
+    }
+    else {
+      /* no naming information available */
+      ;
+    }
+
+    if(remove_p) {
+      /* FI: just in case? */
+      remove_entity_type_stacks(formals);
+
+      /* Remore the dummy formals from f's declaration list (and from
+	 the symbol table?) and cancel all pointers in their
+	 declarations towards themselves as in "void foo(n,a[n])" */
+      for(cd = formals; !ENDP(cd); POP(cd)) {
+	entity p = ENTITY(CAR(cd));
+	//type pt = entity_type(p);
+	storage ps = entity_storage(p);
+	formal pfs = storage_formal(ps);
+
+	pips_debug(8, "Formal dummy parameter \"%s\" is removed\n",
+		   entity_name(p));
+
+	//clean_up_dummy_parameter_type(pt, formals);
+	gen_remove(&code_declarations(fc), (void *) p);
+
+	/* FI: The storage might point to another dummy argument
+	   (although it should not) */
+	formal_function(pfs) = entity_undefined;
+	/* Let's hope there are no other pointers towards dummy formal parameters */
+	free_entity(p);
+      }
     }
     gen_free_list(formals);
   }
@@ -1716,9 +1780,37 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
   /* Be careful if standard arguments are needed: replace the dummy parameters */
   if(TRUE || !is_declaration) {
     type t = entity_type(e);
-    if(type_functional_p(t) && !typedef_entity_p(e)) {
-      if(is_declaration)
-	RemoveDummyArguments(e);
+    /* FI: intrinsic may need to be processed here if they use dynamic
+       typing, a.k.a. dependent types but they do not have a code
+       value!*/
+    if(type_functional_p(t) && !typedef_entity_p(e) && !intrinsic_entity_p(e)) {
+      if(is_declaration) {
+	/* They cannot be removed in general because they may appear
+	   in declarations as in foo(int n, double a[n]) */
+	value ev = entity_initial(e);
+	code ec = value_code(ev);
+	list cmdl = code_declarations(ec);
+	extern list extract_references_from_declarations(list);
+	list refs =  extract_references_from_declarations(cmdl);
+	bool dummy_p = FALSE;
+
+	MAP(REFERENCE, r, {
+	    entity v = reference_variable(r);
+
+	    if(dummy_parameter_entity_p(v)) {
+	      dummy_p = TRUE;
+	      break;
+	    }}, refs);
+
+	//RemoveDummyArguments(e, !dummy_p);
+	  //else
+	  /* They are kept in the symbol table. Hopefully, they
+	     won't create conflict when the fonction definition is
+	     parsed... */
+
+	  /* FI: I do not know if refs contains copies of references or just pointer to them */
+	gen_free_list(refs);
+      }
       else
 	UseFormalArguments(e);
     }
@@ -2270,7 +2362,9 @@ list MakeParameterList(list l1, list l2, stack FunctionStack)
 	entity_type(ent) = make_type_variable(v);
 	entity_storage(ent) = make_storage_formal(make_formal(function,offset));
 	AddToDeclarations(ent,function);
-	p = make_parameter(entity_type(ent),make_mode_reference(),strdup(""));
+	p = make_parameter(entity_type(ent),
+			   make_mode_value(),
+			   make_dummy_identifier(ent)); // FI: could be unknown?
       }
     l = gen_nconc(l,CONS(PARAMETER,p,NIL));
     offset++;
@@ -2286,7 +2380,7 @@ parameter FindParameterEntity(string s, int offset, list l)
     if (strcmp(name,s)==0)
       {
 	type t = entity_type(e);
-	mode m = make_mode_reference(); /* to be verified in C, when by reference, when by value*/
+	mode m = make_mode_value(); /* to be verified in C, when by reference, when by value*/
 	/*
 	  What about the storage of 
 
@@ -2301,7 +2395,7 @@ parameter FindParameterEntity(string s, int offset, list l)
 	    formal f = storage_formal(st);
 	    formal_offset(f) = offset;
 	  }
-	return make_parameter(t,m,strdup(""));
+	return make_parameter(t,m,make_dummy_identifier(e)); // FI: Could be entity_undefined
       }
   },l);
   return parameter_undefined;
@@ -2390,7 +2484,9 @@ static bool callnodeclfilter(call c)
 	for(carg=args; !ENDP(carg); POP (carg)) {
 	  expression ce = EXPRESSION(CAR(carg));
 	  type ct = expression_to_user_type(ce);
-	  parameter cp = make_parameter(ct, make_mode(is_mode_value, UU), strdup(""));
+	  /* Here, there is no known dummy parameter entity... unless
+	     we build a default dummy parameter, using unique names such as v1, v2, v3,.. */
+	  parameter cp = make_parameter(ct, make_mode_value(), make_dummy_unknown());
 
 	  ptl = gen_nconc(ptl, CONS(PARAMETER, cp, NIL));
 	}

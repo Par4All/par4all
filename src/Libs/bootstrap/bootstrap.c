@@ -254,7 +254,7 @@ make_parameter_list(int n, parameter (* mkprm)(void))
     parameter p = mkprm();
     type pt = copy_type(parameter_type(p));
     type v = make_type(is_type_varargs, pt);
-    parameter vp = make_parameter(v, make_mode(is_mode_reference, UU), strdup(""));
+    parameter vp = make_parameter(v, make_mode(is_mode_reference, UU), make_dummy_unknown());
 
     l = CONS(PARAMETER, vp, l);
     free_parameter(p);
@@ -3562,7 +3562,7 @@ MakeVoidParameter()
 {
   return make_parameter(make_type(is_type_void, UU),
                         make_mode(is_mode_reference, UU),
-                        strdup(""));
+                        make_dummy_unknown());
 }
 
 static type

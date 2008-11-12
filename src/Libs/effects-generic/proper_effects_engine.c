@@ -536,7 +536,7 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
       expression e1 = EXPRESSION(CAR(args));
       syntax s1 = expression_syntax(e1);
       expression e2 = EXPRESSION(CAR(CDR(args)));
-      pips_user_warning("Not implemented yet");
+      pips_user_warning("Not fully and correctly implemented yet\n");
 
       if(syntax_reference_p(s1)) {
 	reference r1 = syntax_reference(s1);
