@@ -4,4 +4,5 @@ void decl28(int b);
 void decl28(int c);
 void decl28(int d)
 {
+  d = 1;
 }

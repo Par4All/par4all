@@ -93,7 +93,7 @@ End of declarations for module sizeofArray02!
 
 Parsed code
 
-extern void foo(int, int);
+extern void foo(int m, int n);
 void foo(int m, int n)
 {
    int A[m];

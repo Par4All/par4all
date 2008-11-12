@@ -1,7 +1,7 @@
-typedef int f(int);
+typedef int f(int cookie);
 typedef int (*g)(int);
-extern int typedef07(int);
-extern int typedef07(int);
+extern int typedef07(int cookie);
+extern int typedef07(int cookie);
 
 int typedef07(int cookie)
 {

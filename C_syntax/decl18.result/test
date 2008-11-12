@@ -56,14 +56,16 @@ Variable list:
 	Declared entity "decl18:*DYNAMIC*" with type "area" with size 0
 	Declared entity "decl18:*STACK*" with type "area" with size 0
 	Declared entity "decl18:*STATIC*" with type "area" with size 0
+	Declared entity "decl18:iarg1" with type "variable" "int"
 	Declared entity "decl18:iarg2" with type "variable" "int"
+	Declared entity "decl18:iarg4" with type "variable" "int"
 
 * empty extern declaration list *
 
 
 Layouts for formal parameters:
 
-	Variable decl18:iarg2	offset = 1
+	Variable decl18:iarg1	offset = 1	Variable decl18:iarg2	offset = 1	Variable decl18:iarg4	offset = 1
 Layouts for memory areas:
 
 Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
@@ -94,11 +96,11 @@ End of declarations for module decl18
 
 Parsed printed file for "decl18!" and "decl18"
 
-extern void decl18(int);
-extern void decl18(int);
-extern void decl18(int);
+extern void decl18(int iarg2);
+extern void decl18(int iarg2);
+extern void decl18(int iarg2);
 
-void decl18(int iarg2)
+void decl18(int iarg1)
 {
    iarg2++;
 }

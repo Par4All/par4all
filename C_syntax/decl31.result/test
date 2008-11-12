@@ -1,0 +1,4 @@
+
+Parsed printed file for "decl31!"
+
+extern void decl31(int n, double a[n]);

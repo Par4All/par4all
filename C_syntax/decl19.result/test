@@ -95,10 +95,10 @@ End of declarations for module decl19
 
 Parsed printed file for "decl19!" and "decl19"
 
-typedef int f(int);
+typedef int f(int cookie);
 typedef int (*g)(int);
-extern int decl19(int);
-extern int decl19(int);
+extern int decl19(int cookie);
+extern int decl19(int cookie);
 
 int decl19(int cookie)
 {

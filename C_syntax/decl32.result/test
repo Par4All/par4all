@@ -1,0 +1,4 @@
+
+Parsed printed file for "decl32!"
+
+void decl32(int n, float, double a[n]);

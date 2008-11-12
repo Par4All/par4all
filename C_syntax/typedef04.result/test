@@ -7,7 +7,7 @@ typedef double mydouble;
 struct s {
    int dim;
 };
-extern void typedef04(int, struct s , struct s *);
+extern void typedef04(int n, struct s d, struct s *pd);
 void typedef04(int n, struct s d, struct s *pd)
 {
    typedef int narray_t[n+2];

@@ -43,4 +43,4 @@ End of declarations for module decl08!
 
 Parsed printed file
 
-void decl08(int, void (*)(char));
+void decl08(int a, void (*f)(char a));

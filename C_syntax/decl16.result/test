@@ -44,7 +44,7 @@ End of declarations for module decl16!
 
 Parsed printed file for "decl16!"
 
-typedef int f(int);
+typedef int f(int cookie);
 f x;
-typedef int g(int);
+typedef int g(int cookie);
 g y;

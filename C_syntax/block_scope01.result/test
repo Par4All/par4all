@@ -154,7 +154,7 @@ Parsed printed files
 
 extern int main();
 int x = 1;
-extern void foo(int);
+extern void foo(int x);
 int main()
 {
    int x = 6;
@@ -185,7 +185,7 @@ Printed files
 
 extern int main();
 int x = 1;
-extern void foo(int);
+extern void foo(int x);
 int main()
 {
    int x = 6;

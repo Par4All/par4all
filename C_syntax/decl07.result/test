@@ -53,5 +53,5 @@ Parsed printed file
 void decl07()
 {
    int a;
-   void (*f)(char);
+   void (*f)(char a);
 }

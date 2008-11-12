@@ -45,14 +45,14 @@ Parsed printed file
 
 struct _err_manager {
    char function;
-   void (*push)(int);
+   void (*push)(int function);
 };
-void ERR_mgr_ctor(const char *, const char *);
+void ERR_mgr_ctor(const char *file, const char *function);
 
 Printed file
 
 struct _err_manager {
    char function;
-   void (*push)(int);
+   void (*push)(int function);
 };
-void ERR_mgr_ctor(const char *, const char *);
+void ERR_mgr_ctor(const char *file, const char *function);

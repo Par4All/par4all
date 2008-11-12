@@ -91,7 +91,7 @@ End of declarations for module sizeofArray03!
 
 Parsed code
 
-extern int foo(int);
+extern int foo(int a);
 int foo(int a)
 {
    int X[a];

@@ -1,9 +1,9 @@
 
 Parsed printed file for "decl28!" and "decl28"
 
-extern void decl28(int);
-extern void decl28(int);
-extern void decl28(int);
+extern void decl28(int d);
+extern void decl28(int d);
+extern void decl28(int d);
 void decl28(int d)
 {
 }

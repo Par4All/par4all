@@ -2,7 +2,7 @@ void foo(int a, double b)
 {
 }
 extern  main();
-extern void foo(int, double);
+extern void foo(int a, double b);
 main()
 {
 }
