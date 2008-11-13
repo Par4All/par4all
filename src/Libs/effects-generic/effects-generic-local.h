@@ -78,7 +78,7 @@ static void db_put_##name(char *m, list l) \
 
 /* For COMPATIBILITY purpose only - DO NOT USE anymore
  */
-#define effect_variable(e) reference_variable(effect_reference(e))
+#define effect_variable(e) reference_variable(effect_any_reference(e))
 
 /* end of effects-generic-local.h
  */

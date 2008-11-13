@@ -582,7 +582,11 @@ module_formal_parameters(entity func)
     decl = code_declarations(entity_code(func));
     MAP(ENTITY, e, 
      {
-	 if(storage_formal_p(entity_storage(e)))
+       /* Dummy parameters should have been filtered out of the
+	  declarations by the parser, but let's be careful here. As a
+	  consequence, dummy parameters cannot be retrieved, except
+	  thru the type. */
+       if(!dummy_parameter_entity_p(e) && storage_formal_p(entity_storage(e)))
 	     formals = CONS(ENTITY, e, formals);
      },
 	 decl);

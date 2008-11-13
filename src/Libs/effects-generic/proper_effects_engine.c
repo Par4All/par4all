@@ -498,10 +498,10 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
 			    make_descriptor_none());
     /* Read effect to generate for point_to and for dereferencing */
     effect mre = make_effect(make_cell_reference(copy_reference(syntax_reference(s))),
-			    make_action_read(),
-			    make_addressing_index(),
-			    make_approximation_must(),
-			    make_descriptor_none());
+			     make_action_read(),
+			     make_addressing_index(),
+			     make_approximation_must(),
+			     make_descriptor_none());
 
     *pmwe = me;
     *pmre = mre;
@@ -527,51 +527,110 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
       *pmwe = effect_undefined;
       finished_p = TRUE;
     }
-    else if(ENTITY_FIELD_P(op) || ENTITY_POINT_TO_P(op) || ENTITY_DEREFERENCING_P(op)) {
+    else if(ENTITY_FIELD_P(op) || ENTITY_POINT_TO_P(op)) {
       s_exp = EXPRESSION(CAR(args));
     }
-    else if(ENTITY_PLUS_C_P(op)) {
-      /* This might be tractable if arg1 is a reference to a
-	 pointer. For instance, *(p+q-r) can be converted to p[q-r] */
-      expression e1 = EXPRESSION(CAR(args));
-      syntax s1 = expression_syntax(e1);
-      expression e2 = EXPRESSION(CAR(CDR(args)));
-      pips_user_warning("Not fully and correctly implemented yet\n");
+    else if(ENTITY_DEREFERENCING_P(op)) {
+      s_exp = EXPRESSION(CAR(args));
+      if(expression_call_p(s_exp)) {
+	call s_c = syntax_call(expression_syntax(s_exp));
+	entity s_op = call_function(s_c);
+	list s_args = call_arguments(s_c);
 
-      if(syntax_reference_p(s1)) {
-	reference r1 = syntax_reference(s1);
-	entity v1 = reference_variable(r1);
-	type t1 = ultimate_type(entity_type(v1));
-	if(type_variable_p(t1)) {
-	  variable vt1 = type_variable(t1);
-	  basic b1 = variable_basic(vt1);
-	  if(basic_pointer_p(b1)) {
-	    effect me = make_effect(make_cell_reference(make_reference(v1, CONS(EXPRESSION,e2,NIL))),
-				    lhs_p?make_action_write():make_action_read(),
-				    make_addressing_index(),
-				    make_approximation_must(),
-				    make_descriptor_none());
-	    /* Read effect to generate for point_to and for dereferencing */
-	    effect mre = make_effect(make_cell_reference(make_reference(v1,NIL)),
-				     make_action_read(),
-				     make_addressing_index(),
-				     make_approximation_must(),
-				     make_descriptor_none());
+	if(ENTITY_PLUS_C_P(s_op)) {
+	  /* This might be tractable if arg1 is a reference to a
+	     pointer. For instance, *(p+q-r) can be converted to p[q-r] */
+	  expression e1 = EXPRESSION(CAR(s_args));
+	  syntax s1 = expression_syntax(e1);
+	  expression e2 = EXPRESSION(CAR(CDR(s_args)));
+	  pips_user_warning("Not fully and correctly implemented yet\n");
 
-	    *pmwe = me;
-	    *pmre = mre;
-	    le = generic_proper_effects_of_expression(e2);
+	  if(syntax_reference_p(s1)) {
+	    reference r1 = syntax_reference(s1);
+	    entity v1 = reference_variable(r1);
+	    type t1 = ultimate_type(entity_type(v1));
+	    if(type_variable_p(t1)) {
+	      variable vt1 = type_variable(t1);
+	      basic b1 = variable_basic(vt1);
+	      if(basic_pointer_p(b1)) {
+		effect me = make_effect(make_cell_reference(make_reference(v1, CONS(EXPRESSION,e2,NIL))),
+					lhs_p?make_action_write():make_action_read(),
+					make_addressing_index(),
+					make_approximation_must(),
+					make_descriptor_none());
+		/* Read effect to generate for point_to and for dereferencing */
+		effect mre = make_effect(make_cell_reference(make_reference(v1,NIL)),
+					 make_action_read(),
+					 make_addressing_index(),
+					 make_approximation_must(),
+					 make_descriptor_none());
+
+		*pmwe = me;
+		*pmre = mre;
+		le = generic_proper_effects_of_expression(e1);
+		le = gen_nconc(le, generic_proper_effects_of_expression(e2));
+		finished_p = TRUE;
+	      }
+	    }
+	  }
+	  if(!finished_p) {
+	    le = generic_proper_effects_of_expression(exp);
+	    *pmwe = effect_undefined;
 	    finished_p = TRUE;
- 	  }
+	  }
+	}
+	/* Other functions to process: p++, ++p, p--, --p */
+	else if(ENTITY_POST_INCREMENT_P(s_op) || ENTITY_POST_DECREMENT_P(s_op)) {
+	  expression e1 = EXPRESSION(CAR(s_args));
+	  syntax s1 = expression_syntax(e1);
+	  reference r1 = syntax_reference(s1);
+
+	  /* YOU DO NOT WANT TO GO DOWN RECURSIVELY. DO AS FOR C_PLUS ABOVE: p[0]! */
+
+	  pips_assert("The argument is a reference", syntax_reference_p(s1));
+
+	  /* This seems OK for a scalar. How about an indexed reference? */
+
+	  le = generic_proper_effects_of_expression(EXPRESSION(CAR(args)));
+	  s_exp = e1;
+	  /* DO NOT go down recursively with this new s_exp since the
+	     incrementation or decrementation can be ignored for the
+	     dereferencing. */
+	}
+	else if(ENTITY_PRE_INCREMENT_P(s_op) || ENTITY_PRE_DECREMENT_P(s_op)) {
+	  expression e1 = EXPRESSION(CAR(s_args));
+	  syntax s1 = expression_syntax(e1);
+	  reference r1 = syntax_reference(s1);
+	  reference nr1 = reference_undefined;
+
+	  /* YOU DO NOT WANT TO GO DOWN RECURSIVELY. DO AS FOR C_PLUS ABOVE */
+
+	  pips_assert("The argument is a reference", syntax_reference_p(s1));
+	  pips_assert("The reference is scalar", ENDP(reference_indices(r1)));
+
+	  le = generic_proper_effects_of_expression(EXPRESSION(CAR(args)));
+	  nr1 = copy_reference(r1);
+	  if(ENTITY_PRE_INCREMENT_P(s_op))
+	    reference_indices(nr1) = CONS(EXPRESSION, int_to_expression(1), NIL);
+	  else
+	    reference_indices(nr1) = CONS(EXPRESSION, int_to_expression(-1), NIL);
+
+	  /* Too bad for the memory leaks involved... This s_exp
+	     should be freed at exit. */
+	  s_exp = make_expression(make_syntax_reference(nr1), normalized_undefined);
+	  /* DO NOT go down recursively with this new s_exp since the
+	     incrementation can be ignored for the dereferencing. */
+	}
+	else {
+	  /* do nothing, go down recursively to handle other calls */
+	  ;
 	}
       }
-      if(!finished_p) {
-	le = generic_proper_effects_of_expression(exp);
-	*pmwe = effect_undefined;
-	finished_p = TRUE;
+      else {
+	/* This is not a call, go down recursively */
+	;
       }
     }
-    /* Other functions to process: p++, ++p, p--, --p */
     else {
       /* failure: a user function is called to return a structure or an address */
       pips_user_warning("PIPS does not know how to handle precisely this %s: \"%s\"\n",
@@ -592,7 +651,7 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
   if(!finished_p) {
 
     /* go down */
-    le = generic_proper_effects_of_complex_lhs(s_exp, pmwe, pmre, lhs_p);
+    le = gen_nconc(le, generic_proper_effects_of_complex_lhs(s_exp, pmwe, pmre, lhs_p));
 
     ifdebug(8) {
       if(effect_undefined_p(*pmwe)) {
@@ -721,8 +780,8 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
 
 	/* Take care of effects in ind */
 	MAP(EXPRESSION, exp, {
-	  le = gen_nconc(le, generic_proper_effects_of_expression(exp));
-	}, ind);
+	    le = gen_nconc(le, generic_proper_effects_of_expression(exp));
+	  }, ind);
 
 	/* take care of the pointer itself: it must be read, but this
 	   must have been done much earlier when the main reference in
@@ -909,7 +968,7 @@ list generic_proper_effects_of_address_expression(expression lhs, int write_p)
     }
     else {
       /* add an anywhere effect */
-      ge = anywhere_effect(make_action_write());
+      ge = anywhere_effect(write_p? make_action_write() : make_action_read());
     }
     le = CONS(EFFECT, ge, le);
     ifdebug(8) {
