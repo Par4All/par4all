@@ -1380,3 +1380,19 @@ entity entity_to_module_entity(entity e)
 
   return m;
 }
+
+void update_dummy_parameter(parameter p, entity ep)
+{
+  if(dummy_unknown_p(parameter_dummy(p))) {
+    free_dummy(parameter_dummy(p));
+    parameter_dummy(p) = make_dummy_identifier(ep);
+  }
+  else {
+    dummy d = parameter_dummy(p);
+
+    pips_debug(8, "Dummy identifier changed from \"\%s\" to \"\%s\"\n",
+	       entity_name(dummy_identifier(d)), entity_name(ep));
+    /* Note that free_entity(dummy_identifier(d)) should be performed... */
+    dummy_identifier(d) = ep;
+  }
+}

@@ -2252,14 +2252,24 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			  else {
 			    entity cm = get_current_module_entity();
 			    /* A function can be redeclared inside itself. see C_syntax/extern.c */
-			    /* Dummy parameters can also be redeclared */
-			    if(cm!=e && !dummy_parameter_entity_p(e)) {
+			    if(cm!=e) {
 			      extern int yylineno; /* from lexer */
-			      pips_user_warning("Variable \"%s\" is redefined at line %d (%d)\n",
-						entity_user_name(e) /* entity_name(e)*/,
-						get_current_C_line_number(), yylineno);
-			      CParserError("Variable redefinition not compatible with ISO standard."
-					   " Try to compile with \"gcc -ansi -c\"\n");
+			      /* Dummy parameters can also be redeclared
+				 as long as their types are equal */
+			      if(dummy_parameter_entity_p(e)) {
+				pips_user_warning("Dummy parameter \"%s\" is redefined at line %d (%d)\n",
+						  entity_user_name(e),
+						  get_current_C_line_number(), yylineno);
+				CParserError("Dummy redefinition accepted by gcc but not compatible with ISO standard."
+					     " Try to compile with \"gcc -ansi -c\"\n");
+			      }
+			      else {
+				pips_user_warning("Variable \"%s\" is redefined at line %d (%d)\n",
+						  entity_user_name(e) /* entity_name(e)*/,
+						  get_current_C_line_number(), yylineno);
+				CParserError("Variable redefinition not compatible with ISO standard."
+					     " Try to compile with \"gcc -ansi -c\"\n");
+			      }
 			    }
 			  }
 			 
