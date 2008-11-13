@@ -6,4 +6,5 @@ extern void decl28(int d);
 extern void decl28(int d);
 void decl28(int d)
 {
+   d = 1;
 }
