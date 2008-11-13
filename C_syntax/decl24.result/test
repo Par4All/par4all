@@ -20,9 +20,9 @@ struct _hdl_progress_handler {
    int percent_start;
    int percent_stop;
    int percent_done;
-   void (*progress)(struct _hdl_progress_handler *, const int, const int);
-   void (*display)(struct _hdl_progress_handler *);
-   void *(*end_monitor)(struct _hdl_progress_handler *);
+   void (*progress)(struct _hdl_progress_handler *progress_mgr, const int nbfait, const int nbtotal);
+   void (*display)(struct _hdl_progress_handler *progress_mgr);
+   void *(*end_monitor)(struct _hdl_progress_handler *progress_mgr);
    void *display_data;
 };
 typedef const struct _hdl_progress_handler HDL_progress_handler;

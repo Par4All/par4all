@@ -1,0 +1,63 @@
+
+Parsed printed file for "dereferencing05"
+
+void dereferencing05()
+{
+   double *p;
+   int i;
+
+   *p++ = 0.;
+   *p-- = 0.;
+   *++p = 0.;
+   *--p = 0.;
+}
+
+Proper effetcs for "dereferencing05"
+
+void dereferencing05()
+{
+   double *p;
+   int i;
+//               <must be read   >: p
+//               <must be written>: p
+//               <must be written - post>: (*p)
+
+   *p++ = 0.;
+//               <must be read   >: p
+//               <must be written>: p
+//               <must be written - post>: (*p)
+   *p-- = 0.;
+//               <must be read   >: p
+//               <must be written>: p
+//               <must be written - pre>: *(p[1])
+   *++p = 0.;
+//               <must be read   >: p
+//               <must be written>: p
+//               <must be written - pre>: *(p[-1])
+   *--p = 0.;
+}
+
+Cumulated effetcs for "dereferencing05"
+
+void dereferencing05()
+{
+   double *p;
+   int i;
+//               <must be read   >: p
+//               <must be written>: p
+//               <must be written - post>: (*p)
+
+   *p++ = 0.;
+//               <must be read   >: p
+//               <must be written>: p
+//               <must be written - post>: (*p)
+   *p-- = 0.;
+//               <must be read   >: p
+//               <must be written>: p
+//               <must be written - pre>: *(p[1])
+   *++p = 0.;
+//               <must be read   >: p
+//               <must be written>: p
+//               <must be written - pre>: *(p[-1])
+   *--p = 0.;
+}

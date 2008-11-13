@@ -21,16 +21,49 @@ Module decl11! already active.
 Request: build resource SYMBOL_TABLE_FILE for module decl11!.
   BOOTSTRAP                      building   ENTITIES()
   COMPILATION_UNIT_PARSER        building   DECLARATIONS(decl11!)
-user warning in c_parse: Variable "a" is redefined at line 2 (6)
-user warning in CParserError: 
-Recovery from C parser failure not (fully) implemented yet.
-C parser is likely to fail later if re-used.
-user error in CParserError: 
-Variable redefinition not compatible with ISO standard. Try to compile with "gcc -ansi -c"
- at line -1 (1)
-user warning in set_debug_stack_pointer: debug level stack is set to 2
-user warning in safe_do_something: Request aborted under pipsmake: build resource SYMBOL_TABLE_FILE for module decl11!.
-user error in display_a_resource: Cannot build view file SYMBOL_TABLE_FILE
+  C_PARSER                       building   PARSED_CODE(decl11!)
+                                 building   CALLEES(decl11!)
+  C_SYMBOL_TABLE                 building   SYMBOL_TABLE_FILE(decl11!)
+SYMBOL_TABLE_FILE made for decl11!.
+decl11!
+
+Declarations for module "decl11!" with type "() -> unknow"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:decl11" with type "functional" "int x int -> void"
+	Declared entity "decl11!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "decl11!:*HEAP*" with type "area" with size 0
+	Declared entity "decl11!:*STACK*" with type "area" with size 0
+	Declared entity "decl11!:*STATIC*" with type "area" with size 0
+
+* empty extern declaration list *
+
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl11!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl11!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl11!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl11!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module decl11!
+
 echo
 
 echo Parsed printed file
@@ -39,17 +72,9 @@ echo
 
 Module decl11! already active.
 Request: build resource PARSED_PRINTED_FILE for module decl11!.
-  COMPILATION_UNIT_PARSER        building   DECLARATIONS(decl11!)
-user warning in c_parse: Variable "a" is redefined at line 2 (6)
-user warning in CParserError: 
-Recovery from C parser failure not (fully) implemented yet.
-C parser is likely to fail later if re-used.
-user error in CParserError: 
-Variable redefinition not compatible with ISO standard. Try to compile with "gcc -ansi -c"
- at line -1 (1)
-user warning in set_debug_stack_pointer: debug level stack is set to 2
-user warning in safe_do_something: Request aborted under pipsmake: build resource PARSED_PRINTED_FILE for module decl11!.
-user error in display_a_resource: Cannot build view file PARSED_PRINTED_FILE
+  PRINT_SOURCE                   building   PARSED_PRINTED_FILE(decl11!)
+PARSED_PRINTED_FILE made for decl11!.
+void decl11(int a, int a);
 Deletion of obsolete resources:
 none destroyed.
 Closing all modules.

@@ -17,11 +17,11 @@ void dereferencing03()
    double *p;
    int i;
 //               <must be read   >: p
-//               <must be written - pre>: p[1]
+//               <must be written>: p[1]
 
    *(p+1) = 0.;
 //               <must be read   >: i p
-//               <must be written - pre>: p[i]
+//               <must be written>: p[i]
    *(p+i) = 0.;
 }
 
@@ -32,10 +32,10 @@ void dereferencing03()
    double *p;
    int i;
 //               <must be read   >: p
-//               <must be written - pre>: p[1]
+//               <must be written>: p[1]
 
    *(p+1) = 0.;
 //               <must be read   >: i p
-//               <must be written - pre>: p[i]
+//               <must be written>: p[i]
    *(p+i) = 0.;
 }

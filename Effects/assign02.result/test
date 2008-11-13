@@ -22,11 +22,12 @@ void assign02()
 {
    s_t s;
    int j;
-//               <may be written >: s[*]
+//               <must be written>: s[*]
 
    s = make_s(1, 2.);
-//               <may be written >: s[*]
+//               <must be written>: s[1]
    s.entier = 4;
+//               <may be read    >: TOP-LEVEL:*MEMORY*
 //               <must be written>: j
    
    /* invalid lvalue in assignment */
@@ -47,6 +48,7 @@ void assign02()
    s = make_s(1, 2.);
 //               <may be written >: s[*]
    s.entier = 4;
+//               <may be read    >: TOP-LEVEL:*MEMORY*
 //               <must be written>: j
    
    /* invalid lvalue in assignment */

@@ -17,7 +17,7 @@ void dereferencing04()
    double *q;
    double *r;
 //               <must be read   >: p q r
-//               <must be written - pre>: p[q-r]
+//               <must be written>: p[q-r]
    *(p+q-r) = 0.;
 }
 
@@ -29,6 +29,6 @@ void dereferencing04()
    double *q;
    double *r;
 //               <must be read   >: p q r
-//               <must be written - pre>: p[q-r]
+//               <must be written>: p[q-r]
    *(p+q-r) = 0.;
 }
