@@ -875,8 +875,11 @@ address_of_effects(entity f __attribute__ ((__unused__)),list args)
 
     pips_debug(5, "begin\n");
     pips_assert("address of has only one argument", gen_length(args)==1);
+    /* FI: this is not true with "&c.a" */
+    /*
     pips_assert("address of has only one argument and it is a reference",
 		syntax_reference_p(s));
+    */
     lr = generic_proper_effects_of_expressions(i);
     pips_debug(5, "end\n");
     return(lr);
@@ -1168,7 +1171,8 @@ static list io_effects(entity e, list args)
     return(le);
 }
 
-/*generic_io_effects to encompass the system functions and the C libray IO functions. Amira Mensi*/
+/*generic_io_effects to encompass the system functions and the C
+  libray IO functions. Amira Mensi*/
 
 static list generic_io_effects(entity e, list args, bool system_p)
 {
@@ -1225,7 +1229,7 @@ static list generic_io_effects(entity e, list args, bool system_p)
 
   if(!system_p) {
     /* FILE * file descriptors are used */
-    if(ENTITY_PRINTF_P(e) || ENTITY_GETS_P(e) || ENTITY_PUTS_P(e)|| ENTITY_VPRINTF_P(e))
+    if(ENTITY_PRINTF_P(e) || ENTITY_PUTCHAR_P(e) || ENTITY_PUTS_P(e)|| ENTITY_VPRINTF_P(e))
       // The output is written into stdout
       unit = int_to_expression(STDOUT_FILENO);
     else if (ENTITY_SCANF_P(e) || ENTITY_GETS_P(e) || ENTITY_VSCANF_P(e) || ENTITY_GETCHAR_P(e))
@@ -1414,7 +1418,7 @@ static list effects_of_any_ioelem(expression exp, tag act, bool is_fortran)
 	  else if(basic_pointer_p(variable_basic(vt))) {
 	    /* This is going to be called for the FILE descriptors */
 	    /* pips_internal_error("Effects thru pointers not implemented yet"); */
-	    pips_user_warning("Effects thru pointers not implemented yet");
+	    pips_user_warning("Effects thru pointers not implemented yet\n");
 	  }
 	  else
 	    pips_user_error("IO element update for \"\%s\": an address should be passed",

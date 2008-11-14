@@ -349,6 +349,40 @@ static void rw_effects_of_call(call c)
     pips_debug(2, "end\n");
 }
 
+/* just to handle one kind of instruction, expressions which are not calls */
+rw_effects_of_expression_instruction(instruction i)
+{
+  list l_proper = NIL;
+  statement current_stat = effects_private_current_stmt_head();
+  instruction inst = statement_instruction(current_stat);
+
+  /* Is the call an instruction, or a sub-expression? */
+  if (instruction_expression_p(i)) {
+    expression ie = instruction_expression(i);
+    syntax is = expression_syntax(ie);
+
+    if(syntax_cast_p(is)) {
+      expression ce = cast_expression(syntax_cast(is));
+      syntax sc = expression_syntax(ce);
+
+      if(syntax_call_p(sc)) {
+	call c = syntax_call(sc);
+
+	pips_debug(2, "Effects for expression instruction in statement%03zd:\n",
+		   statement_ordering(current_stat)); 
+
+	rw_effects_of_call(c);
+      }
+      else {
+	pips_internal_error("Cast case not implemented\n");
+	  }
+    }
+    else {
+      pips_internal_error("Instruction expression case not implemented\n");
+	}
+  }
+}
+
 static void rw_effects_of_test(test t)
 {
   statement current_stat = effects_private_current_stmt_head();
@@ -521,6 +555,7 @@ void rw_effects_of_module_statement(statement module_stat)
 	 whileloop_domain, gen_true, rw_effects_of_while,
 	 forloop_domain, gen_true, rw_effects_of_forloop,
 	 unstructured_domain, gen_true, rw_effects_of_unstructured,
+	 instruction_domain, gen_true, rw_effects_of_expression_instruction,
 	 expression_domain, gen_false, gen_null, /* NOT THESE CALLS */
 	 NULL); 
 

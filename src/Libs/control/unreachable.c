@@ -97,6 +97,12 @@ propagate(statement s)
 	propagate(whileloop_body(instruction_whileloop(i)));
 	break;
     }
+    case is_instruction_forloop:
+    {
+	/* Undecidable implies "propagate" by default */
+	propagate(forloop_body(instruction_forloop(i)));
+	break;
+    }
     case is_instruction_test:
     {	
 	test t = instruction_test(i);
@@ -114,11 +120,29 @@ propagate(statement s)
     }
     case is_instruction_call:
     {
-	continued = !ENTITY_STOP_P(call_function(instruction_call(i)));
-	break;
+      /* FI: not satisfying; interprocedural control effects required here */
+      entity f = call_function(instruction_call(i));
+      continued = !ENTITY_STOP_P(f) && !ENTITY_ABORT_SYSTEM_P(f) && !ENTITY_EXIT_SYSTEM_P(f);
+      break;
+    }
+    case is_instruction_return:
+    {
+      continued = TRUE; /* FI: might be FALSE, but this depends on the
+			   precise semantics of this function */
+      break; 
+    }
+    case is_instruction_expression:
+    {
+      continued = TRUE; /* FI: interprocedural exit possible:-( */
+      break;
+    }
+    case is_instruction_multitest:
+    {
+      pips_internal_error("Not implemented yet\n"); /* FI: undone by the controlizer? */
+      break;
     }
     case is_instruction_goto:
-	pips_internal_error("GOTO not welcome\n");
+	pips_internal_error("GOTO should have been eliminated by the controlizer\n");
 	break;
     default:
 	pips_internal_error("unexpected instruction tag\n");

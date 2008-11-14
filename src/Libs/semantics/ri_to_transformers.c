@@ -280,7 +280,7 @@ intrinsic_to_transformer(
   if(ENTITY_ASSIGN_P(e)) {
     tf = any_assign_to_transformer(pc, ef, pre);
   }
-  else if(ENTITY_STOP_P(e))
+  else if(ENTITY_STOP_P(e)||ENTITY_ABORT_SYSTEM_P(e)||ENTITY_EXIT_SYSTEM_P(e))
     tf = transformer_empty();
   else
     tf = effects_to_transformer(ef);
@@ -1045,6 +1045,9 @@ instruction_to_transformer(
     wl = instruction_whileloop(i);
     tf = whileloop_to_transformer(wl, pre, e);
     break;
+  case is_instruction_forloop:
+    pips_user_error("Use property to convert for loops into while loops");
+    break;
   case is_instruction_goto:
     pips_error("instruction_to_transformer",
 	       "unexpected goto in semantics analysis");
@@ -1057,6 +1060,9 @@ instruction_to_transformer(
   case is_instruction_unstructured:
     tf = unstructured_to_transformer(instruction_unstructured(i), pre, e);
     break ;
+  case is_instruction_expression:
+    tf = expression_to_transformer(instruction_expression(i), pre, e);
+    break;
   default:
     pips_error("instruction_to_transformer","unexpected tag %d\n",
 	       instruction_tag(i));

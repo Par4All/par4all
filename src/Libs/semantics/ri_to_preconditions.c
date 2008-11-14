@@ -216,6 +216,27 @@ test_to_postcondition(
 }
 
 static transformer 
+expression_to_postcondition(
+    transformer pre,
+    expression exp,
+    transformer tf)
+{
+  transformer post = transformer_undefined;
+
+  if(get_bool_property("SEMANTICS_RECOMPUTE_EXPRESSION_TRANSFORMERS")) {
+    /* Wild guess. See what should be done in call_to_postcondition() */
+    list el = expression_to_proper_effects(exp);
+    transformer new_tf = expression_to_transformer(exp, pre, el);
+    post = transformer_apply(new_tf, pre);
+    free_transformer(new_tf);
+  }
+  else
+    post = transformer_apply(tf, pre);
+
+  return post;
+}
+
+static transformer 
 call_to_postcondition(
     transformer pre,
     call c,
@@ -405,6 +426,7 @@ instruction_to_postcondition(
     loop l;
     whileloop wl;
     call c;
+    expression exp;
 
     pips_debug(9,"begin pre=%p tf=%p\n", pre, tf);
 
@@ -424,6 +446,9 @@ instruction_to_postcondition(
 	wl = instruction_whileloop(i);
 	post = whileloop_to_postcondition(pre, wl, tf);
 	break;
+      case is_instruction_forloop:
+	pips_user_error("Use property to convert for loops into while loops");
+	break;
       case is_instruction_goto:
 	pips_error("instruction_to_postcondition",
 		   "unexpected goto in semantics analysis");
@@ -437,9 +462,15 @@ instruction_to_postcondition(
 	post = unstructured_to_postcondition(pre, instruction_unstructured(i),
 					     tf);
 	break ;
+      case is_instruction_expression:
+	exp = instruction_expression(i);
+	post = expression_to_postcondition(pre, exp, tf);
+	break ;
+      case is_instruction_multitest:
+	pips_internal_error("Should have been removed by the controlizer?\n");
+	break ;
       default:
-	pips_error("instruction_to_postcondition","unexpected tag %d\n",
-	      instruction_tag(i));
+	pips_internal_error("unexpected tag %d\n", instruction_tag(i));
     }
     pips_debug(9,"resultat post, %p:\n", post);
     ifdebug(9) (void) print_transformer(post);

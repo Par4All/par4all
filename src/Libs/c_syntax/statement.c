@@ -100,10 +100,14 @@ statement MakeBlock(list decls, list stms)
 
   discard_C_comment();
 
-  ifdebug(1) 
-    {
-      printf("Declaration list: ");
-      print_entities(statement_declarations(s));
+  ifdebug(1) {
+      fprintf(stderr, "Declaration list: ");
+      if(ENDP(statement_declarations(s)))
+	fprintf(stderr, "NONE\n");
+      else {
+	print_entities(statement_declarations(s));
+	fprintf(stderr, "\n");
+      }
     }
 
   pips_assert("Block statement is consistent",statement_consistent_p(s));

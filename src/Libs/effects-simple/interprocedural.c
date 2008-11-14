@@ -65,7 +65,7 @@ effects_dynamic_elim(list l_eff)
 
     ifdebug(4) {
       pips_debug(4, "current effect \n%s for entity \"\%s\":\n",
-		 effect_to_string(eff), entity_name(eff_ent));
+		 list_to_string(words_effect(eff)), entity_name(eff_ent));
     }
 
     /* If the reference is a common variable (ie. with storage ram but

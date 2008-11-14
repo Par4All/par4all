@@ -51,7 +51,7 @@ int
 compare_effect_reference(effect * e1, effect * e2)
 {
   entity v1 = reference_variable(effect_any_reference(*e1));
-    entity v2 = reference_variable(effect_any_reference(*e2));
+  entity v2 = reference_variable(effect_any_reference(*e2));
   int n1, n2;
   string s1 = entity_name_without_scope(v1);
   string s2 = entity_name_without_scope(v2);

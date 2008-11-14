@@ -217,6 +217,12 @@ expression MakeFunctionExpression(expression e, list le)
 	bool ok = TRUE;
 	entity cf = get_current_module_entity();
 
+	ifdebug(8) {
+	  pips_debug(8, "Call to \"\%s\" with %d argument(s)\n",
+		     entity_name(ent), gen_length(le));
+	  print_expressions(le);
+	}
+
 	if(!intrinsic_entity_p(ent)) {
 	  entity cu = get_current_compilation_unit_entity();
 	  list cudl = code_declarations(value_code(entity_initial(cu)));

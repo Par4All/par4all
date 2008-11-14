@@ -484,27 +484,16 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
   bool finished_p = FALSE;
   expression s_exp = expression_undefined;
   extern void print_effect(effect);
+  reference mr = reference_undefined;
+  reference mre = reference_undefined;
 
-  /* First step: see if we should recurse or not. Set s_exp if yes. */
+  /* First step: see if we should recurse or not. Set s_exp if yes. If not, set mr. */
 
   if(syntax_reference_p(s)) {
-    /* Do not recurse any longer: the basis of the lhs expression is found */
-    reference mr = copy_reference(syntax_reference(s));
-    /* Keep addressing open to further indexation if possible */
-    effect me = make_effect(make_cell_reference(mr),
-			    lhs_p?make_action_write():make_action_read(),
-			    make_addressing_index(),
-			    make_approximation_must(),
-			    make_descriptor_none());
-    /* Read effect to generate for point_to and for dereferencing */
-    effect mre = make_effect(make_cell_reference(copy_reference(syntax_reference(s))),
-			     make_action_read(),
-			     make_addressing_index(),
-			     make_approximation_must(),
-			     make_descriptor_none());
-
-    *pmwe = me;
-    *pmre = mre;
+    /* Do not recurse any longer: the basis of the address expression is found */
+    mr = copy_reference(syntax_reference(s));
+    mre = copy_reference(syntax_reference(s));
+      
     /* take care fo the object itself: it must be read, most of the
        times. Also take care of its indices */
     /* We know it must be read because we are dealing with a complex
@@ -524,7 +513,7 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
       pips_user_warning("Constant in a lhs expression: \"\%s\"\n",
 			words_to_string(words_expression(exp)));
       /* Will be converted into an anywhere effect by the caller */
-      *pmwe = effect_undefined;
+      mr = reference_undefined;
       finished_p = TRUE;
     }
     else if(ENTITY_FIELD_P(op) || ENTITY_POINT_TO_P(op)) {
@@ -553,20 +542,8 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
 	      variable vt1 = type_variable(t1);
 	      basic b1 = variable_basic(vt1);
 	      if(basic_pointer_p(b1)) {
-		effect me = make_effect(make_cell_reference(make_reference(v1, CONS(EXPRESSION,e2,NIL))),
-					lhs_p?make_action_write():make_action_read(),
-					make_addressing_index(),
-					make_approximation_must(),
-					make_descriptor_none());
-		/* Read effect to generate for point_to and for dereferencing */
-		effect mre = make_effect(make_cell_reference(make_reference(v1,NIL)),
-					 make_action_read(),
-					 make_addressing_index(),
-					 make_approximation_must(),
-					 make_descriptor_none());
-
-		*pmwe = me;
-		*pmre = mre;
+		mr = make_reference(v1, CONS(EXPRESSION,e2,NIL));
+		mre = make_reference(v1, NIL);
 		le = generic_proper_effects_of_expression(e1);
 		le = gen_nconc(le, generic_proper_effects_of_expression(e2));
 		finished_p = TRUE;
@@ -575,7 +552,7 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
 	  }
 	  if(!finished_p) {
 	    le = generic_proper_effects_of_expression(exp);
-	    *pmwe = effect_undefined;
+	    mr = reference_undefined;
 	    finished_p = TRUE;
 	  }
 	}
@@ -584,6 +561,7 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
 	  expression e1 = EXPRESSION(CAR(s_args));
 	  syntax s1 = expression_syntax(e1);
 	  reference r1 = syntax_reference(s1);
+	  entity v1 = reference_variable(r1);
 
 	  /* YOU DO NOT WANT TO GO DOWN RECURSIVELY. DO AS FOR C_PLUS ABOVE: p[0]! */
 
@@ -592,10 +570,12 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
 	  /* This seems OK for a scalar. How about an indexed reference? */
 
 	  le = generic_proper_effects_of_expression(EXPRESSION(CAR(args)));
-	  s_exp = e1;
+	  mr = make_reference(v1, CONS(EXPRESSION, int_to_expression(0), NIL));
+	  mre = copy_reference(r1);
 	  /* DO NOT go down recursively with this new s_exp since the
 	     incrementation or decrementation can be ignored for the
 	     dereferencing. */
+	  finished_p = TRUE;
 	}
 	else if(ENTITY_PRE_INCREMENT_P(s_op) || ENTITY_PRE_DECREMENT_P(s_op)) {
 	  expression e1 = EXPRESSION(CAR(s_args));
@@ -617,9 +597,9 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
 
 	  /* Too bad for the memory leaks involved... This s_exp
 	     should be freed at exit. */
-	  s_exp = make_expression(make_syntax_reference(nr1), normalized_undefined);
-	  /* DO NOT go down recursively with this new s_exp since the
-	     incrementation can be ignored for the dereferencing. */
+	  mr = nr1;
+	  mre = copy_reference(r1);
+	  finished_p = TRUE;
 	}
 	else {
 	  /* do nothing, go down recursively to handle other calls */
@@ -640,7 +620,7 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
 	 the other sub-expressions won't be computed because we've set
 	 up finish_p==TRUE and *pmwe == effect_undefined */
       le = generic_proper_effects_of_expression(exp);
-      *pmwe = effect_undefined;
+
       finished_p = TRUE;
     }
   }
@@ -648,14 +628,42 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
     s_exp = subscript_array(syntax_subscript(s));
   }
 
-  if(!finished_p) {
+  if(finished_p) {
+    if(reference_undefined_p(mr)) {
+      *pmwe = effect_undefined;
+    }
+    else {
+      /* Keep addressing open to further indexation if possible */
+      effect me = make_effect(make_cell_reference(mr),
+			      lhs_p?make_action_write():make_action_read(),
+			      make_addressing_index(),
+			      make_approximation_must(),
+			      make_descriptor_none());
+      *pmwe = me;
 
+      /* Can mre be undefined when mr is defined?*/
+      if(!reference_undefined_p(mre)) {
+	/* Read effect to generate for point_to and for dereferencing */
+	effect mre = make_effect(make_cell_reference(copy_reference(mr)),
+				 make_action_read(),
+				 make_addressing_index(),
+				 make_approximation_must(),
+				 make_descriptor_none());
+
+	*pmre = mre;
+      }
+      else {
+	pips_debug(8, "mr is defined but not mre\n");
+      }
+    }
+  }
+  else {
     /* go down */
     le = gen_nconc(le, generic_proper_effects_of_complex_lhs(s_exp, pmwe, pmre, lhs_p));
 
     ifdebug(8) {
       if(effect_undefined_p(*pmwe)) {
-	pips_debug(8, "And *pmwe:\n");
+	pips_debug(8, "\nReturn with *pmwe:\n");
 	fprintf(stderr, "EFFECT UNDEFINED\n");
       }
       else {
@@ -734,8 +742,9 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
 
 	  /* add effects due to e2 */
 	  le = gen_nconc(le, generic_proper_effects_of_expression(e2));
+
 	  /* A read must to the main variable must be added to le */
-	  pips_debug(8, "Add *pmre to le");
+	  pips_debug(8, "Add *pmre to le\n");
 	  le = gen_nconc(le, CONS(EFFECT, copy_effect(*pmre), NIL));
 	}
 	else if(ENTITY_DEREFERENCING_P(op)) {
@@ -752,7 +761,7 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
 	    finished_p = TRUE;
 	  }
 	  /* A read must to the main variable must be added to le */
-	  pips_debug(8, "Add *pmre to le");
+	  pips_debug(8, "Add *pmre to le\n");
 	  le = gen_nconc(le, CONS(EFFECT, copy_effect(*pmre), NIL));
 	}
 	else {
@@ -1141,7 +1150,7 @@ generic_proper_effects_of_syntax(syntax s)
 
     ifdebug(8)
     {
-	pips_debug(8, "Proper effects of expression  %s :\n",
+	pips_debug(8, "Proper effects of expression \"%s\":\n",
 		   words_to_string(words_syntax(s)));
 	(*effects_prettyprint_func)(le);
     }
@@ -1314,6 +1323,53 @@ proper_effects_of_call(call c)
 
 	store_proper_rw_effects_list(current_stat, l_proper);
     }
+}
+
+/* judt to handle one kind of instruction */
+proper_effects_of_expression_instruction(instruction i)
+{
+  list l_proper = NIL;
+  statement current_stat = effects_private_current_stmt_head();
+  instruction inst = statement_instruction(current_stat);
+  list l_cumu_range = cumu_range_effects();
+
+  /* Is the call an instruction, or a sub-expression? */
+  if (instruction_expression_p(i)) {
+    expression ie = instruction_expression(i);
+    syntax is = expression_syntax(ie);
+
+    if(syntax_cast_p(is)) {
+      expression ce = cast_expression(syntax_cast(is));
+      syntax sc = expression_syntax(ce);
+
+      if(syntax_call_p(sc)) {
+	call c = syntax_call(sc);
+
+	pips_debug(2, "Effects for expression instruction in statement%03zd:\n",
+		   statement_ordering(current_stat)); 
+
+	l_proper = generic_r_proper_effects_of_call(c);
+	l_proper = gen_nconc(l_proper, effects_dup(l_cumu_range));
+		
+	if (contract_p)
+	  l_proper = proper_effects_contract(l_proper);
+	ifdebug(2) {
+	  pips_debug(2, "Proper effects for statement%03zd:\n",
+		     statement_ordering(current_stat));  
+	  (*effects_prettyprint_func)(l_proper);
+	  pips_debug(2, "end\n");
+	}
+
+	store_proper_rw_effects_list(current_stat, l_proper);
+      }
+      else {
+	pips_internal_error("Cast case not implemented\n");
+	  }
+    }
+    else {
+      pips_internal_error("Instruction expression case not implemented\n");
+	}
+  }
 }
 
 static void 
@@ -1491,7 +1547,7 @@ static void proper_effects_of_statement(statement s)
 {
     if (!bound_proper_rw_effects_p(s)) 
      { 
- 	pips_debug(2, "Warning, proper effects undefined, set to NIL"); 
+ 	pips_debug(2, "Warning, proper effects undefined, set to NIL\n"); 
  	store_proper_rw_effects_list(s,NIL);	 
      } 
     effects_private_current_stmt_pop();
@@ -1513,11 +1569,15 @@ void proper_effects_of_module_statement(statement module_stat)
 	 statement_domain, stmt_filter, proper_effects_of_statement,
 	 sequence_domain, gen_true, proper_effects_of_sequence,
 	 test_domain, gen_true, proper_effects_of_test,
+	 /* Reached only through syntax (see expression rule) */
 	 call_domain, gen_true, proper_effects_of_call,
 	 loop_domain, loop_filter, proper_effects_of_loop,
 	 whileloop_domain, gen_true, proper_effects_of_while,
 	 forloop_domain, gen_true, proper_effects_of_forloop,
 	 unstructured_domain, gen_true, proper_effects_of_unstructured,
+         /* Just to retrieve effects of instructions with kind
+	    expression since they are ruled out by the next clause */
+	 instruction_domain, gen_true, proper_effects_of_expression_instruction,
 	 expression_domain, gen_false, gen_null, /* NOT THESE CALLS */
 	 NULL); 
 

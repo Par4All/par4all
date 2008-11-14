@@ -37,11 +37,26 @@ normalized NormalizeSyntax(syntax s)
 	n = NormalizeReference(syntax_reference(s));
 	break;
       case is_syntax_range:
-	n = make_normalized(is_normalized_complex, UU);
+	n = make_normalized_complex();
 	break;
       case is_syntax_call:
 	n = NormalizeCall((syntax_call(s)));
 	break;
+    case is_syntax_cast:
+	n = make_normalized_complex();
+      break;
+    case is_syntax_sizeofexpression:
+	n = make_normalized_complex();
+      break;
+    case is_syntax_subscript:
+	n = make_normalized_complex();
+      break;
+    case is_syntax_application:
+	n = make_normalized_complex();
+      break;
+    case is_syntax_va_arg:
+	n = make_normalized_complex();
+      break;
       default:
 	pips_error("NormalizeSyntax", "cas default");
     }

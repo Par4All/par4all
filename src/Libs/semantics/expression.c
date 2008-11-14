@@ -2054,6 +2054,26 @@ any_expression_to_transformer(
 
   return tf;
 }
+
+
+/* Just to capture side effects as the returned value is
+   ignored. Example: "(void) inc(&i);' */
+transformer expression_to_transformer(
+			      expression exp,
+			      transformer pre,
+			      list el)
+{
+  type et = expression_to_type(exp);
+  entity tmpv = make_local_temporary_value_entity(et);
+  /* FI: I do not remember the meaning of the last parameter */
+  transformer tf = any_expression_to_transformer(tmpv, exp, pre, FALSE);
+
+  if(transformer_undefined_p(tf))
+    tf = effects_to_transformer(el);
+  else
+    tf = transformer_temporary_value_projection(tf);
+  return tf;
+}
 
 bool false_condition_wrt_precondition_p(expression c, transformer pre)
 {
