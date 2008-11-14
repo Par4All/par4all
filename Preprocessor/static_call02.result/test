@@ -3,24 +3,24 @@ Parsed printed file for all
 
 void bar(int i)
 {
-   extern void foo(int);
+   extern void foo(int i);
    foo(i);
 
    if (i) {
-      extern void foo(int);
+      extern void foo(int i);
 
       foo(i);
    }
 }
-extern void foo(int);
+extern void foo(int i);
 void foo(int i)
 {
 
    i++;
    printf("This is the top-level version in bar.c\n");
 }
-static void foo(int);
-extern void bar(int);
+static void foo(int i);
+extern void bar(int i);
 static void foo(int i)
 {
    int foo;
@@ -32,8 +32,8 @@ static void foo(int i)
 }
 int main()
 {
-   extern void foo(int);
-   extern void bar(int);
+   extern void foo(int i);
+   extern void bar(int i);
    foo(3);
    bar(3);
 }
@@ -43,24 +43,24 @@ Printed file for all
 
 void bar(int i)
 {
-   extern void foo(int);
+   extern void foo(int i);
    foo(i);
 
    if (i) {
-      extern void foo(int);
+      extern void foo(int i);
 
       foo(i);
    }
 }
-extern void foo(int);
+extern void foo(int i);
 void foo(int i)
 {
 
    i++;
    printf("This is the top-level version in bar.c\n");
 }
-static void foo(int);
-extern void bar(int);
+static void foo(int i);
+extern void bar(int i);
 static void foo(int i)
 {
    int foo;
@@ -72,8 +72,8 @@ static void foo(int i)
 }
 int main()
 {
-   extern void foo(int);
-   extern void bar(int);
+   extern void foo(int i);
+   extern void bar(int i);
    foo(3);
    bar(3);
 }

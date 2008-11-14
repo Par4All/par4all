@@ -2,7 +2,7 @@ int main()
 {
    foo(3);
 }
-static void foo(int);
+static void foo(int i);
 extern int main();
 static void foo(int i)
 {
@@ -12,7 +12,7 @@ int main()
 {
    foo(3);
 }
-static void foo(int);
+static void foo(int i);
 extern int main();
 static void foo(int i)
 {
