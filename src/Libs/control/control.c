@@ -413,7 +413,10 @@ bool controlize(
       controlized =  TRUE;
       break;
     case is_instruction_expression:
-      controlized =  TRUE;
+      /* PJ: controlize_call() controlize any "nice" statement */
+      controlized = controlize_call(st, call_undefined,
+				    pred, succ, c_res, used_labels);
+
       break;
     default:
 	pips_error("controlize", 
@@ -448,17 +451,15 @@ bool controlize(
    continuations are not dealt with here. The END= and ERR= clauses are
    simulated by hidden tests. */
 
-bool controlize_call(st, c, pred, succ, c_res, used_labels)
-statement st;
-call c;
-control pred, succ;
-control c_res;
-hash_table used_labels;
+bool controlize_call(statement st,
+		     call c __attribute__ ((unused)),
+		     control pred,
+		     control succ,
+		     control c_res,
+		     hash_table used_labels __attribute__ ((unused)))
 {
   pips_debug(5, "(st = %p, pred = %p, succ = %p, c_res = %p)\n",
 	     st, pred, succ, c_res);
-        
-  pips_assert("Useless parameters", c==c && used_labels==used_labels);
 
   UPDATE_CONTROL(c_res, st,
 		 ADD_PRED(pred, c_res), 
