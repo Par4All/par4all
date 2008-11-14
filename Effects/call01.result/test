@@ -1,0 +1,26 @@
+
+Parsed code for "call01"
+
+void call01(int *pi)
+{
+   *pi = 1;
+}
+
+Code for "call01"
+
+void call01(int *pi)
+{
+   *pi = 1;
+}
+
+Proper effects for "call01"
+
+void call01(int *pi)
+{
+//               <must be read   >: pi
+//               <must be written - post>: (*pi)
+   *pi = 1;
+}
+
+Cumulated effects for "call01"
+
