@@ -1192,6 +1192,29 @@ binding, so you click on an interesting variable and then use
 \end{description}
 
 
+\subsection{Debugging memory issues}
+\label{sec:debugg-memory-issu}
+
+There are tools quite useful for tracking memory issues that may happen
+when dealing with complex structures in C as in PIPS.
+
+The more powerful is Rational Purify, but unfortunately it is non
+free. But since it is a good tool, that makes sense to invest in such a
+tool. It works by instrumenting all the memory access at link time. The
+execution is slower.
+
+Valgrind is another tool to run a program in a virtual machine that
+monitor every bit of the memory to detect memory corruption or the use of
+an uninitialized bit (yes, not byte) of memory. Of course the execution is
+quite slower.
+
+Another solution is to ask the compiler to instrument the code at compile
+time to detect memory corruption later at run time. This is done with
+\texttt{gcc} by compiling with \texttt{-fmudflap} option (or
+\texttt{-fmudflapth} when PIPS is multi-threaded...). The run-time
+behaviour is controlled at execution with the \verb|MUDFLAP_OPTIONS|
+environment variable.
+
 
 \section{Documentation}
 \label{sec:documentation}
