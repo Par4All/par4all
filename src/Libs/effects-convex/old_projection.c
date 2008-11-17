@@ -601,7 +601,7 @@ void region_remove_phi_variables(region reg)
 	print_region(reg);
     }
     
-    l_phi = phi_entities_list(1,7);    
+    l_phi = phi_entities_list(1,NB_MAX_ARRAY_DIM);    
     project_regions_along_variables(l_reg, l_phi);
     gen_free_list(l_reg);
     gen_free_list(l_phi);
@@ -632,7 +632,7 @@ void region_remove_psi_variables(region reg)
 	print_region(reg);
     }
     
-    l_psi = psi_entities_list(1,7);    
+    l_psi = psi_entities_list(1,NB_MAX_ARRAY_DIM);    
     project_regions_along_variables(l_reg, l_psi);
     gen_free_list(l_reg);    
 

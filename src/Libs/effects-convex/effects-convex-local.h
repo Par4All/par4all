@@ -106,3 +106,5 @@ ifdebug(1){region_consistent_p(reg);}
 #define USER_IN_REGION_SUFFIX ".uinreg"
 #define SEQUENTIAL_OUT_REGION_SUFFIX ".outreg"
 #define USER_OUT_REGION_SUFFIX ".uoutreg"
+
+#define NB_MAX_ARRAY_DIM 12

@@ -255,7 +255,7 @@ static bool reference_p;
 static Value offset;
 static int dim_1, dim_2;
 static Value size_elt_1, size_elt_2;
-static dimension dims_1[7], dims_2[7];
+static dimension dims_1[NB_MAX_ARRAY_DIM], dims_2[NB_MAX_ARRAY_DIM];
 static boolean dim_1_assumed, dim_2_assumed;
 
 static bool dims_array_init(entity array, dimension* dims, int dim_array)

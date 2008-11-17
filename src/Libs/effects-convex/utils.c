@@ -125,13 +125,13 @@ list beta_entities_list(int beta_min, int beta_max)
 
 /****************************************** INTIALISATION  AND TERMINATION */
 
-static entity phi[7]; /* phi entities */
-static entity psi[7]; /* psi entities */
+static entity phi[NB_MAX_ARRAY_DIM]; /* phi entities */
+static entity psi[NB_MAX_ARRAY_DIM]; /* psi entities */
 
 void regions_init()
 {
     int i;
-    for(i=0; i<7; i++)
+    for(i=0; i<NB_MAX_ARRAY_DIM; i++)
     {
 	phi[i] = entity_undefined;
 	psi[i] = entity_undefined;
@@ -1152,9 +1152,9 @@ region entity_whole_region(entity e, tag tac)
  */
 entity make_phi_entity(int n)
 {
-    pips_assert("phi index between 1 and 7\n", 1<=n && n<=7);
+    pips_assert("phi index between 1 and NB_MAX_ARRAY_DIM\n", 1<=n && n<=NB_MAX_ARRAY_DIM);
     
-    /* phi indices are between 1 to 7. array indices are between 0 to 6. */
+    /* phi indices are between 1 to NB_MAX_ARRAY_DIM. array indices are between 0 to NB_MAX_ARRAY_DIM-1. */
     if (phi[n-1] == entity_undefined)
     {
 	entity v;
@@ -1425,9 +1425,9 @@ int base_nb_phi(Pbase b)
  */
 entity make_psi_entity(int n)
 {
-    pips_assert("psy index between 1 and 7\n", 1<=n && n<=7);
+    pips_assert("psy index between 1 and NB_MAX_ARRAY_DIM\n", 1<=n && n<=NB_MAX_ARRAY_DIM);
 
-    /* psi indices are between 1 to 7. Array indices are between 0 to 6. */
+    /* psi indices are between 1 to NB_MAX_ARRAY_DIM. Array indices are between 0 to NB_MAX_ARRAY_DIM-1. */
     if (psi[n-1] == entity_undefined) 
     {
 	entity v;
