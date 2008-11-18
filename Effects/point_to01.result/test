@@ -75,9 +75,9 @@ void point_to01()
 
    p = &c;
 //               <may be read    >: p
-//               <may be read    - post >: (*p)
-//               <may be written - post >: (*p) (*p) (*p) (*p) (*p)
-//                                  (*p)
+//               <may be read    - post >: (*p)[1]
+//               <may be written - post >: (*p)[1] (*p)[3] (*p)
+//                                  [4] (*p)[1] (*p)[4] (*p)[2]
 
    if (1) {
 //               <must be read   >: p

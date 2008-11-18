@@ -1,0 +1,80 @@
+
+Parsed code for "call08"
+
+void call08(int r, int m, int *x)
+{
+   int j;
+
+   x[4] = 10*r+4;
+}
+
+Code for "call08"
+
+void call08(int r, int m, int *x)
+{
+   int j;
+
+   x[4] = 10*r+4;
+}
+
+Proper effects for "call08"
+
+void call08(int r, int m, int *x)
+{
+   int j;
+//               <must be read   >: r
+//               <must be written>: x[4]
+
+   x[4] = 10*r+4;
+}
+
+Cumulated effects for "call08"
+
+//               <must be read   >: r
+//               <must be written>: x[4]
+void call08(int r, int m, int *x)
+{
+   int j;
+//               <must be read   >: r
+//               <must be written>: x[4]
+
+   x[4] = 10*r+4;
+}
+
+Proper effects for "main"
+
+main()
+{
+   int d1 = 4;
+   int d2 = 4;
+   int y[d1][d2];
+   int i;
+   int j;
+//               <must be read   >: d1
+//               <must be written>: i
+
+   for(i = 0; i <= d1-1; i += 1)
+//               <must be read   >: d1 i
+//               <must be written>: y[i][1+4]
+      call08(i, d2, &y[i][1]);
+}
+
+Cumulated effects for "main"
+
+main()
+{
+   int d1 = 4;
+   int d2 = 4;
+   int y[d1][d2];
+   int i;
+   int j;
+//               <may be read    >: i
+//               <may be written >: y[*][1+4]
+//               <must be read   >: d1
+//               <must be written>: i
+
+   for(i = 0; i <= d1-1; i += 1)
+//               <may be written >: y[*][1+4]
+//               <must be read   >: d1 i
+      call08(i, d2, &y[i][1]);
+}

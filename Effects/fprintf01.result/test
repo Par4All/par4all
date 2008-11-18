@@ -29,15 +29,16 @@ int main()
 //               <may be written >: __IO_EFFECTS:LUNS[*] name[*]
 //               <must be written>: n
    for(n = 0; n <= 2; n += 1) {
-//               <may be read    >: __IO_EFFECTS:LUNS[*]
-//               <may be written >: __IO_EFFECTS:LUNS[*]
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
       puts("please, enter a name: ");
-//               <may be read    >: __IO_EFFECTS:LUNS[*]
-//               <may be written >: __IO_EFFECTS:LUNS[*] name[*]
+//               <may be written >: name[*]
+//               <must be read   >: __IO_EFFECTS:LUNS[0]
+//               <must be written>: __IO_EFFECTS:LUNS[0]
       gets(name);
-//               <may be read    >: __IO_EFFECTS:LUNS[*] name[*]
+//               <may be read    >: __IO_EFFECTS:LUNS[*]
 //               <may be written >: __IO_EFFECTS:LUNS[*]
-//               <must be read   >: n pFile
+//               <must be read   >: n name[*] pFile
       fprintf(pFile, "Name %d %s\n", n, name);
    }
 //               <may be read    >: __IO_EFFECTS:LUNS[*]

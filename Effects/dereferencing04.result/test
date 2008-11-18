@@ -28,7 +28,7 @@ void dereferencing04()
    double *p;
    double *q;
    double *r;
+//               <may be written >: p[*]
 //               <must be read   >: p q r
-//               <must be written>: p[q-r]
    *(p+q-r) = 0.;
 }

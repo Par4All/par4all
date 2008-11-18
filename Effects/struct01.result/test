@@ -9,12 +9,12 @@ int struct01()
    };
    struct one x;
    int y[10];
-//               <may be written >: x[*]
+//               <must be written>: x[1]
 
    x.first = 1;
-//               <may be written >: x[*]
+//               <must be written>: x[2]
    x.second = 2;
-//               <may be written >: y[*]
+//               <must be written>: y[0]
 
    y[0] = 1;
 }

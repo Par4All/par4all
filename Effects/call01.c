@@ -1,12 +1,19 @@
 /* #include<stdio.h> */
 
-void call01(int * pi)
+typedef struct two_fields{int one; int two[10];} tf_t;
+
+void call01(int * pi, tf_t *q)
 {
   *pi = 1;
+  pi++;
+  q->one = 1;
+  q->two[4] = 2;
 }
 
 main()
 {
   int i;
-  call01(&i);
+  tf_t s;
+
+  call01(&i, &s);
 }

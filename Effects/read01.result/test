@@ -16,7 +16,6 @@ int main()
    size_t nbytes;
    ssize_t bytes_read;
    int fd;
-//               <may be read    >: buf[*]
 //               <must be written>: nbytes
 
    nbytes = sizeof(buf);

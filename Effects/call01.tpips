@@ -38,7 +38,6 @@ echo
 
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[call01]
-
 echo
 echo Cumulated effects for "call01"
 echo
@@ -46,6 +45,21 @@ echo
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[call01]
 
+echo
+echo Proper effects for "main"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+quit
+
+echo
+echo Cumulated effects for "main"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]
+quit
 echo
 echo Regions for "call01"
 echo

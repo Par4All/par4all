@@ -9,8 +9,8 @@ int main()
    y[0] = 0.;
    printf(fmt, i, i+j, x);
 }
-//               <may be read    >: __IO_EFFECTS:LUNS[*]
-//               <may be written >: __IO_EFFECTS:LUNS[*]
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
 int main()
 {
    int i = 5;
@@ -18,11 +18,10 @@ int main()
    float x;
    double y[10];
    char *fmt = "i=%d, %d, %f\n";
-//               <may be written >: y[*]
+//               <must be written>: y[0]
 
    y[0] = 0.;
-//               <may be read    >: __IO_EFFECTS:LUNS[*]
-//               <may be written >: __IO_EFFECTS:LUNS[*]
-//               <must be read   >: fmt i j x
+//               <must be read   >: __IO_EFFECTS:LUNS[1] fmt i j x
+//               <must be written>: __IO_EFFECTS:LUNS[1]
    printf(fmt, i, i+j, x);
 }

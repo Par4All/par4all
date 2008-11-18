@@ -35,7 +35,7 @@ void dereferencing03()
 //               <must be written>: p[1]
 
    *(p+1) = 0.;
+//               <may be written >: p[*]
 //               <must be read   >: i p
-//               <must be written>: p[i]
    *(p+i) = 0.;
 }

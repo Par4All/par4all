@@ -25,12 +25,12 @@ int main()
 //               <must be read   >: fp
 //               <must be written>: n
    n = fread(buf, 8, 50, fp);
-//               <may be read    >: __IO_EFFECTS:LUNS[*]
-//               <may be written >: __IO_EFFECTS:LUNS[*]
+//               <may be read    >: __IO_EFFECTS:LUNS[1]
+//               <may be written >: __IO_EFFECTS:LUNS[1]
 //               <must be read   >: n
    if (n==-1) 
-//               <may be read    >: __IO_EFFECTS:LUNS[*]
-//               <may be written >: __IO_EFFECTS:LUNS[*]
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
       printf("fread failed");
 //               <may be read    >: __IO_EFFECTS:LUNS[*]
 //               <may be written >: __IO_EFFECTS:LUNS[*]

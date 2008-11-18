@@ -1,0 +1,74 @@
+
+Parsed code for "call02"
+
+void call02(int i, int j)
+{
+   i = j+1;
+}
+
+Code for "call02"
+
+void call02(int i, int j)
+{
+   i = j+1;
+}
+
+Proper effects for "call02"
+
+void call02(int i, int j)
+{
+//               <must be read   >: j
+//               <must be written>: i
+   i = j+1;
+}
+
+Cumulated effects for "call02"
+
+//               <must be read   >: j
+//               <must be written>: i
+void call02(int i, int j)
+{
+//               <must be read   >: j
+//               <must be written>: i
+   i = j+1;
+}
+
+Cumulated effects for "main"
+
+main()
+{
+   int a;
+   int b;
+//               <must be read   >: a b
+
+   call02(a, b);
+}
+
+Regions for "main"
+
+main()
+{
+   int a;
+   int b;
+
+//  <a-R-EXACT-{}>
+//  <b-R-EXACT-{}>
+
+
+   call02(a, b);
+}
+
+Regions for "call02"
+
+
+//  <i-W-EXACT-{}>
+//  <j-R-EXACT-{}>
+
+void call02(int i, int j)
+{
+
+//  <i-W-EXACT-{}>
+//  <j-R-EXACT-{}>
+
+   i = j+1;
+}

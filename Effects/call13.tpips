@@ -1,0 +1,78 @@
+delete call13
+
+setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create call13 call13.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+# setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
+
+echo
+echo Parsed code for "call13"
+echo
+
+display PARSED_PRINTED_FILE[call13]
+
+echo
+echo Code for "call13"
+echo
+
+display PRINTED_FILE[call13]
+
+#echo
+#echo Code for "main"
+#echo
+#
+#display PRINTED_FILE[main]
+
+echo
+echo Proper effects for "call13"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[call13]
+
+echo
+echo Cumulated effects for "call13"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[call13]
+quit
+
+#
+# No main in call13
+#
+
+echo
+echo Cumulated effects for "main"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]
+quit
+echo
+echo Regions for "call13"
+echo
+
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[call13]
+
+echo
+echo Regions for "main"
+echo
+
+setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[main]
+
+close
+delete call13
+quit

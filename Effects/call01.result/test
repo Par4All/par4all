@@ -1,26 +1,70 @@
 
 Parsed code for "call01"
 
-void call01(int *pi)
+void call01(int *pi, tf_t *q)
 {
    *pi = 1;
+   pi++;
+   q->one = 1;
+   (q->two)[4] = 2;
 }
 
 Code for "call01"
 
-void call01(int *pi)
+void call01(int *pi, tf_t *q)
 {
    *pi = 1;
+   pi++;
+   q->one = 1;
+   (q->two)[4] = 2;
 }
 
 Proper effects for "call01"
 
-void call01(int *pi)
+void call01(int *pi, tf_t *q)
 {
 //               <must be read   >: pi
 //               <must be written - post>: (*pi)
    *pi = 1;
+//               <must be read   >: pi
+//               <must be written>: pi
+   pi++;
+//               <must be read   >: q
+//               <must be written - post>: (*q)[1]
+   q->one = 1;
+//               <must be read   >: q
+//               <must be written - post>: (*q)[2][4]
+   (q->two)[4] = 2;
 }
 
 Cumulated effects for "call01"
 
+//               <must be read   >: pi q
+//               <must be written>: pi
+//               <must be written - post>: (*pi) (*q)[2][4] (*q)[1]
+void call01(int *pi, tf_t *q)
+{
+//               <must be read   >: pi
+//               <must be written - post>: (*pi)
+   *pi = 1;
+//               <must be read   >: pi
+//               <must be written>: pi
+   pi++;
+//               <must be read   >: q
+//               <must be written - post>: (*q)[1]
+   q->one = 1;
+//               <must be read   >: q
+//               <must be written - post>: (*q)[2][4]
+   (q->two)[4] = 2;
+}
+
+Proper effects for "main"
+
+main()
+{
+   int i;
+   tf_t s;
+//               <must be written>: i s[2][4] s[1]
+
+   call01(&i, &s);
+}

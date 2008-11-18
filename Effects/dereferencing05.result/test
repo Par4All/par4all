@@ -19,21 +19,17 @@ void dereferencing05()
    double *p;
    int i;
 //               <must be read   >: p
-//               <must be written>: p
-//               <must be written - post>: (*p)
+//               <must be written>: p[0] p
 
    *p++ = 0.;
 //               <must be read   >: p
-//               <must be written>: p
-//               <must be written - post>: (*p)
+//               <must be written>: p[0] p
    *p-- = 0.;
 //               <must be read   >: p
-//               <must be written>: p
-//               <must be written - pre>: *(p[1])
+//               <must be written>: p[1] p
    *++p = 0.;
 //               <must be read   >: p
-//               <must be written>: p
-//               <must be written - pre>: *(p[-1])
+//               <must be written>: p[-1] p
    *--p = 0.;
 }
 
@@ -44,20 +40,16 @@ void dereferencing05()
    double *p;
    int i;
 //               <must be read   >: p
-//               <must be written>: p
-//               <must be written - post>: (*p)
+//               <must be written>: p[0] p
 
    *p++ = 0.;
 //               <must be read   >: p
-//               <must be written>: p
-//               <must be written - post>: (*p)
+//               <must be written>: p[0] p
    *p-- = 0.;
 //               <must be read   >: p
-//               <must be written>: p
-//               <must be written - pre>: *(p[1])
+//               <must be written>: p[1] p
    *++p = 0.;
 //               <must be read   >: p
-//               <must be written>: p
-//               <must be written - pre>: *(p[-1])
+//               <must be written>: p[-1] p
    *--p = 0.;
 }

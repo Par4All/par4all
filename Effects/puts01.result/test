@@ -3,13 +3,12 @@ int main()
    char *s = "sortie de puts";
    puts(s);
 }
-//               <may be read    >: __IO_EFFECTS:LUNS[*]
-//               <may be written >: __IO_EFFECTS:LUNS[*]
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
 int main()
 {
    char *s = "sortie de puts";
-//               <may be read    >: __IO_EFFECTS:LUNS[*]
-//               <may be written >: __IO_EFFECTS:LUNS[*]
-//               <must be read   >: s
+//               <must be read   >: __IO_EFFECTS:LUNS[1] s
+//               <must be written>: __IO_EFFECTS:LUNS[1]
    puts(s);
 }

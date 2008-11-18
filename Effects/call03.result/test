@@ -1,0 +1,73 @@
+
+Parsed code for "call03"
+
+void call03()
+{
+   *pi = 1;
+   pi++;
+   q->one = 1;
+   (q->two)[4] = 2;
+}
+
+Code for "call03"
+
+void call03()
+{
+   *pi = 1;
+   pi++;
+   q->one = 1;
+   (q->two)[4] = 2;
+}
+
+Proper effects for "call03"
+
+void call03()
+{
+//               <must be read   >: TOP-LEVEL:pi
+//               <must be written - post>: (*TOP-LEVEL:pi)
+   *pi = 1;
+//               <must be read   >: TOP-LEVEL:pi
+//               <must be written>: TOP-LEVEL:pi
+   pi++;
+//               <must be read   >: TOP-LEVEL:q
+//               <must be written - post>: (*TOP-LEVEL:q)[1]
+   q->one = 1;
+//               <must be read   >: TOP-LEVEL:q
+//               <must be written - post>: (*TOP-LEVEL:q)[2][4]
+   (q->two)[4] = 2;
+}
+
+Cumulated effects for "call03"
+
+//               <must be read   >: TOP-LEVEL:pi TOP-LEVEL:q
+//               <must be written>: TOP-LEVEL:pi
+//               <must be written - post>: (*TOP-LEVEL:pi)
+//                                  (*TOP-LEVEL:q)
+//                                  [2][4] (*TOP-LEVEL:q)[1]
+void call03()
+{
+//               <must be read   >: TOP-LEVEL:pi
+//               <must be written - post>: (*TOP-LEVEL:pi)
+   *pi = 1;
+//               <must be read   >: TOP-LEVEL:pi
+//               <must be written>: TOP-LEVEL:pi
+   pi++;
+//               <must be read   >: TOP-LEVEL:q
+//               <must be written - post>: (*TOP-LEVEL:q)[1]
+   q->one = 1;
+//               <must be read   >: TOP-LEVEL:q
+//               <must be written - post>: (*TOP-LEVEL:q)[2][4]
+   (q->two)[4] = 2;
+}
+
+Proper effects for "main"
+
+main()
+{
+//               <must be read   >: TOP-LEVEL:pi TOP-LEVEL:q
+//               <must be written>: TOP-LEVEL:pi
+//               <must be written - post>: (*TOP-LEVEL:pi)
+//                                  (*TOP-LEVEL:q)
+//                                  [2][4] (*TOP-LEVEL:q)[1]
+   call03();
+}

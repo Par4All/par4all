@@ -27,8 +27,8 @@ void assign03()
 {
    double *p = (double *) malloc(10*sizeof(double));
    int j = 2;
+//               <may be written >: p[*]
 //               <must be read   >: j
-//               <must be written>: p[j]
 
    p[j] = 1.;
 }
