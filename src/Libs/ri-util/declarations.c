@@ -1821,57 +1821,6 @@ static list words_dimensions(list dims)
   return pc; 
 }
 
-/* Here is the set of mapping functions, from the RI to C language types*/
-
-/* Returns TRUE if t is one of the following types : 
-   void, char, short, int, long, float, double, signed, unsigned, 
-   and there is no array dimensions, of course*/
-
-bool basic_type_p(type t)
-{
-  if (type_variable_p(t))
-    {
-      basic b = variable_basic(type_variable(t));
-      return ((variable_dimensions(type_variable(t)) == NIL) &&
-	      (basic_int_p(b) || basic_float_p(b) || basic_logical_p(b)
-	       || basic_overloaded_p(b) || basic_complex_p(b) || basic_string_p(b)
-	       || basic_bit_p(b)));
-    }
-  return (type_void_p(t) || type_unknown_p(t)) ;
-}
-
-bool array_type_p(type t)
-{
-  return (type_variable_p(t) && (variable_dimensions(type_variable(t)) != NIL));
-}
-
-bool pointer_type_p(type t)
-{
-  return (type_variable_p(t) && basic_pointer_p(variable_basic(type_variable(t)))
-	  && (variable_dimensions(type_variable(t)) == NIL));
-}
-
-/* Returns TRUE if t is of type struct, union or enum. Need to distinguish 
-   with the case struct/union/enum in type in RI, these are the definitions 
-   of the struct/union/enum themselve, not a variable of this type. 
-
-   Example : struct foo var;*/
-
-bool derived_type_p(type t)
-{
-  return (type_variable_p(t) && basic_derived_p(variable_basic(type_variable(t))) 
-	  && (variable_dimensions(type_variable(t)) == NIL));
-}
-
-/* Returns TRUE if t is a typedefED type. 
-   Example : Myint i;*/
-
-bool typedef_type_p(type t)
-{
-  return (type_variable_p(t) && basic_typedef_p(variable_basic(type_variable(t))) 
-	  && (variable_dimensions(type_variable(t)) == NIL));
-}
-
 /* This recursive function prints a C variable with its type. 
    It can be a simple variable declaration such as "int a"
    or complicated one such as "int (* forces[10])()" (an array of 

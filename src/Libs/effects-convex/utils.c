@@ -934,23 +934,36 @@ list l_reg;
 /****************************************************** CREATION OF REGIONS */
 
 
-/* reference make_regions_reference(entity ent)
- * input    : a variable entity.
- * output   : a reference made with the entity ent, and, in case of an array,
- *            PHI variables as indices.
- * modifies : nothing.
- */
-reference make_regions_reference(entity ent)
+reference make_pointed_regions_reference(entity ent, bool indexed_p)
 {
   list regions_ref_inds = NIL, ent_list_dim = NIL;
   int dim;
-  type ent_ty = entity_type(ent);
+  type ent_ty = ultimate_type(entity_type(ent));
   int d = -1;
 
-  if (type_variable_p(ent_ty))
+  if (type_variable_p(ent_ty)) {
     /* ent_list_dim = variable_dimensions(type_variable(ent_ty)); */
-    d = type_depth(ent_ty);
-    
+    if(pointer_type_p(ent_ty)) {
+      /* Are we dealing with the pointer or with the pointed area? */
+      if(indexed_p) {
+	/* Only one dimension for pointers when arithmetic is used:
+	   let's hope that subscripts are combined! Unless the pointed type has dimensions... */
+	type pt = basic_pointer(variable_basic(type_variable(ent_ty)));
+
+	d = type_depth(pt);
+	if(d==0)
+	  d = 1;
+      }
+      else {
+	d = 0;
+      }
+    }
+    else {
+      /* Beware, ultimate type does not respect dimensions! */
+      d = type_depth(entity_type(ent));
+    }
+  }
+
   for (dim = 1; dim <= d; dim++)
     regions_ref_inds = gen_nconc(regions_ref_inds,
 				 CONS(EXPRESSION,
@@ -960,6 +973,18 @@ reference make_regions_reference(entity ent)
   /* FI: if I want to add extra-dimensions to reflect structure fields... */
 
   return make_reference(ent, regions_ref_inds);
+}
+
+/* reference make_regions_reference(entity ent)
+ * input    : a variable entity.
+ * output   : a reference made with the entity ent, and, in case of an array,
+ *            PHI variables as indices.
+ * modifies : nothing.
+ */
+reference make_regions_reference(entity ent)
+{
+  /* The Fortran semantics */
+  return make_pointed_regions_reference(ent, FALSE);
 }
 
 
@@ -974,8 +999,17 @@ reference make_regions_reference(entity ent)
 static Psysteme make_whole_array_predicate(entity e)
 {
     Psysteme ps = sc_new();
-    type t = entity_type(e);
+    type t = ultimate_type(entity_type(e));
     int d = type_depth(t);
+
+    /* Let's deal with scalar pointers at least */
+    /* If d==0 and if t is a pointer type, then d is a function of the pointed type */
+    if(d==0 && pointer_type_p(t)) {
+      basic tb = variable_basic(type_variable(t));
+      type pt = basic_pointer(tb);
+
+      d = type_depth(pt);
+    }
 
     /* No phi if the entity has no depth (includes scalar entity which have depth 0 */
     if (d>0)
@@ -1013,6 +1047,7 @@ effect make_reference_region(reference ref, tag tac)
   effect reg;
   boolean linear_p = TRUE;
   Psysteme sc;
+  bool pointer_p = pointer_type_p(ultimate_type(t));
 
   /* first make the predicate according to ref */
 
@@ -1025,14 +1060,16 @@ effect make_reference_region(reference ref, tag tac)
     
   sc = make_whole_array_predicate(e);
     
-  /* No predicate if the entity is a scalar. */
-  if (d>0)
+  /* No predicate if the entity is a scalar, but not a pointer. */
+  /* FI: If t is a pointer type, then d should depend on the type_depth of the pointed type... */
+  if (d>0 || pointer_p)
     {
       int idim;
       list ind = reference_indices(ref);
 
-      pips_assert("The number of indices is less or equal to the type depth",
-		  (int) gen_length(ind) <= d);
+      /* only for non pointer entity */
+      pips_assert("The number of indices is less or equal to the type depth, unless we are dealing with a pointer",
+		  (int) gen_length(ind) <= d || pointer_p);
 
       /* Nga Nguyen 04 June 2002 . Bug for regions, see Validation/Regions/incr3.f
 	 If the whole array is accessed (ind = NIL), for example 
@@ -1044,7 +1081,7 @@ effect make_reference_region(reference ref, tag tac)
 	 append_declaration_sc_if_exact_without_constraints 
 	 but if the current region is used, it is not consistent => core dumped*/
 
-      if (ENDP(ind))
+      if (ENDP(ind)) /* FI: Should be generalized for incomplete subscript */
 	sc = entity_declaration_sc(e); /* FI see what happens with structures */
       else {
 	for (idim = 1; ind != NIL; idim++, ind = CDR(ind)) {
@@ -1065,12 +1102,13 @@ effect make_reference_region(reference ref, tag tac)
       }
     } /* if */
     
-  reg = make_region(reference_dup(make_regions_reference(e)),
+  reg = make_region(reference_dup(make_pointed_regions_reference(e, !ENDP(reference_indices(ref)))),
 		    make_action(tac, UU),
 		    make_approximation
 		    (linear_p? is_approximation_must : is_approximation_may,
 		     UU),
 		    sc);
+  debug_region_consistency(reg);
   return(reg);
 }    
 

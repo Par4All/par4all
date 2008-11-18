@@ -423,9 +423,10 @@ reference_ith_index(ref, i)
 reference ref;
 int i;
 {
+  int count = i;
     cons *pi = reference_indices(ref);
 
-    while (pi != NIL && --i > 0)
+    while (pi != NIL && --count > 0)
 	pi = CDR(pi);
     
     pips_assert("reference_ith_index", pi != NIL);

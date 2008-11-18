@@ -482,6 +482,21 @@ expression e ;
     return(FALSE);
 }
 
+/* More extensive than next function */
+bool extended_integer_constant_expression_p(e)
+expression e;
+{
+  value v = EvalExpression(e);
+  bool ice_p = FALSE;
+
+  if(value_constant_p(v)) {
+    constant c = value_constant(v);
+
+    ice_p = constant_int_p(c);
+  }
+  return ice_p;
+}
+
 /* positive integer constant expression: call to a positive constant
    or to a sum of positive integer constant expressions (much too
    restrictive, but enough for the source codes submitted to PIPS up
@@ -492,6 +507,8 @@ expression e ;
 
    NormalizeExpression() could be used instead, as it is in fact to compute
    the value of the expression.
+
+   Use previous function instead of this one, and -1 will be a constant...
 */
 bool integer_constant_expression_p(e)
 expression e;
@@ -2137,4 +2154,72 @@ expression convert_bound_expression(expression e, bool upper_p, bool non_strict_
     }
   }
   return b;
+}
+
+
+bool reference_with_constant_indices_p(reference r)
+{
+  list sel = reference_indices(r);
+  bool constant_p = TRUE;
+
+  MAP(EXPRESSION, se, {
+      if(!extended_integer_constant_expression_p(se)) {
+	constant_p = FALSE;
+	break;
+      }
+    }, sel);
+  return constant_p;
+}
+
+/* indices can be constant or unbounded: they are store independent. */
+bool reference_with_unbounded_indices_p(reference r)
+{
+  list sel = reference_indices(r);
+  bool unbounded_p = TRUE;
+
+  MAP(EXPRESSION, se, {
+      if(!extended_integer_constant_expression_p(se)
+	 && !unbounded_expression_p(se)) {
+	unbounded_p = FALSE;
+	break;
+      }
+    }, sel);
+  return unbounded_p;
+}
+
+void check_user_call_site(entity func, list args)
+{
+  /* check the number of parameters */
+  list l_formals = module_formal_parameters(func);
+  int n_formals = (int) gen_length(l_formals);
+   
+  if ((int) gen_length(args) < n_formals)
+    {
+      /* this is really a user error.
+       * if you move this as a user warning, the pips would drop
+       * effects about unbounded formals... why not? FC.
+       */
+      fprintf(stderr,"%d formal arguments for module %s:\n",
+	      n_formals,module_local_name(func));
+      dump_arguments(l_formals);
+      fprintf(stderr,"%zd actual arguments:\n",gen_length(args));
+      print_expressions(args);
+      pips_user_error("\nCall to module %s: "
+		      "insufficient number of actual arguments.\n",
+		      module_local_name(func));
+    }
+  else if ((int) gen_length(args) > n_formals)
+    {
+      /* This can be survived... */        
+      fprintf(stderr,"%d formal arguments for module%s:\n",
+	      n_formals,module_local_name(func));
+      dump_arguments(l_formals);
+      fprintf(stderr,"%zd actual arguments:\n",gen_length(args));
+      print_expressions(args);
+
+      pips_user_warning("\nCall to module %s: "
+			"too many actual arguments.\n",
+			module_local_name(func));
+    }
+  gen_free_list(l_formals), l_formals=NIL;
 }

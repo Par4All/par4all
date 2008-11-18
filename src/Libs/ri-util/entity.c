@@ -21,7 +21,6 @@ void print_entities(list l)
   }, l);
 }
 
-
 bool unbounded_expression_p(expression e)
 {
   syntax s = expression_syntax(e);
@@ -442,7 +441,7 @@ bool entity_field_p(entity e)
  * it would have been better to keep the struct prefix in the field
  * name.
  */
-int entity_field_to_entity_struct(entity f)
+entity entity_field_to_entity_struct(entity f)
 {
   entity s = entity_undefined;
   string sn = strdup(entity_name(f)); /* structure name */
@@ -1176,7 +1175,7 @@ string entity_name_without_scope(entity e)
   else
     enws = strdup(concatenate(mn, MODULE_SEP_STRING, ns+1, NULL));
 
-  pips_debug(8, "entity name = \"%s\", without scope: \"%s\"\n",
+  pips_debug(9, "entity name = \"%s\", without scope: \"%s\"\n",
 	     en, enws);
 
   return enws;
@@ -1395,4 +1394,32 @@ void update_dummy_parameter(parameter p, entity ep)
     /* Note that free_entity(dummy_identifier(d)) should be performed... */
     dummy_identifier(d) = ep;
   }
+}
+
+/* Returns true when f has no parameters */
+bool parameter_passing_mode_p(entity f, int tag)
+{
+    type ft = ultimate_type(entity_type(f));
+    functional ftf = type_functional(ft);
+    bool mode_p = TRUE;
+
+    /* Calls thru pointers require syntax_application */
+    pips_assert("call to a function", type_functional_p(ft));
+
+    if(!ENDP(functional_parameters(ftf))) {
+      /* It is assumed that all parameters are passed the same way,
+	 either by valule or by reference */
+      parameter p = PARAMETER(CAR(functional_parameters(ftf)));
+      mode_p = (mode_tag(parameter_mode(p))==tag);
+    }
+    return mode_p;
+}
+bool parameter_passing_by_value_p(entity f)
+{
+  return parameter_passing_mode_p(f, is_mode_value);
+}
+
+bool parameter_passing_by_reference_p(entity f)
+{
+  return parameter_passing_mode_p(f, is_mode_reference);
 }

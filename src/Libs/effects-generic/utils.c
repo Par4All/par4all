@@ -696,7 +696,7 @@ list extract_references_from_declarations(list decls)
   return(lref.lr);
 }   
 
-list summary_effects_from_declaration(string module_name)
+list summary_effects_from_declaration(string module_name __attribute__ ((unused)))
 {
   list sel = NIL;
   //entity mod = module_name_to_entity(module_name);
@@ -830,4 +830,44 @@ bool anywhere_effect_p(effect e)
   anywhere_p = same_string_p(entity_name(v), ALL_MEMORY_ENTITY_NAME);
 
   return anywhere_p;
+}
+
+/* Can we merge these two effects because they are equal or because
+   they only differ by their approximations and their descriptors? */
+bool effect_comparable_p(effect e1, effect e2)
+{
+  bool comparable_p = FALSE;
+  reference r1 = effect_any_reference(e1);
+  reference r2 = effect_any_reference(e2);
+  entity v1 = reference_variable(r1);
+  entity v2 = reference_variable(r2);
+
+  if(v1==v2) {
+    action a1 = effect_action(e1);
+    action a2 = effect_action(e2);
+    if(action_tag(a1)==action_tag(a2)) {
+      addressing ad1 = effect_addressing(e1);
+      addressing ad2 = effect_addressing(e2);
+      if(addressing_tag(ad1)==addressing_tag(ad2)) {
+	/* Check the subscript lists because p and p[0] do not refer
+	   the same memory locations at all */
+	list sl1 = reference_indices(r1);
+	list sl2 = reference_indices(r2);
+	if(gen_length(sl1)==gen_length(sl2)) {
+	  list csl1 = list_undefined;
+	  list csl2 = list_undefined;
+	  bool equal_p = TRUE;
+
+	  for(csl1=sl1, csl2=sl2; !ENDP(csl1) && equal_p; POP(csl1), POP(csl2)) {
+	    expression e1 = EXPRESSION(CAR(csl1));
+	    expression e2 = EXPRESSION(CAR(csl2));
+	    equal_p = expression_equal_p(e1, e2);
+	  }
+	  comparable_p = equal_p;
+	}
+      }
+    }
+  }
+
+  return comparable_p;
 }

@@ -121,29 +121,54 @@ simple_effects_union_over_range(list l_eff,
 }
 
 
+/* FI: instead of simply getting rid of indices, I preserve constant
+   indices for the semantics analysis. Instead of stripping the
+   indices, they are replaced by unbounded expressions to keep the
+   difference between p and p[*] when p is a pointer. 
+
+   No memory allocation, side effects on eff? Side effects on the
+   reference too in spite of the persistant reference?
+*/
 list 
-effect_to_may_sdfi_list(effect eff)
+effect_to_store_independent_sdfi_list(effect eff, bool force_may_p)
 {
-  if (!ENDP(reference_indices(effect_any_reference(eff)))) {
-    /* FI: a persistant reference is forced here */
-    pips_assert("reference is a persistant reference", cell_preference_p(effect_cell(eff)));
-    effect_reference(eff) = make_reference(effect_entity(eff), NIL);
+  reference r = effect_any_reference(eff);
+  list ind = reference_indices(r);
+  list cind = list_undefined;
+  bool may_p = FALSE;
+
+  for(cind = ind; !ENDP(cind); POP(cind)) {
+    expression se = EXPRESSION(CAR(cind));
+
+    if(!extended_integer_constant_expression_p(se)) {
+      if(!unbounded_expression_p(se)) {
+	expression nse = make_unbounded_expression();
+	may_p = TRUE;
+	free_expression(se);
+	CAR(cind).p = (void *) nse;
+      }
+    }
   }
-  effect_approximation_tag(eff) = is_approximation_may;
+
+  /* FI: Why is MAY always forced? Because of the semantics of the function! */
+  if(may_p || force_may_p)
+    effect_approximation_tag(eff) = is_approximation_may;
+
   return(CONS(EFFECT,eff,NIL));
 }
 
 list 
+effect_to_may_sdfi_list(effect eff)
+{
+  return effect_to_store_independent_sdfi_list(eff, TRUE);
+}
+
+/* FI: instead of simpy getting rid of indices, I preserve cosntant
+   indices for the semantics analysis. */
+list 
 effect_to_sdfi_list(effect eff)
 {
-  if (!ENDP(reference_indices(effect_any_reference(eff))))
-    {
-      /* FI: persistant reference assumed */
-      pips_assert("reference is a persistant reference", cell_preference_p(effect_cell(eff)));
-      effect_reference(eff) = make_reference(effect_entity(eff), NIL);
-      effect_approximation_tag(eff) = is_approximation_may;
-    }
-  return(CONS(EFFECT,eff,NIL));
+  return effect_to_store_independent_sdfi_list(eff, FALSE);
 }
 
 void

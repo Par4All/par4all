@@ -644,13 +644,15 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
       /* Can mre be undefined when mr is defined?*/
       if(!reference_undefined_p(mre)) {
 	/* Read effect to generate for point_to and for dereferencing */
-	effect mre = make_effect(make_cell_reference(copy_reference(mr)),
+	/*
+	effect mree = make_effect(make_cell_reference(copy_reference(mre)),
 				 make_action_read(),
 				 make_addressing_index(),
 				 make_approximation_must(),
-				 make_descriptor_none());
+				 make_descriptor_none());*/
+	effect mree = (*reference_to_effect_func)(mre, make_action_read());
 
-	*pmre = mre;
+	*pmre = mree;
       }
       else {
 	pips_debug(8, "mr is defined but not mre\n");
@@ -667,8 +669,8 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
 	fprintf(stderr, "EFFECT UNDEFINED\n");
       }
       else {
-	pips_debug(8, "And *pmwe (addressing mode %d):\n",
-		   addressing_tag(effect_addressing(*pmwe)));
+	pips_debug(8, "\nReturn with *pmwe (addressing mode %d and reference %p):\n",
+		   addressing_tag(effect_addressing(*pmwe)), effect_any_reference(*pmwe));
 	print_effect(*pmwe);
       }
       if(effect_undefined_p(*pmre)) {
@@ -676,8 +678,8 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
 	fprintf(stderr, "EFFECT UNDEFINED\n");
       }
       else {
-	pips_debug(8, "And *pmre (addressing mode %d):\n",
-		   addressing_tag(effect_addressing(*pmre)));
+	pips_debug(8, "And *pmre (addressing mode %d and reference %p):\n",
+		   addressing_tag(effect_addressing(*pmre)), effect_any_reference(*pmre));
 	print_effect(*pmre);
       }
       pips_debug(8, "And le :\n");
@@ -819,8 +821,8 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
       fprintf(stderr, "EFFECT UNDEFINED\n");
     }
     else {
-      pips_debug(8, "And *pmwe (addressing mode %d):\n",
-		 addressing_tag(effect_addressing(*pmwe)));
+      pips_debug(8, "And *pmwe (addressing mode %d and reference %p):\n",
+		 addressing_tag(effect_addressing(*pmwe)), effect_any_reference(*pmwe));
       print_effect(*pmwe);
     }
     if(effect_undefined_p(*pmre)) {
@@ -828,8 +830,8 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
       fprintf(stderr, "EFFECT UNDEFINED\n");
     }
     else {
-      pips_debug(8, "And *pmre (addressing mode %d):\n",
-		 addressing_tag(effect_addressing(*pmre)));
+      pips_debug(8, "And *pmre (addressing mode %d and reference %p):\n",
+		 addressing_tag(effect_addressing(*pmre)), effect_any_reference(*pmre));
       print_effect(*pmre);
     }
   }
@@ -1129,8 +1131,14 @@ generic_proper_effects_of_syntax(syntax s)
       case is_syntax_sizeofexpression:
 	{
 	  sizeofexpression se = syntax_sizeofexpression(s);
-	  if (sizeofexpression_expression_p(se))
-	    le = generic_proper_effects_of_expression(sizeofexpression_expression(se));
+	  if (sizeofexpression_expression_p(se)) {
+	    /* FI: If the type of the reference is a dependent type, this
+	       may imply the reading of some expressions... See for
+	       instance type_supporting_entities()? Is sizeof(a[i]) ok? */
+	    /* The type of the variable is read, not the variable itself.*/
+	    /* le = generic_proper_effects_of_expression(sizeofexpression_expression(se)); */
+	    ;
+	  }
 	  break;
 	}
       case is_syntax_subscript:
@@ -1325,7 +1333,7 @@ proper_effects_of_call(call c)
     }
 }
 
-/* judt to handle one kind of instruction */
+/* just to handle one kind of instruction, expressions which are not calls */
 proper_effects_of_expression_instruction(instruction i)
 {
   list l_proper = NIL;

@@ -170,6 +170,28 @@ proper_effects_contract(list l_effects)
  * or to simplify the hash management, two entity -> consp?
  * a generic multi key combination hash would help.
  * the list is modified IN PLACE, storing on the first effect encountered...
+ *
+ * Extensions for C make it more complex as an effect on p and on p[1]
+ * are not related. It would be possible to eliminate syntactically
+ * equal effects by converting them into strings, without information
+ * about the approximation. As a first try, I keep the hash tables
+ * based on names and actions, and I only check compatibility in
+ * reference and addressing mode afterwards. But this is not working
+ * as I do not get enough different entries in the hash table since
+ * entity_name is the key.
+ *
+ * The syntactic elimination is implemented, but the scoping
+ * information is left out because the function is shard with the
+ * effect prettyprinter. Scoping information should be preserved in the key.
+ *
+ * Also, it might be useful to normalize the effects and to convert
+ * the pointer-based effects into an anywhere effect as soon as the
+ * corresponding pointer is written before it is
+ * dereferenced. However, we can delay the conversion till needed, as
+ * long as the concrete semantics of the effect lists is understoof by
+ * the user. This gives us a chance to find later the value of the
+ * written pointer and to substitue it where needed. Else, the effects
+ * to substitute will be gone.
  */
 list 
 proper_effects_combine(list l_effects, bool scalars_only_p)
@@ -182,8 +204,22 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
   //hash_table all_read_post_effects, all_write_post_effects;
   
   ifdebug(6) {
-    pips_debug(6, "proper effects: \n");
+    list refl = NIL;
+    int i = 0;
+    pips_debug(6, "Proper effects to combine: \n");
     (*effects_prettyprint_func)(l_effects);	
+    pips_assert("The very same effect does not appear twice", gen_once_p(l_effects));
+    MAP(EFFECT, eff, {
+	cell c = effect_cell(eff);
+	reference ref = cell_reference(c);
+
+	if(cell_reference_p(c)) {
+	  refl = gen_nconc(refl, CONS(REFERENCE, ref, NIL));
+	}
+	fprintf(stderr, "Effect %d: %p\tReference %d: %p (%spersistant)\n",
+		++i, eff, i, ref, cell_reference_p(c)? "not ":""); 
+      }, l_effects);
+    pips_assert("The very same reference does not appear twice unless it is persistant", gen_once_p(refl));
   }
   
   all_read_effects = hash_table_make(hash_string, 10);
@@ -206,37 +242,47 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
     list do_combine_item = NIL;
     list next = CDR(cur); /* now, as 'cur' may be removed... */
 
+    /* Summarization before combination: let's be as store independent as possible */
     current = (*proper_to_summary_effect_func)(lcurrent);
-    n = entity_name(effect_entity(current));
+ 
+   // n = entity_name(effect_entity(current));
+    n = words_to_string
+      (effect_words_reference_with_addressing_as_it_is(effect_any_reference(current),
+						       addressing_tag(effect_addressing(current))));
     a = effect_action_tag(current);
     ad = effect_addressing(current);
+
+    pips_debug(8,"key: \"\%s\"\n", n);
 
     /* may/do we have to combine ? */
     /* ??? FC this should be no big deal... anyway :
      * in the previous implementation, 'current' was not yet
      * passed thru proper_to_summary_effect_func when tested...
      *
-     * Indirect addressing prevents combining
+     * Indirect addressing prevents combining? Why?
+     *
+     * FI: effect_scalar_p() should be redefined because the new key
+     * used let us deal with complex effects.
      */
-    may_combine = (!scalars_only_p || effect_scalar_p(current))
-      && addressing_index_p(ad);
+    may_combine = (!scalars_only_p || effect_scalar_p(current));
+    //&& addressing_index_p(ad);
+
+    /* FI: addressing should be checked below against writing of the
+       underlying pointer. No time right now. */
 
     if (may_combine)
     {
-      /* did we see it? */
-      /* effect with indirect addressing cannot be combined, unless equal */
+      /* did we see it at a previous iteration? */
       switch (a) {
       case is_action_write:
-	if (hash_defined_p(all_write_effects, n)
-	    && addressing_index_p(effect_addressing(current)))
+	if (hash_defined_p(all_write_effects, n))
 	{
 	  do_combine = TRUE;
 	  do_combine_item = hash_get(all_write_effects, n); 
 	}
 	break;
       case is_action_read:
-	if (hash_defined_p(all_read_effects, n)
-	    && addressing_index_p(effect_addressing(current)))
+	if (hash_defined_p(all_read_effects, n))
 	{
 	  do_combine = TRUE;
 	  do_combine_item = hash_get(all_read_effects, n);
@@ -251,22 +297,27 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
       /* YES, me must combine */
 
       effect base = EFFECT(CAR(do_combine_item));
-      /* compute their union */
-      effect combined = (*effect_union_op)(base, current);
+      if(effect_comparable_p(base, current)) {
+	/* compute their union */
+	effect combined = (*effect_union_op)(base, current);
 	
-      /* free the original effects: no memory leak */
-      free_effect(base);
-      free_effect(current);
+	/* free the original effects: no memory leak */
+	free_effect(base);
+	free_effect(current);
 	
-      /* replace the base effect by the new effect */
-      EFFECT_(CAR(do_combine_item)) = combined;
+	/* replace the base effect by the new effect */
+	EFFECT_(CAR(do_combine_item)) = combined;
 	
-      /* remove the current list element from the global list */
-      /* pred!=NIL as on the first items hash's are empty */
-      CDR(pred) = next; /* pred is not changed! */
-      free(cur);
+	/* remove the current list element from the global list */
+	/* pred!=NIL as on the first items hash's are empty */
+	CDR(pred) = next; /* pred is not changed! */
+	free(cur);
+      }
+      else {
+	do_combine = FALSE;
+      }
     }
-    else
+    if(!do_combine)
     {
       /* NO, just store if needed... */
       EFFECT_(CAR(cur)) = current;
@@ -291,9 +342,16 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
   
   ifdebug(6){
     pips_debug(6, "summary effects: \n"); 
-    (*effects_prettyprint_func)(l_effects);	
+    (*effects_prettyprint_func)(l_effects);
+    MAP(EFFECT, eff, {
+	reference r = effect_any_reference(eff);
+	tag t = addressing_tag(effect_addressing(eff));
+	fprintf(stderr, "Effect %p with reference %p: %s\n", eff, r,
+		words_to_string(effect_words_reference_with_addressing_as_it_is(r,t)));
+      }, l_effects);
   }
 
+  /* The keys should be freed as well */
   hash_table_free(all_write_effects);
   hash_table_free(all_read_effects);
 
@@ -323,6 +381,8 @@ bool combinable_effects_p(effect eff1, effect eff2)
     return(same_var && same_act);
 }
 
+/* FI: same action, but also same variable and same direct
+   addressing. The constraint on addressing could be challenged... */
 bool effects_same_action_p(effect eff1, effect eff2)
 {
   bool same_p = TRUE;
@@ -338,7 +398,7 @@ bool effects_same_action_p(effect eff1, effect eff2)
       same_act = (effect_action_tag(eff1) == effect_action_tag(eff2));
       direct_p = (addressing_index_p(ad1) && addressing_index_p(ad2));
 
-      same_p = same_var && same_act &&direct_p;
+      same_p = same_var && same_act && direct_p;
     }
     return same_p;
 }

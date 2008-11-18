@@ -133,24 +133,35 @@ effect_may_union(effect eff1, effect eff2)
     return(eff);
 }
 
-effect 
-effect_must_union(effect eff1, effect eff2)
+/* FI: this very simple function assumed that the two effect are fully comparable */
+/* FI: memoy management is unclear to me, but a new sharing free effect is produced */
+effect effect_must_union(effect eff1, effect eff2)
 {
     effect eff;
+    tag app1 = effect_approximation_tag(eff1);
+    tag app2 = effect_approximation_tag(eff2);
+	
     if (effect_scalar_p(eff1))
     {
-	tag app1 = effect_approximation_tag(eff1);
-	tag app2 = effect_approximation_tag(eff2);
-	
 	eff = make_simple_effect(make_reference(effect_entity(eff1), NIL), 
 			  make_action(action_tag(effect_action(eff1)), UU), 
 			  make_approximation(approximation_or(app1,app2), UU));
     }
     else
     {
+      /* FI: I do change this a lot, because the keys used in
+	 proper_effects_combine() are now much more extensive for
+	 C. */
+      /* we might have must effects for struct or array elements */
+      /*pips_assert("The tags for non scalar effects are may",
+	app1==app2 && app1 == is_approximation_may); */
+	/*
 	eff = make_simple_effect(make_reference(effect_entity(eff1), NIL), 
 			  make_action(action_tag(effect_action(eff1)), UU), 
 			  make_approximation(is_approximation_may, UU));
+	*/
+	eff = copy_effect(eff1);
+	effect_approximation_tag(eff) = approximation_or(app1,app2);
     }
     return(eff);
 }
@@ -229,25 +240,73 @@ EffectsInfDifference(list l1, list l2,
     return l_res;
 }
 
-
-
-effect 
-proper_to_summary_simple_effect(effect eff)
+/* FI: the goal is to get rid of array subscripts to handle the arrays
+ * atomically.
+ *
+ * This is not possible with pointer indexing. For instance, p[0] is
+ * reduced the Fortran way into p, which is wrong. It could be reduced
+ * to p[*] and lead to an anywhere effects. Or we must preserve
+ * constant indices (store independent), which is the way to go with C
+ * since we transform lots of scalar accesses into array accesses.
+ *
+ * FI: I do not understand the mix of side effects on eff, free and
+ * alloc conditionnaly for some fields. To be checked.
+ */
+effect proper_to_summary_simple_effect(effect eff)
 {
-    if (!effect_scalar_p(eff))
-    {
-	entity e = effect_entity(eff);
-	cell c = effect_cell(eff);
+  if (!effect_scalar_p(eff)) {
+    //cell c = effect_cell(eff);
+    reference r = effect_any_reference(eff);
+    entity e = reference_variable(r);
+    //type ut = ultimate_type(entity_type(e));
+    list inds = reference_indices(r);
+    list cind = list_undefined;
+    bool may_p = FALSE;
 
-	free_reference(effect_any_reference(eff));
-	if(cell_preference_p(c)) {
-	  preference p = cell_preference(c);
-	  preference_reference(p) = make_reference(e, NIL);
-	}
-	else {
-	  cell_reference(c) = make_reference(e, NIL);
-	}
-	effect_approximation_tag(eff) = is_approximation_may;
+    ifdebug(8) {
+      pips_debug(8, "Proper effect %p with reference %p: %s\n", eff, r,
+		 words_to_string(effect_words_reference_with_addressing_as_it_is(r, addressing_tag(effect_addressing(eff)))));
     }
-    return(eff);
+
+    for(cind = inds; !ENDP(cind); POP(cind)) {
+      expression se = EXPRESSION(CAR(cind));
+
+      ifdebug(8) {
+	pips_debug(8, "Subscript expression :\n");
+	print_expression(se);
+      }
+
+      if(!extended_integer_constant_expression_p(se)) {
+	if(!unbounded_expression_p(se)) {
+	  may_p = TRUE;
+	  CAR(cind).p = make_unbounded_expression();
+	}
+      }
+    }
+
+    if(may_p)
+      effect_approximation_tag(eff) = is_approximation_may;
+
+    ifdebug(8) {
+      pips_debug(8, "Summary simple effect %p with reference %p: %s\n", eff, r,
+		 words_to_string(effect_words_reference_with_addressing_as_it_is(r, addressing_tag(effect_addressing(eff)))));
+    }
+
+    /*
+    if(!reference_with_constant_indices_p(r)) {
+      reference nr = pointer_type_p(ut)?
+	make_reference(e, CONS(EXPRESSION, make_unbounded_expression(), NIL))
+	: make_reference(e, NIL);
+      free_reference(effect_any_reference(eff));
+      if(cell_preference_p(c)) {
+	preference p = cell_preference(c);
+	preference_reference(p) = nr;
+      }
+      else {
+	cell_reference(c) = nr;
+      }
+    }
+    */
+  }
+  return(eff);
 }

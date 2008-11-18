@@ -903,13 +903,22 @@ static list any_affect_effects(entity e __attribute__ ((__unused__)),
   pips_debug(5, "begin\n");
 
   if (syntax_reference_p(s)) {
-    if(update_p)
+    if(update_p) {
       le = generic_proper_effects_of_expression(lhs);
+      /* To avoid sharing between references as we move away from preference with C */
+      le = gen_nconc(le, generic_proper_effects_of_lhs(copy_reference(syntax_reference(s))));
+  }
     le = gen_nconc(le, generic_proper_effects_of_lhs(syntax_reference(s)));
   }
   else {
-    if(update_p)
+    if(update_p) {
       le = generic_proper_effects_of_expression(lhs);
+      /* To avoid sharing in effects which help when combining and
+	 freeing effects, too bad for the memory leak at the
+	 expression level. No time to think about something better for
+	 the time being, although preference is around to help. FI */
+      le = gen_nconc(le, generic_proper_effects_of_any_lhs(copy_expression(lhs)));
+    }
     le = gen_nconc(le, generic_proper_effects_of_any_lhs(lhs));
   }
 
@@ -1162,7 +1171,7 @@ static list io_effects(entity e, list args)
 
             ref = make_reference(private_io_entity, indices);
             le = gen_nconc(le, generic_proper_effects_of_reference(ref));
-            le = gen_nconc(le, generic_proper_effects_of_lhs(ref));
+            le = gen_nconc(le, generic_proper_effects_of_lhs(copy_reference(ref)));
         }
     }
 
@@ -1283,7 +1292,7 @@ static list generic_io_effects(entity e, list args, bool system_p)
        ) {
       /* The first argument must be an integer expression, which may
          be statically evaluable. */
-      ;
+      unit = copy_expression(EXPRESSION(CAR(args)));;
     }
     else if(ENTITY_C_OPEN_SYSTEM_P(e) || ENTITY_CREAT_SYSTEM_P(e)) {
       /* No information about the fd returned */
@@ -1299,7 +1308,7 @@ static list generic_io_effects(entity e, list args, bool system_p)
 
   if(file_p) {
     if(expression_undefined_p(unit))
-      indices = NIL;
+      indices = CONS(EXPRESSION, make_unbounded_expression(), NIL);
     else
       indices = CONS(EXPRESSION, unit, NIL);
 
@@ -1414,6 +1423,11 @@ static list effects_of_any_ioelem(expression exp, tag act, bool is_fortran)
 	  if(!ENDP(variable_dimensions(vt))) {
 	    /* Fine, this is an array */
 	    le = generic_proper_effects_of_any_lhs(exp);
+	    /* Is it fully written? More information about the IO and
+	       about the array would be needed to make the
+	       decision...*/
+	    pips_assert("Only one effect for this reference?", gen_length(le)==1);
+	    effects_to_may_effects(le);
 	  }
 	  else if(basic_pointer_p(variable_basic(vt))) {
 	    /* This is going to be called for the FILE descriptors */

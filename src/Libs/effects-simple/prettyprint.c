@@ -345,10 +345,8 @@ effect_to_string(effect eff)
     return result;
 }
 
-/* Assumes that the cell is a preference and not a reference. */
-list
-words_effect(obj)
-effect obj;
+/* Assumed that the cell is a preference and not a reference. */
+list words_effect_generic(effect obj, bool approximation_p)
 {
     list pc = NIL;
     reference r = effect_any_reference(obj);
@@ -361,8 +359,19 @@ effect obj;
     pc = CHAIN_SWORD(pc, action_read_p(ac) ? "-R" : "-W" );  
     if(!addressing_index_p(ad))
       pc = CHAIN_SWORD(pc, addressing_pre_p(ad)? "-PRE" : "-POST");
-    pc = CHAIN_SWORD(pc, approximation_may_p(ap) ? "-MAY>" : "-MUST>" );
+    if(approximation_p)
+      pc = CHAIN_SWORD(pc, approximation_may_p(ap) ? "-MAY>" : "-MUST>" );
     return (pc);
+}
+
+list words_effect(effect obj)
+{
+  return words_effect_generic(obj, TRUE);
+}
+
+list words_effect_without_approximation(effect obj)
+{
+  return words_effect_generic(obj, FALSE);
 }
 
 void 

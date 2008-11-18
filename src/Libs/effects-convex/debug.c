@@ -35,6 +35,7 @@ bool region_consistent_p(region reg)
     Pcontrainte c;
 
     pips_assert("it is a region",  effect_consistent_p(reg));
+    pips_assert("the descriptor is defined",  !descriptor_none_p(effect_descriptor(reg)));
 
     /* the system must be defined */
     consistent = consistent && !SC_UNDEFINED_P(region_system(reg));

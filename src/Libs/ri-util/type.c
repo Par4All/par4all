@@ -1023,6 +1023,10 @@ basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
       /* returns the type of the left hand side */
       rb = basic_of_expression(EXPRESSION(CAR(args)));
     }
+    else if(ENTITY_FIELD_P(f)) {
+      free_basic(rb);
+      rb = basic_of_expression(EXPRESSION(CAR(CDR(args))));
+    }
     else {
       free_basic(rb);
       rb = basic_of_expression(EXPRESSION(CAR(args)));
@@ -1507,7 +1511,73 @@ bool char_type_p(type t)
   return is_char;
 }
 
+/* Safer than the other implementation?
+bool pointer_type_p(type t)
+{
+  bool is_pointer = FALSE;
 
+  if (!type_undefined_p(t) && type_variable_p(t)) {
+    basic b = variable_basic(type_variable(t));
+    if (!basic_undefined_p(b) && basic_pointer_p(b)) {
+      is_pointer = TRUE;
+    }
+  }
+  return is_pointer;
+}
+*/
+
+/* Here is the set of mapping functions, from the RI to C language types*/
+
+/* Returns TRUE if t is one of the following types : 
+   void, char, short, int, long, float, double, signed, unsigned, 
+   and there is no array dimensions, of course*/
+
+bool basic_type_p(type t)
+{
+  if (type_variable_p(t))
+    {
+      basic b = variable_basic(type_variable(t));
+      return ((variable_dimensions(type_variable(t)) == NIL) &&
+	      (basic_int_p(b) || basic_float_p(b) || basic_logical_p(b)
+	       || basic_overloaded_p(b) || basic_complex_p(b) || basic_string_p(b)
+	       || basic_bit_p(b)));
+    }
+  return (type_void_p(t) || type_unknown_p(t)) ;
+}
+
+bool array_type_p(type t)
+{
+  return (type_variable_p(t) && (variable_dimensions(type_variable(t)) != NIL));
+}
+
+bool pointer_type_p(type t)
+{
+  return (type_variable_p(t) && basic_pointer_p(variable_basic(type_variable(t)))
+	  && (variable_dimensions(type_variable(t)) == NIL));
+}
+
+/* Returns TRUE if t is of type struct, union or enum. Need to distinguish 
+   with the case struct/union/enum in type in RI, these are the definitions 
+   of the struct/union/enum themselve, not a variable of this type. 
+
+   Example : struct foo var;*/
+
+bool derived_type_p(type t)
+{
+  return (type_variable_p(t) && basic_derived_p(variable_basic(type_variable(t))) 
+	  && (variable_dimensions(type_variable(t)) == NIL));
+}
+
+/* Returns TRUE if t is a typedefED type. 
+   Example : Myint i;*/
+
+bool typedef_type_p(type t)
+{
+  return (type_variable_p(t) && basic_typedef_p(variable_basic(type_variable(t))) 
+	  && (variable_dimensions(type_variable(t)) == NIL));
+}
+
+
 type make_standard_integer_type(type t, int size)
 {
   if (t == type_undefined)
@@ -1597,13 +1667,13 @@ type ultimate_type(type t)
 {
   type nt;
 
-  pips_debug(8, "Begins with type \"%s\"\n", type_to_string(t));
+  pips_debug(9, "Begins with type \"%s\"\n", type_to_string(t));
 
   if(type_variable_p(t)) {
     variable vt = type_variable(t);
     basic bt = variable_basic(vt);
 
-    pips_debug(8, "and basic \"%s\"\n", basic_to_string(bt));
+    pips_debug(9, "and basic \"%s\"\n", basic_to_string(bt));
 
     if(basic_typedef_p(bt)) {
       entity e = basic_typedef(bt);
@@ -1623,7 +1693,7 @@ type ultimate_type(type t)
       variable nvt = type_variable(nt);
       basic nbt = variable_basic(nvt);
 
-      pips_debug(8, "and basic \"%s\"\n", basic_to_string(nbt));
+      pips_debug(9, "and basic \"%s\"\n", basic_to_string(nbt));
     }
   }
 

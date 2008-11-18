@@ -10,8 +10,18 @@
 #define effect_approximation_tag(eff) \
 	approximation_tag(effect_approximation(eff))
 
-/* #define effect_scalar_p(eff) entity_scalar_p(effect_entity(eff)) */
-#define effect_scalar_p(eff) (type_depth(entity_type(effect_entity(eff)))==0)
+/* #define effect_scalar_p(eff) entity_scalar_p(effect_entity(eff))
+ *
+ * The semantics of effects_scalar_p() must be refined. If all the
+ * indices are constant expressions, we still have a scalar effect,
+ * unless they are later replaced by "*", as is the case currently for
+ * summary effects.
+ *
+ * Potential bug: eff is evaluated twice. Should be copied in a local
+ * variable and braces be used.
+ */
+#define effect_scalar_p(eff) ((type_depth(entity_type(effect_entity(eff)))==0) \
+			      && ENDP(reference_indices(effect_any_reference(eff))))
 #define effect_read_p(eff) (action_tag(effect_action(eff))==is_action_read)
 #define effect_write_p(eff) (action_tag(effect_action(eff))==is_action_write)
 #define effect_may_p(eff) \
