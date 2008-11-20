@@ -1908,43 +1908,54 @@ boolean vect_zero_p(Pvecteur v) {
   
 }
 
-static void type_and_size_for_array(entity var, char ** datatype, int *size)
+static void type_and_size_of_var(entity var, char ** datatype, int *size)
 {
-  basic b = variable_basic(type_variable(entity_type(var)));
-  
-  switch (basic_tag(b)) 
-    {
-    case is_basic_int:
-      *datatype = "INTEGER ";
-      *size = basic_int(b);
-      break;
-    case is_basic_float:
-      *datatype = "REAL";
-      *size =basic_float(b);
-      break;
-    case is_basic_logical:
-      *datatype = "BOOLEAN";
-      *size = 1;
-      break;
-    case is_basic_complex: 
-      *datatype = "COMPLEX";
-      *size = basic_complex(b); 
-      break;
-    case is_basic_string: 
+  // type t = ultimate_type(entity_type(var)); 
+  type t = entity_type(var);
+  if (type_variable_p(t)) {
+    basic b = variable_basic(type_variable(t));
+    entity eb = entity_undefined; 
+    int e = SizeOfElements(b);
+    if (e==-1)
+      *size = 9999;
+    else
+      *size = e;
+    switch (basic_tag(b)) 
       {
-	value v = basic_string(b);
-	*datatype = "CHARACTER";
-	if (value_constant_p(v) && constant_int_p(value_constant(v)))
-	  *size = constant_int(value_constant(v));
-	else if (value_symbolic_p(v)) {
-	  *size =9999;
-	}
+      case is_basic_int:
+	*datatype = "INTEGER ";
+	break;
+      case is_basic_float:
+	*datatype = "REAL";
+	break;
+      case is_basic_logical:
+	*datatype = "BOOLEAN";
+	break;
+      case is_basic_complex: 
+	*datatype = "COMPLEX";
+	break;
+      case is_basic_string: 
+     	*datatype = "CHARACTER";
+       
+	break;
+      case is_basic_pointer: 
+	*datatype = "POINTER";
+	break; 
+      case is_basic_derived:{ 
+	eb = basic_derived(b);
+	*datatype = entity_user_name(eb);
 	break;
       }
-    default:
-      *datatype = "UNKNOWN";
-      *size = 9999;
-    }
+      case is_basic_typedef: {
+	eb = basic_typedef(b);
+	*datatype = entity_user_name(eb);
+	break;
+      }
+      default:{
+	*datatype = "UNKNOWN";
+      }
+      }
+  }
 }
 
 
@@ -2502,7 +2513,7 @@ static void xml_Array(entity var,string_buffer sb_result)
 					  NL, NULL)));
 
   /* Print XML Array DATA TYPE and DATA SIZE */
-  type_and_size_for_array(var, &datatype,&size); 
+  type_and_size_of_var(var, &datatype,&size); 
   add_margin(global_margin,sb_result);
   string_buffer_append(sb_result,
 		       strdup(concatenate(OPENANGLE,
@@ -2975,7 +2986,7 @@ int find_rw_effect_for_entity(list leff, effect *eff, entity e)
 
   for ( lr = leff; !ENDP(lr) && (effet_rwb==0); lr = CDR(lr)) {
     *eff= EFFECT(CAR(lr));
-    reference ref = effect_reference(*eff);  
+    reference ref = effect_any_reference(*eff);  
     entity v = reference_variable(ref);
     if (same_entity_p(v,e)) {
       if (action_read_p(effect_action(*eff))) effet_rwb ++ ;
@@ -3012,7 +3023,7 @@ static void  xml_Arguments(statement s, entity function, Pvecteur loop_indices, 
     if (syntax_reference_p(sr)) {
       ActualRef = syntax_reference(sr);
       ActualArrayName = reference_variable(ActualRef);
-      aan = entity_local_name(ActualArrayName);
+      aan = entity_user_name(ActualArrayName);
       rw_ef = find_rw_effect_for_entity(call_effect,&ef, ActualArrayName);
     }
     else {
@@ -3031,7 +3042,7 @@ static void  xml_Arguments(statement s, entity function, Pvecteur loop_indices, 
 					      QUOTE,
 					      aan,
 					      QUOTE,BL,
-					      "FormalName=", QUOTE,entity_local_name(FormalArrayName), QUOTE,BL,
+					      "FormalName=", QUOTE,entity_user_name(FormalArrayName), QUOTE,BL,
 					      "AccessMode=",QUOTE,(rw_ef==2)? "DEF":"USE", QUOTE,CLOSEANGLE,
 					      NL, NULL)));         
       if (expression_integer_value(exp, &iexp))  
@@ -3050,9 +3061,9 @@ static void  xml_Arguments(statement s, entity function, Pvecteur loop_indices, 
 			   strdup(concatenate(OPENANGLE, 
 					      "ArrayArgument ActualName=", 
 					      QUOTE,
-					      entity_local_name(ActualArrayName),QUOTE,BL,
+					      entity_user_name(ActualArrayName),QUOTE,BL,
 					      "ActualDim=", QUOTE,SActualArrayDim,QUOTE,BL,
-					      "FormalName=", QUOTE,entity_local_name(FormalArrayName), QUOTE,BL,
+					      "FormalName=", QUOTE,entity_user_name(FormalArrayName), QUOTE,BL,
 					      "FormalDim=", QUOTE,itoa(FormalArrayDim),QUOTE,BL,
 					      "AccessMode=",QUOTE,(rw_ef==2)? "DEF":"USE",QUOTE,CLOSEANGLE,
 					      NL, NULL)));
@@ -3097,7 +3108,7 @@ static void xml_Call(entity module,  int code_tag,int taskNumber, nest_context_p
 		       strdup(concatenate(OPENANGLE, 
 					  "Call Name=", 
 					  QUOTE,
-					  ENTITY_ASSIGN_P(func) ? "LocalAssignment" : entity_local_name(func), 
+					  ENTITY_ASSIGN_P(func) ? "LocalAssignment" : entity_user_name(func), 
 					  QUOTE,
  					  CLOSEANGLE,NL, NULL)));
  global_margin++;
@@ -3121,7 +3132,7 @@ boolean array_in_effect_list(list effects_list)
   list pc;
  for (pc= effects_list;pc != NIL; pc = CDR(pc)){
       effect e = EFFECT(CAR(pc));
-      reference r = effect_reference(e);
+      reference r = effect_any_reference(e);
       entity v =  reference_variable(r);
       if (array_entity_p(v)){
 	return(TRUE);
@@ -3156,7 +3167,7 @@ static void xml_BoxGraph(entity module, nest_context_p nest, string_buffer sb_re
     entity func= call_function(c);
     string_buffer buffer_needs = string_buffer_make();
     boolean assign_func = ENTITY_ASSIGN_P(func);
-    string n= assign_func ? "LocalAssignment" : entity_local_name(func);
+    string n= assign_func ? "LocalAssignment" : entity_user_name(func);
 
     if (!assign_func || array_in_effect_list(effects_list)) {
 
@@ -3168,7 +3179,7 @@ static void xml_BoxGraph(entity module, nest_context_p nest, string_buffer sb_re
 					      NULL)));
       for (pc= effects_list;pc != NIL; pc = CDR(pc)){
 	effect e = EFFECT(CAR(pc));
-	reference r = effect_reference(e);
+	reference r = effect_any_reference(e);
 	action ac = effect_action(e);
 	entity v =  reference_variable(r);
 	if (array_entity_p(v)){
@@ -3179,7 +3190,7 @@ static void xml_BoxGraph(entity module, nest_context_p nest, string_buffer sb_re
 	    string_buffer_append(buffer_needs,
 				 strdup(concatenate(OPENANGLE, 
 						    "Needs ArrayName=", 
-						    QUOTE,entity_local_name(v),QUOTE, BL,
+						    QUOTE,entity_user_name(v),QUOTE, BL,
 						    "DefinedBy=",
 						    QUOTE,
 						    (t!= HASH_UNDEFINED_VALUE) ? entity_local_name(t): "IN_VALUE",
@@ -3192,7 +3203,7 @@ static void xml_BoxGraph(entity module, nest_context_p nest, string_buffer sb_re
 	      string_buffer_append(appli_needs,
 				   strdup(concatenate(OPENANGLE, 
 						      "Needs ArrayName=", 
-						      QUOTE,entity_local_name(v),QUOTE, BL,
+						      QUOTE,entity_user_name(v),QUOTE, BL,
 						      "DefinedBy=",
 						      QUOTE,(t!= HASH_UNDEFINED_VALUE) ? entity_local_name(t): "IN_VALUE",
 						      QUOTE,"/",
@@ -3207,7 +3218,7 @@ static void xml_BoxGraph(entity module, nest_context_p nest, string_buffer sb_re
 	    add_margin(global_margin,sb_result);
 	    string_buffer_append(sb_result,
 				 strdup(concatenate(OPENANGLE,"Computes ArrayName=",
-						    QUOTE,entity_local_name(v),QUOTE,"/",
+						    QUOTE,entity_user_name(v),QUOTE,"/",
 						    CLOSEANGLE,NL,
 						    NULL)));
 
@@ -3217,7 +3228,7 @@ static void xml_BoxGraph(entity module, nest_context_p nest, string_buffer sb_re
 	      string_buffer_append(sb_ac,
 				   strdup(concatenate(OPENANGLE, 
 						      "Computes ArrayName=",
-						      QUOTE,entity_local_name(v),QUOTE,"/",
+						      QUOTE,entity_user_name(v),QUOTE,"/",
 						      CLOSEANGLE,NL,
 						      NULL)));
 	
