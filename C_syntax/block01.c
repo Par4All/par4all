@@ -5,11 +5,11 @@ void block01()
 {
   int i = 1;
   {
-    int j = 2;
+    int j = i++;
   }
   i++;
   {
-    int k = 2;
+    int k = i++;
 
     k++;
   }

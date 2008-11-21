@@ -1,8 +1,8 @@
-delete block01
+delete block00
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create block01 block01.c
+create block00 block00.c
 
 activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE
@@ -16,14 +16,14 @@ echo
 echo parsed printed file
 echo
 
-display PARSED_PRINTED_FILE[block01]
+display PARSED_PRINTED_FILE[block00]
 
 echo
 echo printed file
 echo
 
-display PRINTED_FILE[block01]
+display PRINTED_FILE[block00]
 
 close
-#delete block01
+#delete block00
 quit

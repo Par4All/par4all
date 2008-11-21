@@ -1,32 +1,24 @@
 
 parsed printed file
 
-void block01()
+void block04()
 {
    int i = 1;
    {
       int j = i++;
+      i += j;
    }
-   i++;
-   {
-      int k = i++;
-
-      k++;
-   }
+   i--;
 }
 
 printed file
 
-void block01()
+void block04()
 {
    int i = 1;
    {
       int j = i++;
+      i += j;
    }
-   i++;
-   {
-      int k = i++;
-
-      k++;
-   }
+   i--;
 }

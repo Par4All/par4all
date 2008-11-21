@@ -1,4 +1,7 @@
 delete forloop04
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create forloop04 forloop04.c
 
 setproperty PRETTYPRINT_C_CODE TRUE

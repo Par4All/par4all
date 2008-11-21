@@ -1,0 +1,28 @@
+
+parsed printed file
+
+void block02()
+{
+   int i = 1;
+//:   BEGIN BLOCK
+   {
+      int j = i++;
+//:      BEGIN BLOCK
+//:      END BLOCK
+   }
+//:   END BLOCK
+}
+
+printed file
+
+void block02()
+{
+   int i = 1;
+//:   BEGIN BLOCK
+   {
+      int j = i++;
+//:      BEGIN BLOCK
+//:      END BLOCK
+   }
+//:   END BLOCK
+}

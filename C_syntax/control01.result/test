@@ -23,7 +23,7 @@ break_2:         ;
    }
 break_1:   ;
    if (val)
-       *val = v;
+      *val = v;
    return 0;
 }
 
@@ -33,6 +33,7 @@ int control01(int *in, int *val)
 {
    int c;
    int v;
+   extern int pnm_getc(int *);
    ;
 l99996:   ;
    if (!1) goto break_1;
@@ -57,6 +58,6 @@ l99995:   ;
    goto l99995;
 break_1:   ;
    if (val) 
-       *val = v;
+      *val = v;
    return 0;
 }

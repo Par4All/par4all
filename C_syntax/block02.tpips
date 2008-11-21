@@ -1,29 +1,29 @@
-delete block01
+delete block02
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create block01 block01.c
+create block02 block02.c
 
 activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 # For debugging
-# setproperty PRETTYPRINT_BLOCKS TRUE
-# setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
+setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
 
 echo
 echo parsed printed file
 echo
 
-display PARSED_PRINTED_FILE[block01]
+display PARSED_PRINTED_FILE[block02]
 
 echo
 echo printed file
 echo
 
-display PRINTED_FILE[block01]
+display PRINTED_FILE[block02]
 
 close
-#delete block01
+#delete block02
 quit

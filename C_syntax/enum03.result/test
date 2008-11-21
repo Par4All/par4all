@@ -23,11 +23,11 @@ main()
 
    ia = a;
 
-//  P(ia) {ia==4}
+//  P(0`ia) {0`ia==4}
 
    ib = b;
 
-//  P(ia,ib) {ia==4, ib==5}
+//  P(0`ia,0`ib) {0`ia==4, 0`ib==5}
 
 
    t = ia+ib;
