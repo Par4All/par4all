@@ -31,15 +31,15 @@ main()
    int i;
    int j;
    int a[5];
-//               <must be written>: i j
+//               <must be written>: 0`i 0`j
    (i = 1, j = 2);
-//               <must be read   >: i
+//               <must be read   >: 0`i
    while (i<5) {
-//               <must be read   >: i
-//               <must be written>: a[i]
+//               <must be read   >: 0`i
+//               <must be written>: 0`a[i]
       a[i] = i;
-//               <must be read   >: i j
-//               <must be written>: i j
+//               <must be read   >: 0`i 0`j
+//               <must be written>: 0`i 0`j
       (i++, j += 2);
    }
 }
@@ -55,11 +55,11 @@ main()
    int j;
    int a[5];
 
-//  T(i,j) {}
+//  T(0`i,0`j) {}
 
    (i = 1, j = 2);
 
-//  T(i,j) {}
+//  T(0`i,0`j) {}
 
    while (i<5) {
 
@@ -67,7 +67,7 @@ main()
 
       a[i] = i;
 
-//  T(i,j) {}
+//  T(0`i,0`j) {}
 
       (i++, j += 2);
    }

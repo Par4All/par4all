@@ -9,8 +9,8 @@ setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 # For debugging
-setproperty PRETTYPRINT_BLOCKS TRUE
-setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
+# setproperty PRETTYPRINT_BLOCKS TRUE
+# setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
 
 echo
 echo parsed printed file

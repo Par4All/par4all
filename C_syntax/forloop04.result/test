@@ -11,10 +11,10 @@ main()
    int i;
    int j;
    int a[5];
-//               <must be written>: i
+//               <must be written>: 0`i
    for(i = 1; i <= 4; i += 1)
-//               <must be read   >: i
-//               <must be written>: a[i]
+//               <must be read   >: 0`i
+//               <must be written>: 0`a[i]
       a[i] = i;
 }
 
@@ -26,11 +26,11 @@ main()
    int j;
    int a[5];
 
-//  T(i) {1<=i}
+//  T(0`i) {1<=0`i}
 
    for(i = 1; i <= 4; i += 1)
 
-//  T() {1<=i, i<=4}
+//  T() {1<=0`i, 0`i<=4}
 
       a[i] = i;
 }
@@ -47,7 +47,7 @@ main()
 
    for(i = 1; i <= 4; i += 1)
 
-//  P(i) {1<=i, i<=4}
+//  P(0`i) {1<=0`i, 0`i<=4}
 
       a[i] = i;
 }
@@ -57,11 +57,11 @@ main()
    int j;
    int a[5];
 
-//  <a[PHI1]-W-MAY-{1<=PHI1, PHI1<=4}>
+//  <0`a[PHI1]-W-MAY-{1<=PHI1, PHI1<=4}>
 
    for(i = 1; i <= 4; i += 1)
 
-//  <a[PHI1]-W-EXACT-{PHI1==i, 1<=i, i<=4}>
+//  <0`a[PHI1]-W-EXACT-{PHI1==0`i, 1<=0`i, 0`i<=4}>
 
       a[i] = i;
 }

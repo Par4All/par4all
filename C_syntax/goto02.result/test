@@ -15,8 +15,8 @@ PRINTED FILE (after controlization)
 
 main()
 {
-   int a[5];
    int i;
+   int a[5];
    i = 0;
 l99998:   ;
    if (!(i<5)) goto found;

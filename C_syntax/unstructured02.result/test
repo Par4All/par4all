@@ -42,12 +42,12 @@ Printed file
 
 int unstructured02()
 {
-   int a1;
-   int a2;
    int i;
-   int b;
-   int lambda;
    int n;
+   int a2;
+   int a1;
+   int lambda;
+   int b;
    i = 1;
 l99994:   ;
    if (!(i<=n)) goto l99998;

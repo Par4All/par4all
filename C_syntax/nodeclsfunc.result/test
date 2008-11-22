@@ -84,7 +84,6 @@ End of declarations for module nodeclsfunc!
 
 void nodecls()
 {
-   extern int foo();
    foo();
 }
 extern void nodecls();

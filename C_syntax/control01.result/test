@@ -33,7 +33,6 @@ int control01(int *in, int *val)
 {
    int c;
    int v;
-   extern int pnm_getc(int *);
    ;
 l99996:   ;
    if (!1) goto break_1;
