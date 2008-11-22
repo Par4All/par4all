@@ -175,157 +175,171 @@ deal_with_pending_comment(statement s,
 }
 
 
-void
-clean_up_sequences_rewrite(statement s)
+void clean_up_sequences_rewrite(statement s)
 {
-    instruction i = statement_instruction(s);
-    tag t = instruction_tag(i);
-    switch(t) {
-    case is_instruction_sequence:
-	{
-	    /* Delete empty instruction and fuse blocks of instructions : */
-	    list useful_sts, delete_sts;
-	    string the_comments = NULL;
-	    useful_sts = delete_sts = NIL;
+  instruction i = statement_instruction(s);
+  tag t = instruction_tag(i);
+  switch(t) {
+  case is_instruction_sequence:
+    {
+      /* Delete empty instruction and fuse blocks of instructions : */
+      list useful_sts, delete_sts;
+      string the_comments = NULL;
+      list cst = list_undefined;
 
-	    if(!(statement_with_empty_comment_p(s)
-		 && statement_number(s) == STATEMENT_NUMBER_UNDEFINED
-		 && unlabelled_statement_p(s))) {
-	      print_statement(s);
-	      user_log("Statement %s\n"
-		       "Number=%d, label=\"%s\", comment=\"%s\"\n",
-		       statement_identification(s),
-		       statement_number(s), label_local_name(statement_label(s)),
-		       empty_comments_p(statement_comments(s))? "" : statement_comments(s));
-	      pips_error("text_statement", "This block statement should be labelless, numberless"
+      useful_sts = delete_sts = NIL;
+
+      if(!(statement_with_empty_comment_p(s)
+	   && statement_number(s) == STATEMENT_NUMBER_UNDEFINED
+	   && unlabelled_statement_p(s))) {
+	print_statement(s);
+	user_log("Statement %s\n"
+		 "Number=%d, label=\"%s\", comment=\"%s\"\n",
+		 statement_identification(s),
+		 statement_number(s), label_local_name(statement_label(s)),
+		 empty_comments_p(statement_comments(s))? "" : statement_comments(s));
+	pips_error("text_statement", "This block statement should be labelless, numberless"
 			 
-			 " and commentless.\n");
-		}
+		   " and commentless.\n");
+      }
 
-	    /*
-	    pips_assert("This statement should be labelless, numberless and commentless.",
-			statement_with_empty_comment_p(s)
-			&& statement_number(s) == STATEMENT_NUMBER_UNDEFINED
-			&& unlabelled_statement_p(s));
-			*/
+      /*
+	pips_assert("This statement should be labelless, numberless and commentless.",
+	statement_with_empty_comment_p(s)
+	&& statement_number(s) == STATEMENT_NUMBER_UNDEFINED
+	&& unlabelled_statement_p(s));
+      */
 
-	    pips_debug(3, "A sequence of %zd statements\n",
-		       gen_length(sequence_statements(instruction_sequence(i))));
-	    ifdebug(5) {
-		pips_debug(5,
-		       "Statement at entry:\n");
-		print_statement(s);
-	    }
+      pips_debug(3, "A sequence of %zd statements with %d declarations\n",
+		 gen_length(sequence_statements(instruction_sequence(i))),
+		 gen_length(statement_declarations(s)));
+      ifdebug(5) {
+	pips_debug(5,
+		   "Statement at entry:\n");
+	print_statement(s);
+      }
 
-	    MAP(STATEMENT, st,
-		{
-		    ifdebug(9) {
-			fprintf(stderr, "[ The current statement in the sequence: ]\n");
-			print_statement(st);
-		    }
+      for(cst = sequence_statements(instruction_sequence(i)); !ENDP(cst); POP(cst)) {
+	statement st = STATEMENT(CAR(cst));
 
-		    if (empty_statement_or_labelless_continue_p(st)) {
-			ifdebug(9)
-			    fprintf(stderr, "[ Empty statement or continue ]\n");		
-
-			if (!statement_with_empty_comment_p(st)) {
-			    /* Keep the comment to put it on the next
-                               useful statement: */
-			    if (the_comments == NULL)
-				/* No comment has been gathered up to
-                                   now: */
-				the_comments = statement_comments(st);
-			    else {
-				string new_comments =
-				    strdup(concatenate(the_comments,
-						       statement_comments(st),
-						       NULL));;
-				free(the_comments);
-				the_comments = new_comments;
-			    }
-			    statement_comments(st) = string_undefined;
-			}
-			/* Unused instructions can be deleted in any
-                           order... :-) */
-			delete_sts = CONS(STATEMENT, st, delete_sts);
-			pips_debug(3, "Empty block removed...\n");
-			clean_up_empty_block_removed++;
-		    }
-		    else {
-			if (instruction_sequence_p(statement_instruction(st))) {
-			    /* A sequence in a sequence: they can be fused: */
-			    list statements = sequence_statements(instruction_sequence(statement_instruction(st)));
-			    statement first = STATEMENT(CAR(statements));
-			    /* Unlink the innermost sequence: */
-			    sequence_statements(instruction_sequence(statement_instruction(st))) = NIL;
-			    /* Keep the sequence: */
-			    useful_sts = gen_nconc(useful_sts, statements);
-			    pips_debug(3, "2 nested sequences fused...\n");
-			    clean_up_fused_sequences++;
-			    /* Think to delete the sequence parent: */
-			    delete_sts = CONS(STATEMENT, st, delete_sts);
-			    /* To deal with a pending comment: */
-			    st = first;
-			}
-			else {
-			    /* By default, it should be useful: */
-			    useful_sts = gen_nconc(useful_sts,
-						   CONS(STATEMENT, st, NIL));
-			    pips_debug(4, "Statement useful... %zd\n",
-				       gen_length(useful_sts));
-			}
-
-			deal_with_pending_comment(st, &the_comments);
-		    }
-		},
-		sequence_statements(instruction_sequence(i)));
-	    
-	    /* Remove the list of unused statements with the
-               statemenents them-self: */
-	    gen_full_free_list(delete_sts);
-
-	    if (the_comments != NULL) {
-		/* We have a pending comment we were not able to
-                   attach. Create a continue statement to attach it: */
-		statement st = make_continue_statement(entity_empty_label());
-		deal_with_pending_comment(st, &the_comments);
-		useful_sts = gen_nconc(useful_sts,
-				       CONS(STATEMENT, st, NIL));
-		pips_debug(3, "CONTINUE created to add a pending comment...\n");
-	    }
-
-	    /* Remove the old list of statements without the
-               statements: */
-	    gen_free_list(sequence_statements(instruction_sequence(i)));
-	    sequence_statements(instruction_sequence(i)) = useful_sts;
-       
-	    if (gen_length(useful_sts) == 1) {
-		/* A sequence of only 1 instruction can be replaced by
-                   this instruction: */
-		statement st = STATEMENT(CAR(useful_sts));
-		/* Transfer the deeper statement in the current one: */
-		statement_label(s) = statement_label(st);
-		statement_label(st) = entity_undefined;
-		statement_number(s) = statement_number(st);
-		statement_comments(s) = statement_comments(st);
-		statement_comments(st) = string_undefined;
-		statement_instruction(s) = statement_instruction(st);
-		statement_instruction(st) = instruction_undefined;
-		/* Do not forget to adjust the GOTOs pointing on st: */
-		adjust_goto_from_to(st, s);
-		/* Discard the old statement: */
-		free_instruction(i);
-		pips_debug(3, "Sequence with 1 statement replaced by 1 statement...\n");
-		clean_up_1_statement_sequence++;
-	    }
-	    
-	    ifdebug(5) {
-		pips_debug(5, "Statement at exit:\n");
-		print_statement(s);
-	    }
-	    break;
+	ifdebug(9) {
+	  fprintf(stderr, "[ The current statement in the sequence: ]\n");
+	  print_statement(st);
 	}
+
+	if (empty_statement_or_labelless_continue_p(st)) {
+	  ifdebug(9)
+	    fprintf(stderr, "[ Empty statement or continue ]\n");		
+
+	  if (!statement_with_empty_comment_p(st)) {
+	    /* Keep the comment to put it on the next
+	       useful statement: */
+	    if (the_comments == NULL)
+	      /* No comment has been gathered up to
+		 now: */
+	      the_comments = statement_comments(st);
+	    else {
+	      string new_comments =
+		strdup(concatenate(the_comments,
+				   statement_comments(st),
+				   NULL));;
+	      free(the_comments);
+	      the_comments = new_comments;
+	    }
+	    statement_comments(st) = string_undefined;
+	  }
+	  /* Unused instructions can be deleted in any
+	     order... :-) */
+	  delete_sts = CONS(STATEMENT, st, delete_sts);
+	  pips_debug(3, "Empty block removed...\n");
+	  clean_up_empty_block_removed++;
+	}
+	else {
+	  if (instruction_sequence_p(statement_instruction(st))
+	      && ENDP(statement_declarations(st))) {
+	    /* A sequence without declarations in a sequence: they can be fused: */
+	    list statements = sequence_statements(instruction_sequence(statement_instruction(st)));
+	    statement first = STATEMENT(CAR(statements));
+	    /* Unlink the innermost sequence: */
+	    sequence_statements(instruction_sequence(statement_instruction(st))) = NIL;
+	    /* Keep the sequence: */
+	    useful_sts = gen_nconc(useful_sts, statements);
+	    pips_debug(3, "2 nested sequences fused...\n");
+	    clean_up_fused_sequences++;
+	    /* Think to delete the sequence parent: */
+	    delete_sts = CONS(STATEMENT, st, delete_sts);
+	    /* To deal with a pending comment: */
+	    st = first;
+	  }
+	  else {
+	    /* By default, it should be useful: */
+	    useful_sts = gen_nconc(useful_sts,
+				   CONS(STATEMENT, st, NIL));
+	    pips_debug(4, "Statement useful... %zd\n",
+		       gen_length(useful_sts));
+	  }
+
+	  deal_with_pending_comment(st, &the_comments);
+	}
+      }
+	    
+      /* Remove the list of unused statements with the
+	 statemenents them-self: */
+      gen_full_free_list(delete_sts);
+
+      if (the_comments != NULL /* || !ENDP(statement_declarations(s))*/) {
+	/* We have a pending comment we were not able to
+	   attach. Create a continue statement to attach it: */
+	statement st = make_continue_statement(entity_empty_label());
+	deal_with_pending_comment(st, &the_comments);
+	useful_sts = gen_nconc(useful_sts,
+			       CONS(STATEMENT, st, NIL));
+	pips_debug(3, "CONTINUE created to add a pending comment...\n");
+      }
+
+      /* Keep track of declarations within an empty sequence:
+	 see C_syntax/block01.c */
+      /*
+	if(ENDP(useful_sts) && !ENDP(statement_declarations(s))) {
+	useful_sts = CONS(STATEMENT, s, NIL); // FI: maybe I should copy s?
+	}
+      */
+
+      /* Remove the old list of statements without the
+	 statements: */
+      gen_free_list(sequence_statements(instruction_sequence(i)));
+      sequence_statements(instruction_sequence(i)) = useful_sts;
+       
+      if (gen_length(useful_sts) == 1
+	  && ENDP(statement_declarations(s))) {
+	/* A sequence of only 1 instruction can be replaced by
+	   this instruction, if it has not declarations */
+	statement st = STATEMENT(CAR(useful_sts));
+	/* Transfer the deeper statement in the current one: */
+	statement_label(s) = statement_label(st);
+	statement_label(st) = entity_undefined;
+	statement_number(s) = statement_number(st);
+	statement_comments(s) = statement_comments(st);
+	statement_comments(st) = string_undefined;
+	statement_instruction(s) = statement_instruction(st);
+	statement_instruction(st) = instruction_undefined;
+	statement_declarations(s) = statement_declarations(st);
+	statement_declarations(st) = NIL;
+	/* Do not forget to adjust the GOTOs pointing on st: */
+	adjust_goto_from_to(st, s);
+	/* Discard the old statement: */
+	free_instruction(i);
+	pips_debug(3, "Sequence with 1 statement replaced by 1 statement...\n");
+	clean_up_1_statement_sequence++;
+      }
+	    
+      ifdebug(5) {
+	pips_debug(5, "Statement at exit:\n");
+	print_statement(s);
+      }
+      break;
     }
+  }
 }
 
 
@@ -337,7 +351,7 @@ clean_up_sequences_internal(statement s)
     debug_on("CLEAN_UP_SEQUENCES_DEBUG_LEVEL");
     compute_statement_to_goto_table(s);
     gen_recurse(s, statement_domain,
-		clean_up_sequences_filter,
+		gen_true,
 		clean_up_sequences_rewrite);  
     discard_statement_to_goto_table();
     debug_off();
@@ -350,9 +364,17 @@ clean_up_sequences_internal(statement s)
 void
 clean_up_sequences(statement s)
 {
-    debug_on("CLEAN_UP_SEQUENCES_DEBUG_LEVEL");
-    initialize_clean_up_sequences_statistics();
-    clean_up_sequences_internal(s);
-    display_clean_up_sequences_statistics();
-    debug_off();
+  debug_on("CLEAN_UP_SEQUENCES_DEBUG_LEVEL");
+  ifdebug(8) {
+    pips_debug(5, "Statement at entry:\n");
+    print_statement(s);
+  }
+  initialize_clean_up_sequences_statistics();
+  clean_up_sequences_internal(s);
+  display_clean_up_sequences_statistics();
+  ifdebug(8) {
+    pips_debug(5, "Statement at exit:\n");
+    print_statement(s);
+  }
+  debug_off();
 }

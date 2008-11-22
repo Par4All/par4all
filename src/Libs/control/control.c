@@ -320,11 +320,11 @@ bool controlize(
     string label = entity_name(statement_label(st));
     bool controlize_list(), controlize_test(), controlize_loop(),
 	controlize_whileloop(), controlize_call();
-    bool controlized=FALSE;
+    bool controlized = FALSE;
 
     ifdebug(5) {
 	pips_debug(1, 
-	   "(st = %p, pred = %p, succ = %p, c_res = %p)\nst at entry:\n",
+	   "Begin with (st = %p, pred = %p, succ = %p, c_res = %p)\nst at entry:\n",
 		   st, pred, succ, c_res);
 	print_statement(st);
 	/*
@@ -333,7 +333,7 @@ bool controlize(
 	pips_assert("c_res is a successor of pred",
 		    gen_in_list_p(c_res, control_successors(pred)));
 	*/
-	pips_debug(1, "Result c_res %p:\n", c_res);
+	pips_debug(1, "Begin with result c_res %p:\n", c_res);
 	display_linked_control_nodes(c_res);
 	check_control_coherency(pred);
 	check_control_coherency(succ);
@@ -342,14 +342,22 @@ bool controlize(
     
     switch(instruction_tag(i)) {
     case is_instruction_block: {
+      /* A block may only contain declarations with initializations
+	 and side effects on the store */
+      if(ENDP(instruction_block(i))) {
+	controlized = controlize_call(st, call_undefined,
+				      pred, succ, c_res, used_labels);
+      }
+      else {
 	controlized = controlize_list(st, instruction_block(i),
 				      pred, succ, c_res, used_labels);
 	/* If st carries local declarations, so should the statement associated to c_res. */
-	if(!ENDP(statement_declarations(st))
+	if(controlized && !ENDP(statement_declarations(st))
 	   && ENDP(statement_declarations(control_statement(c_res)))) {
 	  pips_user_warning("Some local declarations may have been lost\n");
 	}
-	break;
+      }
+      break;
     }
     case is_instruction_test:
 	controlized = controlize_test(st, instruction_test(i), 
@@ -424,21 +432,24 @@ bool controlize(
     }
 
     ifdebug(5) {
-	pips_debug(1, "st at exit:\n");
+	pips_debug(1, "st %p at exit:\n", st);
 	print_statement(st);
 	pips_debug(1, "Resulting Control c_res %p at exit:\n", c_res);
 	display_linked_control_nodes(c_res);
 	fprintf(stderr, "---\n");
+	/* The declarations may be preserved at a lower leve
 	if(!ENDP(statement_declarations(st))
 	   && ENDP(statement_declarations(control_statement(c_res)))) {
 	  pips_internal_error("Lost local declarations\n");
 	}
+	*/
 	check_control_coherency(pred);
 	check_control_coherency(succ);
 	check_control_coherency(c_res);
     }
     
     update_used_labels(used_labels, label, st);
+
     return(controlized);
 }
 
@@ -1265,6 +1276,23 @@ compact_list(list ctls,
 	
 	if(c_res != succ) {
 	    /* If it is not a loop on c_res, fuse the nodes: */
+	  if((statement_block_p(st) && !ENDP(statement_declarations(st)))
+	     || (statement_block_p(succ_st) && !ENDP(statement_declarations(succ_st)))) {
+	    /* You need a new block to fuse and to respect the scopes */
+		i = make_instruction_block(CONS(STATEMENT, st,
+						CONS(STATEMENT, succ_st, NIL)));
+		control_statement(c_res) =
+		    make_statement(entity_empty_label(), 
+				   STATEMENT_NUMBER_UNDEFINED,
+				   STATEMENT_ORDERING_UNDEFINED,
+				   string_undefined,
+				   i,NIL,NULL);
+	    ;
+	  }
+	  else {
+	    if(!ENDP(statement_declarations(st))) {
+	      pips_user_warning("Declarations carried by a statement which is not a block!\n");
+	    }
 	    if(!instruction_block_p(i=statement_instruction(st))) {
 		i = make_instruction_block(CONS(STATEMENT, st, NIL));
 		control_statement(c_res) =
@@ -1286,20 +1314,10 @@ compact_list(list ctls,
 		    gen_nconc(instruction_block(i), 
 			      CONS(STATEMENT, succ_st, NIL));
 	    }
-	    /* Skip the useless control: */
-	    control_statement(succ) = statement_undefined;
-	    remove_a_control_from_an_unstructured(succ);
-#if 0	    
-	    gen_free_list(control_successors(c_res));
-	    control_successors(c_res) = control_successors(succ);
-	    patch_references(PREDS_OF_SUCCS, succ, c_res);
-	    /* Now remove the useless control: */
-	    gen_free_list(control_predecessors(succ));
-	    control_successors(succ) = NIL;
-	    control_predecessors(succ) = NIL;
-	    control_statement(succ) = statement_undefined;
-	    free_control(succ);
-#endif
+	  }
+	  /* Skip the useless control: */
+	  control_statement(succ) = statement_undefined;
+	  remove_a_control_from_an_unstructured(succ);
 	}
 
 	if(succ == c_last) {
@@ -1408,9 +1426,14 @@ hash_table used_labels __attribute__((__unused__));
     list ctls;
     bool controlized;
 
-    pips_debug(5, "(st = %p, pred = %p, succ = %p, c_res = %p)\n",
+    pips_debug(5, "Begin with (st = %p, pred = %p, succ = %p, c_res = %p)\n",
 	       st, pred, succ, c_res);
     ifdebug(1) {
+      ifdebug(8) {
+	pips_debug(8, "\nControl nodes linked to pred = %p:\n", pred);
+	display_linked_control_nodes(pred);
+	pips_debug(8, "\n");
+      }
 	check_control_coherency(pred);
 	check_control_coherency(succ);
 	check_control_coherency(c_res);
@@ -1428,7 +1451,7 @@ hash_table used_labels __attribute__((__unused__));
 
       c_block = make_control(make_empty_statement_with_declarations_and_comments(d, dt, ct),
 			     NIL, NIL);
-      /*pips_assert("declarations are preserved",
+      /*pips_assert("declarations are preserved in control",
 		  gen_length(statement_declarations(st))
 		  ==gen_length(statement_declarations(control_statement(c_block))));*/
     
@@ -1436,7 +1459,7 @@ hash_table used_labels __attribute__((__unused__));
     else {
       /* What happens to the declarations and comments attached to st? */
       c_block = make_conditional_control(STATEMENT(CAR(sts)));
-      /*pips_assert("declarations are preserved",
+      /*pips_assert("declarations are preserved in conditional control",
 		  gen_length(statement_declarations(st))
 		  ==gen_length(statement_declarations(control_statement(c_block))));*/
     
@@ -1452,7 +1475,7 @@ hash_table used_labels __attribute__((__unused__));
 	pips_debug(0, "Nodes from c_last %p\n", c_last);
 	display_linked_control_nodes(c_last);
     }
-    /*    pips_assert("declarations are preserved",
+    /*    pips_assert("declarations are preserved in list",
 		gen_length(statement_declarations(st))
 		==gen_length(statement_declarations(control_statement(c_block))));*/
     
@@ -1466,45 +1489,45 @@ hash_table used_labels __attribute__((__unused__));
 	unlink_2_control_nodes(c_block, c_end);
 
 	if(ENDP(control_predecessors(c_block)) &&
-	    ENDP(control_successors(c_block))) {
-	    /* c_block is a lonely control node: */
-	    new_st = control_statement(c_block);
-	    control_statement(c_block) = statement_undefined;
+	   ENDP(control_successors(c_block))) {
+	  /* c_block is a lonely control node: */
+	  new_st = control_statement(c_block);
+
+	  /* FI: fragile attempt at keeping local declarations and their scope */
+	  /* Does not work when st has been changed... */
+	  if(/*!statement_block_p(new_st) &&*/ !ENDP(statement_declarations(st))) {
+	    /* new_st = st*/;
+	  }
+
+	  /* PJ: fragile attempt at keeping local declarations and their scope */
+	  if(!ENDP(statement_declarations(st))) {
+	    ifdebug(8) {
+	      pips_debug(8, "Block declarations to copy: ");
+	      print_entities(statement_declarations(st));
+	      pips_debug(8, "End of declarations.\n");
+	    }
+	    if(statement_block_p(new_st)) {
+	      if(ENDP(statement_declarations(new_st))) {
+		statement_declarations(new_st) = 
+		  gen_copy_seq(statement_declarations(st));
+	      }
+	      else {
+		new_st = make_block_statement(CONS(STATEMENT, new_st, NIL));
+		statement_declarations(new_st) = 
+		  gen_copy_seq(statement_declarations(st));
+	      }
+	    }
+	    else {
+	      new_st = make_block_statement(CONS(STATEMENT, new_st, NIL));
+ 	      statement_declarations(new_st) = 
+		gen_copy_seq(statement_declarations(st));
+	    }
+	  }
+
+	  control_statement(c_block) = statement_undefined;
 	    free_control(c_block);
 
-	    /* new_st must inherit the declarations of st, if not its comments! */
-	    if(ENDP(statement_declarations(new_st))) {
-	      statement_declarations(new_st) = gen_copy_seq(statement_declarations(st));
-	      if(statement_decls_text(st)!=NULL) {
-		statement_decls_text(new_st) = 
-		  string_undefined_p(statement_decls_text(st))? 
-		  string_undefined
-		  : strdup(statement_decls_text(st));
-	      }
-	    }
-	    else if(!ENDP(statement_declarations(st))) {
-	      /* Both new_st and st carry declarations */
-	      if(!compilation_unit_p(get_current_module_name())) {
-		/* The compilation unit statement does not require any
-		   controlizer action, but its duplication. However,
-		   globals are often declared twice. */
-		pips_assert("No variable is declared twice in st",
-			    gen_once_p(statement_declarations(st)));
-		pips_assert("No variable is declared twice in new_st",
-			    gen_once_p(statement_declarations(new_st)));
-	      }
-	      MAP(ENTITY, v, 
-	      {if(!gen_in_list_p(v, statement_declarations(new_st))) {
-		pips_debug(1, "Variable %s added to declarations of new_st\n", entity_name(v));
-		statement_declarations(new_st)
-		  = CONS(ENTITY, v, statement_declarations(new_st));}},
-		  statement_declarations(st));
-	      if(!compilation_unit_p(get_current_module_name())) {
-		pips_assert("No variable is declared twice in resulting new_st",
-			    gen_once_p(statement_declarations(new_st)));
-	      }
-	      /* pips_internal_error("Declaration conflict in controlizer\n"); */
-	    }
+	    /* FI: no need to update declarations as the code is structured */
 	}
 	else {
 	    /* The control is kept in an unstructured: */
@@ -1524,22 +1547,20 @@ hash_table used_labels __attribute__((__unused__));
 				    statement_declarations(st),
 				    statement_decls_text(st));
 	}
+
 	/* Not a good idea from mine to add this free... RK
 	   free_statement(control_statement(c_res)); */
-	pips_assert("declarations are preserved",
-		    gen_length(statement_declarations(st))
-		    ==gen_length(statement_declarations(new_st)));
+
 	control_statement(c_res) = new_st;
+
+	/* FI: when going down controlize list, these two nodes are
+	   already linked, and the are relinked uncondiotionnally by
+	   link_2_control_nodes() which does not check that its input
+	   assumption is met. */
+	unlink_2_control_nodes(pred, c_res);
+
 	link_2_control_nodes(pred, c_res);
 	link_2_control_nodes(c_res, succ);
-#if 0	
-	UPDATE_CONTROL(c_res, new_st,
-		        ADD_PRED(pred, c_res),
-		        CONS(CONTROL, succ, NIL));
-	control_predecessors(succ) = ADD_PRED(c_res, succ);
-	add_proper_successor_to_predecessor(pred, c_res);
-	/* control_successors(pred) = CONS(CONTROL, c_res, NIL); */
-#endif
 	controlized = FALSE;
     }
     else {
@@ -1564,14 +1585,21 @@ hash_table used_labels __attribute__((__unused__));
     
     hash_table_free(block_used_labels);
 
-    pips_debug(5, "Exiting\n");
+    pips_debug(5, "Exiting with controlized = %s\n", bool_to_string(controlized));
     ifdebug(1) {
+      ifdebug(8) {
+	pips_debug(8, "\nNodes linked to pred %p\n", pred);
+	display_linked_control_nodes(pred);
+	pips_debug(8, "\n");
+      }
 	check_control_coherency(pred);
 	check_control_coherency(succ);
 	check_control_coherency(c_res);
+	/*
 	pips_assert("declarations are preserved",
 		    gen_length(statement_declarations(st))
 		    ==gen_length(statement_declarations(control_statement(c_res))));
+	*/
     }
     
     return(controlized);
@@ -1861,7 +1889,8 @@ statement st;
     top = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
     bottom = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
     Unreachable = NIL;
-    controlize(st, top, bottom, result, used_labels);
+    /* FI: structured or not, let's build an unstructured... */
+    (void) controlize(st, top, bottom, result, used_labels);
 
     if(!ENDP(Unreachable)) {
 	pips_user_warning("Some statements are unreachable\n");

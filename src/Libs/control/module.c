@@ -18,6 +18,51 @@
 
 #include "misc.h"
 
+/* FI: a short-term solution to fix declarations lost due to
+   unstructured building by controlizer. */
+static statement update_unstructured_declarations(statement module_stat)
+{
+  list dl = statement_to_declarations(module_stat);
+  list vl = statement_to_referenced_entities(module_stat);
+  list fl = statement_to_called_user_entities(module_stat);
+  /* To preserve the order, it would be better to collect variables
+     and functions at the same time with a
+     statement_to_referenced_or_called-entities()*/
+  list vfl = gen_nconc(vl, fl);
+  list udl = NIL;
+  entity m = get_current_module_entity();
+  entity cu = module_entity_to_compilation_unit_entity(m);
+  list cudl = code_declarations(value_code(entity_initial(cu)));
+
+  MAP(ENTITY, e, {
+    if(!gen_in_list_p(e, dl) && !gen_in_list_p(e, cudl)
+       && !gen_in_list_p(e, udl) && !formal_parameter_p(e)
+       && !member_entity_p(e))
+      udl = gen_nconc(udl, CONS(ENTITY, e, NIL));
+  }, vfl);
+
+  if(!ENDP(udl)) {
+    ifdebug(8) {
+      pips_debug(8, "Lost declarations: ");
+      print_entities(udl);
+    }
+    if(statement_block_p(module_stat))
+      statement_declarations(module_stat)
+	= gen_nconc(statement_declarations(module_stat), udl);
+    else if(statement_unstructured_p(module_stat)) {
+      /* might be OK... */
+      statement_declarations(module_stat)
+	= gen_nconc(statement_declarations(module_stat), udl);
+    }
+    else {
+      module_stat = make_block_statement(CONS(STATEMENT, module_stat, NIL));
+      statement_declarations(module_stat)
+	= gen_nconc(statement_declarations(module_stat), udl);
+    }
+  }
+  return module_stat;
+}
+
 /* interface with pipsdbm and pipsmake */
 
 bool controlizer(string module_name)
@@ -54,9 +99,12 @@ bool controlizer(string module_name)
 			       empty_comments,
 			       make_instruction(is_instruction_unstructured,
 						control_graph(module_stat)),
-			       gen_copy_seq(statement_declarations(parsed_mod_stat)),NULL);
+			       NIL /* gen_copy_seq(statement_declarations(parsed_mod_stat))*/,
+			       NULL);
   ifdebug(5) {
     statement_consistent_p(module_stat);
+    pips_debug(5, "New statement before unspaghettify:\n");
+    print_statement(module_stat);
   }
 
     /* By setting this property, we try to unspaghettify the control
@@ -74,6 +122,11 @@ bool controlizer(string module_name)
 	module_reorder(module_stat);
 	reset_current_module_statement();
     }
+
+    /* With C code, some local declarations may have been lost by the
+       (current) restructurer */
+    if(c_module_p(m)) 
+      module_stat = update_unstructured_declarations(module_stat);
 
     ifdebug(5) {
 	statement_consistent_p(module_stat);
