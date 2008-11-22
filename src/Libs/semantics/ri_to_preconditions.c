@@ -604,6 +604,13 @@ transformer statement_to_postcondition(
 	    arguments_difference(transformer_arguments(pre),
 				 get_module_global_arguments());
 	transformer foo = transformer_undefined;
+	list dl = statement_block_p(s) ? statement_declarations(s) : NIL;
+
+	if(!ENDP(statement_declarations(s) && !statement_block_p(s))) {
+	  // FI: Just to gain some time before dealing with controlizer and declarations updates
+	  //pips_internal_error("Statement %p carries declarations\n");
+	  pips_user_warning("Statement %p carries declarations\n");
+	}
 
 	MAPL(cv,
 	 {
@@ -617,7 +624,19 @@ transformer statement_to_postcondition(
 	    precondition_add_reference_information(pre, s);
 	}
 
-	post = instruction_to_postcondition(pre, i, tf);
+	if(!ENDP(dl)) {
+	  list vl = variables_to_values(dl);
+	  transformer dt = declarations_to_transformer(dl, pre);
+	  transformer dpre = transformer_apply(dt, pre);
+
+	  post = instruction_to_postcondition(dpre, i, tf);
+	  if(!ENDP(vl))
+	    post = safe_transformer_projection(post, vl);
+	  free_transformer(dpre);
+	}
+	else {
+	  post = instruction_to_postcondition(pre, i, tf);
+	}
 
 	/* add equivalence equalities */
 	pre = tf_equivalence_equalities_add(pre);

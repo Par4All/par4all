@@ -98,7 +98,8 @@ select_fix_point_operator()
 
 static void add_declaration_information(transformer pre, entity m, bool precondition_p)
 {
-  list decls = code_declarations(value_code(entity_initial(m)));
+  //list decls = code_declarations(value_code(entity_initial(m)));
+  list decls = current_module_declarations();
 
   ifdebug(8) {
       pips_debug(8, "Begin for module %s with precondition\n", module_local_name(m));

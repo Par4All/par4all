@@ -289,6 +289,7 @@ static void allocate_module_value_mappings(entity m)
        its usefulness is limited... but keep at least hash table
        allocations! */
     
+  /* FI: not a good estimate for C codes with local delcarations */
     list module_intra_effects = load_module_intraprocedural_effects(m);
     int old_value_number = 0;
     int intermediate_value_number = 0;
@@ -476,7 +477,8 @@ void module_to_value_mappings(entity m)
      {entity e = ENTITY(CAR(ce));
 	  if(analyzable_scalar_entity_p(e) && !entity_has_values_p(e)) {
 	      add_intraprocedural_value_entities(e);
-	  }}, code_declarations(value_code(entity_initial(m))));
+	  }}, current_module_declarations());
+    //}}, code_declarations(value_code(entity_initial(m))));
 
     /* for debug, print hash tables */
     ifdebug(8) {
@@ -544,11 +546,13 @@ list variables_to_values(list list_mod)
   list list_val = NIL;
 
   MAP(ENTITY, e, {
+    if(entity_has_values_p(e)) {
     entity v_old = entity_to_old_value(e);
     entity v_new = entity_to_new_value(e);
 
     list_val = CONS(ENTITY, v_old, list_val);
     list_val = CONS(ENTITY, v_new, list_val);
+    }
   }, list_mod);
   return list_val;
 }

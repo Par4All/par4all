@@ -120,6 +120,89 @@ transformer filter_transformer(transformer t, list e)
  * BC, oct. 94 
  */
 
+/* It is assumed that entity_has_values_p(v)==TRUE */
+transformer declaration_to_transformer(entity v, transformer pre)
+{
+  transformer tf = transformer_undefined;
+
+  pips_debug(8, "Transformer for declaration of \"%s\"\n", entity_name(v));
+
+  if(entity_has_values_p(v)) {
+    value vv = entity_initial(v);
+    if(value_unknown_p(vv)) {
+      tf = transformer_identity();
+    }
+    else if (value_symbolic_p(vv)) {
+      pips_internal_error("Unexpected value tag: symbolic\n");
+    }
+    else if (value_constant_p(vv)) {
+      pips_internal_error("Unexpected value tag: constant\n");
+    }
+    else if (value_expression_p(vv)) {
+      expression e = value_expression(vv);
+      tf = any_expression_to_transformer(v, e, pre, FALSE);
+    }
+    else {
+      pips_internal_error("Unexpected value tag\n");
+    }
+  }
+  else {
+    tf = transformer_identity();
+  }
+
+  ifdebug(8) {
+    pips_debug(8, "Ends with:\n");
+    (void) print_transformer(tf);
+  }
+
+  return tf;
+}
+
+/* For C declarations. Very close to a block_to_transformer() as
+   declarations can be seen as a sequence of assignments */
+transformer declarations_to_transformer(list dl, transformer pre)
+{
+  entity v = entity_undefined;
+  transformer btf = transformer_undefined;
+  transformer stf = transformer_undefined;
+  transformer post = transformer_undefined;
+  transformer next_pre = transformer_undefined;
+  list l = dl;
+
+  pips_debug(8,"begin\n");
+
+  if(ENDP(l))
+    btf = transformer_identity();
+  else {
+    v = ENTITY(CAR(l));
+    stf = declaration_to_transformer(v, pre);
+    post = transformer_safe_apply(stf, pre);
+    post = transformer_safe_normalize(post, 4);
+    btf = transformer_dup(stf);
+    for (POP(l) ; !ENDP(l); POP(l)) {
+      v = ENTITY(CAR(l));
+      if(!transformer_undefined_p(next_pre))
+	free_transformer(next_pre);
+      next_pre = post;
+      stf = declaration_to_transformer(v, next_pre);
+      post = transformer_safe_apply(stf, next_pre);
+      post = transformer_safe_normalize(post, 4);
+      btf = transformer_combine(btf, stf);
+      btf = transformer_normalize(btf, 4);
+      ifdebug(1) 
+	pips_assert("btf is a consistent transformer", 
+		    transformer_consistency_p(btf));
+	pips_assert("post is a consistent transformer if pre is defined", 
+		    transformer_undefined_p(pre)
+		    || transformer_consistency_p(post));
+    }
+    free_transformer(post);
+  }
+
+  pips_debug(8, "end\n");
+  return btf;
+}
+
 static transformer 
 block_to_transformer(list b, transformer pre)
 {
@@ -1046,7 +1129,8 @@ instruction_to_transformer(
     tf = whileloop_to_transformer(wl, pre, e);
     break;
   case is_instruction_forloop:
-    pips_user_error("Use property to convert for loops into while loops");
+    pips_user_error("Use property FOR_TO_WHILE_LOOP_IN_CONTROLIZER or "
+		    "FOR_TO_DO_LOOP_IN_CONTROLIZER to convert for loops into while loops");
     break;
   case is_instruction_goto:
     pips_error("instruction_to_transformer",
@@ -1128,12 +1212,42 @@ transformer statement_to_transformer(
   /* it would be nicer to control warning_on_redefinition */
   if (transformer_undefined_p(ot)
       || get_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT")) {
-    nt = instruction_to_transformer(i, pre, e);
+    list dl = statement_block_p(s) ? statement_declarations(s) : NIL;
+
+    if(!ENDP(statement_declarations(s) && !statement_block_p(s))) {
+      // FI: Just to gain some time before dealing with controlizer and declarations updates
+      //pips_internal_error("Statement %p carries declarations\n");
+      pips_user_warning("Statement %p carries declarations\n");
+    }
+
+    if(!ENDP(dl)) {
+      transformer dt = declarations_to_transformer(dl, pre);
+      transformer ipre = transformer_range(dt);
+      transformer it = transformer_undefined;
+
+      ifdebug(8) {
+	pips_debug(8, "Statement local preconditions due to declarations:");
+	print_transformer(ipre);
+      }
+
+      it = instruction_to_transformer(i, ipre, e);
+      nt = transformer_combine(dt, it);
+      free_transformer(it);
+      // free_transformer(ipre);
+    }
+    else {
+      nt = instruction_to_transformer(i, pre, e);
+    }
 
     /* add array references information using proper effects */
     if(get_bool_property("SEMANTICS_TRUST_ARRAY_REFERENCES")) {
       transformer_add_reference_information(nt, s);
       /* nt = transformer_normalize(nt, 0); */
+    }
+    if(!ENDP(dl)) {
+      list vl = variables_to_values(dl);
+      if(!ENDP(vl))
+	nt = safe_transformer_projection(nt, vl);
     }
     /* nt = transformer_normalize(nt, 7); */
     nt = transformer_normalize(nt, 4);

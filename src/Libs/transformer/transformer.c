@@ -890,6 +890,28 @@ transformer transformer_temporary_value_projection(transformer tf)
   return tf;
 }
 
+/* t may be undefined, args may contain values unrelated to t */
+transformer safe_transformer_projection(transformer t, list args)
+{
+  transformer nt = transformer_undefined;
+  if(!transformer_undefined_p(t)) {
+    Psysteme r = (Psysteme) predicate_system(transformer_relation(t));
+    list nargs = NIL;
+
+    /* keep only values of args related to the transformer t */
+    MAP(ENTITY, v, {
+      if(base_contains_variable_p(sc_base(r), (Variable) v)) {
+	nargs = gen_nconc(nargs, CONS(ENTITY, v, NIL));
+      }
+    }, args);
+
+    nt = transformer_projection(t, nargs);
+    gen_free_list(nargs);
+  }
+  return nt;
+}
+
+/* vaues in args must be in t's base */
 /* transformer transformer_projection(transformer t, cons * args):
  * projection of t along the hyperplane defined by values in args;
  * this generate a projection and not a cylinder based on the projection
