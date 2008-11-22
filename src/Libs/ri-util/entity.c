@@ -323,7 +323,8 @@ entity_minimal_name(entity e)
 
   if (strcmp(local_name, entity_module_name(e)) == 0) {
     free(local_name);
-    return global_name_to_user_name(entity_name(e));
+    //return global_name_to_user_name(entity_name(e));
+    return entity_local_name(e);
   }
   else {
     free(local_name);

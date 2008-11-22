@@ -352,7 +352,11 @@ nop_statement_p(statement s)
 
 /* Return true if the statement is an empty instruction block without
    label or a continue without label or a recursive combination of
-   above. */
+   above.
+
+   FI: I add a check on declarations. With their initializations, they
+   have side effects. See C_syntax/block01.c.
+ */
 bool
 empty_statement_or_labelless_continue_p(statement st)
 {
@@ -363,7 +367,7 @@ empty_statement_or_labelless_continue_p(statement st)
    if (continue_statement_p(st))
       return TRUE;
    i = statement_instruction(st);
-   if (instruction_block_p(i)) {
+   if (instruction_block_p(i) && ENDP(statement_declarations(st))) {
        MAP(STATEMENT, s,
            {
 	       if (!empty_statement_or_labelless_continue_p(s))
@@ -2361,6 +2365,77 @@ statement add_comment_and_line_number(statement s, string sc, int sn)
       CONS(STATEMENT, nops, sss);
   }
   return ns;
+}
+
+static list statement_to_all_included_declarations;
+
+static bool add_statement_declarations(statement s)
+{
+  list dl = statement_declarations(s);
+  if(!ENDP(dl)) {
+    statement_to_all_included_declarations
+      = gen_nconc(statement_to_all_included_declarations,
+		  gen_copy_seq(dl));
+  }
+  return TRUE;
+}
+
+/* Get a list of all variables declared recursively within a statement */
+list statement_to_declarations(statement s)
+{
+  statement_to_all_included_declarations = NIL;
+
+  gen_multi_recurse(s, statement_domain, add_statement_declarations, gen_null, NULL);
+
+  return statement_to_all_included_declarations;
+}
+
+static list statement_to_all_included_referenced_entities;
+
+static bool add_statement_referenced_entities(reference r)
+{
+  /* Sometimes, a function may be referenced, for instance in a
+     function pointer assignment. */
+  entity v = reference_variable(r);
+
+  statement_to_all_included_referenced_entities
+    = gen_nconc(statement_to_all_included_referenced_entities,
+		CONS(ENTITY, v, NIL));
+  return TRUE;
+}
+
+/* Get a list of all variables referenced recursively within a statement */
+list statement_to_referenced_entities(statement s)
+{
+  statement_to_all_included_referenced_entities = NIL;
+
+  gen_multi_recurse(s, reference_domain, add_statement_referenced_entities, gen_null, NULL);
+
+  return statement_to_all_included_referenced_entities;
+}
+
+static list statement_to_all_included_called_user_entities;
+
+static bool add_statement_called_user_entities(call c)
+{
+  entity f = call_function(c);
+
+  if(!intrinsic_entity_p(f)) {
+    statement_to_all_included_called_user_entities
+      = gen_nconc(statement_to_all_included_called_user_entities,
+		  CONS(ENTITY, f, NIL));
+  }
+  return TRUE;
+}
+
+/* Get a list of all user function called recursively within a statement */
+list statement_to_called_user_entities(statement s)
+{
+  statement_to_all_included_called_user_entities = NIL;
+
+  gen_multi_recurse(s, statement_domain, add_statement_called_user_entities, gen_null, NULL);
+
+  return statement_to_all_included_declarations;
 }
 
 /* That's all folks */

@@ -31,7 +31,8 @@
 #define COMMON_PREFIX                   "~"
 #define BLOCKDATA_PREFIX                "&"
 
-#define FILE_SEP                        '!'
+#define FILE_SEP_CHAR                   '!'
+#define FILE_SEP                         FILE_SEP_CHAR
 
 #define FILE_SEP_STRING                 "!"
 #define BLOCK_SEP_STRING                "`"
@@ -1040,6 +1041,10 @@
 #define effect_any_reference(e) \
          (cell_preference_p(effect_cell(e))? preference_reference(cell_preference(effect_cell(e))) : cell_reference(effect_cell(e)))
 
+/* An entity_variable_p(e) may hide a typedef and hence a functional
+   type.  In C, use type_variable_p(ultimate_type(entity_type(e))) to
+   make sure e is a variable.
+ */
 #define entity_variable_p(e) (type_variable_p(entity_type(e)))
 
 #define entity_symbolic_p(e) (type_functional_p(entity_type(e)) && \
@@ -1058,6 +1063,9 @@
 
 #define statement_block_p(stat) \
         (instruction_block_p(statement_instruction(stat)))
+
+#define statement_unstructured_p(stat) \
+        (instruction_unstructured_p(statement_instruction(stat)))
 
 #define entity_constant_p(e) (type_functional_p(entity_type(e)) && \
   storage_rom_p(entity_storage(e)) && value_constant_p(entity_initial(e)))

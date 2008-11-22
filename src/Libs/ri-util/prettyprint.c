@@ -3172,6 +3172,12 @@ text text_statement_enclosed(
   list l = statement_declarations(stmt);
 
   if (!ENDP(l) && !is_fortran) {
+    if(!statement_block_p(stmt)
+       && !instruction_unstructured_p(statement_instruction(stmt))) {
+      /* Maybe it should be a warning as the controlizer might need to
+	 generate such statements... */
+      pips_internal_error("Declarations added to a standard statement\n");
+    }
     if(!braces_p) {
       braces_added = TRUE;
       ADD_SENTENCE_TO_TEXT(r,
@@ -3180,11 +3186,12 @@ text text_statement_enclosed(
     }
     MERGE_TEXTS(r,c_text_entities(module,l,nmargin));
   }
-  pips_debug(2, "Begin for statement %s with braces_p=%d\n", statement_identification(stmt),braces_p);
+
+  pips_debug(2, "Begin for statement %s with braces_p=%d\n",
+	     statement_identification(stmt),braces_p);
   pips_debug(9, "statement_comments: --%s--\n", 
 	     string_undefined_p(comments)? "<undef>": comments);
  
-
   if(statement_number(stmt)!=STATEMENT_NUMBER_UNDEFINED &&
      statement_ordering(stmt)==STATEMENT_ORDERING_UNDEFINED) {
     /* we are in trouble with some kind of dead (?) code... 
@@ -3210,9 +3217,15 @@ text text_statement_enclosed(
     }
   else
     {
-      temp = text_instruction(module, label, nmargin, i,
-			      statement_number(stmt));
-    }
+      entity m = entity_undefined_p(module)?
+	get_current_module_entity()
+	: module;
+      if(!compilation_unit_p(entity_name(m)))
+	 temp = text_instruction(module, label, nmargin, i,
+				 statement_number(stmt));
+      else
+ 	temp = make_text(NIL);
+   }
 
   /* note about comments: they are duplicated here, but I'm pretty
    * sure that the free is NEVER performed as it should. FC.
@@ -3452,11 +3465,13 @@ text_named_module(
 	  ADD_SENTENCE_TO_TEXT(r,attach_head_to_sentence(sentence_head(name), module)); 
 	  ADD_SENTENCE_TO_TEXT(r,MAKE_ONE_WORD_SENTENCE(0,"{"));
 	  /* get the declarations when they are not located in the module statement. A.Mensi */
+	  /*
 	  if(ENDP(statement_declarations(stat))) {
 	    list l = code_declarations(value_code(entity_initial(module)));
 	    
 	    MERGE_TEXTS(r,c_text_entities(module, l, INDENTATION));
 	  }
+	  */
 	}
     }
   

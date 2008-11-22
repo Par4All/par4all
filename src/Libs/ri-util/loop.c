@@ -92,6 +92,12 @@ rloops_mapping_of_statement(
 	  break ;
       }
 	
+      case is_instruction_forloop: {
+	  pips_user_error("Use property FOR_TO_WHILE_LOOP_IN_CONTROLIZER or "
+			  "FOR_TO_DO_LOOP_IN_CONTROLIZER to convert for loops into while loops\n");
+	  break ;
+      }
+	
       default:
 	pips_internal_error("unexpected tag %d\n", instruction_tag(i));
     }

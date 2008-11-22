@@ -58,3 +58,50 @@ list current_module_declarations()
 
   return dl;
 }
+
+entity module_entity_to_compilation_unit_entity(entity m)
+{
+  entity cu = entity_undefined;
+
+  if(compilation_unit_entity_p(m)) 
+    cu = m;
+  else {
+    string aufn = db_get_memory_resource(DBR_USER_FILE, entity_user_name(m), TRUE);
+    string lufn = strrchr(aufn, '/')+1;
+
+    if(lufn!=NULL) {
+      string n = strstr(lufn, ".cpp_processed.c");
+      int l = n-lufn;
+      string cun = strndup(lufn, l);
+
+      if(static_module_name_p(cun)) {
+	string end = strrchr(cun, FILE_SEP_CHAR);
+	*(end+1) = '\0';
+	cu = local_name_to_top_level_entity(cun);
+      }
+      else {
+	string ncun = strdup(concatenate(cun, FILE_SEP_STRING, NULL));
+	cu = local_name_to_top_level_entity(ncun);
+	free(ncun);
+      }
+      free(cun);
+    }
+    else
+      pips_internal_error("Not implemented yet\n");
+  }
+  pips_assert("cu is a compilation unit", compilation_unit_entity_p(cu));
+  return cu;
+}
+
+bool c_module_p(entity m)
+{
+  bool c_p = FALSE;
+
+  if(entity_module_p(m)) {
+    string aufn = db_get_memory_resource(DBR_USER_FILE, entity_user_name(m), TRUE);
+    string n = strstr(aufn, ".cpp_processed.c");
+
+    c_p = (n!=NULL);
+  }
+  return c_p;
+}

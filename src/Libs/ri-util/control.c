@@ -237,7 +237,7 @@ display_linked_control_nodes(control c) {
 	fprintf(stderr, "), ");
 	ifdebug(8) {
 	  fprintf(stderr, "\n");
-	    pips_debug(0, "Statement of control %p:\n", ctl);
+	    pips_debug(0, "Statement %p of control %p:\n", control_statement(ctl), ctl);
 	    safe_print_statement(control_statement(ctl));
 	}
     }, c, blocs);
