@@ -1315,7 +1315,7 @@ declared outside a module can be pretty-printed if the source file is
 considered as a module, with the declarations list and the decls\_text
 string. This is implemented in the data structure \verb/code/ but the
 field \verb/decl_text/ does not seem to be initialized by the parser
-and is not used by the prettyprinter..
+and is not used by the prettyprinter.
 
 However, this does not let us know if a global variable has been
 declared \verb/extern/ or not. For instance, the two declarations:
@@ -1340,6 +1340,16 @@ extern int i;
 int i;
 \end{verbatim}
 is legal, probably to simplify the design of include files.
+
+The field \verb/code_declarations/ contains all variables declared
+within the function definition. Iternal PIPS entities such as memory
+areas are declared first, followed by formal parameters. Other
+variables declared within statement blocks are also listed here. So
+most variables appear in a \verb/statement_declarations/ field and in
+the \verb/code_declarations/ field of the module.
+
+For a compilation unit, which does not really have a body, the
+\verb/code_declarations/ field can be used.
 
 The field \verb/initializations/ is used to represent DATA statements
 in Fortran. In C, the initializer for a scalar variable is a single
@@ -1367,7 +1377,10 @@ is j ?
   executable statements, represent \lstinline/int i =j/ as
   \lstinline/int i; i = j;/.
 \end{itemize}
-The first solution is chosen. 
+The first solution is chosen and the field \verb/initial_value/ leads
+to a value containing the initialization expression thru
+\verb/value_expression/. Sepcial expressions are built for array and
+structure initializations.
 
 \section{Statement}
 \label{statement}
