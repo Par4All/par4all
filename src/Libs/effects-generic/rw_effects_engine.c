@@ -246,13 +246,15 @@ static void rw_effects_of_loop(loop l)
     transformer loop_trans;
 
     pips_debug(2, "begin\n");
+
     /* proper effects of loop */
     l_prop = effects_dup(load_proper_rw_effects_list(current_stat));
     if (contract_p)
 	l_prop = proper_to_summary_effects(l_prop);    
    
     /* rw effects of loop body */
-    l_body = load_rw_effects_list(b);;
+    l_body = load_rw_effects_list(b);
+
     ifdebug(4){
 	pips_debug(4, "rw effects of loop body:\n");
 	(*effects_prettyprint_func)(l_body);
@@ -349,12 +351,16 @@ static void rw_effects_of_call(call c)
     pips_debug(2, "end\n");
 }
 
-/* just to handle one kind of instruction, expressions which are not calls */
-rw_effects_of_expression_instruction(instruction i)
+/* Just to handle one kind of instruction, expressions which are not
+   calls.  As we do not distinguish between Fortran and C, this
+   function is called for Fortran module although it does not have any
+   effect.
+ */
+static void rw_effects_of_expression_instruction(instruction i)
 {
-  list l_proper = NIL;
+  //list l_proper = NIL;
   statement current_stat = effects_private_current_stmt_head();
-  instruction inst = statement_instruction(current_stat);
+  //instruction inst = statement_instruction(current_stat);
 
   /* Is the call an instruction, or a sub-expression? */
   if (instruction_expression_p(i)) {
@@ -368,18 +374,18 @@ rw_effects_of_expression_instruction(instruction i)
       if(syntax_call_p(sc)) {
 	call c = syntax_call(sc);
 
-	pips_debug(2, "Effects for expression instruction in statement%03zd:\n",
+	pips_debug(2, "Effects for expression instruction in statement%03zd\n",
 		   statement_ordering(current_stat)); 
 
 	rw_effects_of_call(c);
       }
       else {
 	pips_internal_error("Cast case not implemented\n");
-	  }
+      }
     }
     else {
       pips_internal_error("Instruction expression case not implemented\n");
-	}
+    }
   }
 }
 
@@ -389,7 +395,7 @@ static void rw_effects_of_test(test t)
   list le, lt, lf, lc, lr;
   statement true_s = test_true(t);
   statement false_s = test_false(t);
-  extern reference_to_convex_region();
+  extern effect reference_to_convex_region(reference, action);
 
   pips_debug(2, "begin\n");
 

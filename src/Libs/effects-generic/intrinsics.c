@@ -1192,7 +1192,7 @@ static list generic_io_effects(entity e, list args, bool system_p)
   */
   list le = NIL, lep;
   entity private_io_entity;
-  reference ref;
+  //reference ref;
   list indices = NIL;
   IoElementDescriptor *p;
   int lenght=0;
@@ -1307,10 +1307,19 @@ static list generic_io_effects(entity e, list args, bool system_p)
   }
 
   if(file_p) {
-    if(expression_undefined_p(unit))
+    bool must_p = TRUE;
+    reference ref1 = reference_undefined;
+    effect eff1 = effect_undefined;
+    reference ref2 = reference_undefined;
+    effect eff2 = effect_undefined;
+
+    if(expression_undefined_p(unit)) {
       indices = CONS(EXPRESSION, make_unbounded_expression(), NIL);
-    else
+      must_p = FALSE;
+    }
+    else {
       indices = CONS(EXPRESSION, unit, NIL);
+    }
 
     private_io_entity = global_name_to_entity
       (IO_EFFECTS_PACKAGE_NAME,
@@ -1318,10 +1327,23 @@ static list generic_io_effects(entity e, list args, bool system_p)
 
     pips_assert("private_io_entity is defined", private_io_entity != entity_undefined);
 
-    ref = make_reference(private_io_entity, indices);
-    ifdebug(8) print_reference(ref);
-    le = gen_nconc(le, generic_proper_effects_of_reference(ref));
-    le = gen_nconc(le, generic_proper_effects_of_lhs(ref));
+    ref1 = make_reference(private_io_entity, indices);
+    ref2 = copy_reference(ref1);
+    /* FI: I would like not to use "preference" isntead of
+       "reference", but this causes a bug in cumulated effects and I
+       do not have time to chase it. */
+    eff1 = make_effect(make_cell_preference(make_preference(ref1)),
+		       make_action_read(),
+		       make_addressing_index(),
+		       must_p? make_approximation_must() : make_approximation_may(),
+		       make_descriptor_none()); /* Is this generic?*/
+    eff2 = make_effect(make_cell_preference(make_preference(ref2)),
+		       make_action_write(),
+		       make_addressing_index(),
+		       must_p? make_approximation_must() : make_approximation_may(),
+		       make_descriptor_none()); /* Is this generic?...*/
+    ifdebug(8) print_reference(ref1);
+    le = gen_nconc(le, CONS(EFFECT, eff1, CONS(EFFECT, eff2, NIL)));
   }
 
   pips_debug(5, "end\n");

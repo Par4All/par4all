@@ -1334,11 +1334,11 @@ proper_effects_of_call(call c)
 }
 
 /* just to handle one kind of instruction, expressions which are not calls */
-proper_effects_of_expression_instruction(instruction i)
+static void proper_effects_of_expression_instruction(instruction i)
 {
   list l_proper = NIL;
   statement current_stat = effects_private_current_stmt_head();
-  instruction inst = statement_instruction(current_stat);
+  //instruction inst = statement_instruction(current_stat);
   list l_cumu_range = cumu_range_effects();
 
   /* Is the call an instruction, or a sub-expression? */
@@ -1376,7 +1376,7 @@ proper_effects_of_expression_instruction(instruction i)
     }
     else {
       pips_internal_error("Instruction expression case not implemented\n");
-	}
+    }
   }
 }
 

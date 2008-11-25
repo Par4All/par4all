@@ -15,6 +15,7 @@
 #include "ri.h"
 #include "ri-util.h"
 #include "misc.h"
+#include "text.h"
 
 #include "effects-generic.h"
 
@@ -202,7 +203,8 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
   /* FI: at this level, it's pretty dangerous to combine effects with no constant addresses */
   //hash_table all_read_pre_effects, all_write_pre_effects;
   //hash_table all_read_post_effects, all_write_post_effects;
-  
+  extern string words_to_string(list);
+
   ifdebug(6) {
     list refl = NIL;
     int i = 0;
@@ -216,8 +218,9 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
 	if(cell_reference_p(c)) {
 	  refl = gen_nconc(refl, CONS(REFERENCE, ref, NIL));
 	}
+	i++;
 	fprintf(stderr, "Effect %d: %p\tReference %d: %p (%spersistant)\n",
-		++i, eff, i, ref, cell_reference_p(c)? "not ":""); 
+		i, eff, i, ref, cell_reference_p(c)? "not ":""); 
       }, l_effects);
     pips_assert("The very same reference does not appear twice unless it is persistant", gen_once_p(refl));
   }
@@ -381,15 +384,21 @@ bool combinable_effects_p(effect eff1, effect eff2)
     return(same_var && same_act);
 }
 
-/* FI: same action, but also same variable and same direct
+/* FI: same action, but also same variable, same indexing and same direct
    addressing. The constraint on addressing could be challenged... */
 bool effects_same_action_p(effect eff1, effect eff2)
 {
   bool same_p = TRUE;
+  extern string words_to_string(list);
 
-    if (effect_undefined_p(eff1) || effect_undefined_p(eff2))
-	same_p = TRUE;
-    else {
+  if (effect_undefined_p(eff1) || effect_undefined_p(eff2))
+    same_p = TRUE;
+  else {
+    reference r1 = effect_any_reference(eff1);
+    reference r2 = effect_any_reference(eff2);
+    string n1 = words_to_string(effect_words_reference_with_addressing_as_it_is(r1, addressing_tag(effect_addressing(eff1))));
+    string n2 = words_to_string(effect_words_reference_with_addressing_as_it_is(r2, addressing_tag(effect_addressing(eff2))));
+    /*
       bool same_var, same_act, direct_p;
       addressing ad1 = effect_addressing(eff1);
       addressing ad2 = effect_addressing(eff2);
@@ -399,8 +408,12 @@ bool effects_same_action_p(effect eff1, effect eff2)
       direct_p = (addressing_index_p(ad1) && addressing_index_p(ad2));
 
       same_p = same_var && same_act && direct_p;
-    }
-    return same_p;
+    */
+    same_p = same_string_p(n1,n2) && effect_action_tag(eff1)==effect_action_tag(eff2);
+    free(n1);
+    free(n2);
+  }
+  return same_p;
 }
 
 bool effects_same_variable_p(effect eff1, effect eff2)

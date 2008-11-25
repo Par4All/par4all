@@ -240,7 +240,7 @@ set_methods_for_simple_effects()
     effects_sup_difference_op = EffectsSupDifference;
     effects_inf_difference_op = EffectsInfDifference;
     effects_transformer_composition_op =
-	effects_composition_with_transformer_nop;
+	effects_composition_with_effect_transformer;
     effects_transformer_inverse_composition_op =
 	effects_composition_with_transformer_nop;
     effects_precondition_composition_op =

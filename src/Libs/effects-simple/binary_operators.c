@@ -110,25 +110,30 @@ effects_must_union(effect eff1, effect eff2)
     return(l_res);
 }
 
-effect 
-effect_may_union(effect eff1, effect eff2)
+/* Preserve store independent information as long as you can. I should
+   have some order on references to absorb, for instance, x[1] by
+   x[*]. */
+effect effect_may_union(effect eff1, effect eff2)
 {
     effect eff;
+    tag app1 = effect_approximation_tag(eff1);
+    tag app2 = effect_approximation_tag(eff2);
     
     if (effect_scalar_p(eff1))
     {
-	tag app1 = effect_approximation_tag(eff1);
-	tag app2 = effect_approximation_tag(eff2);
-	
 	eff = make_simple_effect(make_reference(effect_entity(eff1), NIL), 
 			  make_action(action_tag(effect_action(eff1)), UU), 
 			  make_approximation(approximation_and(app1,app2), UU));
     }
     else
     {
+      /*
 	eff = make_simple_effect(make_reference(effect_entity(eff1), NIL), 
 			  make_action(action_tag(effect_action(eff1)), UU), 
 			  make_approximation(is_approximation_may, UU));
+      */
+      eff = copy_effect(eff1);
+      approximation_tag(effect_approximation(eff)) = approximation_and(app1,app2);
     }
     return(eff);
 }
@@ -257,7 +262,7 @@ effect proper_to_summary_simple_effect(effect eff)
   if (!effect_scalar_p(eff)) {
     //cell c = effect_cell(eff);
     reference r = effect_any_reference(eff);
-    entity e = reference_variable(r);
+    //entity e = reference_variable(r);
     //type ut = ultimate_type(entity_type(e));
     list inds = reference_indices(r);
     list cind = list_undefined;
@@ -279,7 +284,7 @@ effect proper_to_summary_simple_effect(effect eff)
       if(!extended_integer_constant_expression_p(se)) {
 	if(!unbounded_expression_p(se)) {
 	  may_p = TRUE;
-	  CAR(cind).p = make_unbounded_expression();
+	  EXPRESSION_(CAR(cind)) = make_unbounded_expression();
 	}
       }
     }

@@ -306,33 +306,6 @@ entity e;
 }
 */
 
-/* In interprocedural context, returns the shortest non-ambiguous name
-   for a variable. If it is local to the current module, use the user
-   name. If not return entity_name(), which is not fully satisfying
-   for C variables because it includes scope information.
-
-   Note also that this function assumes the existence of a current module.
-*/
-string 
-entity_minimal_name(entity e)
-{
-  entity m = get_current_module_entity();
-  string local_name = module_local_name(m);
-
-  pips_assert("some current entity", !entity_undefined_p(m));
-
-  if (strcmp(local_name, entity_module_name(e)) == 0) {
-    free(local_name);
-    //return global_name_to_user_name(entity_name(e));
-    return entity_local_name(e);
-  }
-  else {
-    free(local_name);
-    return entity_name(e);
-  }
-}
-
-
 string 
 entity_and_common_name(entity e)
 {

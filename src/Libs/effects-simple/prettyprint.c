@@ -50,9 +50,12 @@ static string continuation = string_undefined;
 int
 compare_effect_reference(effect * e1, effect * e2)
 {
-  entity v1 = reference_variable(effect_any_reference(*e1));
-  entity v2 = reference_variable(effect_any_reference(*e2));
+  reference r1 = effect_any_reference(*e1);
+  reference r2 = effect_any_reference(*e2);
+  entity v1 = reference_variable(r1);
+  entity v2 = reference_variable(r2);
   int n1, n2;
+  /* FI: might not be best... entity_unambiguous_user_name()? */
   string s1 = entity_name_without_scope(v1);
   string s2 = entity_name_without_scope(v2);
   int result;
@@ -62,6 +65,50 @@ compare_effect_reference(effect * e1, effect * e2)
   result = (n1 || n2)?  (n2-n1): strcmp(s1,s2);
   free(s1);
   free(s2);
+  if(result==0) {
+    list ind1 = reference_indices(r1);
+    list ind2 = reference_indices(r2);
+    list cind1 = list_undefined;
+    list cind2 = list_undefined;
+    int diff = 0;
+
+    if(ENDP(ind1))
+      if(ENDP(ind2))
+	diff = 0;
+      else
+	diff = -1;
+    else
+      if(ENDP(ind2))
+	diff = 1;
+      else
+	diff = 0;
+
+    for(cind1 = ind1, cind2 = ind2; !ENDP(cind1) && !ENDP(cind2) && diff ==0; POP(cind1), POP(cind2)) {
+      expression e1 = EXPRESSION(CAR(cind1));
+      expression e2 = EXPRESSION(CAR(cind2));
+
+      if(unbounded_expression_p(e1))
+	if(unbounded_expression_p(e2))
+	  diff = 0;
+	else
+	  diff = 1;
+      else
+	if(unbounded_expression_p(e2))
+	  diff = -1;
+	else {
+	  int i1 = 0;
+	  int i2 = 0;
+
+	  /* FI: This is not enough as effects are not summarized
+	     right away. It may be impossible to find an integer value
+	     for e1 and/or e2. The output is till not deterministic. */
+	  expression_integer_value(e1, &i1);
+	  expression_integer_value(e2, &i2);
+	  diff = i1 - i2;
+	}
+    }
+    result = diff==0? 0 : (diff>0?1:-1);
+  }
   return result;
 }
 

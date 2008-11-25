@@ -635,6 +635,21 @@ module_to_declaration_length(entity func)
     return length;
 }
 
+
+/* Find all references in the declaration list */
+list declaration_supporting_references(list dl)
+{
+  list srl = NIL;
+
+  MAP(ENTITY, v, {
+      type t = entity_type(v);
+      /* FI: we should also look up the initial values */
+      srl = type_supporting_references(srl, t);
+    }, dl);
+
+  return srl;
+}
+
 
 /*
  *  that is all

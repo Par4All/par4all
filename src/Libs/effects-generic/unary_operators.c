@@ -265,10 +265,88 @@ effects_undefined_composition_with_transformer(list l_eff __attribute__((__unuse
     return list_undefined;
 }
 
-list
-effects_composition_with_transformer_nop(list l_eff, transformer trans __attribute__((__unused__)))
+list effects_composition_with_effect_transformer(list l_eff,
+						 transformer trans __attribute__((__unused__)))
 {
-    return l_eff;
+  /* FI: used to be nop and wrong information is now preserved
+     intraprocedurally with loops, maybe because I modified simple
+     effects; since we do not have transformers, we use instead the
+     effects themselves, which could be transformed into a
+     transformer... 
+
+     The effects are supposed to be ordered. A write effect must
+     appears before another effect to require an update.
+*/
+  list l1 = list_undefined;
+  list l2 = list_undefined;
+  extern string words_to_string(list);
+
+  ifdebug(8) {
+    pips_debug(8, "Begin: %d effects before composition:\n", gen_length(l_eff));
+    MAP(EFFECT, eff, {
+	reference r = effect_any_reference(eff);
+	pips_debug(8, "%p: %s\n", eff, words_to_string(effect_words_reference_with_addressing_as_it_is(r, addressing_tag(effect_addressing(eff)))));
+	pips_assert("Effect eff is consitent", effect_consistent_p(eff));
+      },  l_eff);
+  }
+
+  for(l1= l_eff; !ENDP(l1); POP(l1)) {
+    effect e1 = EFFECT(CAR(l1));
+    for(l2 = CDR(l1); !ENDP(l2); POP(l2)) {
+      effect e2 = EFFECT(CAR(l2));
+
+      ifdebug(1) {
+	pips_assert("Effect e1 is consitent", effect_consistent_p(e1));
+	pips_assert("Effect e2 is consitent", effect_consistent_p(e2));
+      }
+
+      ifdebug(8) {
+	reference r1 = effect_any_reference(e1);
+	reference r2 = effect_any_reference(e2);
+	(void) fprintf(stderr, "e1 %p: %s\n", e1, words_to_string(effect_words_reference_with_addressing_as_it_is(r1, addressing_tag(effect_addressing(e1)))));
+	(void) fprintf(stderr, "e2 %p: %s\n", e2, words_to_string(effect_words_reference_with_addressing_as_it_is(r2, addressing_tag(effect_addressing(e2)))));
+      }
+
+      e2 = effect_interference(e2, e1);
+
+      ifdebug(8) {
+	reference r2 = effect_any_reference(e2);
+	tag ad2 = addressing_tag(effect_addressing(e2));
+	(void) fprintf(stderr, "resulting e2 %p: %s\n", e2,
+		       words_to_string(effect_words_reference_with_addressing_as_it_is(r2, ad2)));
+	pips_assert("New effect e2 is consitent", effect_consistent_p(e2));
+      }
+
+      EFFECT_(CAR(l2)) = e2;
+    }
+  }
+
+  ifdebug(8) {
+    pips_debug(8, "End: %d effects after composition:\n", gen_length(l_eff));
+    MAP(EFFECT, eff, {
+	reference r = effect_any_reference(eff);
+	pips_debug(8, "%p: %s\n", eff, words_to_string(effect_words_reference_with_addressing_as_it_is(r, addressing_tag(effect_addressing(eff)))));
+      },  l_eff);
+  }
+
+  /* FI: Not generic. */
+  l_eff = proper_effects_combine(l_eff, FALSE);
+
+  ifdebug(8) {
+    pips_debug(8, "End: %d effects after composition:\n", gen_length(l_eff));
+    MAP(EFFECT, eff, {
+	reference r = effect_any_reference(eff);
+	pips_debug(8, "%p: %s\n", eff, words_to_string(effect_words_reference_with_addressing_as_it_is(r, addressing_tag(effect_addressing(eff)))));
+      },  l_eff);
+  }
+  
+  return l_eff;
+}
+
+list effects_composition_with_transformer_nop(list l_eff,
+					      transformer trans __attribute__((__unused__)))
+{
+  return l_eff;
 }
 
 
@@ -285,7 +363,7 @@ effects_undefined_composition_with_preconditions(list l_eff __attribute__((__unu
 list
 effects_composition_with_preconditions_nop(list l_eff, transformer trans __attribute__((__unused__)))
 {
-    return l_eff;
+  return l_eff;
 }
 
 /* Union over a range */
@@ -303,10 +381,12 @@ effects_undefined_union_over_range(
     return list_undefined;
 }
 
-list 
-effects_union_over_range_nop(list l_eff, entity index __attribute__((__unused__)), range r __attribute__((__unused__)), descriptor d __attribute__((__unused__)))
+list effects_union_over_range_nop(list l_eff,
+				  entity index __attribute__((__unused__)),
+				  range r __attribute__((__unused__)),
+				  descriptor d __attribute__((__unused__)))
 {
-    return l_eff;
+  return l_eff;
 }
 
 

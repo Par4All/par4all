@@ -916,6 +916,11 @@ list lr;
     (void) putc('\n', stderr);
 }
 
+void print_references(list rl)
+{
+  print_reference_list(rl);
+}
+
 void print_normalized(n)
 normalized n;
 {
@@ -2156,7 +2161,6 @@ expression convert_bound_expression(expression e, bool upper_p, bool non_strict_
   return b;
 }
 
-
 bool reference_with_constant_indices_p(reference r)
 {
   list sel = reference_indices(r);
@@ -2169,6 +2173,32 @@ bool reference_with_constant_indices_p(reference r)
       }
     }, sel);
   return constant_p;
+}
+
+/* Return by side effect a reference whose memory locations includes
+   the memory locations of r in case the subcript expressions are
+   changed by a store change.
+
+   Constant subscript expressions are preserved.
+
+   Store varying subscript expressions are replaced by unbounded expressions.
+ */
+reference reference_with_store_independent_indices(reference r)
+{
+  list sel = reference_indices(r);
+  bool constant_p = TRUE;
+  list sec = list_undefined;
+
+  for(sec = sel; !ENDP(sec); POP(sec)) {
+    expression se = EXPRESSION(CAR(sec));
+
+    if(!extended_integer_constant_expression_p(se)) {
+      free_expression(se);
+      EXPRESSION_(CAR(sec)) = make_unbounded_expression();
+    }
+  }
+
+  return r;
 }
 
 /* indices can be constant or unbounded: they are store independent. */
@@ -2185,6 +2215,26 @@ bool reference_with_unbounded_indices_p(reference r)
       }
     }, sel);
   return unbounded_p;
+}
+
+/* Does this reference define the same set of memory locations
+   regardless of the current (environment and) memory state?
+ */
+bool store_independent_reference_p(reference r)
+{
+  bool independent_p = TRUE;
+  //list ind = reference_indices(r);
+  entity v = reference_variable(r);
+  type t = ultimate_type(entity_type(v));
+
+  if(pointer_type_p(t)) {
+    independent_p = FALSE;
+  }
+  else {
+    independent_p = reference_with_constant_indices_p(r);
+  }
+
+  return independent_p;
 }
 
 void check_user_call_site(entity func, list args)

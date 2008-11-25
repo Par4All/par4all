@@ -282,6 +282,19 @@ offset_of_reference(reference ref, int n)
     return(voffset);
 }
 
+/* Generate the unknown subscripts for a variable of type depth d */
+list make_unknown_subscript(int d)
+{
+  list ind = NIL;
+  int i = 0;
+
+  for(i=0; i<d; i++) {
+    expression e = make_unbounded_expression();
+    ind = CONS(EXPRESSION, e, ind);
+  }
+  return ind;
+}
+
 
 /* list global_effect_translation(effect ef, entity func)
  * input    : a global or static effect from/to subroutine func.
@@ -393,6 +406,10 @@ global_effect_translation(
 		(eff_ent_begin_offset <= new_ent_end_offset ))
 		/* these entities have elements in common */
 	    {				
+	      type new_t = entity_type(new_ent);
+	      int new_d = type_depth(new_t);
+	      list ind = make_unknown_subscript(new_d);
+
 		/* if the new entity is entirely contained in the original one
 		 */
 		if ((new_ent_begin_offset >= eff_ent_begin_offset) && 
@@ -400,7 +417,7 @@ global_effect_translation(
 		{
 		    new_eff = 
 			make_simple_effect
-			(make_reference(new_ent, NIL), /* ??? memory leak */
+			(make_reference(new_ent, ind), /* ??? memory leak */
 			 make_action(action_tag(effect_action(ef)), UU), 
 			 make_approximation
 			 (approximation_tag(effect_approximation(ef)), UU));
@@ -410,7 +427,7 @@ global_effect_translation(
 		{						
 		    new_eff = 
 			make_simple_effect
-			(make_reference(new_ent, NIL), /* ??? memory leak */
+			(make_reference(new_ent, ind), /* ??? memory leak */
 			 make_action(action_tag(effect_action(ef)), UU), 
 			 make_approximation(is_approximation_may, UU));
 		}

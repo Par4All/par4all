@@ -2072,6 +2072,249 @@ list type_supporting_entities(list sel, type t)
   return sel;
 }
 
+/* Compute the list of references implied in the definition of a
+   type. This list is empty for basic types such as int or char. But
+   it increases rapidly with typedef, struct, union, bit and dimensions
+   which can use enum elements in sizing expressions. 
+
+   The supporting entities are gathered in an updated list, sel,
+   supporting reference list.
+
+   gen_recurse() does not follow thru entities because they are
+   tabulated and persistant.
+*/
+
+list functional_type_supporting_references(list srl, functional f)
+{
+  ifdebug(9) {
+    pips_debug(8, "Begin: ");
+    print_references(srl);
+    fprintf(stderr, "\n");
+  }
+
+  MAP(PARAMETER, p,
+      srl = type_supporting_references(srl, parameter_type(p)),
+      functional_parameters(f));
+
+  srl = type_supporting_references(srl, functional_result(f));
+
+  ifdebug(9) {
+    pips_debug(8, "End: ");
+    print_references(srl);
+    fprintf(stderr, "\n");
+  }
+
+  return srl;
+}
+
+list enum_supporting_references(list srl, entity e)
+{
+  type t = entity_type(e);
+  list ml = type_enum(t);
+  list cm = list_undefined;
+
+  pips_assert("type is of enum kind", type_enum_p(t));
+
+  ifdebug(9) {
+    pips_debug(8, "Begin: ");
+    print_references(srl);
+    fprintf(stderr, "\n");
+  }
+
+  for(cm = ml; !ENDP(cm); POP(cm)) {
+    entity m = ENTITY(CAR(cm));
+    value v = entity_initial(m);
+    symbolic s = value_symbolic(v);
+
+    pips_assert("m is an enum member", value_symbolic_p(v));
+
+    srl = constant_expression_supporting_references(srl, symbolic_expression(s));
+  }
+
+  ifdebug(9) {
+    pips_debug(8, "End: ");
+    print_references(srl);
+    fprintf(stderr, "\n");
+  }
+
+  return srl;
+}
+
+list constant_expression_supporting_references(list srl, expression e)
+{
+  syntax s = expression_syntax(e);
+
+  ifdebug(9) {
+    pips_debug(8, "Begin: ");
+    print_references(srl);
+    fprintf(stderr, "\n");
+  }
+
+  if(syntax_call_p(s)) {
+    call c = syntax_call(s);
+    entity f = call_function(c);
+
+    if(symbolic_constant_entity_p(f)) {
+      /* f cannot be declared directly, we need its enum */
+      extern entity find_enum_of_member(entity);
+      entity e_of_f = find_enum_of_member(f);
+      //srl = CONS(ENTITY, e_of_f, srl);
+      srl = enum_supporting_references(srl, e_of_f);
+    }
+
+    MAP(EXPRESSION, se, {
+      srl = constant_expression_supporting_references(srl, se);
+    }, call_arguments(c));
+  }
+  else if(syntax_reference_p(s)) {
+    reference r = syntax_reference(s);
+    list inds = reference_indices(r);
+    srl = gen_nconc(srl, CONS(REFERENCE, r, NIL));
+    MAP(EXPRESSION, se, {
+	srl = constant_expression_supporting_references(srl, se);
+      }, inds);
+  }
+  else {
+    /* do nothing for the time being... */
+    ;
+  }
+
+  ifdebug(9) {
+    pips_debug(8, "End: ");
+    print_references(srl);
+    fprintf(stderr, "\n");
+  }
+
+  return srl;
+}
+
+list symbolic_supporting_references(list srl, symbolic s)
+{
+  expression e = symbolic_expression(s);
+  srl = constant_expression_supporting_references(srl, e);
+  return srl;
+}
+
+list basic_supporting_references(list srl, basic b)
+{
+
+  ifdebug(9) {
+    pips_debug(8, "Begin: ");
+    print_references(srl);
+    fprintf(stderr, "\n");
+  }
+
+  if(basic_int_p(b) ||
+     basic_float_p(b) ||
+     basic_logical_p(b) ||
+     basic_overloaded_p(b) ||
+     basic_complex_p(b) ||
+     basic_string_p(b))
+    ;
+  else if(basic_bit_p(b))
+    srl = symbolic_supporting_references(srl, basic_bit(b));
+  else if(basic_pointer_p(b))
+    srl = type_supporting_references(srl, basic_pointer(b));
+  else if(basic_derived_p(b)) {
+    //srl = CONS(ENTITY, basic_derived(b), srl);
+    srl = type_supporting_references(srl, entity_type(basic_derived(b)));
+  }
+  else if(basic_typedef_p(b)) {
+    entity se = basic_typedef(b);
+    //srl = CONS(ENTITY, se, srl);
+    srl = type_supporting_references(srl, entity_type(se));
+  }
+  else
+    pips_internal_error("Unrecognized basic tag %d\n", basic_tag(b));
+ 
+  ifdebug(9) {
+    pips_debug(8, "End: ");
+    print_references(srl);
+    fprintf(stderr, "\n");
+  }
+
+  return srl;
+}
+
+list variable_type_supporting_references(list srl, variable v)
+{
+  basic b = variable_basic(v);
+  list dims = variable_dimensions(v);
+
+  ifdebug(9) {
+    pips_debug(8, "Begin: ");
+    print_references(srl);
+    fprintf(stderr, "\n");
+  }
+
+  MAP(DIMENSION, d, {
+    expression l = dimension_lower(d);
+    expression u = dimension_upper(d);
+    srl = constant_expression_supporting_references(srl, l);
+    srl = constant_expression_supporting_references(srl, u);
+  }, dims);
+
+  srl = basic_supporting_references(srl, b);
+
+  ifdebug(9) {
+    pips_debug(8, "End: ");
+    print_references(srl);
+    fprintf(stderr, "\n");
+  }
+
+  return srl;
+}
+
+list type_supporting_references(list srl, type t)
+{
+
+  ifdebug(9) {
+    pips_debug(8, "Begin: ");
+    print_references(srl);
+    fprintf(stderr, "\n");
+  }
+
+  if(type_functional_p(t))
+    srl = functional_type_supporting_references(srl, type_functional(t));
+  else if(type_variable_p(t))
+    srl = variable_type_supporting_references(srl, type_variable(t));
+  else if(type_varargs_p(t))
+    pips_user_warning("varargs case not implemented yet\n"); /* do nothing? */
+  else if(type_void_p(t))
+    ;
+  else if(type_struct_p(t)) {
+    list sse = type_struct(t);
+
+    MAP(ENTITY, se, {
+      srl = type_supporting_references(srl, entity_type(se));
+    }, sse);
+  }
+  else if(type_union_p(t)) {
+    list use = type_union(t);
+
+    MAP(ENTITY, se, {
+      srl = type_supporting_references(srl, entity_type(se));
+    }, use);
+  }
+  else if(type_enum_p(t)) {
+    list ese = type_enum(t);
+
+    MAP(ENTITY, se, {
+      srl = type_supporting_references(srl, entity_type(se));
+    }, ese);
+  }
+  else
+    pips_internal_error("Unexpected type with tag %d\n", type_tag(t));
+
+  ifdebug(9) {
+    pips_debug(8, "End: ");
+    print_references(srl);
+    fprintf(stderr, "\n");
+  }
+
+  return srl;
+}
+
 /* Check that an effective parameter list is compatible with a
    function type. Or improve the function type when it is not precise
    as with "extern int f()". This is (a bit/partially) redundant with

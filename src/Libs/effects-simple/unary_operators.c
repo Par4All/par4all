@@ -107,13 +107,40 @@ simple_effect_free(effect eff)
  }
 
 
-list 
-simple_effects_union_over_range(list l_eff,
-				entity i __attribute__ ((unused)),
-				range r __attribute__ ((unused)),
-				descriptor d __attribute__ ((unused)))
+list simple_effects_union_over_range(list l_eff,
+				     entity i,
+				     range r,
+				     descriptor d __attribute__ ((unused)))
 {
-  if (!get_bool_property("ONE_TRIP_DO"))
+  /* FI: effects in index and in in range must be taken into account. it
+     would be easier to have the loop proper effects as argument instead
+     of recomputing it. */
+  if(FALSE) {
+    list c_eff = list_undefined;
+    reference ref = make_reference(i, NIL);
+    cell c = make_cell_reference(ref);
+    effect i_eff = make_effect(c, make_action_write(), make_addressing_index(),
+			       make_approximation_must(), make_descriptor_none());
+
+    list r_eff_l = proper_effects_of_range(r);
+    list h_eff_l = CONS(EFFECT, i_eff, r_eff_l);
+    list ch_eff = list_undefined;
+
+    for(ch_eff=h_eff_l; !ENDP(ch_eff); POP(ch_eff)) {
+      effect h_eff = EFFECT(CAR(ch_eff));
+
+      for(c_eff = l_eff; !ENDP(c_eff); POP(c_eff)) {
+	effect eff = EFFECT(CAR(c_eff));
+
+	eff = effect_interference(eff, h_eff);
+
+	EFFECT_(CAR(c_eff)) = eff;
+      }
+    }
+
+    //gen_full_free_list(h_eff_l);
+  }
+ if (!get_bool_property("ONE_TRIP_DO"))
     {
       effects_to_may_effects(l_eff);
     }

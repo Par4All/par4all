@@ -1453,7 +1453,16 @@ void UseFormalArguments(entity f)
     list formals = NIL;
     string mn = string_undefined;
     extern list extract_references_from_declarations(list);
-    list refs =  extract_references_from_declarations(dl);
+    // This is a minimal list of references. We need all references.
+    //list refs1 =  extract_references_from_declarations(dl);
+    list refs =  declaration_supporting_references(dl);
+
+    ifdebug(8) {
+      int l2 = gen_length(refs);
+
+      pips_debug(8, "refs (%d elements):\n", l2);
+      print_references(refs);
+    }
 
     pips_assert("the value is code", value_code_p(fv));
 
@@ -1499,10 +1508,11 @@ void UseFormalArguments(entity f)
 	   references and not to copies... */
 	MAP(REFERENCE, r, {
 	    entity e = reference_variable(r);
+
 	    if(e==p) {
 	      reference_variable(r) = new_p;
-	      pips_debug(8, "reference to \"%s\" changed in reference to \"\%s\"\n",
-			 entity_name(p), entity_name(new_p));
+	      pips_debug(8, "reference %p to \"%s\" changed into reference to \"\%s\"\n",
+			 r, entity_name(p), entity_name(new_p));
 	    }
 	  }, refs);
 
@@ -1516,6 +1526,19 @@ void UseFormalArguments(entity f)
 	/* Let's hope there are no other pointers towards dummy formal parameters */
 	// free_entity(p); // FI: we may use them in the type data structures in spite of the MAP on refs? 
       }
+    }
+
+    ifdebug(1) {
+      /* Check substitution in formal parameter declarations */
+      refs =  declaration_supporting_references(dl);
+      MAP(REFERENCE, r, {
+	  entity v = reference_variable(r);
+	  if(dummy_parameter_entity_p(v)) {
+	    pips_debug(8, "Substitution failed for reference %p and variable \"%s\"\n",
+		       r, entity_name(v));
+	    pips_internal_error("Failed substitution\n");
+	  }
+	}, refs);
     }
 
     /* FI: just in case? */
