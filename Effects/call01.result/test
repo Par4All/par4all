@@ -41,7 +41,7 @@ Cumulated effects for "call01"
 
 //               <must be read   >: pi q
 //               <must be written>: pi
-//               <must be written - post>: (*pi) (*q)[2][4] (*q)[1]
+//               <must be written - post>: (*pi) (*q)[1] (*q)[2][4]
 void call01(int *pi, tf_t *q)
 {
 //               <must be read   >: pi
@@ -64,7 +64,7 @@ main()
 {
    int i;
    tf_t s;
-//               <must be written>: i s[2][4] s[1]
+//               <must be written>: i s[1] s[2][4]
 
    call01(&i, &s);
 }

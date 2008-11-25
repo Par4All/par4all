@@ -144,7 +144,8 @@ main()
 
 //  <d1-R-EXACT-{}>
 //  <d2-R-EXACT-{}>
-//  <y[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1+1<=d1, 0<=PHI2, PHI2+1<=d2}>
+//  <y[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1+1<=d1, 0<=PHI2, PHI2+1<=d2,
+//    d1==10, d2==10}>
 
 
    call04(d1, d2, y);

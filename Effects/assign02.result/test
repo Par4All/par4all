@@ -22,7 +22,7 @@ void assign02()
 {
    s_t s;
    int j;
-//               <must be written>: s[*]
+//               <must be written>: s
 
    s = make_s(1, 2.);
 //               <must be written>: s[1]
@@ -43,7 +43,7 @@ void assign02()
 {
    s_t s;
    int j;
-//               <must be written>: s[*]
+//               <must be written>: s
 
    s = make_s(1, 2.);
 //               <must be written>: s[1]

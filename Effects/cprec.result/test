@@ -1,3 +1,23 @@
+      SUBROUTINE VS
+      COMMON /COMPOSI/ JPOINT
+      COMMON /COMPOS/ EFF(401)
+C               <must be read   >: JPOINT
+C               <must be written>: EFF(JPOINT)
+
+      EFF(JPOINT) = 0.0                                                 0001
+
+      END
+C               <may be written >: EFF(*)
+C               <must be read   >: JPOINT
+      SUBROUTINE VS
+      COMMON /COMPOSI/ JPOINT
+      COMMON /COMPOS/ EFF(401)
+C               <may be written >: EFF(*)
+C               <must be read   >: JPOINT
+
+      EFF(JPOINT) = 0.0                                                 0001
+
+      END
       PROGRAM CPREC
 
 C     check that precondition holding on common variables

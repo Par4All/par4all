@@ -19,8 +19,12 @@ void call13(int nrec, int nsa, int ntt, Cplfloat ptrin[nrec][nsa], Cplfloat ptro
       for (j1 = 0;j1<ntt;j1++)
          for (j2 = 0;j2<nsa;j2++)
             for (k1 = 0;k1<ntt;k1++)
-               for (k2 = 0;k2<nsa;k2++)
+               for (k2 = 0;k2<nsa;k2++) {
                   R = ptrin[i+j1][j2].re*ptrin[i+k1][k2].re+ptrin[i+j1][j2].im*ptrin[i+k1][k2].im;
+                  I = -(ptrin[i+j1][j2].re*ptrin[i+k1][k2].im)+ptrin[i+j1][j2].im*ptrin[i+k1][k2].re;
+                  ptrout[i][j1][j2][k1][k2].re = R;
+                  ptrout[i][j1][j2][k1][k2].im = I;
+               }
 }
 
 Code for "call13"
@@ -43,8 +47,12 @@ void call13(int nrec, int nsa, int ntt, Cplfloat ptrin[nrec][nsa], Cplfloat ptro
       for(j1 = 0; j1 <= ntt-1; j1 += 1)
          for(j2 = 0; j2 <= nsa-1; j2 += 1)
             for(k1 = 0; k1 <= ntt-1; k1 += 1)
-               for(k2 = 0; k2 <= nsa-1; k2 += 1)
+               for(k2 = 0; k2 <= nsa-1; k2 += 1) {
                   R = ptrin[i+j1][j2].re*ptrin[i+k1][k2].re+ptrin[i+j1][j2].im*ptrin[i+k1][k2].im;
+                  I = -(ptrin[i+j1][j2].re*ptrin[i+k1][k2].im)+ptrin[i+j1][j2].im*ptrin[i+k1][k2].re;
+                  ptrout[i][j1][j2][k1][k2].re = R;
+                  ptrout[i][j1][j2][k1][k2].im = I;
+               }
 }
 
 Proper effects for "call13"
@@ -79,23 +87,36 @@ void call13(int nrec, int nsa, int ntt, Cplfloat ptrin[nrec][nsa], Cplfloat ptro
             for(k1 = 0; k1 <= ntt-1; k1 += 1)
 //               <must be read   >: nrec nsa ntt
 //               <must be written>: k2
-               for(k2 = 0; k2 <= nsa-1; k2 += 1)
+               for(k2 = 0; k2 <= nsa-1; k2 += 1) {
 //               <must be read   >: i j1 j2 k1 k2 nrec nsa ntt 
-//                                  ptrin[i+k1][k2][2] 
-//                                  ptrin[i+j1][j2][2] 
 //                                  ptrin[i+k1][k2][1] 
-//                                  ptrin[i+j1][j2][1]
+//                                  ptrin[i+j1][j2][1] 
+//                                  ptrin[i+k1][k2][2] 
+//                                  ptrin[i+j1][j2][2]
 //               <must be written>: R
                   R = ptrin[i+j1][j2].re*ptrin[i+k1][k2].re+ptrin[i+j1][j2].im*ptrin[i+k1][k2].im;
+//               <must be read   >: i j1 j2 k1 k2 nrec nsa ntt 
+//                                  ptrin[i+k1][k2][1] 
+//                                  ptrin[i+j1][j2][1] 
+//                                  ptrin[i+j1][j2][2] 
+//                                  ptrin[i+k1][k2][2]
+//               <must be written>: I
+                  I = -(ptrin[i+j1][j2].re*ptrin[i+k1][k2].im)+ptrin[i+j1][j2].im*ptrin[i+k1][k2].re;
+//               <must be read   >: R i j1 j2 k1 k2 nrec nsa ntt
+//               <must be written>: ptrout[i][j1][j2][k1][k2][1]
+                  ptrout[i][j1][j2][k1][k2].re = R;
+//               <must be read   >: I i j1 j2 k1 k2 nrec nsa ntt
+//               <must be written>: ptrout[i][j1][j2][k1][k2][2]
+                  ptrout[i][j1][j2][k1][k2].im = I;
+               }
 }
 
 Cumulated effects for "call13"
 
-//               <may be read    >: nsa ptrin[*][*][2] ptrin[*][*][1]
-//               <must be read   >: DUMMY-PARAMETER-138577896:nrec 
-//                                  DUMMY-PARAMETER-138577896:nsa 
-//                                  DUMMY-PARAMETER-138577896:ntt nrec
-//                                  nrec nsa ntt ntt
+//               <may be read    >: nsa ptrin[*][*][1] ptrin[*][*][2]
+//               <may be written >: ptrout[*][*][*][*][*][1] 
+//                                  ptrout[*][*][*][*][*][2]
+//               <must be read   >: nrec nrec nsa ntt ntt
 void call13(int nrec, int nsa, int ntt, Cplfloat ptrin[nrec][nsa], Cplfloat ptrout[nrec-ntt+1][ntt][nsa][ntt][nsa])
 {
    int i;
@@ -110,40 +131,58 @@ void call13(int nrec, int nsa, int ntt, Cplfloat ptrin[nrec][nsa], Cplfloat ptro
    R = 0.0;
 //               <must be written>: I
    I = 0.0;
-//               <may be read    >: i j1 j2 k1 k2 nsa ptrin[*][*][1] 
-//                                  ptrin[*][*][2]
-//               <may be written >: R j1 j2 k1 k2
+//               <may be read    >: I R i j1 j2 k1 k2 nsa 
+//                                  ptrin[*][*][1] ptrin[*][*][2]
+//               <may be written >: I R j1 j2 k1 k2 
+//                                  ptrout[*][*][*][*][*][1] 
+//                                  ptrout[*][*][*][*][*][2]
 //               <must be read   >: nrec ntt
 //               <must be written>: i
 
    for(i = 0; i <= nrec-ntt+1-1; i += 1)
-//               <may be read    >: i j1 j2 k1 k2 nsa ptrin[*][*][2] 
-//                                  ptrin[*][*][1]
-//               <may be written >: R j2 k1 k2
+//               <may be read    >: I R i j1 j2 k1 k2 nsa 
+//                                  ptrin[*][*][1] ptrin[*][*][2]
+//               <may be written >: I R j2 k1 k2 
+//                                  ptrout[*][*][*][*][*][1] 
+//                                  ptrout[*][*][*][*][*][2]
 //               <must be read   >: nrec ntt
 //               <must be written>: j1
       //    MOTIF     
       for(j1 = 0; j1 <= ntt-1; j1 += 1)
-//               <may be read    >: i j1 j2 k1 k2 ptrin[*][*][1] 
+//               <may be read    >: I R i j1 j2 k1 k2 ptrin[*][*][1] 
 //                                  ptrin[*][*][2]
-//               <may be written >: R k1 k2
+//               <may be written >: I R k1 k2 ptrout[*][*][*][*][*][1]
+//                                  ptrout[*][*][*][*][*][2]
 //               <must be read   >: nrec nsa ntt
 //               <must be written>: j2
          for(j2 = 0; j2 <= nsa-1; j2 += 1)
-//               <may be read    >: i j1 j2 k1 k2 ptrin[*][*][2] 
-//                                  ptrin[*][*][1]
-//               <may be written >: R k2
+//               <may be read    >: I R i j1 j2 k1 k2 ptrin[*][*][1] 
+//                                  ptrin[*][*][2]
+//               <may be written >: I R k2 ptrout[*][*][*][*][*][1] 
+//                                  ptrout[*][*][*][*][*][2]
 //               <must be read   >: nrec nsa ntt
 //               <must be written>: k1
             for(k1 = 0; k1 <= ntt-1; k1 += 1)
-//               <may be read    >: i j1 j2 k1 k2 ptrin[*][*][1] 
+//               <may be read    >: I R i j1 j2 k1 k2 ptrin[*][*][1] 
 //                                  ptrin[*][*][2]
-//               <may be written >: R
+//               <may be written >: I R ptrout[*][*][*][*][*][1] 
+//                                  ptrout[*][*][*][*][*][2]
 //               <must be read   >: nrec nsa ntt
 //               <must be written>: k2
-               for(k2 = 0; k2 <= nsa-1; k2 += 1)
-//               <may be read    >: ptrin[*][*][2] ptrin[*][*][1]
+               for(k2 = 0; k2 <= nsa-1; k2 += 1) {
+//               <may be read    >: ptrin[*][*][1] ptrin[*][*][2]
 //               <must be read   >: i j1 j2 k1 k2 nrec nsa ntt
 //               <must be written>: R
                   R = ptrin[i+j1][j2].re*ptrin[i+k1][k2].re+ptrin[i+j1][j2].im*ptrin[i+k1][k2].im;
+//               <may be read    >: ptrin[*][*][1] ptrin[*][*][2]
+//               <must be read   >: i j1 j2 k1 k2 nrec nsa ntt
+//               <must be written>: I
+                  I = -(ptrin[i+j1][j2].re*ptrin[i+k1][k2].im)+ptrin[i+j1][j2].im*ptrin[i+k1][k2].re;
+//               <may be written >: ptrout[*][*][*][*][*][1]
+//               <must be read   >: R i j1 j2 k1 k2 nrec nsa ntt
+                  ptrout[i][j1][j2][k1][k2].re = R;
+//               <may be written >: ptrout[*][*][*][*][*][2]
+//               <must be read   >: I i j1 j2 k1 k2 nrec nsa ntt
+                  ptrout[i][j1][j2][k1][k2].im = I;
+               }
 }

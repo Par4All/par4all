@@ -32,13 +32,13 @@ int struct06()
    };
    struct four x[10];
    int i = 0;
-//               <may be read    >: i x[*][*][*]
-//               <may be written >: x[*][*][*]
+//               <may be read    >: i x[*][2][2]
+//               <may be written >: x[*][1][1]
 //               <must be written>: i
 
    for(i = 0; i <= 9; i += 1)
-//               <may be read    >: x[*][*][*]
-//               <may be written >: x[*][*][*]
+//               <may be read    >: x[*][2][2]
+//               <may be written >: x[*][1][1]
 //               <must be read   >: i
       x[i].un.first = x[i].deux.second;
 }
@@ -76,6 +76,14 @@ Printed files after parallelization
 
 int struct06()
 {
+   struct three {
+      int first;
+      int second;
+   };
+   struct four {
+      struct three un;
+      struct three deux;
+   };
    struct four x[10];
    int i = 0;
 

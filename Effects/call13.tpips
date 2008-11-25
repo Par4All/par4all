@@ -19,7 +19,7 @@ echo Parsed code for "call13"
 echo
 
 display PARSED_PRINTED_FILE[call13]
-
+#quit
 echo
 echo Code for "call13"
 echo
@@ -57,7 +57,7 @@ echo
 
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[main]
-quit
+#quit
 echo
 echo Regions for "call13"
 echo

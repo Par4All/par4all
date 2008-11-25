@@ -39,7 +39,7 @@ void point_to04()
 
    p->d = p->a;
 //               <must be read   >: p
-//               <must be written - post>: (*p)[4] (*p)[1]
+//               <must be written - post>: (*p)[1] (*p)[4]
    p->d = p->a = 4;
 }
 
@@ -64,6 +64,6 @@ void point_to04()
 
    p->d = p->a;
 //               <must be read   >: p
-//               <must be written - post>: (*p)[4] (*p)[1]
+//               <must be written - post>: (*p)[1] (*p)[4]
    p->d = p->a = 4;
 }

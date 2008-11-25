@@ -43,7 +43,7 @@ Cumulated effects for "call03"
 //               <must be written>: TOP-LEVEL:pi
 //               <must be written - post>: (*TOP-LEVEL:pi)
 //                                  (*TOP-LEVEL:q)
-//                                  [2][4] (*TOP-LEVEL:q)[1]
+//                                  [1] (*TOP-LEVEL:q)[2][4]
 void call03()
 {
 //               <must be read   >: TOP-LEVEL:pi
@@ -68,6 +68,6 @@ main()
 //               <must be written>: TOP-LEVEL:pi
 //               <must be written - post>: (*TOP-LEVEL:pi)
 //                                  (*TOP-LEVEL:q)
-//                                  [2][4] (*TOP-LEVEL:q)[1]
+//                                  [1] (*TOP-LEVEL:q)[2][4]
    call03();
 }

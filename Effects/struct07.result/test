@@ -23,7 +23,7 @@ void struct07()
 
 Cumulated effetcs for "struct07"
 
-//               <may be written >: TOP-LEVEL:imageout[*][*][*]
+//               <may be written >: TOP-LEVEL:imageout[*][1][1]
 void struct07()
 {
    extern complex imagein[256][256];
@@ -36,11 +36,11 @@ void struct07()
    float z2;
    float x[256][256];
 //               <may be read    >: k z1
-//               <may be written >: TOP-LEVEL:imageout[*][*][*]
+//               <may be written >: TOP-LEVEL:imageout[*][1][1]
 //               <must be written>: k
 
    for(k = 0; k <= 255; k += 1)
-//               <may be written >: TOP-LEVEL:imageout[*][*][*]
+//               <may be written >: TOP-LEVEL:imageout[*][1][1]
 //               <must be read   >: k z1
       imageout[k][1].re = z1;
 //               <may be read    >: i j

@@ -17,13 +17,13 @@ void dereferencing06()
 {
    double x = 1.;
    double *p = &x;
-//               <must be read   >: p[0] p
+//               <must be read   >: p p[0]
 //               <must be written>: p
    
    /* This read has no effect unless p == 0 and the compiler does not optimize? */
    *p++;
 //               <must be read   >: p
-//               <must be written>: p[0] p
+//               <must be written>: p p[0]
    *p++ = 1;
 }
 
@@ -33,13 +33,13 @@ void dereferencing06()
 {
    double x = 1.;
    double *p = &x;
-//               <must be read   >: p[0] p
+//               <must be read   >: p p[0]
 //               <must be written>: p
    
    /* This read has no effect unless p == 0 and the compiler does not optimize? */
    *p++;
 //               <must be read   >: p
-//               <must be written>: p[0] p
+//               <must be written>: p p[0]
    *p++ = 1;
 }
 

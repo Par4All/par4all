@@ -1,36 +1,74 @@
 
 Parsed code for "call02"
 
-void call02(int i, int j)
+void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 {
    i = j+1;
+   y[i] = 0;
+   p->one = 1;
+   (p->two)[j] = 2.;
+   *q[i] = 3;
 }
 
 Code for "call02"
 
-void call02(int i, int j)
+void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 {
    i = j+1;
+   y[i] = 0;
+   p->one = 1;
+   (p->two)[j] = 2.;
+   *q[i] = 3;
 }
 
 Proper effects for "call02"
 
-void call02(int i, int j)
+void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 {
 //               <must be read   >: j
 //               <must be written>: i
    i = j+1;
+//               <must be read   >: i
+//               <must be written>: y[i]
+   y[i] = 0;
+//               <must be read   >: p
+//               <must be written - post>: (*p)[1]
+   p->one = 1;
+//               <must be read   >: j p
+//               <must be written - post>: (*p)[2][j]
+   (p->two)[j] = 2.;
+//               <must be read   >: i q[i]
+//               <must be written - pre>: *(q[i])
+   *q[i] = 3;
 }
 
 Cumulated effects for "call02"
 
-//               <must be read   >: j
+//               <may be read    >: q[*]
+//               <may be written >: y[*]
+//               <must be read   >: i j p
 //               <must be written>: i
-void call02(int i, int j)
+//               <may be written - pre >: *(q[*])
+//               <may be written - post >: (*p)[2][*]
+//               <must be written - post>: (*p)[1]
+void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 {
 //               <must be read   >: j
 //               <must be written>: i
    i = j+1;
+//               <may be written >: y[*]
+//               <must be read   >: i
+   y[i] = 0;
+//               <must be read   >: p
+//               <must be written - post>: (*p)[1]
+   p->one = 1;
+//               <must be read   >: j p
+//               <may be written - post >: (*p)[2][*]
+   (p->two)[j] = 2.;
+//               <may be read    >: q[*]
+//               <must be read   >: i
+//               <may be written - pre >: *(q[*])
+   *q[i] = 3;
 }
 
 Cumulated effects for "main"
@@ -39,9 +77,17 @@ main()
 {
    int a;
    int b;
-//               <must be read   >: a b
+   int x[10];
+   int *ap[10];
+   tf_t s;
+   tf_t *sp = &s;
+//               <may be read    >: ap[*]
+//               <must be read   >: a ap b sp x
+//               <may be written - pre >: *(ap[*])
+//               <may be written - post >: (*sp)[2][*]
+//               <must be written - post>: (*sp)[1]
 
-   call02(a, b);
+   call02(a, b, x, ap, sp);
 }
 
 Regions for "main"
@@ -50,25 +96,63 @@ main()
 {
    int a;
    int b;
+   int x[10];
+   int *ap[10];
+   tf_t s;
+   tf_t *sp = &s;
 
 //  <a-R-EXACT-{}>
+//  <a-W-EXACT-{}>
+//  <ap[PHI1]-R-MAY-{0<=PHI1, PHI1<=9}>
+//  <*(ap[PHI1])-W-MAY-{b==PHI1-1, 0<=PHI1, PHI1<=9}>
 //  <b-R-EXACT-{}>
+//  <sp-R-EXACT-{}>
+//  <sp-W-MAY-{}>
+//  <x[PHI1]-W-MAY-{b==PHI1-1, 0<=PHI1, PHI1<=9}>
 
 
-   call02(a, b);
+   call02(a, b, x, ap, sp);
 }
 
 Regions for "call02"
 
 
+//  <i-R-EXACT-{}>
 //  <i-W-EXACT-{}>
 //  <j-R-EXACT-{}>
+//  <p-R-EXACT-{}>
+//  <(*p)[PHI1][PHI2]-W-MAY-{1<=PHI1, PHI1<=2}>
+//  <q[PHI1]-R-MAY-{}>
+//  <*(q[PHI1])-W-MAY-{PHI1==j+1}>
+//  <y[PHI1]-W-MAY-{PHI1==j+1}>
 
-void call02(int i, int j)
+void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 {
 
 //  <i-W-EXACT-{}>
 //  <j-R-EXACT-{}>
 
    i = j+1;
+
+//  <i-R-EXACT-{}>
+//  <y[PHI1]-W-EXACT-{PHI1==i, i==j+1}>
+
+   y[i] = 0;
+
+//  <p-R-EXACT-{}>
+//  <(*p)[PHI1][PHI2]-W-EXACT-{PHI1==1, i==j+1}>
+
+   p->one = 1;
+
+//  <j-R-EXACT-{}>
+//  <p-R-EXACT-{}>
+//  <(*p)[PHI1][PHI2]-W-EXACT-{PHI1==2, PHI2==j, i==j+1}>
+
+   (p->two)[j] = 2.;
+
+//  <i-R-EXACT-{}>
+//  <q[PHI1]-R-EXACT-{PHI1==i}>
+//  <*(q[PHI1])-W-EXACT-{PHI1==i, i==j+1}>
+
+   *q[i] = 3;
 }
