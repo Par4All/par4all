@@ -173,7 +173,7 @@ type:
 
 tokens_list:
        token tokens_list                {
-                                           $$ = CONS(TOKEN, $1, $2);
+                                           $$ = CONS(TOKEN, (void*)$1, $2);
                                         }
      |                                  { $$ = NIL; }
 

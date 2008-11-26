@@ -489,6 +489,7 @@ void simd_loop_unroll(statement loop_statement, int rate)
 	instruction_block(statement_instruction(body)) = CONS(STATEMENT,
 							      transformed_stmt,
 							      body_block);
+    //free_statement(transformed_stmt);
     }
 
     /* Create loop and insert it in block */

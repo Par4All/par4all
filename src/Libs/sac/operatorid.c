@@ -65,7 +65,7 @@ static oper_id_mapping operators[] =
    { C_EQUAL_OPERATOR_NAME,             EQUAL_OPERATOR_TOK },
    { SIMD_PHI_NAME,                   PHI_TOK },
 
-   { NULL }
+   { NULL,                              UNKNOWN_TOK }
 };
 
 typedef struct {

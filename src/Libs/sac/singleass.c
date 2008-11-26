@@ -131,13 +131,13 @@ static void single_assign_statement(graph dg)
 	 MAP(CONFLICT, 
 	     c, 
 	 {
-	    reference r = effect_reference(conflict_sink(c));
+	    reference r = effect_any_reference(conflict_sink(c));
 	    int nbRef;
 
 	    //Consider only potential DU arcs (may or must does not matter) and do not consider
 	    // arrays
-	    if ((gen_length(reference_indices(effect_reference(conflict_source(c)))) != 0) ||
-                (gen_length(reference_indices(effect_reference(conflict_sink(c)))) != 0) ||
+	    if ((gen_length(reference_indices(effect_any_reference(conflict_source(c)))) != 0) ||
+                (gen_length(reference_indices(effect_any_reference(conflict_sink(c)))) != 0) ||
 	        !effect_write_p(conflict_source(c)) ||
 		!effect_read_p(conflict_sink(c)))
 	       continue;
@@ -174,8 +174,8 @@ static void single_assign_statement(graph dg)
 	    list lSuc;
 
 	    //do something only if we are sure to write
-	    if ((gen_length(reference_indices(effect_reference(conflict_source(c)))) != 0) ||
-                (gen_length(reference_indices(effect_reference(conflict_sink(c)))) != 0) ||
+	    if ((gen_length(reference_indices(effect_any_reference(conflict_source(c)))) != 0) ||
+                (gen_length(reference_indices(effect_any_reference(conflict_sink(c)))) != 0) ||
 	        !effect_write_p(conflict_source(c)) ||
 		!effect_must_p(conflict_source(c)) ||
 		!effect_read_p(conflict_sink(c)))
@@ -185,15 +185,15 @@ static void single_assign_statement(graph dg)
 	    if (0)
 	       continue;
 
-	    l = hash_get(toBeDone, effect_reference(conflict_source(c)));
-	    lSuc = hash_get(hashSuc, effect_reference(conflict_source(c)));
+	    l = hash_get(toBeDone, effect_any_reference(conflict_source(c)));
+	    lSuc = hash_get(hashSuc, effect_any_reference(conflict_source(c)));
 
 	    //If the sink reference has more than one incoming arc, do not change 
 	    //the variable name.
 	    //In this caeffect_entity(conflict_source(c))se, previous conflicts related to this reference are removed
 	    //from the work list, and the list is set to NIL in the work list: this way
 	    //it can be seen in later conflicts also.
-	    if ((int)hash_get(nbPred, effect_reference(conflict_sink(c))) > 1)
+	    if ((int)hash_get(nbPred, effect_any_reference(conflict_sink(c))) > 1)
 	    {
 	       if (l != HASH_UNDEFINED_VALUE)
 		  gen_free_list(l);
@@ -228,8 +228,8 @@ static void single_assign_statement(graph dg)
 	       }
 	    }
 
-	    hash_put(toBeDone, effect_reference(conflict_source(c)), l);
-            hash_put(hashSuc, effect_reference(conflict_source(c)), lSuc);
+	    hash_put(toBeDone, effect_any_reference(conflict_source(c)), l);
+            hash_put(hashSuc, effect_any_reference(conflict_source(c)), lSuc);
 	 },
 	     dg_arc_label_conflicts(successor_arc_label(suc)));
       },
@@ -253,8 +253,8 @@ static void single_assign_statement(graph dg)
 	    eSource = effect_entity(conflict_source(c));
 	    eSink = effect_entity(conflict_sink(c));
 
-            rSource = effect_reference(conflict_source(c));
-            rSink = effect_reference(conflict_sink(c));
+            rSource = effect_any_reference(conflict_source(c));
+            rSink = effect_any_reference(conflict_sink(c));
 
 	    // Get the successor
             successor suc = SUCCESSOR(CAR(lCurSuc));

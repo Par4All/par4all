@@ -14,6 +14,7 @@
 typedef dg_arc_label arc_label;
 typedef dg_vertex_label vertex_label;
 
+
 #include "graph.h"
 #include "ri-util.h"
 #include "text-util.h"
@@ -45,17 +46,13 @@ This function returns TRUE if the statement comment contains searched_string
 static bool check_if_statement_contains_comment(statement s, string searched_string)
 {
   string comments;
+  bool res = FALSE;
 
   if (!statement_with_empty_comment_p(s)) {
-    
-    comments = strdup(statement_comments(s));
-      
-    if (strstr(comments, searched_string) != NULL) {
-      return TRUE;
-    }
+    res = (strstr(statement_comments(s) , searched_string) != NULL);
   }
 
-  return FALSE;
+  return res;
 }
 
 /*

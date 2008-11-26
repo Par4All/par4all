@@ -233,6 +233,7 @@ static bool getSimdCommentNum(statement stat, int * num)
       }
       while (next_line != NULL);
     }
+    free(comments);
   }
 
   return res;
@@ -281,7 +282,7 @@ static list simdize_simple_statements_pass1(list seq, float * simdCost)
    reset_argument_info();
 
    // cons a NULL?
-   sinfo = sinfo_begin = CONS(STATEMENT_INFO, NULL, NIL);
+   sinfo = sinfo_begin = gen_statementInfo_cons( make_statementInfo(0,NULL), NIL);
 
    /* Traverse to list to group isomorphic statements */
    for( i = seq;
@@ -355,7 +356,7 @@ static list simdize_simple_statements_pass1(list seq, float * simdCost)
 	      (ind != CDR(group_last));
 	      ind = CDR(ind) )
 	 {
-	    CDR(sinfo) = CONS(STATEMENT_INFO, 
+	    CDR(sinfo) = gen_statementInfo_cons(
 			      make_nonsimd_statement_info(STATEMENT(CAR(ind))),
 			      NIL);
 	    sinfo = CDR(sinfo);
@@ -401,7 +402,7 @@ static list simdize_simple_statements_pass2(list seq, float * simdCost)
    //argument info dependencies are local to each sequence -> RESET
    reset_argument_info();
 
-   sinfo = sinfo_begin = CONS(STATEMENT_INFO, NULL, NIL);
+   sinfo = sinfo_begin = gen_statementInfo_cons( make_statementInfo(0,NULL), NIL); // CONS(STATEMENT_INFO, NULL, NIL);
 
    /* Traverse to list to group isomorphic statements */
    for( i = seq;
@@ -421,7 +422,7 @@ static list simdize_simple_statements_pass2(list seq, float * simdCost)
       group_matches = get_statement_matching_types(si);
       if (group_matches == NIL)
       {
-	 sinfo = CDR(sinfo) = CONS(STATEMENT_INFO,
+	 sinfo = CDR(sinfo) = gen_statementInfo_cons( // CONS(STATEMENT_INFO,
 				   make_nonsimd_statement_info(STATEMENT(CAR(i))),
 				   NIL);
 	 continue;
@@ -502,13 +503,13 @@ static list simdize_simple_statements_pass2(list seq, float * simdCost)
 }
 
 /*
-This function tries to simdize with two algorithms.
-
-simdize_simple_statements_pass1() attempts to simdize by grouping
-the statements that have the same simd number.
-
-simdize_simple_statements_pass2() attempts to simdize by grouping
-as many statements as possible together.
+ * This function tries to simdize with two algorithms.
+ *
+ * `simdize_simple_statements_pass1' attempts to simdize by grouping
+ * the statements that have the same simd number.
+ *
+ * `simdize_simple_statements_pass2' attempts to simdize by grouping
+ * as many statements as possible together.
  */
 static void simdize_simple_statements(statement s)
 {
@@ -529,15 +530,20 @@ static void simdize_simple_statements(statement s)
 
    seq = sequence_statements(instruction_sequence(statement_instruction(s)));
    copyseq = gen_copy_seq(seq);
+
    init_statement_matches_map(seq);
    init_statement_successors_map(seq);
 
+   /* we try the two available simdizing methods, 
+    * and choose the best according to their "SimDcost"
+    * that's why we work on copies 
+    */
    saveseq = simdize_simple_statements_pass1(seq, &saveSimdCost);
 
    newseq = simdize_simple_statements_pass2(copyseq, &newSimdCost);
 
-   //printf("opcode cost1 %f\n", saveSimdCost);
-   //printf("opcode cost2 %f\n", newSimdCost);
+   printf("opcode cost1 %f\n", saveSimdCost);
+   printf("opcode cost2 %f\n", newSimdCost);
 
    if((saveSimdCost >= 0.0001) && (newSimdCost >= 0.0001))
    {
@@ -563,18 +569,19 @@ static void simdize_simple_statements(statement s)
    free_statement_successors_map();
 }
 
+/*
+ * simple filter for `simdizer'
+ * Do not recurse through simple calls, for better performance 
+ */
 static bool simd_simple_sequence_filter(statement s)
 {
-   instruction i;
-
-   /* Do not recurse through simple calls, for better performance */ 
-   i = statement_instruction(s);
-   if (instruction_call_p(i))
-      return FALSE;
-   else
-      return TRUE;
+    return ! ( instruction_call_p( statement_instruction(s) ) ) ;
 }
 
+/*
+ * main entry function
+ * basically run `simdize_simple_statements' on all sequences
+ */
 bool simdizer(char * mod_name)
 {
    /* get the resources */

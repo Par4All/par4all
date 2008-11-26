@@ -76,6 +76,7 @@ static void simd_insert_statement(statement cs, statement stat)
 statement simd_atomize_this_expression(entity (*create)(entity, basic),
 				       expression e);
 
+#if 0
 static void simd_atomize_call(call c, statement cs)
 {
    MAP(EXPRESSION, ce,
@@ -97,6 +98,7 @@ static void simd_atomize_call(call c, statement cs)
       }
    }, call_arguments(c));
 }
+#endif
 
 static bool check_if_conv_stat(statement s)
 {

@@ -199,7 +199,38 @@ entity get_function_entity(string name)
 {
    entity e = module_name_to_entity(name);
    if (entity_undefined_p(e))
-      e = make_empty_subroutine(name);
+   {
+       e=FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,name);
+       type return_value = make_type_variable(make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NULL,NULL));
+       list head,tail = NIL;
+       head=CONS(PARAMETER,
+               make_parameter(
+                   make_type_variable(make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NULL,NULL)),
+                   make_mode_value(),
+                   make_dummy_unknown()
+               ),
+               tail
+       );
+       CONS(PARAMETER,
+               make_parameter(
+                   make_type_variable(make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NULL,NULL)),
+                   make_mode_value(),
+                   make_dummy_unknown()
+               ),
+               tail
+       );
+       CONS(PARAMETER,
+               make_parameter(
+                   make_type_variable(make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NULL,NULL)),
+                   make_mode_value(),
+                   make_dummy_unknown()
+               ),
+               tail
+       );
+       entity_type(e)       = make_type_functional(make_functional(head,return_value));
+       entity_storage(e)    =  make_storage_rom();
+       entity_initial(e)    = make_value_unknown();
+   }
    return e;
 }
 
@@ -248,7 +279,7 @@ bool analyse_reference(reference r, referenceInfo i)
 	      else
 	         return FALSE;
 
-	      referenceInfo_lExp(i) = CONS(EXPRESSION, expression_undefined, referenceInfo_lExp(i));
+	      referenceInfo_lExp(i) = CONS(EXPRESSION, copy_expression(exp)/*ression_undefined*/, referenceInfo_lExp(i));
 	   }
 	   // r is for exemple A(EXP + 3)(it is supported)
 	   // or A(EXP1 + EXP2)(it's not supported)
@@ -562,7 +593,7 @@ static string get_simd_vector_type(list lExp)
 	 {
 	    char * car;
 
-	    result = strdup(strstr(strdup(entity_name(basic_typedef(bas))), TYPEDEF_PREFIX) + 1);
+	    result = /*strdup(strstr(*/strdup(entity_name(basic_typedef(bas)))/*, TYPEDEF_PREFIX) + 1)*/;
 
             /* switch to upper cases... */
             for (car = result; *car; car++)
@@ -651,7 +682,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad)
    expression e;
    char functionName[30];
 
-   string lsType = get_simd_vector_type(args);
+   string lsType = local_name(get_simd_vector_type(args));
 
    /* the function should not be called with an empty arguments list */
    assert((argc > 1) && (args != NIL));
@@ -723,12 +754,12 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad)
 
 	 string realVectName = get_vect_name_from_data(argc, EXPRESSION(CAR(CDR(args))));
 
-	 if(strcmp(realVectName, lsType))
+	 if(strcmp(strchr(realVectName, MODULE_SEP)?local_name(realVectName):realVectName, lsType))
 	 {
-	    string temp = lsType;
+	    /*string temp = local_name(lsType);*/
 
 	    lsType = strdup(concatenate(realVectName,
-			     "_TO_", temp, (char *) NULL));
+			     "_TO_", /*temp*/lsType, (char *) NULL));
 	 }
 	 if(get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION"))
 	 {
@@ -837,15 +868,22 @@ static entity make_new_simd_vector(int itemSize, int nbItems, int basicTag)
    mod_ent = get_current_module_entity();
    num = (char*) malloc(32);
    sprintf(num, "_vec%i", number++);
-   name = strdup(concatenate(entity_local_name(mod_ent),
+   name = strdup(concatenate(/*entity_local_name(mod_ent),
+			     MODULE_SEP_STRING,*/ prefix, /*num, "_",*/ (char *) NULL));
+   string type_name = strdup(concatenate(name,"_struct", (char *) NULL));
+   string fullname = strdup(concatenate(entity_local_name(mod_ent),
 			     MODULE_SEP_STRING, prefix, num, (char *) NULL));
 
-   entity str_dec = FindOrCreateEntityFromLocalNameAndPrefix(strdup(prefix), TYPEDEF_PREFIX, FALSE);
+   entity str_type = FindOrCreateEntity(entity_local_name(mod_ent), type_name);
+   entity_type(str_type) =make_type_variable(make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE*4),NIL,NIL)); 
+
+   entity str_dec = FindOrCreateEntity(entity_local_name(mod_ent), name);
+   entity_type(str_dec) = entity_type(str_type);
 
    variable v = make_variable(make_basic_typedef(str_dec),NIL,NIL);
 
-   new_ent = make_entity(name,
-			 make_type_variable(v),
+   new_ent = make_entity(fullname,
+           make_type_variable( v ),
 			 storage_undefined,
 			 make_value(is_value_unknown, UU));
 
@@ -1063,14 +1101,14 @@ list make_simd_statements(list kinds, cons* first, cons* last)
    printf("make_simd_statements 1\n");
 
    if (first == last)
-      return CONS(STATEMENT_INFO,
+      return gen_statementInfo_cons(
 		  make_nonsimd_statement_info(STATEMENT(CAR(first))),
 		  NIL);
 
    printf("make_simd_statements 2\n");
 
    i = first;
-   all_instr = CONS(STATEMENT_INFO, NULL, NIL);
+   all_instr = gen_statementInfo_cons(make_statementInfo(0,NULL), NIL);
    instr = all_instr;
 
    type = OPCODECLASS(CAR(kinds));
@@ -1098,7 +1136,7 @@ list make_simd_statements(list kinds, cons* first, cons* last)
 	      (index < MAX_PACK) && (i != CDR(last));
 	      index++, i = CDR(i) )
 	 {
-	    CDR(instr) = CONS(STATEMENT_INFO, 
+	    CDR(instr) = gen_statementInfo_cons(
 			      make_nonsimd_statement_info(STATEMENT(CAR(i))),
 			      NIL);
 	    instr = CDR(instr);
@@ -1115,7 +1153,7 @@ list make_simd_statements(list kinds, cons* first, cons* last)
 	 }
 
          /* generate the statement information */
-	 CDR(instr) = CONS(STATEMENT_INFO, 
+	 CDR(instr) = gen_statementInfo_cons( 
 			   make_simd_statement_info(type, oc, args),
 			   NIL);
 	 instr = CDR(instr);
@@ -1325,7 +1363,7 @@ list generate_simd_code(list/* <statementInfo> */ sil, float * simdCost)
    list sl_begin; /* <statement> */
    list sl; /* <statement> */
 
-   sl = sl_begin = CONS(STATEMENT, NULL, NIL);
+   sl = sl_begin = gen_statementInfo_cons( make_statementInfo(0,NULL), NIL);
 
    gSimdCost = 0;
 
