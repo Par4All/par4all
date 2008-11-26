@@ -1,6 +1,6 @@
-# testing checkpoint
-# first run, create
-# second run, display
+
+
+
 
       SUBROUTINE BLA
       INTEGER K
@@ -94,5 +94,4 @@ C  P(J) {J==2}
       PRINT *, 'foo', 2                                                 0002
       CALL BLA                                                          0003
       END
-
 # done

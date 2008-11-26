@@ -26,7 +26,7 @@ B:Y, B:X
 1 actual arguments:
 syntax = X
 normalized = NORMALIZED UNDEFINED
-user error in summary_to_proper_effects: 
+user error in check_user_call_site: 
 Call to module B: insufficient number of actual arguments.
 user warning in set_debug_stack_pointer: debug level stack is set to 2
 user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module USER_ERROR02.
@@ -35,14 +35,12 @@ Module B selected
 Request: build resource PRINTED_FILE for module B.
   PRINT_CODE_CUMULATED_EFFECTS   building   PRINTED_FILE(B)
 PRINTED_FILE made for B.
-C               <may be read    >: __IO_EFFECTS:LUNS(*)
-C               <may be written >: __IO_EFFECTS:LUNS(*)
-C               <must be read   >: X Y
+C               <must be read   >: X Y __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
 
       SUBROUTINE B(X, Y)
-C               <may be read    >: __IO_EFFECTS:LUNS(*)
-C               <may be written >: __IO_EFFECTS:LUNS(*)
-C               <must be read   >: X Y
+C               <must be read   >: X Y __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
 
       PRINT *, X+Y                                                      0001
 

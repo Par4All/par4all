@@ -1,11 +1,9 @@
-C               <may be read    >: __IO_EFFECTS:LUNS(*)
-C               <may be written >: __IO_EFFECTS:LUNS(*)
-C               <must be read   >: X Y
+C               <must be read   >: X Y __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
 
       SUBROUTINE B(X, Y)
-C               <may be read    >: __IO_EFFECTS:LUNS(*)
-C               <may be written >: __IO_EFFECTS:LUNS(*)
-C               <must be read   >: X Y
+C               <must be read   >: X Y __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
 
       PRINT *, X+Y                                                      0001
 

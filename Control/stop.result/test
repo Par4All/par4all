@@ -1,9 +1,9 @@
-C               <may be read    >: __IO_EFFECTS:LUNS(*)
-C               <may be written >: __IO_EFFECTS:LUNS(*)
+C               <must be read   >: __IO_EFFECTS:LUNS(0)
+C               <must be written>: __IO_EFFECTS:LUNS(0)
 	PROGRAM ST
 C               <must be written>: I
       I = 1                                                             0001
-C               <may be read    >: __IO_EFFECTS:LUNS(*)
-C               <may be written >: __IO_EFFECTS:LUNS(*)
+C               <must be read   >: __IO_EFFECTS:LUNS(0)
+C               <must be written>: __IO_EFFECTS:LUNS(0)
       STOP                                                              0002
       END

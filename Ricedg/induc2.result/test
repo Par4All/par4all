@@ -1,4 +1,6 @@
---- Dependence graph for module INDUC2
+
+Dependence graph for module "INDUC2"
+
 
  **************** Effective Dependence Graph ****************
 
@@ -14,7 +16,9 @@
 		from <J-R-MUST> to <J-W-MUST> at levels  1 2
 
 ****************** End of Dependence Graph ******************
---- Dependence graph for module INDUC2
+
+Dependence graph for module "INDUC2"
+
 
  **************** Effective Dependence Graph ****************
 
@@ -28,5 +32,15 @@
 		from <J-W-MUST> to <J-R-MUST> at levels  1
 	03 --> 04 with conflicts
 		from <J-R-MUST> to <J-W-MUST> at levels  1 2
+	03 --> 03 with conflicts
+		from <A(J)-R-MUST> to <A(J)-W-MUST> at levels  1
+	03 --> 03 with conflicts
+		from <A(J-1)-R-MUST> to <A(J)-W-MUST> at levels  1
+	03 --> 03 with conflicts
+		from <A(J)-W-MUST> to <A(J)-R-MUST> at levels  1
+	03 --> 03 with conflicts
+		from <A(J)-W-MUST> to <A(J-1)-R-MUST> at levels  1
+	03 --> 03 with conflicts
+		from <A(J)-W-MUST> to <A(J)-W-MUST> at levels  1
 
 ****************** End of Dependence Graph ******************

@@ -2,7 +2,7 @@
 
 C     Check special case of unique successor
 
-      IF (NASS.EQ.157) GOTO 99994                                       0001
+      IF (NASS.EQ.157) GOTO 99992                                       0001
 c        false branch
       CONTINUE
 C     BEGIN BLOCK
@@ -10,7 +10,7 @@ C     BEGIN BLOCK
 
       RETURN
 C     END BLOCK
-99994 CONTINUE
+99992 CONTINUE
 c        true branch
       CONTINUE
       RETURN
@@ -29,7 +29,7 @@ C  T() {}
 
 C     Check special case of unique successor
 
-      IF (NASS.EQ.157) GOTO 99993                                       0001
+      IF (NASS.EQ.157) GOTO 99991                                       0001
 
 C  T() {}
 
@@ -49,7 +49,7 @@ C  T() {}
 
       RETURN
 C     END BLOCK
-99993 CONTINUE
+99991 CONTINUE
 
 C  T() {}
 

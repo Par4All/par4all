@@ -15,7 +15,7 @@ Ask for the parallelization of all the modules of the program with OpenMP output
 enum {N=9};
 typedef struct {float re; float im;} complex;
 complex imagein[N][N];
-extern int main(int, char *[]);
+extern int main(int argc, char *argv[]);
 int main(int argc, char *argv[])
 {
    int i;

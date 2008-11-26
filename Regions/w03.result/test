@@ -61,8 +61,8 @@ C               <must be written>: __IO_EFFECTS:LUNS(6)
 
       END
 # cumulated effects
-C               <may be read    >: __IO_EFFECTS:LUNS(*)
-C               <may be written >: __IO_EFFECTS:LUNS(*)
+C               <must be read   >: __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
       PROGRAM W03
 
       INTEGER I, N
@@ -86,22 +86,21 @@ C               <must be written>: I
 C               <must be written>: I
 
       I = 2                                                             0005
-C               <may be read    >: A(*) __IO_EFFECTS:LUNS(*)
-C               <may be written >: __IO_EFFECTS:LUNS(*)
-C               <must be read   >: I
-C               <must be written>: I
+C               <may be read    >: A(*)
+C               <must be read   >: I __IO_EFFECTS:LUNS(6)
+C               <must be written>: I __IO_EFFECTS:LUNS(6)
 
       DO WHILE (I.LT.N)                                                 0006
-C               <may be read    >: A(*) __IO_EFFECTS:LUNS(*)
-C               <may be written >: __IO_EFFECTS:LUNS(*)
-C               <must be read   >: I
+C               <may be read    >: A(*)
+C               <must be read   >: I __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
          PRINT *, A(I-1)                                                0007
 C               <must be read   >: I
 C               <must be written>: I
          I = I+1                                                        0008
       ENDDO
-C               <may be read    >: __IO_EFFECTS:LUNS(*)
-C               <may be written >: __IO_EFFECTS:LUNS(*)
+C               <must be read   >: __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
 
       PRINT *, 'bye'                                                    0009
 

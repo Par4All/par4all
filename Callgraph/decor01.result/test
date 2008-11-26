@@ -40,13 +40,11 @@ Call graph with proper effects
 
 Call graph with cumulated effects
 
-C               <may be read    >: __IO_EFFECTS:LUNS(*)
-C               <may be written >: __IO_EFFECTS:LUNS(*)
+C               <must be read   >: __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
  DECOR01
-C                   <may be read    >: __IO_EFFECTS:LUNS(*)
-C                   <may be written >: __IO_EFFECTS:LUNS(*)
-C                   <must be read   >: N X Y
-C                   <must be written>: N Z
+C                   <must be read   >: N X Y __IO_EFFECTS:LUNS(6)
+C                   <must be written>: N Z __IO_EFFECTS:LUNS(6)
      B
 
 Call graph with RW regions

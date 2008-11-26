@@ -3,7 +3,6 @@ Parsed printed file for all
 
 void bar(int i)
 {
-   extern void foo(int i);
    foo(i);
 
    if (i) {
@@ -32,8 +31,6 @@ static void foo(int i)
 }
 int main()
 {
-   extern void foo(int i);
-   extern void bar(int i);
    foo(3);
    bar(3);
 }
@@ -43,7 +40,6 @@ Printed file for all
 
 void bar(int i)
 {
-   extern void foo(int i);
    foo(i);
 
    if (i) {
@@ -72,8 +68,6 @@ static void foo(int i)
 }
 int main()
 {
-   extern void foo(int i);
-   extern void bar(int i);
    foo(3);
    bar(3);
 }
