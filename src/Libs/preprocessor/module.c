@@ -132,7 +132,7 @@ bool c_module_p(entity m)
 
 bool fortran_module_p(entity m)
 {
-  return language_module_p(m, PP_FORTRAN_ED);
+  return language_module_p(m, FORTRAN_FILE_SUFFIX);
 }
 
 /* Return a list of all variables and functions accessible somewhere in a module. */
