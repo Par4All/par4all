@@ -398,6 +398,7 @@ text text_transformer(transformer tran)
   boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
   string str_prefix;
   char crt_line[MAX_LINE_LENGTH];
+  extern string entity_minimal_name(entity);
 
   /* If in EMACS mode, does not add any separator line: */
   if (!get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES"))

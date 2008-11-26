@@ -56,6 +56,7 @@ relation_to_string(
 
 char * pips_user_value_name(entity e)
 {
+  extern string entity_minimal_name(entity);
     if(e == (entity) TCST) {
 	return "";
     }
@@ -69,6 +70,7 @@ char * pips_user_value_name(entity e)
 char * generic_value_name(entity e)
 {
   string n = string_undefined;
+  extern string entity_minimal_name(entity);
 
   if(e == (entity) TCST) {
     n = "";

@@ -648,6 +648,8 @@ static string string_identity(string s)
 
 void print_value_mappings()
 {
+  extern string entity_minimal_name(entity);
+
   (void) fprintf(stderr,"\nhash table value to name:\n");
   hash_table_fprintf(stderr, dump_value_name, string_identity,
 		     hash_value_to_name);
