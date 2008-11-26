@@ -24,15 +24,15 @@ main()
 
    ia = a;
 
-//  P(0`ia) {0`ia==0}
+//  P(ia) {ia==0}
 
    ib = b;
 
-//  P(0`ia,0`ib) {0`ia==0, 0`ib==1}
+//  P(ia,ib) {ia==0, ib==1}
 
    ic = c;
 
-//  P(0`ia,0`ib,0`ic) {0`ia==0, 0`ib==1, 0`ic==1}
+//  P(ia,ib,ic) {ia==0, ib==1, ic==1}
 
 
    t = ia+ib+ic;

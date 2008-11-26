@@ -53,17 +53,17 @@ int convold1(int X[13][13], int coeff[6], int i, int j)
 {
    int m;
    int res;
-//               <must be written>: 0`res
+//               <must be written>: res
    
    /* for  (m = 0; m<= 5; m++) */
 
    res = 0;
-//               <must be written>: 0`m
+//               <must be written>: m
    for(m = 0; m <= 5; m += 1)
-//               <must be read   >: X[i+m][j] coeff[m] i j 0`m 0`res
-//               <must be written>: 0`res
+//               <must be read   >: X[i+m][j] coeff[m] i j m res
+//               <must be written>: res
       res = res+coeff[m]*X[i+m][j];
-//               <must be read   >: 0`res
+//               <must be read   >: res
 
    return res;
 }
@@ -78,22 +78,22 @@ int convold1(int X[13][13], int coeff[6], int i, int j)
    int m;
    int res;
 
-//  T(0`res) {0`res==0}
+//  T(res) {res==0}
 
    
    /* for  (m = 0; m<= 5; m++) */
 
    res = 0;
 
-//  T(0`m,0`res) {res#init==0, 0<=0`m}
+//  T(m,res) {res#init==0, 0<=m}
 
    for(m = 0; m <= 5; m += 1)
 
-//  T(0`res) {0<=0`m, 0`m<=5}
+//  T(res) {0<=m, m<=5}
 
       res = res+coeff[m]*X[i+m][j];
 
-//  T() {0`m==6}
+//  T() {m==6}
 
 
    return res;
@@ -116,15 +116,15 @@ int convold1(int X[13][13], int coeff[6], int i, int j)
 
    res = 0;
 
-//  P(0`res) {0`res==0}
+//  P(res) {res==0}
 
    for(m = 0; m <= 5; m += 1)
 
-//  P(0`m,0`res) {0<=0`m, 0`m<=5}
+//  P(m,res) {0<=m, m<=5}
 
       res = res+coeff[m]*X[i+m][j];
 
-//  P(0`m,0`res) {0`m==6}
+//  P(m,res) {m==6}
 
 
    return res;
@@ -150,8 +150,8 @@ int convold1(int X[13][13], int coeff[6], int i, int j)
 
    for(m = 0; m <= 5; m += 1)
 
-//  <X[PHI1][PHI2]-R-EXACT-{i+0`m==PHI1, PHI2==j, 0<=0`m, 0`m<=5}>
-//  <coeff[PHI1]-R-EXACT-{PHI1==0`m, 0<=0`m, 0`m<=5}>
+//  <X[PHI1][PHI2]-R-EXACT-{i+m==PHI1, PHI2==j, 0<=m, m<=5}>
+//  <coeff[PHI1]-R-EXACT-{PHI1==m, 0<=m, m<=5}>
 
       res = res+coeff[m]*X[i+m][j];
 

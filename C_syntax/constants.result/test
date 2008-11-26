@@ -49,17 +49,17 @@ main()
 
    i = 015;
 
-//  P(0`i) {0`i==13}
+//  P(i) {i==13}
 
    // octal constant
    j = 0x1ae;
 
-//  P(0`i,0`j) {0`i==13, 0`j==430}
+//  P(i,j) {i==13, j==430}
 
    // hexadecimal
    k = 890L;
 
-//  P(0`i,0`j,0`k) {0`i==13, 0`j==430, 0`k==890}
+//  P(i,j,k) {i==13, j==430, k==890}
 
    // long constant
    l = i+j+k;
