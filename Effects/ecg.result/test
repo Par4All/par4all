@@ -1,4 +1,7 @@
 
+Proper effects for "FFT1"
+
+
 
       SUBROUTINE FFT1(S, F)
       INTEGER I, N
@@ -13,25 +16,9 @@ C               <must be written>: F(I)
       ENDDO
 
       END
-      PROGRAM PROCESS(SIG)
-      INTEGER F, N
-      PARAMETER(N=32768)
-      REAL SIG(N)
-      REAL SPECTRE(N)
-C               <may be read    >: SIGNAL
-C               <may be written >: SPECTRE(*)
 
-      CALL FFT1(SIGNAL, SPECTRE)                                        0001
-C               <must be written>: P
+Cumulated effects for "FFT1"
 
-      P = 0.                                                            0002
-C               <must be written>: F
-      DO F = 1, N                                                       0003
-C               <must be read   >: F P SPECTRE(F)
-C               <must be written>: P
-         P = P+SPECTRE(F)**2                                            0004
-      ENDDO
-      END
 
 
       SUBROUTINE FFT1(S, F)
@@ -48,13 +35,38 @@ C               <must be written>: F(I)
       ENDDO
 
       END
+
+Proper effects for "PROCESS"
+
       PROGRAM PROCESS(SIG)
       INTEGER F, N
       PARAMETER(N=32768)
       REAL SIG(N)
       REAL SPECTRE(N)
 C               <may be read    >: SIGNAL
-C               <may be written >: SPECTRE(*)
+C               <may be written >: SPECTRE
+
+      CALL FFT1(SIGNAL, SPECTRE)                                        0001
+C               <must be written>: P
+
+      P = 0.                                                            0002
+C               <must be written>: F
+      DO F = 1, N                                                       0003
+C               <must be read   >: F P SPECTRE(F)
+C               <must be written>: P
+         P = P+SPECTRE(F)**2                                            0004
+      ENDDO
+      END
+
+Cumulated effects for "PROCESS"
+
+      PROGRAM PROCESS(SIG)
+      INTEGER F, N
+      PARAMETER(N=32768)
+      REAL SIG(N)
+      REAL SPECTRE(N)
+C               <may be read    >: SIGNAL
+C               <may be written >: SPECTRE
 
       CALL FFT1(SIGNAL, SPECTRE)                                        0001
 C               <must be written>: P
