@@ -1849,6 +1849,8 @@ int number_of_fields(type t)
    first we keep all occurences to make sure the partial order
    between.entities is respected. */
 
+static set supporting_types = set_undefined;
+
 list functional_type_supporting_entities(list sel, functional f)
 {
   ifdebug(8) {
@@ -2083,6 +2085,7 @@ list type_supporting_entities(list sel, type t)
    gen_recurse() does not follow thru entities because they are
    tabulated and persistant.
 */
+static list recursive_type_supporting_references(list srl, type t);
 
 list functional_type_supporting_references(list srl, functional f)
 {
@@ -2093,10 +2096,10 @@ list functional_type_supporting_references(list srl, functional f)
   }
 
   MAP(PARAMETER, p,
-      srl = type_supporting_references(srl, parameter_type(p)),
+      srl = recursive_type_supporting_references(srl, parameter_type(p)),
       functional_parameters(f));
 
-  srl = type_supporting_references(srl, functional_result(f));
+  srl = recursive_type_supporting_references(srl, functional_result(f));
 
   ifdebug(9) {
     pips_debug(8, "End: ");
@@ -2169,6 +2172,8 @@ list constant_expression_supporting_references(list srl, expression e)
   else if(syntax_reference_p(s)) {
     reference r = syntax_reference(s);
     list inds = reference_indices(r);
+    /* Could be guarded so as not to be added twice. Guard might be
+       useless with because types are visited only once. */
     srl = gen_nconc(srl, CONS(REFERENCE, r, NIL));
     MAP(EXPRESSION, se, {
 	srl = constant_expression_supporting_references(srl, se);
@@ -2214,15 +2219,15 @@ list basic_supporting_references(list srl, basic b)
   else if(basic_bit_p(b))
     srl = symbolic_supporting_references(srl, basic_bit(b));
   else if(basic_pointer_p(b))
-    srl = type_supporting_references(srl, basic_pointer(b));
+    srl = recursive_type_supporting_references(srl, basic_pointer(b));
   else if(basic_derived_p(b)) {
     //srl = CONS(ENTITY, basic_derived(b), srl);
-    srl = type_supporting_references(srl, entity_type(basic_derived(b)));
+    srl = recursive_type_supporting_references(srl, entity_type(basic_derived(b)));
   }
   else if(basic_typedef_p(b)) {
     entity se = basic_typedef(b);
     //srl = CONS(ENTITY, se, srl);
-    srl = type_supporting_references(srl, entity_type(se));
+    srl = recursive_type_supporting_references(srl, entity_type(se));
   }
   else
     pips_internal_error("Unrecognized basic tag %d\n", basic_tag(b));
@@ -2265,53 +2270,65 @@ list variable_type_supporting_references(list srl, variable v)
   return srl;
 }
 
+static list recursive_type_supporting_references(list srl, type t)
+{
+  /* Do not recurse if this type has already been visited. */
+  if(!set_belong_p(supporting_types, t)) {
+    supporting_types = set_add_element(supporting_types, supporting_types, t);
+    ifdebug(9) {
+      pips_debug(8, "Begin: ");
+      print_references(srl);
+      fprintf(stderr, "\n");
+    }
+  
+    if(type_functional_p(t))
+      srl = functional_type_supporting_references(srl, type_functional(t));
+    else if(type_variable_p(t))
+      srl = variable_type_supporting_references(srl, type_variable(t));
+    else if(type_varargs_p(t))
+      pips_user_warning("varargs case not implemented yet\n"); /* do nothing? */
+    else if(type_void_p(t))
+      ;
+    else if(type_struct_p(t)) {
+      list sse = type_struct(t);
+
+      MAP(ENTITY, se, {
+	  srl = recursive_type_supporting_references(srl, entity_type(se));
+	}, sse);
+    }
+    else if(type_union_p(t)) {
+      list use = type_union(t);
+
+      MAP(ENTITY, se, {
+	  srl = recursive_type_supporting_references(srl, entity_type(se));
+	}, use);
+    }
+    else if(type_enum_p(t)) {
+      list ese = type_enum(t);
+
+      MAP(ENTITY, se, {
+	  srl = recursive_type_supporting_references(srl, entity_type(se));
+	}, ese);
+    }
+    else
+      pips_internal_error("Unexpected type with tag %d\n", type_tag(t));
+
+    ifdebug(9) {
+      pips_debug(8, "End: ");
+      print_references(srl);
+      fprintf(stderr, "\n");
+    }
+  }
+
+  return srl;
+}
+
 list type_supporting_references(list srl, type t)
 {
-
-  ifdebug(9) {
-    pips_debug(8, "Begin: ");
-    print_references(srl);
-    fprintf(stderr, "\n");
-  }
-
-  if(type_functional_p(t))
-    srl = functional_type_supporting_references(srl, type_functional(t));
-  else if(type_variable_p(t))
-    srl = variable_type_supporting_references(srl, type_variable(t));
-  else if(type_varargs_p(t))
-    pips_user_warning("varargs case not implemented yet\n"); /* do nothing? */
-  else if(type_void_p(t))
-    ;
-  else if(type_struct_p(t)) {
-    list sse = type_struct(t);
-
-    MAP(ENTITY, se, {
-      srl = type_supporting_references(srl, entity_type(se));
-    }, sse);
-  }
-  else if(type_union_p(t)) {
-    list use = type_union(t);
-
-    MAP(ENTITY, se, {
-      srl = type_supporting_references(srl, entity_type(se));
-    }, use);
-  }
-  else if(type_enum_p(t)) {
-    list ese = type_enum(t);
-
-    MAP(ENTITY, se, {
-      srl = type_supporting_references(srl, entity_type(se));
-    }, ese);
-  }
-  else
-    pips_internal_error("Unexpected type with tag %d\n", type_tag(t));
-
-  ifdebug(9) {
-    pips_debug(8, "End: ");
-    print_references(srl);
-    fprintf(stderr, "\n");
-  }
-
+  /* To avoid multiple recursion through the same type */
+  supporting_types = set_make(set_pointer);
+  srl = recursive_type_supporting_references(srl, t);
+  set_free(supporting_types);
   return srl;
 }
 

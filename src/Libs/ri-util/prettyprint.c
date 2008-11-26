@@ -3464,14 +3464,14 @@ text_named_module(
 	  /* Print function header if the current module is not a compilation unit*/
 	  ADD_SENTENCE_TO_TEXT(r,attach_head_to_sentence(sentence_head(name), module)); 
 	  ADD_SENTENCE_TO_TEXT(r,MAKE_ONE_WORD_SENTENCE(0,"{"));
-	  /* get the declarations when they are not located in the module statement. A.Mensi */
-	  /*
-	  if(ENDP(statement_declarations(stat))) {
+	  /* get the declarations for Fortran codes prettyrinted as C,
+	     as the declarations are not located in the module
+	     statement. A.Mensi */
+	  if(ENDP(statement_declarations(stat)) && fortran_module_p(module)) {
 	    list l = code_declarations(value_code(entity_initial(module)));
 	    
 	    MERGE_TEXTS(r,c_text_entities(module, l, INDENTATION));
 	  }
-	  */
 	}
     }
   

@@ -641,6 +641,8 @@ list declaration_supporting_references(list dl)
 {
   list srl = NIL;
 
+  /* FI: for efficiency, the type cache used in
+     type_supporting_references() should be moved up here */
   MAP(ENTITY, v, {
       type t = entity_type(v);
       /* FI: we should also look up the initial values */

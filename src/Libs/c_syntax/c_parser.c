@@ -395,7 +395,8 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
     ifdebug(2)
       {
 	pips_debug(2,"Module statement: \n");
-	print_statement(ModuleStatement);
+	print_statement_of_module(ModuleStatement, module_name);
+
 	pips_debug(2,"and declarations: ");
 	print_entities(statement_declarations(ModuleStatement));
 	if(!compilation_unit_p(module_name))

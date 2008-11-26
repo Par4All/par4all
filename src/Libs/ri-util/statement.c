@@ -1038,6 +1038,18 @@ void print_statement(statement s)
   debug_off();
 }
 
+void print_statement_of_module(statement s, string mn)
+{
+  if(entity_undefined_p(get_current_module_entity())) {
+    entity m = local_name_to_top_level_entity(mn);
+    set_current_module_entity(m);
+    print_statement(s);
+    reset_current_module_entity();
+  }
+  else
+    print_statement(s);
+}
+
 text statement_to_text(statement s)
 {
   text t = text_undefined;
