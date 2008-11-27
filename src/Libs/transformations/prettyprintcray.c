@@ -328,6 +328,7 @@ bool print_parallelizedcray_code(char *mod_name)
     string pp = strdup(get_string_property(PRETTYPRINT_PARALLEL));
     set_string_property(PRETTYPRINT_PARALLEL, "cray");
 
+    set_current_module_entity(module);
     mod_stat = (statement)
 	db_get_memory_resource(DBR_PARALLELIZED_CODE, mod_name, TRUE);
     
@@ -337,8 +338,6 @@ bool print_parallelizedcray_code(char *mod_name)
 
     init_rw_effects();
     rcumulated_effects_of_statement(mod_stat);
-
-    set_current_module_entity(module);
 
     debug_on("PRETTYPRINT_DEBUG_LEVEL");
 
