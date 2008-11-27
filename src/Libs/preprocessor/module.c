@@ -85,7 +85,8 @@ entity module_entity_to_compilation_unit_entity(entity m)
   if(compilation_unit_entity_p(m)) 
     cu = m;
   else {
-    string aufn = db_get_memory_resource(DBR_USER_FILE, entity_user_name(m), TRUE);
+    // string aufn = db_get_memory_resource(DBR_USER_FILE, entity_user_name(m), TRUE);
+    string aufn = db_get_memory_resource(DBR_USER_FILE, module_local_name(m), TRUE);
     string lufn = strrchr(aufn, '/')+1;
 
     if(lufn!=NULL) {
@@ -117,7 +118,9 @@ bool language_module_p(entity m, string lid)
   bool c_p = FALSE;
 
   if(entity_module_p(m)) {
-    string aufn = db_get_memory_resource(DBR_USER_FILE, entity_user_name(m), TRUE);
+    /* FI: does not work with static functions */
+    //string aufn = db_get_memory_resource(DBR_USER_FILE, entity_user_name(m), TRUE);
+    string aufn = db_get_memory_resource(DBR_USER_FILE, module_local_name(m), TRUE);
     string n = strstr(aufn, lid);
 
     c_p = (n!=NULL);
