@@ -639,8 +639,13 @@ list /* of effect */ make_effects_for_array_declarations(list refs)
   {  
     
     reference ref = REFERENCE(CAR(l1));
+    /* FI: in this context, I assume that eff is never returned undefined */
      eff = (*reference_to_effect_func)(ref,make_action(is_action_read, UU));
-    leff= CONS(EFFECT,eff,leff);
+     if(effect_undefined_p(eff)) {
+       pips_debug(8, "Reference to \"%s\" ignored\n", entity_name(reference_variable(ref)));
+     }
+     else
+       leff= CONS(EFFECT,eff,leff);
   },refs);
   
   
@@ -715,6 +720,7 @@ list summary_effects_from_declaration(string module_name __attribute__ ((unused)
       pips_debug(8, "Reference for variable \"%s\"\n",
 		 entity_name(reference_variable(r)));
       print_reference(r);
+      fprintf(stderr, "\n");
     }, refs);
   }
 

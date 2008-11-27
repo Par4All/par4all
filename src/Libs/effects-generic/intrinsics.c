@@ -1413,7 +1413,33 @@ static list rgs_effects(entity e, list args)
 {
   return any_rgs_effects( e, args, FALSE);
 }
+
+static entity dummy_c_io_ptr = entity_undefined;
 
+/* Intrinsics do not have formal parameters. This function returns a
+   char * needed to analyze calls to C IO functions. */
+static entity make_dummy_io_ptr()
+{
+  if(entity_undefined_p(dummy_c_io_ptr)) {
+    type pt = make_scalar_integer_type(1); /* char */
+    type t = make_type_variable(make_variable(make_basic_pointer(pt), NIL, NIL));
+ 
+   dummy_c_io_ptr =
+      make_entity(AddPackageToName(IO_EFFECTS_PACKAGE_NAME,
+				   IO_EFFECTS_PTR_NAME),
+		  t,
+		  make_storage(is_storage_ram,
+			       make_ram(global_name_to_entity(TOP_LEVEL_MODULE_NAME,
+							      IO_EFFECTS_PACKAGE_NAME),
+					global_name_to_entity(IO_EFFECTS_PACKAGE_NAME,
+							      STATIC_AREA_LOCAL_NAME),
+					0, NIL)),
+		  make_value_unknown());
+  }
+
+  return dummy_c_io_ptr;
+}
+
 static list effects_of_any_ioelem(expression exp, tag act, bool is_fortran)
 {
   list le = NIL;
@@ -1427,60 +1453,78 @@ static list effects_of_any_ioelem(expression exp, tag act, bool is_fortran)
     if(is_fortran)
       le = generic_proper_effects_of_any_lhs(exp);
     else { /* C language */
-      /* FI: short term simplification... We need pointers for side effects... */
-      syntax s = expression_syntax(exp);
+      /* FI: we lack information about the number of elements written */
+      /* This is not generic! */
+      entity ioptr = make_dummy_io_ptr();
+      reference r = make_reference(ioptr, CONS(EXPRESSION, make_unbounded_expression(), NIL));
+      effect eff = make_effect(make_cell_reference(r), make_action_write(), make_addressing_index(),
+			       make_approximation_may(), make_descriptor_none());
 
-      if(syntax_reference_p(s)) {
-	/* This is not possible as parameters are passed by value,
-	   except if an address is passed, for instance an array or a
-	   pointer */
-	reference r = syntax_reference(s);
-	entity v = reference_variable(r);
-	type t = entity_type(v);
-	type ut = ultimate_type(t); /* FI: is ultimate_type() enough? */
+      /* FI: this is really not generic! */
+      extern effect c_summary_effect_to_proper_effect(effect, expression);
+      effect n_eff = c_summary_effect_to_proper_effect(eff, exp);
+      /* FI: We also need the read effects implied by the evaluation
+	 of exp... but I do not know any function available to do
+	 that. generic_proper_effects_of_expression() is ging to
+	 return a bit too much. */
+      le = CONS(EFFECT, n_eff, NIL);
 
-	if(type_variable_p(ut)) {
-	  variable vt = type_variable(ut);
+      if(FALSE) {
+	/* FI: short term simplification... We need pointers for side effects... */
+	syntax s = expression_syntax(exp);
 
-	  if(!ENDP(variable_dimensions(vt))) {
-	    /* Fine, this is an array */
-	    le = generic_proper_effects_of_any_lhs(exp);
-	    /* Is it fully written? More information about the IO and
-	       about the array would be needed to make the
-	       decision...*/
-	    pips_assert("Only one effect for this reference?", gen_length(le)==1);
-	    effects_to_may_effects(le);
+	if(syntax_reference_p(s)) {
+	  /* This is not possible as parameters are passed by value,
+	     except if an address is passed, for instance an array or a
+	     pointer */
+	  reference r = syntax_reference(s);
+	  entity v = reference_variable(r);
+	  type t = entity_type(v);
+	  type ut = ultimate_type(t); /* FI: is ultimate_type() enough? */
+
+	  if(type_variable_p(ut)) {
+	    variable vt = type_variable(ut);
+
+	    if(!ENDP(variable_dimensions(vt))) {
+	      /* Fine, this is an array */
+	      le = generic_proper_effects_of_any_lhs(exp);
+	      /* Is it fully written? More information about the IO and
+		 about the array would be needed to make the
+		 decision...*/
+	      pips_assert("Only one effect for this reference?", gen_length(le)==1);
+	      effects_to_may_effects(le);
+	    }
+	    else if(basic_pointer_p(variable_basic(vt))) {
+	      /* This is going to be called for the FILE descriptors */
+	      /* pips_internal_error("Effects thru pointers not implemented yet"); */
+	      pips_user_warning("Effects thru pointers not implemented yet\n");
+	    }
+	    else
+	      pips_user_error("IO element update for \"\%s\": an address should be passed",
+			      entity_user_name(v));
 	  }
-	  else if(basic_pointer_p(variable_basic(vt))) {
-	    /* This is going to be called for the FILE descriptors */
-	    /* pips_internal_error("Effects thru pointers not implemented yet"); */
-	    pips_user_warning("Effects thru pointers not implemented yet\n");
-	  }
-	  else
-	    pips_user_error("IO element update for \"\%s\": an address should be passed",
+	  else {
+	    pips_user_error("IO element update for \"\%s\": incompatible type",
 			    entity_user_name(v));
+	  }
 	}
-	else {
-	  pips_user_error("IO element update for \"\%s\": incompatible type",
-			  entity_user_name(v));
-	}
-      }
-      else if(syntax_call_p(s)) {
-	call c = syntax_call(s);
-	entity op = call_function(c);
-	list nargs = call_arguments(c);
+	else if(syntax_call_p(s)) {
+	  call c = syntax_call(s);
+	  entity op = call_function(c);
+	  list nargs = call_arguments(c);
 
-	if(ENTITY_DEREFERENCING_P(op)) {
+	  if(ENTITY_DEREFERENCING_P(op)) {
 	    pips_internal_error("Effects thru dereferenced pointers not implemented yet");
-	}
-	if(ENTITY_ADDRESS_OF_P(op)) {
-	  expression e = EXPRESSION(CAR(nargs));
+	  }
+	  if(ENTITY_ADDRESS_OF_P(op)) {
+	    expression e = EXPRESSION(CAR(nargs));
 
-	  pips_assert("one argument", gen_length(nargs)==1);
-	  le = generic_proper_effects_of_any_lhs(e);
-	}
-	else {
-	  pips_internal_error("Operator \"\%s\" not handled\n", entity_name(op));
+	    pips_assert("one argument", gen_length(nargs)==1);
+	    le = generic_proper_effects_of_any_lhs(e);
+	  }
+	  else {
+	    pips_internal_error("Operator \"\%s\" not handled\n", entity_name(op));
+	  }
 	}
       }
     }

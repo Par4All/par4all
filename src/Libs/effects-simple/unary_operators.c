@@ -39,20 +39,91 @@ reference_effect_free(effect eff)
     free_effect(eff);
 }
 
-effect
-reference_to_simple_effect(reference ref, action ac)
+/* FI: this function is not that simple as it depends on the type of
+   the referenced variable and maybe of the action.
+
+   If s is a structure with a field a, it is called in the very same
+   way when a field is modified:
+
+   s.a = 1;
+
+   and when the whole structure is assigned:
+
+   s = s2;
+ */
+effect reference_to_simple_effect(reference ref, action ac)
 {
-/* It shoulb be this one, but it does not work. Maybe there is a clash with
+/* It should be this one, but it does not work. Maybe there is a clash with
    old uses of make_simple_effects. Or persistancy is not properly handled? 
    - bc.
 */
   /* FI: this should be revisited now that I have cleaned up a lot of
      the effects library to handled the two kinds of cells. */
   /* cell cell_ref = make_cell(is_cell_reference, copy_reference(ref)); */
-  cell cell_ref = make_cell_preference(make_preference(ref));
-  addressing ad = make_addressing_index();
-  approximation ap = make_approximation_must();
-  effect eff = make_effect(cell_ref, ac, ad, ap, make_descriptor_none());  
+
+  effect eff = effect_undefined;
+  list ind = reference_indices(ref);
+  type t = entity_type(reference_variable(ref));
+  type ut = ultimate_type(t);
+
+  pips_debug(8, "Begins for reference: \"%s\"\n", words_to_string(words_reference(ref)));
+
+  if(type_variable_p(ut)) {
+    variable utv = type_variable(ut);
+    list utd = variable_dimensions(utv);
+    //basic utb = variable_basic(utv);
+    bool is_array_p = !ENDP(utd);
+    variable tv = type_variable(t);
+    list td = variable_dimensions(tv);
+
+    /* The dimensions can be hidden in the typedef or before the typedef */
+    if(type_variable_p(t)) {
+      
+      is_array_p = is_array_p || (!ENDP(td));
+    }
+
+    if(is_array_p) {
+      if((gen_length(ind) == type_depth(t))) {
+	cell cell_ref = make_cell_preference(make_preference(ref));
+	addressing ad = make_addressing_index();
+	approximation ap = make_approximation_must();
+	eff = make_effect(cell_ref, ac, ad, ap, make_descriptor_none());
+      }
+      else if((gen_length(ind) < type_depth(t))) {
+	/* This may happen with an array of structures */
+	int d = (t==ut) ? gen_length(td) : gen_length(td)+gen_length(utd);
+	if(gen_length(ind)==d) {
+	  reference n_ref = copy_reference(ref);
+	  cell cell_ref = make_cell_reference(n_ref);
+	  addressing ad = make_addressing_index();
+	  approximation ap = make_approximation_must();
+	  eff = make_effect(cell_ref, ac, ad, ap, make_descriptor_none());
+	}
+      }
+      else {
+	/* The memory is not accessed because the array name is a
+	   constant. It can be used directly or the the base for some
+	   address computation. */
+	;
+      }
+    }
+    else {
+      /* It is not an array. Addressing is encoded in a different way
+	 for structures, unions and pointers. */
+      cell cell_ref = make_cell_preference(make_preference(ref));
+      addressing ad = make_addressing_index();
+      approximation ap = make_approximation_must();
+      eff = make_effect(cell_ref, ac, ad, ap, make_descriptor_none());
+    }
+  }
+  else if(type_functional_p(ut)) {
+    /* Must be a function used to initialize a pointer to a function */
+    ;
+  }
+  else {
+    pips_internal_error("Unexpected type\n");
+  }
+
   return eff;
 }
 

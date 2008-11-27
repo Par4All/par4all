@@ -477,6 +477,9 @@ translate_array_effect(entity called_func, list real_args, reference real_ref,
     Pvecteur ineq;			/* contrainte a tester: 
 					   size_formal+offset < size_real */
 
+    /* FI: why give up for two n-D arrays? Because there is no offset
+       to compute for the other dimensions, since there is no other
+       dimension, I guess. */
     if (formal_ndims >= real_ndims)
 	return(effect_undefined);
 
@@ -667,10 +670,13 @@ translate_effect(entity called_func, list real_args, reference real_ref,
     }
 
     if (real_effect == effect_undefined) {
+      int d = type_depth(entity_type(real_var));
+      list sl = make_unbounded_subscripts(d);
+
 	pips_debug(8," translation failed\n");
         /* translation failed; returns the whole real arg */
         real_effect = make_simple_effect
-	    (make_reference(real_var, NIL), /* ??? memory leak */
+	    (make_reference(real_var, sl), /* ??? memory leak */
 	     make_action(formal_tac, UU), 
 	     make_approximation(is_approximation_may, UU));				  
     }
@@ -897,8 +903,31 @@ effect effect_array_substitution(effect eff __attribute__ ((unused)),
 				 reference er __attribute__ ((unused)))
 {
   effect n_eff = effect_undefined;
+  entity av = reference_variable(er);
+  list aind = reference_indices(er);
+  int ad = type_depth(entity_type(av)); /* In general, do not use
+					   ultimate_type() with
+					   type_depth() */
+  int asn = gen_length(aind);
+  reference fr = effect_any_reference(eff);
+  entity fv = reference_variable(fr);
+  list find = reference_indices(fr);
+  int fsn = gen_length(find);
 
-  pips_internal_error("Not implemented yet\n");
+  if(asn+fsn==ad) {
+    reference n_ref = copy_reference(er);
+
+    reference_indices(n_ref) = gen_nconc(reference_indices(n_ref),
+					 gen_full_copy_list(find));
+    n_eff = make_effect(make_cell_reference(n_ref),
+			copy_action(effect_action(eff)),
+			copy_addressing(effect_addressing(eff)),
+			copy_approximation(effect_approximation(eff)),
+			make_descriptor_none());
+  }
+  else
+    pips_internal_error("Conversion of formal effect on \"%s\" into effect on \"%s\": "
+			"Not implemented yet\n", entity_name(fv), entity_name(av));
   return n_eff;
 }
 
@@ -995,6 +1024,8 @@ effect effect_array_address_substitution(effect eff,
 
 /* Substitute, it possible, the formal parameter in eff by its effective value */
 /* FI: Just starting... */
+/* FI: it might be better to return a list of effects including the
+   read implied by the evaluation of ep */
 effect c_summary_effect_to_proper_effect(effect eff,
 					 expression ep) /* effective parameter */
 {
@@ -1002,10 +1033,23 @@ effect c_summary_effect_to_proper_effect(effect eff,
   type ept = expression_to_type(ep);
   reference r = effect_any_reference(eff);
   entity fp = reference_variable(r);
+  int dim = 0;
+
+  /* This is going to fail in general: temporary fix for simple cases
+     only, with arrays, but not with structures I guess */
+  if(expression_reference_p(ep)) {
+    reference er = expression_reference(ep);
+    entity erv = reference_variable(er);
+    list erind = reference_indices(er);
+    type ervt = entity_type(erv);
+
+    /* Are we dealing with a pointer or with an array element? */
+    dim = type_depth(ervt) - gen_length(erind);
+  }
 
   /* FI: we probably need a more general definition of "pointer"
      type. A partialy indexed array is a pointer... */
-  if(pointer_type_p(ept)) {
+  if(pointer_type_p(ept) || dim>0) {
     syntax eps = expression_syntax(ep);
     if(syntax_reference_p(eps)) {
       reference er = syntax_reference(eps);

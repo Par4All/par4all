@@ -136,29 +136,26 @@ generic_proper_effects_of_range(range r)
 list 
 generic_proper_effects_of_lhs(reference ref)
 {    
-    list le = NIL;
-    list inds = reference_indices(ref);
-    transformer context = effects_private_current_context_head();
+  list le = NIL;
+  list inds = reference_indices(ref);
+  transformer context = effects_private_current_context_head();
 
 
-    pips_debug(3, "begin\n");
+  pips_debug(3, "begin\n");
 
-    if (! (*empty_context_test)(context))
-    {
-	le = CONS(EFFECT, 
-		  (*reference_to_effect_func)(ref,
-					      make_action(is_action_write, UU)),
-		  NIL);
+  if (! (*empty_context_test)(context)) {
+    effect eff = (*reference_to_effect_func)(ref, make_action_write());
+    le = effect_undefined_p(eff)? NIL : CONS(EFFECT, eff, NIL);
 
-	if (! ENDP(inds)) 
-	    le = gen_nconc(le, generic_proper_effects_of_expressions(inds));
+    if (! ENDP(inds)) 
+      le = gen_nconc(le, generic_proper_effects_of_expressions(inds));
 
-	(*effects_precondition_composition_op)(le, context);
-    } 
+    (*effects_precondition_composition_op)(le, context);
+  } 
 
   
-    pips_debug(3, "end\n");
-    return(le);
+  pips_debug(3, "end\n");
+  return(le);
 }
 
 static list generic_proper_effects_of_a_subscripted_lhs(reference ra, list inds, effect * pe)
@@ -972,7 +969,7 @@ list generic_proper_effects_of_address_expression(expression lhs, int write_p)
 
      /* Generate a proper decriptor in a generic way */
       ge = (*reference_to_effect_func)(r, write_p?make_action_write():make_action_read());
-      /* FI: memory leak of a CONS */
+      /* FI: memory leak of a CONS + ge may be undefined... */
       (*effects_precondition_composition_op)(CONS(EFFECT, ge, NIL), context);
       effect_addressing(ge) = copy_addressing(effect_addressing(e));
       effect_approximation(ge) = copy_approximation(effect_approximation(e));
@@ -1041,10 +1038,9 @@ generic_proper_effects_of_reference(reference ref)
     
     if (! (*empty_context_test)(context))
       {	
-	le = CONS(EFFECT, 
-		  (*reference_to_effect_func)(ref,
-					      make_action(is_action_read, UU)),
-		  NIL);
+	effect eff = (*reference_to_effect_func)(ref,
+						 make_action(is_action_read, UU));
+	le = effect_undefined_p(eff)? NIL : CONS(EFFECT, eff, NIL);
 
 	if (! ENDP(inds)) 
 	  le = gen_nconc(le, generic_proper_effects_of_expressions(inds));
