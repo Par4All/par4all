@@ -1,0 +1,26 @@
+void c_clean_declarations03(int x)
+{
+   int x;
+   int y;
+   extern  stderr();
+
+   if (x) {
+      int z;
+      float r = 1.2;
+      x += (int) r;
+   }
+   fprintf(stderr, "x=%dn", x);
+}
+void c_clean_declarations03(int x)
+{
+   int x;
+   int y;
+   extern  stderr();
+
+   if (x) {
+      int z;
+      float r = 1.2;
+      x += (int) r;
+   }
+   fprintf(stderr, "x=%dn", x);
+}

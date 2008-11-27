@@ -1,0 +1,30 @@
+void c_clean_declarations04(int x)
+{
+   int x;
+   int y = 0;
+   extern  stderr();
+
+   if (y) {
+      int x = y++;
+      int z;
+   }
+   else {
+      int z = y--;
+   }
+   fprintf(stderr, "x=%dn", x);
+}
+void c_clean_declarations04(int x)
+{
+   int x;
+   int y = 0;
+   extern  stderr();
+
+   if (y) {
+      int x = y++;
+      int z;
+   }
+   else {
+      int z = y--;
+   }
+   fprintf(stderr, "x=%dn", x);
+}

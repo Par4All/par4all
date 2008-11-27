@@ -1,0 +1,12 @@
+void c_clean_declarations02(int x)
+{
+   int y;
+   extern  stderr();
+   fprintf(stderr, "x=%dn", x);
+}
+void c_clean_declarations02(int x)
+{
+   int y;
+   extern  stderr();
+   fprintf(stderr, "x=%dn", x);
+}
