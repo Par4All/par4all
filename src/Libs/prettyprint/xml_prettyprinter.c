@@ -2384,35 +2384,23 @@ static void xml_Pattern_Paving(entity var, Pvecteur formal_parameters, list patt
       }
     }  
 }
-static void xml_TaskParameters(boolean assign_function, int code_tag, entity module, list pattern_region, Pvecteur paving_indices, string_buffer sb_result)
+
+
+static void xml_TaskParameter(boolean assign_function,boolean is_not_main_p, Variable var, Pvecteur formal_parameters, list pattern_region, Pvecteur paving_indices, string_buffer sb_result)
 {
+
+ list lr;
+ boolean effet_read = TRUE;
  
-  int ith;
-  int FormalParameterNumber = gen_length(module_formal_parameters(module));
-  Pvecteur formal_parameters = VECTEUR_NUL;
-  boolean effet_read = TRUE;
-  list lr;
-  boolean tp = FALSE;
-  
-  if (assign_function)
-    string_buffer_append_word("AssignParameters",sb_result);
-  else
-    string_buffer_append_word("TaskParameters",sb_result);
-  global_margin++;
-  
-  // Creation liste des parametres formels
-  for (ith=1;ith<=FormalParameterNumber;ith++) {
-    entity FormalArrayName = find_ith_formal_parameter(module,ith);
-    vect_add_elem (&formal_parameters,(Variable) FormalArrayName,VALUE_ONE);
-  }
-  
   for ( lr = pattern_region; !ENDP(lr); lr = CDR(lr))
     { 
       region reg = REGION(CAR(lr));
       reference ref = region_reference(reg);  
       entity v = reference_variable(ref);
-      tp = FALSE;
-      if ((code_tag == code_is_a_main || vect_coeff(v,formal_parameters) != 0) && vect_coeff(v,paving_indices) == 0) {
+      // pour les fonctions, on ecrit les parametres formels dans l'ordre
+      // pour le main, ordre des regions
+      if ((is_not_main_p && same_entity_p(v,var)) || (!is_not_main_p &&  vect_coeff(v,paving_indices) == 0)){
+	
 	effet_read = (region_read_p(reg))? TRUE: FALSE;
 	add_margin(global_margin,sb_result);
 	string_buffer_append(sb_result,
@@ -2439,6 +2427,43 @@ static void xml_TaskParameters(boolean assign_function, int code_tag, entity mod
 	  string_buffer_append_word("/TaskParameter",sb_result);
       }
     }
+}
+
+
+static void xml_TaskParameters(boolean assign_function, int code_tag, entity module, list pattern_region, Pvecteur paving_indices, string_buffer sb_result)
+{
+ 
+  int ith;
+  int FormalParameterNumber = gen_length(module_formal_parameters(module));
+  Pvecteur formal_parameters = VECTEUR_NUL;
+  entity FormalArrayName = entity_undefined;
+
+  if (assign_function)
+    string_buffer_append_word("AssignParameters",sb_result);
+  else
+    string_buffer_append_word("TaskParameters",sb_result);
+  global_margin++;
+  
+  // Creation liste des parametres formels
+  for (ith=1;ith<=FormalParameterNumber;ith++) {
+    FormalArrayName = find_ith_formal_parameter(module,ith);
+    vect_add_elem (&formal_parameters,(Variable) FormalArrayName,VALUE_ONE);
+  }
+
+  if (code_tag != code_is_a_main) {
+    // les parametres formels doivent etre introduits dans l'ordre.
+    for (ith=1;ith<=FormalParameterNumber;ith++) {
+      FormalArrayName = find_ith_formal_parameter(module,ith);
+  
+      xml_TaskParameter(assign_function,TRUE,FormalArrayName,
+			formal_parameters,pattern_region,paving_indices,sb_result);
+   
+    }
+  }
+  else   xml_TaskParameter(assign_function,FALSE,FormalArrayName,
+			   formal_parameters,pattern_region,paving_indices,sb_result);
+
+
   global_margin--;
   if (assign_function)
     string_buffer_append_word("/AssignParameters",sb_result);
@@ -2447,16 +2472,69 @@ static void xml_TaskParameters(boolean assign_function, int code_tag, entity mod
 }
 
 
+boolean  eval_linear_expression(expression exp, Psysteme ps, int *val)
+{
+  normalized norm= normalized_undefined;
+  Pvecteur   vexp,pv;
+  boolean result = TRUE;
+  *val = 0;
 
-static void xml_Bounds(expression elow, expression eup,string_buffer sb_result)
+  fprintf(stdout,"Expression a evaluer : %s",words_to_string(words_expression(exp)));
+  
+  if (expression_normalized(exp) == normalized_undefined) 
+    expression_normalized(exp)= NormalizeExpression(exp); 
+  norm = expression_normalized(exp);
+  if (normalized_linear_p(norm) && !SC_UNDEFINED_P(ps)) {
+    vexp = (Pvecteur)normalized_linear(norm);
+    for (pv= vexp; pv != VECTEUR_NUL; pv=pv->succ) {
+      Variable v = var_of(pv);
+      if (v==TCST) {
+	*val += vect_coeff(TCST,vexp);
+      }
+      else {
+	if(base_contains_variable_p(sc_base(ps), v)) {  
+	  Value min, max;
+	  Psysteme ps1 = sc_dup(ps);
+	  bool  feasible = sc_minmax_of_variable2(ps1, (Variable)v, &min, &max);
+	  if (feasible && value_eq(min,max)) {
+	    *val += vect_coeff(v,vexp) *min;
+	  }
+	  else {
+	    fprintf(stdout,"le systeme est non faisable\n");
+	    result = FALSE;
+	  }
+	}
+	else {
+	  fprintf(stdout,"Je n'ai pas trouve la variable dans les preconditions\n");
+	  vect_fprint(stdout,sc_base(ps), entity_global_name);
+	  fprintf(stdout,"A comparer avec Variable %s\n",entity_global_name(v));
+	  result = FALSE;
+	}
+      }	
+    }
+  }
+  else {
+    fprintf(stdout,"Ce n'est pas une expression lineaire\n");
+	 result = FALSE;
+  }
+  fprintf(stdout,"Valeur trouvee : %d \n",*val);
+  
+  return result;
+}
+
+static void xml_Bounds(expression elow, expression eup,Psysteme prec, string_buffer sb_result)
 {
   int low,up;
+  int valr =0;
   string_buffer_append_word("LowerBound",sb_result);
   global_margin++;
   string_buffer_append_symbolic(words_to_string(words_syntax(expression_syntax(elow))),
 				sb_result);     
   if (expression_integer_value(elow, &low))  
     string_buffer_append_numeric(i2a(low),sb_result);
+  else if (eval_linear_expression(elow,prec,&valr))
+    string_buffer_append_numeric(i2a(valr),sb_result);
+  
   global_margin--;
   string_buffer_append_word("/LowerBound",sb_result);
     
@@ -2467,28 +2545,34 @@ static void xml_Bounds(expression elow, expression eup,string_buffer sb_result)
 				sb_result);     
   if (expression_integer_value(eup, &up))  
     string_buffer_append_numeric(i2a(up),sb_result);
+  else if (eval_linear_expression(eup,prec,&valr))
+    string_buffer_append_numeric(i2a(valr),sb_result);
+
   global_margin--;
   string_buffer_append_word("/UpperBound",sb_result);
-     
+  
 }
 static void xml_Bounds_and_Stride(expression elow, expression eup, expression stride, 
-				  string_buffer sb_result)
+				  Psysteme prec, string_buffer sb_result)
 {
   int inc;
- 
-  xml_Bounds(elow, eup,sb_result);
+  int  valr =0;
+  xml_Bounds(elow, eup,prec,sb_result);
   string_buffer_append_word("Stride",sb_result);
   global_margin++;
   string_buffer_append_symbolic(words_to_string(words_syntax(expression_syntax(stride))),
 				sb_result);     
   if (expression_integer_value(stride, &inc))  
     string_buffer_append_numeric(i2a(inc),sb_result);
+  else if (eval_linear_expression(stride,prec,&valr))
+     string_buffer_append_numeric(i2a(valr),sb_result);
+ 
   global_margin--;
   string_buffer_append_word("/Stride",sb_result);
     
 }
 
-static void xml_Array(entity var,string_buffer sb_result)
+static void xml_Array(entity var,Psysteme prec,string_buffer sb_result)
 {
   string datatype;
   list ld, ldim = variable_dimensions(type_variable(entity_type(var)));
@@ -2497,7 +2581,6 @@ static void xml_Array(entity var,string_buffer sb_result)
   char* layout_up[nb_dim];    
   char *layout_low[nb_dim];
   int no_dim=0;
-    
   add_margin(global_margin,sb_result);
   string_buffer_append(sb_result,
 		       strdup(concatenate(OPENANGLE, 
@@ -2538,7 +2621,7 @@ static void xml_Array(entity var,string_buffer sb_result)
 					      NL, NULL)));
       /* Print XML Array Bound */
       global_margin++;
-      xml_Bounds(elow,eup,sb_result);
+      xml_Bounds(elow,eup,prec,sb_result);
       global_margin--;
       add_margin(global_margin,sb_result);
       string_buffer_append(sb_result,
@@ -2591,7 +2674,7 @@ static void xml_Array(entity var,string_buffer sb_result)
 }
 
 
-static void xml_LocalArrays(entity module, string_buffer sb_result)
+static void xml_LocalArrays(entity module, Psysteme prec,string_buffer sb_result)
 {
  list ldecl;
  int nb_dim=0;
@@ -2612,7 +2695,7 @@ static void xml_LocalArrays(entity module, string_buffer sb_result)
       if (type_variable_p(entity_type(var)) 
 	  && ((nb_dim = variable_entity_dimension(var))>0)
 	  &&  !(storage_formal_p(entity_storage(var)))) {
-	xml_Array(var,sb_result);
+	xml_Array(var,prec,sb_result);
       }
     },ldecl);
 
@@ -2626,7 +2709,7 @@ static void xml_LocalArrays(entity module, string_buffer sb_result)
 
 // A completer
 // Ne faire qu'une fonction avec la precedente
-static void xml_FormalArrays(entity module, string_buffer sb_result)
+static void xml_FormalArrays(entity module, Psysteme prec,string_buffer sb_result)
 {
   list ldecl;
   int nb_dim=0;
@@ -2646,7 +2729,7 @@ static void xml_FormalArrays(entity module, string_buffer sb_result)
       if (type_variable_p(entity_type(var)) 
 	  && ((nb_dim = variable_entity_dimension(var))>0) 
 	  &&  storage_formal_p(entity_storage(var))) {
-	xml_Array(var,sb_result);
+	xml_Array(var,prec,sb_result);
       }
     },ldecl);
 
@@ -2673,7 +2756,9 @@ static void box_in_statement(statement s)
 
 static void xml_Loop(statement s, string_buffer sb_result)
 {
-  loop l = instruction_loop(statement_instruction(s));
+  loop l = instruction_loop(statement_instruction(s)); 
+  transformer t = load_statement_precondition(s);
+  Psysteme prec = sc_dup((Psysteme) predicate_system(transformer_relation(t)));
   expression el =range_lower(loop_range(l));
   expression eu =range_upper(loop_range(l));
   expression stride = range_increment(loop_range(l)); 
@@ -2687,7 +2772,7 @@ static void xml_Loop(statement s, string_buffer sb_result)
 					  (execution_parallel_p(loop_execution(l)))? "PARALLEL":"SEQUENTIAL", 
 					  QUOTE, 
 					  CLOSEANGLE,NL,NULL)));
-  xml_Bounds_and_Stride(el,eu,stride,sb_result);
+  xml_Bounds_and_Stride(el,eu,stride,prec,sb_result);
   string_buffer_append_word("/Loop",sb_result);
 }
 
@@ -2751,6 +2836,28 @@ static void xml_Loops(stack st,boolean call_external_loop_p, list *pattern_regio
   
 }
 
+static Psysteme first_precondition_of_module(string module_name)
+{
+  statement st1 = get_current_module_statement();
+  statement st2 = statement_undefined;
+  instruction inst = statement_instruction(st1);
+  transformer t;
+  Psysteme prec= SC_UNDEFINED;
+  switch instruction_tag(inst)
+    {
+    case is_instruction_sequence:{
+      st2 = STATEMENT(CAR(sequence_statements(instruction_sequence(inst))));
+       printf("sequence: 1er instruction statement: \n");
+     print_text(stdout, text_statement(entity_undefined, 0, st2));
+      break;
+    }
+    default:
+      prec= SC_UNDEFINED;
+    }
+  t = (transformer)load_statement_precondition(st2);
+  prec = sc_dup((Psysteme) predicate_system(transformer_relation(t)));
+  return prec;
+}
 static void  xml_Task(string module_name, int code_tag,string_buffer sb_result)
 {
   nest_context_t task_loopnest;
@@ -2766,6 +2873,7 @@ static void  xml_Task(string module_name, int code_tag,string_buffer sb_result)
   Pvecteur pattern_indices = VECTEUR_NUL;
   boolean motif_in_te_p = FALSE;
   entity module = module_name_to_entity(module_name);
+  Psysteme prec;
 
   string string_sb_result;
   statement stat_module=(statement) db_get_memory_resource(DBR_CODE, 
@@ -2776,6 +2884,9 @@ static void  xml_Task(string module_name, int code_tag,string_buffer sb_result)
      db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
 
   push_current_module_statement(stat_module);
+  prec = first_precondition_of_module(module_name);
+  printf("first_precondition_of_module %s\n",module_name);
+  sc_fprint(stdout,prec,entity_local_name);
   global_margin++;
   add_margin(global_margin,sb_result);
   string_buffer_append(sb_result,
@@ -2790,8 +2901,8 @@ static void  xml_Task(string module_name, int code_tag,string_buffer sb_result)
   xml_Library(sb_result);
   xml_Returns(sb_result);
   xml_Timecosts(sb_result);
-  xml_LocalArrays(module, sb_result);
-  xml_FormalArrays(module,sb_result);
+  xml_LocalArrays(module, prec,sb_result);
+  xml_FormalArrays(module,prec,sb_result);
   /*  On ne traite qu'une TE : un seul nid de boucles */
   nested_loops = gen_array_item(task_loopnest.nested_loops,0); 
 
@@ -2821,7 +2932,7 @@ static void  xml_Task(string module_name, int code_tag,string_buffer sb_result)
 }
 
 
-static void xml_ActualArrays(entity module, string_buffer sb_result)
+static void xml_ActualArrays(entity module, Psysteme prec,string_buffer sb_result)
 { 
   int nb_dim =0;
   list ldecl;
@@ -2841,7 +2952,7 @@ static void xml_ActualArrays(entity module, string_buffer sb_result)
     MAP(ENTITY,var, {
       if (type_variable_p(entity_type(var)) 
 	  && (nb_dim = variable_entity_dimension(var))>0) {
-	xml_Array(var,sb_result);
+	xml_Array(var,prec,sb_result);
       }
     },ldecl);
     global_margin--;
@@ -2850,12 +2961,12 @@ static void xml_ActualArrays(entity module, string_buffer sb_result)
   global_margin--;
 }
 
-static void  xml_LocalArrays_for_Box(string_buffer sb_result)
+static void  xml_LocalArrays_for_Box(Psysteme prec,string_buffer sb_result)
 { 
   string_buffer_append_word("LocalArrays/",sb_result); 
   
 }
-static void  xml_FormalArrays_for_Box(string_buffer sb_result)
+static void  xml_FormalArrays_for_Box(Psysteme prec,string_buffer sb_result)
 {
   string_buffer_append_word("FormalArrays/",sb_result); 
 }
@@ -2998,7 +3109,7 @@ int find_rw_effect_for_entity(list leff, effect *eff, entity e)
 
 
 
-static void  xml_Arguments(statement s, entity function, Pvecteur loop_indices, string_buffer sb_result )
+static void  xml_Arguments(statement s, entity function, Pvecteur loop_indices, Psysteme prec, string_buffer sb_result )
 {
   call c = instruction_call(statement_instruction(s));
   list call_effect =load_proper_rw_effects_list(s);
@@ -3009,6 +3120,7 @@ static void  xml_Arguments(statement s, entity function, Pvecteur loop_indices, 
   int iexp,ith=0;
   int rw_ef=0;
   string aan ="";
+  int valr  ;
 
   //   printf("xml_Arguments statement: \n");
   //   print_statement(s);
@@ -3020,6 +3132,7 @@ static void  xml_Arguments(statement s, entity function, Pvecteur loop_indices, 
     ith ++; 
     FormalArrayName = find_ith_formal_parameter(call_function(c),ith);
     sr = expression_syntax(exp);
+    
     if (syntax_reference_p(sr)) {
       ActualRef = syntax_reference(sr);
       ActualArrayName = reference_variable(ActualRef);
@@ -3044,9 +3157,11 @@ static void  xml_Arguments(statement s, entity function, Pvecteur loop_indices, 
 					      QUOTE,BL,
 					      "FormalName=", QUOTE,entity_user_name(FormalArrayName), QUOTE,BL,
 					      "AccessMode=",QUOTE,(rw_ef==2)? "DEF":"USE", QUOTE,CLOSEANGLE,
-					      NL, NULL)));         
+					      NL, NULL)));
       if (expression_integer_value(exp, &iexp))  
 	string_buffer_append_numeric(i2a(iexp),sb_result);
+      else if (eval_linear_expression(exp,prec,&valr))
+    	string_buffer_append_numeric(i2a(valr),sb_result);
       string_buffer_append_word("/ScalarArgument",sb_result);    
       global_margin--;
     }
@@ -3102,13 +3217,16 @@ static void xml_Call(entity module,  int code_tag,int taskNumber, nest_context_p
   Pvecteur paving_indices = VECTEUR_NUL;
   Pvecteur pattern_indices = VECTEUR_NUL;
   boolean motif_in_te_p=FALSE;
- 
- add_margin(global_margin,sb_result);
+  transformer t = load_statement_precondition(s);
+  Psysteme prec = sc_dup((Psysteme) predicate_system(transformer_relation(t)));
+  
+  add_margin(global_margin,sb_result);
   string_buffer_append(sb_result,
 		       strdup(concatenate(OPENANGLE, 
 					  "Call Name=", 
 					  QUOTE,
-					  ENTITY_ASSIGN_P(func) ? "LocalAssignment" : entity_user_name(func), 
+					  ENTITY_ASSIGN_P(func) ? 
+					  "LocalAssignment" : entity_user_name(func), 
 					  QUOTE,
  					  CLOSEANGLE,NL, NULL)));
  global_margin++;
@@ -3121,7 +3239,7 @@ static void xml_Call(entity module,  int code_tag,int taskNumber, nest_context_p
     xml_TaskParameters(TRUE,code_tag, module,pattern_region,paving_indices,sb_result);
   }
   else
-    xml_Arguments(s,func,paving_indices, sb_result);
+    xml_Arguments(s,func,paving_indices, prec,sb_result);
   xml_Dependances();
   global_margin--;
   string_buffer_append_word("/Call",sb_result);
@@ -3260,7 +3378,13 @@ static void xml_Boxes(string module_name, int code_tag,string_buffer sb_result,s
   nest_context_t nest;
   int callnumber =0;
   statement stat = get_current_module_statement();
-  string string_sb_result;
+  string string_sb_result;  
+  //transformer t = load_statement_precondition(stat);
+  Psysteme prec = first_precondition_of_module(module_name);
+  // sc_dup((Psysteme) predicate_system(transformer_relation(t)));
+ printf("first_precondition_of_module %s\n",module_name);
+  sc_fprint(stdout,prec,entity_local_name);
+ 
   nest.loops_for_call = stack_make(statement_domain,0,0);
   nest.loop_indices = stack_make(entity_domain,0,0);
   nest.current_stat = stack_make(statement_domain,0,0);
@@ -3277,17 +3401,15 @@ static void xml_Boxes(string module_name, int code_tag,string_buffer sb_result,s
 					  QUOTE,
 					  CLOSEANGLE,NL, NULL)));
   global_margin++;
-  xml_LocalArrays_for_Box(sb_result);
-  xml_FormalArrays_for_Box(sb_result);
+  xml_LocalArrays_for_Box(prec,sb_result);
+  xml_FormalArrays_for_Box(prec,sb_result);
 
-  /* Search of calls in Box */
+  /* Search calls in Box */
   find_loops_and_calls_in_box(stat,&nest);
  
   for (callnumber = 0; callnumber<(int)gen_array_nitems(nest.nested_call); callnumber++)
     xml_Call(module, code_tag, callnumber, &nest,sb_result);
-  
-
-  
+    
   xml_BoxGraph(module,&nest,sb_result,sb_ac);
   global_margin--;
   string_buffer_append_word("/Box",sb_result); 
@@ -3337,7 +3459,11 @@ static void xml_Application(string module_name, int code_tag,string_buffer sb_re
   string_buffer sb_ac = string_buffer_make();
   string sr;
   global_margin = 0; 
-  
+  Psysteme prec;
+  prec = first_precondition_of_module(module_name);
+  printf("first_precondition_of_module %s\n",module_name);
+  sc_fprint(stdout,prec,entity_local_name);
+ 
    string_buffer_append(sb_result,
 		       strdup(concatenate(OPENANGLE, 
 					  "!DOCTYPE Application SYSTEM ",
@@ -3361,7 +3487,7 @@ static void xml_Application(string module_name, int code_tag,string_buffer sb_re
 					  QUOTE,
 					  CLOSEANGLE, 
 					  NL, NULL)));
- xml_ActualArrays(module,sb_result);
+ xml_ActualArrays(module,prec,sb_result);
  global_margin ++;
   add_margin(global_margin,sb_ac);
   string_buffer_append(sb_ac,
@@ -3467,7 +3593,10 @@ bool print_xml_application(string module_name)
   set_complexity_map( (statement_mapping)
 		      db_get_memory_resource(DBR_COMPLEXITIES, module_name, TRUE));
 
-
+ set_precondition_map((statement_mapping)
+		       db_get_memory_resource(DBR_PRECONDITIONS,
+					      module_name,
+					      TRUE));  
   debug_on("XMLPRETTYPRINTER_DEBUG_LEVEL");   
   out = safe_fopen(filename, "w");
   fprintf(out,"<!-- XML prettyprint for module %s. --> \n",module_name);
@@ -3507,7 +3636,8 @@ bool print_xml_application(string module_name)
   reset_current_module_statement();
   reset_current_module_entity();
   reset_complexity_map();
-  reset_rw_effects();
+    reset_precondition_map();
+    reset_rw_effects();
   reset_proper_rw_effects();
   return TRUE;
 }
