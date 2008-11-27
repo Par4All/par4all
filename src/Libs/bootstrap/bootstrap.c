@@ -4517,23 +4517,3 @@ MakeFileName(prefix, base, suffix)
 
   return(s);
 }
-
-/* This function creates a fortran operator parameter, i.e. a zero
-   dimension variable with an overloaded basic type. */
-
-char *
-AddPackageToName(p, n)
-     string p, n;
-{
-  string ps;
-  int l;
-
-  l = strlen(p);
-  ps = gen_strndup(p, l + 1 + strlen(n) +1);
-
-  *(ps+l) = MODULE_SEP;
-  *(ps+l+1) = '\0';
-  strcat(ps, n);
-
-  return(ps);
-}

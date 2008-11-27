@@ -38,6 +38,20 @@ expression make_unbounded_expression()
   return MakeNullaryCall(CreateIntrinsic(UNBOUNDED_DIMENSION_NAME));
 }
 
+/* FI: this piece of code must have been duplicated somewhere else in
+   an effect library */
+list make_unbounded_subscripts(int d)
+{
+  list sl = NIL;
+  int i;
+
+  for(i=0; i<d; i++) {
+    sl = CONS(EXPRESSION, make_unbounded_expression(), sl);
+  }
+
+  return sl;
+}
+
 static entity
 make_empty_module(
     string full_name,
@@ -352,8 +366,9 @@ entity_module_p(entity e)
 bool 
 entity_main_module_p(entity e)
 {
-    return entity_module_p(e) &&
-	strspn(entity_local_name(e), MAIN_PREFIX)==1;
+  return entity_module_p(e)
+    && (strspn(entity_local_name(e), MAIN_PREFIX)==1
+	|| same_string_p(entity_local_name(e), "main"));
 }
 
 bool 
@@ -1396,4 +1411,28 @@ bool parameter_passing_by_value_p(entity f)
 bool parameter_passing_by_reference_p(entity f)
 {
   return parameter_passing_mode_p(f, is_mode_reference);
+}
+
+/* This function concatenate a package name and a local name to
+   produce a global entity name.
+
+   Previous comment: This function creates a fortran operator parameter, i.e. a zero
+   dimension variable with an overloaded basic type.
+
+   Moved from bootstrap.c
+ */
+char * AddPackageToName(p, n)
+     string p, n;
+{
+  string ps;
+  int l;
+
+  l = strlen(p);
+  ps = gen_strndup(p, l + 1 + strlen(n) +1);
+
+  *(ps+l) = MODULE_SEP;
+  *(ps+l+1) = '\0';
+  strcat(ps, n);
+
+  return(ps);
 }

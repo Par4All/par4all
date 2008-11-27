@@ -1274,6 +1274,8 @@ the variable is unsigned, signed or not */
 #define RAND_GEN_EFFECTS_NAME "GEN_SEED"
 /* array of Logical UNits; it is more or less handled as the current file pointer */
 #define IO_EFFECTS_ARRAY_NAME "LUNS"
+/* To express C IO intrinsics effects */
+#define IO_EFFECTS_PTR_NAME "_C_IO_ptr"
 /* array of end of file codes */
 #define IO_EOF_ARRAY_NAME "END_LUNS"
 /* array of error codes for LUNs */
