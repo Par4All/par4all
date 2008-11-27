@@ -510,6 +510,10 @@ bool summary_precondition(char * module_name)
     t = ordinary_summary_precondition(module_name, callee);
   }
 
+  /* Cannot be set earlier because, current statement is used and
+     re-used by ordinary_summary_precondition(). */
+  set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE)); 
+
   /* Add declaration information: arrays cannot be empty (Fortran
    * standard, Section 5.1.2)
    *
@@ -519,15 +523,12 @@ bool summary_precondition(char * module_name)
    *
    */
   if(FALSE && get_bool_property("SEMANTICS_TRUST_ARRAY_DECLARATIONS")) {
-    set_current_module_statement(
-				 (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE)); 
     set_cumulated_rw_effects((statement_effects) 
 			     db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
     module_to_value_mappings( get_current_module_entity() );
     transformer_add_declaration_information(t,
 					    get_current_module_entity());
     reset_cumulated_rw_effects();
-    reset_current_module_statement();
     free_value_mappings();
   }
     
@@ -553,6 +554,7 @@ bool summary_precondition(char * module_name)
     pips_debug(1, "end for module %s\n", module_name);
   }
 
+  reset_current_module_statement();
   reset_current_module_entity();
   debug_off();
 
