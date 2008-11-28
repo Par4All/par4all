@@ -166,7 +166,8 @@ gunzip $POLYLIB.tar.gz || error "cannot decompress polylib"
 tar xf $POLYLIB.tar || error "cannot untar polylib"
 cd $POLYLIB || error "cannot cd into polylib"
 ./configure --prefix=$prod/extern || error "cannot configure polylib"
-make || error "cannot make polylib"
+# I'm not the only one to cheat with dependencies:-)
+make -j1 || error "cannot make polylib"
 
 make install || error "cannot install polylib"
 cd .. || error "cannot cd .."
