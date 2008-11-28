@@ -1,3 +1,6 @@
+
+Code for "fprintf01"
+
 int main()
 {
    FILE *pFile;
@@ -12,8 +15,9 @@ int main()
    }
    fclose(pFile);
 }
-//               <may be read    >: __IO_EFFECTS:LUNS[*]
-//               <may be written >: __IO_EFFECTS:LUNS[*]
+
+Code with proper effects for "fprintf01"
+
 int main()
 {
    FILE *pFile;
@@ -24,9 +28,6 @@ int main()
 //               <must be written>: pFile
 
    pFile = fopen("myfile.txt", "w");
-//               <may be read    >: __IO_EFFECTS:LUNS[*] n name[*] 
-//                                  pFile
-//               <may be written >: __IO_EFFECTS:LUNS[*] name[*]
 //               <must be written>: n
    for(n = 0; n <= 2; n += 1) {
 //               <must be read   >: __IO_EFFECTS:LUNS[1]
@@ -37,12 +38,12 @@ int main()
 //               <must be written>: __IO_EFFECTS:LUNS[0]
       gets(name);
 //               <may be read    >: __IO_EFFECTS:LUNS[*]
-//               <may be written >: __IO_EFFECTS:LUNS[*]
-//               <must be read   >: n name[*] pFile
+//               <may be written >: __IO_EFFECTS:LUNS[*] pFile[*]
+//               <must be read   >: n pFile
       fprintf(pFile, "Name %d %s\n", n, name);
    }
 //               <may be read    >: __IO_EFFECTS:LUNS[*]
-//               <may be written >: __IO_EFFECTS:LUNS[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] pFile[*]
 //               <must be read   >: pFile
    fclose(pFile);
 }

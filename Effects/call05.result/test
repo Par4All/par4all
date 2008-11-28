@@ -65,7 +65,8 @@ main()
 //               <must be written>: i
 
    for(i = 0; i <= d1-1; i += 1)
-//               <must be read   >: d1 d2 i y[i]
+//               <may be written >: y[i][*]
+//               <must be read   >: d1 d2 i
       call05(i, d2, y[i]);
 //               <must be read   >: d1
 //               <must be written>: i
@@ -95,12 +96,13 @@ main()
    int y[d1][d2];
    int i;
    int j;
-//               <may be read    >: d2 i y[*]
+//               <may be read    >: d2 i
+//               <may be written >: y[*][*]
 //               <must be read   >: d1
 //               <must be written>: i
 
    for(i = 0; i <= d1-1; i += 1)
-//               <may be read    >: y[*]
+//               <may be written >: y[*][*]
 //               <must be read   >: d1 d2 i
       call05(i, d2, y[i]);
 //               <may be read    >: __IO_EFFECTS:LUNS[1] d2 i j 
@@ -124,34 +126,3 @@ main()
       printf("\n");
    }
 }
-
-Regions for "call05"
-
-
-//  <m-R-EXACT-{}>
-//  <r-R-EXACT-{}>
-//  <x[PHI1]-W-MAY-{0<=PHI1, PHI1+1<=m}>
-
-void call05(int r, int m, int *x)
-{
-   int j;
-
-//  <j-R-EXACT-{}>
-//  <j-W-EXACT-{}>
-//  <m-R-EXACT-{}>
-//  <r-R-EXACT-{}>
-//  <x[PHI1]-W-MAY-{0<=PHI1, PHI1+1<=m}>
-
-
-   for(j = 0; j <= m-1; j += 1)
-
-//  <j-R-EXACT-{}>
-//  <m-R-EXACT-{}>
-//  <r-R-EXACT-{}>
-//  <x[PHI1]-W-EXACT-{PHI1==j, 0<=j, 1+j<=m}>
-
-      x[j] = 10*r+j;
-}
-
-Regions for "main"
-

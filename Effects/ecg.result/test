@@ -43,10 +43,10 @@ Proper effects for "PROCESS"
       PARAMETER(N=32768)
       REAL SIG(N)
       REAL SPECTRE(N)
-C               <may be read    >: SIGNAL
-C               <may be written >: SPECTRE
+C               <may be read    >: SIG(*)
+C               <may be written >: SPECTRE(*)
 
-      CALL FFT1(SIGNAL, SPECTRE)                                        0001
+      CALL FFT1(SIG, SPECTRE)                                           0001
 C               <must be written>: P
 
       P = 0.                                                            0002
@@ -65,10 +65,10 @@ Cumulated effects for "PROCESS"
       PARAMETER(N=32768)
       REAL SIG(N)
       REAL SPECTRE(N)
-C               <may be read    >: SIGNAL
-C               <may be written >: SPECTRE
+C               <may be read    >: SIG(*)
+C               <may be written >: SPECTRE(*)
 
-      CALL FFT1(SIGNAL, SPECTRE)                                        0001
+      CALL FFT1(SIG, SPECTRE)                                           0001
 C               <must be written>: P
 
       P = 0.                                                            0002

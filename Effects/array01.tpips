@@ -24,7 +24,7 @@ echo
 
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[ARRAY01]
-
+# quit
 echo
 echo Cumulated effetcs for "ARRAY01"
 echo

@@ -73,7 +73,8 @@ main()
    int d1 = 10;
    int d2 = 10;
    int y[d1][d2];
-//               <must be read   >: d1 d2 y
+//               <may be written >: y[*][*]
+//               <must be read   >: d1 d2
 
    call04(d1, d2, y);
 }
@@ -85,7 +86,8 @@ main()
    int d1 = 10;
    int d2 = 10;
    int y[d1][d2];
-//               <must be read   >: d1 d2 y
+//               <may be written >: y[*][*]
+//               <must be read   >: d1 d2
 
    call04(d1, d2, y);
 }

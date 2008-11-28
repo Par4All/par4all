@@ -44,35 +44,3 @@ main()
 
    call09(s.one, sp->one);
 }
-
-Regions for "main"
-
-main()
-{
-   tf_t s;
-   tf_t *sp = &s;
-
-//  <s[PHI1][PHI2]-R-MAY-{PHI1==1}>
-//  <(*sp)[PHI1][PHI2]-R-EXACT-{PHI1==1}>
-//  <sp-R-EXACT-{}>
-
-
-   call09(s.one, sp->one);
-}
-
-Regions for "call09"
-
-
-//  <i-R-EXACT-{}>
-//  <i-W-EXACT-{}>
-//  <j-R-EXACT-{}>
-
-void call09(int i, int j)
-{
-
-//  <i-R-EXACT-{}>
-//  <i-W-EXACT-{}>
-//  <j-R-EXACT-{}>
-
-   i = i+j;
-}

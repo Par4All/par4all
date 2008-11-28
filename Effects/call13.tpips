@@ -57,7 +57,7 @@ echo
 
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[main]
-#quit
+quit
 echo
 echo Regions for "call13"
 echo

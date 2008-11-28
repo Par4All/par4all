@@ -4,7 +4,7 @@
       real sig(n)
       real spectre(n)
 
-      call fft1(signal, spectre)
+      call fft1(sig, spectre)
 
       p = 0.
       do f = 1, n

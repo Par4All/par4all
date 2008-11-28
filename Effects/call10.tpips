@@ -52,7 +52,7 @@ echo
 
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[main]
-
+quit
 echo
 echo Regions for "main"
 echo
