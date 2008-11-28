@@ -366,26 +366,31 @@ static void rw_effects_of_expression_instruction(instruction i)
   if (instruction_expression_p(i)) {
     expression ie = instruction_expression(i);
     syntax is = expression_syntax(ie);
+    call c = call_undefined;
 
     if(syntax_cast_p(is)) {
       expression ce = cast_expression(syntax_cast(is));
       syntax sc = expression_syntax(ce);
 
       if(syntax_call_p(sc)) {
-	call c = syntax_call(sc);
-
-	pips_debug(2, "Effects for expression instruction in statement%03zd\n",
-		   statement_ordering(current_stat)); 
-
-	rw_effects_of_call(c);
+	c = syntax_call(sc);
       }
       else {
 	pips_internal_error("Cast case not implemented\n");
       }
     }
+    else if(syntax_call_p(is)) {
+      /* This may happen when a loop is desugared into an unstructured. */
+      c = syntax_call(is);
+    }
     else {
       pips_internal_error("Instruction expression case not implemented\n");
     }
+
+    pips_debug(2, "Effects for expression instruction in statement%03zd\n",
+	       statement_ordering(current_stat)); 
+
+    rw_effects_of_call(c);
   }
 }
 

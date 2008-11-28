@@ -1022,7 +1022,9 @@ effect effect_array_address_substitution(effect eff,
   return n_eff;
 }
 
-/* Substitute, it possible, the formal parameter in eff by its effective value */
+/* Substitute, it possible, the formal parameter in eff by its
+   effective value. Since eff is modified by side effects, a copy of
+   the summary effect must be passed. */
 /* FI: Just starting... */
 /* FI: it might be better to return a list of effects including the
    read implied by the evaluation of ep */
@@ -1161,7 +1163,8 @@ list c_summary_to_proper_effects(
 				   addressing_tag(effect_addressing(eff)))));
       }
 
-      n_eff = c_summary_effect_to_proper_effect(eff, ep);
+      /* copy_effect cannot be used in case a "preference" is used in the cell */
+      n_eff = c_summary_effect_to_proper_effect(effect_dup(eff), ep);
 
       ifdebug(8){
 	pips_debug(8, "Resulting proper effect: \"%s\"\n",

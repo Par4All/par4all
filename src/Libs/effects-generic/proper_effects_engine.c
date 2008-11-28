@@ -1212,6 +1212,42 @@ generic_proper_effects_of_expressions(list exprs)
     return(le);
 }
 
+bool check_sdfi_effects_p(entity func, list func_sdfi)
+{
+  list ce = list_undefined;
+  bool check_p = TRUE;
+  type ut = ultimate_type(entity_type(func));
+
+  pips_assert("func is a function", type_functional_p(ut));
+
+  /* Check the SDFI effects */
+  for(ce = func_sdfi; !ENDP(ce); POP(ce)) {
+    effect eff = EFFECT(CAR(ce));
+    reference r = effect_any_reference(eff);
+    entity v = reference_variable(r);
+
+    if(formal_parameter_p(v)) {
+      storage s = entity_storage(v);
+      formal fs = storage_formal(s);
+      int rank = formal_offset(fs);
+      entity called_function = formal_function(fs);
+
+      if(called_function!=func) {
+	fprintf(stderr, "Summary effect %p for function \"%s\" refers to "
+		"formal parameter \"%s\" of function \"%s\"\n",
+		eff, entity_name(func), entity_name(v), entity_name(called_function));
+	check_p = FALSE;
+      }
+
+      if(rank>gen_length(functional_parameters(type_functional(ut)))) {
+	fprintf(stderr, "Formal parameter \"%s\" is ranked %d out of %d!\n",
+		entity_name(v), rank, gen_length(functional_parameters(type_functional(ut))));
+	check_p = FALSE;
+      }
+    }
+  }
+  return check_p;
+}
 
 static list 
 generic_proper_effects_of_external(entity func, list args)
@@ -1233,9 +1269,18 @@ generic_proper_effects_of_external(entity func, list args)
 
         /* Get the in summary effects of "func". */	
 	func_eff = (*db_get_summary_rw_effects_func)(func_name);
+
+	if(!check_sdfi_effects_p(func, func_eff))
+	  pips_internal_error("SDFI effects for \"%s\" are corrupted in the data base\n",
+			      entity_name(func));
+
 	/* Translate them using context information. */
 	context = effects_private_current_context_head();
 	le = (*effects_backward_translation_op)(func, args, func_eff, context);
+
+	if(!check_sdfi_effects_p(func, func_eff))
+	  pips_internal_error("SDFI effects for \"%s\" have been corrupted by the translation\n",
+			      entity_name(func));
     }
     return le;  
 }
@@ -1341,38 +1386,43 @@ static void proper_effects_of_expression_instruction(instruction i)
   if (instruction_expression_p(i)) {
     expression ie = instruction_expression(i);
     syntax is = expression_syntax(ie);
+    call c = call_undefined;
 
     if(syntax_cast_p(is)) {
       expression ce = cast_expression(syntax_cast(is));
       syntax sc = expression_syntax(ce);
 
       if(syntax_call_p(sc)) {
-	call c = syntax_call(sc);
-
-	pips_debug(2, "Effects for expression instruction in statement%03zd:\n",
-		   statement_ordering(current_stat)); 
-
-	l_proper = generic_r_proper_effects_of_call(c);
-	l_proper = gen_nconc(l_proper, effects_dup(l_cumu_range));
-		
-	if (contract_p)
-	  l_proper = proper_effects_contract(l_proper);
-	ifdebug(2) {
-	  pips_debug(2, "Proper effects for statement%03zd:\n",
-		     statement_ordering(current_stat));  
-	  (*effects_prettyprint_func)(l_proper);
-	  pips_debug(2, "end\n");
-	}
-
-	store_proper_rw_effects_list(current_stat, l_proper);
+	c = syntax_call(sc);
       }
       else {
 	pips_internal_error("Cast case not implemented\n");
-	  }
+      }
+    }
+    else if(syntax_call_p(is)) {
+      /* This may happen when a loop is unstructured by the controlizer */
+      c = syntax_call(is);
     }
     else {
       pips_internal_error("Instruction expression case not implemented\n");
     }
+
+    pips_debug(2, "Effects for expression instruction in statement%03zd:\n",
+	       statement_ordering(current_stat)); 
+
+    l_proper = generic_r_proper_effects_of_call(c);
+    l_proper = gen_nconc(l_proper, effects_dup(l_cumu_range));
+		
+    if (contract_p)
+      l_proper = proper_effects_contract(l_proper);
+    ifdebug(2) {
+      pips_debug(2, "Proper effects for statement%03zd:\n",
+		 statement_ordering(current_stat));  
+      (*effects_prettyprint_func)(l_proper);
+      pips_debug(2, "end\n");
+    }
+
+    store_proper_rw_effects_list(current_stat, l_proper);
   }
 }
 
