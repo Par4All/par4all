@@ -52,29 +52,39 @@ nth_formal_name(int n) {
 static sentence
 stub_var_decl(parameter p, int n, bool is_fortran)
 {
-    sentence result;
-    string name = nth_formal_name(n);
-    type t = parameter_type(p);
-    pips_assert("is a variable", type_variable_p(t));
+  sentence result;
+  type t = parameter_type(p);
 
-    if(basic_overloaded_p(variable_basic(type_variable(t))))
-    {
-	string comment = strdup(concatenate(
-        "!     Unable to determine the type of parameter number ", name, "\n",
-	"!     ", basic_to_string(variable_basic(type_variable(t))),
-	" ", name, "\n", NULL));
-	free(name);
-	result = make_sentence(is_sentence_formatted, comment);
+  if(type_variable_p(t)) {
+    string name = nth_formal_name(n);
+
+    if(basic_overloaded_p(variable_basic(type_variable(t)))) {
+      string comment =
+	strdup(concatenate(
+			   "!     Unable to determine the type of parameter number ", name, "\n",
+			   "!     ", basic_to_string(variable_basic(type_variable(t))),
+			   " ", name, "\n", NULL));
+      free(name);
+      result = make_sentence(is_sentence_formatted, comment);
     }
-    else
-    {
-	result = make_sentence(is_sentence_unformatted,
-	  make_unformatted(string_undefined, 0, 0,
-	     gen_make_list(string_domain,
-		 strdup(basic_to_string(variable_basic(type_variable(t)))),
-		   strdup(" "), name, strdup(is_fortran? "" : ";"), NULL)));
+    else {
+      result = make_sentence(is_sentence_unformatted,
+			     make_unformatted(string_undefined, 0, 0,
+					      gen_make_list(string_domain,
+							    strdup(basic_to_string(variable_basic(type_variable(t)))),
+							    strdup(" "), name, strdup(is_fortran? "" : ";"), NULL)));
     }
-    return result;
+  }
+  else if(type_void_p(t)) {
+      result = make_sentence(is_sentence_unformatted,
+			     make_unformatted(string_undefined, 0, 0,
+					      gen_make_list(string_domain,
+							    strdup("void"), NULL)));
+  }
+  else {
+    pips_internal_error("Unexpected type tag %d.\n", type_tag(t));
+  }
+  return result;
 }
 
 
@@ -117,16 +127,24 @@ stub_head(entity f, bool is_fortran)
     if (number>1) ls = CONS(STRING, strdup(")"), ls);
   }
   else {
-    // Assume C and generate the formal parameter list with their types
-    for(number=1; number<=n; number++) {
-      ls = CONS(STRING, nth_formal_name(number),
-		CONS(STRING, strdup(number==1? "(": ", "), ls));
+    if(n>=1) {
+      type t = parameter_type(PARAMETER(CAR(functional_parameters(fu))));
+      if(type_void_p(t)) {
+	ls = CONS(STRING, strdup("(void)"), ls);
+      }
+      else {
+	// Assume C and generate the formal parameter list with their types
+	for(number=1; number<=n; number++) {
+	  ls = CONS(STRING, nth_formal_name(number),
+		    CONS(STRING, strdup(number==1? "(": ", "), ls));
+	}
+	/* close */
+	ls = CONS(STRING, strdup(")"), ls);
+      }
     }
-    /* close */
-    if (number>1) ls = CONS(STRING, strdup(")"), ls);
-    else  ls = CONS(STRING, strdup("()"), ls);
+    else 
+      ls = CONS(STRING, strdup("()"), ls);
   }
-
   return make_sentence(is_sentence_unformatted, 
 		       make_unformatted(string_undefined, 0, 0, gen_nreverse(ls)));
 }
@@ -160,9 +178,11 @@ stub_text(entity module, bool is_fortran)
 			    strdup(is_fortran? FILE_WARNING:C_FILE_WARNING_EFFECT));
     head = stub_head(module, is_fortran);
     
-    MAP(PARAMETER, p, 
-	ls = CONS(SENTENCE, stub_var_decl(p, n++, is_fortran), ls),
-	functional_parameters(type_functional(t)));
+    MAP(PARAMETER, p, {
+      type t = parameter_type(p);
+      if(!type_void_p(t))
+	ls = CONS(SENTENCE, stub_var_decl(p, n++, is_fortran), ls);
+    }, functional_parameters(type_functional(t)));
 
     ls = CONS(SENTENCE, make_sentence(is_sentence_unformatted,
 	     make_unformatted(string_undefined, 0, 0, 

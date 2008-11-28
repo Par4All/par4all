@@ -144,11 +144,12 @@ static void add_intraprocedural_value_entities_unconditionally(entity e)
  */
 static void add_intraprocedural_value_entities(entity e)
 { 
-    debug(8,"add_interprocedural__value_entities",
-	  "for %s\n", entity_name(e));
-    if(!entity_has_values_p(e)) {
-	add_intraprocedural_value_entities_unconditionally(e);
-    }
+  type ut = ultimate_type(e);
+
+  pips_debug(8, "for %s\n", entity_name(e));
+  if(!entity_has_values_p(e) && type_variable_p(ut) && !typedef_entity_p(e)) {
+    add_intraprocedural_value_entities_unconditionally(e);
+  }
 }
 
 /* Look for variables equivalenced with e. e already has values associated

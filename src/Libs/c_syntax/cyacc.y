@@ -1855,6 +1855,8 @@ type_spec:   /* ISO 6.7.2 */
 			     because it is declared in other file  */
 			  if (type_undefined_p(entity_type(ent)))
 			    entity_type(ent) = make_type_struct(NIL); 
+			  if (storage_undefined_p(entity_storage(ent)))
+			    entity_storage(ent) = make_storage_rom(); 
 			  c_parser_context_type(ycontext) = make_type_variable(v);
 			  $$ = NIL;
 			}

@@ -430,7 +430,7 @@ bool entity_field_p(entity e)
  * it would have been better to keep the struct prefix in the field
  * name.
  */
-entity entity_field_to_entity_struct(entity f)
+entity entity_field_to_entity(entity f, char prefix)
 {
   entity s = entity_undefined;
   string sn = strdup(entity_name(f)); /* structure name */
@@ -443,7 +443,7 @@ entity entity_field_to_entity_struct(entity f)
   *pos = '\0'; /* get rid of the field name */
   usn = strdup(global_name_to_user_name(sn));
   usnl = strlen(usn);
-  *(pos-usnl) = STRUCT_PREFIX_CHAR;
+  *(pos-usnl) = prefix;
   /* can be done in place because the field name is at least on
      character long and because we also gain the field marker */
   (void) strncpy(pos-usnl+1, usn, usnl+1);
@@ -452,28 +452,69 @@ entity entity_field_to_entity_struct(entity f)
   pips_debug(8, "struct entity name is \"\%s\"\n", sn);
   s = gen_find_tabulated(sn, entity_domain);
 
-  pips_assert("entity s is defined", !entity_undefined_p(s));
-
   return s;
 }
 
-/* f is a field of a structure: what is its rank? */
+entity entity_field_to_entity_struct(entity f)
+{
+  entity s = entity_field_to_entity(f, STRUCT_PREFIX_CHAR);
+
+  /* To be able to breakpoint effectively */
+  if(entity_undefined_p(s))
+    pips_assert("entity s is defined", !entity_undefined_p(s));
+  return s;
+}
+
+entity entity_field_to_entity_union(entity f)
+{
+  entity u = entity_field_to_entity(f, UNION_PREFIX_CHAR);
+
+  /* To be able to breakpoint effectively */
+  if(entity_undefined_p(u))
+    pips_assert("entity s is defined", !entity_undefined_p(u));
+  return u;
+}
+
+entity entity_field_to_entity_struct_or_union(entity f)
+{
+  entity su = entity_field_to_entity(f, UNION_PREFIX_CHAR);
+
+  if(entity_undefined_p(su))
+    su = entity_field_to_entity(f, STRUCT_PREFIX_CHAR);
+
+  /* To be able to breakpoint effectively */
+  if(entity_undefined_p(su))
+    pips_assert("entity s is defined", !entity_undefined_p(su));
+
+  return su;
+}
+
+/* f is a field of a structure or of an union: what is its rank? */
 int entity_field_rank(entity f)
 {
   int rank = -1;
-  entity s = entity_field_to_entity_struct(f);
-  type st = entity_type(s);
-  list fl = type_struct(st);
+  entity su = entity_field_to_entity_struct_or_union(f);
+  type st = entity_type(su);
+  list fl = list_undefined;
 
-  pips_assert("st is a struct type", type_struct_p(st));
+  if(type_struct_p(st))
+    fl = type_struct(st);
+  else if(type_union_p(st))
+    fl = type_union(st);
+  else
+    pips_internal_error("Unexpected type tag %d\n", type_tag(st));
+
+  pips_assert("st is a struct or union type",
+	      type_struct_p(st) || type_union_p(st));
 
   /* FI: positions are counted from 1 on; do we want to subtract 1? */
   rank = gen_position((void *) f, fl);
 
   if(rank==0) {
-    pips_internal_error("Field \"\%s\" is not part of its structure \"\%s\"\n",
-			entity_name(f), entity_name(s));
+    pips_internal_error("Field \"\%s\" is not part of its %s \"\%s\"\n",
+			entity_name(f), type_struct_p(st)?"structure":"union" , entity_name(su));
   }
+
   return rank;
 }
 
@@ -1175,6 +1216,7 @@ string local_name_to_scope(string ln)
 {
   string ns = strrchr(ln, BLOCK_SEP_CHAR);
   string s = string_undefined;
+  extern string empty_scope(void);
 
   if(ns==NULL)
     s = empty_scope();

@@ -1687,8 +1687,8 @@ type ultimate_type(type t)
   else
     nt = t;
 
-  pips_debug(8, "Ends with type \"%s\"\n", type_to_string(nt));
-  ifdebug(8) {
+  pips_debug(9, "Ends with type \"%s\"\n", type_to_string(nt));
+  ifdebug(9) {
     if(type_variable_p(nt)) {
       variable nvt = type_variable(nt);
       basic nbt = variable_basic(nvt);
