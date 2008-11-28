@@ -5,7 +5,7 @@ int main()
    double virgule;
    graine = 50;
    srandom(graine);
-   /* Initialisation du générateur */
+   /* generator initialization */
    virgule = (double) rand()/(2147483647+1);
    entier = 1+rand();
 }
@@ -23,7 +23,7 @@ int main()
    srandom(graine);
 //               <must be read   >: _RANDOM_EFFECTS:GEN_SEED
 //               <must be written>: virgule
-   /* Initialisation du générateur */
+   /* generator initialization */
    virgule = (double) rand()/(2147483647+1);
 //               <must be read   >: _RANDOM_EFFECTS:GEN_SEED
 //               <must be written>: entier

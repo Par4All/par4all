@@ -6,7 +6,7 @@ int main ()
    int graine;
    double virgule;
    graine=50;
-   srandom (graine);         /* Initialisation du générateur */
+   srandom (graine);         /* generator initialization */
    virgule = (double) rand () / (RAND_MAX+1);
    entier = 1 + rand ();
 }
