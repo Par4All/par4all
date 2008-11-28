@@ -1332,16 +1332,28 @@ static list generic_io_effects(entity e, list args, bool system_p)
     /* FI: I would like not to use "preference" isntead of
        "reference", but this causes a bug in cumulated effects and I
        do not have time to chase it. */
-    eff1 = make_effect(make_cell_preference(make_preference(ref1)),
+    eff1 = (*reference_to_effect_func)(ref1, make_action_read());
+      /*
+      (make_effect(make_cell_preference(make_preference(ref1)),
 		       make_action_read(),
 		       make_addressing_index(),
 		       must_p? make_approximation_must() : make_approximation_may(),
-		       make_descriptor_none()); /* Is this generic?*/
-    eff2 = make_effect(make_cell_preference(make_preference(ref2)),
+		       make_descriptor_none()));
+      */
+    eff2 = (*reference_to_effect_func)(ref2, make_action_write());
+    /*
+       (make_effect(make_cell_preference(make_preference(ref2)),
 		       make_action_write(),
 		       make_addressing_index(),
 		       must_p? make_approximation_must() : make_approximation_may(),
-		       make_descriptor_none()); /* Is this generic?...*/
+		       make_descriptor_none()));
+    */
+    if(!must_p) {
+      free_approximation(effect_approximation(eff1));
+      free_approximation(effect_approximation(eff2));
+      effect_approximation(eff1) = make_approximation_may();
+      effect_approximation(eff2) = make_approximation_may();
+    }
     ifdebug(8) print_reference(ref1);
     le = gen_nconc(le, CONS(EFFECT, eff1, CONS(EFFECT, eff2, NIL)));
   }
