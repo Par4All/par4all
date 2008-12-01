@@ -488,10 +488,13 @@ L\"([^\"]|(\"\")|(\\\"))*\"	{
 				return(TK_ATTRIBUTE);
 			} 
 "__extension__"         {
-                                pips_user_warning("gcc keyword \"__extension__\" is ignored\n");
+                                pips_user_warning("gcc extension keyword \"__extension__\" is ignored\n");
                         }
-"__inline"            {
-                                pips_user_warning("gcc keyword \"__inline\" is ignored\n");
+"__inline"              {
+                                pips_user_warning("gcc extension keyword \"__inline\" is ignored\n");
+                        }
+"__inline__"            {
+                                pips_user_warning("gcc extension keyword \"__inline__\" is ignored\n");
                         }
 {ident}			{ 
                                 /* C keywords or identifiers */

@@ -429,6 +429,11 @@ missing_file_initializer(string module_name, bool is_fortran) {
   pips_user_warning("no source file for %s: synthetic code is generated\n",
 		    module_name);
 
+  if(entity_undefined_p(m)) {
+    pips_user_error("No occurence of function \"%s\" has been encountered. "
+		    "Code synthesis is not possible\n", module_name);
+  }
+
   /* Builds a stub code text for the missing module */
   text stub = stub_text(m, is_fortran);
   return add_new_module_from_text(module_name,
