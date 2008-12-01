@@ -57,6 +57,11 @@ EvalSyntax(syntax s)
   case is_syntax_sizeofexpression:
     v = EvalSizeofexpression((syntax_sizeofexpression(s)));
     break;
+  case is_syntax_subscript:
+  case is_syntax_application:
+  case is_syntax_va_arg:
+    v = MakeValueUnknown();
+    break;
   default:
     fprintf(stderr, "[EvalExpression] Unexpected default case %td\n",
 	    syntax_tag(s));

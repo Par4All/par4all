@@ -38,21 +38,28 @@ expression e;
 value EvalSyntax(s)
 syntax s;
 {
-	value v;
+  value v;
 
-	switch (syntax_tag(s)) {
-	    case is_syntax_reference:
-	    case is_syntax_range:
-		v = MakeValueUnknown();
-		break;
-	    case is_syntax_call:
-		v = EvalCall((syntax_call(s)));
-		break;
-	    default:
-		ParserError("EvalExpression", "cas default\n");
-	}
+  switch (syntax_tag(s)) {
+  case is_syntax_reference:
+  case is_syntax_range:
+    v = MakeValueUnknown();
+    break;
+  case is_syntax_call:
+    v = EvalCall((syntax_call(s)));
+    break;
+  case is_syntax_cast:
+  case is_syntax_sizeofexpression:
+  case is_syntax_subscript:
+  case is_syntax_application:
+  case is_syntax_va_arg:
+    v = MakeValueUnknown();
+    break;
+  default:
+    ParserError("EvalExpression", "cas default\n");
+  }
 
-	return(v);
+  return(v);
 }
 
 
