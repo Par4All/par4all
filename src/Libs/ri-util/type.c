@@ -978,7 +978,7 @@ basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
 	type pt = type_undefined;
 
 	if(ultimate_p)
-	  pt = ultimate_type(basic_pointer(rb));
+	  pt = copy_type(ultimate_type(basic_pointer(rb)));
 	else
 	  pt = copy_type(basic_pointer(rb));
 

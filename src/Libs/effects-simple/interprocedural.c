@@ -899,8 +899,7 @@ effect effect_scalar_substitution(effect eff, entity ev)
   return n_eff;
 }
 
-effect effect_array_substitution(effect eff __attribute__ ((unused)),
-				 reference er __attribute__ ((unused)))
+effect effect_array_substitution(effect eff, reference er)
 {
   effect n_eff = effect_undefined;
   entity av = reference_variable(er);
@@ -924,6 +923,54 @@ effect effect_array_substitution(effect eff __attribute__ ((unused)),
 			copy_addressing(effect_addressing(eff)),
 			copy_approximation(effect_approximation(eff)),
 			make_descriptor_none());
+  }
+  else if(asn+fsn==ad+1) {
+    /* One dimension should be merged: which test case? */
+    reference n_ref = copy_reference(er);
+    expression e1 = EXPRESSION(CAR(gen_last(reference_indices(n_ref))));
+    expression e2 = EXPRESSION(CAR(reference_indices(fr)));
+    value sv = EvalExpression(e1);
+    constant sc = value_constant(sv);
+    /* FI: could/should be PLUS_C ? We could try to evaluate s+l...*/
+    expression sl = (constant_int_p(sc) && constant_int(sc)==0)?
+      copy_expression(e2) : MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME), 
+					   copy_expression(e1),
+					   copy_expression(e2));
+
+    EXPRESSION_(CAR(gen_last(reference_indices(n_ref)))) = sl;
+    n_eff = make_effect(make_cell_reference(n_ref),
+			copy_action(effect_action(eff)),
+			copy_addressing(effect_addressing(eff)),
+			copy_approximation(effect_approximation(eff)),
+			make_descriptor_none());
+  }
+  else if(ad==0 && fsn==1 && asn==1) {
+    /* av must be a pointer */
+    type avt = ultimate_type(entity_type(av));
+    if(pointer_type_p(avt)) {
+      type pavt = ultimate_type(basic_pointer(variable_basic(type_variable(avt))));
+      if(pointer_type_p(pavt)) {
+	/* The actual argument is a pointer to a pointer. It can be
+	   subscripted twice. */
+	reference n_ref = copy_reference(er);
+
+	reference_indices(n_ref) = gen_nconc(reference_indices(n_ref),
+					 gen_full_copy_list(find));
+	n_eff = make_effect(make_cell_reference(n_ref),
+			    copy_action(effect_action(eff)),
+			    copy_addressing(effect_addressing(eff)),
+			    copy_approximation(effect_approximation(eff)),
+			    make_descriptor_none());
+      }
+      else {
+	pips_internal_error("Conversion of formal effect on \"%s\" into effect on \"%s\": "
+			    "Not implemented yet\n", entity_name(fv), entity_name(av));
+      }
+    }
+    else {
+      pips_internal_error("Conversion of formal effect on \"%s\" into effect on \"%s\": "
+			  "Not implemented yet\n", entity_name(fv), entity_name(av));
+    }
   }
   else
     pips_internal_error("Conversion of formal effect on \"%s\" into effect on \"%s\": "
@@ -960,6 +1007,7 @@ effect effect_scalar_address_substitution(effect eff, entity ev)
   return n_eff;
 }
 
+/* The actual argument is the address of the reference, &(er) */
 effect effect_array_address_substitution(effect eff,
 					 reference er)
 {
@@ -968,11 +1016,11 @@ effect effect_array_address_substitution(effect eff,
   int eff_d = gen_length(reference_indices(eff_r));
   int er_d = gen_length(reference_indices(er));
   entity er_v = reference_variable(er);
-  type t = entity_type(er_v);
-  int d = type_depth(t);
+  type er_t = entity_type(er_v);
+  int d = type_depth(er_t);
 
   /* One special case: a contiguous vector of the argument array is touched */
-  /* FI: these are not the regions yet! We are going t bump into the unbounded expression...*/
+  /* FI: these are not the regions yet! We are going to bump into the unbounded expression...*/
   if(eff_d==1 && er_d==d) {
     reference nr = copy_reference(er);
     expression s = EXPRESSION(gen_nth(d-1, reference_indices(nr)));
@@ -1015,6 +1063,35 @@ effect effect_array_address_substitution(effect eff,
 			copy_addressing(effect_addressing(eff)),
 			copy_approximation(effect_approximation(eff)),
 			copy_descriptor(effect_descriptor(eff)));
+  }
+  else if(d==0 && er_d==1 && eff_d==1) {
+    /* We must assume that er_v is a pointer because d==0 and er_d==1.
+     The two subscript expressions must be added */
+    type er_tu = ultimate_type(er_t);
+    if(pointer_type_p(er_tu)) {
+      reference nr = copy_reference(er);
+      expression exp_r = EXPRESSION(CAR(reference_indices(nr)));
+      expression exp_e = EXPRESSION(CAR(reference_indices(eff_r)));
+      expression n_exp = expression_undefined;
+
+      if(unbounded_expression_p(exp_e))
+	n_exp = make_unbounded_expression();
+      else {
+	expression s = copy_expression(exp_r);
+	expression l = copy_expression(exp_e);
+	n_exp = MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME), s, l);
+      }
+      n_eff = make_effect(make_cell_reference(nr),
+			  copy_action(effect_action(eff)),
+			  copy_addressing(effect_addressing(eff)),
+			  copy_approximation(effect_approximation(eff)),
+			  make_descriptor_none());
+      free_expression(EXPRESSION(CAR(reference_indices(nr))));
+      EXPRESSION_(CAR(reference_indices(nr))) = n_exp;
+    }
+    else {
+      pips_internal_error("Not implemented yet\n");
+    }
   }
   else
     pips_internal_error("Not implemented yet\n");
