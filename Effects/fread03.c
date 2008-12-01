@@ -22,13 +22,14 @@ byte ** LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
   if (file==NULL)
     nrerror("ouverture du fichier impossible\n");
 
-  readitem(file, buffer);
+  // The code synthesis fails because of type_supporting_entities() which explodes the stack
+  //readitem(file, buffer);
   if(strcmp(buffer, "P5") != 0)
     nrerror("entete du fichier %s invalide\n");
 
-  width  = atoi(readitem(file, buffer));
-  height = atoi(readitem(file, buffer));
-  gris   = atoi(readitem(file, buffer));
+  //width  = atoi(readitem(file, buffer));
+  //height = atoi(readitem(file, buffer));
+  //gris   = atoi(readitem(file, buffer));
 
   *nrl = 0;
   *nrh = height - 1;

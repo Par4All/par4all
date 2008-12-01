@@ -9,8 +9,34 @@ setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
 
 display PRINTED_FILE[%ALLFUNC]
+
+echo
+echo Proper effects for "ReadPGMrow"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[ReadPGMrow]
+
+echo
+echo Cumulated effects for "ReadPGMrow"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[ReadPGMrow]
+
+echo
+echo Proper effects for "LoadPGM_bmatrix"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[LoadPGM_bmatrix]
+
+echo
+echo Cumulated effects for "LoadPGM_bmatrix"
+echo
 
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[LoadPGM_bmatrix]
