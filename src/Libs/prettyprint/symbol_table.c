@@ -389,11 +389,13 @@ string get_symbol_table(entity m, bool isfortran)
       if(storage_formal_p(vs)) {
 	nth++;
 	if(nth==1) {
-	  string_buffer_append(result, strdup(concatenate(NL,"Layouts for formal parameters:"
+	  string_buffer_append(result, strdup(concatenate(NL,"Layout for formal parameters:"
 							  ,NL,NL,NULL)));
 	}
-	string_buffer_append(result,strdup(concatenate("\tVariable ",entity_name(v),
-						       "\toffset = ", itoa(formal_offset(storage_formal(vs))),NULL)));
+	string_buffer_append(result,strdup(concatenate("\tVariable ", entity_name(v),
+						       "\toffset = ",
+						       itoa(formal_offset(storage_formal(vs))),
+						       "\n", NULL)));
       }
       else if(storage_return_p(vs)) {
 	pips_assert("No more than one return variable", entity_undefined_p(rv));
