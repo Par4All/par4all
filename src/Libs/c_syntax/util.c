@@ -1539,7 +1539,13 @@ void UseFormalArguments(entity f)
     }
 
     ifdebug(1) {
+      dl = code_declarations(fc);
       /* Check substitution in formal parameter declarations */
+      ifdebug(8) {
+	pips_debug(8, "list of declared variables:\n");
+	print_entities(dl);
+	(void) fprintf(stderr, "\n");
+      }
       refs =  declaration_supporting_references(dl);
       MAP(REFERENCE, r, {
 	  entity v = reference_variable(r);
