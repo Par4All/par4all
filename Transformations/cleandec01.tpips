@@ -8,9 +8,27 @@ activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
+echo
+echo Initial code
+echo
+
 display PRINTED_FILE[c_clean_declarations01]
+
+echo
+echo Code after declaration cleaning
+echo
+
 apply CLEAN_DECLARATIONS[c_clean_declarations01]
 display PRINTED_FILE[c_clean_declarations01]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+# shell $(PIPS_CC) -c cleandec01.database/Src/cleandec01.c
+shell gcc -c cleandec01.database/Src/cleandec01.c
+
 close
 delete cleandec01
 quit
