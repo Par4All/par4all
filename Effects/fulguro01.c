@@ -14,6 +14,25 @@ enum FLGR_TYPE
 typedef int fgINT32;
 typedef struct {int * array; int spp;int length;} FLGR_Data1D;
 typedef struct{FLGR_Data1D ** row; int size;int size_y;int size_x;enum FLGR_TYPE type;} FLGR_Data2D;
+static void flgr_set_array_fgINT32(fgINT32 *array, int pos, fgINT32 value)
+{
+   array[pos] = value;
+}
+
+static void flgr1d_set_data_array_fgINT32(fgINT32 *array, int pos, fgINT32 value)
+{
+   flgr_set_array_fgINT32(array, pos, value);
+}
+
+static fgINT32 flgr_get_array_fgINT32(fgINT32 *array, int pos)
+{
+  return array[pos];
+}
+
+static __inline__ fgINT32 flgr1d_get_data_array_fgINT32(fgINT32* array, int pos) {
+  return flgr_get_array_fgINT32(array,pos);
+}
+
 typedef enum _FLGR_Ret {
 	FLGR_RET_NULL_OBJECT,
 	FLGR_RET_OK,

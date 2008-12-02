@@ -54,6 +54,26 @@ echo Proper and cumulated effects for all functions (this implies cumulated effe
 echo
 
 activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[fulguro01!flgr_set_array_fgINT32]
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[fulguro01!flgr_set_array_fgINT32]
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[fulguro01!flgr1d_set_data_array_fgINT32]
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[fulguro01!flgr1d_set_data_array_fgINT32]
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[fulguro01!flgr_get_array_fgINT32]
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[fulguro01!flgr_get_array_fgINT32]
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[fulguro01!flgr1d_get_data_array_fgINT32]
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[fulguro01!flgr1d_get_data_array_fgINT32]
+
+activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[flgr1d_arith_add_fgINT32]
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[flgr1d_arith_add_fgINT32]
