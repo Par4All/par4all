@@ -1468,13 +1468,21 @@ void UseFormalArguments(entity f)
 
     pips_assert("the value is code", value_code_p(fv));
 
-    /* make a list of formal parameters */
+    /* make a list of formal dumy parameters; depending on the kind of
+       function declaration, dummy formal parameters are used (new C
+       function declaration style), or not (old C function declaration
+       style).
+
+       FI: Maybe, it would be better to unify the use of summy formal
+       parameter in the parser?
+    */
     for(cd = dl; !ENDP(cd); POP(cd)) {
       entity v = ENTITY(CAR(cd));
       if(formal_entity_p(v)) {
-	pips_debug(8, "Formal dummy parameter: \"%s\"\n", entity_name(v));
-	formals = gen_nconc(formals, CONS(ENTITY, v, NIL));
-	pips_assert("v is a dummy parameter", dummy_parameter_entity_p(v));
+	pips_debug(8, "Formal parameter: \"%s\"\n", entity_name(v));
+	if(dummy_parameter_entity_p(v))
+	  formals = gen_nconc(formals, CONS(ENTITY, v, NIL));
+	//pips_assert("v is a dummy parameter", dummy_parameter_entity_p(v));
       }
     }
 
@@ -2078,7 +2086,7 @@ void AddToDeclarations(entity e, entity mod)
     {
       pips_debug(5,"Add entity \"%s\" (\"%s\") to module %s\n",
 		 entity_user_name(e),
-		 entity_local_name(e),
+		 entity_name(e),
 		 entity_user_name(mod));
       code_declarations(value_code(entity_initial(mod)))
 	= gen_nconc(code_declarations(value_code(entity_initial(mod))),
