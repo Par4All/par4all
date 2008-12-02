@@ -648,6 +648,7 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
   pips_debug(5,"Entity local name is \"%s\" with prefix \"%s\" and scope \"%s\"\n",
 	     name,prefix,scope);
   pips_assert("Scope is a block scope", string_block_scope_p(scope));
+  free(scope);
 
   if (!entity_undefined_p(get_current_module_entity())) {
     /* Add block scope case here */
@@ -969,6 +970,7 @@ entity FindOrCreateCurrentEntity(string name,
 	}
     }
   pips_debug(5,"Entity global name \"%s\"\n\n",entity_name(ent));
+  free(block_scope);
   return ent;
 }
 

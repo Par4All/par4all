@@ -1319,9 +1319,16 @@ entity MakeCompilationUnitEntity(string name)
 
   /* Normally, the storage must be rom but in order to store the list of entities
      declared with extern, we use the ram storage to put this list in ram_shared*/
-  //entity_storage(e) = make_storage_ram(make_ram(entity_undefined,entity_undefined,0,NIL));
+  if(!storage_undefined_p(entity_storage(e)))
+    free_storage(entity_storage(e));
   entity_storage(e) = make_storage(is_storage_rom, UU);
+
+  if(!type_undefined_p(entity_type(e)))
+    free_type(entity_type(e));
   entity_type(e) = make_type_functional(make_functional(NIL,make_type_unknown()));
+
+  if(!value_undefined_p(entity_initial(e)))
+    free_value(entity_initial(e));
   entity_initial(e) = make_value(is_value_code, make_code(NIL,strdup(""), make_sequence(NIL),NIL));
 
   return e;

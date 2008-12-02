@@ -209,6 +209,7 @@ string compilation_unit_of_module(string module_name)
     /* It is not clear how robust it is going to be when file name conflicts occur. */
     compilation_unit_name
       = strdup(concatenate(simpler_file_name, FILE_SEP_STRING, NULL));
+    free(simpler_file_name);
   }
 
   return compilation_unit_name;

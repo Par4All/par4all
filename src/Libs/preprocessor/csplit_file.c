@@ -134,6 +134,7 @@ void csplit_open_compilation_unit(string input_file_name)
   fprintf(module_list_file, "%s %s\n", 
 	  current_compilation_unit_name,
 	  current_compilation_unit_file_name);
+  free(simpler_file_name);
 }
 
 void csplit_close_compilation_unit()

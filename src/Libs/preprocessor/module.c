@@ -65,6 +65,7 @@ list module_declarations(entity m)
 
   return dl;
 }
+
 list current_module_declarations()
 {
   entity m = get_current_module_entity();

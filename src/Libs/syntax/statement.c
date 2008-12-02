@@ -1717,105 +1717,110 @@ int keyword;
 cons *lci;
 cons *lio;
 {
-    cons *l;
-    /* The composite IO with potential branches for ERR and END */
-    instruction io = instruction_undefined;
-    /* The pure io itself */
-    instruction io_call = instruction_undefined;
-    /* virtual tests to implement ERR= and END= clauses */
-    statement io_err = statement_undefined;
-    statement io_end = statement_undefined;
-    expression unit = expression_undefined;
+  cons *l;
+  /* The composite IO with potential branches for ERR and END */
+  instruction io = instruction_undefined;
+  /* The pure io itself */
+  instruction io_call = instruction_undefined;
+  /* virtual tests to implement ERR= and END= clauses */
+  statement io_err = statement_undefined;
+  statement io_end = statement_undefined;
+  expression unit = expression_undefined;
 
-    for (l = lci; l != NULL; l = CDR(CDR(l))) {
-	syntax s1;
-	entity e1;
+  for (l = lci; l != NULL; l = CDR(CDR(l))) {
+    syntax s1;
+    entity e1;
 
-	s1 = expression_syntax(EXPRESSION(CAR(l)));
+    s1 = expression_syntax(EXPRESSION(CAR(l)));
 
-	e1 = call_function(syntax_call(s1));
+    e1 = call_function(syntax_call(s1));
 
-	if (strcmp(entity_local_name(e1), "UNIT=") == 0) {
-	    unit = copy_expression(EXPRESSION(CAR(CDR(l))));
-	}
+    if (strcmp(entity_local_name(e1), "UNIT=") == 0) {
+      if( ! expression_undefined_p(unit) )
+	free_expression(unit);
+      unit = copy_expression(EXPRESSION(CAR(CDR(l))));
     }
+  }
 
-    /* we scan the list of specifications to detect labels (such as in
-       ERR=20, END=30, FMT=50, etc.), that were stored as integer constants
-       (20, 30, 50) and that must be replaced by labels (_20, _30, _50). */
-    for (l = lci; l != NULL; l = CDR(CDR(l))) {
-	syntax s1, s2;
-	entity e1, e2;
+  /* we scan the list of specifications to detect labels (such as in
+     ERR=20, END=30, FMT=50, etc.), that were stored as integer constants
+     (20, 30, 50) and that must be replaced by labels (_20, _30, _50). */
+  for (l = lci; l != NULL; l = CDR(CDR(l))) {
+    syntax s1, s2;
+    entity e1, e2;
 
-	s1 = expression_syntax(EXPRESSION(CAR(l)));
-	s2 = expression_syntax(EXPRESSION(CAR(CDR(l))));
+    s1 = expression_syntax(EXPRESSION(CAR(l)));
+    s2 = expression_syntax(EXPRESSION(CAR(CDR(l))));
 
-	pips_assert("syntax is a call", syntax_call_p(s1));
-	e1 = call_function(syntax_call(s1));
-	pips_assert("value is constant", value_constant_p(entity_initial(e1)));
-	pips_assert("constant is not int (thus litteral or call)", 
-		    !constant_int_p(value_constant(entity_initial(e1))));
+    pips_assert("syntax is a call", syntax_call_p(s1));
+    e1 = call_function(syntax_call(s1));
+    pips_assert("value is constant", value_constant_p(entity_initial(e1)));
+    pips_assert("constant is not int (thus litteral or call)", 
+		!constant_int_p(value_constant(entity_initial(e1))));
 
-	if (strcmp(entity_local_name(e1), "ERR=") == 0 || 
-	    strcmp(entity_local_name(e1), "END=") == 0 ||
-	    strcmp(entity_local_name(e1), "FMT=") == 0) {
-	    if (syntax_call_p(s2)) {
-		e2 = call_function(syntax_call(s2));
-		if (value_constant_p(entity_initial(e2))) {
-		    if (constant_int_p(value_constant(entity_initial(e2)))) {
-			/* here is a label */
-			call_function(syntax_call(s2)) = 
-			    MakeLabel(entity_local_name(e2));
-		    }
-		}
-		e2 = call_function(syntax_call(s2));
-		if (strcmp(entity_local_name(e1), "FMT=") != 0
-		    && expression_undefined_p(unit)) {
-		    /* UNIT is not defined for INQUIRE (et least)
-		     * Let's use LUN 0 by default for END et ERR.
-		     */
-		    unit = int_to_expression(0);
-		}
-		if (strcmp(entity_local_name(e1), "ERR=") == 0) {
-		    io_err = make_check_io_statement(IO_ERROR_ARRAY_NAME, unit, e2);
-		}
-		else if (strcmp(entity_local_name(e1), "END=") == 0) {
-		    io_end = make_check_io_statement(IO_EOF_ARRAY_NAME, unit, e2);
-		}
-	    }
+    if (strcmp(entity_local_name(e1), "ERR=") == 0 || 
+	strcmp(entity_local_name(e1), "END=") == 0 ||
+	strcmp(entity_local_name(e1), "FMT=") == 0) {
+      if (syntax_call_p(s2)) {
+	e2 = call_function(syntax_call(s2));
+	if (value_constant_p(entity_initial(e2))) {
+	  if (constant_int_p(value_constant(entity_initial(e2)))) {
+	    /* here is a label */
+	    call_function(syntax_call(s2)) = 
+	      MakeLabel(entity_local_name(e2));
+	  }
 	}
-    }
-
-    /*
-      for (l = lci; CDR(l) != NULL; l = CDR(l)) ;
-
-      CDR(l) = lio;
-      l = lci;
-    */
-
-    lci = gen_nconc(lci, lio);
-
-    io_call = make_instruction(is_instruction_call,
-			       make_call(CreateIntrinsic(NameOfToken(keyword)),
-					 lci));
-
-    if(statement_undefined_p(io_err) && statement_undefined_p(io_end)) {
-	io = io_call;
-    }
-    else {
-	list ls = NIL;
-	if(!statement_undefined_p(io_err)) {
-	    ls = CONS(STATEMENT, io_err, ls);
+	e2 = call_function(syntax_call(s2));
+	if (strcmp(entity_local_name(e1), "FMT=") != 0
+	    && expression_undefined_p(unit)) {
+	  /* UNIT is not defined for INQUIRE (et least)
+	   * Let's use LUN 0 by default for END et ERR.
+	   */
+	  unit = int_to_expression(0);
 	}
-	if(!statement_undefined_p(io_end)) {
-	    ls = CONS(STATEMENT, io_end, ls);
+	if (strcmp(entity_local_name(e1), "ERR=") == 0) {
+	  io_err = make_check_io_statement(IO_ERROR_ARRAY_NAME, unit, e2);
 	}
-	ls = CONS(STATEMENT, MakeStatement(entity_empty_label(), io_call), ls);
-	io = make_instruction(is_instruction_sequence, make_sequence(ls));
-	instruction_consistent_p(io);
+	else if (strcmp(entity_local_name(e1), "END=") == 0) {
+	  io_end = make_check_io_statement(IO_EOF_ARRAY_NAME, unit, e2);
+	}
+	else
+	  //free_expression(unit);
+	  ;
+      }
     }
+  }
+
+  /*
+    for (l = lci; CDR(l) != NULL; l = CDR(l)) ;
+
+    CDR(l) = lio;
+    l = lci;
+  */
+
+  lci = gen_nconc(lci, lio);
+
+  io_call = make_instruction(is_instruction_call,
+			     make_call(CreateIntrinsic(NameOfToken(keyword)),
+				       lci));
+
+  if(statement_undefined_p(io_err) && statement_undefined_p(io_end)) {
+    io = io_call;
+  }
+  else {
+    list ls = NIL;
+    if(!statement_undefined_p(io_err)) {
+      ls = CONS(STATEMENT, io_err, ls);
+    }
+    if(!statement_undefined_p(io_end)) {
+      ls = CONS(STATEMENT, io_end, ls);
+    }
+    ls = CONS(STATEMENT, MakeStatement(entity_empty_label(), io_call), ls);
+    io = make_instruction(is_instruction_sequence, make_sequence(ls));
+    instruction_consistent_p(io);
+  }
     
-    return io;
+  return io;
 }
 
 
