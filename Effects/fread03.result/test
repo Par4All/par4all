@@ -12,14 +12,15 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
    file = fopen(filename, "rb");
    if (file==(void *) 0) 
       nrerror("ouverture du fichier impossible\n");
-
-   readitem(file, buffer);
+   
+   // The code synthesis fails because of type_supporting_entities() which explodes the stack
+   //readitem(file, buffer);
    if (strcmp(buffer, "P5")!=0) 
       nrerror("entete du fichier %s invalide\n");
-
-   width = atoi(readitem(file, buffer));
-   height = atoi(readitem(file, buffer));
-   gris = atoi(readitem(file, buffer));
+   
+   //width  = atoi(readitem(file, buffer));
+   //height = atoi(readitem(file, buffer));
+   //gris   = atoi(readitem(file, buffer));
 
    *nrl = 0;
    *nrh = height-1;
@@ -38,4 +39,173 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 void ReadPGMrow(FILE *file, int width, byte *line)
 {
    fread(&line[0], sizeof(byte), width, file);
+}
+
+Proper effects for "ReadPGMrow"
+
+void ReadPGMrow(FILE *file, int width, byte *line)
+{
+//               <may be read    >: __IO_EFFECTS:LUNS[*]
+//               <may be written >: file[*] line[*] 
+//                                  __IO_EFFECTS:LUNS[*]
+//               <must be read   >: file width
+   fread(&line[0], sizeof(byte), width, file);
+}
+
+Cumulated effects for "ReadPGMrow"
+
+//               <may be read    >: __IO_EFFECTS:LUNS[*]
+//               <may be written >: file[*] line[*] 
+//                                  __IO_EFFECTS:LUNS[*]
+//               <must be read   >: file width
+void ReadPGMrow(FILE *file, int width, byte *line)
+{
+//               <may be read    >: __IO_EFFECTS:LUNS[*]
+//               <may be written >: file[*] line[*] 
+//                                  __IO_EFFECTS:LUNS[*]
+//               <must be read   >: file width
+   fread(&line[0], sizeof(byte), width, file);
+}
+
+Proper effects for "LoadPGM_bmatrix"
+
+byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
+{
+   int height;
+   int width;
+   int gris;
+   byte **m;
+   FILE *file;
+   char *buffer;
+   int i;
+//               <must be written>: buffer
+
+   buffer = (char *) calloc(80, sizeof(char));
+//               <may be read    >: __IO_EFFECTS:LUNS[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*]
+//               <must be read   >: filename
+//               <must be written>: file
+   file = fopen(filename, "rb");
+//               <must be read   >: file
+   if (file==(void *) 0) 
+      nrerror("ouverture du fichier impossible\n");
+//               <must be read   >: buffer
+   
+   // The code synthesis fails because of type_supporting_entities() which explodes the stack
+   //readitem(file, buffer);
+   if (strcmp(buffer, "P5")!=0) 
+      nrerror("entete du fichier %s invalide\n");
+//               <must be read   >: nrl
+//               <must be written - post>: (*nrl)
+   
+   //width  = atoi(readitem(file, buffer));
+   //height = atoi(readitem(file, buffer));
+   //gris   = atoi(readitem(file, buffer));
+
+   *nrl = 0;
+//               <must be read   >: height nrh
+//               <must be written - post>: (*nrh)
+   *nrh = height-1;
+//               <must be read   >: ncl
+//               <must be written - post>: (*ncl)
+   *ncl = 0;
+//               <must be read   >: nch width
+//               <must be written - post>: (*nch)
+   *nch = width-1;
+//               <must be written>: m
+   m = bmatrix(*nrl, *nrh, *ncl, *nch);
+//               <must be read   >: height
+//               <must be written>: i
+
+   for(i = 0; i <= height-1; i += 1)
+//               <may be read    >: __IO_EFFECTS:LUNS[*]
+//               <may be written >: file[*] m[i][*] 
+//                                  __IO_EFFECTS:LUNS[*]
+//               <must be read   >: file height i m[i] width
+      ReadPGMrow(file, width, m[i]);
+//               <may be read    >: __IO_EFFECTS:LUNS[*]
+//               <may be written >: file[*] __IO_EFFECTS:LUNS[*]
+//               <must be read   >: file
+
+   fclose(file);
+//               <must be read   >: buffer
+   free(buffer);
+//               <must be read   >: m
+
+   return m;
+}
+
+Cumulated effects for "LoadPGM_bmatrix"
+
+//               <may be read    >: __IO_EFFECTS:LUNS[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*]
+//               <must be read   >: filename
+byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
+{
+   int height;
+   int width;
+   int gris;
+   byte **m;
+   FILE *file;
+   char *buffer;
+   int i;
+//               <must be written>: buffer
+
+   buffer = (char *) calloc(80, sizeof(char));
+//               <may be read    >: __IO_EFFECTS:LUNS[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*]
+//               <must be read   >: filename
+//               <must be written>: file
+   file = fopen(filename, "rb");
+//               <must be read   >: file
+   if (file==(void *) 0) 
+      nrerror("ouverture du fichier impossible\n");
+//               <must be read   >: buffer
+   
+   // The code synthesis fails because of type_supporting_entities() which explodes the stack
+   //readitem(file, buffer);
+   if (strcmp(buffer, "P5")!=0) 
+      nrerror("entete du fichier %s invalide\n");
+//               <must be read   >: nrl
+//               <must be written - post>: (*nrl)
+   
+   //width  = atoi(readitem(file, buffer));
+   //height = atoi(readitem(file, buffer));
+   //gris   = atoi(readitem(file, buffer));
+
+   *nrl = 0;
+//               <must be read   >: height nrh
+//               <must be written - post>: (*nrh)
+   *nrh = height-1;
+//               <must be read   >: ncl
+//               <must be written - post>: (*ncl)
+   *ncl = 0;
+//               <must be read   >: nch width
+//               <must be written - post>: (*nch)
+   *nch = width-1;
+//               <must be written>: m
+   m = bmatrix(*nrl, *nrh, *ncl, *nch);
+//               <may be read    >: file i width TOP-LEVEL:*MEMORY* 
+//                                  __IO_EFFECTS:LUNS[*]
+//               <may be written >: file[*] m[*][*] 
+//                                  __IO_EFFECTS:LUNS[*]
+//               <must be read   >: height
+//               <must be written>: i
+
+   for(i = 0; i <= height-1; i += 1)
+//               <may be read    >: m[*] __IO_EFFECTS:LUNS[*]
+//               <may be written >: file[*] m[*][*] 
+//                                  __IO_EFFECTS:LUNS[*]
+//               <must be read   >: file height i width
+      ReadPGMrow(file, width, m[i]);
+//               <may be read    >: __IO_EFFECTS:LUNS[*]
+//               <may be written >: file[*] __IO_EFFECTS:LUNS[*]
+//               <must be read   >: file
+
+   fclose(file);
+//               <must be read   >: buffer
+   free(buffer);
+//               <must be read   >: m
+
+   return m;
 }
