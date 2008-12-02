@@ -665,8 +665,10 @@ i_create: TK_CREATE workspace_name /* workspace name */
 			    /* If you need to preserve the workspace
 			       for debugging purposes, use property
 			       ABORT_ON_USER_ERROR */
-			    user_log("Deleting workspace...\n");
-			    delete_workspace($2);
+			    if(!get_bool_property("ABORT_ON_USER_ERROR")) {
+			      user_log("Deleting workspace...\n");
+			      delete_workspace($2);
+			    }
 			    pips_user_error("Could not create workspace %s\n", 
 					    $2);
 			}
