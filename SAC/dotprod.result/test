@@ -1,0 +1,17 @@
+/* C pretty print for module DOTPROD. */
+#define size 10000
+
+void
+dotprod (short a[1], short b[10000], short c[10000])
+{
+  int i;
+
+  a[1] = 0;
+  for (i = 1; i <= size; i++)
+    {
+      a[1] = (a[1] + (b[i] * c[i]));
+      continue;
+    }
+  return;
+}
+

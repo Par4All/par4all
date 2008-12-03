@@ -12,8 +12,19 @@ enum FLGR_TYPE
 	FLGR_FLOAT64
 };
 typedef int fgINT32;
-typedef struct {int * array; int spp;int length;} FLGR_Data1D;
-typedef struct{FLGR_Data1D ** row; int size;int size_y;int size_x;enum FLGR_TYPE type;} FLGR_Data2D;
+
+typedef struct {
+  int * array; int spp;
+  int length;} FLGR_Data1D;
+
+typedef struct{
+  FLGR_Data1D ** row;
+  int size;
+  int size_y;
+  int size_x;
+  enum FLGR_TYPE type;
+} FLGR_Data2D;
+
 static void flgr_set_array_fgINT32(fgINT32 *array, int pos, fgINT32 value)
 {
    array[pos] = value;

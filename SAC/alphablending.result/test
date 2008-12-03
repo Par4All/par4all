@@ -1,0 +1,17 @@
+/* C pretty print for module ALPHABLENDING. */
+#define size 50000
+
+void
+alphablending (float result[50000], float src[50000], float dest[50000],
+	       float alpha)
+{
+  int i;
+
+  for (i = 1; i <= size; i++)
+    {
+      result[i] = ((alpha * src[i]) + ((1 - alpha) * dest[i]));
+      continue;
+    }
+  return;
+}
+

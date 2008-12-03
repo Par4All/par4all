@@ -1,0 +1,143 @@
+nsucc = 2 
+Result = if (sa == 0.0) {
+
+succ1 must be reached by GOTO
+No endif
+Result = if (sa == 0.0) {
+ goto 00000;
+}
+
+Result before = if (sa == 0.0) {
+ goto 00000;
+}
+
+Result after = if (sa == 0.0) {
+ goto 00000;
+}
+
+nsucc = 2 
+Result = if (sa == 0.0) {
+ goto 00000;
+}
+if ((incx == 1) && (incy == 1)) {
+
+succ1 must be reached by GOTO
+No endif
+Result = if (sa == 0.0) {
+ goto 00000;
+}
+if ((incx == 1) && (incy == 1)) {
+ goto ;
+}
+
+Result before = if (sa == 0.0) {
+ goto 00000;
+}
+if ((incx == 1) && (incy == 1)) {
+ goto ;
+}
+
+Result after = if (sa == 0.0) {
+ goto 00000;
+}
+if ((incx == 1) && (incy == 1)) {
+ goto ;
+}
+
+nsucc = 1 
+nsucc = 1 
+nsucc = 0 
+nsucc = 2 
+Result = if (sa == 0.0) {
+
+succ1 must be reached by GOTO
+No endif
+Result = if (sa == 0.0) {
+ goto 00000;
+}
+
+Result before = if (sa == 0.0) {
+ goto 00000;
+}
+
+Result after = if (sa == 0.0) {
+ goto 00000;
+}
+
+nsucc = 2 
+Result = if (sa == 0.0) {
+ goto 00000;
+}
+if ((incx == 1) && (incy == 1)) {
+
+succ1 must be reached by GOTO
+No endif
+Result = if (sa == 0.0) {
+ goto 00000;
+}
+if ((incx == 1) && (incy == 1)) {
+ goto ;
+}
+
+Result before = if (sa == 0.0) {
+ goto 00000;
+}
+if ((incx == 1) && (incy == 1)) {
+ goto ;
+}
+
+Result after = if (sa == 0.0) {
+ goto 00000;
+}
+if ((incx == 1) && (incy == 1)) {
+ goto ;
+}
+
+nsucc = 1 
+nsucc = 1 
+nsucc = 0 
+/* C pretty print for module SAXPY. */
+#define size 1000
+
+void
+saxpy (float sx[1000], float sy[1000])
+{
+  float sa;
+  int i;
+  int incx;
+  int incy;
+  int ix;
+  int iy;
+  int m;
+  int mp1;
+
+  sa = 3;
+  incx = 1;
+  incy = 1;
+  if (sa == 0.0)
+    {
+      goto 00000;
+    }
+  if ((incx == 1) && (incy == 1))
+    {
+      goto;
+    }
+  ix = 1;
+  iy = 1;
+  for (i = 1; i <= size; i++)
+    {
+      sy[iy] = (sy[iy] + (sa * sx[ix]));
+      ix = (ix + incx);
+      iy = (iy + incy);
+      continue;
+    }
+  goto 00000;
+  for (i = 1; i <= size; i++)
+    {
+      sy[i] = (sy[i] + (sa * sx[i]));
+      continue;
+    }
+  ;
+  return;
+}
+

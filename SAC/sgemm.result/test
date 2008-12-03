@@ -1,0 +1,453 @@
+nsucc = 2 
+Result = if (info != 0) {
+
+succ1 must be reached by GOTO
+No endif
+Result = if (info != 0) {
+ goto 00000;
+}
+
+Result before = if (info != 0) {
+ goto 00000;
+}
+
+Result after = if (info != 0) {
+ goto 00000;
+}
+
+nsucc = 2 
+Result = if (info != 0) {
+ goto 00000;
+}
+if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
+
+succ1 must be reached by GOTO
+No endif
+Result = if (info != 0) {
+ goto 00000;
+}
+if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
+ goto 00000;
+}
+
+Result before = if (info != 0) {
+ goto 00000;
+}
+if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
+ goto 00000;
+}
+
+Result after = if (info != 0) {
+ goto 00000;
+}
+if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
+ goto 00000;
+}
+
+nsucc = 2 
+Result = if (info != 0) {
+ goto 00000;
+}
+if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
+ goto 00000;
+}
+if (alpha == zero) {
+
+succ1 must be reached by GOTO
+No endif
+Result = if (info != 0) {
+ goto 00000;
+}
+if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
+ goto 00000;
+}
+if (alpha == zero) {
+ goto ;
+}
+
+Result before = if (info != 0) {
+ goto 00000;
+}
+if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
+ goto 00000;
+}
+if (alpha == zero) {
+ goto ;
+}
+
+Result after = if (info != 0) {
+ goto 00000;
+}
+if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
+ goto 00000;
+}
+if (alpha == zero) {
+ goto ;
+}
+
+nsucc = 1 
+nsucc = 1 
+nsucc = 0 
+nsucc = 2 
+Result = if (info != 0) {
+
+succ1 must be reached by GOTO
+No endif
+Result = if (info != 0) {
+ goto 00000;
+}
+
+Result before = if (info != 0) {
+ goto 00000;
+}
+
+Result after = if (info != 0) {
+ goto 00000;
+}
+
+nsucc = 2 
+Result = if (info != 0) {
+ goto 00000;
+}
+if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
+
+succ1 must be reached by GOTO
+No endif
+Result = if (info != 0) {
+ goto 00000;
+}
+if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
+ goto 00000;
+}
+
+Result before = if (info != 0) {
+ goto 00000;
+}
+if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
+ goto 00000;
+}
+
+Result after = if (info != 0) {
+ goto 00000;
+}
+if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
+ goto 00000;
+}
+
+nsucc = 2 
+Result = if (info != 0) {
+ goto 00000;
+}
+if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
+ goto 00000;
+}
+if (alpha == zero) {
+
+succ1 must be reached by GOTO
+No endif
+Result = if (info != 0) {
+ goto 00000;
+}
+if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
+ goto 00000;
+}
+if (alpha == zero) {
+ goto ;
+}
+
+Result before = if (info != 0) {
+ goto 00000;
+}
+if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
+ goto 00000;
+}
+if (alpha == zero) {
+ goto ;
+}
+
+Result after = if (info != 0) {
+ goto 00000;
+}
+if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
+ goto 00000;
+}
+if (alpha == zero) {
+ goto ;
+}
+
+nsucc = 1 
+nsucc = 1 
+nsucc = 0 
+/* C pretty print for module SGEMM. */
+#define size 10
+
+void
+sgemm (char transa, char transb, int m, int n, int k, float alpha,
+       float a[10][10], int lda, float b[10][10], int ldb, float beta,
+       float c[10][10], int ldc)
+{
+  int nota;
+  int notb;
+  int i;
+  int info;
+  int j;
+  int l;
+  int ncola;
+  int nrowa;
+  int nrowb;
+  float temp;
+  float one;
+  float zero;
+
+  one = 1.0e+0;
+  zero = 0.0e+0;
+  nota = lsame (transa, 'n');
+  notb = lsame (transb, 'n');
+  if (nota)
+    {
+      nrowa = m;
+      ncola = k;
+    }
+  else
+    {
+      nrowa = k;
+      ncola = m;
+    }
+  if (notb)
+    {
+      nrowb = k;
+    }
+  else
+    {
+      nrowb = n;
+    }
+  info = 0;
+  if ((!nota && !lsame (transa, 'c')) && !lsame (transa, 't'))
+    {
+      info = 1;
+    }
+  else
+    {
+      if ((!notb && !lsame (transb, 'c')) && !lsame (transb, 't'))
+	{
+	  info = 2;
+	}
+      else
+	{
+	  if (m < 0)
+	    {
+	      info = 3;
+	    }
+	  else
+	    {
+	      if (n < 0)
+		{
+		  info = 4;
+		}
+	      else
+		{
+		  if (k < 0)
+		    {
+		      info = 5;
+		    }
+		  else
+		    {
+		      if (lda < max (1, nrowa))
+			{
+			  info = 8;
+			}
+		      else
+			{
+			  if (ldb < max (1, nrowb))
+			    {
+			      info = 10;
+			    }
+			  else
+			    {
+			      if (ldc < max (1, m))
+				{
+				  info = 13;
+				}
+			    }
+			}
+		    }
+		}
+	    }
+	}
+    }
+  if (info != 0)
+    {
+      goto 00000;
+    }
+  if (((m == 0) || (n == 0))
+      || (((alpha == zero) || (k == 0)) && (beta == one)))
+    {
+      goto 00000;
+    }
+  if (alpha == zero)
+    {
+      goto;
+    }
+  if (notb)
+    {
+      if (nota)
+	{
+	  for (j = 1; j <= n; j++)
+	    {
+	      if (beta == zero)
+		{
+		  for (i = 1; i <= m; i++)
+		    {
+		      c[j][i] = zero;
+		      continue;
+		    }
+		}
+	      else
+		{
+		  if (beta != one)
+		    {
+		      for (i = 1; i <= m; i++)
+			{
+			  c[j][i] = (beta * c[j][i]);
+			  continue;
+			}
+		    }
+		}
+	      for (l = 1; l <= k; l++)
+		{
+		  if (b[j][l] != zero)
+		    {
+		      temp = (alpha * b[j][l]);
+		      for (i = 1; i <= m; i++)
+			{
+			  c[j][i] = (c[j][i] + (temp * a[l][i]));
+			  continue;
+			}
+		    }
+		  continue;
+		}
+	      continue;
+	    }
+	}
+      else
+	{
+	  for (j = 1; j <= n; j++)
+	    {
+	      for (i = 1; i <= m; i++)
+		{
+		  temp = zero;
+		  for (l = 1; l <= k; l++)
+		    {
+		      temp = (temp + (a[i][l] * b[j][l]));
+		      continue;
+		    }
+		  if (beta == zero)
+		    {
+		      c[j][i] = (alpha * temp);
+		    }
+		  else
+		    {
+		      c[j][i] = ((alpha * temp) + (beta * c[j][i]));
+		    }
+		  continue;
+		}
+	      continue;
+	    }
+	}
+    }
+  else
+    {
+      if (nota)
+	{
+	  for (j = 1; j <= n; j++)
+	    {
+	      if (beta == zero)
+		{
+		  for (i = 1; i <= m; i++)
+		    {
+		      c[j][i] = zero;
+		      continue;
+		    }
+		}
+	      else
+		{
+		  if (beta != one)
+		    {
+		      for (i = 1; i <= m; i++)
+			{
+			  c[j][i] = (beta * c[j][i]);
+			  continue;
+			}
+		    }
+		}
+	      for (l = 1; l <= k; l++)
+		{
+		  if (b[l][j] != zero)
+		    {
+		      temp = (alpha * b[l][j]);
+		      for (i = 1; i <= m; i++)
+			{
+			  c[j][i] = (c[j][i] + (temp * a[l][i]));
+			  continue;
+			}
+		    }
+		  continue;
+		}
+	      continue;
+	    }
+	}
+      else
+	{
+	  for (j = 1; j <= n; j++)
+	    {
+	      for (i = 1; i <= m; i++)
+		{
+		  temp = zero;
+		  for (l = 1; l <= k; l++)
+		    {
+		      temp = (temp + (a[i][l] * b[l][j]));
+		      continue;
+		    }
+		  if (beta == zero)
+		    {
+		      c[j][i] = (alpha * temp);
+		    }
+		  else
+		    {
+		      c[j][i] = ((alpha * temp) + (beta * c[j][i]));
+		    }
+		  continue;
+		}
+	      continue;
+	    }
+	}
+    }
+  ;
+  goto 00000;
+  if (beta == zero)
+    {
+      for (j = 1; j <= n; j++)
+	{
+	  for (i = 1; i <= m; i++)
+	    {
+	      c[j][i] = zero;
+	      continue;
+	    }
+	  continue;
+	}
+    }
+  else
+    {
+      for (j = 1; j <= n; j++)
+	{
+	  for (i = 1; i <= m; i++)
+	    {
+	      c[j][i] = (beta * c[j][i]);
+	      continue;
+	    }
+	  continue;
+	}
+    }
+  return;
+}
+
