@@ -42,9 +42,14 @@ entity previouscompunit;
 
 /* To keep track of the current dummy parameter naming. */
 static int current_dummy_parameter_number;
+
 static void set_current_dummy_parameter_number(int n)
 {current_dummy_parameter_number=n;}
-int get_current_dummy_parameter_number(void)
+
+void reset_current_dummy_parameter_number()
+{current_dummy_parameter_number=0;}
+
+static int get_current_dummy_parameter_number(void)
 {return current_dummy_parameter_number;}
 
 /******************* TOP LEVEL ENTITY  **********************/
@@ -1450,7 +1455,7 @@ void UseFormalArguments(entity f)
 
   if(!value_undefined_p(fv)) {
     code fc = value_code(fv);
-    list dl = code_declarations(fc);
+    list dl = module_all_declarations(f);
     list cd = list_undefined;
     list formals = NIL;
     string mn = string_undefined;
@@ -1534,12 +1539,12 @@ void UseFormalArguments(entity f)
 	   (although it should not) */
 	//formal_function(pfs) = entity_undefined;
 	/* Let's hope there are no other pointers towards dummy formal parameters */
-	// free_entity(p); // FI: we may use them in the type data structures in spite of the MAP on refs? 
+	//free_entity(p); // FI: we may use them in the type data structures in spite of the MAP on refs? 
       }
     }
 
     ifdebug(1) {
-      dl = code_declarations(fc);
+      dl = module_all_declarations(f);
       /* Check substitution in formal parameter declarations */
       ifdebug(8) {
 	pips_debug(8, "list of declared variables:\n");
@@ -1559,6 +1564,14 @@ void UseFormalArguments(entity f)
 
     /* FI: just in case? */
     remove_entity_type_stacks(formals);
+
+    /* Do not free the dummy formal parameter variable as they are
+       preserved in the dummy field for accurate prettyprinting */
+    /*
+    MAP(ENTITY, df, {
+      free_entity(df);
+    }, formals);
+    */
 
     free(mn);
     gen_free_list(formals);

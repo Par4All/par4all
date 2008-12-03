@@ -756,6 +756,13 @@ list declaration_supporting_references(list dl)
   return srl;
 }
 
+/* The function itself is not in its declarations. Maybe, it should be changed in the parser? */
+list module_all_declarations(entity m)
+{
+  list dl = CONS(ENTITY, m, code_declarations(value_code(entity_initial(m))));
+
+  return dl;
+}
 
 /*
  *  that is all

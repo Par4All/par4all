@@ -185,6 +185,7 @@ void CParserError(char *msg)
 
   /* The error may occur before the current module entity is defined */
   error_reset_current_module_entity();
+  reset_current_dummy_parameter_number();
 
   // Get rid of partly declared variables
   if(mod!=entity_undefined) {
@@ -435,6 +436,7 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
     reset_entity_type_stack_table(); /* Used to be done in ResetCurrentCompilationUnitEntity() */
     reset_current_C_line_number();
     reset_C_comment(compilation_unit_p(module_name));
+    reset_current_dummy_parameter_number();
     /*  reset_keyword_typedef_table();*/
     pips_assert("ContextStack is empty", stack_empty_p(ContextStack));
     stack_free(&ContextStack);
