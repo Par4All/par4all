@@ -1684,7 +1684,3 @@ bool print_code_smalltalk(string module_name)
 
   return TRUE;
 }
-
-
-
-

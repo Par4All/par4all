@@ -229,7 +229,7 @@ int type_memory_size(type t)
 represented by a basic, except for a varying size string (formal
 parameter). */
 
-int SizeOfElements(basic b)
+intptr_t SizeOfElements(basic b)
 {
   int e = -1;
 

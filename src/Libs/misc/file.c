@@ -568,6 +568,11 @@ pips_dirname(char *fullpath)
     return result;
 }
 
+
+/* Delete the given file.
+
+   Throw a pips_internal_error() if it fails.
+*/   
 void
 safe_unlink(char *file_name)
 {
@@ -588,6 +593,12 @@ safe_symlink(char *topath, char *frompath)
     }
 }
 
+
+/* Create a hard link to topath. That means that the file is accessible
+   with the new name frompath too.
+
+   Throw a pips_internal_error() if it fails.
+*/
 void
 safe_link(char *topath, char *frompath)
 {
