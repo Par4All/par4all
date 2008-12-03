@@ -144,7 +144,7 @@ static void add_intraprocedural_value_entities_unconditionally(entity e)
  */
 static void add_intraprocedural_value_entities(entity e)
 { 
-  type ut = ultimate_type(e);
+  type ut = ultimate_type(entity_type(e));
 
   pips_debug(8, "for %s\n", entity_name(e));
   if(!entity_has_values_p(e) && type_variable_p(ut) && !typedef_entity_p(e)) {
