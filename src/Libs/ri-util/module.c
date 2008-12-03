@@ -341,25 +341,68 @@ sort_with_initial_order(list l, list old)
     initial_order = NIL;
 }
 
-/******************************************************** EXTERNAL INTERFACE */
-
-void 
-insure_global_declaration_coherency(
-    entity module,          /* the module whose declarations are considered */
-    statement stat,         /* the statement where to find references */
-    list /* of entity */ le /* added entities, for includes... */)
+/* similar to gen_list_and but specialized for
+ * keeping reference of otherwise deleted expression
+ */
+static list
+gen_list_and_keep_expression(list * a,
+	     list b,list statements)
 {
-    list decl = entity_declarations(module), new_decl = NIL;
+    if (ENDP(*a))
+        return statements;
 
-    debug_on("RI_UTIL_DEBUG_LEVEL");
-    pips_debug(2, "Processing module %s\n", entity_name(module));
+    if (!gen_in_list_p(CHUNK(CAR(*a)), b)) {
+        /* This element of a is not in list b: delete it
+         * but first check that assignment have no side effect !
+         */
+
+        entity e = ENTITY(CAR(*a));
+        value v = entity_initial(e);
+        /* look for operations with poosible side-effect
+         */
+        if( v != NULL && value_expression_p(v) )
+        {
+            /* build simple statement
+             */
+            expression expr = copy_expression(value_expression(v));
+            statement s = instruction_to_statement( make_instruction_expression(expr) );
+            statements=CONS(STATEMENT, s , statements );
+            *a = CDR(*a);
+        }
+        else
+        {
+            cons *aux = *a;
+            *a = CDR(*a);
+            CAR(aux).p = NULL;
+            CDR(aux) = NULL;
+            free(aux);
+        }
+        return gen_list_and_keep_expression(a, b, statements);
+    }
+    else {
+        return gen_list_and_keep_expression(&CDR(*a), b, statements);
+    }
+}
+
+/* declare those statically in order to get the same behavior between fortran and c parsing
+ */
+static list current_included_entities = NIL;
+
+/* real implementation of insure_global_declaration_coherency
+ * with ugly switches to handle both fortran and C
+ */
+static void
+insure_global_declaration_coherency_helper(statement stat)
+{
+    list decl, new_decl = NIL;
+    decl=(is_fortran?entity_declarations(get_current_module_entity()):statement_declarations(stat));
 
     init_declared_variables();
     init_referenced_variables_in_list();
     referenced_variables_list = NIL;
     pips_assert("ref var initialized", !referenced_variables_undefined_p());
 
-    if (le) MAP(ENTITY, e, store_this_entity(e), le);
+    if (current_included_entities) MAP(ENTITY, e, store_this_entity(e), current_included_entities);
 
     pips_debug(3, "tagging references\n");
     mark_referenced_entities(stat);
@@ -424,20 +467,82 @@ insure_global_declaration_coherency(
      */
     sort_with_initial_order(new_decl, decl);
 
-    entity_declarations(module) = new_decl;
+    /* commit changes
+     */
+    if( is_fortran) {
+        entity_declarations(get_current_module_entity()) = new_decl;
+    }
+    else {
+        /* only remove elements, never add !
+         * new_decl may contain entities declared in deeper statements
+         */
+        list head = gen_list_and_keep_expression(&decl,new_decl,NIL);
+        statement_declarations(stat) = decl;
+        /* add extra statements if needed
+         */
+        if( head != NIL )
+        {
+            head=gen_nreverse(head);
+            instruction i = statement_instruction(stat);
+            switch( instruction_tag(i) )
+            {
+                case is_instruction_sequence:
+                    {
+                        /* insert new statements in front of thoses
+                        */
+                        sequence s = instruction_sequence(i);
+                        head = gen_nconc(head, sequence_statements(s) );
+                        sequence_statements(s) = head ;
+                    } break;
+                default:
+                    pips_assert("this instruction should not provide extra declaration ?!",false);
+
+            };
+
+        }
+
+    }
 
     ifdebug(2) {
-	pips_debug(2, "resulting declarations for %s: ", entity_name(module));
+	pips_debug(2, "resulting declarations for %s: ", entity_name(get_current_module_entity()));
 	MAP(ENTITY, e, fprintf(stderr, "%s, ", entity_name(e)), new_decl);
 	fprintf(stderr, "\n");
     }
 
     /* the temporaries are cleaned
      */
-    gen_free_list(decl);
+    gen_free_list(is_fortran?decl:new_decl);
     close_declared_variables();
     close_referenced_variables_in_list();
     gen_free_list(referenced_variables_list), referenced_variables_list = NIL;
+
+}
+
+
+/******************************************************** EXTERNAL INTERFACE */
+
+
+/* remove unused definition from codes
+ * use legacy implementation for fortran
+ * c implementation should work
+ * *but* it does *not* handle the following case
+ * int a =y++; //a is unused and will be removed
+ * int b=y; // b is used but will be declared before y++ is applied
+ */
+void 
+insure_global_declaration_coherency(
+    entity module,          /* the module whose declarations are considered */
+    statement stat,         /* the statement where to find references */
+    list /* of entity */ le /* added entities, for includes... */)
+{
+    debug_on("RI_UTIL_DEBUG_LEVEL");
+    pips_debug(2, "Processing module %s\n", entity_name(module));
+
+    /* set globals prior to processing, unset them after processing to be safe*/
+    current_included_entities=le;
+    if( is_fortran ) insure_global_declaration_coherency_helper(stat);
+    else gen_recurse( stat, statement_domain, gen_true, insure_global_declaration_coherency_helper);
+    current_included_entities=NIL;
 
     debug_off();
 }
@@ -635,7 +740,6 @@ module_to_declaration_length(entity func)
     return length;
 }
 
-
 /* Find all references in the declaration list */
 list declaration_supporting_references(list dl)
 {
