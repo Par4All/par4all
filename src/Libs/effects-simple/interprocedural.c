@@ -95,6 +95,8 @@ effects_dynamic_elim(list l_eff)
 {
   list l_res = NIL;
   list c_eff = list_undefined;
+  bool add_anywhere_write_effect_p = FALSE;
+  bool add_anywhere_read_effect_p = FALSE;
 
   for(c_eff = l_eff; !ENDP(c_eff); POP(c_eff)) {
     effect eff = EFFECT(CAR(c_eff));
@@ -124,12 +126,44 @@ effects_dynamic_elim(list l_eff)
 	ram r = storage_ram(eff_s);
 	/* FI: heap areas effects should be preserved... */
 	if (dynamic_area_p(ram_section(r)) || heap_area_p(ram_section(r))
-	    || stack_area_p(ram_section(r)))
-	  {
+	    || stack_area_p(ram_section(r))) {
+	  type ut = ultimate_type(entity_type(eff_ent));
+	  addressing ad = effect_addressing(eff);
+	  list sl = reference_indices(effect_any_reference(eff));
+
+	  if(pointer_type_p(ut))
+	    if(!ENDP(sl) || !addressing_index_p(ad)) {
+	      /* Can we convert this effect using the pointer initial value? */
+	      /* FI: this should rather be done after a constant
+		 pointer analysis but I'd like to improve quickly
+		 results with Effects/fulguro01.c */
+	      value v = entity_initial(eff_ent);
+
+	      if(FALSE && value_expression_p(v)) {
+		;
+	      }
+	      else {
+		action ac = effect_action(eff);
+		pips_debug(5, "Local pointer \"%s\" is not initialized!\n", 
+			   entity_name(eff_ent));
+		if(action_write_p(ac))
+		  add_anywhere_write_effect_p = TRUE;
+		else
+		  add_anywhere_read_effect_p = TRUE;
+		ignore_this_effect = TRUE;
+	      }
+	    }
+	    else {
+	      pips_debug(5, "Local pointer \"%s\" can be ignored\n", 
+			 entity_name(eff_ent));
+	      ignore_this_effect = TRUE;
+	    }
+	  else { 
 	    pips_debug(5, "dynamic or pointed var ignored (%s)\n", 
 		       entity_name(eff_ent));
 	    ignore_this_effect = TRUE;
 	  }
+	}
 	break;
       }
     case is_storage_formal:
@@ -164,6 +198,10 @@ effects_dynamic_elim(list l_eff)
     }
   }
 
+  if(add_anywhere_write_effect_p)
+    l_res = CONS(EFFECT, anywhere_effect(make_action_write()), l_res);
+  if(add_anywhere_read_effect_p)
+    l_res = CONS(EFFECT, anywhere_effect(make_action_read()), l_res);
   return(l_res);
 }
 
