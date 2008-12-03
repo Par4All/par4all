@@ -50,6 +50,7 @@
 
 #include "pipsdbm.h"
 #include "resources.h"
+#include "preprocessor.h"
 #include "compsec.h"
 #include "bootstrap.h"
 

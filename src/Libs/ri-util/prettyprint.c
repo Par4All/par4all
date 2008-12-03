@@ -305,6 +305,7 @@ char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data
 #include "misc.h"
 #include "properties.h"
 #include "prettyprint.h"
+#include "preprocessor.h"
 
 /* operator precedences are in the [0,100] range */
 

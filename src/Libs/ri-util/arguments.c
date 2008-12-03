@@ -18,6 +18,7 @@
 #include "misc.h"
 #include "ri-util.h"
 #include "constants.h"
+#include "preprocessor.h"
 
 void print_arguments(args)
 cons * args;

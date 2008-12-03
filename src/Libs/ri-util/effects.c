@@ -568,7 +568,7 @@ bool expression_invariant_wrt_effects(expression exp, list el)
 
   for(cee=ee; !ENDP(cee) && invariant_p; POP(cee)) {
     effect exp_e = EFFECT(CAR(cee));
-    reference exp_r = effect_any_reference(exp_e);
+    //reference exp_r = effect_any_reference(exp_e);
     //entity exp_v = reference_variable(exp_r);
 
     for(cel=el; !ENDP(el) && invariant_p; POP(el)) {

@@ -12,6 +12,8 @@
 #include "text-util.h"
 #include "ri-util.h"
 
+extern int CurrentOffsetOfArea(entity /*a*/, entity /*v*/);
+
 #define STATIC_CONTROLIZE_MODULE_NAME 	"STATCON"
 #define NLC_PREFIX 			"NLC"
 #define NSP_PREFIX 			"NSP"

@@ -4,6 +4,9 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+
+// To have strndup():
+#define _GNU_SOURCE
 #include <string.h>
 
 #include "linear.h"

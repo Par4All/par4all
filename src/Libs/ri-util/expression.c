@@ -2186,7 +2186,6 @@ bool reference_with_constant_indices_p(reference r)
 reference reference_with_store_independent_indices(reference r)
 {
   list sel = reference_indices(r);
-  bool constant_p = TRUE;
   list sec = list_undefined;
 
   for(sec = sel; !ENDP(sec); POP(sec)) {

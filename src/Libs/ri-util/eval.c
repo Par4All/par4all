@@ -115,7 +115,7 @@ value EvalSizeofexpression(sizeofexpression soe)
 {
   type t = type_undefined;
   value v = value_undefined;
-  int i;
+  intptr_t i;
 
   if(sizeofexpression_expression_p(soe)) {
     expression e = sizeofexpression_expression(soe);
@@ -179,7 +179,7 @@ EvalIntrinsic(entity e, list la)
 value EvalConditionalOp(list la)
 {
   value vout, v1, v2, v3;
-  int arg1 = 0, arg2 = 0, arg3 = 0;
+  intptr_t arg1 = 0, arg2 = 0, arg3 = 0;
   bool failed = FALSE;
 
   pips_assert("Three arguments", gen_length(la)==3);
