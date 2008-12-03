@@ -796,10 +796,10 @@ local_name_to_top_level_entity(string n)
     if (static_module_name_p(n)) {
       string cun = strdup(n);
       string sep = strchr(cun, FILE_SEP);
-      string ln = strchr(n, FILE_SEP)+1;
+      //string ln = strchr(n, MODULE_SEP)+1;
 
       *(sep+1) = '\0';
-      module = gen_find_tabulated(concatenate(cun, MODULE_SEP_STRING, ln, NULL),entity_domain);
+      module = gen_find_tabulated(concatenate(cun, MODULE_SEP_STRING, n, NULL),entity_domain);
       free(cun);
     }
     else 
