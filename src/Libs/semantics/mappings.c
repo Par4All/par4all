@@ -32,7 +32,7 @@
 #include "transformer.h"
 
 #include "semantics.h"
-
+#include "preprocessor.h"
 
 /* EQUIVALENCE */
 

@@ -606,7 +606,7 @@ transformer statement_to_postcondition(
 	transformer foo = transformer_undefined;
 	list dl = statement_block_p(s) ? statement_declarations(s) : NIL;
 
-	if(!ENDP(statement_declarations(s) && !statement_block_p(s))) {
+	if(!ENDP(statement_declarations(s)) && !statement_block_p(s)) {
 	  // FI: Just to gain some time before dealing with controlizer and declarations updates
 	  //pips_internal_error("Statement %p carries declarations\n");
 	  pips_user_warning("Statement %p carries declarations\n");

@@ -43,6 +43,7 @@
 #include "semantics.h"
 
 #include "properties.h"
+#include "preprocessor.h"
 
 /* three mappings used throughout semantics analysis:
  *  - transformer_map is computed in a first phase
