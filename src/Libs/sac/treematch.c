@@ -19,7 +19,6 @@ typedef dg_vertex_label vertex_label;
 #include "patterns.tab.h"
 
 
-static bool patterns_initialized = FALSE;
 static matchTree patterns_tree = NULL;
 
 static list finalArgType = NIL;
@@ -375,10 +374,8 @@ void init_tree_patterns()
 {
    extern FILE * patterns_yyin;
 
-   if (!patterns_initialized)
+   if (patterns_tree == NULL) /* never initialized */
    {
-      patterns_initialized = TRUE;
-
       patterns_tree = make_tree();
 
       patterns_yyin = fopen("patterns.def", "r");

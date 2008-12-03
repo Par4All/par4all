@@ -41,8 +41,8 @@ static graph dependence_graph;
 static hash_table matches = NULL;
 
 /*
-This function stores in the matches hash table the
-simd pattern matches for each statement
+ * This function stores in the matches hash table the
+ * simd pattern matches for each statement
  */
 void init_statement_matches_map(list l)
 {
@@ -102,8 +102,8 @@ match get_statement_match_of_kind(statement s, opcodeClass kind)
 }
 
 /*
-This function gets the simd pattern matches opcodeClass's
-list for the statement s
+ * This function gets the simd pattern matches opcodeClass's
+ * list for the statement s
  */
 list get_statement_matching_types(statement s)
 {
@@ -119,8 +119,10 @@ list get_statement_matching_types(statement s)
 static hash_table successors;
 
 /*
-This function stores in the hash_table successors
-the successors of each statement in the list l
+ * This function stores in the hash_table successors
+ * the successors of each statement in the list l
+ * 
+ * it is done by iterating over the `dependence_graph'
  */
 void init_statement_successors_map(list l)
 {
@@ -143,9 +145,9 @@ void init_statement_successors_map(list l)
 }
 
 /*
-This function frees the successors hash table
+ * This function frees the successors hash table
  */
-void free_statement_successors_map()
+static void free_statement_successors_map()
 {
    hash_table_free(successors);
 }

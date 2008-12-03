@@ -18,6 +18,13 @@ typedef dg_vertex_label vertex_label;
 #include "sac.h"
 #include "patterns.tab.h"
 
+/*
+ * we manipulate tokens from
+ * either the `ri'
+ * or from the pattern lexer
+ * binding is done here
+ */
+
 typedef struct {
       char* name;
       int id;
