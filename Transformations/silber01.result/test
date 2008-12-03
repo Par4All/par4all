@@ -1,0 +1,171 @@
+
+Initial code
+
+void access_counter(unsigned int *hi, unsigned int *lo)
+{
+}
+void copy(int w, int h, unsigned char *bytes, unsigned char *dest)
+{
+   int i;
+   int j;
+
+   for (i = 0;i<w;i++)
+      for (j = 0;j<h;j++)
+         dest[j*w+i] = bytes[j*w+i];
+}
+void curve(int w, int h, unsigned char *bytes, unsigned char *lut)
+{
+   int i;
+   int j;
+
+   for (i = 0;i<w;i++)
+      for (j = 0;j<h;j++) {
+         unsigned char current = bytes[j*w+i];
+         bytes[j*w+i] = lut[current];
+      }
+}
+double get_counter()
+{
+   unsigned int ncyc_hi;
+   unsigned int ncyc_lo;
+   unsigned int hi;
+   unsigned int lo;
+   unsigned int borrow;
+
+   access_counter(&ncyc_hi, &ncyc_lo);
+
+   lo = ncyc_lo-cyc_lo;
+   borrow = lo>ncyc_lo;
+   hi = ncyc_hi-cyc_hi-borrow;
+   return (double) hi*(1<<30)*4+lo;
+}
+void light(int w, int h, unsigned char *bytes, unsigned char val)
+{
+   int i;
+   int j;
+
+   for (i = 0;i<w;i++)
+      for (j = 0;j<h;j++) {
+         unsigned char current = bytes[j*w+i];
+         bytes[j*w+i] = ((int) current+val>255?255:current+val);
+      }
+}
+int main(int ac, char *av[])
+{
+   FILE *in;
+   FILE *map;
+   FILE *out;
+   unsigned char *bytes;
+   unsigned char *dest;
+   unsigned char *lut;
+   int height;
+   int width;
+   int maxval;
+   char c1;
+   char c2;
+   double t;
+   long i;
+   long size;
+
+   if (ac!=4) {
+      printf("Usage: light infile.pgm mapfile.amp outfile.pgm\n");
+      exit(1);
+   }
+
+   in = fopen(av[1], "r");
+   if (in==(void *) 0) {
+      perror("fopen");
+      exit(1);
+   }
+
+   map = fopen(av[2], "r");
+   if (map==(void *) 0) {
+      perror("fopen");
+      exit(1);
+   }
+
+   fscanf(in, "%c", &c1);
+   fscanf(in, "%c", &c2);
+   if (c1!='P'||c2!='5') {
+      fprintf(stderr, "Error, input file is not PGM\n");
+      exit(1);
+   }
+
+   fscanf(in, "%d %d", &height, &width);
+   fscanf(in, "%d", &maxval);
+
+   printf("w=%d, h=%d, max=%d\n", width, height, maxval);
+
+   size = width*height;
+
+   bytes = (unsigned char *) malloc(sizeof(unsigned char)*size);
+   if (bytes==(void *) 0) {
+      perror("malloc");
+      exit(1);
+   }
+
+   dest = (unsigned char *) malloc(sizeof(unsigned char)*size);
+   if (dest==(void *) 0) {
+      perror("malloc");
+      exit(1);
+   }
+
+   lut = (unsigned char *) malloc(sizeof(unsigned char)*256);
+   if (lut==(void *) 0) {
+      perror("malloc");
+      exit(1);
+   }
+   {
+      int n = 0;
+      unsigned char val;
+      while (fread(&val, 1, 1, map)!=0) {
+         lut[n] = val;
+         n++;
+      }
+   }
+
+   fseek(in, 1, 1);
+   for (i = 0;i<size;i++)
+      if (fread(bytes+i, 1, 1, in)==0) {
+         perror("fread");
+         exit(1);
+      }
+   fclose(in);
+
+   start_counter();
+   transfo(width, height, bytes, dest, lut, 5);
+   t = get_counter();
+   printf("%f clock cycles.\n", t);
+   
+
+   out = fopen(av[3], "w");
+   if (out==(void *) 0) {
+      perror("fopen");
+      exit(1);
+   }
+   fprintf(out, "P5\n");
+   fprintf(out, "%d %d\n", height, width);
+   fprintf(out, "%d\n", maxval);
+   for (i = 0;i<size;i++)
+      if (fwrite(dest+i, 1, 1, out)==-1) {
+         perror("fwrite");
+         exit(1);
+      }
+   fclose(out);
+}
+void start_counter()
+{
+   access_counter(&cyc_hi, &cyc_lo);
+}
+void transfo(int w, int h, unsigned char *bytes, unsigned char *dest, unsigned char *lut, unsigned char val)
+{
+   copy(w, h, bytes, dest);
+   curve(w, h, dest, lut);
+   light(w, h, dest, val);
+}
+
+Code after transformations to come...
+
+
+Unsplit resulting code
+
