@@ -56,8 +56,8 @@ int main()
    int COEFF[6];
    int i;
    int j;
-//               <must be read   >: COEFF COEFF COEFF COEFF COEFF 
-//                                  COEFF
+//               <must be written>: COEFF[0] COEFF[1] COEFF[2] 
+//                                  COEFF[3] COEFF[4] COEFF[5]
 
    init_coeff(COEFF);
 //               <must be written>: i
@@ -73,7 +73,8 @@ int main()
    for(i = 0; i <= 7; i += 1)
 //               <must be written>: j
       for(j = 0; j <= 12; j += 1)
-//               <must be read   >: COEFF X i j
+//               <may be read    >: COEFF[*] X[*][*]
+//               <must be read   >: i j
 //               <must be written>: H[i][j]
          H[i][j] = convold1(X, COEFF, i, j);
 //               <must be written>: i
@@ -81,7 +82,8 @@ int main()
    for(i = 0; i <= 7; i += 1)
 //               <must be written>: j
       for(j = 0; j <= 7; j += 1)
-//               <must be read   >: COEFF H i j
+//               <may be read    >: COEFF[*] H[*][*]
+//               <must be read   >: i j
 //               <must be written>: K[i][j]
          K[i][j] = convold2(H, COEFF, i, j);
 //               <must be written>: i
@@ -89,7 +91,8 @@ int main()
    for(i = 0; i <= 7; i += 1)
 //               <must be written>: j
       for(j = 0; j <= 7; j += 1)
-//               <must be read   >: H K i j
+//               <may be read    >: H[*][*] K[*][*]
+//               <must be read   >: i j
 //               <must be written>: Y[i][j]
          Y[i][j] = filtre(H, K, i, j);
 //               <must be written>: i

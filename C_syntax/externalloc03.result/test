@@ -19,9 +19,11 @@ External variable list:
 
 	Declared external entity "TOP-LEVEL:i"	with type "variable" "int"
 
-Layouts for formal parameters:
+Layout for formal parameters:
 
-	Variable main:argc	offset = 1	Variable main:argv	offset = 2
+	Variable main:argc	offset = 1
+	Variable main:argv	offset = 2
+
 Layouts for memory areas:
 
 Layout for memory area "TOP-LEVEL:*STATIC*" of size 4:
