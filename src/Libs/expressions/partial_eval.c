@@ -250,7 +250,7 @@ void partial_eval_expression_and_regenerate(expression *ep, Psysteme ps, effects
     regenerate_expression(&ef, ep);
 
     if(get_debug_level()>=5 && !expression_consistent_p(*ep)) {
-	pips_error("partial_eval_expression_and_regenerate", "bad evaluation");
+	pips_internal_error("bad evaluation");
     }
 }
 
@@ -276,28 +276,76 @@ struct eformat partial_eval_expression(expression e, Psysteme ps, effects fx)
 
 struct eformat partial_eval_syntax(expression e, Psysteme ps, effects fx)
 {
-    struct eformat ef;
-    syntax s = expression_syntax(e);
+  struct eformat ef;
+  syntax s = expression_syntax(e);
 
-    switch (syntax_tag(s)) {
-      case is_syntax_reference:
-	ef = partial_eval_reference(e, ps, fx);
-	break;
-      case is_syntax_range:
-	ef = eformat_undefined;
-	break;
-      case is_syntax_call:
-	ef = partial_eval_call(e, ps, fx);
-	break;
-      default:
-	pips_error( "partial_eval_syntax", "case default\n");
-	abort();
+  switch (syntax_tag(s)) {
+  case is_syntax_reference:
+    ef = partial_eval_reference(e, ps, fx);
+    break;
+  case is_syntax_range:
+    ef = eformat_undefined;
+    break;
+  case is_syntax_call:
+    ef = partial_eval_call(e, ps, fx);
+    break;
+  case is_syntax_cast: {
+    cast c = syntax_cast(s);
+
+    partial_eval_expression_and_regenerate(&(cast_expression(c)), ps, fx);
+    ef = eformat_undefined;
+    break;
+  }
+  case is_syntax_sizeofexpression: {
+    sizeofexpression soe = syntax_sizeofexpression(s);
+
+    if(sizeofexpression_expression_p(soe)) {
+      partial_eval_expression_and_regenerate(&(sizeofexpression_expression(soe)), ps, fx);
     }
+    ef = eformat_undefined;
+    break;
+  }
+  case is_syntax_subscript: {
+    subscript sub = syntax_subscript(s);
+    list el = subscript_indices(sub);
 
-    if (get_debug_level()==9)
-	print_eformat(ef, "after partial_eval_syntax");
+    partial_eval_expression_and_regenerate(&(subscript_array(sub)), ps, fx);
 
-    return(ef);
+    /*
+    MAPL(ce, {
+      partial_eval_expression_and_regenerate(&(EXPRESSION(CAR(ce))), ps, fx);
+    }, el);
+    */
+
+    ef = eformat_undefined;
+    break;
+  }
+  case is_syntax_application: {
+    application a = syntax_application(s);
+    list al = application_arguments(a);
+
+    partial_eval_expression_and_regenerate(&(application_function(a)), ps, fx);
+
+    /*
+    MAPL(ce, {
+      partial_eval_expression_and_regenerate(&(EXPRESSION(CAR(ce))), ps, fx);
+    }, al);
+    */
+    ef = eformat_undefined;
+    break;
+  }
+  case is_syntax_va_arg:
+    ef =  eformat_undefined;
+    break;
+  default:
+    pips_error( "partial_eval_syntax", "case default\n");
+    abort();
+  }
+
+  if (get_debug_level()==9)
+    print_eformat(ef, "after partial_eval_syntax");
+
+  return(ef);
 }
 
 struct eformat partial_eval_reference(expression e, Psysteme ps, effects fx)
@@ -440,7 +488,7 @@ struct eformat partial_eval_call(expression exp, Psysteme ps, effects fx)
     value vinit;
     struct eformat ef;
     
-    pips_assert("partial_eval_call", 
+    pips_assert("The expression is a call", 
 		syntax_call_p(expression_syntax(exp)));
     ec = syntax_call(expression_syntax(exp));
 
@@ -487,6 +535,7 @@ struct eformat partial_eval_call(expression exp, Psysteme ps, effects fx)
 	else ef = eformat_undefined;
 	break;
       case is_value_code:
+	/* FI: The actual aruments are not partially evaluated? */
 	ef = eformat_undefined;
 	break;
       default:
