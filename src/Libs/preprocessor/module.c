@@ -1,4 +1,4 @@
-/* 
+/*
  * $Id$
  */
 #include <stdio.h>
@@ -49,7 +49,7 @@ list module_declarations(entity m)
   current_module_declaration_list = NIL;
 
     gen_multi_recurse
-      (s, 
+      (s,
        statement_domain, add_local_statement_declarations, gen_null,
        NULL);
 
@@ -72,7 +72,7 @@ list current_module_declarations()
   return module_declarations(m);
 }
 
-/* Retrieve the compilation unit containing a module definition. 
+/* Retrieve the compilation unit containing a module definition.
 
    The implementation is clumsy.
 
@@ -83,7 +83,7 @@ entity module_entity_to_compilation_unit_entity(entity m)
 {
   entity cu = entity_undefined;
 
-  if(compilation_unit_entity_p(m)) 
+  if(compilation_unit_entity_p(m))
     cu = m;
   else {
     // string aufn = db_get_memory_resource(DBR_USER_FILE, entity_user_name(m), TRUE);
@@ -91,7 +91,7 @@ entity module_entity_to_compilation_unit_entity(entity m)
     string lufn = strrchr(aufn, '/')+1;
 
     if(lufn!=NULL) {
-      string n = strstr(lufn, ".cpp_processed.c");
+      string n = strstr(lufn, PP_C_ED);
       int l = n-lufn;
       string cun = strndup(lufn, l);
 
@@ -208,7 +208,7 @@ string entity_unambiguous_user_name(entity e)
    the scope information in the name of extraprocedural variables and
    functions.
 */
-string 
+string
 entity_minimal_name(entity e)
 {
   entity m = get_current_module_entity();

@@ -67,14 +67,14 @@ EvalSyntax(syntax s)
 	    syntax_tag(s));
     abort();
   }
-  
+
   return v;
 }
 
 /* only calls to constant, symbolic or intrinsic functions might be
  * evaluated. recall that intrinsic functions are not known.
  */
-value 
+value
 EvalCall(call c)
 {
     value vout, vin;
@@ -85,7 +85,7 @@ EvalCall(call c)
 
     if (value_undefined_p(vin))
 	pips_internal_error("undefined value for %s\n", entity_name(f));
-	
+
     switch (value_tag(vin)) {
       case is_value_intrinsic:
 	vout = EvalIntrinsic(f, call_arguments(c));
@@ -127,7 +127,7 @@ value EvalSizeofexpression(sizeofexpression soe)
   }
 
   i = type_memory_size(t);
-  v = make_value(is_value_constant, make_constant(is_constant_int, i));
+  v = make_value(is_value_constant, make_constant(is_constant_int, (void *) i));
 
   if(sizeofexpression_expression_p(soe))
     free_type(t);

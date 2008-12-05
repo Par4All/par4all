@@ -20,7 +20,7 @@ static void
 flint_initialize_statement_def_use_variables(graph dependence_graph)
 {
     flint_statement_def_use_variables = hash_table_make(hash_pointer, 0);
-   
+
     MAP(VERTEX,
 	a_vertex,
 	{
@@ -42,16 +42,15 @@ flint_initialize_statement_def_use_variables(graph dependence_graph)
 			    statement use;
 			    statement def;
 			    cell a_use_cell;
-                        
-			    ifdebug(7) 
-			    {
+
+			    ifdebug(7) {
 				fprintf(stderr, "\t\tfrom ");
 				print_words(stderr, words_effect(conflict_source(a_conflict)));
 				fprintf(stderr, " to ");
 				print_words(stderr, words_effect(conflict_sink(a_conflict)));
 				fprintf(stderr, "\n");
 			    }
-                    
+
 			    /* Something is useful for the current
 			       statement if it writes something that
 			       is used in the current statement: */
@@ -66,23 +65,23 @@ flint_initialize_statement_def_use_variables(graph dependence_graph)
 				/* The dependance is not a use-def
 				   one, look forward... */
 				continue;
-                        
+
 			    {
 				/* Mark that we will visit the node
 				   that defined a source for this
 				   statement, if not already visited: */
 				entity a_variable;
 				set def_use_variables;
-				
+
 				/* Get the variable entity involved in
                                    the dependence: */
 				if (cell_preference_p(a_use_cell))
 				    a_variable = reference_variable(preference_reference(cell_preference(a_use_cell)));
 				else
 				    a_variable = reference_variable(cell_reference(a_use_cell));
-    
+
 				def_use_variables = (set) hash_get(flint_statement_def_use_variables, (char *) use);
-                                       
+
 				if (def_use_variables == (set) HASH_UNDEFINED_VALUE) {
 				    /* It is the first dependence we
 				       found for use. Create the set: */
@@ -103,7 +102,7 @@ flint_initialize_statement_def_use_variables(graph dependence_graph)
 					   def, (uintptr_t) statement_ordering(def),
 					   entity_minimal_name(a_variable));
 			    }
-                        
+
 			    /* One use-def is enough for this variable
 			       couple: */
 			    break;

@@ -588,7 +588,7 @@ character_to_character_type(int n)
 }
 
 static type
-substring_type(size_t n)
+substring_type(int n)
 {
   type t = type_undefined;
   functional ft = functional_undefined;
@@ -610,7 +610,7 @@ substring_type(size_t n)
 }
 
 static type
-assign_substring_type(size_t n)
+assign_substring_type(int n)
 {
   type t = type_undefined;
   functional ft = functional_undefined;
@@ -3696,8 +3696,6 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {FORMAT_FUNCTION_NAME, 1, default_intrinsic_type, check_format, 0},
   {INQUIRE_FUNCTION_NAME, (INT_MAX), default_intrinsic_type, check_inquire, 0},
 
-
-  // Typing issue introduced by Ronan with size_t. Why aren't they all size_t or int?
   {SUBSTRING_FUNCTION_NAME, 3, substring_type, typing_substring, 0},
   {ASSIGN_SUBSTRING_FUNCTION_NAME, 4, assign_substring_type, typing_assign_substring, 0},
 

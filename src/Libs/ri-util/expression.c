@@ -765,13 +765,13 @@ int r;
    Negative constants do not seem to be included in PIPS internal
    representation.
   */
-expression 
-int_to_expression(int i)
+expression
+int_to_expression(intptr_t i)
 {
-    char constant_name[12];
+  char constant_name[3*sizeof(i)];
     expression e;
 
-    (void) sprintf(constant_name,"%d",i>=0?i:-i);
+    (void) sprintf(constant_name,"%td", i >= 0 ? i : -i);
     e = MakeIntegerConstantExpression(strdup(constant_name));
     if(i<0) {
 	entity um = entity_intrinsic(UNARY_MINUS_OPERATOR_NAME);

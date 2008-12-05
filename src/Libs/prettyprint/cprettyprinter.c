@@ -240,8 +240,9 @@ static string c_basic_string(basic b)
             break;
         case is_basic_bit:
             {
-                int i = basic_bit(b);
-                pips_debug(2,"Bit field basic: %d\n",i);
+	      /* An expression indeed... To be fixed... */
+                intptr_t i = (intptr_t) basic_bit(b);
+                pips_debug(2,"Bit field basic: %td\n", i);
                 result = "int" SPACE; /* ignore if it is signed or unsigned */
                 break;
             }
@@ -476,9 +477,12 @@ static string this_entity_cdeclaration(entity var)
                 }
                 if (basic_bit_p(variable_basic(v)))
                 {
-                    int i = basic_bit(variable_basic(v));
-                    pips_debug(2,"Basic bit %d",i);
-                    result = strdup(concatenate(result,":",int_to_string(i),NULL));
+		  /* It is an expression... */
+		  intptr_t i = (intptr_t) basic_bit(variable_basic(v));
+		  pips_debug(2,"Basic bit %td",i);
+		  result = strdup(concatenate(result,":",int_to_string(i),NULL));
+		  user_error("this_entity_cdeclaration",
+			     "Bitfield to be finished...");
                 }
                 free(st);
                 //free(sd);

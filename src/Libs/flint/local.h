@@ -37,5 +37,6 @@ typedef dg_vertex_label vertex_label;
 #include "ricedg.h"
 #include "semantics.h"
 #include "transformations.h"
+#include "preprocessor.h"
 #include "flint.h"
 
