@@ -173,7 +173,7 @@ Ppolynome pp;
 char * (*variable_name)(Variable);
 int (*is_inferior_var)(Pvecteur *, Pvecteur *);
 {
-#define POLYNOME_BUFFER_SIZE 1024
+#define POLYNOME_BUFFER_SIZE 20480
     static char t[POLYNOME_BUFFER_SIZE];
     char *r, *s;
 
