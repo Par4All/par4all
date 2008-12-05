@@ -19,12 +19,9 @@ void c_clean_declarations04(int x)
    int y = 0;
    extern  stderr();
 
-   if (y) {
-      int x = y++;
-      int z;
-   }
-   else {
-      int z = y--;
-   }
+   if (y)
+      y++;
+   else
+      y--;
    fprintf(stderr, "x=%dn", x);
 }
