@@ -37,6 +37,7 @@
 #include "ri-util.h"
 #include "misc.h"
 #include "matrice.h"
+#include "preprocessor.h"
 #include "complexity.h"
 
 char *variable_name(var)

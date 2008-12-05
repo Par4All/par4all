@@ -282,7 +282,7 @@ list effects_composition_with_effect_transformer(list l_eff,
   extern string words_to_string(list);
 
   ifdebug(8) {
-    pips_debug(8, "Begin: %d effects before composition:\n", gen_length(l_eff));
+    pips_debug(8, "Begin: %zd effects before composition:\n", gen_length(l_eff));
     MAP(EFFECT, eff, {
 	reference r = effect_any_reference(eff);
 	pips_debug(8, "%p: %s\n", eff, words_to_string(effect_words_reference_with_addressing_as_it_is(r, addressing_tag(effect_addressing(eff)))));
@@ -322,7 +322,7 @@ list effects_composition_with_effect_transformer(list l_eff,
   }
 
   ifdebug(8) {
-    pips_debug(8, "End: %d effects after composition:\n", gen_length(l_eff));
+    pips_debug(8, "End: %zd effects after composition:\n", gen_length(l_eff));
     MAP(EFFECT, eff, {
 	reference r = effect_any_reference(eff);
 	pips_debug(8, "%p: %s\n", eff, words_to_string(effect_words_reference_with_addressing_as_it_is(r, addressing_tag(effect_addressing(eff)))));
@@ -333,13 +333,13 @@ list effects_composition_with_effect_transformer(list l_eff,
   l_eff = proper_effects_combine(l_eff, FALSE);
 
   ifdebug(8) {
-    pips_debug(8, "End: %d effects after composition:\n", gen_length(l_eff));
+    pips_debug(8, "End: %zd effects after composition:\n", gen_length(l_eff));
     MAP(EFFECT, eff, {
 	reference r = effect_any_reference(eff);
 	pips_debug(8, "%p: %s\n", eff, words_to_string(effect_words_reference_with_addressing_as_it_is(r, addressing_tag(effect_addressing(eff)))));
       },  l_eff);
   }
-  
+
   return l_eff;
 }
 

@@ -75,16 +75,16 @@ list make_filtered_dg_or_dvdg(statement mod_stat, graph mod_graph)
 {
     list verlist = NIL;
     list vars_ent_list = get_list_of_variable_to_filter();
-  
+
     persistant_statement_to_int s_to_l = persistant_statement_to_int_undefined;
     int dl = -1;
-  
+
     if (!statement_undefined_p(mod_stat)) {
         /* for computing the line numbers of statements */
         s_to_l = statement_to_line_number(mod_stat);
 	dl = module_to_declaration_length(get_current_module_entity());
     }
-    
+
     MAP(VERTEX, v1, {
         statement s1 = vertex_to_statement(v1);
 
@@ -92,7 +92,7 @@ list make_filtered_dg_or_dvdg(statement mod_stat, graph mod_graph)
 	    vertex v2 = successor_vertex(su);
 	    statement s2 = vertex_to_statement(v2);
 	    dg_arc_label dal = (dg_arc_label) successor_arc_label(su);
-	    
+
 	    MAP(CONFLICT, c, {
 	        if (!statement_undefined_p(mod_stat)) {
 		    entity conflict_var = reference_variable(effect_any_reference(conflict_source(c)));
@@ -113,10 +113,10 @@ list make_filtered_dg_or_dvdg(statement mod_stat, graph mod_graph)
 			successor succ = NULL;
 			memset(node_name_parent, 0, sizeof(string)*strlen(variable_name_parent) + 30);
 			memset(node_name_child, 0, sizeof(string)*strlen(variable_name_child) + 30);
-			sprintf(node_name_parent, "%td-<%s>-%c", l1, variable_name_parent, statement_action_parent);
-			sprintf(node_name_child, "%td-<%s>-%c", l2, variable_name_child, statement_action_child);
+			sprintf(node_name_parent, "%d-<%s>-%c", l1, variable_name_parent, statement_action_parent);
+			sprintf(node_name_child, "%d-<%s>-%c", l2, variable_name_child, statement_action_child);
 
-			/* Additional information for EDF prettyprint. 
+			/* Additional information for EDF prettyprint.
 			   Instruction calls are given with  statement numbers
 			*/
 			if (get_bool_property("PRETTYPRINT_WITH_COMMON_NAMES")) {
@@ -129,19 +129,19 @@ list make_filtered_dg_or_dvdg(statement mod_stat, graph mod_graph)
 					entity_local_name(call_function(instruction_call(statement_instruction(s2)))));
 			    else sprintf(node_name_child + strlen(node_name_child), " %td", statement_number(s2));
 			}
-			
+
 			memset(succ_label, 0, strlen(succ_label));
 			if (conflict_cone(c) != cone_undefined) {
 			    if (!statement_undefined_p(mod_stat)) {
 			        strcat(succ_label, "levels(");
 				MAPL(pl, {
-				    sprintf(succ_label + strlen(succ_label), 
+				    sprintf(succ_label + strlen(succ_label),
 					    pl == cone_levels(conflict_cone(c)) ? "%td" : ",%td", INT(CAR(pl)));
 				}, cone_levels(conflict_cone(c)));
 				strcat(succ_label, ")");
 			    }
 			}
-	    
+
 			vertex_parent = get_vertex_in_list(verlist, node_name_parent);
 			if (vertex_undefined_p(vertex_parent)) {
 			    vertex_parent = make_vertex((vertex_label)node_name_parent, NIL);
@@ -165,10 +165,10 @@ list make_filtered_dg_or_dvdg(statement mod_stat, graph mod_graph)
     }, graph_vertices(mod_graph));
 
     gen_free_list(vars_ent_list);
-    
+
     if (!statement_undefined_p(mod_stat))
         free_persistant_statement_to_int(s_to_l);
-    
+
     return verlist;
 }
 

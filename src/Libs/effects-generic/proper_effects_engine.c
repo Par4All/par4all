@@ -246,7 +246,8 @@ static list generic_proper_effects_of_a_point_to_lhs(reference r1, expression e2
 }
 
 /* This function is not used */
-static list generic_proper_effects_of_a_dereferencing_lhs(expression e1)
+static list __attribute__ ((unused))
+generic_proper_effects_of_a_dereferencing_lhs(expression e1)
 {
   /* Pattern: *e */
   list le = NIL;
@@ -666,7 +667,7 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
 	fprintf(stderr, "EFFECT UNDEFINED\n");
       }
       else {
-	pips_debug(8, "\nReturn with *pmwe (addressing mode %d and reference %p):\n",
+	pips_debug(8, "\nReturn with *pmwe (addressing mode %td and reference %p):\n",
 		   addressing_tag(effect_addressing(*pmwe)), effect_any_reference(*pmwe));
 	print_effect(*pmwe);
       }
@@ -675,7 +676,7 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
 	fprintf(stderr, "EFFECT UNDEFINED\n");
       }
       else {
-	pips_debug(8, "And *pmre (addressing mode %d and reference %p):\n",
+	pips_debug(8, "And *pmre (addressing mode %td and reference %p):\n",
 		   addressing_tag(effect_addressing(*pmre)), effect_any_reference(*pmre));
 	print_effect(*pmre);
       }
@@ -818,7 +819,7 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
       fprintf(stderr, "EFFECT UNDEFINED\n");
     }
     else {
-      pips_debug(8, "And *pmwe (addressing mode %d and reference %p):\n",
+      pips_debug(8, "And *pmwe (addressing mode %td and reference %p):\n",
 		 addressing_tag(effect_addressing(*pmwe)), effect_any_reference(*pmwe));
       print_effect(*pmwe);
     }
@@ -827,7 +828,7 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
       fprintf(stderr, "EFFECT UNDEFINED\n");
     }
     else {
-      pips_debug(8, "And *pmre (addressing mode %d and reference %p):\n",
+      pips_debug(8, "And *pmre (addressing mode %td and reference %p):\n",
 		 addressing_tag(effect_addressing(*pmre)), effect_any_reference(*pmre));
       print_effect(*pmre);
     }
@@ -836,7 +837,8 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
   return le;
 }
 
-static list generic_proper_effects_of_subscript_in_lhs(subscript sub, effect * pe)
+static list __attribute__ ((unused))
+generic_proper_effects_of_subscript_in_lhs(subscript sub, effect * pe)
 {
   expression a = subscript_array(sub); /* address expression */
   list inds = subscript_indices(sub);
@@ -1240,7 +1242,7 @@ bool check_sdfi_effects_p(entity func, list func_sdfi)
       }
 
       if(rank>gen_length(functional_parameters(type_functional(ut)))) {
-	fprintf(stderr, "Formal parameter \"%s\" is ranked %d out of %d!\n",
+	fprintf(stderr, "Formal parameter \"%s\" is ranked %d out of %zd!\n",
 		entity_name(v), rank, gen_length(functional_parameters(type_functional(ut))));
 	check_p = FALSE;
       }

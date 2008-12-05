@@ -31,7 +31,7 @@
 #include "semantics.h"
 #include "pipsdbm.h"
 #include "resources.h"
-
+#include "preprocessor.h"
 
 #include "effects-generic.h"
 

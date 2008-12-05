@@ -731,7 +731,7 @@ list summary_effects_from_declaration(string module_name __attribute__ ((unused)
 
 void dump_cell(cell c)
 {
-  fprintf(stderr, "Cell %p = (cell_tag=%d, reference=%p)\n", c, cell_tag(c),
+  fprintf(stderr, "Cell %p = (cell_tag=%td, reference=%p)\n", c, cell_tag(c),
 	  cell_preference_p(c)? preference_reference(cell_preference(c)):cell_reference(c));
 }
 
@@ -744,7 +744,7 @@ void dump_effect(effect e)
   descriptor d = effect_descriptor(e);
 
   effect_consistent_p(e);
-  fprintf(stderr, "Effect %p = (domain=%d, cell=%p, action=%p, addressing=%p,"
+  fprintf(stderr, "Effect %p = (domain=%td, cell=%p, action=%p, addressing=%p,"
 	  " approximation=%p, descriptor=%p\n",
 	  e, effect_domain_number(e), c, ac,ad, ap, d);
   dump_cell(c);

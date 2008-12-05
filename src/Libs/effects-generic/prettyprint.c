@@ -28,6 +28,7 @@
 
 #include "text-util.h"
 #include "prettyprint.h"
+#include "preprocessor.h"
 
 #include "effects-generic.h"
 
