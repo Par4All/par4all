@@ -33,10 +33,9 @@
 static bool is_user_view;	/* print_code_complexities or print_source_complexities */
 static hash_table nts = hash_table_undefined;
 
-text text_complexity(module, margin, stat)
-entity module;
-int margin;
-statement stat;
+text text_complexity(entity module __attribute__ ((__unused__)),
+		     int margin __attribute__ ((__unused__)),
+		     statement stat)
 {
     complexity stat_comp = complexity_undefined;
     int print_stats_level = get_int_property("COMPLEXITY_PRINT_STATISTICS");

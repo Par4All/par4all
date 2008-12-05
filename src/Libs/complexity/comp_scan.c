@@ -201,10 +201,9 @@ char *module_name;
 }
 
 /* starting point of Abstract Syntax Tree */
-complexity statement_to_complexity(stat, precon, eff_list)
-statement stat;
-transformer precon;
-list eff_list;
+complexity statement_to_complexity(statement stat,
+				   transformer precon __attribute__ ((__unused__)),
+				   list eff_list __attribute__ ((__unused__)))
 {
     instruction instr = statement_instruction(stat);
     int so = statement_ordering(stat);
@@ -330,12 +329,12 @@ list effects_list;
 	for ( i = block_length; i > 0 ; i-- ) {
 	    statement stat = STATEMENT(CAR(gen_nthcdr( i-1, block )));
 	    statement up_stat;
-	    
 	    complexity ctemp = statement_to_complexity(stat, 
 						       precond, effects_list);
 	    transformer prec = load_statement_precondition(stat);
 	    
 	    list cumu_list = load_cumulated_rw_effects_list(stat);
+	    //extern int default_is_inferior_pvarval(Pvecteur *, Pvecteur *);
 	    
 	    Pbase pb = VECTEUR_NUL;
 	    
@@ -649,10 +648,9 @@ list effects_list;
 }
 
 /* 4th element of instruction */
-complexity goto_to_complexity(st, precond, effects_list)
-statement st;
-transformer precond;
-list effects_list;
+complexity goto_to_complexity(statement st __attribute__ ((__unused__)),
+			      transformer precond __attribute__ ((__unused__)),
+			      list effects_list __attribute__ ((__unused__)))
 {
     pips_error("goto_to_complexity", "A GOTO is remaining.\n");
     return(make_zero_complexity());
@@ -792,30 +790,58 @@ basic *pbasic;
 transformer precond;
 list effects_list;
 {
-    complexity comp = complexity_undefined;
+  complexity comp = complexity_undefined;
 
-    trace_on("syntax");
+  trace_on("syntax");
 
-    switch (syntax_tag(s)) {
-    case is_syntax_reference:
-	comp = reference_to_complexity(syntax_reference(s), pbasic, 
-				       precond, effects_list);
-	break;
-    case is_syntax_range:
-	comp = range_to_complexity(syntax_range(s), precond, effects_list);
-	break;
-    case is_syntax_call:
-	comp = call_to_complexity(syntax_call(s), pbasic, precond, effects_list);
-	break;
-    default: 
-	pips_error("syntax_to_complexity", 
-		   "syntax_tag %d, not in 28->30\n", (int)syntax_tag(s));
+  switch (syntax_tag(s)) {
+  case is_syntax_reference:
+    comp = reference_to_complexity(syntax_reference(s), pbasic, 
+				   precond, effects_list);
+    break;
+  case is_syntax_range:
+    comp = range_to_complexity(syntax_range(s), precond, effects_list);
+    break;
+  case is_syntax_call:
+    comp = call_to_complexity(syntax_call(s), pbasic, precond, effects_list);
+    break;
+  case is_syntax_cast: {
+    cast c = syntax_cast(s);
+    /* A cost for casting could be added, although casting is mostly
+       used for typing issue. However, (float) 2 has a cost.  */
+    comp = expression_to_complexity(cast_expression(c), pbasic, precond, effects_list);
+    break;
+  }
+  case is_syntax_sizeofexpression: {
+    sizeofexpression se = syntax_sizeofexpression(s);
+    if(sizeofexpression_expression_p(se))
+      comp = expression_to_complexity(sizeofexpression_expression(se),
+				      pbasic, precond, effects_list);
+    else {
+      /* Compiler generated constant: equivalent to a constant load... */
+      pips_internal_error("Not implemented yet\n");
     }
+    break;
+  }
+  case is_syntax_subscript:
+    pips_internal_error("Not implemented yet\n");
+    break;
+  case is_syntax_application:
+    pips_internal_error("Not implemented yet\n");
+    break;
+  case is_syntax_va_arg:
+    pips_internal_error("Not implemented yet\n");
+    break;
+  default: 
+    pips_error("syntax_to_complexity", 
+	       "syntax_tag %d, not in %d->%d\n", (int)syntax_tag(s),
+	       is_syntax_reference, is_syntax_va_arg);
+  }
 
-    complexity_check_and_warn("syntax_to_complexity", comp);
+  complexity_check_and_warn("syntax_to_complexity", comp);
 
-    trace_off();
-    return(comp);
+  trace_off();
+  return(comp);
 }
 
 /* 1st element of syntax */

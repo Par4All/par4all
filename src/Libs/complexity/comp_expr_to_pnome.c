@@ -303,12 +303,11 @@ int maximize;
 }
 
 /* 2nd element of syntax */
-complexity range_to_polynome(rg, precond, effects_list, keep_symbols, maximize)
-range rg;
-transformer precond;
-list effects_list;
-boolean keep_symbols;
-int maximize;
+complexity range_to_polynome(range rg __attribute__ ((__unused__)),
+			     transformer precond __attribute__ ((__unused__)),
+			     list effects_list __attribute__ ((__unused__)),
+			     boolean keep_symbols __attribute__ ((__unused__)),
+			     int maximize __attribute__ ((__unused__)))
 {
     complexity comp = make_zero_complexity();
     
@@ -531,11 +530,10 @@ int maximize;
  * varcount_unknown set to 1. The variable statistics are up to
  * date in the new complexity returned, in any case.
  */
-complexity evaluate_var_to_complexity(var, precond, effects_list, maximize)
-entity var;
-transformer precond;
-list effects_list;
-int maximize;
+complexity evaluate_var_to_complexity(entity var,
+				      transformer precond,
+				      list effects_list __attribute__ ((__unused__)),
+				      int maximize)
 {
     predicate pred = transformer_relation(precond);
     Psysteme psyst = (Psysteme) predicate_system(pred);

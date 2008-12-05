@@ -77,9 +77,11 @@ Variable var;
     else if (var == (Variable) chunk_undefined) 
 	pips_error("variable_local_name",
 		   "unexpected var == chunk_undefined.\n");
-    else 
+    else {
+      extern string entity_minimal_name(entity);
       // s = strdup(entity_local_name((entity) var));
 	s = strdup(entity_minimal_name((entity) var));
+    }
 
     return (s);
 }
@@ -100,40 +102,37 @@ Variable var1, var2;
     return is_inferior; 
 }
 
-bool is_inferior_varval(Pvecteur varval1, Pvecteur varval2)
+int is_inferior_varval(Pvecteur varval1, Pvecteur varval2)
 {
-    bool is_inferior = TRUE;
+  int is_inferior;
     
-    if (term_cst(varval1))
-	is_inferior = TRUE;
-    else if(term_cst(varval2))
-	is_inferior = FALSE;
-    else
-	is_inferior = (strcmp(variable_local_name(vecteur_var(varval1)), 
-			      variable_local_name(vecteur_var(varval2)))
-		       <= 0 );
+  if (term_cst(varval1))
+    is_inferior = 1;
+  else if(term_cst(varval2))
+    is_inferior = -1;
+  else
+    is_inferior = - strcmp(variable_local_name(vecteur_var(varval1)), 
+			   variable_local_name(vecteur_var(varval2)));
 
-    return is_inferior; 
+  return is_inferior; 
 }
 
-bool is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
+int is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
 {
-    bool is_inferior = TRUE;
+  int is_inferior;
     
-    if (term_cst(*pvarval1))
-	is_inferior = FALSE;
-    else if(term_cst(*pvarval2))
-	is_inferior = TRUE;
-    else
-	is_inferior = (strcmp(variable_local_name(vecteur_var(*pvarval1)), 
-			      variable_local_name(vecteur_var(*pvarval2)))
-		       > 0 );
+  if (term_cst(*pvarval1))
+    is_inferior = -1;
+  else if(term_cst(*pvarval2))
+    is_inferior = 1;
+  else
+    is_inferior = strcmp(variable_local_name(vecteur_var(*pvarval1)), 
+			 variable_local_name(vecteur_var(*pvarval2)));
 
-    return is_inferior; 
+  return is_inferior; 
 }
 
-Variable name_to_variable(name)
-char *name;
+Variable name_to_variable(char * name)
 {
     if (strcmp(name, TCST_NAME) == 0) 
 	return(TCST);

@@ -148,7 +148,7 @@ boolean print_stats_p, print_local_names_p;
 #define COMPLEXITY_BUFFER_SIZE 1024
     static char t[COMPLEXITY_BUFFER_SIZE];
     char *s, *p;
-    extern boolean is_inferior_pvarval(Pvecteur *, Pvecteur *);
+    extern int is_inferior_pvarval(Pvecteur *, Pvecteur *);
 
     s = t;
 
@@ -913,6 +913,7 @@ hash_table hash_complexity_params;
 {
     string module_name = module_local_name(module);
     list sefs_list = list_undefined;
+    list ce = list_undefined;
 
     pips_assert("add_common_variables_to_hash_table",
 		entity_module_p(module));
@@ -927,9 +928,9 @@ hash_table hash_complexity_params;
 	print_effects(sefs_list);
     }
 
-    MAPL(ce, { 
+    for(ce= sefs_list; !ENDP(ce); POP(ce)) {
 	effect obj = EFFECT(CAR(ce));
-	reference r = effect_reference(obj);
+	reference r = effect_any_reference(obj);
 	action ac = effect_action(obj);
 	approximation ap = effect_approximation(obj);
 	entity e = reference_variable(r);
@@ -942,7 +943,7 @@ hash_table hash_complexity_params;
 	    hash_put(hash_complexity_params, (char *) module_local_name(e),
 		     HASH_COMMON_VARIABLE);
 	}
-    }, sefs_list);
+    }
 }
 
 void remove_common_variables_from_hash_table(module, hash_complexity_params)
@@ -960,7 +961,7 @@ hash_table hash_complexity_params;
 
     MAPL(ce, { 
 	effect obj = EFFECT(CAR(ce));
-	reference r = effect_reference(obj);
+	reference r = effect_any_reference(obj);
 	action ac = effect_action(obj);
 	approximation ap = effect_approximation(obj);
 	entity e = reference_variable(r);
@@ -986,7 +987,7 @@ char *var_name;
 
 	if ( action_write_p(effect_action(eff)) 
 	    && approximation_must_p(effect_approximation(eff)) ) {
-	    reference r = effect_reference(eff);
+	    reference r = effect_any_reference(eff);
 	    entity e = reference_variable(r);
 /*	    
 	    fprintf(stderr, "is_must_be_written_var for entity %s\n", 
@@ -999,7 +1000,7 @@ char *var_name;
 /*
 	else {
 	    fprintf(stderr, "is_must_be_written_var for NOT entity %s\n", 
-		    module_local_name(reference_variable(effect_reference(eff))) );
+		    module_local_name(reference_variable(effect_any_reference(eff))) );
 	}
 */
     },effects_list);
@@ -1019,7 +1020,7 @@ list effects_list;
 {
     complexity final_comp = complexity_dup(comp);
     Ppolynome pp = complexity_polynome(comp);
-    extern boolean default_is_inferior_pvarval(Pvecteur *, Pvecteur *);
+    extern int default_is_inferior_pvarval(Pvecteur *, Pvecteur *);
     Pbase pb = vect_dup(polynome_used_var(pp, default_is_inferior_pvarval));
 
 
@@ -1066,7 +1067,7 @@ complexity callee_comp;
 string oldname,newname;
 {
     Ppolynome pp = complexity_polynome(callee_comp);
-    extern boolean is_inferior_pvarval(Pvecteur *, Pvecteur *);
+    extern int is_inferior_pvarval(Pvecteur *, Pvecteur *);
     Pbase pb = polynome_used_var(pp, is_inferior_pvarval);
     Pbase pbcur = BASE_UNDEFINED;
     complexity comp = make_zero_complexity();
