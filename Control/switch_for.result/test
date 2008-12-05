@@ -1,9 +1,3 @@
-
-List of callees:
-For loop statement: 
-Declaration list: Switch statement: 
-Declaration list: 
-List of callees:
 void gl_enable()
 {
    int cap;

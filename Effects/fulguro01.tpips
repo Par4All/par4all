@@ -77,7 +77,7 @@ activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[flgr1d_arith_add_fgINT32]
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[flgr1d_arith_add_fgINT32]
-
+quit
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[flgr2d_arith_add_fgINT32]
 activate PRINT_CODE_CUMULATED_EFFECTS
