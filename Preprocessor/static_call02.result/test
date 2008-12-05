@@ -93,9 +93,10 @@ Variable list:
 * empty extern declaration list *
 
 
-Layouts for formal parameters:
+Layout for formal parameters:
 
 	Variable bar:i	offset = 1
+
 Layouts for memory areas:
 
 Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
@@ -180,9 +181,10 @@ Variable list:
 * empty extern declaration list *
 
 
-Layouts for formal parameters:
+Layout for formal parameters:
 
 	Variable foo:i	offset = 1
+
 Layouts for memory areas:
 
 Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
@@ -270,9 +272,10 @@ Variable list:
 * empty extern declaration list *
 
 
-Layouts for formal parameters:
+Layout for formal parameters:
 
 	Variable foo!foo:i	offset = 1
+
 Layouts for memory areas:
 
 Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
