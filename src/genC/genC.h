@@ -111,6 +111,7 @@ enum internal_type {
   bool_domain = 1,
   char_domain = 2,
   int_domain  = 3,
+  intptr_t_domain  = 3,
   float_domain = 4,
   string_domain = 5
 };
