@@ -1,0 +1,37 @@
+delete inlining02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create inlining02 inlining02.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[inlining02!pmax]
+display PRINTED_FILE[main]
+
+echo
+echo Code after inlining
+echo
+
+apply INLINING[inlining02!pmax]
+display PRINTED_FILE[inlining02!pmax]
+display PRINTED_FILE[main]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+# shell $(PIPS_CC) -c inlining02.database/Src/inlining02.c
+shell gcc -c inlining02.database/Src/inlining02.c
+
+close
+delete inlining02
+quit
+
