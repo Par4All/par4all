@@ -294,7 +294,7 @@ GetBoundary(simple_section Dad, int DimNo, unsigned Low)
 /*}}}*/
 /*{{{  PutBoundryPair */
 /* substitute with new boundary */
-void 
+void
 PutBoundPair(simple_section Dad, int DimNo, LinExpr Low, LinExpr Up)
 {
   list BoundPair = dad_struct_shape(simple_section_dad(Dad));

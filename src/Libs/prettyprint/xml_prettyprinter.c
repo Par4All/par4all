@@ -23,6 +23,7 @@
 #include "complexity.h"
 #include "transformations.h"
 #include "callgraph.h"
+#include "semantics.h"
 
 #define COMMA         ","
 #define EMPTY         ""
@@ -3432,7 +3433,7 @@ static void xml_Boxes(string module_name, int code_tag,string_buffer sb_result,s
 }
 
 // A completer avec les effects IN et OUT de l'application
-static void xml_ApplicationGraph(string module_name, string_buffer sb_ac )
+static void __attribute__ ((unused)) xml_ApplicationGraph(string module_name, string_buffer sb_ac )
 {
   string_buffer sb_pref_ac = string_buffer_make();
   string string_sb_ac="";
@@ -3561,7 +3562,7 @@ bool print_xml_application(string module_name)
 {
   FILE * out;
   entity module;
-  string string_sb_result, xml, dir, filename;
+  string xml, dir, filename;
   statement stat;
   string_buffer sb_result=string_buffer_make();
  string_buffer sb_ac = string_buffer_make();  
@@ -3593,11 +3594,11 @@ bool print_xml_application(string module_name)
   set_complexity_map( (statement_mapping)
 		      db_get_memory_resource(DBR_COMPLEXITIES, module_name, TRUE));
 
- set_precondition_map((statement_mapping)
+  set_precondition_map((statement_mapping)
 		       db_get_memory_resource(DBR_PRECONDITIONS,
 					      module_name,
-					      TRUE));  
-  debug_on("XMLPRETTYPRINTER_DEBUG_LEVEL");   
+					      TRUE));
+  debug_on("XMLPRETTYPRINTER_DEBUG_LEVEL");
   out = safe_fopen(filename, "w");
   fprintf(out,"<!-- XML prettyprint for module %s. --> \n",module_name);
   safe_fclose(out, filename);
