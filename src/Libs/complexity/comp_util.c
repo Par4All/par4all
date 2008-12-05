@@ -145,7 +145,7 @@ char *complexity_sprint(comp, print_stats_p, print_local_names_p)
 complexity comp;
 boolean print_stats_p, print_local_names_p;
 {
-#define COMPLEXITY_BUFFER_SIZE 1024
+#define COMPLEXITY_BUFFER_SIZE 20480
     static char t[COMPLEXITY_BUFFER_SIZE];
     char *s, *p;
     extern int is_inferior_pvarval(Pvecteur *, Pvecteur *);
@@ -184,7 +184,7 @@ boolean print_stats_p, print_local_names_p;
 			    is_inferior_pvarval);
 	strcpy(s, p);
     }
-    pips_assert("complexity_sprint", strlen(s) < COMPLEXITY_BUFFER_SIZE);
+    pips_assert("no buffer overflow", strlen(s) < COMPLEXITY_BUFFER_SIZE);
     return((char *) strdup((char *) t));
 }
 
