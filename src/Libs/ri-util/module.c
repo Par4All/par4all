@@ -756,10 +756,13 @@ list declaration_supporting_references(list dl)
   return srl;
 }
 
-/* The function itself is not in its declarations. Maybe, it should be changed in the parser? */
+/* The function itself is not in its declarations. Maybe, it should be changed in the parser?
+
+   A new list is allocated to avoid sharing with code_declarations.
+ */
 list module_all_declarations(entity m)
 {
-  list dl = CONS(ENTITY, m, code_declarations(value_code(entity_initial(m))));
+  list dl = CONS(ENTITY, m, gen_copy_seq(code_declarations(value_code(entity_initial(m)))));
 
   return dl;
 }
