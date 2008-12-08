@@ -540,9 +540,15 @@ insure_global_declaration_coherency(
 
     /* set globals prior to processing, unset them after processing to be safe*/
     current_included_entities=le;
+    
+    entity saved_module = get_current_module_entity(); /* SG: why is this not set to module ? */
+    reset_current_module_entity();
+    set_current_module_entity(module);
     if( is_fortran ) insure_global_declaration_coherency_helper(stat);
     else gen_recurse( stat, statement_domain, gen_true, insure_global_declaration_coherency_helper);
     current_included_entities=NIL;
+    reset_current_module_entity();
+    set_current_module_entity(saved_module);
 
     debug_off();
 }
