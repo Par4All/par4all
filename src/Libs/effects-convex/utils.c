@@ -168,12 +168,10 @@ region region_dup(region reg)
       preference p = cell_preference(region_cell(new_reg));
       preference_reference(p) = reference_dup(region_any_reference(reg));
     }
-    
+
     debug_region_consistency(new_reg);
-    /* FI: I do not understand the type check error in the comparison
-       below. Is one of the pointers forced to int by operator !=?*/
     pips_assert("No sharing of references",
-		region_any_reference(reg)!=region_any_reference(new_reg));
+		region_any_reference(reg) != region_any_reference(new_reg));
     return new_reg;
 }
 
@@ -936,7 +934,7 @@ list l_reg;
 
 reference make_pointed_regions_reference(entity ent, bool indexed_p)
 {
-  list regions_ref_inds = NIL, ent_list_dim = NIL;
+  list regions_ref_inds = NIL;
   int dim;
   type ent_ty = ultimate_type(entity_type(ent));
   int d = -1;

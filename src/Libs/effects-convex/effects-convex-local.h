@@ -19,7 +19,7 @@
 #define region_reference(reg) \
     preference_reference(cell_preference(effect_cell(reg)))
 #define region_any_reference(reg) \
-    cell_preference_p(effect_cell(reg))? preference_reference(cell_preference(effect_cell(reg))):cell_reference(effect_cell(reg))
+  (cell_preference_p(effect_cell(reg)) ? preference_reference(cell_preference(effect_cell(reg))) : cell_reference(effect_cell(reg)))
 #define region_action(reg) effect_action(reg)
 #define region_approximation(reg) effect_approximation(reg)
 #define region_context(reg) effect_context(reg)

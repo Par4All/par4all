@@ -38,6 +38,7 @@
 #include "semantics.h"
 #include "text.h"
 #include "transformer.h"
+#include "preprocessor.h"
 
 #include "effects-generic.h"
 #include "effects-convex.h"

@@ -18,6 +18,7 @@
 #include "misc.h"
 
 #include "properties.h"
+#include "preprocessor.h"
 
 #include "effects-generic.h"
 #include "effects-convex.h"

@@ -32,6 +32,7 @@
 #include "pipsdbm.h"
 #include "resources.h"
 #include "prettyprint.h"
+#include "preprocessor.h"
 
 #define REGION_FORESYS_PREFIX "C$REG"
 
@@ -56,7 +57,7 @@ pips_region_user_name(entity ent)
 	if (strncmp(ent_name, REGIONS_MODULE_NAME, 7) == 0)
 	    /* ent is a PHI entity from the regions module */
 	    name = entity_local_name(ent);
-	else	
+	else
 	    /**** ARGH why using this stuff in transformer... ******/
             /* if (entity_has_values_p(ent)) */
 	    /* else name = entity_name(ent); */
