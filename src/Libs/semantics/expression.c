@@ -154,6 +154,41 @@ static transformer unary_minus_operation_to_transformer(entity v,
   return tf;
 }
 
+/* See also any_basic_update_to_transformer(), which should be based on this function */
+transformer any_basic_update_operation_to_transformer(entity tmp, entity v, entity op)
+{
+  transformer tf = transformer_undefined;
+  expression ve = entity_to_expression(v);
+  expression inc = expression_undefined;
+  expression n_rhs = expression_undefined;
+  entity plus = entity_intrinsic(PLUS_C_OPERATOR_NAME);
+  list args = list_undefined;
+
+  if(ENTITY_POST_INCREMENT_P(op) || ENTITY_PRE_INCREMENT_P(op))
+    inc = int_to_expression(1);
+  else
+    inc = int_to_expression(-1);
+
+  n_rhs = MakeBinaryCall(plus, inc, entity_to_expression(v));
+
+  /* FI: why*/
+  args = CONS(EXPRESSION, ve, CONS(EXPRESSION, n_rhs, NIL));
+  tf = any_assign_operation_to_transformer(v,
+					   args,
+					   transformer_undefined,
+					   FALSE); 
+  if(ENTITY_POST_INCREMENT_P(op) || ENTITY_POST_DECREMENT_P(op))
+    tf = transformer_add_equality(tf, entity_to_old_value(v), tmp);
+  else
+    tf = transformer_add_equality(tf, v, tmp);
+  gen_full_free_list(args);
+
+  pips_debug(6,"return tf=%p\n", tf);
+  ifdebug(6) (void) dump_transformer(tf);
+  pips_debug(8,"end\n");
+  return tf;
+}
+
 /* forward declaration */
 static transformer generic_abs_to_transformer(
        entity, expression, transformer, bool);
@@ -175,12 +210,20 @@ generic_unary_operation_to_transformer(
 	  || ENTITY_CABS_P(op)) {
     tf = generic_abs_to_transformer(e, e1, pre, is_internal);
   }
+  else if(ENTITY_POST_INCREMENT_P(op) || ENTITY_POST_DECREMENT_P(op)
+	  || ENTITY_PRE_INCREMENT_P(op) || ENTITY_PRE_DECREMENT_P(op)) {
+    syntax s1 = expression_syntax(e1);
+    entity v1 = reference_variable(syntax_reference(s1));
+
+    if(entity_has_values_p(v1))
+       tf = any_basic_update_operation_to_transformer(e, v1, op);
+  }
 
   return tf;
 }
 
 /* Type independent. Most of it should be factored out for binary
-   operations. v= e1 + e2 or v = e1 - e2 */
+   operations. v = e1 + e2 or v = e1 - e2 */
 static transformer addition_operation_to_transformer(entity v,
 						     expression e1,
 						     expression e2,
@@ -204,13 +247,13 @@ static transformer addition_operation_to_transformer(entity v,
   tf = transformer_safe_image_intersection(tf12, tf_op);
 
   /*
-  ifdebug(9) {
+    ifdebug(9) {
     pips_debug(9, "before projection, with temporaries v=%s, tmp1=%s, tmp2=%s,"
-	       " transformer rf=%p\n",
-	       entity_local_name(v), entity_local_name(tmp1),
-	       entity_local_name(tmp2), tf);
+    " transformer rf=%p\n",
+    entity_local_name(v), entity_local_name(tmp1),
+    entity_local_name(tmp2), tf);
     dump_transformer(tf);
-  }
+    }
   */
 
   /* Too early: you are projecting v and loosing all useful information
@@ -223,6 +266,137 @@ static transformer addition_operation_to_transformer(entity v,
 
   pips_debug(9, "End with transformer tf=%p\n", tf);
   ifdebug(9) dump_transformer(tf);
+
+  return tf;
+}
+
+/* Similar to any_assign_to_transformer(), which is a simpler case. */
+/* Here, we cope with expression such as the lhs of j = (i=1); */
+transformer any_assign_operation_to_transformer(entity tmp,
+						list args, /* arguments for assign */
+						transformer pre, /* precondition */
+						bool is_internal)
+{
+  transformer tf = transformer_undefined;
+  transformer tfe = transformer_undefined;
+  expression lhs = EXPRESSION(CAR(args));
+  expression rhs = EXPRESSION(CAR(CDR(args)));
+  syntax slhs = expression_syntax(lhs);
+
+  pips_assert("2 args to assign", CDR(CDR(args))==NIL);
+
+  /* The lhs must be a scalar reference to perform an interesting analysis */
+  if(syntax_reference_p(slhs)) {
+    reference rlhs = syntax_reference(slhs);
+    if(ENDP(reference_indices(rlhs))) {
+      entity v = reference_variable(rlhs);
+
+      if(entity_has_values_p(v)) {
+	entity v_new = entity_to_new_value(v);
+	entity v_old = entity_to_old_value(v);
+	entity tmp2 = make_local_temporary_value_entity(entity_type(v));
+
+	tf = any_expression_to_transformer(tmp2, rhs, pre, TRUE);
+
+	if(!transformer_undefined_p(tf)) {
+
+	  pips_debug(9, "A transformer has been obtained:\n");
+	  ifdebug(9) dump_transformer(tf);
+
+	  if(entity_is_argument_p(v, transformer_arguments(tf))) {
+	    /* Is it standard compliant? The assigned variable is modified by the rhs. */
+	    transformer teq = simple_equality_to_transformer(v, tmp, TRUE);
+	    extern string words_to_string(list);
+	    string s = words_to_string(words_syntax(expression_syntax(rhs)));
+
+	    pips_user_warning("Variable %s in lhs is uselessly updated by the rhs '%s'\n",
+			      entity_local_name(v), s);
+
+	    free(s);
+
+	    tf = transformer_combine(tf, teq);
+	    free_transformer(teq);
+	  }
+	  else {
+	    /* Take care of aliasing */
+	    entity v_repr = value_to_variable(v_new);
+
+	    /* tf = transformer_value_substitute(tf, v_new, v_old); */
+	    tf = transformer_value_substitute(tf, v_new, v_old);
+
+	    pips_debug(9,"After substitution v_new=%s -> v_old=%s\n",
+		       entity_local_name(v_new), entity_local_name(v_old));
+
+	    tf = transformer_value_substitute(tf, tmp2, v_new);
+
+	    pips_debug(9,"After substitution tmp=%s -> v_new=%s\n",
+		       entity_local_name(tmp2), entity_local_name(v_new));
+
+	    transformer_add_modified_variable(tf, v_repr);
+	  }
+	  //tf = generic_equality_to_transformer(tmp, tmp2, FALSE, FALSE);
+	  //tf = transformer_combine(tf, tfe);
+	}
+      }
+    }
+  }
+
+  pips_debug(6,"return tf=%p\n", tf);
+  ifdebug(6) (void) print_transformer(tf);
+  pips_debug(8,"end\n");
+  return tf;
+}
+
+/* v = (e1 = e1 op e2) */
+static transformer update_operation_to_transformer(entity v,
+						   entity op,
+						   expression e1,
+						   expression e2,
+						   transformer pre,
+						   bool is_internal)
+{
+  transformer tf = transformer_undefined;
+  transformer utf = transformer_undefined;
+  entity tmp1 = make_local_temporary_value_entity(entity_type(v));
+  entity tmp2 = make_local_temporary_value_entity(entity_type(v));
+  /* sub-expressions are not necessarily integer? Then the expression
+     should not be integer? */
+  /* We assume that the update operation is syntactically correct */
+  entity v1 = reference_variable(syntax_reference(expression_syntax(e1)));
+  entity sop = update_operator_to_regular_operator(op);
+  expression n_exp = MakeBinaryCall(sop, copy_expression(e1), copy_expression(e2));
+  list args = CONS(EXPRESSION, e1, CONS(EXPRESSION, n_exp, NIL));
+
+  pips_assert("e1 is an reference", expression_reference_p(e1));
+
+  pips_debug(9, "Begin officialy... but a lot has been done already!\n");
+
+  /* Effects are used at a higher level */
+  tf = any_assign_operation_to_transformer(v, args, /* ef,*/ pre, is_internal);
+  gen_free_list(args);
+  free_expression(n_exp);
+
+  tf = transformer_add_equality(tf, v, v1);
+
+  ifdebug(8) {
+    pips_debug(8, "before projection, with temporaries v=%s, tmp1=%s, tmp2=%s,"
+	       " transformer rf=%p\n",
+	       entity_local_name(v), entity_local_name(tmp1),
+	       entity_local_name(tmp2), tf);
+    dump_transformer(tf);
+  }
+
+  /* Too early: you are projecting v and loosing all useful information
+     within an expression! */
+  /* tf = transformer_temporary_value_projection(tf); */
+    
+  //free_transformer(tf2);
+  //free_transformer(tf12);
+  //free_transformer(tf12u);
+  //free_transformer(tf_op);
+
+  pips_debug(9, "End with transformer tf=%p\n", tf);
+  ifdebug(8) dump_transformer(tf);
 
   return tf;
 }
@@ -773,19 +947,16 @@ affine_increment_to_transformer(entity e, Pvecteur a)
 }
 
 static transformer modulo_to_transformer(entity e, /* assumed to be a value */
-					 expression arg1,
+					 expression arg1 __attribute__ ((_unused_)),
 					 expression arg2,
 					 transformer pre, /* not used yet */
-					 bool is_internal)
+					 bool is_internal __attribute__ ((_unused_)))
 {
   transformer tf = transformer_undefined;
 
   pips_debug(8, "begin with pre=%p\n", pre);
 
   /* Should be rewritten with expression_to_transformer */
-  /* pips_assert("Precondition is unused", pre==pre); */
-  pips_assert("arg1 is unused, shut up the compiler", arg1==arg1);
-  pips_assert("arg1 is unused, shut up the compiler", is_internal==is_internal);
     
   if(integer_constant_expression_p(arg2)) {
     int d = integer_constant_expression_value(arg2);
@@ -1276,8 +1447,14 @@ integer_binary_operation_to_transformer(
 
   pips_debug(8, "Begin\n");
 
-  if(ENTITY_PLUS_P(op) || ENTITY_MINUS_P(op)) {
-    tf = addition_operation_to_transformer(e, e1, e2, pre, ENTITY_PLUS_P(op), is_internal);
+  if(ENTITY_PLUS_P(op) || ENTITY_MINUS_P(op)
+     || ENTITY_PLUS_C_P(op) || ENTITY_MINUS_C_P(op)) {
+    tf = addition_operation_to_transformer(e, e1, e2, pre,
+					   ENTITY_PLUS_P(op) || ENTITY_PLUS_C_P(op),
+					   is_internal);
+  }
+  if(ENTITY_PLUS_UPDATE_P(op) || ENTITY_MINUS_UPDATE_P(op)) {
+    tf = update_operation_to_transformer(e, op, e1, e2, pre, is_internal);
   }
   else if(ENTITY_MULTIPLY_P(op)) {
     tf = integer_multiply_to_transformer(e, e1, e2, pre, is_internal);
@@ -1317,10 +1494,10 @@ integer_call_expression_to_transformer(
   /* tests are organized to trap 0-ary user-defined functions as well as
      binary min and max */
 
-  if(ENTITY_MIN0_P(f)||ENTITY_MIN_P(f)) {
+  if(ENTITY_MIN0_P(f) || ENTITY_MIN_P(f)) {
     tf = min0_to_transformer(e, args, pre, is_internal);
   }
-  else if(ENTITY_MAX0_P(f)||ENTITY_MAX_P(f)) {
+  else if(ENTITY_MAX0_P(f) || ENTITY_MAX_P(f)) {
     tf = max0_to_transformer(e, args, pre, is_internal);
   }
   else if(value_code_p(entity_initial(f))) {

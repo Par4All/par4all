@@ -363,6 +363,21 @@ intrinsic_to_transformer(
   if(ENTITY_ASSIGN_P(e)) {
     tf = any_assign_to_transformer(pc, ef, pre);
   }
+ else if(ENTITY_PLUS_UPDATE_P(e) || ENTITY_MINUS_UPDATE_P(e)
+	 || ENTITY_MULTIPLY_UPDATE_P(e) || ENTITY_DIVIDE_UPDATE_P(e)
+	 || ENTITY_MODULO_UPDATE_P(e) || ENTITY_LEFT_SHIFT_UPDATE_P(e)
+	 || ENTITY_RIGHT_SHIFT_UPDATE_P(e) || ENTITY_BITWISE_AND_UPDATE_P(e)
+	 || ENTITY_BITWISE_XOR_UPDATE_P(e) || ENTITY_BITWISE_OR_UPDATE_P(e)) {
+    //tf = update_addition_operation_to_transformer(pc, ef, pre);
+   tf = any_update_to_transformer(e, pc, ef, pre);
+  }
+ else if(ENTITY_POST_INCREMENT_P(e) || ENTITY_POST_DECREMENT_P(e)
+	 || ENTITY_PRE_INCREMENT_P(e) || ENTITY_PRE_DECREMENT_P(e)) {
+   tf = any_basic_update_to_transformer(e, pc, ef, pre);
+  }
+ else if(ENTITY_C_RETURN_P(e)) {
+   tf = c_return_to_transformer(e, pc, ef, pre);
+  }
   else if(ENTITY_STOP_P(e)||ENTITY_ABORT_SYSTEM_P(e)||ENTITY_EXIT_SYSTEM_P(e))
     tf = transformer_empty();
   else
@@ -625,7 +640,7 @@ transformer_intra_to_inter(
       /* Variables with no impact on the caller world are eliminated.
        * However, the return value associated to a function is preserved.
        */
-      if( ! effects_read_or_write_entity_p(le, v) &&
+      if( !effects_read_or_write_entity_p(le, v) &&
 	  !storage_return_p(entity_storage(v)) &&
 	  !entity_constant_p(v)) {
 	lost_args = arguments_add_entity(lost_args, e);
@@ -898,6 +913,48 @@ user_call_to_transformer(
   return t_caller;
 }
 
+transformer c_return_to_transformer(entity e __attribute__ ((__unused__)),
+				    list pc, list ef, transformer pre)
+{
+  transformer tf = transformer_undefined;
+  entity m = get_current_module_entity();
+  string mn = entity_local_name(m);
+  entity rv = global_name_to_entity(mn, mn);
+
+  if(ENDP(pc))
+    tf = transformer_identity();
+  else {
+    type umt = ultimate_type(entity_type(m));
+    type rt = functional_result(type_functional(umt));
+
+    pips_assert("A module has a functional type", type_functional_p(umt));
+
+    if(!type_void_p(rt)) {
+      //type urt = ultimate_type(rt);
+      //basic b = variable_basic(type_variable(urt));
+
+      /* FI: Are we sure the return value entity has values? No... */
+      /* if(entity_has_values_p(rv)) {*/
+      if(analyzable_scalar_entity_p(rv)) {
+	expression expr = EXPRESSION(CAR(pc));
+	tf = any_expression_to_transformer(rv, expr, pre, FALSE);
+	if(transformer_undefined_p(tf))
+	  tf = effects_to_transformer(ef);
+	tf = transformer_add_value_update(tf, rv);
+      }
+    }
+    else {
+      pips_internal_error("value returned from a void function\n");
+    }
+
+    if(transformer_undefined_p(tf))
+      tf = effects_to_transformer(ef);
+  }
+
+  return tf;
+}
+
+
 
 /* transformer assigned_expression_to_transformer(entity e, expression
  * expr, list ef): returns a transformer abstracting the effect of
@@ -1085,6 +1142,84 @@ transformer any_assign_to_transformer(list args, /* arguments for assign */
     if(ENDP(reference_indices(rlhs))) {
       entity v = reference_variable(rlhs);
       tf = any_scalar_assign_to_transformer(v, rhs, ef, pre); 
+    }
+  }
+
+  /* if some condition was not met and transformer derivation failed */
+  if(tf==transformer_undefined)
+    tf = effects_to_transformer(ef);
+
+  pips_debug(6,"return tf=%p\n", tf);
+  ifdebug(6) (void) print_transformer(tf);
+  pips_debug(8,"end\n");
+  return tf;
+}
+
+transformer any_update_to_transformer(entity op,
+				      list args, /* arguments for update */
+				      list ef, /* effects of assign */
+				      transformer pre) /* precondition */
+{
+  transformer tf = transformer_undefined;
+  expression lhs = EXPRESSION(CAR(args));
+  expression rhs = EXPRESSION(CAR(CDR(args)));
+  syntax slhs = expression_syntax(lhs);
+
+  pips_assert("2 args for regular update", CDR(CDR(args))==NIL);
+
+  /* The lhs must be a scalar reference to perform an interesting analysis */
+  if(syntax_reference_p(slhs)) {
+    reference rlhs = syntax_reference(slhs);
+    if(ENDP(reference_indices(rlhs))) {
+      entity v = reference_variable(rlhs);
+      expression ve = entity_to_expression(v);
+      entity sop = update_operator_to_regular_operator(op);
+      expression n_rhs = MakeBinaryCall(sop, ve, copy_expression(rhs));
+
+      tf = any_scalar_assign_to_transformer(v, n_rhs, ef, pre); 
+      free_expression(n_rhs);
+    }
+  }
+
+  /* if some condition was not met and transformer derivation failed */
+  if(tf==transformer_undefined)
+    tf = effects_to_transformer(ef);
+
+  pips_debug(6,"return tf=%p\n", tf);
+  ifdebug(6) (void) print_transformer(tf);
+  pips_debug(8,"end\n");
+  return tf;
+}
+
+transformer any_basic_update_to_transformer(entity op,
+					    list args, /* arguments for update */
+					    list ef, /* effects of assign */
+					    transformer pre) /* precondition */
+{
+  transformer tf = transformer_undefined;
+  expression lhs = EXPRESSION(CAR(args));
+  syntax slhs = expression_syntax(lhs);
+
+  pips_assert("1 arg for basic_update", CDR(args)==NIL);
+
+  /* The lhs must be a scalar reference to perform an interesting analysis */
+  if(syntax_reference_p(slhs)) {
+    reference rlhs = syntax_reference(slhs);
+    if(ENDP(reference_indices(rlhs))) {
+      entity v = reference_variable(rlhs);
+      expression ve = expression_undefined;
+      expression n_rhs = expression_undefined;
+      entity plus = entity_intrinsic(PLUS_C_OPERATOR_NAME);
+
+      if(ENTITY_POST_INCREMENT_P(op) || ENTITY_PRE_INCREMENT_P(op))
+	ve = int_to_expression(1);
+      else
+	ve = int_to_expression(-1);
+
+      n_rhs = MakeBinaryCall(plus, ve, copy_expression(lhs));
+
+      tf = any_scalar_assign_to_transformer(v, n_rhs, ef, pre); 
+      free_expression(n_rhs);
     }
   }
 
