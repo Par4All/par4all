@@ -126,93 +126,101 @@ normalized NormalizeReference(reference r)
 
 normalized NormalizeIntrinsic(entity e, list la)
 {
-    normalized n;
+  normalized n;
 
-    if (! top_level_entity_p(e))
-	return(make_normalized(is_normalized_complex, UU));
+  if (! top_level_entity_p(e))
+    return(make_normalized(is_normalized_complex, UU));
 
-    if (ENTITY_UNARY_MINUS_P(e)) {
-	n = NormalizeExpression(EXPRESSION(CAR(la)));
+  if (ENTITY_UNARY_MINUS_P(e)) {
+    n = NormalizeExpression(EXPRESSION(CAR(la)));
 
-	if (normalized_complex_p(n))
-	    return(n);
+    if (normalized_complex_p(n))
+      return(n);
 
-	vect_chg_sgn(normalized_linear(n));
+    vect_chg_sgn(normalized_linear(n));
+  }
+  else if (ENTITY_MINUS_P(e) || ENTITY_MINUS_C_P(e) || ENTITY_PLUS_P(e) || ENTITY_PLUS_C_P(e)) {
+    normalized ng, nd;
+
+    ng = NormalizeExpression(EXPRESSION(CAR(la)));
+    if (normalized_complex_p(ng))
+      return(ng);
+
+    nd = NormalizeExpression(EXPRESSION(CAR(CDR(la))));
+    if (normalized_complex_p(nd)) {
+      FreeNormalized(ng);
+      return(nd);
     }
-    else if (ENTITY_MINUS_P(e) || ENTITY_MINUS_C_P(e) || ENTITY_PLUS_P(e) || ENTITY_PLUS_C_P(e)) {
-	normalized ng, nd;
 
-	ng = NormalizeExpression(EXPRESSION(CAR(la)));
-	if (normalized_complex_p(ng))
-	    return(ng);
-
-	nd = NormalizeExpression(EXPRESSION(CAR(CDR(la))));
-	if (normalized_complex_p(nd)) {
-	    FreeNormalized(ng);
-	    return(nd);
-	}
-
-	n = (ENTITY_PLUS_P(e) || ENTITY_PLUS_C_P(e)) ? 
-	    make_normalized(is_normalized_linear, 
-			    vect_add(normalized_linear(ng), 
-					   normalized_linear(nd))) : 
-	    make_normalized(is_normalized_linear, 
-			    vect_substract(normalized_linear(ng), 
+    n = (ENTITY_PLUS_P(e) || ENTITY_PLUS_C_P(e)) ? 
+      make_normalized(is_normalized_linear, 
+		      vect_add(normalized_linear(ng), 
+			       normalized_linear(nd))) : 
+      make_normalized(is_normalized_linear, 
+		      vect_substract(normalized_linear(ng), 
 				     normalized_linear(nd)));
 
-	FreeNormalized(ng);
-	FreeNormalized(nd);
-    }
-    else if (ENTITY_MULTIPLY_P(e)) {
-	normalized ng, nd;
-	int val;
+    FreeNormalized(ng);
+    FreeNormalized(nd);
+  }
+  else if (ENTITY_MINUS_UPDATE_P(e) || ENTITY_PLUS_UPDATE_P(e)) {
+    /* There is no point in normalizing ng since this cannot be
+       expressed by a normalized expression */
+    //normalized nd;
 
-	ng = NormalizeExpression(EXPRESSION(CAR(la)));
-	if (normalized_complex_p(ng))
-	    return(ng);
+    (void) NormalizeExpression(EXPRESSION(CAR(CDR(la))));
+    return make_normalized_complex();
+  }
+  else if (ENTITY_MULTIPLY_P(e)) {
+    normalized ng, nd;
+    int val;
 
-	nd = NormalizeExpression(EXPRESSION(CAR(CDR(la))));
-	if (normalized_complex_p(nd)) {
-	    FreeNormalized(ng);
-	    return(nd);
-	}
+    ng = NormalizeExpression(EXPRESSION(CAR(la)));
+    if (normalized_complex_p(ng))
+      return(ng);
 
-	if (EvalNormalized(nd, &val)) {
-	    FreeNormalized(nd);
-	    normalized_linear(n = ng) = 
-		vect_multiply(normalized_linear(ng), val);
-	}
-	else if (EvalNormalized(ng, &val)) {
-	    FreeNormalized(ng);
-	    normalized_linear(n = nd) = 
-		vect_multiply(normalized_linear(nd), val);
-	}
-	else {
-	    FreeNormalized(ng);
-	    FreeNormalized(nd);
-	    return(make_normalized(is_normalized_complex, UU));
-	}
+    nd = NormalizeExpression(EXPRESSION(CAR(CDR(la))));
+    if (normalized_complex_p(nd)) {
+      FreeNormalized(ng);
+      return(nd);
     }
-    else if((ENTITY_MIN_P(e) || ENTITY_MIN0_P(e)) && gen_length(la) == 2) {
-	n = binary_to_normalized(la, MINIMUM);
+
+    if (EvalNormalized(nd, &val)) {
+      FreeNormalized(nd);
+      normalized_linear(n = ng) = 
+	vect_multiply(normalized_linear(ng), val);
     }
-    else if((ENTITY_MAX_P(e) || ENTITY_MAX0_P(e)) && gen_length(la) == 2) {
-	n = binary_to_normalized(la, MAXIMUM);
-    }
-    else if(ENTITY_MODULO_P(e)) {
-	n = binary_to_normalized(la, MOD);
-    }
-    else if(ENTITY_DIVIDE_P(e)) {
-	n = binary_to_normalized(la, SLASH);
-    }
-    else if(ENTITY_POWER_P(e)) {
-	n = binary_to_normalized(la, POWER);
+    else if (EvalNormalized(ng, &val)) {
+      FreeNormalized(ng);
+      normalized_linear(n = nd) = 
+	vect_multiply(normalized_linear(nd), val);
     }
     else {
-	return(make_normalized(is_normalized_complex, UU));
+      FreeNormalized(ng);
+      FreeNormalized(nd);
+      return(make_normalized(is_normalized_complex, UU));
     }
+  }
+  else if((ENTITY_MIN_P(e) || ENTITY_MIN0_P(e)) && gen_length(la) == 2) {
+    n = binary_to_normalized(la, MINIMUM);
+  }
+  else if((ENTITY_MAX_P(e) || ENTITY_MAX0_P(e)) && gen_length(la) == 2) {
+    n = binary_to_normalized(la, MAXIMUM);
+  }
+  else if(ENTITY_MODULO_P(e)) {
+    n = binary_to_normalized(la, MOD);
+  }
+  else if(ENTITY_DIVIDE_P(e)) {
+    n = binary_to_normalized(la, SLASH);
+  }
+  else if(ENTITY_POWER_P(e)) {
+    n = binary_to_normalized(la, POWER);
+  }
+  else {
+    return(make_normalized(is_normalized_complex, UU));
+  }
 
-    return(n);
+  return(n);
 }
 
 normalized binary_to_normalized(list la, int op)

@@ -179,14 +179,13 @@ statement s;
     return (fortran_instruction_p(i, ASSIGN_OPERATOR_NAME));
 }
 
-bool 
-return_statement_p(s)
-statement s;
+bool return_statement_p(statement s)
 {
-    instruction i = statement_instruction(s);
-    bool return_p = fortran_instruction_p(i, RETURN_FUNCTION_NAME);
+  instruction i = statement_instruction(s);
+  bool return_p = fortran_instruction_p(i, RETURN_FUNCTION_NAME)
+    || fortran_instruction_p(i, C_RETURN_FUNCTION_NAME);
 
-    return return_p;
+  return return_p;
 }
 
 bool 

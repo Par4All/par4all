@@ -878,7 +878,8 @@ words_nullary_op_c(call obj,
   if(nargs==0){
     if(same_string_p(fname,STOP_FUNCTION_NAME))
       pc = CHAIN_SWORD(pc, "exit(0)");
-    else if(same_string_p(fname,RETURN_FUNCTION_NAME))
+    else if(same_string_p(fname,RETURN_FUNCTION_NAME)
+	    ||same_string_p(fname,C_RETURN_FUNCTION_NAME))
       pc = CHAIN_SWORD(pc, "return");
     else if(same_string_p(fname,PAUSE_FUNCTION_NAME))
       pc = CHAIN_SWORD(pc, "_f77_intrinsics_pause_(0)");
@@ -900,15 +901,16 @@ words_nullary_op_c(call obj,
 	pc = CHAIN_SWORD(pc, "_f77_intrinsics_stop_");
       }
     }
-    else if(same_string_p(fname,RETURN_FUNCTION_NAME)){
+    else if(same_string_p(fname,RETURN_FUNCTION_NAME)
+	    ||same_string_p(fname,C_RETURN_FUNCTION_NAME)){
       pc = CHAIN_SWORD(pc, "return");
       parentheses_p = FALSE;
       //pips_user_error("alternate returns are not supported in C\n");
     }
-    else if(same_string_p(fname,PAUSE_FUNCTION_NAME)){
+    else if(same_string_p(fname, PAUSE_FUNCTION_NAME)){
       pc = CHAIN_SWORD(pc, "_f77_intrinsics_pause_");
     }
-    else if(same_string_p(fname,BUILTIN_VA_END)){
+    else if(same_string_p(fname, BUILTIN_VA_END)){
       pc = CHAIN_SWORD(pc, "va_end");
     }
     else {
@@ -949,7 +951,8 @@ static list words_nullary_op_fortran(call obj,
   entity func = call_function(obj);
   string fname = entity_local_name(func);
 
-  if(same_string_p(fname,RETURN_FUNCTION_NAME))
+  if(same_string_p(fname,RETURN_FUNCTION_NAME)
+     ||same_string_p(fname,C_RETURN_FUNCTION_NAME))
     pc = CHAIN_SWORD(pc, "return");
   else 
     pc = CHAIN_SWORD(pc, fname);
@@ -959,7 +962,8 @@ static list words_nullary_op_fortran(call obj,
   if(gen_length(args)==1) {
     if(same_string_p(fname,STOP_FUNCTION_NAME)
        || same_string_p(fname,PAUSE_FUNCTION_NAME)
-       || same_string_p(fname,RETURN_FUNCTION_NAME)) {
+       || same_string_p(fname,RETURN_FUNCTION_NAME)
+       || same_string_p(fname, C_RETURN_FUNCTION_NAME)) {
       expression e = EXPRESSION(CAR(args));
       pc = CHAIN_SWORD(pc, " ");
       pc = gen_nconc(pc, words_subexpression(e, precedence, TRUE));
@@ -1737,6 +1741,7 @@ static struct intrinsic_handler {
     {IMPLIED_DO_FUNCTION_NAME, words_implied_do, 0},
 
     {RETURN_FUNCTION_NAME, words_nullary_op,0},
+    {C_RETURN_FUNCTION_NAME, words_nullary_op,0},
     {PAUSE_FUNCTION_NAME, words_nullary_op,0 },
     {STOP_FUNCTION_NAME, words_nullary_op, 0},
     {CONTINUE_FUNCTION_NAME, words_nullary_op,0},

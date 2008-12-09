@@ -1487,3 +1487,35 @@ char * AddPackageToName(p, n)
 
   return(ps);
 }
+
+/* Returns the binary operator associated to a C update operator such as += 
+
+   If the operator is unknown, an undefined entity is returned.
+*/
+entity update_operator_to_regular_operator(entity op)
+{
+  entity sop = entity_undefined;
+
+  if(ENTITY_PLUS_UPDATE_P(op))
+    sop = entity_intrinsic(PLUS_C_OPERATOR_NAME);
+  else if(ENTITY_MINUS_UPDATE_P(op))
+    sop = entity_intrinsic(PLUS_C_OPERATOR_NAME);
+  else if(ENTITY_MULTIPLY_UPDATE_P(op))
+    sop = entity_intrinsic(MULTIPLY_OPERATOR_NAME);
+  else if(ENTITY_DIVIDE_UPDATE_P(op))
+    sop = entity_intrinsic(DIVIDE_OPERATOR_NAME);
+  else if(ENTITY_MODULO_UPDATE_P(op)) 
+    sop = entity_intrinsic(C_MODULO_OPERATOR_NAME);
+  else if(ENTITY_LEFT_SHIFT_UPDATE_P(op))
+    sop = entity_intrinsic(LEFT_SHIFT_OPERATOR_NAME);
+  else if(ENTITY_RIGHT_SHIFT_UPDATE_P(op))
+    sop = entity_intrinsic(RIGHT_SHIFT_OPERATOR_NAME);
+  else if(ENTITY_BITWISE_AND_UPDATE_P(op))
+    sop = entity_intrinsic(BITWISE_AND_OPERATOR_NAME);
+  else if(ENTITY_BITWISE_XOR_UPDATE_P(op))
+    sop = entity_intrinsic(BITWISE_XOR_OPERATOR_NAME);
+  else if(ENTITY_BITWISE_OR_UPDATE_P(op))
+    sop = entity_intrinsic(BITWISE_OR_OPERATOR_NAME);
+
+  return sop;
+}
