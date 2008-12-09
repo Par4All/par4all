@@ -25,6 +25,10 @@ typedef struct{
   enum FLGR_TYPE type;
 } FLGR_Data2D;
 
+static __inline__ fgINT32 flgr_defop_add_fgINT32(fgINT32 a,fgINT32 b) {
+  return a+b;
+}
+
 static void flgr_set_array_fgINT32(fgINT32 *array, int pos, fgINT32 value)
 {
    array[pos] = value;

@@ -74,6 +74,11 @@ activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[fulguro01!flgr1d_get_data_array_fgINT32]
 
 activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[fulguro01!flgr_defop_add_fgINT32]
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[fulguro01!flgr_defop_add_fgINT32]
+
+activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[flgr1d_arith_add_fgINT32]
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[flgr1d_arith_add_fgINT32]
