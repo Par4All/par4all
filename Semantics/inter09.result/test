@@ -1,0 +1,68 @@
+
+Parsed printed file for "inter09"
+
+int inter09(int i)
+{
+   return(i+1);
+}
+
+Proper effects for "inter09"
+
+int inter09(int i)
+{
+//               <must be read   >: i
+   return(i+1);
+}
+
+Cumulated effects for "inter09"
+
+//               <must be read   >: i
+int inter09(int i)
+{
+//               <must be read   >: i
+   return(i+1);
+}
+
+Transformers for "inter09"
+
+
+//  T(inter09) {i==inter09-1}
+
+int inter09(int i)
+{
+
+//  T(inter09) {i==inter09-1}
+
+   return(i+1);
+}
+
+Preconditions for "inter09"
+
+
+//  P() {i==4}
+
+int inter09(int i)
+{
+
+//  P() {i==4}
+
+   return(i+1);
+}
+
+Preconditions for "main"
+
+
+//  P() {}
+
+main()
+{
+   int i = 4;
+
+//  P() {i==4}
+
+   i = inter09(i);
+
+//  P(i) {i==5}
+
+   foo(i);
+}

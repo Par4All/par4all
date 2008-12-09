@@ -1,0 +1,48 @@
+C               <must be read   >: I
+
+      INTEGER FUNCTION INTER10(I)
+C               <must be read   >: I
+C               <must be written>: INTER10
+      INTER10 = I+1                                                     0001
+      END
+
+C  T(INTER10) {I==INTER10-1}
+
+
+      INTEGER FUNCTION INTER10(I)
+
+C  T(INTER10) {I==INTER10-1}
+
+      INTER10 = I+1                                                     0001
+      END
+
+C  P() {}
+
+      SUBROUTINE FOO(I)
+      END
+
+C  P() {I==4}
+
+
+      INTEGER FUNCTION INTER10(I)
+
+C  P() {I==4}
+
+      INTER10 = I+1                                                     0001
+      END
+
+C  P() {I==4}
+
+
+      PROGRAM MAIN
+      INTEGER I
+      DATA I/4/
+
+C  P() {I==4}
+
+      I = INTER10(I)                                                    0001
+
+C  P(I) {I==5, I#init==4}
+
+      CALL FOO(I)                                                       0002
+      END

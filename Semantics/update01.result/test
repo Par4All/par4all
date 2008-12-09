@@ -1,0 +1,107 @@
+
+Parsed printed file for "update01"
+
+void update01()
+{
+   int i = 1;
+   
+   //i = (i+= 2);
+   i += 3;
+   i++;
+   i--;
+   foo(i);
+}
+
+Proper effects for "update01"
+
+void update01()
+{
+   int i = 1;
+//               <must be read   >: i
+//               <must be written>: i
+   
+   //i = (i+= 2);
+   i += 3;
+//               <must be read   >: i
+//               <must be written>: i
+   i++;
+//               <must be read   >: i
+//               <must be written>: i
+   i--;
+   foo(i);
+}
+
+Cumulated effects for "update01"
+
+void update01()
+{
+   int i = 1;
+//               <must be read   >: i
+//               <must be written>: i
+   
+   //i = (i+= 2);
+   i += 3;
+//               <must be read   >: i
+//               <must be written>: i
+   i++;
+//               <must be read   >: i
+//               <must be written>: i
+   i--;
+   foo(i);
+}
+
+Transformers for "update01"
+
+
+//  T() {}
+
+void update01()
+{
+   int i = 1;
+
+//  T(i) {i==i#init+3}
+
+   
+   //i = (i+= 2);
+   i += 3;
+
+//  T(i) {i==i#init+1}
+
+   i++;
+
+//  T(i) {i==i#init-1}
+
+   i--;
+
+//  T() {}
+
+   foo(i);
+}
+
+Preconditions for "update01"
+
+
+//  P() {}
+
+void update01()
+{
+   int i = 1;
+
+//  P() {i==1}
+
+   
+   //i = (i+= 2);
+   i += 3;
+
+//  P(i) {i==4}
+
+   i++;
+
+//  P(i) {i==5}
+
+   i--;
+
+//  P(i) {i==4}
+
+   foo(i);
+}

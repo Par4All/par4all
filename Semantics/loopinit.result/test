@@ -45,8 +45,8 @@ C               <must be read   >: K
 C               <must be written>: INC
       INC = K                                                           0002
       END
-C               <may be read    >: __IO_EFFECTS:LUNS(*)
-C               <may be written >: __IO_EFFECTS:LUNS(*)
+C               <must be read   >: __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
       PROGRAM LOOPINIT
 
 c     Check that loop index initialization is performed correctly
@@ -69,9 +69,8 @@ C               <must be read   >: J N
 C               <must be written>: J
          J = J+2                                                        0004
       ENDDO
-C               <may be read    >: __IO_EFFECTS:LUNS(*)
-C               <may be written >: __IO_EFFECTS:LUNS(*)
-C               <must be read   >: I J
+C               <must be read   >: I J __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
 
       PRINT *, I, J                                                     0005
 
