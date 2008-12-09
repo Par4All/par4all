@@ -58,6 +58,7 @@ Variable list:
 	Declared entity "decl19:*STATIC*" with type "area" with size 0
 	Declared entity "decl19:0`x" with type "variable" "g"
 	Declared entity "decl19:cookie" with type "variable" "int"
+	Declared entity "decl19:decl19" with type "variable" "int"
 
 * empty extern declaration list *
 
@@ -65,6 +66,10 @@ Variable list:
 Layout for formal parameters:
 
 	Variable decl19:cookie	offset = 1
+
+Layout for return variable:
+
+	Variable "decl19:decl19"	size = 4
 
 Layouts for memory areas:
 

@@ -10,9 +10,14 @@ Variable list:
 	Declared entity "foo:*DYNAMIC*" with type "area" with size 0
 	Declared entity "foo:*STACK*" with type "area" with size 0
 	Declared entity "foo:*STATIC*" with type "area" with size 0
+	Declared entity "foo:foo" with type "variable" "int"
 
 * empty extern declaration list *
 
+
+Layout for return variable:
+
+	Variable "foo:foo"	size = 4
 
 Layouts for memory areas:
 

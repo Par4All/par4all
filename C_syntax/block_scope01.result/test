@@ -59,9 +59,14 @@ Variable list:
 	Declared entity "main:*STATIC*" with type "area" with size 0
 	Declared entity "main:0`1`x" with type "variable" "int"
 	Declared entity "main:0`x" with type "variable" "int"
+	Declared entity "main:main" with type "variable" "int"
 
 * empty extern declaration list *
 
+
+Layout for return variable:
+
+	Variable "main:main"	size = 4
 
 Layouts for memory areas:
 

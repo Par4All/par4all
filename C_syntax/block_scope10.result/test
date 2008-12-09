@@ -55,9 +55,14 @@ Variable list:
 	Declared entity "block_scope10!block_scope10:*STATIC*" with type "area" with size 0
 	Declared entity "block_scope10!block_scope10:0`1`x" with type "variable" "int"
 	Declared entity "block_scope10!block_scope10:0`x" with type "variable" "int"
+	Declared entity "block_scope10!block_scope10:block_scope10!block_scope10" with type "variable" "int"
 
 * empty extern declaration list *
 
+
+Layout for return variable:
+
+	Variable "block_scope10!block_scope10:block_scope10!block_scope10"	size = 4
 
 Layouts for memory areas:
 

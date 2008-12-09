@@ -185,10 +185,15 @@ Variable list:
 	Declared entity "main:*DYNAMIC*" with type "area" with size 0
 	Declared entity "main:*STACK*" with type "area" with size 0
 	Declared entity "main:*STATIC*" with type "area" with size 0
+	Declared entity "main:main" with type "variable" "int"
 
 External variable list:
 
 	Declared external entity "TOP-LEVEL:i"	with type "variable" "int"
+
+Layout for return variable:
+
+	Variable "main:main"	size = 4
 
 Layouts for memory areas:
 

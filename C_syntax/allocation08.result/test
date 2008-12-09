@@ -15,9 +15,14 @@ Variable list:
 	Declared entity "allocation08:*STATIC*" with type "area" with size 0
 	Declared entity "allocation08:0`x" with type "variable" "ac"
 	Declared entity "allocation08:0`y" with type "variable" "int"
+	Declared entity "allocation08:allocation08" with type "variable" "int"
 
 * empty extern declaration list *
 
+
+Layout for return variable:
+
+	Variable "allocation08:allocation08"	size = 4
 
 Layouts for memory areas:
 

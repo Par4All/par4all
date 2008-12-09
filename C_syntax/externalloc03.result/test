@@ -14,6 +14,7 @@ Variable list:
 	Declared entity "main:0`i" with type "variable" "int"
 	Declared entity "main:argc" with type "variable" "int"
 	Declared entity "main:argv" with type "variable" "char *"
+	Declared entity "main:main" with type "variable" "int"
 
 External variable list:
 
@@ -23,6 +24,10 @@ Layout for formal parameters:
 
 	Variable main:argc	offset = 1
 	Variable main:argv	offset = 2
+
+Layout for return variable:
+
+	Variable "main:main"	size = 4
 
 Layouts for memory areas:
 

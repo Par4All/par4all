@@ -28,9 +28,14 @@ Variable list:
 	Declared entity "allocation09:0`uc" with type "variable" "unsigned int"
 	Declared entity "allocation09:0`ud" with type "variable" "unsigned long"
 	Declared entity "allocation09:0`ue" with type "variable" "unsigned long long"
+	Declared entity "allocation09:allocation09" with type "variable" "int"
 
 * empty extern declaration list *
 
+
+Layout for return variable:
+
+	Variable "allocation09:allocation09"	size = 4
 
 Layouts for memory areas:
 

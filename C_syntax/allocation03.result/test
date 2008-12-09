@@ -59,9 +59,14 @@ Variable list:
 	Declared entity "main:0`fooi" with type "variable" "int"
 	Declared entity "main:0`i" with type "variable" "int"
 	Declared entity "main:0`j" with type "variable" "int"
+	Declared entity "main:main" with type "variable" "int"
 
 * empty extern declaration list *
 
+
+Layout for return variable:
+
+	Variable "main:main"	size = 4
 
 Layouts for memory areas:
 

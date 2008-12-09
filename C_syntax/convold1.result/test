@@ -71,7 +71,7 @@ int convold1(int X[13][13], int coeff[6], int i, int j)
 Transformers for convold1
 
 
-//  T() {}
+//  T(convold1) {}
 
 int convold1(int X[13][13], int coeff[6], int i, int j)
 {
@@ -93,7 +93,7 @@ int convold1(int X[13][13], int coeff[6], int i, int j)
 
       res = res+coeff[m]*X[i+m][j];
 
-//  T() {m==6}
+//  T(convold1) {convold1==res, m==6}
 
 
    return res;

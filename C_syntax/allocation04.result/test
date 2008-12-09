@@ -15,6 +15,7 @@ Variable list:
 	Declared entity "foo:*STATIC*" with type "area" with size 4
 	Declared entity "foo:0`k" with type "variable" "int"
 	Declared entity "foo:0`l" with type "variable" "int"
+	Declared entity "foo:foo" with type "variable" "int"
 	Declared entity "foo:i" with type "variable" "int"
 
 * empty extern declaration list *
@@ -23,6 +24,10 @@ Variable list:
 Layout for formal parameters:
 
 	Variable foo:i	offset = 1
+
+Layout for return variable:
+
+	Variable "foo:foo"	size = 4
 
 Layouts for memory areas:
 
@@ -70,9 +75,14 @@ Variable list:
 	Declared entity "main:0`fooi" with type "variable" "int"
 	Declared entity "main:0`i" with type "variable" "int"
 	Declared entity "main:0`j" with type "variable" "int"
+	Declared entity "main:main" with type "variable" "int"
 
 * empty extern declaration list *
 
+
+Layout for return variable:
+
+	Variable "main:main"	size = 4
 
 Layouts for memory areas:
 

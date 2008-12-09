@@ -11,6 +11,7 @@ Variable list:
 	Declared entity "foo:0`X" with type "variable" "int"
 	Declared entity "foo:0`Y" with type "variable" "int"
 	Declared entity "foo:a" with type "variable" "int"
+	Declared entity "foo:foo" with type "variable" "int"
 	Declared entity "sizeofArray03!:*HEAP*" with type "area" with size 0
 	Declared entity "sizeofArray03!:*STATIC*" with type "area" with size 0
 
@@ -20,6 +21,10 @@ Variable list:
 Layout for formal parameters:
 
 	Variable foo:a	offset = 1
+
+Layout for return variable:
+
+	Variable "foo:foo"	size = 4
 
 Layouts for memory areas:
 
