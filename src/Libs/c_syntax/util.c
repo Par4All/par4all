@@ -1844,7 +1844,23 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
   else if (type_functional_p(ultimate_type(entity_type(e)))){
     /* The function should also added to the declarations */
     if(!entity_undefined_p(get_current_module_entity()))
-      AddToDeclarations(e,get_current_module_entity());
+      AddToDeclarations(e, get_current_module_entity());
+    else {
+      /* We are defining the current module entity */
+      type rt = functional_result(type_functional(ultimate_type(entity_type(e))));
+
+      if(!type_void_p(rt)) {
+	/* Create the return value */
+	string fn = entity_local_name(e);
+	entity re = FindOrCreateEntity(fn,fn);
+	if(type_undefined_p(entity_type(re))) {
+	  entity_type(re) = copy_type(rt);
+	  entity_storage(re) = make_storage_return(e);
+	  entity_initial(re) = make_value_unknown();
+	  AddToDeclarations(re, e);
+	}
+      }
+    }
     entity_storage(e) = MakeStorageRom();
   }
   else

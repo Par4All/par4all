@@ -1472,18 +1472,18 @@ statement:
 			}
 |   TK_RETURN TK_SEMICOLON		 
                         {
-			  /* $$ =  call_to_statement(make_call(CreateIntrinsic(RETURN_FUNCTION_NAME),NIL)); */
+			  /* $$ =  call_to_statement(make_call(CreateIntrinsic(C_RETURN_FUNCTION_NAME),NIL)); */
                           $$ = make_statement(entity_empty_label(), 
 			       get_current_C_line_number(), 
 			       STATEMENT_ORDERING_UNDEFINED, 
 			       get_current_C_comment(),
-			       call_to_instruction(make_call(CreateIntrinsic(RETURN_FUNCTION_NAME),NIL)),
+			       call_to_instruction(make_call(CreateIntrinsic(C_RETURN_FUNCTION_NAME),NIL)),
 			       NIL, string_undefined);
 			  statement_consistent_p($$);
 			}
 |   TK_RETURN comma_expression TK_SEMICOLON
 	                {  
-			  /* $$ =  call_to_statement(make_call(CreateIntrinsic(RETURN_FUNCTION_NAME),$2)); */
+			  /* $$ =  call_to_statement(make_call(CreateIntrinsic(C_RETURN_FUNCTION_NAME),$2)); */
 			  expression res = EXPRESSION(CAR($2));
 			  if(expression_reference_p(res)) {
 			    reference r = expression_reference(res);
@@ -1501,7 +1501,7 @@ statement:
 			       STATEMENT_ORDERING_UNDEFINED, 
 			       get_current_C_comment(),
 			       make_instruction(is_instruction_call,
-						make_call(CreateIntrinsic(RETURN_FUNCTION_NAME), $2)),
+						make_call(CreateIntrinsic(C_RETURN_FUNCTION_NAME), $2)),
 					      NIL, string_undefined);
 			  statement_consistent_p($$);
 			}
