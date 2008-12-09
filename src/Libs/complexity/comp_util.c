@@ -309,6 +309,7 @@ intrinsic_cost_record intrinsic_cost_table[] = {
     { "CONTINUE",                 is_basic_overloaded, ZERO_BYTE, EMPTY_COST },
     { "ENDDO",                    is_basic_overloaded, ZERO_BYTE, EMPTY_COST },
     { "RETURN",                   is_basic_overloaded, ZERO_BYTE, EMPTY_COST },
+    { "return",                   is_basic_overloaded, ZERO_BYTE, EMPTY_COST },
     { "STOP",                     is_basic_overloaded, ZERO_BYTE, EMPTY_COST },
     { "END",                      is_basic_overloaded, ZERO_BYTE, EMPTY_COST },
     { "FORMAT",                   is_basic_overloaded, ZERO_BYTE, EMPTY_COST },
