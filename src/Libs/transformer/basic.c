@@ -154,6 +154,36 @@ Pvecteur incr;
     return t;
 }
 
+/* Add an update of variable v to t */
+transformer transformer_add_variable_update(transformer t, entity v)
+{
+  Psysteme psyst = predicate_system(transformer_relation(t));
+  entity v_new = entity_to_new_value(v);
+  entity v_rep = value_to_variable(v_new);
+
+  transformer_arguments(t) = arguments_add_entity(transformer_arguments(t), v_rep);
+  if(!base_contains_variable_p(psyst->base, (Variable) v_new)) {
+    psyst->base = base_add_variable(psyst->base, (Variable) v_new);
+    psyst->dimension = vect_size(psyst->base);
+  }
+
+  return t;
+}
+
+/* Add an update of value v to t */
+transformer transformer_add_value_update(transformer t, entity v)
+{
+  Psysteme psyst = predicate_system(transformer_relation(t));
+
+  transformer_arguments(t) = arguments_add_entity(transformer_arguments(t), v);
+  if(!base_contains_variable_p(psyst->base, (Variable) v)) {
+    psyst->base = base_add_variable(psyst->base, (Variable) v);
+    psyst->dimension = vect_size(psyst->base);
+  }
+
+  return t;
+}
+
 transformer 
 transformer_constraint_add(tf, i, equality)
 transformer tf;
@@ -238,6 +268,20 @@ transformer_add_identity(transformer tf, entity v)
   tf = transformer_equality_add(tf, eq);
   transformer_arguments(tf) = 
     arguments_add_entity(transformer_arguments(tf), v_new);
+
+  return tf;
+}
+
+/* Add an equality between two values (two variables?) */
+transformer transformer_add_equality(transformer tf, entity v1, entity v2)
+{
+  Pvecteur eq = vect_new((Variable) v1, (Value) 1);
+
+  //pips_assert("v1 has values", entity_has_values_p(v1));
+  //pips_assert("v2 has values", entity_has_values_p(v2));
+
+  vect_add_elem(&eq, (Variable) v2, (Value) -1);
+  tf = transformer_equality_add(tf, eq);
 
   return tf;
 }

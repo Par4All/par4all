@@ -274,8 +274,9 @@ bool complex_analyzed_p()
 /* The entity is type of one of the analyzed types */
 bool analyzable_scalar_entity_p(entity e)
 {
-  if(type_variable_p(entity_type(e)) && entity_scalar_p(e)) {
-    basic b = variable_basic(type_variable(entity_type(e)));
+  type ut = ultimate_type(entity_type(e));
+  if(type_variable_p(ut) && entity_scalar_p(e)) {
+    basic b = variable_basic(type_variable(ut));
     if(basic_int_p(b) && analyze_integer_scalar_entities)
       return TRUE;
     if(basic_string_p(b) && analyze_string_scalar_entities)
