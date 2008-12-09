@@ -405,9 +405,13 @@ string get_symbol_table(entity m, bool isfortran)
 
   /* Return variable */
   if(!entity_undefined_p(rv)) {
+    basic rb = variable_basic(type_variable(ultimate_type(entity_type(rv))));
     string_buffer_append(result, strdup(concatenate(NL,"Layout for return variable:",NL,NL,NULL)));
-    string_buffer_append(result, strdup(concatenate("\tVariable \"",entity_name(rv),
-						    "\"\tsize = ", SafeSizeOfArray(rv),NULL)));
+    string_buffer_append(result, strdup(concatenate("\tVariable \"",
+						    entity_name(rv),
+						    "\"\tsize = ",
+						    strdup(itoa(SizeOfElements(rb))),
+						    "\n", NULL)));
   }
 
   /* Structure of each area/common */
