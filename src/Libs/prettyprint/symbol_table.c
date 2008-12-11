@@ -298,13 +298,17 @@ string get_symbol_table(entity m, bool isfortran)
   for(ce=decls; !ENDP(ce); POP(ce)) {
     entity e = ENTITY(CAR(ce));
     type t = entity_type(e);
+    storage s = entity_storage(e);
 
     pips_debug(8, "Processing entity \"%s\"\n", entity_name(e));
     string_buffer_append(result, strdup(concatenate("\tDeclared entity \"",
 						    entity_name(e),"\" with type \"",
 						    type_to_string(t),"\" ",NULL)));
     
-    if(type_variable_p(t)) {
+    /* FI: struct, union and enum are also declared (in theory...), but
+       their characteristics should be given differently. */
+    if(type_variable_p(t)
+       /* && (storage_ram_p(s) || storage_return_p(s) || storage_formal_p(s))*/) {
       variable v = type_variable(t);
       basic b = variable_basic(v);
       if(basic_pointer_p(b) && type_functional_p(basic_pointer(b))) {
@@ -327,8 +331,10 @@ string get_symbol_table(entity m, bool isfortran)
       string_buffer_append(result,strdup(concatenate("with size ",
 						     itoa(area_size(type_area(t))),NL, NULL)));
     }
-    else
+    else {
+      /* FI: How do we want to print out structures, unions and enums? */
       string_buffer_append(result, strdup(concatenate(NL,NULL)));
+    }
   }
  
   if(!isfortran) {
