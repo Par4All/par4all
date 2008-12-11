@@ -395,7 +395,11 @@ void module_to_value_mappings(entity m)
      {entity e = 
 	  reference_variable(effect_any_reference(EFFECT(CAR(cef))));
 	  action a = effect_action(EFFECT(CAR(cef)));
-	  if(analyzable_scalar_entity_p(e) && action_write_p(a)) 
+	  /* In C, write effects on scalar formal parameter are masked
+	     by the vallue passing mode but the copu may nevertheless
+	     be written inside the function. */
+	  if(analyzable_scalar_entity_p(e)
+	     && (action_write_p(a) || (c_module_p(m) && formal_entity_p(e)))) 
 	      add_interprocedural_value_entities(e);
       },
 	 module_inter_effects);

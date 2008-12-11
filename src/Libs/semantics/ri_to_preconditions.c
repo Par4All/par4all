@@ -321,18 +321,27 @@ call_to_postcondition(
 /******************************************************** DATA PRECONDITIONS */
 
 /* a remake that works in all cases. FC.
+ *
+ * This function works for C as well as Fortran. Its name should be
+ * initial_value_to_preconditions.
+ *
+ * FI: It remains to be enhanced to handle more cases for non-integer
+ * types. EvalExpression() should be extended to non-integer
+ * types. The new fields of data structure "constant" should be
+ * exploited.
+ *
  */
-static transformer 
-data_to_prec_for_variables(entity m, list /* of entity */le) 
+static transformer data_to_prec_for_variables(entity m, list /* of entity */le) 
 {
   transformer pre = transformer_identity();
   linear_hashtable_pt b = linear_hashtable_make(); /* already seen */
+  list ce = list_undefined;
   
   pips_debug(8, "begin for %s\n", module_local_name(m));
   
   /* look for entities with an initial value. */
-  MAP(ENTITY, e,
-  {
+  for(ce = le; !ENDP(ce); POP(ce)) {
+    entity e = ENTITY(CAR(ce));
     value val = entity_initial(e);
 
     if(value_constant_p(val))
@@ -371,8 +380,7 @@ data_to_prec_for_variables(entity m, list /* of entity */le)
 	}
       }
     }
-  },
-      le);
+  }
       
   linear_hashtable_free(b);
   pips_assert("some transformer", pre != transformer_undefined);

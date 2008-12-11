@@ -913,6 +913,9 @@ user_call_to_transformer(
   return t_caller;
 }
 
+/* FI: This transformer carry the information about the value
+   returned, but not the fact that the next statement is not
+   reached. */
 transformer c_return_to_transformer(entity e __attribute__ ((__unused__)),
 				    list pc, list ef, transformer pre)
 {
