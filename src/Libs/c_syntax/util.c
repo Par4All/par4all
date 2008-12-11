@@ -93,7 +93,8 @@ void init_c_areas()
   entity_initial(StaticArea) = make_value_unknown();
   AddEntityToDeclarations(StaticArea, get_current_module_entity());
 
-  HeapArea = FindOrCreateEntity(compilation_unit_name, HEAP_AREA_LOCAL_NAME);
+  //HeapArea = FindOrCreateEntity(compilation_unit_name, HEAP_AREA_LOCAL_NAME);
+  HeapArea = FindOrCreateEntity(get_current_module_name(), HEAP_AREA_LOCAL_NAME);
   entity_type(HeapArea) = make_type(is_type_area, make_area(0, NIL));
   entity_storage(HeapArea) = MakeStorageRom();
   entity_initial(HeapArea) = MakeValueUnknown();
@@ -2244,6 +2245,10 @@ entity MakeDerivedEntity(string name, list members, bool is_external, int i)
     }
   }
   entity_storage(ent) = make_storage_rom();
+  /* FI: What should the initial value be? */
+  if (value_undefined_p(entity_initial(ent)))
+    entity_initial(ent) = make_value_unknown();
+  AddEntityToDeclarations(ent, get_current_module_entity());
 
   return ent;
 }

@@ -1950,7 +1950,11 @@ type_spec:   /* ISO 6.7.2 */
 			  /* Specify the type of the variable that follows this declaration specifier */
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
 			  if (type_undefined_p(entity_type(ent)))
-			    entity_type(ent) = make_type_enum(NIL); 
+			    entity_type(ent) = make_type_enum(NIL);
+			  /* FI: What should the initial value be? */
+			  if (value_undefined_p(entity_initial(ent)))
+			    entity_initial(ent) = make_value_unknown();
+			  AddEntityToDeclarations(ent, get_current_module_entity());
 			  c_parser_context_type(ycontext) = make_type_variable(v);
 			  $$ = NIL;  
 			}
