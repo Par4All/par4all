@@ -546,20 +546,29 @@ bool c_initializer(string module_name)
 entity find_enum_of_member(entity m)
 {
   entity mod = entity_to_module_entity(m);
-  statement mod_stat = (statement) db_get_memory_resource(DBR_PARSED_CODE,
-							  entity_local_name(mod), TRUE);
-  /* Not good in general, but should work for compilation units... */
   list dl = code_declarations(value_code(entity_initial(mod)));
-  /* No, it does not... */
-  list sdl = statement_declarations(mod_stat);
-  list fdl = gen_nconc(gen_copy_seq(dl), gen_copy_seq(sdl));
+  list sdl = list_undefined;
+  list fdl = list_undefined;
+
+  if(compilation_unit_entity_p(mod)) {
+    /* if m was declared in the compilation unit cu and used elsewhere, cu may not be parsed yet. */
+    sdl = NIL;
+  }
+  else {
+    statement mod_stat = (statement) db_get_memory_resource(DBR_PARSED_CODE,
+							    entity_local_name(mod), TRUE);
+    /* Not good in general, but should work for compilation units... */
+    /* No, it does not... */
+    sdl = statement_declarations(mod_stat);
+  }
+  fdl = gen_nconc(gen_copy_seq(dl), gen_copy_seq(sdl));
 
   entity ee = entity_undefined;
 
   ifdebug(8) {
     pips_debug(8, "Declarations for enclosing module \"\%s\": \"", entity_name(mod));
     print_entities(dl);
-    print_entities(sdl);
+    //print_entities(sdl);
     fprintf(stderr, "\"\n");
   }
 
