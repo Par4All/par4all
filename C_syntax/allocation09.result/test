@@ -8,9 +8,9 @@ Declarations for module "allocation09" with type "() -> int"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
-	Declared entity "allocation09!:*HEAP*" with type "area" with size 0
 	Declared entity "allocation09!:*STATIC*" with type "area" with size 0
 	Declared entity "allocation09:*DYNAMIC*" with type "area" with size 57
+	Declared entity "allocation09:*HEAP*" with type "area" with size 0
 	Declared entity "allocation09:*STACK*" with type "area" with size 0
 	Declared entity "allocation09:*STATIC*" with type "area" with size 0
 	Declared entity "allocation09:0`a" with type "variable" "char"
@@ -43,10 +43,6 @@ Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for memory area "allocation09!:*HEAP*" of size 0:
-	* empty area *
-
-
 Layout for memory area "allocation09!:*STATIC*" of size 0:
 	* empty area *
 
@@ -67,6 +63,10 @@ Layout for memory area "allocation09:*DYNAMIC*" of size 57:
 	Variable "allocation09:0`sc"	offset = 41	size = 4
 	Variable "allocation09:0`sd"	offset = 45	size = 4
 	Variable "allocation09:0`se"	offset = 49	size = 8
+
+
+Layout for memory area "allocation09:*HEAP*" of size 0:
+	* empty area *
 
 
 Layout for memory area "allocation09:*STACK*" of size 0:

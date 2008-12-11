@@ -6,9 +6,9 @@ Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 4
 	Declared entity "TOP-LEVEL:i" with type "variable" "int"
-	Declared entity "externalloc03!:*HEAP*" with type "area" with size 0
 	Declared entity "externalloc03!:*STATIC*" with type "area" with size 0
 	Declared entity "main:*DYNAMIC*" with type "area" with size 4
+	Declared entity "main:*HEAP*" with type "area" with size 0
 	Declared entity "main:*STACK*" with type "area" with size 0
 	Declared entity "main:*STATIC*" with type "area" with size 0
 	Declared entity "main:0`i" with type "variable" "int"
@@ -35,16 +35,16 @@ Layout for memory area "TOP-LEVEL:*STATIC*" of size 4:
 	Variable "TOP-LEVEL:i"	offset = 0	size = 4
 
 
-Layout for memory area "externalloc03!:*HEAP*" of size 0:
-	* empty area *
-
-
 Layout for memory area "externalloc03!:*STATIC*" of size 0:
 	* empty area *
 
 
 Layout for memory area "main:*DYNAMIC*" of size 4:
 	Variable "main:0`i"	offset = 0	size = 4
+
+
+Layout for memory area "main:*HEAP*" of size 0:
+	* empty area *
 
 
 Layout for memory area "main:*STACK*" of size 0:

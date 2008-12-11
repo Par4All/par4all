@@ -6,12 +6,12 @@ Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
 	Declared entity "fcompat:*DYNAMIC*" with type "area" with size 4
+	Declared entity "fcompat:*HEAP*" with type "area" with size 0
 	Declared entity "fcompat:*STACK*" with type "area" with size 0
 	Declared entity "fcompat:*STATIC*" with type "area" with size 0
 	Declared entity "fcompat:0`a" with type "variable" "int"
 	Declared entity "fcompat:0`c" with type "variable" "int"
 	Declared entity "fcompat:0`p" with type "variable" "int *"
-	Declared entity "sizeofArray01!:*HEAP*" with type "area" with size 0
 	Declared entity "sizeofArray01!:*STATIC*" with type "area" with size 0
 
 * empty extern declaration list *
@@ -28,16 +28,16 @@ Layout for memory area "fcompat:*DYNAMIC*" of size 4:
 	Variable "fcompat:0`p"	offset = 0	size = 4
 
 
+Layout for memory area "fcompat:*HEAP*" of size 0:
+	* empty area *
+
+
 Layout for memory area "fcompat:*STACK*" of size 0:
 	Dynamic Variable "fcompat:0`a"	offset = UNKNOWN, 	size = DYNAMIC
 	Dynamic Variable "fcompat:0`c"	offset = UNKNOWN, 	size = DYNAMIC
 
 
 Layout for memory area "fcompat:*STATIC*" of size 0:
-	* empty area *
-
-
-Layout for memory area "sizeofArray01!:*HEAP*" of size 0:
 	* empty area *
 
 

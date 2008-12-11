@@ -5,9 +5,9 @@ Declarations for module "bar" with type "() -> void"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
-	Declared entity "bar!:*HEAP*" with type "area" with size 0
 	Declared entity "bar!:*STATIC*" with type "area" with size 0
 	Declared entity "bar:*DYNAMIC*" with type "area" with size 4
+	Declared entity "bar:*HEAP*" with type "area" with size 0
 	Declared entity "bar:*STACK*" with type "area" with size 0
 	Declared entity "bar:*STATIC*" with type "area" with size 0
 	Declared entity "bar:0`bar" with type "variable" "int"
@@ -22,16 +22,16 @@ Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
 	External Variable "TOP-LEVEL:foobar"	offset = UNKNOWN,	size = 4
 
 
-Layout for memory area "bar!:*HEAP*" of size 0:
-	* empty area *
-
-
 Layout for memory area "bar!:*STATIC*" of size 0:
 	* empty area *
 
 
 Layout for memory area "bar:*DYNAMIC*" of size 4:
 	Variable "bar:0`bar"	offset = 0	size = 4
+
+
+Layout for memory area "bar:*HEAP*" of size 0:
+	* empty area *
 
 
 Layout for memory area "bar:*STACK*" of size 0:
@@ -180,9 +180,9 @@ Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 12
 	Declared entity "TOP-LEVEL:i" with type "variable" "int"
-	Declared entity "foobar!:*HEAP*" with type "area" with size 0
 	Declared entity "foobar!:*STATIC*" with type "area" with size 0
 	Declared entity "main:*DYNAMIC*" with type "area" with size 0
+	Declared entity "main:*HEAP*" with type "area" with size 0
 	Declared entity "main:*STACK*" with type "area" with size 0
 	Declared entity "main:*STATIC*" with type "area" with size 0
 	Declared entity "main:main" with type "variable" "int"
@@ -203,15 +203,15 @@ Layout for memory area "TOP-LEVEL:*STATIC*" of size 12:
 	Variable "TOP-LEVEL:j"	offset = 8	size = 4
 
 
-Layout for memory area "foobar!:*HEAP*" of size 0:
-	* empty area *
-
-
 Layout for memory area "foobar!:*STATIC*" of size 0:
 	* empty area *
 
 
 Layout for memory area "main:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*HEAP*" of size 0:
 	* empty area *
 
 

@@ -13,6 +13,9 @@ Variable list:
 	Declared entity "TOP-LEVEL:ini" with type "variable" "f_t"
 	Declared entity "TOP-LEVEL:initialization04" with type "functional" "() -> void"
 	Declared entity "TOP-LEVEL:tab" with type "variable" "si_t"
+	Declared entity "initialization04!:#f" with type "struct" 
+	Declared entity "initialization04!:#s" with type "struct" 
+	Declared entity "initialization04!:#si" with type "struct" 
 	Declared entity "initialization04!:*DYNAMIC*" with type "area" with size 0
 	Declared entity "initialization04!:*HEAP*" with type "area" with size 0
 	Declared entity "initialization04!:*STACK*" with type "area" with size 0
@@ -55,9 +58,9 @@ Declarations for module "initialization04" with type "() -> void"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 48
-	Declared entity "initialization04!:*HEAP*" with type "area" with size 0
 	Declared entity "initialization04!:*STATIC*" with type "area" with size 0
 	Declared entity "initialization04:*DYNAMIC*" with type "area" with size 32
+	Declared entity "initialization04:*HEAP*" with type "area" with size 0
 	Declared entity "initialization04:*STACK*" with type "area" with size 0
 	Declared entity "initialization04:*STATIC*" with type "area" with size 0
 	Declared entity "initialization04:0`tab2" with type "variable" "si_t"
@@ -72,10 +75,6 @@ Layout for memory area "TOP-LEVEL:*STATIC*" of size 48:
 	Variable "TOP-LEVEL:tab"	offset = 0	size = 48
 
 
-Layout for memory area "initialization04!:*HEAP*" of size 0:
-	* empty area *
-
-
 Layout for memory area "initialization04!:*STATIC*" of size 0:
 	* empty area *
 
@@ -83,6 +82,10 @@ Layout for memory area "initialization04!:*STATIC*" of size 0:
 Layout for memory area "initialization04:*DYNAMIC*" of size 32:
 	Variable "initialization04:0`tab2"	offset = 0	size = 16
 	Variable "initialization04:0`tab3"	offset = 16	size = 16
+
+
+Layout for memory area "initialization04:*HEAP*" of size 0:
+	* empty area *
 
 
 Layout for memory area "initialization04:*STACK*" of size 0:

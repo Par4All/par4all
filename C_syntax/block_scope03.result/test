@@ -8,9 +8,9 @@ Declarations for module "main" with type "() -> int"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
-	Declared entity "block_scope03!:*HEAP*" with type "area" with size 0
 	Declared entity "block_scope03!:*STATIC*" with type "area" with size 0
 	Declared entity "main:*DYNAMIC*" with type "area" with size 12
+	Declared entity "main:*HEAP*" with type "area" with size 0
 	Declared entity "main:*STACK*" with type "area" with size 0
 	Declared entity "main:*STATIC*" with type "area" with size 0
 	Declared entity "main:0`1`x" with type "variable" "int"
@@ -31,10 +31,6 @@ Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for memory area "block_scope03!:*HEAP*" of size 0:
-	* empty area *
-
-
 Layout for memory area "block_scope03!:*STATIC*" of size 0:
 	* empty area *
 
@@ -43,6 +39,10 @@ Layout for memory area "main:*DYNAMIC*" of size 12:
 	Variable "main:0`x"	offset = 0	size = 4
 	Variable "main:0`z"	offset = 4	size = 4
 	Variable "main:0`1`x"	offset = 8	size = 4
+
+
+Layout for memory area "main:*HEAP*" of size 0:
+	* empty area *
 
 
 Layout for memory area "main:*STACK*" of size 0:

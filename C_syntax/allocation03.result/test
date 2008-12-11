@@ -5,9 +5,9 @@ Declarations for module "foo" with type "() -> void"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 4
-	Declared entity "allocation03!:*HEAP*" with type "area" with size 0
 	Declared entity "allocation03!:*STATIC*" with type "area" with size 0
 	Declared entity "foo:*DYNAMIC*" with type "area" with size 4
+	Declared entity "foo:*HEAP*" with type "area" with size 0
 	Declared entity "foo:*STACK*" with type "area" with size 0
 	Declared entity "foo:*STATIC*" with type "area" with size 4
 	Declared entity "foo:0`k" with type "variable" "int"
@@ -22,16 +22,16 @@ Layout for memory area "TOP-LEVEL:*STATIC*" of size 4:
 	Variable "TOP-LEVEL:a"	offset = 0	size = 4
 
 
-Layout for memory area "allocation03!:*HEAP*" of size 0:
-	* empty area *
-
-
 Layout for memory area "allocation03!:*STATIC*" of size 0:
 	* empty area *
 
 
 Layout for memory area "foo:*DYNAMIC*" of size 4:
 	Variable "foo:0`k"	offset = 0	size = 4
+
+
+Layout for memory area "foo:*HEAP*" of size 0:
+	* empty area *
 
 
 Layout for memory area "foo:*STACK*" of size 0:
@@ -50,9 +50,9 @@ Declarations for module "main" with type "() -> int"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 4
-	Declared entity "allocation03!:*HEAP*" with type "area" with size 0
 	Declared entity "allocation03!:*STATIC*" with type "area" with size 0
 	Declared entity "main:*DYNAMIC*" with type "area" with size 88
+	Declared entity "main:*HEAP*" with type "area" with size 0
 	Declared entity "main:*STACK*" with type "area" with size 0
 	Declared entity "main:*STATIC*" with type "area" with size 4
 	Declared entity "main:0`array" with type "variable" "float"
@@ -74,10 +74,6 @@ Layout for memory area "TOP-LEVEL:*STATIC*" of size 4:
 	Variable "TOP-LEVEL:a"	offset = 0	size = 4
 
 
-Layout for memory area "allocation03!:*HEAP*" of size 0:
-	* empty area *
-
-
 Layout for memory area "allocation03!:*STATIC*" of size 0:
 	* empty area *
 
@@ -86,6 +82,10 @@ Layout for memory area "main:*DYNAMIC*" of size 88:
 	Variable "main:0`i"	offset = 0	size = 4
 	Variable "main:0`fooi"	offset = 4	size = 4
 	Variable "main:0`array"	offset = 8	size = 80
+
+
+Layout for memory area "main:*HEAP*" of size 0:
+	* empty area *
 
 
 Layout for memory area "main:*STACK*" of size 0:

@@ -74,9 +74,9 @@ Declarations for module "static_function!foo" with type "int -> void"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
-	Declared entity "static_function!:*HEAP*" with type "area" with size 0
 	Declared entity "static_function!:*STATIC*" with type "area" with size 0
 	Declared entity "static_function!foo:*DYNAMIC*" with type "area" with size 4
+	Declared entity "static_function!foo:*HEAP*" with type "area" with size 0
 	Declared entity "static_function!foo:*STACK*" with type "area" with size 0
 	Declared entity "static_function!foo:*STATIC*" with type "area" with size 0
 	Declared entity "static_function!foo:0`i" with type "variable" "float"
@@ -95,16 +95,16 @@ Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for memory area "static_function!:*HEAP*" of size 0:
-	* empty area *
-
-
 Layout for memory area "static_function!:*STATIC*" of size 0:
 	* empty area *
 
 
 Layout for memory area "static_function!foo:*DYNAMIC*" of size 4:
 	Variable "static_function!foo:0`i"	offset = 0	size = 4
+
+
+Layout for memory area "static_function!foo:*HEAP*" of size 0:
+	* empty area *
 
 
 Layout for memory area "static_function!foo:*STACK*" of size 0:

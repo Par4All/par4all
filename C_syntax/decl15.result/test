@@ -8,6 +8,8 @@ Declarations for module "decl15!" with type "() -> unknow"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "decl15!:#_PIPS_STRUCT_1" with type "struct" 
+	Declared entity "decl15!:'_PIPS_UNION_2" with type "union" 
 	Declared entity "decl15!:*DYNAMIC*" with type "area" with size 0
 	Declared entity "decl15!:*HEAP*" with type "area" with size 0
 	Declared entity "decl15!:*STACK*" with type "area" with size 0

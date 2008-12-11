@@ -6,10 +6,10 @@ Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
 	Declared entity "foo:*DYNAMIC*" with type "area" with size 40
+	Declared entity "foo:*HEAP*" with type "area" with size 0
 	Declared entity "foo:*STACK*" with type "area" with size 0
 	Declared entity "foo:*STATIC*" with type "area" with size 0
 	Declared entity "foo:0`A" with type "variable" "int"
-	Declared entity "sizeofArray04!:*HEAP*" with type "area" with size 0
 	Declared entity "sizeofArray04!:*STATIC*" with type "area" with size 0
 
 * empty extern declaration list *
@@ -25,15 +25,15 @@ Layout for memory area "foo:*DYNAMIC*" of size 40:
 	Variable "foo:0`A"	offset = 0	size = 40
 
 
+Layout for memory area "foo:*HEAP*" of size 0:
+	* empty area *
+
+
 Layout for memory area "foo:*STACK*" of size 0:
 	* empty area *
 
 
 Layout for memory area "foo:*STATIC*" of size 0:
-	* empty area *
-
-
-Layout for memory area "sizeofArray04!:*HEAP*" of size 0:
 	* empty area *
 
 

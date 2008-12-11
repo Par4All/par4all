@@ -8,11 +8,12 @@ Declarations for module "decl01" with type "char * -> void"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
-	Declared entity "decl01!:*HEAP*" with type "area" with size 0
 	Declared entity "decl01!:*STATIC*" with type "area" with size 0
 	Declared entity "decl01:*DYNAMIC*" with type "area" with size 16
+	Declared entity "decl01:*HEAP*" with type "area" with size 0
 	Declared entity "decl01:*STACK*" with type "area" with size 0
 	Declared entity "decl01:*STATIC*" with type "area" with size 0
+	Declared entity "decl01:0`#c" with type "struct" 
 	Declared entity "decl01:0`x" with type "variable" "struct c "
 	Declared entity "decl01:0`y" with type "variable" "struct c  *"
 	Declared entity "decl01:dir" with type "variable" "char *"
@@ -30,10 +31,6 @@ Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for memory area "decl01!:*HEAP*" of size 0:
-	* empty area *
-
-
 Layout for memory area "decl01!:*STATIC*" of size 0:
 	* empty area *
 
@@ -41,6 +38,10 @@ Layout for memory area "decl01!:*STATIC*" of size 0:
 Layout for memory area "decl01:*DYNAMIC*" of size 16:
 	Variable "decl01:0`y"	offset = 0	size = 4
 	Variable "decl01:0`x"	offset = 4	size = 12
+
+
+Layout for memory area "decl01:*HEAP*" of size 0:
+	* empty area *
 
 
 Layout for memory area "decl01:*STACK*" of size 0:

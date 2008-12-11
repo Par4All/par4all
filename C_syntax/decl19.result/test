@@ -51,9 +51,9 @@ Declarations for module "decl19" with type "int -> int"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
-	Declared entity "decl19!:*HEAP*" with type "area" with size 0
 	Declared entity "decl19!:*STATIC*" with type "area" with size 0
 	Declared entity "decl19:*DYNAMIC*" with type "area" with size 4
+	Declared entity "decl19:*HEAP*" with type "area" with size 0
 	Declared entity "decl19:*STACK*" with type "area" with size 0
 	Declared entity "decl19:*STATIC*" with type "area" with size 0
 	Declared entity "decl19:0`x" with type "variable" "g"
@@ -77,16 +77,16 @@ Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for memory area "decl19!:*HEAP*" of size 0:
-	* empty area *
-
-
 Layout for memory area "decl19!:*STATIC*" of size 0:
 	* empty area *
 
 
 Layout for memory area "decl19:*DYNAMIC*" of size 4:
 	Variable "decl19:0`x"	offset = 0	size = 4
+
+
+Layout for memory area "decl19:*HEAP*" of size 0:
+	* empty area *
 
 
 Layout for memory area "decl19:*STACK*" of size 0:

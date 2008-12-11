@@ -19,9 +19,9 @@ Declarations for module "decl30" with type "void -> void"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
-	Declared entity "decl30!:*HEAP*" with type "area" with size 0
 	Declared entity "decl30!:*STATIC*" with type "area" with size 0
 	Declared entity "decl30:*DYNAMIC*" with type "area" with size 12
+	Declared entity "decl30:*HEAP*" with type "area" with size 0
 	Declared entity "decl30:*STACK*" with type "area" with size 0
 	Declared entity "decl30:*STATIC*" with type "area" with size 0
 	Declared entity "decl30:0`foo" with type "functional" "double * -> double"
@@ -37,10 +37,6 @@ Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for memory area "decl30!:*HEAP*" of size 0:
-	* empty area *
-
-
 Layout for memory area "decl30!:*STATIC*" of size 0:
 	* empty area *
 
@@ -48,6 +44,10 @@ Layout for memory area "decl30!:*STATIC*" of size 0:
 Layout for memory area "decl30:*DYNAMIC*" of size 12:
 	Variable "decl30:0`x"	offset = 0	size = 4
 	Variable "decl30:0`z"	offset = 4	size = 8
+
+
+Layout for memory area "decl30:*HEAP*" of size 0:
+	* empty area *
 
 
 Layout for memory area "decl30:*STACK*" of size 0:

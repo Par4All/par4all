@@ -77,9 +77,9 @@ Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 4
 	Declared entity "TOP-LEVEL:i" with type "variable" "INTEGER*4"
-	Declared entity "bar!:*HEAP*" with type "area" with size 0
 	Declared entity "bar!:*STATIC*" with type "area" with size 0
 	Declared entity "main:*DYNAMIC*" with type "area" with size 0
+	Declared entity "main:*HEAP*" with type "area" with size 0
 	Declared entity "main:*STACK*" with type "area" with size 0
 	Declared entity "main:*STATIC*" with type "area" with size 0
 	Declared entity "main:main" with type "variable" "INTEGER*4"
@@ -93,15 +93,15 @@ Layouts for commons:
 Layout for common /TOP-LEVEL:*STATIC*/ of size 4:
 
 
-Layout for common /bar!:*HEAP*/ of size 0:
-	* empty area *
-
-
 Layout for common /bar!:*STATIC*/ of size 0:
 	* empty area *
 
 
 Layout for common /main:*DYNAMIC*/ of size 0:
+	* empty area *
+
+
+Layout for common /main:*HEAP*/ of size 0:
 	* empty area *
 
 

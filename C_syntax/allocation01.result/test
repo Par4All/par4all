@@ -5,9 +5,9 @@ Declarations for module "foo" with type "() -> void"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
-	Declared entity "allocation01!:*HEAP*" with type "area" with size 0
 	Declared entity "allocation01!:*STATIC*" with type "area" with size 0
 	Declared entity "foo:*DYNAMIC*" with type "area" with size 18
+	Declared entity "foo:*HEAP*" with type "area" with size 0
 	Declared entity "foo:*STACK*" with type "area" with size 0
 	Declared entity "foo:*STATIC*" with type "area" with size 0
 	Declared entity "foo:0`a" with type "variable" "char"
@@ -23,10 +23,6 @@ Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for memory area "allocation01!:*HEAP*" of size 0:
-	* empty area *
-
-
 Layout for memory area "allocation01!:*STATIC*" of size 0:
 	* empty area *
 
@@ -35,6 +31,10 @@ Layout for memory area "foo:*DYNAMIC*" of size 18:
 	Variable "foo:0`i"	offset = 0	size = 4
 	Variable "foo:0`j"	offset = 4	size = 4
 	Variable "foo:0`a"	offset = 8	size = 10
+
+
+Layout for memory area "foo:*HEAP*" of size 0:
+	* empty area *
 
 
 Layout for memory area "foo:*STACK*" of size 0:

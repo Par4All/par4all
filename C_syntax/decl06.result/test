@@ -9,6 +9,7 @@ Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
 	Declared entity "TOP-LEVEL:ERR_mgr_ctor" with type "functional" "char * x char * -> void"
+	Declared entity "decl06!:#_err_manager" with type "struct" 
 	Declared entity "decl06!:*DYNAMIC*" with type "area" with size 0
 	Declared entity "decl06!:*HEAP*" with type "area" with size 0
 	Declared entity "decl06!:*STACK*" with type "area" with size 0

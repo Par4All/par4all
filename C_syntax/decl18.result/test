@@ -51,9 +51,9 @@ Declarations for module "decl18" with type "int -> void"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
-	Declared entity "decl18!:*HEAP*" with type "area" with size 0
 	Declared entity "decl18!:*STATIC*" with type "area" with size 0
 	Declared entity "decl18:*DYNAMIC*" with type "area" with size 0
+	Declared entity "decl18:*HEAP*" with type "area" with size 0
 	Declared entity "decl18:*STACK*" with type "area" with size 0
 	Declared entity "decl18:*STATIC*" with type "area" with size 0
 	Declared entity "decl18:iarg2" with type "variable" "int"
@@ -71,15 +71,15 @@ Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for memory area "decl18!:*HEAP*" of size 0:
-	* empty area *
-
-
 Layout for memory area "decl18!:*STATIC*" of size 0:
 	* empty area *
 
 
 Layout for memory area "decl18:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl18:*HEAP*" of size 0:
 	* empty area *
 
 

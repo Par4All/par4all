@@ -8,9 +8,9 @@ Declarations for module "decl20" with type "char * -> void"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
-	Declared entity "decl20!:*HEAP*" with type "area" with size 0
 	Declared entity "decl20!:*STATIC*" with type "area" with size 0
 	Declared entity "decl20:*DYNAMIC*" with type "area" with size 0
+	Declared entity "decl20:*HEAP*" with type "area" with size 0
 	Declared entity "decl20:*STACK*" with type "area" with size 0
 	Declared entity "decl20:*STATIC*" with type "area" with size 0
 	Declared entity "decl20:dir" with type "variable" "char *"
@@ -28,15 +28,15 @@ Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for memory area "decl20!:*HEAP*" of size 0:
-	* empty area *
-
-
 Layout for memory area "decl20!:*STATIC*" of size 0:
 	* empty area *
 
 
 Layout for memory area "decl20:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "decl20:*HEAP*" of size 0:
 	* empty area *
 
 

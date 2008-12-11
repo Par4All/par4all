@@ -52,9 +52,9 @@ Declarations for module "block_scope09" with type "int -> int"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 8
-	Declared entity "block_scope09!:*HEAP*" with type "area" with size 0
 	Declared entity "block_scope09!:*STATIC*" with type "area" with size 0
 	Declared entity "block_scope09:*DYNAMIC*" with type "area" with size 8
+	Declared entity "block_scope09:*HEAP*" with type "area" with size 0
 	Declared entity "block_scope09:*STACK*" with type "area" with size 0
 	Declared entity "block_scope09:*STATIC*" with type "area" with size 0
 	Declared entity "block_scope09:0`1`x" with type "variable" "int"
@@ -80,10 +80,6 @@ Layout for memory area "TOP-LEVEL:*STATIC*" of size 8:
 	Variable "TOP-LEVEL:y"	offset = 4	size = 4
 
 
-Layout for memory area "block_scope09!:*HEAP*" of size 0:
-	* empty area *
-
-
 Layout for memory area "block_scope09!:*STATIC*" of size 0:
 	* empty area *
 
@@ -91,6 +87,10 @@ Layout for memory area "block_scope09!:*STATIC*" of size 0:
 Layout for memory area "block_scope09:*DYNAMIC*" of size 8:
 	Variable "block_scope09:0`k"	offset = 0	size = 4
 	Variable "block_scope09:0`1`x"	offset = 4	size = 4
+
+
+Layout for memory area "block_scope09:*HEAP*" of size 0:
+	* empty area *
 
 
 Layout for memory area "block_scope09:*STACK*" of size 0:

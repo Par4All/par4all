@@ -7,9 +7,9 @@ Variable list:
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
 	Declared entity "TOP-LEVEL:foo" with type "functional" "() -> int"
 	Declared entity "nodecls:*DYNAMIC*" with type "area" with size 0
+	Declared entity "nodecls:*HEAP*" with type "area" with size 0
 	Declared entity "nodecls:*STACK*" with type "area" with size 0
 	Declared entity "nodecls:*STATIC*" with type "area" with size 0
-	Declared entity "nodeclsfunc!:*HEAP*" with type "area" with size 0
 	Declared entity "nodeclsfunc!:*STATIC*" with type "area" with size 0
 
 * empty extern declaration list *
@@ -25,15 +25,15 @@ Layout for memory area "nodecls:*DYNAMIC*" of size 0:
 	* empty area *
 
 
+Layout for memory area "nodecls:*HEAP*" of size 0:
+	* empty area *
+
+
 Layout for memory area "nodecls:*STACK*" of size 0:
 	* empty area *
 
 
 Layout for memory area "nodecls:*STATIC*" of size 0:
-	* empty area *
-
-
-Layout for memory area "nodeclsfunc!:*HEAP*" of size 0:
 	* empty area *
 
 

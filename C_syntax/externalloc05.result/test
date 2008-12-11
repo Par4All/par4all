@@ -6,9 +6,9 @@ Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
 	Declared entity "TOP-LEVEL:bar" with type "functional" "() -> int"
-	Declared entity "externalloc05!:*HEAP*" with type "area" with size 0
 	Declared entity "externalloc05!:*STATIC*" with type "area" with size 0
 	Declared entity "foo:*DYNAMIC*" with type "area" with size 0
+	Declared entity "foo:*HEAP*" with type "area" with size 0
 	Declared entity "foo:*STACK*" with type "area" with size 0
 	Declared entity "foo:*STATIC*" with type "area" with size 0
 
@@ -21,15 +21,15 @@ Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for memory area "externalloc05!:*HEAP*" of size 0:
-	* empty area *
-
-
 Layout for memory area "externalloc05!:*STATIC*" of size 0:
 	* empty area *
 
 
 Layout for memory area "foo:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "foo:*HEAP*" of size 0:
 	* empty area *
 
 
