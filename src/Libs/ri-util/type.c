@@ -654,6 +654,12 @@ type_to_string(type t)
 	return "unknow";
     case is_type_void:
 	return "void";
+    case is_type_struct:
+	return "struct";
+    case is_type_union:
+	return "union";
+    case is_type_enum:
+	return "enum";
     default: break;
     }
 

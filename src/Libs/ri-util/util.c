@@ -455,6 +455,11 @@ bool stack_area_p(entity aire)
 {
   return(strcmp(entity_local_name(aire), STACK_AREA_LOCAL_NAME) == 0);
 }
+
+bool area_entity_p(entity a)
+{
+  return static_area_p(a) || dynamic_area_p(a) || heap_area_p(a) || stack_area_p(a);
+}
 
 
 /* Test if a string can be a Fortran 77 comment: */

@@ -641,6 +641,7 @@
 #define ENTITY_CONTINUE_P(e) entity_a_function_p(e, CONTINUE)
 #define ENTITY_STOP_P(e) entity_a_function_p(e, STOP)
 #define ENTITY_RETURN_P(e) entity_a_function_p(e, RETURN)
+#define ENTITY_C_RETURN_P(e) entity_a_function_p(e, C_RETURN)
 
 #define ENTITY_ASSIGN_P(e) entity_an_operator_p(e, ASSIGN)
 #define ENTITY_POST_INCREMENT_P(e) entity_an_operator_p(e, POST_INCREMENT)

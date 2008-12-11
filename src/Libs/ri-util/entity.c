@@ -1452,6 +1452,15 @@ bool parameter_passing_mode_p(entity f, int tag)
       parameter p = PARAMETER(CAR(functional_parameters(ftf)));
       mode_p = (mode_tag(parameter_mode(p))==tag);
     }
+    else {
+      /* We are in trouble... because we have to call a higher-level
+	 function from the preprocessor library. */
+      extern bool c_module_p(entity);
+      if(c_module_p(f))
+	mode_p = (tag==is_mode_value);
+      else
+	mode_p = (tag==is_mode_reference);
+    }
     return mode_p;
 }
 bool parameter_passing_by_value_p(entity f)

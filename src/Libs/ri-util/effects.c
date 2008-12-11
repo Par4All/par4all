@@ -100,7 +100,7 @@ statement_has_a_module_formal_argument_write_effect_p(statement s,
 
    Action a is integrated in the new effect (aliasing).
  */
-effect anywhere_effect(action a)
+effect anywhere_effect(action ac)
 {
   entity anywhere = gen_find_tabulated(ALL_MEMORY_ENTITY_NAME, entity_domain);
   effect any = effect_undefined;
@@ -113,7 +113,7 @@ effect anywhere_effect(action a)
   }
     
   any = make_effect(make_cell_reference(make_reference(anywhere, NIL)),
-		    a,
+		    ac,
 		    make_addressing_index(),
 		    make_approximation_may(),
 		    make_descriptor_none());
@@ -131,6 +131,24 @@ bool anywhere_effect_p(effect e)
   anywhere_p = same_string_p(entity_name(v), ALL_MEMORY_ENTITY_NAME);
 
   return anywhere_p;
+}
+
+effect heap_effect(entity m, action ac)
+{
+  entity heap = global_name_to_entity(entity_local_name(m), HEAP_AREA_LOCAL_NAME );
+  effect any = effect_undefined;
+
+  if(entity_undefined_p(heap)) {
+    pips_internal_error("Heap for module \"%s\" not found\n", entity_name(m));
+  }
+    
+  any = make_effect(make_cell_reference(make_reference(heap, NIL)),
+		    ac,
+		    make_addressing_index(),
+		    make_approximation_may(),
+		    make_descriptor_none());
+
+  return any;
 }
 
 /* Can we merge these two effects because they are equal or because
