@@ -637,11 +637,13 @@ correspondent pas nécessairement à la réalité, c'est-à-dire aux
 zones de mémoire qui seraient affectées par un compilateur.
 \end{comment}
 
-Member \texttt{return} is appropriate for Fortran functions. The value
-returned by a function is locally stored in a variable whose name is the
-function name. This variable can be used by the Fortran programmer like
-any other variable in statements and expressions. The entity accessible
-thru the \texttt{return} field is the corresponding function.
+Member \texttt{return} is appropriate for Fortran and C functions. The
+value returned by a function is locally stored in a variable whose
+name is the function name. This variable can be used explictly by the
+Fortran programmer like any other variable in statements and
+expressions. In C, it is only set through the return statement. The
+entity accessible thru the \texttt{return} field is the corresponding
+function.
 
 \begin{comment}
 Le sous-domaine \verb/return/ permet de représenter les variables ayant
