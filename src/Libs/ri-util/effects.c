@@ -275,13 +275,17 @@ bool store_independent_effect_p(effect eff)
     pips_assert("The reference is consistent", reference_consistent_p(r));
   }
   
-  if(addressing_index_p(ad)) {
+  if(anywhere_effect_p(eff))
+    independent_p = TRUE;
+  else if(addressing_index_p(ad)) {
     reference r = effect_any_reference(eff);
     entity v = reference_variable(r);
     type t = ultimate_type(entity_type(v));
 
     if(pointer_type_p(t)) {
-      independent_p = FALSE;
+      list inds = reference_indices(r);
+
+      independent_p = ENDP(inds);
     }
     else {
       pips_assert("The reference is consistent", reference_consistent_p(r));
@@ -491,8 +495,8 @@ effect effect_interference(effect eff1, effect eff2)
   effect n_eff1 = eff1; /* default value */
 
   ifdebug(1) {
-    pips_assert("The new effect is consitent", effect_consistent_p(eff1));
-    pips_assert("The new effect is consitent", effect_consistent_p(eff2));
+    pips_assert("The new effect is consistent", effect_consistent_p(eff1));
+    pips_assert("The new effect is consistent", effect_consistent_p(eff2));
   }
 
   if(store_independent_effect_p(eff1)) {
@@ -572,7 +576,7 @@ effect effect_interference(effect eff1, effect eff2)
     }
   }
   ifdebug(1)
-    pips_assert("The new effect is consitent", effect_consistent_p(n_eff1));
+    pips_assert("The new effect is consistent", effect_consistent_p(n_eff1));
   return n_eff1;
 }
 
@@ -604,4 +608,9 @@ bool expression_invariant_wrt_effects(expression exp, list el)
     }
   }
   return invariant_p;
+}
+
+string action_to_string(action ac)
+{
+  return action_read_p(ac)? "read" : "write";
 }
