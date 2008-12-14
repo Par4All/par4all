@@ -82,21 +82,32 @@ effect translate_effect_to_sdfi_effect(effect le)
 /****************************************************************************/
 
 /* list effects_dynamic_elim(list l_reg)
+ *
  * input    : a list of effects.
- * output   : a list of effects in which effects of dynamic variables are
- *            removed, and in which dynamic integer scalar variables are 
- *            eliminated from the predicate.
- * modifies : nothing; the effects l_reg initially contains are copied 
- *            if necessary.
- * comment  :	
+ *
+ * output   : a list of effects in which effects of dynamic variables
+ *            are removed, and in which dynamic integer scalar
+ *            variables are eliminated from the predicate. If
+ *            parameters are passed by value, direct effects on scalar
+ *            are also removed.
+ *
+ * modifies : nothing for direct effects; the effects l_reg initially
+ *            contains are copied if necessary. Indirect effects may
+ *            have to be changed into anywhere effects.
+ *
+ * comment : this procedure is used to generate summary effects. It is
+ *            related to the procedure used to summarize the effects
+ *            of a block.
+ *
  */
-list 
-effects_dynamic_elim(list l_eff)
+list effects_dynamic_elim(list l_eff)
 {
   list l_res = NIL;
   list c_eff = list_undefined;
   bool add_anywhere_write_effect_p = FALSE;
   bool add_anywhere_read_effect_p = FALSE;
+  extern bool c_module_p(entity); /* From preprocessor.h */
+  bool value_passing_p = c_module_p(get_current_module_entity());
 
   for(c_eff = l_eff; !ENDP(c_eff); POP(c_eff)) {
     effect eff = EFFECT(CAR(c_eff));
@@ -113,68 +124,104 @@ effects_dynamic_elim(list l_eff)
 				 addressing_tag(effect_addressing(eff)))));
     }
 
-    /* If the reference is a common variable (ie. with storage ram but
-     * not dynamic) or a formal parameter, the effect is not ignored.
-     */
-    switch (storage_tag(eff_s)) {
-    case is_storage_return:
-      pips_debug(5, "return var ignored (%s)\n", entity_name(eff_ent));
-      ignore_this_effect = TRUE;
-      break;
-    case is_storage_ram:
-      {
-	ram r = storage_ram(eff_s);
-	/* FI: heap areas effects should be preserved... */
-	if (dynamic_area_p(ram_section(r)) || heap_area_p(ram_section(r))
-	    || stack_area_p(ram_section(r))) {
-	  type ut = ultimate_type(entity_type(eff_ent));
-	  addressing ad = effect_addressing(eff);
-	  list sl = reference_indices(effect_any_reference(eff));
+    if(!anywhere_effect_p(eff)) {
+      /* If the reference is a common variable (ie. with storage ram but
+       * not dynamic) or a formal parameter, the effect is not ignored.
+       */
+      switch (storage_tag(eff_s)) {
+      case is_storage_return:
+	pips_debug(5, "return var ignored (%s)\n", entity_name(eff_ent));
+	ignore_this_effect = TRUE;
+	break;
+      case is_storage_ram:
+	{
+	  ram r = storage_ram(eff_s);
+	  /* FI: heap areas effects should be preserved... */
+	  if (dynamic_area_p(ram_section(r)) || heap_area_p(ram_section(r))
+	      || stack_area_p(ram_section(r))) {
+	    type ut = ultimate_type(entity_type(eff_ent));
+	    addressing ad = effect_addressing(eff);
+	    list sl = reference_indices(effect_any_reference(eff));
 
-	  if(pointer_type_p(ut))
-	    if(!ENDP(sl) || !addressing_index_p(ad)) {
-	      /* Can we convert this effect using the pointer initial value? */
-	      /* FI: this should rather be done after a constant
-		 pointer analysis but I'd like to improve quickly
-		 results with Effects/fulguro01.c */
-	      value v = entity_initial(eff_ent);
+	    if(pointer_type_p(ut))
+	      if(!ENDP(sl) || !addressing_index_p(ad)) {
+		/* Can we convert this effect using the pointer initial value? */
+		/* FI: this should rather be done after a constant
+		   pointer analysis but I'd like to improve quickly
+		   results with Effects/fulguro01.c */
+		value v = entity_initial(eff_ent);
 
-	      if(FALSE && value_expression_p(v)) {
-		;
+		if(/*FALSE && */value_expression_p(v)) {
+		  expression ae = value_expression(v);
+
+		  /* re-use an existing function... */
+		  eff = c_summary_effect_to_proper_effect(eff, ae);
+		  if(effect_undefined_p(eff)) {
+		    action ac = effect_action(eff);
+		    pips_debug(5, "Local pointer \"%s\" initialization is not usable!\n", 
+			       entity_name(eff_ent));
+		    if(action_write_p(ac))
+		      add_anywhere_write_effect_p = TRUE;
+		    else
+		      add_anywhere_read_effect_p = TRUE;
+		    ignore_this_effect = TRUE;
+		  }
+		  else {
+		    /* Should this effect be preserved? */
+		    /* Let's hope we do not loop recursively... */
+		    list nel = CONS(EFFECT, eff, NIL);
+		    list fel = effects_dynamic_elim(nel);
+
+		    if(ENDP(fel)) {
+		      ignore_this_effect = TRUE;
+		    }
+		    gen_free_list(nel);
+		    gen_free_list(fel);
+		  }
+		}
+		else {
+		  action ac = effect_action(eff);
+		  pips_debug(5, "Local pointer \"%s\" is not initialized!\n", 
+			     entity_name(eff_ent));
+		  if(action_write_p(ac))
+		    add_anywhere_write_effect_p = TRUE;
+		  else
+		    add_anywhere_read_effect_p = TRUE;
+		  ignore_this_effect = TRUE;
+		}
 	      }
 	      else {
-		action ac = effect_action(eff);
-		pips_debug(5, "Local pointer \"%s\" is not initialized!\n", 
+		pips_debug(5, "Local pointer \"%s\" can be ignored\n", 
 			   entity_name(eff_ent));
-		if(action_write_p(ac))
-		  add_anywhere_write_effect_p = TRUE;
-		else
-		  add_anywhere_read_effect_p = TRUE;
 		ignore_this_effect = TRUE;
 	      }
-	    }
-	    else {
-	      pips_debug(5, "Local pointer \"%s\" can be ignored\n", 
+	    else { 
+	      pips_debug(5, "dynamic or pointed var ignored (%s)\n", 
 			 entity_name(eff_ent));
 	      ignore_this_effect = TRUE;
 	    }
-	  else { 
-	    pips_debug(5, "dynamic or pointed var ignored (%s)\n", 
-		       entity_name(eff_ent));
-	    ignore_this_effect = TRUE;
 	  }
+	  break;
+	}
+      case is_storage_formal:
+	if(value_passing_p) {
+	  reference r = effect_any_reference(eff);
+	  list inds = reference_indices(r);
+	  addressing ad = effect_addressing(eff);
+	  action ac = effect_action(eff);
+	  if(action_write_p(ac) && addressing_index_p(ad) && ENDP(inds))
+	    ignore_this_effect = TRUE;
 	}
 	break;
+      case is_storage_rom:
+	if(!area_entity_p(eff_ent) && !anywhere_effect_p(eff))
+	  ignore_this_effect = TRUE;
+	break;
+	/*  pips_internal_error("bad tag for %s (rom)\n", 
+	    entity_name(eff_ent));*/
+      default:
+	pips_internal_error("case default reached\n");
       }
-    case is_storage_formal:
-      break;
-    case is_storage_rom:
-      ignore_this_effect = TRUE;
-      break;
-      /*  pips_internal_error("bad tag for %s (rom)\n", 
-	  entity_name(eff_ent));*/
-    default:
-      pips_internal_error("case default reached\n");
     }
 	
     if (! ignore_this_effect)  /* Eliminate dynamic variables. */ {
@@ -192,10 +239,10 @@ effects_dynamic_elim(list l_eff)
       l_res = CONS(EFFECT, eff_res, l_res);
     }
     else ifdebug(4) {
-      pips_debug(4, "effect removed for variable \"\%s\": \n\t %s\n", 
-		 entity_name(effect_variable(eff)),
-		 words_to_string(words_effect(eff)));
-    }
+	pips_debug(4, "effect removed for variable \"\%s\": \n\t %s\n", 
+		   entity_name(effect_variable(eff)),
+		   words_to_string(words_effect(eff)));
+      }
   }
 
   if(add_anywhere_write_effect_p)
@@ -1201,12 +1248,26 @@ effect c_summary_effect_to_proper_effect(effect eff,
 	  n_eff = effect_array_address_substitution(eff, r1);
 	}
       }
-      else {
+      else if(ENTITY_POINT_TO_P(eop)) {
 	pips_internal_error("not implemented yet\n");
+      }
+      else if(ENTITY_FIELD_P(eop)) {
+	pips_internal_error("not implemented yet\n");
+      }
+      else if(ENTITY_MALLOC_SYSTEM_P(eop)) {
+	n_eff = heap_effect(get_current_module_entity(),
+			    copy_action(effect_action(eff)));
+      }
+      else {
+	/* We do not know what to do with the initial value */
+	n_eff = anywhere_effect(copy_action(effect_action(eff)));
       }
     }
     else if(syntax_cast_p(eps)) {
-      pips_internal_error("Cast not supported yet\n");
+      /* Ignore the cast */
+      cast c = syntax_cast(eps);
+      pips_user_warning("Cast effect is ignored\n");
+      n_eff = c_summary_effect_to_proper_effect(eff, cast_expression(c));
     }
     else if(syntax_sizeofexpression_p(eps)) {
       /* No translation possible */
@@ -1240,7 +1301,6 @@ effect c_summary_effect_to_proper_effect(effect eff,
   }
 
   /* Is ep an address expression? */
-
 
   free_type(ept);
   return n_eff;

@@ -952,11 +952,11 @@ list generic_proper_effects_of_address_expression(expression lhs, int write_p)
       pips_internal_error("Case not taken into account");
   }
   else if(syntax_call_p(s) || syntax_subscript_p(s)) {
-    effect e = effect_undefined; /* main write effect */
-    effect re = effect_undefined; /* main read effect */
+    effect e = effect_undefined; /* main data read-write effect: p[*] */
+    effect re = effect_undefined; /* main pointer read effect: p */
     effect ge = effect_undefined; /* generic effect */
 
-    /* Look for a main write effect of the lhs */
+    /* Look for a main read-write effect of the lhs and for its secondary effects */
     le = generic_proper_effects_of_complex_lhs(lhs, &e, &re, write_p);
 
     if(!effect_undefined_p(re)) {

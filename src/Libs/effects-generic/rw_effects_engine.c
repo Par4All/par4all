@@ -80,7 +80,9 @@ bool summary_rw_effects_engine(string module_name)
     
     // MAP(EFFECT, e, fprintf(stderr, "=%s=", entity_name(reference_variable(effect_any_reference(e)))) ,l_loc2);
     l_glob = (*effects_local_to_global_translation_op)(l_loc2);
-    
+    /* Different effects may have been reduced to the same one */
+    /* FI: I'm not to sure the parameter TRUE is generic */
+    l_glob = proper_effects_combine(l_glob, TRUE);
 
     ifdebug(2){
 	pips_debug(2, "local regions, after translation to global scope:\n");
@@ -614,5 +616,3 @@ bool rw_effects_engine(char * module_name)
     
     return(TRUE);
 }
-
-

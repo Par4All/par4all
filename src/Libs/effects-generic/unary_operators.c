@@ -303,8 +303,11 @@ list effects_composition_with_effect_transformer(list l_eff,
       ifdebug(8) {
 	reference r1 = effect_any_reference(e1);
 	reference r2 = effect_any_reference(e2);
-	(void) fprintf(stderr, "e1 %p: %s\n", e1, words_to_string(effect_words_reference_with_addressing_as_it_is(r1, addressing_tag(effect_addressing(e1)))));
-	(void) fprintf(stderr, "e2 %p: %s\n", e2, words_to_string(effect_words_reference_with_addressing_as_it_is(r2, addressing_tag(effect_addressing(e2)))));
+	(void) fprintf(stderr, "e1 %p: %s (%s)\n", e1, words_to_string(effect_words_reference_with_addressing_as_it_is(r1, addressing_tag(effect_addressing(e1)))),
+		       action_to_string(effect_action(e1)));
+	(void) fprintf(stderr, "e2 %p: %s (%s)\n", e2,
+		       words_to_string(effect_words_reference_with_addressing_as_it_is(r2, addressing_tag(effect_addressing(e2)))),
+		       action_to_string(effect_action(e2)));
       }
 
       e2 = effect_interference(e2, e1);
@@ -312,8 +315,9 @@ list effects_composition_with_effect_transformer(list l_eff,
       ifdebug(8) {
 	reference r2 = effect_any_reference(e2);
 	tag ad2 = addressing_tag(effect_addressing(e2));
-	(void) fprintf(stderr, "resulting e2 %p: %s\n", e2,
-		       words_to_string(effect_words_reference_with_addressing_as_it_is(r2, ad2)));
+	(void) fprintf(stderr, "resulting e2 %p: %s (%s)\n", e2,
+		       words_to_string(effect_words_reference_with_addressing_as_it_is(r2, ad2)),
+		       action_to_string(effect_action(e2)));
 	pips_assert("New effect e2 is consitent", effect_consistent_p(e2));
       }
 
