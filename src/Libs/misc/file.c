@@ -18,6 +18,7 @@
 
 #include "genC.h"
 #include "misc.h"
+#include "properties.h"
 
 /* @return a file descriptor. 
  */
@@ -664,3 +665,29 @@ char * safe_new_tmp_file(char * prefix)
   pips_assert("could create temporary name", desc!=-1);
   return name;
 }
+
+/* utility to open configuration file, (read only!)
+ * its name can be found using various ways
+ * property and env can be NULL (and ignored)
+ * if the file if not found a pips_error is generated
+ * canonical_name should be a file name, not a path
+ */
+#define CONFIG_DIR "etc"
+#define CONFIG_DEFAULT_RIGHT "r"
+FILE * fopen_config(const char *canonical_name, const char *cproperty, const char * cenv)
+{
+    char * senv=NULL,*sproperty=NULL,*pipsenv=NULL,*sdefault=NULL;
+    FILE * fconf = NULL;
+    if(cproperty) sproperty=get_string_property(cproperty);
+    if(cenv) senv=getenv(cenv);
+
+    /* try various combinaison : pips property, then pips env var, then default */
+    if( sproperty && (fconf = fopen(sproperty, CONFIG_DEFAULT_RIGHT) ) ) return fconf;
+    if( senv && (fconf = fopen(senv, CONFIG_DEFAULT_RIGHT) ) ) return fconf;
+
+    pipsenv=getenv("PIPS_ROOT");
+    if(!pipsenv) pipsenv="";
+    sdefault=concatenate(pipsenv,"/" CONFIG_DIR "/" , canonical_name, NULL) ;
+    return safe_fopen(sdefault,CONFIG_DEFAULT_RIGHT);
+}
+

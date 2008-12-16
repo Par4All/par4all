@@ -136,7 +136,9 @@ transformer declaration_to_transformer(entity v, transformer pre)
       pips_internal_error("Unexpected value tag: symbolic\n");
     }
     else if (value_constant_p(vv)) {
-      pips_internal_error("Unexpected value tag: constant\n");
+    tf = transformer_identity();
+    //  SG: quickly fix this, unsure about the meaning
+    //pips_internal_error("Unexpected value tag: constant\n");
     }
     else if (value_expression_p(vv)) {
       expression e = value_expression(vv);
