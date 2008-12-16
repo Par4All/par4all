@@ -254,6 +254,8 @@ type t2;
        Francois Irigoin, 10 March 1992
        */
   bool tequal = FALSE;
+  t1= ultimate_type(t1);
+  t2= ultimate_type(t2);
 
     if(t1 == t2)
 	return TRUE;
@@ -367,6 +369,10 @@ variable_equal_p(variable v1, variable v2)
 bool 
 basic_equal_p(basic b1, basic b2)
 {
+    if( basic_typedef_p(b1) )
+    {
+        type t1 = ultimate_type( basic_typedef(b1) );
+    }
     if(b1 == b2)
 	return TRUE;
     else if (b1 == basic_undefined && b2 != basic_undefined)
@@ -1103,30 +1109,26 @@ basic_union(expression exp1, expression exp2)
   return b;
 }
 
+/* get the ultimate basic from a basic typedef
+ */
+basic
+basic_ultimate(basic b)
+{
+  if(basic_typedef_p(b)) {
+    type t = ultimate_type(entity_type(basic_typedef(b)));
+    pips_assert("typedef really has a variable type", type_variable_p(t) );
+    b = variable_basic(type_variable(t));
+  }
+  return b;
+}
+
 basic 
 basic_maximum(basic fb1, basic fb2)
 {
   basic b = basic_undefined;
-  basic b1 = fb1;
-  basic b2 = fb2;
+  basic b1 = basic_ultimate(fb1);
+  basic b2 = basic_ultimate(fb2);
 
-  if(basic_typedef_p(fb1)) {
-    type t1 = ultimate_type(entity_type(basic_typedef(b1)));
-
-    if(type_variable_p(t1))
-      b1 = variable_basic(type_variable(t1));
-    else
-      pips_internal_error("Incompatible basic b1: not really a variable type\n");
-  }
-
-  if(basic_typedef_p(fb2)) {
-    type t2 = ultimate_type(entity_type(basic_typedef(b2)));
-
-    if(type_variable_p(t2))
-      b2 = variable_basic(type_variable(t2));
-    else
-      pips_internal_error("Incompatible basic b1: not really a variable type\n");
-  }
 
   if(basic_derived_p(fb1)) {
     entity e1 = basic_derived(fb1);
