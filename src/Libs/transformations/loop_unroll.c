@@ -25,6 +25,7 @@
 #include "control.h"
 
 #include "arithmetique.h"
+#include "properties.h"
 
 #include "transformations.h"
 

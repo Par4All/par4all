@@ -92,7 +92,7 @@ void StatementReplaceReference(statement s, reference ref, expression next)
 
 	StatementReplaceReference(st, ref, next);
       }, entry_node, nodes);
-      gen_free(nodes);
+      gen_free_list(nodes);
       /* pips_error("StatementReplaceReference", 
 	 "case is_instruction_unstructured"); */
 	break;

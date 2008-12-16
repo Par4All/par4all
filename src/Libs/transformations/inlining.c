@@ -11,11 +11,7 @@
 #include "misc.h"
 #include "transformations.h"
 
-static bool has_static_statements(list decl)
-{
-    decl=decl;
-    return FALSE;
-}
+
 
 static entity       inlined_module;
 static statement    inlined_module_statement;
@@ -24,12 +20,23 @@ static entity       modified_module;
 static size_t       block_level;
 static statement    laststmt;
 static entity       returned_entity;
+static instruction  tail_ins;
+
+static list         new_instructions;
+
+static
+bool has_static_statements(list decl)
+{
+    decl=decl;
+    return FALSE;
+}
 
 static
 void inline_return_remover(instruction ins)
 {
     if( instruction_call_p(ins) &&
-            same_string_p( entity_local_name(call_function(instruction_call(ins))), RETURN_FUNCTION_NAME ) )
+        same_string_p( entity_local_name(call_function(instruction_call(ins))), RETURN_FUNCTION_NAME ) &&
+        ins !=tail_ins    )
     {
         *ins = *make_instruction_goto( copy_statement(laststmt) );
     }
@@ -43,7 +50,7 @@ void inline_return_switcher(instruction ins)
     {
         expression e = MakeBinaryCall( CreateIntrinsic(ASSIGN_OPERATOR_NAME) , entity_to_expression( returned_entity ) , EXPRESSION(CAR(call_arguments(instruction_call(ins)))));
 
-        list l= CONS( STATEMENT, instruction_to_statement( make_instruction_goto( copy_statement(laststmt) ) ) , NIL ) ;
+        list l= (ins == tail_ins ) ? NIL : CONS( STATEMENT, instruction_to_statement( make_instruction_goto( copy_statement(laststmt) ) ) , NIL ) ;
         l = CONS( STATEMENT, instruction_to_statement(  make_instruction_expression( e ) ), l );
 
         sequence s = make_sequence( l );
@@ -87,6 +94,7 @@ instruction inline_expression_call(expression modified_expression, call callee)
 
     /* should add them to modified_module's*/
     list inlined_extern_declaration = code_externs(inlined_code);
+    pips_assert("no external declaration",inlined_extern_declaration == NIL);
 
 
     /* the new instruction sequence */
@@ -104,7 +112,15 @@ instruction inline_expression_call(expression modified_expression, call callee)
     statement_label(laststmt) = make_new_label( modified_module_name ); 
     gen_nconc( sequence_statements(instruction_sequence(statement_instruction(expanded))), CONS( STATEMENT, laststmt, NIL) );
 
-    /* fix `return' calls */
+    /* fix `return' calls
+     * in case a goto is immediatly followed by its targeted label
+     * the goto is not needed (SG: seems difficult to do in the previous gen_recurse)
+     */
+    list tail = sequence_statements(instruction_sequence(statement_instruction(expanded)));
+    pips_assert("expanded sequence_statements has at least a label and a statement",CDR(tail)!=NIL);
+    while( CDR(CDR(tail)) != NIL ) POP(tail);
+    tail_ins = statement_instruction(STATEMENT(CAR(tail)));
+
     type treturn = functional_result(type_functional(entity_type(inlined_module)));
     if( type_void_p(treturn) ) /* only replace return statement by gotos */
     {
@@ -113,12 +129,21 @@ instruction inline_expression_call(expression modified_expression, call callee)
     else /* replace by affectation + goto */
     {
         /* create new variable to receive computation result */
+        string mname = entity_local_name(inlined_module);
+        size_t esize = strlen(mname) + 1 + 4 ;
+        static unsigned int counter = 0;
+        pips_assert("counter does not overflow",counter < 10000);
+        string ename = malloc(sizeof(*ename)*esize);
+        pips_assert("allocation ok",ename);
+        snprintf(ename,esize,"%s%u",mname,counter++);
+
         string tname = strdup(concatenate(
                     modified_module_name,
                     MODULE_SEP_STRING,
-                    entity_local_name(inlined_module),
+                    ename,
                     NULL
-        ));
+                    ));
+        free(ename);
 
         /* the entity */
         returned_entity=make_entity(
@@ -126,7 +151,7 @@ instruction inline_expression_call(expression modified_expression, call callee)
                 copy_type(treturn),
                 storage_undefined,
                 value_undefined
-        );
+                );
         /* fix storage */
         entity dynamic_area = global_name_to_entity(modified_module_name, DYNAMIC_AREA_LOCAL_NAME);
         area aa = type_area(entity_type(dynamic_area));
@@ -141,6 +166,7 @@ instruction inline_expression_call(expression modified_expression, call callee)
 
         gen_recurse(expanded, instruction_domain, gen_true, &inline_return_switcher);
     }
+
 
     /* fix declarations */
     string block_level = "0";
@@ -196,22 +222,21 @@ instruction inline_expression_call(expression modified_expression, call callee)
 }
 
 
-static void inline_all_expressions( instruction current_instruction, list expressions );
-
 /* recursievly inline an expression if needed
  */
 static
-void inline_expression( instruction current_instruction, expression expr )
+void inline_expression(expression expr )
 {
     if( expression_call_p(expr) )
     {
         call callee = syntax_call(expression_syntax(expr));
         if( inline_should_inline( callee ) )
         {
+                new_instructions = CONS(STATEMENT, instruction_to_statement( inline_expression_call( expr, callee )), new_instructions);
+#if 0
             type t= functional_result(type_functional(entity_type(inlined_module)));
             if( type_void_p(t) ) /* only replace return statement by gotos */
             {
-                *current_instruction=*inline_expression_call( expr, callee );
             }
             else
             {
@@ -221,23 +246,30 @@ void inline_expression( instruction current_instruction, expression expr )
                 l = CONS(STATEMENT, new_instr ,l);
                 *current_instruction=*make_instruction_sequence( make_sequence( l ) );
             }
+#endif
         }
-        else
+     /*   else
         {
             inline_all_expressions(current_instruction, call_arguments( callee ) );
-        }
+        }*/
 
     }
 }
 
-/* try to inline all expressions in a list
+/* check if a call has inlinable calls
  */
+static bool has_inlinable_calls;
 static
-void inline_all_expressions( instruction current_instruction, list expressions )
+void inline_has_inlinable_calls_crawler(call callee)
 {
-    MAP(EXPRESSION, expr, {
-            inline_expression(current_instruction,expr);
-    }, expressions);
+    has_inlinable_calls|=inline_should_inline(callee);
+}
+static
+bool inline_has_inlinable_calls(call callee)
+{
+    has_inlinable_calls=false;
+    gen_recurse(callee, call_domain, gen_true,&inline_has_inlinable_calls_crawler);
+    return has_inlinable_calls;
 }
 
 /* this is in charge of replacing instruction by new ones
@@ -253,16 +285,28 @@ void inline_instruction_switcher(instruction ins)
         case is_instruction_call:
             {
                 call callee =instruction_call(ins);
-                *ins= *make_instruction_expression( call_to_expression(callee) );
-                inline_instruction_switcher( ins );
+                if( inline_has_inlinable_calls( callee ) )
+                {
+                    *ins= *make_instruction_expression( call_to_expression(callee) );
+                    inline_instruction_switcher( ins );
+                }
             } break;
+        /* handle those with a gen_recurse */
         case is_instruction_return:
-            {
-               call tcall =  syntax_call(expression_syntax(instruction_return(ins)));
-               inline_all_expressions( ins, call_arguments( tcall) );
-            } break;
         case is_instruction_expression:
-            inline_expression( ins, instruction_expression( ins ) );
+            {
+                new_instructions=NIL;
+                gen_recurse(ins,expression_domain,gen_true,&inline_expression);
+                if( new_instructions != NIL ) /* something happens on the way to heaven */
+                {
+                    type t= functional_result(type_functional(entity_type(inlined_module)));
+                    if( ! type_void_p(t) )
+                    {
+                        new_instructions=CONS(STATEMENT,instruction_to_statement(copy_instruction(ins)),new_instructions);
+                    }
+                    *ins = *make_instruction_sequence( make_sequence( gen_nreverse(new_instructions) ) );
+                }
+            }
             break;
 
         default:
