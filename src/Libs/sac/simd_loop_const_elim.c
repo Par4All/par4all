@@ -309,21 +309,20 @@ static void insert_prelude_postlude(statement s, hash_table argsToVect, hash_tab
 
       list callArgs = gen_concatenate(
          CONS(EXPRESSION, entity_to_expression(vector),NIL), args);
+         list callArgs2 =NIL;
+         MAP(EXPRESSION,e,callArgs2=CONS(EXPRESSION,copy_expression(e),callArgs2),callArgs);
 
-      statement loadStat = call_to_statement(make_call(
-         get_function_entity(loadFuncName), callArgs));
+
+      statement loadStat = make_exec_statement_from_name(loadFuncName,callArgs);
 
       loadStats = CONS(STATEMENT, loadStat, loadStats);
 
+      
       if(strncmp(loadFuncName, SIMD_CONS_LOAD_NAME, SIMD_CONS_LOAD_SIZE))
       {
          string saveFuncName = simd_save_function_name(strdup(tFuncName));
 
-         callArgs = gen_concatenate(
-            CONS(EXPRESSION, entity_to_expression(vector),NIL), args);
-
-         statement saveStat = call_to_statement(make_call(
-            get_function_entity(saveFuncName), callArgs));
+         statement saveStat = make_exec_statement_from_name( saveFuncName, callArgs2);
 
          saveStats = CONS(STATEMENT, saveStat, saveStats);
 
@@ -377,22 +376,41 @@ static void moveConstArgsStatements(statement s, statement body, hash_table cons
       if(args == HASH_UNDEFINED_VALUE)
 	 continue;
 
-      entity curVector = reference_variable(expression_reference(
-	 EXPRESSION(CAR(call_arguments(statement_call(curStat))))));
+      entity curVector;
+      expression called = EXPRESSION(CAR(call_arguments(statement_call(curStat))));
+      /* dirty fix to take C & reference in account*/
+      if( expression_reference_p( called ) )
+        curVector = reference_variable(expression_reference(called));
+      else if( expression_call_p( called ) )
+      {
+        call c = syntax_call(expression_syntax(called));
+        list parameters = call_arguments(c);
+        curVector = expression_to_entity(  EXPRESSION(CAR(parameters)));
+      }
+      /* their may be &references in the args list too */
+      /*
+      MAP(EXPRESSION,expr, {
+          if( expression_call_p( expr ) )
+          {
+            call c = syntax_call(expression_syntax(expr));
+            list parameters = call_arguments(c);
+            *expr=* copy_expression( EXPRESSION(CAR(parameters) ) );
+          }
+          }, args);*/
 
       entity simdVector = args_to_vector(args, argsToVect);
 
       if(simdVector == entity_undefined)
       {
-         string funcName = entity_local_name(
-            call_function(statement_call(curStat)));
+          string funcName = entity_local_name(
+                  call_function(statement_call(curStat)));
 
-	 hash_put(argsToVect, curVector, args);
-	 hash_put(argsToFunc, curVector, funcName);
+          hash_put(argsToVect, curVector, args);
+          hash_put(argsToFunc, curVector, funcName);
       }
       else
       {
-	 replace_simd_vector(body, curVector, simdVector);
+          replace_simd_vector(body, curVector, simdVector);
       }
 
    }, statement_block(body));
@@ -420,7 +438,7 @@ static void moveConstArgsStatements(statement s, statement body, hash_table cons
    gen_free_list(instruction_block(statement_instruction(body)));
    instruction_block(statement_instruction(body)) = newSeq;
 
-   // Insert the statements remove from the sequence before 
+   // Insert the statements removed from the sequence before 
    // and after the loop
    insert_prelude_postlude(s, argsToVect, argsToFunc);
 

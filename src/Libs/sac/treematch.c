@@ -17,6 +17,7 @@ typedef dg_vertex_label vertex_label;
 
 #include "sac.h"
 #include "patterns.tab.h"
+#include <errno.h>
 
 
 static matchTree patterns_tree = NULL;
@@ -377,8 +378,7 @@ void init_tree_patterns()
    if (patterns_tree == NULL) /* never initialized */
    {
       patterns_tree = make_tree();
-
-      patterns_yyin = fopen("patterns.def", "r");
+      patterns_yyin=fopen_config("patterns.def",NULL,NULL);
       patterns_yyparse();
       fclose(patterns_yyin);
    }

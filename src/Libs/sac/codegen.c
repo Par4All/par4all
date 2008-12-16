@@ -197,40 +197,14 @@ static opcode get_optimal_opcode(opcodeClass kind, int argc, list* args)
 
 entity get_function_entity(string name)
 {
-   entity e = module_name_to_entity(name);
-   if (entity_undefined_p(e))
+   string ename = strdup(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, name, NULL));
+   entity e = gen_find_tabulated( ename, entity_domain);
+   if ( entity_undefined_p( e ) )
    {
-       e=FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,name);
-       type return_value = make_type_variable(make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NULL,NULL));
-       list head,tail = NIL;
-       head=CONS(PARAMETER,
-               make_parameter(
-                   make_type_variable(make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NULL,NULL)),
-                   make_mode_value(),
-                   make_dummy_unknown()
-               ),
-               tail
-       );
-       CONS(PARAMETER,
-               make_parameter(
-                   make_type_variable(make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NULL,NULL)),
-                   make_mode_value(),
-                   make_dummy_unknown()
-               ),
-               tail
-       );
-       CONS(PARAMETER,
-               make_parameter(
-                   make_type_variable(make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NULL,NULL)),
-                   make_mode_value(),
-                   make_dummy_unknown()
-               ),
-               tail
-       );
-       entity_type(e)       = make_type_functional(make_functional(head,return_value));
-       entity_storage(e)    =  make_storage_rom();
-       entity_initial(e)    = make_value_unknown();
+       pips_error(__FUNCTION__,"entity %s not defined, please load the appropriate definition source file",ename);
    }
+   free(ename);
+
    return e;
 }
 
@@ -664,6 +638,35 @@ static string get_vect_name_from_data(int argc, expression exp)
    return result;
 }
 
+static
+void replace_subscript(expression e)
+{
+    syntax s = expression_syntax(e);
+    if( syntax_reference_p( s ) )
+    {
+        expression e_copy = copy_expression(e);
+        if( ! syntax_undefined_p( expression_syntax(e) ) ) free_syntax(expression_syntax(e));
+        if( ! normalized_undefined_p( expression_normalized(e) ) ) free_normalized(expression_normalized(e));
+
+        *e=*MakeUnaryCall(CreateIntrinsic(ADDRESS_OF_OPERATOR_NAME), e_copy );
+    }
+
+}
+
+statement make_exec_statement_from_name(string ename, list args)
+{
+    /* SG: ugly patch to make sure fortran's parameter passing and c's are respected */
+    if( ! is_fortran )
+    {
+        MAP(EXPRESSION,e,replace_subscript(e),args);
+    }
+    return call_to_statement(make_call(get_function_entity(ename), args));
+}
+statement make_exec_statement_from_opcode(opcode oc, list args)
+{
+    return make_exec_statement_from_name( opcode_name(oc) , args );
+}
+
 static statement make_loadsave_statement(int argc, list args, bool isLoad)
 {
    enum {
@@ -799,8 +802,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad)
    free_empty_referenceInfo(cRef);
 
    sprintf(functionName, "%s%s", funcNames[argsType][isLoad], lsType);
-   return call_to_statement(make_call(get_function_entity(functionName), 
-				      args));
+   return make_exec_statement_from_name(functionName, args);
 
 }
 
@@ -814,11 +816,6 @@ static statement make_save_statement(int argc, list args)
    return make_loadsave_statement(argc, args, FALSE);
 }
 
-static statement make_exec_statement(opcode oc, list args)
-{
-   return call_to_statement(make_call(get_function_entity(opcode_name(oc)),
-				      args));
-}
 
 /*
 This function creates a simd vector.
@@ -875,7 +872,8 @@ static entity make_new_simd_vector(int itemSize, int nbItems, int basicTag)
 			     MODULE_SEP_STRING, prefix, num, (char *) NULL));
 
    entity str_type = FindOrCreateEntity(entity_local_name(mod_ent), type_name);
-   entity_type(str_type) =make_type_variable(make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE*4),NIL,NIL)); 
+   basic str_basic;
+   entity_type(str_type) =make_type_variable(make_variable(simdVector,NIL,NIL)); 
 
    entity str_dec = FindOrCreateEntity(entity_local_name(mod_ent), name);
    entity_type(str_dec) = entity_type(str_type);
@@ -1181,7 +1179,7 @@ static statement generate_exec_statement(simdStatementInfo si)
 
    gSimdCost += opcode_cost(simdStatementInfo_opcode(si));
 
-   return make_exec_statement(simdStatementInfo_opcode(si), args);
+   return make_exec_statement_from_opcode(simdStatementInfo_opcode(si), args);
 }
 
 static list merge_available_places(list l1, list l2, int element)
@@ -1229,8 +1227,7 @@ static statement make_shuffle_statement(entity dest, entity src, int order)
 			     entity_to_expression(src),
 			     make_integer_constant_expression(order),
 			     NULL);
-   return call_to_statement(make_call(get_function_entity("PSHUFW"),
-				      args));
+   return make_exec_statement_from_name( "PSHUFW",args);
 }
 
 static statement generate_load_statement(simdStatementInfo si, int line)

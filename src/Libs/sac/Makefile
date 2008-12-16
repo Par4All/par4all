@@ -17,6 +17,8 @@ INC_TARGET =    $(TARGET).h
 
 LIB_TARGET =    lib$(TARGET).a
 
+INSTALL_ETC = patterns.def
+
 # common stuff
 ifdef PIPS_ROOT
 ROOT    = $(PIPS_ROOT)

@@ -46,7 +46,7 @@ static statement make_transformation_statement(transformation t, entity vdest, e
    l = CONS(EXPRESSION, entity_to_expression(vsrc1), l);
    l = CONS(EXPRESSION, entity_to_expression(vdest), l);
 
-   return call_to_statement(make_call(get_function_entity(transformation_name(t)), l));
+   return make_exec_statement_from_name(transformation_name(t), l);
 }
 
 static bool best_transformation_p(transformation t1, transformation t2)
