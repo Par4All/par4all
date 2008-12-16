@@ -1,0 +1,294 @@
+
+Initial code
+
+void dotprod(int *a, int *b, int *c)
+{
+   int i;
+   for(i = 0; i <= 999999; i += 1)
+      a[i] = b[i]+c[i];
+   
+
+   return;
+}
+void dotprod(int *a, int *b, int *c)
+{
+   int i;
+   for(i = 0; i <= 999999; i += 1)
+      a[i] = b[i]+c[i];
+   
+
+   return;
+}
+void dotprod(int *a, int *b, int *c)
+{
+   int i;
+   for(i = 0; i <= 999999; i += 1)
+      a[i] = b[i]+c[i];
+   
+
+   return;
+}
+void dotprod(int *a, int *b, int *c)
+{
+   int i;
+   for(i = 0; i <= 999999; i += 1)
+      a[i] = b[i]+c[i];
+   
+
+}
+void dotprod(int *a, int *b, int *c)
+{
+   int i;
+   for(i = 0; i <= 999999; i += 1)
+      a[i] = b[i]+c[i];
+   
+
+}
+void dotprod(int *a, int *b, int *c)
+{
+   int i;
+   LU_NUB0 = 1000000;
+   LU_IB0 = 0;
+   LU_IND0 = 0;
+l99998:   ;
+   for(99997 LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
+      //c SIMD_COMMENT_0
+
+      a[LU_IND0] = b[LU_IND0]+c[LU_IND0];
+      //c SIMD_COMMENT_0
+
+      a[LU_IND0+1] = b[LU_IND0+1]+c[LU_IND0+1];
+      //c SIMD_COMMENT_0
+
+      a[LU_IND0+2] = b[LU_IND0+2]+c[LU_IND0+2];
+      //c SIMD_COMMENT_0
+
+      a[LU_IND0+3] = b[LU_IND0+3]+c[LU_IND0+3];
+l99997:      ;
+   }
+   i = 1000000;
+   
+
+   ;
+}
+void dotprod(int *a, int *b, int *c)
+{
+   int i;
+   LU_NUB0 = 1000000;
+   LU_IB0 = 0;
+   LU_IND0 = 0;
+l99998:   ;
+   for(99997 LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
+      //c SIMD_COMMENT_0
+
+      a[LU_IND0] = b[LU_IND0]+c[LU_IND0];
+      //c SIMD_COMMENT_0
+
+      a[LU_IND0+1] = b[LU_IND0+1]+c[LU_IND0+1];
+      //c SIMD_COMMENT_0
+
+      a[LU_IND0+2] = b[LU_IND0+2]+c[LU_IND0+2];
+      //c SIMD_COMMENT_0
+
+      a[LU_IND0+3] = b[LU_IND0+3]+c[LU_IND0+3];
+l99997:      ;
+   }
+   i = 1000000;
+   
+
+}
+void dotprod(int *a, int *b, int *c)
+{
+   int i;
+l99998:   ;
+   for(99997 LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
+      //c SIMD_COMMENT_0
+
+      a[LU_IND0] = b[LU_IND0]+c[LU_IND0];
+      //c SIMD_COMMENT_0
+
+      a[LU_IND0+1] = b[LU_IND0+1]+c[LU_IND0+1];
+      //c SIMD_COMMENT_0
+
+      a[LU_IND0+2] = b[LU_IND0+2]+c[LU_IND0+2];
+      //c SIMD_COMMENT_0
+
+      a[LU_IND0+3] = b[LU_IND0+3]+c[LU_IND0+3];
+l99997:      ;
+   }
+   
+
+}
+void dotprod(int *a, int *b, int *c)
+{
+   int i;
+l99998:   ;
+   for(99997 LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
+      //c SIMD_COMMENT_0
+
+      a[LU_IND0] = b[LU_IND0]+c[LU_IND0];
+      //c SIMD_COMMENT_0
+
+      a[LU_IND0+1] = b[LU_IND0+1]+c[LU_IND0+1];
+      //c SIMD_COMMENT_0
+
+      a[LU_IND0+2] = b[LU_IND0+2]+c[LU_IND0+2];
+      //c SIMD_COMMENT_0
+
+      a[LU_IND0+3] = b[LU_IND0+3]+c[LU_IND0+3];
+l99997:      ;
+   }
+   
+
+}
+make_simd_statements 1
+make_simd_statements 2
+make_simd_statements 3
+generate_simd_code 1
+generate_simd_code 2
+make_simd_statements 1
+make_simd_statements 2
+make_simd_statements 3
+generate_simd_code 1
+generate_simd_code 2
+opcode cost1 -8.000000
+opcode cost2 -8.000000
+generate_simd_code 1
+generate_simd_code 2
+generate_simd_code 1
+generate_simd_code 2
+opcode cost1 0.000000
+opcode cost2 0.000000
+void dotprod(int *a, int *b, int *c)
+{
+   int i;
+l99998:   ;
+   for(99997 LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
+      SIMD_LOAD_V2SI(&v2si_vec0, &c[LU_IND0]);
+      SIMD_LOAD_V2SI(&v2si_vec1, &b[LU_IND0]);
+      SIMD_ADDD(&v2si_vec2, &v2si_vec1, &v2si_vec0);
+      SIMD_SAVE_V2SI(&v2si_vec2, &a[LU_IND0]);
+      SIMD_LOAD_V2SI(&v2si_vec3, &c[LU_IND0+2]);
+      SIMD_LOAD_V2SI(&v2si_vec4, &b[LU_IND0+2]);
+      SIMD_ADDD(&v2si_vec5, &v2si_vec4, &v2si_vec3);
+      SIMD_SAVE_V2SI(&v2si_vec5, &a[LU_IND0+2]);
+l99997:      ;
+   }
+   
+
+}
+void dotprod(int *a, int *b, int *c)
+{
+   int i;
+l99998:   ;
+   for(99997 LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
+      SIMD_LOAD_V2SI(&v2si_vec0, &c[LU_IND0]);
+      SIMD_LOAD_V2SI(&v2si_vec1, &b[LU_IND0]);
+      SIMD_ADDD(&v2si_vec2, &v2si_vec1, &v2si_vec0);
+      SIMD_SAVE_V2SI(&v2si_vec2, &a[LU_IND0]);
+      SIMD_LOAD_V2SI(&v2si_vec3, &c[LU_IND0+2]);
+      SIMD_LOAD_V2SI(&v2si_vec4, &b[LU_IND0+2]);
+      SIMD_ADDD(&v2si_vec5, &v2si_vec4, &v2si_vec3);
+      SIMD_SAVE_V2SI(&v2si_vec5, &a[LU_IND0+2]);
+l99997:      ;
+   }
+   
+
+}
+void dotprod(int *a, int *b, int *c)
+{
+   int i;
+   int LU_IND0;
+   int LU_IB0;
+   int LU_NUB0;
+   int i;
+   v2si v2si_vec0;
+   v2si v2si_vec1;
+   v2si v2si_vec2;
+   v2si v2si_vec3;
+   v2si v2si_vec4;
+   v2si v2si_vec5;
+   v2si v2si_vec6;
+   v2si v2si_vec7;
+   v2si v2si_vec8;
+   v2si v2si_vec9;
+   v2si v2si_vec10;
+   v2si v2si_vec11;
+l99998:   ;
+   SIMD_LOAD_V2SI(&v2si_vec0, &c[LU_IND0]);
+   SIMD_LOAD_V2SI(&v2si_vec3, &c[LU_IND0+2]);
+   SIMD_LOAD_V2SI(&v2si_vec1, &b[LU_IND0]);
+   SIMD_LOAD_V2SI(&v2si_vec4, &b[LU_IND0+2]);
+   for(99997 LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
+      SIMD_ADDD(&v2si_vec2, &v2si_vec1, &v2si_vec0);
+      SIMD_SAVE_V2SI(&v2si_vec2, &a[LU_IND0]);
+      SIMD_ADDD(&v2si_vec5, &v2si_vec4, &v2si_vec3);
+      SIMD_SAVE_V2SI(&v2si_vec5, &a[LU_IND0+2]);
+l99997:      ;
+   }
+   SIMD_SAVE_V2SI(&c[LU_IND0], &v2si_vec0);
+   SIMD_SAVE_V2SI(&c[LU_IND0+2], &v2si_vec3);
+   SIMD_SAVE_V2SI(&b[LU_IND0], &v2si_vec1);
+   SIMD_SAVE_V2SI(&b[LU_IND0+2], &v2si_vec4);
+   
+
+}
+void dotprod(int *a, int *b, int *c)
+{
+   int LU_IND0;
+   v2si v2si_vec0;
+   v2si v2si_vec1;
+   v2si v2si_vec2;
+   v2si v2si_vec3;
+   v2si v2si_vec4;
+   v2si v2si_vec5;
+l99998:   ;
+   SIMD_LOAD_V2SI(&v2si_vec0, &c[LU_IND0]);
+   SIMD_LOAD_V2SI(&v2si_vec3, &c[LU_IND0+2]);
+   SIMD_LOAD_V2SI(&v2si_vec1, &b[LU_IND0]);
+   SIMD_LOAD_V2SI(&v2si_vec4, &b[LU_IND0+2]);
+   for(99997 LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
+      SIMD_ADDD(&v2si_vec2, &v2si_vec1, &v2si_vec0);
+      SIMD_SAVE_V2SI(&v2si_vec2, &a[LU_IND0]);
+      SIMD_ADDD(&v2si_vec5, &v2si_vec4, &v2si_vec3);
+      SIMD_SAVE_V2SI(&v2si_vec5, &a[LU_IND0+2]);
+l99997:      ;
+   }
+   SIMD_SAVE_V2SI(&c[LU_IND0], &v2si_vec0);
+   SIMD_SAVE_V2SI(&c[LU_IND0+2], &v2si_vec3);
+   SIMD_SAVE_V2SI(&b[LU_IND0], &v2si_vec1);
+   SIMD_SAVE_V2SI(&b[LU_IND0+2], &v2si_vec4);
+   
+
+}
+
+simdized code
+
+void dotprod(int *a, int *b, int *c)
+{
+   int LU_IND0;
+   v2si v2si_vec0;
+   v2si v2si_vec1;
+   v2si v2si_vec2;
+   v2si v2si_vec3;
+   v2si v2si_vec4;
+   v2si v2si_vec5;
+l99998:   ;
+   SIMD_LOAD_V2SI(&v2si_vec0, &c[LU_IND0]);
+   SIMD_LOAD_V2SI(&v2si_vec3, &c[LU_IND0+2]);
+   SIMD_LOAD_V2SI(&v2si_vec1, &b[LU_IND0]);
+   SIMD_LOAD_V2SI(&v2si_vec4, &b[LU_IND0+2]);
+   for(99997 LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
+      SIMD_ADDD(&v2si_vec2, &v2si_vec1, &v2si_vec0);
+      SIMD_SAVE_V2SI(&v2si_vec2, &a[LU_IND0]);
+      SIMD_ADDD(&v2si_vec5, &v2si_vec4, &v2si_vec3);
+      SIMD_SAVE_V2SI(&v2si_vec5, &a[LU_IND0+2]);
+l99997:      ;
+   }
+   SIMD_SAVE_V2SI(&c[LU_IND0], &v2si_vec0);
+   SIMD_SAVE_V2SI(&c[LU_IND0+2], &v2si_vec3);
+   SIMD_SAVE_V2SI(&b[LU_IND0], &v2si_vec1);
+   SIMD_SAVE_V2SI(&b[LU_IND0+2], &v2si_vec4);
+   
+
+}
