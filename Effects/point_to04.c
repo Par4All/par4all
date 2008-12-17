@@ -9,6 +9,6 @@ void point_to04()
 
   p = &c;
 
-    p->d = p->a;
-    p->d = (p->a = 4);
+  p->d = p->a;
+  p->d = (p->a = 4);
 }

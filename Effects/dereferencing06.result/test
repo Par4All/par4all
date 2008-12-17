@@ -29,6 +29,7 @@ void dereferencing06()
 
 Cumulated effects for "dereferencing06"
 
+//               <may be written >: TOP-LEVEL:*MEMORY*
 void dereferencing06()
 {
    double x = 1.;

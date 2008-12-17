@@ -4,6 +4,8 @@ Parsed code for "call01"
 void call01(int *pi, tf_t *q)
 {
    *pi = 1;
+   /* pi is passed by value: pi++ does not generate a summary effect
+        for call01 */
    pi++;
    q->one = 1;
    (q->two)[4] = 2;
@@ -14,6 +16,8 @@ Code for "call01"
 void call01(int *pi, tf_t *q)
 {
    *pi = 1;
+   /* pi is passed by value: pi++ does not generate a summary effect
+        for call01 */
    pi++;
    q->one = 1;
    (q->two)[4] = 2;
@@ -28,6 +32,8 @@ void call01(int *pi, tf_t *q)
    *pi = 1;
 //               <must be read   >: pi
 //               <must be written>: pi
+   /* pi is passed by value: pi++ does not generate a summary effect
+        for call01 */
    pi++;
 //               <must be read   >: q
 //               <must be written - post>: (*q)[1]
@@ -40,7 +46,6 @@ void call01(int *pi, tf_t *q)
 Cumulated effects for "call01"
 
 //               <must be read   >: pi q
-//               <must be written>: pi
 //               <must be written - post>: (*pi) (*q)[1] (*q)[2][4]
 void call01(int *pi, tf_t *q)
 {
@@ -49,6 +54,8 @@ void call01(int *pi, tf_t *q)
    *pi = 1;
 //               <must be read   >: pi
 //               <must be written>: pi
+   /* pi is passed by value: pi++ does not generate a summary effect
+        for call01 */
    pi++;
 //               <must be read   >: q
 //               <must be written - post>: (*q)[1]

@@ -137,9 +137,11 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 
 Cumulated effects for "LoadPGM_bmatrix"
 
-//               <may be read    >: __IO_EFFECTS:LUNS[*]
-//               <may be written >: __IO_EFFECTS:LUNS[*]
-//               <must be read   >: filename
+//               <may be read    >: TOP-LEVEL:*MEMORY* 
+//                                  __IO_EFFECTS:LUNS[*]
+//               <may be written >: TOP-LEVEL:*MEMORY* 
+//                                  __IO_EFFECTS:LUNS[*]
+//               <must be read   >: filename nch ncl nrh nrl
 byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 {
    int height;

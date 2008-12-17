@@ -6,7 +6,10 @@ typedef struct two_fields{int one; int two[10];} tf_t;
 
 void call02(int i, int j, int y[10], int * q[10], tf_t *p)
 {
-  i = j +1;
+  /* i can be modified locally, but it won't show in the summary
+     effects... which creates a problem for transformer and
+     precondition computation. */
+  i = j + 1;
   y[i] = 0;
   p->one = 1;
   p->two[j] = 2.;

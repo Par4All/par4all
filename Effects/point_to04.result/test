@@ -45,6 +45,8 @@ void point_to04()
 
 Cumulated effetcs for "point_to04"
 
+//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be written >: TOP-LEVEL:*MEMORY*
 void point_to04()
 {
    struct s {

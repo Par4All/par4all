@@ -19,6 +19,20 @@ echo
 display PARSED_PRINTED_FILE[assign02]
 
 echo
+echo Proper effetcs for "make_s"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[make_s]
+
+echo
+echo Cumulated effetcs for "make_s"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[make_s]
+
+echo
 echo Proper effetcs for "assign02"
 echo
 

@@ -3,6 +3,7 @@ Parsed printed file for "assign03"
 
 void assign03()
 {
+   extern char *malloc(int);
    double *p = (double *) malloc(10*sizeof(double));
    int j = 2;
 
@@ -13,6 +14,7 @@ Proper effetcs for "assign03"
 
 void assign03()
 {
+   extern char *malloc(int);
    double *p = (double *) malloc(10*sizeof(double));
    int j = 2;
 //               <must be read   >: j
@@ -23,12 +25,31 @@ void assign03()
 
 Cumulated effetcs for "assign03"
 
+//               <may be written >: *HEAP*
 void assign03()
 {
+   extern char *malloc(int);
    double *p = (double *) malloc(10*sizeof(double));
    int j = 2;
 //               <may be written >: p[*]
 //               <must be read   >: j
 
    p[j] = 1.;
+}
+
+Proper effetcs for "foo"
+
+void foo()
+{
+//               <may be written >: assign03:*HEAP*
+   assign03();
+}
+
+Cumulated effetcs for "foo"
+
+//               <may be written >: assign03:*HEAP*
+void foo()
+{
+//               <may be written >: assign03:*HEAP*
+   assign03();
 }

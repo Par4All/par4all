@@ -32,6 +32,20 @@ echo
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[assign03]
 
+echo
+echo Proper effetcs for "foo"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[foo]
+
+echo
+echo Cumulated effetcs for "foo"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[foo]
+
 close
 delete assign03
 quit

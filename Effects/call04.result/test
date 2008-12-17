@@ -43,9 +43,8 @@ void call04(int n, int m, int x[n][m])
 
 Cumulated effects for "call04"
 
-//               <may be read    >: m
 //               <may be written >: x[*][*]
-//               <must be read   >: m n n
+//               <must be read   >: m n
 void call04(int n, int m, int x[n][m])
 {
    int i;
@@ -96,8 +95,6 @@ Regions for "call04"
 
 
 //  <m-R-EXACT-{}>
-//  <m-R-EXACT-{}>
-//  <n-R-EXACT-{}>
 //  <n-R-EXACT-{}>
 //  <x[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1+1<=n, 0<=PHI2, PHI2+1<=m}>
 

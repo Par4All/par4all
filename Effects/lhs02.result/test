@@ -30,6 +30,7 @@ void lhs02()
 
 Cumulated effects for "lhs02"
 
+//               <may be written >: TOP-LEVEL:*MEMORY*
 void lhs02()
 {
    int i = 2;

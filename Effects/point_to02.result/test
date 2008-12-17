@@ -16,6 +16,7 @@ void point_to02()
 
 Cumulated effetcs for "point_to02"
 
+//               <may be written >: TOP-LEVEL:*MEMORY*
 void point_to02()
 {
    struct s {

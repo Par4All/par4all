@@ -16,18 +16,64 @@ void assign02()
    j = make_s(1, 2.).entier;
 }
 
+Proper effetcs for "make_s"
+
+s_t make_s(int i, float x)
+{
+   s_t *p;
+   extern char *malloc(int);
+//               <must be written>: p
+
+   p = (s_t *) malloc(sizeof(s_t));
+//               <must be read   >: i p
+//               <must be written - post>: (*p)[1]
+   p->entier = i;
+//               <must be read   >: p x
+//               <must be written - post>: (*p)[2]
+   p->reel = x;
+//               <must be read   >: p
+//               <must be read    - post>: (*p)
+   return *p;
+}
+
+Cumulated effetcs for "make_s"
+
+//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <must be read   >: i x
+s_t make_s(int i, float x)
+{
+   s_t *p;
+   extern char *malloc(int);
+//               <must be written>: p
+
+   p = (s_t *) malloc(sizeof(s_t));
+//               <must be read   >: i p
+//               <must be written - post>: (*p)[1]
+   p->entier = i;
+//               <must be read   >: p x
+//               <must be written - post>: (*p)[2]
+   p->reel = x;
+//               <must be read   >: p
+//               <must be read    - post>: (*p)
+   return *p;
+}
+
 Proper effetcs for "assign02"
 
 void assign02()
 {
    s_t s;
    int j;
+//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be written >: TOP-LEVEL:*MEMORY*
 //               <must be written>: s
 
    s = make_s(1, 2.);
 //               <must be written>: s[1]
    s.entier = 4;
 //               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be written >: TOP-LEVEL:*MEMORY*
 //               <must be written>: j
    
    /* invalid lvalue in assignment */
@@ -39,16 +85,21 @@ void assign02()
 
 Cumulated effetcs for "assign02"
 
+//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be written >: TOP-LEVEL:*MEMORY*
 void assign02()
 {
    s_t s;
    int j;
+//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be written >: TOP-LEVEL:*MEMORY*
 //               <must be written>: s
 
    s = make_s(1, 2.);
 //               <must be written>: s[1]
    s.entier = 4;
 //               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be written >: TOP-LEVEL:*MEMORY*
 //               <must be written>: j
    
    /* invalid lvalue in assignment */

@@ -47,6 +47,8 @@ void dereferencing02()
 
 Cumulated effetcs for "dereferencing02"
 
+//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be written >: TOP-LEVEL:*MEMORY*
 void dereferencing02()
 {
    double x = 1.;

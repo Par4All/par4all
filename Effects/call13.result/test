@@ -113,10 +113,10 @@ void call13(int nrec, int nsa, int ntt, Cplfloat ptrin[nrec][nsa], Cplfloat ptro
 
 Cumulated effects for "call13"
 
-//               <may be read    >: nsa ptrin[*][*][1] ptrin[*][*][2]
+//               <may be read    >: ptrin[*][*][1] ptrin[*][*][2]
 //               <may be written >: ptrout[*][*][*][*][*][1] 
 //                                  ptrout[*][*][*][*][*][2]
-//               <must be read   >: nrec nrec nsa ntt ntt
+//               <must be read   >: nrec nsa ntt
 void call13(int nrec, int nsa, int ntt, Cplfloat ptrin[nrec][nsa], Cplfloat ptrout[nrec-ntt+1][ntt][nsa][ntt][nsa])
 {
    int i;

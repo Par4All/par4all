@@ -25,7 +25,6 @@ void call09(int i, int j)
 Cumulated effects for "call09"
 
 //               <must be read   >: i j
-//               <must be written>: i
 void call09(int i, int j)
 {
 //               <must be read   >: i j

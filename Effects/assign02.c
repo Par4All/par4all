@@ -3,6 +3,7 @@ typedef struct {int entier; float reel;} s_t;
 s_t make_s(int i, float x)
 {
   s_t * p;
+  extern char * malloc(int);
 
   p = (s_t *) malloc(sizeof(s_t));
   p->entier = i;

@@ -45,7 +45,7 @@ echo
 
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[call02]
-
+quit
 echo
 echo Cumulated effects for "main"
 echo

@@ -27,6 +27,7 @@ void dereferencing03()
 
 Cumulated effetcs for "dereferencing03"
 
+//               <may be written >: TOP-LEVEL:*MEMORY*
 void dereferencing03()
 {
    double *p;
