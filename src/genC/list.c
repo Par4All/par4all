@@ -631,7 +631,7 @@ list gen_bool_cons(bool b, list l)
   return gen_cons((void *) b, l);
 }
 
-list gen_int_cons(int i, list l)
+list gen_int_cons(intptr_t i, list l)
 {
   return gen_cons((void *) i, l);
 }

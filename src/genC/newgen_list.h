@@ -117,7 +117,7 @@ extern list gen_copy_string_list GEN_PROTO((list));
 extern void gen_free_string_list GEN_PROTO((list));
 extern list gen_cons GEN_PROTO((void *, list));
 extern list gen_bool_cons GEN_PROTO((bool, list));
-extern list gen_int_cons GEN_PROTO((int, list));
+extern list gen_int_cons GEN_PROTO((intptr_t, list));
 extern list gen_string_cons GEN_PROTO((string, list));
 extern list gen_list_cons GEN_PROTO((list, list));
 extern list gen_typed_cons GEN_PROTO((intptr_t, void *, list));

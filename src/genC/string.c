@@ -103,6 +103,17 @@ static string buffer = (string) NULL;
 static size_t buffer_size = 0;
 static size_t current = 0;
 
+/* ITOA (Integer TO Ascii) yields a string for a given Integer.
+
+   Moved in this global place from build.c since it used in many place in
+   PIPS.*/
+char * itoa(int i) {
+  static char buf[ 20 ] ;
+  sprintf( &buf[0], "%d", i ) ;
+  return buf;
+}
+
+
 void init_the_buffer(void)
 {
     /* initial allocation

@@ -100,15 +100,6 @@ void user(char * fmt, ...)
     error_seen++ ;
 }
 
-/* ITOA (Integer TO Ascii) yields a string for a given Integer. */
-
-char * itoa(int i)
-{
-  static char buf[ 20 ] ;
-  sprintf( &buf[0], "%d", i ) ;
-  return buf;
-}
-
 /* CHECK_NOT_KEYWORD checks if S isn't a reserved word. */
 
 void check_not_keyword(char *s)
