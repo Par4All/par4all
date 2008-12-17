@@ -129,7 +129,7 @@ static string claire_entity_local_name(entity var)
    parameter (n=4) -> #define n 4
  */
 
-static string 
+static string
 int_to_string(int i)
 {
   char buffer[50];
@@ -139,13 +139,6 @@ int_to_string(int i)
 
 
 /* Code duplicated from Newgen build.c */
-static char * itoa(int i)
-{
-  static char buf[ 20 ] ;
-  sprintf( &buf[0], "%d", i ) ;
-  return buf;
-}
-
 /* forward declaration */
 static string claire_expression(expression);
 

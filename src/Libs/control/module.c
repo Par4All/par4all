@@ -15,6 +15,7 @@
 #include "resources.h"
 #include "properties.h"
 #include "constants.h"
+#include "preprocessor.h"
 
 #include "misc.h"
 

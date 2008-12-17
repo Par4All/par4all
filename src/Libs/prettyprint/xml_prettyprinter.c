@@ -150,14 +150,6 @@ int_to_string(int i)
 }
 
 
-/* Code duplicated from Newgen build.c */
-static char * itoa(int i)
-{
-  static char buf[ 20 ] ;
-  sprintf( &buf[0], "%d", i ) ;
-  return buf;
-}
-
 /* forward declaration */
 static string xml_expression(expression);
 

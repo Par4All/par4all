@@ -68,7 +68,7 @@ display_clean_up_sequences_statistics()
 }
 
 
-static bool
+static bool __attribute__ ((unused))
 clean_up_sequences_filter(statement s)
 {
   /* Just say to recurse... */
@@ -210,7 +210,7 @@ void clean_up_sequences_rewrite(statement s)
 	&& unlabelled_statement_p(s));
       */
 
-      pips_debug(3, "A sequence of %zd statements with %d declarations\n",
+      pips_debug(3, "A sequence of %zd statements with %zd declarations\n",
 		 gen_length(sequence_statements(instruction_sequence(i))),
 		 gen_length(statement_declarations(s)));
       ifdebug(5) {

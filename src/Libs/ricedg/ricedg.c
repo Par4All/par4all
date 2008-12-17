@@ -437,20 +437,19 @@ statement stat;
 	}
 	rice_update_dependence_graph(stat, region);
     }
-    else 
+    else
     {
 	if ((region = distributable_loop(stat)) == set_undefined) 
 	{
 	    instruction i = statement_instruction(stat) ;
-	    
-	    ifdebug(1) 
-	    {
-		fprintf( stderr, "[rdg_loop] skipping loop %dd (but recursing)\n", 
+
+	    ifdebug(1) {
+		fprintf( stderr, "[rdg_loop] skipping loop %td (but recursing)\n",
 			statement_number(stat));
 	    }
 	    rdg_statement(loop_body(instruction_loop(i))) ;
 	}
-	else 
+	else
 	{
 	    rice_update_dependence_graph(stat, region);
 	}
@@ -2196,7 +2195,7 @@ TestDiVariables(Psysteme ps, int cl, statement s1, effect ef1 __attribute__ ((un
 	mem_spy_begin();
     }
 
-    for (l = 1; !all_level_founds && l <= cl; l++) 
+    for (l = 1; !all_level_founds && l <= cl; l++)
     {
 	Variable di = (Variable) GetDiVar(l);
 	Value min, max;
@@ -2207,11 +2206,11 @@ TestDiVariables(Psysteme ps, int cl, statement s1, effect ef1 __attribute__ ((un
 
 	ifdebug(7)
 	{
-	    pips_debug(7, "current level: %d, variable: %s\n", 
+	    pips_debug(7, "current level: %td, variable: %s\n",
 		       l, entity_local_name((entity) di));
 	}
 
-	if (sc_minmax_of_variable_optim(pss, di, &min, &max) == FALSE) 
+	if (sc_minmax_of_variable_optim(pss, di, &min, &max) == FALSE)
 	{
 	    pips_debug(7,"sc_minmax_of_variable_optim: non feasible system\n");
 	    all_level_founds = TRUE;
@@ -2228,34 +2227,34 @@ TestDiVariables(Psysteme ps, int cl, statement s1, effect ef1 __attribute__ ((un
 	    pips_debug(7, "values: ");
 	    fprint_string_Value(stderr, "min = ", min);
 	    fprint_string_Value(stderr, "  max = ",max);
-	    fprintf(stderr, "  ==> %s\n", 
-		  IsPositif?"positive": 
+	    fprintf(stderr, "  ==> %s\n",
+		  IsPositif?"positive":
 		  (IsNegatif? "negative" : (IsNull? "null":"undefined") ) );
 	}
 
-	if(IsNegatif) 
+	if(IsNegatif)
 	{
 	    all_level_founds = TRUE;
 	    break;
 	}
 
-	if(IsPositif) 
+	if(IsPositif)
 	{
-	    pips_debug(7, "adding level %d\n", l);
+	    pips_debug(7, "adding level %td\n", l);
 	    levels = gen_nconc(levels, CONS(INT, l, NIL));
 	    all_level_founds = TRUE;
 	    break;
 	}
-	
+
 	if (!IsNull && !NotPositif)
 	{
-	    pips_debug(7, "adding level %d\n", l);
-	    levels = gen_nconc(levels, CONS(INT, l, NIL));	     
+	    pips_debug(7, "adding level %td\n", l);
+	    levels = gen_nconc(levels, CONS(INT, l, NIL));
 	}
 
-	if (!all_level_founds && l <= cl-1) 
+	if (!all_level_founds && l <= cl-1)
 	{
-	    pips_debug(7, "forcing variable %s to 0 (l < cl)\n", 
+	    pips_debug(7, "forcing variable %s to 0 (l < cl)\n",
 		       entity_local_name((entity) di));
 	    /* This function does not test feasibility and does not
 	     * deallocate ps
@@ -2263,13 +2262,13 @@ TestDiVariables(Psysteme ps, int cl, statement s1, effect ef1 __attribute__ ((un
 	    sc_force_variable_to_zero(ps, di);
 	}
     }
-    
+
     /* If there is no dependence at a common loop level: since the system
      * is feasible, it can be a dependence at the innermost level (inside the
      * common loop nest).
      *
      * WARNING:
-     * If the source and target statements are identical, we do not add the 
+     * If the source and target statements are identical, we do not add the
      * innermost level because the parallelization phase (rice) does not appreciate.
      * In order to be correct, we should add this level 1) because the statement
      * may be a call to an external routine, in which case we cannot be sure
@@ -2277,22 +2276,22 @@ TestDiVariables(Psysteme ps, int cl, statement s1, effect ef1 __attribute__ ((un
      * of a single assignement, the generated code must preserve the order of
      * the write and read memory operations. BC.
      */
-    if (!all_level_founds && s1 != s2 && statement_possible_less_p(s1, s2) ) 
+    if (!all_level_founds && s1 != s2 && statement_possible_less_p(s1, s2) )
     {
-	pips_debug(7, "adding innermost level %d\n", l);
+	pips_debug(7, "adding innermost level %td\n", l);
 	levels = gen_nconc(levels, CONS(INT, l, NIL));
     }
 
     ifdebug(1) {
 	mem_spy_end("TestsDiVariables");
     }
-        
+
     return(levels);
 }
 
 /* Ptsg  dependence_cone_positive(Psysteme dept_syst)
- */ 
-static Ptsg 
+ */
+static Ptsg
 dependence_cone_positive(dep_sc)
 Psysteme dep_sc;
 {

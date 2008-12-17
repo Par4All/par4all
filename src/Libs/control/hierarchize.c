@@ -44,8 +44,11 @@ typedef interval_vertex_label arc_label;
 #define free_predecessor free_successor
 #define PREDECESSOR SUCCESSOR
 #define PREDECESSOR_TYPE SUCCESSOR_TYPE
+#undef PREDECESSOR_NEWGEN_DOMAIN
 #define PREDECESSOR_NEWGEN_DOMAIN (-1)
+#undef SUCCESSOR_NEWGEN_DOMAIN
 #define SUCCESSOR_NEWGEN_DOMAIN (-1)
+#undef gen_SUCCESSOR_cons
 #define gen_SUCCESSOR_cons gen_cons
 #define gen_PREDECESSOR_cons gen_cons
 #define gen_successor_cons gen_cons
@@ -137,7 +140,7 @@ add_node_to_interval(graph intervals,
 		  interval_vertex_label_controls(vertex_vertex_label(node)));
     /* Protect the control nodes from later deletion (useless to free
        the list since it is still lived via gen_nconc. Thanks to
-       purify... :-) */
+       Purify... :-) */
     interval_vertex_label_controls(vertex_vertex_label(node)) = NIL;
     /* Detach the node: */
     remove_interval_predecessors(node);
