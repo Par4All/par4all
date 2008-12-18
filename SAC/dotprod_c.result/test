@@ -216,8 +216,8 @@ void dotprod(int *a, int *b, int *c)
    v2si v2si_vec11;
 l99998:   ;
    SIMD_LOAD_V2SI(&v2si_vec0, &c[LU_IND0]);
-   SIMD_LOAD_V2SI(&v2si_vec3, &c[LU_IND0+2]);
    SIMD_LOAD_V2SI(&v2si_vec1, &b[LU_IND0]);
+   SIMD_LOAD_V2SI(&v2si_vec3, &c[LU_IND0+2]);
    SIMD_LOAD_V2SI(&v2si_vec4, &b[LU_IND0+2]);
    for(99997 LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
       SIMD_ADDD(&v2si_vec2, &v2si_vec1, &v2si_vec0);
@@ -226,10 +226,10 @@ l99998:   ;
       SIMD_SAVE_V2SI(&v2si_vec5, &a[LU_IND0+2]);
 l99997:      ;
    }
-   SIMD_SAVE_V2SI(&c[LU_IND0], &v2si_vec0);
-   SIMD_SAVE_V2SI(&c[LU_IND0+2], &v2si_vec3);
    SIMD_SAVE_V2SI(&b[LU_IND0], &v2si_vec1);
    SIMD_SAVE_V2SI(&b[LU_IND0+2], &v2si_vec4);
+   SIMD_SAVE_V2SI(&c[LU_IND0], &v2si_vec0);
+   SIMD_SAVE_V2SI(&c[LU_IND0+2], &v2si_vec3);
    
 
 }
@@ -244,8 +244,8 @@ void dotprod(int *a, int *b, int *c)
    v2si v2si_vec5;
 l99998:   ;
    SIMD_LOAD_V2SI(&v2si_vec0, &c[LU_IND0]);
-   SIMD_LOAD_V2SI(&v2si_vec3, &c[LU_IND0+2]);
    SIMD_LOAD_V2SI(&v2si_vec1, &b[LU_IND0]);
+   SIMD_LOAD_V2SI(&v2si_vec3, &c[LU_IND0+2]);
    SIMD_LOAD_V2SI(&v2si_vec4, &b[LU_IND0+2]);
    for(99997 LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
       SIMD_ADDD(&v2si_vec2, &v2si_vec1, &v2si_vec0);
@@ -254,10 +254,10 @@ l99998:   ;
       SIMD_SAVE_V2SI(&v2si_vec5, &a[LU_IND0+2]);
 l99997:      ;
    }
-   SIMD_SAVE_V2SI(&c[LU_IND0], &v2si_vec0);
-   SIMD_SAVE_V2SI(&c[LU_IND0+2], &v2si_vec3);
    SIMD_SAVE_V2SI(&b[LU_IND0], &v2si_vec1);
    SIMD_SAVE_V2SI(&b[LU_IND0+2], &v2si_vec4);
+   SIMD_SAVE_V2SI(&c[LU_IND0], &v2si_vec0);
+   SIMD_SAVE_V2SI(&c[LU_IND0+2], &v2si_vec3);
    
 
 }
@@ -275,8 +275,8 @@ void dotprod(int *a, int *b, int *c)
    v2si v2si_vec5;
 l99998:   ;
    SIMD_LOAD_V2SI(&v2si_vec0, &c[LU_IND0]);
-   SIMD_LOAD_V2SI(&v2si_vec3, &c[LU_IND0+2]);
    SIMD_LOAD_V2SI(&v2si_vec1, &b[LU_IND0]);
+   SIMD_LOAD_V2SI(&v2si_vec3, &c[LU_IND0+2]);
    SIMD_LOAD_V2SI(&v2si_vec4, &b[LU_IND0+2]);
    for(99997 LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
       SIMD_ADDD(&v2si_vec2, &v2si_vec1, &v2si_vec0);
@@ -285,10 +285,10 @@ l99998:   ;
       SIMD_SAVE_V2SI(&v2si_vec5, &a[LU_IND0+2]);
 l99997:      ;
    }
-   SIMD_SAVE_V2SI(&c[LU_IND0], &v2si_vec0);
-   SIMD_SAVE_V2SI(&c[LU_IND0+2], &v2si_vec3);
    SIMD_SAVE_V2SI(&b[LU_IND0], &v2si_vec1);
    SIMD_SAVE_V2SI(&b[LU_IND0+2], &v2si_vec4);
+   SIMD_SAVE_V2SI(&c[LU_IND0], &v2si_vec0);
+   SIMD_SAVE_V2SI(&c[LU_IND0+2], &v2si_vec3);
    
 
 }
