@@ -4453,6 +4453,30 @@ instruction_selection > MODULE.code
         < MODULE.code
 \end{verbatim}
 
+%%%%%%%%%%
+
+\subsection{Inlining}
+\label{subsection-inlining}
+
+%%@UserManualDocumentation: inlining
+This documentation is a work in progress, as well as the documented topic.
+
+
+Inlining is a well known technique.
+Basically it replaces a function call by the function body.
+Current implementation does not work if the function has static declarations, access global variables \dots.
+Actually it (seems to) work(s) for pure, non-recursive functions \dots and not for any kind of call.
+It should be followed by a call to \verb+UNSPAGHETTIFY+ and \verb+SUPPRESS_DEAD_CODE+.
+
+
+%%!UserManualDocumentation
+\begin{verbatim}
+
+inlining      > MODULE.code
+        < PROGRAM.entities
+        < ALL.code
+        < MODULE.callers
+\end{verbatim}
 
 %-----------End of Expression Transformations -------------------------
 

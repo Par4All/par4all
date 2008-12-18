@@ -2272,3 +2272,24 @@ void check_user_call_site(entity func, list args)
     }
   gen_free_list(l_formals), l_formals=NIL;
 }
+
+/* just returns the entity of an expression... 
+ * SG: moved here from hpfc
+ */
+entity expression_to_entity(e)
+expression e;
+{
+    syntax s = expression_syntax(e);
+    
+    switch (syntax_tag(s))
+    {
+    case is_syntax_call:
+	return call_function(syntax_call(s));
+    case is_syntax_reference:
+	return reference_variable(syntax_reference(s));
+    case is_syntax_range:
+    default: 
+	pips_internal_error("unexpected syntax tag: %d\n", syntax_tag(s));
+	return entity_undefined; 
+    }
+}
