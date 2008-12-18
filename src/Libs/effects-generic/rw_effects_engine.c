@@ -353,6 +353,40 @@ static void rw_effects_of_call(call c)
     pips_debug(2, "end\n");
 }
 
+/* For the time being, just a duplicate of rw_effects_of_call() */
+static void rw_effects_of_application(application a __attribute__ ((__unused__)))
+{
+    statement current_stat = effects_private_current_stmt_head();
+    transformer context = (*load_context_func)(current_stat);
+    list le = NIL;
+
+    pips_debug(2, "begin application\n");
+
+    if (!(*empty_context_test)(context))
+    {
+      list sel = load_proper_rw_effects_list(current_stat);
+	le = effects_dup(sel);
+	ifdebug(2){
+	    pips_debug(2, "proper effects before summarization: \n");
+	    (*effects_prettyprint_func)(le);
+	}
+	if (contract_p)
+	    le = proper_to_summary_effects(le);
+    }
+    else
+	pips_debug(2, "empty context\n");
+
+    (*effects_descriptor_normalize_func)(le);
+
+    ifdebug(2){
+	pips_debug(2, "R/W effects: \n");
+	(*effects_prettyprint_func)(le);
+    }
+    store_rw_effects_list(current_stat, le);
+
+    pips_debug(2, "end\n");
+}
+
 /* Just to handle one kind of instruction, expressions which are not
    calls.  As we do not distinguish between Fortran and C, this
    function is called for Fortran module although it does not have any
@@ -376,6 +410,7 @@ static void rw_effects_of_expression_instruction(instruction i)
 
       if(syntax_call_p(sc)) {
 	c = syntax_call(sc);
+	rw_effects_of_call(c);
       }
       else {
 	pips_internal_error("Cast case not implemented\n");
@@ -384,6 +419,15 @@ static void rw_effects_of_expression_instruction(instruction i)
     else if(syntax_call_p(is)) {
       /* This may happen when a loop is desugared into an unstructured. */
       c = syntax_call(is);
+      rw_effects_of_call(c);
+    }
+    else if(syntax_application_p(is)) {
+      application a = syntax_application(is);
+      //expression fe = application_function(a);
+
+      pips_user_warning("Cumulated effects of call site using function "
+			"pointers in data structures are ignored for the time being\n");
+      rw_effects_of_application(a);
     }
     else {
       pips_internal_error("Instruction expression case not implemented\n");
@@ -392,7 +436,6 @@ static void rw_effects_of_expression_instruction(instruction i)
     pips_debug(2, "Effects for expression instruction in statement%03zd\n",
 	       statement_ordering(current_stat)); 
 
-    rw_effects_of_call(c);
   }
 }
 

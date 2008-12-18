@@ -622,10 +622,24 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
       finished_p = TRUE;
     }
   }
+  else if(syntax_cast_p(s)) {
+    /* FI: The cast has an impact o pointer arithmetic. I do not know
+       how to take it into account. */
+    pips_user_warning("Cast impact on pointer arithmetic and indexing is ignored\n");
+    s_exp = cast_expression(syntax_cast(s));
+  }
   else if(syntax_subscript_p(s)) {
     s_exp = subscript_array(syntax_subscript(s));
   }
-
+  else if(syntax_va_arg_p(s)) {
+    /* The built-in can return a pointer which is dereferenced */
+    /* va_args is read... */
+    finished_p = TRUE;
+  }
+  else {
+    /* sizeofexpression, application. va_arg */
+    pips_internal_error("Unexpected case\n");
+  }
   if(finished_p) {
     if(reference_undefined_p(mr)) {
       *pmwe = effect_undefined;
@@ -743,9 +757,15 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
 	  /* add effects due to e2 */
 	  le = gen_nconc(le, generic_proper_effects_of_expression(e2));
 
-	  /* A read must to the main variable must be added to le */
-	  pips_debug(8, "Add *pmre to le\n");
-	  le = gen_nconc(le, CONS(EFFECT, copy_effect(*pmre), NIL));
+	  /* A read must to the main variable must be added to le,
+	     unless an array is used as pointer; possibly an array
+	     with only one element... */
+	  if(effect_undefined_p(*pmre))
+	    pips_debug(8, "Do not add *pmre to le\n");
+	  else {
+	    pips_debug(8, "Add *pmre to le\n");
+	    le = gen_nconc(le, CONS(EFFECT, copy_effect(*pmre), NIL));
+	  }
 	}
 	else if(ENTITY_DEREFERENCING_P(op)) {
 	  /* Any kind of complex expressions may appear here. But only
@@ -1150,6 +1170,12 @@ generic_proper_effects_of_syntax(syntax s)
       case is_syntax_application:
 	le = generic_proper_effects_of_application(syntax_application(s));
 	break;
+      case is_syntax_va_arg: {
+	list al = syntax_va_arg(s);
+	sizeofexpression ae = EXPRESSION(CAR(al));
+	le = generic_proper_effects_of_expression(sizeofexpression_expression(ae));
+	break;
+      }
     default:
         pips_internal_error("unexpected tag %d\n", syntax_tag(s));
     }
@@ -1304,9 +1330,11 @@ generic_r_proper_effects_of_call(call c)
     tag t = value_tag(entity_initial(e));
     string n = module_local_name(e);
     list pc = call_arguments(c);
+    type uet = ultimate_type(entity_type(e));
 
     pips_debug(2, "begin for %s\n", entity_local_name(e));
 
+    if(type_functional_p(uet)) {
     switch (t)
     {
     case is_value_code:
@@ -1337,6 +1365,21 @@ generic_r_proper_effects_of_call(call c)
 
     default:
         pips_internal_error("unknown tag %d\n", t);
+    }
+    }
+    else if(type_variable_p(uet)) {
+      /* We could be less optimistic even when no information about the function called is known.
+       *
+       * We could look up all functions with the same type and make the union of their effects.
+       *
+       * We could assume that all parameters are read.
+       *
+       * We could assume that all pointers are used to produce indirect write.
+       */
+      pips_user_warning("Effects of call thru functional pointers are ignored\n");
+    }
+    else {
+      pips_internal_error("Unexpected case\n");
     }
 
     pips_debug(2, "end\n");
@@ -1396,6 +1439,7 @@ static void proper_effects_of_expression_instruction(instruction i)
 
       if(syntax_call_p(sc)) {
 	c = syntax_call(sc);
+	l_proper = generic_r_proper_effects_of_call(c);
       }
       else {
 	pips_internal_error("Cast case not implemented\n");
@@ -1404,6 +1448,23 @@ static void proper_effects_of_expression_instruction(instruction i)
     else if(syntax_call_p(is)) {
       /* This may happen when a loop is unstructured by the controlizer */
       c = syntax_call(is);
+      l_proper = generic_r_proper_effects_of_call(c);
+    }
+    else if(syntax_application_p(is)) {
+      /* This may happen when a structure field contains a pointer to
+	 a function. We do not know which function is is... */
+      application a = syntax_application(is);
+      expression fe = application_function(a);
+
+      /* Effect to find which function it it */
+      l_proper = generic_proper_effects_of_expression(fe);
+      /* More effects should be added to take the call site into account */
+      /* Same as for pointer-based call: use type, assume worst case,... */
+      /* A new function is needed to retrieve all functions with a
+	 given signature. Then the effects of all the candidates must
+	 be unioned. */
+      pips_user_warning("Effects of call site using a function pointer in "
+			"a structure are ignored for the time being\n");
     }
     else {
       pips_internal_error("Instruction expression case not implemented\n");
@@ -1412,7 +1473,6 @@ static void proper_effects_of_expression_instruction(instruction i)
     pips_debug(2, "Effects for expression instruction in statement%03zd:\n",
 	       statement_ordering(current_stat)); 
 
-    l_proper = generic_r_proper_effects_of_call(c);
     l_proper = gen_nconc(l_proper, effects_dup(l_cumu_range));
 		
     if (contract_p)

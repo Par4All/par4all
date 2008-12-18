@@ -94,12 +94,25 @@ effect reference_to_simple_effect(reference ref, action ac)
       else if((gen_length(ind) < type_depth(t))) {
 	/* This may happen with an array of structures */
 	int d = (t==ut) ? gen_length(td) : gen_length(td)+gen_length(utd);
+
+	/* FI: I'm now lost here... */
 	if(gen_length(ind)==d) {
 	  reference n_ref = copy_reference(ref);
 	  cell cell_ref = make_cell_reference(n_ref);
 	  addressing ad = make_addressing_index();
 	  approximation ap = make_approximation_must();
 	  eff = make_effect(cell_ref, ac, ad, ap, make_descriptor_none());
+	}
+	/* FI: I'm not sure this code is of any positive use */
+	else if(pointer_type_p(ut)) {
+	  reference n_ref = copy_reference(ref);
+	  cell cell_ref = make_cell_reference(n_ref);
+	  addressing ad = make_addressing_index();
+	  approximation ap = make_approximation_must();
+	  eff = make_effect(cell_ref, ac, ad, ap, make_descriptor_none());
+	}
+	else {
+	  /* FI: Which case are we in?*/
 	}
       }
       else {

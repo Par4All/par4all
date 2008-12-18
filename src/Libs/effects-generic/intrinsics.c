@@ -433,6 +433,13 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {DEFAULT_FUNCTION_NAME,                  no_write_effects},
   {C_RETURN_FUNCTION_NAME,                 no_write_effects},
 
+  /* stdarg.h */
+
+  {BUILTIN_VA_START,                       no_write_effects},
+  {BUILTIN_VA_END,                         no_write_effects},
+  /* va_arg is not a standard call; it is directly represented in PIPS
+     internal representation. */
+
   /* These intrinsics are added with no_write_effects to work with C.
      The real effects must be studied !!! I do not have time for the moment */
 

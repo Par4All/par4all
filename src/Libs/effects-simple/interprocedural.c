@@ -1073,6 +1073,7 @@ effect effect_scalar_address_substitution(effect eff, entity ev)
   effect n_eff = effect_undefined;
 
   if(addressing_index_p(ad) && ENDP(reference_indices(r))) {
+    /* FI: I'm confused here. Why do we discard read effects? */
     pips_user_warning
       ("Ineffective %s effect with value passing mode for formal parameter \"%s\"\n",
        action_write_p(ac)? "write":"read", entity_user_name(reference_variable(r)));
