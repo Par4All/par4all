@@ -1,0 +1,182 @@
+
+Symbol table for "fpointer01"
+
+fpointer01
+
+Declarations for module "fpointer01" with type "char x void * x (char x void * -> void) * x int * x int x int * -> void"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "fpointer01!:*STATIC*" with type "area" with size 0
+	Declared entity "fpointer01:*DYNAMIC*" with type "area" with size 0
+	Declared entity "fpointer01:*HEAP*" with type "area" with size 0
+	Declared entity "fpointer01:*STACK*" with type "area" with size 0
+	Declared entity "fpointer01:*STATIC*" with type "area" with size 0
+	Declared entity "fpointer01:_stream" with type "variable" "void *"
+	Declared entity "fpointer01:c" with type "variable" "char"
+	Declared entity "fpointer01:col" with type "variable" "int *"
+	Declared entity "fpointer01:indent" with type "variable" "int"
+	Declared entity "fpointer01:my_fputc" with type "variable" "(char x void * -> void) *"
+	Declared entity "fpointer01:nbout" with type "variable" "int *"
+
+* empty extern declaration list *
+
+
+Layout for formal parameters:
+
+	Variable fpointer01:_stream	offset = 2
+	Variable fpointer01:c	offset = 1
+	Variable fpointer01:col	offset = 4
+	Variable fpointer01:indent	offset = 5
+	Variable fpointer01:my_fputc	offset = 3
+	Variable fpointer01:nbout	offset = 6
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "fpointer01!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "fpointer01:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "fpointer01:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "fpointer01:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "fpointer01:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module fpointer01
+
+
+Parsed printed file for "fpointer01"
+
+void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_stream), int *col, int indent, int *nbout)
+{
+   if (c=='\n'||c=='\r')
+      /* on change de ligne */
+
+      *col = 0;
+   else {
+      /* indentation ok ? */
+
+      while (*col<indent) {
+         my_fputc(' ', _stream);
+         *nbout++;
+         *col++;
+      }
+
+      *col++;
+   }
+   
+   /* dans tous les cas il faut afficher le caractere passe */
+
+   my_fputc(c, _stream);
+   *nbout++;
+}
+
+Proper effects for "fpointer01"
+
+void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_stream), int *col, int indent, int *nbout)
+{
+//               <must be read   >: c
+   if (c=='\n'||c=='\r')
+//               <must be read   >: col
+//               <must be written - post>: (*col)
+      /* on change de ligne */
+
+      *col = 0;
+   else {
+//               <must be read   >: col indent
+//               <must be read    - post>: (*col)
+      /* indentation ok ? */
+
+      while (*col<indent) {
+         my_fputc(' ', _stream);
+//               <must be read   >: nbout
+//               <must be written>: nbout
+//               <must be read    - post>: (*nbout)
+         *nbout++;
+//               <must be read   >: col
+//               <must be written>: col
+//               <must be read    - post>: (*col)
+         *col++;
+      }
+//               <must be read   >: col
+//               <must be written>: col
+//               <must be read    - post>: (*col)
+
+      *col++;
+   }
+   
+   /* dans tous les cas il faut afficher le caractere passe */
+
+   my_fputc(c, _stream);
+//               <must be read   >: nbout
+//               <must be written>: nbout
+//               <must be read    - post>: (*nbout)
+   *nbout++;
+}
+
+Cumulated effects for "fpointer01"
+
+//               <may be read    >: TOP-LEVEL:*MEMORY* indent
+//               <must be read   >: c col nbout
+//               <may be written - post >: (*col)
+void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_stream), int *col, int indent, int *nbout)
+{
+//               <may be read    >: TOP-LEVEL:*MEMORY* col indent 
+//                                  nbout
+//               <may be written >: col nbout
+//               <must be read   >: c col
+//               <may be written - post >: (*col)
+   if (c=='\n'||c=='\r')
+//               <must be read   >: col
+//               <must be written - post>: (*col)
+      /* on change de ligne */
+
+      *col = 0;
+   else {
+//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <must be read   >: col indent nbout
+//               <must be written>: col nbout
+//               <must be read    - post>: (*col)
+      /* indentation ok ? */
+
+      while (*col<indent) {
+         my_fputc(' ', _stream);
+//               <must be read   >: nbout
+//               <must be written>: nbout
+//               <must be read    - post>: (*nbout)
+         *nbout++;
+//               <must be read   >: col
+//               <must be written>: col
+//               <must be read    - post>: (*col)
+         *col++;
+      }
+//               <must be read   >: col
+//               <must be written>: col
+//               <must be read    - post>: (*col)
+
+      *col++;
+   }
+   
+   /* dans tous les cas il faut afficher le caractere passe */
+
+   my_fputc(c, _stream);
+//               <must be read   >: nbout
+//               <must be written>: nbout
+//               <must be read    - post>: (*nbout)
+   *nbout++;
+}

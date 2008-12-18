@@ -1,0 +1,85 @@
+delete malloc01
+create malloc01 malloc01.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+
+
+#echo
+#echo Parser output
+#echo
+
+#display PARSED_PRINTED_FILE[malloc01]
+
+echo
+echo Controlizer output
+echo
+
+display PRINTED_FILE[malloc01]
+
+echo
+echo Preconditions
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[malloc01]
+
+echo
+echo Proper effects
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[malloc01]
+
+echo
+echo Cumulated effects
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[malloc01]
+
+echo
+echo Regions
+echo
+
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[malloc01]
+
+#echo
+#echo Dependence graph
+#echo
+
+# This dependence graph prettyprinter cannot be used in validation
+# because it uses hexadecimal adresses activate
+#activate PRINT_WHOLE_DEPENDENCE_GRAPH  
+
+display DG_FILE[malloc01]
+quit
+echo
+echo Parallelization
+echo
+
+activate PRINT_PARALLELIZEDOMP_CODE
+
+display PARALLELPRINTED_FILE[malloc01]
+
+echo
+echo Parallelization in Fortran (if one of the resources can be made obsolete)
+echo
+
+shell touch malloc01.database/malloc01/malloc01.c
+shell touch malloc01.database/malloc01/USER_FILE
+shell touch malloc01.database/malloc01/PARSED_CODE
+setproperty PRETTYPRINT_C_CODE FALSE
+
+display PARALLELPRINTED_FILE[malloc01]
+
+close
+
+#delete malloc01

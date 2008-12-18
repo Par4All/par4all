@@ -1,0 +1,93 @@
+
+Parsed code for "inter01"
+
+void inter01()
+{
+   static int l;
+   int m;
+   int n;
+
+   for (n = 0;n<10;n++) {
+      i = 1;
+      j = 2;
+      k = 3;
+      l = 4;
+      m = 5;
+   }
+}
+
+Code for "inter01"
+
+void inter01()
+{
+   static int l;
+   int m;
+   int n;
+
+   for(n = 0; n <= 9; n += 1) {
+      i = 1;
+      j = 2;
+      k = 3;
+      l = 4;
+      m = 5;
+   }
+}
+
+Proper effects for "inter01"
+
+void inter01()
+{
+   static int l;
+   int m;
+   int n;
+//               <must be written>: n
+
+   for(n = 0; n <= 9; n += 1) {
+//               <must be written>: TOP-LEVEL:i
+      i = 1;
+//               <must be written>: TOP-LEVEL:j
+      j = 2;
+//               <must be written>: inter01!:k
+      k = 3;
+//               <must be written>: l
+      l = 4;
+//               <must be written>: m
+      m = 5;
+   }
+}
+
+Cumulated effects for "inter01"
+
+//               <may be written >: TOP-LEVEL:i TOP-LEVEL:j inter01!:k
+//                                  l
+void inter01()
+{
+   static int l;
+   int m;
+   int n;
+//               <may be written >: TOP-LEVEL:i TOP-LEVEL:j inter01!:k
+//                                  l m
+//               <must be written>: n
+
+   for(n = 0; n <= 9; n += 1) {
+//               <must be written>: TOP-LEVEL:i
+      i = 1;
+//               <must be written>: TOP-LEVEL:j
+      j = 2;
+//               <must be written>: inter01!:k
+      k = 3;
+//               <must be written>: l
+      l = 4;
+//               <must be written>: m
+      m = 5;
+   }
+}
+
+Proper effects for "main"
+
+main()
+{
+//               <may be written >: TOP-LEVEL:i TOP-LEVEL:j inter01!:k
+//                                  inter01:0`l
+   inter01();
+}
