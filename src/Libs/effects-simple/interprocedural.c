@@ -153,11 +153,12 @@ list effects_dynamic_elim(list l_eff)
 
 		if(/*FALSE && */value_expression_p(v)) {
 		  expression ae = value_expression(v);
+		  /* Save the action before the effect may be changed */
+		  action ac = effect_action(eff);
 
 		  /* re-use an existing function... */
 		  eff = c_summary_effect_to_proper_effect(eff, ae);
 		  if(effect_undefined_p(eff)) {
-		    action ac = effect_action(eff);
 		    pips_debug(5, "Local pointer \"%s\" initialization is not usable!\n", 
 			       entity_name(eff_ent));
 		    if(action_write_p(ac))
