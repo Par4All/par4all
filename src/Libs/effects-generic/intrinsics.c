@@ -858,6 +858,13 @@ conditional_effects(entity e __attribute__ ((__unused__)),list args)
   list lf = generic_proper_effects_of_expression(ef);
 
   le = (*effects_test_union_op)(lt, lf, effects_same_action_p);
+
+  ifdebug(8) {
+    pips_debug(8, "Effects for the two branches:\n");
+    print_effects(le);
+    (void) fprintf(stderr, "\n");
+  }
+
   le = (*effects_union_op)(le, lc, effects_same_action_p);
 
   pips_debug(5, "end\n");

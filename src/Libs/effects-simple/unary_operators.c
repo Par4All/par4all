@@ -226,13 +226,21 @@ list simple_effects_union_over_range(list l_eff,
    indices, they are replaced by unbounded expressions to keep the
    difference between p and p[*] when p is a pointer. 
 
+   This is not as strong as store_independent_effect_p() which would
+   require that the reference is not pointer dependent.
+
    No memory allocation, side effects on eff? Side effects on the
-   reference too in spite of the persistant reference?
+   reference too in spite of the persistant reference? No, it's not
+   possible. It's easier to work on a copy of the reference when a
+   "preference" is used.
 */
 list 
 effect_to_store_independent_sdfi_list(effect eff, bool force_may_p)
 {
-  reference r = effect_any_reference(eff);
+  cell c = effect_cell(eff);
+  reference r = cell_preference_p(c)?
+    copy_reference(effect_any_reference(eff))
+    : effect_any_reference(eff);
   list ind = reference_indices(r);
   list cind = list_undefined;
   bool may_p = FALSE;
@@ -245,7 +253,8 @@ effect_to_store_independent_sdfi_list(effect eff, bool force_may_p)
 	expression nse = make_unbounded_expression();
 	may_p = TRUE;
 	free_expression(se);
-	CAR(cind).p = (void *) nse;
+	//CAR(cind).p = (void *) nse;
+	EXPRESSION_(CAR(cind)) = nse;
       }
     }
   }
@@ -253,6 +262,16 @@ effect_to_store_independent_sdfi_list(effect eff, bool force_may_p)
   /* FI: Why is MAY always forced? Because of the semantics of the function! */
   if(may_p || force_may_p)
     effect_approximation_tag(eff) = is_approximation_may;
+
+  /* FI: if necessary, use the reference copy in the cell */
+  if(cell_preference_p(c)) {
+    free_preference(cell_preference(c));
+    cell_tag(c) = is_cell_reference;
+    cell_reference(c) = r;
+  }
+
+  ifdebug(1)
+    pips_assert("eff is consistent", effect_consistent_p(eff));
 
   return(CONS(EFFECT,eff,NIL));
 }

@@ -48,6 +48,7 @@ list_of_effects_generic_binary_op(
 {
     list l_res = NIL;
     list cr1 = list_undefined;
+    list cr2 = list_undefined;
 
     debug_on("EFFECTS_OPERATORS_DEBUG_LEVEL");
 
@@ -73,6 +74,8 @@ list_of_effects_generic_binary_op(
 	effect r2 = EFFECT(CAR(lr2));
 	
 	pips_debug(8, "r2: %s\n", entity_name(effect_variable(r2)));
+	ifdebug(8)
+	  pips_assert("r2 is consistent", effect_consistent_p(r2));
 	
 	if ( (*r1_r2_combinable_p)(r1,r2) ) {
 	  combinable = TRUE;
@@ -114,12 +117,15 @@ list_of_effects_generic_binary_op(
       }
     
     /* we must then deal with the remnants of l2 */
-    MAP(EFFECT, r2,
-    {  
+    for(cr2 = l2; !ENDP(cr2); POP(cr2)) {
+      effect r2 = EFFECT(CAR(cr2));
+
+      ifdebug(8)
+	pips_assert("r2 is consistent", effect_consistent_p(r2));
+
       if ( (*r1_r2_combinable_p)(effect_undefined,r2) ) 
 	l_res = gen_nconc((*r2_unary_op)(r2), l_res);
-    },
-	l2);
+    }
         
     ifdebug(1)
       {

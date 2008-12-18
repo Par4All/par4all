@@ -949,7 +949,7 @@ transformer c_return_to_transformer(entity e __attribute__ ((__unused__)),
       }
     }
     else {
-      pips_internal_error("value returned from a void function\n");
+      pips_user_error("value returned from a void function\n");
     }
 
     if(transformer_undefined_p(tf))
