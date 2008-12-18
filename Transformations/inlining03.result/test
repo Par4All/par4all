@@ -1,0 +1,42 @@
+
+Initial code
+
+static int pmax(int a, int b)
+{
+   int c = (a>b?a:b);
+   printf("%d\n", c);
+   return c;
+}
+int main(int argc, char **argv)
+{
+   int c;
+   c = pmax(2, argc);
+   return 0;
+}
+
+Code after inlining
+
+static int pmax(int a, int b)
+{
+   int c = (a>b?a:b);
+   printf("%d\n", c);
+   return c;
+}
+int main(int argc, char **argv)
+{
+   int pmax0;
+   int c;
+   {
+      int a = argc;
+      int pmax = 2;
+      int c = (a>b?a:b);
+      printf("%d\n", c);
+      return c;
+l99998:      0;
+   }
+   c = pmax0;
+   return 0;
+}
+
+Unsplit resulting code
+
