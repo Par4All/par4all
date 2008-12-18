@@ -1954,7 +1954,16 @@ type_spec:   /* ISO 6.7.2 */
 			  /* FI: What should the initial value be? */
 			  if (value_undefined_p(entity_initial(ent)))
 			    entity_initial(ent) = make_value_unknown();
-			  AddEntityToDeclarations(ent, get_current_module_entity());
+			  if(!entity_undefined_p(get_current_module_entity()))
+			    AddEntityToDeclarations(ent, get_current_module_entity());
+			  else {
+			    /* This happens with the old style
+			       function declaration at least */
+			    /* Oops, we have to assume that the enum
+			       is also defined in the compilation
+			       unit... else it would be useless. */
+			    ;
+			  }
 			  c_parser_context_type(ycontext) = make_type_variable(v);
 			  $$ = NIL;  
 			}
