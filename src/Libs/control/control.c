@@ -1015,8 +1015,11 @@ static sequence for_to_while_loop_conversion(expression init,
 
   pips_debug(5, "Begin\n");
 
-  if(!syntax_call_p(s_init) || !syntax_call_p(s_cond) || !syntax_call_p(s_incr)) {
-    pips_internal_error("expression arguments must be calls\n");
+  if(!syntax_call_p(s_init)
+     || !(syntax_call_p(s_cond)||syntax_reference_p(s_cond))
+     || !syntax_call_p(s_incr)) {
+    pips_internal_error("expression arguments must be calls "
+			"(in C, the condition may be a reference)\n");
   }
   else {
     statement init_st = make_statement(entity_empty_label(), 
