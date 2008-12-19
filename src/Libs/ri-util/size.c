@@ -276,7 +276,9 @@ intptr_t SizeOfElements(basic b)
   }
   case is_basic_bit:
     /* Check meaning...*/
-    e = basic_bit(b);
+    pips_assert("element size match",
+            sizeof(e)==sizeof(basic_bit(b)) );
+    e = (int)basic_bit(b);
     break;
   case is_basic_pointer:
     e = DEFAULT_POINTER_TYPE_SIZE;

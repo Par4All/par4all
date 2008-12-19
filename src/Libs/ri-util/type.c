@@ -237,6 +237,43 @@ MakeAnyScalarResult(tag t, intptr_t size)
 
 /* Warning: the lengths of string basics are not checked!!!
  * string_type_size() could be used but it is probably not very robust.
+ *
+ * Second Warning: current version only compares ultimate_types
+ * but check the various typedef that follows
+ *
+ * typedef int foo;
+ * 
+ * Doit-on retourner TRUE or FALSE pour la paire (int, foo)?
+ * 
+ * typedef struct a {
+ *     int x;
+ *     int y;
+ * } a_t;
+ * 
+ * typedef struct b {
+ *     int x;
+ *     int y;
+ * } b_t;
+ * 
+ * Doit-on retourner TRUE or FALSE pour la paire (a_t, b_t)?
+ * 
+ * typedef struct  {
+ *     int x;
+ *     int y;
+ * } c_t;
+ * 
+ * typedef struct  {
+ *     int x;
+ *     int y;
+ * } d_t;
+ * 
+ * Doit-on retourner TRUE or FALSE pour la paire (c_t, d_t) quand les structures sont nommees implicitement? Quid de (a_t, d_t) et des autres combinaisons?
+ * 
+ * typedef int foo[n+n];
+ * 
+ * typedef int fii[2*n];
+ * 
+ * Doit-on retourner TRUE or FALSE pour la paire (foo, fii)? 
  */
 bool 
 type_equal_p(t1, t2)
