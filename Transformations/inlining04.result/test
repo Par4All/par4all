@@ -9,8 +9,7 @@ static int pmax(int a, int b)
 }
 int main(int argc, char **argv)
 {
-   pmax(2, argc);
-   return 0;
+   return pmax(1, 2)+pmax(2, 3);
 }
 
 Code after inlining
@@ -23,17 +22,25 @@ static int pmax(int a, int b)
 }
 int main(int argc, char **argv)
 {
+   int pmax1;
    int pmax0;
    {
-      int a = 2;
-      int b = argc;
+      int a = 1;
+      int b = 2;
       int c = (a>b?a:b);
       printf("%d\n", c);
       return c;
 l99998:      ;
    }
-   pmax0;
-   return 0;
+   {
+      int a = 2;
+      int b = 3;
+      int c = (a>b?a:b);
+      printf("%d\n", c);
+      return c;
+l99997:      ;
+   }
+   return pmax0+pmax1;
 }
 
 Unsplit resulting code

@@ -27,12 +27,12 @@ int main(int argc, char **argv)
    int pmax0;
    int c;
    {
-      int a = argc;
-      int pmax = 2;
+      int a = 2;
+      int b = argc;
       int c = (a>b?a:b);
       printf("%d\n", c);
       return c;
-l99998:      0;
+l99998:      ;
    }
    c = pmax0;
    return 0;
