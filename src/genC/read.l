@@ -56,9 +56,11 @@ static void append_to_literal(string s)
     strcat(literal, s);
 }
 
-static size_t newgen_line_number;
-static size_t newgen_char_number;
-static size_t newgen_col_number;
+static size_t
+  newgen_line_number,
+  newgen_char_number,
+  newgen_col_number,
+  newgen_lex_number;
 
 void newgen_start_lexer(FILE * in)
 {
@@ -66,12 +68,14 @@ void newgen_start_lexer(FILE * in)
   newgen_char_number = 0;
   newgen_line_number = 1;
   newgen_col_number = 0;
+  newgen_lex_number = 0;
 }
 
 void newgen_lexer_position(FILE * out)
 {
-  fprintf(out, "newgen lexer at line %zd (column %zd, char %zd)\n", 
-	  newgen_line_number, newgen_col_number, newgen_char_number);
+  fprintf(out, "newgen lexer token %zd at line %zd (column %zd, char %zd)\n",
+	  newgen_lex_number, newgen_line_number,
+	  newgen_col_number, newgen_char_number);
 }
 
 %}
@@ -87,32 +91,53 @@ void newgen_lexer_position(FILE * out)
 			  BEGIN 0 ;
 			  yylval.s = strdup(literal);
 			  free(literal); literal=(char*)NULL; literal_size=0;
+			  newgen_lex_number++;
 			  return READ_STRING ;
 			}
-_			{ yylval.s = NULL; return READ_STRING; }
-!			{ yylval.s = string_undefined; return READ_STRING; }
-\[                      { return LB; }
-T			{ return CHUNK_BEGIN; }
-\$			{ return VECTOR_BEGIN; }
-%			{ return ARROW_BEGIN; }
-\*			{ return TABULATED_BEGIN; }
-\(		        { return LP; }
-\)			{ return RP; }
-\{		        { return LC; }
-\}			{ return RC; }
-H			{ return SHARED_POINTER; }
-U			{ return READ_UNIT; }
-B			{ return READ_BOOL; }
-E	 		{ return READ_EXTERNAL; }
-D			{ return READ_DEF; }
-R			{ return READ_REF; }
-N			{ return READ_NULL; }
-L	                { return READ_LIST_UNDEFINED; }
-S	                { return READ_SET_UNDEFINED; }
-A			{ return READ_ARRAY_UNDEFINED; }
-\#\\.			{ yylval.c=*(yytext+2); return READ_CHAR; }
-[+-]?[ \t]*[0-9]+       { yylval.val=atoi(yytext); return READ_INT; }
-[+-]?[ \t]*[0-9]+\.[0-9]+ { yylval.d=atof(yytext); return READ_FLOAT; }
+_			{
+                          yylval.s = NULL;
+			  newgen_lex_number++;
+                          return READ_STRING;
+                        }
+!			{
+                          yylval.s = string_undefined;
+			  newgen_lex_number++;
+			  return READ_STRING;
+                        }
+\[                      { newgen_lex_number++; return LB; }
+T			{ newgen_lex_number++; return CHUNK_BEGIN; }
+\$			{ newgen_lex_number++; return VECTOR_BEGIN; }
+%			{ newgen_lex_number++; return ARROW_BEGIN; }
+\*			{ newgen_lex_number++; return TABULATED_BEGIN; }
+\(		        { newgen_lex_number++; return LP; }
+\)			{ newgen_lex_number++; return RP; }
+\{		        { newgen_lex_number++; return LC; }
+\}			{ newgen_lex_number++; return RC; }
+H			{ newgen_lex_number++; return SHARED_POINTER; }
+U			{ newgen_lex_number++; return READ_UNIT; }
+B			{ newgen_lex_number++; return READ_BOOL; }
+E	 		{ newgen_lex_number++; return READ_EXTERNAL; }
+D			{ newgen_lex_number++; return READ_DEF; }
+R			{ newgen_lex_number++; return READ_REF; }
+N			{ newgen_lex_number++; return READ_NULL; }
+L	                { newgen_lex_number++; return READ_LIST_UNDEFINED; }
+S	                { newgen_lex_number++; return READ_SET_UNDEFINED; }
+A			{ newgen_lex_number++; return READ_ARRAY_UNDEFINED; }
+\#\\.			{
+                          yylval.c=*(yytext+2);
+			  newgen_lex_number++;
+			  return READ_CHAR;
+                        }
+[+-]?[ \t]*[0-9]+       {
+                          yylval.val=atoi(yytext);
+			  newgen_lex_number++;
+			  return READ_INT;
+                        }
+[+-]?[ \t]*[0-9]+\.[0-9]+ {
+                          yylval.d=atof(yytext);
+			  newgen_lex_number++;
+			  return READ_FLOAT;
+                        }
 \"			{ BEGIN a_string ; append_to_literal(""); }
 [ \t]*	                ;
 \n 			{ newgen_line_number++; newgen_col_number=0; }
