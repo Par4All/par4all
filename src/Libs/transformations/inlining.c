@@ -57,11 +57,24 @@ void inline_return_switcher(instruction ins)
         *ins = *make_instruction_sequence( s );
     }
 }
-
+/* helper function to check if a call is a call to the inlined function
+ */
 static
 bool inline_should_inline(call callee)
 {
     return call_function(callee) == inlined_module ;
+}
+
+/* helper function to remove comments from a statement
+ */
+static
+void remove_comments(statement s)
+{
+    /* this should be freed, but the value of the comment is never consistent
+     * it can be NULL, string_undefined or a random ! one
+     * so better leak than fail
+     */
+    statement_comments(s)=string_undefined;
 }
 
 /* this should inline the call callee
@@ -108,8 +121,7 @@ instruction inline_expression_call(expression modified_expression, call callee)
     }
 
     /* add label at the end of the statement */
-    laststmt=instruction_to_statement( make_instruction_expression( int_to_expression(0) ) );
-    statement_label(laststmt) = make_new_label( modified_module_name ); 
+    laststmt=make_continue_statement(make_new_label( modified_module_name ));
     gen_nconc( sequence_statements(instruction_sequence(statement_instruction(expanded))), CONS( STATEMENT, laststmt, NIL) );
 
     /* fix `return' calls
@@ -156,7 +168,7 @@ instruction inline_expression_call(expression modified_expression, call callee)
         entity dynamic_area = global_name_to_entity(modified_module_name, DYNAMIC_AREA_LOCAL_NAME);
         area aa = type_area(entity_type(dynamic_area));
         int OldOffset = area_size(aa);
-        area_size(aa) = OldOffset + basic_type_size( variable_basic(type_variable(treturn)) );
+        area_size(aa) = OldOffset + SizeOfElements( variable_basic(type_variable(treturn)) );
         area_layout(aa) = gen_nconc(area_layout(aa), CONS(ENTITY, returned_entity, NIL));
         entity_storage(returned_entity) = make_storage_ram( make_ram( modified_module, dynamic_area, OldOffset, NIL ) );
         /* push it into the declaration list*/
@@ -173,10 +185,13 @@ instruction inline_expression_call(expression modified_expression, call callee)
 
     list iter = inlined_declaration; // << this is the only I found to recover the inlined entitties' declaration
     while( !same_string_p( entity_local_name(ENTITY(CAR(iter))), DYNAMIC_AREA_LOCAL_NAME ) ) POP(iter);
+    POP(iter);/*pop the dynamic area label*/
+    if( same_string_p( entity_local_name(ENTITY(CAR(iter))) , entity_local_name(inlined_module) ) )
+            POP(iter); /* pop the first flag if needed */
 
-    list adder = statement_declarations(expanded);
+    list adder = /*statement_declarations(expanded);*/NIL;
     list c_iter = call_arguments(callee);
-    for( POP(iter)/*to pop the dynamic area label*/ ; !ENDP(c_iter); POP(iter),POP(c_iter) )
+    for( ; !ENDP(c_iter); POP(iter),POP(c_iter) )
     {
         entity e = ENTITY(CAR(iter));
         expression from = EXPRESSION(CAR(c_iter));
@@ -199,7 +214,7 @@ instruction inline_expression_call(expression modified_expression, call callee)
         entity dynamic_area = global_name_to_entity(emn, DYNAMIC_AREA_LOCAL_NAME);
         area aa = type_area(entity_type(dynamic_area));
         int OldOffset = area_size(aa);
-        area_size(aa) = OldOffset + basic_type_size( basic_of_expression( from ) );
+        area_size(aa) = OldOffset + SizeOfElements( basic_of_expression( from ) );
         area_layout(aa) = gen_nconc(area_layout(aa), CONS(ENTITY, new_ent, NIL));
         entity_storage(new_ent)= make_storage_ram( make_ram( modified_module, dynamic_area, OldOffset, NIL ) );
 
@@ -209,11 +224,21 @@ instruction inline_expression_call(expression modified_expression, call callee)
         /* add the entity to our list */
         adder=CONS(ENTITY,new_ent,adder);
     }
-    statement_declarations(expanded)=adder;
+    if( adder !=NIL)
+    {
+        adder=gen_nreverse(adder);
+        adder=gen_nconc(adder, statement_declarations(expanded));
+        statement_declarations(expanded)=adder;
+    }
 
     /* final packing */
     sequence s = make_sequence( CONS(STATEMENT,expanded,NIL) );
     instruction ins = make_instruction_sequence( s );
+
+    /* remove all comments from inlined statement,
+     * because those comment could have a corrupted meaning
+     */
+    gen_recurse(ins,statement_domain,gen_true,remove_comments);
 
     if( !type_void_p(treturn) )
         *modified_expression = *entity_to_expression(returned_entity);
@@ -276,19 +301,21 @@ bool inline_has_inlinable_calls(call callee)
  * only apply if this instruction does not contain other instructions
  */ 
 static 
-void inline_instruction_switcher(instruction ins)
+void inline_statement_switcher(statement stmt)
 {
+    instruction* ins=&statement_instruction(stmt);
     block_level=0;
-    switch( instruction_tag(ins) )
+    switch( instruction_tag(*ins) )
     {
         /* handle this with the expression handler */
         case is_instruction_call:
             {
-                call callee =instruction_call(ins);
+                call callee =instruction_call(*ins);
                 if( inline_has_inlinable_calls( callee ) )
                 {
-                    *ins= *make_instruction_expression( call_to_expression(callee) );
-                    inline_instruction_switcher( ins );
+                    //free_instruction(*ins);
+                    *ins= make_instruction_expression( call_to_expression(callee) );
+                    inline_statement_switcher(stmt);
                 }
             } break;
         /* handle those with a gen_recurse */
@@ -296,15 +323,17 @@ void inline_instruction_switcher(instruction ins)
         case is_instruction_expression:
             {
                 new_instructions=NIL;
-                gen_recurse(ins,expression_domain,gen_true,&inline_expression);
+                gen_recurse(*ins,expression_domain,gen_true,&inline_expression);
                 if( new_instructions != NIL ) /* something happens on the way to heaven */
                 {
                     type t= functional_result(type_functional(entity_type(inlined_module)));
                     if( ! type_void_p(t) )
                     {
-                        new_instructions=CONS(STATEMENT,instruction_to_statement(copy_instruction(ins)),new_instructions);
+                        new_instructions=CONS(STATEMENT,instruction_to_statement(copy_instruction(*ins)),new_instructions);
                     }
-                    *ins = *make_instruction_sequence( make_sequence( gen_nreverse(new_instructions) ) );
+                    //free_instruction(*ins);
+                    *ins = make_instruction_sequence( make_sequence( gen_nreverse(new_instructions) ) );
+                    statement_number(stmt)=STATEMENT_NUMBER_UNDEFINED;
                 }
             }
             break;
@@ -327,9 +356,10 @@ inline_calls(char * module)
     pips_assert("statements found", !statement_undefined_p(modified_module_statement) );
 
     /* inline all calls to inlined_module */
-    gen_recurse(modified_module_statement, instruction_domain, gen_true, &inline_instruction_switcher);
+    gen_recurse(modified_module_statement, statement_domain, gen_true, &inline_statement_switcher);
 
-    /* validate changes */
+    /* validate changes but Reorder the module first, because new statements may have been added */  
+    module_reorder(modified_module_statement);
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module), modified_module_statement);
 
     modified_module_statement = statement_undefined;
