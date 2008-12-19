@@ -1473,26 +1473,9 @@ int gen_free_tabulated(int domain)
 /* USER_FILE is used by driver functions (sorry, no closure in C). */
 static FILE *user_file ;
 
-#define IBS 20
 static void fputi(int i, FILE * f)
 {
-  char buf[IBS];
-  char * c = buf+IBS;
-
-  *--c = '\0';
-
-  if (i<0) {
-    putc('-', f);
-    i=-i;
-  }
-  
-  do {
-    *--c = (i%10) + '0';
-    i /= 10;
-  } while (i!=0);
-
-  fputs(c, f);
-  putc(' ', f);
+  fprintf(f, "%d ", i);
 }
 
 static void fputci(char c, int i, FILE * f)
