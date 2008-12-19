@@ -292,6 +292,52 @@ static string simd_save_function_name(string tFuncName)
    return tFuncName;
 }
 
+/* compare functions to sort load / save statements
+ * for load statements , the first argument is relevant
+ * for store statements, the second argument is relevant
+ */
+static int entity_cmp(entity e1, entity e2)
+{
+    return strcmp(entity_local_name(e1), entity_local_name(e2));
+}
+
+static 
+entity cmp_helper(expression ex)
+{
+    entity en;
+    switch( syntax_tag(expression_syntax(ex)) )
+    {
+        case is_syntax_reference:
+            en = reference_variable(expression_reference(ex));
+            break;
+        case is_syntax_call:
+            en = reference_variable(expression_reference(EXPRESSION( CAR( call_arguments( syntax_call( expression_syntax(ex) ) ) ) ) ) );
+            break;
+        default:
+            pips_internal_error("unexpected synatx tag");
+    };
+    return en;
+}
+
+static int cmp(const statement* s1,const statement* s2)
+{
+    pips_assert( "is a call" ,statement_call_p(*s1));
+    pips_assert( "is a call" ,statement_call_p(*s2));
+    expression ex11 = EXPRESSION( CAR(call_arguments(statement_call(*s1))));
+    expression ex12 = EXPRESSION( CAR(call_arguments(statement_call(*s2))));
+    expression ex21 = EXPRESSION( CAR(CDR(call_arguments(statement_call(*s1)))));
+    expression ex22 = EXPRESSION( CAR(CDR(call_arguments(statement_call(*s2)))));
+
+    entity en11,en12,en21,en22;
+    en11=cmp_helper(ex11);
+    en12=cmp_helper(ex12);
+    en21=cmp_helper(ex21);
+    en22=cmp_helper(ex22);
+
+    int n = entity_cmp(en11,en12);
+    return (n) ? (n) : entity_cmp(en21,en22);
+}
+
 /*
 This function inserts before and after the loop s the statement corresponding to the vector and arguments in argsToVect.
  */
@@ -332,6 +378,9 @@ static void insert_prelude_postlude(statement s, hash_table argsToVect, hash_tab
       free(loadFuncName);
 
    }, argsToVect);
+
+   gen_sort_list(saveStats,cmp);
+   gen_sort_list(loadStats,cmp);
 
    list oldStatDecls = statement_declarations(s);
    statement_declarations(s) = NIL;

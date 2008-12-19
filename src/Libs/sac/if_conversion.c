@@ -45,7 +45,6 @@ This function returns TRUE if the statement comment contains searched_string
  */
 static bool check_if_statement_contains_comment(statement s, string searched_string)
 {
-  string comments;
   bool res = FALSE;
 
   if (!statement_with_empty_comment_p(s)) {

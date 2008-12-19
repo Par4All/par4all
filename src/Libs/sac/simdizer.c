@@ -36,7 +36,7 @@ typedef dg_vertex_label vertex_label;
 
 #include "effects-convex.h"
 
-static graph dependence_graph;
+static graph dependence_graph = NULL;
 
 static hash_table matches = NULL;
 

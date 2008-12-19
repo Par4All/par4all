@@ -197,15 +197,13 @@ static opcode get_optimal_opcode(opcodeClass kind, int argc, list* args)
 
 entity get_function_entity(string name)
 {
-   string ename = strdup(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, name, NULL));
-   entity e = gen_find_tabulated( ename, entity_domain);
-   if ( entity_undefined_p( e ) )
-   {
-       pips_error(__FUNCTION__,"entity %s not defined, please load the appropriate definition source file",ename);
-   }
-   free(ename);
+    entity e = local_name_to_top_level_entity(name); 
+    if ( entity_undefined_p( e ) )
+    {
+        pips_internal_error("entity %s not defined, please load the appropriate definition source file",name);
+    }
 
-   return e;
+    return e;
 }
 
 /* 
@@ -656,7 +654,7 @@ void replace_subscript(expression e)
 statement make_exec_statement_from_name(string ename, list args)
 {
     /* SG: ugly patch to make sure fortran's parameter passing and c's are respected */
-    if( ! is_fortran )
+    if( c_module_p(get_current_module_entity()) )
     {
         MAP(EXPRESSION,e,replace_subscript(e),args);
     }
@@ -872,7 +870,6 @@ static entity make_new_simd_vector(int itemSize, int nbItems, int basicTag)
 			     MODULE_SEP_STRING, prefix, num, (char *) NULL));
 
    entity str_type = FindOrCreateEntity(entity_local_name(mod_ent), type_name);
-   basic str_basic;
    entity_type(str_type) =make_type_variable(make_variable(simdVector,NIL,NIL)); 
 
    entity str_dec = FindOrCreateEntity(entity_local_name(mod_ent), name);
@@ -1244,12 +1241,14 @@ static statement generate_load_statement(simdStatementInfo si, int line)
    {
       if (vectorElement_element(ve) == 0)
 	 sourcesCopy = CONS(VECTORELEMENT, ve, sourcesCopy);
+     /*
       if ( FALSE)//(vectorElement_subwordSize(ve) == 16) &&
 	//(vectorElement_vectorLength(ve) == 4) )
       {
 	 vectorElement e = copy_vector_element(ve);
 	 sourcesShuffle = CONS(VECTORELEMENT, e, sourcesShuffle);
       }
+      */
    },
        statementArgument_dependances(simdStatementInfo_arguments(si)[offset]));
 
