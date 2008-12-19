@@ -1325,66 +1325,68 @@ generic_proper_effects_of_external(entity func, list args)
 list 
 generic_r_proper_effects_of_call(call c)
 {
-    list le = NIL;
-    entity e = call_function(c);
-    tag t = value_tag(entity_initial(e));
-    string n = module_local_name(e);
-    list pc = call_arguments(c);
-    type uet = ultimate_type(entity_type(e));
+  list le = NIL;
+  entity e = call_function(c);
+  tag t = value_tag(entity_initial(e));
+  string n = module_local_name(e);
+  list pc = call_arguments(c);
+  type uet = ultimate_type(entity_type(e));
 
-    pips_debug(2, "begin for %s\n", entity_local_name(e));
+  pips_debug(2, "begin for %s\n", entity_local_name(e));
 
-    if(type_functional_p(uet)) {
-    switch (t)
-    {
+  if(type_functional_p(uet)) {
+    switch (t) {
     case is_value_code:
-        pips_debug(5, "external function %s\n", n);
-        le = generic_proper_effects_of_external(e, pc);
-        break;
+      pips_debug(5, "external function %s\n", n);
+      le = generic_proper_effects_of_external(e, pc);
+      break;
 
     case is_value_intrinsic:
-        pips_debug(5, "intrinsic function %s\n", n);
-        le = generic_proper_effects_of_intrinsic(e, pc);
-        break;
+      pips_debug(5, "intrinsic function %s\n", n);
+      le = generic_proper_effects_of_intrinsic(e, pc);
+      break;
 
     case is_value_symbolic:
-	pips_debug(5, "symbolic\n");
-	break;
+      pips_debug(5, "symbolic\n");
+      break;
 
     case is_value_constant:
-	pips_debug(5, "constant\n");
-        break;
+      pips_debug(5, "constant\n");
+      break;
 
     case is_value_unknown:
-	if (get_bool_property("HPFC_FILTER_CALLEES"))
-	    /* hpfc specials are managed here... */
-	    le = NIL;
-	else
-	    pips_internal_error("unknown function %s\n", entity_name(e));
-        break;
+      if (get_bool_property("HPFC_FILTER_CALLEES"))
+	/* hpfc specials are managed here... */
+	le = NIL;
+      else
+	pips_internal_error("unknown function %s\n", entity_name(e));
+      break;
 
     default:
-        pips_internal_error("unknown tag %d\n", t);
+      pips_internal_error("unknown tag %d\n", t);
     }
-    }
-    else if(type_variable_p(uet)) {
-      /* We could be less optimistic even when no information about the function called is known.
-       *
-       * We could look up all functions with the same type and make the union of their effects.
-       *
-       * We could assume that all parameters are read.
-       *
-       * We could assume that all pointers are used to produce indirect write.
-       */
-      pips_user_warning("Effects of call thru functional pointers are ignored\n");
-    }
-    else {
-      pips_internal_error("Unexpected case\n");
-    }
+  }
+  else if(type_variable_p(uet)) {
+    /* We could be less optimistic even when no information about the function called is known.
+     *
+     * We could look up all functions with the same type and make the union of their effects.
+     *
+     * We could assume that all parameters are read.
+     *
+     * We could assume that all pointers are used to produce indirect write.
+     */
+    pips_user_warning("Effects of call thru functional pointers are ignored\n");
+  }
+  else if(type_statement_p(uet)) {
+    le = NIL;
+  }
+  else {
+    pips_internal_error("Unexpected case\n");
+  }
 
-    pips_debug(2, "end\n");
+  pips_debug(2, "end\n");
 
-    return(le);
+  return(le);
 }
 
 
