@@ -50,6 +50,11 @@ convex_regions_precondition_compose(list l_reg, transformer context)
 	
     MAP(EFFECT, reg,
 	{
+	  /* FI: this leads to problems when the context might become
+	     later empty: there won't be any way to find out; in one
+	     case I do not remember, the IN effects end up wrong;
+	     however, adding descriptors for all scalar references may
+	     slow down the region computation a lot. */
 	    if (! effect_scalar_p(reg) )
 		region_sc_append(reg, sc_context, FALSE);
 

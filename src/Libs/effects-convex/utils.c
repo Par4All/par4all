@@ -388,25 +388,29 @@ Psysteme region_sc_normalize(Psysteme sc_reg, int level)
  */
 void region_sc_append_and_normalize(region reg, Psysteme sc, int level)
 {
-    Psysteme sc_reg;
-    Psysteme copy = sc_dup(sc);
+  Psysteme sc_reg;
+  Psysteme copy = sc_dup(sc);
 
-    /* pips_assert("region context must be defined\n", 
-		!transformer_undefined_p(region_context(reg))); */
+  /* pips_assert("region context must be defined\n", 
+     !transformer_undefined_p(region_context(reg))); */
 
-    sc_reg = region_system(reg);    
+  sc_reg = region_system(reg);    
+  if(!sc_weak_consistent_p(sc_reg)) {
+    pips_debug(8, "Inconsistent region: \n");
+    sc_syst_debug(sc_reg);
     assert(sc_weak_consistent_p(sc_reg));
-    assert(sc_weak_consistent_p(copy));
-    copy = sc_safe_normalize(copy);
-    sc_reg = sc_safe_append(sc_safe_normalize(sc_reg), copy); 
-    assert(sc_weak_consistent_p(sc_reg));
-    if (level!=-1) 
-	sc_reg = region_sc_normalize(sc_reg, level);
-    assert(sc_weak_consistent_p(sc_reg));
+  }
+  assert(sc_weak_consistent_p(copy));
+  copy = sc_safe_normalize(copy);
+  sc_reg = sc_safe_append(sc_safe_normalize(sc_reg), copy); 
+  assert(sc_weak_consistent_p(sc_reg));
+  if (level!=-1) 
+    sc_reg = region_sc_normalize(sc_reg, level);
+  assert(sc_weak_consistent_p(sc_reg));
     
-    sc_rm(copy);
+  sc_rm(copy);
 
-    region_system_(reg) = newgen_Psysteme(sc_reg);      
+  region_system_(reg) = newgen_Psysteme(sc_reg);      
 }
 
 /* void regions_sc_append(list l_reg, Psysteme sc, boolean arrays_only, 
@@ -597,26 +601,41 @@ void array_regions_variable_rename(list l_reg, entity old_entity, entity new_ent
  * input    : a list of regions, and two variables
  * output   : nothing.
  * modifies : the list of regions
- * comment  : in the array reigons of l_reg, the variable old_entity
+ * comment  : in the array regions of l_reg, the variable old_entity
  *            that appears in the predicates is replaced with new_entity.	
  */
 void all_regions_variable_rename(list l_reg, entity old_entity, entity new_entity)
 {
-    MAP(EFFECT, reg, 
-    {
-	Psysteme sc_reg = region_system(reg);
+  MAP(EFFECT, reg, {
+    Psysteme sc_reg = region_system(reg);
       
-	if (!sc_empty_p(sc_reg) && !sc_rn_p(sc_reg))
-	{ 
-	    ifdebug(8){
-		pips_debug(8, "current system: \n");
-		sc_syst_debug(sc_reg);
-	    }
-	    sc_reg = sc_variable_rename(sc_reg, (Variable) old_entity, 
-					(Variable) new_entity);
+    if (!sc_empty_p(sc_reg) && !sc_rn_p(sc_reg)) {
+      Pbase b = sc_base(sc_reg);
+      ifdebug(8){
+	pips_debug(8, "current system: \n");
+	sc_syst_debug(sc_reg);
+      }
+
+      /* FI: I do not know if I'm fixing a bug or if I'm correcting a symptom */
+      /* This is done to ocmpute the OUT regions of the routine
+	 COMPUTE_PD3 in the NAS beanchmark md. (Request Alain Muller) */
+      if(base_contains_variable_p(b, (Variable) new_entity)) {
+	Pbase nb = sc_to_minimal_basis(sc_reg);
+	if(base_contains_variable_p(nb, (Variable) new_entity)) {
+	  /* We are in trouble because we cannot perform a simple renaming */
+	  pips_internal_error("Unexpected renaming\n");
 	}
-	
-    },l_reg);
+	else {
+	  base_rm(b);
+	  sc_base(sc_reg) = nb;
+	  sc_dimension(sc_reg) = base_dimension(nb);
+	}
+      }
+
+      sc_reg = sc_variable_rename(sc_reg, (Variable) old_entity, 
+				    (Variable) new_entity);
+    }
+  },l_reg);
 }
 
 /* void region_value_substitute(region reg, entity e1, entity e2)

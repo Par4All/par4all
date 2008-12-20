@@ -153,12 +153,15 @@ bool
 out_summary_regions(char * module_name)
 {
     bool res;
+
     set_methods_for_convex_effects();
+    init_convex_rw_prettyprint(module_name); // for debugging
     effects_computation_init_func = init_convex_in_out_regions;
     effects_computation_reset_func = reset_convex_in_out_regions;
 
     res =  summary_out_effects_engine(module_name);
     generic_effects_reset_all_methods();
+
     return res;
 }
 
@@ -167,6 +170,7 @@ out_regions(char *module_name)
 {
     bool res;
     set_methods_for_convex_effects();
+    // init_convex_rw_prettyprint(module_name); // FI: added by mistake
     effects_computation_init_func = init_convex_in_out_regions;
     effects_computation_reset_func = reset_convex_in_out_regions;
 
