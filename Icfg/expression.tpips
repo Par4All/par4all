@@ -2,7 +2,7 @@ delete expression
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create expression ${PIPS_ROOT}/Validation/Icfg/expression.f
+create expression expression.f
 
 echo
 echo Basic ICFG file
