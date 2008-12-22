@@ -684,9 +684,9 @@ transformer transformer_range_intersection(transformer tf, transformer r)
   return tf;
 }
 
-static bool varval_value_name_is_inferior_p(Pvecteur * pvarval1, Pvecteur * pvarval2)
+static int varval_value_name_is_inferior_p(Pvecteur * pvarval1, Pvecteur * pvarval2)
 {
-    bool is_inferior = TRUE;
+    int is_inferior = TRUE;
     string s1 = generic_value_name((entity) vecteur_var(*pvarval1));
     string s2 = generic_value_name((entity) vecteur_var(*pvarval2));
     

@@ -37,6 +37,7 @@
 #include "resources.h"
 
 #include "effects-generic.h"
+#include "effects-simple.h"
 
 
 /********************************************************* LOCAL FUNCTIONS */

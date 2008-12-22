@@ -604,7 +604,7 @@ substring_type(int n)
          functional_parameters(ft));
   t = make_type(is_type_functional, ft);
 
-  pips_assert("valid arity", gen_length(functional_parameters(ft))==n);
+  pips_assert("valid arity", (int)gen_length(functional_parameters(ft))==n);
 
   return t;
 }
@@ -629,7 +629,7 @@ assign_substring_type(int n)
          functional_parameters(ft));
   t = make_type(is_type_functional, ft);
 
-  pips_assert("valid arity", gen_length(functional_parameters(ft))==n);
+  pips_assert("valid arity", (int)gen_length(functional_parameters(ft))==n);
 
   return t;
 }

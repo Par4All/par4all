@@ -1322,7 +1322,7 @@ static void add_test_successor(control t, control new_s, bool is_true_successor)
   } , control_successors(t));
 
   if(!slot_found) {
-    if( ((intptr_t)gen_length(control_successors(t))%2) == is_true_successor) {
+    if( ((bool)gen_length(control_successors(t))%2) == is_true_successor) {
       /* Allocate a meaningless control */
       control mlc = make_meaningless_control(CONS(CONTROL, t, NIL), NIL);
       
@@ -1343,7 +1343,7 @@ static void add_test_successor(control t, control new_s, bool is_true_successor)
 	     bool_to_string(slot_found), rank, pos);
 
   pips_assert("The position is consistent with is_true_successor",
-	      pos%2==is_true_successor);
+	      (bool)pos%2 == is_true_successor);
   
   /* t may not be consistent because of the caller
   ifdebug(1) {

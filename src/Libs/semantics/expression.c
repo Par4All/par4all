@@ -278,7 +278,7 @@ transformer any_assign_operation_to_transformer(entity tmp,
 						bool is_internal)
 {
   transformer tf = transformer_undefined;
-  transformer tfe = transformer_undefined;
+  //transformer tfe = transformer_undefined;
   expression lhs = EXPRESSION(CAR(args));
   expression rhs = EXPRESSION(CAR(CDR(args)));
   syntax slhs = expression_syntax(lhs);
@@ -356,7 +356,7 @@ static transformer update_operation_to_transformer(entity v,
 						   bool is_internal)
 {
   transformer tf = transformer_undefined;
-  transformer utf = transformer_undefined;
+  //transformer utf = transformer_undefined;
   entity tmp1 = make_local_temporary_value_entity(entity_type(v));
   entity tmp2 = make_local_temporary_value_entity(entity_type(v));
   /* sub-expressions are not necessarily integer? Then the expression
@@ -947,10 +947,10 @@ affine_increment_to_transformer(entity e, Pvecteur a)
 }
 
 static transformer modulo_to_transformer(entity e, /* assumed to be a value */
-					 expression arg1 __attribute__ ((_unused_)),
+					 expression arg1 __attribute__ ((unused)),
 					 expression arg2,
 					 transformer pre, /* not used yet */
-					 bool is_internal __attribute__ ((_unused_)))
+					 bool is_internal __attribute__ ((unused)))
 {
   transformer tf = transformer_undefined;
 

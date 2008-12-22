@@ -612,7 +612,7 @@ static list find_target_position(list cvl, int ctp, int * pmin_cp, int * pmax_cp
 
     vs = EXPRESSION(CAR(lcvl)); /* Value Set */
 
-    lcvl = POP(lcvl);
+    POP(lcvl);
     *pmin_cp = *pmax_cp+1;
 
     if(expression_call_p(vs)) {

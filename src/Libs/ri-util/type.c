@@ -408,7 +408,9 @@ basic_equal_p(basic b1, basic b2)
 {
     if( basic_typedef_p(b1) )
     {
-        type t1 = ultimate_type( basic_typedef(b1) );
+        type t1 = ultimate_type( entity_type(basic_typedef(b1)) );
+        b1 = variable_basic(type_variable(t1));
+        
     }
     if(b1 == b2)
 	return TRUE;

@@ -37,7 +37,7 @@ static string current_module_name; /* Bad hack to avoid an argument
 
 static bool expression_invariant = FALSE; 
 static set /* of entity */ invariant_entities = set_undefined;
-static set /* of statement */ statements_partialy_invariant = set_undefined;
+//static set /* of statement */ statements_partialy_invariant = set_undefined;
 
 
 /*********************************************************** PRINT FUNCTIONS */
@@ -59,7 +59,7 @@ dump_sef(statement_effects se)
 
 	MAP(EFFECT, e, { 
 	    print_words(stderr, words_effect(e));
-	    fprintf(stderr, "(%X), ", e);
+	    fprintf(stderr, "(%p), ", e);
 	}, effects_effects(e));
 	
 	fprintf(stderr, "\n");

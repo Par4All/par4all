@@ -3,6 +3,7 @@
  */
 
 #include "local.h"
+#include "effects-generic.h"
 
 extern entity current_module_entity;
 

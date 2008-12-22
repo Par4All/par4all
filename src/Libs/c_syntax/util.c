@@ -1505,7 +1505,7 @@ void UseFormalArguments(entity f)
       entity p = ENTITY(CAR(cd));
       string pn = entity_user_name(p);
       entity new_p = entity_undefined;
-      storage ps = entity_storage(p);
+      //storage ps = entity_storage(p);
       //formal pfs = storage_formal(ps);
 
       if(!stack_undefined_p(get_from_entity_type_stack_table(p))) {

@@ -1202,7 +1202,7 @@ update_common_sizes()
     sort_list_of_entities(commons);
 
     MAP(ENTITY, c, {
-	size_t s = common_to_size(c);
+	int s = common_to_size(c);
 	type tc = entity_type(c);
 	area ac = type_area(tc);
 
