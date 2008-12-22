@@ -234,7 +234,7 @@ DisplaySimpleSection(simple_section Dad)
 /*{{{  auxilliary functions */
 /*{{{  GetRefTemp */
 tag 
-GetRefTemp(simple_section Dad, int DimNo)
+GetRefTemp(simple_section Dad, intptr_t DimNo)
 {
   list Rtemp = dad_struct_rtemps(simple_section_dad(Dad));
   tag ret_tag;
@@ -295,7 +295,7 @@ GetBoundary(simple_section Dad, int DimNo, unsigned Low)
 /*{{{  PutBoundryPair */
 /* substitute with new boundary */
 void
-PutBoundPair(simple_section Dad, int DimNo, LinExpr Low, LinExpr Up)
+PutBoundPair(simple_section Dad, intptr_t DimNo, LinExpr Low, LinExpr Up)
 {
   list BoundPair = dad_struct_shape(simple_section_dad(Dad));
 
@@ -310,11 +310,11 @@ PutBoundPair(simple_section Dad, int DimNo, LinExpr Low, LinExpr Up)
     if (bound_pair_index(bp) == DimNo) {
       if (Low != NULL) {
 	  /* check later vect_rm(bound_pair_lb(bp));  */
-	  bound_pair_lb_(bp) = (Pvecteur *) Low;
+	  bound_pair_lb_(bp) = (Pvecteur) Low;
       }
       if (Up != NULL) {
 	  /* check later vect_rm(bound_pair_ub(bp)); */
-	  bound_pair_ub_(bp) = (Pvecteur *) Up;
+	  bound_pair_ub_(bp) = (Pvecteur) Up;
       }
       return;
     }

@@ -372,7 +372,7 @@ effect reg;
     return(t_reg);   
 }
 
-/* cons *words_comp_region(comp_desc Dad)
+/* list words_comp_region(comp_desc Dad)
  * input    : a region.
  * output   : a list of strings representing the region.
  * modifies : nothing.
@@ -380,12 +380,12 @@ effect reg;
  * its output is processed. Also, overflows in relation_to_string() 
  * cannot be prevented. They are checked on return.
  */
-cons *words_comp_region(comp_desc Dad)
+list words_comp_region(comp_desc Dad)
 {
   char buffer[REGION_BUFFER_SIZE];
 
-  unsigned Rank;
-  unsigned int i;
+  int Rank;
+  int i;
   tag RefType;
   list pc = NIL;
 

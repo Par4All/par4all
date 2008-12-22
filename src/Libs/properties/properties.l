@@ -268,7 +268,7 @@ read_properties(void)
 }
 
 static property
-get_property(string name, bool cool)
+get_property(const string name, bool cool)
 {
     property p;
     if (!pl) read_properties(); /* rather lazy... */
@@ -281,7 +281,7 @@ get_property(string name, bool cool)
 }
 
 bool 
-get_bool_property(string name)
+get_bool_property(const string name)
 {
     property p = get_property(name, FALSE);
     if (! property_bool_p(p))
@@ -290,7 +290,7 @@ get_bool_property(string name)
 }
 
 void 
-set_bool_property(string name, bool b)
+set_bool_property(const string name, bool b)
 {
     property p = get_property(name, FALSE);
     if (! property_bool_p(p))
@@ -299,7 +299,7 @@ set_bool_property(string name, bool b)
 }
 
 string 
-get_string_property(string name)
+get_string_property(const string name)
 {
     property p = get_property(name, FALSE);
     if (! property_string_p(p)) 
@@ -308,7 +308,7 @@ get_string_property(string name)
 }
 
 void 
-set_string_property(string name, string s)
+set_string_property(const string name, string s)
 {
     property p = get_property(name, FALSE);
     if (! property_string_p(p))
@@ -318,7 +318,7 @@ set_string_property(string name, string s)
 }
 
 int 
-get_int_property(string name)
+get_int_property(const string name)
 {
     property p = get_property(name, FALSE);
     if (! property_int_p(p)) 
@@ -327,7 +327,7 @@ get_int_property(string name)
 }
 
 void 
-set_int_property(string name, int i)
+set_int_property(const string name, int i)
 {
     property p = get_property(name, FALSE);
     if (! property_int_p(p)) 
@@ -335,7 +335,7 @@ set_int_property(string name, int i)
     property_int(p) = i;
 }
 
-void fprint_property_direct(FILE * fd, string pname)
+void fprint_property_direct(FILE * fd, const string pname)
 {
     property p = get_property(pname, TRUE);
     if (property_undefined_p(p)) 
@@ -358,7 +358,7 @@ void fprint_property_direct(FILE * fd, string pname)
 }
 
 void 
-fprint_property(FILE * fd, string pname)
+fprint_property(FILE * fd, const string pname)
 {
     property p = get_property(pname, TRUE);
     if (property_undefined_p(p)) 

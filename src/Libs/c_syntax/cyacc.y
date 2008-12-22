@@ -103,12 +103,13 @@ extern stack ContextStack;
 extern stack FunctionStack; /* to know in which function the current formal arguments are declared */
 static void PushFunction(entity f)
 {
-  string s = local_name_to_scope(f);
   entity nf = f;
-
+/* SG: this implementations is completely buggy */
+#if 0
+  string s = local_name_to_scope(f); // << SG: passing an entity instead of a string
   if(!empty_scope_p(s)) {
     /* Scoping is not used in function naming, static or not */
-    string nn = entity_name_without_scope(entity_name(f));
+    string nn = entity_name_without_scope(entity_name(f)); // << SG: passing a string instead of entity
 
     nf = find_or_create_entity(nn);
 
@@ -128,7 +129,8 @@ static void PushFunction(entity f)
     /* let's assume that the entity has not been recorded anywhere yet. */
     free_entity(f);
   }
-
+  free(s);
+#endif
   stack_push((char *) nf, FunctionStack);
 }
 

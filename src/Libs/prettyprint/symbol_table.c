@@ -298,7 +298,7 @@ string get_symbol_table(entity m, bool isfortran)
   for(ce=decls; !ENDP(ce); POP(ce)) {
     entity e = ENTITY(CAR(ce));
     type t = entity_type(e);
-    storage s = entity_storage(e);
+    //storage s = entity_storage(e);
 
     pips_debug(8, "Processing entity \"%s\"\n", entity_name(e));
     string_buffer_append(result, strdup(concatenate("\tDeclared entity \"",

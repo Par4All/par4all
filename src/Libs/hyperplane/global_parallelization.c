@@ -23,13 +23,7 @@
 
 #include "hyperplane.h"
 
-static bool 
-select_loop_nest(loop l)
-{
-    return TRUE;
-}
-
-
+static bool always_select() { return TRUE;}
 void global_parallelization(module_name)
 string module_name;
 {
@@ -41,7 +35,7 @@ string module_name;
 	
     debug_on("HYPERPLANE_DEBUG_LEVEL");
 
-    look_for_nested_loop_statements(s, hyperplane, select_loop_nest);
+    look_for_nested_loop_statements(s, hyperplane, always_select);
 
     debug_off();
 
