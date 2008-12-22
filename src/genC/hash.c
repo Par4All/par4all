@@ -43,8 +43,8 @@ struct __hash_table {
   hash_key_type type;                  /* the type of keys... */
   size_t size;                         /* size of actual array */
   size_t n_entry;                      /* number of associations stored */
-  uintptr_t (*rank)(void*, uintptr_t); /* how to compute rank for key */
-  int (*equals)(void*, void*);         /* how to compare keys */
+  uintptr_t (*rank)(const void*, uintptr_t); /* how to compute rank for key */
+  int (*equals)(const void*, const void*);         /* how to compare keys */
   hash_entry *array;                   /* actual array */
   size_t limit;                        /* max entries before reallocation */
 
@@ -74,19 +74,19 @@ struct __hash_table {
  */
 static void hash_enlarge_table(hash_table htp);
 static hash_entry * hash_find_entry(hash_table htp, 
-				    void * key, 
+				    const void * key, 
 				    uintptr_t *prank, 
 				    uintptr_t * stats);
-static string hash_print_key(hash_key_type, void*);
+static string hash_print_key(hash_key_type, const void*);
 
-static int hash_int_equal(int, int);
-static uintptr_t hash_int_rank(void*, size_t);
-static int hash_pointer_equal(void*, void*);
-static uintptr_t hash_pointer_rank(void*, size_t);
-static int hash_string_equal(char*, char*);
-static uintptr_t hash_string_rank(void*, size_t);
-static int hash_chunk_equal(gen_chunk*, gen_chunk*) ;
-static uintptr_t hash_chunk_rank(gen_chunk*, size_t);
+static int hash_int_equal(const int, const int);
+static uintptr_t hash_int_rank(const void*, size_t);
+static int hash_pointer_equal(const void*, const void*);
+static uintptr_t hash_pointer_rank(const void*, size_t);
+static int hash_string_equal(const char*, const char*);
+static uintptr_t hash_string_rank(const void*, size_t);
+static int hash_chunk_equal(const gen_chunk*, const gen_chunk*) ;
+static uintptr_t hash_chunk_rank(const gen_chunk*, size_t);
 
 /* list of the prime numbers from 17 to 2^31-1 
  * used as allocated size
@@ -209,16 +209,16 @@ hash_table hash_table_make(hash_key_type key_type, size_t size)
     switch(key_type)
     {
     case hash_string:
-	htp->equals = (int(*)(void*,void*)) hash_string_equal;
+	htp->equals = (int(*)(const void*,const void*)) hash_string_equal;
 	htp->rank = hash_string_rank;
 	break;
     case hash_int:
-	htp->equals = (int(*)(void*,void*)) hash_int_equal;
+	htp->equals = (int(*)(const void*,const void*)) hash_int_equal;
 	htp->rank = hash_int_rank;
 	break;
     case hash_chunk:
-	htp->equals = (int(*)(void*,void*)) hash_chunk_equal;
-	htp->rank = (uintptr_t (*)(void*, uintptr_t)) hash_chunk_rank;
+	htp->equals = (int(*)(const void*,const void*)) hash_chunk_equal;
+	htp->rank = (uintptr_t (*)(const void*, uintptr_t)) hash_chunk_rank;
 	break;
     case hash_pointer:
 	htp->equals = hash_pointer_equal;
@@ -357,7 +357,7 @@ void * hash_del(hash_table htp, void * key)
    couple whose key is equal to key. the HASH_UNDEFINED_VALUE pointer is
    returned if no such couple exists. otherwise the corresponding value
    is returned. */
-void * hash_get(hash_table htp, void * key)
+void * hash_get(hash_table htp, const void * key)
 {
   hash_entry * hep;
   uintptr_t n;
@@ -527,32 +527,32 @@ hash_enlarge_table(hash_table htp)
  * mais...
  */
 
-static uintptr_t hash_string_rank(void * key, size_t size)
+static uintptr_t hash_string_rank(const void * key, size_t size)
 {
   uintptr_t v = 0;
-  char * s;
+  const char * s;
   for (s = (char*) key; *s; s++)
     /* FC: */ v = ((v<<7) | (v>>25)) ^ *s;
     /* GO: v <<= 2, v += *s; */
   return v % size;
 }
 
-static uintptr_t hash_int_rank(void * key, size_t size)
+static uintptr_t hash_int_rank(const void * key, size_t size)
 {
   return RANK(key, size);
 }
 
-static uintptr_t hash_pointer_rank(void * key, size_t size)
+static uintptr_t hash_pointer_rank(const void * key, size_t size)
 {
   return RANK(key, size);
 }
 
-static uintptr_t hash_chunk_rank(gen_chunk * key, size_t size)
+static uintptr_t hash_chunk_rank(const gen_chunk * key, size_t size)
 {
   return RANK(key->i, size);
 }
 
-static int hash_string_equal(char * key1, char * key2)
+static int hash_string_equal(const char * key1, const char * key2)
 {
   if (key1==key2)
     return TRUE;
@@ -563,22 +563,22 @@ static int hash_string_equal(char * key1, char * key2)
   return *key1==*key2;
 }
 
-static int hash_int_equal(int key1, int key2)
+static int hash_int_equal(const int key1, const int key2)
 {
   return key1 == key2;
 }
 
-static int hash_pointer_equal(void * key1, void * key2)
+static int hash_pointer_equal(const void * key1, const void * key2)
 {
   return key1 == key2;
 }
 
-static int hash_chunk_equal(gen_chunk * key1, gen_chunk * key2)
+static int hash_chunk_equal(const gen_chunk * key1, const gen_chunk * key2)
 {
   return key1->p == key2->p;
 }
 
-static char * hash_print_key(hash_key_type t, void * key)
+static char * hash_print_key(hash_key_type t, const void * key)
 {
   static char buffer[32]; /* even 8 byte pointer => ~16 chars */
 
@@ -616,7 +616,7 @@ static int inc_prime_list[] = {
  */
 static hash_entry *
 hash_find_entry(hash_table htp,
-		void * key,
+		const void * key,
 		uintptr_t *prank,
 		uintptr_t * stats)
 {

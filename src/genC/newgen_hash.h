@@ -77,7 +77,7 @@ extern void hash_warn_on_redefinition GEN_PROTO((void));
 extern void hash_dont_warn_on_redefinition GEN_PROTO((void));
 extern void * hash_delget GEN_PROTO((hash_table, void *, void **));
 extern void * hash_del GEN_PROTO((hash_table, void *));
-extern void * hash_get GEN_PROTO((hash_table, void *));
+extern void * hash_get GEN_PROTO((hash_table, const void *));
 extern bool hash_defined_p GEN_PROTO((hash_table, void *));
 extern void hash_put GEN_PROTO((hash_table, void *, void *));
 extern void hash_table_clear GEN_PROTO((hash_table));
