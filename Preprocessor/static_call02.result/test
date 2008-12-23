@@ -84,10 +84,10 @@ Variable list:
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
 	Declared entity "TOP-LEVEL:foo" with type "functional" "int -> void"
 	Declared entity "bar:*DYNAMIC*" with type "area" with size 0
+	Declared entity "bar:*HEAP*" with type "area" with size 0
 	Declared entity "bar:*STACK*" with type "area" with size 0
 	Declared entity "bar:*STATIC*" with type "area" with size 0
 	Declared entity "bar:i" with type "variable" "int"
-	Declared entity "foo!:*HEAP*" with type "area" with size 0
 	Declared entity "foo!:*STATIC*" with type "area" with size 0
 
 * empty extern declaration list *
@@ -107,15 +107,15 @@ Layout for memory area "bar:*DYNAMIC*" of size 0:
 	* empty area *
 
 
+Layout for memory area "bar:*HEAP*" of size 0:
+	* empty area *
+
+
 Layout for memory area "bar:*STACK*" of size 0:
 	* empty area *
 
 
 Layout for memory area "bar:*STATIC*" of size 0:
-	* empty area *
-
-
-Layout for memory area "foo!:*HEAP*" of size 0:
 	* empty area *
 
 
@@ -171,9 +171,9 @@ Declarations for module "foo" with type "int -> void"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
-	Declared entity "bar!:*HEAP*" with type "area" with size 0
 	Declared entity "bar!:*STATIC*" with type "area" with size 0
 	Declared entity "foo:*DYNAMIC*" with type "area" with size 0
+	Declared entity "foo:*HEAP*" with type "area" with size 0
 	Declared entity "foo:*STACK*" with type "area" with size 0
 	Declared entity "foo:*STATIC*" with type "area" with size 0
 	Declared entity "foo:i" with type "variable" "int"
@@ -191,15 +191,15 @@ Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for memory area "bar!:*HEAP*" of size 0:
-	* empty area *
-
-
 Layout for memory area "bar!:*STATIC*" of size 0:
 	* empty area *
 
 
 Layout for memory area "foo:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "foo:*HEAP*" of size 0:
 	* empty area *
 
 
@@ -260,9 +260,9 @@ Declarations for module "foo!foo" with type "int -> void"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
-	Declared entity "foo!:*HEAP*" with type "area" with size 0
 	Declared entity "foo!:*STATIC*" with type "area" with size 0
 	Declared entity "foo!foo:*DYNAMIC*" with type "area" with size 8
+	Declared entity "foo!foo:*HEAP*" with type "area" with size 0
 	Declared entity "foo!foo:*STACK*" with type "area" with size 0
 	Declared entity "foo!foo:*STATIC*" with type "area" with size 0
 	Declared entity "foo!foo:0`foo" with type "variable" "int"
@@ -282,10 +282,6 @@ Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for memory area "foo!:*HEAP*" of size 0:
-	* empty area *
-
-
 Layout for memory area "foo!:*STATIC*" of size 0:
 	* empty area *
 
@@ -293,6 +289,10 @@ Layout for memory area "foo!:*STATIC*" of size 0:
 Layout for memory area "foo!foo:*DYNAMIC*" of size 8:
 	Variable "foo!foo:0`foo"	offset = 0	size = 4
 	Variable "foo!foo:0`p"	offset = 4	size = 4
+
+
+Layout for memory area "foo!foo:*HEAP*" of size 0:
+	* empty area *
 
 
 Layout for memory area "foo!foo:*STACK*" of size 0:
@@ -314,13 +314,18 @@ Variable list:
 	Declared entity "TOP-LEVEL:bar" with type "functional" "int -> void"
 	Declared entity "TOP-LEVEL:foo" with type "functional" "int -> void"
 	Declared entity "main:*DYNAMIC*" with type "area" with size 0
+	Declared entity "main:*HEAP*" with type "area" with size 0
 	Declared entity "main:*STACK*" with type "area" with size 0
 	Declared entity "main:*STATIC*" with type "area" with size 0
-	Declared entity "static_call02!:*HEAP*" with type "area" with size 0
+	Declared entity "main:main" with type "variable" "int"
 	Declared entity "static_call02!:*STATIC*" with type "area" with size 0
 
 * empty extern declaration list *
 
+
+Layout for return variable:
+
+	Variable "main:main"	size = 4
 
 Layouts for memory areas:
 
@@ -332,15 +337,15 @@ Layout for memory area "main:*DYNAMIC*" of size 0:
 	* empty area *
 
 
+Layout for memory area "main:*HEAP*" of size 0:
+	* empty area *
+
+
 Layout for memory area "main:*STACK*" of size 0:
 	* empty area *
 
 
 Layout for memory area "main:*STATIC*" of size 0:
-	* empty area *
-
-
-Layout for memory area "static_call02!:*HEAP*" of size 0:
 	* empty area *
 
 
