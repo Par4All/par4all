@@ -2032,7 +2032,9 @@ bool simplify_C_expression(expression e)
       type rt = entity_type(re);
 
       if(type_undefined_p(rt)) {
-	/* FI: see block_scope12.c */
+	/* FI: see C_syntax/block_scope12.c. The source code line
+	   number where the problem occurs cannot be given because we
+	   are not in the c_syntax library. */
 	pips_user_warning("Variable \"%s\" is probably used before it is defined\n",
 			  entity_user_name(re));
 	can_be_substituted_p = FALSE;
