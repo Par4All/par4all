@@ -432,11 +432,13 @@ static void in_effects_of_loop(loop l)
 	     */
 	    
 	    /* computation of W(i') */     
-	    /* i' is here an integer scalar variable */
-	    i_prime = entity_to_intermediate_value(i);
-	    (*effects_descriptors_variable_change_func)
+	    /* i' is here an integer scalar value */
+	    if (get_descriptor_range_p()) {
+	      i_prime = entity_to_intermediate_value(i);
+	      (*effects_descriptors_variable_change_func)
 		(global_write, i, i_prime);
-	    	    	    
+	    }
+
 	    ifdebug(4){
 		pips_debug(4, "W(i')= \n");
 		(*effects_prettyprint_func)(global_write);
