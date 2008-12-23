@@ -1172,7 +1172,7 @@ generic_proper_effects_of_syntax(syntax s)
 	break;
       case is_syntax_va_arg: {
 	list al = syntax_va_arg(s);
-	sizeofexpression ae = make_sizeofexpression_expression(EXPRESSION(CAR(al)));
+	sizeofexpression ae = SIZEOFEXPRESSION(CAR(al));
 	le = generic_proper_effects_of_expression(sizeofexpression_expression(ae));
 	break;
       }
