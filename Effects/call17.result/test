@@ -1,0 +1,24 @@
+void call17(int *x)
+{
+   int *y = x;
+   y[0] = 1;
+}
+
+Proper effects for "call17"
+
+void call17(int *x)
+{
+   int *y = x;
+//               <must be written>: y[0]
+   y[0] = 1;
+}
+
+Cumulated effects for "call17"
+
+//               <must be written>: x[0]
+void call17(int *x)
+{
+   int *y = x;
+//               <must be written>: y[0]
+   y[0] = 1;
+}

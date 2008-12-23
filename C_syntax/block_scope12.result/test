@@ -104,3 +104,6 @@ static int block_scope12()
    return foo(x);
 }
 
+Check warnings
+
+C_PARSER[block_scope12!block_scope12] (simplify_C_expression) Variable "x" is probably used before it is defined

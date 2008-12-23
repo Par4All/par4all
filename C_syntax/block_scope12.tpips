@@ -40,8 +40,16 @@ echo
 
 display PRINTED_FILE[block_scope12!block_scope12]
 
+
+echo
+echo Check warnings
+echo
+
+# The warnins are not fully accessible before the database is closed:
 close
 
-delete block_scope12
+shell /bin/cat block_scope12.database/Warnings
 
+#delete block_scope12
 
+quit

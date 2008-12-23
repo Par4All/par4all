@@ -1,0 +1,40 @@
+delete lhs06
+
+setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create lhs06 lhs06.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+echo
+echo Parsed printed file for "lhs06"
+echo
+
+display PARSED_PRINTED_FILE[lhs06]
+
+close
+open lhs06
+
+echo
+echo Proper effects for "lhs06"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[lhs06]
+
+echo
+echo Cumulated effects for "lhs06"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[lhs06]
+
+close
+delete lhs06
+quit
