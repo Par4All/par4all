@@ -2021,7 +2021,7 @@ expression substitute_entity_in_expression(entity old, entity new, expression e)
 bool simplify_C_expression(expression e)
 {
   syntax s = expression_syntax(e);
-  bool   can_be_substituted_p = FALSE;
+  bool can_be_substituted_p = FALSE;
 
   pips_debug(9, "Begin\n");
   
@@ -2030,19 +2030,29 @@ bool simplify_C_expression(expression e)
     {
       entity re = reference_variable(syntax_reference(s));
       type rt = entity_type(re);
-      basic bt = basic_undefined;
 
-      if(type_variable_p(rt)) { /* FI: What if not? core dump? */
-	bt = variable_basic(type_variable(rt));
+      if(type_undefined_p(rt)) {
+	/* FI: see block_scope12.c */
+	pips_user_warning("Variable \"%s\" is probably used before it is defined\n",
+			  entity_user_name(re));
+	can_be_substituted_p = FALSE;
+      }
+      else {
+	basic bt = basic_undefined;
 
-	can_be_substituted_p =
-	  basic_int_p(bt)
-	  || basic_float_p(bt) 
-	  || basic_overloaded_p(bt) /* Might be wrong, but necessary */
-	  || basic_complex_p(bt); /* Should not occur in C */
+	if(type_variable_p(rt)) { /* FI: What if not? core dump? */
+	  bt = variable_basic(type_variable(rt));
 
-	pips_debug(9, "Variable %s is an arithmetic variable: %s\n",
-		   entity_local_name(re), bool_to_string(can_be_substituted_p));
+	  can_be_substituted_p =
+	    basic_int_p(bt)
+	    || basic_float_p(bt) 
+	    || basic_overloaded_p(bt) /* Might be wrong, but necessary */
+	    || basic_complex_p(bt) /* Should not occur in old C code */
+	    || basic_logical_p(bt); /* Should not occur in old C code */
+
+	  pips_debug(9, "Variable %s is an arithmetic variable: %s\n",
+		     entity_local_name(re), bool_to_string(can_be_substituted_p));
+	}
       }
       break; /* FI: The index expressions should be simplified too... */
     }
