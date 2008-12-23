@@ -1,0 +1,17 @@
+delete use_def_elim01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create use_def_elim01 use_def_elim01.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+display PRINTED_FILE[use_def_elim]
+apply USE_DEF_ELIMINATION[use_def_elim]
+display PRINTED_FILE[use_def_elim]
+close
+delete use_def_elim01
+quit
+
