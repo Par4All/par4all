@@ -189,10 +189,15 @@ statement st ;
 	if(!instruction_block_p(statement_instruction(st))) {
 	    MAPL( peffects, {
 		effect e = EFFECT( CAR( peffects )) ;
-	      
-		if( action_write_p( effect_action( e )) &&
-		   approximation_must_p( effect_approximation( e ))) {
-		    add_entity_to_defs( effect_entity( e ), st );
+
+		if(fortran_compatible_effect_p(e)) {
+		  if( action_write_p( effect_action( e )) &&
+		      approximation_must_p( effect_approximation( e ))) {
+		    add_entity_to_defs(effect_entity(e) , st );
+		  }
+		}
+		else {
+		  pips_user_warning("Non-Fortran effects are ignored\n");
 		}
 	    }, load_statement_effects(st) ) ;
 	}
@@ -348,12 +353,15 @@ statement st ;
 		    
 	if(action_write_p( a ) &&
 	   approximation_must_p( effect_approximation( e ))) {
-	    reference r = effect_reference( e ) ;
+
+	  if(fortran_compatible_effect_p(e)) {
+	    reference r = effect_any_reference( e ) ;
 
 	    kill_statement(kill, 
 			   st, 
 			   reference_variable( r ),
 			   reference_indices( r )) ;
+	  }
 	}
 	does_write |= action_write_p( a ) ;
 	does_read |= action_read_p( a ) ;
@@ -425,7 +433,9 @@ statement st ;
     statement b = loop_body( l ) ;
     set gen = GEN( st ) ;
     set ref = REF( st ) ;
-    cons *locals = loop_locals( l ) ;
+    list llocals = loop_locals( l ) ;
+    list slocals = statement_declarations(st);
+    list locals = gen_nconc(gen_copy_seq(llocals), gen_copy_seq(slocals));
 
     genkill_statement( b ) ;
 
@@ -439,6 +449,7 @@ statement st ;
 	mask_effects( gen, locals ) ;
 	mask_effects( ref, locals ) ;
     }
+    gen_free_list(locals);
 }
 
 static void genkill_whileloop( l, st )
@@ -448,12 +459,17 @@ statement st ;
     statement b = whileloop_body( l ) ;
     set gen = GEN( st ) ;
     set ref = REF( st ) ;
+    list locals = statement_declarations(st);
 
     genkill_statement( b ) ;
     
     set_union( gen, gen,  GEN( b )) ;
     set_union( ref, ref, REF( b )) ;
    
+    if( get_bool_property( "CHAINS_MASK_EFFECTS" )) {
+	mask_effects( gen, locals ) ;
+	mask_effects( ref, locals ) ;
+    }
 }
 
 

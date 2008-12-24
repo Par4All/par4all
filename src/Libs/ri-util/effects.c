@@ -297,6 +297,24 @@ bool store_independent_effect_p(effect eff)
   return independent_p;
 }
 
+/* FI: I use this predicate to guard the use-def chains computation */
+bool fortran_compatible_effect_p(effect e)
+{
+  bool compatible_p = FALSE;
+  reference r = effect_any_reference(e);
+  entity v = reference_variable(r);
+  type ut = ultimate_type(entity_type(v));
+  addressing ad = effect_addressing(e);
+  list ind = reference_indices(effect_any_reference(e));
+
+  /* Basically, this is about a Fortran effect... */
+  if(addressing_index_p(ad) && (!pointer_type_p(ut) || ENDP(ind))) {
+    compatible_p = TRUE;
+  }
+
+  return compatible_p;
+}
+
 
 /* Two effects interfere if one of them modify the set of locations
    defined by the other one. For instance, an index or a pointer may
