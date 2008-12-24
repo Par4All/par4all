@@ -321,6 +321,7 @@ bool controlize(
     bool controlize_list(), controlize_test(), controlize_loop(),
 	controlize_whileloop(), controlize_call();
     bool controlized = FALSE;
+    control n_succ = control_undefined; // To be used in case of goto
 
     ifdebug(5) {
 	pips_debug(1, 
@@ -381,15 +382,15 @@ bool controlize(
         statement_declarations(nop) = statement_declarations(st);
         statement_decls_text(nop) = statement_decls_text(st);
 
-	succ = get_label_control(name);
+	n_succ = get_label_control(name);
 	/* Memory leak in CONS(CONTROL, pred, NIL). Also forgot to
            unlink the predecessor of the former successor of pred. RK */
 	/* control_successors(pred) = ADD_SUCC(c_res, pred); */
 	add_proper_successor_to_predecessor(pred, c_res);
 	UPDATE_CONTROL(c_res, nop, 
 		       CONS(CONTROL, pred, NIL), 
-		       ADD_SUCC(succ, c_res )) ;
-	control_predecessors(succ) = ADD_PRED(c_res, succ);
+		       ADD_SUCC(n_succ, c_res )) ;
+	control_predecessors(n_succ) = ADD_PRED(c_res, n_succ);
 	/* I do not know why, but my following code does not work. So
            I put back former one above... :-( RK. */
 #if 0
@@ -398,7 +399,7 @@ bool controlize(
 	if (gen_length(control_successors(pred)) == 1)
 	    unlink_2_control_nodes(pred, CONTROL(CAR(control_successors(pred))));
 	link_2_control_nodes(pred, c_res);
-	link_2_control_nodes(c_res, succ);
+	link_2_control_nodes(c_res, n_succ);
 	/* Hmmm... A memory leak on the previous statement of c_res? */
 	control_statement(c_res) = nop;
 #endif
@@ -444,7 +445,10 @@ bool controlize(
 	}
 	*/
 	check_control_coherency(pred);
-	check_control_coherency(succ);
+	if(control_undefined_p(n_succ))
+	  check_control_coherency(succ);
+	else
+	  check_control_coherency(n_succ);
 	check_control_coherency(c_res);
     }
     
