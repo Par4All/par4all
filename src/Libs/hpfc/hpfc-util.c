@@ -179,12 +179,10 @@ int the_tag;
     loop x = loop_undefined;
     string c = statement_comments(stat);
     statement new_s;
-/* temporary for block->sequence transition
- */
-#ifdef is_instruction_sequence 
+
     if (the_tag==is_instruction_sequence)
-	x = make_sequence(NIL);
-#endif
+        x = make_sequence(NIL);
+
 
     new_s = make_statement(statement_label(stat),
 			   STATEMENT_NUMBER_UNDEFINED,
