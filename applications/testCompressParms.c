@@ -317,13 +317,13 @@ int test_Constraints_fullDimensionize(Matrix * A, Matrix * B,
     show_matrix(parmVL);
     show_matrix(VLInv);
   }
-  srandom(nbSamples);
+  srand(nbSamples);
   value_init(mod);
   value_init(div);
   for (i = 0; i< nbSamples; i++) {
     /* create a random sample */
     for (j=0; j< nbOrigParms; j++) {
-      value_set_si(sample->p[0][j], random()%100);
+      value_set_si(sample->p[0][j], rand()%100);
     }
     /* compute the corresponding value for the full-dimensional
        constraints */
