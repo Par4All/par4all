@@ -364,16 +364,16 @@ void Vector_Oppose(Value *p1, Value *p2, unsigned len)
 /* 
  * Return the inner product of the two Vectors 'p1' and 'p2' 
  */
-void Inner_Product(Value *p1,Value *p2,unsigned length,Value *ip) {
-  
+void Inner_Product(Value *p1, Value *p2, unsigned length, Value *ip)
+{
   int i;
 
-  value_multiply(*ip,*p1,*p2);
-  p1++; p2++;
-  for(i=1;i<length;i++) {
-    value_addmul(*ip, *p1, *p2);
-    p1++; p2++;
-  }
+  if (length != 0)
+    value_multiply(*ip, p1[0], p2[0]);
+  else
+    value_set_si(*ip, 0);
+  for(i = 1; i < length; i++)
+    value_addmul(*ip, p1[i], p2[i]);
 } /* Inner_Product */
 
 /* 
