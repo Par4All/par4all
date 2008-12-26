@@ -218,7 +218,7 @@ static void generate_make(
 		newgen_type_name_close(dlp->domain));
       break;
     case OR_OP:
-      fprintf(header, "intptr_t, void *");
+      fprintf(header, "enum %s_utype, void *", name);
       break;
     case ARROW_OP:
       fprintf(header, "void");
@@ -251,7 +251,7 @@ static void generate_make(
 		newgen_type_name_close(dlp->domain), i);
       break;
     case OR_OP:
-      fprintf(code, "intptr_t tag, void * val");
+      fprintf(code, "enum %s_utype tag, void * val", name);
       break;
     case ARROW_OP:
       fprintf(code, "void");
@@ -359,9 +359,9 @@ static void generate_struct_members(
 
   if (domain_type==CONSTRUCTED_DT && operator==OR_OP) {
     fprintf(out,
-	    "  %s _%s_tag__;\n"
+	    "  enum %s_utype _%s_tag__;\n"
 	    "  union {\n",
-	    int_type(), bp->name);
+	    bp->name, bp->name);
     offset = "  ";
   }
 
@@ -391,6 +391,30 @@ static void generate_struct_members(
   fprintf(out, "};\n\n");
 }
 
+static void generate_union_type_descriptor(
+  FILE * out,
+  struct gen_binding * bp,
+  int domain_type,
+  int operator)
+{
+  union domain * dom = bp->domain;
+  struct domainlist * dlp;
+  string name=bp->name;
+
+  if (domain_type==CONSTRUCTED_DT &&
+      operator==OR_OP && dom->co.components!=NULL)
+  {
+    fprintf(out,"enum %s_utype {\n", name);
+    for (dlp=dom->co.components; dlp!=NULL; dlp=dlp->cdr) {
+      string field = dlp->domain->ba.constructor;
+      fprintf(out,
+	      "is_%s_%s%s\n",
+	      name, field, (dlp->cdr == NULL)? "": ",");
+    }
+    fprintf(out,"};\n");
+  }
+}
+
 /* access to members are managed thru macros.
  * cannot be functions because assign would not be possible.
  * it would be better to avoid having field names that appear twice...
@@ -405,7 +429,6 @@ static void generate_access_members(
   struct domainlist * dlp;
   bool in_between;
   string name=bp->name;
-  int gen_current_tag = 0; /* tag numbers? */
 
   fprintf(out,
 	  "#define %s_domain_number(x) ((x)->_type_%s)\n",
@@ -433,31 +456,29 @@ static void generate_access_members(
 	    name, dom->ba.constructor);
 
   if (domain_type==CONSTRUCTED_DT && operator!=ARROW_OP) {
-    for (dlp=dom->co.components; dlp!=NULL; dlp=dlp->cdr) {
-      char c;
-      if (operator==OR_OP) {
-	string field = dlp->domain->ba.constructor;
-	fprintf(out,
-		"#define is_%s_%s (%d)\n"
-		"#define %s_%s_p(x) (%s_tag(x)==is_%s_%s)\n",
-		name, field, gen_current_tag++,
-		name, field, name, name, field);
-      }
 
       /* accesses... */
-      fprintf(out,
-	      "#define %s_%s_(x) %s_%s(x) /* old hack compatible */\n"
-	      "#define %s_%s(x) ((x)->",
-	      name, dlp->domain->ba.constructor,
-	      name, dlp->domain->ba.constructor,
-	      name, dlp->domain->ba.constructor);
-      if (in_between) fprintf(out, "_%s_union_.", name);
-      fprintf(out, "_%s_%s_" FIELD, name, dlp->domain->ba.constructor);
-      c = newgen_access_name(dlp->domain);
-      if (c && !inline_directly(dlp->domain))
-	fprintf(out, ".%c", c);
-      fprintf(out, ")\n");
-    }
+      for (dlp=dom->co.components; dlp!=NULL; dlp=dlp->cdr) {
+          char c;
+          if(operator==OR_OP) {
+              string field = dlp->domain->ba.constructor;
+              fprintf(out,
+                      "#define %s_%s_p(x) (%s_tag(x)==is_%s_%s)\n",
+                      name, field, name, name, field);
+          }
+          fprintf(out,
+                  "#define %s_%s_(x) %s_%s(x) /* old hack compatible */\n"
+                  "#define %s_%s(x) ((x)->",
+                  name, dlp->domain->ba.constructor,
+                  name, dlp->domain->ba.constructor,
+                  name, dlp->domain->ba.constructor);
+          if (in_between) fprintf(out, "_%s_union_.", name);
+          fprintf(out, "_%s_%s_" FIELD, name, dlp->domain->ba.constructor);
+          c = newgen_access_name(dlp->domain);
+          if (c && !inline_directly(dlp->domain))
+              fprintf(out, ".%c", c);
+          fprintf(out, ")\n");
+      }
   }
 }
 
@@ -469,6 +490,7 @@ static void generate_constructed(
   struct gen_binding * bp,
   int operator)
 {
+  generate_union_type_descriptor(header, bp, CONSTRUCTED_DT, operator);
   generate_make(header, code, bp, CONSTRUCTED_DT, operator);
   fprintf(header, "\n");
   generate_struct_members(header, bp, CONSTRUCTED_DT, operator);
