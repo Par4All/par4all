@@ -6,10 +6,10 @@ static int block_scope13()
   {
     int x = 7;
   lab1: fprintf(stdout, "%d\n",x);
-    x++;
+  //x++;
   }
   {
-    int x = -1;
+    //int x = -1;
     goto lab1;
   }
   return x;

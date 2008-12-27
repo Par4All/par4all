@@ -33,5 +33,5 @@ echo
 
 shell diff try1.database/TRY/TRY.dg try2.database/TRY/TRY.dg
 
-delete try1
-delete try2
+# delete try1
+# delete try2
