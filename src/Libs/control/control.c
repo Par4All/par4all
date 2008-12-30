@@ -85,6 +85,22 @@ char * k;
 }
 
 
+/* FI -> PJ:
+ *
+ * The naming for ADD_PRED et ADD_SUCC is misleading. ADD_SUCC is in
+ * fact a SET_SUCC.  ADD_PRED is UNION_PRED. When used to Newgen but
+ * not to control, ADD_SUCC reduces readability.
+ *
+ * Furthermore, ADD_SUCC() is dangerous when used on a control that is
+ * a test since the position in the successor list is
+ * significant. TRUE successors are in the odd positions (the first
+ * element is of rank one). FALSE successors are in the odd position.
+ *
+ * Also pushnew() does not push anything. And it could be implemented
+ * by "return gen_once((void *) x, l)"
+ *
+ */
+
 /* PUSHNEW pushes a control X on the list L if it's not here. */
 
 static cons * pushnew(x, l)
@@ -100,11 +116,17 @@ cons *l;
 
 /* Add control "pred" to the predecessor set of control c */
 #define ADD_PRED(pred,c) (pushnew(pred,control_predecessors(c)))
-/* Make a one element list from succ */
+
+/* Make a one element list from succ. */
 #define ADD_SUCC(succ,c) (CONS(CONTROL, succ, NIL))
+
 /* Update control c by setting its statement to s, by unioning its predecessor
  * set with pd, and by setting its successor set to sc (i.e. previous successors
  * are lost, but not previous predecessors).
+ *
+ * Note: This macro does not preserve the consistency of the control
+ * flow graph as pd's successor list and sc predecessor list are not
+ * updated.
  */
 #define UPDATE_CONTROL(c,s,pd,sc) { \
 	control_statement(c)=s; \
@@ -383,6 +405,18 @@ bool controlize(
         statement_decls_text(nop) = statement_decls_text(st);
 
 	n_succ = get_label_control(name);
+
+	ifdebug(5) {
+	  pips_debug(1, "CFG consistency check before goto controlization."
+		     " Control \"pred\" %p:\n", pred);
+	  display_linked_control_nodes(pred);
+	  pips_debug(1, "Control \"n_succ\" %p:\n", n_succ);
+	  display_linked_control_nodes(n_succ);
+	  check_control_coherency(pred);
+	  check_control_coherency(n_succ);
+	  check_control_coherency(c_res);
+	}
+
 	/* Memory leak in CONS(CONTROL, pred, NIL). Also forgot to
            unlink the predecessor of the former successor of pred. RK */
 	/* control_successors(pred) = ADD_SUCC(c_res, pred); */
@@ -438,7 +472,7 @@ bool controlize(
 	pips_debug(1, "Resulting Control c_res %p at exit:\n", c_res);
 	display_linked_control_nodes(c_res);
 	fprintf(stderr, "---\n");
-	/* The declarations may be preserved at a lower leve
+	/* The declarations may be preserved at a lower level
 	if(!ENDP(statement_declarations(st))
 	   && ENDP(statement_declarations(control_statement(c_res)))) {
 	  pips_internal_error("Lost local declarations\n");
@@ -1343,15 +1377,22 @@ compact_list(list ctls,
    The trick is to keep a list of the controls to compact them latter. Note
    that if a statement is controlized, then the predecessor has to be
    computed (i.e. is not the previous control on STS).; this is the purpose
-   of c_in. */
+   of c_in.
 
-cons * controlize_list_1(sts, pred, succ, c_res, used_labels)
-cons *sts;
-control pred, succ;
-control c_res;
-hash_table used_labels;
+   This function used to update its formal parameters pred and c_res, which
+   makes stack visualization and debugging difficult.
+ */
+
+list controlize_list_1(list sts,
+		       control i_pred,
+		       control i_succ,
+		       control i_c_res,
+		       hash_table used_labels)
 {
-    cons *ctls = NIL;
+  list ctls = NIL;
+  control pred = i_pred;
+  control succ = i_succ;
+  control c_res = i_c_res;
 
     for(; !ENDP(sts); sts = CDR(sts)) {
 	statement st = STATEMENT(CAR(sts));
@@ -1369,6 +1410,7 @@ hash_table used_labels;
 	ifdebug(1) {
 	    check_control_coherency(pred);
 	    check_control_coherency(succ);
+	    check_control_coherency(c_next);
 	    check_control_coherency(c_res);
 	}
     
@@ -1397,7 +1439,16 @@ hash_table used_labels;
 	}
 	c_res = c_next ; 
     }
+
     ifdebug(1) {
+      /* The consistency check should be applied to all elements in
+	 ctls. Let's hope all controls in ctls are linked one way or
+	 the other. */
+      control c = CONTROL(CAR(ctls));
+	pips_debug(5, "Nodes from c %p\n", c);
+	display_linked_control_nodes(c);
+	check_control_coherency(c);
+
 	check_control_coherency(pred);
 	check_control_coherency(succ);
 	check_control_coherency(c_res);

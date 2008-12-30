@@ -164,6 +164,7 @@ check_control_coherency(control c)
 {
     list blocs = NIL;
     int i1, i2;
+    set stmts = set_make(set_pointer);
 
     CONTROL_MAP(ctl, {
 
@@ -208,7 +209,18 @@ check_control_coherency(control c)
 		    pips_assert("Control is correct", consistent_p);
 	    }
 	}, control_predecessors(ctl));
+
+	/* Check that two nodes do not point towards the same
+	   statement as this makes label resolution ambiguous */
+	if(set_belong_p(stmts, control_statement(ctl))) {
+	  fprintf(stderr, "Statement %p is pointed by two different control nodes\n");
+	  pips_assert("each statement appears in at most one control node", FALSE);
+	}
+	else
+	  stmts = set_add_element(stmts, stmts, (void *) control_statement(ctl));
     }, c, blocs);
+
+    set_free(stmts);
     gen_free_list(blocs);  
 }
 
@@ -224,25 +236,35 @@ display_address_of_control_nodes(list cs)
 }
 
 
-/* Display all the control nodes from c for debugging purpose: */
-void
-display_linked_control_nodes(control c) {
-    list blocs = NIL;
-    CONTROL_MAP(ctl, {
-	fprintf(stderr, "%p (pred (#%zd)=", ctl,
-		gen_length(control_predecessors(ctl)));
-	display_address_of_control_nodes(control_predecessors(ctl));
-	fprintf(stderr, " succ (#%zd)=", gen_length(control_successors(ctl)));
-	display_address_of_control_nodes(control_successors(ctl));
-	fprintf(stderr, "), ");
-	ifdebug(8) {
-	  fprintf(stderr, "\n");
-	    pips_debug(0, "Statement %p of control %p:\n", control_statement(ctl), ctl);
-	    safe_print_statement(control_statement(ctl));
-	}
-    }, c, blocs);
-    gen_free_list(blocs);
-    fprintf(stderr, "---\n");
+/* Display all the control nodes eeached or reachable from c for debugging purpose: */
+void display_linked_control_nodes(control c)
+{
+  list blocs = NIL;
+  set stmts = set_make(set_pointer);
+
+  CONTROL_MAP(ctl, {
+    fprintf(stderr, "%p (pred (#%zd)=", ctl,
+	    gen_length(control_predecessors(ctl)));
+    display_address_of_control_nodes(control_predecessors(ctl));
+    fprintf(stderr, " succ (#%zd)=", gen_length(control_successors(ctl)));
+    display_address_of_control_nodes(control_successors(ctl));
+    fprintf(stderr, "), ");
+    ifdebug(8) {
+      fprintf(stderr, "\n");
+      pips_debug(0, "Statement %p of control %p:\n", control_statement(ctl), ctl);
+      safe_print_statement(control_statement(ctl));
+    }
+    if(set_belong_p(stmts, control_statement(ctl))) {
+      fprintf(stderr, "Statement %p is pointed by two different control nodes\n",
+	      control_statement(ctl));
+    }
+    else
+      stmts = set_add_element(stmts, stmts, (void *) control_statement(ctl));
+  }, c, blocs);
+  gen_free_list(blocs);
+  set_free(stmts);
+
+  fprintf(stderr, "---\n");
 }
 
 
