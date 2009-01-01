@@ -408,7 +408,7 @@ static void generate_union_type_descriptor(
     for (dlp=dom->co.components; dlp!=NULL; dlp=dlp->cdr) {
       string field = dlp->domain->ba.constructor;
       fprintf(out,
-	      "is_%s_%s%s\n",
+	      "  is_%s_%s%s\n",
 	      name, field, (dlp->cdr == NULL)? "": ",");
     }
     fprintf(out,"};\n");
@@ -679,18 +679,20 @@ generate_domain(
     fprintf(code,
 	    "/* %s\n */\n"
 	    "%s copy_%s(%s p) {\n"
-	    "  return (%s) gen_copy_tree((gen_chunk*)p);\n"
+	    "  return (%s) gen_copy_tree((gen_chunk*) p);\n"
 	    "}\n"
 	    "void free_%s(%s p) {\n"
-	    "  gen_free((gen_chunk*)p);}\n"
+	    "  gen_free((gen_chunk*) p);\n"
+	    "}\n"
 	    "%s check_%s(%s p) {\n"
-	    "  return (%s) gen_check((gen_chunk*)p, %s_domain);\n"
+	    "  return (%s) gen_check((gen_chunk*) p, %s_domain);\n"
 	    "}\n"
 	    "bool %s_consistent_p(%s p) {\n"
-	    "  check_%s(p); return gen_consistent_p((gen_chunk*)p);\n"
+	    "  check_%s(p);\n"
+	    "  return gen_consistent_p((gen_chunk*) p);\n"
 	    "}\n"
 	    "bool %s_defined_p(%s p) {\n"
-	    "  return gen_defined_p((gen_chunk*)p);\n"
+	    "  return gen_defined_p((gen_chunk*) p);\n"
 	    "}\n"
 	    "list gen_%s_cons(%s p, list l) {\n"
 	    "  return gen_typed_cons(%s_NEWGEN_DOMAIN, p, l);\n"
@@ -713,13 +715,13 @@ generate_domain(
 	      name, /* write */
 	      name /* read */);
       fprintf(code,
-	      "%s gen_find_%s(char * s) {\n"
+	      "%s gen_find_%s(char* s) {\n"
 	      "  return (%s) gen_find_tabulated(s, %s_domain);\n"
 	      "}\n"
-	      "void write_tabulated_%s(FILE * f) {\n"
+	      "void write_tabulated_%s(FILE* f) {\n"
 	      "  (void) gen_write_tabulated(f, %s_domain);\n"
 	      "}\n"
-	      "void read_tabulated_%s(FILE * f) {\n"
+	      "void read_tabulated_%s(FILE* f) {\n"
 	      "  int domain = gen_read_tabulated(f, 0);\n"
 	      "  if (domain!=%s_domain) {\n"
 	      "    fprintf(stderr, " DomainNumberError ",\n"
@@ -734,15 +736,15 @@ generate_domain(
     else {
       /* NOT tabulated */
       fprintf(header,
-	      "extern void write_%s(FILE *, %s);\n"
-	      "extern %s read_%s(FILE *);\n",
+	      "extern void write_%s(FILE*, %s);\n"
+	      "extern %s read_%s(FILE*);\n",
 	      name, name, /* write */
 	      name, name /* read */);
       fprintf(code,
-	      "void write_%s(FILE * f, %s p) {\n"
-	      "  gen_write(f, (gen_chunk *) p);\n"
+	      "void write_%s(FILE* f, %s p) {\n"
+	      "  gen_write(f, (gen_chunk*) p);\n"
 	      "}\n"
-	      "%s read_%s(FILE * f) {\n"
+	      "%s read_%s(FILE* f) {\n"
 	      "  return (%s) gen_read(f);\n"
 	      "}\n",
 	      name, name, /* write */
