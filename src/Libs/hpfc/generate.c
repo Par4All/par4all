@@ -1,32 +1,32 @@
-/* 
+/*
  * $Id$
- * 
+ *
  * Fabien Coelho, May 1993
  */
 
 #include "defines-local.h"
-#include "bootstrap.h" 
+#include "bootstrap.h"
 
 /* ??? this should work (but that is not the case yet),
- * with every call with no write to distributed arrays. 
+ * with every call with no write to distributed arrays.
  *
  * these conditions are to be verifyed, by calculating
- * the proper effects of the statement. 
+ * the proper effects of the statement.
  *
- * to be corrected later on. 
+ * to be corrected later on.
  */
-void generate_c1_beta(stat, lhp, lnp) 
-statement stat; 
-list *lhp, *lnp; 
-{ 
+void generate_c1_beta(stat, lhp, lnp)
+statement stat;
+list *lhp, *lnp;
+{
     statement staths, statns;
-    expression w; 
-    call the_call; 
+    expression w;
+    call the_call;
     list lreftodistarray = NIL;
-    
+
     (*lhp) = NIL;
     (*lnp) = NIL;
-    
+
     pips_assert("call", statement_call_p(stat));
 
     the_call = instruction_call(statement_instruction(stat));
@@ -34,9 +34,9 @@ list *lhp, *lnp;
     /* this shouldn't be necessary
      */
     pips_assert("assignment", ENTITY_ASSIGN_P(call_function(the_call)));
-    
+
     w = EXPRESSION(CAR(call_arguments(the_call)));
-    
+
     pips_assert("reference",
 		syntax_reference_p(expression_syntax(w)) &&
 	    (!array_distributed_p
@@ -44,39 +44,39 @@ list *lhp, *lnp;
 
     /* references to distributed arrays:
      * w(A(I)) = B(I)
-     * so the whole list is to be considered. 
+     * so the whole list is to be considered.
      */
     lreftodistarray = FindRefToDistArrayFromList(call_arguments(the_call));
 
-    /* generation of the code 
-     */ 
+    /* generation of the code
+     */
     MAP(SYNTAX, s,
-     { 	 
-	 list lhost; 	 
+     {
+	 list lhost;
 	 list lnode;
- 	 	
-	 pips_debug(8, "considering reference to %s\n", 	
+
+	 pips_debug(8, "considering reference to %s\n",
 	       entity_name(reference_variable(syntax_reference(s))));
 
 	 generate_read_of_ref_for_all(s, &lhost, &lnode);
 
-	 (*lhp) = gen_nconc((*lhp), lhost); 	
+	 (*lhp) = gen_nconc((*lhp), lhost);
 	 (*lnp) = gen_nconc((*lnp), lnode);
-     }, 
+     },
 	 lreftodistarray);
 
     /*
      * then updated statements are to be added to both host and nodes:
      */
 
-    staths = make_stmt_of_instr(make_instruction 			
-			  (is_instruction_call, 			
+    staths = make_stmt_of_instr(make_instruction
+			  (is_instruction_call,
 			   make_call(call_function(the_call),
 				     lUpdateExpr(host_module,
 						 call_arguments(the_call)))));
 
-    statns = make_stmt_of_instr(make_instruction 			
-			  (is_instruction_call, 			
+    statns = make_stmt_of_instr(make_instruction
+			  (is_instruction_call,
 			   make_call(call_function(the_call),
 				     lUpdateExpr(node_module,
 						 call_arguments(the_call)))));
@@ -87,7 +87,7 @@ list *lhp, *lnp;
     (*lhp) = gen_nconc((*lhp), CONS(STATEMENT, staths, NIL));
     (*lnp) = gen_nconc((*lnp), CONS(STATEMENT, statns, NIL));
 
-    gen_free_list(lreftodistarray); 
+    gen_free_list(lreftodistarray);
 }
 
 
@@ -115,7 +115,7 @@ list *lhp, *lnp;
 
     (*lhp) = NIL;
     (*lnp) = NIL;
-    
+
     pips_assert("call", statement_call_p(stat));
 
     the_call = instruction_call(statement_instruction(stat));
@@ -124,28 +124,28 @@ list *lhp, *lnp;
     writtenexpr = EXPRESSION(CAR(call_arguments(the_call)));
     pips_assert("reference",
 		syntax_reference_p(expression_syntax(writtenexpr)) &&
-	   (array_distributed_p 		
+	   (array_distributed_p
 	    (reference_variable
 	     (syntax_reference(expression_syntax(writtenexpr))))));
-    
-    /* read references to distributed arrays. 
+
+    /* read references to distributed arrays.
      */
     lreadreftodistarray =
 	FindRefToDistArray(EXPRESSION(CAR(CDR(call_arguments(the_call)))));
 
-    /* generation of the code to get the necessary values... 
+    /* generation of the code to get the necessary values...
      */
-    MAP(SYNTAX, s, 
-    { 	 
+    MAP(SYNTAX, s,
+    {
 	list lnotcomp;
 	list lcomp;
-	
-	pips_debug(8, "considering reference to %s\n",  	
+
+	pips_debug(8, "considering reference to %s\n",
 	      entity_name(reference_variable(syntax_reference(s))));
-	
+
 	generate_read_of_ref_for_computer(s, &lcomp, &lnotcomp);
-	
-	lstatcomp = gen_nconc(lstatcomp, lcomp); 	
+
+	lstatcomp = gen_nconc(lstatcomp, lcomp);
 	lstatnotcomp = gen_nconc(lstatnotcomp, lnotcomp);
     },
 	lreadreftodistarray);
@@ -161,15 +161,15 @@ list *lhp, *lnp;
     newreadexpr = UpdateExpressionForModule
 	(node_module, EXPRESSION(CAR(CDR(call_arguments(the_call)))));
 
-    statcomputation = 
-	make_assign_statement(reference_to_expression(newref), 
+    statcomputation =
+	make_assign_statement(reference_to_expression(newref),
 			      newreadexpr);
 
     lstatcomp = gen_nconc(lstatcomp, lstat);
     lstatcomp = gen_nconc(lstatcomp, CONS(STATEMENT, statcomputation, NIL));
 
     /* Update the values of the defined distributed variable
-     * if necessary... 
+     * if necessary...
      */
     generate_update_values_on_nodes(ref, newref, &lupdatecomp, &lupdatenotcomp);
 
@@ -200,7 +200,7 @@ list *lhp, *lnp;
 void generate_update_values_on_nodes(ref, newref, lscompp, lsnotcompp)
 reference ref, newref;
 list *lscompp, *lsnotcompp;
-{ 
+{
     entity array = reference_variable(ref);
 
     if (replicated_p(array))
@@ -221,7 +221,7 @@ list *lscompp, *lsnotcompp;
  	statco2 = st_compute_current_owners(ref);
 	statsndtoon = st_send_to_other_owners(newref);
 	generate_compute_local_indices(ref, &lstat, &linds);
- 	statrcvfromcomp = 
+ 	statrcvfromcomp =
 	    st_receive_from_computer(make_reference(reference_variable(newref),
 						    linds));
 	statif = st_make_nice_test(condition_ownerp(),
@@ -230,16 +230,16 @@ list *lscompp, *lsnotcompp;
 						  statrcvfromcomp,
 						  NIL)),
 				   NIL);
-	
+
 	(*lscompp) = CONS(STATEMENT, statco2,
 		     CONS(STATEMENT, statsndtoon,
 			  NIL));
 	(*lsnotcompp) = CONS(STATEMENT, statco,
 			CONS(STATEMENT, statif,
 			     NIL));
-    } 
+    }
     else
-    { 
+    {
 	(*lscompp) = NIL;
 	(*lsnotcompp) = NIL;
     }
@@ -247,7 +247,7 @@ list *lscompp, *lsnotcompp;
 
 /* generate_read_of_ref_for_computer
  *
- * en cours d'adaptation... 
+ * en cours d'adaptation...
  */
 void generate_read_of_ref_for_computer(s, lcompp, lnotcompp)
 syntax s;
@@ -257,7 +257,7 @@ list *lcompp, *lnotcompp;
     reference ref = syntax_reference(s);
     entity tempn,
  	var = reference_variable(ref),
-	temp = make_new_scalar_variable(get_current_module_entity(), 
+	temp = make_new_scalar_variable(get_current_module_entity(),
 				    entity_basic(var));
 
     pips_assert("distributed array", array_distributed_p(var));
@@ -268,27 +268,27 @@ list *lcompp, *lnotcompp;
     statcompco = st_compute_current_owners(ref);
     statcompgv = st_get_value_for_computer(ref, make_reference(tempn, NIL));
 
-    (*lcompp) = CONS(STATEMENT, statcompco, 
+    (*lcompp) = CONS(STATEMENT, statcompco,
 		CONS(STATEMENT, statcompgv, NIL));
 
     statnotcompco = st_compute_current_owners(ref);
     statnotcompmaysend = st_send_to_computer_if_necessary(ref);
 
 
-    (*lnotcompp) = 
-	CONS(STATEMENT, statnotcompco, 
+    (*lnotcompp) =
+	CONS(STATEMENT, statnotcompco,
 	CONS(STATEMENT, statnotcompmaysend,
 	     NIL));
 
     /* the new variable is inserted in the expression...
      */
-    syntax_reference(s) = make_reference(temp, NIL); 
+    syntax_reference(s) = make_reference(temp, NIL);
 }
 
 /* generate_read_of_ref_for_all
  *
  * this function organise the read of the given reference
- * for all the nodes, and for host. 
+ * for all the nodes, and for host.
  */
 void generate_read_of_ref_for_all(s, lhp, lnp)
 syntax s;
@@ -298,13 +298,13 @@ list *lhp, *lnp;
     reference ref = syntax_reference(s);
     entity temph, tempn,
 	var = reference_variable(ref),
-	temp = make_new_scalar_variable(get_current_module_entity(), 
+	temp = make_new_scalar_variable(get_current_module_entity(),
 				    entity_basic(var));
 
     pips_assert("distributed array", array_distributed_p(var));
-    
+
     AddEntityToHostAndNodeModules(temp);
-    temph = load_new_host(temp); 
+    temph = load_new_host(temp);
     tempn = load_new_node(temp);
 
     /* the receive statement is built for host:
@@ -327,20 +327,20 @@ list *lhp, *lnp;
     DEBUG_STAT(9, entity_name(host_module), stathrcv);
 
     /* the code for node is built, in order that temp has the
-     * wanted value. 
+     * wanted value.
      *
      * COMPUTE_CURRENT_OWNERS(ref)
      * IF OWNERP(ME)
      * THEN
      *   local_ref = COMPUTE_LOCAL(ref)
      *   temp = (local_ref)
-     *   IF SENDERP(ME) // this protection in case of replicated arrays. 
+     *   IF SENDERP(ME) // this protection in case of replicated arrays.
      *   THEN
      *       SENDTOHOST(temp)
      *   SENDTONODE(ALL-OWNERS,temp)
      *   ENDIF
      * ELSE
-     *   temp = RECEIVEFROM(SENDER(...)) 
+     *   temp = RECEIVEFROM(SENDER(...))
      * ENDIF
      */
     statnco = st_compute_current_owners(ref);
@@ -351,7 +351,7 @@ list *lhp, *lnp;
     DEBUG_STAT(9, entity_name(node_module), statnco);
     DEBUG_STAT(9, entity_name(node_module), statngv);
 
-    /* the new variable is inserted in the expression... 
+    /* the new variable is inserted in the expression...
      */
     syntax_reference(s) = make_reference(temp, NIL);
 }
@@ -360,13 +360,13 @@ list *lhp, *lnp;
  *
  * this function generate the list of statement necessary to compute
  * the local indices of the given reference. It gives back the new list
- * of indices for the reference. 
+ * of indices for the reference.
  */
 void generate_compute_local_indices(ref, lsp, lindsp)
 reference ref;
-list *lsp, *lindsp; 
-{ 
-    int i; 
+list *lsp, *lindsp;
+{
+    int i;
     entity array = reference_variable(ref);
     list inds = reference_indices(ref);
 
@@ -377,30 +377,30 @@ list *lsp, *lindsp;
     pips_debug(9, "number of dimensions of %s to compute: %d\n",
 	  entity_name(array), NumberOfDimension(array));
 
-    for(i=1; i<=NumberOfDimension(array); i++, inds = CDR(inds)) 
+    for(i=1; i<=NumberOfDimension(array); i++, inds = CDR(inds))
     {
 	if (local_index_is_different_p(array, i))
 	{
 	    syntax s;
-	    statement stat = st_compute_ith_local_index(array, i, 
+	    statement stat = st_compute_ith_local_index(array, i,
 					      EXPRESSION(CAR(inds)), &s);
-	    
+
 	    DEBUG_STAT(9, entity_name(node_module), stat);
-	    
+
 	    (*lsp) = gen_nconc((*lsp), CONS(STATEMENT, stat, NIL));
 	    (*lindsp) =
-		gen_nconc((*lindsp), CONS(EXPRESSION, 
+		gen_nconc((*lindsp), CONS(EXPRESSION,
 			   make_expression(s, normalized_undefined), NIL));
 	}
 	else
 	{
-	    expression expr = 
+	    expression expr =
 		UpdateExpressionForModule(node_module, EXPRESSION(CAR(inds)));
 
 	    (*lindsp) =
-		gen_nconc((*lindsp),  		
+		gen_nconc((*lindsp),
 			  CONS(EXPRESSION, expr, NIL));
-	} 
+	}
     }
 
     pips_debug(8, "result:\n");
@@ -410,26 +410,26 @@ list *lsp, *lindsp;
 
 /* generate_get_value_locally
  *
- * put the local value of ref in the variable local. 
+ * put the local value of ref in the variable local.
  *
  * for every indexes, if necessary, compute
  * the local value of the indices, by calling
  * RTR support function LOCAL_INDEX(array_number, dimension)
  * then the assignment is performed.
  *
- * tempi = LOCAL_INDEX(array_number, dimension, indexi) ... 
- * goal = ref_local(tempi...) 
+ * tempi = LOCAL_INDEX(array_number, dimension, indexi) ...
+ * goal = ref_local(tempi...)
  */
 void generate_get_value_locally(ref, goal, lstatp)
 reference ref, goal;
 list *lstatp;
-{ 
+{
     statement stat;
     expression expr;
     entity array = reference_variable(ref),
  	   newarray = load_new_node(array);
     list ls = NIL, newinds = NIL;
-    
+
     pips_assert("distributed array", array_distributed_p(array));
 
     generate_compute_local_indices(ref, &ls, &newinds);
@@ -448,38 +448,38 @@ list *lstatp;
 void generate_send_to_computer(ref, lstatp)
 reference ref;
 list *lstatp;
-{ 
+{
     statement statsnd;
-    entity 
+    entity
 	array = reference_variable(ref),
  	newarray = load_new_node(array);
     list ls = NIL, newinds = NIL;
-    
+
     pips_assert("distributed array", array_distributed_p(array));
 
     generate_compute_local_indices(ref, &ls, &newinds);
     statsnd = st_send_to_computer(make_reference(newarray, newinds));
 
     DEBUG_STAT(9, entity_name(node_module), statsnd);
-    
+
     (*lstatp) = gen_nconc(ls, CONS(STATEMENT, statsnd, NIL));
 }
 
 void generate_receive_from_computer(ref, lstatp)
-reference ref; 
+reference ref;
 list *lstatp;
 {
     statement statrcv;
-    entity 
-	array = reference_variable(ref), 
+    entity
+	array = reference_variable(ref),
  	newarray = load_new_node(array);
     list ls = NIL, newinds = NIL;
-    
+
     pips_assert("distributed array", array_distributed_p(array));
 
     generate_compute_local_indices(ref, &ls, &newinds);
     statrcv = st_receive_from_computer(make_reference(newarray, newinds));
-    
+
     DEBUG_STAT(9, entity_name(node_module), statrcv);
 
     (*lstatp) = gen_nconc(ls, CONS(STATEMENT, statrcv, NIL));
@@ -490,7 +490,7 @@ statement body;
 list *lstatp, lw, lr;
 {
     statement statcc, statbody;
-    list lcomp = NIL, lcompr = NIL, lcompw = NIL, 
+    list lcomp = NIL, lcompr = NIL, lcompw = NIL,
         lnotcomp = NIL, lnotcompr = NIL, lnotcompw = NIL;
     syntax comp;
 
@@ -510,7 +510,7 @@ list *lstatp, lw, lr;
 	 generate_read_of_ref_for_computer(s, &lco, &lnotco);
 
 	 lcompr = gen_nconc(lcompr, lco);
-	 lnotcompr = gen_nconc(lnotcompr, lnotco);	 
+	 lnotcompr = gen_nconc(lnotcompr, lnotco);
      },
 	 lr);
 
@@ -536,16 +536,16 @@ list *lstatp, lw, lr;
 	     entity newarray = load_new_node(var);
 
 	     generate_compute_local_indices(r, &lstat, &linds);
-	     lstat = 
+	     lstat =
 		 gen_nconc
 		     (lstat,
 		      CONS(STATEMENT,
 			   make_assign_statement
-			     (reference_to_expression(make_reference(newarray, 
+			     (reference_to_expression(make_reference(newarray,
 								     linds)),
 			      entity_to_expression(tempn)),
 			   NIL));
-									      
+
 	     generate_update_values_on_nodes
 		 (r, make_reference(tempn, NIL), &lco, &lnotco);
 
@@ -556,7 +556,7 @@ list *lstatp, lw, lr;
 	     generate_update_values_on_computer_and_nodes
 		 (r, make_reference(tempn, NIL), &lco, &lnotco);
 	 }
-	 
+
 	 lcompw = gen_nconc(lcompw, lco);
 	 lnotcompw = gen_nconc(lnotcompw, lnotco);
 
@@ -611,7 +611,7 @@ list *lstatp, lw, lr;
 void generate_update_values_on_computer_and_nodes(ref, val, lscompp, lsnotcompp)
 reference ref, val;
 list *lscompp, *lsnotcompp;
-{ 
+{
     entity
 	array = reference_variable(ref),
 	newarray = load_new_node(array);
@@ -619,16 +619,16 @@ list *lscompp, *lsnotcompp;
 	statif, statcompif, statco, statcompco, statcompassign,
 	statsndtoO, statsndtoOO, statrcvfromcomp;
     list lstat, lstatcomp, linds, lindscomp;
-    
+
     /* all values have to be updated...
      */
     statcompco = st_compute_current_owners(ref);
     generate_compute_local_indices(ref, &lstatcomp, &lindscomp);
 
-    statcompassign = 
+    statcompassign =
 	make_assign_statement
 	    (reference_to_expression(make_reference(newarray, lindscomp)),
-	     reference_to_expression(val));   
+	     reference_to_expression(val));
 
     if (replicated_p(array))
     {
@@ -650,14 +650,14 @@ list *lscompp, *lsnotcompp;
 
     statco = st_compute_current_owners(ref);
     generate_compute_local_indices(ref, &lstat, &linds);
-    statrcvfromcomp = 
+    statrcvfromcomp =
 	st_receive_from_computer(make_reference(newarray,linds));
     statif = st_make_nice_test(condition_ownerp(),
 			       gen_nconc(lstat, CONS(STATEMENT, statrcvfromcomp,
 						     NIL)),
 			       NIL);
-    
-    (*lscompp) = CONS(STATEMENT, statcompco, 
+
+    (*lscompp) = CONS(STATEMENT, statcompco,
 		 CONS(STATEMENT, statcompif, NIL));
     (*lsnotcompp) = CONS(STATEMENT, statco,
 		    CONS(STATEMENT, statif, NIL));
@@ -680,7 +680,7 @@ list *lhstatp, *lnstatp;
     array    = reference_variable(r);
     newarray = load_new_node(array);
 
-    temp     = make_new_scalar_variable(get_current_module_entity(), 
+    temp     = make_new_scalar_variable(get_current_module_entity(),
 				    entity_basic(array));
 
     AddEntityToHostAndNodeModules(temp);
@@ -692,11 +692,11 @@ list *lhstatp, *lnstatp;
 			      gen_nconc(lnstat,
 					CONS(STATEMENT, stnrcv, NIL)),
 			      NIL);
-    
+
     /* call the necessary communication function
      */
 
-    sthsnd = (replicated_p(array) ? 
+    sthsnd = (replicated_p(array) ?
 	      st_send_to_owners(make_reference(temph, NIL)) :
 	      st_send_to_owner(make_reference(temph, NIL))) ;
 
@@ -712,31 +712,29 @@ list *lhstatp, *lnstatp;
 
 /* generate_update_private_value_from_host
  */
-void generate_update_private_value_from_host(s, lhstatp, lnstatp)
-syntax s;
-list *lhstatp, *lnstatp;
+void generate_update_private_value_from_host
+  (syntax s, list* lhstatp, list* lnstatp)
 {
-    entity
-	var  = reference_variable(syntax_reference(s)),
-	varn = load_new_node(var),
-	varh = load_new_host(var);
-    
-    pips_assert("not distributed reference",
-		!array_distributed_p(reference_variable(syntax_reference(s))));
+  entity
+    var  = reference_variable(syntax_reference(s)),
+    varn = load_new_node(var),
+    varh = load_new_host(var);
 
-    (*lhstatp) = CONS(STATEMENT,
-		      st_host_send_to_all_nodes(make_reference(varh, NIL)),
-		      NIL);
+  pips_assert("not distributed reference",
+	      !array_distributed_p(reference_variable(syntax_reference(s))));
 
-    (*lnstatp) = CONS(STATEMENT,
-		      st_receive_mcast_from_host(make_reference(varn, NIL)),
-		      NIL);
+  (*lhstatp) = CONS(STATEMENT,
+		    st_host_send_to_all_nodes(make_reference(varh, NIL)),
+		    NIL);
+
+  (*lnstatp) = CONS(STATEMENT,
+		    st_receive_mcast_from_host(make_reference(varn, NIL)),
+		    NIL);
 }
 
 /************************************************************** STATEMENTS */
 
-statement st_get_value_locally_and_send(ref,goal) 
-reference ref,goal;
+statement st_get_value_locally_and_send(reference ref, reference goal)
 {
     list ls=NIL;
 
@@ -749,17 +747,17 @@ reference ref,goal;
 
 
 /* the returned expression is translated into variables
- * of the node module. 
- */ 
+ * of the node module.
+ */
 statement st_compute_ith_local_index(array, i, expr, sp)
-entity array; 
-int i; 
-expression expr; 
-syntax *sp; 
-{ 
+entity array;
+int i;
+expression expr;
+syntax *sp;
+{
     /* the necessity is not checked, but it could be done,
      * looking that the new declaration of the given array
-     * is smaller or not on the given dimension... 
+     * is smaller or not on the given dimension...
      */
 
     entity temp = make_new_scalar_variable(node_module,
@@ -772,7 +770,7 @@ syntax *sp;
  	(make_assign_instruction
 	 (reference_to_expression(make_reference(temp, NIL)),
 	  expr_compute_local_index(array,
-				   i, 			
+				   i,
 				   UpdateExpressionForModule(node_module,
 							     expr))));
 
@@ -780,7 +778,7 @@ syntax *sp;
 }
 
 statement st_send_to_host_and_nodes(ref,val)
-reference ref,val; 
+reference ref,val;
 {
     if(replicated_p(reference_variable(ref)))
  	return(st_make_nice_test(condition_senderp(),
@@ -789,17 +787,16 @@ reference ref,val;
 				      NIL),
 				 NIL));
     else
-	return(st_send_to_host_and_all_nodes(val));
+	return st_send_to_host_and_all_nodes(val);
 }
 
-statement st_send_to_computer_if_necessary(ref)
-reference ref; 
+statement st_send_to_computer_if_necessary(reference ref)
 {
     entity
  	array = reference_variable(ref),
 	newarray = load_new_node(array);
     expression
-	condition=((replicated_p(array))? 
+	condition=((replicated_p(array))?
 		   (MakeBinaryCall
 		    (entity_intrinsic(AND_OPERATOR_NAME),
 		     condition_senderp(),
@@ -808,18 +805,17 @@ reference ref;
     list lstat = NIL, lnewinds = NIL;
 
     generate_compute_local_indices(ref, &lstat, &lnewinds);
-    
-    return(st_make_nice_test(condition,
-			     gen_nconc(lstat,
-				       CONS(STATEMENT,
-					    st_send_to_computer(make_reference(newarray,
-									       lnewinds)),
-					    NIL)),
-			     NIL));
+
+    return
+      st_make_nice_test(condition,
+	gen_nconc(lstat,
+	  CONS(STATEMENT,
+	       st_send_to_computer(make_reference(newarray, lnewinds)),
+	       NIL)),
+			NIL));
 }
 
-statement st_get_value_for_all(ref,goal)
-reference ref, goal;
+statement st_get_value_for_all(reference ref, reference goal)
 {
     return
 	st_make_nice_test(condition_ownerp(),
@@ -831,18 +827,16 @@ statement st_get_value_for_computer(ref,goal)
 reference ref, goal;
 {
     list ltrue=NIL, lfalse=NIL;
-
     generate_get_value_locally(ref,goal,&ltrue);
     lfalse=CONS(STATEMENT,st_receive_from_sender(goal),NIL);
-
-    return(st_make_nice_test(condition_ownerp(),ltrue,lfalse));
+    return st_make_nice_test(condition_ownerp(),ltrue,lfalse);
 }
 
 /* if ref is replicated:
- * goal = Receive_From_Sender() 
+ * goal = Receive_From_Sender()
  *
  * if ref is not replicated
- * goal = Receive_Multi_Cast_From_Sender() 
+ * goal = Receive_Multi_Cast_From_Sender()
  */
 statement st_receive_from(ref,goal)
 reference ref,goal;
