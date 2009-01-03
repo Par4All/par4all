@@ -69,7 +69,7 @@ void fprint_entity_list(FILE *fp, list l);
      (control_successors(unstructured_control(u)) == NIL))
 
 #define entity_functional(e) (type_functional(entity_type(e)))
-	    
+
 #define update_functional_as_model(e, model) \
     free_functional(entity_functional(e)), \
     entity_functional(e) = copy_functional(entity_functional(model));
@@ -409,7 +409,7 @@ void fprint_entity_list(FILE *fp, list l);
  */
 #define NO_FILE (strdup(""))
 
-/* File suffixes 
+/* File suffixes
  */
 
 #define HOST_SUFFIX	"_host.f"
