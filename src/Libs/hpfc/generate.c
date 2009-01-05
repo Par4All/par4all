@@ -812,7 +812,7 @@ statement st_send_to_computer_if_necessary(reference ref)
 	  CONS(STATEMENT,
 	       st_send_to_computer(make_reference(newarray, lnewinds)),
 	       NIL)),
-			NIL));
+			NIL);
 }
 
 statement st_get_value_for_all(reference ref, reference goal)
