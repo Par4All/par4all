@@ -46,14 +46,6 @@ static set the_useful_statements;
 static hash_table statements_use_def_dependence;
 
 
-static bool
-use_def_true_filter(statement s)
-{
-   /* Go down: */
-   return TRUE;
-}
-
-
 /* Define a static stack and related functions to remember the current
    statement for build_statement_to_statement_father_mapping(): */
 DEFINE_LOCAL_STACK(current_statement, statement)
@@ -234,7 +226,8 @@ free_statement_to_statement_dependence_mapping()
             statements_use_def_dependence);
 }
 
-
+/* unused */
+#if 0 
 static void
 mark_this_node_and_its_predecessors_in_the_dg_as_useful(set s,
                                                         vertex v)
@@ -274,6 +267,7 @@ mark_this_node_and_its_predecessors_in_the_dg_as_useful(set s,
        },
           vertex_successors(v));
 }
+#endif
 
 
 static void
@@ -351,7 +345,7 @@ propagate_the_usefulness_through_the_predecessor_graph()
    ifdebug(5)
       fprintf(stderr, "Entering propagate_the_usefulness_through_the_predecessor_graph\n");
    
-   gen_set_closure((void (*)(char *, set)) iterate_through_the_predecessor_graph,
+   gen_set_closure((void (*)(void *, set)) iterate_through_the_predecessor_graph,
                    the_useful_statements);
 
    ifdebug(5)
@@ -450,7 +444,7 @@ remove_all_the_non_marked_statements(statement s)
    gen_recurse(s, statement_domain,
                /* Since statements can be nested, only remove in a
                   bottom-up way: */
-               use_def_true_filter,
+               gen_true,
                remove_this_statement_if_useless);
 
    ifdebug(5)
@@ -473,7 +467,7 @@ use_def_elimination_on_a_statement(statement s)
 
    /* Mark as useful the seed statements: */
    gen_recurse(s, statement_domain,
-               use_def_true_filter,
+               gen_true,
                use_def_deal_if_useful);
 
    /* Propagate the usefulness through all the predecessor graph: */
