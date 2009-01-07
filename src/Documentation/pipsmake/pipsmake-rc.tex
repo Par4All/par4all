@@ -4475,7 +4475,31 @@ It should be followed by a call to \verb+UNSPAGHETTIFY+ and \verb+SUPPRESS_DEAD_
 inlining      > MODULE.code
         < PROGRAM.entities
         < ALL.code
+        < MODULE.cumulated_effects
         < MODULE.callers
+\end{verbatim}
+%%%%%%%%%%
+
+\subsection{Unfolding}
+\label{subsection-unfolding}
+
+%%@UserManualDocumentation: unfolding
+This documentation is a work in progress, as well as the documented topic.
+
+
+Unfolding is a complementary transformation of inlining~\ref{subsection-inlining}.
+While inlining inlines all calls to a module in other modules, unfolding inline all calls in a module.
+Thus unfolding the content of the module.
+
+
+%%!UserManualDocumentation
+\begin{verbatim}
+
+unfolding      > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.cumulated_effects
+        < ALL.code
 \end{verbatim}
 
 %-----------End of Expression Transformations -------------------------

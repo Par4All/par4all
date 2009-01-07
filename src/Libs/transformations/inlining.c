@@ -396,3 +396,7 @@ inlining(char * module_name)
    /* Should have worked: */
    return TRUE;
 }
+bool unfolding(char*module_name)
+{
+    return true;
+}
