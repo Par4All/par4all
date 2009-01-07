@@ -20,7 +20,6 @@ echo Code after inlining
 echo
 
 apply INLINING[inlining02!pmax]
-display PRINTED_FILE[inlining02!pmax]
 display PRINTED_FILE[main]
 
 echo

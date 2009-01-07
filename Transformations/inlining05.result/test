@@ -3,13 +3,13 @@ Initial code
 
 static int pmax(int a, int b)
 {
-   int c = (a>b?a:b);
-   printf("%d\n", c);
-   return c;
+   int argc = (a>b?a:b);
+   return argc;
 }
 int main(int argc, char **argv)
 {
-   pmax(2, argc);
+   int c;
+   c = pmax(2, argc);
    return 0;
 }
 
@@ -18,13 +18,13 @@ Code after inlining
 int main(int argc, char **argv)
 {
    int pmax0;
+   int c;
    {
-      int c = (2>argc?2:argc);
-      printf("%d\n", c);
-      pmax0 = c;
+      int argc_ = (2>argc?2:argc);
+      pmax0 = argc_;
 l99998:      ;
    }
-   pmax0;
+   c = pmax0;
    return 0;
 }
 

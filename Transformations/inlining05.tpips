@@ -1,8 +1,8 @@
-delete inlining03
+delete inlining05
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create inlining03 inlining03.c
+create inlining05 inlining05.c
 
 activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE
@@ -12,14 +12,14 @@ echo
 echo Initial code
 echo
 
-display PRINTED_FILE[inlining03!pmax]
+display PRINTED_FILE[inlining05!pmax]
 display PRINTED_FILE[main]
 
 echo
 echo Code after inlining
 echo
 
-apply INLINING[inlining03!pmax]
+apply INLINING[inlining05!pmax]
 display PRINTED_FILE[main]
 
 echo
@@ -27,10 +27,10 @@ echo Unsplit resulting code
 echo
 
 apply UNSPLIT
-# shell $(PIPS_CC) -c inlining03.database/Src/inlining03.c
-shell gcc -c inlining03.database/Src/inlining03.c
+# shell $(PIPS_CC) -c inlining05.database/Src/inlining05.c
+shell gcc -c inlining05.database/Src/inlining05.c
 
 close
-delete inlining03
+delete inlining05
 quit
 

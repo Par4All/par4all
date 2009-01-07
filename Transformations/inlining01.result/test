@@ -16,23 +16,13 @@ int main(int argc, char **argv)
 
 Code after inlining
 
-static void pmax(int a, int b)
-{
-   if (a>b) 
-      return;
-   printf("%d\n", (a>b?a:b));
-}
 int main(int argc, char **argv)
 {
    int d = 0;
-   {
-      int a = 2;
-      int b = argc;
-      if (a>b) 
-         return;
-      printf("%d\n", (a>b?a:b));
-l99998:      ;
-   }
+   if (2>argc)
+      goto l99998;
+   printf("%d\n", (2>argc?2:argc));
+l99998:   ;
    return d;
 }
 
