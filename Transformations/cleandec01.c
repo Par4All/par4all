@@ -1,7 +1,8 @@
+#include<stdio.h>
 void c_clean_declarations01(int x)
 {
     /* Hide the formal parameter */
-    int x;
+    //int x; << compilation of this failed with gcc
     int y;
 
     if(y) {

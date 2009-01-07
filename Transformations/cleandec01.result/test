@@ -3,9 +3,7 @@ Initial code
 
 void c_clean_declarations01(int x)
 {
-   int x;
    int y;
-   extern  stderr();
 
    if (y) {
       int x = y++;
@@ -26,9 +24,7 @@ Code after declaration cleaning
 
 void c_clean_declarations01(int x)
 {
-   int x;
    int y;
-   extern  stderr();
 
    if (y) {
       y++;
