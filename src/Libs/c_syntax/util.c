@@ -224,7 +224,7 @@ expression MakeFunctionExpression(expression e, list le)
 	entity cf = get_current_module_entity();
 
 	ifdebug(8) {
-	  pips_debug(8, "Call to \"\%s\" with %d argument(s)\n",
+	  pips_debug(8, "Call to \"\%s\" with %zd argument(s)\n",
 		     entity_name(ent), gen_length(le));
 	  print_expressions(le);
 	}
@@ -756,7 +756,8 @@ bool CheckExternList()
 	if(!code_undefined_p(fc)) {
 	  list el = code_externs(fc);
 	  list le = gen_last(el);
-	  pips_debug(8, "Number of extern variables and functions: %d\n", gen_length(el));
+	  pips_debug(8, "Number of extern variables and functions: %zd\n",
+		     gen_length(el));
 	  if(gen_length(el)>0) {
 	    pips_debug(8, "Last entity %s in cons %p with car=%p and cdr=%p\n",
 		       entity_name(ENTITY(CAR(le))),
@@ -806,7 +807,7 @@ entity FindOrCreateCurrentEntity(string name,
   if (stack_undefined_p(FormalStack) || stack_empty_p(FormalStack))
     is_formal = FALSE;
   else {
-    is_formal= TRUE; 
+    is_formal= TRUE;
     function = stack_head(FunctionStack);
   }
 
@@ -878,7 +879,7 @@ entity FindOrCreateCurrentEntity(string name,
 	      pips_assert("el is a pure entity list", entity_list_p(el));
 	    }
 	}
-      else 
+      else
 	{
 	  if (is_formal) {
 	    /* Formal parameter for a function declaration or for a
@@ -888,15 +889,15 @@ entity FindOrCreateCurrentEntity(string name,
 	    extern string int_to_string(int);
 
 	    if(typedef_entity_p(function)) {
-	      string sn = int_to_string((int) function); // To get a unique identifier for each function typedef
+	      string sn = int_to_string((intptr_t) function); // To get a unique identifier for each function typedef
 	      ent = find_or_create_entity(strdup(concatenate(DUMMY_PARAMETER_PREFIX,sn,
 							     MODULE_SEP_STRING,name,NULL)));
 	      free(sn);
 	    }
 	    else if(!type_undefined_p(ft) && type_variable_p(ft)
 		&& basic_pointer_p(variable_basic(type_variable(ft)))) {
-	      string sn = int_to_string((int)ft); // To get a unique identifier for each function pointerdeclaration, dummy or not
-	      set_current_dummy_parameter_number((int) ft);
+	      string sn = int_to_string((intptr_t) ft); // To get a unique identifier for each function pointerdeclaration, dummy or not
+	      set_current_dummy_parameter_number((intptr_t) ft);
 	      ent = find_or_create_entity(strdup(concatenate(DUMMY_PARAMETER_PREFIX,sn,
 							     MODULE_SEP_STRING,name,NULL)));
 	      free(sn);
@@ -906,8 +907,8 @@ entity FindOrCreateCurrentEntity(string name,
 	      // To get a unique identifier for each function (This
 	      // may not be sufficient as a function can be declared
 	      // any number of times with any parameter names)
-	      string sn = int_to_string((int) function); 
-	      set_current_dummy_parameter_number((int) function);
+	      string sn = int_to_string((intptr_t) function);
+	      set_current_dummy_parameter_number((intptr_t) function);
 	      ent = find_or_create_entity(strdup(concatenate(DUMMY_PARAMETER_PREFIX,sn,
 							     MODULE_SEP_STRING,name,NULL)));
 	      free(sn);
@@ -2183,20 +2184,20 @@ void UpdateDerivedEntities(list ld, list le, stack ContextStack)
     UpdateDerivedEntity(ld,e,ContextStack);
   },le);
 
-} 
+}
 
 void InitializeEnumMemberValues(list lem)
 {
   // enum member with implicit values are not yet fully instantiated
   list cem = list_undefined;
-  int cv = 0;
+  intptr_t cv = 0;
 
   for(cem = lem; !ENDP(cem); POP(cem)) {
     entity em = ENTITY(CAR(cem));
     value emv = entity_initial(em);
 
     if(value_undefined_p(emv)) {
-      entity_initial(em) = 
+      entity_initial(em) =
 	make_value_symbolic(make_symbolic(int_to_expression(cv),
 					  make_constant(is_constant_int, (void *) cv)));
     }
@@ -2223,11 +2224,11 @@ void InitializeEnumMemberValues(list lem)
 
 entity MakeDerivedEntity(string name, list members, bool is_external, int i)
 {
-  entity ent = entity_undefined;  
+  entity ent = entity_undefined;
   switch (i) {
-  case is_type_struct: 
+  case is_type_struct:
     {
-      ent = CreateEntityFromLocalNameAndPrefix(name,STRUCT_PREFIX,is_external);	
+      ent = CreateEntityFromLocalNameAndPrefix(name,STRUCT_PREFIX,is_external);
       entity_type(ent) = make_type_struct(members);
       break;
     }

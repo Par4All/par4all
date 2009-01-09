@@ -73,7 +73,7 @@
 
 static int C_line_number = UNDEFINED_C_LINE_NUMBER;
 
-DEFINE_LOCAL_STACK(line_number, int)
+DEFINE_LOCAL_STACK(line_number, intptr_t)
 
 /* Count the number of c in s. */
 unsigned int character_occurences_in_string(string s, char c)
