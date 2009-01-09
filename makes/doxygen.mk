@@ -42,7 +42,7 @@ doxygen :: doxygen-plain doxygen-graph
 # To force a different evaluation of varables with different targets (have
 # a look to GNU Make documentation at the end of "6.10 Target-specific
 # Variable Values" for the rationale):
-doxygen-plain doxygen-graph:
+doxygen-plain doxygen-graph::
 	$(MAKE) do-$@
 
 do-doxygen-plain : OUTPUT_DIRECTORY       = plain
