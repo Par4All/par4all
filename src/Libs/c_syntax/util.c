@@ -289,7 +289,7 @@ expression MemberDerivedIdentifierToExpression(type t,string m)
   if (type_variable_p(t))
     {
       basic b = variable_basic(type_variable(t));
-      pips_debug(6,"Basic tag is %td\n",basic_tag(b));
+      pips_debug(6,"Basic tag is %d\n",basic_tag(b));
       switch (basic_tag(b)) {
       case is_basic_pointer:
 	{
@@ -1049,7 +1049,7 @@ type UpdateFinalPointer(type pt, type t)
   /* This function replaces the type pointed by the pointer pt
      (this can be a pointer of pointer,... so we have to go until the last one)
      by the type t*/
-  pips_debug(3,"Update final pointer type %td and %td\n",type_tag(pt),type_tag(t));
+  pips_debug(3,"Update final pointer type %d and %d\n", type_tag(pt), type_tag(t));
   if (type_variable_p(pt) && basic_pointer_p(variable_basic(type_variable(pt))))
     {
       type ppt = basic_pointer(variable_basic(type_variable(pt)));
@@ -1769,10 +1769,10 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
       t2 = UpdateType(t1,t2);
     }
   entity_type(e) = t2;
-  
-   
-    
-      
+
+
+
+
   /************************* STORAGE PART *******************************************/
 
   /* FI: no longer true, I believe "this field is always pre-defined. It is temporarilly used to
@@ -1780,7 +1780,7 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
 
 
   if (!storage_undefined_p(c_parser_context_storage(context))) {
-    pips_debug(3,"Current storage context is %td\n",
+    pips_debug(3,"Current storage context is %d\n",
 	       storage_tag(c_parser_context_storage(context)));
     entity_storage(e) = c_parser_context_storage(context);
   }

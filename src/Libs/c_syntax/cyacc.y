@@ -80,7 +80,7 @@ extern string compilation_unit_name;
 extern statement ModuleStatement;
 
 static int CurrentMode = 0; /* to know the mode of the formal parameter: by value or by reference*/
-static bool is_external = TRUE; /* to know if the variable is declared inside or outside a function, so its scope 
+static bool is_external = TRUE; /* to know if the variable is declared inside or outside a function, so its scope
 				   is the current function or the compilation unit or TOP-LEVEL*/
 static int enum_counter = 0; /* to compute the enumerator value: val(i) = val(i-1) + 1*/
 static int abstract_counter = 1; /* to create temporary entities for abstract types*/
@@ -88,12 +88,12 @@ static int abstract_counter = 1; /* to create temporary entities for abstract ty
 extern int loop_counter; /* Global counter */
 extern int derived_counter;
 
-/* The following structures must be stacks because all the related entities are in recursive structures. 
+/* The following structures must be stacks because all the related entities are in recursive structures.
    Since there are not stacks with basic types such as integer or logical domain, I used basic_domain
    to avoid creating special stacks for FormalStack, OffsetStack, ... */
 
-extern stack LoopStack; 
-extern stack SwitchControllerStack; 
+extern stack LoopStack;
+extern stack SwitchControllerStack;
 extern stack SwitchGotoStack;
 
 extern stack StructNameStack; /* to remember the name of a struct/union and add it to the member prefix name*/
@@ -103,13 +103,12 @@ extern stack ContextStack;
 extern stack FunctionStack; /* to know in which function the current formal arguments are declared */
 static void PushFunction(entity f)
 {
+  string s = local_name_to_scope(entity_name(f));
   entity nf = f;
-/* SG: this implementations is completely buggy */
-#if 0
-  string s = local_name_to_scope(f); // << SG: passing an entity instead of a string
+
   if(!empty_scope_p(s)) {
     /* Scoping is not used in function naming, static or not */
-    string nn = entity_name_without_scope(entity_name(f)); // << SG: passing a string instead of entity
+    string nn = entity_name_without_scope(f);
 
     nf = find_or_create_entity(nn);
 
@@ -129,8 +128,7 @@ static void PushFunction(entity f)
     /* let's assume that the entity has not been recorded anywhere yet. */
     free_entity(f);
   }
-  free(s);
-#endif
+
   stack_push((char *) nf, FunctionStack);
 }
 
@@ -1621,7 +1619,7 @@ init_declarator:                             /* ISO 6.7 */
 				    print_expression(value_expression(oiv));
 				  }
 				  else {
-				    fprintf(stderr, "Value tag: %td\n", value_tag(entity_initial(v)));
+				    fprintf(stderr, "Value tag: %d\n", value_tag(entity_initial(v)));
 				  }
 				  pips_internal_error("Scoping not implemented yet, might be the reason\n");
 				}

@@ -1864,7 +1864,7 @@ entity val;
     {
 	if(storage_rom_p(store)) 
 	{
-	  pips_debug(8, "%s is not translatable: store tag %td\n",
+	  pips_debug(8, "%s is not translatable: store tag %d\n",
 		     entity_name(val), storage_tag(store));
 	  /* Should it be projected? No, this should occur later for xxx#init
 	   * variables when the xxx is translated. Or before if xxx has been

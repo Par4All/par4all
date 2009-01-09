@@ -195,13 +195,18 @@ are the functions used, and more subtly what are the functions that call a
 given function (if you need to verify a function is correctly used or you
 want to change a function name).
 
-As an experimented user, you may need to generate them again. Go to the
-\texttt{doxygen} directories in the documentation directory of the
-products (NewGen, Linear and PIPS) and use \texttt{make} and \texttt{make
-  publish} to push them on the WWW site. The \texttt{make} target
-\texttt{doxygen-plain} or \texttt{doxygen-graph} can be used to generate
-only a documentation without or with call and caller graphs. Note that
-generating the graph version for PIPS lasts several hours...
+As an experimented user, you may need to generate them again. The
+\texttt{doxygen} \emph{make} target is propagated downwards down to the
+various \texttt{doxygen} directories in the products (NewGen, Linear and
+PIPS).
+
+To push them on the WWW, you can use a \texttt{make doxygen-publish}, if
+you have the right access.
+
+The \texttt{make} target \texttt{doxygen-plain}
+or \texttt{doxygen-graph} can be used to generate only a documentation
+without or with call and caller graphs. Note that generating the graph
+version for PIPS lasts several hours on a 2009 computer...
 
 
 \subsection{Developing with the Emacs editor}
@@ -1237,10 +1242,9 @@ documentation of the sources.
 The various PIPS documentations can be published on the web site
 \PipsOldWWW with the \verb|pips_publish_www| once you have compiled it.
 
-To publish the Doxygen documentation of the sources, as explained in
+To publish the Doxygen documentation of the sources, see
 \S~\ref{sec:brows-source-files}, once you have compiled the Doxygen
-version, use a \texttt{make publish} to push the files on the PIPS Doxygen
-server.
+version.
 
 There is also a new dynamic web site \PipsNewWWW that reference better the
 information stored on\PipsOldWWW. The idea is to have the content edited

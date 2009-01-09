@@ -225,10 +225,11 @@ int type_memory_size(type t)
   return s;
 }
 
-/* this function returns the length in bytes of the fortran or C type
+/* This function returns the length in bytes of the fortran or C type
 represented by a basic, except for a varying size string (formal
-parameter). */
+parameter).
 
+What is the semantics for bitfields? */
 intptr_t SizeOfElements(basic b)
 {
   int e = -1;
@@ -276,9 +277,10 @@ intptr_t SizeOfElements(basic b)
   }
   case is_basic_bit:
     /* Check meaning...*/
-    pips_assert("element size match",
-            sizeof(e)==sizeof(basic_bit(b)) );
-    e = (int)basic_bit(b);
+    pips_error("SizeOfElements",
+	       "bitfield size not yet implemented...");
+    e = -1;
+    //e = basic_bit(b);
     break;
   case is_basic_pointer:
     e = DEFAULT_POINTER_TYPE_SIZE;
