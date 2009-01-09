@@ -157,6 +157,12 @@ $(ARCH)/%.o: %.f; $(F77CMP) `pwd`/$< -o $@
 %.c: %.m4c;	$(M4FLT) $(M4COPT) $< > $@
 %.h: %.m4h;	$(M4FLT) $(M4HOPT) $< > $@
 
+
+# A rule to debug Makefile forwarding used by forward.mk.
+# Do not warn downwards:
+debug_forward_makefile:
+
+
 ################################################################## DEPENDENCIES
 
 ifdef LIB_CFILES
@@ -612,15 +618,12 @@ main-clean:
 
 # Doxygen documentation:
 
-# By default, doxygen has nothing to do... Rely on explicit Makefile where
+# By default, doxygen stuff has nothing to do... Rely on explicit Makefile where
 # it is really needed (that includes doxygen.mk for example).  If there is
 # a doxygen directory somewhere, explicit forward the make inside it:
-doxygen::
+doxygen doxygen-plain doxygen-graph doxygen-publish::
 	if [ -d $@ ]; then $(MAKE) --directory=$@ $@; fi
 
-# The same to publish on the web the doxygenized documentation
-doxygen-publish::
-	if [ -d doxygen ]; then $(MAKE) --directory=doxygen $@; fi
 
 ################################################################### DEVELOPMENT
 

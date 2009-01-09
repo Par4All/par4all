@@ -1,12 +1,12 @@
-# 
-# $Id$ 
+#
+# $Id$
 #
 # (c) Fabien COELHO July 1996
 #
 # This makefile forwards make targets to sub-directories...
 # It must be used with GNU make (or some make that supports -C)
-# 
-# If you do 'gmake FOO' in a directory with this Makefile 
+#
+# If you do 'gmake FOO' in a directory with this Makefile
 # then 'gmake FOO' is done downwards in the sub-directories.
 # Gmake automatically forward make macros of the command line,
 # thus 'gmake CC=mycc all' will also forward the CC macro.
@@ -42,10 +42,14 @@
 # the default target is all.
 #
 
+# doxygen is a target to do, even if there is such a directory/file with
+# this name:
+.PHONY: doxygen
+
 # Just to avoid troubles...
 SHELL		= /bin/sh
 
-# default values 
+# default values
 FWD_DIRS	= *
 FWD_MSG		=
 FWD_REPORT	= >&2
@@ -61,7 +65,7 @@ la_cible_par_defaut_si_aucune_n_est_precisee_sur_la_ligne_de_commande: all
 
 # Forward any command to the specified directories (if any).
 # Report the result of the forward.
-.DEFAULT:
+.DEFAULT doxygen:
 	@echo Making $@ in $(FWD_ROOT) >&2;\
 	globally_failed=;\
 	if test "$@" = debug_forward_makefile ; \
