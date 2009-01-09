@@ -25,7 +25,8 @@ FWD_DIRS = \
 	sg \
 	polynome \
 	union \
-	polyedre
+	polyedre \
+	doxygen
 
 #	plint \
 #	janusvalue \
