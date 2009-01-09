@@ -6,6 +6,8 @@
 # Assume that NEWGEN_ROOT and LINEAR_ROOT are set and that PIPS has
 # already been compiled to have the newgen objects already generated.
 
+# Some hack to get the NewGen source file list.
+
 # Newgen
 NEWGEN_SOURCE_DIR=$(NEWGEN_ROOT)/src/genC
 
@@ -37,6 +39,17 @@ ROOT    = ../../..
 endif
 
 include $(ROOT)/makes/doxygen.mk
+
+# The hack is going on...
+# Undo some work done by the "include
+# $(NEWGEN_SOURCE_DIR)/standard_defines.mk" in order to make the following
+# not to think there is really something to compile:
+LIB_CFILES=
+OTHER_CFILES=
+INSTALL_INC=
+LIB_TARGET=
+BIN_TARGET=
+include $(ROOT)/makes/main.mk
 
 # If needed:
 #make_destination_dir :
