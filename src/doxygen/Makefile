@@ -1,4 +1,4 @@
-# $Id$	
+# $Id$
 
 ifdef LINEAR_ROOT
 ROOT    = $(LINEAR_ROOT)
@@ -24,6 +24,7 @@ GENERATE_TAGFILE_NAME       = Linear.doxygen-tag
 
 DEFAULT_DOXYGEN_CONFIG = $(LINEAR_SOURCE_DIR)/../makes/share/doxygen/Doxyfile
 
+include $(ROOT)/makes/main.mk
 include $(LINEAR_SOURCE_DIR)/../makes/doxygen.mk
 
 # If needed:
