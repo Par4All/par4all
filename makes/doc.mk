@@ -34,7 +34,7 @@ RSYNC = rsync --archive --hard-links --delete --force --partial --compress --ver
 	$(LATEX) $<
 	touch $@
 
-# If we want to generate HTML output from file.tex, 
+# If we want to generate HTML output from file.tex,
 # create a "file.htdoc" directory to hide junk details:
 %.htdoc: %.tex
 	rm -rf $@

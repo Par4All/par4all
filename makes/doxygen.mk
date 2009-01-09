@@ -37,7 +37,7 @@ endif
 .PHONY: doxygen doxygen-plain doxygen-plain do-doxygen-graph do-doxygen-graph do-doxygen publish
 
 # We generate 2 versions, one without callers/callees graphs, and another full-fledged heavy one:
-doxygen : doxygen-plain doxygen-graph
+doxygen :: doxygen-plain doxygen-graph
 
 # To force a different evaluation of varables with different targets (have
 # a look to GNU Make documentation at the end of "6.10 Target-specific
@@ -64,7 +64,7 @@ clean:
 
 ifdef DOXYGEN_PUBLISH_LOCATION
 
-publish: make_destination_dir
+doxygen-publish:: make_destination_dir
 	$(RSYNC) plain/html/ $(DOXYGEN_PUBLISH_LOCATION)/plain
 	$(RSYNC) graph/html/ $(DOXYGEN_PUBLISH_LOCATION)/graph
 

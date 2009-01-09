@@ -279,7 +279,7 @@ header:	.header $(INC_TARGET)
 .PHONY: header
 
 # .header carries all dependencies for INC_TARGET:
-.header: $(TARGET)-local.h $(DERIVED_HEADERS) $(LIB_CFILES) 
+.header: $(TARGET)-local.h $(DERIVED_HEADERS) $(LIB_CFILES)
 	$(MAKE) $(GMKNODIR) build-header-file
 	touch .header
 
@@ -610,6 +610,18 @@ clean: main-clean
 main-clean:
 	$(RM) *~ *.tmp
 
+# Doxygen documentation:
+
+# By default, doxygen has nothing to do... Rely on explicit Makefile where
+# it is really needed (that includes doxygen.mk for example).  If there is
+# a doxygen directory somewhere, explicit forward the make inside it:
+doxygen::
+	if [ -d $@ ]; then $(MAKE) --directory=$@ $@; fi
+
+# The same to publish on the web the doxygenized documentation
+doxygen-publish::
+	if [ -d doxygen ]; then $(MAKE) --directory=doxygen $@; fi
+
 ################################################################### DEVELOPMENT
 
 # try development directory under setup_pips.sh
@@ -619,12 +631,12 @@ DEVDIR	= $(ROOT)/../../$(PROJECT)_dev
 NEW_BRANCH_NAME	= $(notdir $(CURDIR))
 
 # the old pips development target
-install: 
+install:
 	@echo "See 'create-branch' target to create a development branch"
 	@echo "See 'install-branch' target to install a development branch"
 
 # should be ok
-force-create-branch: 
+force-create-branch:
 	$(MAKE) BRANCH_FLAGS+=--commit create-branch
 	-test -d $(DEVDIR)/.svn && $(SVN) update $(DEVDIR)
 
@@ -652,7 +664,7 @@ create-branch:
 	fi
 
 # hum...
-force-install-branch: 
+force-install-branch:
 	$(MAKE) BRANCH_FLAGS+=--commit install-branch
 	-test -d $(ROOT)/.svn && $(SVN) update $(ROOT)
 
@@ -688,5 +700,5 @@ branch-diff:
 branch-info:
 	-@$(IS_BRANCH) . && $(BRANCH) info
 
-branch-avail:	
+branch-avail:
 	-@$(IS_BRANCH) . && $(BRANCH) avail
