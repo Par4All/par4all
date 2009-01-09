@@ -29,6 +29,7 @@ PROJECT_NAME           = libgenC
 #PUBLISH_LOCATION := /tmp/$(PROJECT_NAME)
 
 
+include $(ROOT)/makes/main.mk
 include $(ROOT)/makes/doxygen.mk
 
 # If needed:

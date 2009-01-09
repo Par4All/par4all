@@ -14,7 +14,7 @@ include $(NEWGEN_SOURCE_DIR)/standard_defines.mk
 
 # Some pure local Doxygen parameters:
 define DOXYGEN_PARAMETERS
-INPUT                  = $(addprefix $(NEWGEN_SOURCE_DIR)/, $(LIB_CFILES) $(LIB_HEADERS) $(DERIVED_HEADERS) new.c) 
+INPUT                  = $(addprefix $(NEWGEN_SOURCE_DIR)/, $(LIB_CFILES) $(LIB_HEADERS) $(DERIVED_HEADERS) new.c)
 endef
 
 PROJECT_NAME           = newC
@@ -23,6 +23,7 @@ PROJECT_NAME           = newC
 #PUBLISH_LOCATION := /tmp/$(PROJECT_NAME)
 
 
+include $(ROOT)/makes/main.mk
 include $(ROOT)/makes/doxygen.mk
 
 # If needed:
