@@ -326,7 +326,8 @@ out_effects_from_loop_to_body(loop l)
     l_out_loop =
 	(*effects_transformer_inverse_composition_op)(l_out_loop, loop_trans);
     range_descriptor = (*loop_descriptor_make_func)(l); 
-    loop_proper_context = descriptor_to_context(range_descriptor);
+    if(descriptor_defined_p(range_descriptor))
+      loop_proper_context = descriptor_to_context(range_descriptor);
     l_out_loop =
 	(*effects_precondition_composition_op)(l_out_loop, loop_proper_context); 
 
