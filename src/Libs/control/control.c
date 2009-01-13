@@ -1707,7 +1707,7 @@ hash_table used_labels;
     test it = make_test(test_condition(t),
 			control_statement(c1),
 			control_statement(c2));
-
+    // Memory leak on c1 & c2...
     UPDATE_CONTROL(c_res,
 		   make_statement(statement_label(st),
 				  statement_number(st),
@@ -1723,7 +1723,7 @@ hash_table used_labels;
   }
   else {
     // Keep the unstructured test:
-    UPDATE_CONTROL(c_res, st, 
+    UPDATE_CONTROL(c_res, st,
 		   ADD_PRED(pred, c_res),
 		   CONS(CONTROL, c1, CONS(CONTROL, c2, NIL)));
     test_true(t) = MAKE_CONTINUE_STATEMENT();

@@ -1,10 +1,23 @@
+# Generate the Doxygen version of the PIPS sources.
 
 # Since we need to compute the caller graphs for NewGen and Linear, we
 # must generate Doxygen documentation for NewGen, Linear and PIPS in the
 # same run.
 
-# Assume that NEWGEN_ROOT and LINEAR_ROOT are set and that PIPS has
-# already been compiled to have the newgen objects already generated.
+# common stuff
+ifdef PIPS_ROOT
+ROOT    = $(PIPS_ROOT)
+else
+ROOT    = ../../..
+endif
+
+# Assume that that PIPS has already been compiled to have the newgen
+# and linear objects already generated.
+
+# Try to figure out where newgen and linear are if not specified. Useful
+# when bootstrapping PIPS:
+NEWGEN_ROOT ?= $(ROOT)/../newgen
+LINEAR_ROOT ?= $(ROOT)/../linear
 
 # Some hack to get the NewGen source file list.
 
@@ -30,13 +43,6 @@ PROJECT_NAME           = PIPS
 
 ## Where we want the documentation to be published:
 #PUBLISH_LOCATION := /tmp/$(PROJECT_NAME)
-
-# common stuff
-ifdef PIPS_ROOT
-ROOT    = $(PIPS_ROOT)
-else
-ROOT    = ../../..
-endif
 
 include $(ROOT)/makes/doxygen.mk
 

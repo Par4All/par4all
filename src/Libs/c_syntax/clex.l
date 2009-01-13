@@ -128,7 +128,7 @@ void reset_current_C_line_number()
   free_line_number_stack();
 }
 
-pvoid error_reset_current_C_line_number()
+void error_reset_current_C_line_number()
 {
   C_line_number = UNDEFINED_C_LINE_NUMBER;
 
