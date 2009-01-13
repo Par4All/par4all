@@ -3,7 +3,7 @@
 ifdef NEWGEN_ROOT
 ROOT    = $(NEWGEN_ROOT)
 else
-ROOT    = ../../..
+ROOT    = ../../../..
 endif
 
 # If it is not defined:
