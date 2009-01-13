@@ -18,7 +18,8 @@ download=
 update=
 compile=
 validate=
-vopt=
+# A hack to survive missing -m|--mail option...
+vopt=NOTHING=NOTHING
 
 # where to do it by default
 target=~/PIPS
@@ -59,7 +60,7 @@ if [[ $download ]]
 then
   test -d $target && err "will not overwrite target directory: $target" 4
   # full download
-  wget --no-verbose $setup
+  wget --no-directories --no-verbose $setup
   # should be silent?
   sh ./setup_pips.sh $target
 elif [[ $update ]]
