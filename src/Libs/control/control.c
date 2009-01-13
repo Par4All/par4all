@@ -1,15 +1,15 @@
 /* $Id$ */
 
 #ifndef lint
-char vcid_control_control[] = 
+char vcid_control_control[] =
 "$Id$\nCopyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* - control.c
 
-   Computes the Hierarchical Control Flow Graph of a given statement. 
+   Computes the Hierarchical Control Flow Graph of a given statement.
 
-   WARNINGS: 
+   WARNINGS:
 
    . Temporary locations malloced while recursing in the process are
      not freed (to be done latter ... if required)
@@ -50,25 +50,25 @@ char vcid_control_control[] =
 #include "c_syntax.h"
 
 #define LABEL_TABLES_SIZE 10
- 
-/* UNREACHABLE is the hook used as a predecessor of statements that are  
+
+/* UNREACHABLE is the hook used as a predecessor of statements that are
    following a goto. The list of unreachable statements is kept in the
    successors list. */
 
-static list Unreachable;		
+static list Unreachable;
 
 /* LABEL_STATEMENTS maps label names to the list of statements where
    they appear (either as definition or reference). */
 
-static hash_table Label_statements;	
+static hash_table Label_statements;
 
 /* LABEL_CONTROL maps label names to their (possible forward) control
    nodes. */
 
-static hash_table Label_control;	
+static hash_table Label_control;
 
 
-#define MAKE_CONTINUE_STATEMENT() make_continue_statement(entity_undefined) 
+#define MAKE_CONTINUE_STATEMENT() make_continue_statement(entity_undefined)
 
 
 
@@ -148,22 +148,22 @@ control fnode, tnode;
 {
     MAPL(preds, {
 	control pred = CONTROL(CAR(preds));
-	
+
 	MAPL(succs, {
 	    if(CONTROL(CAR(succs)) == fnode)
 		    CONTROL_(CAR(succs)) = tnode;
-	}, (how == SUCCS_OF_PREDS) ? 
+	}, (how == SUCCS_OF_PREDS) ?
 	     control_successors(pred) :
 	     control_predecessors(pred));
-    }, (how == SUCCS_OF_PREDS) ? 
-	 control_predecessors(fnode) : 
+    }, (how == SUCCS_OF_PREDS) ?
+	 control_predecessors(fnode) :
 	 control_successors(fnode));
 }
 
 /* MAKE_CONDITIONAL_CONTROL is make_control except when the statement ST
    has a label and is thus already in Label_control. */
 
-static control make_conditional_control(st) 
+static control make_conditional_control(st)
 statement st;
 {
     string label = entity_name(statement_label(st));
@@ -209,7 +209,7 @@ statement st;
 	    hash_update(used_labels, name, (char*) new_sts);
 	else
 	    hash_put(used_labels, name, (char*) new_sts);
-	debug(5, "update_used_labels", "Reference to statement %d seen\n", 
+	debug(5, "update_used_labels", "Reference to statement %d seen\n",
 	      statement_number( st )) ;
     }
 }
@@ -337,8 +337,6 @@ bool controlize(
 {
     instruction i = statement_instruction(st);
     string label = entity_name(statement_label(st));
-    bool controlize_list(), controlize_test(), controlize_loop(),
-	controlize_whileloop(), controlize_call();
     bool controlized = FALSE;
     control n_succ = control_undefined; // To be used in case of goto
 
@@ -365,8 +363,7 @@ bool controlize(
       /* A block may only contain declarations with initializations
 	 and side effects on the store */
       if(ENDP(instruction_block(i))) {
-	controlized = controlize_call(st, call_undefined,
-				      pred, succ, c_res, used_labels);
+	controlized = controlize_call(st, pred, succ, c_res);
       }
       else {
 	controlized = controlize_list(st, instruction_block(i),
@@ -440,13 +437,12 @@ bool controlize(
     }
     case is_instruction_call:
 	/* FI: IO calls may have control effects; they should be handled here! */
-	controlized = controlize_call(st, instruction_call(i), 
-				      pred, succ, c_res, used_labels);
+	controlized = controlize_call(st, pred, succ, c_res);
 	break;
     case is_instruction_forloop:
       pips_assert("We are really dealing with a for loop",
 		  instruction_forloop_p(statement_instruction(st)));
-      controlized = controlize_forloop(st, instruction_forloop(i), 
+      controlized = controlize_forloop(st, instruction_forloop(i),
 				       pred, succ, c_res, used_labels);
       break;
     case is_instruction_return:
@@ -454,12 +450,11 @@ bool controlize(
       break;
     case is_instruction_expression:
       /* PJ: controlize_call() controlize any "nice" statement */
-      controlized = controlize_call(st, call_undefined,
-				    pred, succ, c_res, used_labels);
+      controlized = controlize_call(st, pred, succ, c_res);
 
       break;
     default:
-	pips_error("controlize", 
+	pips_error("controlize",
 		   "Unknown instruction tag %d\n", instruction_tag(i));
     }
 
@@ -482,7 +477,7 @@ bool controlize(
 	  check_control_coherency(n_succ);
 	check_control_coherency(c_res);
     }
-    
+
     update_used_labels(used_labels, label, st);
 
     return(controlized);
@@ -498,22 +493,19 @@ bool controlize(
    simulated by hidden tests. */
 
 bool controlize_call(statement st,
-		     call c __attribute__ ((unused)),
 		     control pred,
 		     control succ,
-		     control c_res,
-		     hash_table used_labels __attribute__ ((unused)))
+		     control c_res)
 {
   pips_debug(5, "(st = %p, pred = %p, succ = %p, c_res = %p)\n",
 	     st, pred, succ, c_res);
 
   UPDATE_CONTROL(c_res, st,
-		 ADD_PRED(pred, c_res), 
+		 ADD_PRED(pred, c_res),
 		 CONS(CONTROL, succ, NIL));
 
   /* control_successors(pred) = ADD_SUCC(c_res, pred); */
   add_proper_successor_to_predecessor(pred, c_res);
-   
   control_predecessors(succ) = ADD_PRED(c_res, succ);
   return(FALSE);
 }
@@ -522,7 +514,7 @@ bool controlize_call(statement st,
    do-loop L for the loop header (i=1), the test (i<10) and the increment
    (i=i+1). */
 
-statement loop_header(statement sl) 
+statement loop_header(statement sl)
 {
   loop l = statement_loop(sl);
   statement hs = statement_undefined;
@@ -547,8 +539,8 @@ statement loop_test(statement sl)
 			       range_upper(loop_range(l)),
 			       NIL)));
   test t = make_test(make_expression(make_syntax(is_syntax_call, c),
-				     normalized_undefined), 
-		     MAKE_CONTINUE_STATEMENT(), 
+				     normalized_undefined),
+		     MAKE_CONTINUE_STATEMENT(),
 		     MAKE_CONTINUE_STATEMENT());
   string csl = statement_comments(sl);
   string prev_comm = empty_comments_p(csl)? /* empty_comments */ strdup("")  : strdup(csl);
@@ -556,19 +548,19 @@ statement loop_test(statement sl)
 
   if(entity_empty_label_p(loop_label(l)))
     lab = ""; // FI: to be replaced by a symbolic constant
-  else 
+  else
     lab = label_local_name(loop_label(l));
 
   if (get_bool_property("PRETTYPRINT_C_CODE"))
     cs = prev_comm;
-  else 
+  else
     cs = strdup(concatenate(prev_comm,
 			    "C     DO loop ",
 			    lab,
 			    " with exit had to be desugared\n",
 			    NULL));
 
-  ts = make_statement(entity_empty_label(), 
+  ts = make_statement(entity_empty_label(),
 		      statement_number(sl),
 		      STATEMENT_ORDERING_UNDEFINED,
 		      cs,
@@ -583,13 +575,13 @@ statement loop_inc(statement sl)
   expression I = make_entity_expression(loop_index(l), NIL);
   expression II = make_entity_expression(loop_index(l), NIL);
   call c = make_call(entity_intrinsic(PLUS_OPERATOR_NAME), // Even for C code?
-		     CONS(EXPRESSION, 
-			  I, 
-			  CONS(EXPRESSION, 
-			       range_increment(loop_range(l)), 
+		     CONS(EXPRESSION,
+			  I,
+			  CONS(EXPRESSION,
+			       range_increment(loop_range(l)),
 			       NIL)));
-  expression I_plus_one = 
-    make_expression(make_syntax(is_syntax_call, c), 
+  expression I_plus_one =
+    make_expression(make_syntax(is_syntax_call, c),
 		    normalized_undefined);
   statement is = statement_undefined;
 
@@ -617,7 +609,7 @@ hash_table used_labels;
 
     pips_debug(5, "(st = %p, pred = %p, succ = %p, c_res = %p)\n",
 	       st, pred, succ, c_res);
-    
+
     controlize(loop_body(l), c_test, c_inc, c_body, loop_used_labels);
 
     if(covers_labels_p(loop_body(l),loop_used_labels)) {
@@ -661,9 +653,9 @@ hash_table used_labels;
 
     union_used_labels( used_labels, loop_used_labels);
     hash_table_free(loop_used_labels);
-    
+
     pips_debug(5, "Exiting\n");
-    
+
     return(controlized);
 }
 
@@ -681,8 +673,8 @@ statement whileloop_test(statement sl)
 			    copy_expression(whileloop_condition(l)),
 			    NIL));
     test t = make_test(make_expression(make_syntax(is_syntax_call, c),
-				       normalized_undefined), 
-		       MAKE_CONTINUE_STATEMENT(), 
+				       normalized_undefined),
+		       MAKE_CONTINUE_STATEMENT(),
 		       MAKE_CONTINUE_STATEMENT());
     string csl = statement_comments(sl);
     /* string prev_comm = empty_comments_p(csl)? "" : strdup(csl); */
@@ -690,9 +682,9 @@ statement whileloop_test(statement sl)
 
     if (get_bool_property("PRETTYPRINT_C_CODE"))
       cs = prev_comm;
-    else 
+    else
       {
-	if(entity_empty_label_p(whileloop_label(l))) { 
+	if(entity_empty_label_p(whileloop_label(l))) {
 	  cs = strdup(concatenate(prev_comm,
 				  "C     DO WHILE loop ",
 				  "with GO TO exit had to be desugared\n",
@@ -707,8 +699,8 @@ statement whileloop_test(statement sl)
 				  NULL));
 	}
       }
-    
-    ts = make_statement(entity_empty_label(), 
+
+    ts = make_statement(entity_empty_label(),
 			statement_number(sl),
 			STATEMENT_ORDERING_UNDEFINED,
 			cs,
@@ -739,7 +731,7 @@ hash_table used_labels;
 
     pips_debug(5, "(st = %p, pred = %p, succ = %p, c_res = %p)\n",
 	       st, pred, succ, c_res);
-    
+
     controlize(whileloop_body(l), c_res, c_res, c_body, loop_used_labels);
 
     if(covers_labels_p(whileloop_body(l),loop_used_labels)) {
@@ -748,7 +740,7 @@ hash_table used_labels;
 					 whileloop_label(l),
 					 whileloop_evaluation(l));
 
-	/* The edges between c_res and c_body, created by the above call to 
+	/* The edges between c_res and c_body, created by the above call to
 	 * controlize are useless. The edge succ
 	 * from c_res to c_body is erased by the UPDATE_CONTROL macro.
 	 */
@@ -761,7 +753,7 @@ hash_table used_labels;
 				      statement_number(st),
 				      STATEMENT_ORDERING_UNDEFINED,
 				      statement_comments(st),
-				      make_instruction(is_instruction_whileloop, 
+				      make_instruction(is_instruction_whileloop,
 						       new_l),
 				      statement_declarations(st),
 				      statement_decls_text(st)),
@@ -790,14 +782,14 @@ hash_table used_labels;
 
     union_used_labels( used_labels, loop_used_labels);
     hash_table_free(loop_used_labels);
-    
+
     pips_debug(5, "Exiting\n");
-    
+
     return(controlized);
 }
 
 
-statement forloop_header(statement sl) 
+statement forloop_header(statement sl)
 {
   forloop l = instruction_forloop(statement_instruction(sl));
   statement hs = instruction_to_statement(make_instruction_expression(forloop_initialization(l)));
@@ -815,13 +807,13 @@ statement forloop_test(statement sl)
 			   copy_expression(cond),
 			   NIL));
   test t = make_test(make_expression(make_syntax(is_syntax_call, c),
-				     normalized_undefined), 
-		     MAKE_CONTINUE_STATEMENT(), 
+				     normalized_undefined),
+		     MAKE_CONTINUE_STATEMENT(),
 		     MAKE_CONTINUE_STATEMENT());
   string csl = statement_comments(sl);
   string cs = empty_comments_p(csl)? empty_comments /* strdup("") */ : strdup(csl);
 
-  statement ts = make_statement(entity_empty_label(), 
+  statement ts = make_statement(entity_empty_label(),
 				statement_number(sl),
 				STATEMENT_ORDERING_UNDEFINED,
 				cs,
@@ -831,7 +823,7 @@ statement forloop_test(statement sl)
     pips_debug(8, "Condition expression: ");
     print_expression(cond);
   }
-  
+
   return ts;
 }
 
@@ -872,7 +864,7 @@ static bool init_expression_to_index_and_initial_bound(expression init,
 	type lit = entity_type(li);
 
 	if(ENDP(reference_indices(r)) /* scalar reference */
-	   && type_variable_p(lit) 
+	   && type_variable_p(lit)
 	   && basic_int_p(variable_basic(type_variable(lit)))) {
 	  *pli = li;
 	  /* To avoid sharing and intricate free operations */
@@ -1057,14 +1049,14 @@ static sequence for_to_while_loop_conversion(expression init,
 			"(in C, the condition may be a reference)\n");
   }
   else {
-    statement init_st = make_statement(entity_empty_label(), 
+    statement init_st = make_statement(entity_empty_label(),
 				       STATEMENT_NUMBER_UNDEFINED,
 				       STATEMENT_ORDERING_UNDEFINED,
 				       empty_comments,
-				       make_instruction(is_instruction_call, 
+				       make_instruction(is_instruction_call,
 							syntax_call(s_init)),
 				       NIL,NULL);
-    statement incr_st =  make_statement(entity_empty_label(), 
+    statement incr_st =  make_statement(entity_empty_label(),
 					STATEMENT_NUMBER_UNDEFINED,
 					STATEMENT_ORDERING_UNDEFINED,
 					empty_comments,
@@ -1073,7 +1065,7 @@ static sequence for_to_while_loop_conversion(expression init,
 					NIL,NULL);
     sequence body_seq = make_sequence(CONS(STATEMENT, body,
 					CONS(STATEMENT, incr_st, NIL)));
-    statement n_body = make_statement(entity_empty_label(), 
+    statement n_body = make_statement(entity_empty_label(),
 				      STATEMENT_NUMBER_UNDEFINED,
 				      STATEMENT_ORDERING_UNDEFINED,
 				      empty_comments,
@@ -1082,7 +1074,7 @@ static sequence for_to_while_loop_conversion(expression init,
 				     NIL,NULL);
     whileloop wl_i = make_whileloop(cond, n_body, entity_empty_label(),
 				    make_evaluation_before() );
-    statement wl_st =  make_statement(entity_empty_label(), 
+    statement wl_st =  make_statement(entity_empty_label(),
 				     STATEMENT_NUMBER_UNDEFINED,
 				     STATEMENT_ORDERING_UNDEFINED,
 				     comments,
@@ -1116,7 +1108,7 @@ static sequence for_to_while_loop_conversion(expression init,
   }
 
   ifdebug(5) {
-    statement d_st =  make_statement(entity_empty_label(), 
+    statement d_st =  make_statement(entity_empty_label(),
 				     STATEMENT_NUMBER_UNDEFINED,
 				     STATEMENT_ORDERING_UNDEFINED,
 				     string_undefined,
@@ -1149,7 +1141,7 @@ hash_table used_labels;
 
   pips_debug(5, "(st = %p, pred = %p, succ = %p, c_res = %p)\n",
 	     st, pred, succ, c_res);
-    
+
   controlize(forloop_body(l), c_test, c_inc, c_body, loop_used_labels);
 
   if (covers_labels_p(forloop_body(l),loop_used_labels)) {
@@ -1199,7 +1191,7 @@ hash_table used_labels;
     gen_remove(&control_successors(c_body), c_res);
     gen_remove(&control_predecessors(c_body), c_res);
     gen_remove(&control_predecessors(c_res), c_body);
-      
+
     UPDATE_CONTROL(c_res,
 		   make_statement(statement_label(st),
 				  (!instruction_sequence_p(ni))
@@ -1207,7 +1199,7 @@ hash_table used_labels;
 				  STATEMENT_ORDERING_UNDEFINED,
 				  (!instruction_sequence_p(ni))
 				  ?statement_comments(st):empty_comments,
-				  ni, 
+				  ni,
 				  statement_declarations(st),
 				  statement_decls_text(st)),
 		   ADD_PRED(pred, c_res),
@@ -1217,10 +1209,10 @@ hash_table used_labels;
   }
   else /* The foor loop cannot be preserved as a control structure*/
     {
-      /* NN : I do not know how to deal with this, the following code does not always work 
-	   
+      /* NN : I do not know how to deal with this, the following code does not always work
+
 	 pips_internal_error("Forloop with goto not implemented yet\n");*/
-	
+
       control_statement(c_test) = forloop_test(st);
       control_predecessors(c_test) =
 	CONS(CONTROL, c_res, CONS(CONTROL, c_inc, NIL)),
@@ -1234,19 +1226,17 @@ hash_table used_labels;
 		     CONS(CONTROL, c_test, NIL));
       controlized = TRUE ;
       control_predecessors(succ) = ADD_PRED(c_test, succ);
-	
-	
     }
   add_proper_successor_to_predecessor(pred, c_res);
   /* control_successors(pred) = ADD_SUCC(c_res, pred); */
-    
+
   ifdebug(5) check_control_coherency(c_res);
-    
+
   union_used_labels( used_labels, loop_used_labels);
   hash_table_free(loop_used_labels);
-    
+
   pips_debug(5, "Exiting\n");
-    
+
   return(controlized);
 }
 
@@ -1258,7 +1248,7 @@ hash_table used_labels;
    case on terminal compaction.
 
    Added a set to avoid investigating a removed node.
-   Many memory leaks removed. RK.   
+   Many memory leaks removed. RK.
    In fact this procedure could be replaced by
    fuse_sequences_in_unstructured()... RK.
    */
@@ -1306,12 +1296,12 @@ compact_list(list ctls,
 	    c_res = CONTROL(CAR(ctls));
 	    continue;
 	}
-	
+
 	st = control_statement(c_res) ;
 	/* Ok, succ is defined. RK */
 	succ_st = control_statement(succ);
 	set_add_element(processed_nodes, processed_nodes, (char *) succ);
-	
+
 	if(c_res != succ) {
 	    /* If it is not a loop on c_res, fuse the nodes: */
 	  if((statement_block_p(st) && !ENDP(statement_declarations(st)))
@@ -1320,7 +1310,7 @@ compact_list(list ctls,
 		i = make_instruction_block(CONS(STATEMENT, st,
 						CONS(STATEMENT, succ_st, NIL)));
 		control_statement(c_res) =
-		    make_statement(entity_empty_label(), 
+		    make_statement(entity_empty_label(),
 				   STATEMENT_NUMBER_UNDEFINED,
 				   STATEMENT_ORDERING_UNDEFINED,
 				   string_undefined,
@@ -1334,22 +1324,22 @@ compact_list(list ctls,
 	    if(!instruction_block_p(i=statement_instruction(st))) {
 		i = make_instruction_block(CONS(STATEMENT, st, NIL));
 		control_statement(c_res) =
-		    make_statement(entity_empty_label(), 
+		    make_statement(entity_empty_label(),
 				   STATEMENT_NUMBER_UNDEFINED,
 				   STATEMENT_ORDERING_UNDEFINED,
 				   string_undefined,
 				   i,NIL,NULL);
 	    }
 	    if(instruction_block_p(succ_i=statement_instruction(succ_st))){
-		instruction_block(i) = 
-		    gen_nconc(instruction_block(i), 
+		instruction_block(i) =
+		    gen_nconc(instruction_block(i),
 			      instruction_block(succ_i));
 		statement_instruction(succ_st) = instruction_undefined;
 		free_statement(succ_st);
 	    }
 	    else {
 		instruction_block(i) =
-		    gen_nconc(instruction_block(i), 
+		    gen_nconc(instruction_block(i),
 			      CONS(STATEMENT, succ_st, NIL));
 	    }
 	  }
@@ -1393,8 +1383,8 @@ list controlize_list_1(list sts,
 
     for(; !ENDP(sts); sts = CDR(sts)) {
 	statement st = STATEMENT(CAR(sts));
-	control c_next = 
-		ENDP(CDR(sts)) ? succ : 
+	control c_next =
+		ENDP(CDR(sts)) ? succ :
 			make_conditional_control(STATEMENT(CAR(CDR(sts))));
 	bool controlized;
 	bool unreachable;
@@ -1410,7 +1400,7 @@ list controlize_list_1(list sts,
 	    check_control_coherency(c_next);
 	    check_control_coherency(c_res);
 	}
-    
+
 	controlized = controlize(st, pred, c_next, c_res, used_labels);
 	unreachable = ENDP(control_predecessors(c_next));
 
@@ -1421,7 +1411,7 @@ list controlize_list_1(list sts,
 	}
 	if(controlized) {
 	    control c_in = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
-	    
+
 	    ctls = CONS(CONTROL, c_in, ctls);
 	    control_predecessors(c_in) = control_predecessors(c_next);
 	    control_successors(c_in) = CONS(CONTROL, c_next, NIL);
@@ -1430,11 +1420,11 @@ list controlize_list_1(list sts,
 	    pred = c_in;
 	}
 	else {
-	    pred = (unreachable) ? 
+	    pred = (unreachable) ?
 		    make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL) :
 		    c_res;
 	}
-	c_res = c_next ; 
+	c_res = c_next ;
     }
 
     ifdebug(1) {
@@ -1458,7 +1448,7 @@ list controlize_list_1(list sts,
 	pips_debug(5, "Nodes from c_res %p\n", c_res);
 	display_linked_control_nodes(c_res);
     }
-    
+
     return(gen_nreverse(ctls));
 }
 
@@ -1497,7 +1487,7 @@ hash_table used_labels __attribute__((__unused__));
     if(ENDP(sts)) {
       list d = gen_copy_seq(statement_declarations(st));
       string dt
-	= (statement_decls_text(st)==NULL || string_undefined_p(statement_decls_text(st))) ? 
+	= (statement_decls_text(st)==NULL || string_undefined_p(statement_decls_text(st))) ?
 	NULL
 	: strdup(statement_decls_text(st));
       string ct = string_undefined_p(statement_comments(st))?
@@ -1509,7 +1499,7 @@ hash_table used_labels __attribute__((__unused__));
       /*pips_assert("declarations are preserved in control",
 		  gen_length(statement_declarations(st))
 		  ==gen_length(statement_declarations(control_statement(c_block))));*/
-    
+
     }
     else {
       /* What happens to the declarations and comments attached to st? */
@@ -1517,9 +1507,9 @@ hash_table used_labels __attribute__((__unused__));
       /*pips_assert("declarations are preserved in conditional control",
 		  gen_length(statement_declarations(st))
 		  ==gen_length(statement_declarations(control_statement(c_block))));*/
-    
+
     }
-    
+
     ctls = controlize_list_1(sts, pred, c_end, c_block, block_used_labels);
     c_last = compact_list(ctls, c_end);
     /* To avoid compact list: c_last = c_end; */
@@ -1533,11 +1523,11 @@ hash_table used_labels __attribute__((__unused__));
     /*    pips_assert("declarations are preserved in list",
 		gen_length(statement_declarations(st))
 		==gen_length(statement_declarations(control_statement(c_block))));*/
-    
+
     if(covers_labels_p(st,block_used_labels)) {
 	/* There is no GOTO to/from  outside the statement list:
            hierarchize the control graph. */
-	statement new_st; 
+	statement new_st;
 
 	/* Unlink the c_block from the unstructured. RK. */
 	unlink_2_control_nodes(pred, c_block);
@@ -1563,18 +1553,18 @@ hash_table used_labels __attribute__((__unused__));
 	    }
 	    if(statement_block_p(new_st)) {
 	      if(ENDP(statement_declarations(new_st))) {
-		statement_declarations(new_st) = 
+		statement_declarations(new_st) =
 		  gen_copy_seq(statement_declarations(st));
 	      }
 	      else {
 		new_st = make_block_statement(CONS(STATEMENT, new_st, NIL));
-		statement_declarations(new_st) = 
+		statement_declarations(new_st) =
 		  gen_copy_seq(statement_declarations(st));
 	      }
 	    }
 	    else {
 	      new_st = make_block_statement(CONS(STATEMENT, new_st, NIL));
- 	      statement_declarations(new_st) = 
+ 	      statement_declarations(new_st) =
 		gen_copy_seq(statement_declarations(st));
 	    }
 	  }
@@ -1594,7 +1584,7 @@ hash_table used_labels __attribute__((__unused__));
 		check_control_coherency(unstructured_control(u));
 		check_control_coherency(unstructured_exit(u));
 	    }
-	    new_st = make_statement(entity_empty_label(), 
+	    new_st = make_statement(entity_empty_label(),
 				    statement_number(st),
 				    STATEMENT_ORDERING_UNDEFINED,
 				    statement_comments(st),
@@ -1637,7 +1627,7 @@ hash_table used_labels __attribute__((__unused__));
 		    ==gen_length(statement_declarations(control_statement(c_res))));*/
     }
     union_used_labels( used_labels, block_used_labels);
-    
+
     hash_table_free(block_used_labels);
 
     pips_debug(5, "Exiting with controlized = %s\n", bool_to_string(controlized));
@@ -1656,7 +1646,7 @@ hash_table used_labels __attribute__((__unused__));
 		    ==gen_length(statement_declarations(control_statement(c_res))));
 	*/
     }
-    
+
     return(controlized);
 }
 
@@ -1679,7 +1669,7 @@ hash_table used_labels;
   statement s_f = test_false(t);
   bool controlized;
 
-  pips_debug(5, "(st = %p, pred = %p, succ = %p, c_res = %p)\n",
+  pips_debug(5, "Entering (st = %p, pred = %p, succ = %p, c_res = %p)\n",
 	     st, pred, succ, c_res);
 
   ifdebug(5) {
@@ -1697,17 +1687,24 @@ hash_table used_labels;
   }
 
   controlize(s_t, c_res, c_join, c1, t_used_labels);
+  /* Just put the IF statement in c_res so that
+     add_proper_successor_to_predecessor() that may be called from the
+     next controlize() here behave correctly: */
+  control_statement(c_res) = st;
   controlize(s_f, c_res, c_join, c2, f_used_labels);
 
   if(covers_labels_p(s_t, t_used_labels) &&
      covers_labels_p(s_f, f_used_labels)) {
     /* If all the label jumped to from the THEN/ELSE statements are in
        their respecive statement, we can replace the unstructured test by
-       a structure one: */
+       a structured one: */
     test it = make_test(test_condition(t),
 			control_statement(c1),
 			control_statement(c2));
-    // Memory leak on c1 & c2...
+    /* c1 & c2 are no longer useful: */
+    free_a_control_without_its_statement(c1);
+    free_a_control_without_its_statement(c2);
+
     UPDATE_CONTROL(c_res,
 		   make_statement(statement_label(st),
 				  statement_number(st),
@@ -1748,7 +1745,7 @@ hash_table used_labels;
   /* control_successors(pred) = ADD_SUCC(c_res, pred); */
   add_proper_successor_to_predecessor(pred, c_res);
 
-  union_used_labels(used_labels, 
+  union_used_labels(used_labels,
 		    union_used_labels(t_used_labels, f_used_labels));
 
   hash_table_free(t_used_labels);
@@ -1761,9 +1758,9 @@ hash_table used_labels;
     check_control_coherency(pred);
     check_control_coherency(succ);
     check_control_coherency(c_res);
-  }    
+  }
   pips_debug(5, "Exiting\n");
-    
+
   return(controlized);
 }
 
@@ -1771,7 +1768,7 @@ hash_table used_labels;
    int the Label_statements table and allocate a slot in the Label_control
    table. */
 
-void init_label(name, st ) 
+void init_label(name, st )
 string name;
 statement st;
 {
@@ -1788,7 +1785,7 @@ statement st;
 	if (! hash_defined_p(Label_control, name)) {
 	    statement new_st = make_continue_statement(statement_label(st)) ;
 	    control c = make_control( new_st, NIL, NIL);
-	    
+
 	    hash_put(Label_control, name, (char *)c);
 	}
     }
@@ -1822,12 +1819,12 @@ statement st;
 void create_statements_of_labels(st)
 statement st ;
 {
-    gen_recurse(st, 
+    gen_recurse(st,
 		statement_domain,
 		gen_true,
 		create_statements_of_label);
 }
-	
+
 
 /* SIMPLIFIED_UNSTRUCTURED tries to get rid of top-level and useless
    unstructure nodes.
@@ -1860,31 +1857,31 @@ simplified_unstructured(control top,
 	display_linked_control_nodes(res);
 	check_control_coherency(res);
     }
-    
+
     u = make_unstructured(top, bottom);
 
     if(!ENDP(control_predecessors(top))) {
 	/* There are goto on the entry node: */
 	return(u);
     }
-    
+
     if(gen_length(succs=control_successors(top)) != 1) {
 	/* The entry node is not a simple node sequence: */
 	return(u);
     }
-    
+
     pips_assert("simplify_control", CONTROL(CAR(succs)) == res);
-    
+
     if(gen_length(control_predecessors(res)) != 1) {
 	/* The second node has more than 1 goto on it: */
 	return(u);
     }
-    
+
     if(gen_length(succs=control_successors(res)) != 1) {
 	/* Second node is not a simple node sequence: */
 	return(u);
     }
-    
+
     if(CONTROL(CAR(succs)) != bottom) {
 	/* The third node is not the exit node: */
 	return(u);
@@ -1894,7 +1891,7 @@ simplified_unstructured(control top,
 	/* The exit node has more than 1 goto on it: */
 	return(u);
     }
-    
+
     if(!ENDP(control_successors(bottom))) {
 	/* The exit node has a successor: */
 	return(u);

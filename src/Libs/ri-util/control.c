@@ -169,7 +169,7 @@ check_control_coherency(control c)
     CONTROL_MAP(ctl, {
 
 	/* Test the coherency of the successors */
-	MAP(CONTROL, cc, {	    
+	MAP(CONTROL, cc, {
 	    /* if (!is_control_in_list_p(ctl, control_predecessors(cc))) { */
 	    if ((i1=occurences_in_control_list(ctl, control_predecessors(cc)))
 		!= (i2=occurences_in_control_list(cc, control_successors(ctl)))) {
@@ -213,7 +213,7 @@ check_control_coherency(control c)
 	/* Check that two nodes do not point towards the same
 	   statement as this makes label resolution ambiguous */
 	if(set_belong_p(stmts, control_statement(ctl))) {
-	  fprintf(stderr, "Statement %p is pointed by two different control nodes\n");
+	  fprintf(stderr, "Statement %p is pointed by two different control nodes\n", control_statement(ctl));
 	  pips_assert("each statement appears in at most one control node", FALSE);
 	}
 	else
@@ -221,7 +221,7 @@ check_control_coherency(control c)
     }, c, blocs);
 
     set_free(stmts);
-    gen_free_list(blocs);  
+    gen_free_list(blocs);
 }
 
 
@@ -594,7 +594,7 @@ remove_a_control_from_an_unstructured_without_relinking(control c)
       unlink_2_control_nodes(a_predecessor, c);
    }, the_predecessors);
    gen_free_list(the_predecessors);
-    
+
    MAP(CONTROL, a_successor, {
       unlink_2_control_nodes(c, a_successor);
    }, the_successors);
@@ -629,6 +629,20 @@ discard_an_unstructured_without_its_statements(unstructured u)
 }
 
 
+/* Remove a control node without touching its statement, its predecessors
+   and successors, if any. */
+void
+free_a_control_without_its_statement(control c) {
+  /* Protect the statement: */
+  control_statement(c) = statement_undefined;
+  gen_free_list(control_successors(c));
+  control_successors(c) = NIL;
+  gen_free_list(control_predecessors(c));
+  control_predecessors(c) = NIL;
+
+  free_control(c);
+}
+
 /* Used to discard a control sequence without touching its statements.
  It also removes the reference to the sequence from the predecessors
  or the successors. */
@@ -646,26 +660,21 @@ discard_a_control_sequence_without_its_statements(control begin,
                      begin);
        },
        control_predecessors(begin));
-   
+
    MAP(CONTROL, a_successor,
        {
           gen_remove(&control_predecessors(a_successor) ,
                      end);
        },
        control_successors(end));
-   
+
    for(c = begin; ; c = CONTROL(CAR(successor_list))) {
       /* To pass through the free: */
       successor_list = control_successors(c);
-      
-      pips_assert("discard_a_control_sequence_without_its_statements: not a sequence.", gen_length(successor_list) <= 1);
-      
-      /* Protect the statement: */
-      control_statement(c) = statement_undefined;
-      control_successors(c) = NIL;
-      control_predecessors(c) = NIL;
 
-      free_control(c);
+      pips_assert("discard_a_control_sequence_without_its_statements: not a sequence.", gen_length(successor_list) <= 1);
+
+      free_a_control_without_its_statement(c);
 
       if (c == end)
          break;
