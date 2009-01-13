@@ -9,6 +9,7 @@ VERSION	= $(MAKE.d)/version.sh
 	  echo '#define LINEAR_REV "$(shell $(VERSION) $(LINEAR_ROOT))"'; \
 	  echo '#define PIPS_REV "$(shell $(VERSION) $(PIPS_ROOT))"'; \
 	  echo '#define NLPMAKE_REV "$(shell $(VERSION) $(PIPS_ROOT)/makes)"'; \
+	  echo '#define CC_VERSION "$(shell $(CC_VERSION))"'; \
 	} > revisions.h
 
 
