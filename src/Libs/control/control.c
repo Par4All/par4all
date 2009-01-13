@@ -114,7 +114,7 @@ cons *l;
     return(CONS(CONTROL, x, l));
 }
 
-/* Add control "pred" to the predecessor set of control c */
+/* Add control "pred" to the predecessor set of control c if not already here */
 #define ADD_PRED(pred,c) (pushnew(pred,control_predecessors(c)))
 
 /* Make a one element list from succ. */
@@ -136,13 +136,12 @@ cons *l;
 	control_successors(c)=sc; \
 	}
 
-/* PATCH_REFERENCES replaces all occurrences of FNODE by TNODE in the
-   predecessors or successors lists of its predecessors
-   or successors list (according to HOW). */
-
 #define PREDS_OF_SUCCS 1
 #define SUCCS_OF_PREDS 2
 
+/* PATCH_REFERENCES replaces all occurrences of FNODE by TNODE in the
+   predecessors or successors lists of its predecessors
+   or successors list (according to HOW, PREDS_OF_SUCCS or SUCCS_OF_PREDS). */
 static void patch_references(how, fnode, tnode)
 int how;
 control fnode, tnode;
@@ -231,7 +230,6 @@ hash_table l1, l2;
 
 /* COVERS_LABELS_P returns whether a USED_LABELS list for statement ST
    covers all the references to its labels. */
-
 static bool covers_labels_p(st,used_labels)
 statement st ;
 hash_table used_labels;
@@ -242,7 +240,7 @@ hash_table used_labels;
     }
     HASH_MAP(name, sts, {
 	cons *stats = (cons *)sts;
-	
+
 	MAPL(defs, {
 	    bool found = FALSE;
 	    statement def = STATEMENT(CAR(defs));
@@ -330,10 +328,9 @@ static void add_proper_successor_to_predecessor(control pred, control c_res)
    SUCC. If they are linked later, it is useless to pass PRED down. If
    they are linked earlier, they might have to be unlinked when structured
    code is found. */
-
 bool controlize(
     statement st,
-    control pred, 
+    control pred,
     control succ,
     control c_res,
     hash_table used_labels)
@@ -346,7 +343,7 @@ bool controlize(
     control n_succ = control_undefined; // To be used in case of goto
 
     ifdebug(5) {
-	pips_debug(1, 
+	pips_debug(1,
 	   "Begin with (st = %p, pred = %p, succ = %p, c_res = %p)\nst at entry:\n",
 		   st, pred, succ, c_res);
 	print_statement(st);
@@ -362,7 +359,7 @@ bool controlize(
 	check_control_coherency(succ);
 	check_control_coherency(c_res);
     }
-    
+
     switch(instruction_tag(i)) {
     case is_instruction_block: {
       /* A block may only contain declarations with initializations
@@ -383,7 +380,7 @@ bool controlize(
       break;
     }
     case is_instruction_test:
-	controlized = controlize_test(st, instruction_test(i), 
+	controlized = controlize_test(st, instruction_test(i),
 				      pred, succ, c_res, used_labels);
 	break;
     case is_instruction_loop:
@@ -421,8 +418,8 @@ bool controlize(
            unlink the predecessor of the former successor of pred. RK */
 	/* control_successors(pred) = ADD_SUCC(c_res, pred); */
 	add_proper_successor_to_predecessor(pred, c_res);
-	UPDATE_CONTROL(c_res, nop, 
-		       CONS(CONTROL, pred, NIL), 
+	UPDATE_CONTROL(c_res, nop,
+		       CONS(CONTROL, pred, NIL),
 		       ADD_SUCC(n_succ, c_res )) ;
 	control_predecessors(n_succ) = ADD_PRED(c_res, n_succ);
 	/* I do not know why, but my following code does not work. So
@@ -1662,10 +1659,9 @@ hash_table used_labels __attribute__((__unused__));
     
     return(controlized);
 }
-	
-/* CONTROL_TEST builds the control node of a statement ST in C_RES which is a 
+
+/* CONTROL_TEST builds the control node of a statement ST in C_RES which is a
    test T. */
-
 bool controlize_test(st, t, pred, succ, c_res, used_labels)
 test t;
 statement st;
@@ -1673,8 +1669,8 @@ control pred, succ;
 control c_res;
 hash_table used_labels;
 {
-  hash_table 
-    t_used_labels = hash_table_make(hash_string, 0), 
+  hash_table
+    t_used_labels = hash_table_make(hash_string, 0),
     f_used_labels = hash_table_make(hash_string, 0);
   control c1 = make_conditional_control(test_true(t));
   control c2 = make_conditional_control(test_false(t));
@@ -1685,7 +1681,7 @@ hash_table used_labels;
 
   pips_debug(5, "(st = %p, pred = %p, succ = %p, c_res = %p)\n",
 	     st, pred, succ, c_res);
-    
+
   ifdebug(5) {
     pips_debug(1, "THEN at entry:\n");
     print_statement(s_t);
@@ -1700,17 +1696,20 @@ hash_table used_labels;
     check_control_coherency(c_res);
   }
 
-  controlize(s_t, c_res, c_join, c1, t_used_labels);	
+  controlize(s_t, c_res, c_join, c1, t_used_labels);
   controlize(s_f, c_res, c_join, c2, f_used_labels);
 
-  if(covers_labels_p(s_t, t_used_labels) && 
+  if(covers_labels_p(s_t, t_used_labels) &&
      covers_labels_p(s_f, f_used_labels)) {
-    test it = make_test(test_condition(t), 
+    /* If all the label jumped to from the THEN/ELSE statements are in
+       their respecive statement, we can replace the unstructured test by
+       a structure one: */
+    test it = make_test(test_condition(t),
 			control_statement(c1),
 			control_statement(c2));
 
-    UPDATE_CONTROL(c_res, 
-		   make_statement(statement_label(st), 
+    UPDATE_CONTROL(c_res,
+		   make_statement(statement_label(st),
 				  statement_number(st),
 				  STATEMENT_ORDERING_UNDEFINED,
 				  statement_comments(st),
@@ -1723,6 +1722,7 @@ hash_table used_labels;
     controlized = FALSE;
   }
   else {
+    // Keep the unstructured test:
     UPDATE_CONTROL(c_res, st, 
 		   ADD_PRED(pred, c_res),
 		   CONS(CONTROL, c1, CONS(CONTROL, c2, NIL)));
@@ -1919,8 +1919,7 @@ simplified_unstructured(control top,
 
 
 /* CONTROL_GRAPH returns the control graph of the statement ST. */
-
-unstructured control_graph(st) 
+unstructured control_graph(st)
 statement st;
 {
     control result, top, bottom;
@@ -1967,13 +1966,17 @@ statement st;
     u = simplified_unstructured(top, bottom, result);
 
     if( get_debug_level() > 5) {
-	pips_debug(1, 
+	pips_debug(1,
 	  "Nodes in unstructured %p (entry %p, exit %p) from entry:\n",
 		   u, unstructured_control(u), unstructured_exit(u));
 	display_linked_control_nodes(unstructured_control(u));
 	pips_debug(1, "Accessible nodes from exit:\n");
 	display_linked_control_nodes(unstructured_exit(u));
     }
+
+    /* Since the controlizer is a sensitive pass, avoid leaking basic
+       errors... */
+    unstructured_consistent_p(u);
 
     reset_unstructured_number();
     unstructured_reorder(u);

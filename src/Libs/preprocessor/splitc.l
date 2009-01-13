@@ -2,8 +2,8 @@
 
 /******************** LEXICAL ANALYZER **************************
 
-  Here are the lexical rules, based on the work of people from 
-  Open Source Quality projects (http://osq.cs.berkeley.edu/), used 
+  Here are the lexical rules, based on the work of people from
+  Open Source Quality projects (http://osq.cs.berkeley.edu/), used
   by the CCured source-to-source translator for C
 
 
@@ -17,7 +17,7 @@
  *  Wes Weimer          <weimer@cs.berkeley.edu>
  *  Ben Liblit          <liblit@cs.berkeley.edu>
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
  * met:
@@ -109,15 +109,15 @@ void reset_csplit_current_beginning()
   user_current_beginning = 1000000;
   csplit_is_static_p = FALSE;
 
-  if(!string_undefined_p(csplit_current_function_name)) 
+  if(!string_undefined_p(csplit_current_function_name))
     free(csplit_current_function_name);
   csplit_current_function_name = string_undefined;
 
-  if(!string_undefined_p(csplit_definite_function_name)) 
+  if(!string_undefined_p(csplit_definite_function_name))
     free(csplit_definite_function_name);
   csplit_definite_function_name = string_undefined;
 
-  if(!string_undefined_p(csplit_definite_function_signature)) 
+  if(!string_undefined_p(csplit_definite_function_signature))
     free(csplit_definite_function_signature);
   csplit_definite_function_signature = string_undefined;
 
@@ -168,32 +168,32 @@ octnum (0{octdigit}+{intsuffix}?)
 hexnum ({hexprefix}{hexdigit}+{intsuffix}?)
 exponent ([eE][\+\-]?{decdigit}+)
 fraction (\.{decdigit}+)
-decfloat (({intnum}?{fraction})|({intnum}{exponent})|({intnum}?{fraction}{exponent})|({intnum}\.)|({intnum}\.{exponent})) 
+decfloat (({intnum}?{fraction})|({intnum}{exponent})|({intnum}?{fraction}{exponent})|({intnum}\.)|({intnum}\.{exponent}))
 hexfraction (({hexdigit}*"."{hexdigit}+)|({hexdigit}+))
 binexponent ([pP]["+""-"]?{decdigit}+)
 hexfloat (({hexprefix}{hexfraction}{binexponent})|({hexprefix}{hexdigit}+{binexponent}))
 floatsuffix [fFlL]
 floatnum (({decfloat}|{hexfloat}){floatsuffix}?)
-ident ({letter}|"_")({letter}|{decdigit}|"_")* 
+ident ({letter}|"_")({letter}|{decdigit}|"_")*
 attribident (({letter}|"_")({letter}|{decdigit}|"_"|":"))
 blank [ \t\r]+
 escape ('\\'_)
 hex_escape ('\\'[xX]{hexdigit}+)
-oct_escape ('\\'{octdigit}{octdigit}?{octdigit}?) 
+oct_escape ('\\'{octdigit}{octdigit}?{octdigit}?)
 
 %%
-"/*"([^\*]|(\*+[^\/\*]))*(\*)+"/"	{ 
-                                /* Difficulties: stars contiguous to the opening 
+"/*"([^\*]|(\*+[^\/\*]))*(\*)+"/"	{
+                                /* Difficulties: stars contiguous to the opening
                                    or closing parts. */
                                 /* Bug FI: line feed are not counted! */
                                 csplit_line_number += lf_count(yytext);
                                 user_line_number += lf_count(yytext);
                                 pips_debug(5,"Comment \"%s\"\n",yytext);
                         }
-"//"[^\n]*                { 
+"//"[^\n]*                {
                                 pips_debug(5,"Comment %s\n",yytext);
                         }
-^"#"[^\n]*              { 
+^"#"[^\n]*              {
                                 /* csplit_line_number++; */
                                 pips_debug(5,"Pragma comment %s\n",yytext);
                                 /* Must be a line pragma left by the preprocessor */
@@ -211,78 +211,78 @@ oct_escape ('\\'{octdigit}{octdigit}?{octdigit}?)
                                    }
                                 }
                         }
-{blank}			{ 
+{blank}			{
                                 /* Eat up whitespaces */
                         }
-\n                      { 
+\n                      {
                                 csplit_line_number++;
                                 user_line_number++;
                                 pips_debug(5, "New line %d, ext=%d, func=%d\n", csplit_line_number, csplit_is_external, csplit_is_function);
                         }
-"_Pragma" 	        { 
+"_Pragma" 	        {
                                 pips_debug(5,"Pragma not implemented %s\n",yytext);
 				return(TK_PRAGMA);
                         }
 
-\'[^\\]\'               { 
+\'[^\\]\'               {
                                 pips_debug(9,"TK_CHARCON: %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_CHARCON);
                         }
-\'\\[abfnrtv\'\\]\'     { 
+\'\\[abfnrtv\'\\]\'     {
                                 pips_debug(9,"TK_CHARCON: %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_CHARCON);
                         }
-\'\\0[0-9]*\'           { 
+\'\\0[0-9]*\'           {
                                 pips_debug(9,"TK_CHARCON: %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_CHARCON);
                         }
-L\'[^\\]\'               { 
+L\'[^\\]\'              {
                                 pips_debug(9,"TK_CHARCON wide character constant: %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_CHARCON);
                         }
-L\'\\[abfnrtv\'\\]\'     { 
+L\'\\[abfnrtv\'\\]\'    {
                                 pips_debug(9,"TK_CHARCON wide character constant: %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_CHARCON);
                         }
-L\'\\0[0-9]*\'           { 
+L\'\\0[0-9]*\'          {
                                 pips_debug(9,"TK_CHARCON wide character constant: %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_CHARCON);
                         }
 
-\"([^\"]|(\\\"))*\"	{ 
+\"([^\"]|(\\\"))*\"	{
                                 pips_debug(5,"TK_STRINGCON regular or wide string: %s\n",yytext);
-                                /* the "world" in L"Hello, " "world" should be treated as 
+                                /* the "world" in L"Hello, " "world" should be treated as
                                    wide even though there's no L immediately preceding it */
                                 yylval.string = strdup(yytext);
 				return(TK_STRINGCON);
                         }
-L\"([^\"]|(\"\")|(\\\"))*\"	{ 
+L\"([^\"]|(\"\")|(\\\"))*\"	{
                                 pips_debug(5,"TK_WSTRINGCON wide string: %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_WSTRINGCON);
                         }
-{floatnum}		{ 
+{floatnum}		{
                                 pips_debug(5,"TK_FLOATCON %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_FLOATCON);
                         }
-{hexnum}		{ 
+{hexnum}		{
                                 pips_debug(5,"Hexnum TK_INTCON %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_INTCON);
                         }
-{octnum}		{ 
+{octnum}		{
                                 pips_debug(5,"Octnum TK_INTCON %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_INTCON);
                         }
-{intnum}		{ 
+{intnum}		{
                                 pips_debug(5,"TK_INTCON %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_INTCON);
@@ -438,7 +438,7 @@ L\"([^\"]|(\"\")|(\\\"))*\"	{
 "~"			{
 				pips_debug(5,"TK_TILDE %s\n",yytext);
 				return(TK_TILDE);
-			}	
+			}
 "\{"                    {
 				pips_debug(5,"TK_LBRACE %s\n",yytext);
 				return(TK_LBRACE);
@@ -482,11 +482,11 @@ L\"([^\"]|(\"\")|(\\\"))*\"	{
 "__asm"                 {
 				pips_debug(5,"TK_ASM %s\n",yytext);
 				return(TK_ASM);
-			} 
+			}
 "__attribute__"                 {
 				pips_debug(5,"TK_ATTRIBUTE %s\n",yytext);
 				return(TK_ATTRIBUTE);
-			} 
+			}
 "__extension__"         {
                                 pips_user_warning("gcc extension keyword \"__extension__\" is ignored\n");
                         }
@@ -496,19 +496,19 @@ L\"([^\"]|(\"\")|(\\\"))*\"	{
 "__inline__"            {
                                 pips_user_warning("gcc extension keyword \"__inline__\" is ignored\n");
                         }
-{ident}			{ 
+{ident}			{
                                 /* C keywords or identifiers */
 				int t = is_c_keyword_typedef(yytext);
                                 update_csplit_current_beginning();
-                                if (t>0) 
-				   { 
+                                if (t>0)
+				   {
 				       pips_debug(5,"Keyword or typedef name: %s\n",yytext);
                                        yylval.string = strdup(yytext);
 				       return (t);
 				   }
 				else
 				   {
-				       pips_debug(5,"TK_IDENT: %s\n",yytext);
+ 				       pips_debug(5,"TK_IDENT: %s\n",yytext);
                                        /* Might not work if a function returns a struct declared locally in the function declaration, or a pointer to such a structrue */
                                        if(string_undefined_p(csplit_current_function_name)) {
 					 csplit_current_function_name = strdup(yytext);
@@ -518,9 +518,9 @@ L\"([^\"]|(\"\")|(\\\"))*\"	{
                                        else
 					 pips_debug(5, "Identifier ignored: \"%s\"\n",
 						    yytext);
-  
+
 				       yylval.string = strdup(yytext);
-				       return(TK_IDENT); 
+				       return(TK_IDENT);
 				   }
 			}
 <<EOF>>			{

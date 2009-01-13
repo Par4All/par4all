@@ -58,7 +58,6 @@
 #include <string.h>
 #include <ctype.h>
 
-
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
@@ -129,7 +128,7 @@ void reset_current_C_line_number()
   free_line_number_stack();
 }
 
-void error_reset_current_C_line_number()
+pvoid error_reset_current_C_line_number()
 {
   C_line_number = UNDEFINED_C_LINE_NUMBER;
 
@@ -318,7 +317,7 @@ void clear_C_comment()
     while(!comments_empty_p()) {
       string c = comments_pop();
       count++;
-      pips_debug(3, "Element %d: \"%s\"\n", 
+      pips_debug(3, "Element %d: \"%s\"\n",
 		 count, string_undefined_p(c) ? "string undefined" : c);
       if(!string_undefined_p(c))
         free(c);
@@ -416,7 +415,6 @@ oct_escape ('\\'{octdigit}{octdigit}?{octdigit}?)
 				pips_debug(3,"CNew line %s\n", yytext);
                                 C_line_number++;
                         }
-
 "_Pragma" 	        {
                                 pips_debug(9,"Pragma not implemented %s\n",yytext);
 				return(TK_PRAGMA);
@@ -746,5 +744,3 @@ void yyreset_lex(void)
 #ifndef yywrap
 int yywrap() { return 1;}
 #endif
-
-
