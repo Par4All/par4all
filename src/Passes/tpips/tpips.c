@@ -1056,17 +1056,18 @@ static void parse_arguments(int argc, char * argv[])
       case 'e':
 	tpips_exec(optarg);
 	break;
-      case 'v': 
-	fprintf(stdout, 
+      case 'v':
+	fprintf(stdout,
 		"tpips: (%s)\n"
 		"ARCH=" STRINGIFY(SOFT_ARCH) "\n"
 		"REVS=\n"
-		"%s" 
-		"DATE=%s\n", 
-		argv[0], soft_revisions, soft_date);
+		"%s"
+		"DATE=%s\n"
+		"CC_VERSION=%s\n",
+		argv[0], soft_revisions, soft_date, cc_version);
 	exit(0);
 	break;
-      case 'r': 
+      case 'r':
 	free(tpipsrc);
 	tpipsrc = strdup(optarg);
 	break;

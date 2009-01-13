@@ -8,3 +8,5 @@ char * soft_revisions =
   "  nlpmake: " NLPMAKE_REV "\n";
 
 char * soft_date = UTC_DATE;
+
+char * cc_version = CC_VERSION;
