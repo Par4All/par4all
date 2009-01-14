@@ -1,0 +1,30 @@
+delete unstruc01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create unstruc01 unstruc01.f
+
+echo
+echo Code:
+echo
+
+display PRINTED_FILE
+
+echo
+echo Proper effects:
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE
+
+echo
+echo Cumulated effects:
+echo
+
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE
+
+close
+delete unstruc01
+quit
