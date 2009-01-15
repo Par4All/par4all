@@ -329,11 +329,17 @@ make_entity_expression(entity e, cons *inds)
 			   normalized_undefined));			    
 }
 
+static int init = 100000;
+
+void reset_label_counter()
+{
+  init = 100000;
+}
+
 string 
 new_label_name(entity module)
 {
     static char name[ 64 ];
-    static int init = 99999;
     char *module_name ;
 
     pips_assert( "new_label_name", module != 0 ) ;

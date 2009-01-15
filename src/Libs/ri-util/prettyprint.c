@@ -3482,7 +3482,8 @@ text_named_module(
     }
   
   set_alternate_return_set();
-  
+  reset_label_counter();
+
   if (stat != statement_undefined) {
     MERGE_TEXTS(r,
 		text_statement(module,

@@ -1025,6 +1025,7 @@ void print_statement(statement s)
 {
   debug_on("TEXT_DEBUG_LEVEL");
   set_alternate_return_set();
+  reset_label_counter();
   push_current_module_statement(s);
   print_text(stderr, text_statement(entity_undefined, 0, s));
   pop_current_module_statement();
@@ -1037,6 +1038,7 @@ void print_statement_of_module(statement s, string mn)
   if(entity_undefined_p(get_current_module_entity())) {
     entity m = local_name_to_top_level_entity(mn);
     set_current_module_entity(m);
+    reset_label_counter();  
     print_statement(s);
     reset_current_module_entity();
   }
@@ -1050,6 +1052,7 @@ text statement_to_text(statement s)
   
   debug_on("PRETTYPRINT_DEBUG_LEVEL");
   set_alternate_return_set();
+  reset_label_counter();
   t = text_statement(entity_undefined, 0, s);
   reset_alternate_return_set();
   debug_off();
