@@ -135,26 +135,26 @@ C  T(J) {J==1}
 C (0,16)
       J = 1                                                             0015
 C (0,17)
-99995 CONTINUE
+99996 CONTINUE
 
 C  T() {}
 
 C (1,1)
 *
 C     DO loop 5 with exit had to be desugared
-      IF (J.GT.NP) GOTO 99998                                           0015
+      IF (J.GT.NP) GOTO 99999                                           0015
 
 C  T(I) {I==1, J<=160}
 
 C (10,1)
       I = 1                                                             0016
-99996 CONTINUE
+99997 CONTINUE
 
 C  T() {J<=160}
 
 C (7,1)
 C     DO loop 5 with exit had to be desugared
-      IF (I.GT.MP) GOTO 99997                                           0016
+      IF (I.GT.MP) GOTO 99998                                           0016
 
 C  T() {1<=I, I<=402, 1<=J, J<=160}
 
@@ -176,7 +176,7 @@ C  T(I) {I==I#init+1, 2<=I, I<=403, 1<=J, J<=160}
 C (6,3)
       I = I+1                                                           0016
 C     END BLOCK
-      GOTO 99996
+      GOTO 99997
 
 C  T() {0==-1}
 
@@ -203,14 +203,14 @@ C  T() {0==-1}
 C (4,5)
 1099  FORMAT(' NO FURTHER MODEL DATA AVAILABLE, STOP')                  0042
 C     END BLOCK
-99997 CONTINUE
+99998 CONTINUE
 
 C  T(J) {I==403, J==J#init+1, J<=161}
 
 C (8,1)
       J = J+1                                                           0015
-      GOTO 99995
-99998 CONTINUE
+      GOTO 99996
+99999 CONTINUE
 
 C  T(I,J,NPJET) {3<=I, 803<=I+400J, 2I+5J<=811, NPJET+1<=J,
 C    MPCON<=401}
@@ -488,26 +488,26 @@ C  P(MPCON,MPSTR) {}
 C (0,16)
       J = 1                                                             0015
 C (0,17)
-99991 CONTINUE
+99996 CONTINUE
 
 C  P(I,J,MPCON,MPSTR) {1<=J, J<=161}
 
 C (1,1)
 *
 C     DO loop 5 with exit had to be desugared
-      IF (J.GT.NP) GOTO 99994                                           0015
+      IF (J.GT.NP) GOTO 99999                                           0015
 
 C  P(I,J,MPCON,MPSTR) {1<=J, J<=160}
 
 C (10,1)
       I = 1                                                             0016
-99992 CONTINUE
+99997 CONTINUE
 
 C  P(I,J,MPCON,MPSTR) {1<=I, I<=403, 1<=J, J<=160}
 
 C (7,1)
 C     DO loop 5 with exit had to be desugared
-      IF (I.GT.MP) GOTO 99993                                           0016
+      IF (I.GT.MP) GOTO 99998                                           0016
 
 C  P(I,J,MPCON,MPSTR) {1<=I, I<=402, 1<=J, J<=160}
 
@@ -529,7 +529,7 @@ C  P(I,J,MPCON,MPSTR) {1<=I, I<=402, 1<=J, J<=160}
 C (6,3)
       I = I+1                                                           0016
 C     END BLOCK
-      GOTO 99992
+      GOTO 99997
 
 C  P(I,J,MPCON,MPSTR) {1<=I, I<=402, 1<=J, J<=160}
 
@@ -556,14 +556,14 @@ C  P() {0==-1}
 C (4,5)
 1099  FORMAT(' NO FURTHER MODEL DATA AVAILABLE, STOP')                  0042
 C     END BLOCK
-99993 CONTINUE
+99998 CONTINUE
 
 C  P(I,J,MPCON,MPSTR) {I==403, 1<=J, J<=160}
 
 C (8,1)
       J = J+1                                                           0015
-      GOTO 99991
-99994 CONTINUE
+      GOTO 99996
+99999 CONTINUE
 
 C  P(I,J,MPCON,MPSTR) {J==161}
 

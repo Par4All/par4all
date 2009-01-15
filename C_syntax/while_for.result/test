@@ -2,7 +2,7 @@ main()
 {
    int c;
    int i;
-break_2:   if (!(c>0)) goto l99998;
+break_2:   if (!(c>0)) goto l99999;
    i = 0;
    if (!(i<5)) {
       goto break_2;
@@ -10,6 +10,6 @@ break_2:   if (!(c>0)) goto l99998;
    else {
       goto break_2;
    }
-l99998:   ;
+l99999:   ;
 }
 

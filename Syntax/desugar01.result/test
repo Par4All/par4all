@@ -15,13 +15,13 @@ c     assign statement
       NEXT = 200                                                        0010
 
 c     labelled logical if with alternate return
-100   IF (X.GT.0.) GOTO 99998                                           0012
+100   IF (X.GT.0.) GOTO 99999                                           0012
 
 c     labelled logical if with computed go to
-200   IF (X.EQ.0.) GOTO 99997                                           0015
+200   IF (X.EQ.0.) GOTO 99998                                           0015
 
 c     labelled logical if with assigned go to
-300   IF (X.LT.0.) GOTO 99996                                           0018
+300   IF (X.LT.0.) GOTO 99997                                           0018
 
 c     labelled loop
 400   CONTINUE
@@ -32,12 +32,12 @@ c     labelled loop
 
       I_PIPS_RETURN_CODE_ = 0                                           0024
       RETURN
-99996 CONTINUE
+99997 CONTINUE
       IF (NEXT.EQ.100) GOTO 100                                         0019
       IF (NEXT.EQ.200) GOTO 200                                         0019
       IF (NEXT.EQ.300) GOTO 300                                         0019
       STOP                                                              0017
-99997 CONTINUE
+99998 CONTINUE
       IF (I.EQ.1) GOTO 100                                              0016
       IF (I.EQ.2) GOTO 200                                              0016
       IF (I.EQ.3) THEN                                                  0016
@@ -45,7 +45,7 @@ c     labelled loop
       ELSE
          GOTO 300
       ENDIF
-99998 CONTINUE
+99999 CONTINUE
       I_PIPS_RETURN_CODE_ = 2                                           0013
       END
 

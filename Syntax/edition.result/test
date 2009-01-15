@@ -60,14 +60,14 @@ c     BUFFER IN (NFICH,0) (TITRE(1),IT)
       WRITE (IMP, 1000) IT                                              0020
       REWIND (NFICH)                                                    0021
       N = 1                                                             0022
-99994 CONTINUE
+99995 CONTINUE
 C
 C     DO loop 100 with exit had to be desugared
-      IF (N.GT.NT) GOTO 99998                                           0022
+      IF (N.GT.NT) GOTO 99999                                           0022
       ICHIF = KPRINT/(10**(NT-N))-10*(KPRINT/(10**(NT-N+1)))            0023
       IF (ICHIF.EQ.0) GOTO 100                                          0024
       KP = 1                                                            0026
-99995 CONTINUE
+99996 CONTINUE
 C     DO loop 200 with exit had to be desugared
       IF (KP.GT.KPMAX) GOTO 100                                         0026
 c     BUFFER IN (NFICH,0) (TITRE(1),IT)
@@ -77,9 +77,9 @@ c     BUFFER IN (NFICH,0) (TITRE(1),IT)
       ENDIF
 41    CONTINUE                                                          0028
       II = I1                                                           0029
-99996 CONTINUE
+99997 CONTINUE
 C     DO loop 210 with exit had to be desugared
-      IF (II.GT.I2) GOTO 99997                                          0029
+      IF (II.GT.I2) GOTO 99998                                          0029
 c     BUFFER IN (NFICH,0) (TI(1,1,1),TI(JMAX,KMAX,5))
       IF (UNIT(NFICH).LT.0) THEN                                        0030
       ELSE
@@ -111,8 +111,8 @@ c     BUFFER IN (NFICH,0) (TI(1,1,1),TI(JMAX,KMAX,5))
 220      CONTINUE                                                       0064
 210   CONTINUE                                                          0065
       II = II+1                                                         0029
-      GOTO 99996
-99997 CONTINUE
+      GOTO 99997
+99998 CONTINUE
 C
       DO 230 KAS = 1, 2                                                 0066
          JDEB = JD(KAS)                                                 0067
@@ -133,11 +133,11 @@ C
       REWIND (NFICH)                                                    0082
 200   CONTINUE                                                          0083
       KP = KP+1                                                         0026
-      GOTO 99995
+      GOTO 99996
 100   CONTINUE                                                          0084
       N = N+1                                                           0022
-      GOTO 99994
-99998 CONTINUE
+      GOTO 99995
+99999 CONTINUE
 C
 C*******************************************************************
 1000  FORMAT(///,' NOMBRE D ITERATIONS EFFECTUEES',I5/,' ---------------

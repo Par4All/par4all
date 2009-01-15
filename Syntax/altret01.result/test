@@ -49,11 +49,11 @@ C     Check different handlings of alternate return constructs
       CALL BAR2("*123", X, I_PIPS_RETURN_CODE_)                         0003
       IF (I_PIPS_RETURN_CODE_.EQ.1) GOTO 123                            0003
 
-      IF (X.GT.FLOAT(IY)) GOTO 99998                                    0005
+      IF (X.GT.FLOAT(IY)) GOTO 99999                                    0005
 
 123   CONTINUE                                                          0007
       I_PIPS_RETURN_CODE_ = 1                                           0008
       RETURN
-99998 CONTINUE
+99999 CONTINUE
       I_PIPS_RETURN_CODE_ = 0                                           0006
       END

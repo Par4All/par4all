@@ -22,13 +22,13 @@ int main(int argc, char **argv)
       int c = (1>2?1:2);
       printf("%d\n", c);
       pmax0 = c;
-l99998:      ;
+l99999:      ;
    }
    {
       int c = (1>2?1:2);
       printf("%d\n", c);
       pmax1 = c;
-l99997:      ;
+l99998:      ;
    }
    return pmax0+pmax1;
 }

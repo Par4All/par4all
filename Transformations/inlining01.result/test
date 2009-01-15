@@ -20,9 +20,9 @@ int main(int argc, char **argv)
 {
    int d = 0;
    if (2>argc)
-      goto l99998;
+      goto l99999;
    printf("%d\n", (2>argc?2:argc));
-l99998:   ;
+l99999:   ;
    return d;
 }
 

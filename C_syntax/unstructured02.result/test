@@ -49,39 +49,39 @@ int unstructured02()
    int lambda;
    int b;
    i = 1;
-l99994:   ;
-   if (!(i<=n)) goto l99998;
 l99995:   ;
+   if (!(i<=n)) goto l99999;
+l99996:   ;
    if (!(a2!=0)) goto break_2;
    i = 0;
-l99996:   ;
-   if (!(i<n)) goto l99997;
+l99997:   ;
+   if (!(i<n)) goto l99998;
    if (a2==a1) goto SKIP;
    i++;
-   goto l99996;
+   goto l99997;
 SKIP:   if (a2==a1) goto break_2;
    a2 = a1;
-   goto l99995;
+   goto l99996;
 break_2:   ;
    i++;
-   goto l99994;
-l99997:   ;
-   if (lambda==0.) goto l99993;
-   if (1>a2) goto SKIP;
-   if (1>b) {
-      goto SKIP;
-   }
-   else {
-      goto SKIP;
-   }
-l99993:   ;
-   if (1>a2) goto SKIP;
-   if (1>b) {
-      goto SKIP;
-   }
-   else {
-      goto SKIP;
-   }
+   goto l99995;
 l99998:   ;
+   if (lambda==0.) goto l99994;
+   if (1>a2) goto SKIP;
+   if (1>b) {
+      goto SKIP;
+   }
+   else {
+      goto SKIP;
+   }
+l99994:   ;
+   if (1>a2) goto SKIP;
+   if (1>b) {
+      goto SKIP;
+   }
+   else {
+      goto SKIP;
+   }
+l99999:   ;
    return 1;
 }

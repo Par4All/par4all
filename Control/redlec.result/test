@@ -10,14 +10,14 @@ Output of the parser
             IF (IPOYNT.GT.LONGSF) THEN                                  0003
                READ (UNIT=NFILEC,FMT='(A)',END=1999,ERR=1999) LIGNE(1   0004
      &         :LONGSF)                                                 0004
+               GOTO 99999
+               
+               GOTO 1999
+99999          CONTINUE
                GOTO 99998
                
                GOTO 1999
 99998          CONTINUE
-               GOTO 99997
-               
-               GOTO 1999
-99997          CONTINUE
             ELSE
             ENDIF
          ENDDO
@@ -36,15 +36,15 @@ Output of the controlizer
       ELSE
          GOTO 1999
       ENDIF
-99996 CONTINUE
+99999 CONTINUE
 C     DO WHILE loop with GO TO exit had to be desugared
       IF (.NOT.IPOYNT.LE.LONGSF) GOTO 1999                              0002
       IF (IPOYNT.GT.LONGSF) THEN                                        0003
       ELSE
-         GOTO 99996
+         GOTO 99999
       ENDIF
       READ (UNIT=NFILEC,FMT='(A)',END=1999,ERR=1999) LIGNE(1:LONGSF)    0004
-      GOTO 99996
+      GOTO 99999
 1999  CONTINUE                                                          0005
       END
 

@@ -16,7 +16,7 @@ Module INCREMENT
       INTEGER M
       CHARACTER Y(1:M)
 
-99998 CONTINUE                                                          0001
+99999 CONTINUE                                                          0001
 
       PRINT *, Y(2)                                                     0002
 

@@ -16,13 +16,13 @@ Entry INCREMENT
       INTEGER M
       CHARACTER Y(1:M)
 
-99998 CONTINUE                                                          0001
+99999 CONTINUE                                                          0001
 
       PRINT *, Y(2)                                                     0002
 
       M = M+1                                                           0003
 
-99997 CONTINUE                                                          0004
+99998 CONTINUE                                                          0004
 
       PRINT *, Y(3)                                                     0005
 
@@ -36,7 +36,7 @@ Entry INCREMENT
       INTEGER M
       CHARACTER Y(1:M)
 
-99997 CONTINUE                                                          0001
+99998 CONTINUE                                                          0001
 
       PRINT *, Y(3)                                                     0002
 

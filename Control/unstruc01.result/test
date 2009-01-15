@@ -3,19 +3,19 @@
 C     Check bug in controlizer when controlize_test() calls itself
 C     recursively
 
-      IF (NASS.EQ.157) GOTO 99980                                       0001
-      IF (NASS.EQ.60) GOTO 99979                                        0003
+      IF (NASS.EQ.157) GOTO 99999                                       0001
+      IF (NASS.EQ.60) GOTO 99998                                        0003
 C     BEGIN BLOCK
 
       RETURN
 C     END BLOCK
-99979 CONTINUE
+99998 CONTINUE
       NQ = 1                                                            0004
-99978 CONTINUE
+99997 CONTINUE
       RETURN
-99980 CONTINUE
+99999 CONTINUE
       NQ = 4                                                            0002
-      GOTO 99978
+      GOTO 99997
       END
 
 Try Bourdoncle's restructuring...
@@ -31,11 +31,11 @@ C  T() {}
 C     Check bug in controlizer when controlize_test() calls itself
 C     recursively
 
-      IF (NASS.EQ.157) GOTO 99977                                       0001
+      IF (NASS.EQ.157) GOTO 99999                                       0001
 
 C  T() {}
 
-      IF (NASS.EQ.60) GOTO 99976                                        0003
+      IF (NASS.EQ.60) GOTO 99998                                        0003
 
 C  T() {}
 
@@ -46,17 +46,17 @@ C  T() {}
 
       RETURN
 C     END BLOCK
-99976 CONTINUE
+99998 CONTINUE
 
 C  T(NQ) {NQ==1}
 
       NQ = 1                                                            0004
-99975 CONTINUE
+99997 CONTINUE
       RETURN
-99977 CONTINUE
+99999 CONTINUE
 
 C  T(NQ) {NQ==4}
 
       NQ = 4                                                            0002
-      GOTO 99975
+      GOTO 99997
       END

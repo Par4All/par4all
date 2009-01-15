@@ -11,7 +11,7 @@ Module ENTRY22
 
       PRINT *, X                                                        0001
 
-99998 CONTINUE
+99999 CONTINUE
 
       X(1) = 0.                                                         0002
 
@@ -27,7 +27,7 @@ Entry INIBND
       REAL*4 X(1:NCL)
       COMMON /FOO/ X
 
-99998 CONTINUE                                                          0001
+99999 CONTINUE                                                          0001
 
       X(1) = 0.                                                         0002
 

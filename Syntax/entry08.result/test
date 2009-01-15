@@ -20,7 +20,7 @@ Entry INCREMENT
       CHARACTER Y(1:M)
       COMMON /ENTRY_ENTRY08/ L
 
-99998 CONTINUE                                                          0001
+99999 CONTINUE                                                          0001
 
       PRINT *, Y(2), U                                                  0002
 

@@ -4,7 +4,7 @@ Entry INCREMENT
       SUBROUTINE INCREMENT(M)
       INTEGER M, K
 
-99998 CONTINUE                                                          0001
+99999 CONTINUE                                                          0001
 
       M = K+1                                                           0002
 

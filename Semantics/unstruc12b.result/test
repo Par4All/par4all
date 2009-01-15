@@ -12,14 +12,14 @@ C (0,2)
       J = 1                                                             0001
 C (0,3)
 C     BEGIN UNSTRUCTURED
-99997 CONTINUE
+99998 CONTINUE
 C (1,1)
 
 C     DO loop 31 with exit had to be desugared
       IF (J.GT.NJM1) GOTO 44                                            0001
 C (9,1)
       K = IINF                                                          0002
-99998 CONTINUE
+99999 CONTINUE
 C (6,1)
 C     DO loop 41 with exit had to be desugared
       IF (K.GT.ISUP) GOTO 42                                            0002
@@ -32,7 +32,7 @@ C (8,2)
 C (8,3)
       K = K+1                                                           0002
 C     END BLOCK
-      GOTO 99998
+      GOTO 99999
 C (5,1)
 42    VOLUME = ZMOYEN                                                   0006
 C (3,1)
@@ -44,7 +44,7 @@ C (4,2)
 C (4,3)
       J = J+1                                                           0001
 C     END BLOCK
-      GOTO 99997
+      GOTO 99998
 C (2,1)
 44    CONTINUE                                                          0010
 C     END UNSTRUCTURED
@@ -86,7 +86,7 @@ C  T(J,K) {J#init<=J}
 
 C (0,3)
 C     BEGIN UNSTRUCTURED
-99995 CONTINUE
+99998 CONTINUE
 
 C  T() {}
 
@@ -99,7 +99,7 @@ C  T(K) {IINF==K}
 
 C (9,1)
       K = IINF                                                          0002
-99996 CONTINUE
+99999 CONTINUE
 
 C  T() {}
 
@@ -127,7 +127,7 @@ C  T(K) {K==K#init+1}
 C (8,3)
       K = K+1                                                           0002
 C     END BLOCK
-      GOTO 99996
+      GOTO 99999
 
 C  T() {}
 
@@ -154,7 +154,7 @@ C  T(J) {J==J#init+1}
 C (4,3)
       J = J+1                                                           0001
 C     END BLOCK
-      GOTO 99995
+      GOTO 99998
 
 C  T() {}
 
@@ -208,7 +208,7 @@ C  P(J) {J==1}
 
 C (0,3)
 C     BEGIN UNSTRUCTURED
-99993 CONTINUE
+99998 CONTINUE
 
 C  P(J,K) {1<=J}
 
@@ -221,7 +221,7 @@ C  P(J,K) {1<=J, J<=NJM1}
 
 C (9,1)
       K = IINF                                                          0002
-99994 CONTINUE
+99999 CONTINUE
 
 C  P(J,K) {IINF<=K, 1<=J, J<=NJM1}
 
@@ -249,7 +249,7 @@ C  P(J,K) {IINF<=K, K<=ISUP, 1<=J, J<=NJM1}
 C (8,3)
       K = K+1                                                           0002
 C     END BLOCK
-      GOTO 99994
+      GOTO 99999
 
 C  P(J,K) {IINF<=K, 1<=J, J<=NJM1}
 
@@ -276,7 +276,7 @@ C  P(J,K) {IINF<=K, 1<=J, J<=NJM1}
 C (4,3)
       J = J+1                                                           0001
 C     END BLOCK
-      GOTO 99993
+      GOTO 99998
 
 C  P(J,K) {1<=J}
 

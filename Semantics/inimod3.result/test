@@ -143,7 +143,7 @@ C    BSR==QTZ}
 C (0,16)
       J = 1                                                             0015
 C (0,17)
-99995 CONTINUE
+99996 CONTINUE
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
 C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
@@ -152,7 +152,7 @@ C    BSR==QTZ, 1<=J, J<=161}
 C (1,1)
 *
 C     DO loop 5 with exit had to be desugared
-      IF (J.GT.NP) GOTO 99998                                           0015
+      IF (J.GT.NP) GOTO 99999                                           0015
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
 C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
@@ -160,7 +160,7 @@ C    BSR==QTZ, 1<=J, J<=160}
 
 C (10,1)
       I = 1                                                             0016
-99996 CONTINUE
+99997 CONTINUE
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
 C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
@@ -168,7 +168,7 @@ C    BSR==QTZ, 1<=I, I<=403, 1<=J, J<=160}
 
 C (7,1)
 C     DO loop 5 with exit had to be desugared
-      IF (I.GT.MP) GOTO 99997                                           0016
+      IF (I.GT.MP) GOTO 99998                                           0016
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
 C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
@@ -198,7 +198,7 @@ C    BSR==QTZ, 1<=I, I<=402, 1<=J, J<=160}
 C (6,3)
       I = I+1                                                           0016
 C     END BLOCK
-      GOTO 99996
+      GOTO 99997
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
 C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
@@ -231,7 +231,7 @@ C  P() {0==-1}
 C (4,5)
 1099  FORMAT(' NO FURTHER MODEL DATA AVAILABLE, STOP')                  0042
 C     END BLOCK
-99997 CONTINUE
+99998 CONTINUE
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
 C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,
@@ -239,8 +239,8 @@ C    BSR==QTZ, I==403, 1<=J, J<=160}
 
 C (8,1)
       J = J+1                                                           0015
-      GOTO 99995
-99998 CONTINUE
+      GOTO 99996
+99999 CONTINUE
 
 C  P(BSR,BSZ,CON,EN0,FTR,FTZ,GAM,I,J,MPCON,MPSTR,QTR,QTZ,TR,TZ)
 C    {0.0D0==FTR, 1.0D0==BSR, BSR==BSZ, BSR+CON==GAM, BSR==QTR,

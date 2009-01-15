@@ -16,26 +16,26 @@ C  T(J) {J==1}
 C (0,2)
       J = 1                                                             0001
 C (0,3)
-99995 CONTINUE
+99996 CONTINUE
 
 C  T() {}
 
 C (1,1)
 
 C     DO loop 5 with exit had to be desugared
-      IF (J.GT.NP) GOTO 99998                                           0001
+      IF (J.GT.NP) GOTO 99999                                           0001
 
 C  T(I) {I==1, J<=160}
 
 C (9,1)
       I = 1                                                             0002
-99996 CONTINUE
+99997 CONTINUE
 
 C  T() {J<=160}
 
 C (6,1)
 C     DO loop 5 with exit had to be desugared
-      IF (I.GT.MP) GOTO 99997                                           0002
+      IF (I.GT.MP) GOTO 99998                                           0002
 
 C  T() {1<=I, I<=402, 1<=J, J<=160}
 
@@ -57,15 +57,15 @@ C  T(I) {I==I#init+1, 2<=I, I<=403, 1<=J, J<=160}
 C (5,3)
       I = I+1                                                           0002
 C     END BLOCK
-      GOTO 99996
-99997 CONTINUE
+      GOTO 99997
+99998 CONTINUE
 
 C  T(J) {I==403, J==J#init+1, J<=161}
 
 C (7,1)
       J = J+1                                                           0001
-      GOTO 99995
-99998 CONTINUE
+      GOTO 99996
+99999 CONTINUE
 
 C  T() {J==161}
 

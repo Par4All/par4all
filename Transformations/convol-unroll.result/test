@@ -20,7 +20,7 @@ c     of the image
             LU_NUB1 = 3
             LU_IB1 = 0
             LU_IND1 = 0
-99996       CONTINUE
+99997       CONTINUE
             LU_IND1 = 0
             LU_NUB0 = 3
             LU_IB0 = 0
@@ -50,7 +50,7 @@ c     of the image
             NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+1,J+1)*KERNEL(3,3   0009
      &      )                                                           0009
             KJ = 4
-99995       CONTINUE
+99996       CONTINUE
             KI = 4
             NEW_IMAGE(I,J) = NEW_IMAGE(I,J)/9                           0012
 300         CONTINUE                                                    0013

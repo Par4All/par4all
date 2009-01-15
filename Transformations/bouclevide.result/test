@@ -10,20 +10,20 @@ C      parameter (NC=100)
       DO 320 I = 1, NC                                                  0003
          V(I) = 0.                                                      0004
          W(I) = 0.                                                      0005
-         IF (I.GT.10) GOTO 99998                                        0006
+         IF (I.GT.10) GOTO 99999                                        0006
          DO J = 1, JC                                                   0009
             W(I) = W(I)/V(I)                                            0010
             GAMAI(I) = W(I)+G(I,J)                                      0011
          ENDDO
-99995    CONTINUE
-320      CONTINUE                                                       0012
-         GOTO 99997
-99998    CONTINUE
-         IF (NC.LT.JC.AND.NC.GT.10) GOTO 99996                          0007
-         GOTO 99995
 99996    CONTINUE
-         GOTO 320
+320      CONTINUE                                                       0012
+         GOTO 99998
+99999    CONTINUE
+         IF (NC.LT.JC.AND.NC.GT.10) GOTO 99997                          0007
+         GOTO 99996
 99997    CONTINUE
+         GOTO 320
+99998    CONTINUE
 
       END
 ## apres restructuration

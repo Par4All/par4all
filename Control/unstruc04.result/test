@@ -4,14 +4,14 @@ C     BEGIN UNSTRUCTURED
 C     Check special case of loop with a unique controle node
 
       I = 0                                                             0001
-1     IF (INC(I).LT.10) GOTO 99994                                      0002
+1     IF (INC(I).LT.10) GOTO 99999                                      0002
 C     BEGIN BLOCK
 C     END BLOCK
 C     BEGIN BLOCK
       PRINT *, I                                                        0004
       RETURN
 C     END BLOCK
-99994 CONTINUE
+99999 CONTINUE
       GOTO 1
 C     END UNSTRUCTURED
       END
@@ -36,7 +36,7 @@ C     Check special case of loop with a unique controle node
 
 C  T(I) {I==I#init+1}
 
-1     IF (INC(I).LT.10) GOTO 99993                                      0002
+1     IF (INC(I).LT.10) GOTO 99999                                      0002
 
 C  T() {}
 
@@ -55,7 +55,7 @@ C  T() {}
 
       RETURN
 C     END BLOCK
-99993 CONTINUE
+99999 CONTINUE
       GOTO 1
 C     END UNSTRUCTURED
       END

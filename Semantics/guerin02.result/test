@@ -10,24 +10,24 @@
       DO5_END = 10                                                      0004
       DO5_INCREMENT = 1                                                 0004
       DO5_INDEX = DO5_BEGIN                                             0004
-99993 CONTINUE
-      IF (DO5_INDEX.LE.DO5_END) GOTO 99998                              0004
-      IF (A.LT.B) GOTO 99997                                            0012
+99994 CONTINUE
+      IF (DO5_INDEX.LE.DO5_END) GOTO 99999                              0004
+      IF (A.LT.B) GOTO 99998                                            0012
       B = 7                                                             0015
       A = 89                                                            0016
-99995 CONTINUE
+99996 CONTINUE
       IF (A.LT.B) THEN                                                  0017
       ELSE
-         GOTO 99996
+         GOTO 99997
       ENDIF
       R = A*R                                                           0018
       A = A+9                                                           0019
-      GOTO 99995
-99997 CONTINUE
+      GOTO 99996
+99998 CONTINUE
       B = 5                                                             0013
       A = 17                                                            0014
-      GOTO 99995
-99998 CONTINUE
+      GOTO 99996
+99999 CONTINUE
       J = DO5_INDEX                                                     0004
       B = 5                                                             0005
       A = 8                                                             0006
@@ -35,19 +35,19 @@
       DO9_END = 10                                                      0007
       DO9_INCREMENT = 1                                                 0007
       DO9_INDEX = DO9_BEGIN                                             0007
-99992 CONTINUE
-      IF (DO9_INDEX.LE.DO9_END) GOTO 99994                              0007
+99993 CONTINUE
+      IF (DO9_INDEX.LE.DO9_END) GOTO 99995                              0007
       A = B+K                                                           0011
       DO5_INDEX = DO5_INDEX+DO5_INCREMENT                               0004
-      GOTO 99993
-99994 CONTINUE
+      GOTO 99994
+99995 CONTINUE
       I = DO9_INDEX                                                     0007
       N = A*I+B                                                         0008
       M = B*I+J                                                         0009
       K = K+N*M                                                         0010
       DO9_INDEX = DO9_INDEX+DO9_INCREMENT                               0007
-      GOTO 99992
-99996 CONTINUE
+      GOTO 99993
+99997 CONTINUE
 
       STOP                                                              0020
       END

@@ -24,7 +24,7 @@ int main(int argc, char **argv)
       int c = (2>argc?2:argc);
       printf("%d\n", c);
       pmax0 = c;
-l99998:      ;
+l99999:      ;
    }
    c = pmax0;
    return 0;

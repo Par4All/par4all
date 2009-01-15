@@ -18,11 +18,11 @@ main()
    int i;
    int a[5];
    i = 0;
-l99998:   ;
+l99999:   ;
    if (!(i<5)) goto found;
    if (a[i]<0) goto found;
    i++;
-   goto l99998;
+   goto l99999;
 found:   ;
    printf("found\n");
 }

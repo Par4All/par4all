@@ -124,7 +124,7 @@ PRINTED_FILE made for INCREMENT.
       SUBROUTINE INCREMENT(M, K)
       INTEGER M, K, N
 
-99998 CONTINUE                                                          0001
+99999 CONTINUE                                                          0001
 
       M = K+1                                                           0002
 

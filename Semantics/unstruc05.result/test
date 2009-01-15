@@ -16,7 +16,7 @@ C (6,1)
 C (4,1)
 200   IF (I.LE.2) THEN                                                  0009
       ELSE
-         GOTO 99998
+         GOTO 99999
       ENDIF
 C (3,1)
 C     BEGIN BLOCK
@@ -29,7 +29,7 @@ C     END BLOCK
 C (2,1)
 100   J = 7                                                             0005
       GOTO 300
-99998 CONTINUE
+99999 CONTINUE
 
 C     END UNSTRUCTURED
 C (0,4)
@@ -78,7 +78,7 @@ C  T() {}
 C (4,1)
 200   IF (I.LE.2) THEN                                                  0009
       ELSE
-         GOTO 99997
+         GOTO 99999
       ENDIF
 
 C  T(I) {I==4}
@@ -103,7 +103,7 @@ C  T(J) {J==7}
 C (2,1)
 100   J = 7                                                             0005
       GOTO 300
-99997 CONTINUE
+99999 CONTINUE
 
 C     END UNSTRUCTURED
 
@@ -158,7 +158,7 @@ C  P(I,J) {18<=I+2J, 6<=J, J<=7}
 C (4,1)
 200   IF (I.LE.2) THEN                                                  0009
       ELSE
-         GOTO 99996
+         GOTO 99999
       ENDIF
 
 C  P(I,J) {J==7, I<=5}
@@ -183,7 +183,7 @@ C  P(I) {I<=5}
 C (2,1)
 100   J = 7                                                             0005
       GOTO 300
-99996 CONTINUE
+99999 CONTINUE
 
 C     END UNSTRUCTURED
 

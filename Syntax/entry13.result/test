@@ -1,25 +1,25 @@
       SUBROUTINE BLA1
       INTEGER I
       COMMON /ENTRY_BLAX/ I
-99996 CONTINUE                                                          0001
+99997 CONTINUE                                                          0001
       I = I+1                                                           0002
       END
       SUBROUTINE BLA2
-      INTEGER I
-      COMMON /ENTRY_BLAX/ I
-99997 CONTINUE                                                          0001
-      I = I+1                                                           0002
-99996 CONTINUE                                                          0003
-      I = I+1                                                           0004
-      END
-      SUBROUTINE BLA3
       INTEGER I
       COMMON /ENTRY_BLAX/ I
 99998 CONTINUE                                                          0001
       I = I+1                                                           0002
 99997 CONTINUE                                                          0003
       I = I+1                                                           0004
-99996 CONTINUE                                                          0005
+      END
+      SUBROUTINE BLA3
+      INTEGER I
+      COMMON /ENTRY_BLAX/ I
+99999 CONTINUE                                                          0001
+      I = I+1                                                           0002
+99998 CONTINUE                                                          0003
+      I = I+1                                                           0004
+99997 CONTINUE                                                          0005
       I = I+1                                                           0006
       END
       SUBROUTINE BLAX

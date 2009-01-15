@@ -67,7 +67,7 @@ PRINTED_FILE made for EXTEND.
 
       ISTAT = 0                                                         0001
 
-99998 CONTINUE
+99999 CONTINUE
       GATEF = GATE1                                                     0002
       GATVEL = GATE2                                                    0003
       NEQUIV = NEQQ                                                     0004
@@ -197,7 +197,7 @@ PRINTED_FILE made for EXTINT.
       INTEGER NEQQ, IPRT, NEQUIV
       REAL*4 GATE1, GATE2, ALVNEW, GATEF, GATVEL, ALVERT
 
-99998 CONTINUE                                                          0001
+99999 CONTINUE                                                          0001
       GATEF = GATE1                                                     0002
       GATVEL = GATE2                                                    0003
       NEQUIV = NEQQ                                                     0004
@@ -219,7 +219,7 @@ C               <must be written>: ISTAT
 
       ISTAT = 0                                                         0001
 
-99998 CONTINUE
+99999 CONTINUE
 C               <must be read   >: GATE1
 C               <must be written>: GATEF
       GATEF = GATE1                                                     0002

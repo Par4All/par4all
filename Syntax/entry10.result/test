@@ -7,7 +7,7 @@ Module ENTRY10
 
       PRINT *, X(1)                                                     0001
 
-99998 CONTINUE
+99999 CONTINUE
 
 
       END
@@ -18,7 +18,7 @@ Entry INCREMENT
       INTEGER M, INCREMENT
       CHARACTER Y(1:M)
 
-99997 CONTINUE                                                          0001
+99998 CONTINUE                                                          0001
 
       PRINT *, Y(2)                                                     0002
 

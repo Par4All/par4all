@@ -16,7 +16,7 @@ Entry INCREMENT
       INTEGER N, M, K
       COMMON /ENTRY_ENTRY15/ M
 
-99998 CONTINUE                                                          0001
+99999 CONTINUE                                                          0001
 
       M = K+1                                                           0002
 

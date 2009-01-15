@@ -85,13 +85,13 @@ c     de'pendance sur ce qui pre'ce`de :
 c     doit e^tre re'e'crit :
 c     k = 1
 c     goto 100
-      IF (J.GE.3) GOTO 99998                                            0015
+      IF (J.GE.3) GOTO 99999                                            0015
 
 C  P() {0==-1}
 
       K = 1                                                             0017
       GOTO 100
-99998 CONTINUE
+99999 CONTINUE
 
 C  P(A,I,J) {A==9, I==4, J==8}
 
@@ -209,13 +209,13 @@ c     de'pendance sur ce qui pre'ce`de :
 c     doit e^tre re'e'crit :
 c     k = 1
 c     goto 100
-      IF (J.GE.3) GOTO 99997                                            0015
+      IF (J.GE.3) GOTO 99999                                            0015
 
 C  P() {0==-1}
 
       K = 1                                                             0017
       GOTO 100
-99997 CONTINUE
+99999 CONTINUE
 
 C  P(A,I,J) {A==9, I==4, J==8}
 

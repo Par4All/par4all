@@ -28,10 +28,10 @@ struct bar {
    int bar_second;
 };
 typedef struct bar t_bar;
-extern int bar_e(int);
-extern int bar_d(int);
-static int bar_c(int);
-extern int bar_b(int);
+extern int bar_e(int k);
+extern int bar_d(int k);
+static int bar_c(int k);
+extern int bar_b(int k);
 int bar_e(int k)
 {
    return k+5;
@@ -56,7 +56,7 @@ struct foo {
    int foo_second;
 };
 typedef struct foo t_foo;
-static int foo_a(int);
+static int foo_a(int k);
 extern  foo();
 static int foo_a(int k)
 {

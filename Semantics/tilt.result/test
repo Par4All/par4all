@@ -18,7 +18,7 @@ C  T(I,J,K) {K#init<=K}
 
 C (0,3)
 C     BEGIN UNSTRUCTURED
-99995 CONTINUE
+99996 CONTINUE
 
 C  T() {}
 
@@ -30,7 +30,7 @@ C  T(J) {J==1}
 
 C (11,1)
       J = 1                                                             0002
-99996 CONTINUE
+99997 CONTINUE
 
 C  T() {}
 
@@ -42,13 +42,13 @@ C  T(I) {I==1}
 
 C (10,1)
       I = 1                                                             0003
-99997 CONTINUE
+99998 CONTINUE
 
 C  T() {}
 
 C (6,1)
 C     DO loop 200 with exit had to be desugared
-      IF (I.GT.IM1) GOTO 99998                                          0003
+      IF (I.GT.IM1) GOTO 99999                                          0003
 
 C  T() {}
 
@@ -76,7 +76,7 @@ C  T(I) {I==I#init+1}
 C (5,3)
       I = I+1                                                           0003
 C     END BLOCK
-      GOTO 99997
+      GOTO 99998
 
 C  T() {}
 
@@ -91,13 +91,13 @@ C  T() {}
 C (4,1)
       P = 2                                                             0008
       GOTO 200
-99998 CONTINUE
+99999 CONTINUE
 
 C  T(J) {J==J#init+1}
 
 C (7,1)
       J = J+1                                                           0002
-      GOTO 99996
+      GOTO 99997
 
 C  T(K) {K==K#init+1}
 
@@ -114,7 +114,7 @@ C  T(K) {K==K#init+1}
 C (9,3)
       K = K+1                                                           0001
 C     END BLOCK
-      GOTO 99995
+      GOTO 99996
 C
 
 c        PRINT *, P
@@ -142,7 +142,7 @@ C  P(K) {K==1}
 
 C (0,3)
 C     BEGIN UNSTRUCTURED
-99991 CONTINUE
+99996 CONTINUE
 
 C  P(I,J,K) {1<=K}
 
@@ -154,7 +154,7 @@ C  P(I,J,K) {1<=K, K<=KM1}
 
 C (11,1)
       J = 1                                                             0002
-99992 CONTINUE
+99997 CONTINUE
 
 C  P(I,J,K) {1<=J, 1<=K, K<=KM1}
 
@@ -166,13 +166,13 @@ C  P(I,J,K) {1<=J, J<=JM1, 1<=K, K<=KM1}
 
 C (10,1)
       I = 1                                                             0003
-99993 CONTINUE
+99998 CONTINUE
 
 C  P(I,J,K) {1<=I, 1<=J, J<=JM1, 1<=K, K<=KM1}
 
 C (6,1)
 C     DO loop 200 with exit had to be desugared
-      IF (I.GT.IM1) GOTO 99994                                          0003
+      IF (I.GT.IM1) GOTO 99999                                          0003
 
 C  P(I,J,K) {1<=I, I<=IM1, 1<=J, J<=JM1, 1<=K, K<=KM1}
 
@@ -200,7 +200,7 @@ C  P(I,J,K) {1<=I, I<=IM1, 1<=J, J<=JM1, 1<=K, K<=KM1}
 C (5,3)
       I = I+1                                                           0003
 C     END BLOCK
-      GOTO 99993
+      GOTO 99998
 
 C  P(I,J,K) {1<=I, I<=IM1, 1<=J, J<=JM1, 1<=K, K<=KM1}
 
@@ -215,13 +215,13 @@ C  P(I,J,K) {1<=I, I<=IM1, 1<=J, J<=JM1, 1<=K, K<=KM1}
 C (4,1)
       P = 2                                                             0008
       GOTO 200
-99994 CONTINUE
+99999 CONTINUE
 
 C  P(I,J,K) {I==IM1+1, 2<=I, 1<=J, J<=JM1, 1<=K, K<=KM1}
 
 C (7,1)
       J = J+1                                                           0002
-      GOTO 99992
+      GOTO 99997
 
 C  P(I,J,K) {J==JM1+1, 1<=I, IM1+1<=I, 2<=J, 1<=K, K<=KM1}
 
@@ -238,7 +238,7 @@ C  P(I,J,K) {J==JM1+1, 1<=I, IM1+1<=I, 2<=J, 1<=K, K<=KM1}
 C (9,3)
       K = K+1                                                           0001
 C     END BLOCK
-      GOTO 99991
+      GOTO 99996
 C
 
 c        PRINT *, P

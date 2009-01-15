@@ -80,23 +80,23 @@ C
 C
 C_END_DOCUMENT
 
-      IF (ITYPE.EQ.LDOUBL) GOTO 99998                                   0001
-      IF (ITYPE.EQ.LINTEG) GOTO 99997                                   0013
+      IF (ITYPE.EQ.LDOUBL) GOTO 99999                                   0001
+      IF (ITYPE.EQ.LINTEG) GOTO 99998                                   0013
       PRINT *, 'INVALID TYPE OF DATA IN CREATE REQUEST '                0025
       WRITE (IOSTER, *) 'INVALID DATA TYPE IN ALLOCATION REQUEST'       0026
 9999  WRITE (IOSTER, 90000)                                             0027
 90000 FORMAT(' @(#) CREATE.f +_v14e_+ 2.1 05/26/97 ')                   0028
       GOTO 8888
-99997 CONTINUE
+99998 CONTINUE
 C
 C     MEMORY ALLOCATION FOR INTEGER ARRAYS
 C
-      IF (LONG.LE.LFREEIA) GOTO 99996                                   0014
+      IF (LONG.LE.LFREEIA) GOTO 99997                                   0014
       IPOINT = LNULL                                                    0022
       WRITE (IOSTER, *) 'NO MEMORY SPACE LEFT FOR INTEGER'              0023
       WRITE (IOSTER, *) 'NEED ', LONG, ' : ', LFREEIA, ' LEFT'          0024
       GOTO 9999
-99996 CONTINUE
+99997 CONTINUE
       IPOINT = LNEXTIA                                                  0015
       LNEXTIA = LNEXTIA+LONG                                            0016
       LFREEIA = LFREEIA-LONG                                            0017
@@ -108,16 +108,16 @@ C
 C
 C
       GOTO 8888
-99998 CONTINUE
+99999 CONTINUE
 C
 C     MEMORY ALLOCATION FOR DOUBLE PRECISION ARRAYS
 C
-      IF (LONG.LE.LFREEA) GOTO 99995                                    0002
+      IF (LONG.LE.LFREEA) GOTO 99996                                    0002
       IPOINT = LNULL                                                    0010
       WRITE (IOSTER, *) 'NO MEMORY SPACE LEFT FOR DOUBLE'               0011
       WRITE (IOSTER, *) 'NEED ', LONG, ' : ', LFREEA, ' LEFT'           0012
       GOTO 9999
-99995 CONTINUE
+99996 CONTINUE
 C
       IPOINT = LNEXTA                                                   0003
       LNEXTA = LNEXTA+LONG                                              0004
@@ -216,23 +216,23 @@ C
 C
 C_END_DOCUMENT
 
-      IF (ITYPE.EQ.LDOUBL) GOTO 99994                                   0001
-      IF (ITYPE.EQ.LINTEG) GOTO 99993                                   0013
+      IF (ITYPE.EQ.LDOUBL) GOTO 99999                                   0001
+      IF (ITYPE.EQ.LINTEG) GOTO 99998                                   0013
       PRINT *, 'INVALID TYPE OF DATA IN CREATE REQUEST '                0025
       WRITE (IOSTER, *) 'INVALID DATA TYPE IN ALLOCATION REQUEST'       0026
 9999  WRITE (IOSTER, 90000)                                             0027
 90000 FORMAT(' @(#) CREATE.f +_v14e_+ 2.1 05/26/97 ')                   0028
       GOTO 8888
-99993 CONTINUE
+99998 CONTINUE
 C
 C     MEMORY ALLOCATION FOR INTEGER ARRAYS
 C
-      IF (LONG.LE.LFREEIA) GOTO 99992                                   0014
+      IF (LONG.LE.LFREEIA) GOTO 99997                                   0014
       IPOINT = LNULL                                                    0022
       WRITE (IOSTER, *) 'NO MEMORY SPACE LEFT FOR INTEGER'              0023
       WRITE (IOSTER, *) 'NEED ', LONG, ' : ', LFREEIA, ' LEFT'          0024
       GOTO 9999
-99992 CONTINUE
+99997 CONTINUE
       IPOINT = LNEXTIA                                                  0015
       LNEXTIA = LNEXTIA+LONG                                            0016
       LFREEIA = LFREEIA-LONG                                            0017
@@ -244,16 +244,16 @@ C
 C
 C
       GOTO 8888
-99994 CONTINUE
+99999 CONTINUE
 C
 C     MEMORY ALLOCATION FOR DOUBLE PRECISION ARRAYS
 C
-      IF (LONG.LE.LFREEA) GOTO 99991                                    0002
+      IF (LONG.LE.LFREEA) GOTO 99996                                    0002
       IPOINT = LNULL                                                    0010
       WRITE (IOSTER, *) 'NO MEMORY SPACE LEFT FOR DOUBLE'               0011
       WRITE (IOSTER, *) 'NEED ', LONG, ' : ', LFREEA, ' LEFT'           0012
       GOTO 9999
-99991 CONTINUE
+99996 CONTINUE
 C
       IPOINT = LNEXTA                                                   0003
       LNEXTA = LNEXTA+LONG                                              0004

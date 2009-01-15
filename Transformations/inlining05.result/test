@@ -22,7 +22,7 @@ int main(int argc, char **argv)
    {
       int argc_ = (2>argc?2:argc);
       pmax0 = argc_;
-l99998:      ;
+l99999:      ;
    }
    c = pmax0;
    return 0;
