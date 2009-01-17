@@ -56,7 +56,7 @@ reference_effect_free(effect eff)
 effect reference_to_simple_effect(reference ref, action ac)
 {
 /* It should be this one, but it does not work. Maybe there is a clash with
-   old uses of make_simple_effects. Or persistancy is not properly handled? 
+   old uses of make_simple_effects. Or persistancy is not properly handled?
    - bc.
 */
   /* FI: this should be revisited now that I have cleaned up a lot of
@@ -80,12 +80,13 @@ effect reference_to_simple_effect(reference ref, action ac)
 
     /* The dimensions can be hidden in the typedef or before the typedef */
     if(type_variable_p(t)) {
-      
+
       is_array_p = is_array_p || (!ENDP(td));
     }
 
     if(is_array_p) {
       if((gen_length(ind) == type_depth(t))) {
+	/* The dimensionalities of the index and type are the same: */
 	cell cell_ref = make_cell_preference(make_preference(ref));
 	addressing ad = make_addressing_index();
 	approximation ap = make_approximation_must();
@@ -95,6 +96,9 @@ effect reference_to_simple_effect(reference ref, action ac)
 	/* This may happen with an array of structures */
 	int d = (t==ut) ? gen_length(td) : gen_length(td)+gen_length(utd);
 
+	/* RK: In the following there is 3 tests with the same code in
+	   it. Sounds it needs some code hoisting... ::-) Or some
+	   debug. Is it really the same for the pointer type? */
 	/* FI: I'm now lost here... */
 	if(gen_length(ind)==d) {
 	  reference n_ref = copy_reference(ref);
@@ -113,6 +117,26 @@ effect reference_to_simple_effect(reference ref, action ac)
 	}
 	else {
 	  /* FI: Which case are we in?*/
+	  /* RK: we may access an array with a lower dimensionality, that
+	     is a slice. Useful for example in Fortran code such as:
+	       PRINT *, an_array
+	       Cf @validation Transformations/unroll2.f
+
+	     With this solution it is not the an_array(*) that is marked
+	     as must-read but only an_array. But as stated at the main
+	     comment, the effect depends on the action.
+
+	     When calling a function with blah(an_array), an_array is
+	     marked as must-read, for its address.
+	     Cf. @validation Effects/call04.c
+	     Even more interesting:
+	     @validation Effects/call05.c
+	  */
+	  reference n_ref = copy_reference(ref);
+	  cell cell_ref = make_cell_reference(n_ref);
+	  addressing ad = make_addressing_index();
+	  approximation ap = make_approximation_must();
+	  eff = make_effect(cell_ref, ac, ad, ap, make_descriptor_none());
 	}
       }
       else {

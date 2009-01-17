@@ -681,7 +681,7 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
 	fprintf(stderr, "EFFECT UNDEFINED\n");
       }
       else {
-	pips_debug(8, "\nReturn with *pmwe (addressing mode %td and reference %p):\n",
+	pips_debug(8, "\nReturn with *pmwe (addressing mode %d and reference %p):\n",
 		   addressing_tag(effect_addressing(*pmwe)), effect_any_reference(*pmwe));
 	print_effect(*pmwe);
       }
@@ -690,7 +690,7 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
 	fprintf(stderr, "EFFECT UNDEFINED\n");
       }
       else {
-	pips_debug(8, "And *pmre (addressing mode %td and reference %p):\n",
+	pips_debug(8, "And *pmre (addressing mode %d and reference %p):\n",
 		   addressing_tag(effect_addressing(*pmre)), effect_any_reference(*pmre));
 	print_effect(*pmre);
       }
@@ -839,7 +839,7 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
       fprintf(stderr, "EFFECT UNDEFINED\n");
     }
     else {
-      pips_debug(8, "And *pmwe (addressing mode %td and reference %p):\n",
+      pips_debug(8, "And *pmwe (addressing mode %d and reference %p):\n",
 		 addressing_tag(effect_addressing(*pmwe)), effect_any_reference(*pmwe));
       print_effect(*pmwe);
     }
@@ -848,7 +848,7 @@ list generic_proper_effects_of_complex_lhs(expression exp, effect * pmwe, effect
       fprintf(stderr, "EFFECT UNDEFINED\n");
     }
     else {
-      pips_debug(8, "And *pmre (addressing mode %td and reference %p):\n",
+      pips_debug(8, "And *pmre (addressing mode %d and reference %p):\n",
 		 addressing_tag(effect_addressing(*pmre)), effect_any_reference(*pmre));
       print_effect(*pmre);
     }
@@ -1057,19 +1057,17 @@ generic_proper_effects_of_reference(reference ref)
       }
 
     pips_debug(3, "begin\n");
-    
-    if (! (*empty_context_test)(context))
-      {	
-	effect eff = (*reference_to_effect_func)(ref,
-						 make_action(is_action_read, UU));
-	le = effect_undefined_p(eff)? NIL : CONS(EFFECT, eff, NIL);
 
-	if (! ENDP(inds)) 
+    if (! (*empty_context_test)(context)) {
+	action its_a_read = make_action(is_action_read, UU);
+	effect eff = (*reference_to_effect_func)(ref, its_a_read);
+	le = effect_undefined_p(eff) ? NIL : CONS(EFFECT, eff, NIL);
+
+	if (! ENDP(inds))
 	  le = gen_nconc(le, generic_proper_effects_of_expressions(inds));
 
-
 	(*effects_precondition_composition_op)(le, context);
-      }
+    }
   }
   pips_debug(3, "end\n");
   return(le);
@@ -1403,7 +1401,7 @@ proper_effects_of_call(call c)
     /* Is the call an instruction, or a sub-expression? */
     if (instruction_call_p(inst) && (instruction_call(inst) == c))
     {
-	pips_debug(2, "Effects for statement%03zd:\n",
+	pips_debug(2, "Effects for statement %03zd:\n",
 		   statement_ordering(current_stat)); 
 	l_proper = generic_r_proper_effects_of_call(c);
 	l_proper = gen_nconc(l_proper, effects_dup(l_cumu_range));
@@ -1411,7 +1409,7 @@ proper_effects_of_call(call c)
 	if (contract_p)
 	    l_proper = proper_effects_contract(l_proper);
 	ifdebug(2) {
-	  pips_debug(2, "Proper effects for statement%03zd:\n",
+	  pips_debug(2, "Proper effects for statement %03zd:\n",
 		     statement_ordering(current_stat));  
 	  (*effects_prettyprint_func)(l_proper);
 	  pips_debug(2, "end\n");

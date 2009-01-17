@@ -8,7 +8,8 @@ SCRIPTS = \
 	onegraph.pl \
 	display_pips_daVinci \
 	pips_graph2daVinci \
-	pips_unstructured2daVinci
+	pips_unstructured2daVinci \
+	pips_unstructured2dot
 
 INSTALL_UTL =	$(SCRIPTS)
 
