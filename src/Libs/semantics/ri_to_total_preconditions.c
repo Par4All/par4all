@@ -327,7 +327,7 @@ statement_to_total_precondition(
   pips_assert("The statement total postcondition is defined", t_post != transformer_undefined);
 
   ifdebug(1) {
-    intptr_t so = statement_ordering(s);
+    _int so = statement_ordering(s);
     (void) fprintf(stderr, "statement %03td (%td,%td), total postcondition %p:\n",
 		   statement_number(s), ORDERING_NUMBER(so),
 		   ORDERING_STATEMENT(so), t_post);
@@ -336,7 +336,7 @@ statement_to_total_precondition(
 
   pips_assert("The statement transformer is defined", tf != transformer_undefined);
   ifdebug(1) {
-    intptr_t so = statement_ordering(s);
+    _int so = statement_ordering(s);
     pips_debug(9,"statement %03td (%td,%td), transformer %p:\n",
 	       statement_number(s), ORDERING_NUMBER(so),
 	       ORDERING_STATEMENT(so), tf);
@@ -377,7 +377,7 @@ statement_to_total_precondition(
     t_pre = transformer_normalize(t_pre, 4);
 
     if(!transformer_consistency_p(t_pre)) {
-      intptr_t so = statement_ordering(s);
+      _int so = statement_ordering(s);
       fprintf(stderr, "statement %03td (%td,%td), precondition %p end:\n",
 	      statement_number(s), ORDERING_NUMBER(so),
 	      ORDERING_STATEMENT(so), t_pre);
@@ -393,7 +393,7 @@ statement_to_total_precondition(
     gen_free_list(non_initial_values);
   }
   else {
-    intptr_t so = statement_ordering(s);
+    _int so = statement_ordering(s);
     pips_debug(8, "total precondition already available:\n");
     (void) print_transformer(t_pre);
     pips_debug(8, "for statement %03td (%td,%td), total precondition %p end:\n",
@@ -403,7 +403,7 @@ statement_to_total_precondition(
   }
 
   ifdebug(1) {
-    intptr_t so = statement_ordering(s);
+    _int so = statement_ordering(s);
     fprintf(stderr, "statement %03td (%td,%td), total precondition %p end:\n",
 	    statement_number(s), ORDERING_NUMBER(so),
 	    ORDERING_STATEMENT(so), load_statement_total_precondition(s));
@@ -411,7 +411,7 @@ statement_to_total_precondition(
   }
 
   ifdebug(1) {
-    intptr_t so = statement_ordering(s);
+    _int so = statement_ordering(s);
     fprintf(stderr, "statement %03td (%td,%td), total_precondition %p:\n",
 	    statement_number(s), ORDERING_NUMBER(so),
 	    ORDERING_STATEMENT(so), t_pre);

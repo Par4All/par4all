@@ -94,9 +94,9 @@ bool integer_constant_name_p(string name)
     return strlen(name)==strspn(name, INTEGER_CONSTANT_NAME_CHARS);
 }
 
-intptr_t TK_CHARCON_to_intptr_t(string name)
+_int TK_CHARCON_to__int(string name)
 {
-  intptr_t r;
+  _int r;
 
   /* Should be able to decode any C character constant... */
   if(strlen(name)==3 && name[0]=='\'' && name[2]=='\'')
@@ -266,7 +266,7 @@ Character constants are typed as int.
     }
     else if(bt == is_basic_int && size==1) {
       // Character constant
-      intptr_t i = TK_CHARCON_to_intptr_t(name);
+      _int i = TK_CHARCON_to__int(name);
       // fprintf(stderr,"make integer constant:name=%s\n",name);
       ce = make_constant(is_constant_int, (void*) i);
     }

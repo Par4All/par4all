@@ -491,9 +491,9 @@ entity v;
 /* entity make_integer_constant_entity(int c)
  * make entity for integer constant c
 
- WARNING : the basic integer size is fixed to sizeof(intptr_t) */
+ WARNING : the basic integer size is fixed to sizeof(_int) */
 entity 
-make_integer_constant_entity(intptr_t c) {
+make_integer_constant_entity(_int c) {
   entity ce;
   /* 64 bits numbers are printed in decimal in 20 digits, so with - and \0
      32 is enough. */

@@ -87,9 +87,9 @@ static void reset_dfn(control c)
 
 static void copy_dfn(control new_c, control old_c)
 {
-  intptr_t d = 0;
+  _int d = 0;
   
-  if((d = (intptr_t) hash_get(dfn, (void *) old_c)) == (intptr_t) (HASH_UNDEFINED_VALUE))
+  if((d = (_int) hash_get(dfn, (void *) old_c)) == (_int) (HASH_UNDEFINED_VALUE))
     pips_internal_error("No dfn value for control %p\n", old_c);
   
   hash_put(dfn, (void *) new_c, (void *) d);
@@ -97,15 +97,15 @@ static void copy_dfn(control new_c, control old_c)
 
 static int get_dfn(control c)
 {
-  intptr_t d = 0;
+  _int d = 0;
   
-  if((d = (intptr_t) hash_get(dfn, (void *) c)) == (intptr_t) (HASH_UNDEFINED_VALUE))
+  if((d = (_int) hash_get(dfn, (void *) c)) == (_int) (HASH_UNDEFINED_VALUE))
     pips_internal_error("No dfn value for control %p\n", c);
 
   return d;
 }
 
-static void update_dfn(control c, intptr_t d)
+static void update_dfn(control c, _int d)
 {
   hash_update(dfn, (void *) c, (void *) d);
 }

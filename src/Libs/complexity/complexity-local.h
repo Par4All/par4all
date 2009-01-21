@@ -100,13 +100,13 @@
 
 typedef struct intrinsic_cost_rec {
     char *name;
-    intptr_t min_basic_result;
-    intptr_t min_nbytes_result;
-    intptr_t int_cost;
-    intptr_t float_cost;
-    intptr_t double_cost;
-    intptr_t complex_cost;
-    intptr_t dcomplex_cost;
+    _int min_basic_result;
+    _int min_nbytes_result;
+    _int int_cost;
+    _int float_cost;
+    _int double_cost;
+    _int complex_cost;
+    _int dcomplex_cost;
 } intrinsic_cost_record;
 
 #define LOOP_INIT_OVERHEAD "LOOP-INIT-OVERHEAD"

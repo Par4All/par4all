@@ -231,7 +231,7 @@ int type_memory_size(type t)
 
    What is the semantics for bitfields? Return its size rounded to a byte
    number large enough to fit, and not the size in bit. */
-intptr_t SizeOfElements(basic b)
+_int SizeOfElements(basic b)
 {
   int e = -1;
 
@@ -567,13 +567,13 @@ storage_space_of_variable(entity v)
 	entity_to_size = hash_table_make(hash_pointer, 0);
     }
     s = hash_get(entity_to_size, (char *) v);
-    l = (intptr_t) s;
+    l = (_int) s;
     if (s == HASH_UNDEFINED_VALUE) {
       if(!SizeOfArray(v, &l)) {
 	fprintf(stderr, "[storage_space_of_variable] Non constant array size\n");
 	abort();
       }
-      hash_put(entity_to_size, (char *) v, (char *) (intptr_t) l);
+      hash_put(entity_to_size, (char *) v, (char *) (_int) l);
     }
 
     return l;

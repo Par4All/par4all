@@ -933,7 +933,7 @@ TestCoupleOfReferences(
 		       list * levelsop __attribute__ ((unused)), 
 		       Ptsg * gsop __attribute__ ((unused)))
 {
-    intptr_t i, cl, dims, ty;
+    _int i, cl, dims, ty;
     list levels = NIL, levels1 = NIL;
 
     entity e1 = reference_variable(r1), 
@@ -2186,7 +2186,7 @@ static list
 TestDiVariables(Psysteme ps, int cl, statement s1, effect ef1 __attribute__ ((unused)), statement s2, effect ef2 __attribute__ ((unused)))
 {
     list levels = NIL;
-    intptr_t l;
+    _int l;
     boolean all_level_founds = FALSE;
 
     pips_debug(7, "maximum common level (cl): %d\n", cl);

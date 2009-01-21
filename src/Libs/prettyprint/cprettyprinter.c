@@ -241,7 +241,7 @@ static string c_basic_string(basic b)
         case is_basic_bit:
             {
 	      /* An expression indeed... To be fixed... */
-                intptr_t i = (intptr_t) basic_bit(b);
+                _int i = (_int) basic_bit(b);
                 pips_debug(2,"Bit field basic: %td\n", i);
                 result = "int" SPACE; /* ignore if it is signed or unsigned */
                 break;
@@ -478,7 +478,7 @@ static string this_entity_cdeclaration(entity var)
                 if (basic_bit_p(variable_basic(v)))
                 {
 		  /* It is an expression... */
-		  intptr_t i = (intptr_t) basic_bit(variable_basic(v));
+		  _int i = (_int) basic_bit(variable_basic(v));
 		  pips_debug(2,"Basic bit %td",i);
 		  result = strdup(concatenate(result,":",int_to_string(i),NULL));
 		  user_error("this_entity_cdeclaration",

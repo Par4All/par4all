@@ -297,7 +297,7 @@ void declarations_write(FILE * f, hash_table h)
   HASH_MAP(k,v,
   {
     fprintf(f, "%s\n", (char *) k);
-    fprintf(f, "%td\n", (intptr_t) v);
+    fprintf(f, "%td\n", (_int) v);
   },h);
 }
 

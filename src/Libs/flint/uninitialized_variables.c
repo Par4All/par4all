@@ -98,8 +98,8 @@ flint_initialize_statement_def_use_variables(graph dependence_graph)
 						(char *)  a_variable);
 
 				pips_debug(6, "\tUse: statement %p (%#tx). Def: statement %p (%#tx), variable \"%s\".\n",
-					   use, (uintptr_t) statement_ordering(use),
-					   def, (uintptr_t) statement_ordering(def),
+					   use, (_uint) statement_ordering(use),
+					   def, (_uint) statement_ordering(def),
 					   entity_minimal_name(a_variable));
 			    }
 

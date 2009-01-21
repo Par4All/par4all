@@ -166,7 +166,7 @@ MakeCharacterParameter()
 
 /* For Fortran */
 parameter 
-MakeAnyScalarParameter(tag t, intptr_t size)
+MakeAnyScalarParameter(tag t, _int size)
 {
   return make_parameter(MakeTypeArray(make_basic(t, UUINT(size)), NIL),
 			make_mode_reference(),
@@ -229,7 +229,7 @@ MakeCharacterResult()
 }
 
 type 
-MakeAnyScalarResult(tag t, intptr_t size)
+MakeAnyScalarResult(tag t, _int size)
 {
     return MakeTypeArray(make_basic(t, UUINT(size)), NIL);
 }
@@ -325,7 +325,7 @@ type t2;
     return FALSE; /* just to avoid a warning */
 }
 
-type make_scalar_integer_type(intptr_t n)
+type make_scalar_integer_type(_int n)
 {
     type t = make_type(is_type_variable,
 		       make_variable(make_basic(is_basic_int, UUINT(n)), NIL,NIL));
@@ -1228,8 +1228,8 @@ basic_maximum(basic fb1, basic fb2)
 
     case is_basic_logical:
       if(basic_logical_p(b2)) {
-	intptr_t s1 = basic_logical(b1);
-	intptr_t s2 = basic_logical(b2);
+	_int s1 = basic_logical(b1);
+	_int s2 = basic_logical(b2);
 
 	b = make_basic(is_basic_logical,UUINT(s1>s2?s1:s2));
       }
@@ -1239,8 +1239,8 @@ basic_maximum(basic fb1, basic fb2)
 
     case is_basic_complex:
       if(basic_complex_p(b2) || basic_float_p(b2) || basic_int_p(b2)) {
-	intptr_t s1 = SizeOfElements(b1);
-	intptr_t s2 = SizeOfElements(b2);
+	_int s1 = SizeOfElements(b1);
+	_int s2 = SizeOfElements(b2);
 
 	b = make_basic(is_basic_complex, UUINT(s1>s2?s1:s2));
       }
@@ -1250,14 +1250,14 @@ basic_maximum(basic fb1, basic fb2)
 
     case is_basic_float:
       if(basic_complex_p(b2)) {
-	intptr_t s1 = SizeOfElements(b1);
-	intptr_t s2 = SizeOfElements(b2);
+	_int s1 = SizeOfElements(b1);
+	_int s2 = SizeOfElements(b2);
 
 	b = make_basic(is_basic_complex, UUINT(s1>s2?s1:s2));
       }
       else if(basic_float_p(b2) || basic_int_p(b2)) {
-	intptr_t s1 = SizeOfElements(b1);
-	intptr_t s2 = SizeOfElements(b2);
+	_int s1 = SizeOfElements(b1);
+	_int s2 = SizeOfElements(b2);
 
 	b = make_basic(is_basic_float, UUINT(s1>s2?s1:s2));
       }
@@ -1267,14 +1267,14 @@ basic_maximum(basic fb1, basic fb2)
 
     case is_basic_int:
       if(basic_complex_p(b2) || basic_float_p(b2)) {
-	intptr_t s1 = SizeOfElements(b1);
-	intptr_t s2 = SizeOfElements(b2);
+	_int s1 = SizeOfElements(b1);
+	_int s2 = SizeOfElements(b2);
 	
 	b = make_basic(basic_tag(b2), UUINT(s1>s2?s1:s2));
       }
       else if(basic_int_p(b2)) {
-	intptr_t s1 = SizeOfElements(b1);
-	intptr_t s2 = SizeOfElements(b2);
+	_int s1 = SizeOfElements(b1);
+	_int s2 = SizeOfElements(b2);
 
 	b = make_basic(is_basic_int, UUINT(s1>s2?s1:s2));
       }

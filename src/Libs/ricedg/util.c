@@ -283,7 +283,7 @@ prettyprint_dependence_graph_view(FILE * fd,
 		    cons *llsred =NIL;
 		    if (get_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS")){
 			MAPL(pl,{
-			    intptr_t level = INT(CAR(pl));
+			    _int level = INT(CAR(pl));
 			    if (level <= nbrcomloops) {
 				if (! ignore_this_conflict(v1,v2,c,level)) {
 				    llsred = gen_nconc(llsred, CONS(INT, level, NIL));

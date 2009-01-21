@@ -27,7 +27,7 @@ void pop_pips_context(char const * file, char const * function, int line)
   if (!debug_stack) 
     pips_internal_error("unexpected pop without push %s %s:%d\n",
 			function, file, line);
-  set_debug_stack_pointer((intptr_t) stack_pop(debug_stack));
+  set_debug_stack_pointer((_int) stack_pop(debug_stack));
 }
 
 /* That's all */

@@ -160,10 +160,10 @@ void reset_keyword_typedef_table()
    the hash table keyword_typedef_table.
    It returns an integer number corresponding to the keyword. 
    It returns 0 if s is not a keyword/typedef name */
-intptr_t
+_int
 is_c_keyword_typedef(char * s)
 {
-  intptr_t i = (intptr_t) hash_get(keyword_typedef_table,s);
+  _int i = (_int) hash_get(keyword_typedef_table,s);
   return ((char *) i == HASH_UNDEFINED_VALUE) ? 0: i;
 }
 

@@ -34,16 +34,16 @@ static void transitive_positions(set vertices,
 				 hash_table arcs,
 				 hash_table position)
 {
-  intptr_t n = 1; /* Number of modules processed at the previous iteration */
-  intptr_t iter = 0;
-  intptr_t nvertices = 0;
+  _int n = 1; /* Number of modules processed at the previous iteration */
+  _int iter = 0;
+  _int nvertices = 0;
 
   while(n>0) {
     n = 0;
     iter++;
 
     SET_MAP(v1, {
-      intptr_t cmp = 0; /* current module position */
+      _int cmp = 0; /* current module position */
       string source_module = (string) v1; /* gdb does not access v1 */
       callees c = (callees) hash_get(arcs, (void *) v1);
       list destinations = list_undefined;
@@ -65,9 +65,9 @@ static void transitive_positions(set vertices,
       }
       else {
 	MAP(STRING, v2, {
-	  intptr_t p = 0;
+	  _int p = 0;
 
-	  if((p = (intptr_t) hash_get(position, v2)) == (intptr_t) HASH_UNDEFINED_VALUE)
+	  if((p = (_int) hash_get(position, v2)) == (_int) HASH_UNDEFINED_VALUE)
 	    goto next;
 	  cmp = p+1>cmp? p+1 : cmp;
 	}, destinations);
@@ -86,8 +86,8 @@ static void transitive_positions(set vertices,
      true if no recursive cycle exists. */
   ifdebug(7) {
     SET_MAP(v1, {
-      intptr_t p = (intptr_t)hash_get(position, (void *) v1);
-      pips_assert("p is defined", p != (intptr_t) HASH_UNDEFINED_VALUE);
+      _int p = (_int)hash_get(position, (void *) v1);
+      pips_assert("p is defined", p != (_int) HASH_UNDEFINED_VALUE);
     }, vertices);
   }
 
@@ -260,10 +260,10 @@ bool callgraph(string name)
 
     DB_PUT_MEMORY_RESOURCE(DBR_CALLERS, (string) module_name, (void *) callers);
 
-    sprintf(depth,"%td", (intptr_t) hash_get(module_depth, (string) module_name));
+    sprintf(depth,"%td", (_int) hash_get(module_depth, (string) module_name));
     DB_PUT_MEMORY_RESOURCE(DBR_DEPTH, (string) module_name, (void *) strdup(depth));
 
-    sprintf(height,"%td", (intptr_t) hash_get(module_height, (string) module_name));
+    sprintf(height,"%td", (_int) hash_get(module_height, (string) module_name));
     DB_PUT_MEMORY_RESOURCE(DBR_HEIGHT, (string) module_name, (void *) strdup(height));
     i++;
   }, module_callers);

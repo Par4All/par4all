@@ -1393,7 +1393,7 @@ transformer statement_to_transformer(
     nt = transformer_normalize(nt, 4);
 
     if(!transformer_consistency_p(nt)) {
-      intptr_t so = statement_ordering(s);
+      _int so = statement_ordering(s);
       (void) fprintf(stderr, "statement %03td (%td,%td):\n",
 		     statement_number(s),
 		     ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
@@ -1453,7 +1453,7 @@ transformer statement_to_transformer(
   }
 
   ifdebug(1) {
-    intptr_t so = statement_ordering(s);
+    _int so = statement_ordering(s);
     transformer stf = load_statement_transformer(s);
 
     (void) fprintf(stderr, "statement %03td (%td,%td), transformer %p:\n",

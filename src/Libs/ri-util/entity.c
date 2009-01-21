@@ -748,7 +748,7 @@ entity_basic(entity e)
 
 /* return TRUE if the basic associated with entity e matchs the passed tag */
 bool 
-entity_basic_p(entity e,intptr_t basictag)
+entity_basic_p(entity e,_int basictag)
 {
     return (basic_tag(entity_basic(e)) == basictag);
 }

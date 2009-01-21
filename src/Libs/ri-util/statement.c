@@ -1130,7 +1130,7 @@ statement s;
 }
 
 statement
-apply_number_to_statement(hash_table nts, intptr_t n)
+apply_number_to_statement(hash_table nts, _int n)
 {
     /* This function used to be inline in prettyprinting functions for user views.
      * It was assumed that all statements produced by the parser had a defined
@@ -1180,7 +1180,7 @@ print_number_to_statement(nts)
 hash_table nts;
 {
     HASH_MAP(number, stmt, {
-	fprintf(stderr,"%td\t", (intptr_t) number);
+	fprintf(stderr,"%td\t", (_int) number);
 	print_statement((statement) stmt);
     }, nts);
 }

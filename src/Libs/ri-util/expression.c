@@ -766,7 +766,7 @@ int r;
    representation.
   */
 expression
-int_to_expression(intptr_t i)
+int_to_expression(_int i)
 {
   char constant_name[3*sizeof(i)];
     expression e;
@@ -1886,14 +1886,14 @@ static bool  davinci_dump_expression_rc(
   
     /* daVinci node prolog. */
   fprintf(out, "l(\"%zx\",n(\"\",[a(\"OBJECT\",\"%s\")%s%s],[", 
-	  (uintptr_t) e, name, color, shape);
+	  (_uint) e, name, color, shape);
   
   MAP(EXPRESSION, son, 
   {      
     if (!first) fprintf(out, ",\n");
     else { fprintf(out, "\n"); first=FALSE; }
     fprintf(out, " l(\"%zx->%zx\",e(\"\",[],r(\"%zx\")))", 
-	    (uintptr_t) e, (uintptr_t) son, (uintptr_t) son);
+	    (_uint) e, (_uint) son, (_uint) son);
   },
     sons);
 

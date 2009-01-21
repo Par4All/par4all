@@ -889,15 +889,15 @@ entity FindOrCreateCurrentEntity(string name,
 	    extern string int_to_string(int);
 
 	    if(typedef_entity_p(function)) {
-	      string sn = int_to_string((intptr_t) function); // To get a unique identifier for each function typedef
+	      string sn = int_to_string((_int) function); // To get a unique identifier for each function typedef
 	      ent = find_or_create_entity(strdup(concatenate(DUMMY_PARAMETER_PREFIX,sn,
 							     MODULE_SEP_STRING,name,NULL)));
 	      free(sn);
 	    }
 	    else if(!type_undefined_p(ft) && type_variable_p(ft)
 		&& basic_pointer_p(variable_basic(type_variable(ft)))) {
-	      string sn = int_to_string((intptr_t) ft); // To get a unique identifier for each function pointerdeclaration, dummy or not
-	      set_current_dummy_parameter_number((intptr_t) ft);
+	      string sn = int_to_string((_int) ft); // To get a unique identifier for each function pointerdeclaration, dummy or not
+	      set_current_dummy_parameter_number((_int) ft);
 	      ent = find_or_create_entity(strdup(concatenate(DUMMY_PARAMETER_PREFIX,sn,
 							     MODULE_SEP_STRING,name,NULL)));
 	      free(sn);
@@ -907,8 +907,8 @@ entity FindOrCreateCurrentEntity(string name,
 	      // To get a unique identifier for each function (This
 	      // may not be sufficient as a function can be declared
 	      // any number of times with any parameter names)
-	      string sn = int_to_string((intptr_t) function);
-	      set_current_dummy_parameter_number((intptr_t) function);
+	      string sn = int_to_string((_int) function);
+	      set_current_dummy_parameter_number((_int) function);
 	      ent = find_or_create_entity(strdup(concatenate(DUMMY_PARAMETER_PREFIX,sn,
 							     MODULE_SEP_STRING,name,NULL)));
 	      free(sn);
@@ -2190,7 +2190,7 @@ void InitializeEnumMemberValues(list lem)
 {
   // enum member with implicit values are not yet fully instantiated
   list cem = list_undefined;
-  intptr_t cv = 0;
+  _int cv = 0;
 
   for(cem = lem; !ENDP(cem); POP(cem)) {
     entity em = ENTITY(CAR(cem));

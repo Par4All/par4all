@@ -721,7 +721,7 @@ static void store_initial_value(entity var, expression val)
 
   /* Storage if a proper initial value has been found */
   if(!expression_undefined_p(coerced_val)) {
-    intptr_t b = -1;
+    _int b = -1;
     int sign = 1;
     call c = syntax_call(expression_syntax(coerced_val));
     entity f = call_function(c);
@@ -838,7 +838,7 @@ static void process_static_initialization(call c)
   list args = call_arguments(c);
   list isvs = NIL; /* Initialized Scalar VariableS */
   list svps = NIL; /* Scalar Value PositionS */
-  intptr_t cvp = 0; /* Current Variable Position */
+  _int cvp = 0; /* Current Variable Position */
   list al = args; /* Value list from the second element on */
   list rl = list_undefined; /* Reference list, hanging from call to DATA LIST function */
   entity rlf = entity_undefined; /* DATA LIST function */

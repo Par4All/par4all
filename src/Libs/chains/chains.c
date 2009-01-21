@@ -997,8 +997,8 @@ bool (*which)() ;
     }
 
     ifdebug(2) {
-      intptr_t stin_o = statement_ordering(stin);
-      intptr_t stout_o = statement_ordering(stout);
+      _int stin_o = statement_ordering(stin);
+      _int stout_o = statement_ordering(stout);
 	fprintf( stderr, "Conflicts %td (%td,%td) (%p) -> %td (%td,%td) (%p) %s\n",
 		statement_number(stin), ORDERING_NUMBER(stin_o), ORDERING_STATEMENT(stin_o), stin,
 		statement_number(stout), ORDERING_NUMBER(stout_o), ORDERING_STATEMENT(stout_o), stout,

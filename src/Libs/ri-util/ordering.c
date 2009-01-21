@@ -39,7 +39,7 @@ void
 print_ordering_to_statement(void)
 {
     HASH_MAP(ko, vs, {
-	intptr_t o = (intptr_t) ko;
+	_int o = (_int) ko;
 	statement s = (statement) vs;
 
 	fprintf(stderr,"%td (%td,%td)->%s\n",
@@ -49,7 +49,7 @@ print_ordering_to_statement(void)
 }
 
 static statement 
-apply_ordering_to_statement(hash_table ots, intptr_t o)
+apply_ordering_to_statement(hash_table ots, _int o)
 {
     statement s;
     pips_assert("defined hash table...",

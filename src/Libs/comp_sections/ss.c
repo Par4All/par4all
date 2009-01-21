@@ -234,7 +234,7 @@ DisplaySimpleSection(simple_section Dad)
 /*{{{  auxilliary functions */
 /*{{{  GetRefTemp */
 tag 
-GetRefTemp(simple_section Dad, intptr_t DimNo)
+GetRefTemp(simple_section Dad, _int DimNo)
 {
   list Rtemp = dad_struct_rtemps(simple_section_dad(Dad));
   tag ret_tag;
@@ -295,7 +295,7 @@ GetBoundary(simple_section Dad, int DimNo, unsigned Low)
 /*{{{  PutBoundryPair */
 /* substitute with new boundary */
 void
-PutBoundPair(simple_section Dad, intptr_t DimNo, LinExpr Low, LinExpr Up)
+PutBoundPair(simple_section Dad, _int DimNo, LinExpr Low, LinExpr Up)
 {
   list BoundPair = dad_struct_shape(simple_section_dad(Dad));
 
@@ -621,7 +621,7 @@ TransRefTemp(loop ThisLoop, comp_desc Desc)
 {
   tVariants Vars;
   simple_section Dad;
-  intptr_t DimNo, Rank;
+  _int DimNo, Rank;
   normalized Nexpr;
   expression TmpExpr;
   list OldList, NewList, NewEle;
