@@ -77,9 +77,10 @@ log_on_file(char chaine[])
 #define PIPS_THANKS_STRING(arch)					\
   "%s (ARCH=" arch ")\n  running as %s\n\n"				\
   "  (c) 1988-2009 Centre de Recherche en Informatique,\n"		\
-  "                Ecole des mines de Paris, France.\n\n"		\
-  "  URL: http://www.cri.ensmp.fr/pips/\n"				\
-  "  E-MAIL: pipsgroup@cri.ensmp.fr\n\n"				\
+  "                Unite de Recherche Mathematiques et Systemes,\n"	\
+  "                MINES-ParisTech, France.\n\n"			\
+  "  URL: http://www.cri.mines-paristech.fr/pips/\n"			\
+  "  EMAIL: pipsgroup@cri.ensmp.fr\n\n"					\
   "  This software is provided as is, under the terms of the GPL.\n"	\
   "  It includes software from GNU (readline, rx) and Berkeley (fsplit).\n\n"
 
