@@ -35,6 +35,11 @@ int un, sn;
     instruction i = statement_instruction(st);
     void unstructured_reorder();
 
+    /* temporary, just to avoid rebooting... */
+    static int check_depth_hack = 0;
+    check_depth_hack++;
+    pips_assert("not too deep", check_depth_hack<10000);
+
     debug(5, "statement_reorder", "entering for %d : (%d,%d)\n",
 	  statement_number(st), un, sn);
 
@@ -72,17 +77,18 @@ int un, sn;
       case is_instruction_expression:
 	debug(5, "statement_reorder", "expression\n");
 	break;
-      case is_instruction_unstructured: 
+      case is_instruction_unstructured:
 	debug(5, "statement_reorder", "unstructured\n");
 	unstructured_reorder(instruction_unstructured(i));
 	break;
       default:
-	pips_error("statement_reorder", "Unknown tag %d\n", 
+	pips_error("statement_reorder", "Unknown tag %d\n",
 		   instruction_tag(i));
     }
 
     debug(5, "statement_reorder", "exiting %d\n", sn);
 
+    check_depth_hack--;
     return(sn);
 }
 
