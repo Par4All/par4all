@@ -54,7 +54,7 @@ typedef union gen_chunk {
   unit u;
   bool b;
   char c;
-  intptr_t i;
+  _int i;
   float f;
   string s;
   void * e; /* for externals */
@@ -112,6 +112,7 @@ enum internal_type {
   char_domain = 2,
   int_domain  = 3,
   intptr_t_domain  = 3,
+  _int_domain = 3,
   float_domain = 4,
   string_domain = 5
 };
@@ -231,7 +232,7 @@ extern void gen_context_multi_recurse GEN_PROTO((void *, void *,...));
  */
 #define NEWGEN_CHECK_TYPE(dom, item)					\
   {									\
-    intptr_t __type = dom, __itype;					\
+    _int __type = dom, __itype;					\
     void * __item = item;						\
     message_assert("valid required domaine number",			\
 		   __type>0 && __type<MAX_DOMAIN);			\

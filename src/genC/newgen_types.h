@@ -1,5 +1,4 @@
 /*
-
 	-- NewGen Project
 
 	The NewGen software has been designed by Remi Triolet and Pierre
@@ -10,7 +9,7 @@
 	provided regarding its appropriate behavior. Any request or comment
 	should be sent to newgen@isatis.ensmp.fr.
 
-	(C) Copyright Ecole des Mines de Paris, 1989
+	(C) Copyright Ecole des Mines de Paris, 1989-2009
 
 */
 
@@ -19,11 +18,11 @@
 #define newgen_types_included
 
 /*
-  
+
   $Id$
 
   The implementation of the basic types UNIT, BOOL, TAG and STRING. The
-  others CHAR, INT and FLOAT are provided by C. 
+  others CHAR, INT and FLOAT are provided by C.
 
 */
 
@@ -44,6 +43,18 @@ typedef boolean bool;
 #undef string
 #endif
 typedef char *string ;
+
+#ifndef _INT_TYPE_DEFINED
+/* RK wants an "int" which is the size of a "pointer".
+ * However, the use of the relevant "intptr_t" type in the code
+ * amounts to source file defacing, hence this definition. FC.
+ * The ifndef macro is to avoid a double definition it the type
+ * needs to be defined in the C3/linear library as well.
+ */
+typedef intptr_t _int;
+typedef uintptr_t _uint;
+#define _INT_TYPE_DEFINED
+#endif /* _INT_TYPE_DEFINED */
 
 #define string_undefined ((string)-15)
 #define string_undefined_p(s) ((s)==string_undefined)

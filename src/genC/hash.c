@@ -28,7 +28,7 @@
 #include "newgen_include.h"
 #include "newgen_hash.h"
 
-/* Some predefined values for the key 
+/* Some predefined values for the key
  */
 
 #define HASH_ENTRY_FREE ((void *) 0)
@@ -43,8 +43,8 @@ struct __hash_table {
   hash_key_type type;                  /* the type of keys... */
   size_t size;                         /* size of actual array */
   size_t n_entry;                      /* number of associations stored */
-  uintptr_t (*rank)(const void*, uintptr_t); /* how to compute rank for key */
-  int (*equals)(const void*, const void*);         /* how to compare keys */
+  _uint (*rank)(const void*, _uint);   /* how to compute rank for key */
+  int (*equals)(const void*, const void*);    /* how to compare keys */
   hash_entry *array;                   /* actual array */
   size_t limit;                        /* max entries before reallocation */
 
@@ -54,41 +54,41 @@ struct __hash_table {
     n_put_iter, n_get_iter, n_del_iter, n_upd_iter;
 };
 
-/* Constant to find the end of the prime numbers table 
+/* Constant to find the end of the prime numbers table
  */
 #define END_OF_SIZE_TABLE (0)
 
-/* Hash function to get the index of the array from the key 
+/* Hash function to get the index of the array from the key
  */
 /* Does not work :
    #if sizeof(uintptr_t) == 8
    so go into less portable way: */
 #if __WORDSIZE == 64
-#define RANK(key, size) ((((uintptr_t)(key)) ^ 0xC001BabeFab1C0e1LLU)%(size))
+#define RANK(key, size) ((((_uint)(key)) ^ 0xC001BabeFab1C0e1LLU)%(size))
 #else
 /* Fabien began with this joke... :-) */
-#define RANK(key, size) ((((uintptr_t)(key)) ^ 0xfab1c0e1U)%(size))
+#define RANK(key, size) ((((_uint)(key)) ^ 0xfab1c0e1U)%(size))
 #endif
 
-/* Private functions 
+/* Private functions
  */
 static void hash_enlarge_table(hash_table htp);
-static hash_entry * hash_find_entry(hash_table htp, 
-				    const void * key, 
-				    uintptr_t *prank, 
-				    uintptr_t * stats);
+static hash_entry * hash_find_entry(hash_table htp,
+				    const void * key,
+				    _uint *prank,
+				    _uint * stats);
 static string hash_print_key(hash_key_type, const void*);
 
 static int hash_int_equal(const int, const int);
-static uintptr_t hash_int_rank(const void*, size_t);
+static _uint hash_int_rank(const void*, size_t);
 static int hash_pointer_equal(const void*, const void*);
-static uintptr_t hash_pointer_rank(const void*, size_t);
+static _uint hash_pointer_rank(const void*, size_t);
 static int hash_string_equal(const char*, const char*);
-static uintptr_t hash_string_rank(const void*, size_t);
+static _uint hash_string_rank(const void*, size_t);
 static int hash_chunk_equal(const gen_chunk*, const gen_chunk*) ;
-static uintptr_t hash_chunk_rank(const gen_chunk*, size_t);
+static _uint hash_chunk_rank(const gen_chunk*, size_t);
 
-/* list of the prime numbers from 17 to 2^31-1 
+/* list of the prime numbers from 17 to 2^31-1
  * used as allocated size
  */
 static size_t prime_list[] = {
@@ -203,9 +203,9 @@ hash_table hash_table_make(hash_key_type key_type, size_t size)
     htp->n_del_iter = 0;
     htp->n_upd_iter = 0;
 
-    for (i = 0; i < size; i++) 
+    for (i = 0; i < size; i++)
 	htp->array[i].key = HASH_ENTRY_FREE;
-    
+
     switch(key_type)
     {
     case hash_string:
@@ -218,7 +218,7 @@ hash_table hash_table_make(hash_key_type key_type, size_t size)
 	break;
     case hash_chunk:
 	htp->equals = (int(*)(const void*,const void*)) hash_chunk_equal;
-	htp->rank = (uintptr_t (*)(const void*, uintptr_t)) hash_chunk_rank;
+	htp->rank = (_uint (*)(const void*, _uint)) hash_chunk_rank;
 	break;
     case hash_pointer:
 	htp->equals = hash_pointer_equal;
@@ -242,14 +242,13 @@ void hash_table_clear(hash_table htp)
   if (htp->size > max_size_seen) {
     max_size_seen = htp->size;
 #ifdef DBG_HASH
-    fprintf(stderr, "[hash_table_clear] maximum size is %d\n", 
-	    max_size_seen);
+    fprintf(stderr, "[hash_table_clear] maximum size is %d\n", max_size_seen);
 #endif
   }
-  
+
   end = htp->array + htp->size ;
   htp->n_entry = 0 ;
-  
+
   for ( p = htp->array ; p < end ; p++ ) {
     p->key = HASH_ENTRY_FREE ;
   }
@@ -278,10 +277,10 @@ void hash_table_free(hash_table htp)
 
 void hash_put(hash_table htp, void * key, void * val)
 {
-  uintptr_t rank;
+  _uint rank;
   hash_entry * hep;
 
-  if (htp->n_entry+1 >= (htp->limit)) 
+  if (htp->n_entry+1 >= (htp->limit))
     hash_enlarge_table(htp);
 
   message_assert("illegal input key",
@@ -308,8 +307,8 @@ void hash_put(hash_table htp, void * key, void * val)
 }
 
 /* deletes key from the hash table. returns the val and key
- */ 
-void * 
+ */
+void *
 hash_delget(
     hash_table htp,
     void * key,
@@ -317,7 +316,7 @@ hash_delget(
 {
     hash_entry * hep;
     void *val;
-    uintptr_t rank;
+    _uint rank;
 
     /* FI: the stack is destroyed by assert; I need to split the
        statement to put a breakpoint just before the stack
@@ -360,7 +359,7 @@ void * hash_del(hash_table htp, void * key)
 void * hash_get(hash_table htp, const void * key)
 {
   hash_entry * hep;
-  uintptr_t n;
+  _uint n;
 
   /* FI: the stack is destroyed by assert; I need to split the
      statement to put a breakpoint just before the stack
@@ -392,7 +391,7 @@ bool hash_defined_p(hash_table htp, void * key)
 void hash_update(hash_table htp, void * key, void * val)
 {
   hash_entry * hep;
-  uintptr_t n;
+  _uint n;
 
   message_assert("illegal input key",
 		 key!=HASH_ENTRY_FREE && key!=HASH_ENTRY_FREE_FOR_PUT);
@@ -406,7 +405,7 @@ void hash_update(hash_table htp, void * key, void * val)
 }
 
 /* this function prints the header of the hash_table pointed to by htp
- * on the opened stream fout 
+ * on the opened stream fout.
  */
 void hash_table_print_header(hash_table htp, FILE *fout)
 {
@@ -415,28 +414,27 @@ void hash_table_print_header(hash_table htp, FILE *fout)
   /* to be used by pips, we should not print this
      as it is only for debugging NewGen and it is not important data
      I (go) comment it.
-     
      fprintf(fout, "limit    %d\n", htp->limit);
   */
   fprintf(fout, "n_entry: %zd\n", htp->n_entry);
 }
- 
+
 /* this function prints the content of the hash_table pointed to by htp
 on stderr. it is mostly useful when debugging programs. */
 
 void hash_table_print(hash_table htp)
 {
   size_t i;
-  
+
   hash_table_print_header (htp,stderr);
-  
+
   for (i = 0; i < htp->size; i++) {
     hash_entry he;
-    
+
     he = htp->array[i];
-    
+
     if (he.key != HASH_ENTRY_FREE && he.key != HASH_ENTRY_FREE_FOR_PUT) {
-      fprintf(stderr, "%zd %s %p\n", 
+      fprintf(stderr, "%zd %s %p\n",
 	      i, hash_print_key(htp->type, he.key),
 	      he.val);
     }
@@ -448,9 +446,9 @@ on file descriptor f, using functions key_to_string and value_to string
 to display the mapping. it is mostly useful when debugging programs. */
 
 void hash_table_fprintf(
-    FILE * f, 
+    FILE * f,
     char *(*key_to_string)(void*),
-    char *(*value_to_string)(void*), 
+    char *(*value_to_string)(void*),
     hash_table htp)
 {
     size_t i;
@@ -463,7 +461,7 @@ void hash_table_fprintf(
 	he = htp->array[i];
 
 	if (he.key != HASH_ENTRY_FREE && he.key != HASH_ENTRY_FREE_FOR_PUT) {
-	    fprintf(f, "%s -> %s\n", 
+	    fprintf(f, "%s -> %s\n",
 		    key_to_string(he.key), value_to_string(he.val));
 	}
     }
@@ -471,18 +469,18 @@ void hash_table_fprintf(
 
 /* function to enlarge the hash_table htp.
  * the new size will be first number in the array prime_numbers_for_table_size
- * that will be greater or equal to the actual size 
+ * that will be greater or equal to the actual size
  */
 
-static void 
+static void
 hash_enlarge_table(hash_table htp)
 {
   hash_entry * old_array;
   size_t i, old_size;
-  
+
   old_size = htp->size;
   old_array = htp->array;
-  
+
   htp->size++;
   /* Get the next prime number in the table */
   htp->size = get_next_hash_table_size(htp->size);
@@ -499,7 +497,7 @@ hash_enlarge_table(hash_table htp)
 
     if (he.key != HASH_ENTRY_FREE && he.key != HASH_ENTRY_FREE_FOR_PUT) {
       hash_entry * nhep;
-      uintptr_t rank;
+      _uint rank;
 
       htp->n_put++;
       nhep = hash_find_entry(htp, he.key, &rank, &htp->n_put_iter);
@@ -527,9 +525,9 @@ hash_enlarge_table(hash_table htp)
  * mais...
  */
 
-static uintptr_t hash_string_rank(const void * key, size_t size)
+static _uint hash_string_rank(const void * key, size_t size)
 {
-  uintptr_t v = 0;
+  _uint v = 0;
   const char * s;
   for (s = (char*) key; *s; s++)
     /* FC: */ v = ((v<<7) | (v>>25)) ^ *s;
@@ -537,17 +535,17 @@ static uintptr_t hash_string_rank(const void * key, size_t size)
   return v % size;
 }
 
-static uintptr_t hash_int_rank(const void * key, size_t size)
+static _uint hash_int_rank(const void * key, size_t size)
 {
   return RANK(key, size);
 }
 
-static uintptr_t hash_pointer_rank(const void * key, size_t size)
+static _uint hash_pointer_rank(const void * key, size_t size)
 {
   return RANK(key, size);
 }
 
-static uintptr_t hash_chunk_rank(const gen_chunk * key, size_t size)
+static _uint hash_chunk_rank(const gen_chunk * key, size_t size)
 {
   return RANK(key->i, size);
 }
@@ -587,23 +585,23 @@ static char * hash_print_key(hash_key_type t, const void * key)
   /* Use extensive C99 printf formats and stdint.h types to avoid
      truncation warnings: */
   else if (t == hash_int)
-    sprintf(buffer, "%td", (intptr_t) key);
+    sprintf(buffer, "%td", (_int) key);
   else if (t == hash_pointer)
     sprintf(buffer, "%p", key);
   else if (t == hash_chunk)
-    sprintf(buffer, "%zx", (uintptr_t) ((gen_chunk *)key)->p);	    
+    sprintf(buffer, "%zx", (_uint) ((gen_chunk *)key)->p);
   else {
     fprintf(stderr, "[hash_print_key] bad type : %d\n", t);
     abort();
   }
-  
+
   return buffer;
 }
 
 
 /* distinct primes for long cycle incremental search */
 static int inc_prime_list[] = {
-    2,   3,   5,  11,  13,  19,  23,  29,  31,  41, 
+    2,   3,   5,  11,  13,  19,  23,  29,  31,  41,
    43,  47,  53,  59,  61,  67,  73,  79,  83,  89,
    97, 101, 103, 107, 109, 113, 127, 131, 139, 149,
   151
@@ -617,8 +615,8 @@ static int inc_prime_list[] = {
 static hash_entry *
 hash_find_entry(hash_table htp,
 		const void * key,
-		uintptr_t *prank,
-		uintptr_t * stats)
+		_uint *prank,
+		_uint * stats)
 {
   register size_t
     r_init = (*(htp->rank))(key, htp->size),
@@ -733,13 +731,13 @@ hash_table_scan(hash_table htp,
 {
   hash_entry * hentryp = (hash_entry *) hentryp_arg;
   hash_entry * hend = htp->array + htp->size;
-  
+
   if (!hentryp)	hentryp = (void*) htp->array;
 
   while (hentryp < hend)
   {
     void *key = hentryp->key;
-    
+
     if ((key !=HASH_ENTRY_FREE) && (key !=HASH_ENTRY_FREE_FOR_PUT))
     {
       *pkey = key;
@@ -753,7 +751,7 @@ hash_table_scan(hash_table htp,
 
 int hash_table_own_allocated_memory(hash_table htp)
 {
-    return htp ? 
+    return htp ?
       sizeof(struct __hash_table) + sizeof(hash_entry)*(htp->size) : 0 ;
 }
 
