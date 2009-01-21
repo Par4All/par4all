@@ -232,7 +232,7 @@ extern void gen_context_multi_recurse GEN_PROTO((void *, void *,...));
  */
 #define NEWGEN_CHECK_TYPE(dom, item)					\
   {									\
-    _int __type = dom, __itype;					\
+    _int __type = dom, __itype;						\
     void * __item = item;						\
     message_assert("valid required domaine number",			\
 		   __type>0 && __type<MAX_DOMAIN);			\
