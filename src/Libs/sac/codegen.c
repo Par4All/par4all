@@ -896,7 +896,7 @@ static entity make_new_simd_vector(int itemSize, int nbItems, int basicTag)
 						   OldOffset,
 						   NIL));
 
-   add_variable_declaration_to_module(mod_ent, new_ent);
+   AddEntityToDeclarations( new_ent, mod_ent);
 
    return new_ent;
 }

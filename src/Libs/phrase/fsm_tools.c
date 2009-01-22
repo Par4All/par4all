@@ -88,7 +88,7 @@ entity create_state_variable (string module_name,
     new_state_variable = find_or_create_scalar_entity (state_variable_name,
 						       module_name,
 						       is_basic_int);
-    add_variable_declaration_to_module(module, new_state_variable);
+    AddEntityToDeclarations( new_state_variable,module);
     return new_state_variable;
   } 
   else {

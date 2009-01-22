@@ -568,23 +568,6 @@ int add_any_variable_to_area(entity a, entity v, bool is_fortran_p)
   return(OldOffset);
 }
 
-
-void 
-add_variable_declaration_to_module(m, v)
-entity m;
-entity v;
-{
-  value val = entity_initial(m);
-  code c = code_undefined;
-
-  pips_assert("add_variable_declaration_to_module", value_code_p(val));
-
-  c = value_code(val);
-  code_declarations(c) = gen_nconc(code_declarations(c),
-				   CONS(ENTITY, v, NIL));
-}
-
-
 bool
 formal_parameter_p(entity v)
 {
@@ -880,7 +863,7 @@ int kind;
 						  dynamic_area,
 						  add_variable_to_area(dynamic_area, new_ent),
 						  NIL));
-  add_variable_declaration_to_module(mod_ent, new_ent);
+  AddEntityToDeclarations( new_ent,mod_ent);
 
   /* Is the following useless : */
   

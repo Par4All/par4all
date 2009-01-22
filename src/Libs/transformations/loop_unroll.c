@@ -156,7 +156,7 @@ void loop_unroll(statement loop_statement, int rate)
     /* 
     nub = make_scalar_integer_entity(NORMALIZED_UPPER_BOUND_NAME, 
 				     module_name);
-    add_variable_declaration_to_module( mod_ent, nub);
+    AddEntityToDeclarations( mod_ent, nub);
     */
     nub = make_new_scalar_variable_with_prefix(NORMALIZED_UPPER_BOUND_NAME, 
 					       mod_ent,
@@ -197,7 +197,7 @@ void loop_unroll(statement loop_statement, int rate)
     /*
     ib = make_scalar_integer_entity(INTERMEDIATE_BOUND_NAME,
 				    module_name);
-    add_variable_declaration_to_module( mod_ent, ib);
+    AddEntityToDeclarations( mod_ent, ib);
     */
     ib = make_new_scalar_variable_with_prefix(INTERMEDIATE_BOUND_NAME, 
 					      mod_ent,
@@ -229,7 +229,7 @@ void loop_unroll(statement loop_statement, int rate)
     /* Entity LU_IND is created */
     /*
     lu_ind = make_scalar_integer_entity(INDEX_NAME,module_name);
-    add_variable_declaration_to_module( mod_ent, lu_ind);
+    AddEntityToDeclarations( mod_ent, lu_ind);
     */
     lu_ind = make_new_scalar_variable_with_prefix(INDEX_NAME, 
 						  mod_ent,

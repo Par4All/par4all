@@ -251,7 +251,7 @@ int ls;
 								    esv),
 					       NIL)));
     
-    add_variable_declaration_to_module(memory_module, esv);
+    AddEntityToDeclarations(esv,memory_module);
 
     debug(8,"make_emulated_shared_variable", "esv_name=%s\n", entity_name(esv));
     ifdebug(8) print_sentence(stderr,sentence_variable(esv));
@@ -356,7 +356,7 @@ hash_table v_to_lllv;
 						    NIL)));
 
 
-	add_variable_declaration_to_module(compute_module, lv);
+	AddEntityToDeclarations( lv,compute_module);
 	llv = gen_nconc(llv, CONS(ENTITY, lv, NIL));
     }
 

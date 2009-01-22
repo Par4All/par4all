@@ -485,7 +485,7 @@ array_scalar_access_to_compute_communication(
 				 NIL);
 
 	statement  stat = loop_to_statement(newloop);
-    add_variable_declaration_to_module(compute_module,ent1);
+    AddEntityToDeclarations(ent1,compute_module);
 	icode = gen_nconc(icode,CONS(STATEMENT,stat,NIL));
 	ccode = constant_symbolic_communication(compute_module,lt,load_code,var_id);
 	icode = gen_nconc(icode,ccode);  
@@ -553,7 +553,7 @@ list array_scalar_access_to_bank_communication(entity memory_module,Pbase  bank_
 				 make_execution(is_execution_parallel,UU), NIL);
 
 	statement  stat = loop_to_statement(newloop);
-	add_variable_declaration_to_module(memory_module,ent1);
+	AddEntityToDeclarations(ent1,memory_module);
 	icode = gen_nconc(ccode,CONS(STATEMENT,stat,NIL));
 	return icode;
     }
@@ -675,7 +675,7 @@ void insert_run_time_communications(entity compute_module,entity memory_module,
 	       != (list) HASH_UNDEFINED_VALUE && nbcall ) { 
 
 	       ent1 = make_new_module_variable(compute_module,100);
-	       add_variable_declaration_to_module(compute_module,ent1);
+	       AddEntityToDeclarations(ent1,compute_module);
 	       
 	       insert_array_scalar_access_movement(compute_module,memory_module,bank_indices,
 						   bn,ls,proc_id,ent1,lt,STATEMENT(CAR(st1)),TRUE,
@@ -689,7 +689,7 @@ void insert_run_time_communications(entity compute_module,entity memory_module,
 	       != (list) HASH_UNDEFINED_VALUE && nbcall )
 	   { 
 	       ent1 = make_new_module_variable(compute_module,100);
-	       add_variable_declaration_to_module(compute_module,ent1);
+	       AddEntityToDeclarations(ent1,compute_module);
 	   
 	       insert_array_scalar_access_movement(compute_module,memory_module,bank_indices,
 						   bn,ls,proc_id,ent1,lt,STATEMENT(CAR(st1)),FALSE,

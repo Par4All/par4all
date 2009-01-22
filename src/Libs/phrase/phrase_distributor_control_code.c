@@ -183,7 +183,7 @@ entity create_new_common(string name, entity module)
 			   common_type,
 			   common_storage,
 			   common_value);
-  add_variable_declaration_to_module(module, new_common);
+  AddEntityToDeclarations( new_common,module);
   pips_debug(2, "New common %s created in module %s\n", name, module_name);
   return new_common;
 }
@@ -210,7 +210,7 @@ entity create_new_common_variable(string name, entity module, entity common, var
   area_layout(type_area(entity_type(common))) = gen_nconc(old_layout,CONS(ENTITY,e,NIL));
   /* gen_nreverse(CONS(ENTITY,e,old_layout)); */
   area_size(type_area(entity_type(common))) = old_size+variable_size;
-  add_variable_declaration_to_module(module, e);
+  AddEntityToDeclarations( e,module);
   return e;
 }
 
@@ -305,7 +305,7 @@ void declare_common_variables_in_module (entity common, entity module)
     pips_debug(7, "Add to declarations %s\n", var_global_name); 
 
     /* Add to declarations.... */
-    add_variable_declaration_to_module(module, new_variable);
+    AddEntityToDeclarations( new_variable,module);
     
     pips_debug(7, "New common variable %s declared\n", var_global_name); 
     
@@ -317,7 +317,7 @@ void declare_common_variables_in_module (entity common, entity module)
     area_layout(type_area(entity_type(common))) = gen_nconc(old_layout,new_variables);
   }
 
-  add_variable_declaration_to_module(module, common);
+  AddEntityToDeclarations( common,module);
   pips_debug(3, "Common %s declared in module %s\n", 
 	     entity_local_name(common), 
 	     entity_local_name(module));

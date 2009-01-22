@@ -118,7 +118,7 @@ static void reset_global_variables()
 static  entity build_new_variable(entity module, basic b)
 {
     entity ent = make_new_module_variable(module,0);
-    add_variable_declaration_to_module(module, ent); 
+    AddEntityToDeclarations( ent,module); 
     return ent;
 }
 

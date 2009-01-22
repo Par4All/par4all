@@ -283,7 +283,7 @@ entity clone_variable_with_new_name(entity a_variable,
 	new_name, NULL)),module_name,
 	is_basic_int);*/
       
-      add_variable_declaration_to_module(module, new_variable);
+      AddEntityToDeclarations(new_variable,module);
       return new_variable;
     }
   else 

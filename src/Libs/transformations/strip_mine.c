@@ -98,7 +98,7 @@ statement loop_strip_mine(statement loop_statement, int chunk_size, int chunk_nu
 							    entity_local_name(index),
 							    "_1", 
 							    NULL)), module_name);
-    add_variable_declaration_to_module(module, new_index);
+    AddEntityToDeclarations( new_index,module);
 
     /* build the inner loop */
     new_l = make_loop(index, 

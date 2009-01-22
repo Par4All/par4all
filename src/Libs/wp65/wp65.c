@@ -247,38 +247,38 @@ statement * pemulator;
        */
     proc_id_mm = make_scalar_integer_entity(PROCESSOR_IDENTIFIER,
 					    entity_local_name(memory_module));
-    add_variable_declaration_to_module(memory_module, proc_id_mm);
+    AddEntityToDeclarations( proc_id_mm,memory_module);
 
     proc_id = make_scalar_integer_entity(PROCESSOR_IDENTIFIER,
 					 entity_local_name(compute_module));
     entity_storage(proc_id) = make_storage(is_storage_formal, 
 					   make_formal(compute_module, 1));
-    add_variable_declaration_to_module(compute_module, proc_id);
+    AddEntityToDeclarations( proc_id,compute_module);
 
     bank_id = make_scalar_integer_entity(BANK_IDENTIFIER,
 					 entity_local_name(compute_module));
-    add_variable_declaration_to_module(compute_module, bank_id);
+    AddEntityToDeclarations( bank_id,compute_module);
 
     bank_id = make_scalar_integer_entity(BANK_IDENTIFIER,
 					 entity_local_name(memory_module));
     entity_storage(bank_id) = make_storage(is_storage_formal, 
 					   make_formal(memory_module, 1)); 
-    add_variable_declaration_to_module(memory_module, bank_id);
+    AddEntityToDeclarations( bank_id,memory_module);
 
     bank_line = make_scalar_integer_entity(BANK_LINE_IDENTIFIER,
 					   entity_local_name(compute_module)); 
-    add_variable_declaration_to_module(compute_module, bank_line); 
+    AddEntityToDeclarations( bank_line,compute_module); 
 
     bank_line = make_scalar_integer_entity(BANK_LINE_IDENTIFIER,
 					   entity_local_name(memory_module));
-    add_variable_declaration_to_module(memory_module, bank_line);
+    AddEntityToDeclarations( bank_line,memory_module);
 
     bank_offset = make_scalar_integer_entity(BANK_OFFSET_IDENTIFIER,
 					     entity_local_name(memory_module));
-    add_variable_declaration_to_module(memory_module, bank_offset);
+    AddEntityToDeclarations( bank_offset,memory_module);
     bank_offset = make_scalar_integer_entity(BANK_OFFSET_IDENTIFIER,
 					     entity_local_name(compute_module));
-    add_variable_declaration_to_module(compute_module, bank_offset);
+    AddEntityToDeclarations( bank_offset,compute_module);
     /* variables related to bank emulation are put together in one basis
        to decrease the number of parameters; they are used as such when
        liner systems of constraints are built */

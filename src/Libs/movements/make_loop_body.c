@@ -76,7 +76,7 @@ find_entity(entity module, Pvecteur pv,string st)
 	name = strdup(concatenate(entity_local_name((entity) vecteur_var(pv)),
 				  st, NULL));
 	new_ind = make_scalar_integer_entity(name, entity_local_name(module));
-	add_variable_declaration_to_module(module, new_ind);
+	AddEntityToDeclarations( new_ind,module);
 	free(name);
     }
   return(new_ind);

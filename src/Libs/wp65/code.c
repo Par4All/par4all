@@ -796,7 +796,7 @@ list reference_conversion_computation(
 	    Pvecteur pv = make_loop_indice_equation(initial_basis,tile, pvt,
 						    tile_indices,
 						    tile_local_indices,i);
-	    add_variable_declaration_to_module(compute_module,ent1);   
+	    AddEntityToDeclarations(ent1,compute_module);   
 	    reference_variable(r) = ent1 ;
 	    exp1= make_vecteur_expression(pv);
 	    exp2 = make_vecteur_expression(pv2);

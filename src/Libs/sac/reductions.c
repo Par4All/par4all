@@ -145,7 +145,7 @@ static entity make_reduction_vector_entity(reduction r)
 						   add_variable_to_area(dynamic_area,
 									new_ent),
 						   NIL));
-   add_variable_declaration_to_module(mod_ent, new_ent);
+   AddEntityToDeclarations(new_ent, mod_ent);
    
    /* The new entity is stored in the list of entities of the same type. */
    switch(basic_tag(base))

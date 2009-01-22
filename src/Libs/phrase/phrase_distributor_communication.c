@@ -780,7 +780,7 @@ entity create_private_integer_variable_for_new_module (string new_name,
 			      (add_variable_to_area(a, new_variable)):(0),
 			      NIL));
       /* Add to declarations.... */
-      add_variable_declaration_to_module(module, new_variable);
+      AddEntityToDeclarations( new_variable,module);
       pips_debug(2, "Created new private variable: %s\n", entity_global_name(new_variable));
       return new_variable;
     }

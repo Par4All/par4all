@@ -43,7 +43,7 @@ entity create_local_index(entity module, Pvecteur pv, string st)
     {
 	new_ind=make_scalar_integer_entity(name, 
 					    module_local_name(module));
-    add_variable_declaration_to_module(module, new_ind); 
+    AddEntityToDeclarations( new_ind,module); 
     }
     free(name);
     return(new_ind);
@@ -62,7 +62,7 @@ entity create_local_index2(entity module, Pvecteur pv, string st)
 	    new_ind=make_scalar_integer_entity(name, 
 					       entity_local_name(
 								 module));
-	    add_variable_declaration_to_module(module, new_ind);
+	    AddEntityToDeclarations( new_ind,module);
 	}
 	free(name);
     return(new_ind);
