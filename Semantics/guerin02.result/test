@@ -1,6 +1,7 @@
       PROGRAM TEST12
-      INTEGER A, B, C, N, M, K, J, I, DO5_INDEX, DO5_BEGIN, DO5_END, 
-     &DO5_INCREMENT, DO9_INDEX, DO9_BEGIN, DO9_END, DO9_INCREMENT
+      INTEGER DO9_INCREMENT, DO9_END, DO9_BEGIN, DO9_INDEX, 
+     &DO5_INCREMENT, DO5_END, DO5_BEGIN, DO5_INDEX, A, B, C, N, M, K
+     &, J, I
       REAL*4 R
 
       B = 5                                                             0001
@@ -52,9 +53,9 @@
       STOP                                                              0020
       END
       PROGRAM TEST12
-      INTEGER A, B, C, N, M, K, J, I, DO5_INDEX, DO5_BEGIN, DO5_END, 
-     &DO5_INCREMENT, DO9_INDEX, DO9_BEGIN, DO9_END, DO9_INCREMENT, 
-     &FSM9_STATE
+      INTEGER FSM9_STATE, DO9_INCREMENT, DO9_END, DO9_BEGIN, 
+     &DO9_INDEX, DO5_INCREMENT, DO5_END, DO5_BEGIN, DO5_INDEX, A, B, 
+     &C, N, M, K, J, I
       REAL*4 R
 
       B = 5                                                             0001
