@@ -7,6 +7,7 @@
 #include "misc.h"
 #include "ri-util.h"
 #include "pipsdbm.h"
+#include "statistics-local.h"
 
 #define DEFAULT_INT_PREFIX 	"I_"
 #define DEFAULT_FLOAT_PREFIX 	"F_"
@@ -72,15 +73,6 @@ static bool first_turn=FALSE, overflow=FALSE;
 /* pour marquer si la sequence repond a nos hypotheses */
 
 typedef enum {is_a_stencil, is_a_continue, is_a_no_stencil } contenu_t;
-
-/* cette structure contient une pile. La tete de cette pile contient le statement courant */
-/* depth represente  la profondeur des nids */ 
-
-typedef struct {
-  hash_table contenu;
-  hash_table depth;
-  stack statement_stack;
-} * context_p, context_t;
 
 
 static bool loop_flt(loop l )
@@ -688,7 +680,7 @@ list lis;
 /* J'ai ameliore la fonction make_new_scalar_variable_with_prefix  */
 /* afin de l'etendre  a des tableau   */
 
-static entity make_new_array_variable_with_prefix(string prefix, entity module,basic b,list lis)
+entity make_new_array_variable_with_prefix(string prefix, entity module,basic b,list lis)
 {
   string module_name = module_local_name(module);
   char buffer[20];
