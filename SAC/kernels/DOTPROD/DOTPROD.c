@@ -1,13 +1,13 @@
-void dotprod(int* a, int *b, int *c)
+#include<math.h>
+short dotprod(short b[], short c[])
 {
     int i;
+    short a=0;
     for(i=0;i<1000000;++i)
     {
-        a[i] = b[i] + c[i];
+        a = a + b[i] * c[i] ;
     }
-
-
-    return;
+    return a;
 }
 
 

@@ -4,6 +4,8 @@ create DOTPROD kernels/DOTPROD/DOTPROD.f include/simd.f
 
 module DOTPROD
 
+display PRINTED_FILE
+
 source ${VDIR:-.}/include/benchmark.tpips.h
 
 apply PRINT_C_CODE[DOTPROD]
