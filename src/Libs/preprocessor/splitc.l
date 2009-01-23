@@ -496,6 +496,9 @@ L\"([^\"]|(\"\")|(\\\"))*\"	{
 "__inline__"            {
                                 pips_user_warning("gcc extension keyword \"__inline__\" is ignored\n");
                         }
+"__signed__"            {
+                                pips_user_warning("gcc extension keyword \"__signed__\" is ignored\n");
+                        }
 {ident}			{
                                 /* C keywords or identifiers */
 				int t = is_c_keyword_typedef(yytext);
