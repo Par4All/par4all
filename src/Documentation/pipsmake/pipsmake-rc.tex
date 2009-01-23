@@ -4474,7 +4474,7 @@ It should be followed by a call to \verb+UNSPAGHETTIFY+ and \verb+SUPPRESS_DEAD_
 
 inlining      > MODULE.code
         < PROGRAM.entities
-        < ALL.code
+        < CALLEES.code
         < MODULE.cumulated_effects
         < MODULE.callers
 \end{verbatim}
@@ -4499,7 +4499,7 @@ unfolding      > MODULE.code
         < PROGRAM.entities
         < MODULE.code
         < MODULE.cumulated_effects
-        < ALL.code
+        < CALLERS.code
 \end{verbatim}
 
 %-----------End of Expression Transformations -------------------------
