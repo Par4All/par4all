@@ -54,16 +54,34 @@ AddEntityToDeclarations(e, f)
 entity e;
 entity f;
 {
-  cons *pc, *l;
+  list l = code_declarations(EntityCode(f));
+  if( gen_chunk_undefined_p( gen_find_eq(e,l) ) )
+      code_declarations(EntityCode(f)) = CONS(ENTITY, e, l);
+}
 
-  l = code_declarations(EntityCode(f));
-
-  for (pc = l; pc != NULL; pc = CDR(pc)) {
-    if (e == ENTITY(CAR(pc)))
-      return;
-  }
-
-  code_declarations(EntityCode(f)) = CONS(ENTITY, e, l);
+/** 
+ * adds the entity e to the list of variables of the function f
+ * as AddEntityToDeclarations does if f is a fortran function
+ * adds the entity to statenent s declaration if called from a C module
+ * 
+ * @param e entity to add
+ * @param f module entity
+ * @param s statement where entity must be added. can be statement_undefined from Fortran module
+ */
+void
+AddLocalEntityToDeclarations(entity e, entity f, statement s)
+{
+    if(c_module_p(f))
+    {
+        pips_assert("Calling AddLocalEntityToDeclarations from c_module with valid statement",
+                !statement_undefined_p(s) );
+        list l = statement_declarations(s);
+        if( gen_chunk_undefined_p( gen_find_eq(e,l) ) )
+            statement_declarations(s) = CONS(ENTITY,e,l);
+    }
+    {
+        AddEntityToDeclarations(e,f);
+    }
 }
 
 /* entity make_scalar_entity(name, module_name, base)
