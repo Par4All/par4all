@@ -388,12 +388,25 @@ sh> svn commit
 {\small
 \begin{verbatim}
 sh> cd your-pips-trunk-copy
+sh> svn mergeinfo \
+  http://svn.cri.ensmp.fr/svn/pips/calvin/my-branch-name \
+  --show-revs eligible
+# revisions that need be reintegrated...
 sh> svn merge \
   http://svn.cri.ensmp.fr/svn/pips/calvin/my-branch-name \
   --reintegrate
 sh> svn commit
 \end{verbatim}
 }
+\item When your are fully done with your branch, you may remove it.
+{\small
+\begin{verbatim}
+sh> cd pips_dev
+sh> svn remove my-branch-name
+sh> svn commit
+\end{verbatim}
+}
+
 \end{enumerate}
 
 
