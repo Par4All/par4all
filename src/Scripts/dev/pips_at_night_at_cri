@@ -3,6 +3,10 @@
 # $Id$
 #
 # what to do at night from the pips account at cri.
+#
+# TODO
+# - ulimit?
+# - 64bits validation?
 
 umask 022
 

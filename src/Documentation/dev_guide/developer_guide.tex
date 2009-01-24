@@ -322,16 +322,8 @@ merged back into the \texttt{trunk}.
 
 \subsubsection{Pips development branches}
 
-THIS IS NOW PARTLY OBSOLETE!
-
-As the CRI subversion server now runs with subversion 1.5,
-which includes a convenient branch management feature,
-branches can be managed directly with svn, without relying on the
-custom script described hereafter. This section should be updated shortly.
-
-In order to help with the branch management, we propose the following
-procedure based on the \texttt{svn\_branch.sh} script provided in
-\texttt{pips/trunk/makes}.
+If you are doing something non trivial or do not have commit rights on
+pips' trunk, you shoud develop in a branch of your own. To do so:
 
 \begin{enumerate}
 \item Obtain an svn user account on \texttt{svn.cri.ensmp.fr}
@@ -361,156 +353,48 @@ sh> svn co http://svn.cri.ensmp.fr/svn/pips/branches/calvin pips_dev
     Branches may also be used for linear and newgen development,
     in which case the local directory name for the checkout should be called
     \texttt{linear\_dev} or \texttt{newgen\_dev} respectively.
-  \item[valid] a working copy of pips non regression tests for validation.
+  \item[validation] a working copy of pips non regression tests for validation.
     See Section~\ref{sec:utils} for informations about the validation,
     and then really read the \texttt{README} file to run it.
   \item[pipsrc.sh] sh-compatible shell initialization;
   \item[pipsrc.csh] csh-compatible shell initialization.
   \end{description}
 
-\item Create your own development branch refering to a given library directory
-  in the production version. Assuming that Calvin wants to develop
-  in the \texttt{hpfc} library in pips:
+\item Create your own development branch for pips.
+{\small
 \begin{verbatim}
-sh> cd /home/.../MYPIPS/prod/pips/src/Libs/hpfc
-sh> make SVN_USERNAME=calvin create-branch
-# ... not really created before the commit
-sh> svn commit /tmp/svn_branch.XXXXXX/
-\end{verbatim}
-  It creates a new branch, not yet committed, in some temporary directory.
-  \verb/SVN_USERNAME/ is not necessary if the svn and unix account share
-  the same login name. In this case the name in the \verb/USER/
-  environment variable is used instead. This directory \textbf{must} then
-  be committed.
-\item If necessary, update your development area to make the branch appear.
-\begin{verbatim}
-sh> cd /home/.../MYPIPS/pips_dev
-sh> svn update
-A    hpfc
-sh> cd hpfc
-\end{verbatim}
-\item Develop, test, commit within your branch\ldots
-  Some makefile targets of interest to the developer:
-  \begin{description}
-  \item[diff] svn diff of local directory.
-  \item[info] svn info of local directory.
-  \item[branch-diff] what you have developed in your branch, i.e. the
-    differences between your branch and the production version
-    (\texttt{trunk}).
-  \item[branch-info] information about your branch.
-  \item[branch-avail] list of commits on the trunk that where not pulled
-    into the branch.
-  \end{description}
-  For other targets about compilation, see \S~\ref{sec:local-targets}.
-
-  It may be desirable to look for the differences between the branch
-  and trunk with additional options, for instance to ignore space changes.
-  In order to do that:
-  \begin{enumerate}
-  \item get the branch initial revision with \texttt{make branch-info}.
-    Let us assume that the result is 12345.
-  \item perform a svn diff: {\small for example by passing through the
-      \texttt{-x} option the \texttt{-b} option to \texttt{diff} to ignore
-      changes in the amount of white space:
-\begin{verbatim}
-sh> svn diff --revision 12345:HEAD -x -b
-\end{verbatim}
-      or with the \texttt{-w} option to ignore all white space:
-\begin{verbatim}
-sh> svn diff --revision 12345:HEAD -x -w
+sh> cd pips_dev
+sh> svn cp http://svn.cri.ensmp.fr/svn/pips/trunk my-branch-name
+sh> svn commit my-branch-name
 \end{verbatim}
 }
-  \end{enumerate}
+  It creates a new branch as a working copy, which is then committed
+  to the repository.
+\item Develop, test, commit within your branch\ldots
 
-\item If you want to merge into your branch the on-going development from
-  the trunk, see \S~\ref{sec:other-approaches} to do a \texttt{pull}.
+\item To merge into your branch on-going developments from trunk:
+{\small
+\begin{verbatim}
+sh> cd my-branch-name
+sh> svn merge http://svn.cri.ensmp.fr/svn/pips/trunk
+# do the merging into the branch working copy
+sh> svn commit
+\end{verbatim}
+}
 
 \item When you are done with your developments, they are committed into
-  your branch, you want to install them back to the pips main line.
+  your branch, you want to install them back to the pips trunk.
   You must have write access to the \texttt{trunk} in order to do the commit.
 {\small
 \begin{verbatim}
-sh> make install-branch
-# ... create a temporary merged library
-# ... there may be conflicts to be dealt with
-sh> cd /tmp/svn_branch.XXXXXX
-sh> svn commit .
+sh> cd your-pips-trunk-copy
+sh> svn merge \
+  http://svn.cri.ensmp.fr/svn/pips/calvin/my-branch-name \
+  --reintegrate
+sh> svn commit
 \end{verbatim}
 }
-  The \texttt{XXXXXX} part in the directory name is some temporary number
-  created for the nonce by the branch script.
-
-  There are two commits:
-  \begin{itemize}
-  \item the first one is in trunk to install the new version of the library.
-  \item the second one in the branch to update bookeeping informations stored
-    within the branch.
-  \end{itemize}
-
-  It may be possible (not tried) to commit several libraries at once.
 \end{enumerate}
-
-
-\subsubsection{Other approaches}
-\label{sec:other-approaches}
-
-You may also decide that the previous procedure is not for you. Well, it
-may not be advisable to begin with, but it can be useful to work on many
-libraries in PIPS at the same time and to have an atomic view or even
-having different versions of your own in your branch, for example.
-
-Here are other possible approaches for developping in PIPS,
-that you may use provided that you do not break the development
-policy which requires all changes committed to the \texttt{trunk}
-not to break the non-regression tests.
-
-It is possible to use the \texttt{svn\_branch.sh} script directly to
-create a branch for any part of pips, including the full
-software. \verb|svn_branch.sh| has been developed because \textsc{svn}
-cannot yet deal natively with branching but it is planned to change when
-all the PIPS developers will use SVN version 1.5 or more.
-
-It is possible to use \texttt{svn} directly to create and manage your
-branches with copies. The \texttt{svn\_branch.sh} adds convenient
-administrative data in the directory to know about the status of the
-branch: what is its source, what was merged (pulled) from the source or
-joined back (pushed) to it, and so on. These informations are stored in
-\texttt{svnbranch:...} properties. So if you want to play around with
-home-made branching, think about them too...
-
-Here is an excerpt of the available \verb|svn_branch.sh| that can be
-described more precisely with \verb|svn_branch.sh --help|
-\begin{description}
-\item[\texttt{create}] a new branch of something somewhere;
-\item[\texttt{pull}] into your branch the modifications that have been
-  done in the trunk since your last \texttt{pull} or branch creation;
-\item[\texttt{push}] merge back your branch into the trunk since the last
-  merge you've done.
-\end{description}
-
-If you want to directly hack the SVN repository, for example, if you want
-to merge directly and atomically into your own working copy of the trunk
-your own copy of several branch pieces such as
-\texttt{pips/trunk/src/Libs/expressions} that is from the trunk at
-revision 12475 and so on, you can do something like:
-\begin{verbatim}
-cd .../svn/pips/trunk/src/Libs/expressions
-svn merge -r 12475:HEAD ../../../../branches/godet/expressions
-cd .../svn/pips/trunk/src/Libs/sac
-svn merge -r 12356:HEAD ../../../../branches/godet/sac
-cd .../svn/pips/trunk/src/Libs/phrase
-svn merge -r 12356:HEAD ../../../../branches/godet/phrase
-cd cd .../svn/pips/trunk
-svn commit
-\end{verbatim}
-But it should be used only for emergency case (for example if the branch
-were developed outside the PIPS branch infrastructure).
-
-It is finally possible to edit directly your production working copy, and
-just commit from there when you're happy with your changes.  This may be
-advisable for small easy to test global changes, such as adding a new
-library in PIPS. This is not advisable for long development, as it is
-often useful to have an history of such developments.
 
 
 \subsubsection{Developing in a branch? Validate before merging!}
@@ -526,9 +410,9 @@ Here is a typical behaviour you should follow:
   \texttt{svn up}, recompile the production version and apply the
   validation against it;
 \item commit your branch if not already done;
-\item merge into your branch the last developments from the trunk with a
-  \texttt{svn\_branch.sh pull}, recompile (so it will modify the
-  executables and libraries in the production version) and validate;
+\item merge into your branch the last developments from the \texttt{trunk},
+  recompile (so it will modify the executables and libraries in the
+  production version) and validate;
 \item if it is worse than point 1, improve the code in your branch and go
   to step 1 again;
 \item if you are happy with the validation, merge your beautiful work into
