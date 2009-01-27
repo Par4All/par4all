@@ -58,6 +58,7 @@ static bool variables_width_filter(reference r)
 	    {
 	       case is_basic_int: width = 8*basic_int(bas); break;
 	       case is_basic_float: width = 8*basic_float(bas); break;
+           default: pips_internal_error("basic type %u not supported",basic_tag(bas));
 	    }
 	 }
 	 else

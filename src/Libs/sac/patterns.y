@@ -246,6 +246,6 @@ int patterns_yywrap(void)
 
 int patterns_yyerror(char* s)
 {
-   fprintf(stderr, "%s\n", s);
+   pips_error("patterns parser: %s\n", s);
    return 0;
 }
