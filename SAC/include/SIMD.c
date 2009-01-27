@@ -221,21 +221,21 @@ SIMD_SAVE_GENERIC_V4SI (int VEC[4], int X1[1], int X2[1], int X3[1], int X4[1])
 }
 
 void
-SIMD_ADDD (int *DEST, int *SRC1, int *SRC2)
+SIMD_ADDD (int DEST[2], int SRC1[2], int SRC2[2])
 {
     DEST[0] = SRC1[0] + SRC2[0];
     DEST[1] = SRC1[1] + SRC2[1];
 }
 
 void
-SIMD_SUBD (int *DEST, int *SRC1, int *SRC2)
+SIMD_SUBD (int DEST[2], int SRC1[2], int SRC2[2])
 {
     DEST[0] = SRC1[0] - SRC2[0];
     DEST[1] = SRC1[1] - SRC2[1];
 }
 
 void
-SIMD_MULD (int *DEST, int *SRC1, int *SRC2)
+SIMD_MULD (int DEST[2], int SRC1[2], int SRC2[2])
 {
     DEST[0] = SRC1[0] * SRC2[0];
     DEST[1] = SRC1[1] * SRC2[1];
@@ -296,7 +296,7 @@ SIMD_SAVE_GENERIC_V4HI (short VEC[4], short X1[1],
 }
 
 void
-SIMD_CMPGTW (LOGICAL * DEST, short *SRC1, short *SRC2)
+SIMD_CMPGTW (LOGICAL DEST[4], short SRC1[4], short SRC2[4])
 {
     DEST[0] = SRC1[0] > SRC2[0];
     DEST[1] = SRC1[1] > SRC2[1];
@@ -305,7 +305,7 @@ SIMD_CMPGTW (LOGICAL * DEST, short *SRC1, short *SRC2)
 }
 
 void
-SIMD_PHIW (short *DEST, LOGICAL * COND, short *SRC1, short *SRC2)
+SIMD_PHIW (short DEST[4], LOGICAL COND[4], short SRC1[4], short SRC2[4])
 {
 
     if (COND[0])
@@ -343,7 +343,7 @@ SIMD_PHIW (short *DEST, LOGICAL * COND, short *SRC1, short *SRC2)
 }
 
 void
-SIMD_ADDW (short *DEST, short *SRC1, short *SRC2)
+SIMD_ADDW (short DEST[4], short SRC1[4], short SRC2[4])
 {
     DEST[0] = SRC1[0] + SRC2[0];
     DEST[1] = SRC1[1] + SRC2[1];
@@ -352,7 +352,7 @@ SIMD_ADDW (short *DEST, short *SRC1, short *SRC2)
 }
 
 void
-SIMD_SUBW (short *DEST, short *SRC1, short *SRC2)
+SIMD_SUBW (short DEST[4], short SRC1[4], short SRC2[4])
 {
     DEST[0] = SRC1[0] - SRC2[0];
     DEST[1] = SRC1[1] - SRC2[1];
@@ -370,7 +370,7 @@ SIMD_MULW (short DEST[4], short SRC1[4], short SRC2[4])
 }
 
 void
-SIMD_LOAD_CONSTANT_V8QI (char *VEC, int HIGH, int LOW)
+SIMD_LOAD_CONSTANT_V8QI (char VEC[8], int HIGH, int LOW)
 {
     VEC[0] = (char) LOW;
     VEC[1] = (char) (LOW >> 1);
@@ -383,7 +383,7 @@ SIMD_LOAD_CONSTANT_V8QI (char *VEC, int HIGH, int LOW)
 }
 
 void
-SIMD_LOAD_V8QI (char *VEC, char *BASE)
+SIMD_LOAD_V8QI (char VEC[8], char BASE[8])
 {  VEC[0] = BASE[0];
     VEC[1] = BASE[1];
     VEC[2] = BASE[2];
@@ -395,7 +395,7 @@ SIMD_LOAD_V8QI (char *VEC, char *BASE)
 }
 
 void
-SIMD_LOAD_GENERIC_V8QI (char *VEC, char X1,
+SIMD_LOAD_GENERIC_V8QI (char VEC[8], char X1,
         char X2, char X3, char X4, char X5, char X6,
         char X7, char X8)
 {
@@ -410,7 +410,7 @@ SIMD_LOAD_GENERIC_V8QI (char *VEC, char X1,
 }
 
 void
-SIMD_SAVE_V8QI (char *VEC, char *BASE)
+SIMD_SAVE_V8QI (char VEC[8], char BASE[8])
 {  BASE[0] = VEC[0];
     BASE[1] = VEC[1];
     BASE[2] = VEC[2];
@@ -422,23 +422,23 @@ SIMD_SAVE_V8QI (char *VEC, char *BASE)
 }
 
 void
-SIMD_SAVE_GENERIC_V8QI (char *VEC, char *X0,
-        char *X1, char *X2, char *X3, char *X4, char *X5,
-        char *X6, char *X7)
+SIMD_SAVE_GENERIC_V8QI (char VEC[8], char *X0,
+        char X1[1], char X2[1], char X3[1], char X4[1], char X5[1],
+        char X6[1], char X7[1])
 {
 
-    *X0 = VEC[0];
-    *X1 = VEC[1];
-    *X2 = VEC[2];
-    *X3 = VEC[3];
-    *X4 = VEC[4];
-    *X5 = VEC[5];
-    *X6 = VEC[6];
-    *X7 = VEC[7];
+    X0[0] = VEC[0];
+    X1[0] = VEC[1];
+    X2[0] = VEC[2];
+    X3[0] = VEC[3];
+    X4[0] = VEC[4];
+    X5[0] = VEC[5];
+    X6[0] = VEC[6];
+    X7[0] = VEC[7];
 }
 
 void
-SIMD_ADDB (char *DEST, char *SRC1, char *SRC2)
+SIMD_ADDB (char DEST[8], char SRC1[8], char SRC2[8])
 {
     DEST[0] = SRC1[0] + SRC2[0];
     DEST[1] = SRC1[1] + SRC2[1];
@@ -451,7 +451,7 @@ SIMD_ADDB (char *DEST, char *SRC1, char *SRC2)
 }
 
 void
-SIMD_SUBB (char *DEST, char *SRC1, char *SRC2)
+SIMD_SUBB (char DEST[8], char SRC1[8], char SRC2[8])
 {
     DEST[0] = SRC1[0] - SRC2[0];
     DEST[1] = SRC1[1] - SRC2[1];
@@ -464,7 +464,7 @@ SIMD_SUBB (char *DEST, char *SRC1, char *SRC2)
 }
 
 void
-SIMD_MULB (char *DEST, char *SRC1, char *SRC2)
+SIMD_MULB (char DEST[8], char SRC1[8], char SRC2[8])
 {
 
     DEST[0] = SRC1[0] * SRC2[0];
@@ -478,21 +478,21 @@ SIMD_MULB (char *DEST, char *SRC1, char *SRC2)
 }
 
 void
-SIMD_MOVPS (float *DEST, float *SRC)
+SIMD_MOVPS (float DEST[2], float SRC[2])
 {
     DEST[0] = SRC[0];
     DEST[1] = SRC[1];
 }
 
 void
-SIMD_MOVD (int *DEST, int *SRC)
+SIMD_MOVD (int DEST[2], int SRC[2])
 {
     DEST[0] = SRC[0];
     DEST[1] = SRC[1];
 }
 
 void
-SIMD_MOVW (short *DEST, short *SRC)
+SIMD_MOVW (short DEST[4], short SRC[4])
 {
     DEST[0] = SRC[0];
     DEST[1] = SRC[1];
@@ -501,7 +501,7 @@ SIMD_MOVW (short *DEST, short *SRC)
 }
 
 void
-SIMD_MOVB (char *DEST, char *SRC)
+SIMD_MOVB (char DEST[8], char SRC[8])
 {
 
     DEST[0] = SRC[0];
@@ -515,21 +515,21 @@ SIMD_MOVB (char *DEST, char *SRC)
 }
 
 void
-SIMD_OPPPS (float *DEST, float *SRC)
+SIMD_OPPPS (float DEST[2], float SRC[2])
 {
     DEST[0] = -SRC[0];
     DEST[1] = -SRC[1];
 }
 
 void
-SIMD_OPPD (int *DEST, int *SRC)
+SIMD_OPPD (int DEST[2], int SRC[2])
 {
     DEST[0] = -SRC[0];
     DEST[1] = -SRC[1];
 }
 
 void
-SIMD_OPPW (short *DEST, short *SRC)
+SIMD_OPPW (short DEST[4], short SRC[4])
 {
     DEST[0] = -SRC[0];
     DEST[1] = -SRC[1];
@@ -538,7 +538,7 @@ SIMD_OPPW (short *DEST, short *SRC)
 }
 
 void
-SIMD_OPPB (char *DEST, char *SRC)
+SIMD_OPPB (char DEST[8], char SRC[8])
 {
     DEST[0] = -SRC[0];
     DEST[1] = -SRC[1];

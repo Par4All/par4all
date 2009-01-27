@@ -6,13 +6,13 @@ module DOTPROD
 
 display PRINTED_FILE
 
-source ${VDIR:-.}/include/benchmark.tpips.h
+source ${VDIR:-.}/include/fortran.tpips
 
-apply PRINT_C_CODE[DOTPROD]
-apply PRINT_C_CODE[DOTPRODREF]
-apply PRINT_C_CODE[MAIN]
+#apply PRINT_C_CODE[DOTPROD]
+#apply PRINT_C_CODE[DOTPRODREF]
+#apply PRINT_C_CODE[MAIN]
 
-display C_PRINTED_FILE
+#display C_PRINTED_FILE
 
 
 close

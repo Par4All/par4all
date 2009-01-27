@@ -1,5 +1,5 @@
 #include<math.h>
-short dotprod(short b[], short c[])
+short dotprod(short b[1000000], short c[1000000])
 {
     int i;
     short a=0;

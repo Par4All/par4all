@@ -1,7 +1,8 @@
       SUBROUTINE DOTPROD(A, B, C)
 
 ! include "DOTPROD_INC.f"
-      PARAMETER (SIZE=10000)
+        INTEGER*2 SIZE
+        PARAMETER (SIZE=10000)
 ! end include "DOTPROD_INC.f"
 !       INCLUDE 'DOTPROD_INC.f'
 
@@ -15,12 +16,8 @@
 
       END
       SUBROUTINE DOTPROD(A, B, C)
-
-! include "DOTPROD_INC.f"
-      PARAMETER (SIZE=10000)
-! end include "DOTPROD_INC.f"
-!       INCLUDE 'DOTPROD_INC.f'
-
+      INTEGER*2 SIZE
+      PARAMETER (SIZE = 10000)
       INTEGER I
       INTEGER*2 A(1:1), B(1:SIZE), C(1:SIZE)
 
@@ -31,12 +28,8 @@
 
       END
       SUBROUTINE DOTPROD(A, B, C)
-
-! include "DOTPROD_INC.f"
-      PARAMETER (SIZE=10000)
-! end include "DOTPROD_INC.f"
-!       INCLUDE 'DOTPROD_INC.f'
-
+      INTEGER*2 SIZE
+      PARAMETER (SIZE = 10000)
       INTEGER I
       INTEGER*2 A(1:1), B(1:SIZE), C(1:SIZE)
 
@@ -47,12 +40,21 @@
 
       END
       SUBROUTINE DOTPROD(A, B, C)
+      INTEGER*2 SIZE
+      PARAMETER (SIZE = 10000)
+      INTEGER I
+      INTEGER*2 A(1:1), B(1:SIZE), C(1:SIZE)
 
-! include "DOTPROD_INC.f"
-      PARAMETER (SIZE=10000)
-! end include "DOTPROD_INC.f"
-!       INCLUDE 'DOTPROD_INC.f'
+      A(1) = 0                                                          0001
+      DO 10 I = 1, SIZE                                                 0002
+         A(1) = A(1)+B(I)*C(I)                                          0003
+10       CONTINUE                                                       0004
 
+      END
+      SUBROUTINE DOTPROD(A, B, C)
+      INTEGER*2 SIZE
+      PARAMETER (SIZE = 10000)
+      INTEGER*2 I_0
       INTEGER I
       INTEGER*2 A(1:1), B(1:SIZE), C(1:SIZE)
 
@@ -64,21 +66,18 @@
 
       END
       SUBROUTINE DOTPROD(A, B, C)
-
-! include "DOTPROD_INC.f"
-      PARAMETER (SIZE=10000)
-! end include "DOTPROD_INC.f"
-!       INCLUDE 'DOTPROD_INC.f'
-
-      INTEGER I
+      INTEGER*2 SIZE
+      PARAMETER (SIZE = 10000)
+      INTEGER*2 I_0
+      INTEGER LU_IND0, LU_IB0, LU_NUB0, I
       INTEGER*2 A(1:1), B(1:SIZE), C(1:SIZE)
 
       A(1) = 0                                                          0001
       LU_NUB0 = 10000
       LU_IB0 = 0
       LU_IND0 = 0
-99998 CONTINUE
-      DO 99997 LU_IND0 = 0, 9999, 4
+99999 CONTINUE
+      DO 99998 LU_IND0 = 0, 9999, 4
 c SIMD_COMMENT_0
          I_0 = B(LU_IND0+1)*C(LU_IND0+1)
 c SIMD_COMMENT_1
@@ -99,48 +98,27 @@ c SIMD_COMMENT_0
 c SIMD_COMMENT_1
          A(1) = A(1)+I_0                                                0003
 c SIMD_COMMENT_2
-99997    CONTINUE
+99998    CONTINUE
       I = 10001
 
       END
-red bas
-
-red bas
-
-red bas
-
-red bas
-
-red bas
-
-red bas
-
-red bas
-
-red bas
-
-red bas
-
       SUBROUTINE DOTPROD(A, B, C)
-
-! include "DOTPROD_INC.f"
-      PARAMETER (SIZE=10000)
-! end include "DOTPROD_INC.f"
-!       INCLUDE 'DOTPROD_INC.f'
-
-      INTEGER I
-      INTEGER*2 A(1:1), B(1:SIZE), C(1:SIZE)
+      INTEGER*2 SIZE
+      PARAMETER (SIZE = 10000)
+      INTEGER*2 I_0
+      INTEGER LU_IND0, LU_IB0, LU_NUB0, I
+      INTEGER*2 A_RED0(0:3), A(1:1), B(1:SIZE), C(1:SIZE)
 
       A(1) = 0                                                          0001
       LU_NUB0 = 10000
       LU_IB0 = 0
       LU_IND0 = 0
-99998 CONTINUE
+99999 CONTINUE
       A_RED0(0) = 0
       A_RED0(1) = 0
       A_RED0(2) = 0
       A_RED0(3) = 0
-      DO 99997 LU_IND0 = 0, 9999, 4
+      DO 99998 LU_IND0 = 0, 9999, 4
 c SIMD_COMMENT_0
          I_0 = B(LU_IND0+1)*C(LU_IND0+1)
 c SIMD_COMMENT_1
@@ -161,28 +139,25 @@ c SIMD_COMMENT_0
 c SIMD_COMMENT_1
          A_RED0(3) = A_RED0(3)+I_0                                      0003
 c SIMD_COMMENT_2
-99997    CONTINUE
+99998    CONTINUE
       A(1) = A_RED0(3)+A_RED0(2)+A_RED0(1)+A_RED0(0)+A(1)
       I = 10001
 
       END
       SUBROUTINE DOTPROD(A, B, C)
-
-! include "DOTPROD_INC.f"
-      PARAMETER (SIZE=10000)
-! end include "DOTPROD_INC.f"
-!       INCLUDE 'DOTPROD_INC.f'
-
-      INTEGER I
-      INTEGER*2 A(1:1), B(1:SIZE), C(1:SIZE)
+      INTEGER*2 SIZE
+      PARAMETER (SIZE = 10000)
+      INTEGER*2 I_0
+      INTEGER LU_IND0, LU_IB0, LU_NUB0, I
+      INTEGER*2 A_RED0(0:3), A(1:1), B(1:SIZE), C(1:SIZE)
 
       A(1) = 0                                                          0001
-99998 CONTINUE
+99999 CONTINUE
       A_RED0(0) = 0
       A_RED0(1) = 0
       A_RED0(2) = 0
       A_RED0(3) = 0
-      DO 99997 LU_IND0 = 0, 9999, 4
+      DO 99998 LU_IND0 = 0, 9999, 4
 c SIMD_COMMENT_0
          I_0 = B(LU_IND0+1)*C(LU_IND0+1)
 c SIMD_COMMENT_1
@@ -203,27 +178,24 @@ c SIMD_COMMENT_0
 c SIMD_COMMENT_1
          A_RED0(3) = A_RED0(3)+I_0                                      0003
 c SIMD_COMMENT_2
-99997    CONTINUE
+99998    CONTINUE
       A(1) = A_RED0(3)+A_RED0(2)+A_RED0(1)+A_RED0(0)+A(1)
 
       END
       SUBROUTINE DOTPROD(A, B, C)
-
-! include "DOTPROD_INC.f"
-      PARAMETER (SIZE=10000)
-! end include "DOTPROD_INC.f"
-!       INCLUDE 'DOTPROD_INC.f'
-
-      INTEGER I
-      INTEGER*2 A(1:1), B(1:SIZE), C(1:SIZE)
+      INTEGER*2 SIZE
+      PARAMETER (SIZE = 10000)
+      INTEGER*2 I_03, I_02, I_01, I_00, I_0
+      INTEGER LU_IND0, LU_IB0, LU_NUB0, I
+      INTEGER*2 A_RED0(0:3), A(1:1), B(1:SIZE), C(1:SIZE)
 
       A(1) = 0                                                          0001
-99998 CONTINUE
+99999 CONTINUE
       A_RED0(0) = 0
       A_RED0(1) = 0
       A_RED0(2) = 0
       A_RED0(3) = 0
-      DO 99997 LU_IND0 = 0, 9999, 4
+      DO 99998 LU_IND0 = 0, 9999, 4
 c SIMD_COMMENT_0
          I_03 = B(LU_IND0+1)*C(LU_IND0+1)
 c SIMD_COMMENT_1
@@ -244,51 +216,27 @@ c SIMD_COMMENT_0
 c SIMD_COMMENT_1
          A_RED0(3) = A_RED0(3)+I_00                                     0003
 c SIMD_COMMENT_2
-99997    CONTINUE
+99998    CONTINUE
       A(1) = A_RED0(3)+A_RED0(2)+A_RED0(1)+A_RED0(0)+A(1)
 
       END
-make_simd_statements 1
-make_simd_statements 2
-make_simd_statements 3
-make_simd_statements 1
-make_simd_statements 2
-make_simd_statements 3
-generate_simd_code 1
-generate_simd_code 2
-make_simd_statements 1
-make_simd_statements 2
-make_simd_statements 3
-make_simd_statements 1
-make_simd_statements 2
-make_simd_statements 3
-generate_simd_code 1
-generate_simd_code 2
-opcode cost1 -12.000000
-opcode cost2 -12.000000
-generate_simd_code 1
-generate_simd_code 2
-generate_simd_code 1
-generate_simd_code 2
-opcode cost1 0.000000
-opcode cost2 0.000000
       SUBROUTINE DOTPROD(A, B, C)
-
-! include "DOTPROD_INC.f"
-      PARAMETER (SIZE=10000)
-! end include "DOTPROD_INC.f"
-!       INCLUDE 'DOTPROD_INC.f'
-
-      INTEGER I
-      INTEGER*2 A(1:1), B(1:SIZE), C(1:SIZE)
+      INTEGER*2 SIZE
+      PARAMETER (SIZE = 10000)
+      INTEGER*2 I_03, I_02, I_01, I_00, I_0
+      INTEGER LU_IND0, LU_IB0, LU_NUB0, I
+      INTEGER*2 v4hi_vec11(0:3), v4hi_vec10(0:3), v4hi_vec9(0:3), 
+     &v4hi_vec8(0:3), v4hi_vec7(0:3), v4hi_vec6(0:3), v4hi_vec5(0:3)
+     &, v4hi_vec4(0:3), v4hi_vec3(0:3), v4hi_vec2(0:3), v4hi_vec1(0:3
+     &), v4hi_vec0(0:3), A_RED0(0:3), A(1:1), B(1:SIZE), C(1:SIZE)
 
       A(1) = 0                                                          0001
-99998 CONTINUE
+99999 CONTINUE
       A_RED0(0) = 0
       A_RED0(1) = 0
       A_RED0(2) = 0
       A_RED0(3) = 0
-      DO 99997 LU_IND0 = 0, 9999, 4
+      DO 99998 LU_IND0 = 0, 9999, 4
          CALL SIMD_LOAD_V4HI(v4hi_vec0, C(LU_IND0+1))
          CALL SIMD_LOAD_V4HI(v4hi_vec1, B(LU_IND0+1))
          CALL SIMD_MULW(v4hi_vec2, v4hi_vec1, v4hi_vec0)
@@ -300,27 +248,27 @@ opcode cost2 0.000000
          CALL SIMD_SAVE_GENERIC_V4HI(v4hi_vec5, A_RED0(0), A_RED0(1)
      &   , A_RED0(2), A_RED0(3))
 c SIMD_COMMENT_2
-99997    CONTINUE
+99998    CONTINUE
       A(1) = A_RED0(3)+A_RED0(2)+A_RED0(1)+A_RED0(0)+A(1)
 
       END
       SUBROUTINE DOTPROD(A, B, C)
-
-! include "DOTPROD_INC.f"
-      PARAMETER (SIZE=10000)
-! end include "DOTPROD_INC.f"
-!       INCLUDE 'DOTPROD_INC.f'
-
-      INTEGER I
-      INTEGER*2 A(1:1), B(1:SIZE), C(1:SIZE)
+      INTEGER*2 SIZE
+      PARAMETER (SIZE = 10000)
+      INTEGER*2 I_03, I_02, I_01, I_00, I_0
+      INTEGER LU_IND0, LU_IB0, LU_NUB0, I
+      INTEGER*2 v4hi_vec11(0:3), v4hi_vec10(0:3), v4hi_vec9(0:3), 
+     &v4hi_vec8(0:3), v4hi_vec7(0:3), v4hi_vec6(0:3), v4hi_vec5(0:3)
+     &, v4hi_vec4(0:3), v4hi_vec3(0:3), v4hi_vec2(0:3), v4hi_vec1(0:3
+     &), v4hi_vec0(0:3), A_RED0(0:3), A(1:1), B(1:SIZE), C(1:SIZE)
 
       A(1) = 0                                                          0001
-99998 CONTINUE
+99999 CONTINUE
       A_RED0(0) = 0
       A_RED0(1) = 0
       A_RED0(2) = 0
       A_RED0(3) = 0
-      DO 99997 LU_IND0 = 0, 9999, 4
+      DO 99998 LU_IND0 = 0, 9999, 4
          CALL SIMD_LOAD_V4HI(v4hi_vec0, C(LU_IND0+1))
          CALL SIMD_LOAD_V4HI(v4hi_vec1, B(LU_IND0+1))
          CALL SIMD_MULW(v4hi_vec2, v4hi_vec1, v4hi_vec0)
@@ -330,103 +278,66 @@ c SIMD_COMMENT_2
          CALL SIMD_SAVE_GENERIC_V4HI(v4hi_vec5, A_RED0(0), A_RED0(1)
      &   , A_RED0(2), A_RED0(3))
 c SIMD_COMMENT_2
-99997    CONTINUE
+99998    CONTINUE
       A(1) = A_RED0(3)+A_RED0(2)+A_RED0(1)+A_RED0(0)+A(1)
 
       END
       SUBROUTINE DOTPROD(A, B, C)
-
-! include "DOTPROD_INC.f"
-      PARAMETER (SIZE=10000)
-! end include "DOTPROD_INC.f"
-!       INCLUDE 'DOTPROD_INC.f'
-
-      INTEGER I
-      INTEGER*2 A(1:1), B(1:SIZE), C(1:SIZE)
+      INTEGER*2 SIZE
+      PARAMETER (SIZE = 10000)
+      INTEGER*2 I_03, I_02, I_01, I_00, I_0
+      INTEGER LU_IND0, LU_IB0, LU_NUB0, I
+      INTEGER*2 v4hi_vec11(0:3), v4hi_vec10(0:3), v4hi_vec9(0:3), 
+     &v4hi_vec8(0:3), v4hi_vec7(0:3), v4hi_vec6(0:3), v4hi_vec5(0:3)
+     &, v4hi_vec4(0:3), v4hi_vec3(0:3), v4hi_vec2(0:3), v4hi_vec1(0:3
+     &), v4hi_vec0(0:3), A_RED0(0:3), A(1:1), B(1:SIZE), C(1:SIZE)
 
       A(1) = 0                                                          0001
-99998 CONTINUE
+99999 CONTINUE
       A_RED0(0) = 0
       A_RED0(1) = 0
       A_RED0(2) = 0
       A_RED0(3) = 0
       CALL SIMD_LOAD_GENERIC_V4HI(v4hi_vec4, A_RED0(0), A_RED0(1), 
      &A_RED0(2), A_RED0(3))
-      DO 99997 LU_IND0 = 0, 9999, 4
+      DO 99998 LU_IND0 = 0, 9999, 4
          CALL SIMD_LOAD_V4HI(v4hi_vec0, C(LU_IND0+1))
          CALL SIMD_LOAD_V4HI(v4hi_vec1, B(LU_IND0+1))
          CALL SIMD_MULW(v4hi_vec2, v4hi_vec1, v4hi_vec0)
-         CALL SIMD_ADDW(v4hi_vec4, v4hi_vec4, v4hi_vec2)
+         CALL SIMD_ADDW(v4hi_vec5, v4hi_vec4, v4hi_vec2)
 c SIMD_COMMENT_2
-99997    CONTINUE
-      CALL SIMD_SAVE_GENERIC_V4HI(A_RED0(3), A_RED0(2), A_RED0(1), 
-     &A_RED0(0), v4hi_vec4)
+99998    CONTINUE
+      CALL SIMD_SAVE_GENERIC_V4HI(v4hi_vec5, A_RED0(0), A_RED0(1), 
+     &A_RED0(2), A_RED0(3))
       A(1) = A_RED0(3)+A_RED0(2)+A_RED0(1)+A_RED0(0)+A(1)
 
       END
       SUBROUTINE DOTPROD(A, B, C)
-
-! include "DOTPROD_INC.f"
-      PARAMETER (SIZE=10000)
-! end include "DOTPROD_INC.f"
-!       INCLUDE 'DOTPROD_INC.f'
-
-      INTEGER I
-      INTEGER*2 A(1:1), B(1:SIZE), C(1:SIZE)
+      INTEGER*2 SIZE
+      PARAMETER (SIZE = 10000)
+      INTEGER LU_IND0
+      INTEGER*2 v4hi_vec5(0:3), v4hi_vec4(0:3), v4hi_vec2(0:3), 
+     &v4hi_vec1(0:3), v4hi_vec0(0:3), A_RED0(0:3), A(1:1), B(1:SIZE)
+     &, C(1:SIZE)
 
       A(1) = 0                                                          0001
-99998 CONTINUE
+99999 CONTINUE
       A_RED0(0) = 0
       A_RED0(1) = 0
       A_RED0(2) = 0
       A_RED0(3) = 0
-      CALL SIMD_SAVE_GENERIC_V4HI(A_RED0(3), A_RED0(2), A_RED0(1), 
-     &A_RED0(0), v4hi_vec4)
+      CALL SIMD_LOAD_GENERIC_V4HI(v4hi_vec4, A_RED0(0), A_RED0(1), 
+     &A_RED0(2), A_RED0(3))
+      DO 99998 LU_IND0 = 0, 9999, 4
+         CALL SIMD_LOAD_V4HI(v4hi_vec0, C(LU_IND0+1))
+         CALL SIMD_LOAD_V4HI(v4hi_vec1, B(LU_IND0+1))
+         CALL SIMD_MULW(v4hi_vec2, v4hi_vec1, v4hi_vec0)
+         CALL SIMD_ADDW(v4hi_vec5, v4hi_vec4, v4hi_vec2)
+c SIMD_COMMENT_2
+99998    CONTINUE
+      CALL SIMD_SAVE_GENERIC_V4HI(v4hi_vec5, A_RED0(0), A_RED0(1), 
+     &A_RED0(2), A_RED0(3))
       A(1) = A_RED0(3)+A_RED0(2)+A_RED0(1)+A_RED0(0)+A(1)
 
       END
-/* C pretty print for module DOTPROD. */
-#define size 10000
-
-void
-dotprod (short a[1], short b[10000], short c[10000])
-{
-  short a_red0[4];
-  v4hi v4hi_vec4;
-
-  short i_03;
-  short i_02;
-  short i_01;
-  short i_00;
-  int lu_ind0;
-  int lu_ib0;
-  int lu_nub0;
-  short i_0;
-#define size 10000
-  ;
-  int i;
-  short a_red0[4];
-  v4hi v4hi_vec0;
-  v4hi v4hi_vec1;
-  v4hi v4hi_vec2;
-  v4hi v4hi_vec3;
-  v4hi v4hi_vec4;
-  v4hi v4hi_vec5;
-  v4hi v4hi_vec6;
-  v4hi v4hi_vec7;
-  v4hi v4hi_vec8;
-  v4hi v4hi_vec9;
-  v4hi v4hi_vec10;
-  v4hi v4hi_vec11;
-  a[1] = 0;
-  ;
-  a_red0[0] = 0;
-  a_red0[1] = 0;
-  a_red0[2] = 0;
-  a_red0[3] = 0;
-  simd_save_generic_v4hi (a_red0[3], a_red0[2], a_red0[1], a_red0[0],
-			  v4hi_vec4);
-  a[1] = (a_red0[3] + (a_red0[2] + (a_red0[1] + (a_red0[0] + a[1]))));
-  ;
-}
 
