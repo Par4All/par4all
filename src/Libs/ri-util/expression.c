@@ -242,6 +242,11 @@ expression e;
     return(syntax_call_p(expression_syntax(e)));
 }
 
+call expression_call(expression e)
+{
+    return(syntax_call(expression_syntax(e)));
+}
+
 bool expression_reference_p(e)
 expression e;
 {

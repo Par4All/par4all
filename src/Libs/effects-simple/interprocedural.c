@@ -1115,7 +1115,7 @@ effect effect_array_address_substitution(effect eff,
     value sv = EvalExpression(s);
     constant sc = value_constant(sv);
     /* FI: could/should be PLUS_C ? We could try to evaluate s+l...*/
-    expression sl = (constant_int_p(sc) && constant_int(sc)==0)?
+    expression sl = (value_constant_p(sv) && constant_int_p(sc) && constant_int(sc)==0)?
       l : MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME), s, l);
 
     CAR(gen_last(reference_indices(nr))).p = (void *) sl;

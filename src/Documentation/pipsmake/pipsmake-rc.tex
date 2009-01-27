@@ -3067,8 +3067,10 @@ of similar statements into vector operations.
 alias simdizer 'Generate SIMD code'
 
 simdizer                    > MODULE.code
+                            > MODULE.callees
         < PROGRAM.entities
-        < MODULE.code MODULE.dg
+        < MODULE.code
+        < MODULE.dg
 \end{verbatim}
 
 
