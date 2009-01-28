@@ -6,8 +6,8 @@
 #
 
 case `uname -s` in
-    Linux) 
-      if [ `uname -m` = 'x86_64' ] ; then 
+    Linux)
+      if [ `uname -m` = 'x86_64' ] ; then
 	echo "LINUX_x86_64_LL"
       elif [ `uname -m` = 'ppc64' ] ; then
 	echo "LINUX_PPC_64_LL"
@@ -18,6 +18,8 @@ case `uname -s` in
 	echo "GNUSOL2LL" ;;
     FreeBSD)
 	echo "FREEBSDLL" ;;
-    *) 
+    Darwin)
+	echo "MACOSX" ;;
+    *)
 	echo "DEFAULT" ;;
 esac
