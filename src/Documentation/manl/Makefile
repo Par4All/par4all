@@ -1,6 +1,4 @@
-#
-# $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1997/03/17 13:12:42 $, 
+# $Id$
 
 MANS =	Build.l \
 	Delete.l \
@@ -20,14 +18,18 @@ SOURCES = $(MANS)
 
 all: $(HTMS)
 
-INSTALL_DOC_DIR=$(PIPS_ROOT)/Doc/manl
-
-INSTALL_DOC=$(MANS)
+INSTALL_MAN=$(MANS)
 INSTALL_HTM=$(HTMS)
 
 clean: local-clean
 local-clean:
 	$(RM) $(HTMS)
 
-# end of $RCSfile: config.makefile,v $
-#
+# common stuff
+ifdef PIPS_ROOT
+ROOT    = $(PIPS_ROOT)
+else
+ROOT    = ../../..
+endif
+include $(ROOT)/makes/main.mk
+
