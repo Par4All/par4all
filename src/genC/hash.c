@@ -20,7 +20,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
-#include <malloc.h>
 #include <stdlib.h>
 
 #include "newgen_types.h"

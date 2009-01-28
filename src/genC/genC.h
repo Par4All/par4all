@@ -24,7 +24,6 @@
 /* #include <sys/stdtypes.h> */
 #include <stdio.h>
 #include <stdint.h>
-#include <malloc.h>
 #include <strings.h>
 /* extern char * strdup(const char *);*/
 

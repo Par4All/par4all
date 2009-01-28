@@ -16,7 +16,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <malloc.h>
 #include "genC.h"
 #include "newgen_include.h"
 /* #include "newgen_assert.h" #include "newgen_stack.h" */
