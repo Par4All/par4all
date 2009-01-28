@@ -8,7 +8,7 @@ MANS =	Build.l \
 	Pips.l \
 	Select.l \
 	epips.l \
-	pips.l \
+	pips-cmd.l \
 	tpips.l \
 	wpips.l
 
