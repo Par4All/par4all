@@ -1422,11 +1422,17 @@ integer_nullary_operation_to_transformer(
 					 bool is_internal __attribute__ ((unused)))
 {
   transformer tf = transformer_undefined;
-  /* rand() returns a float, but it can be casted to int. See
-     Semantics/rand01.c */
+  /* rand() returns an integer between 0 and RAND_MAX. See
+     Semantics/rand01.c
+
+     How do you make sure that RAND_MAX is the same for the analyzed
+     code and for the analyzer?
+ */
   if (ENTITY_RAND_P(f)) {
     Pbase b = VECTEUR_NUL;
     Psysteme s = sc_new();
+
+    /* Two inequalities should be added... */
 
     b = vect_add_variable(b, (Variable) e);  
     s->base = b;
