@@ -4273,7 +4273,7 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {MBSTOWCS_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
   {MBTOWC_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
   {QSORT_FUNCTION_NAME, 4, default_intrinsic_type, 0, 0},
-  {RAND_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+  {RAND_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0}, /* void -> int */
   {REALLOC_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
   {SRAND_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {STRTOD_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
@@ -4307,7 +4307,7 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {C_164A_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {MKTEMP_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {PTSNAME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {RANDOM_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+  {RANDOM_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0}, /* void -> long int */
   {REALPATH_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
   {SETSTATE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {SRANDOM_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
