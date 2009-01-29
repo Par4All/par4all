@@ -945,6 +945,8 @@
 
 #define ENTITY_RANDOM_P(e)               ENTITY_NAME_P(e,"random")
 #define ENTITY_SRANDOM_P(e)              ENTITY_NAME_P(e,"srandom")
+#define ENTITY_RAND_P(e)                 ENTITY_NAME_P(e,"rand")
+#define ENTITY_SRAND_P(e)                ENTITY_NAME_P(e,"srand")
 
 /* signal.h */
 #define ENTITY_SIGNAL_P(e)               ENTITY_NAME_P(e,"signal")
