@@ -22,7 +22,8 @@ htdoc: doc
 	$(MAKE) -C src FWD_STOP_ON_ERROR= phase7
 
 build: doc
-full-build: build 
+
+full-build: build htdoc
 
 # do not include dependencies for some target
 clean: NO_INCLUDES=1

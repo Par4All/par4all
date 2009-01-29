@@ -7,7 +7,8 @@ include $(MAKE.d)/doc.mk
 
 # Where we want the documentation to be published if not redefined in the
 # environment:
-DOXYGEN_PUBLISH_LOCATION ?= doxygen.pips.enstb.org:/var/www/pips/doxygen/$(PROJECT_NAME)
+DOXYGEN_PUBLISH_LOCATION_DIR ?= doxygen.pips.enstb.org:/var/www/pips/doxygen
+DOXYGEN_PUBLISH_LOCATION ?= $(DOXYGEN_PUBLISH_LOCATION_DIR)/$(PROJECT_NAME)
 
 # The configuration stuff:
 DEFAULT_DOXYGEN_DIR ?= $(ROOT)/makes/share/doxygen
