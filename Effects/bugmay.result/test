@@ -10,3 +10,4 @@ module CONDINC called by module BUGMAY:
 	possible write effect on non-variable actual parameter thru 1st formal parameter K
 module INC called by module BUGMAY:
 	write effect on non-variable actual parameter thru 1st formal parameter K
+  PRINT_CODE_PROPER_EFFECTS      building   PRINTED_FILE(BUGMAY)
