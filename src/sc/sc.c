@@ -300,7 +300,6 @@ boolean sc_weak_consistent_p(Psysteme sc)
     if(weak_consistent && sc_dimension(sc) != 0) {
 	base_normalized_p(sc_base(sc));
     }
-					      
 
     if(weak_consistent) {
 	Pcontrainte eq;
