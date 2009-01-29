@@ -275,7 +275,7 @@ static transformer addition_operation_to_transformer(entity v,
 transformer any_assign_operation_to_transformer(entity tmp,
 						list args, /* arguments for assign */
 						transformer pre, /* precondition */
-						bool is_internal)
+						bool is_internal __attribute__ ((unused)))
 {
   transformer tf = transformer_undefined;
   //transformer tfe = transformer_undefined;
@@ -1413,6 +1413,31 @@ max0_to_transformer(entity e, list args, transformer pre, bool is_internal)
 }
 
 /* */
+
+static transformer 
+integer_nullary_operation_to_transformer(
+					 entity e, 
+					 entity f, 
+					 transformer pre __attribute__ ((unused)), 
+					 bool is_internal __attribute__ ((unused)))
+{
+  transformer tf = transformer_undefined;
+  /* rand() returns a float, but it can be casted to int. See
+     Semantics/rand01.c */
+  if (ENTITY_RAND_P(f)) {
+    Pbase b = VECTEUR_NUL;
+    Psysteme s = sc_new();
+
+    b = vect_add_variable(b, (Variable) e);  
+    s->base = b;
+    s->dimension = vect_size(b);
+
+    tf= make_transformer(NIL, make_predicate(s));
+  }
+
+  return tf;
+}
+
 static transformer 
 integer_unary_operation_to_transformer(
     entity e,
@@ -1511,8 +1536,8 @@ integer_call_expression_to_transformer(
   }
   else if(arity==0) {
     /* integer constant must have been detected earlier as linear (affine)
-       expressions */
-    pips_user_error("Call to %s with no arguments", entity_name(f));
+       expressions but there might be nullary intrinsic such as rand() */
+    tf = integer_nullary_operation_to_transformer(e, f, pre, is_internal);
   }
   else if(arity==1) {
     expression e1 = EXPRESSION(CAR(args));
