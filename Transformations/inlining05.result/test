@@ -17,14 +17,14 @@ Code after inlining
 
 int main(int argc, char **argv)
 {
-   int pmax0;
+   int I_0;
    int c;
    {
       int argc_ = (2>argc?2:argc);
-      pmax0 = argc_;
+      I_0 = argc_;
 l99999:      ;
    }
-   c = pmax0;
+   c = I_0;
    return 0;
 }
 

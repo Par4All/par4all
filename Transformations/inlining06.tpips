@@ -1,0 +1,36 @@
+delete inlining06
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create inlining06 inlining06.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[inlining06!test]
+display PRINTED_FILE[thetest]
+
+echo
+echo Code after inlining
+echo
+
+apply INLINING[inlining06!test]
+display PRINTED_FILE[thetest]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+# shell $(PIPS_CC) -c inlining06.database/Src/inlining06.c
+shell gcc -c inlining06.database/Src/inlining06.c
+
+close
+delete inlining06
+quit
+
