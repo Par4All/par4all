@@ -32,15 +32,30 @@ static graph dependence_graph;
 
 
 #define same_stringn_p(a,b,c) (!strncmp((a),(b),(c)))
-#define FOREACH(_map_CASTER, _map_item,  _map_list)		\
-  {									\
-    list _map_item##_list = (_map_list);				\
-    _map_CASTER##_TYPE _map_item;					\
-    for(; _map_item##_list; POP(_map_item##_list))			\
-    {									\
-      _map_item = _map_CASTER(CAR(_map_item##_list));
 
-#define END }}
+/* FOREACH, similar to MAP but more gdb (and vim) friendly
+ */
+
+#define UNIQUE_NAME_1(prefix, x)   prefix##x
+#define UNIQUE_NAME_2(prefix, x)   UNIQUE_NAME_1 (prefix, x)
+#define UNIQUE_NAME  UNIQUE_NAME_2 (iter_, __LINE__)
+
+#if __STDC_VERSION__ >= 199901L
+#define FOREACH(_fe_CASTER, _fe_item, _fe_list) \
+        list UNIQUE_NAME = (_fe_list);\
+for( _fe_CASTER##_TYPE _fe_item;\
+        !ENDP(UNIQUE_NAME) && (_fe_item= _fe_CASTER(CAR(UNIQUE_NAME) ));\
+        POP(UNIQUE_NAME))
+#else
+#define FOREACH(_fe_CASTER, _fe_item, _fe_list) \
+        list UNIQUE_NAME;\
+        _fe_CASTER##_TYPE _fe_item;\
+for( UNIQUE_NAME= (_fe_list);\
+        !ENDP(UNIQUE_NAME) && (_fe_item= _fe_CASTER(CAR(UNIQUE_NAME) ));\
+        POP(UNIQUE_NAME))
+#endif
+
+
 
 static bool simd_save_stat_p(statement stat)
 {
@@ -97,6 +112,7 @@ static bool list_eq_expression(list args1, list args2, bool allow_addressing)
     {
         list pArgs2 = args2;
         FOREACH(EXPRESSION, exp1, args1)
+        {
             expression exp2 = EXPRESSION(CAR(pArgs2));
             /* hack to handle the & operator in C */
             if(allow_addressing)
@@ -117,7 +133,7 @@ static bool list_eq_expression(list args1, list args2, bool allow_addressing)
             if(!same_expression_p(exp1, exp2))
                 return FALSE;
             pArgs2 = CDR(pArgs2);
-        END
+        }
         return TRUE;
     }
     else
@@ -132,6 +148,7 @@ static bool list_eq_expression(list args1, list args2, bool allow_addressing)
 static bool index_argument_conflict(list args, list l_reg)
 {
     FOREACH(EXPRESSION, arg, args)
+    {
         /* hack to handle the & operator in C */
         if( expression_call_p(arg) )
         {
@@ -143,25 +160,28 @@ static bool index_argument_conflict(list args, list l_reg)
         if(expression_reference_p(arg))
         {
             FOREACH(EXPRESSION, ind, reference_indices(expression_reference(arg)) )
+            {
 
                 list ef = expression_to_proper_effects(ind);
 
                 FOREACH(EFFECT, indEff, ef)
+                {
                     FOREACH(EFFECT, loopEff, l_reg)
+                    {
                         if(action_write_p(effect_action(loopEff)) &&
                                 same_entity_p(effect_entity(indEff), effect_entity(loopEff)))
                         {
                             gen_free_list(ef);
                             return TRUE;
                         }
-                    END
-                END
+                    }
+                }
 
                 gen_free_list(ef);
 
-            END
+            }
         }
-    END
+    }
 
     return FALSE;
 }
@@ -172,30 +192,24 @@ static bool index_argument_conflict(list args, list l_reg)
 static bool constant_argument_list_p(list args, statement theStat, list forstats, list l_reg)
 {
     bool bConstArg = TRUE;
-    list l1,l2,l3;
     /* consider each vertex */
-    //MAP(VERTEX, a_vertex, 
-    for(l1= graph_vertices(dependence_graph); l1!=NIL;POP(l1))
+    FOREACH(VERTEX, a_vertex, graph_vertices(dependence_graph) )
     {
-        vertex a_vertex = VERTEX(CAR(l1));
         statement stat1 = vertex_to_statement(a_vertex);
 
         if (stat1 != theStat)
             continue;
 
         /* check this vertex successor */
-        //MAP(SUCCESSOR, suc,
-        for(l2= vertex_successors(a_vertex); l2!=NIL;POP(l2))
+        FOREACH(SUCCESSOR, suc, vertex_successors(a_vertex) )
         {
-            successor suc = SUCCESSOR(CAR(l2));
             statement stat2 = vertex_to_statement(successor_vertex(suc));
 
             /* skip if the successor is not in the loop body */
             if ((gen_find_eq(stat2, forstats) != gen_chunk_undefined) && (stat1 != stat2))
             {
-                
-                //MAP(CONFLICT, c, 
-                for(l3=dg_arc_label_conflicts(successor_arc_label(suc));l3!=NIL;POP(l3))
+
+                FOREACH(CONFLICT, c,dg_arc_label_conflicts(successor_arc_label(suc)) )
                 {
                     //conflict c = CONFLICT(CAR(l3));
                     // If stat2 is not a simd statement, then return FALSE
@@ -207,15 +221,15 @@ static bool constant_argument_list_p(list args, statement theStat, list forstats
                     // between the arguments of 
                     else if(   simd_loadsave_stat_p(stat2)
                             && !list_eq_expression(args, CDR(call_arguments(statement_call(stat2))),true)
-                    )
+                           )
                     {
                         bConstArg = FALSE;
                     }
                     break;
-                }/*, dg_arc_label_conflicts(successor_arc_label(suc)));*/
-           }
-        }/*, vertex_successors(a_vertex));*/
-    }/*, graph_vertices(dependence_graph));*/
+                }
+            }
+        }
+    }
 
     return bConstArg && !index_argument_conflict(args, l_reg);
 }
@@ -229,6 +243,7 @@ static bool searchForConstArgs(statement body, hash_table constArgs, list l_reg)
     if(statement_block_p(body))
     {
         FOREACH(STATEMENT, curStat, statement_block(body) )
+        {
             // If if it is a simd load or save statement, ...
             if(simd_loadsave_stat_p(curStat))
             {
@@ -243,7 +258,7 @@ static bool searchForConstArgs(statement body, hash_table constArgs, list l_reg)
                     hash_put(constArgs, curStat, args);
                 }
             }
-        END
+        }
         return TRUE;
     }
     else
@@ -266,6 +281,7 @@ static void moveConstArgsStatements(statement s, statement body, hash_table cons
      * and argsToFunc and to replace simdVector, if necessary
      */
     FOREACH(STATEMENT, curStat, statement_block(body))
+    {
         list args = (list) hash_get(constArgs, curStat);
 
         /* add it to argsToVect / argsToFunc */
@@ -283,7 +299,7 @@ static void moveConstArgsStatements(statement s, statement body, hash_table cons
         {
             bodySeq = gen_nconc(bodySeq, CONS(STATEMENT, copy_statement(curStat), NIL) );
         }
-    END
+    }
 
     
 

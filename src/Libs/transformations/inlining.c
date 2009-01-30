@@ -25,15 +25,29 @@
 #include "transformations.h"
 
 
-#define FOREACH(_map_CASTER, _map_item,  _map_list)		\
-  {									\
-    list _map_item##_list = (_map_list);				\
-    _map_CASTER##_TYPE _map_item;					\
-    for(; _map_item##_list; POP(_map_item##_list))			\
-    {									\
-      _map_item = _map_CASTER(CAR(_map_item##_list));
+/* FOREACH, similar to MAP but more gdb (and vim) friendly
+ */
 
-#define END }}
+#define UNIQUE_NAME_1(prefix, x)   prefix##x
+#define UNIQUE_NAME_2(prefix, x)   UNIQUE_NAME_1 (prefix, x)
+#define UNIQUE_NAME  UNIQUE_NAME_2 (iter_, __LINE__)
+
+#if __STDC_VERSION__ >= 199901L
+#define FOREACH(_fe_CASTER, _fe_item, _fe_list) \
+        list UNIQUE_NAME = (_fe_list);\
+for( _fe_CASTER##_TYPE _fe_item;\
+        !ENDP(UNIQUE_NAME) && (_fe_item= _fe_CASTER(CAR(UNIQUE_NAME) ));\
+        POP(UNIQUE_NAME))
+#else
+#define FOREACH(_fe_CASTER, _fe_item, _fe_list) \
+        list UNIQUE_NAME;\
+        _fe_CASTER##_TYPE _fe_item;\
+for( UNIQUE_NAME= (_fe_list);\
+        !ENDP(UNIQUE_NAME) && (_fe_item= _fe_CASTER(CAR(UNIQUE_NAME) ));\
+        POP(UNIQUE_NAME))
+#endif
+
+
 static entity       inlined_module;
 static statement    inlined_module_statement;
 static statement    laststmt;
@@ -44,9 +58,7 @@ static entity       returned_entity;
 static
 void inline_return_remover(instruction ins,instruction tail_ins)
 {
-    if( instruction_call_p(ins) &&
-        same_string_p( entity_local_name(call_function(instruction_call(ins))), C_RETURN_FUNCTION_NAME ) &&
-        ins !=tail_ins    )
+    if( return_instruction_p( ins ) && ins !=tail_ins )
     {
         *ins = *make_instruction_goto( copy_statement(laststmt) );
     }
@@ -57,13 +69,18 @@ void inline_return_remover(instruction ins,instruction tail_ins)
 static
 void inline_return_switcher(instruction ins,instruction tail_ins)
 {
-    if( instruction_call_p(ins) &&
-            same_string_p( entity_local_name(call_function(instruction_call(ins))), C_RETURN_FUNCTION_NAME ) )
+    if( return_instruction_p( ins ) )
     {
-        expression e = MakeBinaryCall( CreateIntrinsic(ASSIGN_OPERATOR_NAME) , entity_to_expression( returned_entity ) , EXPRESSION(CAR(call_arguments(instruction_call(ins)))));
-
+        call c = make_call(
+                    CreateIntrinsic(ASSIGN_OPERATOR_NAME),
+                    CONS(
+                        EXPRESSION,
+                        entity_to_expression( returned_entity ),
+                        call_arguments(instruction_call(ins))
+                    )
+                 );
         list l= (ins == tail_ins ) ? NIL : CONS( STATEMENT, instruction_to_statement( make_instruction_goto( copy_statement(laststmt) ) ) , NIL ) ;
-        l = CONS( STATEMENT, instruction_to_statement(  make_instruction_expression( e ) ), l );
+        l = CONS( STATEMENT, instruction_to_statement(  make_instruction_call(c) ), l );
 
         sequence s = make_sequence( l );
         *ins = *make_instruction_sequence( s );
@@ -170,10 +187,11 @@ static
 bool inline_has_static_declaration(list iter)
 {
     FOREACH(ENTITY, e ,iter)
+    {
         storage s = entity_storage(e);
         if ( storage_ram_p(s) && ENTITY_NAME_P( ram_section(storage_ram(s)), STATIC_AREA_LOCAL_NAME) )
             return true;
-    END
+    }
     return false;
 }
 
@@ -252,7 +270,7 @@ instruction inline_expression_call(expression modified_expression, call callee)
         while( CDR(CDR(tail)) != NIL ) POP(tail);
         instruction tail_ins = statement_instruction(STATEMENT(CAR(tail)));
 
-        type treturn = functional_result(type_functional(entity_type(inlined_module)));
+        type treturn = ultimate_type(functional_result(type_functional(entity_type(inlined_module))));
         if( type_void_p(treturn) ) /* only replace return statement by gotos */
         {
             gen_context_recurse(expanded, tail_ins, instruction_domain, gen_true, &inline_return_remover);
@@ -325,7 +343,7 @@ instruction inline_expression_call(expression modified_expression, call callee)
 
             /* fix name */
             string tname = strdup(concatenate(
-                        modified_module_name,
+                        emn,
                         MODULE_SEP_STRING,
                         block_level,
                         BLOCK_SEP_STRING,
@@ -336,11 +354,13 @@ instruction inline_expression_call(expression modified_expression, call callee)
 
             /* fix storage */
             entity dynamic_area = global_name_to_entity(emn, DYNAMIC_AREA_LOCAL_NAME);
-            area aa = type_area(entity_type(dynamic_area));
-            int OldOffset = area_size(aa);
-            area_size(aa) = OldOffset + SizeOfElements( basic_of_expression( from ) );
-            area_layout(aa) = gen_nconc(area_layout(aa), CONS(ENTITY, new_ent, NIL));
-            entity_storage(new_ent)= make_storage_ram( make_ram( get_current_module_entity(), dynamic_area, OldOffset, NIL ) );
+            entity_storage(new_ent)= make_storage_ram(
+                    make_ram(
+                        get_current_module_entity(),
+                        dynamic_area,
+                        add_any_variable_to_area(dynamic_area,new_ent, c_module_p(get_current_module_entity())),
+                        NIL)
+            );
 
             /* fix value */
             entity_initial(new_ent) = make_value_expression( copy_expression( from ) );
@@ -352,9 +372,41 @@ instruction inline_expression_call(expression modified_expression, call callee)
         else
         {
             /* get new reference */
-            entity new =  expression_reference_p( from ) ?
-                reference_variable(syntax_reference(expression_syntax(from))) :
-                call_function(syntax_call(expression_syntax(from)));
+            entity new = entity_undefined;
+            switch(syntax_tag(expression_syntax(from)))
+            {
+                case is_syntax_reference:
+                    new = reference_variable(syntax_reference(expression_syntax(from)));
+                    break;
+                    /* this one is more complicated than I thought,
+                     * what of the side effect of the call ?
+                     * we must create a new variable holding the call result before
+                     */
+                case is_syntax_call:
+                    if( expression_constant_p(from) )
+                    {
+                        new = call_function(expression_call(from));
+                    }
+                    else
+                    {
+                        new = make_new_scalar_variable(
+                                get_current_module_entity(),
+                                copy_basic(variable_basic(type_variable(entity_type(e))))
+                                );
+                        entity dynamic_area =
+                            global_name_to_entity(module_local_name(get_current_module_entity()),DYNAMIC_AREA_LOCAL_NAME);
+                        entity_storage(new) = make_storage_ram(
+                                make_ram(get_current_module_entity(),
+                                    dynamic_area,
+                                    add_any_variable_to_area(dynamic_area,returned_entity, c_module_p(get_current_module_entity())),                     
+                                    NIL));
+                        entity_initial(new) = make_value_expression(from);
+                        AddLocalEntityToDeclarations(new, get_current_module_entity(),
+                                c_module_p(get_current_module_entity())?get_current_module_statement():statement_undefined);
+                    } break;
+                default:
+                    pips_internal_error("unhandled tag %d\n", syntax_tag(expression_syntax(from)) );
+            };
 
             /* check wether the substitution will cause naming clashes 
              * then perform the substitution
@@ -448,7 +500,17 @@ void inline_statement_switcher(statement stmt)
                     type t= functional_result(type_functional(entity_type(inlined_module)));
                     if( ! type_void_p(t) )
                     {
-                        new_instructions=CONS(STATEMENT,instruction_to_statement(copy_instruction(*ins)),new_instructions);
+                        instruction tmp = *ins;
+                        if( expression_call_p(instruction_expression(tmp)) )
+                        {
+                            tmp = make_instruction_call(
+                                    expression_call(instruction_expression(tmp))
+                            );
+                        }
+                        new_instructions=CONS(STATEMENT,
+                                instruction_to_statement(copy_instruction(tmp)),
+                                new_instructions
+                        );
                     }
                     //free_instruction(*ins);
                     *ins = make_instruction_sequence( make_sequence( gen_nreverse(new_instructions) ) );
@@ -491,6 +553,9 @@ inline_calls(char * module)
     /* restucture the generated unstructured statement */
     if(!restructure_control(module))
         pips_user_warning("failed to restructure after inlining");
+    /* we can try to remove some labels now*/
+    if(!remove_useless_label(module))
+        pips_user_warning("failed to remove useless labels after restructure_control in inlining");
 
 }
 

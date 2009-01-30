@@ -1046,3 +1046,57 @@ statement_write_effect_p(statement s)
 
    return write_effect_found;
 }
+
+
+
+/** 
+ * @brief remove the label of a statement if the statement is not unstructured
+ * labels on fortran loops are also preserved
+ * 
+ * @param s statement considered
+ */
+void statement_remove_useless_label(statement s)
+{
+    instruction i = statement_instruction(s);
+    if(    !instruction_unstructured_p(i)
+        || (    !c_module_p( get_current_module_entity() ) 
+             && ( instruction_loop_p(i) || instruction_whileloop_p(i) || instruction_forloop_p(i))
+           )
+    )
+    {
+        if( !entity_empty_label_p( statement_label(s) ) )
+        {
+            free_entity(statement_label(s));
+            statement_label(s)=entity_empty_label();
+        }
+    }
+}
+
+/** 
+ * recursievly remove all labels from a module
+ * only labels in unstructured are kept
+ * @param module_name module considered
+ * 
+ * @return true (never fails)
+ */
+bool
+remove_useless_label(char* module_name)
+{
+   /* Get the module ressource */
+   entity module = module_name_to_entity( module_name );
+   statement module_statement = 
+       (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+
+   set_current_module_entity( module );
+   set_current_module_statement( module_statement );
+
+   gen_recurse(module_statement,statement_domain, gen_true, statement_remove_useless_label);
+
+   module_reorder(module_statement);
+   DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_statement);
+
+   reset_current_module_entity();
+   reset_current_module_statement();
+
+   return true;
+}
