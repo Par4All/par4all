@@ -6,9 +6,9 @@
 char vcid_unspaghettify[] = "%A% ($Date: 2004/01/23 13:55:04 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
-#include <stdlib.h> 
-#include <stdio.h> 
-#include <string.h> 
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "linear.h"
 
@@ -40,6 +40,7 @@ static int number_of_restructured_if_then;
 static int number_of_restructured_if_else;
 static int number_of_restructured_if_then_else;
 static int number_of_restructured_null_if;
+static int number_of_recovered_while;
 
 
 static void
@@ -49,8 +50,19 @@ initialize_unspaghettify_statistics()
     number_of_restructured_if_else = 0;
     number_of_restructured_if_then_else = 0;
     number_of_restructured_null_if = 0;
+    number_of_recovered_while = 0;
 }
 
+
+/* Compute the number of all the computations that have been done */
+static int
+total_number_of_restructurations() {
+  return number_of_restructured_if_then
+    + number_of_restructured_if_else
+    + number_of_restructured_if_then_else
+    + number_of_restructured_null_if
+    + number_of_recovered_while;
+}
 
 static void
 display_unspaghettify_statistics()
@@ -61,6 +73,9 @@ display_unspaghettify_statistics()
 	    + number_of_restructured_if_else
 		+ number_of_restructured_if_then_else
 		    + number_of_restructured_null_if;
+	user_log("Total number of restructurations: %d\n",
+		 total_number_of_restructurations());
+
 	if (number_of_restructured_tests != 0) {
 	    user_log("%d test%s %s been restructured:\n",
 		     number_of_restructured_tests,
@@ -71,6 +86,12 @@ display_unspaghettify_statistics()
 		     number_of_restructured_if_then,
 		     number_of_restructured_if_else,
 		     number_of_restructured_null_if);
+	}
+	if (number_of_recovered_while != 0) {
+	  user_log("%d structured while%s %s been recovered.\n",
+		   number_of_recovered_while,
+		   number_of_recovered_while > 1 ? "s" : "",
+		   number_of_recovered_while > 1 ? "have" : "has");
 	}
     }
 }
@@ -84,14 +105,14 @@ remove_useless_continue_or_empty_code_in_unstructured(unstructured u)
 {
    list blocs = NIL;
    list remove_continue_list = NIL;
-   
+
    /* The entry point of the unstructured: */
    control entry_node = unstructured_control(u);
    /* and its exit point: */
    control exit_node = unstructured_exit(u);
 
    pips_debug(7, "Dealing with unstructured %p (begin: %p, end: %p)\n",
-	      u, entry_node, exit_node);     
+	      u, entry_node, exit_node);
 
    CONTROL_MAP(c,
                {
@@ -116,7 +137,7 @@ remove_useless_continue_or_empty_code_in_unstructured(unstructured u)
 
                            There may be also some unreachable
                            continues, that are without predecessors
-                           (0)... We want to remove them also. 
+                           (0)... We want to remove them also.
 
 Well with this modification, I am not sure that this procedure is
 still useful...
@@ -168,7 +189,7 @@ clean_up_exit_node(unstructured u)
 {
    control exit_node = unstructured_exit(u);
    list l = control_successors(exit_node);
-   
+
    if (gen_length(l) >= 1) {
       control c = CONTROL(CAR(l));
       pips_assert("clean_up_exit_node",
@@ -180,7 +201,7 @@ clean_up_exit_node(unstructured u)
       /* Remove the useless node: */
       CONTROL_(CAR(control_predecessors(c))) = control_undefined;
       gen_free_list(control_successors(exit_node));
-      
+
       /* Now the exit node has no longer a successor: */
       control_successors(exit_node) = NIL;
    }
@@ -213,19 +234,19 @@ fuse_sequences_in_unstructured(statement s)
       print_arguments(tl);
       pips_debug(4, "\n");
     }
-    
+
     ifdebug (1)
 	pips_assert("unstructured is consistent",
 		    unstructured_consistent_p(u));
     pips_debug(3, "Unstructured %p\n", u);
-   
+
     CONTROL_MAP(c,
 		{
 		    ifdebug (1)
 			pips_assert("control is consistent",
 				    control_consistent_p(c));
 		    pips_debug(3, "Looking for control %p...\n", c);
-		    /* Select a node with only one successor: */      
+		    /* Select a node with only one successor: */
 		    if (gen_length(control_successors(c)) == 1) {
 			control the_successor = CONTROL(CAR(control_successors(c)));
 
@@ -288,10 +309,10 @@ fuse_sequences_in_unstructured(statement s)
 		entry_node,
 		blocs);
     gen_free_list(blocs);
-   
+
     /* Reverse the list to follow the order of appearance : */
     control_nodes_to_fuse = gen_nreverse(control_nodes_to_fuse);
-   
+
     /* Now, since we have the list of the control nodes to fuse with
        their successors, do the fusion: */
     MAP(CONTROL, the_original_control, {
@@ -299,7 +320,7 @@ fuse_sequences_in_unstructured(statement s)
 	control the_successor;
 	char * its_address_now;
 	char * old_address;
-	       
+
 	its_address_now = hash_get(controls_to_fuse_with_their_successors,
 				   (char *) the_original_control);
 	/* Find the address of a control node to fuse even if
@@ -326,7 +347,7 @@ fuse_sequences_in_unstructured(statement s)
 	    }
 	}
 	a_control_to_fuse = (control) its_address_now;
-	       
+
 	ifdebug(5) {
 	  fprintf(stderr,"Statement with label \"%s\" for control a_control_fo_fuse=%p\n",
 		  entity_local_name(statement_label(control_statement(a_control_to_fuse))),
@@ -344,7 +365,7 @@ fuse_sequences_in_unstructured(statement s)
 	ifdebug (1)
 	    pips_assert("control a_control_to_fuse is consistent",
 			control_consistent_p(a_control_to_fuse));
-               
+
 	the_successor = CONTROL(CAR(control_successors(a_control_to_fuse)));
 	ifdebug (3)
 	    fprintf(stderr, " with control %p\n", the_successor);
@@ -380,13 +401,13 @@ fuse_sequences_in_unstructured(statement s)
 
 		fuse_2_control_nodes(a_control_to_fuse, the_successor);
 		/* make st with the statements of 2 following nodes: */
-		
+
 		if (the_successor == entry_node)
 		    /* Update the entry node if we fuse with it: */
-		entry_node = a_control_to_fuse;		      
+		entry_node = a_control_to_fuse;
 		if (the_successor == exit_node)
 		    exit_node = a_control_to_fuse;
-		  
+
 		/* If the node "the_successor" is in the fuse list, we
 		   want to keep track of its new place, that is in
 		   fact fused in "a_control_to_fuse", so that an
@@ -404,7 +425,7 @@ fuse_sequences_in_unstructured(statement s)
 		}
 	    }
 	    else
-		pips_debug(3, "\tDo not fuse them because the semantics have changed.\n");		
+		pips_debug(3, "\tDo not fuse them because the semantics have changed.\n");
 	}
 	ifdebug (1)
 	    pips_assert("control after fuse is consistent",
@@ -422,7 +443,7 @@ fuse_sequences_in_unstructured(statement s)
 }
 
 
-/* Take the entry node out the unstructured if it is not useful, such
+/* Take the entry node out of the unstructured if it is not useful, such
    as not an IF or a node without predecessor.
 
    Return TRUE if there is still an unstructured, FALSE if the
@@ -440,7 +461,7 @@ take_out_the_entry_node_of_the_unstructured(statement s,
     list entry_node_successors = control_successors(entry_node);
     int entry_node_successors_length = gen_length(entry_node_successors);
     *new_unstructured_statement = s;
-   
+
     if (entry_node_successors_length == 2
 	|| gen_length(control_predecessors(entry_node)) > 0)
 	/* Well, this node is useful here since it is an unstructured IF
@@ -481,7 +502,7 @@ take_out_the_entry_node_of_the_unstructured(statement s,
 	pips_assert("take_out_the_entry_node_of_the_unstructured",
 		    entry_node_successors_length == 1);
 	unstructured_control(u) = CONTROL(CAR(entry_node_successors));
-      
+
 	discard_a_control_sequence_without_its_statements(entry_node,
 							  entry_node);
 	return TRUE;
@@ -498,7 +519,7 @@ take_out_the_entry_node_of_the_unstructured(statement s,
    is returned in new_unstructured_statement: */
 
 /* Still buggy. No longer used. */
-static bool __attribute__ ((unused)) 
+static bool __attribute__ ((unused))
 try_to_structure_the_unstructured(statement s,
                                   statement * new_unstructured_statement)
 {
@@ -509,7 +530,7 @@ try_to_structure_the_unstructured(statement s,
    control begin_of_last_sequence = control_undefined /* no gcc warning */;
     instruction i = statement_instruction(s);
     unstructured u = instruction_unstructured(i);
-   
+
    /* The entry point of the unstructured: */
    control entry_node = unstructured_control(u);
    /* and its exit point: */
@@ -532,13 +553,13 @@ try_to_structure_the_unstructured(statement s,
             break;
       }
    }
-   
+
    if (end_of_first_sequence != control_undefined)
       /* OK, there is a sequence at the beginning of the unstructured: */
       begin_statement_list =
          generate_a_statement_list_from_a_control_sequence(entry_node,
                                                            end_of_first_sequence);
-   
+
    /* If there is still something in the sequence: */
    if (end_of_first_sequence != exit_node) {
       /* Find the biggest sequence from the end: */
@@ -560,7 +581,7 @@ try_to_structure_the_unstructured(statement s,
             controllizer seems to put always a continue as an IF
             successor, it is *seems* sensible. */
          the_successors = control_successors(begin_of_last_sequence);
-         
+
          if (the_successors != NIL)
             /* There is one successor, that is the sequence has at
                least 2 control node. Keep the first node as part as IF
@@ -571,7 +592,7 @@ try_to_structure_the_unstructured(statement s,
                the unstructured: */
             begin_of_last_sequence = control_undefined;
       }
-      
+
       if (begin_of_last_sequence != control_undefined)
          /* Then there is a sequence at the end of the unstructured: */
          end_statement_list =
@@ -600,22 +621,22 @@ try_to_structure_the_unstructured(statement s,
          list list_of_the_new_statements;
          /* Put the unstructured in the new statement list: */
          *new_unstructured_statement = make_stmt_of_instr(i);
-         
+
          list_of_the_new_statements = CONS(STATEMENT,
                                            *new_unstructured_statement,
                                            NIL);
-         
+
          if (begin_statement_list != NIL) {
             /* There is a pre-sequence before the unstructured: */
 
             /* Put the sequence before the unstructured: */
             list_of_the_new_statements = gen_nconc(begin_statement_list,
                                                    list_of_the_new_statements);
-            
+
             /* Update the entry node of the unstructured: */
             unstructured_control(u) =
                CONTROL(CAR(control_successors(end_of_first_sequence)));
-            
+
             /* Clean up the equivalent control sequence: */
             discard_a_control_sequence_without_its_statements(entry_node,
                                                               end_of_first_sequence);
@@ -625,7 +646,7 @@ try_to_structure_the_unstructured(statement s,
             /* There is a post-sequence after the unstructured: */
             list_of_the_new_statements = gen_nconc(list_of_the_new_statements,
                                                    end_statement_list);
-            
+
             /* Update the exit node of the unstructured: */
             unstructured_exit(u) =
                CONTROL(CAR(control_predecessors(begin_of_last_sequence)));
@@ -638,14 +659,14 @@ try_to_structure_the_unstructured(statement s,
             sequence(s) and the stripped-down unstructured: */
          statement_instruction(s) =
             make_instruction_block(list_of_the_new_statements);
-         
+
          return FALSE;
       }
    }
    /* By default the unstructured is not changed, thus return the
       statement owning it: */
    *new_unstructured_statement = s;
-   
+
    return FALSE;
 }
 
@@ -690,12 +711,12 @@ take_out_the_exit_node_if_not_a_continue(statement s)
 	&& !nop_statement_p(the_exit_statement)) {
 	list first_statement_list;
 	statement first_statement, last_statements;
-	
+
 	list the_statements =
 	    sequence_statements(instruction_sequence(the_exit_instruction));
 	pips_assert("the_statements must be a true sequence",
 		    gen_length(the_statements) >= 2);
-	
+
 	/* Well, this should be always true if the sequence
 	   survived to clean_up_sequences_rewrite()... */
 	first_statement_list = the_statements;
@@ -703,11 +724,11 @@ take_out_the_exit_node_if_not_a_continue(statement s)
 	the_statements = CDR(the_statements);
 	CDR(first_statement_list) = NIL;
 	gen_free_list(first_statement_list);
-	    
+
 	last_statements = the_exit_statement;
 	sequence_statements(instruction_sequence(the_exit_instruction)) =
 	    the_statements;
-	    
+
 	control_statement(exit_node) = first_statement;
 	/* Then, append the last statements at the end of the
 	   unstructured: */
@@ -784,7 +805,7 @@ restructure_this_test(control c,
     else
 	test_exit = CONTROL(CAR(control_successors(else_node)));
     pips_debug(9, "exit node=%p\n", test_exit);
-		
+
     /* Discard and unlink the then_node and else_node if any: */
     if (t == STRUCTURED_IF_THEN || t == STRUCTURED_IF_THEN_ELSE)
 	discard_a_control_sequence_without_its_statements(then_node,
@@ -815,7 +836,7 @@ restructure_this_test(control c,
 			statement_consistent_p(else_statement));
 	}
     }
-    
+
     /* Replace the useless CONTINUE by a NOP to improve the
        prettyprinted code: */
     if (t == STRUCTURED_IF_THEN || t == STRUCTURED_NULL_IF) {
@@ -838,7 +859,7 @@ restructure_this_test(control c,
 	link_2_control_nodes(c, test_exit);
     }
     /* In the other case, the remaining link is just what needed. */
-    
+
     ifdebug(9) {
 	pips_debug(9, "the test statement:\n");
 	print_statement(the_test_statement);
@@ -940,7 +961,7 @@ restructure_if_then_else(statement s)
 	  number_of_restructured_if_else,
 	  number_of_restructured_if_then_else,
 	  number_of_restructured_null_if);
-    
+
     /* Then restructure if needed: */
 
     HASH_MAP(key, value,
@@ -968,7 +989,7 @@ recursively_restructure_an_unstructured(statement s)
     statement new_unstructured_statement;
     instruction i = statement_instruction(s);
     if (!instruction_unstructured_p(i))
-	/* Just stop, it is not or no longer an unstructured. */	
+	/* Just stop, it is not or no longer an unstructured. */
 	return;
 
     /* Replace control sequences by simple nodes: */
@@ -978,7 +999,7 @@ recursively_restructure_an_unstructured(statement s)
 	print_statement(s);
 	pips_assert("Statement is consistent", statement_consistent_p(s));
     }
-    
+
     if (take_out_the_entry_node_of_the_unstructured(s, &new_unstructured_statement)) {
 	/* If take_out_the_entry_node_of_the_unstructured() has not been
 	   able to discard the unstructured, go on with some other
@@ -991,7 +1012,7 @@ recursively_restructure_an_unstructured(statement s)
 
 	new_unstructured_statement =
 	    take_out_the_exit_node_if_not_a_continue(new_unstructured_statement);
-	
+
 	ifdebug(5) {
 	    pips_debug(5, "after take_out_the_exit_node_if_not_a_continue\n");
 	    print_statement(s);
@@ -1026,7 +1047,7 @@ clean_up_control(statement s)
 
     if (instruction_unstructured_p(i)) {
 	unstructured u = instruction_unstructured(i);
- 
+
 	pips_debug(2, "enter\n");
 	ifdebug (3) {
 	    display_linked_control_nodes(unstructured_control(u));
@@ -1034,7 +1055,7 @@ clean_up_control(statement s)
 	    print_statement(s);
 	}
 	clean_up_exit_node(u);
-   
+
 	remove_all_unreachable_controls_of_an_unstructured(u);
 
 	ifdebug(5) {
@@ -1048,7 +1069,7 @@ clean_up_control(statement s)
 	}
 
 	remove_useless_continue_or_empty_code_in_unstructured(u);
-   
+
 	ifdebug(5) {
 	    pips_assert("Consistent unstructured", unstructured_consistent_p(u));
 	    pips_debug(5, "after remove_useless_continue_or_empty_code_in_unstructured\n");
@@ -1059,59 +1080,120 @@ clean_up_control(statement s)
 }
 
 
+/* Try to recover structured while loops in an already recursively
+   restructured control graph */
+static void
+recover_structured_while(unstructured u) {
+  control next;
+  control entry_node = unstructured_control(u);
+  control exit_node = unstructured_exit(u);
+  size_t arity = gen_length(control_successors(entry_node));
+  switch(arity) {
+  case 1:
+    /* There is one simple node at unstructured entry:
+       try to detect a "do ... while();" */
+    next = CONTROL(CAR(control_successors(entry_node)));
+    if (gen_length(control_successors(next)) != 2)
+      // It is not a test, so no while to be expected here...
+      break;
+    if (CONTROL(CAR(control_successors(next))) == entry_node
+	&& CONTROL(CAR(CDR(control_successors(next)))) == exit) {
+      /* We have
+	 entry:
+	 ...
+	 if (cond) goto entry;
+      */
+      
+    }
+    else if (CONTROL(CAR(control_successors(next))) == exit
+	     && CONTROL(CAR(CDR(control_successors(next)))) == entry_node) {
+      /* We have
+	 entry:
+	 ...
+	 if (cond)
+	 goto exit
+	 else goto entry;
+      */
+
+    }
+
+    break;
+  case 2:
+    // The entry node is a test. Try to detect a "while() ...;"
+    next;
+  }
+}
+
+
 /* The entry point common to unspaghettify or restructure a module: */
 void
 unspaghettify_or_restructure_statement(statement mod_stmt)
 {
-   debug_on("UNSPAGHETTIFY_DEBUG_LEVEL");
+  /* Track the number of restructurations done for a fix point: */
+  int nr = 0;
+  int old_nr;
 
-   ifdebug (1)
+  debug_on("UNSPAGHETTIFY_DEBUG_LEVEL");
+
+  ifdebug (1)
+    pips_assert("Statement is consistent", statement_consistent_p(mod_stmt));
+
+  if (get_bool_property("GATHER_FORMATS_AT_BEGINNING"))
+    put_formats_at_module_beginning(mod_stmt);
+  else if (get_bool_property("GATHER_FORMATS_AT_END"))
+    put_formats_at_module_end(mod_stmt);
+
+  ifdebug (1)
+    pips_assert("Statement is consistent", statement_consistent_p(mod_stmt));
+
+  initialize_unspaghettify_statistics();
+
+  do {
+    old_nr = nr;
+    /* Split the recursion in three parts to fit in my brain: */
+    /* First, clean up easy things done by the controlizer: */
+    gen_recurse(mod_stmt, statement_domain,
+		gen_true, clean_up_control);
+
+    ifdebug (1)
       pips_assert("Statement is consistent", statement_consistent_p(mod_stmt));
 
-   if (get_bool_property("GATHER_FORMATS_AT_BEGINNING"))
-       put_formats_at_module_beginning(mod_stmt);
-   else if (get_bool_property("GATHER_FORMATS_AT_END"))
-       put_formats_at_module_end(mod_stmt);
-   
-   ifdebug (1)
+    if (currently_apply_recursive_decomposition) {
+      /* Then try to hierarchize the control flow: */
+      gen_recurse(mod_stmt, unstructured_domain,
+		  gen_true, control_graph_recursive_decomposition);
+
+      ifdebug (1)
+	pips_assert("Statement is consistent",
+		    statement_consistent_p(mod_stmt));
+    }
+
+    /* Now apply some local rule, such as if/then/else restructuring
+       and so on: */
+    gen_recurse(mod_stmt, statement_domain,
+		gen_true, recursively_restructure_an_unstructured);
+
+    ifdebug (1)
       pips_assert("Statement is consistent", statement_consistent_p(mod_stmt));
 
-   initialize_unspaghettify_statistics();
-   /* Split the recursion in three parts to fit in my brain: */
-   /* First, clean up easy things done by the controlizer: */
-   gen_recurse(mod_stmt, statement_domain,
-               gen_true, clean_up_control);
-   
-   ifdebug (1)
+    if (get_bool_property("UNSPAGHETTIFY_WHILE_RECOVER"))
+      gen_recurse(mod_stmt, unstructured_domain,
+		  gen_true, recover_structured_while);
+
+    display_unspaghettify_statistics();
+
+    /* End by removing parasitic sequences: */
+    clean_up_sequences(mod_stmt);
+
+    ifdebug (1)
       pips_assert("Statement is consistent", statement_consistent_p(mod_stmt));
 
-   if (currently_apply_recursive_decomposition) {
-       /* Then try to hierarchize the control flow: */
-       gen_recurse(mod_stmt, unstructured_domain,
-		   gen_true, control_graph_recursive_decomposition);
-   
-   ifdebug (1)
-      pips_assert("Statement is consistent", statement_consistent_p(mod_stmt));
-   }
+    /* If something changed, retry further restructuring: */
+    nr = total_number_of_restructurations();
+  } while (nr != old_nr);
 
-   /* Now apply some local rule, such as if/then/else restructuring
-      and so on: */
-   gen_recurse(mod_stmt, statement_domain,
-               gen_true, recursively_restructure_an_unstructured);
-   
-   ifdebug (1)
-      pips_assert("Statement is consistent", statement_consistent_p(mod_stmt));
-
-   display_unspaghettify_statistics();
-
-   /* End by removing parasitic sequences: */
-   clean_up_sequences(mod_stmt);
-   
-   ifdebug (1)
-      pips_assert("Statement is consistent", statement_consistent_p(mod_stmt));
-
-   pips_debug(2, "done\n");
-   debug_off();
+  pips_debug(2, "done\n");
+  debug_off();
 }
 
 
@@ -1123,7 +1205,7 @@ unspaghettify_statement(statement mod_stmt)
        get_bool_property("UNSPAGHETTIFY_TEST_RESTRUCTURING");
    currently_apply_recursive_decomposition =
        get_bool_property("UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION");
-   
+
    unspaghettify_or_restructure_statement(mod_stmt);
 }
 
@@ -1135,7 +1217,7 @@ simple_restructure_statement(statement mod_stmt)
 {
   currently_apply_test_restructuring = FALSE;
   currently_apply_recursive_decomposition = FALSE;
-   
+
   unspaghettify_or_restructure_statement(mod_stmt);
 }
 
@@ -1147,7 +1229,7 @@ simple_restructure_statement(statement mod_stmt)
    Unspaguettify is now targetted to be included in the controlizer.
    */
 bool
-unspaghettify(char * mod_name)  
+unspaghettify(char * mod_name)
 {
    statement mod_stmt;
 
@@ -1156,7 +1238,7 @@ unspaghettify(char * mod_name)
    set_current_module_statement(mod_stmt);
 
    set_current_module_entity(local_name_to_top_level_entity(mod_name));
-  
+
    unspaghettify_statement(mod_stmt);
 
    /* Reorder the module, because new statements may have been
@@ -1178,7 +1260,7 @@ restructure_statement(statement mod_stmt)
 {
    currently_apply_test_restructuring = TRUE;
    currently_apply_recursive_decomposition = TRUE;
-   
+
    unspaghettify_or_restructure_statement(mod_stmt);
 }
 
@@ -1190,7 +1272,7 @@ restructure_statement(statement mod_stmt)
    decomposition.
    */
 bool
-restructure_control(char * mod_name)  
+restructure_control(char * mod_name)
 {
    statement mod_stmt;
 
@@ -1199,7 +1281,7 @@ restructure_control(char * mod_name)
    set_current_module_statement(mod_stmt);
 
    set_current_module_entity(local_name_to_top_level_entity(mod_name));
-  
+
    restructure_statement(mod_stmt);
 
    /* Reorder the module, because new statements may have been

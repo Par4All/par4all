@@ -7,9 +7,9 @@
    Ronan.Keryell@cri.ensmp.fr
    */
 
-#include <stdlib.h> 
-#include <stdio.h> 
-#include <string.h> 
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "linear.h"
 
@@ -152,7 +152,7 @@ add_node_to_interval(graph intervals,
 
 /* Add the interval from (node, intervals) to interval graph
    intervals and update selected_nodes accordingly if : */
-static void __attribute__ ((unused)) 
+static void __attribute__ ((unused))
 add_to_interval_or_create_new_interval(vertex node,
 				       graph intervals,
 				       set selected_nodes)
@@ -165,7 +165,7 @@ add_to_interval_or_create_new_interval(vertex node,
     /* The new interval will be the node itself, begin of the new
        interval. Just select it and keep it: */
     set_add_element(selected_nodes, selected_nodes, (char *) node);
-    
+
     do {
 	a_node_has_been_added = FALSE;
 	/* Find a candidate through all the intervals: */
@@ -199,7 +199,7 @@ add_to_interval_or_create_new_interval(vertex node,
 }
 
 
-static void	
+static void
 display_interval_graph(graph intervals)
 {
     MAP(VERTEX, node, {
@@ -208,7 +208,7 @@ display_interval_graph(graph intervals)
 	pips_debug(0, "Interval predecessors:\n");
 	MAP(SUCCESSOR, p, {
 	    pips_debug(0, "\t%p\n", predecessor_vertex(p));
-	}, vertex_predecessors(node));    
+	}, vertex_predecessors(node));
     }, graph_vertices(intervals));
 }
 
@@ -227,6 +227,9 @@ display_interval_graph(graph intervals)
     publisher = {Addison-Wesley Publishing Company},
     year = 1986
     }
+
+    It looks like it is from Hecht and Ullman according to Zahira
+    Ammarguellat.
 */
 static bool
 interval_graph(graph intervals)
@@ -254,7 +257,7 @@ interval_graph(graph intervals)
 		break;
 	    }
 	}, graph_vertices(intervals));
-	the_interval_graph_has_been_modified |= a_node_has_been_fused;	
+	the_interval_graph_has_been_modified |= a_node_has_been_fused;
     } while (a_node_has_been_fused);
 
     /* T1 transformation on page 668: Remove the eventual arcs to
@@ -265,7 +268,7 @@ interval_graph(graph intervals)
 	the_interval_graph_has_been_modified
 	    |= remove_interval_predecessor(node, node);
     }, graph_vertices(intervals));
-    
+
     return the_interval_graph_has_been_modified;
 }
 
@@ -309,13 +312,13 @@ control_graph_to_interval_graph_format(control entry_node)
     graph intervals = make_graph(NIL);
 
     hash_table control_to_interval_node = hash_table_make(hash_pointer, 0);
-    pips_debug(5, "Control entry node %p:\n", entry_node);   
+    pips_debug(5, "Control entry node %p:\n", entry_node);
     CONTROL_MAP(c, {
 	vertex interval =
 	    create_or_get_an_interval_node(c,
 					   intervals,
 					   control_to_interval_node);
-	pips_debug(6, "\tControl %p -> interval %p\n", c,  interval);   
+	pips_debug(6, "\tControl %p -> interval %p\n", c,  interval);
 	MAP(CONTROL, p, {
 	  bool interval_already_in_predecessors = FALSE;
 	    vertex vertex_predecessor =
@@ -337,32 +340,32 @@ control_graph_to_interval_graph_format(control entry_node)
 		CONS(PREDECESSOR, v_p, vertex_predecessors(interval));
 	    }
 	    pips_debug(7, "\t\tControl predecessor %p -> interval %p\n",
-		   p,  vertex_predecessor);   
+		   p,  vertex_predecessor);
 	}, control_predecessors(c));
     }, entry_node, blocs);
     gen_free_list(blocs);
-    
+
     hash_table_free(control_to_interval_node);
 
     return intervals;
 }
 
 
-/* Return the list of control node exiting an interval. Note that if a
-   node of the control list is in fact the exit_note of a unstructure,
-   it is really an exit node at an upper level. */
+/* Return the list of control nodes exiting an interval. Note that if a
+   node of the control list is in fact the exit_node of an unstructured, it
+   is really an exit node at an upper level. */
 static list
 interval_exit_nodes(vertex interval, control exit_node)
 {
     list exit_controls = NIL;
-    
+
     pips_debug(6, "Interval %p with controls ", interval);
     ifdebug(6)
 	display_address_of_control_nodes(interval_vertex_label_controls(vertex_vertex_label(interval)));
     MAP(CONTROL, c, {
-	pips_debug(7, "\n\tControl %p:\n", c);   
-	MAP(CONTROL, successor, {	    
-	    pips_debug(7, "\t\tControl successor %p:\n", successor);   
+	pips_debug(7, "\n\tControl %p:\n", c);
+	MAP(CONTROL, successor, {
+	    pips_debug(7, "\t\tControl successor %p:\n", successor);
 	    if (!gen_in_list_p(successor,
 			       interval_vertex_label_controls(vertex_vertex_label(interval)))) {
 		/* A successor that is not in the interval is an exit
@@ -372,7 +375,7 @@ interval_exit_nodes(vertex interval, control exit_node)
 		    exit_controls = CONS(CONTROL, successor, exit_controls);
 	    }
 	}, control_successors(c));
-	
+
 	if (c == exit_node)
 	    /* The current exit_node of the unstructured is clearly an
                exit node even if it does not have any successor: */
@@ -384,7 +387,7 @@ interval_exit_nodes(vertex interval, control exit_node)
 	display_address_of_control_nodes(exit_controls);
 	pips_debug(0, "\n");
     }
-    
+
     return exit_controls;
 }
 
@@ -485,7 +488,7 @@ replace_control_related_to_a_list(control old_node,
 	}
     }, controls_to_change);
     gen_free_list(controls_to_change);
-    
+
     /* And then transfer the predecessors in controls from old_node to
        new_node (the previous double loops have disappeared here): */
     controls_to_change = NIL;
@@ -506,7 +509,7 @@ replace_control_related_to_a_list(control old_node,
 
 /* Put all the controls in their own unstructured to hierarchize the
    graph and link the unstructured to the outer unstructured.
-   
+
    The exit_node is the exit control node, either control_undefined if
    it there is no exit : it is a true endless loop (assume it is not
    the exit node). */
@@ -573,22 +576,22 @@ hierarchize_control_list(vertex interval,
     /* Detach the new unstructured from the old one: */
     MAP(CONTROL, c, {
 	gen_list_and(&control_successors(c), new_controls);
-	gen_list_and(&control_predecessors(c), new_controls);	
+	gen_list_and(&control_predecessors(c), new_controls);
     }, new_controls);
 
     /* If there was a goto from exit_node to entry_node, there is an
        artefact one between new_exit_node and new_entry_node. Remove
        it: */
     unlink_2_control_nodes(new_exit_node, new_entry_node);
-    
+
     /* Detach the old unstructured from the new one: */
     gen_list_and_not(&control_successors(entry_node), new_controls);
-    gen_list_and_not(&control_predecessors(entry_node), new_controls);	
+    gen_list_and_not(&control_predecessors(entry_node), new_controls);
 
     /* Unlink an eventual loop around entry_node that has been
        captured anyway in the new unstructured: */
     unlink_2_control_nodes(entry_node, entry_node);
-    
+
     if (exit_node != control_undefined) {
 	gen_list_and_not(&control_successors(exit_node), new_controls);
 	gen_list_and_not(&control_predecessors(exit_node), new_controls);
@@ -639,7 +642,12 @@ hierarchize_control_list(vertex interval,
 
 
 /* Use an interval graph partitionning method to recursively
-   decompose the control graph: */
+   decompose the control graph.
+
+   Have a look to paper "A Control-Flow Normalization Algorithm and Its
+   Complexity" (1994) from Zahira Ammarguellat for a bibliography of the
+   domain.
+ */
 void
 control_graph_recursive_decomposition(unstructured u)
 {
@@ -651,9 +659,9 @@ control_graph_recursive_decomposition(unstructured u)
     bool modified;
     control entry_node, exit_node;
     graph intervals;
-    
+
     debug_on("RECURSIVE_DECOMPOSITION_DEBUG_LEVEL");
-    
+
     entry_node = unstructured_control(u);
     exit_node = unstructured_exit(u);
 
@@ -701,17 +709,17 @@ control_graph_recursive_decomposition(unstructured u)
 		hierarchize_control_list(interval,
 					 controls,
 					 interval_exits == NIL ? control_undefined : CONTROL(CAR(interval_exits)));
-		
+
 		gen_free_list(interval_exits);
 	    }
 	}, CDR(graph_vertices(intervals)) /* Skip the entry interval */);
-	/* Stop if the interval graph does no longer changed : it is
+	/* Stop if the interval graph does no longer change : it is
            only one node or an irreductible graph: */
 	/* Construct the interval graph from the previous one: */
 	modified = interval_graph(intervals);
 	pips_debug(6, "Modified = %d\n", modified);
 	ifdebug(6)
-	    display_interval_graph(intervals);		
+	    display_interval_graph(intervals);
     } while (modified);
 
 
@@ -722,7 +730,7 @@ control_graph_recursive_decomposition(unstructured u)
 	interval_vertex_label_controls(vertex_vertex_label(v)) = NIL;
     }, graph_vertices(intervals));
     free_graph(intervals);
-    
+
     pips_debug(3, "Exiting.\n");
     ifdebug(5) {
 	pips_debug(0, "Nodes from entry_node: ");

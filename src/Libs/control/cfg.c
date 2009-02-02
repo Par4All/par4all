@@ -3,8 +3,8 @@
  * Francois Irigoin, 1997.
  */
 
-#include <stdlib.h> 
-#include <stdio.h> 
+#include <stdlib.h>
+#include <stdio.h>
 
 #include "linear.h"
 
@@ -22,7 +22,6 @@
  *
  * See also check_control_coherency().
  */
-
 bool
 unstructured_consistency_p(unstructured u, bool assert_p)
 {
@@ -30,7 +29,7 @@ unstructured_consistency_p(unstructured u, bool assert_p)
     control exit_node = unstructured_exit(u);
     bool consistency_p = TRUE;
     list nodes = NIL;
-    
+
     forward_control_map_get_blocs(entry_node, &nodes);
 
     /* the exit and entry nodes must be different or the
@@ -60,7 +59,7 @@ unstructured_consistency_p(unstructured u, bool assert_p)
     }
 
     /* The exit node should not be a test:
-     * else one of its successors should be control_undefined 
+     * else one of its successors should be control_undefined
      * since it would be outside of the unstructured, or the
      * exit condition would be unknown.
      */
@@ -161,6 +160,7 @@ unstructured_consistency_p(unstructured u, bool assert_p)
 }
 
 
+/* Test if an unstructured is found to be like a structured while-loop */
 bool
 unstructured_while_p(unstructured u)
 {
@@ -186,7 +186,7 @@ unstructured_while_p(unstructured u)
      *
      * A loop with two exit conditions is not recognized as a while loop.
      *
-     * A loop with an exit test on entry, a final exit test (do...while) or 
+     * A loop with an exit test on entry, a final exit test (do...while) or
      * an exit test anywhere is recognized as a while loop.
      */
 
