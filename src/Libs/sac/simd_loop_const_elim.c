@@ -20,7 +20,7 @@ typedef dg_vertex_label vertex_label;
 
 #include "graph.h"
 
-#include "sac-local.h" 
+#include "sac-local.h"
 
 #include "sac.h"
 
@@ -32,29 +32,6 @@ static graph dependence_graph;
 
 
 #define same_stringn_p(a,b,c) (!strncmp((a),(b),(c)))
-
-/* FOREACH, similar to MAP but more gdb (and vim) friendly
- */
-
-#define UNIQUE_NAME_1(prefix, x)   prefix##x
-#define UNIQUE_NAME_2(prefix, x)   UNIQUE_NAME_1 (prefix, x)
-#define UNIQUE_NAME  UNIQUE_NAME_2 (iter_, __LINE__)
-
-#if __STDC_VERSION__ >= 199901L
-#define FOREACH(_fe_CASTER, _fe_item, _fe_list) \
-        list UNIQUE_NAME = (_fe_list);\
-for( _fe_CASTER##_TYPE _fe_item;\
-        !ENDP(UNIQUE_NAME) && (_fe_item= _fe_CASTER(CAR(UNIQUE_NAME) ));\
-        POP(UNIQUE_NAME))
-#else
-#define FOREACH(_fe_CASTER, _fe_item, _fe_list) \
-        list UNIQUE_NAME;\
-        _fe_CASTER##_TYPE _fe_item;\
-for( UNIQUE_NAME= (_fe_list);\
-        !ENDP(UNIQUE_NAME) && (_fe_item= _fe_CASTER(CAR(UNIQUE_NAME) ));\
-        POP(UNIQUE_NAME))
-#endif
-
 
 
 static bool simd_save_stat_p(statement stat)
@@ -100,7 +77,7 @@ static bool simd_loadsave_stat_p(statement stat)
  */
 static bool simd_stat_p(statement stat)
 {
-    return statement_call_p(stat) 
+    return statement_call_p(stat)
         && same_stringn_p( entity_local_name(call_function(statement_call(stat))) , SIMD_NAME, SIMD_SIZE);
 }
 
@@ -186,7 +163,7 @@ static bool index_argument_conflict(list args, list l_reg)
     return FALSE;
 }
 
-/* This function returns true if the arguments of the simd statement theStat do 
+/* This function returns true if the arguments of the simd statement theStat do
  * not depend on the loop iteration
  */
 static bool constant_argument_list_p(list args, statement theStat, list forstats, list l_reg)
@@ -218,7 +195,7 @@ static bool constant_argument_list_p(list args, statement theStat, list forstats
                         bConstArg = FALSE;
                     }
                     // If stat2 is a loadsave statement and that there is a conflict
-                    // between the arguments of 
+                    // between the arguments of
                     else if(   simd_loadsave_stat_p(stat2)
                             && !list_eq_expression(args, CDR(call_arguments(statement_call(stat2))),true)
                            )
@@ -301,7 +278,6 @@ static void moveConstArgsStatements(statement s, statement body, hash_table cons
         }
     }
 
-    
 
     gen_free_list(instruction_block(statement_instruction(body)));
     instruction_block(statement_instruction(body)) = bodySeq;
@@ -312,7 +288,7 @@ static void moveConstArgsStatements(statement s, statement body, hash_table cons
     newseq = gen_nconc(headerSeq, newseq);
 
 
-    // Insert the statements removed from the sequence before 
+    // Insert the statements removed from the sequence before
     list oldStatDecls = statement_declarations(s);
     statement_declarations(s) = NIL;
 
@@ -330,7 +306,7 @@ static void moveConstArgsStatements(statement s, statement body, hash_table cons
 
 }
 
-/* This function is called for each statement and performs the 
+/* This function is called for each statement and performs the
  * simd_loop_const_elim on loop
  */
 static void simd_loop_const_elim_rwt(statement s)
@@ -394,7 +370,7 @@ bool simd_loop_const_elim(char * module_name)
     gen_recurse(module_stat, statement_domain,
             gen_true, simd_loop_const_elim_rwt);
 
-    pips_assert("Statement is consistent after SIMD_SCALAR_EXPANSION", 
+    pips_assert("Statement is consistent after SIMD_SCALAR_EXPANSION",
             statement_consistent_p(module_stat));
 
     module_reorder(module_stat);

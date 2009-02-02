@@ -25,29 +25,6 @@
 #include "transformations.h"
 
 
-/* FOREACH, similar to MAP but more gdb (and vim) friendly
- */
-
-#define UNIQUE_NAME_1(prefix, x)   prefix##x
-#define UNIQUE_NAME_2(prefix, x)   UNIQUE_NAME_1 (prefix, x)
-#define UNIQUE_NAME  UNIQUE_NAME_2 (iter_, __LINE__)
-
-#if __STDC_VERSION__ >= 199901L
-#define FOREACH(_fe_CASTER, _fe_item, _fe_list) \
-        list UNIQUE_NAME = (_fe_list);\
-for( _fe_CASTER##_TYPE _fe_item;\
-        !ENDP(UNIQUE_NAME) && (_fe_item= _fe_CASTER(CAR(UNIQUE_NAME) ));\
-        POP(UNIQUE_NAME))
-#else
-#define FOREACH(_fe_CASTER, _fe_item, _fe_list) \
-        list UNIQUE_NAME;\
-        _fe_CASTER##_TYPE _fe_item;\
-for( UNIQUE_NAME= (_fe_list);\
-        !ENDP(UNIQUE_NAME) && (_fe_item= _fe_CASTER(CAR(UNIQUE_NAME) ));\
-        POP(UNIQUE_NAME))
-#endif
-
-
 static entity       inlined_module;
 static statement    inlined_module_statement;
 static statement    laststmt;
