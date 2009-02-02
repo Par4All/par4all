@@ -66,7 +66,35 @@ typedef struct cons {
     }									\
   }
 
-/* Fonctions de list.c 
+
+/* FOREACH, similar to MAP but more gdb/emacs/vim... friendly since it
+   remains line oriented
+ */
+
+#define UNIQUE_NAME_1(prefix, x)   prefix##x
+#define UNIQUE_NAME_2(prefix, x)   UNIQUE_NAME_1 (prefix, x)
+/* Should work if 2 FOREACH are not on the same line... */
+#define UNIQUE_NAME  UNIQUE_NAME_2 (iter_, __LINE__)
+
+#if __STDC_VERSION__ >= 199901L
+/* We can use a declaration in the for() */
+#define FOREACH(_fe_CASTER, _fe_item, _fe_list) \
+        list UNIQUE_NAME = (_fe_list);\
+for( _fe_CASTER##_TYPE _fe_item;\
+        !ENDP(UNIQUE_NAME) && (_fe_item= _fe_CASTER(CAR(UNIQUE_NAME) ));\
+        POP(UNIQUE_NAME))
+#else
+#define FOREACH(_fe_CASTER, _fe_item, _fe_list) \
+        list UNIQUE_NAME;\
+        _fe_CASTER##_TYPE _fe_item;\
+for( UNIQUE_NAME= (_fe_list);\
+        !ENDP(UNIQUE_NAME) && (_fe_item= _fe_CASTER(CAR(UNIQUE_NAME) ));\
+        POP(UNIQUE_NAME))
+#endif
+
+
+
+/* Fonctions de list.c
  */
 extern list gen_append GEN_PROTO(( list , list )) ;
 extern list gen_concatenate GEN_PROTO(( list , list )) ;
@@ -75,14 +103,14 @@ extern list gen_copy_seq GEN_PROTO(( list )) ;
 extern int gen_eq GEN_PROTO(( void *, void * )) ;
 extern void *gen_car GEN_PROTO((list));
 extern void *gen_identity GEN_PROTO((void*));
-extern void *gen_find GEN_PROTO((void *, list , 
+extern void *gen_find GEN_PROTO((void *, list ,
 				  bool (*)(), void *(*)() )) ;
-extern void *gen_find_from_end GEN_PROTO((void *, list , 
+extern void *gen_find_from_end GEN_PROTO((void *, list ,
 				  bool (*)(), void *(*)() )) ;
 extern void *gen_find_eq GEN_PROTO(( void *, list )) ;
 extern void *gen_find_if GEN_PROTO(( bool (*)(), list ,
 					 void *(*)())) ;
-extern void *gen_find_if_from_end GEN_PROTO((bool (*)(), list , 
+extern void *gen_find_if_from_end GEN_PROTO((bool (*)(), list ,
 					      void *(*)())) ;
 extern void *gen_find_tabulated GEN_PROTO(( char *, int )) ;
 extern list gen_filter_tabulated GEN_PROTO(( bool (*)(gen_chunk*), int )) ;
