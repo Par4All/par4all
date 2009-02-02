@@ -1178,12 +1178,12 @@ Section~\ref{subsubsection-call}.
 The code of a module is either in a user-defined form or in so-called
 \texttt{controlized} form. In the former case, no \texttt{unstructured}
 instruction is allowed and explicit \texttt{goto}'s are used. In the later
-case, \texttt{goto}'s are forbidden and abstracted by 
+case, \texttt{goto}'s are forbidden and abstracted by
 \texttt{unstructered}. of course, a fully-structured code does not contain
 either \texttt{goto} or \texttt{unstructured}\footnote{PIPS does not contain a
 control restructurer but it is interfaced to Toolpack.}. The
 user-defined form only is used by the parser and some
-pretty-printers. The pretty-printers are able to restore Fortran-77 
+pretty-printers. The pretty-printers are able to restore Fortran-77
 \texttt{goto}'s from the \texttt{unstructured}. More on this in
 Section~\ref{subsubsection-unstructured}.
 
@@ -1198,14 +1198,15 @@ contient le
 \verb/call/ pour toutes les autres instructions (affectation, appel de
 subroutine, entrées-sorties, return, stop, etc) ou un sous-domaine de
 \verb/unstructured/ dans le cas ou` l'on traite d'un graphe de contrôle
-structuré. Toutes ces instructions 
+structuré. Toutes ces instructions
 sont représentées par des appels à des fonctions prédéfinies dont
 nous étudierons la nature plus loin.
 \end{comment}
 
 Several PIPS contributors have asked for a \verb/while/ construct.
 In addition, a statement in C can be any expression, not only call
-expression, so we have to add \verb/expression/ to \verb/instruction/. 
+expression, so we have to add \verb/expression/ to \verb/instruction/.
+
 
 \subsubsection{Sequence}
 \label{subsubsection-sequence}
@@ -1218,6 +1219,198 @@ no effect, a \texttt{NOP}. See \texttt{empty\_statement\_p()}.
 
 Note that the statement owning the sequence cannot have information
 such as \verb|comment|, etc. on it. See~\ref{}
+
+\subsubsection{Conditional (a.k.a. Test)}
+\label{subsubsection-test}
+\index{Test}\index{IF}
+
+\domain{Test = condition:expression x true:statement x false:statement}
+
+Type \texttt{test} is used to represent conditional statements. Field
+\texttt{condition} must contain a \emph{boolean}\footnote{Note that expressions
+are untyped in PIPS internal representation. They are kept in an
+overloaded form because typing does not matter for parallelization. An
+new pass would be required to insert the conversion operators. Besides,
+fully typed Fortran operators would have to be added.} expression to
+evaluate. Fields \texttt{true} and \texttt{false} contain the statement to
+execute if the test evaluates to true or false.
+
+If the false branch is empty, an \emph{empty} statement is inserted. It might
+be an empty sequence or a \texttt{CONTINUE} statement or... (see Function
+\texttt{empty\_statement\_p}). Of course, an empty statement \emph{must} have
+an empty label (see Section~\ref{subsection-entity}).
+
+Fortran control instructions, but DO loops with no internal exits, are decomposed into
+combinations of such \texttt{test} instructions and other PIPS instructions
+by the parser, which may add \texttt{goto} statements, and by the controlizer.
+
+\begin{comment}
+Le domaine \verb/test/ permet de représenter toutes les instructions à base
+de contrôle. Le sous-domaine \verb/condition/ contient l'expression à
+tester, et les deux sous-domaines \verb/true/ et \verb/false/ contiennent les
+instructions à exécuter selon la valeur du test.
+
+Il faut noter que chaque instruction de contrôle de Fortran,
+à l'exception de l'instruction \verb/DO/, est
+transformée en une combinaison sémantiquement équivalente de \verb/test/s
+et de \verb/goto/s.
+\end{comment}
+
+
+\subsubsection{Switch}
+\label{subsubsection-switch}
+\index{switch}
+
+\domain{Multitest = controller:expression x body:statement}
+
+
+\subsubsection{DO Loop, Sequential or Parallel}
+\label{subsubsection-loop}
+\index{Loop}\index{DO}
+
+\domain{Loop = index:entity x range x body:statement x label:entity x execution x locals:entity*}
+
+Type \texttt{loop} is used to represent Fortran DO loops or Pascal FOR
+loops. Field \texttt{index} points to the loop index, an entity. Field
+\texttt{range} contains the lower and upper bounds, as well as the step. Field
+\texttt{body} points to the loop body, a unique statement which usually is
+a sequence. Field \texttt{label} is used for Fortran labelled DO loops. It
+is the label of the last statement in the loop body. Field \texttt{execution}
+specifies if the loop should be executed sequentially or
+concurrently. Entities in the \texttt{local}\index{Private} field
+are loop-private
+variables. They can be stack-allocated on body entrance and deallocated
+on exit. The read and write effects on these variables are not visible
+from outside the loop body. They can be privatized and their effects can
+be ignored when running the loop in parallel if each processor gets a
+private copy of it.
+
+This field should be factored out in the \verb/statement/ type in order
+to declare variables local to a block, as in C. However, the two levels,
+statement and instruction, would make coding more difficult.
+
+
+\begin{comment}
+Le domaine \verb/loop/ permet de représenter les boucles du type DO Fortran
+ou FOR Pascal. Le sous-domaine \verb/index/ contient l'entité indice de
+boucle, le sous-domaine \verb/range/ contient les bornes de la boucle, le
+sous-domaine \verb/body/ contient le corps de la boucle, c'est-à-dire un
+\verb/statement/, le sous-domaine \verb/label/ contient le label de fin de boucle,
+c'est-à-dire une entité. Le sous-domaine \verb/execution/ définit le
+comportement dynamique d'une boucle. Les entités présentes dans
+\verb/locals/ sont propres au corps de boucle (les effets sur elles sont
+masqués quand on sort de la boucle).
+\end{comment}
+
+\index{Execution}\index{Sequential Loop}\index{Parallel Loop}
+\domain{Execution = sequential:unit + parallel:unit}
+
+Type \texttt{execution} is used to specify if a loop must be executed
+sequentially (\texttt{sequential} or if it may be executed concurrently
+(\texttt{parallel}). The parser only
+recognizes sequential loops.
+
+\begin{comment}
+Le domain \verb/execution/ définit la sémantique d'une boucle:
+\verb/sequential/ correspond à une boucle DO classique, \verb/parallel/
+définit un boucle dont les instances d'itération peuvent être
+exécutées en parallèle.
+\end{comment}
+
+\label{range}
+\index{Range}
+\domain{Range = lower:expression x upper:expression x increment:expression}
+{}
+
+Type \verb/range/ is used to store the loop bounds and step. The three
+fields are used to store the lower bound (\verb/lower/), the upper bound
+(\verb/upper/) and the step expression (\verb/increment/).
+
+\begin{comment}
+Le domaine \verb/range/ permet de représenter les bornes des boucles DO
+Fortran. Il y a trois sous-domaines \verb/lower/, \verb/upper/ et \verb/increment/ de
+type \verb/expression/ qui sont respectivement la borne inférieure, la borne
+supérieure et l'incrément.
+\end{comment}
+
+Expressions of type range can be used in other context. For instance,
+Fortran~90 triplet construct is a range. See
+Section~\ref{section-expressions} for details about expressions. For
+loops, other ranges are \emph{not} expected in bound and step expressions.
+
+
+\subsubsection{While Loop}
+\label{subsubsection-whileloop}
+\index{While}
+
+\domain{Whileloop = condition:expression x body:statement x label:entity x evaluation}
+
+\domain{Evaluation = before:unit + after:unit}
+
+Here is a while loop. It is not the \verb|while| domain because it would
+interfere with C keywords. The content is similar to the \verb|loop|
+domain. Possible parallel while loops are considered unimportant, hence no
+execution part was added. No locals are attached, because this should be
+rather done at the \verb|statement| level, not within the
+\verb|instruction| itself.
+
+
+\subsubsection{For loop}
+\label{subsubsection-forloop}
+\index{Forloop}
+
+\domain{Forloop = initialization:expression x condition:expression x increment:expression x body:statement}
+
+
+\subsubsection{Function Call}
+\label{subsubsection-call}
+\index{Call}\index{Intrinsic}\index{Assignment}\index{RETURN}
+
+\domain{Call = function:entity x arguments:expression*}
+{}
+
+Type \verb/call/ is used to represent Fortran commands as well as
+user-defined function and subroutine calls in a pseudo-functional
+way. These pseudo-functions with side effects are very important for the
+PIPS internal representation since constants, operators such as + and *,
+intrinsics like \texttt{MOD} or \texttt{SIN}, and basic Fortran statements
+such as assignment \texttt{=},\texttt{READ, WRITE, PAUSE, OPEN, CLOSE, RETURN,
+CALL, FORMAT}, and so on... are all encoded in the same way, like
+user-defined function calls. The number of arguments depends on the
+pseudo-function: 0 for constants, 1 or 2 for operators, and so
+on. Fortran keywords, operators and intrinsics are known as predefined
+functions. This unification of language and user defined functions is
+useful to reduce the size of the datastructure definition as well as the
+code required for many algorithms.
+
+\begin{comment}
+Le domaine \verb/call/ permet de représenter les commandes et les
+appels de fonctions Fortran sous une forme unique pseudo-fonctionelle.
+Ces pseudo-fonctions jouent un rôle important dans notre
+représentation intermédiaire puisque les constantes, les opérateurs
+comme + et *, les intrinsèques comme \texttt{MOD} ou \texttt{SIN} et surtout
+les commandes (i.e. instructions) Fortran, à commencer par
+l'assignation et en continuant avec \texttt{READ, WRITE, PAUSE, OPEN,
+CLOSE, RETURN, CALL, FORMAT,}
+etc., sont représentées comme les appels de fonctions définies par
+l'utilisateur. Le nombre d'arguments de chaque pseudo-fonction varie: 0
+pour les constantes, 1 ou 2 pour les opérateurs, etc. Les commandes
+Fortran, les opérateurs et les intrinsèques sont caractérisés par
+des pseudo-fonctions prédéfinies. Cette convention permet de diminuer
+considérablement la taille de la définition de la représentation
+ainsi que le volume de code nécessaire à de nombreux algorithmes.
+\end{comment}
+
+Type \verb/function/ points towards the entity associated with the
+called function. Subtype \verb/arguments/ is a list of \verb/expression/
+objects which represent the actual arguments for the function.
+
+\begin{comment}
+Le sous-domaine \verb/function/ est une entité qui définit la fonction
+appelée. Le sous-domaine \verb/arguments/ est une liste de sous-domaines
+\verb/expression/ qui représente les arguments d'appel de la fonction.
+\end{comment}
+
 
 \subsubsection{Control Flow Graph (a.k.a. Unstructured)}
 \label{subsubsection-unstructured}
@@ -1317,181 +1510,6 @@ Figure~\ref{figure-hierarchical-control-flow-graph}).
 \end{figure}
 
 
-\subsubsection{Conditional (a.k.a. Test)}
-\label{subsubsection-test}
-\index{Test}\index{IF}
-
-\domain{Test = condition:expression x true:statement x false:statement}
-
-Type \texttt{test} is used to represent conditional statements. Field 
-\texttt{condition} must contain a \emph{boolean}\footnote{Note that expressions
-are untyped in PIPS internal representation. They are kept in an
-overloaded form because typing does not matter for parallelization. An
-new pass would be required to insert the conversion operators. Besides,
-fully typed Fortran operators would have to be added.} expression to
-evaluate. Fields \texttt{true} and \texttt{false} contain the statement to
-execute if the test evaluates to true or false.
-
-If the false branch is empty, an \emph{empty} statement is inserted. It might
-be an empty sequence or a \texttt{CONTINUE} statement or... (see Function
-\texttt{empty\_statement\_p}). Of course, an empty statement \emph{must} have
-an empty label (see Section~\ref{subsection-entity}).
-
-Fortran control instructions, but DO loops with no internal exits, are decomposed into
-combinations of such \texttt{test} instructions and other PIPS instructions
-by the parser, which may add \texttt{goto} statements, and by the controlizer.
-
-\begin{comment}
-Le domaine \verb/test/ permet de représenter toutes les instructions à base
-de contrôle. Le sous-domaine \verb/condition/ contient l'expression à
-tester, et les deux sous-domaines \verb/true/ et \verb/false/ contiennent les
-instructions à exécuter selon la valeur du test. 
-
-Il faut noter que chaque instruction de contrôle de Fortran,
-à l'exception de l'instruction \verb/DO/, est
-transformée en une combinaison sémantiquement équivalente de \verb/test/s
-et de \verb/goto/s.
-\end{comment}
-
-\subsubsection{DO Loop, Sequential or Parallel}
-\label{subsubsection-loop}
-\index{Loop}\index{DO}
-
-\domain{Loop = index:entity x range x body:statement x label:entity x execution x locals:entity*}
-
-Type \texttt{loop} is used to represent Fortran DO loops or Pascal FOR
-loops. Field \texttt{index} points to the loop index, an entity. Field 
-\texttt{range} contains the lower and upper bounds, as well as the step. Field
-\texttt{body} points to the loop body, a unique statement which usually is
-a sequence. Field \texttt{label} is used for Fortran labelled DO loops. It
-is the label of the last statement in the loop body. Field \texttt{execution}
-specifies if the loop should be executed sequentially or
-concurrently. Entities in the \texttt{local}\index{Private} field 
-are loop-private
-variables. They can be stack-allocated on body entrance and deallocated
-on exit. The read and write effects on these variables are not visible
-from outside the loop body. They can be privatized and their effects can
-be ignored when running the loop in parallel if each processor gets a
-private copy of it.
-
-This field should be factored out in the \verb/statement/ type in order
-to declare variables local to a block, as in C. However, the two levels,
-statement and instruction, would make coding more difficult.
-
-
-\begin{comment}
-Le domaine \verb/loop/ permet de représenter les boucles du type DO Fortran
-ou FOR Pascal. Le sous-domaine \verb/index/ contient l'entité indice de
-boucle, le sous-domaine \verb/range/ contient les bornes de la boucle, le
-sous-domaine \verb/body/ contient le corps de la boucle, c'est-à-dire un
-\verb/statement/, le sous-domaine \verb/label/ contient le label de fin de boucle,
-c'est-à-dire une entité. Le sous-domaine \verb/execution/ définit le
-comportement dynamique d'une boucle. Les entités présentes dans
-\verb/locals/ sont propres au corps de boucle (les effets sur elles sont
-masqués quand on sort de la boucle).
-\end{comment}
-
-\index{Execution}\index{Sequential Loop}\index{Parallel Loop}
-\domain{Execution = sequential:unit + parallel:unit}
-
-Type \texttt{execution} is used to specify if a loop must be executed
-sequentially (\texttt{sequential} or if it may be executed concurrently
-(\texttt{parallel}). The parser only
-recognizes sequential loops.
-
-\begin{comment}
-Le domain \verb/execution/ définit la sémantique d'une boucle:
-\verb/sequential/ correspond à une boucle DO classique, \verb/parallel/
-définit un boucle dont les instances d'itération peuvent être
-exécutées en parallèle.
-\end{comment}
-
-\label{range}
-\index{Range}
-\domain{Range = lower:expression x upper:expression x increment:expression}
-{}
-
-Type \verb/range/ is used to store the loop bounds and step. The three
-fields are used to store the lower bound (\verb/lower/), the upper bound
-(\verb/upper/) and the step expression (\verb/increment/).
-
-\begin{comment}
-Le domaine \verb/range/ permet de représenter les bornes des boucles DO
-Fortran. Il y a trois sous-domaines \verb/lower/, \verb/upper/ et \verb/increment/ de
-type \verb/expression/ qui sont respectivement la borne inférieure, la borne
-supérieure et l'incrément.
-\end{comment}
-
-Expressions of type range can be used in other context. For instance,
-Fortran~90 triplet construct is a range. See
-Section~\ref{section-expressions} for details about expressions. For
-loops, other ranges are \emph{not} expected in bound and step expressions.
-
-
-\subsubsection{While Loop}
-\label{subsubsection-whileloop}
-\index{While}
-
-\domain{Whileloop = condition:expression x body:statement x label:entity x evaluation}
-
-\domain{Evaluation = before:unit + after:unit}
-
-Here is a while loop. It is not the \verb|while| domain because it would
-interfere with C keywords. The content is similar to the \verb|loop|
-domain. Possible parallel while loops are considered unimportant, hence no
-execution part was added. No locals are attached, because this should be
-rather done at the \verb|statement| level, not within the
-\verb|instruction| itself. 
-
-\subsubsection{Function Call}
-\label{subsubsection-call}
-\index{Call}\index{Intrinsic}\index{Assignment}\index{RETURN}
-
-\domain{Call = function:entity x arguments:expression*}
-{}
-
-Type \verb/call/ is used to represent Fortran commands as well as
-user-defined function and subroutine calls in a pseudo-functional
-way. These pseudo-functions with side effects are very important for the
-PIPS internal representation since constants, operators such as + and *,
-intrinsics like \texttt{MOD} or \texttt{SIN}, and basic Fortran statements
-such as assignment \texttt{=},\texttt{READ, WRITE, PAUSE, OPEN, CLOSE, RETURN,
-CALL, FORMAT}, and so on... are all encoded in the same way, like
-user-defined function calls. The number of arguments depends on the
-pseudo-function: 0 for constants, 1 or 2 for operators, and so
-on. Fortran keywords, operators and intrinsics are known as predefined
-functions. This unification of language and user defined functions is
-useful to reduce the size of the datastructure definition as well as the
-code required for many algorithms.
-
-\begin{comment}
-Le domaine \verb/call/ permet de représenter les commandes et les
-appels de fonctions Fortran sous une forme unique pseudo-fonctionelle.
-Ces pseudo-fonctions jouent un rôle important dans notre
-représentation intermédiaire puisque les constantes, les opérateurs
-comme + et *, les intrinsèques comme \texttt{MOD} ou \texttt{SIN} et surtout
-les commandes (i.e. instructions) Fortran, à commencer par
-l'assignation et en continuant avec \texttt{READ, WRITE, PAUSE, OPEN,
-CLOSE, RETURN, CALL, FORMAT,}
-etc., sont représentées comme les appels de fonctions définies par
-l'utilisateur. Le nombre d'arguments de chaque pseudo-fonction varie: 0
-pour les constantes, 1 ou 2 pour les opérateurs, etc. Les commandes
-Fortran, les opérateurs et les intrinsèques sont caractérisés par
-des pseudo-fonctions prédéfinies. Cette convention permet de diminuer
-considérablement la taille de la définition de la représentation
-ainsi que le volume de code nécessaire à de nombreux algorithmes.
-\end{comment}
-
-Type \verb/function/ points towards the entity associated with the
-called function. Subtype \verb/arguments/ is a list of \verb/expression/
-objects which represent the actual arguments for the function.
-
-\begin{comment}
-Le sous-domaine \verb/function/ est une entité qui définit la fonction
-appelée. Le sous-domaine \verb/arguments/ est une liste de sous-domaines
-\verb/expression/ qui représente les arguments d'appel de la fonction.
-\end{comment}
-
 \subsubsection{Control Flow Graph Node}
 \label{subsubsection-control}
 \index{Control}
@@ -1553,6 +1571,7 @@ structure for oriented graphs, \verb/graph/, should be used instead so
 as to pool basic graph functions, e.g. search for strongly connected
 components.
 
+
 \subsubsection{Mappings between Statements and Control Nodes}
 
 \domain{Controlmap = persistant statement->control}
@@ -1566,16 +1585,6 @@ control father of a statement in order to travel on the control graph
 associated to a statement. The persistance is needed to avoid freeing
 the control graph when the mapping is freed.
 
-\subsubsection{Switch}
-\label{subsubsection-switch}
-\index{switch}
-\domain{Multitest = controller:expression x body:statement}
-
-\subsubsection{For loop}
-\label{subsubsection-forloop}
-\index{Forloop}
-
-\domain{Forloop = initialization:expression x condition:expression x increment:expression x body:statement}
 
 % \section{Représentation des expressions}
 \section{Expressions}
@@ -1595,7 +1604,7 @@ ones. Field \verb/normalized/ indirectly contains a secondary
 representation of affine integer expressions stored as
 \verb/Pvecteur/\index{Pvecteur} (see Section~\ref{subsection-pvecteur}).
 
-If field \texttt{normalized} is set to value 
+If field \texttt{normalized} is set to value
 \texttt{normalized\_undefined}, this implies that the PIPS function used to
 detect affine expressions and sub-expressions has not been called. This
 {\bf does not} imply that the expression is not affine.
@@ -1610,9 +1619,11 @@ Expressions synthesized by program transformations, such as partial
 evaluation or loop interchange, should all have their \texttt{normalized}
 field set to \texttt{normalized\_undefined}.
 
+
 \subsection{Mapping between Expressions and effects}
 
 \domain{persistant\_expression\_to\_effects = persistant expression -> effects}
+
 
 \subsection{Abstract Tree of an Expression: Syntax}
 \label{subsection-syntax}
@@ -1627,7 +1638,7 @@ defined in the program source code. A \verb/syntax/ object is either a
 element\footnote{Scalar variables are represented as 0-dimensional
   arrays.}, or a \verb/call/ to a function\footnote{All operators and
   commands, including assignment, are encoded as \emph{functions}. This
-  explains why the \texttt{call} type is defined in the 
+  explains why the \texttt{call} type is defined in the
   \emph{Instruction} section.}, or a \verb/range/ as in loop
 definitions\footnote{This explains why type \texttt{range} is defined
   in the \emph{Instruction} section.} and array declarations.
@@ -1640,6 +1651,7 @@ complicated array objects such as pointer, function, structure or
 union member... The same extension is made to call expression, named
 function application, because the called function is not necessarily
 an entity but can be any expression that denotes the address of a function.
+
 
 \subsubsection{Reference}
 \label{subsubsection-reference}
