@@ -2101,6 +2101,13 @@ This is generally the case when you simdize classical instruction ( add, divide 
 SIMD_GENERATE_LOAD_STORE TRUE
 \end{verbatim}
 
+\subsubsection{Extravagant SIMD atomizer}
+Use this property to make the SIMD Atomizer go wild: unlike other atomizer, it will break
+expressions such as \lstinline|a=b[2]+2| into \lstinline|i=b[2];a=i+2|.
+\begin{verbatim}
+SIMD_EXTRAVAGANT_ATOMIZER FALSE
+\end{verbatim}
+
 \subsection{PHRASE ComEngine}
 
 This property is set to TRUE if we want to synthesize only one

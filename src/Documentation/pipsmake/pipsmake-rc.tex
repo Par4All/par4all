@@ -3090,6 +3090,24 @@ simd_loop_const_elim                    > MODULE.code
         < MODULE.dg
 \end{verbatim}
 
+%%@UserManualDocumentation: simd_memory_packing
+This phase uses the simdization algorithm from simdizer to detect memory access
+that could be packed together.
+For example, four consecutive load from a char array could be a single load from an int array.
+This prove to be useful for \textit{c to vhdl} compilers such as \texttt{c2h}.
+%%!UserManualDocumentation
+
+\begin{verbatim}
+alias simd_memory_packing 'Generate Optimized Load Store'
+
+simd_memory_packing  > MODULE.code
+                     > MODULE.callees
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.dg
+\end{verbatim}
+
+
 
 \subsection{Coarse Grain Parallelization}
 \label{subsubsection-coarse-grain-parallelization}
