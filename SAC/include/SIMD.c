@@ -242,6 +242,13 @@ SIMD_MULD (int DEST[2], int SRC1[2], int SRC2[2])
 }
 
 void
+SIMD_DIVD (int DEST[2], int SRC1[2], int SRC2[2])
+{
+    DEST[0] = SRC1[0] / SRC2[0];
+    DEST[1] = SRC1[1] / SRC2[1];
+}
+
+void
 SIMD_LOAD_CONSTANT_V4HI (short VEC[4], int HIGH, int LOW)
 {
     VEC[0] = (short) LOW;
@@ -367,6 +374,14 @@ SIMD_MULW (short DEST[4], short SRC1[4], short SRC2[4])
     DEST[1] = SRC1[1] * SRC2[1];
     DEST[2] = SRC1[2] * SRC2[2];
     DEST[3] = SRC1[3] * SRC2[3];
+}
+void
+SIMD_DIVW (short DEST[4], short SRC1[4], short SRC2[4])
+{
+    DEST[0] = SRC1[0] / SRC2[0];
+    DEST[1] = SRC1[1] / SRC2[1];
+    DEST[2] = SRC1[2] / SRC2[2];
+    DEST[3] = SRC1[3] / SRC2[3];
 }
 
 void
