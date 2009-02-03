@@ -784,7 +784,9 @@ some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p)
       }
       else {
 	if(type_variable_p(exp_type))
+    {
 	  b = copy_basic(variable_basic(type_variable(exp_type)));
+    }
 	else if(type_functional_p(exp_type)) {
 	  /* A reference to a function returns a pointer to a function of the very same time */
 	  b = make_basic(is_basic_pointer, copy_type(exp_type));
@@ -793,6 +795,17 @@ some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p)
 	  pips_internal_error("Bad reference type tag %d \"%s\"\n",
 			      type_tag(exp_type), type_to_string(exp_type));
 	}
+      }
+      /* SG: added so that the basic of a dereferenced pointer is the basic of the dereferenced value
+       */
+      if( basic_pointer_p(b) )
+      {
+          MAP(EXPRESSION,e, { 
+            pips_assert( "reference indicies size and pointer level match",basic_pointer_p(b) );
+            basic bt = copy_basic(variable_basic(type_variable(basic_pointer(b))));
+            free_basic(b);
+            b=bt;        
+          } ,reference_indices( syntax_reference(sy) ) );
       }
       break;
     }
