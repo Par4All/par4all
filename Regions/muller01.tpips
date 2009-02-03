@@ -1,0 +1,9 @@
+delete muller01
+create muller01 muller01.f
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate PRINT_CODE_OUT_REGIONS
+display PRINTED_FILE[SUB]
+quit
