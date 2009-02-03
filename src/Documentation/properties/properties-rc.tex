@@ -2073,6 +2073,34 @@ but \lstinline|a(i,j,k)| and \lstinline|a(i+1,j,k)| are not.
 SIMD_FORTRAN_MEM_ORGANISATION TRUE
 \end{verbatim}
 
+\subsubsection{Pattern file}
+
+This property is used by the sac library to know the path of the pattern definition file.
+If the file is not found, the execution fails.
+
+\begin{verbatim}
+SIMD_PATTERN_FILE "patterns.def"
+\end{verbatim}
+
+\subsubsection{Constant type inferance}
+
+This property is used by the sac library to know if it must override C constant type inferance.
+In \texttt{C}, an integer constant always as the minmum size needed to hold its value, starting from an \lstinline|int|. In sac we may want to have it converted to a smaller size, in situation like \lstinline|char b;/*...*/;char a = 2 + b;|. Otherwise the result of \lstinline|2+b| is considered as an \lstinline|int|.
+if \verb|SIMD_OVERRIDE_CONSTANT_TYPE_INFERANCE| is set to \texttt{TRUE}, the result of \lstinline|2+b| will be a \lstinline|char|.
+
+\begin{verbatim}
+SIMD_OVERRIDE_CONSTANT_TYPE_INFERANCE FALSE
+\end{verbatim}
+
+\subsubsection{Generate load store statement}
+
+Duting the simdization process, one may want to generate automagically the appropriate load / store instructions.
+This is generally the case when you simdize classical instruction ( add, divide \dots) but you may want to disable this if you simdize unusal instruction (what if you simdize the load and store ? hu ?)
+
+\begin{verbatim}
+SIMD_GENERATE_LOAD_STORE TRUE
+\end{verbatim}
+
 \subsection{PHRASE ComEngine}
 
 This property is set to TRUE if we want to synthesize only one
