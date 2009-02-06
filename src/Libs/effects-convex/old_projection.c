@@ -968,6 +968,8 @@ list l_var;
  *            the approximation is not modified.
  * comment  : overflow errors are trapped here. if it occurs, an empty region
  *           replaces the initial region.	
+ *
+ * FI: it seems that a value rather than a variable is projected.
  */
 void region_exact_projection_along_variable(region reg, entity var)
 {

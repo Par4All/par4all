@@ -623,7 +623,17 @@ void all_regions_variable_rename(list l_reg, entity old_entity, entity new_entit
 	Pbase nb = sc_to_minimal_basis(sc_reg);
 	if(base_contains_variable_p(nb, (Variable) new_entity)) {
 	  /* We are in trouble because we cannot perform a simple renaming */
-	  pips_internal_error("Unexpected renaming\n");
+	  /* The caller may reuse values already used in the
+	     system. This is the case for muller01.f because the
+	     precondition and the region rightly used I#old. Rightly,
+	     but uselessly in that case. */
+	  /* new_entity must/can be projected first although this is
+	     dangerous when dealing with MUST/MAY regions (no other
+	     idea, but use of temporary values t# instead of i#old in
+	     caller, ).. */
+	  region_exact_projection_along_variable(reg, new_entity);
+	  sc_reg = region_system(reg);
+	  pips_user_warning("Unexpected variable renaming in a region\n");
 	}
 	else {
 	  base_rm(b);
