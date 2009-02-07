@@ -56,7 +56,7 @@ short dotprod(short b[1000000], short c[1000000])
    LU_IB0 = 0;
    LU_IND0 = 0;
 l99999:   ;
-   for(99998 LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
+   for(LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
       //c SIMD_COMMENT_0
 
       I_0 = b[LU_IND0]*c[LU_IND0];
@@ -88,7 +88,7 @@ l99998:      ;
 }
 short dotprod(short b[1000000], short c[1000000])
 {
-   short a_RED0[3+1];
+   short RED0[3+1];
    int LU_IND0;
    int LU_IB0;
    int LU_NUB0;
@@ -99,44 +99,44 @@ short dotprod(short b[1000000], short c[1000000])
    LU_IB0 = 0;
    LU_IND0 = 0;
 l99999:   ;
-   a_RED0[0] = 0;
-   a_RED0[1] = 0;
-   a_RED0[2] = 0;
-   a_RED0[3] = 0;
-   for(99998 LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
+   RED0[0] = 0;
+   RED0[1] = 0;
+   RED0[2] = 0;
+   RED0[3] = 0;
+   for(LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
       //c SIMD_COMMENT_0
 
       I_0 = b[LU_IND0]*c[LU_IND0];
       //c SIMD_COMMENT_1
 
-      a_RED0[0] = a_RED0[0]+I_0;
+      RED0[0] = RED0[0]+I_0;
       //c SIMD_COMMENT_0
 
       I_0 = b[LU_IND0+1]*c[LU_IND0+1];
       //c SIMD_COMMENT_1
 
-      a_RED0[1] = a_RED0[1]+I_0;
+      RED0[1] = RED0[1]+I_0;
       //c SIMD_COMMENT_0
 
       I_0 = b[LU_IND0+2]*c[LU_IND0+2];
       //c SIMD_COMMENT_1
 
-      a_RED0[2] = a_RED0[2]+I_0;
+      RED0[2] = RED0[2]+I_0;
       //c SIMD_COMMENT_0
 
       I_0 = b[LU_IND0+3]*c[LU_IND0+3];
       //c SIMD_COMMENT_1
 
-      a_RED0[3] = a_RED0[3]+I_0;
+      RED0[3] = RED0[3]+I_0;
 l99998:      ;
    }
-   a = a_RED0[3]+a_RED0[2]+a_RED0[1]+a_RED0[0]+a;
+   a = RED0[3]+RED0[2]+RED0[1]+RED0[0]+a;
    i = 1000000;
    return a;
 }
 short dotprod(short b[1000000], short c[1000000])
 {
-   short a_RED0[3+1];
+   short RED0[3+1];
    int LU_IND0;
    int LU_IB0;
    int LU_NUB0;
@@ -147,38 +147,38 @@ short dotprod(short b[1000000], short c[1000000])
    LU_IB0 = 0;
    LU_IND0 = 0;
 l99999:   ;
-   a_RED0[0] = 0;
-   a_RED0[1] = 0;
-   a_RED0[2] = 0;
-   a_RED0[3] = 0;
-   for(99998 LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
+   RED0[0] = 0;
+   RED0[1] = 0;
+   RED0[2] = 0;
+   RED0[3] = 0;
+   for(LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
       //c SIMD_COMMENT_0
 
       I_0 = b[LU_IND0]*c[LU_IND0];
       //c SIMD_COMMENT_1
 
-      a_RED0[0] = a_RED0[0]+I_0;
+      RED0[0] = RED0[0]+I_0;
       //c SIMD_COMMENT_0
 
       I_0 = b[LU_IND0+1]*c[LU_IND0+1];
       //c SIMD_COMMENT_1
 
-      a_RED0[1] = a_RED0[1]+I_0;
+      RED0[1] = RED0[1]+I_0;
       //c SIMD_COMMENT_0
 
       I_0 = b[LU_IND0+2]*c[LU_IND0+2];
       //c SIMD_COMMENT_1
 
-      a_RED0[2] = a_RED0[2]+I_0;
+      RED0[2] = RED0[2]+I_0;
       //c SIMD_COMMENT_0
 
       I_0 = b[LU_IND0+3]*c[LU_IND0+3];
       //c SIMD_COMMENT_1
 
-      a_RED0[3] = a_RED0[3]+I_0;
+      RED0[3] = RED0[3]+I_0;
 l99998:      ;
    }
-   a = a_RED0[3]+a_RED0[2]+a_RED0[1]+a_RED0[0]+a;
+   a = RED0[3]+RED0[2]+RED0[1]+RED0[0]+a;
    i = 1000000;
    return a;
 }
@@ -188,7 +188,7 @@ short dotprod(short b[1000000], short c[1000000])
    short I_02;
    short I_01;
    short I_00;
-   short a_RED0[3+1];
+   short RED0[3+1];
    int LU_IND0;
    int LU_IB0;
    int LU_NUB0;
@@ -199,38 +199,38 @@ short dotprod(short b[1000000], short c[1000000])
    LU_IB0 = 0;
    LU_IND0 = 0;
 l99999:   ;
-   a_RED0[0] = 0;
-   a_RED0[1] = 0;
-   a_RED0[2] = 0;
-   a_RED0[3] = 0;
-   for(99998 LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
+   RED0[0] = 0;
+   RED0[1] = 0;
+   RED0[2] = 0;
+   RED0[3] = 0;
+   for(LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
       //c SIMD_COMMENT_0
 
       I_03 = b[LU_IND0]*c[LU_IND0];
       //c SIMD_COMMENT_1
 
-      a_RED0[0] = a_RED0[0]+I_03;
+      RED0[0] = RED0[0]+I_03;
       //c SIMD_COMMENT_0
 
       I_02 = b[LU_IND0+1]*c[LU_IND0+1];
       //c SIMD_COMMENT_1
 
-      a_RED0[1] = a_RED0[1]+I_02;
+      RED0[1] = RED0[1]+I_02;
       //c SIMD_COMMENT_0
 
       I_01 = b[LU_IND0+2]*c[LU_IND0+2];
       //c SIMD_COMMENT_1
 
-      a_RED0[2] = a_RED0[2]+I_01;
+      RED0[2] = RED0[2]+I_01;
       //c SIMD_COMMENT_0
 
       I_00 = b[LU_IND0+3]*c[LU_IND0+3];
       //c SIMD_COMMENT_1
 
-      a_RED0[3] = a_RED0[3]+I_00;
+      RED0[3] = RED0[3]+I_00;
 l99998:      ;
    }
-   a = a_RED0[3]+a_RED0[2]+a_RED0[1]+a_RED0[0]+a;
+   a = RED0[3]+RED0[2]+RED0[1]+RED0[0]+a;
    i = 1000000;
    return a;
 }
@@ -252,7 +252,7 @@ short dotprod(short b[1000000], short c[1000000])
    short I_02;
    short I_01;
    short I_00;
-   short a_RED0[3+1];
+   short RED0[3+1];
    int LU_IND0;
    int LU_IB0;
    int LU_NUB0;
@@ -263,21 +263,21 @@ short dotprod(short b[1000000], short c[1000000])
    LU_IB0 = 0;
    LU_IND0 = 0;
 l99999:   ;
-   a_RED0[0] = 0;
-   a_RED0[1] = 0;
-   a_RED0[2] = 0;
-   a_RED0[3] = 0;
-   for(99998 LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
+   RED0[0] = 0;
+   RED0[1] = 0;
+   RED0[2] = 0;
+   RED0[3] = 0;
+   for(LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
       SIMD_LOAD_V4HI(v4hi_vec0, &c[LU_IND0]);
       SIMD_LOAD_V4HI(v4hi_vec1, &b[LU_IND0]);
       SIMD_MULW(v4hi_vec2, v4hi_vec1, v4hi_vec0);
       SIMD_SAVE_GENERIC_V4HI(v4hi_vec2, &I_03, &I_02, &I_01, &I_00);
-      SIMD_LOAD_GENERIC_V4HI(v4hi_vec4, a_RED0[0], a_RED0[1], a_RED0[2], a_RED0[3]);
+      SIMD_LOAD_V4HI(v4hi_vec4, &RED0[0]);
       SIMD_ADDW(v4hi_vec5, v4hi_vec4, v4hi_vec2);
-      SIMD_SAVE_GENERIC_V4HI(v4hi_vec5, &a_RED0[0], &a_RED0[1], &a_RED0[2], &a_RED0[3]);
+      SIMD_SAVE_V4HI(v4hi_vec5, &RED0[0]);
 l99998:      ;
    }
-   a = a_RED0[3]+a_RED0[2]+a_RED0[1]+a_RED0[0]+a;
+   a = RED0[3]+RED0[2]+RED0[1]+RED0[0]+a;
    i = 1000000;
    return a;
 }
@@ -299,7 +299,7 @@ short dotprod(short b[1000000], short c[1000000])
    short I_02;
    short I_01;
    short I_00;
-   short a_RED0[3+1];
+   short RED0[3+1];
    int LU_IND0;
    int LU_IB0;
    int LU_NUB0;
@@ -310,21 +310,21 @@ short dotprod(short b[1000000], short c[1000000])
    LU_IB0 = 0;
    LU_IND0 = 0;
 l99999:   ;
-   a_RED0[0] = 0;
-   a_RED0[1] = 0;
-   a_RED0[2] = 0;
-   a_RED0[3] = 0;
-   for(99998 LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
+   RED0[0] = 0;
+   RED0[1] = 0;
+   RED0[2] = 0;
+   RED0[3] = 0;
+   for(LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
       SIMD_LOAD_V4HI(v4hi_vec0, &c[LU_IND0]);
       SIMD_LOAD_V4HI(v4hi_vec1, &b[LU_IND0]);
       SIMD_MULW(v4hi_vec2, v4hi_vec1, v4hi_vec0);
       SIMD_SAVE_GENERIC_V4HI(v4hi_vec2, &I_03, &I_02, &I_01, &I_00);
-      SIMD_LOAD_GENERIC_V4HI(v4hi_vec4, a_RED0[0], a_RED0[1], a_RED0[2], a_RED0[3]);
+      SIMD_LOAD_V4HI(v4hi_vec4, &RED0[0]);
       SIMD_ADDW(v4hi_vec5, v4hi_vec4, v4hi_vec2);
-      SIMD_SAVE_GENERIC_V4HI(v4hi_vec5, &a_RED0[0], &a_RED0[1], &a_RED0[2], &a_RED0[3]);
+      SIMD_SAVE_V4HI(v4hi_vec5, &RED0[0]);
 l99998:      ;
    }
-   a = a_RED0[3]+a_RED0[2]+a_RED0[1]+a_RED0[0]+a;
+   a = RED0[3]+RED0[2]+RED0[1]+RED0[0]+a;
    i = 1000000;
    return a;
 }
@@ -346,7 +346,7 @@ short dotprod(short b[1000000], short c[1000000])
    short I_02;
    short I_01;
    short I_00;
-   short a_RED0[3+1];
+   short RED0[3+1];
    int LU_IND0;
    int LU_IB0;
    int LU_NUB0;
@@ -357,59 +357,12 @@ short dotprod(short b[1000000], short c[1000000])
    LU_IB0 = 0;
    LU_IND0 = 0;
 l99999:   ;
-   a_RED0[0] = 0;
-   a_RED0[1] = 0;
-   a_RED0[2] = 0;
-   a_RED0[3] = 0;
-   for(99998 LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
-      SIMD_LOAD_V4HI(v4hi_vec0, &c[LU_IND0]);
-      SIMD_LOAD_V4HI(v4hi_vec1, &b[LU_IND0]);
-      SIMD_MULW(v4hi_vec2, v4hi_vec1, v4hi_vec0);
-      SIMD_SAVE_GENERIC_V4HI(v4hi_vec2, &I_03, &I_02, &I_01, &I_00);
-      SIMD_LOAD_GENERIC_V4HI(v4hi_vec4, a_RED0[0], a_RED0[1], a_RED0[2], a_RED0[3]);
-      SIMD_ADDW(v4hi_vec5, v4hi_vec4, v4hi_vec2);
-      SIMD_SAVE_GENERIC_V4HI(v4hi_vec5, &a_RED0[0], &a_RED0[1], &a_RED0[2], &a_RED0[3]);
-l99998:      ;
-   }
-   a = a_RED0[3]+a_RED0[2]+a_RED0[1]+a_RED0[0]+a;
-   i = 1000000;
-   return a;
-}
-short dotprod(short b[1000000], short c[1000000])
-{
-   short v4hi_vec11[3+1];
-   short v4hi_vec10[3+1];
-   short v4hi_vec9[3+1];
-   short v4hi_vec8[3+1];
-   short v4hi_vec7[3+1];
-   short v4hi_vec6[3+1];
-   short v4hi_vec5[3+1];
-   short v4hi_vec4[3+1];
-   short v4hi_vec3[3+1];
-   short v4hi_vec2[3+1];
-   short v4hi_vec1[3+1];
-   short v4hi_vec0[3+1];
-   short I_03;
-   short I_02;
-   short I_01;
-   short I_00;
-   short a_RED0[3+1];
-   int LU_IND0;
-   int LU_IB0;
-   int LU_NUB0;
-   short I_0;
-   int i;
-   short a = 0;
-   LU_NUB0 = 1000000;
-   LU_IB0 = 0;
-   LU_IND0 = 0;
-l99999:   ;
-   a_RED0[0] = 0;
-   a_RED0[1] = 0;
-   a_RED0[2] = 0;
-   a_RED0[3] = 0;
-   SIMD_LOAD_GENERIC_V4HI(v4hi_vec4, a_RED0[0], a_RED0[1], a_RED0[2], a_RED0[3]);
-   for(99998 LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
+   RED0[0] = 0;
+   RED0[1] = 0;
+   RED0[2] = 0;
+   RED0[3] = 0;
+   SIMD_LOAD_V4HI(v4hi_vec4, &RED0[0]);
+   for(LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
       SIMD_LOAD_V4HI(v4hi_vec0, &c[LU_IND0]);
       SIMD_LOAD_V4HI(v4hi_vec1, &b[LU_IND0]);
       SIMD_MULW(v4hi_vec2, v4hi_vec1, v4hi_vec0);
@@ -417,47 +370,8 @@ l99999:   ;
 l99998:      ;
    }
    SIMD_SAVE_GENERIC_V4HI(v4hi_vec2, &I_03, &I_02, &I_01, &I_00);
-   SIMD_SAVE_GENERIC_V4HI(v4hi_vec5, &a_RED0[0], &a_RED0[1], &a_RED0[2], &a_RED0[3]);
-   a = a_RED0[3]+a_RED0[2]+a_RED0[1]+a_RED0[0]+a;
-   i = 1000000;
-   return a;
-}
-short dotprod(short b[1000000], short c[1000000])
-{
-   short v4hi_vec5[3+1];
-   short v4hi_vec4[3+1];
-   short v4hi_vec2[3+1];
-   short v4hi_vec1[3+1];
-   short v4hi_vec0[3+1];
-   short I_03;
-   short I_02;
-   short I_01;
-   short I_00;
-   short a_RED0[3+1];
-   int LU_IND0;
-   int LU_IB0;
-   int LU_NUB0;
-   int i;
-   short a = 0;
-   LU_NUB0 = 1000000;
-   LU_IB0 = 0;
-   LU_IND0 = 0;
-l99999:   ;
-   a_RED0[0] = 0;
-   a_RED0[1] = 0;
-   a_RED0[2] = 0;
-   a_RED0[3] = 0;
-   SIMD_LOAD_GENERIC_V4HI(v4hi_vec4, a_RED0[0], a_RED0[1], a_RED0[2], a_RED0[3]);
-   for(99998 LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
-      SIMD_LOAD_V4HI(v4hi_vec0, &c[LU_IND0]);
-      SIMD_LOAD_V4HI(v4hi_vec1, &b[LU_IND0]);
-      SIMD_MULW(v4hi_vec2, v4hi_vec1, v4hi_vec0);
-      SIMD_ADDW(v4hi_vec5, v4hi_vec4, v4hi_vec2);
-l99998:      ;
-   }
-   SIMD_SAVE_GENERIC_V4HI(v4hi_vec2, &I_03, &I_02, &I_01, &I_00);
-   SIMD_SAVE_GENERIC_V4HI(v4hi_vec5, &a_RED0[0], &a_RED0[1], &a_RED0[2], &a_RED0[3]);
-   a = a_RED0[3]+a_RED0[2]+a_RED0[1]+a_RED0[0]+a;
+   SIMD_SAVE_V4HI(v4hi_vec5, &RED0[0]);
+   a = RED0[3]+RED0[2]+RED0[1]+RED0[0]+a;
    i = 1000000;
    return a;
 }
@@ -475,7 +389,7 @@ short dotprod(short b[1000000], short c[1000000])
    short I_02;
    short I_01;
    short I_00;
-   short a_RED0[3+1];
+   short RED0[3+1];
    int LU_IND0;
    int LU_IB0;
    int LU_NUB0;
@@ -485,12 +399,12 @@ short dotprod(short b[1000000], short c[1000000])
    LU_IB0 = 0;
    LU_IND0 = 0;
 l99999:   ;
-   a_RED0[0] = 0;
-   a_RED0[1] = 0;
-   a_RED0[2] = 0;
-   a_RED0[3] = 0;
-   SIMD_LOAD_GENERIC_V4HI(v4hi_vec4, a_RED0[0], a_RED0[1], a_RED0[2], a_RED0[3]);
-   for(99998 LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
+   RED0[0] = 0;
+   RED0[1] = 0;
+   RED0[2] = 0;
+   RED0[3] = 0;
+   SIMD_LOAD_V4HI(v4hi_vec4, &RED0[0]);
+   for(LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
       SIMD_LOAD_V4HI(v4hi_vec0, &c[LU_IND0]);
       SIMD_LOAD_V4HI(v4hi_vec1, &b[LU_IND0]);
       SIMD_MULW(v4hi_vec2, v4hi_vec1, v4hi_vec0);
@@ -498,8 +412,8 @@ l99999:   ;
 l99998:      ;
    }
    SIMD_SAVE_GENERIC_V4HI(v4hi_vec2, &I_03, &I_02, &I_01, &I_00);
-   SIMD_SAVE_GENERIC_V4HI(v4hi_vec5, &a_RED0[0], &a_RED0[1], &a_RED0[2], &a_RED0[3]);
-   a = a_RED0[3]+a_RED0[2]+a_RED0[1]+a_RED0[0]+a;
+   SIMD_SAVE_V4HI(v4hi_vec5, &RED0[0]);
+   a = RED0[3]+RED0[2]+RED0[1]+RED0[0]+a;
    i = 1000000;
    return a;
 }

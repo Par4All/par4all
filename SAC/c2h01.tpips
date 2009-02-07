@@ -8,7 +8,6 @@ activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
-setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 
 echo
 echo Initial code
@@ -16,13 +15,24 @@ echo
 
 display PRINTED_FILE[average]
 
+setproperty CLONE_NAME "average_packed"
+apply CLONE_ONLY[average]
+
+activate C_PARSER
+display PRINTED_FILE[average_packed]
+module average_packed
+
+
+
 source ${VDIR:-.}/include/c2h.tpips.h
 
 echo
 echo simdized code
 echo
 
-display PRINTED_FILE[average]
+display PRINTED_FILE
+apply SIMD_MEMORY_PACKING
+display PRINTED_FILE
 
 close
 quit
