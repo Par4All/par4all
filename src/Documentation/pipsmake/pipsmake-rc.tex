@@ -3091,8 +3091,9 @@ simd_loop_const_elim                    > MODULE.code
 \end{verbatim}
 
 %%@UserManualDocumentation: simd_memory_packing
-This phase uses the simdization algorithm from simdizer to detect memory access
-that could be packed together.
+This phase si to be called after simdizarion of affectation operator.
+It performs type substitution from char/short array to in array
+using the packing from the simdization phase
 For example, four consecutive load from a char array could be a single load from an int array.
 This prove to be useful for \textit{c to vhdl} compilers such as \texttt{c2h}.
 %%!UserManualDocumentation
@@ -3101,10 +3102,8 @@ This prove to be useful for \textit{c to vhdl} compilers such as \texttt{c2h}.
 alias simd_memory_packing 'Generate Optimized Load Store'
 
 simd_memory_packing  > MODULE.code
-                     > MODULE.callees
         < PROGRAM.entities
         < MODULE.code
-        < MODULE.dg
 \end{verbatim}
 
 
@@ -5087,6 +5086,7 @@ feature is low.
 
 \subsection{Cloning}
 
+
 %%@UserManualDocumentation: clone
 Procedures can be cloned to obtain several specialized versions. The
 call sites must be updated to refer to the desired version.
@@ -5144,6 +5144,20 @@ clone_on_argument       > CALLERS.code
         < CALLERS.code
 \end{verbatim}
 
+%%@UserManualDocumentation: clone_only
+Not use assisted version of cloning
+it just perform the cloning without any substitution
+Use the \lstinline|CLONE_NAME| property if you want a particular clone name.
+It's up to another phase to perform the substitution.
+%%!UserManualDocumentation
+\begin{verbatim}
+
+alias clone_only 'Simple Clone'
+
+clone_only
+        < MODULE.code
+        < MODULE.user_file
+\end{verbatim}
 \subsection{Transformation Test}
 \label{subsection-transformation_test}
 

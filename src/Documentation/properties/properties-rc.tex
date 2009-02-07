@@ -1862,6 +1862,12 @@ Cloning on an argument. If 0, a user request is performed.
 TRANSFORMATION_CLONE_ON_ARGUMENT 0
 \end{verbatim}
 
+Clone name can be given using the \lstinline|CLONE_NAME| properties
+Otherwise, a new one is generated
+\begin{verbatim}
+CLONE_NAME ""
+\end{verbatim}
+
 \subsection{Expression Optimizer}
 \index{Optimization}
 \index{EOLE}
@@ -2090,15 +2096,6 @@ if \verb|SIMD_OVERRIDE_CONSTANT_TYPE_INFERANCE| is set to \texttt{TRUE}, the res
 
 \begin{verbatim}
 SIMD_OVERRIDE_CONSTANT_TYPE_INFERANCE FALSE
-\end{verbatim}
-
-\subsubsection{Generate load store statement}
-
-Duting the simdization process, one may want to generate automagically the appropriate load / store instructions.
-This is generally the case when you simdize classical instruction ( add, divide \dots) but you may want to disable this if you simdize unusal instruction (what if you simdize the load and store ? hu ?)
-
-\begin{verbatim}
-SIMD_GENERATE_LOAD_STORE TRUE
 \end{verbatim}
 
 \subsubsection{Extravagant SIMD atomizer}
