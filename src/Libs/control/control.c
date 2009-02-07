@@ -959,18 +959,52 @@ static bool incrementation_expression_to_increment(expression incr,
   if(syntax_call_p(incr_s)) {
     call incr_c = syntax_call(incr_s);
     entity op = call_function(incr_c);
+    if( ! ENDP(call_arguments(incr_c)) )
+    {
+        expression e = EXPRESSION(CAR(call_arguments(incr_c)));
 
-    if((ENTITY_POST_INCREMENT_P(op) || ENTITY_PRE_INCREMENT_P(op))
-       && is_expression_reference_to_entity_p(EXPRESSION(CAR(call_arguments(incr_c))), li)) {
-      * is_increasing_p = TRUE;
-      * pincrement = int_to_expression(1);
-      success = TRUE;
-    }
-    else if((ENTITY_POST_DECREMENT_P(op) || ENTITY_PRE_DECREMENT_P(op))
-       && is_expression_reference_to_entity_p(EXPRESSION(CAR(call_arguments(incr_c))), li)) {
-      * is_decreasing_p = TRUE;
-      * pincrement = int_to_expression(-1);
-      success = TRUE;
+        if((ENTITY_POST_INCREMENT_P(op) || ENTITY_PRE_INCREMENT_P(op))
+                && is_expression_reference_to_entity_p(e,li)) {
+            * is_increasing_p = TRUE;
+            * pincrement = int_to_expression(1);
+            success = TRUE;
+        }
+        else if((ENTITY_POST_DECREMENT_P(op) || ENTITY_PRE_DECREMENT_P(op))
+                && is_expression_reference_to_entity_p(e, li)) {
+            * is_decreasing_p = TRUE;
+            * pincrement = int_to_expression(-1);
+            success = TRUE;
+        }
+        else if( ! ENDP(CDR(call_arguments(incr_c))) )
+        {
+            e =  EXPRESSION(CAR(CDR(call_arguments(incr_c))));
+            if(ENTITY_PLUS_UPDATE_P(op)
+                    && extended_integer_constant_expression_p(e)) {
+                int v = expression_to_int(e);
+                if( v != 0)
+                {
+                    * pincrement = e;
+                    success = TRUE;
+                    if( v > 0 )
+                        * is_increasing_p = TRUE;
+                    else
+                        * is_decreasing_p = TRUE;
+                }
+            }
+            else if(ENTITY_MINUS_UPDATE_P(op)
+                    && extended_integer_constant_expression_p(e)) {
+                int v = expression_to_int(e);
+                if( v != 0)
+                {
+                    * pincrement = int_to_expression(-v);
+                    success = TRUE;
+                    if( v < 0 )
+                        * is_increasing_p = TRUE;
+                    else
+                        * is_decreasing_p = TRUE;
+                }
+            }
+        }
     }
   }
 
