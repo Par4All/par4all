@@ -124,8 +124,8 @@ build_statement_for_clone(
  * which looks like a not yet parsed routine.
  * it puts the initial_file for the routine, and updates its user_file.
  */
-static entity
-build_a_clone_for(
+static
+entity build_a_clone_for(
     entity cloned,
     int argn,
     int val)
@@ -144,15 +144,15 @@ build_a_clone_for(
     
     /* builds some kind of module / statement for the clone.
      */
-    new_name = build_new_top_level_entity_name(name);
-    new_fun = make_empty_function(new_name, copy_type(entity_type(cloned)));
+    new_name = get_string_property("CLONE_NAME");
+    new_name = empty_string_p(new_name) ?
+            build_new_top_level_entity_name(name) :
+            strdup(new_name);
 
-    saved_t = entity_type(new_fun), 
-	entity_type(new_fun) = entity_type(cloned);
-    saved_s = entity_storage(new_fun),
-	entity_storage(new_fun) = entity_storage(cloned);
-    saved_v = entity_initial(new_fun),
-	entity_initial(new_fun) = entity_initial(cloned);
+    new_fun = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,new_name);
+    entity_type(new_fun) = copy_type(entity_type(cloned));
+    entity_storage(new_fun) = copy_storage(entity_storage(cloned));
+    entity_initial(new_fun) = entity_initial(cloned); /* no copy, reseted later*/
 
     saved_b1 = get_bool_property(ALL_DECLS);
     saved_b2 = get_bool_property(STAT_ORDER);
@@ -162,37 +162,32 @@ build_a_clone_for(
     stat = build_statement_for_clone(cloned, argn, val);
     t = text_named_module(new_fun, cloned, stat);
 
-    entity_type(new_fun) = saved_t;
-    entity_storage(new_fun) = saved_s;
-    entity_initial(new_fun) = saved_v;
 
     set_bool_property(ALL_DECLS, saved_b1);
     set_bool_property(STAT_ORDER, saved_b2);
 
     /* add some comments before the code.
      */
+    char *comment_prefix = fortran_module_p(cloned) ? "!!" : "//"; 
     comments = strdup(concatenate(
-      "!!\n"
-      "!! PIPS: please caution!\n"
-      "!!\n"
-      "!! this routine has been generated as a clone of ", name, "\n"
-      "!! the code may change significantly with respect to the original\n"
-      "!! version, especially after program transformations such as dead\n"
-      "!! code elimination and partial evaluation, hence the function may\n"
-      "!! not have the initial behavior, if called under some other context.\n"
-      "!!\n", NULL));
+      comment_prefix,"\n",
+      comment_prefix," PIPS: please caution!\n",
+      comment_prefix,"\n",
+      comment_prefix," this routine has been generated as a clone of ", name, "\n",
+      comment_prefix," the code may change significantly with respect to the original\n",
+      comment_prefix," version, especially after program transformations such as dead\n",
+      comment_prefix," code elimination and partial evaluation, hence the function may\n",
+      comment_prefix," not have the initial behavior, if called under some other context.\n",
+      comment_prefix,"\n", NULL));
     text_sentences(t) = 
-	CONS(SENTENCE, make_sentence(is_sentence_formatted, comments),
-	     text_sentences(t));
+	CONS(SENTENCE, make_sentence(is_sentence_formatted, comments), text_sentences(t));
+    add_new_module_from_text(new_name,t,fortran_module_p(cloned));
 
-    make_text_resource_and_free(new_name, DBR_INITIAL_FILE, ".f_initial", t);
+    /* should fix the declarations ...*/
+    entity_initial(new_fun)=make_value(is_value_code,
+            make_code(NIL, strdup(""), make_sequence(NIL),NIL));
+
     free_statement(stat);
-
-    /* give the clonee a user file.
-     */
-    DB_PUT_MEMORY_RESOURCE(DBR_USER_FILE, new_name, 
-	strdup(db_get_memory_resource(DBR_USER_FILE, name, TRUE)));
-
     free(new_name);
     return new_fun;
 }
@@ -724,4 +719,34 @@ bool
 clone_substitute(string name)
 {
     return clone_or_clone_substitute(name, TRUE);
+}
+
+/* use get_current_entity()
+ * and get_current_statement()
+ * to build a new copy entity
+ */
+entity
+clone_current_entity()
+{
+    return build_a_clone_for(get_current_module_entity(), 0,0);
+}
+
+/* similar to previous clone and clone_substitute
+ * but does not try to make any substitution
+ */
+bool
+clone_only(string mod_name)
+{
+    /* get the resources */
+    statement mod_stmt = (statement)db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+    set_current_module_statement(mod_stmt);
+    set_current_module_entity(module_name_to_entity(mod_name));
+
+    entity cloned_entity = clone_current_entity();
+
+    /* update/release resources */
+    reset_current_module_statement();
+    reset_current_module_entity();
+
+    return !entity_undefined_p(cloned_entity);
 }
