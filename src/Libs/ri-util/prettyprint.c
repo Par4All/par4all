@@ -2279,7 +2279,7 @@ text_loop_default(
     else
       pc = CHAIN_SWORD(NIL, (doall_loop_p) ? "forall(" : "for(" );
     
-    if(!structured_do && !doall_loop_p && !do_enddo_p) {
+    if(is_fortran && !structured_do && !doall_loop_p && !do_enddo_p) {
 	pc = CHAIN_SWORD(pc, concatenate(do_label, " ", NULL));
     }
     //pc = CHAIN_SWORD(pc, entity_local_name(loop_index(obj)));
