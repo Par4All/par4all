@@ -615,5 +615,3 @@ bool simdizer(char * mod_name)
 
     return TRUE;
 }
-bool simd_memory_packing(char *m)
-{ return true; }
