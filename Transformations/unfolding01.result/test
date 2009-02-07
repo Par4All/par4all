@@ -13,13 +13,11 @@ void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Dat
    fgINT32 result;
    int spp = datdest->spp;
    int length = datdest->length*spp;
-   j = 0;
-   while (j<=length-1) {
+   for(j = 0; j <= length-1; j += 1) {
       v1 = flgr1d_get_data_array_fgINT32(psrc1, j);
       v2 = flgr1d_get_data_array_fgINT32(psrc2, j);
       result = flgr_defop_add_fgINT32(v1, v2);
       flgr1d_set_data_array_fgINT32(pdest, j, result);
-      j += 1;
    }
    return;
 }
@@ -42,8 +40,7 @@ void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Dat
    fgINT32 result;
    int spp = datdest->spp;
    int length = datdest->length*spp;
-   j = 0;
-   while (j<=length-1) {
+   for(j = 0; j <= length-1; j += 1) {
       I_3 = psrc1[j];
       I_1 = I_3;
       v1 = I_1;
@@ -53,7 +50,6 @@ void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Dat
       I_0 = v1+v2;
       result = I_0;
       pdest[j] = result;
-      j += 1;
    }
    return;
 }
