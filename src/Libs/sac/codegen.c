@@ -32,12 +32,29 @@ typedef dg_vertex_label vertex_label;
 #include "c_syntax.h"
 
 #define MAX_PACK 16
+#define VECTOR_POSTFIX "_vec"
 
 static argumentInfo* arguments = NULL;
 static int nbArguments = 0;
 static int nbAllocatedArguments = 0;
 
 static float gSimdCost;
+
+/* expression is an simd vector
+ * if it is a reference array
+ * containing VECTOR_POSTFIX in its name
+ */
+static
+bool simd_vector_p(expression e)
+{
+    syntax s = expression_syntax(e);
+    return 
+           syntax_reference_p(s)
+        && strstr(entity_local_name(reference_variable(syntax_reference(s))),VECTOR_POSTFIX)
+        && type_variable_p(entity_type(reference_variable(syntax_reference(s))))
+        && ! ENDP( variable_dimensions(type_variable(entity_type(reference_variable(syntax_reference(s))))))
+    ;
+}
 
 entity vectorElement_vector(vectorElement ve)
 {
@@ -131,17 +148,12 @@ static opcode get_optimal_opcode(opcodeClass kind, int argc, list* args)
 {
     int i;
     opcode best;
-    list l;
-
     /* Based on the available implementations of the operation, decide
      * how many statements to pack together
      */
     best = opcode_undefined;
-    for( l = opcodeClass_opcodes(kind);
-            l != NIL;
-            l = CDR(l) )
+    FOREACH(OPCODE,oc,opcodeClass_opcodes(kind))
     {
-        opcode oc = OPCODE(CAR(l));
         bool bTagDiff = FALSE;
 
         for(i = 0; i < argc; i++)
@@ -149,11 +161,8 @@ static opcode get_optimal_opcode(opcodeClass kind, int argc, list* args)
             int count = 0;
             int width = 0;
 
-            //MAP(EXPRESSION, arg,
-            list L;
-            for(L=args[i];L!=NIL;POP(L))
+            FOREACH(EXPRESSION,arg,args[i])
             {
-                expression arg = EXPRESSION(CAR(L));
                 int bTag;
                 basic bas;
 
@@ -189,7 +198,7 @@ static opcode get_optimal_opcode(opcodeClass kind, int argc, list* args)
 
                 count++;
 
-            }/*, args[i])*/;
+            }
         }
 
         if ( (!bTagDiff) &&
@@ -236,7 +245,7 @@ bool analyse_reference(reference r, referenceInfo i)
     referenceInfo_lOffset(i) = NIL;
 
     // For each indices of r
-    MAP(EXPRESSION, exp,
+    FOREACH(EXPRESSION, exp,reference_indices(r))
     {
         s = expression_syntax(exp);
         switch(syntax_tag(s))
@@ -257,8 +266,8 @@ bool analyse_reference(reference r, referenceInfo i)
                             referenceInfo_lOffset(i) = CONS(INT, constant_int(cn), referenceInfo_lOffset(i));
                         else
                             return FALSE;
-
-                        referenceInfo_lExp(i) = CONS(EXPRESSION, copy_expression(exp)/*ression_undefined*/, referenceInfo_lExp(i));
+                        /* use gen_cons instead of CONS here to bypass type check */
+                        referenceInfo_lExp(i) = gen_cons(expression_undefined, referenceInfo_lExp(i));
                     }
                     // r is for exemple A(EXP + 3)(it is supported)
                     // or A(EXP1 + EXP2)(it's not supported)
@@ -372,7 +381,7 @@ bool analyse_reference(reference r, referenceInfo i)
             default:
                 return FALSE;
         }
-    }, reference_indices(r));
+    }
 
     return TRUE;
 }
@@ -451,13 +460,12 @@ static bool consecutive_refs_p(referenceInfo firstRef, int lastOffset, reference
     list lOff2 = referenceInfo_lOffset(cRef);
     list lInd2 = referenceInfo_lExp(cRef);
 
-    int off1;
-    int off2;
-    expression ind2;
 
     // Let's look at each index of the references
-    MAP(EXPRESSION, ind1,
+    FOREACH(EXPRESSION, ind1,referenceInfo_lExp(firstRef))
     {
+        int off1,off2;
+        expression ind2;
         counter++;
 
         // If TRUE, it means that ind1 corresponds to
@@ -466,9 +474,9 @@ static bool consecutive_refs_p(referenceInfo firstRef, int lastOffset, reference
         // check ind1 right now.
         if(counter == get_consec_ind_number(firstRef))
         {
-            lOff1 = CDR(lOff1);
-            lOff2 = CDR(lOff2);
-            lInd2 = CDR(lInd2);
+            POP(lOff1);
+            POP(lOff2);
+            POP(lInd2);
             continue;
         }
 
@@ -477,14 +485,15 @@ static bool consecutive_refs_p(referenceInfo firstRef, int lastOffset, reference
         off2 = INT(CAR(lOff2));
 
         // If TRUE, it means that the two indices are different, so return FALSE.
-        if(((ind1 == expression_undefined) && (ind2 != expression_undefined)) ||
-                ((ind1 != expression_undefined) && (ind2 == expression_undefined)))
+        if(( expression_undefined_p(ind1) && !expression_undefined_p(ind2)) ||
+           (!expression_undefined_p(ind1) &&  expression_undefined_p(ind2)) 
+          )
         {
             bIndEq = FALSE;
         }
         // If TRUE, it means that the two indices can be identical, 
         // let's check the offsets.
-        else if((ind1 == expression_undefined) && (ind2 == expression_undefined))
+        else if(expression_undefined_p(ind1) && expression_undefined_p(ind2))
         {
             // If TRUE, it means that the two indices are different, so return FALSE.
             if(off1 != off2)
@@ -493,49 +502,43 @@ static bool consecutive_refs_p(referenceInfo firstRef, int lastOffset, reference
         else
         {
             // If TRUE, it means that the two indices are identical
-            if(!(same_expression_p(ind1, ind2) &&
-                        (off1 == off2)))
+            if(!(same_expression_p(ind1, ind2) && (off1 == off2)))
                 bIndEq = FALSE;
         }
 
-        lOff1 = CDR(lOff1);
-        lOff2 = CDR(lOff2);
-        lInd2 = CDR(lInd2);
+        POP(lOff1);
+        POP(lOff2);
+        POP(lInd2);
 
-    }, referenceInfo_lExp(firstRef));
+    }
 
     // This if-elseif-else statement checks if get_consec_exp(firstRef)
     // and get_consec_exp(cRef) are identical
-    if((get_consec_exp(firstRef) == expression_undefined) &&
-            (get_consec_exp(cRef) == expression_undefined))
+    if(expression_undefined_p(get_consec_exp(firstRef)) &&
+       expression_undefined_p(get_consec_exp(cRef)))
     {
         bConsIndEq = TRUE;
     }
-    else if((get_consec_exp(firstRef) == expression_undefined) ||
-            (get_consec_exp(cRef) == expression_undefined))
+    else if(expression_undefined_p(get_consec_exp(firstRef)) ||
+            expression_undefined_p(get_consec_exp(cRef)) )
     {
         bConsIndEq = FALSE;
     }
     else
     {
-        bConsIndEq = same_expression_p(get_consec_exp(firstRef),
-                get_consec_exp(cRef));
+        bConsIndEq = same_expression_p(get_consec_exp(firstRef), get_consec_exp(cRef));
     }
 
-    return ( same_entity_p(reference_variable(referenceInfo_reference(firstRef)), 
-                reference_variable(referenceInfo_reference(cRef))) &&
-            (referenceInfo_nbDimensions(firstRef) == referenceInfo_nbDimensions(cRef)) &&
-            bConsIndEq &&
-            (lastOffset + 1 == get_consec_offset(cRef)) && bIndEq);
+    return     bConsIndEq
+            && same_entity_p(reference_variable(referenceInfo_reference(firstRef)),reference_variable(referenceInfo_reference(cRef)))
+            && (referenceInfo_nbDimensions(firstRef) == referenceInfo_nbDimensions(cRef))
+            && (lastOffset + 1 == get_consec_offset(cRef))
+            && bIndEq;
 }
 
 referenceInfo make_empty_referenceInfo()
 {
-    return make_referenceInfo(reference_undefined,
-            0,
-            NIL,
-            NIL,
-            NIL);
+    return make_referenceInfo(reference_undefined, 0, NIL, NIL, NIL);
 }
 
 void free_empty_referenceInfo(referenceInfo ri)
@@ -558,7 +561,7 @@ static string get_simd_vector_type(list lExp)
 {
     string result = NULL;
 
-    MAP(EXPRESSION, exp,
+    FOREACH(EXPRESSION, exp,lExp)
     {
         type t = entity_type(reference_variable(
                     syntax_reference(expression_syntax(
@@ -578,7 +581,7 @@ static string get_simd_vector_type(list lExp)
             break;
 
         }
-    }, lExp);
+    }
 
     return result;
 }
@@ -641,8 +644,7 @@ static string get_vect_name_from_data(int argc, expression exp)
 static
 void replace_subscript(expression e)
 {
-    syntax s = expression_syntax(e);
-    if( syntax_reference_p( s ) && ! strstr(entity_local_name(reference_variable(syntax_reference(s))),"_vec") )
+    if( !simd_vector_p(e) )
     {
         expression e_copy = copy_expression(e);
         if( ! syntax_undefined_p( expression_syntax(e) ) ) free_syntax(expression_syntax(e));
@@ -664,7 +666,7 @@ statement make_exec_statement_from_name(string ename, list args)
         }
         else
         {
-            MAP(EXPRESSION,e,replace_subscript(e),args);
+            FOREACH(EXPRESSION,e,args) replace_subscript(e);
         }
     }
     return call_to_statement(make_call(get_function_entity(ename), args));
@@ -688,8 +690,6 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad)
     referenceInfo firstRef = make_empty_referenceInfo();
     referenceInfo cRef = make_empty_referenceInfo();
     int lastOffset = 0;
-    cons * argPtr;
-    expression e;
     char functionName[30];
 
     string lsType = local_name(get_simd_vector_type(args));
@@ -705,14 +705,14 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad)
 
     /* classify according to the second element
      * (first one should be the SIMD vector) */
-    e = EXPRESSION(CAR(CDR(args)));
-    if (expression_constant_p(e))
+    expression exp = EXPRESSION(CAR(CDR(args)));
+    if (expression_constant_p(exp))
     {
         argsType = CONSTANT;
     }
     // If e is a reference expression, let's analyse this reference
-    else if ( (expression_reference_p(e)) &&
-            (analyse_reference(expression_reference(e), firstRef)) )
+    else if ( (expression_reference_p(exp)) &&
+            (analyse_reference(expression_reference(exp), firstRef)) )
     {
         lastOffset = get_consec_offset(firstRef);
         argsType = CONSEC_REFS;
@@ -722,10 +722,8 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad)
 
     /* now verify the estimation on the first element is correct, and update
      * parameters needed later */
-    for( argPtr = CDR(CDR(args)); argPtr != NIL; argPtr = CDR(argPtr) )
+    FOREACH( EXPRESSION, e, CDR(CDR(args)) )
     {
-        e = EXPRESSION(CAR(argPtr));
-
         if (argsType == OTHER)
             break;
         else if (argsType == CONSTANT)
@@ -834,7 +832,9 @@ static entity make_new_simd_vector(int itemSize, int nbItems, int basicTag)
     basic simdVector;
 
     entity new_ent, mod_ent;
-    char prefix[5]={ 'v', '0', '\0', '\0', '\0' }, *num;
+    char prefix[5]={ 'v', '0', '\0', '\0', '\0' },
+         num[1 + sizeof(VECTOR_POSTFIX) + 3 ],
+         name[sizeof(prefix)+sizeof(num)+1];
     static int number = 0;
     entity dynamic_area;
 
@@ -869,30 +869,29 @@ static entity make_new_simd_vector(int itemSize, int nbItems, int basicTag)
             break;
     }
 
-     num = (char*) malloc(32);
-     sprintf(num, "_vec%i", number++);
-     string name = strdup(concatenate(prefix,num,(char*)NULL));
-     list lis=CONS(DIMENSION, make_dimension(int_to_expression(0),int_to_expression(1+itemSize/8)), NIL);  
-     new_ent = make_new_array_variable_with_prefix(name, mod_ent , simdVector, lis);
- 
+    pips_assert("buffer doesnot overflow",number<1000);
+    sprintf(name, "%s%s%u",prefix,VECTOR_POSTFIX,number++);
+    list lis=CONS(DIMENSION, make_dimension(int_to_expression(0),int_to_expression(nbItems-1)), NIL);  
+    new_ent = make_new_array_variable_with_prefix(name, mod_ent , simdVector, lis);
+
 #if 0
-     string type_name = strdup(concatenate(prefix,"_struct", (char *) NULL));
-     entity str_type = FindOrCreateEntity(entity_local_name(mod_ent), type_name);
-     entity_type(str_type) =make_type_variable(make_variable(simdVector,NIL,NIL)); 
- 
-     entity str_dec = FindOrCreateEntity(entity_local_name(mod_ent), name);
-     entity_type(str_dec) = entity_type(str_type);
+    string type_name = strdup(concatenate(prefix,"_struct", (char *) NULL));
+    entity str_type = FindOrCreateEntity(entity_local_name(mod_ent), type_name);
+    entity_type(str_type) =make_type_variable(make_variable(simdVector,NIL,NIL)); 
+
+    entity str_dec = FindOrCreateEntity(entity_local_name(mod_ent), name);
+    entity_type(str_dec) = entity_type(str_type);
 #endif
 
-     dynamic_area = global_name_to_entity(module_local_name(mod_ent),DYNAMIC_AREA_LOCAL_NAME);
-     entity_storage(new_ent) = make_storage(is_storage_ram,
-             make_ram(mod_ent,
-                 dynamic_area,
-                 add_any_variable_to_area(dynamic_area, new_ent, c_module_p(mod_ent) ),
-                 NIL));
- 
-     AddLocalEntityToDeclarations(new_ent,mod_ent,
-             c_module_p(mod_ent)?get_current_module_statement():statement_undefined);
+    dynamic_area = global_name_to_entity(module_local_name(mod_ent),DYNAMIC_AREA_LOCAL_NAME);
+    entity_storage(new_ent) = make_storage(is_storage_ram,
+            make_ram(mod_ent,
+                dynamic_area,
+                add_any_variable_to_area(dynamic_area, new_ent, c_module_p(mod_ent) ),
+                NIL));
+
+    AddLocalEntityToDeclarations(new_ent,mod_ent,
+            c_module_p(mod_ent)?get_current_module_statement():statement_undefined);
 
     return new_ent;
 }
@@ -1176,18 +1175,12 @@ static statement generate_exec_statement(simdStatementInfo si)
 
 static list merge_available_places(list l1, list l2, int element)
 {
-    list i;
-    list j;
-
     list res = NIL;
 
-    for(i = l1; i != NIL; i = CDR(i))
+    FOREACH(VECTORELEMENT,ei,l1)
     {
-        for(j = l2; j != NIL; j = CDR(j))
+        FOREACH(VECTORELEMENT,ej,l2)
         {
-            vectorElement ei = VECTORELEMENT(CAR(i));
-            vectorElement ej = VECTORELEMENT(CAR(j));
-
             if (vectorElement_vector(ei) == vectorElement_vector(ej))
             {
                 if (element < 0)
@@ -1231,7 +1224,7 @@ static statement generate_load_statement(simdStatementInfo si, int line)
     list sourcesShuffle = NIL;
 
     //try to see if the arguments have not already been loaded
-    MAP(VECTORELEMENT, ve,
+    FOREACH(VECTORELEMENT, ve,statementArgument_dependances(simdStatementInfo_arguments(si)[offset]))
     {
         if (vectorElement_element(ve) == 0)
             sourcesCopy = CONS(VECTORELEMENT, ve, sourcesCopy);
@@ -1243,8 +1236,7 @@ static statement generate_load_statement(simdStatementInfo si, int line)
         sourcesShuffle = CONS(VECTORELEMENT, e, sourcesShuffle);
         }
         */
-    },
-        statementArgument_dependances(simdStatementInfo_arguments(si)[offset]));
+    }
 
     for(i = 1; 
             (i<opcode_vectorSize(simdStatementInfo_opcode(si))) && 
@@ -1359,10 +1351,11 @@ list generate_simd_code(list/* <statementInfo> */ sil, float * simdCost)
 
     pips_debug(3,"generate_simd_code 1\n");
 
-    for(; sil != NIL; sil=CDR(sil))
+    /* this is the classical generation process:
+     * several load, an exec and a store
+     */
+    FOREACH(STATEMENTINFO,si,sil)
     {
-        statementInfo si = STATEMENTINFO(CAR(sil));
-
         if (statementInfo_nonsimd_p(si))
         {
             /* regular (non-SIMD) statement */
@@ -1374,12 +1367,13 @@ list generate_simd_code(list/* <statementInfo> */ sil, float * simdCost)
             int i;
             simdStatementInfo ssi = statementInfo_simd(si);
 
+
             //First, the load statement(s)
             for(i = 0; i < simdStatementInfo_nbArgs(ssi)-1; i++)
             {
                 statement s = generate_load_statement(ssi, i);
 
-                if (s != statement_undefined)
+                if (! statement_undefined_p(s))
                     sl = CDR(sl) = CONS(STATEMENT, s, NIL);
             }
 

@@ -34,6 +34,7 @@ typedef dg_vertex_label vertex_label;
 #include "properties.h"
 #include "atomizer.h"
 #include "preprocessor.h"
+#include "properties.h"
 
 #include "expressions.h"
 
@@ -43,118 +44,28 @@ typedef dg_vertex_label vertex_label;
 
 static statement orginal_statement = NULL;
 
-static basic simd_basic_of_expression(expression exp);
 
-/* This function computes the basic of an intrinsic
-*/
-static basic simd_basic_of_intrinsic(call c)
+static 
+void patch_constant_size(syntax s, bool* patch_all)
 {
-    entity f = call_function(c);
-    type rt = functional_result(type_functional(entity_type(f)));
-    basic rb = copy_basic(variable_basic(type_variable(rt)));
-
-    pips_debug(7, "Intrinsic call to %s with result type %s\n",
-            module_local_name(f),
-            basic_to_string(rb));
-
-    if(basic_overloaded_p(rb)) {
-        list args = call_arguments(c);
-
-        if (ENDP(args)) {
-            /* I don't know the type since there is no arguments !
-               Bug encountered with a FMT=* in a PRINT.
-               RK, 21/02/1994 : */
-            /* leave it overloaded */
-            ;
-        }
-        else {
-            free_basic(rb);
-            rb = simd_basic_of_expression(EXPRESSION(CAR(args)));
-
-            MAP(EXPRESSION, arg,
-            {
-                basic b = simd_basic_of_expression(arg);
-
-                if(basic_undefined_p(rb) || basic_undefined_p(b))
-                    break;
-
-                basic new_rb = basic_maximum(rb, b);
-
-                free_basic(rb);
-                free_basic(b);
-                rb = new_rb;
-            }, CDR(args));
-        }
-
-    }
-
-    return rb;
-}
-
-/* This function computes the basic of a call
- */
-static basic simd_basic_of_call(call c)
-{
-    entity e = call_function(c);
-    tag t = value_tag(entity_initial(e));
-    basic b = basic_undefined;
-
-    switch (t)
+    switch(syntax_tag(s))
     {
-        case is_value_code:
-            b = copy_basic(basic_of_external(c));
-            break;
-        case is_value_intrinsic: 
-            b = simd_basic_of_intrinsic(c);
-            break;
-        case is_value_symbolic: 
-            /* b = make_basic(is_basic_overloaded, UU); */
-            b = copy_basic(basic_of_constant(c));
-            break;
-        case is_value_constant:
-            b = copy_basic(basic_of_constant(c));
-            break;
-        case is_value_unknown:
-            debug(1, "simd_basic_of_call", "function %s has no initial value.\n"
-                    " Maybe it has not been parsed yet.\n",
-                    entity_name(e));
-            b = copy_basic(basic_of_external(c));
-            break;
-        default: pips_error("simd_basic_of_call", "unknown tag %d\n", t);
-                 /* Never go there... */
-    }
-    return b;
-}
-
-/* This function computes the basic of an expression
- */
-static basic simd_basic_of_expression(expression exp)
-{
-    syntax syn = expression_syntax(exp);
-    basic bas = basic_undefined;
-
-    switch(syntax_tag(syn))
-    {
-        case is_syntax_reference:
-            {
-                bas = copy_basic(get_basic_from_array_ref(syntax_reference(syn)));
-                break;
-            }
-
         case is_syntax_call:
             {
-                call ca = syntax_call(syn);
-
-                bas = simd_basic_of_call(ca);
-
-                break;
-            }
-
+                call c = syntax_call(s);
+                if(entity_constant_p(call_function(c)) )
+                {
+                    basic b = variable_basic(type_variable(functional_result(type_functional(entity_type(call_function(c))))));
+                       if( basic_int_p(b) && (basic_int(b) == DEFAULT_INTEGER_TYPE_SIZE) )
+                            basic_int(b)= 1;
+                }
+            } break;
+        case is_syntax_reference:
+            *patch_all = false;
+            break;
         default:
-            pips_error("simd_basic_of_expression", "Bad syntax tag");
-    }
-
-    return bas;
+            break;
+    };
 }
 
 /* returns the assignment statement if moved, or NULL if not.
@@ -162,13 +73,31 @@ static basic simd_basic_of_expression(expression exp)
 statement simd_atomize_this_expression(entity (*create)(entity, basic),
         expression e)
 {
-    basic bofe;
+    basic bofe = basic_undefined;
 
     /* it does not make sense to atomize a range...
     */
     if (syntax_range_p(expression_syntax(e))) return NULL;
 
-    bofe = simd_basic_of_expression(e);
+    /* SG: in case of expression similar to (a+2), if a is a short (or a char ...),
+     * the user may expect the result is a short two 
+     * the C syntax expect 2 is an int
+     * set the property to false if you want to override this behavior
+     */
+    if( get_bool_property("SIMD_OVERRIDE_CONSTANT_TYPE_INFERANCE") )
+    {
+        expression etemp = copy_expression(e);
+        bool patch_all=true;
+        /* force all integer to char, then compute the basic
+         * validate only if we can guess the size from something not a constant integer
+         */
+        gen_context_recurse(etemp,&patch_all,syntax_domain,gen_true,patch_constant_size);
+        if( !patch_all )
+            bofe=basic_of_expression(etemp);
+        free_expression(etemp);
+    }
+    if(basic_undefined_p(bofe) )
+        bofe = basic_of_expression(e);
 
     if(!basic_undefined_p(bofe)) {
         if (!basic_overloaded_p(bofe))
@@ -201,7 +130,7 @@ statement simd_atomize_this_expression(entity (*create)(entity, basic),
  */
 static void get_type_max_width(call ca, int* maxWidth)
 {
-    MAP(EXPRESSION, arg,
+    FOREACH(EXPRESSION, arg,call_arguments(ca))
     {
         syntax s = expression_syntax(arg);
 
@@ -229,7 +158,7 @@ static void get_type_max_width(call ca, int* maxWidth)
             default:pips_internal_error("synatx_tag %u not supported yet",syntax_tag(s));
 
         }
-    },call_arguments(ca));
+    }
 
 }
 
@@ -324,7 +253,7 @@ static void simd_atomize_call(call c, statement cs)
 {
 
     // Each call argument is atomize if needed
-    MAP(EXPRESSION, ce,
+    FOREACH(EXPRESSION, ce,call_arguments(c))
     {
         syntax s = expression_syntax(ce);
 
@@ -350,7 +279,21 @@ static void simd_atomize_call(call c, statement cs)
                 simd_insert_statement(cs, stat);
             }
         }
-    }, call_arguments(c));
+        /* SG: we may want to atomize array indexing
+         * that is a = b[i] + c -> d = b[i]; a = d+ c
+         * this is usefull for grouping array load / store in
+         * some particular case
+         */
+        else if( get_bool_property("SIMD_EXTRAVAGANT_ATOMIZER") && syntax_reference_p(s))
+        {
+            reference r = syntax_reference(s);
+            if( reference_variable(r) && !ENDP(reference_indices(r)) )
+            {
+                statement stat = simd_atomize_this_expression(sac_make_new_variable, ce);
+                simd_insert_statement(cs, stat);
+            }
+        }
+    }
 }
 
 /* This function is called for each call statement and atomize it
@@ -364,7 +307,7 @@ static void atomize_call_statement(statement cs)
 
     // For each call argument, the argument is atomized
     // if needed
-    MAP(EXPRESSION, ce,
+    FOREACH(EXPRESSION, ce,call_arguments(c))
     {
         syntax s = expression_syntax(ce);
 
@@ -376,25 +319,17 @@ static void atomize_call_statement(statement cs)
             // Atomize expression only if the call is not a constant
             if(FUNC_TO_ATOMIZE_P(cc))
             {
+                simd_atomize_call(cc, cs);
                 // If the current call is not an assign call,
                 // let's atomize the current argument
-                if(!ENTITY_ASSIGN_P(call_function(c)))
+                if(!ENTITY_ASSIGN_P(call_function(c)) || get_bool_property("SIMD_EXTRAVAGANT_ATOMIZER") )
                 {
-                    simd_atomize_call(cc, cs);
-
                     statement stat = simd_atomize_this_expression(sac_make_new_variable, ce);
-
                     simd_insert_statement(cs, stat);
-                }
-                // If the current call is an assign call,
-                // the current argument is not atomize
-                else
-                {
-                    simd_atomize_call(cc, cs);
                 }
             }
         }
-    }, call_arguments(c));
+    }
 }
 
 /* This function is called for all statements in the code

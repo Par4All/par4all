@@ -27,6 +27,7 @@ typedef dg_vertex_label vertex_label;
 #include "effects-convex.h"
 #include "effects-simple.h"
 #include "preprocessor.h"
+#include "statistics.h"
 
 #include "control.h"
 
@@ -113,33 +114,19 @@ expression make_float_constant_expression(float c)
 static entity make_reduction_vector_entity(reduction r)
 {
     extern list integer_entities, real_entities, double_entities;
-    entity var = reference_variable(reduction_reference(r));
     basic base = get_basic_from_array_ref(reduction_reference(r));
     entity new_ent, mod_ent;
-    char *name, num[32];
-    static int number = 0;
     entity dynamic_area;
+    static int counter = 0;
+    static const char prefix[] = "RED" ;
+    static char buffer[ 1 + 3 + sizeof(prefix) ];
+    pips_assert("buffer does not overflow",counter < 1000);
+    sprintf(buffer,"%s%u",prefix,counter++);
 
     mod_ent = get_current_module_entity();
-    sprintf(num, "_RED%i", number++);
-    name = strdup(concatenate(entity_local_name(mod_ent),
-                MODULE_SEP_STRING, 
-                entity_local_name(var), 
-                num, 
-                (char *) NULL));
-
-    new_ent = make_entity(name,
-            make_type(is_type_variable,
-                make_variable(base, 
-                    CONS(DIMENSION, 
-                        make_dimension(int_expr(0),
-                            int_expr(0)), 
-                        NIL),
-                    NIL)),
-            storage_undefined,
-            make_value(is_value_unknown, UU));
-    dynamic_area = global_name_to_entity(module_local_name(mod_ent),
-            DYNAMIC_AREA_LOCAL_NAME);
+    list lis = CONS(DIMENSION,make_dimension(int_expr(0),int_expr(0)), NIL);
+    new_ent = make_new_array_variable_with_prefix(buffer,mod_ent,base,lis);
+    dynamic_area = global_name_to_entity(module_local_name(mod_ent),DYNAMIC_AREA_LOCAL_NAME);
     entity_storage(new_ent) = make_storage(is_storage_ram,
             make_ram(mod_ent,
                 dynamic_area,

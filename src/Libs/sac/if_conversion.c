@@ -97,14 +97,14 @@ static bool expr_has_write_eff_p(expression expr)
 
     list ef = expression_to_proper_effects(expr);
 
-    MAP(EFFECT, f,
+    FOREACH(EFFECT, f,ef)
     {
         if(action_write_p(effect_action(f)))
         {
             actionWrite = TRUE;
         }
 
-    }, ef);
+    } 
 
     gen_free_list(ef);
 

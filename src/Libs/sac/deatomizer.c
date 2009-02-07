@@ -70,11 +70,10 @@ static void checkReplaceReference(expression e, reference ref)
                                        else {
                                            gInIndex++;
 
-                                           MAPL(lexpr,
+                                           FOREACH(EXPRESSION,indice,reference_indices(r))
                                            {
-                                               expression indice = EXPRESSION(CAR(lexpr));
                                                checkReplaceReference(indice, ref);
-                                           }, reference_indices(r));
+                                           }
 
                                        gInIndex--;
                                        }
@@ -115,10 +114,12 @@ static void daCheckCallReplace(call c, reference ref)
             /* We assume that it is legal to replace arguments (because it should
                have been verified with the effects that the index is not WRITTEN).
                */
-            MAPL(a,
             {
-                checkReplaceReference(EXPRESSION(CAR(a)), ref);
-            }, call_arguments(c));
+                FOREACH(EXPRESSION,e,call_arguments(c))
+                {
+                    checkReplaceReference(e, ref);
+                }
+            }
     break;
         default:
     pips_error("CallReplaceReference", "unknown tag: %d\n", 
@@ -236,7 +237,7 @@ static bool expr_has_write_eff_ref_p(reference ref, expression expr)
 
     list ef = expression_to_proper_effects(expr);
 
-    MAP(EFFECT, f,
+    FOREACH(EFFECT, f, ef)
     {
         entity effEnt = effect_entity(f);
 
@@ -246,7 +247,7 @@ static bool expr_has_write_eff_ref_p(reference ref, expression expr)
             actionWrite = TRUE;
         }
 
-    }, ef);
+    }
 
     gen_free_list(ef);
 
@@ -260,7 +261,7 @@ bool stat_has_write_eff_ref_p(reference ref, statement stat)
 {
     bool actionWrite = FALSE;
 
-    MAP(EFFECT, f, 
+    FOREACH(EFFECT, f, load_proper_rw_effects_list(stat))
     {
         entity effEnt = effect_entity(f);
 
@@ -269,7 +270,7 @@ bool stat_has_write_eff_ref_p(reference ref, statement stat)
             actionWrite = TRUE;
         }
 
-    }, load_proper_rw_effects_list(stat));
+    }
 
     return actionWrite;
 }
@@ -339,11 +340,11 @@ static bool stats_has_rw_conf_p(statement si, statement sj,
         return FALSE;
     }
 
-    MAP(VERTEX, v1,
+    FOREACH(VERTEX, v1,graph_vertices(dep_graph))
     {
-        MAP(SUCCESSOR, suc,
+        FOREACH(SUCCESSOR, suc,vertex_successors(v1))
         {
-            MAP(CONFLICT, conf,
+            FOREACH(CONFLICT, conf,dg_arc_label_conflicts(successor_arc_label(suc)))
             {
                 statement s1 = vertex_to_statement(v1);
                 statement s2 = vertex_to_statement(successor_vertex(suc));
@@ -357,9 +358,9 @@ static bool stats_has_rw_conf_p(statement si, statement sj,
                     return TRUE;
                 }
 
-            }, dg_arc_label_conflicts(successor_arc_label(suc)));
-        }, vertex_successors(v1));
-    }, graph_vertices(dep_graph));
+            }
+        }
+    }
 
     return FALSE;
 }

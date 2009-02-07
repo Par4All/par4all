@@ -3,6 +3,7 @@
 #include "ri.h"
 
 #include "resources.h"
+#include "properties.h"
 
 #include "misc.h"
 #include "ri-util.h"
@@ -379,7 +380,7 @@ void init_tree_patterns()
     if (patterns_tree == NULL) /* never initialized */
     {
         patterns_tree = make_tree();
-        patterns_yyin=fopen_config("patterns.def",NULL,NULL);
+        patterns_yyin=fopen_config("patterns.def","SIMD_PATTERN_FILE",NULL);
         patterns_yyparse();
         fclose(patterns_yyin);
     }

@@ -34,7 +34,7 @@ static graph dependence_graph;
 #define same_stringn_p(a,b,c) (!strncmp((a),(b),(c)))
 
 
-static bool simd_save_stat_p(statement stat)
+bool simd_save_stat_p(statement stat)
 {
     if(statement_call_p(stat))
     {
@@ -49,7 +49,7 @@ static bool simd_save_stat_p(statement stat)
         return FALSE;
     }
 }
-static bool simd_load_stat_p(statement stat)
+bool simd_load_stat_p(statement stat)
 {
     if(statement_call_p(stat))
     {
@@ -67,7 +67,7 @@ static bool simd_load_stat_p(statement stat)
 /* This function returns true if the statement is a simd loadsave
  * statement
  */
-static bool simd_loadsave_stat_p(statement stat)
+bool simd_loadsave_stat_p(statement stat)
 {
     return simd_load_stat_p(stat) || simd_save_stat_p(stat);
 }
@@ -75,7 +75,7 @@ static bool simd_loadsave_stat_p(statement stat)
 /* This function returns true if the statement is a simd
  * statement
  */
-static bool simd_stat_p(statement stat)
+bool simd_stat_p(statement stat)
 {
     return statement_call_p(stat)
         && same_stringn_p( entity_local_name(call_function(statement_call(stat))) , SIMD_NAME, SIMD_SIZE);
