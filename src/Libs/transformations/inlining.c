@@ -37,7 +37,9 @@ void inline_return_remover(instruction ins,instruction tail_ins)
 {
     if( return_instruction_p( ins ) && ins !=tail_ins )
     {
-        *ins = *make_instruction_goto( copy_statement(laststmt) );
+        free_expression(instruction_return(ins));
+        instruction_tag(ins)=is_instruction_goto;
+        instruction_goto(ins)=copy_statement(laststmt);
     }
 }
 
@@ -48,19 +50,22 @@ void inline_return_switcher(instruction ins,instruction tail_ins)
 {
     if( return_instruction_p( ins ) )
     {
+        call ic = instruction_call(ins);
         call c = make_call(
                     CreateIntrinsic(ASSIGN_OPERATOR_NAME),
                     CONS(
                         EXPRESSION,
                         entity_to_expression( returned_entity ),
-                        call_arguments(instruction_call(ins))
+                        gen_full_copy_list(call_arguments(ic))
                     )
                  );
         list l= (ins == tail_ins ) ? NIL : CONS( STATEMENT, instruction_to_statement( make_instruction_goto( copy_statement(laststmt) ) ) , NIL ) ;
         l = CONS( STATEMENT, instruction_to_statement(  make_instruction_call(c) ), l );
 
-        sequence s = make_sequence( l );
-        *ins = *make_instruction_sequence( s );
+
+        free_call( instruction_call(ins));
+        instruction_tag(ins) = is_instruction_sequence;
+        instruction_sequence(ins)=make_sequence( l );
     }
 }
 
@@ -273,7 +278,18 @@ instruction inline_expression_call(expression modified_expression, call callee)
             gen_context_recurse(expanded, tail_ins, instruction_domain, gen_true, &inline_return_switcher);
         }
         if( !type_void_p(treturn) )
-            *modified_expression = *entity_to_expression(returned_entity);
+        {
+#if 0
+            if( normalized_defined_p(expression_normalized(modified_expression)))
+            {
+                    free_normalized( expression_normalized(modified_expression) );
+            }
+            free_syntax(expression_syntax(modified_expression));
+#endif
+            reference r = make_reference( returned_entity, NIL);
+            expression_syntax(modified_expression) = make_syntax_reference(r);
+            expression_normalized(modified_expression) = normalize_reference(r);
+        }
     }
 
     /* fix declarations */
@@ -426,7 +442,9 @@ void inline_expression(expression expr, list * new_instructions)
         {
                 instruction i = inline_expression_call( expr, callee );
                 if( !instruction_undefined_p(i) )
+                {
                     *new_instructions = CONS(STATEMENT, instruction_to_statement(i), *new_instructions);
+                }
         }
     }
 }
@@ -452,7 +470,7 @@ bool inline_has_inlinable_calls(call callee)
 static 
 void inline_statement_switcher(statement stmt)
 {
-    instruction* ins=&statement_instruction(stmt);
+    instruction *ins=&statement_instruction(stmt);
     switch( instruction_tag(*ins) )
     {
         /* handle this with the expression handler */
@@ -461,8 +479,8 @@ void inline_statement_switcher(statement stmt)
                 call callee =instruction_call(*ins);
                 if( inline_has_inlinable_calls( callee ) )
                 {
-                    //free_instruction(*ins);
-                    *ins= make_instruction_expression( call_to_expression(callee) );
+                    instruction_tag(*ins) = is_instruction_expression;
+                    instruction_expression(*ins)=call_to_expression(callee);
                     inline_statement_switcher(stmt);
                 }
             } break;
@@ -472,25 +490,29 @@ void inline_statement_switcher(statement stmt)
             {
                 list new_instructions=NIL;
                 gen_context_recurse(*ins,&new_instructions,expression_domain,gen_true,&inline_expression);
-                if( new_instructions != NIL ) /* something happens on the way to heaven */
+                if( !ENDP(new_instructions) ) /* something happens on the way to heaven */
                 {
                     type t= functional_result(type_functional(entity_type(inlined_module)));
                     if( ! type_void_p(t) )
                     {
-                        instruction tmp = *ins;
-                        if( expression_call_p(instruction_expression(tmp)) )
+                        instruction tmp = instruction_undefined;
+                        if( expression_call_p(instruction_expression(*ins)) )
                         {
                             tmp = make_instruction_call(
-                                    expression_call(instruction_expression(tmp))
+                                    expression_call(instruction_expression(copy_instruction(*ins)))
                             );
                         }
+                        else
+                        {
+                            tmp = copy_instruction(*ins);
+                        }
                         new_instructions=CONS(STATEMENT,
-                                instruction_to_statement(copy_instruction(tmp)),
+                                instruction_to_statement(tmp),
                                 new_instructions
                         );
                     }
                     //free_instruction(*ins);
-                    *ins = make_instruction_sequence( make_sequence( gen_nreverse(new_instructions) ) );
+                    *ins=make_instruction_sequence( make_sequence( gen_nreverse(new_instructions) ) );
                     statement_number(stmt)=STATEMENT_NUMBER_UNDEFINED;
                 }
             }
