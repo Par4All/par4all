@@ -4,7 +4,7 @@
    Ronan Keryell.
    */
 
-/* 
+/*
  * $Id$
  */
 
@@ -12,9 +12,9 @@
 char vcid_ri_util_control[] = "%A% ($Date: 2002/07/03 09:22:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
-#include <stdlib.h> 
-#include <stdio.h> 
-#include <string.h> 
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "linear.h"
 
@@ -103,7 +103,7 @@ forward_control_map_get_blocs_but(control c, control f, list * l )
 /* Same as above, but follows successors by minimal path lengths. It is OK
    if there is only one path length when computing transformers and/or
    preconditions. However, if a node is reached by several paths, the node
-   with the minimal maximal path length should come first. 
+   with the minimal maximal path length should come first.
 
    This last condition assumes infinite path length for nodes in cycles
    (?). It is not implemented. */
@@ -146,12 +146,130 @@ is_control_in_list_p(control c,
     return FALSE;
 }
 
-/* Count the number of occurences of a control node in a list of control nodes */
+/* Count the number of occurences of a control node in a list of control
+   nodes */
 int
 occurences_in_control_list(control c,
 		     list cs)
 {
     return gen_occurences((gen_chunk *) c, cs);
+}
+
+
+/* Replace references to c_old control node by references to c_new in the
+   list of control nodes: */
+void
+control_list_patch(list l,
+		   control c_old,
+		   control c_new)
+{
+    gen_list_patch(l, (gen_chunk *) c_old, (gen_chunk *) c_new);
+}
+
+
+/* Transfer the control node c as a predecessor from old_node to
+   new_node: */
+void
+transfer_control_predecessor(control old_node,
+			     control new_node,
+			     control c)
+{
+    MAP(CONTROL, predecessor, {
+	if (predecessor == c)
+	    /* Add c as a predecessor of new_node: */
+	    control_predecessors(new_node) =
+		gen_nconc(control_predecessors(new_node),
+			  CONS(CONTROL, c, NIL));
+    }, control_predecessors(old_node));
+    /* Remove c as a predecessor of old_node: */
+    gen_remove(&control_predecessors(old_node), c);
+    /* Correct the reverse link c->old_node to c->new_node: */
+    control_list_patch(control_successors(c), old_node, new_node);
+}
+
+
+/* Transfer the control node c as a successor from old_node to
+   new_node: */
+void
+transfer_control_successor(control old_node,
+			   control new_node,
+			   control c)
+{
+    MAP(CONTROL, successor, {
+	if (successor == c)
+	    /* Add c as a predecessor of new_node: */
+	    control_successors(new_node) =
+		gen_nconc(control_successors(new_node),
+			  CONS(CONTROL, c, NIL));
+    }, control_successors(old_node));
+    /* Remove c as a successor of old_node: */
+    gen_remove(&control_successors(old_node), c);
+    /* Correct the reverse link c->old_node to c->new_node: */
+    control_list_patch(control_predecessors(c), old_node, new_node);
+}
+
+
+/* Replace all the references to old_node by new_node in the
+   successors & predecessors of the controls in the control node
+   list: */
+void
+replace_control_related_to_a_list(control old_node,
+				  control new_node,
+				  list controls)
+{
+    /* Need a intermediate list since we cannot iterate on
+       control_successors(old_node) for example and modifying it...*/
+    list controls_to_change = NIL;
+    /* Since we need to keep successors order (to avoid for example
+       IF/THEN/ELSE transformed in IF/ELSE/THEN), iterate directly on
+       the links of old_node instead of on controls: */
+    /* First transfer the successors in controls from old_node to
+       new_node: */
+    MAP(CONTROL, c, {
+	if (gen_in_list_p(c, controls))
+	    /* Use gen_nconc to keep test order: */
+	    controls_to_change = gen_nconc(controls_to_change,
+					   CONS(CONTROL, c, NIL));
+    }, control_successors(old_node));
+    /* And then do the modification: */
+    MAP(CONTROL, c, {
+	pips_debug(8, "Transfer old node %p to new node %p in successor %p\n", old_node, new_node, c);
+	if (c != old_node)
+	    transfer_control_successor(old_node, new_node, c);
+	else {
+	    /* Hmmm... We need to transfer a loop around old_node to a
+               loop around new_node: */
+	    /* Create the new loop around new_node: */
+	    control_successors(new_node) =
+		gen_nconc(control_successors(new_node),
+			  CONS(CONTROL, new_node, NIL));
+	    control_predecessors(new_node) =
+		gen_nconc(control_predecessors(new_node),
+			  CONS(CONTROL, new_node, NIL));
+	    /* Delete the old one. Use gen_remove_once() instead of
+               gen_remove() to deal with double loops around a node
+               (See hierarchy02.f in validation): */
+	    gen_remove_once(&control_successors(old_node), (gen_chunk *) old_node);
+	    gen_remove_once(&control_predecessors(old_node), (gen_chunk *) old_node);
+	}
+    }, controls_to_change);
+    gen_free_list(controls_to_change);
+
+    /* And then transfer the predecessors in controls from old_node to
+       new_node (the previous double loops have disappeared here): */
+    controls_to_change = NIL;
+    MAP(CONTROL, c, {
+	if (gen_in_list_p(c, controls))
+	    /* Use gen_nconc to keep test order: */
+	    controls_to_change = gen_nconc(controls_to_change,
+					   CONS(CONTROL, c, NIL));
+    }, control_predecessors(old_node));
+    /* And then do the modification: */
+    MAP(CONTROL, c, {
+	pips_debug(8, "Transfer old node %p to new node %p in predecessor %p\n", old_node, new_node, c);
+	transfer_control_predecessor(old_node, new_node, c);
+    }, controls_to_change);
+    gen_free_list(controls_to_change);
 }
 
 
@@ -236,7 +354,8 @@ display_address_of_control_nodes(list cs)
 }
 
 
-/* Display all the control nodes eeached or reachable from c for debugging purpose: */
+/* Display all the control nodes reached or reachable from c for debugging
+   purpose: */
 void display_linked_control_nodes(control c)
 {
   list blocs = NIL;
@@ -284,7 +403,7 @@ remove_unreachable_following_control(control c,
                                      control do_not_delete_node_either)
 {
     list the_successors;
- 
+
     /* If this is the do_not_delete_node nodes: stop deleting: */
     if (c == do_not_delete_node || c == do_not_delete_node_either)
 	return;
@@ -310,12 +429,12 @@ remove_unreachable_following_control(control c,
                                             do_not_delete_node_either);
     }, the_successors);
     gen_free_list(the_successors);
-    
+
     /* Discard the control node itself: */
     pips_debug(7, "Discarding control node %p.\n", c);
     ifdebug(7) {
 	display_linked_control_nodes(c);
-    } 
+    }
     free_control(c);
 }
 
@@ -331,7 +450,7 @@ remove_some_unreachable_controls_of_an_unstructured(unstructured u)
 {
     list blocs = NIL;
     list control_remove_list = NIL;
-   
+
     /* The entry point of the unstructured: */
     control entry_node = unstructured_control(u);
     control exit_node = unstructured_exit(u);
@@ -390,7 +509,7 @@ remove_some_unreachable_controls_of_an_unstructured(unstructured u)
 		    },
 		    exit_node,
 		    blocs);
-	gen_free_list(blocs);      
+	gen_free_list(blocs);
 	/* Now remove all the marqued sequences from the entry_node: */
 	MAP(CONTROL, c,
 	    {
@@ -398,7 +517,7 @@ remove_some_unreachable_controls_of_an_unstructured(unstructured u)
 	    },
 	    control_remove_list);
 	gen_free_list(control_remove_list);
-    }   
+    }
 }
 
 
@@ -412,7 +531,7 @@ remove_all_unreachable_controls_of_an_unstructured(unstructured u)
 
     set useful_controls = set_make(set_pointer);
     set unreachable_controls = set_make(set_pointer);
-    
+
     /* The entry point of the unstructured: */
     control entry_node = unstructured_control(u);
     control exit_node = unstructured_exit(u);
@@ -441,7 +560,7 @@ remove_all_unreachable_controls_of_an_unstructured(unstructured u)
           set_add_element(unreachable_controls,
                           unreachable_controls,
                           (char *) c);
-       }       
+       }
     },
        entry_node,
        blocs);
@@ -477,7 +596,7 @@ remove_all_unreachable_controls_of_an_unstructured(unstructured u)
                                "Try to use the GATHER_FORMATS_AT_BEGINNING "
                                "property.\n");
           remove_a_control_from_an_unstructured_without_relinking(c);
-       }      
+       }
     },
        unreachable_controls);
     set_free(useful_controls);
@@ -499,7 +618,7 @@ remove_a_control_from_a_list_and_relink(control c,
            list the_position_of_c = NIL;
            list the_position_before_c = NIL;
            list l = NIL;
-           
+
            control a_dest_of_a_source = CONTROL(CAR(a_control_list));
            /* Now, find the corresponding dest in the source list
               with the same value as c: */
@@ -524,7 +643,7 @@ remove_a_control_from_a_list_and_relink(control c,
                    the_position_before_c = the_position_of_c;
                 },
                    *the_dest_of_a_source_list);
-           
+
            /* And add the a_dest_control_list_of_c instead of c: */
            /* First concatenate (with copy) a_dest_control_list_of_c
               before what follow c in the list: */
@@ -551,7 +670,7 @@ remove_a_control_from_a_list_and_relink(control c,
 
 
 /* It removes a control node from its successor and predecessor list
-   and relink the successor and the predecessor.   
+   and relink the successor and the predecessor.
    */
 void
 remove_a_control_from_an_unstructured(control c)
@@ -560,7 +679,7 @@ remove_a_control_from_an_unstructured(control c)
    list the_successors = control_successors(c);
 
    int number_of_successors = gen_length(the_successors);
-   
+
    /* Unlink from the predecessor. Note that a node may have more than
       one predecessor. Since we cannot discard an IF this way, we have
       at most 1 successor: */
@@ -575,7 +694,7 @@ remove_a_control_from_an_unstructured(control c)
                                            the_successors,
                                            the_predecessors,
                                            source_is_successor_and_dest_is_predecessor);
-   
+
    /* Remove the control node: */
    free_control(c);
 }
@@ -693,7 +812,7 @@ generate_a_statement_list_from_a_control_sequence(control begin,
 
    /* Because of the way CONS is working, reversed the walk through
       the sequence. */
-   
+
    for(c = end; ; c = CONTROL(CAR(control_predecessors(c)))) {
       int number_of_predecessor = gen_length(control_predecessors(c));
       pips_assert("discard_a_control_sequence_without_its_statements: not a sequence.", number_of_predecessor <= 1);
@@ -738,8 +857,9 @@ unlink_2_control_nodes(control source,
 
 /* Fuse a 2 control node and add the statement of the second one to
    the statement of the first one. Assumes that the second node is the
-   only successor of the first one:\. Do not update the entry or exit
-   field of the unstructured. */
+   only successor of the first one.
+
+   It does not update the entry or exit field of the unstructured. */
 void
 fuse_2_control_nodes(control first,
 		     control second)
@@ -774,7 +894,7 @@ fuse_2_control_nodes(control first,
 	}
 	insert_comments_to_statement(control_statement(second),
 				     first_comment);
-	control_statement(first) = control_statement(second);	
+	control_statement(first) = control_statement(second);
     }
     else {
 	/* If not, build a block with the two statements: */
@@ -792,7 +912,7 @@ fuse_2_control_nodes(control first,
     /* Unlink the second node from the first one: */
     gen_free_list(control_successors(first));
     gen_remove(&control_predecessors(second), first);
-	       
+
     /* Link the first node with the successors of the second one in
        the forward direction: */
     control_successors(first) =
@@ -806,7 +926,7 @@ fuse_2_control_nodes(control first,
 			 CONTROL_(CAR(cp)) = first;
 		 }, control_predecessors(c));
 	}, control_successors(first));
-	       
+
     /* Transfer the predecessors of the second node to the first one.
        Note that the original second -> first predecessor link has
        already been removed. But a loop from second to second appear
@@ -823,7 +943,7 @@ fuse_2_control_nodes(control first,
 		     }
 		 }, control_successors(c));
 	}, control_predecessors(second));
-    
+
     /* Now we remove the useless intermediate node "second": */
     /* Do not gen_free_list(control_successors(second)) since it is
        used as control_successors(first) now: */

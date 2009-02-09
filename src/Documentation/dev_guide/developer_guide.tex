@@ -320,7 +320,8 @@ per-developer \texttt{branches} which should be validated before being
 merged back into the \texttt{trunk}.
 
 
-\subsubsection{Pips development branches}
+\subsubsection{PIPS development branches}
+\label{sec:pips-devel-branch}
 
 If you are doing something non trivial or do not have commit rights on
 pips' trunk, you shoud develop in a branch of your own. To do so:
@@ -360,7 +361,7 @@ sh> svn co http://svn.cri.ensmp.fr/svn/pips/branches/calvin pips_dev
   \item[pipsrc.csh] csh-compatible shell initialization.
   \end{description}
 
-\item Create your own development branch for pips.
+\item Create your own development branch for all PIPS:
 {\small
 \begin{verbatim}
 sh> cd pips_dev
@@ -429,8 +430,9 @@ Here is a typical behaviour you should follow:
 \item if it is worse than point 1, improve the code in your branch and go
   to step 1 again;
 \item if you are happy with the validation, merge your beautiful work into
-  the PIPS Holly trunk with \texttt{svn\_branch.sh push} so that all the
-  PIPS community can congratulate you.
+  the PIPS Holly trunk with \texttt{svn merge -\,-reintegrate}
+  (\S~\ref{sec:pips-devel-branch}) so that all the PIPS community can
+  congratulate you.
 \end{enumerate}
 
 For more information about the validation process, have a look to
@@ -474,23 +476,23 @@ repository anyway.
 \section{Shell environment (sh, ksh, bash, csh, tcsh)}
 \label{sec:shell}
 
-Many environment variables may be used by PIPS executables and utilities. 
+Many environment variables may be used by PIPS executables and utilities.
 They mainly describe PIPS directory hierarchy, compilation options, helper
 programs, and so on.
 
-These variables should be initialized by sourcing the 
-\texttt{pipsrc.sh} file for \texttt{sh ksh bash} shells,
-or \texttt{pipsrc.csh} file for \texttt{csh tcsh} shells. 
-An initial version of these files is created by the setup script, 
-and can be customized as desired.
+These variables should be initialized by sourcing the \texttt{pipsrc.sh}
+file for \texttt{sh ksh bash} shells, or \texttt{pipsrc.csh} file for
+\texttt{csh tcsh} shells.  An initial version of these files is created by
+the setup script, and can be customized as desired.
 
-Two variables are of special interest: \texttt{\$PIPS\_ROOT} 
-which stores the root of PIPS current version, and \texttt{\$PIPS\_ARCH}.
+Two variables are of special interest: \texttt{\$PIPS\_ROOT} which stores
+the root of PIPS current version, and \texttt{\$PIPS\_ARCH}.
+
 
 \subsection{PIPS architecture (\texttt{PIPS\_ARCH})}
 
-The variable holds the current architecture. If not set, 
-a default is automatically derived with the \texttt{arch.sh} script. 
+The variable holds the current architecture. If not set, a default is
+automatically derived with the \texttt{arch.sh} script.
 
 A PIPS architecture is to be understood not as strictly as a computer
 architecture. It simply a set of tools (compilers, linkers, but also
@@ -725,7 +727,8 @@ The rationale for relying on GNU make rather than make is that in the
 previous situation the software was relying heavily on SUN make special
 features, thus was highly not portable. Now it is more portable, say as
 much as the GNU softwares. The complex makefiles of PIPS rely on GNU
-extensions such as conditionals for instance. 
+extensions such as conditionals for instance.
+
 
 \subsection{Global targets}
 \label{sec:global-targets}

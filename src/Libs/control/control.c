@@ -1845,10 +1845,15 @@ statement st;
 	init_label(where, st);
 	break;
     }
+
     case is_instruction_unstructured:
 	pips_error("create_statement_of_labels", "Found unstructured", "");
+
+    default:
+      ;
     }
 }
+
 
 void create_statements_of_labels(st)
 statement st ;

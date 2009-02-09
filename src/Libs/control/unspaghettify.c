@@ -1084,46 +1084,160 @@ clean_up_control(statement s)
    restructured control graph */
 static void
 recover_structured_while(unstructured u) {
-  control next;
   control entry_node = unstructured_control(u);
-  control exit_node = unstructured_exit(u);
+  control next = CONTROL(CAR(control_successors(entry_node)));
   size_t arity = gen_length(control_successors(entry_node));
+  control exit_node = unstructured_exit(u);
   switch(arity) {
+  case 0:
+    /* It looks like a single node unstructured. Nothing to look at,
+       here. Anyway, it should not exist if the restructured was launched
+       on the graph before... */
+    return;
+
   case 1:
     /* There is one simple node at unstructured entry:
        try to detect a "do ... while();" */
-    next = CONTROL(CAR(control_successors(entry_node)));
     if (gen_length(control_successors(next)) != 2)
-      // It is not a test, so no while to be expected here...
-      break;
-    if (CONTROL(CAR(control_successors(next))) == entry_node
-	&& CONTROL(CAR(CDR(control_successors(next)))) == exit) {
+      // next is not a test, so no while to be expected here...
+      return;
+
+    test t = instruction_test(statement_instruction(control_statement(next)));
+    expression cond = test_condition(t);
+    control then_c = CONTROL(CAR(control_successors(next)));
+    control else_c = CONTROL(CAR(CDR(control_successors(next))));
+    if (then_c == entry_node && else_c == exit) {
       /* We have
 	 entry:
 	 ...
 	 if (cond) goto entry;
+	 exit:
       */
-      
+      // See afterwards to generate the "do ... while(cond)"
     }
-    else if (CONTROL(CAR(control_successors(next))) == exit
-	     && CONTROL(CAR(CDR(control_successors(next)))) == entry_node) {
+    else if (then_c == exit && else_c == entry_node) {
       /* We have
 	 entry:
 	 ...
 	 if (cond)
-	 goto exit
+	 goto exit;
 	 else goto entry;
       */
-
+      // We need to negate the condition to generate a "do ... while(!cond)"
+      cond = MakeUnaryCall(CreateIntrinsic(C_NOT_OPERATOR_NAME), cond);
     }
+    // Build the equivalent do ... while(). Do not save ay label yet.
+    whileloop w = make_whileloop(cond,
+				 control_statement(entry_node),
+				 entity_empty_label(),
+				 make_evaluation_after());
+    /* Protect recycled old stuff from being discarded later: */
+    test_condition(t) = expression_undefined;
 
+    control_statement(entry_node) =
+      make_stmt_of_instr(make_instruction_whileloop(w));
+    /* Put the new statement in a one-node unstructured. Rely on later
+       cleaning... */
+    remove_a_control_from_an_unstructured_without_relinking(exit_node);
+    free_control(exit_node);
+    unstructured_exit(u) = entry_node;
     break;
-  case 2:
+
+  case 2: {
     // The entry node is a test. Try to detect a "while() ...;"
-    next;
+    test t = instruction_test(statement_instruction(control_statement(entry_node)));
+    expression cond = test_condition(t);
+    control then_c = CONTROL(CAR(control_successors(entry_node)));
+    control else_c = CONTROL(CAR(CDR(control_successors(entry_node))));
+    control body_control = control_undefined;
+    statement body = statement_undefined;
+
+    if (else_c == exit) {
+      if (then_c == entry_node) {
+	/* we have:
+	   entry: if (cond) goto entry;
+	   exit:
+
+	   so we can generate a while(cond);
+	*/
+      }
+      else if (gen_length(control_successors(then_c)) == 1
+	       && CONTROL(CAR(control_successors(then_c))) == entry_node) {
+	/* we have:
+	   entry: if (cond) {
+	   body
+	   goto entry;
+	   }
+	   exit:
+
+	   so we can generate a while(cond) body;
+	*/
+	body_control = then_c;
+      }
+    }
+    else if (then_c == exit) {
+      if (else_c == entry_node) {
+	/* we have:
+	   entry: if (cond) goto exit;
+	   else goto entry;
+	   exit:
+
+	   so we can generate a while(!cond);
+	*/
+	cond = MakeUnaryCall(CreateIntrinsic(C_NOT_OPERATOR_NAME), cond);
+      }
+      else if (gen_length(control_successors(else_c)) == 1
+	       && CONTROL(CAR(control_successors(else_c))) == entry_node) {
+	/* we have:
+	   entry: if (cond) goto exit;
+	   else {
+	   body
+	   goto entry;
+	   }
+	   exit:
+
+	   so we can generate a while(!cond) body;
+	*/
+	body_control = else_c;
+	cond = MakeUnaryCall(CreateIntrinsic(C_NOT_OPERATOR_NAME), cond);
+      }
+    }
+    else
+      // No while() recognized here...
+      return;
+
+    if (body_control != control_undefined) {
+      // Keep the body to put it in the while later:
+      body = control_statement(body_control);
+      // Remove the control node of the body:
+      control_statement(body_control) = statement_undefined;
+      remove_a_control_from_an_unstructured_without_relinking(body_control);
+    }
+    else
+      // Make an empty body for the loop:
+      body = make_continue_statement(entity_empty_label());
+
+    // Build the equivalent do ... while(). Do not save ay label yet.
+    whileloop w = make_whileloop(cond,
+				 body,
+				 entity_empty_label(),
+				 make_evaluation_before());
+    // Remove the test node:
+    test_condition(t) = expression_undefined;
+    remove_a_control_from_an_unstructured_without_relinking(entry_node);
+    // Keep only the node with the while:
+    free_statement(control_statement(exit_node));
+    control_statement(exit_node) = w;
+    unstructured_control(u) = exit_node;
+    /* Other restructuring is applied afterwards to replace the
+       unstructured by a simple statement... */
+    break;
+  }
+  default:
+    // This case is not expected in the RI!
+    pips_internal_error("A node cannot have %zd successors!", arity);
   }
 }
-
 
 /* The entry point common to unspaghettify or restructure a module: */
 void
