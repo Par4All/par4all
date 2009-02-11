@@ -306,7 +306,10 @@ expression MemberDerivedIdentifierToExpression(type t,string m)
 	{
 	  entity de = basic_derived(b);
 	  string name = entity_user_name(de);
-	  return IdentifierToExpression(strdup(concatenate(name,MEMBER_SEP_STRING,m,NULL))); 
+      string id = strdup(concatenate(name,MEMBER_SEP_STRING,m,NULL));
+	  expression exp = IdentifierToExpression(id); 
+      free(id);
+      return exp;
 	}
       default:
 	break;
@@ -585,6 +588,7 @@ entity FindEntityFromLocalName(string name)
     /* Is it a static function? It must have been parsed in the compilation unit */
     string sname = strdup(concatenate(compilation_unit_name, name, NULL));
     ent = global_name_to_entity(compilation_unit_name, sname);
+    free(sname);
     return ent;
   }
 
@@ -609,6 +613,7 @@ entity FindOrCreateEntityFromLocalNameAndPrefixAndScope(string name,
 {
   entity e = entity_undefined;
   string ls = strdup(scope);
+  string ls_head = ls;
 
   pips_assert("Should not be used", FALSE);
   
@@ -625,6 +630,7 @@ entity FindOrCreateEntityFromLocalNameAndPrefixAndScope(string name,
     /* The current scope will be automatically added */
     e = CreateEntityFromLocalNameAndPrefix(name,prefix,is_external);
   }
+  free(ls_head);
   pips_debug(8, "Entity returned: \"%s\"\n", entity_name(e));
   return e;
 }
@@ -650,6 +656,7 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
   string global_name = string_undefined; 
   string scope = scope_to_block_scope(GetScope());
   string ls = strdup(scope);
+  string ls_head = ls;
 
   pips_debug(5,"Entity local name is \"%s\" with prefix \"%s\" and scope \"%s\"\n",
 	     name,prefix,scope);
@@ -660,11 +667,11 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
     /* Add block scope case here */
     do {
       if (static_module_p(get_current_module_entity()))
-	global_name = strdup(concatenate(/*compilation_unit_name,*/
+	global_name = (concatenate(/*compilation_unit_name,*/
 					 get_current_module_name(),MODULE_SEP_STRING,
 					 ls,prefix,name,NULL));
       else
-	global_name = strdup(concatenate(get_current_module_name(),MODULE_SEP_STRING,
+	global_name = (concatenate(get_current_module_name(),MODULE_SEP_STRING,
 					 ls,prefix,name,NULL));
       ent = gen_find_tabulated(global_name,entity_domain);
     } while(entity_undefined_p(ent) && (ls = pop_block_scope(ls))!=NULL);
@@ -675,7 +682,7 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
     extern string int_to_string(int);
     string sn = int_to_string(get_current_dummy_parameter_number());
 
-    global_name = strdup(concatenate(DUMMY_PARAMETER_PREFIX,sn,MODULE_SEP_STRING,
+    global_name = (concatenate(DUMMY_PARAMETER_PREFIX,sn,MODULE_SEP_STRING,
 				     prefix,name,NULL));
     ent = gen_find_tabulated(global_name,entity_domain);
     free(sn);
@@ -683,14 +690,14 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
 
   /* Is it a static variable declared in the compilation unit? */
   if(entity_undefined_p(ent)) {
-    global_name = strdup(concatenate(compilation_unit_name,MODULE_SEP_STRING,
+    global_name = (concatenate(compilation_unit_name,MODULE_SEP_STRING,
 				     prefix,name,NULL));
     ent = gen_find_tabulated(global_name,entity_domain);
   }
  
   /* Is it a global variable declared in the compilation unit? */
   if(entity_undefined_p(ent)) {
-    global_name = strdup(concatenate(TOP_LEVEL_MODULE_NAME,MODULE_SEP_STRING,
+    global_name = (concatenate(TOP_LEVEL_MODULE_NAME,MODULE_SEP_STRING,
 				     prefix,name,NULL));
     ent = gen_find_tabulated(global_name,entity_domain);
   }
@@ -705,6 +712,7 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
   } else
     pips_debug(5,"Entity global name is %s\n",global_name);
   //free(global_name);
+  free(ls_head);
   return ent;
 }
 
@@ -720,7 +728,7 @@ entity CreateEntityFromLocalNameAndPrefix(string name, string prefix, bool is_ex
 
   if (is_external) {
     pips_debug(5,"Entity local name is %s with prefix %s\n",name,prefix);
-    ent = find_or_create_entity(strdup(concatenate(compilation_unit_name,MODULE_SEP_STRING,
+    ent = find_or_create_entity((concatenate(compilation_unit_name,MODULE_SEP_STRING,
 						   prefix,name,NULL)));
   }
   else {
@@ -731,11 +739,11 @@ entity CreateEntityFromLocalNameAndPrefix(string name, string prefix, bool is_ex
     pips_assert("scope is a block scope", string_block_scope_p(scope));
 
     if (static_module_p(get_current_module_entity()))
-      ent = find_or_create_entity(strdup(concatenate(compilation_unit_name,
+      ent = find_or_create_entity((concatenate(compilation_unit_name,
 						     get_current_module_name(),MODULE_SEP_STRING,
 						     scope,prefix,name,NULL)));	
     else 
-      ent = find_or_create_entity(strdup(concatenate(get_current_module_name(),MODULE_SEP_STRING,
+      ent = find_or_create_entity((concatenate(get_current_module_name(),MODULE_SEP_STRING,
 						     scope,prefix,name,NULL)));
     free(scope);
   }
@@ -855,7 +863,7 @@ entity FindOrCreateCurrentEntity(string name,
       if (strcmp(scope,"") != 0 && !is_formal)
 	{
 	  /* Prefix for the current struct: use full_scope */
-	  ent = find_or_create_entity(strdup(concatenate(full_scope,name,NULL)));
+	  ent = find_or_create_entity(concatenate(full_scope,name,NULL));
 	  if (is_external 
 	      && !member_entity_p(ent) /* Maybe it would have been
 					  better to push "external" in
@@ -890,16 +898,16 @@ entity FindOrCreateCurrentEntity(string name,
 
 	    if(typedef_entity_p(function)) {
 	      string sn = int_to_string((_int) function); // To get a unique identifier for each function typedef
-	      ent = find_or_create_entity(strdup(concatenate(DUMMY_PARAMETER_PREFIX,sn,
-							     MODULE_SEP_STRING,name,NULL)));
+	      ent = find_or_create_entity(concatenate(DUMMY_PARAMETER_PREFIX,sn,
+							     MODULE_SEP_STRING,name,NULL));
 	      free(sn);
 	    }
 	    else if(!type_undefined_p(ft) && type_variable_p(ft)
 		&& basic_pointer_p(variable_basic(type_variable(ft)))) {
 	      string sn = int_to_string((_int) ft); // To get a unique identifier for each function pointerdeclaration, dummy or not
 	      set_current_dummy_parameter_number((_int) ft);
-	      ent = find_or_create_entity(strdup(concatenate(DUMMY_PARAMETER_PREFIX,sn,
-							     MODULE_SEP_STRING,name,NULL)));
+	      ent = find_or_create_entity(concatenate(DUMMY_PARAMETER_PREFIX,sn,
+							     MODULE_SEP_STRING,name,NULL));
 	      free(sn);
 	    }
 	    else {
@@ -909,8 +917,8 @@ entity FindOrCreateCurrentEntity(string name,
 	      // any number of times with any parameter names)
 	      string sn = int_to_string((_int) function);
 	      set_current_dummy_parameter_number((_int) function);
-	      ent = find_or_create_entity(strdup(concatenate(DUMMY_PARAMETER_PREFIX,sn,
-							     MODULE_SEP_STRING,name,NULL)));
+	      ent = find_or_create_entity(concatenate(DUMMY_PARAMETER_PREFIX,sn,
+							     MODULE_SEP_STRING,name,NULL));
 	      free(sn);
 	      /*
 	      if(top_level_entity_p(function))
@@ -943,10 +951,10 @@ entity FindOrCreateCurrentEntity(string name,
 		    /* Depending on the type, we should or not
 		       introduce a MODULE_SEP_STRING, but the type is
 		       still not fully known. Wait for UpdateFunctionEntity(). */
-		    ent = find_or_create_entity(strdup(concatenate(compilation_unit_name,
+		    ent = find_or_create_entity(concatenate(compilation_unit_name,
 								   MODULE_SEP_STRING,
 								   compilation_unit_name,
-								   name,NULL)));
+								   name,NULL));
 		  else 
 		    ent = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,name);
 		}
@@ -956,13 +964,13 @@ entity FindOrCreateCurrentEntity(string name,
 		     Attention, the scope of a function declared in module is the module, not global.*/
 		  if (static_module_p(get_current_module_entity()))
 		    /* The module name is unambiguous because it is used by pipdbm */
-		    ent = find_or_create_entity(strdup(concatenate(get_current_module_name(),
+		    ent = find_or_create_entity(concatenate(get_current_module_name(),
 								   MODULE_SEP_STRING,
 								   block_scope,
 								   name,
-								   NULL)));      
+								   NULL));      
 		  else
-		    ent = find_or_create_entity(strdup(concatenate(get_current_module_name(),
+		    ent = find_or_create_entity((concatenate(get_current_module_name(),
 								   MODULE_SEP_STRING,
 								   block_scope,
 								   name,
@@ -1164,7 +1172,7 @@ entity RenameFunctionEntity(entity oe)
     stack s = get_from_entity_type_stack_table(oe);
     stack ns = stack_copy(s);
 
-    ne = find_or_create_entity(strdup(concatenate(mn, ln, NULL)));
+    ne = find_or_create_entity(concatenate(mn, ln, NULL));
     entity_type(ne) = copy_type(entity_type(oe));
     entity_storage(ne) = copy_storage(entity_storage(oe));
     /* FI I do not understand how formal parameters could be declared before */
@@ -1510,7 +1518,7 @@ void UseFormalArguments(entity f)
       //formal pfs = storage_formal(ps);
 
       if(!stack_undefined_p(get_from_entity_type_stack_table(p))) {
-	new_p = find_or_create_entity(strdup(concatenate(mn,MODULE_SEP_STRING, pn, NULL)));
+	new_p = find_or_create_entity(concatenate(mn,MODULE_SEP_STRING, pn, NULL));
 	free(pn);
 	entity_storage(new_p) = copy_storage(entity_storage(p));
 	entity_type(new_p) = copy_type(entity_type(p));

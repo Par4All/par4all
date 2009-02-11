@@ -335,10 +335,10 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
 	/* if we do not combine. ONLY IF we test, we put... */
 	switch (a) {
 	case is_action_write:
-	  hash_put(all_write_effects, n, cur);
+	  hash_put(all_write_effects, strdup(n), cur);
 	  break;
 	case is_action_read:
-	  hash_put(all_read_effects, n, cur);
+	  hash_put(all_read_effects, strdup(n), cur);
 	  break;
 	default: pips_internal_error("unexpected action tag %d", a);
 	}
@@ -347,6 +347,7 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
     }
 
     cur = next;
+    free(n);
   }
   
   ifdebug(6){

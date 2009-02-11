@@ -103,8 +103,10 @@ extern stack ContextStack;
 extern stack FunctionStack; /* to know in which function the current formal arguments are declared */
 static void PushFunction(entity f)
 {
-  string s = local_name_to_scope(entity_name(f));
-  entity nf = f;
+  /*
+    string s = local_name_to_scope(entity_name(f));
+    entity nf = f;
+   */
 /* SG: this implementations is completely buggy */
 #if 0
   string s = local_name_to_scope(f); // << SG: passing an entity instead of a string
@@ -132,7 +134,7 @@ static void PushFunction(entity f)
   }
   free(s);
 #endif
-  stack_push((char *) nf, FunctionStack);
+  stack_push((char *) f, FunctionStack);
 }
 
 static void PopFunction()

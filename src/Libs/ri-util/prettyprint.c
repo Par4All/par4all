@@ -3087,6 +3087,7 @@ text C_any_comment_to_text(int margin, string c)
 	    s = MAKE_ONE_WORD_SENTENCE(0, cl);
 	  }
 	  ADD_SENTENCE_TO_TEXT(ct, s);
+      free(cl);
 	}
        	lb = cp+1;
 	le = cp+1;
@@ -3096,7 +3097,9 @@ text C_any_comment_to_text(int margin, string c)
     }
     // Final \n has been removed in the parser presumably by Ronan
     if(lb<cp){
-      ADD_SENTENCE_TO_TEXT(ct,MAKE_ONE_WORD_SENTENCE(margin,gen_strndup0(lb,le-lb)));
+      string s = gen_strndup0(lb,le-lb);
+      ADD_SENTENCE_TO_TEXT(ct,MAKE_ONE_WORD_SENTENCE(margin,s));
+      free(s);
     } else{
       ADD_SENTENCE_TO_TEXT(ct,MAKE_ONE_WORD_SENTENCE(0,""));
     }
