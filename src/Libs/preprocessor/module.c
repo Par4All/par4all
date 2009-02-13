@@ -187,7 +187,7 @@ string entity_module_unambiguous_user_name(entity e, entity m)
       }, conflicts);
   }
 
-  return uan;
+  return strdup(uan);
 }
 
 string entity_unambiguous_user_name(entity e)

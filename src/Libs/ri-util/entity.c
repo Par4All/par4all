@@ -1184,13 +1184,12 @@ list /* of entity */ string_to_entity_list(string module, string names)
    which can appear just before the initial name, so the order of test is
    important.
 
-   @return the user name in a new string (allocated with strdup!)
+   @return pointer to the the user name (not newly allocated!)
 */
 string entity_user_name(entity e)
 {
   string gn = entity_name(e);
-  string un = strdup(global_name_to_user_name(gn));
-
+  string un = global_name_to_user_name(gn);
   return un;
 }
 

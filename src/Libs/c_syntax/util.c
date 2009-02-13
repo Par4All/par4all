@@ -241,7 +241,6 @@ expression MakeFunctionExpression(expression e, list le)
 	    string eun = entity_user_name(ent);
 	    pips_user_warning("Call to an unknown function via function pointer \"\%s\"\n",
 			      eun);
-	    free(eun);
 	  }
 
 	  if(!gen_in_list_p(ent, cudl)) {
@@ -1503,7 +1502,7 @@ void UseFormalArguments(entity f)
 
     /* Is it a local function or global function? */
     if(top_level_entity_p(f))
-      mn = entity_user_name(f);
+      mn = strdup(entity_user_name(f));
     else
       /* mn = strdup(concatenate(entity_module_name(f),entity_local_name(f), NULL)); */
       mn = strdup(entity_local_name(f));
@@ -1519,7 +1518,6 @@ void UseFormalArguments(entity f)
 
       if(!stack_undefined_p(get_from_entity_type_stack_table(p))) {
 	new_p = find_or_create_entity(concatenate(mn,MODULE_SEP_STRING, pn, NULL));
-	free(pn);
 	entity_storage(new_p) = copy_storage(entity_storage(p));
 	entity_type(new_p) = copy_type(entity_type(p));
 	entity_initial(new_p) = copy_value(entity_initial(p));

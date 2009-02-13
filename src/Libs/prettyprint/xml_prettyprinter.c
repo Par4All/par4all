@@ -3129,7 +3129,7 @@ static void  xml_Arguments(statement s, entity function, Pvecteur loop_indices, 
     if (syntax_reference_p(sr)) {
       ActualRef = syntax_reference(sr);
       ActualArrayName = reference_variable(ActualRef);
-      aan = entity_user_name(ActualArrayName);
+      aan = strdup(entity_user_name(ActualArrayName));
       rw_ef = find_rw_effect_for_entity(call_effect,&ef, ActualArrayName);
     }
     else {

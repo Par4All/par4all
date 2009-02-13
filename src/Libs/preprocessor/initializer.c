@@ -275,7 +275,7 @@ compilation_unit_text(entity cu, entity module)
 
 	MERGE_TEXTS(cut, se_text);
       }
-      free(n);
+      //free(n);
     }, nsel);
 
     MERGE_TEXTS(cut, md);

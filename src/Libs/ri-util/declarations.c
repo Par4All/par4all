@@ -377,7 +377,6 @@ list words_basic(basic obj)
 	  else {
 	    pc = gen_nconc(pc, c_words_entity(t, NIL));
 	  }
-	  free(name);
 	  break;
 	}
       case is_basic_typedef:
