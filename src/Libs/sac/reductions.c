@@ -71,10 +71,10 @@ static void free_reductionInfo(reductionInfo ri)
 entity make_float_constant_entity(float c)
 {
     entity ce;
-    char *num = (char*) malloc(32);
+    char num[32];
     string cn;
 
-    sprintf(num, "%f", c);
+    snprintf(num,sizeof(num)/sizeof(*num), "%f", c);
 
     cn = concatenate(TOP_LEVEL_MODULE_NAME,MODULE_SEP_STRING,num,(char *)NULL);
     ce = gen_find_tabulated(cn,entity_domain);
@@ -91,8 +91,6 @@ entity make_float_constant_entity(float c)
                 make_value(is_value_constant, 
                     make_constant(is_constant_litteral, NULL)));
     }
-    else 
-        free(num);
 
     return (ce);
 }
@@ -205,7 +203,7 @@ static reductionInfo add_reduction(list* reds, reduction r)
     ri = make_reductionInfo(r, 1, make_reduction_vector_entity(r));
 
     //Add to the list of reductions encountered
-    if (prev == NIL) // same as (*reductions == NIL)
+    if ( ENDP(prev) ) // same as (*reductions == NIL)
         *reds = CONS(REDUCTIONINFO, ri, NIL);
     else
         CDR(prev) = CONS(REDUCTIONINFO, ri, NIL);

@@ -93,6 +93,19 @@ static operator_id_tree* make_operator_id_tree()
     return n;
 }
 
+static void free_operator_id_tree(operator_id_tree* t)
+{
+    operator_id_tree * next;
+    HASH_MAP(key,l,
+    {
+        next = (operator_id_tree *) hash_get(t->sons,key);
+        free_operator_id_tree(next);
+        hash_del(t->sons,key);
+    }, t->sons )
+    hash_table_free(t->sons);
+    free(t);
+}
+
 static void insert_mapping(oper_id_mapping* item)
 {
     char * s;
@@ -130,6 +143,11 @@ void init_operator_id_mappings()
     mappings = make_operator_id_tree();
     for(i=0; operators[i].name != NULL; i++)
         insert_mapping(&operators[i]);
+}
+void term_operator_id_mappings()
+{
+    free_operator_id_tree(mappings);
+    mappings=NULL;
 }
 
 int get_operator_id(entity e)

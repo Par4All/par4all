@@ -66,6 +66,7 @@ void init_statement_matches_map(list l)
 void free_statement_matches_map()
 {
     hash_table_free(matches);
+    term_operator_id_mappings();
 }
 
 /*
@@ -495,6 +496,7 @@ static list simdize_simple_statements_pass2(list seq, float * simdCost)
     newseq = generate_simd_code(CDR(sinfo_begin), simdCost);
 
     /* Free the list of statements info */
+    free_simd_statements(CDR(sinfo_begin));
     gen_free_list(sinfo_begin);
 
     /* Set the new list as the statements' instructions */

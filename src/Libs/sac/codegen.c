@@ -997,10 +997,7 @@ static statementInfo make_simd_statement_info(opcodeClass kind, opcode oc, list*
     ssi = make_simdStatementInfo(oc, 
             nbargs,
             (entity *)malloc(sizeof(entity)*nbargs),
-            (statementArgument*)malloc(
-                sizeof(statementArgument) *
-                nbargs * 
-                opcode_vectorSize(oc)));
+            (statementArgument*)malloc(sizeof(statementArgument) * nbargs * opcode_vectorSize(oc)));
     si = make_statementInfo_simd(ssi);
 
     list temp = args[0];
@@ -1076,6 +1073,13 @@ static statementInfo make_simd_statement_info(opcodeClass kind, opcode oc, list*
     }
 
     return si;
+}
+
+static
+void free_simd_statement_info(simdStatementInfo s)
+{
+    free(simdStatementInfo_vectors(s));
+    free(simdStatementInfo_arguments(s));
 }
 
 list make_simd_statements(list kinds, cons* first, cons* last)
@@ -1154,6 +1158,22 @@ list make_simd_statements(list kinds, cons* first, cons* last)
     gen_free_list(all_instr);
     pips_debug(3,"make_simd_statements 3\n");
     return instr;
+}
+
+void free_simd_statements(list sil)
+{
+    FOREACH(STATEMENTINFO,si,sil)
+    {
+        switch(statementInfo_tag(si))
+        {
+            case is_statementInfo_nonsimd:
+                //free_statementInfo(si);
+                break;
+            case is_statementInfo_simd:
+                free_simd_statement_info(statementInfo_simd(si));
+                break;
+        };
+    }
 }
 
 static statement generate_exec_statement(simdStatementInfo si)

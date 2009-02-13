@@ -368,6 +368,7 @@ boolean simd_atomizer(char * mod_name)
     /* update/release resources */
     reset_current_module_statement();
     reset_current_module_entity();
+    term_operator_id_mappings();
 
     debug_off();
 

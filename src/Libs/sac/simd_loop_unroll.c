@@ -215,7 +215,7 @@ static void loCallReplaceReference(call c, reference ref, expression next)
 
 static void addSimdCommentToStat(statement s, int num)
 {
-    char* comment = malloc(256);
+    char comment[2 + sizeof(SIMD_COMMENT) + 8*sizeof(int) ];
 
     sprintf(comment, "c %s%d\n", SIMD_COMMENT, num);
 
