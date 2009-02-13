@@ -674,7 +674,7 @@ char * safe_new_tmp_file(char * prefix)
  */
 #define CONFIG_DIR "etc"
 #define CONFIG_DEFAULT_RIGHT "r"
-FILE * fopen_config(const char *canonical_name, const char *cproperty, const char * cenv)
+FILE * fopen_config(const string canonical_name, const string cproperty, const string cenv)
 {
     char * senv=NULL,*sproperty=NULL,*pipsenv=NULL,*sdefault=NULL;
     FILE * fconf = NULL;

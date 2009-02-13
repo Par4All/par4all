@@ -140,6 +140,8 @@ void csplit_open_compilation_unit(string input_file_name)
 void csplit_close_compilation_unit()
 {
   safe_fclose(compilation_unit_file, current_compilation_unit_file_name);
+  free(current_compilation_unit_name);
+  free(current_compilation_unit_file_name);
   current_compilation_unit_name = string_undefined;
   current_compilation_unit_file_name = string_undefined;
 }

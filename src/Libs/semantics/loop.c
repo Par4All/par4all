@@ -817,7 +817,7 @@ loop_to_transformer(loop l, transformer pre, list e)
     (void) print_transformer(preb);
   }
 
-  tfb = transformer_dup(statement_to_transformer(b, preb));
+  tfb = (statement_to_transformer(b, preb));
   /* add indexation step under loop precondition pre */
   tfb = transformer_add_loop_index_incrementation(tfb, l, pre);
 
