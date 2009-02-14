@@ -2,8 +2,8 @@
 
 /******************** SYNTAX ANALYZER ************************************
 
-  Here are the parsing rules, based on the work of people from 
-  Open Source Quality projects (http://osq.cs.berkeley.edu/), used 
+  Here are the parsing rules, based on the work of people from
+  Open Source Quality projects (http://osq.cs.berkeley.edu/), used
   by the CCured source-to-source translator for C
 
 *****************************************************************/
@@ -16,7 +16,7 @@
  *  Wes Weimer          <weimer@cs.berkeley.edu>
  *  Ben Liblit          <liblit@cs.berkeley.edu>
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
  * met:
@@ -61,9 +61,10 @@
 #include "ri-util.h"
 #include "misc.h"
 #include "transformations.h"
-  
+
 #include "c_syntax.h"
 #include "preprocessor.h"
+#include "splitc.h"
 
 #define C_ERROR_VERBOSE 1 /* much clearer error messages with bison */
 
@@ -1500,11 +1501,12 @@ decl_spec_list_opt:
  */
 decl_spec_list_opt_no_named:     /* empty */
                         {
-			  $$ = new_empty();
+			  /* Cf "Actions in Mid-Rule" in the Bison doc. */
+			  $<string>$ = new_empty();
 			  PushTypedef();
 			}
     %prec TK_IDENT
-                        { 
+                        {
 			  pips_debug(8, "empty TK_IDENT->decl_spec_list_opt_no_named\n");
 			  /* pips_debug(8, "TK_IDENT %s is discarded\n", $1); */
 			  /* free($1); */
@@ -1513,7 +1515,7 @@ decl_spec_list_opt_no_named:     /* empty */
 			  /* $$ = strdup("IAmNotSure"); */
 			  $$ = new_empty();
 			}
-|   decl_spec_list      { 
+|   decl_spec_list      {
 			  pips_debug(8,
 				     "decl_spec_slit->decl_spec_list_opt_no_named\n");
 			  $$=$1;

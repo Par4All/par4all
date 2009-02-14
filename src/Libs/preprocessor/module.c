@@ -2,6 +2,9 @@
  * $Id$
  */
 #include <stdio.h>
+
+// strndup are GNU extensions...
+#define _GNU_SOURCE
 #include <string.h>
 
 #include "genC.h"
