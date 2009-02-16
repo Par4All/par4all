@@ -57,33 +57,34 @@ string remove_newline_of_string(string s)
     return r;
 }
 
-static string convert_string_for_daVinci_graph(string s)
+static string convert_string_for_daVinci_graph (string s)
 {
-    string r;
-    int l = strlen(s);
-    if (l == 0) /* if empty, do nothing */
-        return s;
-    else if (*(s + l - 1) == '\n') {
-        r = (string)malloc(l + 1);
-	memset(r, 0, l + 1);
-	if (strstr(s, "C               <") == s) {/* effects lines */
-	    r[0] = ' '; /* delete the comment of effects */
-	    strncpy(r + 1, s + 1, l - 2);
-	} else {
-	    strncpy(r, s, l - 1);
-	}
+  string r;
+  int l = strlen(s);
+  if (l == 0) /* if empty, do nothing */
+    return s;
+  else if (*(s + l - 1) == '\n') {
+    r = (string)malloc(l + 1);
+    memset(r, 0, l + 1);
+    if (strstr(s, "C               <") == s) {/* effects lines */
+      r[0] = ' '; /* delete the comment of effects */
+      strncpy(r + 1, s + 1, l - 2);
     } else {
-        r = (string)malloc(l + 2);
-	memset(r, 0, l + 2);
-	if (strstr(s, "C               <") == s) {/* effects lines */
-	    r[0] = ' '; /* delete the comment of effects */
-	    strcpy(r + 1, s + 1);
-	} else {
-	    strcpy(r, s);
-	}
+      strncpy(r, s, l - 1);
     }
-    strcat(r, "\\n");
-    return r;
+  } else {
+    r = (string)malloc(l + 2);
+    memset(r, 0, l + 2);
+    if (strstr(s, "C               <") == s) {/* effects lines */
+      r[0] = ' '; /* delete the comment of effects */
+      strcpy(r + 1, s + 1);
+    } else {
+      strcpy(r, s);
+    }
+  }
+  string ret =  concatenate (r, "\\n", NULL);
+  free (r);
+  return ret;
 }
 
 vertex get_vertex_by_string(string str_name, list l_of_vers)
