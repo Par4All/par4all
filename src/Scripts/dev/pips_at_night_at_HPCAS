@@ -1,4 +1,4 @@
-#! /bin/bash -vx
+#! /bin/bash
 #
 # $Id: pips_at_night_at_cri 13052 2008-09-29 07:46:21Z coelho $
 #
@@ -16,7 +16,7 @@ ulimit -v 2000000
 ulimit -d 2000000
 
 #email=pips-validation@cri.ensmp.fr
-email=rk@enstb.org
+email=pips-by-night@enstb.org
 target=~/PIPS
 
 # set environment...
@@ -24,8 +24,8 @@ test -f $target/pipsrc.sh && source $target/pipsrc.sh
 
 start=$(date)
 
-#pips_at_night -t $target -m $email -u -c -v "$@" > out.$$ 2> err.$$
-/home/keryell/projets/PIPS/MYPIPS/prod/pips/src/Scripts/dev/pips_at_night -t $target -d -c -v "$@"
+pips_at_night --target $target --mail $email --update --full-compile --validate "$@" > out.$$ 2> err.$$
+
 status=$?
 
 if [ $status -ne 0 ] ; then

@@ -43,7 +43,8 @@ do
     -nd|--no-download) download= ;;
     -u|--update) update=1 ;;
     -nu|--no-update) update= ;;
-    -c|--compile) compile=1 ;;
+    -c|--compile) compile=recompile ;;
+    -fc|--full-compile) compile=full-compile ;;
     -nc|--no-compile) compile= ;;
     -v|--validate) validate=1 ;;
     -nv|--no-validate) validate= ;;
@@ -81,18 +82,16 @@ source $target/pipsrc.sh
 if [[ $compile && ! $download ]]
 then
   pushd $target
-  # build? verbosity? clean+recompile?
-  # skip documentation?
 
   cd prod/newgen
-  make clean recompile
+  make clean $compile
 
   cd ../linear
-  make clean recompile
+  make clean $compile
 
   cd ../pips
   rm -rf bin/$PIPS_ARCH lib/$PIPS_ARCH
-  make clean recompile
+  make clean $compile
 
   if [ -f bin/$PIPS_ARCH/tpips ]
   then
