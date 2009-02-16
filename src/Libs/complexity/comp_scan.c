@@ -461,7 +461,7 @@ list effects_list;
 
     /* tell callees that they mustn't try to evaluate the loop index */
 
-    hash_put(hash_complexity_parameters, (char *)module_local_name(index), 
+    hash_put(hash_complexity_parameters, (char *)strdup(module_local_name(index)), 
 	     HASH_LOOP_INDEX);
 
     crange = range_to_complexity(rng, precond, effects_list);
@@ -640,7 +640,7 @@ list effects_list;
 	fprintf(stderr, "\n");
     }
 
-    hash_del(hash_complexity_parameters, (char *)module_local_name(index));
+    hash_del(hash_complexity_parameters, (char *)(module_local_name(index)));
     complexity_check_and_warn("loop_to_complexity", comp);    
 
     trace_off();

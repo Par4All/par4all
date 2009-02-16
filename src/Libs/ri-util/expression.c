@@ -499,6 +499,7 @@ expression e;
 
     ice_p = constant_int_p(c);
   }
+  free_value(v);
   return ice_p;
 }
 

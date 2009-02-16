@@ -230,6 +230,5 @@ entity_minimal_name(entity e)
     emn = entity_name(e);
   }
 
-  free(mln);
   return emn;
 }

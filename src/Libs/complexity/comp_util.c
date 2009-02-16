@@ -747,7 +747,7 @@ hash_table hash_complexity_params;
 		fprintf(stderr,"\nstorage_formal %s\n",
 			entity_name(param));
 	    }
-	    hash_put(hash_complexity_params, (char *) module_local_name(param),
+	    hash_put(hash_complexity_params, (char *) strdup(module_local_name(param)),
 		     HASH_FORMAL_PARAM);
         }
     }, decl);

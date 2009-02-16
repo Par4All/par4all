@@ -249,7 +249,7 @@ string safe_entity_name(entity e)
  * special care of constants there. So I added something here, to deal
  * with the "null" entity which codes the constant. FC 28/11/94.
  */
-string 
+const string 
 entity_local_name(entity e)
 {
     string null_name = "null";
@@ -267,15 +267,15 @@ string entity_global_name(entity e)
     return entity_name(e);
 }
 
-/* Returns a copy of the module local user name */
-string module_local_name(entity e)
+/* Returns the module local user name */
+const string module_local_name(entity e)
 {
   /* No difference between modules and other entities, except for prefixes */
   /* Allocates a new string */
 
   string name = local_name(entity_name(e));
 
-  return strdup(name 
+  return (name 
     + strspn(name, MAIN_PREFIX)
     + strspn(name, BLOCKDATA_PREFIX)
     + strspn(name, COMMON_PREFIX));
