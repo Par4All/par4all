@@ -78,8 +78,9 @@ static void transitive_positions(set vertices,
       next: ;
       }
     }, vertices);
-    pips_debug(1, "Iteration %d completed with %d vertices processed\n"
-	       "(total number of vertices processed: %d)\n", iter, n, nvertices);
+    pips_debug(1, "Iteration %td completed with %td vertices processed\n"
+	       "(total number of vertices processed: %td)\n",
+	       iter, n, nvertices);
   }
 
   /* Check that all vertices are associated to a position... which only is
@@ -229,8 +230,8 @@ bool callgraph(string name)
       pips_debug(7, "adding %p as %s for module %s\n",
 		 callers, DBR_CALLERS, (string) module_name);
       print_callees((callees) callers);
-      fprintf(stderr, "HEIGHT = %d\n", (int) hash_get(module_height, (string) module_name));
-      fprintf(stderr, "DEPTH = %d\n", (int) hash_get(module_depth, (string) module_name));
+      fprintf(stderr, "HEIGHT = %td\n", (_int) hash_get(module_height, (string) module_name));
+      fprintf(stderr, "DEPTH = %td\n", (_int) hash_get(module_depth, (string) module_name));
     }, module_callers);
   }
 
