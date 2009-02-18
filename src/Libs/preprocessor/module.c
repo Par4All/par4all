@@ -188,9 +188,10 @@ string entity_module_unambiguous_user_name(entity e, entity m)
 	  }
 	}
       }, conflicts);
+    gen_free_list(conflicts);
   }
 
-  return strdup(uan);
+  return (uan);
 }
 
 string entity_unambiguous_user_name(entity e)

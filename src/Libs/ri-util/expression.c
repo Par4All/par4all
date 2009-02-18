@@ -778,7 +778,7 @@ int_to_expression(_int i)
     expression e;
 
     (void) sprintf(constant_name,"%td", i >= 0 ? i : -i);
-    e = MakeIntegerConstantExpression(strdup(constant_name));
+    e = MakeIntegerConstantExpression(constant_name);
     if(i<0) {
 	entity um = entity_intrinsic(UNARY_MINUS_OPERATOR_NAME);
 	e = MakeUnaryCall(um, e);
