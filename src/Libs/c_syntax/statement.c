@@ -197,8 +197,8 @@ entity MakeCLabel(string s)
 
 
 statement MakeWhileLoop(list lexp, statement s, bool before)
-{  
-  whileloop w; 
+{
+  whileloop w;
   statement smt;
   int i = basic_int((basic) stack_head(LoopStack));
   string lab1 = strdup(concatenate("loop_end_",int_to_string(i),NULL));
@@ -212,23 +212,19 @@ statement MakeWhileLoop(list lexp, statement s, bool before)
 	 Add the labeled statement at the end of loop body*/
       insert_statement(s,s1,FALSE);
     }
-  w  = make_whileloop(MakeCommaExpression(lexp),
-		      s,entity_empty_label(),
-		      before ? make_evaluation_before(): make_evaluation_after());
-  smt = make_statement(entity_empty_label(), 
-		       get_current_C_line_number(), 
-		       STATEMENT_ORDERING_UNDEFINED, 
-		       //pop_current_C_comment(),
-		       string_undefined,
-		       make_instruction_whileloop(w),
-		       NIL, string_undefined);
 
+  smt = make_whileloop_statement(MakeCommaExpression(lexp),
+				 s,
+				 get_current_C_line_number(),
+				 before);
   if (!statement_undefined_p(s2))
     {
       /* This loop has a break statement which has been transformed to goto 
 	 Add the labeled statement after the loop */
       insert_statement(smt,s2,FALSE);
     }
+
+  w = instruction_whileloop(statement_instruction(smt));
   pips_assert("While loop is consistent",whileloop_consistent_p(w));
   ifdebug(5) 
     {

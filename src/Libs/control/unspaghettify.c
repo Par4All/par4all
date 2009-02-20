@@ -671,26 +671,40 @@ try_to_structure_the_unstructured(statement s,
 }
 
 
-/* The exit node is the landing pad of the control graph. But if it is
-   not a continue, that means that its statement is a sequence at the
-   end of the unstructured and we can take it out of the
+/* Extract the statement from an exit node of an unstructured statement if
+   it is a useful statement
+
+   @param s is the statement that contains an unstructured
+   @return the new restructured statement
+
+   The exit node is the landing pad of the control graph. But if it is not
+   a continue, that means that its statement is a useful instruction at
+   the end of the unstructured and we can take it out of the
    unstructured. We just return the statement directly containing the
-   unstructured. */
+   unstructured.
+
+   Right now, it does not extract a RETURN since as explained in « PIPS:
+   Internal Representation of Fortran and C Code » about RETURN_LABEL_NAME
+   in the Entities section, since a RETURN with a label at the exit of un
+   unstructured is always the representation of a RETURN in Fortran
+   unstructured code... So even for C code, a return stay inside an
+   unstructured.  RK does not think it is important anyway...
+*/
 statement
 take_out_the_exit_node_if_not_a_continue(statement s)
 {
+    instruction i = statement_instruction(s);
+
+    pips_assert("take_out_the_exit_node_if_not_a_continue :"
+		"The statement must be an unstructured",
+		instruction_unstructured_p(i));
+
     /* To return and keep track of the unstructured: */
     statement the_unstructured = s;
-    instruction i = statement_instruction(s);
     unstructured u = instruction_unstructured(i);
     control exit_node = unstructured_exit(u);
     statement the_exit_statement = control_statement(exit_node);
     instruction the_exit_instruction;
-
-    pips_assert("take_out_the_exit_node_if_not_a_continue :"
-		"i != statement_instruction(s) || u != instruction_unstructured(i) !",
-		instruction_unstructured_p(i)
-		&& u == instruction_unstructured(i));
 
     ifdebug(5) {
       pips_debug(5,
@@ -1088,6 +1102,13 @@ recover_structured_while(unstructured u) {
   control next = CONTROL(CAR(control_successors(entry_node)));
   size_t arity = gen_length(control_successors(entry_node));
   control exit_node = unstructured_exit(u);
+  int line_number;
+
+  ifdebug (3) {
+    pips_debug(2, "At entry, from the entry node:\n");
+    display_linked_control_nodes(entry_node);
+  }
+
   switch(arity) {
   case 0:
     /* It looks like a single node unstructured. Nothing to look at,
@@ -1102,11 +1123,13 @@ recover_structured_while(unstructured u) {
       // next is not a test, so no while to be expected here...
       return;
 
+    line_number = statement_number(control_statement(next));
     test t = instruction_test(statement_instruction(control_statement(next)));
     expression cond = test_condition(t);
     control then_c = CONTROL(CAR(control_successors(next)));
     control else_c = CONTROL(CAR(CDR(control_successors(next))));
-    if (then_c == entry_node && else_c == exit) {
+
+    if (then_c == entry_node && else_c == exit_node) {
       /* We have
 	 entry:
 	 ...
@@ -1115,7 +1138,7 @@ recover_structured_while(unstructured u) {
       */
       // See afterwards to generate the "do ... while(cond)"
     }
-    else if (then_c == exit && else_c == entry_node) {
+    else if (then_c == exit_node && else_c == entry_node) {
       /* We have
 	 entry:
 	 ...
@@ -1126,25 +1149,31 @@ recover_structured_while(unstructured u) {
       // We need to negate the condition to generate a "do ... while(!cond)"
       cond = MakeUnaryCall(CreateIntrinsic(C_NOT_OPERATOR_NAME), cond);
     }
-    // Build the equivalent do ... while(). Do not save ay label yet.
-    whileloop w = make_whileloop(cond,
-				 control_statement(entry_node),
-				 entity_empty_label(),
-				 make_evaluation_after());
-    /* Protect recycled old stuff from being discarded later: */
-    test_condition(t) = expression_undefined;
+    else
+      // No "while" detected here:
+      return;
 
-    control_statement(entry_node) =
-      make_stmt_of_instr(make_instruction_whileloop(w));
-    /* Put the new statement in a one-node unstructured. Rely on later
-       cleaning... */
-    remove_a_control_from_an_unstructured_without_relinking(exit_node);
-    free_control(exit_node);
-    unstructured_exit(u) = entry_node;
+    /* Build the equivalent " do body; while(cond)". Do not save any
+       label yet, but use the same line number as the "if" one: */
+    statement body = control_statement(entry_node);
+    statement w = make_whileloop_statement(cond,
+					   body,
+					   line_number,
+					   FALSE);
+    control_statement(entry_node) = w;
+    /* Remove the test control node after having protected recycled old
+       stuff from being discarded: */
+    test_condition(t) = expression_undefined;
+    remove_a_control_from_an_unstructured_without_relinking(next);
+
+    /* Relink the remaining nodes in sequence, to be fused later somewhere
+       else: */
+    link_2_control_nodes(entry_node, exit_node);
     break;
 
   case 2: {
     // The entry node is a test. Try to detect a "while() ...;"
+    line_number = statement_number(control_statement(next));
     test t = instruction_test(statement_instruction(control_statement(entry_node)));
     expression cond = test_condition(t);
     control then_c = CONTROL(CAR(control_successors(entry_node)));
@@ -1152,7 +1181,7 @@ recover_structured_while(unstructured u) {
     control body_control = control_undefined;
     statement body = statement_undefined;
 
-    if (else_c == exit) {
+    if (else_c == exit_node) {
       if (then_c == entry_node) {
 	/* we have:
 	   entry: if (cond) goto entry;
@@ -1174,8 +1203,11 @@ recover_structured_while(unstructured u) {
 	*/
 	body_control = then_c;
       }
+      else
+	// No while() recognized here...
+	return;
     }
-    else if (then_c == exit) {
+    else if (then_c == exit_node) {
       if (else_c == entry_node) {
 	/* we have:
 	   entry: if (cond) goto exit;
@@ -1213,29 +1245,39 @@ recover_structured_while(unstructured u) {
       control_statement(body_control) = statement_undefined;
       remove_a_control_from_an_unstructured_without_relinking(body_control);
     }
-    else
+    else {
       // Make an empty body for the loop:
       body = make_continue_statement(entity_empty_label());
+      // Remove the arc from the "if" to itself:
+      unlink_2_control_nodes(entry_node, entry_node);
+    }
 
-    // Build the equivalent do ... while(). Do not save ay label yet.
-    whileloop w = make_whileloop(cond,
-				 body,
-				 entity_empty_label(),
-				 make_evaluation_before());
-    // Remove the test node:
+    /* Build the equivalent "while(cond) body;". Do not save any label
+       yet, but use the same line number as the "if" one: */
+    statement w = make_whileloop_statement(cond,
+					   body,
+					   line_number,
+					   TRUE);
+    // Remove the test node and replace it by the "while":
     test_condition(t) = expression_undefined;
-    remove_a_control_from_an_unstructured_without_relinking(entry_node);
-    // Keep only the node with the while:
-    free_statement(control_statement(exit_node));
-    control_statement(exit_node) = w;
-    unstructured_control(u) = exit_node;
+    free_statement(control_statement(entry_node));
+    control_statement(entry_node) = w;
     /* Other restructuring is applied afterwards to replace the
-       unstructured by a simple statement... */
+       unstructured by a simple statement, the entry and the exit are
+       still linked into a lazy sequence. */
     break;
   }
   default:
     // This case is not expected in the RI!
     pips_internal_error("A node cannot have %zd successors!", arity);
+  }
+  // If we land here, the restructuring has taken place above...
+  /* Increase the statistics. Used to rerun a restrustructuring shot after
+     a modification too: */
+  number_of_recovered_while++;
+  ifdebug (3) {
+    pips_debug(2, "After while recovering, from the entry node:\n");
+    display_linked_control_nodes(unstructured_control(u));
   }
 }
 

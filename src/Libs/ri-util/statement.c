@@ -749,6 +749,39 @@ entity l;
     return make_call_statement(CONTINUE_FUNCTION_NAME, NIL, l, 
 			       empty_comments);
 }
+
+/* Build a while loop statement.
+
+   If \a before is true, build a
+   while (\a condition)
+     \a s;
+
+   else build a
+   do
+     \a s;
+   while (\a condition);
+
+  @param line_number is used to specify a source-line number to the statement
+*/
+statement make_whileloop_statement(expression condition,
+				   statement s,
+				   int line_number,
+				   bool before) {
+  whileloop w;
+  statement smt;
+
+  w  = make_whileloop(condition, s, entity_empty_label(),
+		      before ? make_evaluation_before() : make_evaluation_after());
+  smt = make_statement(entity_empty_label(),
+		       line_number,
+		       STATEMENT_ORDERING_UNDEFINED,
+		       //pop_current_C_comment(),
+		       string_undefined,
+		       make_instruction_whileloop(w),
+		       NIL, string_undefined);
+  return smt;
+}
+
 
 
 
