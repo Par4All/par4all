@@ -1,0 +1,116 @@
+void sub_00402680()
+{
+   int var3;
+   int var4;
+   int var2;
+   int var1;
+   
+   
+
+   var3 = 0;                                                               /*0064*/
+loc_402685:   var4 = *g_408330;
+
+   var4 *= 25;                                                               /*0076*/
+
+   var4 += var3;                                                               /*0078*/
+
+   g_407480[var4] = 0.0;                                                               /*0080*/
+   
+   
+
+   ++var3;                                                               /*0084*/
+
+
+   if (var3<25) goto loc_402685;                                                               /*0088*/
+   
+   
+   
+   
+
+   parameters(1);                                                               /*0094*/
+loc_4026A6:   var2 = 0;
+   
+   
+
+   var1 = *g_xxxx;                                                               /*0110*/
+
+
+   if (var1<=0) goto loc_4026E9;                                                               /*0114*/
+loc_4016B2:   g_40E120[var2] = (g_412010[var2]**g_471F58+g_412000[var2]**g_471F28)*g_410068[var2]+*g_471F18;
+   
+   
+
+   ++var2;                                                               /*0132*/
+
+
+   if (var2<var1) goto loc_4016B2;                                                               /*0136*/
+   
+   
+   
+   
+
+loc_4026E9:   endloop(1);
+
+
+   if (*g_4081E8<*g_40746C) goto loc_4026A6;                                                               /*0154*/
+}
+void sub_00402680()
+{
+   int var3;
+   int var4;
+   int var2;
+   int var1;
+   
+   
+
+   var3 = 0;                                                               /*0064*/
+loc_402685:   var4 = *g_408330;
+
+   var4 *= 25;                                                               /*0076*/
+
+   var4 += var3;                                                               /*0078*/
+
+   g_407480[var4] = 0.0;                                                               /*0080*/
+   
+   
+
+   ++var3;                                                               /*0084*/
+
+
+   if (var3<25) goto loc_402685;                                                               /*0088*/
+   
+   
+   
+   
+
+   parameters(1);                                                               /*0094*/
+loc_4026A6:   var2 = 0;
+   
+   
+
+   var1 = *g_xxxx;                                                               /*0110*/
+   
+   
+
+   if (var1<=0)                                                               /*0114*/
+      ;
+   else {
+loc_4016B2:      g_40E120[var2] = (g_412010[var2]**g_471F58+g_412000[var2]**g_471F28)*g_410068[var2]+*g_471F18;
+      
+      
+
+      ++var2;                                                            /*0132*/
+
+
+      if (var2<var1) goto loc_4016B2;                                                            /*0136*/
+   }
+   
+   
+   
+   
+
+loc_4026E9:   endloop(1);
+
+
+   if (*g_4081E8<*g_40746C) goto loc_4026A6;                                                               /*0154*/
+}

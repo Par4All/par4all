@@ -1,0 +1,28 @@
+delete recover_while3
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create recover_while3 recover_while3.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+#setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+## To investigate with weird control graphs:
+#setproperty UNSPAGHETTIFY_IN_CONTROLIZER FALSE
+
+display PRINTED_FILE[find_while]
+
+#display GRAPH_PRINTED_FILE[find_while]
+
+setproperty UNSPAGHETTIFY_WHILE_RECOVER TRUE
+apply RESTRUCTURE_CONTROL
+
+display PRINTED_FILE
+
+activate TRANSFORMERS_INTER_FULL
+activate PRINT_CODE_PRECONDITIONS
+
+close
+delete recover_while3
+quit

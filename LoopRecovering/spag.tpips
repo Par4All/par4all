@@ -1,0 +1,14 @@
+delete spag
+create spag spag.c
+setproperty ABORT_ON_USER_ERROR TRUE
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+
+display PRINTED_FILE[bazar]
+setproperty UNSPAGHETTIFY_WHILE_RECOVER TRUE
+apply RESTRUCTURE_CONTROL
+display PRINTED_FILE[bazar]
+
+close
+quit

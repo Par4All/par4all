@@ -1,0 +1,24 @@
+int find_do_while(int i)
+{
+begin:   i = 8*i;
+   i++;                                                               /*0006*/
+   if (i<9) {                                                               /*0007*/
+   }
+   else {
+      goto begin;
+   }
+   
+
+the_end:   return i;
+}
+int find_do_while(int i)
+{
+   do {                                                               /*0007*/
+begin:      i = 8*i;
+      i++;                                                            /*0006*/
+   }
+   while (!(i<9));                                                               /*0007*/
+   
+
+the_end:   return i;
+}
