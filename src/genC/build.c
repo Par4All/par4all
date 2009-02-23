@@ -237,12 +237,10 @@ struct gen_binding * new_binding(char * name, union domain * val)
     {
 	if( val->ba.type == IMPORT_DT || 
 	    (Read_spec_mode && val->ba.type == EXTERNAL_DT )) {
-	    free( (char *)val ) ;
 	}
 	else 
 	    user( "Redeclaration skipped: <%s>\n", name ) ;
 
-	free(name);
     }
 
     return( bp ) ;

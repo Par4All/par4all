@@ -77,6 +77,34 @@ void genspec_reset_string_to_parse()
   // The file created by tmpfile() is automatically deleted on close:
     fclose(genspec_in);
 }
+     
+}
+#endif
+
+/* cache parsed string instead of strduplicating them
+ * valid because those strign are never released
+ * SG, feb. 2009
+ */
+#ifndef DISABLE_NEWGEN_PARSER_CACHE
+
+    #include <search.h>
+    char* strcache(char *s)
+    {
+        static void* rootp = NULL;
+        char ** res = NULL;
+        if( !(res = tfind(s,&rootp,(int(*)(const void*,const void*))strcmp)) )
+        {
+            char * dup = strdup(s);
+            res = tsearch(dup,&rootp,(int(*)(const void*,const void*))strcmp);
+            assert(*res == dup);
+        }
+        return *res;
+    }
+
+#else
+
+    #define strcache strdup
+
 #endif
 
 %}
@@ -99,8 +127,8 @@ x			{return AND ;}
 \]			{return RB ;}
 \{			{return LR ;}
 \}			{return RR ;}
-\"[_a-zA-Z0-9/\.~]+\"	{ yylval.name = strdup(yytext+1);
-                          *(yylval.name+strlen(yytext)-2) = '\0';
+\"[_a-zA-Z0-9/\.~]+\"	{ ++yytext; yytext[+strlen(yytext)-1] = '\0';
+                          yylval.name = strcache(yytext);
                           return GRAM_FILE ;}
 =			{return EQUAL ;}
 ^--NEWGEN-START\ [0-9]*\n {
@@ -109,7 +137,7 @@ x			{return AND ;}
 			}
 ^--NEWGEN-INDEX\ [0-9]*\n ;
 --.*\n			{}
-[_a-zA-Z][_a-zA-Z0-9]*	{ yylval.name = strdup(yytext); return IDENT ;}
+[_a-zA-Z][_a-zA-Z0-9]*	{ yylval.name = strcache(yytext); return IDENT ;}
 [0-9]+                  { yylval.val = atoi(yytext); return GRAM_INT ;}
 [ \t\n]*		;
 %%
