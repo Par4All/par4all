@@ -445,6 +445,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
      The real effects must be studied !!! I do not have time for the moment */
 
   {"__assert",                             no_write_effects},
+  {"__assert_fail",                        no_write_effects}, /* in fact, IO effect, does not return */
 
   /* #include <ctype.h>*/
 

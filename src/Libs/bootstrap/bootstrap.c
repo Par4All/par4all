@@ -4005,6 +4005,7 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
 
   /* #include <assert.h> */
   {"__assert", 3, overloaded_to_void_type,0,0},
+  {"__assert_fail", 4, overloaded_to_void_type,0,0}, /* does not return */
 
   /* #include <complex.h>*/
 
