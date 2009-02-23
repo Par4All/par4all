@@ -196,9 +196,19 @@ oct_escape ('\\'{octdigit}{octdigit}?{octdigit}?)
 ^"#"[^\n]*              {
                                 /* csplit_line_number++; */
                                 pips_debug(5,"Pragma comment %s\n",yytext);
-                                /* Must be a line pragma left by the preprocessor */
+                                /* Must be a line pragma left by the preprocessor:
+                                   # 1 blablabla.c
+                                   #pragma blablabla
+                                   #line nnn
+                                */
                                 gdb_marker();
-                                if(/* strstr(yytext, "#line")==yytext && */ strlen(yytext)>=4) {
+                                if(strstr(yytext, "#pragma")==yytext) {
+                                   pips_user_warning("Pragma #pragma is ignored: \"%s\".\n", yytext);
+                                   user_line_number--;
+                                }
+                                /* the preprocessor seems to provide line information in pragmas
+                                   which are not #line pragmas. */
+                                else if(/* strstr(yytext, "#line")==yytext && */ strlen(yytext)>=4) {
                                    int initial_C_line_number = -1;
                                    int items = sscanf(yytext+1, "%d", &initial_C_line_number);
                                    if(items==1) {

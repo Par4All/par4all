@@ -387,11 +387,17 @@ oct_escape ('\\'{octdigit}{octdigit}?{octdigit}?)
 ^"#"[^\n]*              {
                                 pips_debug(9,"Pragma comment %s\n",yytext);
                                 /* Is it a #line pragma? It has to be after preprocessing */
-                                if(/* strstr(yytext, "#line")==yytext && */ strlen(yytext)>=4) {
+                                if(strstr(yytext, "#pragma")==yytext) {
+                                   pips_user_warning("Pragma #pragma is ignored: \"%s\".\n", yytext);
+                                   C_line_number--;
+                                }
+                                /* the preprocessor seems to provide line information in pragmas
+                                   which are not #line pragmas. */
+                                else if(/* strstr(yytext, "#line")==yytext && */ strlen(yytext)>=4) {
                                    int initial_C_line_number = -1;
                                    int items = sscanf(yytext+1, "%d", &initial_C_line_number);
                                    if(items==1) {
-                                      /* Get rid of the pragma LF itslef */
+                                      /* Get rid of the pragma LF itself */
                                       C_line_number = initial_C_line_number-1;
                                    }
                                    else {
