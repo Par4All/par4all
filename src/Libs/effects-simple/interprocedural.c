@@ -905,7 +905,7 @@ fortran_summary_to_proper_effects(entity func,
 			    }
 			    
 			    if (effect_must_p(formal_effect))
-				pips_user_error
+				pips_user_warning
 				    ("\nmodule %s called by module %s:\n\twrite"
 				     " effect on non-variable actual"
 				     " parameter thru %d%s formal parameter %s\n",
