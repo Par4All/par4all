@@ -190,7 +190,7 @@ entity MakeCLabel(string s)
       entity_initial(l) = make_value(is_value_constant,
 				     MakeConstantLitteral());
     }
-  else 
+  else
     pips_debug(7, "Label %s already exists\n", s);
   return(l);
 }
@@ -198,7 +198,6 @@ entity MakeCLabel(string s)
 
 statement MakeWhileLoop(list lexp, statement s, bool before)
 {
-  whileloop w;
   statement smt;
   int i = basic_int((basic) stack_head(LoopStack));
   string lab1 = strdup(concatenate("loop_end_",int_to_string(i),NULL));
@@ -208,7 +207,7 @@ statement MakeWhileLoop(list lexp, statement s, bool before)
 
   if (!statement_undefined_p(s1))
     {
-      /* This loop has a continue statement which has been transformed to goto 
+      /* This loop has a continue statement which has been transformed to goto
 	 Add the labeled statement at the end of loop body*/
       insert_statement(s,s1,FALSE);
     }
@@ -219,14 +218,13 @@ statement MakeWhileLoop(list lexp, statement s, bool before)
 				 before);
   if (!statement_undefined_p(s2))
     {
-      /* This loop has a break statement which has been transformed to goto 
+      /* This loop has a break statement which has been transformed to goto
 	 Add the labeled statement after the loop */
       insert_statement(smt,s2,FALSE);
     }
 
-  w = instruction_whileloop(statement_instruction(smt));
-  pips_assert("While loop is consistent",whileloop_consistent_p(w));
-  ifdebug(5) 
+  pips_assert("While loop is consistent",statement_consistent_p(smt));
+  ifdebug(5)
     {
       printf("While loop statement: \n");
       print_statement(smt);

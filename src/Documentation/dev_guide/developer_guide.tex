@@ -400,7 +400,7 @@ svn revert . -R
 
 To know about where you are compared to the trunk, you can try a:
 \begin{verbatim}
-svn diff http://svn.cri.ensmp.fr/svn/pips/branches/villalon/graph \
+svn diff http://svn.cri.ensmp.fr/svn/pips/branches/calvin/graph \
    http://svn.cri.ensmp.fr/svn/pips/trunk
 \end{verbatim}
 
@@ -961,7 +961,10 @@ Two validation scripts are available:
 
   If you are Emacs oriented, setting the \verb|PIPS_GRAPHICAL_DIFF|
   environment variable to \verb|pips_emacs_diff| to use graphical Ediff
-  mode sounds like a good idea.
+  merge mode sounds like a good idea. You can use it like:
+\begin{verbatim}
+PIPS_GRAPHICAL_DIFF=pips_emacs_diff manual_accept LoopRecovering
+\end{verbatim}
 \end{description}
 
 If you work on a branch, you should also have a look to
