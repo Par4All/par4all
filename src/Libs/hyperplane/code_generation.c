@@ -84,11 +84,9 @@ Psysteme sc_newbase;
     }
     
     instr_lhyp = make_instruction(is_instruction_loop,l_hyp);
-    state_lhyp = make_statement(statement_label(s_loop),
-				statement_number(s_loop),
-				statement_ordering(s_loop),
-				statement_comments(s_loop),
-				instr_lhyp,NIL,NULL);
+    state_lhyp = copy_statement(s_loop);
+    free_instruction(statement_instruction(state_lhyp));
+    statement_instruction(state_lhyp) = instr_lhyp;
     return(state_lhyp);
 }
 
