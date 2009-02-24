@@ -1,0 +1,72 @@
+
+Transformers for SUB
+
+
+C  T(I) {I==11}
+
+
+
+      SUBROUTINE SUB(I)
+      INTEGER  I
+      INTEGER A(10)
+
+C  T(I) {}
+
+
+      DO I = 1, 10                                                      0001
+
+C  T() {}
+
+         A(I) = I                                                       0002
+      ENDDO
+
+C  T() {}
+
+      PRINT *, A                                                        0003
+      END
+
+Preconditions for SUB
+
+
+C  P() {I==4}
+
+
+
+      SUBROUTINE SUB(I)
+      INTEGER  I
+      INTEGER A(10)
+
+C  P() {I==4}
+
+
+      DO I = 1, 10                                                      0001
+
+C  P(I) {I#init==4, 1<=I, I<=10}
+
+         A(I) = I                                                       0002
+      ENDDO
+
+C  P(I) {I==11, I#init==4}
+
+      PRINT *, A                                                        0003
+      END
+
+Out regions for SUB
+
+
+
+      SUBROUTINE SUB(I)
+      INTEGER  I
+      INTEGER A(10)
+
+C  <A(PHI1)-OUT-EXACT-{1<=PHI1, PHI1<=10, init==4}>
+
+
+      DO I = 1, 10                                                      0001
+
+C  <A(PHI1)-OUT-EXACT-{I==PHI1, init==4, 1<=I, I<=10}>
+
+         A(I) = I                                                       0002
+      ENDDO
+      PRINT *, A                                                        0003
+      END
