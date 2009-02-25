@@ -1,0 +1,10 @@
+delete muller02
+create muller02 muller02.f
+
+#apply MUST_REGIONS
+
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[%ALL]
+
+close
+quit
