@@ -266,8 +266,7 @@ static bool dims_array_init(entity array, dimension* dims, int dim_array)
 
     i = 0; 
     dim_assumed = FALSE;
-    MAP(DIMENSION, dim,
-    {
+    FOREACH(DIMENSION, dim, variable_dimensions(type_variable(entity_type(array)))) {
 	if (i == dim_array -1)
 	{
 	    normalized nup = NORMALIZE_EXPRESSION(dimension_upper(dim));
@@ -278,6 +277,8 @@ static bool dims_array_init(entity array, dimension* dims, int dim_array)
 		Pvecteur pvup = normalized_linear(nup);
 		Pvecteur pvlo = normalized_linear(nlo);
 
+		/* FI: special case for? the warning message does not seem to fit the test */
+		if(!VECTEUR_NUL_P(pvup) && !VECTEUR_NUL_P(pvlo))
 		if (vect_constant_p(pvup) && value_one_p(val_of(pvup)) &&
 		    vect_constant_p(pvlo) && value_one_p(val_of(pvlo)))
 		{
@@ -295,9 +296,7 @@ static bool dims_array_init(entity array, dimension* dims, int dim_array)
 	}
 	dims[i] = dim;
 	i++;
-    }, 
-	variable_dimensions(type_variable(entity_type(array))) 
-	);
+    }
 
     return dim_assumed;
 }
