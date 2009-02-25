@@ -19,6 +19,6 @@ echo
 
 display PRINTED_FILE
 
-#close
-#delete tiling04
-#quit
+close
+delete tiling04
+quit
