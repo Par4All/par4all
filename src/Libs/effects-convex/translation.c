@@ -277,7 +277,14 @@ static bool dims_array_init(entity array, dimension* dims, int dim_array)
 		Pvecteur pvup = normalized_linear(nup);
 		Pvecteur pvlo = normalized_linear(nlo);
 
-		/* FI: special case for? the warning message does not seem to fit the test */
+		/* FI: special case for the old Fortran habit of using
+		   declarations such as D(1) or E(N,1) to declare a
+		   pointer to an array of undefined (last) dimension.
+
+		   Such declarations cannot be used for array bound
+		   checking.
+
+		   The warning message does not seem to fit the test. */
 		if(!VECTEUR_NUL_P(pvup) && !VECTEUR_NUL_P(pvlo))
 		if (vect_constant_p(pvup) && value_one_p(val_of(pvup)) &&
 		    vect_constant_p(pvlo) && value_one_p(val_of(pvlo)))
