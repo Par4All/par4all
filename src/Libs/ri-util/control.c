@@ -671,6 +671,8 @@ remove_a_control_from_a_list_and_relink(control c,
 
 /* It removes a control node from its successor and predecessor list
    and relink the successor and the predecessor.
+
+   Assume that it cannot have more than 1 successor (so no test node)
    */
 void
 remove_a_control_from_an_unstructured(control c)
