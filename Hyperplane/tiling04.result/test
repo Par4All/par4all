@@ -40,4 +40,3 @@ C     Check tiling: use integer lower loop bounds and symbolic upper bounds
       PRINT *, X                                                        0006
 
       END
-
