@@ -565,5 +565,42 @@ SIMD_OPPB (char DEST[8], char SRC[8])
     DEST[7] = -SRC[7];
 }
 
+void
+SIMD_SETPS (float DEST[2], float SRC[2])
+{
+    DEST[0] = SRC[0];
+    DEST[1] = SRC[1];
+}
+
+void
+SIMD_SETD (int DEST[2], int SRC[2])
+{
+    DEST[0] = SRC[0];
+    DEST[1] = SRC[1];
+}
+
+void
+SIMD_SETW (short DEST[4], short SRC[4])
+{
+    DEST[0] = SRC[0];
+    DEST[1] = SRC[1];
+    DEST[2] = SRC[2];
+    DEST[3] = SRC[3];
+}
+
+void
+SIMD_SETB (char DEST[8], char SRC[8])
+{
+    DEST[0] = SRC[0];
+    DEST[1] = SRC[1];
+    DEST[2] = SRC[2];
+    DEST[3] = SRC[3];
+    DEST[4] = SRC[4];
+    DEST[5] = SRC[5];
+    DEST[6] = SRC[6];
+    DEST[7] = SRC[7];
+}
+
+
 #undef LOGICAL
 #undef DMAX
