@@ -1301,6 +1301,41 @@ text_of_parameters(
     return make_text(ls);
 }
 
+void check_fortran_declaration_dependencies(list ldecl)
+{
+  /* Check that each declaration only depends on previous declarations */
+  int r = 1;
+
+  FOREACH(ENTITY, v, ldecl) {
+    type t = entity_type(v);
+
+    if(type_variable_p(t)) {
+      list dep = fortran_type_supporting_entities(NIL, t);
+      list cdep = list_undefined;
+
+      /* FOREACH(ENTITY, dv, dep) { */
+      for(cdep = dep; !ENDP(cdep); POP(cdep)) {
+	entity dv = ENTITY(CAR(cdep));
+	int dr = gen_position(dv, ldecl);
+
+	if(dr>=r) {
+	  if(entity_scalar_p(dv))
+	    pips_user_warning("Fortran declaration order may be violated. Variable \"%s\" "
+			    "depends on variable \"%s\" but is declared first.\n",
+			    entity_user_name(v), entity_user_name(dv));
+	  else
+	    /* Should be a ParserError() when called from ProcessEntries()... */
+	    pips_user_error("Fortran declaration order violated. Variable \"%s\" "
+			    "depends on variable \"%s\" but is declared first.\n",
+			    entity_user_name(v), entity_user_name(dv));
+	}
+      }
+      gen_free_list(dep);
+    }
+    r++;
+  }
+}
+
 /********************************************************** ALL DECLARATIONS */
 
 static text 
@@ -1323,16 +1358,19 @@ text_entity_declaration(
   string pp_var_dim = get_string_property("PRETTYPRINT_VARIABLE_DIMENSIONS");
   bool pp_in_type = FALSE, pp_in_common = FALSE, pp_cinc;
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
-  /* Declarations cannot be sorted out because Fortran standard impose at
-  least an order on parameters. Fortunately here, PARAMETER are mostly
-  integers, defined from other integer parameters... I assume that PIPS
-  would fail with an ENTRY referencing an integer array dimensionned with
-  a real parameter. But real parameters are not really well processed by
-  PIPS...
+  /* Declarations cannot be sorted out because Fortran standard impose
+  at least an order on parameters. Fortunately here, PARAMETER are
+  mostly integers, defined from other integer parameters... I assume
+  that PIPS would fail with an ENTRY referencing an integer array
+  dimensionned with a real parameter. But real parameters are not
+  really well processed by PIPS anyway... Also we are in trouble if
+  arrays or functions are used dimension other arrays
 
   list sorted_ldecl = gen_copy_seq(ldecl);
 
   gen_sort_list(sorted_ldecl, compare_entities); */
+
+  check_fortran_declaration_dependencies(ldecl);
      
   /* where to put the dimension information.
    */

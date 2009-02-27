@@ -1973,7 +1973,7 @@ list enum_supporting_entities(list sel, entity e)
   return sel;
 }
 
-list constant_expression_supporting_entities(list sel, expression e)
+list generic_constant_expression_supporting_entities(list sel, expression e, bool language_c_p)
 {
   syntax s = expression_syntax(e);
 
@@ -1988,16 +1988,38 @@ list constant_expression_supporting_entities(list sel, expression e)
     entity f = call_function(c);
 
     if(symbolic_constant_entity_p(f)) {
-      /* f cannot be declared directly, we need its enum */
-      extern entity find_enum_of_member(entity);
-      entity e_of_f = find_enum_of_member(f);
-      sel = CONS(ENTITY, e_of_f, sel);
-      sel = enum_supporting_entities(sel, e_of_f);
+      if(language_c_p) {
+	/* In C, f cannot be declared directly, we need its enum */
+	extern entity find_enum_of_member(entity);
+	entity e_of_f = find_enum_of_member(f);
+	sel = CONS(ENTITY, e_of_f, sel);
+	sel = enum_supporting_entities(sel, e_of_f);
+      }
+      else {
+	/* In Fortran, symbolic constant are declared directly, but
+	   the may depend on other symbolic constants */
+	value v = entity_initial(f);
+	symbolic s = value_symbolic(v);
+	
+	sel = CONS(ENTITY, f, sel);
+	sel = generic_symbolic_supporting_entities(sel, s, language_c_p);
+      }
     }
 
     MAP(EXPRESSION, se, {
-      sel = constant_expression_supporting_entities(sel, se);
+      sel = generic_constant_expression_supporting_entities(sel, se, language_c_p);
     }, call_arguments(c));
+  }
+  else if(syntax_reference_p(s)) {
+    reference r = syntax_reference(s);
+    entity v = reference_variable(r);
+    list inds = reference_indices(r);
+    /* Could be guarded so as not to be added twice. Guard might be
+       useless with because types are visited only once. */
+    sel = gen_nconc(sel, CONS(ENTITY, v, NIL));
+    MAP(EXPRESSION, se, {
+	sel = generic_constant_expression_supporting_entities(sel, se, language_c_p);
+      }, inds);
   }
   else {
     /* do nothing */
@@ -2013,11 +2035,29 @@ list constant_expression_supporting_entities(list sel, expression e)
   return sel;
 }
 
-list symbolic_supporting_entities(list sel, symbolic s)
+/* C version */
+list constant_expression_supporting_entities(list sel, expression e)
+{
+  return generic_constant_expression_supporting_entities(sel, e, TRUE);
+}
+
+/* Fortran version */
+list fortran_constant_expression_supporting_entities(list sel, expression e)
+{
+  return generic_constant_expression_supporting_entities(sel, e, FALSE);
+}
+
+list generic_symbolic_supporting_entities(list sel, symbolic s, bool language_c_p)
 {
   expression e = symbolic_expression(s);
-  sel = constant_expression_supporting_entities(sel, e);
+  sel = generic_constant_expression_supporting_entities(sel, e, language_c_p);
   return sel;
+}
+
+/* C version */
+list symbolic_supporting_entities(list sel, symbolic s)
+{
+  return generic_symbolic_supporting_entities(sel, s, TRUE);
 }
 
 list basic_supporting_entities(list sel, basic b)
@@ -2209,6 +2249,7 @@ list enum_supporting_references(list srl, entity e)
   return srl;
 }
 
+/* Only applicable to C expressions */
 list constant_expression_supporting_references(list srl, expression e)
 {
   syntax s = expression_syntax(e);
@@ -2224,7 +2265,13 @@ list constant_expression_supporting_references(list srl, expression e)
     entity f = call_function(c);
 
     if(symbolic_constant_entity_p(f)) {
-      /* f cannot be declared directly, we need its enum */
+      /* We need to know if we are dealing with C or Fortran code. */
+      /* In C, f cannot be declared directly, we need its enum */
+      /* But in Fortran, we are done */
+      /* FI: suggested kludge: use a Fortran incompatible type for
+	 enum member. But currently they are four byte signed integer (c89)
+	 and this Fortran INTEGER type :-( */
+
       extern entity find_enum_of_member(entity);
       entity e_of_f = find_enum_of_member(f);
       //srl = CONS(ENTITY, e_of_f, srl);
@@ -2336,6 +2383,45 @@ list variable_type_supporting_references(list srl, variable v)
   return srl;
 }
 
+list fortran_type_supporting_entities(list srl, type t)
+{
+  ifdebug(9) {
+    pips_debug(8, "Begin: ");
+    print_references(srl);
+    fprintf(stderr, "\n");
+  }
+  
+  if(type_functional_p(t))
+    ;
+  else if(type_variable_p(t)) {
+    /* In Fortran, dependencies are due to the dimension expressions.*/
+    variable v = type_variable(t);
+    list dims = variable_dimensions(v);
+
+    FOREACH(DIMENSION, d, dims) {
+      expression l = dimension_lower(d);
+      expression u = dimension_upper(d);
+      srl = fortran_constant_expression_supporting_entities(srl, l);
+      srl = fortran_constant_expression_supporting_entities(srl, u);
+    }
+  }
+  else if(type_void_p(t))
+    ;
+  else
+    pips_internal_error("Unexpected Fortran type with tag %d\n", type_tag(t));
+
+  ifdebug(9) {
+    pips_debug(8, "End: ");
+    print_references(srl);
+    fprintf(stderr, "\n");
+  }
+
+  return srl;
+}
+
+/* This is not Fortran compatible as enum members and symbolic
+   constant appear the same but cannot be dealt with in the same
+   way. */
 static list recursive_type_supporting_references(list srl, type t)
 {
   /* Do not recurse if this type has already been visited. */
@@ -2397,7 +2483,9 @@ list type_supporting_references(list srl, type t)
   set_free(supporting_types);
   return srl;
 }
+
 
+
 /* Check that an effective parameter list is compatible with a
    function type. Or improve the function type when it is not precise
    as with "extern int f()". This is (a bit/partially) redundant with
