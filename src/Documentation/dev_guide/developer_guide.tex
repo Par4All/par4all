@@ -1146,6 +1146,11 @@ monitor every bit of the memory to detect memory corruption or the use of
 an uninitialized bit (yes, not byte) of memory. Of course the execution is
 quite slower.
 
+Electric fence (\texttt{libefence}) also proves to be usefull when you need to stop exactly when
+an illegal memory operation happens. Note that because of \lstinline|regcomp|,
+I had to define the env variable \lstinline|EF_ALLOW_MALLOC_0| when debugging
+tpips.
+
 Another solution is to ask the compiler to instrument the code at compile
 time to detect memory corruption later at run time. This is done with
 \texttt{gcc} by compiling with \texttt{-fmudflap} option (or
