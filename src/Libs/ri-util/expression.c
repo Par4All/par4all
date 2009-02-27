@@ -2311,3 +2311,186 @@ expression e;
 	return entity_undefined; 
     }
 }
+
+
+/** 
+ * @brief perform the real similarity comparaison between two expressions
+ * target is matcehd against pattern, and expression <> argument is strored in symbols
+ * 
+ * @param target cheked expression
+ * @param pattern pattern expression
+ * @param symbols map storing entity <> expression tuple
+ * 
+ * @return true if similar
+ */
+static
+bool _expression_similar_p(expression target, expression pattern,hash_table symbols)
+{
+    bool similar=true;
+    syntax starget = expression_syntax(target),
+           spattern = expression_syntax(pattern);
+
+    /* cast handler */
+    if( syntax_cast_p( spattern ) )
+    {
+        pips_user_warning("cast badly handled\n");
+        return _expression_similar_p(target, cast_expression(syntax_cast(spattern)),symbols);
+    }
+    
+    switch(syntax_tag(spattern) )
+    {
+        /* we memorize reference from target and pattern in the symbol table
+         * similar to \1 in sed
+         */
+        case is_syntax_reference:
+            {
+                if( syntax_reference_p(starget) ||
+                        ( syntax_call_p(starget) && call_constant_p(syntax_call(starget))) ||
+                        syntax_sizeofexpression_p(starget) ||
+                        syntax_subscript_p(starget)
+                  )
+                {
+                    reference r = syntax_reference(spattern);
+                    /* simple variable */
+                    if(ENDP(reference_indices(r)))
+                    {
+
+                        expression val = hash_get(symbols,entity_name(reference_variable(r)));
+                        if ( val == HASH_UNDEFINED_VALUE )
+                            hash_put(symbols,entity_name(reference_variable(r)), target);
+                        else
+                            similar = syntax_equal_p(expression_syntax(val),starget);
+                    }
+                    else 
+                    {
+                        pips_user_warning("arrays are not supported in expression_similar\n");
+                        similar=false;
+                    }
+                }
+                else
+                {
+                    similar=false;
+                }
+            } break;
+        /* recursively compare each arguments if call do not differ */
+        case is_syntax_call:
+            if( syntax_call_p(starget) &&
+                    same_entity_p( call_function(syntax_call(starget)), call_function(syntax_call(spattern)) ) )
+            {
+                list iter = call_arguments(syntax_call(spattern));
+                FOREACH(EXPRESSION, etarget, call_arguments(syntax_call(starget) ) )
+                {
+                    if( ENDP(iter) ) { similar = false; break; }/* could occur with va args */
+                    expression epattern = EXPRESSION(CAR(iter));
+                    similar&= _expression_similar_p(etarget,epattern,symbols);
+                    POP(iter);
+                }
+            }
+            else
+            {
+                similar =false;
+            }
+            break;
+        /* SG: will this be usefull ?*/
+        case is_syntax_range:
+            similar = syntax_range_p(starget) && 
+                _expression_similar_p(range_lower(syntax_range(starget)),range_lower(syntax_range(spattern)),symbols) &&
+                _expression_similar_p(range_upper(syntax_range(starget)),range_upper(syntax_range(spattern)),symbols) &&
+                _expression_similar_p(range_increment(syntax_range(starget)),range_increment(syntax_range(spattern)),symbols);
+            break;
+
+        /* SG:not supported yet */
+        case is_syntax_cast:
+            pips_user_warning("cast ignored\n");
+            similar = _expression_similar_p(cast_expression(syntax_cast(starget)),pattern,symbols);
+            break;
+
+        case is_syntax_sizeofexpression:
+            if( syntax_sizeofexpression_p(starget) )
+            {
+                sizeofexpression seo_target = syntax_sizeofexpression(starget);
+                sizeofexpression seo_pattern = syntax_sizeofexpression(spattern);
+                if( sizeofexpression_type(seo_pattern) )
+                    similar = sizeofexpression_type_p(seo_target) &&
+                        type_equal_p( sizeofexpression_type(seo_target), sizeofexpression_type(seo_pattern) );
+                else
+                    similar = _expression_similar_p(sizeofexpression_expression(seo_target),
+                            sizeofexpression_expression(seo_pattern),
+                            symbols );
+            }
+            else
+            {
+                similar =false;
+            }
+            break;
+
+        case is_syntax_subscript:
+            if( syntax_subscript_p(starget) )
+            {
+                subscript sub_target = syntax_subscript(starget),
+                          sub_pattern = syntax_subscript(spattern);
+                similar&= _expression_similar_p( subscript_array(sub_target), subscript_array(sub_pattern),symbols );
+
+                list iter = subscript_indices(sub_pattern);
+                FOREACH(EXPRESSION, etarget, subscript_indices(sub_target) )
+                {
+                    if( ENDP(iter) ) { similar = false; break; }/* could occur with va args */
+                    expression epattern = EXPRESSION(CAR(iter));
+                    similar&= _expression_similar_p(etarget,epattern,symbols);
+                    POP(iter);
+                }
+            }
+            else
+                similar =false;
+            break;
+        case is_syntax_application:
+            pips_user_warning("application similarity not implemented yet\n");
+            similar=false;
+            break;
+        case is_syntax_va_arg:
+            pips_user_warning("va_arg similarity not implemented yet\n");
+            similar=false;
+            break;
+    };
+    return similar;
+}
+/** 
+ * @brief similar to expression_similar_p but the hash_map
+ * containing the crossref value is retured for further use
+ * 
+ * @param target expression to compare
+ * @param pattern expression serving as pattern
+ * @param symbol_table pointer to unallocated hash_map, in the end it will contain a set of pair (original syntax reference name, substituted syntax element). Must be freed, but only if expressions are similar
+ * 
+ * @return true if expressions are similar
+ */
+bool expression_similar_get_context_p(expression target, expression pattern, hash_table* symbol_table)
+{
+    *symbol_table = hash_table_make(hash_string,HASH_DEFAULT_SIZE);
+    bool similar = _expression_similar_p(target,pattern,*symbol_table);
+    if( !similar) hash_table_free(*symbol_table);
+    return similar;
+}
+
+/** 
+ * @brief compare if two expressions are similar
+ * that is can we exchange target and pattern by substituing
+ * variables
+ * examples:
+ *  1+2 ~  a+b
+ *  a+b !~ a+2
+ *  1+b ~  1+c
+ * @param target expression that sould match with pattern
+ * @param pattern the pattern to match
+ * 
+ * @return true if expressions are similar
+ */
+bool expression_similar_p(expression target, expression pattern)
+{
+    hash_table symbol_table = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
+    bool similar = _expression_similar_p(target,pattern,symbol_table);
+    hash_table_free(symbol_table);
+    return similar;
+}
+
+

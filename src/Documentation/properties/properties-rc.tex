@@ -2029,6 +2029,14 @@ top-down approach !
 ALIAS_CHECKING_USING_MAIN_PROGRAM FALSE
 \end{verbatim}
 
+\subsection{Expression substituion}
+
+This property is used to set the one-liner module used during expression substitution.
+It must be the name of a module already loaded in pips and containing only one return instruction (the instruction to be matched)
+\begin{verbatim}
+EXPRESSION_SUBSTITUTION_PATTERN ""
+\end{verbatim}
+
 \subsection{SAC - SIMD Architecture Compiler}
 
 This property is used to set the target register size, expressed in

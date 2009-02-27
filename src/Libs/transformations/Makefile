@@ -29,7 +29,8 @@ LIB_CFILES =	replace.c \
 		partial_redundancy_elimination.c \
 		variable_expansion.c \
 		internalize_parallel_code.c \
-		inlining.c
+		inlining.c\
+		expression_substitution.c
 
 INC_TARGET =    $(TARGET).h
 

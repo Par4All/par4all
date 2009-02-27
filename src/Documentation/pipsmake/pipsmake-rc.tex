@@ -4424,6 +4424,23 @@ forward_substitute      > MODULE.code
         < MODULE.cumulated_effects
 \end{verbatim}
 
+\subsection{Expression Substitution}
+
+%%@UserManualDocumentation: expression_substitution
+This transformation is quickly developped to fullfill the need of a simple pattern matcher in pips.
+The user provide a module name through \verb|EXPRESSION_SUBSTITUTION_PATTERN| property and all expression similar to those contained in \verb|EXPRESSION_SUBSTITUTION_PATTERN| will be substituted to a call to this module.
+It is  a kind of simple outlining transformations, it proves to be usefull during simdization to recognize some idioms. Note that the pattern must contain only a single return instruction !
+This phase was developped by Serge \textsc{Guelton} during his PhD.
+%%!UserManualDocumentation
+
+\begin{verbatim}
+alias expression_substitution "Expression Substitution"
+
+expression_substitution > MODULE.code
+        > MODULE.callee
+        < PROGRAM.entities
+        < ALL.code
+\end{verbatim}
 
 \subsection{Expression Optimizations}
 \label{subsection-expression-optimizations}
@@ -4520,6 +4537,8 @@ unfolding      > MODULE.code
         < MODULE.cumulated_effects
         < CALLERS.code
 \end{verbatim}
+
+
 
 %-----------End of Expression Transformations -------------------------
 
