@@ -9,7 +9,8 @@ SCRIPTS = \
 	display_pips_daVinci \
 	pips_graph2daVinci \
 	pips_unstructured2daVinci \
-	pips_unstructured2dot
+	pips_unstructured2dot \
+	display_pips_graph
 
 INSTALL_UTL =	$(SCRIPTS)
 
@@ -22,3 +23,4 @@ endif
 
 #PROJECT = pips
 include $(ROOT)/makes/main.mk
+
