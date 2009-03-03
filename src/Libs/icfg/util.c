@@ -104,13 +104,6 @@ vertex get_vertex_by_string(string str_name, list l_of_vers)
     return vertex_undefined;
 }
 
-string sentence_to_string(sentence sen)
-{
-    if (!sentence_formatted_p(sen))
-        return words_to_string(unformatted_words(sentence_unformatted(sen)));
-    else
-        return sentence_formatted(sen);
-}
 
 list safe_make_successor(vertex ver_parent, vertex ver_child, list l_of_vers)
 {

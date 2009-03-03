@@ -22,6 +22,7 @@
 #include "control.h"
 #include "effects-generic.h"
 #include "preprocessor.h"
+#include "text-util.h"
 #include "transformations.h"
 
 
@@ -678,4 +679,266 @@ unfolding(char* module_name)
 
    debug_off();
    return !ENDP(calls_name);
+}
+
+
+/*********************************************************************************************
+ *
+ *  outlining part
+ *
+ */
+
+#define STAT_ORDER "PRETTYPRINT_STATEMENT_NUMBER"
+
+static
+void patch_outlined_reference(expression x, entity e)
+{
+    if(expression_reference_p(x))
+    {
+        reference r =expression_reference(x);
+        entity e1 = reference_variable(r);
+        if(same_entity_p(e,e1))
+        {
+            expression X = make_expression(expression_syntax(x),normalized_undefined);
+            expression_syntax(x)=make_syntax_call(make_call(
+                    CreateIntrinsic(DEREFERENCING_OPERATOR_NAME),
+                    CONS(EXPRESSION,X,NIL)));
+        }
+    }
+
+}
+
+statement outliner(string outline_module_name, list statements_to_outline)
+{
+    pips_assert("there are some statements to outline",!ENDP(statements_to_outline));
+
+    /* retreive referenced and declared entities */
+    list referenced_entities = NIL,
+         declared_entities = NIL ;
+    FOREACH(STATEMENT, s, statements_to_outline)
+    {
+        referenced_entities=gen_nconc(referenced_entities, statement_to_referenced_entities(s));
+        declared_entities =gen_nconc(declared_entities, statement_to_declarations(s));
+    }
+
+    /* get the relative complements and create the parameter list*/
+    gen_list_and_not(&referenced_entities,declared_entities);
+
+    list parameters = NIL;
+    intptr_t i=0;
+    set enames = set_make(set_string);
+    entity new_fun = make_empty_subroutine(outline_module_name);
+    statement body = instruction_to_statement(make_instruction_sequence(make_sequence(statements_to_outline)));
+
+    list effective_parameters = NIL;
+    FOREACH(ENTITY,e,referenced_entities)
+    {
+        entity dummy_entity = FindOrCreateEntity(
+                outline_module_name,
+                entity_user_name(e)
+        );
+        if(!set_belong_p(enames,entity_name(dummy_entity)))
+        {
+            set_add_element(enames,enames,entity_name(dummy_entity));
+            entity_type(dummy_entity)=copy_type(entity_type(e));
+            entity_storage(dummy_entity)=make_storage_formal(make_formal(dummy_entity,++i));
+
+
+            parameters=CONS(PARAMETER,make_parameter(
+                        copy_type(entity_type(e)),
+                        make_mode_value(), /* to be changed */
+                        make_dummy_identifier(dummy_entity)),parameters);
+            AddEntityToDeclarations(dummy_entity,new_fun);
+
+            effective_parameters=CONS(EXPRESSION,entity_to_expression(e),effective_parameters);
+
+            /* we need to patch this fo C , see below*/
+            if(c_module_p(get_current_module_entity()))
+                gen_context_recurse(body,e,expression_domain,gen_true,patch_outlined_reference);
+        }
+    }
+    set_free(enames);
+
+
+
+    /* we need to patch parameters , effective parameters and body in C
+     * because of by copy function call
+     */
+    if(c_module_p(get_current_module_entity()))
+    {
+        FOREACH(PARAMETER,p,parameters)
+        {
+            entity e = dummy_identifier(parameter_dummy(p));
+            type t = copy_type(entity_type(e));
+            entity_type(e)=make_type_variable(
+                    make_variable(
+                        make_basic_pointer(t),
+                        NIL,
+                        NIL
+                        )
+                    );
+            parameter_type(p)=t;
+        }
+        FOREACH(EXPRESSION,x,effective_parameters)
+        {
+            syntax s = expression_syntax(x);
+            expression X = make_expression(s,normalized_undefined);
+            expression_syntax(x)=make_syntax_call(make_call(CreateIntrinsic(ADDRESS_OF_OPERATOR_NAME),CONS(EXPRESSION,X,NIL)));
+        }
+    }
+
+    /* prepare paramters and body*/
+    functional_parameters(type_functional(entity_type(new_fun)))=parameters;
+
+    /* we can now begin the outlining */
+    bool saved = get_bool_property(STAT_ORDER);
+    set_bool_property(STAT_ORDER,false);
+    text t = text_named_module(new_fun, get_current_module_entity(), body);
+    add_new_module_from_text(outline_module_name, t, fortran_module_p(get_current_module_entity()));
+    set_bool_property(STAT_ORDER,saved);
+
+    /* and return the replacement statement */
+    instruction new_inst =  make_instruction_call(make_call(new_fun,effective_parameters));
+    statement new_stmt = statement_undefined;
+
+    /* perform substitution :
+     * replace the original statements by a single call
+     * and patch the remaining statement (yes it's ugly)
+     */
+    FOREACH(STATEMENT,old_statement,statements_to_outline)
+    {
+        free_instruction(statement_instruction(old_statement));
+        if(statement_undefined_p(new_stmt))
+        {
+            statement_instruction(old_statement)=new_inst;
+            new_stmt=old_statement;
+        }
+        else
+            statement_instruction(old_statement)=make_continue_instruction();
+        gen_free_list(statement_declarations(old_statement));
+        statement_declarations(old_statement)=NIL;
+    }
+    return new_stmt;
+}
+
+
+static
+bool interactive_statement_picker(statement s,bool started)
+{
+    string statement_text = text_to_string(text_statement(get_current_module_entity(),1,s));
+    string answer = string_undefined;
+    do {
+        while( string_undefined_p(answer) || empty_string_p(answer)  )
+        {
+            answer = user_request("%s\n%s\n%s\n%s\n%s\n",
+                "Do you want to pick the following statement ?",
+                "**********************",
+                statement_text,
+                "**********************",
+                "[y/n] ?"
+            );
+        }
+        if( answer[0]!='y' && answer[0]!='n' )
+        {
+            pips_user_warning("answer by 'y' or 'n' !\n");
+            free(answer);
+            answer=string_undefined;
+        }
+    } while(string_undefined_p(answer));
+
+    if(!started &&  answer[0]=='y') started=true;
+
+    return  answer[0]=='y';
+}
+
+static
+void statement_walker(statement s, list* l, bool (*picker)(statement,bool), bool started )
+{
+    if( picker(s,started) ) 
+    {
+        *l=CONS(STATEMENT,s,*l);
+        started=true;
+    }
+    else if( !started )
+    {
+        instruction i = statement_instruction(s);
+        switch(instruction_tag(i))
+        {
+            case is_instruction_sequence:
+                {
+                    FOREACH(STATEMENT,S,sequence_statements(instruction_sequence(i)))
+                        statement_walker(S,l,picker,started);
+                } break;
+            case is_instruction_test:
+                {
+                    statement_walker(test_true(instruction_test(i)),l,picker,started);
+                    statement_walker(test_false(instruction_test(i)),l,picker,started);
+                } break;
+            case is_instruction_loop:
+                statement_walker(loop_body(instruction_loop(i)),l,picker,started);
+                break;
+            case is_instruction_whileloop:
+                statement_walker(whileloop_body(instruction_whileloop(i)),l,picker,started);
+                break;
+            case is_instruction_multitest:
+                statement_walker(multitest_body(instruction_multitest(i)),l,picker,started);
+                break;
+            case is_instruction_forloop:
+                statement_walker(forloop_body(instruction_forloop(i)),l,picker,started);
+                break;
+            case is_instruction_unstructured:
+            case is_instruction_return:
+            case is_instruction_expression:
+            case is_instruction_goto:
+            case is_instruction_call:
+                break;
+        };
+    }
+}
+
+
+/** 
+ * @brief entry point for outline module
+ * outlining will be performed using either pragma recognition
+ * or interactively
+ * 
+ * @param module_name name of the module containg the statements to outline
+ */
+bool
+outline(char* module_name)
+{
+    /* prelude */
+    set_current_module_entity(module_name_to_entity( module_name ));
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+
+    /* retrieve name of the outiled module */
+    string outline_module_name = string_undefined;
+    do {
+        outline_module_name = user_request("outline module name ?\n");// should check
+    } while( string_undefined_p(outline_module_name) || outline_module_name[0] == '\0' );
+    
+
+    /* retrieve statement to outline */
+    list statements_to_outline = NIL;
+    statement_walker(get_current_module_statement(),&statements_to_outline,&interactive_statement_picker,false);
+    /* we may want to try another picker later ;-) */
+
+
+    /* may need a sort */
+    statements_to_outline=gen_nreverse(statements_to_outline);
+
+    /* apply outlining */
+    statement new_stmt = outliner(outline_module_name,statements_to_outline);
+
+
+    /* validate */
+    module_reorder(get_current_module_statement());
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
+    DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module_name, compute_callees(get_current_module_statement()));
+
+    /*postlude*/
+    reset_current_module_entity();
+    reset_current_module_statement();
+
+    return true;
 }

@@ -292,6 +292,28 @@ words_to_string(list ls)
     return buffer;
 }
 
+/* SG: moved here from icfdg */
+string sentence_to_string(sentence sen)
+{
+    if (!sentence_formatted_p(sen))
+        return words_to_string(unformatted_words(sentence_unformatted(sen)));
+    else
+        return sentence_formatted(sen);
+}
+
+/* SG: moved here from ricedg */
+string text_to_string(text t)
+{
+  string str = strdup("");
+  string str_new;
+  MAP(SENTENCE, sen, {
+    str_new = strdup(concatenate(str, sentence_to_string(sen), NULL));
+    free(str);
+    str = str_new;
+  }, text_sentences(t));
+  return(str);
+}
+
 void 
 print_words(FILE * fd, list lw)
 {

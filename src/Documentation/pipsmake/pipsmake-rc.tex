@@ -4538,6 +4538,33 @@ unfolding      > MODULE.code
         < CALLERS.code
 \end{verbatim}
 
+\subsection{Outlining}
+\label{subsection-outlining}
+
+%%@UserManualDocumentation: outline
+This documentation is a work in progress, as well as the documented topic.
+
+
+Outlining is the oppositie transformation of inlining~\ref{subsection-inlining}.
+It creates a new module based on some statements from an existing module.
+The new module body is similar to the piece of code outlined from the existing modules.
+The old statements are replaced by a call to the new module.
+The user will be prompted for various question in order to perform the outlining
+\begin{itemize}
+    \item new module name
+    \item statement number of the first outlined statement
+    \item number of statement to outline
+\end{itemize}
+
+
+%%!UserManualDocumentation
+\begin{verbatim}
+
+outline      > MODULE.code
+        > PROGRAM.entities
+        < PROGRAM.entities
+        < MODULE.code
+\end{verbatim}
 
 
 %-----------End of Expression Transformations -------------------------

@@ -292,17 +292,6 @@ static string print_call_path(list path)
   return words_to_string(pc);
 }
 
-string text_to_string(text t)
-{
-  string str = strdup("");
-  string str_new;
-  MAP(SENTENCE, sen, {
-    str_new = strdup(concatenate(str, sentence_to_string(sen), NULL));
-    free(str);
-    str = str_new;
-  }, text_sentences(t));
-  return(str);
-}
 
 static void insert_impact_description_as_comment(statement s1, statement s2, bool impact_must_p, int dep_type)
 {

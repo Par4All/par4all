@@ -213,7 +213,7 @@ static matchTree match_call(call c, matchTree t, list *args)
     if (t == matchTree_undefined)
         return matchTree_undefined; /* no match */
 
-    MAP(EXPRESSION, arg,
+    FOREACH(EXPRESSION, arg, call_arguments(c))
     {
         syntax s = expression_syntax(arg);
 
@@ -255,8 +255,8 @@ static matchTree match_call(call c, matchTree t, list *args)
 
         if (t == matchTree_undefined)
             return matchTree_undefined;
-    },
-        call_arguments(c));
+    }
+        
 
     return t;
 }
