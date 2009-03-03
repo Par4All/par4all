@@ -1,0 +1,23 @@
+delete capron02
+create capron02 capron02.f
+
+echo
+echo Print code with proper reductions
+echo
+
+activate PRINT_CODE_PROPER_REDUCTIONS
+display PRINTED_FILE[%ALL]
+
+echo
+echo Print code with cumulated reductions
+echo
+
+activate PRINT_CODE_CUMULATED_REDUCTIONS
+display PRINTED_FILE[%ALL]
+
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE[capron02]
+
+close
+delete capron02
+quit
