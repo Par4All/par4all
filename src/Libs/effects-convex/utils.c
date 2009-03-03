@@ -1223,9 +1223,12 @@ entity make_phi_entity(int n)
     if (phi[n-1] == entity_undefined)
     {
 	entity v;
-	char phi_name[5];
+	char phi_name[6];
 	char * s;
-	
+
+	pips_assert ("n can't be more than a two digit number", n < 100);
+	pips_assert ("PHI_PREFIX lenght has been changed", strlen (PHI_PREFIX) == 3);
+
 	(void) strcpy(phi_name, PHI_PREFIX);
 	(void) sprintf(phi_name+3,"%d",n);
 	s = strdup(concatenate(REGIONS_MODULE_NAME,
@@ -1496,8 +1499,11 @@ entity make_psi_entity(int n)
     if (psi[n-1] == entity_undefined) 
     {
 	entity v;
-	char psi_name[5];
+	char psi_name[6];
 	char * s;
+
+	pips_assert ("n can't be more than a two digit number", n < 100);
+	pips_assert ("PSI_PREFIX lenght has been changed", strlen (PSI_PREFIX) == 3);
 
 	(void) strcpy(psi_name, PSI_PREFIX);
 	(void) sprintf(psi_name+3,"%d",n);

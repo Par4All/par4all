@@ -138,9 +138,11 @@ int l;
 {
     entity e;
     string s;
-    static char din[] = "ds#X";
+    static char din[] = "ds#XXXX";
 
-    sprintf(din+3, "%1d", l);
+    pips_assert ("check four digits number",l < 10000);
+    
+    sprintf(din+3, "%.4d", l);
     s = concatenate(DI_VAR_MODULE_NAME, MODULE_SEP_STRING, din, (char*) NULL);
 
     if ((e = gen_find_tabulated(s, entity_domain)) == entity_undefined) {

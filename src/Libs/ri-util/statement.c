@@ -35,6 +35,9 @@ extern bool is_fortran;
 /* detects a statement with no special effect...
  */ 
 
+/* Define the static buffer size */
+#define STATIC_BUFFER_SZ 100
+
 
 static bool statement_is_empty;
 
@@ -1458,22 +1461,25 @@ instruction_identification(instruction i)
 string 
 external_statement_identification(statement s)
 {
-    static char buffer[50];
+    static char buffer[STATIC_BUFFER_SZ];
     instruction i = statement_instruction(s);
     string instrstring = instruction_identification(i);
     int so = statement_ordering(s);
     entity called = entity_undefined;
+    int nb_char = 0;
 
     if(same_string_p(instrstring, "CALL")) {
 	called = call_function(instruction_call(i));
     }
 
-    sprintf(buffer, "%td (%d, %d): %s %s\n",
+    nb_char = snprintf(buffer, STATIC_BUFFER_SZ, "%td (%d, %d): %s %s\n",
 	    statement_number(s),
 	    ORDERING_NUMBER(so),
 	    ORDERING_STATEMENT(so),
 	    instrstring,
 	    entity_undefined_p(called)? "" : module_local_name(called));
+
+    pips_assert ("checking static buffer overflow", nb_char < STATIC_BUFFER_SZ);
 
     return buffer;
 }
@@ -1483,23 +1489,26 @@ external_statement_identification(statement s)
 string 
 statement_identification(statement s)
 {
-    static char buffer[50];
+    static char buffer[STATIC_BUFFER_SZ];
     instruction i = statement_instruction(s);
     string instrstring = instruction_identification(i);
     int so = statement_ordering(s);
     entity called = entity_undefined;
+    int nb_char = 0;
 
     if(same_string_p(instrstring, "CALL")) {
 	called = call_function(instruction_call(i));
     }
 
-    sprintf(buffer, "%td (%d, %d) at %p: %s %s\n",
-	    statement_number(s),
-	    ORDERING_NUMBER(so),
-	    ORDERING_STATEMENT(so),
-	    s,
-	    instrstring,
-	    entity_undefined_p(called)? "" : module_local_name(called));
+    nb_char = snprintf(buffer, STATIC_BUFFER_SZ, "%td (%d, %d) at %p: %s %s\n",
+		 statement_number(s),
+		 ORDERING_NUMBER(so),
+		 ORDERING_STATEMENT(so),
+		 s,
+		 instrstring,
+		 entity_undefined_p(called)? "" : module_local_name(called));
+
+    pips_assert ("static buffer overflow, increase the buffer size", nb_char < STATIC_BUFFER_SZ);
 
     return buffer;
 }
