@@ -3,6 +3,7 @@
  * @brief add inlining support to pips, with two flavors
  *  - inlining(char* module) to inline all calls to a module
  *  - unfolding(char* module) to inline all call in a module
+ *  - outlining(char* module) to outline statements from a module
  *
  * @author Serge Guelton <serge.guelton@enst-bretagne.fr>
  * @date 2009-01-07
@@ -90,7 +91,7 @@ find_effect_on_entity(statement s, entity e)
     {
         reference r = effect_any_reference(eff);
         entity re = reference_variable(r);
-        if( same_entity_p(e,re) )
+        if( same_entity_name_p(e,re) )
         {
            cell c = effect_cell(eff);
            found = (reference_indices( cell_preference_p(c) ? preference_reference(cell_preference(c)) : cell_reference(c) ) == NIL) ? eff :found ;
@@ -115,9 +116,10 @@ do_substitute_entity(expression exp, struct entity_pair* thecouple)
     {
         reference ref = syntax_reference(expression_syntax(exp));
         entity referenced_entity = reference_variable(ref);
-        if( same_entity_p(referenced_entity , thecouple->old) )
+        if( same_entity_name_p(referenced_entity , thecouple->old) )
         {
-             reference_variable(ref) = thecouple->new;
+            reference_variable(ref) = thecouple->new;
+            //expression_normalized(exp) = normalize_reference(ref);
         }
     }
 }
@@ -131,12 +133,12 @@ substitute_entity(statement s, entity old, entity new)
 
     gen_context_recurse( s, &thecouple, expression_domain, gen_true, do_substitute_entity);
 
-    MAP(ENTITY,decl_ent,
+    FOREACH(ENTITY,decl_ent,statement_declarations(s))
     {
         value v = entity_initial(decl_ent);
         if( !value_undefined_p(v) && value_expression_p( v ) )
             gen_context_recurse( value_expression(v), &thecouple, expression_domain, gen_true, do_substitute_entity);
-    }, statement_declarations(s) );
+    }
 }
 
 /* look for entity locally named has `new' in statements `s'
@@ -146,7 +148,7 @@ static void
 solve_name_clashes(statement s, entity new)
 {
     list l = statement_declarations(s);
-    for(;l!=NIL;POP(l))
+    for(;!ENDP(l);POP(l))
     {
         entity decl_ent = ENTITY(CAR(l));
         if( same_string_p(local_name(entity_name_without_scope(decl_ent)),
@@ -225,7 +227,15 @@ instruction inline_expression_call(expression modified_expression, call callee)
 
 
     /* the new instruction sequence */
-    statement expanded = copy_statement( inlined_module_statement );
+    statement expanded = make_statement(
+            entity_empty_label(),
+            STATEMENT_NUMBER_UNDEFINED,
+            STATEMENT_ORDERING_UNDEFINED,
+            empty_comments,
+            copy_instruction(statement_instruction(inlined_module_statement)),
+            gen_full_copy_list(statement_declarations(inlined_module_statement)),
+            NULL
+    );
 
     /* fix block status */
     if( ! statement_block_p( expanded ) )
@@ -280,13 +290,6 @@ instruction inline_expression_call(expression modified_expression, call callee)
         }
         if( !type_void_p(treturn) )
         {
-#if 0
-            if( normalized_defined_p(expression_normalized(modified_expression)))
-            {
-                    free_normalized( expression_normalized(modified_expression) );
-            }
-            free_syntax(expression_syntax(modified_expression));
-#endif
             reference r = make_reference( returned_entity, NIL);
             expression_syntax(modified_expression) = make_syntax_reference(r);
             expression_normalized(modified_expression) = normalize_reference(r);
@@ -582,9 +585,14 @@ inlining(char * module_name)
    list callers_l = callees_callees(callers);
 
    /* inline call in each caller */
-   MAP(STRING, caller_name, inline_calls( caller_name ) , callers_l );
+   FOREACH(STRING, caller_name,callers_l)
+   {
+       inline_calls( caller_name );
+   }
 
    reset_cumulated_rw_effects();
+   inlined_module = entity_undefined;
+   inlined_module_statement = statement_undefined;
 
    debug(2, "inlining", "done for %s\n", module_name);
    debug_off();
@@ -603,13 +611,16 @@ inlining(char * module_name)
 /* select every call that is not an intrinsic
  */
 static void 
-call_selector(call c, list* calls_name)
+call_selector(call c, set calls_name)
 {
     entity e = call_function(c);
     if( !entity_constant_p(e) && !intrinsic_entity_p(e) && !entity_symbolic_p(e) )
     {
         string name = entity_local_name(e);
-        *calls_name= CONS(STRING,name,*calls_name);
+        if( !set_belong_p(calls_name,name) )
+        {
+            set_add_element(calls_name,calls_name,name);
+        }
     }
 
 }
@@ -633,6 +644,8 @@ run_inlining(string caller_name, string module_name)
    /* inline call */
    inline_calls( caller_name );
    reset_cumulated_rw_effects();
+   inlined_module = entity_undefined;
+   inlined_module_statement=statement_undefined;
 }
 
 /* this should inline all call in module `module_name'
@@ -642,43 +655,36 @@ run_inlining(string caller_name, string module_name)
 bool
 unfolding(char* module_name)
 {
-   /* Get the module ressource */
-   entity unfolded_module = module_name_to_entity( module_name );
-   statement unfolded_module_statement = 
-       (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+    /* Get the module ressource */
+    entity unfolded_module = module_name_to_entity( module_name );
+    statement unfolded_module_statement = 
+        (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
 
-   /* check them */
-   pips_assert("is a functionnal",entity_function_p(unfolded_module) || entity_subroutine_p(unfolded_module) );
-   pips_assert("statements found", !statement_undefined_p(unfolded_module_statement) );
-   debug_on("UNFOLDING_DEBUG_LEVEL");
+    /* check them */
+    pips_assert("is a functionnal",entity_function_p(unfolded_module) || entity_subroutine_p(unfolded_module) );
+    pips_assert("statements found", !statement_undefined_p(unfolded_module_statement) );
+    debug_on("UNFOLDING_DEBUG_LEVEL");
 
-   /* gather all referenced calls */
-   list calls_name = NIL;
-   gen_context_recurse(unfolded_module_statement, &calls_name, call_domain, gen_true, &call_selector);
+    /* gather all referenced calls */
+    set calls_name = set_make(set_string);
+    gen_context_recurse(unfolded_module_statement, calls_name, call_domain, gen_true, &call_selector);
 
-   /* there is something to inline */
-   if( !ENDP(calls_name) ) 
-   {
-       MAP(STRING, call_name,
-       { run_inlining(module_name,call_name);
-       },calls_name);
-   }
-   else
-   {
-       debug(1, "unfolding", "no function call in %s\n", module_name);
-   }
-   /* remove all comments from inlined statement,
-    * because those comment could have a corrupted meaning
-    */
-   //gen_recurse(unfolded_module_statement,statement_domain,gen_true,remove_comments);
-    /* Reorder the module, because new statements have been added */  
-    module_reorder(unfolded_module_statement);
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, unfolded_module_statement);
+    /* there is something to inline */
+    if( !set_empty_p(calls_name) ) 
+    {
+        SET_MAP(call_name, run_inlining(module_name,(string)call_name) ,calls_name);
+    }
+    else
+    {
+        debug(1, "unfolding", "no function call in %s\n", module_name);
+    }
+    set_free(calls_name);
 
-   debug(2, "unfolding", "done for %s\n", module_name);
 
-   debug_off();
-   return !ENDP(calls_name);
+    debug(2, "unfolding", "done for %s\n", module_name);
+
+    debug_off();
+    return !set_empty_p(calls_name);
 }
 
 
