@@ -1,0 +1,181 @@
+
+Transformers for "foo"
+
+
+C  T(foo) {}
+
+int foo(int s)
+{
+   int t = s+2;
+
+//  T(t) {t#init<=t+1, t<=t#init+3}
+
+
+   if (t>6)
+
+//  T(t) {t==t#init+3}
+
+      t -= 3;
+   else
+
+//  T(t) {t==t#init-1}
+
+      t--;
+
+//  T(foo) {foo==t}
+
+
+   return t;
+}
+
+Transformers for "bar"
+
+
+//  T() {}
+
+void bar()
+{
+   int x = 3;
+   int y = x-3;
+
+//  T(x,y) {}
+
+   while (x<=4) {
+
+//  T(y) {y==y#init+1}
+
+      y++;
+
+//  T(x) {}
+
+      x = foo(x);
+   }
+
+//  T(y) {}
+
+   y = foo(y);
+}
+
+Preconditions for "bar"
+
+
+//  P() {}
+
+void bar()
+{
+   int x = 3;
+   int y = x-3;
+
+//  P() {x==3, y==0}
+
+   while (x<=4) {
+
+//  P(x,y) {x<=4}
+
+      y++;
+
+//  P(x,y) {x<=4}
+
+      x = foo(x);
+   }
+
+//  P(x,y) {5<=x}
+
+   y = foo(y);
+}
+
+Preconditions for "foo"
+
+
+//  P() {}
+
+int foo(int s)
+{
+   int t = s+2;
+
+//  P() {s==t-2}
+
+
+   if (t>6)
+
+//  P() {s==t-2, 5<=s}
+
+      t -= 3;
+   else
+
+//  P() {s==t-2, s<=4}
+
+      t--;
+
+//  P(t) {t<=s+5, s+1<=t}
+
+
+   return t;
+}
+
+
+
+void bar()
+{
+   int I_1;
+   int I_0;
+   int x = 3;
+   int y = x-3;
+   while (x<=4) {
+      y++;
+      {
+         int t = x+2;
+
+         if (t>6)
+            t -= 3;
+         else
+            t--;
+
+         I_0 = t;
+      }
+      x = I_0;
+   }
+   {
+      int t = x+2;
+
+      if (t>6)
+         t -= 3;
+      else
+         t--;
+
+      I_1 = t;
+   }
+   y = I_1;
+}
+void bar()
+{
+   int I_1;
+   int I_0;
+   int x = 3;
+   int y = x-3;
+   while (x<=4) {
+      y++;
+      {
+         int t = x+2;
+
+         if (t>6)
+            t -= 3;
+         else
+            t--;
+
+         I_0 = t;
+      }
+      x = I_0;
+   }
+   {
+      int t = x+2;
+
+      if (t>6)
+         t -= 3;
+      else
+         t--;
+
+      I_1 = t;
+   }
+   y = I_1;
+}
