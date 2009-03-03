@@ -1312,13 +1312,22 @@ void check_fortran_declaration_dependencies(list ldecl)
     if(type_variable_p(t)) {
       list dep = fortran_type_supporting_entities(NIL, t);
       list cdep = list_undefined;
+      storage vs = entity_storage(v);
 
       /* FOREACH(ENTITY, dv, dep) { */
       for(cdep = dep; !ENDP(cdep); POP(cdep)) {
 	entity dv = ENTITY(CAR(cdep));
 	int dr = gen_position(dv, ldecl);
+	value dvv = entity_initial(dv);
 
-	if(dr>=r) {
+	if(storage_formal_p(vs) && value_symbolic_p(dvv)) {
+	  /* Formal parameters are put in ldecl right away when
+	     parsing the SUBROUTINE or FUNCTION statement. The
+	     placement of their actual declaration is unknown. They
+	     may depend on PARAMETERs declared later */
+	  ;
+	}
+	else if(dr>=r) {
 	  if(entity_scalar_p(dv))
 	    pips_user_warning("Fortran declaration order may be violated. Variable \"%s\" "
 			    "depends on variable \"%s\" but is declared first.\n",
