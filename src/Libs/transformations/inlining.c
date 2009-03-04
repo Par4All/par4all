@@ -227,15 +227,8 @@ instruction inline_expression_call(expression modified_expression, call callee)
 
 
     /* the new instruction sequence */
-    statement expanded = make_statement(
-            entity_empty_label(),
-            STATEMENT_NUMBER_UNDEFINED,
-            STATEMENT_ORDERING_UNDEFINED,
-            empty_comments,
-            copy_instruction(statement_instruction(inlined_module_statement)),
-            gen_full_copy_list(statement_declarations(inlined_module_statement)),
-            NULL
-    );
+    statement expanded = instruction_to_statement( copy_instruction(statement_instruction(inlined_module_statement) ) );
+    statement_declarations(expanded) = gen_full_copy_list(statement_declarations(inlined_module_statement));
 
     /* fix block status */
     if( ! statement_block_p( expanded ) )
@@ -594,7 +587,7 @@ inlining(char * module_name)
    inlined_module = entity_undefined;
    inlined_module_statement = statement_undefined;
 
-   debug(2, "inlining", "done for %s\n", module_name);
+   pips_debug(2, "inlining", "done for %s\n", module_name);
    debug_off();
    /* Should have worked: */
    return TRUE;
@@ -676,15 +669,16 @@ unfolding(char* module_name)
     }
     else
     {
-        debug(1, "unfolding", "no function call in %s\n", module_name);
+        pips_debug(1, "unfolding", "no function call in %s\n", module_name);
     }
+    bool result = !set_empty_p(calls_name);
     set_free(calls_name);
 
 
-    debug(2, "unfolding", "done for %s\n", module_name);
+    pips_debug(2, "unfolding", "done for %s\n", module_name);
 
     debug_off();
-    return !set_empty_p(calls_name);
+    return result;
 }
 
 
