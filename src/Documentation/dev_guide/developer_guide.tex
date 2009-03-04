@@ -161,17 +161,26 @@ sh> source /home/temp/MYPIPS/pipsrc.sh
 sh> # enjoy
 \end{verbatim}
 
-In order to build only the PIPS infrastructure, just do \texttt{make} into
-the \verb|$PIPS_ROOT| directory.
+Before you {\em enjoy} PIPS, do not worry about the many error
+messages that are displayed: the header files are being recomputed
+from the C files. After a while, C files should be compiled without
+errors.
+
+In order to rebuild only the PIPS infrastructure, just type
+\texttt{make -j1} into the \verb|$PIPS_ROOT| directory. If something
+has gone wrong, for instance because a software component is missing
+or outdated, it is advised to restart from scratch by runing
+\texttt{make unbuild} before trying again.
 
 For more information about the PIPS Makefile infrastructure, see
+Section~\ref{{sec:underst-makef-infr}.
 
 \subsection{Important Note}
 
 It is important to realize that:
 \begin{enumerate}
-\item PIPS build is much more efficient if it is stored on local disks rather
-  than remote directories accesses through the network (for instance via NFS).
+\item PIPS build is much more efficiently if it is stored on local disks rather
+  than on remote directories accessed through the network (for instance via NFS).
   Hence the \texttt{/home/temp} directory choice in the above axample.
 \item the local copy editions are not saved unless commits are performed.
 \item in a standard development, commits should not be made directly under
@@ -1353,39 +1362,49 @@ bool myphase(char *module_name)
   return(good_result_p);
 }
 \end{lstlisting}
-This phase is usually located in a library named \texttt{myphase}, but this is
-not compulsory. It must set the global variables which are necessary for its
-execution using \texttt{properties}, and acquire the necessary resources by
-invoking \texttt{pipsdbm}. Directly invoking \texttt{pipsmake} is forbidden at
+This phase is located either in a new file\footnote{It is also
+possible to define several phases in one C file, but a new user should
+avoid it.} in an existing library or in a new library named
+\texttt{myphase}. The latter is not compulsory, but it is advised for
+new contributors. If the new phase requires global variables to tune
+its behavior, the \texttt{properties} mechanism must be used. The new
+phase must acquire the necessary resources by invoking
+\texttt{pipsdbm}. Recursively invoking \texttt{pipsmake} is forbidden at
 this level.
 
-This section did not deal with the case where a new resource is
-introduced. This is the object of the section~\ref{sec:dealing-with-new}
+This section does not deal with the case where a new kind of resource is
+introduced. This is the object of Section~\ref{sec:dealing-with-new}
 instead.
 
-Here are now the steps to install a new library named \texttt{mylib}.
+Here are now the steps to install a new library named \texttt{mylib}
+with a new C file named \texttt{myphase}.
 
 \subsubsection{In the directory \texttt{src/Libs}}
 \label{sec:direct-textttsrcl-1}
 
 \begin{itemize}
-\item First, create a new directory \texttt{mylib} in \texttt{src/Libs};
+\item First, create\footnote{Beware of svn. You can either perform a
+\texttt{svn mkdir} now, or a \texttt{svn add} later.} a new directory
+\texttt{mylib} in \texttt{src/Libs};
 \item add the new directory name to the
   \verb|$PIPS_ROOT/src/Libs/local.mk|, so that the recursive make will
   consider it.
 \end{itemize}
 
+Skip this step if you are using an already existing library.
+
 \subsubsection{In the directory \texttt{src/Libs/mylib}}
 \label{sec:direct-mylib}
 
 \begin{itemize}
-\item Add some \texttt{.c} files (at least the one where the code is for
-  the C \texttt{boolean mylib(string name)} function, which corresponds to
+\item Add some \texttt{.c} files, at least the one containing
+  the C \texttt{bool myphase(string name)} function, which corresponds to
   the phase to add, generally is);
-\item create a \texttt{Makefile} (see examples in the other libraries).
-  This file must list the sources of the library and the targets to be
-  built, then it must include the common makefile
-  \verb|$(ROOT)/makes/main.mk|;
+\item create a \texttt{Makefile} (see examples in the other libraries)
+  if \texttt{mylib} is a new library.  This file must list the sources
+  of the library and the targets to be built, then it must include the
+  common makefile \verb|$(ROOT)/makes/main.mk|; if an existing library
+  is used, update its \texttt{Makefile} to add the new source files;
 \item Then run the commands \texttt{make}. The file \texttt{mylib.h} is
   installed in the \verb+$PIPS_ROOT/include+ directory, and
   \texttt{libmylib.a} in the \verb+$PIPS_ROOT/lib/$PIPS_ARCH+ directory.
@@ -1393,13 +1412,15 @@ Here are now the steps to install a new library named \texttt{mylib}.
   passes.
 
   Note that the \texttt{cproto} command is used to generate the library
-  header file \texttt{mylib.h}. To force this file to be build again, do a
+  header file \texttt{mylib.h}. To force this file to be build again, type
   \texttt{make header}.
   \end{itemize}
 
 
 \subsubsection{In directory \texttt{\$PIPS\_ROOT/makes}}
 \label{sec:direct-makes}
+
+If you have created a new library:
 
 \begin{itemize}
 \item Update file
@@ -1442,11 +1463,12 @@ reconstruct the \texttt{pipsrc.*sh} files.
 \label{sec:direct-pipsmake}
 
 \begin{itemize}
-\item declare the new phase to \texttt{pipsmake} by adding the necessary
-  rules in the \texttt{pipsmake-rc.tex} file. Each rule describes the
-  dependences between the input and output resources of each phase. Just
-  have a look at the other rules to build your owns. You can also add
-  aliases to obtain nice menus in the \texttt{wpips} interface.
+\item declare the new phase to \texttt{pipsmake} by adding the
+  necessary rules in the \texttt{pipsmake-rc.tex} file in the proper
+  section. Each rule describes the dependences between the input and
+  output resources of each phase. Just have a look at the other rules
+  to build your owns. You can also add aliases to obtain nice menus in
+  the \texttt{wpips} interface.
 
   For instance, for a phase \emph{myphase} which reads a resource
   \emph{res1} and produces a resource \emph{res2} for the current module,
@@ -1459,14 +1481,15 @@ myphase > MODULE.res2
         < MODULE.res1
 \end{verbatim}
 
-  Note that libraries generally use the program entities (for example if
-  you display some code in debug routines...), that is to say all the
-  objects from the current Fortran program and which have a name.  This
-  resource is named \texttt{PROGRAM.entities}.
+  Note that all phases generally use the program entities, for example
+  if you display some code in debug routines..., that is all the
+  objects from the current C or Fortran program and from C and Fortran
+  run-times that have a name.  This resource, the global symbol table,
+  is named \texttt{PROGRAM.entities}.
 
 \item Run the command \texttt{make} to derive the various files
   \texttt{pipsmake.rc}, \texttt{phases.h}, \texttt{resources.h},
-  \texttt{wpips.rc} and \texttt{builder-map.h} , and to copy them to
+  \texttt{wpips.rc} and \texttt{builder-map.h} , and to copy them into
   \verb|$PIPS_ROOT/doc|, \verb|$PIPS_ROOT/include| and
   \verb|$PIPS_ROOT/etc|.
 \end{itemize}
@@ -1479,7 +1502,7 @@ New \emph{properties} (that are global variables with a user interface in
 PIPS) may be necessary for the fine control of the new phase.  They must
 be declared in the \texttt{properties-rc.tex} file.
 
-Use \texttt{make} to push them into PIPS.
+If any, use \texttt{make} to push them into PIPS.
 
 
 \subsubsection{In directory \texttt{src/Libs/pipsmake}}
@@ -1495,6 +1518,10 @@ Execute the command \texttt{make recompile} to recompile the
 Execute the command \texttt{make recompile} to recompile and install
 updated versions of \texttt{pips}, \texttt{tpips} and \texttt{wpips}.
 
+With fast computers, it may be easier to skip the previous steps and
+to rebuild PIPS from directory \texttt{PIPS\_ROOT} using \texttt{make
+-j1 build}.
+
 
 \subsubsection{The final touch}
 \label{sec:final-touch}
@@ -1509,10 +1536,10 @@ directory \texttt{src/Scripts/drivers}.\marginpar{Are they still in use
 \label{sec:dealing-with-new}
 
 A new resource is declared by its use or its production by one of the rules
-in the file {\tt pipsmake-rc.tex} (see below). Here are now the steps to
-follow to deal with a new resource {\tt myres} once the phase {\tt myphase}
+in the file {\tt pipsmake-rc.tex} (see below). Here are the steps to
+perform to declare a new resource {\tt myres} once the phase {\tt myphase}
 from the library {\tt mylib} has been declared and installed as shown in the
-previous section, that is to say that the function
+previous section. This assumes that the function
 \begin{verbatim}
 bool myphase(char *module_name)
 \end{verbatim}
@@ -1704,7 +1731,7 @@ anything) is okay and validated, it is installed under the
 developers who may use its services. %%$
 
 When developing or debugging several related libraries at the same time,
-you can used the development version of these libraries by using unix
+you can used the development version of these libraries by using Unix
 links (\texttt{ln -s}) to one of the directory under the corresponding
 \verb|$PIPS_ARCH| subdirectory. When building %%$
 a new binary, the linker takes these local libraries first.
