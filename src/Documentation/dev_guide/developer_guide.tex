@@ -52,7 +52,8 @@
   Ronan & KERYELL\\
   Béatrice & CREUSILLET\\
   Fabien & COELHO\\
-  Corinne & ANCOURT
+  Corinne & ANCOURT\\
+  \emph{... and so many other contributors...}
 \end{tabular}
 }
 
@@ -884,6 +885,39 @@ directory, which has very convenient targets including \texttt{validate
   accept clean}.  Using this approach does not require the validation
 directory to be under \texttt{\$PIPS\_ROOT}.
 
+
+\subsection{Validation makefile}
+\label{sec:validation-makefile}
+
+The main user interface is from the \texttt{Makefile} at the validation
+top directory and is usable through few \texttt{make} targets:
+\begin{description}
+\item[validate] to clean and run the validation;
+\item[validate-\emph{target}] to clean and run the validation only on the
+  \texttt{\emph{target}} directory;
+\item[validate-private:] run the private validation at CRI. It should be in the
+  \texttt{private} directory;
+\item[validate-all:] run the normal and private validation;
+\item[clean:] to remove the results and output from the previous validation;
+\item[private] extract from the private CRI svn the private validation
+  collection at CRI. It goes into the \texttt{private} directory;
+\item [accept:] run the accept script on the previous validation;
+\end{description}
+
+The validation can also be restricted to some directories by setting the
+\texttt{TARGET} environment variable, such as with
+\begin{verbatim}
+make TARGET=LoopRecovering validate
+\end{verbatim}
+
+The \texttt{VOPT} \texttt{make} variable can be used to pass and modify
+default options for the validation.
+
+
+\subsection{Validation scripts}
+\label{sec:validation-scripts}
+
+
 Two validation scripts are available:
 \begin{description}
 \item[pips\_validate]: \index{Validate} Non-regression tests;
@@ -949,6 +983,9 @@ Two validation scripts are available:
   encouraged. It is very important not to validate \texttt{stderr} output
   and pips with some level of debugging on, because these outputs are not
   very stable from one architecture to another.
+
+  This script is also used by the various nightly validations such as
+  \verb|pips_at_night|.
 
 \item[manual\_accept] \index{Validate} interactive script to accept new
   validation results. It accepts a list of directories to ask for

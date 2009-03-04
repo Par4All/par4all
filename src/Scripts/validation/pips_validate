@@ -27,6 +27,15 @@ pips=$(type -p pips)
 # by default, do not create a missing .result directory:
 auto_result_create=""
 
+# By default do not display the diff:
+display_diff=
+
+# By default, no archive:
+keep_archive=
+
+# Where is stored the validation archives:
+archive_dir_basename=SUMMARY_Archive
+
 # fix collation (sort) order to default ASCII for all validations
 unset LANG LC_ALL LC_COLLATE
 export LC_ALL=C
@@ -56,6 +65,10 @@ function usage()
 	"     default '$vdir'\n" \
 	"  -R|--run dir: running directory, default '.'\n" \
         "  -r|--recurse: look for subdirectories...\n" \
+	"  -d|--diff: display also a diff against previous validation\n" \
+	"     to show what changed. Imply the --archive option\n" \
+	"  -k|--archive: keep the summary of the validation in the archive
+directory '$archive_dir_basename'\n" \
 	"  -O|--out|--output dir: output directory, default '.'\n" \
 	"arguments:\n" \
 	"  -a|--auto-result-create: create a .result directory if it does\n" \
@@ -102,6 +115,8 @@ while [ "$1" ] ; do
       -m|--mail) mail="$mail $1" ; shift ;;
       -a|--auto-result-create) auto_result_create=1 ;;
       -r|--recurse) recurse=1 ;;
+      -d|--diff) display_diff=1; keep_archive=1 ;;
+      -k|--archive) keep_archive=1 ;;
       --version) echo "$script revision $rev" ; exit 0 ;;
       *) usage 1 "unexpected option: $opt"
   esac
@@ -127,6 +142,23 @@ mkdir $odir || usage 6 "error on mkdir $odir"
 
 # start summary
 summary=$odir/SUMMARY
+
+# Where is stored the validation archives:
+archive_dir=$vdir/$archive_dir_basename
+# The previous validation summary:
+previous_summary=$archive_dir/SUMMARY-previous
+# The last validation summary:
+last_summary=$archive_dir/SUMMARY-last
+
+# Create the archive directory only if necessary:
+[[ $keep_archive ]] && [[ ! -d $archive_dir ]] && mkdir $archive_dir
+
+# Save last summary for later diff or inspection:
+if [[ $keep_archive ]] && [[ -f $last_summary ]]; then
+    # To deal with symbolic links:
+    rm -f $previous_summary
+    mv $last_summary $previous_summary
+fi
 
 echo "validation for $@
 in directory ${vdir}/
@@ -334,6 +366,7 @@ do
   fi
   [[ $failed ]] && elist="$elist$obj "
 done
+
 echo -e "\n$errors failed out of $dones on $(date)" >> $summary
 rm -rf *.database # cold cleanup
 
@@ -343,11 +376,36 @@ if [[ $errors -eq 0 ]] ; then
 else
     msg="FAILED $errors/$dones ($elist)"
 fi
-echo -e "\nvalidation $msg\n" ; cat $summary
+
+
+if [[ $keep_archive ]]; then
+    # Keep a copy as archive with date of the last modification of the
+    # file in its name, inside a year/month directory:
+    archive_summary=$archive_dir/`date +%Y/%m/SUMMARY-%F.%H_%M_%S --date="\`stat --format %z $summary\`"`
+    # Funny line to get the year/month directory:
+    local_archive_dir=`basename \`dirname \\\`dirname $archive_summary\\\`\``/`basename \`dirname $archive_summary\``
+    mkdir -p $archive_dir/$local_archive_dir
+    cp -a $summary $archive_summary
+    #rm -f $last_summary
+    # basename is to have a clean local symbolic link:
+    ln -s $local_archive_dir/`basename $archive_summary` $last_summary
+fi
+
+if [[ $display_diff ]] && [[ -f $previous_summary ]] && [[ -f $last_summary ]]
+then
+    the_diff="`echo 'What changed since the previous validation:'; diff $previous_summary $last_summary;
+echo ' '`"
+else
+    the_diff=
+fi
+
+
+echo -e "\nvalidation $msg\n" ; echo "$the_diff"; cat $summary
 if [[ $mail ]]
 then
-    ${PIPS_MAIL:-Mail} -s "validation $msg" $mail < $summary
+    (echo "$the_diff"; cat $summary) | ${PIPS_MAIL:-Mail} -s "validation $msg" $mail
 fi
+
 
 # ensure okay to make
 exit 0
