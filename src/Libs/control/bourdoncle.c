@@ -95,7 +95,7 @@ static void copy_dfn(control new_c, control old_c)
   hash_put(dfn, (void *) new_c, (void *) d);
 }
 
-static int get_dfn(control c)
+static _int get_dfn(control c)
 {
   _int d = 0;
   
@@ -2275,8 +2275,8 @@ int bourdoncle_visit(control vertex,
 		     hash_table ancestor_map,
 		     hash_table scc_map)
 {
-  int min = 0;
-  int head = 0;
+  _int min = 0;
+  _int head = 0;
   bool loop = FALSE;
   
   vertex_push(vertex);
