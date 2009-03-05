@@ -1,5 +1,9 @@
 # $Id$
 
+# The option used by default for validating. Can be overridden by the
+# command line "make VOPT=..." or the environment variable:
+VOPT	= -v --archive --diff
+
 FIND	= find . -name '.svn' -type d -prune -o
 
 .PHONY: clean
@@ -17,7 +21,6 @@ clean:
 
 # subdirectories to consider
 TARGET	:= $(shell grep '^[a-zA-Z]' defaults)
-VOPT	= -v
 
 .PHONY: validate
 validate: clean
