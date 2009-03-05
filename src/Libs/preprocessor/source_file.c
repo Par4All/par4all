@@ -706,7 +706,6 @@ static string process_thru_C_pp(string name)
 		   CPP_CPPFLAGS, cpp_options? cpp_options: "",
 		   old_include_options,
 		   name, " > ", new_name, " 2> ", cpp_err, NULL));
-    free(cpp_err);
 
     if(status) {
       (void) safe_system_no_abort(concatenate("cat ", cpp_err, NULL));
@@ -720,6 +719,8 @@ static string process_thru_C_pp(string name)
       free(new_name);
       new_name = NULL;
     }
+
+    free(cpp_err);
 
     return new_name;
 }
