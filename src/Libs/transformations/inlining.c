@@ -118,8 +118,17 @@ do_substitute_entity(expression exp, struct entity_pair* thecouple)
         entity referenced_entity = reference_variable(ref);
         if( same_entity_name_p(referenced_entity , thecouple->old) )
         {
-            reference_variable(ref) = thecouple->new;
-            //expression_normalized(exp) = normalize_reference(ref);
+            if( entity_constant_p(thecouple->new) )
+            {
+                expression_syntax(exp) = make_syntax_call(make_call(thecouple->new,NIL));
+            }
+            else
+            {
+                reference_variable(ref) = thecouple->new;
+            }
+            recursive_free_normalized(exp);
+            expression_normalized(exp)=normalized_undefined;
+            NORMALIZE_EXPRESSION(exp);
         }
     }
 }
@@ -283,9 +292,18 @@ instruction inline_expression_call(expression modified_expression, call callee)
         }
         if( !type_void_p(treturn) )
         {
-            reference r = make_reference( returned_entity, NIL);
-            expression_syntax(modified_expression) = make_syntax_reference(r);
-            expression_normalized(modified_expression) = normalize_reference(r);
+            if( entity_constant_p(returned_entity) )
+            {
+                expression_syntax(modified_expression) = make_syntax_call(make_call(returned_entity,NIL));
+            }
+            else
+            {
+                reference r = make_reference( returned_entity, NIL);
+                expression_syntax(modified_expression) = make_syntax_reference(r);
+            }
+            recursive_free_normalized(modified_expression);
+            expression_normalized(modified_expression)=normalized_undefined;
+            NORMALIZE_EXPRESSION(modified_expression);
         }
     }
 
@@ -537,8 +555,6 @@ inline_calls(char * module)
 
     /* inline all calls to inlined_module */
     gen_recurse(modified_module_statement, statement_domain, gen_true, &inline_statement_switcher);
-
-
 
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module, modified_module_statement);
     DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module, compute_callees(modified_module_statement));
