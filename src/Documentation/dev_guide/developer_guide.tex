@@ -52,9 +52,9 @@
   Ronan & KERYELL\\
   Béatrice & CREUSILLET\\
   Fabien & COELHO\\
-  Corinne & ANCOURT\\
+  Corinne & ANCOURT
+\end{tabular}\\
   \emph{... and so many other contributors...}
-\end{tabular}
 }
 
 \date{August 1996 - January 2009}
@@ -361,12 +361,13 @@ pips' trunk, you shoud develop in a branch of your own. To do so:
 sh> svn co http://svn.cri.ensmp.fr/svn/pips/branches/calvin pips_dev
 \end{verbatim}
 }
-    Branches may also be used for linear and newgen development,
+    Branches may also be used for \emph{linear} and \emph{newgen} development,
     in which case the local directory name for the checkout should be called
     \texttt{linear\_dev} or \texttt{newgen\_dev} respectively.
-  \item[validation] a working copy of pips non regression tests for validation.
-    See Section~\ref{sec:utils} for informations about the validation,
-    and then really read the \texttt{README} file to run it.
+  \item[validation] a working copy of pips non regression tests for
+    validation.  See Sections~\ref{sec:devel-branch-valid} \&
+    \ref{sec:validation} for informations about the validation, and then
+    really read the \texttt{README} file to run it.
   \item[pipsrc.sh] sh-compatible shell initialization;
   \item[pipsrc.csh] csh-compatible shell initialization.
   \end{description}
@@ -381,6 +382,12 @@ sh> svn commit my-branch-name
 }
   It creates a new branch as a working copy, which is then committed
   to the repository.
+
+  The idea is to branch a whole PIPS copy since it ensures that the
+  developments you do in many places in PIPS (even at some place you would
+  not have expected when you created the branch!) can be committed
+  atomically.
+
 \item Develop, test, commit within your branch\ldots
 
 \item To merge into your branch on-going developments by other people from
@@ -438,34 +445,49 @@ sh> svn remove my-branch-name
 sh> svn commit
 \end{verbatim}
 }
-
-
 \end{enumerate}
 
 
 \subsubsection{Developing in a branch? Validate before merging!}
 \label{sec:devel-branch-valid}
 
-
 Do not forget that if you or someone else merges your branch into the
-trunk, things must be validated against the global PIPS validation to
+trunk, things must be compiled with an up-to-date copy of all the PIPS
+environment and validated first against the last global PIPS validation to
 avoid havoc for the other PIPS developers.
 
 Here is a typical behaviour you should follow:
 \begin{enumerate}
-\item update your production copy of PIPS (the \texttt{trunk}) with
+\item update your production copy of PIPS and all (the \texttt{prod}) with
   \texttt{svn up}, recompile the production version and apply the
-  validation against it;
-\item commit your branch if not already done;
-\item merge into your branch the last developments from the \texttt{trunk},
-  recompile (so it will modify the executables and libraries in the
-  production version) and validate;
-\item if it is worse than point 1, improve the code in your branch and go
-  to step 1 again;
+  validation against it to have a reference;
+\item do/correct your development;\label{item:do_correct}
+\item compile and validate\footnote{If you work in a localized part of
+    PIPS, it may be interesting to first run a reduced validation, such as
+    if you work in the C parser, it is obvious that at least the C parser
+    should work so you can run, instead a full validation, only a
+    \texttt{make TARGET=C\_syntax validate}. Of course, if it pass the
+    validation, do not forget to run a full validation
+    afterwards.};\label{item:compile_validate}
+\item if it does not work, go to point \ref{item:do_correct}
+\item merge the \texttt{trunk} into your branch to get synchronized with
+  the PIPS outside world;\label{item:pull}
+\item commit your branch saying you have merged the universe into your
+  branch\footnote{You commit to avoid having in your working copy both
+    modifications from the trunk and further eventual corrections you will
+    do to have things working, which is a bad practice from a tracking
+    point of view. Between 2 commit points it is better to have only one
+    kind of modification so you can easily see what has changed, when and
+    who is guilty...};
+\item compile and validate;
+\item if it does not work, go to point \ref{item:do_correct};
 \item if you are happy with the validation, merge your beautiful work into
   the PIPS Holly trunk with \texttt{svn merge -\,-reintegrate}
   (\S~\ref{sec:pips-devel-branch}) so that all the PIPS community can
-  congratulate you.
+  congratulate you;
+\item if the merge fails because someone insidiously committed her
+  valuable work just since your last synchronization from the trunk, go to
+  step \ref{item:pull}.
 \end{enumerate}
 
 For more information about the validation process, have a look to
@@ -860,6 +882,9 @@ include $(ROOT)/makes/main.mk
 The validation is stored in a separate subversion repository
 \url{http://svn.cri.ensmp.fr/svn/validation}
 
+For an overview of the validation daily use case, you should also have a
+look to \S~\ref{sec:devel-branch-valid}.
+
 Different phases are validated in distinct sub-directories.
 Running the validation uses the \texttt{pips\_validate} script.
 
@@ -1012,9 +1037,6 @@ Two validation scripts are available:
 PIPS_GRAPHICAL_DIFF=pips_emacs_diff manual_accept LoopRecovering
 \end{verbatim}
 \end{description}
-
-If you work on a branch, you should also have a look to
-\S~\ref{sec:devel-branch-valid}.
 
 %%\begin{itemize}
 %%\item \verb+bug-to-validate+: \index{bug-to-validate}When a bug is
