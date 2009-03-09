@@ -131,6 +131,14 @@ do_substitute_entity(expression exp, struct entity_pair* thecouple)
             NORMALIZE_EXPRESSION(exp);
         }
     }
+    else {
+        if( ! normalized_undefined_p(expression_normalized(exp)))
+        {
+            recursive_free_normalized(exp);
+            expression_normalized(exp)=normalized_undefined;
+        }
+        NORMALIZE_EXPRESSION(exp);
+    }
 }
 
 /* substitute `thecouple->new' to `thecouple->old' in `s'
@@ -146,7 +154,7 @@ substitute_entity(statement s, entity old, entity new)
     {
         value v = entity_initial(decl_ent);
         if( !value_undefined_p(v) && value_expression_p( v ) )
-            gen_context_recurse( value_expression(v), &thecouple, expression_domain, gen_true, do_substitute_entity);
+            gen_context_recurse( v, &thecouple, expression_domain, gen_true, do_substitute_entity);
     }
 }
 
