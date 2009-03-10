@@ -4508,7 +4508,7 @@ It should be followed by a call to \verb+UNSPAGHETTIFY+ and \verb+SUPPRESS_DEAD_
 %%!UserManualDocumentation
 \begin{verbatim}
 
-inlining      > MODULE.code
+inlining      > CALLERS.parsed_code
         < PROGRAM.entities
         < CALLEES.code
         < MODULE.cumulated_effects
@@ -4531,7 +4531,7 @@ Thus unfolding the content of the module.
 %%!UserManualDocumentation
 \begin{verbatim}
 
-unfolding      > MODULE.code
+unfolding      > MODULE.parsed_code
         < PROGRAM.entities
         < MODULE.code
         < MODULE.cumulated_effects

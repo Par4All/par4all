@@ -32,6 +32,7 @@ static statement    inlined_module_statement;
 static statement    laststmt;
 static entity       returned_entity;
 
+
 /* replace return instruction by a goto
  */
 static
@@ -126,18 +127,7 @@ do_substitute_entity(expression exp, struct entity_pair* thecouple)
             {
                 reference_variable(ref) = thecouple->new;
             }
-            recursive_free_normalized(exp);
-            expression_normalized(exp)=normalized_undefined;
-            NORMALIZE_EXPRESSION(exp);
         }
-    }
-    else {
-        if( ! normalized_undefined_p(expression_normalized(exp)))
-        {
-            recursive_free_normalized(exp);
-            expression_normalized(exp)=normalized_undefined;
-        }
-        NORMALIZE_EXPRESSION(exp);
     }
 }
 
@@ -157,6 +147,7 @@ substitute_entity(statement s, entity old, entity new)
             gen_context_recurse( v, &thecouple, expression_domain, gen_true, do_substitute_entity);
     }
 }
+
 
 /* look for entity locally named has `new' in statements `s'
  * when found, fidn a new name and perform substitution
@@ -243,15 +234,16 @@ instruction inline_expression_call(expression modified_expression, call callee)
     pips_assert("no external declaration",inlined_extern_declaration == NIL);
 
 
-    /* the new instruction sequence */
-    statement expanded = instruction_to_statement( copy_instruction(statement_instruction(inlined_module_statement) ) );
-    statement_declarations(expanded) = gen_full_copy_list(statement_declarations(inlined_module_statement));
+    /* create the new instruction sequence 
+     * no need to change all entities in the new statements, because we build a new text ressource latter
+     */
+    statement expanded = copy_statement(inlined_module_statement);
+    statement_declarations(expanded) = gen_full_copy_list( statement_declarations(expanded) ); // simple copy != deep copy
 
     /* fix block status */
     if( ! statement_block_p( expanded ) )
     {
         instruction i = make_instruction_sequence( make_sequence( CONS(STATEMENT,expanded,NIL) ) );
-
         expanded = instruction_to_statement( i );
     }
 
@@ -309,9 +301,6 @@ instruction inline_expression_call(expression modified_expression, call callee)
                 reference r = make_reference( returned_entity, NIL);
                 expression_syntax(modified_expression) = make_syntax_reference(r);
             }
-            recursive_free_normalized(modified_expression);
-            expression_normalized(modified_expression)=normalized_undefined;
-            NORMALIZE_EXPRESSION(modified_expression);
         }
     }
 
@@ -546,6 +535,14 @@ void inline_statement_switcher(statement stmt)
     };
 }
 
+static void
+clean_unused_entities(entity e)
+{
+    string s=entity_module_name(e);
+    string ref = entity_local_name(get_current_module_entity());
+    if( same_string_p(s,ref))
+        gen_clear_tabulated_element((gen_chunk*)e);
+}
 /* this should replace all call to `inlined' in `module'
  * by the expansion of `inlined'
  */
@@ -564,9 +561,11 @@ inline_calls(char * module)
     /* inline all calls to inlined_module */
     gen_recurse(modified_module_statement, statement_domain, gen_true, &inline_statement_switcher);
 
+    /* perform restructuring and cleaning
+     * SG: this may not be needed ...
+     */
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module, modified_module_statement);
     DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module, compute_callees(modified_module_statement));
-
     reset_current_module_entity();
     reset_current_module_statement();
 
@@ -576,6 +575,55 @@ inline_calls(char * module)
     /* we can try to remove some labels now*/
     if(!remove_useless_label(module))
         pips_user_warning("failed to remove useless labels after restructure_control in inlining");
+}
+
+/* build a textual representation of the modified module and update db
+ * SG: this code should not be there
+ */
+void
+recompile_module(char* module)
+{
+    entity modified_module = module_name_to_entity(module);
+    statement modified_module_statement =
+        (statement) db_get_memory_resource(DBR_CODE, module, TRUE);
+
+    set_current_module_entity( modified_module );
+    set_current_module_statement( modified_module_statement );
+
+    /* build and register textual representation */
+    text t = text_module(get_current_module_entity(), modified_module_statement);
+    string dirname = db_get_current_workspace_directory();
+    string res = fortran_module_p(modified_module)? DBR_INITIAL_FILE : DBR_C_SOURCE_FILE;
+    string filename = db_get_file_resource(res,module,TRUE);
+    string fullname = strdup(concatenate(dirname, "/",filename, NULL));
+    FILE* f = safe_fopen(fullname,"w");
+    print_text(f,t);
+    fclose(f);
+    DB_PUT_FILE_RESOURCE(res,module,filename);
+
+    /* the module will be reparsed, so fix(=delete) all its previous entites */
+    {
+        list p = NIL;
+        FOREACH(ENTITY, e, entity_declarations(modified_module))
+        {
+            if(! area_entity_p(e) )
+                gen_clear_tabulated_element((gen_chunk*)e);
+
+            else
+                p = CONS(ENTITY,e,p);
+        }
+        entity_declarations(modified_module) = gen_nreverse(p);
+        code_initializations(value_code(entity_initial(modified_module)))=make_sequence(NIL);
+    }
+
+    reset_current_module_entity();
+    reset_current_module_statement();
+
+    bool parsing_ok =(fortran_module_p(modified_module)) ? parser(module) : c_parser(module);
+    if(!parsing_ok)
+        pips_user_error("failed to recompile module");
+    if(!controlizer(module))
+        pips_user_warning("failed to apply controlizer after recompilation");
 
 }
 
@@ -605,6 +653,7 @@ inlining(char * module_name)
    FOREACH(STRING, caller_name,callers_l)
    {
        inline_calls( caller_name );
+       recompile_module(caller_name);
    }
 
    reset_cumulated_rw_effects();
@@ -690,6 +739,7 @@ unfolding(char* module_name)
     if( !set_empty_p(calls_name) ) 
     {
         SET_MAP(call_name, run_inlining(module_name,(string)call_name) ,calls_name);
+        recompile_module(module_name);
     }
     else
     {
