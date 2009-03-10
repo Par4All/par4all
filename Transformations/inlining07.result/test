@@ -23,7 +23,6 @@ int main(int argc, char **argv)
       int c = (I_1>argc?I_1:argc);
       printf("%d\n", c);
       I_0 = c;
-      ;
    }
    I_0;
    return 0;

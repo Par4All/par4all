@@ -22,7 +22,6 @@ int main(int argc, char **argv)
       int c = (2>argc?2:argc);
       printf("%d\n", c);
       I_0 = c;
-      ;
    }
    I_0;
    return 0;

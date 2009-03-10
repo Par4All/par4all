@@ -50,7 +50,6 @@ void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Dat
       I_2 = v1+v2;
       result = I_2;
       pdest[j] = result;
-      ;
    }
    return;
 }

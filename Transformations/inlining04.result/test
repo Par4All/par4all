@@ -22,13 +22,11 @@ int main(int argc, char **argv)
       int c = (1>2?1:2);
       printf("%d\n", c);
       I_0 = c;
-      ;
    }
    {
       int c = (2>3?2:3);
       printf("%d\n", c);
       I_1 = c;
-      ;
    }
    return I_0+I_1;
 }
