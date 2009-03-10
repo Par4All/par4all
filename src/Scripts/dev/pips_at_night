@@ -18,8 +18,8 @@ download=
 update=
 compile=
 validate=
-# A hack to survive missing -m|--mail option...
-vopt=NOTHING=NOTHING
+# The default options for the validation:
+vopt="VOPT=--archive --diff"
 
 # where to do it by default
 target=~/PIPS
@@ -37,7 +37,7 @@ do
 
   case $opt in
     -t|--target) target=$1 ; shift ;;
-    -m|--mail) vopt="VOPT=-m $1" ; shift ;;
+    -m|--mail) vopt="$vopt -m $1" ; shift ;;
     # what to do
     -d|--download) download=1 ;;
     -nd|--no-download) download= ;;
