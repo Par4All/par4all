@@ -131,6 +131,17 @@ do_substitute_entity(expression exp, struct entity_pair* thecouple)
     }
 }
 
+static void
+do_substitute_all_entities(statement s, struct entity_pair* thecouple)
+{
+    FOREACH(ENTITY,decl_ent,statement_declarations(s))
+    {
+        value v = entity_initial(decl_ent);
+        if( !value_undefined_p(v) && value_expression_p( v ) )
+            gen_context_recurse( v, thecouple, expression_domain, gen_true, do_substitute_entity);
+    }
+}
+
 /* substitute `thecouple->new' to `thecouple->old' in `s'
  */
 void
@@ -138,14 +149,9 @@ substitute_entity(statement s, entity old, entity new)
 {
     struct entity_pair thecouple = { old, new };
 
-    gen_context_recurse( s, &thecouple, expression_domain, gen_true, do_substitute_entity);
+    gen_context_multi_recurse( s, &thecouple, expression_domain, gen_true, do_substitute_entity,
+            statement_domain,gen_true, do_substitute_all_entities, NULL);
 
-    FOREACH(ENTITY,decl_ent,statement_declarations(s))
-    {
-        value v = entity_initial(decl_ent);
-        if( !value_undefined_p(v) && value_expression_p( v ) )
-            gen_context_recurse( v, &thecouple, expression_domain, gen_true, do_substitute_entity);
-    }
 }
 
 
