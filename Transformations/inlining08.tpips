@@ -1,0 +1,36 @@
+delete inlining08
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create inlining08 inlining08.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[foo]
+display PRINTED_FILE[bar]
+
+echo
+echo Code after inlining
+echo
+
+apply INLINING[bar]
+display PRINTED_FILE[foo]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+# shell $(PIPS_CC) -c inlining03.database/Src/inlining03.c
+shell gcc -c inlining08.database/Src/inlining08.c
+
+close
+delete inlining08
+quit
+

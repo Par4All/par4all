@@ -1,0 +1,26 @@
+delete inlining01f
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create inlining01f inlining01.f
+
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[FOO]
+display PRINTED_FILE[BAR]
+
+echo
+echo Code after inlining
+echo
+
+apply INLINING[FOO]
+display PRINTED_FILE[BAR]
+
+close
+delete inlining01f
+quit
+
