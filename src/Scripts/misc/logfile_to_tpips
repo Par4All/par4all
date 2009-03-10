@@ -65,8 +65,11 @@ $sed -n \
      s,^HPFC View of \"\(.*\)\" done.,shell $CAT $WDIR\/hpfc\/\1,p;
      s,^User Request...,# user request :,p;
      s,^\"\(.*\)\"\$,\1,p" $WS.database/Logfile |
-{ tr '\012' '' ; echo ; } | 
-$sed "s,create $WS,,g;s,,,g;s,\$,,;" | 
+{ tr '\012' '' ; echo ; } |
+$sed "s,create $WS,,g;
+      s,,,g;
+      s,\$,,;
+      s,\(apply UNSPLIT\)\[\],\1," |
 tr '' '\012'
 echo quit
 echo \# EOF
