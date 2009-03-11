@@ -4,11 +4,11 @@
 # and display it using the given viewer or the one by default.
 
 
-usage="                                                              \n
-usage: $0 format graph [viewer]                                      \n
-\tformat : it can be davinci or dot                                  \n
-\tgraph  : it should be an output pips file such as graph.pref-graph \n
-\tviewer : viewer to use, default is daVinci or evince               \n\n"
+usage="                                                              \n"\
+"usage: $0 format graph [viewer]                                      \n"\
+"\tformat : it can be davinci or dot                                  \n"\
+"\tgraph  : it should be an output pips file such as graph.pref-graph \n"\
+"\tviewer : viewer to use, default is daVinci or evince               \n\n"
 
 
 viewer="default"

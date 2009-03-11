@@ -237,7 +237,7 @@ for line in f.readlines():
 # Add what foloowed the unstructured part 
 n = add_a_statement(control, line[1:])
 
-oupuut_file_name_dot = sys.argv[1] + '.dot'
+output_file_name_dot = sys.argv[1] + '.dot'
 output_file_name_ps = sys.argv[1] + '.ps'
 
 graph.write(output_file_name_dot)
