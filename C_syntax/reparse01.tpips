@@ -1,0 +1,36 @@
+delete reparse01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create reparse01 reparse01.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#setenv PRETTYPRINT_DEBUG_LEVEL 7
+
+echo
+echo Parsed printed file for "reparse01"
+echo
+
+display PARSED_PRINTED_FILE[reparse01]
+
+shell sleep 2
+shell touch reparse01.database/reparse01/reparse01.c
+
+echo
+echo Parsed printed file for "reparse01"
+echo
+
+display PARSED_PRINTED_FILE[reparse01]
+
+close
+
+# delete reparse01
+
+quit
