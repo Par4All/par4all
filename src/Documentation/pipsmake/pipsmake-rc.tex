@@ -2802,16 +2802,24 @@ alias internalize_parallel_code 'Consider a parallel code as a sequential one'
 \end{verbatim}
 
 
-\subsection{Considering a parallel code as a sequential one}
+\subsection{Mark Parallel Loops in Sequential Code}
 \label{sec:cons-parall-code}
 
-For historical reasons, a parallelized program in PIPS is no longer a
-classical PIPS program we can work on later because sequential code and
-parallelized code do not have the same resource type. Unfortunately,
-improving the parallelized code with some other transformations (dead-code
-elimination, etc) is also useful. Thus we add a new pseudo-transformation
-that coerce a parallel code into a classical (sequential) one to consider
-parallelization as an internal transformation in PIPS.
+To simplify the user interface and to display with one click a
+parallelized program, programs in PIPS are ({\em parallelized code})
+instead of standard ({\em code}. As a consequence, parallelized
+programs cannot be further analyzed and transformed because sequential
+code and parallelized code do not have the same resource type. Most
+pipsmake rules apply to {\em code} but not to {\em parallelized
+code}. Unfortunately, improving the parallelized code with some other
+transformations such as dead-code elimination is also useful. Thus
+this pseudo-transformation is added to coerce a parallel code into a
+classical (sequential) one. Parallelization is made an internal code
+transformation in PIPS with this rule.
+
+Although this is not the effective process, parallel loops are tagged
+as parallel and loop local variables may be added in a {\em code}
+ressource because of a previous privatization phase.
 
 \begin{verbatim}
 internalize_parallel_code             > MODULE.code
@@ -2819,10 +2827,11 @@ internalize_parallel_code             > MODULE.code
 \end{verbatim}
 
 If you display the ``generated'' code, it may not be displayed as a
-parallel one if the good properties are not switched. Anyway, it's here.
+parallel one if the good properties\marginpar{RK: what are they?} are
+not switched on. Anyway, the information is available in {\em code}.
 
 Note this transformation may no be usable with some special
-parallelization in PIPS such as WP65 or HPFC that generate other resource
+parallelizations in PIPS such as WP65 or HPFC that generate other resource
 types.
 
 
