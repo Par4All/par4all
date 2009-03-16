@@ -97,14 +97,10 @@ unset NEWGEN_ROOT LINEAR_ROOT PIPS_ROOT
 }
 
 echo
-echo "### downloading $POLYLIB"
-cd /tmp
-test -f $POLYLIB.tar.gz && warn "some /tmp/$POLYLIB.tar.gz file already there. Continue?"
-wget -nd $POLYLIB_SITE/$POLYLIB.tar.gz || error "cannot wget polylib"
-
-echo
 echo "### testing special commands for config.mk"
 config=$prod/pips/makes/config.mk
+# Save an old config file if we run again this script:
+[ -f $config ] && mv $config $config.old
 
 type javac && echo '_HAS_JDK_ = 1' >> $config
 type latex && echo '_HAS_LATEX_ = 1' >> $config
@@ -158,6 +154,12 @@ echo "### generating csh environment"
 $prod/pips/src/Scripts/env/sh2csh.pl \
     < $destination/pipsrc.sh \
     > $destination/pipsrc.csh
+
+echo
+echo "### downloading $POLYLIB"
+cd /tmp
+test -f $POLYLIB.tar.gz && warn "some /tmp/$POLYLIB.tar.gz file already there. Continue?"
+wget -nd $POLYLIB_SITE/$POLYLIB.tar.gz || error "cannot wget polylib"
 
 echo
 echo "### building $POLYLIB"
