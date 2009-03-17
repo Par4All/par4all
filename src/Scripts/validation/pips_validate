@@ -67,8 +67,8 @@ function usage()
         "  -r|--recurse: look for subdirectories...\n" \
 	"  -d|--diff: display also a diff against previous validation\n" \
 	"     to show what changed. Imply the --archive option\n" \
-	"  -k|--archive: keep the summary of the validation in the archive
-directory '$archive_dir_basename'\n" \
+	"  -k|--archive: keep a summary of the validation in directory\n" \
+	"    '$archive_dir_basename'\n" \
 	"  -O|--out|--output dir: output directory, default '.'\n" \
 	"arguments:\n" \
 	"  -a|--auto-result-create: create a .result directory if it does\n" \
@@ -143,19 +143,19 @@ mkdir $odir || usage 6 "error on mkdir $odir"
 # start summary
 summary=$odir/SUMMARY
 
-# Where is stored the validation archives:
+# directory for validation archives
 archive_dir=$vdir/$archive_dir_basename
-# The previous validation summary:
+# previous validation summary
 previous_summary=$archive_dir/SUMMARY-previous
-# The last validation summary:
+# last validation summary
 last_summary=$archive_dir/SUMMARY-last
 
-# Create the archive directory only if necessary:
-[[ $keep_archive ]] && [[ ! -d $archive_dir ]] && mkdir $archive_dir
+# create the archive directory only if necessary:
+[[ $keep_archive && ! -d $archive_dir ]] && mkdir $archive_dir
 
 # Save last summary for later diff or inspection:
-if [[ $keep_archive ]] && [[ -f $last_summary ]]; then
-    # To deal with symbolic links:
+if [[ $keep_archive && -f $last_summary ]]; then
+    # deal with symbolic links:
     rm -f $previous_summary
     mv $last_summary $previous_summary
 fi
@@ -377,24 +377,31 @@ else
     msg="FAILED $errors/$dones ($elist)"
 fi
 
-
 if [[ $keep_archive ]]; then
-    # Keep a copy as archive with date of the last modification of the
+    # keep a copy as archive with date of the last modification of the
     # file in its name, inside a year/month directory:
-    archive_summary=$archive_dir/`date +%Y/%m/SUMMARY-%F.%H_%M_%S --date="\`stat --format %z $summary\`"`
-    # Funny line to get the year/month directory:
-    local_archive_dir=`basename \`dirname \\\`dirname $archive_summary\\\`\``/`basename \`dirname $archive_summary\``
-    mkdir -p $archive_dir/$local_archive_dir
+    sum_ts=$(stat --format %z $summary)
+    sum_ts=${sum_ts//.*/}
+    sum_date=${sum_ts// */}
+    sum_year=${sum_ts/-*/}
+    sum_month=${sum_ts#*-}
+    sum_month=${sum_month/-*/}
+    sub_dir=$sum_year/$sum_month
+    sum_time=${sum_ts//* /}
+    sum_file=SUMMARY.${sum_date}_${sum_time}
+
+    archive_summary=$archive_dir/$sub_dir/$sum_file
+    mkdir -p $archive_dir/$sub_dir
     cp -a $summary $archive_summary
-    #rm -f $last_summary
-    # basename is to have a clean local symbolic link:
-    ln -s $local_archive_dir/`basename $archive_summary` $last_summary
+    rm -f $last_summary
+    # use relative symbolic link
+    ln -s $sub_dir/$sum_file $last_summary
 fi
 
-if [[ $display_diff ]] && [[ -f $previous_summary ]] && [[ -f $last_summary ]]
+if [[ $display_diff && -f $previous_summary && -f $last_summary ]]
 then
-    the_diff="`echo 'What changed since the previous validation:'; diff $previous_summary $last_summary;
-echo ' '`"
+    the_diff="`echo 'What changed since the previous validation:';
+              diff $previous_summary $last_summary; echo ' '`"
 else
     the_diff=
 fi
