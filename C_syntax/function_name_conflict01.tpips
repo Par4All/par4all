@@ -1,6 +1,6 @@
 delete function_name_conflict01
 
-setproperty ABORT_ON_USER_ERROR TRUE
+# setproperty ABORT_ON_USER_ERROR TRUE
 
 create function_name_conflict01 function_name_conflict01.c
 
