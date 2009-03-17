@@ -24,7 +24,7 @@ shell sleep 2
 shell touch reparse01.database/reparse01/reparse01.c
 
 echo
-echo Parsed printed file for "reparse01"
+echo Reparsed printed file for "reparse01"
 echo
 
 display PARSED_PRINTED_FILE[reparse01]
