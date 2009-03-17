@@ -51,6 +51,39 @@ void MakeCurrentModule(entity e)
   /* code_declaration to be updated : only need formal parameters, because the others are added in
      block statement declaration ? */
   pips_debug(4,"Set current module entity %s\n",entity_user_name(e));
+
+  /* The next two tests are replicated from the Fortran parser,
+     Syntax/procedure.c, MakeCurrentFunction() */
+
+  /* In case the module is parsed a second time, clean up the symbol
+     table to avoid variable redefinition warnings and errors */
+  if(!value_undefined_p(entity_initial(e))) {
+    if(value_code_p(entity_initial(e))) {
+      code c = value_code(entity_initial(e));
+      if(!code_undefined_p(c) && !ENDP(code_declarations(c))) {
+	/* Clean up existing local entities in case of a recompilation. */
+	CCleanLocalEntities(e);
+      }
+    }
+  }
+
+  /* Let's hope cf is not an intrinsic: name conflict */
+  if( entity_type(e) != type_undefined
+      && intrinsic_entity_p(e) ) {
+    pips_user_warning("Intrinsic %s redefined.\n"
+		      "This is not supported by PIPS. Please rename %s\n",
+		      entity_local_name(e), entity_local_name(e));
+    /* Unfortunately, an intrinsics cannot be redefined, just like a user function
+     * or subroutine after editing because intrinsics are not handled like
+     * user functions or subroutines. They are not added to the called_modules
+     * list of other modules, unless the redefining module is parsed FIRST.
+     * There is not mechanism in PIPS to control the parsing order.
+     */
+    CParserError("Name conflict between a "
+		 "function and an intrinsic\n");
+  }
+
+
   set_current_module_entity(e);
   init_c_areas(); 
   LabeledStatements = NIL;

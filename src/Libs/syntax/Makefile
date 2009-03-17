@@ -16,7 +16,6 @@ INC_CFILES= 	declaration.c \
 		statement.c \
 		return.c \
 		malloc-info.c \
-		clean.c \
 		macros.c
 
 DERIVED_HEADERS = keywtbl.h tokyacc.h syn_yacc.h yacc.in
