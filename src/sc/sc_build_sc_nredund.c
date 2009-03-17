@@ -405,7 +405,10 @@ int n __attribute__ ((unused));
 {
 
     Psysteme sc = sc_new();
-    Pcontrainte ineq,pred,eq;
+    Pcontrainte ineq,eq;
+    /* Automatic variables read in CATCH block need to be declared volatile as
+     * sepcified by the doc*/
+    Pcontrainte volatile pred;
     int rank_hr,rank_max = 0;
     Variable var_hr;
     Value coeff;
@@ -427,7 +430,7 @@ int n __attribute__ ((unused));
 	for (pred = ps->inegalites,ineq = (ps->inegalites)->succ;
 	     !CONTRAINTE_UNDEFINED_P(ineq); ineq=ineq->succ) {
 
-	    Pcontrainte ineg = contrainte_copy(ineq);
+	    Pcontrainte volatile ineg = contrainte_copy(ineq);
 	    sc_add_inegalite(sc,ineg);	    
 
 	    /* search the characteristics of the variable of higher rank in 

@@ -576,25 +576,29 @@ sc_simplexe_feasibility_ofl_ctrl(
 {
     Pcontrainte pc, pc_tmp ;
     Pvecteur pv ;
-    intptr_t premier_hash = PTR_NIL; /* tete de liste des noms de variables */
+    /* All the folowing automatic variables are used when coming back from
+     * longjmp (i.e. in CATCH block) so they need to be declared volatile as
+     * sepcified by the doc*/      
+    intptr_t volatile premier_hash = PTR_NIL; /* tete de liste des noms de variables */
     /* Necessaire de declarer "hashtable" static 
      *  pour initialiser tout automatiquement a` 0.
      * Necessaire de chainer les enregistrements
      *  pour reinitialiser a 0
      *  en sortie de la procedure.
      */
-    static hashtable_t hashtable[MAX_VAR];
-    Pbase saved_base;
-    int saved_dimension;
-    tableau *eg = NULL; /* tableau des egalite's  */
-    tableau *t = NULL; /* tableau des inegalite's  */
+    static hashtable_t volatile hashtable[MAX_VAR];
+    Pbase volatile saved_base;
+    int volatile saved_dimension;
+    tableau * volatile eg = NULL; /* tableau des egalite's  */
+    tableau * volatile t = NULL; /* tableau des inegalite's  */
+    frac * volatile nlle_colonne = NULL;
     /* les colonnes 0 et 1 sont reservees au terme const: */
     int compteur = 2 ;
     intptr_t i, j, k, h, trouve, hh=0, ligne, i0, i1, jj, ii ;
     Value poidsM, valeur, tmpval;
     intptr_t w ;
     int soluble; /* valeur retournee par feasible */
-    frac *nlle_colonne = NULL, *colo;
+    frac* colo;
     frac objectif[2] ; /* objectif de max pour simplex : 
 			  somme des (b2,c2) termes constants "inferieurs" */
     frac rapport1, rapport2, min1, min2, pivot, cc ;

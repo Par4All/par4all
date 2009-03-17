@@ -370,7 +370,10 @@ sc_minmax_of_variable2(Psysteme ps, Variable var, Value *pmin, Value *pmax)
 
 			if(d<=nvar) {
 			    Pcontrainte def = CONTRAINTE_UNDEFINED;
-			    Variable v = TCST;
+			    /* Automatic variables read in CATCH block need
+			     * to be declared volatile as
+			     * sepcified by the doc*/
+			    Variable volatile v = TCST;
 			    Variable v1 = TCST;
 			    Variable v2 = TCST;
 			    Variable nv = TCST;

@@ -428,11 +428,14 @@ static void polyhedron_to_sg(Polyhedron  *pol, Ptsg sg)
  */
 Ptsg  sc_to_sg_chernikova(Psysteme sc)
 {
-    Matrix *a = NULL;
+    /* Automatic variables read in CATCH block need to be declared volatile as
+     * sepcified by the doc*/
+    Polyhedron * volatile A = NULL;
+    Matrix * volatile a = NULL;
+    Ptsg volatile sg = NULL;
+
     int nbrows = 0;
     int nbcolumns = 0;
-    Ptsg sg = NULL;
-    Polyhedron *A = NULL;
 
     CATCH(any_exception_error)
     {
@@ -473,9 +476,11 @@ Psysteme sg_to_sc_chernikova(Ptsg sg)
 {
     int nbrows = sg_nbre_droites(sg)+ sg_nbre_rayons(sg)+sg_nbre_sommets(sg);
     int nbcolumns = base_dimension(sg->base)+2;
-    Matrix *a = NULL;
-    Psysteme sc = NULL;
-    Polyhedron *A = NULL;
+    /* Automatic variables read in CATCH block need to be declared volatile as
+     * sepcified by the doc*/
+    Matrix * volatile a = NULL;
+    Psysteme volatile sc = NULL;
+    Polyhedron * volatile A = NULL;
 
     CATCH(any_exception_error)
     {
@@ -531,15 +536,21 @@ Psysteme sg_to_sc_chernikova(Ptsg sg)
 
 Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
 {
-    Matrix *a1 = NULL,*a2 = NULL;
     int nbrows1 = 0;
     int nbcolumns1 = 0;
     int nbrows2 = 0;
     int nbcolumns2 = 0;
-    Polyhedron *A1 = NULL,*A2 = NULL;
-    Matrix *a = NULL;
-    Psysteme sc = NULL;
-    Polyhedron *A = NULL;
+
+    /* Automatic variables read in CATCH block need to be declared volatile as
+     * sepcified by the doc*/
+    Matrix * volatile a1 = NULL;
+    Matrix * volatile a2 = NULL;
+    Polyhedron * volatile A1 = NULL;
+    Polyhedron * volatile A2 = NULL;
+    Matrix * volatile a = NULL;
+    Psysteme volatile sc = NULL;
+    Polyhedron * volatile A = NULL;
+
     unsigned int i1, i2;
     int j;
     int Dimension,cp;

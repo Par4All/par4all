@@ -338,7 +338,11 @@ static boolean internal_sc_feasibility
 (Psysteme sc, int heuristic, boolean int_p, int ofl_ctrl)
 {   
   boolean ok = TRUE;
-  int method, n_var, n_cont_eq = 0, n_ref_eq = 0, n_cont_in = 0, n_ref_in = 0;
+  int method, n_var,  n_ref_eq = 0, n_ref_in = 0;
+ /* Automatic variables read in CATCH block need to be declared volatile as
+  * sepcified by the doc*/
+  int volatile n_cont_in = 0;
+  int volatile n_cont_eq = 0;
   Value magnitude;
 
  feasibility_sc_counter ++;
@@ -588,7 +592,9 @@ boolean ofl_res;
   boolean 
     ok = FALSE,
     catch_performed = FALSE;
-  int heuristic = 0;
+  /* Automatic variables read in CATCH block need to be declared volatile as
+   * sepcified by the doc*/
+  int volatile heuristic = 0;
   
   ifscdebug(5) {    
     if (sc->dimension < 0) {
@@ -722,7 +728,9 @@ Psysteme sc;
 boolean int_p;
 int ofl_ctrl;
 {
-  Psysteme w = NULL;
+  /* Automatic variables read in CATCH block need to be declared volatile as
+   * sepcified by the doc*/
+  Psysteme volatile w = NULL;
   boolean ok = TRUE;
 
   if (sc->dimension == 0) return TRUE;
@@ -794,7 +802,9 @@ boolean project_eq_p;
 boolean int_p;
 int ofl_ctrl;
 { 
-  Psysteme w = NULL;
+  /* Automatic variables read in CATCH block need to be declared volatile as
+   * sepcified by the doc*/
+  Psysteme volatile w = NULL;
   boolean ok = TRUE;
 
   if (sc->dimension == 0) return TRUE;
@@ -864,7 +874,9 @@ sc_janus_feasibility_ofl_ctrl_timeout_ctrl(sc,ofl_ctrl)
 Psysteme sc;
 boolean ofl_ctrl;
 {
-  Psysteme w = NULL;
+  /* Automatic variables read in CATCH block need to be declared volatile as
+   * sepcified by the doc*/
+  Psysteme volatile w = NULL;
   int ok=0;
 
   /*DN: We should be sure that the sc is not null in the sc_feasibility_ofl_ctrl, but for direct calls of Janus ...*/
