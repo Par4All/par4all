@@ -398,21 +398,29 @@ if [[ $keep_archive ]]; then
     ln -s $sub_dir/$sum_file $last_summary
 fi
 
-if [[ $display_diff && -f $previous_summary && -f $last_summary ]]
-then
-    the_diff="`echo 'What changed since the previous validation:';
-              diff $previous_summary $last_summary; echo ' '`"
-else
-    the_diff=
+# output difference to stdout if required
+function do_diff()
+{
+  if [[ -f $previous_summary && -f $last_summary ]]
+  then
+    echo 'What changed since the previous validation:'
+    diff $previous_summary $last_summary
+    echo ''
+  else
+    echo 'Previous or last summary is missing, no diff...'
+  fi
+}
+
+echo -e "\nvalidation $msg\n"
+[[ $display_diff ]] && do_diff
+cat $summary
+
+if [[ $mail ]] ; then
+  {
+    [[ $display_diff ]] && do_diff
+    cat $summary
+  } | ${PIPS_MAIL:-Mail} -s "validation $msg" $mail
 fi
-
-
-echo -e "\nvalidation $msg\n" ; echo "$the_diff"; cat $summary
-if [[ $mail ]]
-then
-    (echo "$the_diff"; cat $summary) | ${PIPS_MAIL:-Mail} -s "validation $msg" $mail
-fi
-
 
 # ensure okay to make
 exit 0
