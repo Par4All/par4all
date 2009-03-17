@@ -273,10 +273,13 @@ static bool loop_executed_once_p(statement s, loop l)
   expression m1, m2, m3;
   normalized n_m1, n_m2, n_m3;
   transformer pre;
-  Psysteme ps, precondition_ps;
+  Psysteme precondition_ps;
   Pvecteur pv3;
   Pcontrainte pc3;
   bool m3_negatif = false, m3_positif = false, retour;
+  /* Automatic variables read in CATCH block need to be declared volatile as
+   * sepcified by the doc*/
+  Psysteme volatile ps;
 
   retour = FALSE;
   ind = loop_index(l);

@@ -1183,8 +1183,11 @@ TestDependence(
     Psysteme dep_syst1 = SC_UNDEFINED;
     Psysteme dep_syst2 = SC_UNDEFINED;
     Psysteme dep_syst_op = SC_UNDEFINED;
-    Pbase b, tmp_base, coord;
-    
+    Pbase b, coord;
+    /* Automatic variables read in CATCH block need to be declared volatile as
+     * sepcified by the doc*/
+    Pbase volatile tmp_base;
+   
     int l, cl;
     list levels;
     Pvecteur DiIncNonCons = NULL;

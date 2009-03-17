@@ -414,7 +414,9 @@ static Psysteme region_sc_convex_hull(Psysteme ps1, Psysteme ps2);
 effect regions_must_convex_hull(region r1, region r2)
 {
     region reg = r1;  /* result */
-    Psysteme s1 = region_system(r1);
+    /* Automatic variables read in CATCH block need to be declared volatile as
+     * sepcified by the doc*/
+    Psysteme volatile s1 = region_system(r1);
     Psysteme s2 = region_system(r2);
     Psysteme sr;
     tag app1 = region_approximation_tag(r1);
@@ -835,7 +837,9 @@ region_intersection(region reg1, region reg2)
     tag app2 = region_approximation_tag(reg2);
     tag app_res = approximation_and(app1,app2); 
 
-    region reg;
+    /* Automatic variables read in CATCH block need to be declared volatile as
+     * sepcified by the doc*/
+    region volatile reg;
     boolean feasible = TRUE;
 
 
@@ -921,7 +925,9 @@ static list disjunction_to_list_of_regions(Pdisjunct disjonction, effect reg,
 list region_sup_difference(region reg1, region reg2)
 {
     Psysteme sc1, sc2;
-    tag app1 = region_approximation_tag(reg1);
+    /* Automatic variables read in CATCH block need to be declared volatile as
+     * sepcified by the doc*/
+    tag volatile app1 = region_approximation_tag(reg1);
     tag app2 = region_approximation_tag(reg2);
 
     /* approximation of the resulting regions if the difference is exact */    

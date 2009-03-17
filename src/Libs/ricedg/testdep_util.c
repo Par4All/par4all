@@ -498,7 +498,9 @@ Psysteme sc;
     debug(6, "sc_faisabilite_optim", "begin\n");
     sc = sc_normalize(sc);
     if (sc != NULL) {	
-	Psysteme sc1 = sc_dup(sc);
+	/* Automatic variables read in CATCH block need to be declared volatile as
+	 * sepcified by the doc*/
+	Psysteme volatile sc1 = sc_dup(sc);
 	is_test_Di = FALSE;
 	
 	CATCH(overflow_error) {

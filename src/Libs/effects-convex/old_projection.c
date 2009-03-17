@@ -685,7 +685,9 @@ void region_remove_beta_variables(region reg)
  */
 void region_non_exact_projection_along_parameters(region reg, list l_param)
 {
-    Psysteme ps;    
+    /* Automatic variables read in CATCH block need to be declared volatile as
+     * sepcified by the doc*/
+    Psysteme volatile ps;    
     ps = region_system(reg);
 
     if (!sc_empty_p(ps) && !sc_rn_p(ps)) 
@@ -740,7 +742,9 @@ void region_non_exact_projection_along_parameters(region reg, list l_param)
 void region_exact_projection_along_parameters(region reg, list l_param)
 {
     tag app = region_approximation_tag(reg);
-    Psysteme ps;
+    /* Automatic variables read in CATCH block need to be declared volatile as
+     * sepcified by the doc*/
+    Psysteme volatile ps;
 
 
     ps = region_system(reg);
@@ -853,7 +857,9 @@ void region_exact_projection_along_parameters(region reg, list l_param)
  */
 void region_non_exact_projection_along_variables(region reg, list l_var)
 {
-    Psysteme ps;
+    /* Automatic variables read in CATCH block need to be declared volatile as
+     * sepcified by the doc*/
+    Psysteme volatile ps;
     
     ps = region_system(reg);
 
@@ -909,7 +915,9 @@ void region_exact_projection_along_variables(reg, l_var)
 effect reg;
 list l_var;
 {
-    Psysteme ps;    
+    /* Automatic variables read in CATCH block need to be declared volatile as
+     * sepcified by the doc*/
+    Psysteme volatile ps;    
     ps = region_system(reg);
 
     if (!sc_empty_p(ps) && !sc_rn_p(ps))
@@ -973,7 +981,9 @@ list l_var;
  */
 void region_exact_projection_along_variable(region reg, entity var)
 {
-    Psysteme sc;
+    /* Automatic variables read in CATCH block need to be declared volatile as
+     * sepcified by the doc*/
+    Psysteme volatile sc;
 
     sc = region_system(reg);
 
