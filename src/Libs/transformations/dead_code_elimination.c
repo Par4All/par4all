@@ -277,8 +277,8 @@ static bool loop_executed_once_p(statement s, loop l)
   Pvecteur pv3;
   Pcontrainte pc3;
   bool m3_negatif = false, m3_positif = false, retour;
-  /* Automatic variables read in CATCH block need to be declared volatile as
-   * sepcified by the doc*/
+  /* Automatic variables read in a CATCH block need to be declared volatile as
+   * specified by the documentation*/
   Psysteme volatile ps;
 
   retour = FALSE;

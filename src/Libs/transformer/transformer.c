@@ -205,8 +205,8 @@ transformer transformer_combine(transformer t1, transformer t2)
   cons * a1 = transformer_arguments(t1);
   cons * a2 = transformer_arguments(t2);
   /* Newgen does not generate the proper castings */
-  /* Automatic variables read in CATCH block need to be declared volatile as
-   * sepcified by the doc*/
+  /* Automatic variables read in a CATCH block need to be declared volatile as
+   * specified by the documentation*/
   Psysteme volatile r1 = (Psysteme) predicate_system(transformer_relation(t1));
   Psysteme r2 = sc_dup((Psysteme)predicate_system(transformer_relation(t2)));
   /* ints: list of intermediate value entities */
@@ -707,8 +707,8 @@ static int varval_value_name_is_inferior_p(Pvecteur * pvarval1, Pvecteur * pvarv
 transformer
 transformer_normalize(transformer t, int level)
 {
-  /* Automatic variables read in CATCH block need to be declared volatile as
-   * sepcified by the doc*/
+  /* Automatic variables read in a CATCH block need to be declared volatile as
+   * specified by the documentation*/
   Psysteme volatile r = (Psysteme) predicate_system(transformer_relation(t));
 
   ifdebug(1) {
@@ -718,8 +718,8 @@ transformer_normalize(transformer t, int level)
 
   if (!sc_empty_p(r)) {
     Pbase b = base_dup(sc_base(r));
-    /* Automatic variables read in CATCH block need to be declared volatile as
-     * sepcified by the doc*/
+    /* Automatic variables read in a CATCH block need to be declared volatile as
+     * specified by the documentation*/
     Psysteme r2 = sc_dup(r);
     /* Select one tradeoff between speed and accuracy:
      * enumerated by increasing speeds according to Beatrice
@@ -1021,8 +1021,8 @@ transformer transformer_projection_with_redundancy_elimination_and_check(
    * no_elim() is provided here to obtain the fastest possible projection
    */
   list new_args = NIL;
-  /* Automatic variables read in CATCH block need to be declared volatile as
-   * sepcified by the doc*/
+  /* Automatic variables read in a CATCH block need to be declared volatile as
+   * specified by the documentation*/
   Psysteme volatile r = (Psysteme) predicate_system(transformer_relation(t));
   extern string entity_global_name(entity); /* useless with ri-util.h */
 
@@ -1045,8 +1045,8 @@ transformer transformer_projection_with_redundancy_elimination_and_check(
 
     /* Step 1: get rid of unwanted values in the relation r and in the basis */
     for (cea = args ; !ENDP(cea); POP(cea)) {
-      /* Automatic variables read in CATCH block need to be declared volatile as
-       * sepcified by the doc*/
+      /* Automatic variables read in a CATCH block need to be declared volatile as
+       * specified by the documentation*/
       entity volatile e = ENTITY(CAR(cea));
       pips_assert("base contains variable to project...",
 		  base_contains_variable_p(sc_base(r), (Variable) e));
@@ -1316,8 +1316,8 @@ transformer t;
 cons * args;
 {
   cons * new_args = NIL;
-  /* Automatic variables read in CATCH block need to be declared volatile as
-   * sepcified by the doc*/
+  /* Automatic variables read in a CATCH block need to be declared volatile as
+   * specified by the documentation*/
   Psysteme volatile r = (Psysteme) predicate_system(transformer_relation(t));
   extern string entity_global_name(entity); /* useless with ri-util.h */
 
@@ -1336,8 +1336,8 @@ cons * args;
     list cea = list_undefined;
 
     for(cea=args; !ENDP(cea); POP(cea)) {
-      /* Automatic variables read in CATCH block need to be declared volatile as
-       * sepcified by the doc*/
+      /* Automatic variables read in a CATCH block need to be declared volatile as
+       * specified by the documentation*/
       entity volatile e = ENTITY(CAR(cea));
       if(base_contains_variable_p(r->base, (Variable) e)) {
 	/* r = sc_projection(r, (Variable) e); */
@@ -1768,8 +1768,8 @@ parametric_transformer_empty_p(transformer t,
   Psysteme ps = predicate_system(pred);
   bool empty_p = FALSE;
   bool consistent_p = TRUE;
-  /* Automatic variables read in CATCH block need to be declared volatile as
-   * sepcified by the doc*/
+  /* Automatic variables read in a CATCH block need to be declared volatile as
+   * specified by the documentation*/
   Psysteme volatile new_ps = sc_dup (ps);
 
   pips_debug(9,"Begin for t=%p\n", t);
@@ -1808,8 +1808,8 @@ parametric_transformer_empty_p(transformer t,
       Pbase b_min = sc_to_minimal_basis(new_ps);
 
       for (b = b_min ; !VECTEUR_UNDEFINED_P(b) && !empty_p; b = vecteur_succ(b)) {
-	/* Automatic variables read in CATCH block need to be declared volatile as
-	 * sepcified by the doc*/
+	/* Automatic variables read in a CATCH block need to be declared volatile as
+	 * specified by the documentation*/
 	Variable volatile var = vecteur_var(b);
 	entity volatile e_var = (entity) var;
  

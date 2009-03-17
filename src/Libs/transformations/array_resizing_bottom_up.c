@@ -207,8 +207,8 @@ vect_partial_eval(Pvecteur pv)
 static Pvecteur
 sc_minmax_of_pvector(Psysteme ps_prec, Pvecteur pv1, Pvecteur pv2, boolean is_min)
 {
-  /* Automatic variables read in CATCH block need to be declared volatile as
-   * sepcified by the doc*/
+  /* Automatic variables read in a CATCH block need to be declared volatile as
+   * specified by the documentation*/
   Psysteme volatile ps_egal = SC_UNDEFINED;
   Psysteme volatile ps_inf = SC_UNDEFINED;
   Psysteme volatile ps_sup = SC_UNDEFINED;

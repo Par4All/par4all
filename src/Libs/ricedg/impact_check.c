@@ -372,8 +372,8 @@ static int __attribute__ ((unused)) expression_approximation(statement s, expres
     {
       Pvecteur pv = vect_dup(normalized_linear(n));
       Pcontrainte volatile pc = contrainte_make(pv);
-      /* Automatic variables read in CATCH block need to be declared volatile as
-       * sepcified by the doc*/
+      /* Automatic variables read in a CATCH block need to be declared volatile as
+       * specified by the documentation*/
       Psysteme volatile ps = sc_dup(precondition_ps);
       sc_add_ineg(ps, pc);
       CATCH(overflow_error) {
@@ -411,8 +411,8 @@ static int loop_executed_approximation(statement s)
       /* Tester le signe de l'incrément en fonction des préconditions : */
       Pvecteur pv3 = vect_dup(normalized_linear(n_m3));
       Pcontrainte pc3 = contrainte_make(pv3);
-      /* Automatic variables read in CATCH block need to be declared volatile as
-       * sepcified by the doc*/
+      /* Automatic variables read in a CATCH block need to be declared volatile as
+       * specified by the documentation*/
       Psysteme volatile ps = sc_dup(precondition_ps);
       sc_add_ineg(ps, pc3);
       CATCH(overflow_error) {

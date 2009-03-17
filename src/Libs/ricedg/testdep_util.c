@@ -498,8 +498,8 @@ Psysteme sc;
     debug(6, "sc_faisabilite_optim", "begin\n");
     sc = sc_normalize(sc);
     if (sc != NULL) {	
-	/* Automatic variables read in CATCH block need to be declared volatile as
-	 * sepcified by the doc*/
+	/* Automatic variables read in a CATCH block need to be declared volatile as
+	 * specified by the documentation*/
 	Psysteme volatile sc1 = sc_dup(sc);
 	is_test_Di = FALSE;
 	

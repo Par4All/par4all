@@ -685,8 +685,8 @@ void region_remove_beta_variables(region reg)
  */
 void region_non_exact_projection_along_parameters(region reg, list l_param)
 {
-    /* Automatic variables read in CATCH block need to be declared volatile as
-     * sepcified by the doc*/
+    /* Automatic variables read in a CATCH block need to be declared volatile as
+     * specified by the documentation*/
     Psysteme volatile ps;    
     ps = region_system(reg);
 
@@ -742,8 +742,8 @@ void region_non_exact_projection_along_parameters(region reg, list l_param)
 void region_exact_projection_along_parameters(region reg, list l_param)
 {
     tag app = region_approximation_tag(reg);
-    /* Automatic variables read in CATCH block need to be declared volatile as
-     * sepcified by the doc*/
+    /* Automatic variables read in a CATCH block need to be declared volatile as
+     * specified by the documentation*/
     Psysteme volatile ps;
 
 
@@ -857,8 +857,8 @@ void region_exact_projection_along_parameters(region reg, list l_param)
  */
 void region_non_exact_projection_along_variables(region reg, list l_var)
 {
-    /* Automatic variables read in CATCH block need to be declared volatile as
-     * sepcified by the doc*/
+    /* Automatic variables read in a CATCH block need to be declared volatile as
+     * specified by the documentation*/
     Psysteme volatile ps;
     
     ps = region_system(reg);
@@ -915,8 +915,8 @@ void region_exact_projection_along_variables(reg, l_var)
 effect reg;
 list l_var;
 {
-    /* Automatic variables read in CATCH block need to be declared volatile as
-     * sepcified by the doc*/
+    /* Automatic variables read in a CATCH block need to be declared volatile as
+     * specified by the documentation*/
     Psysteme volatile ps;    
     ps = region_system(reg);
 
@@ -981,8 +981,8 @@ list l_var;
  */
 void region_exact_projection_along_variable(region reg, entity var)
 {
-    /* Automatic variables read in CATCH block need to be declared volatile as
-     * sepcified by the doc*/
+    /* Automatic variables read in a CATCH block need to be declared volatile as
+     * specified by the documentation*/
     Psysteme volatile sc;
 
     sc = region_system(reg);
