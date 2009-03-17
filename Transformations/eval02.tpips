@@ -1,0 +1,18 @@
+delete eval02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create eval02 eval02.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[eval02]
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "max"
+apply PARTIAL_EVAL
+display PRINTED_FILE[eval02]
+
+close eval02
+delete eval02
