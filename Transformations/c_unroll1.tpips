@@ -1,0 +1,39 @@
+delete c_unroll1
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create c_unroll1 c_unroll1.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[main]
+
+echo
+echo Code after unrolling
+echo
+
+apply UNROLL[main]
+loop
+4
+display PRINTED_FILE[main]
+
+echo
+echo Unsplit resulting code
+echo
+apply UNSPLIT
+
+shell gcc -c c_unroll1.database/Src/c_unroll1.c
+shell rm -f c_unroll1.o
+
+close
+delete c_unroll1
+quit
+

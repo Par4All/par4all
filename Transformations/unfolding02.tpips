@@ -1,11 +1,11 @@
-delete unfolding01
+delete unfolding02
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
 setenv PIPS_CPP_FLAGS=" -D__u64='unsigned long long' -D__s64='long long' -D__signed__=signed -DFLGR_PROC_NUMBER=1 -D__GLIBC_HAVE_LONG_LONG "
 
 
-create unfolding01 unfolding01.c
+create unfolding02 unfolding01.c
 activate C_PARSER
 activate C_SYMBOL_TABLE
 
@@ -29,9 +29,10 @@ echo
 echo after inling
 echo
 
+setproperty UNFOLDING_FILTER "unfolding01!flgr_defop_add_fgINT32"
 apply UNFOLDING[flgr1d_arith_add_fgINT32]
 display PRINTED_FILE[flgr1d_arith_add_fgINT32]
 
 close
-delete unfolding01
+delete unfolding02
 quit

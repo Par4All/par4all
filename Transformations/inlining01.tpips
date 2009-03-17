@@ -19,6 +19,8 @@ echo
 echo Code after inlining
 echo
 
+# property not usefull here, but relevant for validation
+setproperty INLINING_CALLERS "main"
 apply INLINING[inlining01!pmax]
 display PRINTED_FILE[main]
 
