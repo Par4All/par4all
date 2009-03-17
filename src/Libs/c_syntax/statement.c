@@ -67,7 +67,9 @@ void MakeCurrentModule(entity e)
     }
   }
 
-  /* Let's hope cf is not an intrinsic: name conflict */
+  /* Let's hope cf is not an intrinsic: name conflict (the problem may
+     have been detected earlier in UpdateEntity() if there are
+     arguments) */
   if( entity_type(e) != type_undefined
       && intrinsic_entity_p(e) ) {
     pips_user_warning("Intrinsic %s redefined.\n"

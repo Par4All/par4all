@@ -1853,7 +1853,7 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
     /* The function should also added to the declarations */
     if(!entity_undefined_p(get_current_module_entity()))
       AddToDeclarations(e, get_current_module_entity());
-    else {
+    else if(!intrinsic_entity_p(e)) {
       /* We are defining the current module entity */
       type rt = functional_result(type_functional(ultimate_type(entity_type(e))));
 
@@ -1868,6 +1868,20 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
 	  AddToDeclarations(re, e);
 	}
       }
+    }
+    else {
+      /* Test case C_syntax/function_name_conflict01.c */
+      pips_user_warning("Intrinsic %s redefined.\n"
+			"This is not supported by PIPS. Please rename \"%s\"\n",
+			entity_local_name(e), entity_local_name(e));
+      /* Unfortunately, an intrinsics cannot be redefined, just like a user function
+       * or subroutine after editing because intrinsics are not handled like
+       * user functions or subroutines. They are not added to the called_modules
+       * list of other modules, unless the redefining module is parsed FIRST.
+       * There is not mechanism in PIPS to control the parsing order.
+       */
+      CParserError("Name conflict between a "
+		   "function and an intrinsic\n");
     }
     entity_storage(e) = MakeStorageRom();
   }
