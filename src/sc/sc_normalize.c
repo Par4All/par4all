@@ -380,8 +380,8 @@ Psysteme sc_strong_normalize_and_check_feasibility
     Psysteme volatile new_ps = SC_UNDEFINED;
     Psysteme proj_ps = SC_UNDEFINED;
     boolean feasible_p = TRUE;
-    /* Automatic variables read in CATCH block need to be declared volatile as
-     * sepcified by the doc*/
+    /* Automatic variables read in a CATCH block need to be declared volatile as
+     * specified by the documentation*/
     Psysteme volatile ps_backup = sc_copy(ps);
     /*
     fprintf(stderr, "[sc_strong_normalize]: Begin\n");
@@ -664,8 +664,8 @@ Psysteme sc_strong_normalize2(Psysteme ps)
     Psysteme new_ps = sc_make(NULL, NULL);
     boolean feasible_p = TRUE;
 
-    /* Automatic variables read in CATCH block need to be declared volatile as
-     * sepcified by the doc*/
+    /* Automatic variables read in a CATCH block need to be declared volatile as
+     * specified by the documentation*/
     Psysteme volatile ps_backup = sc_copy(ps);
 
     CATCH(overflow_error) 
@@ -905,8 +905,8 @@ Psysteme sc_strong_normalize_and_check_feasibility2
 
   Psysteme new_ps = sc_make(NULL, NULL);
   boolean feasible_p = TRUE;
-  /* Automatic variables read in CATCH block need to be declared volatile as
-   * sepcified by the doc*/
+  /* Automatic variables read in a CATCH block need to be declared volatile as
+   * specified by the documentation*/
   Psysteme volatile ps_backup = sc_copy(ps);
 
   CATCH(overflow_error) 

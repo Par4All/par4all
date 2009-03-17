@@ -406,8 +406,8 @@ int n __attribute__ ((unused));
 
     Psysteme sc = sc_new();
     Pcontrainte ineq,eq;
-    /* Automatic variables read in CATCH block need to be declared volatile as
-     * sepcified by the doc*/
+    /* Automatic variables read in a CATCH block need to be declared volatile as
+     * specified by the documentation*/
     Pcontrainte volatile pred;
     int rank_hr,rank_max = 0;
     Variable var_hr;

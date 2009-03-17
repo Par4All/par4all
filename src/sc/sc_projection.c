@@ -696,15 +696,15 @@ Pvecteur pv;
 {
     Pvecteur lvar_proj;
     Psysteme sc1=sc_init_with_sc(sc);
-    /* Automatic variables read in CATCH block need to be declared volatile as
-     * sepcified by the doc*/
+    /* Automatic variables read in a CATCH block need to be declared volatile as
+     * specified by the documentation*/
     Psysteme volatile sc2;
     Variable var;
 
     if (!VECTEUR_NUL_P(pv)) {
         Pvecteur pv1;
-	/* Automatic variables read in CATCH block need to be declared volatile as
-	 * sepcified by the doc*/
+	/* Automatic variables read in a CATCH block need to be declared volatile as
+	 * specified by the documentation*/
         Pvecteur volatile pv2;
         lvar_proj = vect_copy(pv);
 	for (pv1 = index_base;!VECTEUR_NUL_P(pv1); pv1=pv1->succ) {
@@ -1057,8 +1057,8 @@ Variable v;
 int ofl_ctrl;
 {
   /* static boolean DN = FALSE; */
-  /* Automatic variables read in CATCH block need to be declared volatile as
-   * sepcified by the doc*/
+  /* Automatic variables read in a CATCH block need to be declared volatile as
+   * specified by the documentation*/
   Psysteme volatile sc; 
   Pbase volatile base_saved;
   static int volatile projection_sc_counter = 0;

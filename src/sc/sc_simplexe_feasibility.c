@@ -577,8 +577,8 @@ sc_simplexe_feasibility_ofl_ctrl(
     Pcontrainte pc, pc_tmp ;
     Pvecteur pv ;
     /* All the folowing automatic variables are used when coming back from
-     * longjmp (i.e. in CATCH block) so they need to be declared volatile as
-     * sepcified by the doc*/      
+     * longjmp (i.e. in a CATCH block) so they need to be declared volatile as
+     * specified by the documentation*/      
     intptr_t volatile premier_hash = PTR_NIL; /* tete de liste des noms de variables */
     /* Necessaire de declarer "hashtable" static 
      *  pour initialiser tout automatiquement a` 0.
