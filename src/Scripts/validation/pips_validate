@@ -107,17 +107,29 @@ while [ "$1" ] ; do
   case $opt in
       -h|--help) usage 0 ;;
       -v|--verbose) let verb++ ;;
-      -t|--tpips) tpips=$1 ; shift ;;
-      -p|--pips) pips=$1 ; shift ;;
-      -V|--valid) vdir=$1 ; shift ;;
-      -R|--run) rdir=$1 ; shift ;;
-      -O|--out|--output) odir=$1 ; shift ;;
-      -m|--mail) mail="$mail $1" ; shift ;;
-      -a|--auto-result-create) auto_result_create=1 ;;
+      --version) echo "$script revision $rev" ; exit 0 ;;
+      # look for work
       -r|--recurse) recurse=1 ;;
+      # binaries to use
+      -t|--tpips) tpips=$1 ; shift ;;
+      --tpips=*) tpips=${opt/*=/} ;;
+      -p|--pips) pips=$1 ; shift ;;
+      --pips=*) pips=${opt/*=/} ;;
+      # directories to use
+      -V|--valid) vdir=$1 ; shift ;;
+      --valid=*) vdir=${opt/*=/} ;;
+      -R|--run) rdir=$1 ; shift ;;
+      --run=*) rdir=${opt/*=/} ;;
+      # result
+      -O|--out|--output) odir=$1 ; shift ;;
+      --out=*|--output=*) odir=${opt/*=/} ;;
+      -m|--mail) mail="$mail $1" ; shift ;;
+      --mail=*) mail="$mail ${opt/*=/}" ;;
+      -a|--auto-result-create) auto_result_create=1 ;;
+      # archive to detect changes
       -d|--diff) display_diff=1; keep_archive=1 ;;
       -k|--archive) keep_archive=1 ;;
-      --version) echo "$script revision $rev" ; exit 0 ;;
+      # error
       *) usage 1 "unexpected option: $opt"
   esac
 done
