@@ -2,13 +2,15 @@
 Parsed printed file for "rand"
 
 
+Warnings for "rand"
+
+C_PARSER[rand] (UpdateEntity) Intrinsic rand redefined.
+This is not supported by PIPS. Please rename rand
+C_PARSER[rand] (CParserError) 
+Recovery from C parser failure not (fully) implemented yet.
+C parser is likely to fail later if re-used.
+C_PARSER[rand] (set_debug_stack_pointer) debug level stack is set to 2
+unknown[unknown] (safe_do_something) Request aborted under pipsmake: build resource PARSED_PRINTED_FILE for module rand.
+
 Parsed printed file for "function_name_conflict01"
 
-void function_name_conflict01(int x)
-{
-   float y;
-
-   y = 1.;
-   x = rand(y);
-}
- function_name_conflict01
