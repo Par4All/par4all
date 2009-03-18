@@ -79,7 +79,7 @@ static hash_table hash_entity_def_to_task = hash_table_undefined;
 static string global_module_name;
 static int global_margin =0;
 
-extern boolean is_fortran;
+extern boolean prettyprint_is_fortran;
 static boolean box_in_statement_p=FALSE;
 static boolean motif_in_statement_p=FALSE;
 
@@ -2682,7 +2682,7 @@ static void xml_LocalArrays(entity module, Psysteme prec,string_buffer sb_result
  list ldecl;
  int nb_dim=0;
 
- if (is_fortran)
+ if (prettyprint_is_fortran)
     ldecl = code_declarations(value_code(entity_initial(module)));
   else {
     statement s = get_current_module_statement();
@@ -2935,7 +2935,7 @@ static void xml_ActualArrays(entity module, Psysteme prec,string_buffer sb_resul
   int nb_dim =0;
   list ldecl;
 
-   if (is_fortran)
+   if (prettyprint_is_fortran)
     ldecl = code_declarations(value_code(entity_initial(module)));
   else {
     statement s = get_current_module_statement();
@@ -3021,7 +3021,7 @@ static void xml_Connection(list  ActualArrayInd,int ActualArrayDim, int FormalAr
   string_buffer_append_word("Connection",sb_result); 
   mat = matrix_new(ActualArrayDim,FormalArrayDim);
   matrix_init(mat,ActualArrayDim,FormalArrayDim);
-  if (is_fortran) {
+  if (prettyprint_is_fortran) {
     for (i=1;i<=ActualArrayDim && i<= FormalArrayDim;i++)
       MATRIX_ELEM(mat,i,i)=1;
   }
@@ -3480,11 +3480,11 @@ static void xml_Application(string module_name, int code_tag,string_buffer sb_re
 					  get_current_module_name(), 
 					  QUOTE, BL,
 					  "Language=",QUOTE,
-					  (is_fortran) ? "FORTRAN":"C",
+					  (prettyprint_is_fortran) ? "FORTRAN":"C",
 					  QUOTE, BL,
 					  "PassingMode=",
 					  QUOTE,
-					  (is_fortran) ? "BYREFERENCE":"BYVALUE",
+					  (prettyprint_is_fortran) ? "BYREFERENCE":"BYVALUE",
 					  QUOTE,
 					  CLOSEANGLE, 
 					  NL, NULL)));

@@ -158,7 +158,7 @@ print_sentence(FILE * fd,
 			{
 			    for (i = col; i <= MAX_END_COLUMN; i++) 
 				putc_sentence(' ', fd);
-			    fprintf_sentence(fd, is_fortran? "%04d" : "/*%04d*/", n);
+			    fprintf_sentence(fd, prettyprint_is_fortran? "%04d" : "/*%04d*/", n);
 			}
 			
 			/* start a new line with its prefix */
@@ -241,7 +241,7 @@ print_sentence(FILE * fd,
 	if (n > 0 && get_bool_property("PRETTYPRINT_STATEMENT_NUMBER")) {
 	    for (i = col; i <= MAX_END_COLUMN; i++) 
 		putc_sentence(' ', fd);
-	    fprintf_sentence(fd,  is_fortran? "%04d" : "/*%04d*/", n);
+	    fprintf_sentence(fd,  prettyprint_is_fortran? "%04d" : "/*%04d*/", n);
 	}
 	putc_sentence('\n', fd);
     }

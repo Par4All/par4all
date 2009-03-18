@@ -217,7 +217,7 @@ compilation_unit_text(entity cu, entity module)
     text cut = make_text(NIL);
     //entity e = entity_undefined;
     
-    pips_assert("We must be in a C prettyprinter environement", !is_fortran);
+    pips_assert("We must be in a C prettyprinter environement", !prettyprint_is_fortran);
 
     if (type_undefined_p(t))
 	pips_user_error("undefined type for %s\n", entity_name(module));

@@ -1868,6 +1868,29 @@ Otherwise, a new one is generated
 CLONE_NAME ""
 \end{verbatim}
 
+\subsection{Inlining}
+\index{Inlining}
+\index{INLINING\_CALLERS}
+The default behavior of inlining is to inline the given module in \textbf{all} call sites.
+Use this property to filter the call sites: only given module names will be considered
+\begin{verbatim}
+INLINING_CALLERS ""
+\end{verbatim}
+
+\index{UNFOLDING\_CALLEES}
+Using \lstinline|UNFOLDING_CALLEES|, you cam specify which module you want to inline in the unfolded module.
+The unfolding will be performed as long as one of the module in \lstinline|UNFOLDING_CALLEES| is called.
+More than one module can be specified, they are seperated by blank spaces.
+\begin{verbatim}
+UNFOLDING_CALLEES ""
+\end{verbatim}
+ 
+\index{UNFOLDING\_FILTER}
+The default behavior of unfolding is to recursively inline all callees from given module, as long as a callee remains. Use \lstinline|UNFOLDING_FILTER| to inline all calls not in the space seperated module list 
+\begin{verbatim}
+UNFOLDING_FILTER ""
+\end{verbatim}
+
 \subsection{Expression Optimizer}
 \index{Optimization}
 \index{EOLE}

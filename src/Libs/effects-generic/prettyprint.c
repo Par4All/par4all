@@ -320,7 +320,7 @@ print_source_or_code_effects_engine(
     char *file_name, *file_resource_name;
     bool success = TRUE;
 
-    is_fortran = !get_bool_property("PRETTYPRINT_C_CODE");
+    prettyprint_is_fortran = !get_bool_property("PRETTYPRINT_C_CODE");
 
     file_name = strdup(concatenate(file_suffix,
                                   get_bool_property
@@ -376,9 +376,9 @@ list /* of string */ effect_words_reference_with_addressing_as_it_is_or_not(refe
   begin_attachment = STRING(CAR(pc));
 
   if (reference_indices(obj) != NIL) {
-    string beg = is_fortran? "(" : "[";
-    string mid = is_fortran? "," : "][";
-    string end = is_fortran? ")" : "]";
+    string beg = prettyprint_is_fortran? "(" : "[";
+    string mid = prettyprint_is_fortran? "," : "][";
+    string end = prettyprint_is_fortran? ")" : "]";
 
     pc = CHAIN_SWORD(pc,beg);
     MAPL(pi, {
@@ -389,9 +389,9 @@ list /* of string */ effect_words_reference_with_addressing_as_it_is_or_not(refe
     pc = CHAIN_SWORD(pc,end);
   }
   else if(!as_it_is_p){
-    string beg = is_fortran? "(*" : "[*";
-    string mid = is_fortran? ",*" : "][*";
-    string end = is_fortran? ")" : "]";
+    string beg = prettyprint_is_fortran? "(*" : "[*";
+    string mid = prettyprint_is_fortran? ",*" : "][*";
+    string end = prettyprint_is_fortran? ")" : "]";
     int d;
     /* if( (d=variable_entity_dimension(reference_variable(obj))) != 0) { */
     if( (d=type_depth(entity_type(reference_variable(obj)))) != 0) {

@@ -24,6 +24,8 @@
 #include "pipsdbm.h"
 #include "pipsmake.h"
 
+extern bool prettyprint_is_fortran;
+
 string compilation_unit_name; 
 
 list CalledModules = NIL; 
@@ -284,7 +286,9 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
  
     /* FI: not clean, but useful for debugging statement */
     ifdebug(1)
-      is_fortran = FALSE;
+    {
+      prettyprint_is_fortran = FALSE;
+    }
 
     /* Predefined type(s): __builtin_va_list */
     built_in_va_list = find_or_create_entity(strdup(concatenate(compilation_unit_name,

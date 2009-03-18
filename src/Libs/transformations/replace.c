@@ -192,20 +192,27 @@ void CallReplaceReference(call c, reference ref, expression next)
 		   */
 	/* FI: I'd rather assume, nothing to replace for symbolic constants */
 	break;
+      case is_value_code:
+        /* SG: in C, value_code is not a problem (copy passing)
+         */
+        if(fortran_module_p(f))
+        {
+            pips_error("CallReplaceReference", 
+                    "case is_value_code: interprocedural replacement for"
+                    " call to \"%s\" is impossible\n", module_local_name(f));
+        }
       case is_value_intrinsic:
       case is_value_unknown:
-	/* We assume that it is legal to replace arguments (because it should
-	   have been verified with the effects that the index is not WRITTEN).
-	   */
-	MAPL(a, {
-	    ExpressionReplaceReference(EXPRESSION(CAR(a)), ref, next);
-	}, call_arguments(c));
-	break;
-      case is_value_code:
-	pips_error("CallReplaceReference", 
-		   "case is_value_code: interprocedural replacement for"
-		   " call to \"%s\" is impossible\n", module_local_name(f));
-	break;
+        /* We assume that it is legal to replace arguments (because it should
+           have been verified with the effects that the index is not WRITTEN).
+           */
+        
+        {
+            FOREACH(EXPRESSION,e, call_arguments(c))
+            {
+                ExpressionReplaceReference(e, ref, next);
+            }
+        } break;
       default:
 	pips_error("CallReplaceReference", "unknown tag: %d\n", 
 		   (int) value_tag(vin));

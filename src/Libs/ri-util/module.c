@@ -395,7 +395,9 @@ static void
 insure_global_declaration_coherency_helper(statement stat)
 {
     list decl, new_decl = NIL;
-    decl=(is_fortran?entity_declarations(get_current_module_entity()):statement_declarations(stat));
+    decl=(prettyprint_is_fortran?
+            entity_declarations(get_current_module_entity()):
+            statement_declarations(stat));
 
     init_declared_variables();
     init_referenced_variables_in_list();
@@ -469,7 +471,7 @@ insure_global_declaration_coherency_helper(statement stat)
 
     /* commit changes
      */
-    if( is_fortran) {
+    if( prettyprint_is_fortran) {
         entity_declarations(get_current_module_entity()) = new_decl;
     }
     else {
@@ -511,7 +513,7 @@ insure_global_declaration_coherency_helper(statement stat)
 
     /* the temporaries are cleaned
      */
-    gen_free_list(is_fortran?decl:new_decl);
+    gen_free_list(prettyprint_is_fortran?decl:new_decl);
     close_declared_variables();
     close_referenced_variables_in_list();
     gen_free_list(referenced_variables_list), referenced_variables_list = NIL;
@@ -544,7 +546,7 @@ insure_global_declaration_coherency(
     entity saved_module = get_current_module_entity(); /* SG: why is this not set to module ? */
     reset_current_module_entity();
     set_current_module_entity(module);
-    if( is_fortran ) insure_global_declaration_coherency_helper(stat);
+    if( prettyprint_is_fortran ) insure_global_declaration_coherency_helper(stat);
     else gen_recurse( stat, statement_domain, gen_true, insure_global_declaration_coherency_helper);
     current_included_entities=NIL;
     reset_current_module_entity();

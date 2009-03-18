@@ -162,6 +162,7 @@ void loop_unroll(statement loop_statement, int rate)
 					       mod_ent,
 					       copy_basic(indb)
 					       /* MakeBasic(is_basic_int)*/);
+    AddEntityToCurrentModule(nub);
 
     if (expression_integer_value(lb, &lbval) 
 	&& expression_integer_value(ub, &ubval) 
@@ -203,6 +204,7 @@ void loop_unroll(statement loop_statement, int rate)
 					      mod_ent,
 					      copy_basic(indb)
 					      /* MakeBasic(is_basic_int)*/);
+    AddEntityToCurrentModule(ib);
 
     if (numeric_range_p) {
 	rhs_expr = int_expr(FORTRAN_MOD(FORTRAN_DIV(ubval-lbval+incval, 
@@ -234,7 +236,8 @@ void loop_unroll(statement loop_statement, int rate)
     lu_ind = make_new_scalar_variable_with_prefix(INDEX_NAME, 
 						  mod_ent,
 						  copy_basic(indb)
-						  /* MakeBasic(is_basic_int)*/);
+	);
+    AddEntityToCurrentModule(lu_ind);
 
     /* Loop range is created */
     rg = make_range(MakeIntegerConstantExpression("0"),
@@ -559,6 +562,7 @@ void full_loop_unroll(statement loop_statement)
 bool recursiv_loop_unroll(statement stmt, entity lb_ent, int rate)
 {
     instruction inst = statement_instruction(stmt);
+    entity stmt_label = statement_label(stmt);
     bool not_done = TRUE;
 
     debug(8, "recursiv_loop_unroll", "begin with tag %d\n", 
@@ -586,11 +590,11 @@ bool recursiv_loop_unroll(statement stmt, entity lb_ent, int rate)
       case is_instruction_loop : {
 	  entity do_lab_ent = loop_label(instruction_loop(inst));
 	  /* is it the right label? */
-	  if (do_lab_ent == entity_undefined) {
+	  if ( entity_undefined_p(do_lab_ent) && entity_undefined_p(stmt_label) ) {
 	      pips_error("recursive_loop_unroll", "DO label undefined\n");
 	      not_done = TRUE;
 	  }
-	  else if (gen_eq(lb_ent, do_lab_ent)) {
+	  else if (gen_eq(lb_ent, do_lab_ent) || gen_eq(lb_ent,stmt_label) ) {
 	      loop_unroll(stmt, rate);
 	      not_done = FALSE;
 	  }
@@ -681,8 +685,13 @@ unroll(char *mod_name)
 	       since there is only *one* version of code; a new version 
 	       will be put back in the
 	       data base after unrolling */
+
 	    mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
 	    mod_inst = statement_instruction(mod_stmt);
+
+        /* prelude */
+        set_current_module_entity(module_name_to_entity( mod_name ));
+        set_current_module_statement( mod_stmt);
 
 	    switch (instruction_tag (mod_inst)) {
 
@@ -714,6 +723,9 @@ unroll(char *mod_name)
 	    module_reorder(mod_stmt);
 
 	    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stmt);
+        /*postlude*/
+        reset_current_module_entity();
+        reset_current_module_statement();
 	    return_status = TRUE;
 	}
     }
@@ -802,6 +814,9 @@ full_unroll(char * mod_name)
   if(return_status) {
 
     mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+    /* prelude */
+    set_current_module_entity(module_name_to_entity( mod_name ));
+    set_current_module_statement( mod_stmt);
 
     if(entity_undefined_p(searched_loop_label)) {
       gen_recurse (mod_stmt, statement_domain, 
@@ -818,6 +833,9 @@ full_unroll(char * mod_name)
     searched_loop_label = entity_undefined;
 
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stmt);
+    /*postlude*/
+    reset_current_module_entity();
+    reset_current_module_statement();
   }
 
   debug(2,"unroll","done for %s\n", mod_name);

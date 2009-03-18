@@ -27,9 +27,6 @@
 
 #include "properties.h"
 
-/*===================== Variables and Function prototypes for C ===========*/
-extern bool is_fortran; 
-
 
 /******************************************************* EMPTY STATEMENT */
 /* detects a statement with no special effect...

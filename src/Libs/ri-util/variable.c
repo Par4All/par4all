@@ -84,6 +84,12 @@ AddLocalEntityToDeclarations(entity e, entity f, statement s)
     }
 }
 
+void
+AddEntityToCurrentModule(entity e)
+{
+    AddLocalEntityToDeclarations(e,get_current_module_entity(),get_current_module_statement());
+}
+
 /* entity make_scalar_entity(name, module_name, base)
  */
 entity 

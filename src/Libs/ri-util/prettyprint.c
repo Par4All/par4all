@@ -323,7 +323,7 @@ char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data
 
 /*===================== Variables and Function prototypes for C ===========*/
 
-bool is_fortran = TRUE;
+bool prettyprint_is_fortran = TRUE;
 static list words_cast(cast obj);
 static list words_sizeofexpression(sizeofexpression obj);
 static list words_subscript(subscript s);
@@ -519,7 +519,7 @@ words_reference(reference obj)
   begin_attachment = STRING(CAR(pc));
     
   if (reference_indices(obj) != NIL) {
-    if (is_fortran)
+    if (prettyprint_is_fortran)
       {
 	pc = CHAIN_SWORD(pc,"(");
 	MAPL(pi, {
@@ -605,7 +605,7 @@ text generate_alternate_return_targets()
 	make_unformatted
 	(strdup(label_local_name(le)),
 	 STATEMENT_NUMBER_UNDEFINED, 0, 
-	 CONS(STRING, strdup(is_fortran?"CONTINUE":";"), NIL));
+	 CONS(STRING, strdup(prettyprint_is_fortran?"CONTINUE":";"), NIL));
 
       s1 = make_sentence(is_sentence_unformatted, u1);
       sl = gen_nconc(sl, CONS(SENTENCE, s1, NIL));
@@ -635,7 +635,7 @@ words_regular_call(call obj, bool is_a_subroutine)
     if(type_statement_p(t))
       return(CHAIN_SWORD(pc, entity_local_name(f)+strlen(LABEL_PREFIX)));
     if(value_constant_p(i)||value_symbolic_p(i)) {
-      if(is_fortran)
+      if(prettyprint_is_fortran)
 	return(CHAIN_SWORD(pc, entity_user_name(f)));
       else {
 	if(ENTITY_TRUE_P(f))
@@ -649,18 +649,18 @@ words_regular_call(call obj, bool is_a_subroutine)
 
   if(type_void_p(functional_result(type_functional(call_compatible_type(entity_type(call_function(obj))))))) {
     if(is_a_subroutine) 
-      pc = CHAIN_SWORD(pc, is_fortran?"CALL ":"");
+      pc = CHAIN_SWORD(pc, prettyprint_is_fortran?"CALL ":"");
     else
-      if(is_fortran) /* to avoid this warning for C*/
+      if(prettyprint_is_fortran) /* to avoid this warning for C*/
 	pips_user_warning("subroutine '%s' used as a function.\n",
 			  entity_name(f));
       
   }
   else if(is_a_subroutine) {
-    if(is_fortran) /* to avoid this warning for C*/
+    if(prettyprint_is_fortran) /* to avoid this warning for C*/
       pips_user_warning("function '%s' used as a subroutine.\n",
 			entity_name(f));
-    pc = CHAIN_SWORD(pc, is_fortran?"CALL ":"");
+    pc = CHAIN_SWORD(pc, prettyprint_is_fortran?"CALL ":"");
   }
 
   /* the implied complex operator is hidden... [D]CMPLX_(x,y) -> (x,y)
@@ -724,7 +724,7 @@ words_regular_call(call obj, bool is_a_subroutine)
     pc = CHAIN_SWORD(pc, ")");
   }
   else if(!type_void_p(functional_result(type_functional(t))) ||
-	  !is_a_subroutine || !is_fortran) {
+	  !is_a_subroutine || !prettyprint_is_fortran) {
     pc = CHAIN_SWORD(pc, "()");
   }
 
@@ -775,7 +775,7 @@ words_assign_op(call obj,
   pc = CHAIN_SWORD(pc," ");
   pc = CHAIN_SWORD(pc, fun); 
   pc = CHAIN_SWORD(pc," ");
-  if(is_fortran) {
+  if(prettyprint_is_fortran) {
     expression e = EXPRESSION(CAR(CDR(args)));
     if(expression_call_p(e)) {
       /* = is not a Fortran operator. No need for parentheses ever,
@@ -983,7 +983,7 @@ static list words_nullary_op(call obj,
 			     int precedence,
 			     bool __attribute__ ((unused)) leftmost)
 {
-  return is_fortran? words_nullary_op_fortran(obj, precedence, leftmost)
+  return prettyprint_is_fortran? words_nullary_op_fortran(obj, precedence, leftmost)
     : words_nullary_op_c(obj, precedence, leftmost);
 }
 
@@ -1183,7 +1183,7 @@ words_io_inst(call obj,
 	
       if (pio_write != NIL )	/* READ (*,*) pio -> READ *, pio */
 	{ 
-	  if(!is_fortran)
+	  if(!prettyprint_is_fortran)
 	    pc = CHAIN_SWORD(pc, "_f77_intrinsics_read_(");
 	  else
 	    pc = CHAIN_SWORD(pc, "READ *, ");
@@ -1235,7 +1235,7 @@ words_io_inst(call obj,
     }
   }, pcio);
 
-  if(!is_fortran)
+  if(!prettyprint_is_fortran)
     pc = CHAIN_SWORD(pc, ") ");
 	   
   return(pc) ;
@@ -1277,7 +1277,7 @@ words_prefix_unary_op(call obj,
     fun = "*";
   else if (strcmp(fun,UNARY_PLUS_OPERATOR_NAME) == 0) 
     fun = "+";
-  else if(!is_fortran){ 
+  else if(!prettyprint_is_fortran){ 
 	if(strcasecmp(fun, NOT_OPERATOR_NAME)==0)
 	  fun="!";
       }
@@ -1365,9 +1365,9 @@ words_goto_label(string tlabel)
     }
     else {
       /* In C, a label cannot begin with a number so "l" is added for this case*/
-      pc = CHAIN_SWORD(pc, strdup(is_fortran?"GOTO ":(isdigit(tlabel[0])?"goto l":"goto ")));
+      pc = CHAIN_SWORD(pc, strdup(prettyprint_is_fortran?"GOTO ":(isdigit(tlabel[0])?"goto l":"goto ")));
       pc = CHAIN_SWORD(pc, tlabel);
-      if (!is_fortran)
+      if (!prettyprint_is_fortran)
 	pc = CHAIN_SWORD(pc, ";");
     }
     return pc;
@@ -1569,7 +1569,7 @@ words_infix_binary_op(call obj, int precedence, bool leftmost)
     fun = "!=";
   else  if ( strcmp(fun,C_MODULO_OPERATOR_NAME) == 0 )
     fun = "%";
-  else if (!is_fortran){
+  else if (!prettyprint_is_fortran){
     if(strcasecmp(fun, GREATER_THAN_OPERATOR_NAME)==0)
       fun=C_GREATER_THAN_OPERATOR_NAME;
     else if(strcasecmp(fun, LESS_THAN_OPERATOR_NAME)==0)
@@ -1981,7 +1981,7 @@ words_subexpression(
 static sentence 
 sentence_tail(void)
 {
-  return MAKE_ONE_WORD_SENTENCE(0, strdup(is_fortran?"END":"}"));
+  return MAKE_ONE_WORD_SENTENCE(0, strdup(prettyprint_is_fortran?"END":"}"));
 }
 
 /* exported for unstructured.c */
@@ -2052,7 +2052,7 @@ text_block(
 	    pbeg = CHAIN_SWORD(NIL, "BEGIN BLOCK");
 	    pend = CHAIN_SWORD(NIL, "END BLOCK");
 	    
-	    /* Should be guarded by is_fortran as "C" is not OK in C,
+	    /* Should be guarded by prettyprint_is_fortran as "C" is not OK in C,
 	       however, this option is useless in C since { and } are
 	       visible. Also, the comment prefix should be uniquely declared.*/
 	    u = make_unformatted(strdup(PIPS_COMMENT_SENTINEL), n, margin, pbeg);
@@ -2121,7 +2121,7 @@ loop_private_variables(loop obj)
     {
 	string private;
 	if (hpf_private) private = "NEW(";
-	else if (omp_private) private = is_fortran? "PRIVATE(" : "private(";
+	else if (omp_private) private = prettyprint_is_fortran? "PRIVATE(" : "private(";
 	else private = "PRIVATE ";
 	l = CONS(STRING, MAKE_SWORD(private), l);
 	if (hpf_private || omp_private) CHAIN_SWORD(l, ")");
@@ -2143,7 +2143,7 @@ marged(
     int len = strlen(prefix), i;
     string result = (string) malloc(strlen(prefix)+margin+1);
     strcpy(result, prefix);
-    if(is_fortran) {
+    if(prettyprint_is_fortran) {
       for (i=len; margin-->0;) 
 	result[i++] = ' '; result[i]='\0';
     }
@@ -2225,7 +2225,7 @@ text_omp_directive(loop l, int m)
 {
   text t = text_undefined;
 
-  if(is_fortran)
+  if(prettyprint_is_fortran)
     t = text_directive(l, m, "\n" OMP_DIRECTIVE, OMP_CONTINUATION,
 		       OMP_PARALLELDO);
   else { // assume C
@@ -2274,19 +2274,19 @@ text_loop_default(
 
     /* LOOP prologue.
      */
-    if(is_fortran)
+    if(prettyprint_is_fortran)
       pc = CHAIN_SWORD(NIL, (doall_loop_p) ? "DOALL " : "DO " );
     else
       pc = CHAIN_SWORD(NIL, (doall_loop_p) ? "forall(" : "for(" );
     
-    if(is_fortran && !structured_do && !doall_loop_p && !do_enddo_p) {
+    if(prettyprint_is_fortran && !structured_do && !doall_loop_p && !do_enddo_p) {
 	pc = CHAIN_SWORD(pc, concatenate(do_label, " ", NULL));
     }
     //pc = CHAIN_SWORD(pc, entity_local_name(loop_index(obj)));
     pc = CHAIN_SWORD(pc, entity_user_name(loop_index(obj)));
     pc = CHAIN_SWORD(pc, " = ");
 
-    if(is_fortran) {
+    if(prettyprint_is_fortran) {
       pc = gen_nconc(pc, words_loop_range(loop_range(obj)));
     }
     else {
@@ -2321,7 +2321,7 @@ text_loop_default(
 
 
 
-    if(!is_fortran) { /* i.e. is_C for the time being */
+    if(!prettyprint_is_fortran) { /* i.e. is_C for the time being */
       if(!one_liner_p(body))
 	 ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
     }
@@ -2427,7 +2427,7 @@ text_whileloop(
 
     if (evaluation_before_p(eval))
       {
-	if (is_fortran)
+	if (prettyprint_is_fortran)
 	  {
 	    /* LOOP prologue.
 	     */
@@ -2560,10 +2560,10 @@ text_logical_if(
   list pc = NIL;
   statement tb = test_true(obj);
 
-  pc = CHAIN_SWORD(pc, strdup(is_fortran?"IF (":"if ("));
+  pc = CHAIN_SWORD(pc, strdup(prettyprint_is_fortran?"IF (":"if ("));
   pc = gen_nconc(pc, words_expression(test_condition(obj)));
   pc = CHAIN_SWORD(pc, ") ");
-  if(is_fortran) {
+  if(prettyprint_is_fortran) {
     instruction ti = statement_instruction(tb);
     call c = instruction_call(ti);
     pc = gen_nconc(pc, words_call(c, 0, TRUE, TRUE));
@@ -2605,9 +2605,9 @@ text_block_if(
     bool one_liner_false_statement = one_liner_p(test_false(obj));
     bool else_branch_p = FALSE; /* The else branch must be printed */
 
-    pc = CHAIN_SWORD(pc, is_fortran?"IF (":"if (");
+    pc = CHAIN_SWORD(pc, prettyprint_is_fortran?"IF (":"if (");
     pc = gen_nconc(pc, words_expression(test_condition(obj)));
-    if(is_fortran)
+    if(prettyprint_is_fortran)
       pc = CHAIN_SWORD(pc, ") THEN");
     else if(one_liner_true_statement){
       pc = CHAIN_SWORD(pc, ")");
@@ -2638,7 +2638,7 @@ text_block_if(
 	 && (get_bool_property("PRETTYPRINT_ALL_LABELS"))))
       {
         else_branch_p = TRUE;
-	if (is_fortran) 
+	if (prettyprint_is_fortran) 
 	  {
 	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
 	  }
@@ -2657,7 +2657,7 @@ text_block_if(
 				      test_false_obj));
       }
     
-    if(is_fortran)
+    if(prettyprint_is_fortran)
       ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,strdup("ENDIF")))
     else if((!else_branch_p && !one_liner_true_statement) || (else_branch_p && !one_liner_false_statement))
       ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,strdup("}")))
@@ -2706,7 +2706,7 @@ text_io_block_if(
       ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, 
 					    make_unformatted(strdup(strglab), n, margin, 
 							     CONS(STRING, 
-								  strdup(is_fortran?"CONTINUE":";"), NIL))));
+								  strdup(prettyprint_is_fortran?"CONTINUE":";"), NIL))));
     } 
     
     if (!empty_statement_p(test_false(obj))) 
@@ -2728,16 +2728,16 @@ text_block_ifthen(
     list pc = NIL;
     statement tb=test_true(obj);
 
-    pc = CHAIN_SWORD(pc, is_fortran?"IF (":"if (");
+    pc = CHAIN_SWORD(pc, prettyprint_is_fortran?"IF (":"if (");
     pc = gen_nconc(pc, words_expression(test_condition(obj)));
-    pc = CHAIN_SWORD(pc, is_fortran?") THEN": (one_liner_p(tb)?")":") {"));
+    pc = CHAIN_SWORD(pc, prettyprint_is_fortran?") THEN": (one_liner_p(tb)?")":") {"));
 
     ADD_SENTENCE_TO_TEXT(r, 
 			 make_sentence(is_sentence_unformatted, 
 				       make_unformatted(strdup(label), n, 
 							margin, pc)));
     MERGE_TEXTS(r, text_statement_enclosed(module, margin+INDENTATION, tb, !one_liner_p(tb)));
-    if (!is_fortran && !one_liner_p(tb)) 
+    if (!prettyprint_is_fortran && !one_liner_p(tb)) 
       ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
     return(r);
 }
@@ -2764,7 +2764,7 @@ text_block_else(
        && (get_bool_property("PRETTYPRINT_ALL_LABELS"))))
     {
       //code added by Amira Mensi
-      if (is_fortran) {
+      if (prettyprint_is_fortran) {
 	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin, "ELSE"));
 	MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, stmt));
       }
@@ -2781,9 +2781,9 @@ text_block_else(
       }
     }
   /*original code
-    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,is_fortran?"ELSE":(one_liner_p(stmt)?"else":"else {")));
+    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,prettyprint_is_fortran?"ELSE":(one_liner_p(stmt)?"else":"else {")));
     MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, stmt)); 
-    if (!is_fortran && !one_liner_p(stmt))
+    if (!prettyprint_is_fortran && !one_liner_p(stmt))
     ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));*/
         	   
   return r;
@@ -2802,9 +2802,9 @@ text_block_elseif(
   statement tb = test_true(obj);
   statement fb = test_false(obj);
 
-  pc = CHAIN_SWORD(pc, strdup(is_fortran?"ELSEIF (":"else if ("));
+  pc = CHAIN_SWORD(pc, strdup(prettyprint_is_fortran?"ELSEIF (":"else if ("));
   pc = gen_nconc(pc, words_expression(test_condition(obj)));
-  pc = CHAIN_SWORD(pc, strdup(is_fortran?") THEN":(one_liner_p(tb)?")":") {")));
+  pc = CHAIN_SWORD(pc, strdup(prettyprint_is_fortran?") THEN":(one_liner_p(tb)?")":") {")));
   ADD_SENTENCE_TO_TEXT(r, 
 		       make_sentence(is_sentence_unformatted, 
 				     make_unformatted(strdup(label), n, 
@@ -2812,7 +2812,7 @@ text_block_elseif(
     
   MERGE_TEXTS(r, text_statement_enclosed(module, margin+INDENTATION, tb,!one_liner_p(tb)));
 
-  if (!is_fortran && !one_liner_p(tb)) {
+  if (!prettyprint_is_fortran && !one_liner_p(tb)) {
     ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin, strdup("}")));
   }
 
@@ -2871,7 +2871,7 @@ text_test(
 		     label_local_name(statement_label(fb)),
 		     margin, statement_test(fb), n));
 	
-	if(is_fortran)
+	if(prettyprint_is_fortran)
 	  ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDIF"));
 	
 	/* r = text_block_if(module, label, margin, obj, n); */
@@ -2951,7 +2951,7 @@ text_instruction(
 	r = make_text(NIL);
       }
       else {
-	if (is_fortran)
+	if (prettyprint_is_fortran)
 	  u = make_unformatted(strdup(label), n, margin, 
 			       words_call(instruction_call(obj), 
 					  0, TRUE, TRUE));
@@ -3180,7 +3180,7 @@ text text_statement_enclosed(
      statement can have its own declarations */
   list l = statement_declarations(stmt);
 
-  if (!ENDP(l) && !is_fortran) {
+  if (!ENDP(l) && !prettyprint_is_fortran) {
     if(!statement_block_p(stmt)
        && !instruction_unstructured_p(statement_instruction(stmt))) {
       /* Maybe it should be a warning as the controlizer might need to
@@ -3242,7 +3242,7 @@ text text_statement_enclosed(
   if(!ENDP(text_sentences(temp))) {
     MERGE_TEXTS(r, init_text_statement(module, nmargin, stmt));
     if (! string_undefined_p(comments)) {
-      if(is_fortran) {
+      if(prettyprint_is_fortran) {
 	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
 					      strdup(comments)));
       }
@@ -3256,7 +3256,7 @@ text text_statement_enclosed(
   else {
     /* Preserve comments and empty C instruction */
     if (! string_undefined_p(comments)) {
-      if(is_fortran) {
+      if(prettyprint_is_fortran) {
 	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
 					      strdup(comments)));
       }
@@ -3265,7 +3265,7 @@ text text_statement_enclosed(
 	MERGE_TEXTS(r, ct);
       }
     }
-    else if(!is_fortran && !braces_p && !braces_added) {
+    else if(!prettyprint_is_fortran && !braces_p && !braces_added) {
       // Because C braces can be eliminated and hence semi-colon
       // may be mandatory in a test branch or in a loop body.
       // A. Mensi
@@ -3367,7 +3367,7 @@ find_last_statement(statement s)
     if(!(statement_undefined_p(last)
 	 || !block_statement_p(s)
 	 || return_statement_p(last))) {
-      if (is_fortran) /* to avoid this warning for C, is it right for C ?*/
+      if (prettyprint_is_fortran) /* to avoid this warning for C, is it right for C ?*/
 	{
 	  pips_user_warning("Last statement is not a RETURN!\n");
 	}
@@ -3422,7 +3422,7 @@ text_named_module(
   text ral = text_undefined;
 
   debug_on("PRETTYPRINT_DEBUG_LEVEL");
-  is_fortran = !get_bool_property("PRETTYPRINT_C_CODE");
+  prettyprint_is_fortran = !get_bool_property("PRETTYPRINT_C_CODE");
   
   /* This guard is correct but could be removed if find_last_statement()
    * were robust and/or if the internal representations were always "correct".
@@ -3433,7 +3433,7 @@ text_named_module(
 
   precedence_p = !get_bool_property("PRETTYPRINT_ALL_PARENTHESES");
 
-  if (is_fortran)
+  if (prettyprint_is_fortran)
     {
       if ( strcmp(s,"") == 0 
 	   || get_bool_property("PRETTYPRINT_ALL_DECLARATIONS") )
@@ -3490,7 +3490,7 @@ text_named_module(
   if (stat != statement_undefined) {
     MERGE_TEXTS(r,
 		text_statement(module,
-			       (is_fortran||compilation_unit_p(entity_name(name)))?0:INDENTATION,
+			       (prettyprint_is_fortran||compilation_unit_p(entity_name(name)))?0:INDENTATION,
 			       stat));
   }
     
@@ -3498,7 +3498,7 @@ text_named_module(
   reset_alternate_return_set();
   MERGE_TEXTS(r, ral);
   
-  if (!compilation_unit_p(entity_name(name)) || is_fortran)
+  if (!compilation_unit_p(entity_name(name)) || prettyprint_is_fortran)
     {
       /* No need to print TAIL (}) if the current module is a C compilation unit*/
       ADD_SENTENCE_TO_TEXT(r, sentence_tail());

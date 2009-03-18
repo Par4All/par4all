@@ -182,7 +182,7 @@ print_parallelized_code_common(
     close_prettyprint();
 
     success = make_text_resource (mod_name, DBR_PARALLELPRINTED_FILE,
-				  is_fortran? PARALLEL_FORTRAN_EXT : PARALLEL_C_EXT, r);
+				  prettyprint_is_fortran? PARALLEL_FORTRAN_EXT : PARALLEL_C_EXT, r);
 
     end_attachment_prettyprint();
 

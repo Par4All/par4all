@@ -19,6 +19,7 @@
 #include "text.h"
 #include "pipsdbm.h"
 #include "resources.h"
+#include "properties.h"
 #include "misc.h"
 #include "control.h"
 #include "effects-generic.h"
@@ -651,9 +652,22 @@ inlining(char * module_name)
    pips_assert("statements found", !statement_undefined_p(inlined_module_statement) );
    debug_on("INLINING_DEBUG_LEVEL");
 
-   /* get module's callers */
-   callees callers = (callees)db_get_memory_resource(DBR_CALLERS, module_name, TRUE);
-   list callers_l = callees_callees(callers);
+
+   /* parse filter property */
+   string inlining_callers_name = strdup(get_string_property("INLINING_CALLERS"));
+   list callers_l = NIL;
+
+   string c_name= NULL;
+   for(c_name = strtok(inlining_callers_name," ") ; c_name ; c_name=strtok(NULL," ") )
+   {
+       callers_l = CONS(STRING, c_name, callers_l);
+   }
+   /*  or get module's callers */
+   if(ENDP(callers_l))
+   {
+       callees callers = (callees)db_get_memory_resource(DBR_CALLERS, module_name, TRUE);
+       callers_l = callees_callees(callers);
+   }
 
    /* inline call in each caller */
    FOREACH(STRING, caller_name,callers_l)
@@ -666,7 +680,7 @@ inlining(char * module_name)
    inlined_module = entity_undefined;
    inlined_module_statement = statement_undefined;
 
-   pips_debug(2, "inlining", "done for %s\n", module_name);
+   pips_debug(2, "inlining done for %s\n", module_name);
    debug_off();
    /* Should have worked: */
    return TRUE;
@@ -697,27 +711,30 @@ call_selector(call c, set calls_name)
 
 }
 
+static bool statement_has_callee = false;
+
 /* get ressources for the call to inline and call
  * apropriate inlining function
  */
 static void
 run_inlining(string caller_name, string module_name)
 {
-   /* Get the module ressource */
-   inlined_module = module_name_to_entity( module_name );
-   inlined_module_statement = 
-       (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
-   set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,TRUE));
+    statement_has_callee = true;
+    /* Get the module ressource */
+    inlined_module = module_name_to_entity( module_name );
+    inlined_module_statement = 
+        (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+    set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,TRUE));
 
-   /* check them */
-   pips_assert("is a functionnal",entity_function_p(inlined_module) || entity_subroutine_p(inlined_module) );
-   pips_assert("statements found", !statement_undefined_p(inlined_module_statement) );
+    /* check them */
+    pips_assert("is a functionnal",entity_function_p(inlined_module) || entity_subroutine_p(inlined_module) );
+    pips_assert("statements found", !statement_undefined_p(inlined_module_statement) );
 
-   /* inline call */
-   inline_calls( caller_name );
-   reset_cumulated_rw_effects();
-   inlined_module = entity_undefined;
-   inlined_module_statement=statement_undefined;
+    /* inline call */
+    inline_calls( caller_name );
+    reset_cumulated_rw_effects();
+    inlined_module = entity_undefined;
+    inlined_module_statement=statement_undefined;
 }
 
 /* this should inline all call in module `module_name'
@@ -729,36 +746,65 @@ unfolding(char* module_name)
 {
     /* Get the module ressource */
     entity unfolded_module = module_name_to_entity( module_name );
-    statement unfolded_module_statement = 
-        (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
 
-    /* check them */
-    pips_assert("is a functionnal",entity_function_p(unfolded_module) || entity_subroutine_p(unfolded_module) );
-    pips_assert("statements found", !statement_undefined_p(unfolded_module_statement) );
     debug_on("UNFOLDING_DEBUG_LEVEL");
 
-    /* gather all referenced calls */
-    set calls_name = set_make(set_string);
-    gen_context_recurse(unfolded_module_statement, calls_name, call_domain, gen_true, &call_selector);
+    /* parse filter property */
+    string unfolding_filter_names = strdup(get_string_property("UNFOLDING_FILTER"));
+    set unfolding_filters = set_make(set_string);
 
-    /* there is something to inline */
-    if( !set_empty_p(calls_name) ) 
+    string filter_name= NULL;
+    for(filter_name = strtok(unfolding_filter_names," ") ; filter_name ; filter_name=strtok(NULL," ") )
     {
-        SET_MAP(call_name, run_inlining(module_name,(string)call_name) ,calls_name);
+        set_add_element(unfolding_filters, unfolding_filters, filter_name);
         recompile_module(module_name);
     }
-    else
+
+    /* parse callee property */
+    string unfolding_callees_names = strdup(get_string_property("UNFOLDING_CALLEES"));
+    set unfolding_callees = set_make(set_string);
+
+    string callee_name= NULL;
+    for(callee_name = strtok(unfolding_callees_names," ") ; callee_name ; callee_name=strtok(NULL," ") )
     {
-        pips_debug(1, "unfolding", "no function call in %s\n", module_name);
+        set_add_element(unfolding_callees, unfolding_callees, callee_name);
     }
-    bool result = !set_empty_p(calls_name);
-    set_free(calls_name);
+
+    /* gather all referenced calls as long as there are some */
+    do {
+        statement_has_callee = false;
+        statement unfolded_module_statement = 
+            (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+        /* gather all referenced calls */
+        set calls_name = set_make(set_string);
+        gen_context_recurse(unfolded_module_statement, calls_name, call_domain, gen_true, &call_selector);
+
+        /* maybe the user put a restriction on the calls to inline ?*/
+        if(!set_empty_p(unfolding_callees))
+            calls_name=set_intersection(calls_name,calls_name,unfolding_callees);
+
+        /* maybe the user used a filter ?*/
+        calls_name=set_difference(calls_name,calls_name,unfolding_filters);
 
 
-    pips_debug(2, "unfolding", "done for %s\n", module_name);
+
+        /* there is something to inline */
+        if( !set_empty_p(calls_name) ) 
+        {
+            SET_MAP(call_name, run_inlining(module_name,(string)call_name) ,calls_name);
+            recompile_module(module_name);
+        }
+        set_free(calls_name);
+    } while(statement_has_callee);
+
+    set_free(unfolding_filters);
+    free(unfolding_filter_names);
+
+
+    pips_debug(2, "unfolding done for %s\n", module_name);
 
     debug_off();
-    return result;
+    return true;
 }
 
 

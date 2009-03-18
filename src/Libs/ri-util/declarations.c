@@ -25,7 +25,7 @@
 
 /*===================== Variables and Function prototypes for C ===========*/
 
-extern bool is_fortran;
+extern bool prettyprint_is_fortran;
 text c_text_entity(entity module, entity e, int margin);
 list c_words_entity(type t, list name);
 static list words_qualifier(list obj);
@@ -102,7 +102,7 @@ words_parameters(entity e)
 	    //string pn = parameter_name(p);
 	    /* param can be undefined for C language: void foo(void)
 	       We do not have an entity corresponding to the 1st argument */
-	    if (is_fortran)
+	    if (prettyprint_is_fortran)
 	      pips_user_warning("%dth parameter out of %d parameters not found for function %s\n",
 				i, nparams, entity_name(e));
 	    pc = gen_nconc(pc,words_type(t));
@@ -114,7 +114,7 @@ words_parameters(entity e)
 	  }
 	else 
 	  {
-	    if (is_fortran)
+	    if (prettyprint_is_fortran)
 	      pc = CHAIN_SWORD(pc, entity_local_name(param));
 	    else 
 	      {
@@ -133,7 +133,7 @@ static list
 words_dimension(dimension obj)
 {
   list pc = NIL;
-  if (is_fortran) {
+  if (prettyprint_is_fortran) {
     pc = words_expression(dimension_lower(obj));
     pc = CHAIN_SWORD(pc,":");
     pc = gen_nconc(pc, words_expression(dimension_upper(obj)));
@@ -198,7 +198,7 @@ words_declaration(
 	    {
 		list dims = variable_dimensions(type_variable(entity_type(e)));
 	
-		if (is_fortran)
+		if (prettyprint_is_fortran)
 		  {
 		    pl = CHAIN_SWORD(pl, "(");		    
 		    MAPL(pd, 
@@ -232,7 +232,7 @@ list words_basic(basic obj)
     switch (basic_tag(obj)) {
       case is_basic_int: 
 	{
-	  if (is_fortran)
+	  if (prettyprint_is_fortran)
 	    {
 	      pc = CHAIN_SWORD(pc,"INTEGER*");
 	      pc = CHAIN_IWORD(pc,basic_int(obj));
@@ -276,7 +276,7 @@ list words_basic(basic obj)
 	}
       case is_basic_float:
 	{
-	  if (is_fortran)
+	  if (prettyprint_is_fortran)
 	    {
 	      pc = CHAIN_SWORD(pc,"REAL*");
 	      pc = CHAIN_IWORD(pc,basic_float(obj));
@@ -294,7 +294,7 @@ list words_basic(basic obj)
 	}
       case is_basic_logical:
 	{
-	   if (is_fortran)
+	   if (prettyprint_is_fortran)
 	     {
 	       pc = CHAIN_SWORD(pc,"LOGICAL*");
 	       pc = CHAIN_IWORD(pc,basic_logical(obj));
@@ -306,12 +306,12 @@ list words_basic(basic obj)
       case is_basic_overloaded:
 	{
 	  /* should be a user error ? */
-	  pc = CHAIN_SWORD(pc,is_fortran?"OVERLOADED":"overloaded");
+	  pc = CHAIN_SWORD(pc,prettyprint_is_fortran?"OVERLOADED":"overloaded");
 	  break;
 	}
       case is_basic_complex:
 	{
-	  if(is_fortran) {
+	  if(prettyprint_is_fortran) {
 	    pc = CHAIN_SWORD(pc,"COMPLEX*");
 	    pc = CHAIN_IWORD(pc,basic_complex(obj));
 	  }
@@ -334,7 +334,7 @@ list words_basic(basic obj)
 	}
       case is_basic_string:
 	{
-	  if (is_fortran)
+	  if (prettyprint_is_fortran)
 	    {
 	      pc = CHAIN_SWORD(pc,"CHARACTER*");
 	      pc = gen_nconc(pc, words_value(basic_string(obj)));
@@ -441,7 +441,7 @@ sentence_head(entity e)
     switch (type_tag(tr)) {
     case is_type_void: 
       {
-	if (is_fortran)
+	if (prettyprint_is_fortran)
 	  {
 	    if (entity_main_module_p(e))
 	      pc = CHAIN_SWORD(pc,"PROGRAM ");
@@ -460,7 +460,7 @@ sentence_head(entity e)
     case is_type_variable:
       {
 	pc = gen_nconc(pc, words_basic(variable_basic(type_variable(tr))));
-	pc = CHAIN_SWORD(pc,is_fortran? " FUNCTION ":" ");
+	pc = CHAIN_SWORD(pc,prettyprint_is_fortran? " FUNCTION ":" ");
 	break;
       }
     case is_type_unknown:
@@ -481,7 +481,7 @@ sentence_head(entity e)
       pc = gen_nconc(pc, args);
       pc = CHAIN_SWORD(pc, ")");
     }
-    else if (type_variable_p(tr) || (!is_fortran && (type_unknown_p(tr) || type_void_p(tr)))) {
+    else if (type_variable_p(tr) || (!prettyprint_is_fortran && (type_unknown_p(tr) || type_void_p(tr)))) {
       pc = CHAIN_SWORD(pc, "()");
     }
 
@@ -1845,7 +1845,7 @@ static list words_dimensions(list dims)
   list pc = NIL;
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
 
-  if (is_fortran)
+  if (prettyprint_is_fortran)
     {
       pc = CHAIN_SWORD(pc, "(");		    
       MAPL(pd, 
