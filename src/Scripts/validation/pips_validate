@@ -340,8 +340,7 @@ errors=0
 elist=''
 
 # what do we have to do?
-if [[ $recurse ]] ;
-then
+if [[ $recurse ]] ; then
   what=$(find "$@" -type d -print |
          egrep -v '(\.svn|OLD|\.result|\.src|\.include)')
 else
@@ -391,36 +390,43 @@ fi
 
 if [[ $keep_archive ]]; then
     # keep a copy as archive with date of the last modification of the
-    # file in its name, inside a year/month directory:
+    # file in its name, inside a year/month directory.
+
+    # summary file timestamp
     sum_ts=$(stat --format %z $summary)
-    sum_ts=${sum_ts//.*/}
-    sum_date=${sum_ts// */}
+    sum_ts=${sum_ts/.*/}
+    # date part, then extract year and month
+    sum_date=${sum_ts/ */}
     sum_year=${sum_ts/-*/}
     sum_month=${sum_ts#*-}
     sum_month=${sum_month/-*/}
-    sub_dir=$sum_year/$sum_month
-    sum_time=${sum_ts//* /}
-    sum_file=SUMMARY.${sum_date}_${sum_time}
+    # time part
+    sum_time=${sum_ts/* /}
 
+    # archive directory and file
+    sub_dir=$sum_year/$sum_month
+    sum_file=SUMMARY.${sum_date}_${sum_time}
     archive_summary=$archive_dir/$sub_dir/$sum_file
+
+    # keep it!
     mkdir -p $archive_dir/$sub_dir
     cp -a $summary $archive_summary
-    rm -f $last_summary
     # use relative symbolic link
+    rm -f $last_summary
     ln -s $sub_dir/$sum_file $last_summary
 fi
 
 # output difference to stdout if required
 function do_diff()
 {
+  echo 'Differences from previous summary:'
   if [[ -f $previous_summary && -f $last_summary ]]
   then
-    echo 'What changed since the previous validation:'
     diff $previous_summary $last_summary
-    echo ''
   else
-    echo 'Previous or last summary is missing, no diff...'
+    echo ' - previous or last summary is missing, no diff...'
   fi
+  echo
 }
 
 echo -e "\nvalidation $msg\n"
