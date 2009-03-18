@@ -26,6 +26,13 @@ loop
 display PRINTED_FILE[main]
 
 echo
+echo Code after dead code elimination
+echo
+
+apply SUPPRESS_DEAD_CODE[main]
+display PRINTED_FILE[main]
+
+echo
 echo Unsplit resulting code
 echo
 apply UNSPLIT
