@@ -1,26 +1,33 @@
-TARGET=$1.database/$1/$1.c
-TARGETREF=$1.database/$1REF/$1REF.c
-MAIN=$1.database/MAIN/MAIN.c
+#!/bin/sh
+set -e
 
-# add simd header 
-if ! grep -q '\#include "../../simd.h"' $TARGET ; then
-    sed -i -e '1 i \#include "../../simd.h"' $TARGET
+SCRIPTNAME="`basename $0`"
+
+perror()
+{
+    echo "error: $1" 1>&2
+    exit
+}
+
+test "$#" -gt 1 || perror "not enough args, usage: $SCRIPTNAME project module [outfile] "
+PROJECT_NAME="$1"
+MODULE_NAME="$2"
+OUTFILE=/dev/stdout
+
+if test -f "$3"; then
+    OUTFILE="$3"
 fi
 
-#fix main
-if ! grep -q '\#include "../../fixmain.h"' $MAIN ; then
-    sed -i -e '1 i \#include "../../fixmain.h"' $MAIN
-fi
+TARGET=$PROJECT_NAME.database/$MODULE_NAME/$MODULE_NAME.pref
 
-# dirty fix
-for f in $TARGET $TARGETREF; do
-if ! grep -q '\#include "../../dirtyfix.h"' $f ; then
-    sed -i -e '1 i \#include "../../dirtyfix.h"' $f
-fi
-done
+cat include/sse.h
+sed -r -e 's/float v4sf_([^ ,]+)\[.*\]/__m128 \1/g' \
+    -e 's/v4sf_([^ ,]+)/\1/g' $TARGET
+cat 1>&2 << EOF
+********************************************
+substitution done,
+output can be compiled using
+gcc -march=native -O3 -c $OUTFILE
+********************************************
+EOF
 
-gcc -O6 -mmmx -msse $MAIN $TARGETREF $TARGET -I . -o $1.out
-
-#gcc -O6 -mmmx -msse $1.database/$1/$1.c -I . -S
-
-#rm -r -f $1.database
