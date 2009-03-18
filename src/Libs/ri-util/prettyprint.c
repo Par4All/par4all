@@ -1281,7 +1281,7 @@ words_prefix_unary_op(call obj,
 	if(strcasecmp(fun, NOT_OPERATOR_NAME)==0)
 	  fun="!";
       }
-  pc = CHAIN_SWORD(pc,strdup(fun));
+  pc = CHAIN_SWORD(pc,fun);
   pc = gen_nconc(pc, words_subexpression(e, prec, FALSE));
 
   return(pc);
