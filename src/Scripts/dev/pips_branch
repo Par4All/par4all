@@ -138,16 +138,15 @@ for repos in $src_repos ; do
 done
 
 # create full bundle, including validation
-bundle_dir=$tmp/bundle
+bundle=$tmp/bundle
 
 doit $svn mkdir --parents $root/pips/bundles/$name -m "$msg: bundle"
-doit $svn co $root/pips/bundles/$name $bundle_dir
+doit $svn co $root/pips/bundles/$name $bundle
 
-[ -d $bundle_dir ] || mkdir $bundle_dir
 for repos in $src_repos validation
 do
   echo "$repos $root/$repos/$type/$name"
 done > $tmp/bundle_externals
 
-doit $svn pset svn:externals --file $tmp/bundle_externals $bundle_dir
-doit $svn commit -m "$msg: bundle set" $bundle_dir
+doit $svn pset svn:externals --file $tmp/bundle_externals $bundle
+doit $svn commit -m "$msg: bundle set" $bundle
