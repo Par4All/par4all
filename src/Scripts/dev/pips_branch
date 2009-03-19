@@ -3,7 +3,11 @@
 # $Id$
 #
 # creates a coherent branch or tag for all of pips
+#
+# TODO
+# - check svn version
 
+# script revision
 script=${0##*/}
 rev='$Revision$'
 rev=${rev#* }
@@ -70,6 +74,7 @@ while [[ $1 == -* ]] ; do
     -h|--help) usage 0 '' ;;
     -V|--version) echo "revision $rev" ; exit 0 ;;
     -v|--verbose) let verb++ ;;
+    # what to do
     -d|--dry-run) run=: ;;
     -D|--do-run) run= ;;
     # commit message, a default is supplied
@@ -104,8 +109,8 @@ shift 3
 # may create a branch from a branch?
 #[[ $type = 'branches' && $src == branches/* ]]
 
-# set default message
-[[ $msg ]] || msg="creating $name in $type for $src"
+# set default message if necessary
+[[ $msg ]] || msg="creating '$name' in '$type' from '$src'"
 
 # get parent directory for name
 pdir=
@@ -150,3 +155,7 @@ done > $tmp/bundle_externals
 
 doit $svn pset svn:externals --file $tmp/bundle_externals $bundle
 doit $svn commit -m "$msg: bundle set" $bundle
+
+# cleanup
+rm -rf $tmp
+[[ $run ]] && verb 0 "use -D option to actually DO it..."
