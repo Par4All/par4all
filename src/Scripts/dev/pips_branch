@@ -5,7 +5,7 @@
 # creates a coherent branch or tag for all of pips
 #
 # TODO
-# - check svn version
+# - check svn version, should be at least 1.5
 
 # script revision
 script=${0##*/}
@@ -18,10 +18,11 @@ root='http://svn.cri.ensmp.fr/svn'
 svn='svn'
 msg=
 default_tmp="/tmp/${script}_$$"
+do_bundle=1
+revs=
 
 # repositories
 src_repos='newgen linear pips'
-all_repos="nlpmake $src_repos validation"
 
 function usage()
 {
@@ -35,14 +36,17 @@ function usage()
     "  -V: show script revision ($rev)\n" \
     "  -d: dry run (it is the default)\n" \
     "  -D: do run!\n" \
+    "  -n: no bundle\n" \
     "  -r url: root url of repositories, ($root)\n" \
     "  -s svn: svn binary to use ($svn)\n" \
     "  -t tmp: temporary directory ($default_tmp)\n" \
     "  -m msg: commit message\n" \
+    "  -R rev: set per repository revision\n" \
+    "    -R 'nlpmake=941 newgen=964 linear=1272 pips=13589 validation=377'\n" \
     "  source: directory 'trunk', 'branches/something'...\n" \
-    "  type: branches or tags\n" \
+    "  type: 'branches' or 'tags'\n" \
     "  name: must be unique among tags or branches for the bundle\n" \
-    "        it may include a subdirectory: fabien/test\n" \
+    "        it may include a subdirectory: 'fabien/test'\n" \
     "Examples:\n" \
     "  $script trunk branches 1.0.x\n" \
     "  $script branches/1.0.x tags 1.0.1\n" >&2
@@ -52,15 +56,18 @@ function usage()
 verb=0
 function verb()
 {
-  local level=$1
+  local level=$1 n=$1
   shift
-  [[ $level -le $verb ]] && echo "# $@" >&2
+  if [[ $level -le $verb ]] ; then
+    while let n-- ; do echo -n '#' ; done
+    echo " $@"
+  fi >&2
 }
 
 run=:
 function doit()
 {
-  verb 1 "$@"
+  verb 2 "$@"
   $run "$@" || { echo "error $?: $@" ; exit 1 ; }
 }
 
@@ -77,6 +84,10 @@ while [[ $1 == -* ]] ; do
     # what to do
     -d|--dry-run) run=: ;;
     -D|--do-run) run= ;;
+    -n|--no-bundle) do_bundle= ;;
+    # control revisions
+    -R|--revision) revs+=" $1 " ; shift ;;
+    --revision=*) revs+=" ${opt#*=} " ;;
     # commit message, a default is supplied
     -m|--message) msg=$1 ; shift;;
     --message=*) msg=${opt#*=} ;;
@@ -124,38 +135,67 @@ pdir=
   mkdir $tmp
 }
 
+# repos_rev pips
+# return the revision number if set with -R
+function repos_rev()
+{
+  local rep=$1 r=$revs
+  shift
+  r=${r#*$rep=}
+  r=${r%% *}
+  [[ $r ]] && echo "-r $r"
+}
+
 # create per repos branches or tags
-for repos in $all_repos ; do
-  verb 2 'create intermediate directories if necessary'
-  [[ $pdir ]] && doit \
-    $svn mkdir --parents $root/$repos/$type/$pdir -m "$msg: mkdir"
-
-  verb 2 "branching $repos"
-  doit $svn cp $root/$repos/$src $root/$repos/$type/$name -m "$msg: cp"
-done
-
-# handle "makes" reference
-echo "makes $root/nlpmake/$type/$name/makes" > $tmp/makes_externals
-for repos in $src_repos ; do
-  doit $svn co --depth=files $root/$repos/$type/$name $tmp/$repos
-  doit $svn pset svn:externals --file $tmp/makes_externals $tmp/$repos
-  doit $svn commit -m "$msg: 'makes' reference" $tmp/$repos
-done
-
-# create full bundle, including validation
-bundle=$tmp/bundle
-
-doit $svn mkdir --parents $root/pips/bundles/$name -m "$msg: bundle"
-doit $svn co $root/pips/bundles/$name $bundle
-
-for repos in $src_repos validation
+for repos in nlpmake validation
 do
-  echo "$repos $root/$repos/$type/$name"
-done > $tmp/bundle_externals
+  verb 1 "branching $repos"
+  doit $svn cp --parents -m "$msg" $(repos_rev $repos) \
+    $root/$repos/$src $root/$repos/$type/$name
+done
 
-doit $svn pset svn:externals --file $tmp/bundle_externals $bundle
-doit $svn commit -m "$msg: bundle set" $bundle
+echo "makes $root/nlpmake/$type/$name/makes" > $tmp/makes_externals
+for repos in $src_repos
+do
+  verb 1 "branching $repos"
+
+  # get directory
+  doit $svn co --depth immediates $root/$repos/$type $tmp/$repos
+
+  # branch copy...
+  # this does a checkout, so it is slow, but it avoids another commit
+  doit $svn cp --parents $(repos_rev $repos) $root/$repos/$src $tmp/$repos/$name
+
+  # fix externals in source repositories
+  doit $svn pset svn:externals --file $tmp/makes_externals $tmp/$repos/$name
+
+  # done
+  doit $svn commit -m "$msg" $tmp/$repos
+done
+
+if [[ $do_bundle ]] ; then
+
+  verb 1 "creating bundle at $root/pips/bundles/$name"
+
+  # create full bundle, including validation
+  doit $svn co --depth immediates $root/pips/bundles $tmp/bundle
+
+  # fix directory
+  doit $svn mkdir --parents $tmp/bundle/$name
+
+  # create externals
+  for repos in $src_repos validation ; do
+    echo "$repos $root/$repos/$type/$name"
+  done > $tmp/bundle_externals
+  doit $svn pset svn:externals --file $tmp/bundle_externals $tmp/bundle/$name
+
+  # get Makefile
+  doit $svn cp $root/pips/bundles/trunks/Makefile $tmp/bundle/$name
+
+  # OK!
+  doit $svn commit -m "$msg: bundle" $tmp/bundle
+fi
 
 # cleanup
 rm -rf $tmp
-[[ $run ]] && verb 0 "use -D option to actually DO it..."
+[[ $run ]] && verb 0 "Use -D option to actually DO it..."
