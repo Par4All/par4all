@@ -1,0 +1,153 @@
+#! /bin/bash
+#
+# $Id$
+#
+# creates a coherent branch or tag for all of pips
+
+script=${0##*/}
+rev='$Revision$'
+rev=${rev#* }
+rev=${rev% *}
+
+# defaults
+root='http://svn.cri.ensmp.fr/svn'
+svn='svn'
+msg=
+default_tmp="/tmp/${script}_$$"
+
+# repositories
+src_repos='newgen linear pips'
+all_repos="nlpmake $src_repos validation"
+
+function usage()
+{
+  local code=$1 msg=$2
+  shift 2
+  [[ $msg ]] && echo "error: $msg" >&2
+  echo -e \
+    "$script [options] source type name\n" \
+    "  -h: help!\n" \
+    "  -v: increase verbosity\n" \
+    "  -V: show script revision ($rev)\n" \
+    "  -d: dry run (it is the default)\n" \
+    "  -D: do run!\n" \
+    "  -r url: root url of repositories, ($root)\n" \
+    "  -s svn: svn binary to use ($svn)\n" \
+    "  -t tmp: temporary directory ($default_tmp)\n" \
+    "  -m msg: commit message\n" \
+    "  source: directory 'trunk', 'branches/something'...\n" \
+    "  type: branches or tags\n" \
+    "  name: must be unique among tags or branches for the bundle\n" \
+    "        it may include a subdirectory: fabien/test\n" \
+    "Examples:\n" \
+    "  $script trunk branches 1.0.x\n" \
+    "  $script branches/1.0.x tags 1.0.1\n" >&2
+  exit $code
+}
+
+verb=0
+function verb()
+{
+  local level=$1
+  shift
+  [[ $level -le $verb ]] && echo "# $@" >&2
+}
+
+run=:
+function doit()
+{
+  verb 1 "$@"
+  $run "$@" || { echo "error $?: $@" ; exit 1 ; }
+}
+
+# options
+while [[ $1 == -* ]] ; do
+  opt=$1
+  shift
+  [[ $opt = '--' ]] && break
+
+  case $opt in
+    -h|--help) usage 0 '' ;;
+    -V|--version) echo "revision $rev" ; exit 0 ;;
+    -v|--verbose) let verb++ ;;
+    -d|--dry-run) run=: ;;
+    -D|--do-run) run= ;;
+    # commit message, a default is supplied
+    -m|--message) msg=$1 ; shift;;
+    --message=*) msg=${opt#*=} ;;
+    # svn command
+    -s|--svn) svn=$1 ; shift ;;
+    --svn=*) svn=${opt#*=} ;;
+    # tmp directory
+    -t|--tmp) tmp=$1 ; shift ;;
+    --tmp=*) tmp=${opt#*=} ;;
+    # root url (for tests)
+    -r|--root) root=$1 ; shift ;;
+    --root=*) root=${opt#*=} ;;
+    # option error
+    *) usage 1 "unexpected option '$opt'" ;;
+  esac
+done
+
+# arguments
+[[ $# -eq 3 ]] || usage 2 "expecting 3 arguments, got $#"
+
+src=$1 type=$2 name=$3
+shift 3
+
+[[ $type = 'branches' || $type = 'tags' ]] || \
+  usage 3 "type argument must be 'branches' or 'tags'"
+
+[[ $src == trunk || $src == branches/* ]] || \
+  usage 4 "source argument must be 'trunk' or 'branches/...'"
+
+# may create a branch from a branch?
+#[[ $type = 'branches' && $src == branches/* ]]
+
+# set default message
+[[ $msg ]] || msg="creating $name in $type for $src"
+
+# get parent directory for name
+pdir=
+[[ $name == */* ]] && pdir=${name%/*}
+
+# set default temporary directory
+[[ $tmp ]] ||
+{
+  tmp=$default_tmp
+  verb 2 "creating $tmp temporary directory"
+  mkdir $tmp
+}
+
+# create per repos branches or tags
+for repos in $all_repos ; do
+  verb 2 'create intermediate directories if necessary'
+  [[ $pdir ]] && doit \
+    $svn mkdir --parents $root/$repos/$type/$pdir -m "$msg: mkdir"
+
+  verb 2 "branching $repos"
+  doit $svn cp $root/$repos/$src $root/$repos/$type/$name -m "$msg: cp"
+done
+
+# handle "makes" reference
+echo "makes $root/nlpmake/$type/$name/makes" > $tmp/makes_externals
+for repos in $src_repos ; do
+  doit $svn co --depth=files $root/$repos/$type/$name $tmp/$repos
+  doit $svn pset svn:externals --file $tmp/makes_externals $tmp/$repos
+  doit $svn commit -m "$msg: 'makes' reference" $tmp/$repos
+done
+
+# create full bundle, including validation
+bundle_dir=$tmp/bundle
+
+doit $svn mkdir --parents $root/pips/bundles/$name -m "$msg: bundle"
+doit $svn co $root/pips/bundles/$name $bundle_dir
+
+[ -d $bundle_dir ] || mkdir $bundle_dir
+for repos in $src_repos validation
+do
+  echo "$repos $root/$repos/$type/$name"
+done > $tmp/bundle_externals
+
+doit $svn pset svn:externals --file $tmp/bundle_externals $bundle_dir
+doit $svn commit -m "$msg: bundle set" $bundle_dir
