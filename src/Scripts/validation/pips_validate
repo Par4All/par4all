@@ -395,13 +395,14 @@ if [[ $keep_archive ]]; then
     # summary file timestamp
     sum_ts=$(stat --format %z $summary)
     sum_ts=${sum_ts/.*/}
-    # date part, then extract year and month
+    # date part as "2009-03-20", then extract year and month
     sum_date=${sum_ts/ */}
     sum_year=${sum_ts/-*/}
     sum_month=${sum_ts#*-}
     sum_month=${sum_month/-*/}
-    # time part
+    # time part as "09_10_57"
     sum_time=${sum_ts/* /}
+    sum_time=${sum_time//:/_}
 
     # archive directory and file
     sub_dir=$sum_year/$sum_month
