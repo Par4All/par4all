@@ -808,6 +808,16 @@ Useful targets defined:
 \item[full-build:] like \texttt{build} but with \texttt{htdoc} too.
 \end{description}
 
+If you use a global compiling target in the \texttt{prod} directory, it
+will compile NewGen, Linear and PIPS to build coherent binaries.
+
+If you you use a global compiling target in a sub-component such as
+NewGen, Linear or PIPS, it will be compiled and eventually linked with the
+global libraries (defined according to the environment variables, by
+default the \texttt{prod} directory). So it is useful to have a coherent
+PIPS compilation of a branch (such as in you \verb|pips_dev|) that is
+linked with production NewGen and Linear.
+
 
 \subsection{Local targets}
 \label{sec:local-targets}
@@ -823,14 +833,29 @@ some passes or documentation parts, such as:
   created\marginpar{Is this line obsolete?} before, otherwise \texttt{make
     depend} selects the header file from \verb+$PIPS_ROOT/include+, and
   the local header will never be created;%% $
-\item[\texttt{fast}:] {\tt make fast}\index{make!fast} recompile
-  the local library and relink the executables.
-\item[\texttt{full}:] {\tt make full}\index{make!full} rebuild PIPS
-  fully from the root, so that all rependencies are checked.
-\item[\texttt{compile}:] also builds the documentation;
-\item[\texttt{full-compile}:] also builds the documentation for web publication;
+\item[\texttt{fast}:] {\tt make fast}\index{make!fast} recompile the local
+  library and relink the executables with the global libraries (defined
+  according to the environment variables, by default the \texttt{prod}
+  directory) to build running PIPS executables into the main directories
+  (by default below the \texttt{prod});
+\item[\texttt{full}:] {\tt make full}\index{make!full} rebuild PIPS fully
+  from the root (defined according to the environment variables, by
+  default the \texttt{prod/pips} directory), so that all rependencies are
+  checked, compile your local sources and link with the global libraries
+  to build running PIPS executables into the main directories (by default
+  below the \texttt{prod});
+\item[\texttt{compile}:] also builds the documentationinto the main
+  directories (by default below the \texttt{prod});
+\item[\texttt{full-compile}:] also builds the documentation for web
+  publicationinto the main directories (by default below the
+  \texttt{prod});
 \end{description}
 \marginpar{There are other rules to describe\ldots}
+
+Note that if you work on many libraries or documentation at the same time,
+to have a coherent compilation, you should not use local target but rather
+use some global targets from \S~\ref{sec:global-targets} at a higher level
+in your branch or your working copy of the trunk.
 
 THIS PARAGRAPH IS OBSOLETE.\marginpar{I cannot see how to compile without
   installing to the PROD directory...}
@@ -1165,7 +1190,7 @@ macros will be provided\footnote{Well, we just need GNU people to add
   macros.}.
 
 To ease this kind of inspection, some keyboard accelerators can be defined
-inside the Emacs debugger mode by adding into you \texttt{.emacs}such as:
+inside the Emacs debugger mode by adding into your \texttt{.emacs} such as:
 \begin{verbatim}
 (add-hook 'gdb-mode-hook
  (function
