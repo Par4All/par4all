@@ -583,6 +583,7 @@ c_parser_context GetContextCopy()
 %type <type> pointer pointer_opt 
 %type <void> location
 
+%type <string> label
 %type <string> id_or_typename
 %type <liste> comma_expression_opt
 %type <liste> initializer_list_opt
@@ -1326,18 +1327,27 @@ statement_list:
 			  $$ = CONS(STATEMENT,$1,$2);
 			}
 /*(* GCC accepts a label at the end of a block *)*/
-|   TK_IDENT TK_COLON	{ CParserError("gcc not implemented\n"); }
+|   label	{ CParserError("gcc not implemented\n"); }
 ;
 
-local_labels: 
+local_labels:
    /* empty */          {}
 |  TK_LABEL__ local_label_names TK_SEMICOLON local_labels
                         { CParserError("LABEL__ not implemented\n"); }
 ;
 
-local_label_names: 
+local_label_names:
    TK_IDENT             {}
 |  TK_IDENT TK_COMMA local_label_names {}
+;
+
+label:
+   TK_IDENT TK_COLON
+                        {
+			  // Push the comment associated with the label:
+			  push_current_C_comment();
+			  $$ = $1;
+			}
 ;
 
 statement:
@@ -1459,9 +1469,15 @@ statement:
 			  stack_pop(LoopStack);
 			  pips_assert("For loop consistent",statement_consistent_p($$));
 			}
-|   TK_IDENT TK_COLON statement
+|   label statement
                         {
-			  $$ = MakeLabeledStatement($1,$3);
+			  /* Create the statement with label comment in
+			     front of it: */
+			  $$ = MakeLabeledStatement($1,$2, pop_current_C_comment());
+			  ifdebug(8) {
+			    pips_debug(8,"Adding label '%s' to statement:\n", $1);
+			    print_statement($$);
+			  }
 			}
 |   TK_CASE expression TK_COLON
                         {
@@ -1475,19 +1491,19 @@ statement:
 	                {
 			  $$ = MakeDefaultStatement();
 			}
-|   TK_RETURN TK_SEMICOLON		 
+|   TK_RETURN TK_SEMICOLON
                         {
 			  /* $$ =  call_to_statement(make_call(CreateIntrinsic(C_RETURN_FUNCTION_NAME),NIL)); */
-                          $$ = make_statement(entity_empty_label(), 
-			       get_current_C_line_number(), 
-			       STATEMENT_ORDERING_UNDEFINED, 
+                          $$ = make_statement(entity_empty_label(),
+			       get_current_C_line_number(),
+			       STATEMENT_ORDERING_UNDEFINED,
 			       get_current_C_comment(),
 			       call_to_instruction(make_call(CreateIntrinsic(C_RETURN_FUNCTION_NAME),NIL)),
 			       NIL, string_undefined);
 			  statement_consistent_p($$);
 			}
 |   TK_RETURN comma_expression TK_SEMICOLON
-	                {  
+	                {
 			  /* $$ =  call_to_statement(make_call(CreateIntrinsic(C_RETURN_FUNCTION_NAME),$2)); */
 			  expression res = EXPRESSION(CAR($2));
 			  if(expression_reference_p(res)) {

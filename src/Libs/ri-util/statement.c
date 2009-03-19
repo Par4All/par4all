@@ -1260,12 +1260,10 @@ statement s;
 	    entity_empty_label();
 }
 
-/*
- *   moved from HPFC by FC, 15 May 94
- *
+/* Build a statement sequence from a statement list if there are more than
+ * one statement or return the statement itself after discarding the list.
  */
-
-statement 
+statement
 list_to_statement(l)
 list l;
 {
@@ -1636,7 +1634,7 @@ put_a_comment_on_a_statement(statement s,
     if (empty_comments_p(the_comments))
 	/* Nothing to add... */
 	return;
- 
+
     if (!try_to_put_a_comment_on_a_statement(s, the_comments)) {
 	/* It failed because it is an empty sequence. So add a
            CONTINUE to attach the statement on it: */
@@ -1651,7 +1649,10 @@ put_a_comment_on_a_statement(statement s,
 
 
 /* Append a comment string (if non empty) to the comments of a
-   statement, if the c. */
+   statement, if the c.
+
+   @param the_comments is strdup'ed in this function.
+*/
 void
 append_comments_to_statement(statement s,
 			     string the_comments)
@@ -1674,7 +1675,10 @@ append_comments_to_statement(statement s,
 
 
 /* Insert a comment string (if non empty) at the beginning of the
-   comments of a statement. */
+   comments of a statement.
+
+   @param the_comments is strdup'ed in this function.
+*/
 void
 insert_comments_to_statement(statement s,
 			     string the_comments)
@@ -1684,7 +1688,7 @@ insert_comments_to_statement(statement s,
     if (empty_comments_p(the_comments))
 	/* Nothing to add... */
 	return;
-    
+
     old  = find_first_statement_comment(s);
     if (empty_comments_p(old))
 	/* There are no comments yet: */
@@ -1781,7 +1785,7 @@ statement_to_label(statement s)
 	if(!entity_empty_label_p(l)||!continue_statement_p(stmt))
 	  break;
       }, sequence_statements(instruction_sequence(i)));
-      break;    
+      break;
     case is_instruction_unstructured:
       l = statement_to_label(control_statement(unstructured_control(instruction_unstructured(i))));
       break;
@@ -1804,6 +1808,55 @@ statement_to_label(statement s)
 
   return l;
 }
+
+
+/* Add a label to a statement. If the statement cannot accept a label (it
+   is a sequence or it has already a label...), add a CONTINUE in front of
+   the statement to carry it.
+
+   @return \param s with the new \param label if it was possible to add it
+   directly, or a new statement sequence with the new \param label added
+   to a CONTINUE followed by the old statement \param s.
+
+   \param label is the label to add to the statement
+
+   \param s is the statement to be labelled
+
+   \param labeled_statement is a pointer to a statement. It is initialized
+   by the function to the statement that really get the label on. It is
+   useful when we need to track it, for exemple for "goto" generation in
+   the parser.
+
+   The caller is responsible to *avoid* garbage collecting on \param s if a
+   new statements are allocated in this fonction since it is included in
+   the return statement.
+ */
+statement
+add_label_to_statement(entity label,
+		       statement s,
+		       statement *labeled_statement) {
+  /* Test with statement_to_label to deal with a label inside an
+     instruction block: */
+  entity old_label = statement_to_label(s);
+  if (old_label == entity_undefined
+      || (!instruction_sequence_p(statement_instruction(s))
+	  && unlabelled_statement_p(s))) {
+    statement_label(s) = label;
+    *labeled_statement = s;
+    return s;
+  }
+  else {
+    /* Add a continue as a label landing pad since a statement can not
+       have more than 1 label and a sequence cannot have a label: */
+    statement c = make_continue_statement(label);
+    *labeled_statement = c;
+    list stmts = gen_statement_cons(s, NIL);
+    stmts = gen_statement_cons(c, stmts);
+    statement seq = make_block_statement(stmts);
+    return seq;
+  }
+}
+
 
 /* Returns FALSE is no syntactic control path exits s (i.e. even if TRUE is returned
  * there might be no control path). Subroutines and
@@ -1891,7 +1944,12 @@ unstructured_does_return(unstructured u)
 }
 
 
-/* Insert some statements at the very beginning of another statement: */
+/* Insert some statements at the very beginning of another statement.
+
+   It should not work in parsed code with "goto", that is before being
+   controllized, since "goto" points to a given statement and here we
+   change the statement that could be pointed to...
+*/
 void
 insert_a_statement_list_in_a_statement(statement target,
 				       list s_list)

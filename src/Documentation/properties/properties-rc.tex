@@ -1742,12 +1742,22 @@ UNSPAGHETTIFY_WHILE_RECOVER FALSE
 
 
 \subsubsection{Clean Up Sequences}
-\index{CLEAN\_UP\_SEQUENCES\_DISPLAY\_STATISTICS}
 
+\index{CLEAN\_UP\_SEQUENCES\_DISPLAY\_STATISTICS}
 To display the statistics about cleaning-up sequences and removing
 useless CONTINUE or empty statement.
 \begin{verbatim}
 CLEAN_UP_SEQUENCES_DISPLAY_STATISTICS FALSE
+\end{verbatim}
+
+
+\index{FUSE\_CONTROL\_NODES\_WITH\_COMMENTS\_OR\_LABEL}
+There is a trade-off between keeping the comments associated to labels and
+goto and the cleaning that can be do on the control graph.
+
+By default, do not fuse empty control nodes that have labels or comments:
+\begin{verbatim}
+FUSE_CONTROL_NODES_WITH_COMMENTS_OR_LABEL FALSE
 \end{verbatim}
 
 

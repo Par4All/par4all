@@ -211,8 +211,8 @@ clean_up_exit_node(unstructured u)
 }
 
 
-/* Try to transform each sequence in a single statement instead of a
-   list of control nodes: */
+/* Try to transform each control sequence in a single statement instead of
+   a list of control nodes: */
 void
 fuse_sequences_in_unstructured(statement s)
 {
@@ -229,6 +229,8 @@ fuse_sequences_in_unstructured(statement s)
     hash_table controls_to_fuse_with_their_successors =
 	hash_table_make(hash_pointer, 0);
 
+    boolean aggressive_restructure_p = get_bool_property("FUSE_CONTROL_NODES_WITH_COMMENTS_OR_LABEL");
+
     ifdebug(4) {
       pips_debug(4, "Begin with implicit target labels:");
       print_arguments(tl);
@@ -242,10 +244,14 @@ fuse_sequences_in_unstructured(statement s)
 
     CONTROL_MAP(c,
 		{
+		    statement s = control_statement(c);
 		    ifdebug (1)
 			pips_assert("control is consistent",
 				    control_consistent_p(c));
 		    pips_debug(3, "Looking for control %p...\n", c);
+		    ifdebug(5)
+		      print_statement(s);
+
 		    /* Select a node with only one successor: */
 		    if (gen_length(control_successors(c)) == 1) {
 			control the_successor = CONTROL(CAR(control_successors(c)));
@@ -257,7 +263,7 @@ fuse_sequences_in_unstructured(statement s)
 				   number_of_successors_of_the_successor,
 				   number_of_predecessors_of_the_successor,
 				   the_successor == entry_node,
-				   empty_statement_or_continue_p(control_statement(c)));
+				   aggressive_restructure_p ? empty_statement_or_continue_p(s) : empty_statement_or_continue_without_comment_p(s));
 			/* Since I use an O(n) algorithm instead of an
                            O(n^2) all this condition must be checked
                            again later since these topological and
@@ -266,13 +272,12 @@ fuse_sequences_in_unstructured(statement s)
                            because the fused graph is included into
                            the former graph but I am too lazy to write
                            a proof... :-( Have a look to
-                           Valdation/Control/create.f. */
+                           Validation/Control/create.f. */
 			if ((number_of_successors_of_the_successor <= 1
 			     /* ...Accept the exit node */
 			     && the_successor != entry_node
 			     && number_of_predecessors_of_the_successor == 1)
-			    ||
-			    empty_statement_or_continue_p(control_statement(c))) {
+			    || (aggressive_restructure_p ? empty_statement_or_continue_p(s) : empty_statement_or_continue_without_comment_p(s))) {
 			    /* Ok, we have found a node in a
 			       sequence. Note that we cannot fuse with the
 			       entry node since it must keep this
@@ -280,7 +285,9 @@ fuse_sequences_in_unstructured(statement s)
 			    /* But if c is empty, we can fuse it with any
 			       successor without changing the semantincs,
 			       even if the successor is the entry
-			       node. */
+			       node. Don't do this if there is a comment
+			       since it mess up the original source
+			       look-alike. */
 			    /* The fact we can have a cycle is considered
 			       a page below... */
 			    /* Put the control in the fuse
@@ -1289,6 +1296,12 @@ unspaghettify_or_restructure_statement(statement mod_stmt)
   int nr = 0;
   int old_nr;
 
+  // Note that this debug is not controlled by "UNSPAGHETTIFY_DEBUG_LEVEL":
+  ifdebug(5) {
+    pips_debug(5, "Statement before unspaghettify_or_restructure_statement:\n");
+    print_statement(mod_stmt);
+  }
+
   debug_on("UNSPAGHETTIFY_DEBUG_LEVEL");
 
   ifdebug (1)
@@ -1350,6 +1363,11 @@ unspaghettify_or_restructure_statement(statement mod_stmt)
 
   pips_debug(2, "done\n");
   debug_off();
+  // Note that this debug is not controlled by "UNSPAGHETTIFY_DEBUG_LEVEL":
+  ifdebug(5) {
+    pips_debug(5, "Statement after unspaghettify_or_restructure_statement:\n");
+    print_statement(mod_stmt);
+  }
 }
 
 

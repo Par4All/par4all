@@ -160,56 +160,82 @@ statement FindStatementFromLabel(entity l)
   return statement_undefined;
 }
 
-statement MakeLabeledStatement(string label, statement s)
-{
+
+/* Construct a new statement from \param s by adding a \param label and a
+   \param comment. If it is possible to do it without creating a new
+   statement, retun the old one modified according to.
+*/
+statement MakeLabeledStatement(string label, statement s, string comment) {
   entity l = MakeCLabel(label);
+  statement labeled_statement;
+  // Get the statement with the l label, if any:
   statement smt = FindStatementFromLabel(l);
-  statement st;
-  if (smt == statement_undefined) 
-    {
-      st = make_statement(l, STATEMENT_NUMBER_UNDEFINED, 
-			 STATEMENT_ORDERING_UNDEFINED, 
-			 get_current_C_comment(), 
-			 statement_instruction(s),
-			 NIL,string_undefined);
-      LabeledStatements = CONS(STATEMENT,st,LabeledStatements);
-   }
-  else 
-    {
-      /* The statement is already created pseudoly, replace it by the real one*/
+  if (smt == statement_undefined) {
+    /* There is no other statement already associated with this
+       label... */
+    /* Add a label and deal all the gory details about the PIPS internal
+     representation: */
+    s = add_label_to_statement(l, s, &labeled_statement);
+    // Keep a track of this statement associated to a label:
+    LabeledStatements = CONS(STATEMENT, labeled_statement, LabeledStatements);
+  }
+  else {
+    /* There is already a statement stub smt associated to this label with
+       some gotos pointing to it, so keep it as the labeled target. */
+    if (!instruction_sequence_p(statement_instruction(s))
+	&& unlabelled_statement_p(s)) {
+      /* The statement does not have a label and can accept one, so
+	 patch in place smt: */
       statement_instruction(smt) =  statement_instruction(s);
       statement_comments(smt) = statement_comments(s);
-      st = smt;
+      // Discard the old statement:
+      statement_instruction(s) = instruction_undefined;
+      statement_comments(s) = string_undefined;
+      free_statement(s);
+      // And keep the old one:
+      s = smt;
+      labeled_statement = s;
     }
-  return st;
+    else {
+      /* The statement can not accept a label or another one, just keep
+	 the previous label in front: */
+      list stmts = gen_statement_cons(s, NIL);
+      stmts = gen_statement_cons(smt, stmts);
+      statement seq = make_block_statement(stmts);
+      labeled_statement = smt;
+      s = seq;
+    }
+  }
+  // Associate the current comment to the statement with the label:
+  if (comment != string_undefined) {
+    insert_comments_to_statement(labeled_statement, comment);
+    free(comment);
+  }
+  return s;
 }
+
 
 statement MakeGotoStatement(string label)
 {
   entity l = MakeCLabel(label);
   statement gts = statement_undefined;
 
-  /* Find the corresponding statement from its label, 
+  /* Find the corresponding statement from its label,
      if not found, create a pseudo one, which will be replaced lately when
      we see the statement (label: statement) */
- 
-  statement s = FindStatementFromLabel(l);
-  if (s == statement_undefined) 
-    {
-      s = make_statement(l,STATEMENT_NUMBER_UNDEFINED,
-			 STATEMENT_ORDERING_UNDEFINED,
-			 string_undefined, 
-			 make_continue_instruction(),NIL,NULL);
-      LabeledStatements = CONS(STATEMENT,s,LabeledStatements);
 
-    }
+  statement s = FindStatementFromLabel(l);
+  if (s == statement_undefined) {
+    s = make_continue_statement(l);
+    LabeledStatements = CONS(STATEMENT,s,LabeledStatements);
+  }
   gts = make_statement(entity_empty_label(),
 		       get_current_C_line_number(),
 		       STATEMENT_ORDERING_UNDEFINED,
-		       get_current_C_comment(), 
+		       get_current_C_comment(),
 		       make_instruction(is_instruction_goto,s),NIL,NULL);
 
- return gts;
+  return gts;
 }
 
 /* The labels in C have function scope. */
@@ -217,7 +243,7 @@ statement MakeGotoStatement(string label)
 entity MakeCLabel(string s)
 {
   entity l = FindOrCreateEntity(get_current_module_name(),strdup(concatenate(LABEL_PREFIX,s,NULL)));
-  if (entity_type(l) == type_undefined) 
+  if (entity_type(l) == type_undefined)
     {
       pips_debug(7,"Label %s\n", s);
       entity_type(l) = MakeTypeStatement();
@@ -420,7 +446,9 @@ statement MakeCaseStatement(expression e)
   int i = basic_int((basic) stack_head(LoopStack));
   string lab = strdup(concatenate("switch_",int_to_string(i),
 				  "_case_",words_to_string(words_expression(e)),NULL));
-  statement s = MakeLabeledStatement(lab,make_continue_statement(entity_empty_label()));
+  statement s = MakeLabeledStatement(lab,
+				     make_continue_statement(entity_empty_label()),
+				     get_current_C_comment());
   expression cond = call_to_expression(make_call(entity_intrinsic("=="),
 						 CONS(EXPRESSION, stack_head(SwitchControllerStack), 
 						      CONS(EXPRESSION, e, NIL))));
@@ -440,7 +468,9 @@ statement MakeDefaultStatement()
      to the switch header */
   int i = basic_int((basic) stack_head(LoopStack));
   string lab = strdup(concatenate("switch_",int_to_string(i),"_default",NULL));
-  statement s = MakeLabeledStatement(lab,make_continue_statement(entity_empty_label()));
+  statement s = MakeLabeledStatement(lab,
+				     make_continue_statement(entity_empty_label()),
+				     get_current_C_comment());
   sequence CurrentSwitchGoto = stack_head(SwitchGotoStack);
   /* If the default case is not last, it must be moved later in the
      sequence_statements(CurrentSwitchGoto) */

@@ -106,11 +106,6 @@ bool controlizer(string module_name)
 			       NIL /* gen_copy_seq(statement_declarations(parsed_mod_stat))*/,
 			       NULL);
 
-  ifdebug(5) {
-    pips_debug(5, "New statement before unspaghettify:\n");
-    print_statement(module_stat);
-  }
-
     /* By setting this property, we try to unspaghettify the control
        graph of the module: */
 
