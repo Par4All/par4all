@@ -13,29 +13,29 @@ C (0,4)
 C     BEGIN UNSTRUCTURED
 C (1,1)
       IF (N.GT.0) GOTO 99999                                            0003
-C (8,1)
+C (9,1)
 C     BEGIN BLOCK
-C (8,2)
+C (9,2)
 100   CONTINUE                                                          0005
-C (8,3)
+C (9,3)
       J = 1                                                             0006
 C     END BLOCK
 C (3,1)
-C     BEGIN BLOCK
-C (3,2)
 200   CONTINUE                                                          0007
-C (3,3)
+C (4,1)
+C     BEGIN BLOCK
+C (4,2)
 300   CONTINUE                                                          0008
-C (3,4)
+C (4,3)
       J = J+1                                                           0009
 C     END BLOCK
-C (4,1)
-      IF (J.LT.K) GOTO 200                                              0010
 C (5,1)
+      IF (J.LT.K) GOTO 300                                              0010
+C (6,1)
       IF (I+J.GT.105) GOTO 400                                          0012
-C (9,1)
+C (10,1)
       I = I+1                                                           0014
-C (7,1)
+C (8,1)
       IF (I.LT.100) THEN                                                0015
          GOTO 100
       ELSE
@@ -45,7 +45,7 @@ C (7,1)
 C (2,1)
       J = 1                                                             0004
       GOTO 200
-C (6,1)
+C (7,1)
 400   CONTINUE                                                          0017
 C     END UNSTRUCTURED
 C (0,5)
@@ -58,7 +58,7 @@ C  T() {}
 
       PROGRAM UNSTRUC15
 
-C  T(I,J,K,N) {1<=I, K<=J}
+C  T(I,J,K,N) {1<=I, 110<=5I+J, 102<=I+J, 2<=J, K<=J}
 
 C (0,1)
 C     BEGIN BLOCK
@@ -77,7 +77,7 @@ C  T(I) {I==1}
 C (0,3)
       I = 1                                                             0002
 
-C  T(I,J) {I#init<=I, K<=J}
+C  T(I,J) {I#init<=I, 4I#init+106<=5I+J, 102<=I+J, 2<=J, K<=J}
 
 C (0,4)
 C     BEGIN UNSTRUCTURED
@@ -89,59 +89,59 @@ C (1,1)
 
 C  T(J) {J==1}
 
-C (8,1)
+C (9,1)
 C     BEGIN BLOCK
 
 C  T() {}
 
-C (8,2)
+C (9,2)
 100   CONTINUE                                                          0005
 
 C  T(J) {J==1}
 
-C (8,3)
+C (9,3)
       J = 1                                                             0006
 C     END BLOCK
 
-C  T(J) {J==J#init+1}
+C  T() {}
 
 C (3,1)
+200   CONTINUE                                                          0007
+
+C  T(J) {J==J#init+1}
+
+C (4,1)
 C     BEGIN BLOCK
 
 C  T() {}
 
-C (3,2)
-200   CONTINUE                                                          0007
-
-C  T() {}
-
-C (3,3)
+C (4,2)
 300   CONTINUE                                                          0008
 
 C  T(J) {J==J#init+1}
 
-C (3,4)
+C (4,3)
       J = J+1                                                           0009
 C     END BLOCK
 
 C  T() {}
 
-C (4,1)
-      IF (J.LT.K) GOTO 200                                              0010
+C (5,1)
+      IF (J.LT.K) GOTO 300                                              0010
 
 C  T() {}
 
-C (5,1)
+C (6,1)
       IF (I+J.GT.105) GOTO 400                                          0012
 
 C  T(I) {I==I#init+1}
 
-C (9,1)
+C (10,1)
       I = I+1                                                           0014
 
 C  T() {}
 
-C (7,1)
+C (8,1)
       IF (I.LT.100) THEN                                                0015
          GOTO 100
       ELSE
@@ -157,7 +157,7 @@ C (2,1)
 
 C  T() {}
 
-C (6,1)
+C (7,1)
 400   CONTINUE                                                          0017
 C     END UNSTRUCTURED
 
@@ -204,59 +204,59 @@ C (1,1)
 
 C  P(I,J,K,N) {1<=I, I<=99}
 
-C (8,1)
+C (9,1)
 C     BEGIN BLOCK
 
 C  P(I,J,K,N) {1<=I, I<=99}
 
-C (8,2)
+C (9,2)
 100   CONTINUE                                                          0005
 
 C  P(I,J,K,N) {1<=I, I<=99}
 
-C (8,3)
+C (9,3)
       J = 1                                                             0006
 C     END BLOCK
 
-C  P(I,J,K,N) {1<=I}
+C  P(I,J,K,N) {J==1, 1<=I, I<=99}
 
 C (3,1)
-C     BEGIN BLOCK
-
-C  P(I,J,K,N) {1<=I}
-
-C (3,2)
 200   CONTINUE                                                          0007
 
-C  P(I,J,K,N) {1<=I}
+C  P(I,J,K,N) {1<=I, I<=99, 1<=J}
 
-C (3,3)
+C (4,1)
+C     BEGIN BLOCK
+
+C  P(I,J,K,N) {1<=I, I<=99, 1<=J}
+
+C (4,2)
 300   CONTINUE                                                          0008
 
-C  P(I,J,K,N) {1<=I}
+C  P(I,J,K,N) {1<=I, I<=99, 1<=J}
 
-C (3,4)
+C (4,3)
       J = J+1                                                           0009
 C     END BLOCK
 
-C  P(I,J,K,N) {1<=I}
-
-C (4,1)
-      IF (J.LT.K) GOTO 200                                              0010
-
-C  P(I,J,K,N) {1<=I, K<=J}
+C  P(I,J,K,N) {1<=I, I<=99, 2<=J}
 
 C (5,1)
+      IF (J.LT.K) GOTO 300                                              0010
+
+C  P(I,J,K,N) {1<=I, I<=99, 2<=J, K<=J}
+
+C (6,1)
       IF (I+J.GT.105) GOTO 400                                          0012
 
-C  P(I,J,K,N) {1<=I, I+J<=105, K<=J}
+C  P(I,J,K,N) {1<=I, I<=99, I+J<=105, 2<=J, K<=J}
 
-C (9,1)
+C (10,1)
       I = I+1                                                           0014
 
-C  P(I,J,K,N) {2<=I, I+J<=106, K<=J}
+C  P(I,J,K,N) {2<=I, I<=100, I+J<=106, 2<=J, K<=J}
 
-C (7,1)
+C (8,1)
       IF (I.LT.100) THEN                                                0015
          GOTO 100
       ELSE
@@ -270,13 +270,13 @@ C (2,1)
       J = 1                                                             0004
       GOTO 200
 
-C  P(I,J,K,N) {1<=I, K<=J}
+C  P(I,J,K,N) {1<=I, I<=100, 10498<=103I+99J, K<=J}
 
-C (6,1)
+C (7,1)
 400   CONTINUE                                                          0017
 C     END UNSTRUCTURED
 
-C  P(I,J,K,N) {1<=I, K<=J}
+C  P(I,J,K,N) {1<=I, I<=100, 10498<=103I+99J, K<=J}
 
 C (0,5)
       PRINT *, I, J                                                     0018

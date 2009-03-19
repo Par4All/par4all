@@ -11,19 +11,17 @@ Printed file
 100   PRINT *, J                                                        0006
 
 
-      IF (I.GE.34) THEN                                                 0007
-      ENDIF
+      IF (I.GE.34) GOTO 99998                                           0007
 c     else goto 150
-c     then goto 150
 150   PRINT *, J                                                        0008
 
 
-      IF (J.GE.3) GOTO 99998                                            0009
+      IF (J.GE.3) GOTO 99997                                            0009
       I = 1                                                             0014
       GOTO 100
-99998 CONTINUE
+99997 CONTINUE
       I = 3                                                             0010
-      IF (K.LT.6) GOTO 99997                                            0011
+      IF (K.LT.6) GOTO 99996                                            0011
       I = I-1                                                           0013
 
 200   PRINT *, I+6                                                      0015
@@ -32,17 +30,20 @@ c     then goto 150
 201   IF (J.GE.11) GOTO 202                                             0017
 203   PRINT *, 'j < 11'                                                 0019
 
-400   IF (K.GE.10) GOTO 401                                             0020
+400   IF (K.GE.10) GOTO 99995                                           0020
 
 c     500      
-500   IF (J.GE.11) GOTO 501                                             0024
+500   IF (J.GE.11) GOTO 99994                                           0024
 c     goto 502
 502   PRINT *, '502'                                                    0026
-c     goto 501
 c     501
 501   PRINT *, '501'                                                    0025
 c     goto 502      
       GOTO 502
+99994 CONTINUE
+c     goto 501
+      GOTO 501
+99995 CONTINUE
 c     Some irreductible graphs
 401   IF (J.GE.10) GOTO 402                                             0021
 403   PRINT *, '403'                                                    0023
@@ -50,9 +51,12 @@ c     Some irreductible graphs
       GOTO 403
 202   PRINT *, 'j >= 11'                                                0018
       GOTO 400
-99997 CONTINUE
+99996 CONTINUE
       I = 7                                                             0012
       GOTO 200
+99998 CONTINUE
+c     then goto 150
+      GOTO 150
 99999 CONTINUE
       I = 3                                                             0004
       GOTO 100
@@ -74,9 +78,10 @@ Printed file after RESTUCTURE_CONTROL
 
 
       IF (I.GE.34) THEN                                                 0007
-      ENDIF
-c     else goto 150
 c     then goto 150
+      ELSE
+c     else goto 150
+      ENDIF
 150   PRINT *, J                                                        0008
 
 
@@ -97,17 +102,20 @@ c     then goto 150
 201   IF (J.GE.11) GOTO 202                                             0017
 203   PRINT *, 'j < 11'                                                 0019
 
-400   IF (K.GE.10) GOTO 401                                             0020
+400   IF (K.GE.10) GOTO 99998                                           0020
 
 c     500      
-500   IF (J.GE.11) GOTO 501                                             0024
+500   IF (J.GE.11) GOTO 99997                                           0024
 c     goto 502
 502   PRINT *, '502'                                                    0026
-c     goto 501
 c     501
 501   PRINT *, '501'                                                    0025
 c     goto 502      
       GOTO 502
+99997 CONTINUE
+c     goto 501
+      GOTO 501
+99998 CONTINUE
 c     Some irreductible graphs
 401   IF (J.GE.10) GOTO 402                                             0021
 403   PRINT *, '403'                                                    0023

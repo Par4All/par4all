@@ -13,8 +13,7 @@ C     third comment 2
 C     third comment 3
       X = 3                                                             0003
 C     fourth comment
-      IF (X.EQ.3) THEN                                                  0004
-      ENDIF
+      IF (X.EQ.3) RETURN                                                0004
 C     fifth comment
 C     sixth comment
       END

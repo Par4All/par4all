@@ -5,7 +5,7 @@ void gl_enable()
    if (cap==1) {
    }
    else {
-      goto break_2;
+      goto break_1;
    }
 switch_1_case_1:   ;
    p = 0;                                                               /*0009*/

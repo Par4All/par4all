@@ -9,6 +9,14 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 display PRINTED_FILE[foo]
 
+apply RESTRUCTURE_CONTROL[foo]
+
+echo
+echo printed file after RESTRUCTURE_CONTROL
+echo
+
+display PRINTED_FILE[foo]
+
 apply UNSPLIT[%PROGRAM]
 close
 

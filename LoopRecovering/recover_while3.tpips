@@ -1,8 +1,8 @@
-delete recover_while3
+delete recover_while4
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create recover_while3 recover_while3.c
+create recover_while4 recover_while4.c
 
 activate C_PARSER
 
@@ -11,9 +11,13 @@ setproperty PRETTYPRINT_C_CODE TRUE
 ## To investigate with weird control graphs:
 #setproperty UNSPAGHETTIFY_IN_CONTROLIZER FALSE
 
+display PARSED_PRINTED_FILE[find_while]
+
 display PRINTED_FILE[find_while]
 
-#display GRAPH_PRINTED_FILE[find_while]
+setproperty PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH_VERBOSE TRUE
+
+display GRAPH_PRINTED_FILE[find_while]
 
 setproperty UNSPAGHETTIFY_WHILE_RECOVER TRUE
 apply RESTRUCTURE_CONTROL
@@ -24,5 +28,5 @@ activate TRANSFORMERS_INTER_FULL
 activate PRINT_CODE_PRECONDITIONS
 
 close
-delete recover_while3
+#delete recover_while4
 quit

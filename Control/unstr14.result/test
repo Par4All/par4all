@@ -7,14 +7,16 @@ Printed file
       I = 4                                                             0002
 
 c     500      
-500   IF (J.GE.11) GOTO 501                                             0003
+500   IF (J.GE.11) GOTO 99999                                           0003
 c     goto 502
 502   PRINT *, '502'                                                    0005
-c     goto 501
 c     501
 501   PRINT *, '501'                                                    0004
 c     goto 502      
       GOTO 502
+99999 CONTINUE
+c     goto 501
+      GOTO 501
       END
 
 Printed file after RESTUCTURE_CONTROL
@@ -25,12 +27,14 @@ Printed file after RESTUCTURE_CONTROL
       I = 4                                                             0002
 
 c     500      
-500   IF (J.GE.11) GOTO 501                                             0003
+500   IF (J.GE.11) GOTO 99999                                           0003
 c     goto 502
 502   PRINT *, '502'                                                    0005
-c     goto 501
 c     501
 501   PRINT *, '501'                                                    0004
 c     goto 502      
       GOTO 502
+99999 CONTINUE
+c     goto 501
+      GOTO 501
       END

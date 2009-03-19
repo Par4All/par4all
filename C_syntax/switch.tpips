@@ -19,7 +19,18 @@ echo
 
 display PRINTED_FILE[main]
 
-apply UNSPLIT[%PROGRAM]
+echo Try more aggressive restructuring:
+setproperty FUSE_CONTROL_NODES_WITH_COMMENTS_OR_LABEL TRUE
+apply RESTRUCTURE_CONTROL[main]
+
+echo
+echo printed file after RESTRUCTURE_CONTROL
+echo
+
+display PRINTED_FILE[main]
+
+
+capply UNSPLIT[%PROGRAM]
 close
 
 delete switch

@@ -27,6 +27,14 @@ echo
 
 display PRINTED_FILE[gl_enable]
 
+apply RESTRUCTURE_CONTROL[gl_enable]
+
+echo
+echo printed file after RESTRUCTURE_CONTROL
+echo
+
+display PRINTED_FILE[gl_enable]
+
 apply UNSPLIT[%PROGRAM]
 
 close

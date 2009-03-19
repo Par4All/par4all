@@ -6,9 +6,9 @@ Printed file
 
       IF (I.EQ.1) GOTO 9999                                             0001
       IF (I.EQ.2) I = 3                                                 0002
-      GOTO 8888
-9999  I = 4                                                             0004
 8888  CONTINUE
+      RETURN
+9999  I = 4                                                             0004
       END
 
 Printed file after RESTUCTURE_CONTROL
@@ -18,8 +18,8 @@ Printed file after RESTUCTURE_CONTROL
 
       IF (I.EQ.1) THEN                                                  0001
 9999     I = 4                                                          0004
-      ELSEIF (I.EQ.2) THEN                                              0001
-         I = 3                                                          0003
+      ELSE
+         IF (I.EQ.2) I = 3                                              0002
+8888     CONTINUE
       ENDIF
-8888  CONTINUE
       END

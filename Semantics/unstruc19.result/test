@@ -27,15 +27,17 @@ C (3,2)
 C (3,3)
 C     BEGIN UNSTRUCTURED
 C (4,1)
-5     IF (ITYP.EQ.2.AND.IR.LE.IRSUP) THEN                               0005
+5     CONTINUE                                                          0004
+C (5,1)
+      IF (ITYP.EQ.2.AND.IR.LE.IRSUP) THEN                               0005
       ELSE
          GOTO 99999
       ENDIF
-C (5,1)
+C (6,1)
 C     BEGIN BLOCK
-C (5,2)
+C (6,2)
       XIR(IR) = AFLOT                                                   0006
-C (5,3)
+C (6,3)
       IR = IR+1                                                         0007
 C     END BLOCK
       GOTO 5
@@ -76,15 +78,17 @@ C (3,2)
 C (3,3)
 C     BEGIN UNSTRUCTURED
 C (4,1)
-5     IF (ITYP.EQ.2.AND.IR.LE.IRSUP) THEN                               0005
+5     CONTINUE                                                          0004
+C (5,1)
+      IF (ITYP.EQ.2.AND.IR.LE.IRSUP) THEN                               0005
       ELSE
          GOTO 99998
       ENDIF
-C (5,1)
+C (6,1)
 C     BEGIN BLOCK
-C (5,2)
+C (6,2)
       XIR(IR) = AFLOT                                                   0006
-C (5,3)
+C (6,3)
       IR = IR+1                                                         0007
 C     END BLOCK
       GOTO 5
@@ -146,24 +150,29 @@ C     BEGIN UNSTRUCTURED
 C  T() {}
 
 C (4,1)
-5     IF (ITYP.EQ.2.AND.IR.LE.IRSUP) THEN                               0005
+5     CONTINUE                                                          0004
+
+C  T() {}
+
+C (5,1)
+      IF (ITYP.EQ.2.AND.IR.LE.IRSUP) THEN                               0005
       ELSE
          GOTO 99998
       ENDIF
 
 C  T(IR) {IR==IR#init+1}
 
-C (5,1)
+C (6,1)
 C     BEGIN BLOCK
 
 C  T() {}
 
-C (5,2)
+C (6,2)
       XIR(IR) = AFLOT                                                   0006
 
 C  T(IR) {IR==IR#init+1}
 
-C (5,3)
+C (6,3)
       IR = IR+1                                                         0007
 C     END BLOCK
       GOTO 5

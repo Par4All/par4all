@@ -7,6 +7,8 @@ int foo(int predicate)
    if (predicate==3) goto switch_1_case_3;
 switch_1_default:   ;
    return 222;
+switch_1_case_3:   ;
+   goto break_1;
 switch_1_case_2:   ;
    return x+3;
 switch_1_case_1:   ;
@@ -14,7 +16,30 @@ switch_1_case_1:   ;
    goto switch_1_case_2;
 switch_1_case_0:   ;
    return 111;
+break_1:   ;
+   return 333;
+}
+
+printed file after RESTRUCTURE_CONTROL
+
+int foo(int predicate)
+{
+   int x = 0;
+   if (predicate==0) goto switch_1_case_0;
+   if (predicate==1) goto switch_1_case_1;
+   if (predicate==2) goto switch_1_case_2;
+   if (predicate==3) goto switch_1_case_3;
+switch_1_default:   ;
+   return 222;
 switch_1_case_3:   ;
+   goto break_1;
+switch_1_case_2:   ;
+   return x+3;
+switch_1_case_1:   ;
+   x = x+1;
+   goto switch_1_case_2;
+switch_1_case_0:   ;
+   return 111;
 break_1:   ;
    return 333;
 }

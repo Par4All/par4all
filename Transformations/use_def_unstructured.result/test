@@ -10,7 +10,7 @@ C     BEGIN UNSTRUCTURED
 C  P() {}
 
 
-1     IF (I.EQ.0) GOTO 1                                                0001
+1     IF (I.EQ.0) GOTO 100                                              0001
 
 C  P() {}
 
@@ -27,6 +27,10 @@ C  P() {}
 C  P() {}
 
       WRITE (*, B)                                                      0007
+
+C  P() {}
+
+100   CONTINUE                                                          0008
       GOTO 1
 C     END UNSTRUCTURED
       END
@@ -42,7 +46,7 @@ C     BEGIN UNSTRUCTURED
 C  P() {}
 
 
-1     IF (I.EQ.0) GOTO 1                                                0001
+1     IF (I.EQ.0) GOTO 100                                              0001
 
 C  P() {}
 
@@ -55,6 +59,10 @@ C  P() {}
 C  P() {}
 
       WRITE (*, B)                                                      0007
+
+C  P() {}
+
+100   CONTINUE                                                          0008
       GOTO 1
 C     END UNSTRUCTURED
       END
@@ -70,7 +78,7 @@ C     BEGIN UNSTRUCTURED
 C  P() {}
 
 
-1     IF (I.EQ.0) GOTO 1                                                0001
+1     IF (I.EQ.0) GOTO 100                                              0001
 
 C  P() {}
 
@@ -83,6 +91,10 @@ C  P() {}
 C  P() {}
 
       WRITE (*, B)                                                      0007
+
+C  P() {}
+
+100   CONTINUE                                                          0008
       GOTO 1
 C     END UNSTRUCTURED
       END
@@ -98,7 +110,7 @@ C     BEGIN UNSTRUCTURED
 C  P() {}
 
 
-1     IF (I.EQ.0) GOTO 1                                                0001
+1     IF (I.EQ.0) GOTO 100                                              0001
 
 C  P() {}
 
@@ -111,6 +123,10 @@ C  P() {}
 C  P() {}
 
       WRITE (*, B)                                                      0007
+
+C  P() {}
+
+100   CONTINUE                                                          0008
       GOTO 1
 C     END UNSTRUCTURED
 

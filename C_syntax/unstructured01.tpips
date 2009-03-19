@@ -29,6 +29,15 @@ echo
 
 display PRINTED_FILE[unstructured01]
 
+echo Try more aggressive restructuring:
+setproperty FUSE_CONTROL_NODES_WITH_COMMENTS_OR_LABEL TRUE
+apply RESTRUCTURE_CONTROL[unstructured01]
+
+echo
+echo printed file after RESTRUCTURE_CONTROL
+echo
+
+display PRINTED_FILE[unstructured01]
 close
 
 delete unstructured01

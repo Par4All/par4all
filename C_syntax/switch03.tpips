@@ -25,6 +25,14 @@ echo
 
 display PRINTED_FILE[switch03]
 
+apply RESTRUCTURE_CONTROL[switch03]
+
+echo
+echo printed file after RESTRUCTURE_CONTROL
+echo
+
+display PRINTED_FILE[switch03]
+
 apply UNSPLIT[%PROGRAM]
 close
 

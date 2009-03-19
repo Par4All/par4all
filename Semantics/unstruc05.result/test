@@ -11,10 +11,12 @@ C     BEGIN UNSTRUCTURED
 C (1,1)
 
       IF (I.LE.5) GOTO 100                                              0002
-C (6,1)
+C (7,1)
       J = 6                                                             0004
 C (4,1)
-200   IF (I.LE.2) THEN                                                  0009
+200   CONTINUE                                                          0008
+C (5,1)
+      IF (I.LE.2) THEN                                                  0009
       ELSE
          GOTO 99999
       ENDIF
@@ -70,13 +72,18 @@ C (1,1)
 
 C  T(J) {J==6}
 
-C (6,1)
+C (7,1)
       J = 6                                                             0004
 
 C  T() {}
 
 C (4,1)
-200   IF (I.LE.2) THEN                                                  0009
+200   CONTINUE                                                          0008
+
+C  T() {}
+
+C (5,1)
+      IF (I.LE.2) THEN                                                  0009
       ELSE
          GOTO 99999
       ENDIF
@@ -150,13 +157,18 @@ C (1,1)
 
 C  P(I) {6<=I}
 
-C (6,1)
+C (7,1)
       J = 6                                                             0004
 
 C  P(I,J) {18<=I+2J, 6<=J, J<=7}
 
 C (4,1)
-200   IF (I.LE.2) THEN                                                  0009
+200   CONTINUE                                                          0008
+
+C  P(I,J) {18<=I+2J, 6<=J, J<=7}
+
+C (5,1)
+      IF (I.LE.2) THEN                                                  0009
       ELSE
          GOTO 99999
       ENDIF

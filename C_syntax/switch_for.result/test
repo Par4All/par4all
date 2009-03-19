@@ -24,12 +24,28 @@ void gl_enable()
    if (cap==1) {
    }
    else {
-      goto break_2;
+      goto break_1;
    }
 switch_1_case_1:   ;
    p = 0;
    if (!(p<6)) {
    }
 break_2:   ;
+break_1:   ;
+}
+
+printed file after RESTRUCTURE_CONTROL
+
+void gl_enable()
+{
+   int cap;
+   int p;
+   if (cap==1) {
+switch_1_case_1:      ;
+      p = 0;
+      if (!(p<6))
+         ;
+break_2:      ;
+   }
 break_1:   ;
 }

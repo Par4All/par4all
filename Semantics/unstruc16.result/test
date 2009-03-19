@@ -20,23 +20,23 @@ C (0,4)
 C     BEGIN UNSTRUCTURED
 C (1,1)
       IF (N.GT.0) GOTO 99999                                            0003
-C (4,1)
-C     BEGIN BLOCK
-C (4,2)
 C        J is not (re-)initialized
+C (4,1)
 200   CONTINUE                                                          0007
-C (4,3)
+C (5,1)
+C     BEGIN BLOCK
+C (5,2)
 300   CONTINUE                                                          0008
-C (4,4)
+C (5,3)
       J = J+1                                                           0009
 C     END BLOCK
-C (5,1)
-      IF (J.LT.10) GOTO 200                                             0010
 C (6,1)
+      IF (J.LT.10) GOTO 300                                             0010
+C (7,1)
       IF (I+J.GT.105) GOTO 400                                          0012
-C (9,1)
+C (10,1)
       I = I+1                                                           0014
-C (8,1)
+C (9,1)
       IF (I.LT.100) THEN                                                0015
       ELSE
          GOTO 400
@@ -54,7 +54,7 @@ C     END BLOCK
 C (2,1)
       J = 2                                                             0004
       GOTO 100
-C (7,1)
+C (8,1)
 
 400   CONTINUE                                                          0017
 C     END UNSTRUCTURED
@@ -111,47 +111,47 @@ C  T() {}
 
 C (1,1)
       IF (N.GT.0) GOTO 99999                                            0003
+C        J is not (re-)initialized
+
+C  T() {}
+
+C (4,1)
+200   CONTINUE                                                          0007
 
 C  T(J) {J==J#init+1}
 
-C (4,1)
+C (5,1)
 C     BEGIN BLOCK
 
 C  T() {}
 
-C (4,2)
-C        J is not (re-)initialized
-200   CONTINUE                                                          0007
-
-C  T() {}
-
-C (4,3)
+C (5,2)
 300   CONTINUE                                                          0008
 
 C  T(J) {J==J#init+1}
 
-C (4,4)
+C (5,3)
       J = J+1                                                           0009
 C     END BLOCK
 
 C  T() {}
 
-C (5,1)
-      IF (J.LT.10) GOTO 200                                             0010
+C (6,1)
+      IF (J.LT.10) GOTO 300                                             0010
 
 C  T() {}
 
-C (6,1)
+C (7,1)
       IF (I+J.GT.105) GOTO 400                                          0012
 
 C  T(I) {I==I#init+1}
 
-C (9,1)
+C (10,1)
       I = I+1                                                           0014
 
 C  T() {}
 
-C (8,1)
+C (9,1)
       IF (I.LT.100) THEN                                                0015
       ELSE
          GOTO 400
@@ -184,7 +184,7 @@ C (2,1)
 
 C  T() {}
 
-C (7,1)
+C (8,1)
 
 400   CONTINUE                                                          0017
 C     END UNSTRUCTURED
@@ -244,47 +244,47 @@ C  P(I,J,N) {I==1}
 
 C (1,1)
       IF (N.GT.0) GOTO 99999                                            0003
+C        J is not (re-)initialized
 
 C  P(I,J,N) {1<=I, I<=96}
 
 C (4,1)
-C     BEGIN BLOCK
-
-C  P(I,J,N) {1<=I, I<=96}
-
-C (4,2)
-C        J is not (re-)initialized
 200   CONTINUE                                                          0007
 
 C  P(I,J,N) {1<=I, I<=96}
 
-C (4,3)
+C (5,1)
+C     BEGIN BLOCK
+
+C  P(I,J,N) {1<=I, I<=96}
+
+C (5,2)
 300   CONTINUE                                                          0008
 
 C  P(I,J,N) {1<=I, I<=96}
 
-C (4,4)
+C (5,3)
       J = J+1                                                           0009
 C     END BLOCK
 
 C  P(I,J,N) {1<=I, I<=96}
 
-C (5,1)
-      IF (J.LT.10) GOTO 200                                             0010
+C (6,1)
+      IF (J.LT.10) GOTO 300                                             0010
 
 C  P(I,J,N) {1<=I, I<=96, 10<=J}
 
-C (6,1)
+C (7,1)
       IF (I+J.GT.105) GOTO 400                                          0012
 
 C  P(I,J,N) {1<=I, I+J<=105, 10<=J}
 
-C (9,1)
+C (10,1)
       I = I+1                                                           0014
 
 C  P(I,J,N) {2<=I, I+J<=106, 10<=J}
 
-C (8,1)
+C (9,1)
       IF (I.LT.100) THEN                                                0015
       ELSE
          GOTO 400
@@ -317,7 +317,7 @@ C (2,1)
 
 C  P(I,J,N) {1<=I, I<=96, 106<=I+J}
 
-C (7,1)
+C (8,1)
 
 400   CONTINUE                                                          0017
 C     END UNSTRUCTURED

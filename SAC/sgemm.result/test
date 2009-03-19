@@ -4,41 +4,41 @@ Result = if (info != 0) {
 succ1 must be reached by GOTO
 No endif
 Result = if (info != 0) {
- goto 00000;
+ goto ;
 }
 
 Result before = if (info != 0) {
- goto 00000;
+ goto ;
 }
 
 Result after = if (info != 0) {
- goto 00000;
+ goto ;
 }
 
 nsucc = 2 
 Result = if (info != 0) {
- goto 00000;
+ goto ;
 }
 if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
 
 succ1 must be reached by GOTO
 No endif
 Result = if (info != 0) {
- goto 00000;
+ goto ;
 }
 if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
  goto 00000;
 }
 
 Result before = if (info != 0) {
- goto 00000;
+ goto ;
 }
 if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
  goto 00000;
 }
 
 Result after = if (info != 0) {
- goto 00000;
+ goto ;
 }
 if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
  goto 00000;
@@ -46,7 +46,7 @@ if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) 
 
 nsucc = 2 
 Result = if (info != 0) {
- goto 00000;
+ goto ;
 }
 if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
  goto 00000;
@@ -56,7 +56,7 @@ if (alpha == zero) {
 succ1 must be reached by GOTO
 No endif
 Result = if (info != 0) {
- goto 00000;
+ goto ;
 }
 if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
  goto 00000;
@@ -66,7 +66,7 @@ if (alpha == zero) {
 }
 
 Result before = if (info != 0) {
- goto 00000;
+ goto ;
 }
 if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
  goto 00000;
@@ -76,7 +76,7 @@ if (alpha == zero) {
 }
 
 Result after = if (info != 0) {
- goto 00000;
+ goto ;
 }
 if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
  goto 00000;
@@ -85,6 +85,7 @@ if (alpha == zero) {
  goto ;
 }
 
+nsucc = 1 
 nsucc = 1 
 nsucc = 1 
 nsucc = 0 
@@ -94,41 +95,41 @@ Result = if (info != 0) {
 succ1 must be reached by GOTO
 No endif
 Result = if (info != 0) {
- goto 00000;
+ goto ;
 }
 
 Result before = if (info != 0) {
- goto 00000;
+ goto ;
 }
 
 Result after = if (info != 0) {
- goto 00000;
+ goto ;
 }
 
 nsucc = 2 
 Result = if (info != 0) {
- goto 00000;
+ goto ;
 }
 if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
 
 succ1 must be reached by GOTO
 No endif
 Result = if (info != 0) {
- goto 00000;
+ goto ;
 }
 if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
  goto 00000;
 }
 
 Result before = if (info != 0) {
- goto 00000;
+ goto ;
 }
 if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
  goto 00000;
 }
 
 Result after = if (info != 0) {
- goto 00000;
+ goto ;
 }
 if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
  goto 00000;
@@ -136,7 +137,7 @@ if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) 
 
 nsucc = 2 
 Result = if (info != 0) {
- goto 00000;
+ goto ;
 }
 if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
  goto 00000;
@@ -146,7 +147,7 @@ if (alpha == zero) {
 succ1 must be reached by GOTO
 No endif
 Result = if (info != 0) {
- goto 00000;
+ goto ;
 }
 if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
  goto 00000;
@@ -156,7 +157,7 @@ if (alpha == zero) {
 }
 
 Result before = if (info != 0) {
- goto 00000;
+ goto ;
 }
 if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
  goto 00000;
@@ -166,7 +167,7 @@ if (alpha == zero) {
 }
 
 Result after = if (info != 0) {
- goto 00000;
+ goto ;
 }
 if (((m == 0) || (n == 0)) || (((alpha == zero) || (k == 0)) && (beta == one))) {
  goto 00000;
@@ -175,6 +176,7 @@ if (alpha == zero) {
  goto ;
 }
 
+nsucc = 1 
 nsucc = 1 
 nsucc = 1 
 nsucc = 0 
@@ -277,7 +279,7 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
     }
   if (info != 0)
     {
-      goto 00000;
+      goto;
     }
   if (((m == 0) || (n == 0))
       || (((alpha == zero) || (k == 0)) && (beta == one)))
@@ -448,6 +450,8 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 	  continue;
 	}
     }
+  goto 00000;
+  ;
   return;
 }
 

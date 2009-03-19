@@ -30,7 +30,7 @@ PRINTED_FILE made for ALTRET11.
 Request: build phase/rule UNSPLIT for module ALTRET11.
   UNSPLIT                        building   USER_FILE()
 UNSPLIT made for ALTRET11.
-shell f77 -c altret11.database/Src/altret11.f
+shell ${PIPS_F77:-f77} -c altret11.database/Src/altret11.f
 shell ls altret11.o
 altret11.o
 shell rm altret11.o

@@ -2,9 +2,9 @@
 Printed file
 
       SUBROUTINE MSTADB
-      IF (KT-1.NE.0) THEN                                               0001
-      ENDIF
+      IF (KT-1.NE.0) GOTO 105                                           0001
 106   CONTINUE                                                          0005
+      RETURN
 105   CONTINUE                                                          0004
       END
 
@@ -12,7 +12,6 @@ Printed file after RESTUCTURE_CONTROL
 
       SUBROUTINE MSTADB
       IF (KT-1.NE.0) THEN                                               0001
+105      CONTINUE                                                       0004
       ENDIF
-106   CONTINUE                                                          0005
-105   CONTINUE                                                          0004
       END

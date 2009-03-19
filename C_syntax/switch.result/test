@@ -25,16 +25,31 @@ main()
 {
    int i = 1;
    if (i==1) goto switch_1_case_1;
-   if (i==2) {
-   }
-   else {
-      goto switch_1_default;
-   }
+   if (i==2) goto switch_1_case_2;
+switch_1_default:   ;
+   goto break_1;
 switch_1_case_2:   ;
    printf("2 = %d", i);
-   goto switch_1_default;
+   goto break_1;
 switch_1_case_1:   ;
    printf("1 = %d", i);
+break_1:   ;
+}
+Try more aggressive restructuring:
+
+printed file after RESTRUCTURE_CONTROL
+
+main()
+{
+   int i = 1;
+   if (i==1) {
+switch_1_case_1:      ;
+      printf("1 = %d", i);
+   }
+   else if (i==2) {
+switch_1_case_2:      ;
+      printf("2 = %d", i);
+   }
 switch_1_default:   ;
 break_1:   ;
 }

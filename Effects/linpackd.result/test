@@ -119,7 +119,7 @@ C               <must be read   >: K N
          CALL DAXPY(K-1, T, A(1,K), 1, B(1), 1)                         0021
 C               <must be read   >: N
 40       CONTINUE                                                       0022
-      GOTO 90
+      GOTO 100
 50    CONTINUE                                                          0023
 C               <must be read   >: N
 C               <must be written>: K
@@ -306,7 +306,7 @@ C               <must be read   >: K N
          CALL DAXPY(K-1, T, A(1,K), 1, B(1), 1)                         0021
 C               <must be read   >: N
 40       CONTINUE                                                       0022
-      GOTO 90
+      GOTO 100
 50    CONTINUE                                                          0023
 C               <may be read    >: A(*,*) B(*) K T
 C               <may be written >: B(*) T

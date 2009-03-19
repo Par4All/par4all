@@ -15,8 +15,8 @@ setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
 display PRINTED_FILE[ALTRET11]
 apply UNSPLIT
 # The flexibility is useless because the validation file cannot follow the changes in PIPS_F77
-# shell ${PIPS_F77:-f77} -c altret11.database/Src/altret11.f
-shell f77 -c altret11.database/Src/altret11.f
+shell ${PIPS_F77:-f77} -c altret11.database/Src/altret11.f
+#shell f77 -c altret11.database/Src/altret11.f
 shell ls altret11.o
 shell rm altret11.o
 close

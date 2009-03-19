@@ -40,7 +40,7 @@ l99997:   ;
       return -1;
    if (c=='#') goto l99999;
    if (c=='0'||c=='1') goto l99998;
-break_2:   ;
+l99995:   ;
    ;
    goto l99997;
 l99998:   ;
@@ -54,6 +54,81 @@ l99996:   ;
       return -1;
    if (c=='\n') goto break_2;
    ;
+   goto l99996;
+break_2:   ;
+   goto l99995;
+break_1:   ;
+   if (val) 
+      *val = v;
+   return 0;
+}
+
+printed file after RESTRUCTURE_CONTROL
+
+int control01(int *in, int *val)
+{
+   int c;
+   int v;
+   ;
+l99997:   ;
+   if (!1) goto break_1;
+   if ((c = pnm_getc(in))==-1) 
+      return -1;
+   if (c=='#') goto l99999;
+   if (c=='0'||c=='1') goto l99998;
+l99996:   ;
+   ;
+   goto l99997;
+l99998:   ;
+   v = c-'0';
+   goto break_1;
+l99999:   ;
+   ;
+l99995:   ;
+   if (!1) goto break_2;
+   if ((c = pnm_getc(in))==-1) 
+      return -1;
+   if (c=='\n') goto break_2;
+   ;
+   goto l99995;
+break_2:   ;
+   goto l99996;
+break_1:   ;
+   if (val) 
+      *val = v;
+   return 0;
+}
+Try more aggressive restructuring:
+
+printed file after RESTRUCTURE_CONTROL
+
+int control01(int *in, int *val)
+{
+   int c;
+   int v;
+   ;
+l99997:   ;
+   if (!1) goto break_1;
+   if ((c = pnm_getc(in))==-1) 
+      return -1;
+   if (c=='#') goto l99999;
+   if (c=='0'||c=='1') goto l99998;
+l99996:   ;
+   ;
+   goto l99997;
+l99998:   ;
+   v = c-'0';
+   goto break_1;
+l99999:   ;
+   ;
+l99995:   ;
+   if (!1) goto break_2;
+   if ((c = pnm_getc(in))==-1) 
+      return -1;
+   if (c=='\n') goto break_2;
+   ;
+   goto l99995;
+break_2:   ;
    goto l99996;
 break_1:   ;
    if (val) 

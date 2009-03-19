@@ -36,16 +36,43 @@ void unstructured01()
    int b;
    int c;
    if (a==1) goto switch_1_case_1;
-switch_2_case_1:   if (c==1) {
-      goto switch_3_case_1;
+break_1:   ;
+   if (c==1) {
    }
    else {
-      goto switch_3_case_1;
+      goto break_3;
    }
-switch_1_case_1:   if (b==1) goto switch_2_case_1;
+switch_3_case_1:   ;
+   goto break_3;
+switch_1_case_1:   ;
+   if (b==1) goto switch_2_case_1;
 switch_2_default:   ;
    printf("Error\n");
-   goto switch_2_case_1;
+break_2:   ;
+   goto break_1;
+switch_2_case_1:   ;
+   goto break_2;
+break_3:   ;
+}
+Try more aggressive restructuring:
+
+printed file after RESTRUCTURE_CONTROL
+
+void unstructured01()
+{
+   int a;
+   int b;
+   int c;
+   if (a==1)
+switch_1_case_1:      if (b==1)
+         ;
+      else {
+switch_2_default:         ;
+         printf("Error\n");
+      }
+switch_2_case_1:   ;
+   if (c==1)
+      ;
 switch_3_case_1:   ;
 break_3:   ;
 }

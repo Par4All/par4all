@@ -19,7 +19,11 @@ C  P(N) {}
 
 C  P(I,N) {1<=I}
 
-100   IF (I.GT.N) GOTO 200                                              0004
+100   CONTINUE                                                          0003
+
+C  P(I,N) {1<=I}
+
+      IF (I.GT.N) GOTO 200                                              0004
 
 C  P(I,N) {1<=I, I<=N}
 
