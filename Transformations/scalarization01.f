@@ -2,7 +2,7 @@
       real x(n,n), y(n,n)
       real t(100), t2(100)
       
-C     Expected result : t(i) scalarized
+C     Expected result: t(i) scalarized
       do j = 1,n
          do i=1,n
             t(i) = x(i,j)
@@ -11,7 +11,7 @@ C     Expected result : t(i) scalarized
          enddo
       enddo
 
-C     Expected result : t2(i) NOT scalarized (b/c copied out)
+C     Expected result: t2(i) NOT scalarized (b/c copied out)
       do j = 1,n
          do i=1,n
             t2(i)  = x(i,j)
