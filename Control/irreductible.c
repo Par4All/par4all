@@ -9,13 +9,18 @@ int main() {
   if ((rand() & 1) == 0)
     goto b;
 
- a:
+   /* The a label */
+a:
   printf("a\n");
+  /* The b label */
   goto b;
+  /* The b label */
  b:
   printf("b\n");
-  goto a;
+  /* Oh, go to a... */
+ goto a;
 
+  /* Unreachable... */
   printf("It will never print %d...\n", i);
   return i;
 }

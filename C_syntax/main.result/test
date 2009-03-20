@@ -78,11 +78,9 @@ Variable list:
 	Declared entity "main!:#_IO_marker" with type "struct" 
 	Declared entity "main!:#_PIPS_STRUCT_1" with type "struct" 
 	Declared entity "main!:#_PIPS_STRUCT_2" with type "struct" 
-	Declared entity "main!:#_PIPS_STRUCT_3" with type "struct" 
 	Declared entity "main!:#_PIPS_STRUCT_4" with type "struct" 
-	Declared entity "main!:#_PIPS_STRUCT_6" with type "struct" 
-	Declared entity "main!:#_PIPS_STRUCT_7" with type "struct" 
-	Declared entity "main!:'_PIPS_UNION_5" with type "union" 
+	Declared entity "main!:#_PIPS_STRUCT_5" with type "struct" 
+	Declared entity "main!:'_PIPS_UNION_3" with type "union" 
 	Declared entity "main!:*DYNAMIC*" with type "area" with size 0
 	Declared entity "main!:*HEAP*" with type "area" with size 0
 	Declared entity "main!:*STACK*" with type "area" with size 0
