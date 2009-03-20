@@ -5,7 +5,7 @@ Parsed printed file for "rand"
 Warnings for "rand"
 
 C_PARSER[rand] (UpdateEntity) Intrinsic rand redefined.
-This is not supported by PIPS. Please rename rand
+This is not supported by PIPS. Please rename "rand"
 C_PARSER[rand] (CParserError) 
 Recovery from C parser failure not (fully) implemented yet.
 C parser is likely to fail later if re-used.
