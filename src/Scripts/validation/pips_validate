@@ -112,19 +112,19 @@ while [ "$1" ] ; do
       -r|--recurse) recurse=1 ;;
       # binaries to use
       -t|--tpips) tpips=$1 ; shift ;;
-      --tpips=*) tpips=${opt/*=/} ;;
+      --tpips=*) tpips=${opt#*=} ;;
       -p|--pips) pips=$1 ; shift ;;
-      --pips=*) pips=${opt/*=/} ;;
+      --pips=*) pips=${opt#*=} ;;
       # directories to use
       -V|--valid) vdir=$1 ; shift ;;
-      --valid=*) vdir=${opt/*=/} ;;
+      --valid=*) vdir=${opt#*=} ;;
       -R|--run) rdir=$1 ; shift ;;
-      --run=*) rdir=${opt/*=/} ;;
+      --run=*) rdir=${opt#*=} ;;
       # result
       -O|--out|--output) odir=$1 ; shift ;;
-      --out=*|--output=*) odir=${opt/*=/} ;;
+      --out=*|--output=*) odir=${opt#*=} ;;
       -m|--mail) mail="$mail $1" ; shift ;;
-      --mail=*) mail="$mail ${opt/*=/}" ;;
+      --mail=*) mail="$mail ${opt#*=}" ;;
       -a|--auto-result-create) auto_result_create=1 ;;
       # archive to detect changes
       -d|--diff) display_diff=1; keep_archive=1 ;;
@@ -218,7 +218,7 @@ function validate_file()
       echo "  of this file as the reference."
     else
       verb 1 "skipping $file: no matching result directory"
-      echo "skipped: $file" >> $summary
+      echo "skipped: ${file#$vdir/}" >> $summary
       return 0
     fi
   fi
