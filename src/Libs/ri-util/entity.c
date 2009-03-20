@@ -248,8 +248,9 @@ string safe_entity_name(entity e)
  * vect_fprint, since someone thought that it was pertinent to remove the
  * special care of constants there. So I added something here, to deal
  * with the "null" entity which codes the constant. FC 28/11/94.
+ * SG: should return a const pointer
  */
-const string 
+/*const*/ string 
 entity_local_name(entity e)
 {
     string null_name = "null";
@@ -267,8 +268,10 @@ string entity_global_name(entity e)
     return entity_name(e);
 }
 
-/* Returns the module local user name */
-const string module_local_name(entity e)
+/* Returns the module local user name
+ * SG: should return a const pointer
+ */
+/*const*/ string module_local_name(entity e)
 {
   /* No difference between modules and other entities, except for prefixes */
   /* Allocates a new string */
