@@ -125,6 +125,7 @@ There are 5 repositories for the various files:
 \item[pips] PIPS software.
 \item[validation] Pips non-regression tests
 \end{description}
+There is also \emph{private} validation directory on another server.
 
 The subversion repositories are organised in standard subdirectories as
 advised for best subversion practices:
@@ -180,7 +181,7 @@ Section~\ref{sec:underst-makef-infr}.
 It is important to realize that:
 \begin{enumerate}
 \item PIPS build is much more efficiently if it is stored on local disks rather
-  than on remote directories accessed through the network (for instance via NFS).
+  than on remote directories accessed through the network (\emph{e.g.} via NFS).
   Hence the \texttt{/home/temp} directory choice in the above axample.
 \item the local copy editions are not saved unless commits are performed.
 \item in a standard development, commits should not be made directly under
@@ -496,6 +497,29 @@ to your target architecture because of bugs or limitations (little or big
 Endian, native 32-bit or 64 bit architecture...) you should try to
 validate on various architectures.
 
+\subsubsection{Creating FULL branches or tags}
+\label{sec:full-branch}
+
+The \texttt{pips\_branch} script creates a full branch or tag of the
+same name in all 5 repositories (makefiles, 3 softwares, validation),
+and a \emph{bundle} entry to extract all these files at once.
+The script needs full write permissions to all five repositories, thus
+it is restricted to core developers. The help option provides help.
+
+To create a \texttt{foo/bla} named branch from trunk try:
+\begin{verbatim}
+  sh> pips_branch -v -v trunk branches foo/bla
+\end{verbatim}
+It shows the various \texttt{svn} commands which are going to be issued.
+If you are happy with them, do that again with the \texttt{-D} option
+to actually run them. The created \emph{bundle} can be extracted with:
+\begin{verbatim}
+  sh> svn co http://svn.cri.ensmp.fr/svn/pips/bundles/foo/bla
+  extracting newgen... linear... pips... validation... nlpmake...
+\end{verbatim}
+
+Note that the \texttt{-R} options allows to fix the revision number to
+consider from each repository, instead of using the head revision.
 
 \subsubsection{Understanding the Makefile infrastructure inside the SVN
   infrastructure}
@@ -507,14 +531,15 @@ people wanting to modify more globally the PIPS infrastructure.
 The compilation directories are managed by some global variables
 initialized as described in section~\ref{sec:shell}.
 
-If you compile into a directory, in the \verb/prod/ directory installed by
+If you compile into a directory, in the \texttt{prod} directory installed by
 the installation script, your branch directory or whatever, the compiled
 stuff from a directory goes to \verb/$NEWGEN_ROOT/, \verb/$LINEAR_ROOT/
-\verb/PIPS_ROOT/ respectively, use the Makefile definitions from their
+and \verb/$PIPS_ROOT/ respectively, use the
+\texttt{Makefile} definitions from their
 \verb/$/\emph{*}\verb/_ROOT/ and are build with library found in the other
 \verb/$/\emph{*}\verb/_ROOT/ directory. The Makefile parts are picked into
 \verb/$/\emph{*}\verb|_ROOT/makes| directory, \emph{except} for
-\emph{Makefile} that are local symbolic links.
+\texttt{Makefile} that are local symbolic links.
 %$
 
 For example, if you have a local PIPS copy in the \texttt{svn/pips/trunk}
@@ -1339,8 +1364,8 @@ derives a header file that defines the object interfaces, which is placed
 in \verb+$PIPS_ROOT/include+.
 
 For instance, the internal representation (i.e. the abstract syntax tree)
-is called \verb+ri+\index{ri}\footnote{For the French «
-  \emph{Représentation Interne} » or Internal Representation.}. It is
+is called \verb+ri+\index{ri}\footnote{For the French
+«~\emph{Représentation Interne}~» or Internal Representation.}. It is
 described in the \LaTeX\ file {\tt ri.tex} in
 \verb+$PIPS_ROOT/src/Documentation/newgen+. It is then automatically
 transformed into a NewGen file {\tt ri.newgen}. And finally, NewGen
