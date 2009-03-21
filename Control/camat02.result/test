@@ -557,26 +557,26 @@ C      IF (BS) WRITE(KS,1000) TZEREA(IBT)
       ENDIF
 
       CALL NLIRE(NX4, ITVATM(IBT), LON, KER)                            0005
-ÄUnstructured 0x83d63c8 end: 0x83d0768
-ÇUnstructured Item 0x83d63c8
+ÄUnstructured c_1_1 end: c_2_1
+ÇUnstructured Item c_1_1
       IF (KER.NE.0) THEN                                                0006
       ENDIF
-ÉUnstructured Successor -> 0x83d0768 0x83d6690
-ÇUnstructured Item 0x83d0768
+ÉUnstructured Successor -> c_2_1 c_18_1
+ÇUnstructured Item c_2_1
 
 C    1 IF (BS) WRITE(KS,1004) TZEREA(IBT), KER
 1     CONTINUE                                                          0067
 ÉUnstructured Successor ->
-ÇUnstructured Item 0x83db2f8
+ÇUnstructured Item c_3_1
 
 C  902 IF(B9.AND..NOT.BS) WRITE(KS,1003) NH, MAXNH
 902   KER = 13                                                          0070
-ÉUnstructured Successor -> 0x83d0768
-ÇUnstructured Item 0x83d8be0
+ÉUnstructured Successor -> c_2_1
+ÇUnstructured Item c_4_1
       IF (NH.GT.MAXNH) THEN                                             0027
       ENDIF
-ÉUnstructured Successor -> 0x83db2f8 0x83d91a0
-ÇUnstructured Item 0x83d91a0
+ÉUnstructured Successor -> c_3_1 c_5_1
+ÇUnstructured Item c_5_1
 
       LON = 8                                                           0029
       CALL MOVEK(NX2, I_IPTAI, 1, 1, LON)                               0030
@@ -629,12 +629,12 @@ C                  IPTAI, NTAI, ZIMP, ADTR)
      &NA1(I_NRTJ), NX4, NX4(I_IVEL), NX4(I_IVGR), NX4(I_IVTM), NX5(     0051
      &I_NXUT), NX5(I_IVAC), NX5(I_LITA), NX2(I_IPTAI), NX2(I_NTAI),     0051
      &ZIMP, ADTR)                                                       0051
-ÉUnstructured Successor -> 0x83da180
-ÇUnstructured Item 0x83da180
+ÉUnstructured Successor -> c_6_1
+ÇUnstructured Item c_6_1
       IF (KER.NE.0) THEN                                                0052
       ENDIF
-ÉUnstructured Successor -> 0x83d0768 0x83da3c0
-ÇUnstructured Item 0x83da3c0
+ÉUnstructured Successor -> c_2_1 c_7_1
+ÇUnstructured Item c_7_1
 
 C -----------------------------------------------------------
 C       ECRITURE SUR DISQUE DES TABLEAUX D'ECRIVANT LES T.M.
@@ -695,29 +695,29 @@ C                  IVAC, M_GAIN)
 
       CALL CAGAIN(NTM, INTM, NX3(I_LHAC), NX3(I_NCHA), NX3(I_EHA),      0063
      &NX5(I_IVAC), M_GAIN)                                              0063
-ÉUnstructured Successor -> 0x83daa58
-ÇUnstructured Item 0x83daa58
+ÉUnstructured Successor -> c_8_1
+ÇUnstructured Item c_8_1
       IF (KER.NE.0) THEN                                                0064
       ENDIF
-ÉUnstructured Successor -> 0x83d0768 0x83daca8
-ÇUnstructured Item 0x83daca8
+ÉUnstructured Successor -> c_2_1 c_9_1
+ÇUnstructured Item c_9_1
 
 C -----------------------------------------------------------
 C               ECRITURE DE LA MATRICE DE GAIN SUR DISQUE
 C -----------------------------------------------------------
 
       LON = LBLC(6,IBT)                                                 0066
-ÉUnstructured Successor -> 0x83d0768
-ÇUnstructured Item 0x83d8488
+ÉUnstructured Successor -> c_2_1
+ÇUnstructured Item c_10_1
       IF (MVA.GT.MAXMVA) THEN                                           0025
       ENDIF
-ÉUnstructured Successor -> 0x83db158 0x83d8be0
-ÇUnstructured Item 0x83db158
+ÉUnstructured Successor -> c_11_1 c_4_1
+ÇUnstructured Item c_11_1
 
 C  901 IF (B9.AND..NOT.BS) WRITE(KS,1002) MVA, MAXMVA
 901   KER = 12                                                          0069
-ÉUnstructured Successor -> 0x83d0768
-ÇUnstructured Item 0x83d5c48
+ÉUnstructured Successor -> c_2_1
+ÇUnstructured Item c_12_1
 
 C      if (BS) then
 C         WRITE(KS,1001) NTM, MAXNTM
@@ -727,8 +727,8 @@ C      end if
 
 10    IF (NTM.GT.MAXNTM) THEN                                           0023
       ENDIF
-ÉUnstructured Successor -> 0x83d7638 0x83d8488
-ÇUnstructured Item 0x83d7638
+ÉUnstructured Successor -> c_13_1 c_10_1
+ÇUnstructured Item c_13_1
 
 C -----------------------------------------------------------
 C                       ERREURS DE DEBORDEMENT          
@@ -736,8 +736,8 @@ C -----------------------------------------------------------
 
 C  900 IF (B9.AND..NOT.BS) WRITE(KS,1001) NTM, MAXNTM
 900   KER = 11                                                          0068
-ÉUnstructured Successor -> 0x83d0768
-ÇUnstructured Item 0x83d6f58
+ÉUnstructured Successor -> c_2_1
+ÇUnstructured Item c_14_1
 
       IF (IBT.EQ.1) THEN                                                0014
          MAXNTM = IRDO*NMS/10                                           0015
@@ -755,12 +755,12 @@ C  900 IF (B9.AND..NOT.BS) WRITE(KS,1001) NTM, MAXNTM
      &I_NRGR), NA1(I_NRTJ), NX4, NX4(I_IVEL), NX4(I_IVGR), NX4(I_IVTM   0022
      &), NX6, NX6(I_IVEL), NX6(I_IVGR), NX6(I_IVTM), NX2(I_IPTAI),      0022
      &NDTM, INTM)                                                       0022
-ÉUnstructured Successor -> 0x83d5c48
-ÇUnstructured Item 0x83d6d08
+ÉUnstructured Successor -> c_12_1
+ÇUnstructured Item c_15_1
       IF (KER.NE.0) THEN                                                0012
       ENDIF
-ÉUnstructured Successor -> 0x83d0768 0x83d6f58
-ÇUnstructured Item 0x83d6b38
+ÉUnstructured Successor -> c_2_1 c_14_1
+ÇUnstructured Item c_16_1
 
 C -----------------------------------------------------------
 C               REJET DES TM FAUSSES DE FTMERR          
@@ -768,16 +768,16 @@ C -----------------------------------------------------------
 
       CALL CATMFA(ITMF_P, NX4, NX4(I_IVEL), NX4(I_IVGR), NX4(I_IVCO)    0011
      &, NX4(I_IVTM), NDTM)                                              0011
-ÉUnstructured Successor -> 0x83d6d08
-ÇUnstructured Item 0x83d68e8
+ÉUnstructured Successor -> c_15_1
+ÇUnstructured Item c_17_1
       IF (KER.NE.0) THEN                                                0009
       ENDIF
-ÉUnstructured Successor -> 0x83d0768 0x83d6b38
-ÇUnstructured Item 0x83d6690
+ÉUnstructured Successor -> c_2_1 c_16_1
+ÇUnstructured Item c_18_1
 
       CALL NLIRE(NX6, ITMTMA(IBT), LON, KER)                            0008
-ÉUnstructured Successor -> 0x83d68e8
-ÅUnstructured End 0x83d63c8 end: 0x83d0768
+ÉUnstructured Successor -> c_17_1
+ÅUnstructured End c_1_1 end: c_2_1
 
 C 1000 FORMAT (///,1X,'* ENTREE DANS CAMAT , DEBUT DU TRAITEMENT ',
 C     +        'DES DONNEES EN ',A4)

@@ -129,14 +129,14 @@ c=========================================================
       ETO11 = (SIG11/YOUNG+EVI11)*CT                                    0009
       DMOY = (DIAMINT+DIAMEXT)/DE                                       0010
       ETO12 = (SIG12*(UN+POISS)/YOUNG+EVI12)*CT*DIAMEXT/DMOY            0011
-€Unstructured 0x83c45b8 end: 0x83c3ba0
-‚Unstructured Item 0x83c45b8
+€Unstructured c_1_1 end: c_2_1
+‚Unstructured Item c_1_1
       IF (IFSIM.NE.1) THEN                                              0012
       ENDIF
-ƒUnstructured Successor -> 0x83c3ba0 0x83c4890
-‚Unstructured Item 0x83c3ba0
+ƒUnstructured Successor -> c_2_1 c_3_1
+‚Unstructured Item c_2_1
 ƒUnstructured Successor ->
-‚Unstructured Item 0x83c4890
+‚Unstructured Item c_3_1
       SIGMI = DSQRT(SIG11*SIG11+TR*SIG12*SIG12)                         0014
       SIGTR = DSQRT(SIG11*SIG11+QU*SIG12*SIG12)                         0015
       EVIMI = DSQRT(EVI11*EVI11+QU*EVI12*EVI12/TR)                      0016
@@ -157,6 +157,6 @@ C*        filsys=fichtest(itest)(1:lonfich)
 910         CONTINUE                                                    0027
          CLOSE (56)                                                     0028
       ENDIF
-ƒUnstructured Successor -> 0x83c3ba0
-Unstructured End 0x83c45b8 end: 0x83c3ba0
+ƒUnstructured Successor -> c_2_1
+Unstructured End c_1_1 end: c_2_1
       END
