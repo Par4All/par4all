@@ -63,7 +63,7 @@ EvalSyntax(syntax s)
     v = MakeValueUnknown();
     break;
   default:
-    fprintf(stderr, "[EvalExpression] Unexpected default case %td\n",
+    fprintf(stderr, "[EvalExpression] Unexpected default case %d\n",
 	    syntax_tag(s));
     abort();
   }

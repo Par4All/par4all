@@ -1703,6 +1703,9 @@ expression exp;
 	    rv = 0 - expression_to_int(EXPRESSION(CAR(call_arguments(c))));
 	    break;
 	}
+	default:
+	pips_error("expression_to_int",
+		   "expression is not an integer constant");
 	}
     }
     else if(expression_call_p(exp)) {
@@ -1731,7 +1734,7 @@ expression exp;
  * Note : A negative constant can be represented with a call to the unary
  *        minus intrinsic function upon a positive value.
  */
-bool 
+bool
 expression_constant_p(exp)
 expression exp;
 {
@@ -1746,11 +1749,13 @@ expression exp;
 	    if(ENTITY_UNARY_MINUS_P(call_function(c)))
 		return expression_constant_p
 		    (EXPRESSION(CAR(call_arguments(c))));
+	default:
+	  ;
 	}
     }
     return(FALSE);
 }
-bool 
+bool
 expression_one_p(expression exp)
 {
   bool one_p = FALSE;

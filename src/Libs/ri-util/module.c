@@ -158,7 +158,7 @@ variable_declaration_coherency_p(entity module, statement st)
 #define bool_undefined_p(b) ((b)==bool_undefined)
 #endif
 
-/* global summary of referenced variables. 
+/* global summary of referenced variables.
  * used to clean commons on the whole by hpfc...
  */
 GENERIC_GLOBAL_FUNCTION(referenced_variables, entity_int)
@@ -170,7 +170,7 @@ GENERIC_LOCAL_FUNCTION(declared_variables, entity_int)
 GENERIC_LOCAL_FUNCTION(referenced_variables_in_list, entity_int)
 static list /* of entity */ referenced_variables_list = NIL;
 
-static void 
+static void
 store_this_entity(entity var)
 {
     message_assert("defined entity", !entity_undefined_p(var));
@@ -178,15 +178,15 @@ store_this_entity(entity var)
     if (!bound_referenced_variables_in_list_p(var))
     {
 	storage s = entity_storage(var);
-	pips_debug(4, "new reference to %s (storage: %td)\n",
+	pips_debug(4, "new reference to %s (storage: %d)\n",
 		   entity_name(var), storage_tag(s));
-	referenced_variables_list = 
+	referenced_variables_list =
 	    CONS(ENTITY, var, referenced_variables_list);
 	store_or_update_referenced_variables(var, TRUE);
 	store_referenced_variables_in_list(var, TRUE);
 
-	if (storage_ram_p(s) && 
-           !bound_referenced_variables_in_list_p(ram_section(storage_ram(s)))) 
+	if (storage_ram_p(s) &&
+           !bound_referenced_variables_in_list_p(ram_section(storage_ram(s))))
 	{
 	    /* the COMMON is also marqued as referenced...
 	     * as well as its variables: one => all primary members...
@@ -195,9 +195,9 @@ store_this_entity(entity var)
 		common = ram_section(storage_ram(s)),
 		module = get_current_module_entity();
 	    store_this_entity(common);
-	    if (!SPECIAL_COMMON_P(common)) 
+	    if (!SPECIAL_COMMON_P(common))
             {
-                list /* of entity */ lc = 
+                list /* of entity */ lc =
                     common_members_of_module(common, module, TRUE);
 		MAP(ENTITY, e, store_this_entity(e), lc);
                 gen_free_list(lc);

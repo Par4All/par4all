@@ -17,6 +17,7 @@
 #include "ri-util.h"
 
 #include "properties.h"
+#include "preprocessor.h"
 
 bool 
 variable_entity_p(entity e)
@@ -216,12 +217,12 @@ make_new_scalar_variable_with_prefix(string prefix,
 				       buffer,
 				       NULL),
 			   entity_domain) != entity_undefined);
-   
-  pips_debug(9, "var %s, tag %td\n", buffer, basic_tag(b));
-   
+
+  pips_debug(9, "var %s, tag %d\n", buffer, basic_tag(b));
+
   e = make_scalar_entity(&buffer[0], module_name, b);
   AddEntityToDeclarations(e, module);
-   
+
   return e;
 }
 

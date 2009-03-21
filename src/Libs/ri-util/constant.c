@@ -186,11 +186,11 @@ Character constants are typed as int.
       bool lsuffix = (strchr(name, 'L') != NULL) || (strchr(name, 'l') != NULL);
       int basis = is_fortran? 10 : 0;
       char * error_string = string_undefined;
-      int64_t l = 0;
+      long long int l = 0;
       extern bool ParserError(string, string);
       extern void CParserError(string);
       int error_number = 0;
-      int (* conversion)(string, string *, int);
+      //int (* conversion)(string, string *, int);
 
       //pips_debug(8, "unsigned int suffix = %s, strspn = %d\n",
       //	 unsignedintsuffix, usuffix);
@@ -201,7 +201,7 @@ Character constants are typed as int.
 	usuffix = TRUE;
 	lsuffix = TRUE;
       }
-
+      /*
       if(usuffix)
 	if(lsuffix)
 	  conversion = (int (*)(string, string *, int)) strtoull;
@@ -212,23 +212,34 @@ Character constants are typed as int.
 	  conversion = (int (*)(string, string *, int)) strtoll;
 	else
 	  conversion = (int (*)(string, string *, int)) strtol;
+      */
 
+      errno = 0;
+      if(usuffix)
+	if(lsuffix)
+	  l = strtoull(name, &error_string, basis);
+	else
+	  l = strtoul(name, &error_string, basis);
+      else
+	if(lsuffix)
+	  l = strtoll(name, &error_string, basis);
+	else
+	  l = strtol(name, &error_string, basis);
+      error_number = errno;
+      /* %ld, long; %zd, size_t; %td, ptrdiff_t */
+      pips_debug(8, "value = %lld, errno=%d\n", l, error_number);
+      errno = 0;
+
+      /* Since the value is stored in a NewGen int that has the size of a
+	 pointer, verify is is OK to store it. In should not assume
+	 this... */
       if(size==4) { // 32 bit target machine
-	errno = 0;
-	l = (int64_t) conversion(name, &error_string, basis);
-	error_number = errno;
-	/* %ld, long; %zd, size_t; %td, ptrdiff_t */
-	pips_debug(8, "value = %lld, errno=%d\n", l, error_number);
-	errno = 0;
-      }
+	// Well, no problem...
+     }
       else if(size==8) {
 	pips_assert("pointers have the right size", sizeof(void *)==8);
-	errno = 0;
-	l = (int64_t) conversion(name, &error_string, basis);
-	error_number = errno;
-	errno = 0;
       }
-      else 
+      else
 	pips_internal_error("Unexpected number of bytes for an integer variable\n");
 
       pips_assert("Integer constants are internally stored on 4 or 8 bytes",
@@ -237,7 +248,7 @@ Character constants are typed as int.
       if(error_number==EINVAL) {
 	pips_user_warning("Integer constant '%s' cannot be converted in %d bytes (%s)\n",
 			  name, size, error_string);
-	if(is_fortran) 
+	if(is_fortran)
 	  ParserError("make_constant_entity",
 		      "Integer constant conversion error\n");
 	else

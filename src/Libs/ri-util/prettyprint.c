@@ -3503,7 +3503,7 @@ text_named_module(
       /* No need to print TAIL (}) if the current module is a C compilation unit*/
       ADD_SENTENCE_TO_TEXT(r, sentence_tail());
     }
-  
+
   if(!get_bool_property("PRETTYPRINT_FINAL_RETURN"))
     reset_last_statement();
 
@@ -3523,20 +3523,33 @@ text text_graph(), text_control() ;
 string control_slabel() ;
 
 
+/* The node itentifiers are generated from the ordering, more stable than
+   the control node address: */
+void
+add_control_node_identifier_to_text(text r, control c) {
+  _int so = statement_ordering(control_statement(c));
+  add_one_unformated_printf_to_text(r, "c_%d_%d",
+				    ORDERING_NUMBER(so),
+				    ORDERING_STATEMENT(so));
+}
+
 void
 output_a_graph_view_of_the_unstructured_successors(text r,
                                                    entity module,
                                                    int margin,
                                                    control c)
-{                  
-   add_one_unformated_printf_to_text(r, "%s %p\n",
-                                     PRETTYPRINT_UNSTRUCTURED_ITEM_MARKER,
-                                     c);
+{
+   _int so = statement_ordering(control_statement(c));
+   add_one_unformated_printf_to_text(r, "%s ",
+                                     PRETTYPRINT_UNSTRUCTURED_ITEM_MARKER);
+   add_control_node_identifier_to_text(r, c);
+   add_one_unformated_printf_to_text(r, "\n");
 
    if (get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH_VERBOSE")) {
       add_one_unformated_printf_to_text(r, "C Unstructured node %p ->", c);
       MAP(CONTROL, a_successor,
-	  add_one_unformated_printf_to_text(r," %p", a_successor),
+	  so = statement_ordering(control_statement(a_successor));
+	  add_one_unformated_printf_to_text(r, " %p", a_successor),
 	  control_successors(c));
       add_one_unformated_printf_to_text(r,"\n");
    }
@@ -3549,8 +3562,9 @@ output_a_graph_view_of_the_unstructured_successors(text r,
                                      PRETTYPRINT_UNSTRUCTURED_SUCC_MARKER);
    MAP(CONTROL, a_successor,
        {
-          add_one_unformated_printf_to_text(r," %p", a_successor);
-       },
+          add_one_unformated_printf_to_text(r, " ");
+	  add_control_node_identifier_to_text(r, a_successor);
+      },
           control_successors(c));
    add_one_unformated_printf_to_text(r,"\n");
 }
@@ -3565,7 +3579,7 @@ output_a_graph_view_of_the_unstructured_from_a_control(text r,
 {
    bool exit_node_has_been_displayed = FALSE;
    list blocs = NIL;
-   
+
    CONTROL_MAP(c,
                {
                   /* Display the statements of each node followed by
@@ -3596,17 +3610,20 @@ output_a_graph_view_of_the_unstructured(text r,
    control begin_control = unstructured_control(u);
    control end_control = unstructured_exit(u);
 
-   add_one_unformated_printf_to_text(r, "%s %p end: %p\n",
-                                     PRETTYPRINT_UNSTRUCTURED_BEGIN_MARKER,
-                                     begin_control,
-                                     end_control);
+   add_one_unformated_printf_to_text(r, "%s ",
+                                     PRETTYPRINT_UNSTRUCTURED_BEGIN_MARKER);
+   add_control_node_identifier_to_text(r, begin_control);
+   add_one_unformated_printf_to_text(r, " end: ");
+   add_control_node_identifier_to_text(r, end_control);
+   add_one_unformated_printf_to_text(r, "\n");
+
    exit_node_has_been_displayed =
       output_a_graph_view_of_the_unstructured_from_a_control(r,
                                                              module,
                                                              margin,
                                                              begin_control,
                                                              end_control);
-   
+
    /* If we have not displayed the exit node, that mean that it is not
       connex with the entry node and so the code is
       unreachable. Anyway, it has to be displayed as for the classical
@@ -3626,20 +3643,24 @@ output_a_graph_view_of_the_unstructured(text r,
          control above is semantically related to the entry node. Add
          a dash arrow from the entry node to the exit node in daVinci,
          for example: */
-      add_one_unformated_printf_to_text(r, "%s %p -> %p\n",
-                                        PRETTYPRINT_UNREACHABLE_EXIT_MARKER,
-                                        begin_control,
-                                        end_control);
+      add_one_unformated_printf_to_text(r, "%s ",
+                                        PRETTYPRINT_UNREACHABLE_EXIT_MARKER);
+      add_control_node_identifier_to_text(r, begin_control);
+      add_one_unformated_printf_to_text(r, " -> ");
+      add_control_node_identifier_to_text(r, end_control);
+      add_one_unformated_printf_to_text(r, "\n");
       if (get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH_VERBOSE"))
-	  add_one_unformated_printf_to_text(r, "C Unreachable exit node (%p -> %p)\n",
-					    begin_control,
-					    end_control);
+	add_one_unformated_printf_to_text(r, "C Unreachable exit node (%p -> %p)\n",
+					  begin_control,
+					  end_control);
   }
-   
-   add_one_unformated_printf_to_text(r, "%s %p end: %p\n",
-                                     PRETTYPRINT_UNSTRUCTURED_END_MARKER,
-                                     begin_control,
-                                     end_control);
+
+  add_one_unformated_printf_to_text(r, "%s ",
+				    PRETTYPRINT_UNSTRUCTURED_END_MARKER);
+  add_control_node_identifier_to_text(r, begin_control);
+  add_one_unformated_printf_to_text(r, " end: ");
+  add_control_node_identifier_to_text(r, end_control);
+  add_one_unformated_printf_to_text(r, "\n");
 }
 
 

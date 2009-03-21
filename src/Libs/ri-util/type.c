@@ -1216,7 +1216,7 @@ basic_maximum(basic fb1, basic fb2)
 
   /* FI: I do not believe this is correct for all intrinsics! */
 
-  pips_debug(7, "Tags: tag exp1 = %td, tag exp2 = %td\n",
+  pips_debug(7, "Tags: tag exp1 = %d, tag exp2 = %d\n",
 	     basic_tag(b1), basic_tag(b2));
 
 
@@ -1230,7 +1230,7 @@ basic_maximum(basic fb1, basic fb2)
       b = copy_basic(b1);
       break;
 
-    case is_basic_string: 
+    case is_basic_string:
       if(basic_string_p(b2)) {
 	int s1 = SizeOfElements(b1);
 	int s2 = SizeOfElements(b2);
@@ -1454,12 +1454,12 @@ basic b1, b2;
     return (TRUE);
 }
 
-basic 
+basic
 simple_basic_dup(basic b)
 {
     /* basic_int, basic_float, basic_logical, basic_complex are all int's */
     /* so we duplicate them the same manner: with basic_int. */
-    if (basic_int_p(b)     || basic_float_p(b) || 
+    if (basic_int_p(b)     || basic_float_p(b) ||
 	basic_logical_p(b) || basic_complex_p(b))
 	return(make_basic(basic_tag(b), UUINT(basic_int(b))));
     else if (basic_overloaded_p(b))
@@ -1468,7 +1468,7 @@ simple_basic_dup(basic b)
 	user_warning("simple_basic_dup",
 		     "(tag %td) isn't that simple\n", basic_tag(b));
 	if (basic_string_p(b))
-	    fprintf(stderr, "string: value tag = %td\n", 
+	    fprintf(stderr, "string: value tag = %d\n",
 		             value_tag(basic_string(b)));
 	return make_basic(basic_tag(b), UUINT(basic_int(b)));
     }

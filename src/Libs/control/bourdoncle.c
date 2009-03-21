@@ -1482,7 +1482,7 @@ static unstructured scc_to_dag(control root, list partition, hash_table ancestor
 	  copy_dfn(new_c1, c);
 
 	  pips_debug(4, "Allocate new input control node new_c1=%p"
-		     " as a copy of node %p with depth %d\n",
+		     " as a copy of node %p with depth %td\n",
 		     new_c1, c, get_dfn(c));
 	  
 	  /* Keep only predecessors out of partition for new_c1. */
