@@ -43,7 +43,7 @@ output_statement_buffer = []
 newline_re = re.compile("\n")
 
 def protect_newline(text):
-    "Transform all the newline into texto \n"
+    "Transform all the newline into tex to \n"
     return newline_re.sub("\\n", text)
 
 def keep_for_output(text):
@@ -68,12 +68,18 @@ def set_attribute(graphic_object, attribute, value):
 
 this_is_the_unstructured_entry_p = False
 
+def left_justify (label):
+  nl_re=  re.compile("\\\\n")
+  label_left_justified = nl_re.sub("\\l", label)
+  label_left_justified += "\\l"
+  return label_left_justified
+
 def add_a_node(node, label, comment = " "):
   graph.add_node(node)
   n = graph.get_node (node)
   if (label==''):
       label = " "
-  n.attr['label'] = label
+  n.attr['label']   = left_justify (label)
   n.attr['comment'] = comment
   if (node_number == 0): set_attribute(n, "color", "yellow")
   return n

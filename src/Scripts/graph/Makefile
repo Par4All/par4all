@@ -10,7 +10,7 @@ SCRIPTS = \
 	pips_graph2daVinci \
 	pips_unstructured2daVinci \
 	pips_unstructured2dot \
-	display_pips_graph
+	pips_graph_display
 
 INSTALL_UTL =	$(SCRIPTS)
 
