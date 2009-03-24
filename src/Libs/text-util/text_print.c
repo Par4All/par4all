@@ -242,14 +242,14 @@ print_sentence(FILE * fd,
 	/* statement line number starts at different column depending on */
 	/* the used language : C or fortran                              */
 	unsigned int column_start = 0;
-	if (get_bool_property("PRETTYPRINT_C_CODE")) {
+	if (prettyprint_is_fortran) {
+	  /* fortran case */
+	  column_start = MAX_END_COLUMN;
+	} else {
 	  /* C case */
 	  column_start = C_STATEMENT_LINE_COLUMN;
 	  while (column_start <= col) 
 	    column_start += C_STATEMENT_LINE_STEP;
-	} else {
-	  /* fortran case */
-	  column_start = MAX_END_COLUMN;
 	}
 	/* Output the statement line number on the right end of the
            line: */
