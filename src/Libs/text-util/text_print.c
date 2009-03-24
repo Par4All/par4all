@@ -72,6 +72,8 @@ fprintf_sentence(FILE * fd,
 
 #define MAX_END_COLUMN 		(72)
 #define MAX_START_COLUMN 	(42)
+#define C_STATEMENT_LINE_COLUMN (71)
+#define C_STATEMENT_LINE_STEP   (15)
 
 void
 print_sentence(FILE * fd,
@@ -129,14 +131,14 @@ print_sentence(FILE * fd,
 	for (i = 0; i < em; i++) 
 	    putc_sentence(' ', fd);
 	
-	col = 7+em;
+	col = em + (get_bool_property("PRETTYPRINT_C_CODE")? 0 : 7);
 	
 	pips_assert("not too many columns", col <= MAX_END_COLUMN);
 	
 	MAP(STRING, w,
 	{
 	  if (get_bool_property("PRETTYPRINT_C_CODE"))
-	    fprintf_sentence(fd, "%s", w);
+	    col += fprintf_sentence(fd, "%s", w);
 	  else {
 	    
 	    /* if the string fits on the current line: no problem */
@@ -234,12 +236,25 @@ print_sentence(FILE * fd,
 	    lw);
 
 	pips_debug(9, "line completed, col=%d\n", col);
-	pips_assert("not too many columns", col <= MAX_END_COLUMN+1);
+	if (!get_bool_property("PRETTYPRINT_C_CODE"))
+	  pips_assert("not too many columns", col <= MAX_END_COLUMN+1);
 
+	/* statement line number starts at different column depending on */
+	/* the used language : C or fortran                              */
+	unsigned int column_start = 0;
+	if (get_bool_property("PRETTYPRINT_C_CODE")) {
+	  /* C case */
+	  column_start = C_STATEMENT_LINE_COLUMN;
+	  while (column_start <= col) 
+	    column_start += C_STATEMENT_LINE_STEP;
+	} else {
+	  /* fortran case */
+	  column_start = MAX_END_COLUMN;
+	}
 	/* Output the statement line number on the right end of the
            line: */
 	if (n > 0 && get_bool_property("PRETTYPRINT_STATEMENT_NUMBER")) {
-	    for (i = col; i <= MAX_END_COLUMN; i++) 
+	    for (i = col; i <= column_start; i++) 
 		putc_sentence(' ', fd);
 	    fprintf_sentence(fd,  prettyprint_is_fortran? "%04d" : "/*%04d*/", n);
 	}
