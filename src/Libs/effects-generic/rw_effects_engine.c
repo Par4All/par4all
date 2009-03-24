@@ -583,6 +583,10 @@ static void rw_effects_of_sequence(sequence seq)
 static bool rw_effects_stmt_filter(statement s)
 {
     pips_debug(1, "Entering statement %03zd :\n", statement_ordering(s));
+    ifdebug(4) {
+      
+      print_statement(s);
+    }
     effects_private_current_stmt_push(s);
     return(TRUE);
 }

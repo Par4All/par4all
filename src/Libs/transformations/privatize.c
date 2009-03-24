@@ -269,6 +269,11 @@ try_privatize(vertex v, statement st, effect f, entity e)
 {
     cons *ls ;
 
+    /* BC : really dirty : overrides problems in the computation of effects 
+       for C programs; Should be fixed later. */
+    if (anywhere_effect_p(f))
+      {return;}
+
     if( !entity_scalar_p( e )) {
 	return ;
     }
@@ -382,9 +387,19 @@ bool privatize_module(char *mod_name)
 	dg_vertex_label vl = (dg_vertex_label) vertex_vertex_label( v ) ;
 	statement st = 
 	    ordering_to_statement(dg_vertex_label_statement(vl));
+	
+	pips_debug(1, "Entering statement %03zd :\n", statement_ordering(st));
+	ifdebug(4) {
+      
+	  print_statement(st);
+	}
 	       
 	MAP(EFFECT, f, {
 	    entity e = effect_entity( f ) ;
+	    ifdebug(4) {
+	      pips_debug(1, "effect :");
+	      print_effect(f);
+	    }
 	    if( action_write_p( effect_action( f ))) {
 		try_privatize( v, st, f, e ) ;
 	    }
