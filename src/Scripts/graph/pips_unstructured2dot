@@ -20,7 +20,7 @@ THEN_ELSE_BOX_SHAPE = "triangle"
 UNREACHABLE_NODE_COLOR="red"
 UNSTRUCTURED_ENTRY_POINT_COLOR="green"
 UNSTRUCTURED_EXIT_POINT_COLOR="orange"
-MODULE_ENTRY_POINT="yellow"
+MODULE_ENTRY_POINT_COLOR="yellow"
 THEN_EDGE_COLOR="red"
 ELSE_EDGE_COLOR="blue"
 THEN_BOX_COLOR="pink"
@@ -81,7 +81,7 @@ def add_a_node(node, label, comment = " "):
       label = " "
   n.attr['label']   = left_justify (label)
   n.attr['comment'] = comment
-  if (node_number == 0): set_attribute(n, "color", "yellow")
+  if (node_number == 0): set_attribute(n, "color", MODULE_ENTRY_POINT_COLOR)
   return n
 
 remove_leading_blank_lines_re = re.compile("^([ \\t]*\\\\n)+")
