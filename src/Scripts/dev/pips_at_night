@@ -56,9 +56,9 @@ do
     --source-directory=*) sdir=${opt#*=} ;;
     # validation directories
     -nv|--no-validate) valids= ;;
-    -v|--validate) valids+=" validation" ;;
-    -av|--add-validation) valids+=" $1" ; shift ;;
-    --add-validation=*) valids+=" ${opt#*=}" ;;
+    -v|--validate) valids="$valids validation" ;;
+    -av|--add-validation) valids="$valids $1" ; shift ;;
+    --add-validation=*) valids="$valids ${opt#*=}" ;;
     # help
     -h|--help) err 'display help message' 0 ;;
     *) err "unexpected option '$opt'" 1 ;;
