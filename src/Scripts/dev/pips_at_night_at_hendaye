@@ -1,0 +1,61 @@
+#! /bin/bash
+#
+# $Id$
+#
+# what to do at night from the irigoin account on hendaye
+#
+
+umask 0077
+
+[[ $(hostname -f) = 'hendaye.cri.ensmp.fr' ]] || {
+  echo "script must run on hendaye, but $(hostname) found" >&2
+  exit 1
+}
+
+email=irigoin@cri.ensmp.fr
+target=/home/local/irigoin/NIGHTY
+
+# set environment...
+test -f $target/pipsrc.sh && source $target/pipsrc.sh
+
+start=$(date)
+
+# use a copy of the 'pips_at_night' script:
+# the script may be removed by 'unbuild'
+pips_at_night=$target/pan
+cp $target/prod/pips/src/Scripts/dev/pips_at_night $pips_at_night
+chmod a+rx $pips_at_night
+
+$pips_at_night -t $target -m $email -u -b -v -av private "$@" > out.$$ 2> err.$$
+status=$?
+
+if [ $status -ne 0 ] ; then
+  result="failed ($status)"
+else
+  result='succeeded'
+fi
+
+mv out.$$ $target/out
+mv err.$$ $target/err
+
+end=$(date)
+
+{
+  echo "target=$target"
+  echo "host=$(hostname)"
+  echo "arch=$PIPS_ARCH"
+  echo "out=$target/out"
+  echo "err=$target/err"
+  echo "email=$email"
+  echo "start=$start"
+  echo "end=$end"
+  echo "result=$result"
+  echo
+  echo "software revisions used in this night job:"
+  echo "pips: $(svnversion $target/prod/pips)"
+  echo "newgen: $(svnversion $target/prod/newgen)"
+  echo "linear: $(svnversion $target/prod/linear)"
+  echo "nlpmake: $(svnversion $target/prod/pips/makes)"
+  echo "validation: $(svnversion $target/validation)"
+  echo "private: $(svnversion $target/private)"
+} | ${PIPS_MAIL:-Mail} -s "[pips] hendaye night job $result" $email
