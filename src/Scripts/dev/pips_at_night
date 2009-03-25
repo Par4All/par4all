@@ -17,12 +17,13 @@ function err()
 download=
 update=
 compile=
-validate=
+valids=
 # The default options for the validation:
 vopt="VOPT=--archive --diff"
 
 # where to do it by default
 target=~/PIPS
+sdir=prod
 
 setup='http://svn.cri.ensmp.fr/svn/nlpmake/trunk/makes/setup_pips.sh'
 
@@ -36,7 +37,6 @@ do
   esac
 
   case $opt in
-    -t|--target) target=$1 ; shift ;;
     -m|--mail) vopt="$vopt -m $1" ; shift ;;
     # what to do
     -d|--download) download=1 ;;
@@ -45,9 +45,19 @@ do
     -nu|--no-update) update= ;;
     -c|--compile) compile=recompile ;;
     -fc|--full-compile) compile=full-compile ;;
+    -bc|--build) compile=build ;;
     -nc|--no-compile) compile= ;;
-    -v|--validate) validate=1 ;;
-    -nv|--no-validate) validate= ;;
+    # where to do it
+    -t|--target) target=$1 ; shift ;;
+    --target=*) target=${opt#*=} ;;
+    # subdirectory within $target where the sources are
+    -sd|--source-directory) sdir=$1 ; shift ;;
+    --source-directory=*) sdir=${opt#*=} ;;
+    # validation directories
+    -nv|--no-validate) valids= ;;
+    -v|--validate) valids+=" validation" ;;
+    -av|--add-validation) valids+=" $1" ; shift ;;
+    --add-validation=*) valids+=" ${opt#*=}" ;;
     # help
     -h|--help) err 'display help message' 0 ;;
     *) err "unexpected option '$opt'" 1 ;;
@@ -63,41 +73,47 @@ then
   # full download
   wget --no-directories --no-verbose $setup
   # should be silent?
-  sh ./setup_pips.sh $target
+  chmod u+rx ./setup_pips.sh
+  ./setup_pips.sh $target
 elif [[ $update ]]
 then
   test -d $target || err "no target directory: $target" 2
   pushd $target
-  svn update prod validation
+  svn update $sdir $valids
   test $? -ne 0 && err "svn update failed" 5
   popd
 else
-    echo '### no download, no update'
+    echo '### no download, no update...'
 fi
 
 # use this PIPS
 test -d $target || err "no target directory: $target" 3
+#export NEWGEN_ROOT=$target/$sdir/newgen
+#export LINEAR_ROOT=$target/$sdir/linear
+#export PIPS_ROOT=$target/$sdir/pips
+test -f $target/pipsrc.sh || err "no pipsrc.sh file in $target" 7
 source $target/pipsrc.sh
+
+# check for *_ROOT variables? set them? rely on pipsrc.sh?
 
 if [[ $compile && ! $download ]]
 then
-  pushd $target
+  pushd $target/$sdir
+  make unbuild
 
-  cd prod/newgen
-  make clean $compile
+  cd newgen
+  make -j1 $compile
 
   cd ../linear
-  make clean $compile
+  make -j1 $compile
 
   cd ../pips
-  rm -rf bin/$PIPS_ARCH lib/$PIPS_ARCH
-  make clean $compile
+  make -j1 $compile
 
   if [ -f bin/$PIPS_ARCH/tpips ]
   then
     echo "### recompilation succeeded"
   else
-    validate=
     err "recompilation failed, no tpips" 6
   fi
   popd
@@ -105,14 +121,20 @@ else
   echo '### no compile'
 fi
 
-if [[ $validate ]]
-then
-  pushd $target/validation
-  make clean
-  make "$vopt" validate
-  popd
+if [[ $valids ]] ; then
+  echo '### no validation...'
 else
-  echo '### no validate'
+  for d in $valids ; do
+    if [[ -d $target/$d/. ]] ; then
+      echo "### validating $d"
+      pushd $target/$d
+      make clean
+      make "$vopt" validate
+      popd
+    else
+      echo "### skipping validation $d, no such directory"
+    fi
+  done
 fi
 
 exit 0
