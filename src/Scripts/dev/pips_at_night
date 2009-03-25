@@ -123,8 +123,6 @@ else
 fi
 
 if [[ $valids ]] ; then
-  echo '### no validation...'
-else
   for d in $valids ; do
     if [[ -d $target/$d/. ]] ; then
       echo "### validating $d"
@@ -136,6 +134,8 @@ else
       echo "### skipping validation $d, no such directory"
     fi
   done
+else
+  echo '### no validation...'
 fi
 
 exit 0
