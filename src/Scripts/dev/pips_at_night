@@ -45,7 +45,7 @@ do
     -nu|--no-update) update= ;;
     -c|--compile) compile=recompile ;;
     -fc|--full-compile) compile=full-compile ;;
-    -bc|--build) compile=build ;;
+    -b|--build) compile=build ;;
     -nc|--no-compile) compile= ;;
     # where to do it
     -t|--target) target=$1 ; shift ;;
