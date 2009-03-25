@@ -113,7 +113,7 @@ property_equal_p(property p1, property p2)
             equal_p = (strcmp(property_string(p1),property_string(p2))==0);
             break;
         default:
-	    error("illegal tag %td\n", property_tag(p1));
+	    error("illegal tag %d\n", property_tag(p1));
         }
     }
 

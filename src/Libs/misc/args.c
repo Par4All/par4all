@@ -1,6 +1,6 @@
 /* $Id$
  *
- * there was some static buffer management here. 
+ * there was some static buffer management here.
  * now it relies on dynamic arrays.
  */
 #include <stdlib.h>
@@ -34,7 +34,7 @@ void
 sort_list_of_strings(list l)
 {
     size_t number_of_strings = gen_length(l);
-    gen_array_t a = gen_array_make(number_of_strings); 
+    gen_array_t a = gen_array_make(number_of_strings);
     list_to_array(l, a);
     pips_assert("same length", number_of_strings == gen_array_nitems(a));
     gen_array_sort(a);

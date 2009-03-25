@@ -804,8 +804,9 @@ bool rmake(string rname, string oname)
     
     return TRUE;
 }
-    
-    static bool apply(string pname, string oname)
+
+
+static bool apply(string pname, string oname)
 {
     bool success_p = TRUE;
 
@@ -824,6 +825,7 @@ bool rmake(string rname, string oname)
     return success_p;
 }
 
+
 static bool concurrent_apply(
     string pname,       /* phase to be applied */
     gen_array_t modules /* modules that must be computed */)
@@ -836,18 +838,27 @@ static bool concurrent_apply(
     save_active_phases();
 
     GEN_ARRAY_MAP(oname,
-		  if (!make_pre_transformation(oname, ru)) { okay = FALSE; break; },
+		  if (!make_pre_transformation(oname, ru)) {
+		    okay = FALSE;
+		    break;
+		  },
 		  modules);
 
     if (okay) {
 	GEN_ARRAY_MAP(oname,
-		      if (!make_required(oname, ru)) { okay = FALSE; break; },
+		      if (!make_required(oname, ru)) {
+			okay = FALSE;
+			break;
+		      },
 		      modules);
     }
 
     if (okay) {
-	GEN_ARRAY_MAP(oname, 
-		      if (!apply_a_rule(oname, ru)) { okay = FALSE; break; },
+	GEN_ARRAY_MAP(oname,
+		      if (!apply_a_rule(oname, ru)) {
+			okay = FALSE;
+			break;
+		      },
 		      modules);
     }
 
@@ -1271,8 +1282,8 @@ static void logs_off(void)
 }
 
 static bool safe_do_something(
-    string name, 
-    string module_n, 
+    string name,
+    string module_n,
     string what_it_is,
     rule (*find_rule)(string),
     bool (*doit)(string,string))
@@ -1296,16 +1307,16 @@ static bool safe_do_something(
 	reset_static_phase_variables();
 	retrieve_active_phases();
 	pips_user_warning("Request aborted in pipsmake: "
-			  "build %s %s for module %s.\n", 
+			  "build %s %s for module %s.\n",
 			  what_it_is, name, module_n);
 	db_clean_all_required_resources();
 	success = FALSE;
     }
     TRY
     {
-	user_log("Request: build %s %s for module %s.\n", 
+	user_log("Request: build %s %s for module %s.\n",
 		 what_it_is, name, module_n);
-	
+
 	logs_on();
 	pips_malloc_debug();
 
@@ -1313,15 +1324,15 @@ static bool safe_do_something(
 	 */
 	success = doit(name, module_n);
 
-	if(success) 
+	if(success)
 	{
 	    user_log("%s made for %s.\n", name, module_n);
 	    logs_off();
 	}
-	else 
+	else
 	{
 	    pips_user_warning("Request aborted under pipsmake: "
-			      "build %s %s for module %s.\n", 
+			      "build %s %s for module %s.\n",
 			      what_it_is, name, module_n);
 	}
 	UNCATCH(any_exception_error);
@@ -1343,13 +1354,16 @@ bool safe_apply(string phase_n, string module_n)
 }
 
 bool safe_concurrent_apply(
-    string phase_n, 
+    string phase_n,
     gen_array_t modules)
 {
     bool ok = TRUE;
     debug_on("PIPSMAKE_DEBUG_LEVEL");
 
-    if (find_rule_by_phase(phase_n)==rule_undefined) 
+    /* Get a human being representation of the modules: */
+    string module_list = strdup(string_array_join(modules, ","));
+
+    if (find_rule_by_phase(phase_n)==rule_undefined)
     {
 	pips_user_warning("Unknown phase \"%s\"\n", phase_n);
 	ok = FALSE;
@@ -1366,22 +1380,27 @@ bool safe_concurrent_apply(
       TRY
       {
 	logs_on();
-	
+
+	user_log("Request: capply %s for module [%s].\n",
+		 phase_n, module_list);
+
 	ok = concurrent_apply(phase_n, modules);
-	
-	if (ok)
-	{
-	  logs_off();
+
+	if (ok)	{
+	    user_log("capply %s made for [%s].\n", phase_n, module_list);
+	    logs_off();
 	}
-	else
-	{
-	  pips_user_warning("Request aborted under pipsmake\n");
+	else {
+	  pips_user_warning("Request aborted under pipsmake: "
+			    "capply %s for module [%s].\n",
+			    phase_n, module_list);
 	}
 
 	UNCATCH(any_exception_error);
       }
     }
 
+    free(module_list);
     debug_off();
     return ok;
 }

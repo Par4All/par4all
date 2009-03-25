@@ -253,7 +253,7 @@ list comp_regions_of_instruction(instruction i, transformer t_inst, transformer 
       break;
       /* }}} */
       default:
-          pips_debug(3, "unexpected tag %td\n", instruction_tag(i));
+          pips_debug(3, "unexpected tag %d\n", instruction_tag(i));
       /* }}} */
     }
     

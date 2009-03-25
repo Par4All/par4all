@@ -40,6 +40,7 @@ static int number_of_restructured_if_then;
 static int number_of_restructured_if_else;
 static int number_of_restructured_if_then_else;
 static int number_of_restructured_null_if;
+static int number_of_recovered_do_while;
 static int number_of_recovered_while;
 
 
@@ -50,6 +51,7 @@ initialize_unspaghettify_statistics()
     number_of_restructured_if_else = 0;
     number_of_restructured_if_then_else = 0;
     number_of_restructured_null_if = 0;
+    number_of_recovered_do_while = 0;
     number_of_recovered_while = 0;
 }
 
@@ -61,6 +63,7 @@ total_number_of_restructurations() {
     + number_of_restructured_if_else
     + number_of_restructured_if_then_else
     + number_of_restructured_null_if
+    + number_of_recovered_do_while
     + number_of_recovered_while;
 }
 
@@ -87,10 +90,12 @@ display_unspaghettify_statistics()
 		     number_of_restructured_if_else,
 		     number_of_restructured_null_if);
 	}
-	if (number_of_recovered_while != 0) {
-	  user_log("%d structured while%s %s been recovered.\n",
+	if ((number_of_recovered_do_while + number_of_recovered_while) != 0) {
+	  user_log("%d structured \"do ... while()\" %s been recovered.\n",
+		   number_of_recovered_do_while,
+		   number_of_recovered_do_while > 1 ? "have" : "has");
+	  user_log("%d structured \"while() ...\" %s been recovered.\n",
 		   number_of_recovered_while,
-		   number_of_recovered_while > 1 ? "s" : "",
 		   number_of_recovered_while > 1 ? "have" : "has");
 	}
     }
@@ -1176,6 +1181,7 @@ recover_structured_while(unstructured u) {
     /* Relink the remaining nodes in sequence, to be fused later somewhere
        else: */
     link_2_control_nodes(entry_node, exit_node);
+    number_of_recovered_do_while++;
     break;
 
   case 2: {
@@ -1272,6 +1278,7 @@ recover_structured_while(unstructured u) {
     /* Other restructuring is applied afterwards to replace the
        unstructured by a simple statement, the entry and the exit are
        still linked into a lazy sequence. */
+    number_of_recovered_while++;
     break;
   }
   default:
@@ -1281,7 +1288,6 @@ recover_structured_while(unstructured u) {
   // If we land here, the restructuring has taken place above...
   /* Increase the statistics. Used to rerun a restrustructuring shot after
      a modification too: */
-  number_of_recovered_while++;
   ifdebug (3) {
     pips_debug(2, "After while recovering, from the entry node:\n");
     display_linked_control_nodes(unstructured_control(u));
@@ -1349,8 +1355,6 @@ unspaghettify_or_restructure_statement(statement mod_stmt)
       gen_recurse(mod_stmt, unstructured_domain,
 		  gen_true, recover_structured_while);
 
-    display_unspaghettify_statistics();
-
     /* End by removing parasitic sequences: */
     clean_up_sequences(mod_stmt);
 
@@ -1360,6 +1364,8 @@ unspaghettify_or_restructure_statement(statement mod_stmt)
     /* If something changed, retry further restructuring: */
     nr = total_number_of_restructurations();
   } while (nr != old_nr);
+
+  display_unspaghettify_statistics();
 
   pips_debug(2, "done\n");
   debug_off();

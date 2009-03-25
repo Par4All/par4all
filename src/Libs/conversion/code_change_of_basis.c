@@ -121,7 +121,7 @@ Pbase base_oldindex;
     
     e_old_norm = NORMALIZE_EXPRESSION(e_old);
 
-    pips_debug(8, "tag=%td\n", normalized_tag(e_old_norm));
+    pips_debug(8, "tag=%d\n", normalized_tag(e_old_norm));
     ifdebug(9) {
 	pips_debug(9, "considering expression %p:\n", e_old);
 	print_expression(e_old);
