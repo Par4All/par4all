@@ -162,5 +162,27 @@ list_from_gen_array(gen_array_t a)
 }
 
 
+/* Join a string array with a string separator.
 
+   @param array is the string array
+   @param separator is the string separator
 
+   @return a string in a concatenate buffer, so it needs to be strdup()ed
+   quickly if it is expected to last some time in the caller...
+
+   It is similar to the join() string method in Python. Using the function
+   with ["foo", "bar", "daurade"] and "," should return the string
+   "foo,bar,daurade".
+*/
+string string_array_join(gen_array_t array, string separator) {
+  string join = "";
+  boolean first_iteration = TRUE;
+
+  GEN_ARRAY_MAP(s, {
+      if (! first_iteration)
+	join = concatenate(join, separator, NULL);
+      join = concatenate(join, (string) s, NULL);
+    }, array);
+
+  return join;
+}

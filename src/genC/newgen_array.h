@@ -25,6 +25,7 @@ void gen_array_sort_with_cmp(gen_array_t, int (*)(const void *, const void *));
 
 gen_array_t gen_array_from_list(list);
 list list_from_gen_array(gen_array_t);
+string string_array_join(gen_array_t array, string separator);
 
 #define GEN_ARRAY_MAP(s, code, array)			\
   {							\
