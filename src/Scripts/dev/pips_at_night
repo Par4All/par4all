@@ -16,6 +16,7 @@ function err()
 # what to do
 download=
 update=
+clean=clean
 compile=
 valids=
 # The default options for the validation:
@@ -45,7 +46,7 @@ do
     -nu|--no-update) update= ;;
     -c|--compile) compile=recompile ;;
     -fc|--full-compile) compile=full-compile ;;
-    -b|--build) compile=build ;;
+    -b|--build) compile=build ; clean=unbuild ;;
     -nc|--no-compile) compile= ;;
     # where to do it
     -t|--target) target=$1 ; shift ;;
@@ -99,7 +100,7 @@ source $target/pipsrc.sh
 if [[ $compile && ! $download ]]
 then
   pushd $target/$sdir
-  make unbuild
+  make $clean
 
   cd newgen
   make -j1 $compile
