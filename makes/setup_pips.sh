@@ -6,10 +6,9 @@
 # Setup a basic pips installation from scratch
 #
 
-# for those who try: sh setup_pips.sh
-[ $_ != '/bin/bash' ] && {
-  echo "ERROR: script $0 to be interpreted by /bin/bash, got $_" >&2
-  exit 1
+[ "$BASH_VERSION" ] || {
+   echo "ERROR: script $0 to be interpreted with bash" >&2
+   exit 1
 }
 
 # where to get pips
