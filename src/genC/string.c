@@ -134,17 +134,18 @@ void init_the_buffer(void)
    wrong assertion is some higher parts of the code... */
 string append_to_the_buffer(string s /* what to append to the buffer */)
 {
-  if (s != string_undefined) {
+  if (s != string_undefined)
+  {
     size_t len = strlen(s);
 
     /* reallocates if needed
      */
     if (current+len >= buffer_size)
     {
-		buffer_size = MAX(current+len+1, 
-						  buffer_size+BUFFER_SIZE_INCREMENT);
-		buffer = realloc(buffer, buffer_size);
-		message_assert("enough memory", buffer);
+      buffer_size = MAX(current+len+1,
+			buffer_size+BUFFER_SIZE_INCREMENT);
+      buffer = realloc(buffer, buffer_size);
+      message_assert("enough memory", buffer);
     }
 
     (void) memcpy(&buffer[current], s, len);
@@ -162,7 +163,7 @@ string get_the_buffer(void)
 
 /* Return the concatenation of the given strings.
  *
- * concatenation is based on a static dynamic buffer
+ * CAUTION! concatenation is based on a static dynamically allocated buffer
  * which is shared from one call to another.
  *
  * Note that if a string is string_undefined, it is just skiped.
@@ -171,27 +172,32 @@ string get_the_buffer(void)
  */
 string concatenate(string next, ...)
 {
-    int count = 0;
-    va_list args;
+  int count = 0;
+  va_list args;
+  char * initial_buffer = buffer;
 
+  if (next && next!=initial_buffer)
     init_the_buffer();
+  /* else first argument is the buffer itself... */
 
-    /* now gets the strings and concatenates them
-     */
-    va_start(args, next);
-    while (next)
-    {
-		count++;
-		(void) append_to_the_buffer(next);
-		next = va_arg(args, string);
+  /* now gets the strings and concatenates them
+   */
+  va_start(args, next);
+  while (next)
+  {
+    count++;
+    if (next!=initial_buffer) /* skipping first argument if is buffer */
+      (void) append_to_the_buffer(next);
+    next = va_arg(args, string);
+    message_assert("reuse concatenate result only as the first argument",
+		   !next || next!=initial_buffer);
+    /* should stop after some count? */
+  }
+  va_end(args);
 
-		/* should stop after some count. */
-    }
-    va_end(args);
-
-    /* returns the static null terminated buffer
-     */
-    return buffer;
+  /* returns the static '\0' terminated buffer.
+   */
+  return buffer;
 }
 
 string strupper(string s1, string s2)
