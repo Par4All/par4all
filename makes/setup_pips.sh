@@ -6,6 +6,12 @@
 # Setup a basic pips installation from scratch
 #
 
+# for those who try: sh setup_pips.sh
+[ $_ != '/bin/bash' ] && {
+  echo "ERROR: script $0 to be interpreted by /bin/bash, got $_" >&2
+  exit 1
+}
+
 # where to get pips
 SVN_CRI='http://svn.cri.ensmp.fr/svn'
 PIPS_SVN=$SVN_CRI/pips
