@@ -7,7 +7,6 @@
 
 \documentclass[a4paper]{article}
 \usepackage[latin9]{inputenc}
-\usepackage[T1]{fontenc}
 \usepackage[backref,pagebackref]{hyperref}
 \makeatletter
 % Test for a TeX4ht command:
@@ -38,9 +37,7 @@
 \newcommand{\PipsDevGuideHTDOC}{\LINK{http://www.cri.ensmp.fr/pips/developer_guide.htdoc}}
 \newcommand{\DoxygenSources}{\LINK{https://freia.enstb.org/pips/source}}
 
-\title{\bf {\Huge PIPS}\\
-  Development Environment\\
-}
+\title{{\Huge PIPS} \\ ~ \\ Developer Guide}
 
 \author{
 \begin{tabular}{rl}
@@ -57,7 +54,7 @@
   \emph{... and so many other contributors...}
 }
 
-\date{August 1996 - January 2009}
+\date{August 1996 - March 2009}
 
 \renewcommand{\indexname}{Index}
 \makeindex
@@ -69,6 +66,7 @@
 \begin{document}
 \maketitle
 
+%% show document revision:
 {\small\vfill\hfill
  \verb$Id$
 }
@@ -1387,8 +1385,8 @@ derives a header file that defines the object interfaces, which is placed
 in \verb+$PIPS_ROOT/include+.
 
 For instance, the internal representation (i.e. the abstract syntax tree)
-is called \verb+ri+\index{ri}\footnote{For the French
-«~\emph{Représentation Interne}~» or Internal Representation.}. It is
+is called \verb+ri+\index{ri}\footnote{French for
+\emph{Représentation Interne}, \emph{i.e.} Internal Representation.}. It is
 described in the \LaTeX\ file {\tt ri.tex} in
 \verb+$PIPS_ROOT/src/Documentation/newgen+. It is then automatically
 transformed into a NewGen file {\tt ri.newgen}. And finally, NewGen
