@@ -325,10 +325,10 @@ PIPS.  See for instance the SVN book at
 
 The development policy within the PIPS-related software is that the
 \texttt{trunk} version should hold a production quality software which
-should pass all non-regression tests that run nightly at CRI. Thus day-to-day
-development should not occur within this part, but in independent
-per-developer \texttt{branches} which should be validated before being
-merged back into the \texttt{trunk}.
+should pass all non-regression tests that run nightly at CRI and elsewhere.
+Thus day-to-day development should not occur within this part, but in
+independent per-developer \texttt{branches} which should be validated
+before being merged back into the \texttt{trunk}.
 
 
 \subsubsection{PIPS development branches}
@@ -340,6 +340,7 @@ pips' trunk, you shoud develop in a branch of your own. To do so:
 \begin{enumerate}
 \item Obtain an svn user account on \texttt{svn.cri.ensmp.fr}
   by asking for it to Fabien Coelho.
+
   For instance, a login \texttt{calvin} and some password may be attributed.
   Calvin will have his own development area under \texttt{branches/calvin}
   in the subversion repository.
@@ -391,6 +392,13 @@ sh> svn commit my-branch-name
 
 \item Develop, test, commit within your branch\ldots
 
+  \textbf{CAUTION!}
+  This requires that your \verb.PIPS_ROOT. environment variable
+  points to your development branch instead of the trunk, otherwise
+  the compilation of the branch install files into the other location
+  pointed to by this variable. Also check for your \verb.PATH. to
+  ensure that the right executable is used.
+
 \item To merge into your branch on-going developments by other people from
   trunk, first you need to have already committed your branch and then:
   {\small
@@ -413,7 +421,7 @@ sh> svn commit
 If you change your initial idea, you can always revert back to your
 original version \emph{if it was committed before} with a:
 \begin{verbatim}
-svn revert . -R
+svn revert -R .
 \end{verbatim}
 
 To know about where you are compared to the trunk, you can try a:
