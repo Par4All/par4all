@@ -322,15 +322,18 @@ function validate_file()
     local test_filter=$file_resdir/test.filter
     local out_filter=$file_resdir/out.filter
     if [[ -f $test_and_out_filter ]] ; then
+	chmod +x $test_and_out_filter
 	$test_and_out_filter $reference > $reference.filtered
 	$test_and_out_filter $out.out > $out.out.filtered
     else
 	# applied either the user define filter or the identical filter on the
 	# reference
+	[[ -f $test_filter ]] && chmod +x $test_filter
 	[[ -f $test_filter ]] && $test_filter $reference > $reference.filtered
 	[[ ! -f $test_filter ]] && cp $reference $reference.filtered
 	# applied either the user define filter or the identical filter on the
 	# output
+	[[ -f $out_filter ]] && chmod +x $out_filter
 	[[ -f $out_filter ]] && $out_filter $out.out > $out.out.filtered
 	[[ ! -f $out_filter ]] && cp $out.out $out.out.filtered
     fi
