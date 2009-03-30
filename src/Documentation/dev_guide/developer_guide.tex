@@ -960,7 +960,13 @@ reference \texttt{MyTest.result/test} to know if the validation is
 correct. So to install a new validation item, you need to create the
 reference \texttt{MyTest.result/test}. \texttt{pips\_validate -a} (see
 afterwards) can help to install a new validation reference file and
-directory.
+directory. Note that an additional transformation on output and/or 
+reference file is possible for special cases. In fact depending on
+the compiler used for example, you can get floating point numbers in
+different formats. Then you might want to post process the output to
+make it compliant with the reference. To make this possible a filtering
+phase is included in the validation process and is explained in 
+\S~\ref{sec:filtering}.
 
 For more complex validations, a \texttt{.tpips} script without a direct
 corresponding source file but that may use many files from various
@@ -1075,7 +1081,7 @@ Two validation scripts are available:
   test is to be applied. As a second choice, the \texttt{.tpips} script is
   encouraged. It is very important not to validate \texttt{stderr} output
   and pips with some level of debugging on, because these outputs are not
-  very stable from one architecture to another.
+  very stable from one architecture to another.  
 
   This script is also used by the various nightly validations such as
   \verb|pips_at_night|.
@@ -1115,6 +1121,29 @@ PIPS_GRAPHICAL_DIFF=pips_emacs_diff manual_accept LoopRecovering
 %%  documentation here are welcome!
 %%\end{itemize}
 
+\subsubsection{Filtering}
+\label{sec:filtering}
+
+  Once the tpips script has been run, the current output has to be compared
+  with the expected one (the reference). As explained previously, before to
+  perfom a basic difference (using the \texttt{diff} shell command) the 
+  pips\_validate script search for user defined filters to apply on the
+  outputs. This search is done as follow:
+  \begin{enumerate}
+  \item Search for \texttt{test\_and\_out.filter}. If found the filter is
+    applied on both the current tpips output and on the reference. 
+  \item Otherwhise:
+    \begin{enumerate}
+    \item Search for \texttt{test.filter}. If found the filter is applied on
+      the reference only. If not found \texttt{pips\_validate} apply the
+      default identical filter.
+    \item Search for \texttt{out.filter}, if found the filter is applied on
+      the current tpips output only. If not found \texttt{pips\_validate}
+      apply the default identical filter.
+    \end{enumerate}
+  \end{enumerate}
+  A filter has to be a shell script getting an input file as its first
+  parameter and printing the filtered file to the standard output.
 
 \section{Debugging and NewGen}
 \label{sec:newgen}

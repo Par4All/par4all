@@ -315,17 +315,39 @@ function validate_file()
     local reference=$file_resdir/test.$arch
     [[ -f $reference ]] || reference=$file_resdir/test
 
-    ${PIPS_DIFF:-diff -b -u} $reference $out.out > $out.diff
+    # let's apply some filter on output if define by user
+    # First try to apply a test_and_out filter on both expected and obtained output
+    # Else try to apply test and out filter on test and out output
+    local test_and_out_filter=$file_resdir/test_and_out.filter
+    local test_filter=$file_resdir/test.filter
+    local out_filter=$file_resdir/out.filter
+    if [[ -f $test_and_out_filter ]] ; then
+	$test_and_out_filter $reference > $reference.filtered
+	$test_and_out_filter $out.out > $out.out.filtered
+    else
+	# applied either the user define filter or the identical filter on the
+	# reference
+	[[ -f $test_filter ]] && $test_filter $reference > $reference.filtered
+	[[ ! -f $test_filter ]] && cp $reference $reference.filtered
+	# applied either the user define filter or the identical filter on the
+	# output
+	[[ -f $out_filter ]] && $out_filter $out.out > $out.out.filtered
+	[[ ! -f $out_filter ]] && cp $out.out $out.out.filtered
+    fi
+    
+    ${PIPS_DIFF:-diff -b -u} $reference.filtered $out.out.filtered > $out.diff
 
     if [[ -s $out.diff ]] ; then
       verb 2 "$rel_file: CHANGED"
       echo "changed: $rel_file" >> $summary
       cp $out.out $file_resdir/out
+      cp $out.out.filtered $file_resdir/out.filtered
       status=1 # something was wrong...
     else
       verb 3 "$rel_file: SUCCEEDED" # ok!
-      rm -f $out.*
+      rm -f $out.* $reference.filtered
     fi
+    
   else
       verb 2 "$rel_file: FAILED"
       echo "failed: $rel_file" >> $summary
