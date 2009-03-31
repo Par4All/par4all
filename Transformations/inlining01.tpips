@@ -22,6 +22,7 @@ echo
 # property not usefull here, but relevant for validation
 setproperty INLINING_CALLERS "main"
 apply INLINING[inlining01!pmax]
+apply RESTRUCTURE_CONTROL[main]
 display PRINTED_FILE[main]
 
 echo

@@ -1,0 +1,40 @@
+delete carto
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create carto carto.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+echo
+echo Initial code
+echo
+
+module carto
+display PRINTED_FILE
+
+echo
+echo Code after first loop peeling
+echo
+
+setproperty LOOP_PEELING_LOOP_LABEL "l2"
+setproperty LOOP_PEELING_BOUND		"i" 
+apply LOOP_PEELING
+display PRINTED_FILE
+
+echo Code after dead code elimination
+apply SUPPRESS_DEAD_CODE
+display PRINTED_FILE
+
+# check result
+apply UNSPLIT
+shell gcc -c carto.database/Src/carto.c
+shell rm -f carto.o
+
+close
+delete carto
+quit
