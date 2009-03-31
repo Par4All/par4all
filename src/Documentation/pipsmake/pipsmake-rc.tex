@@ -84,6 +84,8 @@
 \newcommand{\PipsPIPSmakePDF}{\url{http://www.cri.ensmp.fr/pips/pipsmake-rc.htdoc/pipsmake-rc.pdf}\xspace}
 \newcommand{\PipsPIPSmakeHTDOC}{\url{http://www.cri.ensmp.fr/pips/pipsmake-rc.htdoc}\xspace}
 
+% Some day it should point to the right place for the given property...
+\newcommand{\PipsProperty}[1]{\href{http://www.cri.ensmp.fr/pips/properties-rc.htdoc}{\texttt{#1}}\xspace}
 
 
 \title{PIPS High-Level Software Interface \\
@@ -2827,12 +2829,13 @@ internalize_parallel_code             > MODULE.code
 \end{verbatim}
 
 If you display the ``generated'' code, it may not be displayed as a
-parallel one if the good properties\marginpar{RK: what are they?} are
-not switched on. Anyway, the information is available in {\em code}.
+parallel one if the \PipsProperty{PRETTYPRINT\_SEQUENTIAL\_STYLE} is set
+to a parallel output style (such as \texttt{omp}). Anyway, the information
+is available in {\em code}.
 
 Note this transformation may no be usable with some special
 parallelizations in PIPS such as WP65 or HPFC that generate other resource
-types.
+types that may be quite different.
 
 
 \subsection{Allen \& Kennedy's Parallelization Algorithm}
