@@ -17,6 +17,11 @@ $(ARCH)/wpips:
 	$(LINK) $@ $(WPIPS_LDFLAGS) \
 		$(main.dir)/$(WPIPS_MAIN) -lwpips $(addprefix -l,$(wpips.libs))
 
+$(ARCH)/gpips:
+	$(MAKE) $(ARCH)
+	$(LINK) $@ $(GPIPS_LDFLAGS) \
+		$(main.dir)/$(GPIPS_MAIN) -lwpips $(addprefix -l,$(gpips.libs))
+
 $(ARCH)/fpips:
 	$(MAKE) $(ARCH)
 	$(LINK) $@ $(FPIPS_LDFLAGS) \
@@ -39,6 +44,7 @@ LINEAR_LIBS	= \
 $(ARCH)/pips \
 $(ARCH)/tpips \
 $(ARCH)/wpips \
+$(ARCH)/gpips \
 $(ARCH)/fpips: \
 	$(PIPSLIBS_LIBS) \
 	$(NEWGEN_LIBS) \
@@ -50,6 +56,7 @@ ifdef LIB_TARGET
 $(ARCH)/pips \
 $(ARCH)/tpips \
 $(ARCH)/wpips \
+$(ARCH)/gpips \
 $(ARCH)/fpips: \
 	$(ARCH)/$(LIB_TARGET)
 

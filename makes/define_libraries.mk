@@ -66,13 +66,31 @@ wpips_add.libs	= xview olgx X11
 wpips.libs	= $(pips.libs) $(wpips_add.libs)
 WPIPS_MAIN 	= main_wpips.o
 
+######################################################################### GPIPS
+
+# The following locations should be parameterized somewhere else
+# or à la autocon
+GPIPS_CPPFLAGS 	= $(shell pkg-config --cflags gtk+-2.0)
+GPIPS_LDFLAGS 	= $(shell pkg-config --libs gtk+-2.0)
+
+gpips_add.libs	=
+gpips.libs	= $(pips.libs) $(gpips_add.libs)
+GPIPS_MAIN 	= main_gpips.o
+
 ######################################################################### FPIPS
 
 ifndef PIPS_NO_WPIPS
 	FPIPS_LDFLAGS	= $(WPIPS_LDFLAGS)
-
 	# By default, compile with wpips:
 	fpips_add.libs	= wpips $(wpips_add.libs)
+else
+	fpips_add.libs	=
+endif
+
+ifndef PIPS_NO_GPIPS
+	FPIPS_LDFLAGS	+= $(GPIPS_LDFLAGS)
+	# By default, compile with gpips:
+	fpips_add.libs	+= gpips $(gpips_add.libs)
 else
 	fpips_add.libs	=
 endif
