@@ -1,6 +1,6 @@
 PYTHON_MODULE=pypips
 PYTHON_INCLUDE=/usr/include/python2.5
-all:_$(PYTHON_MODULE).so
+all:_$(PYTHON_MODULE).so pyps.py
 
 
 # common stuff
@@ -46,8 +46,17 @@ clean:
 	rm -f *.o *.tmp $(TMP_PREFIX)* *.I *.H $(PYTHON_MODULE)_wrap.c *.pyc $(PYTHON_MODULE).h
 
 distclean:clean
-	rm -f $(PYTHON_MODULE).py _$(PYTHON_MODULE).so
+	rm -f $(PYTHON_MODULE).py _$(PYTHON_MODULE).so pyps.py
 
 check:sample.py all
 	python -c "import pypips"
 	./$<
+
+DOCSTRING=%%@UserManualDocumentation:
+pyps.py: ../../Documentation/pipsmake/pipsmake-rc.tex _pyps.py
+	sed -n -e '1,/### helpers/ p' _pyps.py > $@
+	sed -n -e '/$(DOCSTRING)/ p' $< |\
+		sed -e 's/$(DOCSTRING) *//g' |\
+		sed -e 's/ /_/g' |\
+		sed -r -e 's/(.*)/\tdef \1(self):\n\t\tself.apply("\1")\n/g' >> $@
+	sed -n -e '/### helpers/,$$ p' _pyps.py >> $@

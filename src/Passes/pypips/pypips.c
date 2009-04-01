@@ -73,6 +73,7 @@ void create(char* workspace_name, char ** filenames)
 void quit()
 {
     tpips_close();
+    db_close_pips_database();
 }
 
 void set_property(char* propname, char* value)

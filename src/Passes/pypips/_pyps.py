@@ -40,8 +40,7 @@ class module:
 		shutil.copy(src,dest)
 
 	def inline(self):self.apply("inlining")
-
-
+### helpers /!\ do not touch this line /!\
 
 
 def info(topic):

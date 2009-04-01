@@ -348,20 +348,23 @@ new_label_name(entity module)
 {
     static char name[ 64 ];
     char *module_name ;
+    char * format;
 
     pips_assert( "new_label_name", module != 0 ) ;
 
     if( module == entity_undefined ) {
-	module_name = "__GENSYM" ;
+        module_name = "__GENSYM" ;
+        format = "%s%s%s%d";
     }
     else {
-	module_name = module_local_name(module) ;
+        module_name = module_local_name(module) ;
+        format = c_module_p(module)?"%s%s%sl%d":"%s%s%s%d";
     }
-    for(sprintf(name, "%s%s%s%d", module_name, MODULE_SEP_STRING, LABEL_PREFIX,
+    for(sprintf(name, format, module_name, MODULE_SEP_STRING, LABEL_PREFIX,
 		--init);
 	 init >= 0 && 
 	    !entity_undefined_p(gen_find_tabulated(name, entity_domain)) ;
-	sprintf(name, "%s%s%s%d", module_name, MODULE_SEP_STRING, LABEL_PREFIX,
+	sprintf(name, format, module_name, MODULE_SEP_STRING, LABEL_PREFIX,
 		--init)) {
     /* loop */ 
     }
