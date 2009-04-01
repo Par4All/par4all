@@ -7,7 +7,9 @@ main()
   int k = decl33(2,3);
 }
 
-int decl33(int i, int j)
+int decl33(i, j)
+     int i;
+     int j;
 {
   return i+j;
 }
