@@ -1236,12 +1236,15 @@ summary_reductions > MODULE.summary_reductions
 Some possible (simple) transformations could be added to the code to mark
 reductions in loops, for latter use in the parallelization.
 
+The following is NOT implemented. Anyway, should the cumulated_reductions
+be simply used by the prettyprinter instead?
 \begin{verbatim}
 loop_reductions > MODULE.code
   < PROGRAM.entities
   < MODULE.code
   < MODULE.cumulated_reductions
 \end{verbatim}
+
 
 \section{Chains (Use-Def Chains)}
 \label{subsection-chains}
@@ -2771,19 +2774,21 @@ from the loop body must end up inside the loop body. Else, the loop
 index is not privatized because its final value is likely to be needed
 after the loop end and because no copy-out scheme is supported.
 
-A better privatization algorithm for all scalar variable may be used as
-a preliminary code transformation. An array privatizer is also available
-(see Section~\ref{sec:scalar-and-array-privatization}). A
-non-standard {\tt PRIVATE} declaration is used to specify which variables
-should be allocated on stack for each loop iteration. An HPF format can
+A better privatization algorithm for all scalar variable may be used as a
+preliminary code transformation. An array privatizer is also available
+(see Section~\ref{sec:scalar-and-array-privatization}). A non-standard
+{\tt PRIVATE} declaration is used to specify which variables should be
+allocated on stack for each loop iteration. An HPF or OpenMP format can
 also be selected.
 
 Objects of type \verb+parallelized_code+ differs from objects of type
-\verb+code+ because most algorithms cannot be applied on {\tt DOALL}
-loops. This is true for pre-condition computation, dependence testing
-and so on... It is possible neither to re-analyze parallel code, nor to
-re-parse it (although it would be interesting to compute the complexity
-of a parallel code).
+\verb+code+ for historic reasons, to simplify the user interface and
+because most algorithms cannot be applied on {\tt DOALL} loops. This used
+to be true for pre-condition computation, dependence testing and so
+on... It is possible neither to re-analyze parallel code, nor to re-parse
+it (although it would be interesting to compute the complexity of a
+parallel code) right now but it should evolves. See
+\S~\ref{sec:cons-parall-code}.
 %%!UserManualDocumentation
 
 \subsection{Menu for Parallelization Algorithm Selection}
@@ -2807,6 +2812,7 @@ alias internalize_parallel_code 'Consider a parallel code as a sequential one'
 \subsection{Mark Parallel Loops in Sequential Code}
 \label{sec:cons-parall-code}
 
+%%@UserManualDocumentation: internalize_parallel_code
 To simplify the user interface and to display with one click a
 parallelized program, programs in PIPS are ({\em parallelized code})
 instead of standard ({\em code}. As a consequence, parallelized
@@ -2823,11 +2829,6 @@ Although this is not the effective process, parallel loops are tagged
 as parallel and loop local variables may be added in a {\em code}
 ressource because of a previous privatization phase.
 
-\begin{verbatim}
-internalize_parallel_code             > MODULE.code
-        < MODULE.parallelized_code
-\end{verbatim}
-
 If you display the ``generated'' code, it may not be displayed as a
 parallel one if the \PipsProperty{PRETTYPRINT\_SEQUENTIAL\_STYLE} is set
 to a parallel output style (such as \texttt{omp}). Anyway, the information
@@ -2836,6 +2837,12 @@ is available in {\em code}.
 Note this transformation may no be usable with some special
 parallelizations in PIPS such as WP65 or HPFC that generate other resource
 types that may be quite different.
+%%!UserManualDocumentation
+
+\begin{verbatim}
+internalize_parallel_code             > MODULE.code
+        < MODULE.parallelized_code
+\end{verbatim}
 
 
 \subsection{Allen \& Kennedy's Parallelization Algorithm}
@@ -2850,7 +2857,7 @@ dependences.
 
 \begin{verbatim}
 rice_all_dependence             > MODULE.parallelized_code
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code MODULE.dg
 \end{verbatim}
 
@@ -2867,7 +2874,7 @@ dependence computation (\textsc{Brandes}, \textsc{Feautrier}, \textsc{Pugh}).
 
 \begin{verbatim}
 rice_data_dependence            > MODULE.parallelized_code
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code MODULE.dg
 \end{verbatim}
 
@@ -2884,7 +2891,7 @@ Section~\ref{subsection-parallel-printed-files}).
 
 \begin{verbatim}
 rice_cray                   > MODULE.parallelized_code
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code MODULE.dg
 \end{verbatim}
 
