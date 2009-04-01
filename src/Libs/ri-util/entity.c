@@ -840,6 +840,14 @@ global_name_to_entity(string m, string n)
     return gen_find_tabulated(concatenate(m, MODULE_SEP_STRING, n, NULL),
 			      entity_domain);
 }
+entity
+FindEntity(string package, string name)
+{
+    entity e = gen_find_tabulated(concatenate(package,MODULE_SEP_STRING,name,NULL), entity_domain);
+    if( entity_undefined_p(e))
+        e=gen_find_tabulated(concatenate(package,MODULE_SEP_STRING,"0",BLOCK_SEP_STRING,name,NULL), entity_domain);
+    return e;
+}
 
 /* BEGIN_EOLE */ /* - please do not remove this line */
 /* Lines between BEGIN_EOLE and END_EOLE tags are automatically included
@@ -885,6 +893,8 @@ find_or_create_entity(string full_name)
 		       type_undefined, storage_undefined, value_undefined);
 
 }
+
+
 
 /* Problem: A functional global entity may be referenced without
    parenthesis or CALL keyword in a function or subroutine call.

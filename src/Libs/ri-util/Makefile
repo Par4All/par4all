@@ -31,7 +31,8 @@ LIB_CFILES =	contrainte_to_text.c \
 		hpfc.c \
 		misc_paf_utils.c \
 		convex_hull.c \
-		clean.c
+		clean.c \
+		clone_statement.c
 
 INC_TARGET =	$(TARGET).h
 

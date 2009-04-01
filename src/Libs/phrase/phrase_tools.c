@@ -229,15 +229,6 @@ void short_debug_unstructured (unstructured an_unstructured,
   }
 }
 
-/**
- * This function build and return an expression given
- * an entity an_entity
- */
-expression make_expression_from_entity(entity an_entity)
-{
-  return make_entity_expression(an_entity, NIL);
-  
-}
 
 /**
  * This function build and return new variable from

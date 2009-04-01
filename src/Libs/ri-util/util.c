@@ -323,10 +323,17 @@ module_entitiesfilename(entity e)
 expression 
 make_entity_expression(entity e, cons *inds)
 {
-    reference E = make_reference(e, inds);
-
-    return(make_expression(make_syntax(is_syntax_reference,E),
-			   normalized_undefined));			    
+    syntax s = syntax_undefined;
+    if( entity_constant_p(e) )
+    {
+        s = make_syntax_call(make_call(e,NIL));
+    }
+    else
+    {
+        reference r = make_reference(e, inds);
+        s = make_syntax_reference(r);			    
+    }
+    return make_expression(s, normalized_undefined);
 }
 
 static int init = 100000;
@@ -353,7 +360,7 @@ new_label_name(entity module)
     for(sprintf(name, "%s%s%s%d", module_name, MODULE_SEP_STRING, LABEL_PREFIX,
 		--init);
 	 init >= 0 && 
-	    (entity)gen_find_tabulated(name, entity_domain) != entity_undefined ;
+	    !entity_undefined_p(gen_find_tabulated(name, entity_domain)) ;
 	sprintf(name, "%s%s%s%d", module_name, MODULE_SEP_STRING, LABEL_PREFIX,
 		--init)) {
     /* loop */ 

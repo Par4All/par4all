@@ -2498,4 +2498,13 @@ bool expression_similar_p(expression target, expression pattern)
     return similar;
 }
 
+/**
+ * This function build and return an expression given
+ * an entity an_entity
+ */
+expression make_expression_from_entity(entity an_entity)
+{
+  return make_entity_expression(an_entity, NIL);
+  
+}
 

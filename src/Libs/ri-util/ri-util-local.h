@@ -20,6 +20,7 @@
 #include "linear.h"
 #include "text.h"
 #include "newgen.h"
+#include "cloning.h"
 
 /*  special characters
  */
@@ -1351,6 +1352,7 @@ the variable is unsigned, signed or not */
    if( _cm_list_init == NIL ) \
         list = _cm_list ; \
 }
+
 
 /* that is all for ri-util-local.h
  */

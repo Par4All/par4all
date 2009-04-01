@@ -54,18 +54,22 @@ void inline_return_switcher(instruction ins,instruction tail_ins)
 {
     if( return_instruction_p( ins ) )
     {
+        // create the goto
+        list l= (ins == tail_ins ) ? NIL : CONS( STATEMENT, instruction_to_statement( make_instruction_goto( copy_statement(laststmt) ) ) , NIL ) ;
+        // create the assign and push it if needed
         call ic = instruction_call(ins);
-        call c = make_call(
+        if( !ENDP(call_arguments(ic)) )
+        {
+            call c = make_call(
                     CreateIntrinsic(ASSIGN_OPERATOR_NAME),
                     CONS(
                         EXPRESSION,
                         entity_to_expression( returned_entity ),
                         gen_full_copy_list(call_arguments(ic))
-                    )
-                 );
-        list l= (ins == tail_ins ) ? NIL : CONS( STATEMENT, instruction_to_statement( make_instruction_goto( copy_statement(laststmt) ) ) , NIL ) ;
-        l = CONS( STATEMENT, instruction_to_statement(  make_instruction_call(c) ), l );
-
+                        )
+                    );
+            l = CONS( STATEMENT, instruction_to_statement(  make_instruction_call(c) ), l );
+        }
 
         free_call( instruction_call(ins));
         instruction_tag(ins) = is_instruction_sequence;
@@ -130,6 +134,13 @@ do_substitute_entity(expression exp, struct entity_pair* thecouple)
             }
         }
     }
+}
+
+static void reset_expression_normalized(expression e)
+{
+    if(!normalized_undefined_p(expression_normalized(e)))
+        free_normalized(expression_normalized(e));
+    expression_normalized(e)=normalized_undefined;
 }
 
 static void
@@ -441,6 +452,7 @@ instruction inline_expression_call(expression modified_expression, call callee)
      * because of the unstructuration, we must purge statement number
      */
     gen_recurse(expanded,statement_domain,gen_true,fix_sequence_statement_attributes_if_sequence);
+    gen_recurse(expanded,expression_domain,gen_true,reset_expression_normalized);
     unstructured u = control_graph(expanded);
     instruction ins = make_instruction_unstructured(u);
 
@@ -579,6 +591,7 @@ inline_calls(char * module)
     /* restucture the generated unstructured statement */
     if(!restructure_control(module))
         pips_user_warning("failed to restructure after inlining");
+
     /* we can try to remove some labels now*/
     if(!remove_useless_label(module))
         pips_user_warning("failed to remove useless labels after restructure_control in inlining");

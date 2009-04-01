@@ -30,7 +30,8 @@ LIB_CFILES =	replace.c \
 		variable_expansion.c \
 		internalize_parallel_code.c \
 		inlining.c\
-		expression_substitution.c
+		expression_substitution.c\
+		loop_peeling.c
 
 INC_TARGET =    $(TARGET).h
 

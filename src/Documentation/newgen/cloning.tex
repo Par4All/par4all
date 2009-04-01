@@ -1,0 +1,34 @@
+\documentclass[a4paper]{article}
+
+\usepackage[latin1]{inputenc}
+\usepackage{newgen_domain}
+\usepackage{listings}
+
+\title{Cloning statement}
+\author{Serge Guelton}
+
+
+\begin{document}
+\maketitle
+\sloppy
+
+\section*{New type used for cloning}
+
+This document defines and describes the data structure used to pass parameters to the \lstinline|clone_statement| function.
+It consist of three fields given by the user:
+\begin{itemize}
+\item \lstinline|previous_module| is the entity of the module from which the cloned statement comes
+\item \lstinline|new_module| is the entity of the module to which the cloned statement will be added. It can be the same as \lstinline|previous_module|
+\item \lstinline|new_module_statement| is the root statement of \lstinline|new_module|
+\end{itemize}
+
+\domain{import entity from "ri.newgen"}
+{}
+\domain{import statement from "ri.newgen"}
+{}
+
+
+
+\domain{clone_context = previous_module:entity x new_module:entity x new_module_statement:statement}
+
+\end{document}

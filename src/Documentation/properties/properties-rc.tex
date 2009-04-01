@@ -2007,6 +2007,20 @@ with constant loop bounds and constant increment are fully unrolled.
 FULL_UNROLL_INTERACTIVELY TRUE
 \end{verbatim}
 
+\subsubsection{Loop peeling}
+
+Loop peeling \emph{requires} the two following globals to be set :
+\begin{itemize}
+    \item \lstinline|LOOP_PEELING_LOOP_LABEL| is the loop label
+\begin{verbatim}
+LOOP_PEELING_LOOP_LABEL ""
+\end{verbatim}
+    \item \lstinline|LOOP_PEELING_BOUND| is the splitting bound
+\begin{verbatim}
+LOOP_PEELING_BOUND ""
+\end{verbatim}
+\end{itemize}
+
 
 \section{Program Verifications}
 

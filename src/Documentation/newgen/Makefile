@@ -30,7 +30,8 @@ F.tex =	ri.tex \
 	text.tex \
 	hpf.tex \
 	sac_private.tex \
-	ri_C.tex
+	ri_C.tex \
+	cloning.tex
 
 SOURCES = $(F.tex) unstructured.idraw newgen_domain.sty optimizer.tex
 

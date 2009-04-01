@@ -18,8 +18,13 @@ include $(MAKE.d)/$(ARCH).mk
 
 FWD_DIRS	= pips tpips fpips
 
-# Skip compiling WPips is not required:
+# Skip compiling WPips if not required:
 
 ifndef PIPS_NO_WPIPS
 	FWD_DIRS	+= wpips
+endif
+
+# compile pypips only if required
+ifdef PIPS_PYPIPS
+	FWD_DIRS	+= pypips
 endif
