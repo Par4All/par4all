@@ -14,7 +14,8 @@ EOF
 
 
 function display_end () {
-    echo "The parallelized code is in $workspace.database/Src"
+    # Display this message on stderr to avoid blinking the validation
+    echo "The parallelized code is in $workspace.database/Src" 1>&2
 }
 
 
