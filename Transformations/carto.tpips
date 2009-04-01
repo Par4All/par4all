@@ -18,22 +18,57 @@ module carto
 display PRINTED_FILE
 
 echo
-echo Code after first loop peeling
+echo Code after first loop peelings
+echo
+
+setproperty LOOP_PEELING_LOOP_LABEL "l3"
+setproperty LOOP_PEELING_BOUND		"j" 
+setproperty LOOP_PEELING_PEEL_BEFORE_BOUND TRUE
+apply LOOP_PEELING
+display PRINTED_FILE
+
+setproperty LOOP_PEELING_LOOP_LABEL "99999"
+setproperty LOOP_PEELING_PEEL_BEFORE_BOUND FALSE
+apply LOOP_PEELING
+
+display PRINTED_FILE
+
+echo
+echo Code after dead code elimination
+echo
+
+apply SUPPRESS_DEAD_CODE
+display PRINTED_FILE
+
+echo
+echo Code after first loop peelings
 echo
 
 setproperty LOOP_PEELING_LOOP_LABEL "l2"
 setproperty LOOP_PEELING_BOUND		"i" 
+setproperty LOOP_PEELING_PEEL_BEFORE_BOUND TRUE
 apply LOOP_PEELING
 display PRINTED_FILE
 
+setproperty LOOP_PEELING_LOOP_LABEL "99997"
+setproperty LOOP_PEELING_PEEL_BEFORE_BOUND FALSE
+apply LOOP_PEELING
+
+display PRINTED_FILE
+
+echo
 echo Code after dead code elimination
+echo
+
 apply SUPPRESS_DEAD_CODE
 display PRINTED_FILE
 
 # check result
 apply UNSPLIT
-shell gcc -c carto.database/Src/carto.c
-shell rm -f carto.o
+shell gcc ${VDIR:-.}/carto.c -lm -o ${VDIR:-.}/carto
+shell gcc carto.database/Src/carto.c -lm -o  carto.database/Src/carto
+shell if test `./carto.database/Src/carto` = `${VDIR:-.}/carto` ; then echo "ok" ; else echo "ko" ; fi
+shell rm -f carto.database/Src/carto ${VDIR:-.}/carto
 
 close
 delete carto
