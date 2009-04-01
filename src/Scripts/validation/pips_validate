@@ -321,34 +321,46 @@ function validate_file()
     local test_and_out_filter=$file_resdir/test_and_out.filter
     local test_filter=$file_resdir/test.filter
     local out_filter=$file_resdir/out.filter
+    local reference_filtered=$reference
+    local out_filtered=$out.out
+    local reference_filtered=$reference
+    local out_filtered=$out.out
     if [[ -f $test_and_out_filter ]] ; then
+	# apply the user define filter on both the reference
 	chmod +x $test_and_out_filter
-	$test_and_out_filter $reference > $reference.filtered
-	$test_and_out_filter $out.out > $out.out.filtered
-    else
-	# applied either the user define filter or the identical filter on the
-	# reference
-	[[ -f $test_filter ]] && chmod +x $test_filter
-	[[ -f $test_filter ]] && $test_filter $reference > $reference.filtered
-	[[ ! -f $test_filter ]] && cp $reference $reference.filtered
-	# applied either the user define filter or the identical filter on the
-	# output
-	[[ -f $out_filter ]] && chmod +x $out_filter
-	[[ -f $out_filter ]] && $out_filter $out.out > $out.out.filtered
-	[[ ! -f $out_filter ]] && cp $out.out $out.out.filtered
+	reference_filtered=$reference.filtered
+	out_filtered=$out.out.filtered
+	$test_and_out_filter $reference > $reference_filtered
+	$test_and_out_filter $out.out > $out_filtered
+	echo "PIER out_filtered : $out_filtered    reference_filtered : $reference_filtered" >> $summary
+   else
+	# apply the user define filter on the reference
+	if [[ -f $test_filter ]] ; then
+	    chmod +x $test_filter
+	    reference_filtered=$reference.filtered
+	    $test_filter $reference > $reference_filtered
+	fi
+	# apply the user define filter on the output
+	if [[ -f $out_filter ]] ; then
+	    chmod +x $out_filter
+	    out_filtered=$out.out.filtered
+	    $out_filter $out.out > $out_filtered
+	fi
     fi
-    
-    ${PIPS_DIFF:-diff -b -u} $reference.filtered $out.out.filtered > $out.diff
+
+    echo "PIER out_filtered : $out_filtered    reference_filtered : $reference_filtered" >> $summary
+
+    ${PIPS_DIFF:-diff -b -u} $reference_filtered $out_filtered > $out.diff
 
     if [[ -s $out.diff ]] ; then
       verb 2 "$rel_file: CHANGED"
       echo "changed: $rel_file" >> $summary
       cp $out.out $file_resdir/out
-      cp $out.out.filtered $file_resdir/out.filtered
+      cp $out_filtered $file_resdir/out.filtered
       status=1 # something was wrong...
     else
       verb 3 "$rel_file: SUCCEEDED" # ok!
-      rm -f $out.* $reference.filtered
+      rm -f $out.* $file_resdir/*.filtered
     fi
     
   else
