@@ -1,0 +1,45 @@
+int main()
+{
+   float a[10][10][10][10][10];
+   float b[10][10][10][10][10];
+   int i;
+   int j;
+   int k = 17;
+   int l;
+   int m = 120;
+   float x = 2.12;
+   float w = 1.0;
+
+ #pragma omp parallel for private(j)
+   for(i = 0; i <= 9; i += 1)                                           /*0013*/
+#pragma omp parallel for private(k)
+      for(j = 2; j <= 6; j += 1)                                        /*0014*/
+#pragma omp parallel for private(l)
+         for(k = 4; k <= 2; k += 1)                                     /*0015*/
+#pragma omp parallel for private(m)
+            for(l = 2; l <= 9; l += 1)                                  /*0016*/
+#pragma omp parallel for private(w)
+               for(m = 0; m <= 9; m += 1)                               /*0017*/
+                  w = 1.2+z+p;                                          /*0022*/
+#pragma omp parallel for private(j)
+   for(i = 0; i <= 9; i += 1)                                           /*0013*/
+#pragma omp parallel for private(k)
+      for(j = 2; j <= 6; j += 1)                                        /*0014*/
+#pragma omp parallel for private(l)
+         for(k = 4; k <= 2; k += 1)                                     /*0015*/
+#pragma omp parallel for private(m)
+            for(l = 2; l <= 9; l += 1)                                  /*0016*/
+#pragma omp parallel for private(y)
+               for(m = 0; m <= 9; m += 1)                               /*0017*/
+	          y = 3.5+x;                                                        /*0033*/
+                  a[i][j][k][l][m] = x*y+x+z;                           /*0023*/
+#pragma omp parallel for private(w)
+   for(m = 0; m <= 9; m += 1)                                           /*0029*/
+      w = 1.2+z+p;                                                      /*0034*/
+#pragma omp parallel for private(y)
+   for(m = 0; m <= 9; m += 1) {                                         /*0029*/
+      y = 3.5+x;                                                        /*0033*/
+      a[1][1][1][1][m] = x*y+x+z;                                       /*0035*/
+   }
+   return 0;                                                            /*0037*/
+}
