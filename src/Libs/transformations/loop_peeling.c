@@ -79,19 +79,23 @@ peel_loop(statement original_loop, entity new_loop_bound)
     }
 
     /* fix the bound */
-    range_upper(loop_range(statement_loop(first_loop_statement)))=
-        make_expression_from_entity(new_loop_bound);
-    range_lower(loop_range(statement_loop(the_second_loop_statement)))=
+    bool peel_before_bound = get_bool_property("LOOP_PEELING_PEEL_BEFORE_BOUND");
+    expression increment = range_increment(loop_range(statement_loop(the_second_loop_statement)));
+    expression new_loop_bound_expression = make_expression_from_entity(new_loop_bound);
+    expression new_loop_bound_expression_with_xcrement = 
         make_expression(
                 make_syntax_call(
                     make_call(
-                        CreateIntrinsic(PLUS_OPERATOR_NAME),
+                        CreateIntrinsic(
+                            peel_before_bound?
+                            MINUS_OPERATOR_NAME:
+                            PLUS_OPERATOR_NAME),
                         CONS(
                             EXPRESSION,
                             make_expression_from_entity(new_loop_bound),
                             CONS(
                                 EXPRESSION,
-                                copy_expression(range_increment(loop_range(statement_loop(the_second_loop_statement)))),
+                                copy_expression(increment),
                                 NIL
                                 )
                             )
@@ -99,6 +103,20 @@ peel_loop(statement original_loop, entity new_loop_bound)
                     ),
                 normalized_undefined
                 );
+
+    expression fst_loop_upper = peel_before_bound ?
+        new_loop_bound_expression_with_xcrement:
+        new_loop_bound_expression;
+        new_loop_bound_expression_with_xcrement;
+    expression snd_loop_lower = peel_before_bound ?
+        new_loop_bound_expression:
+        new_loop_bound_expression_with_xcrement;
+
+
+    range_upper(loop_range(statement_loop(first_loop_statement)))=
+        fst_loop_upper;
+    range_lower(loop_range(statement_loop(the_second_loop_statement)))=
+        snd_loop_lower;
 
     /* put loops together */
     instruction new_instruction = make_instruction_sequence(

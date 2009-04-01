@@ -194,7 +194,7 @@ do_clone_label(entity l, clone_context cc/*, hash_table ht*/)
 {
     return entity_empty_label_p(l)?
         entity_empty_label():
-        make_new_label(entity_module_name(clone_context_new_module(cc)));
+        make_new_label(module_local_name(clone_context_new_module(cc)));
 }
 
 static whileloop
