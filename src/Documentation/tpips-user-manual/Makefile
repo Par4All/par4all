@@ -19,4 +19,4 @@ include $(ROOT)/makes/main.mk
 clean: local-clean
 
 local-clean:
-	$(RM) $(INSTALL_DOC) *.aux *.toc *.idx *.ilg *.ind *.log *.dvi *.ps *.pdf
+	$(RM) $(INSTALL_DOC) *.aux *.toc *.idx *.ilg *.ind *.log *.dvi *.ps *.pdf *.out
