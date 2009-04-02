@@ -331,7 +331,6 @@ function validate_file()
 	out_filtered=$out.out.filtered
 	$test_and_out_filter $reference > $reference_filtered
 	$test_and_out_filter $out.out > $out_filtered
-	echo "PIER out_filtered : $out_filtered    reference_filtered : $reference_filtered" >> $summary
    else
 	# apply the user define filter on the reference
 	if [[ -f $test_filter ]] ; then
@@ -346,8 +345,6 @@ function validate_file()
 	    $out_filter $out.out > $out_filtered
 	fi
     fi
-
-    echo "PIER out_filtered : $out_filtered    reference_filtered : $reference_filtered" >> $summary
 
     ${PIPS_DIFF:-diff -b -u} $reference_filtered $out_filtered > $out.diff
 
