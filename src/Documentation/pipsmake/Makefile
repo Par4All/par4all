@@ -92,7 +92,7 @@ clean: local-clean
 
 local-clean:
 	$(RM) -r $(DERIVED_FILES) pipsmake-rc.htdoc \
-		*.aux *.log *.ind *.idx *.toc *.ilg *.dvi *.ps
+		*.aux *.log *.ind *.idx *.toc *.ilg *.dvi *.ps *.out *.brf
 
 # common stuff
 ifdef PIPS_ROOT
