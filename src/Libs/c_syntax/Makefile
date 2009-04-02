@@ -8,7 +8,9 @@ INC_CFILES =	c_parser.c \
 		util.c
 
 DERIVED_HEADERS = cyacc.h
-DERIVED_CFILES = cyaccer.c clexer.c
+DERIVED_CFILES	= cyaccer.c clexer.c
+# unclear why they may be there...
+DERIVED_STUFF	= cyacc.c y.tab.c y.tab.h
 
 LIB_CFILES = 	$(INC_CFILES) $(DERIVED_CFILES)
 
@@ -31,7 +33,7 @@ $(TARGET).h: $(DERIVED_HEADERS) $(DERIVED_CFILES)
 clean: local-clean
 
 local-clean:
-	$(RM) $(DERIVED_CFILES) $(DERIVED_HEADERS)
+	$(RM) $(DERIVED_CFILES) $(DERIVED_HEADERS) $(DERIVED_STUFF)
 
 # C parser
 
