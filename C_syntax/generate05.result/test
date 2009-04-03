@@ -24,7 +24,7 @@ Printed synthesized file "func!"
 typedef double fii;
 enum count {zero, un, deux, trois, quatre};
 typedef fii foo[deux];
-fii func(foo, double *);
+fii func(foo f1, double *f2);
 
 Compile the generated code
 

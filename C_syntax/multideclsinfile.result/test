@@ -67,52 +67,6 @@ Layout for memory area "multideclsinfile!:*STATIC*" of size 0:
 
 End of declarations for module multideclsinfile!
 
-  C_PARSER                       building   PARSED_CODE(multideclsinfile!)
-                                 building   CALLEES(multideclsinfile!)
-user warning in UpdateEntity: Multiple declarations of variable a in file
-
-Declarations for module multideclsinfile! with type  () ->  unknow
-
-
-Variable list:
-
-
-Declared entity TOP-LEVEL:*STATIC*	with type area with size 8
-Declared entity TOP-LEVEL:a	with type variable INTEGER*4
-Declared entity TOP-LEVEL:k	with type variable INTEGER*4
-Declared entity multideclsinfile!:*DYNAMIC*	with type area with size 0
-Declared entity multideclsinfile!:*HEAP*	with type area with size 0
-Declared entity multideclsinfile!:*STACK*	with type area with size 0
-Declared entity multideclsinfile!:*STATIC*	with type area with size 0
-* empty external declaration list *
-
-
-
-Layouts for areas (commons):
-
-
-Layout for memory area "TOP-LEVEL:*STATIC*" of size 8: 
-	Variable TOP-LEVEL:a,	offset = 0,	size = 4
-	Variable TOP-LEVEL:k,	offset = 4,	size = 4
-
-
-Layout for memory area "multideclsinfile!:*DYNAMIC*" of size 0: 
-	* empty area *
-
-
-Layout for memory area "multideclsinfile!:*HEAP*" of size 0: 
-	* empty area *
-
-
-Layout for memory area "multideclsinfile!:*STACK*" of size 0: 
-	* empty area *
-
-
-Layout for memory area "multideclsinfile!:*STATIC*" of size 0: 
-	* empty area *
-
-End of declarations for module multideclsinfile!
-
   PRINT_SOURCE                   building   PARSED_PRINTED_FILE(multideclsinfile!)
 PARSED_PRINTED_FILE made for multideclsinfile!.
 int a;

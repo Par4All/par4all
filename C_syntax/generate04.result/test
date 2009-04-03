@@ -24,7 +24,7 @@ Printed synthesized file "func!"
 typedef double faa;
 typedef double fii[2];
 typedef fii foo;
-faa func(foo, double *);
+faa func(foo f1, double *f2);
 
 Compile the generated code
 

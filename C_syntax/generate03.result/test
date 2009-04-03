@@ -21,7 +21,7 @@ int func(foo f1, double *f2)
 Printed synthesized file "func!"
 
 typedef _Complex foo;
-int func(foo, double *);
+int func(foo f1, double *f2);
 
 Compile the generated code
 

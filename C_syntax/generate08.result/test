@@ -114,7 +114,7 @@ struct first {
    double b;
 };
 typedef struct {struct first c; char d;} sem_t;
-int func(sem_t *);
+int func(sem_t *f1);
 
 Compile the generated code
 

@@ -24,7 +24,7 @@ struct second {
    char d;
 };
 typedef struct second sem_t;
-int func(sem_t *);
+int func(sem_t *f1);
 
 Compile the generated code
 
