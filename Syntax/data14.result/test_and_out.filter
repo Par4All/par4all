@@ -1,4 +1,5 @@
 
 #let's format floating point numbers by ignoring the decimal part
 #if it is only made of zero
-sed 's/\([0-9]\+\.\)0*/\1/g' $1
+#sed 's/\([0-9]\+\.\)0*/\1/g' $1
+cat $1
