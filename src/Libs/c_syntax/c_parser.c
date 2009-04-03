@@ -246,7 +246,9 @@ void CParserError(char *msg)
   debug_off();
 }
 
-static bool actual_c_parser(string module_name, string dbr_file, bool is_compilation_unit_parser)
+static bool actual_c_parser(string module_name, 
+			    string dbr_file, 
+			    bool is_compilation_unit_parser)
 {
     string dir = db_get_current_workspace_directory();
     string file_name = 
@@ -268,7 +270,9 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
     else
       {
 	compilation_unit_name = compilation_unit_of_module(module_name);
-	keyword_typedef_table = (hash_table) db_get_memory_resource(DBR_DECLARATIONS,compilation_unit_name,TRUE); 
+	keyword_typedef_table = 
+	  (hash_table) db_get_memory_resource(DBR_DECLARATIONS,
+					      compilation_unit_name,TRUE); 
       }
 
     ContextStack = stack_make(c_parser_context_domain,0,0);
@@ -283,6 +287,9 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
     CalledModules = NIL;
     
     debug_on("C_SYNTAX_DEBUG_LEVEL");
+    pips_debug(1,"Module name: %s\n", module_name);
+    pips_debug(1,"Compilation unit name: %s\n", compilation_unit_name);
+
  
     /* FI: not clean, but useful for debugging statement */
     ifdebug(1)
@@ -291,22 +298,28 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
     }
 
     /* Predefined type(s): __builtin_va_list */
-    built_in_va_list = find_or_create_entity(strdup(concatenate(compilation_unit_name,
-							    MODULE_SEP_STRING,
-							    TYPEDEF_PREFIX,"__builtin_va_list",
-							    NULL)));
+    built_in_va_list = 
+      find_or_create_entity(strdup(concatenate(compilation_unit_name,
+					       MODULE_SEP_STRING,
+					       TYPEDEF_PREFIX,
+					       "__builtin_va_list",
+					       NULL)));
     if(storage_undefined_p(entity_storage(built_in_va_list))) {
       entity_storage(built_in_va_list) = make_storage_rom();
       /* Let's lie about the real type */
-      entity_type(built_in_va_list) = make_type(is_type_variable,
-					    make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),
-							  NIL, NIL));
+      entity_type(built_in_va_list) = 
+	make_type(is_type_variable,
+		  make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),
+				NIL, 
+				NIL));
       entity_initial(built_in_va_list) = make_value_unknown();
     }
-    built_in_bool = find_or_create_entity(strdup(concatenate(compilation_unit_name,
-							    MODULE_SEP_STRING,
-							    TYPEDEF_PREFIX,"_Bool",
-							    NULL)));
+    built_in_bool = 
+      find_or_create_entity(strdup(concatenate(compilation_unit_name,
+					       MODULE_SEP_STRING,
+					       TYPEDEF_PREFIX,
+					       "_Bool",
+					       NULL)));
     if(storage_undefined_p(entity_storage(built_in_bool))) {
       entity_storage(built_in_bool) = make_storage_rom();
       entity_type(built_in_bool) =
@@ -315,10 +328,12 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
 				NIL, NIL));
       entity_initial(built_in_bool) = make_value_unknown();
     }
-    built_in_complex = find_or_create_entity(strdup(concatenate(compilation_unit_name,
-								MODULE_SEP_STRING,
-								TYPEDEF_PREFIX,"_Complex",
-								NULL)));
+    built_in_complex = 
+      find_or_create_entity(strdup(concatenate(compilation_unit_name,
+					       MODULE_SEP_STRING,
+					       TYPEDEF_PREFIX,
+					       "_Complex",
+					       NULL)));
     if(storage_undefined_p(entity_storage(built_in_complex))) {
       entity_storage(built_in_complex) = make_storage_rom();
       entity_type(built_in_complex) =
@@ -329,22 +344,26 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
     }
 
     /* Predefined functions(s): __builtin_va_end (va_arg() is parser directly) */
-    built_in_va_start = find_or_create_entity(strdup(concatenate(compilation_unit_name,
-								 MODULE_SEP_STRING,
-								 BUILTIN_VA_START,
-								 NULL)));
+    built_in_va_start = 
+      find_or_create_entity(strdup(concatenate(compilation_unit_name,
+					       MODULE_SEP_STRING,
+					       BUILTIN_VA_START,
+					       NULL)));
     if(storage_undefined_p(entity_storage(built_in_va_start))) {
       basic va_list_b = make_basic(is_basic_typedef, built_in_va_list);
-      type va_list_t = make_type(is_type_variable, make_variable(va_list_b, NIL, NIL));
+      type va_list_t = 
+	make_type(is_type_variable, make_variable(va_list_b, NIL, NIL));
       basic void_star_b = make_basic(is_basic_pointer, make_type_void());
-      type void_start_t = make_type(is_type_variable, make_variable(void_star_b, NIL, NIL));
+      type void_start_t = 
+	make_type(is_type_variable, make_variable(void_star_b, NIL, NIL));
       entity_storage(built_in_va_start) = make_storage_rom();
       /* Let's lie about the real type... */
       entity_type(built_in_va_start) =
 	make_type(is_type_functional,
 		  make_functional(CONS(PARAMETER,
 				       make_parameter(va_list_t,
-						      make_mode(is_mode_value, UU),
+						      make_mode(is_mode_value, 
+								UU),
 						      make_dummy_unknown()),
 				       CONS(PARAMETER,
 					    make_parameter(void_start_t,
@@ -361,7 +380,8 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
 							    NULL)));
     if(storage_undefined_p(entity_storage(built_in_va_end))) {
       basic va_list_b = make_basic(is_basic_typedef, built_in_va_list);
-      type va_list_t = make_type(is_type_variable, make_variable(va_list_b, NIL, NIL));
+      type va_list_t = 
+	make_type(is_type_variable, make_variable(va_list_b, NIL, NIL));
       entity_storage(built_in_va_end) = make_storage_rom();
       /* Let's lie about the real type */
       entity_type(built_in_va_end) =
@@ -421,9 +441,21 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
   
     if (is_compilation_unit_parser)
       {
+	/* Beware : the rule in pipsmake-rc.tex for compilation_unit_parser
+	   does not include the production of parsed_code and callees. 
+	   This is not very clean, and is done to work around the way pipsmake
+	   handles compilation units and modules. 
+	   There was no simple solution... BC. 
+	*/
+	DB_PUT_MEMORY_RESOURCE(DBR_PARSED_CODE,
+			       module_name,
+			       (char *) ModuleStatement);
 	DB_PUT_MEMORY_RESOURCE(DBR_DECLARATIONS, 
 			       module_name, 
 			       (void *) keyword_typedef_table);   
+	DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, 
+			       module_name, 
+			       (char *) make_callees(NIL));
       }
     else 
       {

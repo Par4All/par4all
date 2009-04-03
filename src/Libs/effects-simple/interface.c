@@ -146,7 +146,9 @@ print_code_effects(
     ok = print_source_or_code_with_any_effects_engine
 	(module_name, resource_name, summary_resource_name, suffix);
 
-    generic_effects_reset_all_methods();
+    reset_methods_for_effects_prettyprint(module_name);
+
+    /* generic_effects_reset_all_methods(); not useful here */
     return ok;
 }
 

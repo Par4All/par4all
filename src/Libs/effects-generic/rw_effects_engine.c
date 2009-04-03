@@ -72,14 +72,28 @@ bool summary_rw_effects_engine(string module_name)
 
     l_dec = summary_effects_from_declaration(module_name);
     ifdebug(8) {
+      int nb_param;
       pips_debug(8, "Summary effects from declarations:\n");
-	(*effects_prettyprint_func)(l_dec);
+      (*effects_prettyprint_func)(l_dec);
+      nb_param = gen_length(functional_parameters(type_functional(ultimate_type(entity_type(get_current_module_entity())))));
+      pips_debug(8, "number of declared formal parameters:%d\n", nb_param);
+	
     }
     
     l_loc2 = gen_append(l_loc,l_dec);
     
     // MAP(EFFECT, e, fprintf(stderr, "=%s=", entity_name(reference_variable(effect_any_reference(e)))) ,l_loc2);
     l_glob = (*effects_local_to_global_translation_op)(l_loc2);
+
+
+    ifdebug(4)
+      {
+	/* Check that summary effects are not corrupted */
+	if(!check_sdfi_effects_p(get_current_module_entity(), l_glob))
+	  pips_internal_error("SDFI effects for \"%s\" are corrupted \n",
+			      entity_name(get_current_module_entity()));
+      }
+
     /* Different effects may have been reduced to the same one */
     /* FI: I'm not to sure the parameter TRUE is generic */
     l_glob = proper_effects_combine(l_glob, TRUE);
@@ -91,7 +105,14 @@ bool summary_rw_effects_engine(string module_name)
 	(*effects_prettyprint_func)(l_glob);
     }
 
-    
+    ifdebug(4)
+      {
+	/* Check that summary effects are not corrupted */
+	if(!check_sdfi_effects_p(get_current_module_entity(), l_glob))
+	  pips_internal_error("SDFI effects for \"%s\" are corrupted\n",
+			      entity_name(get_current_module_entity()));
+      }
+
     (*db_put_summary_rw_effects_func)(module_name, l_glob);
 
     reset_current_module_entity();

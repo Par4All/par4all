@@ -873,6 +873,8 @@ parsing of the new compilation unit before the parsing of its associated
 functions. It is in fact a hash table containing the file-global C
 keywords and typedef names defined in each compilation unit.
 
+In fact phase compilation\_unit\_parser also produces parsed\_code and callees ressources for the compilation unit. This is done to work around the fact that rule c\_parser was invoked on compilation units by later phases (in particular for the computation of initial preconditions), breaking the declarations of function prototypes. These two resources are not declared here because pipsmake gets confused between the different rules to compute parsed code : there is no simple way to distinguish between compilation units and modules at some times and handling them similarly at other times.
+
 % The parsed code of the compilation unit is about empty but it contains
 % declarations that are used by function \verb/find_enum_of_member()/
 % because the compilation unit declarations were not satisfactory (to be
