@@ -61,7 +61,7 @@ entity create_state_variable (string module_name,
   entity module;
   entity new_state_variable;
   string state_variable_name;
-  char buffer[50];
+  char *buffer;
 
   module = module_name_to_entity(module_name); 
 
@@ -72,9 +72,7 @@ entity create_state_variable (string module_name,
     state_variable_name = strdup (STATE_VARIABLE_NAME_NO_REF);
   }
   else {
-    sprintf(buffer, STATE_VARIABLE_NAME, name_identifier);
-    state_variable_name = strdup(concatenate(strdup(buffer),
-					     NULL));
+    asprintf(&state_variable_name, STATE_VARIABLE_NAME, name_identifier);
   }
   
   if ((gen_find_tabulated(concatenate(module_name, 

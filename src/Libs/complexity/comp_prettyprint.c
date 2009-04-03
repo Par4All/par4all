@@ -6,7 +6,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <malloc.h>
 #include <string.h>
 
 #include "linear.h"
@@ -46,8 +45,7 @@ text text_complexity(entity module __attribute__ ((__unused__)),
     char *r ;
     int nblanks ;
     instruction ins = statement_instruction(stat);
-#define TEXT_COMPLEXITY_BUFFER_SIZE 20480
-    static char s[TEXT_COMPLEXITY_BUFFER_SIZE];
+    char *s;
     text t = make_text(NIL);
 
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
@@ -93,12 +91,10 @@ text text_complexity(entity module __attribute__ ((__unused__)),
 	else
 	    pips_error("text_complexity", "Never occur!");
 
-	sprintf(s, "%s    %*s%s %s\n", PIPS_COMMENT_SENTINEL, nblanks, "", r, it);
-
-	pips_assert("no buffer overflow", strlen(s) < TEXT_COMPLEXITY_BUFFER_SIZE);
+	asprintf(&s, "%s    %*s%s %s\n", PIPS_COMMENT_SENTINEL, nblanks, "", r, it);
 
 	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
-					      strdup(s)));
+					      s));
     }
 
     return (t);
@@ -185,16 +181,14 @@ entity module;
 						  PRINT_LOCAL_NAMES));
     char *r = words_to_string(pc);
     int nblanks = 65-strlen(r);
-#define TEXT_SUMMARY_COMPLEXITY 20480
-    static char s[TEXT_SUMMARY_COMPLEXITY];
+    char *s;
     text t = make_text(NIL);
 
     if (nblanks < 1) 
 	nblanks = 1;
-    sprintf(s, "C    %*s%s (SUMMARY)\n", nblanks, "", r);
-    pips_assert("no buffer overflow", strlen(s) < TEXT_SUMMARY_COMPLEXITY);
+    asprintf(&s, "C    %*s%s (SUMMARY)\n", nblanks, "", r);
     ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
-					  strdup(s)));
+					  s));
 
     return (t);
 }

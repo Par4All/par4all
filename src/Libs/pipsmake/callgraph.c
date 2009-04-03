@@ -256,16 +256,16 @@ bool callgraph(string name)
 
   HASH_MAP(module_name, callers,
   {
-    char depth[13];
-    char height[13];
+    char *depth;
+    char *height;
 
     DB_PUT_MEMORY_RESOURCE(DBR_CALLERS, (string) module_name, (void *) callers);
 
-    sprintf(depth,"%td", (_int) hash_get(module_depth, (string) module_name));
-    DB_PUT_MEMORY_RESOURCE(DBR_DEPTH, (string) module_name, (void *) strdup(depth));
+    asprintf(&depth,"%td", (_int) hash_get(module_depth, (string) module_name));
+    DB_PUT_MEMORY_RESOURCE(DBR_DEPTH, (string) module_name, (void *) depth);
 
-    sprintf(height,"%td", (_int) hash_get(module_height, (string) module_name));
-    DB_PUT_MEMORY_RESOURCE(DBR_HEIGHT, (string) module_name, (void *) strdup(height));
+    asprintf(&height,"%td", (_int) hash_get(module_height, (string) module_name));
+    DB_PUT_MEMORY_RESOURCE(DBR_HEIGHT, (string) module_name, (void *) height);
     i++;
   }, module_callers);
 

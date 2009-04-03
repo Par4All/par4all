@@ -683,10 +683,8 @@ list lis;
 entity make_new_array_variable_with_prefix(string prefix, entity module,basic b,list lis)
 {
   string module_name = module_local_name(module);
-  char buffer[20];
   entity e;
-  sprintf(buffer,"%s", prefix);
-  e = make_array_entity(&buffer[0], module_name, b, lis);
+  e = make_array_entity(prefix, module_name, b, lis);
   AddEntityToDeclarations(e, module);
   return e;
 }
@@ -696,12 +694,14 @@ entity make_new_array_variable_with_prefix(string prefix, entity module,basic b,
 static entity make_new_array_variable(int i, int j, entity module,
                          basic b,list lis)
 {
-  char buffer[20];
+  char *buffer;
   if(j==-1)
-  sprintf(buffer,"%s%d", "B",i);
+  asprintf(&buffer,"%s%d", "B",i);
   else 
-    sprintf(buffer,"%s%d_%d", "B",i,j);
-  return make_new_array_variable_with_prefix(buffer, module, b,lis);
+    asprintf(&buffer,"%s%d_%d", "B",i,j);
+  entity e = make_new_array_variable_with_prefix(buffer, module, b,lis);
+  free(buffer);
+  return e;
 }
 
 /* Cette fonction donne le code fusionne avec allocation des tampons */

@@ -936,7 +936,7 @@ text_equivalence_class(
 		/* ATTENTION: Je n'ai pas considere le cas 
 		 * ou il y a association partielle. De ce fait, offset
 		 * est divisiable par size_elt_1. */
-		static char buffer[10];
+		char *buffer;
 		int offset = offset2 - offset1;
 		int rest;
 		int current_dim;    
@@ -987,9 +987,7 @@ text_equivalence_class(
 		          size, rest, offset, (int)VALUE_TO_INT(val_of(pvlo)));
 		    
 		    new_decl = VALUE_TO_INT(val_of(pvlo)) + rest;
-		    buffer[0] = '\0';
-		    sprintf(buffer+strlen(buffer), "%d", new_decl);		 
-		    lw = CHAIN_SWORD(lw,strdup(buffer));			
+		    lw = CHAIN_SWORD(lw,i2a(new_decl));			
 		    if (current_dim < dim_max)
 			lw = CHAIN_SWORD(lw, space_p? ", " : ",");
 		    

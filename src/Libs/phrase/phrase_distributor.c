@@ -96,8 +96,8 @@ string get_function_name_by_searching_tag(statement stat,
  */
 static void remove_begin_tag (statement stat, string function_name)
 {
-  char* removed_tag = malloc(256);
-  sprintf (removed_tag,EXTERNALIZED_CODE_PRAGMA_BEGIN,function_name);
+  char* removed_tag ;
+  asprintf (&removed_tag,EXTERNALIZED_CODE_PRAGMA_BEGIN,function_name);
   ifdebug(2) {
     pips_debug(2, "REMOVE %s from\n", removed_tag);
     print_statement (stat);
@@ -110,8 +110,8 @@ static void remove_begin_tag (statement stat, string function_name)
  */
 static void remove_end_tag (statement stat, string function_name)
 {
-  char* removed_tag = malloc(256);
-  sprintf (removed_tag,EXTERNALIZED_CODE_PRAGMA_END,function_name);
+  char* removed_tag ;
+  asprintf (&removed_tag,EXTERNALIZED_CODE_PRAGMA_END,function_name);
   ifdebug(2) {
     pips_debug(2, "REMOVE %s from\n", removed_tag);
     print_statement (stat);
@@ -171,9 +171,9 @@ static statement isolate_code_portion (statement begin_tag_statement,
 
   /* Insert an analyzed tag */
   {
-    char* new_tag = malloc(256);
-    sprintf (new_tag, 
-	     strdup(concatenate("! ",
+    char* new_tag ;
+    asprintf (&new_tag, 
+	     (concatenate("! ",
 				EXTERNALIZED_CODE_PRAGMA_ANALYZED,
 				"\n",
 				NULL)),
@@ -324,8 +324,8 @@ static list identify_statements_to_distribute (statement module_stat)
     function_name = get_externalizable_function_name(s);
     if (function_name != NULL) {
       pips_debug(5, "Name: [%s] \n", function_name);
-      end_tag = malloc(256);
-      sprintf (end_tag, EXTERNALIZED_CODE_PRAGMA_END,function_name);
+      end_tag ;
+      asprintf (&end_tag, EXTERNALIZED_CODE_PRAGMA_END,function_name);
       potential_end_statement
 	= get_statements_with_comments_containing (end_tag,
 						   sequence_statement);
@@ -389,14 +389,12 @@ static void distribute_code (string function_name,
   
   // Insert an analyzed tag 
   {
-    char* new_tag = malloc(256);
-    sprintf (new_tag, 
-	     strdup(concatenate("! ",
+    asprintf (&call_comments, 
+	     (concatenate("! ",
 				EXTERNALIZED_CODE_PRAGMA_CALL,
 				"\n",
 				NULL)),
 	     function_name);
-    call_comments = strdup (new_tag);
   }
 
   call_statement = make_statement(entity_empty_label(),
@@ -496,12 +494,12 @@ static void prepare_distribute (statement module_stat)
  */
 static string get_externalized_function_param_name (entity variable, int param_nb) 
 {
-  char buffer[256];
-  sprintf(buffer,
+  char *buffer;
+  asprintf(&buffer,
 	  EXTERNALIZED_FUNCTION_PARAM_NAME,
 	  entity_local_name(variable),
 	  param_nb);
-  return strdup(buffer);
+  return (buffer);
 }
 
 /*
@@ -509,11 +507,11 @@ static string get_externalized_function_param_name (entity variable, int param_n
  */
 static string get_externalized_function_private_param_name (entity variable) 
 {
-  char buffer[256];
-  sprintf(buffer,
+  char *buffer;
+  asprintf(&buffer,
 	  EXTERNALIZED_FUNCTION_PRIVATE_PARAM_NAME,
 	  entity_local_name(variable));
-  return strdup(buffer);
+  return (buffer);
 }
 
 /**

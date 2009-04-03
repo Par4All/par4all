@@ -124,10 +124,17 @@ bool language_module_p(entity m, string lid)
   if(entity_module_p(m)) {
     /* FI: does not work with static functions */
     //string aufn = db_get_memory_resource(DBR_USER_FILE, entity_user_name(m), TRUE);
-    string aufn = db_get_memory_resource(DBR_USER_FILE, module_local_name(m), TRUE);
-    string n = strstr(aufn, lid);
+    /* SG: must check if the ressource exist (not always the case) */
+    string lname= module_local_name(m);
+    if( db_resource_p(DBR_USER_FILE,lname) )
+    {
+        string aufn = db_get_memory_resource(DBR_USER_FILE, module_local_name(m), TRUE);
+        string n = strstr(aufn, lid);
 
-    c_p = (n!=NULL);
+        c_p = (n!=NULL);
+    }
+    else
+        c_p = TRUE; /* SG: be positive ! (needed for Hpfc)*/
   }
   return c_p;
 }

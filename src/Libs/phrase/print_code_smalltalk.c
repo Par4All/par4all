@@ -58,16 +58,6 @@ static string st_loop(loop l);
 static string st_whileloop(whileloop w);
 static string st_forloop(forloop f);
 
-/**
- * Return string representing integer i
- */
-static string 
-int_to_string(int i)
-{
-  char buffer[50];
-  sprintf(buffer, "%d", i);
-  return strdup(buffer);
-}
 
 /**
  * Return beautified string representing name for entity var
@@ -179,18 +169,24 @@ static string st_dimension_reference_as_string (dimension dim, expression old_ex
   if (low_given_by_expression) {
     if (old_given_by_expression) {
       pips_debug(5,"old=%d low=%d\n", old, low);
-      result = strdup(concatenate(result, int_to_string(old-low), NULL));
+      string istr = i2a(old-low);
+      result = strdup(concatenate(result, istr, NULL));
+      free(istr);
     }
     else {
       pips_debug(5,"sold=%s low=%d\n", sold, low);
-      result = strdup(concatenate(result, sold,"-",int_to_string(low), NULL));
+      string istr = i2a(low);
+      result = strdup(concatenate(result, sold,"-",istr, NULL));
+      free(istr);
     }
     }
   else {
     if (old_given_by_expression) {
       pips_debug(5,"old=%d slow=%s\n", old, slow);
-      result = strdup(concatenate(result, int_to_string(old),"-",
+      string istr = i2a(old);
+      result = strdup(concatenate(result, istr,"-",
 				  OPENBRACE,slow,CLOSEBRACE, NULL));
+      free(istr);
     }
     else {
       pips_debug(5,"sold=%s slow=%s\n", sold, slow);
@@ -238,18 +234,24 @@ static string st_dimension_bound_as_string (dimension dim) {
   if (low_given_by_expression) {
     if (up_given_by_expression) {
       pips_debug(5,"up=%d low=%d\n", up, low);
-      result = strdup(concatenate(result, int_to_string(up-low+1), NULL));
+      string istr = i2a(up-low+1);
+      result = strdup(concatenate(result, istr, NULL));
+      free(istr);
     }
     else {
+      string istr = i2a(low-1);
       pips_debug(5,"sup=%s low=%d\n", sup, low);
-      result = strdup(concatenate(result, sup,"-",int_to_string(low-1), NULL));
+      result = strdup(concatenate(result, sup,"-",istr, NULL));
+      free(istr);
     }
     }
   else {
     if (up_given_by_expression) {
       pips_debug(5,"up=%d slow=%s\n", up, slow);
-      result = strdup(concatenate(result, int_to_string(up+1),"-",
+      string istr = i2a(up+1);
+      result = strdup(concatenate(result, istr,"-",
 				  OPENBRACE,slow,CLOSEBRACE, NULL));
+      free(istr);
     }
     else {
       pips_debug(5,"sup=%s slow=%s\n", sup, slow);
@@ -477,7 +479,7 @@ static string st_declaration_init(entity var)
 	    {
 	      if (constant_int_p(c))
 		{
-		  string sval = int_to_string(constant_int(c));
+		  string sval = i2a(constant_int(c));
 		  string svar = st_entity_local_name(var);
 		  pips_debug(4,"Constant is an integer\n");
 		  result = strdup(concatenate(svar, SPACE, SETVALUE
@@ -1415,14 +1417,18 @@ static string st_loop(loop l)
   initialisation = strdup(concatenate(index, SPACE, SETVALUE, SPACE, low, STSEMICOLON, NULL));
 
   if (expression_integer_value(range_increment(r), &incasint)) {
+      string istr;
     if (incasint >= 0) {
+         istr = i2a(incasint);
       inc = strdup(concatenate(ST_PLUS, SPACE, 
-			       int_to_string (incasint), NULL));
+			       istr, NULL));
     }
     else {
+         istr = i2a(-incasint);
       inc = strdup(concatenate(ST_MINUS, SPACE, 
-			       int_to_string (-incasint), NULL));
+			       istr, NULL));
     }
+    free(istr);
   }
   else {
     inc = strdup(concatenate(ST_PLUS, SPACE, 

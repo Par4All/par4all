@@ -140,8 +140,7 @@ int *Gcount_nlc;
 
 	debug( 7, "make_nlc_entity", "doing\n");
 	(*Gcount_nlc)++;
-	num = (char*) malloc(32);
-	(void) sprintf(num, "%d", *Gcount_nlc);
+	(void) asprintf(&num, "%d", *Gcount_nlc);
 
 	mod_ent = get_current_module_entity();
 
@@ -188,8 +187,7 @@ entity make_nsp_entity()
 
 	debug( 7, "make_nsp_entity", "doing\n");
 	Gcount_nsp++;
-	num = (char*) malloc(32);
-	(void) sprintf(num, "%d", Gcount_nsp);
+	(void) asprintf(&num, "%d", Gcount_nsp);
 
 	mod_ent = get_current_module_entity();
 
@@ -232,8 +230,7 @@ entity make_nub_entity()
 
 	debug( 7, "make_nub_entity", "doing\n");
 	Gcount_nub++;
-	num = (char*) malloc(32);
-	(void) sprintf(num, "%d", Gcount_nub);
+	(void) asprintf(&num, "%d", Gcount_nub);
 
 	mod_ent = get_current_module_entity();
 

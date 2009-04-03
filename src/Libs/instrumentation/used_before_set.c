@@ -791,7 +791,7 @@ static list words_numerical_dimension(dimension obj)
     {
       if (low!=1)
 	{
-	  pc = CHAIN_SWORD(pc,int_to_string(low));
+	  pc = CHAIN_SWORD(pc,i2a(low));
 	  pc = CHAIN_SWORD(pc,":");
 	}
     }
@@ -801,7 +801,7 @@ static list words_numerical_dimension(dimension obj)
       pc = CHAIN_SWORD(pc,":");
     }
   if (EvalNormalized(n_up,&up))
-    pc = CHAIN_SWORD(pc,int_to_string(up));
+    pc = CHAIN_SWORD(pc,i2a(up));
   else
     pc = gen_nconc(pc, words_expression(up_exp));
   return(pc);

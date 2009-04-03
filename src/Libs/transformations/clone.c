@@ -71,15 +71,13 @@ compute_callees(statement stat)
 static string
 build_new_top_level_entity_name(string prefix)
 {
-    string name = (string) malloc(sizeof(char)*(strlen(prefix)+20)), res;
+    string name = (string) malloc(sizeof(char)*(strlen(prefix)+20));
     int version = 0;
 
     do { sprintf(name, "%s_%x", prefix, version++); }
     while (module_name_to_entity(name)!=entity_undefined);
 
-    res = strdup(name); 
-    free(name);
-    return res;
+    return name;
 }
 
 /* build a new clone version. if argn is not null, generate a check.

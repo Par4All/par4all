@@ -477,11 +477,11 @@ static entity make_scalar_communication_module (variable var,
  */
 string get_dynamic_variable_name(entity dynamic_variable)
 {
-  char buffer[256];
-  sprintf(buffer,
+  char *buffer;
+  asprintf(&buffer,
 	  DYN_VAR_PARAM_NAME,
 	  entity_local_name(dynamic_variable));
-  return strdup(buffer);
+  return (buffer);
 }
 
 /**
@@ -489,11 +489,11 @@ string get_dynamic_variable_name(entity dynamic_variable)
  */
 string get_ref_var_param_name(entity reference_param)
 {
-  char buffer[256];
-  sprintf(buffer,
+  char *buffer;
+  asprintf(&buffer,
 	  REF_VAR_PARAM_NAME,
 	  entity_local_name(reference_param));
-  return strdup(buffer);
+  return (buffer);
 }
 
 /**
@@ -505,12 +505,12 @@ string get_send_param_module_name(entity function, region reg)
     return get_send_parameter_module_name(type_variable(entity_type(region_entity(reg))));
   }
   else {
-    char buffer[256];
-    sprintf(buffer,
+    char *buffer;
+    asprintf(&buffer,
 	    SEND_ARRAY_PARAM_MODULE_NAME,
 	    entity_local_name(function),
 	    entity_local_name(region_entity(reg)));
-    return strdup(buffer);
+    return (buffer);
   }
 }
 
@@ -523,12 +523,12 @@ string get_receive_param_module_name(entity function, region reg)
     return get_receive_parameter_module_name(type_variable(entity_type(region_entity(reg))));
   }
   else {
-    char buffer[256];
-    sprintf(buffer,
+    char *buffer;
+    asprintf(&buffer,
 	    RECEIVE_ARRAY_PARAM_MODULE_NAME,
 	    entity_local_name(function),
 	    entity_local_name(region_entity(reg)));
-    return strdup(buffer);
+    return (buffer);
   }
 }
 

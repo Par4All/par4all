@@ -129,10 +129,10 @@ void debug_unstructured (unstructured an_unstructured,
       statement s = control_statement (current_control);
       string next_nodes_as_string = "";
       string previous_nodes_as_string = "";
-      char title[80];
+      char *title;
       list predecessors = control_predecessors(current_control);
       list successors = control_successors(current_control);
-      char temp[50];
+      char *temp;
       int i;
       int ordering = 0;
 
@@ -141,10 +141,11 @@ void debug_unstructured (unstructured an_unstructured,
 				      (CONTROL(gen_nth(i,predecessors))));
 	ordering = beautify_ordering (ordering);
 	/*if (ordering > 65535) ordering = ordering >> 16;*/
-	sprintf (temp, "[%p] ",ordering);
+	asprintf (&temp, "[%p] ",ordering);
 	previous_nodes_as_string = strdup (concatenate(previous_nodes_as_string,
-						       strdup(temp),
+						       temp,
 						       NULL));
+    free(temp);
       }
       
       for (i=0; i<gen_length(successors); i++) {
@@ -152,20 +153,21 @@ void debug_unstructured (unstructured an_unstructured,
 				      (CONTROL(gen_nth(i,successors))));
 	ordering = beautify_ordering (ordering);
 	/*if (ordering > 65535) ordering = ordering >> 16;*/
-	sprintf (temp, "[%p] ",ordering);
+	asprintf (&temp, "[%p] ",ordering);
 	next_nodes_as_string = strdup (concatenate(next_nodes_as_string,
-						   strdup(temp),
+						   (temp),
 						   NULL));
+    free(temp);
       }
       
       ordering = beautify_ordering (ordering);
       ordering = statement_ordering(s);
       /*if (ordering > 65535) ordering = ordering >> 16;*/
-      sprintf (title, "CONTROL: %p\n", ordering);
       ifdebug(debug_level) {
+      asprintf (&title, "CONTROL: %p\n", ordering);
 	pips_debug(debug_level, "%s\n",
 		   strdup(concatenate("\n", line,
-				      "* ", strdup(title),
+				      "* ", (title),
 				      line, NULL)));
 	print_statement(s);
 	pips_debug(debug_level, "%s\n",
@@ -173,6 +175,7 @@ void debug_unstructured (unstructured an_unstructured,
 				      "NEXT: ", next_nodes_as_string, "\n",
 				      "PREVIOUS: ", previous_nodes_as_string, "\n",
 				      line, NULL)));
+    free(title);
       }
     }, unstructured_entry(an_unstructured), blocs);
   }
@@ -187,7 +190,7 @@ void short_debug_unstructured (unstructured an_unstructured,
 {
   list blocs = NIL ;
   string entry_as_string, exit_as_string;
-  char temp[50];
+  char *temp;
 
   ifdebug (debug_level) {
     sprintf (temp, "[%p] ",unstructured_entry(an_unstructured));
@@ -203,28 +206,31 @@ void short_debug_unstructured (unstructured an_unstructured,
     CONTROL_MAP (current_control, { 
       string next_nodes_as_string = "";
       string previous_nodes_as_string = "";
-      char title[80];
+      char *title;
 
       MAP(CONTROL, c, {
-	sprintf (temp, "[%p] ",c);
+	asprintf (&temp, "[%p] ",c);
 	previous_nodes_as_string = strdup (concatenate(previous_nodes_as_string,
-						       strdup(temp),
+						       (temp),
 						       NULL));
+    free(temp);
       }, control_predecessors(current_control));
 
       MAP(CONTROL, c, {
-	sprintf (temp, "[%p] ",c);
+	asprintf (&temp, "[%p] ",c);
 	next_nodes_as_string = strdup (concatenate(next_nodes_as_string,
-						   strdup(temp),
+						   (temp),
 						   NULL));
+    free(temp);
       }, control_successors(current_control));
 
-      sprintf (title, "CONTROL: %p\n", current_control);
+      asprintf (&title, "CONTROL: %p\n", current_control);
       pips_debug(debug_level, "%s\n",
 		 strdup(concatenate(title,
 				    "NEXT: ", next_nodes_as_string, "\n",
 				    "PREVIOUS: ", previous_nodes_as_string, "\n",
 				    NULL)));
+      free(title);
     }, unstructured_entry(an_unstructured), blocs);
   }
 }
@@ -300,13 +306,11 @@ entity make_variable_from_name_and_entity (entity cloned_variable,
   string variable_name;
   entity returned_variable = NULL;
   int index = statement_ordering(stat);
-  char buffer[50];
+  char *buffer;
   
   while (returned_variable == NULL) {
     
-    sprintf(buffer, base_name, index++);
-    variable_name = strdup(concatenate(strdup(buffer),
-				       NULL));
+    asprintf(&variable_name, base_name, index++);
     returned_variable 
       = clone_variable_with_new_name (cloned_variable,
 				      variable_name,

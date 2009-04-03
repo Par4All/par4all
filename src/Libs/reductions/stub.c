@@ -34,7 +34,7 @@
 bool old_reductions(string mod_name)
 {
     string program_name = db_get_current_workspace_name() ;
-    char command[ 1024 ] ;
+    char *command ;
     struct stat buf ;
     char *options ; 
     statement mod_stat ;
@@ -48,7 +48,7 @@ bool old_reductions(string mod_name)
     debug_on("REDUCTIONS_DEBUG_LEVEL");
     db_close_workspace(FALSE) ;
     options = (get_debug_level() <= 5) ? " -batch" : "" ;
-    sprintf(command, 
+    asprintf(&command, 
 	    "(echo \"(defparameter files-directory \\\"%s\\\")\
              (load (concatenate %s files-directory \\\"/init\\\"))\
              (load (concatenate %s files-directory \\\"/top\\\"))\
@@ -65,6 +65,7 @@ bool old_reductions(string mod_name)
     if( (system( command ) >> 8) != 0 ) {
 	pips_error( "reductions", "Lisp process died unexpectedly\n" ) ;
     }
+    free(command);
     debug_off();
     db_open_workspace( program_name ) ;
     mod_stat = (statement) 

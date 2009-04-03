@@ -1206,15 +1206,16 @@ entity_constant_string_size(entity e)
 static string
 entity_size_uname(entity e)
 {
+    static const char  prefix []= "PIPS_size_";
     string name = entity_name(e);
     string uname;
     int i, len = strlen(name);
 
-    if ((uname = malloc(len + 12)) == NULL) {
+    if ((uname = malloc(len + 1 + sizeof(prefix))) == NULL) {
         perror("malloc");
         exit(1);
     }
-    sprintf(uname, "PIPS_size_%s", name);
+    sprintf(uname, "%s%s",prefix, name);
     len = strlen(uname);
     for (i = 0; i < len; i++) {
         if (uname[i] == ':' || uname[i] == '-') {

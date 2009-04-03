@@ -690,7 +690,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad)
     referenceInfo firstRef = make_empty_referenceInfo();
     referenceInfo cRef = make_empty_referenceInfo();
     int lastOffset = 0;
-    char functionName[30];
+    char *functionName;
 
     string lsType = local_name(get_simd_vector_type(args));
 
@@ -806,8 +806,10 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad)
     free_empty_referenceInfo(firstRef);
     free_empty_referenceInfo(cRef);
 
-    sprintf(functionName, "%s%s", funcNames[argsType][isLoad], lsType);
-    return make_exec_statement_from_name(functionName, args);
+    asprintf(&functionName, "%s%s", funcNames[argsType][isLoad], lsType);
+    statement es = make_exec_statement_from_name(functionName, args);
+    free(functionName);
+    return es;
 
 }
 

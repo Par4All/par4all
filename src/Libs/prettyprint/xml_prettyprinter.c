@@ -141,14 +141,6 @@ static string xml_entity_local_name(entity var)
    parameter (n=4) -> #define n 4
  */
 
-static string 
-int_to_string(int i)
-{
-  char buffer[50];
-  sprintf(buffer, "%d", i);
-  return strdup(buffer);
-}
-
 
 /* forward declaration */
 static string xml_expression(expression);
@@ -255,24 +247,24 @@ static string xml_dim_string(list ldim, string name)
 	nbdim++;
 	if (expression_integer_value(elow, &low)){
 	  if(nbdim != 1)
-	    origins = strdup(concatenate(origins, COMMA ,int_to_string(low), NULL));
+	    origins = strdup(concatenate(origins, COMMA ,i2a(low), NULL));
 	  else
-	    origins = strdup(concatenate(origins, int_to_string(low), NULL));
+	    origins = strdup(concatenate(origins, i2a(low), NULL));
 	}
 	else pips_user_error("Array origins must be integer\n");
 
 	if (expression_integer_value(eup, &up)){
 	  if(nbdim != 1)
-	    dimensions = strdup(concatenate(dimensions, COMMA ,int_to_string(up-low+1), NULL));
+	    dimensions = strdup(concatenate(dimensions, COMMA ,i2a(up-low+1), NULL));
 	  else
-	    dimensions = strdup(concatenate(dimensions, int_to_string(up-low+1), NULL));
+	    dimensions = strdup(concatenate(dimensions, i2a(up-low+1), NULL));
 	}
 	else pips_user_error("Array dimensions must be integer\n");
       }, ldim);
       *nbdimptr = nbdim;
       gen_array_append(array_dims, nbdimptr);
       gen_array_append(array_names, namep);
-      result = strdup(concatenate(result, int_to_string(nbdim), COMMA, NL, NULL));
+      result = strdup(concatenate(result, i2a(nbdim), COMMA, NL, NULL));
       result = strdup(concatenate(result, TAB, origins, CLOSEPAREN, COMMA, NL, NULL));
       result = strdup(concatenate(result, TAB, dimensions, CLOSEPAREN, COMMA, NL, NULL));
       result = strdup(concatenate(result, TAB, datatype, NL, NL, NULL));
@@ -531,7 +523,7 @@ static string xml_array_in_task(reference r, bool first, int task_number){
       fitting_array[i][j] = "0";
 
   /* XML reference header */
-  result = strdup(concatenate(result, "DATA(name = symbol!(\"", "T_", int_to_string(task_number),
+  result = strdup(concatenate(result, "DATA(name = symbol!(\"", "T_", i2a(task_number),
 			      "\" /+ \"", varname, "\"),", NL, TAB, TAB, NULL));
 
   result = strdup(concatenate(result, "darray = ", varname, "," NL, TAB, TAB, "accessMode = ", (first?"Wmode,":"Rmode,"),
@@ -629,7 +621,7 @@ static string xml_array_in_task(reference r, bool first, int task_number){
   
   /* Definition of the inner loop nest */
   /* FI->IH: if some columns are removed, the effective depth is unkown and must be computed here */
-  /* result = strdup(concatenate(result, "inLoopNest = LOOPNEST(deep = ", int_to_string(MONMAX(gen_array_nitems(intern_indices_array), 1)), ",", NL, TAB, TAB, TAB, NULL)); */
+  /* result = strdup(concatenate(result, "inLoopNest = LOOPNEST(deep = ", i2a(MONMAX(gen_array_nitems(intern_indices_array), 1)), ",", NL, TAB, TAB, TAB, NULL)); */
 
   for (j = 0; j<intern_nb; j++){
     bool is_null_p = TRUE;
@@ -819,7 +811,7 @@ static call xml_loop_from_loop(loop l, string * result, int task_number){
   u = atoi(xml_expression(range_upper(loop_range(l))));
   low = atoi(xml_expression(range_lower(loop_range(l))));
   /*  printf("%i %i\n", u, low); */
-  *up = strdup(int_to_string(u - low+1));
+  *up = strdup(i2a(u - low+1));
 	       //*up = xml_expression(range_upper(loop_range(l)) - range_lower(loop_range(l)) + 1);
   *xml_name = xml_entity_local_name(loop_index(l));
   if( (*xml_name)[0] == 'M'){
@@ -880,7 +872,7 @@ static string xml_loop_from_sequence(loop l, int task_number){
   }
 
 
-  *taskname = strdup(concatenate("T_", int_to_string(task_number), NULL));
+  *taskname = strdup(concatenate("T_", i2a(task_number), NULL));
   result = strdup(concatenate(*taskname, 
 			      " :: TASK(unitSpentTime = vartype!(1),"
 			      NL, TAB, "exLoopNest = LOOPNEST(deep = ", NULL));
@@ -895,7 +887,7 @@ static string xml_loop_from_sequence(loop l, int task_number){
   *name = xml_entity_local_name(loop_index(l));
   u = atoi(xml_expression(range_upper(loop_range(l))));
   low = atoi(xml_expression(range_lower(loop_range(l))));
-  *up = strdup(int_to_string(u - low+1));
+  *up = strdup(i2a(u - low+1));
   //*up = xml_expression(range_upper(loop_range(l)) - range_lower(loop_range(l)) + 1);
 
   if((*name)[0] == 'M'){
@@ -932,7 +924,7 @@ static string xml_loop_from_sequence(loop l, int task_number){
   }
 
   /* External loop nest depth */
-  result = strdup(concatenate(result, int_to_string(gen_array_nitems(extern_upperbounds_array)), ",", NL, TAB, TAB, NULL));
+  result = strdup(concatenate(result, i2a(gen_array_nitems(extern_upperbounds_array)), ",", NL, TAB, TAB, NULL));
 
   /* add external upperbounds */
   result = strdup(concatenate(result, "upperBound = list<VARTYPE>(", NULL));

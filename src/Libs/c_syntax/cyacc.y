@@ -60,6 +60,7 @@
 #include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
+#include "text-util.h"
 #include "misc.h"
 #include "transformations.h" // FI: should not be referenced
 #include "alias_private.h" // FI: should not be referenced
@@ -318,7 +319,7 @@ void EnterScope()
   // parameters and local variable. See
   // Validation/C_syntax/block_scope01.c, identifier x in function foo
   if(C_scope_identifier>=0) {
-    string ns = int_to_string(C_scope_identifier);
+    string ns = i2a(C_scope_identifier);
     
     c_parser_context_scope(nc) = strdup(concatenate(cs, ns, BLOCK_SEP_STRING, NULL));
     free(ns);
@@ -1900,8 +1901,10 @@ type_spec:   /* ISO 6.7.2 */
 			}
 |   TK_STRUCT TK_LBRACE
                         {
+              string istr = i2a(derived_counter++);
 			  code c = make_code(NIL,strdup(concatenate(DUMMY_STRUCT_PREFIX,
-								    int_to_string(derived_counter++),NULL)),sequence_undefined, NIL);
+								    istr,NULL)),sequence_undefined, NIL);
+              free(istr);
 			  stack_push((char *) c, StructNameStack);
                         }
     struct_decl_list TK_RBRACE
@@ -1944,7 +1947,7 @@ type_spec:   /* ISO 6.7.2 */
 			}
 |   TK_UNION TK_LBRACE
                         { 
-			  string n = int_to_string(derived_counter++);
+			  string n = i2a(derived_counter++);
 			  code c = make_code(NIL,
 					     strdup(concatenate(DUMMY_UNION_PREFIX,n,NULL)),
 					     sequence_undefined,
@@ -2001,7 +2004,7 @@ type_spec:   /* ISO 6.7.2 */
 |   TK_ENUM TK_LBRACE enum_list maybecomma TK_RBRACE
                         {
 			  /* Create the enum entity with unique name */
-			  string n = int_to_string(derived_counter++);
+			  string n = i2a(derived_counter++);
 			  string s = strdup(concatenate(DUMMY_ENUM_PREFIX,n,NULL));
 			  free(n);
 			  entity ent = MakeDerivedEntity(s,$3,is_external,is_type_enum);
@@ -2053,7 +2056,8 @@ struct_decl_list: /* (* ISO 6.7.2. Except that we allow empty structs. We
 			  c_parser_context ycontext = GetContext();
 			  /* Create the struct member entity with unique name, the name of the 
 			     struct/union is added to the member name prefix */
-			  string s = strdup(concatenate("PIPS_MEMBER_",int_to_string(derived_counter++),NULL));  
+              string istr = i2a(derived_counter++);
+			  string s = strdup(concatenate("PIPS_MEMBER_",istr,NULL));  
 			  string derived = code_decls_text((code) stack_head(StructNameStack));		
 			  entity ent = CreateEntityFromLocalNameAndPrefix(s,strdup(concatenate(derived,
 											       MEMBER_SEP_STRING,NULL)),
@@ -2062,6 +2066,7 @@ struct_decl_list: /* (* ISO 6.7.2. Except that we allow empty structs. We
 			  pips_debug(5,"Member name: %s\n",entity_name(ent));
 			  entity_storage(ent) = make_storage_rom();
 			  entity_type(ent) = c_parser_context_type(ycontext); 
+              free(s);
 
 			  /* Temporally put the list of struct/union
 			     entities defined in $1 to initial value
@@ -2144,7 +2149,7 @@ field_decl: /* (* ISO 6.7.2. Except that we allow unnamed fields. *) */
 			  //c_parser_context ycontext = stack_head(ContextStack);
 			  c_parser_context ycontext = GetContext();
 			  /* Unnamed bit-field : special and unique name */
-			  string n = int_to_string(derived_counter++);
+			  string n = i2a(derived_counter++);
 			  string s = strdup(concatenate(DUMMY_MEMBER_PREFIX,n,NULL));  
 			  entity ent = CreateEntityFromLocalNameAndPrefix(s,c_parser_context_scope(ycontext),is_external);
 			  value nv = EvalExpression($2);
@@ -2155,6 +2160,7 @@ field_decl: /* (* ISO 6.7.2. Except that we allow unnamed fields. *) */
                           /* pips_assert("Width of bit-field must be a positive constant integer", 
                              integer_constant_expression_p($2)); */
 			  entity_type(ent) = make_type_variable(v);
+              free(n);
 			  $$ = ent;
 			}
 ;
@@ -2571,7 +2577,7 @@ abstract_decl: /* (* ISO 6.7.6. *) */
 			}
 |   pointer 
                         {
-			  string n = int_to_string(abstract_counter++);
+			  string n = i2a(abstract_counter++);
 			  $$ = FindOrCreateCurrentEntity(strdup(concatenate(DUMMY_ABSTRACT_PREFIX,
 									    n,NULL)),
 							 ContextStack,
@@ -2637,7 +2643,7 @@ abs_direct_decl_opt:
     abs_direct_decl    
                         { }
 |   /* empty */         {
-                          string n = int_to_string(abstract_counter++);
+                          string n = i2a(abstract_counter++);
 			  $$ = FindOrCreateCurrentEntity(strdup(concatenate(DUMMY_ABSTRACT_PREFIX,
 									    n,NULL)),
 							 ContextStack,FormalStack,

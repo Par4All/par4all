@@ -20,9 +20,15 @@ void create(char* workspace_name, char ** filenames)
     string main_module_name;
     tpips_init();
     gen_array_t filename_list = gen_array_make(0);
+    static bool exception_callback_set = false;
+    if(!exception_callback_set)
+    {
+        exception_callback_set = true;
+        set_exception_callbacks(push_pips_context, pop_pips_context);
+    }
     while(*filenames)
     {
-        printf("appending '%s'\n",*filenames);
+        //printf("appending '%s'\n",*filenames);
         gen_array_append(filename_list,*filenames);
         filenames++;
     }
@@ -72,8 +78,9 @@ void create(char* workspace_name, char ** filenames)
 
 void quit()
 {
+    tp_close_the_workspace(db_get_current_workspace_name());
     tpips_close();
-    db_close_pips_database();
+//    db_close_pips_database();
 }
 
 void set_property(char* propname, char* value)

@@ -1,19 +1,19 @@
 import pypips
 import os
 import random
-from string import split, upper
+from string import split, upper, join
 import shutil 
 
 modules = {}
-
 module_ext = ""
 
 def workspace_dir():return workspace()+".database/"
 
 
 class module:
-	def __init__(self,name):
+	def __init__(self,name, source=""):
 		self.name=name
+		self.source=source
 		modules[name]=self
 
 	def show(self,rc):
@@ -34,12 +34,28 @@ class module:
 		if not dest:
 			dest=self.name + module_ext
 		self.apply("unsplit")
-		src=workspace_dir()+"Src/"+self.name+module_ext
+		src=workspace_dir()+"Src/"+self.source
 		if not os.path.exists(src):
+			#print "unsplitted file not found, saving module file"
 			src=workspace_dir()+self.show("printed_file")
 		shutil.copy(src,dest)
 
-	def inline(self):self.apply("inlining")
+	def compile(self,CC="gcc",CFLAGS="-O2 -g", LDFLAGS="", link=True):
+		tmpfile="._.c"
+		self.save(tmpfile)
+		command=[CC,CFLAGS]
+		
+		if link:
+			outfile=self.name
+			command+=[tmpfile,LDFLAGS]
+		else:
+			outfile=self.name+".o"
+			command+=["-c" , tmpfile]
+		command+=["-o", outfile]
+		os.system(" ".join(command))
+		os.remove(tmpfile)
+		return outfile
+
 ### helpers /!\ do not touch this line /!\
 
 
@@ -72,8 +88,10 @@ def create(*sources):
 		set_property("PRETTYPRINT_STATEMENT_NUMBER", False)
 	else:
 		module_ext=".f"
+	if len(sources) > 1:
+		print "/!\\ the save method will not work correctly /!\\"
 	for m in info("modules"):
-		modules[m]=module(m)
+		modules[m]=module(m,sources[0])
 
 def close():
 	ws=workspace()

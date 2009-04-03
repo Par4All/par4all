@@ -273,17 +273,6 @@ static bool tail_call_path_p(call_site cs, list l1, list l2)
   return FALSE;
 }
 
-
-string
-int_to_string(_int i)
-{
-  // If it is enough for an octal number it will be OK for a decimal :-)
-  char buffer[2+sizeof(_int)*CHAR_BIT/3];
-  sprintf(buffer, "%td", i);
-  return strdup(buffer);
-}
-
-
 /* This function prints the call path , including names of caller functions 
    and orderings of call sites in their corresponding functions */
 static string print_call_path(list path)
@@ -296,9 +285,9 @@ static string print_call_path(list path)
     pc = CHAIN_SWORD(pc,"(");
     pc = CHAIN_SWORD(pc,module_local_name(casifunc));
     pc = CHAIN_SWORD(pc,":(");
-    pc = CHAIN_SWORD(pc,int_to_string(ORDERING_NUMBER(casiord)));
+    pc = CHAIN_SWORD(pc,i2a(ORDERING_NUMBER(casiord)));
     pc = CHAIN_SWORD(pc,",");
-    pc = CHAIN_SWORD(pc,int_to_string(ORDERING_STATEMENT(casiord)));
+    pc = CHAIN_SWORD(pc,i2a(ORDERING_STATEMENT(casiord)));
     pc = CHAIN_SWORD(pc,")) ");
   },path);
   return words_to_string(pc);

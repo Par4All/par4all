@@ -63,9 +63,10 @@ int	in_i;
   
   
   debug(9, "adg_get_integer_entity", "begin \n");
-  num     = (char*) malloc(32); (void) sprintf(num, "%d", in_i);
+  num     = i2a(in_i);
   mod_ent = get_current_module_entity();
   name    = strdup(concatenate("I", (char*) num, (char *) NULL));
+  free(num);
   
   /* If a Renamed Entity already exists, we use it ;
    * else, we make a new one and increment Gcount_re.
@@ -1110,9 +1111,10 @@ hash_table fst;
     char    *name  = NULL, *name2 = NULL, *num = NULL;
     
     counter++;
-    num     = (char*) malloc(32); (void) sprintf(num, "%d", counter);
+    num     = i2a(counter);
     mod_ent = get_current_module_entity(); 
     name    = strdup(concatenate("RE", num, (char *) NULL));
+    free(num);
 
     /* If a Renamed Entity already exists, we use it ;
      * else, we make a new one and increment Gcount_re.

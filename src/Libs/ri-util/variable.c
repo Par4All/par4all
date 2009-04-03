@@ -168,10 +168,11 @@ make_new_scalar_variable_with_prefix(string prefix,
 				     basic b)
 {
   string module_name = module_local_name(module);
-  char buffer[20];
+  char buffer[22];
   entity e;
   int number = 0;
   bool empty_prefix = (strlen(prefix) == 0);
+  const string format = fortran_module_p(module)?"%s%d":"0" BLOCK_SEP_STRING "%s%d";
 
   /* let's assume positive int stored on 4 bytes */
   pips_assert("make_new_scalar_variable_with_prefix", strlen(prefix)<=10);
@@ -180,23 +181,23 @@ make_new_scalar_variable_with_prefix(string prefix,
     if (empty_prefix) {
       switch(basic_tag(b)) {
       case is_basic_int:
-	sprintf(buffer,"%s%d", DEFAULT_INT_PREFIX,
+	sprintf(buffer,format, DEFAULT_INT_PREFIX,
 		unique_integer_number++);
 	break;
       case is_basic_float:
-	sprintf(buffer,"%s%d", DEFAULT_FLOAT_PREFIX, 
+	sprintf(buffer,format, DEFAULT_FLOAT_PREFIX, 
 		unique_float_number++);
 	break;
       case is_basic_logical:
-	sprintf(buffer,"%s%d", DEFAULT_LOGICAL_PREFIX,
+	sprintf(buffer,format, DEFAULT_LOGICAL_PREFIX,
 		unique_logical_number++);
 	break;
       case is_basic_complex:
-	sprintf(buffer,"%s%d", DEFAULT_COMPLEX_PREFIX,
+	sprintf(buffer,format, DEFAULT_COMPLEX_PREFIX,
 		unique_complex_number++);
 	break;
       case is_basic_string:
-	sprintf(buffer, "%s%d", DEFAULT_STRING_PREFIX,
+	sprintf(buffer, format, DEFAULT_STRING_PREFIX,
 		unique_string_number++);
 	break;
       default:
@@ -220,7 +221,7 @@ make_new_scalar_variable_with_prefix(string prefix,
 
   pips_debug(9, "var %s, tag %d\n", buffer, basic_tag(b));
 
-  e = make_scalar_entity(&buffer[0], module_name, b);
+  e = make_scalar_entity(buffer, module_name, b);
   AddEntityToDeclarations(e, module);
 
   return e;

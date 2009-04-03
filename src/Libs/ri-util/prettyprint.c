@@ -2524,18 +2524,18 @@ init_text_statement(
 
     if (get_bool_property("PRETTYPRINT_ALL_EFFECTS") ||
 	get_bool_property("PRETTYPRINT_STATEMENT_ORDERING")) {
-	static char buffer[ 256 ] ;
+	char *buffer;
 	int so = statement_ordering(obj) ;
 
 	if (!(instruction_block_p(statement_instruction(obj)) && 
 	      (! get_bool_property("PRETTYPRINT_BLOCKS")))) {
 
 	    if (so != STATEMENT_ORDERING_UNDEFINED) {
-	      sprintf(buffer, "%s (%d,%d)\n", PIPS_COMMENT_SENTINEL,
+	      asprintf(&buffer, "%s (%d,%d)\n", PIPS_COMMENT_SENTINEL,
 			ORDERING_NUMBER(so), ORDERING_STATEMENT(so)) ;
 		ADD_SENTENCE_TO_TEXT(r, 
 				     make_sentence(is_sentence_formatted, 
-						   strdup(buffer))) ;
+						   buffer)) ;
 	    }
 	    else {
 		if(user_view_p())

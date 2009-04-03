@@ -787,14 +787,14 @@ update_number_of_use(entity ent, list lst_stat, int up_down)
       /* Update old value */
       else
       {
-	char new[20];
+	char *new;
 	int number_use = 0;
 	char* comment = statement_comments(s);
 	sscanf((const char*)comment, "%d", &number_use);
 	
 	number_use += up_down;
-	sprintf(new, "%d", number_use);
-	set_comment_of_statement(s, strdup(new));
+    new=i2a(number_use);
+	set_comment_of_statement(s, (new));
       }
       return s;
     }

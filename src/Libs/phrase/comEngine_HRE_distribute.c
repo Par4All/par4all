@@ -664,12 +664,11 @@ static void make_HRE_empty_module()
 {
   static int number = 0;
 
-  string num = (char*) malloc(32);
-  sprintf(num, "_%i", number++);
-
-  string prefix = strdup(concatenate(g_new_module_name,
+  string num  = i2a(number++);
+  string prefix = strdup(concatenate(g_new_module_name,"_",
 				     num,
 				     (char *) NULL));
+  free(num);
 
   entity new_fun = make_empty_subroutine(prefix);
 

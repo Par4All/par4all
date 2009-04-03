@@ -128,6 +128,7 @@
 #include "pipsmake.h"
 #include "instrumentation.h"
 #include "conversion.h"
+#include "text-util.h"
 #include "transformations.h"
 
 #define ALIAS_SECTION "ALIAS_SECTION"
@@ -787,8 +788,11 @@ static void same_or_equivalence_argument_add_aliases(list l,call c,call_site cs,
     }
   else
     {
-      entity sec = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, 
-	 strdup(concatenate(ALIAS_SECTION,int_to_string(unique_section_number++),NULL)));
+        string istr = i2a(unique_section_number++);
+        string ename = strdup(concatenate(ALIAS_SECTION,istr,NULL));
+      entity sec = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, ename);
+      free(ename);
+      free(istr);
       MAP(INT,k,
       {
 	expression actual_arg = find_ith_argument(l_actual,k);

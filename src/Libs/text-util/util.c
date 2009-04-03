@@ -18,18 +18,18 @@
 char *
 i2a(int i)
 {
-    char buffer[32];
-    sprintf(buffer, "%d", i);
-    return strdup(buffer);
+    char *buffer;
+    asprintf(&buffer,"%d", i);
+    return buffer;
 }
 
 
 char *
 f2a(float f)
 {
-    char buffer[32];
-    sprintf(buffer, "%f", f);
-    return strdup(buffer);
+    char *buffer;
+    asprintf(&buffer, "%f", f);
+    return buffer;
 }
 
 void
@@ -37,12 +37,12 @@ add_one_unformated_printf_to_text(text r,
                                   string a_format, ...)
 {
   /* beurk... */
-   char buffer[200];
+   char *buffer;
    va_list some_arguments;
    va_start(some_arguments, a_format);
-   (void) vsprintf(buffer, a_format, some_arguments);
+   (void) vasprintf(&buffer, a_format, some_arguments);
    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
-                                         strdup(buffer)));
+                                         buffer));
    va_end(some_arguments);
 }
 

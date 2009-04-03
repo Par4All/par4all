@@ -328,11 +328,11 @@ void declare_common_variables_in_module (entity common, entity module)
  */
 string get_controlized_statement_comment (entity function) 
 {
-  char buffer[256];
-  sprintf(buffer,
+  char *buffer;
+  asprintf(&buffer,
 	  CONTROLIZED_STATEMENT_COMMENT,
 	  entity_local_name(function));
-  return strdup(buffer);
+  return (buffer);
 }
 
 /*
@@ -340,12 +340,12 @@ string get_controlized_statement_comment (entity function)
  */
 string get_in_param_id_name (entity variable, entity function) 
 {
-  char buffer[256];
-  sprintf(buffer,
+  char *buffer;
+  asprintf(&buffer,
 	  IN_PARAM_ID_NAME,
 	  entity_local_name(variable),
 	  entity_local_name(function));
-  return strdup(buffer);
+  return (buffer);
 }
 
 /*
@@ -353,12 +353,12 @@ string get_in_param_id_name (entity variable, entity function)
  */
 string get_out_param_id_name (entity variable, entity function) 
 {
-  char buffer[256];
-  sprintf(buffer,
+  char *buffer;
+  asprintf(&buffer,
 	  OUT_PARAM_ID_NAME,
 	  entity_local_name(variable),
 	  entity_local_name(function));
-  return strdup(buffer);
+  return (buffer);
 }
 
 /*
@@ -366,8 +366,8 @@ string get_out_param_id_name (entity variable, entity function)
  */
 string get_function_id_name (entity function) 
 {
-  char buffer[256];
-  sprintf(buffer,
+  char *buffer;
+  asprintf(&buffer,
 	  FUNCTION_ID_NAME,
 	  entity_local_name(function));
   return strdup(buffer);
@@ -378,8 +378,8 @@ string get_function_id_name (entity function)
  */
 static string get_function_common_name (entity function) 
 {
-  char buffer[256];
-  sprintf(buffer,
+  char *buffer;
+  asprintf(&buffer,
 	  FUNCTION_COMMON_NAME,
 	  entity_local_name(function));
   return strdup(buffer);
@@ -390,8 +390,8 @@ static string get_function_common_name (entity function)
  */
 string get_common_param_name (entity variable, entity function) 
 {
-  char buffer[256];
-  sprintf(buffer,
+  char *buffer;
+  asprintf(&buffer,
 	  COMMON_PARAM_NAME,
 	  entity_local_name(variable),
 	  entity_local_name(function));
@@ -403,8 +403,8 @@ string get_common_param_name (entity variable, entity function)
  */
 static string get_unit_id_name (int unit) 
 {
-  char buffer[256];
-  sprintf(buffer,UNIT_ID_NAME,unit);
+  char *buffer;
+  asprintf(&buffer,UNIT_ID_NAME,unit);
   return strdup(buffer);
 }
 
@@ -413,8 +413,8 @@ static string get_unit_id_name (int unit)
  */
 string get_send_parameter_module_name (variable var) 
 {
-  char buffer[256];
-  sprintf(buffer,SEND_PARAMETER_MODULE_NAME,variable_to_string(var));
+  char *buffer;
+  asprintf(&buffer,SEND_PARAMETER_MODULE_NAME,variable_to_string(var));
   return strdup(buffer);
 }
 
@@ -423,8 +423,8 @@ string get_send_parameter_module_name (variable var)
  */
 string get_receive_parameter_module_name (variable var) 
 {
-  char buffer[256];
-  sprintf(buffer,RECEIVE_PARAMETER_MODULE_NAME,variable_to_string(var));
+  char *buffer;
+  asprintf(&buffer,RECEIVE_PARAMETER_MODULE_NAME,variable_to_string(var));
   return strdup(buffer);
 }
 
@@ -784,12 +784,13 @@ static statement controlize_distribution (statement module_stat,
 	  unit_id = 0;
 	  
 	  if (number_of_deployment_units > 1) {
-	    char question[256];
+	    char *question;
 	    unit_id = 0;
 	    do {
-	      sprintf (question, "Deployment of function %s on which units ?\n(give its number 1-%d):", function_name, number_of_deployment_units);
+	      asprintf (&question, "Deployment of function %s on which units ?\n(give its number 1-%d):", function_name, number_of_deployment_units);
 	      resp = user_request(question);  
 	      sscanf(resp,"%d",&unit_id);	    
+          free(question);
 	    }
 	    while ((unit_id <1) || (unit_id > number_of_deployment_units));
 	    

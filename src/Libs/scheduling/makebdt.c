@@ -118,10 +118,11 @@ entity create_var_name(Type, source, dest, count)
 {
  char    *name;
 
- name = (char*) malloc(30);
- sprintf(name, "%s_%d_%d_%d", Type, source, dest, count);
+ asprintf(&name, "%s_%d_%d_%d", Type, source, dest, count);
 
- return (create_named_entity(name));
+ entity e = (create_named_entity(name));
+ free(name);
+ return e;
 }
 
 /*======================================================================*/
@@ -373,6 +374,7 @@ list make_x_list(c)
      ent = create_named_entity(name);
      ADD_ELEMENT_TO_LIST(laux, ENTITY, ent);
     }
+ free(name);
 
  return(laux);
 }
@@ -485,6 +487,7 @@ list make_list_of_n(n, c)
      ent = create_named_entity(name);
      ADD_ELEMENT_TO_LIST(l, ENTITY, ent);
     }
+ free(name);
  return(l);
 }
 
@@ -861,6 +864,7 @@ Ppolynome include_trans_in_poly(s, p, l, d)
       ADD_ELEMENT_TO_LIST(lvar, ENTITY, ent);
       count++;
     }
+    free(name);
 
     /* replace all local variables by the transformation */
     lexp = l;
@@ -1261,9 +1265,10 @@ Ppolynome make_polynome_Xe(xc, xe)
  entity     e;
  char       *n;
 
- n = (char*) malloc(10);
- sprintf(n, "X%d", xc);
+ asprintf(&n, "X%d", xc);
  e = create_named_entity(n);
+ free(n);
+
  p = make_polynome((float)1, (Variable)e, 1);
 
  *xe = e;
@@ -2323,8 +2328,7 @@ static Pn_coef extract_stat_lunk(stat, lunk)
  int      len;
  entity   ent;
 
- name = (char*) malloc(20);
- sprintf(name, "%s_%d", "MU", stat);
+ asprintf(&name, "%s_%d", "MU", stat);
  len = strlen(name);
  lv_coef = NULL;
 
@@ -2338,6 +2342,7 @@ static Pn_coef extract_stat_lunk(stat, lunk)
      else   pn = make_n_coef(ent, VECTEUR_NUL);
      lv_coef = add_n_coef_to_list(lv_coef, pn);
     }
+ free(name);
 
  return(lv_coef);
 }
@@ -2413,8 +2418,7 @@ boolean is_mu_stat_in_sc(stat, sc)
  list      lbase;
  boolean   is_here = FALSE;
 
- name = (char*) malloc(20);
- sprintf(name, "%s_%d", "MU", stat);
+ asprintf(&name, "%s_%d", "MU", stat);
  len = strlen(name);
 
  lbase = base_to_list(sc->base);
@@ -2425,6 +2429,7 @@ boolean is_mu_stat_in_sc(stat, sc)
      if (!strncmp(name, entity_local_name(ent), len))
 	is_here = TRUE;
     }
+ free(name);
  return(is_here);
 }
 

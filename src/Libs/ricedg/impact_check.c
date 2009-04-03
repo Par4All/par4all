@@ -284,9 +284,9 @@ static string print_call_path(list path)
     pc = CHAIN_SWORD(pc,"(");
     pc = CHAIN_SWORD(pc,module_local_name(casifunc));
     pc = CHAIN_SWORD(pc,":(");
-    pc = CHAIN_SWORD(pc,int_to_string(ORDERING_NUMBER(casiord)));
+    pc = CHAIN_SWORD(pc,i2a(ORDERING_NUMBER(casiord)));
     pc = CHAIN_SWORD(pc,",");
-    pc = CHAIN_SWORD(pc,int_to_string(ORDERING_STATEMENT(casiord)));
+    pc = CHAIN_SWORD(pc,i2a(ORDERING_STATEMENT(casiord)));
     pc = CHAIN_SWORD(pc,")) ");
   },path);
   return words_to_string(pc);

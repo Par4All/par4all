@@ -273,14 +273,6 @@ static string c_basic_string(basic b)
     return allocated ? result : strdup(result);
 }
 
-    static string
-int_to_string(int i)
-{
-    char buffer[50];
-    sprintf(buffer, "%d", i);
-    return strdup(buffer);
-}
-
 static string c_dim_string(list ldim)
 {
     string result = "";
@@ -305,7 +297,7 @@ static string c_dim_string(list ldim)
                 if (low == 0)
                 {
                     if (expression_integer_value(eup, &up))
-                        result = strdup(concatenate(OPENBRACKET,int_to_string(up+1),CLOSEBRACKET,result,NULL));
+                        result = strdup(concatenate(OPENBRACKET,i2a(up+1),CLOSEBRACKET,result,NULL));
                     else
                         /* to be refined here to make more beautiful expression */
                         result = strdup(concatenate(OPENBRACKET,
@@ -316,11 +308,11 @@ static string c_dim_string(list ldim)
                 else
                 {
                     if (expression_integer_value(eup, &up))
-                        result = strdup(concatenate(OPENBRACKET,int_to_string(up-low+1),CLOSEBRACKET,result,NULL));
+                        result = strdup(concatenate(OPENBRACKET,i2a(up-low+1),CLOSEBRACKET,result,NULL));
                     else
                     {
                         sup = words_to_string(words_expression(eup));
-                        result = strdup(concatenate(OPENBRACKET,sup,"-",int_to_string(low-1),CLOSEBRACKET,result,NULL));
+                        result = strdup(concatenate(OPENBRACKET,sup,"-",i2a(low-1),CLOSEBRACKET,result,NULL));
                         free(sup);
                     }
                 }
@@ -425,7 +417,7 @@ static string this_entity_cdeclaration(entity var)
                     {
                         if (constant_int_p(c))
                         {
-                            string sval = int_to_string(constant_int(c));
+                            string sval = i2a(constant_int(c));
                             string svar = c_entity_local_name(var);
                             result = strdup(concatenate(SHARPDEF, SPACE, svar,
                                         SPACE, sval, NL, NULL));
@@ -480,7 +472,7 @@ static string this_entity_cdeclaration(entity var)
 		  /* It is an expression... */
 		  _int i = (_int) basic_bit(variable_basic(v));
 		  pips_debug(2,"Basic bit %td",i);
-		  result = strdup(concatenate(result,":",int_to_string(i),NULL));
+		  result = strdup(concatenate(result,":",i2a(i),NULL));
 		  user_error("this_entity_cdeclaration",
 			     "Bitfield to be finished...");
                 }

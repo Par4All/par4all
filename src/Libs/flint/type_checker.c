@@ -470,24 +470,25 @@ static void put_summary(string name, type_context_p context)
   {
     entity module = local_name_to_top_level_entity(name);
     code c;
-    char buf[100];
+    char *buf;
 
     pips_assert("entity is a module", entity_module_p(module));
 
     c = value_code(entity_initial(module));
 
-    sprintf(buf, 
+    asprintf( &buf,
 	    "!PIPS TYPER: %d errors, %d conversions, %d simplifications\n",
 	    context->number_of_error,
 	    context->number_of_conversion,
 	    context->number_of_simplication);
 
     if (!code_decls_text(c) || string_undefined_p(code_decls_text(c)))
-      code_decls_text(c) = strdup(buf);
+      code_decls_text(c) = buf;
     else
     {
       string tmp = code_decls_text(c);
       code_decls_text(c) = strdup(concatenate(buf, tmp, NULL));
+      free(buf);
       free(tmp);
     }
   }

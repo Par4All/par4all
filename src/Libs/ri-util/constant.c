@@ -426,10 +426,10 @@ int_expr(i)
 int i;
 {
     /* What should be the length of buffer? */
-    char buffer[20];
-
-    sprintf(buffer, "%d", i);
-    return(MakeIntegerConstantExpression(buffer));
+    char * istr = i2a(i);
+    expression e = MakeIntegerConstantExpression(istr);
+    free(istr);
+    return e;
 }
 
 /* BEGIN_EOLE */ /* - please do not remove this line */
