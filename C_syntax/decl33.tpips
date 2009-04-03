@@ -1,3 +1,6 @@
+# Check that the signature of decl33 is not "damaged" when decl33! is
+# parsed in spite of the old style declaration of decl33
+
 delete decl33
 create decl33 decl33.c
 
