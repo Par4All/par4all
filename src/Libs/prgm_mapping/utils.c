@@ -22,7 +22,7 @@ char vcid_prgm_mapping_utils[] = "$Id$";
 /* Ansi includes 	*/
 #include <stdlib.h>
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
 
 /* Newgen includes 	*/
@@ -188,8 +188,7 @@ int n;
  string num, name;
  entity new_coeff;
 
- num = (string) malloc(32);
- (void) sprintf(num, "%d", n);
+ num=i2a(n);
 
  name = strdup(concatenate(MAPPING_MODULE_NAME, MODULE_SEP_STRING,
                            prefix, num, (char *) NULL));
@@ -218,8 +217,7 @@ int n;
  string num, name;
  entity new_coeff;
 
- num = (string) malloc(32);
- (void) sprintf(num, "%d", n);
+ num=i2a(n);
  name = strdup(concatenate(MAPPING_MODULE_NAME, MODULE_SEP_STRING,
                            prefix, num, (char *) NULL));
  new_coeff = gen_find_tabulated(name, entity_domain);

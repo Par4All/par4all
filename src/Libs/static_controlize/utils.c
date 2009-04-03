@@ -1253,14 +1253,14 @@ int *Gcount_nlc;
 
 	debug( 7, "make_nlc_entity", "doing\n");
 	(*Gcount_nlc)++;
-	num = (char*) malloc(32);
-	(void) sprintf(num, "%d", *Gcount_nlc);
+    num=i2a(*Gcount_nlc);
 
 	mod_ent = get_current_module_entity();
 
 	name = strdup(concatenate(STATIC_CONTROLIZE_MODULE_NAME,
                           entity_local_name(mod_ent),
                           MODULE_SEP_STRING, NLC_PREFIX, num, (char *) NULL));
+    free(num);
 
 	new_ent = make_entity(name,
                       make_type(is_type_variable,
@@ -1296,14 +1296,14 @@ entity make_nsp_entity()
 
 	debug( 7, "make_nsp_entity", "doing\n");
 	Gcount_nsp++;
-	num = (char*) malloc(32);
-	(void) sprintf(num, "%d", Gcount_nsp);
+    num=i2a(Gcount_nsp);
 
 	mod_ent = get_current_module_entity();
 
 	name = strdup(concatenate(STATIC_CONTROLIZE_MODULE_NAME,
                           entity_local_name(mod_ent),
                           MODULE_SEP_STRING, NSP_PREFIX, num, (char *) NULL));
+    free(num);
 
         new_ent = make_entity(name,
                       make_type(is_type_variable,
@@ -1340,8 +1340,7 @@ entity make_nub_entity()
 
 	debug( 7, "make_nub_entity", "doing\n");
 	Gcount_nub++;
-	num = (char*) malloc(32);
-	(void) sprintf(num, "%d", Gcount_nub);
+    num=i2a(Gcount_nub);
 
 	mod_ent = get_current_module_entity();
 

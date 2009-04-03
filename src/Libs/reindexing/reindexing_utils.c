@@ -12,7 +12,7 @@
 /* Ansi includes        */
 #include <stdlib.h>
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
  
 /* Newgen includes      */
@@ -207,8 +207,7 @@ reference my_build_new_ref(kind, n, subscripts, old_r)
   /* we duplicate this list */
   sl = subscripts;
 
-  num = (string) malloc(32);
-  (void) sprintf(num, "%d", n-BASE_NODE_NUMBER);
+  num = atoi(n-BASE_NODE_NUMBER);
   if(kind == IS_TEMP)
     name = strdup(concatenate(SA_MODULE_NAME, MODULE_SEP_STRING,
 			      SAT, num, (char *) NULL));
@@ -1119,6 +1118,7 @@ char    *typ;
   /* f_name = concatenate(RE_MODULE_NAME, MODULE_SEP_STRING, name, NULL); */
   f_name = concatenate(strdup(db_get_current_module_name()),
 		       MODULE_SEP_STRING, name, NULL);
+  free(name);
 
   ent = make_entity(strdup(f_name),
 		    make_type(is_type_variable,

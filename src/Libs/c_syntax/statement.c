@@ -242,7 +242,9 @@ statement MakeGotoStatement(string label)
 
 entity MakeCLabel(string s)
 {
-  entity l = FindOrCreateEntity(get_current_module_name(),strdup(concatenate(LABEL_PREFIX,s,NULL)));
+  string ename = strdup(concatenate(LABEL_PREFIX,s,NULL));
+  entity l = FindOrCreateEntity(get_current_module_name(),ename);
+  free(ename);
   if (entity_type(l) == type_undefined)
     {
       pips_debug(7,"Label %s\n", s);
@@ -261,10 +263,14 @@ statement MakeWhileLoop(list lexp, statement s, bool before)
 {
   statement smt;
   int i = basic_int((basic) stack_head(LoopStack));
-  string lab1 = strdup(concatenate("loop_end_",int_to_string(i),NULL));
+  string lab1;
+  asprintf(&lab1,"%s%d","loop_end_",i);
   statement s1 = FindStatementFromLabel(MakeCLabel(lab1));
-  string lab2 = strdup(concatenate("break_",int_to_string(i),NULL));
+  free(lab1);
+  string lab2;
+  asprintf(&lab2,"%s%d","break_",i);
   statement s2 = FindStatementFromLabel(MakeCLabel(lab2));
+  free(lab2);
 
   if (!statement_undefined_p(s1))
     {
@@ -298,10 +304,14 @@ statement MakeForloop(expression e1, expression e2, expression e3, statement s)
   forloop f;
   statement smt;
   int i = basic_int((basic) stack_head(LoopStack));
-  string lab1 = strdup(concatenate("loop_end_",int_to_string(i),NULL));
+  string lab1;
+  asprintf(&lab1,"%s%d","loop_end_",i);
   statement s1 = FindStatementFromLabel(MakeCLabel(lab1));
-  string lab2 = strdup(concatenate("break_",int_to_string(i),NULL));
+  free(lab1);
+  string lab2;
+  asprintf(&lab2,"%s%d","break_",i);
   statement s2 = FindStatementFromLabel(MakeCLabel(lab2));
+  free(lab2);
 
  if (!statement_undefined_p(s1))
     {
@@ -377,7 +387,8 @@ statement MakeSwitchStatement(statement s)
 
      before s and return the inserted statement.  */
   int i = basic_int((basic) stack_head(LoopStack));
-  string lab = strdup(concatenate("break_",int_to_string(i),NULL));
+  string lab ;
+  asprintf(&lab,"break_%d",i);
   statement smt = statement_undefined;
   statement seq = statement_undefined;
   sequence oseq = (sequence)stack_head(SwitchGotoStack);
@@ -418,6 +429,7 @@ statement MakeSwitchStatement(statement s)
   insert_statement(s,seq,TRUE);
 
   smt = FindStatementFromLabel(MakeCLabel(lab));
+  free(lab);
   if (!statement_undefined_p(smt))
     {
       /* This switch has a break statement which has been transformed to goto 
@@ -444,8 +456,10 @@ statement MakeCaseStatement(expression e)
      where c is retrieved from SwitchControllerStack
            xxx is unique from LoopStack */
   int i = basic_int((basic) stack_head(LoopStack));
-  string lab = strdup(concatenate("switch_",int_to_string(i),
-				  "_case_",words_to_string(words_expression(e)),NULL));
+  string lab ;
+  string estr = words_to_string(words_expression(e));
+  asprintf(&lab,"switch_%d_case_%s",i,estr);
+  free(estr);
   statement s = MakeLabeledStatement(lab,
 				     make_continue_statement(entity_empty_label()),
 				     get_current_C_comment());
@@ -467,7 +481,8 @@ statement MakeDefaultStatement()
        goto switch_xxx_default;
      to the switch header */
   int i = basic_int((basic) stack_head(LoopStack));
-  string lab = strdup(concatenate("switch_",int_to_string(i),"_default",NULL));
+  string lab;
+ asprintf(&lab,"switch_%d_default",i);
   statement s = MakeLabeledStatement(lab,
 				     make_continue_statement(entity_empty_label()),
 				     get_current_C_comment());
@@ -476,6 +491,7 @@ statement MakeDefaultStatement()
      sequence_statements(CurrentSwitchGoto) */
   sequence_statements(CurrentSwitchGoto) = gen_nconc(sequence_statements(CurrentSwitchGoto),
 							       CONS(STATEMENT,MakeGotoStatement(lab),NULL));
+  free(lab);
   return s;
 }
 
@@ -483,8 +499,10 @@ statement MakeBreakStatement(string cmt)
 {
   /* NN : I did not add a boolean variable to distinguish between loop and switch statements :-(*/
   int i = basic_int((basic) stack_head(LoopStack));
-  string lab = strdup(concatenate("break_",int_to_string(i),NULL));
+  string lab;
+  asprintf(&lab,"break_%d",i);
   statement bs = MakeGotoStatement(lab);
+  free(lab);
 
   statement_comments(bs) = cmt;
 
@@ -495,8 +513,10 @@ statement MakeContinueStatement(string cmt)
 {
   /* Unique label with the LoopStack */
   int i = basic_int((basic) stack_head(LoopStack));
-  string lab = strdup(concatenate("loop_end_",int_to_string(i),NULL));
+  string lab;
+  asprintf(&lab,"loop_end_%d",i);
   statement cs = MakeGotoStatement(lab);
+  free(lab);
 
   statement_comments(cs) = cmt;
 

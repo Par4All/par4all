@@ -12,7 +12,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <math.h>
 
 /* #include <values.h> */
@@ -300,7 +300,7 @@ hash_table v_to_lllv;
        local variable declarations should be delayed to that point. */
 
     /* concatenate cannot be used (directly) because of n and s conversions */
-    static char local_variable_name[MAXIMUM_LOCAL_VARIABLE_NAME_SIZE];
+    char *local_variable_name;
     int s;
     list llv = NIL;
     list lllv = NIL;
@@ -312,22 +312,13 @@ hash_table v_to_lllv;
     debug(7,"make_new_local_variables","begin v=%s, number=%d, pd=%d\n",
 	  entity_name(v), number, pd);
 
-    if(strlen(computational_name)+strlen(MODULE_SEP_STRING)
-       +strlen(LOCAL_MEMORY_PREFIX)+strlen(entity_local_name(v))
-       +2*strlen(LOCAL_MEMORY_SEPARATOR)
-       +ceil(log10((double)(number<2?2:number)))
-       +ceil(log10((double)(pd<2?2:pd)))+1
-       > MAXIMUM_LOCAL_VARIABLE_NAME_SIZE)
-	pips_error("make_new_local_variable", 
-		   "local variable name too large for buffer size\n");
-
     for(s=0; s<pd; s++) {
 	entity lv;
 	/* a new btv is necessary for each variable because CONS cannot
 	   be shared under NewGen rules */
 	basic btv = (basic) gen_copy_tree(variable_basic(type_variable(tv)));
 
-	(void) sprintf(local_variable_name,"%s%s%s%s%s%d%s%d",
+	(void) asprintf(&local_variable_name,"%s%s%s%s%s%d%s%d",
 		       computational_name,
 		       MODULE_SEP_STRING,
 		       LOCAL_MEMORY_PREFIX,
@@ -341,7 +332,7 @@ hash_table v_to_lllv;
 	   the storage should be RAM and allocated in the dynamic
 	   area of module_name, and the value is undefined;
 	   the actual dimensions will be updated later */
-	lv = make_entity(strdup(local_variable_name),
+	lv = make_entity(local_variable_name,
 			 MakeTypeVariable(btv, NIL),
 			 storage_undefined,
 			 value_undefined);

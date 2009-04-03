@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "genC.h"
@@ -15,6 +15,7 @@
 
 #include "c_syntax.h"
 #include "syntax.h" /* FI: To dump the symbol table. move in ri-util? */
+#include "text-util.h"
 
 #include "cyacc.h"
 
@@ -679,7 +680,7 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
   /* Is it a formal parameter not yet converted in the function frame? */
   if(entity_undefined_p(ent)) {
     extern string int_to_string(int);
-    string sn = int_to_string(get_current_dummy_parameter_number());
+    string sn = i2a(get_current_dummy_parameter_number());
 
     global_name = (concatenate(DUMMY_PARAMETER_PREFIX,sn,MODULE_SEP_STRING,
 				     prefix,name,NULL));
@@ -896,14 +897,14 @@ entity FindOrCreateCurrentEntity(string name,
 	    extern string int_to_string(int);
 
 	    if(typedef_entity_p(function)) {
-	      string sn = int_to_string((_int) function); // To get a unique identifier for each function typedef
+	      string sn = i2a((_int) function); // To get a unique identifier for each function typedef
 	      ent = find_or_create_entity(concatenate(DUMMY_PARAMETER_PREFIX,sn,
 							     MODULE_SEP_STRING,name,NULL));
 	      free(sn);
 	    }
 	    else if(!type_undefined_p(ft) && type_variable_p(ft)
 		&& basic_pointer_p(variable_basic(type_variable(ft)))) {
-	      string sn = int_to_string((_int) ft); // To get a unique identifier for each function pointerdeclaration, dummy or not
+	      string sn = i2a((_int) ft); // To get a unique identifier for each function pointerdeclaration, dummy or not
 	      set_current_dummy_parameter_number((_int) ft);
 	      ent = find_or_create_entity(concatenate(DUMMY_PARAMETER_PREFIX,sn,
 							     MODULE_SEP_STRING,name,NULL));
@@ -914,7 +915,7 @@ entity FindOrCreateCurrentEntity(string name,
 	      // To get a unique identifier for each function (This
 	      // may not be sufficient as a function can be declared
 	      // any number of times with any parameter names)
-	      string sn = int_to_string((_int) function);
+	      string sn = i2a((_int) function);
 	      set_current_dummy_parameter_number((_int) function);
 	      ent = find_or_create_entity(concatenate(DUMMY_PARAMETER_PREFIX,sn,
 							     MODULE_SEP_STRING,name,NULL));

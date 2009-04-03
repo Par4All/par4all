@@ -6,7 +6,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
 
 /* #include "values.h" */
@@ -177,7 +177,7 @@ int number_of_lower_bounds,number_of_upper_bounds;
     text t;  
     test test1;
      cons * args, * args2, * lex2, * lex3;
-    char str1[64];
+    char *str1;
     Psysteme sctmp=NULL;
     boolean b2 ;
     debug_on("MOVEMENT_DEBUG_LEVEL");
@@ -203,9 +203,10 @@ int number_of_lower_bounds,number_of_upper_bounds;
 	nb_bytes = SizeOfElements(b);
     }
 
-    (void) sprintf(str1,"%d",nb_bytes);
+    str1=i2a(nb_bytes);
     operator_receive = find_operator(module, "RECEIVE",str1);
     operator_send = find_operator(module,"SEND",str1);
+    free(str1);
    
     ofs = local_indices;
 
@@ -387,7 +388,7 @@ Pbase var_id;              /* corresponds to the Pvecteur belonging Prod_id
     cons * args, * args2;
     type tp = entity_type(ent);
     int nb_bytes = 0;
-    char str1[64];
+    char *str1;
     debug_on("MOVEMENT_DEBUG_LEVEL");
     debug(8,"make_datum_movement","begin\n");
  
@@ -397,9 +398,10 @@ Pbase var_id;              /* corresponds to the Pvecteur belonging Prod_id
 	nb_bytes = SizeOfElements(b);
     }
 
-    (void) sprintf(str1,"%d",nb_bytes);
+    str1=i2a(nb_bytes);
     operator_receive = find_operator(module, "RECEIVE",str1);
     operator_send = find_operator(module,"SEND",str1);
+    free(str1);
    
     /* build the list of expressions : 
        Prod_id,ES_A(L,O),1  for bank case and 
@@ -469,7 +471,7 @@ entity var_id;
     int nb_bytes=4;		/* nb_bytes is the number of bytes 
 				   needed for the variable location  */
     basic bas;
-    char str1[64];
+    char *str1;
 
     debug_on("MOVEMENT_DEBUG_LEVEL");
     pips_debug(8, "begin\n");
@@ -482,9 +484,10 @@ entity var_id;
 	bas = variable_basic(var);
 	nb_bytes = SizeOfElements(bas);
     }
-    (void) sprintf(str1,"%d",nb_bytes);
+    str1=i2a(nb_bytes);
     operator_receive = find_operator(module, "RECEIVE",str1);
     operator_send = find_operator(module,"SEND",str1);
+    free(str1);
    
     /* build the  expression :     S    */
     /*    args = CONS(EXPRESSION,int_expr(nb_bytes),NIL);*/
