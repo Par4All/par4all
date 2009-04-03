@@ -20,7 +20,7 @@ $(ARCH)/wpips:
 $(ARCH)/gpips:
 	$(MAKE) $(ARCH)
 	$(LINK) $@ $(GPIPS_LDFLAGS) \
-		$(main.dir)/$(GPIPS_MAIN) -lwpips $(addprefix -l,$(gpips.libs))
+		$(main.dir)/$(GPIPS_MAIN) -lgpips $(addprefix -l,$(gpips.libs))
 
 $(ARCH)/fpips:
 	$(MAKE) $(ARCH)
