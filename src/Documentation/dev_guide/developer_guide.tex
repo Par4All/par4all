@@ -391,6 +391,10 @@ sh> svn commit my-branch-name
   not have expected when you created the branch!) can be committed
   atomically.
 
+  \textbf{CAUTION!}
+  take care to create branches only for the \emph{trunk}. Creating
+  branches for a subdirectory breaks svn bookkeeping.
+
 \item Develop, test, commit within your branch\ldots
 
   \textbf{CAUTION!}
@@ -409,32 +413,42 @@ sh> svn merge http://svn.cri.ensmp.fr/svn/pips/trunk
 # do the merging into the branch working copy
 sh> svn commit
 \end{verbatim}
-}
-With \texttt{svn 1.6} it will be possible to type only:
+  }
+
+  With \texttt{svn 1.6} it will be possible to type only:
   {\small
 \begin{verbatim}
 sh> cd my-branch-name
 sh> svn merge ^/trunk
 sh> svn commit
 \end{verbatim}
-}
+  }
 
-If you change your initial idea, you can always revert back to your
-original version \emph{if it was committed before} with a:
+  If you change your initial idea, you can always revert back to your
+  original version \emph{if it was committed before} with a:
+  {\small
 \begin{verbatim}
 svn revert -R .
 \end{verbatim}
+  }
 
-To know about where you are compared to the trunk, you can try a:
+  To know about where you are compared to the trunk, you can try a:
+  {\small
 \begin{verbatim}
 svn diff http://svn.cri.ensmp.fr/svn/pips/branches/calvin/graph \
    http://svn.cri.ensmp.fr/svn/pips/trunk
 \end{verbatim}
+  }
+
+  \textbf{CAUTION!}
+  Merging must be done at the branch level which must correspond to
+  the \texttt{trunk}. \textbf{DO NOT} merge in a subdirectory as it
+  breaks svn bookkeeping for subsequent merges.
 
 \item When you are done with your developments, they are committed into
   your branch, you want to install them back to the pips trunk.
   You must have write access to the \texttt{trunk} in order to do the commit.
-{\small
+  {\small
 \begin{verbatim}
 sh> cd prod/pips  # cd in your pips trunk copy
 sh> svn mergeinfo \
@@ -446,15 +460,22 @@ sh> svn merge \
   --reintegrate
 sh> svn commit
 \end{verbatim}
-}
+  }
+
+  \textbf{CAUTION!} it is important to merge at the \texttt{trunk}
+  level. If the merging is done on a subdirectory, it breaks svn merge
+  bookkeeping used my the automatic mergings and reintegration because
+  \texttt{svn:mergeinfo} properties are added on these subdirectories:
+  when set, they must be manually removed in order to fix.
+
 \item When your are fully done with your branch, you may remove it.
-{\small
+  {\small
 \begin{verbatim}
 sh> cd pips_dev
 sh> svn remove my-branch-name
 sh> svn commit
 \end{verbatim}
-}
+  }
 \end{enumerate}
 
 
