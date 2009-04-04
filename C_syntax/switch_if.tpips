@@ -1,0 +1,43 @@
+delete switch_if
+create switch_if switch_if.c
+
+activate C_PARSER
+
+#setenv C_SYNTAX_DEBUG_LEVEL 7
+#setproperty  PRETTYPRINT_ALL_LABELS FALSE
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+#setproperty PRETTYPRINT_BLOCKS TRUE
+#setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
+
+setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+
+#display PRINTED_FILE[main%c]
+
+echo
+echo PARSED PRINTED FILE
+echo
+
+display PARSED_PRINTED_FILE[pretty]
+
+echo
+echo PRINTED FILE
+echo
+
+display PRINTED_FILE[pretty]
+
+apply RESTRUCTURE_CONTROL[pretty]
+
+echo
+echo printed file after RESTRUCTURE_CONTROL
+echo
+
+display PRINTED_FILE[pretty]
+
+apply UNSPLIT[%PROGRAM]
+
+close
+delete switch_if
+
+quit

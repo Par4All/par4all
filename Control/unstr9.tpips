@@ -1,0 +1,25 @@
+delete unstr9
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create unstr9 unstr9.f
+
+echo Try more aggressive restructuring:
+setproperty FUSE_CONTROL_NODES_WITH_COMMENTS_OR_LABEL TRUE
+
+echo
+echo Printed file
+echo
+
+display PRINTED_FILE
+
+echo
+echo Printed file after RESTUCTURE_CONTROL
+echo
+
+apply RESTRUCTURE_CONTROL
+display PRINTED_FILE
+
+close
+delete unstr9
+quit

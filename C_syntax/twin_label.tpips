@@ -1,0 +1,31 @@
+delete miam
+
+setenv C_SYNTAX_DEBUG_LEVEL 9
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create miam twin_label.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+# For debugging
+setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
+
+echo
+echo parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[miam]
+
+echo
+echo printed file
+echo
+
+display PRINTED_FILE[miam]
+
+close
+#delete miam
+quit

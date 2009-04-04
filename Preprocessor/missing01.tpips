@@ -1,0 +1,30 @@
+delete missing01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv SHELL /bin/bash
+set PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+setproperty PRETTYPRINT_C_CODE TRUE
+
+create missing01 missing01.c
+
+activate C_PARSER
+# Display result of csplit, including for the compilation unit(s).
+
+# No static functions in validation files using default_tpips?
+
+# The semantics of %ALL has cnaged twice, including or not the
+# compilation unit.  Besides, these files include preprocessor
+# dependent information, which make it unsuitable for validation
+display PRINTED_FILE[%ALL]
+display C_SOURCE_FILE[%ALL]
+display PRINTED_FILE[inC1]
+display PRINTED_FILE[inC1!]
+display C_SOURCE_FILE[inC1]
+display C_SOURCE_FILE[inC1!]
+
+# List all C files, including compilation unitsencies on gcc and/or preprocessor version
+shell ls missing01.database/*/*.c
+
+close
+delete missing01
+quit
