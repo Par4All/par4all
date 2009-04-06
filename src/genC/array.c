@@ -181,6 +181,8 @@ string string_array_join(gen_array_t array, string separator) {
   GEN_ARRAY_MAP(s, {
       if (! first_iteration)
 	join = concatenate(join, separator, NULL);
+      else
+	first_iteration = FALSE;
       join = concatenate(join, (string) s, NULL);
     }, array);
 
